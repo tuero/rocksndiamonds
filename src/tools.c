@@ -529,6 +529,30 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
     DrawLevelFieldCrumbledSand(x, y);
 }
 
+static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
+{
+  if (player->use_murphy_graphic)
+  {
+    /* this works only because currently only one player can be "murphy" ... */
+    static int last_horizontal_dir = MV_LEFT;
+    int graphic = el_act_dir2img(EL_SP_MURPHY, player->GfxAction, move_dir);
+
+    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
+      last_horizontal_dir = move_dir;
+
+    if (graphic == IMG_SP_MURPHY)	/* undefined => use special graphic */
+    {
+      int direction = (player->is_snapping ? move_dir : last_horizontal_dir);
+
+      graphic = el_act_dir2img(EL_SP_MURPHY, player->GfxAction, direction);
+    }
+
+    return graphic;
+  }
+  else
+    return el_act_dir2img(player->element_nr, player->GfxAction, move_dir);
+}
+
 void DrawAllPlayers()
 {
   int i;
@@ -571,6 +595,8 @@ void DrawPlayer(struct PlayerInfo *player)
   int element = Feld[jx][jy], last_element = Feld[last_jx][last_jy];
   int graphic;
   int action = ACTION_DEFAULT;
+  int last_player_graphic = getPlayerGraphic(player, move_dir);
+  int last_player_frame = player->Frame;
   int frame = 0;
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
@@ -672,6 +698,18 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw player himself                                                     */
   /* ----------------------------------------------------------------------- */
 
+#if 1
+
+  graphic = getPlayerGraphic(player, move_dir);
+
+  /* in the case of changed player action or direction, prevent the current
+     animation frame from being restarted for identical animations */
+  if (player->Frame == 0 &&
+      graphic_info[graphic].bitmap == graphic_info[last_player_graphic].bitmap)
+    player->Frame = last_player_frame;
+
+#else
+
   if (player->use_murphy_graphic)
   {
     static int last_horizontal_dir = MV_LEFT;
@@ -690,6 +728,8 @@ void DrawPlayer(struct PlayerInfo *player)
   }
   else
     graphic = el_act_dir2img(player->element_nr, player->GfxAction, move_dir);
+
+#endif
 
   frame = getGraphicAnimationFrame(graphic, player->Frame);
 

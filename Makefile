@@ -108,6 +108,9 @@ valgrind:
 enginetest:
 	./Scripts/make_enginetest.sh
 
+enginetestcustom:
+	./Scripts/make_enginetest.sh custom
+
 enginetestfast:
 	./Scripts/make_enginetest.sh fast
 

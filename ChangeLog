@@ -1,3 +1,7 @@
+2003-11-09
+	* fixed reset of player animation frame when, for example,
+	  walking, digging or collecting share the same animation
+
 2003-11-08
 	* fixed tape recording when player is created from CE element change
 

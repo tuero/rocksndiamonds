@@ -4657,7 +4657,9 @@ void ContinueMoving(int x, int y)
   {
     TestIfBadThingTouchesHero(newx, newy);
     TestIfBadThingTouchesFriend(newx, newy);
-    TestIfBadThingTouchesOtherBadThing(newx, newy);
+
+    if (!IS_CUSTOM_ELEMENT(element))
+      TestIfBadThingTouchesOtherBadThing(newx, newy);
   }
   else if (element == EL_PENGUIN)
     TestIfFriendTouchesBadThing(newx, newy);
