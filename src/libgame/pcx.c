@@ -167,12 +167,11 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
 
 	  for (j = 7; j >= 0; j--)
 	  {
-	    byte bit;
+	    byte bit = (value >> j) & 1;
 
 	    if (i * 8 + j >= width)	/* skip padding bits */
 	      continue;
 
-	    bit = (value >> j) & 1;
 	    bitmap_ptr[x++] |= bit << plane;
 	  }
 	}
