@@ -3440,6 +3440,7 @@ static void DrawPropertiesConfig()
       MapCheckbuttonGadget(i);
     }
 
+#if 1
     /* draw selectbox gadget */
     i = ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE;
     x = selectbox_info[i].x + xoffset_right2;
@@ -3451,6 +3452,7 @@ static void DrawPropertiesConfig()
     ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
 		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
     MapSelectboxGadget(i);
+#endif
   }
 }
 
@@ -3746,6 +3748,7 @@ static void DrawPropertiesInfo()
     if (HAS_PROPERTY(properties_element, properties[i].value))
       num_standard_properties++;
 
+#if 1
   if (num_standard_properties > 0)
   {
     DrawTextF(pad_x, pad_y + screen_line * font2_height, font1_nr,
@@ -3764,6 +3767,7 @@ static void DrawPropertiesInfo()
 
     screen_line++;
   }
+#endif
 
   PrintInfoText("Description:", FONT_TEXT_1, screen_line);
   if (PrintElementDescriptionFromFile(filename, screen_line + 1) == 0)
