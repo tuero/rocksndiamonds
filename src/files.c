@@ -3066,16 +3066,232 @@ void print_unknown_token_end(int token_nr)
     Error(ERR_RETURN_LINE, "-");
 }
 
+#if 1
+
 void LoadHelpAnimInfo()
 {
   char *filename = getHelpAnimFilename();
-  SetupFileList *setup_file_list, *list;
+  SetupFileList *setup_file_list = NULL, *list;
   SetupFileHash *element_hash, *action_hash, *direction_hash;
   int num_list_entries = 0;
   int num_unknown_tokens = 0;
   int i;
 
-  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+  if (fileExists(filename))
+    setup_file_list = loadSetupFileList(filename);
+
+  if (setup_file_list == NULL)
+  {
+    /* use reliable default values from static configuration */
+    SetupFileList *insert_ptr;
+
+    insert_ptr = setup_file_list =
+      newSetupFileList(helpanim_config[0].token,
+		       helpanim_config[0].value);
+
+    for (i = 1; helpanim_config[i].token; i++)
+      insert_ptr = addListEntry(insert_ptr,
+				helpanim_config[i].token,
+				helpanim_config[i].value);
+  }
+
+  element_hash   = newSetupFileHash();
+  action_hash    = newSetupFileHash();
+  direction_hash = newSetupFileHash();
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    setHashEntry(element_hash, element_info[i].token_name, itoa(i));
+
+  for (i = 0; i < NUM_ACTIONS; i++)
+    setHashEntry(action_hash, element_action_info[i].suffix,
+		 itoa(element_action_info[i].value));
+
+  /* do not store direction index (bit) here, but direction value! */
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+    setHashEntry(direction_hash, element_direction_info[i].suffix,
+		 itoa(1 << element_direction_info[i].value));
+
+  for (list = setup_file_list; list != NULL; list = list->next)
+  {
+    char *element_token, *action_token, *direction_token;
+    char *element_value, *action_value, *direction_value;
+    int delay = atoi(list->value);
+
+    if (strcmp(list->token, "end") == 0)
+    {
+      add_helpanim_entry(HELPANIM_LIST_NEXT, -1, -1, -1, &num_list_entries);
+
+      continue;
+    }
+
+    /* first try to break element into element/action/direction parts;
+       if this does not work, also accept combined "element[.act][.dir]"
+       elements (like "dynamite.active"), which are unique elements */
+
+    if (strchr(list->token, '.') == NULL)	/* token contains no '.' */
+    {
+      element_value = getHashEntry(element_hash, list->token);
+      if (element_value != NULL)	/* element found */
+	add_helpanim_entry(atoi(element_value), -1, -1, delay,
+			   &num_list_entries);
+      else
+      {
+	/* no further suffixes found -- this is not an element */
+	print_unknown_token(filename, list->token, num_unknown_tokens++);
+      }
+
+      continue;
+    }
+
+    /* token has format "<prefix>.<something>" */
+
+    action_token = strchr(list->token, '.');	/* suffix may be action ... */
+    direction_token = action_token;		/* ... or direction */
+
+    element_token = getStringCopy(list->token);
+    *strchr(element_token, '.') = '\0';
+
+    element_value = getHashEntry(element_hash, element_token);
+
+    if (element_value == NULL)		/* this is no element */
+    {
+      element_value = getHashEntry(element_hash, list->token);
+      if (element_value != NULL)	/* combined element found */
+	add_helpanim_entry(atoi(element_value), -1, -1, delay,
+			   &num_list_entries);
+      else
+	print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+      free(element_token);
+
+      continue;
+    }
+
+    action_value = getHashEntry(action_hash, action_token);
+
+    if (action_value != NULL)		/* action found */
+    {
+      add_helpanim_entry(atoi(element_value), atoi(action_value), -1, delay,
+		    &num_list_entries);
+
+      free(element_token);
+
+      continue;
+    }
+
+    direction_value = getHashEntry(direction_hash, direction_token);
+
+    if (direction_value != NULL)	/* direction found */
+    {
+      add_helpanim_entry(atoi(element_value), -1, atoi(direction_value), delay,
+			 &num_list_entries);
+
+      free(element_token);
+
+      continue;
+    }
+
+    if (strchr(action_token + 1, '.') == NULL)
+    {
+      /* no further suffixes found -- this is not an action nor direction */
+
+      element_value = getHashEntry(element_hash, list->token);
+      if (element_value != NULL)	/* combined element found */
+	add_helpanim_entry(atoi(element_value), -1, -1, delay,
+			   &num_list_entries);
+      else
+	print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+      free(element_token);
+
+      continue;
+    }
+
+    /* token has format "<prefix>.<suffix>.<something>" */
+
+    direction_token = strchr(action_token + 1, '.');
+
+    action_token = getStringCopy(action_token);
+    *strchr(action_token + 1, '.') = '\0';
+
+    action_value = getHashEntry(action_hash, action_token);
+
+    if (action_value == NULL)		/* this is no action */
+    {
+      element_value = getHashEntry(element_hash, list->token);
+      if (element_value != NULL)	/* combined element found */
+	add_helpanim_entry(atoi(element_value), -1, -1, delay,
+			   &num_list_entries);
+      else
+	print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+      free(element_token);
+      free(action_token);
+
+      continue;
+    }
+
+    direction_value = getHashEntry(direction_hash, direction_token);
+
+    if (direction_value != NULL)	/* direction found */
+    {
+      add_helpanim_entry(atoi(element_value), atoi(action_value),
+			 atoi(direction_value), delay, &num_list_entries);
+
+      free(element_token);
+      free(action_token);
+
+      continue;
+    }
+
+    /* this is no direction */
+
+    element_value = getHashEntry(element_hash, list->token);
+    if (element_value != NULL)		/* combined element found */
+      add_helpanim_entry(atoi(element_value), -1, -1, delay,
+			 &num_list_entries);
+    else
+      print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+    free(element_token);
+    free(action_token);
+  }
+
+  print_unknown_token_end(num_unknown_tokens);
+
+  add_helpanim_entry(HELPANIM_LIST_END, -1, -1, -1, &num_list_entries);
+
+  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(element_hash);
+  freeSetupFileHash(action_hash);
+  freeSetupFileHash(direction_hash);
+
+#if 0
+  /* TEST ONLY */
+  for (i = 0; i < num_list_entries; i++)
+    printf("::: %d, %d, %d => %d\n",
+	   helpanim_info[i].element,
+	   helpanim_info[i].action,
+	   helpanim_info[i].direction,
+	   helpanim_info[i].delay);
+#endif
+}
+
+#else
+
+void LoadHelpAnimInfo()
+{
+  char *filename = getHelpAnimFilename();
+  SetupFileList *setup_file_list = NULL, *list;
+  SetupFileHash *element_hash, *action_hash, *direction_hash;
+  int num_list_entries = 0;
+  int num_unknown_tokens = 0;
+  int i;
+
+  if (fileExists(filename))
+    setup_file_list = loadSetupFileList(filename);
+
+  if (setup_file_list == NULL)
   {
     /* use reliable default values from static configuration */
     SetupFileList *insert_ptr;
@@ -3241,6 +3457,7 @@ void LoadHelpAnimInfo()
 	   helpanim_info[i].delay);
 #endif
 }
+#endif
 
 void LoadHelpTextInfo()
 {
@@ -3248,9 +3465,15 @@ void LoadHelpTextInfo()
   int i;
 
   if (helptext_info != NULL)
+  {
     freeSetupFileHash(helptext_info);
+    helptext_info = NULL;
+  }
 
-  if ((helptext_info = loadSetupFileHash(filename)) == NULL)
+  if (fileExists(filename))
+    helptext_info = loadSetupFileHash(filename);
+
+  if (helptext_info == NULL)
   {
     /* use reliable default values from static configuration */
     helptext_info = newSetupFileHash();

@@ -811,6 +811,57 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
   FrameCounter++;
 }
 
+#if 1
+
+static char *getHelpText(int element, int action, int direction)
+{
+  char token[MAX_LINE_LEN];
+
+  strcpy(token, element_info[element].token_name);
+
+  if (action != -1)
+    strcat(token, element_action_info[action].suffix);
+
+  if (direction != -1)
+    strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
+
+  return getHashEntry(helptext_info, token);
+}
+
+void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
+{
+  int font_nr = FONT_TEXT_2;
+  int max_chars_per_line = 34;
+  int max_lines_per_text = 2;    
+  int sx = mSX + 56;
+  int sy = mSY + 65 + 2 * 32 + 1;
+  int ystep = TILEY + 4;
+  char *text = NULL;
+
+  if (action != -1 && direction != -1)		/* element.action.direction */
+    text = getHelpText(element, action, direction);
+
+  if (text == NULL && action != -1)		/* element.action */
+    text = getHelpText(element, action, -1);
+
+  if (text == NULL && direction != -1)		/* element.direction */
+    text = getHelpText(element, -1, direction);
+
+  if (text == NULL)				/* base element */
+    text = getHelpText(element, -1, -1);
+
+  if (text == NULL)				/* not found */
+    text = "No description available";
+
+  if (strlen(text) <= max_chars_per_line)	/* only one line of text */
+    sy += getFontHeight(font_nr) / 2;
+
+  DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
+		  max_chars_per_line, max_lines_per_text);
+}
+
+#else
+
 void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
   int font_nr = FONT_TEXT_2;
@@ -849,6 +900,7 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
   DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
 		  max_chars_per_line, max_lines_per_text);
 }
+#endif
 
 void DrawInfoScreen_Elements()
 {

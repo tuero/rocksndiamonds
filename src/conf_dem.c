@@ -362,7 +362,7 @@ struct ConfigInfo helpanim_config[] =
 struct ConfigInfo helptext_config[] =
 {
   {
-    "player_1.moving.down",
+    "player_1",
     "THE HERO: (Is _this_ guy good old Rockford?)"
   },
   {
@@ -386,7 +386,7 @@ struct ConfigInfo helptext_config[] =
     "Normal Wall: You can't go through it, but you can bomb it away"
   },
   {
-    "expandable_wall.growing.left",
+    "expandable_wall",
     "Growing Wall: Grows in several directions if there is an empty field"
   },
   {
@@ -470,7 +470,7 @@ struct ConfigInfo helptext_config[] =
     "Dynamite: This one explodes after a few seconds"
   },
   {
-    "dynabomb.active",
+    "dynabomb",
     "Dyna Bomb: Explodes in 4 directions with variable explosion size"
   },
   {
@@ -486,11 +486,11 @@ struct ConfigInfo helptext_config[] =
     "Dyna Bomb: Increases the power of explosion of dyna bombs"
   },
   {
-    "spaceship.right",
+    "spaceship",
     "Spaceship: Moves at the left side of walls; don't touch it!"
   },
   {
-    "bug.right",
+    "bug",
     "Bug: Moves at the right side of walls; don't touch it!"
   },
   {
@@ -502,7 +502,7 @@ struct ConfigInfo helptext_config[] =
     "Firefly: Moves at the left side of walls; don't touch it!"
   },
   {
-    "pacman.right",
+    "pacman",
     "Pacman: Eats the amoeba and you, if you're not careful"
   },
   {
@@ -518,19 +518,19 @@ struct ConfigInfo helptext_config[] =
     "Robot: Tries to kill the player"
   },
   {
-    "mole.moving.right",
+    "mole",
     "The mole: Eats the amoeba and turns empty space into normal sand"
   },
   {
-    "penguin.moving.right",
+    "penguin",
     "The penguin: Guide him to the exit, but keep him away from monsters!"
   },
   {
-    "pig.moving.right",
+    "pig",
     "The Pig: Harmless, but eats all gems it can get"
   },
   {
-    "dragon.moving.right",
+    "dragon",
     "The Dragon: Breathes fire, especially to some monsters"
   },
   {
@@ -578,11 +578,11 @@ struct ConfigInfo helptext_config[] =
     "Biomaze: A bit like the 'Game Of Life', but builds crazy mazes"
   },
   {
-    "magic_wall.active",
+    "magic_wall",
     "Magic Wall: Changes rocks, emeralds and diamonds when they pass it"
   },
   {
-    "bd_magic_wall.active",
+    "bd_magic_wall",
     "Magic Wall (BD style): Changes rocks and BD style diamonds"
   },
   {
