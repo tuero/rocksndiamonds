@@ -11,7 +11,7 @@
 *  pcx.c                                                   *
 ***********************************************************/
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 
 #include "pcx.h"
 #include "image.h"
@@ -262,4 +262,4 @@ Image *Read_PCX_to_Image(char *filename)
   return image;
 }
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */

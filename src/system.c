@@ -17,7 +17,7 @@
 
 inline void InitEventFilter(EventFilter filter_function)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   /* set event filter to filter out certain events */
   SDL_SetEventFilter(filter_function);
 #endif
@@ -25,7 +25,7 @@ inline void InitEventFilter(EventFilter filter_function)
 
 inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDLInitBufferedDisplay(backbuffer, window);
 #else
   X11InitBufferedDisplay(backbuffer, window);
@@ -34,7 +34,7 @@ inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 
 inline int GetDisplayDepth(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   return SDL_GetVideoSurface()->format->BitsPerPixel;
 #else
   return XDefaultDepth(display, screen);
@@ -45,7 +45,7 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
 {
   int real_depth = (depth == DEFAULT_DEPTH ? GetDisplayDepth() : depth);
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_Surface *surface_tmp, *surface_native;
 
   if ((surface_tmp = SDL_CreateRGBSurface(SURFACE_FLAGS, width, height,
@@ -71,7 +71,7 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
 
 inline void FreeBitmap(Bitmap bitmap)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_FreeSurface(bitmap);
 #else
   XFreePixmap(display, bitmap);
@@ -80,7 +80,7 @@ inline void FreeBitmap(Bitmap bitmap)
 
 inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
 #else
   XFillRectangle(display, bitmap, gc, x, y, width, height);
@@ -92,7 +92,7 @@ inline void BlitBitmap(Bitmap src_bitmap, Bitmap dst_bitmap,
 		       int width, int height,
 		       int dst_x, int dst_y)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y);
 #else
@@ -101,13 +101,13 @@ inline void BlitBitmap(Bitmap src_bitmap, Bitmap dst_bitmap,
 #endif
 }
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 static GC last_clip_gc = 0;	/* needed for XCopyArea() through clip mask */
 #endif
 
 inline void SetClipMask(GC clip_gc, Pixmap clip_pixmap)
 {
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   XSetClipMask(display, clip_gc, clip_pixmap);
   last_clip_gc = clip_gc;
 #endif
@@ -115,7 +115,7 @@ inline void SetClipMask(GC clip_gc, Pixmap clip_pixmap)
 
 inline void SetClipOrigin(GC clip_gc, int clip_x, int clip_y)
 {
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   XSetClipOrigin(display, clip_gc, clip_x, clip_y);
   last_clip_gc = clip_gc;
 #endif
@@ -126,7 +126,7 @@ inline void BlitBitmapMasked(Bitmap src_bitmap, Bitmap dst_bitmap,
 			     int width, int height,
 			     int dst_x, int dst_y)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y);
 #else
@@ -138,7 +138,7 @@ inline void BlitBitmapMasked(Bitmap src_bitmap, Bitmap dst_bitmap,
 inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, 0xffffff);
 #else
   XSetForeground(display, gc, WhitePixel(display, screen));
@@ -150,7 +150,7 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 /* execute all pending screen drawing operations */
 inline void FlushDisplay(void)
 {
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   XFlush(display);
 #endif
 }
@@ -158,14 +158,14 @@ inline void FlushDisplay(void)
 /* execute and wait for all pending screen drawing operations */
 inline void SyncDisplay(void)
 {
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   XSync(display, FALSE);
 #endif
 }
 
 inline void KeyboardAutoRepeatOn(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
 		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
   SDL_EnableUNICODE(1);
@@ -176,7 +176,7 @@ inline void KeyboardAutoRepeatOn(void)
 
 inline void KeyboardAutoRepeatOff(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
   SDL_EnableUNICODE(0);
 #else
@@ -186,7 +186,7 @@ inline void KeyboardAutoRepeatOff(void)
 
 inline boolean PointerInWindow(DrawWindow window)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   return TRUE;
 #else
   DrawWindow root, child;
@@ -203,7 +203,7 @@ inline boolean PointerInWindow(DrawWindow window)
 
 inline boolean PendingEvent(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);
 #else
   return (XPending(display) ? TRUE : FALSE);
@@ -212,7 +212,7 @@ inline boolean PendingEvent(void)
 
 inline void NextEvent(Event *event)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_WaitEvent(event);
 #else
   XNextEvent(display, event);
@@ -221,7 +221,7 @@ inline void NextEvent(Event *event)
 
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 #if 0
   printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
 	 (int)event->keysym.unicode,
@@ -249,7 +249,7 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 
 inline boolean SetVideoMode(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   return SDLSetVideoMode(&backbuffer);
 #else
   boolean success = TRUE;
@@ -270,16 +270,25 @@ inline boolean SetVideoMode(void)
 
 inline void ChangeVideoModeIfNeeded(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
       (!setup.fullscreen && fullscreen_enabled))
     SetVideoMode();
 #endif
 }
 
+inline boolean InitAudio(void)
+{
+#ifdef TARGET_SDL
+  return SDLInitAudio();
+#else
+  return TRUE;
+#endif
+}
+
 inline void dummy(void)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 #else
 #endif
 }

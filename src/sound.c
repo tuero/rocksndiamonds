@@ -69,6 +69,32 @@ int OpenAudio(char *audio_device_name)
   return audio_fd;
 }
 
+int CheckAudio(char *audio_device_name)
+{
+  int audio_fd;
+
+  if (access(audio_device_name, W_OK) != 0)
+  {
+    Error(ERR_WARN, "cannot access audio device - no sound");
+    return SOUND_OFF;
+  }
+
+  if ((audio_fd = OpenAudio(sound_device_name)) < 0)
+  {
+    Error(ERR_WARN, "cannot open audio device - no sound");
+    return SOUND_OFF;
+  }
+
+  close(audio_fd);
+
+  return SOUND_AVAILABLE;
+}
+
+boolean UnixInitAudio(void)
+{
+  return TRUE;
+}
+
 void SoundServer()
 {
   int i;
@@ -741,7 +767,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 {
   char filename[256];
   char *sound_ext = "wav";
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 #ifndef MSDOS
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
@@ -755,7 +781,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 	  options.ro_base_directory, SOUNDS_DIRECTORY,
 	  snd_info->name, sound_ext);
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
   snd_info->mix_chunk = Mix_LoadWAV(filename);
   if (snd_info->mix_chunk == NULL)
@@ -764,7 +790,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
     return FALSE;
   }
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 
 #ifndef MSDOS
 
@@ -832,7 +858,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
   }
 
 #endif /* MSDOS */
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 
   return TRUE;
 }
@@ -877,7 +903,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   snd_ctrl.data_ptr	= Sound[nr].data_ptr;
   snd_ctrl.data_len	= Sound[nr].data_len;
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
   Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
   Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
@@ -936,7 +962,7 @@ void StopSoundExt(int nr, int method)
     snd_ctrl.stop_sound = TRUE;
   }
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
   if (SSND_FADING(method))
   {

@@ -1,11 +1,11 @@
 #=============================================================================#
-# Makefile for Rocks'n'Diamonds 1.4.0                                         #
-# (c) 1995-1999 Holger Schemel, aeglos@valinor.owl.de                         #
+# Makefile for Rocks'n'Diamonds                                               #
+# (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 ifndef PLATFORM			# platform not specified -- try auto detection
 ifdef COMSPEC
-PLATFORM = dos
+PLATFORM = msdos
 else
 PLATFORM = unix
 endif
@@ -19,22 +19,24 @@ X11_LIBS = -L$(XLIB_PATH)
 endif
 
 
-ifeq ($(PLATFORM),dos)		# DOS / Windows
+ifeq ($(PLATFORM),msdos)	# MS-DOS native compiling
 
 RM = del
 PROGNAME = ../rocks.exe
-LIBS = -s -lm -lalleg
 
-else				# Unix
+SYS_CFLAGS = -DTARGET_X11
+SYS_LDFLAGS = -s -lalleg -lm
+
+else				# Unix; Win32 cross-compiling
 
 RM = rm -f
 PROGNAME = ../rocksndiamonds
 
 ifeq ($(PLATFORM),solaris)
-EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
+EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
-ifeq ($(PLATFORM),windows)
+ifeq ($(PLATFORM),win32)
 PROGNAME = ../rocksndiamonds.exe
 TARGET = sdl
 else
@@ -42,35 +44,14 @@ PROFILING = -pg
 endif
 
 ifeq ($(TARGET),sdl)
-USE_SDL = true
+SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
+SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs) -lm
 else
-USE_SDL = false
+SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
+SYS_LDFLAGS = $(X11_LIBS) -lX11 -lm
 endif
 
-ifeq ($(USE_SDL_OLD_LIBS),true)
-SDL_EXTRA_LIBS = -lIMG -lmixer
-else
-SDL_EXTRA_LIBS = -lSDL_image -lSDL_mixer
-endif
-
-SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)
-SDL_LDFLAGS := $(SDL_EXTRA_LIBS) $(shell sdl-config --libs)
-
-X11_CFLAGS = -DUSE_X11_LIBRARY $(X11_INCL)
-X11_LDFLAGS = $(X11_LIBS) -lX11
-
-ifeq ($(USE_SDL),true)
-SYS_CFLAGS  = $(SDL_CFLAGS)
-SYS_LDFLAGS = $(SDL_LDFLAGS)
-else
-SYS_CFLAGS  = $(X11_CFLAGS)
-SYS_LDFLAGS = $(X11_LDFLAGS)
-endif
-
-INCL = $(SYS_CFLAGS)
-LIBS = $(SYS_LDFLAGS) $(EXTRA_LIBS) -lm
-
-endif				# (PLATFORM != dos)
+endif				# (PLATFORM != msdos)
 
 
 ifdef RO_GAME_DIR		# path to read-only game data specified
@@ -98,9 +79,8 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
 
-# SYSTEM = -DSYSV -Ae				# may be needed for HP-UX
-
-CFLAGS = $(OPTIONS) $(SYSTEM) $(SYS_CFLAGS) $(CONFIG)
+CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
+LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS)
 
 SRCS =	main.c		\
 	init.c		\
@@ -153,7 +133,7 @@ OBJS =	main.o		\
 all:	$(PROGNAME)
 
 $(PROGNAME):	$(OBJS)
-	$(CC) $(PROFILING) $(OBJS) $(LIBS) -o $(PROGNAME)
+	$(CC) $(PROFILING) $(OBJS) $(LDFLAGS) -o $(PROGNAME)
 
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c

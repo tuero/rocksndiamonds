@@ -45,7 +45,7 @@ END_OF_FUNCTION(increment_counter);
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
 static unsigned long mainCounter(int mode)
 {
@@ -64,7 +64,7 @@ static unsigned long mainCounter(int mode)
   return counter_ms;		/* return milliseconds since last init */
 }
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 #ifndef MSDOS
 
 static unsigned long mainCounter(int mode)
@@ -86,7 +86,7 @@ static unsigned long mainCounter(int mode)
 }
 
 #endif /* !MSDOS */
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 
 void InitCounter()		/* set counter back to zero */
 {
@@ -133,9 +133,9 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   }
   else
   {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
     SDL_Delay(milliseconds_delay);
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
     struct timeval delay;
 
     delay.tv_sec  = milliseconds_delay / 1000;
@@ -143,7 +143,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
 
     if (select(0, NULL, NULL, NULL, &delay) != 0)
       Error(ERR_WARN, "sleep_milliseconds(): select() failed");
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
   }
 }
 
@@ -228,7 +228,7 @@ char *int2str(int number, int size)
 
 unsigned int SimpleRND(unsigned int max)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
   static unsigned long root = 654321;
   unsigned long current_ms;
@@ -237,7 +237,7 @@ unsigned int SimpleRND(unsigned int max)
   root = root * 4253261 + current_ms;
   return (root % max);
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 
   static unsigned long root = 654321;
   struct timeval current_time;
@@ -246,7 +246,7 @@ unsigned int SimpleRND(unsigned int max)
   root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
   return (root % max);
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 #ifdef DEBUG
@@ -269,7 +269,7 @@ unsigned int RND(unsigned int max)
 
 unsigned int InitRND(long seed)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   unsigned long current_ms;
 
   if (seed == NEW_RANDOMIZE)
@@ -283,7 +283,7 @@ unsigned int InitRND(long seed)
     srandom_linux_libc((unsigned int) seed);
     return (unsigned int) seed;
   }
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
   struct timeval current_time;
 
   if (seed == NEW_RANDOMIZE)
@@ -297,7 +297,7 @@ unsigned int InitRND(long seed)
     srandom_linux_libc((unsigned int) seed);
     return (unsigned int) seed;
   }
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 char *getLoginName()

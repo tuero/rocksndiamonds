@@ -35,7 +35,7 @@ struct PictureFileInfo
   boolean picture_with_mask;
 };
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 static int sound_process_id = 0;
 #endif
 
@@ -149,66 +149,31 @@ void InitSound()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifdef USE_SDL_LIBRARY
-  /* initialize SDL audio */
-
-  if (SDL_Init(SDL_INIT_AUDIO) < 0)
+#ifdef TARGET_SDL
+  if (InitAudio())
   {
-    Error(ERR_WARN, "SDL_Init() failed: %s", SDL_GetError());
-    sound_status = SOUND_OFF;
-    return;
+    sound_status = SOUND_AVAILABLE;
+    sound_loops_allowed = TRUE;
   }
-
-  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 512) < 0)
+  else
   {
-    Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
     sound_status = SOUND_OFF;
-    return;
   }
-
-  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
-  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
-
-  sound_status = SOUND_AVAILABLE;
-  sound_loops_allowed = TRUE;
-
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 
 #if !defined(MSDOS) && !defined(WIN32)
-  if (access(sound_device_name, W_OK) != 0)
-  {
-    Error(ERR_WARN, "cannot access sound device - no sounds");
-    sound_status = SOUND_OFF;
+  if ((sound_status = CheckAudio(sound_device_name)) == SOUND_OFF)
     return;
-  }
-
-  if ((sound_device = OpenAudio(sound_device_name)) < 0)
-  {
-    Error(ERR_WARN, "cannot open sound device - no sounds");
-    sound_status = SOUND_OFF;
-    return;
-  }
-
-  close(sound_device);
-  sound_status = SOUND_AVAILABLE;
 
 #ifdef VOXWARE
   sound_loops_allowed = TRUE;
-
-  /*
-  setup.sound_loops_on = TRUE;
-  */
-
 #endif
+
 #else /* MSDOS || WIN32 */
   sound_loops_allowed = TRUE;
 
-  /*
-  setup.sound_loops_on = TRUE;
-  */
-
 #endif /* MSDOS || WIN32 */
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
@@ -221,11 +186,6 @@ void InitSound()
       return;
     }
   }
-
-#if 0
-  sound_status = SOUND_OFF;
-#endif
-
 }
 
 void InitSoundServer()
@@ -233,7 +193,7 @@ void InitSoundServer()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 
 #if !defined(MSDOS) && !defined(WIN32)
 
@@ -267,7 +227,7 @@ void InitSoundServer()
 
 #endif /* MSDOS */
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 void InitJoysticks()
@@ -379,14 +339,14 @@ void InitJoysticks()
   }
 #endif
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 void InitGfx()
 {
   int i, j;
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_Surface *sdl_image_tmp;
 #else
   GC copy_clipmask_gc;
@@ -496,7 +456,7 @@ void InitGfx()
 
   /* create additional image buffers for masking of graphics */
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
   /* initialize surface array to 'NULL' */
   for(i=0; i<NUM_TILES; i++)
@@ -534,7 +494,7 @@ void InitGfx()
     }
   }
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
@@ -583,7 +543,7 @@ void InitGfx()
     }
   }
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 void InitGfxBackground()
@@ -610,11 +570,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char basefilename[256];
   char filename[256];
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SDL_Surface *sdl_image_tmp;
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
   int pcx_err;
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
   char *picture_ext = ".pcx";
 
   /* Grafik laden */
@@ -629,7 +589,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     rest(100);
 #endif /* MSDOS */
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
     /* load image to temporary surface */
     if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
       Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
@@ -647,7 +607,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     /* free temporary surface */
     SDL_FreeSurface(sdl_image_tmp);
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !TARGET_SDL */
 
     pcx_err = Read_PCX_to_Pixmap(display, window, gc, filename,
 				 &pix[pos], &clipmask[pos]);
@@ -676,14 +636,14 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
        use pix_masked[], although they are the same when not using SDL */
     pix_masked[pos] = pix[pos];
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
   }
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   /* zugehörige Maske laden (wenn vorhanden) */
   if (pic->picture_with_mask && !clipmask[pos])
     Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !TARGET_SDL */
 }
 
 void InitGadgets()
@@ -1847,7 +1807,7 @@ void CloseAllAndExit(int exit_value)
 {
   int i;
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   StopSounds();
   FreeSounds(NUM_SOUNDS);
 #else
@@ -1864,7 +1824,7 @@ void CloseAllAndExit(int exit_value)
     if (pix[i])
       FreeBitmap(pix[i]);
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
     FreeBitmap(pix_masked[i]);
 #else
     if (clipmask[i])
@@ -1874,7 +1834,7 @@ void CloseAllAndExit(int exit_value)
 #endif
   }
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   KeyboardAutoRepeatOn();
 #else
   if (gc)

@@ -206,7 +206,7 @@ void SleepWhileUnmapped()
 
 void HandleExposeEvent(ExposeEvent *event)
 {
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
 
@@ -326,7 +326,7 @@ void HandleFocusEvent(FocusChangeEvent *event)
 
 void HandleClientMessageEvent(ClientMessageEvent *event)
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   CloseAllAndExit(0);	/* the only possible message here is SDL_QUIT */
 #else
 #ifndef MSDOS

@@ -310,4 +310,6 @@ inline void SDLCopyArea(SDL_Surface *, SDL_Surface *,
 inline void SDLFillRectangle(SDL_Surface *, int, int, int, int, unsigned int);
 inline void SDLDrawSimpleLine(SDL_Surface *, int, int, int, int, unsigned int);
 
+inline boolean SDLInitAudio(void);
+
 #endif /* SDL_H */

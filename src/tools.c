@@ -927,7 +927,7 @@ void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
   else
   {
 #if DEBUG
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
     printf("DrawGraphicThruMask(): tile '%d' needs clipping!\n", tile);
 #endif
 #endif
@@ -1110,7 +1110,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
     else
     {
 #if DEBUG
-#ifndef	USE_SDL_LIBRARY
+#ifndef	TARGET_SDL
       printf("DrawGraphicShifted(): tile '%d' needs clipping!\n", tile);
 #endif
 #endif
@@ -2249,7 +2249,7 @@ void UndrawSpecialEditorDoor()
   redraw_mask |= REDRAW_ALL;
 }
 
-#ifndef	USE_SDL_LIBRARY
+#ifndef	TARGET_SDL
 int ReadPixel(DrawBuffer d, int x, int y)
 {
   XImage *pixel_image;

@@ -1,6 +1,6 @@
 #=============================================================================#
-# Makefile for Rocks'n'Diamonds 1.4.0                                         #
-# (c) 1995-1999 Holger Schemel, aeglos@valinor.owl.de                         #
+# Makefile for Rocks'n'Diamonds                                               #
+# (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 #-----------------------------------------------------------------------------#
@@ -9,13 +9,6 @@
 
 # specify your favorite ANSI C compiler
 CC = gcc
-
-# explicitely choose your platform, if defaults doesn't work right
-# needed for SUN/Solaris; Linux and DOS work fine with auto detection
-# PLATFORM = solaris
-# PLATFORM = unix
-# PLATFORM = dos
-# PLATFORM = windows
 
 # specify path to X11 on your system
 # if undefined, use system defaults (works with Linux/gcc/libc5)
@@ -42,7 +35,7 @@ X11_PATH = /usr/X11
 # when installing the game in a single user environment, choose this
 # SCORE_ENTRIES = MANY_PER_NAME
 
-# specify path for cross-compiling (only needed for Windows build)
+# specify path for cross-compiling (only needed for Win32 build)
 CROSS_PATH=/usr/local/cross-tools/i386-mingw32/bin
 
 #-----------------------------------------------------------------------------#
@@ -65,14 +58,14 @@ x11:
 sdl:
 	@$(MAKE_CMD) TARGET=sdl
 
-sdl_old:
-	@$(MAKE_CMD) TARGET=sdl USE_SDL_OLD_LIBS=true
-
 solaris:
 	@$(MAKE_CMD) PLATFORM=solaris
 
-windows:
-	@PATH=$(CROSS_PATH):${PATH} $(MAKE_CMD) PLATFORM=windows
+msdos:
+	@$(MAKE_CMD) PLATFORM=msdos
+
+win32:
+	@PATH=$(CROSS_PATH):${PATH} $(MAKE_CMD) PLATFORM=win32
 
 clean:
 	@$(MAKE_CMD) clean
@@ -94,10 +87,10 @@ backup_gfx:
 dist-unix:
 	./Scripts/make_dist.sh unix .
 
-dist-dos:
+dist-msdos:
 	./Scripts/make_dist.sh dos .
 
-dist: dist-unix dist-dos
+dist: dist-unix dist-msdos
 
 depend dep:
 	$(MAKE_CMD) depend

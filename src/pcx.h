@@ -14,7 +14,7 @@
 #ifndef PCX_H
 #define PCX_H
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 
 #include "main.h"
 #include "image.h"
@@ -31,6 +31,5 @@ extern int errno_pcx;
 
 Image *Read_PCX_to_Image(char *);
 
-#endif /* !USE_SDL_LIBRARY */
-
+#endif /* !TARGET_SDL */
 #endif	/* PCX_H */

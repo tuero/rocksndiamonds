@@ -86,7 +86,7 @@ void DrawMainMenu()
 
   /* needed if last screen was the setup screen and fullscreen state changed */
   ChangeVideoModeIfNeeded();
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 

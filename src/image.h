@@ -14,7 +14,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#ifndef USE_SDL_LIBRARY
+#ifndef TARGET_SDL
 
 #include "main.h"
 
@@ -57,6 +57,5 @@ Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);
 
-#endif /* !USE_SDL_LIBRARY */
-
+#endif /* !TARGET_SDL */
 #endif	/* IMAGE_H */

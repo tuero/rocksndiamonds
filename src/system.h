@@ -16,12 +16,20 @@
 #define SYSTEM_H
 
 #if defined(MSDOS)
+#define PLATFORM_MSDOS
+#elif defined(WIN32)
+#define PLATFORM_WIN32
+#else
+#define PLATFORM_UNIX
+#endif
+
+#if defined(MSDOS)
 #include "msdos.h"
 #endif
 
-#if defined(USE_SDL_LIBRARY)
+#if defined(TARGET_SDL)
 #include "sdl.h"
-#elif defined(USE_X11_LIBRARY)
+#elif defined(TARGET_X11)
 #include "x11.h"
 #endif
 
@@ -69,5 +77,7 @@ inline Key GetEventKey(KeyEvent *, boolean);
 
 inline boolean SetVideoMode(void);
 inline void ChangeVideoModeIfNeeded(void);
+
+inline boolean InitAudio(void);
 
 #endif /* SYSTEM_H */

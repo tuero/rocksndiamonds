@@ -12,7 +12,7 @@
 *  x11.c                                                   *
 ***********************************************************/
 
-#ifdef USE_X11_LIBRARY
+#ifdef TARGET_X11
 
 #include "main.h"
 #include "misc.h"
@@ -203,4 +203,4 @@ inline void X11InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
   pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is off-screen buffer */
 }
 
-#endif /* USE_X11_LIBRARY */
+#endif /* TARGET_X11 */

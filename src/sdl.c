@@ -12,7 +12,7 @@
 *  sdl.c                                                   *
 ***********************************************************/
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
 
 #include "main.h"
 #include "misc.h"
@@ -183,4 +183,24 @@ inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
 }
 
-#endif /* USE_SDL_LIBRARY */
+inline boolean SDLInitAudio(void)
+{
+  if (SDL_Init(SDL_INIT_AUDIO) < 0)
+  {
+    Error(ERR_WARN, "SDL_Init() failed: %s", SDL_GetError());
+    return FALSE;
+  }
+
+  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 512) < 0)
+  {
+    Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
+    return FALSE;
+  }
+
+  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
+  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
+
+  return TRUE;
+}
+
+#endif /* TARGET_SDL */

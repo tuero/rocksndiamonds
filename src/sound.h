@@ -135,7 +135,7 @@ struct SoundInfo
   SAMPLE *sample_ptr;
 #endif
 
-#ifdef USE_SDL_LIBRARY
+#ifdef TARGET_SDL
   Mix_Chunk *mix_chunk;
 #endif
 };
@@ -159,11 +159,15 @@ struct SoundControl
 #endif
 };
 
-/* start sound server */
+/* general sound functions */
 int OpenAudio(char *);
+int CheckAudio(char *);
+boolean UnixInitAudio(void);
+
+/* sound server functions */ 
 void SoundServer(void);
 
-/* client functions */
+/* sound client functions */
 boolean LoadSound(struct SoundInfo *);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
