@@ -535,6 +535,53 @@ void InitGame()
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
+  if (BorderElement == EL_LEERRAUM)
+  {
+    SBX_Left = 0;
+    SBX_Right = lev_fieldx - SCR_FIELDX;
+    SBY_Upper = 0;
+    SBY_Lower = lev_fieldy - SCR_FIELDY;
+  }
+  else
+  {
+    SBX_Left = -1;
+    SBX_Right = lev_fieldx - SCR_FIELDX + 1;
+    SBY_Upper = -1;
+    SBY_Lower = lev_fieldy - SCR_FIELDY + 1;
+  }
+
+  if (lev_fieldx < SCR_FIELDX)
+  {
+    SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
+
+    /*
+    SBX_Left  -= (SCR_FIELDX - lev_fieldx) / 2;
+    SBX_Right -= (SCR_FIELDX - lev_fieldx) / 2;
+    */
+  }
+
+  if (lev_fieldy < SCR_FIELDY)
+  {
+    SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
+
+    /*
+    SBY_Upper -= (SCR_FIELDY - lev_fieldy) / 2;
+    SBY_Lower -= (SCR_FIELDY - lev_fieldy) / 2;
+    */
+  }
+
+#if 1
+  scroll_x = SBX_Left;
+  scroll_y = SBY_Upper;
+  if (local_player->jx >= SBX_Left + MIDPOSX)
+    scroll_x = (local_player->jx <= SBX_Right + MIDPOSX ?
+		local_player->jx - MIDPOSX :
+		SBX_Right);
+  if (local_player->jy >= SBY_Upper + MIDPOSY)
+    scroll_y = (local_player->jy <= SBY_Lower + MIDPOSY ?
+		local_player->jy - MIDPOSY :
+		SBY_Lower);
+#else
   scroll_x = scroll_y = -1;
   if (local_player->jx >= MIDPOSX-1)
     scroll_x = (local_player->jx <= lev_fieldx-MIDPOSX ?
@@ -544,6 +591,7 @@ void InitGame()
     scroll_y = (local_player->jy <= lev_fieldy-MIDPOSY ?
 		local_player->jy - MIDPOSY :
 		lev_fieldy - SCR_FIELDY + 1);
+#endif
 
   CloseDoor(DOOR_CLOSE_1);
 
@@ -1051,7 +1099,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (!IN_LEV_FIELD(x, y) || IS_MASSIV(element) || element == EL_BURNING)
+      if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(element) || element == EL_BURNING)
 	continue;
 
       if ((mode!=EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
@@ -1214,7 +1262,7 @@ void DynaExplode(int ex, int ey)
       int y = ey+j*xy[i%4][1];
       int element;
 
-      if (!IN_LEV_FIELD(x, y) || IS_MASSIV(Feld[x][y]))
+      if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(Feld[x][y]))
 	break;
 
       element = Feld[x][y];
@@ -3875,9 +3923,15 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 	    (player->MovDir == MV_RIGHT && scroll_x < jx-MIDPOSX-offset))
 	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
 
+#if 1
+	/* don't scroll over playfield boundaries */
+	if (scroll_x < SBX_Left || scroll_x > SBX_Right)
+	  scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+#else
 	/* don't scroll over playfield boundaries */
 	if (scroll_x < -1 || scroll_x > lev_fieldx - SCR_FIELDX + 1)
 	  scroll_x = (scroll_x < -1 ? -1 : lev_fieldx - SCR_FIELDX + 1);
+#endif
 
 	/* don't scroll more than one field at a time */
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
@@ -3893,9 +3947,15 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 	    (player->MovDir == MV_DOWN && scroll_y < jy-MIDPOSY-offset))
 	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
 
+#if 1
+	/* don't scroll over playfield boundaries */
+	if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
+	  scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+#else
 	/* don't scroll over playfield boundaries */
 	if (scroll_y < -1 || scroll_y > lev_fieldy - SCR_FIELDY + 1)
 	  scroll_y = (scroll_y < -1 ? -1 : lev_fieldy - SCR_FIELDY + 1);
+#endif
 
 	/* don't scroll more than one field at a time */
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);

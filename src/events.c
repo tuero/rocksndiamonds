@@ -337,7 +337,12 @@ void HandleButton(int mx, int my, int button)
 	  int x = LEVELX(sx);
 	  int y = LEVELY(sy);
 
-	  printf("INFO: Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
+	  printf("INFO: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
+
+	  if (!IN_LEV_FIELD(x, y))
+	    break;
+
+	  printf("      Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
 	  printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
 	  printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
 	  printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);

@@ -66,8 +66,13 @@ typedef unsigned char byte;
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE	(SCR_FIELDY + 2)
 
+#if 0
 #define MIN_LEV_FIELDX	(SCR_FIELDX - 2)
 #define MIN_LEV_FIELDY	(SCR_FIELDY - 2)
+#else
+#define MIN_LEV_FIELDX	3
+#define MIN_LEV_FIELDY	3
+#endif
 #define STD_LEV_FIELDX	64
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128
@@ -101,7 +106,7 @@ typedef unsigned char byte;
 #define EP_BIT_SCHLUESSEL	(1 << 2)
 #define EP_BIT_PFORTE		(1 << 3)
 #define EP_BIT_SOLID		(1 << 4)
-#define EP_BIT_MASSIV		(1 << 5)
+#define EP_BIT_MASSIVE		(1 << 5)
 #define EP_BIT_SLIPPERY		(1 << 6)
 #define EP_BIT_ENEMY		(1 << 7)
 #define EP_BIT_MAUER		(1 << 8)
@@ -131,7 +136,7 @@ typedef unsigned char byte;
 #define IS_SCHLUESSEL(e)	(Elementeigenschaften[e] & EP_BIT_SCHLUESSEL)
 #define IS_PFORTE(e)		(Elementeigenschaften[e] & EP_BIT_PFORTE)
 #define IS_SOLID(e)		(Elementeigenschaften[e] & EP_BIT_SOLID)
-#define IS_MASSIV(e)		(Elementeigenschaften[e] & EP_BIT_MASSIV)
+#define IS_MASSIVE(e)		(Elementeigenschaften[e] & EP_BIT_MASSIVE)
 #define IS_SLIPPERY(e)		(Elementeigenschaften[e] & EP_BIT_SLIPPERY)
 #define IS_ENEMY(e)		(Elementeigenschaften[e] & EP_BIT_ENEMY)
 #define IS_MAUER(e)		(Elementeigenschaften[e] & EP_BIT_MAUER)
@@ -434,10 +439,13 @@ extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScrollStepSize;
 extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
+extern int		BorderElement;
 extern int		GameFrameDelay;
 extern int		FfwdFrameDelay;
 extern int		MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
+extern int		SBX_Left, SBX_Middle, SBX_Right;
+extern int		SBY_Upper, SBY_Middle, SBY_Lower;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;

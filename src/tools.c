@@ -1205,7 +1205,12 @@ void DrawScreenField(int x, int y)
 
   if (!IN_LEV_FIELD(ux, uy))
   {
-    DrawScreenElement(x, y, EL_BETON);
+    if (ux < -1 || ux > lev_fieldx || uy < -1 || uy > lev_fieldy)
+      element = EL_LEERRAUM;
+    else
+      element = BorderElement;
+
+    DrawScreenElement(x, y, element);
     return;
   }
 
@@ -1394,7 +1399,7 @@ void DrawMicroLevel(int xpos, int ypos)
 			 Ur[x][y]);
       else if (x >= -1 && x < lev_fieldx+1 && y >= -1 && y < lev_fieldy+1)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 EL_BETON);
+			 BorderElement);
 
   XFillRectangle(display, drawto,gc, SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
 

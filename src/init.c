@@ -889,7 +889,7 @@ void InitElementProperties()
   };
   static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
 
-  static int ep_massiv[] =
+  static int ep_massive[] =
   {
     EL_BETON,
     EL_SALZSAEURE,
@@ -918,7 +918,7 @@ void InitElementProperties()
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
   };
-  static int ep_massiv_num = sizeof(ep_massiv)/sizeof(int);
+  static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
 
   static int ep_slippery[] =
   {
@@ -1430,7 +1430,7 @@ void InitElementProperties()
     EP_BIT_SCHLUESSEL,
     EP_BIT_PFORTE,
     EP_BIT_SOLID,
-    EP_BIT_MASSIV,
+    EP_BIT_MASSIVE,
     EP_BIT_SLIPPERY,
     EP_BIT_ENEMY,
     EP_BIT_MAUER,
@@ -1461,7 +1461,7 @@ void InitElementProperties()
     ep_schluessel,
     ep_pforte,
     ep_solid,
-    ep_massiv,
+    ep_massive,
     ep_slippery,
     ep_enemy,
     ep_mauer,
@@ -1492,7 +1492,7 @@ void InitElementProperties()
     &ep_schluessel_num,
     &ep_pforte_num,
     &ep_solid_num,
-    &ep_massiv_num,
+    &ep_massive_num,
     &ep_slippery_num,
     &ep_enemy_num,
     &ep_mauer_num,

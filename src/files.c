@@ -253,8 +253,8 @@ static void setLevelInfoToDefaults()
   lev_fieldx = level.fieldx = STD_LEV_FIELDX;
   lev_fieldy = level.fieldy = STD_LEV_FIELDY;
 
-  for(x=0; x<MAX_LEV_FIELDX; x++) 
-    for(y=0; y<MAX_LEV_FIELDY; y++) 
+  for(x=0; x<MAX_LEV_FIELDX; x++)
+    for(y=0; y<MAX_LEV_FIELDY; y++)
       Feld[x][y] = Ur[x][y] = EL_ERDREICH;
 
   level.time = 100;
@@ -280,6 +280,8 @@ static void setLevelInfoToDefaults()
   Feld[0][0] = Ur[0][0] = EL_SPIELFIGUR;
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_AUSGANG_ZU;
+
+  BorderElement = EL_BETON;
 }
 
 void LoadLevel(int level_nr)
@@ -400,8 +402,8 @@ void LoadLevel(int level_nr)
     }
   }
 
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++) 
+  for(y=0; y<lev_fieldy; y++)
+    for(x=0; x<lev_fieldx; x++)
       Feld[x][y] = Ur[x][y] = fgetc(file);
 
   fclose(file);
@@ -418,6 +420,20 @@ void LoadLevel(int level_nr)
     Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
     Error(ERR_WARN, "using high speed movement for player");
     level.high_speed = TRUE;
+  }
+
+  /* determine border element */
+  BorderElement = EL_LEERRAUM;
+  for(y=0; y<lev_fieldy && BorderElement == EL_LEERRAUM; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (!IS_MASSIVE(Feld[x][y]))
+	BorderElement = EL_BETON;
+
+      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
+	x = lev_fieldx - 2;
+    }
   }
 }
 
