@@ -63,6 +63,21 @@ static int getNewGadgetID()
   return id;
 }
 
+#if 0
+void DUMP_GADGET_MAP_STATE()
+{
+  struct GadgetInfo *gi = gadget_list_first_entry;
+
+  while (gi)
+  {
+    printf("-XXX-1-> '%s': %s\n",
+	   gi->info_text, (gi->mapped ? "mapped" : "not mapped"));
+
+    gi = gi->next;
+  }
+}
+#endif
+
 static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 {
   struct GadgetInfo *gi = gadget_list_first_entry;

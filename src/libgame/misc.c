@@ -1362,7 +1362,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 {
   struct FileInfo *file_list;
   int num_suffix_list_entries = 0;
-  int list_pos = -1;
+  int list_pos = 0;
   int i, j;
 
   file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
@@ -1373,9 +1373,9 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   /* always start with reliable default values */
   for (i=0; i<num_file_list_entries; i++)
   {
-    file_list[list_pos].token = NULL;
-    file_list[list_pos].default_filename = NULL;
-    file_list[list_pos].filename = NULL;
+    file_list[i].token = NULL;
+    file_list[i].default_filename = NULL;
+    file_list[i].filename = NULL;
 
     if (num_suffix_list_entries > 0)
     {
@@ -1416,7 +1416,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
     if (is_file_entry)
     {
-      list_pos++;
+      if (i > 0)
+	list_pos++;
 
       if (list_pos >= num_file_list_entries)
 	Error(ERR_EXIT, "inconsistant config list information -- please fix");
@@ -1464,8 +1465,11 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   {
     for (i=0; i<num_file_list_entries; i++)
     {
-      file_list[i].filename =
-	getStringCopy(getTokenValue(setup_file_list, file_list[i].token));
+      char *filename = getTokenValue(setup_file_list, file_list[i].token);
+
+      if (filename == NULL)
+	filename = file_list[i].default_filename;
+      file_list[i].filename = getStringCopy(filename);
 
       for (j=0; j<num_suffix_list_entries; j++)
       {
@@ -1629,7 +1633,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     DrawInitText(draw_init[artwork_info->type].text, 120, FC_GREEN);
 
 #if 0
-  printf("DEBUG: reloading %d sounds ...\n", num_file_list_entries);
+  printf("DEBUG: reloading %d artwork files ...\n", num_file_list_entries);
 #endif
 
   for(i=0; i<num_file_list_entries; i++)
@@ -1637,10 +1641,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     if (draw_init[artwork_info->type].do_it)
       DrawInitText(file_list[i].token, 150, FC_YELLOW);
 
-    if (file_list[i].filename)
-      LoadArtworkToList(artwork_info, file_list[i].filename, i);
-    else
-      LoadArtworkToList(artwork_info, file_list[i].default_filename, i);
+    LoadArtworkToList(artwork_info, file_list[i].filename, i);
   }
 
   draw_init[artwork_info->type].do_it = FALSE;
