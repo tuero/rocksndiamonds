@@ -1381,11 +1381,8 @@ boolean Request(char *text, unsigned int req_state)
 
   button_status = MB_RELEASED;
 
-  while(result<0)
+  while(result < 0)
   {
-    DoAnimation();
-    Delay(10);
-
     if (XPending(display))
     {
       XEvent event;
@@ -1494,6 +1491,11 @@ boolean Request(char *text, unsigned int req_state)
       else if (joy & JOY_BUTTON_2)
 	result = 0;
     }
+
+    DoAnimation();
+
+    /* don't eat all CPU time */
+    Delay(10);
   }
 
   if (game_status != MAINMENU)

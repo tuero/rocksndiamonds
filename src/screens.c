@@ -1135,18 +1135,71 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     DoAnimation();
 }
 
-static int readJoystick_TEST()
+void CalibrateJoystick()
 {
+#ifdef __FreeBSD__
+  struct joystick joy_ctrl;
+#else
+  struct joystick_control
+  {
+    int buttons;
+    int x;
+    int y;
+  } joy_ctrl;
+#endif
+
+#ifdef MSDOS
+  char joy_nr[4];
+#endif
+
+  int new_joystick_xleft = 128, new_joystick_xright = 128;
+  int new_joystick_yupper = 128, new_joystick_ylower = 128;
+  int new_joystick_xmiddle, new_joystick_ymiddle;
+  int x, y, last_x, last_y, xpos = 8, ypos = 3;
+  boolean check[3][3];
+  int check_remaining = 3 * 3;
+  int joy;
   int result = -1;
+
+  if (joystick_status == JOYSTICK_OFF)
+    return;
+
+  ClearWindow();
+  DrawText(SX,      SY +  6*32, " ROTATE JOYSTICK ",FS_BIG,FC_YELLOW);
+  DrawText(SX,      SY +  7*32, "IN ALL DIRECTIONS",FS_BIG,FC_YELLOW);
+  DrawText(SX + 16, SY +  9*32, "  IF ALL BALLS  ",FS_BIG,FC_YELLOW);
+  DrawText(SX,      SY + 10*32, "   ARE YELLOW,   ",FS_BIG,FC_YELLOW);
+  DrawText(SX,      SY + 11*32, "  PRESS BUTTON!  ",FS_BIG,FC_YELLOW);
+
+  for(y=0; y<3; y++)
+  {
+    for(x=0; x<3; x++)
+    {
+      check[x][y] = FALSE;
+      DrawGraphic(xpos + x - 1, ypos + y - 1, GFX_KUGEL_BLAU);
+    }
+  }
+
+  joy = Joystick();
+  last_x = (joy & JOY_LEFT ? -1 : joy & JOY_RIGHT ? +1 : 0);
+  last_y = (joy & JOY_UP   ? -1 : joy & JOY_DOWN  ? +1 : 0);
+  DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_ROT);
+
+  BackToFront();
+
+#ifdef __FreeBSD__
+  joy_ctrl.b1 = joy_ctrl.b2 = 0;
+#else
+  joy_ctrl.buttons = 0;
+#endif
+
+  while(Joystick() & JOY_BUTTON);
 
   InitAnimation();
 
   while(result < 0)
   {
-    DoAnimation();
-    Delay(10);
-
-    if (XPending(display))
+    if (XPending(display))	/* got event from X server */
     {
       XEvent event;
 
@@ -1164,7 +1217,8 @@ static int readJoystick_TEST()
 			       ((XKeyEvent *)&event)->state))
 	  {
 	    case XK_Return:
-	      result = 1;
+	      if (check_remaining == 0)
+		result = 1;
 	      break;
 	    case XK_Escape:
 	      result = 0;
@@ -1185,12 +1239,90 @@ static int readJoystick_TEST()
 	  break;
       }
     }
+
+    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    {
+      joystick_status = JOYSTICK_OFF;
+      goto error_out;
+    }
+
+    new_joystick_xleft  = MIN(new_joystick_xleft,  joy_ctrl.x);
+    new_joystick_xright = MAX(new_joystick_xright, joy_ctrl.x);
+    new_joystick_yupper = MIN(new_joystick_yupper, joy_ctrl.y);
+    new_joystick_ylower = MAX(new_joystick_ylower, joy_ctrl.y);
+
+    new_joystick_xmiddle =
+      new_joystick_xleft + (new_joystick_xright - new_joystick_xleft) / 2;
+    new_joystick_ymiddle =
+      new_joystick_yupper + (new_joystick_ylower - new_joystick_yupper) / 2;
+
+    joystick[setup.joystick_nr].xleft = new_joystick_xleft;
+    joystick[setup.joystick_nr].yupper = new_joystick_yupper;
+    joystick[setup.joystick_nr].xright = new_joystick_xright;
+    joystick[setup.joystick_nr].ylower = new_joystick_ylower;
+    joystick[setup.joystick_nr].xmiddle = new_joystick_xmiddle;
+    joystick[setup.joystick_nr].ymiddle = new_joystick_ymiddle;
+
+    CheckJoystickData();
+
+    joy = Joystick();
+
+    if (joy & JOY_BUTTON && check_remaining == 0)
+      result = 1;
+
+    x = (joy & JOY_LEFT ? -1 : joy & JOY_RIGHT ? +1 : 0);
+    y = (joy & JOY_UP   ? -1 : joy & JOY_DOWN  ? +1 : 0);
+
+    if (x != last_x || y != last_y)
+    {
+      DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_GELB);
+      DrawGraphic(xpos + x,      ypos + y,      GFX_KUGEL_ROT);
+
+      last_x = x;
+      last_y = y;
+
+      if (check_remaining > 0 && !check[x+1][y+1])
+      {
+	check[x+1][y+1] = TRUE;
+	check_remaining--;
+      }
+
+#if 0
+      printf("LEFT / MIDDLE / RIGHT == %d / %d / %d\n",
+	     joystick[setup.joystick_nr].xleft,
+	     joystick[setup.joystick_nr].xmiddle,
+	     joystick[setup.joystick_nr].xright);
+      printf("UP / MIDDLE / DOWN == %d / %d / %d\n",
+	     joystick[setup.joystick_nr].yupper,
+	     joystick[setup.joystick_nr].ymiddle,
+	     joystick[setup.joystick_nr].ylower);
+#endif
+    }
+
+    BackToFront();
+    DoAnimation();
+
+    /* don't eat all CPU time */
+    Delay(10);
   }
 
   StopAnimation();
+
+  DrawSetupScreen();
+  while(Joystick() & JOY_BUTTON);
+  return;
+
+ error_out:
+
+  ClearWindow();
+  DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
+  BackToFront();
+  Delay(3000);
+  DrawSetupScreen();
 }
 
-void CalibrateJoystick()
+void CalibrateJoystick_OLD()
 {
 #ifdef __FreeBSD__
   struct joystick joy_ctrl;
@@ -1210,7 +1342,7 @@ void CalibrateJoystick()
   int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
   int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
 
-  if (joystick_status==JOYSTICK_OFF)
+  if (joystick_status == JOYSTICK_OFF)
     goto error_out;
 
 #ifndef MSDOS
@@ -1227,7 +1359,7 @@ void CalibrateJoystick()
 #endif
   while(Joystick() & JOY_BUTTON);
 #ifdef __FreeBSD__
-  while(!(joy_ctrl.b1||joy_ctrl.b2))
+  while(!(joy_ctrl.b1 || joy_ctrl.b2))
 #else
   while(!joy_ctrl.buttons)
 #endif
@@ -1256,7 +1388,7 @@ void CalibrateJoystick()
 #endif
   while(Joystick() & JOY_BUTTON);
 #ifdef __FreeBSD__
-  while(!(joy_ctrl.b1||joy_ctrl.b2))
+  while(!(joy_ctrl.b1 || joy_ctrl.b2))
 #else
   while(!joy_ctrl.buttons)
 #endif
@@ -1284,7 +1416,7 @@ void CalibrateJoystick()
 #endif
   while(Joystick() & JOY_BUTTON);
 #ifdef __FreeBSD__
-  while(!(joy_ctrl.b1||joy_ctrl.b2))
+  while(!(joy_ctrl.b1 || joy_ctrl.b2))
 #else
   while(!joy_ctrl.buttons)
 #endif

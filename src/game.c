@@ -197,17 +197,26 @@ void InitGame()
 	{
 	  player->active = TRUE;
 
+	  /* remove potentially duplicate players */
+	  if (StorePlayer[jx][jy] == Feld[x][y])
+	    StorePlayer[jx][jy] = 0;
+
+	  StorePlayer[x][y] = Feld[x][y];
+
 	  printf("Player %d activated.\n", player->element_nr);
 	  printf("[Local player is %d and currently %s.]\n",
 		 local_player->element_nr,
 		 local_player->active ? "active" : "not active");
 	}
 
+#if 0
 	/* remove potentially duplicate players */
 	if (StorePlayer[jx][jy] == Feld[x][y])
 	  StorePlayer[jx][jy] = 0;
 
 	StorePlayer[x][y] = Feld[x][y];
+#endif
+
 	Feld[x][y] = EL_LEERRAUM;
 	player->jx = player->last_jx = x;
 	player->jy = player->last_jy = y;

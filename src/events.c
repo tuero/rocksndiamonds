@@ -263,7 +263,7 @@ void HandleClientMessageEvent(XClientMessageEvent *event)
 {
   if ((event->window == window) &&
       (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
-    game_status = EXITGAME;
+    CloseAllAndExit(0);
 }
 
 void HandleButton(int mx, int my, int button)
@@ -773,7 +773,7 @@ void HandleJoystick()
     {
       static long joystickmove_delay = 0;
 
-      if (joystick && !button && !DelayReached(&joystickmove_delay,15))
+      if (joystick && !button && !DelayReached(&joystickmove_delay,150))
 	newbutton = dx = dy = 0;
 
       if (game_status==MAINMENU)
