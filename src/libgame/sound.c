@@ -299,7 +299,7 @@ void UnixCloseAudio(void)
   if (audio.device_fd)
     close(audio.device_fd);
 
-  if (IS_PARENT_PROCESS())
+  if (IS_PARENT_PROCESS() && HAS_CHILD_PROCESS())
     kill(audio.mixer_pid, SIGTERM);
 }
 

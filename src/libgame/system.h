@@ -234,9 +234,11 @@
 #if defined(PLATFORM_UNIX)
 #define IS_PARENT_PROCESS()	(audio.mixer_pid != getpid())
 #define IS_CHILD_PROCESS()	(audio.mixer_pid == getpid())
+#define HAS_CHILD_PROCESS()	(audio.mixer_pid > 0)
 #else
 #define IS_PARENT_PROCESS()	TRUE
 #define IS_CHILD_PROCESS()	FALSE
+#define HAS_CHILD_PROCESS()	FALSE
 #endif
 
 /* type definitions */

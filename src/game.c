@@ -533,32 +533,15 @@ static void InitGameEngine()
     };
     static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
 
+    /* special EM style gems behaviour */
     for (i=0; i<ep_em_slippery_wall_num; i++)
-    {
-#if 1
       SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
 		   level.em_slippery_gems);
-#else
-      if (level.em_slippery_gems)	/* special EM style gems behaviour */
-	PROPERTY_VAR(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL) |=
-	  EP_BIT_EM_SLIPPERY_WALL;
-      else
-	PROPERTY_VAR(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL) &=
-	  ~EP_BIT_EM_SLIPPERY_WALL;
-#endif
-    }
 
     /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
-#if 1
     SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
 		 (level.em_slippery_gems &&
 		  game.engine_version > VERSION_IDENT(2,0,1)));
-#else
-    if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
-      Properties2[EL_EXPANDABLE_WALL_GROWING] |= EP_BIT_EM_SLIPPERY_WALL;
-    else
-      Properties2[EL_EXPANDABLE_WALL_GROWING] &=~EP_BIT_EM_SLIPPERY_WALL;
-#endif
   }
 
   /* initialize changing elements information */
@@ -1123,7 +1106,7 @@ void GameWon()
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
       if (TimeLeft > 0 && !(TimeLeft % 10))
-	RaiseScore(level.score[SC_ZEITBONUS]);
+	RaiseScore(level.score[SC_TIME_BONUS]);
       if (TimeLeft > 100 && !(TimeLeft % 10))
 	TimeLeft -= 10;
       else
@@ -1149,7 +1132,7 @@ void GameWon()
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
       if (TimePlayed < 999 && !(TimePlayed % 10))
-	RaiseScore(level.score[SC_ZEITBONUS]);
+	RaiseScore(level.score[SC_TIME_BONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
 	TimePlayed += 10;
       else
@@ -2446,11 +2429,11 @@ void TurnRound(int x, int y)
 
     if (IN_LEV_FIELD(left_x, left_y) &&
 	(IS_FREE_OR_PLAYER(left_x, left_y) ||
-	 IS_MAMPF2(Feld[left_x][left_y])))
+	 IS_FOOD_DARK_YAMYAM(Feld[left_x][left_y])))
       can_turn_left = TRUE;
     if (IN_LEV_FIELD(right_x, right_y) &&
 	(IS_FREE_OR_PLAYER(right_x, right_y) ||
-	 IS_MAMPF2(Feld[right_x][right_y])))
+	 IS_FOOD_DARK_YAMYAM(Feld[right_x][right_y])))
       can_turn_right = TRUE;
 
     if (can_turn_left && can_turn_right)
@@ -2737,7 +2720,7 @@ void TurnRound(int x, int y)
 	     Feld[newx][newy] == EL_ACID ||
 	     (element == EL_PENGUIN &&
 	      (Feld[newx][newy] == EL_EXIT_OPEN ||
-	       IS_MAMPF3(Feld[newx][newy])))))
+	       IS_FOOD_PENGUIN(Feld[newx][newy])))))
 	  return;
 
 	MovDir[x][y] =
@@ -2749,7 +2732,7 @@ void TurnRound(int x, int y)
 	     Feld[newx][newy] == EL_ACID ||
 	     (element == EL_PENGUIN &&
 	      (Feld[newx][newy] == EL_EXIT_OPEN ||
-	       IS_MAMPF3(Feld[newx][newy])))))
+	       IS_FOOD_PENGUIN(Feld[newx][newy])))))
 	  return;
 
 	MovDir[x][y] = old_move_dir;
@@ -3039,8 +3022,8 @@ void StartMoving(int x, int y)
 
     if (!MovDelay[x][y])	/* start new movement phase */
     {
-      /* all objects that can change their move direction after each step */
-      /* (MAMPFER, MAMPFER2 and PACMAN go straight until they hit a wall  */
+      /* all objects that can change their move direction after each step
+	 (YAMYAM, DARK_YAMYAM and PACMAN go straight until they hit a wall */
 
       if (element != EL_YAMYAM &&
 	  element != EL_DARK_YAMYAM &&
@@ -3167,7 +3150,7 @@ void StartMoving(int x, int y)
 
 	return;
       }
-      else if (IS_MAMPF3(Feld[newx][newy]))
+      else if (IS_FOOD_PENGUIN(Feld[newx][newy]))
       {
 	if (DigField(local_player, newx, newy, 0, 0, DF_DIG) == MF_MOVING)
 	  DrawLevelField(newx, newy);
@@ -3262,7 +3245,7 @@ void StartMoving(int x, int y)
       PlaySoundLevel(x, y, SND_YAMYAM_DIGGING);
     }
     else if (element == EL_DARK_YAMYAM && IN_LEV_FIELD(newx, newy) &&
-	     IS_MAMPF2(Feld[newx][newy]))
+	     IS_FOOD_DARK_YAMYAM(Feld[newx][newy]))
     {
       if (AmoebaNr[newx][newy])
       {
@@ -5047,10 +5030,17 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 
     if (field_under_player_is_free &&
 	!player_is_moving_to_valid_field &&
-	!IS_TUBE(Feld[jx][jy]))
+	!IS_WALKABLE_UNDER(Feld[jx][jy]))
       player->programmed_action = MV_DOWN;
   }
 }
+
+/*
+  MoveFigureOneStep()
+  -----------------------------------------------------------------------------
+  dx, dy:		direction (non-diagonal) to try to move the player to
+  real_dx, real_dy:	direction as read from input device (can be diagonal)
+*/
 
 boolean MoveFigureOneStep(struct PlayerInfo *player,
 			  int dx, int dy, int real_dx, int real_dy)
@@ -5326,7 +5316,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   if (player->MovPos == 0)
   {
-    if (IS_QUICK_GATE(Feld[last_jx][last_jy]))
+    if (IS_WALKABLE_THROUGH(Feld[last_jx][last_jy]))
     {
       /* continue with normal speed after quickly moving through gate */
       HALVE_PLAYER_SPEED(player);
@@ -5667,6 +5657,25 @@ void RemoveHero(struct PlayerInfo *player)
   ExitY = ZY = jy;
 }
 
+#if 0
+/*
+  checkDiagonalPushing()
+  -----------------------------------------------------------------------------
+  check if diagonal input device direction results in pushing of object
+*/
+
+static boolean checkDiagonalPushing(int x, int y, int real_dx, int real_dy)
+{
+}
+#endif
+
+/*
+  DigField()
+  -----------------------------------------------------------------------------
+  x, y:			field next to player (non-diagonal) to try to dig to
+  real_dx, real_dy:	direction as read from input device (can be diagonal)
+*/
+
 int DigField(struct PlayerInfo *player,
 	     int x, int y, int real_dx, int real_dy, int mode)
 {
@@ -5697,7 +5706,7 @@ int DigField(struct PlayerInfo *player,
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
 
-  if (IS_TUBE(Feld[jx][jy]))
+  if (IS_WALKABLE_UNDER(Feld[jx][jy]))
   {
     int i = 0;
     int tube_leave_directions[][2] =
@@ -6115,16 +6124,16 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_SP_PORT_LEFT:
-    case EL_SP_GRAVITY_PORT_LEFT:
     case EL_SP_PORT_RIGHT:
-    case EL_SP_GRAVITY_PORT_RIGHT:
     case EL_SP_PORT_UP:
-    case EL_SP_GRAVITY_PORT_UP:
     case EL_SP_PORT_DOWN:
-    case EL_SP_GRAVITY_PORT_DOWN:
     case EL_SP_PORT_HORIZONTAL:
     case EL_SP_PORT_VERTICAL:
     case EL_SP_PORT_ANY:
+    case EL_SP_GRAVITY_PORT_LEFT:
+    case EL_SP_GRAVITY_PORT_RIGHT:
+    case EL_SP_GRAVITY_PORT_UP:
+    case EL_SP_GRAVITY_PORT_DOWN:
       if ((dx == -1 &&
 	   element != EL_SP_PORT_LEFT &&
 	   element != EL_SP_GRAVITY_PORT_LEFT &&
@@ -6628,22 +6637,22 @@ void RaiseScoreElement(int element)
     case EL_EMERALD_YELLOW:
     case EL_EMERALD_RED:
     case EL_EMERALD_PURPLE:
-      RaiseScore(level.score[SC_EDELSTEIN]);
+      RaiseScore(level.score[SC_EMERALD]);
       break;
     case EL_DIAMOND:
-      RaiseScore(level.score[SC_DIAMANT]);
+      RaiseScore(level.score[SC_DIAMOND]);
       break;
     case EL_BUG:
     case EL_BD_BUTTERFLY:
-      RaiseScore(level.score[SC_KAEFER]);
+      RaiseScore(level.score[SC_BUG]);
       break;
     case EL_SPACESHIP:
     case EL_BD_FIREFLY:
-      RaiseScore(level.score[SC_FLIEGER]);
+      RaiseScore(level.score[SC_SPACESHIP]);
       break;
     case EL_YAMYAM:
     case EL_DARK_YAMYAM:
-      RaiseScore(level.score[SC_MAMPFER]);
+      RaiseScore(level.score[SC_YAMYAM]);
       break;
     case EL_ROBOT:
       RaiseScore(level.score[SC_ROBOT]);
@@ -6652,16 +6661,16 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_PACMAN]);
       break;
     case EL_NUT:
-      RaiseScore(level.score[SC_KOKOSNUSS]);
+      RaiseScore(level.score[SC_NUT]);
       break;
     case EL_DYNAMITE:
-      RaiseScore(level.score[SC_DYNAMIT]);
+      RaiseScore(level.score[SC_DYNAMITE]);
       break;
     case EL_KEY_1:
     case EL_KEY_2:
     case EL_KEY_3:
     case EL_KEY_4:
-      RaiseScore(level.score[SC_SCHLUESSEL]);
+      RaiseScore(level.score[SC_KEY]);
       break;
     default:
       break;

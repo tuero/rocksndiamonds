@@ -530,19 +530,7 @@ static int random_placement_method = RANDOM_USE_QUANTITY;
 static int random_placement_background_element = EL_SAND;
 static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
-
-#if 1
-boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
-#else
-static struct
-{
-  boolean indestructible;
-  boolean can_fall;
-  boolean can_smash;
-  boolean pushable;
-  boolean slippery;
-} custom_element_properties[NUM_CUSTOM_ELEMENTS];
-#endif
+static boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
 
 static struct
 {
@@ -607,7 +595,7 @@ static struct
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
-    &level.score[SC_ZEITBONUS],
+    &level.score[SC_TIME_BONUS],
     "score for each 10 seconds left",	NULL
   },
   {
@@ -2812,13 +2800,12 @@ static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
       dst[x][y] = src[x][y];
 }
 
-#if 1
 static void CopyCustomElementPropertiesToEditor(int element)
 {
   int i;
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
-    custom_element_properties[i] = PROPERTY_VALUE(element, i);
+    custom_element_properties[i] = HAS_PROPERTY(element, i);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -2828,72 +2815,6 @@ static void CopyCustomElementPropertiesToGame(int element)
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
 }
-
-#else
-
-static void CopyCustomElementPropertiesToEditor()
-{
-  int i;
-
-  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    int element = EL_CUSTOM_START + i;
-    int properties = Properties1[element];
-
-    custom_element_properties[i].indestructible =
-      ((properties & EP_BIT_INDESTRUCTIBLE) != 0 ? TRUE : FALSE);
-
-    custom_element_properties[i].can_fall =
-      ((properties & EP_BIT_CAN_FALL) != 0 ? TRUE : FALSE);
-
-    custom_element_properties[i].can_smash =
-      ((properties & EP_BIT_CAN_SMASH) != 0 ? TRUE : FALSE);
-
-    custom_element_properties[i].pushable =
-      ((properties & EP_BIT_PUSHABLE) != 0 ? TRUE : FALSE);
-
-    custom_element_properties[i].slippery =
-      ((properties & EP_BIT_SLIPPERY) != 0 ? TRUE : FALSE);
-  }
-}
-
-static void CopyCustomElementPropertiesToGame()
-{
-  int i;
-
-  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    int element = EL_CUSTOM_START + i;
-
-    Properties1[element] = EP_BITMASK_DEFAULT;
-
-    if (custom_element_properties[i].indestructible)
-      Properties1[element] |= EP_BIT_INDESTRUCTIBLE;
-    else
-      Properties1[element] &= ~EP_BIT_INDESTRUCTIBLE;
-
-    if (custom_element_properties[i].can_fall)
-      Properties1[element] |= EP_BIT_CAN_FALL;
-    else
-      Properties1[element] &= ~EP_BIT_CAN_FALL;
-
-    if (custom_element_properties[i].can_smash)
-      Properties1[element] |= EP_BIT_CAN_SMASH;
-    else
-      Properties1[element] &= ~EP_BIT_CAN_SMASH;
-
-    if (custom_element_properties[i].pushable)
-      Properties1[element] |= EP_BIT_PUSHABLE;
-    else
-      Properties1[element] &= ~EP_BIT_PUSHABLE;
-
-    if (custom_element_properties[i].slippery)
-      Properties1[element] |= EP_BIT_SLIPPERY;
-    else
-      Properties1[element] &= ~EP_BIT_SLIPPERY;
-  }
-}
-#endif
 
 void DrawLevelEd()
 {
@@ -3375,45 +3296,45 @@ static struct
   char *text;
 } elements_with_counter[] =
 {
-  { EL_EMERALD,		&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
-  { EL_BD_DIAMOND,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
-  { EL_EMERALD_YELLOW,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
-  { EL_EMERALD_RED,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
-  { EL_EMERALD_PURPLE,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
-  { EL_DIAMOND,		&level.score[SC_DIAMANT],	TEXT_COLLECTING	},
-  { EL_BUG_RIGHT,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BUG_UP,		&level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BUG_LEFT,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BUG_DOWN,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BD_BUTTERFLY_RIGHT,&level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BD_BUTTERFLY_UP,   &level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BD_BUTTERFLY_LEFT, &level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_BD_BUTTERFLY_DOWN, &level.score[SC_KAEFER],	TEXT_SMASHING	},
-  { EL_SPACESHIP_RIGHT,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_SPACESHIP_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_SPACESHIP_LEFT,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_SPACESHIP_DOWN,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_BD_FIREFLY_RIGHT,&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_BD_FIREFLY_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_BD_FIREFLY_LEFT, &level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_BD_FIREFLY_DOWN, &level.score[SC_FLIEGER],	TEXT_SMASHING	},
-  { EL_YAMYAM,		&level.score[SC_MAMPFER],	TEXT_SMASHING	},
-  { EL_DARK_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING	},
+  { EL_EMERALD,		&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_BD_DIAMOND,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_EMERALD_YELLOW,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_EMERALD_RED,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_EMERALD_PURPLE,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_DIAMOND,		&level.score[SC_DIAMOND],	TEXT_COLLECTING	},
+  { EL_BUG_RIGHT,	&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BUG_UP,		&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BUG_LEFT,	&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BUG_DOWN,	&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_RIGHT,&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_UP,   &level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_LEFT, &level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_DOWN, &level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_SPACESHIP_RIGHT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_SPACESHIP_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_SPACESHIP_LEFT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_SPACESHIP_DOWN,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_RIGHT,&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_LEFT, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_DOWN, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_YAMYAM,		&level.score[SC_YAMYAM],	TEXT_SMASHING	},
+  { EL_DARK_YAMYAM,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING	},
   { EL_PACMAN_RIGHT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_UP,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
-  { EL_NUT,		&level.score[SC_KOKOSNUSS],	TEXT_CRACKING	},
-  { EL_DYNAMITE,	&level.score[SC_DYNAMIT],	TEXT_COLLECTING	},
-  { EL_KEY_1,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_KEY_2,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_KEY_3,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_KEY_4,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_EM_KEY_1_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
-  { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_NUT,		&level.score[SC_NUT],		TEXT_CRACKING	},
+  { EL_DYNAMITE,	&level.score[SC_DYNAMITE],	TEXT_COLLECTING	},
+  { EL_KEY_1,		&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_KEY_2,		&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_KEY_3,		&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_KEY_4,		&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_1_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_2_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_3_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_4_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_SPEED	},
   { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_SPEED	},
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_SPEED	},
@@ -3504,81 +3425,20 @@ static void DrawPropertiesConfig()
 
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
-#if 0
-    int nr = properties_element - EL_CUSTOM_START;
-#endif
-
     CopyCustomElementPropertiesToEditor(properties_element);
 
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
+    for (i =  ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
+	 i <= ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY; i++)
+    {
+      /* draw checkbutton gadget */
+      x = checkbutton_info[i].x + xoffset_right2;
+      y = checkbutton_info[i].y + yoffset_right2;
 
-#if 0
-    checkbutton_info[i].value = &custom_element_properties[nr].indestructible;
-#endif
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
-
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-#if 0
-    checkbutton_info[i].value = &custom_element_properties[nr].can_fall;
-#endif
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
-
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-#if 0
-    checkbutton_info[i].value = &custom_element_properties[nr].can_smash;
-#endif
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
-
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_CUSTOM_PUSHABLE;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-#if 0
-    checkbutton_info[i].value = &custom_element_properties[nr].pushable;
-#endif
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
-
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-#if 0
-    checkbutton_info[i].value = &custom_element_properties[nr].slippery;
-#endif
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
+      DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
+      ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		   GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+      MapCheckbuttonGadget(i);
+    }
 
     /* draw selectbox gadget */
     i = ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE;
@@ -3812,11 +3672,65 @@ static void DrawPropertiesTabulatorGadgets()
 
 static void DrawPropertiesInfo()
 {
+  static struct
+  {
+    int value;
+    char *text;
+  }
+  properties[] =
+  {
+    { EP_AMOEBALIVE,		"- living amoeba"		},
+    { EP_AMOEBOID,		"- amoeboid"			},
+    { EP_PFORTE,		"- pforte"			},
+    { EP_SOLID,			"- solid"			},
+    { EP_INDESTRUCTIBLE,	"- undestructible"		},
+    { EP_SLIPPERY,		"- slippery"			},
+    { EP_ENEMY,			"- enemy"			},
+    { EP_MAUER,			"- mauer"			},
+    { EP_CAN_FALL,		"- can fall"			},
+    { EP_CAN_SMASH,		"- can smash"			},
+    { EP_CAN_CHANGE,		"- can change"			},
+    { EP_CAN_MOVE,		"- can move"			},
+    { EP_COULD_MOVE,		"- could move"			},
+    { EP_DONT_TOUCH,		"- don't touch"			},
+    { EP_DONT_GO_TO,		"- don't go to"			},
+    { EP_FOOD_DARK_YAMYAM,	"- food for dark yamyam"	},
+    { EP_BD_ELEMENT,		"- BD style"			},
+    { EP_SB_ELEMENT,		"- SB style"			},
+    { EP_GEM,			"- gem"				},
+    { EP_INACTIVE,		"- inactive"			},
+    { EP_EXPLOSIVE,		"- explosive"			},
+    { EP_FOOD_PENGUIN,		"- food for penguin"		},
+    { EP_PUSHABLE,		"- pushable"			},
+    { EP_PLAYER,		"- player"			},
+    { EP_HAS_CONTENT,		"- has content"			},
+    { EP_DIGGABLE,		"- diggable"			},
+    { EP_SP_ELEMENT,		"- SB style"			},
+    { EP_WALKABLE_THROUGH,	"- walkable through"		},
+    { EP_OVER_PLAYER,		"- over player"			},
+    { EP_ACTIVE_BOMB,		"- active bomb"			},
+    { EP_BELT,			"- belt"			},
+    { EP_BELT_ACTIVE,		"- active belt"			},
+    { EP_BELT_SWITCH,		"- belt switch"			},
+    { EP_WALKABLE_UNDER,	"- walkable under"		},
+    { EP_EM_SLIPPERY_WALL,	"- EM style slippery wall"	},
+    { EP_CAN_BE_CRUMBLED,	"- can be crumbled"		},
+    { -1,			NULL				}
+  };
   char *filename = getElementDescriptionFilename(properties_element);
-  int num_elements_in_level;
+  char *percentage_text = "In this level:";
+  char *properties_text = "Standard properties:";
   float percentage;
+  int num_elements_in_level;
+  int num_standard_properties = 0;
+  int font1_nr = FONT_TEXT_1;
+  int font2_nr = FONT_TEXT_2;
+  int font1_width = getFontWidth(font1_nr);
+  int font2_height = getFontHeight(font2_nr);
+  int pad_x = ED_SETTINGS_XPOS;
+  int pad_y = 5 * TILEY;
   int screen_line = 2;
-  int x, y;
+  int i, x, y;
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3825,9 +3739,32 @@ static void DrawPropertiesInfo()
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, FONT_TEXT_1, "In this level:");
-  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(FONT_TEXT_1), 5 * TILEY,
-	    FONT_TEXT_2, "%d (%.2f%%)", num_elements_in_level, percentage);
+  DrawTextF(pad_x, pad_y, font1_nr, percentage_text);
+  DrawTextF(pad_x + strlen(percentage_text) * font1_width, pad_y,
+	    font2_nr, "%d (%.2f%%)", num_elements_in_level, percentage);
+
+  for (i=0; properties[i].value != -1; i++)
+    if (HAS_PROPERTY(properties_element, properties[i].value))
+      num_standard_properties++;
+
+  if (num_standard_properties > 0)
+  {
+    DrawTextF(pad_x, pad_y + screen_line * font2_height, font1_nr,
+	      properties_text);
+    screen_line++;
+
+    for (i=0; properties[i].value != -1; i++)
+    {
+      if (!HAS_PROPERTY(properties_element, properties[i].value))
+	continue;
+
+      DrawTextF(pad_x, pad_y + screen_line * font2_height, font2_nr,
+		properties[i].text);
+      screen_line++;
+    }
+
+    screen_line++;
+  }
 
   PrintInfoText("Description:", FONT_TEXT_1, screen_line);
   if (PrintElementDescriptionFromFile(filename, screen_line + 1) == 0)

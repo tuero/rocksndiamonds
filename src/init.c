@@ -1101,16 +1101,12 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_schluessel[] =
+  static int ep_can_be_crumbled[] =
   {
-    EL_KEY_1,
-    EL_KEY_2,
-    EL_KEY_3,
-    EL_KEY_4,
-    EL_EM_KEY_1,
-    EL_EM_KEY_2,
-    EL_EM_KEY_3,
-    EL_EM_KEY_4,
+    EL_SAND,
+    EL_LANDMINE,
+    EL_TRAP,
+    EL_TRAP_ACTIVE,
     -1
   };
 
@@ -1665,7 +1661,7 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_mampf2[] =
+  static int ep_food_dark_yamyam[] =
   {
     EL_SAND,
     EL_BUG,
@@ -1908,7 +1904,7 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_mampf3[] =
+  static int ep_food_penguin[] =
   {
     EL_EMERALD,
     EL_BD_DIAMOND,
@@ -1949,17 +1945,19 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_has_content[] =
+  static int ep_walkable_over[] =
   {
-    EL_YAMYAM,
-    EL_AMOEBA_WET,
-    EL_AMOEBA_DRY,
-    EL_AMOEBA_FULL,
-    EL_BD_AMOEBA,
+    EL_EMPTY_SPACE,
+    EL_SP_EMPTY_SPACE,
+    /* !!! EL_GATE_[1-4],    EL_GATE_[1-4]_GRAY    !!! */
+    /* !!! EL_EM_GATE_[1-4], EL_EM_GATE_[1-4]_GRAY !!! */
+    EL_SOKOBAN_FIELD_EMPTY,
+    EL_EXIT_OPEN,
+    EL_SP_EXIT_OPEN,
     -1
   };
 
-  static int ep_eatable[] =
+  static int ep_diggable[] =
   {
     EL_SAND,
     EL_SP_BASE,
@@ -1968,60 +1966,47 @@ void InitElementProperties()
     EL_TRAP,
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE,
+#if 0
+    EL_LANDMINE,
+    EL_SP_BUGGY_BASE_ACTIVE,
+#endif
     -1
   };
 
-  static int ep_sp_element[] =
+  static int ep_collectible[] =
   {
-    EL_SP_EMPTY,
-    EL_SP_ZONK,
-    EL_SP_BASE,
-    EL_SP_MURPHY,
+    EL_BD_DIAMOND,
+    EL_EMERALD,
+    EL_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_KEY_1,
+    EL_KEY_2,
+    EL_KEY_3,
+    EL_KEY_4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4,
+    EL_DYNAMITE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
     EL_SP_INFOTRON,
-    EL_SP_CHIP_SINGLE,
-    EL_SP_HARDWARE_GRAY,
-    EL_SP_EXIT_CLOSED,
-    EL_SP_EXIT_OPEN,
-    EL_SP_DISK_ORANGE,
-    EL_SP_PORT_RIGHT,
-    EL_SP_PORT_DOWN,
-    EL_SP_PORT_LEFT,
-    EL_SP_PORT_UP,
-    EL_SP_GRAVITY_PORT_RIGHT,
-    EL_SP_GRAVITY_PORT_DOWN,
-    EL_SP_GRAVITY_PORT_LEFT,
-    EL_SP_GRAVITY_PORT_UP,
-    EL_SP_SNIKSNAK,
-    EL_SP_DISK_YELLOW,
-    EL_SP_TERMINAL,
     EL_SP_DISK_RED,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_ANY,
-    EL_SP_ELECTRON,
-    EL_SP_BUGGY_BASE,
-    EL_SP_CHIP_LEFT,
-    EL_SP_CHIP_RIGHT,
-    EL_SP_HARDWARE_BASE_1,
-    EL_SP_HARDWARE_GREEN,
-    EL_SP_HARDWARE_BLUE,
-    EL_SP_HARDWARE_RED,
-    EL_SP_HARDWARE_YELLOW,
-    EL_SP_HARDWARE_BASE_2,
-    EL_SP_HARDWARE_BASE_3,
-    EL_SP_HARDWARE_BASE_4,
-    EL_SP_HARDWARE_BASE_5,
-    EL_SP_HARDWARE_BASE_6,
-    EL_SP_CHIP_TOP,
-    EL_SP_CHIP_BOTTOM,
-    /* additional elements that appeared in newer Supaplex levels */
-    EL_INVISIBLE_WALL,
-    /* more than one murphy in a level results in an inactive clone */
-    EL_SP_MURPHY_CLONE,
+    EL_PEARL,
+    EL_CRYSTAL,
+    EL_KEY_WHITE,
+    EL_SHIELD_NORMAL,
+    EL_SHIELD_DEADLY,
+    EL_EXTRA_TIME,
+    EL_ENVELOPE,
+    EL_SPEED_PILL,
     -1
   };
 
-  static int ep_quick_gate[] =
+  static int ep_walkable_through[] =
   {
     EL_EM_GATE_1,
     EL_EM_GATE_2,
@@ -2035,13 +2020,13 @@ void InitElementProperties()
     EL_SP_PORT_RIGHT,
     EL_SP_PORT_UP,
     EL_SP_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
     EL_SP_GRAVITY_PORT_LEFT,
     EL_SP_GRAVITY_PORT_RIGHT,
     EL_SP_GRAVITY_PORT_UP,
     EL_SP_GRAVITY_PORT_DOWN,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_ANY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
     -1
@@ -2136,7 +2121,7 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_tube[] =
+  static int ep_walkable_under[] =
   {
     EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
@@ -2152,12 +2137,68 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_can_be_crumbled[] =
+  static int ep_sp_element[] =
   {
-    EL_SAND,
-    EL_LANDMINE,
-    EL_TRAP,
-    EL_TRAP_ACTIVE,
+    EL_SP_EMPTY,
+    EL_SP_ZONK,
+    EL_SP_BASE,
+    EL_SP_MURPHY,
+    EL_SP_INFOTRON,
+    EL_SP_CHIP_SINGLE,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_EXIT_CLOSED,
+    EL_SP_EXIT_OPEN,
+    EL_SP_DISK_ORANGE,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_UP,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_SNIKSNAK,
+    EL_SP_DISK_YELLOW,
+    EL_SP_TERMINAL,
+    EL_SP_DISK_RED,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_ANY,
+    EL_SP_ELECTRON,
+    EL_SP_BUGGY_BASE,
+    EL_SP_CHIP_LEFT,
+    EL_SP_CHIP_RIGHT,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    /* additional elements that appeared in newer Supaplex levels */
+    EL_INVISIBLE_WALL,
+    /* more than one murphy in a level results in an inactive clone */
+    EL_SP_MURPHY_CLONE,
+    -1
+  };
+
+  static int ep_has_content[] =
+  {
+    EL_YAMYAM,
+    EL_AMOEBA_WET,
+    EL_AMOEBA_DRY,
+    EL_AMOEBA_FULL,
+    EL_BD_AMOEBA,
+    -1
+  };
+
+  static int ep_solid_new[] =
+  {
     -1
   };
 
@@ -2169,7 +2210,7 @@ void InitElementProperties()
   {
     { ep_amoebalive,		EP_AMOEBALIVE		},
     { ep_amoeboid,		EP_AMOEBOID		},
-    { ep_schluessel,		EP_SCHLUESSEL		},
+    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
     { ep_pforte,		EP_PFORTE		},
     { ep_solid,			EP_SOLID		},
     { ep_indestructible,	EP_INDESTRUCTIBLE	},
@@ -2183,28 +2224,65 @@ void InitElementProperties()
     { ep_could_move,		EP_COULD_MOVE		},
     { ep_dont_touch,		EP_DONT_TOUCH		},
     { ep_dont_go_to,		EP_DONT_GO_TO		},
-    { ep_mampf2,		EP_MAMPF2		},
+    { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
     { ep_bd_element,		EP_BD_ELEMENT		},
     { ep_sb_element,		EP_SB_ELEMENT		},
     { ep_gem,			EP_GEM			},
     { ep_inactive,		EP_INACTIVE		},
     { ep_explosive,		EP_EXPLOSIVE		},
-    { ep_mampf3,		EP_MAMPF3		},
+    { ep_food_penguin,		EP_FOOD_PENGUIN		},
     { ep_pushable,		EP_PUSHABLE		},
     { ep_player,		EP_PLAYER		},
-    { ep_has_content,		EP_HAS_CONTENT		},
-    { ep_eatable,		EP_EATABLE		},
-    { ep_sp_element,		EP_SP_ELEMENT		},
-    { ep_quick_gate,		EP_QUICK_GATE		},
+    { ep_walkable_over,		EP_WALKABLE_OVER	},
+    { ep_diggable,		EP_DIGGABLE		},
+    { ep_collectible,		EP_COLLECTIBLE		},
+    { ep_walkable_through,	EP_WALKABLE_THROUGH	},
     { ep_over_player,		EP_OVER_PLAYER		},
     { ep_active_bomb,		EP_ACTIVE_BOMB		},
     { ep_belt,			EP_BELT			},
     { ep_belt_active,		EP_BELT_ACTIVE		},
     { ep_belt_switch,		EP_BELT_SWITCH		},
-    { ep_tube,			EP_TUBE			},
-    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
+    { ep_walkable_under,	EP_WALKABLE_UNDER	},
+    { ep_sp_element,		EP_SP_ELEMENT		},
+    { ep_has_content,		EP_HAS_CONTENT		},
+    { ep_solid_new,		EP_SOLID_NEW		},
     { NULL,			-1			}
   };
+
+#if 0
+  static int active_properties[] =
+  {
+    EP_AMOEBALIVE,
+    EP_AMOEBOID,
+    EP_PFORTE,
+    EP_SOLID,
+    EP_ENEMY,
+    EP_MAUER,
+    EP_CAN_FALL,
+    EP_CAN_SMASH,
+    EP_CAN_CHANGE,
+    EP_CAN_MOVE,
+    EP_COULD_MOVE,
+    EP_DONT_TOUCH,
+    EP_DONT_GO_TO,
+    EP_GEM,
+    EP_EXPLOSIVE,
+    EP_PUSHABLE,
+    EP_PLAYER,
+    EP_HAS_CONTENT,
+    EP_DIGGABLE,
+    EP_WALKABLE_THROUGH,
+    EP_OVER_PLAYER,
+    EP_ACTIVE_BOMB,
+
+    EP_BELT,
+    EP_BELT_ACTIVE,
+    EP_BELT_SWITCH,
+    EP_WALKABLE_UNDER,
+    EP_EM_SLIPPERY_WALL,
+    EP_CAN_BE_CRUMBLED,
+  };
+#endif
 
   /* always start with reliable default values (no properties) */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
@@ -2213,16 +2291,53 @@ void InitElementProperties()
 
   /* set all predefined element properties from above arrays */
   for (i=0; element_properties[i].elements != NULL; i++)
-    for (j=0; (element_properties[i].elements)[j] >= 0; j++)
+    for (j=0; (element_properties[i].elements)[j] != -1; j++)
       SET_PROPERTY((element_properties[i].elements)[j],
 		   element_properties[i].property, TRUE);
 
   /* set properties of character elements */
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-  {
-    SET_PROPERTY(i, EP_CHAR, TRUE);
     SET_PROPERTY(i, EP_INACTIVE, TRUE);
+
+#if 0
+  /* determine inactive elements (used for engine main loop optimization) */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    boolean active = FALSE;
+
+    for (j=0; i < NUM_ELEMENT_PROPERTIES; j++)
+    {
+      if (HAS_PROPERTY(i, j))
+	active = TRUE;
+    }
+
+#if 0
+    if (!active)
+      SET_PROPERTY(i, EP_INACTIVE, TRUE);
+#endif
   }
+#endif
+
+#if 0
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    boolean element_is_solid = TRUE;
+
+    if (IS_DIGGABLE(i) ||
+	IS_COLLECTIBLE(i) ||
+	CAN_FALL(i) ||
+	CAN_MOVE(i) ||
+	IS_PUSHABLE(i))
+      element_is_solid = FALSE;
+
+    if (IS_INDESTRUCTIBLE(i))
+      element_is_solid = TRUE;
+
+    if (element_is_solid != HAS_PROPERTY(i, EP_SOLID))
+      printf("::: '%s' should %s solid\n", element_info[i].token_name,
+	     (HAS_PROPERTY(i, EP_SOLID) ? "NOT be" : "be"));
+  }
+#endif
 }
 
 static void InitGlobal()
