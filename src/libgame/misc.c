@@ -2167,7 +2167,8 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     if (dynamic_tokens_found)
     {
       Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "dynamic token(s) found:");
+      Error(ERR_RETURN, "dynamic token(s) found in config file:");
+      Error(ERR_RETURN, "- config file: '%s'", filename);
 
       for (list = setup_file_list; list != NULL; list = list->next)
       {
@@ -2220,7 +2221,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   struct FileInfo *file_list = artwork_info->file_list;
   int num_file_list_entries = artwork_info->num_file_list_entries;
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
-  char *filename_base, *filename_local;
+  char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
 
 #if 0
@@ -2264,11 +2265,14 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     artwork_info->num_property_mapping_entries = 0;
   }
 
-  /* first look for special artwork configured in level series config */
-  filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
+  if (!SETUP_OVERRIDE_ARTWORK(setup, artwork_info->type))
+  {
+    /* first look for special artwork configured in level series config */
+    filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
 
-  if (fileExists(filename_base))
-    LoadArtworkConfigFromFilename(artwork_info, filename_base);
+    if (fileExists(filename_base))
+      LoadArtworkConfigFromFilename(artwork_info, filename_base);
+  }
 
   filename_local = getCustomArtworkConfigFilename(artwork_info->type);
 
@@ -2319,9 +2323,11 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   {
     int error_mode = ERR_WARN;
 
+#if 1
     /* we can get away without sounds and music, but not without graphics */
     if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
       error_mode = ERR_EXIT;
+#endif
 
     Error(error_mode, "cannot find artwork file '%s'", basename);
     return;
@@ -2378,9 +2384,11 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   {
     int error_mode = ERR_WARN;
 
+#if 1
     /* we can get away without sounds and music, but not without graphics */
     if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
       error_mode = ERR_EXIT;
+#endif
 
     Error(error_mode, "cannot load artwork file '%s'", basename);
     return;
@@ -2455,6 +2463,18 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 
     LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      file_list[i].filename, i);
+
+#if 0
+    if (artwork_info->artwork_list[i] == NULL &&
+	strcmp(file_list[i].default_filename, file_list[i].filename) != 0)
+    {
+      Error(ERR_WARN, "trying default artwork file '%s'",
+	    file_list[i].default_filename);
+
+      LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
+			file_list[i].default_filename, i);
+    }
+#endif
   }
 
 #if 0

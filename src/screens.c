@@ -197,8 +197,6 @@ void DrawMainMenu()
   int level_width = font_width * strlen("Level:");
   int i;
 
-  printf("::: CHECK A: '%s'\n", leveldir_current->graphics_path);
-
   UnmapAllGadgets();
   FadeSounds();
 
@@ -224,23 +222,15 @@ void DrawMainMenu()
   /* needed if last screen was the setup screen and fullscreen state changed */
   ToggleFullscreenIfNeeded();
 
-  printf("::: CHECK B.1: '%s'\n", leveldir_current->graphics_path);
-
-#if 1
   /* leveldir_current may be invalid (level group, parent link) */
   if (!validLevelSeries(leveldir_current))
     leveldir_current = getFirstValidTreeInfoEntry(leveldir_last_valid);
 
   /* store valid level series information */
   leveldir_last_valid = leveldir_current;
-#endif
-
-  printf("::: CHECK B.2: '%s'\n", leveldir_current->graphics_path);
 
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork();
-
-  printf("::: CHECK C: '%s'\n", leveldir_current->graphics_path);
 
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
@@ -248,15 +238,6 @@ void DrawMainMenu()
 
   /* map gadgets for main menu screen */
   MapTapeButtons();
-
-#if 0
-  /* leveldir_current may be invalid (level group, parent link) */
-  if (!validLevelSeries(leveldir_current))
-    leveldir_current = getFirstValidTreeInfoEntry(leveldir_last_valid);
-
-  /* store valid level series information */
-  leveldir_last_valid = leveldir_current;
-#endif
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
@@ -325,8 +306,6 @@ static void gotoTopLevelDir()
   /* move upwards to top level directory */
   while (leveldir_current->node_parent)
   {
-    printf("::: ---> '%s'\n", leveldir_current->graphics_path);
-
     /* write a "path" into level tree for easy navigation to last level */
     if (leveldir_current->node_parent->node_group->cl_first == -1)
     {
@@ -348,11 +327,7 @@ static void gotoTopLevelDir()
     }
 
     leveldir_current = leveldir_current->node_parent;
-
-    printf("::: +++> '%s'\n", leveldir_current->graphics_path);
   }
-
-  printf("::: ===> '%s'\n", leveldir_current->graphics_path);
 }
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
@@ -443,11 +418,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
-	  printf("::: CHECK C.1: '%s'\n", leveldir_current->graphics_path);
-
 	  gotoTopLevelDir();
-
-	  printf("::: CHECK C.2: '%s'\n", leveldir_current->graphics_path);
 
 	  DrawChooseLevel();
 	}

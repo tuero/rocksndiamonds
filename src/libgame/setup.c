@@ -332,39 +332,17 @@ void setLevelArtworkDir(TreeInfo *ti)
   char **artwork_path_ptr, **artwork_set_ptr;
   TreeInfo *level_artwork;
 
-  TreeInfo *tst1 = getTreeInfoFromIdentifier(leveldir_first, "jue1");
-  printf("::: XXX 0.1 '%s'\n", tst1->graphics_path);
-
   if (ti == NULL || leveldir_current == NULL)
     return;
 
   artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
   artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
 
-  printf("::: ['%s', '%s']\n", tst1->identifier, leveldir_current->identifier);
-
-  printf("::: XXX 0.2 '%s' [%x]\n", tst1->graphics_path, tst1->graphics_path);
-
-#if 1
   if (*artwork_path_ptr != NULL)
-  {
-    if (ti->type == 0)
-      printf("::: free'ing '%s' [%x] [%x] [type %d] ...\n",
-	     *artwork_path_ptr, *artwork_path_ptr,
-	     leveldir_current->graphics_path, ti->type);
-
     free(*artwork_path_ptr);
-  }
-#endif
-
-  printf("::: XXX 0.3 '%s' [%x]\n", tst1->graphics_path, tst1->graphics_path);
 
   if ((level_artwork = getTreeInfoFromIdentifier(ti, *artwork_set_ptr)))
-  {
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
-
-    printf(":1: setting to '%s' [type %d] ...\n", *artwork_path_ptr, ti->type);
-  }
   else
   {
     /* No (or non-existing) artwork configured in "levelinfo.conf". This would
@@ -383,19 +361,11 @@ void setLevelArtworkDir(TreeInfo *ti)
     {
       *artwork_path_ptr = getStringCopy(getDefaultArtworkDir(ti->type));
       *artwork_set_ptr = getStringCopy(getDefaultArtworkSet(ti->type));
-
-      if (ti->type == 0)
-	printf(":2: setting to '%s' [type %d] ...\n",
-	       *artwork_path_ptr, ti->type);
     }
     else
     {
       *artwork_path_ptr = getStringCopy(UNDEFINED_FILENAME);
       *artwork_set_ptr = NULL;
-
-      if (ti->type == 0)
-	printf(":3: setting to '%s' [type %d] ...\n",
-	       *artwork_path_ptr, ti->type);
     }
 
     free(dir);
@@ -1921,13 +1891,6 @@ void LoadLevelInfo()
 
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
-
-  {
-    TreeInfo *tst1 = getTreeInfoFromIdentifier(leveldir_first, "jue1");
-    TreeInfo *tst2 = getTreeInfoFromIdentifier(leveldir_first, "demojue");
-    printf("::: ??? 1 '%s' [%x, %x]\n", tst1->graphics_path,
-	   tst1->graphics_path, tst2->graphics_path);
-  }
 
   /* before sorting, the first entries will be from the user directory */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
