@@ -20,6 +20,11 @@ extern int arg_silence;
 
 extern unsigned int frame;
 
+#define EM_GAME_STATUS_MENU	1
+#define EM_GAME_STATUS_PLAY	2
+
+extern int em_game_status;
+
 extern short ulaw_to_linear[256];
 extern unsigned char linear_to_ulaw[65536];
 
@@ -28,7 +33,7 @@ extern unsigned char linear_to_ulaw[65536];
 int open_all(void);
 void close_all(void);
 
-void readjoy(void);
+void readjoy(byte);
 void input_eventloop(void);
 
 void blitscreen(void);
@@ -45,7 +50,9 @@ void sound_play(void);
 
 int cave_convert(char *filename);
 
-int game_start(void);
+void game_init_vars(void);
+int game_loop(byte);
+
 void synchro_1(void);
 void synchro_2(void);
 void synchro_3(void);

@@ -110,13 +110,9 @@ static void drawmenu(int pos)
   }
 }
 
-/* bring it all together */
-int game_start(void)
+void game_init_vars(void)
 {
-  int x,y;
-  char name[MAXNAME+2];
-  int temp;
-  int pos;
+  int x, y;
 
   Random = 1684108901;
 
@@ -152,132 +148,255 @@ int game_start(void)
   player_level = 0;
 
   input_pause = 1    * 0;
+}
 
-  while (1)
+int game_play_init(int player_level)
+{
+  char name[MAXNAME+2];
+
+  name[MAXNAME] = 0;
+  snprintf(name, MAXNAME+2, "%s/lev%02d", EM_LVL_DIR, player_level);
+
+  if (name[MAXNAME])
+    snprintf_overflow("read a level in cave/");
+
+  if (cave_convert(name) != 0)
+    return 1;
+
+  game_initscreen();
+  game_blitscore();
+  game_animscreen();
+
+  return 0;
+}
+
+int game_menu_loop(boolean init, byte action)
+{
+  static int temp = -1;
+  static int pos = -1;
+
+  if (init)
   {
+    temp = 1;
     pos = 4;
 
-    title_initscreen();
+    return 0;
+  }
 
-    for (temp = 0; temp < 7; temp++)
-      drawmenu(temp);			/* display all lines */
+  input_eventloop();
 
+  if (input_die)
+    return 1;
+
+  if (input_refresh)
+    blitscreen();
+
+  if (!input_pause)
+  {
     title_blitants(4 + pos);
-
     title_blitscore();
     title_animscreen();
 
-    temp = 1;
-    while (1)
+    ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = 0;
+
+    readjoy(action);
+
+    if (temp == 0)
     {
-      input_eventloop();
-      if (input_die) return(0);
-      if (input_refresh) blitscreen();
+      if (ply1.joy_fire)
+	return 2;
 
-      if (!input_pause)
+      if (ply1.joy_e && player_level < 99)
       {
+	player_level++;
+	drawmenu(2);
+      }
+
+      if (ply1.joy_w && player_level > 0)
+      {
+	player_level--;
+	drawmenu(2);
+      }
+
+      if (ply1.joy_n && pos > 0)
+      {
+	drawmenu(pos);
+	pos--;
 	title_blitants(4 + pos);
-	title_blitscore();
-	title_animscreen();
+      }
 
-	ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = 0;
-
-	readjoy();
-
-	if (temp == 0)
-	{
-	  if (ply1.joy_fire)
-	    break;
-
-	  if (ply1.joy_e && player_level < 99)
-	  {
-	    player_level++;
-	    drawmenu(2);
-	  }
-
-	  if (ply1.joy_w && player_level > 0)
-	  {
-	    player_level--;
-	    drawmenu(2);
-	  }
-
-	  if (ply1.joy_n && pos > 0)
-	  {
-	    drawmenu(pos);
-	    pos--;
-	    title_blitants(4 + pos);
-	  }
-
-	  if (ply1.joy_s && pos < 4)
-	  {
-	    drawmenu(pos);
-	    pos++;
-	    title_blitants(4 + pos);
-	  }
-	}
-
-	temp = (ply1.joy_n ||
-		ply1.joy_e ||
-		ply1.joy_s ||
-		ply1.joy_w ||
-		ply1.joy_fire);
+      if (ply1.joy_s && pos < 4)
+      {
+	drawmenu(pos);
+	pos++;
+	title_blitants(4 + pos);
       }
     }
 
-    name[MAXNAME] = 0;
-    snprintf(name, MAXNAME+2, "%s/lev%02d", EM_LVL_DIR, player_level);
+    temp = (ply1.joy_n || ply1.joy_e || ply1.joy_s || ply1.joy_w ||
+	    ply1.joy_fire);
+  }
 
-    if (name[MAXNAME])
-      snprintf_overflow("read a level in cave/");
+  return 0;
+}
 
-    if (cave_convert(name))
-      continue;
+int game_play_loop(byte action)
+{
+  input_eventloop();
 
-    game_initscreen();
-    game_blitscore();
+  if (input_die || input_esc)
+    return 1;
+
+  if (input_refresh)
+    blitscreen();
+
+  if (!input_pause)
+  {
     game_animscreen();
 
-    while (1)
+    frame = (frame - 1) & 7;
+
+    readjoy(action);
+
+#if 1
+    if (input_esc)
+      return 1;
+#endif
+
+    if (frame == 7)
     {
-      input_eventloop();
+      synchro_1();
+      synchro_2();
+    }
 
-      if (input_die || input_esc)
-	break;
-
-      if (input_refresh)
-	blitscreen();
-
-      if (!input_pause)
-      {
-	game_animscreen();
-
-	frame = (frame - 1) & 7;
-
-	readjoy();
-
-	if (frame == 7)
-	{
-	  synchro_1();
-	  synchro_2();
-	}
-
-	if (frame == 6)
-	{
-	  synchro_3();
-	  sound_play();
-	  game_blitscore();
-	}
-      }
+    if (frame == 6)
+    {
+      synchro_3();
+      sound_play();
+      game_blitscore();
     }
   }
+
+  return 0;
+}
+
+void game_menu_init(void)
+{
+  int pos = 4;
+  int i;
+
+  title_initscreen();
+
+  for (i = 0; i < 7; i++)
+    drawmenu(i);			/* display all lines */
+
+  title_blitants(4 + pos);
+  title_blitscore();
+  title_animscreen();
+
+  game_menu_loop(1, 0);
+}
+
+int game_loop(byte action)
+{
+#if 1
+
+#if 0
+  printf("::: action == 0x%02x\n", action);
+#endif
+
+  if (em_game_status == EM_GAME_STATUS_MENU)
+  {
+    int result = game_menu_loop(0, action);
+
+    if (result == 1)
+    {
+      /* exit program */
+
+      return 1;
+    }
+
+    if (result == 2)
+    {
+      /* start playing */
+
+      if (game_play_init(player_level) == 0)
+	em_game_status = EM_GAME_STATUS_PLAY;
+    }
+  }
+  else if (em_game_status == EM_GAME_STATUS_PLAY)
+  {
+    if (game_play_loop(action) != 0)
+    {
+      /* stop playing */
+
+      game_menu_init();
+      em_game_status = EM_GAME_STATUS_MENU;
+    }
+  }
+
+  return 0;
+
+#else
+
+  while (1)
+  {
+    int result = game_menu_loop(0);
+
+    if (result == 1)
+      return 1;
+
+    if (result == 2)
+      break;
+  }
+
+  em_game_status = EM_GAME_STATUS_PLAY;
+  if (game_play_init(player_level) != 0)
+    return 0;
+
+  while (1)
+  {
+    if (game_play_loop() != 0)
+      break;
+  }
+
+  em_game_status = EM_GAME_STATUS_MENU;
+  game_menu_init();
+
+  return 0;
+
+#endif
 }
 
 /* read input device for players
  */
-void readjoy(void)
+void readjoy(byte action)
 {
-  unsigned int i;
   unsigned int north = 0, east = 0, south = 0, west = 0, fire = 0;
+
+#if 1
+
+  if (action & JOY_LEFT)
+    west = 1;
+
+  if (action & JOY_RIGHT)
+    east = 1;
+
+  if (action & JOY_UP)
+    north = 1;
+
+  if (action & JOY_DOWN)
+    south = 1;
+
+  if (action & JOY_BUTTON_1)
+    fire = 1;
+
+  if (action & JOY_BUTTON_2)
+    input_esc = 1;
+
+#else
+
+  unsigned int i;
 
   for (i = 0; i < 3; i++)
     if (keymatrix[northKeyCode[i] >> 3] & 1 << (northKeyCode[i] & 7))
@@ -298,6 +417,7 @@ void readjoy(void)
   for (i = 0; i < 3; i++)
     if (keymatrix[fireKeyCode[i] >> 3] & 1 << (fireKeyCode[i] & 7))
       fire = 1;
+#endif
 
   ply1.joy_fire = fire;
   if (ply1.joy_stick || (north | east | south | west))
@@ -313,16 +433,20 @@ void readjoy(void)
  */
 void input_eventloop(void)
 {
+#if 0
   XEvent event;
+#endif
   unsigned int i;
   unsigned long count;
 
   if (input_pause)
   {
+#if 0
     XPeekEvent(display, &event); /* block until an event arrives */
 
     if (gettimeofday(&tv1, 0) == -1)
       tv1.tv_usec = 0;
+#endif
   }
   else
   {
@@ -352,6 +476,7 @@ void input_eventloop(void)
   input_refresh = 0;
   lastKeySym = NoSymbol;
 
+#if 0
   while (XPending(display))
   {
     /* drain the event queue */
@@ -387,6 +512,7 @@ void input_eventloop(void)
   }
 
   XQueryKeymap(display, keymatrix); /* read the keyboard */
+#endif
 
   input_esc = 0;
   for (i = 0; i < 1; i++)

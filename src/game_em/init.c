@@ -967,7 +967,9 @@ void close_all(void)
 	if(privateColourmap) XFreeColormap(display, privateColourmap);
 	if(privateColours) free(privateColours);
 	if(privateFlags) free(privateFlags);
+#if 0
 	if(display) XCloseDisplay(display);
+#endif
 }
 
 /* ---------------------------------------------------------------------- */

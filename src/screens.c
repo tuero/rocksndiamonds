@@ -501,12 +501,16 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	else
 #endif
 	{
-#if 1
-	  em_main();
-#else
 	  game_status = GAME_MODE_PLAYING;
 	  StopAnimation();
+
+#if 1
+
+	  em_main_init_game();
+
+#else
 	  InitGame();
+
 #endif
 	}
       }
@@ -2948,6 +2952,24 @@ void HandleGameActions()
   if (game_status != GAME_MODE_PLAYING)
     return;
 
+#if 1
+
+  {
+    byte summarized_player_action = 0;
+    int i;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      summarized_player_action |= stored_player[i].action;
+
+    if (em_main_handle_game(summarized_player_action) != 0)
+    {
+      game_status = GAME_MODE_MAIN;
+      DrawMainMenu();
+    }
+  }
+
+#else
+
   if (local_player->LevelSolved)
     GameWon();
 
@@ -2959,6 +2981,8 @@ void HandleGameActions()
 
   if (tape.auto_play && !tape.playing)
     AutoPlayTape();	/* continue automatically playing next tape */
+
+#endif
 }
 
 /* ---------- new screen button stuff -------------------------------------- */

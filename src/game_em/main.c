@@ -25,8 +25,12 @@ char *arg_geometry;
 int arg_install;
 int arg_silence;
 
+int em_game_status;
+
 extern void tab_generate();
 extern void ulaw_generate();
+
+extern void game_menu_init();
 
 void em_open_all()
 {
@@ -38,6 +42,8 @@ void em_open_all()
 
   if (open_all() != 0)
     Error(ERR_EXIT, "em_open_all(): open_all() failed");
+
+  game_init_vars();
 }
 
 void em_close_all()
@@ -45,18 +51,15 @@ void em_close_all()
   close_all();
 }
 
-void em_main()
+void em_main_init_game()
 {
-#if 0
-  em_open_all();
-#endif
+  game_menu_init();
+  em_game_status = EM_GAME_STATUS_MENU;
+}
 
-  if (game_start() != 0)
-    Error(ERR_EXIT, "em_main(): game_start() failed");
-
-#if 0
-  em_close_all();
-#endif
+int em_main_handle_game(byte action)
+{
+  return game_loop(action);
 }
 
 /* massive kludge for buffer overflows

@@ -4434,27 +4434,25 @@ void OpenAll()
 
   game_status = GAME_MODE_MAIN;
 
-  DrawMainMenu();
-
-  InitNetworkServer();
-
 #if 1
   em_open_all();
 #endif
 
+  DrawMainMenu();
+
+  InitNetworkServer();
 }
 
 void CloseAllAndExit(int exit_value)
 {
-
-#if 1
-  em_close_all();
-#endif
-
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();
   CloseAudio();		/* called after freeing sounds (needed for SDL) */
+
+#if 1
+  em_close_all();
+#endif
 
   FreeAllImages();
   FreeTileClipmasks();
