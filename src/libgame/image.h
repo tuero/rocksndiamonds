@@ -88,7 +88,7 @@ void InitImageList(struct ConfigInfo *, int, struct ConfigTypeInfo *,
 		   char **, char **, char **, char **, char **);
 
 void ReloadCustomImages();
-void CreateImageWithSmallImages(int);
+void CreateImageWithSmallImages(int, int);
 
 void FreeAllImages();
 

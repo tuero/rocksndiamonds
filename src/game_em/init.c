@@ -384,6 +384,8 @@ int open_all(void)
   }
 #endif
 
+#if 0	/* BITMAP CREATION STUFF */
+
   for (i = 0; i < 4; i++)
   {
     name[MAXNAME] = 0;
@@ -424,7 +426,6 @@ int open_all(void)
   ttlmaskBitmap = pcxBitmaps[3]->clip_mask;
 #endif
 
-#if 1
   for (i = 0; i < 4; i++)
   {
     Pixmap clip_mask;
@@ -496,11 +497,13 @@ int open_all(void)
 #if 0
     printf("::: CREATING NEW CLIPMASKS ...\n");
 #endif
+
 #if 1
     clip_mask = Pixmap_to_Mask(pcxBitmapsX2[i]->drawable,
 			       pcxBitmapsX2[i]->width,
 			       pcxBitmapsX2[i]->height);
 #endif
+
 #if 0
     printf("::: CREATING NEW CLIPMASKS DONE\n");
 #endif
@@ -539,6 +542,12 @@ int open_all(void)
 #endif
   }
 
+#endif	/* BITMAP CREATION STUFF */
+
+#if 1
+  SetBitmaps_EM(pcxBitmapsX2);
+#endif
+
   objBitmap = pcxBitmapsX2[0];
   botBitmap = pcxBitmapsX2[1];
   sprBitmap = pcxBitmapsX2[2];
@@ -553,7 +562,6 @@ int open_all(void)
   botmaskBitmap = pcxBitmapsX2[1]->clip_mask;
   sprmaskBitmap = pcxBitmapsX2[2]->clip_mask;
   ttlmaskBitmap = pcxBitmapsX2[3]->clip_mask;
-#endif
 #endif
 
 #if 1

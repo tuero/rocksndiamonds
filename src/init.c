@@ -239,6 +239,11 @@ void InitGadgets()
   gadgets_initialized = TRUE;
 }
 
+inline void InitElementSmallImagesScaledUp(int graphic)
+{
+  CreateImageWithSmallImages(graphic, graphic_info[graphic].scale_up_factor);
+}
+
 void InitElementSmallImages()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -247,16 +252,30 @@ void InitElementSmallImages()
 
   /* initialize normal images from static configuration */
   for (i = 0; element_to_graphic[i].element > -1; i++)
-    CreateImageWithSmallImages(element_to_graphic[i].graphic);
+    InitElementSmallImagesScaledUp(element_to_graphic[i].graphic);
 
   /* initialize special images from static configuration */
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
-    CreateImageWithSmallImages(element_to_special_graphic[i].graphic);
+    InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
 
   /* initialize images from dynamic configuration */
   for (i = 0; i < num_property_mappings; i++)
     if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
-      CreateImageWithSmallImages(property_mapping[i].artwork_index);
+      InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+
+  /* !!! FIX ME (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
+#if 1
+  for (i = IMG_EMC_OBJECT; i <= IMG_EMC_TITLE; i++)
+    InitElementSmallImagesScaledUp(i);
+#endif
+}
+
+void SetBitmaps_EM(Bitmap **em_bitmap)
+{
+  em_bitmap[0] = graphic_info[IMG_EMC_OBJECT].bitmap;
+  em_bitmap[1] = graphic_info[IMG_EMC_SCORE].bitmap;
+  em_bitmap[2] = graphic_info[IMG_EMC_SPRITE].bitmap;
+  em_bitmap[3] = graphic_info[IMG_EMC_TITLE].bitmap;
 }
 
 static int getFontBitmapID(int font_nr)
@@ -846,7 +865,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
-  graphic_info[graphic].scale_up_factor = 0;	/* default: no scaling up */
+  graphic_info[graphic].scale_up_factor = 1;	/* default: no scaling up */
   graphic_info[graphic].anim_delay_fixed = 0;
   graphic_info[graphic].anim_delay_random = 0;
   graphic_info[graphic].post_delay_fixed = 0;
@@ -949,6 +968,8 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* optional zoom factor for scaling up the image to a larger size */
   if (parameter[GFX_ARG_SCALE_UP] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP];
+  if (graphic_info[graphic].scale_up_factor < 1)
+    graphic_info[graphic].scale_up_factor = 1;		/* no scaling */
 
   /* this is only used for player "boring" and "sleeping" actions */
   if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)

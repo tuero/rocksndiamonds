@@ -1037,16 +1037,22 @@ void ReloadCustomImages()
   ReloadCustomArtworkList(image_info);
 }
 
-void CreateImageWithSmallImages(int pos)
+void CreateImageWithSmallImages(int pos, int zoom_factor)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
   if (img_info == NULL || img_info->contains_small_images)
     return;
 
-  CreateBitmapWithSmallBitmaps(img_info->bitmap);
+  CreateBitmapWithSmallBitmaps(img_info->bitmap, zoom_factor);
 
   img_info->contains_small_images = TRUE;
+
+#if 0
+  if (zoom_factor)
+    printf("CreateImageWithSmallImages: '%s' zoomed by factor %d\n",
+	   img_info->source_filename, zoom_factor);
+#endif
 
 #if 0
   printf("CreateImageWithSmallImages: '%s' done\n", img_info->source_filename);

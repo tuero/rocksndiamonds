@@ -23,6 +23,7 @@
 
 #include "../libgame/libgame.h"
 
+extern void SetBitmaps_EM(Bitmap **);
 extern void DrawGameDoorValues_EM(int, int, int, int);
 
 

@@ -873,7 +873,7 @@ Bitmap *LoadCustomImage(char *);
 void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
-void CreateBitmapWithSmallBitmaps(Bitmap *);
+void CreateBitmapWithSmallBitmaps(Bitmap *, int);
 
 void SetMouseCursor(int);
 
