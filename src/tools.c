@@ -3975,19 +3975,19 @@ em_object_mapping_list[] =
   },
   {
     Ykey_5_eat,				FALSE,	FALSE,
-    EL_EM_KEY_5,			ACTION_COLLECTING, -1
+    EL_EMC_KEY_5,			ACTION_COLLECTING, -1
   },
   {
     Ykey_6_eat,				FALSE,	FALSE,
-    EL_EM_KEY_6,			ACTION_COLLECTING, -1
+    EL_EMC_KEY_6,			ACTION_COLLECTING, -1
   },
   {
     Ykey_7_eat,				FALSE,	FALSE,
-    EL_EM_KEY_7,			ACTION_COLLECTING, -1
+    EL_EMC_KEY_7,			ACTION_COLLECTING, -1
   },
   {
     Ykey_8_eat,				FALSE,	FALSE,
-    EL_EM_KEY_8,			ACTION_COLLECTING, -1
+    EL_EMC_KEY_8,			ACTION_COLLECTING, -1
   },
   {
     Ylenses_eat,			FALSE,	FALSE,
@@ -4079,19 +4079,19 @@ em_object_mapping_list[] =
   },
   {
     Xdoor_5,				TRUE,	FALSE,
-    EL_EM_GATE_5,			-1, -1
+    EL_EMC_GATE_5,			-1, -1
   },
   {
     Xdoor_6,				TRUE,	FALSE,
-    EL_EM_GATE_6,			-1, -1
+    EL_EMC_GATE_6,			-1, -1
   },
   {
     Xdoor_7,				TRUE,	FALSE,
-    EL_EM_GATE_7,			-1, -1
+    EL_EMC_GATE_7,			-1, -1
   },
   {
     Xdoor_8,				TRUE,	FALSE,
-    EL_EM_GATE_8,			-1, -1
+    EL_EMC_GATE_8,			-1, -1
   },
   {
     Xkey_1,				TRUE,	FALSE,
@@ -4111,19 +4111,19 @@ em_object_mapping_list[] =
   },
   {
     Xkey_5,				TRUE,	FALSE,
-    EL_EM_KEY_5,			-1, -1
+    EL_EMC_KEY_5,			-1, -1
   },
   {
     Xkey_6,				TRUE,	FALSE,
-    EL_EM_KEY_6,			-1, -1
+    EL_EMC_KEY_6,			-1, -1
   },
   {
     Xkey_7,				TRUE,	FALSE,
-    EL_EM_KEY_7,			-1, -1
+    EL_EMC_KEY_7,			-1, -1
   },
   {
     Xkey_8,				TRUE,	FALSE,
-    EL_EM_KEY_8,			-1, -1
+    EL_EMC_KEY_8,			-1, -1
   },
   {
     Xwind_n,				TRUE,	FALSE,
@@ -4335,19 +4335,19 @@ em_object_mapping_list[] =
   },
   {
     Xfake_door_5,			TRUE,	FALSE,
-    EL_EM_GATE_5_GRAY,			-1, -1
+    EL_EMC_GATE_5_GRAY,			-1, -1
   },
   {
     Xfake_door_6,			TRUE,	FALSE,
-    EL_EM_GATE_6_GRAY,			-1, -1
+    EL_EMC_GATE_6_GRAY,			-1, -1
   },
   {
     Xfake_door_7,			TRUE,	FALSE,
-    EL_EM_GATE_7_GRAY,			-1, -1
+    EL_EMC_GATE_7_GRAY,			-1, -1
   },
   {
     Xfake_door_8,			TRUE,	FALSE,
-    EL_EM_GATE_8_GRAY,			-1, -1
+    EL_EMC_GATE_8_GRAY,			-1, -1
   },
   {
     Xfake_acid_1,			TRUE,	FALSE,

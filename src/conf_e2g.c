@@ -2610,52 +2610,52 @@ element_to_graphic[] =
     IMG_TRIGGER_PLAYER
   },
   {
-    EL_EM_KEY_5,			-1, -1, FALSE,
-    IMG_EM_KEY_5
+    EL_EMC_KEY_5,			-1, -1, FALSE,
+    IMG_EMC_KEY_5
   },
   {
-    EL_EM_KEY_6,			-1, -1, FALSE,
-    IMG_EM_KEY_6
+    EL_EMC_KEY_6,			-1, -1, FALSE,
+    IMG_EMC_KEY_6
   },
   {
-    EL_EM_KEY_7,			-1, -1, FALSE,
-    IMG_EM_KEY_7
+    EL_EMC_KEY_7,			-1, -1, FALSE,
+    IMG_EMC_KEY_7
   },
   {
-    EL_EM_KEY_8,			-1, -1, FALSE,
-    IMG_EM_KEY_8
+    EL_EMC_KEY_8,			-1, -1, FALSE,
+    IMG_EMC_KEY_8
   },
   {
-    EL_EM_GATE_5,			-1, -1, FALSE,
-    IMG_EM_GATE_5
+    EL_EMC_GATE_5,			-1, -1, FALSE,
+    IMG_EMC_GATE_5
   },
   {
-    EL_EM_GATE_5_GRAY,			-1, -1, FALSE,
-    IMG_EM_GATE_5_GRAY
+    EL_EMC_GATE_5_GRAY,			-1, -1, FALSE,
+    IMG_EMC_GATE_5_GRAY
   },
   {
-    EL_EM_GATE_6,			-1, -1, FALSE,
-    IMG_EM_GATE_6
+    EL_EMC_GATE_6,			-1, -1, FALSE,
+    IMG_EMC_GATE_6
   },
   {
-    EL_EM_GATE_6_GRAY,			-1, -1, FALSE,
-    IMG_EM_GATE_6_GRAY
+    EL_EMC_GATE_6_GRAY,			-1, -1, FALSE,
+    IMG_EMC_GATE_6_GRAY
   },
   {
-    EL_EM_GATE_7,			-1, -1, FALSE,
-    IMG_EM_GATE_7
+    EL_EMC_GATE_7,			-1, -1, FALSE,
+    IMG_EMC_GATE_7
   },
   {
-    EL_EM_GATE_7_GRAY,			-1, -1, FALSE,
-    IMG_EM_GATE_7_GRAY
+    EL_EMC_GATE_7_GRAY,			-1, -1, FALSE,
+    IMG_EMC_GATE_7_GRAY
   },
   {
-    EL_EM_GATE_8,			-1, -1, FALSE,
-    IMG_EM_GATE_8
+    EL_EMC_GATE_8,			-1, -1, FALSE,
+    IMG_EMC_GATE_8
   },
   {
-    EL_EM_GATE_8_GRAY,			-1, -1, FALSE,
-    IMG_EM_GATE_8_GRAY
+    EL_EMC_GATE_8_GRAY,			-1, -1, FALSE,
+    IMG_EMC_GATE_8_GRAY
   },
   {
     EL_EMC_ANDROID,			-1, -1, FALSE,

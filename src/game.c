@@ -1062,11 +1062,12 @@ inline void DrawGameValue_Dynamite(int value)
   DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
 }
 
-inline void DrawGameValue_Keys(int key[4])
+inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 {
   int i;
 
-  for (i = 0; i < MAX_KEYS; i++)
+  /* currently only 4 of 8 possible keys are displayed */
+  for (i = 0; i < STD_NUM_KEYS; i++)
     if (key[i])
       DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
 			 el2edimg(EL_KEY_1 + i));
@@ -1112,10 +1113,10 @@ inline void DrawGameValue_Level(int value)
 void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 		       int key_bits)
 {
-  int key[4];
+  int key[MAX_NUM_KEYS];
   int i;
 
-  for (i = 0; i < MAX_KEYS; i++)
+  for (i = 0; i < MAX_NUM_KEYS; i++)
     key[i] = key_bits & (1 << i);
 
   DrawGameValue_Level(level_nr);
@@ -1586,7 +1587,7 @@ void InitGame()
     player->lights_still_needed = 0;
     player->friends_still_needed = 0;
 
-    for (j = 0; j < MAX_KEYS; j++)
+    for (j = 0; j < MAX_NUM_KEYS; j++)
       player->key[j] = FALSE;
 
     player->dynabomb_count = 0;
@@ -11368,14 +11369,14 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;	/* player cannot walk here due to gravity */
 #endif
 
-	if (IS_GATE(element))
+	if (IS_RND_GATE(element))
 	{
-	  if (!player->key[element - EL_GATE_1])
+	  if (!player->key[RND_GATE_NR(element)])
 	    return MF_NO_ACTION;
 	}
-	else if (IS_GATE_GRAY(element))
+	else if (IS_RND_GATE_GRAY(element))
 	{
-	  if (!player->key[element - EL_GATE_1_GRAY])
+	  if (!player->key[RND_GATE_GRAY_NR(element)])
 	    return MF_NO_ACTION;
 	}
 	else if (element == EL_EXIT_OPEN ||
@@ -11438,12 +11439,12 @@ int DigField(struct PlayerInfo *player,
 
 	if (IS_EM_GATE(element))
 	{
-	  if (!player->key[element - EL_EM_GATE_1])
+	  if (!player->key[EM_GATE_NR(element)])
 	    return MF_NO_ACTION;
 	}
 	else if (IS_EM_GATE_GRAY(element))
 	{
-	  if (!player->key[element - EL_EM_GATE_1_GRAY])
+	  if (!player->key[EM_GATE_GRAY_NR(element)])
 	    return MF_NO_ACTION;
 	}
 	else if (IS_SP_PORT(element))
@@ -11554,13 +11555,9 @@ int DigField(struct PlayerInfo *player,
 	{
 	  player->dynabomb_xl = TRUE;
 	}
-	else if ((element >= EL_KEY_1 && element <= EL_KEY_4) ||
-		 (element >= EL_EM_KEY_1 && element <= EL_EM_KEY_4))
+	else if (IS_KEY(element))
 	{
-	  int key_nr = (element >= EL_KEY_1 && element <= EL_KEY_4 ?
-			element - EL_KEY_1 : element - EL_EM_KEY_1);
-
-	  player->key[key_nr] = TRUE;
+	  player->key[KEY_NR(element)] = TRUE;
 
 	  DrawGameValue_Keys(player->key);
 
@@ -12654,6 +12651,14 @@ void RaiseScoreElement(int element)
     case EL_KEY_2:
     case EL_KEY_3:
     case EL_KEY_4:
+    case EL_EM_KEY_1:
+    case EL_EM_KEY_2:
+    case EL_EM_KEY_3:
+    case EL_EM_KEY_4:
+    case EL_EMC_KEY_5:
+    case EL_EMC_KEY_6:
+    case EL_EMC_KEY_7:
+    case EL_EMC_KEY_8:
       RaiseScore(level.score[SC_KEY]);
       break;
     default:

@@ -418,17 +418,53 @@
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 
-#define IS_GATE(e)		((e) >= EL_GATE_1 &&			\
+#define IS_RND_KEY(e)		((e) >= EL_KEY_1 &&			\
+	 			 (e) <= EL_KEY_4)
+#define IS_EM_KEY(e)		((e) >= EL_EM_KEY_1 &&			\
+	 			 (e) <= EL_EM_KEY_4)
+#define IS_EMC_KEY(e)		((e) >= EL_EMC_KEY_5 &&			\
+	 			 (e) <= EL_EMC_KEY_8)
+#define IS_KEY(e)		(IS_RND_KEY(e) ||			\
+				 IS_EM_KEY(e) ||			\
+				 IS_EMC_KEY(e))
+#define RND_KEY_NR(e)		((e) - EL_KEY_1)
+#define EM_KEY_NR(e)		((e) - EL_EM_KEY_1)
+#define EMC_KEY_NR(e)		((e) - EL_EMC_KEY_5 + 4)
+#define KEY_NR(e)		(IS_RND_KEY(e) ? RND_KEY_NR(e) :	\
+				 IS_EM_KEY(e) ?  EM_KEY_NR(e) :		\
+				 IS_EMC_KEY(e) ? EMC_KEY_NR(e) : 0)
+
+#define IS_RND_GATE(e)		((e) >= EL_GATE_1 &&			\
 	 			 (e) <= EL_GATE_4)
-
-#define IS_GATE_GRAY(e)		((e) >= EL_GATE_1_GRAY &&		\
-	 			 (e) <= EL_GATE_4_GRAY)
-
 #define IS_EM_GATE(e)		((e) >= EL_EM_GATE_1 &&			\
 	 			 (e) <= EL_EM_GATE_4)
+#define IS_EMC_GATE(e)		((e) >= EL_EMC_GATE_5 &&		\
+	 			 (e) <= EL_EMC_GATE_8)
+#define IS_GATE(e)		(IS_RND_GATE(e) ||			\
+				 IS_EM_GATE(e) ||			\
+				 IS_EMC_GATE(e))
+#define RND_GATE_NR(e)		((e) - EL_GATE_1)
+#define EM_GATE_NR(e)		((e) - EL_EM_GATE_1)
+#define EMC_GATE_NR(e)		((e) - EL_EMC_GATE_5 + 4)
+#define GATE_NR(e)		(IS_RND_GATE(e) ? RND_GATE_NR(e) :	\
+				 IS_EM_GATE(e) ?  EM_GATE_NR(e) :	\
+				 IS_EMC_GATE(e) ? EMC_GATE_NR(e) : 0)
 
+#define IS_RND_GATE_GRAY(e)	((e) >= EL_GATE_1_GRAY &&		\
+	 			 (e) <= EL_GATE_4_GRAY)
 #define IS_EM_GATE_GRAY(e)	((e) >= EL_EM_GATE_1_GRAY &&		\
 	 			 (e) <= EL_EM_GATE_4_GRAY)
+#define IS_EMC_GATE_GRAY(e)	((e) >= EL_EMC_GATE_5_GRAY &&		\
+	 			 (e) <= EL_EMC_GATE_8_GRAY)
+#define IS_GATE_GRAY(e)		(IS_RND_GATE_GRAY(e) ||			\
+				 IS_EM_GATE_GRAY(e) ||			\
+				 IS_EMC_GATE_GRAY(e))
+#define RND_GATE_GRAY_NR(e)	((e) - EL_GATE_1_GRAY)
+#define EM_GATE_GRAY_NR(e)	((e) - EL_EM_GATE_1_GRAY)
+#define EMC_GATE_GRAY_NR(e)	((e) - EL_EMC_GATE_5_GRAY + 4)
+#define GATE_GRAY_NR(e)		(IS_RND_GATE_GRAY(e) ? RND_GATE_GRAY_NR(e) :  \
+				 IS_EM_GATE_GRAY(e) ?  EM_GATE_GRAY_NR(e) :   \
+				 IS_EMC_GATE_GRAY(e) ? EMC_GATE_GRAY_NR(e) : 0)
 
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
@@ -521,7 +557,8 @@
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
 #define MAX_INVENTORY_SIZE	1000
-#define MAX_KEYS		4
+#define STD_NUM_KEYS		4
+#define MAX_NUM_KEYS		8
 #define NUM_BELTS		4
 #define NUM_BELT_PARTS		3
 #define MIN_ENVELOPE_XSIZE	1
@@ -966,18 +1003,18 @@
 
 /* the following EMC style elements are currently not implemented in R'n'D */
 #define EL_BALLOON_SWITCH_NONE		667
-#define EL_EM_GATE_5			668
-#define EL_EM_GATE_6			669
-#define EL_EM_GATE_7			670
-#define EL_EM_GATE_8			671
-#define EL_EM_GATE_5_GRAY		672
-#define EL_EM_GATE_6_GRAY		673
-#define EL_EM_GATE_7_GRAY		674
-#define EL_EM_GATE_8_GRAY		675
-#define EL_EM_KEY_5			676
-#define EL_EM_KEY_6			677
-#define EL_EM_KEY_7			678
-#define EL_EM_KEY_8			679
+#define EL_EMC_GATE_5			668
+#define EL_EMC_GATE_6			669
+#define EL_EMC_GATE_7			670
+#define EL_EMC_GATE_8			671
+#define EL_EMC_GATE_5_GRAY		672
+#define EL_EMC_GATE_6_GRAY		673
+#define EL_EMC_GATE_7_GRAY		674
+#define EL_EMC_GATE_8_GRAY		675
+#define EL_EMC_KEY_5			676
+#define EL_EMC_KEY_6			677
+#define EL_EMC_KEY_7			678
+#define EL_EMC_KEY_8			679
 #define EL_EMC_ANDROID			680
 #define EL_EMC_GRASS			681
 #define EL_EMC_MAGIC_BALL		682
@@ -1523,7 +1560,7 @@ struct PlayerInfo
   int sokobanfields_still_needed;
   int lights_still_needed;
   int friends_still_needed;
-  int key[4];
+  int key[MAX_NUM_KEYS];
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
   int shield_normal_time_left;
   int shield_deadly_time_left;

@@ -2718,20 +2718,20 @@ static int editor_hl_emerald_mine_club[] =
 
 static int editor_el_emerald_mine_club[] =
 {
-  EL_EM_KEY_5,
-  EL_EM_KEY_6,
-  EL_EM_KEY_7,
-  EL_EM_KEY_8,
+  EL_EMC_KEY_5,
+  EL_EMC_KEY_6,
+  EL_EMC_KEY_7,
+  EL_EMC_KEY_8,
 
-  EL_EM_GATE_5,
-  EL_EM_GATE_6,
-  EL_EM_GATE_7,
-  EL_EM_GATE_8,
+  EL_EMC_GATE_5,
+  EL_EMC_GATE_6,
+  EL_EMC_GATE_7,
+  EL_EMC_GATE_8,
 
-  EL_EM_GATE_5_GRAY,
-  EL_EM_GATE_6_GRAY,
-  EL_EM_GATE_7_GRAY,
-  EL_EM_GATE_8_GRAY,
+  EL_EMC_GATE_5_GRAY,
+  EL_EMC_GATE_6_GRAY,
+  EL_EMC_GATE_7_GRAY,
+  EL_EMC_GATE_8_GRAY,
 
   EL_EMC_STEELWALL_1,
   EL_EMC_STEELWALL_2,
@@ -7279,10 +7279,10 @@ static struct
   { EL_EM_KEY_3_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_4_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
 #endif
-  { EL_EM_KEY_5,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_6,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_7,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_8,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EMC_KEY_5,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EMC_KEY_6,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EMC_KEY_7,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EMC_KEY_8,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
