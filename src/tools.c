@@ -189,15 +189,10 @@ void BackToFront()
     XCopyArea(display,backbuffer,window,gc,
 	      MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
 	      MICROLEV_XPOS, MICROLEV_YPOS);
-    redraw_mask &= ~REDRAW_MICROLEVEL;
-  }
-
-  if (redraw_mask & REDRAW_MICROLEVEL_LABEL)
-  {
     XCopyArea(display,backbuffer,window,gc,
 	      SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE,
 	      SX, MICROLABEL_YPOS);
-    redraw_mask &= ~REDRAW_MICROLEVEL_LABEL;
+    redraw_mask &= ~REDRAW_MICROLEVEL;
   }
 
   if (redraw_mask & REDRAW_TILES)
@@ -1442,41 +1437,61 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
   redraw_mask |= REDRAW_MICROLEVEL;
 }
 
+static void DrawMicroLevelLabelExt(int mode)
+{
+  char label_text[100];
+
+  XFillRectangle(display, drawto,gc,
+		 SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
+
+  strcpy(label_text, (mode == 1 ? level.name :
+		      mode == 2 ? "created by" :
+		      mode == 3 ? level.author : ""));
+
+  if (strlen(label_text) > 0)
+  {
+    int size, lxpos, lypos;
+
+    label_text[SXSIZE / FONT4_XSIZE] = '\0';
+
+    size = strlen(label_text);
+    lxpos = SX + (SXSIZE - size * FONT4_XSIZE) / 2;
+    lypos = MICROLABEL_YPOS;
+
+    DrawText(lxpos, lypos, label_text, FS_SMALL, FC_SPECIAL2);
+  }
+
+  redraw_mask |= REDRAW_MICROLEVEL;
+}
+
 void DrawMicroLevel(int xpos, int ypos, boolean restart)
 {
   static unsigned long scroll_delay = 0;
+  static unsigned long label_delay = 0;
   static int from_x, from_y, scroll_direction;
+  static int label_state, label_counter;
 
   if (restart)
   {
     from_x = from_y = 0;
     scroll_direction = MV_RIGHT;
+    label_state = 1;
+    label_counter = 0;
 
     DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+    DrawMicroLevelLabelExt(label_state);
 
-    XFillRectangle(display, drawto,gc,
-		   SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
-
-    if (level.name && restart)
-    {
-      int len = strlen(level.name);
-      int lxpos = SX + (SXSIZE - len * FONT4_XSIZE) / 2;
-      int lypos = MICROLABEL_YPOS;
-
-      DrawText(lxpos, lypos, level.name, FS_SMALL, FC_SPECIAL2);
-    }
-
-    /* initialize delay counter */
+    /* initialize delay counters */
     DelayReached(&scroll_delay, 0);
+    DelayReached(&label_delay, 0);
 
-    redraw_mask |= REDRAW_MICROLEVEL_LABEL;
+    return;
   }
-  else
-  {
-    if ((lev_fieldx <= STD_LEV_FIELDX && lev_fieldy <= STD_LEV_FIELDY) ||
-	!DelayReached(&scroll_delay, MICROLEVEL_SCROLL_DELAY))
-      return;
 
+  /* scroll micro level, if needed */
+  if ((lev_fieldx > STD_LEV_FIELDX || lev_fieldy > STD_LEV_FIELDY) &&
+      DelayReached(&scroll_delay, MICROLEVEL_SCROLL_DELAY))
+  {
     switch (scroll_direction)
     {
       case MV_LEFT:
@@ -1512,6 +1527,16 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     }
 
     DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+  }
+
+  /* redraw micro level label, if needed */
+  if (DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
+  {
+    label_counter = (label_counter + 1) % 23;
+    label_state = (label_counter >= 0 && label_counter <= 7 ? 1 :
+		   label_counter >= 9 && label_counter <= 12 ? 2 :
+		   label_counter >= 14 && label_counter <= 21 ? 3 : 0);
+    DrawMicroLevelLabelExt(label_state);
   }
 }
 

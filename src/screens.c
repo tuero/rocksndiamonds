@@ -47,9 +47,9 @@ extern unsigned char get_ascii(KeySym);
 
 void DrawHeadline()
 {
-  int x = SX + (SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
+  int x = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING) * FONT1_XSIZE) / 2;
 
-  DrawText(x, SY + 8, GAMETITLE_STRING, FS_BIG, FC_YELLOW);
+  DrawText(x, SY + 8, PROGRAM_TITLE_STRING, FS_BIG, FC_YELLOW);
   DrawTextFCentered(46, FC_RED, COPYRIGHT_STRING);
 }
 

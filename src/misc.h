@@ -45,6 +45,7 @@ unsigned int SimpleRND(unsigned int);
 unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *getLoginName(void);
+char *getRealName(void);
 char *getHomeDir(void);
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);

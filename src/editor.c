@@ -91,7 +91,10 @@
 #define ED_COUNT_ELEM_SCORE_YPOS	(14 * MINI_TILEY)
 #define ED_COUNT_ELEM_CONTENT_XPOS	ED_PROPERTIES_XPOS
 #define ED_COUNT_ELEM_CONTENT_YPOS	(17 * MINI_TILEY)
-
+#define ED_COUNTER_YSTART		(ED_LEVELINFO_YPOS + 3 * TILEY)
+#define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
+#define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
+					 n * ED_COUNTER_YDISTANCE)
 /* standard distances */
 #define ED_BORDER_SIZE			3
 #define ED_GADGET_DISTANCE		2
@@ -165,57 +168,63 @@
 #define ED_CTRL_ID_LEVEL_YSIZE_DOWN	31
 #define ED_CTRL_ID_LEVEL_YSIZE_TEXT	32
 #define ED_CTRL_ID_LEVEL_YSIZE_UP	33
-#define ED_CTRL_ID_LEVEL_COLLECT_DOWN	34
-#define ED_CTRL_ID_LEVEL_COLLECT_TEXT	35
-#define ED_CTRL_ID_LEVEL_COLLECT_UP	36
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN	37
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT	38
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_UP	39
-#define ED_CTRL_ID_LEVEL_TIMESCORE_DOWN	40
-#define ED_CTRL_ID_LEVEL_TIMESCORE_TEXT	41
-#define ED_CTRL_ID_LEVEL_TIMESCORE_UP	42
+#define ED_CTRL_ID_LEVEL_RANDOM_DOWN	34
+#define ED_CTRL_ID_LEVEL_RANDOM_TEXT	35
+#define ED_CTRL_ID_LEVEL_RANDOM_UP	36
+#define ED_CTRL_ID_LEVEL_COLLECT_DOWN	37
+#define ED_CTRL_ID_LEVEL_COLLECT_TEXT	38
+#define ED_CTRL_ID_LEVEL_COLLECT_UP	39
+#define ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN	40
+#define ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT	41
+#define ED_CTRL_ID_LEVEL_TIMELIMIT_UP	42
+#define ED_CTRL_ID_LEVEL_TIMESCORE_DOWN	43
+#define ED_CTRL_ID_LEVEL_TIMESCORE_TEXT	44
+#define ED_CTRL_ID_LEVEL_TIMESCORE_UP	45
 
 /* drawing area identifiers */
-#define ED_CTRL_ID_DRAWING_LEVEL	43
-#define ED_CTRL_ID_ELEM_CONTENT_0	44
-#define ED_CTRL_ID_ELEM_CONTENT_1	45
-#define ED_CTRL_ID_ELEM_CONTENT_2	46
-#define ED_CTRL_ID_ELEM_CONTENT_3	47
-#define ED_CTRL_ID_ELEM_CONTENT_4	48
-#define ED_CTRL_ID_ELEM_CONTENT_5	49
-#define ED_CTRL_ID_ELEM_CONTENT_6	50
-#define ED_CTRL_ID_ELEM_CONTENT_7	51
-#define ED_CTRL_ID_AMOEBA_CONTENT	52
+#define ED_CTRL_ID_DRAWING_LEVEL	46
+#define ED_CTRL_ID_ELEM_CONTENT_0	47
+#define ED_CTRL_ID_ELEM_CONTENT_1	48
+#define ED_CTRL_ID_ELEM_CONTENT_2	49
+#define ED_CTRL_ID_ELEM_CONTENT_3	50
+#define ED_CTRL_ID_ELEM_CONTENT_4	51
+#define ED_CTRL_ID_ELEM_CONTENT_5	52
+#define ED_CTRL_ID_ELEM_CONTENT_6	53
+#define ED_CTRL_ID_ELEM_CONTENT_7	54
+#define ED_CTRL_ID_AMOEBA_CONTENT	55
 
 /* text input identifiers */
-#define ED_CTRL_ID_LEVEL_NAME		53
+#define ED_CTRL_ID_LEVEL_NAME		56
+#define ED_CTRL_ID_LEVEL_AUTHOR		57
 
 /* gadgets for scrolling of drawing area */
-#define ED_CTRL_ID_SCROLL_UP		54
-#define ED_CTRL_ID_SCROLL_DOWN		55
-#define ED_CTRL_ID_SCROLL_LEFT		56
-#define ED_CTRL_ID_SCROLL_RIGHT		57
-#define ED_CTRL_ID_SCROLL_VERTICAL	58
-#define ED_CTRL_ID_SCROLL_HORIZONTAL	59
+#define ED_CTRL_ID_SCROLL_UP		58
+#define ED_CTRL_ID_SCROLL_DOWN		59
+#define ED_CTRL_ID_SCROLL_LEFT		60
+#define ED_CTRL_ID_SCROLL_RIGHT		61
+#define ED_CTRL_ID_SCROLL_VERTICAL	62
+#define ED_CTRL_ID_SCROLL_HORIZONTAL	63
 
-#define ED_NUM_GADGETS			60
+#define ED_NUM_GADGETS			64
 
 /* values for counter gadgets */
 #define ED_COUNTER_ID_ELEM_SCORE	0
 #define ED_COUNTER_ID_ELEM_CONTENT	1
 #define ED_COUNTER_ID_LEVEL_XSIZE	2
 #define ED_COUNTER_ID_LEVEL_YSIZE	3
-#define ED_COUNTER_ID_LEVEL_COLLECT	4
-#define ED_COUNTER_ID_LEVEL_TIMELIMIT	5
-#define ED_COUNTER_ID_LEVEL_TIMESCORE	6
+#define ED_COUNTER_ID_LEVEL_RANDOM	4
+#define ED_COUNTER_ID_LEVEL_COLLECT	5
+#define ED_COUNTER_ID_LEVEL_TIMELIMIT	6
+#define ED_COUNTER_ID_LEVEL_TIMESCORE	7
 
 /* values for text input gadgets */
 #define ED_TEXTINPUT_ID_LEVEL_NAME	0
+#define ED_TEXTINPUT_ID_LEVEL_AUTHOR	1
 
-#define ED_NUM_COUNTERBUTTONS		7
+#define ED_NUM_COUNTERBUTTONS		8
 #define ED_NUM_SCROLLBUTTONS		4
 #define ED_NUM_SCROLLBARS		2
-#define ED_NUM_TEXTINPUT		1
+#define ED_NUM_TEXTINPUT		2
 
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
@@ -263,6 +272,7 @@ static int *gadget_elem_score_value = NULL;
 static int *gadget_elem_content_value = NULL;
 static int *gadget_level_xsize_value = NULL;
 static int *gadget_level_ysize_value = NULL;
+static int *gadget_level_random_value = NULL;
 static int *gadget_level_collect_value = NULL;
 static int *gadget_level_timelimit_value = NULL;
 static int *gadget_level_timescore_value = NULL;
@@ -294,7 +304,7 @@ static struct
     "element content"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 6 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(0),
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
     ED_CTRL_ID_LEVEL_XSIZE_DOWN,	ED_CTRL_ID_LEVEL_XSIZE_UP,
     ED_CTRL_ID_LEVEL_XSIZE_TEXT,
@@ -302,7 +312,7 @@ static struct
     "playfield width"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 10 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(1),
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
     ED_CTRL_ID_LEVEL_YSIZE_DOWN,	ED_CTRL_ID_LEVEL_YSIZE_UP,
     ED_CTRL_ID_LEVEL_YSIZE_TEXT,
@@ -310,7 +320,15 @@ static struct
     "playfield height"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 14 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(2),
+    0,					100,
+    ED_CTRL_ID_LEVEL_RANDOM_DOWN,	ED_CTRL_ID_LEVEL_RANDOM_UP,
+    ED_CTRL_ID_LEVEL_RANDOM_TEXT,
+    &gadget_level_random_value,
+    "number of random elements"
+  },
+  {
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(3),
     0,					999,
     ED_CTRL_ID_LEVEL_COLLECT_DOWN,	ED_CTRL_ID_LEVEL_COLLECT_UP,
     ED_CTRL_ID_LEVEL_COLLECT_TEXT,
@@ -318,7 +336,7 @@ static struct
     "number of emeralds to collect"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 18 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(4),
     0,					999,
     ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN,	ED_CTRL_ID_LEVEL_TIMELIMIT_UP,
     ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT,
@@ -326,7 +344,7 @@ static struct
     "time available to solve level"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 22 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(5),
     0,					255,
     ED_CTRL_ID_LEVEL_TIMESCORE_DOWN,	ED_CTRL_ID_LEVEL_TIMESCORE_UP,
     ED_CTRL_ID_LEVEL_TIMESCORE_TEXT,
@@ -344,10 +362,16 @@ static struct
 } textinput_info[ED_NUM_TEXTINPUT] =
 {
   {
-    ED_LEVELINFO_XPOS,			ED_LEVELINFO_YPOS + 26 * MINI_TILEY,
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(6),
     ED_CTRL_ID_LEVEL_NAME,
     level.name,
-    "level title"
+    "Level Title"
+  },
+  {
+    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(7),
+    ED_CTRL_ID_LEVEL_AUTHOR,
+    level.author,
+    "Level Author"
   }
 };
 
@@ -1150,42 +1174,44 @@ static void CreateDrawingAreas()
 
 static void CreateTextInputGadgets()
 {
-  Pixmap gd_pixmap = pix[PIX_DOOR];
-  int gd_x, gd_y;
-  struct GadgetInfo *gi;
-  unsigned long event_mask;
-  char infotext[MAX_INFOTEXT_LEN + 1];
-  int i, id;
+  int i;
 
-  /* text input gadget for the level name */
-  i = ED_TEXTINPUT_ID_LEVEL_NAME;
-  id = ED_CTRL_ID_LEVEL_NAME;
+  for (i=0; i<ED_NUM_TEXTINPUT; i++)
+  {
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    int gd_x, gd_y;
+    struct GadgetInfo *gi;
+    unsigned long event_mask;
+    char infotext[1024];
+    int id = ED_CTRL_ID_LEVEL_NAME + i;
 
-  event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+    event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
-  gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
-  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+    gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
+    gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
 
-  sprintf(infotext, "Enter %s", textinput_info[i].infotext);
+    sprintf(infotext, "Enter %s", textinput_info[i].infotext);
+    infotext[MAX_INFOTEXT_LEN] = '\0';
 
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_INFO_TEXT, infotext,
-		    GDI_X, SX + textinput_info[i].x,
-		    GDI_Y, SY + textinput_info[i].y,
-		    GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
-		    GDI_TEXT_VALUE, textinput_info[i].value,
-		    GDI_TEXT_SIZE, 30,
-		    GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
-		    GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
-		    GDI_DESIGN_BORDER, ED_BORDER_SIZE,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_ACTION, HandleTextInputGadgets,
-		    GDI_END);
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, infotext,
+		      GDI_X, SX + textinput_info[i].x,
+		      GDI_Y, SY + textinput_info[i].y,
+		      GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
+		      GDI_TEXT_VALUE, textinput_info[i].value,
+		      GDI_TEXT_SIZE, 30,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
+		      GDI_DESIGN_BORDER, ED_BORDER_SIZE,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleTextInputGadgets,
+		      GDI_END);
 
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
 
-  level_editor_gadget[id] = gi;
+    level_editor_gadget[id] = gi;
+  }
 }
 
 static void CreateScrollbarGadgets()
@@ -1268,11 +1294,11 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
 }
 
-static void MapCounterButtons(int cnt_id)
+static void MapCounterButtons(int id)
 {
-  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_down]);
-  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_text]);
-  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_up]);
+  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_down]);
+  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_text]);
+  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_up]);
 }
 
 static void MapDrawingArea(int id)
@@ -1282,7 +1308,7 @@ static void MapDrawingArea(int id)
 
 static void MapTextInputGadget(int id)
 {
-  MapGadget(level_editor_gadget[id]);
+  MapGadget(level_editor_gadget[textinput_info[id].gadget_id]);
 }
 
 static void MapMainDrawingArea()
@@ -1651,8 +1677,9 @@ void AdjustEditorScrollbar(int id)
   AdjustScrollbar(gi, items_max, item_position);
 }
 
-void ModifyEditorTextInput(int gadget_id, char *new_text)
+void ModifyEditorTextInput(int textinput_id, char *new_text)
 {
+  int gadget_id = textinput_info[textinput_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
   ModifyTextInputTextValue(gi, new_text);
@@ -2306,7 +2333,7 @@ void LevelNameTyping(KeySym key)
     ascii = '_';
 #endif
 
-  if (ascii && len<MAX_LEVNAMLEN-2)
+  if (ascii && len<MAX_LEVEL_NAME_LEN-2)
   {
     level.name[len] = ascii;
     level.name[len+1] = 0;
@@ -2394,7 +2421,7 @@ static void DrawDrawingWindow()
 
 static void DrawLevelInfoWindow()
 {
-  char infotext[MAX_INFOTEXT_LEN + 1];
+  char infotext[1024];
   int infotext_yoffset = MINI_TILEX + ED_GADGET_DISTANCE;
   int i, x, y;
 
@@ -2406,6 +2433,7 @@ static void DrawLevelInfoWindow()
 
   gadget_level_xsize_value = &lev_fieldx;
   gadget_level_ysize_value = &lev_fieldy;
+  gadget_level_random_value = &random_placement_num_objects;
   gadget_level_collect_value = &level.edelsteine;
   gadget_level_timelimit_value = &level.time;
   gadget_level_timescore_value = &level.score[10];
@@ -2417,17 +2445,26 @@ static void DrawLevelInfoWindow()
     y = counterbutton_info[i].y - infotext_yoffset;
 
     sprintf(infotext, "%s:", counterbutton_info[i].infotext);
-    DrawTextF(x, y, FC_YELLOW, infotext);
+    infotext[MAX_INFOTEXT_LEN] = '\0';
 
+    DrawTextF(x, y, FC_YELLOW, infotext);
     ModifyEditorCounter(i, **counterbutton_info[i].counter_value);
     MapCounterButtons(i);
   }
 
-  /* draw level name text input gadget */
-  x = textinput_info[ED_TEXTINPUT_ID_LEVEL_NAME].x;
-  y = textinput_info[ED_TEXTINPUT_ID_LEVEL_NAME].y - infotext_yoffset;
-  DrawTextF(x, y, FC_YELLOW, "Level Title:");
-  MapTextInputGadget(ED_CTRL_ID_LEVEL_NAME);
+  /* draw text input gadgets for level info */
+  for (i=ED_TEXTINPUT_ID_LEVEL_NAME; i<=ED_TEXTINPUT_ID_LEVEL_AUTHOR; i++)
+  {
+    x = textinput_info[i].x;
+    y = textinput_info[i].y - infotext_yoffset;
+
+    sprintf(infotext, "%s:", textinput_info[i].infotext);
+    infotext[MAX_INFOTEXT_LEN] = '\0';
+
+    DrawTextF(x, y, FC_YELLOW, infotext);
+    ModifyEditorTextInput(i, textinput_info[i].value);
+    MapTextInputGadget(i);
+  }
 }
 
 static void DrawElementContentAreas()
@@ -3512,6 +3549,16 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       level.fieldy = lev_fieldy;
       break;
 
+    case ED_CTRL_ID_LEVEL_RANDOM_DOWN:
+    case ED_CTRL_ID_LEVEL_RANDOM_UP:
+      step *= (id == ED_CTRL_ID_LEVEL_RANDOM_DOWN ? -1 : 1);
+      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_RANDOM,
+			  *gadget_level_random_value + step);
+      break;
+    case ED_CTRL_ID_LEVEL_RANDOM_TEXT:
+      *gadget_level_random_value = gi->text.number_value;
+      break;
+
     case ED_CTRL_ID_LEVEL_COLLECT_DOWN:
     case ED_CTRL_ID_LEVEL_COLLECT_UP:
       step *= (id == ED_CTRL_ID_LEVEL_COLLECT_DOWN ? -1 : 1);
@@ -3555,6 +3602,10 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
   {
     case ED_CTRL_ID_LEVEL_NAME:
       strcpy(level.name, gi->text.value);
+      break;
+
+    case ED_CTRL_ID_LEVEL_AUTHOR:
+      strcpy(level.author, gi->text.value);
       break;
 
     default:

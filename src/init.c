@@ -348,8 +348,8 @@ void InitWindow(int argc, char *argv[])
   XSizeHints size_hints;
   XWMHints wm_hints;
   XClassHint class_hints;
-  char *window_name = WINDOWTITLE_STRING;
-  char *icon_name = WINDOWTITLE_STRING;
+  char *window_name = WINDOW_TITLE_STRING;
+  char *icon_name = WINDOW_TITLE_STRING;
   long window_event_mask;
   Atom proto_atom = None, delete_atom = None;
 #endif
@@ -540,7 +540,7 @@ void InitGfx()
 #endif
 
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
-  DrawInitText(WINDOWTITLE_STRING,20,FC_YELLOW);
+  DrawInitText(WINDOW_TITLE_STRING,20,FC_YELLOW);
   DrawInitText(COPYRIGHT_STRING,50,FC_RED);
 #ifdef MSDOS
   DrawInitText("MSDOS version done by Guido Schulz",210,FC_BLUE);

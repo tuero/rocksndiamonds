@@ -82,7 +82,31 @@
 #define LEVELCLASS_CONTRIBUTION_END	299
 #define LEVELCLASS_USER_START		300
 #define LEVELCLASS_USER_END		399
+
+#define LEVELCLASS_TUTORIAL		LEVELCLASS_TUTORIAL_START
+#define LEVELCLASS_CLASSICS		LEVELCLASS_CLASSICS_START
+#define LEVELCLASS_CONTRIBUTION		LEVELCLASS_CONTRIBUTION_START
+#define LEVELCLASS_USER			LEVELCLASS_USER_START
 #define LEVELCLASS_UNDEFINED		999
+
+#define IS_LEVELCLASS_TUTORIAL(n) \
+	(leveldir[n].sort_priority >= LEVELCLASS_TUTORIAL_START && \
+	 leveldir[n].sort_priority <= LEVELCLASS_TUTORIAL_END)
+#define IS_LEVELCLASS_CLASSICS(n) \
+	(leveldir[n].sort_priority >= LEVELCLASS_CLASSICS_START && \
+	 leveldir[n].sort_priority <= LEVELCLASS_CLASSICS_END)
+#define IS_LEVELCLASS_CONTRIBUTION(n) \
+	(leveldir[n].sort_priority >= LEVELCLASS_CONTRIBUTION_START && \
+	 leveldir[n].sort_priority <= LEVELCLASS_CONTRIBUTION_END)
+#define IS_LEVELCLASS_USER(n) \
+	(leveldir[n].sort_priority >= LEVELCLASS_USER_START && \
+	 leveldir[n].sort_priority <= LEVELCLASS_USER_END)
+
+#define LEVELCLASS(n)	(IS_LEVELCLASS_TUTORIAL(n) ? LEVELCLASS_TUTORIAL : \
+			 IS_LEVELCLASS_CLASSICS(n) ? LEVELCLASS_CLASSICS : \
+			 IS_LEVELCLASS_CONTRIBUTION(n) ? LEVELCLASS_CONTRIBUTION : \
+			 IS_LEVELCLASS_USER(n) ? LEVELCLASS_USER : \
+			 LEVELCLASS_UNDEFINED)
 
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
@@ -267,6 +291,7 @@ static void setLevelInfoToDefaults()
   level.high_speed = FALSE;
 
   strcpy(level.name, "Nameless Level");
+  strcpy(level.author, "Anonymous");
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
@@ -338,9 +363,9 @@ void LoadLevel(int level_nr)
   level.time		= (fgetc(file)<<8) | fgetc(file);
   level.edelsteine	= (fgetc(file)<<8) | fgetc(file);
 
-  for(i=0; i<MAX_LEVNAMLEN; i++)
+  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     level.name[i]	= fgetc(file);
-  level.name[MAX_LEVNAMLEN - 1] = 0;
+  level.name[MAX_LEVEL_NAME_LEN - 1] = 0;
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i]	= fgetc(file);
@@ -413,9 +438,42 @@ void LoadLevel(int level_nr)
     level.time = 10;
 #endif
 
+  /* determine level author */
+  if (leveldir[leveldir_nr].author)
+  {
+    strncpy(level.author, leveldir[leveldir_nr].author,
+	    MAX_LEVEL_AUTHOR_LEN - 1);
+    level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  }
+  else
+  {
+    switch (LEVELCLASS(leveldir_nr))
+    {
+      case LEVELCLASS_TUTORIAL:
+  	strcpy(level.author, PROGRAM_AUTHOR_STRING);
+  	break;
+  
+      case LEVELCLASS_CLASSICS:
+      case LEVELCLASS_CONTRIBUTION:
+  	strncpy(level.author, leveldir[leveldir_nr].name,
+		MAX_LEVEL_AUTHOR_LEN - 1);
+  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  	break;
+  
+      case LEVELCLASS_USER:
+  	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN - 1);
+  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  	break;
+  
+      default:
+  	/* keep default value */
+  	break;
+    }
+  }
+
+  /* player was faster than monsters in pre-1.0 levels */
   if (file_version == FILE_VERSION_1_0 &&
-      leveldir[leveldir_nr].sort_priority >= LEVELCLASS_CONTRIBUTION_START &&
-      leveldir[leveldir_nr].sort_priority <= LEVELCLASS_CONTRIBUTION_END)
+      IS_LEVELCLASS_CONTRIBUTION(leveldir_nr))
   {
     Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
     Error(ERR_WARN, "using high speed movement for player");
@@ -455,7 +513,7 @@ void SaveLevel(int level_nr)
   fputc(level.edelsteine / 256, file);
   fputc(level.edelsteine % 256, file);
 
-  for(i=0; i<MAX_LEVNAMLEN; i++)
+  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     fputc(level.name[i], file);
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     fputc(level.score[i], file);
@@ -887,10 +945,11 @@ void SaveScore(int level_nr)
 
 /* level directory info */
 #define LEVELINFO_TOKEN_NAME		29
-#define LEVELINFO_TOKEN_LEVELS		30
-#define LEVELINFO_TOKEN_FIRST_LEVEL	31
-#define LEVELINFO_TOKEN_SORT_PRIORITY	32
-#define LEVELINFO_TOKEN_READONLY	33
+#define LEVELINFO_TOKEN_AUTHOR		30
+#define LEVELINFO_TOKEN_LEVELS		31
+#define LEVELINFO_TOKEN_FIRST_LEVEL	32
+#define LEVELINFO_TOKEN_SORT_PRIORITY	33
+#define LEVELINFO_TOKEN_READONLY	34
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TEAM_MODE
@@ -952,6 +1011,7 @@ static struct
 
   /* level directory info */
   { TYPE_STRING,  &ldi.name,		"name"				},
+  { TYPE_STRING,  &ldi.author,		"author"			},
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
   { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
   { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
@@ -1216,6 +1276,7 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
   ldi->name = getStringCopy("non-existing");
+  ldi->author = NULL;
   ldi->levels = 0;
   ldi->first_level = 0;
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */

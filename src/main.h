@@ -199,7 +199,8 @@ typedef unsigned char byte;
 
 /* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
-#define MAX_LEVNAMLEN		32
+#define MAX_LEVEL_NAME_LEN	32
+#define MAX_LEVEL_AUTHOR_LEN	34
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_LEVDIR_ENTRIES	100
 #define MAX_SCORE_ENTRIES	100
@@ -214,6 +215,7 @@ typedef unsigned char byte;
 #define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
 #define GADGET_FRAME_DELAY	150	/* delay between gadget actions */
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
+#define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
 struct HiScore
 {
@@ -336,7 +338,8 @@ struct LevelInfo
   int fieldy;
   int time;
   int edelsteine;
-  char name[MAX_LEVNAMLEN];
+  char name[MAX_LEVEL_NAME_LEN];
+  char author[MAX_LEVEL_AUTHOR_LEN];
   int score[LEVEL_SCORE_ELEMENTS];
   int mampfer_inhalt[8][3][3];
   int tempo_amoebe;
@@ -350,6 +353,7 @@ struct LevelDirInfo
 {
   char *filename;
   char *name;
+  char *author;
   int levels;
   int first_level;
   int last_level;
@@ -1232,10 +1236,11 @@ extern int		num_bg_loops;
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#define VERSION_STRING		"1.2.1"
-#define GAMETITLE_STRING	"Rocks'n'Diamonds"
-#define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
-#define COPYRIGHT_STRING	"Copyright ^1995-99 by Holger Schemel"
+#define PROGRAM_VERSION_STRING	"1.2.1"
+#define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
+#define PROGRAM_AUTHOR_STRING	"Holger Schemel"
+#define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING
+#define COPYRIGHT_STRING	"Copyright ^1995-99 by " PROGRAM_AUTHOR_STRING
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
@@ -1265,19 +1270,17 @@ extern int		num_bg_loops;
 #define REDRAW_VIDEO_2		(1L << 5)
 #define REDRAW_VIDEO_3		(1L << 6)
 #define REDRAW_MICROLEVEL	(1L << 7)
-#define REDRAW_MICROLEVEL_LABEL	(1L << 8)
-#define REDRAW_FROM_BACKBUFFER	(1L << 9)
+#define REDRAW_FROM_BACKBUFFER	(1L << 8)
 #define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
 				 REDRAW_VIDEO_2 | \
 				 REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1L << 10)
+#define REDRAW_DOOR_3		(1L << 9)
 #define REDRAW_DOORS		(REDRAW_DOOR_1 | \
 				 REDRAW_DOOR_2 | \
 				 REDRAW_DOOR_3)
 #define REDRAW_MAIN		(REDRAW_FIELD | \
 				 REDRAW_TILES | \
-				 REDRAW_MICROLEVEL | \
-				 REDRAW_MICROLEVEL_LABEL)
+				 REDRAW_MICROLEVEL)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
 /* areas in pixmap PIX_DOOR */
