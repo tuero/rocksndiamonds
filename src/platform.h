@@ -14,6 +14,8 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+/* define keywords for supported main platforms */
+
 #if defined(MSDOS)
 #define PLATFORM_MSDOS
 #elif defined(WIN32)
@@ -23,6 +25,10 @@
 #endif
 
 /* define additional keywords for several Unix platforms */
+
+#if defined(linux)
+#define PLATFORM_LINUX
+#endif
 
 #if defined(__FreeBSD__)
 #define PLATFORM_FREEBSD

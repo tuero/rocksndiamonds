@@ -14,36 +14,28 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include <math.h>
-#include "main.h"
+#include "platform.h"
 
-#ifdef linux
-#include <linux/soundcard.h>
-#ifndef VOXWARE
-#define VOXWARE
-#endif
-
-#if 0
-/* where is the right declaration for 'ioctl'? */
-extern void ioctl(long, long, void *);
-#else
 #include <sys/ioctl.h>
-#endif
-
-#endif
-
-#ifdef __FreeBSD__
-#include <machine/soundcard.h>
-#endif
+#include <math.h>
 
 #define SND_BLOCKSIZE 4096
 
-#ifdef _HPUX_SOURCE
+#if defined(PLATFORM_LINUX)
+#include <linux/soundcard.h>
+#elif defined(PLATFORM_FREEBSD)
+#include <machine/soundcard.h>
+#elif defined(PLATFORM_HPUX)
 #include <sys/audio.h>
 #undef  SND_BLOCKSIZE
 #define SND_BLOCKSIZE 32768
-#define HPUX_AUDIO
-#endif /* _HPUX_SOURCE */
+#endif
+
+#include "main.h"
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
+#define AUDIO_STREAMING_DSP
+#endif
 
 #if !defined(PLATFORM_MSDOS)
 #define MAX_SOUNDS_PLAYING	16
@@ -90,14 +82,14 @@ extern void ioctl(long, long, void *);
 #define SND_PATH	"./sounds"
 #endif
 
-#define DEV_DSP		"/dev/dsp"
-#define DEV_AUDIO	"/dev/audio"
-#define DEV_AUDIOCTL	"/dev/audioCtl"
+#define DEVICENAME_DSP		"/dev/dsp"
+#define DEVICENAME_AUDIO	"/dev/audio"
+#define DEVICENAME_AUDIOCTL	"/dev/audioCtl"
 
-#ifdef	VOXWARE
-#define SOUND_DEVICE   	DEV_DSP
+#if defined(AUDIO_STREAMING_DSP)
+#define AUDIO_DEVICE   	DEVICENAME_DSP
 #else
-#define SOUND_DEVICE	DEV_AUDIO
+#define AUDIO_DEVICE	DEVICENAME_AUDIO
 #endif
 
 struct SoundHeader_SUN

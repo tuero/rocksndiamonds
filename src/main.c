@@ -35,7 +35,7 @@ Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
 
-char	       *sound_device_name = SOUND_DEVICE;
+char	       *sound_device_name = AUDIO_DEVICE;
 
 int		joystick_device = 0;
 char	       *joystick_device_name[MAX_PLAYERS] =

@@ -26,7 +26,7 @@ static struct SoundControl emptySoundControl =
 #if defined(PLATFORM_UNIX)
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
-#ifdef VOXWARE
+#if defined(AUDIO_STREAMING_DSP)
 static char premix_left_buffer[SND_BLOCKSIZE];
 static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
@@ -35,16 +35,14 @@ static unsigned char playing_buffer[SND_BLOCKSIZE];
 #endif
 
 /* forward declaration of internal functions */
-#ifdef VOXWARE
+#if defined(AUDIO_STREAMING_DSP)
 static void SoundServer_InsertNewSound(struct SoundControl);
-#else
-#if defined(PLATFORM_UNIX)
+#elif defined(PLATFORM_UNIX)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
 #endif
-#endif
 
-#ifdef HPUX_AUDIO
+#if defined(PLATFORM_HPUX)
 static void HPUX_Audio_Control();
 #endif
 
@@ -78,8 +76,8 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
 {
   static char *audio_device_name[] =
   {
-    DEV_DSP,
-    DEV_AUDIO
+    DEVICENAME_DSP,
+    DEVICENAME_AUDIO
   };
   int audio_fd;
   int i;
@@ -99,7 +97,7 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
 
   audio->sound_available = TRUE;
 
-#ifdef VOXWARE
+#if defined(AUDIO_STREAMING_DSP)
   audio->loops_available = TRUE;
 #endif
 }
@@ -132,7 +130,7 @@ void SoundServer()
     stereo_volume[i] =
       (int)sqrt((float)(PSND_MAX_LEFT2RIGHT*PSND_MAX_LEFT2RIGHT-i*i));
 
-#ifdef HPUX_AUDIO
+#if defined(PLATFORM_HPUX)
   HPUX_Audio_Control();
 #endif
 
@@ -149,7 +147,7 @@ void SoundServer()
 	!= sizeof(snd_ctrl))
       Error(ERR_EXIT_SOUND_SERVER, "broken pipe - no sounds");
 
-#ifdef VOXWARE
+#if defined(AUDIO_STREAMING_DSP)
 
     if (snd_ctrl.fade_sound)
     {
@@ -356,7 +354,7 @@ void SoundServer()
       }
     }
 
-#else /* !VOXWARE */
+#else /* !AUDIO_STREAMING_DSP */
 
     if (snd_ctrl.active && !snd_ctrl.loop)
     {
@@ -411,7 +409,7 @@ void SoundServer()
       }
     }
 
-#endif /* !VOXWARE */
+#endif /* !AUDIO_STREAMING_DSP */
 
   }
 
@@ -646,7 +644,7 @@ static void SoundServer_StopAllSounds()
 #endif /* PLATFORM_MSDOS */
 #endif /* !PLATFORM_WIN32 */
 
-#ifdef HPUX_AUDIO
+#if defined(PLATFORM_HPUX)
 static void HPUX_Audio_Control()
 {
   struct audio_describe ainfo;
@@ -667,9 +665,9 @@ static void HPUX_Audio_Control()
 
   close(audio_ctl);
 }
-#endif /* HPUX_AUDIO */
+#endif /* PLATFORM_HPUX */
 
-#if !defined(VOXWARE) && defined(PLATFORM_UNIX)
+#if defined(PLATFORM_UNIX) && !defined(AUDIO_STREAMING_DSP)
 
 /* these two are stolen from "sox"... :) */
 
@@ -774,7 +772,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
   return(sample);
 }
-#endif /* !VOXWARE && PLATFORM_UNIX */
+#endif /* PLATFORM_UNIX && !AUDIO_STREAMING_DSP */
 
 /*** THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
