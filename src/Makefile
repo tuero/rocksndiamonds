@@ -96,13 +96,8 @@ all:	$(OBJS)
 clean:
 	$(RM) $(OBJS)
 
-BACKUP_DIR = /home/aeglos/BACKUP/rnd
-BACKUP_DATE = `date +%Y%m%d`
-BACKUP_FILE = $(BACKUP_DIR)/rnd-$(BACKUP_DATE).tgz
-
 backup:
-	@echo "tar cvzf $(BACKUP_FILE) *.c *.h Makefile"
-	@tar cvzf $(BACKUP_FILE) *.c *.h Makefile
+	./make_backup.sh
 
 depend:
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend

@@ -352,7 +352,7 @@ void DrawPlayer(struct PlayerInfo *player)
   int jx = player->jx, jy = player->jy;
   int last_jx = player->last_jx, last_jy = player->last_jy;
   int next_jx = jx + (jx - last_jx), next_jy = jy + (jy - last_jy);
-  int sx = SCROLLX(jx), sy = SCROLLY(jy);
+  int sx = SCREENX(jx), sy = SCREENY(jy);
   int sxx = 0, syy = 0;
   int element = Feld[jx][jy];
   int graphic, phase;
@@ -440,7 +440,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player->Pushing && player->GfxPos)
   {
-    int px = SCROLLX(next_jx), py = SCROLLY(next_jy);
+    int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
     if (Feld[jx][jy] == EL_SOKOBAN_FELD_LEER ||
 	Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
@@ -493,8 +493,8 @@ void DrawPlayer(struct PlayerInfo *player)
 
     if (!ScreenMovPos)
     {
-      dest_x = SX + SCROLLX(MIN(jx,last_jx))*TILEX;
-      dest_y = SY + SCROLLY(MIN(jy,last_jy))*TILEY;
+      dest_x = SX + SCREENX(MIN(jx,last_jx))*TILEX;
+      dest_y = SY + SCREENY(MIN(jy,last_jy))*TILEY;
       x_size = TILEX * (1 + ABS(jx - last_jx));
       y_size = TILEY * (1 + ABS(jy - last_jy));
     }
@@ -531,12 +531,12 @@ void DrawGraphicAnimationExt(int x, int y, int graphic,
 {
   int phase = getGraphicAnimationPhase(frames, delay, mode);
 
-  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
   {
     if (mask_mode == USE_MASKING)
-      DrawGraphicThruMask(SCROLLX(x),SCROLLY(y), graphic + phase);
+      DrawGraphicThruMask(SCREENX(x),SCREENY(y), graphic + phase);
     else
-      DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);
+      DrawGraphic(SCREENX(x),SCREENY(y), graphic + phase);
   }
 }
 
@@ -835,7 +835,7 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
-  int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
+  int ux = LEVELX(x), uy = LEVELY(y);
   int graphic = el2gfx(element);
   int phase4 = ABS(MovPos[ux][uy])/(TILEX/4);
   int phase  = phase4 / 2;
@@ -928,8 +928,8 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
 			 int cut_mode, int mask_mode)
 {
-  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawScreenElementExt(SCROLLX(x),SCROLLY(y), dx,dy, element,
+  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+    DrawScreenElementExt(SCREENX(x),SCREENY(y), dx,dy, element,
 			 cut_mode, mask_mode);
 }
 
@@ -958,7 +958,7 @@ void DrawLevelElementThruMask(int x, int y, int element)
 void ErdreichAnbroeckeln(int x, int y)
 {
   int i, width, height, cx,cy;
-  int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
+  int ux = LEVELX(x), uy = LEVELY(y);
   int element, graphic;
   int snip = 4;
   static int xy[4][2] =
@@ -1068,13 +1068,13 @@ void DrawScreenElement(int x, int y, int element)
 
 void DrawLevelElement(int x, int y, int element)
 {
-  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawScreenElement(SCROLLX(x),SCROLLY(y),element);
+  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+    DrawScreenElement(SCREENX(x),SCREENY(y),element);
 }
 
 void DrawScreenField(int x, int y)
 {
-  int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
+  int ux = LEVELX(x), uy = LEVELY(y);
   int element;
 
   if (!IN_LEV_FIELD(ux,uy))
@@ -1129,8 +1129,8 @@ void DrawScreenField(int x, int y)
     BOOL cut_mode = NO_CUTTING;
 
     Blocked2Moving(ux,uy,&oldx,&oldy);
-    sx = SCROLLX(oldx);
-    sy = SCROLLY(oldy);
+    sx = SCREENX(oldx);
+    sy = SCREENY(oldy);
     horiz_move = (MovDir[oldx][oldy]==MV_LEFT || MovDir[oldx][oldy]==MV_RIGHT);
 
     if (Store[oldx][oldy]==EL_MORAST_LEER ||
@@ -1155,23 +1155,23 @@ void DrawScreenField(int x, int y)
 
 void DrawLevelField(int x, int y)
 {
-  if (IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawScreenField(SCROLLX(x),SCROLLY(y));
+  if (IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+    DrawScreenField(SCREENX(x),SCREENY(y));
   else if (IS_MOVING(x,y))
   {
     int newx,newy;
 
     Moving2Blocked(x,y,&newx,&newy);
-    if (IN_SCR_FIELD(SCROLLX(newx),SCROLLY(newy)))
-      DrawScreenField(SCROLLX(newx),SCROLLY(newy));
+    if (IN_SCR_FIELD(SCREENX(newx),SCREENY(newy)))
+      DrawScreenField(SCREENX(newx),SCREENY(newy));
   }
   else if (IS_BLOCKED(x,y))
   {
     int oldx,oldy;
 
     Blocked2Moving(x,y,&oldx,&oldy);
-    if (IN_SCR_FIELD(SCROLLX(oldx),SCROLLY(oldy)))
-      DrawScreenField(SCROLLX(oldx),SCROLLY(oldy));
+    if (IN_SCR_FIELD(SCREENX(oldx),SCREENY(oldy)))
+      DrawScreenField(SCREENX(oldx),SCREENY(oldy));
   }
 }
 
@@ -1189,16 +1189,16 @@ void DrawMiniElement(int x, int y, int element)
   DrawMiniGraphic(x,y,graphic);
 }
 
-void DrawMiniElementOrWall(int x, int y, int scroll_x, int scroll_y)
+void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 {
-  if (x+scroll_x<-1 || x+scroll_x>lev_fieldx ||
-      y+scroll_y<-1 || y+scroll_y>lev_fieldy)
-    DrawMiniElement(x,y,EL_LEERRAUM);
-  else if (x+scroll_x==-1 || x+scroll_x==lev_fieldx ||
-	   y+scroll_y==-1 || y+scroll_y==lev_fieldy)
-    DrawMiniElement(x,y,EL_BETON);
+  int x = sx + scroll_x, y = sy + scroll_y;
+
+  if (x<-1 || x>lev_fieldx || y<-1 || y>lev_fieldy)
+    DrawMiniElement(sx,sy,EL_LEERRAUM);
+  else if (x==-1 || x==lev_fieldx || y==-1 || y==lev_fieldy)
+    DrawMiniElement(sx,sy,EL_BETON);
   else
-    DrawMiniElement(x,y,Feld[x+scroll_x][y+scroll_y]);
+    DrawMiniElement(sx,sy,Feld[x][y]);
 }
 
 void DrawMicroElement(int xpos, int ypos, int element)

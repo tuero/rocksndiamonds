@@ -601,6 +601,14 @@ int MovingOrBlocked2Element(int x, int y)
     return(element);
 }
 
+static void RemoveField(int x, int y)
+{
+  Feld[x][y] = EL_LEERRAUM;
+  MovPos[x][y] = 0;
+  MovDir[x][y] = 0;
+  MovDelay[x][y] = 0;
+}
+
 void RemoveMovingField(int x, int y)
 {
   int oldx = x,oldy = y, newx = x,newy = y;
@@ -643,7 +651,7 @@ void RemoveMovingField(int x, int y)
 
 void DrawDynamite(int x, int y)
 {
-  int sx = SCROLLX(x), sy = SCROLLY(y);
+  int sx = SCREENX(x), sy = SCREENY(y);
   int graphic = el2gfx(Feld[x][y]);
   int phase;
 
@@ -836,12 +844,12 @@ void Explode(int ex, int ey, int phase, int mode)
       InitMovDir(x,y);
     DrawLevelField(x,y);
   }
-  else if (!(phase%delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+  else if (!(phase%delay) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
   {
     if (phase==delay)
-      ErdreichAnbroeckeln(SCROLLX(x),SCROLLY(y));
+      ErdreichAnbroeckeln(SCREENX(x),SCREENY(y));
 
-    DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_EXPLOSION+(phase/delay-1));
+    DrawGraphic(SCREENX(x),SCREENY(y),GFX_EXPLOSION+(phase/delay-1));
   }
 }
 
@@ -951,8 +959,8 @@ void Blurb(int x, int y)
     if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
     {
       MovDelay[x][y]--;
-      if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-	DrawGraphic(SCROLLX(x),SCROLLY(y),graphic+4-MovDelay[x][y]/2);
+      if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+	DrawGraphic(SCREENX(x),SCREENY(y),graphic+4-MovDelay[x][y]/2);
 
       if (!MovDelay[x][y])
       {
@@ -1490,6 +1498,28 @@ void TurnRound(int x, int y)
   }
 }
 
+static BOOL JustBeingPushed(int x, int y)
+{
+  int i;
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    if (player->active && !player->gone &&
+	player->Pushing && player->MovPos)
+    {
+      int next_jx = player->jx + (player->jx - player->last_jx);
+      int next_jy = player->jy + (player->jy - player->last_jy);
+
+      if (x == next_jx && y == next_jy)
+	return(TRUE);
+    }
+  }
+
+  return(FALSE);
+}
+
 void StartMoving(int x, int y)
 {
   int element = Feld[x][y];
@@ -1499,26 +1529,9 @@ void StartMoving(int x, int y)
 
   if (CAN_FALL(element) && y<lev_fieldy-1)
   {
-    /* check if this element is just being pushed */
     if ((x>0 && IS_PLAYER(x-1,y)) || (x<lev_fieldx-1 && IS_PLAYER(x+1,y)))
-    {
-      int i;
-
-      for(i=0; i<MAX_PLAYERS; i++)
-      {
-	struct PlayerInfo *player = &stored_player[i];
-
-	if (player->active && !player->gone &&
-	    player->Pushing && player->MovPos)
-	{
-	  int next_jx = player->jx + (player->jx - player->last_jx);
-	  int next_jy = player->jy + (player->jy - player->last_jy);
-
-	  if (x == next_jx && y == next_jy)
-	    return;
-	}
-      }
-    }
+      if (JustBeingPushed(x,y))
+	return;
 
     if (element==EL_MORAST_VOLL)
     {
@@ -1648,6 +1661,9 @@ void StartMoving(int x, int y)
   {
     int newx,newy;
 
+    if (element == EL_SONDE && JustBeingPushed(x,y))
+      return;
+
     if (!MovDelay[x][y])	/* neuer Schritt / noch nicht gewartet */
     {
       /* Alle Figuren, die nach jeden Schritt die Richtung wechseln können.
@@ -1673,8 +1689,8 @@ void StartMoving(int x, int y)
 	if (phase>3)
 	  phase = 7-phase;
 
-	if (IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-	  DrawGraphic(SCROLLX(x),SCROLLY(y), el2gfx(element)+phase);
+	if (IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+	  DrawGraphic(SCREENX(x),SCREENY(y), el2gfx(element)+phase);
 
 	if ((element==EL_MAMPFER || element==EL_MAMPFER2)
 	    && MovDelay[x][y]%4==3)
@@ -1695,7 +1711,7 @@ void StartMoving(int x, int y)
 	for(i=1;i<=3;i++)
 	{
 	  int xx = x + i*dx, yy = y + i*dy;
-	  int sx = SCROLLX(xx), sy = SCROLLY(yy);
+	  int sx = SCREENX(xx), sy = SCREENY(yy);
 
 	  if (!IN_LEV_FIELD(xx,yy) ||
 	      IS_SOLID(Feld[xx][yy]) || Feld[xx][yy]==EL_EXPLODING)
@@ -1764,8 +1780,8 @@ void StartMoving(int x, int y)
 	DrawLevelField(x,y);
 
 	PlaySoundLevel(newx,newy,SND_BUING);
-	if (IN_SCR_FIELD(SCROLLX(newx),SCROLLY(newy)))
-	  DrawGraphicThruMask(SCROLLX(newx),SCROLLY(newy),el2gfx(element));
+	if (IN_SCR_FIELD(SCREENX(newx),SCREENY(newy)))
+	  DrawGraphicThruMask(SCREENX(newx),SCREENY(newy),el2gfx(element));
 
 	local_player->friends_still_needed--;
 	if (!local_player->friends_still_needed &&
@@ -1902,27 +1918,7 @@ void StartMoving(int x, int y)
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x,y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element==EL_SONDE)
-      {
-	int i;
-
-	/* check if this element is just being pushed */
-	for(i=0; i<MAX_PLAYERS; i++)
-	{
-	  struct PlayerInfo *player = &stored_player[i];
-
-	  if (player->active && !player->gone &&
-	      player->Pushing && player->GfxPos)
-	  {
-	    int next_jx = player->jx + (player->jx - player->last_jx);
-	    int next_jy = player->jy + (player->jy - player->last_jy);
-
-	    if (x == next_jx && y == next_jy)
-	      return;
-	  }
-	}
-
 	DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
-      }
 
       return;
     }
@@ -2186,8 +2182,8 @@ void AmoebeWaechst(int x, int y)
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AMOEBING+3-MovDelay[x][y]/2);
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+      DrawGraphic(SCREENX(x),SCREENY(y),GFX_AMOEBING+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
@@ -2402,8 +2398,8 @@ void Ablenk(int x, int y)
     MovDelay[x][y]--;
     if (MovDelay[x][y])
     {
-      if (IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-	DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_ABLENK+MovDelay[x][y]%4);
+      if (IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+	DrawGraphic(SCREENX(x),SCREENY(y),GFX_ABLENK+MovDelay[x][y]%4);
       if (!(MovDelay[x][y]%4))
 	PlaySoundLevel(x,y,SND_MIEP);
       return;
@@ -2461,8 +2457,8 @@ void NussKnacken(int x, int y)
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_CRACKINGNUT+3-MovDelay[x][y]/2);
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+      DrawGraphic(SCREENX(x),SCREENY(y),GFX_CRACKINGNUT+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
@@ -2474,8 +2470,8 @@ void NussKnacken(int x, int y)
 
 void SiebAktivieren(int x, int y, int typ)
 {
-  if (!(SiebAktiv % 4) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawGraphic(SCROLLX(x),SCROLLY(y),
+  if (!(SiebAktiv % 4) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+    DrawGraphic(SCREENX(x),SCREENY(y),
 		(typ==1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL)+3-(SiebAktiv%16)/4);
 }
 
@@ -2487,10 +2483,10 @@ void AusgangstuerPruefen(int x, int y)
   {
     Feld[x][y] = EL_AUSGANG_ACT;
 
-    PlaySoundLevel(x < UNSCROLLX(BX1) ? UNSCROLLX(BX1) :
-		   (x > UNSCROLLX(BX2) ? UNSCROLLX(BX2) : x),
-		   y < UNSCROLLY(BY1) ? UNSCROLLY(BY1) :
-		   (y > UNSCROLLY(BY2) ? UNSCROLLY(BY2) : y),
+    PlaySoundLevel(x < LEVELX(BX1) ? LEVELX(BX1) :
+		   (x > LEVELX(BX2) ? LEVELX(BX2) : x),
+		   y < LEVELY(BY1) ? LEVELY(BY1) :
+		   (y > LEVELY(BY2) ? LEVELY(BY2) : y),
 		   SND_OEFFNEN);
   }
 }
@@ -2508,8 +2504,8 @@ void AusgangstuerOeffnen(int x, int y)
 
     MovDelay[x][y]--;
     tuer = MovDelay[x][y]/delay;
-    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AUSGANG_AUF-tuer);
+    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+      DrawGraphic(SCREENX(x),SCREENY(y),GFX_AUSGANG_AUF-tuer);
 
     if (!MovDelay[x][y])
     {
@@ -2526,7 +2522,7 @@ void AusgangstuerBlinken(int x, int y)
 
 void EdelsteinFunkeln(int x, int y)
 {
-  if (!IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)) || IS_MOVING(x,y))
+  if (!IN_SCR_FIELD(SCREENX(x),SCREENY(y)) || IS_MOVING(x,y))
     return;
 
   if (Feld[x][y] == EL_EDELSTEIN_BD)
@@ -2543,7 +2539,7 @@ void EdelsteinFunkeln(int x, int y)
       if (direct_draw_on && MovDelay[x][y])
 	SetDrawtoField(DRAW_BUFFERED);
 
-      DrawGraphic(SCROLLX(x),SCROLLY(y), el2gfx(Feld[x][y]));
+      DrawGraphic(SCREENX(x),SCREENY(y), el2gfx(Feld[x][y]));
 
       if (MovDelay[x][y])
       {
@@ -2552,14 +2548,14 @@ void EdelsteinFunkeln(int x, int y)
 	if (phase > 2)
 	  phase = 4-phase;
 
-	DrawGraphicThruMask(SCROLLX(x),SCROLLY(y), GFX_FUNKELN_WEISS + phase);
+	DrawGraphicThruMask(SCREENX(x),SCREENY(y), GFX_FUNKELN_WEISS + phase);
 
 	if (direct_draw_on)
 	{
 	  int dest_x,dest_y;
 
-	  dest_x = FX + SCROLLX(x)*TILEX;
-	  dest_y = FY + SCROLLY(y)*TILEY;
+	  dest_x = FX + SCREENX(x)*TILEX;
+	  dest_y = FY + SCREENY(y)*TILEY;
 
 	  XCopyArea(display,drawto_field,window,gc,
 		    dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
@@ -2583,8 +2579,8 @@ void MauerWaechst(int x, int y)
 
     MovDelay[x][y]--;
     phase = 2-MovDelay[x][y]/delay;
-    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),
+    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
+      DrawGraphic(SCREENX(x),SCREENY(y),
 		  (Store[x][y]==MV_LEFT ? GFX_MAUER_L1 : GFX_MAUER_R1)+phase);
 
     if (!MovDelay[x][y])
@@ -2631,15 +2627,15 @@ void MauerAbleger(int ax, int ay)
   {
     Feld[ax-1][ay] = EL_MAUERND;
     Store[ax-1][ay] = MV_LEFT;
-    if (IN_SCR_FIELD(SCROLLX(ax-1),SCROLLY(ay)))
-      DrawGraphic(SCROLLX(ax-1),SCROLLY(ay),GFX_MAUER_L1);
+    if (IN_SCR_FIELD(SCREENX(ax-1),SCREENY(ay)))
+      DrawGraphic(SCREENX(ax-1),SCREENY(ay),GFX_MAUER_L1);
   }
   if (rechts_frei)
   {
     Feld[ax+1][ay] = EL_MAUERND;
     Store[ax+1][ay] = MV_RIGHT;
-    if (IN_SCR_FIELD(SCROLLX(ax+1),SCROLLY(ay)))
-      DrawGraphic(SCROLLX(ax+1),SCROLLY(ay),GFX_MAUER_R1);
+    if (IN_SCR_FIELD(SCREENX(ax+1),SCREENY(ay)))
+      DrawGraphic(SCREENX(ax+1),SCREENY(ay),GFX_MAUER_R1);
   }
 
   if (links_frei || rechts_frei)
@@ -3024,7 +3020,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   if (can_move != MF_MOVING)
     return(can_move);
 
-  StorePlayer[jx][jy] = EL_LEERRAUM;
+  StorePlayer[jx][jy] = 0;
   player->last_jx = jx;
   player->last_jy = jy;
   jx = player->jx = new_jx;
@@ -3147,6 +3143,14 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   {
     player->last_jx = jx;
     player->last_jy = jy;
+
+    if (Feld[jx][jy] == EL_AUSGANG_AUF)
+    {
+      RemoveHero(player);
+
+      if (!local_player->friends_still_needed)
+	player->LevelSolved = player->GameOver = TRUE;
+    }
   }
 }
 
@@ -3394,23 +3398,12 @@ int DigField(struct PlayerInfo *player,
     case EL_EDELSTEIN_GELB:
     case EL_EDELSTEIN_ROT:
     case EL_EDELSTEIN_LILA:
-      Feld[x][y] = EL_LEERRAUM;
-      MovDelay[x][y] = 0;	/* wegen EDELSTEIN_BD-Funkeln! */
-      if (local_player->gems_still_needed > 0)
-	local_player->gems_still_needed--;
-      RaiseScoreElement(EL_EDELSTEIN);
-      DrawText(DX_EMERALDS, DY_EMERALDS,
-	       int2str(local_player->gems_still_needed, 3),
-	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevel(x, y, SND_PONG);
-      break;
-
     case EL_DIAMANT:
-      Feld[x][y] = EL_LEERRAUM;
-      local_player->gems_still_needed -= 3;
+      RemoveField(x,y);
+      local_player->gems_still_needed -= (element == EL_DIAMANT ? 3 : 1);
       if (local_player->gems_still_needed < 0)
 	local_player->gems_still_needed = 0;
-      RaiseScoreElement(EL_DIAMANT);
+      RaiseScoreElement(element);
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
@@ -3418,7 +3411,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_DYNAMIT_AUS:
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x,y);
       player->dynamite++;
       RaiseScoreElement(EL_DYNAMIT);
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
@@ -3428,22 +3421,22 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_DYNABOMB_NR:
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x,y);
       player->dynabomb_count++;
       player->dynabombs_left++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
-    case EL_DYNABOMB_SZ:
 
-      Feld[x][y] = EL_LEERRAUM;
+    case EL_DYNABOMB_SZ:
+      RemoveField(x,y);
       player->dynabomb_size++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
 
     case EL_DYNABOMB_XL:
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x,y);
       player->dynabomb_xl = TRUE;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
@@ -3456,7 +3449,7 @@ int DigField(struct PlayerInfo *player,
     {
       int key_nr = element-EL_SCHLUESSEL1;
 
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x,y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
       DrawMiniGraphicExt(drawto,gc,
@@ -3501,7 +3494,7 @@ int DigField(struct PlayerInfo *player,
 	  !tape.playing)
 	return(MF_NO_ACTION);
 
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x,y);
       Feld[x+dx][y+dy] = element;
 
       player->push_delay_value = 2+RND(8);
@@ -3541,11 +3534,15 @@ int DigField(struct PlayerInfo *player,
       if (mode==DF_SNAP)
 	return(MF_NO_ACTION);
 
+      PlaySoundLevel(x,y,SND_BUING);
+
+      /*
       player->gone = TRUE;
       PlaySoundLevel(x,y,SND_BUING);
 
       if (!local_player->friends_still_needed)
 	player->LevelSolved = player->GameOver = TRUE;
+      */
 
       break;
 
@@ -3608,7 +3605,7 @@ int DigField(struct PlayerInfo *player,
 	  local_player->sokobanfields_still_needed++;
 	}
 	else
-	  Feld[x][y] = EL_LEERRAUM;
+	  RemoveField(x,y);
 
 	if (Feld[x+dx][y+dy] == EL_SOKOBAN_FELD_LEER)
 	{
@@ -3622,7 +3619,7 @@ int DigField(struct PlayerInfo *player,
       }
       else
       {
-	Feld[x][y] = EL_LEERRAUM;
+	RemoveField(x,y);
 	Feld[x+dx][y+dy] = element;
       }
 
@@ -3717,7 +3714,7 @@ BOOL PlaceBomb(struct PlayerInfo *player)
     player->dynamite--;
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FS_SMALL, FC_YELLOW);
-    DrawGraphicThruMask(SCROLLX(jx),SCROLLY(jy),GFX_DYNAMIT);
+    DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNAMIT);
   }
   else
   {
@@ -3725,7 +3722,7 @@ BOOL PlaceBomb(struct PlayerInfo *player)
     Store2[jx][jy] = EL_SPIELER1 + player->nr;	/* for DynaExplode() */
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
-    DrawGraphicThruMask(SCROLLX(jx),SCROLLY(jy),GFX_DYNABOMB);
+    DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNABOMB);
   }
 
   return(TRUE);
@@ -3733,7 +3730,7 @@ BOOL PlaceBomb(struct PlayerInfo *player)
 
 void PlaySoundLevel(int x, int y, int sound_nr)
 {
-  int sx = SCROLLX(x), sy = SCROLLY(y);
+  int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo;
   int silence_distance = 8;
 
@@ -3778,6 +3775,10 @@ void RaiseScoreElement(int element)
   switch(element)
   {
     case EL_EDELSTEIN:
+    case EL_EDELSTEIN_BD:
+    case EL_EDELSTEIN_GELB:
+    case EL_EDELSTEIN_ROT:
+    case EL_EDELSTEIN_LILA:
       RaiseScore(level.score[SC_EDELSTEIN]);
       break;
     case EL_DIAMANT:

@@ -268,20 +268,23 @@ void HandleButton(int mx, int my, int button)
   }
 
 #ifdef DEBUG
-  if (game_status == PLAYING && button)
+  if (game_status == PLAYING && !button)
   {
     int sx = (mx - SX) / TILEX;
     int sy = (my - SY) / TILEY;
 
     if (IN_SCR_FIELD(sx,sy))
     {
-      int x = UNSCROLLX(sx);
-      int y = UNSCROLLY(sy);
+      int x = LEVELX(sx);
+      int y = LEVELY(sy);
 
       printf("INFO: Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
       printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
       printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
       printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);
+      printf("      MovPos[%d][%d] == %d\n", x,y, MovPos[x][y]);
+      printf("      MovDir[%d][%d] == %d\n", x,y, MovDir[x][y]);
+      printf("      MovDelay[%d][%d] == %d\n", x,y, MovDelay[x][y]);
       printf("\n");
     }
   }

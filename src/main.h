@@ -82,10 +82,10 @@ typedef int BOOL;
 #ifndef SIGN
 #define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
 #endif
-#define SCROLLX(a)	((a) - scroll_x)
-#define SCROLLY(a)	((a) - scroll_y)
-#define UNSCROLLX(a)	((a) + scroll_x)
-#define UNSCROLLY(a)	((a) + scroll_y)
+#define SCREENX(a)	((a) - scroll_x)
+#define SCREENY(a)	((a) - scroll_y)
+#define LEVELX(a)	((a) + scroll_x)
+#define LEVELY(a)	((a) + scroll_y)
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
