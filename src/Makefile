@@ -3,6 +3,7 @@
 #
 
 PROGNAME = rocksndiamonds
+SERVNAME = rnd_server
 
 RM = rm -f
 CC = gcc
@@ -87,8 +88,13 @@ OBJS =	main.o		\
 	new.o		\
 	random.o
 
-all:	$(OBJS)
+all:	$(PROGNAME) $(SERVNAME)
+
+$(PROGNAME):	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
+
+$(SERVNAME):	$(SERVNAME).c
+	$(CC) $(CFLAGS) $(SERVNAME).c $(LIBS) -o $(SERVNAME)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c

@@ -1,16 +1,21 @@
 /***********************************************************
 *  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
 *----------------------------------------------------------*
-*  ©1995 Artsoft Development                               *
-*        Holger Schemel                                    *
-*        33659 Bielefeld-Senne                             *
-*        Telefon: (0521) 493245                            *
-*        eMail: aeglos@valinor.owl.de                      *
-*               aeglos@uni-paderborn.de                    *
-*               q99492@pbhrzx.uni-paderborn.de             *
+*  (c) 1995-98 Artsoft Entertainment                       *
+*              Holger Schemel                              *
+*              Oststrasse 11a                              *
+*              33604 Bielefeld                             *
+*              phone: ++49 +521 290471                     *
+*              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
 *  init.c                                                  *
 ***********************************************************/
+
+#include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include "init.h"
 #include "misc.h"
@@ -21,8 +26,6 @@
 #include "joystick.h"
 #include "gfxload.h"
 #include "gifload.h"
-
-#include <signal.h>
 
 #ifdef DEBUG
 /*
@@ -44,6 +47,7 @@ struct IconFileInfo
 
 static int sound_process_id = 0;
 
+static void InitServer(void);
 static void InitLevelAndPlayerInfo(void);
 static void InitDisplay(int, char **);
 static void InitSound(void);
@@ -55,6 +59,13 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
+
+
+  /* TEST TEST TEST */
+  InitServer();
+  /* TEST TEST TEST */
+
+
   InitLevelAndPlayerInfo();
 
   InitCounter();
@@ -77,6 +88,141 @@ void OpenAll(int argc, char *argv[])
 
   DrawMainMenu();
 }
+
+
+
+/* TEST STUFF -------------------------------------------------------------- */
+
+int norestart = 0;
+int nospeedup = 0;
+
+/* server stuff */
+
+#define DEFAULTPORT	19503
+#define BUFLEN		4096
+
+int sfd;
+unsigned char realbuf[512], readbuf[BUFLEN], writbuf[BUFLEN];
+unsigned char *buf = realbuf + 4;
+int nread = 0, nwrite = 0;
+
+void fatal(char *s)
+{
+  fprintf(stderr, "%s.\n", s);
+  exit(1);
+}
+
+void u_sleep(int i)
+{
+  struct timeval tm;
+  tm.tv_sec = i / 1000000;
+  tm.tv_usec = i % 1000000;
+  select(0, NULL, NULL, NULL, &tm);
+}
+
+void startserver()
+{
+  char *options[2];
+  int n = 0;
+
+  options[0] = options[1] = NULL;
+  if (norestart)
+    options[n++] = "-norestart";
+  if (nospeedup)
+    options[n++] = "-nospeedup";
+
+  switch (fork())
+  {
+    case 0:
+      execlp(
+#ifdef XTRISPATH
+      XTRISPATH "/rnd_server",
+#else
+      "rnd_server",
+#endif
+      "rnd_server", "-once", "-v", options[0], options[1], NULL);
+
+      fprintf(stderr, "Can't start server '%s'.\n",
+#ifdef XTRISPATH
+	XTRISPATH "/xtserv");
+#else
+	"xtserv");
+#endif
+
+      _exit(1);
+    
+    case -1:
+      fatal("fork() failed");
+    
+    default:
+      return;
+  }
+}
+
+void connect2server(char *host, int port)
+{
+  struct hostent *hp;
+  struct sockaddr_in s;
+  struct protoent *tcpproto;
+  int on = 1, i;
+
+  if (host)
+  {
+    if ((s.sin_addr.s_addr = inet_addr(host)) == -1)
+    {
+      hp = gethostbyname(host);
+      if (!hp)
+	fatal("Host not found");
+      s.sin_addr = *(struct in_addr *)(hp->h_addr_list[0]);
+    }
+  }
+  else
+    s.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+  s.sin_port = htons(port);
+  s.sin_family = AF_INET;
+  sfd = socket(PF_INET, SOCK_STREAM, 0);
+  if (sfd < 0)
+    fatal("Out of file descriptors");
+  if ((tcpproto = getprotobyname("tcp")) != NULL)
+    setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
+
+  if (connect(sfd, (struct sockaddr *)&s, sizeof(s)) < 0)
+  {
+    if (!host)
+    {
+      printf("No xtris server on localhost - starting up one ...\n");
+      startserver();
+      for (i=0; i<6; i++)
+      {
+	u_sleep(500000);
+	close(sfd);
+	sfd = socket(PF_INET, SOCK_STREAM, 0);
+	if (sfd < 0)
+	  fatal("Out of file descriptors");
+	setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
+	if (connect(sfd, (struct sockaddr *)&s, sizeof(s)) >= 0)
+	  break;
+      }
+      if (i==6)
+	fatal("Can't connect to server");
+    }
+    else
+      fatal("Can't connect to server");
+  }
+}
+
+void InitServer()
+{
+  if (server_port == 0)
+    server_port = DEFAULTPORT;
+
+  connect2server(server_host, server_port);
+}
+
+/* TEST STUFF -------------------------------------------------------------- */
+
+
 
 void InitLevelAndPlayerInfo()
 {

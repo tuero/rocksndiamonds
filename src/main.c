@@ -1,13 +1,12 @@
 /***********************************************************
 *  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
 *----------------------------------------------------------*
-*  ©1995 Artsoft Development                               *
-*        Holger Schemel                                    *
-*        33659 Bielefeld-Senne                             *
-*        Telefon: (0521) 493245                            *
-*        eMail: aeglos@valinor.owl.de                      *
-*               aeglos@uni-paderborn.de                    *
-*               q99492@pbhrzx.uni-paderborn.de             *
+*  (c) 1995-98 Artsoft Entertainment                       *
+*              Holger Schemel                              *
+*              Oststrasse 11a                              *
+*              33604 Bielefeld                             *
+*              phone: ++49 +521 290471                     *
+*              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
 *  main.c                                                  *
 ***********************************************************/
@@ -45,6 +44,9 @@ int		joystick_device = 0;
 char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
 char	       *level_directory = LEVEL_PATH;
 int     	width, height;
+
+char	       *server_host = NULL;
+int		server_port = 0;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;
@@ -193,8 +195,22 @@ int main(int argc, char *argv[])
 {
   progname = argv[0];
 
+
+
+  /*
   if (argc>1)
     level_directory = argv[1];
+    */
+
+
+
+  if (argc > 1)
+    server_host = argv[1];
+
+  if (argc > 2)
+    server_port = atoi(argv[2]);
+
+
 
 #ifdef MSDOS
   _fmode = O_BINARY;
