@@ -45,7 +45,7 @@ inline void FlushDisplay();
 inline void SyncDisplay();
 inline void KeyboardAutoRepeatOn();
 inline void KeyboardAutoRepeatOff();
-inline boolean QueryPointer(DrawWindow, int *, int *);
+inline boolean PointerInWindow(DrawWindow);
 
 inline boolean PendingEvent();
 inline void NextEvent(Event *event);

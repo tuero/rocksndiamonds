@@ -35,12 +35,12 @@ EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
 USE_SDL = true
-USE_SDL_OLD_LIBS = true
+USE_SDL_OLD_LIBS = false
 
 ifeq ($(USE_SDL_OLD_LIBS),true)
-SDL_EXTRA_LIBS = -lIMG
+SDL_EXTRA_LIBS = -lIMG -lmixer
 else
-SDL_EXTRA_LIBS = -lSDL_image
+SDL_EXTRA_LIBS = -lSDL_image -lSDL_mixer
 endif
 
 SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)

@@ -16,6 +16,7 @@
 
 #include "main.h"
 
+int EventFilter(const Event *);
 void EventLoop(void);
 void HandleOtherEvents(Event *);
 void ClearEventQueue(void);

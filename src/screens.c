@@ -2087,11 +2087,17 @@ void CalibrateJoystick(int player_nr)
     }
 
 #ifndef MSDOS
+
+#ifdef USE_SDL_LIBRARY
+    joy_ctrl.x = Get_SDL_Joystick_Axis(joystick_fd, 0);
+    joy_ctrl.y = Get_SDL_Joystick_Axis(joystick_fd, 1);
+#else
     if (read(joystick_fd, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
     {
       joystick_status = JOYSTICK_OFF;
       goto error_out;
     }
+#endif
 
     new_joystick_xleft  = MIN(new_joystick_xleft,  joy_ctrl.x);
     new_joystick_xright = MAX(new_joystick_xright, joy_ctrl.x);
@@ -2199,7 +2205,18 @@ void CalibrateJoystick(int player_nr)
   StopAnimation();
 
   DrawSetupInputScreen();
-  while(Joystick(player_nr) & JOY_BUTTON);
+
+  /* wait until the last pressed button was released */
+  while(Joystick(player_nr) & JOY_BUTTON)
+  {
+    if (PendingEvent())		/* got event */
+    {
+      Event event;
+
+      NextEvent(&event);
+      HandleOtherEvents(&event);
+    }
+  }
   return;
 
   error_out:

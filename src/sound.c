@@ -715,6 +715,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 {
   char filename[256];
   char *sound_ext = "wav";
+#ifndef USE_SDL_LIBRARY
 #ifndef MSDOS
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
@@ -722,10 +723,22 @@ boolean LoadSound(struct SoundInfo *snd_info)
   FILE *file;
   int i;
 #endif
+#endif
 
   sprintf(filename, "%s/%s/%s.%s",
 	  options.ro_base_directory, SOUNDS_DIRECTORY,
 	  snd_info->name, sound_ext);
+
+#ifdef USE_SDL_LIBRARY
+
+  snd_info->mix_chunk = Mix_LoadWAV(filename);
+  if (snd_info->mix_chunk == NULL)
+  {
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    return FALSE;
+  }
+
+#else /* !USE_SDL_LIBRARY */
 
 #ifndef MSDOS
 
@@ -789,12 +802,13 @@ boolean LoadSound(struct SoundInfo *snd_info)
   if (!snd_info->sample_ptr)
   {
     Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
-    return(FALSE);
+    return FALSE;
   }
 
 #endif /* MSDOS */
+#endif /* !USE_SDL_LIBRARY */
 
-  return(TRUE);
+  return TRUE;
 }
 
 void PlaySound(int nr)
@@ -815,6 +829,17 @@ void PlaySoundLoop(int nr)
 void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
+
+#ifdef USE_SDL_LIBRARY
+  Mix_PlayChannel(-1, Sound[nr].mix_chunk, 0);
+
+  /*
+  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
+  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
+  */
+
+  return;
+#endif
 
   if (sound_status==SOUND_OFF || !setup.sound)
     return;
@@ -872,6 +897,11 @@ void StopSounds()
 void StopSoundExt(int nr, int method)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
+
+#ifdef USE_SDL_LIBRARY
+  Mix_HaltMusic();
+  return;
+#endif
 
   if (sound_status==SOUND_OFF)
     return;

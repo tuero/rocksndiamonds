@@ -28,6 +28,23 @@
 #define KEY_RELEASED		FALSE
 #define KEY_PRESSED		TRUE
 
+
+/* event filter especially needed for SDL event filtering due to
+   delay problems with lots of mouse motion events when mouse
+   button not pressed */
+
+int EventFilter(const Event *event)
+{
+  if (event->type != EVENT_MOTIONNOTIFY)
+    return 1;
+
+  /* get mouse motion events without pressed button only in level editor */
+  if (button_status == MB_RELEASED && game_status != LEVELED)
+    return 0;
+  else
+    return 1;
+}
+
 void EventLoop(void)
 {
   while(1)
@@ -38,25 +55,28 @@ void EventLoop(void)
 
       NextEvent(&event);
 
-      switch(event.type)
+      if (EventFilter(&event))
       {
-	case EVENT_BUTTONPRESS:
-	case EVENT_BUTTONRELEASE:
-	  HandleButtonEvent((ButtonEvent *) &event);
-	  break;
-
-	case EVENT_MOTIONNOTIFY:
-	  HandleMotionEvent((MotionEvent *) &event);
-	  break;
-
-	case EVENT_KEYPRESS:
-	case EVENT_KEYRELEASE:
-	  HandleKeyEvent((KeyEvent *) &event);
-	  break;
-
-	default:
-	  HandleOtherEvents(&event);
-	  break;
+  	switch(event.type)
+  	{
+  	  case EVENT_BUTTONPRESS:
+  	  case EVENT_BUTTONRELEASE:
+  	    HandleButtonEvent((ButtonEvent *) &event);
+  	    break;
+  
+  	  case EVENT_MOTIONNOTIFY:
+  	    HandleMotionEvent((MotionEvent *) &event);
+  	    break;
+  
+  	  case EVENT_KEYPRESS:
+  	  case EVENT_KEYRELEASE:
+  	    HandleKeyEvent((KeyEvent *) &event);
+  	    break;
+  
+  	  default:
+  	    HandleOtherEvents(&event);
+  	    break;
+  	}
       }
     }
 
@@ -100,6 +120,14 @@ void HandleOtherEvents(Event *event)
     case EVENT_CLIENTMESSAGE:
       HandleClientMessageEvent((ClientMessageEvent *) event);
       break;
+
+#ifdef USE_SDL_LIBRARY
+    case SDL_JOYAXISMOTION:
+    case SDL_JOYBUTTONDOWN:
+    case SDL_JOYBUTTONUP:
+      HandleJoystickEvent(event);
+      break;
+#endif
 
     default:
       break;
@@ -227,17 +255,17 @@ void HandleButtonEvent(ButtonEvent *event)
 
 void HandleMotionEvent(MotionEvent *event)
 {
-  int win_x, win_y;
-
-  if (!QueryPointer(window, &win_x, &win_y))
+  if (!PointerInWindow(window))
     return;	/* window and pointer are on different screens */
 
-  if (!button_status && game_status != LEVELED)
+#if 0
+  if (button_status == MB_RELEASED && game_status != LEVELED)
     return;
+#endif
 
   motion_status = TRUE;
 
-  HandleButton(win_x, win_y, button_status);
+  HandleButton(event->x, event->y, button_status);
 }
 
 void HandleKeyEvent(KeyEvent *event)

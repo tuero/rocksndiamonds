@@ -120,20 +120,20 @@ inline void KeyboardAutoRepeatOff()
 #endif
 }
 
-inline boolean QueryPointer(DrawWindow window, int *win_x, int *win_y)
+inline boolean PointerInWindow(DrawWindow window)
 {
 #ifdef USE_SDL_LIBRARY
-  SDL_GetMouseState(win_x, win_y);
   return TRUE;
 #else
   DrawWindow root, child;
   int root_x, root_y;
   unsigned int mask;
+  int win_x, win_y;
 
   /* if XQueryPointer() returns False, the pointer
      is not on the same screen as the specified window */
   return XQueryPointer(display, window, &root, &child, &root_x, &root_y,
-		       win_x, win_y, &mask);
+		       &win_x, &win_y, &mask);
 #endif
 }
 

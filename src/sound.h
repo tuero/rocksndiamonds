@@ -130,8 +130,13 @@ struct SoundInfo
   char *name;
   byte *data_ptr;
   long data_len;
+
 #ifdef MSDOS
   SAMPLE *sample_ptr;
+#endif
+
+#ifdef USE_SDL_LIBRARY
+  Mix_Chunk *mix_chunk;
 #endif
 };
 

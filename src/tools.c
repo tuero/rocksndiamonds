@@ -1888,9 +1888,7 @@ boolean Request(char *text, unsigned int req_state)
 	{
 	  if (event.type == EVENT_MOTIONNOTIFY)
 	  {
-	    int win_x, win_y;
-
-	    if (!QueryPointer(window, &win_x, &win_y))
+	    if (!PointerInWindow(window))
 	      continue;	/* window and pointer are on different screens */
 
 	    if (!button_status)

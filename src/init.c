@@ -14,6 +14,7 @@
 #include <signal.h>
 
 #include "init.h"
+#include "events.h"
 #include "misc.h"
 #include "sound.h"
 #include "screens.h"
@@ -146,6 +147,31 @@ void InitSound()
   if (sound_status == SOUND_OFF)
     return;
 
+#ifdef USE_SDL_LIBRARY
+  /* initialize SDL audio */
+
+  if (SDL_Init(SDL_INIT_AUDIO) < 0)
+  {
+    Error(ERR_WARN, "SDL_Init() failed: %s\n", SDL_GetError());
+    sound_status = SOUND_OFF;
+    return;
+  }
+
+  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 256) < 0)
+  {
+    Error(ERR_WARN, "Mix_OpenAudio() failed: %s\n", SDL_GetError());
+    sound_status = SOUND_OFF;
+    return;
+  }
+
+  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
+  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
+
+  sound_status = SOUND_AVAILABLE;
+  sound_loops_allowed = TRUE;
+
+#else /* !USE_SDL_LIBRARY */
+
 #ifndef MSDOS
   if (access(sound_device_name, W_OK) != 0)
   {
@@ -180,6 +206,7 @@ void InitSound()
   */
 
 #endif /* MSDOS */
+#endif /* !USE_SDL_LIBRARY */
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
@@ -187,19 +214,36 @@ void InitSound()
     sprintf(sound_name[i], "%d", i + 1);
 #endif
 
+#ifdef USE_SDL_LIBRARY
+    {
+      char *str = getStringCopy(sound_name[i]);
+      sprintf(str, "%d", i + 1);
+      Sound[i].name = str;
+    }
+#else
     Sound[i].name = sound_name[i];
+#endif
     if (!LoadSound(&Sound[i]))
     {
       sound_status = SOUND_OFF;
       return;
     }
   }
+
+#if 0
+  sound_status = SOUND_OFF;
+#endif
+
 }
 
 void InitSoundServer()
 {
   if (sound_status == SOUND_OFF)
     return;
+
+#ifdef USE_SDL_LIBRARY
+  return;
+#endif
 
 #ifndef MSDOS
 
@@ -236,12 +280,58 @@ void InitSoundServer()
 
 void InitJoysticks()
 {
+#ifdef USE_SDL_LIBRARY
+  static boolean sdl_joystick_subsystem_initialized = FALSE;
+#endif
+
   int i;
 
   if (global_joystick_status == JOYSTICK_OFF)
     return;
 
   joystick_status = JOYSTICK_OFF;
+
+#ifdef USE_SDL_LIBRARY
+
+  if (!sdl_joystick_subsystem_initialized)
+  {
+    sdl_joystick_subsystem_initialized = TRUE;
+
+    if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+    {
+      Error(ERR_EXIT, "SDL_Init() failed: %s\n", SDL_GetError());
+      return;
+    }
+  }
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    char *device_name = setup.input[i].joy.device_name;
+    int joystick_nr = getJoystickNrFromDeviceName(device_name);
+
+    if (joystick_nr >= SDL_NumJoysticks())
+      joystick_nr = -1;
+
+    /* misuse joystick file descriptor variable to store joystick number */
+    stored_player[i].joystick_fd = joystick_nr;
+
+    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
+    if (Check_SDL_JoystickOpened(joystick_nr))
+      Close_SDL_Joystick(joystick_nr);
+
+    if (!setup.input[i].use_joystick)
+      continue;
+
+    if (!Open_SDL_Joystick(joystick_nr))
+    {
+      Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
+      continue;
+    }
+
+    joystick_status = JOYSTICK_AVAILABLE;
+  }
+
+#else /* !USE_SDL_LIBRARY */
 
 #ifndef MSDOS
   for (i=0; i<MAX_PLAYERS; i++)
@@ -296,12 +386,14 @@ void InitJoysticks()
     stored_player[i].joystick_fd = joystick_nr;
   }
 #endif
+
+#endif /* !USE_SDL_LIBRARY */
 }
 
 void InitDisplay()
 {
 #ifdef USE_SDL_LIBRARY
-  /* initialize SDL */
+  /* initialize SDL video */
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s\n", SDL_GetError());
 
@@ -366,6 +458,9 @@ void InitWindow(int argc, char *argv[])
 
   /* set window and icon title */
   SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
+
+  /* set event filter to filter out certain mouse motion events */
+  SDL_SetEventFilter(EventFilter);
 
 #else /* !USE_SDL_LIBRARY */
 
