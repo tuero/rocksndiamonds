@@ -655,10 +655,12 @@ struct GraphicInfo_EM
   int dst_offset_x, dst_offset_y;
   int width, height;
 
-  boolean has_crumbled_graphics;
   Bitmap *crumbled_bitmap;
   int crumbled_src_x, crumbled_src_y;
   int crumbled_border_size;
+
+  boolean has_crumbled_graphics;
+  boolean preserve_background;
 
   int unique_identifier;	/* used to identify needed screen updates */
 };

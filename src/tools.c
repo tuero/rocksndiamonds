@@ -5947,11 +5947,13 @@ void InitGraphicInfo_EM(void)
       g_em->width  = TILEX;
       g_em->height = TILEY;
 
-      g_em->has_crumbled_graphics = FALSE;
       g_em->crumbled_bitmap = NULL;
       g_em->crumbled_src_x = 0;
       g_em->crumbled_src_y = 0;
       g_em->crumbled_border_size = 0;
+
+      g_em->has_crumbled_graphics = FALSE;
+      g_em->preserve_background = FALSE;
 #endif
 
 #if 0
@@ -6030,6 +6032,76 @@ void InitGraphicInfo_EM(void)
 	g_em->width  = TILEX - cx * step;
 	g_em->height = TILEY - cy * step;
       }
+
+#if 0
+      if (effective_action == ACTION_SMASHED_BY_ROCK &&
+	  element_info[effective_element].graphic[effective_action] ==
+	  element_info[effective_element].graphic[ACTION_DEFAULT])
+      {
+	int move_dir = MV_DOWN;
+	int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? 1 : 0);
+	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
+	int num_steps = 8;
+	int cx = ABS(dx) * (TILEX / num_steps);
+	int cy = ABS(dy) * (TILEY / num_steps);
+	int step_frame = j + 1;
+	int step = (is_backside ? step_frame : num_steps - step_frame);
+
+	graphic = (el_act_dir2img(EL_ROCK, ACTION_FALLING, MV_DOWN));
+	g = &graphic_info[graphic];
+	sync_frame = j;
+	frame = getAnimationFrame(g->anim_frames,
+				  g->anim_delay,
+				  g->anim_mode,
+				  g->anim_start_frame,
+				  sync_frame);
+	getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y,
+			    g->double_movement && is_backside);
+
+	g_em->bitmap = src_bitmap;
+	g_em->src_x = src_x;
+	g_em->src_y = src_y;
+	g_em->src_offset_x = 0;
+	g_em->src_offset_y = 0;
+	g_em->dst_offset_x = 0;
+	g_em->dst_offset_y = 0;
+
+	if (is_backside)	/* tile where movement starts */
+	{
+	  if (dx < 0 || dy < 0)
+	  {
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
+	  }
+	  else
+	  {
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
+	  }
+	}
+	else			/* tile where movement ends */
+	{
+	  if (dx < 0 || dy < 0)
+	  {
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
+	  }
+	  else
+	  {
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
+	  }
+	}
+
+	g_em->width  = TILEX - cx * step;
+	g_em->height = TILEY - cy * step;
+
+#if 0
+	printf("::: -> '%s'\n", element_info[effective_element].token_name);
+#endif
+      }
+#endif
+
 #endif
 
       /* create unique graphic identifier to decide if tile must be redrawn */
@@ -6102,6 +6174,38 @@ void InitGraphicInfo_EM(void)
 
     }
   }
+
+#if 1
+  for (i = 0; i < TILE_MAX; i++)
+  {
+    for (j = 0; j < 8; j++)
+    {
+      int element = object_mapping[i].element_rnd;
+      int action = object_mapping[i].action;
+
+      if (action == ACTION_SMASHED_BY_ROCK &&
+	  element_info[element].graphic[action] ==
+	  element_info[element].graphic[ACTION_DEFAULT])
+      {
+	/* no separate animation for "smashed by rock" -- use rock instead */
+	struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
+	struct GraphicInfo_EM *g_xx = &graphic_info_em_object[Ystone_s][7 - j];
+
+	g_em->bitmap		= g_xx->bitmap;
+	g_em->src_x		= g_xx->src_x;
+	g_em->src_y		= g_xx->src_y;
+	g_em->src_offset_x	= g_xx->src_offset_x;
+	g_em->src_offset_y	= g_xx->src_offset_y;
+	g_em->dst_offset_x	= g_xx->dst_offset_x;
+	g_em->dst_offset_y	= g_xx->dst_offset_y;
+	g_em->width 		= g_xx->width;
+	g_em->height		= g_xx->height;
+
+	g_em->preserve_background = TRUE;
+      }
+    }
+  }
+#endif
 
   for (p = 0; p < 2; p++)
   {

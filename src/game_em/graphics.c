@@ -96,7 +96,7 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
   }
   else
   {
-    if (width != TILEX || height != TILEY)
+    if ((width != TILEX || height != TILEY) && !g->preserve_background)
       ClearRectangle(screenBitmap, sx * TILEX, sy * TILEY, TILEX, TILEY);
 
     if (width > 0 && height > 0)

@@ -4602,11 +4602,13 @@ void create_obj_graphics_info_em()
       g->width = TILEX;
       g->height = TILEY;
 
-      g->has_crumbled_graphics = FALSE;
       g->crumbled_bitmap = NULL;
       g->crumbled_src_x = 0;
       g->crumbled_src_y = 0;
       g->crumbled_border_size = 0;
+
+      g->has_crumbled_graphics = FALSE;
+      g->preserve_background = FALSE;
 
       /* create unique graphic identifier to decide if tile must be redrawn */
       g->unique_identifier = obj;
