@@ -23,6 +23,7 @@
 #include "system.h"
 #include "sound.h"
 #include "setup.h"
+#include "joystick.h"
 #include "misc.h"
 
 
@@ -111,7 +112,8 @@ void ClosePlatformDependantStuff(void)
 void InitProgramInfo(char *unix_userdata_directory, char *program_title,
 		     char *window_title, char *icon_title,
 		     char *x11_icon_basename, char *x11_iconmask_basename,
-		     char *msdos_pointer_basename)
+		     char *msdos_pointer_basename,
+		     char *cookie_prefix, int program_version)
 {
   char *x11_icon_filename =
     getPath2(options.graphics_directory, x11_icon_basename);
@@ -132,6 +134,10 @@ void InitProgramInfo(char *unix_userdata_directory, char *program_title,
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
   program.msdos_pointer_filename = msdos_pointer_filename;
+  program.cookie_prefix = cookie_prefix;
+  program.version_major = VERSION_MAJOR(program_version);
+  program.version_minor = VERSION_MINOR(program_version);
+  program.version_patch = VERSION_PATCH(program_version);
 }
 
 void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
@@ -623,10 +629,10 @@ inline void OpenAudio(void)
 
 #if defined(TARGET_SDL)
   SDLOpenAudio();
-#elif defined(PLATFORM_MSDOS)
-  MSDOSOpenAudio();
 #elif defined(PLATFORM_UNIX)
   UnixOpenAudio();
+#elif defined(PLATFORM_MSDOS)
+  MSDOSOpenAudio();
 #endif
 }
 
@@ -634,10 +640,10 @@ inline void CloseAudio(void)
 {
 #if defined(TARGET_SDL)
   SDLCloseAudio();
-#elif defined(PLATFORM_MSDOS)
-  MSDOSCloseAudio();
 #elif defined(PLATFORM_UNIX)
   UnixCloseAudio();
+#elif defined(PLATFORM_MSDOS)
+  MSDOSCloseAudio();
 #endif
 
   audio.sound_enabled = FALSE;
@@ -727,9 +733,39 @@ inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 }
 
 
-inline void dummy(void)
+/* ========================================================================= */
+/* joystick functions                                                        */
+/* ========================================================================= */
+
+inline void InitJoysticks()
 {
-#ifdef TARGET_SDL
-#else
+  int i;
+
+#ifdef NO_JOYSTICK
+  return;	/* joysticks generally deactivated by compile-time directive */
+#endif
+
+  /* always start with reliable default values */
+  joystick.status = JOYSTICK_NOT_AVAILABLE;
+  for (i=0; i<MAX_PLAYERS; i++)
+    joystick.fd[i] = -1;		/* joystick device closed */
+
+#if defined(TARGET_SDL)
+  SDLInitJoysticks();
+#elif defined(PLATFORM_UNIX)
+  UnixInitJoysticks();
+#elif defined(PLATFORM_MSDOS)
+  MSDOSInitJoysticks();
+#endif
+}
+
+inline boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
+{
+#if defined(TARGET_SDL)
+  return SDLReadJoystick(nr, x, y, b1, b2);
+#elif defined(PLATFORM_UNIX)
+  return UnixReadJoystick(nr, x, y, b1, b2);
+#elif defined(PLATFORM_MSDOS)
+  return MSDOSReadJoystick(nr, x, y, b1, b2);
 #endif
 }

@@ -17,6 +17,30 @@
 #include "system.h"
 
 
+/* values for setup file handling */
+#define TYPE_BOOLEAN			1
+#define TYPE_SWITCH			2
+#define TYPE_KEY			3
+#define TYPE_INTEGER			4
+#define TYPE_STRING			5
+
+#define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
+
+/* structures for setup file handling */
+struct SetupFileList
+{
+  char *token;
+  char *value;
+  struct SetupFileList *next;
+};
+
+struct TokenInfo
+{
+  int type;
+  void *value;
+  char *text;
+};
+
 /* sort priorities of level series (also used as level series classes) */
 #define LEVELCLASS_TUTORIAL_START	10
 #define LEVELCLASS_TUTORIAL_END		99
@@ -85,6 +109,8 @@
 char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getScoreFilename(int);
+char *getSetupFilename(void);
+
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);
 void InitUserLevelDirectory(char *);
@@ -112,12 +138,20 @@ char *getSetupDir(void);
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);
 void SetFilePermissions(char *, int);
+
+char *getCookie(char *);
 int getFileVersionFromCookieString(const char *);
 boolean checkCookieString(const char *, const char *);
 
+char *getFormattedSetupEntry(char *, char *);
+void freeSetupFileList(struct SetupFileList *);
+char *getTokenValue(struct SetupFileList *, char *);
+struct SetupFileList *loadSetupFileList(char *);
+void checkSetupFileListIdentifier(struct SetupFileList *, char *);
+void setSetupInfo(struct TokenInfo *, int, char *);
+char *getSetupLine(struct TokenInfo *, char *, int);
+
 void LoadLevelInfo(void);
-void LoadSetup(void);
-void SaveSetup(void);
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);

@@ -16,11 +16,9 @@
 
 #include "system.h"
 
-/* values for the joystick */
 #define JOYSTICK_NOT_AVAILABLE	0
 #define	JOYSTICK_AVAILABLE	(1 << 0)
 #define	JOYSTICK_ACTIVE		(1 << 1)
-
 #define JOYSTICK_ACTIVATED	(JOYSTICK_AVAILABLE | JOYSTICK_ACTIVE)
 
 #if defined(PLATFORM_FREEBSD)
@@ -46,16 +44,17 @@
 #define JOYSTICK_YMIDDLE	0
 #define JOYSTICK_YLOWER		32767
 #else
-#define JOYSTICK_XLEFT		30
-#define JOYSTICK_XMIDDLE	530
-#define JOYSTICK_XRIGHT		1250
-#define JOYSTICK_YUPPER		40
-#define JOYSTICK_YMIDDLE	680
-#define JOYSTICK_YLOWER		1440
+#define JOYSTICK_XLEFT		1
+#define JOYSTICK_XMIDDLE	128
+#define JOYSTICK_XRIGHT		255
+#define JOYSTICK_YUPPER		1
+#define JOYSTICK_YMIDDLE	128
+#define JOYSTICK_YLOWER		255
 #endif
 
 #define JOYSTICK_PERCENT	25
 
+#define JOY_NO_ACTION		0
 #define JOY_LEFT		MV_LEFT
 #define JOY_RIGHT		MV_RIGHT
 #define JOY_UP			MV_UP
@@ -69,26 +68,15 @@
 #define JOY_BUTTON_NEW_PRESSED	2
 #define JOY_BUTTON_NEW_RELEASED	3
 
-#ifdef NO_JOYSTICK
-#define JOYSTICK_STATUS		JOYSTICK_NOT_AVAILABLE
-#else
-#define JOYSTICK_STATUS		JOYSTICK_AVAILABLE
+#if defined(PLATFORM_UNIX)
+void UnixInitJoysticks(void);
+boolean UnixReadJoystick(int, int *, int *, boolean *, boolean *);
 #endif
-
 
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);
 char *getDeviceNameFromJoystickNr(int);
-
-#if defined(TARGET_SDL)
-SDL_Joystick *Get_SDL_Joystick(int);
-boolean Open_SDL_Joystick(int);
-void Close_SDL_Joystick(int);
-boolean Check_SDL_JoystickOpened(int);
-void HandleJoystickEvent(Event *);
-int Get_SDL_Joystick_Axis(int, int);
-#endif
 
 void CheckJoystickData(void);
 int Joystick(int);

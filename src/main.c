@@ -29,7 +29,6 @@ boolean		level_editor_test_game = FALSE;
 boolean		network_playing = FALSE;
 
 int		key_joystick_mapping = 0;
-int	    	global_joystick_status = JOYSTICK_STATUS;
 
 boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;

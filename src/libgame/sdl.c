@@ -13,6 +13,7 @@
 
 #include "system.h"
 #include "sound.h"
+#include "joystick.h"
 #include "misc.h"
 
 
@@ -930,6 +931,125 @@ inline void SDLNextEvent(Event *event)
       ((ButtonEvent *)event)->y = 0;
   }
 #endif
+}
+
+
+/* ========================================================================= */
+/* joystick functions                                                        */
+/* ========================================================================= */
+
+static SDL_Joystick *sdl_joystick[MAX_PLAYERS] = { NULL, NULL, NULL, NULL };
+static int sdl_js_axis[MAX_PLAYERS][2]   = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
+static int sdl_js_button[MAX_PLAYERS][2] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
+
+static boolean SDLOpenJoystick(int nr)
+{
+  if (nr < 0 || nr > MAX_PLAYERS)
+    return FALSE;
+
+  return ((sdl_joystick[nr] = SDL_JoystickOpen(nr)) == NULL ? FALSE : TRUE);
+}
+
+static void SDLCloseJoystick(int nr)
+{
+  if (nr < 0 || nr > MAX_PLAYERS)
+    return;
+
+  SDL_JoystickClose(sdl_joystick[nr]);
+}
+
+static boolean SDLCheckJoystickOpened(int nr)
+{
+  if (nr < 0 || nr > MAX_PLAYERS)
+    return FALSE;
+
+  return (SDL_JoystickOpened(nr) ? TRUE : FALSE);
+}
+
+void HandleJoystickEvent(Event *event)
+{
+  switch(event->type)
+  {
+    case SDL_JOYAXISMOTION:
+      if (event->jaxis.axis < 2)
+	sdl_js_axis[event->jaxis.which][event->jaxis.axis]= event->jaxis.value;
+      break;
+
+    case SDL_JOYBUTTONDOWN:
+      if (event->jbutton.button < 2)
+	sdl_js_button[event->jbutton.which][event->jbutton.button] = TRUE;
+      break;
+
+    case SDL_JOYBUTTONUP:
+      if (event->jbutton.button < 2)
+	sdl_js_button[event->jbutton.which][event->jbutton.button] = FALSE;
+      break;
+
+    default:
+      break;
+  }
+}
+
+void SDLInitJoysticks()
+{
+  static boolean sdl_joystick_subsystem_initialized = FALSE;
+  int i;
+
+  if (!sdl_joystick_subsystem_initialized)
+  {
+    sdl_joystick_subsystem_initialized = TRUE;
+
+    if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+    {
+      Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
+      return;
+    }
+  }
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    char *device_name = setup.input[i].joy.device_name;
+    int joystick_nr = getJoystickNrFromDeviceName(device_name);
+
+    if (joystick_nr >= SDL_NumJoysticks())
+      joystick_nr = -1;
+
+    /* misuse joystick file descriptor variable to store joystick number */
+    joystick.fd[i] = joystick_nr;
+
+    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
+    if (SDLCheckJoystickOpened(joystick_nr))
+      SDLCloseJoystick(joystick_nr);
+
+    if (!setup.input[i].use_joystick)
+      continue;
+
+    if (!SDLOpenJoystick(joystick_nr))
+    {
+      Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
+      continue;
+    }
+
+    joystick.status = JOYSTICK_ACTIVATED;
+  }
+}
+
+boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
+{
+  if (nr < 0 || nr >= MAX_PLAYERS)
+    return FALSE;
+
+  if (x != NULL)
+    *x = sdl_js_axis[nr][0];
+  if (y != NULL)
+    *y = sdl_js_axis[nr][1];
+
+  if (b1 != NULL)
+    *b1 = sdl_js_button[nr][0];
+  if (b2 != NULL)
+    *b2 = sdl_js_button[nr][1];
+
+  return TRUE;
 }
 
 #endif /* TARGET_SDL */

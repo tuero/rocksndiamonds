@@ -20,12 +20,6 @@
 #include "system.h"
 
 
-/* functions for version handling */
-#define VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
-#define VERSION_MAJOR(x)	((x) / 10000)
-#define VERSION_MINOR(x)	(((x) % 10000) / 100)
-#define VERSION_PATCH(x)	((x) % 100)
-
 /* values for InitCounter() and Counter() */
 #define INIT_COUNTER			0
 #define READ_COUNTER			1

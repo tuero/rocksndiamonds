@@ -21,12 +21,6 @@
 #include "text.h"
 #include "misc.h"
 
-
-/* file identifier strings */
-#define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
-#define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
-#define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
-
 /* file names and filename extensions */
 #if !defined(PLATFORM_MSDOS)
 #define LEVELSETUP_DIRECTORY	"levelsetup"
@@ -79,45 +73,14 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
 
-/* values for setup file stuff */
-#define TYPE_BOOLEAN			1
-#define TYPE_SWITCH			2
-#define TYPE_KEY			3
-#define TYPE_INTEGER			4
-#define TYPE_STRING			5
-
-#define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
-
 #define TOKEN_VALUE_POSITION		30
 
-struct SetupFileList
-{
-  char *token;
-  char *value;
-  struct SetupFileList *next;
-};
-
-struct TokenInfo
-{
-  int type;
-  void *value;
-  char *text;
-};
+#define MAX_COOKIE_LEN			256
 
 
 /* ------------------------------------------------------------------------- */
 /* file functions                                                            */
 /* ------------------------------------------------------------------------- */
-
-/*
-int get_string_integer_value(char *);
-boolean get_string_boolean_value(char *);
-char *getFormattedSetupEntry(char *, char *);
-void freeSetupFileList(struct SetupFileList *);
-char *getTokenValue(struct SetupFileList *, char *);
-struct SetupFileList *loadSetupFileList(char *);
-void checkSetupFileListIdentifier(struct SetupFileList *, char *);
-*/
 
 char *getLevelClassDescription(struct LevelDirInfo *ldi)
 {
@@ -128,12 +91,6 @@ char *getLevelClassDescription(struct LevelDirInfo *ldi)
   else
     return "Unknown Level Class";
 }
-
-/* for 'InitUserLevelDir()' */
-static void SaveUserLevelInfo();
-
-/* for 'SaveUserLevelInfo()' */
-static char *getSetupLine(struct TokenInfo *, char *, int);
 
 static char *getUserLevelDir(char *level_subdir)
 {
@@ -249,6 +206,18 @@ char *getScoreFilename(int nr)
   return filename;
 }
 
+char *getSetupFilename()
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(getSetupDir(), SETUP_FILENAME);
+
+  return filename;
+}
+
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
@@ -261,6 +230,8 @@ void InitScoreDirectory(char *level_subdir)
   createDirectory(getScoreDir(""), "main score", PERMS_PUBLIC);
   createDirectory(getScoreDir(level_subdir), "level score", PERMS_PUBLIC);
 }
+
+static void SaveUserLevelInfo();
 
 void InitUserLevelDirectory(char *level_subdir)
 {
@@ -645,6 +616,21 @@ void SetFilePermissions(char *filename, int permission_class)
 		   FILE_PERMS_PRIVATE : FILE_PERMS_PUBLIC));
 }
 
+char *getCookie(char *file_type)
+{
+  static char cookie[MAX_COOKIE_LEN + 1];
+
+  if (strlen(program.cookie_prefix) + 1 +
+      strlen(file_type) + strlen("_FILE_VERSION_x.x") > MAX_COOKIE_LEN)
+    return "[COOKIE ERROR]";	/* should never happen */
+
+  sprintf(cookie, "%s_%s_FILE_VERSION_%d.%d",
+	  program.cookie_prefix, file_type,
+	  program.version_major, program.version_minor);
+
+  return cookie;
+}
+
 int getFileVersionFromCookieString(const char *cookie)
 {
   const char *ptr_cookie1, *ptr_cookie2;
@@ -928,9 +914,9 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 
   if (strcmp(setup_file_list->token, TOKEN_STR_FILE_IDENTIFIER) == 0)
   {
-    if (strcmp(setup_file_list->value, identifier) != 0)
+    if (!checkCookieString(setup_file_list->value, identifier))
     {
-      Error(ERR_WARN, "configuration file has wrong version");
+      Error(ERR_WARN, "configuration file has wrong file identifier");
       return;
     }
     else
@@ -941,7 +927,7 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
     checkSetupFileListIdentifier(setup_file_list->next, identifier);
   else
   {
-    Error(ERR_WARN, "configuration file has no version information");
+    Error(ERR_WARN, "configuration file has no file identifier");
     return;
   }
 }
@@ -954,41 +940,6 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 #define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
 #define TOKEN_STR_LAST_PLAYED_LEVEL	"last_played_level"
 #define TOKEN_STR_HANDICAP_LEVEL	"handicap_level"
-#define TOKEN_STR_PLAYER_PREFIX		"player_"
-
-/* global setup */
-#define SETUP_TOKEN_PLAYER_NAME		0
-#define SETUP_TOKEN_SOUND		1
-#define SETUP_TOKEN_SOUND_LOOPS		2
-#define SETUP_TOKEN_SOUND_MUSIC		3
-#define SETUP_TOKEN_SOUND_SIMPLE	4
-#define SETUP_TOKEN_SCROLL_DELAY	5
-#define SETUP_TOKEN_SOFT_SCROLLING	6
-#define SETUP_TOKEN_FADING		7
-#define SETUP_TOKEN_AUTORECORD		8
-#define SETUP_TOKEN_QUICK_DOORS		9
-#define SETUP_TOKEN_TEAM_MODE		10
-#define SETUP_TOKEN_HANDICAP		11
-#define SETUP_TOKEN_TIME_LIMIT		12
-#define SETUP_TOKEN_FULLSCREEN		13
-
-/* player setup */
-#define SETUP_TOKEN_USE_JOYSTICK	0
-#define SETUP_TOKEN_JOY_DEVICE_NAME	1
-#define SETUP_TOKEN_JOY_XLEFT		2
-#define SETUP_TOKEN_JOY_XMIDDLE		3
-#define SETUP_TOKEN_JOY_XRIGHT		4
-#define SETUP_TOKEN_JOY_YUPPER		5
-#define SETUP_TOKEN_JOY_YMIDDLE		6
-#define SETUP_TOKEN_JOY_YLOWER		7
-#define SETUP_TOKEN_JOY_SNAP		8
-#define SETUP_TOKEN_JOY_BOMB		9
-#define SETUP_TOKEN_KEY_LEFT		10
-#define SETUP_TOKEN_KEY_RIGHT		11
-#define SETUP_TOKEN_KEY_UP		12
-#define SETUP_TOKEN_KEY_DOWN		13
-#define SETUP_TOKEN_KEY_SNAP		14
-#define SETUP_TOKEN_KEY_BOMB		15
 
 /* level directory info */
 #define LEVELINFO_TOKEN_NAME		0
@@ -1002,57 +953,9 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 #define LEVELINFO_TOKEN_LEVEL_GROUP	8
 #define LEVELINFO_TOKEN_READONLY	9
 
-#define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
-#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_FULLSCREEN
+#define NUM_LEVELINFO_TOKENS		10
 
-#define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
-#define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
-
-#define FIRST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_NAME
-#define LAST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_READONLY
-
-static struct SetupInfo si;
-static struct SetupInputInfo sii;
 static struct LevelDirInfo ldi;
-static struct TokenInfo global_setup_tokens[] =
-{
-  /* global setup */
-  { TYPE_STRING,  &si.player_name,	"player_name"			},
-  { TYPE_SWITCH,  &si.sound,		"sound"				},
-  { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
-  { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
-  { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
-  { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
-  { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
-  { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
-  { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
-  { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
-  { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
-  { TYPE_SWITCH,  &si.handicap,		"handicap"			},
-  { TYPE_SWITCH,  &si.time_limit,	"time_limit"			},
-  { TYPE_SWITCH,  &si.fullscreen,	"fullscreen"			}
-};
-
-static struct TokenInfo player_setup_tokens[] =
-{
-  /* player setup */
-  { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
-  { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
-  { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
-  { TYPE_INTEGER, &sii.joy.xmiddle,	".joy.xmiddle"			},
-  { TYPE_INTEGER, &sii.joy.xright,	".joy.xright"			},
-  { TYPE_INTEGER, &sii.joy.yupper,	".joy.yupper"			},
-  { TYPE_INTEGER, &sii.joy.ymiddle,	".joy.ymiddle"			},
-  { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
-  { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
-  { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
-  { TYPE_KEY,     &sii.key.left,	".key.move_left"		},
-  { TYPE_KEY,     &sii.key.right,	".key.move_right"		},
-  { TYPE_KEY,     &sii.key.up,		".key.move_up"			},
-  { TYPE_KEY,     &sii.key.down,	".key.move_down"		},
-  { TYPE_KEY,     &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEY,     &sii.key.bomb,	".key.place_bomb"		}
-};
 
 static struct TokenInfo levelinfo_tokens[] =
 {
@@ -1134,52 +1037,8 @@ static void setLevelDirInfoToDefaultsFromParent(struct LevelDirInfo *ldi,
   ldi->next = NULL;
 }
 
-static void setSetupInfoToDefaults(struct SetupInfo *si)
-{
-  int i;
-
-  si->player_name = getStringCopy(getLoginName());
-
-  si->sound = TRUE;
-  si->sound_loops = TRUE;
-  si->sound_music = TRUE;
-  si->sound_simple = TRUE;
-  si->toons = TRUE;
-  si->double_buffering = TRUE;
-  si->direct_draw = !si->double_buffering;
-  si->scroll_delay = TRUE;
-  si->soft_scrolling = TRUE;
-  si->fading = FALSE;
-  si->autorecord = TRUE;
-  si->quick_doors = FALSE;
-  si->team_mode = FALSE;
-  si->handicap = TRUE;
-  si->time_limit = TRUE;
-  si->fullscreen = FALSE;
-
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    si->input[i].use_joystick = FALSE;
-    si->input[i].joy.device_name=getStringCopy(getDeviceNameFromJoystickNr(i));
-    si->input[i].joy.xleft   = JOYSTICK_XLEFT;
-    si->input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
-    si->input[i].joy.xright  = JOYSTICK_XRIGHT;
-    si->input[i].joy.yupper  = JOYSTICK_YUPPER;
-    si->input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
-    si->input[i].joy.ylower  = JOYSTICK_YLOWER;
-    si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
-    si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KSYM_UNDEFINED);
-    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KSYM_UNDEFINED);
-    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KSYM_UNDEFINED);
-    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KSYM_UNDEFINED);
-    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
-    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KSYM_UNDEFINED);
-  }
-}
-
-static void setSetupInfo(struct TokenInfo *token_info,
-			 int token_nr, char *token_value)
+void setSetupInfo(struct TokenInfo *token_info,
+		  int token_nr, char *token_value)
 {
   int token_type = token_info[token_nr].type;
   void *setup_value = token_info[token_nr].value;
@@ -1211,40 +1070,6 @@ static void setSetupInfo(struct TokenInfo *token_info,
 
     default:
       break;
-  }
-}
-
-static void decodeSetupFileList(struct SetupFileList *setup_file_list)
-{
-  int i, pnr;
-
-  if (!setup_file_list)
-    return;
-
-  /* handle global setup values */
-  si = setup;
-  for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
-    setSetupInfo(global_setup_tokens, i,
-		 getTokenValue(setup_file_list, global_setup_tokens[i].text));
-  setup = si;
-
-  /* handle player specific setup values */
-  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
-  {
-    char prefix[30];
-
-    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
-
-    sii = setup.input[pnr];
-    for (i=FIRST_PLAYER_SETUP_TOKEN; i<=LAST_PLAYER_SETUP_TOKEN; i++)
-    {
-      char full_token[100];
-
-      sprintf(full_token, "%s%s", prefix, player_setup_tokens[i].text);
-      setSetupInfo(player_setup_tokens, i,
-		   getTokenValue(setup_file_list, full_token));
-    }
-    setup.input[pnr] = sii;
   }
 }
 
@@ -1342,12 +1167,12 @@ static void LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
       struct LevelDirInfo *leveldir_new = newLevelDirInfo();
       int i;
 
-      checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
+      checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
       setLevelDirInfoToDefaultsFromParent(leveldir_new, node_parent);
 
       /* set all structure fields according to the token/value pairs */
       ldi = *leveldir_new;
-      for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
+      for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
 	setSetupInfo(levelinfo_tokens, i,
 		     getTokenValue(setup_file_list, levelinfo_tokens[i].text));
       *leveldir_new = ldi;
@@ -1466,10 +1291,10 @@ static void SaveUserLevelInfo()
   ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
 
-  fprintf(file, "%s\n\n",
-	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, LEVELINFO_COOKIE));
+  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
+						 getCookie("LEVELINFO")));
 
-  for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
+  for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
     if (i != LEVELINFO_TOKEN_NAME_SHORT &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
 	i != LEVELINFO_TOKEN_IMPORTED_FROM)
@@ -1481,47 +1306,7 @@ static void SaveUserLevelInfo()
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
-void LoadSetup()
-{
-  char *filename;
-  struct SetupFileList *setup_file_list = NULL;
-
-  /* always start with reliable default values */
-  setSetupInfoToDefaults(&setup);
-
-  filename = getPath2(getSetupDir(), SETUP_FILENAME);
-
-  setup_file_list = loadSetupFileList(filename);
-
-  if (setup_file_list)
-  {
-    checkSetupFileListIdentifier(setup_file_list, SETUP_COOKIE);
-    decodeSetupFileList(setup_file_list);
-
-    setup.direct_draw = !setup.double_buffering;
-
-    freeSetupFileList(setup_file_list);
-
-    /* needed to work around problems with fixed length strings */
-    if (strlen(setup.player_name) > MAX_PLAYER_NAME_LEN)
-      setup.player_name[MAX_PLAYER_NAME_LEN] = '\0';
-    else if (strlen(setup.player_name) < MAX_PLAYER_NAME_LEN)
-    {
-      char *new_name = checked_malloc(MAX_PLAYER_NAME_LEN + 1);
-
-      strcpy(new_name, setup.player_name);
-      free(setup.player_name);
-      setup.player_name = new_name;
-    }
-  }
-  else
-    Error(ERR_WARN, "using default setup values");
-
-  free(filename);
-}
-
-static char *getSetupLine(struct TokenInfo *token_info,
-			  char *prefix, int token_nr)
+char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 {
   int i;
   static char entry[MAX_LINE_LEN];
@@ -1584,57 +1369,6 @@ static char *getSetupLine(struct TokenInfo *token_info,
   return entry;
 }
 
-void SaveSetup()
-{
-  int i, pnr;
-  char *filename;
-  FILE *file;
-
-  InitUserDataDirectory();
-
-  filename = getPath2(getSetupDir(), SETUP_FILENAME);
-
-  if (!(file = fopen(filename, MODE_WRITE)))
-  {
-    Error(ERR_WARN, "cannot write setup file '%s'", filename);
-    free(filename);
-    return;
-  }
-
-  fprintf(file, "%s\n",
-	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE));
-  fprintf(file, "\n");
-
-  /* handle global setup values */
-  si = setup;
-  for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
-  {
-    fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
-
-    /* just to make things nicer :) */
-    if (i == SETUP_TOKEN_PLAYER_NAME)
-      fprintf(file, "\n");
-  }
-
-  /* handle player specific setup values */
-  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
-  {
-    char prefix[30];
-
-    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
-    fprintf(file, "\n");
-
-    sii = setup.input[pnr];
-    for (i=FIRST_PLAYER_SETUP_TOKEN; i<=LAST_PLAYER_SETUP_TOKEN; i++)
-      fprintf(file, "%s\n", getSetupLine(player_setup_tokens, prefix, i));
-  }
-
-  fclose(file);
-  free(filename);
-
-  SetFilePermissions(filename, PERMS_PRIVATE);
-}
-
 void LoadLevelSetup_LastSeries()
 {
   char *filename;
@@ -1644,7 +1378,7 @@ void LoadLevelSetup_LastSeries()
   leveldir_current = getFirstValidLevelSeries(leveldir_first);
 
   /* ----------------------------------------------------------------------- */
-  /* ~/.rocksndiamonds/levelsetup.conf                                       */
+  /* ~/.<program>/levelsetup.conf                                            */
   /* ----------------------------------------------------------------------- */
 
   filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
@@ -1658,7 +1392,7 @@ void LoadLevelSetup_LastSeries()
     if (leveldir_current == NULL)
       leveldir_current = leveldir_first;
 
-    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+    checkSetupFileListIdentifier(level_setup_list, getCookie("LEVELSETUP"));
 
     freeSetupFileList(level_setup_list);
   }
@@ -1675,7 +1409,7 @@ void SaveLevelSetup_LastSeries()
   FILE *file;
 
   /* ----------------------------------------------------------------------- */
-  /* ~/.rocksndiamonds/levelsetup.conf                                       */
+  /* ~/.<program>/levelsetup.conf                                            */
   /* ----------------------------------------------------------------------- */
 
   InitUserDataDirectory();
@@ -1690,7 +1424,7 @@ void SaveLevelSetup_LastSeries()
   }
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-						 LEVELSETUP_COOKIE));
+						 getCookie("LEVELSETUP")));
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_LEVEL_SERIES,
 					       level_subdir));
 
@@ -1761,7 +1495,7 @@ void LoadLevelSetup_SeriesInfo()
   checkSeriesInfo(leveldir_current);
 
   /* ----------------------------------------------------------------------- */
-  /* ~/.rocksndiamonds/levelsetup/<level series>/levelsetup.conf             */
+  /* ~/.<program>/levelsetup/<level series>/levelsetup.conf                  */
   /* ----------------------------------------------------------------------- */
 
   level_subdir = leveldir_current->filename;
@@ -1801,7 +1535,7 @@ void LoadLevelSetup_SeriesInfo()
       leveldir_current->handicap_level = level_nr;
     }
 
-    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+    checkSetupFileListIdentifier(level_setup_list, getCookie("LEVELSETUP"));
 
     freeSetupFileList(level_setup_list);
   }
@@ -1820,7 +1554,7 @@ void SaveLevelSetup_SeriesInfo()
   FILE *file;
 
   /* ----------------------------------------------------------------------- */
-  /* ~/.rocksndiamonds/levelsetup/<level series>/levelsetup.conf             */
+  /* ~/.<program>/levelsetup/<level series>/levelsetup.conf                  */
   /* ----------------------------------------------------------------------- */
 
   InitLevelSetupDirectory(level_subdir);
@@ -1835,7 +1569,7 @@ void SaveLevelSetup_SeriesInfo()
   }
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-						 LEVELSETUP_COOKIE));
+						 getCookie("LEVELSETUP")));
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_PLAYED_LEVEL,
 					       level_nr_str));
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_HANDICAP_LEVEL,

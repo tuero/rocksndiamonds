@@ -17,6 +17,7 @@
 #if defined(PLATFORM_MSDOS)
 
 #include "sound.h"
+#include "joystick.h"
 #include "misc.h"
 #include "pcx.h"
 
@@ -942,6 +943,59 @@ void MSDOSCloseAudio(void)
 void NetworkServer(int port, int serveronly)
 {
   Error(ERR_WARN, "networking not supported in DOS version");
+}
+
+
+/* ========================================================================= */
+/* joystick functions                                                        */
+/* ========================================================================= */
+
+void MSDOSInitJoysticks()
+{
+  int i;
+
+  /* start from scratch */
+  remove_joystick();
+
+  /* try to access two joysticks; if that fails, try to access just one */
+  if (install_joystick(JOY_TYPE_2PADS) == 0 ||
+      install_joystick(JOY_TYPE_AUTODETECT) == 0)
+    joystick.status = JOYSTICK_ACTIVATED;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    char *device_name = setup.input[i].joy.device_name;
+    int joystick_nr = getJoystickNrFromDeviceName(device_name);
+
+    if (joystick_nr >= num_joysticks)
+      joystick_nr = -1;
+
+    /* misuse joystick file descriptor variable to store joystick number */
+    joystick.fd[i] = joystick_nr;
+  }
+}
+
+boolean MSDOSReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
+{
+  /* the allegro global variable 'num_joysticks' contains the number
+     of joysticks found at initialization under MS-DOS / Windows */
+
+  if (nr < 0 || nr >= num_joysticks)
+    return FALSE;
+
+  poll_joystick();
+
+  if (x != NULL)
+    *x = joy[nr].stick[0].axis[0].pos;
+  if (y != NULL)
+    *y = joy[nr].stick[0].axis[1].pos;
+
+  if (b1 != NULL)
+    *b1 = joy[nr].button[0].b;
+  if (b2 != NULL)
+    *b2 = joy[nr].button[1].b;
+
+  return TRUE;
 }
 
 #endif /* PLATFORM_MSDOS */

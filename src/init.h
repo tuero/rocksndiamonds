@@ -18,6 +18,5 @@
 
 void OpenAll(void);
 void CloseAllAndExit(int);
-void InitJoysticks(void);
 
 #endif

@@ -48,7 +48,8 @@ void OpenAll(void)
   InitProgramInfo(UNIX_USERDATA_DIRECTORY,
 		  PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
 		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
-		  MSDOS_POINTER_FILENAME);
+		  MSDOS_POINTER_FILENAME,
+		  COOKIE_PREFIX, GAME_VERSION_ACTUAL);
 
   InitPlayerInfo();
 
@@ -141,121 +142,6 @@ void InitSound()
   num_bg_loops = LoadMusic();
 
   StartSoundserver();
-}
-
-void InitJoysticks()
-{
-#if defined(TARGET_SDL)
-  static boolean sdl_joystick_subsystem_initialized = FALSE;
-#endif
-
-  int i;
-
-  /* always start with reliable default values */
-  joystick.status = JOYSTICK_NOT_AVAILABLE;
-  for (i=0; i<MAX_PLAYERS; i++)
-    joystick.fd[i] = -1;		/* joystick device closed */
-
-  if (global_joystick_status == JOYSTICK_NOT_AVAILABLE)
-    return;
-
-#if defined(TARGET_SDL)
-
-  if (!sdl_joystick_subsystem_initialized)
-  {
-    sdl_joystick_subsystem_initialized = TRUE;
-
-    if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
-    {
-      Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
-      return;
-    }
-  }
-
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    char *device_name = setup.input[i].joy.device_name;
-    int joystick_nr = getJoystickNrFromDeviceName(device_name);
-
-    if (joystick_nr >= SDL_NumJoysticks())
-      joystick_nr = -1;
-
-    /* misuse joystick file descriptor variable to store joystick number */
-    joystick.fd[i] = joystick_nr;
-
-    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
-    if (Check_SDL_JoystickOpened(joystick_nr))
-      Close_SDL_Joystick(joystick_nr);
-
-    if (!setup.input[i].use_joystick)
-      continue;
-
-    if (!Open_SDL_Joystick(joystick_nr))
-    {
-      Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
-      continue;
-    }
-
-    joystick.status = JOYSTICK_ACTIVATED;
-  }
-
-#else /* !TARGET_SDL */
-
-#if defined(PLATFORM_UNIX)
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    char *device_name = setup.input[i].joy.device_name;
-
-    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
-    if (joystick.fd[i] != -1)
-    {
-      close(joystick.fd[i]);
-      joystick.fd[i] = -1;
-    }
-
-    if (!setup.input[i].use_joystick)
-      continue;
-
-    if (access(device_name, R_OK) != 0)
-    {
-      Error(ERR_WARN, "cannot access joystick device '%s'", device_name);
-      continue;
-    }
-
-    if ((joystick.fd[i] = open(device_name, O_RDONLY)) < 0)
-    {
-      Error(ERR_WARN, "cannot open joystick device '%s'", device_name);
-      continue;
-    }
-
-    joystick.status = JOYSTICK_ACTIVATED;
-  }
-
-#else /* !PLATFORM_UNIX */
-
-  /* try to access two joysticks; if that fails, try to access just one */
-  if (install_joystick(JOY_TYPE_2PADS) == 0 ||
-      install_joystick(JOY_TYPE_AUTODETECT) == 0)
-    joystick.status = JOYSTICK_ACTIVATED;
-
-  /*
-  load_joystick_data(JOYSTICK_FILENAME);
-  */
-
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    char *device_name = setup.input[i].joy.device_name;
-    int joystick_nr = getJoystickNrFromDeviceName(device_name);
-
-    if (joystick_nr >= num_joysticks)
-      joystick_nr = -1;
-
-    /* misuse joystick file descriptor variable to store joystick number */
-    joystick.fd[i] = joystick_nr;
-  }
-#endif
-
-#endif /* !TARGET_SDL */
 }
 
 void InitGfx()

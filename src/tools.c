@@ -11,14 +11,6 @@
 * tools.c                                                  *
 ***********************************************************/
 
-#if 0
-#include <stdarg.h>
-
-#if defined(PLATFORM_FREEBSD)
-#include <machine/joystick.h>
-#endif
-#endif
-
 #include "libgame/libgame.h"
 
 #include "tools.h"

@@ -341,15 +341,11 @@ extern Pixmap		tile_clipmask[];
 extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;
 
-extern int		joystick_device;
-extern char	       *joystick_device_name[];
-
 extern int		game_status;
 extern boolean		level_editor_test_game;
 extern boolean		network_playing;
 
 extern int		key_joystick_mapping;
-extern int	    	global_joystick_status;
 
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -1467,6 +1463,7 @@ extern int		num_element_info;
 #define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 #define UNIX_USERDATA_DIRECTORY	".rocksndiamonds"
+#define COOKIE_PREFIX		"ROCKSNDIAMONDS"
 
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"

@@ -26,4 +26,7 @@ void DumpTape(struct TapeInfo *);
 void LoadScore(int);
 void SaveScore(int);
 
+void LoadSetup(void);
+void SaveSetup(void);
+
 #endif	/* FILES_H */

@@ -330,4 +330,8 @@ inline void SDLCloseAudio(void);
 
 inline void SDLNextEvent(Event *);
 
+void HandleJoystickEvent(Event *);
+void SDLInitJoysticks(void);
+boolean SDLReadJoystick(int, int *, int *, boolean *, boolean *);
+
 #endif /* SDL_H */

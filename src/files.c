@@ -38,6 +38,10 @@
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
 
+/* ========================================================================= */
+/* level file functions                                                      */
+/* ========================================================================= */
+
 static void setLevelInfoToDefaults()
 {
   int i, x, y;
@@ -668,6 +672,11 @@ void SaveLevel(int level_nr)
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
+
+/* ========================================================================= */
+/* tape file functions                                                       */
+/* ========================================================================= */
+
 static void setTapeInfoToDefaults()
 {
   int i;
@@ -1064,6 +1073,11 @@ void DumpTape(struct TapeInfo *tape)
   printf("-------------------------------------------------------------------------------\n");
 }
 
+
+/* ========================================================================= */
+/* score file functions                                                      */
+/* ========================================================================= */
+
 void LoadScore(int level_nr)
 {
   int i;
@@ -1139,4 +1153,252 @@ void SaveScore(int level_nr)
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PUBLIC);
+}
+
+
+/* ========================================================================= */
+/* setup file functions                                                      */
+/* ========================================================================= */
+
+#define TOKEN_STR_PLAYER_PREFIX		"player_"
+
+/* global setup */
+#define SETUP_TOKEN_PLAYER_NAME		0
+#define SETUP_TOKEN_SOUND		1
+#define SETUP_TOKEN_SOUND_LOOPS		2
+#define SETUP_TOKEN_SOUND_MUSIC		3
+#define SETUP_TOKEN_SOUND_SIMPLE	4
+#define SETUP_TOKEN_SCROLL_DELAY	5
+#define SETUP_TOKEN_SOFT_SCROLLING	6
+#define SETUP_TOKEN_FADING		7
+#define SETUP_TOKEN_AUTORECORD		8
+#define SETUP_TOKEN_QUICK_DOORS		9
+#define SETUP_TOKEN_TEAM_MODE		10
+#define SETUP_TOKEN_HANDICAP		11
+#define SETUP_TOKEN_TIME_LIMIT		12
+#define SETUP_TOKEN_FULLSCREEN		13
+
+#define NUM_GLOBAL_SETUP_TOKENS		14
+
+/* player setup */
+#define SETUP_TOKEN_USE_JOYSTICK	0
+#define SETUP_TOKEN_JOY_DEVICE_NAME	1
+#define SETUP_TOKEN_JOY_XLEFT		2
+#define SETUP_TOKEN_JOY_XMIDDLE		3
+#define SETUP_TOKEN_JOY_XRIGHT		4
+#define SETUP_TOKEN_JOY_YUPPER		5
+#define SETUP_TOKEN_JOY_YMIDDLE		6
+#define SETUP_TOKEN_JOY_YLOWER		7
+#define SETUP_TOKEN_JOY_SNAP		8
+#define SETUP_TOKEN_JOY_BOMB		9
+#define SETUP_TOKEN_KEY_LEFT		10
+#define SETUP_TOKEN_KEY_RIGHT		11
+#define SETUP_TOKEN_KEY_UP		12
+#define SETUP_TOKEN_KEY_DOWN		13
+#define SETUP_TOKEN_KEY_SNAP		14
+#define SETUP_TOKEN_KEY_BOMB		15
+
+#define NUM_PLAYER_SETUP_TOKENS		16
+
+static struct SetupInfo si;
+static struct SetupInputInfo sii;
+
+static struct TokenInfo global_setup_tokens[] =
+{
+  /* global setup */
+  { TYPE_STRING,  &si.player_name,	"player_name"			},
+  { TYPE_SWITCH,  &si.sound,		"sound"				},
+  { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
+  { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
+  { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
+  { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
+  { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
+  { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
+  { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
+  { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
+  { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
+  { TYPE_SWITCH,  &si.handicap,		"handicap"			},
+  { TYPE_SWITCH,  &si.time_limit,	"time_limit"			},
+  { TYPE_SWITCH,  &si.fullscreen,	"fullscreen"			}
+};
+
+static struct TokenInfo player_setup_tokens[] =
+{
+  /* player setup */
+  { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
+  { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
+  { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
+  { TYPE_INTEGER, &sii.joy.xmiddle,	".joy.xmiddle"			},
+  { TYPE_INTEGER, &sii.joy.xright,	".joy.xright"			},
+  { TYPE_INTEGER, &sii.joy.yupper,	".joy.yupper"			},
+  { TYPE_INTEGER, &sii.joy.ymiddle,	".joy.ymiddle"			},
+  { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
+  { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
+  { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
+  { TYPE_KEY,     &sii.key.left,	".key.move_left"		},
+  { TYPE_KEY,     &sii.key.right,	".key.move_right"		},
+  { TYPE_KEY,     &sii.key.up,		".key.move_up"			},
+  { TYPE_KEY,     &sii.key.down,	".key.move_down"		},
+  { TYPE_KEY,     &sii.key.snap,	".key.snap_field"		},
+  { TYPE_KEY,     &sii.key.bomb,	".key.place_bomb"		}
+};
+
+static void setSetupInfoToDefaults(struct SetupInfo *si)
+{
+  int i;
+
+  si->player_name = getStringCopy(getLoginName());
+
+  si->sound = TRUE;
+  si->sound_loops = TRUE;
+  si->sound_music = TRUE;
+  si->sound_simple = TRUE;
+  si->toons = TRUE;
+  si->double_buffering = TRUE;
+  si->direct_draw = !si->double_buffering;
+  si->scroll_delay = TRUE;
+  si->soft_scrolling = TRUE;
+  si->fading = FALSE;
+  si->autorecord = TRUE;
+  si->quick_doors = FALSE;
+  si->team_mode = FALSE;
+  si->handicap = TRUE;
+  si->time_limit = TRUE;
+  si->fullscreen = FALSE;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    si->input[i].use_joystick = FALSE;
+    si->input[i].joy.device_name=getStringCopy(getDeviceNameFromJoystickNr(i));
+    si->input[i].joy.xleft   = JOYSTICK_XLEFT;
+    si->input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
+    si->input[i].joy.xright  = JOYSTICK_XRIGHT;
+    si->input[i].joy.yupper  = JOYSTICK_YUPPER;
+    si->input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
+    si->input[i].joy.ylower  = JOYSTICK_YLOWER;
+    si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
+    si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KSYM_UNDEFINED);
+    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KSYM_UNDEFINED);
+    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KSYM_UNDEFINED);
+    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KSYM_UNDEFINED);
+    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
+    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KSYM_UNDEFINED);
+  }
+}
+
+static void decodeSetupFileList(struct SetupFileList *setup_file_list)
+{
+  int i, pnr;
+
+  if (!setup_file_list)
+    return;
+
+  /* handle global setup values */
+  si = setup;
+  for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
+    setSetupInfo(global_setup_tokens, i,
+		 getTokenValue(setup_file_list, global_setup_tokens[i].text));
+  setup = si;
+
+  /* handle player specific setup values */
+  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
+  {
+    char prefix[30];
+
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
+
+    sii = setup.input[pnr];
+    for (i=0; i<NUM_PLAYER_SETUP_TOKENS; i++)
+    {
+      char full_token[100];
+
+      sprintf(full_token, "%s%s", prefix, player_setup_tokens[i].text);
+      setSetupInfo(player_setup_tokens, i,
+		   getTokenValue(setup_file_list, full_token));
+    }
+    setup.input[pnr] = sii;
+  }
+}
+
+void LoadSetup()
+{
+  char *filename = getSetupFilename();
+  struct SetupFileList *setup_file_list = NULL;
+
+  /* always start with reliable default values */
+  setSetupInfoToDefaults(&setup);
+
+  setup_file_list = loadSetupFileList(filename);
+
+  if (setup_file_list)
+  {
+    checkSetupFileListIdentifier(setup_file_list, getCookie("SETUP"));
+    decodeSetupFileList(setup_file_list);
+
+    setup.direct_draw = !setup.double_buffering;
+
+    freeSetupFileList(setup_file_list);
+
+    /* needed to work around problems with fixed length strings */
+    if (strlen(setup.player_name) > MAX_PLAYER_NAME_LEN)
+      setup.player_name[MAX_PLAYER_NAME_LEN] = '\0';
+    else if (strlen(setup.player_name) < MAX_PLAYER_NAME_LEN)
+    {
+      char *new_name = checked_malloc(MAX_PLAYER_NAME_LEN + 1);
+
+      strcpy(new_name, setup.player_name);
+      free(setup.player_name);
+      setup.player_name = new_name;
+    }
+  }
+  else
+    Error(ERR_WARN, "using default setup values");
+}
+
+void SaveSetup()
+{
+  char *filename = getSetupFilename();
+  FILE *file;
+  int i, pnr;
+
+  InitUserDataDirectory();
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    return;
+  }
+
+  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
+					       getCookie("SETUP")));
+  fprintf(file, "\n");
+
+  /* handle global setup values */
+  si = setup;
+  for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
+  {
+    fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
+
+    /* just to make things nicer :) */
+    if (i == SETUP_TOKEN_PLAYER_NAME)
+      fprintf(file, "\n");
+  }
+
+  /* handle player specific setup values */
+  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
+  {
+    char prefix[30];
+
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
+    fprintf(file, "\n");
+
+    sii = setup.input[pnr];
+    for (i=0; i<NUM_PLAYER_SETUP_TOKENS; i++)
+      fprintf(file, "%s\n", getSetupLine(player_setup_tokens, prefix, i));
+  }
+
+  fclose(file);
+
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }

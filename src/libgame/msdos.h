@@ -40,6 +40,18 @@
 #define XRES	800
 #define YRES	600
 
+/* allegro defines some macros that bother the rest of the program */
+#ifdef joy_x
+#undef joy_x
+#undef joy_y
+#undef joy_left
+#undef joy_right
+#undef joy_up
+#undef joy_down
+#undef joy_b1
+#undef joy_b2
+#endif
+
 /* additional Allegro keyboard mapping */
 
 /* The following are all undefined in Allegro */
@@ -450,7 +462,6 @@
 
 /* end of X11 keyboard mapping */
 
-#define JOYSTICK_FILENAME	"joystick.cnf"
 
 #define screen myscreen
 
@@ -740,5 +751,8 @@ void MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);
 
 void NetworkServer(int, int);
+
+void MSDOSInitJoysticks();
+boolean MSDOSReadJoystick(int, int *, int *, boolean *, boolean *);
 
 #endif /* MSDOS_H */

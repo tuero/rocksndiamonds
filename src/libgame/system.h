@@ -28,8 +28,6 @@
 #endif
 
 
-/* contant definitions */
-
 /* the additional 'b' is needed for Win32 to open files in binary mode */
 #define MODE_READ		"rb"
 #define MODE_WRITE		"wb"
@@ -147,9 +145,14 @@
 #define DOOR_GFX_PAGEY1		(0)
 #define DOOR_GFX_PAGEY2		(gfx.dysize)
 
+/* functions for version handling */
+#define VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
+#define VERSION_MAJOR(x)	((x) / 10000)
+#define VERSION_MINOR(x)	(((x) % 10000) / 100)
+#define VERSION_PATCH(x)	((x) % 100)
+
 
 /* type definitions */
-
 typedef int (*EventFilter)(const Event *);
 
 
@@ -163,9 +166,16 @@ struct ProgramInfo
   char *program_title;
   char *window_title;
   char *icon_title;
+
   char *x11_icon_filename;
   char *x11_iconmask_filename;
   char *msdos_pointer_filename;
+
+  char *cookie_prefix;
+
+  int version_major;
+  int version_minor;
+  int version_patch;
 
   void (*exit_function)(int);
 };
@@ -356,7 +366,8 @@ void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependantStuff(void);
 void ClosePlatformDependantStuff(void);
 
-void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *);
+void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
+		     char *, int);
 
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
 void InitGfxDoor1Info(int, int, int, int);
@@ -399,5 +410,8 @@ inline boolean PendingEvent(void);
 inline void NextEvent(Event *event);
 inline Key GetEventKey(KeyEvent *, boolean);
 inline boolean CheckCloseWindowEvent(ClientMessageEvent *);
+
+inline void InitJoysticks();
+inline boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 
 #endif /* SYSTEM_H */
