@@ -1,6 +1,11 @@
 2004-06-12
 	* fixed bug when pressing "stop, pause, stop, play" on tape recorder
 	* internal change of how the player blocks the last field when moving
+	* fixed blocking delay of last field for EM and SP style block delay
+	* fixed bug where the player had to wait for the usual move delay after
+	  unsuccessfully trying to move, when he directly could move after that
+	* the last two changes should make original Supaplex level 93 solvable
+	* improved use of random number generator to make it less predictable
 
 2004-06-11
 	* fixed bug with wrong door state after trying to quickload empty tape

@@ -873,6 +873,11 @@ void HandleKey(Key key, int key_status)
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
+	case KSYM_v:
+	  printf("::: currently using game engine version %d\n",
+		 game.engine_version);
+	  break;
+
 #if 0
 
 	case KSYM_z:

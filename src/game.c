@@ -9158,6 +9158,12 @@ void GameActions()
     local_player->show_envelope = 0;
   }
 #endif
+
+#if 1
+  /* use random number generator in every frame to make it less predictable */
+  if (game.engine_version >= VERSION_IDENT(3,1,1,0))
+    RND(1);
+#endif
 }
 
 static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
