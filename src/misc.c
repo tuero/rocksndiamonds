@@ -464,6 +464,10 @@ void GetOptions(char *argv[])
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
+  options.debug = FALSE;
+
+  /* initialize some more global variables */
+  global.frames_per_second = 0;
 
   while (*options_left)
   {
@@ -505,7 +509,7 @@ void GetOptions(char *argv[])
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
 	     "  -b, --basepath directory      alternative base directory\n"
-	     "  -l, --level directory        alternative level directory\n"
+	     "  -l, --level directory         alternative level directory\n"
 	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "  -v, --verbose                 verbose mode\n",
@@ -556,6 +560,10 @@ void GetOptions(char *argv[])
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
       options.verbose = TRUE;
+    }
+    else if (strncmp(option, "-debug", option_len) == 0)
+    {
+      options.debug = TRUE;
     }
     else if (*option == '-')
     {

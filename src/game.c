@@ -4563,6 +4563,25 @@ void GameActions()
   }
 
   DrawAllPlayers();
+
+  if (options.debug)			/* calculate frames per second */
+  {
+    static unsigned long fps_counter = 0;
+    static int fps_frames = 0;
+    unsigned long fps_delay_ms = Counter() - fps_counter;
+
+    fps_frames++;
+
+    if (fps_delay_ms >= 500)	/* calculate fps every 0.5 seconds */
+    {
+      global.frames_per_second = 1000 * (float)fps_frames / fps_delay_ms;
+
+      fps_frames = 0;
+      fps_counter = Counter();
+    }
+
+    redraw_mask |= REDRAW_FPS;
+  }
 }
 
 static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)

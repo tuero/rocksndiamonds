@@ -99,6 +99,49 @@ void BackToFront()
   if (!redraw_mask)
     return;
 
+
+
+  if (1 &&   game_status == PLAYING)
+  {
+    static boolean last_frame_skipped = 0;
+    int fps_slowdown_factor = 2;
+    boolean skip_even_when_not_scrolling = 1;
+    boolean just_scrolling = (ScreenMovDir != 0);
+    boolean p = 0;
+
+    /*
+    printf("ScreenMovDir = %d\n", ScreenMovDir);
+    */
+
+    /*
+    printf("ScreenGfxPos = %d\n", ScreenGfxPos);
+    */
+
+    if (fps_slowdown_factor > 1 &&
+	(FrameCounter % fps_slowdown_factor) &&
+	(just_scrolling || skip_even_when_not_scrolling))
+    {
+      redraw_mask &= ~REDRAW_MAIN;
+
+      if (p)
+	printf("FRAME SKIPPED\n");
+
+      last_frame_skipped = 1;
+    }
+    else
+    {
+      if (last_frame_skipped)
+	redraw_mask |= REDRAW_FIELD;
+
+      last_frame_skipped = 0;
+
+      if (p)
+	printf("frame not skipped\n");
+    }
+  }
+
+
+
   /* synchronize X11 graphics at this point; if we would synchronize the
      display immediately after the buffer switching (after the XFlush),
      this could mean that we have to wait for the graphics to complete,
@@ -151,6 +194,7 @@ void BackToFront()
 #endif
       }
     }
+
     redraw_mask &= ~REDRAW_MAIN;
   }
 
@@ -205,6 +249,14 @@ void BackToFront()
 	  BlitBitmap(buffer, window,
 		     FX + x * TILEX, FX + y * TILEY, TILEX, TILEY,
 		     SX + x * TILEX, SY + y * TILEY);
+  }
+
+  if (redraw_mask & REDRAW_FPS)		/* display frames per second */
+  {
+    char text[100];
+
+    sprintf(text, "%.1f fps", global.frames_per_second);
+    DrawTextExt(window, gc, SX, SY, text, FS_SMALL, FC_YELLOW);
   }
 
   FlushDisplay();

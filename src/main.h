@@ -247,6 +247,7 @@ struct OptionInfo
   boolean serveronly;
   boolean network;
   boolean verbose;
+  boolean debug;
 };
 
 struct SetupJoystickInfo
@@ -443,7 +444,7 @@ struct GameInfo
 
 struct GlobalInfo
 {
-  int dummy;
+  float frames_per_second;
 };
 
 extern Display	       *display;
@@ -1701,6 +1702,7 @@ extern char		*element_info[];
 #define REDRAW_MAIN		(REDRAW_FIELD | \
 				 REDRAW_TILES | \
 				 REDRAW_MICROLEVEL)
+#define REDRAW_FPS		(1 << 10)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
 /* areas in bitmap PIX_DOOR */
