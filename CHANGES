@@ -1,19 +1,25 @@
+Pre-Release Version 2.2.0rc7 [?? ??? ????]
+------------------------------------------
+
 Pre-Release Version 2.2.0rc6 [22 APR 2003]
 ------------------------------------------
-	- added missing source file
-	- fixed little font directive bug
-	- added actual CHANGES file ;-)
+	- fixed small font configuration directive bug
+	- tape recorder font slightly enhanced (now complete character set)
+	- added missing font configuration source file
+	- added updated CHANGES file ;-)
 
 Pre-Release Version 2.2.0rc5 [20 APR 2003]
 ------------------------------------------
 	- added generic selectbox gadget
 	- added special mouse cursor for playfield while playing
 	- font handling now more flexible (support for ISO-Latin-1 fonts)
+	- font graphics adjusted accordingly
 
 Pre-Release Version 2.2.0rc4 [30 MAR 2003]
 ------------------------------------------
 	- changes for menu configuration
 	- not officially announced pre-release version
+	- Emerald Mine text font now much better quality
 
 Pre-Release Version 2.2.0rc3 [11 FEB 2003]
 ------------------------------------------

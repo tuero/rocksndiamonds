@@ -138,11 +138,20 @@ upload-macosx:
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
+dist-build-unix:
+	@BUILD_DIST=TRUE $(MAKE) x11
+
+dist-build-win32:
+	@BUILD_DIST=TRUE $(MAKE) cross-win32
+
+dist-build-msdos:
+	@BUILD_DIST=TRUE $(MAKE) cross-msdos
+
 dist-build-all:
 	$(MAKE) clean
-	@BUILD_DIST=TRUE $(MAKE) x11		; $(MAKE) dist-clean
-	@BUILD_DIST=TRUE $(MAKE) cross-win32	; $(MAKE) dist-clean
-	@BUILD_DIST=TRUE $(MAKE) cross-msdos	; $(MAKE) dist-clean
+	$(MAKE) dist-build-unix		; $(MAKE) dist-clean
+	$(MAKE) dist-build-win32	; $(MAKE) dist-clean
+	$(MAKE) dist-build-msdos	; $(MAKE) dist-clean
 
 dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
 

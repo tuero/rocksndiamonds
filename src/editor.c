@@ -3406,8 +3406,10 @@ static void DrawPropertiesConfig()
       else
 	DrawElementContentAreas();
     }
+#if 1
     else if (IS_CUSTOM_ELEMENT(properties_element))
       DrawCustomChangedArea();
+#endif
   }
 
   if (IS_GEM(properties_element))
