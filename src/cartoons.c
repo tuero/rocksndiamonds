@@ -191,8 +191,8 @@ void HandleAnimation(int mode)
 
 boolean AnimateToon(int toon_nr, boolean restart)
 {
-  static pos_x = 0, pos_y = 0;
-  static delta_x = 0, delta_y = 0;
+  static int pos_x = 0, pos_y = 0;
+  static int delta_x = 0, delta_y = 0;
   static int frame = 0, frame_step = 1;
   static boolean horiz_move, vert_move;
   static long anim_delay = 0;

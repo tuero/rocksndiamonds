@@ -617,10 +617,13 @@ void NetworkServer(int port, int serveronly)
     tv.tv_sec = 0;
     tv.tv_usec = 500000;
     if ((sl = select(mfd + 1, &fds, NULL, NULL, &tv)) < 0)
+    {
       if (errno != EINTR)
 	syserr("select");
-      else continue;
-    
+      else
+	continue;
+    }
+
     if (sl < 0)
       continue;
 

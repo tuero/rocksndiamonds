@@ -145,7 +145,7 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
   static Colormap global_cmap = 0;
   static Pixel *global_cmap_index;
   static int num_cmap_entries, free_cmap_entries;
-  static private_cmap = FALSE;
+  static boolean private_cmap = FALSE;
   Pixel *redvalue, *greenvalue, *bluevalue;
   unsigned int a, c=0, x, y, linelen, dpixlen, dbits;
   XColor xcolor;
@@ -515,7 +515,7 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
     XCreateImage(display, visual, 1, XYBitmap, 0, (char *)data_mask,
 		 image->width, image->height, 8, linelen);
 
-#if 0
+#if 1
   if (visual->class == DirectColor || visual->class == TrueColor)
   {
     Pixel pixval;

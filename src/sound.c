@@ -28,9 +28,11 @@ static struct SoundControl emptySoundControl =
 };
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
+#ifdef VOXWARE
 static char premix_left_buffer[SND_BLOCKSIZE];
 static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
+#endif
 static unsigned char playing_buffer[SND_BLOCKSIZE];
 static int playing_sounds = 0;
 #else
