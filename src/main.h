@@ -436,7 +436,13 @@
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
+/* !!! "use sound" deactivated due to problems with level "bug machine" !!! */
+/* (solution: add separate "use sound of element" to level file and editor) */
+#if 0
 #define SND_ELEMENT(e)		GFX_ELEMENT(e)
+#else
+#define SND_ELEMENT(e)		(e)
+#endif
 
 #define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -1584,6 +1590,9 @@ struct GlobalInfo
 {
   char *autoplay_leveldir;
   int autoplay_level_nr;
+
+  char *convert_leveldir;
+  int convert_level_nr;
 
   int num_toons;
 

@@ -4151,7 +4151,7 @@ static void print_usage()
 	 "      --serveronly                 only start network server\n"
 	 "  -v, --verbose                    verbose mode\n"
 	 "      --debug                      display debugging information\n"
-	 "  -e, --execute COMMAND            execute batch COMMAND:\n"
+	 "  -e, --execute COMMAND            execute batch COMMAND\n"
 	 "\n"
 	 "Valid commands for '--execute' option:\n"
 	 "  \"print graphicsinfo.conf\"        print default graphics config\n"
@@ -4162,7 +4162,8 @@ static void print_usage()
 	 "  \"print helptext.conf\"            print default helptext config\n"
 	 "  \"dump level FILE\"                dump level data from FILE\n"
 	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
-	 "  \"autoplay LEVELDIR\"              play level tapes for LEVELDIR\n"
+	 "  \"autoplay LEVELDIR [NR]\"         play level tapes for LEVELDIR\n"
+	 "  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
 	 "\n",
 	 program.command_basename);
 }

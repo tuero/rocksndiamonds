@@ -47,4 +47,6 @@ void LoadMusicInfo();
 void LoadHelpAnimInfo();
 void LoadHelpTextInfo();
 
+void ConvertLevels(void);
+
 #endif	/* FILES_H */

@@ -3656,6 +3656,7 @@ void InitElementPropertiesEngine(int engine_version)
 static void InitGlobal()
 {
   global.autoplay_leveldir = NULL;
+  global.convert_leveldir = NULL;
 
   global.frames_per_second = 0;
   global.fps_slowdown = FALSE;
@@ -3789,6 +3790,20 @@ void Execute_Command(char *command)
     {
       *str_ptr++ = '\0';			/* terminate leveldir string */
       global.autoplay_level_nr = atoi(str_ptr);	/* get level_nr value */
+    }
+  }
+  else if (strncmp(command, "convert ", 8) == 0)
+  {
+    char *str_copy = getStringCopy(&command[8]);
+    char *str_ptr = strchr(str_copy, ' ');
+
+    global.convert_leveldir = str_copy;
+    global.convert_level_nr = -1;
+
+    if (str_ptr != NULL)
+    {
+      *str_ptr++ = '\0';			/* terminate leveldir string */
+      global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
     }
   }
   else
@@ -4394,6 +4409,11 @@ void OpenAll()
   if (global.autoplay_leveldir)
   {
     AutoPlayTape();
+    return;
+  }
+  else if (global.convert_leveldir)
+  {
+    ConvertLevels();
     return;
   }
 

@@ -1,3 +1,9 @@
+2004-06-06
+	* added option "convert LEVELDIR [NR]" to command line batch commands
+	* re-converted Supaplex levels to apply latest engine fixes
+	* changed "use graphic/sound of element" to "use graphic of element"
+	  due to compatibility problems with some levels ("bug machine" etc.)
+
 2004-05-23
 	* fixed bug with CE change replacing player with same or other player
 

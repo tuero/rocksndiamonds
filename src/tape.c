@@ -1304,6 +1304,7 @@ void AutoPlayTape()
   printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
 	 autoplay_leveldir->identifier, num_levels_solved, num_levels_played,
 	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
+
   if (num_levels_played != num_levels_solved)
   {
     printf(", FAILED:");
@@ -1311,6 +1312,7 @@ void AutoPlayTape()
       if (levels_failed[i])
 	printf(" %03d", i);
   }
+
   printf("\n");
   printf_line("=", 79);
 

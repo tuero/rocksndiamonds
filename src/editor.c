@@ -2039,7 +2039,11 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_USE_GRAPHIC,	GADGET_ID_NONE,
     &custom_element.use_gfx_element,
+#if 0
     NULL, "use graphic/sound of element:", "use existing graphic and sound"
+#else
+    NULL, "use graphic of element:",	"use existing element graphic"
+#endif
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
