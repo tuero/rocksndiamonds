@@ -2778,7 +2778,8 @@ void InitElementPropertiesEngine(int engine_version)
 				     CAN_EXPLODE_IMPACT(i)));
 
     /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
-    SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, !CAN_EXPLODE_1X1(i));
+    SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
+					 !CAN_EXPLODE_1X1(i)));
 
     /* ---------- CAN_BE_CRUMBLED ------------------------------------------ */
     SET_PROPERTY(i, EP_CAN_BE_CRUMBLED,

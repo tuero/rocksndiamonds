@@ -1960,22 +1960,50 @@ void RelocatePlayer(int x, int y, int element)
     }
 
     RemoveField(player->jx, player->jy);
+    DrawLevelField(player->jx, player->jy);
   }
 
   InitPlayerField(x, y, element, TRUE);
 
   if (player == local_player)
   {
-    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		local_player->jx - MIDPOSX);
+    int scroll_xx = -999, scroll_yy = -999;
 
-    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		local_player->jy - MIDPOSY);
+    while (scroll_xx != scroll_x || scroll_yy != scroll_y)
+    {
+      int dx = 0, dy = 0;
+      int fx = FX, fy = FY;
+
+      scroll_xx = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		   local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		   local_player->jx - MIDPOSX);
+
+      scroll_yy = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   local_player->jy - MIDPOSY);
+
+      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
+      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+
+      scroll_x -= dx;
+      scroll_y -= dy;
+
+      fx += dx * TILEX / 2;
+      fy += dy * TILEY / 2;
+
+      ScrollLevel(dx, dy);
+      DrawAllPlayers();
+
+      /* scroll in to steps of half tile size to make things smoother */
+      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      FlushDisplay();
+      Delay(GAME_FRAME_DELAY);
+
+      /* scroll second step to align at full tile size */
+      BackToFront();
+      Delay(GAME_FRAME_DELAY);
+    }
   }
-
-  DrawLevel();
 }
 
 void Explode(int ex, int ey, int phase, int mode)
@@ -5295,6 +5323,9 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   TestIfBadThingTouchesHero(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
+
+  if (ELEM_IS_PLAYER(target_element))
+    RelocatePlayer(x, y, target_element);
 }
 
 static void ChangeElementNow(int x, int y, int element)
@@ -6188,24 +6219,24 @@ void ScrollLevel(int dx, int dy)
   int x, y;
 
   BlitBitmap(drawto_field, drawto_field,
-	     FX + TILEX*(dx == -1) - softscroll_offset,
-	     FY + TILEY*(dy == -1) - softscroll_offset,
-	     SXSIZE - TILEX*(dx!=0) + 2*softscroll_offset,
-	     SYSIZE - TILEY*(dy!=0) + 2*softscroll_offset,
-	     FX + TILEX*(dx == 1) - softscroll_offset,
-	     FY + TILEY*(dy == 1) - softscroll_offset);
+	     FX + TILEX * (dx == -1) - softscroll_offset,
+	     FY + TILEY * (dy == -1) - softscroll_offset,
+	     SXSIZE - TILEX * (dx!=0) + 2 * softscroll_offset,
+	     SYSIZE - TILEY * (dy!=0) + 2 * softscroll_offset,
+	     FX + TILEX * (dx == 1) - softscroll_offset,
+	     FY + TILEY * (dy == 1) - softscroll_offset);
 
   if (dx)
   {
     x = (dx == 1 ? BX1 : BX2);
-    for (y=BY1; y<=BY2; y++)
+    for (y=BY1; y <= BY2; y++)
       DrawScreenField(x, y);
   }
 
   if (dy)
   {
     y = (dy == 1 ? BY1 : BY2);
-    for (x=BX1; x<=BX2; x++)
+    for (x=BX1; x <= BX2; x++)
       DrawScreenField(x, y);
   }
 
