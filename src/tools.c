@@ -75,6 +75,51 @@ void SetDrawtoField(int mode)
   }
 }
 
+void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
+{
+  if (game_status == PLAYING)
+  {
+    if (force_redraw)
+    {
+      x = gfx.sx - TILEX;
+      y = gfx.sy - TILEY;
+      width = gfx.sxsize + 2 * TILEX;
+      height = gfx.sysize + 2 * TILEY;
+    }
+
+    if (force_redraw || setup.direct_draw)
+    {
+      int xx, yy;
+      int x1 = (x - SX) / TILEX, y1 = (y - SY) / TILEY;
+      int x2 = (x - SX + width) / TILEX, y2 = (y - SY + height) / TILEY;
+
+      if (setup.direct_draw)
+	SetDrawtoField(DRAW_BACKBUFFER);
+
+      for(xx=BX1; xx<=BX2; xx++)
+	for(yy=BY1; yy<=BY2; yy++)
+	  if (xx >= x1 && xx <= x2 && yy >= y1 && yy <= y2)
+	    DrawScreenField(xx, yy);
+      DrawAllPlayers();
+
+      if (setup.direct_draw)
+	SetDrawtoField(DRAW_DIRECT);
+    }
+
+    if (setup.soft_scrolling)
+    {
+      int fx = FX, fy = FY;
+
+      fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
+      fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
+
+      BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
+    }
+  }
+
+  BlitBitmap(drawto, window, x, y, width, height, x, y);
+}
+
 void BackToFront()
 {
   int x,y;
@@ -89,7 +134,7 @@ void BackToFront()
   if (redraw_mask & REDRAW_FIELD)
     redraw_mask &= ~REDRAW_TILES;
 
-  if (!redraw_mask)
+  if (redraw_mask == REDRAW_NONE)
     return;
 
   if (global.fps_slowdown && game_status == PLAYING)
@@ -250,7 +295,7 @@ void BackToFront()
     for(y=0; y<MAX_BUF_YSIZE; y++)
       redraw[x][y] = 0;
   redraw_tiles = 0;
-  redraw_mask = 0;
+  redraw_mask = REDRAW_NONE;
 }
 
 void FadeToFront()

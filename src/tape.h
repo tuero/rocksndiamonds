@@ -84,17 +84,17 @@ void DrawCompleteVideoDisplay(void);
 void TapeStartRecording(void);
 void TapeStopRecording(void);
 void TapeRecordAction(byte *);
-void TapeRecordDelay(void);
 void TapeTogglePause(void);
 void TapeStartPlaying(void);
 void TapeStopPlaying(void);
 byte *TapePlayAction(void);
-boolean TapePlayDelay(void);
 void TapeStop(void);
 void TapeErase(void);
 unsigned int GetTapeLength(void);
 
 void CreateTapeButtons();
+void MapTapeEjectButton();
+void MapTapeIndexButton();
 void MapTapeButtons();
 void UnmapTapeButtons();
 

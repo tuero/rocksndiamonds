@@ -157,6 +157,8 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   gfx.real_sy = real_sy;
   gfx.full_sxsize = full_sxsize;
   gfx.full_sysize = full_sysize;
+
+  SetDrawDeactivationMask(REDRAW_NONE);		/* do not deactivate drawing */
 }
 
 void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
@@ -180,6 +182,11 @@ void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
   /* currently only used by MSDOS code to alloc VRAM buffer, if available */
   gfx.scrollbuffer_width = scrollbuffer_width;
   gfx.scrollbuffer_height = scrollbuffer_height;
+}
+
+void SetDrawDeactivationMask(int draw_deactivation_mask)
+{
+  gfx.draw_deactivation_mask = draw_deactivation_mask;
 }
 
 
@@ -318,11 +325,26 @@ inline void CloseWindow(DrawWindow *window)
 #endif
 }
 
+inline boolean DrawingDeactivated(int x, int y, int width, int height)
+{
+  if (gfx.draw_deactivation_mask != REDRAW_NONE)
+  {
+    if ((gfx.draw_deactivation_mask & REDRAW_FIELD) &&
+	x < gfx.sx + gfx.sxsize)
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		       int src_x, int src_y,
 		       int width, int height,
 		       int dst_x, int dst_y)
 {
+  if (DrawingDeactivated(dst_x, dst_y, width, height))
+    return;
+
 #ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_OPAQUE);
@@ -334,6 +356,9 @@ inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
 inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
+  if (DrawingDeactivated(x, y, width, height))
+    return;
+
 #ifdef TARGET_SDL
   SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
 #else
@@ -380,6 +405,9 @@ inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			     int width, int height,
 			     int dst_x, int dst_y)
 {
+  if (DrawingDeactivated(dst_x, dst_y, width, height))
+    return;
+
 #ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_MASKED);

@@ -22,12 +22,13 @@
 
 /* tape button identifiers */
 #define TAPE_CTRL_ID_EJECT		0
-#define TAPE_CTRL_ID_STOP		1
-#define TAPE_CTRL_ID_PAUSE		2
-#define TAPE_CTRL_ID_RECORD		3
-#define TAPE_CTRL_ID_PLAY		4
+#define TAPE_CTRL_ID_INDEX		1
+#define TAPE_CTRL_ID_STOP		2
+#define TAPE_CTRL_ID_PAUSE		3
+#define TAPE_CTRL_ID_RECORD		4
+#define TAPE_CTRL_ID_PLAY		5
 
-#define NUM_TAPE_BUTTONS		5
+#define NUM_TAPE_BUTTONS		6
 
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
@@ -305,6 +306,7 @@ void TapeStartRecording()
   tape.changed = TRUE;
   tape.date = 10000*(zeit2->tm_year%100) + 100*zeit2->tm_mon + zeit2->tm_mday;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
+  tape.game_version = GAME_VERSION_ACTUAL;
 
   for(i=0; i<MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
@@ -312,52 +314,23 @@ void TapeStartRecording()
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+  MapTapeIndexButton();
 }
 
 void TapeStopRecording()
 {
-#if 0
-  int i;
-#endif
-
   if (!tape.recording)
     return;
-
-#if 0
-  for(i=0; i<MAX_PLAYERS; i++)
-    tape.pos[tape.counter].action[i] = 0;
-#endif
 
   tape.counter++;
   tape.length = tape.counter;
   tape.length_seconds = GetTapeLength();
   tape.recording = FALSE;
   tape.pausing = FALSE;
+
   DrawVideoDisplay(VIDEO_STATE_REC_OFF, 0);
+  MapTapeEjectButton();
 }
-
-#if 0
-void TapeRecordAction(byte joy[MAX_PLAYERS])
-{
-  int i;
-
-  if (!tape.recording || tape.pausing)
-    return;
-
-  if (tape.counter >= MAX_TAPELEN-1)
-  {
-    TapeStopRecording();
-    return;
-  }
-
-  for(i=0; i<MAX_PLAYERS; i++)
-    tape.pos[tape.counter].action[i] = joy[i];
-
-  tape.counter++;
-  tape.pos[tape.counter].delay = 0;
-}
-
-#else
 
 void TapeRecordAction(byte action[MAX_PLAYERS])
 {
@@ -397,40 +370,6 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
     tape.pos[tape.counter].delay++;
   }
 }
-#endif
-
-#if 0
-void TapeRecordDelay()
-{
-  int i;
-
-  if (!tape.recording || tape.pausing)
-    return;
-
-  if (tape.counter >= MAX_TAPELEN)
-  {
-    TapeStopRecording();
-    return;
-  }
-
-  tape.pos[tape.counter].delay++;
-
-  if (tape.pos[tape.counter].delay >= 255)
-  {
-    for(i=0; i<MAX_PLAYERS; i++)
-      tape.pos[tape.counter].action[i] = 0;
-
-    tape.counter++;
-    tape.pos[tape.counter].delay = 0;
-  }
-}
-
-#else
-
-void TapeRecordDelay()
-{
-}
-#endif
 
 void TapeTogglePause()
 {
@@ -448,6 +387,12 @@ void TapeTogglePause()
     state |= VIDEO_STATE_PBEND_OFF;
 
   DrawVideoDisplay(state, 0);
+
+  if (tape.index_search)
+  {
+    SetDrawDeactivationMask(REDRAW_NONE);
+    RedrawPlayfield(TRUE, 0,0,0,0);
+  }
 }
 
 void TapeStartPlaying()
@@ -465,11 +410,14 @@ void TapeStartPlaying()
   tape.playing = TRUE;
   tape.pausing = FALSE;
   tape.fast_forward = FALSE;
+  tape.index_search = FALSE;
+
   InitRND(tape.random_seed);
 
   DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+  MapTapeIndexButton();
 }
 
 void TapeStopPlaying()
@@ -479,42 +427,10 @@ void TapeStopPlaying()
 
   tape.playing = FALSE;
   tape.pausing = FALSE;
+
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF, 0);
+  MapTapeEjectButton();
 }
-
-#if 0
-byte *TapePlayAction()
-{
-  static byte joy[MAX_PLAYERS];
-  int i;
-
-  if (!tape.playing || tape.pausing)
-    return(NULL);
-
-  if (tape.counter >= tape.length)
-  {
-    TapeStop();
-    return(NULL);
-  }
-
-  if (tape.delay_played == tape.pos[tape.counter].delay)
-  {
-    tape.delay_played = 0;
-    tape.counter++;
-
-    for(i=0; i<MAX_PLAYERS; i++)
-      joy[i] = tape.pos[tape.counter-1].action[i];
-  }
-  else
-  {
-    for(i=0; i<MAX_PLAYERS; i++)
-      joy[i] = 0;
-  }
-
-  return(joy);
-}
-
-#else
 
 byte *TapePlayAction()
 {
@@ -541,6 +457,20 @@ byte *TapePlayAction()
     }
   }
 
+  if (tape.index_search)
+  {
+    if (tape.counter >= tape.length)
+    {
+      tape.index_search = FALSE;
+
+      SetDrawDeactivationMask(REDRAW_NONE);
+      RedrawPlayfield(TRUE, 0,0,0,0);
+
+      TapeTogglePause();
+      return NULL;
+    }
+  }
+
   if (tape.counter >= tape.length)
   {
     TapeStop();
@@ -559,53 +489,6 @@ byte *TapePlayAction()
 
   return action;
 }
-#endif
-
-#if 0
-boolean TapePlayDelay()
-{
-  if (!tape.playing || tape.pausing)
-    return(FALSE);
-
-  if (tape.pause_before_death)	/* STOP 10s BEFORE PLAYER GETS KILLED... */
-  {
-    if (!(FrameCounter % 20))
-    {
-      if ((FrameCounter / 20) % 2)
-	DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
-      else
-	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
-    }
-
-    if (TimePlayed > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
-    {
-      TapeTogglePause();
-      return(FALSE);
-    }
-  }
-
-  if (tape.counter >= tape.length)
-  {
-    TapeStop();
-    return(TRUE);
-  }
-
-  if (tape.delay_played < tape.pos[tape.counter].delay)
-  {
-    tape.delay_played++;
-    return(TRUE);
-  }
-  else
-    return(FALSE);
-}
-
-#else
-
-boolean TapePlayDelay()
-{
-  return TRUE|FALSE;	/* ...it doesn't matter at all */
-}
-#endif
 
 void TapeStop()
 {
@@ -648,6 +531,7 @@ unsigned int GetTapeLength()
 #define TAPE_BUTTON_YPOS	77
 
 #define TAPE_BUTTON_EJECT_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_INDEX_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_STOP_XPOS	(TAPE_BUTTON_XPOS + 1 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_PAUSE_XPOS	(TAPE_BUTTON_XPOS + 2 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_RECORD_XPOS	(TAPE_BUTTON_XPOS + 3 * TAPE_BUTTON_XSIZE)
@@ -664,6 +548,11 @@ static struct
     TAPE_BUTTON_EJECT_XPOS,	TAPE_BUTTON_YPOS,
     TAPE_CTRL_ID_EJECT,
     "eject tape"
+  },
+  {
+    TAPE_BUTTON_INDEX_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_INDEX,
+    "index mark"
   },
   {
     TAPE_BUTTON_STOP_XPOS,	TAPE_BUTTON_YPOS,
@@ -705,6 +594,12 @@ void CreateTapeButtons()
     gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
     gd_y  = DOOR_GFX_PAGEY2 + gd_yoffset;
 
+    if (i == TAPE_CTRL_ID_INDEX)
+    {
+      gd_x1 = DOOR_GFX_PAGEX6 + gd_xoffset;
+      gd_x2 = DOOR_GFX_PAGEX5 + gd_xoffset;
+    }
+
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, tapebutton_info[i].infotext,
 		      GDI_X, VX + gd_xoffset,
@@ -726,12 +621,28 @@ void CreateTapeButtons()
   }
 }
 
+void MapTapeEjectButton()
+{
+  UnmapGadget(tape_gadget[TAPE_CTRL_ID_INDEX]);
+  MapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
+}
+
+void MapTapeIndexButton()
+{
+  UnmapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
+  MapGadget(tape_gadget[TAPE_CTRL_ID_INDEX]);
+}
+
 void MapTapeButtons()
 {
   int i;
 
   for (i=0; i<NUM_TAPE_BUTTONS; i++)
-    MapGadget(tape_gadget[i]);
+    if (i != TAPE_CTRL_ID_INDEX)
+      MapGadget(tape_gadget[i]);
+
+  if (tape.recording || tape.playing)
+    MapTapeIndexButton();
 }
 
 void UnmapTapeButtons()
@@ -768,6 +679,18 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       DrawCompleteVideoDisplay();
       break;
 
+    case TAPE_CTRL_ID_INDEX:
+      if (tape.recording)
+	printf("Setting index mark ...\n");
+      else if (tape.playing)
+      {
+	printf("Going to index mark ...\n");
+
+	tape.index_search = TRUE;
+	SetDrawDeactivationMask(REDRAW_FIELD);
+      }
+      break;
+
     case TAPE_CTRL_ID_STOP:
       TapeStop();
       break;
@@ -800,6 +723,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	  tape.playing = FALSE;
 	  tape.recording = TRUE;
 	  tape.changed = TRUE;
+	  tape.game_version = GAME_VERSION_ACTUAL;
 
 	  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
 	}

@@ -222,38 +222,7 @@ void SleepWhileUnmapped()
 void HandleExposeEvent(ExposeEvent *event)
 {
 #ifndef TARGET_SDL
-  int x = event->x, y = event->y;
-  int width = event->width, height = event->height;
-
-  if (setup.direct_draw && game_status==PLAYING)
-  {
-    int xx,yy;
-    int x1 = (x-SX)/TILEX, y1 = (y-SY)/TILEY;
-    int x2 = (x-SX+width)/TILEX, y2 = (y-SY+height)/TILEY;
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for(xx=0; xx<SCR_FIELDX; xx++)
-      for(yy=0; yy<SCR_FIELDY; yy++)
-	if (xx>=x1 && xx<=x2 && yy>=y1 && yy<=y2)
-	  DrawScreenField(xx,yy);
-    DrawAllPlayers();
-
-    SetDrawtoField(DRAW_DIRECT);
-  }
-
-  if (setup.soft_scrolling && game_status == PLAYING)
-  {
-    int fx = FX, fy = FY;
-
-    fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
-    fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
-
-    BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
-  }
-
-  BlitBitmap(drawto, window, x,y, width,height, x,y);
-
+  RedrawPlayfield(FALSE, event->x, event->y, event->width, event->height);
   FlushDisplay();
 #endif
 }

@@ -238,6 +238,8 @@ struct GfxInfo
 
   int vx, vy;
   int vxsize, vysize;
+
+  boolean draw_deactivation_mask;
 };
 
 struct ArtworkInfo
@@ -384,6 +386,7 @@ void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
+void SetDrawDeactivationMask(int );
 
 inline void InitVideoDisplay(void);
 inline void CloseVideoDisplay(void);

@@ -802,6 +802,7 @@ void InitGame()
 	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
   UnmapGameButtons();
+  UnmapTapeButtons();
   game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
   game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
   game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
@@ -4379,6 +4380,9 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
+  if (tape.playing && tape.index_search)
+    action_delay_value = 0;
+
   /* ---------- main game synchronization point ---------- */
 
   WaitUntilDelayReached(&action_delay, action_delay_value);
@@ -4412,11 +4416,6 @@ void GameActions()
 
   if (tape.pausing)
     return;
-
-  if (tape.playing)
-    TapePlayDelay();
-  else if (tape.recording)
-    TapeRecordDelay();
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
@@ -4972,7 +4971,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 #else
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
-      !(tape.playing && tape.file_version < FILE_VERSION_2_0))
+      !(tape.playing && tape.game_version < FILE_VERSION_2_0))
     return FALSE;
 #endif
 
@@ -5830,7 +5829,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	  !(tape.playing && tape.game_version < FILE_VERSION_2_0) &&
 	  element != EL_SPRING)
 	return MF_NO_ACTION;
 #endif
@@ -6072,7 +6071,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	  !(tape.playing && tape.game_version < FILE_VERSION_2_0) &&
 	  element != EL_BALLOON)
 	return MF_NO_ACTION;
 #endif

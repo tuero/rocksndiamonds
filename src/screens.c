@@ -125,6 +125,7 @@ void DrawMainMenu()
   FadeSounds();
   KeyboardAutoRepeatOn();
   ActivateJoystickIfAvailable();
+  SetDrawDeactivationMask(REDRAW_NONE);
 
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
