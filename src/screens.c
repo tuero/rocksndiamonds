@@ -30,9 +30,11 @@
 #define SETUP_MODE_SHORTCUT		2
 #define SETUP_MODE_GRAPHICS		3
 #define SETUP_MODE_SOUND		4
-#define SETUP_MODE_CHOOSE_SOUNDS	5
+#define SETUP_MODE_CHOOSE_GRAPHICS	5
+#define SETUP_MODE_CHOOSE_SOUNDS	6
+#define SETUP_MODE_CHOOSE_MUSIC		7
 
-#define MAX_SETUP_MODES			6
+#define MAX_SETUP_MODES			8
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -1348,7 +1350,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
 static struct TokenInfo *setup_info;
 static int num_setup_info;
-static char *custom_artwork;
+static char *custom_graphics, *custom_sounds, *custom_music;
 
 static void execSetupMain()
 {
@@ -1356,17 +1358,38 @@ static void execSetupMain()
   DrawSetupScreen();
 }
 
+static void execSetupGraphics()
+{
+  custom_graphics = artwork.gfx_current->name;
+
+  setup_mode = SETUP_MODE_GRAPHICS;
+  DrawSetupScreen();
+}
+
 static void execSetupSound()
 {
-  custom_artwork = artwork.snd_current->name;
+  custom_sounds = artwork.snd_current->name;
+  custom_music = artwork.mus_current->name;
 
   setup_mode = SETUP_MODE_SOUND;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseGraphics()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GRAPHICS;
   DrawSetupScreen();
 }
 
 static void execSetupChooseSounds()
 {
   setup_mode = SETUP_MODE_CHOOSE_SOUNDS;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseMusic()
+{
+  setup_mode = SETUP_MODE_CHOOSE_MUSIC;
   DrawSetupScreen();
 }
 
@@ -1384,7 +1407,9 @@ static void execSetupShortcut()
 
 static void execExitSetupChooseArtwork()
 {
-  if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
+  if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
+    execSetupGraphics();
+  else
     execSetupSound();
 }
 
@@ -1402,49 +1427,56 @@ static void execSaveAndExitSetup()
 
 static struct TokenInfo setup_info_main[] =
 {
-  { TYPE_ENTER_MENU,	execSetupSound,		"Sound Setup"	},
-  { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"	},
-  { TYPE_ENTER_MENU,	execSetupShortcut,	"Key Shortcuts"	},
+  { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics Setup"	},
+  { TYPE_ENTER_MENU,	execSetupSound,		"Sound Setup"		},
+  { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
+  { TYPE_ENTER_MENU,	execSetupShortcut,	"Key Shortcuts"		},
+  { TYPE_EMPTY,		NULL,			""			},
 #if 0
-  { TYPE_EMPTY,		NULL,			""		},
-  { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
-  { TYPE_SWITCH,	&setup.sound_loops,	" Sound Loops:"	},
-  { TYPE_SWITCH,	&setup.sound_music,	" Game Music:"	},
+  { TYPE_SWITCH,	&setup.double_buffering,"Buffered gfx:"		},
+  { TYPE_SWITCH,	&setup.fading,		"Fading:"		},
 #endif
-  { TYPE_SWITCH,	&setup.toons,		"Toons:"	},
-#if 0
-  { TYPE_SWITCH,	&setup.double_buffering,"Buffered gfx:"	},
-#endif
-  { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"	},
-  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scroll.:"	},
-#if 0
-  { TYPE_SWITCH,	&setup.fading,		"Fading:"	},
-#endif
-  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"	},
-  { TYPE_SWITCH,	&setup.quick_doors,	"Quick Doors:"	},
-  { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"	},
-  { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode:"	},
-  { TYPE_SWITCH,	&setup.handicap,	"Handicap:"	},
-  { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"	},
-  { TYPE_EMPTY,		NULL,			""		},
-  { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"		},
-  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and exit"	},
-  { 0,			NULL,			NULL		}
+  { TYPE_SWITCH,	&setup.quick_doors,	"Quick Doors:"		},
+  { TYPE_SWITCH,	&setup.ask_on_escape,	"Ask on Esc:"		},
+  { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
+  { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
+  { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode:"		},
+  { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
+  { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and exit"		},
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_graphics[] =
+{
+  { TYPE_ENTER_MENU,	execSetupChooseGraphics,"Custom Graphics"	},
+  { TYPE_STRING,	&custom_graphics,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
+  { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
+  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scroll.:"		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { 0,			NULL,			NULL			}
 };
 
 static struct TokenInfo setup_info_sound[] =
 {
-  { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
-  { TYPE_EMPTY,		NULL,			""		},
-  { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"	},
-  { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"	},
-  { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"	},
-  { TYPE_EMPTY,		NULL,			""		},
-  { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"	},
-  { TYPE_STRING,	&custom_artwork,	""		},
-  { TYPE_EMPTY,		NULL,			""		},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"		},
-  { 0,			NULL,			NULL		}
+  { TYPE_SWITCH,	&setup.sound,		"Sound:",		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"		},
+  { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"		},
+  { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"		},
+  { TYPE_STRING,	&custom_sounds,		""			},
+  { TYPE_ENTER_MENU,	execSetupChooseMusic,	"Custom Music"		},
+  { TYPE_STRING,	&custom_music,		""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { 0,			NULL,			NULL			}
 };
 
 static struct TokenInfo setup_info_shortcut[] =
@@ -1575,6 +1607,11 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_main;
     title_string = "Setup";
   }
+  else if (setup_mode == SETUP_MODE_GRAPHICS)
+  {
+    setup_info = setup_info_graphics;
+    title_string = "Setup Graphics";
+  }
   else if (setup_mode == SETUP_MODE_SOUND)
   {
     setup_info = setup_info_sound;
@@ -1593,6 +1630,7 @@ static void DrawSetupScreen_Generic()
   {
     void *value_ptr = setup_info[i].value;
     int ypos = MENU_SCREEN_START_YPOS + i;
+    int font_size = FS_BIG;
 
     /* set some entries to "unchangeable" according to other variables */
     if ((value_ptr == &setup.sound       && !audio.sound_available) ||
@@ -1602,7 +1640,10 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.fullscreen  && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
-    DrawText(SX + 32, SY + ypos * 32, setup_info[i].text, FS_BIG, FC_GREEN);
+    if (setup_info[i].type & TYPE_ENTER_OR_LEAVE_MENU)
+      font_size = FS_BIG;
+
+    DrawText(SX + 32, SY + ypos * 32, setup_info[i].text, font_size, FC_GREEN);
 
     if (setup_info[i].type & TYPE_ENTER_MENU)
       initCursor(i, GFX_ARROW_BLUE_RIGHT);
@@ -2303,8 +2344,12 @@ void DrawSetupScreen()
 {
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
+    DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
     DrawChooseTree(&artwork.snd_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_MUSIC)
+    DrawChooseTree(&artwork.mus_current);
   else
     DrawSetupScreen_Generic();
 }
@@ -2313,8 +2358,12 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 {
   if (setup_mode == SETUP_MODE_INPUT)
     HandleSetupScreen_Input(mx, my, dx, dy, button);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
+    HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.snd_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_MUSIC)
+    HandleChooseTree(mx, my, dx, dy, button, &artwork.mus_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }

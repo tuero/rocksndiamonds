@@ -1180,8 +1180,9 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_HANDICAP		12
 #define SETUP_TOKEN_TIME_LIMIT		13
 #define SETUP_TOKEN_FULLSCREEN		14
+#define SETUP_TOKEN_ASK_ON_ESCAPE	15
 
-#define NUM_GLOBAL_SETUP_TOKENS		15
+#define NUM_GLOBAL_SETUP_TOKENS		16
 
 /* shortcut setup */
 #define SETUP_TOKEN_SAVE_GAME		0
@@ -1230,6 +1231,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
   { TYPE_SWITCH, &si.handicap,		"handicap"			},
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
+  { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			}
 };
 
@@ -1283,6 +1285,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->handicap = TRUE;
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
+  si->ask_on_escape = TRUE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;

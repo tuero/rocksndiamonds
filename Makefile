@@ -79,6 +79,9 @@ clean:
 # development only stuff                                                      #
 #-----------------------------------------------------------------------------#
 
+run:
+	@$(MAKE_CMD) TARGET=x11 && ./rocksndiamonds --verbose
+
 backup:
 	./Scripts/make_backup.sh src
 

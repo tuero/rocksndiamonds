@@ -305,6 +305,7 @@ struct SetupInfo
   boolean handicap;
   boolean time_limit;
   boolean fullscreen;
+  boolean ask_on_escape;
 
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];

@@ -6305,6 +6305,31 @@ void RaiseScoreElement(int element)
   }
 }
 
+void RequestQuitGame()
+{
+  if (AllPlayersGone ||
+      !setup.ask_on_escape ||
+      level_editor_test_game ||
+      Request("Do you really want to quit the game ?",
+	      REQ_ASK | REQ_STAY_CLOSED))
+  {
+#if defined(PLATFORM_UNIX)
+    if (options.network)
+      SendToServer_StopPlaying();
+    else
+#endif
+    {
+      game_status = MAINMENU;
+      DrawMainMenu();
+    }
+  }
+  else
+  {
+    OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+  }
+}
+
+
 /* ---------- new game button stuff ---------------------------------------- */
 
 /* graphic position values for game buttons */
@@ -6453,30 +6478,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
   switch (id)
   {
     case GAME_CTRL_ID_STOP:
-      if (AllPlayersGone)
-      {
-	CloseDoor(DOOR_CLOSE_1);
-	game_status = MAINMENU;
-	DrawMainMenu();
-	break;
-      }
-
-      if (level_editor_test_game ||
-	  Request("Do you really want to quit the game ?",
-		  REQ_ASK | REQ_STAY_CLOSED))
-      { 
-#if defined(PLATFORM_UNIX)
-	if (options.network)
-	  SendToServer_StopPlaying();
-	else
-#endif
-	{
-	  game_status = MAINMENU;
-	  DrawMainMenu();
-	}
-      }
-      else
-	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+      RequestQuitGame();
       break;
 
     case GAME_CTRL_ID_PAUSE:

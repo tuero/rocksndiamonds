@@ -29,5 +29,6 @@ void UnmapLevelEditorGadgets();
 void DrawLevelEd(void);
 void HandleLevelEditorKeyInput(Key);
 void HandleEditorGadgetInfoText(void *ptr);
+void RequestExitLevelEditor(boolean);
 
 #endif

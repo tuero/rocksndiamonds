@@ -3946,27 +3946,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_EXIT:
-      if (!LevelChanged() ||
-	  Request("Level has changed! Exit without saving ?",
-		  REQ_ASK | REQ_STAY_OPEN))
-      {
-	CloseDoor(DOOR_CLOSE_1);
-
-	/*
-	CloseDoor(DOOR_CLOSE_ALL);
-	*/
-
-	game_status = MAINMENU;
-	DrawMainMenu();
-      }
-      else
-      {
-	CloseDoor(DOOR_CLOSE_1);
-	BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
-		   DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
-		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-	OpenDoor(DOOR_OPEN_1);
-      }
+      RequestExitLevelEditor(TRUE);	/* if level has changed, ask user */
       break;
 
     default:
@@ -4051,8 +4031,7 @@ void HandleLevelEditorKeyInput(Key key)
       case KSYM_Escape:
         if (edit_mode == ED_MODE_DRAWING)
 	{
-	  game_status = MAINMENU;
-	  DrawMainMenu();
+	  RequestExitLevelEditor(setup.ask_on_escape);
 	}
         else
 	{
@@ -4257,4 +4236,28 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 	      "Content area %d position: %d, %d",
 	      id - GADGET_ID_ELEM_CONTENT_0 + 1, sx, sy);
+}
+
+void RequestExitLevelEditor(boolean ask_if_level_has_changed)
+{
+  if (!ask_if_level_has_changed ||
+      !LevelChanged() ||
+      Request("Level has changed! Exit without saving ?",
+	      REQ_ASK | REQ_STAY_OPEN))
+  {
+    CloseDoor(DOOR_CLOSE_1);
+    /*
+    CloseDoor(DOOR_CLOSE_ALL);
+    */
+    game_status = MAINMENU;
+    DrawMainMenu();
+  }
+  else
+  {
+    CloseDoor(DOOR_CLOSE_1);
+    BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+    OpenDoor(DOOR_OPEN_1);
+  }
 }

@@ -477,6 +477,7 @@ void HandleKey(Key key, int key_status)
   /* allow quick escape to the main menu with the Escape key */
   if (key == KSYM_Escape &&
       game_status != MAINMENU &&
+      game_status != PLAYING &&
       game_status != LEVELED &&
       game_status != CHOOSELEVEL &&
       game_status != SETUP)
@@ -592,6 +593,9 @@ void HandleKey(Key key, int key_status)
     {
       switch(key)
       {
+        case KSYM_Escape:
+	  RequestQuitGame();
+	  break;
 
 #ifdef DEBUG
 	case KSYM_0:
