@@ -849,6 +849,8 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_AWAY_FROM_PLAYER,	"away from player"		},
   { MV_ALONG_LEFT_SIDE,		"along left side"		},
   { MV_ALONG_RIGHT_SIDE,	"along right side"		},
+  { MV_TURNING_LEFT,		"turning left"			},
+  { MV_TURNING_RIGHT,		"turning right"			},
   { -1,				NULL				}
 };
 

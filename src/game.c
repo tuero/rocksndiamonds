@@ -107,7 +107,7 @@
 					(condition)))
 
 #define ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, 1)
+	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, 0)
 
 #define ELEMENT_CAN_ENTER_FIELD_OR_ACID(e, x, y)			\
 	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, (Feld[x][y] == EL_ACID))
@@ -1239,7 +1239,9 @@ void InitMovDir(int x, int y)
       {
 	if (element_info[element].move_direction_initial != MV_NO_MOVING)
 	  MovDir[x][y] = element_info[element].move_direction_initial;
-	else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
+	else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS ||
+		 element_info[element].move_pattern == MV_TURNING_LEFT ||
+		 element_info[element].move_pattern == MV_TURNING_RIGHT)
 	  MovDir[x][y] = 1 << RND(4);
 	else if (element_info[element].move_pattern == MV_HORIZONTAL)
 	  MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
@@ -3045,12 +3047,18 @@ void TurnRound(int x, int y)
       }
     }
   }
-  else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
+  else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS ||
+	   element_info[element].move_pattern == MV_TURNING_LEFT ||
+	   element_info[element].move_pattern == MV_TURNING_RIGHT)
   {
     boolean can_turn_left  = ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
     boolean can_turn_right = ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
-    if (can_turn_left && can_turn_right)
+    if (element_info[element].move_pattern == MV_TURNING_LEFT)
+      MovDir[x][y] = left_dir;
+    else if (element_info[element].move_pattern == MV_TURNING_RIGHT)
+      MovDir[x][y] = right_dir;
+    else if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
     else if (can_turn_left)
       MovDir[x][y] = (RND(2) ? left_dir : back_dir);
@@ -3471,7 +3479,9 @@ void StartMoving(int x, int y)
       if (element != EL_YAMYAM &&
 	  element != EL_DARK_YAMYAM &&
 	  element != EL_PACMAN &&
-	  !(element_info[element].move_pattern & MV_ANY_DIRECTION))
+	  !(element_info[element].move_pattern & MV_ANY_DIRECTION) &&
+	  element_info[element].move_pattern != MV_TURNING_LEFT &&
+	  element_info[element].move_pattern != MV_TURNING_RIGHT)
       {
 	TurnRound(x, y);
 

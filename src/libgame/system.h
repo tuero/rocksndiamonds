@@ -86,6 +86,8 @@
 #define MV_BIT_AWAY_FROM_PLAYER	7
 #define MV_BIT_ALONG_LEFT_SIDE	8
 #define MV_BIT_ALONG_RIGHT_SIDE	9
+#define MV_BIT_TURNING_LEFT	10
+#define MV_BIT_TURNING_RIGHT	11
 
 /* values for move direction/pattern and special "button" key bitmasks */
 #define MV_NO_MOVING		0
@@ -112,6 +114,8 @@
 #define MV_AWAY_FROM_PLAYER	(1 << MV_BIT_AWAY_FROM_PLAYER)
 #define MV_ALONG_LEFT_SIDE	(1 << MV_BIT_ALONG_LEFT_SIDE)
 #define MV_ALONG_RIGHT_SIDE	(1 << MV_BIT_ALONG_RIGHT_SIDE)
+#define MV_TURNING_LEFT		(1 << MV_BIT_TURNING_LEFT)
+#define MV_TURNING_RIGHT	(1 << MV_BIT_TURNING_RIGHT)
 
 /* values for button status */
 #define MB_NOT_PRESSED		FALSE
