@@ -1,4 +1,4 @@
-Release Version 3.0.3 [?? ??? ????]
+Release Version 3.0.3 [08 SEP 2003]
 -----------------------------------
 	- fixed bug (missing array boundary check) which could crash the game
 	- fixed problem with setting mouse cursor in SDL version in fullscreen
