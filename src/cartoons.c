@@ -51,10 +51,16 @@ static void PrepareBackbuffer()
 
 boolean ToonNeedsRedraw()
 {
+#if 1
+  return TRUE;
+#else
   return (game_status == GAME_MODE_INFO ||
+	  game_status == GAME_MODE_LEVELS ||
+	  game_status == GAME_MODE_SETUP ||
 	  (game_status == GAME_MODE_MAIN &&
 	   ((redraw_mask & REDRAW_MICROLEVEL) ||
 	    (redraw_mask & REDRAW_MICROLABEL))));
+#endif
 }
 
 void InitToons()

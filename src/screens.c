@@ -472,8 +472,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     }
   }
 
-  BackToFront();
-
   out:
 
   if (game_status == GAME_MODE_MAIN)
@@ -481,6 +479,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
     DoAnimation();
   }
+
+  BackToFront();
 }
 
 
@@ -1131,10 +1131,9 @@ void HandleHelpScreen(int button)
 #else
     PlaySound_Menu_Continue(SND_BACKGROUND_INFO);
 #endif
-
-    DoAnimation();
   }
 
+  DoAnimation();
   BackToFront();
 }
 
@@ -1537,10 +1536,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
   }
 
-  BackToFront();
-
+#if 0
   if (game_status == GAME_MODE_LEVELS || game_status == GAME_MODE_SETUP)
     DoAnimation();
+
+  BackToFront();
+#endif
 }
 
 void DrawChooseLevel()
@@ -1553,6 +1554,9 @@ void DrawChooseLevel()
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
+
+  DoAnimation();
+  BackToFront();
 }
 
 void DrawHallOfFame(int highlight_position)
@@ -1606,6 +1610,8 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
       DrawText(mSX + dx2, sy, highscore[entry].Name, font_nr2);
     DrawText(mSX + dx3, sy, int2str(highscore[entry].Score, 5), font_nr4);
   }
+
+  redraw_mask |= REDRAW_FIELD;
 }
 
 void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
@@ -1636,8 +1642,6 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 	first_entry = 0;
 
       drawHallOfFameList(first_entry, highlight_position);
-
-      return;
     }
   }
   else if (dy > 0)
@@ -1649,27 +1653,22 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 	first_entry = MAX(0, MAX_SCORE_ENTRIES - NUM_MENU_ENTRIES_ON_SCREEN);
 
       drawHallOfFameList(first_entry, highlight_position);
-
-      return;
     }
   }
-
-  if (button_released)
+  else if (button_released)
   {
     FadeSound(SND_BACKGROUND_SCORES);
     game_status = GAME_MODE_MAIN;
     DrawMainMenu();
   }
 
-  BackToFront();
-
-  if (game_status == GAME_MODE_SCORES)
-  {
-    DoAnimation();
 #if 1
+  if (game_status == GAME_MODE_SCORES)
     PlaySound_Menu_Continue(SND_BACKGROUND_SCORES);
 #endif
-  }
+
+  DoAnimation();
+  BackToFront();
 }
 
 
@@ -1914,8 +1913,8 @@ static Key getSetupKey()
       }
     }
 
-    BackToFront();
     DoAnimation();
+    BackToFront();
 
     /* don't eat all CPU time */
     Delay(10);
@@ -2163,10 +2162,12 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     }
   }
 
+#if 0
   BackToFront();
 
   if (game_status == GAME_MODE_SETUP)
     DoAnimation();
+#endif
 }
 
 void DrawSetupScreen_Input()
@@ -2343,7 +2344,11 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     static unsigned long delay = 0;
 
     if (!DelayReached(&delay, GADGET_FRAME_DELAY))
+#if 1
+      return;
+#else
       goto out;
+#endif
 
     player_nr = (player_nr + (x == 10 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;
 
@@ -2407,12 +2412,14 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     }
   }
 
+#if 0
   BackToFront();
 
   out:
 
   if (game_status == GAME_MODE_SETUP)
     DoAnimation();
+#endif
 }
 
 void CustomizeKeyboard(int player_nr)
@@ -2530,8 +2537,8 @@ void CustomizeKeyboard(int player_nr)
       }
     }
 
-    BackToFront();
     DoAnimation();
+    BackToFront();
 
     /* don't eat all CPU time */
     Delay(10);
@@ -2693,8 +2700,8 @@ static boolean CalibrateJoystickMain(int player_nr)
 
     }
 
-    BackToFront();
     DoAnimation();
+    BackToFront();
 
     /* don't eat all CPU time */
     Delay(10);
@@ -2771,6 +2778,9 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.mus_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
+
+  DoAnimation();
+  BackToFront();
 }
 
 void HandleGameActions()
@@ -2909,6 +2919,7 @@ static void CreateScreenScrollbuttons()
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
+		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);
@@ -2985,6 +2996,7 @@ static void CreateScreenScrollbars()
 		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
 		      GDI_BORDER_SIZE, SC_BORDER_SIZE, SC_BORDER_SIZE,
+		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);

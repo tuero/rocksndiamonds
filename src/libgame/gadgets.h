@@ -102,6 +102,7 @@
 #define GDI_SCROLLBAR_ITEM_POSITION	39
 #define GDI_INFO_TEXT			40
 #define GDI_ACTIVE			41
+#define GDI_DIRECT_DRAW			42
 
 typedef void (*gadget_function)(void *);
 
@@ -202,6 +203,7 @@ struct GadgetInfo
   int radio_nr;				/* number of radio button series */
   boolean mapped;			/* gadget is mapped on the screen */
   boolean active;			/* gadget is active */
+  boolean direct_draw;			/* directly draw to frontbuffer */
   int font;				/* font to use when inactive */
   int font_active;			/* font to use when active */
   struct GadgetBorder border;		/* gadget border design */

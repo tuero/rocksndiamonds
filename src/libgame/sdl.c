@@ -1277,19 +1277,26 @@ static SDL_Cursor *create_cursor(struct MouseCursorInfo *cursor_info)
 void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 {
   static struct MouseCursorInfo *last_cursor_info = NULL;
+  static struct MouseCursorInfo *last_cursor_info2 = NULL;
   static SDL_Cursor *cursor_default = NULL;
   static SDL_Cursor *cursor_current = NULL;
 
+  /* if invoked for the first time, store the SDL default cursor */
   if (cursor_default == NULL)
     cursor_default = SDL_GetCursor();
 
+  /* only create new cursor if cursor info (custom only) has changed */
   if (cursor_info != NULL && cursor_info != last_cursor_info)
   {
     cursor_current = create_cursor(cursor_info);
     last_cursor_info = cursor_info;
   }
 
-  SDL_SetCursor(cursor_info ? cursor_current : cursor_default);
+  /* only set new cursor if cursor info (custom or NULL) has changed */
+  if (cursor_info != last_cursor_info2)
+    SDL_SetCursor(cursor_info ? cursor_current : cursor_default);
+
+  last_cursor_info2 = cursor_info;
 }
 
 

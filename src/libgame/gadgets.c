@@ -22,6 +22,7 @@
 /* values for DrawGadget() */
 #define DG_UNPRESSED		0
 #define DG_PRESSED		1
+
 #define DG_BUFFERED		0
 #define DG_DIRECT		1
 
@@ -590,6 +591,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->active = (boolean)va_arg(ap, int);
 	break;
 
+      case GDI_DIRECT_DRAW:
+	/* take care here: "boolean" is typedef'ed as "unsigned char",
+	   which gets promoted to "int" */
+	gi->direct_draw = (boolean)va_arg(ap, int);
+	break;
+
       case GDI_CHECKED:
 	/* take care here: "boolean" is typedef'ed as "unsigned char",
 	   which gets promoted to "int" */
@@ -923,7 +930,7 @@ void ModifyGadget(struct GadgetInfo *gi, int first_tag, ...)
 void RedrawGadget(struct GadgetInfo *gi)
 {
   if (gi->mapped)
-    DrawGadget(gi, gi->state, DG_DIRECT);
+    DrawGadget(gi, gi->state, gi->direct_draw);
 }
 
 struct GadgetInfo *CreateGadget(int first_tag, ...)
@@ -936,6 +943,8 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   new_gadget->callback_info = default_callback_info;
   new_gadget->callback_action = default_callback_action;
   new_gadget->active = TRUE;
+  new_gadget->direct_draw = TRUE;
+
   new_gadget->next = NULL;
 
   va_start(ap, first_tag);
@@ -1170,13 +1179,13 @@ void HandleGadgets(int mx, int my, int button)
 	gi->text.cursor_position = strlen(gi->text.value);
 
       if (gi->text.cursor_position != old_cursor_position)
-	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else
     {
       /* if mouse button pressed outside text input gadget, deactivate it */
       CheckRangeOfNumericInputGadget(gi);
-      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
       gi->event.type = GD_EVENT_TEXT_LEAVING;
 
@@ -1207,12 +1216,12 @@ void HandleGadgets(int mx, int my, int button)
 	gi->selectbox.current_index = gi->selectbox.num_values - 1;
 
       if (gi->selectbox.current_index != old_index)
-	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else
     {
       /* if mouse button pressed outside selectbox gadget, deactivate it */
-      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
       gi->event.type = GD_EVENT_TEXT_LEAVING;
 
@@ -1312,7 +1321,7 @@ void HandleGadgets(int mx, int my, int button)
 	gi->selectbox.current_index = gi->selectbox.num_values - 1;
 
       if (gi->selectbox.current_index != old_index)
-	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
 
@@ -1361,7 +1370,7 @@ void HandleGadgets(int mx, int my, int button)
 	    rgi != gi)
 	{
 	  rgi->checked = FALSE;
-	  DrawGadget(rgi, DG_UNPRESSED, DG_DIRECT);
+	  DrawGadget(rgi, DG_UNPRESSED, rgi->direct_draw);
 	}
 
 	rgi = rgi->next;
@@ -1431,7 +1440,7 @@ void HandleGadgets(int mx, int my, int button)
       }
     }
 
-    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+    DrawGadget(gi, DG_PRESSED, gi->direct_draw);
 
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_PRESSED;
@@ -1459,9 +1468,9 @@ void HandleGadgets(int mx, int my, int button)
     if (gi->type & GD_TYPE_BUTTON)
     {
       if (gadget_moving_inside && gi->state == GD_BUTTON_UNPRESSED)
-	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
       else if (gadget_moving_off_borders && gi->state == GD_BUTTON_PRESSED)
-	DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
     }
     else if (gi->type & GD_TYPE_SELECTBOX)
     {
@@ -1478,7 +1487,7 @@ void HandleGadgets(int mx, int my, int button)
 	gi->selectbox.current_index = gi->selectbox.num_values - 1;
 
       if (gi->selectbox.current_index != old_index)
-	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (gi->type & GD_TYPE_SCROLLBAR)
     {
@@ -1506,7 +1515,7 @@ void HandleGadgets(int mx, int my, int button)
 	changed_position = TRUE;
       }
 
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
 
     gi->state = (gadget_moving_inside || gi->type & GD_TYPE_SCROLLBAR ?
@@ -1534,7 +1543,7 @@ void HandleGadgets(int mx, int my, int button)
 
     if (deactivate_gadget &&
 	!(gi->type & GD_TYPE_TEXTINPUT))	    /* text input stays open */
-      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;
@@ -1546,7 +1555,7 @@ void HandleGadgets(int mx, int my, int button)
   if (gadget_released_off_borders)
   {
     if (gi->type & GD_TYPE_SCROLLBAR)
-      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
     gi->event.type = GD_EVENT_RELEASED;
 
@@ -1575,7 +1584,7 @@ void HandleGadgetsKeyInput(Key key)
     else if (gi->type & GD_TYPE_SELECTBOX)
       gi->selectbox.index = gi->selectbox.current_index;
 
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+    DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
     gi->event.type = GD_EVENT_TEXT_RETURN;
 
@@ -1601,30 +1610,30 @@ void HandleGadgetsKeyInput(Key key)
       gi->text.value[cursor_pos] = letter;
       gi->text.cursor_position++;
 
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (key == KSYM_Left && cursor_pos > 0)
     {
       gi->text.cursor_position--;
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (key == KSYM_Right && cursor_pos < text_length)
     {
       gi->text.cursor_position++;
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (key == KSYM_BackSpace && cursor_pos > 0)
     {
       strcpy(text, gi->text.value);
       strcpy(&gi->text.value[cursor_pos - 1], &text[cursor_pos]);
       gi->text.cursor_position--;
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (key == KSYM_Delete && cursor_pos < text_length)
     {
       strcpy(text, gi->text.value);
       strcpy(&gi->text.value[cursor_pos], &text[cursor_pos + 1]);
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
   else if (gi->type & GD_TYPE_SELECTBOX)	/* only valid for selectbox */
@@ -1635,12 +1644,12 @@ void HandleGadgetsKeyInput(Key key)
     if (key == KSYM_Up && index > 0)
     {
       gi->selectbox.current_index--;
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
     else if (key == KSYM_Down && index < num_values - 1)
     {
       gi->selectbox.current_index++;
-      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+      DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
 }

@@ -310,6 +310,7 @@ void HandleAnimation(int mode)
 {
   static unsigned long animstart_delay = -1;
   static unsigned long animstart_delay_value = 0;
+  static boolean anim_running = FALSE;
   static boolean anim_restart = TRUE;
   static boolean reset_delay = TRUE;
   static int toon_nr = 0;
@@ -326,12 +327,17 @@ void HandleAnimation(int mode)
   {
     case ANIM_START:
       screen_info.prepare_backbuffer_function();
+
+      anim_running = TRUE;
       anim_restart = TRUE;
       reset_delay = TRUE;
 
       return;
 
     case ANIM_CONTINUE:
+      if (!anim_running)
+	return;
+
       break;
 
     case ANIM_STOP:
@@ -342,6 +348,8 @@ void HandleAnimation(int mode)
       setup.direct_draw = FALSE;
       screen_info.update_function();
       setup.direct_draw = draw_mode;
+
+      anim_running = FALSE;
 
       return;
 
