@@ -1035,16 +1035,17 @@ extern int		num_bg_loops;
 #define FC_SPECIAL2		5
 
 /* values for game_status */
-#define MAINMENU		0
-#define PLAYING			1
-#define LEVELED			2
-#define HELPSCREEN		3
-#define CHOOSELEVEL		4
-#define TYPENAME		5
-#define HALLOFFAME		6
-#define SETUP			7
-#define SETUPINPUT		8
-#define EXITGAME		9
+#define EXITGAME		0
+#define MAINMENU		1
+#define PLAYING			2
+#define LEVELED			3
+#define HELPSCREEN		4
+#define CHOOSELEVEL		5
+#define TYPENAME		6
+#define HALLOFFAME		7
+#define SETUP			8
+#define SETUPINPUT		9
+#define CALIBRATION		10
 
 #ifndef GAME_DIR
 #define GAME_DIR		"."

@@ -622,11 +622,18 @@ static int HandleJoystickForAllPlayers()
   {
     byte joy_action = 0;
 
+    /*
     if (!setup.input[i].use_joystick)
       continue;
+      */
 
     joy_action = Joystick(i);
     result |= joy_action;
+
+
+    if (!setup.input[i].use_joystick)
+      continue;
+
 
     stored_player[i].action = joy_action;
   }

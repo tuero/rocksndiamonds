@@ -715,53 +715,39 @@ void HandleTypeName(int newxpos, KeySym key)
   if (newxpos)
   {
     xpos = newxpos;
-    DrawText(SX+6*32, SY+ypos*32, setup.player_name, FS_BIG, FC_YELLOW);
-    DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
+    DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_YELLOW);
+    DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
     return;
   }
 
-#ifndef MSDOS
-  if ((key>=XK_A && key<=XK_Z) || (key>=XK_a && key<=XK_z && 
-      xpos<MAX_NAMELEN-1))
+  if (((key >= XK_A && key <= XK_Z) || (key >= XK_a && key <= XK_z)) && 
+      xpos < MAX_NAMELEN - 1)
   {
-    if (key>=XK_A && key<=XK_Z)
-      ascii = 'A'+(char)(key-XK_A);
-    if (key>=XK_a && key<=XK_z)
-      ascii = 'a'+(char)(key-XK_a);
+    if (key >= XK_A && key <= XK_Z)
+      ascii = 'A' + (char)(key - XK_A);
+    if (key >= XK_a && key <= XK_z)
+      ascii = 'a' + (char)(key - XK_a);
 
     setup.player_name[xpos] = ascii;
-    setup.player_name[xpos+1] = 0;
+    setup.player_name[xpos + 1] = 0;
     xpos++;
-    DrawTextExt(drawto,gc,SX+6*32,SY+ypos*32,
-		setup.player_name,FS_BIG,FC_YELLOW);
-    DrawTextExt(window,gc,SX+6*32,SY+ypos*32,
-		setup.player_name,FS_BIG,FC_YELLOW);
-    DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
+    DrawTextExt(drawto, gc, SX + 6*32, SY + ypos*32,
+		setup.player_name, FS_BIG, FC_YELLOW);
+    DrawTextExt(window, gc, SX + 6*32, SY + ypos*32,
+		setup.player_name, FS_BIG, FC_YELLOW);
+    DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
   }
-#else
-  if ((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
-  {
-    setup.player_name[xpos] = ascii;
-    setup.player_name[xpos+1] = 0;
-    xpos++;
-    DrawTextExt(drawto,gc,SX+6*32,SY+ypos*32,
-		setup.player_name,FS_BIG,FC_YELLOW);
-    DrawTextExt(window,gc,SX+6*32,SY+ypos*32,
-		setup.player_name,FS_BIG,FC_YELLOW);
-    DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
-  }
-#endif
-  else if ((key==XK_Delete || key==XK_BackSpace) && xpos>0)
+  else if ((key == XK_Delete || key == XK_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
-    DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
-    DrawGraphic(xpos+7,ypos,GFX_LEERRAUM);
+    DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
+    DrawGraphic(xpos + 7, ypos, GFX_LEERRAUM);
   }
-  else if (key==XK_Return && xpos>0)
+  else if (key == XK_Return && xpos > 0)
   {
-    DrawText(SX+6*32,SY+ypos*32,setup.player_name,FS_BIG,FC_RED);
-    DrawGraphic(xpos+6,ypos,GFX_LEERRAUM);
+    DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_RED);
+    DrawGraphic(xpos + 6, ypos, GFX_LEERRAUM);
 
     SaveSetup();
     game_status = MAINMENU;
@@ -1239,28 +1225,12 @@ void DrawSetupInputScreen()
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+15*32, "Exit", FS_BIG, FC_GREEN);
 
+  DrawTextFCentered(SYSIZE - 20, FC_BLUE,
+		    "Joysticks deactivated on this screen");
+
+  HandleSetupInputScreen(0,0, 0,0, MB_MENU_INITIALIZE);
   FadeToFront();
   InitAnimation();
-  HandleSetupInputScreen(0,0,0,0,MB_MENU_INITIALIZE);
-}
-
-static int getJoystickNrFromDeviceName(char *device_name)
-{
-  char c;
-  int joystick_nr = 0;
-
-  if (device_name == NULL || device_name[0] == '\0')
-    return 0;
-
-  c = device_name[strlen(device_name) - 1];
-
-  if (c >= '0' && c <= '9')
-    joystick_nr = (int)(c - '0');
-
-  if (joystick_nr < 0 || joystick_nr >= MAX_PLAYERS)
-    joystick_nr = 0;
-
-  return joystick_nr;
 }
 
 static void setJoystickDeviceToNr(char *device_name, int device_nr)
@@ -1494,7 +1464,9 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 	if (setup.input[player_nr].use_joystick)
 	{
 	  InitJoysticks();
+	  game_status = CALIBRATION;
 	  CalibrateJoystick(player_nr);
+	  game_status = SETUPINPUT;
 	}
 	else
 	  CustomizeKeyboard(player_nr);
@@ -1659,34 +1631,43 @@ void CalibrateJoystick(int player_nr)
   } joy_ctrl;
 #endif
 
-#ifdef MSDOS
-  /*
-  char joy_nr[4];
-  */
-#endif
-
-  int joystick_fd = stored_player[player_nr].joystick_fd;
+#ifndef MSDOS
   int new_joystick_xleft = 128, new_joystick_xright = 128;
   int new_joystick_yupper = 128, new_joystick_ylower = 128;
   int new_joystick_xmiddle, new_joystick_ymiddle;
+#else
+  int calibration_step = 1;
+#endif
+
+  int joystick_fd = stored_player[player_nr].joystick_fd;
   int x, y, last_x, last_y, xpos = 8, ypos = 3;
   boolean check[3][3];
-  int check_remaining = 3 * 3;
-  int joy;
+  int check_remaining;
+  int joy_value;
   int result = -1;
 
-  if (joystick_status == JOYSTICK_OFF)
-    return;
-
-  if (!setup.input[player_nr].use_joystick || joystick_fd < 0)
-    return;
+  if (joystick_status == JOYSTICK_OFF ||
+      joystick_fd < 0 ||
+      !setup.input[player_nr].use_joystick)
+    goto error_out;
 
   ClearWindow();
-  DrawText(SX,      SY +  6*32, " ROTATE JOYSTICK ",FS_BIG,FC_YELLOW);
-  DrawText(SX,      SY +  7*32, "IN ALL DIRECTIONS",FS_BIG,FC_YELLOW);
-  DrawText(SX + 16, SY +  9*32, "  IF ALL BALLS  ",FS_BIG,FC_YELLOW);
-  DrawText(SX,      SY + 10*32, "   ARE YELLOW,   ",FS_BIG,FC_YELLOW);
-  DrawText(SX,      SY + 11*32, "  PRESS BUTTON!  ",FS_BIG,FC_YELLOW);
+
+#ifndef MSDOS
+  DrawText(SX,      SY +  6*32, " ROTATE JOYSTICK ", FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY +  7*32, "IN ALL DIRECTIONS", FS_BIG, FC_YELLOW);
+  DrawText(SX + 16, SY +  9*32, "  IF ALL BALLS  ",  FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY + 10*32, "   ARE YELLOW,   ", FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY + 11*32, "PRESS ANY BUTTON!", FS_BIG, FC_YELLOW);
+  check_remaining = 3 * 3;
+#else
+  DrawText(SX,      SY +  7*32, "  MOVE JOYSTICK  ", FS_BIG, FC_YELLOW);
+  DrawText(SX + 16, SY +  8*32, "       TO       ",  FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY +  9*32, " CENTER POSITION ",  FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY + 10*32, "       AND       ", FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY + 11*32, "PRESS ANY BUTTON!", FS_BIG, FC_YELLOW);
+  check_remaining = 0;
+#endif
 
   for(y=0; y<3; y++)
   {
@@ -1697,9 +1678,9 @@ void CalibrateJoystick(int player_nr)
     }
   }
 
-  joy = Joystick(player_nr);
-  last_x = (joy & JOY_LEFT ? -1 : joy & JOY_RIGHT ? +1 : 0);
-  last_y = (joy & JOY_UP   ? -1 : joy & JOY_DOWN  ? +1 : 0);
+  joy_value = Joystick(player_nr);
+  last_x = (joy_value & JOY_LEFT ? -1 : joy_value & JOY_RIGHT ? +1 : 0);
+  last_y = (joy_value & JOY_UP   ? -1 : joy_value & JOY_DOWN  ? +1 : 0);
   DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_ROT);
 
   BackToFront();
@@ -1758,7 +1739,6 @@ void CalibrateJoystick(int player_nr)
       joystick_status = JOYSTICK_OFF;
       goto error_out;
     }
-#endif
 
     new_joystick_xleft  = MIN(new_joystick_xleft,  joy_ctrl.x);
     new_joystick_xright = MAX(new_joystick_xright, joy_ctrl.x);
@@ -1778,18 +1758,60 @@ void CalibrateJoystick(int player_nr)
     setup.input[player_nr].joy.ymiddle = new_joystick_ymiddle;
 
     CheckJoystickData();
+#endif
 
-    joy = Joystick(player_nr);
+    joy_value = Joystick(player_nr);
 
-    if (joy & JOY_BUTTON && check_remaining == 0)
+    if (joy_value & JOY_BUTTON && check_remaining == 0)
+    {
       result = 1;
 
-    x = (joy & JOY_LEFT ? -1 : joy & JOY_RIGHT ? +1 : 0);
-    y = (joy & JOY_UP   ? -1 : joy & JOY_DOWN  ? +1 : 0);
+#ifdef MSDOS
+      if (calibration_step == 1)
+      {
+	remove_joystick();
+	InitJoysticks();
+      }
+      else if (calibrate_joystick(joystick_fd) != 0)
+      {
+	joystick_status = JOYSTICK_OFF;
+	goto error_out;
+      }
+
+      if (joy[joystick_fd].flags & JOYFLAG_CALIBRATE)
+      {
+	calibration_step++;
+	result = -1;
+
+	DrawText(SX,      SY +  7*32, "  MOVE JOYSTICK  ", FS_BIG, FC_YELLOW);
+	DrawText(SX + 16, SY +  8*32, "       TO       ",  FS_BIG, FC_YELLOW);
+
+	if (calibration_step == 2)
+	  DrawText(SX + 16, SY + 9*32," THE UPPER LEFT ",  FS_BIG, FC_YELLOW);
+	else
+	  DrawText(SX,      SY + 9*32," THE LOWER RIGHT ", FS_BIG, FC_YELLOW);
+
+	DrawText(SX,      SY + 10*32, "       AND       ", FS_BIG, FC_YELLOW);
+	DrawText(SX,      SY + 11*32, "PRESS ANY BUTTON!", FS_BIG, FC_YELLOW);
+
+	BackToFront();
+
+	while(Joystick(player_nr) & JOY_BUTTON)
+	  DoAnimation();
+      }
+#endif
+    }
+
+    x = (joy_value & JOY_LEFT ? -1 : joy_value & JOY_RIGHT ? +1 : 0);
+    y = (joy_value & JOY_UP   ? -1 : joy_value & JOY_DOWN  ? +1 : 0);
 
     if (x != last_x || y != last_y)
     {
+#ifndef MSDOS
       DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_GELB);
+#else
+      DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_BLAU);
+#endif
       DrawGraphic(xpos + x,      ypos + y,      GFX_KUGEL_ROT);
 
       last_x = x;
@@ -1811,6 +1833,7 @@ void CalibrateJoystick(int player_nr)
 	     setup.input[player_nr].joy.ymiddle,
 	     setup.input[player_nr].joy.ylower);
 #endif
+
     }
 
     BackToFront();
@@ -1826,15 +1849,13 @@ void CalibrateJoystick(int player_nr)
   while(Joystick(player_nr) & JOY_BUTTON);
   return;
 
-#ifndef MSDOS
   error_out:
-#endif
 
   ClearWindow();
-  DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
+  DrawText(SX + 16, SY + 6*32, "  JOYSTICK NOT  ", FS_BIG, FC_YELLOW);
+  DrawText(SX,      SY + 7*32, "    AVAILABLE    ", FS_BIG, FC_YELLOW);
   BackToFront();
-  Delay(3000);
+  Delay(2000);
   DrawSetupInputScreen();
 }
 

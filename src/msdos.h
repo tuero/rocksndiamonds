@@ -15,264 +15,431 @@
 #include <allegro.h>
 #include <time.h>
 
+/* allegro defines TRUE as -1 */
+#ifdef TRUE
+#undef TRUE
+#undef FALSE
+#endif
+
+#define TRUE	1
+#define FALSE	0
+
 #define XRES	800
 #define YRES	600
 
-/* Allegro keyboard mapping */
+/* additional Allegro keyboard mapping */
 
-#define OSD_KEY_ESC         1        /* keyboard scan codes */
-#define OSD_KEY_1           2        /* (courtesy of allegro.h) */
-#define OSD_KEY_2           3
-#define OSD_KEY_3           4
-#define OSD_KEY_4           5
-#define OSD_KEY_5           6
-#define OSD_KEY_6           7
-#define OSD_KEY_7           8
-#define OSD_KEY_8           9
-#define OSD_KEY_9           10
-#define OSD_KEY_0           11
-#define OSD_KEY_MINUS       12
-#define OSD_KEY_EQUALS      13
-#define OSD_KEY_BACKSPACE   14
-#define OSD_KEY_TAB         15
-#define OSD_KEY_Q           16
-#define OSD_KEY_W           17
-#define OSD_KEY_E           18
-#define OSD_KEY_R           19
-#define OSD_KEY_T           20
-#define OSD_KEY_Y           21
-#define OSD_KEY_U           22
-#define OSD_KEY_I           23
-#define OSD_KEY_O           24
-#define OSD_KEY_P           25
-#define OSD_KEY_OPENBRACE   26
-#define OSD_KEY_CLOSEBRACE  27
-#define OSD_KEY_ENTER       28
-#define OSD_KEY_LCONTROL    29
-#define OSD_KEY_A           30
-#define OSD_KEY_S           31
-#define OSD_KEY_D           32
-#define OSD_KEY_F           33
-#define OSD_KEY_G           34
-#define OSD_KEY_H           35
-#define OSD_KEY_J           36
-#define OSD_KEY_K           37
-#define OSD_KEY_L           38
-#define OSD_KEY_COLON       39
-#define OSD_KEY_QUOTE       40
-#define OSD_KEY_TILDE       41
-#define OSD_KEY_LSHIFT      42
-/* 43 */
-#define OSD_KEY_Z           44
-#define OSD_KEY_X           45
-#define OSD_KEY_C           46
-#define OSD_KEY_V           47
-#define OSD_KEY_B           48
-#define OSD_KEY_N           49
-#define OSD_KEY_M           50
-#define OSD_KEY_COMMA       51
-#define OSD_KEY_STOP        52
-#define OSD_KEY_SLASH       53
-#define OSD_KEY_RSHIFT      54
-#define OSD_KEY_ASTERISK    55
-#define OSD_KEY_ALT         56
-#define OSD_KEY_SPACE       57
-#define OSD_KEY_CAPSLOCK    58
-#define OSD_KEY_F1          59
-#define OSD_KEY_F2          60
-#define OSD_KEY_F3          61
-#define OSD_KEY_F4          62
-#define OSD_KEY_F5          63
-#define OSD_KEY_F6          64
-#define OSD_KEY_F7          65
-#define OSD_KEY_F8          66
-#define OSD_KEY_F9          67
-#define OSD_KEY_F10         68
-#define OSD_KEY_NUMLOCK     69
-#define OSD_KEY_SCRLOCK     70
-#define OSD_KEY_HOME        71
-#define OSD_KEY_UP          72
-#define OSD_KEY_PGUP        73
-#define OSD_KEY_MINUS_PAD   74
-#define OSD_KEY_LEFT        75
-#define OSD_KEY_5_PAD       76
-#define OSD_KEY_RIGHT       77
-#define OSD_KEY_PLUS_PAD    78
-#define OSD_KEY_END         79
-#define OSD_KEY_DOWN        80
-#define OSD_KEY_PGDN        81
-#define OSD_KEY_INSERT      82
-#define OSD_KEY_DEL         83
-#define OSD_KEY_RCONTROL    84  /* different from Allegro */
-#define OSD_KEY_ALTGR       85  /* different from Allegro */
-/* 86 */
-#define OSD_KEY_F11         87
-#define OSD_KEY_F12         88
-#define OSD_KEY_COMMAND     89
-#define OSD_KEY_OPTION      90
-/* 91 - 100 */
 /* The following are all undefined in Allegro */
-#define OSD_KEY_1_PAD		101
-#define OSD_KEY_2_PAD		102
-#define OSD_KEY_3_PAD		103
-#define OSD_KEY_4_PAD		104
-/* 105 */
-#define OSD_KEY_6_PAD		106
-#define OSD_KEY_7_PAD		107
-#define OSD_KEY_8_PAD		108
-#define OSD_KEY_9_PAD		109
-#define OSD_KEY_0_PAD		110
-#define OSD_KEY_STOP_PAD	111
-#define OSD_KEY_EQUALS_PAD	112
-#define OSD_KEY_SLASH_PAD	113
-#define OSD_KEY_ASTER_PAD	114
-#define OSD_KEY_ENTER_PAD	115
+#define NEW_KEY_BACKSLASH	86
+#define NEW_KEY_1_PAD		101
+#define NEW_KEY_2_PAD		102
+#define NEW_KEY_3_PAD		103
+#define NEW_KEY_4_PAD		104
+#define NEW_KEY_5_PAD		105
+#define NEW_KEY_6_PAD		106
+#define NEW_KEY_7_PAD		107
+#define NEW_KEY_8_PAD		108
+#define NEW_KEY_9_PAD		109
+#define NEW_KEY_0_PAD		110
+#define NEW_KEY_STOP_PAD	111
+#define NEW_KEY_EQUALS_PAD	112
+#define NEW_KEY_SLASH_PAD	113
+#define NEW_KEY_ASTERISK_PAD	114
+#define NEW_KEY_ENTER_PAD	115
 
-#define OSD_MAX_KEY         115
+/* X11 keyboard mapping (from 'keysymdef.h') */
 
-/* X11 keyboard mapping */
+#define XK_VoidSymbol		0xFFFFFF	/* void symbol */
 
-#define XK_KP_Enter	OSD_KEY_ENTER_PAD
-#define XK_KP_0		OSD_KEY_0_PAD
-#define XK_KP_1		OSD_KEY_1_PAD
-#define XK_KP_2		OSD_KEY_2_PAD
-#define XK_KP_3		OSD_KEY_3_PAD
-#define XK_KP_4		OSD_KEY_4_PAD
-#define XK_KP_6		OSD_KEY_6_PAD
-#define XK_KP_7		OSD_KEY_7_PAD
-#define XK_KP_8		OSD_KEY_8_PAD
-#define XK_KP_9		OSD_KEY_9_PAD
 /*
-#define XK_KP_Home	OSD_KEY_7_PAD
-#define XK_KP_Page_Up	OSD_KEY_9_PAD
-#define XK_KP_Page_Down	OSD_KEY_3_PAD
-#define XK_KP_End	OSD_KEY_1_PAD
-#define XK_KP_Left	OSD_KEY_4_PAD	
-#define XK_KP_Up	OSD_KEY_8_PAD
-#define XK_KP_Right	OSD_KEY_6_PAD
-#define XK_KP_Down	OSD_KEY_2_PAD
-*/
-#define XK_0		OSD_KEY_1
-#define XK_1		OSD_KEY_2
-#define XK_2		OSD_KEY_3
-#define XK_3		OSD_KEY_4
-#define XK_4		OSD_KEY_5
-#define XK_5		OSD_KEY_6
-#define XK_6		OSD_KEY_7
-#define XK_7		OSD_KEY_8
-#define XK_8		OSD_KEY_9
-#define XK_9		OSD_KEY_0
-#define XK_A		OSD_KEY_A
-#define XK_B		OSD_KEY_B
-#define XK_C		OSD_KEY_C
-#define XK_D		OSD_KEY_D
-#define XK_E		OSD_KEY_E
-#define XK_F		OSD_KEY_F
-#define XK_G		OSD_KEY_G
-#define XK_H		OSD_KEY_H
-#define XK_I		OSD_KEY_I
-#define XK_J		OSD_KEY_J
-#define XK_K		OSD_KEY_K
-#define XK_L		OSD_KEY_L
-#define XK_M		OSD_KEY_M
-#define XK_N		OSD_KEY_N
-#define XK_O		OSD_KEY_O
-#define XK_P		OSD_KEY_P
-#define XK_Q		OSD_KEY_Q
-#define XK_R		OSD_KEY_R
-#define XK_S		OSD_KEY_S
-#define XK_T		OSD_KEY_T
-#define XK_U		OSD_KEY_U
-#define XK_V		OSD_KEY_V
-#define XK_W		OSD_KEY_W
-#define XK_X		OSD_KEY_X
-#define XK_Y		OSD_KEY_Y
-#define XK_Z		OSD_KEY_Z
-#define XK_a		OSD_KEY_A
-#define XK_b		OSD_KEY_B
-#define XK_c		OSD_KEY_C
-#define XK_d		OSD_KEY_D
-#define XK_e		OSD_KEY_E
-#define XK_f		OSD_KEY_F
-#define XK_g		OSD_KEY_G
-#define XK_h		OSD_KEY_H
-#define XK_i		OSD_KEY_I
-#define XK_j		OSD_KEY_J
-#define XK_k		OSD_KEY_K
-#define XK_l		OSD_KEY_L
-#define XK_m		OSD_KEY_M
-#define XK_n		OSD_KEY_N
-#define XK_o		OSD_KEY_O
-#define XK_p		OSD_KEY_P
-#define XK_q		OSD_KEY_Q
-#define XK_r		OSD_KEY_R
-#define XK_s		OSD_KEY_S
-#define XK_t		OSD_KEY_T
-#define XK_u		OSD_KEY_U
-#define XK_v		OSD_KEY_V
-#define XK_w		OSD_KEY_W
-#define XK_x		OSD_KEY_X
-#define XK_y		OSD_KEY_Y
-#define XK_z		OSD_KEY_Z
-#define XK_Return	OSD_KEY_ENTER
-#define XK_Escape	OSD_KEY_ESC
-#define XK_Shift_L	OSD_KEY_LSHIFT
-#define XK_Shift_R	OSD_KEY_RSHIFT
-#define XK_Left		OSD_KEY_LEFT	
-#define XK_Up		OSD_KEY_UP
-#define XK_Right	OSD_KEY_RIGHT
-#define XK_Down		OSD_KEY_DOWN
-#define XK_BackSpace	OSD_KEY_BACKSPACE
-#define XK_Delete	OSD_KEY_DEL
-#define XK_Space	OSD_KEY_SPACE
-#define XK_F12		OSD_KEY_F12
-#define XK_F11		OSD_KEY_F11
-#define XK_F10		OSD_KEY_F10
+ * TTY Functions, cleverly chosen to map to ascii, for convenience of
+ * programming, but could have been arbitrary (at the cost of lookup
+ * tables in client code.
+ */
 
+#define XK_BackSpace		0xFF08	/* back space, back char */
+#define XK_Tab			0xFF09
+#define XK_Linefeed		0xFF0A	/* Linefeed, LF */
+#define XK_Clear		0xFF0B
+#define XK_Return		0xFF0D	/* Return, enter */
+#define XK_Pause		0xFF13	/* Pause, hold */
+#define XK_Scroll_Lock		0xFF14
+#define XK_Sys_Req		0xFF15
+#define XK_Escape		0xFF1B
+#define XK_Delete		0xFFFF	/* Delete, rubout */
 
-/*!!!*/
-#define XK_KP_Add	OSD_KEY_PLUS_PAD
-#define XK_KP_Subtract	OSD_KEY_MINUS_PAD
-#define XK_KP_Multiply	OSD_KEY_ASTER_PAD
-#define XK_KP_Divide	OSD_KEY_SLASH_PAD
-#define XK_KP_Separator	OSD_KEY_STOP_PAD
-#define XK_Control_L	OSD_KEY_LCONTROL
-#define XK_Control_R	OSD_KEY_RCONTROL
-#define XK_Meta_L	OSD_KEY_ALT
-#define XK_Meta_R	OSD_KEY_ALTGR
-#define XK_Alt_L	OSD_KEY_ALT
-#define XK_Alt_R	OSD_KEY_ALTGR
-#define XK_Mode_switch	0			/* unknown in allegro */
-#define XK_Multi_key	0			/* unknown in allegro */
-#define XK_Insert	OSD_KEY_INSERT
-#define XK_Tab		OSD_KEY_TAB
-#define XK_Home		OSD_KEY_HOME
-#define XK_End		OSD_KEY_END
-#define XK_Page_Up	OSD_KEY_PGUP
-#define XK_Page_Down	OSD_KEY_PGDN
-#define XK_space	OSD_KEY_SPACE
-#define XK_adiaeresis	0			/* unknown in allegro */
-#define XK_odiaeresis	0			/* unknown in allegro */
-#define XK_udiaeresis	0			/* unknown in allegro */
-#define XK_apostrophe	0			/* unknown in allegro */
-#define XK_plus		0			/* unknown in allegro */
-#define XK_minus	OSD_KEY_MINUS
-#define XK_comma	OSD_KEY_COMMA
-#define XK_period	OSD_KEY_STOP
-#define XK_numbersign	0			/* unknown in allegro */
-#define XK_less		0			/* unknown in allegro */
-#define XK_greater	0			/* unknown in allegro */
-#define XK_asciicircum	0			/* unknown in allegro */
-#define XK_ssharp	0			/* unknown in allegro */
-#define XK_F1		0			/* unknown in allegro */
-#define XK_F24		0			/* unknown in allegro */
-#define XK_VoidSymbol	0			/* unknown in allegro */
-/*!!!*/
+/* International & multi-key character composition */
 
+#define XK_Multi_key		0xFF20  /* Multi-key character compose */
+#define XK_SingleCandidate	0xFF3C
+#define XK_MultipleCandidate	0xFF3D
+#define XK_PreviousCandidate	0xFF3E
 
-#define MOUSE_GIF_FILENAME	"graphics\\mouse.gif"
-#define MOUSE_PCX_FILENAME	"graphics\\mouse.gif"
+/* Cursor control & motion */
+
+#define XK_Home			0xFF50
+#define XK_Left			0xFF51	/* Move left, left arrow */
+#define XK_Up			0xFF52	/* Move up, up arrow */
+#define XK_Right		0xFF53	/* Move right, right arrow */
+#define XK_Down			0xFF54	/* Move down, down arrow */
+#define XK_Prior		0xFF55	/* Prior, previous */
+#define XK_Page_Up		0xFF55
+#define XK_Next			0xFF56	/* Next */
+#define XK_Page_Down		0xFF56
+#define XK_End			0xFF57	/* EOL */
+#define XK_Begin		0xFF58	/* BOL */
+
+/* Misc Functions */
+
+#define XK_Select		0xFF60	/* Select, mark */
+#define XK_Print		0xFF61
+#define XK_Execute		0xFF62	/* Execute, run, do */
+#define XK_Insert		0xFF63	/* Insert, insert here */
+#define XK_Undo			0xFF65	/* Undo, oops */
+#define XK_Redo			0xFF66	/* redo, again */
+#define XK_Menu			0xFF67
+#define XK_Find			0xFF68	/* Find, search */
+#define XK_Cancel		0xFF69	/* Cancel, stop, abort, exit */
+#define XK_Help			0xFF6A	/* Help */
+#define XK_Break		0xFF6B
+#define XK_Mode_switch		0xFF7E	/* Character set switch */
+#define XK_script_switch        0xFF7E  /* Alias for mode_switch */
+#define XK_Num_Lock		0xFF7F
+
+/* Keypad Functions, keypad numbers cleverly chosen to map to ascii */
+
+#define XK_KP_Space		0xFF80	/* space */
+#define XK_KP_Tab		0xFF89
+#define XK_KP_Enter		0xFF8D	/* enter */
+#define XK_KP_F1		0xFF91	/* PF1, KP_A, ... */
+#define XK_KP_F2		0xFF92
+#define XK_KP_F3		0xFF93
+#define XK_KP_F4		0xFF94
+#define XK_KP_Home		0xFF95
+#define XK_KP_Left		0xFF96
+#define XK_KP_Up		0xFF97
+#define XK_KP_Right		0xFF98
+#define XK_KP_Down		0xFF99
+#define XK_KP_Prior		0xFF9A
+#define XK_KP_Page_Up		0xFF9A
+#define XK_KP_Next		0xFF9B
+#define XK_KP_Page_Down		0xFF9B
+#define XK_KP_End		0xFF9C
+#define XK_KP_Begin		0xFF9D
+#define XK_KP_Insert		0xFF9E
+#define XK_KP_Delete		0xFF9F
+#define XK_KP_Equal		0xFFBD	/* equals */
+#define XK_KP_Multiply		0xFFAA
+#define XK_KP_Add		0xFFAB
+#define XK_KP_Separator		0xFFAC	/* separator, often comma */
+#define XK_KP_Subtract		0xFFAD
+#define XK_KP_Decimal		0xFFAE
+#define XK_KP_Divide		0xFFAF
+
+#define XK_KP_0			0xFFB0
+#define XK_KP_1			0xFFB1
+#define XK_KP_2			0xFFB2
+#define XK_KP_3			0xFFB3
+#define XK_KP_4			0xFFB4
+#define XK_KP_5			0xFFB5
+#define XK_KP_6			0xFFB6
+#define XK_KP_7			0xFFB7
+#define XK_KP_8			0xFFB8
+#define XK_KP_9			0xFFB9
+
+/*
+ * Auxilliary Functions; note the duplicate definitions for left and right
+ * function keys;  Sun keyboards and a few other manufactures have such
+ * function key groups on the left and/or right sides of the keyboard.
+ * We've not found a keyboard with more than 35 function keys total.
+ */
+
+#define XK_F1			0xFFBE
+#define XK_F2			0xFFBF
+#define XK_F3			0xFFC0
+#define XK_F4			0xFFC1
+#define XK_F5			0xFFC2
+#define XK_F6			0xFFC3
+#define XK_F7			0xFFC4
+#define XK_F8			0xFFC5
+#define XK_F9			0xFFC6
+#define XK_F10			0xFFC7
+#define XK_F11			0xFFC8
+#define XK_L1			0xFFC8
+#define XK_F12			0xFFC9
+#define XK_L2			0xFFC9
+#define XK_F13			0xFFCA
+#define XK_L3			0xFFCA
+#define XK_F14			0xFFCB
+#define XK_L4			0xFFCB
+#define XK_F15			0xFFCC
+#define XK_L5			0xFFCC
+#define XK_F16			0xFFCD
+#define XK_L6			0xFFCD
+#define XK_F17			0xFFCE
+#define XK_L7			0xFFCE
+#define XK_F18			0xFFCF
+#define XK_L8			0xFFCF
+#define XK_F19			0xFFD0
+#define XK_L9			0xFFD0
+#define XK_F20			0xFFD1
+#define XK_L10			0xFFD1
+#define XK_F21			0xFFD2
+#define XK_R1			0xFFD2
+#define XK_F22			0xFFD3
+#define XK_R2			0xFFD3
+#define XK_F23			0xFFD4
+#define XK_R3			0xFFD4
+#define XK_F24			0xFFD5
+#define XK_R4			0xFFD5
+#define XK_F25			0xFFD6
+#define XK_R5			0xFFD6
+#define XK_F26			0xFFD7
+#define XK_R6			0xFFD7
+#define XK_F27			0xFFD8
+#define XK_R7			0xFFD8
+#define XK_F28			0xFFD9
+#define XK_R8			0xFFD9
+#define XK_F29			0xFFDA
+#define XK_R9			0xFFDA
+#define XK_F30			0xFFDB
+#define XK_R10			0xFFDB
+#define XK_F31			0xFFDC
+#define XK_R11			0xFFDC
+#define XK_F32			0xFFDD
+#define XK_R12			0xFFDD
+#define XK_F33			0xFFDE
+#define XK_R13			0xFFDE
+#define XK_F34			0xFFDF
+#define XK_R14			0xFFDF
+#define XK_F35			0xFFE0
+#define XK_R15			0xFFE0
+
+/* Modifiers */
+
+#define XK_Shift_L		0xFFE1	/* Left shift */
+#define XK_Shift_R		0xFFE2	/* Right shift */
+#define XK_Control_L		0xFFE3	/* Left control */
+#define XK_Control_R		0xFFE4	/* Right control */
+#define XK_Caps_Lock		0xFFE5	/* Caps lock */
+#define XK_Shift_Lock		0xFFE6	/* Shift lock */
+
+#define XK_Meta_L		0xFFE7	/* Left meta */
+#define XK_Meta_R		0xFFE8	/* Right meta */
+#define XK_Alt_L		0xFFE9	/* Left alt */
+#define XK_Alt_R		0xFFEA	/* Right alt */
+#define XK_Super_L		0xFFEB	/* Left super */
+#define XK_Super_R		0xFFEC	/* Right super */
+#define XK_Hyper_L		0xFFED	/* Left hyper */
+#define XK_Hyper_R		0xFFEE	/* Right hyper */
+
+/*
+ *  Latin 1
+ *  Byte 3 = 0
+ */
+
+#define XK_space               0x020
+#define XK_exclam              0x021
+#define XK_quotedbl            0x022
+#define XK_numbersign          0x023
+#define XK_dollar              0x024
+#define XK_percent             0x025
+#define XK_ampersand           0x026
+#define XK_apostrophe          0x027
+#define XK_quoteright          0x027	/* deprecated */
+#define XK_parenleft           0x028
+#define XK_parenright          0x029
+#define XK_asterisk            0x02a
+#define XK_plus                0x02b
+#define XK_comma               0x02c
+#define XK_minus               0x02d
+#define XK_period              0x02e
+#define XK_slash               0x02f
+#define XK_0                   0x030
+#define XK_1                   0x031
+#define XK_2                   0x032
+#define XK_3                   0x033
+#define XK_4                   0x034
+#define XK_5                   0x035
+#define XK_6                   0x036
+#define XK_7                   0x037
+#define XK_8                   0x038
+#define XK_9                   0x039
+#define XK_colon               0x03a
+#define XK_semicolon           0x03b
+#define XK_less                0x03c
+#define XK_equal               0x03d
+#define XK_greater             0x03e
+#define XK_question            0x03f
+#define XK_at                  0x040
+#define XK_A                   0x041
+#define XK_B                   0x042
+#define XK_C                   0x043
+#define XK_D                   0x044
+#define XK_E                   0x045
+#define XK_F                   0x046
+#define XK_G                   0x047
+#define XK_H                   0x048
+#define XK_I                   0x049
+#define XK_J                   0x04a
+#define XK_K                   0x04b
+#define XK_L                   0x04c
+#define XK_M                   0x04d
+#define XK_N                   0x04e
+#define XK_O                   0x04f
+#define XK_P                   0x050
+#define XK_Q                   0x051
+#define XK_R                   0x052
+#define XK_S                   0x053
+#define XK_T                   0x054
+#define XK_U                   0x055
+#define XK_V                   0x056
+#define XK_W                   0x057
+#define XK_X                   0x058
+#define XK_Y                   0x059
+#define XK_Z                   0x05a
+#define XK_bracketleft         0x05b
+#define XK_backslash           0x05c
+#define XK_bracketright        0x05d
+#define XK_asciicircum         0x05e
+#define XK_underscore          0x05f
+#define XK_grave               0x060
+#define XK_quoteleft           0x060	/* deprecated */
+#define XK_a                   0x061
+#define XK_b                   0x062
+#define XK_c                   0x063
+#define XK_d                   0x064
+#define XK_e                   0x065
+#define XK_f                   0x066
+#define XK_g                   0x067
+#define XK_h                   0x068
+#define XK_i                   0x069
+#define XK_j                   0x06a
+#define XK_k                   0x06b
+#define XK_l                   0x06c
+#define XK_m                   0x06d
+#define XK_n                   0x06e
+#define XK_o                   0x06f
+#define XK_p                   0x070
+#define XK_q                   0x071
+#define XK_r                   0x072
+#define XK_s                   0x073
+#define XK_t                   0x074
+#define XK_u                   0x075
+#define XK_v                   0x076
+#define XK_w                   0x077
+#define XK_x                   0x078
+#define XK_y                   0x079
+#define XK_z                   0x07a
+#define XK_braceleft           0x07b
+#define XK_bar                 0x07c
+#define XK_braceright          0x07d
+#define XK_asciitilde          0x07e
+
+#define XK_nobreakspace        0x0a0
+#define XK_exclamdown          0x0a1
+#define XK_cent        	       0x0a2
+#define XK_sterling            0x0a3
+#define XK_currency            0x0a4
+#define XK_yen                 0x0a5
+#define XK_brokenbar           0x0a6
+#define XK_section             0x0a7
+#define XK_diaeresis           0x0a8
+#define XK_copyright           0x0a9
+#define XK_ordfeminine         0x0aa
+#define XK_guillemotleft       0x0ab	/* left angle quotation mark */
+#define XK_notsign             0x0ac
+#define XK_hyphen              0x0ad
+#define XK_registered          0x0ae
+#define XK_macron              0x0af
+#define XK_degree              0x0b0
+#define XK_plusminus           0x0b1
+#define XK_twosuperior         0x0b2
+#define XK_threesuperior       0x0b3
+#define XK_acute               0x0b4
+#define XK_mu                  0x0b5
+#define XK_paragraph           0x0b6
+#define XK_periodcentered      0x0b7
+#define XK_cedilla             0x0b8
+#define XK_onesuperior         0x0b9
+#define XK_masculine           0x0ba
+#define XK_guillemotright      0x0bb	/* right angle quotation mark */
+#define XK_onequarter          0x0bc
+#define XK_onehalf             0x0bd
+#define XK_threequarters       0x0be
+#define XK_questiondown        0x0bf
+#define XK_Agrave              0x0c0
+#define XK_Aacute              0x0c1
+#define XK_Acircumflex         0x0c2
+#define XK_Atilde              0x0c3
+#define XK_Adiaeresis          0x0c4
+#define XK_Aring               0x0c5
+#define XK_AE                  0x0c6
+#define XK_Ccedilla            0x0c7
+#define XK_Egrave              0x0c8
+#define XK_Eacute              0x0c9
+#define XK_Ecircumflex         0x0ca
+#define XK_Ediaeresis          0x0cb
+#define XK_Igrave              0x0cc
+#define XK_Iacute              0x0cd
+#define XK_Icircumflex         0x0ce
+#define XK_Idiaeresis          0x0cf
+#define XK_ETH                 0x0d0
+#define XK_Eth                 0x0d0	/* deprecated */
+#define XK_Ntilde              0x0d1
+#define XK_Ograve              0x0d2
+#define XK_Oacute              0x0d3
+#define XK_Ocircumflex         0x0d4
+#define XK_Otilde              0x0d5
+#define XK_Odiaeresis          0x0d6
+#define XK_multiply            0x0d7
+#define XK_Ooblique            0x0d8
+#define XK_Ugrave              0x0d9
+#define XK_Uacute              0x0da
+#define XK_Ucircumflex         0x0db
+#define XK_Udiaeresis          0x0dc
+#define XK_Yacute              0x0dd
+#define XK_THORN               0x0de
+#define XK_Thorn               0x0de	/* deprecated */
+#define XK_ssharp              0x0df
+#define XK_agrave              0x0e0
+#define XK_aacute              0x0e1
+#define XK_acircumflex         0x0e2
+#define XK_atilde              0x0e3
+#define XK_adiaeresis          0x0e4
+#define XK_aring               0x0e5
+#define XK_ae                  0x0e6
+#define XK_ccedilla            0x0e7
+#define XK_egrave              0x0e8
+#define XK_eacute              0x0e9
+#define XK_ecircumflex         0x0ea
+#define XK_ediaeresis          0x0eb
+#define XK_igrave              0x0ec
+#define XK_iacute              0x0ed
+#define XK_icircumflex         0x0ee
+#define XK_idiaeresis          0x0ef
+#define XK_eth                 0x0f0
+#define XK_ntilde              0x0f1
+#define XK_ograve              0x0f2
+#define XK_oacute              0x0f3
+#define XK_ocircumflex         0x0f4
+#define XK_otilde              0x0f5
+#define XK_odiaeresis          0x0f6
+#define XK_division            0x0f7
+#define XK_oslash              0x0f8
+#define XK_ugrave              0x0f9
+#define XK_uacute              0x0fa
+#define XK_ucircumflex         0x0fb
+#define XK_udiaeresis          0x0fc
+#define XK_yacute              0x0fd
+#define XK_thorn               0x0fe
+#define XK_ydiaeresis          0x0ff
+
+/* end of X11 keyboard mapping */
+
+#define MOUSE_FILENAME		"mouse.pcx"
 #define JOYSTICK_FILENAME	"joystick.cnf"
+
 #define screen myscreen
 
 #define XFlush(a)
@@ -287,6 +454,7 @@
 #define XSetWMProperties(a,b,c,d,e,f,g,h,i)
 
 #define MAX_EVENT_BUFFER	256
+#define MAX_SCANCODES		128
 
 #define True			1
 #define False			0

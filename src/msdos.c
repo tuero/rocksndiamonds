@@ -15,19 +15,28 @@
 #ifdef MSDOS
 
 #include "main.h"
+#include "misc.h"
 #include "tools.h"
 #include "sound.h"
 #include "files.h"
 #include "joystick.h"
 #include "image.h"
 
+/* allegro driver declarations */
 DECLARE_GFX_DRIVER_LIST(GFX_DRIVER_VBEAF GFX_DRIVER_VESA2L GFX_DRIVER_VESA1)
 DECLARE_COLOR_DEPTH_LIST(COLOR_DEPTH_8)
 DECLARE_DIGI_DRIVER_LIST(DIGI_DRIVER_SB)
 DECLARE_MIDI_DRIVER_LIST()
 DECLARE_JOYSTICK_DRIVER_LIST(JOYSTICK_DRIVER_STANDARD)
 
-static int key_buffer[OSD_MAX_KEY];
+/* allegro global variables */
+extern volatile int key_shifts;
+extern int num_joysticks;
+extern JOYSTICK_INFO joy[];
+extern int i_love_bill;
+
+/* internal variables of msdos.c */
+static int key_press_state[MAX_SCANCODES];
 static XEvent event_buffer[MAX_EVENT_BUFFER];
 static int pending_events;
 static boolean joystick_event;
@@ -54,22 +63,24 @@ static void allegro_drivers()
 
   for (i=0; i<MAX_EVENT_BUFFER; i++)
     event_buffer[i].type = 0;
-  for(i=0; i<OSD_MAX_KEY; i++)
-    key_buffer[i] = KeyReleaseMask;
+
+  for (i=0; i<MAX_SCANCODES; i++)
+    key_press_state[i] = KeyReleaseMask;
+
   last_mouse_pos = mouse_pos;
   last_mouse_b = 0;
 
   pending_events = 0;
   clear_keybuf();
 
+  /* enable Windows friendly timer mode (already default under Windows) */
   i_love_bill = TRUE;
+
   install_keyboard();
   install_timer();
   if (install_mouse() > 0)
     mouse_installed = TRUE;
-  install_joystick(JOY_TYPE_2PADS);
 
-  load_joystick_data(JOYSTICK_FILENAME);
   last_joystick_state = 0;
   joystick_event = FALSE;
 
@@ -98,131 +109,124 @@ static void unhide_mouse(Display *display)
     show_mouse(video_bitmap);
 }
 
-static int get_joystick_state()
+static KeySym ScancodeToKeySym(byte scancode)
 {
-  int state = 0;
-
-  /*!!!*/
-  int joystick_nr = 0;	/* CHANGE THIS! */
-  /*!!!*/
-
-  poll_joystick();
-
-  if (joy[joystick_nr].stick[0].axis[0].d1)
-    state |= JOY_LEFT;
-  if (joy[joystick_nr].stick[0].axis[0].d2)
-    state |= JOY_RIGHT;
-  if (joy[joystick_nr].stick[0].axis[1].d1)
-    state |= JOY_UP;
-  if (joy[joystick_nr].stick[0].axis[1].d2)
-    state |= JOY_DOWN;
-  if (joy[joystick_nr].button[0].b)
-    state |= JOY_BUTTON_1;
-
-  switch (state)
+  switch(scancode)
   {
-    case (JOY_DOWN | JOY_LEFT):
-      state = XK_KP_1;
-      break;
-    case (JOY_DOWN):
-      state = XK_KP_2;
-      break;
-    case (JOY_DOWN | JOY_RIGHT):
-      state = XK_KP_3;
-      break;
-    case (JOY_LEFT):
-      state = XK_KP_4;
-      break;
-    case (JOY_RIGHT):
-      state = XK_KP_6;
-      break;
-    case (JOY_UP | JOY_LEFT):
-      state = XK_KP_7;
-      break;
-    case (JOY_UP):
-      state = XK_KP_8;
-      break;
-    case (JOY_UP | JOY_RIGHT):
-      state = XK_KP_9;
-      break;
+    case KEY_ESC:		return XK_Escape;
+    case KEY_1:			return XK_1;
+    case KEY_2:			return XK_2;
+    case KEY_3:			return XK_3;
+    case KEY_4:			return XK_4;
+    case KEY_5:			return XK_5;
+    case KEY_6:			return XK_6;
+    case KEY_7:			return XK_7;
+    case KEY_8:			return XK_8;
+    case KEY_9:			return XK_9;
+    case KEY_0:			return XK_0;
+    case KEY_MINUS:		return XK_minus;
+    case KEY_EQUALS:		return XK_equal;
+    case KEY_BACKSPACE:		return XK_BackSpace;
+    case KEY_TAB:		return XK_Tab;
+    case KEY_Q:			return XK_q;
+    case KEY_W:			return XK_w;
+    case KEY_E:			return XK_e;
+    case KEY_R:			return XK_r;
+    case KEY_T:			return XK_t;
+    case KEY_Y:			return XK_y;
+    case KEY_U:			return XK_u;
+    case KEY_I:			return XK_i;
+    case KEY_O:			return XK_o;
+    case KEY_P:			return XK_p;
+    case KEY_OPENBRACE:		return XK_braceleft;
+    case KEY_CLOSEBRACE:	return XK_braceright;
+    case KEY_ENTER:		return XK_Return;
+    case KEY_LCONTROL:		return XK_Control_L;
+    case KEY_A:			return XK_a;
+    case KEY_S:			return XK_s;
+    case KEY_D:			return XK_d;
+    case KEY_F:			return XK_f;
+    case KEY_G:			return XK_g;
+    case KEY_H:			return XK_h;
+    case KEY_J:			return XK_j;
+    case KEY_K:			return XK_k;
+    case KEY_L:			return XK_l;
+    case KEY_COLON:		return XK_colon;
+    case KEY_QUOTE:		return XK_apostrophe;
+    case KEY_TILDE:		return XK_asciitilde;
+    case KEY_LSHIFT:		return XK_Shift_L;
+    case KEY_BACKSLASH:		return XK_backslash;
+    case KEY_Z:			return XK_z;
+    case KEY_X:			return XK_x;
+    case KEY_C:			return XK_c;
+    case KEY_V:			return XK_v;
+    case KEY_B:			return XK_b;
+    case KEY_N:			return XK_n;
+    case KEY_M:			return XK_m;
+    case KEY_COMMA:		return XK_comma;
+    case KEY_STOP:		return XK_period;
+    case KEY_SLASH:		return XK_slash;
+    case KEY_RSHIFT:		return XK_Shift_R;
+    case KEY_ASTERISK:		return XK_KP_Multiply;
+    case KEY_ALT:		return XK_Alt_L;
+    case KEY_SPACE:		return XK_space;
+    case KEY_CAPSLOCK:		return XK_Caps_Lock;
+    case KEY_F1:		return XK_F1;
+    case KEY_F2:		return XK_F2;
+    case KEY_F3:		return XK_F3;
+    case KEY_F4:		return XK_F4;
+    case KEY_F5:		return XK_F5;
+    case KEY_F6:		return XK_F6;
+    case KEY_F7:		return XK_F7;
+    case KEY_F8:		return XK_F8;
+    case KEY_F9:		return XK_F9;
+    case KEY_F10:		return XK_F10;
+    case KEY_NUMLOCK:		return XK_Num_Lock;
+    case KEY_SCRLOCK:		return XK_Scroll_Lock;
+    case KEY_HOME:		return XK_Home;
+    case KEY_UP:		return XK_Up;
+    case KEY_PGUP:		return XK_Page_Up;
+    case KEY_MINUS_PAD:		return XK_KP_Subtract;
+    case KEY_LEFT:		return XK_Left;
+    case KEY_5_PAD:		return XK_KP_5;
+    case KEY_RIGHT:		return XK_Right;
+    case KEY_PLUS_PAD:		return XK_KP_Add;
+    case KEY_END:		return XK_End;
+    case KEY_DOWN:		return XK_Down;
+    case KEY_PGDN:		return XK_Page_Down;
+    case KEY_INSERT:		return XK_Insert;
+    case KEY_DEL:		return XK_Delete;
+    case KEY_PRTSCR:		return XK_Print;
+    case KEY_F11:		return XK_F11;
+    case KEY_F12:		return XK_F12;
+    case KEY_LWIN:		return XK_Meta_L;
+    case KEY_RWIN:		return XK_Meta_R;
+    case KEY_MENU:		return XK_Menu;
+    case KEY_PAD:		return XK_VoidSymbol;
+    case KEY_RCONTROL:		return XK_Control_R;
+    case KEY_ALTGR:		return XK_Alt_R;
+    case KEY_SLASH2:		return XK_KP_Divide;
+    case KEY_PAUSE:		return XK_Pause;
 
-    case (JOY_DOWN | JOY_BUTTON_1):
-      state = XK_X;
-      break;
-    case (JOY_LEFT | JOY_BUTTON_1):
-      state = XK_S;
-      break;
-    case (JOY_RIGHT | JOY_BUTTON_1):
-      state = XK_D;
-      break;
-    case (JOY_UP | JOY_BUTTON_1):
-      state = XK_E;
-      break;
- 
-   default:
-     state = 0;
+    case NEW_KEY_BACKSLASH:	return XK_backslash;
+    case NEW_KEY_1_PAD:		return XK_KP_1;
+    case NEW_KEY_2_PAD:		return XK_KP_2;
+    case NEW_KEY_3_PAD:		return XK_KP_3;
+    case NEW_KEY_4_PAD:		return XK_KP_4;
+    case NEW_KEY_5_PAD:		return XK_KP_5;
+    case NEW_KEY_6_PAD:		return XK_KP_6;
+    case NEW_KEY_7_PAD:		return XK_KP_7;
+    case NEW_KEY_8_PAD:		return XK_KP_8;
+    case NEW_KEY_9_PAD:		return XK_KP_9;
+    case NEW_KEY_0_PAD:		return XK_KP_0;
+    case NEW_KEY_STOP_PAD:	return XK_KP_Separator;
+    case NEW_KEY_EQUALS_PAD:	return XK_KP_Equal;
+    case NEW_KEY_SLASH_PAD:	return XK_KP_Divide;
+    case NEW_KEY_ASTERISK_PAD:	return XK_KP_Multiply;
+    case NEW_KEY_ENTER_PAD:	return XK_KP_Enter;
+
+    default:			return XK_VoidSymbol;
   }
-
-  return state;
-}
-
-unsigned char get_ascii(KeySym key)
-{
-  switch(key)
-  {
-    case OSD_KEY_Q: return 'Q';
-    case OSD_KEY_W: return 'W';
-    case OSD_KEY_E: return 'E';
-    case OSD_KEY_R: return 'R';
-    case OSD_KEY_T: return 'T';
-    case OSD_KEY_Y: return 'Y';
-    case OSD_KEY_U: return 'U';
-    case OSD_KEY_I: return 'I';
-    case OSD_KEY_O: return 'O';
-    case OSD_KEY_P: return 'P';
-    case OSD_KEY_A: return 'A';
-    case OSD_KEY_S: return 'S';
-    case OSD_KEY_D: return 'D';
-    case OSD_KEY_F: return 'F';
-    case OSD_KEY_G: return 'G';
-    case OSD_KEY_H: return 'H';
-    case OSD_KEY_J: return 'J';
-    case OSD_KEY_K: return 'K';
-    case OSD_KEY_L: return 'L';
-    case OSD_KEY_Z: return 'Z';
-    case OSD_KEY_X: return 'X';
-    case OSD_KEY_C: return 'C';
-    case OSD_KEY_V: return 'V';
-    case OSD_KEY_B: return 'B';
-    case OSD_KEY_N: return 'N';
-    case OSD_KEY_M: return 'M';
-    case OSD_KEY_1: return '1';
-    case OSD_KEY_2: return '2';
-    case OSD_KEY_3: return '3';
-    case OSD_KEY_4: return '4';
-    case OSD_KEY_5: return '5';
-    case OSD_KEY_6: return '6';
-    case OSD_KEY_7: return '7';
-    case OSD_KEY_8: return '8';
-    case OSD_KEY_9: return '9';
-    case OSD_KEY_0: return '0';
-    case OSD_KEY_SPACE: return ' ';
-  }
-
-  return 0;
-}
-
-static long osd_key_pressed(int keycode)
-{
-  if (keycode == OSD_KEY_RCONTROL)
-    keycode = KEY_RCONTROL;
-  if (keycode == OSD_KEY_ALTGR)
-    keycode = KEY_ALTGR;
-
-  if (key[keycode])
-    return KeyPressMask;
-  else
-    return KeyReleaseMask;
 }
 
 void XMapWindow(Display *display, Window window)
@@ -248,12 +252,19 @@ Display *XOpenDisplay(char *display_name)
   Screen *screen;
   Display *display;
   BITMAP *mouse_bitmap = NULL;
+  char *filename;
+
+  filename = getPath3(options.base_directory, GRAPHICS_DIRECTORY,
+		      MOUSE_FILENAME);
+
+  mouse_bitmap = Read_PCX_to_AllegroBitmap(filename);
+  free(filename);
+
+  if (mouse_bitmap == NULL)
+    return NULL;
 
   screen = malloc(sizeof(Screen));
   display = malloc(sizeof(Display));
-
-  if ((mouse_bitmap = Read_PCX_to_AllegroBitmap(MOUSE_PCX_FILENAME)) == NULL)
-    return NULL;
 
   screen[0].cmap = 0;
   screen[0].root = 0;
@@ -292,6 +303,7 @@ Window XCreateSimpleWindow(Display *display, Window parent, int x, int y,
   display->screens[display->default_screen].height = YRES;
 
   set_mouse_sprite(display->mouse_ptr);
+  set_mouse_speed(1, 1);
   set_mouse_range(display->screens[display->default_screen].x + 1,
 		  display->screens[display->default_screen].y + 1,
 		  display->screens[display->default_screen].x + WIN_XSIZE + 1,
@@ -585,10 +597,15 @@ void XCloseDisplay(Display *display)
 
   if (is_screen_bitmap(bitmap))
     destroy_bitmap(bitmap);
+
   if (display->screens)
     free(display->screens);
+
   if (display)
     free(display);
+
+  /* return to text mode (or DOS box on Windows screen) */
+  set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 }
 
 void XNextEvent(Display *display, XEvent *event_return)
@@ -600,77 +617,115 @@ void XNextEvent(Display *display, XEvent *event_return)
   pending_events--;
 }
 
+static void NewKeyEvent(int key_press_state, KeySym keysym)
+{
+  XKeyEvent *xkey;
+
+  if (pending_events >= MAX_EVENT_BUFFER)
+    return;
+
+  pending_events++;
+  xkey = (XKeyEvent *)&event_buffer[pending_events];
+  xkey->type = key_press_state;
+  xkey->state = (unsigned int)keysym;
+}
+
+#define HANDLE_RAW_KB_ALL_KEYS		0
+#define HANDLE_RAW_KB_MODIFIER_KEYS_ONLY	1
+
+static int modifier_scancode[] =
+{
+  KEY_LSHIFT,
+  KEY_RSHIFT,
+  KEY_LCONTROL,
+  KEY_RCONTROL,
+  KEY_ALT,
+  KEY_ALTGR,
+  KEY_LWIN,
+  KEY_RWIN,
+  KEY_CAPSLOCK,
+  KEY_NUMLOCK,
+  KEY_SCRLOCK,
+  -1
+};
+
+static void HandleKeyboardRaw(int mode)
+{
+  int i;
+
+  for (i=0; i<MAX_SCANCODES; i++)
+  {
+    int scancode, new_state, event_type;
+    char key_pressed;
+
+    if (mode == HANDLE_RAW_KB_MODIFIER_KEYS_ONLY)
+    {
+      if ((scancode = modifier_scancode[i]) == -1)
+	return;
+    }
+    else
+      scancode = i;
+
+    key_pressed = key[scancode];
+    new_state = (key_pressed ? KeyPressMask : KeyReleaseMask);
+    event_type = (key_pressed ? KeyPress : KeyRelease);
+
+    if (key_press_state[i] == new_state)	/* state not changed */
+      continue;
+
+    key_press_state[i] = new_state;
+
+    NewKeyEvent(event_type, ScancodeToKeySym(scancode));
+  }
+}
+
+static void HandleKeyboardEvent()
+{
+  if (keypressed())
+  {
+    int key_info = readkey();
+    int scancode = (key_info >> 8);
+    int ascii = (key_info & 0xff);
+    KeySym keysym = ScancodeToKeySym(scancode);
+
+    if (scancode == KEY_PAD)
+    {
+      /* keys on the numeric keypad return just scancode 'KEY_PAD'
+	 for some reason, so we must handle them separately */
+
+      if (ascii >= '0' && ascii <= '9')
+	keysym = XK_KP_0 + (KeySym)(ascii - '0');
+      else if (ascii == '.')
+	keysym = XK_KP_Separator;
+    }
+
+    NewKeyEvent(KeyPress, keysym);
+  }
+  else if (key_shifts & (KB_SHIFT_FLAG | KB_CTRL_FLAG | KB_ALT_FLAG))
+  {
+    /* the allegro function keypressed() does not give us single pressed
+       modifier keys, so we must detect them with the internal global
+       allegro variable 'key_shifts' and then handle them separately */
+
+    HandleKeyboardRaw(HANDLE_RAW_KB_MODIFIER_KEYS_ONLY);
+  }
+}
+
 int XPending(Display *display)
 {
-  int i, state;
-  static boolean joy_button_2 = FALSE;
-
-  /*!!!*/
-  int joystick_nr = 0;	/* CHANGE THIS! */
-  /*!!!*/
-
-  XKeyEvent *xkey;
   XButtonEvent *xbutton;
   XMotionEvent *xmotion;
-
-  /* joystick event (simulating keyboard event) */
-
-  state = get_joystick_state();
-
-  if (joy[joystick_nr].button[1].b && !joy_button_2)
-  {
-    pending_events++;
-    xkey = (XKeyEvent *)&event_buffer[pending_events];
-    xkey->type = KeyPress;
-    xkey->state = XK_B;
-    joy_button_2 = TRUE;
-  }
-  else if (!joy[joystick_nr].button[1].b && joy_button_2)
-  {
-    pending_events++;
-    xkey = (XKeyEvent *)&event_buffer[pending_events];
-    xkey->type = KeyRelease;
-    xkey->state = XK_B;
-    joy_button_2 = FALSE;
-  }
-
-  if (state && !joystick_event)
-  {
-    pending_events++;
-    xkey = (XKeyEvent *)&event_buffer[pending_events];
-    xkey->type = KeyPress;
-    xkey->state = state;
-    joystick_event = TRUE;
-    last_joystick_state = state;
-  }
-  else if ((state != last_joystick_state) && joystick_event)
-  {
-    pending_events++;
-    xkey = (XKeyEvent *)&event_buffer[pending_events];
-    xkey->type = KeyRelease;
-    xkey->state = last_joystick_state;
-    joystick_event = FALSE;
-  }
+  int i;
 
   /* keyboard event */
-
-  for(i=0; i<OSD_MAX_KEY+1 && pending_events<MAX_EVENT_BUFFER; i++)
-  {
-    state = osd_key_pressed(i);
-
-    if (state != key_buffer[i])
-    {
-      key_buffer[i] = state;
-      pending_events++;
-      xkey = (XKeyEvent *)&event_buffer[pending_events];
-      xkey->type = (state & KeyPressMask ? KeyPress : KeyRelease);
-      xkey->state = i;
-    }
-  }
+  if (game_status == PLAYING)
+    HandleKeyboardRaw(HANDLE_RAW_KB_ALL_KEYS);
+  else
+    HandleKeyboardEvent();
 
   /* mouse motion event */
-
-  if (mouse_pos != last_mouse_pos && mouse_b != last_mouse_b)
+  /* generate mouse motion event only if any mouse buttons are pressed */
+  if (mouse_pos != last_mouse_pos && mouse_b)
   {
     last_mouse_pos = mouse_pos;
     pending_events++;
@@ -678,19 +733,12 @@ int XPending(Display *display)
     xmotion->type = MotionNotify;
     xmotion->x = mouse_x - display->screens[display->default_screen].x;
     xmotion->y = mouse_y - display->screens[display->default_screen].y;
-
-
-    /*
-    return;
-    */
-
   }
 
   /* mouse button event */
-
   if (mouse_b != last_mouse_b)
   {
-    for(i=1; i<4; i<<=1)
+    for (i=1; i<4; i<<=1)
     {
       if ((last_mouse_b & i) != (mouse_b & i))
       {
@@ -722,7 +770,7 @@ void sound_handler(struct SoundControl snd_ctrl)
     if (!playing_sounds)
       return;
 
-    for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+    for (i=0; i<MAX_SOUNDS_PLAYING; i++)
       if ((snd_ctrl.stop_all_sounds || playlist[i].nr == snd_ctrl.nr) &&
 	  !playlist[i].fade_sound)
       {
@@ -745,7 +793,7 @@ void sound_handler(struct SoundControl snd_ctrl)
     SoundServer_StopSound(snd_ctrl.nr);
   }
 
-  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for (i=0; i<MAX_SOUNDS_PLAYING; i++)
   {
     if (!playlist[i].active || playlist[i].loop)
       continue;
@@ -766,7 +814,7 @@ void sound_handler(struct SoundControl snd_ctrl)
 
 void NetworkServer(int port, int serveronly)
 {
-  printf("Sorry, networking not supported in DOS version.\n");
+  Error(ERR_WARN, "networking not supported in DOS version");
 }
 
 #endif /* MSDOS */

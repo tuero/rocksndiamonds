@@ -72,19 +72,10 @@ void OpenAll(int argc, char *argv[])
   InitDisplay();
   InitWindow(argc, argv);
 
-  print_debug("now map window");
-
   XMapWindow(display, window);
   XFlush(display);
 
-  print_debug("window mapped");
-
-  print_debug("now init gfx");
-
   InitGfx();
-
-  print_debug("gfx initialized");
-
   InitElementProperties();
 
   DrawMainMenu();
@@ -227,9 +218,7 @@ void InitSoundServer()
 
 void InitJoysticks()
 {
-#ifndef MSDOS
   int i;
-#endif
 
   if (global_joystick_status == JOYSTICK_OFF)
     return;
@@ -266,7 +255,27 @@ void InitJoysticks()
     joystick_status = JOYSTICK_AVAILABLE;
   }
 #else
-  joystick_status = JOYSTICK_AVAILABLE;
+
+  /* try to access two joysticks; if that fails, try to access just one */
+  if (install_joystick(JOY_TYPE_2PADS) == 0 ||
+      install_joystick(JOY_TYPE_AUTODETECT) == 0)
+    joystick_status = JOYSTICK_AVAILABLE;
+
+  /*
+  load_joystick_data(JOYSTICK_FILENAME);
+  */
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    char *device_name = setup.input[i].joy.device_name;
+    int joystick_nr = getJoystickNrFromDeviceName(device_name);
+
+    if (joystick_nr >= num_joysticks)
+      joystick_nr = -1;
+
+    /* misuse joystick file descriptor variable to store joystick number */
+    stored_player[i].joystick_fd = joystick_nr;
+  }
 #endif
 }
 
@@ -430,10 +439,6 @@ void InitWindow(int argc, char *argv[])
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
-
-
-
-  print_debug("OpenWindow finished");
 }
 
 void DrawInitText(char *text, int ypos, int color)
@@ -662,10 +667,6 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #endif
 
-
-  print_debug("now load pic:");
-
-
   /* Grafik laden */
   if (pic->picture_filename)
   {
@@ -709,45 +710,25 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else /* !USE_XPM_LIBRARY */
 
-
-
-    print_debug(filename);
-
-
-
     pcx_err = Read_PCX_to_Pixmap(display, window, gc, filename,
 				 &pix[pos], &clipmask[pos]);
-
-
-    print_debug("ok-1");
-
-
     switch(pcx_err)
     {
       case PCX_Success:
-	print_debug("Success");
         break;
       case PCX_OpenFailed:
-	print_debug("OpenFailed");
         Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
       case PCX_ReadFailed:
-	print_debug("ReadFailed");
         Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
       case PCX_FileInvalid:
-	print_debug("FileInvalid");
 	Error(ERR_EXIT, "invalid PCX file '%s'", filename);
       case PCX_NoMemory:
-	print_debug("NoMemory");
 	Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
       case PCX_ColorFailed:
-	print_debug("ColorFailed");
 	Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
       default:
-	print_debug("default");
 	break;
     }
-
-    print_debug("ok-2");
 
 #if DEBUG_TIMING
     printf("SUMMARY LOADING PCX FILE %s:", filename);
@@ -756,16 +737,8 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #endif /* !USE_XPM_LIBRARY */
 
-
-    print_debug("-> 1");
-
-
-
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
-
-
-    print_debug("-> 2");
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
@@ -806,16 +779,9 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #endif /* USE_XPM_LIBRARY */
 
-
-    if (!clipmask[pos])
-      print_debug("Oops -- no clipmask");
-
     if (!clipmask[pos])
       Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
   }
-
-
-  print_debug("LoadGfx done");
 }
 
 void InitElementProperties()
@@ -1411,6 +1377,10 @@ void CloseAllAndExit(int exit_value)
     XAutoRepeatOn(display);
     XCloseDisplay(display);
   }
+
+#ifdef MSDOS
+  dumpErrorFile();
+#endif
 
   exit(exit_value);
 }

@@ -64,9 +64,9 @@ static int JoystickPosition(int middle, int margin, int actual)
 }
 #endif
 
+#ifndef MSDOS
 int Joystick(int player_nr)
 {
-#ifndef MSDOS
 #ifdef __FreeBSD__
   struct joystick joy_ctrl;
 #else
@@ -77,23 +77,21 @@ int Joystick(int player_nr)
     int y;
   } joy_ctrl;
 #endif
-#endif
 
   int joystick_fd = stored_player[player_nr].joystick_fd;
-
-#ifndef MSDOS
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result = 0;
-#endif
 
   if (joystick_status == JOYSTICK_OFF)
     return 0;
 
-  if (!setup.input[player_nr].use_joystick || joystick_fd < 0)
+  if (game_status == SETUPINPUT)
     return 0;
 
-#ifndef MSDOS
+  if (joystick_fd < 0 || !setup.input[player_nr].use_joystick)
+    return 0;
+
   if (read(joystick_fd, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
   {
     Error(ERR_WARN, "cannot read joystick device '%s'",
@@ -137,33 +135,89 @@ int Joystick(int player_nr)
     result |= JOY_BUTTON_2;
 
   return result;
-#else
-  return 0;
-#endif
 }
+
+#else /* MSDOS */
+
+/* allegro global variables for joystick control */
+extern int num_joysticks;
+extern JOYSTICK_INFO joy[];
+
+int Joystick(int player_nr)
+{
+  int joystick_nr = stored_player[player_nr].joystick_fd;
+  int result = 0;
+
+  if (joystick_status == JOYSTICK_OFF)
+    return 0;
+
+  if (game_status == SETUPINPUT)
+    return 0;
+
+  if (joystick_nr < 0)
+    return 0;
+
+  /* the allegro global variable ïnum_joysticksï contains the number
+     of joysticks found at initialization under MSDOS / Windows */
+
+#if 0
+  if (joystick_nr >= num_joysticks || !setup.input[player_nr].use_joystick)
+    return 0;
+#else
+
+#if 1
+  if (joystick_nr >= num_joysticks ||
+      (game_status == PLAYING && !setup.input[player_nr].use_joystick))
+    return 0;
+#else
+  if (joystick_nr >= num_joysticks)
+    return 0;
+#endif
+
+#endif
+
+  poll_joystick();
+
+  if (joy[joystick_nr].stick[0].axis[0].d1)
+    result |= JOY_LEFT;
+  else if (joy[joystick_nr].stick[0].axis[0].d2)
+    result |= JOY_RIGHT;
+  if (joy[joystick_nr].stick[0].axis[1].d1)
+    result |= JOY_UP;
+  else if (joy[joystick_nr].stick[0].axis[1].d2)
+    result |= JOY_DOWN;
+
+  if (joy[joystick_nr].button[0].b)
+    result |= JOY_BUTTON_1;
+  if (joy[joystick_nr].button[1].b)
+    result |= JOY_BUTTON_2;
+
+  return result;
+}
+#endif /* MSDOS */
 
 int JoystickButton(int player_nr)
 {
-  static int last_joy_button = 0;
+  static int last_joy_button[MAX_PLAYERS] = { 0, 0, 0, 0 };
   int joy_button = (Joystick(player_nr) & JOY_BUTTON);
   int result;
 
   if (joy_button)
   {
-    if (last_joy_button)
+    if (last_joy_button[player_nr])
       result = JOY_BUTTON_PRESSED;
     else
       result = JOY_BUTTON_NEW_PRESSED;
   }
   else
   {
-    if (last_joy_button)
+    if (last_joy_button[player_nr])
       result = JOY_BUTTON_NEW_RELEASED;
     else
       result = JOY_BUTTON_NOT_PRESSED;
   }
 
-  last_joy_button = joy_button;
+  last_joy_button[player_nr] = joy_button;
   return result;
 }
 
@@ -174,8 +228,12 @@ int AnyJoystick()
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
+
+    /*
     if (!setup.input[i].use_joystick)
       continue;
+      */
+
 
     result |= Joystick(i);
   }
@@ -186,14 +244,23 @@ int AnyJoystick()
 int AnyJoystickButton()
 {
   int i;
-  int result = 0;
+  int result;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
+
+    /*
     if (!setup.input[i].use_joystick)
       continue;
+      */
 
+    /*
     result |= JoystickButton(i);
+    */
+
+    result = JoystickButton(i);
+    if (result != JOY_BUTTON_NOT_PRESSED)
+      break;
   }
 
   return result;

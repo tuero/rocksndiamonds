@@ -33,4 +33,9 @@ void SaveSetup(void);
 void LoadLevelSetup(void);
 void SaveLevelSetup(void);
 
+#ifdef MSDOS
+FILE *openErrorFile();
+void dumpErrorFile();
+#endif
+
 #endif	/* FILES_H */

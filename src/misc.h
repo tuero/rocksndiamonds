@@ -60,8 +60,9 @@ char *getX11KeyNameFromKeySym(KeySym);
 KeySym getKeySymFromX11KeyName(char *);
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
-void debug_print_timestamp(int, char *);
+int getJoystickNrFromDeviceName(char *);
 
+void debug_print_timestamp(int, char *);
 void print_debug(char *);
 
 #endif /* MISC_H */

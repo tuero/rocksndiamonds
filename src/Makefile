@@ -95,7 +95,8 @@ SRCS =	main.c		\
 	pcx.c		\
 	image.c		\
 	network.c	\
-	netserv.c
+	netserv.c	\
+	msdos.c
 
 OBJS =	main.o		\
 	init.o		\
@@ -115,7 +116,8 @@ OBJS =	main.o		\
 	pcx.o		\
 	image.o		\
 	network.o	\
-	netserv.o
+	netserv.o	\
+	msdos.o
 
 all:	$(PROGNAME)
 
@@ -126,7 +128,7 @@ $(PROGNAME):	$(OBJS)
 	$(CC) $(CFLAGS) -c $*.c
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) *.o
 	$(RM) $(PROGNAME)
 
 depend:

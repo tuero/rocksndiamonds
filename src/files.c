@@ -60,6 +60,7 @@
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"rec"
 #define SCOREFILE_EXTENSION	"sco"
+#define ERROR_FILENAME		"error.out"
 #endif
 
 /* file permissions for newly written files */
@@ -80,7 +81,7 @@ static char *getGlobalDataDir()
   return GAME_DIR;
 }
 
-static char *getUserDataDir()
+char *getUserDataDir()
 {
   static char *userdata_dir = NULL;
 
@@ -1663,3 +1664,63 @@ void SaveLevelSetup()
 
   chmod(filename, SETUP_PERMS);
 }
+
+#ifdef MSDOS
+static boolean initErrorFile()
+{
+  char *filename;
+  FILE *error_file;
+
+  InitUserDataDirectory();
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  error_file = fopen(filename, "w");
+  free(filename);
+
+  if (error_file == NULL)
+    return FALSE;
+
+  fclose(error_file);
+
+  return TRUE;
+}
+
+FILE *openErrorFile()
+{
+  static boolean first_access = TRUE;
+  char *filename;
+  FILE *error_file;
+
+  if (first_access)
+  {
+    if (!initErrorFile())
+      return NULL;
+
+    first_access = FALSE;
+  }
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  error_file = fopen(filename, "a");
+  free(filename);
+
+  return error_file;
+}
+
+void dumpErrorFile()
+{
+  char *filename;
+  FILE *error_file;
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  error_file = fopen(filename, "r");
+  free(filename);
+
+  if (error_file != NULL)
+  {
+    while (!feof(error_file))
+      fputc(fgetc(error_file), stderr);
+
+    fclose(error_file);
+  }
+}
+#endif

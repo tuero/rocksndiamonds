@@ -26,7 +26,7 @@
 #include "sound.h"
 #include "random.h"
 #include "joystick.h"
-
+#include "files.h"
 
 #ifdef MSDOS
 volatile unsigned long counter = 0;
@@ -457,6 +457,15 @@ void GetOptions(char *argv[])
 void Error(int mode, char *format, ...)
 {
   char *process_name = "";
+  FILE *error = stderr;
+
+#ifdef MSDOS
+  if ((error = openErrorFile()) == NULL)
+  {
+    printf("Cannot write to error output file!\n");
+    CloseAllAndExit(1);
+  }
+#endif
 
   if (mode & ERR_SOUND_SERVER)
     process_name = " sound server";
@@ -469,26 +478,30 @@ void Error(int mode, char *format, ...)
   {
     va_list ap;
 
-    fprintf(stderr, "%s%s: ", program_name, process_name);
+    fprintf(error, "%s%s: ", program_name, process_name);
 
     if (mode & ERR_WARN)
-      fprintf(stderr, "warning: ");
+      fprintf(error, "warning: ");
 
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    vfprintf(error, format, ap);
     va_end(ap);
   
-    fprintf(stderr, "\n");
+    fprintf(error, "\n");
   }
   
   if (mode & ERR_HELP)
-    fprintf(stderr, "%s: Try option '--help' for more information.\n",
+    fprintf(error, "%s: Try option '--help' for more information.\n",
 	    program_name);
 
   if (mode & ERR_EXIT)
-  {
-    fprintf(stderr, "%s%s: aborting\n", program_name, process_name);
+    fprintf(error, "%s%s: aborting\n", program_name, process_name);
 
+  if (error != stderr)
+    fclose(error);
+
+  if (mode & ERR_EXIT)
+  {
     if (mode & ERR_FROM_SERVER)
       exit(1);				/* child process: normal exit */
     else
@@ -587,9 +600,15 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
     { XK_apostrophe,	"XK_apostrophe",	"'" },
     { XK_plus,		"XK_plus",		"+" },
     { XK_minus,		"XK_minus",		"-" },
+    { XK_equal,		"XK_equal",		"equal" },
     { XK_comma,		"XK_comma",		"," },
     { XK_period,	"XK_period",		"." },
+    { XK_colon,		"XK_colon",		";" },
+    { XK_slash,		"XK_slash",		"/" },
     { XK_numbersign,	"XK_numbersign",	"#" },
+    { XK_backslash,	"XK_backslash",		"backslash" },
+    { XK_braceleft,	"XK_braceleft",		"brace left" },
+    { XK_braceright,	"XK_braceright",	"brace right" },
     { XK_less,		"XK_less",		"less" },
     { XK_greater,	"XK_greater",		"greater" },
     { XK_asciicircum,	"XK_asciicircum",	"circumflex" },
@@ -849,7 +868,29 @@ int getJoySymbolFromJoyName(char *name)
   return joysymbol;
 }
 
+int getJoystickNrFromDeviceName(char *device_name)
+{
+  char c;
+  int joystick_nr = 0;
+
+  if (device_name == NULL || device_name[0] == '\0')
+    return 0;
+
+  c = device_name[strlen(device_name) - 1];
+
+  if (c >= '0' && c <= '9')
+    joystick_nr = (int)(c - '0');
+
+  if (joystick_nr < 0 || joystick_nr >= MAX_PLAYERS)
+    joystick_nr = 0;
+
+  return joystick_nr;
+}
+
+/* ----------------------------------------------------------------- */
 /* the following is only for debugging purpose and normally not used */
+/* ----------------------------------------------------------------- */
+
 #define DEBUG_NUM_TIMESTAMPS	3
 
 void debug_print_timestamp(int counter_nr, char *message)
@@ -866,29 +907,4 @@ void debug_print_timestamp(int counter_nr, char *message)
 	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
 
   counter[counter_nr][1] = Counter();
-}
-
-void print_debug(char *s)
-{
-  FILE *f;
-
-  if (!s)
-  {
-    if ((f = fopen("debug.asc", "w")) == NULL)
-    {
-      printf("Cannot write to debug file!\n");
-      exit(1);
-    }
-    fclose(f);
-    return;
-  }
-
-  if ((f = fopen("debug.asc", "a")) == NULL)
-  {
-    printf("Cannot append to debug file!\n");
-    exit(1);
-  }
-
-  fprintf(f, "%s\r\n", s);
-  fclose(f);
 }
