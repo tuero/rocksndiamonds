@@ -1,15 +1,18 @@
+Release Version 3.0.9 [?? ??? ????]
+-----------------------------------
+
 Release Version 3.0.8 [14 DEC 2003]
 -----------------------------------
 	- added "musicinfo.conf" for menu and level music configuration
 	- added "editorsetup.conf" for editor element list configuration
 	- added "copy" and "exchange" functions for custom elements to editor
 	- added configurable "bored" and "sleeping" animations for the player
-	- added "awakening" sound for player waking up after sleeping
+	- added "awakening" sound for player when waking up after sleeping
 	- added configurable element animations for info screen
 	- added configurable music credits for info screen
 	- added configurable level set information for info screen
 	- added warnings for undefined token values in artwork config files
-	- menu text now directly clickable
+	- menu entries now also selectable by clicking on entry text
 	- better sniksnak turning movement (two steps instead of only one)
 	- fixed turning movement of butterflies and fireflies (no frame reset)
 	- fixed bug with wrong default impact sound for colored emeralds
