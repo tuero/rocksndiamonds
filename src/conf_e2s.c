@@ -357,6 +357,10 @@ element_to_sound[] =
     SND_CLASS_EXIT_PASSING
   },
   {
+    EL_PENGUIN, FALSE,				ACTION_PASSING,
+    SND_PENGUIN_PASSING
+  },
+  {
     EL_BALLOON, FALSE,				ACTION_MOVING,
     SND_BALLOON_MOVING
   },

@@ -31,299 +31,12 @@
 #include "conf_e2s.c"	/* include auto-generated data structure definitions */
 #include "conf_fnt.c"	/* include auto-generated data structure definitions */
 
+
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
+
 
 struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
 
-static void InitGlobal();
-static void InitSetup();
-static void InitPlayerInfo();
-static void InitLevelInfo();
-static void InitArtworkInfo();
-static void InitLevelArtworkInfo();
-static void InitNetworkServer();
-static void InitArtworkConfig();
-static void InitImages();
-static void InitMixer();
-static void InitSound();
-static void InitMusic();
-static void InitGfx();
-static void InitGfxBackground();
-static void InitGadgets();
-static void InitFontGraphicInfo();
-static void InitElementSmallImages();
-static void InitElementGraphicInfo();
-static void InitElementSpecialGraphicInfo();
-static void InitElementSoundInfo();
-static void InitElementProperties();
-static void InitGraphicInfo();
-static void InitSoundInfo();
-static void Execute_Command(char *);
-
-void OpenAll()
-{
-  InitGlobal();		/* initialize some global variables */
-
-  if (options.execute_command)
-    Execute_Command(options.execute_command);
-
-  if (options.serveronly)
-  {
-#if defined(PLATFORM_UNIX)
-    NetworkServer(options.server_port, options.serveronly);
-#else
-    Error(ERR_WARN, "networking only supported in Unix version");
-#endif
-    exit(0);	/* never reached */
-  }
-
-  InitProgramInfo(UNIX_USERDATA_DIRECTORY,
-		  PROGRAM_TITLE_STRING, getWindowTitleString(),
-		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
-		  MSDOS_POINTER_FILENAME,
-		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
-
-  InitSetup();
-  InitPlayerInfo();
-  InitArtworkInfo();		/* needed before loading gfx, sound & music */
-  InitArtworkConfig();		/* needed before forking sound child process */
-  InitMixer();
-
-  InitCounter();
-
-  InitJoysticks();
-  InitRND(NEW_RANDOMIZE);
-
-  InitVideoDisplay();
-  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
-		  setup.fullscreen);
-
-  InitEventFilter(FilterMouseMotionEvents);
-
-  InitElementProperties();
-
-  InitGfx();
-
-  InitLevelInfo();
-  InitLevelArtworkInfo();
-
-  InitImages();			/* needs to know current level directory */
-  InitSound();			/* needs to know current level directory */
-  InitMusic();			/* needs to know current level directory */
-
-  InitGfxBackground();
-
-  if (global.autoplay_leveldir)
-  {
-    AutoPlayTape();
-    return;
-  }
-
-  game_status = MAINMENU;
-
-  DrawMainMenu();
-
-  InitNetworkServer();
-}
-
-static void InitGlobal()
-{
-  global.autoplay_leveldir = NULL;
-
-  global.frames_per_second = 0;
-  global.fps_slowdown = FALSE;
-  global.fps_slowdown_factor = 1;
-}
-
-static void InitSetup()
-{
-  LoadSetup();					/* global setup info */
-}
-
-static void InitPlayerInfo()
-{
-  int i;
-
-  /* choose default local player */
-  local_player = &stored_player[0];
-
-  for (i=0; i<MAX_PLAYERS; i++)
-    stored_player[i].connected = FALSE;
-
-  local_player->connected = TRUE;
-}
-
-static void InitLevelInfo()
-{
-  LoadLevelInfo();				/* global level info */
-  LoadLevelSetup_LastSeries();			/* last played series info */
-  LoadLevelSetup_SeriesInfo();			/* last played level info */
-}
-
-static void InitArtworkInfo()
-{
-  LoadArtworkInfo();
-}
-
-static char *get_element_class_token(int element)
-{
-  char *element_class_name = element_info[element].class_name;
-  char *element_class_token = checked_malloc(strlen(element_class_name) + 3);
-
-  sprintf(element_class_token, "[%s]", element_class_name);
-
-  return element_class_token;
-}
-
-static void InitArtworkConfig()
-{
-  static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
-  static char *sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS + 1];
-  static char *action_id_suffix[NUM_ACTIONS + 1];
-  static char *direction_id_suffix[NUM_DIRECTIONS + 1];
-  static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
-  static char *dummy[1] = { NULL };
-  static char *ignore_image_tokens[] =
-  {
-    "name",
-    "sort_priority",
-    "global.num_toons",
-    "menu.draw_xoffset",
-    "menu.draw_yoffset",
-    "menu.draw_xoffset.MAIN",
-    "menu.draw_yoffset.MAIN",
-    "door.step_offset",
-    "door.step_delay",
-    NULL
-  };
-  static char *ignore_sound_tokens[] =
-  {
-    "name",
-    "sort_priority",
-    NULL
-  };
-  int i;
-
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    image_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i<NUM_FONTS; i++)
-    image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
-  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
-
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    sound_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    sound_id_prefix[MAX_NUM_ELEMENTS + i] = get_element_class_token(i);
-  sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS] = NULL;
-
-  for (i=0; i<NUM_ACTIONS; i++)
-    action_id_suffix[i] = element_action_info[i].suffix;
-  action_id_suffix[NUM_ACTIONS] = NULL;
-
-  for (i=0; i<NUM_DIRECTIONS; i++)
-    direction_id_suffix[i] = element_direction_info[i].suffix;
-  direction_id_suffix[NUM_DIRECTIONS] = NULL;
-
-  for (i=0; i<NUM_SPECIAL_GFX_ARGS; i++)
-    special_id_suffix[i] = special_suffix_info[i].suffix;
-  special_id_suffix[NUM_SPECIAL_GFX_ARGS] = NULL;
-
-  InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		image_id_prefix, action_id_suffix, direction_id_suffix,
-		special_id_suffix, ignore_image_tokens);
-  InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		sound_id_prefix, action_id_suffix, dummy,
-		dummy, ignore_sound_tokens);
-}
-
-void InitLevelArtworkInfo()
-{
-  LoadLevelArtworkInfo();
-}
-
-void InitNetworkServer()
-{
-#if defined(PLATFORM_UNIX)
-  int nr_wanted;
-#endif
-
-  if (!options.network)
-    return;
-
-#if defined(PLATFORM_UNIX)
-  nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
-
-  if (!ConnectToServer(options.server_host, options.server_port))
-    Error(ERR_EXIT, "cannot connect to network game server");
-
-  SendToServer_PlayerName(setup.player_name);
-  SendToServer_ProtocolVersion();
-
-  if (nr_wanted)
-    SendToServer_NrWanted(nr_wanted);
-#endif
-}
-
-static void InitMixer()
-{
-  OpenAudio();
-  StartMixer();
-}
-
-static void ReinitializeGraphics()
-{
-  InitElementGraphicInfo();		/* element game graphic mapping */
-  InitElementSpecialGraphicInfo();	/* element special graphic mapping */
-  InitGraphicInfo();			/* graphic properties mapping */
-
-  InitElementSmallImages();		/* create editor and preview images */
-  InitFontGraphicInfo();		/* initialize text drawing functions */
-
-  SetMainBackgroundImage(IMG_BACKGROUND);
-  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
-
-  InitGadgets();
-  InitToons();
-}
-
-static void ReinitializeSounds()
-{
-  InitElementSoundInfo();	/* element game sound mapping */
-  InitSoundInfo();		/* sound properties mapping */
-
-#if 1
-  InitElementSoundInfo();	/* element game sound mapping */
-#endif
-
-  InitPlaySoundLevel();		/* internal game sound settings */
-}
-
-static void ReinitializeMusic()
-{
-  /* currently nothing to do */
-}
-
-static void InitImages()
-{
-  ReloadCustomImages();
-
-  LoadCustomElementDescriptions();
-  LoadSpecialMenuDesignSettings();
-
-  ReinitializeGraphics();
-}
-
-static void InitSound()
-{
-  InitReloadCustomSounds(artwork.snd_current->identifier);
-  ReinitializeSounds();
-}
-
-static void InitMusic()
-{
-  InitReloadCustomMusic(artwork.mus_current->identifier);
-  ReinitializeMusic();
-}
 
 static void InitTileClipmasks()
 {
@@ -497,226 +210,6 @@ void FreeTileClipmasks()
 
 #endif /* TARGET_X11 */
 #endif
-}
-
-void InitGfx()
-{
-  char *filename_font_initial = NULL;
-  Bitmap *bitmap_font_initial = NULL;
-  int i, j;
-
-  /* determine settings for initial font (for displaying startup messages) */
-  for (i=0; image_config[i].token != NULL; i++)
-  {
-    for (j=0; j < NUM_INITIAL_FONTS; j++)
-    {
-      char font_token[128];
-      int len_font_token;
-
-      sprintf(font_token, "%s_%d", CONFIG_TOKEN_FONT_INITIAL, j + 1);
-      len_font_token = strlen(font_token);
-
-      if (strcmp(image_config[i].token, font_token) == 0)
-	filename_font_initial = image_config[i].value;
-      else if (strlen(image_config[i].token) > len_font_token &&
-	       strncmp(image_config[i].token, font_token, len_font_token) == 0)
-      {
-	if (strcmp(&image_config[i].token[len_font_token], ".x") == 0)
-	  font_initial[j].src_x = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token], ".y") == 0)
-	  font_initial[j].src_y = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token], ".width") == 0)
-	  font_initial[j].width = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token],".height") == 0)
-	  font_initial[j].height = atoi(image_config[i].value);
-      }
-    }
-  }
-
-  if (filename_font_initial == NULL)	/* should not happen */
-    Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
-
-  /* initialize screen properties */
-  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
-  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
-  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
-
-  /* create additional image buffers for double-buffering */
-  bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
-  bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
-
-  bitmap_font_initial = LoadCustomImage(filename_font_initial);
-
-  for (j=0; j < NUM_INITIAL_FONTS; j++)
-    font_initial[j].bitmap = bitmap_font_initial;
-
-  InitFontGraphicInfo();
-
-  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
-  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
-
-  DrawInitText("Loading graphics:", 120, FC_GREEN);
-
-  InitTileClipmasks();
-}
-
-void InitGfxBackground()
-{
-  int x, y;
-
-  drawto = backbuffer;
-  fieldbuffer = bitmap_db_field;
-  SetDrawtoField(DRAW_BACKBUFFER);
-
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
-
-  for (x=0; x<MAX_BUF_XSIZE; x++)
-    for (y=0; y<MAX_BUF_YSIZE; y++)
-      redraw[x][y] = 0;
-  redraw_tiles = 0;
-  redraw_mask = REDRAW_ALL;
-}
-
-void ReloadCustomArtwork()
-{
-  static char *leveldir_current_identifier = NULL;
-  static boolean last_override_level_graphics = FALSE;
-  static boolean last_override_level_sounds = FALSE;
-  static boolean last_override_level_music = FALSE;
-  /* identifier for new artwork; default: artwork configured in setup */
-  char *gfx_new_identifier = artwork.gfx_current->identifier;
-  char *snd_new_identifier = artwork.snd_current->identifier;
-  char *mus_new_identifier = artwork.mus_current->identifier;
-  boolean redraw_screen = FALSE;
-
-  if (leveldir_current_identifier == NULL)
-    leveldir_current_identifier = leveldir_current->identifier;
-
-#if 0
-  printf("CURRENT GFX: '%s' ['%s']\n", artwork.gfx_current->identifier,
-	 leveldir_current->graphics_set);
-  printf("CURRENT LEV: '%s' / '%s'\n", leveldir_current_identifier,
-	 leveldir_current->identifier);
-#endif
-
-#if 0
-  printf("graphics --> '%s' ('%s')\n",
-	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
-  printf("sounds   --> '%s' ('%s')\n",
-	 artwork.snd_current_identifier, artwork.snd_current->filename);
-  printf("music    --> '%s' ('%s')\n",
-	 artwork.mus_current_identifier, artwork.mus_current->filename);
-#endif
-
-  /* leveldir_current may be invalid (level group, parent link) */
-  if (!validLevelSeries(leveldir_current))
-    return;
-
-  /* when a new level series was selected, check if there was a change
-     in custom artwork stored in level series directory */
-  if (leveldir_current_identifier != leveldir_current->identifier)
-  {
-    char *identifier_old = leveldir_current_identifier;
-    char *identifier_new = leveldir_current->identifier;
-
-    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
-	getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
-      gfx_new_identifier = identifier_new;
-    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
-	getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
-      snd_new_identifier = identifier_new;
-    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
-	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
-      mus_new_identifier = identifier_new;
-
-    leveldir_current_identifier = leveldir_current->identifier;
-  }
-
-  /* custom level artwork configured in level series configuration file
-     always overrides custom level artwork stored in level series directory
-     and (level independant) custom artwork configured in setup menue */
-  if (leveldir_current->graphics_set != NULL)
-    gfx_new_identifier = leveldir_current->graphics_set;
-  if (leveldir_current->sounds_set != NULL)
-    snd_new_identifier = leveldir_current->sounds_set;
-  if (leveldir_current->music_set != NULL)
-    mus_new_identifier = leveldir_current->music_set;
-
-  if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
-      last_override_level_graphics != setup.override_level_graphics)
-  {
-#if 0
-    printf("RELOADING GRAPHICS '%s' -> '%s' ('%s')\n",
-	   artwork.gfx_current_identifier,
-	   artwork.gfx_current->identifier,
-	   gfx_new_identifier);
-#endif
-
-    setLevelArtworkDir(artwork.gfx_first);
-
-    ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
-
-    InitImages();
-
-    FreeTileClipmasks();
-    InitTileClipmasks();
-
-    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
-    last_override_level_graphics = setup.override_level_graphics;
-
-    redraw_screen = TRUE;
-  }
-
-  if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
-      last_override_level_sounds != setup.override_level_sounds)
-  {
-#if 0
-    printf("RELOADING SOUNDS '%s' -> '%s' ('%s')\n",
-	   artwork.snd_current_identifier,
-	   artwork.snd_current->identifier,
-	   snd_new_identifier);
-#endif
-
-    /* set artwork path to send it to the sound server process */
-    setLevelArtworkDir(artwork.snd_first);
-
-    InitReloadCustomSounds(snd_new_identifier);
-    ReinitializeSounds();
-
-    artwork.snd_current_identifier = artwork.snd_current->identifier;
-    last_override_level_sounds = setup.override_level_sounds;
-
-    redraw_screen = TRUE;
-  }
-
-  if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
-      last_override_level_music != setup.override_level_music)
-  {
-    /* set artwork path to send it to the sound server process */
-    setLevelArtworkDir(artwork.mus_first);
-
-    InitReloadCustomMusic(mus_new_identifier);
-    ReinitializeMusic();
-
-    artwork.mus_current_identifier = artwork.mus_current->identifier;
-    last_override_level_music = setup.override_level_music;
-
-    redraw_screen = TRUE;
-  }
-
-  if (redraw_screen)
-  {
-    InitGfxBackground();
-
-    /* force redraw of (open or closed) door graphics */
-    SetDoorState(DOOR_OPEN_ALL);
-    CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
-  }
 }
 
 void FreeGadgets()
@@ -1518,6 +1011,39 @@ static void InitSoundInfo()
     }
   }
 #endif
+}
+
+static void ReinitializeGraphics()
+{
+  InitElementGraphicInfo();		/* element game graphic mapping */
+  InitElementSpecialGraphicInfo();	/* element special graphic mapping */
+  InitGraphicInfo();			/* graphic properties mapping */
+
+  InitElementSmallImages();		/* create editor and preview images */
+  InitFontGraphicInfo();		/* initialize text drawing functions */
+
+  SetMainBackgroundImage(IMG_BACKGROUND);
+  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
+
+  InitGadgets();
+  InitToons();
+}
+
+static void ReinitializeSounds()
+{
+  InitElementSoundInfo();	/* element game sound mapping */
+  InitSoundInfo();		/* sound properties mapping */
+
+#if 1
+  InitElementSoundInfo();	/* element game sound mapping */
+#endif
+
+  InitPlaySoundLevel();		/* internal game sound settings */
+}
+
+static void ReinitializeMusic()
+{
+  /* currently nothing to do */
 }
 
 void InitElementProperties()
@@ -2737,6 +2263,15 @@ void InitElementProperties()
     Properties1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
+static void InitGlobal()
+{
+  global.autoplay_leveldir = NULL;
+
+  global.frames_per_second = 0;
+  global.fps_slowdown = FALSE;
+  global.fps_slowdown_factor = 1;
+}
+
 void Execute_Command(char *command)
 {
   if (strcmp(command, "print graphicsinfo.conf") == 0)
@@ -2829,6 +2364,460 @@ void Execute_Command(char *command)
   {
     Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
   }
+}
+
+static void InitSetup()
+{
+  LoadSetup();					/* global setup info */
+
+  /* set some options from setup file */
+
+  if (setup.options.verbose)
+    options.verbose = TRUE;
+}
+
+static void InitPlayerInfo()
+{
+  int i;
+
+  /* choose default local player */
+  local_player = &stored_player[0];
+
+  for (i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].connected = FALSE;
+
+  local_player->connected = TRUE;
+}
+
+static void InitArtworkInfo()
+{
+  LoadArtworkInfo();
+}
+
+static char *get_element_class_token(int element)
+{
+  char *element_class_name = element_info[element].class_name;
+  char *element_class_token = checked_malloc(strlen(element_class_name) + 3);
+
+  sprintf(element_class_token, "[%s]", element_class_name);
+
+  return element_class_token;
+}
+
+static void InitArtworkConfig()
+{
+  static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
+  static char *sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS + 1];
+  static char *action_id_suffix[NUM_ACTIONS + 1];
+  static char *direction_id_suffix[NUM_DIRECTIONS + 1];
+  static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
+  static char *dummy[1] = { NULL };
+  static char *ignore_image_tokens[] =
+  {
+    "name",
+    "sort_priority",
+    "global.num_toons",
+    "menu.draw_xoffset",
+    "menu.draw_yoffset",
+    "menu.draw_xoffset.MAIN",
+    "menu.draw_yoffset.MAIN",
+    "door.step_offset",
+    "door.step_delay",
+    NULL
+  };
+  static char *ignore_sound_tokens[] =
+  {
+    "name",
+    "sort_priority",
+    NULL
+  };
+  int i;
+
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    image_id_prefix[i] = element_info[i].token_name;
+  for (i=0; i<NUM_FONTS; i++)
+    image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
+  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
+
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    sound_id_prefix[i] = element_info[i].token_name;
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    sound_id_prefix[MAX_NUM_ELEMENTS + i] = get_element_class_token(i);
+  sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS] = NULL;
+
+  for (i=0; i<NUM_ACTIONS; i++)
+    action_id_suffix[i] = element_action_info[i].suffix;
+  action_id_suffix[NUM_ACTIONS] = NULL;
+
+  for (i=0; i<NUM_DIRECTIONS; i++)
+    direction_id_suffix[i] = element_direction_info[i].suffix;
+  direction_id_suffix[NUM_DIRECTIONS] = NULL;
+
+  for (i=0; i<NUM_SPECIAL_GFX_ARGS; i++)
+    special_id_suffix[i] = special_suffix_info[i].suffix;
+  special_id_suffix[NUM_SPECIAL_GFX_ARGS] = NULL;
+
+  InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
+		image_id_prefix, action_id_suffix, direction_id_suffix,
+		special_id_suffix, ignore_image_tokens);
+  InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
+		sound_id_prefix, action_id_suffix, dummy,
+		dummy, ignore_sound_tokens);
+}
+
+static void InitMixer()
+{
+  OpenAudio();
+  StartMixer();
+}
+
+void InitGfx()
+{
+  char *filename_font_initial = NULL;
+  Bitmap *bitmap_font_initial = NULL;
+  int i, j;
+
+  /* determine settings for initial font (for displaying startup messages) */
+  for (i=0; image_config[i].token != NULL; i++)
+  {
+    for (j=0; j < NUM_INITIAL_FONTS; j++)
+    {
+      char font_token[128];
+      int len_font_token;
+
+      sprintf(font_token, "%s_%d", CONFIG_TOKEN_FONT_INITIAL, j + 1);
+      len_font_token = strlen(font_token);
+
+      if (strcmp(image_config[i].token, font_token) == 0)
+	filename_font_initial = image_config[i].value;
+      else if (strlen(image_config[i].token) > len_font_token &&
+	       strncmp(image_config[i].token, font_token, len_font_token) == 0)
+      {
+	if (strcmp(&image_config[i].token[len_font_token], ".x") == 0)
+	  font_initial[j].src_x = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token], ".y") == 0)
+	  font_initial[j].src_y = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token], ".width") == 0)
+	  font_initial[j].width = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token],".height") == 0)
+	  font_initial[j].height = atoi(image_config[i].value);
+      }
+    }
+  }
+
+  if (filename_font_initial == NULL)	/* should not happen */
+    Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
+
+  /* initialize screen properties */
+  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+
+  /* create additional image buffers for double-buffering */
+  bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+  bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+
+  bitmap_font_initial = LoadCustomImage(filename_font_initial);
+
+  for (j=0; j < NUM_INITIAL_FONTS; j++)
+    font_initial[j].bitmap = bitmap_font_initial;
+
+  InitFontGraphicInfo();
+
+  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
+  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
+
+  DrawInitText("Loading graphics:", 120, FC_GREEN);
+
+  InitTileClipmasks();
+}
+
+void InitGfxBackground()
+{
+  int x, y;
+
+  drawto = backbuffer;
+  fieldbuffer = bitmap_db_field;
+  SetDrawtoField(DRAW_BACKBUFFER);
+
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
+
+  for (x=0; x<MAX_BUF_XSIZE; x++)
+    for (y=0; y<MAX_BUF_YSIZE; y++)
+      redraw[x][y] = 0;
+  redraw_tiles = 0;
+  redraw_mask = REDRAW_ALL;
+}
+
+static void InitLevelInfo()
+{
+  LoadLevelInfo();				/* global level info */
+  LoadLevelSetup_LastSeries();			/* last played series info */
+  LoadLevelSetup_SeriesInfo();			/* last played level info */
+}
+
+void InitLevelArtworkInfo()
+{
+  LoadLevelArtworkInfo();
+}
+
+static void InitImages()
+{
+  ReloadCustomImages();
+
+  LoadCustomElementDescriptions();
+  LoadSpecialMenuDesignSettings();
+
+  ReinitializeGraphics();
+}
+
+static void InitSound()
+{
+  InitReloadCustomSounds(artwork.snd_current->identifier);
+  ReinitializeSounds();
+}
+
+static void InitMusic()
+{
+  InitReloadCustomMusic(artwork.mus_current->identifier);
+  ReinitializeMusic();
+}
+
+void InitNetworkServer()
+{
+#if defined(PLATFORM_UNIX)
+  int nr_wanted;
+#endif
+
+  if (!options.network)
+    return;
+
+#if defined(PLATFORM_UNIX)
+  nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
+
+  if (!ConnectToServer(options.server_host, options.server_port))
+    Error(ERR_EXIT, "cannot connect to network game server");
+
+  SendToServer_PlayerName(setup.player_name);
+  SendToServer_ProtocolVersion();
+
+  if (nr_wanted)
+    SendToServer_NrWanted(nr_wanted);
+#endif
+}
+
+void ReloadCustomArtwork()
+{
+  static char *leveldir_current_identifier = NULL;
+  static boolean last_override_level_graphics = FALSE;
+  static boolean last_override_level_sounds = FALSE;
+  static boolean last_override_level_music = FALSE;
+  /* identifier for new artwork; default: artwork configured in setup */
+  char *gfx_new_identifier = artwork.gfx_current->identifier;
+  char *snd_new_identifier = artwork.snd_current->identifier;
+  char *mus_new_identifier = artwork.mus_current->identifier;
+  boolean redraw_screen = FALSE;
+
+  if (leveldir_current_identifier == NULL)
+    leveldir_current_identifier = leveldir_current->identifier;
+
+#if 0
+  printf("CURRENT GFX: '%s' ['%s']\n", artwork.gfx_current->identifier,
+	 leveldir_current->graphics_set);
+  printf("CURRENT LEV: '%s' / '%s'\n", leveldir_current_identifier,
+	 leveldir_current->identifier);
+#endif
+
+#if 0
+  printf("graphics --> '%s' ('%s')\n",
+	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
+  printf("sounds   --> '%s' ('%s')\n",
+	 artwork.snd_current_identifier, artwork.snd_current->filename);
+  printf("music    --> '%s' ('%s')\n",
+	 artwork.mus_current_identifier, artwork.mus_current->filename);
+#endif
+
+  /* leveldir_current may be invalid (level group, parent link) */
+  if (!validLevelSeries(leveldir_current))
+    return;
+
+  /* when a new level series was selected, check if there was a change
+     in custom artwork stored in level series directory */
+  if (leveldir_current_identifier != leveldir_current->identifier)
+  {
+    char *identifier_old = leveldir_current_identifier;
+    char *identifier_new = leveldir_current->identifier;
+
+    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
+	getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
+      gfx_new_identifier = identifier_new;
+    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
+	getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
+      snd_new_identifier = identifier_new;
+    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
+	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
+      mus_new_identifier = identifier_new;
+
+    leveldir_current_identifier = leveldir_current->identifier;
+  }
+
+  /* custom level artwork configured in level series configuration file
+     always overrides custom level artwork stored in level series directory
+     and (level independant) custom artwork configured in setup menue */
+  if (leveldir_current->graphics_set != NULL)
+    gfx_new_identifier = leveldir_current->graphics_set;
+  if (leveldir_current->sounds_set != NULL)
+    snd_new_identifier = leveldir_current->sounds_set;
+  if (leveldir_current->music_set != NULL)
+    mus_new_identifier = leveldir_current->music_set;
+
+  if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
+      last_override_level_graphics != setup.override_level_graphics)
+  {
+#if 0
+    printf("RELOADING GRAPHICS '%s' -> '%s' ('%s')\n",
+	   artwork.gfx_current_identifier,
+	   artwork.gfx_current->identifier,
+	   gfx_new_identifier);
+#endif
+
+    setLevelArtworkDir(artwork.gfx_first);
+
+    ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+    InitImages();
+
+    FreeTileClipmasks();
+    InitTileClipmasks();
+
+    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
+    last_override_level_graphics = setup.override_level_graphics;
+
+    redraw_screen = TRUE;
+  }
+
+  if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
+      last_override_level_sounds != setup.override_level_sounds)
+  {
+#if 0
+    printf("RELOADING SOUNDS '%s' -> '%s' ('%s')\n",
+	   artwork.snd_current_identifier,
+	   artwork.snd_current->identifier,
+	   snd_new_identifier);
+#endif
+
+    /* set artwork path to send it to the sound server process */
+    setLevelArtworkDir(artwork.snd_first);
+
+    InitReloadCustomSounds(snd_new_identifier);
+    ReinitializeSounds();
+
+    artwork.snd_current_identifier = artwork.snd_current->identifier;
+    last_override_level_sounds = setup.override_level_sounds;
+
+    redraw_screen = TRUE;
+  }
+
+  if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
+      last_override_level_music != setup.override_level_music)
+  {
+    /* set artwork path to send it to the sound server process */
+    setLevelArtworkDir(artwork.mus_first);
+
+    InitReloadCustomMusic(mus_new_identifier);
+    ReinitializeMusic();
+
+    artwork.mus_current_identifier = artwork.mus_current->identifier;
+    last_override_level_music = setup.override_level_music;
+
+    redraw_screen = TRUE;
+  }
+
+  if (redraw_screen)
+  {
+    InitGfxBackground();
+
+    /* force redraw of (open or closed) door graphics */
+    SetDoorState(DOOR_OPEN_ALL);
+    CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
+  }
+}
+
+
+/* ========================================================================= */
+/* OpenAll()                                                                 */
+/* ========================================================================= */
+
+void OpenAll()
+{
+  InitGlobal();		/* initialize some global variables */
+
+  if (options.execute_command)
+    Execute_Command(options.execute_command);
+
+  if (options.serveronly)
+  {
+#if defined(PLATFORM_UNIX)
+    NetworkServer(options.server_port, options.serveronly);
+#else
+    Error(ERR_WARN, "networking only supported in Unix version");
+#endif
+    exit(0);	/* never reached */
+  }
+
+  InitProgramInfo(UNIX_USERDATA_DIRECTORY,
+		  PROGRAM_TITLE_STRING, getWindowTitleString(),
+		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
+		  MSDOS_POINTER_FILENAME,
+		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
+
+  InitSetup();
+
+  InitPlayerInfo();
+  InitArtworkInfo();		/* needed before loading gfx, sound & music */
+  InitArtworkConfig();		/* needed before forking sound child process */
+  InitMixer();
+
+  InitCounter();
+
+  InitJoysticks();
+  InitRND(NEW_RANDOMIZE);
+
+  InitVideoDisplay();
+  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
+		  setup.fullscreen);
+
+  InitEventFilter(FilterMouseMotionEvents);
+
+  InitElementProperties();
+
+  InitGfx();
+
+  InitLevelInfo();
+  InitLevelArtworkInfo();
+
+  InitImages();			/* needs to know current level directory */
+  InitSound();			/* needs to know current level directory */
+  InitMusic();			/* needs to know current level directory */
+
+  InitGfxBackground();
+
+  if (global.autoplay_leveldir)
+  {
+    AutoPlayTape();
+    return;
+  }
+
+  game_status = MAINMENU;
+
+  DrawMainMenu();
+
+  InitNetworkServer();
 }
 
 void CloseAllAndExit(int exit_value)

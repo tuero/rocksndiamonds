@@ -113,6 +113,7 @@ struct ConfigInfo sound_config[] =
   { "[quicksand].emptying",		UNDEFINED_FILENAME	},
   { "[exit].opening",			"oeffnen.wav"		},
   { "[exit].passing",			"buing.wav"		},
+  { "penguin.passing",			"buing.wav"		},
 
   /* sounds for Emerald Mine Club style elements and actions */
   { "balloon.moving",			UNDEFINED_FILENAME	},

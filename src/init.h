@@ -16,8 +16,9 @@
 
 #include "main.h"
 
-void OpenAll(void);
 void ReloadCustomArtwork();
+
+void OpenAll(void);
 void CloseAllAndExit(int);
 
 #endif

@@ -40,6 +40,8 @@ static int video_yoffset;
 
 inline void SDLInitVideoDisplay(void)
 {
+  putenv("SDL_VIDEO_CENTERED=1");
+
   /* initialize SDL video */
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_InitSubSystem() failed: %s", SDL_GetError());
@@ -1173,6 +1175,9 @@ Bitmap *SDLLoadImage(char *filename)
 
 inline void SDLOpenAudio(void)
 {
+  if (strcmp(setup.system.sdl_audiodriver, ARG_DEFAULT) != 0)
+    putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
+
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {
     Error(ERR_WARN, "SDL_InitSubSystem() failed: %s", SDL_GetError());
@@ -1181,7 +1186,7 @@ inline void SDLOpenAudio(void)
 
   if (Mix_OpenAudio(DEFAULT_AUDIO_SAMPLE_RATE, MIX_DEFAULT_FORMAT,
 		    AUDIO_NUM_CHANNELS_STEREO,
-		    DEFAULT_AUDIO_FRAGMENT_SIZE) < 0)
+		    setup.system.audio_fragment_size) < 0)
   {
     Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
     return;

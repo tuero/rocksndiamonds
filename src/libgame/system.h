@@ -156,6 +156,9 @@
 /* default value for undefined filename */
 #define UNDEFINED_FILENAME	"[NONE]"
 
+/* default value for undefined parameter */
+#define ARG_DEFAULT		"[DEFAULT]"
+
 /* default values for undefined configuration file parameters */
 #define ARG_UNDEFINED		"-1000000"
 #define ARG_UNDEFINED_VALUE	(atoi(ARG_UNDEFINED))
@@ -391,6 +394,12 @@ struct SetupShortcutInfo
   Key toggle_pause;
 };
 
+struct SetupSystemInfo
+{
+  char *sdl_audiodriver;
+  int audio_fragment_size;
+};
+
 struct SetupInfo
 {
   char *player_name;
@@ -423,6 +432,8 @@ struct SetupInfo
   struct SetupEditorInfo editor;
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
+  struct SetupSystemInfo system;
+  struct OptionInfo options;
 };
 
 #define TREE_TYPE_GENERIC		0

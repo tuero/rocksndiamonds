@@ -941,7 +941,7 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_ALL);
 
-  PlaySoundStereo(SND_GAME_STARTING, SOUND_MAX_RIGHT);
+  PlaySoundStereo(SND_GAME_STARTING, SOUND_MIDDLE);
   if (setup.sound_music)
     PlayMusic(level_nr);
 
@@ -1097,18 +1097,18 @@ void GameWon()
 
   local_player->LevelSolved = FALSE;
 
-  PlaySoundStereo(SND_GAME_WINNING, SOUND_MAX_RIGHT);
+  PlaySoundStereo(SND_GAME_WINNING, SOUND_MIDDLE);
 
   if (TimeLeft)
   {
     if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
+      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
 		   SND_CTRL_PLAY_LOOP);
 
     while (TimeLeft > 0)
     {
       if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
       if (TimeLeft > 0 && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimeLeft > 100 && !(TimeLeft % 10))
@@ -1128,13 +1128,13 @@ void GameWon()
   else if (level.time == 0)		/* level without time limit */
   {
     if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
+      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
 		   SND_CTRL_PLAY_LOOP);
 
     while (TimePlayed < 999)
     {
       if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
       if (TimePlayed < 999 && !(TimePlayed % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
@@ -3141,7 +3141,7 @@ void StartMoving(int x, int y)
 	Feld[x][y] = EL_EMPTY;
 	DrawLevelField(x, y);
 
-	PlaySoundLevel(newx, newy, SND_CLASS_EXIT_PASSING);
+	PlaySoundLevel(newx, newy, SND_PENGUIN_PASSING);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
 	  DrawGraphicThruMask(SCREENX(newx),SCREENY(newy), el2img(element), 0);
 
@@ -4879,7 +4879,7 @@ void GameActions()
       TimeLeft--;
 
       if (TimeLeft <= 10 && setup.time_limit)
-	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
 
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
 
@@ -5768,7 +5768,7 @@ int DigField(struct PlayerInfo *player,
 	TimeLeft += 10;
 	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       }
-      PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MAX_RIGHT);
+      PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MIDDLE);
       break;
 
     case EL_SHIELD_NORMAL:
@@ -6202,7 +6202,7 @@ int DigField(struct PlayerInfo *player,
       TimeLeft += 10;
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       DrawLevelField(x, y);
-      PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MAX_RIGHT);
+      PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MIDDLE);
       return MF_ACTION;
       break;
 

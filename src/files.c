@@ -1379,14 +1379,27 @@ void SaveScore(int level_nr)
 
 #define NUM_PLAYER_SETUP_TOKENS			16
 
+/* system setup */
+#define SETUP_TOKEN_SYSTEM_SDL_AUDIODRIVER	0
+#define SETUP_TOKEN_SYSTEM_AUDIO_FRAGMENT_SIZE	1
+
+#define NUM_SYSTEM_SETUP_TOKENS			2
+
+/* options setup */
+#define SETUP_TOKEN_OPTIONS_VERBOSE		0
+
+#define NUM_OPTIONS_SETUP_TOKENS		1
+
+
 static struct SetupInfo si;
 static struct SetupEditorInfo sei;
 static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
+static struct SetupSystemInfo syi;
+static struct OptionInfo soi;
 
 static struct TokenInfo global_setup_tokens[] =
 {
-  /* global setup */
   { TYPE_STRING, &si.player_name,	"player_name"			},
   { TYPE_SWITCH, &si.sound,		"sound"				},
   { TYPE_SWITCH, &si.sound_loops,	"repeating_sound_loops"		},
@@ -1413,7 +1426,6 @@ static struct TokenInfo global_setup_tokens[] =
 
 static struct TokenInfo editor_setup_tokens[] =
 {
-  /* shortcut setup */
   { TYPE_SWITCH, &sei.el_boulderdash,	"editor.el_boulderdash"		},
   { TYPE_SWITCH, &sei.el_emerald_mine,	"editor.el_emerald_mine"	},
   { TYPE_SWITCH, &sei.el_more,		"editor.el_more"		},
@@ -1427,7 +1439,6 @@ static struct TokenInfo editor_setup_tokens[] =
 
 static struct TokenInfo shortcut_setup_tokens[] =
 {
-  /* shortcut setup */
   { TYPE_KEY_X11, &ssi.save_game,	"shortcut.save_game"		},
   { TYPE_KEY_X11, &ssi.load_game,	"shortcut.load_game"		},
   { TYPE_KEY_X11, &ssi.toggle_pause,	"shortcut.toggle_pause"		}
@@ -1435,7 +1446,6 @@ static struct TokenInfo shortcut_setup_tokens[] =
 
 static struct TokenInfo player_setup_tokens[] =
 {
-  /* player setup */
   { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
   { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
   { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
@@ -1452,6 +1462,17 @@ static struct TokenInfo player_setup_tokens[] =
   { TYPE_KEY_X11, &sii.key.down,	".key.move_down"		},
   { TYPE_KEY_X11, &sii.key.snap,	".key.snap_field"		},
   { TYPE_KEY_X11, &sii.key.bomb,	".key.place_bomb"		}
+};
+
+static struct TokenInfo system_setup_tokens[] =
+{
+  { TYPE_STRING,  &syi.sdl_audiodriver,	"system.sdl_audiodriver"	},
+  { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	}
+};
+
+static struct TokenInfo options_setup_tokens[] =
+{
+  { TYPE_BOOLEAN, &soi.verbose,		"options.verbose"		}
 };
 
 static void setSetupInfoToDefaults(struct SetupInfo *si)
@@ -1518,6 +1539,11 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
     si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KSYM_UNDEFINED);
   }
+
+  si->system.sdl_audiodriver = getStringCopy(ARG_DEFAULT);
+  si->system.audio_fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
+
+  si->options.verbose = FALSE;
 }
 
 static void decodeSetupFileList(struct SetupFileList *setup_file_list)
@@ -1566,6 +1592,20 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
     }
     setup.input[pnr] = sii;
   }
+
+  /* system setup */
+  syi = setup.system;
+  for (i=0; i<NUM_SYSTEM_SETUP_TOKENS; i++)
+    setSetupInfo(system_setup_tokens, i,
+		 getTokenValue(setup_file_list, system_setup_tokens[i].text));
+  setup.system = syi;
+
+  /* options setup */
+  soi = setup.options;
+  for (i=0; i<NUM_OPTIONS_SETUP_TOKENS; i++)
+    setSetupInfo(options_setup_tokens, i,
+		 getTokenValue(setup_file_list, options_setup_tokens[i].text));
+  setup.options = soi;
 }
 
 void LoadSetup()
@@ -1657,6 +1697,18 @@ void SaveSetup()
     for (i=0; i<NUM_PLAYER_SETUP_TOKENS; i++)
       fprintf(file, "%s\n", getSetupLine(player_setup_tokens, prefix, i));
   }
+
+  /* system setup */
+  syi = setup.system;
+  fprintf(file, "\n");
+  for (i=0; i<NUM_SYSTEM_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(system_setup_tokens, "", i));
+
+  /* options setup */
+  soi = setup.options;
+  fprintf(file, "\n");
+  for (i=0; i<NUM_OPTIONS_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(options_setup_tokens, "", i));
 
   fclose(file);
 
