@@ -28,17 +28,6 @@ boolean CreateNewScoreFile(void);
 void LoadScore(int);
 void SaveScore(int);
 
-
-
-#if 0
-
-void LoadJoystickData(void);
-void SaveJoystickData(void);
-
-#endif
-
-
-
 int getLastPlayedLevelOfLevelSeries(char *);
 
 void LoadSetup(void);

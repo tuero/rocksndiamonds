@@ -467,105 +467,13 @@ void SaveScore(int level_nr)
   fclose(file);
 }
 
-
-
-#if 0
-
-void LoadJoystickData()
-{
-  int i;
-  char cookie[256];
-  FILE *file;
-
-  if (joystick_status==JOYSTICK_OFF)
-    return;
-
-#ifndef MSDOS
-  if (!(file=fopen(JOYDAT_FILE,"r")))
-    return;
-
-  fscanf(file,"%s",cookie);
-  if (strcmp(cookie,JOYSTICK_COOKIE))	/* ungültiges Format? */
-  {
-    Error(ERR_WARN, "wrong format of joystick file '%s'", JOYDAT_FILE);
-    fclose(file);
-    return;
-  }
-
-  for(i=0;i<2;i++)
-  {
-    fscanf(file,"%s",cookie);
-    fscanf(file, "%d %d %d \n",
-	   &joystick[i].xleft, &joystick[i].xmiddle, &joystick[i].xright);
-    fscanf(file, "%d %d %d \n",
-	   &joystick[i].yupper, &joystick[i].ymiddle, &joystick[i].ylower);
-  }
-  fclose(file);
-
-  CheckJoystickData();
-#else
-  load_joystick_data(JOYDAT_FILE);
-#endif
-}
-
-void SaveJoystickData()
-{
-  int i;
-  FILE *file;
-
-  if (joystick_status==JOYSTICK_OFF)
-    return;
-
-#ifndef MSDOS
-  CheckJoystickData();
-
-  if (!(file=fopen(JOYDAT_FILE,"w")))
-  {
-    Error(ERR_WARN, "cannot save joystick calibration data to file '%s'",
-	  JOYDAT_FILE);
-    return;
-  }
-
-  fprintf(file,"%s\n",JOYSTICK_COOKIE);	/* Formatkennung */
-  for(i=0;i<2;i++)
-  {
-    fprintf(file,"JOYSTICK_%d_DATA\n",i);
-    fprintf(file, "%d %d %d \n",
-	    joystick[i].xleft, joystick[i].xmiddle, joystick[i].xright);
-    fprintf(file, "%d %d %d \n",
-	    joystick[i].yupper, joystick[i].ymiddle, joystick[i].ylower);
-  }
-  fclose(file);
-
-  chmod(JOYDAT_FILE, JOYDAT_PERMS);
-#else
-  save_joystick_data(JOYDAT_FILE);
-#endif
-
-}
-
-#endif
-
-
-
-/* ------------------------------------------------------------------------- */
-/* new setup functions                                                       */
-/* ------------------------------------------------------------------------- */
-
 #define MAX_LINE_LEN			1000
-#define MAX_SETUP_TOKEN_LEN		100
-#define MAX_SETUP_VALUE_LEN		100
 
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
 #define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
-#define TOKEN_STR_ALIAS_NAME		"alias_name"
-
 #define TOKEN_STR_PLAYER_PREFIX		"player_"
-#define TOKEN_VALUE_POSITION		30
-#define TOKEN_INVALID			-1
-#define TOKEN_IGNORE			-99
 
-#define SETUP_TOKEN_ALIAS_NAME		100
+#define TOKEN_VALUE_POSITION		30
 
 #define SETUP_TOKEN_SOUND		0
 #define SETUP_TOKEN_SOUND_LOOPS		1
@@ -578,7 +486,7 @@ void SaveJoystickData()
 #define SETUP_TOKEN_FADING		8
 #define SETUP_TOKEN_AUTORECORD		9
 #define SETUP_TOKEN_QUICK_DOORS		10
-#define SETUP_TOKEN_ALIAS_NAMES		11
+#define SETUP_TOKEN_ALIAS_NAME		11
 
 #define SETUP_TOKEN_USE_JOYSTICK	12
 #define SETUP_TOKEN_JOY_DEVICE_NAME	13
@@ -600,7 +508,7 @@ void SaveJoystickData()
 #define NUM_SETUP_TOKENS		28
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_SOUND
-#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_ALIAS_NAMES
+#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_ALIAS_NAME
 
 #define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
 #define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
@@ -708,32 +616,6 @@ static boolean get_string_boolean_value(char *s)
     return FALSE;
 }
 
-
-
-#if 0
-
-static char *getSetupToken(int token_nr)
-{
-  return token_info[token_nr].text;
-}
-
-static char *getSetupValue(int token_nr, boolean token_value)
-{
-  return (token_value == TRUE ? "true" : "false");
-
-  /*
-  if (token_value == TRUE)
-    return token_info[token_nr].value_true;
-  else
-    return token_info[token_nr].value_false;
-  */
-
-}
-
-#endif
-
-
-
 static char *getFormattedSetupEntry(char *token, char *value)
 {
   int i;
@@ -748,55 +630,6 @@ static char *getFormattedSetupEntry(char *token, char *value)
 
   return entry;
 }
-
-
-
-#if 0
-
-static char *getSetupEntry(char *prefix, int token_nr, int token_value)
-{
-  int i;
-  static char entry[MAX_LINE_LEN];
-
-  sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
-  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
-    entry[i] = ' ';
-  entry[i] = '\0';
-
-  strcat(entry, getSetupValue(token_nr, token_value));
-
-  return entry;
-}
-
-static char *getSetupEntryWithComment(char *prefix,int token_nr, KeySym keysym)
-{
-  int i;
-  static char entry[MAX_LINE_LEN];
-  char *keyname = getKeyNameFromKeySym(keysym);
-
-  sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
-  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
-    entry[i] = ' ';
-  entry[i] = '\0';
-
-  strcat(entry, getX11KeyNameFromKeySym(keysym));
-  for (i=strlen(entry); i<50; i++)
-    entry[i] = ' ';
-  entry[i] = '\0';
-
-  /* add comment, if useful */
-  if (strcmp(keyname, "(undefined)") != 0 &&
-      strcmp(keyname, "(unknown)") != 0)
-  {
-    strcat(entry, "# ");
-    strcat(entry, keyname);
-  }
-
-  return entry;
-}
-
-#endif
-
 
 static void freeSetupFileList(struct SetupFileList *setup_file_list)
 {
@@ -827,8 +660,8 @@ static struct SetupFileList *newSetupFileList(char *token, char *value)
   return new;
 }
 
-static char *getSetupFileListEntry(struct SetupFileList *setup_file_list,
-				   char *token)
+static char *getTokenValue(struct SetupFileList *setup_file_list,
+			   char *token)
 {
   if (!setup_file_list)
     return NULL;
@@ -836,44 +669,25 @@ static char *getSetupFileListEntry(struct SetupFileList *setup_file_list,
   if (strcmp(setup_file_list->token, token) == 0)
     return setup_file_list->value;
   else
-    return getSetupFileListEntry(setup_file_list->next, token);
+    return getTokenValue(setup_file_list->next, token);
 }
 
-boolean setSetupFileListEntry(struct SetupFileList *setup_file_list,
-			      char *token, char *value)
+static void setTokenValue(struct SetupFileList *setup_file_list,
+			  char *token, char *value)
 {
   if (!setup_file_list)
-    return FALSE;
+    return;
 
   if (strcmp(setup_file_list->token, token) == 0)
   {
     free(setup_file_list->value);
     setup_file_list->value = checked_malloc(strlen(value) + 1);
     strcpy(setup_file_list->value, value);
-
-    return TRUE;
   }
+  else if (setup_file_list->next == NULL)
+    setup_file_list->next = newSetupFileList(token, value);
   else
-    return setSetupFileListEntry(setup_file_list->next, token, value);
-}
-
-void updateSetupFileListEntry(struct SetupFileList *setup_file_list,
-			      char *token, char *value)
-{
-  if (!setup_file_list)
-    return;
-
-  if (getSetupFileListEntry(setup_file_list, token) != NULL)
-    setSetupFileListEntry(setup_file_list, token, value);
-  else
-  {
-    struct SetupFileList *list_entry = setup_file_list;
-
-    while (list_entry->next)
-      list_entry = list_entry->next;
-
-    list_entry->next = newSetupFileList(token, value);
-  }
+    setTokenValue(setup_file_list->next, token, value);
 }
 
 #ifdef DEBUG
@@ -958,7 +772,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
 	break;
 
     if (*token && *value)
-      updateSetupFileListEntry(setup_file_list, token, value);
+      setTokenValue(setup_file_list, token, value);
   }
 
   fclose(file);
@@ -1001,155 +815,112 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
   }
 }
 
-static void decodeSetupFileList(struct SetupFileList *setup_file_list)
+static void setSetupInfoToDefaults(struct SetupInfo *si)
 {
   int i;
-  int token_nr = TOKEN_INVALID;
-  int player_nr = 0;
-  char *token;
-  char *token_value;
-  boolean token_boolean_value;
-  int token_integer_value;
-  int token_player_prefix_len;
+
+  si->sound = TRUE;
+  si->sound_loops = FALSE;
+  si->sound_music = FALSE;
+  si->sound_simple = FALSE;
+  si->toons = TRUE;
+  si->double_buffering = TRUE;
+  si->direct_draw = !si->double_buffering;
+  si->scroll_delay = FALSE;
+  si->soft_scrolling = TRUE;
+  si->fading = FALSE;
+  si->autorecord = FALSE;
+  si->quick_doors = FALSE;
+
+  strncpy(si->login_name, GetLoginName(), MAX_NAMELEN-1);
+  si->login_name[MAX_NAMELEN-1] = '\0';
+  strncpy(si->alias_name, GetLoginName(), MAX_NAMELEN-1);
+  si->alias_name[MAX_NAMELEN-1] = '\0';
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    si->input[i].use_joystick = FALSE;
+    strcpy(si->input[i].joy.device_name, joystick_device_name[i]);
+    si->input[i].joy.xleft   = JOYSTICK_XLEFT;
+    si->input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
+    si->input[i].joy.xright  = JOYSTICK_XRIGHT;
+    si->input[i].joy.yupper  = JOYSTICK_YUPPER;
+    si->input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
+    si->input[i].joy.ylower  = JOYSTICK_YLOWER;
+    si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
+    si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
+    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
+    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
+    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
+    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
+    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
+  }
+}
+
+static void setSetupInfo(int token_nr, char *token_value)
+{
+  int token_type = token_info[token_nr].type;
+  void *setup_value = token_info[token_nr].value;
+
+  if (token_value == NULL)
+    return;
+
+  /* set setup field to corresponding token value */
+  switch (token_type)
+  {
+    case TYPE_BOOLEAN:
+    case TYPE_SWITCH:
+      *(boolean *)setup_value = get_string_boolean_value(token_value);
+      break;
+
+    case TYPE_KEYSYM:
+      *(KeySym *)setup_value = getKeySymFromX11KeyName(token_value);
+      break;
+
+    case TYPE_INTEGER:
+      *(int *)setup_value = get_string_integer_value(token_value);
+      break;
+
+    case TYPE_STRING:
+      strcpy((char *)setup_value, token_value);
+      break;
+
+    default:
+      break;
+  }
+}
+
+static void decodeSetupFileList(struct SetupFileList *setup_file_list)
+{
+  int i, pnr;
 
   if (!setup_file_list)
     return;
 
-  token = setup_file_list->token;
-  token_value = setup_file_list->value;
-  token_boolean_value = get_string_boolean_value(token_value);
-  token_integer_value = get_string_integer_value(token_value);
+  /* handle global setup values */
+  si = setup;
+  for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
+    setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
+  setup = si;
 
-  token_player_prefix_len = strlen(TOKEN_STR_PLAYER_PREFIX);
-
-  if (strncmp(token, TOKEN_STR_PLAYER_PREFIX,
-	      token_player_prefix_len) == 0)
+  /* handle player specific setup values */
+  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
   {
-    token += token_player_prefix_len;
+    char prefix[30];
 
-    if (*token >= '0' && *token <= '9')
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
+
+    sii = setup.input[pnr];
+    for (i=FIRST_PLAYER_SETUP_TOKEN; i<=LAST_PLAYER_SETUP_TOKEN; i++)
     {
-      player_nr = ((int)(*token - '0') - 1 + MAX_PLAYERS) % MAX_PLAYERS;
-      token++;
+      char full_token[100];
+
+      sprintf(full_token, "%s%s", prefix, token_info[i].text);
+      setSetupInfo(i, getTokenValue(setup_file_list, full_token));
     }
+    setup.input[pnr] = sii;
   }
-
-  for (i=0; i<NUM_SETUP_TOKENS; i++)
-  {
-    if (strcmp(token, token_info[i].text) == 0)
-    {
-      token_nr = i;
-      break;
-    }
-  }
-
-  if (strcmp(token, TOKEN_STR_FILE_IDENTIFIER) == 0)
-    token_nr = TOKEN_IGNORE;
-  else if (strcmp(token, TOKEN_STR_ALIAS_NAME) == 0)
-    token_nr = SETUP_TOKEN_ALIAS_NAME;
-
-  switch (token_nr)
-  {
-    case SETUP_TOKEN_SOUND:
-      setup.sound = token_boolean_value;
-      break;
-    case SETUP_TOKEN_SOUND_LOOPS:
-      setup.sound_loops = token_boolean_value;
-      break;
-    case SETUP_TOKEN_SOUND_MUSIC:
-      setup.sound_music = token_boolean_value;
-      break;
-    case SETUP_TOKEN_SOUND_SIMPLE:
-      setup.sound_simple = token_boolean_value;
-      break;
-    case SETUP_TOKEN_TOONS:
-      setup.toons = token_boolean_value;
-      break;
-    case SETUP_TOKEN_DOUBLE_BUFFERING:
-      setup.double_buffering = token_boolean_value;
-      break;
-    case SETUP_TOKEN_SCROLL_DELAY:
-      setup.scroll_delay = token_boolean_value;
-      break;
-    case SETUP_TOKEN_SOFT_SCROLLING:
-      setup.soft_scrolling = token_boolean_value;
-      break;
-    case SETUP_TOKEN_FADING:
-      setup.fading = token_boolean_value;
-      break;
-    case SETUP_TOKEN_AUTORECORD:
-      setup.autorecord = token_boolean_value;
-      break;
-    case SETUP_TOKEN_QUICK_DOORS:
-      setup.quick_doors = token_boolean_value;
-      break;
-
-    case SETUP_TOKEN_ALIAS_NAME:
-      strncpy(setup.alias_name, token_value, MAX_NAMELEN-1);
-      setup.alias_name[MAX_NAMELEN-1] = '\0';
-      break;
-
-    case SETUP_TOKEN_USE_JOYSTICK:
-      setup.input[player_nr].use_joystick = token_boolean_value;
-      break;
-    case SETUP_TOKEN_JOY_DEVICE_NAME:
-      strncpy(setup.input[player_nr].joy.device_name, token_value,
-	      MAX_FILENAME_LEN-1);
-      setup.input[player_nr].joy.device_name[MAX_FILENAME_LEN-1] = '\0';
-      break;
-    case SETUP_TOKEN_JOY_SNAP:
-      setup.input[player_nr].joy.snap = getJoySymbolFromJoyName(token_value);
-      break;
-    case SETUP_TOKEN_JOY_XLEFT:
-      setup.input[player_nr].joy.xleft = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_XMIDDLE:
-      setup.input[player_nr].joy.xmiddle = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_XRIGHT:
-      setup.input[player_nr].joy.xright = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_YUPPER:
-      setup.input[player_nr].joy.yupper = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_YMIDDLE:
-      setup.input[player_nr].joy.ymiddle = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_YLOWER:
-      setup.input[player_nr].joy.ylower = token_integer_value;
-      break;
-    case SETUP_TOKEN_JOY_BOMB:
-      setup.input[player_nr].joy.bomb = getJoySymbolFromJoyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_LEFT:
-      setup.input[player_nr].key.left = getKeySymFromX11KeyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_RIGHT:
-      setup.input[player_nr].key.right = getKeySymFromX11KeyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_UP:
-      setup.input[player_nr].key.up = getKeySymFromX11KeyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_DOWN:
-      setup.input[player_nr].key.down = getKeySymFromX11KeyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_SNAP:
-      setup.input[player_nr].key.snap = getKeySymFromX11KeyName(token_value);
-      break;
-    case SETUP_TOKEN_KEY_BOMB:
-      setup.input[player_nr].key.bomb = getKeySymFromX11KeyName(token_value);
-      break;
-
-    case TOKEN_INVALID:
-      Error(ERR_WARN, "unknown token '%s' not recognized", token);
-      break;
-
-    case TOKEN_IGNORE:
-    default:
-      break;
-  }
-
-  decodeSetupFileList(setup_file_list->next);
 }
 
 int getLevelSeriesNrFromLevelSeriesName(char *level_series_name)
@@ -1175,7 +946,7 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
   if (!level_series_name)
     return 0;
 
-  token_value = getSetupFileListEntry(level_setup_list, level_series_name);
+  token_value = getTokenValue(level_setup_list, level_series_name);
 
   if (token_value)
   {
@@ -1194,49 +965,11 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
 
 void LoadSetup()
 {
-  int i;
   char filename[MAX_FILENAME_LEN];
   struct SetupFileList *setup_file_list = NULL;
 
   /* always start with reliable default setup values */
-
-  setup.sound = TRUE;
-  setup.sound_loops = FALSE;
-  setup.sound_music = FALSE;
-  setup.sound_simple = FALSE;
-  setup.toons = TRUE;
-  setup.double_buffering = TRUE;
-  setup.direct_draw = !setup.double_buffering;
-  setup.scroll_delay = FALSE;
-  setup.soft_scrolling = TRUE;
-  setup.fading = FALSE;
-  setup.autorecord = FALSE;
-  setup.quick_doors = FALSE;
-
-  strncpy(setup.login_name, GetLoginName(), MAX_NAMELEN-1);
-  setup.login_name[MAX_NAMELEN-1] = '\0';
-  strncpy(setup.alias_name, GetLoginName(), MAX_NAMELEN-1);
-  setup.alias_name[MAX_NAMELEN-1] = '\0';
-
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    setup.input[i].use_joystick = FALSE;
-    strcpy(setup.input[i].joy.device_name, joystick_device_name[i]);
-    setup.input[i].joy.xleft   = JOYSTICK_XLEFT;
-    setup.input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
-    setup.input[i].joy.xright  = JOYSTICK_XRIGHT;
-    setup.input[i].joy.yupper  = JOYSTICK_YUPPER;
-    setup.input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
-    setup.input[i].joy.ylower  = JOYSTICK_YLOWER;
-    setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
-    setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-    setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
-    setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
-    setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
-    setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
-    setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
-    setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
-  }
+  setSetupInfoToDefaults(&setup);
 
   sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
 
@@ -1244,11 +977,6 @@ void LoadSetup()
 
   if (setup_file_list)
   {
-
-#if 0
-    printSetupFileList(setup_file_list);
-#endif
-
     checkSetupFileListIdentifier(setup_file_list, SETUP_COOKIE);
     decodeSetupFileList(setup_file_list);
 
@@ -1260,144 +988,12 @@ void LoadSetup()
     Error(ERR_WARN, "using default setup values");
 }
 
-
-#if 0
-
-void SaveSetup()
-{
-  int i;
-  char filename[MAX_FILENAME_LEN];
-  FILE *file;
-
-  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
-
-  if (!(file = fopen(filename, "w")))
-  {
-    Error(ERR_WARN, "cannot write setup file '%s'", filename);
-    return;
-  }
-
-  fprintf(file, "%s:              %s\n",
-	  TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE);
-
-  fprintf(file, "\n");
-
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SOUND,
-			setup.sound));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SOUND_LOOPS,
-			setup.sound_loops));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SOUND_MUSIC,
-			setup.sound_music));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SOUND_SIMPLE,
-			setup.sound_simple));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_TOONS,
-			setup.toons));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_DIRECT_DRAW,
-			setup.direct_draw));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SCROLL_DELAY,
-			setup.scroll_delay));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_SOFT_SCROLLING,
-			setup.soft_scrolling));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_FADING,
-			setup.fading));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_AUTORECORD,
-			setup.autorecord));
-  fprintf(file, "%s\n",
-	  getSetupEntry("", SETUP_TOKEN_QUICK_DOORS,
-			setup.quick_doors));
-
-  fprintf(file, "\n");
-
-  fprintf(file, "%s\n",
-	  getFormattedSetupEntry(TOKEN_STR_ALIAS_NAME,
-				 setup.alias_name));
-
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    char prefix[30];
-
-    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, i + 1);
-
-    fprintf(file, "\n");
-
-    fprintf(file, "%s\n",
-	    getSetupEntry(prefix, SETUP_TOKEN_USE_JOYSTICK,
-			  setup.input[i].use_joystick));
-
-    fprintf(file, "%s%s:      %s\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_DEVICE_NAME),
-	    setup.input[i].joy.device_name);
-
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_XLEFT),
-	    setup.input[i].joy.xleft);
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_XMIDDLE),
-	    setup.input[i].joy.xmiddle);
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_XRIGHT),
-	    setup.input[i].joy.xright);
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_YUPPER),
-	    setup.input[i].joy.yupper);
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_YMIDDLE),
-	    setup.input[i].joy.ymiddle);
-    fprintf(file, "%s%s:      %d\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_YLOWER),
-	    setup.input[i].joy.ylower);
-    fprintf(file, "%s%s:      %s\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_SNAP),
-	    getJoyNameFromJoySymbol(setup.input[i].joy.snap));
-    fprintf(file, "%s%s:      %s\n", prefix,
-	    getSetupToken(SETUP_TOKEN_JOY_BOMB),
-	    getJoyNameFromJoySymbol(setup.input[i].joy.bomb));
-
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_LEFT,
-				     setup.input[i].key.left));
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_RIGHT,
-				     setup.input[i].key.right));
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_UP,
-				     setup.input[i].key.up));
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_DOWN,
-				     setup.input[i].key.down));
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_SNAP,
-				     setup.input[i].key.snap));
-    fprintf(file, "%s\n",
-	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_BOMB,
-				     setup.input[i].key.bomb));
-  }
-
-  fclose(file);
-
-  chmod(filename, SETUP_PERMS);
-}
-
-#endif
-
-
-
 static char *getSetupLine(char *prefix, int token_nr)
 {
   int i;
   static char entry[MAX_LINE_LEN];
   int token_type = token_info[token_nr].type;
-  void *token_value = token_info[token_nr].value;
+  void *setup_value = token_info[token_nr].value;
   char *token_text = token_info[token_nr].text;
 
   /* start with the prefix, token and some spaces to format output line */
@@ -1409,16 +1005,16 @@ static char *getSetupLine(char *prefix, int token_nr)
   switch (token_type)
   {
     case TYPE_BOOLEAN:
-      strcat(entry, (*(boolean *)token_value ? "true" : "false"));
+      strcat(entry, (*(boolean *)setup_value ? "true" : "false"));
       break;
 
     case TYPE_SWITCH:
-      strcat(entry, (*(boolean *)token_value ? "on" : "off"));
+      strcat(entry, (*(boolean *)setup_value ? "on" : "off"));
       break;
 
     case TYPE_KEYSYM:
       {
-	KeySym keysym = *(KeySym *)token_value;
+	KeySym keysym = *(KeySym *)setup_value;
 	char *keyname = getKeyNameFromKeySym(keysym);
 
 	strcat(entry, getX11KeyNameFromKeySym(keysym));
@@ -1439,13 +1035,13 @@ static char *getSetupLine(char *prefix, int token_nr)
       {
 	char buffer[MAX_LINE_LEN];
 
-	sprintf(buffer, "%d", *(int *)token_value);
+	sprintf(buffer, "%d", *(int *)setup_value);
 	strcat(entry, buffer);
       }
       break;
 
     case TYPE_STRING:
-      strcat(entry, *(char **)token_value);
+      strcat(entry, (char *)setup_value);
       break;
 
     default:
@@ -1469,26 +1065,32 @@ void SaveSetup()
     return;
   }
 
-  fprintf(file, "%s:              %s\n",
-	  TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE);
-
+  fprintf(file, "%s\n",
+	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE));
   fprintf(file, "\n");
 
+  /* handle global setup values */
+  si = setup;
   for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
-    fprintf(file, "%s\n", getSetupLine("", i));
+  {
+    /* just to make things nicer :) */
+    if (i == SETUP_TOKEN_ALIAS_NAME)
+      fprintf(file, "\n");
 
+    fprintf(file, "%s\n", getSetupLine("", i));
+  }
+
+  /* handle player specific setup values */
   for (pnr=0; pnr<MAX_PLAYERS; pnr++)
   {
     char prefix[30];
 
-    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, i + 1);
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
     fprintf(file, "\n");
 
+    sii = setup.input[pnr];
     for (i=FIRST_PLAYER_SETUP_TOKEN; i<=LAST_PLAYER_SETUP_TOKEN; i++)
-    {
-      sii = setup.input[pnr];
       fprintf(file, "%s\n", getSetupLine(prefix, i));
-    }
   }
 
   fclose(file);
@@ -1515,14 +1117,10 @@ void LoadLevelSetup()
   if (level_setup_list)
   {
     char *last_level_series =
-      getSetupFileListEntry(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
+      getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
     leveldir_nr = getLevelSeriesNrFromLevelSeriesName(last_level_series);
     level_nr = getLastPlayedLevelOfLevelSeries(last_level_series);
-
-#if 0
-    printSetupFileList(level_setup_list);
-#endif
 
     checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
   }
@@ -1536,13 +1134,11 @@ void SaveLevelSetup()
   struct SetupFileList *list_entry = level_setup_list;
   FILE *file;
 
-  updateSetupFileListEntry(level_setup_list,
-			   TOKEN_STR_LAST_LEVEL_SERIES,
-			   leveldir[leveldir_nr].filename);
+  setTokenValue(level_setup_list,
+		TOKEN_STR_LAST_LEVEL_SERIES, leveldir[leveldir_nr].filename);
 
-  updateSetupFileListEntry(level_setup_list,
-			   leveldir[leveldir_nr].filename,
-			   int2str(level_nr, 0));
+  setTokenValue(level_setup_list,
+		leveldir[leveldir_nr].filename, int2str(level_nr, 0));
 
   sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
 
