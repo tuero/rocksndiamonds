@@ -3596,10 +3596,181 @@ static void DrawPropertiesMain()
   }
 }
 
+char *getElementDescriptionFilename(int element)
+{
+  char *docs_dir = options.docs_directory;
+  char *elements_subdir = "elements";
+  static char *filename = NULL;
+  char basename[MAX_FILENAME_LEN];
+
+  if (filename != NULL)
+    free(filename);
+
+  /* 1st try: look for element description file for exactly this element */
+  sprintf(basename, "%s.txt", element_info[element].token_name);
+  filename = getPath3(docs_dir, elements_subdir, basename);
+  if (fileExists(filename))
+    return filename;
+
+  free(filename);
+
+  /* 2nd try: look for element description file for this element's class */
+  sprintf(basename, "%s.txt", element_info[element].class_name);
+  filename = getPath3(docs_dir, elements_subdir, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;
+}
+
+static int PrintElementDescriptionFromFile(char *filename)
+{
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int pad_x = ED_SETTINGS_XPOS;
+  int pad_y = 5 * TILEY;
+  int sx = SX + pad_x;
+  int sy = SY + pad_y;
+  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
+  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+  int screen_line_nr = 0;
+  char line[MAX_LINE_LEN];
+  char buffer[max_chars_per_line + 1];
+  int buffer_len;
+  FILE *file;
+
+  if (filename == NULL)
+    return 0;
+
+  if (!(file = fopen(filename, MODE_READ)))
+    return 0;
+
+  buffer[0] = '\0';
+  buffer_len = 0;
+
+  while(!feof(file))
+  {
+    char *line_ptr, *word_ptr;
+    boolean last_line_was_empty = TRUE;
+
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* skip comments (lines directly beginning with '#') */
+    if (line[0] == '#')
+      continue;
+
+    /* cut trailing newline from input line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == '\n' || *line_ptr == '\r')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    if (strlen(line) == 0)		/* special case: force empty line */
+      strcpy(line, "\n");
+
+    word_ptr = line;
+
+    while (*word_ptr)
+    {
+      boolean print_buffer = FALSE;
+      int word_len;
+
+      /* skip leading whitespaces */
+      while (*word_ptr == ' ' || *word_ptr == '\t')
+	word_ptr++;
+
+      line_ptr = word_ptr;
+      word_len = 0;
+
+      /* look for end of next word */
+      while (*line_ptr != ' ' && *line_ptr != '\t' && *line_ptr != '\0')
+      {
+	line_ptr++;
+	word_len++;
+      }
+
+      if (word_len == 0)
+      {
+	continue;
+      }
+      else if (*word_ptr == '\n')	/* special case: force empty line */
+      {
+	if (buffer_len == 0)
+	  word_ptr++;
+
+	/* prevent printing of multiple empty lines */
+	if (buffer_len > 0 || !last_line_was_empty)
+	  print_buffer = TRUE;
+      }
+      else if (word_len < max_chars_per_line - buffer_len)
+      {
+	/* word fits into text buffer -- add word */
+
+	if (buffer_len > 0)
+	  buffer[buffer_len++] = ' ';
+
+	strncpy(&buffer[buffer_len], word_ptr, word_len);
+	buffer_len += word_len;
+	buffer[buffer_len] = '\0';
+	word_ptr += word_len;
+      }
+      else if (buffer_len > 0)
+      {
+	/* not enough space left for word in text buffer -- print buffer */
+
+	print_buffer = TRUE;
+      }
+      else
+      {
+	/* word does not fit at all into empty text buffer -- cut word */
+
+	strncpy(buffer, word_ptr, max_chars_per_line);
+	buffer[max_chars_per_line] = '\0';
+	word_ptr += max_chars_per_line;
+	print_buffer = TRUE;
+      }
+
+      if (print_buffer)
+      {
+	DrawText(sx, sy + screen_line_nr * font_height, buffer, FONT_TEXT_2);
+
+	last_line_was_empty = (buffer_len == 0);
+
+	buffer[0] = '\0';
+	buffer_len = 0;
+	print_buffer = FALSE;
+
+	if (++screen_line_nr >= max_lines_per_screen)
+	  return screen_line_nr;	/* currently too much text gets cut */
+      }
+    }
+  }
+
+  if (buffer_len > 0)
+  {
+    DrawText(sx, sy + screen_line_nr * font_height, buffer, FONT_TEXT_2);
+    screen_line_nr++;
+  }
+
+  fclose(file);
+
+  return screen_line_nr;
+}
+
 static void DrawPropertiesInfo()
 {
-  DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY, "No description available.",
-	   FONT_TEXT_1);
+  char *filename = getElementDescriptionFilename(properties_element);
+
+  if (PrintElementDescriptionFromFile(filename) == 0)
+    DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY,
+	     "No description available.", FONT_TEXT_1);
 }
 
 static void DrawPropertiesAdvanced()

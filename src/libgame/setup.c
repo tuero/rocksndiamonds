@@ -437,15 +437,6 @@ static char *getCorrectedImageBasename(char *basename)
   return basename_corrected;
 }
 
-static boolean fileExists(char *filename)
-{
-#if 0
-  printf("checking file '%s'\n", filename);
-#endif
-
-  return (access(filename, F_OK) == 0);
-}
-
 char *getCustomImageFilename(char *basename)
 {
   static char *filename = NULL;
@@ -1124,7 +1115,6 @@ struct SetupFileList *loadSetupFileList(char *filename)
   char *token, *value, *line_ptr;
   struct SetupFileList *setup_file_list = newSetupFileList("", "");
   struct SetupFileList *first_valid_list_entry;
-
   FILE *file;
 
   if (!(file = fopen(filename, MODE_READ)))

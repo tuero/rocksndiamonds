@@ -573,6 +573,7 @@ void GetOptions(char *argv[])
   options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
   options.sounds_directory = RO_BASE_PATH "/" SOUNDS_DIRECTORY;
   options.music_directory = RO_BASE_PATH "/" MUSIC_DIRECTORY;
+  options.docs_directory = RO_BASE_PATH "/" DOCS_DIRECTORY;
   options.execute_command = NULL;
   options.serveronly = FALSE;
   options.network = FALSE;
@@ -1500,8 +1501,17 @@ void dumpList(ListNode *node_first)
 
 
 /* ------------------------------------------------------------------------- */
-/* functions for checking filenames                                          */
+/* functions for checking files and filenames                                */
 /* ------------------------------------------------------------------------- */
+
+boolean fileExists(char *filename)
+{
+#if 0
+  printf("checking file '%s'\n", filename);
+#endif
+
+  return (access(filename, F_OK) == 0);
+}
 
 boolean FileIsGraphic(char *filename)
 {

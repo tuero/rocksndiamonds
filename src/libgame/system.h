@@ -193,6 +193,7 @@
 #define LEVELS_DIRECTORY	"levels"
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
+#define DOCS_DIRECTORY		"docs"
 
 #if !defined(PLATFORM_MSDOS)
 #define GRAPHICS_SUBDIR		"gfx_classic"
@@ -279,6 +280,7 @@ struct OptionInfo
   char *graphics_directory;
   char *sounds_directory;
   char *music_directory;
+  char *docs_directory;
   char *execute_command;
 
   boolean serveronly;

@@ -151,6 +151,7 @@ void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
 ListNode *getNodeFromKey(ListNode *, char *);
 int getNumNodes(ListNode *);
 
+boolean fileExists(char *);
 boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
