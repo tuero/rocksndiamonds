@@ -1007,16 +1007,16 @@ static struct LevelDirInfo ldi;
 static struct TokenInfo levelinfo_tokens[] =
 {
   /* level directory info */
-  { TYPE_STRING,  &ldi.name,		"name"				},
-  { TYPE_STRING,  &ldi.name_short,	"name_short"			},
-  { TYPE_STRING,  &ldi.name_sorting,	"name_sorting"			},
-  { TYPE_STRING,  &ldi.author,		"author"			},
-  { TYPE_STRING,  &ldi.imported_from,	"imported_from"			},
-  { TYPE_INTEGER, &ldi.levels,		"levels"			},
-  { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
-  { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
-  { TYPE_BOOLEAN, &ldi.level_group,	"level_group"			},
-  { TYPE_BOOLEAN, &ldi.readonly,	"readonly"			}
+  { TYPE_STRING,  &ldi.name,		"name"		},
+  { TYPE_STRING,  &ldi.name_short,	"name_short"	},
+  { TYPE_STRING,  &ldi.name_sorting,	"name_sorting"	},
+  { TYPE_STRING,  &ldi.author,		"author"	},
+  { TYPE_STRING,  &ldi.imported_from,	"imported_from"	},
+  { TYPE_INTEGER, &ldi.levels,		"levels"	},
+  { TYPE_INTEGER, &ldi.first_level,	"first_level"	},
+  { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"	},
+  { TYPE_BOOLEAN, &ldi.level_group,	"level_group"	},
+  { TYPE_BOOLEAN, &ldi.readonly,	"readonly"	}
 };
 
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
@@ -1384,6 +1384,44 @@ static void SaveUserLevelInfo()
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
+char *getSetupValue(int type, void *value)
+{
+  static char value_string[MAX_LINE_LEN];
+
+  switch (type)
+  {
+    case TYPE_BOOLEAN:
+      strcpy(value_string, (*(boolean *)value ? "true" : "false"));
+      break;
+
+    case TYPE_SWITCH:
+      strcpy(value_string, (*(boolean *)value ? "on" : "off"));
+      break;
+
+    case TYPE_YES_NO:
+      strcpy(value_string, (*(boolean *)value ? "yes" : "no"));
+      break;
+
+    case TYPE_KEY:
+      strcpy(value_string, getX11KeyNameFromKey(*(Key *)value));
+      break;
+
+    case TYPE_INTEGER:
+      sprintf(value_string, "%d", *(int *)value);
+      break;
+
+    case TYPE_STRING:
+      strcpy(value_string, *(char **)value);
+      break;
+
+    default:
+      value_string[0] = '\0';
+      break;
+  }
+
+  return value_string;
+}
+
 char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 {
   int i;
@@ -1391,6 +1429,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
   int token_type = token_info[token_nr].type;
   void *setup_value = token_info[token_nr].value;
   char *token_text = token_info[token_nr].text;
+  char *value_string = getSetupValue(token_type, setup_value);
 
   /* start with the prefix, token and some spaces to format output line */
   sprintf(entry, "%s%s:", prefix, token_text);
@@ -1398,50 +1437,23 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
     strcat(entry, " ");
 
   /* continue with the token's value (which can have different types) */
-  switch (token_type)
+  strcat(entry, value_string);
+
+  if (token_type == TYPE_KEY)
   {
-    case TYPE_BOOLEAN:
-      strcat(entry, (*(boolean *)setup_value ? "true" : "false"));
-      break;
+    Key key = *(Key *)setup_value;
+    char *keyname = getKeyNameFromKey(key);
 
-    case TYPE_SWITCH:
-      strcat(entry, (*(boolean *)setup_value ? "on" : "off"));
-      break;
+    /* add comment, if useful */
+    if (strcmp(keyname, "(undefined)") != 0 &&
+	strcmp(keyname, "(unknown)") != 0)
+    {
+      for (i=strlen(entry); i<50; i++)
+	strcat(entry, " ");
 
-    case TYPE_KEY:
-      {
-	Key key = *(Key *)setup_value;
-	char *keyname = getKeyNameFromKey(key);
-
-	strcat(entry, getX11KeyNameFromKey(key));
-	for (i=strlen(entry); i<50; i++)
-	  strcat(entry, " ");
-
-	/* add comment, if useful */
-	if (strcmp(keyname, "(undefined)") != 0 &&
-	    strcmp(keyname, "(unknown)") != 0)
-	{
-	  strcat(entry, "# ");
-	  strcat(entry, keyname);
-	}
-      }
-      break;
-
-    case TYPE_INTEGER:
-      {
-	char buffer[MAX_LINE_LEN];
-
-	sprintf(buffer, "%d", *(int *)setup_value);
-	strcat(entry, buffer);
-      }
-      break;
-
-    case TYPE_STRING:
-      strcat(entry, *(char **)setup_value);
-      break;
-
-    default:
-      break;
+      strcat(entry, "# ");
+      strcat(entry, keyname);
+    }
   }
 
   return entry;

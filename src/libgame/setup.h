@@ -18,12 +18,26 @@
 
 
 /* values for setup file handling */
-#define TYPE_BOOLEAN			1
-#define TYPE_SWITCH			2
-#define TYPE_KEY			3
-#define TYPE_INTEGER			4
-#define TYPE_STRING			5
+#define TYPE_BOOLEAN			(1 << 0)
+#define TYPE_SWITCH			(1 << 1)
+#define TYPE_YES_NO			(1 << 2)
+#define TYPE_KEY			(1 << 3)
+#define TYPE_INTEGER			(1 << 4)
+#define TYPE_STRING			(1 << 5)
 
+#define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
+					 TYPE_SWITCH  | \
+					 TYPE_YES_NO)
+
+/* additional values for setup screen */
+#define TYPE_ENTER_MENU			(1 << 6)
+#define TYPE_LEAVE_MENU			(1 << 7)
+#define TYPE_EMPTY			(1 << 8)
+#define TYPE_GHOSTED			(1 << 9)
+
+#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_MENU | TYPE_LEAVE_MENU)
+
+/* cookie token for file identifier and version number */
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
 
 /* structures for setup file handling */
@@ -111,6 +125,7 @@ char *getTapeFilename(int);
 char *getScoreFilename(int);
 char *getSetupFilename(void);
 char *getImageFilename(char *);
+char *getCustomImageFilename(char *);
 
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);
@@ -150,6 +165,7 @@ char *getTokenValue(struct SetupFileList *, char *);
 struct SetupFileList *loadSetupFileList(char *);
 void checkSetupFileListIdentifier(struct SetupFileList *, char *);
 void setSetupInfo(struct TokenInfo *, int, char *);
+char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);
 
 void LoadLevelInfo(void);

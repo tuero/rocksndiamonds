@@ -173,10 +173,10 @@ void GetPlayerConfig()
     setup.sound = FALSE;
 
   if (!audio.loops_available)
-  {
     setup.sound_loops = FALSE;
+
+  if (!audio.music_available)
     setup.sound_music = FALSE;
-  }
 
   if (!video.fullscreen_available)
     setup.fullscreen = FALSE;
@@ -6515,7 +6515,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 	setup.sound_music = FALSE;
 	FadeMusic();
       }
-      else if (audio.loops_available)
+      else if (audio.music_available)
       { 
 	setup.sound = setup.sound_music = TRUE;
 	if (num_bg_loops)
