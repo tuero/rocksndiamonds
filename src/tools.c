@@ -1702,8 +1702,13 @@ void DrawEnvelopeBackground(int envelope_nr, int startx, int starty,
 void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
+#if 1
+  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
+  int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
+#else
   boolean draw_masked = graphic_info[graphic].draw_masked;
   int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
+#endif
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   unsigned long anim_delay = 0;

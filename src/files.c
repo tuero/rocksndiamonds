@@ -1888,6 +1888,17 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
 	  level->field[x][y] <= EL_SP_GRAVITY_PORT_UP)
 	level->field[x][y] += EL_SP_PORT_RIGHT - EL_SP_GRAVITY_PORT_RIGHT;
 
+  /* auto-determine number of infotrons if it was stored as "0" -- see above */
+  if (level->gems_needed == 0)
+  {
+    for (y = 0; y < SP_LEVEL_YSIZE; y++)
+      for (x = 0; x < SP_LEVEL_XSIZE; x++)
+	if (level->field[x][y] == EL_SP_INFOTRON)
+	  level->gems_needed++;
+
+    level->gems_needed &= 0xff;		/* only use low byte -- see above */
+  }
+
   level->fieldx = SP_LEVEL_XSIZE;
   level->fieldy = SP_LEVEL_YSIZE;
 
