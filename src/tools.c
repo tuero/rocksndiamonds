@@ -770,7 +770,8 @@ void DrawPlayer(struct PlayerInfo *player)
 
 void DrawGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
 {
-  if (IN_SCR_FIELD(x, y))
+  if (IN_SCR_FIELD(x, y) &&
+      (FrameCounter % new_graphic_info[graphic].anim_delay) == 0)
   {
     int frame = getGraphicAnimationFrame(graphic, -1);
 
