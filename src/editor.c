@@ -3336,7 +3336,6 @@ static void DrawCustomChangedArea()
   int area_y = ypos / MINI_TILEY;
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
-  int i = properties_element - EL_CUSTOM_START;
 
   if (!IS_CUSTOM_ELEMENT(properties_element))
   {
@@ -3346,7 +3345,7 @@ static void DrawCustomChangedArea()
     return;
   }
 
-  ElementContent[0][0][0] = level.custom_element[i].change.successor;
+  ElementContent[0][0][0] = custom_element_change.successor;
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
@@ -4756,7 +4755,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	{
 	  int i = properties_element - EL_CUSTOM_START;
 
-	  level.custom_element[i].change.successor = new_element;
+	  custom_element_change.successor = new_element;
+	  level.custom_element[i].change = custom_element_change;
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;

@@ -698,7 +698,7 @@ static void InitGameEngine()
 
     changing_element[element].base_element = element;
     changing_element[element].next_element = change->successor;
-    changing_element[i].change_delay = 0;
+    changing_element[element].change_delay = 0;
 
     if (HAS_CHANGE_EVENT(element, CE_DELAY_FIXED))
       changing_element[element].change_delay +=
@@ -4593,6 +4593,11 @@ static void ChangeElement(int x, int y)
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
+#if 1
+    InitField(x, y, FALSE);
+    if (CAN_MOVE(element))
+      InitMovDir(x, y);
+#endif
     DrawLevelField(x, y);
 
     if (changing_element[element].post_change_function)
@@ -4796,6 +4801,15 @@ void GameActions()
     element = Feld[x][y];
     graphic = el2img(element);
 
+#if 0
+    if (element == -1)
+    {
+      printf("::: %d,%d: %d [%d]\n", x, y, element, FrameCounter);
+
+      element = graphic = 0;
+    }
+#endif
+
     if (graphic_info[graphic].anim_global_sync)
       GfxFrame[x][y] = FrameCounter;
 
@@ -4878,11 +4892,12 @@ void GameActions()
 #endif
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
-    else if (IS_ANIMATED(graphic))
+    else if (IS_ANIMATED(graphic) && !IS_AUTO_CHANGING(element))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
 #if 1
-    if (IS_AUTO_CHANGING(element))
+    /* this may take place after moving, therefore element may have changed */
+    if (IS_AUTO_CHANGING(Feld[x][y]))
       ChangeElement(x, y);
 #endif
 

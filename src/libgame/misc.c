@@ -324,7 +324,7 @@ unsigned int init_random_number(int nr, long seed)
 
 unsigned int get_random_number(int nr, unsigned int max)
 {
-  return (random_linux_libc(nr) % max);
+  return (max > 0 ? random_linux_libc(nr) % max : 0);
 }
 
 
