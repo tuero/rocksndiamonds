@@ -1573,8 +1573,12 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	new_gadget->state = va_arg(ap, unsigned long);
 	break;
 
-      case GDI_ALT_STATE:
-	new_gadget->state = va_arg(ap, boolean);
+      case GDI_RADIO_NR:
+	new_gadget->radio_nr = va_arg(ap, unsigned long);
+	break;
+
+      case GDI_RADIO_PRESSED:
+	new_gadget->radio_pressed = va_arg(ap, boolean);
 	break;
 
       case GDI_NUMBER_VALUE:
@@ -1718,22 +1722,29 @@ void FreeGadget(struct GadgetInfo *gi)
   free(gi);
 }
 
+/* values for DrawGadget() */
+#define DG_UNPRESSED	0
+#define DG_PRESSED	1
+#define DG_BUFFERED	0
+#define DG_DIRECT	1
+
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
   int state = (pressed ? 1 : 0);
-  struct GadgetDesign *gd = (gi->alt_state ?
+  struct GadgetDesign *gd = (gi->radio_pressed ?
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
-  if (gi->type != GD_TYPE_NORMAL_BUTTON)
+  if (gi->type != GD_TYPE_NORMAL_BUTTON &&
+      gi->type != GD_TYPE_RADIO_BUTTON)
     return;
 
   XCopyArea(display, gd->pixmap, drawto, gc,
 	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
 
   if (direct)
-    XCopyArea(display, gd->pixmap, window, gc,
-	      gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+    XCopyArea(display, drawto, window, gc,
+	      gi->x, gi->y, gi->width, gi->height, gi->x, gi->y);
   else
     redraw_mask |= REDRAW_ALL;
 }
@@ -1745,7 +1756,7 @@ void MapGadget(struct GadgetInfo *gi)
 
   gi->mapped = TRUE;
 
-  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), FALSE);
+  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), DG_BUFFERED);
 }
 
 void UnmapGadget(struct GadgetInfo *gi)
@@ -1804,7 +1815,28 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_pressed)
   {
-    DrawGadget(gi, TRUE, TRUE);
+    if (gi->type == GD_TYPE_RADIO_BUTTON)
+    {
+      struct GadgetInfo *rgi = gadget_list_first_entry;
+
+      while (rgi)
+      {
+	if (rgi->mapped &&
+	    rgi->type == GD_TYPE_RADIO_BUTTON &&
+	    rgi->radio_nr == gi->radio_nr &&
+	    rgi != gi)
+	{
+	  rgi->radio_pressed = FALSE;
+	  DrawGadget(rgi, DG_UNPRESSED, DG_DIRECT);
+	}
+
+	rgi = rgi->next;
+      }
+
+      gi->radio_pressed = TRUE;
+    }
+
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_PRESSED;
@@ -1829,7 +1861,7 @@ void HandleGadgets(int mx, int my, int button)
   if (gadget_moving)
   {
     if (gi->state == GD_BUTTON_UNPRESSED)
-      DrawGadget(gi, TRUE, TRUE);
+      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_MOVING;
@@ -1841,7 +1873,7 @@ void HandleGadgets(int mx, int my, int button)
   if (gadget_moving_off_borders)
   {
     if (gi->state == GD_BUTTON_PRESSED)
-      DrawGadget(gi, FALSE, TRUE);
+      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_MOVING;
@@ -1854,7 +1886,7 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_released)
   {
-    DrawGadget(gi, FALSE, TRUE);
+    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;

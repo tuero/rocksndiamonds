@@ -49,7 +49,9 @@
 #define RANDOM_USE_NUM_OBJECTS	1
 
 /* values for the control window */
-#define ED_CTRL_BUTTONS_GFX_YPOS 236
+#define ED_CTRL_BUTTONS_GFX_YPOS 	236
+#define ED_CTRL_BUTTONS_ALT_GFX_YPOS 	142
+
 #define ED_CTRL1_BUTTONS_HORIZ	4
 #define ED_CTRL1_BUTTONS_VERT	4
 #define ED_CTRL1_BUTTON_XSIZE	22
@@ -83,10 +85,12 @@
 #define ED_CTRL_ID_PROPERTIES		7
 #define ED_CTRL_ID_FLOOD_FILL		8
 #define ED_CTRL_ID_WRAP_LEFT		9
+#define ED_CTRL_ID_UNUSED1		10
 #define ED_CTRL_ID_WRAP_RIGHT		11
 #define ED_CTRL_ID_RANDOM_PLACEMENT	12
 #define ED_CTRL_ID_BRUSH		13
 #define ED_CTRL_ID_WRAP_DOWN		14
+#define ED_CTRL_ID_UNUSED2		15
 #define ED_CTRL_ID_UNDO			16
 #define ED_CTRL_ID_INFO			17
 #define ED_CTRL_ID_SAVE			18
@@ -493,12 +497,44 @@ static void CreateControlButtons()
     Pixmap gd_pixmap = pix[PIX_DOOR];
     struct GadgetInfo *gi;
     int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_x2, gd_y;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
     int width, height;
+    int button_type;
+    int radio_button_nr;
+    boolean radio_button_pressed;
     unsigned long event_mask;
     int id = i;
 
-    if (i < ED_NUM_CTRL1_BUTTONS)
+    if (id == ED_CTRL_ID_SINGLE_ITEMS ||
+	id == ED_CTRL_ID_CONNECTED_ITEMS ||
+	id == ED_CTRL_ID_LINE ||
+	id == ED_CTRL_ID_TEXT ||
+	id == ED_CTRL_ID_RECTANGLE ||
+	id == ED_CTRL_ID_FILLED_BOX ||
+	id == ED_CTRL_ID_FLOOD_FILL ||
+	id == ED_CTRL_ID_BRUSH)
+    {
+      button_type = GD_TYPE_RADIO_BUTTON;
+      radio_button_nr = 1;
+      radio_button_pressed = (id == drawing_function ? TRUE : FALSE);
+      event_mask = GD_EVENT_PRESSED;
+    }
+    else
+    {
+      button_type = GD_TYPE_NORMAL_BUTTON;
+      radio_button_nr = 0;
+      radio_button_pressed = FALSE;
+
+      if (id == ED_CTRL_ID_WRAP_LEFT ||
+	  id == ED_CTRL_ID_WRAP_RIGHT ||
+	  id == ED_CTRL_ID_WRAP_UP ||
+	  id == ED_CTRL_ID_WRAP_DOWN)
+	event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+      else
+	event_mask = GD_EVENT_RELEASED;
+    }
+
+    if (id < ED_NUM_CTRL1_BUTTONS)
     {
       int x = i % ED_CTRL1_BUTTONS_HORIZ;
       int y = i / ED_CTRL1_BUTTONS_HORIZ;
@@ -521,25 +557,22 @@ static void CreateControlButtons()
 
     gd_x1 = DOOR_GFX_PAGEX8 + gd_xoffset;
     gd_x2 = DOOR_GFX_PAGEX7 + gd_xoffset;
-    gd_y  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_GFX_YPOS + gd_yoffset;
-
-    if (i == ED_CTRL_ID_WRAP_LEFT ||
-	i == ED_CTRL_ID_WRAP_RIGHT ||
-	i == ED_CTRL_ID_WRAP_UP ||
-	i == ED_CTRL_ID_WRAP_DOWN)
-      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
-    else
-      event_mask = GD_EVENT_RELEASED;
+    gd_y1  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_GFX_YPOS + gd_yoffset;
+    gd_y2  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, EX + gd_xoffset,
 		      GDI_Y, EY + gd_yoffset,
 		      GDI_WIDTH, width,
 		      GDI_HEIGHT, height,
-		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_TYPE, button_type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_RADIO_NR, radio_button_nr,
+		      GDI_RADIO_PRESSED, radio_button_pressed,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y2,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK, HandleControlButtons,
 		      GDI_END);
@@ -1866,6 +1899,47 @@ static void DrawFilledBox(int from_x, int from_y, int to_x, int to_y,
     DrawLine(from_x, y, to_x, y, element, change_level);
 }
 
+static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
+{
+  unsigned long border_color = ReadPixel(pix[PIX_SMALLFONT], 2, 16);
+  int from_sx, from_sy;
+  int to_sx, to_sy;
+
+  if (from_x > to_x)
+    swap_numbers(&from_x, &to_x);
+
+  if (from_y > to_y)
+    swap_numbers(&from_y, &to_y);
+
+  from_sx = SX + from_x * MINI_TILEX;
+  from_sy = SY + from_y * MINI_TILEX;
+  to_sx = SX + to_x * MINI_TILEX + MINI_TILEX - 1;
+  to_sy = SY + to_y * MINI_TILEX + MINI_TILEY - 1;
+
+  XSetForeground(display, gc, border_color);
+
+  XDrawLine(display, drawto, gc, from_sx, from_sy, to_sx, from_sy);
+  XDrawLine(display, drawto, gc, to_sx, from_sy, to_sx, to_sy);
+  XDrawLine(display, drawto, gc, to_sx, to_sy, from_sx, to_sy);
+  XDrawLine(display, drawto, gc, from_sx, to_sy, from_sx, from_sy);
+
+  XSetForeground(display, gc, BlackPixel(display,screen));
+
+  if (from_x == to_x && from_y == to_y)
+    MarkTileDirty(from_x/2, from_y/2);
+  else
+    redraw_mask |= REDRAW_FIELD;
+}
+
+static void SelectArea(int from_x, int from_y, int to_x, int to_y,
+		       int element, boolean change_level)
+{
+  if (element == -1 || change_level)
+    DrawRectangle(from_x, from_y, to_x, to_y, -1, FALSE);
+  else
+    DrawAreaBorder(from_x, from_y, to_x, to_y);
+}
+
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
   int i,x,y;
@@ -1897,30 +1971,7 @@ static void FloodFill(int from_x, int from_y, int fill_element)
   safety--;
 }
 
-static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
-{
-  unsigned long border_color = ReadPixel(pix[PIX_SMALLFONT], 2, 16);
-  int from_sx = SX + from_x * MINI_TILEX;
-  int from_sy = SY + from_y * MINI_TILEX;
-  int to_sx = SX + to_x * MINI_TILEX + MINI_TILEX - 1;
-  int to_sy = SY + to_y * MINI_TILEX + MINI_TILEY - 1;
-
-  XSetForeground(display, gc, border_color);
-
-  XDrawLine(display, drawto, gc, from_sx, from_sy, to_sx, from_sy);
-  XDrawLine(display, drawto, gc, to_sx, from_sy, to_sx, to_sy);
-  XDrawLine(display, drawto, gc, to_sx, to_sy, from_sx, to_sy);
-  XDrawLine(display, drawto, gc, from_sx, to_sy, from_sx, from_sy);
-
-  XSetForeground(display, gc, BlackPixel(display,screen));
-
-  if (from_x == to_x && from_y == to_y)
-    MarkTileDirty(from_x/2, from_y/2);
-  else
-    redraw_mask |= REDRAW_FIELD;
-}
-
-/* values for DrawLeveltext() modes */
+/* values for DrawLevelText() modes */
 #define TEXT_INIT	0
 #define TEXT_SETCURSOR	1
 #define TEXT_WRITECHAR	2
@@ -2165,6 +2216,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case ED_CTRL_ID_LINE:
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
+    case ED_CTRL_ID_BRUSH:
       {
 	static int last_sx = -1;
 	static int last_sy = -1;
@@ -2176,8 +2228,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  draw_func = DrawLine;
 	else if (drawing_function == ED_CTRL_ID_RECTANGLE)
 	  draw_func = DrawRectangle;
-	else
+	else if (drawing_function == ED_CTRL_ID_FILLED_BOX)
 	  draw_func = DrawFilledBox;
+	else
+	  draw_func = SelectArea;
 
 	if (button_press_event)
 	{
@@ -2200,6 +2254,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
+    case ED_CTRL_ID_TEXT:
+      if (button_press_event)
+	DrawLevelText(sx, sy, 0, TEXT_INIT);
+      break;
+
     case ED_CTRL_ID_FLOOD_FILL:
       if (button_press_event && Feld[lx][ly] != new_element)
       {
@@ -2207,11 +2266,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	DrawMiniLevel(level_xpos, level_ypos);
 	CopyLevelToUndoBuffer();
       }
-      break;
-
-    case ED_CTRL_ID_TEXT:
-      if (button_press_event)
-	DrawLevelText(sx, sy, 0, TEXT_INIT);
       break;
 
     default:

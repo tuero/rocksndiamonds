@@ -273,7 +273,7 @@ int CheckCountButtons(int, int, int);
 
 /* gadget types */
 #define GD_TYPE_NORMAL_BUTTON		(1<<0)
-#define GD_TYPE_TWO_STATE_BUTTON	(1<<1)
+#define GD_TYPE_RADIO_BUTTON		(1<<1)
 #define GD_TYPE_DRAWING_AREA		(1<<2)
 #define GD_TYPE_TEXTINPUT		(1<<3)
 #define GD_TYPE_TEXTOUTPUT		(1<<4)
@@ -305,18 +305,19 @@ int CheckCountButtons(int, int, int);
 #define GDI_HEIGHT			5
 #define GDI_TYPE			6
 #define GDI_STATE			7
-#define GDI_ALT_STATE			8
-#define GDI_NUMBER_VALUE		9
-#define GDI_TEXT_VALUE			10
-#define GDI_DESIGN_UNPRESSED		11
-#define GDI_DESIGN_PRESSED		12
-#define GDI_ALT_DESIGN_UNPRESSED	13
-#define GDI_ALT_DESIGN_PRESSED		14
-#define GDI_EVENT_MASK			15
-#define GDI_EVENT			16
-#define GDI_CALLBACK			17
-#define GDI_AREA_SIZE			18
-#define GDI_ITEM_SIZE			19
+#define GDI_RADIO_NR			8
+#define GDI_RADIO_PRESSED		9
+#define GDI_NUMBER_VALUE		10
+#define GDI_TEXT_VALUE			11
+#define GDI_DESIGN_UNPRESSED		12
+#define GDI_DESIGN_PRESSED		13
+#define GDI_ALT_DESIGN_UNPRESSED	14
+#define GDI_ALT_DESIGN_PRESSED		15
+#define GDI_EVENT_MASK			16
+#define GDI_EVENT			17
+#define GDI_CALLBACK			18
+#define GDI_AREA_SIZE			19
+#define GDI_ITEM_SIZE			20
 
 typedef void (*gadget_callback_function)(void *);
 
@@ -348,7 +349,8 @@ struct GadgetInfo
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
   unsigned long state;			/* state (pressed, released, ...) */
-  boolean alt_state;			/* alternative state */
+  int radio_nr;				/* number of radio button series */
+  boolean radio_pressed;		/* radio button state */
   boolean mapped;			/* gadget is active */
   long number_value;
   char text_value[MAX_GADGET_TEXTSIZE];
