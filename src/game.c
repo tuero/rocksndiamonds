@@ -5222,6 +5222,7 @@ void StartMoving(int x, int y)
     int move_pattern = element_info[element].move_pattern;
     int newx, newy;
 
+#if 0
 #if DEBUG
     if (MovDir[x][y] == MV_NO_MOVING)
     {
@@ -5229,6 +5230,7 @@ void StartMoving(int x, int y)
 	     x, y, element, element_info[element].token_name);
       printf("StartMoving(): This should never happen!\n");
     }
+#endif
 #endif
 
     Moving2Blocked(x, y, &newx, &newy);
@@ -5825,6 +5827,7 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
+#if 0
       if (move_pattern & MV_ANY_DIRECTION &&
 	  move_pattern == MovDir[x][y])
       {
@@ -5843,6 +5846,7 @@ void StartMoving(int x, int y)
 
 	element = Feld[x][y];	/* element might have changed */
       }
+#endif
 
 #if 1
       if (GFX_ELEMENT(element) != EL_SAND)     /* !!! FIX THIS (crumble) !!! */
@@ -6117,10 +6121,14 @@ void ContinueMoving(int x, int y)
   if (pushed_by_conveyor && CAN_FALL(element) &&
       direction & MV_HORIZONTAL)
   {
+#if 0
     if (CAN_MOVE(element))
       InitMovDir(newx, newy);
     else
       MovDir[newx][newy] = 0;
+#else
+    MovDir[newx][newy] = 0;
+#endif
   }
 #endif
 
