@@ -103,6 +103,9 @@ gdb:
 enginetest:
 	./Scripts/make_enginetest.sh
 
+enginetestfast:
+	./Scripts/make_enginetest.sh fast
+
 backup:
 	./Scripts/make_backup.sh src
 

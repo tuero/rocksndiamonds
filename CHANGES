@@ -1,6 +1,13 @@
-Pre-Release Version 2.2.0rc2 [?? ??? ????]
+Pre-Release Version 2.2.0rc2 [13 JAN 2003]
 ------------------------------------------
 	- added support for stereo WAV sound files
+	- moving objects can now have arbitrary animation length
+	- new batch command for dumping level information
+	- added support for background images for all menu screens
+	- added 128 custom elements that can be decorated with own graphics
+	- added some example levels showing how to create custom artwork
+	- added new contributed levels from the following players:
+	  + Emanuel Schmieg: "Into The Ice Caves" (22 levels + artwork)
 
 Pre-Release Version 2.2.0rc1 [31 DEC 2002]
 ------------------------------------------

@@ -4765,7 +4765,7 @@ static void WarnBuggyBase(int x, int y)
 }
 
 #if 1
-static void CheckBuggyBase(int x, int y)
+void CheckBuggyBase(int x, int y)
 {
   int element = Feld[x][y];
 
@@ -4858,7 +4858,7 @@ static void ChangeActiveTrap(int x, int y)
 }
 
 #if 1
-static void CheckTrap(int x, int y)
+void CheckTrap(int x, int y)
 {
   int element = Feld[x][y];
 
@@ -5342,21 +5342,9 @@ void GameActions()
 	     element == EL_SP_BUGGY_BASE_ACTIVATING ||
 	     element == EL_SP_BUGGY_BASE_ACTIVE)
       CheckBuggyBase(x, y);
-#endif
-#if 0
     else if (element == EL_TRAP ||
 	     element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
-#endif
-#if 0
-    else if (element == EL_TRAP)
-      CheckTrap(x, y);
-#endif
-#if 0
-    else if (element == EL_TRAP_ACTIVE)
-      CheckTrap(x, y);
-#endif
-#if 0
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
     else if (element == EL_SWITCHGATE_OPENING)

@@ -96,6 +96,11 @@ static void setLevelInfoToDefaults()
 
   BorderElement = EL_STEELWALL;
 
+  level.no_level_file = FALSE;
+
+  if (leveldir_current == NULL)		/* only when dumping level */
+    return;
+
   /* try to determine better author name than 'anonymous' */
   if (strcmp(leveldir_current->author, ANONYMOUS_NAME) != 0)
   {
@@ -125,8 +130,6 @@ static void setLevelInfoToDefaults()
 	break;
     }
   }
-
-  level.no_level_file = FALSE;
 }
 
 static int checkLevelElement(int element)
@@ -310,9 +313,8 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
-void LoadLevel(int level_nr)
+void LoadLevelFromFilename(char *filename)
 {
-  char *filename = getLevelFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char chunk_name[CHUNK_ID_LEN + 1];
   int chunk_size;
@@ -433,6 +435,9 @@ void LoadLevel(int level_nr)
 
   fclose(file);
 
+  if (leveldir_current == NULL)		/* only when dumping level */
+    return;
+
   if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
       IS_LEVELCLASS_USER(leveldir_current))
   {
@@ -482,6 +487,13 @@ void LoadLevel(int level_nr)
 
   /* determine border element for this level */
   SetBorderElement();
+}
+
+void LoadLevel(int level_nr)
+{
+  char *filename = getLevelFilename(level_nr);
+
+  LoadLevelFromFilename(filename);
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
@@ -686,6 +698,35 @@ void SaveLevel(int level_nr)
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+}
+
+void DumpLevel(struct LevelInfo *level)
+{
+  printf_line('-', 79);
+  printf("Level xxx (file version %06d, game version %06d)\n",
+	 level->file_version, level->game_version);
+  printf_line('-', 79);
+
+  printf("Level Author: '%s'\n", level->author);
+  printf("Level Title:  '%s'\n", level->name);
+  printf("\n");
+  printf("Playfield Size: %d x %d\n", level->fieldx, level->fieldy);
+  printf("\n");
+  printf("Level Time:  %d seconds\n", level->time);
+  printf("Gems needed: %d\n", level->gems_needed);
+  printf("\n");
+  printf("Time for Magic Wall: %d seconds\n", level->time_magic_wall);
+  printf("Time for Wheel:      %d seconds\n", level->time_wheel);
+  printf("Time for Light:      %d seconds\n", level->time_light);
+  printf("Time for Timegate:   %d seconds\n", level->time_timegate);
+  printf("\n");
+  printf("Amoeba Speed: %d\n", level->amoeba_speed);
+  printf("\n");
+  printf("Gravity:                %s\n", (level->gravity ? "yes" : "no"));
+  printf("Double Speed Movement:  %s\n", (level->double_speed ? "yes" : "no"));
+  printf("EM style slippery gems: %s\n", (level->em_slippery_gems ? "yes" : "no"));
+
+  printf_line('-', 79);
 }
 
 
@@ -1080,7 +1121,7 @@ void DumpTape(struct TapeInfo *tape)
   }
 
   printf_line('-', 79);
-  printf("Tape of Level %d (file version %06d, game version %06d)\n",
+  printf("Tape of Level %03d (file version %06d, game version %06d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
   printf_line('-', 79);
 

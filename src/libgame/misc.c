@@ -458,6 +458,7 @@ static void printUsage()
 	 "  \"print graphicsinfo.conf\"        print default graphics config\n"
 	 "  \"print soundsinfo.conf\"          print default sounds config\n"
 	 "  \"print musicinfo.conf\"           print default music config\n"
+	 "  \"dump level FILE\"                dump level data from FILE\n"
 	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
 	 "  \"autoplay LEVELDIR\"              play level tapes for LEVELDIR\n"
 	 "\n",

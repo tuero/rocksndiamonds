@@ -16,8 +16,10 @@
 
 #include "main.h"
 
+void LoadLevelFromFilename(char *);
 void LoadLevel(int);
 void SaveLevel(int);
+void DumpLevel(struct LevelInfo *);
 
 void LoadTapeFromFilename(char *);
 void LoadTape(int);

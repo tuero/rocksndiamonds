@@ -2260,6 +2260,18 @@ void Execute_Command(char *command)
 
     exit(0);
   }
+  else if (strncmp(command, "dump level ", 11) == 0)
+  {
+    char *filename = &command[11];
+
+    if (access(filename, F_OK) != 0)
+      Error(ERR_EXIT, "cannot open file '%s'", filename);
+
+    LoadLevelFromFilename(filename);
+    DumpLevel(&level);
+
+    exit(0);
+  }
   else if (strncmp(command, "dump tape ", 10) == 0)
   {
     char *filename = &command[10];
