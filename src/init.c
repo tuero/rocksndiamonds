@@ -29,6 +29,7 @@
 static char *image_filename[NUM_PICTURES] =
 {
   "RocksScreen.pcx",
+  "RocksElements.pcx",
   "RocksDoor.pcx",
   "RocksHeroes.pcx",
   "RocksToons.pcx",

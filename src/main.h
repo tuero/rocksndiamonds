@@ -158,20 +158,21 @@
 
 /* Bitmaps with graphic file */
 #define PIX_BACK		0
-#define PIX_DOOR		1
-#define PIX_HEROES		2
-#define PIX_TOONS		3
-#define PIX_SP			4
-#define PIX_DC			5
-#define PIX_MORE		6
-#define	PIX_BIGFONT		7
-#define PIX_SMALLFONT		8
-#define PIX_MEDIUMFONT		9
+#define PIX_ELEMENTS		1
+#define PIX_DOOR		2
+#define PIX_HEROES		3
+#define PIX_TOONS		4
+#define PIX_SP			5
+#define PIX_DC			6
+#define PIX_MORE		7
+#define	PIX_BIGFONT		8
+#define PIX_SMALLFONT		9
+#define PIX_MEDIUMFONT		10
 /* Bitmaps without graphic file */
-#define PIX_DB_DOOR		10
-#define PIX_DB_FIELD		11
+#define PIX_DB_DOOR		11
+#define PIX_DB_FIELD		12
 
-#define NUM_PICTURES		10
+#define NUM_PICTURES		11
 #define NUM_BITMAPS		12
 
 /* boundaries of arrays etc. */
@@ -456,12 +457,10 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL_YPOS		(MICROLEV_YPOS + MICROLEV_YSIZE + 7)
 
-#define GFX_STARTX		SX
-#define GFX_STARTY		SY
-#define MINI_GFX_STARTX		SX
-#define MINI_GFX_STARTY		424
-#define MICRO_GFX_STARTX	SX
-#define MICRO_GFX_STARTY	536
+#define MINI_GFX_STARTX		0
+#define MINI_GFX_STARTY		416
+#define MICRO_GFX_STARTX	0
+#define MICRO_GFX_STARTY	528
 #define GFX_PER_LINE		16
 #define MINI_GFX_PER_LINE	32
 #define MICRO_GFX_PER_LINE	128
@@ -894,7 +893,7 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define EL_MAGIC_WALL_BD_FILLING 612
 
 /* game graphics:
-**	  0 -  255: graphics from "RocksScreen"
+**	  0 -  255: graphics from "RocksElements"
 **	256 -  511: graphics from "RocksFont"
 **	512 -  767: graphics from "RocksHeroes"
 **	768 - 1023: graphics from "RocksSP"
@@ -902,8 +901,8 @@ extern struct FileInfo	       *image_files, *sound_files;
 **     1280 - 1535: graphics from "RocksMore"
 */
 
-#define GFX_START_ROCKSSCREEN	0
-#define GFX_END_ROCKSSCREEN	255
+#define GFX_START_ROCKSELEMENTS	0
+#define GFX_END_ROCKSELEMENTS	255
 #define GFX_START_ROCKSFONT	256
 #define GFX_END_ROCKSFONT	511
 #define GFX_START_ROCKSHEROES	512

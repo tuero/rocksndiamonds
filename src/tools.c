@@ -750,12 +750,13 @@ void getGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
     *x = graphic_info[graphic].src_x;
     *y = graphic_info[graphic].src_y;
   }
-  else if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  else if (graphic >= GFX_START_ROCKSELEMENTS &&
+	   graphic <= GFX_END_ROCKSELEMENTS)
   {
-    graphic -= GFX_START_ROCKSSCREEN;
-    *bitmap = pix[PIX_BACK];
-    *x = SX + (graphic % GFX_PER_LINE) * TILEX;
-    *y = SY + (graphic / GFX_PER_LINE) * TILEY;
+    graphic -= GFX_START_ROCKSELEMENTS;
+    *bitmap = pix[PIX_ELEMENTS];
+    *x = (graphic % GFX_PER_LINE) * TILEX;
+    *y = (graphic / GFX_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
@@ -882,10 +883,10 @@ void DrawMiniGraphic(int x, int y, int graphic)
 
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  if (graphic >= GFX_START_ROCKSELEMENTS && graphic <= GFX_END_ROCKSELEMENTS)
   {
-    graphic -= GFX_START_ROCKSSCREEN;
-    *bitmap = pix[PIX_BACK];
+    graphic -= GFX_START_ROCKSELEMENTS;
+    *bitmap = pix[PIX_ELEMENTS];
     *x = MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX;
     *y = MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY;
   }
@@ -1573,7 +1574,7 @@ void DrawMicroElement(int xpos, int ypos, int element)
 	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else
-    BlitBitmap(pix[PIX_BACK], drawto,
+    BlitBitmap(pix[PIX_ELEMENTS], drawto,
 	       MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,
 	       MICRO_GFX_STARTY + (graphic / MICRO_GFX_PER_LINE) * MICRO_TILEY,
 	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
