@@ -44,7 +44,7 @@ typedef unsigned char byte;
 #endif
 
 #ifndef SIGN
-#define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
+#define SIGN(a)		((a) < 0 ? -1 : ((a) > 0 ? 1 : 0))
 #endif
 
 #define SIZEOF_ARRAY(array, type)	(sizeof(array) / sizeof(type))

@@ -96,8 +96,6 @@ void DrawMiniGraphic(int, int, int);
 void getMiniGraphicSource(int, Bitmap **, int *, int *);
 void DrawMiniGraphicExt(DrawBuffer *, int, int, int);
 
-void DrawGraphicShifted(int, int, int, int, int, int, int, int);
-void DrawGraphicShiftedThruMask(int, int, int, int, int, int, int);
 void DrawScreenElementExt(int, int, int, int, int, int, int);
 void DrawLevelElementExt(int, int, int, int, int, int, int);
 void DrawScreenElementShifted(int, int, int, int, int, int);

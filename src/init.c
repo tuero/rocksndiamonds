@@ -1246,7 +1246,7 @@ static void InitGraphicInfo()
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-    /* currently we need only a tile clip mask from the first frame */
+    /* currently we only need a tile clip mask from the first frame */
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
 
     if (copy_clipmask_gc == None)

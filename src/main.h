@@ -557,12 +557,15 @@
 #define VY			400
 #define EX			DX
 #define EY			(VY - 44)
-#define TILEX			32
-#define TILEY			32
-#define MINI_TILEX		(TILEX / 2)
-#define MINI_TILEY		(TILEY / 2)
-#define MICRO_TILEX		(TILEX / 8)
-#define MICRO_TILEY		(TILEY / 8)
+#define TILESIZE		32
+#define TILEX			TILESIZE
+#define TILEY			TILESIZE
+#define MINI_TILESIZE		(TILESIZE / 2)
+#define MINI_TILEX		MINI_TILESIZE
+#define MINI_TILEY		MINI_TILESIZE
+#define MICRO_TILESIZE		(TILESIZE / 8)
+#define MICRO_TILEX		MICRO_TILESIZE
+#define MICRO_TILEY		MICRO_TILESIZE
 #define MIDPOSX			(SCR_FIELDX / 2)
 #define MIDPOSY			(SCR_FIELDY / 2)
 #define SXSIZE			(SCR_FIELDX * TILEX)

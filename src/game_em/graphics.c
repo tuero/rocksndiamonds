@@ -143,8 +143,8 @@ static void blitplayer(struct PLAYER *ply)
       (unsigned int)(dy - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
   {
     spr = map_spr[ply->num][frame][ply->anim];
-    x %= MAX_BUF_XSIZE * TILEX;
-    y %= MAX_BUF_YSIZE * TILEY;
+    x  %= MAX_BUF_XSIZE * TILEX;
+    y  %= MAX_BUF_YSIZE * TILEY;
     dx %= MAX_BUF_XSIZE * TILEX;
     dy %= MAX_BUF_YSIZE * TILEY;
 
@@ -170,7 +170,7 @@ static void blitplayer(struct PLAYER *ply)
     dst_y = (y / TILEY) * TILEY;
 
 #if 1
-#if 1
+#if 0
     {
       int tile = Draw[ply->oldy][ply->oldx];
       struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
@@ -206,8 +206,32 @@ static void blitplayer(struct PLAYER *ply)
 #if 1
 #if 1
     {
+      /*
+	d? == 1:
+	  0-3: 0, 1
+	  4-7: 0, 1
+
+	d? == 2:
+	  0-3: 0, 1
+	  4-7: 1, 2
+       */
+
+      int dx = (ply->x - ply->oldx);
+      int dy = (ply->y - ply->oldy);
+      int old_x = ply->oldx  ;
+      int old_y = ply->oldy  ;
+      int new_x = ply->oldx  ;
+      int new_y = ply->oldy  ;
+      int xxx = (frame * ply->oldx + (8 - frame) * ply->x) / 8;
+      int yyy = (frame * ply->oldy + (8 - frame) * ply->y) / 8;
+      int tileXXX = Draw[ply->y][ply->x];
       int tile = Draw[ply->y][ply->x];
       struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
+      int xx = ply->x - 1, yy = ply->y;
+
+      printf("::: %d: %d,%d -> %d,%d: %d, %d, %d, %d [%d,%d] <-> ",
+	     frame, ply->oldx, ply->oldy, ply->x, ply->y,
+	     src_x, src_y, dst_x, dst_y, xxx, yyy);
 
       if (g->width > 0 && g->height > 0)
       {
@@ -220,6 +244,9 @@ static void blitplayer(struct PLAYER *ply)
 		      dst_x - src_x, dst_y - src_y);
 	BlitBitmapMasked(g->bitmap, screenBitmap,
 			 src_x, src_y, g->width, g->height, dst_x, dst_y);
+
+	printf("::: %d, %d, %d, %d\n",
+	       src_x, src_y, dst_x, dst_y);
       }
     }
 #else
