@@ -1254,7 +1254,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   /* clear tree list area, but not title or scrollbar */
   DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
-		 SXSIZE - 32 + menu.scrollbar_xoffset, SYSIZE);
+		 SXSIZE - 32 + menu.scrollbar_xoffset,
+		 MAX_MENU_ENTRIES_ON_SCREEN * 32);
 
   for(i=0; i<num_page_entries; i++)
   {

@@ -359,7 +359,7 @@
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
 
-#define PLAYER_SWITCHING(p,x,y)	((p)->Switching &&			\
+#define PLAYER_SWITCHING(p,x,y)	((p)->is_switching &&			\
 				 (p)->switch_x == (x) && (p)->switch_y == (y))
 
 #define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER_2 - IMG_PLAYER_1))
@@ -1136,20 +1136,20 @@ struct PlayerInfo
   int GfxAction;
 
   boolean use_murphy_graphic;
-  boolean use_disk_red_graphic;
 
-  boolean Pushing;
-  boolean Switching;
   boolean LevelSolved, GameOver;
-  boolean snapped;
-
-  int switch_x, switch_y;
 
   int last_move_dir;
-  boolean is_moving;
+
   boolean is_waiting;
+  boolean is_moving;
   boolean is_digging;
+  boolean is_snapping;
   boolean is_collecting;
+  boolean is_pushing;
+  boolean is_switching;
+
+  int switch_x, switch_y;
 
   int show_envelope;
 
@@ -1487,7 +1487,8 @@ extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long		Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long		ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];
 extern short			AmoebaCnt2[MAX_NUM_AMOEBA];
