@@ -38,6 +38,14 @@ XpmAttributes 	xpm_att[NUM_PICTURES];
 Drawable        drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
 
+#ifdef USE_SDL_LIBRARY
+SDL_Surface    *sdl_window;
+SDL_Surface    *sdl_drawto, *sdl_drawto_field;
+SDL_Surface    *sdl_backbuffer, *sdl_fieldbuffer;
+SDL_Surface    *sdl_pix[NUM_PIXMAPS];
+SDL_Surface    *sdl_pix_masked[NUM_PIXMAPS], *sdl_tile_masked[NUM_TILES];
+#endif
+
 int		sound_pipe[2];
 int		sound_device;
 char	       *sound_device_name = SOUND_DEVICE;
@@ -563,6 +571,183 @@ char *element_info[] =
   */
 };
 
+
+
+/* +-----------------------------------------------------------------------+ */
+/* | SDL TEST STUFF                                                        | */
+/* +-----------------------------------------------------------------------+ */
+
+#ifdef	USE_SDL_LIBRARY
+
+SDL_Surface *sdl_screen, *sdl_image_tmp, *sdl_image, *sdl_image_masked;
+SDL_Surface *sdl_image2_tmp, *sdl_image2, *sdl_image2_masked;
+
+void TEST_SDL_BLIT_RECT(int x, int y)
+{
+  SDL_Rect rect_src, rect_dst;
+
+  SDLCopyArea(sdl_pix_masked[PIX_HEROES], sdl_window,
+	      8 * TILEX, 8 * TILEY, TILEX, TILEY, x, y);
+  return;
+
+  rect_src.x = 8 * TILEX;
+  rect_src.y = 8 * TILEY;
+  rect_src.w = TILEX;
+  rect_src.h = TILEY;
+
+  rect_dst.x = x;
+  rect_dst.y = y;
+  rect_dst.w = TILEX;
+  rect_dst.h = TILEY;
+
+  SDL_BlitSurface(sdl_image2_masked, &rect_src, sdl_screen, &rect_dst);
+  SDL_UpdateRect(sdl_screen, x, y, TILEX, TILEY);
+}
+
+void TEST_SDL_INIT_DISPLAY()
+{
+  SDL_Rect rect_src, rect_dst;
+
+  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  {
+    fprintf(stderr, "SDL_Init() failed: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  /* automatically cleanup SDL stuff after exit() */
+  atexit(SDL_Quit);
+
+  if ((sdl_screen = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, 16, SDL_HWSURFACE))
+      == NULL)
+  {
+    fprintf(stderr, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
+
+  if ((sdl_image_tmp = IMG_Load("graphics/RocksScreen.pcx")) == NULL)
+  {
+    fprintf(stderr, "IMG_Load() failed: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  sdl_image = SDL_DisplayFormat(sdl_image_tmp);
+
+  SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
+		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+  sdl_image_masked = SDL_DisplayFormat(sdl_image_tmp);
+
+  SDL_FreeSurface(sdl_image_tmp);
+
+  if ((sdl_image2_tmp = IMG_Load("graphics/RocksHeroes.pcx")) == NULL)
+  {
+    fprintf(stderr, "IMG_Load() failed: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  sdl_image2 = SDL_DisplayFormat(sdl_image2_tmp);
+  SDL_FreeSurface(sdl_image2_tmp);
+
+  sdl_image2_masked = SDL_DisplayFormat(sdl_image2);
+  SDL_SetColorKey(sdl_image2_masked, SDL_SRCCOLORKEY,
+		  SDL_MapRGB(sdl_image2_masked->format, 0x00, 0x00, 0x00));
+
+  rect_src.x = 0;
+  rect_src.y = 0;
+  rect_src.w = sdl_image->w;
+  rect_src.h = sdl_image->h;
+
+  rect_dst.x = 0;
+  rect_dst.y = 0;
+  rect_dst.w = sdl_image->w;
+  rect_dst.h = sdl_image->h;
+                                           
+  SDL_BlitSurface(sdl_image, &rect_src, sdl_screen, &rect_dst);
+
+  /*
+  SDL_UpdateRect(sdl_screen, 0, 0, WIN_XSIZE, WIN_YSIZE);
+  */
+  /*
+  SDL_UpdateRect(sdl_screen, 0, 0, 0, 0);
+  */
+  SDL_Flip(sdl_screen);
+
+  /*
+  SDL_Delay(5000);
+  */
+}
+
+void TEST_SDL_EVENT_LOOP()
+{
+  SDL_Event event;
+  int quit_loop = 0;
+
+  SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+
+  while (!quit_loop && SDL_WaitEvent(&event) >=0)
+  {
+    /* hier werden die Ereignisse behandelt */
+    switch(event.type)
+    {
+      case SDL_QUIT:
+      {
+	quit_loop = 1;
+	break;
+      }
+
+      case SDL_MOUSEBUTTONDOWN:
+      {
+	int x = event.button.x;
+	int y = event.button.y;
+
+	SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+
+	TEST_SDL_BLIT_RECT(x, y);
+
+	printf("SDL_MOUSEBUTTONDOWN(%d, %d)\n", x, y);
+	break;
+      }
+
+      case SDL_MOUSEBUTTONUP:
+      {
+	int x = event.button.x;
+	int y = event.button.y;
+
+	SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+
+	printf("SDL_MOUSEBUTTONUP(%d, %d)\n", x, y);
+	break;
+      }
+
+      case SDL_MOUSEMOTION:
+      {
+	int x = event.motion.x;
+	int y = event.motion.y;
+
+	TEST_SDL_BLIT_RECT(x, y);
+
+	printf("SDL_MOUSEMOTION(%d, %d)\n", x, y);
+	break;
+      }
+
+      default:
+	break;
+    }
+  }
+
+  SDL_FreeSurface(sdl_image);
+  SDL_Quit();
+}
+
+#endif	/* USE_SDL_LIBRARY */
+
+/* +-----------------------------------------------------------------------+ */
+/* | SDL TEST STUFF                                                        | */
+/* +-----------------------------------------------------------------------+ */
+
+
+
 int main(int argc, char *argv[])
 {
   program_name = (strrchr(argv[0],'/') ? strrchr(argv[0],'/') + 1 : argv[0]);
@@ -573,6 +758,13 @@ int main(int argc, char *argv[])
 
   GetOptions(argv);
   OpenAll(argc,argv);
+
+#ifdef USE_SDL_LIBRARY
+  TEST_SDL_BLIT_RECT((WIN_XSIZE - TILEX)/2, (WIN_YSIZE - TILEY)/2);
+  TEST_SDL_EVENT_LOOP();
+  exit(0);
+#endif
+
   EventLoop();
   CloseAllAndExit(0);
   exit(0);	/* to keep compilers happy */

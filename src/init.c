@@ -79,13 +79,16 @@ void OpenAll(int argc, char *argv[])
   InitDisplay();
   InitWindow(argc, argv);
 
+#ifndef USE_SDL_LIBRARY
   XMapWindow(display, window);
   XFlush(display);
+#endif
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
   InitLevelAndPlayerInfo();
+  return;
   InitGadgets();		/* needs to know number of level series */
 
   DrawMainMenu();
@@ -298,6 +301,16 @@ void InitJoysticks()
 
 void InitDisplay()
 {
+#ifdef USE_SDL_LIBRARY
+  /* initialize SDL */
+  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    Error(ERR_EXIT, "SDL_Init() failed: %s\n", SDL_GetError());
+
+  /* automatically cleanup SDL stuff after exit() */
+  atexit(SDL_Quit);
+
+#else /* !USE_SDL_LIBRARY */
+
 #ifndef MSDOS
   XVisualInfo vinfo_template, *vinfo;
   int num_visuals;
@@ -339,11 +352,27 @@ void InitDisplay()
     printf("Sorry, cannot get appropriate visual.\n");
     exit(-1);
   }
-#endif
+#endif /* !MSDOS */
+#endif /* !USE_SDL_LIBRARY */
 }
 
 void InitWindow(int argc, char *argv[])
 {
+#ifdef USE_SDL_LIBRARY
+  /* open SDL video output device (window or fullscreen mode) */
+  if ((sdl_window = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
+				     SDL_HWSURFACE))
+      == NULL)
+    Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
+
+  /* set window and icon title */
+  SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
+
+  /* select event types: initially no mouse motion events */
+  SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+
+#else /* !USE_SDL_LIBRARY */
+
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned long gc_valuemask;
@@ -458,14 +487,20 @@ void InitWindow(int argc, char *argv[])
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
+#endif /* !USE_SDL_LIBRARY */
 }
 
 void InitGfx()
 {
   int i,j;
+
+#ifdef USE_SDL_LIBRARY
+  SDL_Surface *sdl_image_tmp;
+#else
   GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
+#endif
 
 #ifdef MSDOS
   static struct PictureFileInfo pic[NUM_PICTURES] =
@@ -579,8 +614,6 @@ void InitGfx()
 #endif
 #endif
 
-
-
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
   DrawInitText(WINDOW_TITLE_STRING,20,FC_YELLOW);
   DrawInitText(COPYRIGHT_STRING,50,FC_RED);
@@ -597,6 +630,85 @@ void InitGfx()
 #if DEBUG_TIMING
   debug_print_timestamp(0, "SUMMARY LOADING ALL GRAPHICS:");
 #endif
+
+#ifdef USE_SDL_LIBRARY
+  /* create some native image surfaces for double-buffer purposes */
+
+  /* create double-buffer surface for background image */
+  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
+					    WIN_XSIZE, WIN_YSIZE,
+					    WIN_SDL_DEPTH, 0, 0, 0, 0))
+      == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+
+  if ((sdl_pix[PIX_DB_BACK] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+  SDL_FreeSurface(sdl_image_tmp);
+
+  /* create double-buffer surface for door image */
+  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
+					    3 * DXSIZE, DYSIZE + VYSIZE,
+					    WIN_SDL_DEPTH, 0, 0, 0, 0))
+      == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+
+  if ((sdl_pix[PIX_DB_DOOR] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+  SDL_FreeSurface(sdl_image_tmp);
+
+  /* create double-buffer surface for field image */
+  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
+					    FXSIZE, FYSIZE,
+					    WIN_SDL_DEPTH, 0, 0, 0, 0))
+      == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+
+  if ((sdl_pix[PIX_DB_FIELD] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+  SDL_FreeSurface(sdl_image_tmp);
+
+  /* initialize surface array to 'NULL' */
+  for(i=0; i<NUM_TILES; i++)
+    sdl_tile_masked[i] = NULL;
+
+  /* create only those masked surfaces we really need */
+  for(i=0; tile_needs_clipping[i].start>=0; i++)
+  {
+    for(j=0; j<tile_needs_clipping[i].count; j++)
+    {
+      int tile = tile_needs_clipping[i].start + j;
+#if 0
+      int graphic = tile;
+      int src_x, src_y;
+      int pixmap_nr;
+      Pixmap src_pixmap;
+
+      getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
+      src_pixmap = clipmask[pixmap_nr];
+
+      tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
+
+      XCopyArea(display,src_pixmap,tile_clipmask[tile],copy_clipmask_gc,
+		src_x,src_y, TILEX,TILEY, 0,0);
+#endif
+    }
+  }
+
+  sdl_drawto = sdl_backbuffer = sdl_pix[PIX_DB_BACK];
+  sdl_fieldbuffer = sdl_pix[PIX_DB_FIELD];
+  SetDrawtoField(DRAW_BACKBUFFER);
+
+  SDLCopyArea(sdl_pix[PIX_BACK], sdl_backbuffer,
+	      0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
+  SDLFillRectangle(sdl_pix[PIX_DB_BACK],
+		   REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, 0x000000);
+  SDLFillRectangle(sdl_pix[PIX_DB_DOOR],
+		   0,0, 3*DXSIZE,DYSIZE+VYSIZE, 0x000000);
+
+#else /* !USE_SDL_LIBRARY */
 
   pix[PIX_DB_BACK] = XCreatePixmap(display, window,
 				   WIN_XSIZE,WIN_YSIZE,
@@ -661,12 +773,13 @@ void InitGfx()
   fieldbuffer = pix[PIX_DB_FIELD];
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  XCopyArea(display,pix[PIX_BACK],backbuffer,gc,
+  XCopyArea(display, pix[PIX_BACK], backbuffer, gc,
 	    0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-  XFillRectangle(display,pix[PIX_DB_BACK],gc,
+  XFillRectangle(display, pix[PIX_DB_BACK], gc,
 		 REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
-  XFillRectangle(display,pix[PIX_DB_DOOR],gc,
+  XFillRectangle(display, pix[PIX_DB_DOOR], gc,
 		 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
+#endif /* !USE_SDL_LIBRARY */
 
   for(i=0; i<MAX_BUF_XSIZE; i++)
     for(j=0; j<MAX_BUF_YSIZE; j++)
@@ -688,9 +801,15 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char *picture_ext = ".xpm";
   char *picturemask_ext = "Mask.xbm";
 #else
+
+#ifdef USE_SDL_LIBRARY
+  SDL_Surface *sdl_image_tmp;
+#else /* !USE_SDL_LIBRARY */
   int pcx_err;
+#endif /* !USE_SDL_LIBRARY */
   char *picture_ext = ".pcx";
-#endif
+
+#endif /* !USE_XPM_LIBRARY */
 
   /* Grafik laden */
   if (pic->picture_filename)
@@ -707,6 +826,26 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #if DEBUG_TIMING
     debug_print_timestamp(1, NULL);	/* initialize timestamp function */
 #endif
+
+#ifdef USE_SDL_LIBRARY
+    /* load image to temporary surface */
+    if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
+      Error(ERR_EXIT, "IMG_Load() failed: %s\n", SDL_GetError());
+
+    /* create native non-transparent surface for current image */
+    if ((sdl_pix[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+    /* create native transparent surface for current image */
+    SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
+		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+    if ((sdl_pix_masked[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+    /* free temporary surface */
+    SDL_FreeSurface(sdl_image_tmp);
+
+#else /* !USE_SDL_LIBRARY */
 
 #ifdef USE_XPM_LIBRARY
 
@@ -764,8 +903,10 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
+#endif /* !USE_SDL_LIBRARY */
   }
 
+#ifndef USE_SDL_LIBRARY
   /* zugehörige Maske laden (wenn vorhanden) */
   if (pic->picture_with_mask)
   {
@@ -807,6 +948,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     if (!clipmask[pos])
       Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
   }
+#endif /* !USE_SDL_LIBRARY */
 }
 
 void InitGadgets()

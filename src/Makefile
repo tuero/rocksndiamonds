@@ -34,8 +34,11 @@ ifeq ($(PLATFORM),solaris)
 EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
+SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)
+SDL_LDFLAGS := -lIMG $(shell sdl-config --libs)
+
 INCL = $(X11_INCL)
-LIBS = $(X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
+LIBS = $(X11_LIBS) -lX11 -lm $(EXTRA_LIBS) $(SDL_LDFLAGS)
 
 endif
 
@@ -58,14 +61,14 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(SOUNDS) $(JOYSTICK)
 
 # OPTIONS = -DDEBUG -g -Wall -ansi -pedantic	# only for debugging purposes
-# OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
+OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
-OPTIONS = -O3
+# OPTIONS = -O3
 
 # SYSTEM = -DSYSV -Ae		# may be needed for HP-UX
 
-CFLAGS = $(OPTIONS) $(SYSTEM) $(INCL) $(CONFIG)
+CFLAGS = $(OPTIONS) $(SDL_CFLAGS) $(SYSTEM) $(INCL) $(CONFIG)
 
 SRCS =	main.c		\
 	init.c		\
@@ -86,7 +89,8 @@ SRCS =	main.c		\
 	image.c		\
 	network.c	\
 	netserv.c	\
-	msdos.c
+	msdos.c		\
+	sdl.c
 
 OBJS =	main.o		\
 	init.o		\
@@ -107,7 +111,8 @@ OBJS =	main.o		\
 	image.o		\
 	network.o	\
 	netserv.o	\
-	msdos.o
+	msdos.o		\
+	sdl.o
 
 all:	$(PROGNAME)
 

@@ -338,6 +338,15 @@ int getFontHeight(int font_size, int font_type)
 
 void DrawInitText(char *text, int ypos, int color)
 {
+#ifdef USE_SDL_LIBRARY
+  if (sdl_window && sdl_pix[PIX_SMALLFONT])
+  {
+    SDLFillRectangle(sdl_window, 0, ypos, WIN_XSIZE, FONT2_YSIZE, 0x000000);
+    DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
+		ypos,text,FS_SMALL,color);
+    SDL_Flip(sdl_window);
+  }
+#else
   if (display && window && pix[PIX_SMALLFONT])
   {
     XFillRectangle(display, window, gc, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
@@ -345,6 +354,7 @@ void DrawInitText(char *text, int ypos, int color)
 		ypos,text,FS_SMALL,color);
     XFlush(display);
   }
+#endif
 }
 
 void DrawTextFCentered(int y, int font_type, char *format, ...)
@@ -447,8 +457,15 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 		  0, 0, font_width, font_height, dest_x, dest_y);
       }
       else
+      {
+#ifdef USE_SDL_LIBRARY
+	SDLCopyArea(sdl_pix[font_pixmap], sdl_window,
+		    src_x, src_y, font_width, font_height, dest_x, dest_y);
+#else
 	XCopyArea(display, pix[font_pixmap], d, gc,
 		  src_x, src_y, font_width, font_height, dest_x, dest_y);
+#endif
+      }
     }
 
     x += font_width;

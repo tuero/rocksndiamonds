@@ -40,6 +40,10 @@
 #include "msdos.h"
 #endif  /* MSDOS */
 
+#ifdef	USE_SDL_LIBRARY
+#include "sdl.h"
+#endif
+
 #ifdef DEBUG
 #define DEBUG_TIMING	0
 #endif
@@ -54,6 +58,7 @@ typedef unsigned char byte;
 
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
+#define WIN_SDL_DEPTH	16	/* !!! change this !!! */
 #ifndef MSDOS
 #define WIN_XPOS	0
 #define WIN_YPOS	0
@@ -472,6 +477,14 @@ extern XpmAttributes 	xpm_att[];
 
 extern Drawable    	drawto, drawto_field, backbuffer, fieldbuffer;
 extern Colormap		cmap;
+
+#ifdef USE_SDL_LIBRARY
+extern SDL_Surface    *sdl_window;
+extern SDL_Surface    *sdl_drawto, *sdl_drawto_field;
+extern SDL_Surface    *sdl_backbuffer, *sdl_fieldbuffer;
+extern SDL_Surface    *sdl_pix[];
+extern SDL_Surface    *sdl_pix_masked[], *sdl_tile_masked[];
+#endif
 
 extern int		sound_pipe[2];
 extern int		sound_device;
@@ -1662,7 +1675,7 @@ extern char		*element_info[];
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#define PROGRAM_VERSION_STRING	"1.4.0"
+#define PROGRAM_VERSION_STRING	"1.4.0 SDL"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING
