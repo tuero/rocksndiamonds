@@ -99,6 +99,62 @@
 /* to control special behaviour of certain game elements */
 int game_emulation = EMU_NONE;
 
+
+
+
+#ifdef DEBUG
+#if 1
+static unsigned int getStateCheckSum(int counter)
+{
+  int x, y;
+  unsigned int mult = 1;
+  unsigned int checksum = 0;
+  /*
+  static short lastFeld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+  */
+  static boolean first_game = TRUE;
+
+  for (y=0; y<lev_fieldy; y++) for(x=0; x<lev_fieldx; x++)
+  {
+    /*
+    if (counter == 3)
+    {
+      if (first_game)
+	lastFeld[x][y] = Feld[x][y];
+      else if (lastFeld[x][y] != Feld[x][y])
+	printf("DIFF: [%d][%d]: lastFeld == %d != %d == Feld\n",
+	       x, y, lastFeld[x][y], Feld[x][y]);
+    }
+    */
+
+    checksum += mult++ * Ur[x][y];
+    checksum += mult++ * Feld[x][y];
+
+    /*
+    checksum += mult++ * MovPos[x][y];
+    checksum += mult++ * MovDir[x][y];
+    checksum += mult++ * MovDelay[x][y];
+    checksum += mult++ * Store[x][y];
+    checksum += mult++ * Store2[x][y];
+    checksum += mult++ * StorePlayer[x][y];
+    checksum += mult++ * Frame[x][y];
+    checksum += mult++ * AmoebaNr[x][y];
+    checksum += mult++ * JustHit[x][y];
+    checksum += mult++ * Stop[x][y];
+    */
+  }
+
+  if (counter == 3 && first_game)
+    first_game = FALSE;
+
+  return checksum;
+}
+#endif
+#endif
+
+
+
+
 void GetPlayerConfig()
 {
   if (sound_status == SOUND_OFF)
@@ -3194,7 +3250,7 @@ void GameActions()
 
 
 #ifdef DEBUG
-  /*
+
   if (TimeFrames == 0 && !local_player->gone)
   {
     extern unsigned int last_RND();
@@ -3204,7 +3260,7 @@ void GameActions()
 	   last_RND(),
 	   getStateCheckSum(level.time - TimeLeft));
   }
-  */
+
 #endif
 
 
