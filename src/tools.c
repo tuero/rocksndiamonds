@@ -3253,100 +3253,100 @@ mapping_EM_to_RND_list[] =
     EL_EMC_ANDROID,			-1, -1
   },
   {
-    Xandroid_1_n,			TRUE,
-    EL_EMC_ANDROID_UP,			ACTION_MOVING, MV_BIT_UP
+    Xandroid_1_n,			FALSE,
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_UP
   },
   {
     Xandroid_2_n,			FALSE,
-    EL_EMC_ANDROID_UP,			ACTION_MOVING, MV_BIT_UP
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_UP
   },
   {
-    Xandroid_1_e,			TRUE,
-    EL_EMC_ANDROID_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+    Xandroid_1_e,			FALSE,
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_RIGHT
   },
   {
     Xandroid_2_e,			FALSE,
-    EL_EMC_ANDROID_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_RIGHT
   },
   {
-    Xandroid_1_w,			TRUE,
-    EL_EMC_ANDROID_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+    Xandroid_1_w,			FALSE,
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_LEFT
   },
   {
     Xandroid_2_w,			FALSE,
-    EL_EMC_ANDROID_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_LEFT
   },
   {
-    Xandroid_1_s,			TRUE,
-    EL_EMC_ANDROID_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+    Xandroid_1_s,			FALSE,
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_DOWN
   },
   {
     Xandroid_2_s,			FALSE,
-    EL_EMC_ANDROID_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_DOWN
   },
   {
     Yandroid_n,				FALSE,
-    EL_EMC_ANDROID_UP,			ACTION_MOVING, MV_BIT_UP
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_UP
   },
   {
     Yandroid_nB,			FALSE,
-    EL_EMC_ANDROID_UP,			ACTION_MOVING, MV_BIT_UP
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_UP
   },
   {
     Yandroid_ne,			FALSE,
-    EL_EMC_ANDROID_RIGHT_UP,	
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_neB,			FALSE,
-    EL_EMC_ANDROID_RIGHT_UP,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_e,				FALSE,
-    EL_EMC_ANDROID_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_RIGHT
   },
   {
     Yandroid_eB,			FALSE,
-    EL_EMC_ANDROID_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_RIGHT
   },
   {
     Yandroid_se,			FALSE,
-    EL_EMC_ANDROID_RIGHT_DOWN,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_seB,			FALSE,
-    EL_EMC_ANDROID_RIGHT_DOWN,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_s,				FALSE,
-    EL_EMC_ANDROID_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_DOWN
   },
   {
     Yandroid_sB,			FALSE,
-    EL_EMC_ANDROID_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_DOWN
   },
   {
     Yandroid_sw,			FALSE,
-    EL_EMC_ANDROID_LEFT_DOWN,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_swB,			FALSE,
-    EL_EMC_ANDROID_LEFT_DOWN,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_w,				FALSE,
-    EL_EMC_ANDROID_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_LEFT
   },
   {
     Yandroid_wB,			FALSE,
-    EL_EMC_ANDROID_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_MOVING, MV_BIT_LEFT
   },
   {
     Yandroid_nw,			FALSE,
-    EL_EMC_ANDROID_LEFT_UP,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Yandroid_nwB,			FALSE,
-    EL_EMC_ANDROID_LEFT_UP,		-1, -1
+    EL_EMC_ANDROID,			-1, -1
   },
   {
     Xspring,				TRUE,
@@ -3718,23 +3718,23 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xgrass,				TRUE,
-    EL_SAND,				-1, -1
+    EL_EMC_GRASS,			-1, -1
   },
   {
     Ygrass_nB,				FALSE,
-    EL_SAND,				ACTION_MOVING, MV_BIT_UP
+    EL_EMC_GRASS,			ACTION_MOVING, MV_BIT_UP
   },
   {
     Ygrass_eB,				FALSE,
-    EL_SAND,				ACTION_MOVING, MV_BIT_RIGHT
+    EL_EMC_GRASS,			ACTION_MOVING, MV_BIT_RIGHT
   },
   {
     Ygrass_sB,				FALSE,
-    EL_SAND,				ACTION_MOVING, MV_BIT_DOWN
+    EL_EMC_GRASS,			ACTION_MOVING, MV_BIT_DOWN
   },
   {
     Ygrass_wB,				FALSE,
-    EL_SAND,				ACTION_MOVING, MV_BIT_LEFT
+    EL_EMC_GRASS,			ACTION_MOVING, MV_BIT_LEFT
   },
   {
     Xdirt,				TRUE,
@@ -3810,23 +3810,23 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xball_1,				TRUE,
-    EL_EMC_GENERATOR_BALL,		-1, -1
+    EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
     Xball_1B,				FALSE,
-    EL_EMC_GENERATOR_BALL,		-1, -1
+    EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
     Xball_2,				FALSE,
-    EL_EMC_GENERATOR_BALL,		-1, -1
+    EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
     Xball_2B,				FALSE,
-    EL_EMC_GENERATOR_BALL,		-1, -1
+    EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
     Yball_eat,				FALSE,
-    EL_EMC_GENERATOR_BALL,		-1, -1
+    EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
     Xgrow_ns,				TRUE,
@@ -4029,8 +4029,8 @@ mapping_EM_to_RND_list[] =
     EL_ROBOT_WHEEL,			-1, -1
   },
   {
-    Xswitch,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xswitch,				TRUE,
+    EL_EMC_MAGIC_BALL_SWITCH,		-1, -1
   },
   {
     XswitchB,				FALSE,
@@ -4177,52 +4177,52 @@ mapping_EM_to_RND_list[] =
     EL_STEELWALL,			-1, -1
   },
   {
-    Xsteel_2,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xsteel_2,				TRUE,
+    EL_EMC_STEELWALL_2,			-1, -1
   },
   {
     Xsteel_3,				TRUE,
-    EL_EMC_STEELWALL_1,			-1, -1
+    EL_EMC_STEELWALL_3,			-1, -1
   },
   {
-    Xsteel_4,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xsteel_4,				TRUE,
+    EL_EMC_STEELWALL_4,			-1, -1
   },
   {
     Xwall_1,				TRUE,
     EL_WALL,				-1, -1
   },
   {
-    Xwall_2,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xwall_2,				TRUE,
+    EL_EMC_WALL_14,			-1, -1
   },
   {
-    Xwall_3,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xwall_3,				TRUE,
+    EL_EMC_WALL_15,			-1, -1
   },
   {
-    Xwall_4,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xwall_4,				TRUE,
+    EL_EMC_WALL_16,			-1, -1
   },
   {
     Xround_wall_1,			TRUE,
     EL_WALL_SLIPPERY,			-1, -1
   },
   {
-    Xround_wall_2,			FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xround_wall_2,			TRUE,
+    EL_EMC_WALL_SLIPPERY_2,		-1, -1
   },
   {
-    Xround_wall_3,			FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xround_wall_3,			TRUE,
+    EL_EMC_WALL_SLIPPERY_3,		-1, -1
   },
   {
-    Xround_wall_4,			FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xround_wall_4,			TRUE,
+    EL_EMC_WALL_SLIPPERY_4,		-1, -1
   },
   {
-    Xdecor_1,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xdecor_1,				TRUE,
+    EL_EMC_WALL_8,			-1, -1
   },
   {
     Xdecor_2,				TRUE,
@@ -4234,19 +4234,19 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xdecor_4,				TRUE,
-    EL_EMC_WALL_5,			-1, -1
-  },
-  {
-    Xdecor_5,				TRUE,
     EL_EMC_WALL_7,			-1, -1
   },
   {
-    Xdecor_6,				TRUE,
-    EL_EMC_WALL_8,			-1, -1
+    Xdecor_5,				TRUE,
+    EL_EMC_WALL_5,			-1, -1
   },
   {
-    Xdecor_7,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xdecor_6,				TRUE,
+    EL_EMC_WALL_9,			-1, -1
+  },
+  {
+    Xdecor_7,				TRUE,
+    EL_EMC_WALL_10,			-1, -1
   },
   {
     Xdecor_8,				TRUE,
@@ -4261,12 +4261,12 @@ mapping_EM_to_RND_list[] =
     EL_EMC_WALL_3,			-1, -1
   },
   {
-    Xdecor_11,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xdecor_11,				TRUE,
+    EL_EMC_WALL_11,			-1, -1
   },
   {
-    Xdecor_12,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xdecor_12,				TRUE,
+    EL_EMC_WALL_12,			-1, -1
   },
   {
     Xalpha_0,				TRUE,
@@ -4572,7 +4572,7 @@ int map_element_RND_to_EM(int element_rnd)
     { Xacid_sw,			EL_ACID_POOL_BOTTOMLEFT		},
     { Xacid_nw,			EL_ACID_POOL_TOPLEFT		},
     { Xacid_1,			EL_ACID				},
-    { Xball_1,			EL_EMC_GENERATOR_BALL		},
+    { Xball_1,			EL_EMC_MAGIC_BALL		},
     { Xgrow_ns,			EL_EMC_GROW			},
     { Xwonderwall,		EL_MAGIC_WALL			},
     { Xamoeba_1,		EL_AMOEBA_WET			},
@@ -4966,11 +4966,11 @@ int map_element_EM_to_RND(int element_em)
     { Xacid_6,			EL_ACID				},
     { Xacid_7,			EL_ACID				},
     { Xacid_8,			EL_ACID				},
-    { Xball_1,			EL_EMC_GENERATOR_BALL		},
-    { Xball_1B,			EL_EMC_GENERATOR_BALL		},
-    { Xball_2,			EL_EMC_GENERATOR_BALL		},
-    { Xball_2B,			EL_EMC_GENERATOR_BALL		},
-    { Yball_eat,		EL_EMC_GENERATOR_BALL		},
+    { Xball_1,			EL_EMC_MAGIC_BALL		},
+    { Xball_1B,			EL_EMC_MAGIC_BALL		},
+    { Xball_2,			EL_EMC_MAGIC_BALL		},
+    { Xball_2B,			EL_EMC_MAGIC_BALL		},
+    { Yball_eat,		EL_EMC_MAGIC_BALL		},
     { Xgrow_ns,			EL_EMC_GROW			},
     { Ygrow_ns_eat,		EL_EMC_GROW			},
     { Xgrow_ew,			EL_EMC_GROW			},

@@ -2595,6 +2595,105 @@ static int *editor_el_emerald_mine_ptr = editor_el_emerald_mine;
 static int num_editor_hl_emerald_mine=SIZEOF_ARRAY_INT(editor_hl_emerald_mine);
 static int num_editor_el_emerald_mine=SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
+static int editor_hl_emerald_mine_club[] =
+{
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+  EL_CHAR('E'),
+  EL_CHAR('-'),
+
+  EL_CHAR('R'),
+  EL_CHAR('A'),
+  EL_CHAR('L'),
+  EL_CHAR('D'),
+
+  EL_CHAR('M'),
+  EL_CHAR('I'),
+  EL_CHAR('N'),
+  EL_CHAR('E'),
+
+  EL_CHAR('C'),
+  EL_CHAR('L'),
+  EL_CHAR('U'),
+  EL_CHAR('B'),
+};
+
+static int editor_el_emerald_mine_club[] =
+{
+  EL_EMC_KEY_5,
+  EL_EMC_KEY_6,
+  EL_EMC_KEY_7,
+  EL_EMC_KEY_8,
+
+  EL_EMC_GATE_5,
+  EL_EMC_GATE_6,
+  EL_EMC_GATE_7,
+  EL_EMC_GATE_8,
+
+  EL_EMC_GATE_5_GRAY,
+  EL_EMC_GATE_6_GRAY,
+  EL_EMC_GATE_7_GRAY,
+  EL_EMC_GATE_8_GRAY,
+
+  EL_EMC_STEELWALL_1,
+  EL_EMC_STEELWALL_2,
+  EL_EMC_STEELWALL_3,
+  EL_EMC_STEELWALL_4,
+
+  EL_EMC_WALL_13,
+  EL_EMC_WALL_14,
+  EL_EMC_WALL_15,
+  EL_EMC_WALL_16,
+
+  EL_EMC_WALL_SLIPPERY_1,
+  EL_EMC_WALL_SLIPPERY_2,
+  EL_EMC_WALL_SLIPPERY_3,
+  EL_EMC_WALL_SLIPPERY_4,
+
+  EL_EMC_WALL_1,
+  EL_EMC_WALL_2,
+  EL_EMC_WALL_3,
+  EL_EMC_WALL_4,
+
+  EL_EMC_WALL_5,
+  EL_EMC_WALL_6,
+  EL_EMC_WALL_7,
+  EL_EMC_WALL_8,
+
+  EL_EMC_WALL_9,
+  EL_EMC_WALL_10,
+  EL_EMC_WALL_11,
+  EL_EMC_WALL_12,
+
+  EL_EMC_ANDROID,
+  EL_BALLOON,
+  EL_BALLOON_SWITCH_ANY,
+  EL_BALLOON_SWITCH_NONE,
+
+  EL_BALLOON_SWITCH_LEFT,
+  EL_BALLOON_SWITCH_RIGHT,
+  EL_BALLOON_SWITCH_UP,
+  EL_BALLOON_SWITCH_DOWN,
+
+  EL_EMC_GRASS,
+  EL_EMC_PLANT,
+  EL_EMC_LENSES,
+  EL_EMC_MAGNIFIER,
+
+  EL_EMC_MAGIC_BALL,
+  EL_EMC_MAGIC_BALL_SWITCH,
+  EL_SPRING,
+  EL_EMC_BUMPER,
+
+#if 0
+  EL_EMC_LEVEL_BORDER,
+#endif
+};
+static int *editor_hl_emerald_mine_club_ptr = editor_hl_emerald_mine_club;
+static int *editor_el_emerald_mine_club_ptr = editor_el_emerald_mine_club;
+static int num_editor_hl_emerald_mine_club=SIZEOF_ARRAY_INT(editor_hl_emerald_mine_club);
+static int num_editor_el_emerald_mine_club=SIZEOF_ARRAY_INT(editor_el_emerald_mine_club);
+
 static int editor_hl_more[] =
 {
   EL_CHAR('M'),
@@ -2672,13 +2771,8 @@ static int editor_el_more[] =
 
   EL_SPACESHIP,
   EL_MOLE_DOWN,
-  EL_BALLOON,
-  EL_BALLOON_SWITCH_ANY,
-
-  EL_BALLOON_SWITCH_LEFT,
-  EL_BALLOON_SWITCH_RIGHT,
-  EL_BALLOON_SWITCH_UP,
-  EL_BALLOON_SWITCH_DOWN,
+  EL_EMPTY,
+  EL_EMPTY,
 
   EL_SATELLITE,
   EL_EXPANDABLE_WALL_HORIZONTAL,
@@ -2689,16 +2783,6 @@ static int editor_el_more[] =
   EL_INVISIBLE_WALL,
   EL_SPEED_PILL,
   EL_BLACK_ORB,
-
-  EL_EMC_STEELWALL_1,
-  EL_EMC_WALL_1,
-  EL_EMC_WALL_2,
-  EL_EMC_WALL_3,
-
-  EL_EMC_WALL_4,
-  EL_EMC_WALL_5,
-  EL_EMC_WALL_6,
-  EL_EMC_WALL_7,
 };
 static int *editor_hl_more_ptr = editor_hl_more;
 static int *editor_el_more_ptr = editor_el_more;
@@ -2924,7 +3008,7 @@ static int editor_hl_dx_boulderdash[] =
 
 static int editor_el_dx_boulderdash[] =
 {
-  EL_SPRING,
+  EL_EMPTY,
   EL_TUBE_RIGHT_DOWN,
   EL_TUBE_HORIZONTAL_DOWN,
   EL_TUBE_LEFT_DOWN,
@@ -3571,6 +3655,11 @@ editor_elements_info[] =
     &setup.editor.el_emerald_mine,
     &editor_hl_emerald_mine_ptr,	&num_editor_hl_emerald_mine,
     &editor_el_emerald_mine_ptr,	&num_editor_el_emerald_mine
+  },
+  {
+    &setup.editor.el_emerald_mine_club,
+    &editor_hl_emerald_mine_club_ptr,	&num_editor_hl_emerald_mine_club,
+    &editor_el_emerald_mine_club_ptr,	&num_editor_el_emerald_mine_club
   },
   {
     &setup.editor.el_more,

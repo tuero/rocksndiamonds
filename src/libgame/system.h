@@ -550,6 +550,7 @@ struct SetupEditorInfo
 {
   boolean el_boulderdash;
   boolean el_emerald_mine;
+  boolean el_emerald_mine_club;
   boolean el_more;
   boolean el_sokoban;
   boolean el_supaplex;

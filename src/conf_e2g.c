@@ -2574,8 +2574,16 @@ element_to_graphic[] =
     IMG_EMC_ANDROID
   },
   {
-    EL_EMC_GENERATOR_BALL,		-1, -1, FALSE,
-    IMG_EMC_GENERATOR_BALL
+    EL_EMC_GRASS,			-1, -1, FALSE,
+    IMG_EMC_GRASS
+  },
+  {
+    EL_EMC_MAGIC_BALL,			-1, -1, FALSE,
+    IMG_EMC_MAGIC_BALL
+  },
+  {
+    EL_EMC_MAGIC_BALL_SWITCH,		-1, -1, FALSE,
+    IMG_EMC_MAGIC_BALL_SWITCH
   },
   {
     EL_EMC_GATE_5,			-1, -1, FALSE,
@@ -2624,6 +2632,70 @@ element_to_graphic[] =
   {
     EL_EMC_KEY_8,			-1, -1, FALSE,
     IMG_EMC_KEY_8
+  },
+  {
+    EL_EMC_BUMPER,			-1, -1, FALSE,
+    IMG_EMC_BUMPER
+  },
+  {
+    EL_EMC_PLANT,			-1, -1, FALSE,
+    IMG_EMC_PLANT
+  },
+  {
+    EL_EMC_LENSES,			-1, -1, FALSE,
+    IMG_EMC_LENSES
+  },
+  {
+    EL_EMC_MAGNIFIER,			-1, -1, FALSE,
+    IMG_EMC_MAGNIFIER
+  },
+  {
+    EL_EMC_WALL_9,			-1, -1, FALSE,
+    IMG_EMC_WALL_9
+  },
+  {
+    EL_EMC_WALL_10,			-1, -1, FALSE,
+    IMG_EMC_WALL_10
+  },
+  {
+    EL_EMC_WALL_11,			-1, -1, FALSE,
+    IMG_EMC_WALL_11
+  },
+  {
+    EL_EMC_WALL_12,			-1, -1, FALSE,
+    IMG_EMC_WALL_12
+  },
+  {
+    EL_EMC_WALL_13,			-1, -1, FALSE,
+    IMG_EMC_WALL_13
+  },
+  {
+    EL_EMC_WALL_14,			-1, -1, FALSE,
+    IMG_EMC_WALL_14
+  },
+  {
+    EL_EMC_WALL_15,			-1, -1, FALSE,
+    IMG_EMC_WALL_15
+  },
+  {
+    EL_EMC_WALL_16,			-1, -1, FALSE,
+    IMG_EMC_WALL_16
+  },
+  {
+    EL_EMC_WALL_SLIPPERY_1,		-1, -1, FALSE,
+    IMG_EMC_WALL_SLIPPERY_1
+  },
+  {
+    EL_EMC_WALL_SLIPPERY_2,		-1, -1, FALSE,
+    IMG_EMC_WALL_SLIPPERY_2
+  },
+  {
+    EL_EMC_WALL_SLIPPERY_3,		-1, -1, FALSE,
+    IMG_EMC_WALL_SLIPPERY_3
+  },
+  {
+    EL_EMC_WALL_SLIPPERY_4,		-1, -1, FALSE,
+    IMG_EMC_WALL_SLIPPERY_4
   },
   {
     EL_BD_BUTTERFLY_DOWN,		-1, -1, FALSE,

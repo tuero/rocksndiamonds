@@ -1884,8 +1884,9 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
     level->field[x][y] = new_element;
   }
 
-  level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
+  /* if both players are set to the same field, use the first player */
   level->field[ply2->x_initial - 1][ply2->y_initial - 1] = EL_PLAYER_2;
+  level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
 }
 
 static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
@@ -3956,18 +3957,19 @@ void SaveScore(int nr)
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
 #define SETUP_TOKEN_EDITOR_EL_EMERALD_MINE	1
-#define SETUP_TOKEN_EDITOR_EL_MORE		2
-#define SETUP_TOKEN_EDITOR_EL_SOKOBAN		3
-#define SETUP_TOKEN_EDITOR_EL_SUPAPLEX		4
-#define SETUP_TOKEN_EDITOR_EL_DIAMOND_CAVES	5
-#define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	6
-#define SETUP_TOKEN_EDITOR_EL_CHARS		7
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM		8
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM_MORE	9
-#define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
-#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	11
+#define SETUP_TOKEN_EDITOR_EL_EMERALD_MINE_CLUB	2
+#define SETUP_TOKEN_EDITOR_EL_MORE		3
+#define SETUP_TOKEN_EDITOR_EL_SOKOBAN		4
+#define SETUP_TOKEN_EDITOR_EL_SUPAPLEX		5
+#define SETUP_TOKEN_EDITOR_EL_DIAMOND_CAVES	6
+#define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	7
+#define SETUP_TOKEN_EDITOR_EL_CHARS		8
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM		9
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM_MORE	10
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		11
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	12
 
-#define NUM_EDITOR_SETUP_TOKENS			12
+#define NUM_EDITOR_SETUP_TOKENS			13
 
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
@@ -4045,6 +4047,7 @@ static struct TokenInfo editor_setup_tokens[] =
 {
   { TYPE_SWITCH, &sei.el_boulderdash,	"editor.el_boulderdash"		},
   { TYPE_SWITCH, &sei.el_emerald_mine,	"editor.el_emerald_mine"	},
+  { TYPE_SWITCH, &sei.el_emerald_mine_club,"editor.el_emerald_mine_club"},
   { TYPE_SWITCH, &sei.el_more,		"editor.el_more"		},
   { TYPE_SWITCH, &sei.el_sokoban,	"editor.el_sokoban"		},
   { TYPE_SWITCH, &sei.el_supaplex,	"editor.el_supaplex"		},
@@ -4141,16 +4144,17 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
 
-  si->editor.el_boulderdash = TRUE;
-  si->editor.el_emerald_mine = TRUE;
-  si->editor.el_more = TRUE;
-  si->editor.el_sokoban = TRUE;
-  si->editor.el_supaplex = TRUE;
-  si->editor.el_diamond_caves = TRUE;
-  si->editor.el_dx_boulderdash = TRUE;
-  si->editor.el_chars = TRUE;
-  si->editor.el_custom = TRUE;
-  si->editor.el_custom_more = FALSE;
+  si->editor.el_boulderdash       = TRUE;
+  si->editor.el_emerald_mine      = TRUE;
+  si->editor.el_emerald_mine_club = TRUE;
+  si->editor.el_more              = TRUE;
+  si->editor.el_sokoban           = TRUE;
+  si->editor.el_supaplex          = TRUE;
+  si->editor.el_diamond_caves     = TRUE;
+  si->editor.el_dx_boulderdash    = TRUE;
+  si->editor.el_chars             = TRUE;
+  si->editor.el_custom            = TRUE;
+  si->editor.el_custom_more       = FALSE;
 
   si->editor.el_headlines = TRUE;
   si->editor.el_user_defined = FALSE;

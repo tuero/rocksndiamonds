@@ -3475,74 +3475,19 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "android",
   },
   {
-    "emc_android_right",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_up",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_left",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_down",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_left_up",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_left_down",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_right_up",
-    "emc_android",
-    "android",
-  },
-  {
-    "emc_android_right_down",
-    "emc_android",
-    "android",
-  },
-  {
     "emc_grass",
     "emc_grass",
     "grass",
   },
   {
-    "emc_generator_ball",
-    "emc_generator_ball",
-    "generator ball",
+    "emc_magic_ball",
+    "emc_magic_ball",
+    "magic ball",
   },
   {
-    "emc_gate_1",
-    "gate",
-    "door 1 (EMC style)",
-  },
-  {
-    "emc_gate_2",
-    "gate",
-    "door 2 (EMC style)",
-  },
-  {
-    "emc_gate_3",
-    "gate",
-    "door 3 (EMC style)",
-  },
-  {
-    "emc_gate_4",
-    "gate",
-    "door 4 (EMC style)",
+    "emc_magic_ball_switch",
+    "emc_magic_ball_switch",
+    "magic ball switch",
   },
   {
     "emc_gate_5",
@@ -3565,26 +3510,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "door 8 (EMC style)",
   },
   {
-    "emc_gate_1_gray",
-    "gate",
-    "gray door (EMC style, key 1)",
-  },
-  {
-    "emc_gate_2_gray",
-    "gate",
-    "gray door (EMC style, key 2)",
-  },
-  {
-    "emc_gate_3_gray",
-    "gate",
-    "gray door (EMC style, key 3)",
-  },
-  {
-    "emc_gate_4_gray",
-    "gate",
-    "gray door (EMC style, key 4)",
-  },
-  {
     "emc_gate_5_gray",
     "gate",
     "gray door (EMC style, key 5)",
@@ -3603,26 +3528,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "emc_gate_8_gray",
     "gate",
     "gray door (EMC style, key 8)",
-  },
-  {
-    "emc_key_1",
-    "key",
-    "key 1 (EMC style)",
-  },
-  {
-    "emc_key_2",
-    "key",
-    "key 2 (EMC style)",
-  },
-  {
-    "emc_key_3",
-    "key",
-    "key 3 (EMC style)",
-  },
-  {
-    "emc_key_4",
-    "key",
-    "key 4 (EMC style)",
   },
   {
     "emc_key_5",
@@ -3663,6 +3568,66 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "emc_magnifier",
     "emc_magnifier",
     "magnifier",
+  },
+  {
+    "emc_wall_9",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_10",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_11",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_12",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_13",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_14",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_15",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_16",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_slippery_1",
+    "wall",
+    "slippery wall"
+  },
+  {
+    "emc_wall_slippery_2",
+    "wall",
+    "slippery wall"
+  },
+  {
+    "emc_wall_slippery_3",
+    "wall",
+    "slippery wall"
+  },
+  {
+    "emc_wall_slippery_4",
+    "wall",
+    "slippery wall"
   },
 
   /* ----------------------------------------------------------------------- */

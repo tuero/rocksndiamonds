@@ -129,6 +129,7 @@ void readjoy(byte action)
   if (action & JOY_BUTTON_1)
     fire = 1;
 
+#if 1
   ply1.joy_fire = fire;
   if (ply1.joy_stick || (north | east | south | west))
   {
@@ -137,4 +138,14 @@ void readjoy(byte action)
     ply1.joy_s = south;
     ply1.joy_w = west;
   }
+#else
+  ply2.joy_fire = fire;
+  if (ply2.joy_stick || (north | east | south | west))
+  {
+    ply2.joy_n = north;
+    ply2.joy_e = east;
+    ply2.joy_s = south;
+    ply2.joy_w = west;
+  }
+#endif
 }
