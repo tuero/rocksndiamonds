@@ -3318,6 +3318,518 @@ element_to_graphic[] =
     IMG_CUSTOM_128
   },
   {
+    EL_CUSTOM_129,			-1, -1, FALSE,
+    IMG_CUSTOM_129
+  },
+  {
+    EL_CUSTOM_130,			-1, -1, FALSE,
+    IMG_CUSTOM_130
+  },
+  {
+    EL_CUSTOM_131,			-1, -1, FALSE,
+    IMG_CUSTOM_131
+  },
+  {
+    EL_CUSTOM_132,			-1, -1, FALSE,
+    IMG_CUSTOM_132
+  },
+  {
+    EL_CUSTOM_133,			-1, -1, FALSE,
+    IMG_CUSTOM_133
+  },
+  {
+    EL_CUSTOM_134,			-1, -1, FALSE,
+    IMG_CUSTOM_134
+  },
+  {
+    EL_CUSTOM_135,			-1, -1, FALSE,
+    IMG_CUSTOM_135
+  },
+  {
+    EL_CUSTOM_136,			-1, -1, FALSE,
+    IMG_CUSTOM_136
+  },
+  {
+    EL_CUSTOM_137,			-1, -1, FALSE,
+    IMG_CUSTOM_137
+  },
+  {
+    EL_CUSTOM_138,			-1, -1, FALSE,
+    IMG_CUSTOM_138
+  },
+  {
+    EL_CUSTOM_139,			-1, -1, FALSE,
+    IMG_CUSTOM_139
+  },
+  {
+    EL_CUSTOM_140,			-1, -1, FALSE,
+    IMG_CUSTOM_140
+  },
+  {
+    EL_CUSTOM_141,			-1, -1, FALSE,
+    IMG_CUSTOM_141
+  },
+  {
+    EL_CUSTOM_142,			-1, -1, FALSE,
+    IMG_CUSTOM_142
+  },
+  {
+    EL_CUSTOM_143,			-1, -1, FALSE,
+    IMG_CUSTOM_143
+  },
+  {
+    EL_CUSTOM_144,			-1, -1, FALSE,
+    IMG_CUSTOM_144
+  },
+  {
+    EL_CUSTOM_145,			-1, -1, FALSE,
+    IMG_CUSTOM_145
+  },
+  {
+    EL_CUSTOM_146,			-1, -1, FALSE,
+    IMG_CUSTOM_146
+  },
+  {
+    EL_CUSTOM_147,			-1, -1, FALSE,
+    IMG_CUSTOM_147
+  },
+  {
+    EL_CUSTOM_148,			-1, -1, FALSE,
+    IMG_CUSTOM_148
+  },
+  {
+    EL_CUSTOM_149,			-1, -1, FALSE,
+    IMG_CUSTOM_149
+  },
+  {
+    EL_CUSTOM_150,			-1, -1, FALSE,
+    IMG_CUSTOM_150
+  },
+  {
+    EL_CUSTOM_151,			-1, -1, FALSE,
+    IMG_CUSTOM_151
+  },
+  {
+    EL_CUSTOM_152,			-1, -1, FALSE,
+    IMG_CUSTOM_152
+  },
+  {
+    EL_CUSTOM_153,			-1, -1, FALSE,
+    IMG_CUSTOM_153
+  },
+  {
+    EL_CUSTOM_154,			-1, -1, FALSE,
+    IMG_CUSTOM_154
+  },
+  {
+    EL_CUSTOM_155,			-1, -1, FALSE,
+    IMG_CUSTOM_155
+  },
+  {
+    EL_CUSTOM_156,			-1, -1, FALSE,
+    IMG_CUSTOM_156
+  },
+  {
+    EL_CUSTOM_157,			-1, -1, FALSE,
+    IMG_CUSTOM_157
+  },
+  {
+    EL_CUSTOM_158,			-1, -1, FALSE,
+    IMG_CUSTOM_158
+  },
+  {
+    EL_CUSTOM_159,			-1, -1, FALSE,
+    IMG_CUSTOM_159
+  },
+  {
+    EL_CUSTOM_160,			-1, -1, FALSE,
+    IMG_CUSTOM_160
+  },
+  {
+    EL_CUSTOM_161,			-1, -1, FALSE,
+    IMG_CUSTOM_161
+  },
+  {
+    EL_CUSTOM_162,			-1, -1, FALSE,
+    IMG_CUSTOM_162
+  },
+  {
+    EL_CUSTOM_163,			-1, -1, FALSE,
+    IMG_CUSTOM_163
+  },
+  {
+    EL_CUSTOM_164,			-1, -1, FALSE,
+    IMG_CUSTOM_164
+  },
+  {
+    EL_CUSTOM_165,			-1, -1, FALSE,
+    IMG_CUSTOM_165
+  },
+  {
+    EL_CUSTOM_166,			-1, -1, FALSE,
+    IMG_CUSTOM_166
+  },
+  {
+    EL_CUSTOM_167,			-1, -1, FALSE,
+    IMG_CUSTOM_167
+  },
+  {
+    EL_CUSTOM_168,			-1, -1, FALSE,
+    IMG_CUSTOM_168
+  },
+  {
+    EL_CUSTOM_169,			-1, -1, FALSE,
+    IMG_CUSTOM_169
+  },
+  {
+    EL_CUSTOM_170,			-1, -1, FALSE,
+    IMG_CUSTOM_170
+  },
+  {
+    EL_CUSTOM_171,			-1, -1, FALSE,
+    IMG_CUSTOM_171
+  },
+  {
+    EL_CUSTOM_172,			-1, -1, FALSE,
+    IMG_CUSTOM_172
+  },
+  {
+    EL_CUSTOM_173,			-1, -1, FALSE,
+    IMG_CUSTOM_173
+  },
+  {
+    EL_CUSTOM_174,			-1, -1, FALSE,
+    IMG_CUSTOM_174
+  },
+  {
+    EL_CUSTOM_175,			-1, -1, FALSE,
+    IMG_CUSTOM_175
+  },
+  {
+    EL_CUSTOM_176,			-1, -1, FALSE,
+    IMG_CUSTOM_176
+  },
+  {
+    EL_CUSTOM_177,			-1, -1, FALSE,
+    IMG_CUSTOM_177
+  },
+  {
+    EL_CUSTOM_178,			-1, -1, FALSE,
+    IMG_CUSTOM_178
+  },
+  {
+    EL_CUSTOM_179,			-1, -1, FALSE,
+    IMG_CUSTOM_179
+  },
+  {
+    EL_CUSTOM_180,			-1, -1, FALSE,
+    IMG_CUSTOM_180
+  },
+  {
+    EL_CUSTOM_181,			-1, -1, FALSE,
+    IMG_CUSTOM_181
+  },
+  {
+    EL_CUSTOM_182,			-1, -1, FALSE,
+    IMG_CUSTOM_182
+  },
+  {
+    EL_CUSTOM_183,			-1, -1, FALSE,
+    IMG_CUSTOM_183
+  },
+  {
+    EL_CUSTOM_184,			-1, -1, FALSE,
+    IMG_CUSTOM_184
+  },
+  {
+    EL_CUSTOM_185,			-1, -1, FALSE,
+    IMG_CUSTOM_185
+  },
+  {
+    EL_CUSTOM_186,			-1, -1, FALSE,
+    IMG_CUSTOM_186
+  },
+  {
+    EL_CUSTOM_187,			-1, -1, FALSE,
+    IMG_CUSTOM_187
+  },
+  {
+    EL_CUSTOM_188,			-1, -1, FALSE,
+    IMG_CUSTOM_188
+  },
+  {
+    EL_CUSTOM_189,			-1, -1, FALSE,
+    IMG_CUSTOM_189
+  },
+  {
+    EL_CUSTOM_190,			-1, -1, FALSE,
+    IMG_CUSTOM_190
+  },
+  {
+    EL_CUSTOM_191,			-1, -1, FALSE,
+    IMG_CUSTOM_191
+  },
+  {
+    EL_CUSTOM_192,			-1, -1, FALSE,
+    IMG_CUSTOM_192
+  },
+  {
+    EL_CUSTOM_193,			-1, -1, FALSE,
+    IMG_CUSTOM_193
+  },
+  {
+    EL_CUSTOM_194,			-1, -1, FALSE,
+    IMG_CUSTOM_194
+  },
+  {
+    EL_CUSTOM_195,			-1, -1, FALSE,
+    IMG_CUSTOM_195
+  },
+  {
+    EL_CUSTOM_196,			-1, -1, FALSE,
+    IMG_CUSTOM_196
+  },
+  {
+    EL_CUSTOM_197,			-1, -1, FALSE,
+    IMG_CUSTOM_197
+  },
+  {
+    EL_CUSTOM_198,			-1, -1, FALSE,
+    IMG_CUSTOM_198
+  },
+  {
+    EL_CUSTOM_199,			-1, -1, FALSE,
+    IMG_CUSTOM_199
+  },
+  {
+    EL_CUSTOM_200,			-1, -1, FALSE,
+    IMG_CUSTOM_200
+  },
+  {
+    EL_CUSTOM_201,			-1, -1, FALSE,
+    IMG_CUSTOM_201
+  },
+  {
+    EL_CUSTOM_202,			-1, -1, FALSE,
+    IMG_CUSTOM_202
+  },
+  {
+    EL_CUSTOM_203,			-1, -1, FALSE,
+    IMG_CUSTOM_203
+  },
+  {
+    EL_CUSTOM_204,			-1, -1, FALSE,
+    IMG_CUSTOM_204
+  },
+  {
+    EL_CUSTOM_205,			-1, -1, FALSE,
+    IMG_CUSTOM_205
+  },
+  {
+    EL_CUSTOM_206,			-1, -1, FALSE,
+    IMG_CUSTOM_206
+  },
+  {
+    EL_CUSTOM_207,			-1, -1, FALSE,
+    IMG_CUSTOM_207
+  },
+  {
+    EL_CUSTOM_208,			-1, -1, FALSE,
+    IMG_CUSTOM_208
+  },
+  {
+    EL_CUSTOM_209,			-1, -1, FALSE,
+    IMG_CUSTOM_209
+  },
+  {
+    EL_CUSTOM_210,			-1, -1, FALSE,
+    IMG_CUSTOM_210
+  },
+  {
+    EL_CUSTOM_211,			-1, -1, FALSE,
+    IMG_CUSTOM_211
+  },
+  {
+    EL_CUSTOM_212,			-1, -1, FALSE,
+    IMG_CUSTOM_212
+  },
+  {
+    EL_CUSTOM_213,			-1, -1, FALSE,
+    IMG_CUSTOM_213
+  },
+  {
+    EL_CUSTOM_214,			-1, -1, FALSE,
+    IMG_CUSTOM_214
+  },
+  {
+    EL_CUSTOM_215,			-1, -1, FALSE,
+    IMG_CUSTOM_215
+  },
+  {
+    EL_CUSTOM_216,			-1, -1, FALSE,
+    IMG_CUSTOM_216
+  },
+  {
+    EL_CUSTOM_217,			-1, -1, FALSE,
+    IMG_CUSTOM_217
+  },
+  {
+    EL_CUSTOM_218,			-1, -1, FALSE,
+    IMG_CUSTOM_218
+  },
+  {
+    EL_CUSTOM_219,			-1, -1, FALSE,
+    IMG_CUSTOM_219
+  },
+  {
+    EL_CUSTOM_220,			-1, -1, FALSE,
+    IMG_CUSTOM_220
+  },
+  {
+    EL_CUSTOM_221,			-1, -1, FALSE,
+    IMG_CUSTOM_221
+  },
+  {
+    EL_CUSTOM_222,			-1, -1, FALSE,
+    IMG_CUSTOM_222
+  },
+  {
+    EL_CUSTOM_223,			-1, -1, FALSE,
+    IMG_CUSTOM_223
+  },
+  {
+    EL_CUSTOM_224,			-1, -1, FALSE,
+    IMG_CUSTOM_224
+  },
+  {
+    EL_CUSTOM_225,			-1, -1, FALSE,
+    IMG_CUSTOM_225
+  },
+  {
+    EL_CUSTOM_226,			-1, -1, FALSE,
+    IMG_CUSTOM_226
+  },
+  {
+    EL_CUSTOM_227,			-1, -1, FALSE,
+    IMG_CUSTOM_227
+  },
+  {
+    EL_CUSTOM_228,			-1, -1, FALSE,
+    IMG_CUSTOM_228
+  },
+  {
+    EL_CUSTOM_229,			-1, -1, FALSE,
+    IMG_CUSTOM_229
+  },
+  {
+    EL_CUSTOM_230,			-1, -1, FALSE,
+    IMG_CUSTOM_230
+  },
+  {
+    EL_CUSTOM_231,			-1, -1, FALSE,
+    IMG_CUSTOM_231
+  },
+  {
+    EL_CUSTOM_232,			-1, -1, FALSE,
+    IMG_CUSTOM_232
+  },
+  {
+    EL_CUSTOM_233,			-1, -1, FALSE,
+    IMG_CUSTOM_233
+  },
+  {
+    EL_CUSTOM_234,			-1, -1, FALSE,
+    IMG_CUSTOM_234
+  },
+  {
+    EL_CUSTOM_235,			-1, -1, FALSE,
+    IMG_CUSTOM_235
+  },
+  {
+    EL_CUSTOM_236,			-1, -1, FALSE,
+    IMG_CUSTOM_236
+  },
+  {
+    EL_CUSTOM_237,			-1, -1, FALSE,
+    IMG_CUSTOM_237
+  },
+  {
+    EL_CUSTOM_238,			-1, -1, FALSE,
+    IMG_CUSTOM_238
+  },
+  {
+    EL_CUSTOM_239,			-1, -1, FALSE,
+    IMG_CUSTOM_239
+  },
+  {
+    EL_CUSTOM_240,			-1, -1, FALSE,
+    IMG_CUSTOM_240
+  },
+  {
+    EL_CUSTOM_241,			-1, -1, FALSE,
+    IMG_CUSTOM_241
+  },
+  {
+    EL_CUSTOM_242,			-1, -1, FALSE,
+    IMG_CUSTOM_242
+  },
+  {
+    EL_CUSTOM_243,			-1, -1, FALSE,
+    IMG_CUSTOM_243
+  },
+  {
+    EL_CUSTOM_244,			-1, -1, FALSE,
+    IMG_CUSTOM_244
+  },
+  {
+    EL_CUSTOM_245,			-1, -1, FALSE,
+    IMG_CUSTOM_245
+  },
+  {
+    EL_CUSTOM_246,			-1, -1, FALSE,
+    IMG_CUSTOM_246
+  },
+  {
+    EL_CUSTOM_247,			-1, -1, FALSE,
+    IMG_CUSTOM_247
+  },
+  {
+    EL_CUSTOM_248,			-1, -1, FALSE,
+    IMG_CUSTOM_248
+  },
+  {
+    EL_CUSTOM_249,			-1, -1, FALSE,
+    IMG_CUSTOM_249
+  },
+  {
+    EL_CUSTOM_250,			-1, -1, FALSE,
+    IMG_CUSTOM_250
+  },
+  {
+    EL_CUSTOM_251,			-1, -1, FALSE,
+    IMG_CUSTOM_251
+  },
+  {
+    EL_CUSTOM_252,			-1, -1, FALSE,
+    IMG_CUSTOM_252
+  },
+  {
+    EL_CUSTOM_253,			-1, -1, FALSE,
+    IMG_CUSTOM_253
+  },
+  {
+    EL_CUSTOM_254,			-1, -1, FALSE,
+    IMG_CUSTOM_254
+  },
+  {
+    EL_CUSTOM_255,			-1, -1, FALSE,
+    IMG_CUSTOM_255
+  },
+  {
+    EL_CUSTOM_256,			-1, -1, FALSE,
+    IMG_CUSTOM_256
+  },
+  {
     -1,					-1, -1, FALSE,
     -1
   },

@@ -742,10 +742,10 @@
 
 #include "conf_cus.h"	/* include auto-generated data structure definitions */
 
-#define EL_CUSTOM_END			(EL_CUSTOM_START + 127)
+#define NUM_CUSTOM_ELEMENTS		256
 
-#define NUM_CUSTOM_ELEMENTS		128
-#define NUM_FILE_ELEMENTS		488
+#define EL_CUSTOM_END		(EL_CUSTOM_START + NUM_CUSTOM_ELEMENTS - 1)
+#define NUM_FILE_ELEMENTS	(EL_CUSTOM_START + NUM_CUSTOM_ELEMENTS)
 
 
 /* "real" (and therefore drawable) runtime elements */

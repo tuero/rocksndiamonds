@@ -924,7 +924,7 @@ static struct
     GADGET_ID_ELEMENT_NAME,
     MAX_ELEMENT_NAME_LEN - 2,		/* currently 2 chars less editable */
     custom_element.description,
-    NULL
+    "Element name"
   }
 };
 
@@ -2469,6 +2469,170 @@ static int editor_el_custom[] =
 };
 static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
+static int editor_el_custom_more[] =
+{
+  EL_CUSTOM_START + 128,
+  EL_CUSTOM_START + 129,
+  EL_CUSTOM_START + 130,
+  EL_CUSTOM_START + 131,
+
+  EL_CUSTOM_START + 132,
+  EL_CUSTOM_START + 133,
+  EL_CUSTOM_START + 134,
+  EL_CUSTOM_START + 135,
+
+  EL_CUSTOM_START + 136,
+  EL_CUSTOM_START + 137,
+  EL_CUSTOM_START + 138,
+  EL_CUSTOM_START + 139,
+
+  EL_CUSTOM_START + 140,
+  EL_CUSTOM_START + 141,
+  EL_CUSTOM_START + 142,
+  EL_CUSTOM_START + 143,
+
+  EL_CUSTOM_START + 144,
+  EL_CUSTOM_START + 145,
+  EL_CUSTOM_START + 146,
+  EL_CUSTOM_START + 147,
+
+  EL_CUSTOM_START + 148,
+  EL_CUSTOM_START + 149,
+  EL_CUSTOM_START + 150,
+  EL_CUSTOM_START + 151,
+
+  EL_CUSTOM_START + 152,
+  EL_CUSTOM_START + 153,
+  EL_CUSTOM_START + 154,
+  EL_CUSTOM_START + 155,
+
+  EL_CUSTOM_START + 156,
+  EL_CUSTOM_START + 157,
+  EL_CUSTOM_START + 158,
+  EL_CUSTOM_START + 159,
+
+  EL_CUSTOM_START + 160,
+  EL_CUSTOM_START + 161,
+  EL_CUSTOM_START + 162,
+  EL_CUSTOM_START + 163,
+
+  EL_CUSTOM_START + 164,
+  EL_CUSTOM_START + 165,
+  EL_CUSTOM_START + 166,
+  EL_CUSTOM_START + 167,
+
+  EL_CUSTOM_START + 168,
+  EL_CUSTOM_START + 169,
+  EL_CUSTOM_START + 170,
+  EL_CUSTOM_START + 171,
+
+  EL_CUSTOM_START + 172,
+  EL_CUSTOM_START + 173,
+  EL_CUSTOM_START + 174,
+  EL_CUSTOM_START + 175,
+
+  EL_CUSTOM_START + 176,
+  EL_CUSTOM_START + 177,
+  EL_CUSTOM_START + 178,
+  EL_CUSTOM_START + 179,
+
+  EL_CUSTOM_START + 180,
+  EL_CUSTOM_START + 181,
+  EL_CUSTOM_START + 182,
+  EL_CUSTOM_START + 183,
+
+  EL_CUSTOM_START + 184,
+  EL_CUSTOM_START + 185,
+  EL_CUSTOM_START + 186,
+  EL_CUSTOM_START + 187,
+
+  EL_CUSTOM_START + 188,
+  EL_CUSTOM_START + 189,
+  EL_CUSTOM_START + 190,
+  EL_CUSTOM_START + 191,
+
+  EL_CUSTOM_START + 192,
+  EL_CUSTOM_START + 193,
+  EL_CUSTOM_START + 194,
+  EL_CUSTOM_START + 195,
+
+  EL_CUSTOM_START + 196,
+  EL_CUSTOM_START + 197,
+  EL_CUSTOM_START + 198,
+  EL_CUSTOM_START + 199,
+
+  EL_CUSTOM_START + 200,
+  EL_CUSTOM_START + 201,
+  EL_CUSTOM_START + 202,
+  EL_CUSTOM_START + 203,
+
+  EL_CUSTOM_START + 204,
+  EL_CUSTOM_START + 205,
+  EL_CUSTOM_START + 206,
+  EL_CUSTOM_START + 207,
+
+  EL_CUSTOM_START + 208,
+  EL_CUSTOM_START + 209,
+  EL_CUSTOM_START + 210,
+  EL_CUSTOM_START + 211,
+
+  EL_CUSTOM_START + 212,
+  EL_CUSTOM_START + 213,
+  EL_CUSTOM_START + 214,
+  EL_CUSTOM_START + 215,
+
+  EL_CUSTOM_START + 216,
+  EL_CUSTOM_START + 217,
+  EL_CUSTOM_START + 218,
+  EL_CUSTOM_START + 219,
+
+  EL_CUSTOM_START + 220,
+  EL_CUSTOM_START + 221,
+  EL_CUSTOM_START + 222,
+  EL_CUSTOM_START + 223,
+
+  EL_CUSTOM_START + 224,
+  EL_CUSTOM_START + 225,
+  EL_CUSTOM_START + 226,
+  EL_CUSTOM_START + 227,
+
+  EL_CUSTOM_START + 228,
+  EL_CUSTOM_START + 229,
+  EL_CUSTOM_START + 230,
+  EL_CUSTOM_START + 231,
+
+  EL_CUSTOM_START + 232,
+  EL_CUSTOM_START + 233,
+  EL_CUSTOM_START + 234,
+  EL_CUSTOM_START + 235,
+
+  EL_CUSTOM_START + 236,
+  EL_CUSTOM_START + 237,
+  EL_CUSTOM_START + 238,
+  EL_CUSTOM_START + 239,
+
+  EL_CUSTOM_START + 240,
+  EL_CUSTOM_START + 241,
+  EL_CUSTOM_START + 242,
+  EL_CUSTOM_START + 243,
+
+  EL_CUSTOM_START + 244,
+  EL_CUSTOM_START + 245,
+  EL_CUSTOM_START + 246,
+  EL_CUSTOM_START + 247,
+
+  EL_CUSTOM_START + 248,
+  EL_CUSTOM_START + 249,
+  EL_CUSTOM_START + 250,
+  EL_CUSTOM_START + 251,
+
+  EL_CUSTOM_START + 252,
+  EL_CUSTOM_START + 253,
+  EL_CUSTOM_START + 254,
+  EL_CUSTOM_START + 255
+};
+static int num_editor_el_custom_more = SIZEOF_ARRAY_INT(editor_el_custom_more);
+
 static int *editor_elements = NULL;	/* dynamically allocated */
 static int num_editor_elements = 0;	/* dynamically determined */
 
@@ -2500,6 +2664,8 @@ editor_elements_info[] =
     &num_editor_el_chars						},
   { &setup.editor.el_custom,		editor_el_custom,
     &num_editor_el_custom						},
+  { &setup.editor.el_custom_more,	editor_el_custom_more,
+    &num_editor_el_custom_more						},
   { NULL,				NULL,
     NULL								}
 };
@@ -2542,6 +2708,12 @@ static void ReinitializeElementList()
     if (*editor_elements_info[i].setup_value)
       for (j=0; j<*editor_elements_info[i].element_list_size; j++)
 	editor_elements[pos++] = editor_elements_info[i].element_list[j];
+
+  /* correct position of element list scrollbar */
+  if (element_shift < 0)
+    element_shift = 0;
+  if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+    element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
 }
 
 static void ReinitializeElementListButtons()

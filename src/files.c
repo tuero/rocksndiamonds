@@ -1891,6 +1891,7 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
+  { TYPE_SWITCH, &sei.el_custom_more,	"editor.el_custom_more"		},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -1986,6 +1987,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_dx_boulderdash = TRUE;
   si->editor.el_chars = TRUE;
   si->editor.el_custom = TRUE;
+  si->editor.el_custom_more = FALSE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
