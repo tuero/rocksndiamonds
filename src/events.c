@@ -431,6 +431,7 @@ void HandleButton(int mx, int my, int button)
 	  printf("      MovPos[%d][%d] == %d\n", x,y, MovPos[x][y]);
 	  printf("      MovDir[%d][%d] == %d\n", x,y, MovDir[x][y]);
 	  printf("      MovDelay[%d][%d] == %d\n", x,y, MovDelay[x][y]);
+	  printf("      GfxElement[%d][%d] == %d\n", x,y, GfxElement[x][y]);
 	  printf("\n");
 	}
       }

@@ -1378,7 +1378,7 @@ static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
 static void RemoveField(int x, int y)
 {
   Feld[x][y] = EL_EMPTY;
-  GfxElement[x][y] = EL_EMPTY;
+  GfxElement[x][y] = EL_UNDEFINED;
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
@@ -1525,7 +1525,8 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (IS_INDESTRUCTIBLE(element) || element == EL_FLAMES)
+      if ((IS_INDESTRUCTIBLE(element) && !IS_ACCESSIBLE(element)) ||
+	  element == EL_FLAMES)
 	continue;
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
@@ -1542,6 +1543,11 @@ void Explode(int ex, int ey, int phase, int mode)
 
       if (element == EL_EXPLOSION)
 	element = Store2[x][y];
+
+#if 1
+      if (IS_INDESTRUCTIBLE(Store[x][y]))	/* hard element under bomb */
+	element = Store[x][y];
+#endif
 
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
       {
@@ -1595,8 +1601,15 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_PEARL;
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
+#if 1
+      else if (IS_INDESTRUCTIBLE(element))
+	Store[x][y] = element;
+      else
+	Store[x][y] = EL_EMPTY;
+#else
       else if (!IS_PFORTE(Store[x][y]))
 	Store[x][y] = EL_EMPTY;
+#endif
 
       if (x != ex || y != ey ||
 	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_BORDER)
@@ -1612,7 +1625,7 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
       Feld[x][y] = EL_EXPLOSION;
-      GfxElement[x][y] = EL_EMPTY;
+      GfxElement[x][y] = EL_UNDEFINED;
       MovDir[x][y] = MovPos[x][y] = 0;
       AmoebaNr[x][y] = 0;
       ExplodePhase[x][y] = 1;
@@ -1686,6 +1699,20 @@ void Explode(int ex, int ey, int phase, int mode)
     if (phase == delay)
       DrawLevelFieldCrumbledSand(x, y);
 
+#if 1
+    if (IS_ACCESSIBLE_OVER(Store[x][y]))
+    {
+      DrawLevelElement(x, y, Store[x][y]);
+      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
+    }
+    else if (IS_ACCESSIBLE_UNDER(Store[x][y]))
+    {
+      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+      DrawLevelElementThruMask(x, y, Store[x][y]);
+    }
+    else if (!IS_ACCESSIBLE_INSIDE(Store[x][y]))
+      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+#else
     if (IS_PFORTE(Store[x][y]))
     {
       DrawLevelElement(x, y, Store[x][y]);
@@ -1693,6 +1720,7 @@ void Explode(int ex, int ey, int phase, int mode)
     }
     else
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+#endif
   }
 }
 
@@ -5030,7 +5058,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 
     if (field_under_player_is_free &&
 	!player_is_moving_to_valid_field &&
-	!IS_WALKABLE_THROUGH(Feld[jx][jy]))
+	!IS_WALKABLE_INSIDE(Feld[jx][jy]))
       player->programmed_action = MV_DOWN;
   }
 }
@@ -5604,8 +5632,11 @@ void KillHero(struct PlayerInfo *player)
   if (!player->active)
     return;
 
+#if 1
+#else
   if (IS_PFORTE(Feld[jx][jy]))
     Feld[jx][jy] = EL_EMPTY;
+#endif
 
   /* deactivate shield (else Bang()/Explode() would not work right) */
   player->shield_normal_time_left = 0;
