@@ -447,7 +447,6 @@
 
 /* end of X11 keyboard mapping */
 
-#define MOUSE_FILENAME		"mouse.pcx"
 #define JOYSTICK_FILENAME	"joystick.cnf"
 
 #define screen myscreen
@@ -705,7 +704,7 @@ void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
 
 boolean MSDOSOpenAudio(void);
-boolean MSDOSCloseAudio(void);
+void MSDOSCloseAudio(void);
 
 void NetworkServer(int, int);
 

@@ -53,7 +53,7 @@ inline void SDLInitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
      should never be drawn to directly, it would do no harm nevertheless. */
 
   /* create additional (symbolic) buffer for double-buffering */
-  *window = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  *window = CreateBitmap(video.width, video.height, video.depth);
 }
 
 inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)

@@ -8,11 +8,11 @@
 *              phone: ++49 +521 290471                     *
 *              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
-*  buttons.h                                               *
+*  gadgets.h                                               *
 ***********************************************************/
 
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef GADGETS_H
+#define GADGETS_H
 
 #include "libgame.h"
 
@@ -262,4 +262,4 @@ void ClickOnGadget(struct GadgetInfo *, int);
 void HandleGadgets(int, int, int);
 void HandleGadgetsKeyInput(Key);
 
-#endif
+#endif	/* GADGETS_H */

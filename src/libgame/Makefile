@@ -6,7 +6,7 @@
 SRCS =	libgame.c	\
 	private.c	\
 	system.c	\
-	buttons.c	\
+	gadgets.c	\
 	text.c		\
 	sound.c		\
 	pcx.c		\
@@ -20,7 +20,7 @@ SRCS =	libgame.c	\
 OBJS =	libgame.o	\
 	private.o	\
 	system.o	\
-	buttons.o	\
+	gadgets.o	\
 	text.o		\
 	sound.o		\
 	pcx.o		\

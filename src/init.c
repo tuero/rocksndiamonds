@@ -310,15 +310,19 @@ void InitJoysticks()
 
 void InitDisplay()
 {
-  char *x11_icon_filename = getPath3(options.ro_base_directory,
-				     GRAPHICS_DIRECTORY,
-				     "rocks_icon.xbm");
-  char *x11_iconmask_filename = getPath3(options.ro_base_directory,
-					 GRAPHICS_DIRECTORY,
-					 "rocks_iconmask.xbm");
+  char *gfx_dir = getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
+  char *x11_icon_filename = getPath2(gfx_dir, X11_ICON_FILENAME);
+  char *x11_iconmask_filename = getPath2(gfx_dir, X11_ICONMASK_FILENAME);
+  char *msdos_pointer_filename = getPath2(gfx_dir, MSDOS_POINTER_FILENAME);
+
+  free(gfx_dir);
 
   InitProgramInfo(program_name, PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
-		  ICON_TITLE_STRING, x11_icon_filename, x11_iconmask_filename);
+		  ICON_TITLE_STRING, x11_icon_filename, x11_iconmask_filename,
+		  msdos_pointer_filename);
+
+  InitScrollbufferSize(FXSIZE, FYSIZE);	/* (only needed for MS-DOS code) */
+
   InitVideoDisplay();
   InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
 		  setup.fullscreen);

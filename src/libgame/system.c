@@ -14,20 +14,20 @@
 
 #include "libgame.h"
 
-
 /* ========================================================================= */
 /* internal variables                                                        */
 /* ========================================================================= */
 
-Display        *display;
-Visual	       *visual;
-int		screen;
-Colormap	cmap;
+Display        *display = NULL;
+Visual	       *visual = NULL;
+int		screen = 0;
+Colormap	cmap = None;
 
 DrawWindow  	window = None;
-GC		gc;
+DrawBuffer	backbuffer = None;
+GC		gc = None;
 
-int		FrameCounter;
+int		FrameCounter = 0;
 
 
 /* ========================================================================= */
@@ -52,7 +52,8 @@ inline static int GetRealDepth(int depth)
 inline void InitProgramInfo(char *command_name, char *program_title,
 			    char *window_title, char *icon_title,
 			    char *x11_icon_filename,
-			    char *x11_iconmask_filename)
+			    char *x11_iconmask_filename,
+			    char *msdos_pointer_filename)
 {
   program.command_name = command_name;
   program.program_title = program_title;
@@ -60,6 +61,15 @@ inline void InitProgramInfo(char *command_name, char *program_title,
   program.icon_title = icon_title;
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
+  program.msdos_pointer_filename = msdos_pointer_filename;
+}
+
+inline void InitScrollbufferSize(int scrollbuffer_width,
+				 int scrollbuffer_height)
+{
+  /* currently only used by MSDOS code to alloc VRAM buffer, if available */
+  video.scrollbuffer_width = scrollbuffer_width;
+  video.scrollbuffer_height = scrollbuffer_height;
 }
 
 inline void InitVideoDisplay(void)
@@ -274,7 +284,7 @@ inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
 #ifdef TARGET_SDL
   if ((fullscreen && !video.fullscreen_enabled && video.fullscreen_available)||
       (!fullscreen && video.fullscreen_enabled))
-    fullscreen = SetVideoMode(fullscreen_wanted);
+    fullscreen = SetVideoMode(fullscreen);
 #endif
 
   return fullscreen;

@@ -19,7 +19,7 @@
 #include "private.h"
 #include "system.h"
 #include "random.h"
-#include "buttons.h"
+#include "gadgets.h"
 #include "text.h"
 #include "sound.h"
 #include "image.h"

@@ -8,7 +8,7 @@
 *              phone: ++49 +521 290471                     *
 *              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
-*  buttons.c                                               *
+*  gadgets.c                                               *
 ***********************************************************/
 
 #include <stdarg.h>
@@ -17,7 +17,7 @@
 
 #include "main_TMP.h"
 
-#include "buttons.h"
+#include "gadgets.h"
 
 /* some positions in the video tape control window */
 #define VIDEO_DATE_LABEL_XPOS	(VIDEO_DISPLAY1_XPOS)

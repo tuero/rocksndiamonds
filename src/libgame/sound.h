@@ -14,8 +14,11 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include <sys/ioctl.h>
 #include <math.h>
+
+#if defined(PLATFORM_LINUX)
+#include <sys/ioctl.h>
+#endif
 
 #define SND_BLOCKSIZE 4096
 

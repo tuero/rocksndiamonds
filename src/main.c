@@ -25,6 +25,7 @@
 
 #if 0
 DrawWindow  	window = None;
+DrawBuffer	backbuffer;
 GC		gc;
 #endif
 
@@ -33,7 +34,7 @@ Bitmap		pix[NUM_BITMAPS];
 Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
 Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 
-DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
+DrawBuffer	drawto, drawto_field, fieldbuffer;
 #if 0
 Colormap	cmap;
 #endif

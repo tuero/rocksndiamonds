@@ -16,18 +16,6 @@
 
 #if defined(TARGET_X11)
 
-#if 0
-#include "main_TMP.h"
-#endif
-
-#if 0
-struct IconFileInfo
-{
-  char *picture_filename;
-  char *picturemask_filename;
-};
-#endif
-
 static void X11InitDisplay();
 static DrawWindow X11InitWindow();
 

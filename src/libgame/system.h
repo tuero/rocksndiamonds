@@ -15,7 +15,9 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+/*
 #include "libgame.h"
+*/
 
 #if defined(PLATFORM_MSDOS)
 #include "msdos.h"
@@ -51,12 +53,14 @@ struct ProgramInfo
   char *icon_title;
   char *x11_icon_filename;
   char *x11_iconmask_filename;
+  char *msdos_pointer_filename;
 };
 
 struct VideoSystemInfo
 {
   int default_depth;
   int width, height, depth;
+  int scrollbuffer_width, scrollbuffer_height;
   boolean fullscreen_available;
   boolean fullscreen_enabled;
 };
@@ -104,6 +108,7 @@ extern int		screen;
 extern Colormap		cmap;
 
 extern DrawWindow	window;
+extern DrawBuffer	backbuffer;
 extern GC		gc;
 
 extern int		FrameCounter;
@@ -111,7 +116,9 @@ extern int		FrameCounter;
 
 /* function definitions */
 
-inline void InitProgramInfo(char *, char *, char *, char *, char *, char *);
+inline void InitProgramInfo(char *, char *, char *, char *, char *, char *,
+			    char *);
+inline void InitScrollbufferSize(int, int);
 inline void InitVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);
 inline Bitmap CreateBitmap(int, int, int);

@@ -16,6 +16,8 @@
 
 #if defined(PLATFORM_MSDOS)
 
+#define AllegroDefaultScreen() (display->screens[display->default_screen])
+
 /* allegro driver declarations */
 DECLARE_GFX_DRIVER_LIST(GFX_DRIVER_VBEAF GFX_DRIVER_VESA2L GFX_DRIVER_VESA1)
 DECLARE_COLOR_DEPTH_LIST(COLOR_DEPTH_8)
@@ -238,10 +240,10 @@ void XMapWindow(Display *display, Window window)
   unsigned int width, height;
   boolean mouse_off;
 
-  x = display->screens[display->default_screen].x;
-  y = display->screens[display->default_screen].y;
-  width = display->screens[display->default_screen].width;
-  height = display->screens[display->default_screen].height;
+  x = AllegroDefaultScreen().x;
+  y = AllegroDefaultScreen().y;
+  width = AllegroDefaultScreen().width;
+  height = AllegroDefaultScreen().height;
 
   mouse_off = hide_mouse(display, x, y, width, height);
   blit((BITMAP *)window, video_bitmap, 0, 0, x, y, width, height);
@@ -291,14 +293,8 @@ Display *XOpenDisplay(char *display_name)
   Screen *screen;
   Display *display;
   BITMAP *mouse_bitmap = NULL;
-  char *filename;
 
-  filename = getPath3(options.ro_base_directory, GRAPHICS_DIRECTORY,
-		      MOUSE_FILENAME);
-
-  mouse_bitmap = Read_PCX_to_AllegroBitmap(filename);
-  free(filename);
-
+  mouse_bitmap = Read_PCX_to_AllegroBitmap(program.msdos_pointer_filename);
   if (mouse_bitmap == NULL)
     return NULL;
 
@@ -340,11 +336,11 @@ Window XCreateSimpleWindow(Display *display, Window parent, int x, int y,
   video_bitmap = create_video_bitmap(XRES, YRES);
   clear_to_color(video_bitmap, background);
 
-  display->screens[display->default_screen].video_bitmap = video_bitmap;
-  display->screens[display->default_screen].x = x;
-  display->screens[display->default_screen].y = y;
-  display->screens[display->default_screen].width = XRES;
-  display->screens[display->default_screen].height = YRES;
+  AllegroDefaultScreen().video_bitmap = video_bitmap;
+  AllegroDefaultScreen().x = x;
+  AllegroDefaultScreen().y = y;
+  AllegroDefaultScreen().width = XRES;
+  AllegroDefaultScreen().height = YRES;
 
   set_mouse_sprite(display->mouse_ptr);
 
@@ -353,10 +349,10 @@ Window XCreateSimpleWindow(Display *display, Window parent, int x, int y,
 #endif
 
   set_mouse_speed(1, 1);
-  set_mouse_range(display->screens[display->default_screen].x + 1,
-		  display->screens[display->default_screen].y + 1,
-		  display->screens[display->default_screen].x + WIN_XSIZE + 1,
-		  display->screens[display->default_screen].y + WIN_YSIZE + 1);
+  set_mouse_range(AllegroDefaultScreen().x + 1,
+		  AllegroDefaultScreen().y + 1,
+		  AllegroDefaultScreen().x + video.width + 1,
+		  AllegroDefaultScreen().y + video.height + 1);
 
   show_video_bitmap(video_bitmap);
 
@@ -425,8 +421,8 @@ void XFillRectangle(Display *display, Drawable d, GC gc, int x, int y,
 
   if ((BITMAP *)d == video_bitmap)
   {
-    x += display->screens[display->default_screen].x;
-    y += display->screens[display->default_screen].y;
+    x += AllegroDefaultScreen().x;
+    y += AllegroDefaultScreen().y;
     freeze_mouse_flag = TRUE;
     mouse_off = hide_mouse(display, x, y, width, height);
   }
@@ -446,7 +442,7 @@ Pixmap XCreatePixmap(Display *display, Drawable d, unsigned int width,
   BITMAP *bitmap = NULL;
 
   if (gfx_capabilities & GFX_HW_VRAM_BLIT &&
-      width == FXSIZE && height == FYSIZE)
+      width == video.scrollbuffer_width && height == video.scrollbuffer_height)
     bitmap = create_video_bitmap(width, height);
 
   if (bitmap == NULL)
@@ -469,14 +465,14 @@ inline void XCopyArea(Display *display, Drawable src, Drawable dest, GC gc,
 
   if ((BITMAP *)src == video_bitmap)
   {
-    src_x += display->screens[display->default_screen].x;
-    src_y += display->screens[display->default_screen].y;
+    src_x += AllegroDefaultScreen().x;
+    src_y += AllegroDefaultScreen().y;
   }
 
   if ((BITMAP *)dest == video_bitmap)
   {
-    dest_x += display->screens[display->default_screen].x;
-    dest_y += display->screens[display->default_screen].y;
+    dest_x += AllegroDefaultScreen().x;
+    dest_y += AllegroDefaultScreen().y;
     freeze_mouse_flag = TRUE;
     mouse_off = hide_mouse(display, dest_x, dest_y, width, height);
   }
@@ -812,8 +808,8 @@ int XPending(Display *display)
     pending_events++;
     xmotion = (XMotionEvent *)&event_buffer[pending_events];
     xmotion->type = MotionNotify;
-    xmotion->x = mouse_x - display->screens[display->default_screen].x;
-    xmotion->y = mouse_y - display->screens[display->default_screen].y;
+    xmotion->x = mouse_x - AllegroDefaultScreen().x;
+    xmotion->y = mouse_y - AllegroDefaultScreen().y;
   }
 
   /* mouse button event */
@@ -831,8 +827,8 @@ int XPending(Display *display)
         xbutton = (XButtonEvent *)&event_buffer[pending_events];
         xbutton->type = (mouse_b & bitmask ? ButtonPress : ButtonRelease);
         xbutton->button = mapping[i];
-	xbutton->x = mouse_x - display->screens[display->default_screen].x;
-	xbutton->y = mouse_y - display->screens[display->default_screen].y;
+	xbutton->x = mouse_x - AllegroDefaultScreen().x;
+	xbutton->y = mouse_y - AllegroDefaultScreen().y;
       }
     }
     last_mouse_b = mouse_b;
@@ -868,10 +864,10 @@ void XDrawLine(Display *display, Drawable d, GC gc,
 
   if ((BITMAP *)d == video_bitmap)
   {
-    x1 += display->screens[display->default_screen].x;
-    y1 += display->screens[display->default_screen].y;
-    x2 += display->screens[display->default_screen].x;
-    y2 += display->screens[display->default_screen].y;
+    x1 += AllegroDefaultScreen().x;
+    y1 += AllegroDefaultScreen().y;
+    x2 += AllegroDefaultScreen().x;
+    y2 += AllegroDefaultScreen().y;
     freeze_mouse_flag = TRUE;
     mouse_off = hide_mouse(display, MIN(x1, x2), MIN(y1, y2),
 			   MAX(x1, x2) - MIN(x1, x2),
@@ -894,8 +890,8 @@ Bool XQueryPointer(Display *display, Window window,
 		   Window *root, Window *child, int *root_x, int *root_y,
 		   int *win_x, int *win_y, unsigned int *mask)
 {
-  *win_x = mouse_x - display->screens[display->default_screen].x;
-  *win_y = mouse_y - display->screens[display->default_screen].y;
+  *win_x = mouse_x - AllegroDefaultScreen().x;
+  *win_y = mouse_y - AllegroDefaultScreen().y;
 
   return True;
 }
@@ -916,7 +912,7 @@ boolean MSDOSOpenAudio(void)
   return allegro_init_audio();
 }
 
-boolean MSDOSCloseAudio(void)
+void MSDOSCloseAudio(void)
 {
   /* nothing to be done here */
 }

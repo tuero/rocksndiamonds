@@ -437,6 +437,7 @@ struct GlobalInfo
 
 #if 0
 extern DrawWindow	window;
+extern DrawBuffer	backbuffer;
 extern GC		gc;
 #endif
 
@@ -445,7 +446,7 @@ extern Bitmap		pix[];
 extern Bitmap		pix_masked[], tile_masked[];
 extern Pixmap		clipmask[], tile_clipmask[];
 
-extern DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
+extern DrawBuffer	drawto, drawto_field, fieldbuffer;
 #if 0
 extern Colormap		cmap;
 #endif
@@ -1666,6 +1667,10 @@ extern int		num_element_info;
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
 #define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
+
+#define X11_ICON_FILENAME	"rocks_icon.xbm"
+#define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
+#define MSDOS_POINTER_FILENAME	"mouse.pcx"
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"

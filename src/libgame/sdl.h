@@ -297,7 +297,7 @@ typedef int			Colormap;
 /* SDL function definitions */
 
 inline void SDLInitVideoDisplay(void);
-inline void SDLInitVideoBuffer(DrawBuffer *, DrawWindow *);
+inline void SDLInitVideoBuffer(DrawBuffer *, DrawWindow *, boolean);
 inline boolean SDLSetVideoMode(DrawBuffer *, boolean);
 inline void SDLCopyArea(SDL_Surface *, SDL_Surface *,
                         int, int, int, int, int, int);

@@ -11,6 +11,8 @@
 *  image.c                                                 *
 ***********************************************************/
 
+#include "platform.h"
+
 #if defined(TARGET_X11)
 
 #include "image.h"
