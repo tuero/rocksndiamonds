@@ -301,7 +301,7 @@ static void gotoTopLevelDir()
       if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
 	num_page_entries = num_leveldirs;
       else
-	num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+	num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
 
       cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
       cl_cursor = leveldir_pos - cl_first;
@@ -1188,7 +1188,7 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
   int items_max, items_visible, item_position;
 
   items_max = numTreeInfoInGroup(ti);
-  items_visible = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+  items_visible = MAX_MENU_ENTRIES_ON_SCREEN;
   item_position = first_entry;
 
   if (item_position > items_max - items_visible)
@@ -1204,10 +1204,9 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int i;
   char buffer[SCR_FIELDX * 2];
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
-  int num_entries = numTreeInfoInGroup(ti);
   char *title_string = NULL;
   int xoffset_setup = 16;
-  int yoffset_setup = 0;
+  int yoffset_setup = 16;
   int xoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : xoffset_setup);
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : yoffset_setup);
   int last_game_status = game_status;	/* save current game status */
@@ -1248,24 +1247,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
       initCursor(i, IMG_MENU_BUTTON);
   }
 
-  if (first_entry > 0)
-  {
-    int ypos = 1;
-
-    DrawBackground(mSX, mSY + ypos * TILEY, TILEX, TILEY);
-    DrawGraphicThruMaskExt(drawto, mSX, mSY + ypos * TILEY,
-			   IMG_MENU_BUTTON_UP, 0);
-  }
-
-  if (first_entry + num_page_entries < num_entries)
-  {
-    int ypos = MAX_MENU_ENTRIES_ON_SCREEN + 1;
-
-    DrawBackground(mSX, mSY + ypos * TILEY, TILEX, TILEY);
-    DrawGraphicThruMaskExt(drawto, mSX, mSY + ypos * TILEY,
-			   IMG_MENU_BUTTON_DOWN, 0);
-  }
-
   game_status = last_game_status;	/* restore current game status */
 }
 
@@ -1301,7 +1282,6 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 			     TreeInfo **ti_ptr)
 {
-  static unsigned long choose_delay = 0;
   TreeInfo *ti = *ti_ptr;
   int x = 0;
   int y = ti->cl_cursor;
@@ -1312,7 +1292,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   if (num_entries <= MAX_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
   else
-    num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+    num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -1361,52 +1341,56 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
-  else if (dx || dy)	/* keyboard input */
+  else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
   {
-    if (dy)
-      y = ti->cl_cursor + dy;
+    /* move cursor instead of scrolling when already at start/end of list */
+    if (dy == -1 * SCROLL_LINE && ti->cl_first == 0)
+      dy = -1;
+    else if (dy == +1 * SCROLL_LINE &&
+	     ti->cl_first + num_page_entries == num_entries)
+      dy = 1;
 
-    if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
+    /* handle scrolling screen one line or page */
+    if (ti->cl_cursor + dy < 0 ||
+	ti->cl_cursor + dy > num_page_entries - 1)
     {
-      dy = SIGN(dy);
-      step = num_page_entries - 1;
-      y = (dy < 0 ? -1 : num_page_entries);
-    }
-  }
+      if (ABS(dy) == SCROLL_PAGE)
+	step = num_page_entries - 1;
 
-  if (x == 0 && y == -1)
-  {
-    if (ti->cl_first > 0 &&
-	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
-    {
-      ti->cl_first -= step;
-      if (ti->cl_first < 0)
-	ti->cl_first = 0;
+      if (dy < 0 && ti->cl_first > 0)
+      {
+	/* scroll page/line up */
 
-      drawChooseTreeList(ti->cl_first, num_page_entries, ti);
-      drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-      drawCursor(ti->cl_cursor, FC_RED);
-      AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
-				ti->cl_first, ti);
+	ti->cl_first -= step;
+	if (ti->cl_first < 0)
+	  ti->cl_first = 0;
+
+	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+	drawCursor(ti->cl_cursor, FC_RED);
+	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				  ti->cl_first, ti);
+      }
+      else if (dy > 0 && ti->cl_first + num_page_entries < num_entries)
+      {
+	/* scroll page/line down */
+
+	ti->cl_first += step;
+	if (ti->cl_first + num_page_entries > num_entries)
+	  ti->cl_first = MAX(0, num_entries - num_page_entries);
+
+	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+	drawCursor(ti->cl_cursor, FC_RED);
+	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				  ti->cl_first, ti);
+      }
+
       return;
     }
-  }
-  else if (x == 0 && y > num_page_entries - 1)
-  {
-    if (ti->cl_first + num_page_entries < num_entries &&
-	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
-    {
-      ti->cl_first += step;
-      if (ti->cl_first + num_page_entries > num_entries)
-	ti->cl_first = MAX(0, num_entries - num_page_entries);
 
-      drawChooseTreeList(ti->cl_first, num_page_entries, ti);
-      drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-      drawCursor(ti->cl_cursor, FC_RED);
-      AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
-				ti->cl_first, ti);
-      return;
-    }
+    /* handle moving cursor one line */
+    y = ti->cl_cursor + dy;
   }
 
   if (dx == 1)
@@ -1579,7 +1563,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
+  if (ABS(dy) == SCROLL_PAGE)		/* handle scrolling one page */
     step = MAX_MENU_ENTRIES_ON_SCREEN - 1;
 
   if (dy < 0)
@@ -1909,9 +1893,11 @@ static void drawSetupValue(int pos)
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
-  else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
-	   !*(boolean *)(setup_info[pos].value))
-    font_nr = FONT_OPTION_OFF;
+  else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE)
+  {
+    font_nr = (*(boolean *)(setup_info[pos].value) ? FONT_OPTION_ON :
+	       FONT_OPTION_OFF);
+  }
 
   DrawText(mSX + xpos * 32, mSY + ypos * 32,
 	   (xpos == 3 ? "              " : "   "), font_nr);
@@ -2749,17 +2735,20 @@ void HandleGameActions()
 /* ---------- new screen button stuff -------------------------------------- */
 
 /* graphic position and size values for buttons and scrollbars */
-#define SC_SCROLLBUTTON_XSIZE		32
-#define SC_SCROLLBUTTON_YSIZE		32
+#define SC_SCROLLBUTTON_XSIZE		TILEX
+#define SC_SCROLLBUTTON_YSIZE		TILEY
 
-#define SC_SCROLL_UP_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
-#define SC_SCROLL_UP_YPOS		SC_SCROLLBUTTON_YSIZE
-#define SC_SCROLL_DOWN_XPOS		SC_SCROLL_UP_XPOS
-#define SC_SCROLL_DOWN_YPOS		(SYSIZE - SC_SCROLLBUTTON_YSIZE)
-#define SC_SCROLL_VERTICAL_XPOS		SC_SCROLL_UP_XPOS
-#define SC_SCROLL_VERTICAL_YPOS	  (SC_SCROLL_UP_YPOS + SC_SCROLLBUTTON_YSIZE)
 #define SC_SCROLL_VERTICAL_XSIZE	SC_SCROLLBUTTON_XSIZE
-#define SC_SCROLL_VERTICAL_YSIZE	(SYSIZE - 3 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_VERTICAL_YSIZE	((MAX_MENU_ENTRIES_ON_SCREEN - 2) * \
+					 SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_UP_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
+#define SC_SCROLL_UP_YPOS		(2 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_VERTICAL_XPOS		SC_SCROLL_UP_XPOS
+#define SC_SCROLL_VERTICAL_YPOS		(SC_SCROLL_UP_YPOS + \
+					 SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_DOWN_XPOS		SC_SCROLL_UP_XPOS
+#define SC_SCROLL_DOWN_YPOS		(SC_SCROLL_VERTICAL_YPOS + \
+					 SC_SCROLL_VERTICAL_YSIZE)
 
 #define SC_BORDER_SIZE			14
 
@@ -2882,7 +2871,7 @@ static void CreateScreenScrollbars()
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
     unsigned long event_mask;
-    int num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+    int num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
     int id = scrollbar_info[i].gadget_id;
 
     items_max = num_page_entries;
@@ -3012,16 +3001,16 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
   {
     case SCREEN_CTRL_ID_SCROLL_UP:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(mSX,mSY + 32, 0,0, MB_MENU_MARK);
+	HandleChooseLevel(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
-	HandleSetupScreen(mSX,mSY + 32, 0,0, MB_MENU_MARK);
+	HandleSetupScreen(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_DOWN:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(mSX,mSY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+	HandleChooseLevel(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
-	HandleSetupScreen(mSX,mSY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+	HandleSetupScreen(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:

@@ -16,6 +16,11 @@
 
 #include "main.h"
 
+/* (randomly chosen) values for HandleChooseTree() */
+#define SCROLL_LINE	(1 * SCR_FIELDY)
+#define SCROLL_PAGE	(2 * SCR_FIELDY)
+
+
 void DrawHeadline(void);
 
 void DrawMainMenu(void);

@@ -3922,7 +3922,7 @@ static boolean PrintInfoText(char *text, int font_nr, int screen_line)
 {
   int font_height = getFontHeight(font_nr);
   int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0);
+  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
@@ -4076,12 +4076,18 @@ static void DrawPropertiesTabulatorGadgets()
   int gd_y = gd->y + gd_gi->height - 1;
   Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
   int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+#if 1
+  int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
+#else
   int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+#endif
   int i;
 
+#if 0
   /* draw additional "configure" tabulator for configurable elements */
   if (checkPropertiesConfig())
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
+#endif
 
   /* draw additional "advanced" tabulator for custom elements */
   if (IS_CUSTOM_ELEMENT(properties_element))
@@ -4162,7 +4168,7 @@ static void DrawPropertiesInfo()
   int font1_width = getFontWidth(font1_nr);
   int font2_height = getFontHeight(font2_nr);
   int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0);
+  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int screen_line = 0;
   int i, x, y;
 
@@ -4303,6 +4309,13 @@ static void DrawPropertiesConfig()
 {
   int i;
 
+  if (!checkPropertiesConfig())
+  {
+    PrintInfoText("No configuration options available.", FONT_TEXT_1, 0);
+
+    return;
+  }
+
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
   {
@@ -4401,9 +4414,11 @@ static void DrawPropertiesWindow()
       !IS_CUSTOM_ELEMENT(properties_element))
     edit_mode_properties = ED_MODE_PROPERTIES_CONFIG;
 
+#if 0
   if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG &&
       !checkPropertiesConfig())
     edit_mode_properties = ED_MODE_PROPERTIES_INFO;
+#endif
 
   if (IS_CUSTOM_ELEMENT(properties_element))
     CopyCustomElementPropertiesToEditor(properties_element);

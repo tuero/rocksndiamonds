@@ -626,16 +626,16 @@ void HandleKey(Key key, int key_status)
 
         case KSYM_Page_Up:
           if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+            HandleChooseLevel(0,0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_SETUP)
-	    HandleSetupScreen(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+	    HandleSetupScreen(0,0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
 
         case KSYM_Page_Down:
           if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
+            HandleChooseLevel(0,0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_SETUP)
-	    HandleSetupScreen(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
+	    HandleSetupScreen(0,0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
 
 #ifdef DEBUG
@@ -663,11 +663,11 @@ void HandleKey(Key key, int key_status)
 	  break;
 
         case KSYM_Page_Up:
-	  HandleHallOfFame(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+	  HandleHallOfFame(0,0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
 
         case KSYM_Page_Down:
-	  HandleHallOfFame(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
+	  HandleHallOfFame(0,0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
 
 	default:
