@@ -98,6 +98,8 @@ unsigned int GetTapeLength(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
 
+void AutoPlayTape(void);
+
 void CreateTapeButtons();
 void MapTapeEjectButton();
 void MapTapeIndexButton();

@@ -1559,6 +1559,8 @@ struct LevelInfo
   boolean double_speed;
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
+
+  boolean no_level_file;
 };
 
 struct TapeInfo
@@ -1578,6 +1580,8 @@ struct TapeInfo
   boolean recording, playing, pausing;
   boolean fast_forward;
   boolean index_search;
+  boolean auto_play;
+  boolean auto_play_level_solved;
   boolean quick_resume;
   boolean single_step;
   boolean changed;

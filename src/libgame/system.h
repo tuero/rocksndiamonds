@@ -240,16 +240,20 @@ struct OptionInfo
   char *display_name;
   char *server_host;
   int server_port;
+
   char *ro_base_directory;
   char *rw_base_directory;
   char *level_directory;
   char *graphics_directory;
   char *sounds_directory;
   char *music_directory;
+  char *autoplay_leveldir;
+
   boolean serveronly;
   boolean network;
   boolean verbose;
   boolean debug;
+
   char *debug_command;
 };
 

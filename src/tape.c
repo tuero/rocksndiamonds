@@ -14,6 +14,7 @@
 #include "libgame/libgame.h"
 
 #include "tape.h"
+#include "init.h"
 #include "game.h"
 #include "tools.h"
 #include "files.h"
@@ -325,6 +326,8 @@ static void TapeRewind()
   tape.playing = FALSE;
   tape.fast_forward = FALSE;
   tape.index_search = FALSE;
+  tape.auto_play = (options.autoplay_leveldir != NULL);
+  tape.auto_play_level_solved = FALSE;
   tape.quick_resume = FALSE;
   tape.single_step = FALSE;
 
@@ -552,7 +555,7 @@ byte *TapePlayAction()
 
   if (tape.counter >= tape.length)	/* end of tape reached */
   {
-    if (tape.index_search)
+    if (tape.index_search && !tape.auto_play)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
     else
       TapeStop();
@@ -584,6 +587,9 @@ void TapeStop()
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
   }
+
+  if (tape.auto_play)
+    AutoPlayTape();	/* continue automatically playing next tape */
 }
 
 unsigned int GetTapeLength()
@@ -669,6 +675,74 @@ void TapeQuickLoad()
     else
       Request("No tape for this level !", REQ_CONFIRM);
   }
+}
+
+
+/* ------------------------------------------------------------------------- *
+ * tape autoplay functions
+ * ------------------------------------------------------------------------- */
+
+void AutoPlayTape()
+{
+  static LevelDirTree *autoplay_leveldir = NULL;
+  static boolean autoplay_initialized = FALSE;
+  static int autoplay_level_nr = -1;
+
+  if (autoplay_initialized)
+  {
+    /* just finished auto-playing tape */
+    printf("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
+  }
+  else
+  {
+    autoplay_leveldir = getTreeInfoFromIdentifier(leveldir_first,
+						  options.autoplay_leveldir);
+
+    if (autoplay_leveldir == NULL)
+      Error(ERR_EXIT, "no such level identifier: '%s'",
+	    options.autoplay_leveldir);
+
+    leveldir_current = autoplay_leveldir;
+
+    autoplay_level_nr = autoplay_leveldir->first_level;
+
+    printf("Playing tapes of level series '%s'.\n", options.autoplay_leveldir);
+
+    autoplay_initialized = TRUE;
+  }
+
+  while (autoplay_level_nr <= autoplay_leveldir->last_level)
+  {
+    level_nr = autoplay_level_nr++;
+
+    TapeErase();
+
+    printf("Level %03d: ", level_nr);
+
+    LoadLevel(level_nr);
+    if (level.no_level_file)
+    {
+      printf("(no level file)\n");
+      continue;
+    }
+
+    LoadTape(level_nr);
+    if (TAPE_IS_EMPTY(tape))
+    {
+      printf("(no tape file)\n");
+      continue;
+    }
+
+    break;
+  }
+
+  if (autoplay_level_nr >= autoplay_leveldir->last_level)
+    CloseAllAndExit(0);
+
+  printf("playing tape ... ");
+
+  TapeStartGamePlaying();
+  TapeStartIndexSearch();
 }
 
 

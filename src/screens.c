@@ -235,6 +235,9 @@ void DrawMainMenu()
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 
+  if (options.autoplay_leveldir)
+    AutoPlayTape();
+
 #if 0
   ClearEventQueue();
 #endif

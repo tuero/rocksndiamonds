@@ -100,6 +100,7 @@
 #define NUM_GAME_BUTTONS		6
 
 /* forward declaration for internal use */
+static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
@@ -487,7 +488,7 @@ void DrawGameDoorValues()
     for (j=0; j<4; j++)
       if (stored_player[i].key[j])
 	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
-			   GFX_SCHLUESSEL1 + j);
+			   IMG_KEY1 + j);
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
@@ -819,6 +820,8 @@ void InitGame()
       InitField(x, y, TRUE);
     }
   }
+
+  InitBeltMovement();
 
   game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
@@ -1153,6 +1156,9 @@ void GameWon()
 
   if (local_player->MovPos)
     return;
+
+  if (tape.playing && tape.auto_play)
+    tape.auto_play_level_solved = TRUE;
 
   local_player->LevelSolved = FALSE;
 
@@ -1874,6 +1880,67 @@ void Blurb(int x, int y)
       {
 	Feld[x][y] = EL_EMPTY;
 	DrawLevelField(x, y);
+      }
+    }
+  }
+}
+
+static void InitBeltMovement()
+{
+  static int belt_base_element[4] =
+  {
+    EL_CONVEYOR_BELT1_LEFT,
+    EL_CONVEYOR_BELT2_LEFT,
+    EL_CONVEYOR_BELT3_LEFT,
+    EL_CONVEYOR_BELT4_LEFT
+  };
+  static int belt_base_active_element[4] =
+  {
+    EL_CONVEYOR_BELT1_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT2_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT3_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT4_LEFT_ACTIVE
+  };
+
+  int x, y, i, j;
+
+  /* set frame order for belt animation graphic according to belt direction */
+  for (i=0; i<4; i++)
+  {
+    int belt_nr = i;
+
+    for (j=0; j<3; j++)
+    {
+      int element = belt_base_active_element[belt_nr] + j;
+      int graphic = el2img(element);
+
+      if (game.belt_dir[i] == MV_LEFT)
+	new_graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+      else
+	new_graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+    }
+  }
+
+  for(y=0; y<lev_fieldy; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      int element = Feld[x][y];
+
+      for (i=0; i<4; i++)
+      {
+	if (IS_BELT(element) && game.belt_dir[i] != MV_NO_MOVING)
+	{
+	  int e_belt_nr = getBeltNrFromBeltElement(element);
+	  int belt_nr = i;
+
+	  if (e_belt_nr == belt_nr)
+	  {
+	    int belt_part = Feld[x][y] - belt_base_element[belt_nr];
+
+	    Feld[x][y] = belt_base_active_element[belt_nr] + belt_part;
+	  }
+	}
       }
     }
   }
@@ -6098,9 +6165,9 @@ int DigField(struct PlayerInfo *player,
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1 + key_nr);
+			 IMG_KEY1 + key_nr);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1 + key_nr);
+			 IMG_KEY1 + key_nr);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;
     }
@@ -6116,9 +6183,9 @@ int DigField(struct PlayerInfo *player,
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1 + key_nr);
+			 IMG_KEY1 + key_nr);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1 + key_nr);
+			 IMG_KEY1 + key_nr);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;
     }

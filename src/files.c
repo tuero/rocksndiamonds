@@ -125,6 +125,8 @@ static void setLevelInfoToDefaults()
 	break;
     }
   }
+
+  level.no_level_file = FALSE;
 }
 
 static int checkLevelElement(int element)
@@ -321,6 +323,8 @@ void LoadLevel(int level_nr)
 
   if (!(file = fopen(filename, MODE_READ)))
   {
+    level.no_level_file = TRUE;
+
     Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
     return;
   }

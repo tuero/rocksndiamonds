@@ -450,6 +450,7 @@ void GetOptions(char *argv[])
   options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
   options.sounds_directory = RO_BASE_PATH "/" SOUNDS_DIRECTORY;
   options.music_directory = RO_BASE_PATH "/" MUSIC_DIRECTORY;
+  options.autoplay_leveldir = NULL;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -500,6 +501,7 @@ void GetOptions(char *argv[])
 	     "  -g, --graphics <directory>    alternative graphics directory\n"
 	     "  -s, --sounds <directory>      alternative sounds directory\n"
 	     "  -m, --music <directory>       alternative music directory\n"
+	     "  -a, --autoplay <level series> automatically play level tapes\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "      --serveronly              only start network server\n"
 	     "  -v, --verbose                 verbose mode\n"
@@ -568,6 +570,15 @@ void GetOptions(char *argv[])
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       options.music_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-autoplay", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.autoplay_leveldir = option_arg;
       if (option_arg == next_option)
 	options_left++;
     }
@@ -1731,7 +1742,7 @@ void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
   int i;
 
-  if (artwork_info->artwork_list == NULL)
+  if (artwork_info == NULL || artwork_info->artwork_list == NULL)
     return;
 
 #if 0
