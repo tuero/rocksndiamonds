@@ -2916,7 +2916,7 @@ static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
     char *value = getHashEntry(setup_file_hash, token_to_value_ptr[i].token);
 
     *token_to_value_ptr[i].value_ptr =
-      getStringCopy(value != NULL ? value : UNKNOWN_NAME);
+      getStringCopy(value != NULL && *value != '\0' ? value : UNKNOWN_NAME);
   }
 
   tmp_music_file_info.basename = basename;

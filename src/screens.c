@@ -1952,7 +1952,9 @@ static struct TokenInfo setup_info_game[] =
 
 static struct TokenInfo setup_info_editor[] =
 {
+#if 0
   { TYPE_STRING,	NULL,			"Offer Special Elements:"},
+#endif
   { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"BoulderDash:"	},
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
   { TYPE_SWITCH,	&setup.editor.el_more,		"More:"		},
@@ -2208,8 +2210,14 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
+#if 0
+    if (setup_info[i].type & TYPE_STRING ||
+	(setup_info[i].type & TYPE_SWITCH && setup_mode == SETUP_MODE_EDITOR))
+      font_nr = FONT_MENU_2;
+#else
     if (setup_info[i].type & TYPE_STRING)
       font_nr = FONT_MENU_2;
+#endif
 
     DrawText(mSX + 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 

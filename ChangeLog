@@ -1,3 +1,10 @@
+2003-12-13
+	* fixed bug with double nut cracking sound
+	  (by eliminating "default element action sound" assignment in init.c)
+
+2003-12-10
+	* fixed crash when no music info files are available
+
 2003-12-07
 	* fixed boring and sleeping sounds
 
@@ -32,7 +39,7 @@
 	* added configurable music credits for info screen
 
 2003-11-19
-	* finally fixed tape recording when player is created from CE
+	* finally fixed tape recording when player is created from CE change
 
 2003-11-18
 	* added "editorsetup.conf" for editor element list configuration

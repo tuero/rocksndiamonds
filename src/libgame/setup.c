@@ -474,11 +474,13 @@ char *getLevelSetInfoFilename()
   static char *filename = NULL;
   char *basenames[] =
   {
-    "readme",
-    "readme.txt",
     "README",
     "README.txt",
     "README.TXT",
+    "Readme",
+    "Readme.txt",
+    "readme",
+    "readme.txt",
 
     NULL
   };

@@ -1192,9 +1192,12 @@ static void InitElementSoundInfo()
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].sound[act] != -1)
 	default_action_sound = element_info[EL_SB_DEFAULT].sound[act];
 
+      /* !!! there's no such thing as a "default action sound" !!! */
+#if 0
       /* look for element specific default sound (independent from action) */
       if (element_info[i].sound[ACTION_DEFAULT] != -1)
 	default_action_sound = element_info[i].sound[ACTION_DEFAULT];
+#endif
 
       /* no sound for this specific action -- use default action sound */
       if (element_info[i].sound[act] == -1)

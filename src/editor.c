@@ -2146,7 +2146,11 @@ static int editor_el_more[] =
   EL_BD_FIREFLY,
 
   EL_MOLE_LEFT,
+#if 0
   EL_MAZE_RUNNER,
+#else
+  EL_EMPTY,
+#endif
   EL_MOLE_RIGHT,
   EL_PACMAN,
 
