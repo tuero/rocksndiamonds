@@ -28,6 +28,16 @@
 #endif /* !MSDOS */
 
 
+/* system dependent definitions */
+
+/* DOS version has already defined "PLATFORM_STRING" */
+#ifndef PLATFORM_STRING
+#define PLATFORM_STRING		"X11"
+#endif
+
+#define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE
+
+
 /* X11 type definitions */
 
 typedef Pixmap			Bitmap;

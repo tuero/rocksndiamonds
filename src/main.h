@@ -294,6 +294,7 @@ struct SetupInfo
   boolean team_mode;
   boolean handicap;
   boolean time_limit;
+  boolean fullscreen;
 
   struct SetupInputInfo input[MAX_PLAYERS];
 };
@@ -478,6 +479,8 @@ extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
 extern int		sound_status;
 extern boolean		sound_loops_allowed;
+extern boolean		fullscreen_available;
+extern boolean		fullscreen_enabled;
 
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -1649,15 +1652,14 @@ extern char		*element_info[];
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#ifdef USE_SDL_LIBRARY
-#define PROGRAM_VERSION_STRING	"1.4.0 SDL"
-#else
-#define PROGRAM_VERSION_STRING	"1.4.0"
-#endif
+#define PROGRAM_VERSION_STRING	"1.5.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING
-#define COPYRIGHT_STRING	"Copyright ^1995-2000 by " PROGRAM_AUTHOR_STRING
+#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2000 by"
+#define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
+#define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " PLATFORM_STRING
+#define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
+#define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"

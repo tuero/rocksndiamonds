@@ -45,7 +45,8 @@ struct IconFileInfo
 static int sound_process_id = 0;
 #endif
 
-static void InitLevelAndPlayerInfo(void);
+static void InitPlayerInfo(void);
+static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitDisplay(void);
 static void InitSound(void);
@@ -74,6 +75,8 @@ void OpenAll(int argc, char *argv[])
     exit(0);
   }
 
+  InitPlayerInfo();
+
   InitCounter();
   InitSound();
   InitSoundServer();
@@ -94,7 +97,7 @@ void OpenAll(int argc, char *argv[])
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
-  InitLevelAndPlayerInfo();
+  InitLevelInfo();
   InitGadgets();		/* needs to know number of level series */
 
   DrawMainMenu();
@@ -102,7 +105,7 @@ void OpenAll(int argc, char *argv[])
   InitNetworkServer();
 }
 
-void InitLevelAndPlayerInfo()
+void InitPlayerInfo()
 {
   int i;
 
@@ -117,8 +120,12 @@ void InitLevelAndPlayerInfo()
 
   local_player->connected = TRUE;
 
-  LoadLevelInfo();				/* global level info */
   LoadSetup();					/* global setup info */
+}
+
+void InitLevelInfo()
+{
+  LoadLevelInfo();				/* global level info */
   LoadLevelSetup_LastSeries();			/* last played series info */
   LoadLevelSetup_SeriesInfo();			/* last played level info */
 }
@@ -158,14 +165,14 @@ void InitSound()
 
   if (SDL_Init(SDL_INIT_AUDIO) < 0)
   {
-    Error(ERR_WARN, "SDL_Init() failed: %s\n", SDL_GetError());
+    Error(ERR_WARN, "SDL_Init() failed: %s", SDL_GetError());
     sound_status = SOUND_OFF;
     return;
   }
 
   if (Mix_OpenAudio(22050, AUDIO_S16, 2, 256) < 0)
   {
-    Error(ERR_WARN, "Mix_OpenAudio() failed: %s\n", SDL_GetError());
+    Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
     sound_status = SOUND_OFF;
     return;
   }
@@ -294,7 +301,7 @@ void InitJoysticks()
 
     if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
     {
-      Error(ERR_EXIT, "SDL_Init() failed: %s\n", SDL_GetError());
+      Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
       return;
     }
   }
@@ -390,7 +397,7 @@ void InitDisplay()
 #ifdef USE_SDL_LIBRARY
   /* initialize SDL video */
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    Error(ERR_EXIT, "SDL_Init() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
 
   /* automatically cleanup SDL stuff after exit() */
   atexit(SDL_Quit);
@@ -446,10 +453,15 @@ void InitWindow(int argc, char *argv[])
 {
 #ifdef USE_SDL_LIBRARY
   /* open SDL video output device (window or fullscreen mode) */
+#if 0
   if ((window = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
 				 SDL_HWSURFACE))
       == NULL)
-    Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s", SDL_GetError());
+#else
+  if (!SetVideoMode())
+    Error(ERR_EXIT, "setting video mode failed");
+#endif
 
   /* set window and icon title */
   SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
@@ -700,11 +712,11 @@ void InitGfx()
 #endif
 #endif
 
-  LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
-  DrawInitText(WINDOW_TITLE_STRING,20,FC_YELLOW);
-  DrawInitText(COPYRIGHT_STRING,50,FC_RED);
+  LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
+  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
+  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
 #ifdef MSDOS
-  DrawInitText("MSDOS version done by Guido Schulz",210,FC_BLUE);
+  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
   rest(200);
 #endif /* MSDOS */
   DrawInitText("Loading graphics:",120,FC_GREEN);
@@ -725,10 +737,10 @@ void InitGfx()
 					    WIN_XSIZE, WIN_YSIZE,
 					    WIN_SDL_DEPTH, 0, 0, 0, 0))
       == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
   if ((pix[PIX_DB_BACK] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
 
@@ -737,10 +749,10 @@ void InitGfx()
 					    3 * DXSIZE, DYSIZE + VYSIZE,
 					    WIN_SDL_DEPTH, 0, 0, 0, 0))
       == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
   if ((pix[PIX_DB_DOOR] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
 
@@ -749,10 +761,10 @@ void InitGfx()
 					    FXSIZE, FYSIZE,
 					    WIN_SDL_DEPTH, 0, 0, 0, 0))
       == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
   if ((pix[PIX_DB_FIELD] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
 
@@ -778,13 +790,13 @@ void InitGfx()
       if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, TILEX, TILEY,
 						WIN_SDL_DEPTH, 0, 0, 0, 0))
 	  == NULL)
-	Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
+	Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
       /* create native transparent surface for current image */
       SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
 		      SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
       if ((tile_masked[tile] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-	Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+	Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
       SDL_FreeSurface(sdl_image_tmp);
 
@@ -912,17 +924,17 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef USE_SDL_LIBRARY
     /* load image to temporary surface */
     if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-      Error(ERR_EXIT, "IMG_Load() failed: %s\n", SDL_GetError());
+      Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
 
     /* create native non-transparent surface for current image */
     if ((pix[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
     /* create native transparent surface for current image */
     SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
 		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
     if ((pix_masked[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
     /* free temporary surface */
     SDL_FreeSurface(sdl_image_tmp);
@@ -2254,7 +2266,7 @@ void CloseAllAndExit(int exit_value)
   }
 #endif
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
   dumpErrorFile();
 #endif
 

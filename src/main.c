@@ -26,7 +26,7 @@
 Display        *display;
 Visual	       *visual;
 int		screen;
-DrawWindow  	window;
+DrawWindow  	window = None;
 GC		gc, clip_gc[NUM_BITMAPS], tile_clip_gc;
 Bitmap		pix[NUM_BITMAPS];
 Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
@@ -63,6 +63,8 @@ int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;
 int	    	sound_status = SOUND_STATUS;
 boolean		sound_loops_allowed = FALSE;
+boolean		fullscreen_available = FULLSCREEN_STATUS;
+boolean		fullscreen_enabled = FALSE;
 
 boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;

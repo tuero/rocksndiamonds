@@ -13,6 +13,8 @@
 ***********************************************************/
 
 #include "main.h"
+#include "misc.h"
+#include "tools.h"
 
 inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
 {
@@ -84,7 +86,7 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 }
 
 /* execute all pending screen drawing operations */
-inline void FlushDisplay()
+inline void FlushDisplay(void)
 {
 #ifndef USE_SDL_LIBRARY
   XFlush(display);
@@ -92,14 +94,14 @@ inline void FlushDisplay()
 }
 
 /* execute and wait for all pending screen drawing operations */
-inline void SyncDisplay()
+inline void SyncDisplay(void)
 {
 #ifndef USE_SDL_LIBRARY
   XSync(display, FALSE);
 #endif
 }
 
-inline void KeyboardAutoRepeatOn()
+inline void KeyboardAutoRepeatOn(void)
 {
 #ifdef USE_SDL_LIBRARY
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
@@ -110,7 +112,7 @@ inline void KeyboardAutoRepeatOn()
 #endif
 }
 
-inline void KeyboardAutoRepeatOff()
+inline void KeyboardAutoRepeatOff(void)
 {
 #ifdef USE_SDL_LIBRARY
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -137,7 +139,7 @@ inline boolean PointerInWindow(DrawWindow window)
 #endif
 }
 
-inline boolean PendingEvent()
+inline boolean PendingEvent(void)
 {
 #ifdef USE_SDL_LIBRARY
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);
@@ -183,7 +185,90 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 #endif
 }
 
-inline void dummy()
+inline boolean SetVideoMode(void)
+{
+  boolean success = TRUE;
+
+#ifdef USE_SDL_LIBRARY
+  if (setup.fullscreen && !fullscreen_enabled && fullscreen_available)
+  {
+    /* switch display to fullscreen mode, if available */
+    DrawWindow window_old = window;
+    DrawWindow window_new;
+
+    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
+				       SDL_HWSURFACE|SDL_FULLSCREEN))
+	== NULL)
+    {
+      /* switching display to fullscreen mode failed */
+      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
+
+      /* do not try it again */
+      fullscreen_available = FALSE;
+      success = FALSE;
+    }
+    else
+    {
+      if (window_old)
+	SDL_FreeSurface(window_old);
+      window = window_new;
+
+      fullscreen_enabled = TRUE;
+      success = TRUE;
+    }
+  }
+
+  if ((!setup.fullscreen && fullscreen_enabled) || !window)
+  {
+    /* switch display to window mode */
+    DrawWindow window_old = window;
+    DrawWindow window_new;
+
+    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
+				       SDL_HWSURFACE))
+	== NULL)
+    {
+      /* switching display to window mode failed -- should not happen */
+      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
+
+      success = FALSE;
+    }
+    else
+    {
+      if (window_old)
+	SDL_FreeSurface(window_old);
+      window = window_new;
+
+      fullscreen_enabled = FALSE;
+      success = TRUE;
+    }
+  }
+#else
+  if (setup.fullscreen && fullscreen_available)
+  {
+    Error(ERR_WARN, "fullscreen not available in X11 version");
+
+    /* display error message only once */
+    fullscreen_available = FALSE;
+
+    success = FALSE;
+  }
+#endif
+
+  return success;
+}
+
+inline void ChangeVideoModeIfNeeded(void)
+{
+#ifdef USE_SDL_LIBRARY
+  if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
+      (!setup.fullscreen && fullscreen_enabled))
+    SetVideoMode();
+  SetDrawtoField(DRAW_BACKBUFFER);
+#endif
+}
+
+inline void dummy(void)
 {
 #ifdef USE_SDL_LIBRARY
 #else

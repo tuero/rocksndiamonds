@@ -176,6 +176,9 @@ void GetPlayerConfig()
     setup.sound_music = FALSE;
   }
 
+  if (!fullscreen_available)
+    setup.fullscreen = FALSE;
+
   setup.sound_simple = setup.sound;
 
   InitJoysticks();

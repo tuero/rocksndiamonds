@@ -60,7 +60,7 @@ void DrawHeadline()
   int x = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING) * FONT1_XSIZE) / 2;
 
   DrawText(x, SY + 8, PROGRAM_TITLE_STRING, FS_BIG, FC_YELLOW);
-  DrawTextFCentered(46, FC_RED, COPYRIGHT_STRING);
+  DrawTextFCentered(46, FC_RED, WINDOW_SUBTITLE_STRING);
 }
 
 void DrawMainMenu()
@@ -83,6 +83,9 @@ void DrawMainMenu()
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
+
+  /* needed if last screen was the setup screen and fullscreen state changed */
+  ChangeVideoModeIfNeeded();
 
   /* map gadgets for main menu screen */
   MapTapeButtons();
@@ -1283,7 +1286,10 @@ void DrawSetupScreen()
 #endif
     { &setup.scroll_delay,	"Scroll Delay:"	},
     { &setup.soft_scrolling,	"Soft Scroll.:"	},
+#if 0
     { &setup.fading,		"Fading:"	},
+#endif
+    { &setup.fullscreen,	"Fullscreen:"	},
     { &setup.quick_doors,	"Quick Doors:"	},
     { &setup.autorecord,	"Auto-Record:"	},
     { &setup.team_mode,		"Team-Mode:"	},
@@ -1480,6 +1486,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.soft_scrolling = !setup.soft_scrolling;
       }
+#if 0
       else if (y==8)
       {
 	if (setup.fading)
@@ -1487,6 +1494,15 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.fading = !setup.fading;
+      }
+#endif
+      else if (y==8 && fullscreen_available)
+      {
+	if (setup.fullscreen)
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	setup.fullscreen = !setup.fullscreen;
       }
       else if (y==9)
       {

@@ -1078,39 +1078,40 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_TEAM_MODE		10
 #define SETUP_TOKEN_HANDICAP		11
 #define SETUP_TOKEN_TIME_LIMIT		12
+#define SETUP_TOKEN_FULLSCREEN		13
 
 /* player setup */
-#define SETUP_TOKEN_USE_JOYSTICK	13
-#define SETUP_TOKEN_JOY_DEVICE_NAME	14
-#define SETUP_TOKEN_JOY_XLEFT		15
-#define SETUP_TOKEN_JOY_XMIDDLE		16
-#define SETUP_TOKEN_JOY_XRIGHT		17
-#define SETUP_TOKEN_JOY_YUPPER		18
-#define SETUP_TOKEN_JOY_YMIDDLE		19
-#define SETUP_TOKEN_JOY_YLOWER		20
-#define SETUP_TOKEN_JOY_SNAP		21
-#define SETUP_TOKEN_JOY_BOMB		22
-#define SETUP_TOKEN_KEY_LEFT		23
-#define SETUP_TOKEN_KEY_RIGHT		24
-#define SETUP_TOKEN_KEY_UP		25
-#define SETUP_TOKEN_KEY_DOWN		26
-#define SETUP_TOKEN_KEY_SNAP		27
-#define SETUP_TOKEN_KEY_BOMB		28
+#define SETUP_TOKEN_USE_JOYSTICK	14
+#define SETUP_TOKEN_JOY_DEVICE_NAME	15
+#define SETUP_TOKEN_JOY_XLEFT		16
+#define SETUP_TOKEN_JOY_XMIDDLE		17
+#define SETUP_TOKEN_JOY_XRIGHT		18
+#define SETUP_TOKEN_JOY_YUPPER		19
+#define SETUP_TOKEN_JOY_YMIDDLE		20
+#define SETUP_TOKEN_JOY_YLOWER		21
+#define SETUP_TOKEN_JOY_SNAP		22
+#define SETUP_TOKEN_JOY_BOMB		23
+#define SETUP_TOKEN_KEY_LEFT		24
+#define SETUP_TOKEN_KEY_RIGHT		25
+#define SETUP_TOKEN_KEY_UP		26
+#define SETUP_TOKEN_KEY_DOWN		27
+#define SETUP_TOKEN_KEY_SNAP		28
+#define SETUP_TOKEN_KEY_BOMB		29
 
 /* level directory info */
-#define LEVELINFO_TOKEN_NAME		29
-#define LEVELINFO_TOKEN_NAME_SHORT	30
-#define LEVELINFO_TOKEN_NAME_SORTING	31
-#define LEVELINFO_TOKEN_AUTHOR		32
-#define LEVELINFO_TOKEN_IMPORTED_FROM	33
-#define LEVELINFO_TOKEN_LEVELS		34
-#define LEVELINFO_TOKEN_FIRST_LEVEL	35
-#define LEVELINFO_TOKEN_SORT_PRIORITY	36
-#define LEVELINFO_TOKEN_LEVEL_GROUP	37
-#define LEVELINFO_TOKEN_READONLY	38
+#define LEVELINFO_TOKEN_NAME		30
+#define LEVELINFO_TOKEN_NAME_SHORT	31
+#define LEVELINFO_TOKEN_NAME_SORTING	32
+#define LEVELINFO_TOKEN_AUTHOR		33
+#define LEVELINFO_TOKEN_IMPORTED_FROM	34
+#define LEVELINFO_TOKEN_LEVELS		35
+#define LEVELINFO_TOKEN_FIRST_LEVEL	36
+#define LEVELINFO_TOKEN_SORT_PRIORITY	37
+#define LEVELINFO_TOKEN_LEVEL_GROUP	38
+#define LEVELINFO_TOKEN_READONLY	39
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
-#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TIME_LIMIT
+#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_FULLSCREEN
 
 #define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
 #define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
@@ -1154,6 +1155,7 @@ static struct
   { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
   { TYPE_SWITCH,  &si.handicap,		"handicap"			},
   { TYPE_SWITCH,  &si.time_limit,	"time_limit"			},
+  { TYPE_SWITCH,  &si.fullscreen,	"fullscreen"			},
 
   /* player setup */
   { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
@@ -1527,6 +1529,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->team_mode = FALSE;
   si->handicap = TRUE;
   si->time_limit = TRUE;
+  si->fullscreen = FALSE;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
@@ -2077,7 +2080,7 @@ static void checkSeriesInfo()
   level_directory = getPath2((leveldir_current->user_defined ?
 			      getUserLevelDir("") :
 			      options.level_directory),
-			     leveldir_current->filename);
+			     leveldir_current->fullpath);
 
   if ((dir = opendir(level_directory)) == NULL)
   {

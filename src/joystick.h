@@ -19,6 +19,7 @@
 /* values for the joystick */
 #define JOYSTICK_OFF		0
 #define	JOYSTICK_AVAILABLE	1
+
 #ifdef __FreeBSD__
 #include <machine/joystick.h>
 #define DEV_JOYSTICK_0		"/dev/joy0"
@@ -89,4 +90,3 @@ int AnyJoystick(void);
 int AnyJoystickButton(void);
 
 #endif
-

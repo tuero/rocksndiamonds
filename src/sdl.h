@@ -25,6 +25,13 @@
 #include "mixer.h"
 #endif
 
+
+/* system dependent definitions */
+
+#define PLATFORM_STRING		"SDL"
+#define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
+
+
 /* SDL type definitions */
 
 typedef SDL_Surface	       *Bitmap;

@@ -28,6 +28,9 @@
 #include "msdos.h"
 #endif
 
+#define FULLSCREEN_NOT_AVAILABLE	FALSE
+#define FULLSCREEN_AVAILABLE		TRUE
+
 #if defined(USE_SDL_LIBRARY)
 #include "sdl.h"
 #elif defined(USE_X11_LIBRARY)
@@ -41,15 +44,18 @@ inline void SetClipOrigin(GC, int, int);
 inline void BlitBitmapMasked(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap, int, int, int, int);
 
-inline void FlushDisplay();
-inline void SyncDisplay();
-inline void KeyboardAutoRepeatOn();
-inline void KeyboardAutoRepeatOff();
+inline void FlushDisplay(void);
+inline void SyncDisplay(void);
+inline void KeyboardAutoRepeatOn(void);
+inline void KeyboardAutoRepeatOff(void);
 inline boolean PointerInWindow(DrawWindow);
 
-inline boolean PendingEvent();
+inline boolean PendingEvent(void);
 inline void NextEvent(Event *event);
 
 inline Key GetEventKey(KeyEvent *, boolean);
+
+inline boolean SetVideoMode(void);
+inline void ChangeVideoModeIfNeeded(void);
 
 #endif /* SYSTEM_H */

@@ -12,8 +12,16 @@
 *  msdos.h                                                 *
 ***********************************************************/
 
+#ifndef MSDOS_H
+#define MSDOS_H
+
 #include <allegro.h>
 #include <time.h>
+
+
+/* system dependent definitions */
+
+#define PLATFORM_STRING		"DOS"
 
 /* allegro defines TRUE as -1 */
 #ifdef TRUE
@@ -713,3 +721,5 @@ Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
 void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
 void NetworkServer(int, int);
+
+#endif /* MSDOS_H */
