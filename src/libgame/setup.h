@@ -193,6 +193,7 @@ char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
 char *getCustomArtworkFilename(char *, int);
 char *getCustomArtworkConfigFilename(int);
+char *getCustomArtworkLevelConfigFilename(int);
 char *getCustomMusicDirectory(void);
 
 void InitTapeDirectory(char *);

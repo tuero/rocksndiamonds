@@ -540,6 +540,7 @@ void DrawPlayerField(int x, int y)
 
 void DrawPlayer(struct PlayerInfo *player)
 {
+#if 0
   int jx = player->jx, jy = player->jy;
   int last_jx = player->last_jx, last_jy = player->last_jy;
   int next_jx = jx + (jx - last_jx), next_jy = jy + (jy - last_jy);
@@ -551,6 +552,23 @@ void DrawPlayer(struct PlayerInfo *player)
   boolean player_is_moving = (last_jx != jx || last_jy != jy ? TRUE : FALSE);
   int move_dir = player->MovDir;
   int action = ACTION_DEFAULT;
+#else
+  int jx = player->jx, jy = player->jy;
+  int move_dir = player->MovDir;
+  int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? +1 : 0);
+  int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? +1 : 0);
+  int last_jx = (player->is_moving ? jx - dx : jx);
+  int last_jy = (player->is_moving ? jy - dy : jy);
+  int next_jx = jx + dx;
+  int next_jy = jy + dy;
+  int sx = SCREENX(jx), sy = SCREENY(jy);
+  int sxx = 0, syy = 0;
+  int element = Feld[jx][jy], last_element = Feld[last_jx][last_jy];
+  int graphic;
+  int frame = 0;
+  boolean player_is_moving = (player->MovPos ? TRUE : FALSE);
+  int action = ACTION_DEFAULT;
+#endif
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
@@ -580,7 +598,11 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw things in the field the player is leaving, if needed               */
   /* ----------------------------------------------------------------------- */
 
+#if 1
+  if (player->is_moving)
+#else
   if (player_is_moving)
+#endif
   {
     if (Back[last_jx][last_jy] && IS_DRAWABLE(last_element))
     {
@@ -601,6 +623,7 @@ void DrawPlayer(struct PlayerInfo *player)
     if (player->Pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
     {
 #if 1
+#if 1
       DrawLevelElement(next_jx, next_jy, EL_EMPTY);
 #else
       if (player->GfxPos)
@@ -612,6 +635,7 @@ void DrawPlayer(struct PlayerInfo *player)
       }
       else
   	DrawLevelField(next_jx, next_jy);
+#endif
 #endif
     }
   }
@@ -700,7 +724,17 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw things the player is pushing, if needed                            */
   /* ----------------------------------------------------------------------- */
 
+#if 0
+  printf("::: %d, %d [%d, %d] [%d]\n",
+	 player->Pushing, player_is_moving, player->GfxAction,
+	 player->is_moving, player_is_moving);
+#endif
+
+#if 1
+  if (player->Pushing && player->is_moving)
+#else
   if (player->Pushing && player_is_moving)
+#endif
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
@@ -721,22 +755,34 @@ void DrawPlayer(struct PlayerInfo *player)
     else
     {
 #if 1
+      int element = MovingOrBlocked2Element(next_jx, next_jy);
+#else
+#if 1
       int element = Feld[jx][jy];
 #else
       int element = Feld[next_jx][next_jy];
 #endif
+#endif
 
+#if 1
       int graphic = el2img(element);
       int frame = 0;
 
+#if 0
       if ((sxx || syy) && IS_PUSHABLE(element))
+#endif
       {
-	graphic = el_act_dir2img(element, ACTION_MOVING, move_dir);
+	graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 	frame = getGraphicAnimationFrame(graphic, player->Frame);
       }
 
+#if 0
+      printf("::: pushing %d: %d ...\n", sxx, frame);
+#endif
+
       DrawGraphicShifted(px, py, sxx, syy, graphic, frame,
 			 NO_CUTTING, NO_MASKING);
+#endif
     }
   }
 

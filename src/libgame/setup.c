@@ -268,6 +268,16 @@ static char *getDefaultMusicDir(char *music_subdir)
   return music_dir;
 }
 
+static char *getDefaultArtworkDir(int type)
+{
+  return (type == TREE_TYPE_GRAPHICS_DIR ?
+	  getDefaultGraphicsDir(GRAPHICS_SUBDIR) :
+	  type == TREE_TYPE_SOUNDS_DIR ?
+	  getDefaultSoundsDir(SOUNDS_SUBDIR) :
+	  type == TREE_TYPE_MUSIC_DIR ?
+	  getDefaultMusicDir(MUSIC_SUBDIR) : "");
+}
+
 static char *getUserGraphicsDir()
 {
   static char *usergraphics_dir = NULL;
@@ -328,13 +338,29 @@ void setLevelArtworkDir(TreeInfo *ti)
      ti->type == TREE_TYPE_SOUNDS_DIR   ? leveldir_current->sounds_set :
      leveldir_current->music_set);
 
-  if ((level_artwork = getTreeInfoFromIdentifier(ti, artwork_set)) == NULL)
-    return;
-
   if (*artwork_path_ptr != NULL)
     free(*artwork_path_ptr);
 
-  *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
+  if ((level_artwork = getTreeInfoFromIdentifier(ti, artwork_set)))
+    *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
+  else
+  {
+    /* No (or non-existing) artwork configured in "levelinfo.conf". This would
+       normally result in using the artwork configured in the setup menu. But
+       if an artwork subdirectory exists (which might contain custom artwork
+       or an artwork configuration file), this level artwork must be treated
+       as relative to the default "classic" artwork, not to the artwork that
+       is currently configured in the setup menu. */
+
+    char *dir = getPath2(getCurrentLevelDir(), ARTWORK_DIRECTORY(ti->type));
+
+    if (fileExists(dir))
+      *artwork_path_ptr = getStringCopy(getDefaultArtworkDir(ti->type));
+    else
+      *artwork_path_ptr = getStringCopy(UNDEFINED_FILENAME);
+
+    free(dir);
+  }
 }
 
 static char *getLevelArtworkDir(int type)
@@ -453,34 +479,49 @@ char *getCustomImageFilename(char *basename)
 
   if (!setup.override_level_graphics)
   {
+#if 0
     /* 1st try: look for special artwork configured in level series config */
     filename = getPath2(getLevelArtworkDir(TREE_TYPE_GRAPHICS_DIR), basename);
-#if 1
+#if 0
     if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: check 1: filename '%s'\n", filename);
+      printf("::: trying 1 '%s' ...\n", filename);
 #endif
     if (fileExists(filename))
       return filename;
 
     free(filename);
+#endif
 
     /* 2nd try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
-#if 1
+#if 0
     if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: check 2: filename '%s'\n", filename);
+      printf("::: trying 2 '%s' ...\n", filename);
 #endif
     if (fileExists(filename))
       return filename;
 
     free(filename);
+
+#if 1
+    /* 1st try: look for special artwork configured in level series config */
+    filename = getPath2(getLevelArtworkDir(TREE_TYPE_GRAPHICS_DIR), basename);
+#if 0
+    if (strcmp(basename, "RocksScreen.pcx") == 0)
+      printf("::: trying 2.1 '%s' ...\n", filename);
+#endif
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
+#endif
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */
   filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
-#if 1
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: check 3: filename '%s'\n", filename);
+#if 0
+  if (strcmp(basename, "RocksScreen.pcx") == 0)
+    printf("::: trying 3 '%s' ...\n", filename);
 #endif
   if (fileExists(filename))
     return filename;
@@ -489,9 +530,9 @@ char *getCustomImageFilename(char *basename)
 
   /* 4th try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
-#if 1
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: check 4: filename '%s'\n", filename);
+#if 0
+  if (strcmp(basename, "RocksScreen.pcx") == 0)
+    printf("::: trying 4 '%s' ...\n", filename);
 #endif
   if (fileExists(filename))
     return filename;
@@ -500,9 +541,9 @@ char *getCustomImageFilename(char *basename)
 
   /* 5th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.graphics_directory, basename);
-#if 1
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: check 5: filename '%s'\n", filename);
+#if 0
+  if (strcmp(basename, "RocksScreen.pcx") == 0)
+    printf("::: trying 5 '%s' ...\n", filename);
 #endif
   if (fileExists(filename))
     return filename;
@@ -519,12 +560,14 @@ char *getCustomSoundFilename(char *basename)
 
   if (!setup.override_level_sounds)
   {
+#if 0
     /* 1st try: look for special artwork configured in level series config */
     filename = getPath2(getLevelArtworkDir(TREE_TYPE_SOUNDS_DIR), basename);
     if (fileExists(filename))
       return filename;
 
     free(filename);
+#endif
 
     /* 2nd try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
@@ -532,6 +575,15 @@ char *getCustomSoundFilename(char *basename)
       return filename;
 
     free(filename);
+
+#if 1
+    /* 1st try: look for special artwork configured in level series config */
+    filename = getPath2(getLevelArtworkDir(TREE_TYPE_SOUNDS_DIR), basename);
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
+#endif
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */
@@ -571,6 +623,18 @@ char *getCustomArtworkConfigFilename(int type)
   return getCustomArtworkFilename(ARTWORKINFO_FILENAME(type), type);
 }
 
+char *getCustomArtworkLevelConfigFilename(int type)
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(getLevelArtworkDir(type), ARTWORKINFO_FILENAME(type));
+
+  return filename;
+}
+
 char *getCustomMusicDirectory(void)
 {
   static char *directory = NULL;
@@ -580,12 +644,14 @@ char *getCustomMusicDirectory(void)
 
   if (!setup.override_level_music)
   {
+#if 0
     /* 1st try: look for special artwork configured in level series config */
     directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
     if (fileExists(directory))
       return directory;
 
     free(directory);
+#endif
 
     /* 2nd try: look for special artwork in current level series directory */
     directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
@@ -593,6 +659,15 @@ char *getCustomMusicDirectory(void)
       return directory;
 
     free(directory);
+
+#if 1
+    /* 1st try: look for special artwork configured in level series config */
+    directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
+    if (fileExists(directory))
+      return directory;
+
+    free(directory);
+#endif
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */

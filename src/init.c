@@ -754,6 +754,10 @@ static void InitGraphicInfo()
     int src_x, src_y;
     int first_frame, last_frame;
 
+#if 0
+    printf("::: image: '%s'\n", image->token);
+#endif
+
     set_graphic_parameters(i, image->parameter);
 
     /* now check if no animation frames are outside of the loaded image */
@@ -993,6 +997,10 @@ static void InitSoundInfo()
     sound_effect_properties[i] = ACTION_OTHER;
     sound_info[i].loop = FALSE;
 
+#if 0
+    printf("::: sound: '%s'\n", sound->token);
+#endif
+
     /* determine all loop sounds and identify certain sound classes */
 
     for (j=0; element_action_info[j].suffix; j++)
@@ -1009,6 +1017,11 @@ static void InitSoundInfo()
 	  sound_info[i].loop = TRUE;
       }
     }
+
+#if 0
+    if (strcmp(sound->token, "custom_42") == 0)
+      printf("::: '%s' -> %d\n", sound->token, sound_info[i].loop);
+#endif
 
     /* associate elements and some selected sound actions */
 
@@ -3041,6 +3054,18 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
+#if 1
+  setLevelArtworkDir(artwork.gfx_first);
+#endif
+
+#if 0
+  printf("::: InitImages ['%s', '%s'] ['%s', '%s']\n",
+	 artwork.gfx_current_identifier,
+	 artwork.gfx_current->identifier,
+	 leveldir_current->graphics_set,
+	 leveldir_current->graphics_path);
+#endif
+
   ReloadCustomImages();
 
   LoadCustomElementDescriptions();
@@ -3051,12 +3076,16 @@ static void InitImages()
 
 static void InitSound()
 {
+  setLevelArtworkDir(artwork.snd_first);
+
   InitReloadCustomSounds(artwork.snd_current->identifier);
   ReinitializeSounds();
 }
 
 static void InitMusic()
 {
+  setLevelArtworkDir(artwork.mus_first);
+
   InitReloadCustomMusic(artwork.mus_current->identifier);
   ReinitializeMusic();
 }
@@ -3090,6 +3119,12 @@ void ReloadCustomArtwork()
   static boolean last_override_level_graphics = FALSE;
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
+  static boolean last_own_level_graphics_set = FALSE;
+  static boolean last_own_level_sounds_set = FALSE;
+  static boolean last_own_level_music_set = FALSE;
+  boolean level_graphics_set_changed = FALSE;
+  boolean level_sounds_set_changed = FALSE;
+  boolean level_music_set_changed = FALSE;
   /* identifier for new artwork; default: artwork configured in setup */
 #if 0
   char *gfx_new_identifier = artwork.gfx_current->identifier;
@@ -3187,12 +3222,14 @@ void ReloadCustomArtwork()
 	   gfx_new_identifier, identifier_old, identifier_new);
 #endif
 
+#if 0
     leveldir_current_identifier = leveldir_current->identifier;
+#endif
   }
 
   /* custom level artwork configured in level series configuration file
      always overrides custom level artwork stored in level series directory
-     and (level independent) custom artwork configured in setup menue */
+     and (level independent) custom artwork configured in setup menu */
   if (leveldir_current->graphics_set != NULL)
     gfx_new_identifier = leveldir_current->graphics_set;
   if (leveldir_current->sounds_set != NULL)
@@ -3200,16 +3237,46 @@ void ReloadCustomArtwork()
   if (leveldir_current->music_set != NULL)
     mus_new_identifier = leveldir_current->music_set;
 
+  if (leveldir_current_identifier != leveldir_current->identifier)
+  {
+    if (last_own_level_graphics_set || leveldir_current->graphics_set != NULL)
+      level_graphics_set_changed = TRUE;
+
+    if (last_own_level_sounds_set || leveldir_current->sounds_set != NULL)
+      level_sounds_set_changed = TRUE;
+
+    if (last_own_level_music_set || leveldir_current->music_set != NULL)
+      level_music_set_changed = TRUE;
+
+    last_own_level_graphics_set = (leveldir_current->graphics_set != NULL);
+    last_own_level_sounds_set = (leveldir_current->sounds_set != NULL);
+    last_own_level_music_set = (leveldir_current->music_set != NULL);
+  }
+
 #if 1
-  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' [setup '%s', level '%s']\n",
+  leveldir_current_identifier = leveldir_current->identifier;
+#endif
+
+  if (setup.override_level_graphics)
+    gfx_new_identifier = artwork.gfx_current->identifier;
+  if (setup.override_level_sounds)
+    snd_new_identifier = artwork.snd_current->identifier;
+  if (setup.override_level_music)
+    mus_new_identifier = artwork.mus_current->identifier;
+
+
+#if 0
+  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' ['%s', '%s'] [%d]\n",
 	 artwork.gfx_current_identifier, gfx_new_identifier,
-	 artwork.gfx_current->identifier, leveldir_current->graphics_set);
+	 artwork.gfx_current->identifier, leveldir_current->graphics_set,
+	 level_graphics_set_changed);
 #endif
 
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
-      last_override_level_graphics != setup.override_level_graphics)
+      last_override_level_graphics != setup.override_level_graphics ||
+      level_graphics_set_changed)
   {
-#if 1
+#if 0
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
 	   artwork.gfx_current_identifier,
 	   gfx_new_identifier,
@@ -3224,7 +3291,9 @@ void ReloadCustomArtwork()
     artwork.gfx_current_identifier = gfx_new_identifier;
 #endif
 
+#if 0
     setLevelArtworkDir(artwork.gfx_first);
+#endif
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -3259,7 +3328,8 @@ void ReloadCustomArtwork()
   }
 
   if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
-      last_override_level_sounds != setup.override_level_sounds)
+      last_override_level_sounds != setup.override_level_sounds ||
+      level_sounds_set_changed)
   {
 #if 0
     printf("RELOADING SOUNDS '%s' -> '%s' ('%s')\n",
@@ -3288,7 +3358,8 @@ void ReloadCustomArtwork()
   }
 
   if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
-      last_override_level_music != setup.override_level_music)
+      last_override_level_music != setup.override_level_music ||
+      level_music_set_changed)
   {
     /* set artwork path to send it to the sound server process */
     setLevelArtworkDir(artwork.mus_first);

@@ -37,16 +37,20 @@ element_to_graphic[] =
     IMG_BD_ROCK
   },
   {
-    EL_BD_ROCK,					ACTION_FALLING, -1,
-    IMG_BD_ROCK_FALLING
-  },
-  {
     EL_BD_ROCK,					ACTION_MOVING, MV_BIT_LEFT,
     IMG_BD_ROCK_MOVING_LEFT
   },
   {
     EL_BD_ROCK,					ACTION_MOVING, MV_BIT_RIGHT,
     IMG_BD_ROCK_MOVING_RIGHT
+  },
+  {
+    EL_BD_ROCK,					ACTION_PUSHING, MV_BIT_LEFT,
+    IMG_BD_ROCK_PUSHING_LEFT
+  },
+  {
+    EL_BD_ROCK,					ACTION_PUSHING, MV_BIT_RIGHT,
+    IMG_BD_ROCK_PUSHING_RIGHT
   },
   {
     EL_BD_DIAMOND,				-1, -1,
@@ -193,16 +197,20 @@ element_to_graphic[] =
     IMG_SP_ZONK
   },
   {
-    EL_SP_ZONK,					ACTION_FALLING, -1,
-    IMG_SP_ZONK_FALLING
-  },
-  {
     EL_SP_ZONK,					ACTION_MOVING, MV_BIT_LEFT,
     IMG_SP_ZONK_MOVING_LEFT
   },
   {
     EL_SP_ZONK,					ACTION_MOVING, MV_BIT_RIGHT,
     IMG_SP_ZONK_MOVING_RIGHT
+  },
+  {
+    EL_SP_ZONK,					ACTION_PUSHING, MV_BIT_LEFT,
+    IMG_SP_ZONK_PUSHING_LEFT
+  },
+  {
+    EL_SP_ZONK,					ACTION_PUSHING, MV_BIT_RIGHT,
+    IMG_SP_ZONK_PUSHING_RIGHT
   },
   {
     EL_SP_BASE,					-1, -1,
@@ -269,10 +277,6 @@ element_to_graphic[] =
     IMG_SP_INFOTRON
   },
   {
-    EL_SP_INFOTRON,				ACTION_FALLING, -1,
-    IMG_SP_INFOTRON_FALLING
-  },
-  {
     EL_SP_CHIP_SINGLE,				-1, -1,
     IMG_SP_CHIP_SINGLE
   },
@@ -325,20 +329,8 @@ element_to_graphic[] =
     IMG_SP_DISK_ORANGE
   },
   {
-    EL_SP_DISK_ORANGE,				ACTION_FALLING, -1,
-    IMG_SP_DISK_ORANGE_FALLING
-  },
-  {
-    EL_SP_DISK_ORANGE,				ACTION_PUSHING, -1,
-    IMG_SP_DISK_ORANGE_PUSHING
-  },
-  {
     EL_SP_DISK_YELLOW,				-1, -1,
     IMG_SP_DISK_YELLOW
-  },
-  {
-    EL_SP_DISK_YELLOW,				ACTION_PUSHING, -1,
-    IMG_SP_DISK_YELLOW_PUSHING
   },
   {
     EL_SP_DISK_RED,				-1, -1,
@@ -347,14 +339,6 @@ element_to_graphic[] =
   {
     EL_SP_DISK_RED,				ACTION_COLLECTING, -1,
     IMG_SP_DISK_RED_COLLECTING
-  },
-  {
-    EL_SP_DISK_RED_ACTIVE,			-1, -1,
-    IMG_SP_DISK_RED_ACTIVE
-  },
-  {
-    EL_SP_DISK_RED,				ACTION_ACTIVE, -1,
-    IMG_SP_DISK_RED_ACTIVE
   },
   {
     EL_SP_PORT_RIGHT,				-1, -1,
@@ -557,16 +541,20 @@ element_to_graphic[] =
     IMG_ROCK
   },
   {
-    EL_ROCK,					ACTION_FALLING, -1,
-    IMG_ROCK_FALLING
-  },
-  {
     EL_ROCK,					ACTION_MOVING, MV_BIT_LEFT,
     IMG_ROCK_MOVING_LEFT
   },
   {
     EL_ROCK,					ACTION_MOVING, MV_BIT_RIGHT,
     IMG_ROCK_MOVING_RIGHT
+  },
+  {
+    EL_ROCK,					ACTION_PUSHING, MV_BIT_LEFT,
+    IMG_ROCK_PUSHING_LEFT
+  },
+  {
+    EL_ROCK,					ACTION_PUSHING, MV_BIT_RIGHT,
+    IMG_ROCK_PUSHING_RIGHT
   },
   {
     EL_EMERALD,					-1, -1,
@@ -607,18 +595,6 @@ element_to_graphic[] =
   {
     EL_NUT,					-1, -1,
     IMG_NUT
-  },
-  {
-    EL_NUT,					ACTION_FALLING, -1,
-    IMG_NUT_FALLING
-  },
-  {
-    EL_NUT,					ACTION_MOVING, MV_BIT_LEFT,
-    IMG_NUT_MOVING_LEFT
-  },
-  {
-    EL_NUT,					ACTION_MOVING, MV_BIT_RIGHT,
-    IMG_NUT_MOVING_RIGHT
   },
   {
     EL_NUT_BREAKING,				-1, -1,
@@ -965,6 +941,10 @@ element_to_graphic[] =
     IMG_BALLOON_MOVING
   },
   {
+    EL_BALLOON,					ACTION_PUSHING, -1,
+    IMG_BALLOON_PUSHING
+  },
+  {
     EL_BALLOON_SWITCH_LEFT,			-1, -1,
     IMG_BALLOON_SWITCH_LEFT
   },
@@ -987,10 +967,6 @@ element_to_graphic[] =
   {
     EL_SPRING,					-1, -1,
     IMG_SPRING
-  },
-  {
-    EL_SPRING,					ACTION_MOVING, -1,
-    IMG_SPRING_MOVING
   },
   {
     EL_EMC_STEELWALL_1,				-1, -1,
@@ -1705,23 +1681,63 @@ element_to_graphic[] =
     IMG_DARK_YAMYAM
   },
   {
+    EL_DYNABOMB,				-1, -1,
+    IMG_DYNABOMB
+  },
+  {
     EL_DYNABOMB_ACTIVE,				-1, -1,
     IMG_DYNABOMB_ACTIVE
+  },
+  {
+    EL_DYNABOMB,				ACTION_ACTIVE, -1,
+    IMG_DYNABOMB_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_1,			-1, -1,
+    IMG_DYNABOMB_PLAYER_1
   },
   {
     EL_DYNABOMB_PLAYER_1_ACTIVE,		-1, -1,
     IMG_DYNABOMB_PLAYER_1_ACTIVE
   },
   {
+    EL_DYNABOMB_PLAYER_1,			ACTION_ACTIVE, -1,
+    IMG_DYNABOMB_PLAYER_1_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_2,			-1, -1,
+    IMG_DYNABOMB_PLAYER_2
+  },
+  {
     EL_DYNABOMB_PLAYER_2_ACTIVE,		-1, -1,
     IMG_DYNABOMB_PLAYER_2_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_2,			ACTION_ACTIVE, -1,
+    IMG_DYNABOMB_PLAYER_2_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_3,			-1, -1,
+    IMG_DYNABOMB_PLAYER_3
   },
   {
     EL_DYNABOMB_PLAYER_3_ACTIVE,		-1, -1,
     IMG_DYNABOMB_PLAYER_3_ACTIVE
   },
   {
+    EL_DYNABOMB_PLAYER_3,			ACTION_ACTIVE, -1,
+    IMG_DYNABOMB_PLAYER_3_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_4,			-1, -1,
+    IMG_DYNABOMB_PLAYER_4
+  },
+  {
     EL_DYNABOMB_PLAYER_4_ACTIVE,		-1, -1,
+    IMG_DYNABOMB_PLAYER_4_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER_4,			ACTION_ACTIVE, -1,
     IMG_DYNABOMB_PLAYER_4_ACTIVE
   },
   {
@@ -1947,10 +1963,6 @@ element_to_graphic[] =
   {
     EL_SATELLITE,				-1, -1,
     IMG_SATELLITE
-  },
-  {
-    EL_SATELLITE,				ACTION_MOVING, -1,
-    IMG_SATELLITE_MOVING
   },
   {
     EL_STONEBLOCK,				-1, -1,

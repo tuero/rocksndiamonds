@@ -2924,7 +2924,32 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "dynabomb",
+    "-",
+    "-"
+  },
+  {
     "dynabomb_active",
+    "-",
+    "-"
+  },
+  {
+    "dynabomb_player_1",
+    "-",
+    "-"
+  },
+  {
+    "dynabomb_player_2",
+    "-",
+    "-"
+  },
+  {
+    "dynabomb_player_3",
+    "-",
+    "-"
+  },
+  {
+    "dynabomb_player_4",
     "-",
     "-"
   },
@@ -3002,6 +3027,9 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1] =
   { ".exploding",	ACTION_EXPLODING,	FALSE	},
   { ".dying",		ACTION_DYING,		FALSE	},
   { ".other",		ACTION_OTHER,		FALSE	},
+
+  /* empty suffix always matches -- check as last entry in InitSoundInfo() */
+  { "",			ACTION_DEFAULT,		TRUE	},
 
   { NULL,		0,			0	}
 };

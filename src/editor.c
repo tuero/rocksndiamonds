@@ -888,7 +888,7 @@ static struct
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
     &custom_element.change.random,
-    NULL,				"use random change:", NULL
+    NULL,				"use random change:", "(%)"
   },
 };
 

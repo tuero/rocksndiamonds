@@ -1906,6 +1906,8 @@ void Explode(int ex, int ey, int phase, int mode)
 
     for (y = ey - 1; y <= ey + 1; y++) for(x = ex - 1; x <= ex + 1; x++)
     {
+      int xx = x - ex + 1;
+      int yy = y - ey + 1;
       int element;
 
       if (!IN_LEV_FIELD(x, y) ||
@@ -2016,11 +2018,10 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (center_element == EL_AMOEBA_TO_DIAMOND)
 	Store[x][y] = level.amoeba_content;
       else if (center_element == EL_YAMYAM)
-	Store[x][y] =
-	  level.yamyam_content[game.yamyam_content_nr][x - ex + 1][y - ey + 1];
-      else if (IS_CUSTOM_ELEMENT(center_element))
-	Store[x][y] =
-	  element_info[center_element].content[x - ex + 1][y - ey + 1];
+	Store[x][y] = level.yamyam_content[game.yamyam_content_nr][xx][yy];
+      else if (IS_CUSTOM_ELEMENT(center_element) &&
+	       element_info[center_element].content[xx][yy] != EL_EMPTY)
+	Store[x][y] = element_info[center_element].content[xx][yy];
       else if (element == EL_WALL_EMERALD)
 	Store[x][y] = EL_EMERALD;
       else if (element == EL_WALL_DIAMOND)
@@ -2037,6 +2038,8 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_PEARL;
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
+      else if (IS_CUSTOM_ELEMENT(element))
+	Store[x][y] = element_info[element].content[1][1];
       else
 	Store[x][y] = EL_EMPTY;
 
@@ -3440,7 +3443,7 @@ void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
-  /* !!! this should be handled more generic (not only for more) !!! */
+  /* !!! this should be handled more generic (not only for mole) !!! */
   if (element != EL_MOLE && GfxAction[x][y] != ACTION_DIGGING)
     GfxAction[x][y] = ACTION_DEFAULT;
 
@@ -5224,7 +5227,7 @@ static void ChangeElementNow(int x, int y, int element)
     if (!change->only_complete || complete_change)
     {
       if (change->only_complete && change->use_random_change &&
-	  RND(change->random) != 0)
+	  RND(100) < change->random)
 	return;
 
       for (yy = 0; yy < 3; yy++) for(xx = 0; xx < 3 ; xx++)
@@ -5233,7 +5236,7 @@ static void ChangeElementNow(int x, int y, int element)
 	int ey = y + yy - 1;
 
 	if (can_change[xx][yy] && (!change->use_random_change ||
-				   RND(change->random) == 0))
+				   RND(100) < change->random))
 	{
 	  if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
 	    RemoveMovingField(ex, ey);
@@ -5582,6 +5585,16 @@ void GameActions()
       JustStopped[x][y]--;
 
     GfxFrame[x][y]++;
+
+#if 1
+    /* reset finished pushing action (not done in ContinueMoving() to allow
+       continous pushing animation for elements without push delay) */
+    if (GfxAction[x][y] == ACTION_PUSHING && !IS_MOVING(x, y))
+    {
+      ResetGfxAnimation(x, y);
+      DrawLevelField(x, y);
+    }
+#endif
 
 #if DEBUG
     if (IS_BLOCKED(x, y))
@@ -6339,7 +6352,9 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     if (Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 
+#if 0
     DrawPlayer(player);
+#endif
     return;
   }
   else if (!FrameReached(&player->actual_frame_counter, 1))
@@ -6355,7 +6370,9 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   if (player->MovPos == 0)
     CheckGravityMovement(player);
 
-  DrawPlayer(player);
+#if 0
+  DrawPlayer(player);	/* needed here only to cleanup last field */
+#endif
 
   if (player->MovPos == 0)
   {
@@ -7327,6 +7344,7 @@ int DigField(struct PlayerInfo *player,
 	  PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
 
 	InitMovingField(x, y, move_direction);
+	GfxAction[x][y] = ACTION_PUSHING;
 
 	if (mode == DF_SNAP)
 	  ContinueMoving(x, y);
@@ -7885,6 +7903,8 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       else if (audio.music_available)
       { 
 	setup.sound = setup.sound_music = TRUE;
+
+	SetAudioMode(setup.sound);
 	PlayMusic(level_nr);
       }
       break;
@@ -7893,14 +7913,20 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       if (setup.sound_loops)
 	setup.sound_loops = FALSE;
       else if (audio.loops_available)
+      {
 	setup.sound = setup.sound_loops = TRUE;
+	SetAudioMode(setup.sound);
+      }
       break;
 
     case SOUND_CTRL_ID_SIMPLE:
       if (setup.sound_simple)
 	setup.sound_simple = FALSE;
       else if (audio.sound_available)
+      {
 	setup.sound = setup.sound_simple = TRUE;
+	SetAudioMode(setup.sound);
+      }
       break;
 
     default:

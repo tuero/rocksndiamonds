@@ -1801,8 +1801,16 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
     /* mark config file token as well known from default config */
     setHashEntry(setup_file_hash, file_list_entry->token, known_token_value);
   }
+#if 0
   else
+  {
+    if (strcmp(file_list_entry->filename,
+	       file_list_entry->default_filename) != 0)
+      printf("___ resetting '%s' to default\n", file_list_entry->token);
+
     setString(&file_list_entry->filename, file_list_entry->default_filename);
+  }
+#endif
 
   /* check for config tokens that can be build by base token and suffixes */
   for (i=0; suffix_list[i].token != NULL; i++)
@@ -1869,8 +1877,346 @@ static void add_property_mapping(struct PropertyMapping **list,
   new_list_entry->artwork_index = artwork_index;
 }
 
+static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
+					  char *filename)
+{
+  struct FileInfo *file_list = artwork_info->file_list;
+  struct ConfigInfo *suffix_list = artwork_info->suffix_list;
+  char **base_prefixes = artwork_info->base_prefixes;
+  char **ext1_suffixes = artwork_info->ext1_suffixes;
+  char **ext2_suffixes = artwork_info->ext2_suffixes;
+  char **ext3_suffixes = artwork_info->ext3_suffixes;
+  char **ignore_tokens = artwork_info->ignore_tokens;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
+  int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
+  int num_base_prefixes = artwork_info->num_base_prefixes;
+  int num_ext1_suffixes = artwork_info->num_ext1_suffixes;
+  int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
+  int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
+  int num_ignore_tokens = artwork_info->num_ignore_tokens;
+  SetupFileHash *setup_file_hash, *extra_file_hash;
+  char *known_token_value = KNOWN_TOKEN_VALUE;
+  int i, j, k, l;
+
+  if (filename == NULL)
+    return;
+
+#if 0
+  printf("::: LoadArtworkConfigFromFilename: '%s'\n", filename);
+#endif
+
+  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
+    return;
+
+  /* read parameters for all known config file tokens */
+  for (i=0; i<num_file_list_entries; i++)
+    read_token_parameters(setup_file_hash, suffix_list, &file_list[i]);
+
+  /* set all tokens that can be ignored here to "known" keyword */
+  for (i=0; i < num_ignore_tokens; i++)
+    setHashEntry(setup_file_hash, ignore_tokens[i], known_token_value);
+
+  /* copy all unknown config file tokens to extra config list */
+  extra_file_hash = newSetupFileHash();
+  BEGIN_HASH_ITERATION(setup_file_hash, itr)
+  {
+    if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
+      setHashEntry(extra_file_hash,
+		   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));
+  }
+  END_HASH_ITERATION(setup_file_hash, itr)
+
+  /* at this point, we do not need the config file hash anymore -- free it */
+  freeSetupFileHash(setup_file_hash);
+
+  /* now try to determine valid, dynamically defined config tokens */
+
+  BEGIN_HASH_ITERATION(extra_file_hash, itr)
+  {
+    struct FileInfo **dynamic_file_list =
+      &artwork_info->dynamic_file_list;
+    int *num_dynamic_file_list_entries =
+      &artwork_info->num_dynamic_file_list_entries;
+    struct PropertyMapping **property_mapping =
+      &artwork_info->property_mapping;
+    int *num_property_mapping_entries =
+      &artwork_info->num_property_mapping_entries;
+    int current_summarized_file_list_entry =
+      artwork_info->num_file_list_entries +
+      artwork_info->num_dynamic_file_list_entries;
+    char *token = HASH_ITERATION_TOKEN(itr);
+    int len_token = strlen(token);
+    int start_pos;
+    boolean base_prefix_found = FALSE;
+    boolean parameter_suffix_found = FALSE;
+
+    /* skip all parameter definitions (handled by read_token_parameters()) */
+    for (i=0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
+    {
+      int len_suffix = strlen(suffix_list[i].token);
+
+      if (token_suffix_match(token, suffix_list[i].token, -len_suffix))
+	parameter_suffix_found = TRUE;
+    }
+
+#if 0
+    if (IS_PARENT_PROCESS())
+    {
+      if (parameter_suffix_found)
+	printf("---> skipping token '%s' (parameter token)\n", token);
+      else
+	printf("---> examining token '%s': search prefix ...\n", token);
+    }
+#endif
+
+    if (parameter_suffix_found)
+      continue;
+
+    /* ---------- step 0: search for matching base prefix ---------- */
+
+    start_pos = 0;
+    for (i=0; i<num_base_prefixes && !base_prefix_found; i++)
+    {
+      char *base_prefix = base_prefixes[i];
+      int len_base_prefix = strlen(base_prefix);
+      boolean ext1_suffix_found = FALSE;
+      boolean ext2_suffix_found = FALSE;
+      boolean ext3_suffix_found = FALSE;
+      boolean exact_match = FALSE;
+      int base_index = -1;
+      int ext1_index = -1;
+      int ext2_index = -1;
+      int ext3_index = -1;
+
+      base_prefix_found = token_suffix_match(token, base_prefix, start_pos);
+
+      if (!base_prefix_found)
+	continue;
+
+      base_index = i;
+
+      if (start_pos + len_base_prefix == len_token)	/* exact match */
+      {
+	exact_match = TRUE;
+
+	add_dynamic_file_list_entry(dynamic_file_list,
+				    num_dynamic_file_list_entries,
+				    extra_file_hash,
+				    suffix_list,
+				    num_suffix_list_entries,
+				    token);
+	add_property_mapping(property_mapping,
+			     num_property_mapping_entries,
+			     base_index, -1, -1, -1,
+			     current_summarized_file_list_entry);
+	continue;
+      }
+
+#if 0
+      if (IS_PARENT_PROCESS())
+	printf("---> examining token '%s': search 1st suffix ...\n", token);
+#endif
+
+      /* ---------- step 1: search for matching first suffix ---------- */
+
+      start_pos += len_base_prefix;
+      for (j=0; j<num_ext1_suffixes && !ext1_suffix_found; j++)
+      {
+	char *ext1_suffix = ext1_suffixes[j];
+	int len_ext1_suffix = strlen(ext1_suffix);
+
+	ext1_suffix_found = token_suffix_match(token, ext1_suffix, start_pos);
+
+	if (!ext1_suffix_found)
+	  continue;
+
+	ext1_index = j;
+
+	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
+	{
+	  exact_match = TRUE;
+
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_hash,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       base_index, ext1_index, -1, -1,
+			       current_summarized_file_list_entry);
+	  continue;
+	}
+
+	start_pos += len_ext1_suffix;
+      }
+
+      if (exact_match)
+	break;
+
+#if 0
+      if (IS_PARENT_PROCESS())
+	printf("---> examining token '%s': search 2nd suffix ...\n", token);
+#endif
+
+      /* ---------- step 2: search for matching second suffix ---------- */
+
+      for (k=0; k<num_ext2_suffixes && !ext2_suffix_found; k++)
+      {
+	char *ext2_suffix = ext2_suffixes[k];
+	int len_ext2_suffix = strlen(ext2_suffix);
+
+	ext2_suffix_found = token_suffix_match(token, ext2_suffix,start_pos);
+
+	if (!ext2_suffix_found)
+	  continue;
+
+	ext2_index = k;
+
+	if (start_pos + len_ext2_suffix == len_token)	/* exact match */
+	{
+	  exact_match = TRUE;
+
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_hash,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       base_index, ext1_index, ext2_index, -1,
+			       current_summarized_file_list_entry);
+	  continue;
+	}
+
+	start_pos += len_ext2_suffix;
+      }
+
+      if (exact_match)
+	break;
+
+#if 0
+      if (IS_PARENT_PROCESS())
+	printf("---> examining token '%s': search 3rd suffix ...\n",token);
+#endif
+
+      /* ---------- step 3: search for matching third suffix ---------- */
+
+      for (l=0; l<num_ext3_suffixes && !ext3_suffix_found; l++)
+      {
+	char *ext3_suffix = ext3_suffixes[l];
+	int len_ext3_suffix = strlen(ext3_suffix);
+
+	ext3_suffix_found =token_suffix_match(token,ext3_suffix,start_pos);
+
+	if (!ext3_suffix_found)
+	  continue;
+
+	ext3_index = l;
+
+	if (start_pos + len_ext3_suffix == len_token) /* exact match */
+	{
+	  exact_match = TRUE;
+
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_hash,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       base_index, ext1_index, ext2_index, ext3_index,
+			       current_summarized_file_list_entry);
+	  continue;
+	}
+      }
+    }
+  }
+  END_HASH_ITERATION(extra_file_hash, itr)
+
+  if (artwork_info->num_dynamic_file_list_entries > 0)
+  {
+    artwork_info->dynamic_artwork_list =
+      checked_calloc(artwork_info->num_dynamic_file_list_entries *
+		     artwork_info->sizeof_artwork_list_entry);
+  }
+
+  if (extra_file_hash != NULL && options.verbose && IS_PARENT_PROCESS())
+  {
+    SetupFileList *setup_file_list, *list;
+    boolean dynamic_tokens_found = FALSE;
+    boolean unknown_tokens_found = FALSE;
+
+    if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+      Error(ERR_EXIT, "loadSetupFileHash works, but loadSetupFileList fails");
+
+    BEGIN_HASH_ITERATION(extra_file_hash, itr)
+    {
+      if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) == 0)
+	dynamic_tokens_found = TRUE;
+      else
+	unknown_tokens_found = TRUE;
+    }
+    END_HASH_ITERATION(extra_file_hash, itr)
+
+#if DEBUG
+    if (dynamic_tokens_found)
+    {
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "dynamic token(s) found:");
+
+      for (list = setup_file_list; list != NULL; list = list->next)
+      {
+	char *value = getHashEntry(extra_file_hash, list->token);
+
+	if (value != NULL && strcmp(value, known_token_value) == 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+      }
+
+      Error(ERR_RETURN_LINE, "-");
+    }
+#endif
+
+    if (unknown_tokens_found)
+    {
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
+      Error(ERR_RETURN, "- config file: '%s'", filename);
+
+      for (list = setup_file_list; list != NULL; list = list->next)
+      {
+	char *value = getHashEntry(extra_file_hash, list->token);
+
+	if (value != NULL && strcmp(value, known_token_value) != 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+      }
+
+      Error(ERR_RETURN_LINE, "-");
+    }
+
+    freeSetupFileList(setup_file_list);
+  }
+
+  freeSetupFileHash(extra_file_hash);
+
+#if 0
+  for (i=0; i<num_file_list_entries; i++)
+  {
+    printf("'%s' ", file_list[i].token);
+    if (file_list[i].filename)
+      printf("-> '%s'\n", file_list[i].filename);
+    else
+      printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
+  }
+#endif
+}
+
 void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
+#if 0
   struct FileInfo *file_list = artwork_info->file_list;
   struct ConfigInfo *suffix_list = artwork_info->suffix_list;
   char **base_prefixes = artwork_info->base_prefixes;
@@ -1889,6 +2235,13 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   SetupFileHash *setup_file_hash, *extra_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i, j, k, l;
+#else
+  struct FileInfo *file_list = artwork_info->file_list;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
+  int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
+  char *filename_base, *filename_local;
+  int i, j;
+#endif
 
 #if 0
   printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
@@ -1930,6 +2283,38 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     artwork_info->property_mapping = NULL;
     artwork_info->num_property_mapping_entries = 0;
   }
+
+#if 1
+  /* first look for special artwork configured in level series config */
+  filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
+
+  if (fileExists(filename_base))
+    LoadArtworkConfigFromFilename(artwork_info, filename_base);
+
+#if 0
+  for(i=0; i<num_file_list_entries; i++)
+    if (strcmp(file_list[i].token, "background") == 0)
+      printf("!!! base !!! -- '%s' -> '%s'\n",
+	     file_list[i].token, file_list[i].filename);
+#endif
+
+#if 1
+  filename_local = getCustomArtworkConfigFilename(artwork_info->type);
+
+  if (filename_local != NULL && strcmp(filename_base, filename_local) != 0)
+    LoadArtworkConfigFromFilename(artwork_info, filename_local);
+
+#if 0
+  for(i=0; i<num_file_list_entries; i++)
+    if (strcmp(file_list[i].token, "background") == 0)
+      printf("!!! local !!! -- '%s' -> '%s'\n",
+	     file_list[i].token, file_list[i].filename);
+#endif
+
+#endif
+#endif
+
+#if 0
 
   if (filename == NULL)
     return;
@@ -2241,6 +2626,8 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
   }
 #endif
+
+#endif
 }
 
 static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
@@ -2282,11 +2669,6 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   ListNode *node;
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
 
-#if 1
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: got filename '%s'\n", filename);
-#endif
-
   if (filename == NULL)
   {
     int error_mode = ERR_WARN;
@@ -2306,11 +2688,8 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
        This usually means that this artwork does not exist in this artwork set
        and a fallback to the existing artwork is done. */
 
-#if 1
-#if 1
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-#endif
-      printf("[artwork '%s' already exists (same list entry)]\n", filename);
+#if 0
+    printf("[artwork '%s' already exists (same list entry)]\n", filename);
 #endif
 
     return;
@@ -2418,8 +2797,15 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 #endif
 
   for(i=0; i<num_file_list_entries; i++)
+  {
+#if 0
+    if (strcmp(file_list[i].token, "background") == 0)
+      printf("::: '%s' -> '%s'\n", file_list[i].token, file_list[i].filename);
+#endif
+
     LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      file_list[i].filename, i);
+  }
 
 #if 0
   printf("DEBUG: reloading %d dynamic artwork files ...\n",
