@@ -24,6 +24,7 @@
 #include "network.h"
 
 #ifdef DEBUG
+#if 0
 static unsigned int getStateCheckSum(int counter)
 {
   int x, y;
@@ -69,6 +70,7 @@ static unsigned int getStateCheckSum(int counter)
 
   return checksum;
 }
+#endif
 #endif
 
 void GetPlayerConfig()

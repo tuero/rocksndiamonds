@@ -11,6 +11,9 @@
 *  tools.c                                                 *
 ***********************************************************/
 
+#include <math.h>
+#include <stdarg.h>
+
 #ifdef __FreeBSD__
 #include <machine/joystick.h>
 #endif
@@ -24,8 +27,6 @@
 #include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
-
-#include <math.h>
 
 #ifdef MSDOS
 extern boolean wait_for_vsync;
@@ -281,9 +282,27 @@ void ClearWindow()
   redraw_mask |= REDRAW_FIELD;
 }
 
-void DrawText(int x, int y, char *text, int font, int col)
+void DrawTextCentered(int y, int font_type, char *format, ...)
 {
-  DrawTextExt(drawto, gc, x, y, text, font, col);
+  char buffer[FULL_SXSIZE / FONT3_XSIZE + 10];
+  int font_xsize;
+  va_list ap;
+
+  font_xsize = (font_type < FC_SPECIAL1 ? FONT2_XSIZE :
+		font_type < FC_SPECIAL2 ? FONT3_XSIZE : FONT4_XSIZE);
+
+  va_start(ap, format);
+  vsprintf(buffer, format, ap);
+  va_end(ap);
+
+  DrawText(SX + (SXSIZE - strlen(buffer) * font_xsize) / 2, SY + y,
+	   buffer, FS_SMALL, font_type);
+}
+
+void DrawText(int x, int y, char *text, int font_size, int font_type)
+{
+  DrawTextExt(drawto, gc, x, y, text, font_size, font_type);
+
   if (x < DX)
     redraw_mask |= REDRAW_FIELD;
   else if (y < VY)
@@ -291,23 +310,23 @@ void DrawText(int x, int y, char *text, int font, int col)
 }
 
 void DrawTextExt(Drawable d, GC gc, int x, int y,
-		 char *text, int font, int font_color)
+		 char *text, int font_size, int font_type)
 {
   int font_width, font_height, font_start;
   int font_pixmap;
 
-  if (font != FS_SMALL && font != FS_BIG)
-    font = FS_SMALL;
-  if (font_color < FC_RED || font_color > FC_SPECIAL2)
-    font_color = FC_RED;
+  if (font_size != FS_SMALL && font_size != FS_BIG)
+    font_size = FS_SMALL;
+  if (font_type < FC_RED || font_type > FC_SPECIAL2)
+    font_type = FC_RED;
 
-  font_width = (font == FS_BIG ? FONT1_XSIZE :
-		font_color < FC_SPECIAL1 ? FONT2_XSIZE :
-		font_color < FC_SPECIAL2 ? FONT3_XSIZE : FONT4_XSIZE);
-  font_height = (font == FS_BIG ? FONT1_XSIZE :
-		 font_color < FC_SPECIAL2 ? FONT2_XSIZE : FONT4_XSIZE);
-  font_pixmap = (font == FS_BIG ? PIX_BIGFONT : PIX_SMALLFONT);
-  font_start = (font_color * (font == FS_BIG ? FONT1_YSIZE : FONT2_YSIZE) *
+  font_width = (font_size == FS_BIG ? FONT1_XSIZE :
+		font_type < FC_SPECIAL1 ? FONT2_XSIZE :
+		font_type < FC_SPECIAL2 ? FONT3_XSIZE : FONT4_XSIZE);
+  font_height = (font_size == FS_BIG ? FONT1_XSIZE :
+		 font_type < FC_SPECIAL2 ? FONT2_XSIZE : FONT4_XSIZE);
+  font_pixmap = (font_size == FS_BIG ? PIX_BIGFONT : PIX_SMALLFONT);
+  font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE : FONT2_YSIZE) *
 		FONT_LINES_PER_FONT);
 
   while(*text)

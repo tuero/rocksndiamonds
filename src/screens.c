@@ -32,13 +32,13 @@ extern unsigned char get_ascii(KeySym);
 
 void DrawHeadline()
 {
-  int x1 = SX+(SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
-  int y1 = SY+8;
-  int x2 = SX+(SXSIZE - strlen(COPYRIGHT_STRING) * FONT2_XSIZE) / 2;
-  int y2 = SY+46;
+  int x1 = SX + (SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
+  int y1 = SY + 8;
+  int x2 = SX + (SXSIZE - strlen(COPYRIGHT_STRING) * FONT2_XSIZE) / 2;
+  int y2 = SY + 46;
 
-  DrawText(x1,y1, GAMETITLE_STRING, FS_BIG, FC_YELLOW);
-  DrawText(x2,y2, COPYRIGHT_STRING, FS_SMALL, FC_RED);
+  DrawText(x1, y1, GAMETITLE_STRING, FS_BIG, FC_YELLOW);
+  DrawText(x2, y2, COPYRIGHT_STRING, FS_SMALL, FC_RED);
 }
 
 void DrawMainMenu()
@@ -56,7 +56,7 @@ void DrawMainMenu()
   DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
-	   (level_nr<leveldir[leveldir_nr].levels ? FC_RED : FC_YELLOW));
+	   (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW));
   DrawText(SX + 32,    SY + 4*32, "Hall Of Fame", FS_BIG, FC_GREEN);
   DrawText(SX + 32,    SY + 5*32, "Level Creator", FS_BIG, FC_GREEN);
   DrawText(SY + 32,    SY + 6*32, "Info Screen", FS_BIG, FC_GREEN);
@@ -66,26 +66,26 @@ void DrawMainMenu()
 
   DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
 
-  for(i=2;i<10;i++)
-    DrawGraphic(0,i,GFX_KUGEL_BLAU);
-  DrawGraphic(10,3,GFX_PFEIL_L);
-  DrawGraphic(14,3,GFX_PFEIL_R);
+  for(i=2; i<10; i++)
+    DrawGraphic(0, i, GFX_KUGEL_BLAU);
+  DrawGraphic(10, 3, GFX_PFEIL_L);
+  DrawGraphic(14, 3, GFX_PFEIL_R);
 
-  DrawText(SX+56, SY+326, "A Game by Artsoft Entertainment",
+  DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
 
   if (leveldir[leveldir_nr].name)
   {
     int len = strlen(leveldir[leveldir_nr].name);
-    int lxpos = SX+(SXSIZE-len*FONT4_XSIZE)/2;
-    int lypos = SY+352;
+    int lxpos = SX + (SXSIZE - len * FONT4_XSIZE) / 2;
+    int lypos = SY + 352;
 
-    DrawText(lxpos,lypos,leveldir[leveldir_nr].name,FS_SMALL,FC_SPECIAL2);
+    DrawText(lxpos, lypos, leveldir[leveldir_nr].name, FS_SMALL, FC_SPECIAL2);
   }
 
   FadeToFront();
   InitAnimation();
-  HandleMainMenu(0,0,0,0,MB_MENU_INITIALIZE);
+  HandleMainMenu(0,0, 0,0, MB_MENU_INITIALIZE);
 
   TapeStop();
   if (TAPE_IS_EMPTY(tape))
@@ -102,11 +102,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 3;
   static int redraw = TRUE;
-  int x = (mx+32-SX)/32, y = (my+32-SY)/32;
+  int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
 
   if (redraw || button == MB_MENU_INITIALIZE)
   {
-    DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
+    DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
     redraw = FALSE;
   }
 
@@ -115,22 +115,22 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (dx || dy)
   {
-    if (dx && choice==4)
+    if (dx && choice == 4)
     {
-      x = (dx<0 ? 11 : 15);
+      x = (dx < 0 ? 11 : 15);
       y = 4;
     }
     else if (dy)
     {
       x = 1;
-      y = choice+dy;
+      y = choice + dy;
     }
     else
       x = y = 0;
 
-    if (y<3)
+    if (y < 3)
       y = 3;
-    else if (y>10)
+    else if (y > 10)
       y = 10;
   }
 
@@ -140,32 +140,33 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (y==4 && ((x==11 && level_nr>0) ||
-	       (x==15 && level_nr<leveldir[leveldir_nr].levels-1)) &&
+  if (y == 4 && ((x == 11 && level_nr > 0) ||
+		 (x == 15 && level_nr < leveldir[leveldir_nr].levels - 1)) &&
       button)
   {
     static long level_delay = 0;
-    int step = (button==1 ? 1 : button==2 ? 5 : 10);
+    int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int new_level_nr, old_level_nr = level_nr;
+    int font_color = (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW);
 
-    new_level_nr = level_nr + (x==11 ? -step : +step);
-    if (new_level_nr<0)
+    new_level_nr = level_nr + (x == 11 ? -step : +step);
+    if (new_level_nr < 0)
       new_level_nr = 0;
-    if (new_level_nr>leveldir[leveldir_nr].levels-1)
-      new_level_nr = leveldir[leveldir_nr].levels-1;
+    if (new_level_nr > leveldir[leveldir_nr].levels - 1)
+      new_level_nr = leveldir[leveldir_nr].levels - 1;
 
-    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,150))
+    if (old_level_nr == new_level_nr || !DelayReached(&level_delay, 150))
       goto out;
 
     level_nr = new_level_nr;
 
-    DrawTextExt(drawto,gc,SX+11*32,SY+3*32,
-		int2str(level_nr,3), FS_BIG,FC_RED);
-    DrawTextExt(window,gc,SX+11*32,SY+3*32,
-		int2str(level_nr,3), FS_BIG,FC_RED);
+    DrawTextExt(drawto, gc, SX + 11 * 32, SY + 3 * 32,
+		int2str(level_nr, 3), FS_BIG, font_color);
+    DrawTextExt(window, gc, SX + 11 * 32, SY + 3 * 32,
+		int2str(level_nr, 3), FS_BIG, font_color);
 
     LoadLevel(level_nr);
-    DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
+    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS);
 
     TapeErase();
     LoadTape(level_nr);
@@ -173,28 +174,28 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     /* needed because DrawMicroLevel() takes some time */
     BackToFront();
-    XSync(display,FALSE);
-    DelayReached(&level_delay,0);	/* reset delay counter */
+    XSync(display, FALSE);
+    DelayReached(&level_delay, 0);	/* reset delay counter */
   }
-  else if (x==1 && y>=3 && y<=10)
+  else if (x == 1 && y >= 3 && y <= 10)
   {
     if (button)
     {
-      if (y!=choice)
+      if (y != choice)
       {
-	DrawGraphic(0,y-1,GFX_KUGEL_ROT);
-	DrawGraphic(0,choice-1,GFX_KUGEL_BLAU);
+	DrawGraphic(0, y-1, GFX_KUGEL_ROT);
+	DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
       }
       choice = y;
     }
     else
     {
-      if (y==3)
+      if (y == 3)
       {
 	game_status = TYPENAME;
 	HandleTypeName(strlen(setup.player_name), 0);
       }
-      else if (y==4)
+      else if (y == 4)
       {
 	if (num_leveldirs)
 	{
@@ -203,24 +204,24 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  DrawChooseLevel();
 	}
       }
-      else if (y==5)
+      else if (y == 5)
       {
 	game_status = HALLOFFAME;
 	DrawHallOfFame(-1);
       }
-      else if (y==6)
+      else if (y == 6)
       {
-	game_status = LEVELED;
 	if (leveldir[leveldir_nr].readonly)
-	  Request("This level is read only !",REQ_CONFIRM);
+	  Request("This level is read only !", REQ_CONFIRM);
+	game_status = LEVELED;
 	DrawLevelEd();
       }
-      else if (y==7)
+      else if (y == 7)
       {
 	game_status = HELPSCREEN;
 	DrawHelpScreen();
       }
-      else if (y==8)
+      else if (y == 8)
       {
 	if (setup.autorecord)
 	  TapeStartRecording();
@@ -233,12 +234,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  InitGame();
 	}
       }
-      else if (y==9)
+      else if (y == 9)
       {
 	game_status = SETUP;
 	DrawSetupScreen();
       }
-      else if (y==10)
+      else if (y == 10)
       {
 	SaveLevelSetup();
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
@@ -252,7 +253,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   out:
 
-  if (game_status==MAINMENU)
+  if (game_status == MAINMENU)
     DoAnimation();
 }
 
@@ -506,64 +507,51 @@ void DrawHelpScreenElAction(int start)
 void DrawHelpScreenElText(int start)
 {
   int i;
-  int xstart = SX+56, ystart = SY+65+2*32, ystep = TILEY+4;
-  char text[FULL_SXSIZE/FONT2_XSIZE+10];
+  int xstart = SX + 56, ystart = SY + 65 + 2 * 32, ystep = TILEY + 4;
+  int ybottom = SYSIZE - 20;
 
   ClearWindow();
   DrawHeadline();
 
-  sprintf(text,"The game elements:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
-	   text,FS_SMALL,FC_GREEN);
+  DrawTextCentered(100, FC_GREEN, "The game elements:");
 
-  for(i=start;i<start+MAX_HELPSCREEN_ELS && i<num_helpscreen_els;i++)
+  for(i=start; i < start + MAX_HELPSCREEN_ELS && i < num_helpscreen_els; i++)
   {
-    DrawText(xstart,ystart+(i-start)*ystep+(*helpscreen_eltext[i][1] ? 0 : 8),
-	     helpscreen_eltext[i][0],FS_SMALL,FC_YELLOW);
-    DrawText(xstart,ystart+(i-start)*ystep+16,
-	     helpscreen_eltext[i][1],FS_SMALL,FC_YELLOW);
+    DrawText(xstart,
+	     ystart + (i - start) * ystep + (*helpscreen_eltext[i][1] ? 0 : 8),
+	     helpscreen_eltext[i][0], FS_SMALL, FC_YELLOW);
+    DrawText(xstart, ystart + (i - start) * ystep + 16,
+	     helpscreen_eltext[i][1], FS_SMALL, FC_YELLOW);
   }
 
-  sprintf(text,"Press any key or button for next page");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
-	   text,FS_SMALL,FC_BLUE);
+  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 }
 
 void DrawHelpScreenMusicText(int num)
 {
   int ystart = 150, ystep = 30;
-  char text[FULL_SXSIZE/FONT2_XSIZE+10];
+  int ybottom = SYSIZE - 20;
 
   FadeSounds();
   ClearWindow();
   DrawHeadline();
 
-  sprintf(text,"The game background music loops:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
-	   text,FS_SMALL,FC_GREEN);
+  DrawTextCentered(100, FC_GREEN, "The game background music loops:");
 
-  sprintf(text,"Excerpt from");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+0*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"%c%s%c",'\"',helpscreen_music[num][0],'\"');
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+1*ystep,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"by");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+2*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"%s",helpscreen_music[num][1]);
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+3*ystep,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"from the album");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"%c%s%c",'\"',helpscreen_music[num][2],'\"');
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+5*ystep,
-	   text,FS_SMALL,FC_RED);
+  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
+		   "Excerpt from");
+  DrawTextCentered(ystart + 1 * ystep, FC_RED, "\"%s\"",
+		   helpscreen_music[num][0]);
+  DrawTextCentered(ystart + 2 * ystep, FC_YELLOW,
+		   "by");
+  DrawTextCentered(ystart + 3 * ystep, FC_RED,
+		   "%s", helpscreen_music[num][1]);
+  DrawTextCentered(ystart + 4 * ystep, FC_YELLOW,
+		   "from the album");
+  DrawTextCentered(ystart + 5 * ystep, FC_RED, "\"%s\"",
+		   helpscreen_music[num][2]);
 
-  sprintf(text,"Press any key or button for next page");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
-	   text,FS_SMALL,FC_BLUE);
+  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 
   PlaySoundLoop(background_loop[num]);
 }
@@ -571,93 +559,66 @@ void DrawHelpScreenMusicText(int num)
 void DrawHelpScreenCreditsText()
 {
   int ystart = 150, ystep = 30;
-  char text[FULL_SXSIZE/FONT2_XSIZE+10];
+  int ybottom = SYSIZE - 20;
 
   FadeSounds();
   ClearWindow();
   DrawHeadline();
 
-  sprintf(text,"Credits:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
-	   text,FS_SMALL,FC_GREEN);
+  DrawTextCentered(100, FC_GREEN,
+		   "Credits:");
+  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
+		   "DOS/Windows port of the game:");
+  DrawTextCentered(ystart + 1 * ystep, FC_RED,
+		   "Guido Schulz");
+  DrawTextCentered(ystart + 2 * ystep, FC_YELLOW,
+		   "Additional toons:");
+  DrawTextCentered(ystart + 3 * ystep, FC_RED,
+		   "Karl Hörnell");
+  DrawTextCentered(ystart + 5 * ystep, FC_YELLOW,
+		   "...and many thanks to all contributors");
+  DrawTextCentered(ystart + 6 * ystep, FC_YELLOW,
+		   "of new levels!");
 
-  sprintf(text,"DOS/Windows port of the game:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+0*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"Guido Schulz");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+1*ystep,
-	   text,FS_SMALL,FC_RED);
-
-  sprintf(text,"Additional toons:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+2*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"Karl Hörnell");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+3*ystep,
-	   text,FS_SMALL,FC_RED);
-
-  sprintf(text,"...and many thanks to all contributors");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+5*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"of new levels!");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+6*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-
-  sprintf(text,"Press any key or button for next page");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
-	   text,FS_SMALL,FC_BLUE);
+  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 }
 
 void DrawHelpScreenContactText()
 {
   int ystart = 150, ystep = 30;
-  char text[FULL_SXSIZE/FONT2_XSIZE+10];
+  int ybottom = SYSIZE - 20;
 
-  FadeSounds();
   ClearWindow();
   DrawHeadline();
 
-  sprintf(text,"Program information:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
-	   text,FS_SMALL,FC_GREEN);
+  DrawTextCentered(100, FC_GREEN, "Program information:");
 
-  sprintf(text,"This game is Freeware!");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+0*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"If you like it, send e-mail to:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+1*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"aeglos@valinor.owl.de");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+2*ystep,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"or SnailMail to:");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+3*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"Holger Schemel");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"Sennehof 28");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+20,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"33659 Bielefeld");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+40,
-	   text,FS_SMALL,FC_RED);
-  sprintf(text,"Germany");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+60,
-	   text,FS_SMALL,FC_RED);
+  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
+		   "This game is Freeware!");
+  DrawTextCentered(ystart + 1 * ystep, FC_YELLOW,
+		   "If you like it, send e-mail to:");
+  DrawTextCentered(ystart + 2 * ystep, FC_RED,
+		   "aeglos@valinor.owl.de");
+  DrawTextCentered(ystart + 3 * ystep, FC_YELLOW,
+		   "or SnailMail to:");
+  DrawTextCentered(ystart + 4 * ystep + 0, FC_RED,
+		   "Holger Schemel");
+  DrawTextCentered(ystart + 4 * ystep + 20, FC_RED,
+		   "Oststrasse 11a");
+  DrawTextCentered(ystart + 4 * ystep + 40, FC_RED,
+		   "33604 Bielefeld");
+  DrawTextCentered(ystart + 4 * ystep + 60, FC_RED,
+		   "Germany");
 
-  sprintf(text,"If you have created new levels,");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+7*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,"send them to me to include them!");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+8*ystep,
-	   text,FS_SMALL,FC_YELLOW);
-  sprintf(text,":-)");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+9*ystep,
-	   text,FS_SMALL,FC_YELLOW);
+  DrawTextCentered(ystart + 7 * ystep, FC_YELLOW,
+		   "If you have created new levels,");
+  DrawTextCentered(ystart + 8 * ystep, FC_YELLOW,
+		   "send them to me to include them!");
+  DrawTextCentered(ystart + 9 * ystep, FC_YELLOW,
+		   ":-)");
 
-  sprintf(text,"Press any key or button for main menu");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
-	   text,FS_SMALL,FC_BLUE);
+  DrawTextCentered(ybottom, FC_BLUE,
+		   "Press any key or button for main menu");
 }
 
 void DrawHelpScreen()
@@ -791,16 +752,17 @@ void DrawChooseLevel()
   CloseDoor(DOOR_CLOSE_2);
 
   ClearWindow();
-  DrawText(SX,SY,"Level Directories",FS_BIG,FC_GREEN);
-  for(i=0;i<num_leveldirs;i++)
+  DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
+  for(i=0; i<num_leveldirs; i++)
   {
-    DrawText(SX+32,SY+(i+2)*32,leveldir[i].name,FS_BIG,FC_YELLOW);
-    DrawGraphic(0,i+2,GFX_KUGEL_BLAU);
+    DrawText(SX + 32, SY + (i + 2) * 32, leveldir[i].name, FS_BIG,
+	     (leveldir[i].readonly ? FC_RED : FC_YELLOW));
+    DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
   }
 
   FadeToFront();
   InitAnimation();
-  HandleChooseLevel(0,0,0,0,MB_MENU_INITIALIZE);
+  HandleChooseLevel(0,0, 0,0, MB_MENU_INITIALIZE);
 }
 
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
@@ -2063,13 +2025,13 @@ void HandleVideoButtons(int mx, int my, int button)
 	else if (!tape.pause_before_death)	/* FFWD PLAY -> + AUTO PAUSE */
 	{
 	  tape.pause_before_death = TRUE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, VIDEO_DISPLAY_LABEL_ONLY);
+	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
 	}
 	else					/* -> NORMAL PLAY */
 	{
 	  tape.fast_forward = FALSE;
 	  tape.pause_before_death = FALSE;
-	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PAUSE_OFF, 0);
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_OFF, 0);
 	}
       }
       break;

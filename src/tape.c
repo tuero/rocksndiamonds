@@ -113,7 +113,7 @@ void TapeTogglePause()
   tape.pause_before_death = FALSE;
   DrawVideoDisplay((tape.pausing ?
 		    VIDEO_STATE_PAUSE_ON :
-		    VIDEO_STATE_PAUSE_OFF),
+		    VIDEO_STATE_PAUSE_OFF) | VIDEO_STATE_PBEND_OFF,
 		   0);
 }
 
@@ -187,12 +187,12 @@ boolean TapePlayDelay()
 
   if (tape.pause_before_death)	/* STOP 10s BEFORE PLAYER GETS KILLED... */
   {
-    if (!(FrameCounter % 5))
+    if (!(FrameCounter % 20))
     {
-      if (2*(FrameCounter/10) == FrameCounter/5)
-	DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, VIDEO_DISPLAY_LABEL_ONLY);
+      if ((FrameCounter / 20) % 2)
+	DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
       else
-	DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
     }
 
     if (level.time-TimeLeft > tape.length_seconds - PAUSE_SECONDS_BEFORE_DEATH)

@@ -84,6 +84,19 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
        0,0 }}
   };
 
+  if (state & VIDEO_STATE_PBEND_OFF)
+  {
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_REC_LABEL_XPOS,
+	      cy + VIDEO_REC_LABEL_YPOS,
+	      VIDEO_PBEND_LABEL_XSIZE,
+	      VIDEO_PBEND_LABEL_YSIZE,
+	      VX + VIDEO_REC_LABEL_XPOS,
+	      VY + VIDEO_REC_LABEL_YPOS);
+  }
+
   for(i=0;i<20;i++)
   {
     if (state & (1<<i))
@@ -125,6 +138,19 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	      VIDEO_PLAY_SYMBOL_YSIZE,
 	      VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
 	      VY + VIDEO_PLAY_SYMBOL_YPOS);
+  }
+
+  if (state & VIDEO_STATE_PBEND_ON)
+  {
+    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_PBEND_LABEL_XPOS,
+	      cy + VIDEO_PBEND_LABEL_YPOS,
+	      VIDEO_PBEND_LABEL_XSIZE,
+	      VIDEO_PBEND_LABEL_YSIZE,
+	      VX + VIDEO_REC_LABEL_XPOS,
+	      VY + VIDEO_REC_LABEL_YPOS);
   }
 
   if (state & VIDEO_STATE_DATE_ON)
