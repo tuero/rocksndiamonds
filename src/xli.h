@@ -1,9 +1,41 @@
 
-/* image.h */
+/* xli.h:
+ *
+ * jim frost 06.21.89
+ *
+ * Copyright 1989 Jim Frost.  See included file "copyright.h" for complete
+ * copyright information.
+ */
 
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <malloc.h>
 
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <X11/cursorfont.h>
+
+typedef unsigned long  Pixel;     /* what X thinks a pixel is */
 typedef unsigned short Intensity; /* what X thinks an RGB intensity is */
+typedef unsigned char  byte;      /* unsigned byte type */
+
+#define FALSE 0
+#define TRUE (!FALSE)
+
+/* Display device dependent Information structure */
+typedef struct
+{
+  int  width;		/* Display width and height */
+  int  height;
+
+  Display      *disp;
+  int           scrn;
+  Colormap      colormap;
+} DisplayInfo;
 
 /* This struct holds the X-client side bits for a rendered image. */
 typedef struct
@@ -29,8 +61,7 @@ Pixmap      ximageToPixmap();
 void        freeXImage();
 
 
-typedef struct rgbmap
-{
+typedef struct rgbmap {
   unsigned int  size;       /* size of RGB map */
   unsigned int  used;       /* number of colors used in RGB map */
   int           compressed; /* image uses colormap fully */
@@ -43,6 +74,7 @@ typedef struct rgbmap
  */
 
 typedef struct {
+  char	       *title;  /* name of image */
   unsigned int  type;   /* type of image */
   RGBMap        rgb;    /* RGB map of image if IRGB type */
   unsigned int  width;  /* width of image in pixels */
@@ -93,7 +125,14 @@ typedef struct {
 
 /* functions */
 
-extern unsigned long DepthToColorsTable[];
+void cleanUpWindow();	/* window.c */
+char imageInWindow();
+
+int   visualClassFromName();
+char *nameOfVisualClass();
+
+extern unsigned long DepthToColorsTable[]; /* new.c */
+char  *dupString();
 Image *newBitImage();
 Image *newRGBImage();
 void   freeImage();
@@ -103,13 +142,12 @@ void   freeRGBMapData();
 byte  *lcalloc();
 byte  *lmalloc();
 
-Image *Read_GIF_to_Image();
+Image *gifLoad();
 Image *monochrome();
 Image *zoom();
 
-void compress();
+void compress(); /* compress.c */
 
-Pixmap XImage_to_Pixmap(Display *, Window, XImageInfo *);
-XImageInfo *Image_to_XImage(Display *, int, Visual *, unsigned int, Image *);
-void XImage_to_Drawable(XImageInfo *, int, int, int, int,
-			unsigned int, unsigned int);
+int xliOpenDisplay();
+void tellAboutDisplay(DisplayInfo *);
+void xliCloseDisplay(DisplayInfo *);

@@ -1,8 +1,7 @@
 
-/* image.c */
+/* send.c */
 
-#include "image.h"
-#include "misc.h"
+#include "xli.h"
 
 /* extra colors to try allocating in private color maps to minimise flashing */
 #define NOFLASH_COLORS 256
@@ -20,7 +19,17 @@ Image *monochrome(Image *cimage)
   if (BITMAPP(cimage))
     return(NULL);
 
-  image = newBitImage(cimage->width, cimage->height);
+  /*
+  printf("  Converting to monochrome...");
+  fflush(stdout);
+  */
+
+  image= newBitImage(cimage->width, cimage->height);
+  if (cimage->title)
+  {
+    image->title= (char *)lmalloc(strlen(cimage->title) + 13);
+    sprintf(image->title, "%s (monochrome)", cimage->title);
+  }
 
   spl = cimage->pixlen;
   dll = (image->width / 8) + (image->width % 8 ? 1 : 0);
@@ -49,6 +58,10 @@ Image *monochrome(Image *cimage)
     dp += dll;	/* next row */
   }
 
+  /*
+  printf("done\n");
+  */
+
   return(image);
 }
 
@@ -70,7 +83,7 @@ static unsigned int *buildIndex(unsigned int width,
     fzoom= (float)zoom / 100.0;
     *rwidth= (unsigned int)(fzoom * width + 0.5);
   }
-  index= (unsigned int *)checked_malloc(sizeof(unsigned int) * *rwidth);
+  index= (unsigned int *)lmalloc(sizeof(unsigned int) * *rwidth);
   for (a= 0; a < *rwidth; a++)
   {
     if (zoom)
@@ -217,6 +230,7 @@ Image *zoom(Image *oimage, unsigned int xzoom, unsigned int yzoom)
       break;
   }
 
+  image->title = dupString(oimage->title);
   free((byte *)xindex);
   free((byte *)yindex);
 
@@ -241,9 +255,14 @@ void compress(Image *image)
   if (!RGBP(image) || image->rgb.compressed)
     return;
 
-  used = (unsigned char *)checked_calloc(sizeof(unsigned char) * depthToColors(image->depth));
+  /*
+  printf("  Compressing colormap...");
+  fflush(stdout);
+  */
+
+  used = (unsigned char *)lcalloc(sizeof(unsigned char) * depthToColors(image->depth));
   dmask = (1 << image->depth) -1;	/* Mask any illegal bits for that depth */
-  map = (Pixel *)checked_calloc(sizeof(Pixel) * depthToColors(image->depth));
+  map = (Pixel *)lcalloc(sizeof(Pixel) * depthToColors(image->depth));
 
   /* init fast duplicate check table */
   for(r=0;r<32;r++)
@@ -319,7 +338,7 @@ void compress(Image *image)
   free(map);
   free(used);
 
-#if 0
+  /*
   if (badcount)
     printf("%d out-of-range pixels, ", badcount);
 
@@ -334,7 +353,7 @@ void compress(Image *image)
     printf("%d unique color%s\n",
 	   next_index, (next_index == 1 ? "" : "s"));
   }
-#endif
+  */
 
   image->rgb.compressed= TRUE;	/* don't do it again */
 }
@@ -342,7 +361,7 @@ void compress(Image *image)
 
 
 
-Pixmap XImage_to_Pixmap(Display *disp, Window parent, XImageInfo *ximageinfo)
+Pixmap ximageToPixmap(Display *disp, Window parent, XImageInfo *ximageinfo)
 {
   Pixmap pixmap;
 
@@ -352,8 +371,8 @@ Pixmap XImage_to_Pixmap(Display *disp, Window parent, XImageInfo *ximageinfo)
 
   ximageinfo->drawable = pixmap;
 
-  XImage_to_Drawable(ximageinfo, 0, 0, 0, 0,
-		     ximageinfo->ximage->width, ximageinfo->ximage->height);
+  sendXImage(ximageinfo, 0, 0, 0, 0,
+	     ximageinfo->ximage->width, ximageinfo->ximage->height);
   return(pixmap);
 }
 
@@ -367,6 +386,8 @@ Pixmap XImage_to_Pixmap(Display *disp, Window parent, XImageInfo *ximageinfo)
 static unsigned int bitsPerPixelAtDepth(Display *disp, int scrn,
 					unsigned int depth)
 {
+#if defined(XlibSpecificationRelease) && (XlibSpecificationRelease >= 4)
+  /* the way things are */
   XPixmapFormatValues *xf;
   int nxf, a;
 
@@ -382,6 +403,13 @@ static unsigned int bitsPerPixelAtDepth(Display *disp, int scrn,
     }
   }
   XFree(xf);
+#else /* the way things were (X11R3) */
+  unsigned int a;
+
+  for (a= 0; a < disp->nformats; a++)
+    if (disp->pixmap_format[a].depth == depth)
+      return(disp->pixmap_format[a].bits_per_pixel);
+#endif
 
   /* this should never happen; if it does, we're in trouble
    */
@@ -390,8 +418,8 @@ static unsigned int bitsPerPixelAtDepth(Display *disp, int scrn,
   exit(1);
 }
 
-XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
-			    unsigned int ddepth, Image *image)
+XImageInfo *imageToXImage(Display *disp, int scrn, Visual *visual,
+			  unsigned int ddepth, Image *image)
 {
   static XColor xcolor_private[NOFLASH_COLORS];
   static int colorcell_used[NOFLASH_COLORS];
@@ -419,7 +447,7 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
 
   xcolor.flags = DoRed | DoGreen | DoBlue;
   redvalue = greenvalue = bluevalue = NULL;
-  ximageinfo = (XImageInfo *)checked_malloc(sizeof(XImageInfo));
+  ximageinfo = (XImageInfo *)lmalloc(sizeof(XImageInfo));
   ximageinfo->disp = disp;
   ximageinfo->scrn = scrn;
   ximageinfo->depth = 0;
@@ -441,9 +469,9 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
       unsigned int redbottom, greenbottom, bluebottom;
       unsigned int redtop, greentop, bluetop;
 
-      redvalue = (Pixel *)checked_malloc(sizeof(Pixel) * 256);
-      greenvalue = (Pixel *)checked_malloc(sizeof(Pixel) * 256);
-      bluevalue = (Pixel *)checked_malloc(sizeof(Pixel) * 256);
+      redvalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
+      greenvalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
+      bluevalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
 
       ximageinfo->cmap = global_cmap;
 
@@ -534,8 +562,7 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
     case PseudoColor:
 
       ximageinfo->cmap = global_cmap;
-      ximageinfo->index =
-	(Pixel *)checked_malloc(sizeof(Pixel) * image->rgb.used);
+      ximageinfo->index = (Pixel *)lmalloc(sizeof(Pixel) * image->rgb.used);
 
       for (a=0; a<image->rgb.used; a++)
       {
@@ -566,7 +593,7 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
 
 	    /* allocate the rest of the color cells read/write */
 	    global_cmap_index =
-	      (Pixel *)checked_malloc(sizeof(Pixel) * NOFLASH_COLORS);
+	      (Pixel *)lmalloc(sizeof(Pixel) * NOFLASH_COLORS);
 	    for (i=0; i<NOFLASH_COLORS; i++)
 	      if (!XAllocColorCells(disp, global_cmap, FALSE, NULL, 0,
 				    global_cmap_index + i, 1))
@@ -680,7 +707,7 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
        */
 
       linelen = ((image->width + 7) / 8);
-      data= checked_malloc(linelen * image->height);
+      data= lmalloc(linelen * image->height);
 
       memcpy((char *)data, (char *)image->data, linelen * image->height);
 
@@ -731,7 +758,7 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
 					NULL, image->width, image->height,
 					8, image->width * dpixlen);
 
-      data = (byte *)checked_malloc(image->width * image->height * dpixlen);
+      data = (byte *)lmalloc(image->width * image->height * dpixlen);
       ximageinfo->depth = ddepth;
       ximageinfo->ximage->data = (char *)data;
       ximageinfo->ximage->byte_order = MSBFirst;
@@ -813,9 +840,9 @@ XImageInfo *Image_to_XImage(Display *disp, int scrn, Visual *visual,
  * to the drawable.
  */
 
-void XImage_to_Drawable(XImageInfo *ximageinfo,
-			int src_x, int src_y, int dst_x, int dst_y,
-			unsigned int w, unsigned int h)
+void sendXImage(XImageInfo *ximageinfo,
+		int src_x, int src_y, int dst_x, int dst_y,
+		unsigned int w, unsigned int h)
 {
   XGCValues gcv;
 
@@ -850,8 +877,7 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   if (ximageinfo->index != NULL)	/* if we allocated colors */
   {
     if (ximageinfo->no > 0 && !ximageinfo->rootimage)	/* don't free root colors */
-      XFreeColors(ximageinfo->disp, ximageinfo->cmap, ximageinfo->index,
-		  ximageinfo->no, 0);
+      XFreeColors(ximageinfo->disp, ximageinfo->cmap, ximageinfo->index, ximageinfo->no, 0);
     free(ximageinfo->index);
   }
   if (ximageinfo->gc)
@@ -861,106 +887,4 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   XDestroyImage(ximageinfo->ximage);
   free((byte *)ximageinfo);
   /* should we free private color map to ??? */
-}
-
-
-
-/* this table is useful for quick conversions between depth and ncolors
- */
-
-unsigned long DepthToColorsTable[] =
-{
-  /*  0 */ 1,
-  /*  1 */ 2,
-  /*  2 */ 4,
-  /*  3 */ 8,
-  /*  4 */ 16,
-  /*  5 */ 32,
-  /*  6 */ 64,
-  /*  7 */ 128,
-  /*  8 */ 256,
-  /*  9 */ 512,
-  /* 10 */ 1024,
-  /* 11 */ 2048,
-  /* 12 */ 4096,
-  /* 13 */ 8192,
-  /* 14 */ 16384,
-  /* 15 */ 32768,
-  /* 16 */ 65536,
-  /* 17 */ 131072,
-  /* 18 */ 262144,
-  /* 19 */ 524288,
-  /* 20 */ 1048576,
-  /* 21 */ 2097152,
-  /* 22 */ 4194304,
-  /* 23 */ 8388608,
-  /* 24 */ 16777216
-};
-
-void newRGBMapData(RGBMap *rgb, unsigned int size)
-{
-  rgb->used = 0;
-  rgb->size = size;
-  rgb->compressed = FALSE;
-  rgb->red = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-  rgb->green = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-  rgb->blue = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-}
-
-void freeRGBMapData(RGBMap *rgb)
-{
-  free((byte *)rgb->red);
-  free((byte *)rgb->green);
-  free((byte *)rgb->blue);
-}
-
-Image *newBitImage(unsigned int width, unsigned int height)
-{
-  Image        *image;
-  unsigned int  linelen;
-
-  image = (Image *)checked_malloc(sizeof(Image));
-  image->type = IBITMAP;
-  newRGBMapData(&(image->rgb), (unsigned int)2);
-  *(image->rgb.red)= *(image->rgb.green) = *(image->rgb.blue)= 65535;
-  *(image->rgb.red + 1)= *(image->rgb.green + 1) = *(image->rgb.blue + 1)= 0;
-  image->rgb.used = 2;
-  image->width = width;
-  image->height = height;
-  image->depth = 1;
-  linelen = ((width + 7) / 8);
-  image->data = (unsigned char *)checked_calloc(linelen * height);
-  return(image);
-}
-
-Image *newRGBImage(unsigned int width, unsigned int height, unsigned int depth)
-{
-  Image        *image;
-  unsigned int  pixlen, numcolors;
-
-  if (depth == 0)	/* special case for `zero' depth image, which is */
-    depth = 1;		/* sometimes interpreted as `one color' */
-  pixlen = ((depth+7) / 8);
-  numcolors = depthToColors(depth);
-  image = (Image *)checked_malloc(sizeof(Image));
-  image->type = IRGB;
-  newRGBMapData(&(image->rgb), numcolors);
-  image->width = width;
-  image->height = height;
-  image->depth = depth;
-  image->pixlen = pixlen;
-  image->data = (unsigned char *)checked_malloc(width * height * pixlen);
-  return(image);
-}
-
-void freeImageData(Image *image)
-{
-  freeRGBMapData(&(image->rgb));
-  free(image->data);
-}
-
-void freeImage(Image *image)
-{
-  freeImageData(image);
-  free((byte *)image);
 }
