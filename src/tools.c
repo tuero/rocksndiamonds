@@ -1463,95 +1463,32 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
   int ux = LEVELX(x), uy = LEVELY(y);
   int move_dir = MovDir[ux][uy];
   int move_pos = ABS(MovPos[ux][uy]) / (TILEX / 8);
-  int graphic = el_dir2img(element, move_dir);
+  int gfx_action = (IS_MOVING(ux,uy) ? GFX_ACTION_MOVING : GFX_ACTION_DEFAULT);
+  int graphic = el_dir_act2img(element, move_dir, gfx_action);
   int frame = getNewGraphicAnimationFrame(graphic, move_pos);
+#if 0
   int phase8 = move_pos;
   int phase4 = phase8 / 2;
   int phase2  = phase8 / 4;
+#endif
 
-  int dir = move_dir;	/* !!! THROW AWAY LATER !!! */
-
-  if (0)
+  if (element == EL_WALL_GROWING)
   {
-    ;
+    boolean left_stopped = FALSE, right_stopped = FALSE;
+
+    if (!IN_LEV_FIELD(ux-1, uy) || IS_MAUER(Feld[ux-1][uy]))
+      left_stopped = TRUE;
+    if (!IN_LEV_FIELD(ux+1, uy) || IS_MAUER(Feld[ux+1][uy]))
+      right_stopped = TRUE;
+
+    if (left_stopped && right_stopped)
+      graphic = IMG_WALL;
+    else if (left_stopped)
+      graphic = IMG_WALL_GROWING_ACTIVE_RIGHT;
+    else if (right_stopped)
+      graphic = IMG_WALL_GROWING_ACTIVE_LEFT;
   }
 #if 0
-  else if (element == EL_PACMAN || element == EL_BUG ||
-	   element == EL_SPACESHIP)
-  {
-    graphic += 1 * !phase2;
-
-    if (dir == MV_UP)
-      graphic += 1 * 2;
-    else if (dir == MV_LEFT)
-      graphic += 2 * 2;
-    else if (dir == MV_DOWN)
-      graphic += 3 * 2;
-  }
-  else if (element == EL_SP_SNIKSNAK)
-  {
-    if (dir == MV_LEFT)
-      graphic = GFX_SP_SNIKSNAK_LEFT;
-    else if (dir == MV_RIGHT)
-      graphic = GFX_SP_SNIKSNAK_RIGHT;
-    else if (dir == MV_UP)
-      graphic = GFX_SP_SNIKSNAK_UP;
-    else
-      graphic = GFX_SP_SNIKSNAK_DOWN;
-
-    graphic += (phase8 < 4 ? phase8 : 7 - phase8);
-  }
-  else if (element == EL_SP_ELECTRON)
-  {
-    graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
-  }
-#endif
-  else if (element == EL_MOLE || element == EL_PENGUIN ||
-	   element == EL_PIG || element == EL_DRAGON)
-  {
-    if (dir == MV_LEFT)
-      graphic = (element == EL_MOLE ? GFX_MOLE_LEFT :
-		 element == EL_PENGUIN ? GFX_PINGUIN_LEFT :
-		 element == EL_PIG ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
-    else if (dir == MV_RIGHT)
-      graphic = (element == EL_MOLE ? GFX_MOLE_RIGHT :
-		 element == EL_PENGUIN ? GFX_PINGUIN_RIGHT :
-		 element == EL_PIG ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
-    else if (dir == MV_UP)
-      graphic = (element == EL_MOLE ? GFX_MOLE_UP :
-		 element == EL_PENGUIN ? GFX_PINGUIN_UP :
-		 element == EL_PIG ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
-    else
-      graphic = (element == EL_MOLE ? GFX_MOLE_DOWN :
-		 element == EL_PENGUIN ? GFX_PINGUIN_DOWN :
-		 element == EL_PIG ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
-
-    graphic += phase4;
-  }
-  else if (element == EL_SATELLITE)
-  {
-#if 1
-    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
-#else
-    graphic = GFX_SONDE_START + getNewGraphicAnimationFrame(graphic, move_pos);
-#endif
-  }
-  else if (element == EL_ACID)
-  {
-#if 1
-    graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
-#else
-    graphic = GFX_GEBLUBBER + getNewGraphicAnimationFrame(graphic, move_pos);
-#endif
-  }
-  else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
-  {
-    graphic += !phase2;
-  }
-  else if (element == EL_BALLOON)
-  {
-    graphic += phase4;
-  }
   else if ((element == EL_ROCK ||
 	    element == EL_SP_ZONK ||
 	    element == EL_BD_ROCK ||
@@ -1565,9 +1502,9 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 	  element == EL_SP_ZONK ||
 	  element == EL_BD_ROCK)
       {
-	if (dir == MV_LEFT)
+	if (move_dir == MV_LEFT)
 	  graphic += (4 - phase4) % 4;
-	else if (dir == MV_RIGHT)
+	else if (move_dir == MV_RIGHT)
 	  graphic += phase4;
 	else
 	  graphic += phase2 * 2;
@@ -1576,48 +1513,10 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 	graphic += phase2;
     }
   }
-  else if (element == EL_MAGIC_WALL_ACTIVE ||
-	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_BD_MAGIC_WALL_ACTIVE ||
-	   element == EL_BD_MAGIC_WALL_EMPTYING ||
-	   element == EL_MAGIC_WALL_FULL ||
-	   element == EL_BD_MAGIC_WALL_FULL)
-  {
-#if 1
-    graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
-#else
-    graphic += 3 + getNewGraphicAnimationFrame(graphic, move_pos);
-#endif
-  }
   else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
   {
     graphic = (element == EL_AMOEBA_DEAD ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x + 2 * y + 4) % 4;
-  }
-  else if (element == EL_WALL_GROWING)
-  {
-    boolean links_massiv = FALSE, rechts_massiv = FALSE;
-
-    if (!IN_LEV_FIELD(ux-1, uy) || IS_MAUER(Feld[ux-1][uy]))
-      links_massiv = TRUE;
-    if (!IN_LEV_FIELD(ux+1, uy) || IS_MAUER(Feld[ux+1][uy]))
-      rechts_massiv = TRUE;
-
-    if (links_massiv && rechts_massiv)
-      graphic = GFX_MAUERWERK;
-    else if (links_massiv)
-      graphic = GFX_MAUER_R;
-    else if (rechts_massiv)
-      graphic = GFX_MAUER_L;
-  }
-#if 0
-  else if ((element == EL_INVISIBLE_STEELWALL ||
-	    element == EL_INVISIBLE_WALL ||
-	    element == EL_INVISIBLE_SAND) && game.light_time_left)
-  {
-    graphic = (element == EL_INVISIBLE_STEELWALL ? GFX_INVISIBLE_STEEL_ON :
-	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
-	       GFX_SAND_INVISIBLE_ON);
   }
 #endif
 
@@ -3365,26 +3264,13 @@ int el2img(int element)
 
 int el_dir2img(int element, int direction)
 {
-  int action = GFX_ACTION_DEFAULT;
-
-  if (element_info[element].has_direction_graphic[action])
-  {
-    direction = MV_DIR_BIT(direction);
-
-    return element_info[element].direction_graphic[action][direction];
-  }
-  else
-    return el2img(element);
+  return el_dir_act2img(element, direction, GFX_ACTION_DEFAULT);
 }
 
 int el_dir_act2img(int element, int direction, int action)
 {
-  if (element_info[element].has_direction_graphic[action])
-  {
-    direction = MV_DIR_BIT(direction);
+  action = graphics_action_mapping[action];
+  direction = MV_DIR_BIT(direction);
 
-    return element_info[element].direction_graphic[action][direction];
-  }
-  else
-    return el_dir2img(element, direction);
+  return element_info[element].direction_graphic[action][direction];
 }

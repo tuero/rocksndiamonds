@@ -1563,11 +1563,11 @@ struct ElementInfo
   char *sound_class_name;	/* classification for custom sound effects */
   char *editor_description;	/* short description for level editor */
 
+				/* default graphics for several actions */
   int graphic[NUM_GFX_ACTIONS_MAPPED];
 
 				/* special graphics for left/right/up/down */
   int direction_graphic[NUM_GFX_ACTIONS_MAPPED][NUM_MV_DIRECTIONS];
-  boolean has_direction_graphic[NUM_GFX_ACTIONS_MAPPED];
 };
 
 struct GraphicInfo

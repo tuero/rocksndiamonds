@@ -669,11 +669,13 @@ void InitGame()
 
   InitGameEngine();
 
+#if 0
 #if DEBUG
 #if USE_NEW_AMOEBA_CODE
   printf("Using new amoeba code.\n");
 #else
   printf("Using old amoeba code.\n");
+#endif
 #endif
 #endif
 
@@ -3132,7 +3134,7 @@ void StartMoving(int x, int y)
       else
       {
 	Feld[newx][newy] = EL_EMPTY;
-	DrawLevelField(newx, newy);
+	DrawNewLevelField(newx, newy);
       }
 
       PlaySoundLevel(x, y, SND_YAMYAM_EATING);
@@ -3153,7 +3155,7 @@ void StartMoving(int x, int y)
       else
       {
 	Feld[newx][newy] = EL_EMPTY;
-	DrawLevelField(newx, newy);
+	DrawNewLevelField(newx, newy);
       }
 
       PlaySoundLevel(x, y, SND_DARK_YAMYAM_EATING);
@@ -3205,7 +3207,7 @@ void StartMoving(int x, int y)
 #endif
       else if (element == EL_BUG || element == EL_SPACESHIP ||
 	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
-#if 1
+#if 0
 	DrawLevelField(x, y);
 #else
 	DrawNewLevelField(x, y);
@@ -3296,7 +3298,7 @@ void ContinueMoving(int x, int y)
       };
 
       Feld[x][y] = EL_SAND;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
 
       for(i=0; i<4; i++)
       {
@@ -3306,7 +3308,7 @@ void ContinueMoving(int x, int y)
 	yy = y + xy[i][1];
 
 	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_SAND)
-	  DrawLevelField(xx, yy);	/* for "ErdreichAnbroeckeln()" */
+	  DrawNewLevelField(xx, yy);	/* for "ErdreichAnbroeckeln()" */
       }
     }
 
@@ -3365,18 +3367,8 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 
-    if (element == EL_BUG || element == EL_SPACESHIP ||
-	element == EL_SP_SNIKSNAK || element == EL_PACMAN ||
-	element == EL_SP_ELECTRON)
-    {
-      DrawNewLevelField(x, y);
-      DrawNewLevelField(newx, newy);
-    }
-    else
-    {
-      DrawLevelField(x, y);
-      DrawLevelField(newx, newy);
-    }
+    DrawNewLevelField(x, y);
+    DrawNewLevelField(newx, newy);
 
     Stop[newx][newy] = TRUE;
     JustStopped[newx][newy] = 3;
@@ -3396,12 +3388,7 @@ void ContinueMoving(int x, int y)
   }
   else				/* still moving on */
   {
-    if (element == EL_BUG || element == EL_SPACESHIP ||
-	element == EL_SP_SNIKSNAK || element == EL_PACMAN ||
-	element == EL_SP_ELECTRON)
-      DrawNewLevelField(x, y);
-    else
-      DrawLevelField(x, y);
+    DrawNewLevelField(x, y);
   }
 }
 

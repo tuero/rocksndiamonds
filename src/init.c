@@ -930,11 +930,10 @@ void InitElementInfo()
   {
     for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
     {
-      element_info[i].graphic[j] = IMG_EMPTY_SPACE;
+      element_info[i].graphic[j] = -1;			/* use default */
 
       for(k=0; k<NUM_MV_DIRECTIONS; k++)
-	element_info[i].direction_graphic[j][k] = IMG_EMPTY_SPACE;
-      element_info[i].has_direction_graphic[j] = FALSE;
+	element_info[i].direction_graphic[j][k] = -1;	/* use default */
     }
   }
 
@@ -1004,12 +1003,44 @@ void InitElementInfo()
       direction = MV_DIR_BIT(direction);
 
       element_info[element].direction_graphic[action][direction] = graphic;
-      element_info[element].has_direction_graphic[action] = TRUE;
     }
     else
       element_info[element].graphic[action] = graphic;
 
     i++;
+  }
+
+  /* now set all '-1' values with element specific default values */
+  for(i=0; i<MAX_ELEMENTS; i++)
+  {
+    int default_action_graphic = element_info[i].graphic[GFX_ACTION_DEFAULT];
+    int default_action_direction_graphic[NUM_MV_DIRECTIONS];
+
+    if (default_action_graphic == -1)
+      default_action_graphic = EL_CHAR_QUESTION;
+
+    for(k=0; k<NUM_MV_DIRECTIONS; k++)
+      default_action_direction_graphic[k] =
+	element_info[i].direction_graphic[GFX_ACTION_DEFAULT][k];
+
+    for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
+    {
+      /* no graphic for this specific action -- use default action graphic */
+      if (element_info[i].graphic[j] == -1)
+	element_info[i].graphic[j] = default_action_graphic;
+
+      for(k=0; k<NUM_MV_DIRECTIONS; k++)
+      {
+	int default_direction_graphic = default_action_direction_graphic[k];
+
+	/* no default direction graphic -- use graphic for current action */
+	if (default_direction_graphic == -1)
+	  default_direction_graphic = element_info[i].graphic[j];
+
+	if (element_info[i].direction_graphic[j][k] == -1)
+	  element_info[i].direction_graphic[j][k] = default_direction_graphic;
+      }
+    }
   }
 
 #endif
