@@ -1985,8 +1985,6 @@ void AdjustScrollbar(struct GadgetInfo *gi, int items_max, int item_pos)
   if (gs->item_position == gs->items_max - gs->items_visible)
     gs->position = gs->position_max;
 
-  printf("gs->item_position == %d\n", gs->item_position);
-
   if (gi->mapped)
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 }
@@ -2014,8 +2012,8 @@ static struct GadgetInfo *last_gi = NULL;
 void HandleGadgets(int mx, int my, int button)
 {
   static unsigned long pressed_delay = 0;
-  static last_button = 0;
-  static last_mx = 0, last_my = 0;
+  static int last_button = 0;
+  static int last_mx = 0, last_my = 0;
   int scrollbar_mouse_pos;
   struct GadgetInfo *new_gi, *gi;
   boolean press_event;
@@ -2166,8 +2164,6 @@ void HandleGadgets(int mx, int my, int button)
 	{
 	  gi->event.item_position = gs->item_position;
 	  changed_position = TRUE;
-
-	  printf("gs->item_position == %d\n", gs->item_position);
 	}
 
 	AdjustScrollbar(gi, gs->items_max, gs->item_position);
@@ -2238,8 +2234,6 @@ void HandleGadgets(int mx, int my, int button)
       {
 	gi->event.item_position = gs->item_position;
 	changed_position = TRUE;
-
-	printf("gs->item_position == %d\n", gs->item_position);
       }
 
       DrawGadget(gi, DG_PRESSED, DG_DIRECT);

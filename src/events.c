@@ -234,8 +234,24 @@ void HandleMotionEvent(XMotionEvent *event)
 void HandleKeyEvent(XKeyEvent *event)
 {
   int key_status = (event->type == KeyPress ? KEY_PRESSED : KEY_RELEASED);
-  unsigned int event_state = (game_status != PLAYING ? event->state : 0);
-  KeySym key = XLookupKeysym(event, event_state);
+  KeySym key;
+
+  if (game_status == PLAYING)
+  {
+    /* use '0' instead of 'event->state' to get the key without modifiers */
+    key = XLookupKeysym(event, 0);
+  }
+  else
+  {
+    /* get the key with all modifiers */
+    char buffer[10];
+    int buffer_size = 10;
+    XComposeStatus compose;
+    int char_count;
+
+    char_count = XLookupString(event, buffer, buffer_size, &key, &compose);
+    buffer[char_count] = '\0';
+  }
 
   HandleKey(key, key_status);
 }

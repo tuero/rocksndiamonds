@@ -550,6 +550,7 @@ typedef long XVisualInfo;
 typedef long Atom;
 typedef int Status;
 typedef int Bool;
+typedef int XComposeStatus;	/* we don't need the real type */
 
 typedef struct _XGC
 {
@@ -706,4 +707,8 @@ void XCloseDisplay(Display *);
 void XNextEvent(Display *, XEvent *);
 int XPending(Display *);
 KeySym XLookupKeysym(XKeyEvent *, int);
+int XLookupString(XKeyEvent *, char *, int, KeySym *, XComposeStatus *);
+void XSetForeground(Display *, GC, unsigned long);
+void XDrawLine(Display *, Drawable, GC, int, int, int, int);
+void XDestroyImage(XImage *);
 void NetworkServer(int, int);

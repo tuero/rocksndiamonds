@@ -853,6 +853,8 @@ char getCharFromKeySym(KeySym keysym)
     letter = '=';
   else if (strcmp(keyname, "greater") == 0)
     letter = '>';
+  else if (strcmp(keyname, "circumflex") == 0)
+    letter = '^';
 
   return letter;
 }

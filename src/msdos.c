@@ -768,6 +768,50 @@ KeySym XLookupKeysym(XKeyEvent *key_event, int index)
   return key_event->state;
 }
 
+int XLookupString(XKeyEvent *key_event, char *buffer, int buffer_size,
+		  KeySym *key, XComposeStatus *compose)
+{
+  *key = key_event->state;
+  return 0;
+}
+
+void XSetForeground(Display *display, GC gc, unsigned long pixel)
+{
+  XGCValues *gcv = (XGCValues *)gc;
+
+  gcv->foreground = pixel;
+}
+
+void XDrawLine(Display *display, Drawable d, GC gc,
+	       int x1, int y1, int x2, int y2)
+{
+  XGCValues *gcv = (XGCValues *)gc;
+  boolean mouse_off = FALSE;
+
+  if ((BITMAP *)d == video_bitmap)
+  {
+    x1 += display->screens[display->default_screen].x;
+    y1 += display->screens[display->default_screen].y;
+    x2 += display->screens[display->default_screen].x;
+    y2 += display->screens[display->default_screen].y;
+    freeze_mouse_flag = TRUE;
+    mouse_off = hide_mouse(display, MIN(x1, x2), MIN(y1, y2),
+			   MAX(x1, x2) - MIN(x1, x2),
+			   MAX(y1, y2) - MIN(y1, y2));
+  }
+
+  line((BITMAP *)d, x1, y1, x2, y2, gcv->foreground);
+
+  if (mouse_off)
+    unhide_mouse(display);
+
+  freeze_mouse_flag = FALSE;
+}
+
+void XDestroyImage(XImage *ximage)
+{
+}
+
 void NetworkServer(int port, int serveronly)
 {
   Error(ERR_WARN, "networking not supported in DOS version");

@@ -87,6 +87,24 @@
 #define ED_AREA_ELEMCONT_YPOS	(10 * TILEY)
 
 /* values for scrolling gadgets */
+#if 1
+#define ED_SCROLLBUTTON_XSIZE	16
+#define ED_SCROLLBUTTON_YSIZE	16
+
+#define ED_SCROLLBUTTON_XPOS	24
+#define ED_SCROLLBUTTON_YPOS	0
+#define ED_SCROLLBAR_XPOS	24
+#define ED_SCROLLBAR_YPOS	64
+#else
+#define ED_SCROLLBUTTON_XSIZE	30
+#define ED_SCROLLBUTTON_YSIZE	30
+
+#define ED_SCROLLBUTTON_XPOS	70
+#define ED_SCROLLBUTTON_YPOS	0
+#define ED_SCROLLBAR_XPOS	10
+#define ED_SCROLLBAR_YPOS	110
+#endif
+
 #define ED_SCROLL_UP_XPOS	(SXSIZE - ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_UP_YPOS	(0)
 #define ED_SCROLL_DOWN_XPOS	ED_SCROLL_UP_XPOS
@@ -95,14 +113,14 @@
 #define ED_SCROLL_LEFT_YPOS	(SYSIZE - ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_RIGHT_XPOS	(SXSIZE - TILEX - ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_RIGHT_YPOS	ED_SCROLL_LEFT_YPOS
-#define ED_SCROLL_VERTICAL_XPOS		ED_SCROLL_UP_XPOS
-#define ED_SCROLL_VERTICAL_YPOS		(ED_SCROLL_UP_YPOS + 20)
-#define ED_SCROLL_VERTICAL_XSIZE	30
-#define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - TILEY - 2 * 20)
-#define ED_SCROLL_HORIZONTAL_XPOS	(ED_SCROLL_LEFT_XPOS + 30)
-#define ED_SCROLL_HORIZONTAL_YPOS	(SYSIZE - 30)
-#define ED_SCROLL_HORIZONTAL_XSIZE	(SXSIZE - TILEX - 2*30)
-#define ED_SCROLL_HORIZONTAL_YSIZE	30
+#define ED_SCROLL_VERTICAL_XPOS	ED_SCROLL_UP_XPOS
+#define ED_SCROLL_VERTICAL_YPOS	(ED_SCROLL_UP_YPOS + ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_VERTICAL_XSIZE ED_SCROLLBUTTON_XSIZE
+#define ED_SCROLL_VERTICAL_YSIZE (SYSIZE - TILEY - 2 * ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_HORIZONTAL_XPOS (ED_SCROLL_LEFT_XPOS + ED_SCROLLBUTTON_XSIZE)
+#define ED_SCROLL_HORIZONTAL_YPOS (SYSIZE - ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_HORIZONTAL_XSIZE (SXSIZE - TILEX - 2 * ED_SCROLLBUTTON_XSIZE)
+#define ED_SCROLL_HORIZONTAL_YSIZE ED_SCROLLBUTTON_YSIZE
 
 /* control button identifiers */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
@@ -182,13 +200,13 @@ static struct
   int gadget_id;
 } scrollbutton_info[ED_NUM_SCROLLBUTTONS] =
 {
-  { ED_BUTTON_UP_XPOS,      ED_BUTTON_UP_YPOS,
+  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 0 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_UP_XPOS,      ED_SCROLL_UP_YPOS,      ED_CTRL_ID_SCROLL_UP },
-  { ED_BUTTON_DOWN_XPOS,    ED_BUTTON_DOWN_YPOS,
+  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 1 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_DOWN_XPOS,    ED_SCROLL_DOWN_YPOS,    ED_CTRL_ID_SCROLL_DOWN },
-  { ED_BUTTON_LEFT_XPOS,    ED_BUTTON_LEFT_YPOS,
+  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 2 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,    ED_CTRL_ID_SCROLL_LEFT },
-  { ED_BUTTON_RIGHT_XPOS,   ED_BUTTON_RIGHT_YPOS,
+  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 3 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,   ED_CTRL_ID_SCROLL_RIGHT }
 };
 
@@ -201,12 +219,12 @@ static struct
   int gadget_id;
 } scrollbar_info[ED_NUM_SCROLLBARS] =
 {
-  { GAME_CONTROL_XPOS,		GAME_CONTROL_YPOS - GAME_BUTTON_YSIZE,
+  { ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
     ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     ED_CTRL_ID_SCROLL_VERTICAL },
-  { GAME_CONTROL_XPOS,		GAME_CONTROL_YPOS - GAME_BUTTON_YSIZE,
+  { ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
     ED_SCROLL_HORIZONTAL_XPOS,	ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,	ED_SCROLL_HORIZONTAL_YSIZE,
     GD_TYPE_SCROLLBAR_HORIZONTAL,
@@ -766,9 +784,9 @@ static void CreateControlButtons()
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    gd_x1 = DOOR_GFX_PAGEX6 + scrollbutton_info[i].xpos;
-    gd_x2 = DOOR_GFX_PAGEX5 + scrollbutton_info[i].xpos;
-    gd_y  = DOOR_GFX_PAGEY2 + scrollbutton_info[i].ypos;
+    gd_y  = DOOR_GFX_PAGEY1 + scrollbutton_info[i].ypos;
+    gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[i].xpos;
+    gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, SX + scrollbutton_info[i].x,
@@ -951,7 +969,7 @@ static void CreateScrollbarGadgets()
   {
     int id = scrollbar_info[i].gadget_id;
     Pixmap gd_pixmap = pix[PIX_DOOR];
-    int gd_x1, gd_x2, gd_y;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
     unsigned long event_mask;
@@ -971,9 +989,17 @@ static void CreateScrollbarGadgets()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
-    gd_x1 = DOOR_GFX_PAGEX4 + scrollbar_info[i].xpos;
-    gd_x2 = DOOR_GFX_PAGEX3 + scrollbar_info[i].xpos;
-    gd_y  = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+#if 1
+    gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
+    gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
+    gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+    gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+#else
+    gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
+    gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+    gd_x2 = gd_x1;
+    gd_y2 = gd_y1 - ED_SCROLLBUTTON_YSIZE;
+#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, SX + scrollbar_info[i].x,
@@ -985,8 +1011,8 @@ static void CreateScrollbarGadgets()
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
 		      GDI_DESIGN_BORDER, 3,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK, HandleControlButtons,
@@ -2482,8 +2508,8 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
 {
   static short brush_buffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-  static brush_from_x, brush_from_y;
-  static brush_to_x, brush_to_y;
+  static int brush_from_x, brush_from_y;
+  static int brush_to_x, brush_to_y;
   int x, y;
 
   if (from_x > to_x)
@@ -2571,6 +2597,20 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
   static boolean typing = FALSE;
   int letter_element = EL_CHAR_ASCII0 + letter;
   int lx, ly;
+
+  /* map lower case letters to upper case and convert special characters */
+  if (letter >= 'a' && letter <= 'z')
+    letter_element = EL_CHAR_ASCII0 + letter + (int)('A' - 'a');
+  else if (letter == 'ä' || letter == 'Ä')
+    letter_element = EL_CHAR_AE;
+  else if (letter == 'ö' || letter == 'Ö')
+    letter_element = EL_CHAR_OE;
+  else if (letter == 'ü' || letter == 'Ü')
+    letter_element = EL_CHAR_UE;
+  else if (letter == '^')
+    letter_element = EL_CHAR_COPY;
+  else
+    letter_element = EL_CHAR_ASCII0 + letter;
 
   if (mode != TEXT_INIT)
   {
@@ -3338,16 +3378,6 @@ void HandleLevelEditorKeyInput(KeySym key)
   if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
   {
     char letter = getCharFromKeySym(key);
-
-    /* map lower case letters to upper case */
-    if (letter >= 'a' && letter <= 'z')
-      letter += (int)('A' - 'a');
-    else if (letter == 'ä')
-      letter = 'Ä';
-    else if (letter == 'ä')
-      letter = 'Ö';
-    else if (letter == 'ä')
-      letter = 'Ü';
 
     if (letter)
       DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
