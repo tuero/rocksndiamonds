@@ -1,3 +1,7 @@
+2004-03-20
+	* added copy and paste functions for custom change pages
+	* enhanced graphical display and functionality of tape recorder
+
 2004-03-19
 	* added move speed faster than "very fast" for custom elements
 	* fixed bug with 3+3 style explosions and missing border content
@@ -10,7 +14,7 @@
 
 2004-03-15
 	* added trigger element and trigger player to use as target elements
-	* added copy and paste editor functions for custom and group elements
+	* added copy and paste functions for custom and group elements
 
 2004-03-14
 	* fixed graphical bug when displaying explosion animations

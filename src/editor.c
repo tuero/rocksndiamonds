@@ -244,11 +244,10 @@
 #define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 66)
 
 /* values for some special graphic buttons */
-#define ED_BUTTON_ELEM_XPOS		6
-#define ED_BUTTON_ELEM_YPOS		30
-#define ED_BUTTON_ELEM_XSIZE		22
-#define ED_BUTTON_ELEM_YSIZE		22
-
+#define ED_COPY_CHANGE_PAGE_XPOS	25
+#define ED_COPY_CHANGE_PAGE_YPOS	50
+#define ED_PASTE_CHANGE_PAGE_XPOS	25
+#define ED_PASTE_CHANGE_PAGE_YPOS	70
 
 /* some values for text input, selectbox and counter gadgets */
 #define ED_BUTTON_COUNT_YPOS		60
@@ -1752,9 +1751,9 @@ static struct
   },
   {
     -1,					ED_SETTINGS_YPOS(14),
-    GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
+    GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_PASTE_CHANGE_PAGE,
     -1,					"New",
-    " ", NULL,				"Add new change page"
+    NULL, NULL,				"Add new change page"
   },
   {
     -1,					ED_SETTINGS_YPOS(14),
@@ -1789,17 +1788,17 @@ static struct
     NULL, "change page",		"select next change page"
   },
   {
-    ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    ED_COPY_CHANGE_PAGE_XPOS,		ED_COPY_CHANGE_PAGE_YPOS,
     -1,					ED_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
-    GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
-    NULL, NULL,				"copy settings from this change page"
+    GADGET_ID_COPY_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
+    " ", NULL,				"copy settings from this change page"
   },
   {
-    ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    ED_PASTE_CHANGE_PAGE_XPOS,		ED_PASTE_CHANGE_PAGE_YPOS,
     -1,					ED_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
-    GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
+    GADGET_ID_PASTE_CHANGE_PAGE,	GADGET_ID_COPY_CHANGE_PAGE,
     NULL, NULL,				"paste settings to this change page"
   },
 };
@@ -4785,10 +4784,20 @@ static void CreateGraphicbuttonGadgets()
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    gd_x1 = DOOR_GFX_PAGEX4 + graphicbutton_info[i].gd_x;
-    gd_x2 = DOOR_GFX_PAGEX3 + graphicbutton_info[i].gd_x;
-    gd_y1 = DOOR_GFX_PAGEY1 + graphicbutton_info[i].gd_y;
-    gd_y2 = gd_y1;
+    if (i <= ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE)
+    {
+      gd_x1 = DOOR_GFX_PAGEX4 + graphicbutton_info[i].gd_x;
+      gd_y1 = DOOR_GFX_PAGEY1 + graphicbutton_info[i].gd_y;
+      gd_x2 = DOOR_GFX_PAGEX3 + graphicbutton_info[i].gd_x;
+      gd_y2 = gd_y1;
+    }
+    else	/* (i <= ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE) */
+    {
+      gd_x1 = DOOR_GFX_PAGEX6 + graphicbutton_info[i].gd_x;
+      gd_y1 = DOOR_GFX_PAGEY1 + graphicbutton_info[i].gd_y;
+      gd_x2 = gd_x1 - ED_BUTTON_COUNT_XSIZE;
+      gd_y2 = gd_y1;
+    }
 
     /* determine horizontal position to the right of specified gadget */
     if (graphicbutton_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -8441,6 +8450,21 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
       ei->current_change_page = 0;
     else if (ei->current_change_page >= ei->num_change_pages)
       ei->current_change_page = ei->num_change_pages - 1;
+
+    DrawPropertiesWindow();
+  }
+  else if (type_id == ED_GRAPHICBUTTON_ID_COPY_CHANGE_PAGE ||
+	   type_id == ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE)
+  {
+    struct ElementInfo *ei = &element_info[properties_element];
+    int current_change_page = ei->current_change_page;
+
+    if (type_id == ED_GRAPHICBUTTON_ID_COPY_CHANGE_PAGE)
+      element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0] =
+	ei->change_page[current_change_page];
+    else if (type_id == ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE)
+      ei->change_page[current_change_page] =
+	element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0];
 
     DrawPropertiesWindow();
   }

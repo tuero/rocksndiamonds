@@ -3871,6 +3871,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "empty custom element"
   },
   {
+    "internal_clipboard_change",
+    "internal",
+    "empty change page"
+  },
+  {
     "internal_clipboard_group",
     "internal",
     "empty group element"
