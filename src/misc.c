@@ -401,11 +401,13 @@ char *getKeySymName(KeySym key)
     char *name;
   } translate[] =
   {
+    /* normal cursor keys */
     { XK_Left,		"cursor left" },
     { XK_Right,		"cursor right" },
     { XK_Up,		"cursor up" },
     { XK_Down,		"cursor down" },
 
+    /* keypad cursor keys */
 #ifdef XK_KP_Left
     { XK_KP_Left,	"keypad left" },
     { XK_KP_Right,	"keypad right" },
@@ -413,6 +415,29 @@ char *getKeySymName(KeySym key)
     { XK_KP_Down,	"keypad down" },
 #endif
 
+    /* other keypad keys */
+#ifdef XK_KP_Enter
+    { XK_KP_Enter,	"keypad enter" },
+    { XK_KP_Add,	"keypad +" },
+    { XK_KP_Subtract,	"keypad -" },
+    { XK_KP_Multiply,	"keypad mltply" },
+    { XK_KP_Divide,	"keypad /" },
+    { XK_KP_Separator,	"keypad ," },
+#endif
+
+    /* modifier keys */
+    { XK_Shift_L,	"left shift" },
+    { XK_Shift_R,	"right shift" },
+    { XK_Control_L,	"left control" },
+    { XK_Control_R,	"right control" },
+    { XK_Meta_L,	"left meta" },
+    { XK_Meta_R,	"right meta" },
+    { XK_Alt_L,		"left alt" },
+    { XK_Alt_R,		"right alt" },
+    { XK_Mode_switch,	"mode switch" },
+    { XK_Multi_key,	"multi key" },
+
+    /* some special keys */
     { XK_BackSpace,	"backspace" },
     { XK_Delete,	"delete" },
     { XK_Insert,	"insert" },
@@ -423,17 +448,22 @@ char *getKeySymName(KeySym key)
     { XK_Page_Down,	"page down" },
     { XK_space,		"space" },
 
-    { XK_Shift_L,	"left shift" },
-    { XK_Shift_R,	"right shift" },
-    { XK_Control_L,	"left ctrl" },
-    { XK_Control_R,	"right ctrl" },
-    { XK_Meta_L,	"left meta" },
-    { XK_Meta_R,	"right meta" },
-    { XK_Alt_L,		"left alt" },
-    { XK_Alt_R,		"right alt" },
-    { XK_Mode_switch,	"mode switch" },
-    { XK_Multi_key,	"multi key" },
+    /* even more special keys */
+    { XK_adiaeresis,	"ä" },
+    { XK_odiaeresis,	"ö" },
+    { XK_udiaeresis,	"ü" },
+    { XK_apostrophe,	"'" },
+    { XK_plus,		"+" },
+    { XK_minus,		"-" },
+    { XK_comma,		"," },
+    { XK_period,	"." },
+    { XK_numbersign,	"#" },
+    { XK_less,		"less" },
+    { XK_greater,	"greater" },
+    { XK_asciicircum,	"circumflex" },
+    { XK_ssharp,	"sharp s" },
 
+    /* end-of-array identifier */
     { 0,                NULL }
   };
 
@@ -455,6 +485,11 @@ char *getKeySymName(KeySym key)
   else if (key >= XK_KP_0 && key <= XK_KP_9)
   {
     sprintf(key_name, "keypad %c", '0' + (char)(key - XK_KP_0));
+    return key_name;
+  }
+  else if (key >= XK_F1 && key <= XK_F24)
+  {
+    sprintf(key_name, "function F%d", (int)(key - XK_F1 + 1));
     return key_name;
   }
   else

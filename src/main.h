@@ -1042,7 +1042,8 @@ extern int		num_bg_loops;
 #define TYPENAME		5
 #define HALLOFFAME		6
 #define SETUP			7
-#define EXITGAME		8
+#define SETUPINPUT		8
+#define EXITGAME		9
 
 /* values for game_emulation */
 #define EMU_NONE		0

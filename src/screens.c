@@ -912,8 +912,8 @@ void DrawSetupScreen()
     {SETUP_FADING,	"Fading:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_QUICK_DOORS,	"Quick Doors:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_AUTO_RECORD,	"Auto-Record:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_2ND_JOYSTICK,"Joystick:",	{"2nd","1st"},	{FC_YELLOW,FC_YELLOW}},
-    {0,			"Cal. Joystick",{"",   ""},	{0,0}},
+    {0,			"Input Setup",  {"",   ""},	{0,0}},
+    {0,			"",		{"",   ""},	{0,0}},
     {0,			"",		{"",   ""},	{0,0}},
     {0,			"Exit",		{"",   ""},	{0,0}},
     {0,			"Save and exit",{"",   ""},	{0,0}}
@@ -921,19 +921,19 @@ void DrawSetupScreen()
 
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
-  DrawText(SX+16, SY+16,  "SETUP",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+16, "SETUP",FS_BIG,FC_YELLOW);
 
   for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
   {
     int base = i - SETUP_SCREEN_POS_START;
 
-    if (i != SETUP_SCREEN_POS_EMPTY)
+    if (!(i >= SETUP_SCREEN_POS_EMPTY1 && i <= SETUP_SCREEN_POS_EMPTY2))
     {
       DrawGraphic(0,i,GFX_KUGEL_BLAU);
       DrawText(SX+32,SY+i*32, setup[base].text, FS_BIG,FC_GREEN);
     }
 
-    if (i < SETUP_SCREEN_POS_EMPTY)
+    if (i < SETUP_SCREEN_POS_EMPTY1)
     {
       int setting_bit = setup[base].bit;
       int setting_pos = ((local_player->setup & setting_bit) != 0 ? 0 : 1);
@@ -952,9 +952,10 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
   static int choice = 3;
   static int redraw = TRUE;
   int x = (mx+32-SX)/32, y = (my+32-SY)/32;
-  int pos_start = SETUP_SCREEN_POS_START + 1;
-  int pos_empty = SETUP_SCREEN_POS_EMPTY + 1;
-  int pos_end   = SETUP_SCREEN_POS_END   + 1;
+  int pos_start  = SETUP_SCREEN_POS_START  + 1;
+  int pos_empty1 = SETUP_SCREEN_POS_EMPTY1 + 1;
+  int pos_empty2 = SETUP_SCREEN_POS_EMPTY2 + 1;
+  int pos_end    = SETUP_SCREEN_POS_END    + 1;
 
   if (button == MB_MENU_INITIALIZE)
     redraw = TRUE;
@@ -978,8 +979,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     else
       x = y = 0;
 
-    if (y == pos_empty)
-      y = (dy>0 ? pos_empty+1 : pos_empty-1);
+    if (y >= pos_empty1 && y <= pos_empty2)
+      y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
 
     if (y < pos_start)
       y = pos_start;
@@ -993,7 +994,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (x==1 && y>=pos_start && y<=pos_end && y!=pos_empty)
+  if (x==1 && y >= pos_start && y <= pos_end &&
+      !(y >= pos_empty1 && y <= pos_empty2))
   {
     if (button)
     {
@@ -1006,6 +1008,295 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     }
     else
     {
+      int yy = y-1;
+
+      if (y==3 && sound_status==SOUND_AVAILABLE)
+      {
+	if (SETUP_SOUND_ON(local_player->setup))
+	{
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
+	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
+	  local_player->setup &= ~SETUP_SOUND_LOOPS;
+	  local_player->setup &= ~SETUP_SOUND_MUSIC;
+	}
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_SOUND;
+      }
+      else if (y==4 && sound_loops_allowed)
+      {
+	if (SETUP_SOUND_LOOPS_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	{
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
+	  local_player->setup |= SETUP_SOUND;
+	}
+	local_player->setup ^= SETUP_SOUND_LOOPS;
+      }
+      else if (y==5 && sound_loops_allowed)
+      {
+	if (SETUP_SOUND_MUSIC_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	{
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
+	  local_player->setup |= SETUP_SOUND;
+	}
+	local_player->setup ^= SETUP_SOUND_MUSIC;
+      }
+      else if (y==6)
+      {
+	if (SETUP_TOONS_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_TOONS;
+      }
+      else if (y==7)
+      {
+	if (!SETUP_DIRECT_DRAW_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_DIRECT_DRAW;
+      }
+      else if (y==8)
+      {
+	if (SETUP_SCROLL_DELAY_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_SCROLL_DELAY;
+      }
+      else if (y==9)
+      {
+	if (SETUP_SOFT_SCROLL_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_SOFT_SCROLL;
+      }
+      else if (y==10)
+      {
+	if (SETUP_FADING_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_FADING;
+      }
+      else if (y==11)
+      {
+	if (SETUP_QUICK_DOORS_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_QUICK_DOORS;
+      }
+      else if (y==12)
+      {
+	if (SETUP_AUTO_RECORD_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_AUTO_RECORD;
+      }
+      else if (y==13)
+      {
+	game_status = SETUPINPUT;
+	DrawSetupInputScreen();
+	redraw = TRUE;
+      }
+
+#if 0
+      else if (y==13)
+      {
+	if (SETUP_2ND_JOYSTICK_ON(local_player->setup))
+	  DrawText(SX+14*32, SY+yy*32,"1st",FS_BIG,FC_YELLOW);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"2nd",FS_BIG,FC_YELLOW);
+	local_player->setup ^= SETUP_2ND_JOYSTICK;
+      }
+      else if (y==14)
+      {
+	/*
+	CalibrateJoystick();
+	*/
+
+	CustomizeKeyboard();
+
+	redraw = TRUE;
+      }
+#endif
+
+      else if (y==pos_end-1 || y==pos_end)
+      {
+        if (y==pos_end)
+	{
+	  SavePlayerInfo(PLAYER_SETUP);
+	  SaveJoystickData();
+	}
+
+	game_status = MAINMENU;
+	DrawMainMenu();
+	redraw = TRUE;
+      }
+    }
+  }
+  BackToFront();
+
+  if (game_status==SETUP)
+    DoAnimation();
+}
+
+void DrawSetupInputScreen()
+{
+#if 0
+  static struct setup
+  {
+    unsigned int bit;
+    char *text, *mode[2];
+    int color[2];
+  } setup[] =
+  {
+    {SETUP_SOUND,	"Sound:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOUND_LOOPS,	" Sound Loops:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOUND_MUSIC,	" Game Music:", {"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_TOONS,	"Toons:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_DIRECT_DRAW,	"Buffered gfx:",{"off","on" },	{FC_BLUE,FC_YELLOW}},
+    {SETUP_SCROLL_DELAY,"Scroll Delay:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOFT_SCROLL,	"Soft Scroll.:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_FADING,	"Fading:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_QUICK_DOORS,	"Quick Doors:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_AUTO_RECORD,	"Auto-Record:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_2ND_JOYSTICK,"Joystick:",	{"2nd","1st"},	{FC_YELLOW,FC_YELLOW}},
+    {0,			"Cal. Joystick",{"",   ""},	{0,0}},
+    {0,			"",		{"",   ""},	{0,0}},
+    {0,			"Exit",		{"",   ""},	{0,0}},
+    {0,			"Save and exit",{"",   ""},	{0,0}}
+  };
+#endif
+
+  ClearWindow();
+  DrawText(SX+16, SY+16, "SETUP INPUT", FS_BIG, FC_YELLOW);
+
+  DrawGraphic(0, 2, GFX_KUGEL_BLAU);
+  DrawGraphic(0, 3, GFX_KUGEL_BLAU);
+  DrawGraphic(0, 4, GFX_KUGEL_BLAU);
+
+  DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
+  DrawText(SX+12*32, SY+2*32, "1", FS_BIG, FC_RED);
+  DrawGraphic(9,2,GFX_PFEIL_L);
+  DrawGraphic(11,2,GFX_PFEIL_R);
+
+  DrawText(SX+32, SY+3*32, "Inputdevice:", FS_BIG, FC_GREEN);
+  if (setup.joy_input[0].use_joystick)
+  {
+    DrawText(SX+13*32, SY+3*32,
+	     (setup.joy_input[0].joystick_nr == 0 ? "JOY1" : "JOY2"),
+	     FS_BIG, FC_YELLOW);
+    DrawText(SX+32, SY+4*32, "Calibrate", FS_BIG, FC_GREEN);
+  }
+  else
+  {
+    DrawText(SX+13*32, SY+3*32, "KEYS", FS_BIG, FC_YELLOW);
+    DrawText(SX+32, SY+4*32, "Customize", FS_BIG, FC_GREEN);
+  }
+
+  DrawGraphic(0, 15, GFX_KUGEL_BLAU);
+  DrawText(SX+32, SY+15*32, "Exit", FS_BIG, FC_GREEN);
+
+#if 0
+  for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
+  {
+    int base = i - SETUP_SCREEN_POS_START;
+
+    if (i != SETUP_SCREEN_POS_EMPTY)
+    {
+      DrawGraphic(0,i,GFX_KUGEL_BLAU);
+      DrawText(SX+32,SY+i*32, setup[base].text, FS_BIG,FC_GREEN);
+    }
+
+    if (i < SETUP_SCREEN_POS_EMPTY)
+    {
+      int setting_bit = setup[base].bit;
+      int setting_pos = ((local_player->setup & setting_bit) != 0 ? 0 : 1);
+      DrawText(SX+14*32, SY+i*32,setup[base].mode[setting_pos],
+	       FS_BIG,setup[base].color[setting_pos]);
+    }
+  }
+#endif
+
+  FadeToFront();
+  InitAnimation();
+  HandleSetupInputScreen(0,0,0,0,MB_MENU_INITIALIZE);
+}
+
+void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
+{
+  static int choice = 3;
+  static int redraw = TRUE;
+  int x = (mx+32-SX)/32, y = (my+32-SY)/32;
+  int pos_start  = SETUPINPUT_SCREEN_POS_START  + 1;
+  int pos_empty1 = SETUPINPUT_SCREEN_POS_EMPTY1 + 1;
+  int pos_empty2 = SETUPINPUT_SCREEN_POS_EMPTY2 + 1;
+  int pos_end    = SETUPINPUT_SCREEN_POS_END    + 1;
+
+  if (button == MB_MENU_INITIALIZE)
+    redraw = TRUE;
+
+  if (redraw)
+  {
+    DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
+    redraw = FALSE;
+  }
+
+  if (button == MB_MENU_INITIALIZE)
+    return;
+
+  if (dx || dy)
+  {
+    if (dy)
+    {
+      x = 1;
+      y = choice+dy;
+    }
+    else
+      x = y = 0;
+
+    if (y >= pos_empty1 && y <= pos_empty2)
+      y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
+
+    if (y < pos_start)
+      y = pos_start;
+    else if (y > pos_end)
+      y = pos_end;
+  }
+
+  if (!mx && !my && !dx && !dy)
+  {
+    x = 1;
+    y = choice;
+  }
+
+  if (x==1 && y >= pos_start && y <= pos_end &&
+      !(y >= pos_empty1 && y <= pos_empty2))
+  {
+    if (button)
+    {
+      if (y!=choice)
+      {
+	DrawGraphic(0,y-1,GFX_KUGEL_ROT);
+	DrawGraphic(0,choice-1,GFX_KUGEL_BLAU);
+      }
+      choice = y;
+    }
+    else
+    {
+#if 0
       int yy = y-1;
 
       if (y==3 && sound_status==SOUND_AVAILABLE)
@@ -1132,6 +1423,17 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	DrawMainMenu();
 	redraw = TRUE;
       }
+#endif
+
+
+      if (y==pos_end)
+      {
+	game_status = SETUP;
+	DrawSetupScreen();
+	redraw = TRUE;
+      }
+
+
     }
   }
   BackToFront();
@@ -1145,6 +1447,7 @@ void CustomizeKeyboard( /* int player_nr */ )
   int player_nr = 0;
 
   int i;
+  int step_nr;
   boolean finished = FALSE;
   static struct SetupKeyboardInfo custom_key;
   static struct
@@ -1164,16 +1467,18 @@ void CustomizeKeyboard( /* int player_nr */ )
   custom_key = setup.key_input[player_nr];
 
   ClearWindow();
-  DrawText(SX+16, SY+16, "Keyboard Input", FS_BIG, FC_YELLOW);
+  DrawText(SX + 16, SY + 16, "Keyboard Input", FS_BIG, FC_YELLOW);
 
   BackToFront();
   InitAnimation();
 
-  i = 0;
-  DrawText(SX, SY+(2+2*i)*32, customize_step[i].text, FS_BIG, FC_GREEN);
-  DrawText(SX, SY+(2+2*i+1)*32, "Key:", FS_BIG, FC_GREEN);
-  DrawText(SX + 5*32, SY+(2+2*i+1)*32,
-	   getKeySymName(*customize_step[i].keysym), FS_BIG, FC_BLUE);
+  step_nr = 0;
+  DrawText(SX, SY + (2+2*step_nr)*32,
+	   customize_step[step_nr].text, FS_BIG, FC_RED);
+  DrawText(SX, SY + (2+2*step_nr+1)*32,
+	   "Key:", FS_BIG, FC_RED);
+  DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
+	   getKeySymName(*customize_step[step_nr].keysym), FS_BIG, FC_BLUE);
 
   while(!finished)
   {
@@ -1182,63 +1487,69 @@ void CustomizeKeyboard( /* int player_nr */ )
       XEvent event;
 
       XNextEvent(display, &event);
+
       switch(event.type)
       {
-	case Expose:
-	  HandleExposeEvent((XExposeEvent *) &event);
-	  break;
-	case UnmapNotify:
-	  SleepWhileUnmapped();
-	  break;
-	case KeyPress:
+        case KeyPress:
 	  {
 	    KeySym key = XLookupKeysym((XKeyEvent *)&event,
 				       ((XKeyEvent *)&event)->state);
 
-	    if (key == XK_Escape || (key == XK_Return && i == 6))
+	    if (key == XK_Escape || (key == XK_Return && step_nr == 6))
 	    {
 	      finished = TRUE;
 	      break;
 	    }
 
-	    if (key == XK_Return || i == 6)
+	    if (key == XK_Return || step_nr == 6)
+	      break;
+
+	    /* check if key already used */
+	    for (i=0; i<step_nr; i++)
+	      if (*customize_step[i].keysym == key)
+		break;
+	    if (i < step_nr)
 	      break;
 
 	    /* got new key binding */
-	    *customize_step[i].keysym = key;
-	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+	    *customize_step[step_nr].keysym = key;
+	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
 		     "            ", FS_BIG, FC_YELLOW);
-	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
 		     getKeySymName(key), FS_BIG, FC_YELLOW);
+	    step_nr++;
 
-	    i++;
+	    /* un-highlight last query */
+	    DrawText(SX, SY+(2+2*(step_nr-1))*32,
+		     customize_step[step_nr-1].text, FS_BIG, FC_GREEN);
+	    DrawText(SX, SY+(2+2*(step_nr-1)+1)*32,
+		     "Key:", FS_BIG, FC_GREEN);
 
-	    if (i == 6)
+	    /* query 'Enter' to leave */
+	    if (step_nr == 6)
 	    {
-	      DrawText(SX+16, SY+15*32+16, "Press Enter", FS_BIG, FC_YELLOW);
+	      DrawText(SX + 16, SY + 15*32+16,
+		       "Press Enter", FS_BIG, FC_YELLOW);
 	      break;
 	    }
 
-	    /* ask for next key binding */
-	    DrawText(SX, SY+(2+2*i)*32,
-		     customize_step[i].text, FS_BIG, FC_GREEN);
-	    DrawText(SX, SY+(2+2*i+1)*32, "Key:", FS_BIG, FC_GREEN);
-	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
-		     getKeySymName(*customize_step[i].keysym),
+	    /* query next key binding */
+	    DrawText(SX, SY+(2+2*step_nr)*32,
+		     customize_step[step_nr].text, FS_BIG, FC_RED);
+	    DrawText(SX, SY+(2+2*step_nr+1)*32,
+		     "Key:", FS_BIG, FC_RED);
+	    DrawText(SX + 4*32, SY+(2+2*step_nr+1)*32,
+		     getKeySymName(*customize_step[step_nr].keysym),
 		     FS_BIG, FC_BLUE);
 	  }
 	  break;
-	case KeyRelease:
+
+        case KeyRelease:
 	  key_joystick_mapping = 0;
 	  break;
-	case FocusIn:
-	case FocusOut:
-	  HandleFocusEvent((XFocusChangeEvent *) &event);
-	  break;
-        case ClientMessage:
-	  HandleClientMessageEvent((XClientMessageEvent *) &event);
-	  break;
-	default:
+
+        default:
+	  HandleOtherEvents(&event);
 	  break;
       }
     }
@@ -1324,14 +1635,9 @@ void CalibrateJoystick()
       XEvent event;
 
       XNextEvent(display, &event);
+
       switch(event.type)
       {
-	case Expose:
-	  HandleExposeEvent((XExposeEvent *) &event);
-	  break;
-	case UnmapNotify:
-	  SleepWhileUnmapped();
-	  break;
 	case KeyPress:
 	  switch(XLookupKeysym((XKeyEvent *)&event,
 			       ((XKeyEvent *)&event)->state))
@@ -1340,22 +1646,22 @@ void CalibrateJoystick()
 	      if (check_remaining == 0)
 		result = 1;
 	      break;
+
 	    case XK_Escape:
 	      result = 0;
 	      break;
+
+	    default:
+	      break;
 	  }
 	  break;
+
 	case KeyRelease:
 	  key_joystick_mapping = 0;
 	  break;
-	case FocusIn:
-	case FocusOut:
-	  HandleFocusEvent((XFocusChangeEvent *) &event);
-	  break;
-        case ClientMessage:
-	  HandleClientMessageEvent((XClientMessageEvent *) &event);
-	  break;
+
 	default:
+	  HandleOtherEvents(&event);
 	  break;
       }
     }

@@ -34,31 +34,22 @@ void EventLoop(void)
 
       switch(event.type)
       {
-	case Expose:
-	  HandleExposeEvent((XExposeEvent *) &event);
-	  break;
-	case UnmapNotify:
-	  SleepWhileUnmapped();
-	  break;
 	case ButtonPress:
 	case ButtonRelease:
 	  HandleButtonEvent((XButtonEvent *) &event);
 	  break;
+
 	case MotionNotify:
 	  HandleMotionEvent((XMotionEvent *) &event);
 	  break;
+
 	case KeyPress:
 	case KeyRelease:
 	  HandleKeyEvent((XKeyEvent *) &event);
 	  break;
-	case FocusIn:
-	case FocusOut:
-	  HandleFocusEvent((XFocusChangeEvent *) &event);
-	  break;
-        case ClientMessage:
-	  HandleClientMessageEvent((XClientMessageEvent *) &event);
-	  break;
+
 	default:
+	  HandleOtherEvents(&event);
 	  break;
       }
     }
@@ -99,6 +90,32 @@ void EventLoop(void)
   }
 }
 
+void HandleOtherEvents(XEvent *event)
+{
+  switch(event->type)
+  {
+    case Expose:
+      HandleExposeEvent((XExposeEvent *) event);
+      break;
+
+    case UnmapNotify:
+      SleepWhileUnmapped();
+      break;
+
+    case FocusIn:
+    case FocusOut:
+      HandleFocusEvent((XFocusChangeEvent *) event);
+      break;
+
+    case ClientMessage:
+      HandleClientMessageEvent((XClientMessageEvent *) event);
+      break;
+
+    default:
+      break;
+  }
+}
+
 void ClearEventQueue()
 {
   while(XPending(display))
@@ -109,26 +126,16 @@ void ClearEventQueue()
 
     switch(event.type)
     {
-      case Expose:
-        HandleExposeEvent((XExposeEvent *) &event);
-	break;
-      case UnmapNotify:
-	SleepWhileUnmapped();
-	break;
       case ButtonRelease:
 	button_status = MB_RELEASED;
 	break;
+
       case KeyRelease:
 	key_joystick_mapping = 0;
 	break;
-      case FocusIn:
-      case FocusOut:
-	HandleFocusEvent((XFocusChangeEvent *) &event);
-	break;
-      case ClientMessage:
-	HandleClientMessageEvent((XClientMessageEvent *) &event);
-	break;
+
       default:
+	HandleOtherEvents(&event);
 	break;
     }
   }
@@ -148,22 +155,27 @@ void SleepWhileUnmapped()
 
     switch(event.type)
     {
-      case Expose:
-        HandleExposeEvent((XExposeEvent *) &event);
-	break;
       case ButtonRelease:
 	button_status = MB_RELEASED;
 	break;
+
       case KeyRelease:
 	key_joystick_mapping = 0;
 	break;
+
       case MapNotify:
 	window_unmapped = FALSE;
 	break;
-      case ClientMessage:
-	HandleClientMessageEvent((XClientMessageEvent *) &event);
+
+      case UnmapNotify:
+	/* this is only to surely prevent the 'should not happen' case
+	 * of recursively looping between 'SleepWhileUnmapped()' and
+	 * 'HandleOtherEvents()' which usually calls this funtion.
+	 */
 	break;
+
       default:
+	HandleOtherEvents(&event);
 	break;
     }
   }
@@ -313,24 +325,35 @@ void HandleButton(int mx, int my, int button)
     case MAINMENU:
       HandleMainMenu(mx,my,0,0,button);
       break;
+
     case TYPENAME:
       HandleTypeName(0,XK_Return);
       break;
+
     case CHOOSELEVEL:
       HandleChooseLevel(mx,my,0,0,button);
       break;
+
     case HALLOFFAME:
       HandleHallOfFame(button);
       break;
+
     case LEVELED:
       LevelEd(mx,my,button);
       break;
+
     case HELPSCREEN:
       HandleHelpScreen(button);
       break;
+
     case SETUP:
       HandleSetupScreen(mx,my,0,0,button);
       break;
+
+    case SETUPINPUT:
+      HandleSetupInputScreen(mx,my,0,0,button);
+      break;
+
     case PLAYING:
 
       /* --> NoXEvent() will follow */
@@ -340,6 +363,7 @@ void HandleButton(int mx, int my, int button)
       */
 
       break;
+
     default:
       break;
   }
@@ -364,6 +388,7 @@ void HandleKey(KeySym key, int key_status)
     case XK_j:
       joy |= JOY_LEFT;
       break;
+
     case XK_Right:
 #ifdef XK_KP_Right
     case XK_KP_Right:
@@ -375,6 +400,7 @@ void HandleKey(KeySym key, int key_status)
     case XK_k:
       joy |= JOY_RIGHT;
       break;
+
     case XK_Up:
 #ifdef XK_KP_Up
     case XK_KP_Up:
@@ -386,6 +412,7 @@ void HandleKey(KeySym key, int key_status)
     case XK_i:
       joy |= JOY_UP;
       break;
+
     case XK_Down:
 #ifdef XK_KP_Down
     case XK_KP_Down:
@@ -397,54 +424,63 @@ void HandleKey(KeySym key, int key_status)
     case XK_m:
       joy |= JOY_DOWN;
       break;
+
 #ifdef XK_KP_Home
     case XK_KP_Home:		/* Diagonalrichtungen */
 #endif
     case XK_KP_7:
       joy |= JOY_UP | JOY_LEFT;
       break;
+
 #ifdef XK_KP_Page_Up
     case XK_KP_Page_Up:
 #endif
     case XK_KP_9:
       joy = JOY_UP | JOY_RIGHT;
       break;
+
 #ifdef XK_KP_End
     case XK_KP_End:
 #endif
     case XK_KP_1:
       joy |= JOY_DOWN | JOY_LEFT;
       break;
+
 #ifdef XK_KP_Page_Down
     case XK_KP_Page_Down:
 #endif
     case XK_KP_3:
       joy |= JOY_DOWN | JOY_RIGHT;
       break;
+
 #ifndef MSDOS
     case XK_S:			/* Feld entfernen */
 #endif
     case XK_s:
       joy |= JOY_BUTTON_1 | JOY_LEFT;
       break;
+
 #ifndef MSDOS
     case XK_D:
 #endif
     case XK_d:
       joy |= JOY_BUTTON_1 | JOY_RIGHT;
       break;
+
 #ifndef MSDOS
     case XK_E:
 #endif
     case XK_e:
       joy |= JOY_BUTTON_1 | JOY_UP;
       break;
+
 #ifndef MSDOS
     case XK_X:
 #endif
     case XK_x:
       joy |= JOY_BUTTON_1 | JOY_DOWN;
       break;
+
     case XK_Shift_L:		/* Linker Feuerknopf */
 #ifndef MSDOS
     case XK_Control_L:
@@ -453,6 +489,7 @@ void HandleKey(KeySym key, int key_status)
 #endif
       joy |= JOY_BUTTON_1;
       break;
+
     case XK_Shift_R:		/* Rechter Feuerknopf */
 #ifndef MSDOS
     case XK_Control_R:
@@ -465,6 +502,7 @@ void HandleKey(KeySym key, int key_status)
     case XK_b:
       joy |= JOY_BUTTON_2;
       break;
+
     default:
       break;
   }
@@ -509,10 +547,11 @@ void HandleKey(KeySym key, int key_status)
     case TYPENAME:
       HandleTypeName(0,key);
       break;
+
     case MAINMENU:
     case CHOOSELEVEL:
     case SETUP:
-    {
+    case SETUPINPUT:
       switch(key)
       {
 	case XK_Return:
@@ -522,15 +561,19 @@ void HandleKey(KeySym key, int key_status)
             HandleChooseLevel(0,0,0,0,MB_MENU_CHOICE);
 	  else if (game_status==SETUP)
 	    HandleSetupScreen(0,0,0,0,MB_MENU_CHOICE);
+	  else if (game_status==SETUPINPUT)
+	    HandleSetupInputScreen(0,0,0,0,MB_MENU_CHOICE);
 	  break;
+
 	default:
 	  break;
       }
       break;
-    }
+
     case HELPSCREEN:
       HandleHelpScreen(MB_RELEASED);
       break;
+
     case HALLOFFAME:
       switch(key)
       {
@@ -539,13 +582,16 @@ void HandleKey(KeySym key, int key_status)
 	  DrawMainMenu();
 	  BackToFront();
 	  break;
+
 	default:
 	  break;
       }
       break;
+
     case LEVELED:
       LevelNameTyping(key);
       break;
+
     case PLAYING:
     {
       switch(key)
@@ -582,14 +628,17 @@ void HandleKey(KeySym key, int key_status)
 	  ScrollStepSize = TILEX/8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
 	  break;
+
 	case XK_g:
 	  ScrollStepSize = TILEX/4;
 	  printf("ScrollStepSize == %d (1/4)\n", ScrollStepSize);
 	  break;
+
 	case XK_h:
 	  ScrollStepSize = TILEX/2;
 	  printf("ScrollStepSize == %d (1/2)\n", ScrollStepSize);
 	  break;
+
 	case XK_l:
 	  ScrollStepSize = TILEX;
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
@@ -736,8 +785,10 @@ void HandleNoXEvent()
     case HALLOFFAME:
     case HELPSCREEN:
     case SETUP:
+    case SETUPINPUT:
       HandleJoystick();
       break;
+
     case PLAYING:
       HandleJoystick();
 
@@ -746,6 +797,7 @@ void HandleNoXEvent()
       */
 
       break;
+
     default:
       break;
   }
@@ -770,6 +822,7 @@ void HandleJoystick()
     case MAINMENU:
     case CHOOSELEVEL:
     case SETUP:
+    case SETUPINPUT:
     {
       static long joystickmove_delay = 0;
 
@@ -782,6 +835,9 @@ void HandleJoystick()
         HandleChooseLevel(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status==SETUP)
 	HandleSetupScreen(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
+      else if (game_status==SETUPINPUT)
+	HandleSetupInputScreen(0,0,dx,dy,
+			       newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       break;
     }
 

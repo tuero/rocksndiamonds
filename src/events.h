@@ -17,6 +17,7 @@
 #include "main.h"
 
 void EventLoop(void);
+void HandleOtherEvents(XEvent *);
 void ClearEventQueue(void);
 void SleepWhileUnmapped(void);
 

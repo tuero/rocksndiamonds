@@ -19,7 +19,13 @@
 /* for DrawSetupScreen(), HandleSetupScreen() */
 #define SETUP_SCREEN_POS_START		2
 #define SETUP_SCREEN_POS_END		16
-#define SETUP_SCREEN_POS_EMPTY		(SETUP_SCREEN_POS_END - 2)
+#define SETUP_SCREEN_POS_EMPTY1		(SETUP_SCREEN_POS_END - 3)
+#define SETUP_SCREEN_POS_EMPTY2		(SETUP_SCREEN_POS_END - 2)
+
+#define SETUPINPUT_SCREEN_POS_START	2
+#define SETUPINPUT_SCREEN_POS_END	15
+#define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
+#define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
 void DrawHeadline(void);
 void DrawMainMenu(void);
@@ -37,6 +43,8 @@ void DrawHallOfFame(int);
 void HandleHallOfFame(int);
 void DrawSetupScreen(void);
 void HandleSetupScreen(int, int, int, int, int);
+void DrawSetupInputScreen(void);
+void HandleSetupInputScreen(int, int, int, int, int);
 void CustomizeKeyboard(void);
 void CalibrateJoystick(void);
 void HandleGameActions(byte);

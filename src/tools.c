@@ -1388,14 +1388,9 @@ boolean Request(char *text, unsigned int req_state)
       XEvent event;
 
       XNextEvent(display, &event);
+
       switch(event.type)
       {
-	case Expose:
-	  HandleExposeEvent((XExposeEvent *) &event);
-	  break;
-	case UnmapNotify:
-	  SleepWhileUnmapped();
-	  break;
 	case ButtonPress:
 	case ButtonRelease:
 	case MotionNotify:
@@ -1437,6 +1432,7 @@ boolean Request(char *text, unsigned int req_state)
 	    case BUTTON_CONFIRM:
 	      result = TRUE | FALSE;
 	      break;
+
 	    case BUTTON_PLAYER_1:
 	      result = 1;
 	      break;
@@ -1449,11 +1445,13 @@ boolean Request(char *text, unsigned int req_state)
 	    case BUTTON_PLAYER_4:
 	      result = 4;
 	      break;
+
 	    default:
 	      break;
 	  }
 	  break;
 	}
+
 	case KeyPress:
 	  switch(XLookupKeysym((XKeyEvent *)&event,
 			       ((XKeyEvent *)&event)->state))
@@ -1461,24 +1459,24 @@ boolean Request(char *text, unsigned int req_state)
 	    case XK_Return:
 	      result = 1;
 	      break;
+
 	    case XK_Escape:
 	      result = 0;
+	      break;
+
+	    default:
 	      break;
 	  }
 	  if (req_state & REQ_PLAYER)
 	    result = 0;
 	  break;
+
 	case KeyRelease:
 	  key_joystick_mapping = 0;
 	  break;
-	case FocusIn:
-	case FocusOut:
-	  HandleFocusEvent((XFocusChangeEvent *) &event);
-	  break;
-        case ClientMessage:
-	  HandleClientMessageEvent((XClientMessageEvent *) &event);
-	  break;
+
 	default:
+	  HandleOtherEvents(&event);
 	  break;
       }
     }
