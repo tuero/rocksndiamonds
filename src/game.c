@@ -1525,9 +1525,16 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if ((IS_INDESTRUCTIBLE(element) && !IS_ACCESSIBLE(element)) ||
+#if 1
+      if ((IS_INDESTRUCTIBLE(element) &&
+	   (game.engine_version < VERSION_IDENT(2,2,0) ||
+	    (!IS_WALKABLE_OVER(element) && !IS_WALKABLE_UNDER(element)))) ||
 	  element == EL_FLAMES)
 	continue;
+#else
+      if (IS_INDESTRUCTIBLE(element) || element == EL_FLAMES)
+        continue;
+#endif
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
       {
@@ -1547,6 +1554,11 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 1
       if (IS_INDESTRUCTIBLE(Store[x][y]))	/* hard element under bomb */
 	element = Store[x][y];
+#endif
+
+#if 0
+      if (!IS_INDESTRUCTIBLE(Store[x][y]) != !IS_PFORTE(Store[x][y]))
+	printf("\n::: %d\n", Store[x][y]);
 #endif
 
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
@@ -1602,13 +1614,22 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
 #if 1
-      else if (IS_INDESTRUCTIBLE(element))
+      else if (IS_INDESTRUCTIBLE(element) && IS_ACCESSIBLE(element))
+	Store[x][y] = element;
+      else
+	Store[x][y] = EL_EMPTY;
+#else
+
+#if 1
+      else if (IS_PFORTE(element))
 	Store[x][y] = element;
       else
 	Store[x][y] = EL_EMPTY;
 #else
       else if (!IS_PFORTE(Store[x][y]))
 	Store[x][y] = EL_EMPTY;
+#endif
+
 #endif
 
       if (x != ex || y != ey ||
@@ -1700,17 +1721,17 @@ void Explode(int ex, int ey, int phase, int mode)
       DrawLevelFieldCrumbledSand(x, y);
 
 #if 1
-    if (IS_ACCESSIBLE_OVER(Store[x][y]))
+    if (IS_WALKABLE_OVER(Store[x][y]))
     {
       DrawLevelElement(x, y, Store[x][y]);
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
     }
-    else if (IS_ACCESSIBLE_UNDER(Store[x][y]))
+    else if (IS_WALKABLE_UNDER(Store[x][y]))
     {
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
       DrawLevelElementThruMask(x, y, Store[x][y]);
     }
-    else if (!IS_ACCESSIBLE_INSIDE(Store[x][y]))
+    else
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
 #else
     if (IS_PFORTE(Store[x][y]))
@@ -5633,6 +5654,8 @@ void KillHero(struct PlayerInfo *player)
     return;
 
 #if 1
+  /* remove accessible field at the player's position */
+  Feld[jx][jy] = EL_EMPTY;
 #else
   if (IS_PFORTE(Feld[jx][jy]))
     Feld[jx][jy] = EL_EMPTY;

@@ -3772,7 +3772,8 @@ static void DrawPropertiesInfo()
 
 static void DrawPropertiesAdvanced()
 {
-  DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY, "Coming soon!", FONT_TEXT_1);
+  DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY,
+	   "Under construction! :-)", FONT_TEXT_1);
 }
 
 static void DrawPropertiesWindow()
