@@ -249,7 +249,7 @@ void RemapAllGadgets();
 boolean anyTextGadgetActive();
 void ClickOnGadget(struct GadgetInfo *, int);
 
-void HandleGadgets(int, int, int);
-void HandleGadgetsKeyInput(Key);
+boolean HandleGadgets(int, int, int);
+boolean HandleGadgetsKeyInput(Key);
 
 #endif	/* GADGETS_H */

@@ -16,34 +16,23 @@
 
 #include "main.h"
 
-/* (randomly chosen) values for HandleChooseTree() */
+/* (arbitrary, but unique) values for HandleChooseTree() */
 #define SCROLL_LINE	(1 * SCR_FIELDY)
 #define SCROLL_PAGE	(2 * SCR_FIELDY)
 
 
-void DrawHeadline(void);
-
 void DrawMainMenu(void);
-void HandleMainMenu(int, int, int, int, int);
-
-void HandleInfoScreen(int);
-
-void HandleTypeName(int, Key);
-
-void DrawChooseLevel(void);
-void HandleChooseLevel(int, int, int, int, int);
-
 void DrawHallOfFame(int);
+
+void HandleMainMenu(int, int, int, int, int);
+void HandleChooseLevel(int, int, int, int, int);
 void HandleHallOfFame(int, int, int, int, int);
-
-void DrawSetupScreen(void);
+void HandleInfoScreen(int, int, int, int, int);
 void HandleSetupScreen(int, int, int, int, int);
-
+void HandleTypeName(int, Key);
 void HandleGameActions(void);
 
 void CreateScreenGadgets();
 void FreeScreenGadgets();
-void MapChooseTreeGadgets(TreeInfo *);
-void UnmapChooseTreeGadgets();
 
 #endif	/* SCREENS_H */

@@ -8734,14 +8734,10 @@ static void StopLevelSoundActionIfLoop(int x, int y, int action)
 
 static void PlayLevelMusic()
 {
-#if 1
   if (levelset.music[level_nr] != MUS_UNDEFINED)
     PlayMusic(levelset.music[level_nr]);	/* from config file */
   else
-    PlayMusic(-(level_nr + 1));			/* from music dir */
-#else
-  PlayMusic(level_nr);
-#endif
+    PlayMusic(MAP_NOCONF_MUSIC(level_nr));	/* from music dir */
 }
 
 void RaiseScore(int value)

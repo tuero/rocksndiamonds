@@ -46,12 +46,13 @@
 #define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
 /* screens on the info screen */
-#define INFO_MODE_ELEMENTS		0
-#define INFO_MODE_MUSIC			1
-#define INFO_MODE_CREDITS		2
-#define INFO_MODE_PROGRAM		3
+#define INFO_MODE_MAIN			0
+#define INFO_MODE_ELEMENTS		1
+#define INFO_MODE_MUSIC			2
+#define INFO_MODE_CREDITS		3
+#define INFO_MODE_PROGRAM		4
 
-#define MAX_INFO_MODES			4
+#define MAX_INFO_MODES			5
 
 /* for various menu stuff  */
 #define MAX_INFO_ELEMENTS_ON_SCREEN	10
@@ -77,21 +78,23 @@ static void CalibrateJoystick(int);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
-static void DrawInfoScreenDemoAnim(int, boolean);
-static void DrawInfoScreenDemoText(int, int, int, int);
-static void DrawInfoScreenMusicText(int);
-static void DrawInfoScreenCreditsText(void);
+static void DrawChooseLevel(void);
 static void DrawInfoScreen(void);
+static void DrawSetupScreen(void);
+
+static void DrawInfoScreen_HelpAnim(int, int, boolean);
+static void DrawInfoScreen_HelpText(int, int, int, int);
+static void HandleInfoScreen_Main(int, int, int, int, int);
+static void HandleInfoScreen_Elements(int);
+static void HandleInfoScreen_Music(int);
+static void HandleInfoScreen_Credits(int);
+static void HandleInfoScreen_Program(int);
+
+static void MapChooseTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
-
-static long infoscreen_state;
-static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
-static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
-static int num_infoscreen_elements;
-static int num_infoscreen_music;
-static int infoscreen_musicpos;
+static int info_mode = INFO_MODE_MAIN;
 
 #define mSX (SX + (game_status >= GAME_MODE_MAIN &&	\
 		   game_status <= GAME_MODE_SETUP ?	\
@@ -329,7 +332,8 @@ void DrawMainMenu()
 
   FadeToFront();
   InitAnimation();
-  HandleMainMenu(0,0, 0,0, MB_MENU_INITIALIZE);
+
+  HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
   TapeStop();
   if (TAPE_IS_EMPTY(tape))
@@ -340,10 +344,6 @@ void DrawMainMenu()
   PlayMenuMusic();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
-
-#if 0
-  ClearEventQueue();
-#endif
 }
 
 static void gotoTopLevelDir()
@@ -439,7 +439,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       DelayReached(&level_delay, 0);	/* reset delay counter */
     }
   }
-  else if (x == 0 && y >= 0 && y <= 7)
+  else if (IN_GFX_SCREEN(mx, my) &&
+	   y >= 0 && y <= 7 && (y != 1 || x < 10))
   {
     if (button)
     {
@@ -486,6 +487,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y == 4)
       {
 	game_status = GAME_MODE_INFO;
+	info_mode = INFO_MODE_MAIN;
 	DrawInfoScreen();
       }
       else if (y == 5)
@@ -525,13 +527,185 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
     DoAnimation();
   }
-
-  BackToFront();
 }
 
-void DrawInfoScreenDemoAnim(int start, boolean init)
+
+/* ========================================================================= */
+/* info screen functions                                                     */
+/* ========================================================================= */
+
+static struct TokenInfo *info_info;
+static int num_info_info;
+
+static void execInfoElements()
 {
-  int i = 0, j = 0;
+  info_mode = INFO_MODE_ELEMENTS;
+  DrawInfoScreen();
+}
+
+static void execInfoMusic()
+{
+  info_mode = INFO_MODE_MUSIC;
+  DrawInfoScreen();
+}
+
+static void execInfoCredits()
+{
+  info_mode = INFO_MODE_CREDITS;
+  DrawInfoScreen();
+}
+
+static void execInfoProgram()
+{
+  info_mode = INFO_MODE_PROGRAM;
+  DrawInfoScreen();
+}
+
+static void execExitInfo()
+{
+  game_status = GAME_MODE_MAIN;
+  DrawMainMenu();
+}
+
+static struct TokenInfo info_info_main[] =
+{
+  { TYPE_ENTER_SCREEN,	execInfoElements,	"Elements Info"		},
+  { TYPE_ENTER_SCREEN,	execInfoMusic,		"Music Info"		},
+  { TYPE_ENTER_SCREEN,	execInfoCredits,	"Credits"		},
+  { TYPE_ENTER_SCREEN,	execInfoProgram,	"Program Info"		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execExitInfo, 		"Exit"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static void DrawInfoScreen_Main()
+{
+  int i;
+
+  UnmapAllGadgets();
+  CloseDoor(DOOR_CLOSE_2);
+
+  ClearWindow();
+
+  DrawText(mSX + 16, mSY + 16, "Info Screen", FONT_TITLE_1);
+
+  info_info = info_info_main;
+  num_info_info = 0;
+
+  for (i = 0; info_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
+  {
+    int ypos = MENU_SCREEN_START_YPOS + i;
+    int font_nr = FONT_MENU_1;
+
+    DrawText(mSX + 32, mSY + ypos * 32, info_info[i].text, font_nr);
+
+    if (info_info[i].type & TYPE_ENTER_MENU)
+      initCursor(i, IMG_MENU_BUTTON_RIGHT);
+    else if (info_info[i].type & TYPE_LEAVE_MENU)
+      initCursor(i, IMG_MENU_BUTTON_LEFT);
+    else if (info_info[i].type & ~TYPE_SKIP_ENTRY)
+      initCursor(i, IMG_MENU_BUTTON);
+
+    num_info_info++;
+  }
+
+  FadeToFront();
+  InitAnimation();
+
+  PlayMenuSound();
+  PlayMenuMusic();
+
+  HandleInfoScreen_Main(0, 0, 0, 0, MB_MENU_INITIALIZE);
+}
+
+void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
+{
+  static int choice_store[MAX_INFO_MODES];
+  int choice = choice_store[info_mode];		/* always starts with 0 */
+  int x = 0;
+  int y = choice;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    /* advance to first valid menu entry */
+    while (choice < num_info_info &&
+	   info_info[choice].type & TYPE_SKIP_ENTRY)
+      choice++;
+    choice_store[info_mode] = choice;
+
+    drawCursor(choice, FC_RED);
+    return;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    for (y = 0; y < num_info_info; y++)
+    {
+      if (info_info[y].type & TYPE_LEAVE_MENU)
+      {
+	void (*menu_callback_function)(void) = info_info[y].value;
+
+	menu_callback_function();
+	break;	/* absolutely needed because function changes 'info_info'! */
+      }
+    }
+
+    return;
+  }
+
+  if (mx || my)		/* mouse input */
+  {
+    x = (mx - mSX) / 32;
+    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
+    if (dx)
+    {
+      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
+
+      if (info_info[choice].type & menu_navigation_type ||
+	  info_info[choice].type & TYPE_ENTER_SCREEN ||
+	  info_info[choice].type & TYPE_BOOLEAN_STYLE)
+	button = MB_MENU_CHOICE;
+    }
+    else if (dy)
+      y = choice + dy;
+
+    /* jump to next non-empty menu entry (up or down) */
+    while (y > 0 && y < num_info_info - 1 &&
+	   info_info[y].type & TYPE_SKIP_ENTRY)
+      y += dy;
+  }
+
+  if (IN_GFX_SCREEN(mx, my) &&
+      y >= 0 && y < num_info_info && info_info[y].type & ~TYPE_SKIP_ENTRY)
+  {
+    if (button)
+    {
+      if (y != choice)
+      {
+	drawCursor(y, FC_RED);
+	drawCursor(choice, FC_BLUE);
+	choice = choice_store[info_mode] = y;
+      }
+    }
+    else if (!(info_info[y].type & TYPE_GHOSTED))
+    {
+      if (info_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
+      {
+	void (*menu_callback_function)(void) = info_info[choice].value;
+
+	menu_callback_function();
+      }
+    }
+  }
+}
+
+void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
+{
+  static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
+  static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
   int xstart = mSX + 16;
   int ystart = mSY + 64 + 2 * 32;
   int ystep = TILEY + 4;
@@ -539,9 +713,13 @@ void DrawInfoScreenDemoAnim(int start, boolean init)
   int graphic;
   int delay;
   int sync_frame;
+  int i, j;
 
   if (init)
   {
+    for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+      infoscreen_step[i] = infoscreen_frame[i] = 0;
+
     SetMainBackgroundImage(IMG_BACKGROUND_INFO);
     ClearWindow();
     DrawHeadline();
@@ -550,12 +728,15 @@ void DrawInfoScreenDemoAnim(int start, boolean init)
 
     DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		      "Press any key or button for next page");
+
+    FrameCounter = 0;
   }
 
+  i = j = 0;
   while (helpanim_info[j].element != HELPANIM_LIST_END)
   {
     if (i >= start + MAX_INFO_ELEMENTS_ON_SCREEN ||
-	i >= num_infoscreen_elements)
+	i >= max_anims)
       break;
     else if (i < start)
     {
@@ -620,7 +801,7 @@ void DrawInfoScreenDemoAnim(int start, boolean init)
 			    graphic, sync_frame, USE_MASKING);
 
     if (init)
-      DrawInfoScreenDemoText(element, action, direction, i - start);
+      DrawInfoScreen_HelpText(element, action, direction, i - start);
 
     i++;
   }
@@ -630,7 +811,7 @@ void DrawInfoScreenDemoAnim(int start, boolean init)
   FrameCounter++;
 }
 
-void DrawInfoScreenDemoText(int element, int action, int direction, int ypos)
+void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
   int font_nr = FONT_TEXT_2;
   int max_chars_per_line = 34;
@@ -640,10 +821,12 @@ void DrawInfoScreenDemoText(int element, int action, int direction, int ypos)
   int ystep = TILEY + 4;
   char *text;
 
+  /* 1st try: get text for base element */
   text = getHashEntry(helptext_info, element_info[element].token_name);
 
   if (text == NULL)
   {
+    /* 2nd try: get text for element/action/direction */
     char token[MAX_LINE_LEN];
 
     strcpy(token, element_info[element].token_name);
@@ -660,51 +843,172 @@ void DrawInfoScreenDemoText(int element, int action, int direction, int ypos)
       text = "No description available";
   }
 
-  if (strlen(text) <= max_chars_per_line)
+  if (strlen(text) <= max_chars_per_line)	/* only one line of text */
     sy += getFontHeight(font_nr) / 2;
 
   DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
 		  max_chars_per_line, max_lines_per_text);
 }
 
-void DrawInfoScreenMusicText(int num)
+void DrawInfoScreen_Elements()
 {
-  struct MusicFileInfo *list = music_file_info;
-  int ystart = 150, ystep = 30;
-  int ybottom = SYSIZE - 20;
+  LoadHelpAnimInfo();
+  LoadHelpTextInfo();
+
+  HandleInfoScreen_Elements(MB_MENU_INITIALIZE);
+
+  FadeToFront();
+  InitAnimation();
+}
+
+void HandleInfoScreen_Elements(int button)
+{
+  static unsigned long info_delay = 0;
+  static int num_anims;
+  static int num_pages;
+  static int page;
+  int anims_per_page = MAX_INFO_ELEMENTS_ON_SCREEN;
+  int button_released = !button;
   int i;
 
-  for (i=0; i < num && list; i++)
-    list = list->next;
+  if (button == MB_MENU_INITIALIZE)
+  {
+    boolean new_element = TRUE;
 
-  FadeSoundsAndMusic();
+    num_anims = 0;
+    for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
+    {
+      if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
+	new_element = TRUE;
+      else if (new_element)
+      {
+	num_anims++;
+	new_element = FALSE;
+      }
+    }
+
+    num_pages = (num_anims + anims_per_page - 1) / anims_per_page;
+    page = 0;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
+
+  if (button_released || button == MB_MENU_INITIALIZE)
+  {
+    if (button != MB_MENU_INITIALIZE)
+      page++;
+
+    if (page >= num_pages)
+    {
+      FadeSoundsAndMusic();
+
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreen();
+
+      return;
+    }
+
+    DrawInfoScreen_HelpAnim(page * anims_per_page, num_anims, TRUE);
+  }
+  else
+  {
+    if (DelayReached(&info_delay, GAME_FRAME_DELAY))
+      if (page < num_pages)
+	DrawInfoScreen_HelpAnim(page * anims_per_page, num_anims, FALSE);
+
+    PlayMenuSoundIfLoop();
+  }
+}
+
+void DrawInfoScreen_Music()
+{
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "The game background music loops:");
+  LoadMusicInfo();
 
-  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
-  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
-  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
-  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
-  DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
-  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
-
-  DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for next page");
-
-  /* !!! add playing music !!! */
-#if 0
-  PlaySoundLoop(background_loop[num]);
-#endif
+  HandleInfoScreen_Music(MB_MENU_INITIALIZE);
 }
 
-void DrawInfoScreenCreditsText()
+void HandleInfoScreen_Music(int button)
+{
+  static struct MusicFileInfo *list = NULL;
+  int ystart = 150, ystep = 30;
+  int ybottom = SYSIZE - 20;
+  int button_released = !button;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    list = music_file_info;
+
+    if (list == NULL)
+    {
+      FadeSoundsAndMusic();
+
+      ClearWindow();
+      DrawHeadline();
+
+      DrawTextSCentered(100, FONT_TEXT_1, "No music info for this level set.");
+
+      DrawTextSCentered(ybottom, FONT_TEXT_4,
+			"Press any key or button for info menu");
+
+      return;
+    }
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
+
+  if (button_released || button == MB_MENU_INITIALIZE)
+  {
+    if (list == NULL)
+    {
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreen();
+
+      return;
+    }
+
+    FadeSoundsAndMusic();
+
+    ClearWindow();
+    DrawHeadline();
+
+    DrawTextSCentered(100, FONT_TEXT_1, "The game background music:");
+
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
+    DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
+    DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
+    DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
+
+    DrawTextSCentered(ybottom, FONT_TEXT_4,
+		      "Press any key or button for next page");
+
+    PlayMusic(list->music);
+
+    list = list->next;
+  }
+}
+
+void DrawInfoScreen_Credits()
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
 
   FadeSoundsAndMusic();
+
   ClearWindow();
   DrawHeadline();
 
@@ -718,10 +1022,35 @@ void DrawInfoScreenCreditsText()
   DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2, "of new levels!");
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for next page");
+		    "Press any key or button for info menu");
 }
 
-void DrawInfoScreenContactText()
+void HandleInfoScreen_Credits(int button)
+{
+  int button_released = !button;
+
+  if (button == MB_MENU_LEAVE)
+  {
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
+
+  if (button_released)
+  {
+    FadeSoundsAndMusic();
+
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+  }
+  else
+  {
+    PlayMenuSoundIfLoop();
+  }
+}
+
+void DrawInfoScreen_Program()
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
@@ -756,154 +1085,76 @@ void DrawInfoScreenContactText()
 		    ":-)");
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for main menu");
+		    "Press any key or button for info menu");
 }
 
-#if 1
-void DrawInfoScreen()
+void HandleInfoScreen_Program(int button)
 {
-  struct MusicFileInfo *list;
-  int i;
-
-  UnmapAllGadgets();
-  CloseDoor(DOOR_CLOSE_2);
-
-  for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
-    infoscreen_step[i] = infoscreen_frame[i] = 0;
-  infoscreen_musicpos = 0;
-  infoscreen_state = 0;
-
-  LoadHelpAnimInfo();
-  LoadHelpTextInfo();
-  LoadMusicInfo();
-
-  num_infoscreen_elements = 0;
-  for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
-    if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
-      num_infoscreen_elements++;
-
-  num_infoscreen_music = 0;
-  for (list = music_file_info; list != NULL; list = list->next)
-    num_infoscreen_music++;
-
-  DrawInfoScreenDemoAnim(0, TRUE);
-#if 0
-  DrawInfoScreenDemoText(0);
-#endif
-
-  FadeToFront();
-  InitAnimation();
-
-  PlayMenuSound();
-  PlayMenuMusic();
-}
-
-#else
-
-void DrawInfoScreen()
-{
-  struct MusicFileInfo *list;
-  int i;
-
-  UnmapAllGadgets();
-  CloseDoor(DOOR_CLOSE_2);
-
-  for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
-    infoscreen_step[i] = infoscreen_frame[i] = 0;
-  infoscreen_musicpos = 0;
-  infoscreen_state = 0;
-
-  LoadHelpAnimInfo();
-  LoadHelpTextInfo();
-  LoadMusicInfo();
-
-  num_infoscreen_elements = 0;
-  for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
-    if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
-      num_infoscreen_elements++;
-
-  num_infoscreen_music = 0;
-  for (list = music_file_info; list != NULL; list = list->next)
-    num_infoscreen_music++;
-
-  DrawInfoScreenDemoAnim(0, TRUE);
-#if 0
-  DrawInfoScreenDemoText(0);
-#endif
-
-  FadeToFront();
-  InitAnimation();
-
-  PlayMenuSound();
-  PlayMenuMusic();
-}
-#endif
-
-void HandleInfoScreen(int button)
-{
-  static unsigned long hs_delay = 0;
-  int num_infoscreen_element_pages =
-    (num_infoscreen_elements + MAX_INFO_ELEMENTS_ON_SCREEN - 1)
-    / MAX_INFO_ELEMENTS_ON_SCREEN;
   int button_released = !button;
-  int i;
+
+  if (button == MB_MENU_LEAVE)
+  {
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
 
   if (button_released)
   {
-    if (infoscreen_state < num_infoscreen_element_pages - 1)
-    {
-      for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
-	infoscreen_step[i] = infoscreen_frame[i] = 0;
-      infoscreen_state++;
+    FadeSoundsAndMusic();
 
-      FrameCounter = 0;
-      DrawInfoScreenDemoAnim(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN,
-			     TRUE);
-#if 0
-      DrawInfoScreenDemoText(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN);
-#endif
-    }
-    else if (infoscreen_state <
-	     num_infoscreen_element_pages + num_infoscreen_music - 1)
-    {
-      infoscreen_state++;
-      DrawInfoScreenMusicText(infoscreen_state - num_infoscreen_element_pages);
-    }
-    else if (infoscreen_state ==
-	     num_infoscreen_element_pages + num_infoscreen_music - 1)
-    {
-      infoscreen_state++;
-      DrawInfoScreenCreditsText();
-    }
-    else if (infoscreen_state ==
-	     num_infoscreen_element_pages + num_infoscreen_music)
-    {
-      infoscreen_state++;
-      DrawInfoScreenContactText();
-    }
-    else
-    {
-      FadeSoundsAndMusic();
-
-      game_status = GAME_MODE_MAIN;
-      DrawMainMenu();
-    }
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
   }
   else
   {
-    if (DelayReached(&hs_delay, GAME_FRAME_DELAY))
-    {
-      if (infoscreen_state < num_infoscreen_element_pages)
-	DrawInfoScreenDemoAnim(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN,
-			       FALSE);
-    }
-
     PlayMenuSoundIfLoop();
   }
+}
+
+void DrawInfoScreen()
+{
+  SetMainBackgroundImage(IMG_BACKGROUND_INFO);
+
+  if (info_mode == INFO_MODE_ELEMENTS)
+    DrawInfoScreen_Elements();
+  else if (info_mode == INFO_MODE_MUSIC)
+    DrawInfoScreen_Music();
+  else if (info_mode == INFO_MODE_CREDITS)
+    DrawInfoScreen_Credits();
+  else if (info_mode == INFO_MODE_PROGRAM)
+    DrawInfoScreen_Program();
+  else
+    DrawInfoScreen_Main();
+
+  if (info_mode != INFO_MODE_MUSIC)
+  {
+    PlayMenuSound();
+    PlayMenuMusic();
+  }
+}
+
+void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
+{
+  if (info_mode == INFO_MODE_ELEMENTS)
+    HandleInfoScreen_Elements(button);
+  else if (info_mode == INFO_MODE_MUSIC)
+    HandleInfoScreen_Music(button);
+  else if (info_mode == INFO_MODE_CREDITS)
+    HandleInfoScreen_Credits(button);
+  else if (info_mode == INFO_MODE_PROGRAM)
+    HandleInfoScreen_Program(button);
+  else
+    HandleInfoScreen_Main(mx, my, dx, dy, button);
 
   DoAnimation();
-  BackToFront();
 }
+
+
+/* ========================================================================= */
+/* type name functions                                                       */
+/* ========================================================================= */
 
 void HandleTypeName(int newxpos, Key key)
 {
@@ -956,9 +1207,12 @@ void HandleTypeName(int newxpos, Key key)
     SaveSetup();
     game_status = GAME_MODE_MAIN;
   }
-
-  BackToFront();
 }
+
+
+/* ========================================================================= */
+/* tree menu functions                                                       */
+/* ========================================================================= */
 
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
@@ -971,7 +1225,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   ClearWindow();
 
-  HandleChooseTree(0,0, 0,0, MB_MENU_INITIALIZE, ti_ptr);
+  HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapChooseTreeGadgets(*ti_ptr);
 
   FadeToFront();
@@ -1243,7 +1497,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     return;
   }
 
-  if (x == 0 && y >= 0 && y < num_page_entries)
+  if (IN_GFX_SCREEN(mx, my) &&
+      mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
+      y >= 0 && y < num_page_entries)
   {
     if (button)
     {
@@ -1302,13 +1558,6 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       }
     }
   }
-
-#if 0
-  if (game_status == GAME_MODE_LEVELS || game_status == GAME_MODE_SETUP)
-    DoAnimation();
-
-  BackToFront();
-#endif
 }
 
 void DrawChooseLevel()
@@ -1326,7 +1575,6 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 
   DoAnimation();
-  BackToFront();
 }
 
 void DrawHallOfFame(int highlight_position)
@@ -1341,10 +1589,10 @@ void DrawHallOfFame(int highlight_position)
   FadeToFront();
   InitAnimation();
 
-  HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
-
   PlayMenuSound();
   PlayMenuMusic();
+
+  HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -1433,7 +1681,6 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     PlayMenuSoundIfLoop();
 
   DoAnimation();
-  BackToFront();
 }
 
 
@@ -1550,6 +1797,7 @@ static struct TokenInfo setup_info_main[] =
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
   { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and Exit"		},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1561,6 +1809,7 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1581,6 +1830,7 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_user_defined,	"User defined:"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1597,6 +1847,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1607,6 +1858,7 @@ static struct TokenInfo setup_info_sound[] =
   { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1625,6 +1877,7 @@ static struct TokenInfo setup_info_artwork[] =
   { TYPE_YES_NO,	&setup.override_level_music,	"Music:"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1640,6 +1893,7 @@ static struct TokenInfo setup_info_shortcut[] =
   { TYPE_YES_NO,	&setup.ask_on_escape,	"Ask on Esc:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
   { 0,			NULL,			NULL			}
 };
 
@@ -1837,7 +2091,7 @@ static void DrawSetupScreen_Generic()
 
   FadeToFront();
   InitAnimation();
-  HandleSetupScreen_Generic(0,0,0,0,MB_MENU_INITIALIZE);
+  HandleSetupScreen_Generic(0, 0, 0, 0, MB_MENU_INITIALIZE);
 }
 
 void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
@@ -1851,7 +2105,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   {
     /* advance to first valid menu entry */
     while (choice < num_setup_info &&
-	   (setup_info[choice].type & TYPE_SKIP_ENTRY))
+	   setup_info[choice].type & TYPE_SKIP_ENTRY)
       choice++;
     choice_store[setup_mode] = choice;
 
@@ -1885,8 +2139,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     {
       int menu_navigation_type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
 
-      if ((setup_info[choice].type & menu_navigation_type) ||
-	  (setup_info[choice].type & TYPE_BOOLEAN_STYLE))
+      if (setup_info[choice].type & menu_navigation_type ||
+	  setup_info[choice].type & TYPE_BOOLEAN_STYLE)
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -1894,12 +2148,12 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 
     /* jump to next non-empty menu entry (up or down) */
     while (y > 0 && y < num_setup_info - 1 &&
-	   (setup_info[y].type & TYPE_SKIP_ENTRY))
+	   setup_info[y].type & TYPE_SKIP_ENTRY)
       y += dy;
   }
 
-  if (x == 0 && y >= 0 && y < num_setup_info &&
-      (setup_info[y].type & ~TYPE_SKIP_ENTRY))
+  if (IN_GFX_SCREEN(mx, my) &&
+      y >= 0 && y < num_setup_info && setup_info[y].type & ~TYPE_SKIP_ENTRY)
   {
     if (button)
     {
@@ -1920,8 +2174,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       }
       else
       {
-	if ((setup_info[y].type & TYPE_KEYTEXT) &&
-	    (setup_info[y + 1].type & TYPE_KEY))
+	if (setup_info[y].type & TYPE_KEYTEXT &&
+	    setup_info[y + 1].type & TYPE_KEY)
 	  y++;
 
 	if (setup_info[y].type & TYPE_VALUE)
@@ -1929,13 +2183,6 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       }
     }
   }
-
-#if 0
-  BackToFront();
-
-  if (game_status == GAME_MODE_SETUP)
-    DoAnimation();
-#endif
 }
 
 void DrawSetupScreen_Input()
@@ -1962,7 +2209,7 @@ void DrawSetupScreen_Input()
 		    "Joysticks deactivated on this screen");
 #endif
 
-  HandleSetupScreen_Input(0,0, 0,0, MB_MENU_INITIALIZE);
+  HandleSetupScreen_Input(0, 0, 0, 0, MB_MENU_INITIALIZE);
   FadeToFront();
   InitAnimation();
 }
@@ -2078,6 +2325,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
   {
     drawPlayerSetupInputInfo(player_nr);
     drawCursor(choice, FC_RED);
+
     return;
   }
   else if (button == MB_MENU_LEAVE)
@@ -2085,6 +2333,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     setup_mode = SETUP_MODE_MAIN;
     DrawSetupScreen();
     InitJoysticks();
+
+    return;
   }
 
   if (mx || my)		/* mouse input */
@@ -2107,7 +2357,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
   }
 
-  if (y == 0 && ((x == 0 && !button) || ((x == 10 || x == 12) && button)))
+  if (IN_GFX_SCREEN(mx, my) &&
+      y == 0 && ((x < 10 && !button) || ((x == 10 || x == 12) && button)))
   {
     static unsigned long delay = 0;
 
@@ -2118,7 +2369,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
     drawPlayerSetupInputInfo(player_nr);
   }
-  else if (x == 0 && y >= pos_start && y <= pos_end &&
+  else if (IN_GFX_SCREEN(mx, my) &&
+	   y >= pos_start && y <= pos_end &&
 	   !(y >= pos_empty1 && y <= pos_empty2))
   {
     if (button)
@@ -2538,7 +2790,6 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 
   DoAnimation();
-  BackToFront();
 }
 
 void HandleGameActions()
@@ -2553,13 +2804,10 @@ void HandleGameActions()
     TapeStop();
 
   GameActions();
-
   BackToFront();
 
-#if 1
   if (tape.auto_play && !tape.playing)
     AutoPlayTape();	/* continue automatically playing next tape */
-#endif
 }
 
 /* ---------- new screen button stuff -------------------------------------- */
@@ -2831,6 +3079,7 @@ void MapChooseTreeGadgets(TreeInfo *ti)
     MapGadget(screen_gadget[i]);
 }
 
+#if 0
 void UnmapChooseTreeGadgets()
 {
   int i;
@@ -2838,6 +3087,7 @@ void UnmapChooseTreeGadgets()
   for (i = 0; i < NUM_SCREEN_GADGETS; i++)
     UnmapGadget(screen_gadget[i]);
 }
+#endif
 
 static void HandleScreenGadgets(struct GadgetInfo *gi)
 {

@@ -102,6 +102,10 @@
 						      SND_CTRL_RELOAD_MUSIC))
 #define ALL_SOUNDS(x)			((x).state & SND_CTRL_ALL_SOUNDS)
 
+#define MAP_NOCONF_MUSIC(x)		(-((x) + 1))
+#define UNMAP_NOCONF_MUSIC(x)		MAP_NOCONF_MUSIC(x)
+
+
 #define SOUND_MIN_VOLUME		0
 #if defined(TARGET_SDL)
 #define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME

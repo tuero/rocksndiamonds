@@ -157,6 +157,12 @@
 #define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
+#define IN_GFX_SCREEN(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
+				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
+#define IN_GFX_DOOR(x, y)	(x >= gfx.dx && x < gfx.dx + gfx.dxsize && \
+				 y >= gfx.dy && y < gfx.dy + gfx.dysize)
+#define IN_GFX_VIDEO(x, y)	(x >= gfx.vx && x < gfx.vx + gfx.vxsize && \
+				 y >= gfx.vy && y < gfx.vy + gfx.vysize)
 
 /* values for mouse cursor */
 #define CURSOR_DEFAULT		0
@@ -174,6 +180,9 @@
 
 /* default name for unknown player names */
 #define ANONYMOUS_NAME		"anonymous"
+
+/* default for other unknown names */
+#define UNKNOWN_NAME		"unknown"
 
 /* default name for new levels */
 #define NAMELESS_LEVEL_NAME	"nameless level"

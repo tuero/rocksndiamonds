@@ -2846,7 +2846,7 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
 #endif
 }
 
-static struct MusicFileInfo *get_music_file_info(char *basename)
+static struct MusicFileInfo *get_music_file_info(char *basename, int music)
 {
   SetupFileHash *setup_file_hash = NULL;
   struct MusicFileInfo tmp_music_file_info, *new_music_file_info;
@@ -2911,14 +2911,19 @@ static struct MusicFileInfo *get_music_file_info(char *basename)
 
   /* ---------- music file info found ---------- */
 
+  memset(&tmp_music_file_info, 0, sizeof(struct MusicFileInfo));
+
   for (i = 0; token_to_value_ptr[i].token != NULL; i++)
   {
     char *value = getHashEntry(setup_file_hash, token_to_value_ptr[i].token);
 
-    *token_to_value_ptr[i].value_ptr = getStringCopy(value);  /* may be NULL */
+    *token_to_value_ptr[i].value_ptr =
+      getStringCopy(value != NULL ? value : UNKNOWN_NAME);
   }
 
-  new_music_file_info = checked_calloc(sizeof(struct MusicFileInfo));
+  tmp_music_file_info.music = music;
+
+  new_music_file_info = checked_malloc(sizeof(struct MusicFileInfo));
   *new_music_file_info = tmp_music_file_info;
 
   return new_music_file_info;
@@ -2928,6 +2933,7 @@ void LoadMusicInfo()
 {
   char *music_directory = getCustomMusicDirectory();
   int num_music = getMusicListSize();
+  int num_music_noconf = 0;
   DIR *dir;
   struct dirent *dir_entry;
   struct FileInfo *music;
@@ -2963,11 +2969,15 @@ void LoadMusicInfo()
     if (strcmp(music->filename, UNDEFINED_FILENAME) == 0)
       continue;
 
+    /* a configured file may be not recognized as music */
+    if (!FileIsMusic(music->filename))
+      continue;
+
 #if 0
-    printf("::: -> '%s'\n", music->filename);
+    printf("::: -> '%s' (configured)\n", music->filename);
 #endif
 
-    *new = get_music_file_info(music->filename);
+    *new = get_music_file_info(music->filename, i);
     if (*new != NULL)
       new = &(*new)->next;
   }
@@ -2998,16 +3008,18 @@ void LoadMusicInfo()
     if (music_already_used)
       continue;
 
-    if (!FileIsSound(basename) && !FileIsMusic(basename))
+    if (!FileIsMusic(basename))
       continue;
 
 #if 0
-    printf("::: -> '%s'\n", basename);
+    printf("::: -> '%s' (found in directory)\n", basename);
 #endif
 
-    *new = get_music_file_info(basename);
+    *new = get_music_file_info(basename, MAP_NOCONF_MUSIC(num_music_noconf));
     if (*new != NULL)
       new = &(*new)->next;
+
+    num_music_noconf++;
   }
 
   closedir(dir);

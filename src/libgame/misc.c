@@ -1559,18 +1559,30 @@ boolean fileHasSuffix(char *basename, char *suffix)
   return FALSE;
 }
 
-boolean FileIsGraphic(char *basename)
+boolean FileIsGraphic(char *filename)
 {
+  char *basename = strrchr(filename, '/');
+
+  basename = (basename != NULL ? basename + 1 : filename);
+
   return fileHasSuffix(basename, "pcx");
 }
 
-boolean FileIsSound(char *basename)
+boolean FileIsSound(char *filename)
 {
+  char *basename = strrchr(filename, '/');
+
+  basename = (basename != NULL ? basename + 1 : filename);
+
   return fileHasSuffix(basename, "wav");
 }
 
-boolean FileIsMusic(char *basename)
+boolean FileIsMusic(char *filename)
 {
+  char *basename = strrchr(filename, '/');
+
+  basename = (basename != NULL ? basename + 1 : filename);
+
   if (FileIsSound(basename))
     return TRUE;
 

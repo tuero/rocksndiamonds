@@ -33,13 +33,14 @@
 					 TYPE_YES_NO)
 
 /* additional values for setup screen */
-#define TYPE_ENTER_MENU			(1 << 8)
-#define TYPE_LEAVE_MENU			(1 << 9)
-#define TYPE_EMPTY			(1 << 10)
-#define TYPE_KEYTEXT			(1 << 11)
+#define TYPE_ENTER_SCREEN		(1 << 8)
+#define TYPE_ENTER_MENU			(1 << 9)
+#define TYPE_LEAVE_MENU			(1 << 10)
+#define TYPE_EMPTY			(1 << 11)
+#define TYPE_KEYTEXT			(1 << 12)
 
-#define TYPE_GHOSTED			(1 << 12)
-#define TYPE_QUERY			(1 << 13)
+#define TYPE_GHOSTED			(1 << 13)
+#define TYPE_QUERY			(1 << 14)
 
 #define TYPE_VALUE			(TYPE_BOOLEAN_STYLE	| \
 					 TYPE_KEY		| \
@@ -52,7 +53,8 @@
 					 TYPE_KEY		| \
 					 TYPE_STRING)
 
-#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_MENU	| \
+#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_SCREEN	| \
+					 TYPE_ENTER_MENU	| \
 					 TYPE_LEAVE_MENU)
 
 /* cookie token for file identifier and version number */

@@ -862,7 +862,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
       if (num_music_noconf == 0)	/* no fallback music available */
 	return;
 
-      snd_ctrl.nr = (-(snd_ctrl.nr + 1)) % num_music_noconf;
+      snd_ctrl.nr = UNMAP_NOCONF_MUSIC(snd_ctrl.nr) % num_music_noconf;
       snd_info = Music_NoConf[snd_ctrl.nr];
     }
     else
@@ -1868,13 +1868,9 @@ static void *Load_MOD(char *filename)
 
 static void *Load_WAV_or_MOD(char *filename)
 {
-  char *basename = strrchr(filename, '/');
-
-  basename = (basename != NULL ? basename + 1 : filename);
-
-  if (FileIsSound(basename))
+  if (FileIsSound(filename))
     return Load_WAV(filename);
-  else if (FileIsMusic(basename))
+  else if (FileIsMusic(filename))
     return Load_MOD(filename);
   else
     return NULL;
@@ -1944,10 +1940,15 @@ void LoadCustomMusic_NoConf(void)
 
     filename = getPath2(music_directory, basename);
 
+#if 1
+    if (FileIsMusic(basename))
+      mus_info = Load_WAV_or_MOD(filename);
+#else
     if (FileIsSound(basename))
       mus_info = Load_WAV(filename);
     else if (FileIsMusic(basename))
       mus_info = Load_MOD(filename);
+#endif
 
     free(filename);
 

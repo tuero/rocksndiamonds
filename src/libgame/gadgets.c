@@ -1302,7 +1302,7 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
   HandleGadgets(gi->x, gi->y, 0);
 }
 
-void HandleGadgets(int mx, int my, int button)
+boolean HandleGadgets(int mx, int my, int button)
 {
   static struct GadgetInfo *last_info_gi = NULL;
   static unsigned long pressed_delay = 0;
@@ -1327,7 +1327,7 @@ void HandleGadgets(int mx, int my, int button)
 
   /* check if there are any gadgets defined */
   if (gadget_list_first_entry == NULL)
-    return;
+    return FALSE;
 
   /* simulated release of mouse button over last gadget */
   if (mx == -1 && my == -1 && button == 0)
@@ -1591,7 +1591,7 @@ void HandleGadgets(int mx, int my, int button)
 	/* don't handle this scrollbar anymore while mouse button pressed */
 	last_gi = NULL;
 
-	return;
+	return TRUE;
       }
     }
 
@@ -1723,6 +1723,9 @@ void HandleGadgets(int mx, int my, int button)
   /* handle gadgets unmapped/mapped between pressing and releasing */
   if (release_event && !gadget_released && new_gi)
     new_gi->state = GD_BUTTON_UNPRESSED;
+
+  return (gadget_pressed || gadget_pressed_repeated ||
+	  gadget_released || gadget_moving);
 }
 
 static void insertCharIntoTextArea(struct GadgetInfo *gi, char c)
@@ -1740,7 +1743,7 @@ static void insertCharIntoTextArea(struct GadgetInfo *gi, char c)
   setTextAreaCursorPosition(gi, gi->textarea.cursor_position + 1);
 }
 
-void HandleGadgetsKeyInput(Key key)
+boolean HandleGadgetsKeyInput(Key key)
 {
   struct GadgetInfo *gi = last_gi;
 
@@ -1748,7 +1751,7 @@ void HandleGadgetsKeyInput(Key key)
       !(gi->type & GD_TYPE_TEXT_INPUT ||
 	gi->type & GD_TYPE_TEXT_AREA ||
 	gi->type & GD_TYPE_SELECTBOX))
-    return;
+    return FALSE;
 
   if (key == KSYM_Return)	/* valid for both text input and selectbox */
   {
@@ -1900,4 +1903,6 @@ void HandleGadgetsKeyInput(Key key)
       DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
+
+  return TRUE;
 }

@@ -1542,6 +1542,8 @@ struct MusicFileInfo
   char *album;
   char *year;
 
+  int music;
+
   struct MusicFileInfo *next;
 };
 
