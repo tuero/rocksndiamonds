@@ -1,3 +1,8 @@
+2004-04-09
+	* added possibility to push/press accessible elements from a side that
+	  is not accessible
+	* fixed bug with not setting actual date when appending to tape
+
 2004-04-07
 	* fixed bug with incorrectly initialized custom element editor graphics
 

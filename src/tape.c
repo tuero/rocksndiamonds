@@ -654,10 +654,16 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 /* tape control functions                                                    */
 /* ========================================================================= */
 
-void TapeErase()
+static void TapeSetDate()
 {
   time_t epoch_seconds = time(NULL);
-  struct tm *time = localtime(&epoch_seconds);
+  struct tm *now = localtime(&epoch_seconds);
+
+  tape.date = 10000 * (now->tm_year % 100) + 100 * now->tm_mon + now->tm_mday;
+}
+
+void TapeErase()
+{
   int i;
 
   tape.length = 0;
@@ -670,12 +676,13 @@ void TapeErase()
   tape.pos[tape.counter].delay = 0;
   tape.changed = TRUE;
 
-  tape.date = 10000*(time->tm_year % 100) + 100*time->tm_mon + time->tm_mday;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
 
   tape.file_version = FILE_VERSION_ACTUAL;
   tape.game_version = GAME_VERSION_ACTUAL;
   tape.engine_version = level.game_version;
+
+  TapeSetDate();
 
 #if 0
   printf("::: tape.engine_version = level.game_version = %d \n",
@@ -749,7 +756,10 @@ static void TapeAppendRecording()
   tape.recording = TRUE;
   tape.changed = TRUE;
 
-  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
+  TapeSetDate();
+
+  DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON, 0);
 }
 
 void TapeHaltRecording()

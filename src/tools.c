@@ -878,11 +878,16 @@ void DrawPlayer(struct PlayerInfo *player)
   else if (player_is_moving && IS_ACCESSIBLE_UNDER(last_element))
     DrawLevelFieldThruMask(last_jx, last_jy);
 
-  /* ... and the field the player is entering */
-  if (IS_ACCESSIBLE_INSIDE(element))
-    DrawLevelField(jx, jy);
-  else if (IS_ACCESSIBLE_UNDER(element))
-    DrawLevelFieldThruMask(jx, jy);
+#if 1
+  if (!player->is_pushing)
+#endif
+  {
+    /* ... and the field the player is entering */
+    if (IS_ACCESSIBLE_INSIDE(element))
+      DrawLevelField(jx, jy);
+    else if (IS_ACCESSIBLE_UNDER(element))
+      DrawLevelFieldThruMask(jx, jy);
+  }
 
   if (setup.direct_draw)
   {

@@ -10524,12 +10524,18 @@ int DigField(struct PlayerInfo *player,
 
     default:
 
+#if 1
+      if (IS_WALKABLE(element) && ACCESS_FROM(element, opposite_direction))
+#else
       if (IS_WALKABLE(element))
+#endif
       {
 	int sound_action = ACTION_WALKING;
 
+#if 0
 	if (!ACCESS_FROM(element, opposite_direction))
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
+#endif
 
 #if 1
 	if (element == EL_EMPTY_SPACE &&
@@ -10567,13 +10573,18 @@ int DigField(struct PlayerInfo *player,
 
 	break;
       }
-      else if (IS_PASSABLE(element))
-      {
 #if 1
+      else if (IS_PASSABLE(element) && canPassField(x, y, move_direction))
+#else
+      else if (IS_PASSABLE(element))
+#endif
+      {
+#if 0
 	if (!canPassField(x, y, move_direction))
 	  return MF_NO_ACTION;
 #else
 
+#if 0
 #if 1
 	if (!IN_LEV_FIELD(nextx, nexty) || IS_PLAYER(nextx, nexty) ||
 	    !IS_WALKABLE_FROM(Feld[nextx][nexty], move_direction) ||
@@ -10582,6 +10593,7 @@ int DigField(struct PlayerInfo *player,
 #else
 	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
 	  return MF_NO_ACTION;
+#endif
 #endif
 
 #if 1
