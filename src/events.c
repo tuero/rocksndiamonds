@@ -169,7 +169,7 @@ void SleepWhileUnmapped()
     }
   }
 
-  if (game_status==PLAYING)
+  if (game_status == PLAYING)
     XAutoRepeatOff(display);
 }
 
@@ -274,13 +274,36 @@ void HandleFocusEvent(XFocusChangeEvent *event)
 
   if (event->type == FocusOut)
   {
+    int i;
+
     XAutoRepeatOn(display);
     old_joystick_status = joystick_status;
     joystick_status = JOYSTICK_OFF;
+
+    /* simulate key release events for still pressed keys */
     key_joystick_mapping = 0;
+    for (i=0; i<MAX_PLAYERS; i++)
+      stored_player[i].action = 0;
   }
   else if (event->type == FocusIn)
   {
+    /* When there are two Rocks'n'Diamonds windows which overlap and
+       the player moves the pointer from one game window to the other,
+       a 'FocusOut' event is generated for the window the pointer is
+       leaving and a 'FocusIn' event is generated for the window the
+       pointer is entering. In some cases, it can happen that the
+       'FocusIn' event is handled by the one game process before the
+       'FocusOut' event by the other game process. In this case the
+       X11 environment would end up with activated keyboard auto repeat,
+       because unfortunately this is a global setting and not (which
+       would be far better) set for each X11 window individually.
+       The effect would be keyboard auto repeat while playing the game
+       (game_status == PLAYING), which is not desired.
+       To avoid this special case, we just wait 1/50 second before
+       processing the 'FocusIn' event.
+    */
+
+    Delay(20);
     if (game_status == PLAYING)
       XAutoRepeatOff(display);
     if (old_joystick_status != -1)

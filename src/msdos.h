@@ -444,8 +444,6 @@
 
 #define XFlush(a)
 #define XGetImage(a,b,c,d,e,f,g,h)		((XImage *) NULL)
-#define XAutoRepeatOn(a)
-#define XAutoRepeatOff(a)
 #define XDisplayName(a)				((char *) NULL)
 #define XFreeColors(a,b,c,d,e)
 #define XpmFreeAttributes(a)
@@ -711,4 +709,8 @@ int XLookupString(XKeyEvent *, char *, int, KeySym *, XComposeStatus *);
 void XSetForeground(Display *, GC, unsigned long);
 void XDrawLine(Display *, Drawable, GC, int, int, int, int);
 void XDestroyImage(XImage *);
+Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
+		   int *, int *, unsigned int *);
+void XAutoRepeatOn(Display *);
+void XAutoRepeatOff(Display *);
 void NetworkServer(int, int);

@@ -543,7 +543,7 @@ void DrawPlayer(struct PlayerInfo *player)
     */
 #endif
 
-    static last_dir = MV_LEFT;
+    static int last_dir = MV_LEFT;
 
     if (player->Pushing)
     {
@@ -2430,8 +2430,8 @@ void CreateToolButtons()
   for (i=0; i<NUM_TOOL_BUTTONS; i++)
   {
     Pixmap gd_pixmap = pix[PIX_DOOR];
-    Pixmap deco_pixmap = 0;
-    int deco_x, deco_y, deco_xpos, deco_ypos;
+    Pixmap deco_pixmap = None;
+    int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;
     unsigned long event_mask;
     int gd_xoffset, gd_yoffset;

@@ -1203,7 +1203,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
     /* cut trailing comment or whitespace from input line */
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
-      if (*line_ptr == '#' || *line_ptr == '\n')
+      if (*line_ptr == '#' || *line_ptr == '\n' || *line_ptr == '\r')
       {
 	*line_ptr = '\0';
 	break;

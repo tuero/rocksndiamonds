@@ -69,9 +69,9 @@ CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(CONFIG_SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
 
 # DEBUG = -DDEBUG -g -Wall -ansi -pedantic
-DEBUG = -DDEBUG -g -Wall
+# DEBUG = -DDEBUG -g -Wall
 # DEBUG = -O3 -Wall -ansi -pedantic
-# DEBUG = -O3 -Wall
+DEBUG = -O3 -Wall
 # DEBUG = -O3
 
 # SYSTEM = -Aa -D_HPUX_SOURCE -Dhpux	# for HP-UX (obsolete)

@@ -2297,7 +2297,7 @@ void HandleGadgets(int mx, int my, int button)
   static unsigned long pressed_delay = 0;
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;
-  int scrollbar_mouse_pos;
+  int scrollbar_mouse_pos = 0;
   struct GadgetInfo *new_gi, *gi;
   boolean press_event;
   boolean release_event;

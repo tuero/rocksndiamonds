@@ -243,6 +243,7 @@ char *getLoginName()
 
 char *getRealName()
 {
+#ifndef MSDOS
   struct passwd *pwd;
 
   if ((pwd = getpwuid(getuid())) == NULL || strlen(pwd->pw_gecos) == 0)
@@ -272,6 +273,9 @@ char *getRealName()
 
     return real_name;
   }
+#else
+  return ANONYMOUS_NAME;
+#endif
 }
 
 char *getHomeDir()

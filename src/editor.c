@@ -2814,21 +2814,22 @@ static void FloodFill(int from_x, int from_y, int fill_element)
 }
 
 /* values for DrawLevelText() modes */
-#define TEXT_INIT	0
-#define TEXT_SETCURSOR	1
-#define TEXT_WRITECHAR	2
-#define TEXT_BACKSPACE	3
-#define TEXT_NEWLINE	4
-#define TEXT_END	5
+#define TEXT_INIT		0
+#define TEXT_SETCURSOR		1
+#define TEXT_WRITECHAR		2
+#define TEXT_BACKSPACE		3
+#define TEXT_NEWLINE		4
+#define TEXT_END		5
+#define TEXT_QUERY_TYPING	6
 
-static void DrawLevelText(int sx, int sy, char letter, int mode)
+static int DrawLevelText(int sx, int sy, char letter, int mode)
 {
   static short delete_buffer[MAX_LEV_FIELDX];
   static int start_sx, start_sy;
   static int last_sx, last_sy;
   static boolean typing = FALSE;
   int letter_element = EL_CHAR_ASCII0 + letter;
-  int lx, ly;
+  int lx = 0, ly = 0;
 
   /* map lower case letters to upper case and convert special characters */
   if (letter >= 'a' && letter <= 'z')
@@ -2847,7 +2848,7 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
   if (mode != TEXT_INIT)
   {
     if (!typing)
-      return;
+      return FALSE;
 
     if (mode != TEXT_SETCURSOR)
     {
@@ -2897,7 +2898,7 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
       if (sx > start_sx)
       {
 	Feld[lx - 1][ly] = delete_buffer[sx - start_sx - 1];
-	DrawMiniElement(sx - 1, sy, new_element3);
+	DrawMiniElement(sx - 1, sy, Feld[lx - 1][ly]);
 	DrawLevelText(sx - 1, sy, 0, TEXT_SETCURSOR);
       }
       break;
@@ -2915,9 +2916,14 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
       typing = FALSE;
       break;
 
+    case TEXT_QUERY_TYPING:
+      break;
+
     default:
       break;
   }
+
+  return typing;
 }
 
 static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
@@ -3069,7 +3075,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   int sx = gi->event.x, sy = gi->event.y;
   int min_sx = 0, min_sy = 0;
   int max_sx = gi->drawing.area_xsize - 1, max_sy = gi->drawing.area_ysize - 1;
-  int lx, ly;
+  int lx = 0, ly = 0;
   int min_lx = 0, min_ly = 0;
   int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
   int x, y;
@@ -3832,7 +3838,8 @@ void HandleLevelEditorKeyInput(KeySym key)
   char letter = getCharFromKeySym(key);
   int button = MB_LEFT;
 
-  if (drawing_function == GADGET_ID_TEXT)
+  if (drawing_function == GADGET_ID_TEXT &&
+      DrawLevelText(0, 0, 0, TEXT_QUERY_TYPING) == TRUE)
   {
     if (letter)
       DrawLevelText(0, 0, letter, TEXT_WRITECHAR);

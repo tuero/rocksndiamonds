@@ -1273,7 +1273,7 @@ extern char		*element_info[];
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#define PROGRAM_VERSION_STRING	"1.2.1"
+#define PROGRAM_VERSION_STRING	"1.3.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING
