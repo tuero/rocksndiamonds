@@ -14,6 +14,18 @@
 #include "image.h"
 #include "misc.h"
 
+
+#ifdef DEBUG
+
+#define DEBUG_TIMING
+
+#endif
+
+#ifdef DEBUG_TIMING
+  long count1, count2;
+#endif
+
+
 /* extra colors to try allocating in private color maps to minimise flashing */
 #define NOFLASH_COLORS 256
 
@@ -410,6 +422,13 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
       break;
   }
 
+#ifdef DEBUG_TIMING
+  count2 = Counter();
+  printf("   CONVERTING IMAGE TO XIMAGE (COLORMAP) IN %.2f SECONDS\n",
+	 (float)(count2-count1)/1000.0);
+  count1 = Counter();
+#endif
+
   /* CREATE IMAGE ITSELF */
   /* modify image data to match visual and colormap */
 
@@ -496,12 +515,7 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
     XCreateImage(display, visual, 1, XYBitmap, 0, (char *)data_mask,
 		 image->width, image->height, 8, linelen);
 
-
-  /* use this if you want to use the bitmap as a mask */
-  /*
-    ximageinfo->depth = image->depth;
-    */
-
+#if 0
   if (visual->class == DirectColor || visual->class == TrueColor)
   {
     Pixel pixval;
@@ -511,21 +525,11 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
       redvalue[65535 >> 8] |
       greenvalue[65535 >> 8] |
       bluevalue[65535 >> 8];
-    /*
-      redvalue[image->rgb.red[0] >> 8] |
-      greenvalue[image->rgb.green[0] >> 8] |
-      bluevalue[image->rgb.blue[0] >> 8];
-      */
     ximageinfo->background = pixval;
     pixval =
       redvalue[0 >> 8] |
       greenvalue[0 >> 8] |
       bluevalue[0 >> 8];
-    /*
-      redvalue[image->rgb.red[1] >> 8] |
-      greenvalue[image->rgb.green[1] >> 8] |
-      bluevalue[image->rgb.blue[1] >> 8];
-      */
     ximageinfo->foreground = pixval;
   }
   else	/* Not Direct or True Color */
@@ -533,15 +537,10 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
     ximageinfo->foreground = BlackPixel(display, screen);
     ximageinfo->background = WhitePixel(display, screen);
   }
-
-  /*
-    ximageinfo->foreground = BlackPixel(display, screen);
-    ximageinfo->background = WhitePixel(display, screen);
-    */
-
+#else
   ximageinfo->foreground = WhitePixel(display, screen);
   ximageinfo->background = BlackPixel(display, screen);
-
+#endif
 
   ximageinfo->ximage_mask->bitmap_bit_order = MSBFirst;
   ximageinfo->ximage_mask->byte_order = MSBFirst;
@@ -613,12 +612,6 @@ void freeImage(Image *image)
 /* ------------------------------------------------------------------------- */
 
 
-#ifdef DEBUG
-
-#define DEBUG_TIMING
-
-#endif
-
 
 int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
 			Pixmap *pixmap, Pixmap *pixmap_mask)
@@ -636,7 +629,6 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
   unsigned int depth;
 
 #ifdef DEBUG_TIMING
-  long count1, count2;
   count1 = Counter();
 #endif
 
@@ -673,7 +665,7 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
 
 #ifdef DEBUG_TIMING
   count2 = Counter();
-  printf("   CONVERTING IMAGE TO XIMAGE IN %.2f SECONDS\n",
+  printf("   CONVERTING IMAGE TO XIMAGE (BITMAP) IN %.2f SECONDS\n",
 	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
