@@ -1284,7 +1284,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_collectible[] =
+  static int ep_collectible_only[] =
   {
     EL_BD_DIAMOND,
     EL_EMERALD,
@@ -2495,7 +2495,7 @@ void InitElementPropertiesStatic()
   } element_properties[] =
   {
     { ep_diggable,		EP_DIGGABLE		},
-    { ep_collectible,		EP_COLLECTIBLE		},
+    { ep_collectible_only,	EP_COLLECTIBLE_ONLY	},
     { ep_dont_run_into,		EP_DONT_RUN_INTO	},
     { ep_dont_collide_with,	EP_DONT_COLLIDE_WITH	},
     { ep_dont_touch,		EP_DONT_TOUCH		},
@@ -2639,7 +2639,7 @@ void InitElementPropertiesEngine(int engine_version)
   static int no_wall_properties[] =
   {
     EP_DIGGABLE,
-    EP_COLLECTIBLE,
+    EP_COLLECTIBLE_ONLY,
     EP_DONT_RUN_INTO,
     EP_DONT_COLLIDE_WITH,
     EP_CAN_MOVE,
@@ -2704,6 +2704,10 @@ void InitElementPropertiesEngine(int engine_version)
 
     SET_PROPERTY(i, EP_ACCESSIBLE, (IS_WALKABLE(i) ||
 				    IS_PASSABLE(i)));
+
+    /* ---------- COLLECTIBLE ---------------------------------------------- */
+    SET_PROPERTY(i, EP_COLLECTIBLE, (IS_COLLECTIBLE_ONLY(i) ||
+				     IS_DROPPABLE(i)));
 
     /* ---------- SNAPPABLE ------------------------------------------------ */
     SET_PROPERTY(i, EP_SNAPPABLE, (IS_DIGGABLE(i) ||

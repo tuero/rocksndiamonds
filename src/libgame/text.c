@@ -144,6 +144,11 @@ int getFontHeight(int font_nr)
   return gfx.font_bitmap_info[font_bitmap_id].height;
 }
 
+int getTextWidth(char *text, int font_nr)
+{
+  return (text != NULL ? strlen(text) * getFontWidth(font_nr) : 0);
+}
+
 static char getFontCharPosition(int font_nr, char c)
 {
   int font_bitmap_id = gfx.select_font_function(font_nr);
@@ -179,11 +184,9 @@ void DrawInitText(char *text, int ypos, int font_nr)
       gfx.num_fonts > 0 &&
       gfx.font_bitmap_info[font_nr].bitmap != NULL)
   {
-    int text_width = strlen(text) * getFontWidth(font_nr);
-
     ClearRectangle(window, 0, ypos, video.width, getFontHeight(font_nr));
-    DrawTextExt(window, (video.width - text_width) / 2, ypos, text, font_nr,
-		BLIT_OPAQUE);
+    DrawTextExt(window, (video.width - getTextWidth(text, font_nr)) / 2, ypos,
+		text, font_nr, BLIT_OPAQUE);
     FlushDisplay();
   }
 }
@@ -200,7 +203,7 @@ void DrawTextFCentered(int y, int font_nr, char *format, ...)
   if (strlen(buffer) > MAX_OUTPUT_LINESIZE)
     Error(ERR_EXIT, "string too long in DrawTextFCentered() -- aborting");
 
-  DrawText(gfx.sx + (gfx.sxsize - strlen(buffer) * getFontWidth(font_nr)) / 2,
+  DrawText(gfx.sx + (gfx.sxsize - getTextWidth(buffer, font_nr)) / 2,
 	   gfx.sy + y, buffer, font_nr);
 }
 

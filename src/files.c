@@ -74,7 +74,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->time_timegate = 10;
   level->amoeba_content = EL_DIAMOND;
   level->double_speed = FALSE;
-  level->initial_gravity = FALSE;
+  level->gravity = FALSE;
   level->em_slippery_gems = FALSE;
 
   level->use_custom_template = FALSE;
@@ -116,8 +116,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
 
-    element_info[element].score = 0;
-    element_info[element].gem_count = 0;
+    element_info[element].collect_score = 10;		/* special default */
+    element_info[element].collect_count = 1;		/* special default */
 
     element_info[element].push_delay_fixed = 2;		/* special default */
     element_info[element].push_delay_random = 8;	/* special default */
@@ -171,6 +171,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
       Properties[element][j] = EP_BITMASK_DEFAULT;
+
+    element_info[element].modified_settings = FALSE;
   }
 
   BorderElement = EL_STEELWALL;
@@ -276,7 +278,7 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->time_wheel		= getFile8Bit(file);
   level->amoeba_content		= checkLevelElement(getFile8Bit(file));
   level->double_speed		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
-  level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->gravity		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
@@ -496,8 +498,8 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     element_info[element].gfx_element =
       checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].score = getFile8Bit(file);
-    element_info[element].gem_count = getFile8Bit(file);
+    element_info[element].collect_score = getFile8Bit(file);
+    element_info[element].collect_count = getFile8Bit(file);
 
     element_info[element].push_delay_fixed = getFile16BitBE(file);
     element_info[element].push_delay_random = getFile16BitBE(file);
@@ -542,6 +544,9 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
     /* some free bytes for future properties and padding */
     ReadUnusedBytesFromFile(file, LEVEL_CPART_CUS3_UNUSED);
+
+    /* mark that this custom element has been modified */
+    element_info[element].modified_settings = TRUE;
   }
 
   return chunk_size;
@@ -838,7 +843,7 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->encoding_16bit_amoeba ? EL_EMPTY :
 		     level->amoeba_content));
   putFile8Bit(file, (level->double_speed ? 1 : 0));
-  putFile8Bit(file, (level->initial_gravity ? 1 : 0));
+  putFile8Bit(file, (level->gravity ? 1 : 0));
   putFile8Bit(file, (level->encoding_16bit_field ? 1 : 0));
   putFile8Bit(file, (level->em_slippery_gems ? 1 : 0));
 
@@ -1007,7 +1012,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (Properties[element][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    if (element_info[element].modified_settings)
     {
       if (check < num_changed_custom_elements)
       {
@@ -1024,8 +1029,8 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	putFile8Bit(file, element_info[element].use_gfx_element);
 	putFile16BitBE(file, element_info[element].gfx_element);
 
-	putFile8Bit(file, element_info[element].score);
-	putFile8Bit(file, element_info[element].gem_count);
+	putFile8Bit(file, element_info[element].collect_score);
+	putFile8Bit(file, element_info[element].collect_count);
 
 	putFile16BitBE(file, element_info[element].push_delay_fixed);
 	putFile16BitBE(file, element_info[element].push_delay_random);
@@ -1119,7 +1124,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 
   /* check for non-standard custom elements and calculate "CUS3" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    if (Properties[EL_CUSTOM_START +i][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    if (element_info[EL_CUSTOM_START + i].modified_settings)
       num_changed_custom_elements++;
   level_chunk_CUS3_size = LEVEL_CHUNK_CUS3_SIZE(num_changed_custom_elements);
 
@@ -1198,7 +1203,7 @@ void DumpLevel(struct LevelInfo *level)
   printf("\n");
   printf("Amoeba Speed: %d\n", level->amoeba_speed);
   printf("\n");
-  printf("Gravity:                %s\n", (level->initial_gravity ?"yes":"no"));
+  printf("Gravity:                %s\n", (level->gravity ? "yes" : "no"));
   printf("Double Speed Movement:  %s\n", (level->double_speed ? "yes" : "no"));
   printf("EM style slippery gems: %s\n", (level->em_slippery_gems ? "yes" : "no"));
 

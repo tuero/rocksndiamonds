@@ -155,10 +155,10 @@ static void PlaySound_Menu_Continue(int sound)
 
 void DrawHeadline()
 {
-  int font1_width = getFontWidth(FONT_TITLE_1);
-  int font2_width = getFontWidth(FONT_TITLE_2);
-  int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * font1_width) / 2;
-  int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * font2_width) / 2;
+  int text1_width = getTextWidth(PROGRAM_TITLE_STRING,   FONT_TITLE_1);
+  int text2_width = getTextWidth(WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
+  int x1 = SX + (SXSIZE - text1_width) / 2;
+  int x2 = SX + (SXSIZE - text2_width) / 2;
 
   DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
   DrawText(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
@@ -192,9 +192,8 @@ void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
-  int font_width = getFontWidth(FONT_MENU_1);
-  int name_width = font_width * strlen("Name:");
-  int level_width = font_width * strlen("Level:");
+  int name_width  = getTextWidth("Name:",  FONT_MENU_1);
+  int level_width = getTextWidth("Level:", FONT_MENU_1);
   int i;
 
   UnmapAllGadgets();

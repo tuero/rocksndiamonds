@@ -398,9 +398,9 @@ move_stepsize_list[] =
 struct
 {
   int element;
-  int gem_count;
+  int count;
 }
-gem_count_list[] =
+collect_count_list[] =
 {
   { EL_EMERALD,			1 },
   { EL_BD_DIAMOND,		1 },
@@ -715,7 +715,7 @@ void DrawGameDoorValues()
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
-	   int2str(local_player->dynamite, 3), FONT_TEXT_2);
+	   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
   DrawText(DX + XX_SCORE, DY + YY_SCORE,
 	   int2str(local_player->score, 5), FONT_TEXT_2);
   DrawText(DX + XX_TIME, DY + YY_TIME,
@@ -890,12 +890,12 @@ static void InitGameEngine()
   /* initialize gem count values for each element */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     if (!IS_CUSTOM_ELEMENT(i))
-      element_info[i].gem_count = 0;
+      element_info[i].collect_count = 0;
 
   /* add gem count values for all elements from pre-defined list */
-  for (i=0; gem_count_list[i].element != EL_UNDEFINED; i++)
-    element_info[gem_count_list[i].element].gem_count =
-      gem_count_list[i].gem_count;
+  for (i=0; collect_count_list[i].element != EL_UNDEFINED; i++)
+    element_info[collect_count_list[i].element].collect_count =
+      collect_count_list[i].count;
 }
 
 
@@ -952,7 +952,6 @@ void InitGame()
     for (j=0; j<4; j++)
       player->key[j] = FALSE;
 
-    player->dynamite = 0;
     player->dynabomb_count = 0;
     player->dynabomb_size = 1;
     player->dynabombs_left = 0;
@@ -994,6 +993,8 @@ void InitGame()
     player->shield_normal_time_left = 0;
     player->shield_deadly_time_left = 0;
 
+    player->inventory_size = 0;
+
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
 
@@ -1032,7 +1033,6 @@ void InitGame()
   game.switchgate_pos = 0;
   game.balloon_dir = MV_NO_MOVING;
   game.explosions_delayed = TRUE;
-  game.current_gravity = level.initial_gravity;
 
   for (i=0; i<4; i++)
   {
@@ -2039,7 +2039,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_PEARL;
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
-      else if (IS_CUSTOM_ELEMENT(element))
+      else if (IS_CUSTOM_ELEMENT(element) && !CAN_EXPLODE(element))
 	Store[x][y] = element_info[element].content[1][1];
       else
 	Store[x][y] = EL_EMPTY;
@@ -2684,7 +2684,9 @@ void Impact(int x, int y)
     return;
   }
 
-  if (impact)
+  /* only reset graphic animation if graphic really changes after impact */
+  if (impact &&
+      el_act_dir2img(element, GfxAction[x][y], MV_DOWN) != el2img(element))
   {
     ResetGfxAnimation(x, y);
     DrawLevelField(x, y);
@@ -5146,11 +5148,13 @@ static void ChangeActiveTrap(int x, int y)
 
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
+#if 0	/* !!! let the player exacpe from a suddenly unaccessible element */
   if (IS_PLAYER(x, y) && !IS_ACCESSIBLE(target_element))
   {
     Bang(x, y);
     return;
   }
+#endif
 
   RemoveField(x, y);
   Feld[x][y] = target_element;
@@ -5415,7 +5419,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
-  boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
+  boolean moved = FALSE, snapped = FALSE, dropped = FALSE;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
   int up	= player_action & JOY_UP;
@@ -5438,13 +5442,14 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     else
     {
       if (button2)
-	bombed = PlaceBomb(player);
+	dropped = DropElement(player);
+
       moved = MoveFigure(player, dx, dy);
     }
 
     if (tape.single_step && tape.recording && !tape.pausing)
     {
-      if (button1 || (bombed && !moved))
+      if (button1 || (dropped && !moved))
       {
 	TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 	SnapField(player, 0, 0);		/* stop snapping */
@@ -6088,7 +6093,7 @@ void ScrollLevel(int dx, int dy)
 
 static void CheckGravityMovement(struct PlayerInfo *player)
 {
-  if (game.current_gravity && !player->programmed_action)
+  if (level.gravity && !player->programmed_action)
   {
     int move_dir_vertical = player->action & (MV_UP | MV_DOWN);
     int move_dir_horizontal = player->action & (MV_LEFT | MV_RIGHT);
@@ -6467,11 +6472,9 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     { +1, 0 },
     { 0, +1 }
   };
-  boolean center_is_player = (IS_PLAYER(x, y));
   int i;
 
-  /* prevent TestIfPlayerTouchesCustomElement() from looping */
-  if (check_changing)
+  if (check_changing)	/* prevent this function from running into a loop */
     return;
 
   check_changing = TRUE;
@@ -6484,7 +6487,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-    if (center_is_player)
+    if (IS_PLAYER(x, y))
     {
       CheckTriggeredElementChange(xx, yy, Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
       CheckElementChange(xx, yy, Feld[xx][yy], CE_TOUCHED_BY_PLAYER);
@@ -6511,11 +6514,11 @@ void TestIfElementTouchesCustomElement(int x, int y)
     { +1, 0 },
     { 0, +1 }
   };
-  boolean center_is_custom = (IS_CUSTOM_ELEMENT(Feld[x][y]));
+  boolean change_center_element = FALSE;
+  int center_element = Feld[x][y];
   int i;
 
-  /* prevent TestIfElementTouchesCustomElement() from looping */
-  if (check_changing)
+  if (check_changing)	/* prevent this function from running into a loop */
     return;
 
   check_changing = TRUE;
@@ -6524,22 +6527,26 @@ void TestIfElementTouchesCustomElement(int x, int y)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
+    int border_element;
 
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-    if (center_is_custom &&
-	Feld[xx][yy] == element_info[Feld[x][y]].change.trigger_element)
-    {
-      CheckElementChange(x, y, Feld[x][y], CE_OTHER_IS_TOUCHING);
-    }
+    border_element = Feld[xx][yy];
 
-    if (IS_CUSTOM_ELEMENT(Feld[xx][yy]) &&
-	Feld[x][y] == element_info[Feld[xx][yy]].change.trigger_element)
-    {
-      CheckElementChange(xx, yy, Feld[xx][yy], CE_OTHER_IS_TOUCHING);
-    }
+    /* check for change of center element (but change it only once) */
+    if (IS_CUSTOM_ELEMENT(center_element) &&
+	border_element == element_info[center_element].change.trigger_element)
+      change_center_element = TRUE;
+
+    /* check for change of border element */
+    if (IS_CUSTOM_ELEMENT(border_element) &&
+	center_element == element_info[border_element].change.trigger_element)
+      CheckElementChange(xx, yy, border_element, CE_OTHER_IS_TOUCHING);
   }
+
+  if (change_center_element)
+    CheckElementChange(x, y, center_element, CE_OTHER_IS_TOUCHING);
 
   check_changing = FALSE;
 }
@@ -7086,7 +7093,7 @@ int DigField(struct PlayerInfo *player,
 	  element == EL_SP_GRAVITY_PORT_RIGHT ||
 	  element == EL_SP_GRAVITY_PORT_UP ||
 	  element == EL_SP_GRAVITY_PORT_DOWN)
-	game.current_gravity = !game.current_gravity;
+	level.gravity = !level.gravity;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
@@ -7256,11 +7263,13 @@ int DigField(struct PlayerInfo *player,
 	}
 	else if (element == EL_DYNAMITE || element == EL_SP_DISK_RED)
 	{
-	  player->dynamite++;
+	  if (player->inventory_size < MAX_INVENTORY_SIZE)
+	    player->inventory_element[player->inventory_size++] = element;
+
 	  player->use_disk_red_graphic = (element == EL_SP_DISK_RED);
 
 	  DrawText(DX_DYNAMITE, DY_DYNAMITE,
-		   int2str(local_player->dynamite, 3), FONT_TEXT_2);
+		   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
 	}
 	else if (element == EL_DYNABOMB_INCREASE_NUMBER)
 	{
@@ -7287,10 +7296,21 @@ int DigField(struct PlayerInfo *player,
 			     el2edimg(EL_KEY_1 + key_nr));
 	  redraw_mask |= REDRAW_DOOR_1;
 	}
-	else if (element_info[element].gem_count > 0)
+	else if (IS_DROPPABLE(element))	/* can be collected and dropped */
+	{
+	  int i;
+
+	  for (i=0; i < element_info[element].collect_count; i++)
+	    if (player->inventory_size < MAX_INVENTORY_SIZE)
+	      player->inventory_element[player->inventory_size++] = element;
+
+	  DrawText(DX_DYNAMITE, DY_DYNAMITE,
+		   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
+	}
+	else if (element_info[element].collect_count > 0)
 	{
 	  local_player->gems_still_needed -=
-	    element_info[element].gem_count;
+	    element_info[element].collect_count;
 	  if (local_player->gems_still_needed < 0)
 	    local_player->gems_still_needed = 0;
 
@@ -7466,66 +7486,68 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   return TRUE;
 }
 
-boolean PlaceBomb(struct PlayerInfo *player)
+boolean DropElement(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
-  int element;
+  int old_element;
 
   if (!player->active || player->MovPos)
     return FALSE;
 
-  element = Feld[jx][jy];
+  old_element = Feld[jx][jy];
 
-  if ((player->dynamite == 0 && player->dynabombs_left == 0) ||
-      IS_ACTIVE_BOMB(element) || element == EL_EXPLOSION)
+  /* check if player has anything that can be dropped */
+  if (player->inventory_size == 0 && player->dynabombs_left == 0)
     return FALSE;
 
-#if 0
-  if (element != EL_EMPTY)
+  /* check if anything can be dropped at the current position */
+  if (IS_ACTIVE_BOMB(old_element) || old_element == EL_EXPLOSION)
     return FALSE;
-#endif
 
-  if (element != EL_EMPTY)
-  {
-#if 0
-    Store[jx][jy] = element;
-#else
-    Back[jx][jy] = element;
-#endif
-  }
+  /* collected custom elements can only be dropped on empty fields */
+  if (player->inventory_size > 0 &&
+      IS_CUSTOM_ELEMENT(player->inventory_element[player->inventory_size - 1])
+      && old_element != EL_EMPTY)
+    return FALSE;
+
+  if (old_element != EL_EMPTY)
+    Back[jx][jy] = old_element;		/* store old element on this field */
 
   MovDelay[jx][jy] = 96;
 
   ResetGfxAnimation(jx, jy);
   ResetRandomAnimationValue(jx, jy);
 
-  if (player->dynamite)
+  if (player->inventory_size > 0)
   {
+    int new_element = player->inventory_element[--player->inventory_size];
+
+#if 1
+    Feld[jx][jy] = (new_element == EL_DYNAMITE ? EL_DYNAMITE_ACTIVE :
+		    new_element == EL_SP_DISK_RED ? EL_SP_DISK_RED_ACTIVE :
+		    new_element);
+#else
     Feld[jx][jy] = (player->use_disk_red_graphic ? EL_SP_DISK_RED_ACTIVE :
 		    EL_DYNAMITE_ACTIVE);
-    player->dynamite--;
-
-    DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
-	     FONT_TEXT_2);
-    if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
-    {
-#if 1
-      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
-#else
-      if (game.emulation == EMU_SUPAPLEX)
-	DrawGraphic(SCREENX(jx), SCREENY(jy), IMG_SP_DISK_RED, 0);
-      else
-	DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), IMG_DYNAMITE_ACTIVE, 0);
 #endif
-    }
+
+    DrawText(DX_DYNAMITE, DY_DYNAMITE,
+	     int2str(local_player->inventory_size, 3), FONT_TEXT_2);
+
+    if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
+      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
 
     PlaySoundLevelAction(jx, jy, ACTION_DROPPING);
+
+    CheckTriggeredElementChange(jx, jy, new_element, CE_OTHER_GETS_DROPPED);
+    CheckElementChange(jx, jy, new_element, CE_DROPPED_BY_PLAYER);
   }
-  else
+  else		/* player is dropping a dyna bomb */
   {
+    player->dynabombs_left--;
+
     Feld[jx][jy] =
       EL_DYNABOMB_PLAYER_1_ACTIVE + (player->element_nr - EL_PLAYER_1);
-    player->dynabombs_left--;
 
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
@@ -7711,7 +7733,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_KEY]);
       break;
     default:
-      RaiseScore(element_info[element].score);
+      RaiseScore(element_info[element].collect_score);
       break;
   }
 }

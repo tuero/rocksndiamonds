@@ -63,7 +63,7 @@
 
 /* values for configurable properties (custom elem's only, else pre-defined) */
 #define EP_DIGGABLE		0
-#define EP_COLLECTIBLE		1
+#define EP_COLLECTIBLE_ONLY	1
 #define EP_DONT_RUN_INTO	2
 #define EP_DONT_COLLIDE_WITH	3
 #define EP_DONT_TOUCH		4
@@ -84,7 +84,7 @@
 #define EP_PASSABLE_OVER	19
 #define EP_PASSABLE_INSIDE	20
 #define EP_PASSABLE_UNDER	21
-#define EP_UNUSED_22		22
+#define EP_DROPPABLE		22
 #define EP_UNUSED_23		23
 #define EP_PUSHABLE		24
 
@@ -126,20 +126,21 @@
 #define EP_WALKABLE		60
 #define EP_PASSABLE		61
 #define EP_ACCESSIBLE		62
-#define EP_SNAPPABLE		63
-#define EP_WALL			64
-#define EP_SOLID_FOR_PUSHING	65
-#define EP_DRAGONFIRE_PROOF	66
-#define EP_EXPLOSION_PROOF	67
-#define EP_CAN_SMASH		68
-#define EP_CAN_EXPLODE		69
+#define EP_COLLECTIBLE		63
+#define EP_SNAPPABLE		64
+#define EP_WALL			65
+#define EP_SOLID_FOR_PUSHING	66
+#define EP_DRAGONFIRE_PROOF	67
+#define EP_EXPLOSION_PROOF	68
+#define EP_CAN_SMASH		69
+#define EP_CAN_EXPLODE		70
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	70
-#define EP_WALK_TO_OBJECT	71
-#define EP_DEADLY		72
+#define EP_EXPLODE_RESULT	71
+#define EP_WALK_TO_OBJECT	72
+#define EP_DEADLY		73
 
-#define NUM_ELEMENT_PROPERTIES	73
+#define NUM_ELEMENT_PROPERTIES	74
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -159,23 +160,25 @@
 #define CE_TOUCHED_BY_PLAYER	1
 #define CE_PRESSED_BY_PLAYER	2
 #define CE_PUSHED_BY_PLAYER	3
-#define CE_COLLISION		4
-#define CE_IMPACT		5
-#define CE_SMASHED		6
-#define CE_OTHER_IS_TOUCHING	7
-#define CE_OTHER_IS_CHANGING	8
-#define CE_OTHER_IS_EXPLODING	9
-#define CE_OTHER_GETS_TOUCHED	10
-#define CE_OTHER_GETS_PRESSED	11
-#define CE_OTHER_GETS_PUSHED	12
-#define CE_OTHER_GETS_COLLECTED	13
+#define CE_DROPPED_BY_PLAYER	4
+#define CE_COLLISION		5
+#define CE_IMPACT		6
+#define CE_SMASHED		7
+#define CE_OTHER_IS_TOUCHING	8
+#define CE_OTHER_IS_CHANGING	9
+#define CE_OTHER_IS_EXPLODING	10
+#define CE_OTHER_GETS_TOUCHED	11
+#define CE_OTHER_GETS_PRESSED	12
+#define CE_OTHER_GETS_PUSHED	13
+#define CE_OTHER_GETS_COLLECTED	14
+#define CE_OTHER_GETS_DROPPED	15
 
 /* values for internal purpose only (level editor) */
-#define CE_BY_PLAYER		14
-#define CE_BY_COLLISION		15
-#define CE_BY_OTHER		16
+#define CE_BY_PLAYER		16
+#define CE_BY_COLLISION		17
+#define CE_BY_OTHER		18
 
-#define NUM_CHANGE_EVENTS	17
+#define NUM_CHANGE_EVENTS	19
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -223,7 +226,7 @@
 
 /* macros for configurable properties */
 #define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
-#define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
+#define IS_COLLECTIBLE_ONLY(e)	HAS_PROPERTY(e, EP_COLLECTIBLE_ONLY)
 #define DONT_RUN_INTO(e)	HAS_PROPERTY(e, EP_DONT_RUN_INTO)
 #define DONT_COLLIDE_WITH(e)	HAS_PROPERTY(e, EP_DONT_COLLIDE_WITH)
 #define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
@@ -244,6 +247,7 @@
 #define IS_PASSABLE_OVER(e)	HAS_PROPERTY(e, EP_PASSABLE_OVER)
 #define IS_PASSABLE_INSIDE(e)	HAS_PROPERTY(e, EP_PASSABLE_INSIDE)
 #define IS_PASSABLE_UNDER(e)	HAS_PROPERTY(e, EP_PASSABLE_UNDER)
+#define IS_DROPPABLE(e)		HAS_PROPERTY(e, EP_DROPPABLE)
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 
 /* macros for special configurable properties */
@@ -281,10 +285,11 @@
 #define IS_ACCESSIBLE_OVER(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_OVER)
 #define IS_ACCESSIBLE_INSIDE(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_INSIDE)
 #define IS_ACCESSIBLE_UNDER(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_UNDER)
-#define IS_SNAPPABLE(e)		HAS_PROPERTY(e, EP_SNAPPABLE)
 #define IS_WALKABLE(e)		HAS_PROPERTY(e, EP_WALKABLE)
 #define IS_PASSABLE(e)		HAS_PROPERTY(e, EP_PASSABLE)
 #define IS_ACCESSIBLE(e)	HAS_PROPERTY(e, EP_ACCESSIBLE)
+#define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
+#define IS_SNAPPABLE(e)		HAS_PROPERTY(e, EP_SNAPPABLE)
 #define IS_WALL(e)		HAS_PROPERTY(e, EP_WALL)
 #define IS_SOLID_FOR_PUSHING(e)	HAS_PROPERTY(e, EP_SOLID_FOR_PUSHING)
 #define IS_DRAGONFIRE_PROOF(e)	HAS_PROPERTY(e, EP_DRAGONFIRE_PROOF)
@@ -351,6 +356,7 @@
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
+#define MAX_INVENTORY_SIZE	1000
 
 /* values for elements with content */
 #define MIN_ELEMENT_CONTENTS	1
@@ -971,9 +977,9 @@
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	1
+#define PROGRAM_VERSION_PATCH	0
 #define PROGRAM_VERSION_RELEASE	0
-#define PROGRAM_VERSION_STRING	"3.0.1"
+#define PROGRAM_VERSION_STRING	"3.0.0"
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
@@ -1086,10 +1092,12 @@ struct PlayerInfo
   int lights_still_needed;
   int friends_still_needed;
   int key[4];
-  int dynamite;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
   int shield_normal_time_left;
   int shield_deadly_time_left;
+
+  int inventory_element[MAX_INVENTORY_SIZE];
+  int inventory_size;
 };
 
 struct LevelInfo
@@ -1117,7 +1125,7 @@ struct LevelInfo
   int time_light;
   int time_timegate;
   boolean double_speed;
-  boolean initial_gravity;
+  boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -1179,7 +1187,6 @@ struct GameInfo
   int switchgate_pos;
   int balloon_dir;
   boolean explosions_delayed;
-  boolean current_gravity;
 };
 
 struct GlobalInfo
@@ -1271,8 +1278,8 @@ struct ElementInfo
   boolean use_gfx_element;	/* use custom graphic element */
   short gfx_element;		/* optional custom graphic element */
 
-  int score;			/* score value for collecting */
-  int gem_count;		/* gem count value for collecting */
+  int collect_score;		/* score value for collecting */
+  int collect_count;		/* count value for collecting */
 
   int push_delay_fixed;		/* constant frame delay for pushing */
   int push_delay_random;	/* additional random frame delay for pushing */
@@ -1304,6 +1311,8 @@ struct ElementInfo
   boolean can_explode_by_fire;	/* element explodes by fire */
   boolean can_explode_smashed;	/* element explodes when smashed */
   boolean can_explode_impact;	/* element explodes on impact */
+
+  boolean modified_settings;	/* set for all modified custom elements */
 };
 
 struct FontInfo

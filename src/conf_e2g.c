@@ -1,15 +1,3 @@
-/***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
-*----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
-*               Holger Schemel                             *
-*               Detmolder Strasse 189                      *
-*               33604 Bielefeld                            *
-*               Germany                                    *
-*               e-mail: info@artsoft.org                   *
-*----------------------------------------------------------*
-* conf_e2g.c                                               *
-***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -340,6 +328,14 @@ element_to_graphic[] =
   {
     EL_SP_DISK_RED,			ACTION_COLLECTING, -1, FALSE,
     IMG_SP_DISK_RED_COLLECTING
+  },
+  {
+    EL_SP_DISK_RED_ACTIVE,		-1, -1, FALSE,
+    IMG_SP_DISK_RED_ACTIVE
+  },
+  {
+    EL_SP_DISK_RED,			ACTION_ACTIVE, -1, FALSE,
+    IMG_SP_DISK_RED_ACTIVE
   },
   {
     EL_SP_PORT_RIGHT,			-1, -1, FALSE,

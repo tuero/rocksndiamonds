@@ -57,6 +57,8 @@ void FreeFontInfo(struct FontBitmapInfo *);
 
 int getFontWidth(int);
 int getFontHeight(int);
+int getTextWidth(char *, int);
+
 void getFontCharSource(int, char, Bitmap **, int *, int *);
 
 void DrawInitText(char *, int, int);

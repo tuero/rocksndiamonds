@@ -411,6 +411,10 @@ struct ConfigInfo image_config[] =
   { "sp_disk_red.collecting.xpos",		"8"			},
   { "sp_disk_red.collecting.ypos",		"5"			},
   { "sp_disk_red.collecting.frames",		"8"			},
+  { "sp_disk_red.active",			"RocksSP.pcx"		},
+  { "sp_disk_red.active.xpos",			"4"			},
+  { "sp_disk_red.active.ypos",			"2"			},
+  { "sp_disk_red.active.frames",		"1"			},
 
   { "sp_port_right",				"RocksSP.pcx"		},
   { "sp_port_right.xpos",			"1"			},

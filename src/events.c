@@ -793,9 +793,16 @@ void HandleKey(Key key, int key_status)
 
 	case KSYM_Q:
 	case KSYM_q:
-	  local_player->dynamite = 1000;
-	  break;
+	  {
+	    int i;
 
+	    for (i=0; i < MAX_INVENTORY_SIZE; i++)
+	      if (local_player->inventory_size < MAX_INVENTORY_SIZE)
+		local_player->inventory_element[local_player->inventory_size++] =
+		  EL_DYNAMITE;
+	  }
+
+	  break;
 
 
 #if 0
