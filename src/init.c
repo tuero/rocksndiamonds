@@ -2628,7 +2628,7 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- CAN_EXPLODE ---------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||
 				     CAN_EXPLODE_SMASHED(i) ||
-				     CAN_EXPLODE_BY_FIRE(i)));
+				     CAN_EXPLODE_IMPACT(i)));
   }
 
 #if 0
@@ -3209,7 +3209,7 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
-#if 1
+#if 0
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
 	   artwork.gfx_current_identifier,
 	   gfx_new_identifier,
