@@ -48,6 +48,9 @@
 #define RANDOM_USE_PERCENTAGE	0
 #define RANDOM_USE_NUM_OBJECTS	1
 
+/* values for elements with content */
+#define MAX_ELEMCONT		8
+
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 	236
 #define ED_CTRL_BUTTONS_ALT_GFX_YPOS 	142
@@ -114,8 +117,9 @@
 #define ED_CTRL_ID_DRAWING_LEVEL	26
 #define ED_CTRL_ID_ELEMCONT_0		27
 #define ED_CTRL_ID_ELEMCONT_7		34
+#define ED_CTRL_ID_AMOEBA_CONTENT	35
 
-#define ED_NUM_GADGETS			35
+#define ED_NUM_GADGETS			36
 
 /* values for counter gadgets */
 #define ED_COUNTER_SCORE		0
@@ -137,7 +141,7 @@ static struct
 
 /* forward declaration for internal use */
 static void DrawDrawingWindow();
-static void DrawPropertiesWindow(int);
+static void DrawPropertiesWindow();
 static void CopyLevelToUndoBuffer();
 static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
@@ -147,8 +151,9 @@ static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
 static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
+static int properties_element = 0;
 
-static short ElementContent[8][3][3];
+static short ElementContent[MAX_ELEMCONT][3][3];
 static short OrigBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
@@ -647,13 +652,15 @@ static void CreateDrawingAreas()
 {
   struct GadgetInfo *gi;
   unsigned long event_mask;
-  int id = ED_CTRL_ID_DRAWING_LEVEL;
+  int id;
   int i;
 
   event_mask =
     GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
     GD_EVENT_OFF_BORDERS;
 
+  /* one for the level drawing area ... */
+  id = ED_CTRL_ID_DRAWING_LEVEL;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX,
 		    GDI_Y, SY,
@@ -670,12 +677,13 @@ static void CreateDrawingAreas()
 
   level_editor_gadget[id] = gi;
 
-  for (i=0; i<8; i++)
+  /* ... up to eight areas for element content ... */
+  for (i=0; i<MAX_ELEMCONT; i++)
   {
-    int id = ED_CTRL_ID_ELEMCONT_0 + i;
     int gx = SX + ED_AREA_ELEMCONT_XPOS + 5 * (i % 4) * MINI_TILEX;
     int gy = SX + ED_AREA_ELEMCONT_YPOS + 6 * (i / 4) * MINI_TILEY;
 
+    id = ED_CTRL_ID_ELEMCONT_0 + i;
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, gx,
 		      GDI_Y, gy,
@@ -692,6 +700,24 @@ static void CreateDrawingAreas()
 
     level_editor_gadget[id] = gi;
   }
+
+  /* ... and one for the amoeba content */
+  id = ED_CTRL_ID_AMOEBA_CONTENT;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_X, SX + ED_AREA_ELEMCONT_XPOS,
+		    GDI_Y, SY + ED_AREA_ELEMCONT_YPOS,
+		    GDI_WIDTH, MINI_TILEX,
+		    GDI_HEIGHT, MINI_TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK, HandleDrawingAreas,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
 }
 
 static void CreateLevelEditorGadgets()
@@ -1171,8 +1197,12 @@ void LevelEd(int mx, int my, int button)
 			 el2gfx(new_element3));
       redraw_mask |= REDRAW_DOOR_1;
 
+      /*
+      properties_element = new_element;
       if (edit_mode == ED_MODE_PROPERTIES)
-	DrawPropertiesWindow(new_element);
+	DrawPropertiesWindow();
+      */
+
     }
   
     if (edit_mode == ED_MODE_DRAWING)	/********** EDIT-FENSTER **********/
@@ -1753,10 +1783,20 @@ static void DrawDrawingWindow()
 
 static void DrawElementContentAreas()
 {
-  static int num_areas = 8;
+  static int num_areas = MAX_ELEMCONT;
+  int area_x = ED_AREA_ELEMCONT_XPOS / MINI_TILEX;
+  int area_y = ED_AREA_ELEMCONT_YPOS / MINI_TILEY;
+  int area_sx = SX + ED_AREA_ELEMCONT_XPOS;
+  int area_sy = SY + ED_AREA_ELEMCONT_YPOS;
   int i, x, y;
 
-  for (i=0; i<8; i++)
+  for (i=0; i<MAX_ELEMCONT; i++)
+    for (y=0; y<3; y++)
+      for (x=0; x<3; x++)
+	ElementContent[i][x][y] =
+	  (i < 4 ? level.mampfer_inhalt[i][x][y] : EL_LEERRAUM);
+
+  for (i=0; i<MAX_ELEMCONT; i++)
     UnmapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
 
   /* display counter to choose number of element content areas */
@@ -1768,8 +1808,9 @@ static void DrawElementContentAreas()
 	    FC_YELLOW, "number of content areas");
   MapCounterButtons(ED_COUNTER_ELEMCONT);
 
+  /* delete content areas in case of reducing number of them */
   XFillRectangle(display, backbuffer, gc,
-		 SX, SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEX,
+		 SX, area_sy - MINI_TILEX,
 		 SXSIZE, 12 * MINI_TILEY);
 
   /* draw some decorative border for the objects */
@@ -1777,39 +1818,29 @@ static void DrawElementContentAreas()
   {
     for (y=0; y<4; y++)
       for (x=0; x<4; x++)
-	DrawMiniElement(ED_AREA_ELEMCONT_XPOS / MINI_TILEX + 5 * (i % 4) + x,
-			ED_AREA_ELEMCONT_YPOS / MINI_TILEY + 6 * (i / 4) + y,
+	DrawMiniElement(area_x + 5 * (i % 4) + x, area_y + 6 * (i / 4) + y,
 			EL_ERDREICH);
 
     XFillRectangle(display, drawto, gc,
-		   SX + ED_AREA_ELEMCONT_XPOS
-		   + 5 * (i % 4) * MINI_TILEX + MINI_TILEX/2 - 1,
-		   SY + ED_AREA_ELEMCONT_YPOS
-		   + 6 * (i / 4) * MINI_TILEY + MINI_TILEY/2 - 1,
+		   area_sx + 5 * (i % 4) * MINI_TILEX + MINI_TILEX/2 - 1,
+		   area_sy + 6 * (i / 4) * MINI_TILEY + MINI_TILEY/2 - 1,
 		   3 * MINI_TILEX + 2, 3 * MINI_TILEY + 2);
   }
 
   /* copy border to the right location */
   XCopyArea(display, drawto, drawto, gc,
-	    SX + ED_AREA_ELEMCONT_XPOS - MINI_TILEX/2,
-	    SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEY/2,
-	    (5 * 4 + 1) * MINI_TILEX,
-	    12 * MINI_TILEY,
-	    SX + ED_AREA_ELEMCONT_XPOS - MINI_TILEX,
-	    SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEY);
+	    area_sx, area_sy, (5 * 4 + 1) * MINI_TILEX, 12 * MINI_TILEY,
+	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
   for (i=0; i<num_areas; i++)
   {
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
-	DrawMiniElement(ED_AREA_ELEMCONT_XPOS / MINI_TILEX + 5 * (i % 4) + x,
-			ED_AREA_ELEMCONT_YPOS / MINI_TILEY + 6 * (i / 4) + y,
-			EL_EDELSTEIN_BD);
+	DrawMiniElement(area_x + 5 * (i % 4) + x, area_y + 6 * (i / 4) + y,
+			ElementContent[i][x][y]);
 
-    DrawTextF(ED_AREA_ELEMCONT_XPOS
-	      + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
-	      ED_AREA_ELEMCONT_YPOS
-	      + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
+    DrawTextF(area_sx - SX + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
+	      area_sy - SY + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
 	      FC_YELLOW, "%d", i + 1);
   }
 
@@ -1817,7 +1848,36 @@ static void DrawElementContentAreas()
     MapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
 }
 
-static void DrawPropertiesWindow(int element)
+static void DrawAmoebaContentArea()
+{
+  int area_x = ED_AREA_ELEMCONT_XPOS / MINI_TILEX;
+  int area_y = ED_AREA_ELEMCONT_YPOS / MINI_TILEY;
+  int area_sx = SX + ED_AREA_ELEMCONT_XPOS;
+  int area_sy = SY + ED_AREA_ELEMCONT_YPOS;
+  int x, y;
+
+  ElementContent[0][0][0] = level.amoebe_inhalt;
+
+  /* draw decorative border for the object */
+  for (y=0; y<2; y++)
+    for (x=0; x<2; x++)
+      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
+
+  XFillRectangle(display, drawto, gc,
+		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
+		 MINI_TILEX + 2, MINI_TILEY + 2);
+
+  /* copy border to the right location */
+  XCopyArea(display, drawto, drawto, gc,
+	    area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
+	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
+
+  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+
+  MapDrawingArea(ED_CTRL_ID_AMOEBA_CONTENT);
+}
+
+static void DrawPropertiesWindow()
 {
   int i, x, y;
   int num_elements_in_level;
@@ -1891,14 +1951,14 @@ static void DrawPropertiesWindow(int element)
 	    2 * TILEX, 2 * TILEY,
 	    SX + TILEX - MINI_TILEX/2, SY + TILEY - MINI_TILEY/2);
 
-  DrawGraphic(1, 1, el2gfx(element));
+  DrawGraphic(1, 1, el2gfx(properties_element));
   DrawText(SX + 3*TILEX, SY + 5*TILEY/4, "Element Properties",
 	   FS_SMALL, FC_YELLOW);
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
     for (x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] == element)
+      if (Feld[x][y] == properties_element)
 	num_elements_in_level++;
 
   DrawTextF(TILEX, 5*TILEY, FC_YELLOW, "%d x contained in level",
@@ -1907,7 +1967,7 @@ static void DrawPropertiesWindow(int element)
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
   {
-    if (elements_with_counter[i].element == element)
+    if (elements_with_counter[i].element == properties_element)
     {
       int x = counter_info[ED_COUNTER_SCORE].x + DXSIZE;
       int y = counter_info[ED_COUNTER_SCORE].y;
@@ -1921,7 +1981,10 @@ static void DrawPropertiesWindow(int element)
     }
   }
 
-  DrawElementContentAreas();
+  if (properties_element == EL_MAMPFER)
+    DrawElementContentAreas();
+  else if (IS_AMOEBOID(properties_element))
+    DrawAmoebaContentArea();
 }
 
 static void swap_numbers(int *i1, int *i2)
@@ -2516,8 +2579,8 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       *gadget_areas_value += (id == ED_CTRL_ID_ELEMCONT_DOWN ? -step : step);
       if (*gadget_areas_value < 1)
 	*gadget_areas_value = 1;
-      else if (*gadget_areas_value > 8)
-	*gadget_areas_value = 8;
+      else if (*gadget_areas_value > MAX_ELEMCONT)
+	*gadget_areas_value = MAX_ELEMCONT;
 
       DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
       DrawElementContentAreas();
@@ -2629,7 +2692,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case ED_CTRL_ID_PROPERTIES:
-      DrawPropertiesWindow(new_element);
+      properties_element = new_element;
+      DrawPropertiesWindow();
       edit_mode = ED_MODE_PROPERTIES;
       break;
 
