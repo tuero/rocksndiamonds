@@ -14,6 +14,8 @@
 #ifndef LIBGAME_H
 #define LIBGAME_H
 
+#define LIBGAME_VERSION_1_0_0
+
 #include "platform.h"
 #include "types.h"
 #include "system.h"

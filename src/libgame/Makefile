@@ -1,6 +1,6 @@
 #=============================================================================#
-# Makefile for Rocks'n'Diamonds                                               #
-# (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
+# Makefile for Artsoft Retro-Game Library                                     #
+# (c) 1994-2000 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 SRCS =	system.c	\
