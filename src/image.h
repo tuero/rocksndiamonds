@@ -18,22 +18,18 @@
 
 #define MAX_COLORS	256	/* maximal number of colors for each image */
 
-typedef unsigned short Intensity; /* what X thinks an RGB intensity is */
+typedef unsigned short Intensity;	/* RGB intensity for X11 */
 
 typedef struct
 {
-  Display  *display;	/* destination display                              */
-  int       screen;	/* destination screen                               */
-  int       depth;	/* depth of drawable we want/have                   */
-  Drawable  drawable;	/* drawable to send image to                        */
-  Pixel    *index;	/* array of pixel values allocated                  */
-  int       no;		/* number of pixels in the array                    */
-  int       rootimage;	/* True if is a root image - eg, retain colors      */
-  Colormap  cmap;	/* colormap used for image                          */
-  GC        gc;		/* cached gc for sending image                      */
-  XImage   *ximage;	/* ximage structure                                 */
-  Pixmap   pixmap;	/* final pixmap                                     */
-  Pixmap   pixmap_mask;	/* final pixmap of mask                             */
+  Display  *display;		/* destination display             */
+  int       screen;		/* destination screen              */
+  int       depth;		/* depth of destination drawable   */
+  Pixel     index[MAX_COLORS];	/* array of pixel values           */
+  int       no;			/* number of pixels in the array   */
+  Colormap  cmap;		/* colormap used for image         */
+  Pixmap   pixmap;		/* final pixmap                    */
+  Pixmap   pixmap_mask;		/* final pixmap of mask            */
 } XImageInfo;
 
 struct RGBMap
@@ -52,37 +48,7 @@ typedef struct
   unsigned int  height;		/* height of image in pixels           */
   unsigned int  depth;		/* depth of image in bits if IRGB type */
   byte         *data;		/* image data                          */
-  byte         *data_mask;	/* clip mask data                      */
 } Image;
-
-/*
- * architecture independent memory-to-value conversions
- * note: the internal format is big endian
- */
-
-#define memToVal(PTR,LEN) (                                   \
-(LEN) == 1 ? (unsigned long)(                 *( (byte *)(PTR))         ) :    \
-(LEN) == 2 ? (unsigned long)(((unsigned long)(*( (byte *)(PTR))   ))<< 8)      \
-                          + (                 *(((byte *)(PTR))+1)      ) :    \
-(LEN) == 3 ? (unsigned long)(((unsigned long)(*( (byte *)(PTR))   ))<<16)      \
-                          + (((unsigned long)(*(((byte *)(PTR))+1)))<< 8)      \
-						  + (                 *(((byte *)(PTR))+2)      ) :    \
-             (unsigned long)(((unsigned long)(*( (byte *)(PTR))   ))<<24)      \
-						  + (((unsigned long)(*(((byte *)(PTR))+1)))<<16)      \
-						  + (((unsigned long)(*(((byte *)(PTR))+2)))<< 8)      \
-						  + (                 *(((byte *)(PTR))+3)      ) )
-
-#define valToMem(VAL,PTR,LEN)  (                                          \
-(LEN) == 1 ? (*( (byte *)(PTR)   ) = ( VAL     ) ) : \
-(LEN) == 2 ? (*( (byte *)(PTR)   ) = (((unsigned long)(VAL))>> 8),        \
-              *(((byte *)(PTR))+1) = ( VAL     ) ) : \
-(LEN) == 3 ? (*( (byte *)(PTR)   ) = (((unsigned long)(VAL))>>16),        \
-              *(((byte *)(PTR))+1) = (((unsigned long)(VAL))>> 8),        \
-              *(((byte *)(PTR))+2) = ( VAL     ) ) : \
-             (*( (byte *)(PTR)   ) = (((unsigned long)(VAL))>>24),        \
-              *(((byte *)(PTR))+1) = (((unsigned long)(VAL))>>16),        \
-              *(((byte *)(PTR))+2) = (((unsigned long)(VAL))>> 8),        \
-              *(((byte *)(PTR))+3) = ( VAL     ) ))
 
 #define PCX_Success		 0
 #define PCX_OpenFailed		-1
@@ -91,11 +57,11 @@ typedef struct
 #define PCX_NoMemory		-4
 #define PCX_ColorFailed		-5
 
-int Read_PCX_to_Pixmaps(Display *, Window, char *, Pixmap *, Pixmap *);
+int Read_PCX_to_Pixmaps(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
-Image *Read_PCX_to_Image();
-Image *newImage();
-void freeImage();
-void freeXImage();
+Image *Read_PCX_to_Image(char *);
+Image *newImage(unsigned int, unsigned int, unsigned int);
+void freeImage(Image *);
+void freeXImage(Image *, XImageInfo *);
 
 #endif	/* IMAGE_H */

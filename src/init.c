@@ -693,7 +693,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else 
 
-    pcx_err = Read_PCX_to_Pixmaps(display, window, filename,
+    pcx_err = Read_PCX_to_Pixmaps(display, window, gc, filename,
 				  &pix[pos], &clipmask[pos]);
 
     switch(pcx_err)
