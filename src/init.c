@@ -85,8 +85,8 @@ void OpenAll(int argc, char *argv[])
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
-  InitGadgets();
   InitLevelAndPlayerInfo();
+  InitGadgets();		/* needs to know number of level series */
 
   DrawMainMenu();
 
@@ -813,6 +813,7 @@ void InitGadgets()
   CreateGameButtons();
   CreateTapeButtons();
   CreateToolButtons();
+  CreateScreenGadgets();
 }
 
 void InitElementProperties()

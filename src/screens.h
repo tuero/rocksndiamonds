@@ -38,4 +38,8 @@ void CustomizeKeyboard(int);
 void CalibrateJoystick(int);
 void HandleGameActions(void);
 
+void CreateScreenGadgets();
+void MapChooseLevelGadgets();
+void UnmapChooseLevelGadgets();
+
 #endif	/* SCREENS_H */

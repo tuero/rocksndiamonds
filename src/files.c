@@ -1629,7 +1629,7 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 
       if (leveldir[current_entry].name_sorting == NULL)
 	leveldir[current_entry].name_sorting =
-	  getStringCopy(leveldir[current_entry].name_short);
+	  getStringCopy(leveldir[current_entry].name);
 
       leveldir[current_entry].filename = getStringCopy(dir_entry->d_name);
       leveldir[current_entry].last_level =

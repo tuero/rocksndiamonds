@@ -41,6 +41,20 @@
 /* for HandleChooseLevel() */
 #define MAX_LEVEL_SERIES_ON_SCREEN	(SCR_FIELDY - 2)
 
+/* buttons and scrollbars identifiers */
+#define SCREEN_CTRL_ID_SCROLL_UP	0
+#define SCREEN_CTRL_ID_SCROLL_DOWN	1
+#define SCREEN_CTRL_ID_SCROLL_VERTICAL	2
+
+#define NUM_SCREEN_SCROLLBUTTONS	2
+#define NUM_SCREEN_SCROLLBARS		1
+#define NUM_SCREEN_GADGETS		3
+
+/* forward declaration for internal use */
+static void HandleScreenGadgets(struct GadgetInfo *);
+
+static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
+
 #ifdef MSDOS
 extern unsigned char get_ascii(KeySym);
 #endif
@@ -815,17 +829,39 @@ void DrawChooseLevel()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
+  ClearWindow();
+  HandleChooseLevel(0,0, 0,0, MB_MENU_INITIALIZE);
+  MapChooseLevelGadgets();
+
   FadeToFront();
   InitAnimation();
-  HandleChooseLevel(0,0, 0,0, MB_MENU_INITIALIZE);
+}
+
+static void AdjustChooseLevelScrollbar(int id, int first_entry)
+{
+  struct GadgetInfo *gi = screen_gadget[id];
+  int items_max, items_visible, item_position;
+
+  items_max = num_leveldirs;
+  items_visible = MAX_LEVEL_SERIES_ON_SCREEN - 1;
+  item_position = first_entry;
+
+  if (item_position > items_max - items_visible)
+    item_position = items_max - items_visible;
+
+  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
 static void drawChooseLevelList(int first_entry, int num_page_entries)
 {
   int i;
   char buffer[SCR_FIELDX * 2];
+  int max_buffer_len = (SCR_FIELDX - 2) * 2;
 
-  ClearWindow();
+  XFillRectangle(display, backbuffer, gc, SX, SY, SXSIZE - 32, SYSIZE);
+  redraw_mask |= REDRAW_FIELD;
+
   DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
 
   for(i=0; i<num_page_entries; i++)
@@ -834,8 +870,8 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
     strncpy(buffer, leveldir[first_entry + i].name_short , SCR_FIELDX - 1);
     buffer[SCR_FIELDX - 1] = '\0';
 #else
-    strncpy(buffer, leveldir[first_entry + i].name , (SCR_FIELDX - 1) * 2);
-    buffer[(SCR_FIELDX - 1) * 2] = '\0';
+    strncpy(buffer, leveldir[first_entry + i].name , max_buffer_len);
+    buffer[max_buffer_len] = '\0';
 #endif
 
     DrawText(SX + 32, SY + (i + 2) * 32, buffer,
@@ -854,7 +890,7 @@ static void drawChooseLevelInfo(int leveldir_nr)
 {
   int x, last_redraw_mask = redraw_mask;
 
-  XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 32, 32);
+  XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 64, 32);
 
 #if 0
   DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
@@ -893,7 +929,11 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     {
       first_entry = MAX(0, leveldir_nr - num_page_entries + 1);
       choice = leveldir_nr - first_entry + 3;
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
     }
+
+    if (dx == 1)	/* 'first_entry' is set by scrollbar position */
+      first_entry = dy;
 
     drawChooseLevelList(first_entry, num_page_entries);
     drawChooseLevelInfo(leveldir_nr);
@@ -939,6 +979,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry + choice - 3);
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
       return;
     }
@@ -954,6 +995,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry + choice - 3);
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
       return;
     }
@@ -2049,4 +2091,225 @@ void HandleGameActions()
   GameActions();
 
   BackToFront();
+}
+
+/* ---------- new screen button stuff -------------------------------------- */
+
+/* graphic position and size values for buttons and scrollbars */
+#define SC_SCROLLBUTTON_XPOS		24
+#define SC_SCROLLBUTTON_YPOS		0
+#define SC_SCROLLBAR_XPOS		24
+#define SC_SCROLLBAR_YPOS		64
+
+#define SC_SCROLLBUTTON_XSIZE		16
+#define SC_SCROLLBUTTON_YSIZE		16
+
+#define SC_SCROLL_UP_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
+#define SC_SCROLL_UP_YPOS		(3 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_DOWN_XPOS		SC_SCROLL_UP_XPOS
+#define SC_SCROLL_DOWN_YPOS		(SYSIZE - 2 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_VERTICAL_XPOS		SC_SCROLL_UP_XPOS
+#define SC_SCROLL_VERTICAL_YPOS	  (SC_SCROLL_UP_YPOS + SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_VERTICAL_XSIZE	SC_SCROLLBUTTON_XSIZE
+#define SC_SCROLL_VERTICAL_YSIZE	(SYSIZE - 6 * SC_SCROLLBUTTON_YSIZE)
+
+#define SC_BORDER_SIZE			3
+
+static struct
+{
+  int xpos, ypos;
+  int x, y;
+  int gadget_id;
+  char *infotext;
+} scrollbutton_info[NUM_SCREEN_SCROLLBUTTONS] =
+{
+  {
+    SC_SCROLLBUTTON_XPOS,   SC_SCROLLBUTTON_YPOS + 0 * SC_SCROLLBUTTON_YSIZE,
+    SC_SCROLL_UP_XPOS,      SC_SCROLL_UP_YPOS,
+    SCREEN_CTRL_ID_SCROLL_UP,
+    "scroll level series up"
+  },
+  {
+    SC_SCROLLBUTTON_XPOS,   SC_SCROLLBUTTON_YPOS + 1 * SC_SCROLLBUTTON_YSIZE,
+    SC_SCROLL_DOWN_XPOS,    SC_SCROLL_DOWN_YPOS,
+    SCREEN_CTRL_ID_SCROLL_DOWN,
+    "scroll level series down"
+  }
+};
+
+static struct
+{
+  int xpos, ypos;
+  int x, y;
+  int width, height;
+  int type;
+  int gadget_id;
+  char *infotext;
+} scrollbar_info[NUM_SCREEN_SCROLLBARS] =
+{
+  {
+    SC_SCROLLBAR_XPOS,			SC_SCROLLBAR_YPOS,
+    SX + SC_SCROLL_VERTICAL_XPOS,	SY + SC_SCROLL_VERTICAL_YPOS,
+    SC_SCROLL_VERTICAL_XSIZE,		SC_SCROLL_VERTICAL_YSIZE,
+    GD_TYPE_SCROLLBAR_VERTICAL,
+    SCREEN_CTRL_ID_SCROLL_VERTICAL,
+    "scroll level series vertically"
+  }
+};
+
+static void CreateScreenScrollbuttons()
+{
+  Pixmap gd_pixmap = pix[PIX_DOOR];
+  struct GadgetInfo *gi;
+  unsigned long event_mask;
+  int i;
+
+  for (i=0; i<NUM_SCREEN_SCROLLBUTTONS; i++)
+  {
+    int id = scrollbutton_info[i].gadget_id;
+    int x, y, width, height;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+
+    x = scrollbutton_info[i].x;
+    y = scrollbutton_info[i].y;
+
+    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+
+    x += SX;
+    y += SY;
+    width = SC_SCROLLBUTTON_XSIZE;
+    height = SC_SCROLLBUTTON_YSIZE;
+    gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[i].xpos;
+    gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[i].ypos;
+    gd_x2 = gd_x1 - SC_SCROLLBUTTON_XSIZE;
+    gd_y2 = gd_y1;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_INFO_TEXT, scrollbutton_info[i].infotext,
+		      GDI_X, x,
+		      GDI_Y, y,
+		      GDI_WIDTH, width,
+		      GDI_HEIGHT, height,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    screen_gadget[id] = gi;
+  }
+}
+
+static void CreateScreenScrollbars()
+{
+  int i;
+
+  for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
+  {
+    int id = scrollbar_info[i].gadget_id;
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+    struct GadgetInfo *gi;
+    int items_max, items_visible, item_position;
+    unsigned long event_mask;
+    int num_page_entries;
+
+    if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
+      num_page_entries = num_leveldirs;
+    else
+      num_page_entries = MAX_LEVEL_SERIES_ON_SCREEN - 1;
+
+    items_max = MAX(num_leveldirs, num_page_entries);
+    items_visible = num_page_entries;
+    item_position = 0;
+
+    event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
+
+    gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
+    gd_x2 = (gd_x1 - (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL ?
+		      scrollbar_info[i].height : scrollbar_info[i].width));
+    gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+    gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
+		      GDI_X, scrollbar_info[i].x,
+		      GDI_Y, scrollbar_info[i].y,
+		      GDI_WIDTH, scrollbar_info[i].width,
+		      GDI_HEIGHT, scrollbar_info[i].height,
+		      GDI_TYPE, scrollbar_info[i].type,
+		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
+		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
+		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_BORDER_SIZE, SC_BORDER_SIZE,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    screen_gadget[id] = gi;
+  }
+}
+
+void CreateScreenGadgets()
+{
+  CreateScreenScrollbuttons();
+  CreateScreenScrollbars();
+}
+
+void MapChooseLevelGadgets()
+{
+  int i;
+
+  if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
+    return;
+
+  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+    MapGadget(screen_gadget[i]);
+}
+
+void UnmapChooseLevelGadgets()
+{
+  int i;
+
+  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+    UnmapGadget(screen_gadget[i]);
+}
+
+static void HandleScreenGadgets(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+
+  if (game_status != CHOOSELEVEL)
+    return;
+
+  switch (id)
+  {
+    case SCREEN_CTRL_ID_SCROLL_UP:
+      HandleChooseLevel(SX,SY + 32, 0,0, MB_MENU_MARK);
+      break;
+
+    case SCREEN_CTRL_ID_SCROLL_DOWN:
+      HandleChooseLevel(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+      break;
+
+    case SCREEN_CTRL_ID_SCROLL_VERTICAL:
+      HandleChooseLevel(0,0, 1,gi->event.item_position, MB_MENU_INITIALIZE);
+      break;
+
+    default:
+      break;
+  }
 }
