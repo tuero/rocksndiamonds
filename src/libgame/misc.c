@@ -323,10 +323,27 @@ unsigned int init_random_number(int nr, long seed)
   return (unsigned int) seed;
 }
 
+#if 1
 unsigned int get_random_number(int nr, unsigned int max)
 {
   return (max > 0 ? random_linux_libc(nr) % max : 0);
 }
+#else
+unsigned int get_random_number(int nr, unsigned int max)
+{
+  unsigned int rnd = (max > 0 ? random_linux_libc(nr) % max : 0);
+
+  if (nr == 0 && FrameCounter < 2)
+    printf("::: %d [%d]\n", rnd, FrameCounter);
+
+#if 0
+  if (nr == 0 && FrameCounter < 2 && rnd == 8)
+    rnd /= 0;
+#endif
+
+  return rnd;
+}
+#endif
 
 
 /* ------------------------------------------------------------------------- */

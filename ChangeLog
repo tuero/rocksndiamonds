@@ -1,3 +1,17 @@
+2003-11-14
+	* fixed a very nasty bug in dragon turning code in TurnRoundExt()
+	  (that only showed up on Linux, but not on Windows systems)
+
+2003-11-13
+	* fixed turning movement of butterflies and fireflies (no frame reset)
+	* enhanced sniksnak turning movement (two steps instead of only one)
+
+2003-11-10
+	* Version number set to 3.0.8.
+
+2003-11-10
+	* Version 3.0.7 released.
+
 2003-11-09
 	* fixed reset of player animation frame when, for example,
 	  walking, digging or collecting share the same animation

@@ -1460,6 +1460,10 @@ void InitGame()
       printf("Player %d %sactive.\n",
 	     i + 1, (stored_player[i].active ? "" : "not "));
   }
+
+#if 0
+  printf("::: starting game [%d]\n", FrameCounter);
+#endif
 }
 
 void InitMovDir(int x, int y)
@@ -3388,6 +3392,11 @@ inline static void TurnRoundExt(int x, int y)
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
+#if 0
+    if (FrameCounter < 1 && x == 0 && y == 29)
+      printf(":2: %d/%d: %d [%d]\n", x, y, MovDir[x][y], FrameCounter);
+#endif
+
     if (can_move_on && rnd > rnd_value / 8)
       MovDir[x][y] = old_move_dir;
     else if (can_turn_left && can_turn_right)
@@ -3402,8 +3411,25 @@ inline static void TurnRoundExt(int x, int y)
     xx = x + move_xy[MovDir[x][y]].x;
     yy = y + move_xy[MovDir[x][y]].y;
 
+#if 0
+    if (FrameCounter < 1 && x == 0 && y == 29)
+      printf(":3: %d/%d: %d (%d/%d: %d) [%d]\n", x, y, MovDir[x][y],
+	     xx, yy, Feld[xx][yy],
+	     FrameCounter);
+#endif
+
+#if 1
+    if (!IN_LEV_FIELD_AND_IS_FREE(xx, yy))
+      MovDir[x][y] = old_move_dir;
+#else
     if (!IS_FREE(xx, yy))
       MovDir[x][y] = old_move_dir;
+#endif
+
+#if 0
+    if (FrameCounter < 1 && x == 0 && y == 29)
+      printf(":4: %d/%d: %d [%d]\n", x, y, MovDir[x][y], FrameCounter);
+#endif
 
     MovDelay[x][y] = 0;
   }
@@ -4094,6 +4120,11 @@ void StartMoving(int x, int y)
 #endif
 #endif
 
+#if 0
+    if (FrameCounter < 1 && x == 0 && y == 29)
+      printf(":1: %d/%d: %d [%d]\n", x, y, MovDir[x][y], FrameCounter);
+#endif
+
     if (!MovDelay[x][y])	/* start new movement phase */
     {
       /* all objects that can change their move direction after each step
@@ -4107,6 +4138,11 @@ void StartMoving(int x, int y)
 	  element_info[element].move_pattern != MV_TURNING_RIGHT)
       {
 	TurnRound(x, y);
+
+#if 0
+	if (FrameCounter < 1 && x == 0 && y == 29)
+	  printf(":9: %d: %d [%d]\n", y, MovDir[x][y], FrameCounter);
+#endif
 
 	if (MovDelay[x][y] && (element == EL_BUG ||
 			       element == EL_SPACESHIP ||
@@ -6128,6 +6164,10 @@ void GameActions()
 
   if (tape.pausing)
     return;
+
+#if 0
+  printf("::: getting new tape action [%d]\n", FrameCounter);
+#endif
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 

@@ -3699,6 +3699,8 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".emptying",		ACTION_EMPTYING,		FALSE	},
   { ".changing",		ACTION_CHANGING,		FALSE	},
   { ".exploding",		ACTION_EXPLODING,		FALSE	},
+  { ".boring",			ACTION_BORING,			FALSE	},
+  { ".sleeping",		ACTION_SLEEPING,		TRUE	},
   { ".dying",			ACTION_DYING,			FALSE	},
   { ".turning",			ACTION_TURNING,			FALSE	},
   { ".turning_from_left",	ACTION_TURNING_FROM_LEFT,	FALSE	},
