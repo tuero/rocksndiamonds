@@ -610,7 +610,7 @@ void HandleKey(KeySym key, int key_status)
 	  break;
 #endif
 
-#if 1
+#if 0
 	case XK_m:
 	  if (MoveSpeed == 8)
 	  {

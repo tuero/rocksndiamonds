@@ -86,13 +86,12 @@ unsigned long	Elementeigenschaften[MAX_ELEMENTS];
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-int		FX = SX, FY = SY, ScrollStepSize = TILEX/8;
+int		FX = SX, FY = SY, ScrollStepSize;
 int		ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
 int		ScreenGfxPos = 0;
 int		BorderElement = EL_BETON;
 int		GameFrameDelay = GAME_FRAME_DELAY;
 int		FfwdFrameDelay = FFWD_FRAME_DELAY;
-int		MoveSpeed = 8;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
 int		SBX_Left, SBX_Right;
 int		SBY_Upper, SBY_Lower;

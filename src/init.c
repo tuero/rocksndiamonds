@@ -889,7 +889,15 @@ void InitElementProperties()
     EL_PFORTE1X,
     EL_PFORTE2X,
     EL_PFORTE3X,
-    EL_PFORTE4X
+    EL_PFORTE4X,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1X,
+    EL_EM_GATE_2X,
+    EL_EM_GATE_3X,
+    EL_EM_GATE_4X
   };
   static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
 
@@ -966,6 +974,14 @@ void InitElementProperties()
     EL_PFORTE2X,
     EL_PFORTE3X,
     EL_PFORTE4X,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1X,
+    EL_EM_GATE_2X,
+    EL_EM_GATE_3X,
+    EL_EM_GATE_4X,
     EL_SP_HARD_GRAY,
     EL_SP_HARD_GREEN,
     EL_SP_HARD_BLUE,
@@ -1039,6 +1055,14 @@ void InitElementProperties()
     EL_PFORTE2X,
     EL_PFORTE3X,
     EL_PFORTE4X,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1X,
+    EL_EM_GATE_2X,
+    EL_EM_GATE_3X,
+    EL_EM_GATE_4X,
     EL_AUSGANG_ZU,
     EL_AUSGANG_ACT,
     EL_AUSGANG_AUF,
@@ -1302,6 +1326,14 @@ void InitElementProperties()
     EL_PFORTE2X,
     EL_PFORTE3X,
     EL_PFORTE4X,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1X,
+    EL_EM_GATE_2X,
+    EL_EM_GATE_3X,
+    EL_EM_GATE_4X,
     EL_DYNAMIT_AUS,
     EL_UNSICHTBAR,
     EL_BIRNE_AUS,
@@ -1487,6 +1519,46 @@ void InitElementProperties()
   };
   static int ep_sp_element_num = sizeof(ep_sp_element)/sizeof(int);
 
+  static int ep_quick_gate[] =
+  {
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1X,
+    EL_EM_GATE_2X,
+    EL_EM_GATE_3X,
+    EL_EM_GATE_4X,
+    EL_SP_PORT1_LEFT,
+    EL_SP_PORT2_LEFT,
+    EL_SP_PORT1_RIGHT,
+    EL_SP_PORT2_RIGHT,
+    EL_SP_PORT1_UP,
+    EL_SP_PORT2_UP,
+    EL_SP_PORT1_DOWN,
+    EL_SP_PORT2_DOWN,
+    EL_SP_PORT_X,
+    EL_SP_PORT_Y,
+    EL_SP_PORT_XY
+  };
+  static int ep_quick_gate_num = sizeof(ep_quick_gate)/sizeof(int);
+
+  static int ep_over_player[] =
+  {
+    EL_SP_PORT1_LEFT,
+    EL_SP_PORT2_LEFT,
+    EL_SP_PORT1_RIGHT,
+    EL_SP_PORT2_RIGHT,
+    EL_SP_PORT1_UP,
+    EL_SP_PORT2_UP,
+    EL_SP_PORT1_DOWN,
+    EL_SP_PORT2_DOWN,
+    EL_SP_PORT_X,
+    EL_SP_PORT_Y,
+    EL_SP_PORT_XY
+  };
+  static int ep_over_player_num = sizeof(ep_over_player)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1516,7 +1588,9 @@ void InitElementProperties()
     EP_BIT_PLAYER,
     EP_BIT_HAS_CONTENT,
     EP_BIT_EATABLE,
-    EP_BIT_SP_ELEMENT
+    EP_BIT_SP_ELEMENT,
+    EP_BIT_QUICK_GATE,
+    EP_BIT_OVER_PLAYER
   };
   static int *ep_array[] =
   {
@@ -1547,7 +1621,9 @@ void InitElementProperties()
     ep_player,
     ep_has_content,
     ep_eatable,
-    ep_sp_element
+    ep_sp_element,
+    ep_quick_gate,
+    ep_over_player
   };
   static int *ep_num[] =
   {
@@ -1578,7 +1654,9 @@ void InitElementProperties()
     &ep_player_num,
     &ep_has_content_num,
     &ep_eatable_num,
-    &ep_sp_element_num
+    &ep_sp_element_num,
+    &ep_quick_gate_num,
+    &ep_over_player_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 

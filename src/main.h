@@ -124,6 +124,8 @@ typedef unsigned char byte;
 #define EP_BIT_HAS_CONTENT	(1 << 26)
 #define EP_BIT_EATABLE		(1 << 27)
 #define EP_BIT_SP_ELEMENT	(1 << 28)
+#define EP_BIT_QUICK_GATE	(1 << 29)
+#define EP_BIT_OVER_PLAYER	(1 << 30)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -154,6 +156,8 @@ typedef unsigned char byte;
 #define HAS_CONTENT(e)		(Elementeigenschaften[e] & EP_BIT_HAS_CONTENT)
 #define IS_EATABLE(e)		(Elementeigenschaften[e] & EP_BIT_EATABLE)
 #define IS_SP_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SP_ELEMENT)
+#define IS_QUICK_GATE(e)	(Elementeigenschaften[e] & EP_BIT_QUICK_GATE)
+#define IS_OVER_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_OVER_PLAYER)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -317,6 +321,7 @@ struct PlayerInfo
   boolean gone, LevelSolved, GameOver;
   boolean snapped;
 
+  int move_speed;
   unsigned long move_delay;
   int last_move_dir;
 
@@ -450,7 +455,6 @@ extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
 extern int		BorderElement;
 extern int		GameFrameDelay;
 extern int		FfwdFrameDelay;
-extern int		MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		SBX_Left, SBX_Right;
 extern int		SBY_Upper, SBY_Lower;
@@ -539,12 +543,12 @@ extern char		*element_info[];
 #define MICRO_GFX_PER_LINE	128
 #define HEROES_PER_LINE		16
 #define MINI_MORE_STARTX	0
-#define MINI_MORE_STARTY	224
+#define MINI_MORE_STARTY	352
 #define MICRO_MORE_STARTX	0
-#define MICRO_MORE_STARTY	336
+#define MICRO_MORE_STARTY	448
 #define MORE_PER_LINE		16
 #define MINI_MORE_PER_LINE	16
-#define MICRO_MORE_PER_LINE	16
+#define MICRO_MORE_PER_LINE	64
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
@@ -730,10 +734,11 @@ extern char		*element_info[];
 #define EL_MAUER_Y		201
 #define EL_MAUER_XY		202
 
-#define EL_UNUSED_203		203
-#define EL_UNUSED_204		204
-#define EL_UNUSED_205		205
-#define EL_UNUSED_206		206
+#define EL_EM_GATE_1		203
+#define EL_EM_GATE_2		204
+#define EL_EM_GATE_3		205
+#define EL_EM_GATE_4		206
+
 #define EL_UNUSED_207		207
 #define EL_UNUSED_208		208
 #define EL_UNUSED_209		209
@@ -781,10 +786,11 @@ extern char		*element_info[];
 #define EL_SP_CHIP_LOWER	(EL_SP_START + 39)
 #define EL_SP_END		(EL_SP_START + 39)
 
-#define EL_UNUSED_250		250
-#define EL_UNUSED_251		251
-#define EL_UNUSED_252		252
-#define EL_UNUSED_253		253
+#define EL_EM_GATE_1X		250
+#define EL_EM_GATE_2X		251
+#define EL_EM_GATE_3X		252
+#define EL_EM_GATE_4X		253
+
 #define EL_UNUSED_254		254
 #define EL_UNUSED_255		255
 
@@ -1108,6 +1114,19 @@ extern char		*element_info[];
 #define GFX_INVISIBLE_STEEL	(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  3)
 #define GFX_UNSICHTBAR		(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  7)
 #define GFX_SP_ZONK		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  0)
+
+#define GFX_EM_KEY_1		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  4)
+#define GFX_EM_KEY_2		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  5)
+#define GFX_EM_KEY_3		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  6)
+#define GFX_EM_KEY_4		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  7)
+#define GFX_EM_GATE_1		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  0)
+#define GFX_EM_GATE_2		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  1)
+#define GFX_EM_GATE_3		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  2)
+#define GFX_EM_GATE_4		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  3)
+#define GFX_EM_GATE_1X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  4)
+#define GFX_EM_GATE_2X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  5)
+#define GFX_EM_GATE_3X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  6)
+#define GFX_EM_GATE_4X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  7)
 
 #define GFX_MURPHY_GO_LEFT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  8)
 #define GFX_MURPHY_ANY_LEFT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  9)

@@ -372,6 +372,7 @@ void InitGame()
     player->move_delay = 0;
     player->last_move_dir = MV_NO_MOVING;
 
+    player->move_speed = (level.double_speed ? 4 : 8);
     player->snapped = FALSE;
 
     player->gone = FALSE;
@@ -406,8 +407,12 @@ void InitGame()
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
+  /*
   MoveSpeed = (level.double_speed ? 4 : 8);
   ScrollStepSize = TILEX / MoveSpeed;
+  */
+
+  ScrollStepSize = 0;
 
   AllPlayersGone = FALSE;
   SiebAktiv = FALSE;
@@ -3362,7 +3367,13 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   {
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
+
+    /*
     if (++player->frame_reset_delay > MoveSpeed)
+      player->Frame = 0;
+    */
+
+    if (++player->frame_reset_delay > player->move_speed)
       player->Frame = 0;
   }
 
@@ -3520,7 +3531,11 @@ void GameActions()
       /* this is very bad and need to be fixed!!! */
       unsigned long move_delay = stored_player[i].move_delay;
 
+      /*
       if (FrameReached(&move_delay, MoveSpeed))
+      */
+
+      if (FrameReached(&move_delay, stored_player[i].move_speed))
       {
 	actual_player_action = stored_player[i].programmed_action;
 	stored_player[i].programmed_action = 0;
@@ -3865,7 +3880,12 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   jy = player->jy = new_jy;
   StorePlayer[jx][jy] = player->element_nr;
 
+  /*
   player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / MoveSpeed);
+  */
+
+  player->MovPos =
+    (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_speed);
 
   ScrollFigure(player, SCROLL_INIT);
 
@@ -3881,7 +3901,12 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   if (player->gone || (!dx && !dy))
     return FALSE;
 
+  /*
   if (!FrameReached(&player->move_delay, MoveSpeed) && !tape.playing)
+    return FALSE;
+  */
+
+  if (!FrameReached(&player->move_delay, player->move_speed) && !tape.playing)
     return FALSE;
 
   if (player->MovPos)
@@ -3889,14 +3914,23 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     /* should only happen if pre-1.2 tape recordings are played */
     /* this is only for backward compatibility */
 
+    /*
     int old_move_speed = MoveSpeed;
+    */
+
+    int old_move_speed = player->move_speed;
 
 #if DEBUG
     printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES.\n");
 #endif
 
     /* scroll remaining steps with finest movement resolution */
+
+    /*
     MoveSpeed = 8;
+    */
+
+    player->move_speed = 8;
 
     while (player->MovPos)
     {
@@ -3907,7 +3941,12 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       BackToFront();
     }
 
+    /*
     MoveSpeed = old_move_speed;
+    */
+
+    player->move_speed = old_move_speed;
+
   }
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
@@ -4024,6 +4063,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 {
   int jx = player->jx, jy = player->jy;
   int last_jx = player->last_jx, last_jy = player->last_jy;
+  int move_stepsize = TILEX / player->move_speed;
 
   if (!player->active || player->gone || !player->MovPos)
     return;
@@ -4031,7 +4071,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   if (mode == SCROLL_INIT)
   {
     player->actual_frame_counter = FrameCounter;
-    player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
+    player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
     if (Feld[last_jx][last_jy] == EL_LEERRAUM)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
@@ -4042,8 +4082,8 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   else if (!FrameReached(&player->actual_frame_counter, 1))
     return;
 
-  player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX / MoveSpeed;
-  player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
+  player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
+  player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
@@ -4052,31 +4092,21 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   if (!player->MovPos)
   {
-    switch (Feld[last_jx][last_jy])
+    if (IS_QUICK_GATE(Feld[last_jx][last_jy]))
     {
-      case EL_SP_PORT1_LEFT:
-      case EL_SP_PORT2_LEFT:
-      case EL_SP_PORT1_RIGHT:
-      case EL_SP_PORT2_RIGHT:
-      case EL_SP_PORT1_UP:
-      case EL_SP_PORT2_UP:
-      case EL_SP_PORT1_DOWN:
-      case EL_SP_PORT2_DOWN:
-      case EL_SP_PORT_X:
-      case EL_SP_PORT_Y:
-      case EL_SP_PORT_XY:
-	/* continue with normal speed after moving through port */
-	/* FIX THIS: what about player already having eaten a speed pill? */
-	MoveSpeed = 8;
-	ScrollStepSize = TILEX / MoveSpeed;
+      /* continue with normal speed after moving through port */
+      /* FIX THIS: what about player already having eaten a speed pill? */
 
-	/* don't wait for the next move -- the whole move delay stuff
-	   is worse at the moment; FIX THIS! ;-) */
-	player->move_delay = 0;
-	break;
+      /*
+      MoveSpeed = 8;
+      ScrollStepSize = TILEX / MoveSpeed;
+      */
 
-      default:
-	break;
+      player->move_speed = 8;
+
+      /* don't wait for the next move -- the whole move delay stuff
+	 is worse at the moment; FIX THIS! ;-) */
+      player->move_delay = 0;
     }
 
     player->last_jx = jx;
@@ -4098,6 +4128,9 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
   if (mode == SCROLL_INIT)
   {
+    /* set scrolling step size according to actual player's moving speed */
+    ScrollStepSize = TILEX / player->move_speed;
+
     screen_frame_counter = FrameCounter;
     ScreenMovDir = player->MovDir;
     ScreenMovPos = player->MovPos;
@@ -4109,7 +4142,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
   if (ScreenMovPos)
   {
-    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX / MoveSpeed;
+    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * ScrollStepSize;
     ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
     redraw_mask |= REDRAW_FIELD;
   }
@@ -4327,6 +4360,10 @@ int DigField(struct PlayerInfo *player,
 {
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
+  int move_direction = (dx == -1 ? MV_LEFT :
+			dx == +1 ? MV_RIGHT :
+			dy == -1 ? MV_UP :
+			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
   if (!player->MovPos)
@@ -4383,8 +4420,14 @@ int DigField(struct PlayerInfo *player,
 
     case EL_SPEED_PILL:
       RemoveField(x, y);
+
+      player->move_speed = 4;
+
+      /*
       MoveSpeed = 4;
       ScrollStepSize = TILEX / MoveSpeed;
+      */
+
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -4525,7 +4568,7 @@ int DigField(struct PlayerInfo *player,
     case EL_PFORTE2:
     case EL_PFORTE3:
     case EL_PFORTE4:
-      if (!player->key[element-EL_PFORTE1])
+      if (!player->key[element - EL_PFORTE1])
 	return MF_NO_ACTION;
       break;
 
@@ -4533,8 +4576,40 @@ int DigField(struct PlayerInfo *player,
     case EL_PFORTE2X:
     case EL_PFORTE3X:
     case EL_PFORTE4X:
-      if (!player->key[element-EL_PFORTE1X])
+      if (!player->key[element - EL_PFORTE1X])
 	return MF_NO_ACTION;
+      break;
+
+    case EL_EM_GATE_1:
+    case EL_EM_GATE_2:
+    case EL_EM_GATE_3:
+    case EL_EM_GATE_4:
+      if (!player->key[element - EL_EM_GATE_1])
+	return MF_NO_ACTION;
+
+      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	return MF_NO_ACTION;
+
+      /* automatically move to the next field with double speed */
+      player->programmed_action = move_direction;
+      player->move_speed = 4;
+
+      break;
+
+    case EL_EM_GATE_1X:
+    case EL_EM_GATE_2X:
+    case EL_EM_GATE_3X:
+    case EL_EM_GATE_4X:
+      if (!player->key[element - EL_EM_GATE_1X])
+	return MF_NO_ACTION;
+
+      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	return MF_NO_ACTION;
+
+      /* automatically move to the next field with double speed */
+      player->programmed_action = move_direction;
+      player->move_speed = 4;
+
       break;
 
     case EL_SP_PORT1_LEFT:
@@ -4572,14 +4647,15 @@ int DigField(struct PlayerInfo *player,
 	  !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
-      /* automatically move to field behind the port */
-      player->programmed_action = (dx == -1 ? MV_LEFT :
-				   dx == +1 ? MV_RIGHT :
-				   dy == -1 ? MV_UP :
-				   dy == +1 ? MV_DOWN : MV_NO_MOVING);
-      /* move through port with double speed */
+      /* automatically move to the next field with double speed */
+      player->programmed_action = move_direction;
+      player->move_speed = 4;
+
+      /*
       MoveSpeed = 4;
       ScrollStepSize = TILEX / MoveSpeed;
+      */
+
       break;
 
     case EL_AUSGANG_ZU:

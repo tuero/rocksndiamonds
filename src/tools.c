@@ -456,8 +456,9 @@ void DrawPlayer(struct PlayerInfo *player)
   int next_jx = jx + (jx - last_jx), next_jy = jy + (jy - last_jy);
   int sx = SCREENX(jx), sy = SCREENY(jy);
   int sxx = 0, syy = 0;
-  int element = Feld[jx][jy];
+  int element = Feld[jx][jy], last_element = Feld[last_jx][last_jy];
   int graphic, phase;
+  boolean player_is_moving = (last_jx != jx || last_jy != jy ? TRUE : FALSE);
 
   if (!player->active || player->gone ||
       !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
@@ -478,14 +479,18 @@ void DrawPlayer(struct PlayerInfo *player)
 
   /* draw things in the field the player is leaving, if needed */
 
+  /*
   if (last_jx != jx || last_jy != jy)
+  */
+
+  if (player_is_moving)
   {
-    if (Store[last_jx][last_jy] && IS_DRAWABLE(Feld[last_jx][last_jy]))
+    if (Store[last_jx][last_jy] && IS_DRAWABLE(last_element))
     {
       DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
       DrawLevelFieldThruMask(last_jx, last_jy);
     }
-    else if (Feld[last_jx][last_jy] == EL_DYNAMIT)
+    else if (last_element == EL_DYNAMIT)
       DrawDynamite(last_jx, last_jy);
     else
       DrawLevelField(last_jx, last_jy);
@@ -523,8 +528,9 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     static int last_dir = MV_LEFT;
     boolean action_moving =
-      ((player->action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
-       !(player->action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)));
+      (player_is_moving ||
+       ((player->action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
+	!(player->action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN))));
 
     graphic = GFX_SP_MURPHY;
 
@@ -601,7 +607,7 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
-    if (Feld[jx][jy] == EL_SOKOBAN_FELD_LEER ||
+    if (element == EL_SOKOBAN_FELD_LEER ||
 	Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
       DrawGraphicShiftedThruMask(px, py, sxx, syy, GFX_SOKOBAN_OBJEKT,
 				 NO_CUTTING);
@@ -624,7 +630,7 @@ void DrawPlayer(struct PlayerInfo *player)
     }
   }
 
-  /* draw things in front of player (EL_DYNAMIT || EL_DYNABOMB) */
+  /* draw things in front of player (EL_DYNAMIT or EL_DYNABOMB) */
 
   if (element == EL_DYNAMIT || element == EL_DYNABOMB)
   {
@@ -647,8 +653,11 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(sx, sy, graphic + phase);
   }
 
-  if ((last_jx != jx || last_jy != jy) &&
-      Feld[last_jx][last_jy] == EL_EXPLODING)
+  /*
+  if ((last_jx != jx || last_jy != jy) && last_element == EL_EXPLODING)
+  */
+
+  if (player_is_moving && last_element == EL_EXPLODING)
   {
     int phase = Frame[last_jx][last_jy];
     int delay = 2;
@@ -657,6 +666,14 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy),
 			  GFX_EXPLOSION + ((phase - 1) / delay - 1));
   }
+
+  /* draw elements that stay over the player */
+  /* handle the field the player is leaving ... */
+  if (player_is_moving && IS_OVER_PLAYER(last_element))
+    DrawLevelField(last_jx, last_jy);
+  /* ... and the field the player is entering */
+  if (IS_OVER_PLAYER(element))
+    DrawLevelField(jx, jy);
 
   if (setup.direct_draw)
   {
@@ -936,6 +953,7 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
+    graphic -= ((graphic / MORE_PER_LINE) * MORE_PER_LINE) / 2;
     *pixmap = pix[PIX_MORE];
     *x = MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX;
     *y = MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY;
@@ -1622,6 +1640,7 @@ void DrawMicroElement(int xpos, int ypos, int element)
   if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
+    graphic -= ((graphic / MORE_PER_LINE) * MORE_PER_LINE) / 2;
     XCopyArea(display, pix[PIX_MORE], drawto, gc,
 	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
 	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
@@ -2730,6 +2749,14 @@ int el2gfx(int element)
       /* ^^^^^^^^^^ non-standard position in supaplex graphic set! */
     case EL_INVISIBLE_STEEL:	return GFX_INVISIBLE_STEEL;
     case EL_BLACK_ORB:		return GFX_BLACK_ORB;
+    case EL_EM_GATE_1:		return GFX_EM_GATE_1;
+    case EL_EM_GATE_2:		return GFX_EM_GATE_2;
+    case EL_EM_GATE_3:		return GFX_EM_GATE_3;
+    case EL_EM_GATE_4:		return GFX_EM_GATE_4;
+    case EL_EM_GATE_1X:		return GFX_EM_GATE_1X;
+    case EL_EM_GATE_2X:		return GFX_EM_GATE_2X;
+    case EL_EM_GATE_3X:		return GFX_EM_GATE_3X;
+    case EL_EM_GATE_4X:		return GFX_EM_GATE_4X;
 
     default:
     {

@@ -661,20 +661,20 @@ int element_shift = 0;
 
 int editor_element[] =
 {
-  EL_CHAR_A + ('B' - 'A'),
-  EL_CHAR_A + ('O' - 'A'),
-  EL_CHAR_A + ('U' - 'A'),
-  EL_CHAR_A + ('L' - 'A'),
+  EL_CHAR('B'),
+  EL_CHAR('O'),
+  EL_CHAR('U'),
+  EL_CHAR('L'),
 
   EL_CHAR_MINUS,
-  EL_CHAR_A + ('D' - 'A'),
-  EL_CHAR_A + ('E' - 'A'),
-  EL_CHAR_A + ('R' - 'A'),
+  EL_CHAR('D'),
+  EL_CHAR('E'),
+  EL_CHAR('R'),
 
-  EL_CHAR_A + ('D' - 'A'),
-  EL_CHAR_A + ('A' - 'A'),
-  EL_CHAR_A + ('S' - 'A'),
-  EL_CHAR_A + ('H' - 'A'),
+  EL_CHAR('D'),
+  EL_CHAR('A'),
+  EL_CHAR('S'),
+  EL_CHAR('H'),
 
   EL_SPIELFIGUR,
   EL_LEERRAUM,
@@ -701,20 +701,20 @@ int editor_element[] =
   EL_FIREFLY_U,
   EL_LEERRAUM,
 
-  EL_CHAR_A + ('E' - 'A'),
-  EL_CHAR_A + ('M' - 'A'),
-  EL_CHAR_A + ('E' - 'A'),
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+  EL_CHAR('E'),
   EL_CHAR_MINUS,
 
-  EL_CHAR_A + ('R' - 'A'),
-  EL_CHAR_A + ('A' - 'A'),
-  EL_CHAR_A + ('L' - 'A'),
-  EL_CHAR_A + ('D' - 'A'),
+  EL_CHAR('R'),
+  EL_CHAR('A'),
+  EL_CHAR('L'),
+  EL_CHAR('D'),
 
-  EL_CHAR_A + ('M' - 'A'),
-  EL_CHAR_A + ('I' - 'A'),
-  EL_CHAR_A + ('N' - 'A'),
-  EL_CHAR_A + ('E' - 'A'),
+  EL_CHAR('M'),
+  EL_CHAR('I'),
+  EL_CHAR('N'),
+  EL_CHAR('E'),
 
   EL_SPIELER1,
   EL_SPIELER2,
@@ -781,6 +781,21 @@ int editor_element[] =
   EL_SCHLUESSEL3,
   EL_SCHLUESSEL4,
 
+  EL_EM_GATE_1,
+  EL_EM_GATE_2,
+  EL_EM_GATE_3,
+  EL_EM_GATE_4,
+
+  EL_EM_GATE_1X,
+  EL_EM_GATE_2X,
+  EL_EM_GATE_3X,
+  EL_EM_GATE_4X,
+
+  EL_CHAR('M'),
+  EL_CHAR('O'),
+  EL_CHAR('R'),
+  EL_CHAR('E'),
+
   EL_PFORTE1,
   EL_PFORTE2,
   EL_PFORTE3,
@@ -790,11 +805,6 @@ int editor_element[] =
   EL_PFORTE2X,
   EL_PFORTE3X,
   EL_PFORTE4X,
-
-  EL_CHAR_A + ('M' - 'A'),
-  EL_CHAR_A + ('O' - 'A'),
-  EL_CHAR_A + ('R' - 'A'),
-  EL_CHAR_A + ('E' - 'A'),
 
   EL_PFEIL_L,
   EL_PFEIL_R,
@@ -846,15 +856,15 @@ int editor_element[] =
   EL_SPEED_PILL,
   EL_BLACK_ORB,
 
-  EL_CHAR_A + ('S' - 'A'),
-  EL_CHAR_A + ('O' - 'A'),
-  EL_CHAR_A + ('K' - 'A'),
-  EL_CHAR_A + ('O' - 'A'),
+  EL_CHAR('S'),
+  EL_CHAR('O'),
+  EL_CHAR('K'),
+  EL_CHAR('O'),
 
   EL_CHAR_MINUS,
-  EL_CHAR_A + ('B' - 'A'),
-  EL_CHAR_A + ('A' - 'A'),
-  EL_CHAR_A + ('N' - 'A'),
+  EL_CHAR('B'),
+  EL_CHAR('A'),
+  EL_CHAR('N'),
 
   EL_SOKOBAN_OBJEKT,
   EL_SOKOBAN_FELD_LEER,
@@ -927,20 +937,20 @@ int editor_element[] =
   EL_SP_CHIP_LOWER,
 
   /*
-  EL_CHAR_A + ('D' - 'A'),
-  EL_CHAR_A + ('Y' - 'A'),
-  EL_CHAR_A + ('N' - 'A'),
-  EL_CHAR_A + ('A' - 'A'),
+  EL_CHAR('D'),
+  EL_CHAR('Y'),
+  EL_CHAR('N'),
+  EL_CHAR('A'),
 
-  EL_CHAR_A + ('B' - 'A'),
-  EL_CHAR_A + ('L' - 'A'),
-  EL_CHAR_A + ('A' - 'A'),
-  EL_CHAR_A + ('S' - 'A'),
+  EL_CHAR('B'),
+  EL_CHAR('L'),
+  EL_CHAR('A'),
+  EL_CHAR('S'),
 
   EL_CHAR_MINUS,
-  EL_CHAR_A + ('T' - 'A'),
-  EL_CHAR_A + ('E' - 'A'),
-  EL_CHAR_A + ('R' - 'A'),
+  EL_CHAR('T'),
+  EL_CHAR('E'),
+  EL_CHAR('R'),
   */
 
   EL_LEERRAUM,
