@@ -45,7 +45,16 @@
 #define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
 #define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
+/* screens on the info screen */
+#define INFO_MODE_ELEMENTS		0
+#define INFO_MODE_MUSIC			1
+#define INFO_MODE_CREDITS		2
+#define INFO_MODE_PROGRAM		3
+
+#define MAX_INFO_MODES			4
+
 /* for various menu stuff  */
+#define MAX_INFO_ELEMENTS_ON_SCREEN	10
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - 2)
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		14
@@ -68,8 +77,21 @@ static void CalibrateJoystick(int);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
+static void DrawInfoScreenDemoAnim(int, boolean);
+static void DrawInfoScreenDemoText(int, int, int, int);
+static void DrawInfoScreenMusicText(int);
+static void DrawInfoScreenCreditsText(void);
+static void DrawInfoScreen(void);
+
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
+
+static long infoscreen_state;
+static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
+static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
+static int num_infoscreen_elements;
+static int num_infoscreen_music;
+static int infoscreen_musicpos;
 
 #define mSX (SX + (game_status >= GAME_MODE_MAIN &&	\
 		   game_status <= GAME_MODE_SETUP ?	\
@@ -384,7 +406,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   {
     static unsigned long level_delay = 0;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-    int new_level_nr, old_level_nr = level_nr;
+    int old_level_nr = level_nr;
+    int new_level_nr;
 
     new_level_nr = level_nr + (x == 10 ? -step : +step);
     if (new_level_nr < leveldir_current->first_level)
@@ -395,25 +418,26 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
       new_level_nr = leveldir_current->handicap_level;
 
-    if (old_level_nr == new_level_nr ||
-	!DelayReached(&level_delay, GADGET_FRAME_DELAY))
-      goto out;
+    if (new_level_nr != old_level_nr &&
+	DelayReached(&level_delay, GADGET_FRAME_DELAY))
+    {
+      level_nr = new_level_nr;
 
-    level_nr = new_level_nr;
+      DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3),
+	       FONT_VALUE_1);
 
-    DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
+      LoadLevel(level_nr);
+      DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
-    LoadLevel(level_nr);
-    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
+      TapeErase();
+      LoadTape(level_nr);
+      DrawCompleteVideoDisplay();
 
-    TapeErase();
-    LoadTape(level_nr);
-    DrawCompleteVideoDisplay();
-
-    /* needed because DrawMicroLevel() takes some time */
-    BackToFront();
-    SyncDisplay();
-    DelayReached(&level_delay, 0);	/* reset delay counter */
+      /* needed because DrawMicroLevel() takes some time */
+      BackToFront();
+      SyncDisplay();
+      DelayReached(&level_delay, 0);	/* reset delay counter */
+    }
   }
   else if (x == 0 && y >= 0 && y <= 7)
   {
@@ -462,7 +486,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y == 4)
       {
 	game_status = GAME_MODE_INFO;
-	DrawHelpScreen();
+	DrawInfoScreen();
       }
       else if (y == 5)
       {
@@ -496,8 +520,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     }
   }
 
-  out:
-
   if (game_status == GAME_MODE_MAIN)
   {
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
@@ -507,312 +529,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   BackToFront();
 }
 
-
-#define MAX_HELPSCREEN_ELS	10
-#define HA_NEXT			-999
-#define HA_END			-1000
-
-static long helpscreen_state;
-static int helpscreen_step[MAX_HELPSCREEN_ELS];
-static int helpscreen_frame[MAX_HELPSCREEN_ELS];
-
-#if 0
-static int helpscreen_action[] =
-{
-  IMG_PLAYER_1_MOVING_DOWN,		16,
-  IMG_PLAYER_1_MOVING_UP,		16,
-  IMG_PLAYER_1_MOVING_LEFT,		16,
-  IMG_PLAYER_1_MOVING_RIGHT,		16,
-  IMG_PLAYER_1_PUSHING_LEFT,		16,
-  IMG_PLAYER_1_PUSHING_RIGHT,		16,			HA_NEXT,
-
-  IMG_SAND,				-1,			HA_NEXT,
-
-  IMG_EMPTY_SPACE,			-1,			HA_NEXT,
-
-  IMG_QUICKSAND_EMPTY,			-1,			HA_NEXT,
-
-  IMG_STEELWALL,			-1,			HA_NEXT,
-
-  IMG_WALL,				-1,			HA_NEXT,
-
-  IMG_EXPANDABLE_WALL_GROWING_LEFT,	20,
-  IMG_WALL,				50,
-  IMG_EMPTY_SPACE,			20,
-  IMG_EXPANDABLE_WALL_GROWING_RIGHT,	20,
-  IMG_WALL,				50,
-  IMG_EMPTY_SPACE,			20,
-  IMG_EXPANDABLE_WALL_GROWING_UP,	20,
-  IMG_WALL,				50,
-  IMG_EMPTY_SPACE,			20,
-  IMG_EXPANDABLE_WALL_GROWING_DOWN,	20,
-  IMG_WALL,				50,
-  IMG_EMPTY_SPACE,			20,			HA_NEXT,
-
-  IMG_INVISIBLE_WALL,			-1,			HA_NEXT,
-
-  IMG_WALL_SLIPPERY,			-1,			HA_NEXT,
-
-  IMG_FONT_GAME_INFO,			-1,			HA_NEXT,
-
-  IMG_EMERALD,				-1,			HA_NEXT,
-
-  IMG_DIAMOND,				-1,			HA_NEXT,
-
-  IMG_BD_DIAMOND,			-1,			HA_NEXT,
-
-  IMG_EMERALD_YELLOW,			50,
-  IMG_EMERALD_RED,			50,
-  IMG_EMERALD_PURPLE,			50,			HA_NEXT,
-
-  IMG_BD_ROCK,				-1,			HA_NEXT,
-
-  IMG_BOMB,				100,
-  IMG_EXPLOSION,			16,
-  IMG_EMPTY_SPACE,			10,			HA_NEXT,
-
-  IMG_NUT,				100,
-  IMG_NUT_BREAKING,			6,
-  IMG_EMERALD,				20,			HA_NEXT,
-
-  IMG_WALL_EMERALD, 			100,
-  IMG_EXPLOSION,			16,
-  IMG_EMERALD,				20,			HA_NEXT,
-
-  IMG_WALL_DIAMOND, 			100,
-  IMG_EXPLOSION,			16,
-  IMG_DIAMOND,				20,			HA_NEXT,
-
-  IMG_WALL_BD_DIAMOND, 			100,
-  IMG_EXPLOSION,			16,
-  IMG_BD_DIAMOND,			20,			HA_NEXT,
-
-  IMG_WALL_EMERALD_YELLOW,		100,
-  IMG_EXPLOSION,			16,
-  IMG_EMERALD_YELLOW,			20,
-  IMG_WALL_EMERALD_RED,			100,
-  IMG_EXPLOSION,			16,
-  IMG_EMERALD_RED,			20,
-  IMG_WALL_EMERALD_PURPLE,		100,
-  IMG_EXPLOSION,			16,
-  IMG_EMERALD_PURPLE,			20,			HA_NEXT,
-
-  IMG_ACID,				-1,			HA_NEXT,
-
-  IMG_KEY_1,				50,
-  IMG_KEY_2,				50,
-  IMG_KEY_3,				50,
-  IMG_KEY_4,				50,			HA_NEXT,
-
-  IMG_GATE_1,				50,
-  IMG_GATE_2,				50,
-  IMG_GATE_3,				50,
-  IMG_GATE_4,				50,			HA_NEXT,
-
-  IMG_GATE_1_GRAY,			50,
-  IMG_GATE_2_GRAY,			50,
-  IMG_GATE_3_GRAY,			50,
-  IMG_GATE_4_GRAY,			50,			HA_NEXT,
-
-  IMG_DYNAMITE,				-1,			HA_NEXT,
-
-  IMG_DYNAMITE_ACTIVE,			96,
-  IMG_EXPLOSION,			16,
-  IMG_EMPTY_SPACE,			20,			HA_NEXT,
-
-  IMG_DYNABOMB_ACTIVE,			100,
-  IMG_EXPLOSION,			16,
-  IMG_EMPTY_SPACE,			20,			HA_NEXT,
-
-  IMG_DYNABOMB_INCREASE_NUMBER,		-1,			HA_NEXT,
-
-  IMG_DYNABOMB_INCREASE_SIZE,		-1,			HA_NEXT,
-
-  IMG_DYNABOMB_INCREASE_POWER,		-1,			HA_NEXT,
-
-  IMG_SPACESHIP_RIGHT,			16,
-  IMG_SPACESHIP_UP,			16,
-  IMG_SPACESHIP_LEFT,			16,
-  IMG_SPACESHIP_DOWN,			16,			HA_NEXT,
-
-  IMG_BUG_RIGHT,			16,
-  IMG_BUG_UP,				16,
-  IMG_BUG_LEFT,				16,
-  IMG_BUG_DOWN,				16,			HA_NEXT,
-
-  IMG_BD_BUTTERFLY,			-1,			HA_NEXT,
-
-  IMG_BD_FIREFLY,			-1,			HA_NEXT,
-
-  IMG_PACMAN_RIGHT,			16,
-  IMG_PACMAN_UP,			16,
-  IMG_PACMAN_LEFT,			16,
-  IMG_PACMAN_DOWN,			16,			HA_NEXT,
-
-  IMG_YAMYAM,				-1,			HA_NEXT,
-
-  IMG_DARK_YAMYAM,			-1,			HA_NEXT,
-
-  IMG_ROBOT,				-1,			HA_NEXT,
-
-  IMG_MOLE_MOVING_RIGHT,		16,
-  IMG_MOLE_MOVING_UP,			16,
-  IMG_MOLE_MOVING_LEFT,			16,
-  IMG_MOLE_MOVING_DOWN,			16,			HA_NEXT,
-
-  IMG_PENGUIN_MOVING_RIGHT,		16,
-  IMG_PENGUIN_MOVING_UP,		16,
-  IMG_PENGUIN_MOVING_LEFT,		16,
-  IMG_PENGUIN_MOVING_DOWN,		16,			HA_NEXT,
-
-  IMG_PIG_MOVING_RIGHT,			16,
-  IMG_PIG_MOVING_UP,			16,
-  IMG_PIG_MOVING_LEFT,			16,
-  IMG_PIG_MOVING_DOWN,			16,			HA_NEXT,
-
-  IMG_DRAGON_MOVING_RIGHT,		16,
-  IMG_DRAGON_MOVING_UP,			16,
-  IMG_DRAGON_MOVING_LEFT,		16,
-  IMG_DRAGON_MOVING_DOWN,		16,			HA_NEXT,
-
-  IMG_SATELLITE,			-1,			HA_NEXT,
-
-  IMG_ROBOT_WHEEL,			50,
-  IMG_ROBOT_WHEEL_ACTIVE,		100,			HA_NEXT,
-
-  IMG_LAMP,				50,
-  IMG_LAMP_ACTIVE,			50,			HA_NEXT,
-
-  IMG_TIME_ORB_FULL,			50,
-  IMG_TIME_ORB_EMPTY,			50,			HA_NEXT,
-
-  IMG_AMOEBA_DROP,			50,
-  IMG_AMOEBA_GROWING,			6,
-  IMG_AMOEBA_WET,			20,			HA_NEXT,
-
-  IMG_AMOEBA_DEAD,			-1,			HA_NEXT,
-
-  IMG_AMOEBA_WET,			-1,			HA_NEXT,
-
-  IMG_AMOEBA_WET,			100,
-  IMG_AMOEBA_GROWING,			6,			HA_NEXT,
-
-  IMG_AMOEBA_FULL,			50,
-  IMG_AMOEBA_DEAD,			50,
-  IMG_EXPLOSION,			16,
-  IMG_DIAMOND,				20,			HA_NEXT,
-
-  IMG_GAME_OF_LIFE,			-1,			HA_NEXT,
-
-  IMG_BIOMAZE,				-1,			HA_NEXT,
-
-  IMG_MAGIC_WALL_ACTIVE,		-1,			HA_NEXT,
-
-  IMG_BD_MAGIC_WALL_ACTIVE,		-1,			HA_NEXT,
-
-  IMG_EXIT_CLOSED,			200,
-  IMG_EXIT_OPENING,			16,
-  IMG_EXIT_OPEN,			100,			HA_NEXT,
-
-  IMG_EXIT_OPEN,			-1,			HA_NEXT,
-
-  IMG_SOKOBAN_OBJECT,			-1,			HA_NEXT,
-
-  IMG_SOKOBAN_FIELD_EMPTY,		-1,			HA_NEXT,
-
-  IMG_SOKOBAN_FIELD_FULL,		-1,			HA_NEXT,
-
-  IMG_SPEED_PILL,			-1,			HA_NEXT,
-
-  HA_END
-};
-#endif
-
-static char *helpscreen_eltext[][2] =
-{
- {"THE HERO:",				"(Is _this_ guy good old Rockford?)"},
- {"Normal sand:",			"You can dig through it"},
- {"Empty field:",			"You can walk through it"},
- {"Quicksand: You cannot pass it,",	"but rocks can fall through it"},
- {"Massive Wall:",			"Nothing can go through it"},
- {"Normal Wall: You can't go through",	"it, but you can bomb it away"},
- {"Growing Wall: Grows in several di-",	"rections if there is an empty field"},
- {"Invisible Wall: Behaves like normal","wall, but is invisible"},
- {"Old Wall: Like normal wall, but",	"some things can fall down from it"},
- {"Letter Wall: Looks like a letter,",	"behaves like a normal wall"},
- {"Emerald: You must collect enough of","them to finish a level"},
- {"Diamond: Counts as 3 emeralds, but",	"can be destroyed by rocks"},
- {"Diamond (BD style): Counts like one","emerald and behaves a bit different"},
- {"Colorful Gems:",			"Seem to behave like Emeralds"},
- {"Rock: Smashes several things;",	"Can be moved by the player"},
- {"Bomb: You can move it, but be",	"careful when dropping it"},
- {"Nut: Throw a rock on it to open it;","Each nut contains an emerald"},
- {"Wall with an emerald inside:",	"Bomb the wall away to get it"},
- {"Wall with a diamond inside:",	"Bomb the wall away to get it"},
- {"Wall with BD style diamond inside:",	"Bomb the wall away to get it"},
- {"Wall with colorful gem inside:",	"Bomb the wall away to get it"},
- {"Acid: Things that fall in are gone",	"forever (including our hero)"},
- {"Key: Opens the door that has the",	"same color (red/yellow/green/blue)"},
- {"Door: Can be opened by the key",	"with the same color"},
- {"Door: You have to find out the",	"right color of the key for it"},
- {"Dynamite: Collect it and use it to",	"destroy walls or kill enemies"},
- {"Dynamite: This one explodes after",	"a few seconds"},
- {"Dyna Bomb: Explodes in 4 directions","with variable explosion size"},
- {"Dyna Bomb: Increases the number of",	"dyna bombs available at a time"},
- {"Dyna Bomb: Increases the size of",	"explosion of dyna bombs"},
- {"Dyna Bomb: Increases the power of",	"explosion of dyna bombs"},
- {"Spaceship: Moves at the left side",	"of walls; don't touch it!"},
- {"Bug: Moves at the right side",	"of walls; don't touch it!"},
- {"Butterfly: Moves at the right side",	"of walls; don't touch it!"},
- {"Firefly: Moves at the left side",	"of walls; don't touch it!"},
- {"Pacman: Eats the amoeba and you,",	"if you're not careful"},
- {"Cruncher: Eats diamonds and you,",	"if you're not careful"},
- {"Cruncher (BD style):",		"Eats almost everything"},
- {"Robot: Tries to kill the player",	""},
- {"The mole: Eats the amoeba and turns","empty space into normal sand"},
- {"The penguin: Guide him to the exit,","but keep him away from monsters!"},
- {"The Pig: Harmless, but eats all",	"gems it can get"},
- {"The Dragon: Breathes fire,",		"especially to some monsters"},
- {"Sonde: Follows you everywhere;",	"harmless, but may block your way"},
- {"Magic Wheel: Touch it to get rid of","the robots for some seconds"},
- {"Light Bulb: All of them must be",	"switched on to finish a level"},
- {"Extra Time Orb: Adds some seconds",	"to the time available for the level"},
- {"Amoeba Drop: Grows to an amoeba on",	"the ground - don't touch it"},
- {"Dead Amoeba: Does not grow, but",	"can still kill bugs and spaceships"},
- {"Normal Amoeba: Grows through empty",	"fields, sand and quicksand"},
- {"Dropping Amoeba: This one makes",	"drops that grow to a new amoeba"},
- {"Living Amoeba (BD style): Contains",	"other element, when surrounded"},
- {"Game Of Life: Behaves like the well","known 'Game Of Life' (2333 style)"},
- {"Biomaze: A bit like the 'Game Of",	"Life', but builds crazy mazes"},
- {"Magic Wall: Changes rocks, emeralds","and diamonds when they pass it"},
- {"Magic Wall (BD style):",		"Changes rocks and BD style diamonds"},
- {"Exit door: Opens if you have enough","emeralds to finish the level"},
- {"Open exit door: Enter here to leave","the level and exit the actual game"},
- {"Sokoban element: Object which must", "be pushed to an empty field"},
- {"Sokoban element: Empty field where", "a Sokoban object can be placed on"},
- {"Sokoban element: Field with object", "which can be pushed away"},
- {"Speed pill: Lets the player run",    "twice as fast as normally"},
-};
-static int num_helpscreen_els = sizeof(helpscreen_eltext) / (2*sizeof(char *));
-
-#if 0
-static char *helpscreen_music[][3] =
-{
-  { "Alchemy",			"Ian Boddy",		"Drive" },
-  { "The Chase",		"Propaganda",		"A Secret Wish" },
-  { "Network 23",		"Tangerine Dream",	"Exit" },
-  { "Czardasz",			"Robert Pieculewicz",	"Czardasz" },
-  { "21st Century Common Man",	"Tangerine Dream",	"Tyger" },
-  { "Voyager",			"The Alan Parsons Project","Pyramid" },
-  { "Twilight Painter",		"Tangerine Dream",	"Heartbreakers" }
-};
-#endif
-
-static int num_helpscreen_music = 7;
-static int helpscreen_musicpos;
-
-#if 1
-void DrawHelpScreenElAction(int start, boolean init)
+void DrawInfoScreenDemoAnim(int start, boolean init)
 {
   int i = 0, j = 0;
   int xstart = mSX + 16;
@@ -835,13 +552,14 @@ void DrawHelpScreenElAction(int start, boolean init)
 		      "Press any key or button for next page");
   }
 
-  while (demo_anim_info[j].element != -999)
+  while (helpanim_info[j].element != HELPANIM_LIST_END)
   {
-    if (i >= start + MAX_HELPSCREEN_ELS || i >= num_helpscreen_els)
+    if (i >= start + MAX_INFO_ELEMENTS_ON_SCREEN ||
+	i >= num_infoscreen_elements)
       break;
     else if (i < start)
     {
-      while (demo_anim_info[j].element != -1)
+      while (helpanim_info[j].element != HELPANIM_LIST_NEXT)
 	j++;
 
       j++;
@@ -850,11 +568,11 @@ void DrawHelpScreenElAction(int start, boolean init)
       continue;
     }
 
-    j += helpscreen_step[i - start];
+    j += infoscreen_step[i - start];
 
-    element = demo_anim_info[j].element;
-    action = demo_anim_info[j].action;
-    direction = demo_anim_info[j].direction;
+    element = helpanim_info[j].element;
+    action = helpanim_info[j].action;
+    direction = helpanim_info[j].direction;
 
     if (action != -1 && direction != -1)
       graphic = el_act_dir2img(element, action, direction);
@@ -865,32 +583,32 @@ void DrawHelpScreenElAction(int start, boolean init)
     else
       graphic = el2img(element);
 
-    delay = demo_anim_info[j++].delay;
+    delay = helpanim_info[j++].delay;
 
     if (delay == -1)
       delay = 1000000;
 
-    if (helpscreen_frame[i - start] == 0)
+    if (infoscreen_frame[i - start] == 0)
     {
       sync_frame = 0;
-      helpscreen_frame[i - start] = delay - 1;
+      infoscreen_frame[i - start] = delay - 1;
     }
     else
     {
-      sync_frame = delay - helpscreen_frame[i - start];
-      helpscreen_frame[i - start]--;
+      sync_frame = delay - infoscreen_frame[i - start];
+      infoscreen_frame[i - start]--;
     }
 
-    if (demo_anim_info[j].element == -1)
+    if (helpanim_info[j].element == -1)
     {
-      if (!helpscreen_frame[i - start])
-	helpscreen_step[i - start] = 0;
+      if (!infoscreen_frame[i - start])
+	infoscreen_step[i - start] = 0;
     }
     else
     {
-      if (!helpscreen_frame[i - start])
-	helpscreen_step[i - start]++;
-      while(demo_anim_info[j].element != -1)
+      if (!infoscreen_frame[i - start])
+	infoscreen_step[i - start]++;
+      while(helpanim_info[j].element != -1)
 	j++;
     }
 
@@ -902,7 +620,7 @@ void DrawHelpScreenElAction(int start, boolean init)
 			    graphic, sync_frame, USE_MASKING);
 
     if (init)
-      DrawHelpScreenElText(element, action, direction, i - start);
+      DrawInfoScreenDemoText(element, action, direction, i - start);
 
     i++;
   }
@@ -912,102 +630,17 @@ void DrawHelpScreenElAction(int start, boolean init)
   FrameCounter++;
 }
 
-#else
-
-void DrawHelpScreenElAction(int start)
+void DrawInfoScreenDemoText(int element, int action, int direction, int ypos)
 {
-  int i = 0, j = 0;
-  int xstart = mSX + 16;
-  int ystart = mSY + 64 + 2 * 32;
-  int ystep = TILEY + 4;
-  int graphic;
-  int frame_count;
-  int sync_frame;
-
-  while (helpscreen_action[j] != HA_END)
-  {
-    if (i >= start + MAX_HELPSCREEN_ELS || i >= num_helpscreen_els)
-      break;
-    else if (i < start)
-    {
-      while (helpscreen_action[j] != HA_NEXT)
-	j++;
-
-      j++;
-      i++;
-
-      continue;
-    }
-
-    j += 2 * helpscreen_step[i-start];
-    graphic = helpscreen_action[j++];
-    frame_count = helpscreen_action[j++];
-    if (frame_count == -1)
-      frame_count = 1000000;
-
-    if (helpscreen_frame[i-start] == 0)
-    {
-      sync_frame = 0;
-      helpscreen_frame[i-start] = frame_count - 1;
-    }
-    else
-    {
-      sync_frame = frame_count - helpscreen_frame[i-start];
-      helpscreen_frame[i-start]--;
-    }
-
-    if (helpscreen_action[j] == HA_NEXT)
-    {
-      if (!helpscreen_frame[i-start])
-	helpscreen_step[i-start] = 0;
-    }
-    else
-    {
-      if (!helpscreen_frame[i-start])
-	helpscreen_step[i-start]++;
-      while(helpscreen_action[j] != HA_NEXT)
-	j++;
-    }
-    j++;
-
-#if 1
-    ClearRectangleOnBackground(drawto, xstart, ystart + (i - start) * ystep,
-			       TILEX, TILEY);
-    DrawGraphicAnimationExt(drawto, xstart, ystart + (i - start) * ystep,
-			    graphic, sync_frame, USE_MASKING);
-#else
-    frame = getGraphicAnimationFrame(graphic, sync_frame);
-
-    DrawGraphicExt(drawto, xstart, ystart + (i-start) * ystep,
-		   graphic, frame);
-#endif
-
-    i++;
-  }
-
-#if 1
-  redraw_mask |= REDRAW_FIELD;
-#else
-  for(i=2; i<16; i++)
-  {
-    MarkTileDirty(0, i);
-    MarkTileDirty(1, i);
-  }
-#endif
-
-  FrameCounter++;
-}
-#endif
-
-#if 1
-void DrawHelpScreenElText(int element, int action, int direction, int ypos)
-{
-  int xstart = mSX + 56;
-  int ystart = mSY + 65 + 2 * 32;
+  int font_nr = FONT_TEXT_2;
+  int max_chars_per_line = 34;
+  int max_lines_per_text = 2;    
+  int sx = mSX + 56;
+  int sy = mSY + 65 + 2 * 32 + 1;
   int ystep = TILEY + 4;
   char *text;
 
-  text = getHashEntry(demo_anim_text, element_info[element].token_name);
+  text = getHashEntry(helptext_info, element_info[element].token_name);
 
   if (text == NULL)
   {
@@ -1021,68 +654,20 @@ void DrawHelpScreenElText(int element, int action, int direction, int ypos)
     if (direction != -1)
       strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
 
-    text = getHashEntry(demo_anim_text, token);
+    text = getHashEntry(helptext_info, token);
 
     if (text == NULL)
       text = "No description available";
   }
 
-#if 1
+  if (strlen(text) <= max_chars_per_line)
+    sy += getFontHeight(font_nr) / 2;
 
-#if 1
-
-  if (strlen(text) <= 34)
-    ystart += getFontHeight(FONT_TEXT_2) / 2;
-
-#if 0
-  DrawTextWrapped(xstart, ystart+1 + ypos * ystep, text, FONT_LEVEL_NUMBER,
-		  34, 2);
-#else
-  DrawTextWrapped(xstart, ystart+1 + ypos * ystep, text, FONT_TEXT_2, 34, 2);
-#endif
-
-#else
-  DrawTextToTextArea(xstart, ystart + ypos * ystep, text, FONT_TEXT_2, 34,
-		     34, 2, BLIT_ON_BACKGROUND);
-#endif
-
-#else
-  if (strlen(text) > 25)
-    text[25] = '\0';
-
-  DrawText(xstart, ystart + ypos * ystep + 8, text, FONT_TEXT_2);
-#endif
+  DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
+		  max_chars_per_line, max_lines_per_text);
 }
 
-#else
-
-void DrawHelpScreenElText(int start)
-{
-  int i;
-  int xstart = mSX + 56, ystart = mSY + 65 + 2 * 32, ystep = TILEY + 4;
-  int ybottom = SYSIZE - 20;
-
-  SetMainBackgroundImage(IMG_BACKGROUND_INFO);
-  ClearWindow();
-  DrawHeadline();
-
-  DrawTextSCentered(100, FONT_TEXT_1, "The game elements:");
-
-  for(i=start; i < start + MAX_HELPSCREEN_ELS && i < num_helpscreen_els; i++)
-  {
-    DrawText(xstart,
-	     ystart + (i - start) * ystep + (*helpscreen_eltext[i][1] ? 0 : 8),
-	     helpscreen_eltext[i][0], FONT_TEXT_2);
-    DrawText(xstart, ystart + (i - start) * ystep + 16,
-	     helpscreen_eltext[i][1], FONT_TEXT_2);
-  }
-
-  DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for next page");
-}
-#endif
-
-void DrawHelpScreenMusicText(int num)
+void DrawInfoScreenMusicText(int num)
 {
   struct MusicFileInfo *list = music_file_info;
   int ystart = 150, ystep = 30;
@@ -1098,34 +683,23 @@ void DrawHelpScreenMusicText(int num)
 
   DrawTextSCentered(100, FONT_TEXT_1, "The game background music loops:");
 
-#if 1
   DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
   DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
   DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
   DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
   DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
   DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
-#else
-  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
-  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3,
-		    "\"%s\"", helpscreen_music[num][0]);
-  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
-  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3,
-		    "%s", helpscreen_music[num][1]);
-  DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
-  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3,
-		    "\"%s\"", helpscreen_music[num][2]);
-#endif
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 
+  /* !!! add playing music !!! */
 #if 0
   PlaySoundLoop(background_loop[num]);
 #endif
 }
 
-void DrawHelpScreenCreditsText()
+void DrawInfoScreenCreditsText()
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
@@ -1147,7 +721,7 @@ void DrawHelpScreenCreditsText()
 		    "Press any key or button for next page");
 }
 
-void DrawHelpScreenContactText()
+void DrawInfoScreenContactText()
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
@@ -1185,7 +759,8 @@ void DrawHelpScreenContactText()
 		    "Press any key or button for main menu");
 }
 
-void DrawHelpScreen()
+#if 1
+void DrawInfoScreen()
 {
   struct MusicFileInfo *list;
   int i;
@@ -1193,27 +768,27 @@ void DrawHelpScreen()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
-  for(i=0;i<MAX_HELPSCREEN_ELS;i++)
-    helpscreen_step[i] = helpscreen_frame[i] = 0;
-  helpscreen_musicpos = 0;
-  helpscreen_state = 0;
+  for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+    infoscreen_step[i] = infoscreen_frame[i] = 0;
+  infoscreen_musicpos = 0;
+  infoscreen_state = 0;
 
-  LoadDemoAnimInfo();
-  LoadDemoAnimText();
+  LoadHelpAnimInfo();
+  LoadHelpTextInfo();
   LoadMusicInfo();
 
-  num_helpscreen_els = 0;
-  for (i=0; demo_anim_info[i].element != -999; i++)
-    if (demo_anim_info[i].element == -1)
-      num_helpscreen_els++;
+  num_infoscreen_elements = 0;
+  for (i=0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
+    if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
+      num_infoscreen_elements++;
 
-  num_helpscreen_music = 0;
+  num_infoscreen_music = 0;
   for (list = music_file_info; list != NULL; list = list->next)
-    num_helpscreen_music++;
+    num_infoscreen_music++;
 
-  DrawHelpScreenElAction(0, TRUE);
+  DrawInfoScreenDemoAnim(0, TRUE);
 #if 0
-  DrawHelpScreenElText(0);
+  DrawInfoScreenDemoText(0);
 #endif
 
   FadeToFront();
@@ -1223,45 +798,88 @@ void DrawHelpScreen()
   PlayMenuMusic();
 }
 
-void HandleHelpScreen(int button)
+#else
+
+void DrawInfoScreen()
+{
+  struct MusicFileInfo *list;
+  int i;
+
+  UnmapAllGadgets();
+  CloseDoor(DOOR_CLOSE_2);
+
+  for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+    infoscreen_step[i] = infoscreen_frame[i] = 0;
+  infoscreen_musicpos = 0;
+  infoscreen_state = 0;
+
+  LoadHelpAnimInfo();
+  LoadHelpTextInfo();
+  LoadMusicInfo();
+
+  num_infoscreen_elements = 0;
+  for (i=0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
+    if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
+      num_infoscreen_elements++;
+
+  num_infoscreen_music = 0;
+  for (list = music_file_info; list != NULL; list = list->next)
+    num_infoscreen_music++;
+
+  DrawInfoScreenDemoAnim(0, TRUE);
+#if 0
+  DrawInfoScreenDemoText(0);
+#endif
+
+  FadeToFront();
+  InitAnimation();
+
+  PlayMenuSound();
+  PlayMenuMusic();
+}
+#endif
+
+void HandleInfoScreen(int button)
 {
   static unsigned long hs_delay = 0;
-  int num_helpscreen_els_pages =
-    (num_helpscreen_els + MAX_HELPSCREEN_ELS-1) / MAX_HELPSCREEN_ELS;
+  int num_infoscreen_element_pages =
+    (num_infoscreen_elements + MAX_INFO_ELEMENTS_ON_SCREEN - 1)
+    / MAX_INFO_ELEMENTS_ON_SCREEN;
   int button_released = !button;
   int i;
 
   if (button_released)
   {
-    if (helpscreen_state < num_helpscreen_els_pages - 1)
+    if (infoscreen_state < num_infoscreen_element_pages - 1)
     {
-      for(i=0;i<MAX_HELPSCREEN_ELS;i++)
-	helpscreen_step[i] = helpscreen_frame[i] = 0;
-      helpscreen_state++;
+      for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+	infoscreen_step[i] = infoscreen_frame[i] = 0;
+      infoscreen_state++;
 
       FrameCounter = 0;
-      DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS, TRUE);
+      DrawInfoScreenDemoAnim(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN,
+			     TRUE);
 #if 0
-      DrawHelpScreenElText(helpscreen_state * MAX_HELPSCREEN_ELS);
+      DrawInfoScreenDemoText(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN);
 #endif
     }
-    else if (helpscreen_state <
-	     num_helpscreen_els_pages + num_helpscreen_music - 1)
+    else if (infoscreen_state <
+	     num_infoscreen_element_pages + num_infoscreen_music - 1)
     {
-      helpscreen_state++;
-      DrawHelpScreenMusicText(helpscreen_state - num_helpscreen_els_pages);
+      infoscreen_state++;
+      DrawInfoScreenMusicText(infoscreen_state - num_infoscreen_element_pages);
     }
-    else if (helpscreen_state ==
-	     num_helpscreen_els_pages + num_helpscreen_music - 1)
+    else if (infoscreen_state ==
+	     num_infoscreen_element_pages + num_infoscreen_music - 1)
     {
-      helpscreen_state++;
-      DrawHelpScreenCreditsText();
+      infoscreen_state++;
+      DrawInfoScreenCreditsText();
     }
-    else if (helpscreen_state ==
-	     num_helpscreen_els_pages + num_helpscreen_music)
+    else if (infoscreen_state ==
+	     num_infoscreen_element_pages + num_infoscreen_music)
     {
-      helpscreen_state++;
-      DrawHelpScreenContactText();
+      infoscreen_state++;
+      DrawInfoScreenContactText();
     }
     else
     {
@@ -1275,8 +893,9 @@ void HandleHelpScreen(int button)
   {
     if (DelayReached(&hs_delay, GAME_FRAME_DELAY))
     {
-      if (helpscreen_state < num_helpscreen_els_pages)
-	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS, FALSE);
+      if (infoscreen_state < num_infoscreen_element_pages)
+	DrawInfoScreenDemoAnim(infoscreen_state * MAX_INFO_ELEMENTS_ON_SCREEN,
+			       FALSE);
     }
 
     PlayMenuSoundIfLoop();
@@ -2493,11 +2112,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     static unsigned long delay = 0;
 
     if (!DelayReached(&delay, GADGET_FRAME_DELAY))
-#if 1
       return;
-#else
-      goto out;
-#endif
 
     player_nr = (player_nr + (x == 10 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;
 
@@ -2560,15 +2175,6 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       }
     }
   }
-
-#if 0
-  BackToFront();
-
-  out:
-
-  if (game_status == GAME_MODE_SETUP)
-    DoAnimation();
-#endif
 }
 
 void CustomizeKeyboard(int player_nr)

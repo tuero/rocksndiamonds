@@ -398,7 +398,7 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case GAME_MODE_INFO:
-      HandleHelpScreen(button);
+      HandleInfoScreen(button);
       break;
 
     case GAME_MODE_SETUP:
@@ -652,7 +652,7 @@ void HandleKey(Key key, int key_status)
       break;
 
     case GAME_MODE_INFO:
-      HandleHelpScreen(MB_RELEASED);
+      HandleInfoScreen(MB_RELEASED);
       break;
 
     case GAME_MODE_SCORES:
@@ -920,7 +920,7 @@ void HandleJoystick()
       break;
 
     case GAME_MODE_INFO:
-      HandleHelpScreen(!newbutton);
+      HandleInfoScreen(!newbutton);
       break;
 
     case GAME_MODE_EDITOR:

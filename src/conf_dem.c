@@ -19,7 +19,7 @@
    reliable default values. If that value is GFX_ARG_UNDEFINED, it will
    be dynamically determined, using some of the other list values. */
 
-struct ConfigInfo demo_anim_info_config[] =
+struct ConfigInfo helpanim_config[] =
 {
   { "player_1.moving.down",			"16"			},
   { "player_1.moving.up",			"16"			},
@@ -359,7 +359,7 @@ struct ConfigInfo demo_anim_info_config[] =
   { NULL,					NULL			}
 };
 
-struct ConfigInfo demo_anim_text_config[] =
+struct ConfigInfo helptext_config[] =
 {
   {
     "player_1.moving.down",

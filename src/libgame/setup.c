@@ -417,26 +417,26 @@ char *getEditorSetupFilename()
   return filename;
 }
 
-char *getDemoAnimInfoFilename()
+char *getHelpAnimFilename()
 {
   static char *filename = NULL;
 
   if (filename != NULL)
     free(filename);
 
-  filename = getPath2(getCurrentLevelDir(), DEMOANIMINFO_FILENAME);
+  filename = getPath2(getCurrentLevelDir(), HELPANIM_FILENAME);
 
   return filename;
 }
 
-char *getDemoAnimTextFilename()
+char *getHelpTextFilename()
 {
   static char *filename = NULL;
 
   if (filename != NULL)
     free(filename);
 
-  filename = getPath2(getCurrentLevelDir(), DEMOANIMTEXT_FILENAME);
+  filename = getPath2(getCurrentLevelDir(), HELPTEXT_FILENAME);
 
   return filename;
 }

@@ -3019,16 +3019,16 @@ void LoadMusicInfo()
 #endif
 }
 
-void add_demo_anim(int element, int action, int direction, int delay,
-		   int *num_list_entries)
+void add_helpanim_entry(int element, int action, int direction, int delay,
+			int *num_list_entries)
 {
-  struct DemoAnimInfo *new_list_entry;
+  struct HelpAnimInfo *new_list_entry;
   (*num_list_entries)++;
 
-  demo_anim_info =
-    checked_realloc(demo_anim_info,
-		    *num_list_entries * sizeof(struct DemoAnimInfo));
-  new_list_entry = &demo_anim_info[*num_list_entries - 1];
+  helpanim_info =
+    checked_realloc(helpanim_info,
+		    *num_list_entries * sizeof(struct HelpAnimInfo));
+  new_list_entry = &helpanim_info[*num_list_entries - 1];
 
   new_list_entry->element = element;
   new_list_entry->action = action;
@@ -3054,9 +3054,9 @@ void print_unknown_token_end(int token_nr)
     Error(ERR_RETURN_LINE, "-");
 }
 
-void LoadDemoAnimInfo()
+void LoadHelpAnimInfo()
 {
-  char *filename = getDemoAnimInfoFilename();
+  char *filename = getHelpAnimFilename();
   SetupFileList *setup_file_list, *list;
   SetupFileHash *element_hash, *action_hash, *direction_hash;
   int num_list_entries = 0;
@@ -3069,13 +3069,13 @@ void LoadDemoAnimInfo()
     SetupFileList *insert_ptr;
 
     insert_ptr = setup_file_list =
-      newSetupFileList(demo_anim_info_config[0].token,
-		       demo_anim_info_config[0].value);
+      newSetupFileList(helpanim_config[0].token,
+		       helpanim_config[0].value);
 
-    for (i=1; demo_anim_info_config[i].token; i++)
+    for (i=1; helpanim_config[i].token; i++)
       insert_ptr = addListEntry(insert_ptr,
-				demo_anim_info_config[i].token,
-				demo_anim_info_config[i].value);
+				helpanim_config[i].token,
+				helpanim_config[i].value);
   }
 
   element_hash   = newSetupFileHash();
@@ -3102,7 +3102,7 @@ void LoadDemoAnimInfo()
 
     if (strcmp(list->token, "end") == 0)
     {
-      add_demo_anim(-1, -1, -1, -1, &num_list_entries);
+      add_helpanim_entry(HELPANIM_LIST_NEXT, -1, -1, -1, &num_list_entries);
 
       continue;
     }
@@ -3113,7 +3113,7 @@ void LoadDemoAnimInfo()
     if (element_value != NULL)
     {
       /* element found */
-      add_demo_anim(atoi(element_value), -1, -1, delay, &num_list_entries);
+      add_helpanim_entry(atoi(element_value), -1, -1, delay,&num_list_entries);
 
       continue;
     }
@@ -3146,7 +3146,7 @@ void LoadDemoAnimInfo()
     if (action_value != NULL)
     {
       /* action found */
-      add_demo_anim(atoi(element_value), atoi(action_value), -1, delay,
+      add_helpanim_entry(atoi(element_value), atoi(action_value), -1, delay,
 		    &num_list_entries);
       free(element_token);
 
@@ -3159,8 +3159,8 @@ void LoadDemoAnimInfo()
     if (direction_value != NULL)
     {
       /* direction found */
-      add_demo_anim(atoi(element_value), -1, atoi(direction_value), delay,
-		    &num_list_entries);
+      add_helpanim_entry(atoi(element_value), -1, atoi(direction_value), delay,
+			 &num_list_entries);
       free(element_token);
 
       continue;
@@ -3196,8 +3196,8 @@ void LoadDemoAnimInfo()
     if (direction_value != NULL)
     {
       /* direction found */
-      add_demo_anim(atoi(element_value), atoi(action_value),
-		    atoi(direction_value), delay, &num_list_entries);
+      add_helpanim_entry(atoi(element_value), atoi(action_value),
+			 atoi(direction_value), delay, &num_list_entries);
       free(element_token);
       free(action_token);
 
@@ -3212,7 +3212,7 @@ void LoadDemoAnimInfo()
 
   print_unknown_token_end(num_unknown_tokens);
 
-  add_demo_anim(-999, -999, -999, -999, &num_list_entries);
+  add_helpanim_entry(HELPANIM_LIST_END, -1, -1, -1, &num_list_entries);
 
   freeSetupFileList(setup_file_list);
   freeSetupFileHash(element_hash);
@@ -3223,34 +3223,35 @@ void LoadDemoAnimInfo()
   /* TEST ONLY */
   for (i=0; i < num_list_entries; i++)
     printf("::: %d, %d, %d => %d\n",
-	   demo_anim_info[i].element,
-	   demo_anim_info[i].action,
-	   demo_anim_info[i].direction,
-	   demo_anim_info[i].delay);
+	   helpanim_info[i].element,
+	   helpanim_info[i].action,
+	   helpanim_info[i].direction,
+	   helpanim_info[i].delay);
 #endif
 }
 
-void LoadDemoAnimText()
+void LoadHelpTextInfo()
 {
-  char *filename = getDemoAnimTextFilename();
+  char *filename = getHelpTextFilename();
   int i;
 
-  if (demo_anim_text != NULL)
-    freeSetupFileHash(demo_anim_text);
+  if (helptext_info != NULL)
+    freeSetupFileHash(helptext_info);
 
-  if ((demo_anim_text = loadSetupFileHash(filename)) == NULL)
+  if ((helptext_info = loadSetupFileHash(filename)) == NULL)
   {
     /* use reliable default values from static configuration */
-    demo_anim_text = newSetupFileHash();
+    helptext_info = newSetupFileHash();
 
-    for (i=0; demo_anim_text_config[i].token; i++)
-      setHashEntry(demo_anim_text, demo_anim_text_config[i].token,
-		   demo_anim_text_config[i].value);
+    for (i=0; helptext_config[i].token; i++)
+      setHashEntry(helptext_info,
+		   helptext_config[i].token,
+		   helptext_config[i].value);
   }
 
 #if 0
   /* TEST ONLY */
-  BEGIN_HASH_ITERATION(demo_anim_text, itr)
+  BEGIN_HASH_ITERATION(helptext_info, itr)
   {
     printf("::: '%s' => '%s'\n",
 	   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));

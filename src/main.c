@@ -105,8 +105,8 @@ struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
-struct DemoAnimInfo    *demo_anim_info = NULL;
-SetupFileHash          *demo_anim_text = NULL;
+struct HelpAnimInfo    *helpanim_info = NULL;
+SetupFileHash          *helptext_info = NULL;
 
 
 /* ------------------------------------------------------------------------- */
@@ -3899,6 +3899,8 @@ static void print_usage()
 	 "  \"print soundsinfo.conf\"          print default sounds config\n"
 	 "  \"print musicinfo.conf\"           print default music config\n"
 	 "  \"print editorsetup.conf\"         print default editor config\n"
+	 "  \"print helpanim.conf\"            print default helpanim config\n"
+	 "  \"print helptext.conf\"            print default helptext config\n"
 	 "  \"dump level FILE\"                dump level data from FILE\n"
 	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
 	 "  \"autoplay LEVELDIR\"              play level tapes for LEVELDIR\n"

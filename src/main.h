@@ -1071,6 +1071,12 @@
 #define NUM_MUSIC_PREFIXES			1
 #define MAX_LEVELS				1000
 
+/* definitions for demo animation lists */
+#define HELPANIM_LIST_NEXT			-1
+#define HELPANIM_LIST_END			-999
+
+
+/* program information and versioning definitions */
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
@@ -1080,12 +1086,6 @@
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define PROGRAM_COPYRIGHT_STRING "Copyright ©1995-2003 by Holger Schemel"
-
-#if 0
-#define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
-#define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
-#define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
-#endif
 
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX		"ROCKSNDIAMONDS"
@@ -1564,7 +1564,7 @@ struct SpecialSuffixInfo
   int value;
 };
 
-struct DemoAnimInfo
+struct HelpAnimInfo
 {
   int element;
   int action;
@@ -1667,15 +1667,15 @@ extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct MusicInfo	       *music_info;
 extern struct MusicFileInfo    *music_file_info;
-extern struct DemoAnimInfo     *demo_anim_info;
-extern SetupFileHash           *demo_anim_text;
+extern struct HelpAnimInfo     *helpanim_info;
+extern SetupFileHash           *helptext_info;
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];
 extern struct ConfigInfo	image_config_suffix[];
 extern struct ConfigInfo	sound_config_suffix[];
 extern struct ConfigInfo	music_config_suffix[];
-extern struct ConfigInfo	demo_anim_info_config[];
-extern struct ConfigInfo	demo_anim_text_config[];
+extern struct ConfigInfo	helpanim_config[];
+extern struct ConfigInfo	helptext_config[];
 
 #endif	/* MAIN_H */

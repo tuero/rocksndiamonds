@@ -3192,10 +3192,10 @@ static void InitGlobal()
 
 void Execute_Command(char *command)
 {
+  int i;
+
   if (strcmp(command, "print graphicsinfo.conf") == 0)
   {
-    int i;
-
     printf("# You can configure additional/alternative image files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
@@ -3205,16 +3205,13 @@ void Execute_Command(char *command)
     printf("\n");
 
     for (i=0; image_config[i].token != NULL; i++)
-      printf("# %s\n",
-	     getFormattedSetupEntry(image_config[i].token,
-				    image_config[i].value));
+      printf("# %s\n", getFormattedSetupEntry(image_config[i].token,
+					      image_config[i].value));
 
     exit(0);
   }
   else if (strcmp(command, "print soundsinfo.conf") == 0)
   {
-    int i;
-
     printf("# You can configure additional/alternative sound files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
@@ -3224,16 +3221,13 @@ void Execute_Command(char *command)
     printf("\n");
 
     for (i=0; sound_config[i].token != NULL; i++)
-      printf("# %s\n",
-	     getFormattedSetupEntry(sound_config[i].token,
-				    sound_config[i].value));
+      printf("# %s\n", getFormattedSetupEntry(sound_config[i].token,
+					      sound_config[i].value));
 
     exit(0);
   }
   else if (strcmp(command, "print musicinfo.conf") == 0)
   {
-    int i;
-
     printf("# You can configure additional/alternative music files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
@@ -3243,9 +3237,8 @@ void Execute_Command(char *command)
     printf("\n");
 
     for (i=0; music_config[i].token != NULL; i++)
-      printf("# %s\n",
-	     getFormattedSetupEntry(music_config[i].token,
-				    music_config[i].value));
+      printf("# %s\n", getFormattedSetupEntry(music_config[i].token,
+					      music_config[i].value));
 
     exit(0);
   }
@@ -3256,6 +3249,35 @@ void Execute_Command(char *command)
     printf("\n");
 
     PrintEditorElementList();
+
+    exit(0);
+  }
+  else if (strcmp(command, "print helpanim.conf") == 0)
+  {
+    printf("# You can configure different element help animations here.\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
+    printf("\n");
+
+    for (i=0; helpanim_config[i].token != NULL; i++)
+    {
+      printf("# %s\n", getFormattedSetupEntry(helpanim_config[i].token,
+					      helpanim_config[i].value));
+
+      if (strcmp(helpanim_config[i].token, "end") == 0)
+	printf("#\n");
+    }
+
+    exit(0);
+  }
+  else if (strcmp(command, "print helptext.conf") == 0)
+  {
+    printf("# You can configure different element help text here.\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
+    printf("\n");
+
+    for (i=0; helptext_config[i].token != NULL; i++)
+      printf("# %s\n", getFormattedSetupEntry(helptext_config[i].token,
+					      helptext_config[i].value));
 
     exit(0);
   }
