@@ -519,19 +519,20 @@
 #define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 25)
 #define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 26)
 #define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 27)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 28)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 29)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 31)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 32)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 33)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 34)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 35)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 36)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_CUSTOM_GRAV_REACHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 31)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 32)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 33)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 34)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 35)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 38)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 38)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 39)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -575,8 +576,8 @@
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
 
 #define ED_COUNTER_ID_CUSTOM1_FIRST	ED_COUNTER_ID_CUSTOM_SCORE
-#define ED_COUNTER_ID_CUSTOM1_LAST	ED_COUNTER_ID_MOVE_DELAY_RND
-#define ED_COUNTER_ID_CUSTOM2_FIRST	ED_COUNTER_ID_EXPLOSION_DELAY
+#define ED_COUNTER_ID_CUSTOM1_LAST	ED_COUNTER_ID_DROP_DELAY_RND
+#define ED_COUNTER_ID_CUSTOM2_FIRST	ED_COUNTER_ID_MOVE_DELAY_FIX
 #define ED_COUNTER_ID_CUSTOM2_LAST	ED_COUNTER_ID_IGNITION_DELAY
 #define ED_COUNTER_ID_CUSTOM_FIRST	ED_COUNTER_ID_CUSTOM1_FIRST
 #define ED_COUNTER_ID_CUSTOM_LAST	ED_COUNTER_ID_CUSTOM2_LAST
@@ -656,8 +657,8 @@
 #define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_TIME_OR_STEPS
 
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
-#define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE
-#define ED_SELECTBOX_ID_CUSTOM2_FIRST	ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS
+#define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
+#define ED_SELECTBOX_ID_CUSTOM2_FIRST	ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN
 #define ED_SELECTBOX_ID_CUSTOM2_LAST	ED_SELECTBOX_ID_CUSTOM_EXPLOSION_TYPE
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM1_FIRST
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM2_LAST
@@ -712,34 +713,35 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	14
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	15
 #define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	16
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	17
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	18
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	19
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	20
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	21
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		22
-#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	23
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	24
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	25
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	26
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	27
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	28
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		29
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	30
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	31
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	32
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	33
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	34
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	35
+#define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	17
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	18
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	19
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	20
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	21
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	22
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	23
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		24
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	25
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	26
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	27
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	28
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	29
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		30
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	31
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	32
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	33
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	34
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	35
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	36
 
-#define ED_NUM_CHECKBUTTONS			36
+#define ED_NUM_CHECKBUTTONS			37
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
-#define ED_CHECKBUTTON_ID_CUSTOM1_LAST	ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE
-#define ED_CHECKBUTTON_ID_CUSTOM2_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL
+#define ED_CHECKBUTTON_ID_CUSTOM1_LAST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
+#define ED_CHECKBUTTON_ID_CUSTOM2_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE
 #define ED_CHECKBUTTON_ID_CUSTOM2_LAST	ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT
 #define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM1_FIRST
 #define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM2_LAST
@@ -1039,8 +1041,11 @@ static struct
     &custom_element.drop_delay_random,
     NULL,				"+random", NULL
   },
+
+  /* ---------- element settings: configure 2 (custom elements) ------------ */
+
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
     0,					999,
     GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
     GADGET_ID_MOVE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1048,18 +1053,15 @@ static struct
     NULL,				"move delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(5),
     0,					999,
     GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
     GADGET_ID_MOVE_DELAY_RND_TEXT,	GADGET_ID_MOVE_DELAY_FIX_UP,
     &custom_element.move_delay_random,
     NULL,				"+random", NULL
   },
-
-  /* ---------- element settings: configure 2 (custom elements) ------------ */
-
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
     0,					255,
     GADGET_ID_EXPLOSION_DELAY_DOWN,	GADGET_ID_EXPLOSION_DELAY_UP,
     GADGET_ID_EXPLOSION_DELAY_TEXT,	GADGET_ID_NONE,
@@ -1067,7 +1069,7 @@ static struct
     NULL,				"explosion delay", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     0,					255,
     GADGET_ID_IGNITION_DELAY_DOWN,	GADGET_ID_IGNITION_DELAY_UP,
     GADGET_ID_IGNITION_DELAY_TEXT,	GADGET_ID_NONE,
@@ -1543,16 +1545,19 @@ static struct
     &custom_element.walk_to_action,
     NULL, NULL,				"diggable/collectible/pushable"
   },
+
+  /* ---------- element settings: configure 2 (custom elements) ----------- */
+
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_MOVE_PATTERN,	GADGET_ID_NONE,
     -1,
     options_move_pattern,
     &custom_element.move_pattern,
-    "can move", NULL,			"element move direction"
+    "can move", NULL,			"element move pattern"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_MOVE_DIRECTION,	GADGET_ID_NONE,
     -1,
     options_move_direction,
@@ -1560,7 +1565,7 @@ static struct
     "starts moving", NULL,		"initial element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_MOVE_STEPSIZE,	GADGET_ID_NONE,
     -1,
     options_move_stepsize,
@@ -1568,7 +1573,7 @@ static struct
     "move/fall speed", NULL,		"speed of element movement"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,	GADGET_ID_NONE,
     -1,
     options_move_leave_type,
@@ -1576,7 +1581,7 @@ static struct
     "can dig:    can", ":",		"leave behind or change element"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_SMASH_TARGETS,	GADGET_ID_CUSTOM_CAN_SMASH,
     -1,
     options_smash_targets,
@@ -1584,18 +1589,15 @@ static struct
     "can smash", NULL,			"elements that can be smashed"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY_TYPE,	GADGET_ID_NONE,
     -1,
     options_slippery_type,
     &custom_element.slippery_type,
     "slippery", NULL,			"where other elements fall down"
   },
-
-  /* ---------- element settings: configure 2 (custom elements) ----------- */
-
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(1),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_DEADLINESS,	GADGET_ID_NONE,
     -1,
     options_deadliness,
@@ -1603,7 +1605,7 @@ static struct
     "deadly when", NULL,		"deadliness of element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_EXPLOSION_TYPE,	GADGET_ID_NONE,
     -1,
     options_explosion_type,
@@ -2037,7 +2039,7 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_USE_GRAPHIC,	GADGET_ID_NONE,
     &custom_element.use_gfx_element,
-    NULL, "use graphic of element:",	"use graphic for custom element"
+    NULL, "use graphic/sound of element:", "use existing graphic and sound"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
@@ -2052,6 +2054,12 @@ static struct
     NULL, NULL,				"player can walk to or pass this field"
   },
   {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    GADGET_ID_CUSTOM_GRAV_REACHABLE,	GADGET_ID_NONE,
+    &custom_element_properties[EP_GRAVITY_REACHABLE],
+    NULL, "reachable despite gravity",	"player can walk/dig despite gravity"
+  },
+  {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_WALK_TO_OBJECT,	GADGET_ID_NONE,
     &custom_element_properties[EP_WALK_TO_OBJECT],
@@ -2059,63 +2067,63 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
-    GADGET_ID_CUSTOM_CAN_MOVE,		GADGET_ID_NONE,
-    &custom_element_properties[EP_CAN_MOVE],
-    NULL, NULL,				"element can move in some direction"
-  },
-  {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
-    GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
-    &custom_element_properties[EP_CAN_FALL],
-    NULL, "can fall",			"element can fall down"
-  },
-  {
-    -1,					ED_SETTINGS_YPOS(13),
-    GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
-    &custom_element_properties[EP_CAN_SMASH],
-    " ", NULL,				"element can smash other elements"
-  },
-  {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(14),
-    GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
-    &custom_element_properties[EP_SLIPPERY],
-    NULL, NULL,				"other elements can fall down from it"
+    GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
+    &custom_element_properties[EP_INDESTRUCTIBLE],
+    NULL, "indestructible",		"element is indestructible"
   },
 
   /* ---------- element settings: configure 2 (custom elements) ----------- */
 
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    GADGET_ID_CUSTOM_CAN_MOVE,		GADGET_ID_NONE,
+    &custom_element_properties[EP_CAN_MOVE],
+    NULL, NULL,				"element can move with some pattern"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
+    &custom_element_properties[EP_CAN_FALL],
+    NULL, "can fall",			"element can fall down"
+  },
+  {
+    -1,					ED_SETTINGS_YPOS(7),
+    GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
+    &custom_element_properties[EP_CAN_SMASH],
+    " ", NULL,				"element can smash other elements"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
+    GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
+    &custom_element_properties[EP_SLIPPERY],
+    NULL, NULL,				"other elements can fall down from it"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_DEADLY,		GADGET_ID_NONE,
     &custom_element_properties[EP_DEADLY],
     NULL, NULL,				"element can kill the player"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
-    &custom_element_properties[EP_INDESTRUCTIBLE],
-    NULL, "indestructible",		"element is indestructible"
-  },
-  {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_EXPLODE,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_EXPLODE],
     NULL, NULL,				"element can explode"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,	GADGET_ID_NONE,
     &custom_element_properties[EP_EXPLODES_BY_FIRE],
     NULL, "by fire",			"element can explode by fire/explosion"
   },
   {
-    -1,					ED_SETTINGS_YPOS(3),
+    -1,					ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,	GADGET_ID_CUSTOM_EXPLODE_FIRE,
     &custom_element_properties[EP_EXPLODES_SMASHED],
     " ", "smashed",			"element can explode when smashed"
   },
   {
-    -1,					ED_SETTINGS_YPOS(3),
+    -1,					ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,	GADGET_ID_CUSTOM_EXPLODE_SMASH,
     &custom_element_properties[EP_EXPLODES_IMPACT],
     " ", "impact",			"element can explode on impact"
@@ -2251,6 +2259,8 @@ static struct
     "content:", NULL,			NULL
   },
 
+  /* ---------- element settings: configure 1 (custom elements) ----------- */
+
   /* ---------- custom graphic --------------------------------------------- */
 
   {
@@ -2260,10 +2270,12 @@ static struct
     NULL, NULL,				NULL
   },
 
+  /* ---------- element settings: configure 2 (custom elements) ----------- */
+
   /* ---------- custom content (when exploding) ---------------------------- */
 
   {
-    -1,					ED_AREA_3X3_SETTINGS_YPOS(2),
+    -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
     3, 3,
     GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	/* align three rows */
     "content:", NULL,			NULL
@@ -2272,17 +2284,19 @@ static struct
   /* ---------- custom enter and leave element (when moving) --------------- */
 
   {
-    ED_AREA_1X1_SETTINGS_XPOS(1),	ED_AREA_1X1_SETTINGS_YPOS(11),
+    ED_AREA_1X1_SETTINGS_XPOS(1),	ED_AREA_1X1_SETTINGS_YPOS(3),
     1, 1,
     GADGET_ID_CUSTOM_MOVE_ENTER,	GADGET_ID_NONE,
     "can dig:", " ",			NULL
   },
   {
-    -1,					ED_AREA_1X1_SETTINGS_YPOS(11),
+    -1,					ED_AREA_1X1_SETTINGS_YPOS(3),
     1, 1,
     GADGET_ID_CUSTOM_MOVE_LEAVE,	GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,
     NULL, NULL,				NULL
   },
+
+  /* ---------- element settings: advanced (custom elements) --------------- */
 
   /* ---------- custom change target --------------------------------------- */
 
@@ -5341,13 +5355,15 @@ static void MapCheckbuttonGadget(int id)
   int xoffset_left = getTextWidthForGadget(checkbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
   int yoffset = ED_BORDER_SIZE;
-  int x_left = gi->x - xoffset_left;
-  int x_right = gi->x + gi->width + xoffset_right;
-  int y;	/* set after gadget position was modified */
+  int x_left, x_right, y;	/* set after gadget position was modified */
 
-  /* set position for gadgets with dynamically determined vertical position */
+  /* set position for gadgets with dynamically determined position */
+  if (checkbutton_info[id].x != -1)	/* do not change dynamic positions */
+    ModifyGadget(gi, GDI_X, SX + checkbutton_info[id].x, GDI_END);
   ModifyGadget(gi, GDI_Y, SY + checkbutton_info[id].y, GDI_END);
 
+  x_left = gi->x - xoffset_left;
+  x_right = gi->x + gi->width + xoffset_right;
   y = gi->y + yoffset;
 
   if (checkbutton_info[id].text_left)
@@ -7090,8 +7106,10 @@ static void DrawPropertiesConfig()
        edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2))
   {
     /* set position for checkbutton for "can move into acid" */
+    checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].x =
+      ED_SETTINGS_XPOS(IS_CUSTOM_ELEMENT(properties_element) ? 1 : 0);
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
-      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 7 :
+      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
 		       HAS_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
@@ -7157,8 +7175,6 @@ static void DrawPropertiesConfig()
 
       /* draw drawing area gadgets */
       MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
-      MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_ENTER);
-      MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_LEAVE);
     }
     else if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2)
     {
@@ -7178,6 +7194,8 @@ static void DrawPropertiesConfig()
 	MapSelectboxGadget(i);
 
       /* draw drawing area gadgets */
+      MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_ENTER);
+      MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_LEAVE);
       DrawCustomContentArea();
     }
   }

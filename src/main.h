@@ -91,6 +91,7 @@
 #define EP_CAN_MOVE_INTO_ACID	27
 #define EP_THROWABLE		28
 #define EP_CAN_EXPLODE		29
+#define EP_GRAVITY_REACHABLE	30
 
 /* values for pre-defined properties */
 #define EP_PLAYER		32
@@ -99,63 +100,61 @@
 #define EP_BD_ELEMENT		35
 #define EP_SP_ELEMENT		36
 #define EP_SB_ELEMENT		37
-#define EP_SP_BUGGY_BASE	38
-#define EP_GEM			39
-#define EP_FOOD_DARK_YAMYAM	40
-#define EP_FOOD_PENGUIN		41
-#define EP_FOOD_PIG		42
-#define EP_HISTORIC_WALL	43
-#define EP_HISTORIC_SOLID	44
-#define EP_CLASSIC_ENEMY	45
-#define EP_BELT			46
-#define EP_BELT_ACTIVE		47
-#define EP_BELT_SWITCH		48
-#define EP_TUBE			49
-#define EP_KEYGATE		50
-#define EP_AMOEBOID		51
-#define EP_AMOEBALIVE		52
-#define EP_HAS_CONTENT		53
-#define EP_CAN_TURN_EACH_MOVE	54
-#define EP_CAN_GROW		55
-#define EP_ACTIVE_BOMB		56
-#define EP_INACTIVE		57
+#define EP_GEM			38
+#define EP_FOOD_DARK_YAMYAM	39
+#define EP_FOOD_PENGUIN		40
+#define EP_FOOD_PIG		41
+#define EP_HISTORIC_WALL	42
+#define EP_HISTORIC_SOLID	43
+#define EP_CLASSIC_ENEMY	44
+#define EP_BELT			45
+#define EP_BELT_ACTIVE		46
+#define EP_BELT_SWITCH		47
+#define EP_TUBE			48
+#define EP_KEYGATE		49
+#define EP_AMOEBOID		50
+#define EP_AMOEBALIVE		51
+#define EP_HAS_CONTENT		52
+#define EP_CAN_TURN_EACH_MOVE	53
+#define EP_CAN_GROW		54
+#define EP_ACTIVE_BOMB		55
+#define EP_INACTIVE		56
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	58
+#define EP_EM_SLIPPERY_WALL	57
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_GFX_CRUMBLED		59
+#define EP_GFX_CRUMBLED		58
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	60
-#define EP_ACCESSIBLE_INSIDE	61
-#define EP_ACCESSIBLE_UNDER	62
-#define EP_WALKABLE		63
-#define EP_PASSABLE		64
-#define EP_ACCESSIBLE		65
-#define EP_COLLECTIBLE		66
-#define EP_SNAPPABLE		67
-#define EP_WALL			68
-#define EP_SOLID_FOR_PUSHING	69
-#define EP_DRAGONFIRE_PROOF	70
-#define EP_EXPLOSION_PROOF	71
-#define EP_CAN_SMASH		72
-#define EP_EXPLODES_3X3_OLD	73
-#define EP_CAN_EXPLODE_BY_FIRE	74
-#define EP_CAN_EXPLODE_SMASHED	75
-#define EP_CAN_EXPLODE_IMPACT	76
-#define EP_SP_PORT		77
-#define EP_CAN_EXPLODE_BY_DRAGONFIRE	78
-#define EP_CAN_EXPLODE_BY_EXPLOSION	79
-#define EP_COULD_MOVE_INTO_ACID		80
-#define EP_MAYBE_DONT_COLLIDE_WITH	81
-#define EP_DIGGABLE_WITH_GRAVITY	82
+#define EP_ACCESSIBLE_OVER	59
+#define EP_ACCESSIBLE_INSIDE	60
+#define EP_ACCESSIBLE_UNDER	61
+#define EP_WALKABLE		62
+#define EP_PASSABLE		63
+#define EP_ACCESSIBLE		64
+#define EP_COLLECTIBLE		65
+#define EP_SNAPPABLE		66
+#define EP_WALL			67
+#define EP_SOLID_FOR_PUSHING	68
+#define EP_DRAGONFIRE_PROOF	69
+#define EP_EXPLOSION_PROOF	70
+#define EP_CAN_SMASH		71
+#define EP_EXPLODES_3X3_OLD	72
+#define EP_CAN_EXPLODE_BY_FIRE	73
+#define EP_CAN_EXPLODE_SMASHED	74
+#define EP_CAN_EXPLODE_IMPACT	75
+#define EP_SP_PORT		76
+#define EP_CAN_EXPLODE_BY_DRAGONFIRE	77
+#define EP_CAN_EXPLODE_BY_EXPLOSION	78
+#define EP_COULD_MOVE_INTO_ACID		79
+#define EP_MAYBE_DONT_COLLIDE_WITH	80
 
 /* values for internal purpose only (level editor) */
-#define EP_WALK_TO_OBJECT	83
-#define EP_DEADLY		84
+#define EP_WALK_TO_OBJECT	81
+#define EP_DEADLY		82
 
-#define NUM_ELEMENT_PROPERTIES	85
+#define NUM_ELEMENT_PROPERTIES	83
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -345,6 +344,7 @@
 #define CAN_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_CAN_MOVE_INTO_ACID)
 #define IS_THROWABLE(e)		HAS_PROPERTY(e, EP_THROWABLE)
 #define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
+#define IS_GRAVITY_REACHABLE(e)	HAS_PROPERTY(e, EP_GRAVITY_REACHABLE)
 
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
@@ -359,7 +359,6 @@
 #define IS_BD_ELEMENT(e)	HAS_PROPERTY(e, EP_BD_ELEMENT)
 #define IS_SP_ELEMENT(e)	HAS_PROPERTY(e, EP_SP_ELEMENT)
 #define IS_SB_ELEMENT(e)	HAS_PROPERTY(e, EP_SB_ELEMENT)
-#define IS_SP_BUGGY_BASE(e)	HAS_PROPERTY(e, EP_SP_BUGGY_BASE)
 #define IS_GEM(e)		HAS_PROPERTY(e, EP_GEM)
 #define IS_FOOD_DARK_YAMYAM(e)	HAS_PROPERTY(e, EP_FOOD_DARK_YAMYAM)
 #define IS_FOOD_PENGUIN(e)	HAS_PROPERTY(e, EP_FOOD_PENGUIN)
@@ -405,7 +404,6 @@
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_EXPLOSION)
 #define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
 #define MAYBE_DONT_COLLIDE_WITH(e) HAS_PROPERTY(e, EP_MAYBE_DONT_COLLIDE_WITH)
-#define IS_DIGGABLE_WITH_GRAVITY(e) HAS_PROPERTY(e, EP_DIGGABLE_WITH_GRAVITY)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
@@ -437,6 +435,8 @@
 
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
+
+#define SND_ELEMENT(e)		GFX_ELEMENT(e)
 
 #define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 

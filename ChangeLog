@@ -1,3 +1,8 @@
+2004-04-25
+	* added option "reachable despite gravity" for gravity movement
+	* changed gravity movement of most classic walkable and passable
+	  elements back to "not reachable" (for compatibility reasons)
+
 2004-04-24
 	* fixed (removed) "indestructible" / "can explode" dependency in editor
 	* fixed (removed) "accessible inside" / "protected" dependency

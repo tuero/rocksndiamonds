@@ -9029,6 +9029,13 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 
 #if 1
   return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
+	  IS_GRAVITY_REACHABLE(Feld[newx][newy]) &&
+	  (IS_DIGGABLE(Feld[newx][newy]) ||
+	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
+	   canPassField(newx, newy, move_dir)));
+#else
+#if 1
+  return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
 	  (IS_DIGGABLE_WITH_GRAVITY(Feld[newx][newy]) ||
 	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
 	   canPassField(newx, newy, move_dir)));
@@ -9041,6 +9048,7 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 	    IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
 	    IS_WALKABLE_FROM(Feld[nextx][nexty], move_dir) &&
 	    (level.can_pass_to_walkable || IS_FREE(nextx, nexty)))));
+#endif
 #endif
 }
 
@@ -10779,6 +10787,7 @@ int DigField(struct PlayerInfo *player,
       if (IS_WALKABLE(element))
 #endif
       {
+	int sound_element = SND_ELEMENT(element);
 	int sound_action = ACTION_WALKING;
 
 #if 0
@@ -10815,8 +10824,8 @@ int DigField(struct PlayerInfo *player,
 	}
 
 	/* play sound from background or player, whatever is available */
-	if (element_info[element].sound[sound_action] != SND_UNDEFINED)
-	  PlayLevelSoundElementAction(x, y, element, sound_action);
+	if (element_info[sound_element].sound[sound_action] != SND_UNDEFINED)
+	  PlayLevelSoundElementAction(x, y, sound_element, sound_action);
 	else
 	  PlayLevelSoundElementAction(x, y, player->element_nr, sound_action);
 
@@ -11718,7 +11727,7 @@ static void PlayLevelSoundAction(int x, int y, int action)
 
 static void PlayLevelSoundElementAction(int x, int y, int element, int action)
 {
-  int sound_effect = element_info[element].sound[action];
+  int sound_effect = element_info[SND_ELEMENT(element)].sound[action];
 
   if (sound_effect != SND_UNDEFINED)
     PlayLevelSound(x, y, sound_effect);
@@ -11727,7 +11736,7 @@ static void PlayLevelSoundElementAction(int x, int y, int element, int action)
 static void PlayLevelSoundElementActionIfLoop(int x, int y, int element,
 					      int action)
 {
-  int sound_effect = element_info[element].sound[action];
+  int sound_effect = element_info[SND_ELEMENT(element)].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     PlayLevelSound(x, y, sound_effect);
@@ -11735,7 +11744,7 @@ static void PlayLevelSoundElementActionIfLoop(int x, int y, int element,
 
 static void PlayLevelSoundActionIfLoop(int x, int y, int action)
 {
-  int sound_effect = element_info[Feld[x][y]].sound[action];
+  int sound_effect = element_info[SND_ELEMENT(Feld[x][y])].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     PlayLevelSound(x, y, sound_effect);
@@ -11743,7 +11752,7 @@ static void PlayLevelSoundActionIfLoop(int x, int y, int action)
 
 static void StopLevelSoundActionIfLoop(int x, int y, int action)
 {
-  int sound_effect = element_info[Feld[x][y]].sound[action];
+  int sound_effect = element_info[SND_ELEMENT(Feld[x][y])].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     StopSound(sound_effect);
