@@ -1118,6 +1118,8 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
   for (i = 0; i < MAX_KEYS; i++)
     key[i] = key_bits & (1 << i);
 
+  DrawGameValue_Level(level_nr);
+
   DrawGameValue_Emeralds(emeralds);
   DrawGameValue_Dynamite(dynamite);
   DrawGameValue_Score(score);

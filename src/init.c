@@ -4694,7 +4694,7 @@ void KeyboardAutoRepeatOffUnlessAutoplay()
 
 void OpenAll()
 {
-  InitGlobal();		/* initialize some global variables */
+  InitGlobal();			/* initialize some global variables */
 
   if (options.execute_command)
     Execute_Command(options.execute_command);
@@ -4706,7 +4706,8 @@ void OpenAll()
 #else
     Error(ERR_WARN, "networking only supported in Unix version");
 #endif
-    exit(0);	/* never reached */
+
+    exit(0);			/* never reached, server loops forever */
   }
 
   InitSetup();

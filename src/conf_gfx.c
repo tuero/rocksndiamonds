@@ -3547,6 +3547,13 @@ struct ConfigInfo image_config[] =
   { "emc_fake_grass.active.CRUMBLED.ypos",	"4"			},
   { "emc_fake_grass.active.CRUMBLED.frames",	"1"			},
 
+  { "emc_fake_acid",				"RocksElements.pcx"	},
+  { "emc_fake_acid.xpos",			"12"			},
+  { "emc_fake_acid.ypos",			"7"			},
+  { "emc_fake_acid.frames",			"4"			},
+  { "emc_fake_acid.delay",			"10"			},
+  { "emc_fake_acid.global_sync",		"true"			},
+
   { "emc_dripper",				"RocksSP.pcx"		},
   { "emc_dripper.xpos",				"0"			},
   { "emc_dripper.ypos",				"0"			},

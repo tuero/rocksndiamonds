@@ -81,25 +81,27 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
   int src_y = g->src_y + g->src_offset_y;
   int dst_x = sx * TILEX + g->dst_offset_x;
   int dst_y = sy * TILEY + g->dst_offset_y;
+  int width = g->width;
+  int height = g->height;
 
   if (draw_masked)
   {
-    if (g->width > 0 && g->height > 0)
+    if (width > 0 && height > 0)
     {
       SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
 		    dst_x - src_x, dst_y - src_y);
       BlitBitmapMasked(g->bitmap, screenBitmap,
-		       src_x, src_y, g->width, g->height, dst_x, dst_y);
+		       src_x, src_y, width, height, dst_x, dst_y);
     }
   }
   else
   {
-    if (g->width != TILEX || g->height != TILEY)
+    if (width != TILEX || height != TILEY)
       ClearRectangle(screenBitmap, sx * TILEX, sy * TILEY, TILEX, TILEY);
 
-    if (g->width > 0 && g->height > 0)
+    if (width > 0 && height > 0)
       BlitBitmap(g->bitmap, screenBitmap,
-		 src_x, src_y, g->width, g->height, dst_x, dst_y);
+		 src_x, src_y, width, height, dst_x, dst_y);
   }
 }
 
@@ -263,6 +265,7 @@ static void animscreen(void)
 	}
       }
 
+      /* only redraw screen tiles if they (or their crumbled state) changed */
       if (screentiles[sy][sx] != obj || crumbled_state[sy][sx] != crm)
       {
 	DrawLevelField_EM(x, y, sx, sy, FALSE);
@@ -308,11 +311,13 @@ static void blitplayer(struct PLAYER *ply)
     int old_sy = old_y % MAX_BUF_XSIZE;
     int new_sx = new_x % MAX_BUF_XSIZE;
     int new_sy = new_y % MAX_BUF_XSIZE;
+#if 0
     int old_crm = crumbled_state[old_sy][old_sx];
+#endif
     int new_crm = crumbled_state[new_sy][new_sx];
 
     /* only diggable elements can be crumbled in the classic EM engine */
-    boolean player_is_digging = (crumbled_state[new_sy][new_sx] != 0);
+    boolean player_is_digging = (new_crm != 0);
 
     x1 %= MAX_BUF_XSIZE * TILEX;
     y1 %= MAX_BUF_YSIZE * TILEY;
@@ -321,9 +326,11 @@ static void blitplayer(struct PLAYER *ply)
 
     if (player_is_digging)
     {
+#if 0
       /* draw the field the player is moving from (under the player) */
       DrawLevelField_EM(old_x, old_y, old_sx, old_sy, FALSE);
       DrawLevelFieldCrumbled_EM(old_x, old_y, old_sx, old_sy, old_crm, FALSE);
+#endif
 
       /* draw the field the player is moving to (under the player) */
       DrawLevelField_EM(new_x, new_y, new_sx, new_sy, FALSE);
@@ -331,6 +338,11 @@ static void blitplayer(struct PLAYER *ply)
 
       /* draw the player (masked) over the element he is just digging away */
       DrawLevelPlayer_EM(x1, y1, ply->num, ply->anim, TRUE);
+
+#if 1
+      /* draw the field the player is moving from (masked over the player) */
+      DrawLevelField_EM(old_x, old_y, old_sx, old_sy, TRUE);
+#endif
     }
     else
     {

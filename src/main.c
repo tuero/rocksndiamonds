@@ -3640,6 +3640,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "fake grass"
   },
   {
+    "emc_fake_acid",
+    "fake acid",
+    "fake acid"
+  },
+  {
     "emc_dripper",
     "dripper",
     "dripper"

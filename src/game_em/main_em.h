@@ -362,6 +362,18 @@ enum
   Xfake_door_6,
   Xfake_door_7,
   Xfake_door_8,
+
+#if 1
+  Xfake_acid_1,
+  Xfake_acid_2,
+  Xfake_acid_3,
+  Xfake_acid_4,
+  Xfake_acid_5,
+  Xfake_acid_6,
+  Xfake_acid_7,
+  Xfake_acid_8,
+#endif
+
   Xsteel_1,
   Xsteel_2,
   Xsteel_3,

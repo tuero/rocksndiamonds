@@ -11,21 +11,21 @@
 #include "display.h"
 
 
-static void player(struct PLAYER *);
+static void check_player(struct PLAYER *);
+static void kill_player(struct PLAYER *);
 static boolean player_digfield(struct PLAYER *, int, int);
-static int test(struct PLAYER *);
-static void die(struct PLAYER *);
+static boolean player_killed(struct PLAYER *);
 
 void synchro_1(void)
 {
  /* must test for death and actually kill separately */
-  char ply1_kill = test(&ply1);
-  char ply2_kill = test(&ply2);
+  boolean ply1_kill = player_killed(&ply1);
+  boolean ply2_kill = player_killed(&ply2);
 
   if (ply1.alive && ply1_kill)
-    die(&ply1);
+    kill_player(&ply1);
   if (ply2.alive && ply2_kill)
-    die(&ply2);
+    kill_player(&ply2);
 
 #if 0
   ply1.alive = 1; /* debugging */
@@ -40,13 +40,13 @@ void synchro_1(void)
 
   if (Random & 256)
   {
-    if (ply1.alive) player(&ply1);
-    if (ply2.alive) player(&ply2);
+    if (ply1.alive) check_player(&ply1);
+    if (ply2.alive) check_player(&ply2);
   }
   else
   {
-    if (ply2.alive) player(&ply2);
-    if (ply1.alive) player(&ply1);
+    if (ply2.alive) check_player(&ply2);
+    if (ply1.alive) check_player(&ply1);
   }
 
   if (ply1.alive)
@@ -80,16 +80,16 @@ void synchro_1(void)
   }
 }
 
-static int test(struct PLAYER *ply)
+static boolean player_killed(struct PLAYER *ply)
 {
   register unsigned int x = ply->x;
   register unsigned int y = ply->y;
 
   if (!ply->alive)
-    return 0;
+    return FALSE;
 
   if (lev.time_initial > 0 && lev.time == 0)
-    return 1;
+    return TRUE;
 
   switch(Cave[y-1][x])
   {
@@ -109,7 +109,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return 1;
+      return TRUE;
   }
 
   switch(Cave[y][x+1])
@@ -130,7 +130,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return 1;
+      return TRUE;
   }
 
   switch(Cave[y+1][x])
@@ -151,7 +151,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return 1;
+      return TRUE;
   }
 
   switch(Cave[y][x-1])
@@ -172,7 +172,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return 1;
+      return TRUE;
   }
 
   switch(Cave[y][x])
@@ -185,13 +185,23 @@ static int test(struct PLAYER *ply)
     case Xdynamite_2:
     case Xdynamite_3:
     case Xdynamite_4:
-      return 0;
+#if 1
+    case Xfake_acid_1:
+    case Xfake_acid_2:
+    case Xfake_acid_3:
+    case Xfake_acid_4:
+    case Xfake_acid_5:
+    case Xfake_acid_6:
+    case Xfake_acid_7:
+    case Xfake_acid_8:
+#endif
+      return FALSE;
   }
 
-  return 1;
+  return TRUE;
 }
 
-static void die(struct PLAYER *ply)
+static void kill_player(struct PLAYER *ply)
 {
   register unsigned int x = ply->x;
   register unsigned int y = ply->y;
@@ -335,11 +345,28 @@ static void die(struct PLAYER *ply)
       break;
   }
 
-  Cave[y][x] = Xboom_1;
-  Boom[y][x] = Xblank;
+  switch(Cave[y][x])
+  {
+#if 1
+    case Xacid_1:
+    case Xacid_2:
+    case Xacid_3:
+    case Xacid_4:
+    case Xacid_5:
+    case Xacid_6:
+    case Xacid_7:
+    case Xacid_8:
+      break;
+#endif
+
+    default:
+      Cave[y][x] = Xboom_1;
+      Boom[y][x] = Xblank;
+      break;
+  }
 }
 
-static void player(struct PLAYER *ply)
+static void check_player(struct PLAYER *ply)
 {
   unsigned int oldx = ply->x;
   unsigned int oldy = ply->y;
@@ -523,11 +550,37 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Yacid_splash_wB:
 	Cave[y][x] = Zplayer;
 	Next[y][x] = Zplayer;
+#if 1
+      case Xfake_acid_1:
+      case Xfake_acid_2:
+      case Xfake_acid_3:
+      case Xfake_acid_4:
+      case Xfake_acid_5:
+      case Xfake_acid_6:
+      case Xfake_acid_7:
+      case Xfake_acid_8:
+#endif
 	play_element_sound(x, y, SAMPLE_blank, Xblank);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
 	break;
+
+#if 1
+      case Xacid_1:
+      case Xacid_2:
+      case Xacid_3:
+      case Xacid_4:
+      case Xacid_5:
+      case Xacid_6:
+      case Xacid_7:
+      case Xacid_8:
+#endif
+	if (Cave[y-1][x+1] == Xblank)
+	  Cave[y-1][x+1] = Yacid_splash_eB;
+	if (Cave[y-1][x-1] == Xblank)
+	  Cave[y-1][x-1] = Yacid_splash_wB;
+	play_sound(x, y, SAMPLE_acid);
 
       case Xboom_android:
       case Xboom_1:
@@ -547,6 +600,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xtank_goe:
       case Xtank_gos:
       case Xtank_gow:
+#if 0
       case Xacid_1:
       case Xacid_2:
       case Xacid_3:
@@ -555,6 +609,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xacid_6:
       case Xacid_7:
       case Xacid_8:
+#endif
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;

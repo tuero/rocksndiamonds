@@ -2985,6 +2985,12 @@ void HandleGameActions()
 
     recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
+#if 1
+    /* !!! CHECK THIS (tape.pausing is always FALSE here!) !!! */
+    if (recorded_player_action == NULL && tape.pausing)
+      return;
+#endif
+
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       summarized_player_action |= stored_player[i].action;

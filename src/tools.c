@@ -4350,6 +4350,38 @@ em_object_mapping_list[] =
     EL_EM_GATE_8_GRAY,			-1, -1
   },
   {
+    Xfake_acid_1,			TRUE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_2,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_3,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_4,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_5,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_6,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_7,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
+    Xfake_acid_8,			FALSE,	FALSE,
+    EL_EMC_FAKE_ACID,			-1, -1
+  },
+  {
     Xsteel_1,				TRUE,	FALSE,
     EL_STEELWALL,			-1, -1
   },
@@ -5798,6 +5830,14 @@ void InitGraphicInfo_EM(void)
 			i == Xacid_6 ? 50 :
 			i == Xacid_7 ? 60 :
 			i == Xacid_8 ? 70 :
+			i == Xfake_acid_1 ? 0 :
+			i == Xfake_acid_2 ? 10 :
+			i == Xfake_acid_3 ? 20 :
+			i == Xfake_acid_4 ? 30 :
+			i == Xfake_acid_5 ? 40 :
+			i == Xfake_acid_6 ? 50 :
+			i == Xfake_acid_7 ? 60 :
+			i == Xfake_acid_8 ? 70 :
 			i == Xball_2 ? 7 :
 			i == Xball_2B ? j + 8 :
 			i == Yball_eat ? j + 1 :
@@ -5950,41 +5990,45 @@ void InitGraphicInfo_EM(void)
 	  (effective_action == ACTION_FALLING ? MV_DOWN : direction);
 	int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? 1 : 0);
 	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
-	int cx = ABS(dx) * TILEX / 8;
-	int cy = ABS(dy) * TILEY / 8;
+	int num_steps = (i == Ydrip_s1 ||
+			 i == Ydrip_s1B ||
+			 i == Ydrip_s2 ||
+			 i == Ydrip_s2B ? 16 : 8);
+	int cx = ABS(dx) * (TILEX / num_steps);
+	int cy = ABS(dy) * (TILEY / num_steps);
+	int step_frame = (i == Ydrip_s2 ||
+			  i == Ydrip_s2B ? j + 8 : j) + 1;
+	int step = (is_backside ? step_frame : num_steps - step_frame);
 
 	if (is_backside)	/* tile where movement starts */
 	{
 	  if (dx < 0 || dy < 0)
 	  {
-	    g_em->src_offset_x = cx * (j + 1);
-	    g_em->src_offset_y = cy * (j + 1);
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
 	  }
 	  else
 	  {
-	    g_em->dst_offset_x = cx * (j + 1);
-	    g_em->dst_offset_y = cy * (j + 1);
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
 	  }
-
-	  g_em->width  = TILEX - cx * (j + 1);
-	  g_em->height = TILEY - cy * (j + 1);
 	}
 	else			/* tile where movement ends */
 	{
 	  if (dx < 0 || dy < 0)
 	  {
-	    g_em->dst_offset_x = cx * (7 - j);
-	    g_em->dst_offset_y = cy * (7 - j);
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
 	  }
 	  else
 	  {
-	    g_em->src_offset_x = cx * (7 - j);
-	    g_em->src_offset_y = cy * (7 - j);
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
 	  }
-
-	  g_em->width  = TILEX - cx * (7 - j);
-	  g_em->height = TILEY - cy * (7 - j);
 	}
+
+	g_em->width  = TILEX - cx * step;
+	g_em->height = TILEY - cy * step;
       }
 #endif
 

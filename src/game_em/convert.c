@@ -17,66 +17,75 @@ static unsigned char remap_v6[256] =
 {
   /* filter crap for v6 */
 
-  0,0,2,2,4,4,118,118,8,9,10,11,12,13,14,15,
-  16,16,18,18,20,21,22,23,24,25,26,27,28,28,118,28,
-  0,16,2,18,36,37,37,37,40,41,42,43,44,45,128,128,
-  128,148,148,148,45,45,45,148,0,57,58,59,60,61,62,63,
-  64,65,66,67,68,69,69,69,69,73,74,75,118,75,75,75,
-  75,75,75,75,75,153,153,153,153,153,153,153,153,153,153,153,
-  153,153,153,99,100,68,68,68,68,68,68,68,68,118,118,118,
-  118,118,114,115,131,118,118,119,120,121,122,118,118,118,118,118,
-  128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
-  144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
-  160,161,162,163,164,165,165,118,168,169,170,171,172,173,174,175,
-  176,177,178,179,180,181,182,183,184,185,186,187,188,189,68,191,
-  192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,
-  208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
-  224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
-  240,241,242,243,244,245,153,153,153,153,153,153,153,153,153,153
+  0,0,2,2,         4,4,118,118,     8,9,10,11,       12,13,14,15,
+  16,16,18,18,     20,21,22,23,     24,25,26,27,     28,28,118,28,
+  0,16,2,18,       36,37,37,37,     40,41,42,43,     44,45,128,128,
+  128,148,148,     148,45,45,45,    148,0,57,58,     59,60,61,62,63,
+
+  64,65,66,67,     68,69,69,69,     69,73,74,75,     118,75,75,75,
+  75,75,75,75,     75,153,153,153,  153,153,153,153, 153,153,153,153,
+  153,153,153,99,  100,68,68,68,    68,68,68,68,     68,118,118,118,
+  118,118,114,115, 131,118,118,119, 120,121,122,118, 118,118,118,118,
+
+  128,129,130,131, 132,133,134,135, 136,137,138,139, 140,141,142,143,
+  144,145,146,147, 148,149,150,151, 152,153,154,155, 156,157,158,159,
+  160,161,162,163, 164,165,165,118, 168,169,170,171, 172,173,174,175,
+  176,177,178,179, 180,181,182,183, 184,185,186,187, 188,189,68,191,
+
+  192,193,194,195, 196,197,198,199, 200,201,202,203, 204,205,206,207,
+  208,209,210,211, 212,213,214,215, 216,217,218,219, 220,221,222,223,
+  224,225,226,227, 228,229,230,231, 232,233,234,235, 236,237,238,239,
+  240,241,242,243, 244,245,153,153, 153,153,153,153, 153,153,153,153
 };
 
 static unsigned char remap_v5[256] =
 {
   /* filter crap for v5 */
 
-  0,0,2,2,4,4,118,118,8,9,10,11,12,13,14,15,
-  16,16,18,18,20,21,22,23,24,25,26,27,28,28,118,28,
-  0,16,2,18,36,37,37,37,147,41,42,43,44,45,128,128,
-  128,148,148,148,45,45,45,148,0,57,58,59,60,61,62,63,
-  64,65,66,67,68,153,153,153,153,153,153,153,153,153,153,153,
-  153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,
-  153,153,153,153,153,68,68,68,68,68,68,68,68,118,118,118,
-  118,118,114,115,131,118,118,119,120,121,122,118,118,118,118,118,
-  128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
-  144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
-  160,153,153,153,153,153,153,118,168,169,170,171,172,173,174,175,
-  176,177,178,179,180,181,182,183,184,185,186,187,188,189,68,153,
-  153,153,153,153,153,153,153,153,200,201,202,203,204,205,206,207,
-  208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
-  224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
-  240,241,153,153,153,153,153,153,153,153,153,153,153,153,153,153
+  0,0,2,2,         4,4,118,118,     8,9,10,11,       12,13,14,15,
+  16,16,18,18,     20,21,22,23,     24,25,26,27,     28,28,118,28,
+  0,16,2,18,       36,37,37,37,     147,41,42,43,    44,45,128,128,
+  128,148,148,148, 45,45,45,148,    0,57,58,59,      60,61,62,63,
+
+  64,65,66,67,     68,153,153,153,  153,153,153,153, 153,153,153,153,
+  153,153,153,153, 153,153,153,153, 153,153,153,153, 153,153,153,153,
+  153,153,153,153, 153,68,68,68,68, 68,68,68,68,118, 118,118,
+  118,118,114,115, 131,118,118,119, 120,121,122,118, 118,118,118,118,
+
+  128,129,130,131, 132,133,134,135, 136,137,138,139, 140,141,142,143,
+  144,145,146,147, 148,149,150,151, 152,153,154,155, 156,157,158,159,
+  160,153,153,153, 153,153,153,118, 168,169,170,171, 172,173,174,175,
+  176,177,178,179, 180,181,182,183, 184,185,186,187, 188,189,68,153,
+
+  153,153,153,153, 153,153,153,153, 200,201,202,203, 204,205,206,207,
+  208,209,210,211, 212,213,214,215, 216,217,218,219, 220,221,222,223,
+  224,225,226,227, 228,229,230,231, 232,233,234,235, 236,237,238,239,
+  240,241,153,153, 153,153,153,153, 153,153,153,153, 153,153,153,153
 };
 
 static unsigned char remap_v4[256] =
 {
   /* filter crap for v4 */
 
-  0,0,2,2,4,4,118,118,8,9,10,11,12,13,14,15,
-  16,16,18,18,20,21,22,23,24,25,26,27,28,28,118,28,
-  0,16,2,18,36,37,37,37,147,41,42,43,44,45,128,128,
-  128,148,148,148,45,45,45,148,0,153,153,59,60,61,62,63,
-  64,65,66,153,153,153,153,153,153,153,153,153,153,153,153,153,
-  153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,
-  153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,153,
-  153,118,114,115,131,118,118,119,120,121,122,118,118,118,118,118,
-  128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
-  144,145,146,147,148,149,150,151,152,68,154,155,156,157,158,160,
-  160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,175,
-  153,153,153,153,153,153,153,153,153,153,153,153,153,153,68,153,
-  153,153,153,153,153,153,153,153,200,201,202,203,204,205,206,207,
-  208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
-  224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
-  240,241,153,153,153,153,153,153,153,153,153,153,153,153,153,153
+  0,0,2,2,         4,4,118,118,     8,9,10,11,       12,13,14,15,
+  16,16,18,18,     20,21,22,23,     24,25,26,27,     28,28,118,28,
+  0,16,2,18,       36,37,37,37,     147,41,42,43,    44,45,128,128,
+  128,148,148,148, 45,45,45,148,    0,153,153,59,    60,61,62,63,
+
+  64,65,66,153,    153,153,153,153, 153,153,153,153, 153,153,153,153,
+  153,153,153,153, 153,153,153,153, 153,153,153,153, 153,153,153,153,
+  153,153,153,153, 153,153,153,153, 153,153,153,153, 153,153,153,153,
+  153,118,114,115, 131,118,118,119, 120,121,122,118, 118,118,118,118,
+
+  128,129,130,131, 132,133,134,135, 136,137,138,139, 140,141,142,143,
+  144,145,146,147, 148,149,150,151, 152,68,154,155,  156,157,158,160,
+  160,160,160,160, 160,160,160,160, 160,160,160,160, 160,160,160,175,
+  153,153,153,153, 153,153,153,153, 153,153,153,153, 153,153,68,153,
+
+  153,153,153,153, 153,153,153,153, 200,201,202,203, 204,205,206,207,
+  208,209,210,211, 212,213,214,215, 216,217,218,219, 220,221,222,223,
+  224,225,226,227, 228,229,230,231, 232,233,234,235, 236,237,238,239,
+  240,241,153,153, 153,153,153,153, 153,153,153,153, 153,153,153,153
 };
 
 static unsigned char remap_v4eater[28] =
@@ -193,10 +202,27 @@ int cleanup_em_level(unsigned char *src, int length)
     if (src[i] == 40)
       src[i] = 147;
 
+#if 0
   /* fix acid */
   for (i = 64; i < 2048; i++)
+    if (src[i] == 63)		/* replace element above 'Xacid_s' ... */
+      src[i - 64] = 101;	/* ... with 'Xacid_1' */
+
+#else
+
+  /* fix acid */
+  for (i = 64; i < 2048; i++)
+  {
     if (src[i] == 63)
-      src[i - 64] = 101;
+    {
+      if (file_version == FILE_VERSION_EM_V4 &&
+	  i < 2048 - 64 && src[i + 64] == 63)
+	src[i - 64] = 255;
+      else
+	src[i - 64] = 101;
+    }
+  }
+#endif
 
   /* fix acid in eater 1 */
   for (i = 2051; i < 2057; i++)
@@ -326,6 +352,10 @@ int cleanup_em_level(unsigned char *src, int length)
   /* size of v6 cave */
   length = 2172;
 
+#if 0
+  printf("::: EM level file version: %d\n", file_version);
+#endif
+
   return file_version;
 }
 
@@ -346,7 +376,8 @@ int cleanup_em_level(unsigned char *src, int length)
  *   rolls.
  * - a compile time option for rolling objects (stone, nut, spring, bomb) only
  *   in eater.
- * - acid is always deadly even with no base beneath it.
+ * - acid is always deadly even with no base beneath it (this breaks cave 0 in
+ *   downunder mine 16)
  *
  * so far all below have not broken any caves:
  *
@@ -379,51 +410,106 @@ int cleanup_em_level(unsigned char *src, int length)
 
 static unsigned short remap_emerald[256] =
 {
-  Xstone, Xstone, Xdiamond, Xdiamond, Xalien, Xalien, Xblank, Xblank,
-  Xtank_n, Xtank_e, Xtank_s, Xtank_w, Xtank_gon, Xtank_goe, Xtank_gos, Xtank_gow,
-  Xbomb, Xbomb, Xemerald, Xemerald, Xbug_n, Xbug_e, Xbug_s, Xbug_w,
-  Xbug_gon, Xbug_goe, Xbug_gos, Xbug_gow, Xdrip_eat, Xdrip_eat, Xdrip_eat, Xdrip_eat,
-  Xstone, Xbomb, Xdiamond, Xemerald, Xwonderwall, Xnut, Xnut, Xnut,
-  Xwheel, Xeater_n, Xeater_s, Xeater_w, Xeater_e, Xsand_stone, Xblank, Xblank,
-  Xblank, Xsand, Xsand, Xsand, Xsand_stone, Xsand_stone, Xsand_stone, Xsand,
-  Xstone, Xgrow_ew, Xgrow_ns, Xdynamite_1, Xdynamite_2, Xdynamite_3, Xdynamite_4, Xacid_s,
-  Xexit_1, Xexit_2, Xexit_3, Xballoon, Xplant, Xspring, Xspring, Xspring,
-  Xspring, Xball_1, Xball_2, Xandroid, Xblank, Xandroid, Xandroid, Xandroid,
-  Xandroid, Xandroid, Xandroid, Xandroid, Xandroid, Xblank, Xblank, Xblank,
-  Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank,
+  Xstone,		Xstone,		Xdiamond,	Xdiamond,
+  Xalien,		Xalien,		Xblank,		Xblank,
+  Xtank_n,		Xtank_e,	Xtank_s,	Xtank_w,
+  Xtank_gon,		Xtank_goe,	Xtank_gos,	Xtank_gow,
+
+  Xbomb,		Xbomb,		Xemerald,	Xemerald,
+  Xbug_n,		Xbug_e,		Xbug_s,		Xbug_w,
+  Xbug_gon,		Xbug_goe,	Xbug_gos,	Xbug_gow,
+  Xdrip_eat,		Xdrip_eat,	Xdrip_eat,	Xdrip_eat,
+
+  Xstone,		Xbomb,		Xdiamond,	Xemerald,
+  Xwonderwall,		Xnut,		Xnut,		Xnut,
+  Xwheel,		Xeater_n,	Xeater_s,	Xeater_w,
+  Xeater_e,		Xsand_stone,	Xblank,		Xblank,
+
+  Xblank,		Xsand,		Xsand,		Xsand,
+  Xsand_stone,		Xsand_stone,	Xsand_stone,	Xsand,
+  Xstone,		Xgrow_ew,	Xgrow_ns,	Xdynamite_1,
+  Xdynamite_2,		Xdynamite_3,	Xdynamite_4,	Xacid_s,
+
+  Xexit_1,		Xexit_2,	Xexit_3,	Xballoon,
+  Xplant,		Xspring,	Xspring,	Xspring,
+  Xspring,		Xball_1,	Xball_2,	Xandroid,
+  Xblank,		Xandroid,	Xandroid,	Xandroid,
+
+  Xandroid,		Xandroid,	Xandroid,	Xandroid,
+  Xandroid,		Xblank,		Xblank,		Xblank,
+  Xblank,		Xblank,		Xblank,		Xblank,
+  Xblank,		Xblank,		Xblank,		Xblank,
 
 #ifdef BAD_ROLL
 
-  Xblank, Xblank, Xblank, Xspring_force_w, Xspring_force_e, Xacid_1, Xacid_2, Xacid_3,
-  Xacid_4, Xacid_5, Xacid_6, Xacid_7, Xacid_8, Xblank, Xblank, Xblank,
-  Xblank, Xblank, Xnut_force_w, Xnut_force_e, Xsteel_1, Xblank, Xblank, Xbomb_force_w,
-  Xbomb_force_e, Xstone_force_w, Xstone_force_e, Xblank, Xblank, Xblank, Xblank, Xblank,
+  Xblank,		Xblank,		Xblank,		Xspring_force_w,
+  Xspring_force_e,	Xacid_1,	Xacid_2,	Xacid_3,
+  Xacid_4,		Xacid_5,	Xacid_6,	Xacid_7,
+  Xacid_8,		Xblank,		Xblank,		Xblank,
+
+  Xblank,		Xblank,		Xnut_force_w,	Xnut_force_e,
+  Xsteel_1,		Xblank,		Xblank,		Xbomb_force_w,
+  Xbomb_force_e,	Xstone_force_w,	Xstone_force_e,	Xblank,
+  Xblank,		Xblank,		Xblank,		Xblank,
 
 #else
 
-  Xblank, Xblank, Xblank, Xspring, Xspring, Xacid_1, Xacid_2, Xacid_3,
-  Xacid_4, Xacid_5, Xacid_6, Xacid_7, Xacid_8, Xblank, Xblank, Xblank,
-  Xblank, Xblank, Xnut, Xnut, Xsteel_1, Xblank, Xblank, Xbomb,
-  Xbomb, Xstone, Xstone, Xblank, Xblank, Xblank, Xblank, Xblank,
+  Xblank,		Xblank,		Xblank,		Xspring,
+  Xspring,		Xacid_1,	Xacid_2,	Xacid_3,
+  Xacid_4,		Xacid_5,	Xacid_6,	Xacid_7,
+  Xacid_8,		Xblank,		Xblank,		Xblank,
+
+  Xblank,		Xblank,		Xnut,		Xnut,
+  Xsteel_1,		Xblank,		Xblank,		Xbomb,
+  Xbomb,		Xstone,		Xstone,		Xblank,
+  Xblank,		Xblank,		Xblank,		Xblank,
 
 #endif
 
-  Xblank, Xround_wall_1, Xgrass, Xsteel_1, Xwall_1, Xkey_1, Xkey_2, Xkey_3,
-  Xkey_4, Xdoor_1, Xdoor_2, Xdoor_3, Xdoor_4, Xdripper, Xfake_door_1, Xfake_door_2,
-  Xfake_door_3, Xfake_door_4, Xwonderwall, Xwheel, Xsand, Xacid_nw, Xacid_ne, Xacid_sw,
-  Xacid_se, Xfake_blank, Xamoeba_1, Xamoeba_2, Xamoeba_3, Xamoeba_4, Xexit, Xalpha_arrow_w,
-  Xfake_grass, Xlenses, Xmagnify, Xfake_blank, Xfake_grass, Xswitch, Xswitch, Xblank,
-  Xdecor_8, Xdecor_9, Xdecor_10, Xdecor_5, Xalpha_comma, Xalpha_quote, Xalpha_minus, Xdynamite,
-  Xsteel_3, Xdecor_6, Xdecor_7, Xsteel_2, Xround_wall_2, Xdecor_2, Xdecor_4, Xdecor_3,
-  Xwind_nesw, Xwind_e, Xwind_s, Xwind_w, Xwind_n, Xdirt, Xplant, Xkey_5,
-  Xkey_6, Xkey_7, Xkey_8, Xdoor_5, Xdoor_6, Xdoor_7, Xdoor_8, Xbumper,
-  Xalpha_a, Xalpha_b, Xalpha_c, Xalpha_d, Xalpha_e, Xalpha_f, Xalpha_g, Xalpha_h,
-  Xalpha_i, Xalpha_j, Xalpha_k, Xalpha_l, Xalpha_m, Xalpha_n, Xalpha_o, Xalpha_p,
-  Xalpha_q, Xalpha_r, Xalpha_s, Xalpha_t, Xalpha_u, Xalpha_v, Xalpha_w, Xalpha_x,
-  Xalpha_y, Xalpha_z, Xalpha_0, Xalpha_1, Xalpha_2, Xalpha_3, Xalpha_4, Xalpha_5,
-  Xalpha_6, Xalpha_7, Xalpha_8, Xalpha_9, Xalpha_perio, Xalpha_excla, Xalpha_colon, Xalpha_quest,
-  Xalpha_arrow_e, Xdecor_1, Xfake_door_5, Xfake_door_6, Xfake_door_7, Xfake_door_8, Xblank, Xblank,
-  Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank,
+  Xblank,		Xround_wall_1,	Xgrass,		Xsteel_1,
+  Xwall_1,		Xkey_1,		Xkey_2,		Xkey_3,
+  Xkey_4,		Xdoor_1,	Xdoor_2,	Xdoor_3,
+  Xdoor_4,		Xdripper,	Xfake_door_1,	Xfake_door_2,
+
+  Xfake_door_3,		Xfake_door_4,	Xwonderwall,	Xwheel,
+  Xsand,		Xacid_nw,	Xacid_ne,	Xacid_sw,
+  Xacid_se,		Xfake_blank,	Xamoeba_1,	Xamoeba_2,
+  Xamoeba_3,		Xamoeba_4,	Xexit,		Xalpha_arrow_w,
+
+  Xfake_grass,		Xlenses,	Xmagnify,	Xfake_blank,
+  Xfake_grass,		Xswitch,	Xswitch,	Xblank,
+  Xdecor_8,		Xdecor_9,	Xdecor_10,	Xdecor_5,
+  Xalpha_comma,		Xalpha_quote,	Xalpha_minus,	Xdynamite,
+
+  Xsteel_3,		Xdecor_6,	Xdecor_7,	Xsteel_2,
+  Xround_wall_2,	Xdecor_2,	Xdecor_4,	Xdecor_3,
+  Xwind_nesw,		Xwind_e,	Xwind_s,	Xwind_w,
+  Xwind_n,		Xdirt,		Xplant,		Xkey_5,
+
+  Xkey_6,		Xkey_7,		Xkey_8,		Xdoor_5,
+  Xdoor_6,		Xdoor_7,	Xdoor_8,	Xbumper,
+  Xalpha_a,		Xalpha_b,	Xalpha_c,	Xalpha_d,
+  Xalpha_e,		Xalpha_f,	Xalpha_g,	Xalpha_h,
+
+  Xalpha_i,		Xalpha_j,	Xalpha_k,	Xalpha_l,
+  Xalpha_m,		Xalpha_n,	Xalpha_o,	Xalpha_p,
+  Xalpha_q,		Xalpha_r,	Xalpha_s,	Xalpha_t,
+  Xalpha_u,		Xalpha_v,	Xalpha_w,	Xalpha_x,
+
+  Xalpha_y,		Xalpha_z,	Xalpha_0,	Xalpha_1,
+  Xalpha_2,		Xalpha_3,	Xalpha_4,	Xalpha_5,
+  Xalpha_6,		Xalpha_7,	Xalpha_8,	Xalpha_9,
+  Xalpha_perio,		Xalpha_excla,	Xalpha_colon,	Xalpha_quest,
+
+  Xalpha_arrow_e,	Xdecor_1,	Xfake_door_5,	Xfake_door_6,
+  Xfake_door_7,		Xfake_door_8,	Xblank,		Xblank,
+  Xblank,		Xblank,		Xblank,		Xblank,
+#if 0
+  Xblank,		Xblank,		Xblank,		Xblank,
+#else
+  /* special elements added to solve compatibility problems */
+  Xblank,		Xblank,		Xblank,		Xfake_acid_1
+#endif
 };
 
 void convert_em_level(unsigned char *src, int file_version)

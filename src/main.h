@@ -1001,9 +1001,10 @@
 #define EL_EMC_WALL_SLIPPERY_3		700
 #define EL_EMC_WALL_SLIPPERY_4		701
 #define EL_EMC_FAKE_GRASS		702
-#define EL_EMC_DRIPPER			703
+#define EL_EMC_FAKE_ACID		703
+#define EL_EMC_DRIPPER			704
 
-#define NUM_FILE_ELEMENTS		704
+#define NUM_FILE_ELEMENTS		705
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1324,7 +1325,7 @@
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		1
+#define PROGRAM_VERSION_BUILD		2
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"

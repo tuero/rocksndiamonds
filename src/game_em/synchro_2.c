@@ -356,6 +356,16 @@ void synchro_2(void)
   	case Yacid_splash_wB:
   	case Xplant:
   	case Yplant:
+#if 1
+        case Xfake_acid_1:
+        case Xfake_acid_2:
+        case Xfake_acid_3:
+        case Xfake_acid_4:
+        case Xfake_acid_5:
+        case Xfake_acid_6:
+        case Xfake_acid_7:
+        case Xfake_acid_8:
+#endif
   	  Cave[y][x] = Ystone_sB;
   	  Cave[y+1][x] = Ystone_s;
   	  Next[y][x] = Xblank;
@@ -485,6 +495,16 @@ void synchro_2(void)
   	case Xblank:
   	case Yacid_splash_eB:
   	case Yacid_splash_wB:
+#if 1
+        case Xfake_acid_1:
+        case Xfake_acid_2:
+        case Xfake_acid_3:
+        case Xfake_acid_4:
+        case Xfake_acid_5:
+        case Xfake_acid_6:
+        case Xfake_acid_7:
+        case Xfake_acid_8:
+#endif
   	  Cave[y][x] = Ystone_sB;
   	  Cave[y+1][x] = Ystone_s;
   	  Next[y][x] = Xblank;
@@ -523,6 +543,16 @@ void synchro_2(void)
   	case Yacid_splash_eB:
   	case Yacid_splash_wB:
   	case Zplayer:
+#if 1
+        case Xfake_acid_1:
+        case Xfake_acid_2:
+        case Xfake_acid_3:
+        case Xfake_acid_4:
+        case Xfake_acid_5:
+        case Xfake_acid_6:
+        case Xfake_acid_7:
+        case Xfake_acid_8:
+#endif
   	  Cave[y][x] = Ystone_sB;
   	  Cave[y+1][x] = Ystone_s;
   	  Next[y][x] = Xblank;
@@ -4290,6 +4320,38 @@ void synchro_2(void)
 
     case Xacid_8:
       Next[y][x] = Xacid_1;
+      goto loop;
+
+    case Xfake_acid_1:
+      Next[y][x] = Xfake_acid_2;
+      goto loop;
+
+    case Xfake_acid_2:
+      Next[y][x] = Xfake_acid_3;
+      goto loop;
+
+    case Xfake_acid_3:
+      Next[y][x] = Xfake_acid_4;
+      goto loop;
+
+    case Xfake_acid_4:
+      Next[y][x] = Xfake_acid_5;
+      goto loop;
+
+    case Xfake_acid_5:
+      Next[y][x] = Xfake_acid_6;
+      goto loop;
+
+    case Xfake_acid_6:
+      Next[y][x] = Xfake_acid_7;
+      goto loop;
+
+    case Xfake_acid_7:
+      Next[y][x] = Xfake_acid_8;
+      goto loop;
+
+    case Xfake_acid_8:
+      Next[y][x] = Xfake_acid_1;
       goto loop;
 
     /* --------------------------------------------------------------------- */

@@ -2814,6 +2814,10 @@ element_to_graphic[] =
     IMG_EMC_FAKE_GRASS_ACTIVE_CRUMBLED
   },
   {
+    EL_EMC_FAKE_ACID,			-1, -1, FALSE,
+    IMG_EMC_FAKE_ACID
+  },
+  {
     EL_EMC_DRIPPER,			-1, -1, FALSE,
     IMG_EMC_DRIPPER
   },

@@ -1,3 +1,21 @@
+2005-01-19
+	* fixed bug which caused broken tapes when appending to EM engine tapes
+
+2005-01-17
+	* uploaded pre-release (test) version 3.2.0-1 binary and source code
+
+2005-01-17
+	* added code to replace changed artwork config tokens with other tokens
+	  (needed for backwards compatibility, so that older tokens still work)
+
+2005-01-16
+	* added native R'n'D graphics for some new EMC elements in EM engine
+
+2005-01-15
+	* fixed some bugs in the EM engine integration code
+	* changed EM engine code to allow diagonal movement
+	* changed EM engine code to allow use of separate snap and drop keys
+
 2005-01-03
 	* fixed some redraw bugs when using EM engine
 
