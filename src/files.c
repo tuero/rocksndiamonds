@@ -89,8 +89,7 @@ static char *getUserDataDir()
     char *home_dir = getHomeDir();
     char *data_dir = USERDATA_DIRECTORY;
 
-    userdata_dir = checked_malloc(strlen(home_dir) + strlen(data_dir) + 2);
-    sprintf(userdata_dir, "%s/%s", home_dir, data_dir);
+    userdata_dir = getPath2(home_dir, data_dir);
   }
 
   return userdata_dir;
@@ -110,10 +109,10 @@ static char *getUserLevelDir(char *level_subdir)
   if (userlevel_dir)
     free(userlevel_dir);
 
-  userlevel_dir = checked_malloc(strlen(data_dir) + strlen(userlevel_subdir) +
-				 strlen(level_subdir) + 3);
-  sprintf(userlevel_dir, "%s/%s%s%s", data_dir, userlevel_subdir,
-	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+  if (strlen(level_subdir) > 0)
+    userlevel_dir = getPath3(data_dir, userlevel_subdir, level_subdir);
+  else
+    userlevel_dir = getPath2(data_dir, userlevel_subdir);
 
   return userlevel_dir;
 }
@@ -127,10 +126,10 @@ static char *getTapeDir(char *level_subdir)
   if (tape_dir)
     free(tape_dir);
 
-  tape_dir = checked_malloc(strlen(data_dir) + strlen(tape_subdir) +
-			    strlen(level_subdir) + 3);
-  sprintf(tape_dir, "%s/%s%s%s", data_dir, tape_subdir,
-	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+  if (strlen(level_subdir) > 0)
+    tape_dir = getPath3(data_dir, tape_subdir, level_subdir);
+  else
+    tape_dir = getPath2(data_dir, tape_subdir);
 
   return tape_dir;
 }
@@ -144,10 +143,10 @@ static char *getScoreDir(char *level_subdir)
   if (score_dir)
     free(score_dir);
 
-  score_dir = checked_malloc(strlen(data_dir) + strlen(score_subdir) +
-			     strlen(level_subdir) + 3);
-  sprintf(score_dir, "%s/%s%s%s", data_dir, score_subdir,
-	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+  if (strlen(level_subdir) > 0)
+    score_dir = getPath3(data_dir, score_subdir, level_subdir);
+  else
+    score_dir = getPath2(data_dir, score_subdir);
 
   return score_dir;
 }
@@ -1403,16 +1402,16 @@ void LoadLevelInfo()
 
 static void SaveUserLevelInfo()
 {
-  char filename[MAX_FILENAME_LEN];
+  char *filename;
   FILE *file;
   int i;
 
-  sprintf(filename, "%s/%s",
-	  getUserLevelDir(getLoginName()), LEVELINFO_FILENAME);
+  filename = getPath2(getUserLevelDir(getLoginName()), LEVELINFO_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot write level info file '%s'", filename);
+    free(filename);
     return;
   }
 
@@ -1428,19 +1427,20 @@ static void SaveUserLevelInfo()
     fprintf(file, "%s\n", getSetupLine("", i));
 
   fclose(file);
+  free(filename);
 
   chmod(filename, SETUP_PERMS);
 }
 
 void LoadSetup()
 {
-  char filename[MAX_FILENAME_LEN];
+  char *filename;
   struct SetupFileList *setup_file_list = NULL;
 
   /* always start with reliable default values */
   setSetupInfoToDefaults(&setup);
 
-  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
+  filename = getPath2(getSetupDir(), SETUP_FILENAME);
 
   setup_file_list = loadSetupFileList(filename);
 
@@ -1467,6 +1467,8 @@ void LoadSetup()
   }
   else
     Error(ERR_WARN, "using default setup values");
+
+  free(filename);
 }
 
 static char *getSetupLine(char *prefix, int token_nr)
@@ -1535,16 +1537,17 @@ static char *getSetupLine(char *prefix, int token_nr)
 void SaveSetup()
 {
   int i, pnr;
-  char filename[MAX_FILENAME_LEN];
+  char *filename;
   FILE *file;
 
   InitUserDataDirectory();
 
-  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
+  filename = getPath2(getSetupDir(), SETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    free(filename);
     return;
   }
 
@@ -1577,19 +1580,20 @@ void SaveSetup()
   }
 
   fclose(file);
+  free(filename);
 
   chmod(filename, SETUP_PERMS);
 }
 
 void LoadLevelSetup()
 {
-  char filename[MAX_FILENAME_LEN];
+  char *filename;
 
   /* always start with reliable default values */
   leveldir_nr = 0;
   level_nr = 0;
 
-  sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
+  filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
   if (level_setup_list)
     freeSetupFileList(level_setup_list);
@@ -1612,11 +1616,13 @@ void LoadLevelSetup()
 					LEVELSETUP_COOKIE);
     Error(ERR_WARN, "using default setup values");
   }
+
+  free(filename);
 }
 
 void SaveLevelSetup()
 {
-  char filename[MAX_FILENAME_LEN];
+  char *filename;
   struct SetupFileList *list_entry = level_setup_list;
   FILE *file;
 
@@ -1628,11 +1634,12 @@ void SaveLevelSetup()
   setTokenValue(level_setup_list,
 		leveldir[leveldir_nr].filename, int2str(level_nr, 0));
 
-  sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
+  filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    free(filename);
     return;
   }
 
@@ -1652,6 +1659,7 @@ void SaveLevelSetup()
   }
 
   fclose(file);
+  free(filename);
 
   chmod(filename, SETUP_PERMS);
 }

@@ -46,7 +46,6 @@ struct user
   unsigned char writbuf[MAX_BUFFER_SIZE];
   int nwrite;
   char playing;
-  int lines;
   unsigned int games;
   unsigned char action;
   int action_received;
@@ -359,7 +358,6 @@ static void Handle_OP_START_PLAYING(struct user *u)
     {
       w->active = 1;
       w->playing = 1;
-      w->lines = 0;
       w->nextvictim = NULL;
       for (v=NEXT(w); v!=w; v=NEXT(v))
       {

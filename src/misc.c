@@ -361,10 +361,8 @@ void GetOptions(char *argv[])
       printf("--basepath == '%s'\n", options.base_directory);
 
       /* adjust path for level directory accordingly */
-      options.level_directory = checked_malloc(strlen(options.base_directory) +
-					       strlen(LEVELS_DIRECTORY) + 2);
-      sprintf(options.level_directory, "%s/%s",
-	      options.base_directory, LEVELS_DIRECTORY);
+      options.level_directory =
+	getPath2(options.base_directory, LEVELS_DIRECTORY);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
