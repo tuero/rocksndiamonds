@@ -38,6 +38,9 @@
 /* delay value to avoid too fast scrolling etc. */
 #define CHOICE_DELAY_VALUE	100
 
+/* how many steps can be cancelled */
+#define NUM_UNDO_STEPS		10
+
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 236
 #define ED_CTRL1_BUTTONS_HORIZ	4
@@ -59,10 +62,10 @@
 /* control button names */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
 #define ED_CTRL_ID_CONNECTED_ITEMS	1
-#define ED_CTRL_ID_LINES		2
+#define ED_CTRL_ID_LINE			2
 #define ED_CTRL_ID_TEXT			3
 #define ED_CTRL_ID_RECTANGLE		4
-#define ED_CTRL_ID_BOX			5
+#define ED_CTRL_ID_FILLED_BOX		5
 #define ED_CTRL_ID_WRAP_UP		6
 #define ED_CTRL_ID_ITEM_PROPERTIES	7
 #define ED_CTRL_ID_FLOOD_FILL		8
@@ -85,6 +88,10 @@ static struct GadgetInfo *control_button_gadget[ED_NUM_CTRL_BUTTONS];
 static boolean control_button_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
+
+static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+static int undo_buffer_position = 0;
+static int undo_buffer_steps = 0;
 
 static int level_xpos,level_ypos;
 static boolean edit_mode;
@@ -536,10 +543,10 @@ void HandleLevelEditorControlButtons(struct GadgetInfo *gi)
   {
     case ED_CTRL_ID_SINGLE_ITEMS:
     case ED_CTRL_ID_CONNECTED_ITEMS:
-    case ED_CTRL_ID_LINES:
+    case ED_CTRL_ID_LINE:
     case ED_CTRL_ID_TEXT:
     case ED_CTRL_ID_RECTANGLE:
-    case ED_CTRL_ID_BOX:
+    case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_FLOOD_FILL:
     case ED_CTRL_ID_RANDOM_PLACEMENT:
     case ED_CTRL_ID_BRUSH:
@@ -721,7 +728,7 @@ void UnmapLevelEditorControlButtons()
 
 void DrawLevelEd()
 {
-  int i, graphic;
+  int i, x, y, graphic;
 
   level_xpos=-1;
   level_ypos=-1;
@@ -730,6 +737,12 @@ void DrawLevelEd()
   element_shift = 0;
 
   CloseDoor(DOOR_CLOSE_2);
+
+  undo_buffer_position = 0;
+  undo_buffer_steps = 0;
+  for(x=0; x<lev_fieldx; x++)
+    for(y=0; y<lev_fieldy; y++)
+      UndoBuffer[0][x][y] = Ur[x][y];
 
   DrawMiniLevel(level_xpos,level_ypos);
   FadeToFront();
@@ -1672,21 +1685,19 @@ static void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
   *y2 = help_y;
 }
 
-static void DrawLineElement(int sx, int sy, int element)
+static void DrawLineElement(int sx, int sy, int element, boolean change_level)
 {
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
 
-  if (element < 0)
-    DrawMiniElement(sx, sy, Feld[lx][ly]);
-  else
-  {
+  DrawMiniElement(sx, sy, (element < 0 ? Feld[lx][ly] : element));
+
+  if (change_level)
     Feld[lx][ly] = element;
-    DrawMiniElement(sx, sy, element);
-  }
 }
 
-void DrawLine(int from_x, int from_y, int to_x, int to_y, int element)
+void DrawLine(int from_x, int from_y, int to_x, int to_y, int element,
+	      boolean change_level)
 {
   if (from_y == to_y)			/* horizontal line */
   {
@@ -1697,7 +1708,7 @@ void DrawLine(int from_x, int from_y, int to_x, int to_y, int element)
       swap_numbers(&from_x, &to_x);
 
     for (x=from_x; x<=to_x; x++)
-      DrawLineElement(x, y, element);
+      DrawLineElement(x, y, element, change_level);
   }
   else if (from_x == to_x)		/* vertical line */
   {
@@ -1708,7 +1719,7 @@ void DrawLine(int from_x, int from_y, int to_x, int to_y, int element)
       swap_numbers(&from_y, &to_y);
 
     for (y=from_y; y<=to_y; y++)
-      DrawLineElement(x, y, element);
+      DrawLineElement(x, y, element, change_level);
   }
   else					/* diagonal line */
   {
@@ -1716,35 +1727,56 @@ void DrawLine(int from_x, int from_y, int to_x, int to_y, int element)
     int len_y = ABS(to_y - from_y);
     int x, y;
 
-    if (len_y < len_x)			/* < 45° */
+    if (len_y < len_x)			/* a < 1 */
     {
       float a = (float)len_y / (float)len_x;
 
       if (from_x > to_x)
 	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
 
-      for (x=0; x<len_x; x++)
+      for (x=0; x<=len_x; x++)
       {
 	int y = (int)(a * x + 0.5) * (to_y < from_y ? -1 : +1);
 
-	DrawLineElement(from_x + x, from_y + y, element);
+	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
-    else				/* >= 45° */
+    else				/* a >= 1 */
     {
       float a = (float)len_x / (float)len_y;
 
       if (from_y > to_y)
 	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
 
-      for (y=0; y<len_y; y++)
+      for (y=0; y<=len_y; y++)
       {
 	int x = (int)(a * y + 0.5) * (to_x < from_x ? -1 : +1);
 
-	DrawLineElement(from_x + x, from_y + y, element);
+	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
   }
+}
+
+void DrawRectangle(int from_x, int from_y, int to_x, int to_y, int element,
+		   boolean change_level)
+{
+  DrawLine(from_x, from_y, from_x, to_y, element, change_level);
+  DrawLine(from_x, to_y, to_x, to_y, element, change_level);
+  DrawLine(to_x, to_y, to_x, from_y, element, change_level);
+  DrawLine(to_x, from_y, from_x, from_y, element, change_level);
+}
+
+void DrawFilledBox(int from_x, int from_y, int to_x, int to_y, int element,
+		   boolean change_level)
+{
+  int y;
+
+  if (from_y > to_y)
+    swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
+
+  for (y=from_y; y<=to_y; y++)
+    DrawLine(from_x, y, to_x, y, element, change_level);
 }
 
 void FloodFill(int from_x, int from_y, int fill_element)
@@ -1780,7 +1812,11 @@ void FloodFill(int from_x, int from_y, int fill_element)
 
 void HandleDrawingFunction(int mx, int my, int button)
 {
-  static int in_field_pressed = FALSE;
+  static int last_button = 0;
+  static int last_element = 0;
+  boolean button_press_event;
+  boolean button_release_event;
+  boolean copy_to_undo_buffer = FALSE;
   int new_element;
   int sx = (mx - SX) / MINI_TILEX; 
   int sy = (my - SY) / MINI_TILEY; 
@@ -1788,23 +1824,14 @@ void HandleDrawingFunction(int mx, int my, int button)
   int ly = sy + level_ypos;
   int x, y;
 
+  button_press_event = (last_button == 0 && button != 0);
+  button_release_event = (last_button != 0 && button == 0);
+  last_button = button;
+
   if (mx < SX || mx >= SX + SXSIZE || my < SY || my >= SY + SYSIZE)
-  {
-    /* pointer ouside drawing area */
-
-    if (!motion_status)	/* button pressed or released outside drawing area */
-      in_field_pressed = FALSE;
-
     return;
-  }
 
-  if (button && !motion_status)
-    in_field_pressed = TRUE;
-
-  if (!button ||
-      !in_field_pressed ||
-      button < 1 || button > 3 ||
-      sx > lev_fieldx || sy > lev_fieldy ||
+  if (sx > lev_fieldx || sy > lev_fieldy ||
       (sx == 0 && level_xpos<0) ||
       (sx == 2*SCR_FIELDX - 1 && level_xpos > lev_fieldx - 2*SCR_FIELDX) ||
       (sy == 0 && level_ypos < 0) ||
@@ -1818,6 +1845,12 @@ void HandleDrawingFunction(int mx, int my, int button)
   switch (drawing_function)
   {
     case ED_CTRL_ID_SINGLE_ITEMS:
+      if (button_release_event)
+	copy_to_undo_buffer = TRUE;
+
+      if (!button)
+	break;
+
       if (new_element != Feld[lx][ly])
       {
 	if (new_element == EL_SPIELFIGUR)
@@ -1845,38 +1878,119 @@ void HandleDrawingFunction(int mx, int my, int button)
 
     case ED_CTRL_ID_CONNECTED_ITEMS:
       {
-	static int last_x = -1;
-	static int last_y = -1;
+	static int last_sx = -1;
+	static int last_sy = -1;
 
-	if (last_x == -1)
+	if (button_release_event)
+	  copy_to_undo_buffer = TRUE;
+
+	if (button)
+	{
+	  if (!button_press_event)
+	    DrawLine(last_sx, last_sy, sx, sy, new_element, TRUE);
+
+	  last_sx = sx;
+	  last_sy = sy;
+	}
+      }
+      break;
+
+    case ED_CTRL_ID_LINE:
+    case ED_CTRL_ID_RECTANGLE:
+    case ED_CTRL_ID_FILLED_BOX:
+      {
+	static int last_sx = -1;
+	static int last_sy = -1;
+	static int start_sx = -1;
+	static int start_sy = -1;
+	void (*draw_func)(int, int, int, int, int, boolean);
+
+	if (drawing_function == ED_CTRL_ID_LINE)
+	  draw_func = DrawLine;
+	else if (drawing_function == ED_CTRL_ID_RECTANGLE)
+	  draw_func = DrawRectangle;
+	else
+	  draw_func = DrawFilledBox;
+
+	if (button_press_event)
+	{
+	  last_sx = start_sx = sx;
+	  last_sy = start_sy = sy;
+	}
+	else if (button_release_event)
+	{
+	  draw_func(start_sx, start_sy, sx, sy, last_element, TRUE);
+	  copy_to_undo_buffer = TRUE;
+	}
+	else if (last_sx != sx || last_sy != sy)
+	{
+	  draw_func(start_sx, start_sy, last_sx, last_sy, -1, FALSE);
+	  draw_func(start_sx, start_sy, sx, sy, new_element, FALSE);
+	  last_sx = sx;
+	  last_sy = sy;
+	}
+      }
+      break;
+
+    case 999:
+      {
+	static int last_sx = -1;
+	static int last_sy = -1;
+
+	if (last_sx == -1)
 	{
 	  Feld[lx][ly] = new_element;
 	  DrawMiniElement(sx, sy, new_element);
 
-	  last_x = sx;
-	  last_y = sy;
+	  last_sx = sx;
+	  last_sy = sy;
 	}
-	else if (last_x != sx || last_y != sy)
+	else if (last_sx != sx || last_sy != sy)
 	{
-	  DrawLine(last_x, last_y, sx, sy, new_element);
+	  DrawLine(last_sx, last_sy, sx, sy, new_element, TRUE);
 
-	  last_x = -1;
-	  last_y = -1;
+	  last_sx = -1;
+	  last_sy = -1;
 	}
 
 	/*
-	last_x = sx;
-	last_y = sy;
+	last_sx = sx;
+	last_sy = sy;
 	*/
       }
       break;
 
     case ED_CTRL_ID_FLOOD_FILL:
-      FloodFill(lx, ly, new_element);
-      DrawMiniLevel(level_xpos, level_ypos);
+      if (!button)
+	break;
+
+      if (button_press_event && Feld[lx][ly] != new_element)
+      {
+	FloodFill(lx, ly, new_element);
+	DrawMiniLevel(level_xpos, level_ypos);
+	copy_to_undo_buffer = TRUE;
+      }
       break;
 
     default:
       break;
+  }
+
+  last_element = new_element;
+
+  if (copy_to_undo_buffer)
+  {
+    undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
+
+    if (undo_buffer_steps < NUM_UNDO_STEPS)
+      undo_buffer_steps++;
+
+    for(x=0; x<lev_fieldx; x++)
+      for(y=0; y<lev_fieldy; y++)
+	UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
+
+    copy_to_undo_buffer = FALSE;
+
+    printf("state saved to undo buffer %d\n", undo_buffer_position);
   }
 }
