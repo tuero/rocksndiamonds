@@ -94,6 +94,9 @@ void InitLevelAndPlayerInfo()
 {
   int i;
 
+
+#if 0
+
   /* initialize local setup */
   setup.sound_on = TRUE;
   setup.sound_loops_on = FALSE;
@@ -120,11 +123,21 @@ void InitLevelAndPlayerInfo()
     setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
   }
 
+#endif
+
+
+
   /* choose default local player */
   local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
     Error(ERR_EXIT, NULL);
+
+
+
+  LoadSetup();
+
+
 
   LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */

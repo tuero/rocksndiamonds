@@ -3371,13 +3371,6 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     if (!IN_VIS_FIELD(SCREENX(jx),SCREENY(jy)))
     {
-
-
-      printf("prevent player %d from leaving visible screen\n",
-	     player->index_nr);
-
-
-
       /* actual player has left the screen -- scroll in that direction */
       if (jx != old_jx)		/* player has moved horizontally */
 	scroll_x += (jx - old_jx);
@@ -3456,23 +3449,11 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     {
       if (!options.network && !AllPlayersInVisibleScreen())
       {
-
-
-	printf("oops! not all players visible if we scroll now\n");
-
-
-
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;
       }
       else
       {
-
-
-	printf("ok, scrolling screen...\n");
-
-
-
 	ScrollScreen(player, SCROLL_INIT);
 	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
       }

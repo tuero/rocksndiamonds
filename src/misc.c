@@ -24,6 +24,7 @@
 #include "tools.h"
 #include "sound.h"
 #include "random.h"
+#include "joystick.h"
 
 static unsigned long mainCounter(int mode)
 {
@@ -392,118 +393,331 @@ void *checked_malloc(unsigned long size)
   return ptr;
 }
 
-char *getKeySymName(KeySym key)
+#define TRANSLATE_KEYSYM_TO_KEYNAME	0
+#define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
+#define TRANSLATE_X11KEYNAME_TO_KEYSYM	2
+
+void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 {
-  static char key_name[20];
   static struct
   {
     KeySym keysym;
+    char *x11name;
     char *name;
-  } translate[] =
+  } translate_key[] =
   {
     /* normal cursor keys */
-    { XK_Left,		"cursor left" },
-    { XK_Right,		"cursor right" },
-    { XK_Up,		"cursor up" },
-    { XK_Down,		"cursor down" },
+    { XK_Left,		"XK_Left",		"cursor left" },
+    { XK_Right,		"XK_Right",		"cursor right" },
+    { XK_Up,		"XK_Up",		"cursor up" },
+    { XK_Down,		"XK_Down",		"cursor down" },
 
     /* keypad cursor keys */
 #ifdef XK_KP_Left
-    { XK_KP_Left,	"keypad left" },
-    { XK_KP_Right,	"keypad right" },
-    { XK_KP_Up,		"keypad up" },
-    { XK_KP_Down,	"keypad down" },
+    { XK_KP_Left,	"XK_KP_Left",		"keypad left" },
+    { XK_KP_Right,	"XK_KP_Right",		"keypad right" },
+    { XK_KP_Up,		"XK_KP_Up",		"keypad up" },
+    { XK_KP_Down,	"XK_KP_Down",		"keypad down" },
 #endif
 
     /* other keypad keys */
 #ifdef XK_KP_Enter
-    { XK_KP_Enter,	"keypad enter" },
-    { XK_KP_Add,	"keypad +" },
-    { XK_KP_Subtract,	"keypad -" },
-    { XK_KP_Multiply,	"keypad mltply" },
-    { XK_KP_Divide,	"keypad /" },
-    { XK_KP_Separator,	"keypad ," },
+    { XK_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
+    { XK_KP_Add,	"XK_KP_Add",		"keypad +" },
+    { XK_KP_Subtract,	"XK_KP_Subtract",	"keypad -" },
+    { XK_KP_Multiply,	"XK_KP_Multiply",	"keypad mltply" },
+    { XK_KP_Divide,	"XK_KP_Divide",		"keypad /" },
+    { XK_KP_Separator,	"XK_KP_Separator",	"keypad ," },
 #endif
 
     /* modifier keys */
-    { XK_Shift_L,	"left shift" },
-    { XK_Shift_R,	"right shift" },
-    { XK_Control_L,	"left control" },
-    { XK_Control_R,	"right control" },
-    { XK_Meta_L,	"left meta" },
-    { XK_Meta_R,	"right meta" },
-    { XK_Alt_L,		"left alt" },
-    { XK_Alt_R,		"right alt" },
-    { XK_Mode_switch,	"mode switch" },
-    { XK_Multi_key,	"multi key" },
+    { XK_Shift_L,	"XK_Shift_L",		"left shift" },
+    { XK_Shift_R,	"XK_Shift_R",		"right shift" },
+    { XK_Control_L,	"XK_Control_L",		"left control" },
+    { XK_Control_R,	"XK_Control_R",		"right control" },
+    { XK_Meta_L,	"XK_Meta_L",		"left meta" },
+    { XK_Meta_R,	"XK_Meta_R",		"right meta" },
+    { XK_Alt_L,		"XK_Alt_L",		"left alt" },
+    { XK_Alt_R,		"XK_Alt_R",		"right alt" },
+    { XK_Mode_switch,	"XK_Mode_switch",	"mode switch" },
+    { XK_Multi_key,	"XK_Multi_key",		"multi key" },
 
     /* some special keys */
-    { XK_BackSpace,	"backspace" },
-    { XK_Delete,	"delete" },
-    { XK_Insert,	"insert" },
-    { XK_Tab,		"tab" },
-    { XK_Home,		"home" },
-    { XK_End,		"end" },
-    { XK_Page_Up,	"page up" },
-    { XK_Page_Down,	"page down" },
-    { XK_space,		"space" },
+    { XK_BackSpace,	"XK_BackSpace",		"backspace" },
+    { XK_Delete,	"XK_Delete",		"delete" },
+    { XK_Insert,	"XK_Insert",		"insert" },
+    { XK_Tab,		"XK_Tab",		"tab" },
+    { XK_Home,		"XK_Home",		"home" },
+    { XK_End,		"XK_End",		"end" },
+    { XK_Page_Up,	"XK_Page_Up",		"page up" },
+    { XK_Page_Down,	"XK_Page_Down",		"page down" },
+    { XK_space,		"XK_space",		"space" },
 
     /* even more special keys */
-    { XK_adiaeresis,	"ä" },
-    { XK_odiaeresis,	"ö" },
-    { XK_udiaeresis,	"ü" },
-    { XK_apostrophe,	"'" },
-    { XK_plus,		"+" },
-    { XK_minus,		"-" },
-    { XK_comma,		"," },
-    { XK_period,	"." },
-    { XK_numbersign,	"#" },
-    { XK_less,		"less" },
-    { XK_greater,	"greater" },
-    { XK_asciicircum,	"circumflex" },
-    { XK_ssharp,	"sharp s" },
+    { XK_adiaeresis,	"XK_adiaeresis",	"ä" },
+    { XK_odiaeresis,	"XK_odiaeresis",	"ö" },
+    { XK_udiaeresis,	"XK_udiaeresis",	"ü" },
+    { XK_apostrophe,	"XK_apostrophe",	"'" },
+    { XK_plus,		"XK_plus",		"+" },
+    { XK_minus,		"XK_minus",		"-" },
+    { XK_comma,		"XK_comma",		"," },
+    { XK_period,	"XK_period",		"." },
+    { XK_numbersign,	"XK_numbersign",	"#" },
+    { XK_less,		"XK_less",		"less" },
+    { XK_greater,	"XK_greater",		"greater" },
+    { XK_asciicircum,	"XK_asciicircum",	"circumflex" },
+    { XK_ssharp,	"XK_ssharp",		"sharp s" },
 
     /* end-of-array identifier */
-    { 0,                NULL }
+    { 0,                NULL,			NULL }
   };
 
-  if (key >= XK_A && key <= XK_Z)
-  {
-    sprintf(key_name, "%c", 'A' + (char)(key - XK_A));
-    return key_name;
-  }
-  else if (key >= XK_a && key <= XK_z)
-  {
-    sprintf(key_name, "%c", 'a' + (char)(key - XK_a));
-    return key_name;
-  }
-  else if (key >= XK_0 && key <= XK_9)
-  {
-    sprintf(key_name, "%c", '0' + (char)(key - XK_0));
-    return key_name;
-  }
-  else if (key >= XK_KP_0 && key <= XK_KP_9)
-  {
-    sprintf(key_name, "keypad %c", '0' + (char)(key - XK_KP_0));
-    return key_name;
-  }
-  else if (key >= XK_F1 && key <= XK_F24)
-  {
-    sprintf(key_name, "function F%d", (int)(key - XK_F1 + 1));
-    return key_name;
-  }
-  else
-  {
-    int i = 0;
+  int i;
 
-    do
+  if (mode == TRANSLATE_KEYSYM_TO_KEYNAME)
+  {
+    static char name_buffer[30];
+    KeySym key = *keysym;
+
+    if (key >= XK_A && key <= XK_Z)
+      sprintf(name_buffer, "%c", 'A' + (char)(key - XK_A));
+    else if (key >= XK_a && key <= XK_z)
+      sprintf(name_buffer, "%c", 'a' + (char)(key - XK_a));
+    else if (key >= XK_0 && key <= XK_9)
+      sprintf(name_buffer, "%c", '0' + (char)(key - XK_0));
+    else if (key >= XK_KP_0 && key <= XK_KP_9)
+      sprintf(name_buffer, "keypad %c", '0' + (char)(key - XK_KP_0));
+    else if (key >= XK_F1 && key <= XK_F24)
+      sprintf(name_buffer, "function F%d", (int)(key - XK_F1 + 1));
+    else if (key == KEY_UNDEFINDED)
+      strcpy(name_buffer, "(undefined)");
+    else
     {
-      if (key == translate[i].keysym)
-	return translate[i].name;
-    }
-    while (translate[++i].name);
+      i = 0;
 
-    sprintf(key_name, "(unknown)");
-    return key_name;
+      do
+      {
+	if (key == translate_key[i].keysym)
+	{
+	  strcpy(name_buffer, translate_key[i].name);
+	  break;
+	}
+      }
+      while (translate_key[++i].name);
+
+      if (!translate_key[i].name)
+	strcpy(name_buffer, "(unknown)");
+    }
+
+    *name = name_buffer;
   }
+  else if (mode == TRANSLATE_KEYSYM_TO_X11KEYNAME)
+  {
+    static char name_buffer[30];
+    KeySym key = *keysym;
+
+    if (key >= XK_A && key <= XK_Z)
+      sprintf(name_buffer, "XK_%c", 'A' + (char)(key - XK_A));
+    else if (key >= XK_a && key <= XK_z)
+      sprintf(name_buffer, "XK_%c", 'a' + (char)(key - XK_a));
+    else if (key >= XK_0 && key <= XK_9)
+      sprintf(name_buffer, "XK_%c", '0' + (char)(key - XK_0));
+    else if (key >= XK_KP_0 && key <= XK_KP_9)
+      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - XK_KP_0));
+    else if (key >= XK_F1 && key <= XK_F24)
+      sprintf(name_buffer, "XK_F%d", (int)(key - XK_F1 + 1));
+    else if (key == KEY_UNDEFINDED)
+      strcpy(name_buffer, "[undefined]");
+    else
+    {
+      i = 0;
+
+      do
+      {
+	if (key == translate_key[i].keysym)
+	{
+	  strcpy(name_buffer, translate_key[i].x11name);
+	  break;
+	}
+      }
+      while (translate_key[++i].x11name);
+
+      if (!translate_key[i].x11name)
+	sprintf(name_buffer, "0x%04lx", (unsigned long)key);
+    }
+
+    *x11name = name_buffer;
+  }
+  else if (mode == TRANSLATE_X11KEYNAME_TO_KEYSYM)
+  {
+    KeySym key = XK_VoidSymbol;
+    char *name_ptr = *x11name;
+
+    if (strncmp(name_ptr, "XK_", 3) == 0 && strlen(name_ptr) == 4)
+    {
+      char c = name_ptr[3];
+
+      if (c >= 'A' && c <= 'Z')
+	key = XK_A + (KeySym)(c - 'A');
+      else if (c >= 'a' && c <= 'z')
+	key = XK_a + (KeySym)(c - 'a');
+      else if (c >= '0' && c <= '9')
+	key = XK_0 + (KeySym)(c - '0');
+    }
+    else if (strncmp(name_ptr, "XK_KP_", 6) == 0 && strlen(name_ptr) == 7)
+    {
+      char c = name_ptr[6];
+
+      if (c >= '0' && c <= '9')
+	key = XK_0 + (KeySym)(c - '0');
+    }
+    else if (strncmp(name_ptr, "XK_F", 4) == 0 && strlen(name_ptr) <= 6)
+    {
+      char c1 = name_ptr[4];
+      char c2 = name_ptr[5];
+      int d = 0;
+
+      if ((c1 >= '0' && c1 <= '9') &&
+	  ((c2 >= '0' && c1 <= '9') || c2 == '\0'))
+	d = atoi(&name_ptr[4]);
+
+      if (d >=1 && d <= 24)
+	key = XK_F1 + (KeySym)(d - 1);
+    }
+    else if (strncmp(name_ptr, "XK_", 3) == 0)
+    {
+      i = 0;
+
+      do
+      {
+	if (strcmp(name_ptr, translate_key[i].x11name) == 0)
+	{
+	  key = translate_key[i].keysym;
+	  break;
+	}
+      }
+      while (translate_key[++i].x11name);
+    }
+    else if (strncmp(name_ptr, "0x", 2) == 0)
+    {
+      unsigned long value = 0;
+
+      name_ptr += 2;
+
+      while (name_ptr)
+      {
+	char c = *name_ptr++;
+	int d = -1;
+
+	if (c >= '0' && c <= '9')
+	  d = (int)(c - '0');
+	else if (c >= 'a' && c <= 'f')
+	  d = (int)(c - 'a' + 10);
+	else if (c >= 'A' && c <= 'F')
+	  d = (int)(c - 'A' + 10);
+
+	if (d == -1)
+	{
+	  value = -1;
+	  break;
+	}
+
+	value = value * 16 + d;
+      }
+
+      if (value != -1)
+	key = (KeySym)value;
+    }
+
+    *keysym = key;
+  }
+}
+
+char *getKeyNameFromKeySym(KeySym keysym)
+{
+  char *name;
+
+  translate_keyname(&keysym, NULL, &name, TRANSLATE_KEYSYM_TO_KEYNAME);
+  return name;
+}
+
+char *getX11KeyNameFromKeySym(KeySym keysym)
+{
+  char *x11name;
+
+  translate_keyname(&keysym, &x11name, NULL, TRANSLATE_KEYSYM_TO_X11KEYNAME);
+  return x11name;
+}
+
+KeySym getKeySymFromX11KeyName(char *x11name)
+{
+  KeySym keysym;
+
+  translate_keyname(&keysym, &x11name, NULL, TRANSLATE_X11KEYNAME_TO_KEYSYM);
+  return keysym;
+}
+
+#define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
+#define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
+
+void translate_joyname(int *joysymbol, char **name, int mode)
+{
+  static struct
+  {
+    int joysymbol;
+    char *name;
+  } translate_joy[] =
+  {
+    { JOY_LEFT,		"joystick_left" },
+    { JOY_RIGHT,	"joystick_right" },
+    { JOY_UP,		"joystick_up" },
+    { JOY_DOWN,		"joystick_down" },
+    { JOY_BUTTON_1,	"joystick_button_1" },
+    { JOY_BUTTON_2,	"joystick_button_2" },
+  };
+
+  int i;
+
+  if (mode == TRANSLATE_JOYSYMBOL_TO_JOYNAME)
+  {
+    *name = "[undefined]";
+
+    for (i=0; i<6; i++)
+    {
+      if (*joysymbol == translate_joy[i].joysymbol)
+      {
+	*name = translate_joy[i].name;
+	break;
+      }
+    }
+  }
+  else if (mode == TRANSLATE_JOYNAME_TO_JOYSYMBOL)
+  {
+    *joysymbol = 0;
+
+    for (i=0; i<6; i++)
+    {
+      if (strcmp(*name, translate_joy[i].name) == 0)
+      {
+	*joysymbol = translate_joy[i].joysymbol;
+	break;
+      }
+    }
+  }
+}
+
+char *getJoyNameFromJoySymbol(int joysymbol)
+{
+  char *name;
+
+  translate_joyname(&joysymbol, &name, TRANSLATE_JOYSYMBOL_TO_JOYNAME);
+  return name;
+}
+
+int getJoySymbolFromJoyName(char *name)
+{
+  int joysymbol;
+
+  translate_joyname(&joysymbol, &name, TRANSLATE_JOYNAME_TO_JOYSYMBOL);
+  return joysymbol;
 }

@@ -1211,7 +1211,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
     DrawText(SX + 3*32, SY + ypos*32,
 	     (setup.input[player_nr].use_joystick ?
 	      custom[i].text :
-	      getKeySymName(*custom[i].keysym)),
+	      getKeyNameFromKeySym(*custom[i].keysym)),
 	     FS_BIG, FC_YELLOW);
   }
 }
@@ -1383,7 +1383,8 @@ void CustomizeKeyboard(int player_nr)
   DrawText(SX, SY + (2+2*step_nr+1)*32,
 	   "Key:", FS_BIG, FC_RED);
   DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-	   getKeySymName(*customize_step[step_nr].keysym), FS_BIG, FC_BLUE);
+	   getKeyNameFromKeySym(*customize_step[step_nr].keysym),
+	   FS_BIG, FC_BLUE);
 
   while(!finished)
   {
@@ -1422,7 +1423,7 @@ void CustomizeKeyboard(int player_nr)
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
 		     "             ", FS_BIG, FC_YELLOW);
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-		     getKeySymName(key), FS_BIG, FC_YELLOW);
+		     getKeyNameFromKeySym(key), FS_BIG, FC_YELLOW);
 	    step_nr++;
 
 	    /* un-highlight last query */
@@ -1445,7 +1446,7 @@ void CustomizeKeyboard(int player_nr)
 	    DrawText(SX, SY+(2+2*step_nr+1)*32,
 		     "Key:", FS_BIG, FC_RED);
 	    DrawText(SX + 4*32, SY+(2+2*step_nr+1)*32,
-		     getKeySymName(*customize_step[step_nr].keysym),
+		     getKeyNameFromKeySym(*customize_step[step_nr].keysym),
 		     FS_BIG, FC_BLUE);
 	  }
 	  break;

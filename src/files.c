@@ -11,6 +11,8 @@
 *  files.h                                                 *
 ***********************************************************/
 
+#include <ctype.h>
+
 #include "files.h"
 #include "tools.h"
 #include "misc.h"
@@ -83,7 +85,7 @@ boolean LoadLevelInfo()
 
   if (!(file=fopen(filename,"r")))
   {
-    Error(ERR_RETURN, "cannot load level info '%s'", filename);
+    Error(ERR_RETURN, "cannot read level info '%s'", filename);
     return(FALSE);
   }
 
@@ -129,7 +131,7 @@ void LoadLevel(int level_nr)
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if (!(file = fopen(filename,"r")))
-    Error(ERR_RETURN, "cannot load level '%s' - creating new level", filename);
+    Error(ERR_RETURN, "cannot read level '%s' - creating new level", filename);
   else
   {
     fgets(cookie,LEVEL_COOKIE_LEN,file);
@@ -302,7 +304,7 @@ void LoadScore(int level_nr)
     if (!CreateNewScoreFile())
       Error(ERR_RETURN, "cannot create score file '%s'", filename);
     else if (!(file = fopen(filename,"r"))) 
-      Error(ERR_RETURN, "cannot load score for level %d", level_nr);
+      Error(ERR_RETURN, "cannot read score for level %d", level_nr);
   }
 
   if (file)
@@ -371,7 +373,7 @@ void LoadPlayerInfo(int mode)
     if (!CreateNewNamesFile(mode))
       Error(ERR_RETURN, "cannot create names file '%s'", filename);
     else if (!(file = fopen(filename,"r"))) 
-      Error(ERR_RETURN, "cannot load player information file '%s'", filename);
+      Error(ERR_RETURN, "cannot read player information file '%s'", filename);
   }
 
   if (file)
@@ -620,7 +622,14 @@ void SavePlayerInfo(int mode)
   struct PlayerInfo default_player;
   int version_10_file = FALSE;
 
-  if (mode==PLAYER_LEVEL)
+
+
+  if (mode == PLAYER_SETUP)
+    SaveSetup();
+
+
+
+  if (mode == PLAYER_LEVEL)
     sprintf(filename,"%s/%s/%s",
 	    level_directory,leveldir[leveldir_nr].filename,NAMES_FILENAME);
   else
@@ -762,4 +771,616 @@ void SaveJoystickData()
   save_joystick_data(JOYDAT_FILE);
 #endif
 
+}
+
+/* ------------------------------------------------------------------------- */
+/* new setup functions                                                       */
+/* ------------------------------------------------------------------------- */
+
+#define SETUP_TOKEN_SOUND		0
+#define SETUP_TOKEN_SOUND_LOOPS		1
+#define SETUP_TOKEN_SOUND_MUSIC		2
+#define SETUP_TOKEN_SOUND_SIMPLE	3
+#define SETUP_TOKEN_TOONS		4
+#define SETUP_TOKEN_DIRECT_DRAW		5
+#define SETUP_TOKEN_SCROLL_DELAY	6
+#define SETUP_TOKEN_SOFT_SCROLLING	7
+#define SETUP_TOKEN_FADING		8
+#define SETUP_TOKEN_AUTORECORD		9
+#define SETUP_TOKEN_QUICK_DOORS		10
+#define SETUP_TOKEN_USE_JOYSTICK	11
+#define SETUP_TOKEN_JOYSTICK_NR		12
+#define SETUP_TOKEN_JOY_SNAP		13
+#define SETUP_TOKEN_JOY_BOMB		14
+#define SETUP_TOKEN_KEY_LEFT		15
+#define SETUP_TOKEN_KEY_RIGHT		16
+#define SETUP_TOKEN_KEY_UP		17
+#define SETUP_TOKEN_KEY_DOWN		18
+#define SETUP_TOKEN_KEY_SNAP		19
+#define SETUP_TOKEN_KEY_BOMB		20
+
+#define NUM_SETUP_TOKENS		21
+
+#define SETUP_TOKEN_PLAYER_PREFIX	"player_"
+
+static struct
+{
+  char *token, *value_true, *value_false;
+} setup_info[] =
+{
+  { "sound",			"on", "off" },
+  { "repeating_sound_loops",	"on", "off" },
+  { "background_music",		"on", "off" },
+  { "simple_sound_effects",	"on", "off" },
+  { "toons",			"on", "off" },
+  { "double_buffering", 	"off", "on" },
+  { "scroll_delay",		"on", "off" },
+  { "soft_scrolling",		"on", "off" },
+  { "screen_fading",		"on", "off" },
+  { "automatic_tape_recording",	"on", "off" },
+  { "quick_doors",		"on", "off" },
+
+  /* for each player: */
+  { ".use_joystick",		"true", "false" },
+  { ".joystick_device",		"second", "first" },
+  { ".joy.snap_field",		"", "" },
+  { ".joy.place_bomb",		"", "" },
+  { ".key.move_left",		"", "" },
+  { ".key.move_right",		"", "" },
+  { ".key.move_up",		"", "" },
+  { ".key.move_down",		"", "" },
+  { ".key.snap_field",		"", "" },
+  { ".key.place_bomb",		"", "" }
+};
+
+static char *string_tolower(char *s)
+{
+  static char s_lower[100];
+  int i;
+
+  if (strlen(s) >= 100)
+    return s;
+
+  strcpy(s_lower, s);
+
+  for (i=0; i<strlen(s_lower); i++)
+    s_lower[i] = tolower(s_lower[i]);
+
+  return s_lower;
+}
+
+static int get_string_integer_value(char *s)
+{
+  static char *number_text[][3] =
+  {
+    { "0", "zero", "null", },
+    { "1", "one", "first" },
+    { "2", "two", "second" },
+    { "3", "three", "third" },
+    { "4", "four", "fourth" },
+    { "5", "five", "fifth" },
+    { "6", "six", "sixth" },
+    { "7", "seven", "seventh" },
+    { "8", "eight", "eighth" },
+    { "9", "nine", "ninth" },
+    { "10", "ten", "tenth" },
+    { "11", "eleven", "eleventh" },
+    { "12", "twelve", "twelfth" },
+  };
+
+  int i, j;
+
+  for (i=0; i<13; i++)
+    for (j=0; j<3; j++)
+      if (strcmp(string_tolower(s), number_text[i][j]) == 0)
+	return i;
+
+  return -1;
+}
+
+static boolean get_string_boolean_value(char *s)
+{
+  if (strcmp(string_tolower(s), "true") == 0 ||
+      strcmp(string_tolower(s), "yes") == 0 ||
+      strcmp(string_tolower(s), "on") == 0 ||
+      get_string_integer_value(s) == 1)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+static char *getSetupToken(int token_nr)
+{
+  return setup_info[token_nr].token;
+}
+
+static char *getSetupValue(int token_nr, boolean token_value)
+{
+  if (token_value == TRUE)
+    return setup_info[token_nr].value_true;
+  else
+    return setup_info[token_nr].value_false;
+}
+
+static char *getSetupEntry(char *prefix, int token_nr, int token_value)
+{
+  int i;
+  static char entry[80];
+
+  sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
+  for (i=strlen(entry); i<30; i++)
+    entry[i] = ' ';
+  entry[i] = '\0';
+
+  strcat(entry, getSetupValue(token_nr, token_value));
+
+  return entry;
+}
+
+static char *getSetupEntryWithComment(char *prefix,int token_nr, KeySym keysym)
+{
+  int i;
+  static char entry[80];
+  char *keyname = getKeyNameFromKeySym(keysym);
+
+  sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
+  for (i=strlen(entry); i<30; i++)
+    entry[i] = ' ';
+  entry[i] = '\0';
+
+  strcat(entry, getX11KeyNameFromKeySym(keysym));
+  for (i=strlen(entry); i<50; i++)
+    entry[i] = ' ';
+  entry[i] = '\0';
+
+  /* add comment, if useful */
+  if (strcmp(keyname, "(undefined)") != 0 &&
+      strcmp(keyname, "(unknown)") != 0)
+  {
+    strcat(entry, "# ");
+    strcat(entry, keyname);
+  }
+
+  return entry;
+}
+
+static void freeSetupFileInfo(struct SetupFileInfo *setup_file_info)
+{
+  if (!setup_file_info)
+    return;
+
+  if (setup_file_info->token)
+    free(setup_file_info->token);
+  if (setup_file_info->value)
+    free(setup_file_info->value);
+  if (setup_file_info->next)
+    freeSetupFileInfo(setup_file_info->next);
+  free(setup_file_info);
+}
+
+static struct SetupFileInfo *newSetupFileInfo(char *token, char *value)
+{
+  struct SetupFileInfo *new = checked_malloc(sizeof(struct SetupFileInfo));
+
+  new->token = checked_malloc(strlen(token) + 1);
+  strcpy(new->token, token);
+
+  new->value = checked_malloc(strlen(value) + 1);
+  strcpy(new->value, value);
+
+  new->next = NULL;
+
+  return new;
+}
+
+static char *lookupSetupFileValue(struct SetupFileInfo *setup_file_info,
+				  char *token)
+{
+  if (!setup_file_info)
+    return NULL;
+
+  if (strcmp(setup_file_info->token, token) == 0)
+    return setup_file_info->value;
+  else
+    return lookupSetupFileValue(setup_file_info->next, token);
+}
+
+#ifdef DEBUG
+static void printSetupFileInfo(struct SetupFileInfo *setup_file_info)
+{
+  if (!setup_file_info)
+    return;
+
+  printf("token: '%s'\n", setup_file_info->token);
+  printf("value: '%s'\n", setup_file_info->value);
+
+  printSetupFileInfo(setup_file_info->next);
+}
+#endif
+
+static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
+{
+  int i;
+  int token_nr = -1;
+  int player_nr = 0;
+  char *token;
+  char *token_value;
+  int token_integer_value;
+  boolean token_boolean_value;
+  int token_player_prefix_len;
+
+  if (!setup_file_info)
+    return;
+
+  token = setup_file_info->token;
+  token_value = setup_file_info->value;
+  token_integer_value = get_string_integer_value(token_value);
+  token_boolean_value = get_string_boolean_value(token_value);
+
+  token_player_prefix_len = strlen(SETUP_TOKEN_PLAYER_PREFIX);
+
+  if (strncmp(token, SETUP_TOKEN_PLAYER_PREFIX, token_player_prefix_len) == 0)
+  {
+    token += token_player_prefix_len;
+
+    if (*token >= '0' && *token <= '9')
+    {
+      player_nr = ((int)(*token - '0') - 1 + MAX_PLAYERS) % MAX_PLAYERS;
+      token++;
+    }
+  }
+
+  for (i=0; i<NUM_SETUP_TOKENS; i++)
+  {
+    if (strcmp(token, setup_info[i].token) == 0)
+    {
+      token_nr = i;
+      break;
+    }
+  }
+
+
+
+  /*
+  printf("token == '%s', token_integer_value == %d\n",
+	 token, token_integer_value);
+
+
+  printf("[player %d] token == '%s', token_value == '%s' (%ld)\n",
+	 player_nr, token, token_value,
+	 (unsigned long)getKeySymFromX11KeyName(token_value));
+  */
+
+
+
+  switch (token_nr)
+  {
+    case SETUP_TOKEN_SOUND:
+      setup.sound_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_SOUND_LOOPS:
+      setup.sound_loops_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_SOUND_MUSIC:
+      setup.sound_music_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_SOUND_SIMPLE:
+      setup.sound_simple_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_TOONS:
+      setup.toons_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_DIRECT_DRAW:
+      setup.direct_draw_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_SCROLL_DELAY:
+      setup.scroll_delay_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_SOFT_SCROLLING:
+      setup.soft_scrolling_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_FADING:
+      setup.fading_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_AUTORECORD:
+      setup.autorecord_on = token_boolean_value;
+      break;
+    case SETUP_TOKEN_QUICK_DOORS:
+      setup.quick_doors = token_boolean_value;
+      break;
+
+    case SETUP_TOKEN_USE_JOYSTICK:
+      setup.input[player_nr].use_joystick = token_boolean_value;
+      break;
+    case SETUP_TOKEN_JOYSTICK_NR:
+      if (token_integer_value < 0 || token_integer_value > 1)
+	token_integer_value = 1;
+      setup.input[player_nr].joystick_nr = token_integer_value - 1;
+      break;
+    case SETUP_TOKEN_JOY_SNAP:
+      setup.input[player_nr].joy.snap = getJoySymbolFromJoyName(token_value);
+      break;
+    case SETUP_TOKEN_JOY_BOMB    :
+      setup.input[player_nr].joy.bomb = getJoySymbolFromJoyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_LEFT:
+      setup.input[player_nr].key.left = getKeySymFromX11KeyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_RIGHT:
+      setup.input[player_nr].key.right = getKeySymFromX11KeyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_UP:
+      setup.input[player_nr].key.up = getKeySymFromX11KeyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_DOWN:
+      setup.input[player_nr].key.down = getKeySymFromX11KeyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_SNAP:
+      setup.input[player_nr].key.snap = getKeySymFromX11KeyName(token_value);
+      break;
+    case SETUP_TOKEN_KEY_BOMB:
+      setup.input[player_nr].key.bomb = getKeySymFromX11KeyName(token_value);
+      break;
+    default:
+      break;
+  }
+
+  decodeSetupFileInfo(setup_file_info->next);
+}
+
+void LoadSetup()
+{
+  int line_len;
+  char filename[MAX_FILENAME_LEN];
+  char line[MAX_LINE_LEN];
+  char *token, *value, *line_ptr;
+  struct SetupFileInfo *setup_file_info, **next_entry = &setup_file_info;
+  FILE *file;
+
+
+
+  printf("LoadSetup\n");
+
+
+
+  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
+
+  if (!(file = fopen(filename, "r")))
+  {
+    int i;
+
+    Error(ERR_RETURN, "cannot open setup file '%s'", filename);
+
+    /* use default values for setup */
+
+    setup.sound_on = TRUE;
+    setup.sound_loops_on = FALSE;
+    setup.sound_music_on = FALSE;
+    setup.sound_simple_on = FALSE;
+    setup.toons_on = TRUE;
+    setup.direct_draw_on = FALSE;
+    setup.scroll_delay_on = FALSE;
+    setup.soft_scrolling_on = TRUE;
+    setup.fading_on = FALSE;
+    setup.autorecord_on = FALSE;
+    setup.quick_doors = FALSE;
+
+    for (i=0; i<MAX_PLAYERS; i++)
+    {
+      setup.input[i].use_joystick = FALSE;
+      setup.input[i].joystick_nr = 0;
+      setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
+      setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+      setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
+      setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
+      setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
+      setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
+      setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
+      setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
+    }
+
+    return;
+  }
+
+
+
+  /*
+  next_entry = &setup_file;
+  */
+
+
+
+  while(!feof(file))
+  {
+    /* read next line */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* cut trailing comment or whitespace from input line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == '#' || *line_ptr == '\n')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    /* cut trailing whitespaces from input line */
+    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
+      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
+	*line_ptr = '\0';
+
+    /* ignore empty lines */
+    if (*line == '\0')
+      continue;
+
+    line_len = strlen(line);
+
+
+    /*
+    printf("line: '%s'\n", line);
+    */
+
+
+    /* cut leading whitespaces from token */
+    for (token = line; *token; token++)
+      if (*token != ' ' && *token != '\t')
+	break;
+
+    /* find end of token */
+    for (line_ptr = token; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    if (line_ptr < line + line_len)
+      value = line_ptr + 1;
+    else
+      value = "\0";
+
+    /* cut leading whitespaces from value */
+    for (; *value; value++)
+      if (*value != ' ' && *value != '\t')
+	break;
+
+
+    /*
+    printf("token / value: '%s' / '%s'\n", token, value);
+    */
+
+
+    if (*token && *value)
+    {
+      /* allocate new token/value pair */
+
+      *next_entry = newSetupFileInfo(token, value);
+      next_entry = &((*next_entry)->next);
+    }
+  }
+
+  fclose(file);
+
+#if 0
+  printf("Content of setup file info:\n");
+
+  printSetupFileInfo(setup_file_info);
+#endif
+
+
+
+  printf("decodeSetupFileInfo\n");
+
+
+
+  decodeSetupFileInfo(setup_file_info);
+  freeSetupFileInfo(setup_file_info);
+}
+
+void SaveSetup()
+{
+  int i;
+  char filename[MAX_FILENAME_LEN];
+  FILE *file;
+
+
+
+  printf("SaveSetup\n");
+
+
+
+  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
+
+  if (!(file = fopen(filename, "w")))
+  {
+    Error(ERR_RETURN, "cannot write setup file '%s'", filename);
+    return;
+  }
+
+  fprintf(file, "file_identifier:              %s\n",
+	  SETUP_COOKIE);
+
+  fprintf(file, "\n");
+
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SOUND,
+			setup.sound_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SOUND_LOOPS,
+			setup.sound_loops_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SOUND_MUSIC,
+			setup.sound_music_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SOUND_SIMPLE,
+			setup.sound_simple_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_TOONS,
+			setup.toons_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_DIRECT_DRAW,
+			setup.direct_draw_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SCROLL_DELAY,
+			setup.scroll_delay_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_SOFT_SCROLLING,
+			setup.soft_scrolling_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_FADING,
+			setup.fading_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_AUTORECORD,
+			setup.autorecord_on));
+  fprintf(file, "%s\n",
+	  getSetupEntry("", SETUP_TOKEN_QUICK_DOORS,
+			setup.quick_doors));
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    char prefix[30];
+
+    sprintf(prefix, "%s%d", SETUP_TOKEN_PLAYER_PREFIX, i + 1);
+
+    fprintf(file, "\n");
+
+    fprintf(file, "%s\n",
+	    getSetupEntry(prefix, SETUP_TOKEN_USE_JOYSTICK,
+			  setup.input[i].use_joystick));
+    fprintf(file, "%s\n",
+	    getSetupEntry(prefix, SETUP_TOKEN_JOYSTICK_NR,
+			  setup.input[i].joystick_nr));
+
+    fprintf(file, "%s%s:      %s\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_SNAP),
+	    getJoyNameFromJoySymbol(setup.input[i].joy.snap));
+    fprintf(file, "%s%s:      %s\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_BOMB),
+	    getJoyNameFromJoySymbol(setup.input[i].joy.bomb));
+
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_LEFT,
+				     setup.input[i].key.left));
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_RIGHT,
+				     setup.input[i].key.right));
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_UP,
+				     setup.input[i].key.up));
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_DOWN,
+				     setup.input[i].key.down));
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_SNAP,
+				     setup.input[i].key.snap));
+    fprintf(file, "%s\n",
+	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_BOMB,
+				     setup.input[i].key.bomb));
+  }
+
+  chmod(filename, SETUP_PERMS);
 }

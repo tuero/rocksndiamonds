@@ -720,6 +720,10 @@ void HandleKey(KeySym key, int key_status)
 	  local_player->dynamite = 1000;
 	  break;
 
+
+
+#if 0
+
 	case XK_x:
 
 	  {
@@ -775,8 +779,6 @@ void HandleKey(KeySym key, int key_status)
 
 	  break;
 
-
-#if 0
 	case XK_y:
 	  /*
 	  {
@@ -795,8 +797,6 @@ void HandleKey(KeySym key, int key_status)
 	  printf("direct_draw_on == %d\n", setup.direct_draw_on);
 
 	  break;
-#endif
-
 
 	case XK_z:
 	  {
@@ -828,6 +828,7 @@ void HandleKey(KeySym key, int key_status)
 	  }
 
 	  break;
+#endif
 #endif
 
 	default:

@@ -217,6 +217,12 @@ struct OptionInfo
   boolean verbose;
 };
 
+struct SetupJoystickInfo
+{
+  int snap;
+  int bomb;
+};
+
 struct SetupKeyboardInfo
 {
   KeySym left;
@@ -225,12 +231,6 @@ struct SetupKeyboardInfo
   KeySym down;
   KeySym snap;
   KeySym bomb;
-};
-
-struct SetupJoystickInfo
-{
-  int snap;
-  int bomb;
 };
 
 struct SetupInfo
@@ -253,6 +253,13 @@ struct SetupInfo
     struct SetupJoystickInfo joy;
     struct SetupKeyboardInfo key;
   } input[MAX_PLAYERS];
+};
+
+struct SetupFileInfo
+{
+  char *token;
+  char *value;
+  struct SetupFileInfo *next;
 };
 
 struct PlayerInfo
@@ -1012,7 +1019,7 @@ extern int		num_bg_loops;
 				 (s)==SND_TWILIGHT)
 
 /* default input keys */
-#define KEY_UNDEFINDED		0
+#define KEY_UNDEFINDED		XK_VoidSymbol
 #define DEFAULT_KEY_LEFT	XK_Left
 #define DEFAULT_KEY_RIGHT	XK_Right
 #define DEFAULT_KEY_UP		XK_Up
@@ -1083,17 +1090,22 @@ extern int		num_bg_loops;
 #ifndef JOYDAT_PATH
 #define JOYDAT_PATH		GAME_DIR
 #endif
+#ifndef SETUP_PATH
+#define SETUP_PATH		GAME_DIR
+#endif
 
 #ifndef MSDOS
 #define SCORE_FILENAME		"ROCKS.score"
 #define NAMES_FILENAME		"ROCKS.names"
 #define LEVDIR_FILENAME		"ROCKS.levelinfo"
 #define JOYDAT_FILENAME		"ROCKS.joystick"
+#define SETUP_FILENAME		"ROCKS.setup"
 #else
 #define SCORE_FILENAME		"ROCKS.sco"
 #define NAMES_FILENAME		"ROCKS.nam"
 #define LEVDIR_FILENAME		"ROCKS.lev"
 #define JOYDAT_FILENAME		"ROCKS.joy"
+#define SETUP_FILENAME		"ROCKS.set"
 #endif
 
 #define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
@@ -1104,6 +1116,7 @@ extern int		num_bg_loops;
 #define LEVDIR_PERMS		LEVEL_PERMS
 #define LEVREC_PERMS		LEVEL_PERMS
 #define JOYDAT_PERMS		LEVEL_PERMS
+#define SETUP_PERMS		LEVEL_PERMS
 
 /* old cookies */
 #define NAMES_COOKIE_10		"ROCKSNDIAMONDS_NAMES_FILE_VERSION_1.0"
@@ -1115,12 +1128,14 @@ extern int		num_bg_loops;
 #define LEVELDIR_COOKIE		"ROCKSNDIAMONDS_LEVELDIR_FILE_VERSION_1.0"
 #define LEVELREC_COOKIE		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.2"
 #define JOYSTICK_COOKIE		"ROCKSNDIAMONDS_JOYSTICK_FILE_VERSION_1.0"
+#define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
 #define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE)+1)
 #define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE)+1)
 #define NAMES_COOKIE_LEN	(strlen(NAMES_COOKIE)+1)
 #define LEVELDIR_COOKIE_LEN	(strlen(LEVELDIR_COOKIE)+1)
 #define LEVELREC_COOKIE_LEN	(strlen(LEVELREC_COOKIE)+1)
 #define JOYSTICK_COOKIE_LEN	(strlen(JOYSTICK_COOKIE)+1)
+#define SETUP_COOKIE_LEN	(strlen(SETUP_COOKIE)+1)
 
 #define VERSION_STRING		"1.2"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
