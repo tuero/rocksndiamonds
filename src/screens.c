@@ -1241,12 +1241,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : yoffset_setup);
   int last_game_status = game_status;	/* save current game status */
 
-#if 1
-  DrawBackground(mSX, mSY, SXSIZE - 32 + menu.scrollbar_xoffset, SYSIZE);
-#else
-  DrawBackground(SX, SY, SXSIZE - 32, SYSIZE);
-#endif
-
   title_string =
     (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Directories" :
      ti->type == TREE_TYPE_GRAPHICS_DIR ? "Custom Graphics" :
@@ -1257,6 +1251,10 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   /* force LEVELS font on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
+
+  /* clear tree list area, but not title or scrollbar */
+  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
+		 SXSIZE - 32 + menu.scrollbar_xoffset, SYSIZE);
 
   for(i=0; i<num_page_entries; i++)
   {

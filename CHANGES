@@ -1,5 +1,15 @@
-Release Version 3.0.6 [?? ??? ????]
+Release Version 3.0.6 [06 OCT 2003]
 -----------------------------------
+	- fixed bug when initializing font graphic structure
+	- fixed bug with animation mode "pingpong" when using only 1 frame
+	- fixed bug with extended change target introduced in 3.0.5
+	- fixed bug where passing over moving element doubles player speed
+	- fixed bug with elements continuing to move into push direction
+	- fixed bug with duplicated player when dropping bomb with shield on
+	- fixed switching bug (resetting flag when not switching but not idle)
+	- fixed element tokens for certain file elements with ".active" etc.
+	- added "switching" event for custom elements ("pressing" only once)
+	- added support for MP3 music for SDL version through SMPEG library
 
 Release Version 3.0.5 [29 SEP 2003]
 -----------------------------------

@@ -6258,7 +6258,7 @@ void GameActions()
     }
   }
 
-  if (TimeFrames >= (1000 / GameFrameDelay))
+  if (TimeFrames >= FRAMES_PER_SECOND)
   {
     TimeFrames = 0;
     TimePlayed++;

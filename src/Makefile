@@ -76,7 +76,11 @@ endif
 
 ifeq ($(TARGET),sdl)
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
+ifeq ($(PLATFORM),macosx)
+SYS_LDFLAGS = -lSDL_image -lSDL_mixer -lsmpeg $(shell sdl-config --libs)
+else
 SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs)
+endif
 endif
 
 ifeq ($(TARGET),allegro)
@@ -103,7 +107,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
