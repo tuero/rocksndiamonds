@@ -1172,15 +1172,19 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 	node_cursor->cl_first = leveldir_current->cl_first;
 	node_cursor->cl_cursor = leveldir_current->cl_cursor;
 	leveldir_current = node_cursor->node_group;
+
 	DrawChooseLevel();
       }
       else if (node_cursor->parent_link)
       {
 	leveldir_current = node_cursor->node_parent;
+
 	DrawChooseLevel();
       }
       else
       {
+	node_cursor->cl_first = leveldir_current->cl_first;
+	node_cursor->cl_cursor = leveldir_current->cl_cursor;
 	leveldir_current = node_cursor;
 
 	LoadLevelSetup_SeriesInfo();
