@@ -34,4 +34,6 @@ void HandleEditorGadgetInfoText(void *ptr);
 void RequestExitLevelEditor(boolean);
 void PrintEditorElementList();
 
+void DumpBrush();
+
 #endif

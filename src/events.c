@@ -462,7 +462,7 @@ static boolean is_string_suffix(char *string, char *suffix)
 
 #define MAX_CHEAT_INPUT_LEN	32
 
-static void HandleKeysCheating(Key key)
+static void HandleKeysSpecial(Key key)
 {
   static char cheat_input[2 * MAX_CHEAT_INPUT_LEN + 1] = "";
   char letter = getCharFromKey(key);
@@ -540,6 +540,14 @@ static void HandleKeysCheating(Key key)
 	  local_player->inventory_element[local_player->inventory_size++] =
 	    EL_DYNAMITE;
 #endif
+  }
+  else if (game_status == GAME_MODE_EDITOR)
+  {
+    if (is_string_suffix(cheat_input, ":dump-brush") ||
+	is_string_suffix(cheat_input, ":DB"))
+    {
+      DumpBrush();
+    }
   }
 }
 
@@ -688,9 +696,9 @@ void HandleKey(Key key, int key_status)
       TapeQuickLoad();
     else if (key == setup.shortcut.toggle_pause)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
-
-    HandleKeysCheating(key);
   }
+
+  HandleKeysSpecial(key);
 
   if (HandleGadgetsKeyInput(key))
   {

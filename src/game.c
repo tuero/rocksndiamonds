@@ -164,16 +164,27 @@
 #endif
 #endif
 
+#define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
-#define IS_IN_GROUP(e, g)	(element_info[e].in_group[g] == TRUE)
+#define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
 #define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
 
+#define IS_EQUAL_OR_IN_GROUP(e, ge)					\
+	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
+
+#if 1
+#define CE_ENTER_FIELD_COND(e, x, y)					\
+		(!IS_PLAYER(x, y) &&					\
+		 (Feld[x][y] == EL_ACID ||				\
+		  IS_EQUAL_OR_IN_GROUP(Feld[x][y], MOVE_ENTER_EL(e))))
+#else
 #define CE_ENTER_FIELD_COND(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
 		 (Feld[x][y] == EL_ACID ||				\
 		  Feld[x][y] == MOVE_ENTER_EL(e) ||			\
 		  (IS_GROUP_ELEMENT(MOVE_ENTER_EL(e)) &&		\
 		   IS_IN_GROUP_EL(Feld[x][y], MOVE_ENTER_EL(e)))))
+#endif
 
 #define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
 	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
@@ -1037,7 +1048,16 @@ static void InitGameEngine()
       {
 	int trigger_element = ei->change_page[j].trigger_element;
 
-	trigger_events[trigger_element] |= ei->change_page[j].events;
+	if (IS_GROUP_ELEMENT(trigger_element))
+	{
+	  struct ElementGroupInfo *group = element_info[trigger_element].group;
+
+	  for (k = 0; k < group->num_elements_resolved; k++)
+	    trigger_events[group->element_resolved[k]]
+	      |= ei->change_page[j].events;
+	}
+	else
+	  trigger_events[trigger_element] |= ei->change_page[j].events;
       }
     }
   }
@@ -6410,7 +6430,12 @@ static boolean CheckTriggeredElementSideChange(int lx, int ly,
 	  change->events & CH_EVENT_BIT(trigger_event) &&
 #endif
 	  change->sides & trigger_side &&
-	  change->trigger_element == trigger_element)
+#if 1
+	  IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element)
+#else
+	  change->trigger_element == trigger_element
+#endif
+	  )
       {
 #if 0
 	if (!(change->events & CH_EVENT_BIT(trigger_event)))
@@ -8139,7 +8164,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	if (change->can_change &&
 	    change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
 	    change->sides & border_side &&
-	    change->trigger_element == border_element)
+#if 1
+	    IS_EQUAL_OR_IN_GROUP(border_element, change->trigger_element)
+#else
+	    change->trigger_element == border_element
+#endif
+	    )
 	{
 	  change_center_element = TRUE;
 	  center_element_change_page = j;
@@ -8161,7 +8191,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	if (change->can_change &&
 	    change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
 	    change->sides & center_side &&
-	    change->trigger_element == center_element)
+#if 1
+	    IS_EQUAL_OR_IN_GROUP(center_element, change->trigger_element)
+#else
+	    change->trigger_element == center_element
+#endif
+	    )
 	{
 	  CheckElementSideChange(xx, yy, border_element, CH_SIDE_ANY,
 				 CE_OTHER_IS_TOUCHING, j);
@@ -8241,7 +8276,13 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 	  if (change->can_change &&
 	      change->events & CH_EVENT_BIT(CE_OTHER_IS_HITTING) &&
 	      change->sides & touched_side &&
-	      change->trigger_element == touched_element)
+	  
+#if 1
+	      IS_EQUAL_OR_IN_GROUP(touched_element, change->trigger_element)
+#else
+	      change->trigger_element == touched_element
+#endif
+	      )
 	  {
 	    CheckElementSideChange(x, y, hitting_element,
 				   CH_SIDE_ANY, CE_OTHER_IS_HITTING, i);
@@ -8261,7 +8302,12 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 	  if (change->can_change &&
 	      change->events & CH_EVENT_BIT(CE_OTHER_GETS_HIT) &&
 	      change->sides & hitting_side &&
-	      change->trigger_element == hitting_element)
+#if 1
+	      IS_EQUAL_OR_IN_GROUP(hitting_element, change->trigger_element)
+#else
+	      change->trigger_element == hitting_element
+#endif
+	      )
 	  {
 	    CheckElementSideChange(hitx, hity, touched_element,
 				   CH_SIDE_ANY, CE_OTHER_GETS_HIT, i);

@@ -3184,6 +3184,205 @@ editor_elements_info[] =
   }
 };
 
+static struct
+{
+  short element;
+  short element_mapped;
+}
+forum_sketch_element_mapping[] =
+{
+  { EL_WALL_SLIPPERY,			EL_WALL			},
+  { EL_EXPANDABLE_WALL,			EL_WALL			},
+  { EL_EXPANDABLE_WALL_HORIZONTAL,	EL_WALL			},
+  { EL_EXPANDABLE_WALL_VERTICAL,	EL_WALL			},
+  { EL_EXPANDABLE_WALL_ANY,		EL_WALL			},
+  { EL_WALL_EMERALD,			EL_WALL			},
+  { EL_WALL_DIAMOND,			EL_WALL			},
+  { EL_WALL_BD_DIAMOND,			EL_WALL			},
+  { EL_WALL_EMERALD_YELLOW,		EL_WALL			},
+  { EL_WALL_EMERALD_RED,		EL_WALL			},
+  { EL_WALL_EMERALD_PURPLE,		EL_WALL			},
+  { EL_ACID_POOL_TOPLEFT,		EL_WALL			},
+  { EL_ACID_POOL_TOPRIGHT,		EL_WALL			},
+  { EL_ACID_POOL_BOTTOMLEFT,		EL_WALL			},
+  { EL_ACID_POOL_BOTTOM,		EL_WALL			},
+  { EL_ACID_POOL_BOTTOMRIGHT,		EL_WALL			},
+  { EL_BD_WALL,				EL_WALL			},
+
+  { EL_BD_ROCK,				EL_ROCK			},
+
+  { EL_SP_ZONK,				EL_ROCK			},
+  { EL_SP_BASE,				EL_SAND			},
+  { EL_SP_MURPHY,			EL_PLAYER_1		},
+  { EL_SP_INFOTRON,			EL_EMERALD		},
+  { EL_SP_HARDWARE_GRAY,		EL_STEELWALL		},
+  { EL_SP_EXIT_CLOSED,			EL_EXIT_OPEN		},
+  { EL_SP_DISK_ORANGE,			EL_BOMB			},
+  { EL_SP_DISK_RED,			EL_BOMB			},
+  { EL_SP_DISK_YELLOW,			EL_BOMB			},
+  { EL_SP_PORT_RIGHT,			EL_GATE_1_GRAY		},
+  { EL_SP_PORT_DOWN,			EL_GATE_1_GRAY		},
+  { EL_SP_PORT_LEFT,			EL_GATE_1_GRAY		},
+  { EL_SP_PORT_UP,			EL_GATE_1_GRAY		},
+  { EL_SP_GRAVITY_PORT_RIGHT,		EL_GATE_1_GRAY		},
+  { EL_SP_GRAVITY_PORT_DOWN,		EL_GATE_1_GRAY		},
+  { EL_SP_GRAVITY_PORT_LEFT,		EL_GATE_1_GRAY		},
+  { EL_SP_GRAVITY_PORT_UP,		EL_GATE_1_GRAY		},
+  { EL_SP_PORT_VERTICAL,		EL_GATE_1_GRAY		},
+  { EL_SP_PORT_HORIZONTAL,		EL_GATE_1_GRAY		},
+  { EL_SP_PORT_ANY,			EL_GATE_1_GRAY		},
+  { EL_SP_SNIKSNAK,			EL_BUG			},
+  { EL_SP_ELECTRON,			EL_SPACESHIP		},
+  { EL_SP_CHIP_SINGLE,			EL_WALL			},
+  { EL_SP_CHIP_LEFT,			EL_WALL			},
+  { EL_SP_CHIP_RIGHT,			EL_WALL			},
+  { EL_SP_CHIP_TOP,			EL_WALL			},
+  { EL_SP_CHIP_BOTTOM,			EL_WALL			},
+  { EL_SP_HARDWARE_BASE_1,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_GREEN,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BLUE,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_RED,			EL_STEELWALL		},
+  { EL_SP_HARDWARE_YELLOW,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_2,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_3,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_3,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_4,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_5,		EL_STEELWALL		},
+  { EL_SP_HARDWARE_BASE_6,		EL_STEELWALL		},
+
+  { EL_STEELWALL_SLIPPERY,		EL_STEELWALL		},
+
+  { EL_EXIT_CLOSED,			EL_EXIT_OPEN		},
+
+  { EL_DIAMOND,				EL_EMERALD		},
+  { EL_BD_DIAMOND,			EL_EMERALD		},
+  { EL_EMERALD_YELLOW,			EL_EMERALD		},
+  { EL_EMERALD_RED,			EL_EMERALD		},
+  { EL_EMERALD_PURPLE,			EL_EMERALD		},
+
+  { EL_AMOEBA_DEAD,			EL_AMOEBA		},
+  { EL_AMOEBA_DROP,			EL_AMOEBA		},
+  { EL_AMOEBA_WET,			EL_AMOEBA		},
+  { EL_AMOEBA_DRY,			EL_AMOEBA		},
+  { EL_AMOEBA_FULL,			EL_AMOEBA		},
+  { EL_BD_AMOEBA,			EL_AMOEBA		},
+  { EL_AMOEBA_TO_DIAMOND,		EL_AMOEBA		},
+
+  { EL_DYNAMITE_ACTIVE,			EL_DYNAMITE		},
+
+  { EL_GATE_2_GRAY,			EL_GATE_1_GRAY		},
+  { EL_GATE_3_GRAY,			EL_GATE_1_GRAY		},
+  { EL_GATE_4_GRAY,			EL_GATE_1_GRAY		},
+
+  { EL_EM_KEY_1,			EL_KEY_1		},
+  { EL_EM_KEY_2,			EL_KEY_2		},
+  { EL_EM_KEY_3,			EL_KEY_3		},
+  { EL_EM_KEY_4,			EL_KEY_4		},
+
+  { EL_EM_GATE_1,			EL_GATE_1		},
+  { EL_EM_GATE_2,			EL_GATE_2		},
+  { EL_EM_GATE_3,			EL_GATE_3		},
+  { EL_EM_GATE_4,			EL_GATE_4		},
+
+  { EL_EM_GATE_1_GRAY,			EL_GATE_1_GRAY		},
+  { EL_EM_GATE_2_GRAY,			EL_GATE_1_GRAY		},
+  { EL_EM_GATE_3_GRAY,			EL_GATE_1_GRAY		},
+  { EL_EM_GATE_4_GRAY,			EL_GATE_1_GRAY		},
+
+  { EL_INVISIBLE_SAND,			EL_EMPTY		},
+  { EL_INVISIBLE_WALL,			EL_EMPTY		},
+  { EL_INVISIBLE_STEELWALL,		EL_EMPTY		},
+
+  { EL_PACMAN,				EL_YAMYAM		},
+  { EL_DARK_YAMYAM,			EL_YAMYAM		},
+
+  { EL_BD_MAGIC_WALL,			EL_MAGIC_WALL		},
+
+  { EL_DYNABOMB_INCREASE_NUMBER,	EL_BOMB			},
+  { EL_DYNABOMB_INCREASE_SIZE,		EL_BOMB			},
+  { EL_DYNABOMB_INCREASE_POWER,		EL_BOMB			},
+  { EL_BLACK_ORB,			EL_BOMB			},
+  { EL_DX_SUPABOMB,			EL_BOMB			},
+
+  { EL_SOKOBAN_OBJECT,			EL_KEY_1		},
+  { EL_SOKOBAN_FIELD_EMPTY,		EL_GATE_1_GRAY		},
+  { EL_SOKOBAN_FIELD_FULL,		EL_GATE_1		},
+  { EL_SOKOBAN_FIELD_PLAYER,		EL_PLAYER_1		},
+
+  { EL_BD_BUTTERFLY_RIGHT,		EL_BD_BUTTERFLY		},
+  { EL_BD_BUTTERFLY_UP,			EL_BD_BUTTERFLY		},
+  { EL_BD_BUTTERFLY_LEFT,		EL_BD_BUTTERFLY		},
+  { EL_BD_BUTTERFLY_DOWN,		EL_BD_BUTTERFLY		},
+
+  { EL_BD_FIREFLY_RIGHT,		EL_BD_FIREFLY		},
+  { EL_BD_FIREFLY_UP,			EL_BD_FIREFLY		},
+  { EL_BD_FIREFLY_LEFT,			EL_BD_FIREFLY		},
+  { EL_BD_FIREFLY_DOWN,			EL_BD_FIREFLY		},
+
+  { EL_PLAYER_2,			EL_PLAYER_1		},
+  { EL_PLAYER_3,			EL_PLAYER_1		},
+  { EL_PLAYER_4,			EL_PLAYER_1		},
+
+  { EL_BUG_RIGHT,			EL_BUG			},
+  { EL_BUG_UP,				EL_BUG			},
+  { EL_BUG_LEFT,			EL_BUG			},
+  { EL_BUG_DOWN,			EL_BUG			},
+
+  { EL_SPACESHIP_RIGHT,			EL_SPACESHIP		},
+  { EL_SPACESHIP_UP,			EL_SPACESHIP		},
+  { EL_SPACESHIP_LEFT,			EL_SPACESHIP		},
+  { EL_SPACESHIP_DOWN,			EL_SPACESHIP		},
+
+  { EL_PACMAN_RIGHT,			EL_YAMYAM		},
+  { EL_PACMAN_UP,			EL_YAMYAM		},
+  { EL_PACMAN_LEFT,			EL_YAMYAM		},
+  { EL_PACMAN_DOWN,			EL_YAMYAM		},
+
+  { -1,					-1			}
+};
+
+static struct
+{
+  short element;
+  char *element_string;
+}
+forum_sketch_element_strings[] =
+{
+  { EL_PLAYER_1,		"p" },
+  { EL_EMPTY,			"_" },
+  { EL_SAND,			"s" },
+  { EL_ROCK,			"b" },
+  { EL_EMERALD,			"e" },
+  { EL_BUG,			"u" },
+  { EL_SPACESHIP,		"h" },
+  { EL_BD_FIREFLY,		"f" },
+  { EL_BD_BUTTERFLY,		"b" },
+  { EL_AMOEBA,			"a" },
+  { EL_YAMYAM,			"y" },
+  { EL_WALL,			"w" },
+  { EL_STEELWALL,		"t" },
+  { EL_MAGIC_WALL,		"m" },
+  { EL_EXIT_OPEN,		"x" },
+  { EL_DYNAMITE,		"d" },
+  { EL_KEY_1,			"1" },
+  { EL_KEY_2,			"2" },
+  { EL_KEY_3,			"3" },
+  { EL_KEY_4,			"4" },
+  { EL_GATE_1,			"5" },
+  { EL_GATE_2,			"6" },
+  { EL_GATE_3,			"7" },
+  { EL_GATE_4,			"8" },
+  { EL_GATE_1_GRAY,		"9" },
+  { EL_BOMB,			"@" },
+  { EL_ROBOT,			"r" },
+  { EL_ROBOT_WHEEL,		"0" },
+  { EL_NUT,			"n" },
+  { EL_CUSTOM_1,		"c" },
+  { EL_CHAR_QUESTION,		"?" },
+
+  { -1,				NULL }
+};
+
 
 /*
   -----------------------------------------------------------------------------
@@ -6721,6 +6920,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 #define CB_BRUSH_TO_CURSOR	1
 #define CB_BRUSH_TO_LEVEL	2
 #define CB_DELETE_OLD_CURSOR	3
+#define CB_DUMP_BRUSH		4
 
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 			 int button, int mode)
@@ -6731,6 +6931,54 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
   static boolean delete_old_brush;
   int new_element = BUTTON_ELEMENT(button);
   int x, y;
+
+  if (mode == CB_DUMP_BRUSH)
+  {
+    if (!draw_with_brush)
+    {
+      Error(ERR_WARN, "no brush selected");
+
+      return;
+    }
+
+    for (y = 0; y < brush_height; y++)
+    {
+      for (x = 0; x < brush_width; x++)
+      {
+	int element = brush_buffer[x][y];
+	int element_mapped = element;
+	char *element_string = "?";
+	int k;
+
+	for (k = 0; forum_sketch_element_mapping[k].element != -1; k++)
+	{
+	  if (forum_sketch_element_mapping[k].element == element)
+	  {
+	    element_mapped = forum_sketch_element_mapping[k].element_mapped;
+	    break;
+	  }
+	}
+
+	if (IS_CUSTOM_ELEMENT(element))
+	  element_mapped = EL_CUSTOM_1;
+
+	for (k = 0; forum_sketch_element_strings[k].element != -1; k++)
+	{
+	  if (forum_sketch_element_strings[k].element == element_mapped)
+	  {
+	    element_string = forum_sketch_element_strings[k].element_string;
+	    break;
+	  }
+	}
+
+	printf("`%s", element_string);
+      }
+
+      printf("\n");
+    }
+
+    return;
+  }
 
   if (mode == CB_DELETE_OLD_CURSOR && !delete_old_brush)
     return;
@@ -6844,6 +7092,11 @@ static void CopyBrushToCursor(int x, int y)
 static void DeleteBrushFromCursor()
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
+}
+
+void DumpBrush()
+{
+  CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH);
 }
 
 static void FloodFill(int from_x, int from_y, int fill_element)
