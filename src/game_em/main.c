@@ -52,12 +52,12 @@ void em_close_all()
   close_all();
 }
 
-int em_main_init_game(int level_nr)
+int em_main_init_game(int level_nr, char *filename)
 {
   if (skip_menu)
   {
     em_game_status = EM_GAME_STATUS_PLAY;
-    if (game_play_init(level_nr) != 0)
+    if (game_play_init(level_nr, filename) != 0)
       return 1;
   }
   else

@@ -19,7 +19,7 @@
 extern void em_open_all();
 extern void em_close_all();
 
-extern int em_main_init_game(int);
+extern int em_main_init_game(int, char *);
 extern int em_main_handle_game(byte);
 
 #endif /* GAME_EM_H */

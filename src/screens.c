@@ -2944,8 +2944,8 @@ void HandleGameActions()
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-#if 1
-
+  /* !!! FIX THIS (START) !!! */
+  if (level.file_info.type == LEVEL_FILE_TYPE_EM)
   {
     byte summarized_player_action = 0;
     int i;
@@ -2959,22 +2959,20 @@ void HandleGameActions()
       DrawMainMenu();
     }
   }
+  else
+  {
+    if (local_player->LevelSolved)
+      GameWon();
 
-#else
+    if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
+      TapeStop();
 
-  if (local_player->LevelSolved)
-    GameWon();
+    GameActions();
+    BackToFront();
 
-  if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
-    TapeStop();
-
-  GameActions();
-  BackToFront();
-
-  if (tape.auto_play && !tape.playing)
-    AutoPlayTape();	/* continue automatically playing next tape */
-
-#endif
+    if (tape.auto_play && !tape.playing)
+      AutoPlayTape();	/* continue automatically playing next tape */
+  }
 }
 
 /* ---------- new screen button stuff -------------------------------------- */

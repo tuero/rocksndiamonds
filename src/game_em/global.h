@@ -55,7 +55,7 @@ void sound_play(void);
 int cave_convert(char *filename);
 
 void game_init_vars(void);
-int game_play_init(int);
+int game_play_init(int, char *);
 int game_loop(byte);
 
 void synchro_1(void);

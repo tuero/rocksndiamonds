@@ -2060,32 +2060,33 @@ void InitGame()
 
   CloseDoor(DOOR_CLOSE_1);
 
-#if 1
-
-  if (em_main_init_game(level_nr) != 0)
+  /* !!! FIX THIS (START) !!! */
+  if (level.file_info.type == LEVEL_FILE_TYPE_EM)
   {
-    game_status = GAME_MODE_MAIN;
-    DrawMainMenu();
+    if (em_main_init_game(level_nr, level.file_info.filename) != 0)
+    {
+      game_status = GAME_MODE_MAIN;
+      DrawMainMenu();
 
-    return;
+      return;
+    }
   }
+  else
+  {
+    DrawLevel();
+    DrawAllPlayers();
 
-#else
+    /* after drawing the level, correct some elements */
+    if (game.timegate_time_left == 0)
+      CloseAllOpenTimegates();
 
-  DrawLevel();
-  DrawAllPlayers();
+    if (setup.soft_scrolling)
+      BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
-  /* after drawing the level, correct some elements */
-  if (game.timegate_time_left == 0)
-    CloseAllOpenTimegates();
-
-  if (setup.soft_scrolling)
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-  redraw_mask |= REDRAW_FROM_BACKBUFFER;
-  FadeToFront();
-
-#endif
+    redraw_mask |= REDRAW_FROM_BACKBUFFER;
+    FadeToFront();
+  }
+  /* !!! FIX THIS (END) !!! */
 
   /* copy default game door content to main double buffer */
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,

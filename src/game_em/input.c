@@ -150,18 +150,28 @@ void game_init_vars(void)
   input_pause = 1    * 0;
 }
 
-int game_play_init(int player_level)
+int game_play_init(int level_nr, char *filename)
 {
-  char name[MAXNAME+2];
+  if (filename != NULL)
+  {
+    player_level = level_nr;
 
-  name[MAXNAME] = 0;
-  snprintf(name, MAXNAME+2, "%s/lev%02d", EM_LVL_DIR, player_level);
+    if (cave_convert(filename) != 0)
+      return 1;
+  }
+  else	/* !!! SOON OBSOLETE !!! */
+  {
+    char name[MAXNAME+2];
 
-  if (name[MAXNAME])
-    snprintf_overflow("read a level in cave/");
+    name[MAXNAME] = 0;
+    snprintf(name, MAXNAME+2, "%s/lev%02d", EM_LVL_DIR, player_level);
 
-  if (cave_convert(name) != 0)
-    return 1;
+    if (name[MAXNAME])
+      snprintf_overflow("read a level in cave/");
+
+    if (cave_convert(name) != 0)
+      return 1;
+  }
 
   game_initscreen();
   game_blitscore();
@@ -321,7 +331,7 @@ int game_loop(byte action)
       /* start playing */
 
       em_game_status = EM_GAME_STATUS_PLAY;
-      if (game_play_init(player_level) != 0)
+      if (game_play_init(player_level, NULL) != 0)
 	em_game_status = EM_GAME_STATUS_MENU;
     }
   }

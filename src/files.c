@@ -49,22 +49,6 @@
 #define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
-/* values for level file type identifier */
-#define LEVEL_FILE_TYPE_UNKNOWN		0
-#define LEVEL_FILE_TYPE_RND		1
-#define LEVEL_FILE_TYPE_BD		2
-#define LEVEL_FILE_TYPE_EM		3
-#define LEVEL_FILE_TYPE_SP		4
-#define LEVEL_FILE_TYPE_DX		5
-#define LEVEL_FILE_TYPE_SB		6
-#define LEVEL_FILE_TYPE_DC		7
-
-#define LEVEL_FILE_TYPE_RND_PACKED	(10 + LEVEL_FILE_TYPE_RND)
-#define LEVEL_FILE_TYPE_EM_PACKED	(10 + LEVEL_FILE_TYPE_EM)
-
-#define IS_SINGLE_LEVEL_FILE(x)		(x < 10)
-#define IS_PACKED_LEVEL_FILE(x)		(x > 10)
-
 
 /* ========================================================================= */
 /* level file functions                                                      */
@@ -551,6 +535,20 @@ static void determineLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
     lfi->type = getFileTypeFromBasename(lfi->basename);
 }
 
+#if 1
+static void setLevelFileInfo(struct LevelFileInfo *level_file_info, int nr)
+{
+  /* always start with reliable default values */
+  setFileInfoToDefaults(level_file_info);
+
+  level_file_info->nr = nr;	/* set requested level number */
+
+  determineLevelFileInfo_Filename(level_file_info);
+  determineLevelFileInfo_Filetype(level_file_info);
+}
+
+#else
+
 static struct LevelFileInfo *getLevelFileInfo(int nr)
 {
   static struct LevelFileInfo level_file_info;
@@ -565,7 +563,7 @@ static struct LevelFileInfo *getLevelFileInfo(int nr)
 
   return &level_file_info;
 }
-
+#endif
 
 /* ------------------------------------------------------------------------- */
 /* functions for loading R'n'D level                                         */
@@ -2501,6 +2499,16 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
 void LoadLevelTemplate(int nr)
 {
 #if 1
+  char *filename;
+
+  setLevelFileInfo(&level_template.file_info, nr);
+  filename = level_template.file_info.filename;
+
+  LoadLevelFromFileInfo(&level_template, &level_template.file_info);
+
+#else
+
+#if 1
   struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
   char *filename = level_file_info->filename;
 
@@ -2509,6 +2517,7 @@ void LoadLevelTemplate(int nr)
   char *filename = getDefaultLevelFilename(nr);
 
   LoadLevelFromFilename_RND(&level_template, filename);
+#endif
 #endif
 
 #if 1
@@ -2525,6 +2534,16 @@ void LoadLevelTemplate(int nr)
 void LoadLevel(int nr)
 {
 #if 1
+  char *filename;
+
+  setLevelFileInfo(&level.file_info, nr);
+  filename = level.file_info.filename;
+
+  LoadLevelFromFileInfo(&level, &level.file_info);
+
+#else
+
+#if 1
   struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
   char *filename = level_file_info->filename;
 
@@ -2533,6 +2552,7 @@ void LoadLevel(int nr)
   char *filename = getLevelFilename(nr);
 
   LoadLevelFromFilename_RND(&level, filename);
+#endif
 #endif
 
   if (level.use_custom_template)
