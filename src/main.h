@@ -1050,6 +1050,14 @@ struct GlobalInfo
 
   int num_toons;
 
+  int menu_draw_xoffset;
+  int menu_draw_yoffset;
+  int menu_draw_xoffset_MAIN;
+  int menu_draw_yoffset_MAIN;
+
+  int door_step_offset;
+  int door_step_delay;
+
   float frames_per_second;
   boolean fps_slowdown;
   int fps_slowdown_factor;

@@ -3154,5 +3154,13 @@ struct ConfigInfo image_config[] =
 
   { "global.num_toons",				"20"			},
 
+  { "menu.draw_xoffset",			"0"			},
+  { "menu.draw_yoffset",			"0"			},
+  { "menu.draw_xoffset.MAIN",			"0"			},
+  { "menu.draw_yoffset.MAIN",			"0"			},
+
+  { "door.step_offset",				"2"			},
+  { "door.step_delay",				"10"			},
+
   { NULL,					NULL			}
 };

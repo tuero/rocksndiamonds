@@ -1703,6 +1703,12 @@ void LoadSpecialMenuDesignSettings()
 
   /* !!! CHANGE THIS !!! (redundant initialization) !!! */
   global.num_toons = 20;
+  global.menu_draw_xoffset = 0;
+  global.menu_draw_yoffset = 0;
+  global.menu_draw_xoffset_MAIN = 0;
+  global.menu_draw_yoffset_MAIN = 0;
+  global.door_step_offset = 2;
+  global.door_step_delay = 10;
 
   if ((setup_file_list = loadSetupFileList(filename)) == NULL)
     return;
@@ -1710,6 +1716,30 @@ void LoadSpecialMenuDesignSettings()
   value = getTokenValue(setup_file_list, "global.num_toons");
   if (value != NULL)
     global.num_toons = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "menu.draw_xoffset");
+  if (value != NULL)
+    global.menu_draw_xoffset = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "menu.draw_yoffset");
+  if (value != NULL)
+    global.menu_draw_yoffset = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "menu.draw_xoffset.MAIN");
+  if (value != NULL)
+    global.menu_draw_xoffset_MAIN = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "menu.draw_yoffset.MAIN");
+  if (value != NULL)
+    global.menu_draw_yoffset_MAIN = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "door.step_offset");
+  if (value != NULL)
+    global.door_step_offset = get_integer_from_string(value);
+
+  value = getTokenValue(setup_file_list, "door.step_delay");
+  if (value != NULL)
+    global.door_step_delay = get_integer_from_string(value);
 
   freeSetupFileList(setup_file_list);
 }

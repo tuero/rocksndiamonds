@@ -188,6 +188,12 @@ static void InitArtworkConfig()
     "name",
     "sort_priority",
     "global.num_toons",
+    "menu.draw_xoffset",
+    "menu.draw_yoffset",
+    "menu.draw_xoffset.MAIN",
+    "menu.draw_yoffset.MAIN",
+    "door.step_offset",
+    "door.step_delay",
     NULL
   };
   static char *ignore_sound_tokens[] =
