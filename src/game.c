@@ -2285,6 +2285,22 @@ void Explode(int ex, int ey, int phase, int mode)
 
   ExplodePhase[x][y] = (phase < last_phase ? phase + 1 : 0);
 
+#ifdef DEBUG
+
+  /* activate this even in non-DEBUG version until cause for crash in
+     getGraphicAnimationFrame() (see below) is found and eliminated */
+#endif
+#if 1
+
+  if (GfxElement[x][y] == EL_UNDEFINED)
+  {
+    printf("Explode(): x = %d, y = %d: GfxElement == EL_UNDEFINED\n", x, y);
+    printf("Explode(): This should never happen!\n");
+
+    GfxElement[x][y] = EL_EMPTY;
+  }
+#endif
+
   if (phase == first_phase_after_start)
   {
     int element = Store2[x][y];

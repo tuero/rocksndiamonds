@@ -35,6 +35,7 @@
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
 static int el_act_dir2crm(int, int, int);
+static int el_act2crm(int, int);
 
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
@@ -1217,6 +1218,12 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
     { 0, +1 }
   };
 
+#if 0
+  if (x == 0 && y == 7)
+    printf("::: %d, %d [%d]\n", GfxElement[x][y], Feld[x][y],
+	   crumbled_border_size);
+#endif
+
   if (!IN_LEV_FIELD(x, y))
     return;
 
@@ -1272,7 +1279,9 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   }
   else		/* crumble neighbour fields */
   {
+#if 0
     getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+#endif
 
     for(i=0; i<4; i++)
     {
@@ -1286,6 +1295,12 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	  !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
 	  IS_MOVING(xx, yy))
 	continue;
+
+#if 1
+      graphic = el_act2crm(Feld[xx][yy], ACTION_DEFAULT);
+
+      getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+#endif
 
       if (i == 1 || i == 2)
       {
@@ -1312,7 +1327,18 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
 void DrawLevelFieldCrumbledSand(int x, int y)
 {
+#if 1
+  int graphic;
+
+  if (!IN_LEV_FIELD(x, y))
+    return;
+
+  graphic = el_act2crm(Feld[x][y], ACTION_DEFAULT);
+
+  DrawLevelFieldCrumbledSandExt(x, y, graphic, 0);
+#else
   DrawLevelFieldCrumbledSandExt(x, y, IMG_SAND_CRUMBLED, 0);
+#endif
 }
 
 void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
@@ -2778,6 +2804,13 @@ int el_act2img(int element, int action)
   element = GFX_ELEMENT(element);
 
   return element_info[element].graphic[action];
+}
+
+int el_act2crm(int element, int action)
+{
+  element = GFX_ELEMENT(element);
+
+  return element_info[element].crumbled[action];
 }
 
 int el_dir2img(int element, int direction)

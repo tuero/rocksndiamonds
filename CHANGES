@@ -1,5 +1,7 @@
-Release Version 3.0.4 [?? ??? ????]
+Release Version 3.0.4 [13 SEP 2003]
 -----------------------------------
+	* fixed bug in multiple config pages code that caused crashes
+	* fixed bug in custom definition of crumbled element graphic
 
 Release Version 3.0.3 [08 SEP 2003]
 -----------------------------------
