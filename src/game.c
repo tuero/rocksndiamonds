@@ -9363,22 +9363,23 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       int old_jy = last_jy;
 
 #if 1
-      CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
-					CE_OTHER_GETS_LEFT,
-					player->index_bit, leave_side);
-
+      /* !!! TEST ONLY !!! */
       if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
 	CheckElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
 				 CE_LEFT_BY_PLAYER,
 				 player->index_bit, leave_side);
 
-      CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
-					CE_OTHER_GETS_ENTERED,
-					player->index_bit, enter_side);
+      CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+					CE_OTHER_GETS_LEFT,
+					player->index_bit, leave_side);
 
       if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
 	CheckElementChangePlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
 				 player->index_bit, enter_side);
+
+      CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
+					CE_OTHER_GETS_ENTERED,
+					player->index_bit, enter_side);
 #endif
 
     }
@@ -9517,11 +9518,20 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
       else
 	continue;		/* center and border element do not touch */
 
+#if 1
+      /* !!! TEST ONLY !!! */
+      CheckElementChangePlayer(xx, yy, border_element, CE_TOUCHED_BY_PLAYER,
+			       player->index_bit, border_side);
+      CheckTriggeredElementChangePlayer(xx, yy, border_element,
+					CE_OTHER_GETS_TOUCHED,
+					player->index_bit, border_side);
+#else
       CheckTriggeredElementChangePlayer(xx, yy, border_element,
 					CE_OTHER_GETS_TOUCHED,
 					player->index_bit, border_side);
       CheckElementChangePlayer(xx, yy, border_element, CE_TOUCHED_BY_PLAYER,
 			       player->index_bit, border_side);
+#endif
     }
     else if (IS_PLAYER(xx, yy))
     {
@@ -9533,11 +9543,20 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 	  continue;		/* center and border element do not touch */
       }
 
+#if 1
+      /* !!! TEST ONLY !!! */
+      CheckElementChangePlayer(x, y, center_element, CE_TOUCHED_BY_PLAYER,
+			       player->index_bit, center_side);
+      CheckTriggeredElementChangePlayer(x, y, center_element,
+					CE_OTHER_GETS_TOUCHED,
+					player->index_bit, center_side);
+#else
       CheckTriggeredElementChangePlayer(x, y, center_element,
 					CE_OTHER_GETS_TOUCHED,
 					player->index_bit, center_side);
       CheckElementChangePlayer(x, y, center_element, CE_TOUCHED_BY_PLAYER,
 			       player->index_bit, center_side);
+#endif
 
       break;
     }
@@ -10816,10 +10835,18 @@ int DigField(struct PlayerInfo *player,
 	else
 	  player->push_delay_value = -1;	/* get new value later */
 
+#if 1
+      /* !!! TEST ONLY !!! */
+	CheckElementChangePlayer(x, y, element, CE_PUSHED_BY_PLAYER,
+				 player->index_bit, dig_side);
+	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_PUSHED,
+					  player->index_bit, dig_side);
+#else
 	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_PUSHED,
 					  player->index_bit, dig_side);
 	CheckElementChangePlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				 player->index_bit, dig_side);
+#endif
 
 	break;
       }
@@ -10923,17 +10950,34 @@ int DigField(struct PlayerInfo *player,
 	  player->switch_x = x;
 	  player->switch_y = y;
 
+#if 1
+	  /* !!! TEST ONLY !!! */
+	  CheckElementChangePlayer(x, y, element, CE_SWITCHED,
+				   player->index_bit, dig_side);
+	  CheckTriggeredElementChangePlayer(x, y, element,
+					    CE_OTHER_IS_SWITCHING,
+					    player->index_bit, dig_side);
+#else
 	  CheckTriggeredElementChangePlayer(x, y, element,
 					    CE_OTHER_IS_SWITCHING,
 					    player->index_bit, dig_side);
 	  CheckElementChangePlayer(x, y, element, CE_SWITCHED,
 				   player->index_bit, dig_side);
+#endif
 	}
 
+#if 1
+	/* !!! TEST ONLY !!! */
+	CheckElementChangePlayer(x, y, element, CE_PRESSED_BY_PLAYER,
+				 player->index_bit, dig_side);
+	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_PRESSED,
+					  player->index_bit, dig_side);
+#else
 	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_PRESSED,
 					  player->index_bit, dig_side);
 	CheckElementChangePlayer(x, y, element, CE_PRESSED_BY_PLAYER,
 				 player->index_bit, dig_side);
+#endif
       }
 
       return MF_NO_ACTION;

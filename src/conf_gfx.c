@@ -3708,6 +3708,7 @@ struct ConfigInfo image_config[] =
   { "background.SCORES",			UNDEFINED_FILENAME	},
   { "background.EDITOR",			UNDEFINED_FILENAME	},
   { "background.INFO",				UNDEFINED_FILENAME	},
+  { "background.INFO[ELEMENTS]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
 
