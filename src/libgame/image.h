@@ -72,7 +72,8 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 #endif /* TARGET_X11 */
 
 
-void InitImageList(struct ArtworkConfigInfo *, int);
+void InitImageList(struct FileInfo *, int);
 void ReloadCustomImages();
+void FreeAllImages();
 
 #endif	/* IMAGE_H */

@@ -695,7 +695,7 @@ static void FreeImage(void *ptr)
   free(image);
 }
 
-void InitImageList(struct ArtworkConfigInfo *config_list, int num_list_entries)
+void InitImageList(struct FileInfo *file_list, int num_list_entries)
 {
   if (image_info == NULL)
     image_info = checked_calloc(sizeof(struct ArtworkListInfo));
@@ -706,8 +706,8 @@ void InitImageList(struct ArtworkConfigInfo *config_list, int num_list_entries)
 
   image_info->type = ARTWORK_TYPE_GRAPHICS;
   image_info->num_list_entries = num_list_entries;
-  image_info->config_list = config_list;
-  image_info->file_list = NULL;
+  image_info->file_list = file_list;
+  image_info->content_list = NULL;
   image_info->load_artwork = Load_PCX;
   image_info->free_artwork = FreeImage;
 }
@@ -719,4 +719,9 @@ void ReloadCustomImages()
 #endif
 
   ReloadCustomArtworkList(image_info);
+}
+
+void FreeAllImages()
+{
+  FreeCustomArtworkList(image_info);
 }

@@ -49,8 +49,10 @@ CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
+DEFAULT_TARGET = sdl
+
 all:
-	@$(MAKE_CMD) TARGET=x11
+	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET)
 
 x11:
 	@$(MAKE_CMD) TARGET=x11
@@ -85,7 +87,7 @@ clean:
 #-----------------------------------------------------------------------------#
 
 run:
-	@$(MAKE_CMD) TARGET=x11 && ./rocksndiamonds --verbose
+	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && ./rocksndiamonds --verbose
 
 backup:
 	./Scripts/make_backup.sh src

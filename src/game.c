@@ -153,7 +153,7 @@ static struct
   { NULL,		0,			0 },
 };
 static int element_action_sound[NUM_LEVEL_ELEMENTS][NUM_SND_ACTIONS];
-static boolean is_loop_sound[NUM_SOUND_CONFIG_ENTRIES];
+static boolean is_loop_sound[NUM_SOUND_FILES];
 
 #define IS_LOOP_SOUND(x)	(is_loop_sound[x])
 
@@ -507,7 +507,7 @@ void DrawGameDoorValues()
 
 void InitGameSound()
 {
-  int sound_effect_properties[NUM_SOUND_CONFIG_ENTRIES];
+  int sound_effect_properties[NUM_SOUND_FILES];
   int i, j;
 
 #if 0
@@ -518,22 +518,21 @@ void InitGameSound()
     for (j=0; j<NUM_LEVEL_ELEMENTS; j++)
       element_action_sound[j][i] = -1;
 
-  for (i=0; i<NUM_SOUND_CONFIG_ENTRIES; i++)
+  for (i=0; i<NUM_SOUND_FILES; i++)
   {
-    int len_effect_text = strlen(sound_config[i].token);
+    int len_effect_text = strlen(sound_files[i].token);
 
     sound_effect_properties[i] = SND_ACTION_UNKNOWN;
     is_loop_sound[i] = FALSE;
 
     /* determine all loop sounds and identify certain sound classes */
 
-    j = 0;
-    while (sound_action_properties[j].text)
+    for (j=0; sound_action_properties[j].text; j++)
     {
       int len_action_text = strlen(sound_action_properties[j].text);
 
       if (len_action_text < len_effect_text &&
-	  strcmp(&sound_config[i].token[len_effect_text - len_action_text],
+	  strcmp(&sound_files[i].token[len_effect_text - len_action_text],
 		 sound_action_properties[j].text) == 0)
       {
 	sound_effect_properties[i] = sound_action_properties[j].value;
@@ -541,8 +540,6 @@ void InitGameSound()
 	if (sound_action_properties[j].is_loop)
 	  is_loop_sound[i] = TRUE;
       }
-
-      j++;
     }
 
     /* associate elements and some selected sound actions */
@@ -554,9 +551,9 @@ void InitGameSound()
 	int len_class_text = strlen(element_info[j].sound_class_name);
 
 	if (len_class_text + 1 < len_effect_text &&
-	    strncmp(sound_config[i].token,
+	    strncmp(sound_files[i].token,
 		    element_info[j].sound_class_name, len_class_text) == 0 &&
-	    sound_config[i].token[len_class_text] == '.')
+	    sound_files[i].token[len_class_text] == '.')
 	{
 	  int sound_action_value = sound_effect_properties[i];
 
@@ -6482,8 +6479,8 @@ boolean PlaceBomb(struct PlayerInfo *player)
 
 void PlaySoundLevel(int x, int y, int nr)
 {
-  static int loop_sound_frame[NUM_SOUND_CONFIG_ENTRIES];
-  static int loop_sound_volume[NUM_SOUND_CONFIG_ENTRIES];
+  static int loop_sound_frame[NUM_SOUND_FILES];
+  static int loop_sound_volume[NUM_SOUND_FILES];
   int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo_position;
   int max_distance = 8;

@@ -1721,7 +1721,7 @@ static void *Load_WAV(char *filename)
   return snd_info;
 }
 
-void InitSoundList(struct ArtworkConfigInfo *config_list, int num_list_entries)
+void InitSoundList(struct FileInfo *file_list, int num_list_entries)
 {
   if (sound_info == NULL)
     sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
@@ -1732,8 +1732,8 @@ void InitSoundList(struct ArtworkConfigInfo *config_list, int num_list_entries)
 
   sound_info->type = ARTWORK_TYPE_SOUNDS;
   sound_info->num_list_entries = num_list_entries;
-  sound_info->config_list = config_list;
-  sound_info->file_list = NULL;
+  sound_info->file_list = file_list;
+  sound_info->content_list = NULL;
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;
 

@@ -436,7 +436,13 @@ struct ArtworkInfo
   char *mus_current_identifier;
 };
 
-struct ArtworkConfigInfo
+struct ConfigInfo
+{
+  char *token;
+  char *value;
+};
+
+struct FileInfo
 {
   char *token;
   char *default_filename;
@@ -444,9 +450,9 @@ struct ArtworkConfigInfo
   char *filename;
 };
 
-struct ArtworkListNodeInfo
+struct ListNodeInfo
 {
-  char *source_filename;
+  char *source_filename;			/* primary key for node list */
   int num_references;
 };
 
@@ -454,9 +460,9 @@ struct ArtworkListInfo
 {
   int type;					/* type of artwork */
   int num_list_entries;
-  struct ArtworkConfigInfo *config_list;	/* static config list */
-  struct ArtworkListNodeInfo **artwork_list;	/* static artwork list */
-  ListNode *file_list;				/* dynamic artwork list */
+  struct FileInfo *file_list;			/* static artwork file list */
+  struct ListNodeInfo **artwork_list;		/* static artwork list */
+  struct ListNode *content_list;		/* dynamic artwork list */
   void *(*load_artwork)(char *);		/* constructor function */
   void (*free_artwork)(void *);			/* destructor function */
 };

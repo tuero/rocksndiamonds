@@ -136,7 +136,7 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
-struct ArtworkConfigInfo image_config[] =
+struct ConfigInfo image_config[] =
 {
   /* graphics for Boulder Dash style elements and actions */
   { "bd_diamond",			"bd_diamond.pcx"	},
@@ -145,9 +145,11 @@ struct ArtworkConfigInfo image_config[] =
   { "robot_wheel",			"bd_diamond.pcx"	},
   { "robot_wheel.frame_xpos",		"0"			},
   { "robot_wheel.num_frames",		"4"			},
+
+  { NULL,				NULL			},
 };
 
-struct ArtworkConfigInfo sound_config[] =
+struct ConfigInfo sound_config[] =
 {
   /* sounds for Boulder Dash style elements and actions */
   { "bd_empty_space.digging",		"empty.wav"		},
@@ -362,7 +364,12 @@ struct ArtworkConfigInfo sound_config[] =
   { "[not used]",			"whoosh.wav"		},
   { "[not used]",			"boom.wav"		},
 #endif
+
+  { NULL,				NULL			},
 };
+
+struct FileInfo *image_files;
+struct FileInfo *sound_files;
 
 struct ElementInfo element_info[MAX_ELEMENTS] =
 {

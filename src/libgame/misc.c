@@ -1285,7 +1285,7 @@ void dumpList(ListNode *node_first)
   while (node)
   {
     printf("['%s' (%d)]\n", node->key,
-	   ((struct ArtworkListNodeInfo *)node->content)->num_references);
+	   ((struct ListNodeInfo *)node->content)->num_references);
     node = node->next;
   }
 
@@ -1348,10 +1348,55 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ========================================================================= */
 
+struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
+					   char *suffix_list[],
+					   int num_list_entries)
+{
+  struct FileInfo *file_list =
+    checked_calloc(num_list_entries * sizeof(struct FileInfo));
+  int list_pos = 0;
+  int i, j;
+
+  for (i=0; config_list[i].token != NULL; i++)
+  {
+    int len_config_token = strlen(config_list[i].token);
+    boolean is_file_entry = TRUE;
+
+    for (j=0; suffix_list[j] != NULL; j++)
+    {
+      int len_suffix = strlen(suffix_list[j]);
+
+      if (len_suffix < len_config_token &&
+	  strcmp(&config_list[i].token[len_config_token - len_suffix],
+		 suffix_list[j]) == 0)
+      {
+	is_file_entry = FALSE;
+	break;
+      }
+    }
+
+    if (is_file_entry)
+    {
+      if (list_pos >= num_list_entries)
+	Error(ERR_EXIT, "inconsistant config list information -- please fix");
+
+      file_list[list_pos].token = config_list[i].token;
+      file_list[list_pos].default_filename = config_list[i].value;
+
+      list_pos++;
+    }
+  }
+
+  if (list_pos != num_list_entries)
+    Error(ERR_EXIT, "inconsistant config list information -- please fix");
+
+  return file_list;
+}
+
 static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   int num_list_entries = artwork_info->num_list_entries;
-  struct ArtworkConfigInfo *config_list = artwork_info->config_list;
+  struct FileInfo *file_list = artwork_info->file_list;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
   int i;
@@ -1362,7 +1407,7 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   /* always start with reliable default values */
   for (i=0; i<num_list_entries; i++)
-    config_list[i].filename = NULL;
+    file_list[i].filename = NULL;
 
   if (filename == NULL)
     return;
@@ -1370,26 +1415,26 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if ((setup_file_list = loadSetupFileList(filename)))
   {
     for (i=0; i<num_list_entries; i++)
-      config_list[i].filename =
-	getStringCopy(getTokenValue(setup_file_list, config_list[i].token));
+      file_list[i].filename =
+	getStringCopy(getTokenValue(setup_file_list, file_list[i].token));
 
     freeSetupFileList(setup_file_list);
 
 #if 0
     for (i=0; i<num_list_entries; i++)
     {
-      printf("'%s' ", config_list[i].token);
-      if (config_list[i].filename)
-	printf("-> '%s'\n", config_list[i].filename);
+      printf("'%s' ", file_list[i].token);
+      if (file_list[i].filename)
+	printf("-> '%s'\n", file_list[i].filename);
       else
-	printf("-> UNDEFINED [-> '%s']\n", config_list[i].default_filename);
+	printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
     }
 #endif
   }
 }
 
-void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
-			    struct ArtworkListNodeInfo **listnode)
+static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
+				   struct ListNodeInfo **listnode)
 {
   if (*listnode)
   {
@@ -1405,7 +1450,7 @@ void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
       printf("[deleting artwork '%s']\n", filename);
 #endif
 
-      deleteNodeFromList(&artwork_info->file_list, filename,
+      deleteNodeFromList(&artwork_info->content_list, filename,
 			 artwork_info->free_artwork);
     }
 
@@ -1414,7 +1459,7 @@ void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
 }
 
 static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
-				    struct ArtworkListNodeInfo **listnode,
+				    struct ListNodeInfo **listnode,
 				    char *filename)
 {
   ListNode *node;
@@ -1437,25 +1482,25 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   deleteArtworkListEntry(artwork_info, listnode);
 
   /* check if the new artwork file already exists in the list of artworks */
-  if ((node = getNodeFromKey(artwork_info->file_list, filename)) != NULL)
+  if ((node = getNodeFromKey(artwork_info->content_list, filename)) != NULL)
   {
 #if 0
       printf("[artwork '%s' already exists (other list entry)]\n", filename);
 #endif
 
-      *listnode = (struct ArtworkListNodeInfo *)node->content;
+      *listnode = (struct ListNodeInfo *)node->content;
       (*listnode)->num_references++;
   }
   else if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {
     (*listnode)->num_references = 1;
-    addNodeToList(&artwork_info->file_list, (*listnode)->source_filename,
+    addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
 		  *listnode);
   }
 }
 
 static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
-			      struct ArtworkListNodeInfo **listnode,
+			      struct ListNodeInfo **listnode,
 			      char *basename)
 {
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
@@ -1479,8 +1524,8 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   replaceArtworkListEntry(artwork_info, listnode, filename);
 }
 
-void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
-		       char *basename, int list_pos)
+static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+			      char *basename, int list_pos)
 {
   if (artwork_info->artwork_list == NULL ||
       list_pos >= artwork_info->num_list_entries)
@@ -1488,7 +1533,7 @@ void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 
 #if 0
   printf("loading artwork '%s' ...  [%d]\n",
-	 basename, getNumNodes(artwork_info->file_list));
+	 basename, getNumNodes(artwork_info->content_list));
 #endif
 
   LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
@@ -1496,7 +1541,7 @@ void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 
 #if 0
   printf("loading artwork '%s' done [%d]\n",
-	 basename, getNumNodes(artwork_info->file_list));
+	 basename, getNumNodes(artwork_info->content_list));
 #endif
 }
 
@@ -1516,7 +1561,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   };
 
   int num_list_entries = artwork_info->num_list_entries;
-  struct ArtworkConfigInfo *config_list = artwork_info->config_list;
+  struct FileInfo *file_list = artwork_info->file_list;
   int i;
 
   LoadArtworkConfig(artwork_info);
@@ -1531,22 +1576,22 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   for(i=0; i<num_list_entries; i++)
   {
     if (draw_init[artwork_info->type].do_it)
-      DrawInitText(config_list[i].token, 150, FC_YELLOW);
+      DrawInitText(file_list[i].token, 150, FC_YELLOW);
 
-    if (config_list[i].filename)
-      LoadArtworkToList(artwork_info, config_list[i].filename, i);
+    if (file_list[i].filename)
+      LoadArtworkToList(artwork_info, file_list[i].filename, i);
     else
-      LoadArtworkToList(artwork_info, config_list[i].default_filename, i);
+      LoadArtworkToList(artwork_info, file_list[i].default_filename, i);
   }
 
   draw_init[artwork_info->type].do_it = FALSE;
 
   /*
-  printf("list size == %d\n", getNumNodes(artwork_info->file_list));
+  printf("list size == %d\n", getNumNodes(artwork_info->content_list));
   */
 
 #if 0
-  dumpList(artwork_info->file_list);
+  dumpList(artwork_info->content_list);
 #endif
 }
 

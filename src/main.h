@@ -415,7 +415,8 @@ extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
 extern struct GraphicInfo	graphic_info[];
-extern struct ArtworkConfigInfo	image_config[], sound_config[];
+extern struct ConfigInfo	image_config[], sound_config[];
+extern struct FileInfo	       *image_files, *sound_files;
 
 /* often used screen positions */
 #define SX			8
@@ -1460,8 +1461,9 @@ extern struct ArtworkConfigInfo	image_config[], sound_config[];
 
 /* values for image configuration */
 #define GFX_BD_DIAMOND				0
+#define GFX_ROBOT_WHEEL				1
 
-#define NUM_IMAGE_CONFIG_ENTRIES		1
+#define NUM_IMAGE_FILES				2
 
 
 /* values for sound configuration */
@@ -1635,7 +1637,7 @@ extern struct ArtworkConfigInfo	image_config[], sound_config[];
 #define SND_MENU_HALL_OF_FAME			167
 #define SND_MENU_INFO_SCREEN			168
 
-#define NUM_SOUND_CONFIG_ENTRIES		169
+#define NUM_SOUND_FILES				169
 
 
 /* values for game_status */

@@ -175,7 +175,18 @@ void InitNetworkServer()
 
 static void InitImages()
 {
-  InitImageList(image_config, NUM_IMAGE_CONFIG_ENTRIES);
+  static char *suffix_list[] =
+  {
+    ".frame_xpos",
+    ".frame_ypos",
+    ".num_frames",
+    NULL
+  };
+
+  image_files =
+    getFileListFromConfigList(image_config, suffix_list, NUM_IMAGE_FILES);
+
+  InitImageList(image_files, NUM_IMAGE_FILES);
 
   /* load custom images */
   ReloadCustomImages();
@@ -184,8 +195,17 @@ static void InitImages()
 
 static void InitMixer()
 {
+  static char *suffix_list[] =
+  {
+    NULL
+  };
+
   OpenAudio();
-  InitSoundList(sound_config, NUM_SOUND_CONFIG_ENTRIES);
+
+  sound_files =
+    getFileListFromConfigList(sound_config, suffix_list, NUM_SOUND_FILES);
+
+  InitSoundList(sound_files, NUM_SOUND_FILES);
 
   StartMixer();
 }
@@ -2069,10 +2089,10 @@ void Execute_Debug_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; i<NUM_IMAGE_CONFIG_ENTRIES; i++)
+    for (i=0; image_config[i].token != NULL; i++)
       printf("# %s\n",
 	     getFormattedSetupEntry(image_config[i].token,
-				    image_config[i].default_filename));
+				    image_config[i].value));
   }
   else if (strcmp(command, "create soundsinfo.conf") == 0)
   {
@@ -2086,10 +2106,10 @@ void Execute_Debug_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; i<NUM_SOUND_CONFIG_ENTRIES; i++)
+    for (i=0; sound_config[i].token != NULL; i++)
       printf("# %s\n",
 	     getFormattedSetupEntry(sound_config[i].token,
-				    sound_config[i].default_filename));
+				    sound_config[i].value));
   }
   else if (strcmp(command, "create musicinfo.conf") == 0)
   {
@@ -2116,6 +2136,8 @@ void CloseAllAndExit(int exit_value)
   FreeAllSounds();
   FreeAllMusic();
   CloseAudio();		/* called after freeing sounds (needed for SDL) */
+
+  FreeAllImages();
 
   FreeTileClipmasks();
   for(i=0; i<NUM_BITMAPS; i++)

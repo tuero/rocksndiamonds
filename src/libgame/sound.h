@@ -14,7 +14,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include "platform.h"
+#include "system.h"
 
 
 #if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
@@ -139,7 +139,7 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
-void InitSoundList(struct ArtworkConfigInfo *, int);
+void InitSoundList(struct FileInfo *, int);
 void InitReloadSounds(char *);
 void InitReloadMusic(char *);
 void FreeAllSounds(void);
