@@ -134,7 +134,10 @@ void SoundServer()
       long sample_size;
       static long max_sample_size = 0;
       static long fragment_size = 0;
-      boolean stereo;
+      /* Even if the stereo flag is used as being boolean, it must be
+	 defined as an integer, else 'ioctl()' will fail! */
+      int stereo = TRUE;
+      int sample_rate = 8000;
 
       if (playing_sounds || (sound_device=open(sound_device_name,O_WRONLY))>=0)
       {
@@ -143,12 +146,35 @@ void SoundServer()
 	  /* 2 buffers / 512 bytes, giving 1/16 second resolution */
 	  /* (with stereo the effective buffer size will shrink to 256) */
 	  fragment_size = 0x00020009;
-	  ioctl(sound_device, SNDCTL_DSP_SETFRAGMENT, &fragment_size);
+
+	  if (ioctl(sound_device, SNDCTL_DSP_SETFRAGMENT, &fragment_size) < 0)
+	    Error(ERR_EXIT_SOUND_SERVER,
+		  "cannot set fragment size of /dev/dsp - no sounds");
+
 	  /* try if we can use stereo sound */
-	  stereo = TRUE;
-	  ioctl(sound_device, SNDCTL_DSP_STEREO, &stereo);
+	  if (ioctl(sound_device, SNDCTL_DSP_STEREO, &stereo) < 0)
+	  {
+#ifdef DEBUG
+	    static boolean reported = FALSE;
+
+	    if (!reported)
+	    {
+	      Error(ERR_RETURN, "cannot get stereo sound on /dev/dsp");
+	      reported = TRUE;
+	    }
+#endif
+	    stereo = FALSE;
+	  }
+
+	  if (ioctl(sound_device, SNDCTL_DSP_SPEED, &sample_rate) < 0)
+	    Error(ERR_EXIT_SOUND_SERVER,
+		  "cannot set sample rate of /dev/dsp - no sounds");
+
 	  /* get the real fragmentation size; this should return 512 */
-	  ioctl(sound_device, SNDCTL_DSP_GETBLKSIZE, &fragment_size);
+	  if (ioctl(sound_device, SNDCTL_DSP_GETBLKSIZE, &fragment_size) < 0)
+	    Error(ERR_EXIT_SOUND_SERVER,
+		  "cannot get fragment size of /dev/dsp - no sounds");
+
 	  max_sample_size = fragment_size / (stereo ? 2 : 1);
 	}
 

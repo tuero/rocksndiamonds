@@ -58,6 +58,8 @@ void DrawMainMenu()
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
+  UnmapAllGadgets();
+  FadeSounds();
   XAutoRepeatOn(display);
 
   /* needed if last screen was the playing screen, invoked from level editor */
@@ -68,11 +70,9 @@ void DrawMainMenu()
     return;
   }
 
-  /* unmap gadgets from last screen, map gadgets for main menu screen */
-  UnmapAllGadgets();
+  /* map gadgets for main menu screen */
   MapTapeButtons();
 
-  FadeSounds();
   GetPlayerConfig();
   LoadLevel(level_nr);
 

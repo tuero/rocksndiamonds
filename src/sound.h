@@ -22,8 +22,14 @@
 #ifndef VOXWARE
 #define VOXWARE
 #endif
+
+#if 0
 /* where is the right declaration for 'ioctl'? */
 extern void ioctl(long, long, void *);
+#else
+#include <sys/ioctl.h>
+#endif
+
 #endif
 
 #ifdef __FreeBSD__
