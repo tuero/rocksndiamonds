@@ -43,6 +43,7 @@ extern boolean wait_for_vsync;
 #define NUM_TOOL_BUTTONS	7
 
 /* forward declaration for internal use */
+static int getGraphicAnimationPhase(int, int, int);
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
 
@@ -479,7 +480,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (last_jx != jx || last_jy != jy)
   {
-    if (Store[last_jx][last_jy])
+    if (Store[last_jx][last_jy] && IS_DRAWABLE(Feld[last_jx][last_jy]))
     {
       DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
       DrawLevelFieldThruMask(last_jx, last_jy);
@@ -520,30 +521,12 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (game_emulation == EMU_SUPAPLEX)
   {
-#if 0
-    if (player->MovDir == MV_LEFT)
-      graphic =
-	(player->Pushing ? GFX_MURPHY_PUSH_LEFT : GFX_MURPHY_LEFT);
-    else if (player->MovDir == MV_RIGHT)
-      graphic =
-	(player->Pushing ? GFX_MURPHY_PUSH_RIGHT : GFX_MURPHY_RIGHT);
-    else if (player->MovDir == MV_UP)
-      graphic = GFX_MURPHY_UP;
-    else if (player->MovDir == MV_DOWN)
-      graphic = GFX_MURPHY_DOWN;
-    else	/* MV_NO_MOVING */
-      graphic = GFX_SP_MURPHY;
-
-
-    /*
-    if (player->snapped)
-      graphic = GFX_SPIELER1_PUSH_LEFT;
-    else
-      graphic = GFX_SPIELER1_PUSH_RIGHT;
-    */
-#endif
-
     static int last_dir = MV_LEFT;
+    boolean action_moving =
+      ((player->action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
+       !(player->action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)));
+
+    graphic = GFX_SP_MURPHY;
 
     if (player->Pushing)
     {
@@ -551,12 +534,10 @@ void DrawPlayer(struct PlayerInfo *player)
 	graphic = GFX_MURPHY_PUSH_LEFT;
       else if (player->MovDir == MV_RIGHT)
 	graphic = GFX_MURPHY_PUSH_RIGHT;
-      else if (last_dir == MV_LEFT)
-	graphic = GFX_MURPHY_ANY_LEFT;
-      else if (last_dir == MV_RIGHT)
-	graphic = GFX_MURPHY_ANY_RIGHT;
-      else
-	graphic = GFX_SP_MURPHY;
+      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
+	graphic = GFX_MURPHY_PUSH_LEFT;
+      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
+	graphic = GFX_MURPHY_PUSH_RIGHT;
     }
     else if (player->snapped)
     {
@@ -568,28 +549,23 @@ void DrawPlayer(struct PlayerInfo *player)
 	graphic = GFX_MURPHY_SNAP_UP;
       else if (player->MovDir == MV_DOWN)
 	graphic = GFX_MURPHY_SNAP_DOWN;
-      else
-	graphic = GFX_SP_MURPHY;
     }
-    else
+    else if (action_moving)
     {
       if (player->MovDir == MV_LEFT)
 	graphic = GFX_MURPHY_ANY_LEFT;
       else if (player->MovDir == MV_RIGHT)
 	graphic = GFX_MURPHY_ANY_RIGHT;
-      else if (last_dir == MV_LEFT)
+      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
 	graphic = GFX_MURPHY_ANY_LEFT;
-      else if (last_dir == MV_RIGHT)
+      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
 	graphic = GFX_MURPHY_ANY_RIGHT;
-      else
-	graphic = GFX_SP_MURPHY;
+
+      graphic -= getGraphicAnimationPhase(2, 4, ANIM_NORMAL);
     }
 
     if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
       last_dir = player->MovDir;
-
-    if (!player->Pushing && !player->snapped && player->MovDir != MV_NO_MOVING)
-      graphic -= player->Frame % 2;
   }
   else
   {
@@ -875,6 +851,9 @@ void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
   int src_x, src_y;
   Pixmap src_pixmap;
   GC drawing_gc;
+
+  if (graphic == GFX_LEERRAUM)
+    return;
 
   getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
   src_pixmap = pix[pixmap_nr];
