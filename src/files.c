@@ -22,8 +22,6 @@
 #include "tape.h"
 #include "joystick.h"
 
-#define MAX_FILENAME_LEN	256	/* maximal filename length    */
-#define MAX_LINE_LEN		1000	/* maximal input line length  */
 #define CHUNK_ID_LEN		4	/* IFF style chunk id length  */
 #define CHUNK_SIZE_UNDEFINED	0	/* undefined chunk size == 0  */
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
@@ -172,11 +170,6 @@ char *getLevelClassDescription(struct LevelDirInfo *ldi)
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
 
-static char *getSetupDir()
-{
-  return getUserDataDir();
-}
-
 static char *getUserLevelDir(char *level_subdir)
 {
   static char *userlevel_dir = NULL;
@@ -293,24 +286,24 @@ static char *getScoreFilename(int nr)
 
 static void InitTapeDirectory(char *level_subdir)
 {
-  createDirectory(getUserDataDir(), "user data");
-  createDirectory(getTapeDir(""), "main tape");
-  createDirectory(getTapeDir(level_subdir), "level tape");
+  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+  createDirectory(getTapeDir(""), "main tape", PERMS_PRIVATE);
+  createDirectory(getTapeDir(level_subdir), "level tape", PERMS_PRIVATE);
 }
 
 static void InitScoreDirectory(char *level_subdir)
 {
-  createDirectory(getScoreDir(""), "main score");
-  createDirectory(getScoreDir(level_subdir), "level score");
+  createDirectory(getScoreDir(""), "main score", PERMS_PUBLIC);
+  createDirectory(getScoreDir(level_subdir), "level score", PERMS_PUBLIC);
 }
 
 static void InitUserLevelDirectory(char *level_subdir)
 {
   if (access(getUserLevelDir(level_subdir), F_OK) != 0)
   {
-    createDirectory(getUserDataDir(), "user data");
-    createDirectory(getUserLevelDir(""), "main user level");
-    createDirectory(getUserLevelDir(level_subdir), "user level");
+    createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+    createDirectory(getUserLevelDir(""), "main user level", PERMS_PRIVATE);
+    createDirectory(getUserLevelDir(level_subdir), "user level",PERMS_PRIVATE);
 
     SaveUserLevelInfo();
   }
@@ -318,21 +311,9 @@ static void InitUserLevelDirectory(char *level_subdir)
 
 static void InitLevelSetupDirectory(char *level_subdir)
 {
-  createDirectory(getUserDataDir(), "user data");
-  createDirectory(getLevelSetupDir(""), "main level setup");
-  createDirectory(getLevelSetupDir(level_subdir), "level setup");
-}
-
-static void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
-{
-  while (bytes--)
-    fgetc(file);
-}
-
-static void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
-{
-  while (bytes--)
-    fputc(0, file);
+  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+  createDirectory(getLevelSetupDir(""), "main level setup", PERMS_PRIVATE);
+  createDirectory(getLevelSetupDir(level_subdir), "level setup",PERMS_PRIVATE);
 }
 
 static void ReadChunk_VERS(FILE *file, int *file_version, int *game_version)
@@ -377,53 +358,6 @@ static void WriteChunk_VERS(FILE *file, int file_version, int game_version)
   fputc(game_version_minor, file);
   fputc(game_version_patch, file);
   fputc(0, file);	/* not used */
-}
-
-static int getFileVersionFromCookieString(const char *cookie)
-{
-  const char *ptr_cookie1, *ptr_cookie2;
-  const char *pattern1 = "_FILE_VERSION_";
-  const char *pattern2 = "?.?";
-  const int len_cookie = strlen(cookie);
-  const int len_pattern1 = strlen(pattern1);
-  const int len_pattern2 = strlen(pattern2);
-  const int len_pattern = len_pattern1 + len_pattern2;
-  int version_major, version_minor;
-
-  if (len_cookie <= len_pattern)
-    return -1;
-
-  ptr_cookie1 = &cookie[len_cookie - len_pattern];
-  ptr_cookie2 = &cookie[len_cookie - len_pattern2];
-
-  if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
-    return -1;
-
-  if (ptr_cookie2[0] < '0' || ptr_cookie2[0] > '9' ||
-      ptr_cookie2[1] != '.' ||
-      ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
-    return -1;
-
-  version_major = ptr_cookie2[0] - '0';
-  version_minor = ptr_cookie2[2] - '0';
-
-  return VERSION_IDENT(version_major, version_minor, 0);
-}
-
-boolean checkCookieString(const char *cookie, const char *template)
-{
-  const char *pattern = "_FILE_VERSION_?.?";
-  const int len_cookie = strlen(cookie);
-  const int len_template = strlen(template);
-  const int len_pattern = strlen(pattern);
-
-  if (len_cookie != len_template)
-    return FALSE;
-
-  if (strncmp(cookie, template, len_cookie - len_pattern) != 0)
-    return FALSE;
-
-  return TRUE;
 }
 
 static void setLevelInfoToDefaults()
@@ -901,8 +835,8 @@ static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
 {
   int x, y;
 
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++) 
+  for(y=0; y<level->fieldy; y++) 
+    for(x=0; x<level->fieldx; x++) 
       if (level->encoding_16bit_field)
 	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
       else
@@ -974,13 +908,16 @@ void SaveLevel(int level_nr)
     return;
   }
 
+
   /* check level field for 16-bit elements */
+  level.encoding_16bit_field = FALSE;
   for(y=0; y<level.fieldy; y++) 
     for(x=0; x<level.fieldx; x++) 
       if (Ur[x][y] > 255)
 	level.encoding_16bit_field = TRUE;
 
   /* check yamyam content for 16-bit elements */
+  level.encoding_16bit_yamyam = FALSE;
   for(i=0; i<level.num_yam_contents; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
@@ -988,6 +925,7 @@ void SaveLevel(int level_nr)
 	  level.encoding_16bit_yamyam = TRUE;
 
   /* check amoeba content for 16-bit elements */
+  level.encoding_16bit_amoeba = FALSE;
   if (level.amoeba_content > 255)
     level.encoding_16bit_amoeba = TRUE;
 
@@ -1024,7 +962,7 @@ void SaveLevel(int level_nr)
 
   fclose(file);
 
-  SetFilePermissions_Level(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
 static void setTapeInfoToDefaults()
@@ -1370,7 +1308,7 @@ void SaveTape(int level_nr)
 
   fclose(file);
 
-  SetFilePermissions_Tape(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 
   tape.changed = FALSE;
 
@@ -1496,16 +1434,17 @@ void SaveScore(int level_nr)
 
   fclose(file);
 
-  SetFilePermissions_Score(filename);
+  SetFilePermissions(filename, PERMS_PUBLIC);
 }
 
-#define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
+/* ------------------------------------------------------------------------- */
+/* setup file stuff                                                          */
+/* ------------------------------------------------------------------------- */
+
 #define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
 #define TOKEN_STR_LAST_PLAYED_LEVEL	"last_played_level"
 #define TOKEN_STR_HANDICAP_LEVEL	"handicap_level"
 #define TOKEN_STR_PLAYER_PREFIX		"player_"
-
-#define TOKEN_VALUE_POSITION		30
 
 /* global setup */
 #define SETUP_TOKEN_PLAYER_NAME		0
@@ -1561,12 +1500,6 @@ void SaveScore(int level_nr)
 
 #define FIRST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_NAME
 #define LAST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_READONLY
-
-#define TYPE_BOOLEAN			1
-#define TYPE_SWITCH			2
-#define TYPE_KEY			3
-#define TYPE_INTEGER			4
-#define TYPE_STRING			5
 
 static struct SetupInfo si;
 static struct SetupInputInfo sii;
@@ -1624,261 +1557,6 @@ static struct
   { TYPE_BOOLEAN, &ldi.level_group,	"level_group"			},
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"			}
 };
-
-static char *string_tolower(char *s)
-{
-  static char s_lower[100];
-  int i;
-
-  if (strlen(s) >= 100)
-    return s;
-
-  strcpy(s_lower, s);
-
-  for (i=0; i<strlen(s_lower); i++)
-    s_lower[i] = tolower(s_lower[i]);
-
-  return s_lower;
-}
-
-static int get_string_integer_value(char *s)
-{
-  static char *number_text[][3] =
-  {
-    { "0", "zero", "null", },
-    { "1", "one", "first" },
-    { "2", "two", "second" },
-    { "3", "three", "third" },
-    { "4", "four", "fourth" },
-    { "5", "five", "fifth" },
-    { "6", "six", "sixth" },
-    { "7", "seven", "seventh" },
-    { "8", "eight", "eighth" },
-    { "9", "nine", "ninth" },
-    { "10", "ten", "tenth" },
-    { "11", "eleven", "eleventh" },
-    { "12", "twelve", "twelfth" },
-  };
-
-  int i, j;
-
-  for (i=0; i<13; i++)
-    for (j=0; j<3; j++)
-      if (strcmp(string_tolower(s), number_text[i][j]) == 0)
-	return i;
-
-  return atoi(s);
-}
-
-static boolean get_string_boolean_value(char *s)
-{
-  if (strcmp(string_tolower(s), "true") == 0 ||
-      strcmp(string_tolower(s), "yes") == 0 ||
-      strcmp(string_tolower(s), "on") == 0 ||
-      get_string_integer_value(s) == 1)
-    return TRUE;
-  else
-    return FALSE;
-}
-
-static char *getFormattedSetupEntry(char *token, char *value)
-{
-  int i;
-  static char entry[MAX_LINE_LEN];
-
-  sprintf(entry, "%s:", token);
-  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
-    entry[i] = ' ';
-  entry[i] = '\0';
-
-  strcat(entry, value);
-
-  return entry;
-}
-
-static void freeSetupFileList(struct SetupFileList *setup_file_list)
-{
-  if (!setup_file_list)
-    return;
-
-  if (setup_file_list->token)
-    free(setup_file_list->token);
-  if (setup_file_list->value)
-    free(setup_file_list->value);
-  if (setup_file_list->next)
-    freeSetupFileList(setup_file_list->next);
-  free(setup_file_list);
-}
-
-static struct SetupFileList *newSetupFileList(char *token, char *value)
-{
-  struct SetupFileList *new = checked_malloc(sizeof(struct SetupFileList));
-
-  new->token = checked_malloc(strlen(token) + 1);
-  strcpy(new->token, token);
-
-  new->value = checked_malloc(strlen(value) + 1);
-  strcpy(new->value, value);
-
-  new->next = NULL;
-
-  return new;
-}
-
-static char *getTokenValue(struct SetupFileList *setup_file_list,
-			   char *token)
-{
-  if (!setup_file_list)
-    return NULL;
-
-  if (strcmp(setup_file_list->token, token) == 0)
-    return setup_file_list->value;
-  else
-    return getTokenValue(setup_file_list->next, token);
-}
-
-static void setTokenValue(struct SetupFileList *setup_file_list,
-			  char *token, char *value)
-{
-  if (!setup_file_list)
-    return;
-
-  if (strcmp(setup_file_list->token, token) == 0)
-  {
-    free(setup_file_list->value);
-    setup_file_list->value = checked_malloc(strlen(value) + 1);
-    strcpy(setup_file_list->value, value);
-  }
-  else if (setup_file_list->next == NULL)
-    setup_file_list->next = newSetupFileList(token, value);
-  else
-    setTokenValue(setup_file_list->next, token, value);
-}
-
-#ifdef DEBUG
-static void printSetupFileList(struct SetupFileList *setup_file_list)
-{
-  if (!setup_file_list)
-    return;
-
-  printf("token: '%s'\n", setup_file_list->token);
-  printf("value: '%s'\n", setup_file_list->value);
-
-  printSetupFileList(setup_file_list->next);
-}
-#endif
-
-static struct SetupFileList *loadSetupFileList(char *filename)
-{
-  int line_len;
-  char line[MAX_LINE_LEN];
-  char *token, *value, *line_ptr;
-  struct SetupFileList *setup_file_list = newSetupFileList("", "");
-  struct SetupFileList *first_valid_list_entry;
-
-  FILE *file;
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
-    return NULL;
-  }
-
-  while(!feof(file))
-  {
-    /* read next line of input file */
-    if (!fgets(line, MAX_LINE_LEN, file))
-      break;
-
-    /* cut trailing comment or whitespace from input line */
-    for (line_ptr = line; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == '#' || *line_ptr == '\n' || *line_ptr == '\r')
-      {
-	*line_ptr = '\0';
-	break;
-      }
-    }
-
-    /* cut trailing whitespaces from input line */
-    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
-      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
-	*line_ptr = '\0';
-
-    /* ignore empty lines */
-    if (*line == '\0')
-      continue;
-
-    line_len = strlen(line);
-
-    /* cut leading whitespaces from token */
-    for (token = line; *token; token++)
-      if (*token != ' ' && *token != '\t')
-	break;
-
-    /* find end of token */
-    for (line_ptr = token; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
-      {
-	*line_ptr = '\0';
-	break;
-      }
-    }
-
-    if (line_ptr < line + line_len)
-      value = line_ptr + 1;
-    else
-      value = "\0";
-
-    /* cut leading whitespaces from value */
-    for (; *value; value++)
-      if (*value != ' ' && *value != '\t')
-	break;
-
-    if (*token && *value)
-      setTokenValue(setup_file_list, token, value);
-  }
-
-  fclose(file);
-
-  first_valid_list_entry = setup_file_list->next;
-
-  /* free empty list header */
-  setup_file_list->next = NULL;
-  freeSetupFileList(setup_file_list);
-
-  if (first_valid_list_entry == NULL)
-    Error(ERR_WARN, "configuration file '%s' is empty", filename);
-
-  return first_valid_list_entry;
-}
-
-static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
-					 char *identifier)
-{
-  if (!setup_file_list)
-    return;
-
-  if (strcmp(setup_file_list->token, TOKEN_STR_FILE_IDENTIFIER) == 0)
-  {
-    if (strcmp(setup_file_list->value, identifier) != 0)
-    {
-      Error(ERR_WARN, "configuration file has wrong version");
-      return;
-    }
-    else
-      return;
-  }
-
-  if (setup_file_list->next)
-    checkSetupFileListIdentifier(setup_file_list->next, identifier);
-  else
-  {
-    Error(ERR_WARN, "configuration file has no version information");
-    return;
-  }
-}
 
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
@@ -2285,7 +1963,7 @@ static void SaveUserLevelInfo()
   fclose(file);
   free(filename);
 
-  SetFilePermissions_Setup(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
 void LoadSetup()
@@ -2438,7 +2116,7 @@ void SaveSetup()
   fclose(file);
   free(filename);
 
-  SetFilePermissions_Setup(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
 void LoadLevelSetup_LastSeries()
@@ -2503,7 +2181,7 @@ void SaveLevelSetup_LastSeries()
   fclose(file);
   free(filename);
 
-  SetFilePermissions_Setup(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
 static void checkSeriesInfo()
@@ -2650,5 +2328,5 @@ void SaveLevelSetup_SeriesInfo()
   fclose(file);
   free(filename);
 
-  SetFilePermissions_Setup(filename);
+  SetFilePermissions(filename, PERMS_PRIVATE);
 }

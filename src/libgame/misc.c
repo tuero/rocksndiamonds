@@ -731,6 +731,18 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
   }
 }
 
+void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fgetc(file);
+}
+
+void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fputc(0, file);
+}
+
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
 #define TRANSLATE_X11KEYNAME_TO_KEYSYM	2
@@ -1300,17 +1312,16 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
 #define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
 #define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
-#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
 
-#define MODE_W_USR_GRP		(S_IWUSR | S_IWGRP)
-#define MODE_W_NEW_DIR		(S_ISGID | MODE_W_USR_GRP)
+#define MODE_W_PRIVATE		(S_IWUSR)
+#define MODE_W_PUBLIC		(S_IWUSR | S_IWGRP)
+#define MODE_W_PUBLIC_DIR	(S_IWUSR | S_IWGRP | S_ISGID)
 
-#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | MODE_W_NEW_DIR)
+#define DIR_PERMS_PRIVATE	(MODE_R_ALL | MODE_X_ALL | MODE_W_PRIVATE)
+#define DIR_PERMS_PUBLIC	(MODE_R_ALL | MODE_X_ALL | MODE_W_PUBLIC_DIR)
 
-#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_USR_GRP)
-#define SCORE_PERMS		LEVEL_PERMS
-#define TAPE_PERMS		LEVEL_PERMS
-#define SETUP_PERMS		LEVEL_PERMS
+#define FILE_PERMS_PRIVATE	(MODE_R_ALL | MODE_W_PRIVATE)
+#define FILE_PERMS_PUBLIC	(MODE_R_ALL | MODE_W_PUBLIC)
 
 char *getUserDataDir(void)
 {
@@ -1327,13 +1338,20 @@ char *getUserDataDir(void)
   return userdata_dir;
 }
 
-void createDirectory(char *dir, char *text)
+char *getSetupDir()
+{
+  return getUserDataDir();
+}
+
+void createDirectory(char *dir, char *text, int permission_class)
 {
 #if defined(PLATFORM_UNIX)
   /* leave "other" permissions in umask untouched, but ensure group parts
      of USERDATA_DIR_MODE are not masked */
+  mode_t dir_mode = (permission_class == PERMS_PRIVATE ?
+		     DIR_PERMS_PRIVATE : DIR_PERMS_PUBLIC);
   mode_t normal_umask = umask(0);
-  mode_t group_umask = ~(USERDATA_DIR_MODE & S_IRWXG);
+  mode_t group_umask = ~(dir_mode & S_IRWXG);
   umask(normal_umask & group_umask);
 #endif
 
@@ -1341,7 +1359,7 @@ void createDirectory(char *dir, char *text)
 #if defined(PLATFORM_WIN32)
     if (mkdir(dir) != 0)
 #else
-    if (mkdir(dir, USERDATA_DIR_MODE) != 0)
+    if (mkdir(dir, dir_mode) != 0)
 #endif
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 
@@ -1352,27 +1370,318 @@ void createDirectory(char *dir, char *text)
 
 void InitUserDataDirectory()
 {
-  createDirectory(getUserDataDir(), "user data");
+  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
 }
 
-void SetFilePermissions_Level(char *filename)
+void SetFilePermissions(char *filename, int permission_class)
 {
-  chmod(filename, LEVEL_PERMS);
+  chmod(filename, (permission_class == PERMS_PRIVATE ?
+		   FILE_PERMS_PRIVATE : FILE_PERMS_PUBLIC));
 }
 
-void SetFilePermissions_Tape(char *filename)
+int getFileVersionFromCookieString(const char *cookie)
 {
-  chmod(filename, TAPE_PERMS);
+  const char *ptr_cookie1, *ptr_cookie2;
+  const char *pattern1 = "_FILE_VERSION_";
+  const char *pattern2 = "?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_pattern1 = strlen(pattern1);
+  const int len_pattern2 = strlen(pattern2);
+  const int len_pattern = len_pattern1 + len_pattern2;
+  int version_major, version_minor;
+
+  if (len_cookie <= len_pattern)
+    return -1;
+
+  ptr_cookie1 = &cookie[len_cookie - len_pattern];
+  ptr_cookie2 = &cookie[len_cookie - len_pattern2];
+
+  if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
+    return -1;
+
+  if (ptr_cookie2[0] < '0' || ptr_cookie2[0] > '9' ||
+      ptr_cookie2[1] != '.' ||
+      ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
+    return -1;
+
+  version_major = ptr_cookie2[0] - '0';
+  version_minor = ptr_cookie2[2] - '0';
+
+  return VERSION_IDENT(version_major, version_minor, 0);
 }
 
-void SetFilePermissions_Score(char *filename)
+boolean checkCookieString(const char *cookie, const char *template)
 {
-  chmod(filename, SCORE_PERMS);
+  const char *pattern = "_FILE_VERSION_?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_template = strlen(template);
+  const int len_pattern = strlen(pattern);
+
+  if (len_cookie != len_template)
+    return FALSE;
+
+  if (strncmp(cookie, template, len_cookie - len_pattern) != 0)
+    return FALSE;
+
+  return TRUE;
 }
 
-void SetFilePermissions_Setup(char *filename)
+/* ------------------------------------------------------------------------- */
+/* setup file stuff                                                          */
+/* ------------------------------------------------------------------------- */
+
+static char *string_tolower(char *s)
 {
-  chmod(filename, SETUP_PERMS);
+  static char s_lower[100];
+  int i;
+
+  if (strlen(s) >= 100)
+    return s;
+
+  strcpy(s_lower, s);
+
+  for (i=0; i<strlen(s_lower); i++)
+    s_lower[i] = tolower(s_lower[i]);
+
+  return s_lower;
+}
+
+int get_string_integer_value(char *s)
+{
+  static char *number_text[][3] =
+  {
+    { "0", "zero", "null", },
+    { "1", "one", "first" },
+    { "2", "two", "second" },
+    { "3", "three", "third" },
+    { "4", "four", "fourth" },
+    { "5", "five", "fifth" },
+    { "6", "six", "sixth" },
+    { "7", "seven", "seventh" },
+    { "8", "eight", "eighth" },
+    { "9", "nine", "ninth" },
+    { "10", "ten", "tenth" },
+    { "11", "eleven", "eleventh" },
+    { "12", "twelve", "twelfth" },
+  };
+
+  int i, j;
+
+  for (i=0; i<13; i++)
+    for (j=0; j<3; j++)
+      if (strcmp(string_tolower(s), number_text[i][j]) == 0)
+	return i;
+
+  return atoi(s);
+}
+
+boolean get_string_boolean_value(char *s)
+{
+  if (strcmp(string_tolower(s), "true") == 0 ||
+      strcmp(string_tolower(s), "yes") == 0 ||
+      strcmp(string_tolower(s), "on") == 0 ||
+      get_string_integer_value(s) == 1)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+char *getFormattedSetupEntry(char *token, char *value)
+{
+  int i;
+  static char entry[MAX_LINE_LEN];
+
+  sprintf(entry, "%s:", token);
+  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
+    entry[i] = ' ';
+  entry[i] = '\0';
+
+  strcat(entry, value);
+
+  return entry;
+}
+
+void freeSetupFileList(struct SetupFileList *setup_file_list)
+{
+  if (!setup_file_list)
+    return;
+
+  if (setup_file_list->token)
+    free(setup_file_list->token);
+  if (setup_file_list->value)
+    free(setup_file_list->value);
+  if (setup_file_list->next)
+    freeSetupFileList(setup_file_list->next);
+  free(setup_file_list);
+}
+
+static struct SetupFileList *newSetupFileList(char *token, char *value)
+{
+  struct SetupFileList *new = checked_malloc(sizeof(struct SetupFileList));
+
+  new->token = checked_malloc(strlen(token) + 1);
+  strcpy(new->token, token);
+
+  new->value = checked_malloc(strlen(value) + 1);
+  strcpy(new->value, value);
+
+  new->next = NULL;
+
+  return new;
+}
+
+char *getTokenValue(struct SetupFileList *setup_file_list, char *token)
+{
+  if (!setup_file_list)
+    return NULL;
+
+  if (strcmp(setup_file_list->token, token) == 0)
+    return setup_file_list->value;
+  else
+    return getTokenValue(setup_file_list->next, token);
+}
+
+static void setTokenValue(struct SetupFileList *setup_file_list,
+			  char *token, char *value)
+{
+  if (!setup_file_list)
+    return;
+
+  if (strcmp(setup_file_list->token, token) == 0)
+  {
+    free(setup_file_list->value);
+    setup_file_list->value = checked_malloc(strlen(value) + 1);
+    strcpy(setup_file_list->value, value);
+  }
+  else if (setup_file_list->next == NULL)
+    setup_file_list->next = newSetupFileList(token, value);
+  else
+    setTokenValue(setup_file_list->next, token, value);
+}
+
+#ifdef DEBUG
+static void printSetupFileList(struct SetupFileList *setup_file_list)
+{
+  if (!setup_file_list)
+    return;
+
+  printf("token: '%s'\n", setup_file_list->token);
+  printf("value: '%s'\n", setup_file_list->value);
+
+  printSetupFileList(setup_file_list->next);
+}
+#endif
+
+struct SetupFileList *loadSetupFileList(char *filename)
+{
+  int line_len;
+  char line[MAX_LINE_LEN];
+  char *token, *value, *line_ptr;
+  struct SetupFileList *setup_file_list = newSetupFileList("", "");
+  struct SetupFileList *first_valid_list_entry;
+
+  FILE *file;
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
+    return NULL;
+  }
+
+  while(!feof(file))
+  {
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* cut trailing comment or whitespace from input line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == '#' || *line_ptr == '\n' || *line_ptr == '\r')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    /* cut trailing whitespaces from input line */
+    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
+      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
+	*line_ptr = '\0';
+
+    /* ignore empty lines */
+    if (*line == '\0')
+      continue;
+
+    line_len = strlen(line);
+
+    /* cut leading whitespaces from token */
+    for (token = line; *token; token++)
+      if (*token != ' ' && *token != '\t')
+	break;
+
+    /* find end of token */
+    for (line_ptr = token; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    if (line_ptr < line + line_len)
+      value = line_ptr + 1;
+    else
+      value = "\0";
+
+    /* cut leading whitespaces from value */
+    for (; *value; value++)
+      if (*value != ' ' && *value != '\t')
+	break;
+
+    if (*token && *value)
+      setTokenValue(setup_file_list, token, value);
+  }
+
+  fclose(file);
+
+  first_valid_list_entry = setup_file_list->next;
+
+  /* free empty list header */
+  setup_file_list->next = NULL;
+  freeSetupFileList(setup_file_list);
+
+  if (first_valid_list_entry == NULL)
+    Error(ERR_WARN, "configuration file '%s' is empty", filename);
+
+  return first_valid_list_entry;
+}
+
+void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
+				  char *identifier)
+{
+  if (!setup_file_list)
+    return;
+
+  if (strcmp(setup_file_list->token, TOKEN_STR_FILE_IDENTIFIER) == 0)
+  {
+    if (strcmp(setup_file_list->value, identifier) != 0)
+    {
+      Error(ERR_WARN, "configuration file has wrong version");
+      return;
+    }
+    else
+      return;
+  }
+
+  if (setup_file_list->next)
+    checkSetupFileListIdentifier(setup_file_list->next, identifier);
+  else
+  {
+    Error(ERR_WARN, "configuration file has no version information");
+    return;
+  }
 }
 
 

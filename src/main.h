@@ -262,13 +262,6 @@ struct SetupInfo
   struct SetupInputInfo input[MAX_PLAYERS];
 };
 
-struct SetupFileList
-{
-  char *token;
-  char *value;
-  struct SetupFileList *next;
-};
-
 struct PlayerInfo
 {
   boolean present;		/* player present in level playfield */
@@ -1551,11 +1544,6 @@ extern int		num_element_info;
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
-
-#define VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
-#define VERSION_MAJOR(x)	((x) / 10000)
-#define VERSION_MINOR(x)	(((x) % 10000) / 100)
-#define VERSION_PATCH(x)	((x) % 100)
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
 ** currently supported/known file version numbers:
