@@ -16,11 +16,11 @@
 
 #include "main.h"
 
-boolean LoadLevelInfo(void);
+void InitUserdataDirectory();
 
+boolean LoadLevelInfo(void);
 void LoadLevel(int);
 void SaveLevel(int);
-
 void LoadLevelTape(int);
 void SaveLevelTape(int);
 
@@ -32,7 +32,6 @@ int getLastPlayedLevelOfLevelSeries(char *);
 
 void LoadSetup(void);
 void SaveSetup(void);
-
 void LoadLevelSetup(void);
 void SaveLevelSetup(void);
 

@@ -65,6 +65,7 @@ void OpenAll(int argc, char *argv[])
     exit(0);
   }
 
+  InitUserdataDirectory();
   InitLevelAndPlayerInfo();
 
   InitCounter();
@@ -139,7 +140,7 @@ void InitSound()
     return;
 
 #ifndef MSDOS
-  if (access(sound_device_name,W_OK)<0)
+  if (access(sound_device_name, W_OK) != 0)
   {
     Error(ERR_WARN, "cannot access sound device - no sounds");
     sound_status = SOUND_OFF;
@@ -245,7 +246,7 @@ void InitJoysticks()
     if (!setup.input[i].use_joystick)
       continue;
 
-    if (access(device_name, R_OK) < 0)
+    if (access(device_name, R_OK) != 0)
     {
       Error(ERR_WARN, "cannot access joystick device '%s'", device_name);
       continue;

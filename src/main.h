@@ -1099,24 +1099,32 @@ extern int		num_bg_loops;
 #endif
 
 #ifndef MSDOS
+#define USERDATA_DIRECTORY	".rocksndiamonds"
+#define TAPEDATA_DIRECTORY	"tapes"
 #define SCORE_FILENAME		"ROCKS.score"
-#define NAMES_FILENAME		"ROCKS.names"
 #define LEVDIR_FILENAME		"ROCKS.levelinfo"
 #define JOYDAT_FILENAME		"ROCKS.joystick"
-#define SETUP_FILENAME		"ROCKS.setup"
-#define LEVELSETUP_FILENAME	"ROCKS.levelsetup"
+#define SETUP_FILENAME		"setup"
+#define LEVELSETUP_FILENAME	"setup.level"
+#define TAPEFILE_EXTENSION	"tape"
 #else
+#define USERDATA_DIRECTORY	"userdata"
+#define TAPEDATA_DIRECTORY	"tapes"
 #define SCORE_FILENAME		"ROCKS.sco"
-#define NAMES_FILENAME		"ROCKS.nam"
 #define LEVDIR_FILENAME		"ROCKS.lev"
 #define JOYDAT_FILENAME		"ROCKS.joy"
-#define SETUP_FILENAME		"ROCKS.set"
-#define LEVELSETUP_FILENAME	"ROCKS.lvs"
+#define SETUP_FILENAME		"setup"
+#define LEVELSETUP_FILENAME	"setup.lev"
+#define TAPEFILE_EXTENSION	"rec"
 #endif
 
 #define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
 
-#define LEVEL_PERMS	(S_IRUSR|S_IWUSR | S_IRGRP|S_IWGRP | S_IROTH|S_IWOTH)
+#define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
+#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
+#define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
+#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
+#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
 #define SCORE_PERMS		LEVEL_PERMS
 #define NAMES_PERMS		LEVEL_PERMS
 #define LEVDIR_PERMS		LEVEL_PERMS
@@ -1145,7 +1153,7 @@ extern int		num_bg_loops;
 #define SETUP_COOKIE_LEN	(strlen(SETUP_COOKIE)+1)
 #define LEVELSETUP_COOKIE_LEN	(strlen(LEVELSETUP_COOKIE)+1)
 
-#define VERSION_STRING		"1.2"
+#define VERSION_STRING		"1.2 preview 1"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
 #define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"

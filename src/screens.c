@@ -71,14 +71,8 @@ void DrawMainMenu()
   DrawGraphic(10,3,GFX_PFEIL_L);
   DrawGraphic(14,3,GFX_PFEIL_R);
 
-  DrawText(SX+40+16,SY+326,"A Game by Artsoft Entertainment",FS_SMALL,FC_BLUE);
-
-  /*
-  DrawText(SX+40+16,SY+344,"Graphics: Deluxe Paint IV Amiga",
-	   FS_SMALL,FC_BLUE);
-  DrawText(SX+60+16,SY+362,"Sounds: AudioMaster IV Amiga",
-	   FS_SMALL,FC_BLUE);
-  */
+  DrawText(SX+56, SY+326, "A Game by Artsoft Entertainment",
+	   FS_SMALL, FC_RED);
 
   if (leveldir[leveldir_nr].name)
   {

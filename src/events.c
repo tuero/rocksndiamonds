@@ -272,23 +272,23 @@ void HandleButton(int mx, int my, int button)
     old_mx = mx;
     old_my = my;
 
-    HandleVideoButtons(mx,my,button);
-    HandleSoundButtons(mx,my,button);
-    HandleGameButtons(mx,my,button);
+    HandleVideoButtons(mx,my, button);
+    HandleSoundButtons(mx,my, button);
+    HandleGameButtons(mx,my, button);
   }
 
   switch(game_status)
   {
     case MAINMENU:
-      HandleMainMenu(mx,my,0,0,button);
+      HandleMainMenu(mx,my, 0,0, button);
       break;
 
     case TYPENAME:
-      HandleTypeName(0,XK_Return);
+      HandleTypeName(0, XK_Return);
       break;
 
     case CHOOSELEVEL:
-      HandleChooseLevel(mx,my,0,0,button);
+      HandleChooseLevel(mx,my, 0,0, button);
       break;
 
     case HALLOFFAME:
@@ -296,7 +296,7 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case LEVELED:
-      LevelEd(mx,my,button);
+      LevelEd(mx,my, button);
       break;
 
     case HELPSCREEN:
@@ -304,11 +304,11 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case SETUP:
-      HandleSetupScreen(mx,my,0,0,button);
+      HandleSetupScreen(mx,my, 0,0, button);
       break;
 
     case SETUPINPUT:
-      HandleSetupInputScreen(mx,my,0,0,button);
+      HandleSetupInputScreen(mx,my, 0,0, button);
       break;
 
     case PLAYING:
@@ -545,80 +545,6 @@ void HandleKey(KeySym key, int key_status)
 
 #if 0
 
-	case XK_x:
-
-	  {
-	    int i,j,k, num_steps = 8, step_size = TILEX / num_steps;
-	    static long scroll_delay=0;
-	    long scroll_delay_value = 4*4 / num_steps;
-
-	    printf("Scroll test\n");
-
-	    for(i=0;i<3;i++)
-	    {
-	      for(j=0;j<SCR_FIELDX;j++)
-	      {
-		for(k=0;k<num_steps;k++)
-		{
-		  int xxx = j*TILEX+k*step_size;
-		  int done = 0;
-
-		  while(!done)
-		  {
-  		    if (DelayReached(&scroll_delay, scroll_delay_value))
-  		    {
-  		      XCopyArea(display,fieldbuffer,window,gc,
-  				SX+xxx,SY,
-  				SXSIZE-xxx,SYSIZE,
-  				SX,SY);
-  		      XCopyArea(display,fieldbuffer,window,gc,
-  				SX,SY,
-  				xxx,SYSIZE,
-  				SX+SXSIZE-xxx,SY);
-  
-  		      XFlush(display);
-  		      XSync(display,FALSE);
-
-		      done = 1;
-  		    }
-		    else
-		    {
-		      Delay(1);
-		    }
-		  }
-  
-		  /*
-		  Delay(160 / num_steps);
-		  */
-		  /*
-		  Delay(120 / num_steps);
-		  */
-		}
-	      }
-	    }
-	  }
-
-	  break;
-
-	case XK_y:
-	  /*
-	  {
-	    printf("FX = %d, FY = %d\n", FX,FY);
-
-	    XCopyArea(display,fieldbuffer,window,gc,
-		      0,0,
-		      MIN(WIN_XSIZE,FXSIZE),MIN(WIN_YSIZE,FYSIZE),
-		      0,0);
-	    XFlush(display);
-	    XSync(display,FALSE);
-	    Delay(1000);
-	  }
-	  */
-
-	  printf("direct_draw == %d\n", setup.direct_draw);
-
-	  break;
-
 	case XK_z:
 	  {
 	    int i;
@@ -632,20 +558,6 @@ void HandleKey(KeySym key, int key_status)
 		     stored_player[i].last_jx, stored_player[i].last_jy);
 	    }
 	    printf("\n");
-	  }
-
-	  break;
-
-	case XK_t:
-	  {
-	    char *color[] = { "yellow", "red", "green", "blue" };
-
-	    do
-	      TestPlayer = (TestPlayer + 1) % MAX_PLAYERS;
-	    while(!stored_player[TestPlayer].active);
-
-	    printf("TestPlayer = %d (%s player)\n",
-		   TestPlayer, color[TestPlayer]);
 	  }
 
 	  break;
@@ -666,36 +578,17 @@ void HandleNoXEvent()
 {
   if (button_status && game_status != PLAYING)
   {
-    HandleButton(-1,-1,button_status);
+    HandleButton(-1,-1, button_status);
     return;
   }
 
   if (options.network)
     HandleNetworking();
 
-  switch(game_status)
-  {
-    case MAINMENU:
-    case CHOOSELEVEL:
-    case HALLOFFAME:
-    case HELPSCREEN:
-    case SETUP:
-    case SETUPINPUT:
-      HandleJoystick();
-      break;
+  HandleJoystick();
 
-    case PLAYING:
-      HandleJoystick();
-
-      /*
-      HandleGameActions(0);
-      */
-
-      break;
-
-    default:
-      break;
-  }
+  if (game_status == PLAYING)
+    HandleGameActions();
 }
 
 static int HandleJoystickForAllPlayers()
@@ -777,7 +670,6 @@ void HandleJoystick()
 	return;
       }
 
-      HandleGameActions();
       break;
 
     default:

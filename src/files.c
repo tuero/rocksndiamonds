@@ -19,6 +19,62 @@
 #include "tape.h"
 #include "joystick.h"
 
+static char *getUserdataDir()
+{
+  static char *userdata_dir = NULL;
+
+  if (!userdata_dir)
+  {
+    char *home_dir = getHomeDir();
+    char *data_dir = USERDATA_DIRECTORY;
+
+    userdata_dir = checked_malloc(strlen(home_dir) + strlen(data_dir) + 2);
+    sprintf(userdata_dir, "%s/%s", home_dir, data_dir);
+  }
+
+  return userdata_dir;
+}
+
+static char *getSetupDir()
+{
+  return getUserdataDir();
+}
+
+static char *getTapeDir(char *level_subdir)
+{
+  static char *tape_dir = NULL;
+  char *data_dir = getUserdataDir();
+  char *tape_subdir = TAPEDATA_DIRECTORY;
+
+  if (tape_dir)
+    free(tape_dir);
+
+  tape_dir = checked_malloc(strlen(data_dir) + strlen(tape_subdir) +
+			    strlen(level_subdir) + 3);
+  sprintf(tape_dir, "%s/%s%s%s", data_dir, tape_subdir,
+	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+
+  return tape_dir;
+}
+
+static void createDirectory(char *dir, char *text)
+{
+  if (access(dir, F_OK) != 0)
+    if (mkdir(dir, USERDATA_DIR_MODE) != 0)
+      Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
+}
+
+void InitUserdataDirectory()
+{
+  createDirectory(getUserdataDir(), "user data");
+}
+
+static void InitTapeDirectory(char *level_subdir)
+{
+  createDirectory(getTapeDir(""), "main tape data");
+  createDirectory(getTapeDir(level_subdir), "level tape data");
+}
+
 boolean LoadLevelInfo()
 {
   int i;
@@ -213,21 +269,17 @@ void LoadLevelTape(int level_nr)
   FILE *file;
   boolean levelrec_10 = FALSE;
 
-#ifndef MSDOS
-  sprintf(filename,"%s/%s/%d.tape",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
-#else
-  sprintf(filename,"%s/%s/%d.tap",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
-#endif
+  sprintf(filename, "%s/%d.%s",
+	  getTapeDir(leveldir[leveldir_nr].filename),
+	  level_nr, TAPEFILE_EXTENSION);
 
-  if ((file=fopen(filename,"r")))
+  if ((file = fopen(filename, "r")))
   {
-    fgets(cookie,LEVELREC_COOKIE_LEN,file);
+    fgets(cookie, LEVELREC_COOKIE_LEN, file);
     fgetc(file);
-    if (!strcmp(cookie,LEVELREC_COOKIE_10))	/* old 1.0 tape format */
+    if (!strcmp(cookie, LEVELREC_COOKIE_10))	/* old 1.0 tape format */
       levelrec_10 = TRUE;
-    else if (strcmp(cookie,LEVELREC_COOKIE))	/* unknown tape format */
+    else if (strcmp(cookie, LEVELREC_COOKIE))	/* unknown tape format */
     {
       Error(ERR_WARN, "wrong format of level recording file '%s'", filename);
       fclose(file);
@@ -253,7 +305,7 @@ void LoadLevelTape(int level_nr)
   tape.playing = FALSE;
   tape.pausing = FALSE;
 
-  for(i=0;i<tape.length;i++)
+  for(i=0; i<tape.length; i++)
   {
     int j;
 
@@ -319,32 +371,30 @@ void SaveLevelTape(int level_nr)
   FILE *file;
   boolean new_tape = TRUE;
 
-#ifndef MSDOS
-  sprintf(filename,"%s/%s/%d.tape",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
-#else
-  sprintf(filename,"%s/%s/%d.tap",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
-#endif
+  sprintf(filename, "%s/%d.%s",
+	  getTapeDir(leveldir[leveldir_nr].filename),
+	  level_nr, TAPEFILE_EXTENSION);
+
+  InitTapeDirectory(leveldir[leveldir_nr].filename);
 
   /* Testen, ob bereits eine Aufnahme existiert */
-  if ((file=fopen(filename,"r")))
+  if ((file = fopen(filename, "r")))
   {
     new_tape = FALSE;
     fclose(file);
 
-    if (!Request("Replace old tape ?",REQ_ASK))
+    if (!Request("Replace old tape ?", REQ_ASK))
       return;
   }
 
-  if (!(file=fopen(filename,"w")))
+  if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot save level recording file '%s'", filename);
     return;
   }
 
-  fputs(LEVELREC_COOKIE,file);		/* Formatkennung */
-  fputc(0x0a,file);
+  fputs(LEVELREC_COOKIE, file);		/* Formatkennung */
+  fputc(0x0a, file);
 
   fputc((tape.random_seed >> 24) & 0xff,file);
   fputc((tape.random_seed >> 16) & 0xff,file);
@@ -361,14 +411,14 @@ void SaveLevelTape(int level_nr)
   fputc((tape.length >>   8) & 0xff,file);
   fputc((tape.length >>   0) & 0xff,file);
 
-  for(i=0;i<tape.length;i++)
+  for(i=0; i<tape.length; i++)
   {
     int j;
 
     for(j=0; j<MAX_PLAYERS; j++)
-      fputc(tape.pos[i].action[j],file);
+      fputc(tape.pos[i].action[j], file);
 
-    fputc(tape.pos[i].delay,file);
+    fputc(tape.pos[i].delay, file);
   }
 
   fclose(file);
@@ -862,9 +912,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->autorecord = FALSE;
   si->quick_doors = FALSE;
 
-  strncpy(si->login_name, GetLoginName(), MAX_NAMELEN-1);
+  strncpy(si->login_name, getLoginName(), MAX_NAMELEN-1);
   si->login_name[MAX_NAMELEN-1] = '\0';
-  strncpy(si->alias_name, GetLoginName(), MAX_NAMELEN-1);
+  strncpy(si->alias_name, getLoginName(), MAX_NAMELEN-1);
   si->alias_name[MAX_NAMELEN-1] = '\0';
 
   for (i=0; i<MAX_PLAYERS; i++)
@@ -1001,7 +1051,7 @@ void LoadSetup()
   /* always start with reliable default setup values */
   setSetupInfoToDefaults(&setup);
 
-  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
+  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
 
   setup_file_list = loadSetupFileList(filename);
 
@@ -1087,7 +1137,7 @@ void SaveSetup()
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
+  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
@@ -1137,7 +1187,7 @@ void LoadLevelSetup()
   leveldir_nr = 0;
   level_nr = 0;
 
-  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
+  sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
 
   if (level_setup_list)
     freeSetupFileList(level_setup_list);
@@ -1170,7 +1220,7 @@ void SaveLevelSetup()
   setTokenValue(level_setup_list,
 		leveldir[leveldir_nr].filename, int2str(level_nr, 0));
 
-  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
+  sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {

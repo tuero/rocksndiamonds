@@ -155,39 +155,59 @@ unsigned int SimpleRND(unsigned int max)
 
   gettimeofday(&current_time,NULL);
   root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
-  return(root % max);
+  return (root % max);
 }
 
 unsigned int RND(unsigned int max)
 {
-  return(random_linux_libc() % max);
+  return (random_linux_libc() % max);
 }
 
 unsigned int InitRND(long seed)
 {
   struct timeval current_time;
 
-  if (seed==NEW_RANDOMIZE)
+  if (seed == NEW_RANDOMIZE)
   {
     gettimeofday(&current_time,NULL);
     srandom_linux_libc((unsigned int) current_time.tv_usec);
-    return((unsigned int) current_time.tv_usec);
+    return (unsigned int)current_time.tv_usec;
   }
   else
   {
     srandom_linux_libc((unsigned int) seed);
-    return((unsigned int) seed);
+    return (unsigned int)seed;
   }
 }
 
-char *GetLoginName()
+char *getLoginName()
 {
   struct passwd *pwd;
 
-  if (!(pwd=getpwuid(getuid())))
-    return("ANONYMOUS");
+  if (!(pwd = getpwuid(getuid())))
+    return "ANONYMOUS";
   else
-    return(pwd->pw_name);
+    return pwd->pw_name;
+}
+
+char *getHomeDir()
+{
+  static char *home_dir = NULL;
+
+  if (!home_dir)
+  {
+    if (!(home_dir = getenv("HOME")))
+    {
+      struct passwd *pwd;
+
+      if ((pwd = getpwuid(getuid())))
+	home_dir = pwd->pw_dir;
+      else
+	home_dir = ".";
+    }
+  }
+
+  return home_dir;
 }
 
 void MarkTileDirty(int x, int y)

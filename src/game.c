@@ -2937,7 +2937,7 @@ void GameActions()
   int sieb_x = 0, sieb_y = 0;
   int i, x,y, element;
   byte *recorded_player_action;
-  byte summarized_player_action;
+  byte summarized_player_action = 0;
 
   if (game_status != PLAYING)
     return;
@@ -3373,8 +3373,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
 
 	/* don't scroll over playfield boundaries */
-	if (scroll_x < -1 || scroll_x > lev_fieldx - SCR_FIELDX + 2)
-	  scroll_x = (scroll_x < -1 ? -1 : lev_fieldx - SCR_FIELDX + 2);
+	if (scroll_x < -1 || scroll_x > lev_fieldx - SCR_FIELDX + 1)
+	  scroll_x = (scroll_x < -1 ? -1 : lev_fieldx - SCR_FIELDX + 1);
 
 	/* don't scroll more than one field at a time */
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
@@ -3391,8 +3391,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
 
 	/* don't scroll over playfield boundaries */
-	if (scroll_y < -1 || scroll_y > lev_fieldy - SCR_FIELDY + 2)
-	  scroll_y = (scroll_y < -1 ? -1 : lev_fieldy - SCR_FIELDY + 2);
+	if (scroll_y < -1 || scroll_y > lev_fieldy - SCR_FIELDY + 1)
+	  scroll_y = (scroll_y < -1 ? -1 : lev_fieldy - SCR_FIELDY + 1);
 
 	/* don't scroll more than one field at a time */
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
