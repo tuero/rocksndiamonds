@@ -30,14 +30,22 @@ Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
     Error(ERR_EXIT, "images with more than 256 colors are not supported");
 
   depth = 8;
+
   image = checked_malloc(sizeof(Image));
   image->data = checked_malloc(width * height * bytes_per_pixel);
   image->width = width;
   image->height = height;
   image->depth = depth;
   image->rgb.used = 0;
+
   for (i=0; i<MAX_COLORS; i++)
     image->rgb.color_used[i] = FALSE;
+
+  image->type = (depth < 8 ? IMAGETYPE_BITMAP :
+		 depth > 8 ? IMAGETYPE_TRUECOLOR : IMAGETYPE_RGB);
+
+  image->bytes_per_row = (depth + 7) / 8;
+  image->bytes_per_row *= width;
 
   return image;
 }
@@ -53,20 +61,33 @@ void freeImage(Image *image)
 /* extra colors to try allocating in private color maps to minimize flashing */
 #define NOFLASH_COLORS 256
 
-/* architecture independent value-to-memory conversion
+/* architecture independent value <-> memory conversions;
    note: the internal format is big endian */
 
-#define value_to_memory(value, ptr, length) (				\
-(length) == 1 ? (*( (byte *)(ptr)   ) = ( value     ) ) :		\
-(length) == 2 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>> 8),	\
-		 *(((byte *)(ptr))+1) = ( value     ) ) :		\
-(length) == 3 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>16),	\
-		 *(((byte *)(ptr))+1) = (((unsigned long)(value))>> 8),	\
-		 *(((byte *)(ptr))+2) = ( value     ) ) :		\
-                (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>24),	\
-		 *(((byte *)(ptr))+1) = (((unsigned long)(value))>>16),	\
-		 *(((byte *)(ptr))+2) = (((unsigned long)(value))>> 8),	\
-		 *(((byte *)(ptr))+3) = ( value     ) ))
+#define memory_to_value(ptr, len) (					    \
+(len) == 1 ? (unsigned long)(                 *( (byte *)(ptr))         ) : \
+(len) == 2 ? (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<< 8)   \
+			  + (                 *(((byte *)(ptr))+1)      ) : \
+(len) == 3 ? (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<<16)   \
+			  + (((unsigned long)(*(((byte *)(ptr))+1)))<< 8)   \
+			  + (                 *(((byte *)(ptr))+2)      ) : \
+	     (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<<24)   \
+			  + (((unsigned long)(*(((byte *)(ptr))+1)))<<16)   \
+			  + (((unsigned long)(*(((byte *)(ptr))+2)))<< 8)   \
+			  + (                 *(((byte *)(ptr))+3)      ) )
+
+
+#define value_to_memory(value, ptr, len) (				\
+(len) == 1 ? (*( (byte *)(ptr)   ) = ( value     ) ) :			\
+(len) == 2 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>> 8),	\
+	      *(((byte *)(ptr))+1) = ( value     ) ) :			\
+(len) == 3 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>16),	\
+	      *(((byte *)(ptr))+1) = (((unsigned long)(value))>> 8),	\
+	      *(((byte *)(ptr))+2) = ( value     ) ) :			\
+             (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>24),	\
+	      *(((byte *)(ptr))+1) = (((unsigned long)(value))>>16),	\
+	      *(((byte *)(ptr))+2) = (((unsigned long)(value))>> 8),	\
+	      *(((byte *)(ptr))+3) = ( value     ) ))
 
 static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
 {
@@ -243,7 +264,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 
 	  /* something completely unexpected happened */
 
-	  fprintf(stderr, "imageToXImage: XAllocColor failed on a TrueColor/Directcolor visual\n");
+	  fprintf(stderr, "Image_to_Pixmap: XAllocColor failed on a TrueColor/Directcolor visual\n");
           free(redvalue);
           free(greenvalue);
           free(bluevalue);
@@ -416,18 +437,49 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     {
       Pixel pixval;
 
-      for (y=0; y<image->height; y++)		/* general case */
+      switch (image->type)
       {
-	for (x=0; x<image->width; x++)
+        case IMAGETYPE_RGB:
 	{
-	  pixval = *src_ptr++;
-	  pixval =
-	    redvalue[image->rgb.red[pixval] >> 8] |
-	    greenvalue[image->rgb.green[pixval] >> 8] |
-	    bluevalue[image->rgb.blue[pixval] >> 8];
-	  value_to_memory(pixval, dst_ptr, bytes_per_pixel);
-	  dst_ptr += bytes_per_pixel;
+	  for (y=0; y<image->height; y++)		/* general case */
+	  {
+	    for (x=0; x<image->width; x++)
+	    {
+	      pixval = *src_ptr++;
+	      pixval =
+		redvalue[image->rgb.red[pixval] >> 8] |
+		greenvalue[image->rgb.green[pixval] >> 8] |
+		bluevalue[image->rgb.blue[pixval] >> 8];
+	      value_to_memory(pixval, dst_ptr, bytes_per_pixel);
+	      dst_ptr += bytes_per_pixel;
+	    }
+	  }
+	  break;
 	}
+
+        case IMAGETYPE_TRUECOLOR:
+	{
+	  for (y=0; y<image->height; y++)		/* general case */
+	  {
+	    for (x=0; x<image->width; x++)
+	    {
+	      pixval = memory_to_value(src_ptr, image->depth);
+	      pixval =
+		redvalue[TRUECOLOR_RED(pixval)] |
+		greenvalue[TRUECOLOR_GREEN(pixval)] |
+		bluevalue[TRUECOLOR_BLUE(pixval)];
+	      value_to_memory(pixval, dst_ptr, bytes_per_pixel);
+	      src_ptr += image->depth;
+	      dst_ptr += bytes_per_pixel;
+	    }
+	  }
+	  break;
+	}
+
+        default:
+	  Error(ERR_RETURN, "image type not supported");
+	  Error(ERR_EXIT, "RGB or TrueColor image needed");
+	  break;
       }
       break;
     }
