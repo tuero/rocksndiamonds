@@ -318,7 +318,7 @@ struct FontInfo
 
 struct AnimInfo
 {
-  int simple_random_value;
+  int random_frame;
 };
 
 struct JoystickInfo

@@ -457,7 +457,7 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
 
 void SetRandomAnimationValue(int x, int y)
 {
-  anim.simple_random_value = GfxRandom[x][y];
+  anim.random_frame = GfxRandom[x][y];
 }
 
 inline int getGraphicAnimationFrame(int graphic, int sync_frame)
@@ -484,18 +484,18 @@ inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-inline boolean checkDrawGraphicAnimation(int x, int y, int graphic)
+inline boolean checkDrawGraphicAnimation(int sx, int sy, int graphic)
 {
-  int lx = LEVELX(x), ly = LEVELY(y);
+  int lx = LEVELX(sx), ly = LEVELY(sy);
 
-  return (IN_SCR_FIELD(x, y) &&
-	  GfxFrame[lx][ly] % graphic_info[graphic].anim_delay == 0);
+  return (IN_SCR_FIELD(sx, sy) && IS_NEW_FRAME(GfxFrame[lx][ly], graphic));
 }
 
-inline boolean checkDrawLevelGraphicAnimation(int x, int y, int graphic)
+inline boolean checkDrawLevelGraphicAnimation(int lx, int ly, int graphic)
 {
-  return (IN_SCR_FIELD(SCREENX(x), SCREENY(y)) &&
-	  GfxFrame[x][y] % graphic_info[graphic].anim_delay == 0);
+  int sx = SCREENX(lx), sy = SCREENY(ly);
+
+  return (IN_SCR_FIELD(sx, sy) && IS_NEW_FRAME(GfxFrame[lx][ly], graphic));
 }
 
 inline boolean DrawGraphicAnimation(int x, int y, int graphic)
@@ -529,7 +529,7 @@ boolean DrawLevelElementAnimation(int x, int y, int element)
 
 inline void ContinueLevelGraphicAnimation(int x, int y, int graphic)
 {
-  if (GfxFrame[x][y] % graphic_info[graphic].anim_delay != 0)
+  if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
     return;
 
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);

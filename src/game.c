@@ -89,6 +89,8 @@
 #define DOUBLE_PLAYER_SPEED(p)	(HALVE_MOVE_DELAY((p)->move_delay_value))
 #define HALVE_PLAYER_SPEED(p)	(DOUBLE_MOVE_DELAY((p)->move_delay_value))
 
+#define	INIT_GFX_RANDOM()	(SimpleRND(1000000))
+
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
@@ -100,6 +102,8 @@
 #define NUM_GAME_BUTTONS		6
 
 /* forward declaration for internal use */
+static void ResetGfxAnimation(int, int);
+
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
@@ -114,9 +118,6 @@ static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
-
-#define IS_ANIMATED(g)		(graphic_info[g].anim_frames > 1)
-#define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 
 /* ------------------------------------------------------------------------- */
@@ -722,7 +723,7 @@ void InitGame()
 
       GfxFrame[x][y] = 0;
       GfxAction[x][y] = ACTION_DEFAULT;
-      GfxRandom[x][y] = SimpleRND(1000000);
+      GfxRandom[x][y] = INIT_GFX_RANDOM();
     }
   }
 
@@ -1251,6 +1252,25 @@ int NewHiScore()
   return position;
 }
 
+static void ResetRandomAnimationValue(int x, int y)
+{
+  int element = Feld[x][y];
+  int graphic = el2img(element);
+
+  /* reset random value not until one full delay cycle has reached */
+  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+      GfxFrame[x][y] > ANIM_DELAY(graphic))
+    GfxRandom[x][y] = INIT_GFX_RANDOM();
+}
+
+static void ResetGfxAnimation(int x, int y)
+{
+  ResetRandomAnimationValue(x, y);
+
+  GfxFrame[x][y] = 0;
+  GfxAction[x][y] = ACTION_DEFAULT;
+}
+
 void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
@@ -1258,7 +1278,7 @@ void InitMovingField(int x, int y, int direction)
   int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
 
   if (!JustStopped[x][y] || direction != MovDir[x][y])
-    GfxFrame[x][y] = 0;
+    ResetGfxAnimation(x, y);
 
   MovDir[x][y] = direction;
   MovDir[newx][newy] = direction;
@@ -4338,7 +4358,8 @@ static void ChangeElement(int x, int y)
   if (MovDelay[x][y] == 0)		/* initialize element change */
   {
     MovDelay[x][y] = changing_element[element].change_delay + 1;
-    GfxFrame[x][y] = 0;
+
+    ResetGfxAnimation(x, y);
 
     if (changing_element[element].pre_change_function)
       changing_element[element].pre_change_function(x, y);
@@ -4357,7 +4378,8 @@ static void ChangeElement(int x, int y)
   else					/* finish element change */
   {
     Feld[x][y] = changing_element[element].next_element;
-    GfxFrame[x][y] = 0;
+
+    ResetGfxAnimation(x, y);
 
     DrawLevelField(x, y);
 
@@ -4648,6 +4670,10 @@ void GameActions()
   {
     element = Feld[x][y];
     graphic = el2img(element);
+
+    if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+	IS_NEW_FRAME(GfxFrame[x][y], graphic))
+      ResetRandomAnimationValue(x, y);
 
     SetRandomAnimationValue(x, y);
 
@@ -6417,7 +6443,8 @@ boolean PlaceBomb(struct PlayerInfo *player)
     Store[jx][jy] = element;
 
   MovDelay[jx][jy] = 96;
-  GfxFrame[jx][jy] = 0;
+
+  ResetGfxAnimation(jx, jy);
 
   if (player->dynamite)
   {

@@ -172,6 +172,15 @@
 
 #define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER2 - IMG_PLAYER1))
 
+#define ANIM_FRAMES(g)		(graphic_info[g].anim_frames)
+#define ANIM_DELAY(g)		(graphic_info[g].anim_delay)
+#define ANIM_MODE(g)		(graphic_info[g].anim_mode)
+
+#define IS_ANIMATED(g)		(ANIM_FRAMES(g) > 1)
+#define IS_NEW_FRAME(f, g)	((f) % ANIM_DELAY(g) == 0)
+
+#define IS_LOOP_SOUND(s)	(sound_info[s].loop)
+
 
 #if 0
 
