@@ -876,14 +876,16 @@ static void InitGraphicInfo()
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: first frame of graphic animation object %d outside of image bitmap file '%s'", i, src_bitmap->source_filename);
+      Error(ERR_EXIT, "InitGraphicInfo: first frame of graphic animation object %d outside of image bitmap file '%s' (%d,%d)",
+	    i, src_bitmap->source_filename, src_x, src_y);
 
     last_frame = new_graphic_info[i].anim_frames - 1;
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: last frame of graphic animation object %d outside of image bitmap file '%s'", i, src_bitmap->source_filename);
+      Error(ERR_EXIT, "InitGraphicInfo: last frame of graphic animation object %d outside of image bitmap file '%s' (%d,%d)",
+	    i, src_bitmap->source_filename, src_x, src_y);
   }
 }
 

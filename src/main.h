@@ -262,7 +262,7 @@
 #define VXSIZE			DXSIZE
 #define VYSIZE			100
 #define EXSIZE			DXSIZE
-#define EYSIZE			(VXSIZE + 44)
+#define EYSIZE			(VYSIZE + 44)
 #define FULL_SXSIZE		(2 + SXSIZE + 2)
 #define FULL_SYSIZE		(2 + SYSIZE + 2)
 #define MICROLEV_XSIZE		((STD_LEV_FIELDX + 2) * MICRO_TILEX)

@@ -2395,7 +2395,11 @@ void DrawSpecialEditorDoor()
 {
   /* draw bigger toolbox window */
   BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX7, 0, 108, 56, EX - 4, EY - 12);
+	     DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
+	     EX - 4, EY - 12);
+  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, drawto,
+	     EX - 4, VY - 4, EXSIZE + 8, EYSIZE - VYSIZE + 4,
+	     EX - 4, EY - 4);
 
   redraw_mask |= REDRAW_ALL;
 }
@@ -2404,7 +2408,8 @@ void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
   BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, drawto,
-	     562, 344, 108, 56, EX - 4, EY - 12);
+	     EX - 4, EY - 12, EXSIZE + 8, EYSIZE - VYSIZE + 12,
+	     EX - 4, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
 }

@@ -2098,6 +2098,9 @@ static void SaveUserLevelInfo()
   ldi.first_level = 1;
   ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
+  ldi.graphics_set = getStringCopy(GRAPHICS_SUBDIR);
+  ldi.sounds_set = getStringCopy(SOUNDS_SUBDIR);
+  ldi.music_set = getStringCopy(MUSIC_SUBDIR);
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
 						 getCookie("LEVELINFO")));
