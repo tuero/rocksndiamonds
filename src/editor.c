@@ -421,7 +421,7 @@ static struct
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
     &gadget_level_random_value,
-    "random elements",			"in"
+    "random element placement",		"in"
   }
 };
 
@@ -2937,6 +2937,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   boolean button_release_event;
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean draw_level = (id == GADGET_ID_DRAWING_LEVEL);
+  int actual_drawing_function;
   int button = gi->event.button;
   int new_element = BUTTON_ELEMENT(button);
   int sx = gi->event.x, sy = gi->event.y;
@@ -2995,11 +2996,16 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     button = 0;
 #endif
 
-
+#if 0
   if (!draw_level && drawing_function != GADGET_ID_SINGLE_ITEMS)
     return;
+#endif
 
-  switch (drawing_function)
+  /* automatically switch to 'single item' drawing mode, if needed */
+  actual_drawing_function =
+    (draw_level ? drawing_function : GADGET_ID_SINGLE_ITEMS);
+
+  switch (actual_drawing_function)
   {
     case GADGET_ID_SINGLE_ITEMS:
       if (draw_level)
