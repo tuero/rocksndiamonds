@@ -403,6 +403,14 @@ char *getPath3(char *path1, char *path2, char *path3)
   return complete_path;
 }
 
+static char *getStringCat2(char *s1, char *s2)
+{
+  char *complete_string = checked_malloc(strlen(s1) + strlen(s2) + 1);
+
+  sprintf(complete_string, "%s%s", s1, s2);
+  return complete_string;
+}
+
 char *getStringCopy(char *s)
 {
   char *s_copy;
@@ -1349,7 +1357,7 @@ boolean FileIsArtworkType(char *basename, int type)
 /* ========================================================================= */
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
-					   char *suffix_list[],
+					   struct ConfigInfo *suffix_list,
 					   int num_file_list_entries)
 {
   struct FileInfo *file_list;
@@ -1359,22 +1367,29 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
   file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
 
-  for (i=0; suffix_list[i] != NULL; i++)
+  for (i=0; suffix_list[i].token != NULL; i++)
     num_suffix_list_entries++;
 
-  if (num_suffix_list_entries > 0)
+  /* always start with reliable default values */
+  for (i=0; i<num_file_list_entries; i++)
   {
-    for (i=0; i<num_file_list_entries; i++)
+    file_list[list_pos].token = NULL;
+    file_list[list_pos].default_filename = NULL;
+    file_list[list_pos].filename = NULL;
+
+    if (num_suffix_list_entries > 0)
     {
-      file_list[i].default_parameter =
-	checked_calloc(num_suffix_list_entries * sizeof(int));
-      file_list[i].parameter =
-	checked_calloc(num_suffix_list_entries * sizeof(int));
+      int parameter_array_size = num_suffix_list_entries * sizeof(int);
+
+      file_list[i].default_parameter = checked_calloc(parameter_array_size);
+      file_list[i].parameter = checked_calloc(parameter_array_size);
 
       for (j=0; j<num_suffix_list_entries; j++)
       {
-	file_list[i].default_parameter[j] = -1;
-	file_list[i].parameter[j] = -1;
+	int default_parameter = atoi(suffix_list[j].value);
+
+	file_list[i].default_parameter[j] = default_parameter;
+	file_list[i].parameter[j] = default_parameter;
       }
     }
   }
@@ -1384,13 +1399,13 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
     int len_config_token = strlen(config_list[i].token);
     boolean is_file_entry = TRUE;
 
-    for (j=0; suffix_list[j] != NULL; j++)
+    for (j=0; suffix_list[j].token != NULL; j++)
     {
-      int len_suffix = strlen(suffix_list[j]);
+      int len_suffix = strlen(suffix_list[j].token);
 
       if (len_suffix < len_config_token &&
 	  strcmp(&config_list[i].token[len_config_token - len_suffix],
-		 suffix_list[j]) == 0)
+		 suffix_list[j].token) == 0)
       {
 	file_list[list_pos].default_parameter[j] = atoi(config_list[i].value);
 
@@ -1419,9 +1434,10 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
 static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
+  struct FileInfo *file_list = artwork_info->file_list;
+  struct ConfigInfo *suffix_list = artwork_info->suffix_list;
   int num_file_list_entries = artwork_info->num_file_list_entries;
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
-  struct FileInfo *file_list = artwork_info->file_list;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
   int i, j;
@@ -1433,12 +1449,12 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   /* always start with reliable default values */
   for (i=0; i<num_file_list_entries; i++)
   {
+    if (file_list[i].filename != NULL)
+      free(file_list[i].filename);
     file_list[i].filename = NULL;
 
     for (j=0; j<num_suffix_list_entries; j++)
-    {
       file_list[i].parameter[j] = file_list[i].default_parameter[j];
-    }
   }
 
   if (filename == NULL)
@@ -1447,8 +1463,19 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if ((setup_file_list = loadSetupFileList(filename)))
   {
     for (i=0; i<num_file_list_entries; i++)
+    {
       file_list[i].filename =
 	getStringCopy(getTokenValue(setup_file_list, file_list[i].token));
+
+      for (j=0; j<num_suffix_list_entries; j++)
+      {
+	char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
+	char *value = getTokenValue(setup_file_list, token);
+
+	if (value != NULL)
+	  file_list[i].parameter[j] = atoi(value);
+      }
+    }
 
     freeSetupFileList(setup_file_list);
 

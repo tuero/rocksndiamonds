@@ -1726,7 +1726,8 @@ struct FileInfo *getCurrentSoundList()
   return sound_info->file_list;
 }
 
-void InitSoundList(struct ConfigInfo *config_list, char *config_suffix_list[],
+void InitSoundList(struct ConfigInfo *config_list,
+		   struct ConfigInfo *config_suffix_list,
 		   int num_file_list_entries)
 {
   int i;
@@ -1737,7 +1738,7 @@ void InitSoundList(struct ConfigInfo *config_list, char *config_suffix_list[],
 
   sound_info->num_file_list_entries = num_file_list_entries;
   sound_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i] != NULL; i++)
+  for (i=0; config_suffix_list[i].token != NULL; i++)
     sound_info->num_suffix_list_entries++;
 
   sound_info->file_list =

@@ -700,7 +700,8 @@ struct FileInfo *getCurrentImageList()
   return image_info->file_list;
 }
 
-void InitImageList(struct ConfigInfo *config_list, char *config_suffix_list[],
+void InitImageList(struct ConfigInfo *config_list,
+		   struct ConfigInfo *config_suffix_list,
 		   int num_file_list_entries)
 {
   int i;
@@ -711,7 +712,7 @@ void InitImageList(struct ConfigInfo *config_list, char *config_suffix_list[],
 
   image_info->num_file_list_entries = num_file_list_entries;
   image_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i] != NULL; i++)
+  for (i=0; config_suffix_list[i].token != NULL; i++)
     image_info->num_suffix_list_entries++;
 
   image_info->file_list =

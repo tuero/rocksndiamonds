@@ -136,17 +136,18 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
-char *image_config_suffix[] =
+struct ConfigInfo image_config_suffix[] =
 {
-  ".frame_xpos",
-  ".frame_ypos",
-  ".num_frames",
-  NULL
+  { ".frame_xpos",			"0"			},
+  { ".frame_ypos",			"0"			},
+  { ".num_frames",			"1"			},
+
+  { NULL,				NULL			}
 };
 
-char *sound_config_suffix[] =
+struct ConfigInfo sound_config_suffix[] =
 {
-  NULL
+  { NULL,				NULL			}
 };
 
 struct ConfigInfo image_config[] =
@@ -159,7 +160,7 @@ struct ConfigInfo image_config[] =
   { "robot_wheel.frame_xpos",		"0"			},
   { "robot_wheel.num_frames",		"4"			},
 
-  { NULL,				NULL			},
+  { NULL,				NULL			}
 };
 
 struct ConfigInfo sound_config[] =
@@ -378,7 +379,7 @@ struct ConfigInfo sound_config[] =
   { "[not used]",			"boom.wav"		},
 #endif
 
-  { NULL,				NULL			},
+  { NULL,				NULL			}
 };
 
 struct FileInfo *image_files;

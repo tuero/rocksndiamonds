@@ -857,6 +857,8 @@ static void InitGraphicInfo()
 
   image_files = getCurrentImageList();
 
+  printf("--> %d\n", image_files[0].parameter[2]);
+
   for(i=0; i<MAX_GRAPHICS; i++)
   {
     /* always start with reliable default values */

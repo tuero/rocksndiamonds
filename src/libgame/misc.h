@@ -126,7 +126,8 @@ boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
 
-struct FileInfo *getFileListFromConfigList(struct ConfigInfo *, char **, int);
+struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
+					   struct ConfigInfo *, int);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkList(struct ArtworkListInfo *);
 

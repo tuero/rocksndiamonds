@@ -416,8 +416,8 @@ extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
 extern struct GraphicInfo	graphic_info[];
 extern struct ConfigInfo	image_config[], sound_config[];
+extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
 extern struct FileInfo	       *image_files, *sound_files;
-extern char		       *image_config_suffix[], *sound_config_suffix[];
 
 /* often used screen positions */
 #define SX			8

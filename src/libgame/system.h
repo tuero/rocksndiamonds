@@ -467,7 +467,7 @@ struct ArtworkListInfo
   int num_suffix_list_entries;
 
   struct FileInfo *file_list;			/* static artwork file array */
-  char **suffix_list;				/* parameter suffixes array */
+  struct ConfigInfo *suffix_list;		/* parameter suffixes array */
 
   struct ListNodeInfo **artwork_list;		/* static artwork node array */
 
