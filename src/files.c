@@ -304,6 +304,7 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
   level_file_info->nr = 0;
   level_file_info->type = LEVEL_FILE_TYPE_UNKNOWN;
   level_file_info->packed = FALSE;
+  level_file_info->basename = NULL;
   level_file_info->filename = NULL;
 }
 
@@ -325,13 +326,37 @@ static char *getLevelFilenameFromBasename(char *basename)
   return filename;
 }
 
+static int getFileTypeFromBasename(char *basename)
+{
+  char *filename = getLevelFilenameFromBasename(basename);
+  struct stat file_status;
+
+  /* ---------- try to determine file type from filename ---------- */
+
+  /* check for typical filename of a Supaplex level package file */
+  if (strlen(basename) == 10 && (strncmp(basename, "levels.d", 8) == 0 ||
+				 strncmp(basename, "LEVELS.D", 8) == 0))
+    return LEVEL_FILE_TYPE_SP;
+
+  /* ---------- try to determine file type from filesize ---------- */
+
+  if (stat(filename, &file_status) == 0)
+  {
+    /* check for typical filesize of a Supaplex level package file */
+    if (file_status.st_size == 170496)
+      return LEVEL_FILE_TYPE_SP;
+  }
+
+  return LEVEL_FILE_TYPE_UNKNOWN;
+}
+
 static char *getSingleLevelBasename(int nr, int type)
 {
   static char basename[MAX_FILENAME_LEN];
 
   if (leveldir_current->level_filename == NULL)
     leveldir_current->level_filename =
-      getStringCat2("%%03d.", LEVELFILE_EXTENSION);
+      getStringCat2("%03d.", LEVELFILE_EXTENSION);
 
   switch (type)
   {
@@ -374,28 +399,18 @@ static char *getPackedLevelBasename(int type)
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {
     char *entry_basename = dir_entry->d_name;
-    boolean valid_entry_found = FALSE;
+    int entry_type = getFileTypeFromBasename(entry_basename);
 
-    switch (type)
+    if (entry_type != LEVEL_FILE_TYPE_UNKNOWN)	/* found valid level package */
     {
-      case LEVEL_FILE_TYPE_SP:
-	if (strlen(entry_basename) == 10 &&
-	    (strncmp(entry_basename, "levels.d", 8) == 0 ||
-	     strncmp(entry_basename, "LEVELS.D", 8) == 0))
-	{
-	  /* looks like a typical filename of a Supaplex level package file */
-	  strcpy(basename, entry_basename);
-	  valid_entry_found = TRUE;
-	}
-	break;
+      if (type == LEVEL_FILE_TYPE_UNKNOWN ||
+	  type == entry_type)
+      {
+	strcpy(basename, entry_basename);
 
-      default:
-	valid_entry_found = TRUE;
 	break;
+      }
     }
-
-    if (valid_entry_found)
-      break;
   }
 
   closedir(dir);
@@ -408,23 +423,42 @@ static char *getSingleLevelFilename(int nr, int type)
   return getLevelFilenameFromBasename(getSingleLevelBasename(nr, type));
 }
 
+#if 0
 static char *getPackedLevelFilename(int type)
 {
   return getLevelFilenameFromBasename(getPackedLevelBasename(type));
 }
+#endif
 
 char *getDefaultLevelFilename(int nr)
 {
   return getSingleLevelFilename(nr, LEVEL_FILE_TYPE_RND);
 }
 
-static void setLevelFileInfo_Filename(struct LevelFileInfo *lfi)
+static void setLevelFileInfo_SingleLevelFilename(struct LevelFileInfo *lfi,
+						 int type)
+{
+  lfi->type = type;
+  lfi->packed = FALSE;
+  lfi->basename = getSingleLevelBasename(lfi->nr, lfi->type);
+  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+}
+
+static void setLevelFileInfo_PackedLevelFilename(struct LevelFileInfo *lfi,
+						 int type)
+{
+  lfi->type = type;
+  lfi->packed = TRUE;
+  lfi->basename = getPackedLevelBasename(lfi->type);
+  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+}
+
+static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 {
   /* special case: level number is negative => check for level template file */
   if (lfi->nr < 0)
   {
-    lfi->type = LEVEL_FILE_TYPE_RND;
-    lfi->filename = getDefaultLevelFilename(lfi->nr);
+    setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_RND);
 
     return;
   }
@@ -432,66 +466,34 @@ static void setLevelFileInfo_Filename(struct LevelFileInfo *lfi)
   if (leveldir_current->level_filename != NULL)
   {
     /* check for file name/pattern specified in "levelinfo.conf" */
-    lfi->type = LEVEL_FILE_TYPE_UNKNOWN;
-    lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+    setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
     if (fileExists(lfi->filename))
       return;
   }
 
   /* check for native Rocks'n'Diamonds level file */
-  lfi->type = LEVEL_FILE_TYPE_RND;
-  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_RND);
   if (fileExists(lfi->filename))
     return;
 
   /* check for classic Emerald Mine level file */
-  lfi->type = LEVEL_FILE_TYPE_EM;
-  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_EM);
   if (fileExists(lfi->filename))
     return;
 
-  /* check for packed Supaplex level file */
-  lfi->type = LEVEL_FILE_TYPE_SP;
-  lfi->filename = getPackedLevelFilename(lfi->type);
+  /* check for various packed level file formats */
+  setLevelFileInfo_PackedLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
   if (fileExists(lfi->filename))
     return;
 
   /* no known level file found -- try to use default values */
-  lfi->type = LEVEL_FILE_TYPE_UNKNOWN;
-  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
 }
 
-static void setLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
+static void determineLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
 {
-  struct stat file_status;
-
-  if (lfi->type != LEVEL_FILE_TYPE_UNKNOWN)
-    return;
-
-  /* ---------- try to determine file type from filename ---------- */
-
-  if (strlen(lfi->filename) == 10 &&
-      (strncmp(lfi->filename, "levels.d", 8) == 0 ||
-       strncmp(lfi->filename, "LEVELS.D", 8) == 0))
-  {
-    /* looks like a typical filename of a Supaplex level package file */
-    lfi->type = LEVEL_FILE_TYPE_SP;
-
-    return;
-  }
-
-  /* ---------- try to determine file type from file status ---------- */
-
-  if (stat(lfi->filename, &file_status) == 0)
-  {
-    if (file_status.st_size == 170496)
-    {
-      /* looks like a typical filesize of a Supaplex level package file */
-      lfi->type = LEVEL_FILE_TYPE_SP;
-
-      return;
-    }
-  }
+  if (lfi->type == LEVEL_FILE_TYPE_UNKNOWN)
+    lfi->type = getFileTypeFromBasename(lfi->basename);
 }
 
 static struct LevelFileInfo *getLevelFileInfo(int nr)
@@ -503,8 +505,8 @@ static struct LevelFileInfo *getLevelFileInfo(int nr)
 
   level_file_info.nr = nr;	/* set requested level number */
 
-  setLevelFileInfo_Filename(&level_file_info);
-  setLevelFileInfo_Filetype(&level_file_info);
+  determineLevelFileInfo_Filename(&level_file_info);
+  determineLevelFileInfo_Filetype(&level_file_info);
 
   return &level_file_info;
 }
