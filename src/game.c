@@ -231,26 +231,26 @@ void GetPlayerConfig()
 
 static int getBeltNrFromElement(int element)
 {
-  return (element < EL_BELT2_LEFT ? 0 :
-	  element < EL_BELT3_LEFT ? 1 :
-	  element < EL_BELT4_LEFT ? 2 : 3);
+  return (element < EL_CONVEYOR_BELT2_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT3_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT4_LEFT ? 2 : 3);
 }
 
 static int getBeltNrFromSwitchElement(int element)
 {
-  return (element < EL_BELT2_SWITCH_LEFT ? 0 :
-	  element < EL_BELT3_SWITCH_LEFT ? 1 :
-	  element < EL_BELT4_SWITCH_LEFT ? 2 : 3);
+  return (element < EL_CONVEYOR_BELT2_SWITCH_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT3_SWITCH_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT4_SWITCH_LEFT ? 2 : 3);
 }
 
 static int getBeltDirNrFromSwitchElement(int element)
 {
   static int belt_base_element[4] =
   {
-    EL_BELT1_SWITCH_LEFT,
-    EL_BELT2_SWITCH_LEFT,
-    EL_BELT3_SWITCH_LEFT,
-    EL_BELT4_SWITCH_LEFT
+    EL_CONVEYOR_BELT1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT4_SWITCH_LEFT
   };
 
   int belt_nr = getBeltNrFromSwitchElement(element);
@@ -289,15 +289,15 @@ static void InitField(int x, int y, boolean init_game)
       /* no break! */
     case EL_PLAYER:
       if (init_game)
-	Feld[x][y] = EL_SPIELER1;
+	Feld[x][y] = EL_PLAYER1;
       /* no break! */
-    case EL_SPIELER1:
-    case EL_SPIELER2:
-    case EL_SPIELER3:
-    case EL_SPIELER4:
+    case EL_PLAYER1:
+    case EL_PLAYER2:
+    case EL_PLAYER3:
+    case EL_PLAYER4:
       if (init_game)
       {
-	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
+	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER1];
 	int jx = player->jx, jy = player->jy;
 
 	player->present = TRUE;
@@ -403,12 +403,12 @@ static void InitField(int x, int y, boolean init_game)
       local_player->sokobanfields_still_needed++;
       break;
 
-    case EL_PINGUIN:
+    case EL_PENGUIN:
       local_player->friends_still_needed++;
       break;
 
-    case EL_SCHWEIN:
-    case EL_DRACHE:
+    case EL_PIG:
+    case EL_DRAGON:
       MovDir[x][y] = 1 << RND(4);
       break;
 
@@ -416,31 +416,31 @@ static void InitField(int x, int y, boolean init_game)
       Feld[x][y] = EL_EMPTY;
       break;
 
-    case EL_EM_KEY_1_FILE:
-      Feld[x][y] = EL_EM_KEY_1;
+    case EL_EM_KEY1_FILE:
+      Feld[x][y] = EL_EM_KEY1;
       break;
-    case EL_EM_KEY_2_FILE:
-      Feld[x][y] = EL_EM_KEY_2;
+    case EL_EM_KEY2_FILE:
+      Feld[x][y] = EL_EM_KEY2;
       break;
-    case EL_EM_KEY_3_FILE:
-      Feld[x][y] = EL_EM_KEY_3;
+    case EL_EM_KEY3_FILE:
+      Feld[x][y] = EL_EM_KEY3;
       break;
-    case EL_EM_KEY_4_FILE:
-      Feld[x][y] = EL_EM_KEY_4;
+    case EL_EM_KEY4_FILE:
+      Feld[x][y] = EL_EM_KEY4;
       break;
 
-    case EL_BELT1_SWITCH_LEFT:
-    case EL_BELT1_SWITCH_MIDDLE:
-    case EL_BELT1_SWITCH_RIGHT:
-    case EL_BELT2_SWITCH_LEFT:
-    case EL_BELT2_SWITCH_MIDDLE:
-    case EL_BELT2_SWITCH_RIGHT:
-    case EL_BELT3_SWITCH_LEFT:
-    case EL_BELT3_SWITCH_MIDDLE:
-    case EL_BELT3_SWITCH_RIGHT:
-    case EL_BELT4_SWITCH_LEFT:
-    case EL_BELT4_SWITCH_MIDDLE:
-    case EL_BELT4_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT1_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT1_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT2_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT2_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT3_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT3_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT4_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT4_SWITCH_RIGHT:
       if (init_game)
       {
 	int belt_nr = getBeltNrFromSwitchElement(Feld[x][y]);
@@ -459,12 +459,12 @@ static void InitField(int x, int y, boolean init_game)
       }
       break;
 
-    case EL_SWITCHGATE_SWITCH_2:	/* always start with same switch pos */
+    case EL_SWITCHGATE_SWITCH_DOWN:	/* always start with same switch pos */
       if (init_game)
-	Feld[x][y] = EL_SWITCHGATE_SWITCH_1;
+	Feld[x][y] = EL_SWITCHGATE_SWITCH_UP;
       break;
 
-    case EL_LIGHT_SWITCH_ON:
+    case EL_LIGHT_SWITCH_ACTIVE:
       if (init_game)
 	game.light_time_left = level.time_light * FRAMES_PER_SECOND;
       break;
@@ -623,10 +623,10 @@ static void InitGameEngine()
     {
       EL_STEELWALL,
       EL_WALL,
-      EL_MAUER_LEBT,
-      EL_MAUER_X,
-      EL_MAUER_Y,
-      EL_MAUER_XY
+      EL_WALL_GROWING,
+      EL_WALL_GROWING_X,
+      EL_WALL_GROWING_Y,
+      EL_WALL_GROWING_XY
     };
     static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
 
@@ -682,7 +682,7 @@ void InitGame()
     struct PlayerInfo *player = &stored_player[i];
 
     player->index_nr = i;
-    player->element_nr = EL_SPIELER1 + i;
+    player->element_nr = EL_PLAYER1 + i;
 
     player->present = FALSE;
     player->active = FALSE;
@@ -1480,7 +1480,7 @@ void CheckDynamite(int x, int y)
     if (MovDelay[x][y])
     {
       if (!(MovDelay[x][y] % 6))
-	PlaySoundLevelAction(x, y, SND_ACTION_BURNING);
+	PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
 
       if (IS_ACTIVE_BOMB(Feld[x][y]))
       {
@@ -1495,9 +1495,9 @@ void CheckDynamite(int x, int y)
   }
 
   if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
-    StopSound(SND_DYNAMITE_BURNING);
+    StopSound(SND_DYNAMITE_ACTIVE);
   else
-    StopSound(SND_DYNABOMB_BURNING);
+    StopSound(SND_DYNABOMB_ACTIVE);
 
   Bang(x, y);
 }
@@ -1533,7 +1533,7 @@ void Explode(int ex, int ey, int phase, int mode)
       int element;
 
       if (!IN_LEV_FIELD(x, y) ||
-	  ((mode != EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
+	  ((mode != EX_NORMAL || center_element == EL_AMOEBA_TO_DIAMOND) &&
 	   (x != ex || y != ey)))
 	continue;
 
@@ -1567,18 +1567,18 @@ void Explode(int ex, int ey, int phase, int mode)
       {
 	switch(StorePlayer[ex][ey])
 	{
-	  case EL_SPIELER2:
-	    Store[x][y] = EL_EDELSTEIN_RED;
+	  case EL_PLAYER2:
+	    Store[x][y] = EL_EMERALD_RED;
 	    break;
-	  case EL_SPIELER3:
+	  case EL_PLAYER3:
 	    Store[x][y] = EL_EMERALD;
 	    break;
-	  case EL_SPIELER4:
-	    Store[x][y] = EL_EDELSTEIN_PURPLE;
+	  case EL_PLAYER4:
+	    Store[x][y] = EL_EMERALD_PURPLE;
 	    break;
-	  case EL_SPIELER1:
+	  case EL_PLAYER1:
 	  default:
-	    Store[x][y] = EL_EDELSTEIN_YELLOW;
+	    Store[x][y] = EL_EMERALD_YELLOW;
 	    break;
 	}
 
@@ -1586,31 +1586,31 @@ void Explode(int ex, int ey, int phase, int mode)
 	  Store[x][y] = EL_EMPTY;
       }
       else if (center_element == EL_MOLE)
-	Store[x][y] = EL_EDELSTEIN_RED;
-      else if (center_element == EL_PINGUIN)
-	Store[x][y] = EL_EDELSTEIN_PURPLE;
+	Store[x][y] = EL_EMERALD_RED;
+      else if (center_element == EL_PENGUIN)
+	Store[x][y] = EL_EMERALD_PURPLE;
       else if (center_element == EL_BUG)
 	Store[x][y] = ((x == ex && y == ey) ? EL_DIAMOND : EL_EMERALD);
       else if (center_element == EL_BUTTERFLY)
-	Store[x][y] = EL_EDELSTEIN_BD;
+	Store[x][y] = EL_BD_DIAMOND;
       else if (center_element == EL_SP_ELECTRON)
 	Store[x][y] = EL_SP_INFOTRON;
       else if (center_element == EL_YAMYAM)
 	Store[x][y] = level.yam_content[game.yam_content_nr][x-ex+1][y-ey+1];
-      else if (center_element == EL_AMOEBA2DIAM)
+      else if (center_element == EL_AMOEBA_TO_DIAMOND)
 	Store[x][y] = level.amoeba_content;
       else if (element == EL_WALL_EMERALD)
 	Store[x][y] = EL_EMERALD;
       else if (element == EL_WALL_DIAMOND)
 	Store[x][y] = EL_DIAMOND;
       else if (element == EL_WALL_BD_DIAMOND)
-	Store[x][y] = EL_EDELSTEIN_BD;
+	Store[x][y] = EL_BD_DIAMOND;
       else if (element == EL_WALL_EMERALD_YELLOW)
-	Store[x][y] = EL_EDELSTEIN_YELLOW;
+	Store[x][y] = EL_EMERALD_YELLOW;
       else if (element == EL_WALL_EMERALD_RED)
-	Store[x][y] = EL_EDELSTEIN_RED;
+	Store[x][y] = EL_EMERALD_RED;
       else if (element == EL_WALL_EMERALD_PURPLE)
-	Store[x][y] = EL_EDELSTEIN_PURPLE;
+	Store[x][y] = EL_EMERALD_PURPLE;
       else if (element == EL_WALL_PEARL)
 	Store[x][y] = EL_PEARL;
       else if (element == EL_WALL_CRYSTAL)
@@ -1619,7 +1619,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_EMPTY;
 
       if (x != ex || y != ey ||
-	  center_element == EL_AMOEBA2DIAM || mode == EX_BORDER)
+	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_BORDER)
 	Store2[x][y] = element;
 
       if (AmoebaNr[x][y] &&
@@ -1675,7 +1675,7 @@ void Explode(int ex, int ey, int phase, int mode)
       Store2[x][y] = 0;
       Bang(x, y);
     }
-    else if (element == EL_AMOEBA2DIAM)
+    else if (element == EL_AMOEBA_TO_DIAMOND)
       AmoebeUmwandeln(x, y);
   }
 
@@ -1807,7 +1807,7 @@ void Bang(int x, int y)
     case EL_DYNABOMB_XL:
       DynaExplode(x, y);
       break;
-    case EL_PINGUIN:
+    case EL_PENGUIN:
     case EL_LAMP:
     case EL_LAMP_ACTIVE:
       if (IS_PLAYER(x, y))
@@ -1867,10 +1867,10 @@ static void ToggleBeltSwitch(int x, int y)
 {
   static int belt_base_element[4] =
   {
-    EL_BELT1_SWITCH_LEFT,
-    EL_BELT2_SWITCH_LEFT,
-    EL_BELT3_SWITCH_LEFT,
-    EL_BELT4_SWITCH_LEFT
+    EL_CONVEYOR_BELT1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT4_SWITCH_LEFT
   };
   static int belt_move_dir[4] =
   {
@@ -1934,10 +1934,10 @@ static void ToggleSwitchgateSwitch(int x, int y)
     {
       int element = Feld[xx][yy];
 
-      if (element == EL_SWITCHGATE_SWITCH_1 ||
-	  element == EL_SWITCHGATE_SWITCH_2)
+      if (element == EL_SWITCHGATE_SWITCH_UP ||
+	  element == EL_SWITCHGATE_SWITCH_DOWN)
       {
-	Feld[xx][yy] = EL_SWITCHGATE_SWITCH_1 + game.switchgate_pos;
+	Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
 	DrawLevelField(xx, yy);
       }
       else if (element == EL_SWITCHGATE_OPEN ||
@@ -1966,20 +1966,20 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
     {
       int element = Feld[x][y];
 
-      if (element == EL_LIGHT_SWITCH_OFF &&
+      if (element == EL_LIGHT_SWITCH &&
 	  game.light_time_left > 0)
       {
-	Feld[x][y] = EL_LIGHT_SWITCH_ON;
+	Feld[x][y] = EL_LIGHT_SWITCH_ACTIVE;
 	DrawLevelField(x, y);
       }
-      else if (element == EL_LIGHT_SWITCH_ON &&
+      else if (element == EL_LIGHT_SWITCH_ACTIVE &&
 	       game.light_time_left == 0)
       {
-	Feld[x][y] = EL_LIGHT_SWITCH_OFF;
+	Feld[x][y] = EL_LIGHT_SWITCH;
 	DrawLevelField(x, y);
       }
 
-      if (element == EL_INVISIBLE_STEEL ||
+      if (element == EL_INVISIBLE_STEELWALL ||
 	  element == EL_INVISIBLE_WALL ||
 	  element == EL_SAND_INVISIBLE)
 	DrawLevelField(x, y);
@@ -1992,7 +1992,7 @@ static void ToggleLightSwitch(int x, int y)
   int element = Feld[x][y];
 
   game.light_time_left =
-    (element == EL_LIGHT_SWITCH_OFF ?
+    (element == EL_LIGHT_SWITCH ?
      level.time_light * FRAMES_PER_SECOND : 0);
 
   RedrawAllLightSwitchesAndInvisibleElements();
@@ -2075,7 +2075,7 @@ void Impact(int x, int y)
   {
     if (object_hit && IS_PLAYER(x, y+1))
       KillHeroUnlessProtected(x, y+1);
-    else if (object_hit && smashed == EL_PINGUIN)
+    else if (object_hit && smashed == EL_PENGUIN)
       Bang(x, y+1);
     else
     {
@@ -2114,12 +2114,12 @@ void Impact(int x, int y)
       KillHeroUnlessProtected(x, y+1);
       return;
     }
-    else if (smashed == EL_PINGUIN)
+    else if (smashed == EL_PENGUIN)
     {
       Bang(x, y+1);
       return;
     }
-    else if (element == EL_EDELSTEIN_BD)
+    else if (element == EL_BD_DIAMOND)
     {
       if (IS_ENEMY(smashed) && IS_BD_ELEMENT(smashed))
       {
@@ -2141,8 +2141,8 @@ void Impact(int x, int y)
       if (IS_ENEMY(smashed) ||
 	  smashed == EL_BOMB || smashed == EL_SP_DISK_ORANGE ||
 	  smashed == EL_DX_SUPABOMB ||
-	  smashed == EL_SONDE || smashed == EL_SCHWEIN ||
-	  smashed == EL_DRACHE || smashed == EL_MOLE)
+	  smashed == EL_SATELLITE || smashed == EL_PIG ||
+	  smashed == EL_DRAGON || smashed == EL_MOLE)
       {
 	Bang(x, y+1);
 	return;
@@ -2177,13 +2177,13 @@ void Impact(int x, int y)
 	{
 	  ToggleBeltSwitch(x, y+1);
 	}
-	else if (smashed == EL_SWITCHGATE_SWITCH_1 ||
-		 smashed == EL_SWITCHGATE_SWITCH_2)
+	else if (smashed == EL_SWITCHGATE_SWITCH_UP ||
+		 smashed == EL_SWITCHGATE_SWITCH_DOWN)
 	{
 	  ToggleSwitchgateSwitch(x, y+1);
 	}
-	else if (smashed == EL_LIGHT_SWITCH_OFF ||
-		 smashed == EL_LIGHT_SWITCH_ON)
+	else if (smashed == EL_LIGHT_SWITCH ||
+		 smashed == EL_LIGHT_SWITCH_ACTIVE)
 	{
 	  ToggleLightSwitch(x, y+1);
 	}
@@ -2360,7 +2360,7 @@ void TurnRound(int x, int y)
 
     MovDelay[x][y] = 6+RND(40);
   }
-  else if (element == EL_SCHWEIN)
+  else if (element == EL_PIG)
   {
     boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
     boolean should_turn_left = FALSE, should_turn_right = FALSE;
@@ -2432,7 +2432,7 @@ void TurnRound(int x, int y)
 
     MovDelay[x][y] = 0;
   }
-  else if (element == EL_DRACHE)
+  else if (element == EL_DRAGON)
   {
     boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
     int rnd_value = 24;
@@ -2505,7 +2505,7 @@ void TurnRound(int x, int y)
     }
     MovDelay[x][y] = 0;
   }
-  else if (element == EL_ROBOT || element == EL_SONDE || element == EL_PINGUIN)
+  else if (element == EL_ROBOT || element == EL_SATELLITE || element == EL_PENGUIN)
   {
     int attr_x = -1, attr_y = -1;
 
@@ -2540,7 +2540,7 @@ void TurnRound(int x, int y)
       attr_y = ZY;
     }
 
-    if (element == EL_PINGUIN)
+    if (element == EL_PENGUIN)
     {
       int i;
       static int xy[4][2] =
@@ -2606,7 +2606,7 @@ void TurnRound(int x, int y)
 	if (IN_LEV_FIELD(newx, newy) &&
 	    (IS_FREE(newx, newy) ||
 	     Feld[newx][newy] == EL_ACID ||
-	     (element == EL_PINGUIN &&
+	     (element == EL_PENGUIN &&
 	      (Feld[newx][newy] == EL_EXIT_OPEN ||
 	       IS_MAMPF3(Feld[newx][newy])))))
 	  return;
@@ -2618,7 +2618,7 @@ void TurnRound(int x, int y)
 	if (IN_LEV_FIELD(newx, newy) &&
 	    (IS_FREE(newx, newy) ||
 	     Feld[newx][newy] == EL_ACID ||
-	     (element == EL_PINGUIN &&
+	     (element == EL_PENGUIN &&
 	      (Feld[newx][newy] == EL_EXIT_OPEN ||
 	       IS_MAMPF3(Feld[newx][newy])))))
 	  return;
@@ -2809,7 +2809,7 @@ void StartMoving(int x, int y)
       {
 	if (left && right &&
 	    (game.emulation != EMU_BOULDERDASH &&
-	     element != EL_BD_ROCK && element != EL_EDELSTEIN_BD))
+	     element != EL_BD_ROCK && element != EL_BD_DIAMOND))
 	  left = !(right = RND(2));
 
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
@@ -2831,7 +2831,7 @@ void StartMoving(int x, int y)
   {
     int newx, newy;
 
-    if ((element == EL_SONDE || element == EL_BALLOON ||
+    if ((element == EL_SATELLITE || element == EL_BALLOON ||
 	 element == EL_SPRING_MOVING)
 	&& JustBeingPushed(x, y))
       return;
@@ -2884,7 +2884,7 @@ void StartMoving(int x, int y)
       }
       else if (element == EL_SP_ELECTRON)
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
-      else if (element == EL_DRACHE)
+      else if (element == EL_DRAGON)
       {
 	int i;
 	int dir = MovDir[x][y];
@@ -2954,15 +2954,15 @@ void StartMoving(int x, int y)
 #endif
 
     }
-    else if ((element == EL_PINGUIN || element == EL_ROBOT ||
-	      element == EL_SONDE || element == EL_BALLOON) &&
+    else if ((element == EL_PENGUIN || element == EL_ROBOT ||
+	      element == EL_SATELLITE || element == EL_BALLOON) &&
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_ACID)
     {
       Blurb(x, y);
       Store[x][y] = EL_ACID;
     }
-    else if (element == EL_PINGUIN && IN_LEV_FIELD(newx, newy))
+    else if (element == EL_PENGUIN && IN_LEV_FIELD(newx, newy))
     {
       if (Feld[newx][newy] == EL_EXIT_OPEN)
       {
@@ -2996,7 +2996,7 @@ void StartMoving(int x, int y)
 	return;
       }
     }
-    else if (element == EL_SCHWEIN && IN_LEV_FIELD(newx, newy))
+    else if (element == EL_PIG && IN_LEV_FIELD(newx, newy))
     {
       if (IS_GEM(Feld[newx][newy]))
       {
@@ -3019,7 +3019,7 @@ void StartMoving(int x, int y)
 	return;
       }
     }
-    else if (element == EL_DRACHE && IN_LEV_FIELD(newx, newy))
+    else if (element == EL_DRAGON && IN_LEV_FIELD(newx, newy))
     {
       if (!IS_FREE(newx, newy))
       {
@@ -3041,7 +3041,7 @@ void StartMoving(int x, int y)
 			MovingOrBlocked2Element(newx2, newy2) : EL_STEELWALL);
 
 	if ((wanna_flame || IS_ENEMY(element1) || IS_ENEMY(element2)) &&
-	    element1 != EL_DRACHE && element2 != EL_DRACHE &&
+	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
 	    element1 != EL_BURNING && element2 != EL_BURNING)
 	{
 	  if (IS_PLAYER(x, y))
@@ -3153,7 +3153,7 @@ void StartMoving(int x, int y)
 #else
 	DrawNewGraphicAnimation(x, y, el2img(element));
 #endif
-      else if (element == EL_SONDE)
+      else if (element == EL_SATELLITE)
 #if 0
 	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
 #else
@@ -3324,7 +3324,7 @@ void ContinueMoving(int x, int y)
       TestIfBadThingTouchesFriend(newx, newy);
       TestIfBadThingTouchesOtherBadThing(newx, newy);
     }
-    else if (element == EL_PINGUIN)
+    else if (element == EL_PENGUIN)
       TestIfFriendTouchesBadThing(newx, newy);
 
     if (CAN_SMASH(element) && direction == MV_DOWN &&
@@ -3444,7 +3444,7 @@ void AmoebeUmwandeln(int ax, int ay)
 	if (Feld[x][y] == EL_AMOEBA_DEAD && AmoebaNr[x][y] == group_nr)
 	{
 	  AmoebaNr[x][y] = 0;
-	  Feld[x][y] = EL_AMOEBA2DIAM;
+	  Feld[x][y] = EL_AMOEBA_TO_DIAMOND;
 	}
       }
     }
@@ -3471,7 +3471,7 @@ void AmoebeUmwandeln(int ax, int ay)
       if (!IN_LEV_FIELD(x, y))
 	continue;
 
-      if (Feld[x][y] == EL_AMOEBA2DIAM)
+      if (Feld[x][y] == EL_AMOEBA_TO_DIAMOND)
       {
 	PlaySoundLevel(x, y, (IS_GEM(level.amoeba_content) ?
 			      SND_AMOEBA_TURNING_TO_GEM :
@@ -4073,7 +4073,7 @@ void EdelsteinFunkeln(int x, int y)
   if (!IN_SCR_FIELD(SCREENX(x), SCREENY(y)) || IS_MOVING(x, y))
     return;
 
-  if (Feld[x][y] == EL_EDELSTEIN_BD)
+  if (Feld[x][y] == EL_BD_DIAMOND)
     DrawGraphicAnimation(x, y, GFX_EDELSTEIN_BD, 4, 4, ANIM_REVERSE);
   else
   {
@@ -4193,7 +4193,7 @@ void MauerAbleger(int ax, int ay)
   if (IN_LEV_FIELD(ax+1, ay) && IS_FREE(ax+1, ay))
     rechts_frei = TRUE;
 
-  if (element == EL_MAUER_Y || element == EL_MAUER_XY)
+  if (element == EL_WALL_GROWING_Y || element == EL_WALL_GROWING_XY)
   {
     if (oben_frei)
     {
@@ -4215,8 +4215,8 @@ void MauerAbleger(int ax, int ay)
     }
   }
 
-  if (element == EL_MAUER_X || element == EL_MAUER_XY ||
-      element == EL_MAUER_LEBT)
+  if (element == EL_WALL_GROWING_X || element == EL_WALL_GROWING_XY ||
+      element == EL_WALL_GROWING)
   {
     if (links_frei)
     {
@@ -4239,7 +4239,7 @@ void MauerAbleger(int ax, int ay)
     }
   }
 
-  if (element == EL_MAUER_LEBT && (links_frei || rechts_frei))
+  if (element == EL_WALL_GROWING && (links_frei || rechts_frei))
     DrawLevelField(ax, ay);
 
   if (!IN_LEV_FIELD(ax, ay-1) || IS_MAUER(Feld[ax][ay-1]))
@@ -4252,9 +4252,9 @@ void MauerAbleger(int ax, int ay)
     rechts_massiv = TRUE;
 
   if (((oben_massiv && unten_massiv) ||
-       element == EL_MAUER_X || element == EL_MAUER_LEBT) &&
+       element == EL_WALL_GROWING_X || element == EL_WALL_GROWING) &&
       ((links_massiv && rechts_massiv) ||
-       element == EL_MAUER_Y))
+       element == EL_WALL_GROWING_Y))
     Feld[ax][ay] = EL_WALL;
 
   if (new_wall)
@@ -4280,9 +4280,9 @@ void CheckForDragon(int x, int y)
       int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
 
       if (IN_LEV_FIELD(xx, yy) &&
-	  (Feld[xx][yy] == EL_BURNING || Feld[xx][yy] == EL_DRACHE))
+	  (Feld[xx][yy] == EL_BURNING || Feld[xx][yy] == EL_DRAGON))
       {
-	if (Feld[xx][yy] == EL_DRACHE)
+	if (Feld[xx][yy] == EL_DRAGON)
 	  dragon_found = TRUE;
       }
       else
@@ -4571,7 +4571,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       if (IN_LEV_FIELD(jx+dx, jy) && IS_PUSHABLE(Feld[jx+dx][jy]))
       {
 	int el = Feld[jx+dx][jy];
-	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SONDE ? 2 :
+	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SATELLITE ? 2 :
 			  (el == EL_BALLOON || el == EL_SPRING) ? 0 : 10);
 
 	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
@@ -4777,10 +4777,10 @@ void GameActions()
       AusgangstuerBlinken(x, y);
     else if (element == EL_MAUERND)
       MauerWaechst(x, y);
-    else if (element == EL_MAUER_LEBT ||
-	     element == EL_MAUER_X ||
-	     element == EL_MAUER_Y ||
-	     element == EL_MAUER_XY)
+    else if (element == EL_WALL_GROWING ||
+	     element == EL_WALL_GROWING_X ||
+	     element == EL_WALL_GROWING_Y ||
+	     element == EL_WALL_GROWING_XY)
       MauerAbleger(x, y);
     else if (element == EL_BURNING)
       CheckForDragon(x, y);
@@ -4810,7 +4810,7 @@ void GameActions()
       CloseTimegate(x, y);
     else if (element == EL_EXTRA_TIME)
       DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_NORMAL);
-    else if (element == EL_SHIELD_PASSIVE)
+    else if (element == EL_SHIELD_NORMAL)
     {
       DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_NORMAL);
 #if 0
@@ -4967,12 +4967,12 @@ void GameActions()
       {
 	element = Feld[x][y];
 
-	if (element == EL_LIGHT_SWITCH_ON)
+	if (element == EL_LIGHT_SWITCH_ACTIVE)
 	{
-	  Feld[x][y] = EL_LIGHT_SWITCH_OFF;
+	  Feld[x][y] = EL_LIGHT_SWITCH;
 	  DrawLevelField(x, y);
 	}
-	else if (element == EL_INVISIBLE_STEEL ||
+	else if (element == EL_INVISIBLE_STEELWALL ||
 		 element == EL_INVISIBLE_WALL ||
 		 element == EL_SAND_INVISIBLE)
 	  DrawLevelField(x, y);
@@ -5596,7 +5596,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 	kill_y = test_y;
 	break;
       }
-      else if (test_element == EL_PINGUIN)
+      else if (test_element == EL_PENGUIN)
       {
 	kill_x = test_x;
 	kill_y = test_y;
@@ -5832,10 +5832,10 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_EMERALD:
-    case EL_EDELSTEIN_BD:
-    case EL_EDELSTEIN_YELLOW:
-    case EL_EDELSTEIN_RED:
-    case EL_EDELSTEIN_PURPLE:
+    case EL_BD_DIAMOND:
+    case EL_EMERALD_YELLOW:
+    case EL_EMERALD_RED:
+    case EL_EMERALD_PURPLE:
     case EL_DIAMOND:
     case EL_SP_INFOTRON:
     case EL_PEARL:
@@ -5874,7 +5874,7 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MAX_RIGHT);
       break;
 
-    case EL_SHIELD_PASSIVE:
+    case EL_SHIELD_NORMAL:
       RemoveField(x, y);
       player->shield_passive_time_left += 10;
       PlaySoundLevel(x, y, SND_SHIELD_NORMAL_COLLECTING);
@@ -5938,12 +5938,12 @@ int DigField(struct PlayerInfo *player,
       break;
     }
 
-    case EL_EM_KEY_1:
-    case EL_EM_KEY_2:
-    case EL_EM_KEY_3:
-    case EL_EM_KEY_4:
+    case EL_EM_KEY1:
+    case EL_EM_KEY2:
+    case EL_EM_KEY3:
+    case EL_EM_KEY4:
     {
-      int key_nr = element - EL_EM_KEY_1;
+      int key_nr = element - EL_EM_KEY1;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5986,18 +5986,18 @@ int DigField(struct PlayerInfo *player,
       }
       break;
 
-    case EL_BELT1_SWITCH_LEFT:
-    case EL_BELT1_SWITCH_MIDDLE:
-    case EL_BELT1_SWITCH_RIGHT:
-    case EL_BELT2_SWITCH_LEFT:
-    case EL_BELT2_SWITCH_MIDDLE:
-    case EL_BELT2_SWITCH_RIGHT:
-    case EL_BELT3_SWITCH_LEFT:
-    case EL_BELT3_SWITCH_MIDDLE:
-    case EL_BELT3_SWITCH_RIGHT:
-    case EL_BELT4_SWITCH_LEFT:
-    case EL_BELT4_SWITCH_MIDDLE:
-    case EL_BELT4_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT1_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT1_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT2_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT2_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT3_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT3_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT4_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT4_SWITCH_RIGHT:
       if (!player->Switching)
       {
 	player->Switching = TRUE;
@@ -6007,8 +6007,8 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_SWITCHGATE_SWITCH_1:
-    case EL_SWITCHGATE_SWITCH_2:
+    case EL_SWITCHGATE_SWITCH_UP:
+    case EL_SWITCHGATE_SWITCH_DOWN:
       if (!player->Switching)
       {
 	player->Switching = TRUE;
@@ -6018,13 +6018,13 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_LIGHT_SWITCH_OFF:
-    case EL_LIGHT_SWITCH_ON:
+    case EL_LIGHT_SWITCH:
+    case EL_LIGHT_SWITCH_ACTIVE:
       if (!player->Switching)
       {
 	player->Switching = TRUE;
 	ToggleLightSwitch(x, y);
-	PlaySoundLevel(x, y, element == EL_LIGHT_SWITCH_OFF ?
+	PlaySoundLevel(x, y, element == EL_LIGHT_SWITCH ?
 		       SND_LIGHT_SWITCH_ACTIVATING :
 		       SND_LIGHT_SWITCH_DEACTIVATING);
       }
@@ -6056,7 +6056,7 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_SP_EXIT:
+    case EL_SP_EXIT_CLOSED:
       if (local_player->gems_still_needed > 0)
 	return MF_NO_ACTION;
 
@@ -6144,11 +6144,11 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
       break;
 
-    case EL_EM_GATE_1:
-    case EL_EM_GATE_2:
-    case EL_EM_GATE_3:
-    case EL_EM_GATE_4:
-      if (!player->key[element - EL_EM_GATE_1])
+    case EL_EM_GATE1:
+    case EL_EM_GATE2:
+    case EL_EM_GATE3:
+    case EL_EM_GATE4:
+      if (!player->key[element - EL_EM_GATE1])
 	return MF_NO_ACTION;
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
@@ -6309,7 +6309,7 @@ int DigField(struct PlayerInfo *player,
 
     case EL_SOKOBAN_OBJEKT:
     case EL_SOKOBAN_FELD_VOLL:
-    case EL_SONDE:
+    case EL_SATELLITE:
     case EL_SP_DISK_YELLOW:
     case EL_BALLOON:
       if (mode == DF_SNAP)
@@ -6397,9 +6397,9 @@ int DigField(struct PlayerInfo *player,
 
       break;
 
-    case EL_PINGUIN:
-    case EL_SCHWEIN:
-    case EL_DRACHE:
+    case EL_PENGUIN:
+    case EL_PIG:
+    case EL_DRAGON:
       break;
 
     default:
@@ -6485,7 +6485,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   }
   else
   {
-    Feld[jx][jy] = EL_DYNABOMB_ACTIVE_1 + (player->element_nr - EL_SPIELER1);
+    Feld[jx][jy] = EL_DYNABOMB_ACTIVE_1 + (player->element_nr - EL_PLAYER1);
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
@@ -6569,10 +6569,10 @@ void RaiseScoreElement(int element)
   switch(element)
   {
     case EL_EMERALD:
-    case EL_EDELSTEIN_BD:
-    case EL_EDELSTEIN_YELLOW:
-    case EL_EDELSTEIN_RED:
-    case EL_EDELSTEIN_PURPLE:
+    case EL_BD_DIAMOND:
+    case EL_EMERALD_YELLOW:
+    case EL_EMERALD_RED:
+    case EL_EMERALD_PURPLE:
       RaiseScore(level.score[SC_EDELSTEIN]);
       break;
     case EL_DIAMOND:

@@ -55,7 +55,7 @@ int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 int		FX = SX, FY = SY, ScrollStepSize;
 int		ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
 int		ScreenGfxPos = 0;
-int		BorderElement = EL_BETON;
+int		BorderElement = EL_STEELWALL;
 int		GameFrameDelay = GAME_FRAME_DELAY;
 int		FfwdFrameDelay = FFWD_FRAME_DELAY;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;

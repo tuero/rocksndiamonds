@@ -1346,29 +1346,29 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
-  else if (element == EL_MOLE || element == EL_PINGUIN ||
-	   element == EL_SCHWEIN || element == EL_DRACHE)
+  else if (element == EL_MOLE || element == EL_PENGUIN ||
+	   element == EL_PIG || element == EL_DRAGON)
   {
     if (dir == MV_LEFT)
       graphic = (element == EL_MOLE ? GFX_MOLE_LEFT :
-		 element == EL_PINGUIN ? GFX_PINGUIN_LEFT :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
+		 element == EL_PENGUIN ? GFX_PINGUIN_LEFT :
+		 element == EL_PIG ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
     else if (dir == MV_RIGHT)
       graphic = (element == EL_MOLE ? GFX_MOLE_RIGHT :
-		 element == EL_PINGUIN ? GFX_PINGUIN_RIGHT :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
+		 element == EL_PENGUIN ? GFX_PINGUIN_RIGHT :
+		 element == EL_PIG ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
     else if (dir == MV_UP)
       graphic = (element == EL_MOLE ? GFX_MOLE_UP :
-		 element == EL_PINGUIN ? GFX_PINGUIN_UP :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
+		 element == EL_PENGUIN ? GFX_PINGUIN_UP :
+		 element == EL_PIG ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
     else
       graphic = (element == EL_MOLE ? GFX_MOLE_DOWN :
-		 element == EL_PINGUIN ? GFX_PINGUIN_DOWN :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
+		 element == EL_PENGUIN ? GFX_PINGUIN_DOWN :
+		 element == EL_PIG ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
 
     graphic += phase4;
   }
-  else if (element == EL_SONDE)
+  else if (element == EL_SATELLITE)
   {
     graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
@@ -1422,7 +1422,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     graphic = (element == EL_AMOEBA_DEAD ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x + 2 * y + 4) % 4;
   }
-  else if (element == EL_MAUER_LEBT)
+  else if (element == EL_WALL_GROWING)
   {
     boolean links_massiv = FALSE, rechts_massiv = FALSE;
 
@@ -1438,11 +1438,11 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     else if (rechts_massiv)
       graphic = GFX_MAUER_L;
   }
-  else if ((element == EL_INVISIBLE_STEEL ||
+  else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
 	    element == EL_SAND_INVISIBLE) && game.light_time_left)
   {
-    graphic = (element == EL_INVISIBLE_STEEL ? GFX_INVISIBLE_STEEL_ON :
+    graphic = (element == EL_INVISIBLE_STEELWALL ? GFX_INVISIBLE_STEEL_ON :
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
 	       GFX_SAND_INVISIBLE_ON);
   }
@@ -1504,29 +1504,29 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
 #endif
-  else if (element == EL_MOLE || element == EL_PINGUIN ||
-	   element == EL_SCHWEIN || element == EL_DRACHE)
+  else if (element == EL_MOLE || element == EL_PENGUIN ||
+	   element == EL_PIG || element == EL_DRAGON)
   {
     if (dir == MV_LEFT)
       graphic = (element == EL_MOLE ? GFX_MOLE_LEFT :
-		 element == EL_PINGUIN ? GFX_PINGUIN_LEFT :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
+		 element == EL_PENGUIN ? GFX_PINGUIN_LEFT :
+		 element == EL_PIG ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
     else if (dir == MV_RIGHT)
       graphic = (element == EL_MOLE ? GFX_MOLE_RIGHT :
-		 element == EL_PINGUIN ? GFX_PINGUIN_RIGHT :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
+		 element == EL_PENGUIN ? GFX_PINGUIN_RIGHT :
+		 element == EL_PIG ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
     else if (dir == MV_UP)
       graphic = (element == EL_MOLE ? GFX_MOLE_UP :
-		 element == EL_PINGUIN ? GFX_PINGUIN_UP :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
+		 element == EL_PENGUIN ? GFX_PINGUIN_UP :
+		 element == EL_PIG ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
     else
       graphic = (element == EL_MOLE ? GFX_MOLE_DOWN :
-		 element == EL_PINGUIN ? GFX_PINGUIN_DOWN :
-		 element == EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
+		 element == EL_PENGUIN ? GFX_PINGUIN_DOWN :
+		 element == EL_PIG ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
 
     graphic += phase4;
   }
-  else if (element == EL_SONDE)
+  else if (element == EL_SATELLITE)
   {
 #if 1
     graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
@@ -1592,7 +1592,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     graphic = (element == EL_AMOEBA_DEAD ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x + 2 * y + 4) % 4;
   }
-  else if (element == EL_MAUER_LEBT)
+  else if (element == EL_WALL_GROWING)
   {
     boolean links_massiv = FALSE, rechts_massiv = FALSE;
 
@@ -1608,11 +1608,11 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     else if (rechts_massiv)
       graphic = GFX_MAUER_L;
   }
-  else if ((element == EL_INVISIBLE_STEEL ||
+  else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
 	    element == EL_SAND_INVISIBLE) && game.light_time_left)
   {
-    graphic = (element == EL_INVISIBLE_STEEL ? GFX_INVISIBLE_STEEL_ON :
+    graphic = (element == EL_INVISIBLE_STEELWALL ? GFX_INVISIBLE_STEEL_ON :
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
 	       GFX_SAND_INVISIBLE_ON);
   }
@@ -1844,7 +1844,7 @@ void DrawScreenField(int x, int y)
   if (!IN_LEV_FIELD(ux, uy))
   {
     if (ux < -1 || ux > lev_fieldx || uy < -1 || uy > lev_fieldy)
-      element = EL_LEERRAUM;
+      element = EL_EMPTY;
     else
       element = BorderElement;
 
@@ -1873,7 +1873,7 @@ void DrawScreenField(int x, int y)
     if (cut_mode == CUT_ABOVE)
       DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
     else
-      DrawScreenElement(x, y, EL_LEERRAUM);
+      DrawScreenElement(x, y, EL_EMPTY);
 
     if (horiz_move)
       DrawScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
@@ -1908,7 +1908,7 @@ void DrawScreenField(int x, int y)
 	element_old == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
 
-    DrawScreenElement(x, y, EL_LEERRAUM);
+    DrawScreenElement(x, y, EL_EMPTY);
 
     if (horiz_move)
       DrawScreenElementShifted(sx, sy, MovPos[oldx][oldy], 0, element_old,
@@ -1923,7 +1923,7 @@ void DrawScreenField(int x, int y)
   else if (IS_DRAWABLE(element))
     DrawScreenElement(x, y, element);
   else
-    DrawScreenElement(x, y, EL_LEERRAUM);
+    DrawScreenElement(x, y, EL_EMPTY);
 }
 
 void DrawNewScreenField(int x, int y)
@@ -1934,7 +1934,7 @@ void DrawNewScreenField(int x, int y)
   if (!IN_LEV_FIELD(ux, uy))
   {
     if (ux < -1 || ux > lev_fieldx || uy < -1 || uy > lev_fieldy)
-      element = EL_LEERRAUM;
+      element = EL_EMPTY;
     else
       element = BorderElement;
 
@@ -1963,7 +1963,7 @@ void DrawNewScreenField(int x, int y)
     if (cut_mode == CUT_ABOVE)
       DrawNewScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
     else
-      DrawNewScreenElement(x, y, EL_LEERRAUM);
+      DrawNewScreenElement(x, y, EL_EMPTY);
 
     if (horiz_move)
       DrawNewScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
@@ -1998,7 +1998,7 @@ void DrawNewScreenField(int x, int y)
 	element_old == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
 
-    DrawNewScreenElement(x, y, EL_LEERRAUM);
+    DrawNewScreenElement(x, y, EL_EMPTY);
 
     if (horiz_move)
       DrawNewScreenElementShifted(sx, sy, MovPos[oldx][oldy], 0, element_old,
@@ -2013,7 +2013,7 @@ void DrawNewScreenField(int x, int y)
   else if (IS_DRAWABLE(element))
     DrawNewScreenElement(x, y, element);
   else
-    DrawNewScreenElement(x, y, EL_LEERRAUM);
+    DrawNewScreenElement(x, y, EL_EMPTY);
 }
 
 void DrawLevelField(int x, int y)
@@ -2079,7 +2079,7 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
   int x = sx + scroll_x, y = sy + scroll_y;
 
   if (x < -1 || x > lev_fieldx || y < -1 || y > lev_fieldy)
-    DrawMiniElement(sx, sy, EL_LEERRAUM);
+    DrawMiniElement(sx, sy, EL_EMPTY);
   else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
     DrawMiniElement(sx, sy, Feld[x][y]);
   else
@@ -2112,7 +2112,7 @@ void DrawMicroElement(int xpos, int ypos, int element)
 {
   int graphic;
 
-  if (element == EL_LEERRAUM)
+  if (element == EL_EMPTY)
     return;
 
   graphic = el2gfx(element);
@@ -3016,263 +3016,263 @@ int el2gfx_OLD(int element)
 {
   switch(element)
   {
-    case EL_LEERRAUM:		return -1;
-    case EL_SAND:		return GFX_ERDREICH;
-    case EL_WALL:		return GFX_MAUERWERK;
-    case EL_WALL_CRUMBLED:	return GFX_FELSBODEN;
-    case EL_ROCK:		return GFX_FELSBROCKEN;
-    case EL_KEY:		return GFX_SCHLUESSEL;
-    case EL_EMERALD:		return GFX_EDELSTEIN;
-    case EL_EXIT_CLOSED:	return GFX_AUSGANG_ZU;
-    case EL_AUSGANG_ACT:	return GFX_AUSGANG_ACT;
-    case EL_EXIT_OPEN:		return GFX_AUSGANG_AUF;
-    case EL_PLAYER:		return GFX_SPIELFIGUR;
-    case EL_SPIELER1:		return GFX_SPIELER1;
-    case EL_SPIELER2:		return GFX_SPIELER2;
-    case EL_SPIELER3:		return GFX_SPIELER3;
-    case EL_SPIELER4:		return GFX_SPIELER4;
-    case EL_BUG:		return GFX_KAEFER;
-    case EL_BUG_RIGHT:		return GFX_KAEFER_RIGHT;
-    case EL_BUG_UP:		return GFX_KAEFER_UP;
-    case EL_BUG_LEFT:		return GFX_KAEFER_LEFT;
-    case EL_BUG_DOWN:		return GFX_KAEFER_DOWN;
-    case EL_SPACESHIP:		return GFX_FLIEGER;
-    case EL_SPACESHIP_RIGHT:	return GFX_FLIEGER_RIGHT;
-    case EL_SPACESHIP_UP:	return GFX_FLIEGER_UP;
-    case EL_SPACESHIP_LEFT:	return GFX_FLIEGER_LEFT;
-    case EL_SPACESHIP_DOWN:	return GFX_FLIEGER_DOWN;
-    case EL_BUTTERFLY:		return GFX_BUTTERFLY;
-    case EL_BUTTERFLY_RIGHT:	return GFX_BUTTERFLY_RIGHT;
-    case EL_BUTTERFLY_UP:	return GFX_BUTTERFLY_UP;
-    case EL_BUTTERFLY_LEFT:	return GFX_BUTTERFLY_LEFT;
-    case EL_BUTTERFLY_DOWN:	return GFX_BUTTERFLY_DOWN;
-    case EL_FIREFLY:		return GFX_FIREFLY;
-    case EL_FIREFLY_RIGHT:	return GFX_FIREFLY_RIGHT;
-    case EL_FIREFLY_UP:		return GFX_FIREFLY_UP;
-    case EL_FIREFLY_LEFT:	return GFX_FIREFLY_LEFT;
-    case EL_FIREFLY_DOWN:	return GFX_FIREFLY_DOWN;
-    case EL_YAMYAM:		return GFX_MAMPFER;
-    case EL_ROBOT:		return GFX_ROBOT;
-    case EL_STEELWALL:		return GFX_BETON;
-    case EL_DIAMOND:		return GFX_DIAMANT;
-    case EL_QUICKSAND_EMPTY:	return GFX_MORAST_LEER;
-    case EL_QUICKSAND_FULL:	return GFX_MORAST_VOLL;
-    case EL_QUICKSAND_EMPTYING:	return GFX_MORAST_LEER;
-    case EL_AMOEBA_DROP:	return GFX_TROPFEN;
-    case EL_BOMB:		return GFX_BOMBE;
-    case EL_MAGIC_WALL:		return GFX_MAGIC_WALL_OFF;
-    case EL_MAGIC_WALL_EMPTY:	return GFX_MAGIC_WALL_EMPTY;
-    case EL_MAGIC_WALL_EMPTYING:return GFX_MAGIC_WALL_EMPTY;
-    case EL_MAGIC_WALL_FULL:	return GFX_MAGIC_WALL_FULL;
-    case EL_MAGIC_WALL_DEAD:	return GFX_MAGIC_WALL_DEAD;
-    case EL_ACID:		return GFX_SALZSAEURE;
-    case EL_AMOEBA_DEAD:	return GFX_AMOEBE_TOT;
-    case EL_AMOEBA_WET:		return GFX_AMOEBE_NASS;
-    case EL_AMOEBA_DRY:		return GFX_AMOEBE_NORM;
-    case EL_AMOEBA_FULL:	return GFX_AMOEBE_VOLL;
-    case EL_BD_AMOEBA:		return GFX_AMOEBE_BD;
-    case EL_AMOEBA2DIAM:	return GFX_AMOEBA2DIAM;
-    case EL_AMOEBA_DRIPPING:	return GFX_AMOEBE_NASS;
-    case EL_NUT:		return GFX_KOKOSNUSS;
-    case EL_GAMEOFLIFE:		return GFX_LIFE;
-    case EL_BIOMAZE:		return GFX_LIFE_ASYNC;
-    case EL_DYNAMITE_ACTIVE:	return GFX_DYNAMIT;
-    case EL_BADEWANNE:		return GFX_BADEWANNE;
-    case EL_ACIDPOOL_TOPLEFT:	return GFX_BADEWANNE1;
-    case EL_ACIDPOOL_TOPRIGHT:	return GFX_BADEWANNE2;
-    case EL_ACIDPOOL_BOTTOMLEFT:return GFX_BADEWANNE3;
-    case EL_ACIDPOOL_BOTTOM:	return GFX_BADEWANNE4;
-    case EL_ACIDPOOL_BOTTOMRIGHT:return GFX_BADEWANNE5;
-    case EL_ROBOT_WHEEL:	return GFX_ABLENK_AUS;
-    case EL_ROBOT_WHEEL_ACTIVE:	return GFX_ABLENK_EIN;
-    case EL_KEY1:		return GFX_SCHLUESSEL1;
-    case EL_KEY2:		return GFX_SCHLUESSEL2;
-    case EL_KEY3:		return GFX_SCHLUESSEL3;
-    case EL_KEY4:		return GFX_SCHLUESSEL4;
-    case EL_GATE1:		return GFX_PFORTE1;
-    case EL_GATE2:		return GFX_PFORTE2;
-    case EL_GATE3:		return GFX_PFORTE3;
-    case EL_GATE4:		return GFX_PFORTE4;
-    case EL_GATE1X:		return GFX_PFORTE1X;
-    case EL_GATE2X:		return GFX_PFORTE2X;
-    case EL_GATE3X:		return GFX_PFORTE3X;
-    case EL_GATE4X:		return GFX_PFORTE4X;
-    case EL_DYNAMITE:		return GFX_DYNAMIT_AUS;
-    case EL_PACMAN:		return GFX_PACMAN;
-    case EL_PACMAN_RIGHT:	return GFX_PACMAN_RIGHT;
-    case EL_PACMAN_UP:		return GFX_PACMAN_UP;
-    case EL_PACMAN_LEFT:	return GFX_PACMAN_LEFT;
-    case EL_PACMAN_DOWN:	return GFX_PACMAN_DOWN;
-    case EL_INVISIBLE_WALL:	return GFX_UNSICHTBAR;
-    case EL_WALL_EDEL:		return GFX_ERZ_EDEL;
-    case EL_WALL_DIAMOND:	return GFX_ERZ_DIAM;
-    case EL_LAMP:		return GFX_BIRNE_AUS;
-    case EL_LAMP_ACTIVE:	return GFX_BIRNE_EIN;
-    case EL_TIME_ORB_FULL:	return GFX_ZEIT_VOLL;
-    case EL_TIME_ORB_EMPTY:	return GFX_ZEIT_LEER;
-    case EL_MAUER_LEBT:		return GFX_MAUER_LEBT;
-    case EL_MAUER_X:		return GFX_MAUER_X;
-    case EL_MAUER_Y:		return GFX_MAUER_Y;
-    case EL_MAUER_XY:		return GFX_MAUER_XY;
-    case EL_EMERALD_BD:		return GFX_EDELSTEIN_BD;
-    case EL_EMERALD_YELLOW:	return GFX_EDELSTEIN_GELB;
-    case EL_EMERALD_RED:	return GFX_EDELSTEIN_ROT;
-    case EL_EMERALD_PURPLE:	return GFX_EDELSTEIN_LILA;
-    case EL_WALL_BD_DIAMOND:	return GFX_ERZ_EDEL_BD;
-    case EL_WALL_EDEL_YELLOW:	return GFX_ERZ_EDEL_GELB;
-    case EL_WALL_EDEL_RED:	return GFX_ERZ_EDEL_ROT;
-    case EL_WALL_EDEL_PURPLE:	return GFX_ERZ_EDEL_LILA;
-    case EL_DARK_YAMYAM:	return GFX_MAMPFER2;
-    case EL_MAGIC_WALL_BD_OFF:	return GFX_MAGIC_WALL_BD_OFF;
-    case EL_MAGIC_WALL_BD_EMPTY:return GFX_MAGIC_WALL_BD_EMPTY;
-    case EL_MAGIC_WALL_BD_EMPTYING:return GFX_MAGIC_WALL_BD_EMPTY;
-    case EL_MAGIC_WALL_BD_FULL:	return GFX_MAGIC_WALL_BD_FULL;
-    case EL_MAGIC_WALL_BD_DEAD:	return GFX_MAGIC_WALL_BD_DEAD;
-    case EL_DYNABOMB_ACTIVE_1:	return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_2:	return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_3:	return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_4:	return GFX_DYNABOMB;
-    case EL_DYNABOMB_NR:	return GFX_DYNABOMB_NR;
-    case EL_DYNABOMB_SZ:	return GFX_DYNABOMB_SZ;
-    case EL_DYNABOMB_XL:	return GFX_DYNABOMB_XL;
-    case EL_SOKOBAN_OBJEKT:	return GFX_SOKOBAN_OBJEKT;
-    case EL_SOKOBAN_FELD_LEER:	return GFX_SOKOBAN_FELD_LEER;
-    case EL_SOKOBAN_FELD_VOLL:	return GFX_SOKOBAN_FELD_VOLL;
-    case EL_MOLE:		return GFX_MOLE;
-    case EL_PINGUIN:		return GFX_PINGUIN;
-    case EL_SCHWEIN:		return GFX_SCHWEIN;
-    case EL_DRACHE:		return GFX_DRACHE;
-    case EL_SONDE:		return GFX_SONDE;
-    case EL_PFEIL_LEFT:		return GFX_PFEIL_LEFT;
-    case EL_PFEIL_RIGHT:	return GFX_PFEIL_RIGHT;
-    case EL_PFEIL_UP:		return GFX_PFEIL_UP;
-    case EL_PFEIL_DOWN:		return GFX_PFEIL_DOWN;
-    case EL_SPEED_PILL:		return GFX_SPEED_PILL;
-    case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
-    case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
-    case EL_SP_ZONK:		return GFX_SP_ZONK;
+    case EL_EMPTY:			return -1;
+    case EL_SAND:			return GFX_ERDREICH;
+    case EL_WALL:			return GFX_MAUERWERK;
+    case EL_WALL_CRUMBLED:		return GFX_FELSBODEN;
+    case EL_ROCK:			return GFX_FELSBROCKEN;
+    case EL_KEY:			return GFX_SCHLUESSEL;
+    case EL_EMERALD:			return GFX_EDELSTEIN;
+    case EL_EXIT_CLOSED:		return GFX_AUSGANG_ZU;
+    case EL_AUSGANG_ACT:		return GFX_AUSGANG_ACT;
+    case EL_EXIT_OPEN:			return GFX_AUSGANG_AUF;
+    case EL_PLAYER:			return GFX_SPIELFIGUR;
+    case EL_PLAYER1:			return GFX_SPIELER1;
+    case EL_PLAYER2:			return GFX_SPIELER2;
+    case EL_PLAYER3:			return GFX_SPIELER3;
+    case EL_PLAYER4:			return GFX_SPIELER4;
+    case EL_BUG:			return GFX_KAEFER;
+    case EL_BUG_RIGHT:			return GFX_KAEFER_RIGHT;
+    case EL_BUG_UP:			return GFX_KAEFER_UP;
+    case EL_BUG_LEFT:			return GFX_KAEFER_LEFT;
+    case EL_BUG_DOWN:			return GFX_KAEFER_DOWN;
+    case EL_SPACESHIP:			return GFX_FLIEGER;
+    case EL_SPACESHIP_RIGHT:		return GFX_FLIEGER_RIGHT;
+    case EL_SPACESHIP_UP:		return GFX_FLIEGER_UP;
+    case EL_SPACESHIP_LEFT:		return GFX_FLIEGER_LEFT;
+    case EL_SPACESHIP_DOWN:		return GFX_FLIEGER_DOWN;
+    case EL_BUTTERFLY:			return GFX_BUTTERFLY;
+    case EL_BUTTERFLY_RIGHT:		return GFX_BUTTERFLY_RIGHT;
+    case EL_BUTTERFLY_UP:		return GFX_BUTTERFLY_UP;
+    case EL_BUTTERFLY_LEFT:		return GFX_BUTTERFLY_LEFT;
+    case EL_BUTTERFLY_DOWN:		return GFX_BUTTERFLY_DOWN;
+    case EL_FIREFLY:			return GFX_FIREFLY;
+    case EL_FIREFLY_RIGHT:		return GFX_FIREFLY_RIGHT;
+    case EL_FIREFLY_UP:			return GFX_FIREFLY_UP;
+    case EL_FIREFLY_LEFT:		return GFX_FIREFLY_LEFT;
+    case EL_FIREFLY_DOWN:		return GFX_FIREFLY_DOWN;
+    case EL_YAMYAM:			return GFX_MAMPFER;
+    case EL_ROBOT:			return GFX_ROBOT;
+    case EL_STEELWALL:			return GFX_BETON;
+    case EL_DIAMOND:			return GFX_DIAMANT;
+    case EL_QUICKSAND_EMPTY:		return GFX_MORAST_LEER;
+    case EL_QUICKSAND_FULL:		return GFX_MORAST_VOLL;
+    case EL_QUICKSAND_EMPTYING:		return GFX_MORAST_LEER;
+    case EL_AMOEBA_DROP:		return GFX_TROPFEN;
+    case EL_BOMB:			return GFX_BOMBE;
+    case EL_MAGIC_WALL:			return GFX_MAGIC_WALL_OFF;
+    case EL_MAGIC_WALL_EMPTY:		return GFX_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_EMPTYING:	return GFX_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_FULL:		return GFX_MAGIC_WALL_FULL;
+    case EL_MAGIC_WALL_DEAD:		return GFX_MAGIC_WALL_DEAD;
+    case EL_ACID:			return GFX_SALZSAEURE;
+    case EL_AMOEBA_DEAD:		return GFX_AMOEBE_TOT;
+    case EL_AMOEBA_WET:			return GFX_AMOEBE_NASS;
+    case EL_AMOEBA_DRY:			return GFX_AMOEBE_NORM;
+    case EL_AMOEBA_FULL:		return GFX_AMOEBE_VOLL;
+    case EL_BD_AMOEBA:			return GFX_AMOEBE_BD;
+    case EL_AMOEBA_TO_DIAMOND:		return GFX_AMOEBA2DIAM;
+    case EL_AMOEBA_DRIPPING:		return GFX_AMOEBE_NASS;
+    case EL_NUT:			return GFX_KOKOSNUSS;
+    case EL_GAMEOFLIFE:			return GFX_LIFE;
+    case EL_BIOMAZE:			return GFX_LIFE_ASYNC;
+    case EL_DYNAMITE_ACTIVE:		return GFX_DYNAMIT;
+    case EL_STONEBLOCK:			return GFX_BADEWANNE;
+    case EL_ACIDPOOL_TOPLEFT:		return GFX_BADEWANNE1;
+    case EL_ACIDPOOL_TOPRIGHT:		return GFX_BADEWANNE2;
+    case EL_ACIDPOOL_BOTTOMLEFT:	return GFX_BADEWANNE3;
+    case EL_ACIDPOOL_BOTTOM:		return GFX_BADEWANNE4;
+    case EL_ACIDPOOL_BOTTOMRIGHT:	return GFX_BADEWANNE5;
+    case EL_ROBOT_WHEEL:		return GFX_ABLENK_AUS;
+    case EL_ROBOT_WHEEL_ACTIVE:		return GFX_ABLENK_EIN;
+    case EL_KEY1:			return GFX_SCHLUESSEL1;
+    case EL_KEY2:			return GFX_SCHLUESSEL2;
+    case EL_KEY3:			return GFX_SCHLUESSEL3;
+    case EL_KEY4:			return GFX_SCHLUESSEL4;
+    case EL_GATE1:			return GFX_PFORTE1;
+    case EL_GATE2:			return GFX_PFORTE2;
+    case EL_GATE3:			return GFX_PFORTE3;
+    case EL_GATE4:			return GFX_PFORTE4;
+    case EL_GATE1_GRAY:			return GFX_PFORTE1X;
+    case EL_GATE2_GRAY:			return GFX_PFORTE2X;
+    case EL_GATE3_GRAY:			return GFX_PFORTE3X;
+    case EL_GATE4_GRAY:			return GFX_PFORTE4X;
+    case EL_DYNAMITE:			return GFX_DYNAMIT_AUS;
+    case EL_PACMAN:			return GFX_PACMAN;
+    case EL_PACMAN_RIGHT:		return GFX_PACMAN_RIGHT;
+    case EL_PACMAN_UP:			return GFX_PACMAN_UP;
+    case EL_PACMAN_LEFT:		return GFX_PACMAN_LEFT;
+    case EL_PACMAN_DOWN:		return GFX_PACMAN_DOWN;
+    case EL_INVISIBLE_WALL:		return GFX_UNSICHTBAR;
+    case EL_WALL_EMERALD:		return GFX_ERZ_EDEL;
+    case EL_WALL_DIAMOND:		return GFX_ERZ_DIAM;
+    case EL_LAMP:			return GFX_BIRNE_AUS;
+    case EL_LAMP_ACTIVE:		return GFX_BIRNE_EIN;
+    case EL_TIME_ORB_FULL:		return GFX_ZEIT_VOLL;
+    case EL_TIME_ORB_EMPTY:		return GFX_ZEIT_LEER;
+    case EL_WALL_GROWING:		return GFX_MAUER_LEBT;
+    case EL_WALL_GROWING_X:		return GFX_MAUER_X;
+    case EL_WALL_GROWING_Y:		return GFX_MAUER_Y;
+    case EL_WALL_GROWING_XY:		return GFX_MAUER_XY;
+    case EL_BD_DIAMOND:			return GFX_EDELSTEIN_BD;
+    case EL_EMERALD_YELLOW:		return GFX_EDELSTEIN_GELB;
+    case EL_EMERALD_RED:		return GFX_EDELSTEIN_ROT;
+    case EL_EMERALD_PURPLE:		return GFX_EDELSTEIN_LILA;
+    case EL_WALL_BD_DIAMOND:		return GFX_ERZ_EDEL_BD;
+    case EL_WALL_EMERALD_YELLOW:	return GFX_ERZ_EDEL_GELB;
+    case EL_WALL_EMERALD_RED:		return GFX_ERZ_EDEL_ROT;
+    case EL_WALL_EMERALD_PURPLE:	return GFX_ERZ_EDEL_LILA;
+    case EL_DARK_YAMYAM:		return GFX_MAMPFER2;
+    case EL_MAGIC_WALL_BD_OFF:		return GFX_MAGIC_WALL_BD_OFF;
+    case EL_MAGIC_WALL_BD_EMPTY:	return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_MAGIC_WALL_BD_EMPTYING:	return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_MAGIC_WALL_BD_FULL:		return GFX_MAGIC_WALL_BD_FULL;
+    case EL_MAGIC_WALL_BD_DEAD:		return GFX_MAGIC_WALL_BD_DEAD;
+    case EL_DYNABOMB_ACTIVE_1:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_2:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_3:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_4:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_NR:		return GFX_DYNABOMB_NR;
+    case EL_DYNABOMB_SZ:		return GFX_DYNABOMB_SZ;
+    case EL_DYNABOMB_XL:		return GFX_DYNABOMB_XL;
+    case EL_SOKOBAN_OBJEKT:		return GFX_SOKOBAN_OBJEKT;
+    case EL_SOKOBAN_FELD_LEER:		return GFX_SOKOBAN_FELD_LEER;
+    case EL_SOKOBAN_FELD_VOLL:		return GFX_SOKOBAN_FELD_VOLL;
+    case EL_MOLE:			return GFX_MOLE;
+    case EL_PENGUIN:			return GFX_PINGUIN;
+    case EL_PIG:			return GFX_SCHWEIN;
+    case EL_DRAGON:			return GFX_DRACHE;
+    case EL_SATELLITE:			return GFX_SONDE;
+    case EL_ARROW_LEFT:			return GFX_PFEIL_LEFT;
+    case EL_ARROW_RIGHT:		return GFX_PFEIL_RIGHT;
+    case EL_ARROW_UP:			return GFX_PFEIL_UP;
+    case EL_ARROW_DOWN:			return GFX_PFEIL_DOWN;
+    case EL_SPEED_PILL:			return GFX_SPEED_PILL;
+    case EL_SP_TERMINAL_ACTIVE:		return GFX_SP_TERMINAL;
+    case EL_SP_BUG_ACTIVE:		return GFX_SP_BUG_ACTIVE;
+    case EL_SP_ZONK:			return GFX_SP_ZONK;
       /* ^^^^^^^^^^ non-standard position in supaplex graphic set! */
-    case EL_INVISIBLE_STEEL:	return GFX_INVISIBLE_STEEL;
-    case EL_BLACK_ORB:		return GFX_BLACK_ORB;
-    case EL_EM_GATE1:		return GFX_EM_GATE_1;
-    case EL_EM_GATE2:		return GFX_EM_GATE_2;
-    case EL_EM_GATE3:		return GFX_EM_GATE_3;
-    case EL_EM_GATE4:		return GFX_EM_GATE_4;
-    case EL_EM_GATE1_GRAY:	return GFX_EM_GATE_1X;
-    case EL_EM_GATE2_GRAY:	return GFX_EM_GATE_2X;
-    case EL_EM_GATE3_GRAY:	return GFX_EM_GATE_3X;
-    case EL_EM_GATE4_GRAY:	return GFX_EM_GATE_4X;
-    case EL_EM_KEY_1_FILE:	return GFX_EM_KEY_1;
-    case EL_EM_KEY_2_FILE:	return GFX_EM_KEY_2;
-    case EL_EM_KEY_3_FILE:	return GFX_EM_KEY_3;
-    case EL_EM_KEY_4_FILE:	return GFX_EM_KEY_4;
-    case EL_EM_KEY_1:		return GFX_EM_KEY_1;
-    case EL_EM_KEY_2:		return GFX_EM_KEY_2;
-    case EL_EM_KEY_3:		return GFX_EM_KEY_3;
-    case EL_EM_KEY_4:		return GFX_EM_KEY_4;
-    case EL_PEARL:		return GFX_PEARL;
-    case EL_CRYSTAL:		return GFX_CRYSTAL;
-    case EL_WALL_PEARL:		return GFX_WALL_PEARL;
-    case EL_WALL_CRYSTAL:	return GFX_WALL_CRYSTAL;
-    case EL_DOOR_WHITE:		return GFX_DOOR_WHITE;
-    case EL_DOOR_WHITE_GRAY:	return GFX_DOOR_WHITE_GRAY;
-    case EL_KEY_WHITE:		return GFX_KEY_WHITE;
-    case EL_SHIELD_PASSIVE:	return GFX_SHIELD_PASSIVE;
-    case EL_SHIELD_ACTIVE:	return GFX_SHIELD_ACTIVE;
-    case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
-    case EL_SWITCHGATE_OPEN:	return GFX_SWITCHGATE_OPEN;
-    case EL_SWITCHGATE_CLOSED:	return GFX_SWITCHGATE_CLOSED;
-    case EL_SWITCHGATE_SWITCH_1:return GFX_SWITCHGATE_SWITCH_1;
-    case EL_SWITCHGATE_SWITCH_2:return GFX_SWITCHGATE_SWITCH_2;
-    case EL_BELT1_LEFT:		return GFX_BELT1_LEFT;
-    case EL_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
-    case EL_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
-    case EL_BELT1_SWITCH_LEFT:	return GFX_BELT1_SWITCH_LEFT;
-    case EL_BELT1_SWITCH_MIDDLE:return GFX_BELT1_SWITCH_MIDDLE;
-    case EL_BELT1_SWITCH_RIGHT:	return GFX_BELT1_SWITCH_RIGHT;
-    case EL_BELT2_LEFT:		return GFX_BELT2_LEFT;
-    case EL_BELT2_MIDDLE:	return GFX_BELT2_MIDDLE;
-    case EL_BELT2_RIGHT:	return GFX_BELT2_RIGHT;
-    case EL_BELT2_SWITCH_LEFT:	return GFX_BELT2_SWITCH_LEFT;
-    case EL_BELT2_SWITCH_MIDDLE:return GFX_BELT2_SWITCH_MIDDLE;
-    case EL_BELT2_SWITCH_RIGHT:	return GFX_BELT2_SWITCH_RIGHT;
-    case EL_BELT3_LEFT:		return GFX_BELT3_LEFT;
-    case EL_BELT3_MIDDLE:	return GFX_BELT3_MIDDLE;
-    case EL_BELT3_RIGHT:	return GFX_BELT3_RIGHT;
-    case EL_BELT3_SWITCH_LEFT:	return GFX_BELT3_SWITCH_LEFT;
-    case EL_BELT3_SWITCH_MIDDLE:return GFX_BELT3_SWITCH_MIDDLE;
-    case EL_BELT3_SWITCH_RIGHT:	return GFX_BELT3_SWITCH_RIGHT;
-    case EL_BELT4_LEFT:		return GFX_BELT4_LEFT;
-    case EL_BELT4_MIDDLE:	return GFX_BELT4_MIDDLE;
-    case EL_BELT4_RIGHT:	return GFX_BELT4_RIGHT;
-    case EL_BELT4_SWITCH_LEFT:	return GFX_BELT4_SWITCH_LEFT;
-    case EL_BELT4_SWITCH_MIDDLE:return GFX_BELT4_SWITCH_MIDDLE;
-    case EL_BELT4_SWITCH_RIGHT:	return GFX_BELT4_SWITCH_RIGHT;
-    case EL_LANDMINE:		return GFX_LANDMINE;
-    case EL_ENVELOPE:		return GFX_ENVELOPE;
-    case EL_LIGHT_SWITCH_OFF:	return GFX_LIGHT_SWITCH_OFF;
-    case EL_LIGHT_SWITCH_ON:	return GFX_LIGHT_SWITCH_ON;
-    case EL_SIGN_EXCLAMATION:	return GFX_SIGN_EXCLAMATION;
-    case EL_SIGN_RADIOACTIVITY:	return GFX_SIGN_RADIOACTIVITY;
-    case EL_SIGN_STOP:		return GFX_SIGN_STOP;
-    case EL_SIGN_WHEELCHAIR:	return GFX_SIGN_WHEELCHAIR;
-    case EL_SIGN_PARKING:	return GFX_SIGN_PARKING;
-    case EL_SIGN_ONEWAY:	return GFX_SIGN_ONEWAY;
-    case EL_SIGN_HEART:		return GFX_SIGN_HEART;
-    case EL_SIGN_TRIANGLE:	return GFX_SIGN_TRIANGLE;
-    case EL_SIGN_ROUND:		return GFX_SIGN_ROUND;
-    case EL_SIGN_EXIT:		return GFX_SIGN_EXIT;
-    case EL_SIGN_YINYANG:	return GFX_SIGN_YINYANG;
-    case EL_SIGN_OTHER:		return GFX_SIGN_OTHER;
-    case EL_MOLE_LEFT:		return GFX_MOLE_LEFT;
-    case EL_MOLE_RIGHT:		return GFX_MOLE_RIGHT;
-    case EL_MOLE_UP:		return GFX_MOLE_UP;
-    case EL_MOLE_DOWN:		return GFX_MOLE_DOWN;
-    case EL_STEEL_SLANTED:	return GFX_STEEL_SLANTED;
-    case EL_SAND_INVISIBLE:	return GFX_SAND_INVISIBLE;
-    case EL_DX_UNKNOWN_15:	return GFX_DX_UNKNOWN_15;
-    case EL_DX_UNKNOWN_42:	return GFX_DX_UNKNOWN_42;
-    case EL_TIMEGATE_OPEN:	return GFX_TIMEGATE_OPEN;
-    case EL_TIMEGATE_CLOSED:	return GFX_TIMEGATE_CLOSED;
-    case EL_TIMEGATE_SWITCH_ON:	return GFX_TIMEGATE_SWITCH;
-    case EL_TIMEGATE_SWITCH_OFF:return GFX_TIMEGATE_SWITCH;
-    case EL_BALLOON:		return GFX_BALLOON;
-    case EL_BALLOON_SEND_LEFT:	return GFX_BALLOON_SEND_LEFT;
-    case EL_BALLOON_SEND_RIGHT:	return GFX_BALLOON_SEND_RIGHT;
-    case EL_BALLOON_SEND_UP:	return GFX_BALLOON_SEND_UP;
-    case EL_BALLOON_SEND_DOWN:	return GFX_BALLOON_SEND_DOWN;
-    case EL_BALLOON_SEND_ANY:	return GFX_BALLOON_SEND_ANY;
-    case EL_EMC_STEEL_WALL_1:	return GFX_EMC_STEEL_WALL_1;
-    case EL_EMC_STEEL_WALL_2:	return GFX_EMC_STEEL_WALL_2;
-    case EL_EMC_STEEL_WALL_3:	return GFX_EMC_STEEL_WALL_3;
-    case EL_EMC_STEEL_WALL_4:	return GFX_EMC_STEEL_WALL_4;
-    case EL_EMC_WALL_1:		return GFX_EMC_WALL_1;
-    case EL_EMC_WALL_2:		return GFX_EMC_WALL_2;
-    case EL_EMC_WALL_3:		return GFX_EMC_WALL_3;
-    case EL_EMC_WALL_4:		return GFX_EMC_WALL_4;
-    case EL_EMC_WALL_5:		return GFX_EMC_WALL_5;
-    case EL_EMC_WALL_6:		return GFX_EMC_WALL_6;
-    case EL_EMC_WALL_7:		return GFX_EMC_WALL_7;
-    case EL_EMC_WALL_8:		return GFX_EMC_WALL_8;
-    case EL_TUBE_CROSS:		return GFX_TUBE_CROSS;
-    case EL_TUBE_VERTICAL:	return GFX_TUBE_VERTICAL;
-    case EL_TUBE_HORIZONTAL:	return GFX_TUBE_HORIZONTAL;
-    case EL_TUBE_VERT_LEFT:	return GFX_TUBE_VERT_LEFT;
-    case EL_TUBE_VERT_RIGHT:	return GFX_TUBE_VERT_RIGHT;
-    case EL_TUBE_HORIZ_UP:	return GFX_TUBE_HORIZ_UP;
-    case EL_TUBE_HORIZ_DOWN:	return GFX_TUBE_HORIZ_DOWN;
-    case EL_TUBE_LEFT_UP:	return GFX_TUBE_LEFT_UP;
-    case EL_TUBE_LEFT_DOWN:	return GFX_TUBE_LEFT_DOWN;
-    case EL_TUBE_RIGHT_UP:	return GFX_TUBE_RIGHT_UP;
-    case EL_TUBE_RIGHT_DOWN:	return GFX_TUBE_RIGHT_DOWN;
-    case EL_SPRING:		return GFX_SPRING;
-    case EL_SPRING_MOVING:	return GFX_SPRING;
-    case EL_TRAP_INACTIVE:	return GFX_TRAP_INACTIVE;
-    case EL_TRAP_ACTIVE:	return GFX_TRAP_ACTIVE;
-    case EL_BD_WALL:		return GFX_BD_WALL;
-    case EL_BD_ROCK:		return GFX_BD_ROCK;
-    case EL_DX_SUPABOMB:	return GFX_DX_SUPABOMB;
-    case EL_SP_MURPHY_CLONE:	return GFX_SP_MURPHY_CLONE;
+    case EL_INVISIBLE_STEELWALL:	return GFX_INVISIBLE_STEEL;
+    case EL_BLACK_ORB:			return GFX_BLACK_ORB;
+    case EL_EM_GATE1:			return GFX_EM_GATE_1;
+    case EL_EM_GATE2:			return GFX_EM_GATE_2;
+    case EL_EM_GATE3:			return GFX_EM_GATE_3;
+    case EL_EM_GATE4:			return GFX_EM_GATE_4;
+    case EL_EM_GATE1_GRAY:		return GFX_EM_GATE_1X;
+    case EL_EM_GATE2_GRAY:		return GFX_EM_GATE_2X;
+    case EL_EM_GATE3_GRAY:		return GFX_EM_GATE_3X;
+    case EL_EM_GATE4_GRAY:		return GFX_EM_GATE_4X;
+    case EL_EM_KEY1_FILE:		return GFX_EM_KEY_1;
+    case EL_EM_KEY2_FILE:		return GFX_EM_KEY_2;
+    case EL_EM_KEY3_FILE:		return GFX_EM_KEY_3;
+    case EL_EM_KEY4_FILE:		return GFX_EM_KEY_4;
+    case EL_EM_KEY1:			return GFX_EM_KEY_1;
+    case EL_EM_KEY2:			return GFX_EM_KEY_2;
+    case EL_EM_KEY3:			return GFX_EM_KEY_3;
+    case EL_EM_KEY4:			return GFX_EM_KEY_4;
+    case EL_PEARL:			return GFX_PEARL;
+    case EL_CRYSTAL:			return GFX_CRYSTAL;
+    case EL_WALL_PEARL:			return GFX_WALL_PEARL;
+    case EL_WALL_CRYSTAL:		return GFX_WALL_CRYSTAL;
+    case EL_DOOR_WHITE:			return GFX_DOOR_WHITE;
+    case EL_DOOR_WHITE_GRAY:		return GFX_DOOR_WHITE_GRAY;
+    case EL_KEY_WHITE:			return GFX_KEY_WHITE;
+    case EL_SHIELD_NORMAL:		return GFX_SHIELD_PASSIVE;
+    case EL_SHIELD_ACTIVE:		return GFX_SHIELD_ACTIVE;
+    case EL_EXTRA_TIME:			return GFX_EXTRA_TIME;
+    case EL_SWITCHGATE_OPEN:		return GFX_SWITCHGATE_OPEN;
+    case EL_SWITCHGATE_CLOSED:		return GFX_SWITCHGATE_CLOSED;
+    case EL_SWITCHGATE_SWITCH_UP:	return GFX_SWITCHGATE_SWITCH_1;
+    case EL_SWITCHGATE_SWITCH_DOWN:	return GFX_SWITCHGATE_SWITCH_2;
+    case EL_CONVEYOR_BELT1_LEFT:	return GFX_BELT1_LEFT;
+    case EL_CONVEYOR_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
+    case EL_CONVEYOR_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
+    case EL_CONVEYOR_BELT1_SWITCH_LEFT:	return GFX_BELT1_SWITCH_LEFT;
+    case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:return GFX_BELT1_SWITCH_MIDDLE;
+    case EL_CONVEYOR_BELT1_SWITCH_RIGHT:return GFX_BELT1_SWITCH_RIGHT;
+    case EL_CONVEYOR_BELT2_LEFT:	return GFX_BELT2_LEFT;
+    case EL_CONVEYOR_BELT2_MIDDLE:	return GFX_BELT2_MIDDLE;
+    case EL_CONVEYOR_BELT2_RIGHT:	return GFX_BELT2_RIGHT;
+    case EL_CONVEYOR_BELT2_SWITCH_LEFT:	return GFX_BELT2_SWITCH_LEFT;
+    case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:return GFX_BELT2_SWITCH_MIDDLE;
+    case EL_CONVEYOR_BELT2_SWITCH_RIGHT:return GFX_BELT2_SWITCH_RIGHT;
+    case EL_CONVEYOR_BELT3_LEFT:	return GFX_BELT3_LEFT;
+    case EL_CONVEYOR_BELT3_MIDDLE:	return GFX_BELT3_MIDDLE;
+    case EL_CONVEYOR_BELT3_RIGHT:	return GFX_BELT3_RIGHT;
+    case EL_CONVEYOR_BELT3_SWITCH_LEFT:	return GFX_BELT3_SWITCH_LEFT;
+    case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:return GFX_BELT3_SWITCH_MIDDLE;
+    case EL_CONVEYOR_BELT3_SWITCH_RIGHT:return GFX_BELT3_SWITCH_RIGHT;
+    case EL_CONVEYOR_BELT4_LEFT:	return GFX_BELT4_LEFT;
+    case EL_CONVEYOR_BELT4_MIDDLE:	return GFX_BELT4_MIDDLE;
+    case EL_CONVEYOR_BELT4_RIGHT:	return GFX_BELT4_RIGHT;
+    case EL_CONVEYOR_BELT4_SWITCH_LEFT:	return GFX_BELT4_SWITCH_LEFT;
+    case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:return GFX_BELT4_SWITCH_MIDDLE;
+    case EL_CONVEYOR_BELT4_SWITCH_RIGHT:return GFX_BELT4_SWITCH_RIGHT;
+    case EL_LANDMINE:			return GFX_LANDMINE;
+    case EL_ENVELOPE:			return GFX_ENVELOPE;
+    case EL_LIGHT_SWITCH:		return GFX_LIGHT_SWITCH_OFF;
+    case EL_LIGHT_SWITCH_ACTIVE:	return GFX_LIGHT_SWITCH_ON;
+    case EL_SIGN_EXCLAMATION:		return GFX_SIGN_EXCLAMATION;
+    case EL_SIGN_RADIOACTIVITY:		return GFX_SIGN_RADIOACTIVITY;
+    case EL_SIGN_STOP:			return GFX_SIGN_STOP;
+    case EL_SIGN_WHEELCHAIR:		return GFX_SIGN_WHEELCHAIR;
+    case EL_SIGN_PARKING:		return GFX_SIGN_PARKING;
+    case EL_SIGN_ONEWAY:		return GFX_SIGN_ONEWAY;
+    case EL_SIGN_HEART:			return GFX_SIGN_HEART;
+    case EL_SIGN_TRIANGLE:		return GFX_SIGN_TRIANGLE;
+    case EL_SIGN_ROUND:			return GFX_SIGN_ROUND;
+    case EL_SIGN_EXIT:			return GFX_SIGN_EXIT;
+    case EL_SIGN_YINYANG:		return GFX_SIGN_YINYANG;
+    case EL_SIGN_OTHER:			return GFX_SIGN_OTHER;
+    case EL_MOLE_LEFT:			return GFX_MOLE_LEFT;
+    case EL_MOLE_RIGHT:			return GFX_MOLE_RIGHT;
+    case EL_MOLE_UP:			return GFX_MOLE_UP;
+    case EL_MOLE_DOWN:			return GFX_MOLE_DOWN;
+    case EL_STEELWALL_SLANTED:		return GFX_STEEL_SLANTED;
+    case EL_SAND_INVISIBLE:		return GFX_SAND_INVISIBLE;
+    case EL_DX_UNKNOWN_15:		return GFX_DX_UNKNOWN_15;
+    case EL_DX_UNKNOWN_42:		return GFX_DX_UNKNOWN_42;
+    case EL_TIMEGATE_OPEN:		return GFX_TIMEGATE_OPEN;
+    case EL_TIMEGATE_CLOSED:		return GFX_TIMEGATE_CLOSED;
+    case EL_TIMEGATE_SWITCH_ON:		return GFX_TIMEGATE_SWITCH;
+    case EL_TIMEGATE_SWITCH_OFF:	return GFX_TIMEGATE_SWITCH;
+    case EL_BALLOON:			return GFX_BALLOON;
+    case EL_BALLOON_SEND_LEFT:		return GFX_BALLOON_SEND_LEFT;
+    case EL_BALLOON_SEND_RIGHT:		return GFX_BALLOON_SEND_RIGHT;
+    case EL_BALLOON_SEND_UP:		return GFX_BALLOON_SEND_UP;
+    case EL_BALLOON_SEND_DOWN:		return GFX_BALLOON_SEND_DOWN;
+    case EL_BALLOON_SEND_ANY:		return GFX_BALLOON_SEND_ANY;
+    case EL_EMC_STEELWALL1:		return GFX_EMC_STEEL_WALL_1;
+    case EL_EMC_STEELWALL2:		return GFX_EMC_STEEL_WALL_2;
+    case EL_EMC_STEELWALL3:		return GFX_EMC_STEEL_WALL_3;
+    case EL_EMC_STEELWALL4:		return GFX_EMC_STEEL_WALL_4;
+    case EL_EMC_WALL_PILLAR_UPPER:	return GFX_EMC_WALL_1;
+    case EL_EMC_WALL_PILLAR_MIDDLE:	return GFX_EMC_WALL_2;
+    case EL_EMC_WALL_PILLAR_LOWER:	return GFX_EMC_WALL_3;
+    case EL_EMC_WALL4:			return GFX_EMC_WALL_4;
+    case EL_EMC_WALL5:			return GFX_EMC_WALL_5;
+    case EL_EMC_WALL6:			return GFX_EMC_WALL_6;
+    case EL_EMC_WALL7:			return GFX_EMC_WALL_7;
+    case EL_EMC_WALL8:			return GFX_EMC_WALL_8;
+    case EL_TUBE_CROSS:			return GFX_TUBE_CROSS;
+    case EL_TUBE_VERTICAL:		return GFX_TUBE_VERTICAL;
+    case EL_TUBE_HORIZONTAL:		return GFX_TUBE_HORIZONTAL;
+    case EL_TUBE_VERT_LEFT:		return GFX_TUBE_VERT_LEFT;
+    case EL_TUBE_VERT_RIGHT:		return GFX_TUBE_VERT_RIGHT;
+    case EL_TUBE_HORIZ_UP:		return GFX_TUBE_HORIZ_UP;
+    case EL_TUBE_HORIZ_DOWN:		return GFX_TUBE_HORIZ_DOWN;
+    case EL_TUBE_LEFT_UP:		return GFX_TUBE_LEFT_UP;
+    case EL_TUBE_LEFT_DOWN:		return GFX_TUBE_LEFT_DOWN;
+    case EL_TUBE_RIGHT_UP:		return GFX_TUBE_RIGHT_UP;
+    case EL_TUBE_RIGHT_DOWN:		return GFX_TUBE_RIGHT_DOWN;
+    case EL_SPRING:			return GFX_SPRING;
+    case EL_SPRING_MOVING:		return GFX_SPRING;
+    case EL_TRAP_INACTIVE:		return GFX_TRAP_INACTIVE;
+    case EL_TRAP_ACTIVE:		return GFX_TRAP_ACTIVE;
+    case EL_BD_WALL:			return GFX_BD_WALL;
+    case EL_BD_ROCK:			return GFX_BD_ROCK;
+    case EL_DX_SUPABOMB:		return GFX_DX_SUPABOMB;
+    case EL_SP_MURPHY_CLONE:		return GFX_SP_MURPHY_CLONE;
 
     default:
     {

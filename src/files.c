@@ -58,7 +58,7 @@ static void setLevelInfoToDefaults()
 
   for(x=0; x<MAX_LEV_FIELDX; x++)
     for(y=0; y<MAX_LEV_FIELDY; y++)
-      Feld[x][y] = Ur[x][y] = EL_ERDREICH;
+      Feld[x][y] = Ur[x][y] = EL_SAND;
 
   level.time = 100;
   level.gems_needed = 0;
@@ -67,7 +67,7 @@ static void setLevelInfoToDefaults()
   level.time_wheel = 10;
   level.time_light = 10;
   level.time_timegate = 10;
-  level.amoeba_content = EL_DIAMANT;
+  level.amoeba_content = EL_DIAMOND;
   level.double_speed = FALSE;
   level.gravity = FALSE;
   level.em_slippery_gems = FALSE;
@@ -94,7 +94,7 @@ static void setLevelInfoToDefaults()
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 
-  BorderElement = EL_BETON;
+  BorderElement = EL_STEELWALL;
 
   /* try to determine better author name than 'anonymous' */
   if (strcmp(leveldir_current->author, ANONYMOUS_NAME) != 0)
@@ -132,7 +132,7 @@ static int checkLevelElement(int element)
   if (element >= EL_FIRST_RUNTIME)
   {
     Error(ERR_WARN, "invalid level element %d", element);
-    element = EL_CHAR_FRAGE;
+    element = EL_CHAR_QUESTION;
   }
 
   return element;
@@ -292,7 +292,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
 	for(x=0; x<3; x++)
 	  level->yam_content[i][x][y] = content_array[i][x][y];
   }
-  else if (element == EL_AMOEBE_BD)
+  else if (element == EL_BD_AMOEBA)
   {
     level->amoeba_content = content_array[0][0][0];
   }
@@ -574,7 +574,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 	for(x=0; x<3; x++)
 	  content_array[i][x][y] = level->yam_content[i][x][y];
   }
-  else if (element == EL_AMOEBE_BD)
+  else if (element == EL_BD_AMOEBA)
   {
     num_contents = 1;
     content_xsize = 1;
@@ -672,7 +672,7 @@ void SaveLevel(int level_nr)
   if (level.encoding_16bit_amoeba)
   {
     putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
-    SaveLevel_CNT2(file, &level, EL_AMOEBE_BD);
+    SaveLevel_CNT2(file, &level, EL_BD_AMOEBA);
   }
 
   fclose(file);
