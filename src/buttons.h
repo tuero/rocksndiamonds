@@ -275,15 +275,15 @@ int CheckCountButtons(int, int, int);
 
 
 /* gadget types */
-#define GD_TYPE_NORMAL_BUTTON		(1<<0)
-#define GD_TYPE_RADIO_BUTTON		(1<<1)
-#define GD_TYPE_DRAWING_AREA		(1<<2)
-#define GD_TYPE_TEXTINPUT		(1<<3)
-#define GD_TYPE_TEXTOUTPUT		(1<<4)
-#define GD_TYPE_NUMBERINPUT		(1<<5)
-#define GD_TYPE_NUMBEROUTPUT		(1<<6)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1<<7)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1<<8)
+#define GD_TYPE_NORMAL_BUTTON		(1 << 0)
+#define GD_TYPE_RADIO_BUTTON		(1 << 1)
+#define GD_TYPE_DRAWING_AREA		(1 << 2)
+#define GD_TYPE_TEXTINPUT		(1 << 3)
+#define GD_TYPE_TEXTOUTPUT		(1 << 4)
+#define GD_TYPE_NUMBERINPUT		(1 << 5)
+#define GD_TYPE_NUMBEROUTPUT		(1 << 6)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 7)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 8)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
 					 GD_TYPE_RADIO_BUTTON)
@@ -291,13 +291,13 @@ int CheckCountButtons(int, int, int);
 					 GD_TYPE_SCROLLBAR_HORIZONTAL)
 
 /* gadget events */
-#define GD_EVENT_PRESSED		(1<<0)
-#define GD_EVENT_RELEASED		(1<<1)
-#define GD_EVENT_MOVING			(1<<2)
-#define GD_EVENT_REPEATED		(1<<3)
-#define GD_EVENT_OFF_BORDERS		(1<<4)
-#define GD_EVENT_TEXT_RETURN		(1<<5)
-#define GD_EVENT_TEXT_LEAVING		(1<<6)
+#define GD_EVENT_PRESSED		(1 << 0)
+#define GD_EVENT_RELEASED		(1 << 1)
+#define GD_EVENT_MOVING			(1 << 2)
+#define GD_EVENT_REPEATED		(1 << 3)
+#define GD_EVENT_OFF_BORDERS		(1 << 4)
+#define GD_EVENT_TEXT_RETURN		(1 << 5)
+#define GD_EVENT_TEXT_LEAVING		(1 << 6)
 
 /* gadget button states */
 #define GD_BUTTON_UNPRESSED		0
@@ -361,6 +361,13 @@ struct GadgetDrawingArea
   int item_xsize, item_ysize;		/* size of each item in drawing area */
 };
 
+struct GadgetTextInput
+{
+  char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
+  int size;				/* maximal size of input text */
+  int cursor_position;			/* actual cursor position */
+};
+
 struct GadgetScrollbar
 {
   int items_max;			/* number of items to access */
@@ -386,8 +393,6 @@ struct GadgetInfo
   boolean radio_pressed;		/* radio button state */
   boolean mapped;			/* gadget is active */
   long number_value;
-  char text_value[MAX_GADGET_TEXTSIZE];
-  int text_size;			/* maximal size of input text */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
   int design_border;			/* border size of gadget decoration */
@@ -396,6 +401,7 @@ struct GadgetInfo
   gadget_function callback_info;	/* function for pop-up info text */
   gadget_function callback_action;	/* function for gadget action */
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
+  struct GadgetTextInput text;		/* fields for text input gadget */
   struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */
   struct GadgetInfo *next;		/* next list entry */
 };

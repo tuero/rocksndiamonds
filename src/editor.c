@@ -114,6 +114,8 @@
 #define ED_SCROLL_HORIZONTAL_YSIZE ED_SCROLLBUTTON_YSIZE
 
 /* control button identifiers */
+#define ED_CTRL_ID_NONE			-1
+
 #define ED_CTRL_ID_SINGLE_ITEMS		0
 #define ED_CTRL_ID_CONNECTED_ITEMS	1
 #define ED_CTRL_ID_LINE			2
@@ -127,7 +129,7 @@
 #define ED_CTRL_ID_UNUSED1		10
 #define ED_CTRL_ID_WRAP_RIGHT		11
 #define ED_CTRL_ID_RANDOM_PLACEMENT	12
-#define ED_CTRL_ID_BRUSH		13
+#define ED_CTRL_ID_GRAB_BRUSH		13
 #define ED_CTRL_ID_WRAP_DOWN		14
 #define ED_CTRL_ID_PICK_ELEMENT		15
 #define ED_CTRL_ID_UNDO			16
@@ -267,7 +269,6 @@ static struct
     "scroll level editing area horizontally"
   },
 };
-
 
 /* forward declaration for internal use */
 static void DrawDrawingWindow();
@@ -743,7 +744,7 @@ static void CreateControlButtons()
 	id == ED_CTRL_ID_RECTANGLE ||
 	id == ED_CTRL_ID_FILLED_BOX ||
 	id == ED_CTRL_ID_FLOOD_FILL ||
-	id == ED_CTRL_ID_BRUSH ||
+	id == ED_CTRL_ID_GRAB_BRUSH ||
 	id == ED_CTRL_ID_PICK_ELEMENT)
     {
       button_type = GD_TYPE_RADIO_BUTTON;
@@ -1246,6 +1247,8 @@ void DrawLevelEd()
 
   if (!level_editor_gadgets_created)
     CreateLevelEditorGadgets();
+  else
+    strcpy(level_editor_gadget[ED_CTRL_ID_LEVEL_NAME]->text.value, level.name);
 
   MapControlButtons();
 
@@ -2564,16 +2567,22 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 #define CB_BRUSH_TO_LEVEL	2
 #define CB_DELETE_OLD_CURSOR	3
 
-static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
+static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
+			 int button, int mode)
 {
   static short brush_buffer[ED_FIELDX][ED_FIELDY];
   static int brush_width, brush_height;
   static int last_cursor_x = -1, last_cursor_y = -1;
   static boolean delete_old_brush;
+  int new_element;
   int x, y;
 
   if (mode == CB_DELETE_OLD_CURSOR && !delete_old_brush)
     return;
+
+  new_element = (button == 1 ? new_element1 :
+		 button == 2 ? new_element2 :
+		 button == 3 ? new_element3 : 0);
 
   if (mode == CB_AREA_TO_BRUSH)
   {
@@ -2592,8 +2601,18 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
     from_ly = from_y + level_ypos;
 
     for (y=0; y<brush_height; y++)
+    {
       for (x=0; x<brush_width; x++)
+      {
 	brush_buffer[x][y] = Feld[from_lx + x][from_ly + y];
+
+	if (button != 1)
+	  DrawLineElement(from_x + x, from_y + y, new_element, TRUE);
+      }
+    }
+
+    if (button != 1)
+      CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 
     delete_old_brush = FALSE;
   }
@@ -2608,7 +2627,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
     int border_to_x = cursor_x, border_to_y = cursor_y;
 
     if (mode != CB_DELETE_OLD_CURSOR && delete_old_brush)
-      CopyBrushExt(0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
+      CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
 
     if (!IN_LEV_FIELD(cursor_x + level_xpos, cursor_y + level_ypos))
     {
@@ -2624,8 +2643,10 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
 	int sy = cursor_from_y + y;
 	int lx = sx + level_xpos;
 	int ly = sy + level_ypos;
-	int element = (mode == CB_DELETE_OLD_CURSOR ? -1 : brush_buffer[x][y]);
 	boolean change_level = (mode == CB_BRUSH_TO_LEVEL);
+	int element = (mode == CB_DELETE_OLD_CURSOR ? -1 :
+		       mode == CB_BRUSH_TO_CURSOR || button == 1 ?
+		       brush_buffer[x][y] : new_element);
 
 	if (IN_LEV_FIELD(lx, ly) &&
 	    sx >=0 && sx < ED_FIELDX && sy >=0 && sy < ED_FIELDY)
@@ -2652,8 +2673,10 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
     if (mode != CB_DELETE_OLD_CURSOR)
       DrawAreaBorder(border_from_x, border_from_y, border_to_x, border_to_y);
 
+    /*
     if (mode == CB_BRUSH_TO_LEVEL)
       CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+    */
 
     last_cursor_x = cursor_x;
     last_cursor_y = cursor_y;
@@ -2661,24 +2684,25 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
   }
 }
 
-static void CopyAreaToBrush(int from_x, int from_y, int to_x, int to_y)
+static void CopyAreaToBrush(int from_x, int from_y, int to_x, int to_y,
+			    int button)
 {
-  CopyBrushExt(from_x, from_y, to_x, to_y, CB_AREA_TO_BRUSH);
+  CopyBrushExt(from_x, from_y, to_x, to_y, button, CB_AREA_TO_BRUSH);
 }
 
-static void CopyBrushToLevel(int x, int y)
+static void CopyBrushToLevel(int x, int y, int button)
 {
-  CopyBrushExt(x, y, 0, 0, CB_BRUSH_TO_LEVEL);
+  CopyBrushExt(x, y, 0, 0, button, CB_BRUSH_TO_LEVEL);
 }
 
 static void CopyBrushToCursor(int x, int y)
 {
-  CopyBrushExt(x, y, 0, 0, CB_BRUSH_TO_CURSOR);
+  CopyBrushExt(x, y, 0, 0, 0, CB_BRUSH_TO_CURSOR);
 }
 
 static void DeleteBrushFromCursor()
 {
-  CopyBrushExt(0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
+  CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
 }
 
 static void FloodFill(int from_x, int from_y, int fill_element)
@@ -2946,6 +2970,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
   int x, y;
 
+  /* handle info callback for each invocation of action callback */
+  gi->callback_info(gi);
+
   /*
   if (edit_mode != ED_MODE_DRAWING)
     return;
@@ -3000,7 +3027,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	if (!button)
 	  break;
 
-	if (new_element != Feld[lx][ly])
+	if (draw_with_brush)
+	  CopyBrushToLevel(sx, sy, button);
+	else if (new_element != Feld[lx][ly])
 	{
 	  if (new_element == EL_SPIELFIGUR)
 	  {
@@ -3066,7 +3095,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case ED_CTRL_ID_LINE:
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
-    case ED_CTRL_ID_BRUSH:
+    case ED_CTRL_ID_GRAB_BRUSH:
     case ED_CTRL_ID_TEXT:
       {
 	static int last_sx = -1;
@@ -3081,7 +3110,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  draw_func = DrawRectangle;
 	else if (drawing_function == ED_CTRL_ID_FILLED_BOX)
 	  draw_func = DrawFilledBox;
-	else if (drawing_function == ED_CTRL_ID_BRUSH)
+	else if (drawing_function == ED_CTRL_ID_GRAB_BRUSH)
 	  draw_func = SelectArea;
 	else /* (drawing_function == ED_CTRL_ID_TEXT) */
 	  draw_func = SetTextCursor;
@@ -3098,9 +3127,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	else if (button_release_event)
 	{
 	  draw_func(start_sx, start_sy, sx, sy, new_element, TRUE);
-	  if (drawing_function == ED_CTRL_ID_BRUSH)
+	  if (drawing_function == ED_CTRL_ID_GRAB_BRUSH)
 	  {
-	    CopyAreaToBrush(start_sx, start_sy, sx, sy);
+	    CopyAreaToBrush(start_sx, start_sy, sx, sy, button);
+	    CopyBrushToCursor(sx, sy);
+	    ClickOnGadget(level_editor_gadget[ED_CTRL_ID_SINGLE_ITEMS]);
 	    draw_with_brush = TRUE;
 	  }
 	  else if (drawing_function == ED_CTRL_ID_TEXT)
@@ -3340,10 +3371,11 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_FLOOD_FILL:
-    case ED_CTRL_ID_BRUSH:
+    case ED_CTRL_ID_GRAB_BRUSH:
     case ED_CTRL_ID_PICK_ELEMENT:
       last_drawing_function = drawing_function;
       drawing_function = id;
+      draw_with_brush = FALSE;
       break;
 
     case ED_CTRL_ID_RANDOM_PLACEMENT:
@@ -3538,16 +3570,109 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 void HandleLevelEditorKeyInput(KeySym key)
 {
-  if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
+  if (edit_mode == ED_MODE_DRAWING)
   {
     char letter = getCharFromKeySym(key);
 
-    if (letter)
-      DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
-    else if (key == XK_Delete || key == XK_BackSpace)
-      DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
-    else if (key == XK_Return)
-      DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+    if (drawing_function == ED_CTRL_ID_TEXT)
+    {
+      if (letter)
+	DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
+      else if (key == XK_Delete || key == XK_BackSpace)
+	DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
+      else if (key == XK_Return)
+	DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+    }
+    else if (button_status == MB_RELEASED)
+    {
+      int id;
+
+      switch (letter)
+      {
+        case '.':
+        case 's':
+	  id = ED_CTRL_ID_SINGLE_ITEMS;
+	  break;
+        case 'd':
+	  id = ED_CTRL_ID_CONNECTED_ITEMS;
+	  break;
+        case 'l':
+	  id = ED_CTRL_ID_LINE;
+	  break;
+        case 't':
+	  id = ED_CTRL_ID_TEXT;
+	  break;
+        case 'r':
+	  id = ED_CTRL_ID_RECTANGLE;
+	  break;
+        case 'R':
+	  id = ED_CTRL_ID_FILLED_BOX;
+	  break;
+        case '?':
+	  id = ED_CTRL_ID_PROPERTIES;
+	  break;
+        case 'f':
+	  id = ED_CTRL_ID_FLOOD_FILL;
+	  break;
+        case 'b':
+	  id = ED_CTRL_ID_GRAB_BRUSH;
+	  break;
+        case ',':
+	  id = ED_CTRL_ID_PICK_ELEMENT;
+	  break;
+
+        case 'U':
+	  id = ED_CTRL_ID_UNDO;
+	  break;
+        case 'I':
+	  id = ED_CTRL_ID_INFO;
+	  break;
+        case 'S':
+	  id = ED_CTRL_ID_SAVE;
+	  break;
+        case 'C':
+	  id = ED_CTRL_ID_CLEAR;
+	  break;
+        case 'T':
+	  id = ED_CTRL_ID_TEST;
+	  break;
+        case 'E':
+	  id = ED_CTRL_ID_EXIT;
+	  break;
+
+        default:
+	  id = ED_CTRL_ID_NONE;
+	  break;
+      }
+
+      if (id != ED_CTRL_ID_NONE)
+	ClickOnGadget(level_editor_gadget[id]);
+      else
+      {
+	switch (key)
+	{
+          case XK_Left:
+	    id = ED_CTRL_ID_SCROLL_LEFT;
+	    break;
+          case XK_Right:
+	    id = ED_CTRL_ID_SCROLL_RIGHT;
+	    break;
+          case XK_Up:
+	    id = ED_CTRL_ID_SCROLL_UP;
+	    break;
+          case XK_Down:
+	    id = ED_CTRL_ID_SCROLL_DOWN;
+	    break;
+
+          default:
+	    id = ED_CTRL_ID_NONE;
+	    break;
+	}
+
+	if (id != ED_CTRL_ID_NONE)
+	  ClickOnGadget(level_editor_gadget[id]);
+      }
+    }
   }
 }
 
@@ -3558,7 +3683,7 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
   switch (id)
   {
     case ED_CTRL_ID_LEVEL_NAME:
-      strcpy(level.name, gi->text_value);
+      strcpy(level.name, gi->text.value);
       break;
 
     default:
@@ -3602,6 +3727,8 @@ void HandleEditorGadgetInfoText(void *ptr)
 
 static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 {
+  static int start_lx, start_ly;
+  char *infotext;
   int id = gi->custom_id;
   int sx = gi->event.x;
   int sy = gi->event.y;
@@ -3613,8 +3740,59 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   if (id == ED_CTRL_ID_DRAWING_LEVEL)
   {
     if (IN_LEV_FIELD(lx, ly))
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
-		"Level: %d, %d (Screen: %d, %d)", lx, ly, sx, sy);
+    {
+      if (gi->state == GD_BUTTON_PRESSED)
+      {
+	if (gi->event.type == GD_EVENT_PRESSED)
+	{
+	  start_lx = lx;
+	  start_ly = ly;
+	}
+
+	switch (drawing_function)
+	{
+	  case ED_CTRL_ID_SINGLE_ITEMS:
+	    infotext = "Drawing single items";
+	    break;
+      	  case ED_CTRL_ID_CONNECTED_ITEMS:
+	    infotext = "Drawing connected items";
+	    break;
+      	  case ED_CTRL_ID_LINE:
+	    infotext = "Drawing line";
+	    break;
+      	  case ED_CTRL_ID_TEXT:
+	    infotext = "Setting text cursor";
+	    break;
+      	  case ED_CTRL_ID_RECTANGLE:
+	    infotext = "Drawing rectangle";
+	    break;
+      	  case ED_CTRL_ID_FILLED_BOX:
+	    infotext = "Drawing filled box";
+	    break;
+      	  case ED_CTRL_ID_FLOOD_FILL:
+	    infotext = "Flood fill";
+	    break;
+      	  case ED_CTRL_ID_GRAB_BRUSH:
+	    infotext = "Grabbing brush";
+	    break;
+      	  case ED_CTRL_ID_PICK_ELEMENT:
+	    infotext = "Picking element";
+	    break;
+
+	  default:
+	    infotext = "Drawing position";
+	    break;
+	}
+
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		  "%s: %d, %d", infotext,
+		  ABS(lx - start_lx) + 1,
+		  ABS(ly - start_ly) + 1);
+      }
+      else
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		  "Level position: %d, %d", lx, ly);
+    }
 
     /* misuse this function to draw brush cursor, if needed */
     if (edit_mode == ED_MODE_DRAWING && draw_with_brush)

@@ -621,9 +621,9 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
     { XK_slash,		"XK_slash",		"/" },
     { XK_colon,		"XK_colon",		":" },
     { XK_semicolon,	"XK_semicolon",		";" },
-    { XK_less,		"XK_less",		"less" },
-    { XK_equal,		"XK_equal",		"equal" },
-    { XK_greater,	"XK_greater",		"greater" },
+    { XK_less,		"XK_less",		"<" },
+    { XK_equal,		"XK_equal",		"=" },
+    { XK_greater,	"XK_greater",		">" },
     { XK_question,	"XK_question",		"?" },
     { XK_at,		"XK_at",		"@" },
 
@@ -847,12 +847,6 @@ char getCharFromKeySym(KeySym keysym)
     letter = keyname[0];
   else if (strcmp(keyname, "space") == 0)
     letter = ' ';
-  else if (strcmp(keyname, "less") == 0)
-    letter = '<';
-  else if (strcmp(keyname, "equal") == 0)
-    letter = '=';
-  else if (strcmp(keyname, "greater") == 0)
-    letter = '>';
   else if (strcmp(keyname, "circumflex") == 0)
     letter = '^';
 

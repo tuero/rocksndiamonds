@@ -349,6 +349,7 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 {
   int font_width, font_height, font_start;
   int font_pixmap;
+  boolean print_inverse = FALSE;
 
   if (font_size != FS_SMALL && font_size != FS_BIG)
     font_size = FS_SMALL;
@@ -364,9 +365,15 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE : FONT2_YSIZE) *
 		FONT_LINES_PER_FONT);
 
-  while(*text)
+  while (*text)
   {
     char c = *text++;
+
+    if (c == '~' && font_size == FS_SMALL && font_type <= FC_YELLOW)
+    {
+      print_inverse = TRUE;
+      continue;
+    }
 
     if (c >= 'a' && c <= 'z')
       c = 'A' + (c - 'a');
@@ -378,10 +385,27 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
       c = 93;
 
     if (c >= 32 && c <= 95)
-      XCopyArea(display, pix[font_pixmap], d, gc,
-		((c - 32) % FONT_CHARS_PER_LINE) * font_width,
-		((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_start,
-		font_width, font_height, x, y);
+    {
+      int src_x = ((c - 32) % FONT_CHARS_PER_LINE) * font_width;
+      int src_y = ((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_start;
+      int dest_x = x, dest_y = y;
+
+      if (print_inverse)
+      {
+	XCopyArea(display, pix[font_pixmap], d, gc,
+		  FONT_CHARS_PER_LINE * font_width,
+		  3 * font_height + font_start,
+		  font_width, font_height, x, y);
+
+	XSetClipOrigin(display, clip_gc[font_pixmap],
+		       dest_x - src_x, dest_y - src_y);
+	XCopyArea(display, pix[font_pixmap], drawto, clip_gc[font_pixmap],
+		  0, 0, font_width, font_height, dest_x, dest_y);
+      }
+      else
+	XCopyArea(display, pix[font_pixmap], d, gc,
+		  src_x, src_y, font_width, font_height, dest_x, dest_y);
+    }
 
     x += font_width;
   }

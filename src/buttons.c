@@ -1626,11 +1626,12 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	{
 	  int max_textsize = MAX_GADGET_TEXTSIZE;
 
-	  if (new_gadget->text_size)
-	    max_textsize = MIN(new_gadget->text_size, MAX_GADGET_TEXTSIZE - 1);
+	  if (new_gadget->text.size)
+	    max_textsize = MIN(new_gadget->text.size, MAX_GADGET_TEXTSIZE - 1);
 
-	  strncpy(new_gadget->text_value, va_arg(ap, char *), max_textsize);
-	  new_gadget->text_value[max_textsize] = '\0';
+	  strncpy(new_gadget->text.value, va_arg(ap, char *), max_textsize);
+	  new_gadget->text.value[max_textsize] = '\0';
+	  new_gadget->text.cursor_position = strlen(new_gadget->text.value);
 	}
 	break;
 
@@ -1639,12 +1640,12 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	  int tag_value = va_arg(ap, int);
 	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE - 1);
 
-	  new_gadget->text_size = max_textsize;
-	  new_gadget->text_value[max_textsize] = '\0';
+	  new_gadget->text.size = max_textsize;
+	  new_gadget->text.value[max_textsize] = '\0';
 
 	  if (new_gadget->width == 0 && new_gadget->height == 0)
 	  {
-	    new_gadget->width = (new_gadget->text_size + 1) * FONT2_XSIZE + 6;
+	    new_gadget->width = (new_gadget->text.size + 1) * FONT2_XSIZE + 6;
 	    new_gadget->height = ED_WIN_COUNT_YSIZE;
 	  }
 	}
@@ -1840,36 +1841,41 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     case GD_TYPE_TEXTINPUT:
       {
 	int i;
+	char cursor_letter;
+	char cursor_string[3];
+	char text[MAX_GADGET_TEXTSIZE + 1];
+	int font_color = (pressed ? FC_YELLOW : FC_GREEN);
+	int border = gi->design_border;
+	strcpy(text, gi->text.value);
+	strcat(text, " ");
 
 	/* left part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y,
-		  gi->design_border, gi->height,
-		  gi->x, gi->y);
+		  gd->x, gd->y, border, gi->height, gi->x, gi->y);
 
 	/* middle part of gadget */
-	for (i=0; i<=gi->text_size; i++)
+	for (i=0; i<=gi->text.size; i++)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + gi->design_border, gd->y,
-		    FONT2_XSIZE, gi->height,
-		    gi->x + gi->design_border + i * FONT2_XSIZE, gi->y);
+		    gd->x + border, gd->y, FONT2_XSIZE, gi->height,
+		    gi->x + border + i * FONT2_XSIZE, gi->y);
 
 	/* right part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x + ED_WIN_COUNT_XSIZE - gi->design_border, gd->y,
-		  gi->design_border, gi->height,
-		  gi->x + gi->width - gi->design_border, gi->y);
+		  gd->x + ED_WIN_COUNT_XSIZE - border, gd->y,
+		  border, gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
-	DrawText(gi->x + gi->design_border, gi->y + gi->design_border,
-		 gi->text_value, FS_SMALL, (pressed ? FC_GREEN : FC_YELLOW));
+	DrawText(gi->x + border, gi->y + border, text, FS_SMALL, font_color);
+
+	cursor_letter = gi->text.value[gi->text.cursor_position];
+	cursor_string[0] = '~';
+	cursor_string[1] = (cursor_letter != '\0' ? cursor_letter : ' ');
+	cursor_string[2] = '\0';
 
 	/* draw cursor, if active */
-	DrawText(gi->x + gi->design_border +
-		 strlen(gi->text_value) * FONT2_XSIZE,
-		 gi->y + gi->design_border,
-		 (pressed ? "<" : " "),
-		 FS_SMALL, FC_RED);
+	if (pressed)
+	  DrawText(gi->x + border + gi->text.cursor_position * FONT2_XSIZE,
+		   gi->y + border, cursor_string, FS_SMALL, font_color);
       }
       break;
 
@@ -2004,6 +2010,8 @@ void AdjustScrollbar(struct GadgetInfo *gi, int items_max, int item_pos)
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 }
 
+static struct GadgetInfo *last_gi = NULL;
+
 void MapGadget(struct GadgetInfo *gi)
 {
   if (gi == NULL)
@@ -2020,9 +2028,10 @@ void UnmapGadget(struct GadgetInfo *gi)
     return;
 
   gi->mapped = FALSE;
-}
 
-static struct GadgetInfo *last_gi = NULL;
+  if (gi == last_gi)
+    last_gi = NULL;
+}
 
 void HandleGadgets(int mx, int my, int button)
 {
@@ -2062,18 +2071,34 @@ void HandleGadgets(int mx, int my, int button)
   last_mx = mx;
   last_my = my;
 
-  /* if mouse button pressed outside text input gadget, deactivate it */
-  if (last_gi && last_gi->type == GD_TYPE_TEXTINPUT &&
-      button != 0 && new_gi != last_gi && !motion_status)
+  /* special treatment for text input gadgets */
+  if (last_gi && last_gi->type == GD_TYPE_TEXTINPUT && last_gi->mapped &&
+      button != 0 && !motion_status)
   {
     struct GadgetInfo *gi = last_gi;
 
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+    if (new_gi == last_gi)
+    {
+      /* if mouse button pressed inside activated text gadget, set cursor */
+      gi->text.cursor_position = (mx - gi->x) / FONT2_XSIZE;
 
-    if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
-      gi->callback_action(gi);
+      if (gi->text.cursor_position < 0)
+	gi->text.cursor_position = 0;
+      else if (gi->text.cursor_position > strlen(gi->text.value))
+	gi->text.cursor_position = strlen(gi->text.value);
 
-    last_gi = NULL;
+      DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+    }
+    else
+    {
+      /* if mouse button pressed outside text input gadget, deactivate it */
+      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+
+      if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
+	gi->callback_action(gi);
+
+      last_gi = NULL;
+    }
   }
 
   gadget_pressed =
@@ -2130,7 +2155,10 @@ void HandleGadgets(int mx, int my, int button)
     last_info_gi = new_gi;
 
     if (new_gi != NULL)
+    {
+      new_gi->event.type = 0;
       new_gi->callback_info(new_gi);
+    }
     else
       default_callback_info(NULL);
   }
@@ -2311,24 +2339,47 @@ void HandleGadgets(int mx, int my, int button)
 void HandleGadgetsKeyInput(KeySym key)
 {
   struct GadgetInfo *gi = last_gi;
+  char text[MAX_GADGET_TEXTSIZE];
   int text_length;
+  int cursor_pos;
   char letter;
 
-  if (gi == NULL || gi->type != GD_TYPE_TEXTINPUT)
+  if (gi == NULL || gi->type != GD_TYPE_TEXTINPUT || !gi->mapped)
     return;
 
-  text_length = strlen(gi->text_value);
+  text_length = strlen(gi->text.value);
+  cursor_pos = gi->text.cursor_position;
   letter = getCharFromKeySym(key);
 
-  if (letter && text_length < gi->text_size)
+  if (letter && text_length < gi->text.size)
   {
-    gi->text_value[text_length] = letter;
-    gi->text_value[text_length + 1] = '\0';
+    strcpy(text, gi->text.value);
+    strcpy(&gi->text.value[cursor_pos + 1], &text[cursor_pos]);
+    gi->text.value[cursor_pos] = letter;
+    gi->text.cursor_position++;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if ((key == XK_Delete || key == XK_BackSpace) && text_length > 0)
+  else if (key == XK_Left && cursor_pos > 0)
   {
-    gi->text_value[text_length - 1] = '\0';
+    gi->text.cursor_position--;
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+  }
+  else if (key == XK_Right && cursor_pos < text_length)
+  {
+    gi->text.cursor_position++;
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+  }
+  else if (key == XK_BackSpace && cursor_pos > 0)
+  {
+    strcpy(text, gi->text.value);
+    strcpy(&gi->text.value[cursor_pos - 1], &text[cursor_pos]);
+    gi->text.cursor_position--;
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+  }
+  else if (key == XK_Delete && cursor_pos < text_length)
+  {
+    strcpy(text, gi->text.value);
+    strcpy(&gi->text.value[cursor_pos], &text[cursor_pos + 1]);
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
   else if (key == XK_Return)
