@@ -2847,7 +2847,9 @@ void StartMoving(int x, int y)
       {
 	TurnRound(x, y);
 
-	if (MovDelay[x][y] && (element == EL_KAEFER ||
+	if (MovDelay[x][y] && (element == EL_KAEFER))
+	  DrawNewLevelField(x, y);
+	else if (MovDelay[x][y] && (element == EL_KAEFER ||
 			       element == EL_FLIEGER ||
 			       element == EL_SP_SNIKSNAK ||
 			       element == EL_SP_ELECTRON ||
@@ -3130,19 +3132,37 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
-      if (element == EL_KAEFER || element == EL_FLIEGER ||
-	  element == EL_SP_SNIKSNAK || element == EL_MOLE)
+      if (element == EL_KAEFER)
+#if 0
 	DrawLevelField(x, y);
+#else
+	DrawNewLevelField(x, y);
+#endif
+      else if (element == EL_KAEFER || element == EL_FLIEGER ||
+	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
+#if 1
+	DrawLevelField(x, y);
+#else
+	DrawNewLevelField(x, y);
+#endif
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
+#if 0
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
+#else
+	DrawNewGraphicAnimation(x, y, el2img(element));
+#endif
       else if (element == EL_SONDE)
 #if 0
 	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
 #else
-	DrawNewGraphicAnimation(x, y, IMG_SATELLITE_MOVING);
+	DrawNewGraphicAnimation(x, y, IMG_SATELLITE);
 #endif
       else if (element == EL_SP_ELECTRON)
+#if 0
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
+#else
+	DrawNewGraphicAnimation(x, y, IMG_SP_ELECTRON_MOVING);
+#endif
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
@@ -3280,8 +3300,16 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 
-    DrawLevelField(x, y);
-    DrawLevelField(newx, newy);
+    if (element == EL_KAEFER)
+    {
+      DrawNewLevelField(x, y);
+      DrawNewLevelField(newx, newy);
+    }
+    else
+    {
+      DrawLevelField(x, y);
+      DrawLevelField(newx, newy);
+    }
 
     Stop[newx][newy] = TRUE;
     JustStopped[newx][newy] = 3;
@@ -3300,7 +3328,12 @@ void ContinueMoving(int x, int y)
       Impact(x, newy);
   }
   else				/* still moving on */
-    DrawLevelField(x, y);
+  {
+    if (element == EL_KAEFER)
+      DrawNewLevelField(x, y);
+    else
+      DrawLevelField(x, y);
+  }
 }
 
 int AmoebeNachbarNr(int ax, int ay)

@@ -1169,10 +1169,132 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   MarkTileDirty(x,y);
 }
 
+void DrawNewGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
+			int cut_mode, int mask_mode)
+{
+  Bitmap *src_bitmap;
+  GC drawing_gc;
+  int src_x;
+  int src_y;
+
+  int width = TILEX, height = TILEY;
+  int cx = 0, cy = 0;
+  int dest_x, dest_y;
+
+  if (graphic < 0)
+  {
+    DrawNewGraphic(x, y, graphic, frame);
+    return;
+  }
+
+  if (dx || dy)			/* Verschiebung der Grafik? */
+  {
+    if (x < BX1)		/* Element kommt von links ins Bild */
+    {
+      x = BX1;
+      width = dx;
+      cx = TILEX - dx;
+      dx = 0;
+    }
+    else if (x > BX2)		/* Element kommt von rechts ins Bild */
+    {
+      x = BX2;
+      width = -dx;
+      dx = TILEX + dx;
+    }
+    else if (x==BX1 && dx < 0)	/* Element verl‰ﬂt links das Bild */
+    {
+      width += dx;
+      cx = -dx;
+      dx = 0;
+    }
+    else if (x==BX2 && dx > 0)	/* Element verl‰ﬂt rechts das Bild */
+      width -= dx;
+    else if (dx)		/* allg. Bewegung in x-Richtung */
+      MarkTileDirty(x + SIGN(dx), y);
+
+    if (y < BY1)		/* Element kommt von oben ins Bild */
+    {
+      if (cut_mode==CUT_BELOW)	/* Element oberhalb des Bildes */
+	return;
+
+      y = BY1;
+      height = dy;
+      cy = TILEY - dy;
+      dy = 0;
+    }
+    else if (y > BY2)		/* Element kommt von unten ins Bild */
+    {
+      y = BY2;
+      height = -dy;
+      dy = TILEY + dy;
+    }
+    else if (y==BY1 && dy < 0)	/* Element verl‰ﬂt oben das Bild */
+    {
+      height += dy;
+      cy = -dy;
+      dy = 0;
+    }
+    else if (dy > 0 && cut_mode == CUT_ABOVE)
+    {
+      if (y == BY2)		/* Element unterhalb des Bildes */
+	return;
+
+      height = dy;
+      cy = TILEY - dy;
+      dy = TILEY;
+      MarkTileDirty(x, y + 1);
+    }				/* Element verl‰ﬂt unten das Bild */
+    else if (dy > 0 && (y == BY2 || cut_mode == CUT_BELOW))
+      height -= dy;
+    else if (dy)		/* allg. Bewegung in y-Richtung */
+      MarkTileDirty(x, y + SIGN(dy));
+  }
+
+  src_bitmap = new_graphic_info[graphic].bitmap;
+  drawing_gc = src_bitmap->stored_clip_gc;
+  src_x = new_graphic_info[graphic].src_x;
+  src_y = new_graphic_info[graphic].src_y;
+
+  if (new_graphic_info[graphic].anim_vertical)
+    src_y += frame * TILEY;
+  else
+    src_x += frame * TILEX;
+
+  src_x += cx;
+  src_y += cy;
+
+  dest_x = FX + x * TILEX + dx;
+  dest_y = FY + y * TILEY + dy;
+
+#if DEBUG
+  if (!IN_SCR_FIELD(x,y))
+  {
+    printf("DrawGraphicShifted(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphicShifted(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  if (mask_mode == USE_MASKING)
+    SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
+
+  BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
+	     dest_x, dest_y);
+
+  MarkTileDirty(x,y);
+}
+
 void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
 				int cut_mode)
 {
   DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, USE_MASKING);
+}
+
+void DrawNewGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
+				   int frame, int cut_mode)
+{
+  DrawNewGraphicShifted(x,y, dx,dy, graphic, frame, cut_mode, USE_MASKING);
 }
 
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
@@ -1322,11 +1444,187 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     DrawGraphic(x, y, graphic);
 }
 
+void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
+			  int cut_mode, int mask_mode)
+{
+  int ux = LEVELX(x), uy = LEVELY(y);
+  int dir = MovDir[ux][uy];
+  int graphic = el_dir2img(element, dir);
+  int frame = getNewGraphicAnimationFrame(graphic);
+  int phase8 = ABS(MovPos[ux][uy]) / (TILEX / 8);
+  int phase4 = phase8 / 2;
+  int phase2  = phase8 / 4;
+
+  if (element == EL_KAEFER)
+  {
+    ;
+  }
+  else if (element == EL_PACMAN || element == EL_KAEFER || element == EL_FLIEGER)
+  {
+    graphic += 1 * !phase2;
+
+    if (dir == MV_UP)
+      graphic += 1 * 2;
+    else if (dir == MV_LEFT)
+      graphic += 2 * 2;
+    else if (dir == MV_DOWN)
+      graphic += 3 * 2;
+  }
+  else if (element == EL_SP_SNIKSNAK)
+  {
+    if (dir == MV_LEFT)
+      graphic = GFX_SP_SNIKSNAK_LEFT;
+    else if (dir == MV_RIGHT)
+      graphic = GFX_SP_SNIKSNAK_RIGHT;
+    else if (dir == MV_UP)
+      graphic = GFX_SP_SNIKSNAK_UP;
+    else
+      graphic = GFX_SP_SNIKSNAK_DOWN;
+
+    graphic += (phase8 < 4 ? phase8 : 7 - phase8);
+  }
+  else if (element == EL_SP_ELECTRON)
+  {
+#if 1
+    graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+#else
+    graphic = GFX2_SP_ELECTRON + getNewGraphicAnimationFrame(graphic);
+#endif
+  }
+  else if (element == EL_MOLE || element == EL_PINGUIN ||
+	   element == EL_SCHWEIN || element == EL_DRACHE)
+  {
+    if (dir == MV_LEFT)
+      graphic = (element == EL_MOLE ? GFX_MOLE_LEFT :
+		 element == EL_PINGUIN ? GFX_PINGUIN_LEFT :
+		 element == EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
+    else if (dir == MV_RIGHT)
+      graphic = (element == EL_MOLE ? GFX_MOLE_RIGHT :
+		 element == EL_PINGUIN ? GFX_PINGUIN_RIGHT :
+		 element == EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
+    else if (dir == MV_UP)
+      graphic = (element == EL_MOLE ? GFX_MOLE_UP :
+		 element == EL_PINGUIN ? GFX_PINGUIN_UP :
+		 element == EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
+    else
+      graphic = (element == EL_MOLE ? GFX_MOLE_DOWN :
+		 element == EL_PINGUIN ? GFX_PINGUIN_DOWN :
+		 element == EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
+
+    graphic += phase4;
+  }
+  else if (element == EL_SONDE)
+  {
+#if 1
+    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+#else
+    graphic = GFX_SONDE_START + getNewGraphicAnimationFrame(graphic);
+#endif
+  }
+  else if (element == EL_SALZSAEURE)
+  {
+#if 1
+    graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
+#else
+    graphic = GFX_GEBLUBBER + getNewGraphicAnimationFrame(graphic);
+#endif
+  }
+  else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
+  {
+    graphic += !phase2;
+  }
+  else if (element == EL_BALLOON)
+  {
+    graphic += phase4;
+  }
+  else if ((element == EL_FELSBROCKEN ||
+	    element == EL_SP_ZONK ||
+	    element == EL_BD_ROCK ||
+	    element == EL_SP_INFOTRON ||
+	    IS_GEM(element))
+	   && !cut_mode)
+  {
+    if (uy >= lev_fieldy-1 || !IS_BELT(Feld[ux][uy+1]))
+    {
+      if (element == EL_FELSBROCKEN ||
+	  element == EL_SP_ZONK ||
+	  element == EL_BD_ROCK)
+      {
+	if (dir == MV_LEFT)
+	  graphic += (4 - phase4) % 4;
+	else if (dir == MV_RIGHT)
+	  graphic += phase4;
+	else
+	  graphic += phase2 * 2;
+      }
+      else if (element != EL_SP_INFOTRON)
+	graphic += phase2;
+    }
+  }
+  else if (element == EL_MAGIC_WALL_EMPTY ||
+	   element == EL_MAGIC_WALL_EMPTYING ||
+	   element == EL_MAGIC_WALL_BD_EMPTY ||
+	   element == EL_MAGIC_WALL_BD_EMPTYING ||
+	   element == EL_MAGIC_WALL_FULL ||
+	   element == EL_MAGIC_WALL_BD_FULL)
+  {
+#if 1
+    graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
+#else
+    graphic += 3 + getNewGraphicAnimationFrame(graphic);
+#endif
+  }
+  else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
+  {
+    graphic = (element == EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
+    graphic += (x + 2 * y + 4) % 4;
+  }
+  else if (element == EL_MAUER_LEBT)
+  {
+    boolean links_massiv = FALSE, rechts_massiv = FALSE;
+
+    if (!IN_LEV_FIELD(ux-1, uy) || IS_MAUER(Feld[ux-1][uy]))
+      links_massiv = TRUE;
+    if (!IN_LEV_FIELD(ux+1, uy) || IS_MAUER(Feld[ux+1][uy]))
+      rechts_massiv = TRUE;
+
+    if (links_massiv && rechts_massiv)
+      graphic = GFX_MAUERWERK;
+    else if (links_massiv)
+      graphic = GFX_MAUER_R;
+    else if (rechts_massiv)
+      graphic = GFX_MAUER_L;
+  }
+  else if ((element == EL_INVISIBLE_STEEL ||
+	    element == EL_UNSICHTBAR ||
+	    element == EL_SAND_INVISIBLE) && game.light_time_left)
+  {
+    graphic = (element == EL_INVISIBLE_STEEL ? GFX_INVISIBLE_STEEL_ON :
+	       element == EL_UNSICHTBAR ? GFX_UNSICHTBAR_ON :
+	       GFX_SAND_INVISIBLE_ON);
+  }
+
+  if (dx || dy)
+    DrawNewGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
+  else if (mask_mode == USE_MASKING)
+    DrawNewGraphicThruMask(x, y, graphic, frame);
+  else
+    DrawNewGraphic(x, y, graphic, frame);
+}
+
 void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
 			 int cut_mode, int mask_mode)
 {
   if (IN_LEV_FIELD(x, y) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     DrawScreenElementExt(SCREENX(x), SCREENY(y), dx, dy, element,
+			 cut_mode, mask_mode);
+}
+
+void DrawNewLevelElementExt(int x, int y, int dx, int dy, int element,
+			 int cut_mode, int mask_mode)
+{
+  if (IN_LEV_FIELD(x, y) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    DrawNewScreenElementExt(SCREENX(x), SCREENY(y), dx, dy, element,
 			 cut_mode, mask_mode);
 }
 
@@ -1336,10 +1634,22 @@ void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
   DrawScreenElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
 }
 
+void DrawNewScreenElementShifted(int x, int y, int dx, int dy, int element,
+			      int cut_mode)
+{
+  DrawNewScreenElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
+}
+
 void DrawLevelElementShifted(int x, int y, int dx, int dy, int element,
 			     int cut_mode)
 {
   DrawLevelElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
+}
+
+void DrawNewLevelElementShifted(int x, int y, int dx, int dy, int element,
+			     int cut_mode)
+{
+  DrawNewLevelElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
 }
 
 void DrawScreenElementThruMask(int x, int y, int element)
@@ -1347,14 +1657,29 @@ void DrawScreenElementThruMask(int x, int y, int element)
   DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
 }
 
+void DrawNewScreenElementThruMask(int x, int y, int element)
+{
+  DrawNewScreenElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
+}
+
 void DrawLevelElementThruMask(int x, int y, int element)
 {
   DrawLevelElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
 }
 
+void DrawNewLevelElementThruMask(int x, int y, int element)
+{
+  DrawNewLevelElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
+}
+
 void DrawLevelFieldThruMask(int x, int y)
 {
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
+}
+
+void DrawNewLevelFieldThruMask(int x, int y)
+{
+  DrawNewLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
 void ErdreichAnbroeckeln(int x, int y)
@@ -1480,10 +1805,22 @@ void DrawScreenElement(int x, int y, int element)
   ErdreichAnbroeckeln(x, y);
 }
 
+void DrawNewScreenElement(int x, int y, int element)
+{
+  DrawNewScreenElementExt(x, y, 0, 0, element, NO_CUTTING, NO_MASKING);
+  ErdreichAnbroeckeln(x, y);
+}
+
 void DrawLevelElement(int x, int y, int element)
 {
   if (IN_LEV_FIELD(x, y) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     DrawScreenElement(SCREENX(x), SCREENY(y), element);
+}
+
+void DrawNewLevelElement(int x, int y, int element)
+{
+  if (IN_LEV_FIELD(x, y) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    DrawNewScreenElement(SCREENX(x), SCREENY(y), element);
 }
 
 void DrawScreenField(int x, int y)
@@ -1576,6 +1913,96 @@ void DrawScreenField(int x, int y)
     DrawScreenElement(x, y, EL_LEERRAUM);
 }
 
+void DrawNewScreenField(int x, int y)
+{
+  int ux = LEVELX(x), uy = LEVELY(y);
+  int element, content;
+
+  if (!IN_LEV_FIELD(ux, uy))
+  {
+    if (ux < -1 || ux > lev_fieldx || uy < -1 || uy > lev_fieldy)
+      element = EL_LEERRAUM;
+    else
+      element = BorderElement;
+
+    DrawNewScreenElement(x, y, element);
+    return;
+  }
+
+  element = Feld[ux][uy];
+  content = Store[ux][uy];
+
+  if (IS_MOVING(ux, uy))
+  {
+    int horiz_move = (MovDir[ux][uy] == MV_LEFT || MovDir[ux][uy] == MV_RIGHT);
+    boolean cut_mode = NO_CUTTING;
+
+    if (element == EL_QUICKSAND_EMPTYING ||
+	element == EL_MAGIC_WALL_EMPTYING ||
+	element == EL_MAGIC_WALL_BD_EMPTYING ||
+	element == EL_AMOEBA_DRIPPING)
+      cut_mode = CUT_ABOVE;
+    else if (element == EL_QUICKSAND_FILLING ||
+	     element == EL_MAGIC_WALL_FILLING ||
+	     element == EL_MAGIC_WALL_BD_FILLING)
+      cut_mode = CUT_BELOW;
+
+    if (cut_mode == CUT_ABOVE)
+      DrawNewScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
+    else
+      DrawNewScreenElement(x, y, EL_LEERRAUM);
+
+    if (horiz_move)
+      DrawNewScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
+    else if (cut_mode == NO_CUTTING)
+      DrawNewScreenElementShifted(x, y, 0, MovPos[ux][uy], element, cut_mode);
+    else
+      DrawNewScreenElementShifted(x, y, 0, MovPos[ux][uy], content, cut_mode);
+
+    if (content == EL_SALZSAEURE)
+      DrawNewLevelElementThruMask(ux, uy + 1, EL_SALZSAEURE);
+  }
+  else if (IS_BLOCKED(ux, uy))
+  {
+    int oldx, oldy;
+    int sx, sy;
+    int horiz_move;
+    boolean cut_mode = NO_CUTTING;
+    int element_old, content_old;
+
+    Blocked2Moving(ux, uy, &oldx, &oldy);
+    sx = SCREENX(oldx);
+    sy = SCREENY(oldy);
+    horiz_move = (MovDir[oldx][oldy] == MV_LEFT ||
+		  MovDir[oldx][oldy] == MV_RIGHT);
+
+    element_old = Feld[oldx][oldy];
+    content_old = Store[oldx][oldy];
+
+    if (element_old == EL_QUICKSAND_EMPTYING ||
+	element_old == EL_MAGIC_WALL_EMPTYING ||
+	element_old == EL_MAGIC_WALL_BD_EMPTYING ||
+	element_old == EL_AMOEBA_DRIPPING)
+      cut_mode = CUT_ABOVE;
+
+    DrawNewScreenElement(x, y, EL_LEERRAUM);
+
+    if (horiz_move)
+      DrawNewScreenElementShifted(sx, sy, MovPos[oldx][oldy], 0, element_old,
+			       NO_CUTTING);
+    else if (cut_mode == NO_CUTTING)
+      DrawNewScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], element_old,
+			       cut_mode);
+    else
+      DrawNewScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], content_old,
+			       cut_mode);
+  }
+  else if (IS_DRAWABLE(element))
+    DrawNewScreenElement(x, y, element);
+  else
+    DrawNewScreenElement(x, y, EL_LEERRAUM);
+}
+
 void DrawLevelField(int x, int y)
 {
   if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -1595,6 +2022,28 @@ void DrawLevelField(int x, int y)
     Blocked2Moving(x, y, &oldx, &oldy);
     if (IN_SCR_FIELD(SCREENX(oldx), SCREENY(oldy)))
       DrawScreenField(SCREENX(oldx), SCREENY(oldy));
+  }
+}
+
+void DrawNewLevelField(int x, int y)
+{
+  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    DrawNewScreenField(SCREENX(x), SCREENY(y));
+  else if (IS_MOVING(x, y))
+  {
+    int newx,newy;
+
+    Moving2Blocked(x, y, &newx, &newy);
+    if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
+      DrawNewScreenField(SCREENX(newx), SCREENY(newy));
+  }
+  else if (IS_BLOCKED(x, y))
+  {
+    int oldx, oldy;
+
+    Blocked2Moving(x, y, &oldx, &oldy);
+    if (IN_SCR_FIELD(SCREENX(oldx), SCREENY(oldy)))
+      DrawNewScreenField(SCREENX(oldx), SCREENY(oldy));
   }
 }
 
@@ -2852,4 +3301,26 @@ int el2gfx(int element)
 #endif
 
   return graphic_NEW;
+}
+
+int el2img(int element)
+{
+  switch(element)
+  {
+    case EL_BUTTERFLY:		return IMG_BD_BUTTERFLY;
+    case EL_FIREFLY:		return IMG_BD_FIREFLY;
+
+    default:
+      break;
+  }
+
+  return IMG_EMPTY_SPACE;
+}
+
+int el_dir2img(int element, int direction)
+{
+  if (element_info[element].has_direction_graphic)
+    return element_info[element].direction_graphic[LOG_MV_DIR(direction)];
+  else
+    return el2img(element);
 }

@@ -67,16 +67,25 @@
 #define DEFAULT_KEY_TOGGLE_PAUSE KSYM_space
 
 /* values for move directions and special "button" keys */
+#define MV_BIT_LEFT		0
+#define MV_BIT_RIGHT		1
+#define MV_BIT_UP		2
+#define MV_BIT_DOWN	       	3
+
 #define MV_NO_MOVING		0
-#define MV_LEFT			(1 << 0)
-#define MV_RIGHT		(1 << 1)
-#define MV_UP			(1 << 2)
-#define MV_DOWN	       		(1 << 3)
+#define MV_LEFT			(1 << MV_BIT_LEFT)
+#define MV_RIGHT		(1 << MV_BIT_RIGHT)
+#define MV_UP			(1 << MV_BIT_UP)
+#define MV_DOWN	       		(1 << MV_BIT_DOWN)
 #define KEY_BUTTON_1		(1 << 4)
 #define KEY_BUTTON_2		(1 << 5)
 #define KEY_MOTION		(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
+
+#define LOG_MV_DIR(x)		((x) == MV_LEFT  ? MV_BIT_LEFT  :	\
+				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
+				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
 
 /* values for button status */
 #define MB_NOT_PRESSED		FALSE

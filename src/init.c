@@ -824,9 +824,94 @@ void InitElementInfo()
     { -1,				-1			}
   };
 
+  static struct
+  {
+    int element;
+    int graphic_left;
+    int graphic_right;
+    int graphic_up;
+    int graphic_down;
+  }
+  element_to_direction_graphic[] =
+  {
+    {
+      EL_FLIEGER,
+      IMG_SPACESHIP_LEFT,	IMG_SPACESHIP_RIGHT,
+      IMG_SPACESHIP_UP,		IMG_SPACESHIP_DOWN
+    },
+    {
+      EL_KAEFER,
+      IMG_BUG_LEFT,		IMG_BUG_RIGHT,
+      IMG_BUG_UP,		IMG_BUG_DOWN
+    },
+    {
+      EL_PACMAN,
+      IMG_PACMAN_LEFT,		IMG_PACMAN_RIGHT,
+      IMG_PACMAN_UP,		IMG_PACMAN_DOWN
+    },
+    {
+      EL_SPIELER1,
+      IMG_PLAYER1_LEFT,		IMG_PLAYER1_RIGHT,
+      IMG_PLAYER1_UP,		IMG_PLAYER1_DOWN
+    },
+    {
+      EL_SPIELER2,
+      IMG_PLAYER2_LEFT,		IMG_PLAYER2_RIGHT,
+      IMG_PLAYER2_UP,		IMG_PLAYER2_DOWN
+    },
+    {
+      EL_SPIELER3,
+      IMG_PLAYER3_LEFT,		IMG_PLAYER3_RIGHT,
+      IMG_PLAYER3_UP,		IMG_PLAYER3_DOWN
+    },
+    {
+      EL_SPIELER4,
+      IMG_PLAYER4_LEFT,		IMG_PLAYER4_RIGHT,
+      IMG_PLAYER4_UP,		IMG_PLAYER4_DOWN
+    },
+    {
+      EL_SCHWEIN,
+      IMG_PIG_LEFT,		IMG_PIG_RIGHT,
+      IMG_PIG_UP,		IMG_PIG_DOWN
+    },
+    {
+      EL_DRACHE,
+      IMG_DRAGON_LEFT,		IMG_DRAGON_RIGHT,
+      IMG_DRAGON_UP,		IMG_DRAGON_DOWN
+    },
+    {
+      EL_MOLE,
+      IMG_MOLE_LEFT,		IMG_MOLE_RIGHT,
+      IMG_MOLE_UP,		IMG_MOLE_DOWN
+    },
+    {
+      EL_PINGUIN,
+      IMG_PENGUIN_LEFT,		IMG_PENGUIN_RIGHT,
+      IMG_PENGUIN_UP,		IMG_PENGUIN_DOWN
+    },
+    {
+      EL_SP_MURPHY,
+      IMG_SP_MURPHY_LEFT,	IMG_SP_MURPHY_RIGHT,
+      IMG_SP_MURPHY_UP,		IMG_SP_MURPHY_DOWN
+    },
+    {
+      EL_SP_SNIKSNAK,
+      IMG_SP_SNIKSNAK_LEFT,	IMG_SP_SNIKSNAK_RIGHT,
+      IMG_SP_SNIKSNAK_UP,	IMG_SP_SNIKSNAK_DOWN
+    },
+    {
+      -1,
+      -1,			-1,
+      -1,			-1
+    }
+  };
+
   /* always start with reliable default values */
   for(i=0; i<MAX_ELEMENTS; i++)
+  {
     element_info[i].graphic = GFX_LEERRAUM;
+    element_info[i].has_direction_graphic = FALSE;
+  }
 
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     element_info[i].graphic = GFX_CHAR_START + (i - EL_CHAR_START);
@@ -850,6 +935,25 @@ void InitElementInfo()
     int graphic = element_to_graphic[i].graphic;
 
     element_info[element].graphic = graphic;
+    i++;
+  }
+
+  /* this initializes special graphics for left/right/up/down directions */
+  i = 0;
+  while (element_to_direction_graphic[i].element > -1)
+  {
+    int element = element_to_direction_graphic[i].element;
+    int graphic_left  = element_to_direction_graphic[i].graphic_left;
+    int graphic_right = element_to_direction_graphic[i].graphic_right;
+    int graphic_up    = element_to_direction_graphic[i].graphic_up;
+    int graphic_down  = element_to_direction_graphic[i].graphic_down;
+
+    element_info[element].direction_graphic[MV_BIT_LEFT]  = graphic_left;
+    element_info[element].direction_graphic[MV_BIT_RIGHT] = graphic_right;
+    element_info[element].direction_graphic[MV_BIT_UP]    = graphic_up;
+    element_info[element].direction_graphic[MV_BIT_DOWN]  = graphic_down;
+
+    element_info[element].has_direction_graphic = TRUE;
     i++;
   }
 }
