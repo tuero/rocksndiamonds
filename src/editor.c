@@ -913,7 +913,7 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
-    0,					999,
+    0,					9999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,	GADGET_ID_NONE,
     &level.time,
@@ -1804,7 +1804,7 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_USE_SPRING_BUG,		GADGET_ID_NONE,
     &level.use_spring_bug,
     NULL,
@@ -3378,6 +3378,8 @@ editor_elements_info[] =
   }
 };
 
+#if 0
+
 static struct
 {
   short element;
@@ -3576,6 +3578,8 @@ forum_sketch_element_strings[] =
 
   { -1,				NULL }
 };
+
+#endif
 
 
 /*
@@ -4241,7 +4245,7 @@ static void CreateCounterButtons()
 			  GDI_NUMBER_VALUE, 0,
 			  GDI_NUMBER_MIN, counterbutton_info[i].min_value,
 			  GDI_NUMBER_MAX, counterbutton_info[i].max_value,
-			  GDI_TEXT_SIZE, 3,
+			  GDI_TEXT_SIZE, 3,	/* minimal counter text size */
 			  GDI_TEXT_FONT, font_type,
 			  GDI_TEXT_FONT_ACTIVE, font_type_active,
 			  GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
@@ -7278,6 +7282,8 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
       {
 	int element = brush_buffer[x][y];
 	int element_mapped = element;
+
+#if 0
 	char *element_string = "?";
 	int k;
 
@@ -7303,6 +7309,16 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	}
 
 	printf("`%s", element_string);
+
+#else
+
+	if (IS_CUSTOM_ELEMENT(element))
+	  element_mapped = EL_CUSTOM_START;
+	else if (element > EL_ENVELOPE_4)
+	  element_mapped = EL_CHAR_QUESTION;	/* change to EL_UNKNOWN ... */
+
+	printf("`%03d", element_mapped);
+#endif
       }
 
       printf("\n");

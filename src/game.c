@@ -59,7 +59,8 @@
 #define YY_KEYS			123
 #define XX_SCORE		15
 #define YY_SCORE		159
-#define XX_TIME			29
+#define XX_TIME1		29
+#define XX_TIME2		30
 #define YY_TIME			194
 
 /* special positions in the game control window (relative to main window) */
@@ -73,7 +74,8 @@
 #define DY_KEYS			(DY + YY_KEYS)
 #define DX_SCORE		(DX + XX_SCORE)
 #define DY_SCORE		(DY + YY_SCORE)
-#define DX_TIME			(DX + XX_TIME)
+#define DX_TIME1		(DX + XX_TIME1)
+#define DX_TIME2		(DX + XX_TIME2)
 #define DY_TIME			(DY + YY_TIME)
 
 /* values for initial player move delay (initial delay counter value) */
@@ -146,25 +148,50 @@
 
 #define YAMYAM_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					(CAN_MOVE_INTO_ACID(EL_YAMYAM) && \
+					 Feld[x][y] == EL_ACID) ||	\
 					Feld[x][y] == EL_DIAMOND))
 
 #define DARK_YAMYAM_CAN_ENTER_FIELD(x, y)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					(CAN_MOVE_INTO_ACID(EL_DARK_YAMYAM) &&\
+					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
 
 #define PACMAN_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					(CAN_MOVE_INTO_ACID(EL_PACMAN) && \
+					 Feld[x][y] == EL_ACID) ||	\
 					IS_AMOEBOID(Feld[x][y])))
 
 #define PIG_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(EL_PIG) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_PIG(Feld[x][y])))
 
 #define PENGUIN_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(EL_PENGUIN) && \
+					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_PENGUIN(Feld[x][y]) ||	\
-					Feld[x][y] == EL_EXIT_OPEN ||	\
-					Feld[x][y] == EL_ACID))
+					Feld[x][y] == EL_EXIT_OPEN))
+
+#define DRAGON_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(EL_DRAGON) && \
+					 Feld[x][y] == EL_ACID)))
+
+#define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(EL_MOLE) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
+					(condition)))
+
+#define SPRING_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(EL_SPRING) && \
+					 Feld[x][y] == EL_ACID)))
 
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
@@ -187,9 +214,6 @@
 
 #define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
 	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
-
-#define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
-		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
 
 #define IN_LEV_FIELD_AND_IS_FREE(x, y)  (IN_LEV_FIELD(x, y) &&  IS_FREE(x, y))
 #define IN_LEV_FIELD_AND_NOT_FREE(x, y) (IN_LEV_FIELD(x, y) && !IS_FREE(x, y))
@@ -891,24 +915,76 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
  */
 }
 
+inline void DrawGameValue_Emeralds(int value)
+{
+  DrawText(DX_EMERALDS, DY_EMERALDS, int2str(value, 3), FONT_TEXT_2);
+}
+
+inline void DrawGameValue_Dynamite(int value)
+{
+  DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
+}
+
+inline void DrawGameValue_Keys(struct PlayerInfo *player)
+{
+  int i;
+
+  for (i = 0; i < MAX_KEYS; i++)
+    if (player->key[i])
+      DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
+			 el2edimg(EL_KEY_1 + i));
+}
+
+inline void DrawGameValue_Score(int value)
+{
+  DrawText(DX_SCORE, DY_SCORE, int2str(value, 5), FONT_TEXT_2);
+}
+
+inline void DrawGameValue_Time(int value)
+{
+  if (value < 1000)
+    DrawText(DX_TIME1, DY_TIME, int2str(value, 3), FONT_TEXT_2);
+  else
+    DrawText(DX_TIME2, DY_TIME, int2str(value, 4), FONT_LEVEL_NUMBER);
+}
+
+inline void DrawGameValue_Level(int value)
+{
+  if (level_nr < 100)
+    DrawText(DX_LEVEL, DY_LEVEL, int2str(value, 2), FONT_TEXT_2);
+  else
+  {
+    /* misuse area for displaying emeralds to draw bigger level number */
+    DrawTextExt(drawto, DX_EMERALDS, DY_EMERALDS,
+		int2str(value, 3), FONT_LEVEL_NUMBER, BLIT_OPAQUE);
+
+    /* now copy it to the area for displaying level number */
+    BlitBitmap(drawto, drawto,
+	       DX_EMERALDS, DY_EMERALDS + 1,
+	       getFontWidth(FONT_LEVEL_NUMBER) * 3,
+	       getFontHeight(FONT_LEVEL_NUMBER) - 1,
+	       DX_LEVEL - 1, DY_LEVEL + 1);
+
+    /* restore the area for displaying emeralds */
+    DrawGameValue_Emeralds(local_player->gems_still_needed);
+
+    /* yes, this is all really ugly :-) */
+  }
+}
+
 void DrawGameDoorValues()
 {
-  int i, j;
+  int i;
+
+  DrawGameValue_Level(level_nr);
 
   for (i = 0; i < MAX_PLAYERS; i++)
-    for (j = 0; j < 4; j++)
-      if (stored_player[i].key[j])
-	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
-			   el2edimg(EL_KEY_1 + j));
+    DrawGameValue_Keys(&stored_player[i]);
 
-  DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
-	   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
-  DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
-	   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
-  DrawText(DX + XX_SCORE, DY + YY_SCORE,
-	   int2str(local_player->score, 5), FONT_TEXT_2);
-  DrawText(DX + XX_TIME, DY + YY_TIME,
-	   int2str(TimeLeft, 3), FONT_TEXT_2);
+  DrawGameValue_Emeralds(local_player->gems_still_needed);
+  DrawGameValue_Dynamite(local_player->inventory_size);
+  DrawGameValue_Score(local_player->score);
+  DrawGameValue_Time(TimeLeft);
 }
 
 static void resolve_group_element(int group_element, int recursion_depth)
@@ -1275,7 +1351,7 @@ void InitGame()
     player->lights_still_needed = 0;
     player->friends_still_needed = 0;
 
-    for (j = 0; j < 4; j++)
+    for (j = 0; j < MAX_KEYS; j++)
       player->key[j] = FALSE;
 
     player->dynabomb_count = 0;
@@ -1422,7 +1498,7 @@ void InitGame()
 
   game.envelope_active = FALSE;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_BELTS; i++)
   {
     game.belt_dir[i] = MV_NO_MOVING;
     game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
@@ -1510,7 +1586,7 @@ void InitGame()
   }
 
   /* correct non-moving belts to start moving left */
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_BELTS; i++)
     if (game.belt_dir[i] == MV_NO_MOVING)
       game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
@@ -1754,19 +1830,6 @@ void InitGame()
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
-  if (level_nr < 100)
-    DrawText(DX + XX_LEVEL, DY + YY_LEVEL, int2str(level_nr, 2), FONT_TEXT_2);
-  else
-  {
-    DrawTextExt(drawto, DX + XX_EMERALDS, DY + YY_EMERALDS,
-		int2str(level_nr, 3), FONT_LEVEL_NUMBER, BLIT_OPAQUE);
-    BlitBitmap(drawto, drawto,
-	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
-	       getFontWidth(FONT_LEVEL_NUMBER) * 3,
-	       getFontHeight(FONT_LEVEL_NUMBER) - 1,
-	       DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
-  }
-
   DrawGameDoorValues();
 
   UnmapGameButtons();
@@ -1792,7 +1855,7 @@ void InitGame()
 
   if (options.debug)
   {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < MAX_PLAYERS; i++)
       printf("Player %d %sactive.\n",
 	     i + 1, (stored_player[i].active ? "" : "not "));
   }
@@ -1912,7 +1975,7 @@ void InitMovDir(int x, int y)
 	else if (move_pattern == MV_ALONG_LEFT_SIDE ||
 		 move_pattern == MV_ALONG_RIGHT_SIDE)
 	{
-	  for (i = 0; i < 4; i++)
+	  for (i = 0; i < NUM_DIRECTIONS; i++)
 	  {
 	    int x1 = x + xy[i][0];
 	    int y1 = y + xy[i][1];
@@ -1939,7 +2002,7 @@ void InitMovDir(int x, int y)
 	    element != EL_BD_FIREFLY)
 	  break;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUM_DIRECTIONS; i++)
 	{
 	  int x1 = x + xy[i][0];
 	  int y1 = y + xy[i][1];
@@ -2024,7 +2087,9 @@ void GameWon()
 	TimeLeft -= 10;
       else
 	TimeLeft--;
-      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+
+      DrawGameValue_Time(TimeLeft);
+
       BackToFront();
 
       if (!tape.playing)
@@ -2050,7 +2115,9 @@ void GameWon()
 	TimePlayed += 10;
       else
 	TimePlayed++;
-      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_TEXT_2);
+
+      DrawGameValue_Time(TimePlayed);
+
       BackToFront();
 
       if (!tape.playing)
@@ -3006,12 +3073,12 @@ void DynaExplode(int ex, int ey)
 
   Explode(ex, ey, EX_PHASE_START, EX_CENTER);
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     for (j = 1; j <= dynabomb_size; j++)
     {
-      int x = ex + j * xy[i % 4][0];
-      int y = ey + j * xy[i % 4][1];
+      int x = ex + j * xy[i][0];
+      int y = ey + j * xy[i][1];
       int element;
 
       if (!IN_LEV_FIELD(x, y) || IS_INDESTRUCTIBLE(Feld[x][y]))
@@ -3175,11 +3242,11 @@ static void InitBeltMovement()
   int x, y, i, j;
 
   /* set frame order for belt animation graphic according to belt direction */
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_BELTS; i++)
   {
     int belt_nr = i;
 
-    for (j = 0; j < 3; j++)
+    for (j = 0; j < NUM_BELT_PARTS; j++)
     {
       int element = belt_base_active_element[belt_nr] + j;
       int graphic = el2img(element);
@@ -3197,7 +3264,7 @@ static void InitBeltMovement()
     {
       int element = Feld[x][y];
 
-      for (i = 0; i < 4; i++)
+      for (i = 0; i < NUM_BELTS; i++)
       {
 	if (IS_BELT(element) && game.belt_dir[i] != MV_NO_MOVING)
 	{
@@ -3263,7 +3330,7 @@ static void ToggleBeltSwitch(int x, int y)
     belt_dir_nr = 1;
 
   /* set frame order for belt animation graphic according to belt direction */
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < NUM_BELT_PARTS; i++)
   {
     int element = belt_base_active_element[belt_nr] + i;
     int graphic = el2img(element);
@@ -3921,9 +3988,9 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_DRAGON)
   {
-    boolean can_turn_left  = IN_LEV_FIELD_AND_IS_FREE(left_x, left_y);
-    boolean can_turn_right = IN_LEV_FIELD_AND_IS_FREE(right_x, right_y);
-    boolean can_move_on    = IN_LEV_FIELD_AND_IS_FREE(move_x, move_y);
+    boolean can_turn_left  = DRAGON_CAN_ENTER_FIELD(left_x, left_y);
+    boolean can_turn_right = DRAGON_CAN_ENTER_FIELD(right_x, right_y);
+    boolean can_move_on    = DRAGON_CAN_ENTER_FIELD(move_x, move_y);
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
@@ -4002,10 +4069,16 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_SPRING)
   {
+#if 0
     if (MovDir[x][y] & MV_HORIZONTAL &&
-	(!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y) ||
-	 IN_LEV_FIELD_AND_IS_FREE(x, y + 1)))
+	!SPRING_CAN_ENTER_FIELD(move_x, move_y))
       MovDir[x][y] = MV_NO_MOVING;
+#else
+    if (MovDir[x][y] & MV_HORIZONTAL &&
+	(!SPRING_CAN_ENTER_FIELD(move_x, move_y) ||
+	 SPRING_CAN_ENTER_FIELD(x, y + 1)))
+      MovDir[x][y] = MV_NO_MOVING;
+#endif
 
     MovDelay[x][y] = 0;
   }
@@ -4058,10 +4131,10 @@ inline static void TurnRoundExt(int x, int y)
 	{ 0, +1 }
       };
 
-      for (i = 0; i < 4; i++)
+      for (i = 0; i < NUM_DIRECTIONS; i++)
       {
-    	int ex = x + xy[i % 4][0];
-    	int ey = y + xy[i % 4][1];
+    	int ex = x + xy[i][0];
+    	int ey = y + xy[i][1];
 
     	if (IN_LEV_FIELD(ex, ey) && Feld[ex][ey] == EL_EXIT_OPEN)
 	{
@@ -4296,7 +4369,7 @@ inline static void TurnRoundExt(int x, int y)
   else if (move_pattern == MV_WHEN_PUSHED ||
 	   move_pattern == MV_WHEN_DROPPED)
   {
-    if (!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y))
+    if (!CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = MV_NO_MOVING;
 
     MovDelay[x][y] = 0;
@@ -4329,7 +4402,7 @@ inline static void TurnRoundExt(int x, int y)
     int start_test = RND(4);
     int i;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < NUM_DIRECTIONS; i++)
     {
       int move_dir = test_dir[start_test + i];
       int move_dir_preference;
@@ -5126,7 +5199,7 @@ void StartMoving(int x, int y)
 	PlayLevelSoundAction(x, y, action);
       }
 
-      if (new_element == element_info[element].move_enter_element)
+      if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
 	element_info[element].can_leave_element = TRUE;
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
@@ -5632,7 +5705,7 @@ int AmoebeNachbarNr(int ax, int ay)
     { 0, +1 }
   };
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int x = ax + xy[i][0];
     int y = ay + xy[i][1];
@@ -5662,7 +5735,7 @@ void AmoebenVereinigen(int ax, int ay)
   if (new_group_nr == 0)
     return;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     x = ax + xy[i][0];
     y = ay + xy[i][1];
@@ -5740,7 +5813,7 @@ void AmoebeUmwandeln(int ax, int ay)
       { 0, +1 }
     };
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < NUM_DIRECTIONS; i++)
     {
       x = ax + xy[i][0];
       y = ay + xy[i][1];
@@ -5936,7 +6009,7 @@ void AmoebeAbleger(int ax, int ay)
     int start = RND(4);
     boolean waiting_for_player = FALSE;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < NUM_DIRECTIONS; i++)
     {
       int j = (start + i) % 4;
       int x = ax + xy[j][0];
@@ -6418,11 +6491,11 @@ void CheckForDragon(int x, int y)
     { 0, +1 }
   };
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     for (j = 0; j < 4; j++)
     {
-      int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
+      int xx = x + j * xy[i][0], yy = y + j * xy[i][1];
 
       if (IN_LEV_FIELD(xx, yy) &&
 	  (Feld[xx][yy] == EL_FLAMES || Feld[xx][yy] == EL_DRAGON))
@@ -6437,11 +6510,11 @@ void CheckForDragon(int x, int y)
 
   if (!dragon_found)
   {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < NUM_DIRECTIONS; i++)
     {
       for (j = 0; j < 3; j++)
       {
-  	int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
+  	int xx = x + j * xy[i][0], yy = y + j * xy[i][1];
   
   	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_FLAMES)
   	{
@@ -6480,7 +6553,7 @@ static void WarnBuggyBase(int x, int y)
     { 0, +1 }
   };
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int xx = x + xy[i][0], yy = y + xy[i][1];
 
@@ -7771,14 +7844,14 @@ void GameActions()
       if (TimeLeft <= 10 && setup.time_limit)
 	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
 
-      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+      DrawGameValue_Time(TimeLeft);
 
       if (!TimeLeft && setup.time_limit)
 	for (i = 0; i < MAX_PLAYERS; i++)
 	  KillHero(&stored_player[i]);
     }
     else if (level.time == 0 && !AllPlayersGone) /* level without time limit */
-      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_TEXT_2);
+      DrawGameValue_Time(TimePlayed);
   }
 
   DrawAllPlayers();
@@ -8498,7 +8571,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   int center_element = Feld[x][y];	/* should always be non-moving! */
   int i;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
@@ -8574,7 +8647,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
   int center_element = Feld[x][y];	/* should always be non-moving! */
   int i, j;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
@@ -8772,7 +8845,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
     MV_DOWN
   };
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int test_x, test_y, test_move_dir, test_element;
 
@@ -8847,7 +8920,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
   if (bad_element == EL_EXPLOSION)	/* skip just exploding bad things */
     return;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int test_x, test_y, test_move_dir, test_element;
 
@@ -8951,7 +9024,7 @@ void TestIfBadThingTouchesOtherBadThing(int bad_x, int bad_y)
     { 0, +1 }
   };
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
   {
     int x, y, element;
 
@@ -9416,7 +9489,7 @@ int DigField(struct PlayerInfo *player,
 	else if (element == EL_EXTRA_TIME && level.time > 0)
 	{
 	  TimeLeft += 10;
-	  DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+	  DrawGameValue_Time(TimeLeft);
 	}
 	else if (element == EL_SHIELD_NORMAL || element == EL_SHIELD_DEADLY)
 	{
@@ -9429,8 +9502,7 @@ int DigField(struct PlayerInfo *player,
 	  if (player->inventory_size < MAX_INVENTORY_SIZE)
 	    player->inventory_element[player->inventory_size++] = element;
 
-	  DrawText(DX_DYNAMITE, DY_DYNAMITE,
-		   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
+	  DrawGameValue_Dynamite(local_player->inventory_size);
 	}
 	else if (element == EL_DYNABOMB_INCREASE_NUMBER)
 	{
@@ -9453,8 +9525,8 @@ int DigField(struct PlayerInfo *player,
 
 	  player->key[key_nr] = TRUE;
 
-	  DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			     el2edimg(EL_KEY_1 + key_nr));
+	  DrawGameValue_Keys(player);
+
 	  redraw_mask |= REDRAW_DOOR_1;
 	}
 	else if (IS_ENVELOPE(element))
@@ -9473,8 +9545,7 @@ int DigField(struct PlayerInfo *player,
 	    if (player->inventory_size < MAX_INVENTORY_SIZE)
 	      player->inventory_element[player->inventory_size++] = element;
 
-	  DrawText(DX_DYNAMITE, DY_DYNAMITE,
-		   int2str(local_player->inventory_size, 3), FONT_TEXT_2);
+	  DrawGameValue_Dynamite(local_player->inventory_size);
 	}
 	else if (element_info[element].collect_count > 0)
 	{
@@ -9483,8 +9554,7 @@ int DigField(struct PlayerInfo *player,
 	  if (local_player->gems_still_needed < 0)
 	    local_player->gems_still_needed = 0;
 
-	  DrawText(DX_EMERALDS, DY_EMERALDS,
-		   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
+	  DrawGameValue_Emeralds(local_player->gems_still_needed);
 	}
 
 	RaiseScoreElement(element);
@@ -9734,7 +9804,7 @@ int DigField(struct PlayerInfo *player,
 	{
 	  Feld[x][y] = EL_TIME_ORB_EMPTY;
 	  TimeLeft += 10;
-	  DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+	  DrawGameValue_Time(TimeLeft);
 
 	  DrawLevelField(x, y);
 
@@ -9888,8 +9958,7 @@ boolean DropElement(struct PlayerInfo *player)
 
     Feld[jx][jy] = new_element;
 
-    DrawText(DX_DYNAMITE, DY_DYNAMITE,
-	     int2str(local_player->inventory_size, 3), FONT_TEXT_2);
+    DrawGameValue_Dynamite(local_player->inventory_size);
 
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
@@ -10108,7 +10177,8 @@ static void PlayLevelMusic()
 void RaiseScore(int value)
 {
   local_player->score += value;
-  DrawText(DX_SCORE, DY_SCORE, int2str(local_player->score, 5), FONT_TEXT_2);
+
+  DrawGameValue_Score(local_player->score);
 }
 
 void RaiseScoreElement(int element)

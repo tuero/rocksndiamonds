@@ -681,6 +681,22 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		    gi->y > gfx.vy ? REDRAW_DOOR_2 : REDRAW_DOOR_3);
 }
 
+static int get_minimal_size_for_numeric_input(int minmax_value)
+{
+  int min_size = 1;	/* value needs at least one digit */
+  int i;
+
+  /* add number of digits needed for absolute value */
+  for (i = 10; i <= ABS(minmax_value); i *= 10)
+    min_size++;
+
+  /* if min/max value is negative, add one digit for minus sign */
+  if (minmax_value < 0)
+    min_size++;
+
+  return min_size;
+}
+
 static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 {
   int tag = first_tag;
@@ -984,6 +1000,19 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     int font_height = getFontHeight(font_nr);
     int border_xsize = gi->border.xsize;
     int border_ysize = gi->border.ysize;
+
+    if (gi->type == GD_TYPE_TEXT_INPUT_NUMERIC)
+    {
+      int number_min = gi->textinput.number_min;
+      int number_max = gi->textinput.number_max;
+      int min_size_min = get_minimal_size_for_numeric_input(number_min);
+      int min_size_max = get_minimal_size_for_numeric_input(number_max);
+      int min_size = MAX(min_size_min, min_size_max);
+
+      /* expand gadget text input size, if maximal value is too large */
+      if (gi->textinput.size < min_size)
+	gi->textinput.size = min_size;
+    }
 
     gi->width  = 2 * border_xsize + (gi->textinput.size + 1) * font_width;
     gi->height = 2 * border_ysize + font_height;

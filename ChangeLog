@@ -1,3 +1,7 @@
+2004-02-22
+	* fixed bug with dark yamyam changing to acid when moving over acid
+	* fixed handling of levels with more than 999 seconds level time
+
 2004-02-21
 	* "spring push bug" reintroduced as configurable element property
 	* fixed bug with missing properties for "mole"
