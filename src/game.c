@@ -98,6 +98,8 @@
 				 RND(element_info[e].push_delay_random))
 #define GET_NEW_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				 RND(element_info[e].move_delay_random))
+#define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
+				    (element_info[e].move_delay_random))
 
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -7893,6 +7895,21 @@ int DigField(struct PlayerInfo *player,
 	if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
 	    !(element == EL_SPRING && use_spring_bug))
 	  return MF_NO_ACTION;
+
+#if 1
+	if (CAN_MOVE(element) && GET_MAX_MOVE_DELAY(element) == 0 &&
+	    ((move_direction & MV_VERTICAL &&
+	      ((element_info[element].move_pattern & MV_LEFT &&
+		IN_LEV_FIELD(x - 1, y) && IS_FREE(x - 1, y)) ||
+	       (element_info[element].move_pattern & MV_RIGHT &&
+		IN_LEV_FIELD(x + 1, y) && IS_FREE(x + 1, y)))) ||
+	     (move_direction & MV_HORIZONTAL &&
+	      ((element_info[element].move_pattern & MV_UP &&
+		IN_LEV_FIELD(x, y - 1) && IS_FREE(x, y - 1)) ||
+	       (element_info[element].move_pattern & MV_DOWN &&
+		IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))))))
+	  return MF_NO_ACTION;
+#endif
 
 #if 1
 	/* do not push elements already moving away faster than player */
