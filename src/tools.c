@@ -666,9 +666,10 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
-    if (element == EL_SOKOBAN_FIELD_EMPTY ||
-	Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL)
-      DrawGraphicShiftedThruMask(px, py, sxx, syy, GFX_SOKOBAN_OBJEKT, 0,
+    if ((sxx || syy) &&
+	(element == EL_SOKOBAN_FIELD_EMPTY ||
+	 Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL))
+      DrawGraphicShiftedThruMask(px, py, sxx, syy, IMG_SOKOBAN_OBJECT, 0,
 				 NO_CUTTING);
     else
     {
@@ -678,7 +679,7 @@ void DrawPlayer(struct PlayerInfo *player)
       int frame = 0;
 #endif
 
-      if (sxx && IS_PUSHABLE(element))
+      if ((sxx || syy) && IS_PUSHABLE(element))
       {
 	graphic = el_dir_act2img(element, player->MovDir, GFX_ACTION_MOVING);
 #if 1
@@ -732,7 +733,7 @@ void DrawPlayer(struct PlayerInfo *player)
 #endif
 
     if (game.emulation == EMU_SUPAPLEX)
-      DrawGraphic(sx, sy, GFX_SP_DISK_RED, 0);
+      DrawGraphic(sx, sy, IMG_SP_DISK_RED, 0);
     else
       DrawGraphicThruMask(sx, sy, graphic, frame);
   }

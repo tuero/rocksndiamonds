@@ -2013,6 +2013,7 @@ struct ConfigInfo image_config[] =
   { "satellite.moving.ypos",			"9"			},
   { "satellite.moving.frames",			"8"			},
   { "satellite.moving.delay",			"2"			},
+  { "satellite.moving.global_sync",		"1"			},
 
   { "flames_left1",				"RocksHeroes.pcx"	},
   { "flames_left1.xpos",			"8"			},
