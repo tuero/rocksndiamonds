@@ -259,6 +259,10 @@
 #define MV_TURNING_RANDOM	(1 << MV_BIT_TURNING_RANDOM)
 #define MV_PREVIOUS		(1 << MV_BIT_PREVIOUS)
 
+/* values for elements left behind by custom elements */
+#define LEAVE_TYPE_UNLIMITED	0
+#define LEAVE_TYPE_LIMITED	1
+
 /* values for slippery property for custom elements */
 #define SLIPPERY_ANY_RANDOM	0
 #define SLIPPERY_ANY_LEFT_RIGHT	1
@@ -1524,6 +1528,7 @@ struct ElementInfo
   int move_stepsize;		/* step size element moves with */
   int move_enter_element;	/* element that can be entered (and removed) */
   int move_leave_element;	/* element that can be left behind */
+  int move_leave_type;		/* change (limited) or leave (unlimited) */
 
   int slippery_type;		/* how/where other elements slip away */
 
@@ -1545,6 +1550,9 @@ struct ElementInfo
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   boolean in_group[NUM_GROUP_ELEMENTS];
+
+  boolean can_leave_element;	/* element can leave other element behind */
+  boolean can_leave_element_last;
 
   /* ---------- internal values used in level editor ---------- */
 

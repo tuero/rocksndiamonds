@@ -1085,6 +1085,14 @@ static void InitGameEngine()
     element_info[e].move_stepsize = move_stepsize_list[i].move_stepsize;
   }
 
+  /* ---------- initialize move dig/leave ---------------------------------- */
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    element_info[i].can_leave_element = FALSE;
+    element_info[i].can_leave_element_last = FALSE;
+  }
+
   /* ---------- initialize gem count --------------------------------------- */
 
   /* initialize gem count values for each element */
@@ -1735,10 +1743,11 @@ void InitMovDir(int x, int y)
 	  move_direction_initial = MV_AUTOMATIC;
 	}
 
-	if (move_direction_initial & MV_ANY_DIRECTION)
+	if (move_direction_initial == MV_RANDOM)
+	  MovDir[x][y] = 1 << RND(4);
+	else if (move_direction_initial & MV_ANY_DIRECTION)
 	  MovDir[x][y] = move_direction_initial;
-	else if (move_direction_initial == MV_RANDOM ||
-		 move_pattern == MV_ALL_DIRECTIONS ||
+	else if (move_pattern == MV_ALL_DIRECTIONS ||
 		 move_pattern == MV_TURNING_LEFT ||
 		 move_pattern == MV_TURNING_RIGHT ||
 		 move_pattern == MV_TURNING_LEFT_RIGHT ||
@@ -4731,6 +4740,8 @@ void StartMoving(int x, int y)
 
 )
     {
+      int new_element = Feld[newx][newy];
+
 #if 0
       printf("::: '%s' digs '%s' [%d]\n",
 	     element_info[element].token_name,
@@ -4740,8 +4751,9 @@ void StartMoving(int x, int y)
 
       if (!IS_FREE(newx, newy))
       {
-	int new_element = Feld[newx][newy];
-	int sound;
+	int action = (IS_DIGGABLE(new_element) ? ACTION_DIGGING :
+		      IS_COLLECTIBLE(new_element) ? ACTION_COLLECTING :
+		      ACTION_BREAKING);
 
 	/* no element can dig solid indestructible elements */
 	if (IS_INDESTRUCTIBLE(new_element) &&
@@ -4766,12 +4778,11 @@ void StartMoving(int x, int y)
 	  DrawLevelField(newx, newy);
 	}
 
-	sound = (IS_DIGGABLE(new_element) ? ACTION_DIGGING :
-		 IS_COLLECTIBLE(new_element) ? ACTION_COLLECTING :
-		 ACTION_BREAKING);
-
-	PlayLevelSoundAction(x, y, sound);
+	PlayLevelSoundAction(x, y, action);
       }
+
+      if (new_element == element_info[element].move_enter_element)
+	element_info[element].can_leave_element = TRUE;
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
       {
@@ -4953,6 +4964,7 @@ void StartMoving(int x, int y)
 void ContinueMoving(int x, int y)
 {
   int element = Feld[x][y];
+  struct ElementInfo *ei = &element_info[element];
   int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
@@ -5070,22 +5082,20 @@ void ContinueMoving(int x, int y)
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
 #if 1
-  if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y))
+  if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
+      ei->move_leave_element != EL_EMPTY &&
+      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
+       ei->can_leave_element_last))
   {
-    int new_element = element_info[element].move_leave_element;
+    Feld[x][y] = ei->move_leave_element;
+    InitField(x, y, FALSE);
 
-    Feld[x][y] = new_element;
-
-    if (new_element != EL_EMPTY)
-    {
-      InitField(x, y, FALSE);
-
-      TestIfElementTouchesCustomElement(x, y);
-
-      if (GFX_CRUMBLED(new_element))
-	DrawLevelFieldCrumbledSandNeighbours(x, y);
-    }
+    if (GFX_CRUMBLED(Feld[x][y]))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
   }
+
+  ei->can_leave_element_last = ei->can_leave_element;
+  ei->can_leave_element = FALSE;
 #endif
 
 #if 0
@@ -5147,7 +5157,7 @@ void ContinueMoving(int x, int y)
     Impact(x, newy);
 
 #if 1
-  TestIfElementTouchesCustomElement(x, y);		/* for empty space */
+  TestIfElementTouchesCustomElement(x, y);	/* empty or new element */
 #endif
 
 #if 0

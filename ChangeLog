@@ -1,6 +1,28 @@
+2004-01-18
+	* custom elements can change (limited) or leave (unlimited) elements
+
+2004-01-17
+	* added new start movement type "previous" for continued CE movement
+	* added new start movement type "random" for random CE movement start
+
+2004-01-17
+	* added new element "sokoban_field_player" needed for Sokoban levels
+	  (thanks to Ed Booker for pointing this out!)
+
+2004-01-15
+	* added elements that can be digged or left behind by custom elements
+
+2004-01-12
+	* added group elements for multiple matches and random element creation
+
+2004-01-11
+	* fixed some graphical errors displayed in old levels
+
+2004-01-10
+	* fixed wrong double speed movement after passing closing gates
 
 2004-01-03
-	* level loader can now load native Emerald Mine levels
+	* added level loader for loading native Emerald Mine levels
 
 2004-01-02
 	* changes for "shooting" style CE movement

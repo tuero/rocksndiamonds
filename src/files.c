@@ -214,6 +214,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].move_stepsize = TILEX / 8;
       element_info[element].move_enter_element = EL_EMPTY_SPACE;
       element_info[element].move_leave_element = EL_EMPTY_SPACE;
+      element_info[element].move_leave_type = LEAVE_TYPE_UNLIMITED;
 
       element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
@@ -874,9 +875,10 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   ei->move_enter_element = checkLevelElement(getFile16BitBE(file));
   ei->move_leave_element = checkLevelElement(getFile16BitBE(file));
+  ei->move_leave_type = getFile8Bit(file);
 
   /* some free bytes for future custom property values and padding */
-  ReadUnusedBytesFromFile(file, 8);
+  ReadUnusedBytesFromFile(file, 7);
 
   /* read change property values */
 
@@ -2041,9 +2043,10 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
   putFile16BitBE(file, ei->move_enter_element);
   putFile16BitBE(file, ei->move_leave_element);
+  putFile8Bit(file, ei->move_leave_type);
 
   /* some free bytes for future custom property values and padding */
-  WriteUnusedBytesToFile(file, 8);
+  WriteUnusedBytesToFile(file, 7);
 
   /* write change property values */
 
