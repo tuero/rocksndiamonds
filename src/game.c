@@ -2764,11 +2764,21 @@ void ScrollLevel(int dx, int dy)
   int x,y;
   int softscroll_offset = (FX == TILEX ? TILEX : 0);
 
+  /*
   if (soft_scrolling_on)
   {
     ScreenMovPos = PlayerMovPos;
     redraw_mask |= REDRAW_FIELD;
   }
+  */
+
+
+  ScreenMovPos = PlayerMovPos;
+  if (soft_scrolling_on)
+  {
+    redraw_mask |= REDRAW_FIELD;
+  }
+
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2850,8 +2860,8 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   JY = newJY;
 
 
-  JX2 = oldJX;
-  JY2 = oldJY;
+  lastJX = oldJX;
+  lastJY = oldJY;
 
   PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 3*TILEX/4;
 
@@ -2980,29 +2990,49 @@ BOOL MoveFigure(int dx, int dy)
 void ScrollFigure(int init)
 {
   static long actual_frame_counter;
-  static int oldX = -1, oldY = -1;
+  static int oldJX = -1, oldJY = -1;
 
   if (init)
   {
-    if (PlayerMovPos && oldX != -1 && oldY != -1)
+    /*
+    if (PlayerMovPos && oldJX != -1 && oldJY != -1)
     {
-      if (Feld[JX2][JY2] == EL_LEERRAUM)
-	Feld[JX2][JY2] = EL_UNSICHTBAR;
-      DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
+      if (Feld[lastJX][lastJY] == EL_LEERRAUM)
+	Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
+      DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
       DrawPlayerField();
     }
+    */
 
-    oldX = JX2;
-    oldY = JY2;
+    if (oldJX != -1 && oldJY != -1)
+    {
+      /*
+      if (Feld[lastJX][lastJY] == EL_LEERRAUM)
+	Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
+	*/
+      DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
+      /*
+      DrawLevelElement(lastJX,lastJY, Feld[lastJX][lastJY]);
+      DrawPlayerField();
+      */
+    }
+
+    if (Feld[lastJX][lastJY] == EL_LEERRAUM)
+      Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
+    DrawLevelElement(lastJX,lastJY, Feld[lastJX][lastJY]);
+    DrawPlayerField();
+
+    oldJX = lastJX;
+    oldJY = lastJY;
     actual_frame_counter = FrameCounter;
 
     /*
-    redraw[redraw_x1 + oldX][redraw_y1 + oldY] = 1;
+    redraw[redraw_x1 + oldJX][redraw_y1 + oldJY] = 1;
     redraw_tiles++;
     */
 
     /*
-    DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
+    DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
     */
 
     DrawPlayerField();
@@ -3020,16 +3050,33 @@ void ScrollFigure(int init)
     redraw_mask |= REDRAW_FIELD;
   }
 
-  if (Feld[oldX][oldY] == EL_UNSICHTBAR)
-    Feld[oldX][oldY] = EL_LEERRAUM;
+  if (Feld[oldJX][oldJY] == EL_PLAYER_IS_LEAVING)
+    Feld[oldJX][oldJY] = EL_LEERRAUM;
 
-  DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
+  DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
   DrawPlayerField();
+
+
+
+  if (Store[oldJX][oldJY])
+  {
+    DrawGraphic(SCROLLX(oldJX),SCROLLY(oldJY),el2gfx(Store[oldJX][oldJY]));
+    DrawGraphicThruMask(SCROLLX(oldJX),SCROLLY(oldJY),
+			el2gfx(Feld[oldJX][oldJY]));
+  }
+  else if (Feld[oldJX][oldJY]==EL_DYNAMIT)
+    DrawDynamite(oldJX,oldJY);
+  else
+    DrawLevelField(oldJX,oldJY);
+
+
 
   if (!PlayerMovPos)
   {
-    JX2 = JX;
-    JY2 = JY;
+    lastJX = JX;
+    lastJY = JY;
+
+    oldJX = oldJY = -1;
   }
 }
 
@@ -3539,7 +3586,7 @@ BOOL PlaceBomb(void)
 {
   int element;
 
-  if (PlayerGone)
+  if (PlayerGone || PlayerMovPos)
     return(FALSE);
 
   element = Feld[JX][JY];

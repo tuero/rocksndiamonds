@@ -84,7 +84,7 @@ int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		FX = SX, FY = SY, ScreenMovPos = 0;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
-int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
+int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
 int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 int		PlayerGone,LevelSolved,GameOver;
 int		FrameCounter,TimeFrames,TimeLeft,Score;

@@ -71,7 +71,7 @@ typedef int BOOL;
 #define IS_PLAYER(x,y)		(JX==(x) && JY==(y))
 
 /*
-#define IS_PLAYER(x,y)		((JX==(x) && JY==(y)) || (JX2==(x) && JY2==(y)))
+#define IS_PLAYER(x,y)		((JX==(x) && JY==(y)) || (lastJX==(x) && lastJY==(y)))
 */
 
 #define IS_FREE(x,y)		(Feld[x][y]==EL_LEERRAUM && !IS_PLAYER(x,y))
@@ -308,7 +308,7 @@ extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScreenMovPos;
 extern int		BX1,BY1, BX2,BY2;
-extern int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
+extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
 extern int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 extern int		PlayerGone,LevelSolved,GameOver;
 extern int		FrameCounter,TimeFrames,TimeLeft,Score;
@@ -565,6 +565,7 @@ extern char		*progname;
 #define EL_AMOEBING		305
 #define EL_MAUERND		306
 #define EL_BURNING		307
+#define EL_PLAYER_IS_LEAVING	308
 
 /* game graphics:
 **	  0 - 255: graphics from "RocksScreen"

@@ -71,6 +71,7 @@ void DrawMiniGraphicExt(Drawable, GC, int, int, int);
 void DrawMiniGraphicExtHiRes(Drawable, GC, int, int, int);
 void DrawGraphicShifted(int, int, int, int, int, int);
 void DrawElementShifted(int, int, int, int, int, int);
+void DrawGraphicShiftedThruMask(int, int, int, int, int, int);
 void ErdreichAnbroeckeln(int, int);
 void DrawScreenElement(int, int, int);
 void DrawLevelElement(int, int, int);
