@@ -1850,7 +1850,7 @@ void Explode(int ex, int ey, int phase, int mode)
     if (phase == delay)
       DrawLevelFieldCrumbledSand(x, y);
 
-    if (IS_WALKABLE_OVER(Back[x][y]))
+    if (IS_WALKABLE_OVER(Back[x][y]) && Back[x][y] != EL_EMPTY)
     {
       DrawLevelElement(x, y, Back[x][y]);
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
@@ -4553,7 +4553,7 @@ static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (IS_MOVING(x, y))			/* never change moving elements */
+  if (IS_MOVING(x, y))			/* never change a running system :-) */
     return;
 
   if (MovDelay[x][y] == 0)		/* initialize element change */

@@ -58,7 +58,8 @@ int FilterMouseMotionEvents(const Event *event)
   }
 
   /* skip mouse motion events without pressed button outside level editor */
-  if (button_status == MB_RELEASED && game_status != GAME_MODE_EDITOR)
+  if (button_status == MB_RELEASED && game_status != GAME_MODE_EDITOR &&
+      game_status != GAME_MODE_PLAYING)
     return 0;
   else
     return 1;

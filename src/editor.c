@@ -900,67 +900,67 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(5),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(6),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
     "indestructible",			"element cannot be destroyed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(6),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(7),
     GADGET_ID_CUSTOM_DIGGABLE,
     &custom_element_properties[EP_DIGGABLE],
     "diggable",				"element can be digged away"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(7),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(8),
     GADGET_ID_CUSTOM_COLLECTIBLE,
     &custom_element_properties[EP_COLLECTIBLE],
     "collectible",			"element can be collected"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(8),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(9),
     GADGET_ID_CUSTOM_PUSHABLE,
     &custom_element_properties[EP_PUSHABLE],
     "pushable",				"element can be pushed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(9),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[EP_CAN_SMASH],
     "can smash",			"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
     "can move",				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
     GADGET_ID_CUSTOM_WALKABLE_OVER,
     &custom_element_properties[EP_WALKABLE_OVER],
     "player can walk over",		"player can walk over this element"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(15),
     GADGET_ID_CUSTOM_WALKABLE_INSIDE,
     &custom_element_properties[EP_WALKABLE_INSIDE],
     "player can walk inside",		"player can walk inside this element"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(15),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(16),
     GADGET_ID_CUSTOM_WALKABLE_UNDER,
     &custom_element_properties[EP_WALKABLE_UNDER],
     "player can walk under",		"player can walk under this element"
@@ -2933,6 +2933,10 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   for (i=0; i < NUM_CHANGE_EVENTS; i++)
     SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
+
+  /* copy change events also to special level editor variable */
+  i = properties_element - EL_CUSTOM_START;
+  custom_element_change = level.custom_element[i].change;
 }
 
 void DrawLevelEd()

@@ -279,56 +279,11 @@
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 
-#if 0
-
-/* Bitmaps with graphic file */
-#define PIX_BACK		0
-#define PIX_DOOR		1
-#define PIX_TOONS		2
-#define PIX_FONT_BIG		3
-#define PIX_FONT_SMALL		4
-#define PIX_FONT_MEDIUM		5
-#define PIX_FONT_EM		6
-/* Bitmaps without graphic file */
-#define PIX_DB_DOOR		7
-#define PIX_DB_FIELD		8
-
-#define NUM_PICTURES		7
-#define NUM_BITMAPS		9
-
-#else
-
-/* Bitmaps with graphic file */
-#define PIX_BACK		0
-#define PIX_ELEMENTS		1
-#define PIX_DOOR		2
-#define PIX_HEROES		3
-#define PIX_TOONS		4
-#define PIX_SP			5
-#define PIX_DC			6
-#define PIX_MORE		7
-#define PIX_FONT_BIG		8
-#define PIX_FONT_SMALL		9
-#define PIX_FONT_MEDIUM		10
-#define PIX_FONT_EM		11
-/* Bitmaps without graphic file */
-#define PIX_DB_DOOR		12
-#define PIX_DB_FIELD		13
-
-#define NUM_PICTURES		12
-#define NUM_BITMAPS		14
-
-#endif
-
 /* boundaries of arrays etc. */
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_SCORE_ENTRIES	100
-#if 0
-#define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
-#define MAX_GRAPHICS		1536		/* see below: NUM_TILES */
-#endif
 #define MAX_NUM_AMOEBA		100
 
 /* values for elements with content */

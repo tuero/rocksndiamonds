@@ -198,11 +198,9 @@ static DrawWindow *X11InitWindow()
   /* Select event types wanted */
   window_event_mask =
     ExposureMask | StructureNotifyMask | FocusChangeMask |
-    ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
+    ButtonPressMask | ButtonReleaseMask |
+    PointerMotionMask | PointerMotionHintMask |
     KeyPressMask | KeyReleaseMask;
-
-  /* unwanted mouse motion events now get filtered out by filter function */
-  /* window_event_mask |= PointerMotionHintMask; */
 
   XSelectInput(display, new_window->drawable, window_event_mask);
 #endif

@@ -27,8 +27,8 @@ Bitmap		       *bitmap_db_field, *bitmap_db_door;
 #if 0
 Pixmap			tile_clipmask[NUM_TILES];
 #endif
-DrawBuffer	     *fieldbuffer;
-DrawBuffer	     *drawto_field;
+DrawBuffer	       *fieldbuffer;
+DrawBuffer	       *drawto_field;
 
 int			game_status = -1;
 boolean			level_editor_test_game = FALSE;
