@@ -754,8 +754,8 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   }
 
   /* copy elements to runtime playfield array */
-  for(y=0; y<level->fieldy; y++)
-    for(x=0; x<level->fieldx; x++)
+  for(x=0; x<MAX_LEV_FIELDX; x++)
+    for(y=0; y<MAX_LEV_FIELDY; y++)
       Feld[x][y] = level->field[x][y];
 
   /* initialize level size variables for faster access */
