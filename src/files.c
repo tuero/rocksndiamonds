@@ -52,7 +52,12 @@
 /* values for level file type identifier */
 #define LEVEL_FILE_TYPE_UNKNOWN		0
 #define LEVEL_FILE_TYPE_RND		1
-#define LEVEL_FILE_TYPE_EM		2
+#define LEVEL_FILE_TYPE_BD		2
+#define LEVEL_FILE_TYPE_EM		3
+#define LEVEL_FILE_TYPE_SP		4
+#define LEVEL_FILE_TYPE_DX		5
+#define LEVEL_FILE_TYPE_SB		6
+#define LEVEL_FILE_TYPE_DC		7
 
 #define LEVEL_FILE_TYPE_RND_PACKED	(10 + LEVEL_FILE_TYPE_RND)
 #define LEVEL_FILE_TYPE_EM_PACKED	(10 + LEVEL_FILE_TYPE_EM)
@@ -294,6 +299,14 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   }
 }
 
+static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
+{
+  level_file_info->nr = 0;
+  level_file_info->type = LEVEL_FILE_TYPE_UNKNOWN;
+  level_file_info->packed = FALSE;
+  level_file_info->filename = NULL;
+}
+
 static void ActivateLevelTemplate()
 {
   /* Currently there is no special action needed to activate the template
@@ -316,6 +329,9 @@ static char *getSingleLevelBasename(int nr, int type)
 {
   static char basename[MAX_FILENAME_LEN];
 
+  if (leveldir_current->filename == NULL)
+    leveldir_current->filename = getStringCat2("%%03d.%s",LEVELFILE_EXTENSION);
+
   switch (type)
   {
     case LEVEL_FILE_TYPE_RND:
@@ -329,8 +345,9 @@ static char *getSingleLevelBasename(int nr, int type)
       sprintf(basename, "%d", nr);
       break;
 
+    case LEVEL_FILE_TYPE_UNKNOWN:
     default:
-      strcpy(basename, UNDEFINED_FILENAME);
+      sprintf(basename, leveldir_current->filename, nr);
       break;
   }
 
@@ -366,45 +383,102 @@ char *getDefaultLevelFilename(int nr)
   return getSingleLevelFilename(nr, LEVEL_FILE_TYPE_RND);
 }
 
+static void setLevelFileInfo_Filename(struct LevelFileInfo *lfi)
+{
+  /* special case: level number is negative => check for level template file */
+  if (lfi->nr < 0)
+  {
+    lfi->type = LEVEL_FILE_TYPE_RND;
+    lfi->filename = getDefaultLevelFilename(nr);
+
+    return;
+  }
+
+  if (leveldir_current->filename != NULL)
+  {
+    /* 1st try: check for file name/pattern specified in "levelinfo.conf" */
+    lfi->type = LEVEL_FILE_TYPE_UNKNOWN;
+    lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+
+    if (fileExists(lfi->filename))
+      return;
+  }
+
+  /* 2nd try: check for native Rocks'n'Diamonds level file */
+  lfi->type = LEVEL_FILE_TYPE_RND;
+  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+
+  if (fileExists(lfi->filename))
+    return;
+
+  /* 3rd try: check for classic Emerald Mine level file */
+  lfi->type = LEVEL_FILE_TYPE_EM;
+  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+
+  if (fileExists(lfi->filename))
+    return;
+
+  /* no known level file found -- try to use default values */
+  lfi->type = LEVEL_FILE_TYPE_UNKNOWN;
+  lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+}
+
+static void setLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
+{
+  struct stat file_status;
+
+  if (level_file_info.type != LEVEL_FILE_TYPE_UNKNOWN)
+    return;
+
+  /* ---------- try to determine file type from filename ---------- */
+
+  if (strlen(lfi->filename) == 10 &&
+      (strncmp(lfi->filename, "levels.d", 8) == 0 ||
+       strncmp(lfi->filename, "LEVELS.D", 8) == 0) &&
+      lfi->filename[8] >= '0' && lfi->filename[8] <= '9' &&
+      lfi->filename[9] >= '0' && lfi->filename[9] <= '9')
+  {
+    /* this looks like a typical filename of a Supaplex level package file */
+    lfi->type = LEVEL_FILE_TYPE_SP;
+
+    return;
+  }
+
+  /* ---------- try to determine file type from file status ---------- */
+
+  if (stat(lfi->filename, &file_status) == 0)
+  {
+    if (file_status.off_t == 170496)
+    {
+      /* this looks like a typical filesize of a Supaplex level package file */
+      lfi->type = LEVEL_FILE_TYPE_SP;
+
+      return;
+    }
+  }
+}
+
 static struct LevelFileInfo *getLevelFileInfo(int nr)
 {
   static struct LevelFileInfo level_file_info;
 
-  level_file_info.nr = nr;
+  /* always start with reliable default values */
+  setFileInfoToDefaults(&level_file_info);
 
-  /* special case: level template */
-  if (nr < 0)
-  {
-    level_file_info.type = LEVEL_FILE_TYPE_RND;
-    level_file_info.filename = getDefaultLevelFilename(nr);
+  level_file_info.nr = nr;	/* set requested level number */
 
-    return &level_file_info;
-  }
-
-  /* 1st try: check for native Rocks'n'Diamonds level file */
-  level_file_info.type = LEVEL_FILE_TYPE_RND;
-  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
-  if (fileExists(level_file_info.filename))
-    return &level_file_info;
-
-  /* 2nd try: check for classic Emerald Mine level file */
-  level_file_info.type = LEVEL_FILE_TYPE_EM;
-  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
-  if (fileExists(level_file_info.filename))
-    return &level_file_info;
-
-  /* no known level file found -- use default values */
-  level_file_info.type = LEVEL_FILE_TYPE_RND;
-  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
+  setLevelFileInfo_Filename(&level_file_info);
+  setLevelFileInfo_Filetype(&level_file_info);
 
   return &level_file_info;
 }
+
 
 /* ------------------------------------------------------------------------- */
 /* functions for loading R'n'D level                                         */
 /* ------------------------------------------------------------------------- */
 
-static int checkLevelElement(int element)
+int getMappedElement(int element)
 {
   /* map some (historic, now obsolete) elements */
 
@@ -496,12 +570,12 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < STD_ELEMENT_CONTENTS; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] = checkLevelElement(getFile8Bit(file));
+	level->yamyam_content[i][x][y] = getMappedElement(getFile8Bit(file));
 
   level->amoeba_speed		= getFile8Bit(file);
   level->time_magic_wall	= getFile8Bit(file);
   level->time_wheel		= getFile8Bit(file);
-  level->amoeba_content		= checkLevelElement(getFile8Bit(file));
+  level->amoeba_content		= getMappedElement(getFile8Bit(file));
   level->double_speed		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
@@ -547,8 +621,8 @@ static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
   for (y = 0; y < level->fieldy; y++)
     for (x = 0; x < level->fieldx; x++)
       level->field[x][y] =
-	checkLevelElement(level->encoding_16bit_field ? getFile16BitBE(file) :
-			  getFile8Bit(file));
+	getMappedElement(level->encoding_16bit_field ? getFile16BitBE(file) :
+			 getFile8Bit(file));
   return chunk_size;
 }
 
@@ -587,8 +661,8 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	level->yamyam_content[i][x][y] =
-	  checkLevelElement(level->encoding_16bit_field ?
-			    getFile16BitBE(file) : getFile8Bit(file));
+	  getMappedElement(level->encoding_16bit_field ?
+			   getFile16BitBE(file) : getFile8Bit(file));
   return chunk_size;
 }
 
@@ -599,7 +673,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   int num_contents, content_xsize, content_ysize;
   int content_array[MAX_ELEMENT_CONTENTS][3][3];
 
-  element = checkLevelElement(getFile16BitBE(file));
+  element = getMappedElement(getFile16BitBE(file));
   num_contents = getFile8Bit(file);
   content_xsize = getFile8Bit(file);
   content_ysize = getFile8Bit(file);
@@ -609,7 +683,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	content_array[i][x][y] = checkLevelElement(getFile16BitBE(file));
+	content_array[i][x][y] = getMappedElement(getFile16BitBE(file));
 
   /* correct invalid number of content fields -- should never happen */
   if (num_contents < 1 || num_contents > MAX_ELEMENT_CONTENTS)
@@ -644,7 +718,7 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
   int envelope_len;
   int chunk_size_expected;
 
-  element = checkLevelElement(getFile16BitBE(file));
+  element = getMappedElement(getFile16BitBE(file));
   if (!IS_ENVELOPE(element))
     element = EL_ENVELOPE_1;
 
@@ -756,7 +830,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
     element_info[element].use_gfx_element = getFile8Bit(file);
     element_info[element].gfx_element =
-      checkLevelElement(getFile16BitBE(file));
+      getMappedElement(getFile16BitBE(file));
 
     element_info[element].collect_score = getFile8Bit(file);
     element_info[element].collect_count = getFile8Bit(file);
@@ -773,19 +847,19 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	element_info[element].content[x][y] =
-	  checkLevelElement(getFile16BitBE(file));
+	  getMappedElement(getFile16BitBE(file));
 
     element_info[element].change->events = getFile32BitBE(file);
 
     element_info[element].change->target_element =
-      checkLevelElement(getFile16BitBE(file));
+      getMappedElement(getFile16BitBE(file));
 
     element_info[element].change->delay_fixed = getFile16BitBE(file);
     element_info[element].change->delay_random = getFile16BitBE(file);
     element_info[element].change->delay_frames = getFile16BitBE(file);
 
     element_info[element].change->trigger_element =
-      checkLevelElement(getFile16BitBE(file));
+      getMappedElement(getFile16BitBE(file));
 
     element_info[element].change->explode = getFile8Bit(file);
     element_info[element].change->use_content = getFile8Bit(file);
@@ -798,7 +872,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	element_info[element].change->content[x][y] =
-	  checkLevelElement(getFile16BitBE(file));
+	  getMappedElement(getFile16BitBE(file));
 
     element_info[element].slippery_type = getFile8Bit(file);
 
@@ -853,7 +927,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   /* read custom property values */
 
   ei->use_gfx_element = getFile8Bit(file);
-  ei->gfx_element = checkLevelElement(getFile16BitBE(file));
+  ei->gfx_element = getMappedElement(getFile16BitBE(file));
 
   ei->collect_score = getFile8Bit(file);
   ei->collect_count = getFile8Bit(file);
@@ -871,10 +945,10 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for (y = 0; y < 3; y++)
     for (x = 0; x < 3; x++)
-      ei->content[x][y] = checkLevelElement(getFile16BitBE(file));
+      ei->content[x][y] = getMappedElement(getFile16BitBE(file));
 
-  ei->move_enter_element = checkLevelElement(getFile16BitBE(file));
-  ei->move_leave_element = checkLevelElement(getFile16BitBE(file));
+  ei->move_enter_element = getMappedElement(getFile16BitBE(file));
+  ei->move_leave_element = getMappedElement(getFile16BitBE(file));
   ei->move_leave_type = getFile8Bit(file);
 
   /* some free bytes for future custom property values and padding */
@@ -893,13 +967,13 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     change->events = getFile32BitBE(file);
 
-    change->target_element = checkLevelElement(getFile16BitBE(file));
+    change->target_element = getMappedElement(getFile16BitBE(file));
 
     change->delay_fixed = getFile16BitBE(file);
     change->delay_random = getFile16BitBE(file);
     change->delay_frames = getFile16BitBE(file);
 
-    change->trigger_element = checkLevelElement(getFile16BitBE(file));
+    change->trigger_element = getMappedElement(getFile16BitBE(file));
 
     change->explode = getFile8Bit(file);
     change->use_content = getFile8Bit(file);
@@ -911,7 +985,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	change->content[x][y] = checkLevelElement(getFile16BitBE(file));
+	change->content[x][y] = getMappedElement(getFile16BitBE(file));
 
     change->can_change = getFile8Bit(file);
 
@@ -958,13 +1032,13 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
   group->num_elements = getFile8Bit(file);
 
   ei->use_gfx_element = getFile8Bit(file);
-  ei->gfx_element = checkLevelElement(getFile16BitBE(file));
+  ei->gfx_element = getMappedElement(getFile16BitBE(file));
 
   /* some free bytes for future values and padding */
   ReadUnusedBytesFromFile(file, 4);
 
   for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
-    group->element[i] = checkLevelElement(getFile16BitBE(file));
+    group->element[i] = getMappedElement(getFile16BitBE(file));
 
   /* mark this group element as modified */
   element_info[element].modified_settings = TRUE;
@@ -981,15 +1055,12 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
   int chunk_size;
   FILE *file;
 
-  /* always start with reliable default values */
-  setLevelInfoToDefaults(level);
-
   if (!(file = fopen(filename, MODE_READ)))
   {
     level->no_level_file = TRUE;
 
     if (level != &level_template)
-      Error(ERR_WARN, "cannot read level '%s' - using empty level", filename);
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
@@ -1293,34 +1364,33 @@ static int map_em_element_field(int element)
   }
 }
 
+#define EM_LEVEL_SIZE			2106
+#define EM_LEVEL_XSIZE			64
+#define EM_LEVEL_YSIZE			32
+
 static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 				     struct LevelFileInfo *level_file_info)
 {
   char *filename = level_file_info->filename;
   FILE *file;
-  unsigned char body[40][64];
-  unsigned char *leveldata = &body[0][0];
-  unsigned char *header = &leveldata[2048];
+  unsigned char leveldata[EM_LEVEL_SIZE];
+  unsigned char *header = &leveldata[EM_LEVEL_XSIZE * EM_LEVEL_YSIZE];
   unsigned char code0 = 0x65;
   unsigned char code1 = 0x11;
   boolean level_is_crypted = FALSE;
   int nr = level_file_info->nr;
-  int jx, jy;
   int i, x, y;
-
-  /* always start with reliable default values */
-  setLevelInfoToDefaults(level);
 
   if (!(file = fopen(filename, MODE_READ)))
   {
     level->no_level_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' - using empty level", filename);
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
 
-  for(i = 0; i < 2106; i++)
+  for(i = 0; i < EM_LEVEL_SIZE; i++)
     leveldata[i] = fgetc(file);
 
   fclose(file);
@@ -1339,7 +1409,7 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 
   if (level_is_crypted)		/* decode crypted level data */
   {
-    for(i = 0; i < 2106; i++)
+    for(i = 0; i < EM_LEVEL_SIZE; i++)
     {
       leveldata[i] ^= code0;
       leveldata[i] -= code1;
@@ -1348,8 +1418,8 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
     }
   }
 
-  level->fieldx	= 64;
-  level->fieldy	= 32;
+  level->fieldx	= EM_LEVEL_XSIZE;
+  level->fieldy	= EM_LEVEL_YSIZE;
 
   level->time		= header[46] * 10;
   level->gems_needed	= header[47];
@@ -1363,7 +1433,7 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   if (leveldata[1] == nr)
     leveldata[1] = leveldata[2];	/* correct level number field */
 
-  sprintf(level->name, "Level %d", nr);
+  sprintf(level->name, "Level %d", nr);		/* set level name */
 
   level->score[SC_EMERALD]	= header[36];
   level->score[SC_DIAMOND]	= header[37];
@@ -1390,7 +1460,7 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 
   for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
   {
-    int new_element = map_em_element_field(body[y][x]);
+    int new_element = map_em_element_field(leveldata[y * EM_LEVEL_XSIZE + x]);
 
     if (new_element == EL_AMOEBA_DEAD && level->amoeba_speed)
       new_element = EL_AMOEBA_WET;
@@ -1398,18 +1468,284 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
     level->field[x][y] = new_element;
   }
 
-  jx = (header[48] * 256 + header[49]) % 64;
-  jy = (header[48] * 256 + header[49]) / 64;
-  level->field[jx][jy] = EL_PLAYER_1;
+  x = (header[48] * 256 + header[49]) % EM_LEVEL_XSIZE;
+  y = (header[48] * 256 + header[49]) / EM_LEVEL_XSIZE;
+  level->field[x][y] = EL_PLAYER_1;
 
-  jx = (header[50] * 256 + header[51]) % 64;
-  jy = (header[50] * 256 + header[51]) / 64;
-  level->field[jx][jy] = EL_PLAYER_2;
+  x = (header[50] * 256 + header[51]) % EM_LEVEL_XSIZE;
+  y = (header[50] * 256 + header[51]) / EM_LEVEL_XSIZE;
+  level->field[x][y] = EL_PLAYER_2;
 }
+
+/* ------------------------------------------------------------------------- */
+/* functions for loading SP level                                            */
+/* ------------------------------------------------------------------------- */
+
+#define NUM_SUPAPLEX_LEVELS_PER_PACKAGE	111
+#define SP_LEVEL_SIZE			1536
+#define SP_LEVEL_XSIZE			60
+#define SP_LEVEL_YSIZE			24
+#define SP_LEVEL_NAME_LEN		23
+
+static void LoadLevelFromFileStream_SP(struct LevelInfo *level, FILE *file)
+{
+  int i, x, y;
+
+  /* read level body (width * height == 60 * 24 tiles == 1440 bytes) */
+  for (y = 0; y < SP_LEVEL_YSIZE; y++)
+  {
+    for (x = 0; x < SP_LEVEL_XSIZE; x++)
+    {
+      int element_old = fgetc(file);
+      int element_new;
+
+      if (element_old <= 0x27)
+	element_new = EL_SP_START + element_old;
+      else if (element_old == 0x28)
+	element_new = EL_INVISIBLE_WALL;
+      else
+      {
+	Error(ERR_WARN, "in level %d, at position %d, %d:", l, x, y);
+	Error(ERR_WARN, "invalid level element %d", element_old);
+
+	element_new = EL_CHAR_FRAGE;
+      }
+
+      level->field[x][y] = element_new;
+    }
+  }
+
+  ReadUnusedBytesFromFile(file, 4);
+
+  /* Initial gravitation: 1 == "on", anything else (0) == "off" */
+  level->gravity = (fgetc(file) == 1 ? TRUE : FALSE);
+
+  ReadUnusedBytesFromFile(file, 1);
+
+  /* level title in uppercase letters, padded with dashes ("-") (23 bytes) */
+  for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
+    level->name[i] = fgetc(file);
+  level->name[SP_LEVEL_NAME_LEN] = '\0';
+
+  /* initial "freeze zonks": 2 == "on", anything else (0) == "off" */
+  ReadUnusedBytesFromFile(file, 1);	/* !!! NOT SUPPORTED YET !!! */
+
+  /* number of infotrons needed; 0 means that Supaplex will count the total
+     amount of infotrons in the level and use the low byte of that number.
+     (a multiple of 256 infotrons will result in "0 infotrons needed"!) */
+  level->gems_needed = fgetc(file);
+
+  /* information about special gravity port entries */
+  ReadUnusedBytesFromFile(file, 65);	/* !!! NOT SUPPORTED YET !!! */
+
+  level->fieldx = SP_LEVEL_XSIZE;
+  level->fieldy = SP_LEVEL_YSIZE;
+
+  level->time = 0;			/* no time limit */
+  level->amoeba_speed = 0;
+  level->time_magic_wall = 0;
+  level->time_wheel = 0;
+  level->amoeba_content = EL_EMPTY;
+
+  for(i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
+    level->score[i] = 0;		/* !!! CORRECT THIS !!! */
+
+  /* there are no yamyams in supaplex levels */
+  for(i = 0; i < level->num_yamyam_contents; i++)
+    for(y = 0; y < 3; y++)
+      for(x = 0; x < 3; x++)
+	level->yamyam_content[i][x][y] = EL_EMPTY;
+}
+
+static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  char *filename = level_file_info->filename;
+  FILE *file;
+  int nr = level_file_info->nr;
+  int i, l, x, y;
+  char name_first, name_last;
+  struct LevelInfo multipart_level;
+  int multipart_xpos, multipart_ypos;
+  boolean is_multipart_level;
+  boolean is_first_part;
+  boolean reading_multipart_level = FALSE;
+  boolean use_empty_level = FALSE;
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    level->no_level_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return;
+  }
+
+  /* position file stream to the requested level inside the level package */
+  if (fseek(file, nr * SP_LEVEL_SIZE, SEEK_SET) != 0)
+  {
+    level->no_level_file = TRUE;
+
+    Error(ERR_WARN, "cannot fseek level '%s' -- using empty level", filename);
+
+    return;
+  }
+
+  /* there exist Supaplex level package files with multi-part levels which
+     can be detected as follows: instead of leading and trailing dashes ('-')
+     to pad the level name, they have leading and trailing numbers which are
+     the x and y coordinations of the current part of the multi-part level;
+     if there are '?' characters instead of numbers on the left or right side
+     of the level name, the multi-part level consists of only horizontal or
+     vertical parts */
+
+  for (l = nr; l < NUM_SUPAPLEX_LEVELS_PER_PACKAGE; l++)
+  {
+    LoadLevelFromFileStream_SP(level, file);
+
+    /* check if this level is a part of a bigger multi-part level */
+
+    name_first = level->name[0];
+    name_last  = level->name[SP_LEVEL_NAME_LEN - 1];
+
+    is_multipart_level =
+      ((name_first == '?' || (name_first >= '0' && name_first <= '9')) &&
+       (name_last  == '?' || (name_last  >= '0' && name_last  <= '9')));
+
+    is_first_part =
+      ((name_first == '?' || name_first == '1') &&
+       (name_last  == '?' || name_last  == '1'));
+
+    /* correct leading multipart level meta information in level name */
+    for (i = 0; i < SP_LEVEL_NAME_LEN && level->name[i] == name_first; i++)
+      level->name[i] = '-';
+
+    /* correct trailing multipart level meta information in level name */
+    for (i = SP_LEVEL_NAME_LEN - 1; i>=0 && level->name[i] == name_last; i--)
+      level->name[i] = '-';
+
+    /* ---------- check for normal single level ---------- */
+
+    if (!reading_multipart_level && !is_multipart_level)
+    {
+      /* the current level is simply a normal single-part level, and we are
+	 not reading a multi-part level yet, so return the level as it is */
+
+      break;
+    }
+
+    /* ---------- check for empty level (unused multi-part) ---------- */
+
+    if (!reading_multipart_level && is_multipart_level && !is_first_part)
+    {
+      /* this is a part of a multi-part level, but not the first part
+	 (and we are not already reading parts of a multi-part level);
+	 in this case, use an empty level instead of the single part */
+
+      use_empty_level = TRUE;
+
+      break;
+    }
+
+    /* ---------- check for finished multi-part level ---------- */
+
+    if (reading_multipart_level &&
+	(!is_multipart_level ||
+	 strcmp(level->name, multipart_level.name) != 0))
+    {
+      /* we are already reading parts of a multi-part level, but this level is
+	 either not a multi-part level, or a part of a different multi-part
+	 level; in both cases, the multi-part level seems to be complete */
+
+      break;
+    }
+
+    /* ---------- here we have one part of a multi-part level ---------- */
+
+    reading_multipart_level = TRUE;
+
+    if (is_first_part)	/* start with first part of new multi-part level */
+    {
+      /* copy level info structure from first part */
+      multipart_level = level;
+
+      /* clear playfield of new multi-part level */
+      for (y = 0; y < MAX_LEV_FIELDY; y++)
+	for (x = 0; x < MAX_LEV_FIELDX; x++)
+	  multipart_level->field[x][y] = EL_EMPTY;
+    }
+
+    if (name_first == '?')
+      name_first = '1';
+    if (name_last == '?')
+      name_last = '1';
+
+    multipart_xpos = (int)(name_first - '0');
+    multipart_ypos = (int)(name_last  - '0');
+
+#if 1
+    printf("----------> Part (%d/%d) of multi-part level '%s'\n",
+	   multipart_xpos, multipart_ypos, multipart_level.name);
+#endif
+
+    if (multipart_xpos * SP_LEVEL_XSIZE > MAX_LEV_FIELDX ||
+	multipart_ypos * SP_LEVEL_YSIZE > MAX_LEV_FIELDY)
+    {
+      Error(ERR_WARN, "multi-part level is too big -- ignoring part of it");
+
+      break;
+    }
+
+    multipart_level.fieldx = MAX(multipart_level.fieldx,
+				 multipart_xpos * SP_LEVEL_XSIZE);
+    multipart_level.fieldy = MAX(multipart_level.fieldy,
+				 multipart_ypos * SP_LEVEL_YSIZE);
+
+    /* copy level part at the right position of multi-part level */
+    for (y = 0; y < SP_LEVEL_YSIZE; y++)
+    {
+      for (x = 0; x < SP_LEVEL_XSIZE; x++)
+      {
+	int start_x = (multipart_xpos - 1) * SP_LEVEL_XSIZE;
+	int start_y = (multipart_ypos - 1) * SP_LEVEL_YSIZE;
+
+	multipart_level->field[start_x + x][start_y + y] = level->field[x][y];
+      }
+    }
+  }
+
+  fclose(file);
+
+  if (use_empty_level)
+  {
+    setLevelInfoToDefaults(level);
+
+    level->fieldx = SP_LEVEL_XSIZE;
+    level->fieldy = SP_LEVEL_YSIZE;
+
+    for (y = 0; y < SP_LEVEL_YSIZE; y++)
+      for (x = 0; x < SP_LEVEL_XSIZE; x++)
+	level->field[x][y] = EL_EMPTY;
+
+    strcpy(level->name, "-------- EMPTY --------");
+
+    Error(ERR_WARN, "single part of multi-part level -- using empty level");
+  }
+
+  if (reading_multipart_level)
+    *level = multipart_level;
+}
+
+/* ------------------------------------------------------------------------- */
+/* functions for loading generic level                                       */
+/* ------------------------------------------------------------------------- */
 
 void LoadLevelFromFileInfo(struct LevelInfo *level,
 			   struct LevelFileInfo *level_file_info)
 {
+  /* always start with reliable default values */
+  setLevelInfoToDefaults(level);
+
   switch (level_file_info->type)
   {
     case LEVEL_FILE_TYPE_RND:
@@ -1418,6 +1754,10 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
     case LEVEL_FILE_TYPE_EM:
       LoadLevelFromFileInfo_EM(level, level_file_info);
+      break;
+
+    case LEVEL_FILE_TYPE_SP:
+      LoadLevelFromFileInfo_SP(level, level_file_info);
       break;
 
     default:
@@ -1430,7 +1770,10 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 {
   static struct LevelFileInfo level_file_info;
 
-  level_file_info.nr = 0;			/* unknown */
+  /* always start with reliable default values */
+  setFileInfoToDefaults(&level_file_info);
+
+  level_file_info.nr = 0;			/* unknown level number */
   level_file_info.type = LEVEL_FILE_TYPE_RND;	/* no others supported yet */
   level_file_info.filename = filename;
 

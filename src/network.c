@@ -300,7 +300,7 @@ static void Handle_OP_YOUR_NUMBER()
   }
 
   if (first_player.nr > MAX_PLAYERS)
-    Error(ERR_EXIT, "sorry - no more than %d players", MAX_PLAYERS);
+    Error(ERR_EXIT, "sorry, more than %d players not allowed", MAX_PLAYERS);
 
   Error(ERR_NETWORK_CLIENT, "you get client # %d", new_client_nr);
 }

@@ -1582,8 +1582,10 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_GRAPHICS_SET	11
 #define LEVELINFO_TOKEN_SOUNDS_SET	12
 #define LEVELINFO_TOKEN_MUSIC_SET	13
+#define LEVELINFO_TOKEN_FILENAME	14
+#define LEVELINFO_TOKEN_FILETYPE	15
 
-#define NUM_LEVELINFO_TOKENS		14
+#define NUM_LEVELINFO_TOKENS		16
 
 static LevelDirTree ldi;
 
@@ -1604,6 +1606,8 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,  &ldi.graphics_set,	"graphics_set"	},
   { TYPE_STRING,  &ldi.sounds_set,	"sounds_set"	},
   { TYPE_STRING,  &ldi.music_set,	"music_set"	}
+  { TYPE_STRING,  &ldi.filename,	"filename"	}
+  { TYPE_STRING,  &ldi.filetype,	"filetype"	}
 };
 
 static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
@@ -1648,6 +1652,9 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
     ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+
+    ldi->filename = NULL;
+    ldi->filetype = NULL;
 
     ldi->levels = 0;
     ldi->first_level = 0;
@@ -1707,6 +1714,9 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
     ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+
+    ldi->filename = NULL;
+    ldi->filetype = NULL;
 
     ldi->levels = 0;
     ldi->first_level = 0;

@@ -730,7 +730,7 @@ static void *Load_PCX(char *filename)
 
   if ((img_info->bitmap = LoadImage(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read image file '%s': LoadImage() failed: %s",
+    Error(ERR_WARN, "cannot load image file '%s': LoadImage() failed: %s",
 	  filename, GetError());
     free(img_info);
     return NULL;

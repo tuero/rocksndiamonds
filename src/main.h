@@ -1322,6 +1322,7 @@ struct LevelFileInfo
 {
   int nr;
   int type;
+  boolean packed;
   char *filename;
 };
 

@@ -530,11 +530,11 @@ struct ConfigInfo helptext_config[] =
   },
   {
     "yamyam",
-    "Cruncher: Eats diamonds and you, if you're not careful"
+    "Yam Yam: Eats diamonds and you, if you're not careful"
   },
   {
     "dark_yamyam",
-    "Cruncher (BD style): Eats almost everything"
+    "Dark Yam Yam: Eats almost everything"
   },
   {
     "robot",
