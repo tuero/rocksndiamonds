@@ -1234,6 +1234,17 @@ SetupFileList *setListEntry(SetupFileList *list, char *token, char *value)
     return setListEntry(list->next, token, value);
 }
 
+SetupFileList *addListEntry(SetupFileList *list, char *token, char *value)
+{
+  if (list == NULL)
+    return NULL;
+
+  if (list->next == NULL)
+    return (list->next = newSetupFileList(token, value));
+  else
+    return addListEntry(list->next, token, value);
+}
+
 #ifdef DEBUG
 static void printSetupFileList(SetupFileList *list)
 {
@@ -1430,7 +1441,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
       if (use_hash)
 	setHashEntry((SetupFileHash *)setup_file_data, token, value);
       else
-	insert_ptr = setListEntry((SetupFileList *)insert_ptr, token, value);
+	insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
     }
   }
 

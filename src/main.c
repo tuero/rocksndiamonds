@@ -3714,7 +3714,18 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".changing",		ACTION_CHANGING,		FALSE	},
   { ".exploding",		ACTION_EXPLODING,		FALSE	},
   { ".boring",			ACTION_BORING,			FALSE	},
-  { ".sleeping",		ACTION_SLEEPING,		TRUE	},
+  { ".boring:1",		ACTION_BORING_1,		FALSE	},
+  { ".boring:2",		ACTION_BORING_2,		FALSE	},
+  { ".boring:3",		ACTION_BORING_3,		FALSE	},
+  { ".boring:4",		ACTION_BORING_4,		FALSE	},
+  { ".boring:5",		ACTION_BORING_5,		FALSE	},
+  { ".boring:6",		ACTION_BORING_6,		FALSE	},
+  { ".boring:7",		ACTION_BORING_7,		FALSE	},
+  { ".boring:8",		ACTION_BORING_8,		FALSE	},
+  { ".sleeping",		ACTION_SLEEPING,		FALSE	},
+  { ".sleeping:1",		ACTION_SLEEPING_1,		FALSE	},
+  { ".sleeping:2",		ACTION_SLEEPING_2,		FALSE	},
+  { ".sleeping:3",		ACTION_SLEEPING_3,		FALSE	},
   { ".dying",			ACTION_DYING,			FALSE	},
   { ".turning",			ACTION_TURNING,			FALSE	},
   { ".turning_from_left",	ACTION_TURNING_FROM_LEFT,	FALSE	},
@@ -3792,6 +3803,11 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "door_2.step_delay",	&door_2.step_delay			   },
   { "door_2.anim_mode",		&door_2.anim_mode			   },
 
+  { "[player].boring_delay_fixed",	&game.player_boring_delay_fixed    },
+  { "[player].boring_delay_random",	&game.player_boring_delay_random   },
+  { "[player].sleeping_delay_fixed",	&game.player_sleeping_delay_fixed  },
+  { "[player].sleeping_delay_random",	&game.player_sleeping_delay_random },
+
   { NULL,			NULL,					   }
 };
 
@@ -3856,6 +3872,36 @@ struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 /* main()                                                                    */
 /* ========================================================================= */
 
+static void print_usage()
+{
+  printf("\n"
+	 "Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
+	 "\n"
+	 "Options:\n"
+	 "  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
+	 "  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
+	 "  -l, --level DIRECTORY            alternative level DIRECTORY\n"
+	 "  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
+	 "  -s, --sounds DIRECTORY           alternative sounds DIRECTORY\n"
+	 "  -m, --music DIRECTORY            alternative music DIRECTORY\n"
+	 "  -n, --network                    network multiplayer game\n"
+	 "      --serveronly                 only start network server\n"
+	 "  -v, --verbose                    verbose mode\n"
+	 "      --debug                      display debugging information\n"
+	 "  -e, --execute COMMAND            execute batch COMMAND:\n"
+	 "\n"
+	 "Valid commands for '--execute' option:\n"
+	 "  \"print graphicsinfo.conf\"        print default graphics config\n"
+	 "  \"print soundsinfo.conf\"          print default sounds config\n"
+	 "  \"print musicinfo.conf\"           print default music config\n"
+	 "  \"print editorsetup.conf\"         print default editor config\n"
+	 "  \"dump level FILE\"                dump level data from FILE\n"
+	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
+	 "  \"autoplay LEVELDIR\"              play level tapes for LEVELDIR\n"
+	 "\n",
+	 program.command_basename);
+}
+
 int main(int argc, char *argv[])
 {
   InitProgramInfo(argv[0], USERDATA_DIRECTORY,
@@ -3867,7 +3913,7 @@ int main(int argc, char *argv[])
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();
 
-  GetOptions(argv);
+  GetOptions(argv, print_usage);
   OpenAll();
 
   EventLoop();

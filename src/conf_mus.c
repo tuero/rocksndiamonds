@@ -21,24 +21,24 @@
 
 struct ConfigInfo music_config_suffix[] =
 {
-  { ".mode_loop",			ARG_UNDEFINED,	TYPE_BOOLEAN },
+  { ".mode_loop",			ARG_UNDEFINED,	TYPE_BOOLEAN	},
 
-  { NULL,				NULL,		0	     }
+  { NULL,				NULL,		0		}
 };
 
 struct ConfigInfo music_config[] =
 {
-  { "background",			UNDEFINED_FILENAME	},
-  { "background.MAIN",			UNDEFINED_FILENAME	},
-  { "background.LEVELS",		UNDEFINED_FILENAME	},
-  { "background.SCORES",		UNDEFINED_FILENAME	},
-  { "background.EDITOR",		UNDEFINED_FILENAME	},
-  { "background.INFO",			"rhythmloop.wav"	},
-  { "background.SETUP",			UNDEFINED_FILENAME	},
+  { "background",			UNDEFINED_FILENAME		},
+  { "background.MAIN",			UNDEFINED_FILENAME		},
+  { "background.LEVELS",		UNDEFINED_FILENAME		},
+  { "background.SCORES",		UNDEFINED_FILENAME		},
+  { "background.EDITOR",		UNDEFINED_FILENAME		},
+  { "background.INFO",			"rhythmloop.wav"		},
+  { "background.SETUP",			UNDEFINED_FILENAME		},
 
   /* there is no definition for "background.PLAYING", because this would
      prevent selecting music from music directory that is not defined in
      "musicinfo.conf", when no default music is defined here */
 
-  { NULL,				NULL			}
+  { NULL,				NULL				}
 };

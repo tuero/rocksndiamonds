@@ -243,6 +243,7 @@ SetupFileList *newSetupFileList(char *, char *);
 void freeSetupFileList(SetupFileList *);
 char *getListEntry(SetupFileList *, char *);
 SetupFileList *setListEntry(SetupFileList *, char *, char *);
+SetupFileList *addListEntry(SetupFileList *, char *, char *);
 SetupFileList *loadSetupFileList(char *);
 
 SetupFileHash *newSetupFileHash();

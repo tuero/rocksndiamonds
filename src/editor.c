@@ -3136,6 +3136,35 @@ static void ReinitializeElementList()
     element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
 }
 
+void PrintEditorElementList()
+{
+  boolean *stop = &setup.editor.el_user_defined;
+  int i, j;
+
+  for (i=0; editor_elements_info[i].setup_value != stop; i++)
+  {
+    for (j=0; j < *editor_elements_info[i].headline_list_size; j++)
+    {
+      int element = (*editor_elements_info[i].headline_list)[j];
+
+      printf("# %s\n", element_info[element].token_name);
+    }
+
+    if (j > 0)
+      printf("#\n");
+
+    for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+    {
+      int element = (*editor_elements_info[i].element_list)[j];
+
+      printf("# %s\n", element_info[element].token_name);
+    }
+
+    if (j > 0)
+      printf("#\n");
+  }
+}
+
 static void ReinitializeElementListButtons()
 {
   static boolean last_setup_value_headlines = FALSE;

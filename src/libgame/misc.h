@@ -99,7 +99,7 @@ char *getStringCopy(char *);
 char *getStringToLower(char *);
 void setString(char **, char *);
 
-void GetOptions(char **);
+void GetOptions(char **, void (*print_usage_function)(void));
 
 void SetError(char *, ...);
 char *GetError(void);

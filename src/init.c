@@ -826,6 +826,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
+  graphic_info[graphic].anim_delay_fixed = 0;
+  graphic_info[graphic].anim_delay_random = 0;
+  graphic_info[graphic].post_delay_fixed = 0;
+  graphic_info[graphic].post_delay_random = 0;
 
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
@@ -920,6 +924,20 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* optional border size for "crumbling" diggable graphics */
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].border_size = parameter[GFX_ARG_BORDER_SIZE];
+
+  /* this is only used for player "boring" and "sleeping" actions */
+  if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_delay_fixed =
+      parameter[GFX_ARG_ANIM_DELAY_FIXED];
+  if (parameter[GFX_ARG_ANIM_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_delay_fixed =
+      parameter[GFX_ARG_ANIM_DELAY_RANDOM];
+  if (parameter[GFX_ARG_POST_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_delay_fixed =
+      parameter[GFX_ARG_POST_DELAY_FIXED];
+  if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_delay_fixed =
+      parameter[GFX_ARG_POST_DELAY_RANDOM];
 
   /* this is only used for toon animations */
   graphic_info[graphic].step_offset = parameter[GFX_ARG_STEP_OFFSET];
@@ -3179,7 +3197,7 @@ void Execute_Command(char *command)
     int i;
 
     printf("# You can configure additional/alternative image files here.\n");
-    printf("# (The images below are default and therefore commented out.)\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
     printf("\n");
@@ -3198,7 +3216,7 @@ void Execute_Command(char *command)
     int i;
 
     printf("# You can configure additional/alternative sound files here.\n");
-    printf("# (The sounds below are default and therefore commented out.)\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
     printf("\n");
@@ -3214,11 +3232,30 @@ void Execute_Command(char *command)
   }
   else if (strcmp(command, "print musicinfo.conf") == 0)
   {
-    printf("# (Currently only \"name\" and \"sort_priority\" recognized.)\n");
+    int i;
+
+    printf("# You can configure additional/alternative music files here.\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    printf("\n");
+
+    for (i=0; music_config[i].token != NULL; i++)
+      printf("# %s\n",
+	     getFormattedSetupEntry(music_config[i].token,
+				    music_config[i].value));
+
+    exit(0);
+  }
+  else if (strcmp(command, "print editorsetup.conf") == 0)
+  {
+    printf("# You can configure your personal editor element list here.\n");
+    printf("# (The entries below are default and therefore commented out.)\n");
+    printf("\n");
+
+    PrintEditorElementList();
 
     exit(0);
   }

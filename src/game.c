@@ -186,6 +186,7 @@ static void PlayLevelSound(int, int, int);
 static void PlayLevelSoundNearest(int, int, int);
 static void PlayLevelSoundAction(int, int, int);
 static void PlayLevelSoundElementAction(int, int, int, int);
+static void PlayLevelSoundElementActionIfLoop(int, int, int, int);
 static void PlayLevelSoundActionIfLoop(int, int, int);
 static void StopLevelSoundActionIfLoop(int, int, int);
 static void PlayLevelMusic();
@@ -1058,6 +1059,12 @@ void InitGame()
     player->is_collecting = FALSE;
     player->is_pushing = FALSE;
     player->is_switching = FALSE;
+
+    player->is_bored = FALSE;
+    player->is_sleeping = FALSE;
+
+    player->frame_counter_bored = -1;
+    player->frame_counter_sleeping = -1;
 
     player->switch_x = -1;
     player->switch_y = -1;
@@ -5944,6 +5951,58 @@ static boolean CheckElementChange(int x, int y, int element, int trigger_event)
   return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
 }
 
+static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
+{
+  boolean was_waiting = player->is_waiting;
+
+  if (is_waiting)
+  {
+    int jx = player->jx, jy = player->jy;
+    int element = player->element_nr;
+    int action;
+
+    if (!was_waiting)		/* not waiting -> waiting */
+    {
+      player->is_waiting = TRUE;
+      player->is_bored = FALSE;
+      player->is_sleeping = FALSE;
+
+      player->frame_counter_bored =
+	(FrameCounter +
+	 game.player_boring_delay_fixed +
+	 SimpleRND(game.player_boring_delay_random));
+      player->frame_counter_sleeping =
+	(FrameCounter +
+	 game.player_sleeping_delay_fixed +
+	 SimpleRND(game.player_sleeping_delay_random));
+
+      InitPlayerGfxAnimation(player, ACTION_WAITING, player->MovDir);
+    }
+
+    if (FrameCounter >= player->frame_counter_bored)
+      player->is_bored = TRUE;
+    if (FrameCounter >= player->frame_counter_sleeping)
+      player->is_sleeping = TRUE;
+
+    action = (player->is_sleeping ? ACTION_SLEEPING :
+	      player->is_bored ? ACTION_BORING : ACTION_WAITING);
+
+    if (!was_waiting)
+      PlayLevelSoundElementAction(jx, jy, element, action);
+    else
+      PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
+  }
+  else if (was_waiting)		/* waiting -> not waiting */
+  {
+    player->is_waiting = FALSE;
+    player->is_bored = FALSE;
+    player->is_sleeping = FALSE;
+
+    player->frame_counter_bored = -1;
+    player->frame_counter_sleeping = -1;
+  }
+}
+
 #if 1
 static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 {
@@ -5998,6 +6057,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
       }
     }
 
+    SetPlayerWaiting(player, FALSE);
+
 #if 1
     return player_action;
 #else
@@ -6017,7 +6078,7 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
     CheckGravityMovement(player);
 
     if (player->MovPos == 0)
-      InitPlayerGfxAnimation(player, ACTION_DEFAULT, player->MovDir);
+      SetPlayerWaiting(player, TRUE);
 
     if (player->MovPos == 0)	/* needed for tape.playing */
       player->is_moving = FALSE;
@@ -8591,6 +8652,15 @@ static void PlayLevelSoundElementAction(int x, int y, int element, int action)
   int sound_effect = element_info[element].sound[action];
 
   if (sound_effect != SND_UNDEFINED)
+    PlayLevelSound(x, y, sound_effect);
+}
+
+static void PlayLevelSoundElementActionIfLoop(int x, int y, int element,
+					      int action)
+{
+  int sound_effect = element_info[element].sound[action];
+
+  if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     PlayLevelSound(x, y, sound_effect);
 }
 

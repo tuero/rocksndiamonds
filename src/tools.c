@@ -553,6 +553,19 @@ static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
     return el_act_dir2img(player->element_nr, player->GfxAction, move_dir);
 }
 
+static boolean equalGraphics(int graphic1, int graphic2)
+{
+  struct GraphicInfo *g1 = &graphic_info[graphic1];
+  struct GraphicInfo *g2 = &graphic_info[graphic2];
+
+  return (g1->bitmap      == g2->bitmap &&
+	  g1->src_x       == g2->src_x &&
+	  g1->src_y       == g2->src_y &&
+	  g1->anim_frames == g2->anim_frames &&
+	  g1->anim_delay  == g2->anim_delay &&
+	  g1->anim_mode   == g2->anim_mode);
+}
+
 void DrawAllPlayers()
 {
   int i;
@@ -615,11 +628,19 @@ void DrawPlayer(struct PlayerInfo *player)
   if (element == EL_EXPLOSION)
     return;
 
-  action = (player->is_pushing    ? ACTION_PUSHING    :
+  action = (player->is_pushing	  ? ACTION_PUSHING    :
 	    player->is_digging    ? ACTION_DIGGING    :
 	    player->is_collecting ? ACTION_COLLECTING :
 	    player->is_moving     ? ACTION_MOVING     :
-	    player->is_snapping   ? ACTION_SNAPPING   : ACTION_DEFAULT);
+	    player->is_snapping   ? ACTION_SNAPPING   :
+	    player->is_sleeping   ? ACTION_SLEEPING   :
+	    player->is_bored      ? ACTION_BORING     :
+	    player->is_waiting    ? ACTION_WAITING    : ACTION_DEFAULT);
+
+  if (player->is_bored || player->is_sleeping)
+  {
+    /* ... */
+  }
 
 #if 0
   printf("::: '%s'\n", element_action_info[action].suffix);
@@ -704,8 +725,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   /* in the case of changed player action or direction, prevent the current
      animation frame from being restarted for identical animations */
-  if (player->Frame == 0 &&
-      graphic_info[graphic].bitmap == graphic_info[last_player_graphic].bitmap)
+  if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
     player->Frame = last_player_frame;
 
 #else

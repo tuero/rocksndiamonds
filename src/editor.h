@@ -32,5 +32,6 @@ void HandleLevelEditorKeyInput(Key);
 void HandleLevelEditorIdle();
 void HandleEditorGadgetInfoText(void *ptr);
 void RequestExitLevelEditor(boolean);
+void PrintEditorElementList();
 
 #endif

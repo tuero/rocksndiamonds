@@ -919,16 +919,27 @@
 #define ACTION_CHANGING				23
 #define ACTION_EXPLODING			24
 #define ACTION_BORING				25
-#define ACTION_SLEEPING				26
-#define ACTION_DYING				27
-#define ACTION_TURNING				28
-#define ACTION_TURNING_FROM_LEFT		29
-#define ACTION_TURNING_FROM_RIGHT		30
-#define ACTION_TURNING_FROM_UP			31
-#define ACTION_TURNING_FROM_DOWN		32
-#define ACTION_OTHER				33
+#define ACTION_BORING_1				26
+#define ACTION_BORING_2				27
+#define ACTION_BORING_3				28
+#define ACTION_BORING_4				29
+#define ACTION_BORING_5				30
+#define ACTION_BORING_6				31
+#define ACTION_BORING_7				32
+#define ACTION_BORING_8				33
+#define ACTION_SLEEPING				34
+#define ACTION_SLEEPING_1			35
+#define ACTION_SLEEPING_2			36
+#define ACTION_SLEEPING_3			37
+#define ACTION_DYING				38
+#define ACTION_TURNING				39
+#define ACTION_TURNING_FROM_LEFT		40
+#define ACTION_TURNING_FROM_RIGHT		41
+#define ACTION_TURNING_FROM_UP			42
+#define ACTION_TURNING_FROM_DOWN		43
+#define ACTION_OTHER				44
 
-#define NUM_ACTIONS				34
+#define NUM_ACTIONS				45
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_DEFAULT			0
@@ -973,9 +984,13 @@
 #define GFX_ARG_DRAW_XOFFSET			23
 #define GFX_ARG_DRAW_YOFFSET			24
 #define GFX_ARG_DRAW_MASKED			25
-#define GFX_ARG_NAME				26
+#define GFX_ARG_ANIM_DELAY_FIXED		26
+#define GFX_ARG_ANIM_DELAY_RANDOM		27
+#define GFX_ARG_POST_DELAY_FIXED		28
+#define GFX_ARG_POST_DELAY_RANDOM		29
+#define GFX_ARG_NAME				30
 
-#define NUM_GFX_ARGS				27
+#define NUM_GFX_ARGS				31
 
 
 /* values for sound configuration suffixes */
@@ -1158,7 +1173,7 @@ struct PlayerInfo
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
 
-  int jx,jy, last_jx,last_jy;
+  int jx, jy, last_jx, last_jy;
   int MovDir, MovPos, GfxDir, GfxPos;
   int Frame, StepFrame;
 
@@ -1177,6 +1192,12 @@ struct PlayerInfo
   boolean is_collecting;
   boolean is_pushing;
   boolean is_switching;
+
+  boolean is_bored;
+  boolean is_sleeping;
+
+  int frame_counter_bored;
+  int frame_counter_sleeping;
 
   int switch_x, switch_y;
 
@@ -1304,6 +1325,12 @@ struct GameInfo
   boolean gravity;
   boolean explosions_delayed;
   boolean envelope_active;
+
+  /* values for player idle animation (no effect on engine) */
+  int player_boring_delay_fixed;
+  int player_boring_delay_random;
+  int player_sleeping_delay_fixed;
+  int player_sleeping_delay_random;
 };
 
 struct GlobalInfo
@@ -1455,6 +1482,11 @@ struct GraphicInfo
   int crumbled_like;		/* element for cloning crumble graphics */
   int diggable_like;		/* element for cloning digging graphics */
   int border_size;		/* border size for "crumbled" graphics */
+
+  int anim_delay_fixed;		/* optional delay values for bored and   */
+  int anim_delay_random;	/* sleeping player animations (animation */
+  int post_delay_fixed;		/* intervall and following pause before  */
+  int post_delay_random;	/* next intervall (bored animation only) */
 
   int step_offset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */

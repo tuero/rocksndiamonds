@@ -1,3 +1,19 @@
+
+2003-11-22
+	* added "copy" and "exchange" functions for custom elements to editor
+
+2003-11-21
+	* added configurable element animations for info screen
+
+2003-11-20
+	* added configurable music credits for info screen
+
+2003-11-18
+	* added "editorsetup.conf" for editor element list configuration
+
+2003-11-16
+	* added "musicinfo.conf" for menu and level music configuration
+
 2003-11-14
 	* fixed a very nasty bug in dragon turning code in TurnRoundExt()
 	  (that only showed up on Linux, but not on Windows systems)
