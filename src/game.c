@@ -6068,7 +6068,9 @@ int DigField(struct PlayerInfo *player,
     case EL_SPRING:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
+
       /* no "break" -- fall through to next case */
+
       /* the following elements can be pushed by "snapping" */
     case EL_BD_ROCK:
       if (dy)
@@ -6089,7 +6091,8 @@ int DigField(struct PlayerInfo *player,
 	player->push_delay = FrameCounter;
 #if 0
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !tape.playing && element != EL_SPRING)
+	  !tape.playing &&
+	  element != EL_SPRING)
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
@@ -6400,6 +6403,48 @@ int DigField(struct PlayerInfo *player,
       break;
 
     default:
+      if (IS_PUSHABLE(element))
+      {
+	if (mode == DF_SNAP)
+	  return MF_NO_ACTION;
+
+	if (CAN_FALL(element) && dy)
+	  return MF_NO_ACTION;
+
+	player->Pushing = TRUE;
+
+	if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
+	  return MF_NO_ACTION;
+
+	if (dx && real_dy)
+	{
+	  if (IN_LEV_FIELD(jx, jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
+	    return MF_NO_ACTION;
+	}
+	else if (dy && real_dx)
+	{
+	  if (IN_LEV_FIELD(jx+real_dx, jy) && !IS_SOLID(Feld[jx+real_dx][jy]))
+	    return MF_NO_ACTION;
+	}
+
+	if (player->push_delay == 0)
+	  player->push_delay = FrameCounter;
+
+	if (!FrameReached(&player->push_delay, player->push_delay_value) &&
+	    !(tape.playing && tape.file_version < FILE_VERSION_2_0))
+	  return MF_NO_ACTION;
+
+	RemoveField(x, y);
+	Feld[x + dx][y + dy] = element;
+
+	player->push_delay_value = 2 + RND(8);
+
+	DrawLevelField(x + dx, y + dy);
+	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
+
+	break;
+      }
+
       return MF_NO_ACTION;
   }
 

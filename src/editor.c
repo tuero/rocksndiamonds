@@ -293,10 +293,11 @@
 #define GADGET_ID_CUSTOM_INDESTRUCTIBLE	78
 #define GADGET_ID_CUSTOM_CAN_FALL	79
 #define GADGET_ID_CUSTOM_CAN_SMASH	80
-#define GADGET_ID_CUSTOM_SLIPPERY	81
+#define GADGET_ID_CUSTOM_PUSHABLE	81
+#define GADGET_ID_CUSTOM_SLIPPERY	82
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	82
+#define GADGET_ID_ELEMENTLIST_FIRST	83
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -364,9 +365,10 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	6
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	7
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	8
+#define ED_CHECKBUTTON_ID_CUSTOM_PUSHABLE	8
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	9
 
-#define ED_NUM_CHECKBUTTONS			9
+#define ED_NUM_CHECKBUTTONS			10
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -439,6 +441,7 @@ static struct
   boolean indestructible;
   boolean can_fall;
   boolean can_smash;
+  boolean pushable;
   boolean slippery;
 } custom_element_properties[NUM_CUSTOM_ELEMENTS];
 
@@ -717,6 +720,12 @@ static struct
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(7),
+    GADGET_ID_CUSTOM_PUSHABLE,
+    &custom_element_properties[0].pushable,
+    "pushable",				"element can be pushed"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[0].slippery,
     "slippery",				"other elements can fall down from it"
@@ -2490,6 +2499,9 @@ static void CopyCustomElementPropertiesToEditor()
     custom_element_properties[i].can_smash =
       ((properties & EP_BIT_CAN_SMASH) != 0 ? TRUE : FALSE);
 
+    custom_element_properties[i].pushable =
+      ((properties & EP_BIT_PUSHABLE) != 0 ? TRUE : FALSE);
+
     custom_element_properties[i].slippery =
       ((properties & EP_BIT_SLIPPERY) != 0 ? TRUE : FALSE);
   }
@@ -2519,6 +2531,11 @@ static void CopyCustomElementPropertiesToGame()
       Properties1[element] |= EP_BIT_CAN_SMASH;
     else
       Properties1[element] &= ~EP_BIT_CAN_SMASH;
+
+    if (custom_element_properties[i].pushable)
+      Properties1[element] |= EP_BIT_PUSHABLE;
+    else
+      Properties1[element] &= ~EP_BIT_PUSHABLE;
 
     if (custom_element_properties[i].slippery)
       Properties1[element] |= EP_BIT_SLIPPERY;
@@ -3167,6 +3184,18 @@ static void DrawPropertiesWindow()
     y = checkbutton_info[i].y + yoffset_right2;
 
     checkbutton_info[i].value = &custom_element_properties[nr].can_smash;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
+
+    /* draw checkbutton gadget */
+    i = ED_CHECKBUTTON_ID_CUSTOM_PUSHABLE;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    checkbutton_info[i].value = &custom_element_properties[nr].pushable;
 
     DrawTextF(x, y, font_color, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],

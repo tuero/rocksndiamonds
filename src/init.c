@@ -167,6 +167,14 @@ static void InitArtworkConfig()
   static char *direction_suffix[NUM_DIRECTIONS + 1];
   static char *special_suffix[NUM_SPECIAL_GFX_ARGS + 1];
   static char *dummy[1] = { NULL };
+  static char *ignore_image_tokens[] =
+  {
+    "name",
+    "sort_priority",
+    "menu.main.hide_static_text",
+    "global.num_toons",
+    NULL
+  };
   int i;
 
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
@@ -181,9 +189,10 @@ static void InitArtworkConfig()
     special_suffix[i] = special_suffix_info[i].suffix;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		element_prefix, action_suffix,direction_suffix,special_suffix);
+		element_prefix, action_suffix,direction_suffix, special_suffix,
+		ignore_image_tokens);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		sound_class_prefix, action_suffix, dummy, dummy);
+		sound_class_prefix, action_suffix, dummy, dummy, dummy);
 }
 
 void InitLevelArtworkInfo()
@@ -257,10 +266,11 @@ static void ReinitializeMusic()
 static void InitImages()
 {
   ReloadCustomImages();
-  ReinitializeGraphics();
 
   LoadCustomElementDescriptions();
   LoadSpecialMenuDesignSettings();
+
+  ReinitializeGraphics();
 }
 
 static void InitSound()
@@ -585,11 +595,7 @@ void ReloadCustomArtwork()
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-    ReloadCustomImages();
-    ReinitializeGraphics();
-
-    LoadCustomElementDescriptions();
-    LoadSpecialMenuDesignSettings();
+    InitImages();
 
     FreeTileClipmasks();
     InitTileClipmasks();
@@ -796,7 +802,7 @@ void InitElementGraphicInfo()
     }
   }
 
-#if 1
+#if 0
 #if DEBUG
   if (options.verbose)
   {

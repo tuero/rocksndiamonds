@@ -536,26 +536,25 @@ struct ArtworkListInfo
 
   int num_file_list_entries;
   int num_dynamic_file_list_entries;
-
   struct FileInfo *file_list;			/* static artwork file array */
   struct FileInfo *dynamic_file_list;		/* dynamic artwrk file array */
 
   int num_suffix_list_entries;
-
   struct ConfigInfo *suffix_list;		/* parameter suffixes array */
 
   int num_base_prefixes;
   int num_ext1_suffixes;
   int num_ext2_suffixes;
   int num_ext3_suffixes;
-
   char **base_prefixes;				/* base token prefixes array */
   char **ext1_suffixes;				/* property suffixes array 1 */
   char **ext2_suffixes;				/* property suffixes array 2 */
   char **ext3_suffixes;				/* property suffixes array 3 */
 
-  int num_property_mapping_entries;
+  int num_ignore_tokens;
+  char **ignore_tokens;				/* file tokens to be ignored */
 
+  int num_property_mapping_entries;
   struct PropertyMapping *property_mapping;	/* mapping token -> artwork */
 
   int sizeof_artwork_list_entry;

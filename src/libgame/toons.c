@@ -81,6 +81,18 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 /* toon animation functions                                                  */
 /* ========================================================================= */
 
+static int get_toon_direction(char *direction_raw)
+{
+  static char *direction = NULL;
+
+  setString(&direction, getStringToLower(direction_raw));
+
+  return (strcmp(direction, "left")  == 0 ? MV_LEFT :
+	  strcmp(direction, "right") == 0 ? MV_RIGHT :
+	  strcmp(direction, "up")    == 0 ? MV_UP :
+	  strcmp(direction, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
+}
+
 void InitToonScreen(Bitmap *save_buffer,
 		    void (*update_function)(void),
 		    void (*prepare_backbuffer_function)(void),
@@ -154,11 +166,12 @@ boolean AnimateToon(int toon_nr, boolean restart)
   struct ToonInfo *anim = &screen_info.toons[toon_nr];
   Bitmap *anim_bitmap = screen_info.toons[toon_nr].bitmap;
   GC anim_clip_gc = anim_bitmap->stored_clip_gc;
+  int direction = get_toon_direction(anim->direction);
 
   if (restart)
   {
-    horiz_move = (anim->direction & (ANIMDIR_LEFT | ANIMDIR_RIGHT));
-    vert_move = (anim->direction & (ANIMDIR_UP | ANIMDIR_DOWN));
+    horiz_move = (direction & (MV_LEFT | MV_RIGHT));
+    vert_move = (direction & (MV_UP | MV_DOWN));
     anim_delay_value = anim->step_delay * screen_info.frame_delay_value;
 
     frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
@@ -167,16 +180,20 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
     if (horiz_move)
     {
-      if (anim->position == ANIMPOS_UP)
-	pos_y = 0;
-      else if (anim->position == ANIMPOS_DOWN)
-	pos_y = screen_info.height - anim->height;
-      else if (anim->position == ANIMPOS_UPPER)
-	pos_y = SimpleRND((screen_info.height - anim->height) / 2);
-      else
-	pos_y = SimpleRND(screen_info.height - anim->height);
+      int pos_bottom = screen_info.height - anim->height;
 
-      if (anim->direction == ANIMDIR_RIGHT)
+      if (strcmp(anim->position, "top") == 0)
+	pos_y = 0;
+      else if (strcmp(anim->position, "bottom") == 0)
+	pos_y = pos_bottom;
+      else if (strcmp(anim->position, "upper")  == 0)
+	pos_y = SimpleRND(pos_bottom / 2);
+      else if (strcmp(anim->position, "lower")  == 0)
+	pos_y = pos_bottom / 2 + SimpleRND(pos_bottom / 2);
+      else
+	pos_y = SimpleRND(pos_bottom);
+
+      if (direction == MV_RIGHT)
       {
 	delta_x = anim->step_offset;
 	pos_x = -anim->width + delta_x;
@@ -186,18 +203,21 @@ boolean AnimateToon(int toon_nr, boolean restart)
 	delta_x = -anim->step_offset;
 	pos_x = screen_info.width + delta_x;
       }
+
       delta_y = 0;
     }
     else
     {
-      if (anim->position == ANIMPOS_LEFT)
-	pos_x = 0;
-      else if (anim->position == ANIMPOS_RIGHT)
-	pos_x = screen_info.width - anim->width;
-      else
-	pos_x = SimpleRND(screen_info.width - anim->width);
+      int pos_right = screen_info.width - anim->width;
 
-      if (anim->direction == ANIMDIR_DOWN)
+      if (strcmp(anim->position, "left") == 0)
+	pos_x = 0;
+      else if (strcmp(anim->position, "right")  == 0)
+	pos_x = pos_right;
+      else
+	pos_x = SimpleRND(pos_right);
+
+      if (direction == MV_DOWN)
       {
 	delta_y = anim->step_offset;
 	pos_y = -anim->height + delta_y;
@@ -207,6 +227,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
 	delta_y = -anim->step_offset;
 	pos_y = screen_info.width + delta_y;
       }
+
       delta_x = 0;
     }
   }

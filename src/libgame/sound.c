@@ -1794,10 +1794,9 @@ struct PropertyMapping *getSoundListPropertyMapping()
 
 void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
-		   char **base_prefixes,
-		   char **ext1_suffixes,
-		   char **ext2_suffixes,
-		   char **ext3_suffixes)
+		   char **base_prefixes, char **ext1_suffixes,
+		   char **ext2_suffixes, char **ext3_suffixes,
+		   char **ignore_tokens)
 {
   int i;
 
@@ -1838,10 +1837,15 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   for (i=0; ext3_suffixes[i] != NULL; i++)
     sound_info->num_ext3_suffixes++;
 
+  sound_info->num_ignore_tokens = 0;
+  for (i=0; ignore_tokens[i] != NULL; i++)
+    sound_info->num_ignore_tokens++;
+
   sound_info->base_prefixes = base_prefixes;
   sound_info->ext1_suffixes = ext1_suffixes;
   sound_info->ext2_suffixes = ext2_suffixes;
   sound_info->ext3_suffixes = ext3_suffixes;
+  sound_info->ignore_tokens = ignore_tokens;
 
   sound_info->num_property_mapping_entries = 0;
 

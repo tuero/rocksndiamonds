@@ -82,7 +82,7 @@ char *getImageConfigFilename();
 int getImageListPropertyMappingSize();
 struct PropertyMapping *getImageListPropertyMapping();
 void InitImageList(struct ConfigInfo *, int, struct ConfigInfo *,
-		   char **, char **, char **, char **);
+		   char **, char **, char **, char **, char **);
 
 void ReloadCustomImages();
 void CreateImageWithSmallImages(int);

@@ -1579,6 +1579,11 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       }
     }
 
+    /* the following tokens are no file definitions, but other config tokens */
+    if (strcmp(config_list[i].token, "global.num_toons") == 0 ||
+	strcmp(config_list[i].token, "menu.main.hide_static_text") == 0)
+      is_file_entry = FALSE;
+
     if (is_file_entry)
     {
       if (i > 0)
@@ -1745,12 +1750,14 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   char **ext1_suffixes = artwork_info->ext1_suffixes;
   char **ext2_suffixes = artwork_info->ext2_suffixes;
   char **ext3_suffixes = artwork_info->ext3_suffixes;
+  char **ignore_tokens = artwork_info->ignore_tokens;
   int num_file_list_entries = artwork_info->num_file_list_entries;
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   int num_base_prefixes = artwork_info->num_base_prefixes;
   int num_ext1_suffixes = artwork_info->num_ext1_suffixes;
   int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
   int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
+  int num_ignore_tokens = artwork_info->num_ignore_tokens;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
   struct SetupFileList *extra_file_list = NULL;
@@ -1809,9 +1816,9 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   for (i=0; i<num_file_list_entries; i++)
     read_token_parameters(setup_file_list, suffix_list, &file_list[i]);
 
-  /* set all known tokens to "known" keyword */
-  setTokenValue(setup_file_list, "name", known_token_value);
-  setTokenValue(setup_file_list, "sort_priority", known_token_value);
+  /* set all tokens that can be ignored here to "known" keyword */
+  for (i=0; i < num_ignore_tokens; i++)
+    setTokenValue(setup_file_list, ignore_tokens[i], known_token_value);
 
   /* copy all unknown config file tokens to extra config list */
   for (list = setup_file_list; list != NULL; list = list->next)

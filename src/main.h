@@ -784,8 +784,11 @@
 #define GFX_ARG_GLOBAL_SYNC			19
 #define GFX_ARG_STEP_OFFSET			20
 #define GFX_ARG_STEP_DELAY			21
+#define GFX_ARG_DIRECTION			22
+#define GFX_ARG_POSITION			23
+#define GFX_ARG_NAME				24
 
-#define NUM_GFX_ARGS				22
+#define NUM_GFX_ARGS				25
 
 
 /* values for sound configuration suffixes */
@@ -1001,6 +1004,8 @@ struct GlobalInfo
 {
   char *autoplay_leveldir;
   int autoplay_level_nr;
+
+  int num_toons;
 
   float frames_per_second;
   boolean fps_slowdown;

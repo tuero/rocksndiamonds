@@ -1701,15 +1701,20 @@ void LoadSpecialMenuDesignSettings()
   struct SetupFileList *setup_file_list;
   char *value;
 
+  /* !!! CHANGE THIS !!! (redundant initialization) !!! */
   gfx.menu_main_hide_static_text = FALSE;
+  global.num_toons = 20;
 
   if ((setup_file_list = loadSetupFileList(filename)) == NULL)
     return;
 
   value = getTokenValue(setup_file_list, "menu.main.hide_static_text");
-
   if (value != NULL)
     gfx.menu_main_hide_static_text = get_boolean_from_string(value);
+
+  value = getTokenValue(setup_file_list, "global.num_toons");
+  if (value != NULL)
+    global.num_toons = get_integer_from_string(value);
 
   freeSetupFileList(setup_file_list);
 }

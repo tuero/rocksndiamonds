@@ -17,318 +17,9 @@
 
 
 /* values for toon definition */
-#if 0
-#define NUM_TOONS	18
-#else
-#define NUM_TOONS	6
-#endif
+#define MAX_NUM_TOONS			20
 
-#define DWARF_XSIZE	40
-#define DWARF_YSIZE	48
-#define DWARF_X		2
-#define DWARF_Y		72
-#define DWARF2_Y	186
-#define DWARF_FRAMES	8
-#define DWARF_DELAY	5
-#define DWARF_STEPSIZE	4
-#define JUMPER_XSIZE	48
-#define JUMPER_YSIZE	56
-#define JUMPER_X	2
-#define JUMPER_Y	125
-#define JUMPER_FRAMES	8
-#define JUMPER_DELAY	5
-#define JUMPER_STEPSIZE	4
-#define CLOWN_XSIZE	80
-#define CLOWN_YSIZE	110
-#define CLOWN_X		327
-#define CLOWN_Y		10
-#define CLOWN_FRAMES	1
-#define CLOWN_DELAY	5
-#define CLOWN_STEPSIZE	4
-#define BIRD_XSIZE	32
-#define BIRD_YSIZE	30
-#define BIRD1_X		2
-#define BIRD1_Y		2
-#define BIRD2_X		2
-#define BIRD2_Y		37
-#define BIRD_FRAMES	8
-#define BIRD_DELAY	2
-#define BIRD_STEPSIZE	4
-
-struct ToonInfo toons[NUM_TOONS] =
-{
-#if 0
-  {
-    IMG_GLOBAL_TOONS,
-    DWARF_XSIZE, DWARF_YSIZE,
-    DWARF_X, DWARF_Y,
-    DWARF_FRAMES,
-    DWARF_DELAY,
-    DWARF_STEPSIZE,
-    ANIM_LOOP,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_GLOBAL_TOONS,
-    DWARF_XSIZE, DWARF_YSIZE,
-    DWARF_X, DWARF2_Y,
-    DWARF_FRAMES,
-    DWARF_DELAY,
-    DWARF_STEPSIZE,
-    ANIM_LOOP,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_GLOBAL_TOONS,
-    JUMPER_XSIZE, JUMPER_YSIZE,
-    JUMPER_X, JUMPER_Y,
-    JUMPER_FRAMES,
-    JUMPER_DELAY,
-    JUMPER_STEPSIZE,
-    ANIM_LOOP,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_GLOBAL_TOONS,
-    CLOWN_XSIZE, CLOWN_YSIZE,
-    CLOWN_X, CLOWN_Y,
-    CLOWN_FRAMES,
-    CLOWN_DELAY,
-    CLOWN_STEPSIZE,
-    ANIM_LOOP,
-    ANIMDIR_UP,
-    ANIMPOS_ANY
-  },
-  {
-    IMG_GLOBAL_TOONS,
-    BIRD_XSIZE, BIRD_YSIZE,
-    BIRD1_X, BIRD1_Y,
-    BIRD_FRAMES,
-    BIRD_DELAY,
-    BIRD_STEPSIZE,
-    ANIM_PINGPONG,
-    ANIMDIR_RIGHT,
-    ANIMPOS_UPPER
-  },
-  {
-    IMG_GLOBAL_TOONS,
-    BIRD_XSIZE, BIRD_YSIZE,
-    BIRD2_X, BIRD2_Y,
-    BIRD_FRAMES,
-    BIRD_DELAY,
-    BIRD_STEPSIZE,
-    ANIM_PINGPONG,
-    ANIMDIR_LEFT,
-    ANIMPOS_UPPER
-  },
-#else
-  {
-    IMG_TOON_1,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_TOON_2,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_TOON_3,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_TOON_4,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_UP,
-    ANIMPOS_ANY
-  },
-  {
-    IMG_TOON_5,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_UPPER
-  },
-  {
-    IMG_TOON_6,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_UPPER
-  },
-#endif
-
-#if 0
-  {
-    IMG_PLAYER1_MOVING_LEFT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_PLAYER1_MOVING_RIGHT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_PENGUIN_MOVING_LEFT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_PENGUIN_MOVING_RIGHT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_MOLE_MOVING_LEFT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_MOLE_MOVING_RIGHT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_PIG_MOVING_LEFT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_PIG_MOVING_RIGHT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_DRAGON_MOVING_LEFT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_DRAGON_MOVING_RIGHT,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_DOWN
-  },
-  {
-    IMG_SATELLITE_MOVING,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_LEFT,
-    ANIMPOS_ANY
-  },
-  {
-    IMG_SATELLITE_MOVING,
-    -1, -1,
-    -1, -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    ANIMDIR_RIGHT,
-    ANIMPOS_ANY
-  },
-#endif
-
-};
+static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static void PrepareBackbuffer()
 {
@@ -368,11 +59,16 @@ boolean ToonNeedsRedraw()
 
 void InitToons()
 {
+  int num_toons = MAX_NUM_TOONS;
   int i;
 
-  for (i=0; i<NUM_TOONS; i++)
+  if (global.num_toons > 0 && global.num_toons < MAX_NUM_TOONS)
+    num_toons = global.num_toons;
+
+  for (i=0; i < num_toons; i++)
   {
-    int graphic = toons[i].graphic;
+    int graphic = IMG_TOON_1 + i;
+    struct FileInfo *image = getImageListEntry(graphic);
 
     toons[i].bitmap = graphic_info[graphic].bitmap;
 
@@ -389,11 +85,14 @@ void InitToons()
 
     toons[i].step_offset = graphic_info[graphic].step_offset;
     toons[i].step_delay  = graphic_info[graphic].step_delay;
+
+    toons[i].direction = image->parameter[GFX_ARG_DIRECTION];
+    toons[i].position = image->parameter[GFX_ARG_POSITION];
   }
 
   InitToonScreen(bitmap_db_door,
 		 BackToFront, PrepareBackbuffer, ToonNeedsRedraw,
-		 toons, NUM_TOONS,
+		 toons, num_toons,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
 		 GAME_FRAME_DELAY);
 }

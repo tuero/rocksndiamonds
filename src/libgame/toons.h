@@ -26,6 +26,7 @@
 #define ANIM_REVERSE		(1 << 4)
 #define ANIM_RANDOM		(1 << 5)
 
+#if 0
 /* values for toon animation direction */
 #define ANIMDIR_LEFT	1
 #define ANIMDIR_RIGHT	2
@@ -38,6 +39,7 @@
 #define ANIMPOS_UP	4
 #define ANIMPOS_DOWN	8
 #define ANIMPOS_UPPER	16
+#endif
 
 
 struct ToonScreenInfo
@@ -58,6 +60,7 @@ struct ToonScreenInfo
 
 struct ToonInfo
 {
+#if 0
   int graphic;
   int width, height;
   int src_x, src_y;
@@ -72,7 +75,11 @@ struct ToonInfo
   int anim_start_frame;
   Bitmap *bitmap;	/* dynamically initialized */
 
-#if 0
+  char *direction_str;
+  char *position_str;
+
+#else
+
   Bitmap *bitmap;
   int src_x, src_y;
   int width, height;
@@ -82,6 +89,8 @@ struct ToonInfo
   int anim_mode;
   int step_offset;
   int step_delay;
+  char *direction;
+  char *position;
 #endif
 };
 
