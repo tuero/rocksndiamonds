@@ -46,13 +46,15 @@ static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
 static void InitLevelArtworkInfo(void);
 static void InitNetworkServer(void);
+static void InitImageConfig();
 static void InitMixer(void);
 static void InitSound(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
-static void InitElementInfo(void);
 static void InitElementProperties(void);
+static void InitElementInfo(void);
+static void InitGraphicInfo(void);
 static void Execute_Debug_Command(char *);
 
 void OpenAll(void)
@@ -85,6 +87,7 @@ void OpenAll(void)
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
 
   InitCounter();
+  InitImageConfig();
   InitMixer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
@@ -96,8 +99,9 @@ void OpenAll(void)
   InitEventFilter(FilterMouseMotionEvents);
 
   InitGfx();
-  InitElementInfo();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
+  InitElementInfo();
+  InitGraphicInfo();
 
   InitLevelInfo();
   InitLevelArtworkInfo();
@@ -170,10 +174,15 @@ void InitNetworkServer()
 #endif
 }
 
+static void InitImageConfig()
+{
+  InitImageList(image_config, NUM_IMAGE_CONFIG_ENTRIES);
+}
+
 static void InitMixer()
 {
   OpenAudio();
-  InitSoundList(sound_effects, NUM_SOUND_EFFECTS);
+  InitSoundList(sound_config, NUM_SOUND_CONFIG_ENTRIES);
 
   StartMixer();
 }
@@ -2070,10 +2079,10 @@ void Execute_Debug_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; i<NUM_SOUND_EFFECTS; i++)
+    for (i=0; i<NUM_SOUND_CONFIG_ENTRIES; i++)
       printf("# %s\n",
-	     getFormattedSetupEntry(sound_effects[i].text,
-				    sound_effects[i].default_filename));
+	     getFormattedSetupEntry(sound_config[i].token,
+				    sound_config[i].default_filename));
   }
   else if (strcmp(command, "create musicinfo.conf") == 0)
   {

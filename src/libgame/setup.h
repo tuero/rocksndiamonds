@@ -179,7 +179,8 @@ char *getSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
-char *getCustomSoundConfigFilename(void);
+char *getCustomArtworkFilename(char *, int);
+char *getCustomArtworkConfigFilename(int);
 char *getCustomMusicDirectory(void);
 
 void InitTapeDirectory(char *);

@@ -415,7 +415,7 @@ extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
 extern struct GraphicInfo	graphic_info[];
-extern struct SoundEffectInfo	sound_effects[];
+extern struct ArtworkConfigInfo	image_config[], sound_config[];
 
 /* often used screen positions */
 #define SX			8
@@ -1458,7 +1458,30 @@ extern struct SoundEffectInfo	sound_effects[];
 #define NUM_SOUNDS		55
 
 
-/* values for sound effects */
+/* values for image configuration */
+#define GFX_BD_EMPTY_SPACE_DIGGING		0
+#define GFX_BD_SAND_DIGGING			1
+#define GFX_BD_DIAMOND_COLLECTING		2
+#define GFX_BD_DIAMOND_IMPACT			3
+#define GFX_BD_ROCK_PUSHING			4
+#define GFX_BD_ROCK_IMPACT			5
+#define GFX_BD_MAGIC_WALL_ACTIVATING		6
+#define GFX_BD_MAGIC_WALL_CHANGING		7
+#define GFX_BD_MAGIC_WALL_RUNNING		8
+#define GFX_BD_AMOEBA_WAITING			9
+#define GFX_BD_AMOEBA_CREATING			10
+#define GFX_BD_AMOEBA_TURNING_TO_GEM		11
+#define GFX_BD_AMOEBA_TURNING_TO_ROCK		12
+#define GFX_BD_BUTTERFLY_MOVING			13
+#define GFX_BD_BUTTERFLY_WAITING		14
+#define GFX_BD_FIREFLY_MOVING			15
+#define GFX_BD_FIREFLY_WAITING			16
+#define GFX_BD_EXIT_ENTERING			17
+
+#define NUM_IMAGE_CONFIG_ENTRIES		18
+
+
+/* values for sound configuration */
 #define SND_BD_EMPTY_SPACE_DIGGING		0
 #define SND_BD_SAND_DIGGING			1
 #define SND_BD_DIAMOND_COLLECTING		2
@@ -1629,7 +1652,7 @@ extern struct SoundEffectInfo	sound_effects[];
 #define SND_MENU_HALL_OF_FAME			167
 #define SND_MENU_INFO_SCREEN			168
 
-#define NUM_SOUND_EFFECTS			169
+#define NUM_SOUND_CONFIG_ENTRIES		169
 
 
 /* values for game_status */

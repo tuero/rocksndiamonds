@@ -341,13 +341,13 @@ static char *getLevelArtworkDir(int type)
   char *artwork_path;
 
   if (leveldir_current == NULL)
-    return NOT_AVAILABLE;
+    return UNDEFINED_FILENAME;
 
   artwork_path =
     (type == TREE_TYPE_GRAPHICS_DIR ? leveldir_current->graphics_path :
      type == TREE_TYPE_SOUNDS_DIR   ? leveldir_current->sounds_path :
      type == TREE_TYPE_MUSIC_DIR    ? leveldir_current->music_path :
-     NOT_AVAILABLE);
+     UNDEFINED_FILENAME);
 
   return artwork_path;
 }
@@ -510,9 +510,19 @@ char *getCustomSoundFilename(char *basename)
   return NULL;		/* cannot find specified artwork file anywhere */
 }
 
-char *getCustomSoundConfigFilename()
+char *getCustomArtworkFilename(char *basename, int type)
 {
-  return getCustomSoundFilename(SOUNDSINFO_FILENAME);
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    return getCustomImageFilename(basename);
+  else if (type == ARTWORK_TYPE_SOUNDS)
+    return getCustomSoundFilename(basename);
+  else
+    return UNDEFINED_FILENAME;
+}
+
+char *getCustomArtworkConfigFilename(int type)
+{
+  return getCustomArtworkFilename(ARTWORKINFO_FILENAME(type), type);
 }
 
 char *getCustomMusicDirectory(void)
@@ -1299,9 +1309,9 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
     ldi->graphics_set = NULL;
     ldi->sounds_set = NULL;
     ldi->music_set = NULL;
-    ldi->graphics_path = getStringCopy(NOT_AVAILABLE);
-    ldi->sounds_path = getStringCopy(NOT_AVAILABLE);
-    ldi->music_path = getStringCopy(NOT_AVAILABLE);
+    ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
+    ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
+    ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->levels = 0;
     ldi->first_level = 0;
     ldi->last_level = 0;
@@ -1852,16 +1862,16 @@ static TreeInfo *getDummyArtworkInfo(int type)
 
   setTreeInfoToDefaults(artwork_new, type);
 
-  artwork_new->filename = getStringCopy(NOT_AVAILABLE);
-  artwork_new->fullpath = getStringCopy(NOT_AVAILABLE);
-  artwork_new->basepath = getStringCopy(NOT_AVAILABLE);
+  artwork_new->filename = getStringCopy(UNDEFINED_FILENAME);
+  artwork_new->fullpath = getStringCopy(UNDEFINED_FILENAME);
+  artwork_new->basepath = getStringCopy(UNDEFINED_FILENAME);
 
   if (artwork_new->name != NULL)
     free(artwork_new->name);
 
-  artwork_new->identifier   = getStringCopy(NOT_AVAILABLE);
-  artwork_new->name         = getStringCopy(NOT_AVAILABLE);
-  artwork_new->name_sorting = getStringCopy(NOT_AVAILABLE);
+  artwork_new->identifier   = getStringCopy(UNDEFINED_FILENAME);
+  artwork_new->name         = getStringCopy(UNDEFINED_FILENAME);
+  artwork_new->name_sorting = getStringCopy(UNDEFINED_FILENAME);
 
   return artwork_new;
 }

@@ -16,6 +16,10 @@
 #include "misc.h"
 
 
+/* ========================================================================= */
+/* PLATFORM SPECIFIC IMAGE FUNCTIONS                                         */
+/* ========================================================================= */
+
 #if defined(TARGET_X11)
 
 /* for MS-DOS/Allegro, exclude all except newImage() and freeImage() */
@@ -635,3 +639,28 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
 
 #endif	/* PLATFORM_UNIX */
 #endif	/* TARGET_X11 */
+
+
+/* ========================================================================= */
+/* PLATFORM INDEPENDANT IMAGE FUNCTIONS                                      */
+/* ========================================================================= */
+
+struct ImageInfo
+{
+  char *source_filename;
+  int num_references;
+};
+typedef struct ImageInfo ImageInfo;
+
+static ImageInfo **ImageList = NULL;
+static struct ArtworkConfigInfo *image_config = NULL;
+static int num_images = 0;
+
+void InitImageList(struct ArtworkConfigInfo *config_list, int num_list_entries)
+{
+  if (ImageList == NULL)
+    ImageList = checked_calloc(num_list_entries * sizeof(ImageInfo *));
+
+  image_config = config_list;
+  num_images = num_list_entries;
+}

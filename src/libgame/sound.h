@@ -114,16 +114,7 @@
 #define SOUND_MIDDLE			(SOUND_MAX_LEFT2RIGHT / 2)
 
 /* value for undefined sound effect filename */
-#define SND_FILE_UNDEFINED		"NONE"
-
-
-struct SoundEffectInfo
-{
-  char *text;
-  char *default_filename;
-
-  char *filename;
-};
+#define SND_FILE_UNDEFINED		UNDEFINED_FILENAME
 
 
 /* general sound functions */
@@ -148,7 +139,7 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
-void InitSoundList(struct SoundEffectInfo *, int);
+void InitSoundList(struct ArtworkConfigInfo *, int);
 void InitReloadSounds(char *);
 void InitReloadMusic(char *);
 void FreeAllSounds(void);

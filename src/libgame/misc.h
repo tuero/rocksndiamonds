@@ -113,10 +113,24 @@ Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
 
+
+ListNode *newListNode(void);
+void addNodeToList(ListNode **, char *, void *);
+void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
+ListNode *getNodeFromKey(ListNode *, char *);
+int getNumNodes(ListNode *);
+
+
 boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
+
+/*
+void LoadArtworkConfig(struct ArtworkListInfo *);
+*/
+void ReloadCustomArtworkFiles(struct ArtworkListInfo *);
+
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();

@@ -152,22 +152,9 @@ struct SoundControl
 };
 typedef struct SoundControl SoundControl;
 
-struct ListNode
-{
-  char *key;
-  void *content;
-  struct ListNode *next;
-};
-typedef struct ListNode ListNode;
+static struct ArtworkListInfo sound_info;
 
-static ListNode *newListNode(void);
-static void addNodeToList(ListNode **, char *, void *);
-static void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
-static ListNode *getNodeFromKey(ListNode *, char *);
-static int getNumNodes(ListNode *);
-
-
-static struct SoundEffectInfo *sound_effect;
+static struct ArtworkConfigInfo *sound_config = NULL;
 static ListNode *SoundFileList = NULL;
 static SoundInfo **Sound = NULL;
 static MusicInfo **Music = NULL;
@@ -1550,7 +1537,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		16	/* size of WAV file header */
 
-static SoundInfo *Load_WAV(char *filename)
+static void *Load_WAV(char *filename)
 {
   SoundInfo *snd_info;
 #if defined(AUDIO_UNIX_NATIVE)
@@ -1824,13 +1811,21 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
   replaceSoundEntry(snd_info, filename);
 }
 
-void InitSoundList(struct SoundEffectInfo *sounds_list, int num_list_entries)
+void InitSoundList(struct ArtworkConfigInfo *config_list, int num_list_entries)
 {
   if (Sound == NULL)
     Sound = checked_calloc(num_list_entries * sizeof(SoundInfo *));
 
-  sound_effect = sounds_list;
+  sound_config = config_list;
   num_sounds = num_list_entries;
+
+  sound_info.type = ARTWORK_TYPE_SOUNDS;
+  sound_info.num_list_entries = num_list_entries;
+  sound_info.config_list = config_list;
+  sound_info.artwork_list = (struct ArtworkListNodeInfo **)Sound;
+  sound_info.file_list = NULL;
+  sound_info.load_artwork = Load_WAV;
+  sound_info.free_artwork = FreeSound;
 }
 
 void LoadSoundToList(char *basename, int list_pos)
@@ -2053,119 +2048,12 @@ void StopSoundExt(int nr, int state)
   HandleSoundRequest(snd_ctrl);
 }
 
-ListNode *newListNode()
+#if 1
+static void ReloadCustomSounds()
 {
-  return checked_calloc(sizeof(ListNode));
+  ReloadCustomArtworkFiles(&sound_info);
 }
-
-void addNodeToList(ListNode **node_first, char *key, void *content)
-{
-  ListNode *node_new = newListNode();
-
-#if 0
-  printf("LIST: adding node with key '%s'\n", key);
-#endif
-
-  node_new->key = getStringCopy(key);
-  node_new->content = content;
-  node_new->next = *node_first;
-  *node_first = node_new;
-}
-
-void deleteNodeFromList(ListNode **node_first, char *key,
-			void (*destructor_function)(void *))
-{
-  if (node_first == NULL || *node_first == NULL)
-    return;
-
-#if 0
-  printf("[CHECKING LIST KEY '%s' == '%s']\n",
-	 (*node_first)->key, key);
-#endif
-
-  if (strcmp((*node_first)->key, key) == 0)
-  {
-#if 0
-    printf("[DELETING LIST ENTRY]\n");
-#endif
-
-    free((*node_first)->key);
-    if (destructor_function)
-      destructor_function((*node_first)->content);
-    *node_first = (*node_first)->next;
-  }
-  else
-    deleteNodeFromList(&(*node_first)->next, key, destructor_function);
-}
-
-ListNode *getNodeFromKey(ListNode *node_first, char *key)
-{
-  if (node_first == NULL)
-    return NULL;
-
-  if (strcmp(node_first->key, key) == 0)
-    return node_first;
-  else
-    return getNodeFromKey(node_first->next, key);
-}
-
-int getNumNodes(ListNode *node_first)
-{
-  return (node_first ? 1 + getNumNodes(node_first->next) : 0);
-}
-
-void dumpList(ListNode *node_first)
-{
-  ListNode *node = node_first;
-
-  while (node)
-  {
-    printf("['%s' (%d)]\n", node->key,
-	   ((SoundInfo *)node->content)->num_references);
-    node = node->next;
-  }
-
-  printf("[%d nodes]\n", getNumNodes(node_first));
-}
-
-static void LoadSoundsInfo()
-{
-  char *filename = getCustomSoundConfigFilename();
-  struct SetupFileList *setup_file_list;
-  int i;
-
-#if 0
-  printf("GOT CUSTOM SOUND CONFIG FILE '%s'\n", filename);
-#endif
-
-  /* always start with reliable default values */
-  for (i=0; i<num_sounds; i++)
-    sound_effect[i].filename = NULL;
-
-  if (filename == NULL)
-    return;
-
-  if ((setup_file_list = loadSetupFileList(filename)))
-  {
-    for (i=0; i<num_sounds; i++)
-      sound_effect[i].filename =
-	getStringCopy(getTokenValue(setup_file_list, sound_effect[i].text));
-
-    freeSetupFileList(setup_file_list);
-
-#if 0
-    for (i=0; i<num_sounds; i++)
-    {
-      printf("'%s' ", sound_effect[i].text);
-      if (sound_effect[i].filename)
-	printf("-> '%s'\n", sound_effect[i].filename);
-      else
-	printf("-> UNDEFINED [-> '%s']\n", sound_effect[i].default_filename);
-    }
-#endif
-  }
-}
-
+#else
 static void ReloadCustomSounds()
 {
   static boolean draw_init_text = TRUE;		/* only draw at startup */
@@ -2175,7 +2063,7 @@ static void ReloadCustomSounds()
   printf("DEBUG: reloading sounds '%s' ...\n",artwork.snd_current_identifier);
 #endif
 
-  LoadSoundsInfo();
+  LoadArtworkConfig(&sound_info);
 
   if (draw_init_text)
     DrawInitText("Loading sounds:", 120, FC_GREEN);
@@ -2187,12 +2075,12 @@ static void ReloadCustomSounds()
   for(i=0; i<num_sounds; i++)
   {
     if (draw_init_text)
-      DrawInitText(sound_effect[i].text, 150, FC_YELLOW);
+      DrawInitText(sound_config[i].token, 150, FC_YELLOW);
 
-    if (sound_effect[i].filename)
-      LoadSoundToList(sound_effect[i].filename, i);
+    if (sound_config[i].filename)
+      LoadSoundToList(sound_config[i].filename, i);
     else
-      LoadSoundToList(sound_effect[i].default_filename, i);
+      LoadSoundToList(sound_config[i].default_filename, i);
   }
 
   draw_init_text = FALSE;
@@ -2205,6 +2093,7 @@ static void ReloadCustomSounds()
   dumpList(SoundFileList);
 #endif
 }
+#endif
 
 static void ReloadCustomMusic()
 {

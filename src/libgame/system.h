@@ -131,6 +131,9 @@
 /* default text for non-existant artwork */
 #define NOT_AVAILABLE		"(not available)"
 
+/* default value for undefined filename */
+#define UNDEFINED_FILENAME	"[NONE]"
+
 /* default name for new levels */
 #define NAMELESS_LEVEL_NAME	"nameless level"
 
@@ -358,10 +361,14 @@ struct SetupInfo
 };
 
 #define TREE_TYPE_GENERIC		0
-#define TREE_TYPE_LEVEL_DIR		1
-#define TREE_TYPE_GRAPHICS_DIR		2
-#define TREE_TYPE_SOUNDS_DIR		3
-#define TREE_TYPE_MUSIC_DIR		4
+#define TREE_TYPE_GRAPHICS_DIR		1
+#define TREE_TYPE_SOUNDS_DIR		2
+#define TREE_TYPE_MUSIC_DIR		3
+#define TREE_TYPE_LEVEL_DIR		4
+
+#define ARTWORK_TYPE_GRAPHICS		TREE_TYPE_GRAPHICS_DIR
+#define ARTWORK_TYPE_SOUNDS		TREE_TYPE_SOUNDS_DIR
+#define ARTWORK_TYPE_MUSIC		TREE_TYPE_MUSIC_DIR
 
 struct TreeInfo
 {
@@ -427,6 +434,31 @@ struct ArtworkInfo
   char *gfx_current_identifier;
   char *snd_current_identifier;
   char *mus_current_identifier;
+};
+
+struct ArtworkConfigInfo
+{
+  char *token;
+  char *default_filename;
+
+  char *filename;
+};
+
+struct ArtworkListNodeInfo
+{
+  char *source_filename;
+  int num_references;
+};
+
+struct ArtworkListInfo
+{
+  int type;					/* type of artwork */
+  int num_list_entries;
+  struct ArtworkConfigInfo *config_list;	/* static config list */
+  struct ArtworkListNodeInfo **artwork_list;	/* static artwork list */
+  ListNode *file_list;				/* dynamic artwork list */
+  void *(*load_artwork)(char *);		/* constructor function */
+  void (*free_artwork)(void *);			/* destructor function */
 };
 
 

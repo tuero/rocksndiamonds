@@ -29,6 +29,7 @@
 #include "misc.h"
 #include "setup.h"
 #include "random.h"
+#include "text.h"
 
 
 #if defined(PLATFORM_MSDOS)
@@ -1213,6 +1214,86 @@ char getCharFromKey(Key key)
 
 
 /* ========================================================================= */
+/* functions for generic lists                                               */
+/* ========================================================================= */
+
+ListNode *newListNode()
+{
+  return checked_calloc(sizeof(ListNode));
+}
+
+void addNodeToList(ListNode **node_first, char *key, void *content)
+{
+  ListNode *node_new = newListNode();
+
+#if 0
+  printf("LIST: adding node with key '%s'\n", key);
+#endif
+
+  node_new->key = getStringCopy(key);
+  node_new->content = content;
+  node_new->next = *node_first;
+  *node_first = node_new;
+}
+
+void deleteNodeFromList(ListNode **node_first, char *key,
+			void (*destructor_function)(void *))
+{
+  if (node_first == NULL || *node_first == NULL)
+    return;
+
+#if 0
+  printf("[CHECKING LIST KEY '%s' == '%s']\n",
+	 (*node_first)->key, key);
+#endif
+
+  if (strcmp((*node_first)->key, key) == 0)
+  {
+#if 0
+    printf("[DELETING LIST ENTRY]\n");
+#endif
+
+    free((*node_first)->key);
+    if (destructor_function)
+      destructor_function((*node_first)->content);
+    *node_first = (*node_first)->next;
+  }
+  else
+    deleteNodeFromList(&(*node_first)->next, key, destructor_function);
+}
+
+ListNode *getNodeFromKey(ListNode *node_first, char *key)
+{
+  if (node_first == NULL)
+    return NULL;
+
+  if (strcmp(node_first->key, key) == 0)
+    return node_first;
+  else
+    return getNodeFromKey(node_first->next, key);
+}
+
+int getNumNodes(ListNode *node_first)
+{
+  return (node_first ? 1 + getNumNodes(node_first->next) : 0);
+}
+
+void dumpList(ListNode *node_first)
+{
+  ListNode *node = node_first;
+
+  while (node)
+  {
+    printf("['%s' (%d)]\n", node->key,
+	   ((struct ArtworkListNodeInfo *)node->content)->num_references);
+    node = node->next;
+  }
+
+  printf("[%d nodes]\n", getNumNodes(node_first));
+}
+
+
+/* ========================================================================= */
 /* functions for checking filenames                                          */
 /* ========================================================================= */
 
@@ -1261,6 +1342,220 @@ boolean FileIsArtworkType(char *basename, int type)
     return TRUE;
 
   return FALSE;
+}
+
+/* ========================================================================= */
+/* functions for loading artwork configuration information                   */
+/* ========================================================================= */
+
+static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
+{
+  int num_list_entries = artwork_info->num_list_entries;
+  struct ArtworkConfigInfo *config_list = artwork_info->config_list;
+  char *filename = getCustomArtworkConfigFilename(artwork_info->type);
+  struct SetupFileList *setup_file_list;
+  int i;
+
+#if 0
+  printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
+#endif
+
+  /* always start with reliable default values */
+  for (i=0; i<num_list_entries; i++)
+    config_list[i].filename = NULL;
+
+  if (filename == NULL)
+    return;
+
+  if ((setup_file_list = loadSetupFileList(filename)))
+  {
+    for (i=0; i<num_list_entries; i++)
+      config_list[i].filename =
+	getStringCopy(getTokenValue(setup_file_list, config_list[i].token));
+
+    freeSetupFileList(setup_file_list);
+
+#if 0
+    for (i=0; i<num_list_entries; i++)
+    {
+      printf("'%s' ", config_list[i].token);
+      if (config_list[i].filename)
+	printf("-> '%s'\n", config_list[i].filename);
+      else
+	printf("-> UNDEFINED [-> '%s']\n", config_list[i].default_filename);
+    }
+#endif
+  }
+}
+
+void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
+			    struct ArtworkListNodeInfo **listnode)
+{
+  if (*listnode)
+  {
+    char *filename = (*listnode)->source_filename;
+
+#if 0
+    printf("[decrementing reference counter of artwork '%s']\n", filename);
+#endif
+
+    if (--(*listnode)->num_references <= 0)
+    {
+#if 0
+      printf("[deleting artwork '%s']\n", filename);
+#endif
+
+      deleteNodeFromList(&artwork_info->file_list, filename,
+			 artwork_info->free_artwork);
+    }
+
+    *listnode = NULL;
+  }
+}
+
+static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
+				    struct ArtworkListNodeInfo **listnode,
+				    char *filename)
+{
+  ListNode *node;
+
+  /* check if the old and the new artwork file are the same */
+  if (*listnode && strcmp((*listnode)->source_filename, filename) == 0)
+  {
+    /* The old and new artwork are the same (have the same filename and path).
+       This usually means that this artwork does not exist in this artwork set
+       and a fallback to the existing artwork is done. */
+
+#if 0
+    printf("[artwork '%s' already exists (same list entry)]\n", filename);
+#endif
+
+    return;
+  }
+
+  /* delete existing artwork file entry */
+  deleteArtworkListEntry(artwork_info, listnode);
+
+  /* check if the new artwork file already exists in the list of artworks */
+  if ((node = getNodeFromKey(artwork_info->file_list, filename)) != NULL)
+  {
+#if 0
+      printf("[artwork '%s' already exists (other list entry)]\n", filename);
+#endif
+
+      *listnode = (struct ArtworkListNodeInfo *)node->content;
+      (*listnode)->num_references++;
+  }
+  else if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
+  {
+    (*listnode)->num_references = 1;
+    addNodeToList(&artwork_info->file_list, (*listnode)->source_filename,
+		  *listnode);
+  }
+}
+
+static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
+			      struct ArtworkListNodeInfo **listnode,
+			      char *basename)
+{
+  char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+#if 0
+  printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
+#endif
+
+  if (strcmp(basename, UNDEFINED_FILENAME) == 0)
+  {
+    deleteArtworkListEntry(artwork_info, listnode);
+    return;
+  }
+
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "cannot find artwork file '%s'", basename);
+    return;
+  }
+
+  replaceArtworkListEntry(artwork_info, listnode, filename);
+}
+
+void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+		       char *basename, int list_pos)
+{
+  if (artwork_info->artwork_list == NULL ||
+      list_pos >= artwork_info->num_list_entries)
+    return;
+
+#if 0
+  printf("loading artwork '%s' ...  [%d]\n",
+	 basename, getNumNodes(artwork_info->file_list));
+#endif
+
+  LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
+		    basename);
+
+#if 0
+  printf("loading artwork '%s' done [%d]\n",
+	 basename, getNumNodes(artwork_info->file_list));
+#endif
+}
+
+void ReloadCustomArtworkFiles(struct ArtworkListInfo *artwork_info)
+{
+  static struct
+  {
+    char *text;
+    boolean do_it;
+  }
+  draw_init[] =
+  {
+    { "",			FALSE },
+    { "Loading graphics:",	TRUE },
+    { "Loading sounds:",	TRUE },
+    { "Loading music:",		TRUE }
+  };
+
+  int num_list_entries = artwork_info->num_list_entries;
+  struct ArtworkConfigInfo *config_list = artwork_info->config_list;
+  int i;
+
+#if 0
+  Delay(5000);
+#endif
+
+#if 0
+  printf("DEBUG: reloading sounds '%s' ...\n",artwork.snd_current_identifier);
+#endif
+
+  LoadArtworkConfig(artwork_info);
+
+  if (draw_init[artwork_info->type].do_it)
+    DrawInitText(draw_init[artwork_info->type].text, 120, FC_GREEN);
+
+#if 0
+  printf("DEBUG: reloading %d sounds ...\n", num_list_entries);
+#endif
+
+  for(i=0; i<num_list_entries; i++)
+  {
+    if (draw_init[artwork_info->type].do_it)
+      DrawInitText(config_list[i].token, 150, FC_YELLOW);
+
+    if (config_list[i].filename)
+      LoadArtworkToList(artwork_info, config_list[i].filename, i);
+    else
+      LoadArtworkToList(artwork_info, config_list[i].default_filename, i);
+  }
+
+  draw_init[artwork_info->type].do_it = FALSE;
+
+  /*
+  printf("list size == %d\n", getNumNodes(artwork_info->file_list));
+  */
+
+#if 0
+  dumpList(artwork_info->file_list);
+#endif
 }
 
 
