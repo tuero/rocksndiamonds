@@ -326,7 +326,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   }
 }
 
-void DrawTextToTextArea(int x, int y, char *text, int font_nr,
+void DrawTextToTextArea(int x, int y, char *text, int font_nr, int line_length,
 			int area_xsize, int area_ysize, int mask_mode)
 {
   int area_line = 0;
@@ -340,10 +340,10 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr,
     char buffer[MAX_OUTPUT_LINESIZE + 1];
     int i;
 
-    for (i=0; i < area_xsize && *text; i++)
+    for (i=0; i < line_length && *text; i++)
       if ((buffer[i] = *text++) == '\n')
 	break;
-    buffer[i] = '\0';
+    buffer[MIN(i, area_xsize)] = '\0';
 
     DrawTextExt(drawto, x, y + area_line * font_height, buffer, font_nr,
 		mask_mode);

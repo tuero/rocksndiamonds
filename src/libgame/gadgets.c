@@ -358,7 +358,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 
 	/* gadget text value */
 	DrawTextToTextArea(gi->x + border_x, gi->y + border_y,
-			   gi->textarea.value, font_nr,
+			   gi->textarea.value, font_nr, gi->textarea.xsize,
 			   gi->textarea.xsize, gi->textarea.ysize,
 			   BLIT_ON_BACKGROUND);
 

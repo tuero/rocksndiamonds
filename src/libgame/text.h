@@ -66,6 +66,6 @@ void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
-void DrawTextToTextArea(int, int, char *, int, int, int, int);
+void DrawTextToTextArea(int, int, char *, int, int, int, int, int);
 
 #endif	/* TEXT_H */

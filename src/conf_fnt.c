@@ -76,10 +76,6 @@ font_to_graphic[] =
     IMG_FONT_TEXT_1_PREVIEW
   },
   {
-    FONT_TEXT_1,				GFX_SPECIAL_ARG_PLAYING,
-    IMG_FONT_TEXT_1_PLAYING
-  },
-  {
     FONT_TEXT_1,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_1_SCORES
   },
@@ -98,10 +94,6 @@ font_to_graphic[] =
   {
     FONT_TEXT_2,				GFX_SPECIAL_ARG_PREVIEW,
     IMG_FONT_TEXT_2_PREVIEW
-  },
-  {
-    FONT_TEXT_2,				GFX_SPECIAL_ARG_PLAYING,
-    IMG_FONT_TEXT_2_PLAYING
   },
   {
     FONT_TEXT_2,				GFX_SPECIAL_ARG_SCORES,
@@ -124,10 +116,6 @@ font_to_graphic[] =
     IMG_FONT_TEXT_3_PREVIEW
   },
   {
-    FONT_TEXT_3,				GFX_SPECIAL_ARG_PLAYING,
-    IMG_FONT_TEXT_3_PLAYING
-  },
-  {
     FONT_TEXT_3,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_3_SCORES
   },
@@ -144,16 +132,28 @@ font_to_graphic[] =
     IMG_FONT_TEXT_4_LEVELS
   },
   {
-    FONT_TEXT_4,				GFX_SPECIAL_ARG_PLAYING,
-    IMG_FONT_TEXT_4_PLAYING
-  },
-  {
     FONT_TEXT_4,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_4_SCORES
   },
   {
     FONT_TEXT_4_ACTIVE,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_4_ACTIVE_SCORES
+  },
+  {
+    FONT_ENVELOPE_1,				-1,
+    IMG_FONT_ENVELOPE_1
+  },
+  {
+    FONT_ENVELOPE_2,				-1,
+    IMG_FONT_ENVELOPE_2
+  },
+  {
+    FONT_ENVELOPE_3,				-1,
+    IMG_FONT_ENVELOPE_3
+  },
+  {
+    FONT_ENVELOPE_4,				-1,
+    IMG_FONT_ENVELOPE_4
   },
   {
     FONT_INPUT_1,				-1,
