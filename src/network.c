@@ -427,7 +427,7 @@ static void Handle_OP_START_PLAYING()
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
   new_leveldir_filename = (char *)&buffer[10];
 
-  new_leveldir = getTreeInfoFromFilename(new_leveldir_filename);
+  new_leveldir = getTreeInfoFromFilename(leveldir_first,new_leveldir_filename);
   if (new_leveldir == NULL)
   {
     Error(ERR_WARN, "no such level directory: '%s'", new_leveldir_filename);

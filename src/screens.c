@@ -30,8 +30,9 @@
 #define SETUP_MODE_SHORTCUT		2
 #define SETUP_MODE_GRAPHICS		3
 #define SETUP_MODE_SOUND		4
+#define SETUP_MODE_CHOOSE_SOUNDS	5
 
-#define MAX_SETUP_MODES			5
+#define MAX_SETUP_MODES			6
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -55,6 +56,7 @@
 
 /* forward declarations of internal functions */
 static void HandleScreenGadgets(struct GadgetInfo *);
+static void execExitSetupChooseArtwork(void);
 static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
@@ -62,6 +64,7 @@ static void CalibrateJoystick(int);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
+static int setup_mode = SETUP_MODE_MAIN;
 
 static void drawCursorExt(int pos, int color, int graphic)
 {
@@ -392,6 +395,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y == 6)
       {
 	game_status = SETUP;
+	setup_mode = SETUP_MODE_MAIN;
 	DrawSetupScreen();
       }
       else if (y == 7)
@@ -918,9 +922,6 @@ void HandleTypeName(int newxpos, Key key)
   BackToFront();
 }
 
-
-#if 1
-
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   UnmapAllGadgets();
@@ -928,7 +929,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   ClearWindow();
   HandleChooseTree(0,0, 0,0, MB_MENU_INITIALIZE, ti_ptr);
-  MapChooseTreeGadgets();
+  MapChooseTreeGadgets(*ti_ptr);
 
   FadeToFront();
   InitAnimation();
@@ -958,17 +959,19 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
   int num_entries = numTreeInfoInGroup(ti);
   char *title_string = NULL;
+  int offset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : 16);
 
   ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
 
   title_string =
     (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Directories" :
-     ti->type == TREE_TYPE_GRAPHICS_DIR ? "Game Graphics" :
-     ti->type == TREE_TYPE_SOUNDS_DIR ? "Game Sounds" :
-     ti->type == TREE_TYPE_MUSIC_DIR ? "Game Music" : "");
+     ti->type == TREE_TYPE_GRAPHICS_DIR ? "Custom Graphics" :
+     ti->type == TREE_TYPE_SOUNDS_DIR ? "Custom Sounds" :
+     ti->type == TREE_TYPE_MUSIC_DIR ? "Custom Music" : "");
 
-  DrawText(SX, SY, title_string, FS_BIG, FC_GREEN);
+  DrawText(SX + offset, SY + offset, title_string, FS_BIG,
+	   (ti->type == TREE_TYPE_LEVEL_DIR ? FC_GREEN : FC_YELLOW));
 
   for(i=0; i<num_page_entries; i++)
   {
@@ -1003,7 +1006,9 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 {
   TreeInfo *node, *node_first;
   int x, last_redraw_mask = redraw_mask;
-  char *text = (ti->type == TREE_TYPE_LEVEL_DIR ? "group" : "directory");
+
+  if (ti->type != TREE_TYPE_LEVEL_DIR)
+    return;
 
   node_first = getTreeInfoFirstGroupEntry(ti);
   node = getTreeInfoFromPos(node_first, entry_pos);
@@ -1011,9 +1016,9 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
 
   if (node->parent_link)
-    DrawTextFCentered(40, FC_RED, "leave %s \"%s\"", text, node->class_desc);
+    DrawTextFCentered(40, FC_RED, "leave group \"%s\"", node->class_desc);
   else if (node->level_group)
-    DrawTextFCentered(40, FC_RED, "enter %s \"%s\"", text, node->class_desc);
+    DrawTextFCentered(40, FC_RED, "enter group \"%s\"", node->class_desc);
   else if (ti->type == TREE_TYPE_LEVEL_DIR)
     DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
 		      node->levels, node->class_desc);
@@ -1069,11 +1074,16 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       *ti_ptr = ti->node_parent;
       DrawChooseTree(ti_ptr);
     }
+    else if (game_status == SETUP)
+    {
+      execExitSetupChooseArtwork();
+    }
     else
     {
       game_status = MAINMENU;
       DrawMainMenu();
     }
+
     return;
   }
 
@@ -1201,8 +1211,15 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  TapeErase();
 	}
 
-	game_status = MAINMENU;
-	DrawMainMenu();
+	if (game_status == SETUP)
+	{
+	  execExitSetupChooseArtwork();
+	}
+	else
+	{
+	  game_status = MAINMENU;
+	  DrawMainMenu();
+	}
       }
     }
   }
@@ -1222,296 +1239,6 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 }
-
-
-#else
-
-
-void DrawChooseLevel()
-{
-  UnmapAllGadgets();
-  CloseDoor(DOOR_CLOSE_2);
-
-  ClearWindow();
-  HandleChooseLevel(0,0, 0,0, MB_MENU_INITIALIZE);
-  MapChooseLevelGadgets();
-
-  FadeToFront();
-  InitAnimation();
-}
-
-static void AdjustChooseLevelScrollbar(int id, int first_entry)
-{
-  struct GadgetInfo *gi = screen_gadget[id];
-  int items_max, items_visible, item_position;
-
-  items_max = numTreeInfoInGroup(leveldir_current);
-  items_visible = MAX_MENU_ENTRIES_ON_SCREEN - 1;
-  item_position = first_entry;
-
-  if (item_position > items_max - items_visible)
-    item_position = items_max - items_visible;
-
-  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
-	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
-}
-
-static void drawChooseLevelList(int first_entry, int num_page_entries)
-{
-  int i;
-  char buffer[SCR_FIELDX * 2];
-  int max_buffer_len = (SCR_FIELDX - 2) * 2;
-  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
-
-  ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
-  redraw_mask |= REDRAW_FIELD;
-
-  DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
-
-  for(i=0; i<num_page_entries; i++)
-  {
-    LevelDirTree *node, *node_first;
-    int leveldir_pos = first_entry + i;
-    int ypos = MENU_SCREEN_START_YPOS + i;
-
-    node_first = getTreeInfoFirstGroupEntry(leveldir_current);
-    node = getTreeInfoFromPos(node_first, leveldir_pos);
-
-    strncpy(buffer, node->name , max_buffer_len);
-    buffer[max_buffer_len] = '\0';
-
-    DrawText(SX + 32, SY + ypos * 32, buffer, FS_MEDIUM, node->color);
-
-    if (node->parent_link)
-      initCursor(i, GFX_ARROW_BLUE_LEFT);
-    else if (node->level_group)
-      initCursor(i, GFX_ARROW_BLUE_RIGHT);
-    else
-      initCursor(i, GFX_KUGEL_BLAU);
-  }
-
-  if (first_entry > 0)
-    DrawGraphic(0, 1, GFX_ARROW_BLUE_UP);
-
-  if (first_entry + num_page_entries < num_leveldirs)
-    DrawGraphic(0, MAX_MENU_ENTRIES_ON_SCREEN + 1, GFX_ARROW_BLUE_DOWN);
-}
-
-static void drawChooseLevelInfo(int leveldir_pos)
-{
-  LevelDirTree *node, *node_first;
-  int x, last_redraw_mask = redraw_mask;
-
-  node_first = getTreeInfoFirstGroupEntry(leveldir_current);
-  node = getTreeInfoFromPos(node_first, leveldir_pos);
-
-  ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
-
-  if (node->parent_link)
-    DrawTextFCentered(40, FC_RED, "leave group \"%s\"", node->class_desc);
-  else if (node->level_group)
-    DrawTextFCentered(40, FC_RED, "enter group \"%s\"", node->class_desc);
-  else
-    DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
-		      node->levels, node->class_desc);
-
-  /* let BackToFront() redraw only what is needed */
-  redraw_mask = last_redraw_mask | REDRAW_TILES;
-  for (x=0; x<SCR_FIELDX; x++)
-    MarkTileDirty(x, 1);
-}
-
-void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
-{
-  static unsigned long choose_delay = 0;
-  int x = 0;
-  int y = leveldir_current->cl_cursor;
-  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
-  int num_page_entries;
-
-  if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
-    num_page_entries = num_leveldirs;
-  else
-    num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
-
-  if (button == MB_MENU_INITIALIZE)
-  {
-    int leveldir_pos = posTreeInfo(leveldir_current);
-
-    if (leveldir_current->cl_first == -1)
-    {
-      leveldir_current->cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
-      leveldir_current->cl_cursor =
-	leveldir_pos - leveldir_current->cl_first;
-    }
-
-    if (dx == 999)	/* first entry is set by scrollbar position */
-      leveldir_current->cl_first = dy;
-    else
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
-				 leveldir_current->cl_first);
-
-    drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
-    drawChooseLevelInfo(leveldir_current->cl_first +
-			leveldir_current->cl_cursor);
-    drawCursor(leveldir_current->cl_cursor, FC_RED);
-    return;
-  }
-  else if (button == MB_MENU_LEAVE)
-  {
-    if (leveldir_current->node_parent)
-    {
-      leveldir_current = leveldir_current->node_parent;
-      DrawChooseLevel();
-    }
-    else
-    {
-      game_status = MAINMENU;
-      DrawMainMenu();
-    }
-    return;
-  }
-
-  if (mx || my)		/* mouse input */
-  {
-    x = (mx - SX) / 32;
-    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
-  }
-  else if (dx || dy)	/* keyboard input */
-  {
-    if (dy)
-      y = leveldir_current->cl_cursor + dy;
-
-    if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
-    {
-      dy = SIGN(dy);
-      step = num_page_entries - 1;
-      y = (dy < 0 ? -1 : num_page_entries);
-    }
-  }
-
-  if (x == 0 && y == -1)
-  {
-    if (leveldir_current->cl_first > 0 &&
-	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
-    {
-      leveldir_current->cl_first -= step;
-      if (leveldir_current->cl_first < 0)
-	leveldir_current->cl_first = 0;
-
-      drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
-      drawChooseLevelInfo(leveldir_current->cl_first +
-			  leveldir_current->cl_cursor);
-      drawCursor(leveldir_current->cl_cursor, FC_RED);
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
-				 leveldir_current->cl_first);
-      return;
-    }
-  }
-  else if (x == 0 && y > num_page_entries - 1)
-  {
-    if (leveldir_current->cl_first + num_page_entries < num_leveldirs &&
-	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
-    {
-      leveldir_current->cl_first += step;
-      if (leveldir_current->cl_first + num_page_entries > num_leveldirs)
-	leveldir_current->cl_first = MAX(0, num_leveldirs - num_page_entries);
-
-      drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
-      drawChooseLevelInfo(leveldir_current->cl_first +
-			  leveldir_current->cl_cursor);
-      drawCursor(leveldir_current->cl_cursor, FC_RED);
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
-				 leveldir_current->cl_first);
-      return;
-    }
-  }
-
-  if (dx == 1)
-  {
-    LevelDirTree *node_first, *node_cursor;
-    int leveldir_pos = leveldir_current->cl_first + y;
-
-    node_first = getTreeInfoFirstGroupEntry(leveldir_current);
-    node_cursor = getTreeInfoFromPos(node_first, leveldir_pos);
-
-    if (node_cursor->node_group)
-    {
-      node_cursor->cl_first = leveldir_current->cl_first;
-      node_cursor->cl_cursor = leveldir_current->cl_cursor;
-      leveldir_current = node_cursor->node_group;
-      DrawChooseLevel();
-      return;
-    }
-  }
-  else if (dx == -1 && leveldir_current->node_parent)
-  {
-    leveldir_current = leveldir_current->node_parent;
-    DrawChooseLevel();
-    return;
-  }
-
-  if (x == 0 && y >= 0 && y < num_page_entries)
-  {
-    if (button)
-    {
-      if (y != leveldir_current->cl_cursor)
-      {
-	drawCursor(y, FC_RED);
-	drawCursor(leveldir_current->cl_cursor, FC_BLUE);
-	drawChooseLevelInfo(leveldir_current->cl_first + y);
-	leveldir_current->cl_cursor = y;
-      }
-    }
-    else
-    {
-      LevelDirTree *node_first, *node_cursor;
-      int leveldir_pos = leveldir_current->cl_first + y;
-
-      node_first = getTreeInfoFirstGroupEntry(leveldir_current);
-      node_cursor = getTreeInfoFromPos(node_first, leveldir_pos);
-
-      if (node_cursor->node_group)
-      {
-	node_cursor->cl_first = leveldir_current->cl_first;
-	node_cursor->cl_cursor = leveldir_current->cl_cursor;
-	leveldir_current = node_cursor->node_group;
-
-	DrawChooseLevel();
-      }
-      else if (node_cursor->parent_link)
-      {
-	leveldir_current = node_cursor->node_parent;
-
-	DrawChooseLevel();
-      }
-      else
-      {
-	node_cursor->cl_first = leveldir_current->cl_first;
-	node_cursor->cl_cursor = leveldir_current->cl_cursor;
-	leveldir_current = node_cursor;
-
-	LoadLevelSetup_SeriesInfo();
-
-	SaveLevelSetup_LastSeries();
-	SaveLevelSetup_SeriesInfo();
-	TapeErase();
-
-	game_status = MAINMENU;
-	DrawMainMenu();
-      }
-    }
-  }
-
-  BackToFront();
-
-  if (game_status == CHOOSELEVEL)
-    DoAnimation();
-}
-
-#endif
-
 
 void DrawHallOfFame(int highlight_position)
 {
@@ -1621,7 +1348,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
 static struct TokenInfo *setup_info;
 static int num_setup_info;
-static int setup_mode = SETUP_MODE_MAIN;
+static char *custom_artwork;
 
 static void execSetupMain()
 {
@@ -1631,7 +1358,15 @@ static void execSetupMain()
 
 static void execSetupSound()
 {
+  custom_artwork = artwork.snd_current->name;
+
   setup_mode = SETUP_MODE_SOUND;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseSounds()
+{
+  setup_mode = SETUP_MODE_CHOOSE_SOUNDS;
   DrawSetupScreen();
 }
 
@@ -1645,6 +1380,12 @@ static void execSetupShortcut()
 {
   setup_mode = SETUP_MODE_SHORTCUT;
   DrawSetupScreen();
+}
+
+static void execExitSetupChooseArtwork()
+{
+  if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
+    execSetupSound();
 }
 
 static void execExitSetup()
@@ -1698,6 +1439,9 @@ static struct TokenInfo setup_info_sound[] =
   { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"	},
   { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"	},
   { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"	},
+  { TYPE_EMPTY,		NULL,			""		},
+  { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"	},
+  { TYPE_STRING,	&custom_artwork,	""		},
   { TYPE_EMPTY,		NULL,			""		},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"		},
   { 0,			NULL,			NULL		}
@@ -1779,9 +1523,15 @@ static void drawSetupValue(int pos)
       value_color = FC_RED;
     }
   }
+  else if (setup_info[pos].type & TYPE_STRING)
+  {
+    xpos = 3;
 
-  if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
-      !*(boolean *)(setup_info[pos].value))
+    if (strlen(value_string) > 14)
+      value_string[14] = '\0';
+  }
+  else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
+	   !*(boolean *)(setup_info[pos].value))
     value_color = FC_BLUE;
 
   DrawText(SX + xpos * 32, SY + ypos * 32,
@@ -2553,6 +2303,8 @@ void DrawSetupScreen()
 {
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
+  else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
+    DrawChooseTree(&artwork.snd_current);
   else
     DrawSetupScreen_Generic();
 }
@@ -2561,6 +2313,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 {
   if (setup_mode == SETUP_MODE_INPUT)
     HandleSetupScreen_Input(mx, my, dx, dy, button);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
+    HandleChooseTree(mx, my, dx, dy, button, &artwork.snd_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
@@ -2762,12 +2516,12 @@ void CreateScreenGadgets()
   CreateScreenScrollbars();
 }
 
-void MapChooseTreeGadgets()
+void MapChooseTreeGadgets(TreeInfo *ti)
 {
-  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
+  int num_entries = numTreeInfoInGroup(ti);
   int i;
 
-  if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
+  if (num_entries <= MAX_MENU_ENTRIES_ON_SCREEN)
     return;
 
   for (i=0; i<NUM_SCREEN_GADGETS; i++)

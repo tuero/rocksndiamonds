@@ -46,7 +46,8 @@
 					 TYPE_STRING)
 
 #define TYPE_SKIP_ENTRY			(TYPE_EMPTY | \
-					 TYPE_KEY)
+					 TYPE_KEY | \
+					 TYPE_STRING)
 
 #define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_MENU | \
 					 TYPE_LEAVE_MENU)
@@ -158,7 +159,7 @@ TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *);
 int numTreeInfoInGroup(TreeInfo *);
 int posTreeInfo(TreeInfo *);
 TreeInfo *getTreeInfoFromPos(TreeInfo *, int);
-TreeInfo *getTreeInfoFromFilename(char *);
+TreeInfo *getTreeInfoFromFilename(TreeInfo *, char *);
 void dumpTreeInfo(TreeInfo *, int);
 void sortTreeInfo(TreeInfo **,
 		  int (*compare_function)(const void *, const void *));

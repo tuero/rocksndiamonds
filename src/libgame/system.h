@@ -318,6 +318,7 @@ struct SetupInfo
 
 struct TreeInfo
 {
+  struct TreeInfo **node_top;		/* topmost node in tree */
   struct TreeInfo *node_parent;		/* parent level directory info */
   struct TreeInfo *node_group;		/* level group sub-directory info */
   struct TreeInfo *next;		/* next level series structure node */

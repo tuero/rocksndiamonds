@@ -462,7 +462,7 @@ TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *node)
     return NULL;
 
   if (node->node_parent == NULL)		/* top level group */
-    return leveldir_first;
+    return *node->node_top;
   else						/* sub level group */
     return node->node_parent->node_group;
 }
@@ -534,9 +534,9 @@ TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
   return NULL;
 }
 
-TreeInfo *getTreeInfoFromFilename(char *filename)
+TreeInfo *getTreeInfoFromFilename(TreeInfo *ti, char *filename)
 {
-  return getTreeInfoFromFilenameExt(leveldir_first, filename);
+  return getTreeInfoFromFilenameExt(ti, filename);
 }
 
 void dumpTreeInfo(TreeInfo *node, int depth)
@@ -1076,14 +1076,23 @@ static struct TokenInfo levelinfo_tokens[] =
 
 static void setTreeInfoToDefaults(TreeInfo *ldi)
 {
+  /* ldi->type is expected to be already set! */
+
+  if (ldi->type == 0)
+    Error(ERR_EXIT, "ldi->type == 0");
+
+  ldi->node_top = (ldi->type == TREE_TYPE_LEVEL_DIR ? &leveldir_first :
+		   ldi->type == TREE_TYPE_GRAPHICS_DIR ? &artwork.gfx_first :
+		   ldi->type == TREE_TYPE_SOUNDS_DIR ? &artwork.snd_first :
+		   ldi->type == TREE_TYPE_MUSIC_DIR ? &artwork.mus_first :
+		   NULL);
+
   ldi->node_parent = NULL;
   ldi->node_group = NULL;
   ldi->next = NULL;
 
   ldi->cl_first = -1;
   ldi->cl_cursor = -1;
-
-  /* ldi->type is expected to be already set! */
 
   ldi->filename = NULL;
   ldi->fullpath = NULL;
@@ -1141,6 +1150,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->level_group = FALSE;
   ldi->parent_link = FALSE;
 
+  ldi->node_top = parent->node_top;
   ldi->node_parent = parent;
   ldi->node_group = NULL;
   ldi->next = NULL;
@@ -1585,6 +1595,7 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 
     free(directory_path);
 
+    /* check if this directory contains artwork with or without config file */
     valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first,node_parent,
 							base_directory,
 							directory_name, type);
@@ -1592,14 +1603,10 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 
   closedir(dir);
 
-  if (!valid_entry_found)
-  {
-    /* check if this directory directly contains an artwork config file */
-    valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first,node_parent,
-							base_directory, ".",
-							type);
-  }
-
+  /* check if this directory directly contains artwork itself */
+  valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first,node_parent,
+						      base_directory, ".",
+						      type);
   if (!valid_entry_found)
     Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
 	  base_directory);
@@ -1783,7 +1790,8 @@ void LoadLevelSetup_LastSeries()
     char *last_level_series =
       getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
-    leveldir_current = getTreeInfoFromFilename(last_level_series);
+    leveldir_current = getTreeInfoFromFilename(leveldir_first,
+					       last_level_series);
     if (leveldir_current == NULL)
       leveldir_current = leveldir_first;
 
