@@ -108,6 +108,11 @@
 			 IS_LEVELCLASS_USER(n) ? LEVELCLASS_USER : \
 			 LEVELCLASS_UNDEFINED)
 
+#define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ? FC_BLUE : \
+			 IS_LEVELCLASS_CLASSICS(n) ? FC_YELLOW : \
+			 IS_LEVELCLASS_CONTRIBUTION(n) ? FC_GREEN : \
+			 IS_LEVELCLASS_USER(n) ? FC_RED : FC_BLUE)
+
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
 
@@ -1516,6 +1521,7 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 	leveldir[current_entry].levels - 1;
       leveldir[current_entry].user_defined =
 	(level_directory == options.level_directory ? FALSE : TRUE);
+      leveldir[current_entry].color = LEVELCOLOR(current_entry);
 
       freeSetupFileList(setup_file_list);
       current_entry++;

@@ -357,6 +357,7 @@ struct LevelDirInfo
   int sort_priority;
   boolean user_defined;
   boolean readonly;
+  int color;
 };
 
 struct TapeInfo
@@ -973,12 +974,18 @@ extern int		num_bg_loops;
 #define GFX_FIREFLY_U		207
 
 /* only available as size MINI_TILE */
-#define GFX_STEEL_UPPER_LEFT	208
-#define GFX_STEEL_UPPER_RIGHT	209
-#define GFX_STEEL_LOWER_LEFT	210
-#define GFX_STEEL_LOWER_RIGHT	211
-#define GFX_STEEL_HORIZONTAL	212
-#define GFX_STEEL_VERTICAL	213
+#define GFX_VSTEEL_UPPER_LEFT	208
+#define GFX_VSTEEL_UPPER_RIGHT	209
+#define GFX_VSTEEL_LOWER_LEFT	210
+#define GFX_VSTEEL_LOWER_RIGHT	211
+#define GFX_VSTEEL_HORIZONTAL	212
+#define GFX_VSTEEL_VERTICAL	213
+#define GFX_ISTEEL_UPPER_LEFT	214
+#define GFX_ISTEEL_UPPER_RIGHT	215
+#define GFX_ISTEEL_LOWER_LEFT	216
+#define GFX_ISTEEL_LOWER_RIGHT	217
+#define GFX_ISTEEL_HORIZONTAL	218
+#define GFX_ISTEEL_VERTICAL	219
 
 /* elements with graphics borrowed from other elements */
 #define GFX_SCHLUESSEL		GFX_SCHLUESSEL1

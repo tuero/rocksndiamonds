@@ -220,9 +220,9 @@ void BackToFront()
     for(x=0; x<SCR_FIELDX; x++)
       for(y=0; y<SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
-	  XCopyArea(display,buffer,window,gc,
-		    FX+x*TILEX,FX+y*TILEY, TILEX,TILEY,
-		    SX+x*TILEX,SY+y*TILEY);
+	  XCopyArea(display, buffer, window, gc,
+		    FX + x * TILEX, FX + y * TILEY, TILEX, TILEY,
+		    SX + x * TILEX, SY + y * TILEY);
   }
 
   XFlush(display);
@@ -1397,18 +1397,48 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniElement(sx, sy, EL_LEERRAUM);
   else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
     DrawMiniElement(sx, sy, Feld[x][y]);
-  else if (x == -1 && y == -1)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_LEFT);
-  else if (x == lev_fieldx && y == -1)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_RIGHT);
-  else if (x == -1 && y == lev_fieldy)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_LEFT);
-  else if (x == lev_fieldx && y == lev_fieldy)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_RIGHT);
-  else if (x == -1 || x == lev_fieldx)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_VERTICAL);
-  else if (y == -1 || y == lev_fieldy)
-    DrawMiniGraphic(sx, sy, GFX_STEEL_HORIZONTAL);
+  else
+  {
+    int steel_type, steel_position;
+    int border[6][2] =
+    {
+      { GFX_VSTEEL_UPPER_LEFT,	GFX_ISTEEL_UPPER_LEFT  },
+      { GFX_VSTEEL_UPPER_RIGHT,	GFX_ISTEEL_UPPER_RIGHT },
+      { GFX_VSTEEL_LOWER_LEFT,	GFX_ISTEEL_LOWER_LEFT  },
+      { GFX_VSTEEL_LOWER_RIGHT,	GFX_ISTEEL_LOWER_RIGHT },
+      { GFX_VSTEEL_VERTICAL,	GFX_ISTEEL_VERTICAL    },
+      { GFX_VSTEEL_HORIZONTAL,	GFX_ISTEEL_HORIZONTAL  }
+    };
+
+    steel_type = (BorderElement == EL_BETON ? 0 : 1);
+    steel_position = (x == -1 && y == -1			? 0 :
+		      x == lev_fieldx && y == -1		? 1 :
+		      x == -1 && y == lev_fieldy		? 2 :
+		      x == lev_fieldx && y == lev_fieldy	? 3 :
+		      x == -1 || x == lev_fieldx		? 4 :
+		      y == -1 || y == lev_fieldy		? 5 : -1);
+
+    if (steel_position != -1)
+      DrawMiniGraphic(sx, sy, border[steel_position][steel_type]);
+
+
+#if 0
+    if (x == -1 && y == -1)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_LEFT);
+    else if (x == lev_fieldx && y == -1)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_RIGHT);
+    else if (x == -1 && y == lev_fieldy)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_LEFT);
+    else if (x == lev_fieldx && y == lev_fieldy)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_RIGHT);
+    else if (x == -1 || x == lev_fieldx)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_VERTICAL);
+    else if (y == -1 || y == lev_fieldy)
+      DrawMiniGraphic(sx, sy, GFX_STEEL_HORIZONTAL);
+#endif
+
+
+  }
 }
 
 void DrawMicroElement(int xpos, int ypos, int element)

@@ -816,7 +816,8 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   {
     strncpy(buffer, leveldir[first_entry + i].name , SCR_FIELDX - 1);
     buffer[SCR_FIELDX - 1] = '\0';
-    DrawText(SX + 32, SY + (i + 2) * 32, buffer, FS_BIG, FC_YELLOW);
+    DrawText(SX + 32, SY + (i + 2) * 32, buffer,
+	     FS_BIG, leveldir[first_entry + i].color);
     DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
   }
 
@@ -829,10 +830,17 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
 static void drawChooseLevelInfo(int leveldir_nr)
 {
+  int x, last_redraw_mask = redraw_mask;
+
   XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 32, 32);
   DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
 		    leveldir[leveldir_nr].levels,
 		    leveldir[leveldir_nr].readonly ? "readonly" : "writable");
+
+  /* let BackToFront() redraw only what is needed */
+  redraw_mask = last_redraw_mask | REDRAW_TILES;
+  for (x=0; x<SCR_FIELDX; x++)
+    MarkTileDirty(x, 1);
 }
 
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)

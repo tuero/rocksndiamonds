@@ -95,9 +95,10 @@
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
 /* values for the setting windows */
-#define ED_SETTINGS_XPOS		MINI_TILEX
+#define ED_SETTINGS_XPOS		(MINI_TILEX + 8 * 1)
+#define ED_SETTINGS2_XPOS		MINI_TILEX
 #define ED_SETTINGS_YPOS		MINI_TILEY
-#define ED_SETTINGS2_YPOS		(ED_SETTINGS_YPOS + 12 * TILEY)
+#define ED_SETTINGS2_YPOS		(ED_SETTINGS_YPOS + 12 * TILEY - 2)
 
 /* values for counter gadgets */
 #define ED_COUNT_ELEM_SCORE_XPOS	ED_SETTINGS_XPOS
@@ -109,13 +110,19 @@
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE)
+#define ED_COUNTER2_YPOS(n)		(ED_COUNTER_YSTART + \
+					 n * ED_COUNTER_YDISTANCE - 2)
 /* standard distances */
 #define ED_BORDER_SIZE			3
 #define ED_GADGET_DISTANCE		2
 
 /* values for element content drawing areas */
-#define ED_AREA_ELEM_CONTENT_XPOS	(TILEX)
-#define ED_AREA_ELEM_CONTENT_YPOS	(10 * TILEY)
+#define ED_AREA_ELEM_CONTENT_XPOS	( 2 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT_YPOS	(20 * MINI_TILEY)
+
+/* values for random placement background drawing area */
+#define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_RANDOM_BACKGROUND_YPOS	(31 * MINI_TILEY)
 
 /* values for scrolling gadgets */
 #define ED_SCROLLBUTTON_XPOS		24
@@ -238,9 +245,13 @@
 /* buttons for level settings */
 #define GADGET_ID_RANDOM_PERCENTAGE	106
 #define GADGET_ID_RANDOM_QUANTITY	107
-#define GADGET_ID_DOUBLE_SPEED		108
+#define GADGET_ID_RANDOM_RESTRICTED	108
+#define GADGET_ID_DOUBLE_SPEED		109
 
-#define NUM_EDITOR_GADGETS		109
+/* another drawing area for random placement */
+#define GADGET_ID_RANDOM_BACKGROUND	110
+
+#define NUM_EDITOR_GADGETS		111
 
 /* radio button numbers */
 #define RADIO_NR_NONE			0
@@ -289,8 +300,9 @@
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_DOUBLE_SPEED	0
+#define ED_CHECKBUTTON_RANDOM_RESTRICTED 1
 
-#define ED_NUM_CHECKBUTTONS		1
+#define ED_NUM_CHECKBUTTONS		2
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_PERCENTAGE	0
@@ -416,7 +428,7 @@ static struct
     "score for each 10 seconds left",	NULL
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS,			ED_COUNTER2_YPOS(8),
     1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
@@ -530,6 +542,8 @@ static struct
 
 static int random_placement_value = 10;
 static int random_placement_method = RANDOM_USE_QUANTITY;
+static int random_placement_background_element = EL_ERDREICH;
+static boolean random_placement_background_restricted = FALSE;
 
 static struct
 {
@@ -542,14 +556,14 @@ static struct
 } radiobutton_info[ED_NUM_RADIOBUTTONS] =
 {
   {
-    ED_SETTINGS_XPOS + 160,		ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS + 160,		ED_COUNTER2_YPOS(8),
     GADGET_ID_RANDOM_PERCENTAGE,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_PERCENTAGE,
     "percentage",			"use percentage for random elements"
   },
   {
-    ED_SETTINGS_XPOS + 340,		ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS + 340,		ED_COUNTER2_YPOS(8),
     GADGET_ID_RANDOM_QUANTITY,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_QUANTITY,
@@ -570,6 +584,12 @@ static struct
     GADGET_ID_DOUBLE_SPEED,
     &level.double_speed,
     "double speed movement",		"set movement speed of player"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER2_YPOS(9) - MINI_TILEY,
+    GADGET_ID_RANDOM_RESTRICTED,
+    &random_placement_background_restricted,
+    "restrict random placement to",	"set random placement restriction"
   }
 };
 
@@ -1365,11 +1385,31 @@ static void CreateDrawingAreas()
     level_editor_gadget[id] = gi;
   }
 
-  /* ... and one for the amoeba content */
+  /* ... one for the amoeba content */
   id = GADGET_ID_AMOEBA_CONTENT;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX + ED_AREA_ELEM_CONTENT_XPOS,
 		    GDI_Y, SY + ED_AREA_ELEM_CONTENT_YPOS,
+		    GDI_WIDTH, MINI_TILEX,
+		    GDI_HEIGHT, MINI_TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+
+  /* ... and one for random placement background restrictions */
+
+  id = GADGET_ID_RANDOM_BACKGROUND;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_X, SX + ED_AREA_RANDOM_BACKGROUND_XPOS,
+		    GDI_Y, SY + ED_AREA_RANDOM_BACKGROUND_YPOS,
 		    GDI_WIDTH, MINI_TILEX,
 		    GDI_HEIGHT, MINI_TILEY,
 		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
@@ -1955,6 +1995,35 @@ static void DrawDrawingWindow()
   MapMainDrawingArea();
 }
 
+static void DrawRandomPlacementBackgroundArea()
+{
+  int area_x = ED_AREA_RANDOM_BACKGROUND_XPOS / MINI_TILEX;
+  int area_y = ED_AREA_RANDOM_BACKGROUND_YPOS / MINI_TILEY;
+  int area_sx = SX + ED_AREA_RANDOM_BACKGROUND_XPOS;
+  int area_sy = SY + ED_AREA_RANDOM_BACKGROUND_YPOS;
+  int x, y;
+
+  ElementContent[0][0][0] = random_placement_background_element;
+
+  /* draw decorative border for the object */
+  for (y=0; y<2; y++)
+    for (x=0; x<2; x++)
+      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
+
+  XFillRectangle(display, drawto, gc,
+		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
+		 MINI_TILEX + 2, MINI_TILEY + 2);
+
+  /* copy border to the right location */
+  XCopyArea(display, drawto, drawto, gc,
+	    area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
+	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
+
+  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+
+  MapDrawingArea(GADGET_ID_RANDOM_BACKGROUND);
+}
+
 static void DrawLevelInfoWindow()
 {
   char infotext[1024];
@@ -1970,9 +2039,9 @@ static void DrawLevelInfoWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
-  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS_YPOS,
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
 	   "Level Settings", FS_BIG, FC_YELLOW);
-  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS2_YPOS,
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
 	   "Editor Settings", FS_BIG, FC_YELLOW);
 
   gadget_level_xsize_value = &lev_fieldx;
@@ -2049,6 +2118,42 @@ static void DrawLevelInfoWindow()
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
   }
+
+  /* draw drawing area */
+  DrawRandomPlacementBackgroundArea();
+}
+
+static void DrawAmoebaContentArea()
+{
+  int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
+  int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
+  int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
+  int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
+  int font_color = FC_GREEN;
+  int x, y;
+
+  ElementContent[0][0][0] = level.amoebe_inhalt;
+
+  /* draw decorative border for the object */
+  for (y=0; y<2; y++)
+    for (x=0; x<2; x++)
+      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
+
+  XFillRectangle(display, drawto, gc,
+		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
+		 MINI_TILEX + 2, MINI_TILEY + 2);
+
+  /* copy border to the right location */
+  XCopyArea(display, drawto, drawto, gc,
+	    area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
+	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
+
+  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
+	   FS_SMALL, font_color);
+
+  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+
+  MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
 }
 
 static void DrawElementContentAreas()
@@ -2127,39 +2232,6 @@ static void DrawElementContentAreas()
     MapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 }
 
-static void DrawAmoebaContentArea()
-{
-  int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
-  int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
-  int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
-  int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
-  int font_color = FC_GREEN;
-  int x, y;
-
-  ElementContent[0][0][0] = level.amoebe_inhalt;
-
-  /* draw decorative border for the object */
-  for (y=0; y<2; y++)
-    for (x=0; x<2; x++)
-      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
-
-  XFillRectangle(display, drawto, gc,
-		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
-		 MINI_TILEX + 2, MINI_TILEY + 2);
-
-  /* copy border to the right location */
-  XCopyArea(display, drawto, drawto, gc,
-	    area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
-	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
-
-  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
-	   FS_SMALL, font_color);
-
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
-
-  MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
-}
-
 #define TEXT_COLLECTING		"Score for collecting"
 #define TEXT_SMASHING		"Score for smashing"
 #define TEXT_CRACKING		"Score for cracking"
@@ -2230,7 +2302,7 @@ static void DrawPropertiesWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
-  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS_YPOS,
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
 	   "Element Settings", FS_BIG, FC_YELLOW);
 
   /* draw some decorative border for the object */
@@ -2253,17 +2325,16 @@ static void DrawPropertiesWindow()
 
   DrawGraphic(xstart/2, ystart/2, el2gfx(properties_element));
 
-
   /* copy the whole stuff to the definitive location */
   XCopyArea(display, drawto, drawto, gc,
 	    SX + xstart * MINI_TILEX - MINI_TILEX/2,
 	    SY + ystart * MINI_TILEY - MINI_TILEY,
 	    2 * TILEX, 2 * TILEY,
-	    SX + xstart * MINI_TILEX - MINI_TILEX,
+	    SX + xstart * MINI_TILEX - MINI_TILEX/2,
 	    SY + ystart * MINI_TILEY - MINI_TILEY/2);
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    font_color, "Element Properties");
+	    font_color, "Current Element");
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -2823,6 +2894,7 @@ static void CopyLevelToUndoBuffer(int mode)
 {
   static boolean accumulated_undo = FALSE;
   boolean new_undo_buffer_position = TRUE;
+  int last_border_element;
   int x, y;
 
   switch (mode)
@@ -2853,6 +2925,13 @@ static void CopyLevelToUndoBuffer(int mode)
   for(x=0; x<lev_fieldx; x++)
     for(y=0; y<lev_fieldy; y++)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
+
+  /* check if change of border style was forced by drawing operation */
+  last_border_element = BorderElement;
+  SetBorderElement();
+  if (BorderElement != last_border_element)
+    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+
 #if 0
 #ifdef DEBUG
   printf("level saved to undo buffer\n");
@@ -2869,10 +2948,15 @@ static void RandomPlacement(int new_element)
   int x, y;
 
   /* determine number of free positions for the new elements */
+  /* (maybe this statement should be formatted a bit more readable...) */
   num_free_positions = 0;
   for (x=0; x<lev_fieldx; x++)
     for (y=0; y<lev_fieldy; y++)
-      if ((free_position[x][y] = (Feld[x][y] != new_element)))
+      if ((free_position[x][y] =
+	   ((random_placement_background_restricted &&
+	     Feld[x][y] == random_placement_background_element) ||
+	    (!random_placement_background_restricted &&
+	     Feld[x][y] != new_element))) == TRUE)
 	num_free_positions++;
 
   /* determine number of new elements to place there */
@@ -3065,6 +3149,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	if (id == GADGET_ID_AMOEBA_CONTENT)
 	  level.amoebe_inhalt = new_element;
+	else if (id == GADGET_ID_RANDOM_BACKGROUND)
+	  random_placement_background_element = new_element;
 	else if (id >= GADGET_ID_ELEM_CONTENT_0 &&
 		 id <= GADGET_ID_ELEM_CONTENT_7)
 	  level.mampfer_inhalt[id - GADGET_ID_ELEM_CONTENT_0][sx][sy] =
@@ -3645,6 +3731,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	radiobutton_info[ED_RADIOBUTTON_QUANTITY].checked_value;
       break;
 
+    case GADGET_ID_RANDOM_RESTRICTED:
+      *checkbutton_info[ED_CHECKBUTTON_RANDOM_RESTRICTED].value ^= TRUE;
+      break;
+
     case GADGET_ID_DOUBLE_SPEED:
       *checkbutton_info[ED_CHECKBUTTON_DOUBLE_SPEED].value ^= TRUE;
       break;
@@ -3890,6 +3980,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   else if (id == GADGET_ID_AMOEBA_CONTENT)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 	      "Amoeba content");
+  else if (id == GADGET_ID_RANDOM_BACKGROUND)
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	      "Random placement background");
   else
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 	      "Cruncher %d content: %d, %d",
