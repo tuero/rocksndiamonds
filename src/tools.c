@@ -2376,10 +2376,10 @@ int el2img(int element)
 
 int el2edimg(int element)
 {
-  return element_info[element].editor_graphic;
+  return element_info[element].special_graphic[GFX_SPECIAL_ARG_EDITOR];
 }
 
 int el2preimg(int element)
 {
-  return element_info[element].preview_graphic;
+  return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }

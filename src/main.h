@@ -797,12 +797,34 @@
 
 /* values for font configuration */
 
+#define FONT_INITIAL_1				0
+#define FONT_INITIAL_2				1
+#define FONT_INITIAL_3				2
+#define FONT_INITIAL_4				3
+#define FONT_BIG_1				4
+#define FONT_BIG_2				5
+#define FONT_BIG_3				6
+#define FONT_BIG_4				7
+#define FONT_MEDIUM_1				8
+#define FONT_MEDIUM_2				9
+#define FONT_MEDIUM_3				10
+#define FONT_MEDIUM_4				11
+#define FONT_SMALL_1				12
+#define FONT_SMALL_2				13
+#define FONT_SMALL_3				14
+#define FONT_SMALL_4				15
+#define FONT_TAPE				16
+#define FONT_GAME				17
+#define FONT_NARROW				18
+
+#define NUM_FONTS				19
+#define NUM_INITIAL_FONTS			4
+
 #define FIRST_IMG_FONT				IMG_FONT_INITIAL_1
 #define LAST_IMG_FONT				IMG_FONT_NARROW
 
 #define NUM_IMG_FONTS				(LAST_IMG_FONT - \
 						 FIRST_IMG_FONT + 1)
-#define NUM_INITIAL_FONTS			4
 
 
 /* values for game_status */
@@ -1033,8 +1055,12 @@ struct ElementInfo
   char *custom_description;	/* custom description for level editor */
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
+
 				/* special graphics for left/right/up/down */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
+
+  				/* special graphics for certain screens */
+  int special_graphic[NUM_SPECIAL_GFX_ARGS];
 
   int editor_graphic;		/* graphic displayed in level editor */
   int preview_graphic;		/* graphic displayed in level preview */

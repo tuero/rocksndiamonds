@@ -880,14 +880,13 @@ void InitElementSpecialGraphicInfo()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
-  int i;
+  int i, j;
 
   /* always start with reliable default values */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-  {
-    element_info[i].editor_graphic = element_info[i].graphic[ACTION_DEFAULT];
-    element_info[i].preview_graphic = element_info[i].graphic[ACTION_DEFAULT];
-  }
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+      element_info[i].special_graphic[j] =
+	element_info[i].graphic[ACTION_DEFAULT];
 
   /* initialize special element/graphic mapping from static configuration */
   for (i=0; element_to_special_graphic[i].element > -1; i++)
@@ -901,10 +900,7 @@ void InitElementSpecialGraphicInfo()
     if (base_redefined && !special_redefined)
       continue;
 
-    if (special == GFX_SPECIAL_ARG_EDITOR)
-      element_info[element].editor_graphic = graphic;
-    else if (special == GFX_SPECIAL_ARG_PREVIEW)
-      element_info[element].preview_graphic = graphic;
+    element_info[element].special_graphic[special] = graphic;
   }
 
   /* initialize special element/graphic mapping from dynamic configuration */
@@ -914,10 +910,8 @@ void InitElementSpecialGraphicInfo()
     int special = property_mapping[i].ext3_index;
     int graphic = property_mapping[i].artwork_index;
 
-    if (special == GFX_SPECIAL_ARG_EDITOR)
-      element_info[element].editor_graphic = graphic;
-    else if (special == GFX_SPECIAL_ARG_PREVIEW)
-      element_info[element].preview_graphic = graphic;
+    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+      element_info[element].special_graphic[special] = graphic;
   }
 }
 
