@@ -694,6 +694,12 @@ void OLD_LoadLevel(int level_nr)
   SetBorderElement();
 }
 
+static void SkipBytesInFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fgetc(file);
+}
+
 static void LoadLevel_HEAD(struct LevelInfo *level, FILE *file)
 {
   int i, x, y;
@@ -735,8 +741,7 @@ static void LoadLevel_HEAD(struct LevelInfo *level, FILE *file)
 
   level->encoding_16bit		= (fgetc(file) == 1 ? TRUE : FALSE);
 
-  for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* skip unused header bytes */
-    fgetc(file);
+  SkipBytesInFile(file, LEVEL_HEADER_UNUSED);	/* skip unused header bytes */
 }
 
 static void LoadLevel_AUTH(struct LevelInfo *level, FILE *file)
@@ -781,9 +786,8 @@ static void LoadLevel_BODY(struct LevelInfo *level, FILE *file)
 {
   int x, y;
 
-  /* now read in the valid level fields from level file */
-  for(y=0; y<lev_fieldy; y++)
-    for(x=0; x<lev_fieldx; x++)
+  for(y=0; y<level->fieldy; y++)
+    for(x=0; x<level->fieldx; x++)
       Feld[x][y] = Ur[x][y] =
 	checkLevelElement(level->encoding_16bit ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
@@ -834,6 +838,57 @@ void LoadLevel(int level_nr)
   }
   else
   {
+    static struct
+    {
+      char *chunk_name;
+      void (*chunk_loader)(struct LevelInfo *, FILE *);
+      int chunk_length;
+    }
+    chunk_info[] =
+    {
+      { "HEAD", LoadLevel_HEAD, LEVEL_HEADER_SIZE },
+      { "AUTH", LoadLevel_AUTH, MAX_LEVEL_AUTHOR_LEN },
+      { "CONT", LoadLevel_CONT, 4 + MAX_ELEMENT_CONTENTS * 3 * 3 },
+      { "BODY", LoadLevel_BODY, 0 },	/* depends on contents of "HEAD" */
+      {  NULL,  NULL,           0 }
+    };
+
+    while (getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN))
+    {
+      int i = 0;
+
+      while (chunk_info[i].chunk_name != NULL &&
+	     strcmp(chunk, chunk_info[i].chunk_name) != 0)
+	i++;
+
+      if (chunk_info[i].chunk_name == NULL)
+      {
+	Error(ERR_WARN, "unknown chunk '%s' in level file '%s'",
+	      chunk, filename);
+	SkipBytesInFile(file, chunk_length);
+      }
+      else if (chunk_length != chunk_info[i].chunk_length)
+      {
+	Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
+	      chunk_length, chunk, filename);
+	SkipBytesInFile(file, chunk_length);
+      }
+      else
+      {
+	/* call function to load this level chunk */
+	(chunk_info[i].chunk_loader)(&level, file);
+
+	if (strcmp(chunk, "HEAD") == 0)
+	{
+	  /* Note: "chunk_length" for CONT and BODY is wrong when elements are
+	     stored with 16-bit encoding (and should be twice as big then). */
+
+	  chunk_info[3].chunk_length = level.fieldx * level.fieldy;
+	}
+      }
+    }
+
+#if 0
     getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     if (strcmp(chunk, "HEAD") || chunk_length != LEVEL_HEADER_SIZE)
     {
@@ -872,6 +927,7 @@ void LoadLevel(int level_nr)
     }
 
     LoadLevel_BODY(&level, file);
+#endif
   }
 
   fclose(file);

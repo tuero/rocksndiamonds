@@ -150,13 +150,15 @@ ICON = $(ICONBASE).o
 endif
 
 
-all: $(PROGNAME)
+all: libgame_dir $(PROGNAME)
 
 $(PROGNAME): $(LIBGAME) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
 
+libgame_dir:
+	@$(MAKE) -C $(LIBDIR)
 $(LIBGAME):
-	$(MAKE) -C $(LIBDIR)
+	@$(MAKE) -C $(LIBDIR)
 
 $(ICON):
 	$(BMP2ICO) -transparent $(ICONBASE).ico $(ICON32X32)
