@@ -3010,6 +3010,7 @@ void HandleGameActions()
 	DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
     }
 
+    FrameCounter++;
     TimeFrames++;
 
     BackToFront();

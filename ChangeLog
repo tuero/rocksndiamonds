@@ -1,3 +1,6 @@
+2005-01-03
+	* fixed some redraw bugs when using EM engine
+
 2005-01-02
 	* fixed bug with not converting RND levels which are set to use native
 	  engine to native level structure when loading
