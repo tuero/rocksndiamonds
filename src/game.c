@@ -1053,7 +1053,7 @@ void Explode(int ex, int ey, int phase, int mode)
     }
 
     if (center_element == EL_MAMPFER)
-      MampferNr = (MampferNr+1) % 4;
+      MampferNr = (MampferNr + 1) % MampferMax;
 
     return;
   }

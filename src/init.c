@@ -1245,6 +1245,16 @@ void InitElementProperties()
   };
   static int ep_player_num = sizeof(ep_player)/sizeof(int);
 
+  static int ep_has_content[] =
+  {
+    EL_MAMPFER,
+    EL_AMOEBE_NASS,
+    EL_AMOEBE_NORM,
+    EL_AMOEBE_VOLL,
+    EL_AMOEBE_BD
+  };
+  static int ep_has_content_num = sizeof(ep_has_content)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1271,7 +1281,8 @@ void InitElementProperties()
     EP_BIT_EXPLOSIVE,
     EP_BIT_MAMPF3,
     EP_BIT_PUSHABLE,
-    EP_BIT_PLAYER
+    EP_BIT_PLAYER,
+    EP_BIT_HAS_CONTENT
   };
   static int *ep_array[] =
   {
@@ -1299,7 +1310,8 @@ void InitElementProperties()
     ep_explosive,
     ep_mampf3,
     ep_pushable,
-    ep_player
+    ep_player,
+    ep_has_content
   };
   static int *ep_num[] =
   {
@@ -1327,7 +1339,8 @@ void InitElementProperties()
     &ep_explosive_num,
     &ep_mampf3_num,
     &ep_pushable_num,
-    &ep_player_num
+    &ep_player_num,
+    &ep_has_content_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 

@@ -258,7 +258,8 @@ static void setLevelInfoToDefaults()
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
 
-  for(i=0; i<4; i++)
+  MampferMax = 4;
+  for(i=0; i<8; i++)
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
 	level.mampfer_inhalt[i][x][y] = EL_FELSBROCKEN;
@@ -329,10 +330,20 @@ void LoadLevel(int level_nr)
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i]	= fgetc(file);
 
-  for(i=0; i<4; i++)
+  MampferMax = 4;
+  for(i=0; i<8; i++)
+  {
     for(y=0; y<3; y++)
+    {
       for(x=0; x<3; x++)
-	level.mampfer_inhalt[i][x][y] = fgetc(file);
+      {
+	if (i < 4)
+	  level.mampfer_inhalt[i][x][y] = fgetc(file);
+	else
+	  level.mampfer_inhalt[i][x][y] = EL_LEERRAUM;
+      }
+    }
+  }
 
   level.tempo_amoebe	= fgetc(file);
   level.dauer_sieb	= fgetc(file);
@@ -345,10 +356,29 @@ void LoadLevel(int level_nr)
   /* read chunk "BODY" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    /* next check body chunk identifier and chunk length */
     fgets(chunk, CHUNK_ID_LEN + 1, file);
     chunk_length =
       (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
+
+    /* look for optional content chunk */
+    if (strcmp(chunk, "CONT") == 0 && chunk_length == 4 + 8 * 3 * 3)
+    {
+      fgetc(file);
+      MampferMax = fgetc(file);
+      fgetc(file);
+      fgetc(file);
+
+      for(i=0; i<8; i++)
+	for(y=0; y<3; y++)
+	  for(x=0; x<3; x++)
+	    level.mampfer_inhalt[i][x][y] = fgetc(file);
+
+      fgets(chunk, CHUNK_ID_LEN + 1, file);
+      chunk_length =
+	(fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
+    }
+
+    /* next check body chunk identifier and chunk length */
     if (strcmp(chunk, "BODY") || chunk_length != lev_fieldx * lev_fieldy)
     {
       Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
@@ -414,6 +444,25 @@ void SaveLevel(int level_nr)
 
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
     fputc(0, file);
+
+  fputs("CONT", file);			/* chunk identifier for contents */
+
+  chunk_length = 4 + 8 * 3 * 3;
+
+  fputc((chunk_length >>  24) & 0xff, file);
+  fputc((chunk_length >>  16) & 0xff, file);
+  fputc((chunk_length >>   8) & 0xff, file);
+  fputc((chunk_length >>   0) & 0xff, file);
+
+  fputc(EL_MAMPFER, file);
+  fputc(MampferMax, file);
+  fputc(0, file);
+  fputc(0, file);
+
+  for(i=0; i<8; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	fputc(level.mampfer_inhalt[i][x][y], file);
 
   fputs("BODY", file);			/* chunk identifier for file body */
   chunk_length = lev_fieldx * lev_fieldy;

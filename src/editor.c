@@ -71,12 +71,14 @@
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_BUTTONS + ED_NUM_CTRL2_BUTTONS)
 
+/* values for properties window */
+#define ED_PROPERTIES_XPOS	(TILEX - MINI_TILEX/2)
 /* values for counter gadgets */
 #define ED_COUNT_VALUE_XOFFSET	5
 #define ED_COUNT_VALUE_YOFFSET	3
-#define ED_COUNT_SCORE_XPOS	(TILEX)
+#define ED_COUNT_SCORE_XPOS	ED_PROPERTIES_XPOS
 #define ED_COUNT_SCORE_YPOS	(14 * MINI_TILEY)
-#define ED_COUNT_ELEMCONT_XPOS	(TILEX)
+#define ED_COUNT_ELEMCONT_XPOS	ED_PROPERTIES_XPOS
 #define ED_COUNT_ELEMCONT_YPOS	(17 * MINI_TILEY)
 
 /* values for element content drawing areas */
@@ -1197,12 +1199,12 @@ void LevelEd(int mx, int my, int button)
 			 el2gfx(new_element3));
       redraw_mask |= REDRAW_DOOR_1;
 
-      /*
-      properties_element = new_element;
-      if (edit_mode == ED_MODE_PROPERTIES)
-	DrawPropertiesWindow();
-      */
-
+      if (!HAS_CONTENT(properties_element))
+      {
+	properties_element = new_element;
+	if (edit_mode == ED_MODE_PROPERTIES)
+	  DrawPropertiesWindow();
+      }
     }
   
     if (edit_mode == ED_MODE_DRAWING)	/********** EDIT-FENSTER **********/
@@ -1766,12 +1768,6 @@ static void DrawCounterValueField(int counter_id, int value)
 	   int2str(value, 3), FS_SMALL, FC_YELLOW);
 }
 
-#define TEXT_COLLECTING		"Score for collecting"
-#define TEXT_SMASHING		"Score for smashing"
-#define TEXT_CRACKING		"Score for cracking"
-#define TEXT_SPEED		"Speed of growth"
-#define TEXT_DURATION		"Duration when activated"
-
 static void DrawDrawingWindow()
 {
   ClearWindow();
@@ -1783,7 +1779,7 @@ static void DrawDrawingWindow()
 
 static void DrawElementContentAreas()
 {
-  static int num_areas = MAX_ELEMCONT;
+  int *num_areas = &MampferMax;
   int area_x = ED_AREA_ELEMCONT_XPOS / MINI_TILEX;
   int area_y = ED_AREA_ELEMCONT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEMCONT_XPOS;
@@ -1793,14 +1789,13 @@ static void DrawElementContentAreas()
   for (i=0; i<MAX_ELEMCONT; i++)
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
-	ElementContent[i][x][y] =
-	  (i < 4 ? level.mampfer_inhalt[i][x][y] : EL_LEERRAUM);
+	ElementContent[i][x][y] = level.mampfer_inhalt[i][x][y];
 
   for (i=0; i<MAX_ELEMCONT; i++)
     UnmapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
 
   /* display counter to choose number of element content areas */
-  gadget_areas_value = &num_areas;
+  gadget_areas_value = num_areas;
   DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
   x = counter_info[ED_COUNTER_ELEMCONT].x + DXSIZE;
   y = counter_info[ED_COUNTER_ELEMCONT].y;
@@ -1814,7 +1809,7 @@ static void DrawElementContentAreas()
 		 SXSIZE, 12 * MINI_TILEY);
 
   /* draw some decorative border for the objects */
-  for (i=0; i<num_areas; i++)
+  for (i=0; i<*num_areas; i++)
   {
     for (y=0; y<4; y++)
       for (x=0; x<4; x++)
@@ -1832,7 +1827,14 @@ static void DrawElementContentAreas()
 	    area_sx, area_sy, (5 * 4 + 1) * MINI_TILEX, 12 * MINI_TILEY,
 	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
-  for (i=0; i<num_areas; i++)
+  DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
+	   "Content", FS_SMALL, FC_YELLOW);
+  DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 1 * MINI_TILEY + 1,
+	   "when", FS_SMALL, FC_YELLOW);
+  DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
+	   "smashed", FS_SMALL, FC_YELLOW);
+
+  for (i=0; i<*num_areas; i++)
   {
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
@@ -1844,7 +1846,7 @@ static void DrawElementContentAreas()
 	      FC_YELLOW, "%d", i + 1);
   }
 
-  for (i=0; i<num_areas; i++)
+  for (i=0; i<*num_areas; i++)
     MapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
 }
 
@@ -1872,10 +1874,19 @@ static void DrawAmoebaContentArea()
 	    area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
 	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
+  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
+	   FS_SMALL, FC_YELLOW);
+
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
   MapDrawingArea(ED_CTRL_ID_AMOEBA_CONTENT);
 }
+
+#define TEXT_COLLECTING		"Score for collecting"
+#define TEXT_SMASHING		"Score for smashing"
+#define TEXT_CRACKING		"Score for cracking"
+#define TEXT_SPEED		"Speed of amoeba growth"
+#define TEXT_DURATION		"Duration when activated"
 
 static void DrawPropertiesWindow()
 {
@@ -1961,7 +1972,7 @@ static void DrawPropertiesWindow()
       if (Feld[x][y] == properties_element)
 	num_elements_in_level++;
 
-  DrawTextF(TILEX, 5*TILEY, FC_YELLOW, "%d x contained in level",
+  DrawTextF(ED_PROPERTIES_XPOS, 5*TILEY, FC_YELLOW, "%d x contained in level",
 	    num_elements_in_level);
 
   /* check if there are elements where a score can be chosen for */
@@ -1981,10 +1992,13 @@ static void DrawPropertiesWindow()
     }
   }
 
-  if (properties_element == EL_MAMPFER)
-    DrawElementContentAreas();
-  else if (IS_AMOEBOID(properties_element))
-    DrawAmoebaContentArea();
+  if (HAS_CONTENT(properties_element))
+  {
+    if (IS_AMOEBOID(properties_element))
+      DrawAmoebaContentArea();
+    else
+      DrawElementContentAreas();
+  }
 }
 
 static void swap_numbers(int *i1, int *i2)
@@ -2369,10 +2383,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
   static boolean draw_with_brush = FALSE;
+  int id = gi->custom_id;
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
   boolean button_release_event;
-  boolean draw_level = (gi->custom_id == ED_CTRL_ID_DRAWING_LEVEL);
+  boolean draw_level = (id == ED_CTRL_ID_DRAWING_LEVEL);
   int new_element;
   int button = gi->event.button;
   int sx = gi->event.x, sy = gi->event.y;
@@ -2467,6 +2482,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 			   gi->x + sx * MINI_TILEX,
 			   gi->y + sy * MINI_TILEY,
 			   el2gfx(new_element));
+
+	if (id == ED_CTRL_ID_AMOEBA_CONTENT)
+	  level.amoebe_inhalt = new_element;
+	else if (id >= ED_CTRL_ID_ELEMCONT_0 && id <= ED_CTRL_ID_ELEMCONT_7)
+	  level.mampfer_inhalt[id - ED_CTRL_ID_ELEMCONT_0][sx][sy] =
+	    new_element;
       }
       break;
 
@@ -2726,8 +2747,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       else
       {
-	AdjustLevelScrollPosition();
-	DrawMiniLevel(level_xpos, level_ypos);
+	DrawDrawingWindow();
 	edit_mode = ED_MODE_DRAWING;
       }
       break;
@@ -2753,7 +2773,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  if (Feld[x][y] != Ur[x][y])
 	    level_changed = TRUE;
 
-      if (!level_changed)
+      if (0 && !level_changed)
       {
 	Request("Level has not changed !", REQ_CONFIRM);
 	break;

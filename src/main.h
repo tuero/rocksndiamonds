@@ -122,6 +122,7 @@ typedef unsigned char byte;
 #define EP_BIT_MAMPF3		(1<<23)
 #define EP_BIT_PUSHABLE		(1<<24)
 #define EP_BIT_PLAYER		(1<<25)
+#define EP_BIT_HAS_CONTENT	(1<<26)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -149,6 +150,7 @@ typedef unsigned char byte;
 #define IS_MAMPF3(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF3)
 #define IS_PUSHABLE(e)		(Elementeigenschaften[e] & EP_BIT_PUSHABLE)
 #define ELEM_IS_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_PLAYER)
+#define HAS_CONTENT(e)		(Elementeigenschaften[e] & EP_BIT_HAS_CONTENT)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -329,7 +331,7 @@ struct LevelInfo
   int edelsteine;
   char name[MAX_LEVNAMLEN];
   int score[LEVEL_SCORE_ELEMENTS];
-  int mampfer_inhalt[4][3][3];
+  int mampfer_inhalt[8][3][3];
   int tempo_amoebe;
   int dauer_sieb;
   int dauer_ablenk;
@@ -432,7 +434,7 @@ extern int		BX1,BY1, BX2,BY2;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimeLeft;
-extern int		MampferNr, SiebAktiv;
+extern int		MampferMax, MampferNr, SiebAktiv;
 
 extern boolean		network_player_action_received;
 
