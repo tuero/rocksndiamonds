@@ -857,6 +857,7 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
 /* mouse pointer functions                                                   */
 /* ------------------------------------------------------------------------- */
 
+#if !defined(PLATFORM_MSDOS)
 /* XPM */
 static const char *cursor_image_playfield[] =
 {
@@ -942,9 +943,11 @@ static struct MouseCursorInfo *get_cursor_from_image(const char **image)
 
   return cursor;
 }
+#endif	/* !PLATFORM_MSDOS */
 
 void SetMouseCursor(int mode)
 {
+#if !defined(PLATFORM_MSDOS)
   static struct MouseCursorInfo *cursor_playfield = NULL;
 
   if (cursor_playfield == NULL)
@@ -954,6 +957,7 @@ void SetMouseCursor(int mode)
   SDLSetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
 #elif defined(TARGET_X11_NATIVE)
   X11SetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+#endif
 #endif
 }
 

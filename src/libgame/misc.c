@@ -333,6 +333,7 @@ unsigned int get_random_number(int nr, unsigned int max)
 /* system info functions                                                     */
 /* ------------------------------------------------------------------------- */
 
+#if !defined(PLATFORM_MSDOS)
 static char *get_corrected_real_name(char *real_name)
 {
   char *real_name_new = checked_malloc(MAX_USERNAME_LEN + 1);
@@ -365,6 +366,7 @@ static char *get_corrected_real_name(char *real_name)
 
   return real_name_new;
 }
+#endif
 
 char *getLoginName()
 {

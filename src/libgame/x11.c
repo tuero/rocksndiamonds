@@ -404,6 +404,7 @@ inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
   return pixel_value;
 }
 
+#if defined(TARGET_X11_NATIVE)
 inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
 				unsigned int color_b)
 {
@@ -420,6 +421,8 @@ inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
 
   return pixel;
 }
+#endif	/* TARGET_X11_NATIVE */
+
 
 /* ------------------------------------------------------------------------- */
 /* mouse pointer functions                                                   */
