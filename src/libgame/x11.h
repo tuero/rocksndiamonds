@@ -42,6 +42,7 @@
 typedef struct X11DrawableInfo *Bitmap;
 typedef struct X11DrawableInfo *DrawWindow;
 typedef struct X11DrawableInfo *DrawBuffer;
+/* "Pixel" is already defined in X11/Intrinsic.h */
 
 typedef KeySym			Key;
 
@@ -61,8 +62,14 @@ struct X11DrawableInfo
   Drawable drawable;
   Drawable clip_mask;
   GC gc;		/* GC for normal drawing (inheritated from 'window') */
+  GC line_gc[2];	/* GC for foreground and background line drawing     */
   GC stored_clip_gc;	/* GC for masked drawing (used for whole Pixmap)     */
   GC clip_gc;		/* can be 'stored_clip_gc' or one-tile-only clip GC  */
+};
+
+struct XY
+{
+  short x, y;
 };
 
 

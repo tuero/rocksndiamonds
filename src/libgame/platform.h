@@ -24,7 +24,29 @@
 #define PLATFORM_UNIX
 #endif
 
-/* define additional keywords for several Unix platforms */
+/* ========================================================================= */
+/* define additional keywords for MS-DOS platform                            */
+/* ========================================================================= */
+
+#if defined(PLATFORM_MSDOS)
+
+#ifndef TARGET_ALLEGRO
+#define TARGET_ALLEGRO
+#endif
+
+#ifndef TARGET_X11
+#define TARGET_X11
+#endif
+
+#endif
+
+/* ========================================================================= */
+/* define additional keywords for several Unix platforms                     */
+/* ========================================================================= */
+
+#if defined(PLATFORM_UNIX) && defined(TARGET_X11)
+#define TARGET_X11_NATIVE
+#endif
 
 #if defined(linux)
 #define PLATFORM_LINUX

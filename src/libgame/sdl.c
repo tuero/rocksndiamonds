@@ -17,6 +17,10 @@
 
 #if defined(TARGET_SDL)
 
+/* ========================================================================= */
+/* video functions                                                           */
+/* ========================================================================= */
+
 inline void SDLInitVideoDisplay(void)
 {
   /* initialize SDL video */
@@ -190,6 +194,494 @@ inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
   SDL_FillRect(surface, &rect,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
 }
+
+inline void SDLDrawLine(SDL_Surface *surface, int from_x, int from_y,
+			int to_x, int to_y, Uint32 color)
+{
+  sge_Line(surface, from_x, from_y, to_x, to_y, color);
+}
+
+#if 0
+inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
+			 int num_points, Uint32 color)
+{
+  int i, x, y;
+  int line_width = 4;
+
+  for (i=0; i<num_points - 1; i++)
+  {
+    for (x=0; x<line_width; x++)
+    {
+      for (y=0; y<line_width; y++)
+      {
+	int dx = x - line_width / 2;
+	int dy = y - line_width / 2;
+
+	if ((x == 0 && y == 0) ||
+	    (x == 0 && y == line_width - 1) ||
+	    (x == line_width - 1 && y == 0) ||
+	    (x == line_width - 1 && y == line_width - 1))
+	  continue;
+
+	sge_Line(surface, points[i].x + dx, points[i].y + dy,
+		 points[i+1].x + dx, points[i+1].y + dy, color);
+      }
+    }
+  }
+}
+#endif
+
+
+/* ========================================================================= */
+/* The following functions have been taken from the SGE library              */
+/* (SDL Graphics Extension Library) by Anders Lindström                      */
+/* http://www.etek.chalmers.se/~e8cal1/sge/index.html                        */
+/* ========================================================================= */
+
+void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  if (x >= 0 && x <= surface->w - 1 && y >= 0 && y <= surface->h - 1)
+  {
+    switch (surface->format->BytesPerPixel)
+    {
+      case 1:
+      {
+	/* Assuming 8-bpp */
+	*((Uint8 *)surface->pixels + y*surface->pitch + x) = color;
+      }
+      break;
+
+      case 2:
+      {
+	/* Probably 15-bpp or 16-bpp */
+	*((Uint16 *)surface->pixels + y*surface->pitch/2 + x) = color;
+      }
+      break;
+
+      case 3:
+      {
+	/* Slow 24-bpp mode, usually not used */
+	Uint8 *pix;
+	int shift;
+
+	/* Gack - slow, but endian correct */
+	pix = (Uint8 *)surface->pixels + y * surface->pitch + x*3;
+	shift = surface->format->Rshift;
+	*(pix+shift/8) = color>>shift;
+	shift = surface->format->Gshift;
+	*(pix+shift/8) = color>>shift;
+	shift = surface->format->Bshift;
+	*(pix+shift/8) = color>>shift;
+      }
+      break;
+
+      case 4:
+      {
+	/* Probably 32-bpp */
+	*((Uint32 *)surface->pixels + y*surface->pitch/4 + x) = color;
+      }
+      break;
+    }
+  }
+}
+
+void _PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
+		  Uint8 R, Uint8 G, Uint8 B)
+{
+  _PutPixel(surface, x, y, SDL_MapRGB(surface->format, R, G, B));
+}
+
+void _PutPixel8(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  *((Uint8 *)surface->pixels + y*surface->pitch + x) = color;
+}
+
+void _PutPixel16(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  *((Uint16 *)surface->pixels + y*surface->pitch/2 + x) = color;
+}
+
+void _PutPixel24(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  Uint8 *pix;
+  int shift;
+
+  /* Gack - slow, but endian correct */
+  pix = (Uint8 *)surface->pixels + y * surface->pitch + x*3;
+  shift = surface->format->Rshift;
+  *(pix+shift/8) = color>>shift;
+  shift = surface->format->Gshift;
+  *(pix+shift/8) = color>>shift;
+  shift = surface->format->Bshift;
+  *(pix+shift/8) = color>>shift;
+}
+
+void _PutPixel32(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  *((Uint32 *)surface->pixels + y*surface->pitch/4 + x) = color;
+}
+
+void _PutPixelX(SDL_Surface *dest,Sint16 x,Sint16 y,Uint32 color)
+{
+  switch (dest->format->BytesPerPixel)
+  {
+    case 1:
+      *((Uint8 *)dest->pixels + y*dest->pitch + x) = color;
+      break;
+
+    case 2:
+      *((Uint16 *)dest->pixels + y*dest->pitch/2 + x) = color;
+      break;
+
+    case 3:
+      _PutPixel24(dest,x,y,color);
+      break;
+
+    case 4:
+      *((Uint32 *)dest->pixels + y*dest->pitch/4 + x) = color;
+      break;
+  }
+}
+
+void sge_PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+{
+  if (SDL_MUSTLOCK(surface))
+  {
+    if (SDL_LockSurface(surface) < 0)
+    {
+      return;
+    }
+  }
+
+  _PutPixel(surface, x, y, color);
+
+  if (SDL_MUSTLOCK(surface))
+  {
+    SDL_UnlockSurface(surface);
+  }
+}
+
+void sge_PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
+		  Uint8 R, Uint8 G, Uint8 B)
+{
+  sge_PutPixel(surface, x, y, SDL_MapRGB(surface->format, R, G, B));
+}
+
+Sint32 sge_CalcYPitch(SDL_Surface *dest, Sint16 y)
+{
+  if (y >= 0 && y <= dest->h - 1)
+  {
+    switch (dest->format->BytesPerPixel)
+    {
+      case 1:
+	return y*dest->pitch;
+	break;
+
+      case 2:
+	return y*dest->pitch/2;
+	break;
+
+      case 3:
+	return y*dest->pitch;
+	break;
+
+      case 4:
+	return y*dest->pitch/4;
+	break;
+    }
+  }
+
+  return -1;
+}
+
+void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch, Uint32 color)
+{
+  if (x >= 0 && x <= surface->w - 1 && ypitch >= 0)
+  {
+    switch (surface->format->BytesPerPixel)
+    {
+      case 1:
+      {
+	/* Assuming 8-bpp */
+	*((Uint8 *)surface->pixels + ypitch + x) = color;
+      }
+      break;
+
+      case 2:
+      {
+	/* Probably 15-bpp or 16-bpp */
+	*((Uint16 *)surface->pixels + ypitch + x) = color;
+      }
+      break;
+
+      case 3:
+      {
+	/* Slow 24-bpp mode, usually not used */
+	Uint8 *pix;
+	int shift;
+
+	/* Gack - slow, but endian correct */
+	pix = (Uint8 *)surface->pixels + ypitch + x*3;
+	shift = surface->format->Rshift;
+	*(pix+shift/8) = color>>shift;
+	shift = surface->format->Gshift;
+	*(pix+shift/8) = color>>shift;
+	shift = surface->format->Bshift;
+	*(pix+shift/8) = color>>shift;
+      }
+      break;
+
+      case 4:
+      {
+	/* Probably 32-bpp */
+	*((Uint32 *)surface->pixels + ypitch + x) = color;
+      }
+      break;
+    }
+  }
+}
+
+void sge_HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
+	       Uint32 Color)
+{
+  SDL_Rect l;
+
+  if (SDL_MUSTLOCK(Surface))
+  {
+    if (SDL_LockSurface(Surface) < 0)
+    {
+      return;
+    }
+  }
+
+  if (x1 > x2)
+  {
+    Sint16 tmp = x1;
+    x1 = x2;
+    x2 = tmp;
+  }
+
+  /* Do the clipping */
+  if (y < 0 || y > Surface->h - 1 || x1 > Surface->w - 1 || x2 < 0)
+    return;
+  if (x1 < 0)
+    x1 = 0;
+  if (x2 > Surface->w - 1)
+    x2 = Surface->w - 1;
+
+  l.x = x1;
+  l.y = y;
+  l.w = x2 - x1 + 1;
+  l.h = 1;
+
+  SDL_FillRect(Surface, &l, Color);
+
+  if (SDL_MUSTLOCK(Surface))
+  {
+    SDL_UnlockSurface(Surface);
+  }
+}
+
+void sge_HLineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
+		  Uint8 R, Uint8 G, Uint8 B)
+{
+  sge_HLine(Surface, x1, x2, y, SDL_MapRGB(Surface->format, R, G, B));
+}
+
+void _HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y, Uint32 Color)
+{
+  SDL_Rect l;
+
+  if (x1 > x2)
+  {
+    Sint16 tmp = x1;
+    x1 = x2;
+    x2 = tmp;
+  }
+
+  /* Do the clipping */
+  if (y < 0 || y > Surface->h - 1 || x1 > Surface->w - 1 || x2 < 0)
+    return;
+  if (x1 < 0)
+    x1 = 0;
+  if (x2 > Surface->w - 1)
+    x2 = Surface->w - 1;
+
+  l.x = x1;
+  l.y = y;
+  l.w = x2 - x1 + 1;
+  l.h = 1;
+
+  SDL_FillRect(Surface, &l, Color);
+}
+
+void sge_VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
+	       Uint32 Color)
+{
+  SDL_Rect l;
+
+  if (SDL_MUSTLOCK(Surface))
+  {
+    if (SDL_LockSurface(Surface) < 0)
+    {
+      return;
+    }
+  }
+
+  if (y1 > y2)
+  {
+    Sint16 tmp = y1;
+    y1 = y2;
+    y2 = tmp;
+  }
+
+  /* Do the clipping */
+  if (x < 0 || x > Surface->w - 1 || y1 > Surface->h - 1 || y2 < 0)
+    return;
+  if (y1 < 0)
+    y1 = 0;
+  if (y2 > Surface->h - 1)
+    y2 = Surface->h - 1;
+
+  l.x = x;
+  l.y = y1;
+  l.w = 1;
+  l.h = y2 - y1 + 1;
+
+  SDL_FillRect(Surface, &l, Color);
+
+  if (SDL_MUSTLOCK(Surface))
+  {
+    SDL_UnlockSurface(Surface);
+  }
+}
+
+void sge_VLineRGB(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
+		  Uint8 R, Uint8 G, Uint8 B)
+{
+  sge_VLine(Surface, x, y1, y2, SDL_MapRGB(Surface->format, R, G, B));
+}
+
+void _VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2, Uint32 Color)
+{
+  SDL_Rect l;
+
+  if (y1 > y2)
+  {
+    Sint16 tmp = y1;
+    y1 = y2;
+    y2 = tmp;
+  }
+
+  /* Do the clipping */
+  if (x < 0 || x > Surface->w - 1 || y1 > Surface->h - 1 || y2 < 0)
+    return;
+  if (y1 < 0)
+    y1 = 0;
+  if (y2 > Surface->h - 1)
+    y2 = Surface->h - 1;
+
+  l.x = x;
+  l.y = y1;
+  l.w = 1;
+  l.h = y2 - y1 + 1;
+
+  SDL_FillRect(Surface, &l, Color);
+}
+
+void sge_DoLine(SDL_Surface *Surface, Sint16 x1, Sint16 y1,
+		Sint16 x2, Sint16 y2, Uint32 Color,
+		void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
+			      Uint32 Color))
+{
+  Sint16 dx, dy, sdx, sdy, x, y, px, py;
+
+  dx = x2 - x1;
+  dy = y2 - y1;
+
+  sdx = (dx < 0) ? -1 : 1;
+  sdy = (dy < 0) ? -1 : 1;
+
+  dx = sdx * dx + 1;
+  dy = sdy * dy + 1;
+
+  x = y = 0;
+
+  px = x1;
+  py = y1;
+
+  if (dx >= dy)
+  {
+    for (x = 0; x < dx; x++)
+    {
+      Callback(Surface, px, py, Color);
+
+      y += dy;
+      if (y >= dx)
+      {
+	y -= dx;
+	py += sdy;
+      }
+
+      px += sdx;
+    }
+  }
+  else
+  {
+    for (y = 0; y < dy; y++)
+    {
+      Callback(Surface, px, py, Color);
+
+      x += dx;
+      if (x >= dy)
+      {
+	x -= dy;
+	px += sdx;
+      }
+
+      py += sdy;
+    }
+  }
+}
+
+void sge_DoLineRGB(SDL_Surface *Surface, Sint16 X1, Sint16 Y1,
+		   Sint16 X2, Sint16 Y2, Uint8 R, Uint8 G, Uint8 B,
+		   void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
+				 Uint32 Color))
+{
+  sge_DoLine(Surface, X1, Y1, X2, Y2,
+	     SDL_MapRGB(Surface->format, R, G, B), Callback);
+}
+
+void sge_Line(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2,
+	      Uint32 Color)
+{
+  if (SDL_MUSTLOCK(Surface))
+  {
+    if (SDL_LockSurface(Surface) < 0)
+      return;
+   }
+
+   /* Draw the line */
+   sge_DoLine(Surface, x1, y1, x2, y2, Color, _PutPixel);
+
+   /* unlock the display */
+   if (SDL_MUSTLOCK(Surface))
+   {
+      SDL_UnlockSurface(Surface);
+   }
+}
+
+void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
+		 Sint16 y2, Uint8 R, Uint8 G, Uint8 B)
+{
+  sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
+}
+
+
+/* ========================================================================= */
+/* audio functions                                                           */
+/* ========================================================================= */
 
 inline boolean SDLOpenAudio(void)
 {

@@ -56,18 +56,19 @@
 #define REDRAW_VIDEO_2		(1 << 5)
 #define REDRAW_VIDEO_3		(1 << 6)
 #define REDRAW_MICROLEVEL	(1 << 7)
-#define REDRAW_FROM_BACKBUFFER	(1 << 8)
+#define REDRAW_MICROLABEL	(1 << 8)
+#define REDRAW_FROM_BACKBUFFER	(1 << 9)
 #define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
 				 REDRAW_VIDEO_2 | \
 				 REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1 << 9)
+#define REDRAW_DOOR_3		(1 << 10)
 #define REDRAW_DOORS		(REDRAW_DOOR_1 | \
 				 REDRAW_DOOR_2 | \
 				 REDRAW_DOOR_3)
 #define REDRAW_MAIN		(REDRAW_FIELD | \
 				 REDRAW_TILES | \
 				 REDRAW_MICROLEVEL)
-#define REDRAW_FPS		(1 << 10)
+#define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
 
@@ -273,6 +274,10 @@ inline void SetClipMask(Bitmap, GC, Pixmap);
 inline void SetClipOrigin(Bitmap, GC, int, int);
 inline void BlitBitmapMasked(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap, int, int, int, int);
+inline void DrawLines(Bitmap, struct XY *, int, Pixel);
+inline Pixel GetPixelFromRGB(Bitmap, unsigned int, unsigned int, unsigned int);
+inline Pixel GetPixelFromRGBcompact(Bitmap, unsigned int);
+
 inline void FlushDisplay(void);
 inline void SyncDisplay(void);
 inline void KeyboardAutoRepeatOn(void);

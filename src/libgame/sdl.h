@@ -37,6 +37,7 @@
 typedef struct SDLSurfaceInfo  *Bitmap;
 typedef struct SDLSurfaceInfo  *DrawBuffer;
 typedef struct SDLSurfaceInfo  *DrawWindow;
+typedef Uint32			Pixel;
 
 typedef SDLKey			Key;
 
@@ -63,6 +64,11 @@ struct SDLSurfaceInfo
   SDL_Surface *surface_masked;
   GC gc;
   GC stored_clip_gc;
+};
+
+struct XY
+{
+  short x, y;
 };
 
 
@@ -314,6 +320,9 @@ inline boolean SDLSetVideoMode(DrawBuffer *, boolean);
 inline void SDLCopyArea(Bitmap, Bitmap, int, int, int, int, int, int, int);
 inline void SDLFillRectangle(Bitmap, int, int, int, int, unsigned int);
 inline void SDLDrawSimpleLine(SDL_Surface *, int, int, int, int, unsigned int);
+inline void SDLDrawLine(SDL_Surface *, int, int, int, int, Uint32);
+/* functions from SGE library */
+void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
 inline boolean SDLOpenAudio(void);
 inline void SDLCloseAudio(void);

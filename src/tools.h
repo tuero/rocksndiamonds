@@ -63,16 +63,6 @@ void BackToFront();
 void FadeToFront();
 void ClearWindow();
 
-#if 0
-int getFontWidth(int, int);
-int getFontHeight(int, int);
-void DrawInitText(char *, int, int);
-void DrawTextF(int, int, int, char *, ...);
-void DrawTextFCentered(int, int, char *, ...);
-void DrawText(int, int, char *, int, int);
-void DrawTextExt(DrawBuffer, GC, int, int, char *, int, int);
-#endif
-
 void MarkTileDirty(int, int);
 void SetBorderElement();
 

@@ -207,15 +207,20 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
 #else
   Pixmap pixmap;
 
-  if (!(pixmap = XCreatePixmap(display, window->drawable,
-			       width, height, real_depth)))
+  if ((pixmap = XCreatePixmap(display, window->drawable,
+			      width, height, real_depth))
+      == None)
     Error(ERR_EXIT, "cannot create pixmap");
+
   new_bitmap->drawable = pixmap;
 
   if (window == NULL)
     Error(ERR_EXIT, "Window GC needed for Bitmap -- create Window first");
+
   new_bitmap->gc = window->gc;
 
+  new_bitmap->line_gc[0] = window->line_gc[0];
+  new_bitmap->line_gc[1] = window->line_gc[1];
 #endif
 
   return new_bitmap;
@@ -337,6 +342,91 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
   XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
   XSetForeground(display, bitmap->gc, BlackPixel(display, screen));
 #endif
+}
+
+#if !defined(TARGET_X11_NATIVE)
+inline void DrawLine(Bitmap bitmap, int from_x, int from_y,
+		     int to_x, int to_y, Pixel pixel, int line_width)
+{
+  int x, y;
+
+  for (x=0; x<line_width; x++)
+  {
+    for (y=0; y<line_width; y++)
+    {
+      int dx = x - line_width / 2;
+      int dy = y - line_width / 2;
+
+      if ((x == 0 && y == 0) ||
+	  (x == 0 && y == line_width - 1) ||
+	  (x == line_width - 1 && y == 0) ||
+	  (x == line_width - 1 && y == line_width - 1))
+	continue;
+
+#if defined(TARGET_SDL)
+      sge_Line(bitmap->surface,
+	       from_x + dx, from_y + dy, to_x + dx, to_y + dy, pixel);
+#elif defined(TARGET_ALLEGRO)
+      AllegroDrawLine(bitmap->drawable, from_x + dx, from_y + dy,
+		      to_x + dx, to_y + dy, pixel);
+#endif
+    }
+  }
+}
+#endif
+
+inline void DrawLines(Bitmap bitmap, struct XY *points, int num_points,
+		      Pixel pixel)
+{
+#if !defined(TARGET_X11_NATIVE)
+  int line_width = 4;
+  int i;
+
+  for (i=0; i<num_points - 1; i++)
+    DrawLine(bitmap, points[i].x, points[i].y,
+	     points[i + 1].x, points[i + 1].y, pixel, line_width);
+
+  /*
+  SDLDrawLines(bitmap->surface, points, num_points, pixel);
+  */
+#else
+  XSetForeground(display, bitmap->line_gc[1], pixel);
+  XDrawLines(display, bitmap->drawable, bitmap->line_gc[1],
+	     (XPoint *)points, num_points, CoordModeOrigin);
+  /*
+  XSetForeground(display, gc, BlackPixel(display, screen));
+  */
+#endif
+}
+
+inline Pixel GetPixelFromRGB(Bitmap bitmap, unsigned int color_r,
+			     unsigned int color_g, unsigned int color_b)
+{
+  Pixel pixel;
+
+#if defined(TARGET_SDL)
+  pixel = SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
+#elif defined(TARGET_X11_NATIVE)
+  XColor xcolor;
+
+  xcolor.flags = DoRed | DoGreen | DoBlue;
+  xcolor.red = (color_r << 8);
+  xcolor.green = (color_g << 8);
+  xcolor.blue = (color_b << 8);
+  XAllocColor(display, cmap, &xcolor);
+  pixel = xcolor.pixel;
+#endif
+
+  return pixel;
+}
+
+inline Pixel GetPixelFromRGBcompact(Bitmap bitmap, unsigned int color)
+{
+  unsigned int color_r = (color >> 16) & 0xff;
+  unsigned int color_g = (color >>  8) & 0xff;
+  unsigned int color_b = (color >>  0) & 0xff;
+
+  return GetPixelFromRGB(bitmap, color_r, color_g, color_b);
 }
 
 /* execute all pending screen drawing operations */

@@ -638,6 +638,8 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     if (!pix[pos]->drawable)
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
 
+    pix[pos]->gc = window->gc;
+
 #if 0
     /* setting pix_masked[] to pix[] allows BlitBitmapMasked() to always
        use pix_masked[], although they are the same when not using SDL */

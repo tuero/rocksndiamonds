@@ -66,7 +66,7 @@ SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs)
 endif
 
 ifeq ($(TARGET),allegro)
-SYS_CFLAGS = -DTARGET_X11 -I$(CROSS_PATH_MSDOS)/include
+SYS_CFLAGS = -DTARGET_ALLEGRO -I$(CROSS_PATH_MSDOS)/include
 SYS_LDFLAGS = -lalleg
 endif
 

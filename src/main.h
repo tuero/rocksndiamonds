@@ -30,11 +30,6 @@
 
 #include "libgame/libgame.h"
 
-#ifndef FALSE
-#define FALSE		0
-#define TRUE		(!FALSE)
-#endif
-
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
 #define WIN_SDL_DEPTH	16	/* !!! change this !!! */
@@ -59,21 +54,6 @@
 #define MAX_LEV_FIELDY	128
 
 #define MAX_PLAYERS	4
-
-#if 0
-#ifndef MIN
-#define MIN(a,b) 	((a) < (b) ? (a) : (b))
-#endif
-#ifndef MAX
-#define MAX(a,b) 	((a) > (b) ? (a) : (b))
-#endif
-#ifndef ABS
-#define ABS(a)		((a) < 0 ? -(a) : (a))
-#endif
-#ifndef SIGN
-#define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
-#endif
-#endif
 
 #define SCREENX(a)	((a) - scroll_x)
 #define SCREENY(a)	((a) - scroll_y)
@@ -226,9 +206,6 @@
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
-#if 0
-#define GADGET_FRAME_DELAY	150	/* delay between gadget actions */
-#endif
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
@@ -408,69 +385,23 @@ struct GlobalInfo
   int fps_slowdown_factor;
 };
 
-#if 0
-extern DrawWindow	window;
-extern DrawBuffer	backbuffer;
-extern GC		gc;
-#endif
-
-#if 0
-extern GC		clip_gc[];
-#endif
 extern GC		tile_clip_gc;
 extern Bitmap		pix[];
-#if 0
-extern Bitmap		pix_masked[];
-
-extern Bitmap		tile_masked[];
-
-extern Pixmap		clipmask[];
-#endif
 extern Pixmap		tile_clipmask[];
-
-#if 0
-extern DrawBuffer	drawto;
-#endif
 extern DrawBuffer	drawto_field, fieldbuffer;
-#if 0
-extern Colormap		cmap;
-#endif
-
-#if 0
-extern char	       *sound_device_name;
-#endif
 
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
-
-#if 0
-extern char	       *program_name;
-#endif
 
 extern int		game_status;
 extern boolean		level_editor_test_game;
 extern boolean		network_playing;
 
-#if 0
-extern int		button_status;
-extern boolean		motion_status;
-#endif
-
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
 
-#if 0
-extern boolean		fullscreen_available;
-extern boolean		fullscreen_enabled;
-#endif
-
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
-
-#if 0
-extern int		redraw_mask;
-extern int		redraw_tiles;
-#endif
 
 extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -502,40 +433,19 @@ extern int		SBY_Upper, SBY_Lower;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 
-#if 0
-extern int		FrameCounter;
-#endif
-
 extern int		TimeFrames, TimePlayed, TimeLeft;
 extern boolean		SiebAktiv;
 extern int		SiebCount;
 
 extern boolean		network_player_action_received;
 
-#if 0
-extern struct LevelDirInfo     *leveldir_first, *leveldir_current;
-#endif
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
-#if 0
-extern struct SampleInfo	Sound[];
-#endif
 extern struct JoystickInfo	joystick[];
-
-#if 0
-extern struct OptionInfo	options;
-#endif
-
 extern struct SetupInfo		setup;
 extern struct GameInfo		game;
-
-#if 0
-extern struct VideoSystemInfo	video;
-extern struct AudioSystemInfo	audio;
-#endif
-
 extern struct GlobalInfo	global;
 
 extern char		*sound_name[];
@@ -581,21 +491,6 @@ extern int		num_element_info;
 #define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL_YPOS		(MICROLEV_YPOS + MICROLEV_YSIZE + 7)
 
-#if 0
-#define FONT1_XSIZE		32
-#define FONT1_YSIZE		32
-#define FONT2_XSIZE		14
-#define FONT2_YSIZE		14
-#define FONT3_XSIZE		11
-#define FONT3_YSIZE		14
-#define FONT4_XSIZE		16
-#define FONT4_YSIZE		16
-#define FONT5_XSIZE		10
-#define FONT5_YSIZE		14
-#define FONT6_XSIZE		16
-#define FONT6_YSIZE		32
-#endif
-
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
 #define MINI_GFX_STARTX		SX
@@ -631,11 +526,6 @@ extern int		num_element_info;
 #define MORE_PER_LINE		16
 #define MINI_MORE_PER_LINE	16
 #define MICRO_MORE_PER_LINE	16
-
-#if 0
-#define FONT_CHARS_PER_LINE	16
-#define FONT_LINES_PER_FONT	4
-#endif
 
 /* game elements:
 **	  0 - 499: real elements, stored in level file
@@ -1618,21 +1508,6 @@ extern int		num_element_info;
 #define MV_UP			(1 << 2)
 #define MV_DOWN	       		(1 << 3)
 
-#if 0
-/* font types */
-#define FS_SMALL		0
-#define FS_BIG			1
-#define FS_MEDIUM		2
-/* font colors */
-#define FC_RED			0
-#define FC_BLUE			1
-#define FC_GREEN		2
-#define FC_YELLOW		3
-#define FC_SPECIAL1		4
-#define FC_SPECIAL2		5
-#define FC_SPECIAL3		6
-#endif
-
 /* values for game_status */
 #define EXITGAME		0
 #define MAINMENU		1
@@ -1645,25 +1520,6 @@ extern int		num_element_info;
 #define SETUP			8
 #define SETUPINPUT		9
 #define CALIBRATION		10
-
-#if 0
-#ifndef RO_GAME_DIR
-#define RO_GAME_DIR		"."
-#endif
-
-#ifndef RW_GAME_DIR
-#define RW_GAME_DIR		"."
-#endif
-
-#define RO_BASE_PATH		RO_GAME_DIR
-#define RW_BASE_PATH		RW_GAME_DIR
-
-#define GRAPHICS_DIRECTORY	"graphics"
-#define SOUNDS_DIRECTORY	"sounds"
-#define LEVELS_DIRECTORY	"levels"
-#define TAPES_DIRECTORY		"tapes"
-#define SCORES_DIRECTORY	"scores"
-#endif
 
 #define PROGRAM_VERSION_STRING	"1.5.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
@@ -1679,76 +1535,6 @@ extern int		num_element_info;
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
-
-#if 0
-/* default name for empty highscore entry */
-#define EMPTY_PLAYER_NAME	"no name"
-
-/* default name for unknown player names */
-#define ANONYMOUS_NAME		"anonymous"
-
-/* default name for new levels */
-#define NAMELESS_LEVEL_NAME	"nameless level"
-#endif
-
-#if 0
-/* values for button_status */
-#define MB_NOT_PRESSED		FALSE
-#define MB_RELEASED		FALSE
-#define MB_PRESSED		TRUE
-#define MB_MENU_CHOICE		FALSE
-#define MB_MENU_MARK		TRUE
-#define MB_MENU_INITIALIZE	(-1)
-#define MB_LEFTBUTTON		1
-#define MB_MIDDLEBUTTON		2
-#define MB_RIGHTBUTTON		3
-#endif
-
-#if 0
-/* values for redraw_mask */
-#define REDRAW_ALL		(1 << 0)
-#define REDRAW_FIELD		(1 << 1)
-#define REDRAW_TILES		(1 << 2)
-#define REDRAW_DOOR_1		(1 << 3)
-#define REDRAW_VIDEO_1		(1 << 4)
-#define REDRAW_VIDEO_2		(1 << 5)
-#define REDRAW_VIDEO_3		(1 << 6)
-#define REDRAW_MICROLEVEL	(1 << 7)
-#define REDRAW_FROM_BACKBUFFER	(1 << 8)
-#define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
-				 REDRAW_VIDEO_2 | \
-				 REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1 << 9)
-#define REDRAW_DOORS		(REDRAW_DOOR_1 | \
-				 REDRAW_DOOR_2 | \
-				 REDRAW_DOOR_3)
-#define REDRAW_MAIN		(REDRAW_FIELD | \
-				 REDRAW_TILES | \
-				 REDRAW_MICROLEVEL)
-#define REDRAW_FPS		(1 << 10)
-#define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
-#endif
-
-#if 0
-/* areas in bitmap PIX_DOOR */
-/* meaning in PIX_DB_DOOR: (3 PAGEs)
-   PAGEX1: 1. buffer for DOOR_1
-   PAGEX2: 2. buffer for DOOR_1
-   PAGEX3: buffer for animations
-*/
-
-#define DOOR_GFX_PAGESIZE	DXSIZE
-#define DOOR_GFX_PAGEX1		(0 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX2		(1 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX3		(2 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX4		(3 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX5		(4 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX6		(5 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX7		(6 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX8		(7 * DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEY1		0
-#define DOOR_GFX_PAGEY2		DYSIZE
-#endif
 
 /* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
 #define ANIM_NORMAL		0

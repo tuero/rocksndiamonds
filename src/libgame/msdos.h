@@ -493,8 +493,25 @@
 #define MapNotify		19
 #define ClientMessage		33
 
+#define LineSolid               0
+#define LineOnOffDash           1
+#define LineDoubleDash          2
+
+#define CapNotLast              0
+#define CapButt                 1
+#define CapRound                2
+#define CapProjecting           3
+
+#define JoinMiter               0
+#define JoinRound               1
+#define JoinBevel               2
+
 #define GCForeground            (1L << 2)
 #define GCBackground            (1L << 3)
+#define GCLineWidth             (1L << 4)
+#define GCLineStyle             (1L << 5)
+#define GCCapStyle              (1L << 6)
+#define GCJoinStyle             (1L << 7)
 #define GCGraphicsExposures     (1L << 16)
 #define GCClipMask		(1L << 19)
 
@@ -624,6 +641,12 @@ typedef struct
   int clip_x_origin;		/* x origin for clipping */
   int clip_y_origin;		/* y origin for clipping */
   unsigned long value_mask;
+  int line_width;		/* line width */
+  int line_style;		/* LineSolid, LineOnOffDash, LineDoubleDash */
+  int cap_style;		/* CapNotLast, CapButt, 
+				   CapRound, CapProjecting */
+  int join_style;		/* JoinMiter, JoinRound, JoinBevel */
+
 } XGCValues;
 
 typedef struct
@@ -707,6 +730,8 @@ Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
 		   int *, int *, unsigned int *);
 void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
+
+void AllegroDrawLine(Drawable, int, int, int, int, Pixel);
 
 Bool MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);

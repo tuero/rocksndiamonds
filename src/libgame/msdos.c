@@ -919,6 +919,39 @@ void XAutoRepeatOff(Display *display)
   keyboard_auto_repeat = FALSE;
 }
 
+void AllegroDrawLine(Drawable d, int from_x, int from_y, int to_x, int to_y,
+		     Pixel color)
+{
+  boolean mouse_off = FALSE;
+
+  if ((BITMAP *)d == video_bitmap)
+  {
+    int dx = AllegroDefaultScreen().x;
+    int dy = AllegroDefaultScreen().y;
+    int x1, y1, x2, y2;
+
+    from_x += dx;
+    from_y += dy;
+    to_x += dx;
+    to_y += dy;
+
+    x1 = (from_x < to_x ? from_x : to_x);
+    y1 = (from_y < to_y ? from_y : to_y);
+    x2 = (from_x < to_x ? to_x : from_x);
+    y2 = (from_y < to_y ? to_y : from_y);
+
+    freeze_mouse_flag = TRUE;
+    mouse_off = hide_mouse(display, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+  }
+
+  line((BITMAP *)d, from_x, from_y, to_x, to_y, color);
+
+  if (mouse_off)
+    unhide_mouse(display);
+
+  freeze_mouse_flag = FALSE;
+}
+
 Bool MSDOSOpenAudio(void)
 {
   return allegro_init_audio();

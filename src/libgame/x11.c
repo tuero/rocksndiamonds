@@ -111,6 +111,7 @@ static DrawWindow X11InitWindow()
   unsigned long pen_fg = WhitePixel(display,screen);
   unsigned long pen_bg = BlackPixel(display,screen);
   const int width = video.width, height = video.height;
+  int i;
 
 #if 0
 #if !defined(PLATFORM_MSDOS)
@@ -212,6 +213,23 @@ static DrawWindow X11InitWindow()
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   new_window->gc =
     XCreateGC(display, new_window->drawable, gc_valuemask, &gc_values);
+
+  /* create GCs for line drawing (black and white) */
+  for(i=0; i<2; i++)
+  {
+    gc_values.graphics_exposures = False;
+    gc_values.foreground = (i ? pen_fg : pen_bg);
+    gc_values.background = pen_bg;
+    gc_values.line_width = 4;
+    gc_values.line_style = LineSolid;
+    gc_values.cap_style = CapRound;
+    gc_values.join_style = JoinRound;
+
+    gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground |
+                   GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle;
+    new_window->line_gc[i] =
+      XCreateGC(display, new_window->drawable, gc_valuemask, &gc_values);
+  }
 
   return new_window;
 }
