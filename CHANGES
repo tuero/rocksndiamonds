@@ -1,7 +1,10 @@
 Release Version 2.0.1 [?? ??? 2001]
 -----------------------------------
 	- bug in explosion code fixed that broke level 24 of "Baby Ghost Mine"
-	- Supaplex "orange disk" emulation bug fixed thanks to Mihail Milushev
+	- several Supaplex emulation bugs fixed thanks to Mihail Milushev:
+	  + orange disk does not fall off from slippery elements
+	  + infotrons kill electrons and snik snaks and trigger orange disks
+	  + explosion chain reactions are now a bit slower than murphy
 
 Release Version 2.0.0 [01 JAN 2001]
 -----------------------------------

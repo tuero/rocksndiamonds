@@ -1278,7 +1278,7 @@ void CheckDynamite(int x, int y)
 void Explode(int ex, int ey, int phase, int mode)
 {
   int x, y;
-  int num_phase = 9, delay = 2;
+  int num_phase = 9, delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
   int first_phase_after_start = EX_PHASE_START + 1;
@@ -1885,6 +1885,13 @@ void Impact(int x, int y)
 	Bang(x, y+1);
 	return;
       }
+    }
+    else if ((element == EL_SP_INFOTRON || element == EL_SP_ZONK) &&
+	     (smashed == EL_SP_SNIKSNAK || smashed == EL_SP_ELECTRON ||
+	      smashed == EL_SP_DISK_ORANGE))
+    {
+      Bang(x, y+1);
+      return;
     }
     else if (element == EL_FELSBROCKEN ||
 	     element == EL_SP_ZONK ||
@@ -3437,14 +3444,14 @@ void AmoebeAbleger(int ax, int ay)
   if (element != EL_AMOEBE_NASS || neway < ay || !IS_FREE(newax, neway) ||
       (neway == lev_fieldy - 1 && newax != ax))
   {
-    Feld[newax][neway] = EL_AMOEBING;
+    Feld[newax][neway] = EL_AMOEBING;	/* simple growth of new amoeba tile */
     Store[newax][neway] = element;
   }
   else if (neway == ay)
-    Feld[newax][neway] = EL_TROPFEN;
+    Feld[newax][neway] = EL_TROPFEN;	/* drop left or right from amoeba */
   else
   {
-    InitMovingField(ax, ay, MV_DOWN);
+    InitMovingField(ax, ay, MV_DOWN);	/* drop dripping out of amoeba */
     Feld[ax][ay] = EL_AMOEBA_DRIPPING;
     Store[ax][ay] = EL_TROPFEN;
     ContinueMoving(ax, ay);
@@ -4436,8 +4443,10 @@ void GameActions()
       AmoebeWaechst(x, y);
     else if (element == EL_DEAMOEBING)
       AmoebeSchrumpft(x, y);
+#if 1
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
+#endif
     else if (element == EL_LIFE || element == EL_LIFE_ASYNC)
       Life(x, y);
     else if (element == EL_ABLENK_EIN)
@@ -4520,6 +4529,44 @@ void GameActions()
       }
     }
   }
+
+#if 0
+  /* new experimental amoeba growth stuff*/
+#if 1
+  if (!(FrameCounter % 8))
+#endif
+  {
+    static unsigned long random = 1684108901;
+
+    for (i = 0; i < level.amoeba_speed * 4; i++)
+    {
+#if 1
+      x = (random >> 10) % lev_fieldx;
+      y = (random >> 20) % lev_fieldy;
+#else
+      x = RND(lev_fieldx);
+      y = RND(lev_fieldy);
+#endif
+      element = Feld[x][y];
+
+      if (!IS_PLAYER(x,y) &&
+	  (element == EL_LEERRAUM ||
+	   element == EL_ERDREICH ||
+	   element == EL_MORAST_LEER ||
+	   element == EL_BLURB_LEFT ||
+	   element == EL_BLURB_RIGHT))
+      {
+	if ((IN_LEV_FIELD(x, y-1) && Feld[x][y-1] == EL_AMOEBE_NASS) ||
+	    (IN_LEV_FIELD(x-1, y) && Feld[x-1][y] == EL_AMOEBE_NASS) ||
+	    (IN_LEV_FIELD(x+1, y) && Feld[x+1][y] == EL_AMOEBE_NASS) ||
+	    (IN_LEV_FIELD(x, y+1) && Feld[x][y+1] == EL_AMOEBE_NASS))
+	  Feld[x][y] = EL_TROPFEN;
+      }
+
+      random = random * 129 + 1;
+    }
+  }
+#endif
 
 #if 0
   if (game.explosions_delayed)
