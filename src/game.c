@@ -179,6 +179,50 @@ void GetPlayerConfig()
   InitJoysticks();
 }
 
+static int getBeltNrFromElement(int element)
+{
+  return (element < EL_BELT2_LEFT ? 0 :
+	  element < EL_BELT3_LEFT ? 1 :
+	  element < EL_BELT4_LEFT ? 2 : 3);
+}
+
+static int getBeltNrFromSwitchElement(int element)
+{
+  return (element < EL_BELT2_SWITCH_L ? 0 :
+	  element < EL_BELT3_SWITCH_L ? 1 :
+	  element < EL_BELT4_SWITCH_L ? 2 : 3);
+}
+
+static int getBeltDirNrFromSwitchElement(int element)
+{
+  static int belt_base_element[4] =
+  {
+    EL_BELT1_SWITCH_L,
+    EL_BELT2_SWITCH_L,
+    EL_BELT3_SWITCH_L,
+    EL_BELT4_SWITCH_L
+  };
+
+  int belt_nr = getBeltNrFromSwitchElement(element);
+  int belt_dir_nr = element - belt_base_element[belt_nr];
+
+  return (belt_dir_nr % 3);
+}
+
+static int getBeltDirFromSwitchElement(int element)
+{
+  static int belt_move_dir[3] =
+  {
+    MV_LEFT,
+    MV_NO_MOVING,
+    MV_RIGHT
+  };
+
+  int belt_dir_nr = getBeltDirNrFromSwitchElement(element);
+
+  return belt_move_dir[belt_dir_nr];
+}
+
 static void InitField(int x, int y, boolean init_game)
 {
   switch (Feld[x][y])
@@ -322,6 +366,34 @@ static void InitField(int x, int y, boolean init_game)
       Feld[x][y] = EL_EM_KEY_4;
       break;
 
+    case EL_BELT1_SWITCH_L:
+    case EL_BELT1_SWITCH_M:
+    case EL_BELT1_SWITCH_R:
+    case EL_BELT2_SWITCH_L:
+    case EL_BELT2_SWITCH_M:
+    case EL_BELT2_SWITCH_R:
+    case EL_BELT3_SWITCH_L:
+    case EL_BELT3_SWITCH_M:
+    case EL_BELT3_SWITCH_R:
+    case EL_BELT4_SWITCH_L:
+    case EL_BELT4_SWITCH_M:
+    case EL_BELT4_SWITCH_R:
+      if (init_game)
+      {
+	int belt_nr = getBeltNrFromSwitchElement(Feld[x][y]);
+	int belt_dir = getBeltDirFromSwitchElement(Feld[x][y]);
+	int belt_dir_nr = getBeltDirNrFromSwitchElement(Feld[x][y]);
+
+	if (game.belt_dir_nr[belt_nr] == 3)	/* initial value */
+	{
+	  game.belt_dir[belt_nr] = belt_dir;
+	  game.belt_dir_nr[belt_nr] = belt_dir_nr;
+	}
+	else	/* more than one switch -- set it like the first switch */
+	{
+	  Feld[x][y] = Feld[x][y] - belt_dir_nr + game.belt_dir_nr[belt_nr];
+	}
+      }
     default:
       break;
   }
@@ -424,7 +496,10 @@ void InitGame()
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
   for (i=0; i<4; i++)
+  {
     game.belt_dir[i] = MV_NO_MOVING;
+    game.belt_dir_nr[i] = 3;		/* no moving, next switch left */
+  }
 
   for (i=0; i<MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
@@ -2145,6 +2220,17 @@ void StartMoving(int x, int y)
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
       }
     }
+    else if (IS_BELT(Feld[x][y+1]))
+    {
+      boolean left_is_free  = (x>0 && IS_FREE(x-1, y));
+      boolean right_is_free = (x<lev_fieldx-1 && IS_FREE(x+1, y));
+      int belt_nr = getBeltNrFromElement(Feld[x][y+1]);
+      int belt_dir = game.belt_dir[belt_nr];
+
+      if ((belt_dir == MV_LEFT  && left_is_free) ||
+	  (belt_dir == MV_RIGHT && right_is_free))
+	InitMovingField(x, y, belt_dir);
+    }
   }
   else if (CAN_MOVE(element))
   {
@@ -2441,12 +2527,16 @@ void ContinueMoving(int x, int y)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int horiz_move = (dx!=0);
   int newx = x + dx, newy = y + dy;
-  int step = (horiz_move ? dx : dy) * TILEX/8;
+  int step = (horiz_move ? dx : dy) * TILEX / 8;
 
   if (element == EL_TROPFEN)
-    step/=2;
+    step /= 2;
   else if (Store[x][y] == EL_MORAST_VOLL || Store[x][y] == EL_MORAST_LEER)
-    step/=4;
+    step /= 4;
+  else if (CAN_FALL(element) && horiz_move &&
+	   y < lev_fieldy-1 && IS_BELT(Feld[x][y+1]))
+    step /= 2;
+
 #if OLD_GAME_BEHAVIOUR
   else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
     step*=2;
@@ -3369,6 +3459,21 @@ static void CheckBuggyBase(int x, int y)
   }
 }
 
+static void DrawBeltAnimation(int x, int y, int element)
+{
+  int belt_nr = getBeltNrFromElement(element);
+  int belt_dir = game.belt_dir[belt_nr];
+
+  if (belt_dir != MV_NO_MOVING)
+  {
+    int delay = 2;
+    int mode = (belt_dir == MV_LEFT ? ANIM_NORMAL : ANIM_REVERSE);
+    int graphic = el2gfx(element) + (belt_dir == MV_LEFT ? 0 : 7);
+
+    DrawGraphicAnimation(x, y, graphic, 8, delay, mode);
+  }
+}
+
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
@@ -3655,6 +3760,8 @@ void GameActions()
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
+    else if (IS_BELT(element))
+      DrawBeltAnimation(x, y, element);
 
     if (game.magic_wall_active)
     {
@@ -4546,25 +4653,29 @@ int DigField(struct PlayerInfo *player,
 	  EL_BELT3_SWITCH_L,
 	  EL_BELT4_SWITCH_L
 	};
-	static int belt_move_dir[3] =
+	static int belt_move_dir[4] =
 	{
 	  MV_LEFT,
 	  MV_NO_MOVING,
-	  MV_RIGHT
+	  MV_RIGHT,
+	  MV_NO_MOVING,
 	};
 
-	int belt_nr = (element < EL_BELT2_SWITCH_L ? 0 :
-		       element < EL_BELT3_SWITCH_L ? 1 :
-		       element < EL_BELT4_SWITCH_L ? 2 : 3);
-	int belt_dir_nr = element - belt_base_element[belt_nr];
-	int belt_dir_nr_next = (belt_dir_nr + 1) % 3;
-	int belt_dir_next = belt_move_dir[belt_dir_nr_next];
+	int belt_nr = getBeltNrFromSwitchElement(element);
+	int belt_dir_nr = (game.belt_dir_nr[belt_nr] + 1) % 4;
+	int belt_dir = belt_move_dir[belt_dir_nr];
 	int xx, yy;
 
 	if (player->Switching)
 	  return MF_ACTION;
 
-	game.belt_dir[belt_nr] = belt_dir_next;
+	game.belt_dir_nr[belt_nr] = belt_dir_nr;
+	game.belt_dir[belt_nr] = belt_dir;
+
+	if (belt_dir_nr == 3)
+	  belt_dir_nr = 1;
+
+	player->Switching = TRUE;
 
 	for (yy=0; yy<lev_fieldy; yy++)
 	{
@@ -4572,21 +4683,23 @@ int DigField(struct PlayerInfo *player,
 	  {
 	    if (IS_BELT_SWITCH(Feld[xx][yy]))
 	    {
-	      int e = Feld[xx][yy];
-	      int e_belt_nr = (e < EL_BELT2_SWITCH_L ? 0 :
-			       e < EL_BELT3_SWITCH_L ? 1 :
-			       e < EL_BELT4_SWITCH_L ? 2 : 3);
+	      int e_belt_nr = getBeltNrFromSwitchElement(Feld[xx][yy]);
 
 	      if (e_belt_nr == belt_nr)
 	      {
-		Feld[xx][yy] = belt_base_element[belt_nr] + belt_dir_nr_next;
+		Feld[xx][yy] = belt_base_element[belt_nr] + belt_dir_nr;
 		DrawLevelField(xx, yy);
 	      }
 	    }
+	    else if (belt_dir == MV_NO_MOVING && IS_BELT(Feld[xx][yy]))
+	    {
+	      int e_belt_nr = getBeltNrFromElement(Feld[xx][yy]);
+
+	      if (e_belt_nr == belt_nr)
+		DrawLevelField(xx, yy);    /* set belt to parking position */
+	    }
 	  }
 	}
-
-	player->Switching = TRUE;
 
 	return MF_ACTION;
       }

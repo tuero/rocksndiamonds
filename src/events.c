@@ -477,7 +477,8 @@ void HandleKey(KeySym key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if (key == XK_Return && game_status == PLAYING && AllPlayersGone)
+  if ((key == XK_Return || key == XK_space) &&
+      game_status == PLAYING && AllPlayersGone)
   {
     CloseDoor(DOOR_CLOSE_1);
     game_status = MAINMENU;
@@ -520,6 +521,7 @@ void HandleKey(KeySym key, int key_status)
       switch(key)
       {
 	case XK_Return:
+	case XK_space:
 	  if (game_status == MAINMENU)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
           else if (game_status == CHOOSELEVEL)
@@ -553,6 +555,7 @@ void HandleKey(KeySym key, int key_status)
       switch(key)
       {
 	case XK_Return:
+	case XK_space:
 	  game_status = MAINMENU;
 	  DrawMainMenu();
 	  BackToFront();

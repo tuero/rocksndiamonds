@@ -1116,17 +1116,20 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   else if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK ||
 	    IS_GEM(element)) && !cut_mode)
   {
-    if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
+    if (uy >= lev_fieldy-1 || !IS_BELT(Feld[ux][uy+1]))
     {
-      if (dir == MV_LEFT)
-	graphic += (4 - phase4) % 4;
-      else if (dir == MV_RIGHT)
-	graphic += phase4;
-      else
-	graphic += phase2 * 2;
+      if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
+      {
+	if (dir == MV_LEFT)
+	  graphic += (4 - phase4) % 4;
+	else if (dir == MV_RIGHT)
+	  graphic += phase4;
+	else
+	  graphic += phase2 * 2;
+      }
+      else if (element != EL_SP_INFOTRON)
+	graphic += phase2;
     }
-    else if (element != EL_SP_INFOTRON)
-      graphic += phase2;
   }
   else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
 	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)
@@ -1478,17 +1481,16 @@ void DrawMicroElement(int xpos, int ypos, int element)
     graphic -= GFX_START_ROCKSSP;
     graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
     XCopyArea(display, pix[PIX_SP], drawto, gc,
-	      MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) *MICRO_TILEX,
-	      MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) *MICRO_TILEY,
+	      MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) * MICRO_TILEX,
+	      MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) * MICRO_TILEY,
 	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    graphic -= ((graphic / DC_PER_LINE) * DC_PER_LINE) / 2;
     XCopyArea(display, pix[PIX_DC], drawto, gc,
-	      MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) *MICRO_TILEX,
-	      MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) *MICRO_TILEY,
+	      MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) * MICRO_TILEX,
+	      MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) * MICRO_TILEY,
 	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else

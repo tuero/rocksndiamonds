@@ -216,7 +216,7 @@ typedef unsigned char byte;
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_LEVDIR_ENTRIES	100
 #define MAX_SCORE_ENTRIES	100
-#define MAX_ELEMENTS		512
+#define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
 #define MAX_NUM_AMOEBA		100
 
 /* values for elements with content */
@@ -419,6 +419,7 @@ struct GameInfo
   boolean magic_wall_active;
   int magic_wall_time_left;
   int belt_dir[4];
+  int belt_dir_nr[4];
 };
 
 struct GlobalInfo
@@ -576,6 +577,7 @@ extern char		*element_info[];
 #define MICRO_GFX_PER_LINE	128
 
 #define HEROES_PER_LINE		16
+
 #define MINI_SP_STARTX		0
 #define MINI_SP_STARTY		352
 #define MICRO_SP_STARTX		0
@@ -586,18 +588,18 @@ extern char		*element_info[];
 
 #define MINI_DC_STARTX		256
 #define MINI_DC_STARTY		0
-#define MICRO_DC_STARTX		0
-#define MICRO_DC_STARTY		0
+#define MICRO_DC_STARTX		256
+#define MICRO_DC_STARTY		384
 #define DC_PER_LINE		8
 #define MINI_DC_PER_LINE	8
-#define MICRO_DC_PER_LINE	32
+#define MICRO_DC_PER_LINE	8
 
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
 /* game elements:
-**	  0 - 1000: real elements, stored in level file
-**     1000 - 2000: flag elements, only used at runtime
+**	  0 - 499: real elements, stored in level file
+**      500 - 699: flag elements, only used at runtime
 */
 /* "real" level elements */
 #define EL_LEERRAUM		0
@@ -901,34 +903,34 @@ extern char		*element_info[];
 #define EL_SAND_INVISIBLE	315
 
 /* "real" (and therefore drawable) runtime elements */
-#define EL_SIEB_LEER		1000
-#define EL_SIEB2_LEER		1001
-#define EL_SIEB_VOLL		1002
-#define EL_SIEB2_VOLL		1003
-#define EL_SIEB_TOT		1004
-#define EL_SIEB2_TOT		1005
-#define EL_AUSGANG_ACT		1006
-#define EL_SP_TERMINAL_ACTIVE	1007
-#define EL_SP_BUG_ACTIVE	1008
-#define EL_EM_KEY_1		1009
-#define EL_EM_KEY_2		1010
-#define EL_EM_KEY_3		1011
-#define EL_EM_KEY_4		1012
-#define EL_DYNABOMB_ACTIVE_1	1013
-#define EL_DYNABOMB_ACTIVE_2	1014
-#define EL_DYNABOMB_ACTIVE_3	1015
-#define EL_DYNABOMB_ACTIVE_4	1016
+#define EL_SIEB_LEER		500
+#define EL_SIEB2_LEER		501
+#define EL_SIEB_VOLL		502
+#define EL_SIEB2_VOLL		503
+#define EL_SIEB_TOT		504
+#define EL_SIEB2_TOT		505
+#define EL_AUSGANG_ACT		506
+#define EL_SP_TERMINAL_ACTIVE	507
+#define EL_SP_BUG_ACTIVE	508
+#define EL_EM_KEY_1		509
+#define EL_EM_KEY_2		510
+#define EL_EM_KEY_3		511
+#define EL_EM_KEY_4		512
+#define EL_DYNABOMB_ACTIVE_1	513
+#define EL_DYNABOMB_ACTIVE_2	514
+#define EL_DYNABOMB_ACTIVE_3	515
+#define EL_DYNABOMB_ACTIVE_4	516
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_BLOCKED		2000
-#define EL_EXPLODING		2001
-#define EL_CRACKINGNUT		2002
-#define EL_BLURB_LEFT		2003
-#define EL_BLURB_RIGHT		2004
-#define EL_AMOEBING		2005
-#define EL_MAUERND		2006
-#define EL_BURNING		2007
-#define EL_PLAYER_IS_LEAVING	2008
+#define EL_BLOCKED		600
+#define EL_EXPLODING		601
+#define EL_CRACKINGNUT		602
+#define EL_BLURB_LEFT		603
+#define EL_BLURB_RIGHT		604
+#define EL_AMOEBING		605
+#define EL_MAUERND		606
+#define EL_BURNING		607
+#define EL_PLAYER_IS_LEAVING	608
 
 /* game graphics:
 **	  0 -  255: graphics from "RocksScreen"

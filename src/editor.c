@@ -3935,6 +3935,8 @@ void HandleLevelEditorKeyInput(KeySym key)
       ClickOnGadget(level_editor_gadget[id], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
+    else if (key == XK_space || key == XK_Return)
+      ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
     else
       for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
 	if (letter && letter == control_info[i].shortcut)
@@ -3954,7 +3956,7 @@ void HandleEditorGadgetInfoText(void *ptr)
 {
   struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
   char infotext[MAX_INFOTEXT_LEN + 1];
-  char shortcut[20];
+  char shortcut[MAX_INFOTEXT_LEN + 1];
 
   ClearEditorGadgetInfoText();
 
@@ -3974,10 +3976,13 @@ void HandleEditorGadgetInfoText(void *ptr)
 
     if (key)
     {
-      sprintf(shortcut, " ('%s%c')",
-	      (key >= 'A' && key <= 'Z' ? "Shift-" :
-	       gi->custom_id == GADGET_ID_SINGLE_ITEMS ? ".' or '" : ""),
-	      key);
+      if (gi->custom_id == GADGET_ID_SINGLE_ITEMS)	/* special case 1 */
+	sprintf(shortcut, " ('.' or '%c')", key);
+      else if (gi->custom_id == GADGET_ID_TEST)		/* special case 2 */
+	sprintf(shortcut, " ('Enter' or 'Shift-%c')", key);
+      else						/* normal case */
+	sprintf(shortcut, " ('%s%c')",
+		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
 
       if (strlen(infotext) + strlen(shortcut) <= MAX_INFOTEXT_LEN)
 	strcat(infotext, shortcut);
