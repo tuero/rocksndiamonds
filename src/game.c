@@ -59,7 +59,7 @@ void InitGame()
     player->active = FALSE;
 
     player->action = 0;
-    player->potential_action = 0;
+    player->effective_action = 0;
 
     player->score = 0;
     player->gems_still_needed = level.edelsteine;
@@ -287,6 +287,12 @@ void InitGame()
     }
   }
 
+  /* when in single player mode, eliminate all but the first active player */
+  if (!options.network && !setup.team_mode)
+    for(i=0; i<MAX_PLAYERS; i++)
+      if (stored_player[i].active)
+	for(j=i+1; j<MAX_PLAYERS; j++)
+	  stored_player[j].active = FALSE;
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
@@ -2810,7 +2816,7 @@ void CheckForDragon(int x, int y)
   }
 }
 
-void PlayerActions(struct PlayerInfo *player, byte player_action)
+static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
@@ -2915,6 +2921,7 @@ void GameActions()
   int sieb_x = 0, sieb_y = 0;
   int i, x,y, element;
   byte *recorded_player_action;
+  byte summarized_player_action;
 
   if (game_status != PLAYING)
     return;
@@ -2968,19 +2975,23 @@ void GameActions()
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
-  if (network_playing)
+  for(i=0; i<MAX_PLAYERS; i++)
   {
-    byte local_potential_action = 0;
+    summarized_player_action |= stored_player[i].action;
 
-    for(i=0; i<MAX_PLAYERS; i++)
-      local_potential_action |= stored_player[i].potential_action;
-
-    SendToServer_MovePlayer(local_potential_action);
+    if (!network_playing)
+      stored_player[i].effective_action = stored_player[i].action;
   }
+
+  if (network_playing)
+    SendToServer_MovePlayer(summarized_player_action);
+
+  if (!options.network && !setup.team_mode)
+    local_player->effective_action = summarized_player_action;
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
-    int actual_player_action = stored_player[i].action;
+    int actual_player_action = stored_player[i].effective_action;
 
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
@@ -3295,7 +3306,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     /* should only happen if pre-1.0 tape recordings are played */
     /* this is only for backward compatibility */
 
-#ifdef DEBUG
+#if DEBUG
     printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.0 LEVEL TAPES.\n");
 #endif
 

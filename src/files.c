@@ -514,26 +514,27 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_FADING		8
 #define SETUP_TOKEN_AUTORECORD		9
 #define SETUP_TOKEN_QUICK_DOORS		10
-#define SETUP_TOKEN_ALIAS_NAME		11
+#define SETUP_TOKEN_TEAM_MODE		11
+#define SETUP_TOKEN_ALIAS_NAME		12
 
-#define SETUP_TOKEN_USE_JOYSTICK	12
-#define SETUP_TOKEN_JOY_DEVICE_NAME	13
-#define SETUP_TOKEN_JOY_XLEFT		14
-#define SETUP_TOKEN_JOY_XMIDDLE		15
-#define SETUP_TOKEN_JOY_XRIGHT		16
-#define SETUP_TOKEN_JOY_YUPPER		17
-#define SETUP_TOKEN_JOY_YMIDDLE		18
-#define SETUP_TOKEN_JOY_YLOWER		19
-#define SETUP_TOKEN_JOY_SNAP		20
-#define SETUP_TOKEN_JOY_BOMB		21
-#define SETUP_TOKEN_KEY_LEFT		22
-#define SETUP_TOKEN_KEY_RIGHT		23
-#define SETUP_TOKEN_KEY_UP		24
-#define SETUP_TOKEN_KEY_DOWN		25
-#define SETUP_TOKEN_KEY_SNAP		26
-#define SETUP_TOKEN_KEY_BOMB		27
+#define SETUP_TOKEN_USE_JOYSTICK	13
+#define SETUP_TOKEN_JOY_DEVICE_NAME	14
+#define SETUP_TOKEN_JOY_XLEFT		15
+#define SETUP_TOKEN_JOY_XMIDDLE		16
+#define SETUP_TOKEN_JOY_XRIGHT		17
+#define SETUP_TOKEN_JOY_YUPPER		18
+#define SETUP_TOKEN_JOY_YMIDDLE		19
+#define SETUP_TOKEN_JOY_YLOWER		20
+#define SETUP_TOKEN_JOY_SNAP		21
+#define SETUP_TOKEN_JOY_BOMB		22
+#define SETUP_TOKEN_KEY_LEFT		23
+#define SETUP_TOKEN_KEY_RIGHT		24
+#define SETUP_TOKEN_KEY_UP		25
+#define SETUP_TOKEN_KEY_DOWN		26
+#define SETUP_TOKEN_KEY_SNAP		27
+#define SETUP_TOKEN_KEY_BOMB		28
 
-#define NUM_SETUP_TOKENS		28
+#define NUM_SETUP_TOKENS		29
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_SOUND
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_ALIAS_NAME
@@ -567,6 +568,7 @@ static struct
   { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
   { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
   { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
+  { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
   { TYPE_STRING,  &si.alias_name,	"alias_name"			},
 
   /* for each player: */

@@ -258,6 +258,7 @@ struct SetupInfo
   boolean fading;
   boolean autorecord;
   boolean quick_doors;
+  boolean team_mode;
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
@@ -280,8 +281,10 @@ struct PlayerInfo
 
   int index_nr, client_nr, element_nr;
 
-  byte action;			/* action from server or for local playing */
-  byte potential_action;	/* must go to network server first */
+  byte action;			/* action from local input device */
+  byte effective_action;	/* action aknowledged from network server
+				   or summarized over all configured input
+				   devices when in single player mode */
 
   int joystick_fd;		/* file descriptor of player's joystick */
 

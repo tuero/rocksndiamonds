@@ -905,8 +905,8 @@ void DrawSetupScreen()
     { &setup.fading,		"Fading:"	},
     { &setup.quick_doors,	"Quick Doors:"	},
     { &setup.autorecord,	"Auto-Record:"	},
+    { &setup.team_mode,		"Team-Mode:"	},
     { NULL,			"Input Devices"	},
-    { NULL,			""		},
     { NULL,			""		},
     { NULL,			"Exit"		},
     { NULL,			"Save and exit"	}
@@ -1099,6 +1099,14 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	setup.autorecord = !setup.autorecord;
       }
       else if (y==13)
+      {
+	if (setup.team_mode)
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	setup.team_mode = !setup.team_mode;
+      }
+      else if (y==14)
       {
 	game_status = SETUPINPUT;
 	DrawSetupInputScreen();
