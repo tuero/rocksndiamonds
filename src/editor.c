@@ -950,7 +950,7 @@ static struct
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
     &custom_element_change.random,
-    NULL,				"use random change:", "(%)"
+    NULL,				"use random replace:", "%"
   },
 };
 
@@ -1043,6 +1043,7 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_ALONG_RIGHT_SIDE,	"along right side"		},
   { MV_TURNING_LEFT,		"turning left"			},
   { MV_TURNING_RIGHT,		"turning right"			},
+  { MV_WHEN_PUSHED,		"when pushed"			},
   { -1,				NULL				}
 };
 
@@ -1104,20 +1105,20 @@ static struct ValueTextInfo options_consistency[] =
 
 static struct ValueTextInfo options_time_units[] =
 {
-  { FRAMES_PER_SECOND,		"seconds"			},
   { 1,				"frames"			},
+  { FRAMES_PER_SECOND,		"seconds"			},
   { -1,				NULL				}
 };
 
 static struct ValueTextInfo options_change_direct_action[] =
 {
-  { CE_TOUCHED_BY_PLAYER,	"touched by player"		},
-  { CE_PRESSED_BY_PLAYER,	"pressed by player"		},
-  { CE_PUSHED_BY_PLAYER,	"pushed by player"		},
+  { CE_TOUCHED_BY_PLAYER,	"touched by player ..."		},
+  { CE_PRESSED_BY_PLAYER,	"pressed by player ..."		},
+  { CE_PUSHED_BY_PLAYER,	"pushed by player ..."		},
   { CE_ENTERED_BY_PLAYER,	"entered by player ..."		},
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
   { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
-  { CE_COLLISION,		"collision"			},
+  { CE_COLLISION,		"collision ..."			},
   { CE_IMPACT,			"impact"			},
   { CE_SMASHED,			"smashed"			},
   { -1,				NULL				}
@@ -1125,9 +1126,9 @@ static struct ValueTextInfo options_change_direct_action[] =
 
 static struct ValueTextInfo options_change_other_action[] =
 {
-  { CE_OTHER_GETS_TOUCHED,	"player touches"		},
-  { CE_OTHER_GETS_PRESSED,	"player presses"		},
-  { CE_OTHER_GETS_PUSHED,	"player pushes"			},
+  { CE_OTHER_GETS_TOUCHED,	"player touches ..."		},
+  { CE_OTHER_GETS_PRESSED,	"player presses ..."		},
+  { CE_OTHER_GETS_PUSHED,	"player pushes ..."		},
   { CE_OTHER_GETS_ENTERED,	"player enters ..."		},
   { CE_OTHER_GETS_LEFT,		"player leaves ..."		},
   { CE_OTHER_GETS_DIGGED,	"player digs"			},
@@ -1659,13 +1660,13 @@ static struct
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
     &custom_element_change.only_complete,
-    NULL, "only use complete change",	"only use complete extended content"
+    NULL, "replace all or nothing",	"only replace when all can be changed"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_change,
-    NULL, NULL,				"use random value for new content"
+    NULL, NULL,				"use percentage for random replace"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
@@ -7571,10 +7572,12 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
       Request("Level has changed! Exit without saving ?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
+#if 1
     CloseDoor(DOOR_CLOSE_1);
-    /*
+    SetDoorState(DOOR_CLOSE_2);
+#else
     CloseDoor(DOOR_CLOSE_ALL);
-    */
+#endif
     game_status = GAME_MODE_MAIN;
     DrawMainMenu();
   }

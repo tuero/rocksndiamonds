@@ -204,6 +204,7 @@
 				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
 
 /* values for change sides for custom elements */
+#define CH_SIDE_NONE		MV_NO_MOVING
 #define CH_SIDE_LEFT		MV_LEFT
 #define CH_SIDE_RIGHT		MV_RIGHT
 #define CH_SIDE_TOP		MV_UP
@@ -224,6 +225,7 @@
 #define MV_BIT_ALONG_RIGHT_SIDE	7
 #define MV_BIT_TURNING_LEFT	8
 #define MV_BIT_TURNING_RIGHT	9
+#define MV_BIT_WHEN_PUSHED	10
 
 /* values for special move patterns for custom elements */
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
@@ -236,6 +238,7 @@
 #define MV_ALONG_RIGHT_SIDE	(1 << MV_BIT_ALONG_RIGHT_SIDE)
 #define MV_TURNING_LEFT		(1 << MV_BIT_TURNING_LEFT)
 #define MV_TURNING_RIGHT	(1 << MV_BIT_TURNING_RIGHT)
+#define MV_WHEN_PUSHED		(1 << MV_BIT_WHEN_PUSHED)
 
 /* values for slippery property for custom elements */
 #define SLIPPERY_ANY_RANDOM	0

@@ -34,8 +34,6 @@
 #define LEVEL_CHUNK_CNT3_UNUSED	10	/* unused CNT3 chunk bytes    */
 #define LEVEL_CPART_CUS3_SIZE	134	/* size of CUS3 chunk part    */
 #define LEVEL_CPART_CUS3_UNUSED	15	/* unused CUS3 bytes / part   */
-#define LEVEL_CPART_CUS4_SIZE	???	/* size of CUS4 chunk part    */
-#define LEVEL_CPART_CUS4_UNUSED	???	/* unused CUS4 bytes / part   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
 
@@ -80,7 +78,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 
   change->delay_fixed = 0;
   change->delay_random = 0;
-  change->delay_frames = -1;	/* later set to reliable default value */
+  change->delay_frames = 1;
 
   change->trigger_element = EL_EMPTY_SPACE;
 
@@ -88,7 +86,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->use_content = FALSE;
   change->only_complete = FALSE;
   change->use_random_change = FALSE;
-  change->random = 0;
+  change->random = 100;
   change->power = CP_NON_DESTRUCTIVE;
 
   for(x=0; x<3; x++)
@@ -782,8 +780,13 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     change->can_change = getFile8Bit(file);
 
+    change->sides = getFile8Bit(file);
+
+    if (change->sides == CH_SIDE_NONE)	/* correct empty sides field */
+      change->sides = CH_SIDE_ANY;
+
     /* some free bytes for future change property values and padding */
-    ReadUnusedBytesFromFile(file, 9);
+    ReadUnusedBytesFromFile(file, 8);
   }
 
   /* mark this custom element as modified */
@@ -1649,8 +1652,10 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
     putFile8Bit(file, change->can_change);
 
+    putFile8Bit(file, change->sides);
+
     /* some free bytes for future change property values and padding */
-    WriteUnusedBytesToFile(file, 9);
+    WriteUnusedBytesToFile(file, 8);
   }
 }
 

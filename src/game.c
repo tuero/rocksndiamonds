@@ -3649,6 +3649,13 @@ void TurnRound(int x, int y)
       MovDir[x][y] = old_move_dir;
     }
   }
+  else if (element_info[element].move_pattern == MV_WHEN_PUSHED)
+  {
+    if (!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y))
+      MovDir[x][y] = MV_NO_MOVING;
+
+    MovDelay[x][y] = 0;
+  }
 }
 
 static boolean JustBeingPushed(int x, int y)
@@ -3959,11 +3966,16 @@ void StartMoving(int x, int y)
   {
     int newx, newy;
 
+#if 1
+    if (IS_PUSHABLE(element) && JustBeingPushed(x, y))
+      return;
+#else
     if ((element == EL_SATELLITE ||
 	 element == EL_BALLOON ||
 	 element == EL_SPRING)
 	&& JustBeingPushed(x, y))
       return;
+#endif
 
 #if 0
 #if 0
@@ -4496,7 +4508,7 @@ void ContinueMoving(int x, int y)
       Impact(x, newy);
 
     if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
-      CheckElementChange(newx, newy, element, CE_COLLISION);
+      CheckElementSideChange(newx, newy, element, direction, CE_COLLISION, -1);
 
 #if 1
     TestIfElementTouchesCustomElement(x, y);		/* for empty space */
@@ -6815,6 +6827,14 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     { +1, 0 },
     { 0, +1 }
   };
+  static int change_sides[4][2] =
+  {
+    /* center side       border side */
+    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	},	/* check top    */
+    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* check left   */
+    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
+    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	}	/* check bottom */
+  };
   int i;
 
 #if 0
@@ -6828,10 +6848,30 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
+    int center_side = change_sides[i][0];
+    int border_side = change_sides[i][1];
 
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
+#if 1
+    if (IS_PLAYER(x, y))
+    {
+      CheckTriggeredElementSideChange(xx, yy, Feld[xx][yy], border_side,
+				      CE_OTHER_GETS_TOUCHED);
+      CheckElementSideChange(xx, yy, Feld[xx][yy], border_side,
+			     CE_TOUCHED_BY_PLAYER, -1);
+    }
+    else if (IS_PLAYER(xx, yy))
+    {
+      CheckTriggeredElementSideChange(x, y, Feld[x][y], center_side,
+				      CE_OTHER_GETS_TOUCHED);
+      CheckElementSideChange(x, y, Feld[x][y], center_side,
+			     CE_TOUCHED_BY_PLAYER, -1);
+
+      break;
+    }
+#else
     if (IS_PLAYER(x, y))
     {
       CheckTriggeredElementChange(xx, yy, Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
@@ -6844,6 +6884,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
       break;
     }
+#endif
   }
 
 #if 0
@@ -7277,16 +7318,13 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
 int DigField(struct PlayerInfo *player,
 	     int x, int y, int real_dx, int real_dy, int mode)
 {
-#if 0
-  static int change_sides[4][2] =
+  static int change_sides[4] =
   {
-    /* enter side        leave side */
-    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* moving left  */
-    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* moving right */
-    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
-    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	}	/* moving down  */
+    CH_SIDE_RIGHT,	/* moving left  */
+    CH_SIDE_LEFT,	/* moving right */
+    CH_SIDE_BOTTOM,	/* moving up    */
+    CH_SIDE_TOP,	/* moving down  */
   };
-#endif
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
@@ -7295,10 +7333,7 @@ int DigField(struct PlayerInfo *player,
 			dx == +1 ? MV_RIGHT :
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
-#if 0
-  int enter_side = change_sides[MV_DIR_BIT(move_direction)][0];
-  int leave_side = change_sides[MV_DIR_BIT(move_direction)][1];
-#endif
+  int dig_side = change_sides[MV_DIR_BIT(move_direction)];
   int element;
 
   if (player->MovPos == 0)
@@ -7762,9 +7797,22 @@ int DigField(struct PlayerInfo *player,
 	    !(element == EL_SPRING && use_spring_bug))
 	  return MF_NO_ACTION;
 
+#if 1
+	/*
+	printf("::: %d [%d,%d,%d => %d]\n", MovDir[x][y],
+	       CAN_MOVE(element), move_direction, getElementMoveStepsize(x, y),
+	       (CAN_MOVE(element) && MovDir[x][y] == move_direction &&
+		getElementMoveStepsize(x, y) > MOVE_STEPSIZE_NORMAL) );
+	*/
+
+	/* do not push elements already moving away faster than player */
+	if (CAN_MOVE(element) && MovDir[x][y] == move_direction &&
+	    ABS(getElementMoveStepsize(x, y)) > MOVE_STEPSIZE_NORMAL)
+	  return MF_NO_ACTION;
+#else
 	if (element == EL_SPRING && MovDir[x][y] != MV_NO_MOVING)
 	  return MF_NO_ACTION;
-
+#endif
 	if (!player->Pushing &&
 	    game.engine_version >= RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
@@ -7837,15 +7885,29 @@ int DigField(struct PlayerInfo *player,
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
 
+#if 1
+	CheckTriggeredElementSideChange(x, y, element, dig_side,
+					CE_OTHER_GETS_PUSHED);
+	CheckElementSideChange(x, y, element, dig_side,
+			       CE_PUSHED_BY_PLAYER, -1);
+#else
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_PUSHED);
 	CheckElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
+#endif
 
 	break;
       }
       else
       {
+#if 1
+	CheckTriggeredElementSideChange(x, y, element, dig_side,
+				    CE_OTHER_GETS_PRESSED);
+	CheckElementSideChange(x, y, element, dig_side,
+			       CE_PRESSED_BY_PLAYER, -1);
+#else
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_PRESSED);
 	CheckElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
+#endif
       }
 
       return MF_NO_ACTION;
@@ -7855,24 +7917,6 @@ int DigField(struct PlayerInfo *player,
 
   if (Feld[x][y] != element)		/* really digged/collected something */
     player->is_collecting = !player->is_digging;
-
-#if 0
-  if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
-  {
-    CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy], leave_side,
-				    CE_OTHER_GETS_LEFT);
-    CheckElementSideChange(jx, jy, Feld[jx][jy], leave_side,
-			   CE_LEFT_BY_PLAYER, -1);
-  }
-
-  if (IS_CUSTOM_ELEMENT(Feld[x][y]))
-  {
-    CheckTriggeredElementSideChange(x, y, Feld[x][y], enter_side,
-				    CE_OTHER_GETS_ENTERED);
-    CheckElementSideChange(x, y, Feld[x][y], enter_side,
-			   CE_ENTERED_BY_PLAYER, -1);
-  }
-#endif
 
   return MF_MOVING;
 }

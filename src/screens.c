@@ -212,6 +212,7 @@ void DrawMainMenu()
   {
     game_status = GAME_MODE_EDITOR;
     DrawLevelEd();
+
     return;
   }
 

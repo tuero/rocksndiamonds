@@ -100,6 +100,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_2_PREVIEW
   },
   {
+    FONT_TEXT_2,				GFX_SPECIAL_ARG_PLAYING,
+    IMG_FONT_TEXT_2_PLAYING
+  },
+  {
     FONT_TEXT_2,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_2_SCORES
   },
@@ -120,6 +124,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_3_PREVIEW
   },
   {
+    FONT_TEXT_3,				GFX_SPECIAL_ARG_PLAYING,
+    IMG_FONT_TEXT_3_PLAYING
+  },
+  {
     FONT_TEXT_3,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_3_SCORES
   },
@@ -134,6 +142,10 @@ font_to_graphic[] =
   {
     FONT_TEXT_4,				GFX_SPECIAL_ARG_LEVELS,
     IMG_FONT_TEXT_4_LEVELS
+  },
+  {
+    FONT_TEXT_4,				GFX_SPECIAL_ARG_PLAYING,
+    IMG_FONT_TEXT_4_PLAYING
   },
   {
     FONT_TEXT_4,				GFX_SPECIAL_ARG_SCORES,
