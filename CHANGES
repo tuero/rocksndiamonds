@@ -4,6 +4,9 @@ Release Version 3.0.0 [02 AUG 2003]
 	- custom elements now have lots of configurable properties
 	- advanced custom element settings for powerful new elements
 	- fixed Supaplex gravity tubes
+	- fixed very nasty bug in SDL_image (and X11) PCX loading routine
+	- fixed some very nasty bugs in bitmap zoom routine
+	- fixed very nasty bug in level/artwork tree routine
 	- added new contributed levels from the following players:
 	  + Juergen Bonhagen (with complete artwork set)
 	  + Andreas Buschbeck (with complete artwork set)

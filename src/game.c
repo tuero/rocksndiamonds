@@ -3846,9 +3846,10 @@ void StartMoving(int x, int y)
 	return;
       }
 
-#if 0
-      GfxAction[x][y] = ACTION_MOVING;
-#endif
+      /* special case of "moving" animation of waiting elements (FIX THIS !!!);
+	 for all other elements GfxAction will be set by InitMovingField() */
+      if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
+	GfxAction[x][y] = ACTION_MOVING;
     }
 
     /* now make next step */

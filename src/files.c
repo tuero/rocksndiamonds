@@ -685,6 +685,10 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
       IS_LEVELCLASS_USER(leveldir_current))
   {
+#if 0
+    printf("::: This level is private or contributed: '%s'\n", filename);
+#endif
+
     /* For user contributed and private levels, use the version of
        the game engine the levels were created for.
        Since 2.0.1, the game engine version is now directly stored
@@ -709,6 +713,11 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   }
   else
   {
+#if 0
+    printf("::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",
+	   leveldir_current->sort_priority, filename);
+#endif
+
     /* Always use the latest version of the game engine for all but
        user contributed and private levels; this allows for actual
        corrections in the game engine to take effect for existing,
