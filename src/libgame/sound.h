@@ -165,6 +165,10 @@
 #endif
 #endif
 
+/* value for undefined sound effect filename */
+#define SND_FILE_UNDEFINED	"NONE"
+
+
 #if 0
 struct SoundHeader_SUN
 {

@@ -79,7 +79,7 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
 
-#define TOKEN_VALUE_POSITION		30
+#define TOKEN_VALUE_POSITION		40
 
 #define MAX_COOKIE_LEN			256
 

@@ -1305,7 +1305,7 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 {
   char *filename = getCustomSoundFilename(basename);
 
-  if (strcmp(basename, "NONE") == 0)
+  if (strcmp(basename, SND_FILE_UNDEFINED) == 0)
   {
     deleteSoundEntry(snd_info);
     return;
