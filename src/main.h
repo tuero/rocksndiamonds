@@ -68,21 +68,21 @@
 #define EP_DONT_TOUCH		4
 #define EP_INDESTRUCTIBLE	5
 #define EP_SLIPPERY		6
-#define EP_CAN_EXPLODE_BY_FIRE	7
+#define EP_CAN_CHANGE		7
 #define EP_CAN_MOVE		8
 #define EP_CAN_FALL		9
-#define EP_CAN_SMASH		10
-#define EP_WALKABLE_OVER	11
-#define EP_WALKABLE_INSIDE	12
-#define EP_WALKABLE_UNDER	13
-#define EP_PASSABLE_OVER	14
-#define EP_PASSABLE_INSIDE	15
-#define EP_PASSABLE_UNDER	16
-#define EP_CHANGEABLE		17
-#define EP_CAN_EXPLODE_SMASHED	18
-#define EP_CAN_EXPLODE_IMPACT	19
-#define EP_UNUSED_20		20
-#define EP_UNUSED_21		21
+#define EP_CAN_SMASH_FRIENDS	10
+#define EP_CAN_SMASH_ENEMIES	11
+#define EP_CAN_SMASH_EXPLOSIVES	12
+#define EP_CAN_EXPLODE_BY_FIRE	13
+#define EP_CAN_EXPLODE_SMASHED	14
+#define EP_CAN_EXPLODE_IMPACT	15
+#define EP_WALKABLE_OVER	16
+#define EP_WALKABLE_INSIDE	17
+#define EP_WALKABLE_UNDER	18
+#define EP_PASSABLE_OVER	19
+#define EP_PASSABLE_INSIDE	20
+#define EP_PASSABLE_UNDER	21
 #define EP_UNUSED_22		22
 #define EP_UNUSED_23		23
 #define EP_PUSHABLE		24
@@ -130,13 +130,15 @@
 #define EP_SOLID_FOR_PUSHING	58
 #define EP_DRAGONFIRE_PROOF	59
 #define EP_EXPLOSION_PROOF	60
+#define EP_CAN_SMASH		61
+#define EP_CAN_EXPLODE		62
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	61
-#define EP_WALK_TO_OBJECT	62
-#define EP_DEADLY		63
+#define EP_EXPLODE_RESULT	63
+#define EP_WALK_TO_OBJECT	64
+#define EP_DEADLY		65
 
-#define NUM_ELEMENT_PROPERTIES	64
+#define NUM_ELEMENT_PROPERTIES	66
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -182,17 +184,21 @@
 #define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
 #define IS_INDESTRUCTIBLE(e)	HAS_PROPERTY(e, EP_INDESTRUCTIBLE)
 #define IS_SLIPPERY(e)		HAS_PROPERTY(e, EP_SLIPPERY)
-#define CAN_EXPLODE_BY_FIRE(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_FIRE)
+#define CAN_CHANGE(e)		HAS_PROPERTY(e, EP_CAN_CHANGE)
 #define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_FALL(e)		HAS_PROPERTY(e, EP_CAN_FALL)
-#define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
+#define CAN_SMASH_FRIENDS(e)	HAS_PROPERTY(e, EP_CAN_SMASH_FRIENDS)
+#define CAN_SMASH_ENEMIES(e)	HAS_PROPERTY(e, EP_CAN_SMASH_ENEMIES)
+#define CAN_SMASH_EXPLOSIVES(e)	HAS_PROPERTY(e, EP_CAN_SMASH_EXPLOSIVES)
+#define CAN_EXPLODE_BY_FIRE(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_FIRE)
+#define CAN_EXPLODE_SMASHED(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_SMASHED)
+#define CAN_EXPLODE_IMPACT(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_IMPACT)
 #define IS_WALKABLE_OVER(e)	HAS_PROPERTY(e, EP_WALKABLE_OVER)
 #define IS_WALKABLE_INSIDE(e)	HAS_PROPERTY(e, EP_WALKABLE_INSIDE)
 #define IS_WALKABLE_UNDER(e)	HAS_PROPERTY(e, EP_WALKABLE_UNDER)
 #define IS_PASSABLE_OVER(e)	HAS_PROPERTY(e, EP_PASSABLE_OVER)
 #define IS_PASSABLE_INSIDE(e)	HAS_PROPERTY(e, EP_PASSABLE_INSIDE)
 #define IS_PASSABLE_UNDER(e)	HAS_PROPERTY(e, EP_PASSABLE_UNDER)
-#define IS_CHANGEABLE(e)	HAS_PROPERTY(e, EP_CHANGEABLE)
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 
 /* macros for special configurable properties */
@@ -238,7 +244,10 @@
 #define IS_SOLID_FOR_PUSHING(e)	HAS_PROPERTY(e, EP_SOLID_FOR_PUSHING)
 #define IS_DRAGONFIRE_PROOF(e)	HAS_PROPERTY(e, EP_DRAGONFIRE_PROOF)
 #define IS_EXPLOSION_PROOF(e)	HAS_PROPERTY(e, EP_EXPLOSION_PROOF)
+#define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
+#define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
 
+/* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
 	 			 (e) <= EL_CUSTOM_END)
 
@@ -1180,11 +1189,7 @@ struct ElementInfo
 
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */
-
-  int consistency;		/* only for level editor; not stored */
-  int walk_to_action;		/* only for level editor; not stored */
-  int deadliness;		/* only for level editor; not stored */
-  int walkable_layer;		/* only for level editor; not stored */
+  int move_stepsize;		/* step size element moves with */
 
   int content[3][3];		/* new elements after explosion */
 

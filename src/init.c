@@ -1143,6 +1143,62 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_dont_run_into[] =
+  {
+    /* same elements as in 'ep_dont_touch' */
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+
+    /* same elements as in 'ep_dont_collide_with' */
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+
+    /* new elements */
+    EL_AMOEBA_DROP,
+    EL_ACID,
+
+    /* !!! maybe this should better be handled by 'ep_diggable' !!! */
+#if 1
+    EL_SP_BUGGY_BASE_ACTIVE,
+    EL_TRAP_ACTIVE,
+    EL_LANDMINE,
+#endif
+    -1
+  };
+
+  static int ep_dont_collide_with[] =
+  {
+    /* same elements as in 'ep_dont_touch' */
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+
+    /* new elements */
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    -1
+  };
+
+  static int ep_dont_touch[] =
+  {
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    -1
+  };
+
   static int ep_indestructible[] =
   {
     EL_STEELWALL,
@@ -1272,31 +1328,8 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_by_fire[] =
+  static int ep_can_change[] =
   {
-    EL_BOMB,
-    EL_DYNAMITE_ACTIVE,
-    EL_DYNAMITE,
-    EL_DYNABOMB_PLAYER_1_ACTIVE,
-    EL_DYNABOMB_PLAYER_2_ACTIVE,
-    EL_DYNABOMB_PLAYER_3_ACTIVE,
-    EL_DYNABOMB_PLAYER_4_ACTIVE,
-    EL_DYNABOMB_INCREASE_NUMBER,
-    EL_DYNABOMB_INCREASE_SIZE,
-    EL_DYNABOMB_INCREASE_POWER,
-    EL_SP_DISK_RED_ACTIVE,
-    EL_BUG,
-    EL_MOLE,
-    EL_PENGUIN,
-    EL_PIG,
-    EL_DRAGON,
-    EL_SATELLITE,
-    EL_SP_DISK_RED,
-    EL_SP_DISK_ORANGE,
-    EL_SP_DISK_YELLOW,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_DX_SUPABOMB,
     -1
   };
 
@@ -1350,7 +1383,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_smash[] =
+  static int ep_can_smash_friends[] =
   {
     EL_ROCK,
     EL_BD_ROCK,
@@ -1371,6 +1404,78 @@ void InitElementPropertiesStatic()
     EL_PEARL,
     EL_CRYSTAL,
     EL_SPRING,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_can_smash_enemies[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_SP_ZONK,
+    -1
+  };
+
+  static int ep_can_smash_explosives[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_SP_ZONK,
+    -1
+  };
+
+  static int ep_can_explode_by_fire[] =
+  {
+    /* same elements as in 'ep_can_explode_impact' */
+    EL_BOMB,
+    EL_SP_DISK_ORANGE,
+    EL_DX_SUPABOMB,
+
+    /* same elements as in 'ep_can_explode_smashed' */
+    EL_SATELLITE,
+    EL_PIG,
+    EL_DRAGON,
+    EL_MOLE,
+
+    /* new elements */
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNAMITE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
+    EL_SP_DISK_RED_ACTIVE,
+    EL_BUG,
+    EL_PENGUIN,
+    EL_SP_DISK_RED,
+    EL_SP_DISK_YELLOW,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    -1
+  };
+
+  static int ep_can_explode_smashed[] =
+  {
+    /* same elements as in 'ep_can_explode_impact' */
+    EL_BOMB,
+    EL_SP_DISK_ORANGE,
+    EL_DX_SUPABOMB,
+
+    /* new elements */
+    EL_SATELLITE,
+    EL_PIG,
+    EL_DRAGON,
+    EL_MOLE,
+    -1
+  };
+
+  static int ep_can_explode_impact[] =
+  {
+    EL_BOMB,
+    EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
     -1
   };
@@ -1528,57 +1633,6 @@ void InitElementPropertiesStatic()
     EL_BALLOON_SWITCH_ANY,
     EL_LAMP,
     EL_TIME_ORB_FULL,
-    -1
-  };
-
-  static int ep_dont_touch[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    -1
-  };
-
-  static int ep_dont_collide_with[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    -1
-  };
-
-  static int ep_dont_run_into[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-
-    EL_AMOEBA_DROP,
-    EL_ACID,
-
-    /* !!! maybe this should better be handled by 'ep_diggable' !!! */
-#if 1
-    EL_SP_BUGGY_BASE_ACTIVE,
-    EL_TRAP_ACTIVE,
-    EL_LANDMINE,
-#endif
     -1
   };
 
@@ -2248,10 +2302,20 @@ void InitElementPropertiesStatic()
   {
     { ep_diggable,		EP_DIGGABLE		},
     { ep_collectible,		EP_COLLECTIBLE		},
+    { ep_dont_run_into,		EP_DONT_RUN_INTO	},
+    { ep_dont_collide_with,	EP_DONT_COLLIDE_WITH	},
+    { ep_dont_touch,		EP_DONT_TOUCH		},
     { ep_indestructible,	EP_INDESTRUCTIBLE	},
     { ep_slippery,		EP_SLIPPERY		},
+    { ep_can_change,		EP_CAN_CHANGE		},
+    { ep_can_move,		EP_CAN_MOVE		},
     { ep_can_fall,		EP_CAN_FALL		},
-    { ep_can_smash,		EP_CAN_SMASH		},
+    { ep_can_smash_friends,	EP_CAN_SMASH_FRIENDS	},
+    { ep_can_smash_enemies,	EP_CAN_SMASH_ENEMIES	},
+    { ep_can_smash_explosives,	EP_CAN_SMASH_EXPLOSIVES	},
+    { ep_can_explode_by_fire,	EP_CAN_EXPLODE_BY_FIRE	},
+    { ep_can_explode_smashed,	EP_CAN_EXPLODE_SMASHED	},
+    { ep_can_explode_impact,	EP_CAN_EXPLODE_IMPACT	},
     { ep_walkable_over,		EP_WALKABLE_OVER	},
     { ep_walkable_inside,	EP_WALKABLE_INSIDE	},
     { ep_walkable_under,	EP_WALKABLE_UNDER	},
@@ -2260,15 +2324,11 @@ void InitElementPropertiesStatic()
     { ep_passable_under,	EP_PASSABLE_UNDER	},
     { ep_pushable,		EP_PUSHABLE		},
 
-    { ep_player,		EP_PLAYER		},
     { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
-    { ep_can_move,		EP_CAN_MOVE		},
+
+    { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
     { ep_switchable,		EP_SWITCHABLE		},
-    { ep_dont_touch,		EP_DONT_TOUCH		},
-    { ep_dont_collide_with,	EP_DONT_COLLIDE_WITH	},
-    { ep_dont_run_into,		EP_DONT_RUN_INTO	},
-    { ep_can_explode_by_fire,	EP_CAN_EXPLODE_BY_FIRE	},
     { ep_bd_element,		EP_BD_ELEMENT		},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_sb_element,		EP_SB_ELEMENT		},
@@ -2384,26 +2444,31 @@ void InitElementPropertiesEngine(int engine_version)
 
   static int no_wall_properties[] =
   {
-    EP_AMOEBALIVE,
-    EP_AMOEBOID,
-    EP_CAN_BE_CRUMBLED,
-    EP_DONT_COLLIDE_WITH,
-    EP_CAN_FALL,
-    EP_CAN_SMASH,
-    EP_CAN_MOVE,
-    EP_DONT_RUN_INTO,
-    EP_FOOD_DARK_YAMYAM,
-    EP_GEM,
-    EP_FOOD_PENGUIN,
-    EP_PUSHABLE,
-    EP_PLAYER,
-    EP_ACCESSIBLE,
     EP_DIGGABLE,
     EP_COLLECTIBLE,
-    EP_ACTIVE_BOMB,
+    EP_DONT_RUN_INTO,
+    EP_DONT_COLLIDE_WITH,
+    EP_CAN_MOVE,
+    EP_CAN_FALL,
+    EP_CAN_SMASH_FRIENDS,
+    EP_CAN_SMASH_ENEMIES,
+    EP_CAN_SMASH_EXPLOSIVES,
+    EP_PUSHABLE,
+
+    EP_CAN_BE_CRUMBLED,
+
+    EP_PLAYER,
+    EP_GEM,
+    EP_FOOD_DARK_YAMYAM,
+    EP_FOOD_PENGUIN,
     EP_BELT,
     EP_BELT_ACTIVE,
     EP_TUBE,
+    EP_AMOEBOID,
+    EP_AMOEBALIVE,
+    EP_ACTIVE_BOMB,
+
+    EP_ACCESSIBLE,
     -1
   };
 
@@ -2489,13 +2554,30 @@ void InitElementPropertiesEngine(int engine_version)
 					   !IS_WALKABLE_OVER(i) &&
 					   !IS_WALKABLE_UNDER(i)));
 
-    /* ---------- DONT_COLLIDE_WITH ---------------------------------------- */
-    if (DONT_TOUCH(i))		/* dont_touch => dont_collide_with */
-      SET_PROPERTY(i, EP_DONT_COLLIDE_WITH, TRUE);
+    if (IS_CUSTOM_ELEMENT(i))
+    {
+      /* ---------- DONT_COLLIDE_WITH / DONT_RUN_INTO ---------------------- */
+      if (DONT_TOUCH(i))
+	SET_PROPERTY(i, EP_DONT_COLLIDE_WITH, TRUE);
+      if (DONT_COLLIDE_WITH(i))
+	SET_PROPERTY(i, EP_DONT_RUN_INTO, TRUE);
 
-    /* ---------- DONT_RUN_INTO -------------------------------------------- */
-    if (DONT_COLLIDE_WITH(i))	/* dont_collide_with => dont_run_into */
-      SET_PROPERTY(i, EP_DONT_RUN_INTO, TRUE);
+      /* ---------- CAN_SMASH_ENEMIES / CAN_SMASH_FRIENDS ------------------ */
+      if (CAN_SMASH_EXPLOSIVES(i))
+	SET_PROPERTY(i, EP_CAN_SMASH_ENEMIES, TRUE);
+      if (CAN_SMASH_ENEMIES(i))
+	SET_PROPERTY(i, EP_CAN_SMASH_FRIENDS, TRUE);
+    }
+
+    /* ---------- CAN_SMASH ------------------------------------------------ */
+    SET_PROPERTY(i, EP_CAN_SMASH, (CAN_SMASH_FRIENDS(i) ||
+				   CAN_SMASH_ENEMIES(i) ||
+				   CAN_SMASH_EXPLOSIVES(i)));
+
+    /* ---------- CAN_EXPLODE ---------------------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||
+				     CAN_EXPLODE_SMASHED(i) ||
+				     CAN_EXPLODE_BY_FIRE(i)));
   }
 
 #if 0

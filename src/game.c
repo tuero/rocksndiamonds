@@ -674,7 +674,7 @@ static void InitGameEngine()
     struct ElementChangeInfo *change = &element_info[element].change;
 
     /* only add custom elements that change after fixed/random frame delay */
-    if (!IS_CHANGEABLE(element) || !HAS_CHANGE_EVENT(element, CE_DELAY))
+    if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, CE_DELAY))
       continue;
 
     changing_element[element].base_element = element;
@@ -2316,8 +2316,9 @@ void Impact(int x, int y)
 {
   boolean lastline = (y == lev_fieldy-1);
   boolean object_hit = FALSE;
+  boolean impact = (lastline || object_hit);
   int element = Feld[x][y];
-  int smashed = 0;
+  int smashed = EL_UNDEFINED;
 
   if (!lastline)	/* check if element below was hit */
   {
@@ -2337,16 +2338,20 @@ void Impact(int x, int y)
     return;
   }
 
-  if (lastline || object_hit)
+  if (impact)
   {
     ResetGfxAnimation(x, y);
     DrawLevelField(x, y);
   }
 
+#if 1
+  if (impact && CAN_EXPLODE_IMPACT(element))
+#else
   if ((element == EL_BOMB ||
        element == EL_SP_DISK_ORANGE ||
        element == EL_DX_SUPABOMB) &&
       (lastline || object_hit))		/* element is bomb */
+#endif
   {
     Bang(x, y);
     return;
@@ -2358,7 +2363,7 @@ void Impact(int x, int y)
     return;
   }
 
-  if (element == EL_AMOEBA_DROP && (lastline || object_hit))
+  if (impact && element == EL_AMOEBA_DROP)
   {
     if (object_hit && IS_PLAYER(x, y+1))
       KillHeroUnlessProtected(x, y+1);
@@ -3708,7 +3713,7 @@ void ContinueMoving(int x, int y)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
-  int step = (horiz_move ? dx : dy) * TILEX / 8;
+  int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
 
   if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
     step /= 2;
@@ -3725,6 +3730,8 @@ void ContinueMoving(int x, int y)
     step /= 2;
   else if (element == EL_SPRING && horiz_move)
     step *= 2;
+  else if (IS_CUSTOM_ELEMENT(element))
+    step = SIGN(step) * element_info[element].move_stepsize;
 
 #if OLD_GAME_BEHAVIOUR
   else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))

@@ -71,6 +71,7 @@
 #define ED_BORDER_SIZE			3
 #define ED_BORDER2_SIZE			5
 #define ED_GADGET_DISTANCE		2
+#define ED_GADGET_TEXT_DISTANCE		(2 * ED_GADGET_DISTANCE)
 
 /* values for the setting windows */
 #define ED_SETTINGS_XSTART		(3 * MINI_TILEX / 2)
@@ -117,7 +118,7 @@
 
 #if 1
 #define ED_AREA_ELEM_CONTENT4_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(3) + \
+#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 #else
 #define ED_AREA_ELEM_CONTENT4_XPOS	(17 * MINI_TILEX)
@@ -361,13 +362,15 @@
 #define GADGET_ID_CUSTOM_DEADLINESS	(GADGET_ID_SELECTBOX_FIRST + 2)
 #define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 3)
 #define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 4)
-#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 5)
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 6)
-#define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 7)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 8)
+#define GADGET_ID_CUSTOM_MOVE_STEPSIZE	(GADGET_ID_SELECTBOX_FIRST + 5)
+#define GADGET_ID_CUSTOM_SMASH_TARGETS	(GADGET_ID_SELECTBOX_FIRST + 6)
+#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 7)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 8)
+#define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 9)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 10)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 9)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 11)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -402,21 +405,24 @@
 #define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 5)
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
 #define GADGET_ID_CUSTOM_EXPLODE_RESULT	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 22)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 23)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -494,12 +500,14 @@
 #define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	2
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	3
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	4
-#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	5
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	6
-#define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	7
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		8
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	5
+#define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	6
+#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	7
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	8
+#define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	9
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		10
 
-#define ED_NUM_SELECTBOX			9
+#define ED_NUM_SELECTBOX			11
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
@@ -522,20 +530,23 @@
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	5
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	6
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		7
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	8
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	9
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	10
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	11
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	12
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	13
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	14
-#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	15
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		16
-#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	17
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	6
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	7
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	8
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	9
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		10
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	11
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	12
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	13
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	14
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	15
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	17
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	18
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		19
+#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	20
 
-#define ED_NUM_CHECKBUTTONS			18
+#define ED_NUM_CHECKBUTTONS			21
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -816,7 +827,7 @@ static struct ValueTextInfo options_walk_to_action[] =
   { EP_PUSHABLE,		"pushable"			},
   { -1,				NULL				}
 };
-static int index_walk_to_action = 0;
+static int value_walk_to_action = 0;
 
 static struct ValueTextInfo options_move_pattern[] =
 {
@@ -833,7 +844,6 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_ALONG_RIGHT_SIDE,	"along right side"		},
   { -1,				NULL				}
 };
-static int index_move_pattern = 0;
 
 static struct ValueTextInfo options_move_direction[] =
 {
@@ -844,17 +854,24 @@ static struct ValueTextInfo options_move_direction[] =
   { MV_DOWN,			"down"				},
   { -1,				NULL				}
 };
-static int index_move_direction = 0;
+
+static struct ValueTextInfo options_move_stepsize[] =
+{
+  { 1,				"very slow"			},
+  { 2,				"slow"				},
+  { 4,				"normal"			},
+  { 8,				"fast"				},
+  { 16,				"very fast"			},
+  { -1,				NULL				}
+};
 
 static struct ValueTextInfo options_consistency[] =
 {
+  { EP_CAN_EXPLODE,		"can explode"			},
   { EP_INDESTRUCTIBLE,		"indestructible"		},
-  { EP_CAN_EXPLODE_BY_FIRE,	"can explode by fire"		},
-  { EP_CAN_EXPLODE_SMASHED,	"can explode when smashed"	},
-  { EP_CAN_EXPLODE_IMPACT,	"can explode on impact"		},
   { -1,				NULL				}
 };
-static int index_consistency = 0;
+static int value_consistency = 0;
 
 static struct ValueTextInfo options_deadliness[] =
 {
@@ -863,7 +880,16 @@ static struct ValueTextInfo options_deadliness[] =
   { EP_DONT_TOUCH,		"touching"			},
   { -1,				NULL				}
 };
-static int index_deadliness = 0;
+static int value_deadliness = 0;
+
+static struct ValueTextInfo options_smash_targets[] =
+{
+  { EP_CAN_SMASH_FRIENDS,	"friends"			},
+  { EP_CAN_SMASH_ENEMIES,	"enemies"			},
+  { EP_CAN_SMASH_EXPLOSIVES,	"explosives"			},
+  { -1,				NULL				}
+};
+static int value_smash_targets = 0;
 
 static struct ValueTextInfo options_walkable_layer[] =
 {
@@ -872,7 +898,7 @@ static struct ValueTextInfo options_walkable_layer[] =
   { EP_WALKABLE_UNDER,		"under"				},
   { -1,				NULL				}
 };
-static int index_walkable_layer = 0;
+static int value_walkable_layer = 0;
 
 static struct ValueTextInfo options_time_units[] =
 {
@@ -880,7 +906,6 @@ static struct ValueTextInfo options_time_units[] =
   { 1,				"frames"			},
   { -1,				NULL				}
 };
-static int index_time_units = 0;
 
 static struct ValueTextInfo options_change_player_action[] =
 {
@@ -888,7 +913,7 @@ static struct ValueTextInfo options_change_player_action[] =
   { CE_TOUCHED_BY_PLAYER,	"touched"			},
   { -1,				NULL				}
 };
-static int index_change_player_action = 0, value_change_player_action = 0;
+static int value_change_player_action = 0;
 
 static struct ValueTextInfo options_change_cause[] =
 {
@@ -899,7 +924,7 @@ static struct ValueTextInfo options_change_cause[] =
   { 5,				"pressed by player"		},
   { -1,				NULL				}
 };
-static int index_change_cause = 0, value_change_cause = 0;
+static int value_change_cause = 0;
 
 static struct
 {
@@ -907,7 +932,7 @@ static struct
   int gadget_id;
   int size;	/* char size of selectbox or '-1' (dynamically determined) */
   struct ValueTextInfo *options;
-  int *index, *value;
+  int *value;
   char *text_left, *text_right, *infotext;
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
@@ -915,31 +940,31 @@ static struct
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_WALK_TO_ACTION,
     -1,
-    options_walk_to_action, &index_walk_to_action,
-    &custom_element.walk_to_action,
+    options_walk_to_action,
+    &value_walk_to_action,
     NULL, NULL, "diggable/collectible/pushable"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_CONSISTENCY,
     -1,
-    options_consistency, &index_consistency,
-    &custom_element.consistency,
-    NULL, "to", "consistency/destructibility"
+    options_consistency,
+    &value_consistency,
+    NULL, "explodes to:", "consistency/destructibility"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_DEADLINESS,
     -1,
-    options_deadliness, &index_deadliness,
-    &custom_element.deadliness,
+    options_deadliness,
+    &value_deadliness,
     "deadly when", NULL, "deadliness of element"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_MOVE_PATTERN,
     -1,
-    options_move_pattern, &index_move_pattern,
+    options_move_pattern,
     &custom_element.move_pattern,
     "can move", NULL, "element move direction"
   },
@@ -947,23 +972,39 @@ static struct
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_MOVE_DIRECTION,
     -1,
-    options_move_direction, &index_move_direction,
+    options_move_direction,
     &custom_element.move_direction_initial,
     "starts moving", NULL, "initial element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    GADGET_ID_CUSTOM_MOVE_STEPSIZE,
+    -1,
+    options_move_stepsize,
+    &custom_element.move_stepsize,
+    "move speed", NULL, "speed of element movement"
+  },
+  {
+    ED_SETTINGS_XPOS(7),		ED_SETTINGS_YPOS(10),
+    GADGET_ID_CUSTOM_SMASH_TARGETS,
+    -1,
+    options_smash_targets,
+    &value_smash_targets,
+    "can smash", NULL, "elements that can be smashed"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_WALKABLE_LAYER,
     -1,
-    options_walkable_layer, &index_walkable_layer,
-    &custom_element.walkable_layer,
+    options_walkable_layer,
+    &value_walkable_layer,
     "player can walk", NULL, "layer where player can walk"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_TIME_UNITS,
     -1,
-    options_time_units, &index_time_units,
+    options_time_units,
     &custom_element.change.delay_frames,
     "delay time given in", NULL, "delay time units for change"
   },
@@ -971,7 +1012,7 @@ static struct
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CHANGE_PLAYER_ACTION,
     -1,
-    options_change_player_action, &index_change_player_action,
+    options_change_player_action,
     &value_change_player_action,
     NULL, "by player", "type of player contact"
   },
@@ -979,7 +1020,7 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CHANGE_CAUSE,
     -1,
-    options_change_cause, &index_change_cause,
+    options_change_cause,
     &value_change_cause,
     "test:", NULL, "test-selectbox entry"
   },
@@ -1162,10 +1203,28 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_EXPLODE_RESULT,
     &custom_element_properties[EP_EXPLODE_RESULT],
     NULL,				"set consistency/destructibility"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
+    GADGET_ID_CUSTOM_EXPLODE_FIRE,
+    &custom_element_properties[EP_CAN_EXPLODE_BY_FIRE],
+    "by fire",				"element can explode by fire/explosion"
+  },
+  {
+    ED_SETTINGS_XPOS(7),		ED_SETTINGS_YPOS(3),
+    GADGET_ID_CUSTOM_EXPLODE_SMASH,
+    &custom_element_properties[EP_CAN_EXPLODE_SMASHED],
+    "smashed",				"element can explode when smashed"
+  },
+  {
+    ED_SETTINGS_XPOS(13),		ED_SETTINGS_YPOS(3),
+    GADGET_ID_CUSTOM_EXPLODE_IMPACT,
+    &custom_element_properties[EP_CAN_EXPLODE_IMPACT],
+    "impact",				"element can explode on impact"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(4),
@@ -1174,7 +1233,7 @@ static struct
     NULL,				"player can dig/collect/push element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_DEADLY,
     &custom_element_properties[EP_DEADLY],
     NULL,				"element can kill the player"
@@ -1186,25 +1245,25 @@ static struct
     NULL,				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS(6),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(6),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[EP_CAN_SMASH],
-    "can smash on impact",		"element can smash other elements"
+    NULL,				"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_WALKABLE,
     &custom_element_properties[EP_WALKABLE],
     NULL,				"player can walk on the same field"
@@ -1223,8 +1282,8 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
-    GADGET_ID_CUSTOM_CHANGEABLE,
-    &custom_element_properties[EP_CHANGEABLE],
+    GADGET_ID_CUSTOM_CAN_CHANGE,
+    &custom_element_properties[EP_CAN_CHANGE],
     "element changes to    after/when:","element can change to other element"
   },
   {
@@ -2428,7 +2487,7 @@ static void CreateCounterButtons()
     if (counterbutton_info[i].text_left != NULL)
       xoffset = (getFontWidth(FONT_TEXT_1) *
 		 strlen(counterbutton_info[i].text_left) +
-		 2 * ED_GADGET_DISTANCE);
+		 ED_GADGET_TEXT_DISTANCE);
 
     for (j=0; j<2; j++)
     {
@@ -2796,7 +2855,7 @@ static void CreateSelectboxGadgets()
     if (selectbox_info[i].text_left != NULL)
       xoffset = (getFontWidth(FONT_TEXT_1) *
 		 strlen(selectbox_info[i].text_left) +
-		 2 * ED_GADGET_DISTANCE);
+		 ED_GADGET_TEXT_DISTANCE);
 
     sprintf(infotext, "Select %s", selectbox_info[i].infotext);
     infotext[max_infotext_len] = '\0';
@@ -2808,7 +2867,6 @@ static void CreateSelectboxGadgets()
 		      GDI_Y, SY + selectbox_info[i].y,
 		      GDI_TYPE, GD_TYPE_SELECTBOX,
 		      GDI_SELECTBOX_OPTIONS, selectbox_info[i].options,
-		      GDI_SELECTBOX_INDEX, selectbox_info[i].index,
 		      GDI_TEXT_SIZE, selectbox_info[i].size,
 		      GDI_TEXT_FONT, FONT_INPUT_1,
 		      GDI_TEXT_FONT_ACTIVE, FONT_INPUT_1_ACTIVE,
@@ -3179,7 +3237,7 @@ static void MapSelectboxGadget(int id)
 {
   int xoffset_left = 0;
   int yoffset_left = ED_BORDER_SIZE;
-  int xoffset_right = ED_BORDER_SIZE;
+  int xoffset_right = ED_GADGET_TEXT_DISTANCE;
   int yoffset_right = ED_BORDER_SIZE;
   int x = selectbox_info[id].x + xoffset_left;
   int y = selectbox_info[id].y + yoffset_left;
@@ -3357,7 +3415,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
     custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
 
   /* set walk-to-object action selectbox help value */
-  custom_element.walk_to_action =
+  value_walk_to_action =
     (IS_DIGGABLE(element) ? EP_DIGGABLE :
      IS_COLLECTIBLE(element) ? EP_COLLECTIBLE :
      IS_PUSHABLE(element) ? EP_PUSHABLE :
@@ -3368,16 +3426,16 @@ static void CopyCustomElementPropertiesToEditor(int element)
      IS_PUSHABLE(element));
 
   /* set consistency selectbox help value */
-  custom_element.consistency =
-    (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
-     CAN_EXPLODE_BY_FIRE(element) ? EP_CAN_EXPLODE_BY_FIRE :
-     EP_INDESTRUCTIBLE);
+  value_consistency =
+    (CAN_EXPLODE(element) ? EP_CAN_EXPLODE :
+     IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
+     EP_CAN_EXPLODE);
   custom_element_properties[EP_EXPLODE_RESULT] =
-    (IS_INDESTRUCTIBLE(element) ||
-     CAN_EXPLODE_BY_FIRE(element));
+    (CAN_EXPLODE(element) ||
+     IS_INDESTRUCTIBLE(element));
 
   /* set deadliness selectbox help value */
-  custom_element.deadliness =
+  value_deadliness =
     (DONT_TOUCH(element) ? EP_DONT_TOUCH :
      DONT_COLLIDE_WITH(element) ? EP_DONT_COLLIDE_WITH :
      DONT_RUN_INTO(element) ? EP_DONT_RUN_INTO :
@@ -3387,8 +3445,19 @@ static void CopyCustomElementPropertiesToEditor(int element)
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
+  /* set smash targets selectbox help value */
+  value_smash_targets =
+    (CAN_SMASH_EXPLOSIVES(element) ? EP_CAN_SMASH_EXPLOSIVES :
+     CAN_SMASH_ENEMIES(element) ? EP_CAN_SMASH_ENEMIES :
+     CAN_SMASH_FRIENDS(element) ? EP_CAN_SMASH_FRIENDS :
+     EP_CAN_SMASH_FRIENDS);
+  custom_element_properties[EP_CAN_SMASH] =
+    (CAN_SMASH_EXPLOSIVES(element) ||
+     CAN_SMASH_ENEMIES(element) ||
+     CAN_SMASH_FRIENDS(element));
+
   /* set walkable layer selectbox help value */
-  custom_element.walkable_layer =
+  value_walkable_layer =
     (IS_WALKABLE_OVER(element) ? EP_WALKABLE_OVER :
      IS_WALKABLE_INSIDE(element) ? EP_WALKABLE_INSIDE :
      IS_WALKABLE_UNDER(element) ? EP_WALKABLE_UNDER :
@@ -3415,27 +3484,34 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_DIGGABLE] = FALSE;
   custom_element_properties[EP_COLLECTIBLE] = FALSE;
   custom_element_properties[EP_PUSHABLE] = FALSE;
-  custom_element_properties[custom_element.walk_to_action] =
+  custom_element_properties[value_walk_to_action] =
     custom_element_properties[EP_WALK_TO_OBJECT];
 
   /* set consistency property from checkbox and selectbox */
+  custom_element_properties[EP_CAN_EXPLODE] = FALSE;
   custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
-  custom_element_properties[custom_element.consistency] =
+  custom_element_properties[value_consistency] =
     custom_element_properties[EP_EXPLODE_RESULT];
 
   /* set deadliness property from checkbox and selectbox */
   custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
   custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
   custom_element_properties[EP_DONT_TOUCH] = FALSE;
-  custom_element_properties[custom_element.deadliness] =
+  custom_element_properties[value_deadliness] =
     custom_element_properties[EP_DEADLY];
+
+  /* set smash property from checkbox and selectbox */
+  custom_element_properties[EP_CAN_SMASH_FRIENDS] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_EXPLOSIVES] = FALSE;
+  custom_element_properties[value_smash_targets] =
+    custom_element_properties[EP_CAN_SMASH];
 
   /* set walkable property from checkbox and selectbox */
   custom_element_properties[EP_WALKABLE_OVER] = FALSE;
   custom_element_properties[EP_WALKABLE_INSIDE] = FALSE;
   custom_element_properties[EP_WALKABLE_UNDER] = FALSE;
-  custom_element_properties[custom_element.walkable_layer] =
+  custom_element_properties[value_walkable_layer] =
     custom_element_properties[EP_WALKABLE];
 
   /* set player change event from checkbox and selectbox */
@@ -4174,8 +4250,16 @@ static void DrawPropertiesInfo()
 
     { EP_CAN_MOVE,		"- can move"				},
     { EP_CAN_FALL,		"- can fall"				},
-    { EP_CAN_SMASH,		"- can smash other objects"		},
-    { EP_CAN_EXPLODE_BY_FIRE,	"- can explode (by fire/explosion)"	},
+#if 0
+    { EP_CAN_SMASH,		"- can smash"				},
+#endif
+    { EP_CAN_SMASH_FRIENDS,	"- can smash player and friends"	},
+    { EP_CAN_SMASH_ENEMIES,	"- can smash good and bad guys"		},
+    { EP_CAN_SMASH_EXPLOSIVES,	"- can smash everything smashable"	},
+    { EP_CAN_EXPLODE,		"- can explode"				},
+    { EP_CAN_EXPLODE_BY_FIRE,	"  - by fire or explosions"		},
+    { EP_CAN_EXPLODE_SMASHED,	"  - when smashed"			},
+    { EP_CAN_EXPLODE_IMPACT,	"  - on impact"				},
 
     { EP_DONT_RUN_INTO,		"- deadly when running into"		},
     { EP_DONT_COLLIDE_WITH,	"- deadly when colliding with"		},
@@ -5483,7 +5567,6 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
 
-  *selectbox_info[type_id].index = gi->selectbox.index;
   *selectbox_info[type_id].value =
     selectbox_info[type_id].options[gi->selectbox.index].value;
 
