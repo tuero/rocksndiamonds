@@ -1,6 +1,6 @@
 #=============================================================================#
 # Makefile for Artsoft Retro-Game Library                                     #
-# (c) 1994-2000 Holger Schemel, info@artsoft.org                              #
+# (c) 1994-2002 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 SRCS =	system.c	\

@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -306,12 +306,19 @@ char *getLoginName()
 #if defined(PLATFORM_WIN32)
   return ANONYMOUS_NAME;
 #else
-  struct passwd *pwd;
+  static char *login_name = NULL;
 
-  if ((pwd = getpwuid(getuid())) == NULL)
-    return ANONYMOUS_NAME;
-  else
-    return pwd->pw_name;
+  if (login_name == NULL)
+  {
+    struct passwd *pwd;
+
+    if ((pwd = getpwuid(getuid())) == NULL)
+      login_name = ANONYMOUS_NAME;
+    else
+      login_name = getStringCopy(pwd->pw_name);
+  }
+
+  return login_name;
 #endif
 }
 
@@ -357,16 +364,16 @@ char *getHomeDir()
 #if defined(PLATFORM_UNIX)
   static char *home_dir = NULL;
 
-  if (!home_dir)
+  if (home_dir == NULL)
   {
-    if (!(home_dir = getenv("HOME")))
+    if ((home_dir = getenv("HOME")) == NULL)
     {
       struct passwd *pwd;
 
-      if ((pwd = getpwuid(getuid())))
-	home_dir = pwd->pw_dir;
-      else
+      if ((pwd = getpwuid(getuid())) == NULL)
 	home_dir = ".";
+      else
+	home_dir = getStringCopy(pwd->pw_dir);
     }
   }
 

@@ -14,7 +14,7 @@
 #include "libgame/libgame.h"
 
 #include "config.h"
-#include "timestamp.h"
+#include "conftime.h"
 
 /* use timestamp created at compile-time */
 #define PROGRAM_BUILD_STRING	PROGRAM_IDENT_STRING " " COMPILE_DATE_STRING

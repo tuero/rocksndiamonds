@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -14,7 +14,9 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-/* define keywords for supported main platforms */
+/* ========================================================================= */
+/* define keywords for supported main platforms (Unix, DOS and Windows)      */
+/* ========================================================================= */
 
 #if defined(MSDOS)
 #define PLATFORM_MSDOS
@@ -58,6 +60,18 @@
 
 #if defined(__NetBSD__)
 #define PLATFORM_NETBSD
+#endif
+
+#if defined(__bsdi__)
+#define PLATFORM_BSDI
+#endif
+
+#if defined(sparc) || defined(sun)
+#define PLATFORM_SOLARIS
+#endif
+
+#if defined(__APPLE__) && defined(__MACH__)
+#define PLATFORM_MACOSX
 #endif
 
 /* detecting HP-UX by the following compiler keyword definitions:

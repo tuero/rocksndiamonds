@@ -11,8 +11,9 @@
 * setup.c                                                  *
 ***********************************************************/
 
-#include <dirent.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -1932,8 +1933,8 @@ static void SaveUserLevelInfo()
   /* always start with reliable default values */
   setTreeInfoToDefaults(&ldi, TREE_TYPE_LEVEL_DIR);
 
-  ldi.name = getLoginName();
-  ldi.author = getRealName();
+  ldi.name = getStringCopy(getLoginName());
+  ldi.author = getStringCopy(getRealName());
   ldi.levels = 100;
   ldi.first_level = 1;
   ldi.sort_priority = LEVELCLASS_USER_START;

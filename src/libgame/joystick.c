@@ -326,7 +326,7 @@ int AnyJoystick()
 int AnyJoystickButton()
 {
   int i;
-  int result;
+  int result = JOY_BUTTON_NOT_PRESSED;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {

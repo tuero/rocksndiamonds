@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2001 Artsoft Entertainment                      *
+* (c) 1995-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -1678,18 +1678,34 @@ void InitElementProperties()
 
 void Execute_Debug_Command(char *command)
 {
-  if (strcmp(command, "create soundinfo.conf") == 0)
+  if (strcmp(command, "create graphicsinfo.conf") == 0)
+  {
+    printf("# (Currently only the \"name\" directive is recognized.)\n");
+    printf("\n");
+    printf("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
+    printf("\n");
+  }
+  else if (strcmp(command, "create soundsinfo.conf") == 0)
   {
     int i;
 
     printf("# You can configure additional/alternative sound effects here\n");
     printf("# (The sounds below are default and therefore commented out.)\n");
     printf("\n");
+    printf("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
+    printf("\n");
 
     for (i=0; i<NUM_SOUND_EFFECTS; i++)
       printf("# %s\n",
 	     getFormattedSetupEntry(sound_effects[i].text,
 				    sound_effects[i].default_filename));
+  }
+  else if (strcmp(command, "create musicinfo.conf") == 0)
+  {
+    printf("# (Currently only the \"name\" directive is recognized.)\n");
+    printf("\n");
+    printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
+    printf("\n");
   }
 }
 

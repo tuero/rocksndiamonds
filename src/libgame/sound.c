@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -11,8 +11,9 @@
 * sound.c                                                  *
 ***********************************************************/
 
-#include <string.h>
+#include <sys/types.h>
 #include <sys/time.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
@@ -1304,7 +1305,7 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 	mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
   /* might be needed for u-law /dev/audio */
-#if 0
+#if 1
   for(j=0; j<sample_size; j++)
     playing_buffer[j] =
       linear_to_ulaw(premix_first_buffer[j]);

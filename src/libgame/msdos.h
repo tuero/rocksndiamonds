@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -19,10 +19,10 @@
 
 
 /* symbol 'window' is defined in DJGPP cross-compiler in libc.a(conio.o) */
-#define window window_djgpp
+#define window window_internal
 
 /* symbol 'font' is defined in "allegro.h" */
-#define font font_allegro
+#define font font_internal
 
 /* system dependent definitions */
 

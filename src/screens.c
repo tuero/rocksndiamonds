@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2001 Artsoft Entertainment                      *
+* (c) 1995-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -2097,7 +2097,7 @@ void CustomizeKeyboard(int player_nr)
       {
         case EVENT_KEYPRESS:
 	  {
-	    Key key = GetEventKey((KeyEvent *)&event, TRUE);
+	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
 	    if (key == KSYM_Escape || (key == KSYM_Return && step_nr == 6))
 	    {

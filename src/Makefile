@@ -1,6 +1,6 @@
 #=============================================================================#
 # Makefile for Rocks'n'Diamonds                                               #
-# (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
+# (c) 1995-2002 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 .EXPORT_ALL_VARIABLES:
@@ -46,6 +46,12 @@ PROGNAME = ../$(PROGBASE)
 ifeq ($(PLATFORM),solaris)
 EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
 PLATFORM = unix
+endif
+
+ifeq ($(PLATFORM),macosx)
+# PROGNAME = ../Rocks\'n\'Diamonds.app/Contents/MacOS/$(PROGBASE)
+PLATFORM = unix
+TARGET=sdl
 endif
 
 ifeq ($(PLATFORM),unix)
@@ -144,7 +150,7 @@ OBJS =	main.o		\
 	network.o	\
 	netserv.o
 
-TIMESTAMP_FILE = timestamp.h
+TIMESTAMP_FILE = conftime.h
 
 LIBDIR = libgame
 LIBGAME = $(LIBDIR)/libgame.a
@@ -158,7 +164,7 @@ endif
 
 all: libgame_dir $(PROGNAME)
 
-$(PROGNAME): $(LIBGAME) $(OBJS) $(ICON)
+$(PROGNAME): $(LIBGAME) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
 
 libgame_dir:

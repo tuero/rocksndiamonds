@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -822,7 +822,9 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 	 (int)SDL_GetModState());
 #endif
 
-  if (with_modifiers && event->keysym.unicode != 0)
+  if (with_modifiers &&
+      event->keysym.unicode > 0x0000 &&
+      event->keysym.unicode < 0x2000)
     return event->keysym.unicode;
   else
     return event->keysym.sym;

@@ -1,18 +1,22 @@
 #=============================================================================#
 # Makefile for Rocks'n'Diamonds                                               #
-# (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
+# (c) 1995-2002 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
 #-----------------------------------------------------------------------------#
 # configuration section                                                       #
 #-----------------------------------------------------------------------------#
 
-# specify your favorite ANSI C compiler
+# specify command name of your favorite ANSI C compiler
+# (this must be set to "cc" for some systems)
 CC = gcc
 
+# specify command name of GNU make on your system
+# (this must be set to "gmake" for some systems)
+MAKE = make
+
 # specify path to X11 on your system
-# if undefined, use system defaults (works with Linux/gcc/libc5)
-X11_PATH = /usr/X11
+X11_PATH = /usr/X11R6
 
 # specify directory for read-only game data (like graphics, sounds, levels)
 # default is '.', so you can play without installing game data somewhere
@@ -42,8 +46,6 @@ CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 
 .EXPORT_ALL_VARIABLES:
 
-MAKE = make
-
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
@@ -61,6 +63,9 @@ solaris:
 
 solaris-sdl:
 	@$(MAKE_CMD) PLATFORM=solaris TARGET=sdl
+
+mac:
+	@$(MAKE_CMD) PLATFORM=macosx
 
 msdos:
 	@$(MAKE_CMD) PLATFORM=msdos
@@ -100,6 +105,9 @@ dist-msdos:
 dist-win32:
 	./Scripts/make_dist.sh win .
 
+dist-macosx:
+	./Scripts/make_dist.sh mac . $(MAKE)
+
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
@@ -109,7 +117,7 @@ dist-build-all:
 	@BUILD_DIST=TRUE $(MAKE) cross-win32	; $(MAKE) dist-clean
 	@BUILD_DIST=TRUE $(MAKE) cross-msdos	; $(MAKE) dist-clean
 
-dist-all: dist-build-all dist-unix dist-msdos dist-win32
+dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
 
 depend dep:
 	$(MAKE_CMD) depend

@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2001 Artsoft Entertainment                      *
+* (c) 1995-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -11,7 +11,7 @@
 * network.c                                                *
 ***********************************************************/
 
-#include "libgame/libgame.h"
+#include "libgame/platform.h"
 
 #if defined(PLATFORM_UNIX)
 
@@ -24,9 +24,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#if 0
 #include "libgame/libgame.h"
-#endif
 
 #include "network.h"
 #include "netserv.h"

@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2001 Artsoft Entertainment                      *
+* (c) 1994-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -25,6 +25,14 @@
 #include "sdl.h"
 #elif defined(TARGET_X11)
 #include "x11.h"
+#endif
+
+#if defined(PLATFORM_MACOSX)
+/* some symbols are already defined on Mac OS X */
+#define Delay Delay_internal
+#define DrawLine DrawLine_internal
+#define DrawText DrawText_internal
+#define GetPixel GetPixel_internal
 #endif
 
 

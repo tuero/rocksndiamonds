@@ -1,1 +1,0 @@
-#define COMPILE_DATE_STRING "[2002-07-13 18:18]"
