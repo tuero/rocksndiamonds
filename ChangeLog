@@ -1,3 +1,6 @@
+2004-05-05
+	* fixed bug that caused two activated toolbox buttons in level editor
+
 2004-05-02
 	* fixed bug with creating walkable custom element under player (again)
 	* fixed bug with not copying explosion type when copying CEs in editor
@@ -5,11 +8,12 @@
 	* fixed graphical bug when the player is pushing an accessible element
 	* fixed bug with classic switchable elements triggering CE changes
 	* fixed bug with entering/leaving walkable element in RelocatePlayer()
-	* added special behaviour of Supaplex ports with gravity enabled
+	* fixed crash bug when CE leaves behind the trigger player element
 
 2004-04-30
 	* fixed bug with broken tubes after placing/exploding dynamite in them
 	* fixed bug with exploding dynamite under player due to other explosion
+	* fixed bug with not resetting push delay under certain circumstances
 
 2004-04-27
 	* added option "handicap" for "levelinfo.conf" (thanks to Niko Böhm)

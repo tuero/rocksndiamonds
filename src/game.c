@@ -114,8 +114,11 @@
 	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
 	 (e) == EL_TRIGGER_PLAYER  ? (ch)->actual_trigger_player : (e))
 
+#define GET_VALID_PLAYER_ELEMENT(e)					\
+	((e) >= EL_PLAYER_1 && (e) <= EL_PLAYER_4 ? (e) : EL_PLAYER_1)
+
 #define CAN_GROW_INTO(e)						\
-	(e == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
+	((e) == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
 
 #define ELEMENT_CAN_ENTER_FIELD_BASE_X(x, y, condition)			\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -2818,7 +2821,11 @@ void DrawRelocatePlayer(struct PlayerInfo *player)
 
 void RelocatePlayer(int jx, int jy, int el_player_raw)
 {
+#if 1
+  int el_player = GET_VALID_PLAYER_ELEMENT(el_player_raw);
+#else
   int el_player = (el_player_raw == EL_SP_MURPHY ? EL_PLAYER_1 :el_player_raw);
+#endif
   struct PlayerInfo *player = &stored_player[el_player - EL_PLAYER_1];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
@@ -9077,7 +9084,9 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 #if 1
   return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
 	  IS_GRAVITY_REACHABLE(Feld[newx][newy]) &&
+#if 0
 	  (!IS_SP_PORT(Feld[newx][newy]) || move_dir == MV_UP) &&
+#endif
 	  (IS_DIGGABLE(Feld[newx][newy]) ||
 	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
 	   canPassField(newx, newy, move_dir)));

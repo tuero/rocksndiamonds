@@ -9065,7 +9065,15 @@ void HandleLevelEditorKeyInput(Key key)
 	{
 	  RequestExitLevelEditor(setup.ask_on_escape);
 	}
-        else
+        else if (edit_mode == ED_MODE_INFO)
+	{
+	  HandleControlButtons(level_editor_gadget[GADGET_ID_INFO]);
+	}
+        else if (edit_mode == ED_MODE_PROPERTIES)
+	{
+	  HandleControlButtons(level_editor_gadget[GADGET_ID_PROPERTIES]);
+	}
+	else		/* should never happen */
 	{
 	  DrawDrawingWindow();
 	  edit_mode = ED_MODE_DRAWING;
