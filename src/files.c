@@ -12,6 +12,9 @@
 ***********************************************************/
 
 #include <ctype.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "files.h"
 #include "tools.h"
@@ -103,52 +106,6 @@ static void InitScoreDirectory(char *level_subdir)
 {
   createDirectory(getScoreDir(""), "main score");
   createDirectory(getScoreDir(level_subdir), "level score");
-}
-
-boolean LoadLevelInfo()
-{
-  int i;
-  char filename[MAX_FILENAME_LEN];
-  char cookie[MAX_FILENAME_LEN];
-  FILE *file;
-
-  sprintf(filename, "%s/%s", options.level_directory, LEVDIR_FILENAME);
-
-  if (!(file = fopen(filename, "r")))
-  {
-    Error(ERR_WARN, "cannot read level info '%s'", filename);
-    return(FALSE);
-  }
-
-  fscanf(file, "%s\n", cookie);
-  if (strcmp(cookie, LEVELDIR_COOKIE))
-  {
-    Error(ERR_WARN, "wrong format of level info file");
-    fclose(file);
-    return(FALSE);
-  }
-
-  num_leveldirs = 0;
-  leveldir_nr = 0;
-  for(i=0; i<MAX_LEVDIR_ENTRIES; i++)
-  {
-    fscanf(file, "%s", leveldir[i].filename);
-    fscanf(file, "%s", leveldir[i].name);
-    fscanf(file, "%d", &leveldir[i].levels);
-    fscanf(file, "%d", &leveldir[i].readonly);
-    if (feof(file))
-      break;
-
-    num_leveldirs++;
-  }
-
-  if (!num_leveldirs)
-  {
-    Error(ERR_WARN, "empty level info '%s'", filename);
-    return(FALSE);
-  }
-
-  return(TRUE);
 }
 
 void LoadLevel(int level_nr)
@@ -549,20 +506,22 @@ void SaveScore(int level_nr)
 
 #define TOKEN_VALUE_POSITION		30
 
-#define SETUP_TOKEN_SOUND		0
-#define SETUP_TOKEN_SOUND_LOOPS		1
-#define SETUP_TOKEN_SOUND_MUSIC		2
-#define SETUP_TOKEN_SOUND_SIMPLE	3
-#define SETUP_TOKEN_TOONS		4
-#define SETUP_TOKEN_DOUBLE_BUFFERING	5
-#define SETUP_TOKEN_SCROLL_DELAY	6
-#define SETUP_TOKEN_SOFT_SCROLLING	7
-#define SETUP_TOKEN_FADING		8
-#define SETUP_TOKEN_AUTORECORD		9
-#define SETUP_TOKEN_QUICK_DOORS		10
-#define SETUP_TOKEN_TEAM_MODE		11
-#define SETUP_TOKEN_ALIAS_NAME		12
+/* global setup */
+#define SETUP_TOKEN_PLAYER_NAME		0
+#define SETUP_TOKEN_SOUND		1
+#define SETUP_TOKEN_SOUND_LOOPS		2
+#define SETUP_TOKEN_SOUND_MUSIC		3
+#define SETUP_TOKEN_SOUND_SIMPLE	4
+#define SETUP_TOKEN_TOONS		5
+#define SETUP_TOKEN_DOUBLE_BUFFERING	6
+#define SETUP_TOKEN_SCROLL_DELAY	7
+#define SETUP_TOKEN_SOFT_SCROLLING	8
+#define SETUP_TOKEN_FADING		9
+#define SETUP_TOKEN_AUTORECORD		10
+#define SETUP_TOKEN_QUICK_DOORS		11
+#define SETUP_TOKEN_TEAM_MODE		12
 
+/* player setup */
 #define SETUP_TOKEN_USE_JOYSTICK	13
 #define SETUP_TOKEN_JOY_DEVICE_NAME	14
 #define SETUP_TOKEN_JOY_XLEFT		15
@@ -580,13 +539,20 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_KEY_SNAP		27
 #define SETUP_TOKEN_KEY_BOMB		28
 
-#define NUM_SETUP_TOKENS		29
+/* level directory info */
+#define LEVELINFO_TOKEN_NAME		29
+#define LEVELINFO_TOKEN_LEVELS		30
+#define LEVELINFO_TOKEN_SORT_PRIORITY	31
+#define LEVELINFO_TOKEN_READONLY	32
 
-#define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_SOUND
-#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_ALIAS_NAME
+#define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
+#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TEAM_MODE
 
 #define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
 #define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
+
+#define FIRST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_NAME
+#define LAST_LEVELINFO_TOKEN		LEVELINFO_TOKEN_READONLY
 
 #define TYPE_BOOLEAN			1
 #define TYPE_SWITCH			2
@@ -596,6 +562,7 @@ void SaveScore(int level_nr)
 
 static struct SetupInfo si;
 static struct SetupInputInfo sii;
+struct LevelDirInfo ldi;
 static struct
 {
   int type;
@@ -603,6 +570,8 @@ static struct
   char *text;
 } token_info[] =
 {
+  /* global setup */
+  { TYPE_STRING,  &si.player_name,	"player_name"			},
   { TYPE_SWITCH,  &si.sound,		"sound"				},
   { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
   { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
@@ -615,9 +584,8 @@ static struct
   { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
   { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
   { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
-  { TYPE_STRING,  &si.alias_name,	"alias_name"			},
 
-  /* for each player: */
+  /* player setup */
   { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
   { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
   { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
@@ -633,7 +601,13 @@ static struct
   { TYPE_KEYSYM,  &sii.key.up,		".key.move_up"			},
   { TYPE_KEYSYM,  &sii.key.down,	".key.move_down"		},
   { TYPE_KEYSYM,  &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEYSYM,  &sii.key.bomb,	".key.place_bomb"		}
+  { TYPE_KEYSYM,  &sii.key.bomb,	".key.place_bomb"		},
+
+  /* level directory info */
+  { TYPE_STRING,  &ldi.name,		"name"				},
+  { TYPE_INTEGER, &ldi.levels,		"levels"			},
+  { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
+  { TYPE_BOOLEAN, &ldi.readonly,	"readonly"			}
 };
 
 static char *string_tolower(char *s)
@@ -791,7 +765,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
 
   if (!(file = fopen(filename, "r")))
   {
-    Error(ERR_WARN, "cannot open setup file '%s'", filename);
+    Error(ERR_WARN, "cannot open setup/info file '%s'", filename);
     return NULL;
   }
 
@@ -859,8 +833,8 @@ static struct SetupFileList *loadSetupFileList(char *filename)
   setup_file_list->next = NULL;
   freeSetupFileList(setup_file_list);
 
-  if (!first_valid_list_entry)
-    Error(ERR_WARN, "setup file is empty");
+  if (first_valid_list_entry == NULL)
+    Error(ERR_WARN, "setup/info file '%s' is empty", filename);
 
   return first_valid_list_entry;
 }
@@ -875,7 +849,7 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
   {
     if (strcmp(setup_file_list->value, identifier) != 0)
     {
-      Error(ERR_WARN, "setup file has wrong version");
+      Error(ERR_WARN, "setup/info file has wrong version");
       return;
     }
     else
@@ -886,14 +860,24 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
     checkSetupFileListIdentifier(setup_file_list->next, identifier);
   else
   {
-    Error(ERR_WARN, "setup file has no version information");
+    Error(ERR_WARN, "setup/info file has no version information");
     return;
   }
+}
+
+static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
+{
+  ldi->name = getStringCopy("non-existing");
+  ldi->levels = 0;
+  ldi->sort_priority = 999;	/* default: least priority */
+  ldi->readonly = TRUE;
 }
 
 static void setSetupInfoToDefaults(struct SetupInfo *si)
 {
   int i;
+
+  si->player_name = getStringCopy(getLoginName());
 
   si->sound = TRUE;
   si->sound_loops = FALSE;
@@ -908,15 +892,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->autorecord = FALSE;
   si->quick_doors = FALSE;
 
-  strncpy(si->login_name, getLoginName(), MAX_NAMELEN-1);
-  si->login_name[MAX_NAMELEN-1] = '\0';
-  strncpy(si->alias_name, getLoginName(), MAX_NAMELEN-1);
-  si->alias_name[MAX_NAMELEN-1] = '\0';
-
   for (i=0; i<MAX_PLAYERS; i++)
   {
     si->input[i].use_joystick = FALSE;
-    strcpy(si->input[i].joy.device_name, joystick_device_name[i]);
+    si->input[i].joy.device_name = getStringCopy(joystick_device_name[i]);
     si->input[i].joy.xleft   = JOYSTICK_XLEFT;
     si->input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
     si->input[i].joy.xright  = JOYSTICK_XRIGHT;
@@ -959,7 +938,9 @@ static void setSetupInfo(int token_nr, char *token_value)
       break;
 
     case TYPE_STRING:
-      strcpy((char *)setup_value, token_value);
+      if (*(char **)setup_value != NULL)
+	free(*(char **)setup_value);
+      *(char **)setup_value = getStringCopy(token_value);
       break;
 
     default:
@@ -1039,6 +1020,85 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
   return last_level_nr;
 }
 
+void LoadLevelInfo()
+{
+  DIR *dir;
+  struct stat file_status;
+  char *level_directory = options.level_directory;
+  char *directory = NULL;
+  char *filename = NULL;
+  struct SetupFileList *setup_file_list = NULL;
+  struct dirent *dir_entry;
+  int i, num_entries = 0;
+
+  if ((dir = opendir(level_directory)) == NULL)
+    Error(ERR_EXIT, "cannot read level directory '%s'", level_directory);
+
+  while (num_entries < MAX_LEVDIR_ENTRIES)
+  {
+    if ((dir_entry = readdir(dir)) == NULL)	/* last directory entry */
+      break;
+
+    /* skip entries for current and parent directory */
+    if (strcmp(dir_entry->d_name, ".")  == 0 ||
+	strcmp(dir_entry->d_name, "..") == 0)
+      continue;
+
+    /* find out if directory entry is itself a directory */
+    directory = getPath2(level_directory, dir_entry->d_name);
+    if (stat(directory, &file_status) != 0 ||		/* cannot stat file */
+	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    {
+      free(directory);
+      continue;
+    }
+
+    if (strlen(dir_entry->d_name) >= MAX_LEVDIR_FILENAME)
+    {
+      Error(ERR_WARN, "filename of level directory '%s' too long -- ignoring",
+	    dir_entry->d_name);
+      continue;
+    }
+
+    filename = getPath2(directory, LEVELINFO_FILENAME);
+    setup_file_list = loadSetupFileList(filename);
+
+    if (setup_file_list)
+    {
+      checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
+      setLevelDirInfoToDefaults(&leveldir[num_entries]);
+
+      ldi = leveldir[num_entries];
+      for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
+	setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
+      leveldir[num_entries] = ldi;
+
+      leveldir[num_entries].filename = getStringCopy(dir_entry->d_name);
+
+      freeSetupFileList(setup_file_list);
+      num_entries++;
+    }
+    else
+      Error(ERR_WARN, "ignoring level directory '%s'", directory);
+
+    free(directory);
+    free(filename);
+  }
+
+  if (num_entries == MAX_LEVDIR_ENTRIES)
+    Error(ERR_WARN, "using %d level directories -- ignoring the rest",
+	  num_entries);
+
+  closedir(dir);
+
+  num_leveldirs = num_entries;
+  leveldir_nr = 0;
+
+  if (!num_leveldirs)
+    Error(ERR_EXIT, "cannot find any valid level series in directory '%s'",
+	  level_directory);
+}
+
 void LoadSetup()
 {
   char filename[MAX_FILENAME_LEN];
@@ -1059,6 +1119,18 @@ void LoadSetup()
     setup.direct_draw = !setup.double_buffering;
 
     freeSetupFileList(setup_file_list);
+
+    /* needed to work around problems with fixed length strings */
+    if (strlen(setup.player_name) >= MAX_NAMELEN)
+      setup.player_name[MAX_NAMELEN - 1] = '\0';
+    else if (strlen(setup.player_name) < MAX_NAMELEN - 1)
+    {
+      char *new_name = checked_malloc(MAX_NAMELEN);
+
+      strcpy(new_name, setup.player_name);
+      free(setup.player_name);
+      setup.player_name = new_name;
+    }
   }
   else
     Error(ERR_WARN, "using default setup values");
@@ -1117,7 +1189,7 @@ static char *getSetupLine(char *prefix, int token_nr)
       break;
 
     case TYPE_STRING:
-      strcat(entry, (char *)setup_value);
+      strcat(entry, *(char **)setup_value);
       break;
 
     default:
@@ -1151,11 +1223,11 @@ void SaveSetup()
   si = setup;
   for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
   {
-    /* just to make things nicer :) */
-    if (i == SETUP_TOKEN_ALIAS_NAME)
-      fprintf(file, "\n");
-
     fprintf(file, "%s\n", getSetupLine("", i));
+
+    /* just to make things nicer :) */
+    if (i == SETUP_TOKEN_PLAYER_NAME)
+      fprintf(file, "\n");
   }
 
   /* handle player specific setup values */
@@ -1203,7 +1275,11 @@ void LoadLevelSetup()
     checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
   }
   else
+  {
+    level_setup_list = newSetupFileList(TOKEN_STR_FILE_IDENTIFIER,
+					LEVELSETUP_COOKIE);
     Error(ERR_WARN, "using default setup values");
+  }
 }
 
 void SaveLevelSetup()

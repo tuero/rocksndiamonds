@@ -24,12 +24,6 @@
 #include "network.h"
 #include "netserv.h"
 
-#ifdef DEBUG
-
-#define DEBUG_TIMING
-
-#endif
-
 struct PictureFileInfo
 {
   char *picture_filename;
@@ -104,9 +98,7 @@ void InitLevelAndPlayerInfo()
 
   local_player->connected = TRUE;
 
-  if (!LoadLevelInfo())			/* global level info */
-    Error(ERR_EXIT, NULL);
-
+  LoadLevelInfo();			/* global level info */
   LoadSetup();				/* global setup info */
   LoadLevelSetup();			/* info about last played level */
 }
@@ -123,7 +115,7 @@ void InitNetworkServer()
   if (!ConnectToServer(options.server_host, options.server_port))
     Error(ERR_EXIT, "cannot connect to multiplayer server");
 
-  SendToServer_Nickname(setup.alias_name);
+  SendToServer_Nickname(setup.player_name);
   SendToServer_ProtocolVersion();
 
   if (nr_wanted)
@@ -502,9 +494,8 @@ void InitGfx()
     { -1, 0 }
   };
 
-#ifdef DEBUG_TIMING
-  long count1, count2;
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(0, NULL);	/* initialize timestamp function */
 #endif
 
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
@@ -520,11 +511,9 @@ void InitGfx()
     if (i != PIX_SMALLFONT)
       LoadGfx(i,&pic[i]);
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("SUMMARY: %.2f SECONDS LOADING TIME\n",(float)(count2-count1)/1000.0);
+#if DEBUG_TIMING
+  debug_print_timestamp(0, "SUMMARY LOADING ALL GRAPHICS:");
 #endif
-
 
   pix[PIX_DB_BACK] = XCreatePixmap(display, window,
 				   WIN_XSIZE,WIN_YSIZE,
@@ -632,7 +621,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char basefilename[256];
   char filename[256];
 
-#ifdef XPM_INCLUDE_FILE
+#ifdef USE_XPM_LIBRARY
   int xpm_err, xbm_err;
   unsigned int width,height;
   int hot_x,hot_y;
@@ -642,10 +631,6 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #else
   int pcx_err;
   char *picture_ext = ".pcx";
-#endif
-
-#ifdef DEBUG_TIMING
-  long count1, count2;
 #endif
 
   /* Grafik laden */
@@ -660,17 +645,16 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     rest(100);
 #endif MSDOS
 
-#ifdef DEBUG_TIMING
-    count1 = Counter();
+#if DEBUG_TIMING
+    debug_print_timestamp(1, NULL);	/* initialize timestamp function */
 #endif
 
-#ifdef XPM_INCLUDE_FILE
+#ifdef USE_XPM_LIBRARY
 
     xpm_att[pos].valuemask = XpmCloseness;
     xpm_att[pos].closeness = 20000;
     xpm_err = XpmReadFileToPixmap(display,window,filename,
 				  &pix[pos],&shapemask,&xpm_att[pos]);
-
     switch(xpm_err)
     {
       case XpmOpenFailed:
@@ -685,17 +669,15 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-#ifdef DEBUG_TIMING
-    count2 = Counter();
-    printf("XPM LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/1000.0);
+#if DEBUG_TIMING
+    printf("LOADING XPM FILE %s:", filename);
+    debug_print_timestamp(1, "");
 #endif
 
-#else 
+#else /* !USE_XPM_LIBRARY */
 
     pcx_err = Read_PCX_to_Pixmaps(display, window, gc, filename,
 				  &pix[pos], &clipmask[pos]);
-
     switch(pcx_err)
     {
       case PCX_Success:
@@ -714,13 +696,12 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-#ifdef DEBUG_TIMING
-    count2 = Counter();
-    printf("PCX LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/1000.0);
+#if DEBUG_TIMING
+    printf("SUMMARY LOADING PCX FILE %s:", filename);
+    debug_print_timestamp(1, "");
 #endif
 
-#endif
+#endif /* !USE_XPM_LIBRARY */
 
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
@@ -729,21 +710,19 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   /* zugehörige Maske laden (wenn vorhanden) */
   if (pic->picture_with_mask)
   {
-
-#ifdef XPM_INCLUDE_FILE
+#ifdef USE_XPM_LIBRARY
 
     sprintf(basefilename, "%s%s", pic->picture_filename, picturemask_ext);
     DrawInitText(basefilename, 150, FC_YELLOW);
     sprintf(filename, "%s/%s/%s",
 	    options.base_directory, GRAPHICS_DIRECTORY, basefilename);
 
-#ifdef DEBUG_TIMING
-    count1 = Counter();
+#if DEBUG_TIMING
+    debug_print_timestamp(1, NULL);	/* initialize timestamp function */
 #endif
 
     xbm_err = XReadBitmapFile(display,window,filename,
 			      &width,&height,&clipmask[pos],&hot_x,&hot_y);
-
     switch(xbm_err)
     {
       case BitmapSuccess:
@@ -759,13 +738,12 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-#ifdef DEBUG_TIMING
-    count2 = Counter();
-    printf("XBM LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/1000.0);
+#if DEBUG_TIMING
+    printf("LOADING XBM FILE %s:", filename);
+    debug_print_timestamp(1, "");
 #endif
 
-#endif
+#endif /* USE_XPM_LIBRARY */
 
     if (!clipmask[pos])
       Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
@@ -1341,8 +1319,8 @@ void CloseAllAndExit(int exit_value)
   {
     if (pix[i])
     {
-#ifdef XPM_INCLUDE_FILE
-      if (i<NUM_PICTURES)	/* XPM pictures */
+#ifdef USE_XPM_LIBRARY
+      if (i < NUM_PICTURES)	/* XPM pictures */
       {
 	XFreeColors(display,DefaultColormap(display,screen),
 		    xpm_att[i].pixels,xpm_att[i].npixels,0);

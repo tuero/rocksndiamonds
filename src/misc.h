@@ -41,6 +41,8 @@ unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *getLoginName(void);
 char *getHomeDir(void);
+char *getPath2(char *, char *);
+char *getStringCopy(char *);
 void MarkTileDirty(int, int);
 void GetOptions(char **);
 void Error(int, char *, ...);
@@ -51,5 +53,6 @@ char *getX11KeyNameFromKeySym(KeySym);
 KeySym getKeySymFromX11KeyName(char *);
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
+void debug_print_timestamp(int, char *);
 
-#endif
+#endif /* MISC_H */

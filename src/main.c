@@ -31,7 +31,7 @@ GC		gc, clip_gc[NUM_PIXMAPS], tile_clip_gc;
 Pixmap		pix[NUM_PIXMAPS];
 Pixmap		clipmask[NUM_PIXMAPS], tile_clipmask[NUM_TILES];
 
-#ifdef XPM_INCLUDE_FILE
+#ifdef USE_XPM_LIBRARY
 XpmAttributes 	xpm_att[NUM_PICTURES];
 #endif
 

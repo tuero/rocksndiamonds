@@ -33,11 +33,16 @@
 #include <X11/keysymdef.h>
 
 #ifdef   XPM_INCLUDE_FILE
+#define  USE_XPM_LIBRARY
 #include XPM_INCLUDE_FILE
 #endif
 #else	/* MSDOS */
 #include "msdos.h"
 #endif  /* MSDOS */
+
+#ifdef DEBUG
+#define DEBUG_TIMING	0
+#endif
 
 typedef unsigned char boolean;
 typedef unsigned char byte;
@@ -222,7 +227,7 @@ struct OptionInfo
 
 struct SetupJoystickInfo
 {
-  char device_name[MAX_FILENAME_LEN];
+  char *device_name;
   int xleft, xmiddle, xright;
   int yupper, ymiddle, ylower;
   int snap;
@@ -248,6 +253,8 @@ struct SetupInputInfo
 
 struct SetupInfo
 {
+  char *player_name;
+
   boolean sound;
   boolean sound_loops;
   boolean sound_music;
@@ -261,9 +268,6 @@ struct SetupInfo
   boolean autorecord;
   boolean quick_doors;
   boolean team_mode;
-
-  char login_name[MAX_NAMELEN];
-  char alias_name[MAX_NAMELEN];
 
   struct SetupInputInfo input[MAX_PLAYERS];
 };
@@ -335,10 +339,11 @@ struct LevelInfo
 
 struct LevelDirInfo
 {
-  char filename[MAX_LEVDIR_FILENAME];
-  char name[MAX_LEVDIR_NAME];
+  char *filename;
+  char *name;
   int levels;
-  int readonly;
+  int sort_priority;
+  boolean readonly;
 };
 
 struct RecordingInfo
@@ -369,7 +374,7 @@ extern GC		gc, clip_gc[], tile_clip_gc;
 extern Pixmap		pix[];
 extern Pixmap		clipmask[], tile_clipmask[];
 
-#ifdef XPM_INCLUDE_FILE
+#ifdef USE_XPM_LIBRARY
 extern XpmAttributes 	xpm_att[];
 #endif
 
@@ -1083,16 +1088,16 @@ extern int		num_bg_loops;
 
 #ifndef MSDOS
 #define USERDATA_DIRECTORY	".rocksndiamonds"
-#define LEVDIR_FILENAME		"ROCKS.levelinfo"
-#define SETUP_FILENAME		"setup"
-#define LEVELSETUP_FILENAME	"setup.level"
+#define SETUP_FILENAME		"setup.conf"
+#define LEVELSETUP_FILENAME	"levelsetup.conf"
+#define LEVELINFO_FILENAME	"levelinfo.conf"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
 #else
 #define USERDATA_DIRECTORY	"userdata"
-#define LEVDIR_FILENAME		"ROCKS.lev"
-#define SETUP_FILENAME		"setup"
-#define LEVELSETUP_FILENAME	"setup.lev"
+#define SETUP_FILENAME		"setup.cnf"
+#define LEVELSETUP_FILENAME	"lvlsetup.cnf"
+#define LEVELINFO_FILENAME	"lvlinfo.cnf"
 #define TAPEFILE_EXTENSION	"rec"
 #define SCOREFILE_EXTENSION	"sco"
 #endif
@@ -1119,6 +1124,7 @@ extern int		num_bg_loops;
 #define JOYSTICK_COOKIE		"ROCKSNDIAMONDS_JOYSTICK_FILE_VERSION_1.0"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
 #define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
+#define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
 #define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE)+1)
 #define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE)+1)
 #define LEVELDIR_COOKIE_LEN	(strlen(LEVELDIR_COOKIE)+1)
@@ -1126,6 +1132,7 @@ extern int		num_bg_loops;
 #define JOYSTICK_COOKIE_LEN	(strlen(JOYSTICK_COOKIE)+1)
 #define SETUP_COOKIE_LEN	(strlen(SETUP_COOKIE)+1)
 #define LEVELSETUP_COOKIE_LEN	(strlen(LEVELSETUP_COOKIE)+1)
+#define LEVELINFO_COOKIE_LEN	(strlen(LEVELINFO_COOKIE)+1)
 
 #define VERSION_STRING		"1.2 preview 1"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"

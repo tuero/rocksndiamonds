@@ -14,18 +14,6 @@
 #include "image.h"
 #include "misc.h"
 
-
-#ifdef DEBUG
-
-#define DEBUG_TIMING
-
-#endif
-
-#ifdef DEBUG_TIMING
-  long count1, count2;
-#endif
-
-
 /* extra colors to try allocating in private color maps to minimize flashing */
 #define NOFLASH_COLORS 256
 
@@ -91,36 +79,29 @@ static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
   return mask_pixmap;
 }
 
-/* find the best pixmap depth supported by the server for a particular
-   visual and return that depth */
-
-static unsigned int bitsPerPixelAtDepth(Display *display, int screen,
-					unsigned int depth)
+static int bitsPerPixelAtDepth(Display *display, int screen, int depth)
 {
-  XPixmapFormatValues *xf;
-  int nxf, a;
+  XPixmapFormatValues *pixmap_format;
+  int i, num_pixmap_formats, bits_per_pixel = -1;
 
-  xf = XListPixmapFormats(display, &nxf);
-  for (a = 0; a < nxf; a++)
-  {
-    if (xf[a].depth == depth)
-    {
-      int bpp;
-      bpp = xf[a].bits_per_pixel;
-      XFree(xf);
-      return (unsigned int) bpp;
-    }
-  }
-  XFree(xf);
+  /* get Pixmap formats supported by the X server */
+  pixmap_format = XListPixmapFormats(display, &num_pixmap_formats);
 
-  /* this should never happen; if it does, we're in trouble */
-  Error(ERR_EXIT, "bitsPerPixelAtDepth: can't find pixmap depth info");
-  return 0; /* never reached -- just to make gcc happy */
+  /* find format that matches the given depth */
+  for (i=0; i<num_pixmap_formats; i++)
+    if (pixmap_format[i].depth == depth)
+      bits_per_pixel = pixmap_format[i].bits_per_pixel;
+
+  XFree(pixmap_format);
+
+  if (bits_per_pixel == -1)
+    Error(ERR_EXIT, "cannot find pixmap format for depth %d", depth);
+
+  return bits_per_pixel;
 }
 
 XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
-			    Window window, GC gc,
-			    unsigned int depth, Image *image)
+			    Window window, GC gc, int depth, Image *image)
 {
   static XColor xcolor_private[NOFLASH_COLORS];
   static int colorcell_used[NOFLASH_COLORS];
@@ -151,7 +132,6 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   redvalue = greenvalue = bluevalue = NULL;
   ximageinfo = checked_malloc(sizeof(XImageInfo));
   ximageinfo->display = display;
-  ximageinfo->screen = screen;
   ximageinfo->depth = depth;
 
   switch (visual->class)
@@ -369,16 +349,13 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       break;
   
     default:
-      Error(ERR_RETURN, "display type not supported");
+      Error(ERR_RETURN, "display class not supported");
       Error(ERR_EXIT, "DirectColor, TrueColor or PseudoColor display needed");
       break;
   }
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING IMAGE TO XIMAGE (IMAGE COLORMAP) IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(2, "   ALLOCATING IMAGE COLORS:   ");
 #endif
 
   /* create XImage from internal image structure and convert it to Pixmap */
@@ -443,7 +420,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     }
 
     default:
-      Error(ERR_RETURN, "display type not supported");
+      Error(ERR_RETURN, "display class not supported");
       Error(ERR_EXIT, "DirectColor, TrueColor or PseudoColor display needed");
       break;
   }
@@ -455,11 +432,8 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     free((byte *)bluevalue);
   }
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING IMAGE TO XIMAGE IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(2, "   CONVERTING IMAGE TO XIMAGE:");
 #endif
 
   ximageinfo->pixmap = XCreatePixmap(display, window,
@@ -524,21 +498,19 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, GC gc, char *filename,
   XImageInfo *ximageinfo;
   int screen;
   Visual *visual;
-  unsigned int depth;
+  int depth;
 
-#ifdef DEBUG_TIMING
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(2, NULL);	/* initialize timestamp function */
 #endif
 
   /* read the graphic file in PCX format to image structure */
   if ((image = Read_PCX_to_Image(filename)) == NULL)
     return PCX_FileInvalid;
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   LOADING '%s' IN %.2f SECONDS\n",
-	 filename, (float)(count2-count1)/1000.0);
-  count1 = Counter();
+#if DEBUG_TIMING
+  printf("%s:\n", filename);
+  debug_print_timestamp(2, "   READING PCX FILE TO IMAGE: ");
 #endif
 
   screen = DefaultScreen(display);
@@ -554,21 +526,15 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, GC gc, char *filename,
   if (ximageinfo->cmap != DefaultColormap(display, screen))
     XSetWindowColormap(display, window, ximageinfo->cmap);
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING IMAGE TO PIXMAP IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(2, "   CONVERTING IMAGE TO PIXMAP:");
 #endif
 
   /* create clip mask for the image */
   ximageinfo->pixmap_mask = Image_to_Mask(image, display, window);
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING IMAGE TO MASK IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
+#if DEBUG_TIMING
+  debug_print_timestamp(2, "   CONVERTING IMAGE TO MASK:  ");
 #endif
 
   *pixmap = ximageinfo->pixmap;

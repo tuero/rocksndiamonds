@@ -53,7 +53,7 @@ void DrawMainMenu()
   ClearWindow();
   DrawHeadline();
   DrawText(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
-  DrawText(SX + 6*32,  SY + 2*32, setup.alias_name, FS_BIG, FC_RED);
+  DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
 	   (level_nr<leveldir[leveldir_nr].levels ? FC_RED : FC_YELLOW));
@@ -192,7 +192,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       if (y==3)
       {
 	game_status = TYPENAME;
-	HandleTypeName(strlen(setup.alias_name),0);
+	HandleTypeName(strlen(setup.player_name), 0);
       }
       else if (y==4)
       {
@@ -695,7 +695,7 @@ void HandleTypeName(int newxpos, KeySym key)
   if (newxpos)
   {
     xpos = newxpos;
-    DrawText(SX+6*32, SY+ypos*32, setup.alias_name, FS_BIG, FC_YELLOW);
+    DrawText(SX+6*32, SY+ypos*32, setup.player_name, FS_BIG, FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
     return;
   }
@@ -712,25 +712,25 @@ void HandleTypeName(int newxpos, KeySym key)
   if((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
   {
 #endif
-    setup.alias_name[xpos] = ascii;
-    setup.alias_name[xpos+1] = 0;
+    setup.player_name[xpos] = ascii;
+    setup.player_name[xpos+1] = 0;
     xpos++;
     DrawTextExt(drawto,gc,SX+6*32,SY+ypos*32,
-		setup.alias_name,FS_BIG,FC_YELLOW);
+		setup.player_name,FS_BIG,FC_YELLOW);
     DrawTextExt(window,gc,SX+6*32,SY+ypos*32,
-		setup.alias_name,FS_BIG,FC_YELLOW);
+		setup.player_name,FS_BIG,FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
   }
   else if ((key==XK_Delete || key==XK_BackSpace) && xpos>0)
   {
     xpos--;
-    setup.alias_name[xpos] = 0;
+    setup.player_name[xpos] = 0;
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
     DrawGraphic(xpos+7,ypos,GFX_LEERRAUM);
   }
   else if (key==XK_Return && xpos>0)
   {
-    DrawText(SX+6*32,SY+ypos*32,setup.alias_name,FS_BIG,FC_RED);
+    DrawText(SX+6*32,SY+ypos*32,setup.player_name,FS_BIG,FC_RED);
     DrawGraphic(xpos+6,ypos,GFX_LEERRAUM);
 
     SaveSetup();
@@ -1187,7 +1187,7 @@ static void setJoystickDeviceToNr(char *device_name, int device_nr)
       device_name[strlen(device_name) - 1] = '0' + (char)(device_nr % 10);
   }
   else
-    strcpy(device_name, joystick_device_name[device_nr]);
+    strncpy(device_name, joystick_device_name[device_nr], strlen(device_name));
 }
 
 static void drawPlayerSetupInputInfo(int player_nr)

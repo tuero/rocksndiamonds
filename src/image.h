@@ -23,7 +23,6 @@ typedef unsigned short Intensity;	/* RGB intensity for X11 */
 typedef struct
 {
   Display  *display;		/* destination display             */
-  int       screen;		/* destination screen              */
   int       depth;		/* depth of destination drawable   */
   Pixel     index[MAX_COLORS];	/* array of pixel values           */
   int       no;			/* number of pixels in the array   */

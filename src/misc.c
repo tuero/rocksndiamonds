@@ -210,6 +210,22 @@ char *getHomeDir()
   return home_dir;
 }
 
+char *getPath2(char *path1, char *path2)
+{
+  char *complete_path = checked_malloc(strlen(path1) + strlen(path2) + 2);
+
+  sprintf(complete_path, "%s/%s", path1, path2);
+  return complete_path;
+}
+
+char *getStringCopy(char *s)
+{
+  char *s_copy = checked_malloc(strlen(s) + 1);
+
+  strcpy(s_copy, s);
+  return s_copy;
+}
+
 void MarkTileDirty(int x, int y)
 {
   int xx = redraw_x1 + x;
@@ -363,7 +379,7 @@ void GetOptions(char *argv[])
   }
 }
 
-void Error(int mode, char *format_str, ...)
+void Error(int mode, char *format, ...)
 {
   FILE *output_stream = stderr;
   char *process_name = "";
@@ -371,53 +387,17 @@ void Error(int mode, char *format_str, ...)
   if (mode & ERR_SOUNDSERVER)
     process_name = " sound server";
 
-  if (format_str)
+  if (format)
   {
     va_list ap;
-    char *format_ptr;
-    char *s_value;
-    int i_value;
-    double d_value;
 
     fprintf(output_stream, "%s%s: ", program_name, process_name);
 
     if (mode & ERR_WARN)
       fprintf(output_stream, "warning: ");
 
-    va_start(ap, format_str);	/* ap points to first unnamed argument */
-  
-    for(format_ptr=format_str; *format_ptr; format_ptr++)
-    {
-      if (*format_ptr != '%')
-      {
-  	fprintf(output_stream, "%c", *format_ptr);
-  	continue;
-      }
-  
-      switch(*++format_ptr)
-      {
-  	case 'd':
-  	  i_value = va_arg(ap, int);
-  	  fprintf(output_stream, "%d", i_value);
-  	  break;
-  
-  	case 'f':
-  	  d_value = va_arg(ap, double);
-  	  fprintf(output_stream, "%f", d_value);
-  	  break;
-  
-  	case 's':
-  	  s_value = va_arg(ap, char *);
-  	  fprintf(output_stream, "%s", s_value);
-  	  break;
-  
-  	default:
-  	  fprintf(stderr, "\n%s: Error(): invalid format string: %s\n",
-		  program_name, format_str);
-	  CloseAllAndExit(10);
-      }
-    }
-
+    va_start(ap, format);
+    vfprintf(output_stream, format, ap);
     va_end(ap);
   
     fprintf(output_stream, "\n");
@@ -785,4 +765,23 @@ int getJoySymbolFromJoyName(char *name)
 
   translate_joyname(&joysymbol, &name, TRANSLATE_JOYNAME_TO_JOYSYMBOL);
   return joysymbol;
+}
+
+/* the following is only for debugging purpose and normally not used */
+#define DEBUG_NUM_TIMESTAMPS	3
+
+void debug_print_timestamp(int counter_nr, char *message)
+{
+  static long counter[DEBUG_NUM_TIMESTAMPS][2];
+
+  if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
+    Error(ERR_EXIT, "debugging: increase DEBUG_NUM_TIMESTAMPS in misc.c");
+
+  counter[counter_nr][0] = Counter();
+
+  if (message)
+    printf("%s %.2f seconds\n", message,
+	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
+
+  counter[counter_nr][1] = Counter();
 }

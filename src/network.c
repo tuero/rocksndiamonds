@@ -226,10 +226,11 @@ boolean ConnectToServer(char *host, int port)
 void SendToServer_Nickname(char *nickname)
 {
   static char msgbuf[300];
+  int len_nickname = strlen(nickname);
 
   buf[1] = OP_NICKNAME;
-  memcpy(&buf[2], nickname, strlen(nickname));
-  sendbuf(2 + strlen(nickname));
+  memcpy(&buf[2], nickname, len_nickname);
+  sendbuf(2 + len_nickname);
   sprintf(msgbuf, "you set your nick to \"%s\"", nickname);
   sysmsg(msgbuf);
 }

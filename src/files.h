@@ -16,8 +16,6 @@
 
 #include "main.h"
 
-boolean LoadLevelInfo(void);
-
 void LoadLevel(int);
 void SaveLevel(int);
 
@@ -29,6 +27,7 @@ void SaveScore(int);
 
 int getLastPlayedLevelOfLevelSeries(char *);
 
+void LoadLevelInfo(void);
 void LoadSetup(void);
 void SaveSetup(void);
 void LoadLevelSetup(void);

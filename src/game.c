@@ -572,7 +572,7 @@ boolean NewHiScore()
 
   LoadScore(level_nr);
 
-  if (!strcmp(setup.alias_name,EMPTY_ALIAS) ||
+  if (!strcmp(setup.player_name, EMPTY_ALIAS) ||
       local_player->score < highscore[MAX_SCORE_ENTRIES-1].Score) 
     return(-1);
 
@@ -588,7 +588,7 @@ boolean NewHiScore()
 
 #ifdef ONE_PER_NAME
 	for(l=k;l<MAX_SCORE_ENTRIES;l++)
-	  if (!strcmp(setup.alias_name,highscore[l].Name))
+	  if (!strcmp(setup.player_name, highscore[l].Name))
 	    m = l;
 	if (m==k)	/* Spieler überschreibt seine alte Position */
 	  goto put_into_list;
@@ -604,14 +604,15 @@ boolean NewHiScore()
 #ifdef ONE_PER_NAME
       put_into_list:
 #endif
-      sprintf(highscore[k].Name,setup.alias_name);
+      strncpy(highscore[k].Name, setup.player_name, MAX_NAMELEN - 1);
+      highscore[k].Name[MAX_NAMELEN - 1] = '\0';
       highscore[k].Score = local_player->score; 
       position = k;
       break;
     }
 
 #ifdef ONE_PER_NAME
-    else if (!strcmp(setup.alias_name,highscore[k].Name))
+    else if (!strncmp(setup.player_name, highscore[k].Name, MAX_NAMELEN - 1))
       break;	/* Spieler schon mit besserer Punktzahl in der Liste */
 #endif
 
