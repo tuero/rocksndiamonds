@@ -271,7 +271,8 @@ struct PlayerInfo
 
   int index_nr, client_nr, element_nr;
 
-  byte action;
+  byte action;			/* action from server or for local playing */
+  byte potential_action;	/* must go to network server first */
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];

@@ -409,14 +409,14 @@ void HandleKey(KeySym key, int key_status)
       if (key_status == KEY_PRESSED)
       {
 	if (network_playing)
-	  local_player->action |= key_action;
+	  local_player->potential_action |= key_action;
 	else
 	  stored_player[pnr].action |= key_action;
       }
       else
       {
 	if (network_playing)
-	  local_player->action &= ~key_action;
+	  local_player->potential_action &= ~key_action;
 	else
 	  stored_player[pnr].action &= ~key_action;
       }
@@ -934,16 +934,6 @@ void HandleJoystick()
 	DrawMainMenu();
 	return;
       }
-
-      /*
-      if (tape.pausing || AllPlayersGone)
-      {
-	int i;
-
-	for (i=0; i<MAX_PLAYERS; i++)
-	  stored_player[i].action = 0;
-      }
-      */
 
       HandleGameActions();
       break;

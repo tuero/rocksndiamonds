@@ -68,6 +68,7 @@ void InitGame()
     player->active = FALSE;
 
     player->action = 0;
+    player->potential_action = 0;
 
     player->score = 0;
     player->gems_still_needed = level.edelsteine;
@@ -2949,7 +2950,7 @@ void GameActions()
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
   if (network_playing)
-    SendToServer_MovePlayer(local_player->action);
+    SendToServer_MovePlayer(local_player->potential_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
