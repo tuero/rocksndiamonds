@@ -92,7 +92,6 @@ SRCS =	main.c		\
 	joystick.c	\
 	cartoons.c	\
 	random.c	\
-	gifload.c	\
 	gif.c		\
 	pcx.c		\
 	image.c		\
@@ -114,7 +113,6 @@ OBJS =	main.o		\
 	joystick.o	\
 	cartoons.o	\
 	random.o	\
-	gifload.o	\
 	gif.o		\
 	pcx.o		\
 	image.o		\

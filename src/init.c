@@ -20,15 +20,14 @@
 #include "tools.h"
 #include "files.h"
 #include "joystick.h"
-#include "gfxload.h"
-#include "gifload.h"
+#include "image.h"
 #include "network.h"
 #include "netserv.h"
 
 #ifdef DEBUG
-
+/*
 #define DEBUG_TIMING
-
+*/
 #endif
 
 struct PictureFileInfo
@@ -694,7 +693,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else 
 
-    gif_err = Read_GIF_to_Pixmaps(display, window, filename,
+    gif_err = Read_PCX_to_Pixmaps(display, window, filename,
 				  &pix[pos], &clipmask[pos]);
 
     switch(gif_err)

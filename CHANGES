@@ -1,6 +1,8 @@
 
 Release Version 1.2 [WILL HOPEFULLY SOON BE RELEASED...]
 --------------------------------------------------------
+	- new WAV sound loader
+	- new PCX graphics loader
 	- network multiplayer games with upto four players
 	- no separate network server needed; each client can
 	  fork a network server at startup if there's no server

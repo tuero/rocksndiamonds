@@ -1,5 +1,18 @@
+/***********************************************************
+*  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
+*----------------------------------------------------------*
+*  (c) 1995-98 Artsoft Entertainment                       *
+*              Holger Schemel                              *
+*              Oststrasse 11a                              *
+*              33604 Bielefeld                             *
+*              phone: ++49 +521 290471                     *
+*              email: aeglos@valinor.owl.de                *
+*----------------------------------------------------------*
+*  image.h                                                 *
+***********************************************************/
 
-/* image.h */
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include "main.h"
 
@@ -8,18 +21,18 @@ typedef unsigned short Intensity; /* what X thinks an RGB intensity is */
 /* This struct holds the X-client side bits for a rendered image. */
 typedef struct
 {
-  Display  *disp;       /* destination display */
-  int       scrn;       /* destination screen */
-  int       depth;      /* depth of drawable we want/have */
-  Drawable  drawable;   /* drawable to send image to */
+  Display  *display;	/* destination display */
+  int       screen;	/* destination screen */
+  int       depth;	/* depth of drawable we want/have */
+  Drawable  drawable;	/* drawable to send image to */
   Pixel    *index;	/* array of pixel values allocated */
   int       no;		/* number of pixels in the array */
   int       rootimage;	/* True if is a root image - eg, retain colors */
   Pixel     foreground; /* foreground and background pixels for mono images */
   Pixel     background;
-  Colormap  cmap;       /* colormap used for image */
-  GC        gc;         /* cached gc for sending image */
-  XImage   *ximage;     /* ximage structure */
+  Colormap  cmap;	/* colormap used for image */
+  GC        gc;		/* cached gc for sending image */
+  XImage   *ximage;	/* ximage structure */
 } XImageInfo;
 
 /* Function declarations */
@@ -91,6 +104,22 @@ typedef struct {
               *(((byte *)(PTR))+3) = ( VAL     ) ))
 
 
+/* return values */
+
+#define GIF_Success		 0
+#define GIF_OpenFailed		-1
+#define GIF_ReadFailed		-2
+#define	GIF_FileInvalid		-3
+#define GIF_NoMemory		-4
+#define GIF_ColorFailed		-5
+
+#define PCX_Success		 0
+#define PCX_OpenFailed		-1
+#define PCX_ReadFailed		-2
+#define	PCX_FileInvalid		-3
+#define PCX_NoMemory		-4
+#define PCX_ColorFailed		-5
+
 /* functions */
 
 extern unsigned long DepthToColorsTable[];
@@ -104,6 +133,11 @@ byte  *lcalloc();
 byte  *lmalloc();
 
 Image *Read_GIF_to_Image();
+Image *Read_PCX_to_Image();
+
+int Read_GIF_to_Pixmaps(Display *, Window, char *, Pixmap *, Pixmap *);
+int Read_PCX_to_Pixmaps(Display *, Window, char *, Pixmap *, Pixmap *);
+
 Image *monochrome();
 Image *zoom();
 
@@ -113,3 +147,5 @@ Pixmap XImage_to_Pixmap(Display *, Window, XImageInfo *);
 XImageInfo *Image_to_XImage(Display *, int, Visual *, unsigned int, Image *);
 void XImage_to_Drawable(XImageInfo *, int, int, int, int,
 			unsigned int, unsigned int);
+
+#endif	/* IMAGE_H */

@@ -615,7 +615,87 @@ static unsigned long be2long(unsigned long *be)	/* big-endian -> longword */
   return(ptr[0]<<24 | ptr[1]<<16 | ptr[2]<<8 | ptr[3]);
 }
 
+static unsigned long le2long(unsigned long *be)	/* little-endian -> longword */
+{
+  unsigned char *ptr = (unsigned char *)be;
+
+  return(ptr[3]<<24 | ptr[2]<<16 | ptr[1]<<8 | ptr[0]);
+}
+
 boolean LoadSound(struct SoundInfo *snd_info)
+{
+  FILE *file;
+  char filename[256];
+  char *sound_ext = "wav";
+  struct SoundHeader_WAV *sound_header;
+  int i;
+
+  sprintf(filename, "%s/%s/%s.%s",
+	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);
+
+#ifndef MSDOS
+  if ((file = fopen(filename, "r")) == NULL)
+  {
+    Error(ERR_WARN, "cannot open sound file '%s' - no sounds", filename);
+    return(FALSE);
+  }
+
+  if (fseek(file, 0, SEEK_END) < 0)
+  {
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    fclose(file);
+    return(FALSE);
+  }
+
+  snd_info->file_len = ftell(file);
+  rewind(file);
+
+  snd_info->file_ptr = checked_malloc(snd_info->file_len);
+
+  if (fread(snd_info->file_ptr, 1, snd_info->file_len, file) !=
+      snd_info->file_len)
+  {
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    fclose(file);
+    return(FALSE);
+  }
+
+  fclose(file);
+
+  sound_header = (struct SoundHeader_WAV *)snd_info->file_ptr;
+
+  if (strncmp(sound_header->magic_RIFF, "RIFF", 4) ||
+      snd_info->file_len != le2long(&sound_header->header_size) + 8 ||
+      strncmp(sound_header->magic_WAVE, "WAVE", 4) ||
+      strncmp(sound_header->magic_DATA, "data", 4) ||
+      snd_info->file_len != le2long(&sound_header->data_size) + 44)
+  {
+    Error(ERR_WARN, "'%s' is not a RIFF/WAVE file or broken - no sounds",
+	  filename);
+    return(FALSE);
+  }
+
+  snd_info->data_ptr = snd_info->file_ptr + 44;
+  snd_info->data_len = le2long(&sound_header->data_size);
+
+  for (i=0; i<snd_info->data_len; i++)
+    snd_info->data_ptr[i] = snd_info->data_ptr[i]^0x80;
+
+#else
+
+  snd_info->sample_ptr = load_sample(filename);
+  if (!snd_info->sample_ptr)
+  {
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    fclose(file);
+    return(FALSE);
+  }
+#endif /* MSDOS */
+
+  return(TRUE);
+}
+
+boolean LoadSound_8SVX(struct SoundInfo *snd_info)
 {
   FILE *file;
   char filename[256];
