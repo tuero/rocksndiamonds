@@ -255,10 +255,6 @@ Bitmap *X11LoadImage(char *filename)
   char *error = "Read_PCX_to_Pixmap(): %s '%s'";
   int pcx_err;
 
-#if defined(PLATFORM_MSDOS)
-  rest(100);
-#endif
-
   pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc, filename,
 			       &new_bitmap->drawable, &new_bitmap->clip_mask);
   switch(pcx_err)

@@ -245,6 +245,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       bluestep = 256 / bluecolors;
       redbottom = greenbottom = bluebottom = 0;
       redtop = greentop = bluetop = 0;
+
       for (a=0; a<visual->map_entries; a++)
       {
 	if (redbottom < 256)
@@ -275,10 +276,12 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	  /* something completely unexpected happened */
 
 	  fprintf(stderr, "Image_to_Pixmap: XAllocColor failed on a TrueColor/Directcolor visual\n");
+
           free(redvalue);
           free(greenvalue);
           free(bluevalue);
           free(ximageinfo);
+
 	  return NULL;
 	}
 
@@ -291,6 +294,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	while ((bluebottom < 256) && (bluebottom < bluetop))
 	  bluevalue[bluebottom++] = xcolor.pixel & visual->blue_mask;
       }
+
       break;
     }
 
@@ -421,6 +425,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     default:
       Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
       SetError(error, "display class not supported");
+
       return NULL;
   }
 
@@ -467,6 +472,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	      dst_ptr += display_bytes_per_pixel;
 	    }
 	  }
+
 	  break;
 	}
 
@@ -486,14 +492,17 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	      dst_ptr += display_bytes_per_pixel;
 	    }
 	  }
+
 	  break;
 	}
 
         default:
 	  Error(ERR_RETURN, "RGB or TrueColor image needed");
 	  SetError(error, "image type not supported");
+
 	  return NULL;
       }
+
       break;
     }
 
@@ -517,12 +526,14 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	  }
 	}
       }
+
       break;
     }
 
     default:
       Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
       SetError(error, "display class not supported");
+
       return NULL;
   }
 
@@ -544,11 +555,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   XPutImage(ximageinfo->display, ximageinfo->pixmap, gc,
 	    ximage, 0, 0, 0, 0, ximage->width, ximage->height);
 
-  free(ximage->data);
-  ximage->data = NULL;
   XDestroyImage(ximage);
 
-  return(ximageinfo);
+  return ximageinfo;
 }
 
 void freeXImage(Image *image, XImageInfo *ximageinfo)
@@ -593,7 +602,11 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   /* convert image structure to X11 Pixmap */
   if (!(ximageinfo = Image_to_Pixmap(display, screen, visual,
 				     window, gc, depth, image)))
+  {
+    freeImage(image);
+
     return PCX_OtherError;
+  }
 
   /* if a private colormap has been created, install it */
   if (ximageinfo->cmap != DefaultColormap(display, screen))
@@ -612,6 +625,10 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
 
   *pixmap = ximageinfo->pixmap;
   *pixmap_mask = ximageinfo->pixmap_mask;
+
+  /* free generic image and ximageinfo after native Pixmap has been created */
+  free(ximageinfo);
+  freeImage(image);
 
   return PCX_Success;
 }

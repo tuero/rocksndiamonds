@@ -381,6 +381,7 @@ struct TreeInfo
 
 typedef struct TreeInfo TreeInfo;
 typedef struct TreeInfo LevelDirTree;
+typedef struct TreeInfo ArtworkDirTree;
 typedef struct TreeInfo GraphicsDirTree;
 typedef struct TreeInfo SoundsDirTree;
 typedef struct TreeInfo MusicDirTree;

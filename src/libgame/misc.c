@@ -1206,6 +1206,17 @@ boolean FileIsMusic(char *basename)
   return FALSE;
 }
 
+boolean FileIsArtworkType(char *basename, int type)
+{
+  if ((type == TREE_TYPE_GRAPHICS_DIR && FileIsGraphic(basename)) ||
+      (type == TREE_TYPE_SOUNDS_DIR && FileIsSound(basename)) ||
+      (type == TREE_TYPE_MUSIC_DIR && FileIsMusic(basename)))
+    return TRUE;
+
+  return FALSE;
+}
+
+
 /* ========================================================================= */
 /* functions only needed for non-Unix (non-command-line) systems */
 /* ========================================================================= */

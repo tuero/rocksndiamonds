@@ -1,5 +1,6 @@
 Release Version 2.1.0 [XX XXX XXXX]
 -----------------------------------
+	- fixed memory leak in image loading code
 	- added Boulderdash style "snap-pushing" (thanks to Achim Härtel)
 	- bug fixed that prevented walking through tubes when gravity on
 	- enhanced sound system (especially regarding stereo and loop sounds)

@@ -114,6 +114,7 @@ char getCharFromKey(Key);
 boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
+boolean FileIsArtworkType(char *, int);
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();
