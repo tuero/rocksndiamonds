@@ -1279,6 +1279,7 @@ static void InitGraphicInfo()
 	src_y + TILEY > src_bitmap->height)
       Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d (normal size)", src_bitmap->source_filename, i);
 
+#if 0
     getMiniGraphicSource(i, &src_bitmap, &src_x, &src_y);
     if (src_x + MINI_TILEX > src_bitmap->width ||
 	src_y + MINI_TILEY > src_bitmap->height)
@@ -1288,7 +1289,7 @@ static void InitGraphicInfo()
     if (src_x + MICRO_TILEX > src_bitmap->width ||
 	src_y + MICRO_TILEY > src_bitmap->height)
       Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d ('micro' size)", src_bitmap->source_filename, i);
-
+#endif
 
 #if 0
     {

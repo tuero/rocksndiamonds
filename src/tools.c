@@ -966,6 +966,17 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   int src_x = mini_startx + new_graphic_info[graphic].src_x / 2;
   int src_y = mini_starty + new_graphic_info[graphic].src_y / 2;
 
+  if (src_x + MINI_TILEX > src_bitmap->width ||
+      src_y + MINI_TILEY > src_bitmap->height)
+  {
+    /* graphic of desired size seems not to be contained in this image;
+       dirty workaround: get it from the middle of the normal sized image */
+
+    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+    src_x += (TILEX / 2 - MINI_TILEX / 2);
+    src_y += (TILEY / 2 - MINI_TILEY / 2);
+  }
+
   *bitmap = src_bitmap;
   *x = src_x;
   *y = src_y;
@@ -1682,6 +1693,17 @@ void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   int mini_starty = src_bitmap->height * 2 / 3;
   int src_x = mini_startx + new_graphic_info[graphic].src_x / 8;
   int src_y = mini_starty + new_graphic_info[graphic].src_y / 8;
+
+  if (src_x + MICRO_TILEX > src_bitmap->width ||
+      src_y + MICRO_TILEY > src_bitmap->height)
+  {
+    /* graphic of desired size seems not to be contained in this image;
+       dirty workaround: get it from the middle of the normal sized image */
+
+    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+    src_x += (TILEX / 2 - MICRO_TILEX / 2);
+    src_y += (TILEY / 2 - MICRO_TILEY / 2);
+  }
 
   *bitmap = src_bitmap;
   *x = src_x;

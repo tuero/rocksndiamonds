@@ -549,7 +549,7 @@ static char *helpscreen_eltext[][2] =
  {"THE HERO:",				"(Is _this_ guy good old Rockford?)"},
  {"Normal sand:",			"You can dig through it"},
  {"Empty field:",			"You can walk through it"},
- {"Quicksand: You cannot pass it,",	"but rocks can fall though it"},
+ {"Quicksand: You cannot pass it,",	"but rocks can fall through it"},
  {"Massive Wall:",			"Nothing can go through it"},
  {"Normal Wall: You can't go through",	"it, but you can bomb it away"},
  {"Growing Wall: Grows in several di-",	"rections if there is an empty field"},
