@@ -21,7 +21,7 @@
 
 /* system dependent definitions */
 
-#define PLATFORM_STRING		"DOS"
+#define TARGET_STRING		"DOS"
 
 /* allegro defines TRUE as -1 */
 #ifdef TRUE

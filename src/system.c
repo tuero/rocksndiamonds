@@ -15,13 +15,10 @@
 #include "main.h"
 #include "misc.h"
 
-inline void InitEventFilter(EventFilter filter_function)
-{
-#ifdef TARGET_SDL
-  /* set event filter to filter out certain events */
-  SDL_SetEventFilter(filter_function);
-#endif
-}
+
+/* ========================================================================= */
+/* video functions                                                           */
+/* ========================================================================= */
 
 inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 {
@@ -201,6 +198,63 @@ inline boolean PointerInWindow(DrawWindow window)
 #endif
 }
 
+inline boolean SetVideoMode(void)
+{
+#ifdef TARGET_SDL
+  return SDLSetVideoMode(&backbuffer);
+#else
+  boolean success = TRUE;
+
+  if (setup.fullscreen && fullscreen_available)
+  {
+    Error(ERR_WARN, "fullscreen not available in X11 version");
+
+    /* display error message only once */
+    fullscreen_available = FALSE;
+
+    success = FALSE;
+  }
+
+  return success;
+#endif
+}
+
+inline void ChangeVideoModeIfNeeded(void)
+{
+#ifdef TARGET_SDL
+  if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
+      (!setup.fullscreen && fullscreen_enabled))
+    SetVideoMode();
+#endif
+}
+
+
+/* ========================================================================= */
+/* audio functions                                                           */
+/* ========================================================================= */
+
+inline boolean InitAudio(void)
+{
+#ifdef TARGET_SDL
+  return SDLInitAudio();
+#else
+  return TRUE;
+#endif
+}
+
+
+/* ========================================================================= */
+/* event functions                                                           */
+/* ========================================================================= */
+
+inline void InitEventFilter(EventFilter filter_function)
+{
+#ifdef TARGET_SDL
+  /* set event filter to filter out certain events */
+  SDL_SetEventFilter(filter_function);
+#endif
+}
+
 inline boolean PendingEvent(void)
 {
 #ifdef TARGET_SDL
@@ -247,44 +301,22 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 #endif
 }
 
-inline boolean SetVideoMode(void)
+inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 {
-#ifdef TARGET_SDL
-  return SDLSetVideoMode(&backbuffer);
-#else
-  boolean success = TRUE;
+  if (event->type != EVENT_CLIENTMESSAGE)
+    return FALSE;
 
-  if (setup.fullscreen && fullscreen_available)
-  {
-    Error(ERR_WARN, "fullscreen not available in X11 version");
-
-    /* display error message only once */
-    fullscreen_available = FALSE;
-
-    success = FALSE;
-  }
-
-  return success;
+#if defined(TARGET_SDL)
+  return TRUE;		/* the only possible message here is SDL_QUIT */
+#elif defined(PLATFORM_UNIX)
+  if ((event->window == window) &&
+      (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
+    return TRUE;
 #endif
+
+  return FALSE;
 }
 
-inline void ChangeVideoModeIfNeeded(void)
-{
-#ifdef TARGET_SDL
-  if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
-      (!setup.fullscreen && fullscreen_enabled))
-    SetVideoMode();
-#endif
-}
-
-inline boolean InitAudio(void)
-{
-#ifdef TARGET_SDL
-  return SDLInitAudio();
-#else
-  return TRUE;
-#endif
-}
 
 inline void dummy(void)
 {

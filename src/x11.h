@@ -30,9 +30,9 @@
 
 /* system dependent definitions */
 
-/* DOS version has already defined "PLATFORM_STRING" */
-#ifndef PLATFORM_STRING
-#define PLATFORM_STRING		"X11"
+/* DOS version also defines "TARGET_STRING" */
+#ifndef TARGET_STRING
+#define TARGET_STRING		"X11"
 #endif
 
 #define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE

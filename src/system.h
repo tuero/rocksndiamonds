@@ -49,35 +49,29 @@ typedef int (*EventFilter)(const Event *);
 
 /* system-wide function definitions */
 
-inline void InitEventFilter(EventFilter);
 inline void InitBufferedDisplay(DrawBuffer *, DrawWindow *);
-
 inline int GetDisplayDepth(void);
-
 inline Bitmap CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap);
-
 inline void ClearRectangle(Bitmap, int, int, int, int);
 inline void BlitBitmap(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void SetClipMask(GC, Pixmap);
 inline void SetClipOrigin(GC, int, int);
 inline void BlitBitmapMasked(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap, int, int, int, int);
-
 inline void FlushDisplay(void);
 inline void SyncDisplay(void);
 inline void KeyboardAutoRepeatOn(void);
 inline void KeyboardAutoRepeatOff(void);
 inline boolean PointerInWindow(DrawWindow);
-
-inline boolean PendingEvent(void);
-inline void NextEvent(Event *event);
-
-inline Key GetEventKey(KeyEvent *, boolean);
-
 inline boolean SetVideoMode(void);
 inline void ChangeVideoModeIfNeeded(void);
 
 inline boolean InitAudio(void);
+
+inline void InitEventFilter(EventFilter);
+inline boolean PendingEvent(void);
+inline void NextEvent(Event *event);
+inline Key GetEventKey(KeyEvent *, boolean);
 
 #endif /* SYSTEM_H */

@@ -34,7 +34,7 @@
 
 /* system dependent definitions */
 
-#define PLATFORM_STRING		"SDL"
+#define TARGET_STRING		"SDL"
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 
 

@@ -326,15 +326,8 @@ void HandleFocusEvent(FocusChangeEvent *event)
 
 void HandleClientMessageEvent(ClientMessageEvent *event)
 {
-#ifdef TARGET_SDL
-  CloseAllAndExit(0);	/* the only possible message here is SDL_QUIT */
-#else
-#ifndef MSDOS
-  if ((event->window == window) &&
-      (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
+  if (CheckCloseWindowEvent(event))
     CloseAllAndExit(0);
-#endif
-#endif
 }
 
 void HandleButton(int mx, int my, int button)
@@ -702,10 +695,7 @@ void HandleKey(Key key, int key_status)
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
-#ifndef MSDOS
 	case KEY_Q:
-#endif
-	case KEY_q:
 	  local_player->dynamite = 1000;
 	  break;
 
