@@ -43,20 +43,20 @@
 #define DOOR_ACTION_2		(DOOR_OPEN_2 | DOOR_CLOSE_2)
 #define DOOR_ACTION		(DOOR_ACTION_1 | DOOR_ACTION_2)
 #define DOOR_COPY_BACK		(1 << 4)
-#define DOOR_NO_DELAY		(1 << 5)
-#define DOOR_GET_STATE		(1 << 6)
-#define DOOR_SET_STATE		(1 << 7)
+#define DOOR_NO_COPY_BACK	(1 << 5)
+#define DOOR_NO_DELAY		(1 << 6)
+#define DOOR_GET_STATE		(1 << 7)
+#define DOOR_SET_STATE		(1 << 8)
 
 /* for Request */
 #define REQ_ASK			(1 << 0)
-#define REQ_OPEN		(1 << 1)
-#define REQ_CLOSE		(1 << 2)
-#define REQ_CONFIRM		(1 << 3)
+#define REQ_CONFIRM		(1 << 1)
+#define REQ_PLAYER		(1 << 2)
+#define REQ_STAY_OPEN		(1 << 3)
 #define REQ_STAY_CLOSED		(1 << 4)
-#define REQ_STAY_OPEN		(1 << 5)
-#define REQ_PLAYER		(1 << 6)
+#define REQ_REOPEN		(1 << 5)
 
-#define REQUEST_WAIT_FOR	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
+#define REQUEST_WAIT_FOR_INPUT	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
 void DumpTile(int, int);
 

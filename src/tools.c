@@ -2116,7 +2116,7 @@ boolean Request(char *text, unsigned int req_state)
   /* pause network game while waiting for request to answer */
   if (options.network &&
       game_status == GAME_MODE_PLAYING &&
-      req_state & REQUEST_WAIT_FOR)
+      req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
 #endif
 
@@ -2128,12 +2128,15 @@ boolean Request(char *text, unsigned int req_state)
 
   UnmapAllGadgets();
 
-  CloseDoor(DOOR_CLOSE_1);
+  if (old_door_state & DOOR_OPEN_1)
+  {
+    CloseDoor(DOOR_CLOSE_1);
 
-  /* save old door content */
-  BlitBitmap(bitmap_db_door, bitmap_db_door,
-	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	     DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
+    /* save old door content */
+    BlitBitmap(bitmap_db_door, bitmap_db_door,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
+  }
 
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
@@ -2206,7 +2209,7 @@ boolean Request(char *text, unsigned int req_state)
   ClearEventQueue();
 #endif
 
-  if (!(req_state & REQUEST_WAIT_FOR))
+  if (!(req_state & REQUEST_WAIT_FOR_INPUT))
   {
     SetDrawBackgroundMask(REDRAW_FIELD);
 
@@ -2350,13 +2353,9 @@ boolean Request(char *text, unsigned int req_state)
   {
     CloseDoor(DOOR_CLOSE_1);
 
-    if (!(req_state & REQ_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
-    {
-      BlitBitmap(bitmap_db_door, bitmap_db_door,
-		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-      OpenDoor(DOOR_OPEN_1);
-    }
+    if (((old_door_state & DOOR_OPEN_1) && !(req_state & REQ_STAY_CLOSED)) ||
+	(req_state & REQ_REOPEN))
+      OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
   }
 
   RemapAllGadgets();
@@ -2367,7 +2366,7 @@ boolean Request(char *text, unsigned int req_state)
   /* continue network game after request */
   if (options.network &&
       game_status == GAME_MODE_PLAYING &&
-      req_state & REQUEST_WAIT_FOR)
+      req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
 #endif
 
@@ -2382,33 +2381,42 @@ boolean Request(char *text, unsigned int req_state)
 
 unsigned int OpenDoor(unsigned int door_state)
 {
-  unsigned int new_door_state;
-
   if (door_state & DOOR_COPY_BACK)
   {
-    BlitBitmap(bitmap_db_door, bitmap_db_door,
-	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE + VYSIZE,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+    if (door_state & DOOR_OPEN_1)
+      BlitBitmap(bitmap_db_door, bitmap_db_door,
+		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+    if (door_state & DOOR_OPEN_2)
+      BlitBitmap(bitmap_db_door, bitmap_db_door,
+		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY2, VXSIZE, VYSIZE,
+		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+
     door_state &= ~DOOR_COPY_BACK;
   }
 
-  new_door_state = MoveDoor(door_state);
-
-  return(new_door_state);
+  return MoveDoor(door_state);
 }
 
 unsigned int CloseDoor(unsigned int door_state)
 {
-  unsigned int new_door_state;
+  unsigned int old_door_state = GetDoorState();
 
-  BlitBitmap(backbuffer, bitmap_db_door,
-	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-  BlitBitmap(backbuffer, bitmap_db_door,
-	     VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+  if (!(door_state & DOOR_NO_COPY_BACK))
+  {
+    if (old_door_state & DOOR_OPEN_1)
+      BlitBitmap(backbuffer, bitmap_db_door,
+		 DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
-  new_door_state = MoveDoor(door_state);
+    if (old_door_state & DOOR_OPEN_2)
+      BlitBitmap(backbuffer, bitmap_db_door,
+		 VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
 
-  return(new_door_state);
+    door_state &= ~DOOR_NO_COPY_BACK;
+  }
+
+  return MoveDoor(door_state);
 }
 
 unsigned int GetDoorState()
@@ -2503,7 +2511,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	{
 	  BlitBitmap(bitmap_db_door, drawto,
 		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i / 2,
-		     DXSIZE,DYSIZE - i / 2, DX, DY);
+		     DXSIZE, DYSIZE - i / 2, DX, DY);
 
 	  ClearRectangle(drawto, DX, DY + DYSIZE - i / 2, DXSIZE, i / 2);
 	}

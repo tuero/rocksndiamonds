@@ -27,6 +27,9 @@
 /* EXPERIMENTAL STUFF */
 #define USE_NEW_AMOEBA_CODE	FALSE
 
+/* EXPERIMENTAL STUFF */
+#define USE_NEW_MOVEMENT	FALSE
+
 /* for DigField() */
 #define DF_NO_PUSH		0
 #define DF_DIG			1
@@ -5293,6 +5296,11 @@ void StartMoving(int x, int y)
 
       CheckCollision[x][y] = 0;
 
+#if 0
+      if (IS_PLAYER(x, y + 1))
+	printf("::: we ARE now killing the player [%d]\n", FrameCounter);
+#endif
+
       Impact(x, y);
     }
     else if (IS_FREE(x, y + 1) && element == EL_SPRING && level.use_spring_bug)
@@ -6368,9 +6376,24 @@ void ContinueMoving(int x, int y)
   else if (element == EL_PENGUIN)
     TestIfFriendTouchesBadThing(newx, newy);
 
+#if USE_NEW_MOVEMENT
+#if 0
+  if (CAN_FALL(element) && direction == MV_DOWN &&
+      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
+      IS_PLAYER(x, newy + 1))
+    printf("::: we would now kill the player [%d]\n", FrameCounter);
+#endif
+
+  /* give the player one last chance (one more frame) to move away */
+  if (CAN_FALL(element) && direction == MV_DOWN &&
+      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
+      !IS_PLAYER(x, newy + 1))
+    Impact(x, newy);
+#else
   if (CAN_FALL(element) && direction == MV_DOWN &&
       (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
     Impact(x, newy);
+#endif
 
 #if 1
   if (pushed_by_player)
@@ -9484,14 +9507,30 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #else
 
 #if 1
+
+#if 0
+  printf("::: %d <= %d < %d ?\n", player->move_delay, FrameCounter,
+	 player->move_delay + player->move_delay_value);
+#endif
+
   if (!FrameReached(&player->move_delay, player->move_delay_value))
+  {
+#if 0
+    printf("::: can NOT move\n");
+#endif
+
     return FALSE;
+  }
 #else
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
       !(tape.playing && tape.file_version < FILE_VERSION_2_0))
     return FALSE;
 #endif
 
+#endif
+
+#if 0
+  printf("::: COULD move now\n");
 #endif
 
   /* store if player is automatically moved to next field */
@@ -9623,6 +9662,10 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
   if (moved & MF_MOVING)
   {
+#if 0
+    printf("::: REALLY moves now\n");
+#endif
+
     if (old_jx != jx && old_jy == jy)
       player->MovDir = (old_jx < jx ? MV_RIGHT : MV_LEFT);
     else if (old_jx == jx && old_jy != jy)
@@ -9702,6 +9745,15 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->last_move_dir = MV_NO_MOVING;
     */
     player->is_moving = FALSE;
+
+#if USE_NEW_MOVEMENT
+    /* player is ALLOWED to move, but CANNOT move (something blocks his way) */
+    /* ensure that the player is also allowed to move in the next frame */
+    /* (currently, the player is forced to wait eight frames before he can try
+       again!!!) */
+
+    player->move_delay = -1;	/* allow direct movement in the next frame */
+#endif
   }
 
   if (game.engine_version < VERSION_IDENT(3,0,7,0))
@@ -9730,8 +9782,14 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
+#if USE_NEW_MOVEMENT
+    if (player->block_last_field &&
+	Feld[last_jx][last_jy] == EL_EMPTY)
+      Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
+#else
     if (Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
+#endif
 
 #if 0
     DrawPlayer(player);

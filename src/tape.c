@@ -1152,13 +1152,19 @@ void TapeQuickSave()
 
 void TapeQuickLoad()
 {
+  char *filename = getTapeFilename(level_nr);
+
+  if (!fileExists(filename))
+  {
+    Request("No tape for this level !", REQ_CONFIRM);
+
+    return;
+  }
+
   if (tape.recording && !Request("Stop recording and load tape ?",
 				 REQ_ASK | REQ_STAY_CLOSED))
   {
-    BlitBitmap(bitmap_db_door, bitmap_db_door,
-	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-    OpenDoor(DOOR_OPEN_1);
+    OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
 
     return;
   }
@@ -1176,8 +1182,12 @@ void TapeQuickLoad()
 
       tape.quick_resume = TRUE;
     }
-    else
-      Request("No tape for this level !", REQ_CONFIRM);
+    else	/* this should not happen (basically checked above) */
+    {
+      int reopen_door = (game_status == GAME_MODE_PLAYING ? REQ_REOPEN : 0);
+
+      Request("No tape for this level !", REQ_CONFIRM | reopen_door);
+    }
   }
 }
 

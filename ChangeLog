@@ -1,3 +1,12 @@
+2004-06-11
+	* fixed bug with wrong door state after trying to quickload empty tape
+
+2004-06-07
+	* version number set to 3.1.1
+
+2004-06-07
+	* version 3.1.0 released
+
 2004-06-07
 	* fixed bug with crash when writing user levelinfo.conf the first time
 

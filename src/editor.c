@@ -9401,9 +9401,6 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
   else
   {
     CloseDoor(DOOR_CLOSE_1);
-    BlitBitmap(bitmap_db_door, bitmap_db_door,
-	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-    OpenDoor(DOOR_OPEN_1);
+    OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
   }
 }
