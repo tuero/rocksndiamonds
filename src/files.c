@@ -24,6 +24,9 @@
 
 #define MAX_LINE_LEN			1000
 
+static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
+static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
+
 static char *getGlobalDataDir()
 {
   return GAME_DIR;
@@ -48,6 +51,23 @@ static char *getUserDataDir()
 static char *getSetupDir()
 {
   return getUserDataDir();
+}
+
+static char *getUserLevelDir(char *level_subdir)
+{
+  static char *userlevel_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *userlevel_subdir = LEVELS_DIRECTORY;
+
+  if (userlevel_dir)
+    free(userlevel_dir);
+
+  userlevel_dir = checked_malloc(strlen(data_dir) + strlen(userlevel_subdir) +
+				 strlen(level_subdir) + 3);
+  sprintf(userlevel_dir, "%s/%s%s%s", data_dir, userlevel_subdir,
+	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+
+  return userlevel_dir;
 }
 
 static char *getTapeDir(char *level_subdir)
@@ -108,6 +128,17 @@ static void InitScoreDirectory(char *level_subdir)
   createDirectory(getScoreDir(level_subdir), "level score");
 }
 
+static void InitUserLevelDirectory(char *level_subdir)
+{
+  if (access(getUserLevelDir(level_subdir), F_OK) != 0)
+  {
+    createDirectory(getUserLevelDir(""), "main user level");
+    createDirectory(getUserLevelDir(level_subdir), "user level");
+
+    SaveUserLevelInfo();
+  }
+}
+
 void LoadLevel(int level_nr)
 {
   int i, x, y;
@@ -115,8 +146,12 @@ void LoadLevel(int level_nr)
   char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename, "%s/%s/%d",
-	  options.level_directory, leveldir[leveldir_nr].filename, level_nr);
+  if (leveldir[leveldir_nr].user_defined)
+    sprintf(filename, "%s/%s/%d",
+	    getUserLevelDir(""), leveldir[leveldir_nr].filename, level_nr);
+  else
+    sprintf(filename, "%s/%s/%d",
+	    options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
   if (!(file = fopen(filename, "r")))
     Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
@@ -204,8 +239,12 @@ void SaveLevel(int level_nr)
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename, "%s/%s/%d",
-	  options.level_directory, leveldir[leveldir_nr].filename, level_nr);
+  if (leveldir[leveldir_nr].user_defined)
+    sprintf(filename, "%s/%s/%d",
+	    getUserLevelDir(""), leveldir[leveldir_nr].filename, level_nr);
+  else
+    sprintf(filename, "%s/%s/%d",
+	    options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
   if (!(file = fopen(filename, "w")))
   {
@@ -358,13 +397,13 @@ void SaveTape(int level_nr)
   FILE *file;
   boolean new_tape = TRUE;
 
+  InitTapeDirectory(leveldir[leveldir_nr].filename);
+
   sprintf(filename, "%s/%d.%s",
 	  getTapeDir(leveldir[leveldir_nr].filename),
 	  level_nr, TAPEFILE_EXTENSION);
 
-  InitTapeDirectory(leveldir[leveldir_nr].filename);
-
-  /* Testen, ob bereits eine Aufnahme existiert */
+  /* if a tape still exists, ask to overwrite it */
   if ((file = fopen(filename, "r")))
   {
     new_tape = FALSE;
@@ -478,11 +517,11 @@ void SaveScore(int level_nr)
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
+  InitScoreDirectory(leveldir[leveldir_nr].filename);
+
   sprintf(filename, "%s/%d.%s",
 	  getScoreDir(leveldir[leveldir_nr].filename),
 	  level_nr, SCOREFILE_EXTENSION);
-
-  InitScoreDirectory(leveldir[leveldir_nr].filename);
 
   if (!(file = fopen(filename, "w")))
   {
@@ -562,7 +601,7 @@ void SaveScore(int level_nr)
 
 static struct SetupInfo si;
 static struct SetupInputInfo sii;
-struct LevelDirInfo ldi;
+static struct LevelDirInfo ldi;
 static struct
 {
   int type;
@@ -1020,21 +1059,42 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
   return last_level_nr;
 }
 
-void LoadLevelInfo()
+static int compareLevelDirInfoEntries(const void *object1, const void *object2)
+{
+  const struct LevelDirInfo *entry1 = object1;
+  const struct LevelDirInfo *entry2 = object2;
+  int compare_result;
+
+  if (entry1->sort_priority != entry2->sort_priority)
+    compare_result = entry1->sort_priority - entry2->sort_priority;
+  else
+  {
+    char *name1 = getStringToLower(entry1->name);
+    char *name2 = getStringToLower(entry2->name);
+
+    compare_result = strcmp(name1, name2);
+
+    free(name1);
+    free(name2);
+  }
+
+  return compare_result;
+}
+
+static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 {
   DIR *dir;
   struct stat file_status;
-  char *level_directory = options.level_directory;
   char *directory = NULL;
   char *filename = NULL;
   struct SetupFileList *setup_file_list = NULL;
   struct dirent *dir_entry;
-  int i, num_entries = 0;
+  int i, current_entry = start_entry;
 
   if ((dir = opendir(level_directory)) == NULL)
     Error(ERR_EXIT, "cannot read level directory '%s'", level_directory);
 
-  while (num_entries < MAX_LEVDIR_ENTRIES)
+  while (current_entry < MAX_LEVDIR_ENTRIES)
   {
     if ((dir_entry = readdir(dir)) == NULL)	/* last directory entry */
       break;
@@ -1066,17 +1126,19 @@ void LoadLevelInfo()
     if (setup_file_list)
     {
       checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
-      setLevelDirInfoToDefaults(&leveldir[num_entries]);
+      setLevelDirInfoToDefaults(&leveldir[current_entry]);
 
-      ldi = leveldir[num_entries];
+      ldi = leveldir[current_entry];
       for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
 	setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
-      leveldir[num_entries] = ldi;
+      leveldir[current_entry] = ldi;
 
-      leveldir[num_entries].filename = getStringCopy(dir_entry->d_name);
+      leveldir[current_entry].filename = getStringCopy(dir_entry->d_name);
+      leveldir[current_entry].user_defined =
+	(level_directory == options.level_directory ? FALSE : TRUE);
 
       freeSetupFileList(setup_file_list);
-      num_entries++;
+      current_entry++;
     }
     else
       Error(ERR_WARN, "ignoring level directory '%s'", directory);
@@ -1085,18 +1147,64 @@ void LoadLevelInfo()
     free(filename);
   }
 
-  if (num_entries == MAX_LEVDIR_ENTRIES)
+  if (current_entry == MAX_LEVDIR_ENTRIES)
     Error(ERR_WARN, "using %d level directories -- ignoring the rest",
-	  num_entries);
+	  current_entry);
 
   closedir(dir);
 
-  num_leveldirs = num_entries;
-  leveldir_nr = 0;
-
-  if (!num_leveldirs)
+  if (current_entry == start_entry && start_entry != -1)
     Error(ERR_EXIT, "cannot find any valid level series in directory '%s'",
 	  level_directory);
+
+  return current_entry;
+}
+
+void LoadLevelInfo()
+{
+  InitUserLevelDirectory(getLoginName());
+
+  num_leveldirs = 0;
+  leveldir_nr = 0;
+
+  num_leveldirs = LoadLevelInfoFromLevelDir(options.level_directory,
+					    num_leveldirs);
+  num_leveldirs = LoadLevelInfoFromLevelDir(getUserLevelDir(""),
+					    num_leveldirs);
+  if (num_leveldirs > 1)
+    qsort(leveldir, num_leveldirs, sizeof(struct LevelDirInfo),
+	  compareLevelDirInfoEntries);
+}
+
+static void SaveUserLevelInfo()
+{
+  char filename[MAX_FILENAME_LEN];
+  FILE *file;
+  int i;
+
+  sprintf(filename, "%s/%s",
+	  getUserLevelDir(getLoginName()), LEVELINFO_FILENAME);
+
+  if (!(file = fopen(filename, "w")))
+  {
+    Error(ERR_WARN, "cannot write level info file '%s'", filename);
+    return;
+  }
+
+  ldi.name = getLoginName();
+  ldi.levels = 100;
+  ldi.sort_priority = 300;
+  ldi.readonly = FALSE;
+
+  fprintf(file, "%s\n\n",
+	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, LEVELINFO_COOKIE));
+
+  for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
+    fprintf(file, "%s\n", getSetupLine("", i));
+
+  fclose(file);
+
+  chmod(filename, SETUP_PERMS);
 }
 
 void LoadSetup()
@@ -1205,9 +1313,9 @@ void SaveSetup()
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
-
   InitUserDataDirectory();
+
+  sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
@@ -1288,6 +1396,8 @@ void SaveLevelSetup()
   struct SetupFileList *list_entry = level_setup_list;
   FILE *file;
 
+  InitUserDataDirectory();
+
   setTokenValue(level_setup_list,
 		TOKEN_STR_LAST_LEVEL_SERIES, leveldir[leveldir_nr].filename);
 
@@ -1296,17 +1406,14 @@ void SaveLevelSetup()
 
   sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
 
-  InitUserDataDirectory();
-
   if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
     return;
   }
 
-  fprintf(file, "%s:              %s\n\n",
-	  TOKEN_STR_FILE_IDENTIFIER, LEVELSETUP_COOKIE);
-
+  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
+						 LEVELSETUP_COOKIE));
   while (list_entry)
   {
     if (strcmp(list_entry->token, TOKEN_STR_FILE_IDENTIFIER) != 0)

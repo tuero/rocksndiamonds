@@ -43,6 +43,7 @@ char *getLoginName(void);
 char *getHomeDir(void);
 char *getPath2(char *, char *);
 char *getStringCopy(char *);
+char *getStringToLower(char *);
 void MarkTileDirty(int, int);
 void GetOptions(char **);
 void Error(int, char *, ...);

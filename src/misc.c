@@ -18,6 +18,7 @@
 #include <sys/param.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include "misc.h"
 #include "init.h"
@@ -223,6 +224,17 @@ char *getStringCopy(char *s)
   char *s_copy = checked_malloc(strlen(s) + 1);
 
   strcpy(s_copy, s);
+  return s_copy;
+}
+
+char *getStringToLower(char *s)
+{
+  char *s_copy = checked_malloc(strlen(s) + 1);
+  char *s_ptr = s_copy;
+
+  while (*s)
+    *s_ptr++ = tolower(*s++);
+
   return s_copy;
 }
 

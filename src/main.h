@@ -343,6 +343,7 @@ struct LevelDirInfo
   char *name;
   int levels;
   int sort_priority;
+  boolean user_defined;
   boolean readonly;
 };
 
