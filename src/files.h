@@ -19,7 +19,8 @@
 void setElementChangePages(struct ElementInfo *, int);
 void setElementChangeInfoToDefaults(struct ElementChangeInfo *);
 
-boolean LevelFileExists(int);
+char *getDefaultLevelFilename(int);
+
 void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
 void LoadLevelTemplate(int);

@@ -47,6 +47,17 @@
 #define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
+/* values for level file type identifier */
+#define LEVEL_FILE_TYPE_UNKNOWN		0
+#define LEVEL_FILE_TYPE_RND		1
+#define LEVEL_FILE_TYPE_EM		2
+
+#define LEVEL_FILE_TYPE_RND_PACKED	(10 + LEVEL_FILE_TYPE_RND)
+#define LEVEL_FILE_TYPE_EM_PACKED	(10 + LEVEL_FILE_TYPE_EM)
+
+#define IS_SINGLE_LEVEL_FILE(x)		(x < 10)
+#define IS_PACKED_LEVEL_FILE(x)		(x > 10)
+
 
 /* ========================================================================= */
 /* level file functions                                                      */
@@ -268,12 +279,108 @@ static void ActivateLevelTemplate()
      level data, while all other variables do not change. */
 }
 
-boolean LevelFileExists(int level_nr)
+static char *getLevelFilenameFromBasename(char *basename)
 {
-  char *filename = getLevelFilename(level_nr);
+  static char *filename = NULL;
 
-  return (access(filename, F_OK) == 0);
+  checked_free(filename);
+
+  filename = getPath2(getCurrentLevelDir(), basename);
+
+  return filename;
 }
+
+static char *getSingleLevelBasename(int nr, int type)
+{
+  static char basename[MAX_FILENAME_LEN];
+
+  switch (type)
+  {
+    case LEVEL_FILE_TYPE_RND:
+      if (nr < 0)
+	sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
+      else
+	sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
+      break;
+
+    case LEVEL_FILE_TYPE_EM:
+      sprintf(basename, "%d", nr);
+      break;
+
+    default:
+      strcpy(basename, UNDEFINED_FILENAME);
+      break;
+  }
+
+  return basename;
+}
+
+static char *getPackedLevelBasename(int type)
+{
+  static char basename[MAX_FILENAME_LEN];
+
+  switch (type)
+  {
+    default:
+      strcpy(basename, UNDEFINED_FILENAME);
+      break;
+  }
+
+  return basename;
+}
+
+static char *getSingleLevelFilename(int nr, int type)
+{
+  return getLevelFilenameFromBasename(getSingleLevelBasename(nr, type));
+}
+
+static char *getPackedLevelFilename(int type)
+{
+  return getLevelFilenameFromBasename(getPackedLevelBasename(type));
+}
+
+char *getDefaultLevelFilename(int nr)
+{
+  return getSingleLevelFilename(nr, LEVEL_FILE_TYPE_RND);
+}
+
+static struct LevelFileInfo *getLevelFileInfo(int nr)
+{
+  static struct LevelFileInfo level_file_info;
+
+  level_file_info.nr = nr;
+
+  /* special case: level template */
+  if (nr < 0)
+  {
+    level_file_info.type = LEVEL_FILE_TYPE_RND;
+    level_file_info.filename = getDefaultLevelFilename(nr);
+
+    return &level_file_info;
+  }
+
+  /* 1st try: check for native Rocks'n'Diamonds level file */
+  level_file_info.type = LEVEL_FILE_TYPE_RND;
+  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
+  if (fileExists(level_file_info.filename))
+    return &level_file_info;
+
+  /* 2nd try: check for classic Emerald Mine level file */
+  level_file_info.type = LEVEL_FILE_TYPE_EM;
+  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
+  if (fileExists(level_file_info.filename))
+    return &level_file_info;
+
+  /* no known level file found -- use default values */
+  level_file_info.type = LEVEL_FILE_TYPE_RND;
+  level_file_info.filename = getSingleLevelFilename(nr, level_file_info.type);
+
+  return &level_file_info;
+}
+
+/* ------------------------------------------------------------------------- */
+/* functions for loading R'n'D level                                         */
+/* ------------------------------------------------------------------------- */
 
 static int checkLevelElement(int element)
 {
@@ -797,8 +904,10 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
-void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
+static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
+				      struct LevelFileInfo *level_file_info)
 {
+  char *filename = level_file_info->filename;
   char cookie[MAX_LINE_LEN];
   char chunk_name[CHUNK_ID_LEN + 1];
   int chunk_size;
@@ -812,7 +921,7 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
     level->no_level_file = TRUE;
 
     if (level != &level_template)
-      Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
+      Error(ERR_WARN, "cannot read level '%s' - using empty level", filename);
 
     return;
   }
@@ -925,6 +1034,338 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
   }
 
   fclose(file);
+}
+
+/* ------------------------------------------------------------------------- */
+/* functions for loading EM level                                            */
+/* ------------------------------------------------------------------------- */
+
+static int map_em_element_yam(int element)
+{
+  switch (element)
+  {
+    case 0x00:	return EL_EMPTY;
+    case 0x01:	return EL_EMERALD;
+    case 0x02:	return EL_DIAMOND;
+    case 0x03:	return EL_ROCK;
+    case 0x04:	return EL_ROBOT;
+    case 0x05:	return EL_SPACESHIP_UP;
+    case 0x06:	return EL_BOMB;
+    case 0x07:	return EL_BUG_UP;
+    case 0x08:	return EL_AMOEBA_DROP;
+    case 0x09:	return EL_NUT;
+    case 0x0a:	return EL_YAMYAM;
+    case 0x0b:	return EL_QUICKSAND_FULL;
+    case 0x0c:	return EL_SAND;
+    case 0x0d:	return EL_WALL_SLIPPERY;
+    case 0x0e:	return EL_STEELWALL;
+    case 0x0f:	return EL_WALL;
+    case 0x10:	return EL_EM_KEY_1;
+    case 0x11:	return EL_EM_KEY_2;
+    case 0x12:	return EL_EM_KEY_4;
+    case 0x13:	return EL_EM_KEY_3;
+    case 0x14:	return EL_MAGIC_WALL;
+    case 0x15:	return EL_ROBOT_WHEEL;
+    case 0x16:	return EL_DYNAMITE;
+
+    case 0x17:	return EL_EM_KEY_1;			/* EMC */
+    case 0x18:	return EL_BUG_UP;			/* EMC */
+    case 0x1a:	return EL_DIAMOND;			/* EMC */
+    case 0x1b:	return EL_EMERALD;			/* EMC */
+    case 0x25:	return EL_NUT;				/* EMC */
+    case 0x80:	return EL_EMPTY;			/* EMC */
+    case 0x85:	return EL_EM_KEY_1;			/* EMC */
+    case 0x86:	return EL_EM_KEY_2;			/* EMC */
+    case 0x87:	return EL_EM_KEY_4;			/* EMC */
+    case 0x88:	return EL_EM_KEY_3;			/* EMC */
+    case 0x94:	return EL_QUICKSAND_EMPTY;		/* EMC */
+    case 0x9a:	return EL_AMOEBA_WET;			/* EMC */
+    case 0xaf:	return EL_DYNAMITE;			/* EMC */
+    case 0xbd:	return EL_SAND;				/* EMC */
+
+    default:
+      Error(ERR_WARN, "invalid level element %d", element);
+      return EL_CHAR_QUESTION;
+  }
+}
+
+static int map_em_element_field(int element)
+{
+  if (element >= 0xc8 && element <= 0xe1)
+    return EL_CHAR_A + (element - 0xc8);
+  else if (element >= 0xe2 && element <= 0xeb)
+    return EL_CHAR_0 + (element - 0xe2);
+
+  switch (element)
+  {
+    case 0x00:	return EL_ROCK;
+    case 0x02:	return EL_DIAMOND;
+    case 0x03:	return EL_DIAMOND;
+    case 0x04:	return EL_ROBOT;
+    case 0x05:	return EL_ROBOT;			/* EMC */
+    case 0x08:	return EL_SPACESHIP_UP;
+    case 0x09:	return EL_SPACESHIP_RIGHT;
+    case 0x0a:	return EL_SPACESHIP_DOWN;
+    case 0x0b:	return EL_SPACESHIP_LEFT;
+    case 0x0c:	return EL_SPACESHIP_UP;
+    case 0x0d:	return EL_SPACESHIP_RIGHT;
+    case 0x0e:	return EL_SPACESHIP_DOWN;
+    case 0x0f:	return EL_SPACESHIP_LEFT;
+    case 0x10:	return EL_BOMB;
+    case 0x12:	return EL_EMERALD;
+    case 0x13:	return EL_EMERALD;
+    case 0x14:	return EL_BUG_UP;
+    case 0x15:	return EL_BUG_RIGHT;
+    case 0x16:	return EL_BUG_DOWN;
+    case 0x17:	return EL_BUG_LEFT;
+    case 0x18:	return EL_BUG_UP;
+    case 0x19:	return EL_BUG_RIGHT;
+    case 0x1a:	return EL_BUG_DOWN;
+    case 0x1b:	return EL_BUG_LEFT;
+    case 0x1c:	return EL_AMOEBA_DROP;
+    case 0x20:	return EL_ROCK;
+    case 0x24:	return EL_MAGIC_WALL;
+    case 0x25:	return EL_NUT;
+
+      /* looks like magic wheel, but is _always_ activated */
+    case 0x28:	return EL_ROBOT_WHEEL;			/* EMC */
+
+    case 0x29:	return EL_YAMYAM;
+    case 0x2a:	return EL_YAMYAM;
+    case 0x2b:	return EL_YAMYAM;			/* EMC */
+    case 0x2c:	return EL_YAMYAM;			/* EMC */
+    case 0x2d:	return EL_QUICKSAND_FULL;
+    case 0x39:	return EL_EXPANDABLE_WALL_HORIZONTAL;	/* EMC */
+    case 0x3a:	return EL_EXPANDABLE_WALL_VERTICAL;	/* EMC */
+    case 0x3b:	return EL_DYNAMITE_ACTIVE;
+    case 0x3c:	return EL_DYNAMITE_ACTIVE;
+    case 0x3d:	return EL_DYNAMITE_ACTIVE;
+    case 0x3e:	return EL_DYNAMITE_ACTIVE;
+    case 0x3f:	return EL_ACID_POOL_BOTTOM;
+    case 0x40:	return EL_EXIT_OPEN;
+    case 0x41:	return EL_EXIT_OPEN;
+    case 0x42:	return EL_EXIT_OPEN;
+    case 0x43:	return EL_BALLOON;
+    case 0x4e:	return EL_INVISIBLE_WALL;
+    case 0x65:	return EL_ACID;				/* EMC */
+    case 0x73:	return EL_SAND;				/* EMC */
+    case 0x74:	return EL_STEELWALL;
+    case 0x7b:	return EL_ACID;
+    case 0x80:	return EL_EMPTY;
+    case 0x81:	return EL_WALL_SLIPPERY;
+    case 0x82:	return EL_SAND;
+    case 0x83:	return EL_STEELWALL;
+    case 0x84:	return EL_WALL;
+    case 0x85:	return EL_EM_KEY_1;
+    case 0x86:	return EL_EM_KEY_2;
+    case 0x87:	return EL_EM_KEY_4;
+    case 0x88:	return EL_EM_KEY_3;
+    case 0x89:	return EL_EM_GATE_1;
+    case 0x8a:	return EL_EM_GATE_2;
+    case 0x8b:	return EL_EM_GATE_4;
+    case 0x8c:	return EL_EM_GATE_3;
+    case 0x8d:	return EL_INVISIBLE_WALL;		/* EMC */
+    case 0x8e:	return EL_EM_GATE_1_GRAY;
+    case 0x8f:	return EL_EM_GATE_2_GRAY;
+    case 0x90:	return EL_EM_GATE_4_GRAY;
+    case 0x91:	return EL_EM_GATE_3_GRAY;
+    case 0x92:	return EL_MAGIC_WALL;
+    case 0x94:	return EL_QUICKSAND_EMPTY;
+    case 0x95:	return EL_ACID_POOL_TOPLEFT;
+    case 0x96:	return EL_ACID_POOL_TOPRIGHT;
+    case 0x97:	return EL_ACID_POOL_BOTTOMLEFT;
+    case 0x98:	return EL_ACID_POOL_BOTTOMRIGHT;
+    case 0x99:	return EL_ACID;
+    case 0x9a:	return EL_AMOEBA_DEAD;
+    case 0x9b:	return EL_AMOEBA_DEAD;
+    case 0x9c:	return EL_AMOEBA_DEAD;
+    case 0x9d:	return EL_AMOEBA_DEAD;
+    case 0x9e:	return EL_EXIT_CLOSED;
+    case 0x9f:	return EL_CHAR_LESS;			/* EMC */
+    case 0x93:	return EL_ROBOT_WHEEL;
+
+      /* looks like normal dust, but behaves like wall */
+    case 0xa0:	return EL_WALL;				/* EMC */
+
+    case 0xa8:	return EL_EMC_WALL_1;			/* EMC */
+    case 0xa9:	return EL_EMC_WALL_2;			/* EMC */
+    case 0xaa:	return EL_EMC_WALL_3;			/* EMC */
+    case 0xab:	return EL_EMC_WALL_7;			/* EMC */
+    case 0xae:	return EL_CHAR_MINUS;			/* EMC */
+    case 0xaf:	return EL_DYNAMITE;
+    case 0xb0:	return EL_EMC_STEELWALL_1;		/* EMC */
+    case 0xb1:	return EL_EMC_WALL_8;			/* EMC */
+
+      /* (exact steel wall) */
+    case 0xb3:	return EL_STEELWALL;			/* EMC */
+
+    case 0xb4:	return EL_WALL_SLIPPERY;		/* EMC */
+    case 0xb5:	return EL_EMC_WALL_6;			/* EMC */
+    case 0xb6:	return EL_EMC_WALL_5;			/* EMC */
+    case 0xb7:	return EL_EMC_WALL_4;			/* EMC */
+    case 0xb8:	return EL_BALLOON_SWITCH_ANY;		/* EMC */
+    case 0xb9:	return EL_BALLOON_SWITCH_RIGHT;		/* EMC */
+    case 0xba:	return EL_BALLOON_SWITCH_DOWN;		/* EMC */
+    case 0xbb:	return EL_BALLOON_SWITCH_LEFT;		/* EMC */
+    case 0xbc:	return EL_BALLOON_SWITCH_UP;		/* EMC */
+    case 0xbd:	return EL_SAND;				/* EMC */
+    case 0xec:	return EL_CHAR_PERIOD;
+    case 0xed:	return EL_CHAR_EXCLAM;
+    case 0xee:	return EL_CHAR_COLON;
+    case 0xef:	return EL_CHAR_QUESTION;
+    case 0xf0:	return EL_CHAR_GREATER;
+    case 0xf1:	return EL_CHAR_COPYRIGHT;
+    case 0xfe:	return EL_PLAYER_1;
+    case 0xff:	return EL_PLAYER_2;
+
+    default:
+      Error(ERR_WARN, "invalid level element %d", element);
+      return EL_CHAR_QUESTION;
+  }
+}
+
+static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  char *filename = level_file_info->filename;
+  FILE *file;
+  unsigned char body[40][64];
+  unsigned char *leveldata = &body[0][0];
+  unsigned char *header = &leveldata[2048];
+  unsigned char code0 = 0x65;
+  unsigned char code1 = 0x11;
+  boolean level_is_crypted = FALSE;
+  int nr = level_file_info->nr;
+  int jx, jy;
+  int i, x, y;
+
+  /* always start with reliable default values */
+  setLevelInfoToDefaults(level);
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    level->no_level_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level '%s' - using empty level", filename);
+
+    return;
+  }
+
+  for(i = 0; i < 2106; i++)
+    leveldata[i] = fgetc(file);
+
+  fclose(file);
+
+  /* check if level data is crypted by testing against known starting bytes
+     of the few existing crypted level files (from Emerald Mine 1 + 2) */
+
+  if ((leveldata[0] == 0xf1 ||
+       leveldata[0] == 0xf5) && leveldata[2] == 0xe7 && leveldata[3] == 0xee)
+  {
+    level_is_crypted = TRUE;
+
+    if (leveldata[0] == 0xf5)	/* error in crypted Emerald Mine 2 levels */
+      leveldata[0] = 0xf1;
+  }
+
+  if (level_is_crypted)		/* decode crypted level data */
+  {
+    for(i = 0; i < 2106; i++)
+    {
+      leveldata[i] ^= code0;
+      leveldata[i] -= code1;
+
+      code0  = (code0 + 7) & 0xff;
+    }
+  }
+
+  level->fieldx	= 64;
+  level->fieldy	= 32;
+
+  level->time		= header[46] * 10;
+  level->gems_needed	= header[47];
+
+  /* The original Emerald Mine levels have their level number stored
+     at the second byte of the level file...
+     Do not trust this information at other level files, e.g. EMC,
+     but correct it anyway (normally the first row is completely
+     steel wall, so the correction does not hurt anyway). */
+
+  if (leveldata[1] == nr)
+    leveldata[1] = leveldata[2];	/* correct level number field */
+
+  sprintf(level->name, "Level %d", nr);
+
+  level->score[SC_EMERALD]	= header[36];
+  level->score[SC_DIAMOND]	= header[37];
+  level->score[SC_ROBOT]	= header[38];
+  level->score[SC_SPACESHIP]	= header[39];
+  level->score[SC_BUG]		= header[40];
+  level->score[SC_YAMYAM]	= header[41];
+  level->score[SC_NUT]		= header[42];
+  level->score[SC_DYNAMITE]	= header[43];
+  level->score[SC_TIME_BONUS]	= header[44];
+
+  level->num_yamyam_contents = 4;
+
+  for(i = 0; i < level->num_yamyam_contents; i++)
+    for(y = 0; y < 3; y++)
+      for(x = 0; x < 3; x++)
+	level->yamyam_content[i][x][y] =
+	  map_em_element_yam(header[i * 9 + y * 3 + x]);
+
+  level->amoeba_speed		= (header[52] * 256 + header[53]) % 256;
+  level->time_magic_wall	= (header[54] * 256 + header[55]) * 16 / 100;
+  level->time_wheel		= (header[56] * 256 + header[57]) * 16 / 100;
+  level->amoeba_content		= EL_DIAMOND;
+
+  for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
+  {
+    int new_element = map_em_element_field(body[y][x]);
+
+    if (new_element == EL_AMOEBA_DEAD && level->amoeba_speed)
+      new_element = EL_AMOEBA_WET;
+
+    level->field[x][y] = new_element;
+  }
+
+  jx = (header[48] * 256 + header[49]) % 64;
+  jy = (header[48] * 256 + header[49]) / 64;
+  level->field[jx][jy] = EL_PLAYER_1;
+
+  jx = (header[50] * 256 + header[51]) % 64;
+  jy = (header[50] * 256 + header[51]) / 64;
+  level->field[jx][jy] = EL_PLAYER_2;
+}
+
+void LoadLevelFromFileInfo(struct LevelInfo *level,
+			   struct LevelFileInfo *level_file_info)
+{
+  switch (level_file_info->type)
+  {
+    case LEVEL_FILE_TYPE_RND:
+      LoadLevelFromFileInfo_RND(level, level_file_info);
+      break;
+
+    case LEVEL_FILE_TYPE_EM:
+      LoadLevelFromFileInfo_EM(level, level_file_info);
+      break;
+
+    default:
+      LoadLevelFromFileInfo_RND(level, level_file_info);
+      break;
+  }
+}
+
+void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
+{
+  static struct LevelFileInfo level_file_info;
+
+  level_file_info.nr = 0;			/* unknown */
+  level_file_info.type = LEVEL_FILE_TYPE_RND;	/* no others supported yet */
+  level_file_info.filename = filename;
+
+  LoadLevelFromFileInfo(level, &level_file_info);
 }
 
 static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
@@ -1156,11 +1597,18 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
   SetBorderElement();
 }
 
-void LoadLevelTemplate(int level_nr)
+void LoadLevelTemplate(int nr)
 {
-  char *filename = getLevelFilename(level_nr);
+#if 1
+  struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
+  char *filename = level_file_info->filename;
 
-  LoadLevelFromFilename(&level_template, filename);
+  LoadLevelFromFileInfo(&level, level_file_info);
+#else
+  char *filename = getDefaultLevelFilename(nr);
+
+  LoadLevelFromFilename_RND(&level_template, filename);
+#endif
 
   LoadLevel_InitVersion(&level, filename);
   LoadLevel_InitElements(&level, filename);
@@ -1168,11 +1616,18 @@ void LoadLevelTemplate(int level_nr)
   ActivateLevelTemplate();
 }
 
-void LoadLevel(int level_nr)
+void LoadLevel(int nr)
 {
-  char *filename = getLevelFilename(level_nr);
+#if 1
+  struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
+  char *filename = level_file_info->filename;
 
-  LoadLevelFromFilename(&level, filename);
+  LoadLevelFromFileInfo(&level, level_file_info);
+#else
+  char *filename = getLevelFilename(nr);
+
+  LoadLevelFromFilename_RND(&level, filename);
+#endif
 
   if (level.use_custom_template)
     LoadLevelTemplate(-1);
@@ -1658,16 +2113,16 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
-void SaveLevel(int level_nr)
+void SaveLevel(int nr)
 {
-  char *filename = getLevelFilename(level_nr);
+  char *filename = getDefaultLevelFilename(nr);
 
   SaveLevelFromFilename(&level, filename);
 }
 
 void SaveLevelTemplate()
 {
-  char *filename = getLevelFilename(-1);
+  char *filename = getDefaultLevelFilename(-1);
 
   SaveLevelFromFilename(&level, filename);
 }
@@ -2004,16 +2459,16 @@ void LoadTapeFromFilename(char *filename)
 #endif
 }
 
-void LoadTape(int level_nr)
+void LoadTape(int nr)
 {
-  char *filename = getTapeFilename(level_nr);
+  char *filename = getTapeFilename(nr);
 
   LoadTapeFromFilename(filename);
 }
 
-void LoadSolutionTape(int level_nr)
+void LoadSolutionTape(int nr)
 {
-  char *filename = getSolutionTapeFilename(level_nr);
+  char *filename = getSolutionTapeFilename(nr);
 
   LoadTapeFromFilename(filename);
 }
@@ -2073,9 +2528,9 @@ static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
   }
 }
 
-void SaveTape(int level_nr)
+void SaveTape(int nr)
 {
-  char *filename = getTapeFilename(level_nr);
+  char *filename = getTapeFilename(nr);
   FILE *file;
   boolean new_tape = TRUE;
   int num_participating_players = 0;
@@ -2186,10 +2641,10 @@ void DumpTape(struct TapeInfo *tape)
 /* score file functions                                                      */
 /* ========================================================================= */
 
-void LoadScore(int level_nr)
+void LoadScore(int nr)
 {
   int i;
-  char *filename = getScoreFilename(level_nr);
+  char *filename = getScoreFilename(nr);
   char cookie[MAX_LINE_LEN];
   char line[MAX_LINE_LEN];
   char *line_ptr;
@@ -2239,17 +2694,17 @@ void LoadScore(int level_nr)
   fclose(file);
 }
 
-void SaveScore(int level_nr)
+void SaveScore(int nr)
 {
   int i;
-  char *filename = getScoreFilename(level_nr);
+  char *filename = getScoreFilename(nr);
   FILE *file;
 
   InitScoreDirectory(leveldir_current->filename);
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
-    Error(ERR_WARN, "cannot save score for level %d", level_nr);
+    Error(ERR_WARN, "cannot save score for level %d", nr);
     return;
   }
 

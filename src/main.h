@@ -230,7 +230,7 @@
 #define MV_BIT_WHEN_PUSHED	10
 #define MV_BIT_MAZE_RUNNER	11
 #define MV_BIT_MAZE_HUNTER	12
-#define MV_BIT_PROJECTILE	13
+#define MV_BIT_WHEN_DROPPED	13
 #define MV_BIT_TURNING_LEFT_RIGHT 14
 #define MV_BIT_TURNING_RIGHT_LEFT 15
 #define MV_BIT_TURNING_RANDOM	16
@@ -250,7 +250,7 @@
 #define MV_MAZE_RUNNER		(1 << MV_BIT_MAZE_RUNNER)
 #define MV_MAZE_HUNTER		(1 << MV_BIT_MAZE_HUNTER)
 #define MV_MAZE_RUNNER_STYLE	(MV_MAZE_RUNNER | MV_MAZE_HUNTER)
-#define MV_PROJECTILE		(1 << MV_BIT_PROJECTILE)
+#define MV_WHEN_DROPPED		(1 << MV_BIT_WHEN_DROPPED)
 #define MV_TURNING_LEFT_RIGHT	(1 << MV_BIT_TURNING_LEFT_RIGHT)
 #define MV_TURNING_RIGHT_LEFT	(1 << MV_BIT_TURNING_RIGHT_LEFT)
 #define MV_TURNING_RANDOM	(1 << MV_BIT_TURNING_RANDOM)
@@ -462,6 +462,23 @@
 #define MICROLEV_XPOS		(SX + (SXSIZE - MICROLEV_XSIZE) / 2)
 #define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL_YPOS		(MICROLEV_YPOS + MICROLEV_YSIZE + 7)
+
+
+/* score for elements */
+#define SC_EMERALD		0
+#define SC_DIAMOND		1
+#define SC_BUG			2
+#define SC_SPACESHIP		3
+#define SC_YAMYAM		4
+#define SC_ROBOT		5
+#define SC_PACMAN		6
+#define SC_NUT			7
+#define SC_DYNAMITE		8
+#define SC_KEY			9
+#define SC_TIME_BONUS		10
+#define SC_CRYSTAL		11
+#define SC_PEARL		12
+#define SC_SHIELD		13
 
 
 /* "real" level file elements */
@@ -1217,6 +1234,7 @@ struct PlayerInfo
   boolean is_collecting;
   boolean is_pushing;
   boolean is_switching;
+  boolean is_dropping;
 
   boolean is_bored;
   boolean is_sleeping;
@@ -1267,6 +1285,13 @@ struct PlayerInfo
 struct LevelSetInfo
 {
   int music[MAX_LEVELS];
+};
+
+struct LevelFileInfo
+{
+  int nr;
+  int type;
+  char *filename;
 };
 
 struct LevelInfo

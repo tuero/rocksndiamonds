@@ -270,7 +270,7 @@ void DrawMainMenu()
   leveldir_last_valid = leveldir_current;
 
   /* needed if last screen (level choice) changed graphics, sounds or music */
-  ReloadCustomArtwork();
+  ReloadCustomArtwork(0);
 
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
@@ -1869,7 +1869,7 @@ static void execSetupArtwork()
   setup.music_set = artwork.mus_current->identifier;
 
   /* needed if last screen (setup choice) changed graphics, sounds or music */
-  ReloadCustomArtwork();
+  ReloadCustomArtwork(0);
 
   /* needed for displaying artwork name instead of artwork identifier */
   graphics_set_name = artwork.gfx_current->name;

@@ -487,23 +487,60 @@ static void HandleKeysCheating(Key key)
   printf("::: '%s' [%d]\n", cheat_input, cheat_input_len);
 #endif
 
-#if 1
-  if (is_string_suffix(cheat_input, ":insert-solution-tape"))
-    InsertSolutionTape();
-#else
-  if (is_string_suffix(cheat_input, ":ist"))
-    InsertSolutionTape();
-#endif
-
+  if (game_status == GAME_MODE_MAIN)
+  {
+    if (is_string_suffix(cheat_input, ":insert-solution-tape") ||
+	is_string_suffix(cheat_input, ":ist"))
+    {
+      InsertSolutionTape();
+    }
+    else if (is_string_suffix(cheat_input, ":reload-graphics") ||
+	     is_string_suffix(cheat_input, ":rg"))
+    {
+      ReloadCustomArtwork(1 << ARTWORK_TYPE_GRAPHICS);
+      DrawMainMenu();
+    }
+    else if (is_string_suffix(cheat_input, ":reload-sounds") ||
+	     is_string_suffix(cheat_input, ":rs"))
+    {
+      ReloadCustomArtwork(1 << ARTWORK_TYPE_SOUNDS);
+      DrawMainMenu();
+    }
+    else if (is_string_suffix(cheat_input, ":reload-music") ||
+	     is_string_suffix(cheat_input, ":rm"))
+    {
+      ReloadCustomArtwork(1 << ARTWORK_TYPE_MUSIC);
+      DrawMainMenu();
+    }
+    else if (is_string_suffix(cheat_input, ":reload-artwork") ||
+	     is_string_suffix(cheat_input, ":ra"))
+    {
+      ReloadCustomArtwork(1 << ARTWORK_TYPE_GRAPHICS |
+			  1 << ARTWORK_TYPE_SOUNDS |
+			  1 << ARTWORK_TYPE_MUSIC);
+      DrawMainMenu();
+    }
+    else if (is_string_suffix(cheat_input, ":dump-level") ||
+	     is_string_suffix(cheat_input, ":dl"))
+    {
+      DumpLevel(&level);
+    }
+    else if (is_string_suffix(cheat_input, ":dump-tape") ||
+	     is_string_suffix(cheat_input, ":dt"))
+    {
+      DumpTape(&tape);
+    }
+  }
+  else if (game_status == GAME_MODE_PLAYING)
+  {
 #ifdef DEBUG
-  else if (is_string_suffix(cheat_input, ":dump-tape"))
-    DumpTape(&tape);
-  else if (is_string_suffix(cheat_input, ".q"))
-    for (i = 0; i < MAX_INVENTORY_SIZE; i++)
-      if (local_player->inventory_size < MAX_INVENTORY_SIZE)
-	local_player->inventory_element[local_player->inventory_size++] =
-	  EL_DYNAMITE;
+    if (is_string_suffix(cheat_input, ".q"))
+      for (i = 0; i < MAX_INVENTORY_SIZE; i++)
+	if (local_player->inventory_size < MAX_INVENTORY_SIZE)
+	  local_player->inventory_element[local_player->inventory_size++] =
+	    EL_DYNAMITE;
 #endif
+  }
 }
 
 void HandleKey(Key key, int key_status)
@@ -614,16 +651,35 @@ void HandleKey(Key key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if ((key == KSYM_Return || key == setup.shortcut.toggle_pause) &&
-      game_status == GAME_MODE_PLAYING && AllPlayersGone)
+  if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
+      (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {
     CloseDoor(DOOR_CLOSE_1);
     game_status = GAME_MODE_MAIN;
     DrawMainMenu();
+
     return;
   }
 
-  /* special key shortcuts */
+  if (game_status == GAME_MODE_MAIN && key == setup.shortcut.toggle_pause)
+  {
+    if (setup.autorecord)
+      TapeStartRecording();
+
+#if defined(PLATFORM_UNIX)
+    if (options.network)
+      SendToServer_StartPlaying();
+    else
+#endif
+    {
+      game_status = GAME_MODE_PLAYING;
+      StopAnimation();
+      InitGame();
+    }
+
+    return;
+  }
+
   if (game_status == GAME_MODE_MAIN || game_status == GAME_MODE_PLAYING)
   {
     if (key == setup.shortcut.save_game)

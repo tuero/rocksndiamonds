@@ -154,7 +154,7 @@ static char *getLevelDirFromTreeInfo(TreeInfo *node)
   return level_dir;
 }
 
-static char *getCurrentLevelDir()
+char *getCurrentLevelDir()
 {
   return getLevelDirFromTreeInfo(leveldir_current);
 }
@@ -347,23 +347,6 @@ inline static char *getLevelArtworkDir(int type)
     return UNDEFINED_FILENAME;
 
   return LEVELDIR_ARTWORK_PATH(leveldir_current, type);
-}
-
-char *getLevelFilename(int nr)
-{
-  static char *filename = NULL;
-  char basename[MAX_FILENAME_LEN];
-
-  checked_free(filename);
-
-  if (nr < 0)
-    sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
-  else
-    sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
-
-  filename = getPath2(getCurrentLevelDir(), basename);
-
-  return filename;
 }
 
 char *getTapeFilename(int nr)

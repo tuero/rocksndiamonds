@@ -194,7 +194,6 @@ typedef struct hashtable     SetupFileHash;
 
 
 char *setLevelArtworkDir(TreeInfo *);
-char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getSolutionTapeFilename(int);
 char *getScoreFilename(int);
@@ -234,6 +233,8 @@ void sortTreeInfo(TreeInfo **,
 char *getUserDataDir(void);
 char *getCommonDataDir(void);
 char *getSetupDir(void);
+char *getCurrentLevelDir(void);
+
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);
 void SetFilePermissions(char *, int);

@@ -16,22 +16,6 @@
 
 #include "main.h"
 
-/* score for elements (also used by editor.c) */
-#define SC_EMERALD		0
-#define SC_DIAMOND		1
-#define SC_BUG			2
-#define SC_SPACESHIP		3
-#define SC_YAMYAM		4
-#define SC_ROBOT		5
-#define SC_PACMAN		6
-#define SC_NUT			7
-#define SC_DYNAMITE		8
-#define SC_KEY			9
-#define SC_TIME_BONUS		10
-#define SC_CRYSTAL		11
-#define SC_PEARL		12
-#define SC_SHIELD		13
-
 void GetPlayerConfig(void);
 void DrawGameDoorValues(void);
 void InitGameSound();

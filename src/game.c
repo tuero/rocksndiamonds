@@ -1076,6 +1076,7 @@ void InitGame()
     player->is_collecting = FALSE;
     player->is_pushing = FALSE;
     player->is_switching = FALSE;
+    player->is_dropping = FALSE;
 
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
@@ -3072,6 +3073,10 @@ void Impact(int x, int y)
 					 MovDir[x][y + 1] != MV_DOWN ||
 					 MovPos[x][y + 1] <= TILEY / 2));
 
+#if 0
+    object_hit = !IS_FREE(x, y + 1);
+#endif
+
     /* do not smash moving elements that left the smashed field in time */
     if (game.engine_version >= VERSION_IDENT(2,2,0,7) && IS_MOVING(x, y + 1) &&
 	ABS(MovPos[x][y + 1] + getElementMoveStepsize(x, y + 1)) >= TILEX)
@@ -3845,7 +3850,8 @@ inline static void TurnRoundExt(int x, int y)
       MovDir[x][y] = old_move_dir;
     }
   }
-  else if (move_pattern == MV_WHEN_PUSHED)
+  else if (move_pattern == MV_WHEN_PUSHED ||
+	   move_pattern == MV_WHEN_DROPPED)
   {
     if (!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y))
       MovDir[x][y] = MV_NO_MOVING;
@@ -4164,6 +4170,11 @@ void StartMoving(int x, int y)
 	 element; also, the case of the player being the element to smash was
 	 simply not covered here... :-/ ) */
 
+#if 0
+      WasJustMoving[x][y] = 0;
+      WasJustFalling[x][y] = 0;
+#endif
+
       Impact(x, y);
     }
     else if (IS_FREE(x, y + 1) && element == EL_SPRING && use_spring_bug)
@@ -4294,10 +4305,25 @@ void StartMoving(int x, int y)
 	     HAS_ANY_CHANGE_EVENT(element, CE_OTHER_GETS_HIT));
 #endif
 
+#if 1
+      WasJustMoving[x][y] = 0;
+#endif
+
       TestIfElementHitsCustomElement(x, y, MovDir[x][y]);
 
+#if 0
+      if (Feld[x][y] != element)	/* element has changed */
+      {
+	element = Feld[x][y];
+	move_pattern = element_info[element].move_pattern;
+
+	if (!CAN_MOVE(element))
+	  return;
+      }
+#else
       if (Feld[x][y] != element)	/* element has changed */
 	return;
+#endif
     }
 #endif
 
@@ -6142,7 +6168,11 @@ static void ChangeElement(int x, int y, int page)
       ChangePage[x][y] = -1;
     }
 
+#if 0
+    if (IS_MOVING(x, y) && !change->explode)
+#else
     if (IS_MOVING(x, y))		/* never change a running system ;-) */
+#endif
     {
       ChangeDelay[x][y] = 1;		/* try change after next move step */
       ChangePage[x][y] = page;		/* remember page to use for change */
@@ -6502,6 +6532,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 
     if (player->MovPos == 0)	/* needed for tape.playing */
       player->is_moving = FALSE;
+
+    player->is_dropping = FALSE;
 
     return 0;
   }
@@ -7409,8 +7441,27 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   int old_jx = jx, old_jy = jy;
   int moved = MF_NO_ACTION;
 
+#if 1
+  if (!player->active)
+    return FALSE;
+
+  if (!dx && !dy)
+  {
+    if (player->MovPos == 0)
+    {
+      player->is_moving = FALSE;
+      player->is_digging = FALSE;
+      player->is_collecting = FALSE;
+      player->is_snapping = FALSE;
+      player->is_pushing = FALSE;
+    }
+
+    return FALSE;
+  }
+#else
   if (!player->active || (!dx && !dy))
     return FALSE;
+#endif
 
 #if 0
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
@@ -7564,6 +7615,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #if 1
     player->is_switching = FALSE;
 #endif
+
+    player->is_dropping = FALSE;
 
 
 #if 1
@@ -7915,9 +7968,21 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int hitx = x + dx, hity = y + dy;
   int hitting_element = Feld[x][y];
+#if 0
+  boolean object_hit = (IN_LEV_FIELD(hitx, hity) &&
+			!IS_FREE(hitx, hity) &&
+			(!IS_MOVING(hitx, hity) ||
+			 MovDir[hitx][hity] != direction ||
+			 ABS(MovPos[hitx][hity]) <= TILEY / 2));
+#endif
 
   if (IN_LEV_FIELD(hitx, hity) && IS_FREE(hitx, hity))
     return;
+
+#if 0
+  if (IN_LEV_FIELD(hitx, hity) && !object_hit)
+    return;
+#endif
 
   CheckElementSideChange(x, y, hitting_element,
 			 direction, CE_HITTING_SOMETHING, -1);
@@ -7936,11 +8001,13 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
     int hitting_side = direction;
     int touched_side = opposite_direction;
     int touched_element = MovingOrBlocked2Element(hitx, hity);
+#if 1
     boolean object_hit = (!IS_MOVING(hitx, hity) ||
 			  MovDir[hitx][hity] != direction ||
 			  ABS(MovPos[hitx][hity]) <= TILEY / 2);
 
     object_hit = TRUE;
+#endif
 
     if (object_hit)
     {
@@ -8997,6 +9064,8 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   player->is_digging = FALSE;
   player->is_collecting = FALSE;
 
+  player->is_dropping = FALSE;
+
   if (DigField(player, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
     return FALSE;
 
@@ -9094,7 +9163,7 @@ boolean DropElement(struct PlayerInfo *player)
   new_element = Feld[jx][jy];
 
   if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
-      element_info[new_element].move_pattern == MV_PROJECTILE)
+      element_info[new_element].move_pattern == MV_WHEN_DROPPED)
   {
     int move_stepsize = element_info[new_element].move_stepsize;
     int direction, dx, dy, nextx, nexty;
@@ -9138,6 +9207,7 @@ boolean DropElement(struct PlayerInfo *player)
 
 #endif
 
+  player->is_dropping = TRUE;
 
 
   return TRUE;

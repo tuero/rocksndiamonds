@@ -1074,12 +1074,11 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_TURNING_RIGHT_LEFT,	"turning right, left"		},
   { MV_TURNING_RANDOM,		"turning random"		},
   { MV_WHEN_PUSHED,		"when pushed"			},
+  { MV_WHEN_DROPPED,		"when dropped"			},
 #if 1
   { MV_MAZE_RUNNER,		"maze runner style"		},
   { MV_MAZE_HUNTER,		"maze hunter style"		},
 #endif
-  { MV_PROJECTILE,		"projectile style"		},
-  { MV_PROJECTILE,		"projectile style"		},
   { -1,				NULL				}
 };
 
@@ -7205,7 +7204,8 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   }
   else if (type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE)
   {
-    boolean new_template = (!LevelFileExists(-1));
+    char *template_filename = getDefaultLevelFilename(-1);
+    boolean new_template = !fileExists(template_filename);
 
     if (new_template ||
 	Request("Save this template and kill the old ?", REQ_ASK))
@@ -7293,7 +7293,9 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   }
   else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
   {
-    if (level.use_custom_template && !LevelFileExists(-1))
+    char *template_filename = getDefaultLevelFilename(-1);
+
+    if (level.use_custom_template && !fileExists(template_filename))
     {
       Request("No level template found !", REQ_CONFIRM);
 
@@ -7576,7 +7578,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
-	boolean new_level = (!LevelFileExists(level_nr));
+	char *level_filename = getDefaultLevelFilename(level_nr);
+	boolean new_level = !fileExists(level_filename);
 
 	if (new_level ||
 	    Request("Save this level and kill the old ?", REQ_ASK))

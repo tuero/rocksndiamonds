@@ -19,7 +19,7 @@
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
 
-void ReloadCustomArtwork(void);
+void ReloadCustomArtwork(int);
 
 void KeyboardAutoRepeatOffUnlessAutoplay();
 

@@ -633,6 +633,7 @@ void DrawPlayer(struct PlayerInfo *player)
 	    player->is_collecting ? ACTION_COLLECTING      :
 	    player->is_moving     ? ACTION_MOVING          :
 	    player->is_snapping   ? ACTION_SNAPPING        :
+	    player->is_dropping   ? ACTION_DROPPING        :
 	    player->is_waiting    ? player->action_waiting : ACTION_DEFAULT);
 
   InitPlayerGfxAnimation(player, action, move_dir);

@@ -3825,14 +3825,17 @@ static char *getNewArtworkIdentifier(int type)
   return artwork_new_identifier;
 }
 
-void ReloadCustomArtwork()
+void ReloadCustomArtwork(int force_reload)
 {
   char *gfx_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_GRAPHICS);
   char *snd_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_SOUNDS);
   char *mus_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_MUSIC);
+  boolean force_reload_gfx = (force_reload & (1 << ARTWORK_TYPE_GRAPHICS));
+  boolean force_reload_snd = (force_reload & (1 << ARTWORK_TYPE_SOUNDS));
+  boolean force_reload_mus = (force_reload & (1 << ARTWORK_TYPE_MUSIC));
   boolean redraw_screen = FALSE;
 
-  if (gfx_new_identifier != NULL)
+  if (gfx_new_identifier != NULL || force_reload_gfx)
   {
 #if 0
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s', '%s']\n",
@@ -3857,7 +3860,7 @@ void ReloadCustomArtwork()
     redraw_screen = TRUE;
   }
 
-  if (snd_new_identifier != NULL)
+  if (snd_new_identifier != NULL || force_reload_snd)
   {
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -3866,7 +3869,7 @@ void ReloadCustomArtwork()
     redraw_screen = TRUE;
   }
 
-  if (mus_new_identifier != NULL)
+  if (mus_new_identifier != NULL || force_reload_mus)
   {
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 

@@ -96,22 +96,22 @@ clean:
 auto-conf:
 	@$(MAKE_CMD) auto-conf
 
-run:
-	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && ./rocksndiamonds --verbose
+run: all
+	@./rocksndiamonds --verbose
 
-gdb:
-	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && gdb ./rocksndiamonds
+gdb: all
+	@gdb ./rocksndiamonds
 
-valgrind:
-	valgrind -v --leak-check=yes ./rocksndiamonds 2> valgrind.out
+valgrind: all
+	@valgrind -v --leak-check=yes ./rocksndiamonds 2> valgrind.out
 
-enginetest:
+enginetest: all
 	./Scripts/make_enginetest.sh
 
-enginetestcustom:
+enginetestcustom: all
 	./Scripts/make_enginetest.sh custom
 
-enginetestfast:
+enginetestfast: all
 	./Scripts/make_enginetest.sh fast
 
 backup:
