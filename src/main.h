@@ -297,6 +297,8 @@ struct SetupInfo
   boolean autorecord;
   boolean quick_doors;
   boolean team_mode;
+  boolean handicap;
+  boolean time_limit;
 
   struct SetupInputInfo input[MAX_PLAYERS];
 };
@@ -394,6 +396,7 @@ struct LevelDirInfo
   boolean readonly;	/* readonly levels can not be changed with editor */
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
+  int handicap_level;	/* number of the lowest unsolved level */
 };
 
 struct TapeInfo
@@ -516,8 +519,6 @@ extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
 extern struct OptionInfo	options;
 extern struct SetupInfo		setup;
-extern struct SetupFileList	*setup_list;
-extern struct SetupFileList	*level_setup_list;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 

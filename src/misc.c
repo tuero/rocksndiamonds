@@ -167,9 +167,20 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
   *counter_var = actual_counter;
 }
 
+/* int2str() returns a number converted to a string;
+   the used memory is static, but will be overwritten by later calls,
+   so if you want to save the result, copy it to a private string buffer;
+   there can be 10 local calls of int2str() without buffering the result --
+   the 11th call will then destroy the result from the first call and so on.
+*/
+
 char *int2str(int number, int size)
 {
-  static char s[40];
+  static char shift_array[10][40];
+  static int shift_counter = 0;
+  char *s = shift_array[shift_counter];
+
+  shift_counter = (shift_counter + 1) % 10;
 
   if (size > 20)
     size = 20;

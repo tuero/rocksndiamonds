@@ -48,6 +48,7 @@
 /* file names and filename extensions */
 #ifndef MSDOS
 #define USERDATA_DIRECTORY	".rocksndiamonds"
+#define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
@@ -56,6 +57,7 @@
 #define SCOREFILE_EXTENSION	"score"
 #else
 #define USERDATA_DIRECTORY	"userdata"
+#define LEVELSETUP_DIRECTORY	"lvlsetup"
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
@@ -256,6 +258,23 @@ static char *getScoreDir(char *level_subdir)
   return score_dir;
 }
 
+static char *getLevelSetupDir(char *level_subdir)
+{
+  static char *levelsetup_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *levelsetup_subdir = LEVELSETUP_DIRECTORY;
+
+  if (levelsetup_dir)
+    free(levelsetup_dir);
+
+  if (strlen(level_subdir) > 0)
+    levelsetup_dir = getPath3(data_dir, levelsetup_subdir, level_subdir);
+  else
+    levelsetup_dir = getPath2(data_dir, levelsetup_subdir);
+
+  return levelsetup_dir;
+}
+
 static char *getLevelFilename(int nr)
 {
   static char *filename = NULL;
@@ -337,6 +356,13 @@ static void InitUserLevelDirectory(char *level_subdir)
 
     SaveUserLevelInfo();
   }
+}
+
+static void InitLevelSetupDirectory(char *level_subdir)
+{
+  createDirectory(getUserDataDir(), "user data");
+  createDirectory(getLevelSetupDir(""), "main level setup");
+  createDirectory(getLevelSetupDir(level_subdir), "level setup");
 }
 
 static void setLevelInfoToDefaults()
@@ -987,6 +1013,8 @@ void SaveScore(int level_nr)
 
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
 #define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
+#define TOKEN_STR_LAST_PLAYED_LEVEL	"last_played_level"
+#define TOKEN_STR_HANDICAP_LEVEL	"handicap_level"
 #define TOKEN_STR_PLAYER_PREFIX		"player_"
 
 #define TOKEN_VALUE_POSITION		30
@@ -997,14 +1025,20 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_SOUND_LOOPS		2
 #define SETUP_TOKEN_SOUND_MUSIC		3
 #define SETUP_TOKEN_SOUND_SIMPLE	4
+
+#if 0
 #define SETUP_TOKEN_TOONS		5
 #define SETUP_TOKEN_DOUBLE_BUFFERING	6
-#define SETUP_TOKEN_SCROLL_DELAY	7
-#define SETUP_TOKEN_SOFT_SCROLLING	8
-#define SETUP_TOKEN_FADING		9
-#define SETUP_TOKEN_AUTORECORD		10
-#define SETUP_TOKEN_QUICK_DOORS		11
-#define SETUP_TOKEN_TEAM_MODE		12
+#endif
+
+#define SETUP_TOKEN_SCROLL_DELAY	5
+#define SETUP_TOKEN_SOFT_SCROLLING	6
+#define SETUP_TOKEN_FADING		7
+#define SETUP_TOKEN_AUTORECORD		8
+#define SETUP_TOKEN_QUICK_DOORS		9
+#define SETUP_TOKEN_TEAM_MODE		10
+#define SETUP_TOKEN_HANDICAP		11
+#define SETUP_TOKEN_TIME_LIMIT		12
 
 /* player setup */
 #define SETUP_TOKEN_USE_JOYSTICK	13
@@ -1035,7 +1069,7 @@ void SaveScore(int level_nr)
 #define LEVELINFO_TOKEN_READONLY	36
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
-#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TEAM_MODE
+#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TIME_LIMIT
 
 #define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
 #define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
@@ -1065,14 +1099,20 @@ static struct
   { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
   { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
   { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
+
+#if 0
   { TYPE_SWITCH,  &si.toons,		"toons"				},
   { TYPE_SWITCH,  &si.double_buffering,	"double_buffering"		},
+#endif
+
   { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
   { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
   { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
   { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
   { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
   { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
+  { TYPE_SWITCH,  &si.handicap,		"handicap"			},
+  { TYPE_SWITCH,  &si.time_limit,	"time_limit"			},
 
   /* player setup */
   { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
@@ -1360,14 +1400,20 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
+  ldi->filename = NULL;
   ldi->name = getStringCopy(ANONYMOUS_NAME);
   ldi->name_short = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
   ldi->imported_from = NULL;
   ldi->levels = 0;
   ldi->first_level = 0;
+  ldi->last_level = 0;
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
   ldi->readonly = TRUE;
+  ldi->user_defined = FALSE;
+  ldi->color = 0;
+  ldi->class_desc = NULL;
+  ldi->handicap_level = 0;
 }
 
 static void setSetupInfoToDefaults(struct SetupInfo *si)
@@ -1388,6 +1434,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->fading = FALSE;
   si->autorecord = TRUE;
   si->quick_doors = FALSE;
+  si->team_mode = FALSE;
+  si->handicap = TRUE;
+  si->time_limit = TRUE;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
@@ -1489,30 +1538,6 @@ int getLevelSeriesNrFromLevelSeriesName(char *level_series_name)
       return i;
 
   return 0;
-}
-
-int getLastPlayedLevelOfLevelSeries(char *level_series_name)
-{
-  char *token_value;
-  int level_series_nr = getLevelSeriesNrFromLevelSeriesName(level_series_name);
-  int last_level_nr = leveldir[level_series_nr].first_level;
-
-  if (!level_series_name)
-    return 0;
-
-  token_value = getTokenValue(level_setup_list, level_series_name);
-
-  if (token_value)
-  {
-    last_level_nr = atoi(token_value);
-
-    if (last_level_nr < leveldir[level_series_nr].first_level)
-      last_level_nr = leveldir[level_series_nr].first_level;
-    if (last_level_nr > leveldir[level_series_nr].last_level)
-      last_level_nr = leveldir[level_series_nr].last_level;
-  }
-
-  return last_level_nr;
 }
 
 static int compareLevelDirInfoEntries(const void *object1, const void *object2)
@@ -1835,54 +1860,48 @@ void SaveSetup()
   chmod(filename, SETUP_PERMS);
 }
 
-void LoadLevelSetup()
+void LoadLevelSetup_LastSeries()
 {
   char *filename;
+  struct SetupFileList *level_setup_list = NULL;
 
   /* always start with reliable default values */
   leveldir_nr = 0;
-  level_nr = 0;
+
+  /* ----------------------------------------------------------------------- */
+  /* ~/.rocksndiamonds/levelsetup.conf                                       */
+  /* ----------------------------------------------------------------------- */
 
   filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
-  if (level_setup_list)
-    freeSetupFileList(level_setup_list);
-
-  level_setup_list = loadSetupFileList(filename);
-
-  if (level_setup_list)
+  if ((level_setup_list = loadSetupFileList(filename)))
   {
     char *last_level_series =
       getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
     leveldir_nr = getLevelSeriesNrFromLevelSeriesName(last_level_series);
-    level_nr = getLastPlayedLevelOfLevelSeries(last_level_series);
 
     checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+
+    freeSetupFileList(level_setup_list);
   }
   else
-  {
-    level_setup_list = newSetupFileList(TOKEN_STR_FILE_IDENTIFIER,
-					LEVELSETUP_COOKIE);
     Error(ERR_WARN, "using default setup values");
-  }
 
   free(filename);
 }
 
-void SaveLevelSetup()
+void SaveLevelSetup_LastSeries()
 {
   char *filename;
-  struct SetupFileList *list_entry = level_setup_list;
+  char *level_subdir = leveldir[leveldir_nr].filename;
   FILE *file;
 
+  /* ----------------------------------------------------------------------- */
+  /* ~/.rocksndiamonds/levelsetup.conf                                       */
+  /* ----------------------------------------------------------------------- */
+
   InitUserDataDirectory();
-
-  setTokenValue(level_setup_list,
-		TOKEN_STR_LAST_LEVEL_SERIES, leveldir[leveldir_nr].filename);
-
-  setTokenValue(level_setup_list,
-		leveldir[leveldir_nr].filename, int2str(level_nr, 0));
 
   filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
@@ -1895,18 +1914,102 @@ void SaveLevelSetup()
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
 						 LEVELSETUP_COOKIE));
-  while (list_entry)
+  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_LEVEL_SERIES,
+					       level_subdir));
+
+  fclose(file);
+  free(filename);
+
+  chmod(filename, SETUP_PERMS);
+}
+
+void LoadLevelSetup_SeriesInfo(int leveldir_nr)
+{
+  char *filename;
+  struct SetupFileList *level_setup_list = NULL;
+  char *level_subdir = leveldir[leveldir_nr].filename;
+
+  /* always start with reliable default values */
+  level_nr = 0;
+  leveldir[leveldir_nr].handicap_level = 0;
+
+  /* ----------------------------------------------------------------------- */
+  /* ~/.rocksndiamonds/levelsetup/<level series>/levelsetup.conf             */
+  /* ----------------------------------------------------------------------- */
+
+  level_subdir = leveldir[leveldir_nr].filename;
+
+  filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
+
+  if ((level_setup_list = loadSetupFileList(filename)))
   {
-    if (strcmp(list_entry->token, TOKEN_STR_FILE_IDENTIFIER) != 0)
-      fprintf(file, "%s\n",
-	      getFormattedSetupEntry(list_entry->token, list_entry->value));
+    char *token_value;
 
-    /* just to make things nicer :) */
-    if (strcmp(list_entry->token, TOKEN_STR_LAST_LEVEL_SERIES) == 0)
-      fprintf(file, "\n");
+    token_value = getTokenValue(level_setup_list, TOKEN_STR_LAST_PLAYED_LEVEL);
 
-    list_entry = list_entry->next;
+    if (token_value)
+    {
+      level_nr = atoi(token_value);
+
+      if (level_nr < leveldir[leveldir_nr].first_level)
+	level_nr = leveldir[leveldir_nr].first_level;
+      if (level_nr > leveldir[leveldir_nr].last_level)
+	level_nr = leveldir[leveldir_nr].last_level;
+    }
+
+    token_value = getTokenValue(level_setup_list, TOKEN_STR_HANDICAP_LEVEL);
+
+    if (token_value)
+    {
+      int level_nr = atoi(token_value);
+
+      if (level_nr < leveldir[leveldir_nr].first_level)
+	level_nr = leveldir[leveldir_nr].first_level;
+      if (level_nr > leveldir[leveldir_nr].last_level + 1)
+	level_nr = leveldir[leveldir_nr].last_level;
+
+      leveldir[leveldir_nr].handicap_level = level_nr;
+    }
+
+    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+
+    freeSetupFileList(level_setup_list);
   }
+  else
+    Error(ERR_WARN, "using default setup values");
+
+  free(filename);
+}
+
+void SaveLevelSetup_SeriesInfo(int leveldir_nr)
+{
+  char *filename;
+  char *level_subdir = leveldir[leveldir_nr].filename;
+  char *level_nr_str = int2str(level_nr, 0);
+  char *handicap_level_str = int2str(leveldir[leveldir_nr].handicap_level, 0);
+  FILE *file;
+
+  /* ----------------------------------------------------------------------- */
+  /* ~/.rocksndiamonds/levelsetup/<level series>/levelsetup.conf             */
+  /* ----------------------------------------------------------------------- */
+
+  InitLevelSetupDirectory(level_subdir);
+
+  filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
+
+  if (!(file = fopen(filename, "w")))
+  {
+    Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    free(filename);
+    return;
+  }
+
+  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
+						 LEVELSETUP_COOKIE));
+  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_PLAYED_LEVEL,
+					       level_nr_str));
+  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_HANDICAP_LEVEL,
+					       handicap_level_str));
 
   fclose(file);
   free(filename);

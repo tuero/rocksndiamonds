@@ -31,8 +31,8 @@ XLIB_PATH = /usr/X11/lib
 # choose if you want to allow many global score file entries for one player
 # when installing the game in a multi user environment, choose this
 # SCORE_ENTRIES = ONE_PER_NAME
-# when installing the game in a single user environment, choose this
-SCORE_ENTRIES = MANY_PER_NAME
+# when installing the game in a single user environment, choose this (default)
+# SCORE_ENTRIES = MANY_PER_NAME
 
 # The XPM-Library is no longer needed to build this program,
 # but is used to load graphics if XPM_INCLUDE_FILE is defined,
@@ -73,7 +73,9 @@ ifdef RW_GAME_DIR
 CONFIG_RW_GAME_DIR = -DRW_GAME_DIR="\"$(RW_GAME_DIR)\""
 endif
 
+ifdef SCORE_ENTRIES
 CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
+endif
 
 CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 

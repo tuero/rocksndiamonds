@@ -30,8 +30,10 @@ int getLastPlayedLevelOfLevelSeries(char *);
 void LoadLevelInfo(void);
 void LoadSetup(void);
 void SaveSetup(void);
-void LoadLevelSetup(void);
-void SaveLevelSetup(void);
+void LoadLevelSetup_LastSeries(void);
+void SaveLevelSetup_LastSeries(void);
+void LoadLevelSetup_SeriesInfo(int);
+void SaveLevelSetup_SeriesInfo(int);
 
 #ifdef MSDOS
 FILE *openErrorFile();

@@ -894,7 +894,7 @@ void InitAmoebaNr(int x, int y)
 void GameWon()
 {
   int hi_pos;
-  int bumplevel = FALSE;
+  boolean raise_level = FALSE;
 
   if (local_player->MovPos)
     return;
@@ -965,17 +965,26 @@ void GameWon()
     SaveTape(tape.level_nr);		/* Ask to save tape */
   }
 
+  if (level_nr == leveldir[leveldir_nr].handicap_level)
+  {
+    leveldir[leveldir_nr].handicap_level++;
+    SaveLevelSetup_SeriesInfo(leveldir_nr);
+
+    if (level_nr < leveldir[leveldir_nr].last_level)
+      raise_level = TRUE;
+  }
+
   if ((hi_pos = NewHiScore()) >= 0) 
   {
     game_status = HALLOFFAME;
     DrawHallOfFame(hi_pos);
-    if (bumplevel && TAPE_IS_EMPTY(tape))
+    if (raise_level)
       level_nr++;
   }
   else
   {
     game_status = MAINMENU;
-    if (bumplevel && TAPE_IS_EMPTY(tape))
+    if (raise_level)
       level_nr++;
     DrawMainMenu();
   }
@@ -2803,6 +2812,8 @@ void StartMoving(int x, int y)
       else if (element == EL_SP_ELECTRON)
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 
+      TestIfBadThingHitsHero(x, y);
+
       return;
     }
 
@@ -4390,12 +4401,12 @@ void GameActions()
     {
       TimeLeft--;
 
-      if (TimeLeft <= 10)
+      if (TimeLeft <= 10 && setup.time_limit)
 	PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
 
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
-      if (!TimeLeft)
+      if (!TimeLeft && setup.time_limit)
 	for (i=0; i<MAX_PLAYERS; i++)
 	  KillHero(&stored_player[i]);
     }
@@ -4891,6 +4902,9 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     MV_RIGHT,
     MV_DOWN
   };
+
+  if (Feld[badx][bady] == EL_EXPLODING)	/* skip just exploding bad things */
+    return;
 
   for (i=0; i<4; i++)
   {

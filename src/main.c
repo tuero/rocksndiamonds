@@ -110,8 +110,6 @@ struct SoundInfo	Sound[NUM_SOUNDS];
 struct TapeInfo		tape;
 struct OptionInfo	options;
 struct SetupInfo	setup;
-struct SetupFileList	*setup_list = NULL;
-struct SetupFileList	*level_setup_list = NULL;
 struct GameInfo		game;
 struct GlobalInfo	global;
 

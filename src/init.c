@@ -104,9 +104,10 @@ void InitLevelAndPlayerInfo()
 
   local_player->connected = TRUE;
 
-  LoadLevelInfo();			/* global level info */
-  LoadSetup();				/* global setup info */
-  LoadLevelSetup();			/* info about last played level */
+  LoadLevelInfo();				/* global level info */
+  LoadSetup();					/* global setup info */
+  LoadLevelSetup_LastSeries();			/* last played series info */
+  LoadLevelSetup_SeriesInfo(leveldir_nr);	/* last played level info */
 }
 
 void InitNetworkServer()

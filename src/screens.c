@@ -76,6 +76,10 @@ void DrawMainMenu()
   /* map gadgets for main menu screen */
   MapTapeButtons();
 
+  /* level_nr may have set to value over handicap with level editor */
+  if (setup.handicap && level_nr > leveldir[leveldir_nr].handicap_level)
+    level_nr = leveldir[leveldir_nr].handicap_level;
+
   GetPlayerConfig();
   LoadLevel(level_nr);
 
@@ -196,6 +200,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (new_level_nr > leveldir[leveldir_nr].last_level)
       new_level_nr = leveldir[leveldir_nr].last_level;
 
+    if (setup.handicap && new_level_nr > leveldir[leveldir_nr].handicap_level)
+      new_level_nr = leveldir[leveldir_nr].handicap_level;
+
     if (old_level_nr == new_level_nr ||
 	!DelayReached(&level_delay, GADGET_FRAME_DELAY))
       goto out;
@@ -242,7 +249,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (num_leveldirs)
 	{
 	  game_status = CHOOSELEVEL;
-	  SaveLevelSetup();
+	  SaveLevelSetup_LastSeries();
+	  SaveLevelSetup_SeriesInfo(leveldir_nr);
 	  DrawChooseLevel();
 	}
       }
@@ -276,6 +284,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 #endif
 	{
 	  game_status = PLAYING;
+	  StopAnimation();
 	  InitGame();
 	}
       }
@@ -286,7 +295,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 10)
       {
-	SaveLevelSetup();
+	SaveLevelSetup_LastSeries();
+	SaveLevelSetup_SeriesInfo(leveldir_nr);
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
@@ -964,10 +974,10 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     else
     {
       leveldir_nr = first_entry + y - 3;
-      level_nr =
-	getLastPlayedLevelOfLevelSeries(leveldir[leveldir_nr].filename);
+      LoadLevelSetup_SeriesInfo(leveldir_nr);
 
-      SaveLevelSetup();
+      SaveLevelSetup_LastSeries();
+      SaveLevelSetup_SeriesInfo(leveldir_nr);
       TapeErase();
 
       game_status = MAINMENU;
@@ -1040,14 +1050,18 @@ void DrawSetupScreen()
     { &setup.sound,		"Sound:",	},
     { &setup.sound_loops,	" Sound Loops:"	},
     { &setup.sound_music,	" Game Music:"	},
+#if 0
     { &setup.toons,		"Toons:"	},
     { &setup.double_buffering,	"Buffered gfx:"	},
+#endif
     { &setup.scroll_delay,	"Scroll Delay:"	},
     { &setup.soft_scrolling,	"Soft Scroll.:"	},
     { &setup.fading,		"Fading:"	},
     { &setup.quick_doors,	"Quick Doors:"	},
     { &setup.autorecord,	"Auto-Record:"	},
     { &setup.team_mode,		"Team-Mode:"	},
+    { &setup.handicap,		"Handicap:"	},
+    { &setup.time_limit,	"Timelimit:"	},
     { NULL,			"Input Devices"	},
     { NULL,			""		},
     { NULL,			"Exit"		},
@@ -1185,6 +1199,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	}
 	setup.sound_music = !setup.sound_music;
       }
+
+#if 0
       else if (y==6)
       {
 	if (setup.toons)
@@ -1208,7 +1224,9 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	setup.direct_draw = !setup.double_buffering;
 #endif
       }
-      else if (y==8)
+#endif
+
+      else if (y==6)
       {
 	if (setup.scroll_delay)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1216,7 +1234,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.scroll_delay = !setup.scroll_delay;
       }
-      else if (y==9)
+      else if (y==7)
       {
 	if (setup.soft_scrolling)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1224,7 +1242,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.soft_scrolling = !setup.soft_scrolling;
       }
-      else if (y==10)
+      else if (y==8)
       {
 	if (setup.fading)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1232,7 +1250,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.fading = !setup.fading;
       }
-      else if (y==11)
+      else if (y==9)
       {
 	if (setup.quick_doors)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1240,7 +1258,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.quick_doors = !setup.quick_doors;
       }
-      else if (y==12)
+      else if (y==10)
       {
 	if (setup.autorecord)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1248,13 +1266,29 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.autorecord = !setup.autorecord;
       }
-      else if (y==13)
+      else if (y==11)
       {
 	if (setup.team_mode)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.team_mode = !setup.team_mode;
+      }
+      else if (y==12)
+      {
+	if (setup.handicap)
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	setup.handicap = !setup.handicap;
+      }
+      else if (y==13)
+      {
+	if (setup.time_limit)
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	setup.time_limit = !setup.time_limit;
       }
       else if (y==14)
       {
