@@ -1,3 +1,6 @@
+2005-02-20
+	* fixed small bug when dragging scrollbars to end positions
+
 2005-02-14
 	* added editor element descriptions written by Aaron Davidson
 

@@ -1717,7 +1717,7 @@ boolean HandleGadgets(int mx, int my, int button)
 
 	if (gs->item_position < 0)
 	  gs->item_position = 0;
-	if (gs->item_position > gs->items_max - gs->items_visible)
+	else if (gs->item_position > gs->items_max - gs->items_visible)
 	  gs->item_position = gs->items_max - gs->items_visible;
 
 	if (old_item_position != gs->item_position)
@@ -1799,13 +1799,22 @@ boolean HandleGadgets(int mx, int my, int button)
 
       gs->position = scrollbar_mouse_pos - gs->drag_position;
 
-      if (gs->position < 0)
+      /* make sure to always precisely reach end positions when dragging */
+      if (gs->position <= 0)
+      {
 	gs->position = 0;
-      if (gs->position > gs->position_max)
+	gs->item_position = 0;
+      }
+      else if (gs->position >= gs->position_max)
+      {
 	gs->position = gs->position_max;
-
-      gs->item_position =
-	gs->items_max * (gs->position + gs->correction) / gs->size_max_cmp;
+	gs->item_position = gs->items_max - gs->items_visible;
+      }
+      else
+      {
+	gs->item_position =
+	  gs->items_max * (gs->position + gs->correction) / gs->size_max_cmp;
+      }
 
       if (gs->item_position < 0)
 	gs->item_position = 0;

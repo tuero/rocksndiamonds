@@ -466,7 +466,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
+#if 0
 	  gotoTopLevelDir();
+#endif
 
 	  DrawChooseLevel();
 	}
