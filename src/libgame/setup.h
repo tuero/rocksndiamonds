@@ -154,7 +154,7 @@ TreeInfo *newTreeInfo();
 void pushTreeInfo(TreeInfo **, TreeInfo *);
 int numTreeInfo(TreeInfo *);
 boolean validLevelSeries(TreeInfo *);
-TreeInfo *getFirstValidLevelSeries(TreeInfo *);
+TreeInfo *getFirstValidTreeInfoEntry(TreeInfo *);
 TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *);
 int numTreeInfoInGroup(TreeInfo *);
 int posTreeInfo(TreeInfo *);

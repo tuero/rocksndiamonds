@@ -14,6 +14,7 @@
 #include "system.h"
 #include "pcx.h"
 #include "misc.h"
+#include "setup.h"
 
 
 #if defined(TARGET_X11)
@@ -144,7 +145,7 @@ static DrawWindow *X11InitWindow()
 	  icon_pic.picture_filename);
 #endif
   if (XReadBitmapFile(display, new_window->drawable,
-		      program.x11_icon_filename,
+		      getCustomImageFilename(program.x11_icon_filename),
 		      &icon_width, &icon_height, &icon_pixmap,
 		      &icon_hot_x, &icon_hot_y) != BitmapSuccess)
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'",
@@ -155,7 +156,7 @@ static DrawWindow *X11InitWindow()
 	  icon_pic.picturemask_filename);
 #endif
   if (XReadBitmapFile(display, new_window->drawable,
-		      program.x11_iconmask_filename,
+		      getCustomImageFilename(program.x11_iconmask_filename),
 		      &icon_width, &icon_height, &iconmask_pixmap,
 		      &icon_hot_x, &icon_hot_y) != BitmapSuccess)
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'",
@@ -231,6 +232,16 @@ static DrawWindow *X11InitWindow()
   return new_window;
 }
 
+static void SetImageDimensions(Bitmap *bitmap)
+{
+  Window root;
+  int x, y;
+  unsigned int border_width, depth;
+
+  XGetGeometry(display, bitmap->drawable, &root, &x, &y,
+	       &bitmap->width, &bitmap->height, &border_width, &depth);
+}
+
 Bitmap *X11LoadImage(char *filename)
 {
   Bitmap *new_bitmap = CreateBitmapStruct();
@@ -284,6 +295,9 @@ Bitmap *X11LoadImage(char *filename)
 
   /* set GraphicContext inheritated from Window */
   new_bitmap->gc = window->gc;
+
+  /* set image width and height */
+  SetImageDimensions(new_bitmap);
 
   return new_bitmap;
 }

@@ -19,6 +19,7 @@
 #include "sound.h"
 #include "joystick.h"
 #include "misc.h"
+#include "setup.h"
 #include "pcx.h"
 
 #define AllegroDefaultScreen() (display->screens[display->default_screen])
@@ -302,9 +303,9 @@ Display *XOpenDisplay(char *display_name)
   Screen *screen;
   Display *display;
   BITMAP *mouse_bitmap = NULL;
+  char *mouse_filename =getCustomImageFilename(program.msdos_pointer_filename);
 
-  mouse_bitmap = Read_PCX_to_AllegroBitmap(program.msdos_pointer_filename);
-  if (mouse_bitmap == NULL)
+  if ((mouse_bitmap = Read_PCX_to_AllegroBitmap(mouse_filename)) == NULL)
     return NULL;
 
   screen = malloc(sizeof(Screen));

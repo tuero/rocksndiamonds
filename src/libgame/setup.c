@@ -375,7 +375,7 @@ char *getCustomImageFilename(char *basename)
     return filename;
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultGraphicsDir("gfx_classic"), basename);
+  filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -499,23 +499,23 @@ boolean validLevelSeries(TreeInfo *node)
   return (node != NULL && !node->node_group && !node->parent_link);
 }
 
-TreeInfo *getFirstValidLevelSeries(TreeInfo *node)
+TreeInfo *getFirstValidTreeInfoEntry(TreeInfo *node)
 {
   if (node == NULL)
   {
-    if (leveldir_first)		/* start with first level directory entry */
-      return getFirstValidLevelSeries(leveldir_first);
+    if (node->node_top)		/* start with first tree entry */
+      return getFirstValidTreeInfoEntry(*node->node_top);
     else
       return NULL;
   }
   else if (node->node_group)	/* enter level group (step down into tree) */
-    return getFirstValidLevelSeries(node->node_group);
+    return getFirstValidTreeInfoEntry(node->node_group);
   else if (node->parent_link)	/* skip start entry of level group */
   {
     if (node->next)		/* get first real level series entry */
-      return getFirstValidLevelSeries(node->next);
+      return getFirstValidTreeInfoEntry(node->next);
     else			/* leave empty level group and go on */
-      return getFirstValidLevelSeries(node->node_parent->next);
+      return getFirstValidTreeInfoEntry(node->node_parent->next);
   }
   else				/* this seems to be a regular level series */
     return node;
@@ -1478,7 +1478,8 @@ void LoadLevelInfo()
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
 
-  leveldir_current = getFirstValidLevelSeries(leveldir_first);
+  /* before sorting, the first entries will be from the user directory */
+  leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
   if (leveldir_first == NULL)
     Error(ERR_EXIT, "cannot find any valid level series in any directory");
@@ -1506,7 +1507,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   char *check_dir = NULL;
   int i;
 
-  if (access(getUserLevelDir(filename), F_OK) == 0)	/* file exists */
+  if (access(filename, F_OK) == 0)		/* file exists */
     loadSetupFileList(filename);
 
   if (setup_file_list == NULL)	/* no config file -- look for artwork files */
@@ -1515,7 +1516,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     struct dirent *dir_entry;
     boolean valid_file_found = FALSE;
 
-    if ((dir = opendir(base_directory)) != NULL)
+    if ((dir = opendir(directory_path)) != NULL)
     {
       while ((dir_entry = readdir(dir)) != NULL)
       {
@@ -1535,7 +1536,8 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
     if (!valid_file_found)
     {
-      Error(ERR_WARN, "ignoring artwork directory '%s'", base_directory);
+      if (options.debug)
+	Error(ERR_WARN, "ignoring artwork directory '%s'", base_directory);
 
       free(directory_path);
       free(filename);
@@ -1712,9 +1714,24 @@ void LoadArtworkInfo()
 				TREE_TYPE_MUSIC_DIR);
 
   /* before sorting, the first entries will be from the user directory */
-  artwork.gfx_current = artwork.gfx_first;
-  artwork.snd_current = artwork.snd_first;
-  artwork.mus_current = artwork.mus_first;
+  artwork.gfx_current =
+    getTreeInfoFromFilename(artwork.gfx_first, setup.graphics_set);
+  if (artwork.gfx_current == NULL)
+    artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
+
+  artwork.snd_current =
+    getTreeInfoFromFilename(artwork.snd_first, setup.sounds_set);
+  if (artwork.snd_current == NULL)
+  artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
+
+  artwork.mus_current =
+    getTreeInfoFromFilename(artwork.mus_first, setup.music_set);
+  if (artwork.mus_current == NULL)
+  artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
+
+  artwork.graphics_set_current = artwork.gfx_current->name;
+  artwork.sounds_set_current = artwork.snd_current->name;
+  artwork.music_set_current = artwork.mus_current->name;
 
   sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
@@ -1852,7 +1869,7 @@ void LoadLevelSetup_LastSeries()
   struct SetupFileList *level_setup_list = NULL;
 
   /* always start with reliable default values */
-  leveldir_current = getFirstValidLevelSeries(leveldir_first);
+  leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup.conf                                            */
@@ -1868,7 +1885,7 @@ void LoadLevelSetup_LastSeries()
     leveldir_current = getTreeInfoFromFilename(leveldir_first,
 					       last_level_series);
     if (leveldir_current == NULL)
-      leveldir_current = leveldir_first;
+      leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
     checkSetupFileListIdentifier(level_setup_list, getCookie("LEVELSETUP"));
 

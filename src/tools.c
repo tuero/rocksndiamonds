@@ -2054,7 +2054,12 @@ unsigned int CloseDoor(unsigned int door_state)
 
 unsigned int GetDoorState()
 {
-  return(MoveDoor(DOOR_GET_STATE));
+  return MoveDoor(DOOR_GET_STATE);
+}
+
+unsigned int SetDoorState(unsigned int door_state)
+{
+  return MoveDoor(door_state | DOOR_SET_STATE);
 }
 
 unsigned int MoveDoor(unsigned int door_state)
@@ -2067,6 +2072,16 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
+
+  if (door_state & DOOR_SET_STATE)
+  {
+    if (door_state & DOOR_ACTION_1)
+      door1 = door_state & DOOR_ACTION_1;
+    if (door_state & DOOR_ACTION_2)
+      door2 = door_state & DOOR_ACTION_2;
+
+    return(door1 | door2);
+  }
 
   if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
     door_state &= ~DOOR_OPEN_1;

@@ -152,6 +152,9 @@ void DrawMainMenu()
   /* needed if last screen was the setup screen and fullscreen state changed */
   ToggleFullscreenIfNeeded();
 
+  /* needed if last screen (setup/level) changed graphics, sounds or music */
+  ReloadCustomArtwork();
+
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
@@ -161,7 +164,7 @@ void DrawMainMenu()
 
   /* leveldir_current may be invalid (level group, parent link) */
   if (!validLevelSeries(leveldir_current))
-    leveldir_current = getFirstValidLevelSeries(leveldir_last_valid);
+    leveldir_current = getFirstValidTreeInfoEntry(leveldir_last_valid);
 
   /* store valid level series information */
   leveldir_last_valid = leveldir_current;
@@ -1350,7 +1353,6 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
 static struct TokenInfo *setup_info;
 static int num_setup_info;
-static char *custom_graphics, *custom_sounds, *custom_music;
 
 static void execSetupMain()
 {
@@ -1360,7 +1362,7 @@ static void execSetupMain()
 
 static void execSetupGraphics()
 {
-  custom_graphics = artwork.gfx_current->name;
+  setup.graphics_set = artwork.gfx_current->name;
 
   setup_mode = SETUP_MODE_GRAPHICS;
   DrawSetupScreen();
@@ -1368,8 +1370,8 @@ static void execSetupGraphics()
 
 static void execSetupSound()
 {
-  custom_sounds = artwork.snd_current->name;
-  custom_music = artwork.mus_current->name;
+  setup.sounds_set = artwork.snd_current->name;
+  setup.music_set = artwork.mus_current->name;
 
   setup_mode = SETUP_MODE_SOUND;
   DrawSetupScreen();
@@ -1452,7 +1454,7 @@ static struct TokenInfo setup_info_main[] =
 static struct TokenInfo setup_info_graphics[] =
 {
   { TYPE_ENTER_MENU,	execSetupChooseGraphics,"Custom Graphics"	},
-  { TYPE_STRING,	&custom_graphics,	""			},
+  { TYPE_STRING,	&setup.graphics_set,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
@@ -1471,9 +1473,9 @@ static struct TokenInfo setup_info_sound[] =
   { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"		},
-  { TYPE_STRING,	&custom_sounds,		""			},
+  { TYPE_STRING,	&setup.sounds_set,	""			},
   { TYPE_ENTER_MENU,	execSetupChooseMusic,	"Custom Music"		},
-  { TYPE_STRING,	&custom_music,		""			},
+  { TYPE_STRING,	&setup.music_set,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
   { 0,			NULL,			NULL			}
@@ -1541,7 +1543,8 @@ static void drawSetupValue(int pos)
 {
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
-  int value_color = FC_YELLOW;
+  int font_size = FS_BIG;
+  int font_color = FC_YELLOW;
   char *value_string = getSetupValue(setup_info[pos].type & ~TYPE_GHOSTED,
 				     setup_info[pos].value);
 
@@ -1552,23 +1555,26 @@ static void drawSetupValue(int pos)
     if (setup_info[pos].type & TYPE_QUERY)
     {
       value_string = "<press key>";
-      value_color = FC_RED;
+      font_color = FC_RED;
     }
   }
   else if (setup_info[pos].type & TYPE_STRING)
   {
-    xpos = 3;
+    int max_value_len = (SCR_FIELDX - 2) * 2;
 
-    if (strlen(value_string) > 14)
-      value_string[14] = '\0';
+    xpos = 1;
+    font_size = FS_MEDIUM;
+
+    if (strlen(value_string) > max_value_len)
+      value_string[max_value_len] = '\0';
   }
   else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
 	   !*(boolean *)(setup_info[pos].value))
-    value_color = FC_BLUE;
+    font_color = FC_BLUE;
 
   DrawText(SX + xpos * 32, SY + ypos * 32,
 	   (xpos == 3 ? "              " : "   "), FS_BIG, FC_YELLOW);
-  DrawText(SX + xpos * 32, SY + ypos * 32, value_string, FS_BIG, value_color);
+  DrawText(SX + xpos * 32, SY + ypos * 32, value_string, font_size,font_color);
 }
 
 static void changeSetupValue(int pos)

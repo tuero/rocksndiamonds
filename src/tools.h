@@ -45,6 +45,7 @@
 #define DOOR_COPY_BACK		(1 << 4)
 #define DOOR_NO_DELAY		(1 << 5)
 #define DOOR_GET_STATE		(1 << 6)
+#define DOOR_SET_STATE		(1 << 7)
 
 /* for Request */
 #define REQ_ASK			(1 << 0)
@@ -104,6 +105,7 @@ boolean Request(char *, unsigned int);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
+unsigned int SetDoorState(unsigned int);
 unsigned int MoveDoor(unsigned int);
 void DrawSpecialEditorDoor();
 void UndrawSpecialEditorDoor();

@@ -366,6 +366,36 @@ void InitGfxBackground()
   redraw_mask = REDRAW_ALL;
 }
 
+void ReloadCustomArtwork()
+{
+  if (artwork.graphics_set_current != artwork.gfx_current->name)
+  {
+    int i;
+
+    for(i=0; i<NUM_PICTURES; i++)
+      ReloadCustomImage(&pix[i], image_filename[i]);
+
+    InitGfxBackground();
+    SetDoorState(DOOR_OPEN_1 | DOOR_CLOSE_2);
+
+    artwork.graphics_set_current = artwork.gfx_current->name;
+  }
+
+  if (artwork.sounds_set_current != artwork.snd_current->name)
+  {
+    printf("reload sounds ...\n");
+
+    artwork.sounds_set_current = artwork.snd_current->name;
+  }
+
+  if (artwork.music_set_current != artwork.mus_current->name)
+  {
+    printf("reload music ...\n");
+
+    artwork.music_set_current = artwork.mus_current->name;
+  }
+}
+
 void InitGadgets()
 {
   CreateLevelEditorGadgets();

@@ -125,11 +125,21 @@
 #define RW_BASE_PATH		RW_GAME_DIR
 
 #define GRAPHICS_DIRECTORY	"graphics"
-#define MUSIC_DIRECTORY		"music"
 #define SOUNDS_DIRECTORY	"sounds"
+#define MUSIC_DIRECTORY		"music"
 #define LEVELS_DIRECTORY	"levels"
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
+
+#if !defined(PLATFORM_MSDOS)
+#define GRAPHICS_SUBDIR		"gfx_classic"
+#define SOUNDS_SUBDIR		"snd_classic"
+#define MUSIC_SUBDIR		"mus_classic"
+#else
+#define GRAPHICS_SUBDIR		"gfx_orig"
+#define SOUNDS_SUBDIR		"snd_orig"
+#define MUSIC_SUBDIR		"mus_orig"
+#endif
 
 /* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
@@ -307,9 +317,9 @@ struct SetupInfo
   boolean fullscreen;
   boolean ask_on_escape;
 
-  char *graphics_dir;
-  char *sounds_dir;
-  char *music_dir;
+  char *graphics_set;
+  char *sounds_set;
+  char *music_set;
 
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
@@ -370,6 +380,10 @@ struct ArtworkInfo
   SoundsDirTree *snd_current;
   MusicDirTree *mus_first;
   MusicDirTree *mus_current;
+
+  char *graphics_set_current;
+  char *sounds_set_current;
+  char *music_set_current;
 };
 
 
@@ -451,6 +465,7 @@ inline boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
 Bitmap *LoadCustomImage(char *);
+void ReloadCustomImage(Bitmap **, char *);
 
 inline void OpenAudio(void);
 inline void CloseAudio(void);

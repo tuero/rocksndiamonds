@@ -112,18 +112,11 @@ void ClosePlatformDependantStuff(void)
 
 void InitProgramInfo(char *unix_userdata_directory, char *program_title,
 		     char *window_title, char *icon_title,
-		     char *x11_icon_basename, char *x11_iconmask_basename,
-		     char *msdos_pointer_basename,
+		     char *x11_icon_filename, char *x11_iconmask_filename,
+		     char *msdos_pointer_filename,
 		     char *cookie_prefix, char *filename_prefix,
 		     int program_version)
 {
-  char *x11_icon_filename =
-    getPath2(options.graphics_directory, x11_icon_basename);
-  char *x11_iconmask_filename =
-    getPath2(options.graphics_directory, x11_iconmask_basename);
-  char *msdos_pointer_filename =
-    getPath2(options.graphics_directory, msdos_pointer_basename);
-
 #if defined(PLATFORM_UNIX)
   program.userdata_directory = unix_userdata_directory;
 #else
@@ -635,6 +628,8 @@ Bitmap *LoadImage(char *filename)
   new_bitmap = X11LoadImage(filename);
 #endif
 
+  new_bitmap->source_filename = getStringCopy(filename);
+
   return new_bitmap;
 }
 
@@ -649,9 +644,53 @@ Bitmap *LoadCustomImage(char *basename)
   if ((new_bitmap = LoadImage(filename)) == NULL)
     Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
 
-  new_bitmap->source_filename = getStringCopy(filename);
-
   return new_bitmap;
+}
+
+void ReloadCustomImage(Bitmap **bitmap, char *basename)
+{
+  char *filename = getCustomImageFilename(basename);
+  Bitmap *old_bitmap = *bitmap;
+  Bitmap *new_bitmap;
+
+  if (filename == NULL)		/* (should never happen) */
+  {
+    Error(ERR_WARN, "ReloadCustomImage(): cannot find file '%s'", basename);
+    return;
+  }
+
+  if (strcmp(filename, old_bitmap->source_filename) == 0)
+  {
+    /* The old and new image are the same (have the same filename and path).
+       This usually means that this image does not exist in this graphic set
+       and a fallback to the existing image is done. */
+
+    return;
+  }
+
+  if ((new_bitmap = LoadImage(filename)) == NULL)
+  {
+    Error(ERR_WARN, "LoadImage() failed: %s", GetError());
+    return;
+  }
+
+  if (old_bitmap->width != new_bitmap->width ||
+      old_bitmap->height != new_bitmap->height)
+  {
+    Error(ERR_WARN, "ReloadCustomImage: new image has wrong dimensions");
+    FreeBitmap(new_bitmap);
+    return;
+  }
+
+  /* copy filename for new image */
+  free(old_bitmap->source_filename);
+  old_bitmap->source_filename = getStringCopy(filename);
+
+  /* copy bitmap data for new image */
+  BlitBitmap(new_bitmap, old_bitmap, 0,0,
+	     old_bitmap->width, old_bitmap->height, 0,0);
+
+  FreeBitmap(new_bitmap);
 }
 
 

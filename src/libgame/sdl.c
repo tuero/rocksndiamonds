@@ -853,6 +853,9 @@ Bitmap *SDLLoadImage(char *filename)
   /* free temporary surface */
   SDL_FreeSurface(sdl_image_tmp);
 
+  new_bitmap->width = new_bitmap->surface->w;
+  new_bitmap->height = new_bitmap->surface->h;
+
   return new_bitmap;
 }
 

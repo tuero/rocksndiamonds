@@ -60,6 +60,7 @@ typedef XClientMessageEvent	ClientMessageEvent;
 struct X11DrawableInfo
 {
   char *source_filename;
+  int width, height;
   Drawable drawable;
   Drawable clip_mask;
   GC gc;		/* GC for normal drawing (inheritated from 'window') */
