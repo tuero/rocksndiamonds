@@ -294,10 +294,6 @@ static void InitField(int x, int y, boolean init_game)
 	}
       }
       /* no break! */
-    case EL_PLAYER:
-      if (init_game)
-	Feld[x][y] = EL_PLAYER1;
-      /* no break! */
     case EL_PLAYER1:
     case EL_PLAYER2:
     case EL_PLAYER3:
@@ -1552,7 +1548,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (IS_MASSIVE(element) || element == EL_DRAGON_FIRE)
+      if (IS_MASSIVE(element) || element == EL_FLAMES)
 	continue;
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
@@ -1741,7 +1737,7 @@ void DynaExplode(int ex, int ey)
 
   if (IS_ACTIVE_BOMB(Feld[ex][ey]))
   {
-    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_ACTIVE_1];
+    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_PLAYER1_ACTIVE];
     dynabomb_size = player->dynabomb_size;
     dynabomb_xl = player->dynabomb_xl;
     player->dynabombs_left++;
@@ -1805,10 +1801,10 @@ void Bang(int x, int y)
       RaiseScoreElement(element);
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
-    case EL_DYNABOMB_ACTIVE_1:
-    case EL_DYNABOMB_ACTIVE_2:
-    case EL_DYNABOMB_ACTIVE_3:
-    case EL_DYNABOMB_ACTIVE_4:
+    case EL_DYNABOMB_PLAYER1_ACTIVE:
+    case EL_DYNABOMB_PLAYER2_ACTIVE:
+    case EL_DYNABOMB_PLAYER3_ACTIVE:
+    case EL_DYNABOMB_PLAYER4_ACTIVE:
     case EL_DYNABOMB_NR:
     case EL_DYNABOMB_SZ:
     case EL_DYNABOMB_XL:
@@ -2981,13 +2977,13 @@ void StartMoving(int x, int y)
 	    else
 	      RemoveMovingField(xx, yy);
 
-	    Feld[xx][yy] = EL_DRAGON_FIRE;
+	    Feld[xx][yy] = EL_FLAMES;
 	    if (IN_SCR_FIELD(sx, sy))
 	      DrawGraphic(sx, sy, graphic + phase*3 + i-1);
 	  }
 	  else
 	  {
-	    if (Feld[xx][yy] == EL_DRAGON_FIRE)
+	    if (Feld[xx][yy] == EL_FLAMES)
 	      Feld[xx][yy] = EL_EMPTY;
 	    DrawLevelField(xx, yy);
 	  }
@@ -3109,7 +3105,7 @@ void StartMoving(int x, int y)
 
 	if ((wanna_flame || IS_ENEMY(element1) || IS_ENEMY(element2)) &&
 	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
-	    element1 != EL_DRAGON_FIRE && element2 != EL_DRAGON_FIRE)
+	    element1 != EL_FLAMES && element2 != EL_FLAMES)
 	{
 	  if (IS_PLAYER(x, y))
 	    DrawPlayerField(x, y);
@@ -3119,11 +3115,11 @@ void StartMoving(int x, int y)
 	  PlaySoundLevel(x, y, SND_DRAGON_ATTACKING);
 
 	  MovDelay[x][y] = 50;
-	  Feld[newx][newy] = EL_DRAGON_FIRE;
+	  Feld[newx][newy] = EL_FLAMES;
 	  if (IN_LEV_FIELD(newx1, newy1) && Feld[newx1][newy1] == EL_EMPTY)
-	    Feld[newx1][newy1] = EL_DRAGON_FIRE;
+	    Feld[newx1][newy1] = EL_FLAMES;
 	  if (IN_LEV_FIELD(newx2, newy2) && Feld[newx2][newy2] == EL_EMPTY)
-	    Feld[newx2][newy2] = EL_DRAGON_FIRE;
+	    Feld[newx2][newy2] = EL_FLAMES;
 	  return;
 	}
       }
@@ -4361,7 +4357,7 @@ void CheckForDragon(int x, int y)
       int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
 
       if (IN_LEV_FIELD(xx, yy) &&
-	  (Feld[xx][yy] == EL_DRAGON_FIRE || Feld[xx][yy] == EL_DRAGON))
+	  (Feld[xx][yy] == EL_FLAMES || Feld[xx][yy] == EL_DRAGON))
       {
 	if (Feld[xx][yy] == EL_DRAGON)
 	  dragon_found = TRUE;
@@ -4379,7 +4375,7 @@ void CheckForDragon(int x, int y)
       {
   	int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
   
-  	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_DRAGON_FIRE)
+  	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_FLAMES)
   	{
 	  Feld[xx][yy] = EL_EMPTY;
 	  DrawLevelField(xx, yy);
@@ -4868,7 +4864,7 @@ void GameActions()
 	     element == EL_WALL_GROWING_Y ||
 	     element == EL_WALL_GROWING_XY)
       MauerAbleger(x, y);
-    else if (element == EL_DRAGON_FIRE)
+    else if (element == EL_FLAMES)
       CheckForDragon(x, y);
     else if (element == EL_SP_BUGGY_BASE || element == EL_SP_BUGGY_BASE_ACTIVE)
       CheckBuggyBase(x, y);
@@ -5261,7 +5257,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
     if (element == EL_ACID && dx == 0 && dy == 1)
     {
       Blurb(jx, jy);
-      Feld[jx][jy] = EL_PLAYER;
+      Feld[jx][jy] = EL_PLAYER1;
       InitMovingField(jx, jy, MV_DOWN);
       Store[jx][jy] = EL_ACID;
       ContinueMoving(jx, jy);
@@ -6555,7 +6551,8 @@ boolean PlaceBomb(struct PlayerInfo *player)
   }
   else
   {
-    Feld[jx][jy] = EL_DYNABOMB_ACTIVE_1 + (player->element_nr - EL_PLAYER1);
+    Feld[jx][jy] =
+      EL_DYNABOMB_PLAYER1_ACTIVE + (player->element_nr - EL_PLAYER1);
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))

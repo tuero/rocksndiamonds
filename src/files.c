@@ -90,7 +90,7 @@ static void setLevelInfoToDefaults()
 	level.yam_content[i][x][y] =
 	  (i < STD_ELEMENT_CONTENTS ? EL_ROCK : EL_EMPTY);
 
-  Feld[0][0] = Ur[0][0] = EL_PLAYER;
+  Feld[0][0] = Ur[0][0] = EL_PLAYER1;
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 
@@ -134,6 +134,10 @@ static int checkLevelElement(int element)
     Error(ERR_WARN, "invalid level element %d", element);
     element = EL_CHAR_QUESTION;
   }
+  else if (element == EL_PLAYER_OBSOLETE)
+    element = EL_PLAYER1;
+  else if (element == EL_KEY_OBSOLETE)
+    element = EL_KEY1;
 
   return element;
 }

@@ -3030,7 +3030,6 @@ int el2gfx_OLD(int element)
     case EL_EXIT_OPENING:		return GFX_AUSGANG_ACT;
     case EL_EXIT_OPEN:			return GFX_AUSGANG_AUF;
     case EL_SP_EXIT_OPEN:		return GFX_SP_EXIT;
-    case EL_PLAYER:			return GFX_SPIELFIGUR;
     case EL_PLAYER1:			return GFX_SPIELER1;
     case EL_PLAYER2:			return GFX_SPIELER2;
     case EL_PLAYER3:			return GFX_SPIELER3;
@@ -3133,10 +3132,10 @@ int el2gfx_OLD(int element)
     case EL_BD_MAGIC_WALL_EMPTYING:	return GFX_MAGIC_WALL_BD_EMPTY;
     case EL_BD_MAGIC_WALL_FULL:		return GFX_MAGIC_WALL_BD_FULL;
     case EL_BD_MAGIC_WALL_DEAD:		return GFX_MAGIC_WALL_BD_DEAD;
-    case EL_DYNABOMB_ACTIVE_1:		return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_2:		return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_3:		return GFX_DYNABOMB;
-    case EL_DYNABOMB_ACTIVE_4:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_PLAYER1_ACTIVE:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_PLAYER2_ACTIVE:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_PLAYER3_ACTIVE:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_PLAYER4_ACTIVE:	return GFX_DYNABOMB;
     case EL_DYNABOMB_NR:		return GFX_DYNABOMB_NR;
     case EL_DYNABOMB_SZ:		return GFX_DYNABOMB_SZ;
     case EL_DYNABOMB_XL:		return GFX_DYNABOMB_XL;

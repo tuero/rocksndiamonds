@@ -754,7 +754,7 @@ int editor_element[] =
   EL_CHAR('S'),
   EL_CHAR('H'),
 
-  EL_PLAYER,
+  EL_PLAYER1,
   EL_EMPTY,
   EL_SAND,
   EL_STEELWALL,
@@ -799,7 +799,7 @@ int editor_element[] =
   EL_PLAYER3,
   EL_PLAYER4,
 
-  EL_PLAYER,
+  EL_PLAYER1,
   EL_EMPTY,
   EL_SAND,
   EL_ROCK,
@@ -2101,8 +2101,7 @@ static boolean LevelContainsPlayer()
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] == EL_PLAYER ||
-	  Feld[x][y] == EL_PLAYER1 ||
+      if (Feld[x][y] == EL_PLAYER1 ||
 	  Feld[x][y] == EL_SP_MURPHY) 
 	player_found = TRUE;
 
@@ -3447,14 +3446,14 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (new_element != Feld[lx][ly])
 	{
-	  if (new_element == EL_PLAYER)
+	  if (new_element == EL_PLAYER1)
 	  {
 	    /* remove player at old position */
 	    for(y=0; y<lev_fieldy; y++)
 	    {
 	      for(x=0; x<lev_fieldx; x++)
 	      {
-		if (Feld[x][y] == EL_PLAYER || Feld[x][y] == EL_PLAYER1)
+		if (Feld[x][y] == EL_PLAYER1)
 		{
 		  Feld[x][y] = EL_EMPTY;
 		  if (x - level_xpos >= 0 && x - level_xpos < ed_fieldx &&
