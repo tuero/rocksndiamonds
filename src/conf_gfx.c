@@ -2537,6 +2537,7 @@ struct ConfigInfo image_config[] =
   { "scrollbar_yellow.frames",			"1"			},
 
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
+#include "conf_gen.c"	/* include auto-generated data structure definitions */
 
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */

@@ -1037,6 +1037,10 @@ void InitElementInfo()
       IMG_CHAR_START + (i - EL_CHAR_START);
 #endif
 
+  for (i=EL_GENERIC_START; i<=EL_GENERIC_END; i++)
+    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+      IMG_GENERIC_START + (i - EL_GENERIC_START);
+
 #if 0
   for (i=EL_SP_START; i<=EL_SP_END; i++)
   {

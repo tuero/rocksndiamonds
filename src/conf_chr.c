@@ -16,7 +16,7 @@
 #ifndef CONF_CHR_C
 #define CONF_CHR_C
 
-/* values for character graphics configuration */
+/* values for graphics configuration (character elements) */
 
   { "char_space",				"RocksFontEM.pcx"	},
   { "char_space.xpos",				"0"			},

@@ -30,9 +30,10 @@
 #include "conf_gfx.h"
 #include "conf_snd.h"
 
-#define IMG_EMPTY	IMG_EMPTY_SPACE
-#define IMG_SP_EMPTY	IMG_SP_EMPTY_SPACE
-#define IMG_CHAR_START	IMG_CHAR_SPACE
+#define IMG_EMPTY		IMG_EMPTY_SPACE
+#define IMG_SP_EMPTY		IMG_SP_EMPTY_SPACE
+#define IMG_CHAR_START		IMG_CHAR_SPACE
+#define IMG_GENERIC_START	IMG_GENERIC_0
 
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
@@ -449,6 +450,7 @@
 
 #define EL_CHAR_START			120
 #define EL_CHAR_ASCII0			(EL_CHAR_START  - 32)
+#define EL_CHAR_ASCII0_START		(EL_CHAR_ASCII0 + 32)
 #define EL_CHAR_EXCLAM			(EL_CHAR_ASCII0 + 33)
 #define EL_CHAR_QUOTEDBL		(EL_CHAR_ASCII0 + 34)
 #define EL_CHAR_NUMBERSIGN		(EL_CHAR_ASCII0 + 35)
@@ -479,11 +481,22 @@
 #define EL_CHAR_OE			(EL_CHAR_ASCII0 + 92)
 #define EL_CHAR_UE			(EL_CHAR_ASCII0 + 93)
 #define EL_CHAR_COPYRIGHT		(EL_CHAR_ASCII0 + 94)
+#define EL_CHAR_UNDERSCORE		(EL_CHAR_ASCII0 + 95)
+#define EL_CHAR_EMPTY			(EL_CHAR_ASCII0 + 96)
+#define EL_CHAR_DEGREE			(EL_CHAR_ASCII0 + 97)
+#define EL_CHAR_TM			(EL_CHAR_ASCII0 + 98)
+#define EL_CHAR_CURSOR			(EL_CHAR_ASCII0 + 99)
+#define EL_CHAR_ASCII0_END		(EL_CHAR_ASCII0 + 111)
 #define EL_CHAR_END			(EL_CHAR_START  + 79)
 
-#define EL_CHAR(x)			((x) == 'Ä' ? EL_CHAR_AE : \
-					 (x) == 'Ö' ? EL_CHAR_OE : \
-					 (x) == 'Ü' ? EL_CHAR_UE : \
+#define EL_CHAR(x)			((x) == 'Ä' ? EL_CHAR_AE         : \
+					 (x) == 'Ö' ? EL_CHAR_OE         : \
+					 (x) == 'Ü' ? EL_CHAR_UE         : \
+					 (x) == '^' ? EL_CHAR_COPYRIGHT  : \
+					 (x) == '_' ? EL_CHAR_UNDERSCORE : \
+					 (x) == '°' ? EL_CHAR_DEGREE     : \
+					 (x) == '´' ? EL_CHAR_TM         : \
+					 (x) == '|' ? EL_CHAR_CURSOR     : \
 					 EL_CHAR_A + (x) - 'A')
 
 #define EL_WALL_GROWING_X		200
@@ -661,7 +674,15 @@
 #define EL_TRAP				356
 #define EL_DX_SUPABOMB			357
 
-#define NUM_FILE_ELEMENTS		358
+#define EL_UNUSED_358			358
+#define EL_UNUSED_359			359
+
+#define EL_GENERIC_START		360
+#define EL_GENERIC_0			(EL_GENERIC_START + 0)
+#define EL_GENERIC_31			(EL_GENERIC_START + 31)
+#define EL_GENERIC_END			(EL_GENERIC_START + 31)
+
+#define NUM_FILE_ELEMENTS		392
 
 
 /* "real" (and therefore drawable) runtime elements */

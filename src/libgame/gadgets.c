@@ -288,8 +288,13 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
       case GDI_INFO_TEXT:
 	{
 	  int max_textsize = MAX_INFO_TEXTSIZE - 1;
+	  char *text = va_arg(ap, char *);
 
-	  strncpy(gi->info_text, va_arg(ap, char *), max_textsize);
+	  if (text != NULL)
+	    strncpy(gi->info_text, text, max_textsize);
+	  else
+	    max_textsize = 0;
+
 	  gi->info_text[max_textsize] = '\0';
 	}
 	break;

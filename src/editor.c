@@ -1182,10 +1182,70 @@ int editor_element[] =
   EL_CHAR('R'),
   */
 
-  EL_EMPTY,
-  EL_EMPTY,
-  EL_EMPTY,
-  EL_EMPTY,
+  EL_CHAR('C'),
+  EL_CHAR('U'),
+  EL_CHAR('S'),
+  EL_CHAR('-'),
+
+  EL_CHAR('T'),
+  EL_CHAR('O'),
+  EL_CHAR('M'),
+  EL_CHAR(' '),
+
+  EL_CHAR('E'),
+  EL_CHAR('L'),
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+
+  EL_CHAR('E'),
+  EL_CHAR('N'),
+  EL_CHAR('T'),
+  EL_CHAR('S'),
+
+  EL_GENERIC_START + 0,
+  EL_GENERIC_START + 1,
+  EL_GENERIC_START + 2,
+  EL_GENERIC_START + 3,
+
+  EL_GENERIC_START + 4,
+  EL_GENERIC_START + 5,
+  EL_GENERIC_START + 6,
+  EL_GENERIC_START + 7,
+
+  EL_GENERIC_START + 8,
+  EL_GENERIC_START + 9,
+  EL_GENERIC_START + 10,
+  EL_GENERIC_START + 11,
+
+  EL_GENERIC_START + 12,
+  EL_GENERIC_START + 13,
+  EL_GENERIC_START + 14,
+  EL_GENERIC_START + 15,
+
+  EL_GENERIC_START + 16,
+  EL_GENERIC_START + 17,
+  EL_GENERIC_START + 18,
+  EL_GENERIC_START + 19,
+
+  EL_GENERIC_START + 20,
+  EL_GENERIC_START + 21,
+  EL_GENERIC_START + 22,
+  EL_GENERIC_START + 23,
+
+  EL_GENERIC_START + 24,
+  EL_GENERIC_START + 25,
+  EL_GENERIC_START + 26,
+  EL_GENERIC_START + 27,
+
+  EL_GENERIC_START + 28,
+  EL_GENERIC_START + 29,
+  EL_GENERIC_START + 30,
+  EL_GENERIC_START + 31,
+
+  EL_CHAR('T'),
+  EL_CHAR('E'),
+  EL_CHAR('X'),
+  EL_CHAR('T'),
 
   EL_CHAR(' '),
   EL_CHAR('!'),
@@ -1265,7 +1325,12 @@ int editor_element[] =
   EL_CHAR('Ö'),
   EL_CHAR('Ü'),
   EL_CHAR('^'),
-  EL_CHAR(' ')
+  EL_CHAR('_'),
+
+  EL_CHAR(' '),
+  EL_CHAR('°'),
+  EL_CHAR('´'),
+  EL_CHAR('|')
 };
 int elements_in_list = sizeof(editor_element)/sizeof(int);
 
@@ -1273,7 +1338,8 @@ static char *getElementInfoText(int element)
 {
   char *info_text = "unknown";
 
-  if (element < NUM_FILE_ELEMENTS)
+  if (element < NUM_FILE_ELEMENTS &&
+      element_info[element].editor_description != NULL)
     info_text = element_info[element].editor_description;
   else
     Error(ERR_WARN, "no element description for element %d", element);

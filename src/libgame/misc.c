@@ -1550,7 +1550,13 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
   if (filename == NULL)
   {
-    Error(ERR_WARN, "cannot find artwork file '%s'", basename);
+    int error_mode = ERR_WARN;
+
+    /* we can get away without sounds and music, but not without graphics */
+    if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+      error_mode = ERR_EXIT;
+
+    Error(error_mode, "cannot find artwork file '%s'", basename);
     return;
   }
 
@@ -1596,6 +1602,17 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     (*listnode)->num_references = 1;
     addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
 		  *listnode);
+  }
+  else
+  {
+    int error_mode = ERR_WARN;
+
+    /* we can get away without sounds and music, but not without graphics */
+    if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+      error_mode = ERR_EXIT;
+
+    Error(error_mode, "cannot load artwork file '%s'", basename);
+    return;
   }
 }
 

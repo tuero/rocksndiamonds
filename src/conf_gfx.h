@@ -16,7 +16,7 @@
 #ifndef CONF_GFX_H
 #define CONF_GFX_H
 
-/* values for graphics configuration */
+/* values for graphics configuration (normal elements) */
 
 #define IMG_BD_WALL				0
 #define IMG_BD_ROCK				1
@@ -620,20 +620,52 @@
 #define IMG_CHAR_DEGREE				599
 #define IMG_CHAR_TM				600
 #define IMG_CHAR_CURSOR				601
-#define IMG_MENU_BACK				602
-#define IMG_MENU_DOOR				603
-#define IMG_MENU_TOONS				604
-#define IMG_MENU_FONT_BIG			605
-#define IMG_MENU_FONT_SMALL			606
-#define IMG_MENU_FONT_MEDIUM			607
-#define IMG_MENU_FONT_EM			608
-#define IMG_OLD_PIX_ELEMENTS			609
-#define IMG_OLD_PIX_HEROES			610
-#define IMG_OLD_PIX_SP				611
-#define IMG_OLD_PIX_DC				612
-#define IMG_OLD_PIX_MORE			613
-#define IMG_OLD_PIX_FONT_EM			614
+#define IMG_GENERIC_0				602
+#define IMG_GENERIC_1				603
+#define IMG_GENERIC_2				604
+#define IMG_GENERIC_3				605
+#define IMG_GENERIC_4				606
+#define IMG_GENERIC_5				607
+#define IMG_GENERIC_6				608
+#define IMG_GENERIC_7				609
+#define IMG_GENERIC_8				610
+#define IMG_GENERIC_9				611
+#define IMG_GENERIC_10				612
+#define IMG_GENERIC_11				613
+#define IMG_GENERIC_12				614
+#define IMG_GENERIC_13				615
+#define IMG_GENERIC_14				616
+#define IMG_GENERIC_15				617
+#define IMG_GENERIC_16				618
+#define IMG_GENERIC_17				619
+#define IMG_GENERIC_18				620
+#define IMG_GENERIC_19				621
+#define IMG_GENERIC_20				622
+#define IMG_GENERIC_21				623
+#define IMG_GENERIC_22				624
+#define IMG_GENERIC_23				625
+#define IMG_GENERIC_24				626
+#define IMG_GENERIC_25				627
+#define IMG_GENERIC_26				628
+#define IMG_GENERIC_27				629
+#define IMG_GENERIC_28				630
+#define IMG_GENERIC_29				631
+#define IMG_GENERIC_30				632
+#define IMG_GENERIC_31				633
+#define IMG_MENU_BACK				634
+#define IMG_MENU_DOOR				635
+#define IMG_MENU_TOONS				636
+#define IMG_MENU_FONT_BIG			637
+#define IMG_MENU_FONT_SMALL			638
+#define IMG_MENU_FONT_MEDIUM			639
+#define IMG_MENU_FONT_EM			640
+#define IMG_OLD_PIX_ELEMENTS			641
+#define IMG_OLD_PIX_HEROES			642
+#define IMG_OLD_PIX_SP				643
+#define IMG_OLD_PIX_DC				644
+#define IMG_OLD_PIX_MORE			645
+#define IMG_OLD_PIX_FONT_EM			646
 
-#define NUM_IMAGE_FILES				615
+#define NUM_IMAGE_FILES				647
 
 #endif	/* CONF_GFX_H */

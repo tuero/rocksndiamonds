@@ -167,23 +167,23 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
     else if (c == '\\')			/* bad luck ... */
       c = '/';
 
-    if ((c >= 32 && c <= 95) || c == '°' || c == '´')
+    if ((c >= 32 && c <= 95) || c == '°' || c == '´' || c == '|')
     {
       int src_x = ((c - 32) % FONT_CHARS_PER_LINE) * font_width;
       int src_y = ((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_starty;
       int dest_x = x, dest_y = y;
 
-      if (c == '°' || c == '´')		/* map '°' and 'TM' signs */
+      if (c == '°' || c == '´' || c == '|')	/* map '°' and 'TM' signs */
       {
 	if (font_type == FC_SPECIAL2)
 	{
-	  src_x = (c == '°' ? 1 : 2) * font_width;
+	  src_x = (c == '°' ? 1 : c == '´' ? 2 : 3) * font_width;
 	  src_y = 4 * font_height;
 	}
 	else
 	{
 	  src_x = FONT_CHARS_PER_LINE * font_width;
-	  src_y = (c == '°' ? 1 : 2) * font_height + font_starty;
+	  src_y = (c == '°' ? 1 : c == '´' ? 2 : 3) * font_height +font_starty;
 	}
       }
 
