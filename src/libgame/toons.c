@@ -220,7 +220,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
   if (frame<0 || frame>=anim->frames)
   {
-    if (anim->pingpong)
+    if (anim->mode == ANIM_PINGPONG)
     {
       frame_step *= -1;
       frame = (frame<0 ? 1 : anim->frames-2);

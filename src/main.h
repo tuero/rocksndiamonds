@@ -1336,11 +1336,12 @@
 #define GFX_ARG_YPOS				1
 #define GFX_ARG_FRAMES				2
 #define GFX_ARG_DELAY				3
-#define GFX_ARG_PINGPONG			4
-#define GFX_ARG_PINGPONG2			5
-#define GFX_ARG_REVERSE				6
-#define GFX_ARG_GLOBAL_SYNC			7
-#define GFX_ARG_VERTICAL			8
+#define GFX_ARG_MODE_LINEAR			4
+#define GFX_ARG_MODE_PINGPONG			5
+#define GFX_ARG_MODE_PINGPONG2			6
+#define GFX_ARG_MODE_REVERSE			7
+#define GFX_ARG_GLOBAL_SYNC			8
+#define GFX_ARG_VERTICAL			9
 
 /* values for sound configuration suffixes */
 /* (currently none) */
@@ -1403,12 +1404,6 @@
 #define GAME_VERSION_ACTUAL	VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
 					      PROGRAM_VERSION_MINOR, \
 					      PROGRAM_VERSION_PATCH)
-
-/* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
-#define ANIM_NORMAL		0
-#define ANIM_REVERSE		(1 << 0)
-#define ANIM_PINGPONG		(1 << 1)
-#define ANIM_PINGPONG2		(1 << 2)
 
 /* values for game_emulation */
 #define EMU_NONE		0
@@ -1611,6 +1606,7 @@ extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

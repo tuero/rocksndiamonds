@@ -70,6 +70,7 @@ void SetBorderElement();
 void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
+int getNewGraphicAnimationFrame(int, int);
 void DrawGraphicAnimationExt(int, int, int, int, int, int, int);
 void DrawGraphicAnimation(int, int, int, int, int, int);
 void DrawNewGraphicAnimation(int, int, int);

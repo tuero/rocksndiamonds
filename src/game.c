@@ -795,6 +795,7 @@ void InitGame()
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = 0;
       Frame[x][y] = 0;
+      GfxAction[x][y] = GFX_ACTION_DEFAULT;
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
@@ -1213,7 +1214,7 @@ void GameWon()
 #endif
 
   /* Hero disappears */
-  DrawLevelField(ExitX, ExitY);
+  DrawNewLevelField(ExitX, ExitY);
   BackToFront();
 
   if (tape.playing)
@@ -1329,8 +1330,11 @@ void InitMovingField(int x, int y, int direction)
 
   MovDir[x][y] = direction;
   MovDir[newx][newy] = direction;
+
   if (Feld[newx][newy] == EL_EMPTY)
     Feld[newx][newy] = EL_BLOCKED;
+
+  GfxAction[x][y] = GFX_ACTION_MOVING;
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -1441,22 +1445,31 @@ void RemoveMovingField(int x, int y)
   Feld[newx][newy] = EL_EMPTY;
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
   MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
+  GfxAction[oldx][oldy] = GfxAction[newx][newy] = GFX_ACTION_DEFAULT;
 
-  DrawLevelField(oldx, oldy);
-  DrawLevelField(newx, newy);
+  DrawNewLevelField(oldx, oldy);
+  DrawNewLevelField(newx, newy);
 }
 
 void DrawDynamite(int x, int y)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
+#if 0
   int graphic = el2gfx(Feld[x][y]);
+#else
+  int graphic = el2img(Feld[x][y]);
+#endif
   int phase;
 
   if (!IN_SCR_FIELD(sx, sy) || IS_PLAYER(x, y))
     return;
 
   if (Store[x][y])
+#if 0
     DrawGraphic(sx, sy, el2gfx(Store[x][y]));
+#else
+    DrawNewGraphic(sx, sy, el2img(Store[x][y]), 0);
+#endif
 
   if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
   {
@@ -1469,12 +1482,29 @@ void DrawDynamite(int x, int y)
       phase = 7 - phase;
   }
 
+#if 1
+  phase = getNewGraphicAnimationFrame(graphic, 96 - MovDelay[x][y]);
+#endif
+
+  /*
+  printf("-> %d: %d [%d]\n", graphic, phase, MovDelay[x][y]);
+  */
+
+#if 0
   if (game.emulation == EMU_SUPAPLEX)
     DrawGraphic(sx, sy, GFX_SP_DISK_RED);
   else if (Store[x][y])
     DrawGraphicThruMask(sx, sy, graphic + phase);
   else
     DrawGraphic(sx, sy, graphic + phase);
+#else
+  if (game.emulation == EMU_SUPAPLEX)
+    DrawNewGraphic(sx, sy, IMG_SP_DISK_RED, 0);
+  else if (Store[x][y])
+    DrawNewGraphicThruMask(sx, sy, graphic, phase);
+  else
+    DrawNewGraphic(sx, sy, graphic, phase);
+#endif
 }
 
 void CheckDynamite(int x, int y)
@@ -2723,6 +2753,8 @@ void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
+  GfxAction[x][y] = GFX_ACTION_DEFAULT;
+
   if (CAN_FALL(element) && y<lev_fieldy-1)
   {
     if ((x>0 && IS_PLAYER(x-1, y)) || (x<lev_fieldx-1 && IS_PLAYER(x+1, y)))
@@ -2913,14 +2945,9 @@ void StartMoving(int x, int y)
 	if (MovDelay[x][y] && (element == EL_BUG ||
 			       element == EL_SPACESHIP ||
 			       element == EL_SP_SNIKSNAK ||
-			       element == EL_SP_ELECTRON))
-	  DrawNewLevelField(x, y);
-	else if (MovDelay[x][y] && (element == EL_BUG ||
-			       element == EL_SPACESHIP ||
-			       element == EL_SP_SNIKSNAK ||
 			       element == EL_SP_ELECTRON ||
 			       element == EL_MOLE))
-	  DrawLevelField(x, y);
+	  DrawNewLevelField(x, y);
       }
     }
 
@@ -2948,7 +2975,7 @@ void StartMoving(int x, int y)
 	}
       }
       else if (element == EL_SP_ELECTRON)
-	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
+	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_LOOP);
       else if (element == EL_DRAGON)
       {
 	int i;
@@ -3032,7 +3059,7 @@ void StartMoving(int x, int y)
       if (Feld[newx][newy] == EL_EXIT_OPEN)
       {
 	Feld[x][y] = EL_EMPTY;
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
 
 	PlaySoundLevel(newx, newy, SND_PENGUIN_PASSING_EXIT);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
@@ -3048,7 +3075,7 @@ void StartMoving(int x, int y)
       else if (IS_MAMPF3(Feld[newx][newy]))
       {
 	if (DigField(local_player, newx, newy, 0, 0, DF_DIG) == MF_MOVING)
-	  DrawLevelField(newx, newy);
+	  DrawNewLevelField(newx, newy);
 	else
 	  MovDir[x][y] = MV_NO_MOVING;
       }
@@ -3057,7 +3084,7 @@ void StartMoving(int x, int y)
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
-	  DrawLevelField(x, y);
+	  DrawNewLevelField(x, y);
 	return;
       }
     }
@@ -3070,7 +3097,7 @@ void StartMoving(int x, int y)
 	else
 	{
 	  Feld[newx][newy] = EL_EMPTY;
-	  DrawLevelField(newx, newy);
+	  DrawNewLevelField(newx, newy);
 	}
 
 	PlaySoundLevel(x, y, SND_PIG_EATING);
@@ -3080,7 +3107,7 @@ void StartMoving(int x, int y)
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
-	  DrawLevelField(x, y);
+	  DrawNewLevelField(x, y);
 	return;
       }
     }
@@ -3091,7 +3118,7 @@ void StartMoving(int x, int y)
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
-	  DrawLevelField(x, y);
+	  DrawNewLevelField(x, y);
 	return;
       }
       else
@@ -3112,7 +3139,7 @@ void StartMoving(int x, int y)
 	  if (IS_PLAYER(x, y))
 	    DrawPlayerField(x, y);
 	  else
-	    DrawLevelField(x, y);
+	    DrawNewLevelField(x, y);
 
 	  PlaySoundLevel(x, y, SND_DRAGON_ATTACKING);
 
@@ -3214,19 +3241,19 @@ void StartMoving(int x, int y)
 #endif
       else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
 #if 0
-	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
+	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_LOOP);
 #else
 	DrawNewGraphicAnimation(x, y, el2img(element));
 #endif
       else if (element == EL_SATELLITE)
 #if 0
-	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_LOOP);
 #else
 	DrawNewGraphicAnimation(x, y, IMG_SATELLITE);
 #endif
       else if (element == EL_SP_ELECTRON)
 #if 0
-	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
+	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_LOOP);
 #else
 	DrawNewGraphicAnimation(x, y, IMG_SP_ELECTRON);
 #endif
@@ -3364,6 +3391,9 @@ void ContinueMoving(int x, int y)
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     MovDelay[newx][newy] = 0;
 
+    GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
+    GfxAction[x][y] = GFX_ACTION_DEFAULT;
+
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 
@@ -3388,6 +3418,9 @@ void ContinueMoving(int x, int y)
   }
   else				/* still moving on */
   {
+    if (GfxAction[x][y] == GFX_ACTION_DEFAULT)
+      GfxAction[x][y] = GFX_ACTION_MOVING;
+
     DrawNewLevelField(x, y);
   }
 }
@@ -3908,7 +3941,7 @@ void Blubber(int x, int y)
   if (y > 0 && IS_MOVING(x, y-1) && MovDir[x][y-1] == MV_DOWN)
     DrawLevelField(x, y-1);
   else
-    DrawGraphicAnimation(x, y, GFX_GEBLUBBER, 4, 10, ANIM_NORMAL);
+    DrawGraphicAnimation(x, y, GFX_GEBLUBBER, 4, 10, ANIM_LOOP);
 }
 
 void NussKnacken(int x, int y)
@@ -4500,7 +4533,7 @@ static void DrawBeltAnimation(int x, int y, int element)
   if (belt_dir != MV_NO_MOVING)
   {
     int delay = 2;
-    int mode = (belt_dir == MV_LEFT ? ANIM_NORMAL : ANIM_REVERSE);
+    int mode = ANIM_LOOP | (belt_dir == MV_LEFT ? 0 : ANIM_REVERSE);
     int graphic = el2gfx(element) + (belt_dir == MV_LEFT ? 0 : 7);
 
     DrawGraphicAnimation(x, y, graphic, 8, delay, mode);
@@ -4858,10 +4891,10 @@ void GameActions()
     else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
     else if (element == EL_SP_TERMINAL)
-      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_LOOP);
     else if (element == EL_SP_TERMINAL_ACTIVE)
     {
-      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_LOOP);
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SP_TERMINAL_ACTIVE);
@@ -4878,10 +4911,10 @@ void GameActions()
     else if (element == EL_TIMEGATE_CLOSING)
       CloseTimegate(x, y);
     else if (element == EL_EXTRA_TIME)
-      DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_LOOP);
     else if (element == EL_SHIELD_NORMAL)
     {
-      DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_LOOP);
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_PASSIVE_ACTIVATED);
@@ -4889,7 +4922,7 @@ void GameActions()
     }
     else if (element == EL_SHIELD_DEADLY)
     {
-      DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_LOOP);
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_DEADLY_ACTIVE);

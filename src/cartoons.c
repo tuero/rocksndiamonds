@@ -67,7 +67,7 @@ struct ToonInfo toons[NUM_TOONS] =
     DWARF_FRAMES,
     DWARF_FPS,
     DWARF_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -78,7 +78,7 @@ struct ToonInfo toons[NUM_TOONS] =
     DWARF_FRAMES,
     DWARF_FPS,
     DWARF_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -89,7 +89,7 @@ struct ToonInfo toons[NUM_TOONS] =
     JUMPER_FRAMES,
     JUMPER_FPS,
     JUMPER_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -100,7 +100,7 @@ struct ToonInfo toons[NUM_TOONS] =
     CLOWN_FRAMES,
     CLOWN_FPS,
     CLOWN_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_UP,
     ANIMPOS_ANY
   },
@@ -134,7 +134,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -146,7 +146,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -158,7 +158,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -170,7 +170,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -182,7 +182,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -194,7 +194,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -206,7 +206,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -218,7 +218,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -230,7 +230,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_DOWN
   },
@@ -242,7 +242,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_4,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_DOWN
   },
@@ -254,7 +254,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_8,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_LEFT,
     ANIMPOS_ANY
   },
@@ -266,7 +266,7 @@ struct ToonInfo toons[NUM_TOONS] =
     GAMETOON_FRAMES_8,
     GAMETOON_FPS,
     GAMETOON_STEPSIZE,
-    ANIM_NORMAL,
+    ANIM_LOOP,
     ANIMDIR_RIGHT,
     ANIMPOS_ANY
   },

@@ -923,17 +923,17 @@ void InitElementInfo()
   };
 #endif
 
-  int i, j, k;
+  int i, act, dir;
 
-  /* always start with reliable default values */
+  /* set values to -1 to identify later as "uninitialized" values */
   for(i=0; i<MAX_ELEMENTS; i++)
   {
-    for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
+    for(act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
     {
-      element_info[i].graphic[j] = -1;			/* use default */
+      element_info[i].graphic[act] = -1;
 
-      for(k=0; k<NUM_MV_DIRECTIONS; k++)
-	element_info[i].direction_graphic[j][k] = -1;	/* use default */
+      for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+	element_info[i].direction_graphic[act][dir] = -1;
     }
   }
 
@@ -1010,7 +1010,7 @@ void InitElementInfo()
     i++;
   }
 
-  /* now set all '-1' values with element specific default values */
+  /* now set all '-1' values to element specific default values */
   for(i=0; i<MAX_ELEMENTS; i++)
   {
     int default_action_graphic = element_info[i].graphic[GFX_ACTION_DEFAULT];
@@ -1019,27 +1019,33 @@ void InitElementInfo()
     if (default_action_graphic == -1)
       default_action_graphic = EL_CHAR_QUESTION;
 
-    for(k=0; k<NUM_MV_DIRECTIONS; k++)
-      default_action_direction_graphic[k] =
-	element_info[i].direction_graphic[GFX_ACTION_DEFAULT][k];
-
-    for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
+    for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
     {
-      /* no graphic for this specific action -- use default action graphic */
-      if (element_info[i].graphic[j] == -1)
-	element_info[i].graphic[j] = default_action_graphic;
+      default_action_direction_graphic[dir] =
+	element_info[i].direction_graphic[GFX_ACTION_DEFAULT][dir];
 
-      for(k=0; k<NUM_MV_DIRECTIONS; k++)
+      if (default_action_direction_graphic[dir] == -1)
+	default_action_direction_graphic[dir] = default_action_graphic;
+    }
+
+    for(act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
+    {
+      for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
       {
-	int default_direction_graphic = default_action_direction_graphic[k];
+	int default_direction_graphic = element_info[i].graphic[act];
 
-	/* no default direction graphic -- use graphic for current action */
+	/* no graphic for current action -- use default direction graphic */
 	if (default_direction_graphic == -1)
-	  default_direction_graphic = element_info[i].graphic[j];
+	  default_direction_graphic = default_action_direction_graphic[dir];
 
-	if (element_info[i].direction_graphic[j][k] == -1)
-	  element_info[i].direction_graphic[j][k] = default_direction_graphic;
+	if (element_info[i].direction_graphic[act][dir] == -1)
+	  element_info[i].direction_graphic[act][dir] =
+	    default_direction_graphic;
       }
+
+      /* no graphic for this specific action -- use default action graphic */
+      if (element_info[i].graphic[act] == -1)
+	element_info[i].graphic[act] = default_action_graphic;
     }
   }
 
@@ -1078,17 +1084,21 @@ static void InitGraphicInfo()
     if (new_graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
       new_graphic_info[i].anim_delay = 1;
 
-    /* basically, animation can be either normal or reverse direction */
-    if (parameter[GFX_ARG_REVERSE])
-      new_graphic_info[i].anim_mode = ANIM_REVERSE;
+    /* set mode for animation frame order */
+    if (parameter[GFX_ARG_MODE_LINEAR])
+      new_graphic_info[i].anim_mode = ANIM_LINEAR;
+    else if (parameter[GFX_ARG_MODE_PINGPONG])
+      new_graphic_info[i].anim_mode = ANIM_PINGPONG;
+    else if (parameter[GFX_ARG_MODE_PINGPONG2])
+      new_graphic_info[i].anim_mode = ANIM_PINGPONG2;
+    else if (parameter[GFX_ARG_FRAMES] > 1)
+      new_graphic_info[i].anim_mode = ANIM_LOOP;
     else
-      new_graphic_info[i].anim_mode = ANIM_NORMAL;
+      new_graphic_info[i].anim_mode = ANIM_NONE;
 
-    /* additionally, animation can be either pingpong or pingpong2 layout */
-    if (parameter[GFX_ARG_PINGPONG])
-      new_graphic_info[i].anim_mode |= ANIM_PINGPONG;
-    else if (parameter[GFX_ARG_PINGPONG2])
-      new_graphic_info[i].anim_mode |= ANIM_PINGPONG2;
+    /* set additional flag to play animation frames in reverse order */
+    if (parameter[GFX_ARG_MODE_REVERSE])
+      new_graphic_info[i].anim_mode |= ANIM_REVERSE;
 
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];

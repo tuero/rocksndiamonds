@@ -706,18 +706,29 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   return phase;
 }
 
-static int getNewGraphicAnimationFrame(int graphic, int sync_frame)
+int getNewGraphicAnimationFrame(int graphic, int sync_frame)
 {
   int num_frames = new_graphic_info[graphic].anim_frames;
   int delay = new_graphic_info[graphic].anim_delay;
   int mode = new_graphic_info[graphic].anim_mode;
-  int frame;
+  int frame = 0;
 
   /* animation synchronized with global frame counter, not move position */
   if (new_graphic_info[graphic].anim_global_sync || sync_frame < 0)
     sync_frame = FrameCounter;
 
-  if (mode & ANIM_PINGPONG)		/* use border frames once */
+  if (mode & ANIM_LOOP)			/* normal, looping animation */
+  {
+    frame = (sync_frame % (delay * num_frames)) / delay;
+  }
+  else if (mode & ANIM_LINEAR)		/* normal, non-looping animation */
+  {
+    frame = sync_frame / delay;
+
+    if (frame > num_frames - 1)
+      frame = num_frames - 1;
+  }
+  else if (mode & ANIM_PINGPONG)	/* use border frames once */
   {
     int max_anim_frames = 2 * num_frames - 2;
 
@@ -731,8 +742,6 @@ static int getNewGraphicAnimationFrame(int graphic, int sync_frame)
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
   }
-  else	/* mode == ANIM_NORMAL || mode == ANIM_REVERSE */
-    frame = (sync_frame % (delay * num_frames)) / delay;
 
   if (mode & ANIM_REVERSE)		/* use reverse animation direction */
     frame = num_frames - frame - 1;
@@ -1344,7 +1353,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_SP_ELECTRON)
   {
-    graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+    graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_LOOP);
   }
   else if (element == EL_MOLE || element == EL_PENGUIN ||
 	   element == EL_PIG || element == EL_DRAGON)
@@ -1370,11 +1379,11 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_SATELLITE)
   {
-    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_LOOP);
   }
   else if (element == EL_ACID)
   {
-    graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
+    graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_LOOP);
   }
   else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
   {
@@ -1457,20 +1466,27 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     DrawGraphic(x, y, graphic);
 }
 
+inline static int getGfxAction(int x, int y)
+{
+  int gfx_action = GFX_ACTION_DEFAULT;
+
+  if (GfxAction[x][y] != GFX_ACTION_DEFAULT)
+    gfx_action = GfxAction[x][y];
+  else if (IS_MOVING(x, y))
+    gfx_action = GFX_ACTION_MOVING;
+
+  return gfx_action;
+}
+
 void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
   int ux = LEVELX(x), uy = LEVELY(y);
   int move_dir = MovDir[ux][uy];
   int move_pos = ABS(MovPos[ux][uy]) / (TILEX / 8);
-  int gfx_action = (IS_MOVING(ux,uy) ? GFX_ACTION_MOVING : GFX_ACTION_DEFAULT);
+  int gfx_action = getGfxAction(ux, uy);
   int graphic = el_dir_act2img(element, move_dir, gfx_action);
   int frame = getNewGraphicAnimationFrame(graphic, move_pos);
-#if 0
-  int phase8 = move_pos;
-  int phase4 = phase8 / 2;
-  int phase2  = phase8 / 4;
-#endif
 
   if (element == EL_WALL_GROWING)
   {

@@ -17,7 +17,15 @@
 #include "system.h"
 
 
-/* values for toon animation */
+/* values for animation mode (frame order and direction) */
+#define ANIM_NONE		0
+#define ANIM_LOOP		(1 << 0)
+#define ANIM_LINEAR		(1 << 1)
+#define ANIM_PINGPONG		(1 << 2)
+#define ANIM_PINGPONG2		(1 << 3)
+#define ANIM_REVERSE		(1 << 4)
+
+/* values for toon animation direction */
 #define ANIMDIR_LEFT	1
 #define ANIMDIR_RIGHT	2
 #define ANIMDIR_UP	4
@@ -54,7 +62,7 @@ struct ToonInfo
   int frames;
   int frames_per_second;
   int stepsize;
-  boolean pingpong;
+  int mode;
   int direction;
   int position;
 };
