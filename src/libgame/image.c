@@ -37,8 +37,8 @@ Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
   depth = 8;
 #endif
 
-  image = checked_malloc(sizeof(Image));
-  image->data = checked_malloc(width * height * bytes_per_pixel);
+  image = checked_calloc(sizeof(Image));
+  image->data = checked_calloc(width * height * bytes_per_pixel);
   image->width = width;
   image->height = height;
   image->depth = depth;

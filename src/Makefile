@@ -122,6 +122,8 @@ LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 
 
 SRCS =	main.c		\
+	conf_gfx.c	\
+	conf_snd.c	\
 	init.c		\
 	config.c	\
 	events.c	\
@@ -136,6 +138,8 @@ SRCS =	main.c		\
 	netserv.c
 
 OBJS =	main.o		\
+	conf_gfx.o	\
+	conf_snd.o	\
 	init.o		\
 	config.o	\
 	events.o	\
@@ -170,6 +174,14 @@ libgame_dir:
 	@$(MAKE) -C $(LIBDIR)
 $(LIBGAME):
 	@$(MAKE) -C $(LIBDIR)
+
+conf_gfx.h: conf_gfx.c
+	../Scripts/create_element_defs.pl --graphics > conf_gfx.h
+	../Scripts/create_element_defs.pl --el2gfx   > conf_e2g.c
+	../Scripts/create_element_defs.pl --chars    > conf_chr.c
+
+conf_snd.h: conf_snd.c
+	../Scripts/create_element_defs.pl --sounds   > conf_snd.h
 
 $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME)
 	@date '+"[%Y-%m-%d %H:%M]"' \

@@ -1380,6 +1380,9 @@
 #define GFX_ARG_MODE_REVERSE			11
 #define GFX_ARG_GLOBAL_SYNC			12
 
+#define NUM_GFX_ARGS				13
+
+
 /* values for sound configuration suffixes */
 /* (currently none) */
 

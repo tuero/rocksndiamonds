@@ -1655,6 +1655,10 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
       DrawInitText(file_list[i].token, 150, FC_YELLOW);
 
     LoadArtworkToList(artwork_info, file_list[i].filename, i);
+
+#if 0
+    printf("DEBUG:   loading artwork file '%s'...\n", file_list[i].filename);
+#endif
   }
 
   draw_init[artwork_info->type].do_it = FALSE;

@@ -620,7 +620,20 @@
 #define IMG_CHAR_DEGREE				599
 #define IMG_CHAR_TM				600
 #define IMG_CHAR_CURSOR				601
+#define IMG_MENU_BACK				602
+#define IMG_MENU_DOOR				603
+#define IMG_MENU_TOONS				604
+#define IMG_MENU_FONT_BIG			605
+#define IMG_MENU_FONT_SMALL			606
+#define IMG_MENU_FONT_MEDIUM			607
+#define IMG_MENU_FONT_EM			608
+#define IMG_OLD_PIX_ELEMENTS			609
+#define IMG_OLD_PIX_HEROES			610
+#define IMG_OLD_PIX_SP				611
+#define IMG_OLD_PIX_DC				612
+#define IMG_OLD_PIX_MORE			613
+#define IMG_OLD_PIX_FONT_EM			614
 
-#define NUM_IMAGE_FILES				602
+#define NUM_IMAGE_FILES				615
 
 #endif	/* CONF_GFX_H */

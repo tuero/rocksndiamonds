@@ -3915,14 +3915,15 @@ void RobotWheel(int x, int y)
 	DrawGraphic(SCREENX(x), SCREENY(y), IMG_ROBOT_WHEEL_ACTIVE, frame);
       }
 
-      if (!(MovDelay[x][y]%4))
-	PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVE);
+      PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVE);
+
       return;
     }
   }
 
   Feld[x][y] = EL_ROBOT_WHEEL;
   DrawLevelField(x, y);
+
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
 }
@@ -3944,21 +3945,18 @@ void TimegateWheel(int x, int y)
 	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_SWITCH_ACTIVE, frame);
       }
 
-      if (!(MovDelay[x][y]%4))
-	PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
+      PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
+
       return;
     }
   }
 
   Feld[x][y] = EL_TIMEGATE_SWITCH;
   DrawLevelField(x, y);
+
+  /* !!! THIS LOOKS WRONG !!! */
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
-}
-
-void Blubber(int x, int y)
-{
-  DrawGraphicAnimation(x, y, IMG_ACID);
 }
 
 void NussKnacken(int x, int y)
@@ -3969,20 +3967,22 @@ void NussKnacken(int x, int y)
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (MovDelay[x][y])
     {
-      int frame = getGraphicAnimationFrame(IMG_NUT_CRACKING,
-					   6 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_NUT_CRACKING,
+					     6 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_NUT_CRACKING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_NUT_CRACKING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_EMERALD;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_EMERALD;
+  DrawLevelField(x, y);
 }
 
 void BreakingPearl(int x, int y)
@@ -3993,20 +3993,22 @@ void BreakingPearl(int x, int y)
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (MovDelay[x][y])
     {
-      int frame = getGraphicAnimationFrame(IMG_PEARL_BREAKING,
-					   8 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_PEARL_BREAKING,
+					     8 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_PEARL_BREAKING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_PEARL_BREAKING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_EMPTY;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_EMPTY;
+  DrawLevelField(x, y);
 }
 
 void SiebAktivieren(int x, int y, int type)
@@ -4058,26 +4060,24 @@ void AusgangstuerOeffnen(int x, int y)
     int tuer;
 
     MovDelay[x][y]--;
-    tuer = MovDelay[x][y]/delay;
-    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-    {
-      int frame = getGraphicAnimationFrame(IMG_EXIT_OPENING,
-					   29 - MovDelay[x][y]);
+    tuer = MovDelay[x][y] / delay;
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_EXIT_OPENING, frame);
-    }
-
-    if (!MovDelay[x][y])
+    if (!(MovDelay[x][y] % delay))
     {
-      Feld[x][y] = EL_EXIT_OPEN;
-      DrawLevelField(x, y);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_EXIT_OPENING,
+					     29 - MovDelay[x][y]);
+
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_EXIT_OPENING, frame);
+      }
+
+      return;
     }
   }
-}
 
-void AusgangstuerBlinken(int x, int y)
-{
-  DrawGraphicAnimation(x, y, IMG_EXIT_OPEN);
+  Feld[x][y] = EL_EXIT_OPEN;
+  DrawLevelField(x, y);
 }
 
 void OpenSwitchgate(int x, int y)
@@ -4091,20 +4091,22 @@ void OpenSwitchgate(int x, int y)
   {
     MovDelay[x][y]--;
 
-    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (!(MovDelay[x][y] % delay))
     {
-      int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_OPENING,
-					   29 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_OPENING,
+					     29 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_OPENING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_OPENING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_SWITCHGATE_OPEN;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_SWITCHGATE_OPEN;
+  DrawLevelField(x, y);
 }
 
 void CloseSwitchgate(int x, int y)
@@ -4118,20 +4120,22 @@ void CloseSwitchgate(int x, int y)
   {
     MovDelay[x][y]--;
 
-    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (!(MovDelay[x][y] % delay))
     {
-      int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_CLOSING,
-					   29 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_CLOSING,
+					     29 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_CLOSING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_CLOSING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_SWITCHGATE_CLOSED;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_SWITCHGATE_CLOSED;
+  DrawLevelField(x, y);
 }
 
 void OpenTimegate(int x, int y)
@@ -4145,20 +4149,22 @@ void OpenTimegate(int x, int y)
   {
     MovDelay[x][y]--;
 
-    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (!(MovDelay[x][y] % delay))
     {
-      int frame = getGraphicAnimationFrame(IMG_TIMEGATE_OPENING,
-					   29 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_TIMEGATE_OPENING,
+					     29 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_OPENING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_OPENING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_TIMEGATE_OPEN;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_TIMEGATE_OPEN;
+  DrawLevelField(x, y);
 }
 
 void CloseTimegate(int x, int y)
@@ -4172,20 +4178,22 @@ void CloseTimegate(int x, int y)
   {
     MovDelay[x][y]--;
 
-    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    if (!(MovDelay[x][y] % delay))
     {
-      int frame = getGraphicAnimationFrame(IMG_TIMEGATE_CLOSING,
-					   29 - MovDelay[x][y]);
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      {
+	int frame = getGraphicAnimationFrame(IMG_TIMEGATE_CLOSING,
+					     29 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_CLOSING, frame);
-    }
+	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_CLOSING, frame);
+      }
 
-    if (!MovDelay[x][y])
-    {
-      Feld[x][y] = EL_TIMEGATE_CLOSED;
-      DrawLevelField(x, y);
+      return;
     }
   }
+
+  Feld[x][y] = EL_TIMEGATE_CLOSED;
+  DrawLevelField(x, y);
 }
 
 static void CloseAllOpenTimegates()
@@ -4904,7 +4912,7 @@ void GameActions()
     else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
       TimegateWheel(x, y);
     else if (element == EL_ACID)
-      Blubber(x, y);
+      DrawGraphicAnimation(x, y, IMG_ACID);
     else if (element == EL_ACID_SPLASH_LEFT ||
 	     element == EL_ACID_SPLASH_RIGHT)
       Blurb(x, y);
@@ -4919,9 +4927,9 @@ void GameActions()
     else if (element == EL_EXIT_OPENING)
       AusgangstuerOeffnen(x, y);
     else if (element == EL_EXIT_OPEN)
-      AusgangstuerBlinken(x, y);
+      DrawGraphicAnimation(x, y, IMG_EXIT_OPEN);
     else if (element == EL_SP_EXIT_OPEN)
-      ;		/* !!! ADD SOME (OPTIONAL) ANIMATIONS HERE !!! */
+      DrawGraphicAnimation(x, y, IMG_SP_EXIT_OPEN);
     else if (element == EL_WALL_GROWING_ACTIVE)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
@@ -4938,14 +4946,7 @@ void GameActions()
     else if (element == EL_SP_TERMINAL)
       DrawGraphicAnimation(x, y, IMG_SP_TERMINAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
-    {
       DrawGraphicAnimation(x, y, IMG_SP_TERMINAL_ACTIVE);
-
-#if 0
-      if (!(FrameCounter % 4))
-	PlaySoundLevel(x, y, SND_SP_TERMINAL_ACTIVE);
-#endif
-    }
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
     else if (element == EL_SWITCHGATE_OPENING)
@@ -4959,23 +4960,9 @@ void GameActions()
     else if (element == EL_EXTRA_TIME)
       DrawGraphicAnimation(x, y, IMG_EXTRA_TIME);
     else if (element == EL_SHIELD_NORMAL)
-    {
       DrawGraphicAnimation(x, y, IMG_SHIELD_NORMAL);
-
-#if 0
-      if (!(FrameCounter % 4))
-	PlaySoundLevel(x, y, SND_SHIELD_PASSIVE_ACTIVATED);
-#endif
-    }
     else if (element == EL_SHIELD_DEADLY)
-    {
       DrawGraphicAnimation(x, y, IMG_SHIELD_DEADLY);
-
-#if 0
-      if (!(FrameCounter % 4))
-	PlaySoundLevel(x, y, SND_SHIELD_DEADLY_ACTIVE);
-#endif
-    }
 
     if (game.magic_wall_active)
     {

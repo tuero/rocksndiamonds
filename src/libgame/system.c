@@ -721,7 +721,8 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
   if (bitmap->width != new_bitmap->width ||
       bitmap->height != new_bitmap->height)
   {
-    Error(ERR_WARN, "ReloadCustomImage: new image has wrong dimensions");
+    Error(ERR_WARN, "ReloadCustomImage: new image '%s' has wrong dimensions",
+	  filename);
     FreeBitmap(new_bitmap);
     return;
   }

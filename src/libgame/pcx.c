@@ -112,7 +112,7 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
   for (y = 0; y < height; y++)
   {
     /* decode a scan line into a temporary buffer first */
-    byte *dst_ptr = (pcx_depth == 8) ? bitmap_ptr : row_buffer;
+    byte *dst_ptr = (pcx_depth == 8 ? bitmap_ptr : row_buffer);
     byte value = 0, count = 0;
     int value_int;
     int i;
@@ -152,11 +152,11 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
       {
 	int i, j, x = 0;
 
-	for(i = 0; i < pcx->bytes_per_line; i++)
+	for (i = 0; i < pcx->bytes_per_line; i++)
 	{
 	  byte value = *src_ptr++;
 
-	  for(j = 7; j >= 0; j--)
+	  for (j = 7; j >= 0; j--)
 	  {
 	    byte bit = (value >> j) & 1;
 
@@ -170,12 +170,12 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
       byte *src_ptr = row_buffer;
       int plane;
 
-      for(plane = 0; plane < pcx->color_planes; plane++)
+      for (plane = 0; plane < pcx->color_planes; plane++)
       {
 	int x;
 
 	dst_ptr = bitmap_ptr + plane;
-	for(x = 0; x < width; x++)
+	for (x = 0; x < width; x++)
 	{
 	  *dst_ptr = *src_ptr++;
 	  dst_ptr += pcx->color_planes;

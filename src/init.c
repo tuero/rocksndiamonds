@@ -1079,6 +1079,9 @@ void InitElementInfo()
 static void InitGraphicInfo()
 {
   static int gfx_action[NUM_IMAGE_FILES];
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int last_frame;
   int i;
 
   image_files = getCurrentImageList();
@@ -1189,7 +1192,42 @@ static void InitGraphicInfo()
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
 #endif
+
+    /* now check if the loaded image is large enough for the animation */
+    last_frame = new_graphic_info[i].anim_frames - 1;
+
+    getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
+    if (src_x + TILEX > src_bitmap->width ||
+	src_y + TILEY > src_bitmap->height)
+      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d (normal size)", src_bitmap->source_filename, i);
+
+    getMiniGraphicSource(i, &src_bitmap, &src_x, &src_y);
+    if (src_x + MINI_TILEX > src_bitmap->width ||
+	src_y + MINI_TILEY > src_bitmap->height)
+      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d ('mini' size)", src_bitmap->source_filename, i);
+
+    getMicroGraphicSource(i, &src_bitmap, &src_x, &src_y);
+    if (src_x + MICRO_TILEX > src_bitmap->width ||
+	src_y + MICRO_TILEY > src_bitmap->height)
+      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d ('micro' size)", src_bitmap->source_filename, i);
+
+
+#if 0
+    {
+      int j;
+
+      if (i == IMG_EMERALD)
+      {
+	for (j=0; j<NUM_GFX_ARGS; j++)
+	  printf("%s -> %d\n", image_config_suffix[j].token, parameter[j]);
+	printf("-> %d\n", new_graphic_info[i].anim_frames);
+	printf("\n");
+      }
+    }
+#endif
+
   }
+
 
 #if 0
   printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFX_ARG_NUM_FRAMES]);

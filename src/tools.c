@@ -846,53 +846,66 @@ void getOldGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 	   graphic <= GFX_END_ROCKSELEMENTS)
   {
     graphic -= GFX_START_ROCKSELEMENTS;
-    *bitmap = pix[PIX_ELEMENTS];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_ELEMENTS].bitmap;
     *x = (graphic % GFX_PER_LINE) * TILEX;
     *y = (graphic / GFX_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
-    *bitmap = pix[PIX_HEROES];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_HEROES].bitmap;
     *x = (graphic % HEROES_PER_LINE) * TILEX;
     *y = (graphic / HEROES_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
     graphic -= GFX_START_ROCKSSP;
-    *bitmap = pix[PIX_SP];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_SP].bitmap;
     *x = (graphic % SP_PER_LINE) * TILEX;
     *y = (graphic / SP_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    *bitmap = pix[PIX_DC];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_DC].bitmap;
     *x = (graphic % DC_PER_LINE) * TILEX;
     *y = (graphic / DC_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
-    *bitmap = pix[PIX_MORE];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_MORE].bitmap;
     *x = (graphic % MORE_PER_LINE) * TILEX;
     *y = (graphic / MORE_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *bitmap = pix[PIX_FONT_EM];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_FONT_EM].bitmap;
     *x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
     *y = (graphic / FONT_CHARS_PER_LINE) * TILEY;
   }
   else
   {
-    *bitmap = pix[PIX_SP];
+    *bitmap = new_graphic_info[IMG_OLD_PIX_SP].bitmap;
     *x = 0;
     *y = 0;
   }
 }
 #endif
+
+void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
+{
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  int offset_x = new_graphic_info[graphic].offset_x;
+  int offset_y = new_graphic_info[graphic].offset_y;
+  int src_x = new_graphic_info[graphic].src_x + frame * offset_x;
+  int src_y = new_graphic_info[graphic].src_y + frame * offset_y;
+
+  *bitmap = src_bitmap;
+  *x = src_x;
+  *y = src_y;
+}
 
 void DrawGraphic(int x, int y, int graphic, int frame)
 {
@@ -909,6 +922,7 @@ void DrawGraphic(int x, int y, int graphic, int frame)
   MarkTileDirty(x, y);
 }
 
+#if 1
 void DrawOldGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
 {
   Bitmap *src_bitmap;
@@ -917,10 +931,17 @@ void DrawOldGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
   getOldGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
+#endif
 
 void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 		    int frame)
 {
+#if 1
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+#else
   Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
   int src_x = new_graphic_info[graphic].src_x;
   int src_y = new_graphic_info[graphic].src_y;
@@ -929,6 +950,7 @@ void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 
   src_x += frame * offset_x;
   src_y += frame * offset_y;
+#endif
 
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
@@ -952,8 +974,16 @@ void DrawGraphicThruMask(int x, int y, int graphic, int frame)
 void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic,
 			    int frame)
 {
-  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+#if 1
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  GC drawing_gc;
+
+  getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+  drawing_gc = src_bitmap->stored_clip_gc;
+#else
   GC drawing_gc = src_bitmap->stored_clip_gc;
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
   int src_x = new_graphic_info[graphic].src_x;
   int src_y = new_graphic_info[graphic].src_y;
   int offset_x = new_graphic_info[graphic].offset_x;
@@ -961,6 +991,8 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic,
 
   src_x += frame * offset_x;
   src_y += frame * offset_y;
+
+#endif
 
   SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dest_x, dest_y);
@@ -2902,30 +2934,15 @@ int el2gfx(int element)
 
 int el2img(int element)
 {
-#if 1
-  int graphic_NEW = element_info[element].graphic[GFX_ACTION_DEFAULT];
+  int graphic = element_info[element].graphic[GFX_ACTION_DEFAULT];
 
 #if DEBUG
-  if (graphic_NEW < 0)
+  if (graphic < 0)
     Error(ERR_WARN, "element %d -> graphic %d -- probably crashing now...",
-	  element, graphic_NEW);
+	  element, graphic);
 #endif
 
-  return graphic_NEW;
-#else
-
-  switch(element)
-  {
-    case EL_BD_BUTTERFLY:	return IMG_BD_BUTTERFLY;
-    case EL_BD_FIREFLY:		return IMG_BD_FIREFLY;
-    case EL_SP_ELECTRON:	return IMG_SP_ELECTRON;
-
-    default:
-      break;
-  }
-
-  return IMG_EMPTY;
-#endif
+  return graphic;
 }
 
 int el_dir2img(int element, int direction)
