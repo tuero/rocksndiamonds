@@ -1135,6 +1135,61 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     DoAnimation();
 }
 
+static int readJoystick_TEST()
+{
+  int result = -1;
+
+  InitAnimation();
+
+  while(result < 0)
+  {
+    DoAnimation();
+    Delay(10);
+
+    if (XPending(display))
+    {
+      XEvent event;
+
+      XNextEvent(display, &event);
+      switch(event.type)
+      {
+	case Expose:
+	  HandleExposeEvent((XExposeEvent *) &event);
+	  break;
+	case UnmapNotify:
+	  SleepWhileUnmapped();
+	  break;
+	case KeyPress:
+	  switch(XLookupKeysym((XKeyEvent *)&event,
+			       ((XKeyEvent *)&event)->state))
+	  {
+	    case XK_Return:
+	      result = 1;
+	      break;
+	    case XK_Escape:
+	      result = 0;
+	      break;
+	  }
+	  break;
+	case KeyRelease:
+	  key_joystick_mapping = 0;
+	  break;
+	case FocusIn:
+	case FocusOut:
+	  HandleFocusEvent((XFocusChangeEvent *) &event);
+	  break;
+        case ClientMessage:
+	  HandleClientMessageEvent((XClientMessageEvent *) &event);
+	  break;
+	default:
+	  break;
+      }
+    }
+  }
+
+  StopAnimation();
+}
+
 void CalibrateJoystick()
 {
 #ifdef __FreeBSD__
