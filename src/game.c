@@ -1201,6 +1201,10 @@ static void InitGameEngine()
     ei->change->post_change_function = ch_delay->post_change_function;
 
     ei->change_events |= CH_EVENT_BIT(CE_DELAY);
+
+#if 1
+    SET_PROPERTY(ch_delay->element, EP_CAN_CHANGE, TRUE);
+#endif
   }
 
 #if 1
@@ -1649,7 +1653,7 @@ void InitGame()
     if (!IS_CUSTOM_ELEMENT(i))
     {
       int num_phase = 8;
-      int delay = ((IS_SP_ELEMENT(i) &&
+      int delay = (((IS_SP_ELEMENT(i) && i != EL_EMPTY_SPACE) &&
 		    game.engine_version >= VERSION_IDENT(3,1,0,0)) ||
 		   game.emulation == EMU_SUPAPLEX ? 3 : 2);
       int last_phase = (num_phase + 1) * delay;
@@ -2703,9 +2707,11 @@ void RelocatePlayer(int x, int y, int element_raw)
   else
   {
 #if 1
+#if 0
     int offset = (setup.scroll_delay ? 3 : 0);
     int jx = local_player->jx;
     int jy = local_player->jy;
+#endif
     int scroll_xx = -999, scroll_yy = -999;
 
     ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
@@ -3211,6 +3217,10 @@ void Explode(int ex, int ey, int phase, int mode)
   if (phase == last_phase)
   {
     int element;
+
+#if 0
+  printf("::: done: phase == %d\n", phase);
+#endif
 
 #if 0
     printf("::: explosion %d,%d done [%d]\n", x, y, FrameCounter);
@@ -5810,11 +5820,14 @@ void ContinueMoving(int x, int y)
   MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
   MovDelay[newx][newy] = 0;
 
-  /* copy element change control values to new field */
-  ChangeDelay[newx][newy] = ChangeDelay[x][y];
-  ChangePage[newx][newy] = ChangePage[x][y];
-  Changed[newx][newy] = Changed[x][y];
-  ChangeEvent[newx][newy] = ChangeEvent[x][y];
+  if (CAN_CHANGE(element))
+  {
+    /* copy element change control values to new field */
+    ChangeDelay[newx][newy] = ChangeDelay[x][y];
+    ChangePage[newx][newy]  = ChangePage[x][y];
+    Changed[newx][newy]     = Changed[x][y];
+    ChangeEvent[newx][newy] = ChangeEvent[x][y];
+  }
 
   ChangeDelay[x][y] = 0;
   ChangePage[x][y] = -1;
@@ -7108,9 +7121,8 @@ static void ChangeElement(int x, int y, int page)
   struct ElementInfo *ei = &element_info[element];
   struct ElementChangeInfo *change = &ei->change_page[page];
 
-#if 0
 #ifdef DEBUG
-  if (!CAN_CHANGE(element))
+  if (!CAN_CHANGE(element) && !CAN_CHANGE(Back[x][y]))
   {
     printf("\n\n");
     printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
@@ -7119,7 +7131,17 @@ static void ChangeElement(int x, int y, int page)
     printf("\n\n");
   }
 #endif
+
+  /* this can happen with classic bombs on walkable, changing elements */
+  if (!CAN_CHANGE(element))
+  {
+#if 0
+    if (!CAN_CHANGE(Back[x][y]))	/* prevent permanent repetition */
+      ChangeDelay[x][y] = 0;
 #endif
+
+    return;
+  }
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
@@ -7263,6 +7285,20 @@ static boolean CheckElementChangeExt(int x, int y,
     Blocked2Moving(x, y, &x, &y);
     element = Feld[x][y];
   }
+
+#if 1
+  if (Feld[x][y] != element)	/* check if element has already changed */
+  {
+#if 0
+    printf("::: %d ('%s') != %d ('%s') [%d]\n",
+	   Feld[x][y], element_info[Feld[x][y]].token_name,
+	   element, element_info[element].token_name,
+	   trigger_event);
+#endif
+
+    return FALSE;
+  }
+#endif
 
 #if 1
   if (trigger_page < 0)
@@ -8518,11 +8554,13 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 	!(element_info[Feld[jx][jy]].access_direction & MV_DOWN)));
 
 #if 0
-    printf("::: checking gravity NOW [%d, %d, %d] [%d] ...\n",
+    printf("::: checking gravity NOW [%d, %d, %d] [%d] [%d / %d] ...\n",
 	   player_can_fall_down,
 	   player_is_standing_on_valid_field,
 	   player_is_moving_to_valid_field,
-	   (player_is_moving_to_valid_field ? Feld[new_jx][new_jy] : -1));
+	   (player_is_moving_to_valid_field ? Feld[new_jx][new_jy] : -1),
+	   player->effective_action,
+	   player->can_fall_into_acid);
 #endif
 
     if (player_can_fall_down &&

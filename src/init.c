@@ -3330,7 +3330,8 @@ void InitElementPropertiesEngine(int engine_version)
 						  i == EL_BLACK_ORB));
 
     /* ---------- COULD_MOVE_INTO_ACID ------------------------------------- */
-    SET_PROPERTY(i, EP_COULD_MOVE_INTO_ACID, (CAN_MOVE(i) ||
+    SET_PROPERTY(i, EP_COULD_MOVE_INTO_ACID, (ELEM_IS_PLAYER(i) ||
+					      CAN_MOVE(i) ||
 					      IS_CUSTOM_ELEMENT(i)));
 
     /* ---------- MAYBE_DONT_COLLIDE_WITH ---------------------------------- */
