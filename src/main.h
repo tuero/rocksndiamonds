@@ -302,7 +302,6 @@ extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
 extern int		quick_doors;
-extern int		cpu_friendly;
 
 extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -327,7 +326,7 @@ extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScreenMovPos, ScrollStepSize;
-extern int		GameSpeed, MoveSpeed;
+extern int		GameFrameDelay, MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
 extern int		PlayerMovDir, PlayerMovPos, PlayerPushing;

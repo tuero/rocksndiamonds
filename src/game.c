@@ -2588,7 +2588,7 @@ void GameActions()
 
 #ifdef DEBUG
   action_delay_value =
-    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GameSpeed);
+    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GameFrameDelay);
 #else
   action_delay_value =
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
@@ -2727,7 +2727,7 @@ void GameActions()
     }
   }
 
-  if (TimeLeft>0 && TimeFrames>=(1000/GameSpeed) && !tape.pausing)
+  if (TimeLeft>0 && TimeFrames>=(1000/GameFrameDelay) && !tape.pausing)
   {
     TimeFrames = 0;
     TimeLeft--;

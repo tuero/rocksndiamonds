@@ -32,7 +32,7 @@
 
 /* fundamental game speed */
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define FFWD_FRAME_DELAY	1
+#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
 
 void GetPlayerConfig(void);

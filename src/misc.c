@@ -53,9 +53,9 @@ unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
 
 static void sleep_milliseconds(unsigned long milliseconds_delay)
 {
-  if (milliseconds_delay < 5 || !cpu_friendly)
+  if (milliseconds_delay < 5)
   {
-    /* we want to wait less than 5 ms -- if we assume that we have a
+    /* we want to wait only a few ms -- if we assume that we have a
        kernel timer resolution of 10 ms, we would wait far to long;
        therefore it's better to do a short interval of busy waiting
        to get our sleeping time more accurate */
@@ -110,10 +110,18 @@ BOOL DelayReached(unsigned long *counter_var, unsigned long delay)
 
 void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 {
-  unsigned long actual_counter = Counter();
+  unsigned long actual_counter;
 
-  if (actual_counter < *counter_var + delay && actual_counter >= *counter_var)
-    sleep_milliseconds(*counter_var + delay - actual_counter);
+  while(1)
+  {
+    actual_counter = Counter();
+
+    if (actual_counter < *counter_var + delay &&
+	actual_counter >= *counter_var)
+      sleep_milliseconds((*counter_var + delay - actual_counter) / 2);
+    else
+      break;
+  }
 
   *counter_var = actual_counter;
 }

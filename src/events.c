@@ -516,10 +516,11 @@ void HandleKey(KeySym key, int key_status)
 	case XK_8:
 	case XK_9:
 	  if (key == XK_0)
-	    GameSpeed = 500;
+	    GameFrameDelay = 500;
 	  else
-	    GameSpeed = (key - XK_0) * 10;
-	  printf("GameSpeed == %d\n", GameSpeed);
+	    GameFrameDelay = (key - XK_0) * 10;
+	  printf("Game speed == %d%% (%d ms delay between two frames)\n",
+		 GAME_FRAME_DELAY * 100 / GameFrameDelay, GameFrameDelay);
 	  break;
 
 	case XK_a:
