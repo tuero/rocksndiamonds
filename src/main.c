@@ -3018,15 +3018,18 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.text_2"		},
   { "font.text_3"		},
   { "font.text_4"		},
-  { "font.input"		},
-  { "font.input.active"		},
+  { "font.input_1.active"	},
+  { "font.input_1"		},
+  { "font.input_2.active"	},
+  { "font.input_2"		},
   { "font.option_off"		},
   { "font.option_on"		},
   { "font.value_1"		},
   { "font.value_2"		},
   { "font.value_old"		},
-  { "font.tape_recorder"	},
   { "font.level_number"		},
+  { "font.tape_recorder"	},
+  { "font.game_info"		},
 };
 
 

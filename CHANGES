@@ -1,5 +1,8 @@
-Pre-Release Version 2.2.0rc6 [?? ??? ????]
+Pre-Release Version 2.2.0rc6 [22 APR 2003]
 ------------------------------------------
+	- added missing source file
+	- fixed little font directive bug
+	- added actual CHANGES file ;-)
 
 Pre-Release Version 2.2.0rc5 [20 APR 2003]
 ------------------------------------------

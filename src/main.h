@@ -846,10 +846,10 @@
 #define FONT_TEXT_2				9
 #define FONT_TEXT_3				10
 #define FONT_TEXT_4				11
-#define FONT_INPUT_1				12
-#define FONT_INPUT_1_ACTIVE			13
-#define FONT_INPUT_2				14
-#define FONT_INPUT_2_ACTIVE			15
+#define FONT_INPUT_1_ACTIVE			12
+#define FONT_INPUT_1				13
+#define FONT_INPUT_2_ACTIVE			14
+#define FONT_INPUT_2				15
 #define FONT_OPTION_OFF				16
 #define FONT_OPTION_ON				17
 #define FONT_VALUE_1				18
