@@ -24,6 +24,9 @@
 #include "tape.h"
 
 
+#define INFOTEXT_UNKNOWN_ELEMENT	"unknown"
+
+
 /*
   -----------------------------------------------------------------------------
   screen and artwork graphic pixel position definitions
@@ -860,7 +863,7 @@ static struct
     MIN_ENVELOPE_XSIZE,			MAX_ENVELOPE_XSIZE,
     GADGET_ID_ENVELOPE_XSIZE_DOWN,	GADGET_ID_ENVELOPE_XSIZE_UP,
     GADGET_ID_ENVELOPE_XSIZE_TEXT,	GADGET_ID_NONE,
-    &level.envelope_xsize,
+    NULL,
     NULL,				NULL, "width",
   },
   {
@@ -868,7 +871,7 @@ static struct
     MIN_ENVELOPE_YSIZE,			MAX_ENVELOPE_YSIZE,
     GADGET_ID_ENVELOPE_YSIZE_DOWN,	GADGET_ID_ENVELOPE_YSIZE_UP,
     GADGET_ID_ENVELOPE_YSIZE_TEXT,	GADGET_ID_ENVELOPE_XSIZE_UP,
-    &level.envelope_ysize,
+    NULL,
     NULL,				" ", "height",
   },
 
@@ -996,7 +999,7 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_ENVELOPE_INFO,
     MAX_ENVELOPE_XSIZE, MAX_ENVELOPE_YSIZE,
-    level.envelope,
+    NULL,
     "Envelope Info:", "Envelope Info"
   }
 };
@@ -1999,10 +2002,17 @@ static int editor_el_emerald_mine[] =
   EL_AMOEBA_WET,
   EL_AMOEBA_DRY,
 
+#if 1
+  EL_EM_KEY_1,
+  EL_EM_KEY_2,
+  EL_EM_KEY_3,
+  EL_EM_KEY_4,
+#else
   EL_EM_KEY_1_FILE,
   EL_EM_KEY_2_FILE,
   EL_EM_KEY_3_FILE,
   EL_EM_KEY_4_FILE,
+#endif
 
   EL_EM_GATE_1,
   EL_EM_GATE_2,
@@ -2163,7 +2173,11 @@ static int editor_hl_supaplex[] =
 
 static int editor_el_supaplex[] =
 {
+#if 1
+  EL_EMPTY,
+#else
   EL_SP_EMPTY,
+#endif
   EL_SP_ZONK,
   EL_SP_BASE,
   EL_SP_MURPHY,
@@ -2279,7 +2293,12 @@ static int editor_el_diamond_caves[] =
   EL_SWITCHGATE_OPEN,
   EL_SWITCHGATE_CLOSED,
   EL_SWITCHGATE_SWITCH_UP,
-  EL_ENVELOPE,
+  EL_EMPTY,
+
+  EL_ENVELOPE_1,
+  EL_ENVELOPE_2,
+  EL_ENVELOPE_3,
+  EL_ENVELOPE_4,
 
   EL_TIMEGATE_CLOSED,
   EL_TIMEGATE_OPEN,
@@ -2893,13 +2912,80 @@ editor_elements_info[] =
   -----------------------------------------------------------------------------
 */
 
+static int getMaxInfoTextLength()
+{
+  return (SXSIZE / getFontWidth(FONT_TEXT_2));
+}
+
+static int getTextWidthForGadget(char *text)
+{
+  if (text == NULL)
+    return 0;
+
+  return (getTextWidth(text, FONT_TEXT_1) + ED_GADGET_TEXT_DISTANCE);
+}
+
+static int getTextWidthForDrawingArea(char *text)
+{
+  if (text == NULL)
+    return 0;
+
+  return (getTextWidth(text, FONT_TEXT_1) + ED_DRAWINGAREA_TEXT_DISTANCE);
+}
+
+static int getRightGadgetBorder(struct GadgetInfo *gi, char *text)
+{
+  return (gi->x + gi->width + getTextWidthForGadget(text));
+}
+
+static char *getElementInfoText(int element)
+{
+  char *info_text = NULL;
+
+  if (element < NUM_FILE_ELEMENTS)
+  {
+    if (strlen(element_info[element].description) > 0)
+      info_text = element_info[element].description;
+    else if (element_info[element].custom_description != NULL)
+      info_text = element_info[element].custom_description;
+    else if (element_info[element].editor_description != NULL)
+      info_text = element_info[element].editor_description;
+  }
+
+  if (info_text == NULL)
+    info_text = INFOTEXT_UNKNOWN_ELEMENT;
+
+  return info_text;
+}
+
 static void ReinitializeElementList()
 {
+  static boolean initialized = FALSE;
   int pos = 0;
   int i, j;
 
   if (editor_elements != NULL)
     free(editor_elements);
+
+  /* do some sanity check for each element from element list at startup */
+  if (!initialized)
+  {
+    for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    {
+      for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+      {
+	int element = editor_elements_info[i].element_list[j];
+
+	if (element >= NUM_FILE_ELEMENTS)
+	  Error(ERR_WARN, "editor element %d is runtime element", element);
+
+	if (strcmp(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT) == 0)
+	  Error(ERR_WARN, "no element description for element %d", element);
+      }
+    }
+
+    initialized = TRUE;
+  }
 
   num_editor_elements = 0;
 
@@ -2977,56 +3063,6 @@ static void ReinitializeElementListButtons()
       *editor_elements_info[i].setup_value;
 
   initialization_needed = FALSE;
-}
-
-static int getMaxInfoTextLength()
-{
-  return (SXSIZE / getFontWidth(FONT_TEXT_2));
-}
-
-static int getTextWidthForGadget(char *text)
-{
-  if (text == NULL)
-    return 0;
-
-  return (getTextWidth(text, FONT_TEXT_1) + ED_GADGET_TEXT_DISTANCE);
-}
-
-static int getTextWidthForDrawingArea(char *text)
-{
-  if (text == NULL)
-    return 0;
-
-  return (getTextWidth(text, FONT_TEXT_1) + ED_DRAWINGAREA_TEXT_DISTANCE);
-}
-
-static int getRightGadgetBorder(struct GadgetInfo *gi, char *text)
-{
-  return (gi->x + gi->width + getTextWidthForGadget(text));
-}
-
-static char *getElementInfoText(int element)
-{
-  char *info_text = NULL;
-
-  if (element < NUM_FILE_ELEMENTS)
-  {
-    if (strlen(element_info[element].description) > 0)
-      info_text = element_info[element].description;
-    else if (element_info[element].custom_description != NULL)
-      info_text = element_info[element].custom_description;
-    else if (element_info[element].editor_description != NULL)
-      info_text = element_info[element].editor_description;
-  }
-
-  if (info_text == NULL)
-  {
-    info_text = "unknown";
-
-    Error(ERR_WARN, "no element description for element %d", element);
-  }
-
-  return info_text;
 }
 
 static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
@@ -3285,7 +3321,7 @@ static void CreateControlButtons()
   }
 
   /* create buttons for element list */
-  for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
+  for (i=0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
     Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
@@ -5066,7 +5102,7 @@ static void DrawElementContentAreas()
   DrawText(x, y + 2 * MINI_TILEY, "smashed", FONT_TEXT_1);
 }
 
-static void DrawEnvelopeTextArea()
+static void DrawEnvelopeTextArea(int envelope_nr)
 {
   int id = ED_TEXTAREA_ID_ENVELOPE_INFO;
   struct GadgetInfo *gi = level_editor_gadget[textarea_info[id].gadget_id];
@@ -5074,8 +5110,14 @@ static void DrawEnvelopeTextArea()
   UnmapGadget(gi);
   DrawBackground(gi->x, gi->y, gi->width, gi->height);
 
-  ModifyGadget(gi, GDI_AREA_SIZE, level.envelope_xsize, level.envelope_ysize,
+  if (envelope_nr != -1)
+    textarea_info[id].value = level.envelope_text[envelope_nr];
+
+  ModifyGadget(gi, GDI_AREA_SIZE,
+	       *counterbutton_info[ED_COUNTER_ID_ENVELOPE_XSIZE].value,
+	       *counterbutton_info[ED_COUNTER_ID_ENVELOPE_YSIZE].value,
 	       GDI_END);
+
   MapTextAreaGadget(ED_TEXTAREA_ID_ENVELOPE_INFO);
 }
 
@@ -5467,10 +5509,17 @@ static struct
   { EL_KEY_2,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_3,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_4,		&level.score[SC_KEY],		TEXT_COLLECTING	},
+#if 1
+  { EL_EM_KEY_1,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_2,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_3,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_EM_KEY_4,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+#else
   { EL_EM_KEY_1_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_2_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_3_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_4_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+#endif
   { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_SPEED	},
   { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_SPEED	},
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_SPEED	},
@@ -5486,8 +5535,8 @@ static boolean checkPropertiesConfig()
 
   if (IS_GEM(properties_element) ||
       IS_CUSTOM_ELEMENT(properties_element) ||
-      HAS_CONTENT(properties_element) ||
-      properties_element == EL_ENVELOPE)
+      IS_ENVELOPE(properties_element) ||
+      HAS_CONTENT(properties_element))
     return TRUE;
   else
     for (i=0; elements_with_counter[i].element != -1; i++)
@@ -5539,13 +5588,20 @@ static void DrawPropertiesConfig()
   if (IS_GEM(properties_element))
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS);
 
-  if (properties_element == EL_ENVELOPE)
+  if (IS_ENVELOPE(properties_element))
   {
+    int counter1_id = ED_COUNTER_ID_ENVELOPE_XSIZE;
+    int counter2_id = ED_COUNTER_ID_ENVELOPE_YSIZE;
+    int envelope_nr = properties_element - EL_ENVELOPE_1;
+
+    counterbutton_info[counter1_id].value = &level.envelope_xsize[envelope_nr];
+    counterbutton_info[counter2_id].value = &level.envelope_ysize[envelope_nr];
+
     /* display counter to choose size of envelope text area */
     MapCounterButtons(ED_COUNTER_ID_ENVELOPE_XSIZE);
     MapCounterButtons(ED_COUNTER_ID_ENVELOPE_YSIZE);
 
-    DrawEnvelopeTextArea();
+    DrawEnvelopeTextArea(envelope_nr);
   }
 
   if (IS_CUSTOM_ELEMENT(properties_element))
@@ -6661,7 +6717,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
     case ED_COUNTER_ID_ENVELOPE_XSIZE:
     case ED_COUNTER_ID_ENVELOPE_YSIZE:
-      DrawEnvelopeTextArea();
+      DrawEnvelopeTextArea(-1);
       break;
 
     case ED_COUNTER_ID_LEVEL_XSIZE:

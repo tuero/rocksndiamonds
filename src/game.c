@@ -658,10 +658,13 @@ static void InitField(int x, int y, boolean init_game)
       MovDir[x][y] = 1 << RND(4);
       break;
 
+#if 0
     case EL_SP_EMPTY:
       Feld[x][y] = EL_EMPTY;
       break;
+#endif
 
+#if 0
     case EL_EM_KEY_1_FILE:
       Feld[x][y] = EL_EM_KEY_1;
       break;
@@ -674,6 +677,7 @@ static void InitField(int x, int y, boolean init_game)
     case EL_EM_KEY_4_FILE:
       Feld[x][y] = EL_EM_KEY_4;
       break;
+#endif
 
     case EL_CONVEYOR_BELT_1_SWITCH_LEFT:
     case EL_CONVEYOR_BELT_1_SWITCH_MIDDLE:
@@ -802,7 +806,7 @@ static void InitGameEngine()
     ei->change_events = CE_BITMASK_DEFAULT;
     for (j=0; j < NUM_CHANGE_EVENTS; j++)
     {
-      ei->event_page_num[j] = 0;
+      ei->event_page_nr[j] = 0;
       ei->event_page[j] = &ei->change_page[0];
     }
   }
@@ -841,7 +845,7 @@ static void InitGameEngine()
 	    !(ei->change_events & CH_EVENT_BIT(k)))
 	{
 	  ei->change_events |= CH_EVENT_BIT(k);
-	  ei->event_page_num[k] = j;
+	  ei->event_page_nr[k] = j;
 	  ei->event_page[k] = &ei->change_page[j];
 	}
       }
@@ -1024,7 +1028,7 @@ void InitGame()
     player->is_digging = FALSE;
     player->is_collecting = FALSE;
 
-    player->show_envelope = FALSE;
+    player->show_envelope = 0;
 
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
@@ -4418,12 +4422,14 @@ void ContinueMoving(int x, int y)
 
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
+#if 1
     Changed[newx][newy] = Changed[x][y];
     ChangeEvent[newx][newy] = ChangeEvent[x][y];
 
     ChangeDelay[x][y] = 0;
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
+#endif
 
     /* copy animation control values to new field */
     GfxFrame[newx][newy]  = GfxFrame[x][y];
@@ -5545,6 +5551,16 @@ static void ChangeElement(int x, int y, int page)
   int element = MovingOrBlocked2Element(x, y);
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
 
+#ifdef DEBUG
+  if (!CAN_CHANGE(element))
+  {
+    printf("\n\n\n");
+    printf("ChangeElement(): element = %d\n", element);
+    printf("Explode(): This should never happen!\n");
+    printf("\n\n\n");
+  }
+#endif
+
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
     ChangeDelay[x][y] = (    change->delay_fixed  * change->delay_frames +
@@ -5663,7 +5679,7 @@ static boolean CheckElementSideChange(int x, int y, int element, int side,
   }
 
   if (page < 0)
-    page = element_info[element].event_page_num[trigger_event];
+    page = element_info[element].event_page_nr[trigger_event];
 
   if (!(element_info[element].change_page[page].sides & side))
     return FALSE;
@@ -5946,7 +5962,7 @@ void GameActions()
     /* this may take place after moving, so 'element' may have changed */
     if (IS_CHANGING(x, y))
     {
-      ChangeElement(x, y, element_info[element].event_page_num[CE_DELAY]);
+      ChangeElement(x, y, element_info[element].event_page_nr[CE_DELAY]);
       element = Feld[x][y];
       graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
     }
@@ -6284,11 +6300,11 @@ void GameActions()
 #endif
 
 #if 1
-  if (local_player->show_envelope && local_player->MovPos == 0)
+  if (local_player->show_envelope != 0 && local_player->MovPos == 0)
   {
-    ShowEnvelope();
+    ShowEnvelope(local_player->show_envelope - EL_ENVELOPE_1);
 
-    local_player->show_envelope = FALSE;
+    local_player->show_envelope = 0;
   }
 #endif
 }
@@ -7681,12 +7697,12 @@ int DigField(struct PlayerInfo *player,
 			     el2edimg(EL_KEY_1 + key_nr));
 	  redraw_mask |= REDRAW_DOOR_1;
 	}
-	else if (element == EL_ENVELOPE)
+	else if (IS_ENVELOPE(element))
 	{
 #if 1
-	  player->show_envelope = TRUE;
+	  player->show_envelope = element;
 #else
-	  ShowEnvelope();
+	  ShowEnvelope(element - EL_ENVELOPE_1);
 #endif
 	}
 	else if (IS_DROPPABLE(element))	/* can be collected and dropped */

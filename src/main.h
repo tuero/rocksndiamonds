@@ -173,8 +173,8 @@
 #define CE_OTHER_GETS_PUSHED	13
 #define CE_OTHER_GETS_COLLECTED	14
 #define CE_OTHER_GETS_DROPPED	15
-#define CE_BY_PLAYER		16 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
-#define CE_BY_COLLISION		17 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
+#define CE_BY_PLAYER		16	/* obsolete; now CE_BY_DIRECT_ACTION */
+#define CE_BY_COLLISION		17	/* obsolete; now CE_BY_DIRECT_ACTION */
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_OTHER_GETS_DIGGED	20
@@ -323,6 +323,9 @@
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
 	 			 (e) <= EL_CUSTOM_END)
 
+#define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
+	 			 (e) <= EL_ENVELOPE_4)
+
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
@@ -448,10 +451,10 @@
 #define EL_WALL				2
 #define EL_WALL_SLIPPERY		3
 #define EL_ROCK				4
-#define EL_KEY_OBSOLETE			5 /* obsolete; mapped to EL_KEY_1 */
+#define EL_KEY_OBSOLETE			5	/* obsolete; now EL_KEY_1 */
 #define EL_EMERALD			6
 #define EL_EXIT_CLOSED			7
-#define EL_PLAYER_OBSOLETE		8 /* obsolete; mapped to EL_PLAYER_1 */
+#define EL_PLAYER_OBSOLETE		8	/* obsolete; now EL_PLAYER_1 */
 #define EL_BUG				9
 #define EL_SPACESHIP			10
 #define EL_YAMYAM			11
@@ -573,7 +576,7 @@
 #define EL_PIG				117
 #define EL_DRAGON			118
 
-#define EL_EM_KEY_1_FILE		119
+#define EL_EM_KEY_1_FILE_OBSOLETE	119	/* obsolete; now EL_EM_KEY_1 */
 
 #define EL_CHAR_START			120
 #define EL_CHAR_ASCII0			(EL_CHAR_START  - 32)
@@ -595,9 +598,9 @@
 #define EL_EM_GATE_3			205
 #define EL_EM_GATE_4			206
 
-#define EL_EM_KEY_2_FILE			207
-#define EL_EM_KEY_3_FILE			208
-#define EL_EM_KEY_4_FILE			209
+#define EL_EM_KEY_2_FILE_OBSOLETE	207	/* obsolete; now EL_EM_KEY_2 */
+#define EL_EM_KEY_3_FILE_OBSOLETE	208	/* obsolete; now EL_EM_KEY_3 */
+#define EL_EM_KEY_4_FILE_OBSOLETE	209	/* obsolete; now EL_EM_KEY_4 */
 
 #define EL_SP_START			210
 #define EL_SP_EMPTY_SPACE		(EL_SP_START + 0)
@@ -693,7 +696,7 @@
 #define EL_CONVEYOR_BELT_4_SWITCH_MIDDLE 293
 #define EL_CONVEYOR_BELT_4_SWITCH_RIGHT	 294
 #define EL_LANDMINE			295
-#define EL_ENVELOPE			296
+#define EL_ENVELOPE_OBSOLETE		296   /* obsolete; now EL_ENVELOPE_1 */
 #define EL_LIGHT_SWITCH			297
 #define EL_LIGHT_SWITCH_ACTIVE		298
 #define EL_SIGN_EXCLAMATION		299
@@ -764,69 +767,76 @@
 #define EL_UNUSED_358			358
 #define EL_UNUSED_359			359
 
+/* ---------- begin of custom elements section ----------------------------- */
 #define EL_CUSTOM_START			360
 
 #include "conf_cus.h"	/* include auto-generated data structure definitions */
 
 #define NUM_CUSTOM_ELEMENTS		256
+#define EL_CUSTOM_END			615
+/* ---------- end of custom elements section ------------------------------- */
 
-#define EL_CUSTOM_END		(EL_CUSTOM_START + NUM_CUSTOM_ELEMENTS - 1)
-#define NUM_FILE_ELEMENTS	(EL_CUSTOM_START + NUM_CUSTOM_ELEMENTS)
+#define EL_EM_KEY_1			616
+#define EL_EM_KEY_2			617
+#define EL_EM_KEY_3			618
+#define EL_EM_KEY_4			619
+#define EL_ENVELOPE_1			620
+#define EL_ENVELOPE_2			621
+#define EL_ENVELOPE_3			622
+#define EL_ENVELOPE_4			623
+
+#define NUM_FILE_ELEMENTS		624
 
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_FIRST_RUNTIME_REAL		NUM_FILE_ELEMENTS
 
-#define EL_EM_KEY_1			(EL_FIRST_RUNTIME_REAL + 0)
-#define EL_EM_KEY_2			(EL_FIRST_RUNTIME_REAL + 1)
-#define EL_EM_KEY_3			(EL_FIRST_RUNTIME_REAL + 2)
-#define EL_EM_KEY_4			(EL_FIRST_RUNTIME_REAL + 3)
-#define EL_DYNABOMB_PLAYER_1_ACTIVE	(EL_FIRST_RUNTIME_REAL + 4)
-#define EL_DYNABOMB_PLAYER_2_ACTIVE	(EL_FIRST_RUNTIME_REAL + 5)
-#define EL_DYNABOMB_PLAYER_3_ACTIVE	(EL_FIRST_RUNTIME_REAL + 6)
-#define EL_DYNABOMB_PLAYER_4_ACTIVE	(EL_FIRST_RUNTIME_REAL + 7)
-#define EL_SP_DISK_RED_ACTIVE		(EL_FIRST_RUNTIME_REAL + 8)
-#define EL_SWITCHGATE_OPENING		(EL_FIRST_RUNTIME_REAL + 9)
-#define EL_SWITCHGATE_CLOSING		(EL_FIRST_RUNTIME_REAL + 10)
-#define EL_TIMEGATE_OPENING		(EL_FIRST_RUNTIME_REAL + 11)
-#define EL_TIMEGATE_CLOSING		(EL_FIRST_RUNTIME_REAL + 12)
-#define EL_PEARL_BREAKING		(EL_FIRST_RUNTIME_REAL + 13)
-#define EL_TRAP_ACTIVE			(EL_FIRST_RUNTIME_REAL + 14)
-#define EL_INVISIBLE_STEELWALL_ACTIVE	(EL_FIRST_RUNTIME_REAL + 15)
-#define EL_INVISIBLE_WALL_ACTIVE	(EL_FIRST_RUNTIME_REAL + 16)
-#define EL_INVISIBLE_SAND_ACTIVE	(EL_FIRST_RUNTIME_REAL + 17)
-#define EL_CONVEYOR_BELT_1_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 18)
-#define EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 19)
-#define EL_CONVEYOR_BELT_1_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 20)
-#define EL_CONVEYOR_BELT_2_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 21)
-#define EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 22)
-#define EL_CONVEYOR_BELT_2_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 23)
-#define EL_CONVEYOR_BELT_3_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 24)
-#define EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 25)
-#define EL_CONVEYOR_BELT_3_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 26)
-#define EL_CONVEYOR_BELT_4_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 27)
-#define EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 28)
-#define EL_CONVEYOR_BELT_4_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 29)
-#define EL_EXIT_OPENING			(EL_FIRST_RUNTIME_REAL + 30)
-#define EL_EXIT_CLOSING			(EL_FIRST_RUNTIME_REAL + 31)
-#define EL_SP_EXIT_OPEN			(EL_FIRST_RUNTIME_REAL + 32)
-#define EL_SP_TERMINAL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 33)
-#define EL_SP_BUGGY_BASE_ACTIVATING	(EL_FIRST_RUNTIME_REAL + 34)
-#define EL_SP_BUGGY_BASE_ACTIVE		(EL_FIRST_RUNTIME_REAL + 35)
-#define EL_SP_MURPHY_CLONE		(EL_FIRST_RUNTIME_REAL + 36)
-#define EL_AMOEBA_DROPPING		(EL_FIRST_RUNTIME_REAL + 37)
-#define EL_QUICKSAND_EMPTYING		(EL_FIRST_RUNTIME_REAL + 38)
-#define EL_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 39)
-#define EL_BD_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 40)
-#define EL_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 41)
-#define EL_BD_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 42)
-#define EL_MAGIC_WALL_EMPTYING		(EL_FIRST_RUNTIME_REAL + 43)
-#define EL_BD_MAGIC_WALL_EMPTYING	(EL_FIRST_RUNTIME_REAL + 44)
-#define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 45)
-#define EL_BD_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 46)
+#define EL_DYNABOMB_PLAYER_1_ACTIVE	(EL_FIRST_RUNTIME_REAL + 0)
+#define EL_DYNABOMB_PLAYER_2_ACTIVE	(EL_FIRST_RUNTIME_REAL + 1)
+#define EL_DYNABOMB_PLAYER_3_ACTIVE	(EL_FIRST_RUNTIME_REAL + 2)
+#define EL_DYNABOMB_PLAYER_4_ACTIVE	(EL_FIRST_RUNTIME_REAL + 3)
+#define EL_SP_DISK_RED_ACTIVE		(EL_FIRST_RUNTIME_REAL + 4)
+#define EL_SWITCHGATE_OPENING		(EL_FIRST_RUNTIME_REAL + 5)
+#define EL_SWITCHGATE_CLOSING		(EL_FIRST_RUNTIME_REAL + 6)
+#define EL_TIMEGATE_OPENING		(EL_FIRST_RUNTIME_REAL + 7)
+#define EL_TIMEGATE_CLOSING		(EL_FIRST_RUNTIME_REAL + 8)
+#define EL_PEARL_BREAKING		(EL_FIRST_RUNTIME_REAL + 9)
+#define EL_TRAP_ACTIVE			(EL_FIRST_RUNTIME_REAL + 10)
+#define EL_INVISIBLE_STEELWALL_ACTIVE	(EL_FIRST_RUNTIME_REAL + 11)
+#define EL_INVISIBLE_WALL_ACTIVE	(EL_FIRST_RUNTIME_REAL + 12)
+#define EL_INVISIBLE_SAND_ACTIVE	(EL_FIRST_RUNTIME_REAL + 13)
+#define EL_CONVEYOR_BELT_1_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 14)
+#define EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 15)
+#define EL_CONVEYOR_BELT_1_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 16)
+#define EL_CONVEYOR_BELT_2_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 17)
+#define EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 18)
+#define EL_CONVEYOR_BELT_2_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 19)
+#define EL_CONVEYOR_BELT_3_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 20)
+#define EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 21)
+#define EL_CONVEYOR_BELT_3_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 22)
+#define EL_CONVEYOR_BELT_4_LEFT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 23)
+#define EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE (EL_FIRST_RUNTIME_REAL + 24)
+#define EL_CONVEYOR_BELT_4_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 25)
+#define EL_EXIT_OPENING			(EL_FIRST_RUNTIME_REAL + 26)
+#define EL_EXIT_CLOSING			(EL_FIRST_RUNTIME_REAL + 27)
+#define EL_SP_EXIT_OPEN			(EL_FIRST_RUNTIME_REAL + 28)
+#define EL_SP_TERMINAL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 29)
+#define EL_SP_BUGGY_BASE_ACTIVATING	(EL_FIRST_RUNTIME_REAL + 30)
+#define EL_SP_BUGGY_BASE_ACTIVE		(EL_FIRST_RUNTIME_REAL + 31)
+#define EL_SP_MURPHY_CLONE		(EL_FIRST_RUNTIME_REAL + 32)
+#define EL_AMOEBA_DROPPING		(EL_FIRST_RUNTIME_REAL + 33)
+#define EL_QUICKSAND_EMPTYING		(EL_FIRST_RUNTIME_REAL + 34)
+#define EL_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 35)
+#define EL_BD_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 36)
+#define EL_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 37)
+#define EL_BD_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 38)
+#define EL_MAGIC_WALL_EMPTYING		(EL_FIRST_RUNTIME_REAL + 39)
+#define EL_BD_MAGIC_WALL_EMPTYING	(EL_FIRST_RUNTIME_REAL + 40)
+#define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 41)
+#define EL_BD_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 42)
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 47)
+#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 43)
 
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)
@@ -1070,6 +1080,31 @@
 #define EMU_SOKOBAN		2
 #define EMU_SUPAPLEX		3
 
+struct MenuInfo
+{
+  int draw_xoffset_default;
+  int draw_yoffset_default;
+  int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
+  int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
+
+  int scrollbar_xoffset;
+
+  int list_size_default;
+  int list_size[NUM_SPECIAL_GFX_ARGS];
+};
+
+struct DoorInfo
+{
+  int step_offset;
+  int step_delay;
+  int anim_mode;
+};
+
+struct EnvelopeInfo
+{
+  int anim_mode;
+};
+
 struct HiScore
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
@@ -1111,7 +1146,7 @@ struct PlayerInfo
   boolean is_digging;
   boolean is_collecting;
 
-  boolean show_envelope;
+  int show_envelope;
 
   unsigned long move_delay;
   int move_delay_value;
@@ -1149,8 +1184,8 @@ struct LevelInfo
   int gems_needed;
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
-  char envelope[MAX_ENVELOPE_TEXT_LEN + 1];
-  int envelope_xsize, envelope_ysize;
+  char envelope_text[4][MAX_ENVELOPE_TEXT_LEN + 1];
+  int envelope_xsize[4], envelope_ysize[4];
   int score[LEVEL_SCORE_ELEMENTS];
   int yamyam_content[MAX_ELEMENT_CONTENTS][3][3];
   int num_yamyam_contents;
@@ -1212,6 +1247,8 @@ struct GameInfo
   int initial_move_delay;
   int initial_move_delay_value;
 
+  struct EnvelopeInfo envelope;
+
   /* variable within running game */
   int yamyam_content_nr;
   boolean magic_wall_active;
@@ -1235,25 +1272,6 @@ struct GlobalInfo
   float frames_per_second;
   boolean fps_slowdown;
   int fps_slowdown_factor;
-};
-
-struct MenuInfo
-{
-  int draw_xoffset_default;
-  int draw_yoffset_default;
-  int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
-  int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
-
-  int scrollbar_xoffset;
-
-  int list_size_default;
-  int list_size[NUM_SPECIAL_GFX_ARGS];
-};
-
-struct DoorInfo
-{
-  int step_offset;
-  int step_delay;
 };
 
 struct ElementChangeInfo
@@ -1348,7 +1366,7 @@ struct ElementInfo
 
   unsigned long change_events;	/* bitfield for combined change events */
 
-  int event_page_num[NUM_CHANGE_EVENTS]; /* page number for each event */
+  int event_page_nr[NUM_CHANGE_EVENTS]; /* page number for each event */
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   /* ---------- internal values used in level editor ---------- */

@@ -227,11 +227,6 @@ struct ConfigInfo image_config[] =
   { "[sp_default].exploding.delay",		"3"			},
   { "[sp_default].exploding.anim_mode",		"linear"		},
 
-  { "sp_empty_space",				"RocksSP.pcx"		},
-  { "sp_empty_space.xpos",			"0"			},
-  { "sp_empty_space.ypos",			"0"			},
-  { "sp_empty_space.frames",			"1"			},
-
   { "sp_zonk",					"RocksSP.pcx"		},
   { "sp_zonk.xpos",				"1"			},
   { "sp_zonk.ypos",				"0"			},
@@ -1451,10 +1446,22 @@ struct ConfigInfo image_config[] =
   { "timegate_switch.active.ypos",		"15"			},
   { "timegate_switch.active.frames",		"4"			},
 
-  { "envelope",					"RocksDC.pcx"		},
-  { "envelope.xpos",				"4"			},
-  { "envelope.ypos",				"14"			},
-  { "envelope.frames",				"1"			},
+  { "envelope_1",				"RocksDC.pcx"		},
+  { "envelope_1.xpos",				"4"			},
+  { "envelope_1.ypos",				"14"			},
+  { "envelope_1.frames",			"1"			},
+  { "envelope_2",				"RocksDC.pcx"		},
+  { "envelope_2.xpos",				"4"			},
+  { "envelope_2.ypos",				"14"			},
+  { "envelope_2.frames",			"1"			},
+  { "envelope_3",				"RocksDC.pcx"		},
+  { "envelope_3.xpos",				"4"			},
+  { "envelope_3.ypos",				"14"			},
+  { "envelope_3.frames",			"1"			},
+  { "envelope_4",				"RocksDC.pcx"		},
+  { "envelope_4.xpos",				"4"			},
+  { "envelope_4.ypos",				"14"			},
+  { "envelope_4.frames",			"1"			},
 
   { "sign_exclamation",				"RocksDC.pcx"		},
   { "sign_exclamation.xpos",			"5"			},
@@ -3492,6 +3499,9 @@ struct ConfigInfo image_config[] =
 
   { "door.step_offset",				"2"			},
   { "door.step_delay",				"10"			},
+  { "door.anim_mode",				"default"		},
+
+  { "game.envelope.anim_mode",			"full"			},
 
   { NULL,					NULL			}
 };

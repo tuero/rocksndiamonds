@@ -126,6 +126,12 @@
 #define ANIM_RANDOM		(1 << 4)
 #define ANIM_REVERSE		(1 << 5)
 
+#if 0
+/* values for special animation modes */
+#define ANIM_DEFAULT		(1 << 6)
+#define ANIM_QUICK		(1 << 7)
+#define ANIM_SPECIAL1		(1 << 8)
+#endif
 
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)

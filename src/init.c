@@ -1363,7 +1363,10 @@ void InitElementPropertiesStatic()
     EL_SHIELD_NORMAL,
     EL_SHIELD_DEADLY,
     EL_EXTRA_TIME,
-    EL_ENVELOPE,
+    EL_ENVELOPE_1,
+    EL_ENVELOPE_2,
+    EL_ENVELOPE_3,
+    EL_ENVELOPE_4,
     EL_SPEED_PILL,
     -1
   };
@@ -1904,6 +1907,9 @@ void InitElementPropertiesStatic()
 
   static int ep_sp_element[] =
   {
+    /* should always be valid */
+    EL_EMPTY,
+
     EL_SP_EMPTY,
     EL_SP_ZONK,
     EL_SP_BASE,

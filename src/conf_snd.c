@@ -145,7 +145,7 @@ struct ConfigInfo sound_config[] =
   { "pearl.impact",			"pling.wav"		},
   { "crystal.collecting",		"pong.wav"		},
   { "crystal.impact",			"pling.wav"		},
-  { "envelope.collecting",		"pong.wav"		},
+  { "[envelope].collecting",		"pong.wav"		},
   { "invisible_sand.digging",		"schlurf.wav"		},
   { "shield_normal.collecting",		"pong.wav"		},
   { "shield_normal.active",		UNDEFINED_FILENAME	},

@@ -1644,7 +1644,7 @@ void DrawEnvelopeBackground(int dst_x, int dst_y, int ex, int ey, int font_nr)
 }
 #endif
 
-void ShowEnvelope()
+void ShowEnvelope(int envelope_nr)
 {
   int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
   boolean draw_masked = graphic_info[graphic].draw_masked;
@@ -1655,47 +1655,54 @@ void ShowEnvelope()
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   int anim_delay = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay = (ffwd_delay ? 500 : 1000);
+  int start_pos_vertically = 0;
   int i, x, y;
 
-  /* open envelope window horizontally */
-  for (i = 0; i <= level.envelope_xsize; i++)
+  if (game.envelope.anim_mode > 1)
   {
-    int xsize = i + 2;
-    int ysize = 2;
-    int startx = (SXSIZE - xsize * font_width)  / 2;
-    int starty = (SYSIZE - ysize * font_height) / 2;
+    /* open envelope window horizontally */
+    for (i = 0; i <= level.envelope_xsize[envelope_nr]; i++)
+    {
+      int xsize = i + 2;
+      int ysize = 2;
+      int startx = (SXSIZE - xsize * font_width)  / 2;
+      int starty = (SYSIZE - ysize * font_height) / 2;
 
-    SetDrawtoField(DRAW_BUFFERED);
+      SetDrawtoField(DRAW_BUFFERED);
 
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+      BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
-    SetDrawtoField(DRAW_BACKBUFFER);
+      SetDrawtoField(DRAW_BACKBUFFER);
 
 #if 1
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
 #else
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + startx + x * font_width;
-      int sy = SY + starty + y * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+      {
+	int sx = SX + startx + x * font_width;
+	int sy = SY + starty + y * font_height;
+	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
+	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
 
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
+	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
+      }
 #endif
 
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
+      redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+      BackToFront();
 
-    Delay(anim_delay);
+      Delay(anim_delay / 2);
+    }
   }
 
+  if (game.envelope.anim_mode < 1)
+    start_pos_vertically = level.envelope_ysize[envelope_nr];
+
   /* open envelope window vertically */
-  for (i = 0; i <= level.envelope_ysize; i++)
+  for (i = start_pos_vertically; i <= level.envelope_ysize[envelope_nr]; i++)
   {
-    int xsize = level.envelope_xsize + 2;
+    int xsize = level.envelope_xsize[envelope_nr] + 2;
     int ysize = i + 2;
     int startx = (SXSIZE - xsize * font_width)  / 2;
     int starty = (SYSIZE - ysize * font_height) / 2;
@@ -1721,9 +1728,9 @@ void ShowEnvelope()
     }
 #endif
 
-    DrawTextToTextArea(SX + startx + font_width,
-		       SY + starty + font_height, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i, mask_mode);
+    DrawTextToTextArea(SX + startx + font_width, SY + starty + font_height,
+		       level.envelope_text[envelope_nr], FONT_TEXT_1,
+		       level.envelope_xsize[envelope_nr], i, mask_mode);
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
@@ -1736,78 +1743,84 @@ void ShowEnvelope()
   else
     WaitForEventToContinue();
 
-  /* close envelope window vertically */
-  for (i = level.envelope_ysize; i >= 0; i--)
+  if (game.envelope.anim_mode > 0)
   {
-    int xsize = level.envelope_xsize + 2;
-    int ysize = i + 2;
-    int startx = (SXSIZE - xsize * font_width)  / 2;
-    int starty = (SYSIZE - ysize * font_height) / 2;
+    /* close envelope window vertically */
+    for (i = level.envelope_ysize[envelope_nr]; i >= 0; i--)
+    {
+      int xsize = level.envelope_xsize[envelope_nr] + 2;
+      int ysize = i + 2;
+      int startx = (SXSIZE - xsize * font_width)  / 2;
+      int starty = (SYSIZE - ysize * font_height) / 2;
 
-    SetDrawtoField(DRAW_BUFFERED);
+      SetDrawtoField(DRAW_BUFFERED);
 
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+      BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
-    SetDrawtoField(DRAW_BACKBUFFER);
+      SetDrawtoField(DRAW_BACKBUFFER);
 
 #if 1
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
 #else
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + startx + x * font_width;
-      int sy = SY + starty + y * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+      {
+	int sx = SX + startx + x * font_width;
+	int sy = SY + starty + y * font_height;
+	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
+	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
 
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
+	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
+      }
 #endif
 
-    DrawTextToTextArea(SX + startx + font_width,
-		       SY + starty + font_height, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i, mask_mode);
+      DrawTextToTextArea(SX + startx + font_width, SY + starty + font_height,
+			 level.envelope_text[envelope_nr], FONT_TEXT_1,
+			 level.envelope_xsize[envelope_nr], i, mask_mode);
 
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
+      redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+      BackToFront();
 
-    Delay(anim_delay);
+      Delay(anim_delay);
+    }
   }
 
-  /* close envelope window horizontally */
-  for (i = level.envelope_xsize; i >= 0; i--)
+  if (game.envelope.anim_mode > 1)
   {
-    int xsize = i + 2;
-    int ysize = 2;
-    int startx = (SXSIZE - xsize * font_width)  / 2;
-    int starty = (SYSIZE - ysize * font_height) / 2;
+    /* close envelope window horizontally */
+    for (i = level.envelope_xsize[envelope_nr]; i >= 0; i--)
+    {
+      int xsize = i + 2;
+      int ysize = 2;
+      int startx = (SXSIZE - xsize * font_width)  / 2;
+      int starty = (SYSIZE - ysize * font_height) / 2;
 
-    SetDrawtoField(DRAW_BUFFERED);
+      SetDrawtoField(DRAW_BUFFERED);
 
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+      BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
-    SetDrawtoField(DRAW_BACKBUFFER);
+      SetDrawtoField(DRAW_BACKBUFFER);
 
 #if 1
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
 #else
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + startx + x * font_width;
-      int sy = SY + starty + y * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
+      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
+      {
+	int sx = SX + startx + x * font_width;
+	int sy = SY + starty + y * font_height;
+	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
+	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
 
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
+	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
+      }
 #endif
 
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
+      redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+      BackToFront();
 
-    Delay(anim_delay);
+      Delay(anim_delay / 2);
+    }
   }
 
   SetDrawtoField(DRAW_BUFFERED);
@@ -2477,7 +2490,7 @@ unsigned int MoveDoor(unsigned int door_state)
       if (door_state & DOOR_ACTION_1)
       {
 	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
-	int j = (DXSIZE - i) / 3;
+	int j = (door.anim_mode == 0 ? (DXSIZE - i) / 3 : 0);
 
 	BlitBitmap(bitmap_db_door, drawto,
 		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i/2,
@@ -2485,34 +2498,50 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	ClearRectangle(drawto, DX, DY + DYSIZE - i/2, DXSIZE,i/2);
 
-	SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE, DOOR_GFX_PAGEY1, i, 77,
-			 DX + DXSIZE - i, DY + j);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63,
-			 DX + DXSIZE - i, DY + 140 + j);
-	SetClipOrigin(bitmap, gc, DX - DXSIZE + i, DY - (DOOR_GFX_PAGEY1 + j));
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j,
-			 DX, DY);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63,
-			 DX, DY + 140 - j);
+	if (door.anim_mode == 0)
+	{
+	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE, DOOR_GFX_PAGEY1, i, 77,
+			   DX + DXSIZE - i, DY + j);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63,
+			   DX + DXSIZE - i, DY + 140 + j);
+	  SetClipOrigin(bitmap, gc, DX - DXSIZE + i,
+			DY - (DOOR_GFX_PAGEY1 + j));
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j,
+			   DX, DY);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63,
+			   DX, DY + 140 - j);
 
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
-			 DX, DY + 77 - j);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
-			 DX, DY + 203 - j);
-	SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
-			 DX + DXSIZE - i, DY + 77 + j);
-	BlitBitmapMasked(bitmap, drawto,
-			 DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
-			 DX + DXSIZE - i, DY + 203 + j);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
+			   DX, DY + 77 - j);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
+			   DX, DY + 203 - j);
+	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
+			   DX + DXSIZE - i, DY + 77 + j);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
+			   DX + DXSIZE - i, DY + 203 + j);
+	}
+	else
+	{
+	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE, DOOR_GFX_PAGEY1, i, DYSIZE,
+			   DX + DXSIZE - i, DY);
+
+	  SetClipOrigin(bitmap, gc, DX - DXSIZE + i, DY - DOOR_GFX_PAGEY1);
+	  BlitBitmapMasked(bitmap, drawto,
+			   DXSIZE - i, DOOR_GFX_PAGEY1, i, DYSIZE,
+			   DX, DY);
+	}
 
 	redraw_mask |= REDRAW_DOOR_1;
       }

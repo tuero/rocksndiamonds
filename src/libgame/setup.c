@@ -2401,6 +2401,7 @@ void LoadLevelArtworkInfo()
   LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first);
 
   /* needed for reloading level artwork not known at ealier stage */
+
   if (strcmp(artwork.gfx_current_identifier, setup.graphics_set) != 0)
   {
     artwork.gfx_current =

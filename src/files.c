@@ -143,9 +143,12 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   strcpy(level->name, NAMELESS_LEVEL_NAME);
   strcpy(level->author, ANONYMOUS_NAME);
 
-  level->envelope[0] = '\0';
-  level->envelope_xsize = MAX_ENVELOPE_XSIZE;
-  level->envelope_ysize = MAX_ENVELOPE_YSIZE;
+  for (i=0; i<4; i++)
+  {
+    level->envelope_text[i][0] = '\0';
+    level->envelope_xsize[i] = MAX_ENVELOPE_XSIZE;
+    level->envelope_ysize[i] = MAX_ENVELOPE_YSIZE;
+  }
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = 10;
@@ -274,15 +277,63 @@ boolean LevelFileExists(int level_nr)
 
 static int checkLevelElement(int element)
 {
+  /* map some (historic, now obsolete) elements */
+
+#if 1
+  switch (element)
+  {
+    case EL_PLAYER_OBSOLETE:
+      element = EL_PLAYER_1;
+      break;
+
+    case EL_KEY_OBSOLETE:
+      element = EL_KEY_1;
+
+    case EL_EM_KEY_1_FILE_OBSOLETE:
+      element = EL_EM_KEY_1;
+      break;
+
+    case EL_EM_KEY_2_FILE_OBSOLETE:
+      element = EL_EM_KEY_2;
+      break;
+
+    case EL_EM_KEY_3_FILE_OBSOLETE:
+      element = EL_EM_KEY_3;
+      break;
+
+    case EL_EM_KEY_4_FILE_OBSOLETE:
+      element = EL_EM_KEY_4;
+      break;
+
+    case EL_ENVELOPE_OBSOLETE:
+      element = EL_ENVELOPE_1;
+      break;
+
+    case EL_SP_EMPTY:
+      element = EL_EMPTY;
+      break;
+
+    default:
+      if (element >= NUM_FILE_ELEMENTS)
+      {
+	Error(ERR_WARN, "invalid level element %d", element);
+
+	element = EL_CHAR_QUESTION;
+      }
+      break;
+  }
+#else
   if (element >= NUM_FILE_ELEMENTS)
   {
     Error(ERR_WARN, "invalid level element %d", element);
+
     element = EL_CHAR_QUESTION;
   }
   else if (element == EL_PLAYER_OBSOLETE)
     element = EL_PLAYER_1;
   else if (element == EL_KEY_OBSOLETE)
     element = EL_KEY_1;
+#endif
 
   return element;
 }
@@ -460,13 +511,20 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i;
   int element;
+  int envelope_nr;
   int envelope_len;
   int chunk_size_expected;
 
   element = checkLevelElement(getFile16BitBE(file));
+  if (!IS_ENVELOPE(element))
+    element = EL_ENVELOPE_1;
+
+  envelope_nr = element - EL_ENVELOPE_1;
+
   envelope_len = getFile16BitBE(file);
-  level->envelope_xsize = getFile8Bit(file);
-  level->envelope_ysize = getFile8Bit(file);
+
+  level->envelope_xsize[envelope_nr] = getFile8Bit(file);
+  level->envelope_ysize[envelope_nr] = getFile8Bit(file);
 
   ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT3_UNUSED);
 
@@ -479,7 +537,7 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
   }
 
   for(i=0; i < envelope_len; i++)
-    level->envelope[i] = getFile8Bit(file);
+    level->envelope_text[envelope_nr][i] = getFile8Bit(file);
 
   return chunk_size;
 }
@@ -1363,17 +1421,18 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 static void SaveLevel_CNT3(FILE *file, struct LevelInfo *level, int element)
 {
   int i;
-  int envelope_len = strlen(level->envelope) + 1;
+  int envelope_nr = element - EL_ENVELOPE_1;
+  int envelope_len = strlen(level->envelope_text[envelope_nr]) + 1;
 
   putFile16BitBE(file, element);
   putFile16BitBE(file, envelope_len);
-  putFile8Bit(file, level->envelope_xsize);
-  putFile8Bit(file, level->envelope_ysize);
+  putFile8Bit(file, level->envelope_xsize[envelope_nr]);
+  putFile8Bit(file, level->envelope_ysize[envelope_nr]);
 
   WriteUnusedBytesToFile(file, LEVEL_CHUNK_CNT3_UNUSED);
 
   for(i=0; i < envelope_len; i++)
-    putFile8Bit(file, level->envelope[i]);
+    putFile8Bit(file, level->envelope_text[envelope_nr][i]);
 }
 
 #if 0
@@ -1663,12 +1722,15 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   }
 
   /* check for envelope content */
-  if (strlen(level->envelope) > 0)
+  for (i=0; i<4; i++)
   {
-    int envelope_len = strlen(level->envelope) + 1;
+    if (strlen(level->envelope_text[i]) > 0)
+    {
+      int envelope_len = strlen(level->envelope_text[i]) + 1;
 
-    putFileChunkBE(file, "CNT3", LEVEL_CHUNK_CNT3_HEADER + envelope_len);
-    SaveLevel_CNT3(file, level, EL_ENVELOPE);
+      putFileChunkBE(file, "CNT3", LEVEL_CHUNK_CNT3_HEADER + envelope_len);
+      SaveLevel_CNT3(file, level, EL_ENVELOPE_1 + i);
+    }
   }
 
   /* check for non-default custom elements (unless using template level) */
@@ -2749,6 +2811,20 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
+static int get_special_integer_from_string(char *string_raw)
+{
+  char *string = getStringToLower(string_raw);
+  int value = (strcmp(string, "none")  == 0 ? 0 :
+	       strcmp(string, "short") == 0 ? 1 :
+	       strcmp(string, "full")  == 0 ? 2 :
+	       strcmp(string, "default")  == 0 ? 0 :
+	       strcmp(string, "curtain")  == 0 ? 1 : -1);
+
+  free(string);
+
+  return value;
+}
+
 void LoadSpecialMenuDesignSettings()
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
@@ -2759,8 +2835,15 @@ void LoadSpecialMenuDesignSettings()
   for (i=0; image_config_vars[i].token != NULL; i++)
     for (j=0; image_config[j].token != NULL; j++)
       if (strcmp(image_config_vars[i].token, image_config[j].token) == 0)
-	*image_config_vars[i].value =
-	  get_integer_from_string(image_config[j].value);
+      {
+	if (strcmp(image_config_vars[i].token, "game.envelope.anim_mode") == 0
+	    || strcmp(image_config_vars[i].token, "door.anim_mode") == 0)
+	  *image_config_vars[i].value =
+	    get_special_integer_from_string(image_config[j].value);
+	else
+	  *image_config_vars[i].value =
+	    get_integer_from_string(image_config[j].value);
+      }
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
@@ -2786,7 +2869,13 @@ void LoadSpecialMenuDesignSettings()
     char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
 
     if (value != NULL)
-      *image_config_vars[i].value = get_integer_from_string(value);
+    {
+      if (strcmp(image_config_vars[i].token, "game.envelope.anim_mode") == 0
+	  || strcmp(image_config_vars[i].token, "door.anim_mode") == 0)
+	*image_config_vars[i].value = get_special_integer_from_string(value);
+      else
+	*image_config_vars[i].value = get_integer_from_string(value);
+    }
   }
 
   freeSetupFileHash(setup_file_hash);

@@ -140,8 +140,8 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "key_obsolete",
-    "key",
-    "key"
+    "obsolete",
+    "key (OBSOLETE)"
   },
   {
     "emerald",
@@ -155,8 +155,8 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "player_obsolete",
-    "player",
-    "player"
+    "obsolete",
+    "player (OBSOLETE)"
   },
   {
     "bug",
@@ -700,9 +700,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "fire breathing dragon"
   },
   {
-    "em_key_1_file",
-    "key",
-    "red key (EM style)"
+    "em_key_1_file_obsolete",
+    "obsolete",
+    "key (OBSOLETE)"
   },
   {
     "char_space",
@@ -1140,19 +1140,19 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "blue door (EM style)"
   },
   {
-    "em_key_2_file",
-    "key",
-    "yellow key (EM style)"
+    "em_key_2_file_obsolete",
+    "obsolete",
+    "key (OBSOLETE)"
   },
   {
-    "em_key_3_file",
-    "key",
-    "green key (EM style)"
+    "em_key_3_file_obsolete",
+    "obsolete",
+    "key (OBSOLETE)"
   },
   {
-    "em_key_4_file",
-    "key",
-    "blue key (EM style)"
+    "em_key_4_file_obsolete",
+    "obsolete",
+    "key (OBSOLETE)"
   },
   {
     "sp_empty_space",
@@ -1585,9 +1585,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "land mine"
   },
   {
-    "envelope",
-    "envelope",
-    "mail envelope"
+    "envelope_obsolete",
+    "obsolete",
+    "envelope (OBSOLETE)"
   },
   {
     "light_switch",
@@ -3184,31 +3184,51 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "custom",
     "custom element 256"
   },
+  {
+    "em_key_1",
+    "key",
+    "red key (EM style)"
+    },
+  {
+    "em_key_2",
+    "key",
+    "yellow key (EM style)"
+    },
+  {
+    "em_key_3",
+    "key",
+    "green key (EM style)"
+  },
+  {
+    "em_key_4",
+    "key",
+    "blue key (EM style)"
+  },
+  {
+    "envelope_1",
+    "envelope",
+    "mail envelope 1"
+  },
+  {
+    "envelope_2",
+    "envelope",
+    "mail envelope 2"
+  },
+  {
+    "envelope_3",
+    "envelope",
+    "mail envelope 3"
+  },
+  {
+    "envelope_4",
+    "envelope",
+    "mail envelope 4"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
   /* ----------------------------------------------------------------------- */
 
-  {
-    "em_key_1",
-    "key",
-    "-"
-    },
-  {
-    "em_key_2",
-    "key",
-    "-"
-    },
-  {
-    "em_key_3",
-    "key",
-    "-"
-  },
-  {
-    "em_key_4",
-    "key",
-    "-"
-  },
   {
     "dynabomb_player_1_active",
     "dynabomb",
@@ -3729,6 +3749,9 @@ struct TokenIntPtrInfo image_config_vars[] =
 
   { "door.step_offset",		&door.step_offset			   },
   { "door.step_delay",		&door.step_delay			   },
+  { "door.anim_mode",		&door.anim_mode				   },
+
+  { "game.envelope.anim_mode",	&game.envelope.anim_mode		   },
 
   { NULL,			NULL,					   }
 };
