@@ -1351,6 +1351,7 @@ static void InitGameEngine()
     element_info[e].move_stepsize = move_stepsize_list[i].move_stepsize;
   }
 
+#if 0
   /* ---------- initialize move dig/leave ---------------------------------- */
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -1358,6 +1359,7 @@ static void InitGameEngine()
     element_info[i].can_leave_element = FALSE;
     element_info[i].can_leave_element_last = FALSE;
   }
+#endif
 
   /* ---------- initialize gem count --------------------------------------- */
 
@@ -5556,8 +5558,15 @@ void StartMoving(int x, int y)
 	PlayLevelSoundAction(x, y, action);
       }
 
+#if 1
+      Store[newx][newy] = EL_EMPTY;
+      if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)) ||
+	  element_info[element].move_leave_type == LEAVE_TYPE_UNLIMITED)
+	Store[newx][newy] = element_info[element].move_leave_element;
+#else
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
 	element_info[element].can_leave_element = TRUE;
+#endif
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
       {
@@ -5864,8 +5873,21 @@ void ContinueMoving(int x, int y)
   {
     element = Feld[newx][newy] = EL_ACID;
   }
+#if 1
+  else if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
+	   ei->move_leave_element != EL_EMPTY && Store[x][y] != EL_EMPTY)
+  {
+    /* some elements can leave other elements behind after moving */
 
-  Store[x][y] = 0;
+    Feld[x][y] = Store[x][y];
+    InitField(x, y, FALSE);
+
+    if (GFX_CRUMBLED(Feld[x][y]))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
+  }
+#endif
+
+  Store[x][y] = EL_EMPTY;
   MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
   MovDelay[newx][newy] = 0;
 
@@ -5893,7 +5915,7 @@ void ContinueMoving(int x, int y)
 
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
-#if 1
+#if 0
   /* some elements can leave other elements behind after moving */
   if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
       ei->move_leave_element != EL_EMPTY &&

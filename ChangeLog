@@ -1,6 +1,7 @@
 2004-03-20
 	* added copy and paste functions for custom change pages
 	* enhanced graphical display and functionality of tape recorder
+	* fixed bug with custom elements digging and leaving elements
 
 2004-03-19
 	* added move speed faster than "very fast" for custom elements

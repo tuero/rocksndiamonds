@@ -1671,8 +1671,10 @@ struct ElementInfo
 
   boolean in_group[NUM_GROUP_ELEMENTS];
 
+#if 0
   boolean can_leave_element;	/* element can leave other element behind */
   boolean can_leave_element_last;
+#endif
 
   /* ---------- internal values used in level editor ---------- */
 
