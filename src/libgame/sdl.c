@@ -886,7 +886,9 @@ inline void SDLOpenAudio(void)
   audio.sound_enabled = TRUE;
 
   /* set number of available mixer channels */
-  audio.channels = Mix_AllocateChannels(NUM_MIXER_CHANNELS);
+  audio.num_channels = Mix_AllocateChannels(NUM_MIXER_CHANNELS);
+  audio.music_channel = MUSIC_CHANNEL;
+  audio.first_sound_channel = FIRST_SOUND_CHANNEL;
 
   /* reserve first channel for music loops */
   if (Mix_ReserveChannels(1) == 1)
@@ -896,6 +898,8 @@ inline void SDLOpenAudio(void)
 
   Mix_Volume(-1, SOUND_MAX_VOLUME);
   Mix_VolumeMusic(SOUND_MAX_VOLUME);
+
+  InitPlaylist();
 }
 
 inline void SDLCloseAudio(void)

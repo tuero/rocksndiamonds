@@ -241,8 +241,9 @@ struct AudioSystemInfo
   char *device_name;
   int device_fd;
 
-  int channels;
+  int num_channels;
   int music_channel;
+  int first_sound_channel;
 };
 
 struct GfxInfo

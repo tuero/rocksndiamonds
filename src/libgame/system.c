@@ -747,8 +747,9 @@ inline void OpenAudio(void)
   audio.device_name = NULL;
   audio.device_fd = -1;
 
-  audio.channels = 0;
+  audio.num_channels = 0;
   audio.music_channel = 0;
+  audio.first_sound_channel = 0;
 
 #if defined(TARGET_SDL)
   SDLOpenAudio();

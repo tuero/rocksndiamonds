@@ -931,9 +931,13 @@ void MSDOSOpenAudio(void)
     audio.music_available = TRUE;
     audio.loops_available = TRUE;
     audio.sound_enabled = TRUE;
-  }
 
-  InitPlaylist();
+    audio.num_channels = NUM_MIXER_CHANNELS;
+    audio.music_channel = MUSIC_CHANNEL;
+    audio.first_sound_channel = FIRST_SOUND_CHANNEL;
+
+    InitPlaylist();
+  }
 }
 
 void MSDOSCloseAudio(void)
