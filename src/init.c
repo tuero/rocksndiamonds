@@ -1216,17 +1216,17 @@ static void InitSoundInfo()
   sound_info = checked_calloc(num_sounds * sizeof(struct SoundInfo));
 
   /* initialize sound effect for all elements to "no sound" */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    for (j=0; j<NUM_ACTIONS; j++)
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    for (j=0; j < NUM_ACTIONS; j++)
       element_info[i].sound[j] = SND_UNDEFINED;
 
-  for (i=0; i<num_sounds; i++)
+  for (i=0; i < num_sounds; i++)
   {
     struct FileInfo *sound = getSoundListEntry(i);
     int len_effect_text = strlen(sound->token);
 
     sound_effect_properties[i] = ACTION_OTHER;
-    sound_info[i].loop = FALSE;
+    sound_info[i].loop = FALSE;		/* default: play sound only once */
 
 #if 0
     printf("::: sound %d: '%s'\n", i, sound->token);
@@ -1256,7 +1256,7 @@ static void InitSoundInfo()
 
     /* associate elements and some selected sound actions */
 
-    for (j=0; j<MAX_NUM_ELEMENTS; j++)
+    for (j=0; j < MAX_NUM_ELEMENTS; j++)
     {
       if (element_info[j].class_name)
       {
@@ -1335,6 +1335,132 @@ static void InitSoundInfo()
 #endif
 }
 
+static void InitLevelsetMusicInfo()
+{
+  struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
+  int num_property_mappings = getMusicListPropertyMappingSize();
+  int i, j;
+
+  /* set values to -1 to identify later as "uninitialized" values */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    for (j=0; j < MAX_LEVELS; j++)
+      levelset.music[i][j] = -1;
+
+#if 0
+  /* initialize gamemode/music mapping from static configuration */
+  for (i=0; gamemode_to_music[i].element > -1; i++)
+  {
+    int gamemode = gamemode_to_music[i].gamemode;
+    int level    = gamemode_to_music[i].level;
+    int music    = gamemode_to_music[i].music;
+
+    if (gamemode < 0)
+      gamemode = 0;
+
+    if (level < 0)
+      level = 0;
+
+    levelset.music[gamemode][level] = music;
+  }
+#endif
+
+  /* initialize gamemode/music mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int prefix   = property_mapping[i].base_index;
+    int gamemode = property_mapping[i].ext1_index;
+    int level    = property_mapping[i].ext2_index;
+    int music    = property_mapping[i].artwork_index;
+
+    if (prefix < 0 || prefix >= NUM_MUSIC_PREFIXES)
+      continue;
+
+    if (gamemode < 0)
+      gamemode = 0;
+
+    if (level < 0)
+      level = 0;
+
+    levelset.music[gamemode][level] = music;
+  }
+
+  /* now set all '-1' values to levelset specific default values */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    for (j=0; j < MAX_LEVELS; j++)
+    {
+      /* generic default music */
+      int default_music = levelset.music[i][0];		/* may still be -1 */
+
+      /* no music for this specific game mode and level -- use default music */
+      if (levelset.music[i][j] == -1)
+	levelset.music[i][j] = default_music;
+    }
+  }
+
+#if 0
+  /* TEST ONLY */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    for (j=0; j < MAX_LEVELS; j++)
+      if (levelset.music[i][j] != -1)
+	printf("::: levelset.music[%d][%d] == %d\n",
+	       i, j, levelset.music[i][j]);
+#endif
+}
+
+static void set_music_parameters(int music, char **parameter_raw)
+{
+  int parameter[NUM_MUS_ARGS];
+  int i;
+
+  /* get integer values from string parameters */
+  for (i=0; i < NUM_MUS_ARGS; i++)
+    parameter[i] =
+      get_parameter_value(music_config_suffix[i].token, parameter_raw[i],
+			  music_config_suffix[i].type);
+
+  /* explicit loop mode setting in configuration overrides default value */
+  if (parameter[MUS_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
+    music_info[music].loop = parameter[MUS_ARG_MODE_LOOP];
+}
+
+static void InitMusicInfo()
+{
+  int num_music = getMusicListSize();
+  int i, j;
+
+  if (music_info != NULL)
+    free(music_info);
+
+  music_info = checked_calloc(num_music * sizeof(struct MusicInfo));
+
+  for (i=0; i < num_music; i++)
+  {
+    struct FileInfo *music = getMusicListEntry(i);
+    int len_music_text = strlen(music->token);
+
+    music_info[i].loop = TRUE;		/* default: play music in loop mode */
+
+    /* determine all loop music */
+
+    for (j=0; music_prefix_info[j].prefix; j++)
+    {
+      int len_prefix_text = strlen(music_prefix_info[j].prefix);
+
+      if (len_prefix_text < len_music_text &&
+	  strncmp(music->token,
+		  music_prefix_info[j].prefix, len_prefix_text) == 0)
+      {
+	music_info[i].loop = music_prefix_info[j].is_loop_music;
+
+	break;
+      }
+    }
+
+    set_music_parameters(i, music->parameter);
+  }
+}
+
 static void ReinitializeGraphics()
 {
   InitGraphicInfo();			/* graphic properties mapping */
@@ -1356,12 +1482,13 @@ static void ReinitializeSounds()
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
 
-  InitPlaySoundLevel();		/* internal game sound settings */
+  InitPlayLevelSound();		/* internal game sound settings */
 }
 
 static void ReinitializeMusic()
 {
-  /* currently nothing to do */
+  InitMusicInfo();		/* music properties mapping */
+  InitLevelsetMusicInfo();	/* levelset music mapping */
 }
 
 void InitElementPropertiesStatic()
@@ -3128,6 +3255,18 @@ static char *get_string_in_brackets(char *string)
   return string_in_brackets;
 }
 
+static char *get_level_id_suffix(int id_nr)
+{
+  char *id_suffix = checked_malloc(1 + 3 + 1);
+
+  if (id_nr < 0 || id_nr > 999)
+    id_nr = 0;
+
+  sprintf(id_suffix, ".%03d", id_nr);
+
+  return id_suffix;
+}
+
 #if 0
 static char *get_element_class_token(int element)
 {
@@ -3154,9 +3293,11 @@ static void InitArtworkConfig()
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
   static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
+  static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
+  static char *level_id_suffix[MAX_LEVELS + 1];
   static char *dummy[1] = { NULL };
   static char *ignore_generic_tokens[] =
   {
@@ -3164,9 +3305,13 @@ static void InitArtworkConfig()
     "sort_priority",
     NULL
   };
-  static char **ignore_image_tokens, **ignore_sound_tokens;
+  static char **ignore_image_tokens;
+  static char **ignore_sound_tokens;
+  static char **ignore_music_tokens;
   int num_ignore_generic_tokens;
-  int num_ignore_image_tokens, num_ignore_sound_tokens;
+  int num_ignore_image_tokens;
+  int num_ignore_sound_tokens;
+  int num_ignore_music_tokens;
   int i;
 
   /* dynamically determine list of generic tokens to be ignored */
@@ -3195,30 +3340,46 @@ static void InitArtworkConfig()
     ignore_sound_tokens[i] = ignore_generic_tokens[i];
   ignore_sound_tokens[num_ignore_sound_tokens] = NULL;
 
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  /* dynamically determine list of music tokens to be ignored */
+  num_ignore_music_tokens = num_ignore_generic_tokens;
+  ignore_music_tokens =
+    checked_malloc((num_ignore_music_tokens + 1) * sizeof(char *));
+  for (i=0; i < num_ignore_generic_tokens; i++)
+    ignore_music_tokens[i] = ignore_generic_tokens[i];
+  ignore_music_tokens[num_ignore_music_tokens] = NULL;
+
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
     image_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i<NUM_FONTS; i++)
+  for (i=0; i < NUM_FONTS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
   image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
 
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[MAX_NUM_ELEMENTS + i] =
       get_string_in_brackets(element_info[i].class_name);
   sound_id_prefix[2 * MAX_NUM_ELEMENTS] = NULL;
 
-  for (i=0; i<NUM_ACTIONS; i++)
+  for (i=0; i < NUM_MUSIC_PREFIXES; i++)
+    music_id_prefix[i] = music_prefix_info[i].prefix;
+  music_id_prefix[MAX_LEVELS] = NULL;
+
+  for (i=0; i < NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;
   action_id_suffix[NUM_ACTIONS] = NULL;
 
-  for (i=0; i<NUM_DIRECTIONS; i++)
+  for (i=0; i < NUM_DIRECTIONS; i++)
     direction_id_suffix[i] = element_direction_info[i].suffix;
   direction_id_suffix[NUM_DIRECTIONS] = NULL;
 
-  for (i=0; i<NUM_SPECIAL_GFX_ARGS; i++)
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
     special_id_suffix[i] = special_suffix_info[i].suffix;
   special_id_suffix[NUM_SPECIAL_GFX_ARGS] = NULL;
+
+  for (i=0; i < MAX_LEVELS; i++)
+    level_id_suffix[i] = get_level_id_suffix(i);
+  level_id_suffix[MAX_LEVELS] = NULL;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
 		image_id_prefix, action_id_suffix, direction_id_suffix,
@@ -3226,6 +3387,9 @@ static void InitArtworkConfig()
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
 		sound_id_prefix, action_id_suffix, dummy,
 		special_id_suffix, ignore_sound_tokens);
+  InitMusicList(music_config, NUM_MUSIC_FILES, music_config_suffix,
+		music_id_prefix, special_id_suffix, level_id_suffix,
+		dummy, ignore_music_tokens);
 }
 
 static void InitMixer()

@@ -2058,7 +2058,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     /* ---------- step 0: search for matching base prefix ---------- */
 
     start_pos = 0;
-    for (i=0; i<num_base_prefixes && !base_prefix_found; i++)
+    for (i=0; i < num_base_prefixes && !base_prefix_found; i++)
     {
       char *base_prefix = base_prefixes[i];
       int len_base_prefix = strlen(base_prefix);
@@ -2103,7 +2103,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       /* ---------- step 1: search for matching first suffix ---------- */
 
       start_pos += len_base_prefix;
-      for (j=0; j<num_ext1_suffixes && !ext1_suffix_found; j++)
+      for (j=0; j < num_ext1_suffixes && !ext1_suffix_found; j++)
       {
 	char *ext1_suffix = ext1_suffixes[j];
 	int len_ext1_suffix = strlen(ext1_suffix);
@@ -2145,12 +2145,12 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       /* ---------- step 2: search for matching second suffix ---------- */
 
-      for (k=0; k<num_ext2_suffixes && !ext2_suffix_found; k++)
+      for (k=0; k < num_ext2_suffixes && !ext2_suffix_found; k++)
       {
 	char *ext2_suffix = ext2_suffixes[k];
 	int len_ext2_suffix = strlen(ext2_suffix);
 
-	ext2_suffix_found = token_suffix_match(token, ext2_suffix,start_pos);
+	ext2_suffix_found = token_suffix_match(token, ext2_suffix, start_pos);
 
 	if (!ext2_suffix_found)
 	  continue;
@@ -2187,12 +2187,12 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       /* ---------- step 3: search for matching third suffix ---------- */
 
-      for (l=0; l<num_ext3_suffixes && !ext3_suffix_found; l++)
+      for (l=0; l < num_ext3_suffixes && !ext3_suffix_found; l++)
       {
 	char *ext3_suffix = ext3_suffixes[l];
 	int len_ext3_suffix = strlen(ext3_suffix);
 
-	ext3_suffix_found =token_suffix_match(token,ext3_suffix,start_pos);
+	ext3_suffix_found = token_suffix_match(token, ext3_suffix, start_pos);
 
 	if (!ext3_suffix_found)
 	  continue;

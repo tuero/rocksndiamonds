@@ -135,16 +135,23 @@ void PlaySoundExt(int, int, int, int);
 void FadeMusic(void);
 void FadeSound(int);
 void FadeSounds(void);
+void FadeSoundsAndMusic(void);
 void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
 
 int getSoundListSize();
+int getMusicListSize();
 struct FileInfo *getSoundListEntry(int);
+struct FileInfo *getMusicListEntry(int);
 int getSoundListPropertyMappingSize();
+int getMusicListPropertyMappingSize();
 struct PropertyMapping *getSoundListPropertyMapping();
+struct PropertyMapping *getMusicListPropertyMapping();
 void InitSoundList(struct ConfigInfo *, int, struct ConfigInfo *,
+		   char **, char **, char **, char **, char **);
+void InitMusicList(struct ConfigInfo *, int, struct ConfigInfo *,
 		   char **, char **, char **, char **, char **);
 void InitReloadCustomSounds(char *);
 void InitReloadCustomMusic(char *);

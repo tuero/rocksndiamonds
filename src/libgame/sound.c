@@ -149,14 +149,19 @@ struct SoundControl
 typedef struct SoundControl SoundControl;
 
 static struct ArtworkListInfo *sound_info = NULL;
+static struct ArtworkListInfo *music_info = NULL;
+
 #if 0
 static SoundInfo **Sound = NULL;
 #endif
-static MusicInfo **Music = NULL;
+
+static MusicInfo **Music_NoConf = NULL;
+
 #if 0
 static int num_sounds = 0;
 #endif
-static int num_music = 0;
+
+static int num_music_noconf = 0;
 static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 
 
@@ -179,8 +184,11 @@ static int ulaw_to_linear(unsigned char);
 static void ReloadCustomSounds();
 static void ReloadCustomMusic();
 static void FreeSound(void *);
+static void FreeMusic(void *);
+static void FreeAllMusic_NoConf();
 
 static SoundInfo *getSoundInfoEntryFromSoundID(int);
+static MusicInfo *getMusicInfoEntryFromMusicID(int);
 
 
 /* ------------------------------------------------------------------------- */
@@ -826,27 +834,72 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   SoundInfo *snd_info;
   int i, k;
   int num_sounds = getSoundListSize();
+  int num_music  = getMusicListSize();
 
 #if 0
-  printf("NEW SOUND %d ARRIVED [%d] [%d ACTIVE CHANNELS]\n",
-	 snd_ctrl.nr, num_sounds, mixer_active_channels);
+  if (IS_MUSIC(snd_ctrl))
+    printf("NEW MUSIC %d ARRIVED [%d/%d] [%d ACTIVE CHANNELS]\n",
+	   snd_ctrl.nr, num_music, num_music_noconf, mixer_active_channels);
+  else
+    printf("NEW SOUND %d ARRIVED [%d] [%d ACTIVE CHANNELS]\n",
+	   snd_ctrl.nr, num_sounds, mixer_active_channels);
 #endif
 
+#if 0
+  /* !!! TEST ONLY !!! */
+  if (IS_MUSIC(snd_ctrl))
+    snd_ctrl.nr = 0;
+#endif
+
+#if 1
   if (IS_MUSIC(snd_ctrl))
   {
-    if (num_music == 0)
+    if (snd_ctrl.nr >= num_music)	/* invalid music */
       return;
 
-    snd_ctrl.nr = snd_ctrl.nr % num_music;
+    if (snd_ctrl.nr < 0)		/* undefined music */
+    {
+      if (num_music_noconf == 0)	/* no fallback music available */
+	return;
+
+      snd_ctrl.nr = (-(snd_ctrl.nr + 1)) % num_music_noconf;
+      snd_info = Music_NoConf[snd_ctrl.nr];
+    }
+    else
+      snd_info = getMusicInfoEntryFromMusicID(snd_ctrl.nr);
+  }
+  else
+  {
+    if (snd_ctrl.nr >= num_sounds)
+      return;
+
+    snd_info = getSoundInfoEntryFromSoundID(snd_ctrl.nr);
+  }
+
+  /*
+  if (snd_ctrl.nr >= (IS_MUSIC(snd_ctrl) ? num_music : num_sounds))
+    return;
+  */
+#else
+  if (IS_MUSIC(snd_ctrl))
+  {
+    if (num_music_noconf == 0)
+      return;
+
+    snd_ctrl.nr = snd_ctrl.nr % num_music_noconf;
   }
   else if (snd_ctrl.nr >= num_sounds)
     return;
+#endif
 
 #if 0
-  snd_info = (IS_MUSIC(snd_ctrl) ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
-#else
-  snd_info = (IS_MUSIC(snd_ctrl) ? Music[snd_ctrl.nr] :
+#if 1
+  snd_info = (IS_MUSIC(snd_ctrl) ? getMusicInfoEntryFromMusicID(snd_ctrl.nr) :
 	      getSoundInfoEntryFromSoundID(snd_ctrl.nr));
+#else
+  snd_info = (IS_MUSIC(snd_ctrl) ? Music_NoConf[snd_ctrl.nr] :
+	      getSoundInfoEntryFromSoundID(snd_ctrl.nr));
+#endif
 #endif
 
   if (snd_info == NULL)
@@ -862,6 +915,10 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
   {
+#if 0
+    printf("::: slot %d, ptr 0x%08x\n", snd_ctrl.nr, snd_ctrl.data_ptr);
+#endif
+
     Mixer_StopMusicChannel();
 
     mixer[audio.music_channel] = snd_ctrl;
@@ -1783,10 +1840,136 @@ static void *Load_WAV(char *filename)
   return snd_info;
 }
 
+static void *Load_MOD(char *filename)
+{
+#if defined(TARGET_SDL)
+  MusicInfo *mod_info;
+
+  if (!audio.sound_available)
+    return NULL;
+
+  mod_info = checked_calloc(sizeof(MusicInfo));
+
+  if ((mod_info->data_ptr = Mix_LoadMUS(filename)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music file '%s'", filename);
+    free(mod_info);
+    return NULL;
+  }
+
+  mod_info->type = MUS_TYPE_MOD;
+  mod_info->source_filename = getStringCopy(filename);
+
+  return mod_info;
+#else
+  return NULL;
+#endif
+}
+
+void LoadCustomMusic_NoConf(void)
+{
+  static boolean draw_init_text = TRUE;		/* only draw at startup */
+  static char *last_music_directory = NULL;
+  char *music_directory = getCustomMusicDirectory();
+  DIR *dir;
+  struct dirent *dir_entry;
+  int num_music = getMusicListSize();
+
+  if (!audio.sound_available)
+    return;
+
+  if (last_music_directory != NULL &&
+      strcmp(last_music_directory, music_directory) == 0)
+    return;	/* old and new music directory are the same */
+
+  if (last_music_directory != NULL)
+    free(last_music_directory);
+  last_music_directory = getStringCopy(music_directory);
+
+  FreeAllMusic_NoConf();
+
+  if ((dir = opendir(music_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+    audio.music_available = FALSE;
+    return;
+  }
+
+  if (draw_init_text)
+    DrawInitText("Loading music:", 120, FC_GREEN);
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
+  {
+    char *basename = dir_entry->d_name;
+    char *filename = NULL;
+    MusicInfo *mus_info = NULL;
+    boolean music_already_used = FALSE;
+    int i;
+
+    for (i=0; i < num_music; i++)
+    {
+      struct FileInfo *music = getMusicListEntry(i);
+
+#if 0
+      printf("::: -> '%s'\n", music->filename);
+#endif
+
+      if (strcmp(basename, music->filename) == 0)
+      {
+	music_already_used = TRUE;
+	break;
+      }
+    }
+
+    if (music_already_used)
+      continue;
+
+#if 0
+    if (FileIsSound(basename) || FileIsMusic(basename))
+      printf("DEBUG: loading music '%s' ... [%d]\n",
+	     basename, music_already_used);
+#endif
+
+    if (draw_init_text)
+      DrawInitText(basename, 150, FC_YELLOW);
+
+    filename = getPath2(music_directory, basename);
+
+    if (FileIsSound(basename))
+      mus_info = Load_WAV(filename);
+    else if (FileIsMusic(basename))
+      mus_info = Load_MOD(filename);
+
+    free(filename);
+
+    if (mus_info)
+    {
+      num_music_noconf++;
+      Music_NoConf = checked_realloc(Music_NoConf,
+				     num_music_noconf * sizeof(MusicInfo *));
+      Music_NoConf[num_music_noconf - 1] = mus_info;
+    }
+  }
+
+  closedir(dir);
+
+  draw_init_text = FALSE;
+
+  if (num_music_noconf == 0)
+    Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
+	  music_directory);
+}
+
 int getSoundListSize()
 {
   return (sound_info->num_file_list_entries +
 	  sound_info->num_dynamic_file_list_entries);
+}
+
+int getMusicListSize()
+{
+  return (music_info->num_file_list_entries +
+	  music_info->num_dynamic_file_list_entries);
 }
 
 struct FileInfo *getSoundListEntry(int pos)
@@ -1796,6 +1979,15 @@ struct FileInfo *getSoundListEntry(int pos)
 
   return (pos < num_list_entries ? &sound_info->file_list[list_pos] :
 	  &sound_info->dynamic_file_list[list_pos]);
+}
+
+struct FileInfo *getMusicListEntry(int pos)
+{
+  int num_list_entries = music_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+
+  return (pos < num_list_entries ? &music_info->file_list[list_pos] :
+	  &music_info->dynamic_file_list[list_pos]);
 }
 
 static SoundInfo *getSoundInfoEntryFromSoundID(int pos)
@@ -1809,14 +2001,35 @@ static SoundInfo *getSoundInfoEntryFromSoundID(int pos)
   return snd_info[list_pos];
 }
 
+static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
+{
+  int num_list_entries = music_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+  MusicInfo **mus_info =
+    (MusicInfo **)(pos < num_list_entries ? music_info->artwork_list :
+		   music_info->dynamic_artwork_list);
+
+  return mus_info[list_pos];
+}
+
 int getSoundListPropertyMappingSize()
 {
   return sound_info->num_property_mapping_entries;
 }
 
+int getMusicListPropertyMappingSize()
+{
+  return music_info->num_property_mapping_entries;
+}
+
 struct PropertyMapping *getSoundListPropertyMapping()
 {
   return sound_info->property_mapping;
+}
+
+struct PropertyMapping *getMusicListPropertyMapping()
+{
+  return music_info->property_mapping;
 }
 
 void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
@@ -1899,98 +2112,79 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 #endif
 }
 
-static MusicInfo *Load_MOD(char *filename)
+void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
+		   struct ConfigInfo *config_suffix_list,
+		   char **base_prefixes, char **ext1_suffixes,
+		   char **ext2_suffixes, char **ext3_suffixes,
+		   char **ignore_tokens)
 {
-#if defined(TARGET_SDL)
-  MusicInfo *mod_info;
+  int i;
 
-  if (!audio.sound_available)
-    return NULL;
+  music_info = checked_calloc(sizeof(struct ArtworkListInfo));
+  music_info->type = ARTWORK_TYPE_MUSIC;
 
-  mod_info = checked_calloc(sizeof(MusicInfo));
+  /* ---------- initialize file list and suffix lists ---------- */
 
-  if ((mod_info->data_ptr = Mix_LoadMUS(filename)) == NULL)
-  {
-    Error(ERR_WARN, "cannot read music file '%s'", filename);
-    free(mod_info);
-    return NULL;
-  }
+  music_info->num_file_list_entries = num_file_list_entries;
+  music_info->num_dynamic_file_list_entries = 0;
 
-  mod_info->type = MUS_TYPE_MOD;
-  mod_info->source_filename = getStringCopy(filename);
+  music_info->file_list =
+    getFileListFromConfigList(config_list, config_suffix_list, ignore_tokens,
+			      num_file_list_entries);
+  music_info->dynamic_file_list = NULL;
 
-  return mod_info;
-#else
-  return NULL;
-#endif
-}
+  music_info->num_suffix_list_entries = 0;
+  for (i=0; config_suffix_list[i].token != NULL; i++)
+    music_info->num_suffix_list_entries++;
 
-void LoadCustomMusic(void)
-{
-  static boolean draw_init_text = TRUE;		/* only draw at startup */
-  static char *last_music_directory = NULL;
-  char *music_directory = getCustomMusicDirectory();
-  DIR *dir;
-  struct dirent *dir_entry;
+  music_info->suffix_list = config_suffix_list;
 
-  if (!audio.sound_available)
-    return;
+  /* ---------- initialize base prefix and suffixes lists ---------- */
 
-  if (last_music_directory != NULL &&
-      strcmp(last_music_directory, music_directory) == 0)
-    return;	/* old and new music directory are the same */
+  music_info->num_base_prefixes = 0;
+  for (i=0; base_prefixes[i] != NULL; i++)
+    music_info->num_base_prefixes++;
 
-  if (last_music_directory != NULL)
-    free(last_music_directory);
-  last_music_directory = getStringCopy(music_directory);
+  music_info->num_ext1_suffixes = 0;
+  for (i=0; ext1_suffixes[i] != NULL; i++)
+    music_info->num_ext1_suffixes++;
 
-  FreeAllMusic();
+  music_info->num_ext2_suffixes = 0;
+  for (i=0; ext2_suffixes[i] != NULL; i++)
+    music_info->num_ext2_suffixes++;
 
-  if ((dir = opendir(music_directory)) == NULL)
-  {
-    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
-    audio.music_available = FALSE;
-    return;
-  }
+  music_info->num_ext3_suffixes = 0;
+  for (i=0; ext3_suffixes[i] != NULL; i++)
+    music_info->num_ext3_suffixes++;
 
-  if (draw_init_text)
-    DrawInitText("Loading music:", 120, FC_GREEN);
+  music_info->num_ignore_tokens = 0;
+  for (i=0; ignore_tokens[i] != NULL; i++)
+    music_info->num_ignore_tokens++;
 
-  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
-  {
-    char *basename = dir_entry->d_name;
-    char *filename = getPath2(music_directory, basename);
-    MusicInfo *mus_info = NULL;
+  music_info->base_prefixes = base_prefixes;
+  music_info->ext1_suffixes = ext1_suffixes;
+  music_info->ext2_suffixes = ext2_suffixes;
+  music_info->ext3_suffixes = ext3_suffixes;
+  music_info->ignore_tokens = ignore_tokens;
 
-#if 0
-    printf("DEBUG: loading music '%s' ...\n", basename);
-#endif
+  music_info->num_property_mapping_entries = 0;
 
-    if (draw_init_text)
-      DrawInitText(basename, 150, FC_YELLOW);
+  music_info->property_mapping = NULL;
 
-    if (FileIsSound(basename))
-      mus_info = Load_WAV(filename);
-    else if (FileIsMusic(basename))
-      mus_info = Load_MOD(filename);
+  /* ---------- initialize artwork reference and content lists ---------- */
 
-    free(filename);
+  music_info->sizeof_artwork_list_entry = sizeof(MusicInfo *);
 
-    if (mus_info)
-    {
-      num_music++;
-      Music = checked_realloc(Music, num_music * sizeof(MusicInfo *));
-      Music[num_music - 1] = mus_info;
-    }
-  }
+  music_info->artwork_list =
+    checked_calloc(num_file_list_entries * sizeof(MusicInfo *));
+  music_info->dynamic_artwork_list = NULL;
 
-  closedir(dir);
+  music_info->content_list = NULL;
 
-  draw_init_text = FALSE;
+  /* ---------- initialize artwork loading/freeing functions ---------- */
 
-  if (num_music == 0)
-    Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
-	  music_directory);
+  music_info->load_artwork = Load_MOD;
+  music_info->free_artwork = FreeMusic;
 }
 
 void PlayMusic(int nr)
@@ -2066,8 +2260,13 @@ void FadeSound(int nr)
 
 void FadeSounds()
 {
-  FadeMusic();
   StopSoundExt(-1, SND_CTRL_FADE_ALL);
+}
+
+void FadeSoundsAndMusic()
+{
+  FadeSounds();
+  FadeMusic();
 }
 
 void StopMusic(void)
@@ -2125,7 +2324,13 @@ static void ReloadCustomMusic()
   printf("DEBUG: reloading music '%s' ...\n", artwork.mus_current_identifier);
 #endif
 
-  LoadCustomMusic();
+  LoadArtworkConfig(music_info);
+  ReloadCustomArtworkList(music_info);
+
+#if 1
+  /* load all music files from directory not defined in "musicinfo.conf" */
+  LoadCustomMusic_NoConf();
+#endif
 }
 
 void InitReloadCustomSounds(char *set_identifier)
@@ -2147,6 +2352,7 @@ void InitReloadCustomMusic(char *set_identifier)
     return;
 
 #if defined(AUDIO_UNIX_NATIVE)
+  LoadArtworkConfig(music_info);	/* also load config on sound client */
   WriteReloadInfoToPipe(set_identifier, SND_CTRL_RELOAD_MUSIC);
 #else
   ReloadCustomMusic();
@@ -2177,8 +2383,10 @@ void FreeSound(void *ptr)
   free(sound);
 }
 
-void FreeMusic(MusicInfo *music)
+void FreeMusic(void *ptr)
 {
+  MusicInfo *music = (MusicInfo *)ptr;
+
   if (music == NULL)
     return;
 
@@ -2199,6 +2407,22 @@ void FreeMusic(MusicInfo *music)
   free(music);
 }
 
+static void FreeAllMusic_NoConf()
+{
+  int i;
+
+  if (Music_NoConf == NULL)
+    return;
+
+  for(i=0; i < num_music_noconf; i++)
+    FreeMusic(Music_NoConf[i]);
+
+  free(Music_NoConf);
+
+  Music_NoConf = NULL;
+  num_music_noconf = 0;
+}
+
 void FreeAllSounds()
 {
   FreeCustomArtworkLists(sound_info);
@@ -2206,18 +2430,8 @@ void FreeAllSounds()
 
 void FreeAllMusic()
 {
-  int i;
-
-  if (Music == NULL)
-    return;
-
-  for(i=0; i<num_music; i++)
-    FreeMusic(Music[i]);
-
-  free(Music);
-
-  Music = NULL;
-  num_music = 0;
+  FreeCustomArtworkLists(music_info);
+  FreeAllMusic_NoConf();
 }
 
 /* THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS                          */

@@ -91,6 +91,7 @@ int			TimeFrames, TimePlayed, TimeLeft;
 
 boolean			network_player_action_received = FALSE;
 
+struct LevelSetInfo	levelset;
 struct LevelInfo	level, level_template;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
@@ -102,6 +103,7 @@ struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
+struct MusicInfo       *music_info = NULL;
 
 
 /* ------------------------------------------------------------------------- */
@@ -3819,6 +3821,18 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.level_number"		},
   { "font.tape_recorder"	},
   { "font.game_info"		},
+};
+
+
+/* ------------------------------------------------------------------------- */
+/* music token prefix definitions                                            */
+/* ------------------------------------------------------------------------- */
+
+struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
+{
+  { "background",		TRUE	},
+
+  { NULL,			0	}
 };
 
 

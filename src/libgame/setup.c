@@ -556,12 +556,73 @@ char *getCustomSoundFilename(char *basename)
   return NULL;		/* cannot find specified artwork file anywhere */
 }
 
+char *getCustomMusicFilename(char *basename)
+{
+  static char *filename = NULL;
+  boolean skip_setup_artwork = FALSE;
+
+  if (filename != NULL)
+    free(filename);
+
+  basename = getCorrectedArtworkBasename(basename);
+
+  if (!setup.override_level_music)
+  {
+    /* 1st try: look for special artwork in current level series directory */
+    filename = getPath3(getCurrentLevelDir(), MUSIC_DIRECTORY, basename);
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
+
+    /* check if there is special artwork configured in level series config */
+    if (getLevelArtworkSet(ARTWORK_TYPE_MUSIC) != NULL)
+    {
+      /* 2nd try: look for special artwork configured in level series config */
+      filename = getPath2(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR), basename);
+      if (fileExists(filename))
+	return filename;
+
+      free(filename);
+
+      /* take missing artwork configured in level set config from default */
+      skip_setup_artwork = TRUE;
+    }
+  }
+
+  if (!skip_setup_artwork)
+  {
+    /* 3rd try: look for special artwork in configured artwork directory */
+    filename = getPath2(getSetupArtworkDir(artwork.mus_current), basename);
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
+  }
+
+  /* 4th try: look for default artwork in new default artwork directory */
+  filename = getPath2(getDefaultMusicDir(MUS_CLASSIC_SUBDIR), basename);
+  if (fileExists(filename))
+    return filename;
+
+  free(filename);
+
+  /* 5th try: look for default artwork in old default artwork directory */
+  filename = getPath2(options.music_directory, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;		/* cannot find specified artwork file anywhere */
+}
+
 char *getCustomArtworkFilename(char *basename, int type)
 {
   if (type == ARTWORK_TYPE_GRAPHICS)
     return getCustomImageFilename(basename);
   else if (type == ARTWORK_TYPE_SOUNDS)
     return getCustomSoundFilename(basename);
+  else if (type == ARTWORK_TYPE_MUSIC)
+    return getCustomMusicFilename(basename);
   else
     return UNDEFINED_FILENAME;
 }

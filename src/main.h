@@ -26,6 +26,7 @@
 
 #include "conf_gfx.h"	/* include auto-generated data structure definitions */
 #include "conf_snd.h"	/* include auto-generated data structure definitions */
+#include "conf_mus.h"	/* include auto-generated data structure definitions */
 
 #define IMG_UNDEFINED		(-1)
 #define IMG_EMPTY		IMG_EMPTY_SPACE
@@ -35,6 +36,7 @@
 #define IMG_CUSTOM_START	IMG_CUSTOM_1
 
 #define SND_UNDEFINED		(-1)
+#define MUS_UNDEFINED		(-1)
 
 #define WIN_XSIZE		672
 #define WIN_YSIZE		560
@@ -979,8 +981,13 @@
 #define NUM_SND_ARGS				1
 
 
-/* values for font configuration */
+/* values for music configuration suffixes */
+#define MUS_ARG_MODE_LOOP			0
 
+#define NUM_MUS_ARGS				1
+
+
+/* values for font configuration */
 #define FONT_INITIAL_1				0
 #define FONT_INITIAL_2				1
 #define FONT_INITIAL_3				2
@@ -1032,6 +1039,11 @@
 /* there are no special config file suffixes for these modes */
 #define GAME_MODE_PSEUDO_TYPENAME		10
 #define GAME_MODE_QUIT				11
+
+/* special definitions currently only used for custom artwork configuration */
+#define NUM_MUSIC_PREFIXES			1
+#define MAX_LEVELS				1000
+
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
@@ -1182,6 +1194,11 @@ struct PlayerInfo
 
   int inventory_element[MAX_INVENTORY_SIZE];
   int inventory_size;
+};
+
+struct LevelSetInfo
+{
+  int music[NUM_SPECIAL_GFX_ARGS][MAX_LEVELS];
 };
 
 struct LevelInfo
@@ -1449,6 +1466,17 @@ struct SoundInfo
   boolean loop;
 };
 
+struct MusicInfo
+{
+  boolean loop;
+};
+
+struct MusicPrefixInfo
+{
+  char *prefix;
+  boolean is_loop_music;
+};
+
 struct ElementActionInfo
 {
   char *suffix;
@@ -1542,6 +1570,7 @@ extern boolean			network_player_action_received;
 
 extern int			graphics_action_mapping[];
 
+extern struct LevelSetInfo	levelset;
 extern struct LevelInfo		level, level_template;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
@@ -1556,9 +1585,15 @@ extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
+extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
-extern struct ConfigInfo	image_config[], sound_config[];
-extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
+extern struct MusicInfo	       *music_info;
+extern struct ConfigInfo	image_config[];
+extern struct ConfigInfo	sound_config[];
+extern struct ConfigInfo	music_config[];
+extern struct ConfigInfo	image_config_suffix[];
+extern struct ConfigInfo	sound_config_suffix[];
+extern struct ConfigInfo	music_config_suffix[];
 
 #endif	/* MAIN_H */

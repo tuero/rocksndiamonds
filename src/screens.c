@@ -197,7 +197,7 @@ void DrawMainMenu()
   int i;
 
   UnmapAllGadgets();
-  FadeSounds();
+  FadeSoundsAndMusic();
 
   KeyboardAutoRepeatOn();
   ActivateJoystick();
@@ -961,7 +961,7 @@ void DrawHelpScreenMusicText(int num)
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
 
-  FadeSounds();
+  FadeSoundsAndMusic();
   ClearWindow();
   DrawHeadline();
 
@@ -990,7 +990,7 @@ void DrawHelpScreenCreditsText()
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
 
-  FadeSounds();
+  FadeSoundsAndMusic();
   ClearWindow();
   DrawHeadline();
 
@@ -1063,10 +1063,15 @@ void DrawHelpScreen()
   FadeToFront();
   InitAnimation();
 
+#if 1
+  PlaySound(SND_BACKGROUND_INFO);
+  PlayMusic(MUS_BACKGROUND_INFO);
+#else
 #if 0
   PlaySoundLoop(SND_BACKGROUND_INFO);
 #else
   PlaySound_Menu_Start(SND_BACKGROUND_INFO);
+#endif
 #endif
 }
 
@@ -1110,7 +1115,7 @@ void HandleHelpScreen(int button)
     }
     else
     {
-      FadeSounds();
+      FadeSoundsAndMusic();
 
       game_status = GAME_MODE_MAIN;
       DrawMainMenu();
@@ -1128,9 +1133,11 @@ void HandleHelpScreen(int button)
        must therefore periodically be reactivated with the current sound
        engine !!! */
 #if 0
+#if 0
     PlaySoundLoop(SND_BACKGROUND_INFO);
 #else
     PlaySound_Menu_Continue(SND_BACKGROUND_INFO);
+#endif
 #endif
   }
 
@@ -1562,7 +1569,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 void DrawHallOfFame(int highlight_position)
 {
   UnmapAllGadgets();
-  FadeSounds();
+  FadeSoundsAndMusic();
   CloseDoor(DOOR_CLOSE_2);
 
   if (highlight_position < 0) 
@@ -1573,10 +1580,15 @@ void DrawHallOfFame(int highlight_position)
 
   HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
 
+#if 1
+  PlaySound(SND_BACKGROUND_SCORES);
+  PlayMusic(MUS_BACKGROUND_SCORES);
+#else
 #if 0
   PlaySound(SND_BACKGROUND_SCORES);
 #else
   PlaySound_Menu_Start(SND_BACKGROUND_SCORES);
+#endif
 #endif
 }
 
@@ -1662,9 +1674,11 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     DrawMainMenu();
   }
 
+#if 0
 #if 1
   if (game_status == GAME_MODE_SCORES)
     PlaySound_Menu_Continue(SND_BACKGROUND_SCORES);
+#endif
 #endif
 
   DoAnimation();

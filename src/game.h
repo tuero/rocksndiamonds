@@ -91,7 +91,7 @@ int DigField(struct PlayerInfo *, int, int, int, int, int);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean DropElement(struct PlayerInfo *);
 
-void InitPlaySoundLevel();
+void InitPlayLevelSound();
 
 void RaiseScore(int);
 void RaiseScoreElement(int);
