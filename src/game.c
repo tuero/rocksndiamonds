@@ -8321,8 +8321,13 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 {
   if (game.gravity && !player->programmed_action)
   {
+#if 1
+    int move_dir_horizontal = player->effective_action & MV_HORIZONTAL;
+    int move_dir_vertical   = player->effective_action & MV_VERTICAL;
+#else
     int move_dir_horizontal = player->action & MV_HORIZONTAL;
     int move_dir_vertical   = player->action & MV_VERTICAL;
+#endif
     int move_dir =
       (player->last_move_dir & MV_HORIZONTAL ?
        (move_dir_vertical ? move_dir_vertical : move_dir_horizontal) :
@@ -8331,7 +8336,11 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
     int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
     int new_jx = jx + dx, new_jy = jy + dy;
+#if 1
+    boolean player_is_snapping = player->effective_action & JOY_BUTTON_1;
+#else
     boolean player_is_snapping = player->action & JOY_BUTTON_1;
+#endif
 #if 1
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
