@@ -35,6 +35,7 @@
 
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
+static void TapeStopIndexSearch();
 
 static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
@@ -468,13 +469,7 @@ void TapeTogglePause(boolean toggle_manual)
 
   if (tape.index_search)
   {
-    tape.index_search = FALSE;
-
-    SetDrawDeactivationMask(REDRAW_NONE);
-    audio.sound_deactivated = FALSE;
-
-    RedrawPlayfield(TRUE, 0,0,0,0);
-    DrawGameDoorValues();
+    TapeStopIndexSearch();
 
     if (tape.quick_resume)
     {
@@ -523,6 +518,9 @@ void TapeStopPlaying()
 
   tape.playing = FALSE;
   tape.pausing = FALSE;
+
+  if (tape.index_search)
+    TapeStopIndexSearch();
 
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF, 0);
   MapTapeEjectButton();
@@ -603,7 +601,7 @@ unsigned int GetTapeLength()
   return(tape_length * GAME_FRAME_DELAY / 1000);
 }
 
-void TapeIndexSearch()
+static void TapeStartIndexSearch()
 {
   tape.index_search = TRUE;
 
@@ -616,7 +614,18 @@ void TapeIndexSearch()
   }
 }
 
-void TapeSingleStep()
+static void TapeStopIndexSearch()
+{
+  tape.index_search = FALSE;
+
+  SetDrawDeactivationMask(REDRAW_NONE);
+  audio.sound_deactivated = FALSE;
+
+  RedrawPlayfield(TRUE, 0,0,0,0);
+  DrawGameDoorValues();
+}
+
+static void TapeSingleStep()
 {
   if (options.network)
     return;
@@ -654,7 +663,7 @@ void TapeQuickLoad()
     if (!TAPE_IS_EMPTY(tape))
     {
       TapeStartGamePlaying();
-      TapeIndexSearch();
+      TapeStartIndexSearch();
 
       tape.quick_resume = TRUE;
     }
@@ -823,7 +832,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 
     case TAPE_CTRL_ID_INDEX:
       if (tape.playing)
-	TapeIndexSearch();
+	TapeStartIndexSearch();
       else if (tape.recording)
 	TapeSingleStep();
       break;

@@ -95,7 +95,6 @@ byte *TapePlayAction(void);
 void TapeStop(void);
 void TapeErase(void);
 unsigned int GetTapeLength(void);
-void TapeIndexSearch(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
 

@@ -80,6 +80,7 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 9)
 
 #define TOKEN_VALUE_POSITION		40
+#define TOKEN_COMMENT_POSITION		60
 
 #define MAX_COOKIE_LEN			256
 
@@ -1927,7 +1928,9 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
     if (strcmp(keyname, "(undefined)") != 0 &&
 	strcmp(keyname, "(unknown)") != 0)
     {
-      for (i=strlen(entry); i<50; i++)
+      /* add at least one whitespace */
+      strcat(entry, " ");
+      for (i=strlen(entry); i<TOKEN_COMMENT_POSITION; i++)
 	strcat(entry, " ");
 
       strcat(entry, "# ");

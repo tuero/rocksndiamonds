@@ -450,6 +450,14 @@ static void InitField(int x, int y, boolean init_game)
 
 void DrawGameDoorValues()
 {
+  int i, j;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+    for (j=0; j<4; j++)
+      if (stored_player[i].key[j])
+	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
+			   GFX_SCHLUESSEL1 + j);
+
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
@@ -820,18 +828,7 @@ void InitGame()
 	       DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
   }
 
-#if 1
   DrawGameDoorValues();
-#else
-  DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
-	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
-  DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
-	   int2str(local_player->dynamite, 3), FS_SMALL, FC_YELLOW);
-  DrawText(DX + XX_SCORE, DY + YY_SCORE,
-	   int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
-  DrawText(DX + XX_TIME, DY + YY_TIME,
-	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
-#endif
 
   UnmapGameButtons();
   UnmapTapeButtons();
@@ -1005,7 +1002,7 @@ void GameWon()
       PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
 		   PSND_LOOP);
 
-    while(TimeLeft > 0)
+    while (TimeLeft > 0)
     {
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, PSND_MAX_RIGHT);
@@ -1031,7 +1028,7 @@ void GameWon()
       PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
 		   PSND_LOOP);
 
-    while(TimePlayed < 999)
+    while (TimePlayed < 999)
     {
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, PSND_MAX_RIGHT);
@@ -4835,7 +4832,7 @@ void GameActions()
 	for (i=0; i<MAX_PLAYERS; i++)
 	  KillHero(&stored_player[i]);
     }
-    else if (level.time == 0)		/* level without time limit */
+    else if (level.time == 0 && !AllPlayersGone) /* level without time limit */
       DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FS_SMALL, FC_YELLOW);
   }
 
@@ -5625,7 +5622,8 @@ int DigField(struct PlayerInfo *player,
     case EL_TRAP_INACTIVE:
     case EL_SP_BASE:
     case EL_SP_BUG:
-      Feld[x][y] = EL_LEERRAUM;
+      RemoveField(x, y);
+
       if (element == EL_LEERRAUM)
 	PlaySoundLevel(x, y, SND_EMPTY_SPACE_DIGGING);
       else if (element == EL_ERDREICH)
