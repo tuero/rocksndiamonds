@@ -551,32 +551,6 @@ static void CreateControlButtons()
   }
 }
 
-
-
-#if 0
-
-static void test1(struct GadgetInfo *gi)
-{
-  int event_type = gi->event.type;
-
-  printf("HandleControlButtons: (%d,%d) (%d,%d) [%d] ",
-	 gi->x, gi->y,
-	 gi->event.x, gi->event.y, gi->event.button);
-
-  if (event_type == GD_EVENT_PRESSED)
-    printf("GD_EVENT_PRESSED\n");
-  else if (event_type == GD_EVENT_RELEASED)
-    printf("GD_EVENT_RELEASED\n");
-  else if (event_type == GD_EVENT_MOVING)
-    printf("GD_EVENT_MOVING\n");
-  else
-    printf("?\n");
-}
-
-#endif
-
-
-
 static void CreateCounterButtons(int counter_id)
 {
   int i;
@@ -622,7 +596,9 @@ static void CreateDrawingAreas()
   struct GadgetInfo *gi;
   unsigned long event_mask;
 
-  event_mask = GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING;
+  event_mask =
+    GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
+    GD_EVENT_OFF_BORDERS;
 
   gi = CreateGadget(GDI_CUSTOM_ID, ED_CTRL_ID_DRAWING_LEVEL,
 		    GDI_X, SX,
@@ -1926,12 +1902,6 @@ static void CopyLevelToUndoBuffer()
   for(x=0; x<lev_fieldx; x++)
     for(y=0; y<lev_fieldy; y++)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
-
-
-
-  /*
-    printf("state saved to undo buffer %d\n", undo_buffer_position);
-  */
 }
 
 static void RandomPlacement(int button)
@@ -1993,14 +1963,16 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   lx = sx + level_xpos;
   ly = sy + level_ypos;
 
+  lx = (lx < 0 ? 0 : lx > lev_fieldx - 1 ? lev_fieldx - 1 : lx);
+  ly = (ly < 0 ? 0 : ly > lev_fieldy - 1 ? lev_fieldy - 1 : ly);
+  sx = lx - level_xpos;
+  sy = ly - level_ypos;
+
   if (button_press_event)
     started_inside_drawing_area = inside_drawing_area;
 
   if (!started_inside_drawing_area)
     return;
-
-  printf("%d,%d, %d,%d, %d,%d.\n",
-	 gi->event.x, gi->event.y, sx, sy, lx, ly);
 
   if ((!button && !button_release_event) ||
       sx > lev_fieldx || sy > lev_fieldy ||
@@ -2118,127 +2090,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       break;
   }
 }
-
-
-
-#if 0
-
-static void HandlePressedControlButtons()
-{
-  static unsigned long button_delay = 0;
-  int i;
-
-  /* buttons with action when held pressed */
-  int gadget_id[] =
-  {
-    ED_CTRL_ID_WRAP_UP,
-    ED_CTRL_ID_WRAP_LEFT,
-    ED_CTRL_ID_WRAP_RIGHT,
-    ED_CTRL_ID_WRAP_DOWN,
-    ED_CTRL_ID_SCORE_DOWN,
-    ED_CTRL_ID_SCORE_UP,
-    -1
-  };
-
-  if (!DelayReached(&button_delay, GADGET_FRAME_DELAY))
-    return;
-
-  for (i=0; gadget_id[i] != -1; i++)
-  {
-    int id = gadget_id[i];
-    int state = level_editor_gadget[id]->state;
-    int button = level_editor_gadget[id]->event.button;
-    int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-
-    if (state != GD_BUTTON_PRESSED)
-      continue;
-  
-    switch (id)
-    {
-      case ED_CTRL_ID_WRAP_LEFT:
-  	if (level_xpos >= 0)
-  	{
-  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
-  	    break;
-  
-  	  level_xpos -= step;
-  	  if (level_xpos <- 1)
-  	    level_xpos = -1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_RIGHT:
-  	if (level_xpos <= lev_fieldx - 2*SCR_FIELDX)
-  	{
-  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
-  	    break;
-  
-  	  level_xpos += step;
-  	  if (level_xpos > lev_fieldx - 2*SCR_FIELDX + 1)
-  	    level_xpos = lev_fieldx - 2*SCR_FIELDX + 1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_UP:
-  	if (level_ypos >= 0)
-  	{
-  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
-  	    break;
-  
-  	  level_ypos -= step;
-  	  if (level_ypos < -1)
-  	    level_ypos = -1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_DOWN:
-  	if (level_ypos <= lev_fieldy - 2*SCR_FIELDY)
-  	{
-  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
-  	    break;
-  
-  	  level_ypos += step;
-  	  if (level_ypos > lev_fieldy - 2*SCR_FIELDY + 1)
-  	    level_ypos = lev_fieldy - 2*SCR_FIELDY + 1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-
-      case ED_CTRL_ID_SCORE_DOWN:
-      case ED_CTRL_ID_SCORE_UP:
-	*gadget_score_value += (id == ED_CTRL_ID_SCORE_DOWN ? -step : step);
-	if (*gadget_score_value < 0)
-	  *gadget_score_value = 0;
-	else if (*gadget_score_value > 255)
-	  *gadget_score_value = 255;
-
-	DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
-  	break;
-  
-      default:
-	break;
-    }
-  }
-}
-
-#endif
-
-
 
 static void HandleCounterButtons(struct GadgetInfo *gi)
 {

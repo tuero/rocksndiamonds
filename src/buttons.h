@@ -287,6 +287,7 @@ int CheckCountButtons(int, int, int);
 #define GD_EVENT_RELEASED		(1<<1)
 #define GD_EVENT_MOVING			(1<<2)
 #define GD_EVENT_REPEATED		(1<<3)
+#define GD_EVENT_OFF_BORDERS		(1<<4)
 
 /* gadget button states */
 #define GD_BUTTON_UNPRESSED		0

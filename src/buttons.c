@@ -1761,16 +1761,13 @@ void HandleGadgets(int mx, int my, int button)
   static struct GadgetInfo *gi = NULL;
   static unsigned long pressed_delay = 0;
 
-#if 0
-  static boolean pressed = FALSE;
-#endif
-
   struct GadgetInfo *new_gi;
   boolean gadget_pressed;
   boolean gadget_pressed_repeated;
-  boolean gadget_moving_inside;
-  boolean gadget_moving_outside;
+  boolean gadget_moving;
+  boolean gadget_moving_off_borders;
   boolean gadget_released;
+  boolean gadget_released_off_borders;
 
   if (gadget_list_first_entry == NULL)
     return;
@@ -1778,15 +1775,17 @@ void HandleGadgets(int mx, int my, int button)
   new_gi = getGadgetInfoFromMousePosition(mx,my);
 
   gadget_pressed =
-    (button != 0 && gi == NULL && new_gi != NULL);
+    (button != 0 && gi == NULL && new_gi != NULL && !motion_status);
   gadget_pressed_repeated =
     (button != 0 && gi != NULL && new_gi == gi);
-  gadget_moving_inside =
+  gadget_moving =
     (button != 0 && gi != NULL && new_gi == gi && motion_status);
-  gadget_moving_outside =
+  gadget_moving_off_borders =
     (button != 0 && gi != NULL && new_gi != gi && motion_status);
   gadget_released =
     (button == 0 && gi != NULL && new_gi == gi);
+  gadget_released_off_borders =
+    (button == 0 && gi != NULL && new_gi != gi);
 
   if (gadget_pressed)
     gi = new_gi;
@@ -1827,7 +1826,7 @@ void HandleGadgets(int mx, int my, int button)
       gi->callback(gi);
   }
 
-  if (gadget_moving_inside)
+  if (gadget_moving)
   {
     if (gi->state == GD_BUTTON_UNPRESSED)
       DrawGadget(gi, TRUE, TRUE);
@@ -1839,7 +1838,7 @@ void HandleGadgets(int mx, int my, int button)
       gi->callback(gi);
   }
 
-  if (gadget_moving_outside)
+  if (gadget_moving_off_borders)
   {
     if (gi->state == GD_BUTTON_PRESSED)
       DrawGadget(gi, FALSE, TRUE);
@@ -1848,7 +1847,8 @@ void HandleGadgets(int mx, int my, int button)
     gi->event.type = GD_EVENT_MOVING;
     gi->event.off_borders = TRUE;
 
-    if (gi->event_mask & GD_EVENT_MOVING)
+    if (gi->event_mask & GD_EVENT_MOVING &&
+	gi->event_mask & GD_EVENT_OFF_BORDERS)
       gi->callback(gi);
   }
 
@@ -1863,111 +1863,15 @@ void HandleGadgets(int mx, int my, int button)
       gi->callback(gi);
   }
 
+  if (gadget_released_off_borders)
+  {
+    gi->event.type = GD_EVENT_RELEASED;
+
+    if (gi->event_mask & GD_EVENT_RELEASED &&
+	gi->event_mask & GD_EVENT_OFF_BORDERS)
+      gi->callback(gi);
+  }
+
   if (button == 0)
     gi = NULL;
-
-
-
-#if 0
-  if (button)
-  {
-    if (!motion_status)		/* mouse button just pressed */
-    {
-      if (new_gi != NULL)
-      {
-	gi = new_gi;
-	gi->state = GD_BUTTON_PRESSED;
-	gi->event.type = GD_EVENT_PRESSED;
-	gi->event.button = button;
-	DrawGadget(gi, TRUE, TRUE);
-
-	/* initialize delay counter */
-	pressed_delay = 0;
-	DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
-
-
-	printf("new gadget pressed\n");
-
-
-	if (gi->event_mask & GD_EVENT_PRESSED)
-	  gi->callback(gi);
-
-	pressed = TRUE;
-      }
-    }
-    else			/* mouse movement with pressed mouse button */
-    {
-      if (new_gi != gi && gi != NULL)
-      {
-	if (pressed)
-	  DrawGadget(gi, FALSE, TRUE);
-	gi->state = GD_BUTTON_UNPRESSED;
-	gi->event.type = GD_EVENT_MOVING;
-
-
-	printf("outside gadget\n");
-
-
-
-
-	if (gi->event_mask & GD_EVENT_MOVING)
-	  gi->callback(gi);
-
-	pressed = FALSE;
-      }
-      else if (new_gi == gi && gi != NULL)
-      {
-	if (!pressed)
-	  DrawGadget(gi, TRUE, TRUE);
-	gi->state = GD_BUTTON_PRESSED;
-	gi->event.type = GD_EVENT_MOVING;
-
-
-	printf("inside gadget\n");
-
-
-
-
-	if (gi->event_mask & GD_EVENT_MOVING)
-	  gi->callback(gi);
-
-	pressed = TRUE;
-      }
-    }
-
-    if (gi != NULL &&
-	gi->event_mask & GD_EVENT_PRESSED_REPEATED &&
-	gi->state == GD_BUTTON_PRESSED &&
-	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
-    {
-	printf("gadget pressed (repeated)\n");
-
-
-	gi->callback(gi);
-    }
-  }
-  else				/* mouse button just released */
-  {
-    if (new_gi == gi && gi != NULL && pressed)
-    {
-      gi->state = GD_BUTTON_UNPRESSED;
-      gi->event.type = GD_EVENT_RELEASED;
-      DrawGadget(gi, FALSE, TRUE);
-
-
-      printf("gadget released\n");
-
-
-
-      if (gi->event_mask & GD_EVENT_RELEASED)
-	gi->callback(gi);
-    }
-
-    gi = NULL;
-    pressed = FALSE;
-  }
-#endif
-
-
-
 }
