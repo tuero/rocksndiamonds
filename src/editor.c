@@ -444,9 +444,10 @@
 #define GADGET_ID_CHANGE_SIDES		(GADGET_ID_SELECTBOX_FIRST + 14)
 #define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 15)
 #define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 16)
+#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 17)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 17)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 18)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -615,8 +616,9 @@
 #define ED_SELECTBOX_ID_CHANGE_SIDES		14
 #define ED_SELECTBOX_ID_CHANGE_POWER		15
 #define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	16
+#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	17
 
-#define ED_NUM_SELECTBOX			17
+#define ED_NUM_SELECTBOX			18
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_CONSISTENCY
@@ -1141,7 +1143,7 @@ static struct ValueTextInfo options_move_stepsize[] =
 static struct ValueTextInfo options_move_leave_type[] =
 {
   { LEAVE_TYPE_UNLIMITED,	"leave behind"			},
-  { LEAVE_TYPE_LIMITED,		"change to"			},
+  { LEAVE_TYPE_LIMITED,		"change it to"			},
   { -1,				NULL				}
 };
 
@@ -1253,6 +1255,16 @@ static struct ValueTextInfo options_change_power[] =
 static char options_change_page_strings[MAX_CHANGE_PAGES][10];
 static struct ValueTextInfo options_change_page[MAX_CHANGE_PAGES + 1] =
 {
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_group_choice_mode[] =
+{
+  { ANIM_RANDOM,		"random"			},
+  { ANIM_LOOP,			"loop"				},
+  { ANIM_LINEAR,		"linear"			},
+  { ANIM_PINGPONG,		"pingpong"			},
+  { ANIM_PINGPONG2,		"pingpong 2"			},
   { -1,				NULL				}
 };
 
@@ -1407,6 +1419,17 @@ static struct
     options_change_page,
     &custom_element.current_change_page,
     NULL, NULL,				"element config page"
+  },
+
+  /* ---------- element settings: configure (group elements) --------------- */
+
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    GADGET_ID_GROUP_CHOICE_MODE,	GADGET_ID_NONE,
+    -1,
+    options_group_choice_mode,
+    &group_element_info.choice_mode,
+    "choice type:", NULL,		"type of group element choice"
   },
 };
 
@@ -6536,6 +6559,9 @@ static void DrawPropertiesConfig()
     /* draw counter gadgets */
     MapCounterButtons(ED_COUNTER_ID_GROUP_CONTENT);
 
+    /* draw selectbox gadgets */
+    MapSelectboxGadget(ED_SELECTBOX_ID_GROUP_CHOICE_MODE);
+
     /* draw drawing area gadgets */
     DrawGroupElementArea(properties_element);
 
@@ -7804,7 +7830,8 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   else if ((type_id >= ED_SELECTBOX_ID_CUSTOM_FIRST &&
 	    type_id <= ED_SELECTBOX_ID_CUSTOM_LAST) ||
 	   (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
-	    type_id <= ED_SELECTBOX_ID_CHANGE_LAST))
+	    type_id <= ED_SELECTBOX_ID_CHANGE_LAST) ||
+	   (type_id == ED_SELECTBOX_ID_GROUP_CHOICE_MODE))
     CopyElementPropertiesToGame(properties_element);
 }
 

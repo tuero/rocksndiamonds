@@ -1483,12 +1483,16 @@ struct ElementGroupInfo
   int num_elements;			/* number of elements in this group */
   short element[MAX_ELEMENTS_IN_GROUP];	/* list of elements in this group */
 
+  int choice_mode;		/* how to choose element from group */
+
   /* ---------- internal values used at runtime when playing ---------- */
 
   /* the following is the same as above, but with recursively resolved group
      elements (group elements may also contain further group elements!) */
   int num_elements_resolved;
   short element_resolved[NUM_FILE_ELEMENTS];
+
+  int choice_pos;		/* current element choice position */
 };
 
 struct ElementInfo

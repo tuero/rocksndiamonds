@@ -1,3 +1,15 @@
+2004-01-29
+	* fixed bug: infotron can now smash yellow disks
+
+2004-01-26
+	* added "choice type" for group element selection
+
+2004-01-25
+	* fixed bug with initial invulnerability of non-yellow player
+
+2004-01-23
+	* added level loader for loading native Supaplex packed levels
+	  (including multi-part levels like the "splvls99" levels)
 
 2004-01-19
 	* fixed bug which allowed creating emeralds by escaping explosions

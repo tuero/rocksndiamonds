@@ -810,9 +810,22 @@ static void InitField(int x, int y, boolean init_game)
       else if (IS_GROUP_ELEMENT(element))
       {
 	struct ElementGroupInfo *group = element_info[element].group;
-	int random_pos = RND(group->num_elements_resolved);
+	int last_anim_random_frame = gfx.anim_random_frame;
+	int element_pos;
 
-	Feld[x][y] = group->element_resolved[random_pos];
+	if (group->choice_mode == ANIM_RANDOM)
+	  gfx.anim_random_frame = RND(group->num_elements_resolved);
+
+	element_pos = getAnimationFrame(group->num_elements_resolved, 1,
+					group->choice_mode, 0,
+					group->choice_pos);
+
+	if (group->choice_mode == ANIM_RANDOM)
+	  gfx.anim_random_frame = last_anim_random_frame;
+
+	group->choice_pos++;
+
+	Feld[x][y] = group->element_resolved[element_pos];
 
 	InitField(x, y, init_game);
       }
@@ -861,8 +874,10 @@ static void resolve_group_element(int group_element, int recursion_depth)
   if (recursion_depth == 0)			/* initialization */
   {
     group = element_info[group_element].group;
-    group->num_elements_resolved = 0;
     group_nr = group_element - EL_GROUP_START;
+
+    group->num_elements_resolved = 0;
+    group->choice_pos = 0;
   }
 
   for (i = 0; i < actual_group->num_elements; i++)
@@ -1406,7 +1421,9 @@ void InitGame()
 	{
 	  player->present = TRUE;
 	  player->active = TRUE;
+
 	  some_player->present = FALSE;
+	  some_player->active = FALSE;
 
 	  StorePlayer[jx][jy] = player->element_nr;
 	  player->jx = player->last_jx = jx;
@@ -1420,7 +1437,7 @@ void InitGame()
 
   if (tape.playing)
   {
-    /* when playing a tape, eliminate all players who do not participate */
+    /* when playing a tape, eliminate all players which do not participate */
 
     for (i = 0; i < MAX_PLAYERS; i++)
     {
@@ -1451,6 +1468,8 @@ void InitGame()
 	    int jx = player->jx, jy = player->jy;
 
 	    player->active = FALSE;
+	    player->present = FALSE;
+
 	    StorePlayer[jx][jy] = 0;
 	    Feld[jx][jy] = EL_EMPTY;
 	  }
@@ -3347,11 +3366,13 @@ void Impact(int x, int y)
 	return;
       }
     }
-    else if ((element == EL_SP_INFOTRON ||
-	      element == EL_SP_ZONK) &&
-	     (smashed == EL_SP_SNIKSNAK ||
-	      smashed == EL_SP_ELECTRON ||
-	      smashed == EL_SP_DISK_ORANGE))
+    else if (((element == EL_SP_INFOTRON ||
+	       element == EL_SP_ZONK) &&
+	      (smashed == EL_SP_SNIKSNAK ||
+	       smashed == EL_SP_ELECTRON ||
+	       smashed == EL_SP_DISK_ORANGE)) ||
+	     (element == EL_SP_INFOTRON &&
+	      smashed == EL_SP_DISK_YELLOW))
     {
       Bang(x, y + 1);
       return;
@@ -5116,6 +5137,7 @@ void ContinueMoving(int x, int y)
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
 #if 1
+  /* some elements can leave other elements behind after moving */
   if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
       ei->move_leave_element != EL_EMPTY &&
       (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
@@ -7526,6 +7548,40 @@ void ScrollLevel(int dx, int dy)
   }
 
   redraw_mask |= REDRAW_FIELD;
+}
+
+static boolean canEnterSupaplexPort(int x, int y, int move_dir)
+{
+  int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
+  int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
+  int nextx = x + dx, nexty = y + dy;
+  int element = Feld[x][y];
+
+  if ((dx == -1 &&
+       element != EL_SP_PORT_LEFT &&
+       element != EL_SP_GRAVITY_PORT_LEFT &&
+       element != EL_SP_PORT_HORIZONTAL &&
+       element != EL_SP_PORT_ANY) ||
+      (dx == +1 &&
+       element != EL_SP_PORT_RIGHT &&
+       element != EL_SP_GRAVITY_PORT_RIGHT &&
+       element != EL_SP_PORT_HORIZONTAL &&
+       element != EL_SP_PORT_ANY) ||
+      (dy == -1 &&
+       element != EL_SP_PORT_UP &&
+       element != EL_SP_GRAVITY_PORT_UP &&
+       element != EL_SP_PORT_VERTICAL &&
+       element != EL_SP_PORT_ANY) ||
+      (dy == +1 &&
+       element != EL_SP_PORT_DOWN &&
+       element != EL_SP_GRAVITY_PORT_DOWN &&
+       element != EL_SP_PORT_VERTICAL &&
+       element != EL_SP_PORT_ANY) ||
+      !IN_LEV_FIELD(nextx, nexty) ||
+      !IS_FREE(nextx, nexty))
+    return FALSE;
+
+  return TRUE;
 }
 
 static void CheckGravityMovement(struct PlayerInfo *player)

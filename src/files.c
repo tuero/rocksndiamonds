@@ -258,6 +258,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       /* default: only one element in group */
       element_info[element].group->num_elements = 1;
+
+      element_info[element].group->choice_mode = ANIM_RANDOM;
     }
   }
 
@@ -1077,8 +1079,10 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->use_gfx_element = getFile8Bit(file);
   ei->gfx_element = getMappedElement(getFile16BitBE(file));
 
+  group->choice_mode = getFile8Bit(file);
+
   /* some free bytes for future values and padding */
-  ReadUnusedBytesFromFile(file, 4);
+  ReadUnusedBytesFromFile(file, 3);
 
   for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
     group->element[i] = getMappedElement(getFile16BitBE(file));
@@ -2488,8 +2492,10 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
   putFile8Bit(file, ei->use_gfx_element);
   putFile16BitBE(file, ei->gfx_element);
 
+  putFile8Bit(file, group->choice_mode);
+
   /* some free bytes for future values and padding */
-  WriteUnusedBytesToFile(file, 4);
+  WriteUnusedBytesToFile(file, 3);
 
   for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
     putFile16BitBE(file, group->element[i]);
