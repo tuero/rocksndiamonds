@@ -197,7 +197,7 @@ typedef unsigned char byte;
 /* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
 #define MAX_LEVEL_NAME_LEN	32
-#define MAX_LEVEL_AUTHOR_LEN	34
+#define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_LEVDIR_ENTRIES	100
 #define MAX_SCORE_ENTRIES	100
@@ -335,8 +335,8 @@ struct LevelInfo
   int fieldy;
   int time;
   int edelsteine;
-  char name[MAX_LEVEL_NAME_LEN];
-  char author[MAX_LEVEL_AUTHOR_LEN];
+  char name[MAX_LEVEL_NAME_LEN + 1];
+  char author[MAX_LEVEL_AUTHOR_LEN + 1];
   int score[LEVEL_SCORE_ELEMENTS];
   int mampfer_inhalt[8][3][3];
   int tempo_amoebe;
@@ -1279,19 +1279,19 @@ extern int		num_bg_loops;
 #endif
 
 /* values for redraw_mask */
-#define REDRAW_ALL		(1L << 0)
-#define REDRAW_FIELD		(1L << 1)
-#define REDRAW_TILES		(1L << 2)
-#define REDRAW_DOOR_1		(1L << 3)
-#define REDRAW_VIDEO_1		(1L << 4)
-#define REDRAW_VIDEO_2		(1L << 5)
-#define REDRAW_VIDEO_3		(1L << 6)
-#define REDRAW_MICROLEVEL	(1L << 7)
-#define REDRAW_FROM_BACKBUFFER	(1L << 8)
+#define REDRAW_ALL		(1 << 0)
+#define REDRAW_FIELD		(1 << 1)
+#define REDRAW_TILES		(1 << 2)
+#define REDRAW_DOOR_1		(1 << 3)
+#define REDRAW_VIDEO_1		(1 << 4)
+#define REDRAW_VIDEO_2		(1 << 5)
+#define REDRAW_VIDEO_3		(1 << 6)
+#define REDRAW_MICROLEVEL	(1 << 7)
+#define REDRAW_FROM_BACKBUFFER	(1 << 8)
 #define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
 				 REDRAW_VIDEO_2 | \
 				 REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1L << 9)
+#define REDRAW_DOOR_3		(1 << 9)
 #define REDRAW_DOORS		(REDRAW_DOOR_1 | \
 				 REDRAW_DOOR_2 | \
 				 REDRAW_DOOR_3)

@@ -47,10 +47,6 @@
 /* how many steps can be cancelled */
 #define NUM_UNDO_STEPS			(10 + 1)
 
-/* values for random placement */
-#define RANDOM_USE_PERCENTAGE		0
-#define RANDOM_USE_NUM_OBJECTS		1
-
 /* values for elements with score */
 #define MIN_SCORE			0
 #define MAX_SCORE			255
@@ -150,6 +146,14 @@
 #define ED_SCROLL_VERTICAL_XSIZE	ED_SCROLLBUTTON_XSIZE
 #define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 
+/* values for checkbutton gadgets */
+#define ED_CHECKBUTTON_XSIZE		ED_BUTTON_COUNT_XSIZE
+#define ED_CHECKBUTTON_YSIZE		ED_BUTTON_COUNT_YSIZE
+#define ED_CHECKBUTTON_UNCHECKED_XPOS	ED_BUTTON_MINUS_XPOS
+#define ED_CHECKBUTTON_UNCHECKED_YPOS	ED_BUTTON_MINUS_YPOS
+#define ED_CHECKBUTTON_CHECKED_XPOS	ED_BUTTON_PLUS_XPOS
+#define ED_CHECKBUTTON_CHECKED_YPOS	ED_BUTTON_PLUS_YPOS
+
 /* control button identifiers */
 #define GADGET_ID_NONE			-1
 
@@ -234,7 +238,16 @@
 #define GADGET_ID_ELEMENTLIST_FIRST	66
 #define GADGET_ID_ELEMENTLIST_LAST	105
 
-#define NUM_EDITOR_GADGETS		106
+/* checkbuttons for level settings */
+#define GADGET_ID_RANDOM_PERCENTAGE	106
+#define GADGET_ID_RANDOM_QUANTITY	107
+
+#define NUM_EDITOR_GADGETS		108
+
+/* radio button numbers */
+#define RADIO_NR_NONE			0
+#define RADIO_NR_DRAWING_TOOLBOX	1
+#define RADIO_NR_RANDOM_ELEMENTS	2
 
 /* values for counter gadgets */
 #define ED_COUNTER_ID_ELEM_SCORE	0
@@ -270,16 +283,22 @@
 
 #define ED_NUM_TEXTINPUT		2
 
+/* values for checkbutton gadgets */
+#define ED_CHECKBUTTON_PERCENTAGE	0
+#define ED_CHECKBUTTON_QUANTITY		1
+
+#define ED_NUM_CHECKBUTTONS		2
+
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
 #define UNDO_ACCUMULATE			1
 
 /* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
-#define INFOTEXT_XPOS		SX
-#define INFOTEXT_YPOS		(SY + SYSIZE - MINI_TILEX + 2)
-#define INFOTEXT_XSIZE		SXSIZE
-#define INFOTEXT_YSIZE		MINI_TILEX
-#define MAX_INFOTEXT_LEN	(SXSIZE / FONT2_XSIZE)
+#define INFOTEXT_XPOS			SX
+#define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
+#define INFOTEXT_XSIZE			SXSIZE
+#define INFOTEXT_YSIZE			MINI_TILEX
+#define MAX_INFOTEXT_LEN		(SXSIZE / FONT2_XSIZE)
 
 static struct
 {
@@ -365,11 +384,11 @@ static struct
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(2),
-    0,					100,
+    1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
     &gadget_level_random_value,
-    "number of random elements"
+    "random elements"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(3),
@@ -394,7 +413,7 @@ static struct
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
     &gadget_level_timescore_value,
     "score for each 10 seconds left"
-  },
+  }
 };
 
 static struct
@@ -490,17 +509,45 @@ static struct
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_VERTICAL,
     "scroll level editing area vertically"
+  }
+};
+
+/* values for random placement */
+#define RANDOM_USE_PERCENTAGE		0
+#define RANDOM_USE_QUANTITY		1
+
+static int random_placement_value = 10;
+static int random_placement_method = RANDOM_USE_QUANTITY;
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+  int radio_button_nr;
+  int *value;
+  int checked_value;
+  char *text, *infotext;
+} checkbutton_info[ED_NUM_CHECKBUTTONS] =
+{
+  {
+    ED_LEVELINFO_XPOS + 160,		ED_COUNTER_YPOS(2),
+    GADGET_ID_RANDOM_PERCENTAGE,
+    RADIO_NR_RANDOM_ELEMENTS,
+    &random_placement_method,		RANDOM_USE_PERCENTAGE,
+    "percentage", "use percentage for random elements"
   },
+  {
+    ED_LEVELINFO_XPOS + 340,		ED_COUNTER_YPOS(2),
+    GADGET_ID_RANDOM_QUANTITY,
+    RADIO_NR_RANDOM_ELEMENTS,
+    &random_placement_method,		RANDOM_USE_QUANTITY,
+    "quantity", "use quantity for random elements"
+  }
 };
 
 /* maximal size of level editor drawing area */
 #define MAX_ED_FIELDX		(2 * SCR_FIELDX)
 #define MAX_ED_FIELDY		(2 * SCR_FIELDY - 1)
-
-/*
-#define ED_FIELDX	(2 * SCR_FIELDX - 1)
-#define ED_FIELDY	(2 * SCR_FIELDY - 2)
-*/
 
 /* actual size of level editor drawing area */
 static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
@@ -509,6 +556,15 @@ static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
 static int level_xpos = -1, level_ypos = -1;
 
 #define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldx)
+
+/* drawing elements on the three mouse buttons */
+static int new_element1 = EL_MAUERWERK;
+static int new_element2 = EL_LEERRAUM;
+static int new_element3 = EL_ERDREICH;
+
+#define BUTTON_ELEMENT(button) (button == 1 ? new_element1 : \
+				button == 2 ? new_element2 : \
+				button == 3 ? new_element3 : EL_LEERRAUM)
 
 /* forward declaration for internal use */
 static void DrawDrawingWindow();
@@ -534,18 +590,7 @@ static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
 
-static int random_placement_percentage = 10;
-static int random_placement_num_objects = 10;
-#if 0
-static int random_placement_method = RANDOM_USE_PERCENTAGE;
-#else
-static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
-#endif
-
 static int edit_mode;
-static int new_element1 = EL_MAUERWERK;
-static int new_element2 = EL_LEERRAUM;
-static int new_element3 = EL_ERDREICH;
 
 static int counter_xsize = DXSIZE + 20;
 
@@ -818,7 +863,7 @@ int editor_element[] =
   EL_SP_CHIP_UPPER,
   EL_SP_CHIP_LOWER,
 
-/*
+  /*
   EL_CHAR_A + ('D' - 'A'),
   EL_CHAR_A + ('Y' - 'A'),
   EL_CHAR_A + ('N' - 'A'),
@@ -833,7 +878,7 @@ int editor_element[] =
   EL_CHAR_A + ('T' - 'A'),
   EL_CHAR_A + ('E' - 'A'),
   EL_CHAR_A + ('R' - 'A'),
-*/
+  */
 
   EL_LEERRAUM,
   EL_LEERRAUM,
@@ -977,14 +1022,14 @@ static void CreateControlButtons()
 	id == GADGET_ID_PICK_ELEMENT)
     {
       button_type = GD_TYPE_RADIO_BUTTON;
-      radio_button_nr = 1;
+      radio_button_nr = RADIO_NR_DRAWING_TOOLBOX;
       checked = (id == drawing_function ? TRUE : FALSE);
       event_mask = GD_EVENT_PRESSED;
     }
     else
     {
       button_type = GD_TYPE_NORMAL_BUTTON;
-      radio_button_nr = 0;
+      radio_button_nr = RADIO_NR_NONE;
       checked = FALSE;
 
       if (id == GADGET_ID_WRAP_LEFT ||
@@ -1323,7 +1368,7 @@ static void CreateTextInputGadgets()
     struct GadgetInfo *gi;
     unsigned long event_mask;
     char infotext[1024];
-    int id = GADGET_ID_LEVEL_NAME + i;
+    int id = textinput_info[i].gadget_id;
 
     event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
@@ -1412,6 +1457,59 @@ static void CreateScrollbarGadgets()
   }
 }
 
+static void CreateCheckbuttonGadgets()
+{
+  int i;
+
+  /* create toolbox buttons */
+  for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
+  {
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    struct GadgetInfo *gi;
+    unsigned long event_mask;
+    int gd_x1, gd_x2, gd_x3, gd_x4, gd_y1, gd_y2;
+    int button_type;
+    boolean checked;
+    int id = checkbutton_info[i].gadget_id;
+
+    event_mask = GD_EVENT_PRESSED;
+
+    button_type = (checkbutton_info[i].radio_button_nr == RADIO_NR_NONE ?
+		   GD_TYPE_CHECK_BUTTON : GD_TYPE_RADIO_BUTTON);
+    checked =
+      (*checkbutton_info[i].value == checkbutton_info[i].checked_value);
+
+    gd_x1 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_UNCHECKED_XPOS;
+    gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
+    gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
+    gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
+    gd_y1 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_UNCHECKED_YPOS;
+    gd_y2 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_CHECKED_YPOS;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
+		      GDI_X, SX + checkbutton_info[i].x,
+		      GDI_Y, SY + checkbutton_info[i].y,
+		      GDI_WIDTH, ED_CHECKBUTTON_XSIZE,
+		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
+		      GDI_TYPE, button_type,
+		      GDI_RADIO_NR, checkbutton_info[i].radio_button_nr,
+		      GDI_CHECKED, checked,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y2,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y2,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleControlButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id] = gi;
+  }
+}
+
 void CreateLevelEditorGadgets()
 {
   CreateControlButtons();
@@ -1419,6 +1517,7 @@ void CreateLevelEditorGadgets()
   CreateDrawingAreas();
   CreateTextInputGadgets();
   CreateScrollbarGadgets();
+  CreateCheckbuttonGadgets();
 }
 
 static void MapControlButtons()
@@ -1446,6 +1545,11 @@ static void MapDrawingArea(int id)
 static void MapTextInputGadget(int id)
 {
   MapGadget(level_editor_gadget[textinput_info[id].gadget_id]);
+}
+
+static void MapCheckbuttonGadget(int id)
+{
+  MapGadget(level_editor_gadget[checkbutton_info[id].gadget_id]);
 }
 
 static void MapMainDrawingArea()
@@ -1626,173 +1730,6 @@ void DrawLevelEd()
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
   */
 }
-
-
-
-#if 0
-
-static void DrawControlWindow()
-{
-  int i,x,y;
-
-  ClearWindow();
-  UnmapLevelEditorWindowGadgets();
-
-  /* Inhalt der Mampfer */
-  DrawText(ED_COUNT_GADGET_XPOS+1,SY+6,
-	   "Contents of a smashed cruncher:",FS_SMALL,FC_YELLOW);
-  for(i=0;i<4;i++) for(y=0;y<4;y++) for(x=0;x<4;x++)
-  {
-    DrawMiniElement(1+5*i+x,2+y,EL_ERDREICH);
-    XFillRectangle(display,drawto,gc,
-		   SX+(1+5*i)*MINI_TILEX+MINI_TILEX/2-1,
-		   SY+(2)*MINI_TILEY+MINI_TILEY/2-1,
-		   3*MINI_TILEX+2,3*MINI_TILEY+2);
-  }
-  XCopyArea(display,drawto,drawto,gc,
-	    SX+1*MINI_TILEX,SY+2*MINI_TILEY,
-	    4*5*MINI_TILEX,5*MINI_TILEY,
-	    SX+1*MINI_TILEX-MINI_TILEX/2,SY+2*MINI_TILEY-MINI_TILEY/2);
-  for(i=0;i<4;i++)
-  {
-    for(y=0;y<3;y++) for(x=0;x<3;x++)
-      DrawMiniElement(1+5*i+x,2+y,level.mampfer_inhalt[i][x][y]);
-
-    DrawText(SX+MINI_TILEX+(5*i+1)*MINI_TILEX+1,
-	     SY+2*MINI_TILEY+(4)*MINI_TILEY-4,
-	     int2str(i+1,1),FS_SMALL,FC_YELLOW);
-  }
-
-  /* Inhalt der Amöbe */
-  for(y=0;y<2;y++) for(x=0;x<2;x++)
-  {
-    DrawMiniElement(29+x,26+y,EL_ERDREICH);
-    XFillRectangle(display,drawto,gc,
-		   SX+29*MINI_TILEX+MINI_TILEX/2-1,
-		   SY+26*MINI_TILEY+MINI_TILEY/2-1,
-		   MINI_TILEX+2,MINI_TILEY+2);
-  }
-  XCopyArea(display,drawto,drawto,gc,
-	    SX+29*MINI_TILEX,SY+26*MINI_TILEY,
-	    3*MINI_TILEX,3*MINI_TILEY,
-	    SX+29*MINI_TILEX-MINI_TILEX/2,SY+26*MINI_TILEY-MINI_TILEY/2);
-  DrawMiniElement(29,26,level.amoebe_inhalt);
-
-  for(i=0;i<11+3+2;i++)
-  {
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      DOOR_GFX_PAGEX4+ED_BUTTON_MINUS_XPOS,
-	      DOOR_GFX_PAGEY1+ED_BUTTON_MINUS_YPOS,
-	      DXSIZE-4,ED_BUTTON_MINUS_YSIZE,
-	      ED_COUNT_GADGET_XPOS,
-	      ED_COUNT_GADGET_YPOS+i*ED_COUNT_GADGET_YSIZE);
-
-    if (i<11)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+i*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.score[i],3),FS_SMALL,FC_YELLOW);
-    else if (i==11)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+11*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.tempo_amoebe,3),FS_SMALL,FC_YELLOW);
-    else if (i==12)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+12*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.dauer_sieb,3),FS_SMALL,FC_YELLOW);
-    else if (i==13)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+13*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.dauer_ablenk,3),FS_SMALL,FC_YELLOW);
-    else if (i==14)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+14*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.edelsteine,3),FS_SMALL,FC_YELLOW);
-    else if (i==15)
-      DrawText(ED_COUNT_VALUE_XPOS,
-	       ED_COUNT_VALUE_YPOS+15*ED_COUNT_GADGET_YSIZE,
-	       int2str(level.time,3),FS_SMALL,FC_YELLOW);
-  }
-
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+0*ED_COUNT_TEXT_YSIZE,
-	   "Score for Emerald",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+1*ED_COUNT_TEXT_YSIZE,
-	   "Score for Diamond",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+2*ED_COUNT_TEXT_YSIZE,
-	   "Score for smashing a Bug",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+3*ED_COUNT_TEXT_YSIZE,
-	   "Score for smashing a Spaceship",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+4*ED_COUNT_TEXT_YSIZE,
-	   "Score for smashing a Cruncher",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+5*ED_COUNT_TEXT_YSIZE,
-	   "Score for smashing an Alien",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+6*ED_COUNT_TEXT_YSIZE,
-	   "Score for smashing a Pacman",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+7*ED_COUNT_TEXT_YSIZE,
-	   "Score for cracking a nut",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+8*ED_COUNT_TEXT_YSIZE,
-	   "Score for dynamite",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+9*ED_COUNT_TEXT_YSIZE,
-	   "Score for key",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+10*ED_COUNT_TEXT_YSIZE,
-	   "Score for each 10 seconds left",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+11*ED_COUNT_TEXT_YSIZE,
-	   "Speed of the amoeba / Content",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+12*ED_COUNT_TEXT_YSIZE,
-	   "Time for magic wall",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+13*ED_COUNT_TEXT_YSIZE,
-	   "Time for wheel",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+14*ED_COUNT_TEXT_YSIZE,
-	   "Emeralds needed in this level",FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+15*ED_COUNT_TEXT_YSIZE,
-	   "Time available for this level",FS_SMALL,FC_YELLOW);
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX4+ED_WIN_COUNT_XPOS,
-	    DOOR_GFX_PAGEY1+ED_WIN_COUNT_YPOS,
-	    ED_WIN_COUNT_XSIZE,ED_WIN_COUNT_YSIZE,
-	    ED_COUNT_GADGET_XPOS,
-	    ED_COUNT_GADGET_YPOS+16*ED_COUNT_GADGET_YSIZE);
-  for(i=1;i<31;i++)
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      DOOR_GFX_PAGEX4+ED_WIN_COUNT_XPOS+3+2*FONT2_XSIZE,
-	      DOOR_GFX_PAGEY1+ED_WIN_COUNT_YPOS,
-	      ED_WIN_COUNT_XSIZE-3-2*FONT2_XSIZE,ED_WIN_COUNT_YSIZE,
-	      ED_COUNT_GADGET_XPOS+3+i*FONT2_XSIZE,
-	      ED_COUNT_GADGET_YPOS+16*ED_COUNT_GADGET_YSIZE);
-  DrawText(ED_COUNT_GADGET_XPOS+5,
-	   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-	   level.name,FS_SMALL,FC_YELLOW);
-  DrawText(ED_COUNT_GADGET_XPOS+(30+3)*FONT2_XSIZE-5,
-	   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-	   "Title",FS_SMALL,FC_YELLOW);
-
-  DrawText(ED_SIZE_GADGET_XPOS,ED_SIZE_GADGET_YPOS-18,
-	   "Playfield size:",FS_SMALL,FC_YELLOW);
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX4+ED_BUTTON_MINUS_XPOS,
-	    DOOR_GFX_PAGEY1+ED_BUTTON_MINUS_YPOS,
-	    DXSIZE-4,ED_BUTTON_MINUS_YSIZE,
-	    ED_SIZE_GADGET_XPOS,
-	    ED_SIZE_GADGET_YPOS+0*ED_COUNT_GADGET_YSIZE);
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX4+ED_BUTTON_MINUS_XPOS,
-	    DOOR_GFX_PAGEY1+ED_BUTTON_MINUS_YPOS,
-	    DXSIZE-4,ED_BUTTON_MINUS_YSIZE,
-	    ED_SIZE_GADGET_XPOS,
-	    ED_SIZE_GADGET_YPOS+1*ED_COUNT_GADGET_YSIZE);
-  DrawText(ED_SIZE_TEXT_XPOS,ED_SIZE_TEXT_YPOS+0*ED_SIZE_TEXT_YSIZE,
-	   "Width",FS_SMALL,FC_YELLOW);
-  DrawText(ED_SIZE_TEXT_XPOS,ED_SIZE_TEXT_YPOS+1*ED_SIZE_TEXT_YSIZE,
-	   "Height",FS_SMALL,FC_YELLOW);
-  DrawText(ED_SIZE_VALUE_XPOS,ED_SIZE_VALUE_YPOS+0*ED_SIZE_GADGET_YSIZE,
-	   int2str(level.fieldx,3),FS_SMALL,FC_YELLOW);
-  DrawText(ED_SIZE_VALUE_XPOS,ED_SIZE_VALUE_YPOS+1*ED_SIZE_GADGET_YSIZE,
-	   int2str(level.fieldy,3),FS_SMALL,FC_YELLOW);
-}
-
-#endif
-
-
 
 static void AdjustDrawingAreaGadgets()
 {
@@ -1982,6 +1919,7 @@ static void DrawLevelInfoWindow()
 {
   char infotext[1024];
   int infotext_yoffset = MINI_TILEX + ED_GADGET_DISTANCE;
+  int infotext_yoffset2 = ED_BORDER_SIZE;
   int i, x, y;
 
   ClearWindow();
@@ -1992,12 +1930,12 @@ static void DrawLevelInfoWindow()
 
   gadget_level_xsize_value = &lev_fieldx;
   gadget_level_ysize_value = &lev_fieldy;
-  gadget_level_random_value = &random_placement_num_objects;
+  gadget_level_random_value = &random_placement_value;
   gadget_level_collect_value = &level.edelsteine;
   gadget_level_timelimit_value = &level.time;
   gadget_level_timescore_value = &level.score[10];
 
-  /* draw counter gadgets for level info */
+  /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_XSIZE; i<=ED_COUNTER_ID_LEVEL_TIMESCORE; i++)
   {
     x = counterbutton_info[i].x;
@@ -2011,7 +1949,7 @@ static void DrawLevelInfoWindow()
     MapCounterButtons(i);
   }
 
-  /* draw text input gadgets for level info */
+  /* draw text input gadgets */
   for (i=ED_TEXTINPUT_ID_LEVEL_NAME; i<=ED_TEXTINPUT_ID_LEVEL_AUTHOR; i++)
   {
     x = textinput_info[i].x;
@@ -2023,6 +1961,26 @@ static void DrawLevelInfoWindow()
     DrawTextF(x, y, FC_YELLOW, infotext);
     ModifyEditorTextInput(i, textinput_info[i].value);
     MapTextInputGadget(i);
+  }
+
+  x = counterbutton_info[ED_COUNTER_ID_LEVEL_RANDOM].x + counter_xsize;
+  y = counterbutton_info[ED_COUNTER_ID_LEVEL_RANDOM].y + infotext_yoffset2;
+
+  DrawTextF(x, y, FC_YELLOW, "in");
+
+  /* draw checkbutton gadgets */
+  for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
+  {
+    boolean checked =
+      (*checkbutton_info[i].value == checkbutton_info[i].checked_value);
+
+    x = checkbutton_info[i].x + ED_CHECKBUTTON_XSIZE + ED_GADGET_DISTANCE;
+    y = checkbutton_info[i].y + infotext_yoffset2;
+
+    DrawTextF(x, y, FC_YELLOW, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, checked, GDI_END);
+    MapCheckbuttonGadget(i);
   }
 }
 
@@ -2142,6 +2100,7 @@ static void DrawPropertiesWindow()
 {
   int i, x, y;
   int num_elements_in_level;
+  float percentage;
   static struct
   {
     int element;
@@ -2221,9 +2180,11 @@ static void DrawPropertiesWindow()
     for (x=0; x<lev_fieldx; x++)
       if (Feld[x][y] == properties_element)
 	num_elements_in_level++;
+  percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextF(ED_PROPERTIES_XPOS, 5*TILEY, FC_YELLOW, "%d x contained in level",
-	    num_elements_in_level);
+  DrawTextF(ED_PROPERTIES_XPOS, 5*TILEY, FC_YELLOW,
+	    "%d x contained in level (%.2f %%)",
+	    num_elements_in_level, percentage);
 
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
@@ -2422,7 +2383,8 @@ static void DrawArc(int from_x, int from_y, int to_x, int to_y,
   DrawArcExt(from_x, from_y, to_x2, to_y2, element, change_level);
 }
 
-#if 0
+#define DRAW_CIRCLES_BUTTON_AVAILABLE	0
+#if DRAW_CIRCLES_BUTTON_AVAILABLE
 static void DrawCircle(int from_x, int from_y, int to_x, int to_y,
 		       int element, boolean change_level)
 {
@@ -2813,36 +2775,49 @@ static void CopyLevelToUndoBuffer(int mode)
 #endif
 }
 
-static void RandomPlacement(int button)
+static void RandomPlacement(int new_element)
 {
-  int new_element;
+  static boolean free_position[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+  int num_free_positions;
+  int num_percentage;
+  int num_elements;
   int x, y;
 
-  new_element = (button == 1 ? new_element1 :
-		 button == 2 ? new_element2 :
-		 button == 3 ? new_element3 : 0);
+  /* determine number of free positions for the new elements */
+  num_free_positions = 0;
+  for (x=0; x<lev_fieldx; x++)
+    for (y=0; y<lev_fieldy; y++)
+      if ((free_position[x][y] = (Feld[x][y] != new_element)))
+	num_free_positions++;
 
-  if (random_placement_method == RANDOM_USE_PERCENTAGE)
+  /* determine number of new elements to place there */
+  num_percentage = num_free_positions * random_placement_value / 100;
+  num_elements = (random_placement_method == RANDOM_USE_PERCENTAGE ?
+		  num_percentage : random_placement_value);
+
+  /* if not more free positions than elements to place, fill whole level */
+  if (num_elements >= num_free_positions)
   {
-    for(x=0; x<lev_fieldx; x++)
-      for(y=0; y<lev_fieldy; y++)
-	if (RND(100) < random_placement_percentage)
-	  Feld[x][y] = new_element;
-  }
-  else
-  {
-    int elements_left = random_placement_num_objects;
-
-    while (elements_left > 0)
-    {
-      x = RND(lev_fieldx);
-      y = RND(lev_fieldy);
-
-      if (Feld[x][y] != new_element)
-      {
+    for (x=0; x<lev_fieldx; x++)
+      for (y=0; y<lev_fieldy; y++)
 	Feld[x][y] = new_element;
-	elements_left--;
-      }
+
+    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+    return;
+  }
+
+  while (num_elements > 0)
+  {
+    x = RND(lev_fieldx);
+    y = RND(lev_fieldy);
+
+    /* don't place element at the same position twice */
+    if (free_position[x][y])
+    {
+      free_position[x][y] = FALSE;
+      Feld[x][y] = new_element;
+      num_elements--;
     }
   }
 
@@ -2877,8 +2852,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   boolean button_release_event;
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean draw_level = (id == GADGET_ID_DRAWING_LEVEL);
-  int new_element;
   int button = gi->event.button;
+  int new_element = BUTTON_ELEMENT(button);
   int sx = gi->event.x, sy = gi->event.y;
   int min_sx = 0, min_sy = 0;
   int max_sx = gi->drawing.area_xsize - 1, max_sy = gi->drawing.area_ysize - 1;
@@ -2928,10 +2903,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
   if (!button && !button_release_event)
     return;
-
-  new_element = (button == 1 ? new_element1 :
-		 button == 2 ? new_element2 :
-		 button == 3 ? new_element3 : 0);
 
 
 #if 0
@@ -3233,14 +3204,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int id = gi->custom_id;
   int button = gi->event.button;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-  int new_element;
+  int new_element = BUTTON_ELEMENT(button);
   int player_present = FALSE;
   int level_changed = FALSE;
   int i, x, y;
-
-  new_element = (button == 1 ? new_element1 :
-		 button == 2 ? new_element2 :
-		 button == 3 ? new_element3 : 0);
 
   if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
     DrawLevelText(0, 0, 0, TEXT_END);
@@ -3403,7 +3370,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_RANDOM_PLACEMENT:
-      RandomPlacement(button);
+      RandomPlacement(new_element);
       break;
 
     case GADGET_ID_PROPERTIES:
@@ -3577,6 +3544,16 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
+    case GADGET_ID_RANDOM_PERCENTAGE:
+      *checkbutton_info[ED_CHECKBUTTON_PERCENTAGE].value =
+	checkbutton_info[ED_CHECKBUTTON_PERCENTAGE].checked_value;
+      break;
+
+    case GADGET_ID_RANDOM_QUANTITY:
+      *checkbutton_info[ED_CHECKBUTTON_QUANTITY].value =
+	checkbutton_info[ED_CHECKBUTTON_QUANTITY].checked_value;
+      break;
+
     default:
       if (id >= GADGET_ID_ELEMENTLIST_FIRST &&
 	  id <= GADGET_ID_ELEMENTLIST_LAST)
@@ -3595,13 +3572,13 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
 #ifdef DEBUG
       else if (gi->event.type == GD_EVENT_PRESSED)
-	printf("default: HandleControlButtons: GD_EVENT_PRESSED\n");
+	printf("default: HandleControlButtons: GD_EVENT_PRESSED(%d)\n", id);
       else if (gi->event.type == GD_EVENT_RELEASED)
-	printf("default: HandleControlButtons: GD_EVENT_RELEASED\n");
+	printf("default: HandleControlButtons: GD_EVENT_RELEASED(%d)\n", id);
       else if (gi->event.type == GD_EVENT_MOVING)
-	printf("default: HandleControlButtons: GD_EVENT_MOVING\n");
+	printf("default: HandleControlButtons: GD_EVENT_MOVING(%d)\n", id);
       else
-	printf("default: HandleControlButtons: ?\n");
+	printf("default: HandleControlButtons: ? (id == %d)\n", id);
 #endif
       break;
   }
