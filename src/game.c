@@ -2327,6 +2327,13 @@ void Impact(int x, int y)
     return;
   }
 
+#if 0
+  printf("::: -> %d,%d [%d]\n", element, ACTION_IMPACT,
+	 element_info[element].sound[ACTION_IMPACT]);
+
+  PlaySound(177);
+#endif
+
   /* play sound of object that hits the ground */
   if (lastline || object_hit)
     PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);

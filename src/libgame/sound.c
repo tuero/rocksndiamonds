@@ -149,9 +149,14 @@ struct SoundControl
 typedef struct SoundControl SoundControl;
 
 static struct ArtworkListInfo *sound_info = NULL;
+#if 0
 static SoundInfo **Sound = NULL;
+#endif
 static MusicInfo **Music = NULL;
-static int num_sounds = 0, num_music = 0;
+#if 0
+static int num_sounds = 0;
+#endif
+static int num_music = 0;
 static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 
 
@@ -174,6 +179,8 @@ static int ulaw_to_linear(unsigned char);
 static void ReloadCustomSounds();
 static void ReloadCustomMusic();
 static void FreeSound(void *);
+
+static SoundInfo *getSoundInfoEntryFromSoundID(int);
 
 
 /* ------------------------------------------------------------------------- */
@@ -816,6 +823,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 {
   SoundInfo *snd_info;
   int i, k;
+  int num_sounds = getSoundListSize();
 
 #if 0
   printf("NEW SOUND %d ARRIVED [%d] [%d ACTIVE CHANNELS]\n",
@@ -832,7 +840,13 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   else if (snd_ctrl.nr >= num_sounds)
     return;
 
+#if 0
   snd_info = (IS_MUSIC(snd_ctrl) ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
+#else
+  snd_info = (IS_MUSIC(snd_ctrl) ? Music[snd_ctrl.nr] :
+	      getSoundInfoEntryFromSoundID(snd_ctrl.nr));
+#endif
+
   if (snd_info == NULL)
     return;
 
@@ -1782,6 +1796,17 @@ struct FileInfo *getSoundListEntry(int pos)
 	  &sound_info->dynamic_file_list[list_pos]);
 }
 
+static SoundInfo *getSoundInfoEntryFromSoundID(int pos)
+{
+  int num_list_entries = sound_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+  SoundInfo **snd_info =
+    (SoundInfo **)(pos < num_list_entries ? sound_info->artwork_list :
+		   sound_info->dynamic_artwork_list);
+
+  return snd_info[list_pos];
+}
+
 int getSoundListPropertyMappingSize()
 {
   return sound_info->num_property_mapping_entries;
@@ -1866,8 +1891,10 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;
 
+#if 0
   num_sounds = sound_info->num_file_list_entries;
   Sound = (SoundInfo **)sound_info->artwork_list;
+#endif
 }
 
 static MusicInfo *Load_MOD(char *filename)
@@ -2080,6 +2107,10 @@ static void ReloadCustomSounds()
 
   LoadArtworkConfig(sound_info);
   ReloadCustomArtworkList(sound_info);
+
+#if 0
+  num_sounds = getSoundListSize();
+#endif
 }
 
 static void ReloadCustomMusic()

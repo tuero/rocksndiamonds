@@ -1897,642 +1897,642 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "custom_1",
-    "custom",
+    "custom_1",
     "custom element 1"
   },
   {
     "custom_2",
-    "custom",
+    "custom_2",
     "custom element 2"
   },
   {
     "custom_3",
-    "custom",
+    "custom_3",
     "custom element 3"
   },
   {
     "custom_4",
-    "custom",
+    "custom_4",
     "custom element 4"
   },
   {
     "custom_5",
-    "custom",
+    "custom_5",
     "custom element 5"
   },
   {
     "custom_6",
-    "custom",
+    "custom_6",
     "custom element 6"
   },
   {
     "custom_7",
-    "custom",
+    "custom_7",
     "custom element 7"
   },
   {
     "custom_8",
-    "custom",
+    "custom_8",
     "custom element 8"
   },
   {
     "custom_9",
-    "custom",
+    "custom_9",
     "custom element 9"
   },
   {
     "custom_10",
-    "custom",
+    "custom_10",
     "custom element 10"
   },
   {
     "custom_11",
-    "custom",
+    "custom_11",
     "custom element 11"
   },
   {
     "custom_12",
-    "custom",
+    "custom_12",
     "custom element 12"
   },
   {
     "custom_13",
-    "custom",
+    "custom_13",
     "custom element 13"
   },
   {
     "custom_14",
-    "custom",
+    "custom_14",
     "custom element 14"
   },
   {
     "custom_15",
-    "custom",
+    "custom_15",
     "custom element 15"
   },
   {
     "custom_16",
-    "custom",
+    "custom_16",
     "custom element 16"
   },
   {
     "custom_17",
-    "custom",
+    "custom_17",
     "custom element 17"
   },
   {
     "custom_18",
-    "custom",
+    "custom_18",
     "custom element 18"
   },
   {
     "custom_19",
-    "custom",
+    "custom_19",
     "custom element 19"
   },
   {
     "custom_20",
-    "custom",
+    "custom_20",
     "custom element 20"
   },
   {
     "custom_21",
-    "custom",
+    "custom_21",
     "custom element 21"
   },
   {
     "custom_22",
-    "custom",
+    "custom_22",
     "custom element 22"
   },
   {
     "custom_23",
-    "custom",
+    "custom_23",
     "custom element 23"
   },
   {
     "custom_24",
-    "custom",
+    "custom_24",
     "custom element 24"
   },
   {
     "custom_25",
-    "custom",
+    "custom_25",
     "custom element 25"
   },
   {
     "custom_26",
-    "custom",
+    "custom_26",
     "custom element 26"
   },
   {
     "custom_27",
-    "custom",
+    "custom_27",
     "custom element 27"
   },
   {
     "custom_28",
-    "custom",
+    "custom_28",
     "custom element 28"
   },
   {
     "custom_29",
-    "custom",
+    "custom_29",
     "custom element 29"
   },
   {
     "custom_30",
-    "custom",
+    "custom_30",
     "custom element 30"
   },
   {
     "custom_31",
-    "custom",
+    "custom_31",
     "custom element 31"
   },
   {
     "custom_32",
-    "custom",
+    "custom_32",
     "custom element 32"
   },
   {
     "custom_33",
-    "custom",
+    "custom_33",
     "custom element 33"
   },
   {
     "custom_34",
-    "custom",
+    "custom_34",
     "custom element 34"
   },
   {
     "custom_35",
-    "custom",
+    "custom_35",
     "custom element 35"
   },
   {
     "custom_36",
-    "custom",
+    "custom_36",
     "custom element 36"
   },
   {
     "custom_37",
-    "custom",
+    "custom_37",
     "custom element 37"
   },
   {
     "custom_38",
-    "custom",
+    "custom_38",
     "custom element 38"
   },
   {
     "custom_39",
-    "custom",
+    "custom_39",
     "custom element 39"
   },
   {
     "custom_40",
-    "custom",
+    "custom_40",
     "custom element 40"
   },
   {
     "custom_41",
-    "custom",
+    "custom_41",
     "custom element 41"
   },
   {
     "custom_42",
-    "custom",
+    "custom_42",
     "custom element 42"
   },
   {
     "custom_43",
-    "custom",
+    "custom_43",
     "custom element 43"
   },
   {
     "custom_44",
-    "custom",
+    "custom_44",
     "custom element 44"
   },
   {
     "custom_45",
-    "custom",
+    "custom_45",
     "custom element 45"
   },
   {
     "custom_46",
-    "custom",
+    "custom_46",
     "custom element 46"
   },
   {
     "custom_47",
-    "custom",
+    "custom_47",
     "custom element 47"
   },
   {
     "custom_48",
-    "custom",
+    "custom_48",
     "custom element 48"
   },
   {
     "custom_49",
-    "custom",
+    "custom_49",
     "custom element 49"
   },
   {
     "custom_50",
-    "custom",
+    "custom_50",
     "custom element 50"
   },
   {
     "custom_51",
-    "custom",
+    "custom_51",
     "custom element 51"
   },
   {
     "custom_52",
-    "custom",
+    "custom_52",
     "custom element 52"
   },
   {
     "custom_53",
-    "custom",
+    "custom_53",
     "custom element 53"
   },
   {
     "custom_54",
-    "custom",
+    "custom_54",
     "custom element 54"
   },
   {
     "custom_55",
-    "custom",
+    "custom_55",
     "custom element 55"
   },
   {
     "custom_56",
-    "custom",
+    "custom_56",
     "custom element 56"
   },
   {
     "custom_57",
-    "custom",
+    "custom_57",
     "custom element 57"
   },
   {
     "custom_58",
-    "custom",
+    "custom_58",
     "custom element 58"
   },
   {
     "custom_59",
-    "custom",
+    "custom_59",
     "custom element 59"
   },
   {
     "custom_60",
-    "custom",
+    "custom_60",
     "custom element 60"
   },
   {
     "custom_61",
-    "custom",
+    "custom_61",
     "custom element 61"
   },
   {
     "custom_62",
-    "custom",
+    "custom_62",
     "custom element 62"
   },
   {
     "custom_63",
-    "custom",
+    "custom_63",
     "custom element 63"
   },
   {
     "custom_64",
-    "custom",
+    "custom_64",
     "custom element 64"
   },
   {
     "custom_65",
-    "custom",
+    "custom_65",
     "custom element 65"
   },
   {
     "custom_66",
-    "custom",
+    "custom_66",
     "custom element 66"
   },
   {
     "custom_67",
-    "custom",
+    "custom_67",
     "custom element 67"
   },
   {
     "custom_68",
-    "custom",
+    "custom_68",
     "custom element 68"
   },
   {
     "custom_69",
-    "custom",
+    "custom_69",
     "custom element 69"
   },
   {
     "custom_70",
-    "custom",
+    "custom_70",
     "custom element 70"
   },
   {
     "custom_71",
-    "custom",
+    "custom_71",
     "custom element 71"
   },
   {
     "custom_72",
-    "custom",
+    "custom_72",
     "custom element 72"
   },
   {
     "custom_73",
-    "custom",
+    "custom_73",
     "custom element 73"
   },
   {
     "custom_74",
-    "custom",
+    "custom_74",
     "custom element 74"
   },
   {
     "custom_75",
-    "custom",
+    "custom_75",
     "custom element 75"
   },
   {
     "custom_76",
-    "custom",
+    "custom_76",
     "custom element 76"
   },
   {
     "custom_77",
-    "custom",
+    "custom_77",
     "custom element 77"
   },
   {
     "custom_78",
-    "custom",
+    "custom_78",
     "custom element 78"
   },
   {
     "custom_79",
-    "custom",
+    "custom_79",
     "custom element 79"
   },
   {
     "custom_80",
-    "custom",
+    "custom_80",
     "custom element 80"
   },
   {
     "custom_81",
-    "custom",
+    "custom_81",
     "custom element 81"
   },
   {
     "custom_82",
-    "custom",
+    "custom_82",
     "custom element 82"
   },
   {
     "custom_83",
-    "custom",
+    "custom_83",
     "custom element 83"
   },
   {
     "custom_84",
-    "custom",
+    "custom_84",
     "custom element 84"
   },
   {
     "custom_85",
-    "custom",
+    "custom_85",
     "custom element 85"
   },
   {
     "custom_86",
-    "custom",
+    "custom_86",
     "custom element 86"
   },
   {
     "custom_87",
-    "custom",
+    "custom_87",
     "custom element 87"
   },
   {
     "custom_88",
-    "custom",
+    "custom_88",
     "custom element 88"
   },
   {
     "custom_89",
-    "custom",
+    "custom_89",
     "custom element 89"
   },
   {
     "custom_90",
-    "custom",
+    "custom_90",
     "custom element 90"
   },
   {
     "custom_91",
-    "custom",
+    "custom_91",
     "custom element 91"
   },
   {
     "custom_92",
-    "custom",
+    "custom_92",
     "custom element 92"
   },
   {
     "custom_93",
-    "custom",
+    "custom_93",
     "custom element 93"
   },
   {
     "custom_94",
-    "custom",
+    "custom_94",
     "custom element 94"
   },
   {
     "custom_95",
-    "custom",
+    "custom_95",
     "custom element 95"
   },
   {
     "custom_96",
-    "custom",
+    "custom_96",
     "custom element 96"
   },
   {
     "custom_97",
-    "custom",
+    "custom_97",
     "custom element 97"
   },
   {
     "custom_98",
-    "custom",
+    "custom_98",
     "custom element 98"
   },
   {
     "custom_99",
-    "custom",
+    "custom_99",
     "custom element 99"
   },
   {
     "custom_100",
-    "custom",
+    "custom_100",
     "custom element 100"
   },
   {
     "custom_101",
-    "custom",
+    "custom_101",
     "custom element 101"
   },
   {
     "custom_102",
-    "custom",
+    "custom_102",
     "custom element 102"
   },
   {
     "custom_103",
-    "custom",
+    "custom_103",
     "custom element 103"
   },
   {
     "custom_104",
-    "custom",
+    "custom_104",
     "custom element 104"
   },
   {
     "custom_105",
-    "custom",
+    "custom_105",
     "custom element 105"
   },
   {
     "custom_106",
-    "custom",
+    "custom_106",
     "custom element 106"
   },
   {
     "custom_107",
-    "custom",
+    "custom_107",
     "custom element 107"
   },
   {
     "custom_108",
-    "custom",
+    "custom_108",
     "custom element 108"
   },
   {
     "custom_109",
-    "custom",
+    "custom_109",
     "custom element 109"
   },
   {
     "custom_110",
-    "custom",
+    "custom_110",
     "custom element 110"
   },
   {
     "custom_111",
-    "custom",
+    "custom_111",
     "custom element 111"
   },
   {
     "custom_112",
-    "custom",
+    "custom_112",
     "custom element 112"
   },
   {
     "custom_113",
-    "custom",
+    "custom_113",
     "custom element 113"
   },
   {
     "custom_114",
-    "custom",
+    "custom_114",
     "custom element 114"
   },
   {
     "custom_115",
-    "custom",
+    "custom_115",
     "custom element 115"
   },
   {
     "custom_116",
-    "custom",
+    "custom_116",
     "custom element 116"
   },
   {
     "custom_117",
-    "custom",
+    "custom_117",
     "custom element 117"
   },
   {
     "custom_118",
-    "custom",
+    "custom_118",
     "custom element 118"
   },
   {
     "custom_119",
-    "custom",
+    "custom_119",
     "custom element 119"
   },
   {
     "custom_120",
-    "custom",
+    "custom_120",
     "custom element 120"
   },
   {
     "custom_121",
-    "custom",
+    "custom_121",
     "custom element 121"
   },
   {
     "custom_122",
-    "custom",
+    "custom_122",
     "custom element 122"
   },
   {
     "custom_123",
-    "custom",
+    "custom_123",
     "custom element 123"
   },
   {
     "custom_124",
-    "custom",
+    "custom_124",
     "custom element 124"
   },
   {
     "custom_125",
-    "custom",
+    "custom_125",
     "custom element 125"
   },
   {
     "custom_126",
-    "custom",
+    "custom_126",
     "custom element 126"
   },
   {
     "custom_127",
-    "custom",
+    "custom_127",
     "custom element 127"
   },
   {
     "custom_128",
-    "custom",
+    "custom_128",
     "custom element 128"
   },
 

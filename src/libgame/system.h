@@ -206,9 +206,13 @@
 #define VERSION_PATCH(x)	((x) % 100)
 
 /* functions for parent/child process identification */
+#if defined(PLATFORM_UNIX)
 #define IS_PARENT_PROCESS()	(audio.mixer_pid != getpid())
 #define IS_CHILD_PROCESS()	(audio.mixer_pid == getpid())
-
+#else
+#define IS_PARENT_PROCESS()	TRUE
+#define IS_CHILD_PROCESS()	FALSE
+#endif
 
 /* type definitions */
 typedef int (*EventFilter)(const Event *);

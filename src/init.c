@@ -189,7 +189,7 @@ static void InitArtworkConfig()
     special_suffix[i] = special_suffix_info[i].suffix;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		element_prefix, action_suffix,direction_suffix, special_suffix,
+		element_prefix, action_suffix, direction_suffix,special_suffix,
 		ignore_image_tokens);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
 		sound_class_prefix, action_suffix, dummy, dummy, dummy);
@@ -861,11 +861,6 @@ void InitElementSpecialGraphicInfo()
   }
 }
 
-static void InitElementSoundInfo()
-{
-  /* !!! soon to come !!! */
-}
-
 static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
@@ -1123,6 +1118,11 @@ static void InitGraphicInfo()
   clipmasks_initialized = TRUE;
 }
 
+static void InitElementSoundInfo()
+{
+  /* !!! soon to come !!! */
+}
+
 static void set_sound_parameters(int sound, char **parameter_raw)
 {
   int parameter[NUM_SND_ARGS];
@@ -1140,6 +1140,8 @@ static void set_sound_parameters(int sound, char **parameter_raw)
 
 static void InitSoundInfo()
 {
+  struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
+  int num_property_mappings = getSoundListPropertyMappingSize();
   int *sound_effect_properties;
   int num_sounds = getSoundListSize();
   int i, j;
@@ -1205,6 +1207,37 @@ static void InitSoundInfo()
 
   free(sound_effect_properties);
 
+  /* initialize element/sound mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element   = property_mapping[i].base_index;
+    int action    = property_mapping[i].ext1_index;
+    int sound     = property_mapping[i].artwork_index;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    element_info[element].sound[action] = sound;
+  }
+
+#if 0
+  /* TEST ONLY */
+  {
+    int element = EL_CUSTOM_11;
+    int j = 0;
+
+    while (element_action_info[j].suffix)
+    {
+      printf("element %d, sound action '%s'  == %d\n",
+	     element, element_action_info[j].suffix,
+	     element_info[element].sound[j]);
+      j++;
+    }
+  }
+
+  PlaySoundLevelElementAction(0,0, EL_CUSTOM_11, ACTION_PUSHING);
+#endif
+
 #if 0
   /* TEST ONLY */
   {
@@ -1217,7 +1250,7 @@ static void InitSoundInfo()
       if (element_action_info[j].value == sound_action)
 	printf("element %d, sound action '%s'  == %d\n",
 	       element, element_action_info[j].suffix,
-	       element_info_[element].sound[sound_action]);
+	       element_info[element].sound[sound_action]);
       j++;
     }
   }
