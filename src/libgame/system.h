@@ -63,6 +63,7 @@
 #define MB_MENU_CHOICE		FALSE
 #define MB_MENU_MARK		TRUE
 #define MB_MENU_INITIALIZE	(-1)
+#define MB_MENU_LEAVE		(-2)
 #define MB_LEFTBUTTON		1
 #define MB_MIDDLEBUTTON		2
 #define MB_RIGHTBUTTON		3

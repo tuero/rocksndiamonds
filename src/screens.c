@@ -24,6 +24,10 @@
 #include "network.h"
 #include "init.h"
 
+/* screens in the setup menu */
+#define SETUP_MODE_MAIN			0
+#define SETUP_MODE_INPUT		1
+
 /* for DrawSetupScreen(), HandleSetupScreen() */
 #define SETUP_SCREEN_POS_START		0
 #define SETUP_SCREEN_POS_END		(SCR_FIELDY - 3)
@@ -54,6 +58,33 @@
 static void HandleScreenGadgets(struct GadgetInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
+
+static void drawCursorExt(int pos, int color, int graphic)
+{
+  static int cursor_array[SCR_FIELDY];
+
+  if (graphic)
+    cursor_array[pos] = graphic;
+
+  graphic = cursor_array[pos];
+
+  if (color == FC_RED)
+    graphic = (graphic == GFX_ARROW_BLUE_LEFT  ? GFX_ARROW_RED_LEFT  :
+	       graphic == GFX_ARROW_BLUE_RIGHT ? GFX_ARROW_RED_RIGHT :
+	       GFX_KUGEL_ROT);
+
+  DrawGraphic(0, MENU_SCREEN_START_YPOS + pos, graphic);
+}
+
+static void initCursor(int pos, int graphic)
+{
+  drawCursorExt(pos, FC_BLUE, graphic);
+}
+
+static void drawCursor(int pos, int color)
+{
+  drawCursorExt(pos, color, 0);
+}
 
 void DrawHeadline()
 {
@@ -158,8 +189,9 @@ void DrawMainMenu()
     DrawTextF(15*32 + 6, 3*32 + 9 + 7, FC_RED, "ONLY");
   }
 
-  for(i=2; i<10; i++)
-    DrawGraphic(0, i, GFX_KUGEL_BLAU);
+  for(i=0; i<8; i++)
+    initCursor(i, (i == 1 || i == 6 ? GFX_ARROW_BLUE_RIGHT : GFX_KUGEL_BLAU));
+
   DrawGraphic(10, 3, GFX_ARROW_BLUE_LEFT);
   DrawGraphic(14, 3, GFX_ARROW_BLUE_RIGHT);
 
@@ -211,7 +243,7 @@ static void gotoTopLevelDir()
 	num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
 
       cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
-      cl_cursor = leveldir_pos - cl_first + 1;
+      cl_cursor = leveldir_pos - cl_first;
 
       leveldir_current->node_parent->node_group->cl_first = cl_first;
       leveldir_current->node_parent->node_group->cl_cursor = cl_cursor;
@@ -223,48 +255,31 @@ static void gotoTopLevelDir()
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
-  static int choice = 3;
-  static int redraw = TRUE;
-  int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
-
-  if (redraw || button == MB_MENU_INITIALIZE)
-  {
-    DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
-    redraw = FALSE;
-  }
+  static int choice = 0;
+  int x = 0;
+  int y = choice;
 
   if (button == MB_MENU_INITIALIZE)
+  {
+    drawCursor(choice, FC_RED);
     return;
+  }
 
-  if (dx || dy)
+  if (mx || my)		/* mouse input */
   {
-    if (dx && choice == 4)
-    {
-      x = (dx < 0 ? 11 : 15);
-      y = 4;
-    }
+    x = (mx - SX) / 32;
+    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
+    if (dx && choice == 1)
+      x = (dx < 0 ? 10 : 14);
     else if (dy)
-    {
-      x = 1;
       y = choice + dy;
-    }
-    else
-      x = y = 0;
-
-    if (y < 3)
-      y = 3;
-    else if (y > 10)
-      y = 10;
   }
 
-  if (!mx && !my && !dx && !dy)
-  {
-    x = 1;
-    y = choice;
-  }
-
-  if (y == 4 && ((x == 11 && level_nr > leveldir_current->first_level) ||
-		 (x == 15 && level_nr < leveldir_current->last_level)) &&
+  if (y == 1 && ((x == 10 && level_nr > leveldir_current->first_level) ||
+		 (x == 14 && level_nr < leveldir_current->last_level)) &&
       button)
   {
     static unsigned long level_delay = 0;
@@ -272,7 +287,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     int new_level_nr, old_level_nr = level_nr;
     int font_color = (leveldir_current->readonly ? FC_RED : FC_YELLOW);
 
-    new_level_nr = level_nr + (x == 11 ? -step : +step);
+    new_level_nr = level_nr + (x == 10 ? -step : +step);
     if (new_level_nr < leveldir_current->first_level)
       new_level_nr = leveldir_current->first_level;
     if (new_level_nr > leveldir_current->last_level)
@@ -304,25 +319,25 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     SyncDisplay();
     DelayReached(&level_delay, 0);	/* reset delay counter */
   }
-  else if (x == 1 && y >= 3 && y <= 10)
+  else if (x == 0 && y >= 0 && y <= 7)
   {
     if (button)
     {
       if (y != choice)
       {
-	DrawGraphic(0, y - 1, GFX_KUGEL_ROT);
-	DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
+	drawCursor(y, FC_RED);
+	drawCursor(choice, FC_BLUE);
 	choice = y;
       }
     }
     else
     {
-      if (y == 3)
+      if (y == 0)
       {
 	game_status = TYPENAME;
 	HandleTypeName(strlen(setup.player_name), 0);
       }
-      else if (y == 4)
+      else if (y == 1)
       {
 	if (leveldir_first)
 	{
@@ -335,12 +350,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  DrawChooseLevel();
 	}
       }
-      else if (y == 5)
+      else if (y == 2)
       {
 	game_status = HALLOFFAME;
 	DrawHallOfFame(-1);
       }
-      else if (y == 6)
+      else if (y == 3)
       {
 	if (leveldir_current->readonly &&
 	    strcmp(setup.player_name, "Artsoft") != 0)
@@ -348,12 +363,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	game_status = LEVELED;
 	DrawLevelEd();
       }
-      else if (y == 7)
+      else if (y == 4)
       {
 	game_status = HELPSCREEN;
 	DrawHelpScreen();
       }
-      else if (y == 8)
+      else if (y == 5)
       {
 	if (setup.autorecord)
 	  TapeStartRecording();
@@ -369,22 +384,21 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  InitGame();
 	}
       }
-      else if (y == 9)
+      else if (y == 6)
       {
 	game_status = SETUP;
 	DrawSetupScreen();
       }
-      else if (y == 10)
+      else if (y == 7)
       {
 	SaveLevelSetup_LastSeries();
 	SaveLevelSetup_SeriesInfo();
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
-
-      redraw = TRUE;
     }
   }
+
   BackToFront();
 
   out:
@@ -395,6 +409,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     DoAnimation();
   }
 }
+
 
 #define MAX_HELPSCREEN_ELS	10
 #define HA_NEXT			-999
@@ -898,33 +913,6 @@ void HandleTypeName(int newxpos, Key key)
   BackToFront();
 }
 
-static void drawCursorExt(int pos, int color, int graphic)
-{
-  static int cursor_array[SCR_FIELDY];
-
-  if (graphic)
-    cursor_array[pos] = graphic;
-
-  graphic = cursor_array[pos];
-
-  if (color == FC_RED)
-    graphic = (graphic == GFX_ARROW_BLUE_LEFT  ? GFX_ARROW_RED_LEFT  :
-	       graphic == GFX_ARROW_BLUE_RIGHT ? GFX_ARROW_RED_RIGHT :
-	       GFX_KUGEL_ROT);
-
-  DrawGraphic(0, MENU_SCREEN_START_YPOS + pos, graphic);
-}
-
-static void initCursor(int pos, int graphic)
-{
-  drawCursorExt(pos, FC_BLUE, graphic);
-}
-
-static void drawCursor(int pos, int color)
-{
-  drawCursorExt(pos, color, 0);
-}
-
 void DrawChooseLevel()
 {
   UnmapAllGadgets();
@@ -1022,9 +1010,8 @@ static void drawChooseLevelInfo(int leveldir_pos)
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   static unsigned long choose_delay = 0;
-  static int redraw = TRUE;
-  int x = (mx + 32 - SX) / 32;
-  int y = (my + 32 - SY) / 32 - MENU_SCREEN_START_YPOS;
+  int x = 0;
+  int y = leveldir_current->cl_cursor;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
   int num_page_entries;
@@ -1042,7 +1029,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     {
       leveldir_current->cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
       leveldir_current->cl_cursor =
-	leveldir_pos - leveldir_current->cl_first + 1;
+	leveldir_pos - leveldir_current->cl_first;
     }
 
     if (dx == 999)	/* first entry is set by scrollbar position */
@@ -1053,39 +1040,44 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
     drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
     drawChooseLevelInfo(leveldir_current->cl_first +
-			leveldir_current->cl_cursor - 1);
-    redraw = TRUE;
-  }
-
-  if (redraw)
-  {
-    drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
-    redraw = FALSE;
-  }
-
-  if (button == MB_MENU_INITIALIZE)
+			leveldir_current->cl_cursor);
+    drawCursor(leveldir_current->cl_cursor, FC_RED);
     return;
-
-  if (dx || dy)
+  }
+  else if (button == MB_MENU_LEAVE)
   {
-    if (dy)
+    if (leveldir_current->node_parent)
     {
-      x = 1;
-      y = leveldir_current->cl_cursor + dy;
+      leveldir_current = leveldir_current->node_parent;
+      DrawChooseLevel();
     }
     else
-      x = y = 0;	/* no action */
+    {
+      game_status = MAINMENU;
+      DrawMainMenu();
+    }
+    return;
+  }
+
+  if (mx || my)		/* mouse input */
+  {
+    x = (mx - SX) / 32;
+    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
+    if (dy)
+      y = leveldir_current->cl_cursor + dy;
 
     if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
     {
       dy = SIGN(dy);
       step = num_page_entries - 1;
-      x = 1;
-      y = (dy < 0 ? 0 : num_page_entries + 1);
+      y = (dy < 0 ? -1 : num_page_entries);
     }
   }
 
-  if (x == 1 && y == 0)
+  if (x == 0 && y == -1)
   {
     if (leveldir_current->cl_first > 0 &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
@@ -1096,14 +1088,14 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
       drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
       drawChooseLevelInfo(leveldir_current->cl_first +
-			  leveldir_current->cl_cursor - 1);
-      drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
+			  leveldir_current->cl_cursor);
+      drawCursor(leveldir_current->cl_cursor, FC_RED);
       AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				 leveldir_current->cl_first);
       return;
     }
   }
-  else if (x == 1 && y > num_page_entries)
+  else if (x == 0 && y > num_page_entries - 1)
   {
     if (leveldir_current->cl_first + num_page_entries < num_leveldirs &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
@@ -1114,25 +1106,18 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
       drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
       drawChooseLevelInfo(leveldir_current->cl_first +
-			  leveldir_current->cl_cursor - 1);
-      drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
+			  leveldir_current->cl_cursor);
+      drawCursor(leveldir_current->cl_cursor, FC_RED);
       AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				 leveldir_current->cl_first);
       return;
     }
   }
 
-  if (!mx && !my && !dx && !dy)
-  {
-    x = 1;
-    y = leveldir_current->cl_cursor;
-  }
-
   if (dx == 1)
   {
     struct LevelDirInfo *node_first, *node_cursor;
-    int leveldir_pos =
-      leveldir_current->cl_first + leveldir_current->cl_cursor - 1;
+    int leveldir_pos = leveldir_current->cl_first + y;
 
     node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
     node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
@@ -1143,30 +1128,32 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       node_cursor->cl_cursor = leveldir_current->cl_cursor;
       leveldir_current = node_cursor->node_group;
       DrawChooseLevel();
+      return;
     }
   }
   else if (dx == -1 && leveldir_current->node_parent)
   {
     leveldir_current = leveldir_current->node_parent;
     DrawChooseLevel();
+    return;
   }
 
-  if (x == 1 && y > 0 && y <= num_page_entries)
+  if (x == 0 && y >= 0 && y < num_page_entries)
   {
     if (button)
     {
       if (y != leveldir_current->cl_cursor)
       {
-	drawCursor(y - 1, FC_RED);
-	drawCursor(leveldir_current->cl_cursor - 1, FC_BLUE);
-	drawChooseLevelInfo(leveldir_current->cl_first + y - 1);
+	drawCursor(y, FC_RED);
+	drawCursor(leveldir_current->cl_cursor, FC_BLUE);
+	drawChooseLevelInfo(leveldir_current->cl_first + y);
 	leveldir_current->cl_cursor = y;
       }
     }
     else
     {
       struct LevelDirInfo *node_first, *node_cursor;
-      int leveldir_pos = leveldir_current->cl_first + y - 1;
+      int leveldir_pos = leveldir_current->cl_first + y;
 
       node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
       node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
@@ -1310,9 +1297,18 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     DoAnimation();
 }
 
+
+/* ========================================================================= */
+/* setup screen functions                                                    */
+/* ========================================================================= */
+
+static struct TokenInfo *setup_info;
+static int num_setup_info;
+static int setup_mode = SETUP_MODE_MAIN;
+
 static void execSetupInput()
 {
-  game_status = SETUPINPUT;
+  setup_mode = SETUP_MODE_INPUT;
   DrawSetupInputScreen();
 }
 
@@ -1328,7 +1324,7 @@ static void execSaveAndExitSetup()
   execExitSetup();
 }
 
-static struct TokenInfo setup_info[] =
+static struct TokenInfo setup_main_info[] =
 {
   { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
   { TYPE_SWITCH,	&setup.sound_loops,	" Sound Loops:"	},
@@ -1354,20 +1350,19 @@ static struct TokenInfo setup_info[] =
   { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and exit"	},
   { 0,			NULL,			NULL		}
 };
-static int num_setup_info = 0;
 
-static void drawSetupValue(struct TokenInfo *si, int pos)
+static void drawSetupValue(int pos)
 {
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
   int value_color = FC_YELLOW;
-  char *value_string = getSetupValue(si[pos].type & ~TYPE_GHOSTED,
-				     si[pos].value);
+  char *value_string = getSetupValue(setup_info[pos].type & ~TYPE_GHOSTED,
+				     setup_info[pos].value);
 
-  if (si[pos].type & TYPE_SWITCH ||
-      si[pos].type & TYPE_YES_NO)
+  if (setup_info[pos].type & TYPE_SWITCH ||
+      setup_info[pos].type & TYPE_YES_NO)
   {
-    boolean value = *(boolean *)(si[pos].value);
+    boolean value = *(boolean *)(setup_info[pos].value);
     int value_length = 3;
 
     if (!value)
@@ -1380,7 +1375,7 @@ static void drawSetupValue(struct TokenInfo *si, int pos)
   DrawText(SX + xpos * 32, SY + ypos * 32, value_string, FS_BIG, value_color);
 }
 
-void DrawSetupScreen()
+static void DrawSetupMainScreen()
 {
   int i;
 
@@ -1389,7 +1384,9 @@ void DrawSetupScreen()
   ClearWindow();
 
   DrawText(SX + 16, SY + 16, "SETUP",FS_BIG,FC_YELLOW);
+  setup_info = setup_main_info;
 
+  num_setup_info = 0;
   for(i=0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
     void *value_ptr = setup_info[i].value;
@@ -1406,14 +1403,14 @@ void DrawSetupScreen()
     DrawText(SX + 32, SY + ypos * 32, setup_info[i].text, FS_BIG, FC_GREEN);
 
     if (setup_info[i].type & TYPE_ENTER_MENU)
-	initCursor(i, GFX_ARROW_BLUE_RIGHT);
+      initCursor(i, GFX_ARROW_BLUE_RIGHT);
     else if (setup_info[i].type & TYPE_LEAVE_MENU)
-	initCursor(i, GFX_ARROW_BLUE_LEFT);
+      initCursor(i, GFX_ARROW_BLUE_LEFT);
     else if (setup_info[i].type != TYPE_EMPTY)
       initCursor(i, GFX_KUGEL_BLAU);
 
     if (setup_info[i].type & TYPE_BOOLEAN_STYLE)
-      drawSetupValue(setup_info, i);
+      drawSetupValue(i);
 
     num_setup_info++;
   }
@@ -1423,37 +1420,38 @@ void DrawSetupScreen()
   HandleSetupScreen(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
-
-#if 1
-
-void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
+void HandleSetupMainScreen(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 0;
-  static int redraw = TRUE;
-  int x = (mx - SX) / 32;
-  int y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
-  int pos_start  = SETUP_SCREEN_POS_START;
-  int pos_empty1 = SETUP_SCREEN_POS_EMPTY1;
-  int pos_empty2 = SETUP_SCREEN_POS_EMPTY2;
-  int pos_end    = SETUP_SCREEN_POS_END;
+  int x = 0;
+  int y = choice;
 
   if (button == MB_MENU_INITIALIZE)
-    redraw = TRUE;
-
-  if (redraw)
   {
     drawCursor(choice, FC_RED);
-    redraw = FALSE;
+    return;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    for (y=0; y<num_setup_info; y++)
+    {
+      if (setup_info[y].type & TYPE_LEAVE_MENU)
+      {
+	void (*menu_callback_function)(void) = setup_info[y].value;
+
+	menu_callback_function();
+      }
+    }
+    return;
   }
 
-  if (button == MB_MENU_INITIALIZE)
-    return;
-
-  if (dx || dy)
+  if (mx || my)		/* mouse input */
   {
-    x = 0;
-    y = choice;
-
+    x = (mx - SX) / 32;
+    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
     if (dx)
     {
       int type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
@@ -1465,23 +1463,10 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     else if (dy)
       y = choice + dy;
 
-    /* stay in valid range */
-    if (y < 0)
-      y = 0;
-    else if (y > num_setup_info - 1)
-      y = num_setup_info - 1;
-
     /* jump to next non-empty menu entry (up or down) */
-    if (setup_info[y].type == TYPE_EMPTY)
-      while (y > 0 && y < num_setup_info - 1 &&
-	     setup_info[y].type == TYPE_EMPTY)
-	y += dy;
-  }
-
-  if (!mx && !my && !dx && !dy)
-  {
-    x = 0;
-    y = choice;
+    while (y > 0 && y < num_setup_info - 1 &&
+	   setup_info[y].type == TYPE_EMPTY)
+      y += dy;
   }
 
   if (x == 0 && y >= 0 && y < num_setup_info &&
@@ -1503,15 +1488,13 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	boolean new_value = !*(boolean *)(setup_info[y].value);
 
 	*(boolean *)setup_info[y].value = new_value;
-
-	drawSetupValue(setup_info, y);
+	drawSetupValue(y);
       }
       else if (setup_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
       {
 	void (*menu_callback_function)(void) = setup_info[choice].value;
 
 	menu_callback_function();
-	redraw = TRUE;
       }
     }
   }
@@ -1520,426 +1503,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
   if (game_status == SETUP)
     DoAnimation();
-
-  return;
-
-
-
-  if (x == 0 && y >= pos_start && y <= pos_end &&
-      !(y >= pos_empty1 && y <= pos_empty2))
-  {
-    if (button)
-    {
-      if (y != choice)
-      {
-	drawCursor(y, FC_RED);
-	drawCursor(choice, FC_BLUE);
-      }
-      choice = y;
-    }
-    else
-    {
-      int yy = MENU_SCREEN_START_YPOS + y;
-
-      if (y == 0 && audio.sound_available)
-      {
-	if (setup.sound)
-	{
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
-	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
-	  setup.sound_loops = FALSE;
-	  setup.sound_music = FALSE;
-	}
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.sound = !setup.sound;
-      }
-      else if (y == 1 && audio.loops_available)
-      {
-	if (setup.sound_loops)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	{
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound = TRUE;
-	}
-	setup.sound_loops = !setup.sound_loops;
-      }
-      else if (y == 2 && audio.loops_available)
-      {
-	if (setup.sound_music)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	{
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound = TRUE;
-	}
-	setup.sound_music = !setup.sound_music;
-      }
-
-#if 0
-      else if (y == 3)
-      {
-	if (setup.toons)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.toons = !setup.toons;
-      }
-      else if (y == 4)
-      {
-#if 0
-	if (setup.double_buffering)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.double_buffering = !setup.double_buffering;
-	setup.direct_draw = !setup.double_buffering;
-#else
-	DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.double_buffering = TRUE;
-	setup.direct_draw = !setup.double_buffering;
-#endif
-      }
-#endif
-
-      else if (y == 3)
-      {
-	if (setup.scroll_delay)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.scroll_delay = !setup.scroll_delay;
-      }
-      else if (y == 4)
-      {
-	if (setup.soft_scrolling)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.soft_scrolling = !setup.soft_scrolling;
-      }
-#if 0
-      else if (y == 5)
-      {
-	if (setup.fading)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.fading = !setup.fading;
-      }
-#endif
-      else if (y == 5 && video.fullscreen_available)
-      {
-	if (setup.fullscreen)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.fullscreen = !setup.fullscreen;
-      }
-      else if (y == 6)
-      {
-	if (setup.quick_doors)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.quick_doors = !setup.quick_doors;
-      }
-      else if (y == 7)
-      {
-	if (setup.autorecord)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.autorecord = !setup.autorecord;
-      }
-      else if (y == 8)
-      {
-	if (setup.team_mode)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.team_mode = !setup.team_mode;
-      }
-      else if (y == 9)
-      {
-	if (setup.handicap)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.handicap = !setup.handicap;
-      }
-      else if (y == 10)
-      {
-	if (setup.time_limit)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.time_limit = !setup.time_limit;
-      }
-      else if (y == 11)
-      {
-	game_status = SETUPINPUT;
-	DrawSetupInputScreen();
-	redraw = TRUE;
-      }
-      else if (y == pos_end - 1 || y == pos_end)
-      {
-        if (y == pos_end)
-	  SaveSetup();
-
-	game_status = MAINMENU;
-	DrawMainMenu();
-	redraw = TRUE;
-      }
-    }
-  }
-  BackToFront();
-
-  if (game_status==SETUP)
-    DoAnimation();
 }
-
-#else
-
-void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
-{
-  static int choice = 0;
-  static int redraw = TRUE;
-  int x = (mx - SX) / 32;
-  int y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
-  int pos_start  = SETUP_SCREEN_POS_START;
-  int pos_empty1 = SETUP_SCREEN_POS_EMPTY1;
-  int pos_empty2 = SETUP_SCREEN_POS_EMPTY2;
-  int pos_end    = SETUP_SCREEN_POS_END;
-
-  if (button == MB_MENU_INITIALIZE)
-    redraw = TRUE;
-
-  if (redraw)
-  {
-    drawCursor(choice, FC_RED);
-    redraw = FALSE;
-  }
-
-  if (button == MB_MENU_INITIALIZE)
-    return;
-
-  if (dx || dy)
-  {
-    if (dy)
-    {
-      x = 0;
-      y = choice + dy;
-    }
-    else
-      x = y = -1;
-
-    if (y >= pos_empty1 && y <= pos_empty2)
-      y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
-
-    if (y < pos_start)
-      y = pos_start;
-    else if (y > pos_end)
-      y = pos_end;
-  }
-
-  if (!mx && !my && !dx && !dy)
-  {
-    x = 0;
-    y = choice;
-  }
-
-  if (dx == 1 && choice == 11)
-  {
-    game_status = SETUPINPUT;
-    DrawSetupInputScreen();
-    redraw = TRUE;
-  }
-
-  if (x == 0 && y >= pos_start && y <= pos_end &&
-      !(y >= pos_empty1 && y <= pos_empty2))
-  {
-    if (button)
-    {
-      if (y != choice)
-      {
-	drawCursor(y, FC_RED);
-	drawCursor(choice, FC_BLUE);
-      }
-      choice = y;
-    }
-    else
-    {
-      int yy = MENU_SCREEN_START_YPOS + y;
-
-      if (y == 0 && audio.sound_available)
-      {
-	if (setup.sound)
-	{
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
-	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
-	  setup.sound_loops = FALSE;
-	  setup.sound_music = FALSE;
-	}
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.sound = !setup.sound;
-      }
-      else if (y == 1 && audio.loops_available)
-      {
-	if (setup.sound_loops)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	{
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound = TRUE;
-	}
-	setup.sound_loops = !setup.sound_loops;
-      }
-      else if (y == 2 && audio.loops_available)
-      {
-	if (setup.sound_music)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	{
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound = TRUE;
-	}
-	setup.sound_music = !setup.sound_music;
-      }
-
-#if 0
-      else if (y == 3)
-      {
-	if (setup.toons)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.toons = !setup.toons;
-      }
-      else if (y == 4)
-      {
-#if 0
-	if (setup.double_buffering)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.double_buffering = !setup.double_buffering;
-	setup.direct_draw = !setup.double_buffering;
-#else
-	DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.double_buffering = TRUE;
-	setup.direct_draw = !setup.double_buffering;
-#endif
-      }
-#endif
-
-      else if (y == 3)
-      {
-	if (setup.scroll_delay)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.scroll_delay = !setup.scroll_delay;
-      }
-      else if (y == 4)
-      {
-	if (setup.soft_scrolling)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.soft_scrolling = !setup.soft_scrolling;
-      }
-#if 0
-      else if (y == 5)
-      {
-	if (setup.fading)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.fading = !setup.fading;
-      }
-#endif
-      else if (y == 5 && video.fullscreen_available)
-      {
-	if (setup.fullscreen)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.fullscreen = !setup.fullscreen;
-      }
-      else if (y == 6)
-      {
-	if (setup.quick_doors)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.quick_doors = !setup.quick_doors;
-      }
-      else if (y == 7)
-      {
-	if (setup.autorecord)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.autorecord = !setup.autorecord;
-      }
-      else if (y == 8)
-      {
-	if (setup.team_mode)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.team_mode = !setup.team_mode;
-      }
-      else if (y == 9)
-      {
-	if (setup.handicap)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.handicap = !setup.handicap;
-      }
-      else if (y == 10)
-      {
-	if (setup.time_limit)
-	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
-	else
-	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.time_limit = !setup.time_limit;
-      }
-      else if (y == 11)
-      {
-	game_status = SETUPINPUT;
-	DrawSetupInputScreen();
-	redraw = TRUE;
-      }
-      else if (y == pos_end - 1 || y == pos_end)
-      {
-        if (y == pos_end)
-	  SaveSetup();
-
-	game_status = MAINMENU;
-	DrawMainMenu();
-	redraw = TRUE;
-      }
-    }
-  }
-  BackToFront();
-
-  if (game_status==SETUP)
-    DoAnimation();
-}
-
-#endif
-
 
 void DrawSetupInputScreen()
 {
@@ -1949,7 +1513,7 @@ void DrawSetupInputScreen()
   initCursor(0, GFX_KUGEL_BLAU);
   initCursor(1, GFX_KUGEL_BLAU);
   initCursor(2, GFX_ARROW_BLUE_RIGHT);
-  initCursor(13, GFX_KUGEL_BLAU);
+  initCursor(13, GFX_ARROW_BLUE_LEFT);
 
   DrawGraphic(10, MENU_SCREEN_START_YPOS, GFX_ARROW_BLUE_LEFT);
   DrawGraphic(12, MENU_SCREEN_START_YPOS, GFX_ARROW_BLUE_RIGHT);
@@ -2063,9 +1627,8 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 0;
   static int player_nr = 0;
-  static int redraw = TRUE;
-  int x = (mx - SX) / 32;
-  int y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  int x = 0;
+  int y = choice;
   int pos_start  = SETUPINPUT_SCREEN_POS_START;
   int pos_empty1 = SETUPINPUT_SCREEN_POS_EMPTY1;
   int pos_empty2 = SETUPINPUT_SCREEN_POS_EMPTY2;
@@ -2074,52 +1637,34 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
   if (button == MB_MENU_INITIALIZE)
   {
     drawPlayerSetupInputInfo(player_nr);
-    redraw = TRUE;
-  }
-
-  if (redraw)
-  {
     drawCursor(choice, FC_RED);
-    redraw = FALSE;
+    return;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    setup_mode = SETUP_MODE_MAIN;
+    DrawSetupScreen();
+    InitJoysticks();
   }
 
-  if (button == MB_MENU_INITIALIZE)
-    return;
-
-  if (dx || dy)
+  if (mx || my)		/* mouse input */
+  {
+    x = (mx - SX) / 32;
+    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
   {
     if (dx && choice == 0)
-    {
       x = (dx < 0 ? 10 : 12);
-      y = 0;
-    }
-    else if (dx && choice == 1)
-    {
+    else if ((dx && choice == 1) ||
+	     (dx == +1 && choice == 2) ||
+	     (dx == -1 && choice == pos_end))
       button = MB_MENU_CHOICE;
-      x = 0;
-      y = 1;
-    }
     else if (dy)
-    {
-      x = 0;
       y = choice + dy;
-    }
-    else
-      x = y = -1;
 
     if (y >= pos_empty1 && y <= pos_empty2)
       y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
-
-    if (y < pos_start)
-      y = pos_start;
-    else if (y > pos_end)
-      y = pos_end;
-  }
-
-  if (!mx && !my && !dx && !dy)
-  {
-    x = 0;
-    y = choice;
   }
 
   if (y == 0 && ((x == 0 && !button) || ((x == 10 || x == 12) && button)))
@@ -2142,8 +1687,8 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
       {
 	drawCursor(y, FC_RED);
 	drawCursor(choice, FC_BLUE);
+	choice = y;
       }
-      choice = y;
     }
     else
     {
@@ -2176,31 +1721,43 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 	if (setup.input[player_nr].use_joystick)
 	{
 	  InitJoysticks();
-	  game_status = CALIBRATION;
 	  CalibrateJoystick(player_nr);
-	  game_status = SETUPINPUT;
 	}
 	else
 	  CustomizeKeyboard(player_nr);
-
-	redraw = TRUE;
       }
       else if (y == pos_end)
       {
 	InitJoysticks();
 
-	game_status = SETUP;
+	setup_mode = SETUP_MODE_MAIN;
 	DrawSetupScreen();
-	redraw = TRUE;
       }
     }
   }
+
   BackToFront();
 
   out:
 
-  if (game_status == SETUPINPUT)
+  if (game_status == SETUP)
     DoAnimation();
+}
+
+void DrawSetupScreen()
+{
+  if (setup_mode == SETUP_MODE_MAIN)
+    DrawSetupMainScreen();
+  else if (setup_mode == SETUP_MODE_INPUT)
+    DrawSetupInputScreen();
+}
+
+void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
+{
+  if (setup_mode == SETUP_MODE_MAIN)
+    HandleSetupMainScreen(mx, my, dx, dy, button);
+  else if (setup_mode == SETUP_MODE_INPUT)
+    HandleSetupInputScreen(mx, my, dx, dy, button);
 }
 
 void CustomizeKeyboard(int player_nr)

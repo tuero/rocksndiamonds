@@ -1446,8 +1446,6 @@ extern int		num_element_info;
 #define TYPENAME		6
 #define HALLOFFAME		7
 #define SETUP			8
-#define SETUPINPUT		9
-#define CALIBRATION		10
 
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	0

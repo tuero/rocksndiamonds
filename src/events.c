@@ -392,10 +392,6 @@ void HandleButton(int mx, int my, int button)
       HandleSetupScreen(mx,my, 0,0, button);
       break;
 
-    case SETUPINPUT:
-      HandleSetupInputScreen(mx,my, 0,0, button);
-      break;
-
     case PLAYING:
 #ifdef DEBUG
       if (button == MB_RELEASED)
@@ -511,7 +507,10 @@ void HandleKey(Key key, int key_status)
 
   /* allow quick escape to the main menu with the Escape key */
   if (key == KSYM_Escape &&
-      game_status != MAINMENU && game_status != LEVELED)
+      game_status != MAINMENU &&
+      game_status != LEVELED &&
+      game_status != CHOOSELEVEL &&
+      game_status != SETUP)
   {
     game_status = MAINMENU;
     DrawMainMenu();
@@ -540,7 +539,6 @@ void HandleKey(Key key, int key_status)
     case MAINMENU:
     case CHOOSELEVEL:
     case SETUP:
-    case SETUPINPUT:
       switch(key)
       {
 	case KSYM_Return:
@@ -551,8 +549,13 @@ void HandleKey(Key key, int key_status)
             HandleChooseLevel(0,0, 0,0, MB_MENU_CHOICE);
 	  else if (game_status == SETUP)
 	    HandleSetupScreen(0,0, 0,0, MB_MENU_CHOICE);
-	  else if (game_status == SETUPINPUT)
-	    HandleSetupInputScreen(0,0, 0,0, MB_MENU_CHOICE);
+	  break;
+
+	case KSYM_Escape:
+          if (game_status == CHOOSELEVEL)
+            HandleChooseLevel(0,0, 0,0, MB_MENU_LEAVE);
+	  else if (game_status == SETUP)
+	    HandleSetupScreen(0,0, 0,0, MB_MENU_LEAVE);
 	  break;
 
         case KSYM_Page_Up:
@@ -817,7 +820,6 @@ void HandleJoystick()
     case MAINMENU:
     case CHOOSELEVEL:
     case SETUP:
-    case SETUPINPUT:
     {
       static unsigned long joystickmove_delay = 0;
 
@@ -831,9 +833,6 @@ void HandleJoystick()
         HandleChooseLevel(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status==SETUP)
 	HandleSetupScreen(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
-      else if (game_status==SETUPINPUT)
-	HandleSetupInputScreen(0,0,dx,dy,
-			       newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       break;
     }
 
