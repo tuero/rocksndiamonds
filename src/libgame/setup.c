@@ -2368,6 +2368,7 @@ static void checkSeriesInfo()
 
       levelnum_value = atoi(levelnum_str);
 
+#if 0
       if (levelnum_value < leveldir_current->first_level)
       {
 	Error(ERR_WARN, "additional level %d found", levelnum_value);
@@ -2378,6 +2379,7 @@ static void checkSeriesInfo()
 	Error(ERR_WARN, "additional level %d found", levelnum_value);
 	leveldir_current->last_level = levelnum_value;
       }
+#endif
     }
   }
 

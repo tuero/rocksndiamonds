@@ -267,7 +267,7 @@ void SleepWhileUnmapped()
   }
 
   if (game_status == GAME_MODE_PLAYING)
-    KeyboardAutoRepeatOff();
+    KeyboardAutoRepeatOffUnlessAutoplay();
 }
 
 void HandleExposeEvent(ExposeEvent *event)
@@ -347,7 +347,7 @@ void HandleFocusEvent(FocusChangeEvent *event)
     if (game_status == GAME_MODE_PLAYING)
     {
       Delay(100);
-      KeyboardAutoRepeatOff();
+      KeyboardAutoRepeatOffUnlessAutoplay();
     }
     if (old_joystick_status != -1)
       joystick.status = old_joystick_status;

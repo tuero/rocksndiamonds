@@ -947,8 +947,7 @@ void InitGame()
   if (setup.sound_music)
     PlayMusic(level_nr);
 
-  if (!tape.playing)
-    KeyboardAutoRepeatOff();
+  KeyboardAutoRepeatOffUnlessAutoplay();
 
   if (options.debug)
   {
@@ -1679,7 +1678,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PLAYER(x, y))
       KillHeroUnlessProtected(x, y);
-    else if (IS_EXPLOSIVE(element))
+    else if (IS_CAN_EXPLODE(element))
     {
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
@@ -1702,11 +1701,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
-#if 1
     if (CAN_MOVE(element))
-#else
-    if (CAN_MOVE(element) || COULD_MOVE(element))
-#endif
       InitMovDir(x, y);
     DrawLevelField(x, y);
 
@@ -2234,7 +2229,7 @@ void Impact(int x, int y)
 
   if (!lastline && object_hit)		/* check which object was hit */
   {
-    if (CAN_CHANGE(element) && 
+    if (CAN_PASS_MAGIC_WALL(element) && 
 	(smashed == EL_MAGIC_WALL ||
 	 smashed == EL_BD_MAGIC_WALL))
     {
@@ -2523,13 +2518,13 @@ void TurnRound(int x, int y)
     int rnd = RND(rnd_value);
 
     if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE(left_x, left_y) || IS_GEM(Feld[left_x][left_y])))
+	(IS_FREE(left_x, left_y) || IS_FOOD_PIG(Feld[left_x][left_y])))
       can_turn_left = TRUE;
     if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE(right_x, right_y) || IS_GEM(Feld[right_x][right_y])))
+	(IS_FREE(right_x, right_y) || IS_FOOD_PIG(Feld[right_x][right_y])))
       can_turn_right = TRUE;
     if (IN_LEV_FIELD(move_x, move_y) &&
-	(IS_FREE(move_x, move_y) || IS_GEM(Feld[move_x][move_y])))
+	(IS_FREE(move_x, move_y) || IS_FOOD_PIG(Feld[move_x][move_y])))
       can_move_on = TRUE;
 
     if (can_turn_left &&
@@ -2581,7 +2576,7 @@ void TurnRound(int x, int y)
       MovDir[x][y] = back_dir;
 
     if (!IS_FREE(x+move_xy[MovDir[x][y]].x, y+move_xy[MovDir[x][y]].y) &&
-	!IS_GEM(Feld[x+move_xy[MovDir[x][y]].x][y+move_xy[MovDir[x][y]].y]))
+	!IS_FOOD_PIG(Feld[x+move_xy[MovDir[x][y]].x][y+move_xy[MovDir[x][y]].y]))
       MovDir[x][y] = old_move_dir;
 
     MovDelay[x][y] = 0;
@@ -2931,7 +2926,7 @@ void StartMoving(int x, int y)
 	Store[x][y] = 0;
       }
     }
-    else if (CAN_CHANGE(element) &&
+    else if (CAN_PASS_MAGIC_WALL(element) &&
 	     (Feld[x][y+1] == EL_MAGIC_WALL_ACTIVE ||
 	      Feld[x][y+1] == EL_BD_MAGIC_WALL_ACTIVE))
     {
@@ -3121,7 +3116,7 @@ void StartMoving(int x, int y)
 	  {
 	    int flamed = MovingOrBlocked2Element(xx, yy);
 
-	    if (IS_ENEMY(flamed) || IS_EXPLOSIVE(flamed))
+	    if (IS_ENEMY(flamed) || IS_CAN_EXPLODE(flamed))
 	      Bang(xx, yy);
 	    else
 	      RemoveMovingField(xx, yy);
@@ -3210,7 +3205,7 @@ void StartMoving(int x, int y)
     }
     else if (element == EL_PIG && IN_LEV_FIELD(newx, newy))
     {
-      if (IS_GEM(Feld[newx][newy]))
+      if (IS_FOOD_PIG(Feld[newx][newy]))
       {
 	if (IS_MOVING(newx, newy))
 	  RemoveMovingField(newx, newy);
@@ -5158,6 +5153,24 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 
 #if 0
+  {
+    static boolean done = FALSE;
+    static old_count = -1;
+
+    if (FrameCounter < old_count)
+      done = FALSE;
+
+    if (FrameCounter < 100)
+    {
+      printf("::: wanna move [%d] [%d]\n",
+	     FrameCounter, player->push_delay_value);
+      done = TRUE;
+      old_count = FrameCounter;
+    }
+  }
+#endif
+
+#if 0
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
       !tape.playing)
     return FALSE;
@@ -5743,6 +5756,24 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
+#if 0
+  {
+    static boolean done = FALSE;
+
+    if (FrameCounter < 10)
+      done = FALSE;
+
+    if (!done &&
+	real_dx == -1 &&
+	FrameCounter > 10)
+    {
+      printf("::: wanna move left [%d] [%d]\n",
+	     FrameCounter, player->push_delay_value);
+      done = TRUE;
+    }
+  }
+#endif
+
   if (player->MovPos == 0)
   {
     player->is_digging = FALSE;
@@ -6074,6 +6105,12 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 
       player->Pushing = TRUE;
+
+#if 0
+      if (element == EL_ROCK)
+	printf("::: wanna push [%d] [%d]\n",
+	       FrameCounter, player->push_delay_value);
+#endif
 
       if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
 	return MF_NO_ACTION;

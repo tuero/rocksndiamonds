@@ -45,7 +45,7 @@
 
 static void setLevelInfoToDefaults()
 {
-  int i, x, y;
+  int i, j, x, y;
 
   level.file_version = FILE_VERSION_ACTUAL;
   level.game_version = GAME_VERSION_ACTUAL;
@@ -98,7 +98,14 @@ static void setLevelInfoToDefaults()
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     level.custom_element_successor[i] = EL_EMPTY_SPACE;
+
+    /* start with no properties at all */
+#if 1
+    for (j=0; j < NUM_EP_BITFIELDS; j++)
+      Properties[EL_CUSTOM_START + i][j] = EP_BITMASK_DEFAULT;
+#else
     Properties[EL_CUSTOM_START + i][EP_BITFIELD_BASE] = EP_BITMASK_DEFAULT;
+#endif
   }
 
   BorderElement = EL_STEELWALL;

@@ -481,9 +481,9 @@ void InitElementGraphicInfo()
 
     for (act=0; act<NUM_ACTIONS; act++)
     {
-      boolean act_empty = (act == ACTION_DIGGING ||
-			   act == ACTION_SNAPPING ||
-			   act == ACTION_COLLECTING);
+      boolean act_remove = (act == ACTION_DIGGING ||
+			    act == ACTION_SNAPPING ||
+			    act == ACTION_COLLECTING);
 
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
@@ -492,7 +492,7 @@ void InitElementGraphicInfo()
 	/* no graphic for current action -- use default direction graphic */
 	if (default_direction_graphic == -1)
 	  default_direction_graphic =
-	    (act_empty ? IMG_EMPTY : default_action_direction_graphic[dir]);
+	    (act_remove ? IMG_EMPTY : default_action_direction_graphic[dir]);
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
@@ -502,7 +502,7 @@ void InitElementGraphicInfo()
       /* no graphic for this specific action -- use default action graphic */
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] =
-	  (act_empty ? IMG_EMPTY : default_action_graphic);
+	  (act_remove ? IMG_EMPTY : default_action_graphic);
     }
   }
 
@@ -1459,7 +1459,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_change[] =
+  static int ep_can_pass_magic_wall[] =
   {
     EL_ROCK,
     EL_BD_ROCK,
@@ -1516,7 +1516,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_explosive[] =
+  static int ep_can_explode[] =
   {
     EL_BOMB,
     EL_DYNAMITE_ACTIVE,
@@ -1637,8 +1637,8 @@ void InitElementPropertiesStatic()
 
   static int ep_gem[] =
   {
-    EL_EMERALD,
     EL_BD_DIAMOND,
+    EL_EMERALD,
     EL_EMERALD_YELLOW,
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
@@ -1683,6 +1683,17 @@ void InitElementPropertiesStatic()
     EL_DIAMOND,
     EL_PEARL,
     EL_CRYSTAL,
+    -1
+  };
+
+  static int ep_food_pig[] =
+  {
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
     -1
   };
 
@@ -2198,17 +2209,18 @@ void InitElementPropertiesStatic()
     { ep_player,		EP_PLAYER		},
     { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
     { ep_can_move,		EP_CAN_MOVE		},
-    { ep_can_change,		EP_CAN_CHANGE		},
+    { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
     { ep_dont_touch,		EP_DONT_TOUCH		},
     { ep_enemy,			EP_ENEMY		},
     { ep_dont_go_to,		EP_DONT_GO_TO		},
-    { ep_explosive,		EP_EXPLOSIVE		},
+    { ep_can_explode,		EP_CAN_EXPLODE		},
     { ep_bd_element,		EP_BD_ELEMENT		},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_sb_element,		EP_SB_ELEMENT		},
     { ep_gem,			EP_GEM			},
     { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
     { ep_food_penguin,		EP_FOOD_PENGUIN		},
+    { ep_food_pig,		EP_FOOD_PIG		},
     { ep_historic_wall,		EP_HISTORIC_WALL	},
     { ep_historic_solid,	EP_HISTORIC_SOLID	},
     { ep_belt,			EP_BELT			},
@@ -2251,12 +2263,12 @@ void InitElementPropertiesEngine(int engine_version)
     EP_MAUER,
     EP_CAN_FALL,
     EP_CAN_SMASH,
-    EP_CAN_CHANGE,
+    EP_CAN_PASS_MAGIC_WALL,
     EP_CAN_MOVE,
     EP_DONT_TOUCH,
     EP_DONT_GO_TO,
     EP_GEM,
-    EP_EXPLOSIVE,
+    EP_CAN_EXPLODE,
     EP_PUSHABLE,
     EP_PLAYER,
     EP_HAS_CONTENT,
@@ -2301,31 +2313,42 @@ void InitElementPropertiesEngine(int engine_version)
 
   int i, j;
 
+#if 0
+  InitElementPropertiesStatic();
+#endif
+
   /* set all special, combined or engine dependant element properties */
   for (i=0; i < MAX_NUM_ELEMENTS; i++)
   {
+#if 0
+    for (j=EP_ACCESSIBLE_OVER; j < NUM_ELEMENT_PROPERTIES; j++)
+      SET_PROPERTY(i, j, FALSE);
+#endif
+
     /* ---------- INACTIVE ------------------------------------------------- */
     if (i >= EL_CHAR_START && i <= EL_CHAR_END)
       SET_PROPERTY(i, EP_INACTIVE, TRUE);
 
     /* ---------- WALKABLE, PASSABLE, ACCESSIBLE --------------------------- */
-    if (IS_WALKABLE_OVER(i) || IS_WALKABLE_INSIDE(i) || IS_WALKABLE_UNDER(i))
-      SET_PROPERTY(i, EP_WALKABLE, TRUE);
+    SET_PROPERTY(i, EP_WALKABLE, (IS_WALKABLE_OVER(i) ||
+				  IS_WALKABLE_INSIDE(i) ||
+				  IS_WALKABLE_UNDER(i)));
 
-    if (IS_PASSABLE_OVER(i) || IS_PASSABLE_INSIDE(i) || IS_PASSABLE_UNDER(i))
-      SET_PROPERTY(i, EP_PASSABLE, TRUE);
+    SET_PROPERTY(i, EP_PASSABLE, (IS_PASSABLE_OVER(i) ||
+				  IS_PASSABLE_INSIDE(i) ||
+				  IS_PASSABLE_UNDER(i)));
 
-    if (IS_WALKABLE_OVER(i) || IS_PASSABLE_OVER(i))
-      SET_PROPERTY(i, EP_ACCESSIBLE_OVER, TRUE);
+    SET_PROPERTY(i, EP_ACCESSIBLE_OVER, (IS_WALKABLE_OVER(i) ||
+					 IS_PASSABLE_OVER(i)));
 
-    if (IS_WALKABLE_INSIDE(i) || IS_PASSABLE_INSIDE(i))
-      SET_PROPERTY(i, EP_ACCESSIBLE_INSIDE, TRUE);
+    SET_PROPERTY(i, EP_ACCESSIBLE_INSIDE, (IS_WALKABLE_INSIDE(i) ||
+					   IS_PASSABLE_INSIDE(i)));
 
-    if (IS_WALKABLE_UNDER(i) || IS_PASSABLE_UNDER(i))
-      SET_PROPERTY(i, EP_ACCESSIBLE_UNDER, TRUE);
+    SET_PROPERTY(i, EP_ACCESSIBLE_UNDER, (IS_WALKABLE_UNDER(i) ||
+					  IS_PASSABLE_UNDER(i)));
 
-    if (IS_WALKABLE(i) || IS_PASSABLE(i))
-      SET_PROPERTY(i, EP_ACCESSIBLE, TRUE);
+    SET_PROPERTY(i, EP_ACCESSIBLE, (IS_WALKABLE(i) ||
+				    IS_PASSABLE(i)));
 
     /* ---------- WALL ----------------------------------------------------- */
     SET_PROPERTY(i, EP_WALL, TRUE);	/* default: element is wall */
@@ -2347,9 +2370,12 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_COLLECTIBLE(i)));
 
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
-    if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION ||
-	(IS_CUSTOM_ELEMENT(i) && IS_INDESTRUCTIBLE(i)))
+
+    if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
+    else
+      SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_CUSTOM_ELEMENT(i) &&
+					    IS_INDESTRUCTIBLE(i)));
 
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
     if (i == EL_FLAMES)
@@ -2912,6 +2938,12 @@ void ReloadCustomArtwork()
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
   }
+}
+
+void KeyboardAutoRepeatOffUnlessAutoplay()
+{
+  if (global.autoplay_leveldir == NULL)
+    KeyboardAutoRepeatOff();
 }
 
 

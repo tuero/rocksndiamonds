@@ -21,6 +21,8 @@ void InitElementPropertiesEngine(int);
 
 void ReloadCustomArtwork(void);
 
+void KeyboardAutoRepeatOffUnlessAutoplay();
+
 void OpenAll(void);
 void CloseAllAndExit(int);
 

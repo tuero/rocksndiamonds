@@ -591,8 +591,10 @@ void TapeStop()
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
   }
 
+#if 0
   if (tape.auto_play)
     AutoPlayTape();	/* continue automatically playing next tape */
+#endif
 }
 
 unsigned int GetTapeLength()

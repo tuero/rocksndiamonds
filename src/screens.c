@@ -2741,6 +2741,11 @@ void HandleGameActions()
   GameActions();
 
   BackToFront();
+
+#if 1
+  if (tape.auto_play && !tape.playing)
+    AutoPlayTape();	/* continue automatically playing next tape */
+#endif
 }
 
 /* ---------- new screen button stuff -------------------------------------- */

@@ -3687,38 +3687,32 @@ static void DrawPropertiesInfo()
   }
   properties[] =
   {
-    { EP_AMOEBALIVE,		"- living amoeba"		},
-    { EP_AMOEBOID,		"- amoeboid"			},
-    { EP_INDESTRUCTIBLE,	"- undestructible"		},
-    { EP_SLIPPERY,		"- slippery"			},
-    { EP_ENEMY,			"- enemy"			},
-    { EP_CAN_FALL,		"- can fall"			},
-    { EP_CAN_SMASH,		"- can smash"			},
-    { EP_CAN_CHANGE,		"- can change"			},
-    { EP_CAN_MOVE,		"- can move"			},
-    { EP_DONT_TOUCH,		"- don't touch"			},
-    { EP_DONT_GO_TO,		"- don't go to"			},
-    { EP_FOOD_DARK_YAMYAM,	"- food for dark yamyam"	},
-    { EP_BD_ELEMENT,		"- BD style"			},
-    { EP_SB_ELEMENT,		"- SB style"			},
-    { EP_GEM,			"- gem"				},
-    { EP_INACTIVE,		"- inactive"			},
-    { EP_EXPLOSIVE,		"- explosive"			},
-    { EP_FOOD_PENGUIN,		"- food for penguin"		},
-    { EP_PUSHABLE,		"- pushable"			},
-    { EP_PLAYER,		"- player"			},
-    { EP_HAS_CONTENT,		"- has content"			},
-    { EP_DIGGABLE,		"- diggable"			},
-    { EP_SP_ELEMENT,		"- SB style"			},
-    { EP_WALKABLE_INSIDE,	"- walkable inside"		},
-    { EP_ACTIVE_BOMB,		"- active bomb"			},
-    { EP_BELT,			"- belt"			},
-    { EP_BELT_ACTIVE,		"- active belt"			},
-    { EP_BELT_SWITCH,		"- belt switch"			},
-    { EP_WALKABLE_UNDER,	"- walkable under"		},
-    { EP_EM_SLIPPERY_WALL,	"- EM style slippery wall"	},
-    { EP_CAN_BE_CRUMBLED,	"- can be crumbled"		},
-    { -1,			NULL				}
+    /* configurable properties */
+    { EP_INDESTRUCTIBLE,	"- undestructible"			},
+    { EP_DIGGABLE,		"- diggable"				},
+    { EP_COLLECTIBLE,		"- collectible"				},
+    { EP_PUSHABLE,		"- pushable"				},
+    { EP_CAN_FALL,		"- can fall"				},
+    { EP_CAN_SMASH,		"- can smash other objects"		},
+    { EP_CAN_MOVE,		"- can move"				},
+    { EP_SLIPPERY,		"- slippery for falling objects"	},
+    { EP_EM_SLIPPERY_WALL,	"- slippery for some gems (EM style)"	},
+    { EP_WALKABLE_OVER,		"- player can walk over it"		},
+    { EP_WALKABLE_INSIDE,	"- player can walk inside it"		},
+    { EP_WALKABLE_UNDER,	"- player can walk under it"		},
+    { EP_PASSABLE_OVER,		"- player can pass over it"		},
+    { EP_PASSABLE_INSIDE,	"- player can pass through it"		},
+    { EP_PASSABLE_UNDER,	"- player can pass under it"		},
+
+    /* pre-defined properties */
+    { EP_CAN_PASS_MAGIC_WALL,	"- can pass magic walls"		},
+    { EP_DONT_TOUCH,		"- deadly when touched"			},
+    { EP_ENEMY,			"- can kill the player"			},
+    { EP_DONT_GO_TO,		"- deadly when walked to"		},
+    { EP_CAN_EXPLODE,		"- can explode"				},
+    { EP_HAS_CONTENT,		"- can contain other elements"		},
+
+    { -1,			NULL					}
   };
   char *filename = getElementDescriptionFilename(properties_element);
   char *percentage_text = "In this level:";
