@@ -316,6 +316,11 @@ struct FontInfo
   Bitmap *bitmap_tile;
 };
 
+struct AnimInfo
+{
+  int simple_random_value;
+};
+
 struct JoystickInfo
 {
   int status;
@@ -567,6 +572,7 @@ extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
 extern struct FontInfo		font;
+extern struct AnimInfo		anim;
 extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
 extern struct SetupInfo		setup;

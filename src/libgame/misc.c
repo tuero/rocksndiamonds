@@ -442,7 +442,7 @@ char *getPath3(char *path1, char *path2, char *path3)
   return complete_path;
 }
 
-static char *getStringCat2(char *s1, char *s2)
+char *getStringCat2(char *s1, char *s2)
 {
   char *complete_string = checked_malloc(strlen(s1) + strlen(s2) + 1);
 
@@ -1800,7 +1800,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   for (i=0; i<num_file_list_entries; i++)
     read_token_parameters(setup_file_list, suffix_list, &file_list[i]);
 
-  /* set some additional tokens to "known" */
+  /* set all known tokens to "known" keyword */
   setTokenValue(setup_file_list, "name", known_token_value);
   setTokenValue(setup_file_list, "sort_priority", known_token_value);
 

@@ -191,6 +191,9 @@ static void InitArtworkConfig()
   static char *dummy[1] = { NULL };
   int i;
 
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    element_info[i].custom_description = NULL;
+
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
     element_prefix[i] = element_info[i].token_name;
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
@@ -275,6 +278,8 @@ static void InitImages()
 {
   ReloadCustomImages();
   ReinitializeGraphics();
+
+  LoadCustomElementDescriptions();
 }
 
 static void InitSound()
@@ -618,6 +623,8 @@ void ReloadCustomArtwork()
 
     ReloadCustomImages();
     ReinitializeGraphics();
+
+    LoadCustomElementDescriptions();
 
     FreeTileClipmasks();
     InitTileClipmasks();

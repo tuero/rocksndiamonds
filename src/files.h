@@ -32,4 +32,6 @@ void SaveScore(int);
 void LoadSetup(void);
 void SaveSetup(void);
 
+void LoadCustomElementDescriptions();
+
 #endif	/* FILES_H */

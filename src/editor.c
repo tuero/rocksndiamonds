@@ -1563,13 +1563,22 @@ static void ReinitializeElementListButtons()
 
 static char *getElementInfoText(int element)
 {
-  char *info_text = "unknown";
+  char *info_text = NULL;
 
-  if (element < NUM_FILE_ELEMENTS &&
-      element_info[element].editor_description != NULL)
-    info_text = element_info[element].editor_description;
-  else
+  if (element < NUM_FILE_ELEMENTS)
+  {
+    if (element_info[element].custom_description != NULL)
+      info_text = element_info[element].custom_description;
+    else if (element_info[element].editor_description != NULL)
+      info_text = element_info[element].editor_description;
+  }
+
+  if (info_text == NULL)
+  {
+    info_text = "unknown";
+
     Error(ERR_WARN, "no element description for element %d", element);
+  }
 
   return info_text;
 }
@@ -4334,6 +4343,7 @@ void HandleLevelEditorIdle()
 {
   static unsigned long action_delay = 0;
   unsigned long action_delay_value = GameFrameDelay;
+  int graphic = el2img(properties_element);
   int xpos = 1, ypos = 2;
 
   if (edit_mode != ED_MODE_PROPERTIES)
@@ -4343,11 +4353,10 @@ void HandleLevelEditorIdle()
     return;
 
 #if 1
-
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  el2img(properties_element), -1, NO_MASKING);
+			  graphic, -1, NO_MASKING);
 
 #else
   DrawGraphicAnimationExt(drawto,

@@ -1593,3 +1593,35 @@ void SaveSetup()
 
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
+
+void LoadCustomElementDescriptions()
+{
+  char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
+  struct SetupFileList *setup_file_list;
+  int i;
+
+  for (i=0; i<NUM_FILE_ELEMENTS; i++)
+  {
+    if (element_info[i].custom_description != NULL)
+    {
+      free(element_info[i].custom_description);
+      element_info[i].custom_description = NULL;
+    }
+  }
+
+  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+    return;
+
+  for (i=0; i<NUM_FILE_ELEMENTS; i++)
+  {
+    char *token = getStringCat2(element_info[i].token_name, ".name");
+    char *value = getTokenValue(setup_file_list, token);
+
+    if (value != NULL)
+      element_info[i].custom_description = getStringCopy(value);
+
+    free(token);
+  }
+
+  freeSetupFileList(setup_file_list);
+}

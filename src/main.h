@@ -1034,6 +1034,7 @@ struct ElementInfo
   char *token_name;		/* element token prefix used in config files */
   char *sound_class_name;	/* classification for custom sound effects */
   char *editor_description;	/* short description for level editor */
+  char *custom_description;	/* custom description for level editor */
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
 				/* special graphics for left/right/up/down */
@@ -1116,7 +1117,8 @@ extern unsigned long		Properties1[MAX_NUM_ELEMENTS];
 extern unsigned long		Properties2[MAX_NUM_ELEMENTS];
 
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;

@@ -455,6 +455,11 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   return phase;
 }
 
+void SetRandomAnimationValue(int x, int y)
+{
+  anim.simple_random_value = GfxRandom[x][y];
+}
+
 inline int getGraphicAnimationFrame(int graphic, int sync_frame)
 {
   /* animation synchronized with global frame counter, not move position */
@@ -497,8 +502,13 @@ inline boolean DrawGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
+#if 0
   if (!checkDrawGraphicAnimation(x, y, graphic))
     return FALSE;
+#else
+  if (!IN_SCR_FIELD(x, y))
+    return FALSE;
+#endif
 
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
 			  graphic, GfxFrame[lx][ly], NO_MASKING);
@@ -515,6 +525,19 @@ boolean DrawLevelGraphicAnimation(int x, int y, int graphic)
 boolean DrawLevelElementAnimation(int x, int y, int element)
 {
   return DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
+}
+
+inline void ContinueLevelGraphicAnimation(int x, int y, int graphic)
+{
+  if (GfxFrame[x][y] % graphic_info[graphic].anim_delay != 0)
+    return;
+
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+}
+
+void ContinueLevelElementAnimation(int x, int y, int element)
+{
+  ContinueLevelGraphicAnimation(x, y, el2img(element));
 }
 
 void DrawAllPlayers()
@@ -1172,6 +1195,8 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     int move_dir = MovDir[ux][uy];
     int move_pos = getFramePosition(ux, uy);
     int gfx_action = getGfxAction(ux, uy);
+
+    SetRandomAnimationValue(ux, uy);
 
     graphic = el_dir_act2img(element, move_dir, gfx_action);
     frame = getGraphicAnimationFrame(graphic, move_pos);

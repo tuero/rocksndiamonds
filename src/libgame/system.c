@@ -37,6 +37,7 @@ struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
 struct FontInfo		font;
+struct AnimInfo		anim;
 struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;

@@ -37,6 +37,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".mode_random",			"false",	TYPE_BOOLEAN },
   { ".mode_reverse",			"false",	TYPE_BOOLEAN },
   { ".global_sync",			"false",	TYPE_BOOLEAN },
+  { ".name",				ARG_UNDEFINED,	TYPE_STRING  },
 
   { NULL,				NULL,		0	     }
 };

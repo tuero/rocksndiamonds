@@ -161,6 +161,9 @@ static struct ChangingElementInfo changing_element_list[] =
   { EL_TIMEGATE_OPENING,	EL_TIMEGATE_OPEN,	29, NULL, NULL, NULL },
   { EL_TIMEGATE_CLOSING,	EL_TIMEGATE_CLOSED,	29, NULL, NULL, NULL },
 
+  { EL_ACID_SPLASH_LEFT,	EL_EMPTY,		 8, NULL, NULL, NULL },
+  { EL_ACID_SPLASH_RIGHT,	EL_EMPTY,		 8, NULL, NULL, NULL },
+
   { EL_SP_BUGGY_BASE,		EL_SP_BUGGY_BASE_ACTIVATING, 0,
     InitBuggyBase, NULL, NULL },
   { EL_SP_BUGGY_BASE_ACTIVATING,EL_SP_BUGGY_BASE_ACTIVE, 0,
@@ -185,60 +188,6 @@ static struct ChangingElementInfo changing_element_list[] =
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
 
 #define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
-
-
-
-#ifdef DEBUG
-#if 0
-static unsigned int getStateCheckSum(int counter)
-{
-  int x, y;
-  unsigned int mult = 1;
-  unsigned int checksum = 0;
-  /*
-  static short lastFeld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-  */
-  static boolean first_game = TRUE;
-
-  for (y=0; y<lev_fieldy; y++) for(x=0; x<lev_fieldx; x++)
-  {
-    /*
-    if (counter == 3)
-    {
-      if (first_game)
-	lastFeld[x][y] = Feld[x][y];
-      else if (lastFeld[x][y] != Feld[x][y])
-	printf("DIFF: [%d][%d]: lastFeld == %d != %d == Feld\n",
-	       x, y, lastFeld[x][y], Feld[x][y]);
-    }
-    */
-
-    checksum += mult++ * Ur[x][y];
-    checksum += mult++ * Feld[x][y];
-
-    /*
-    checksum += mult++ * MovPos[x][y];
-    checksum += mult++ * MovDir[x][y];
-    checksum += mult++ * MovDelay[x][y];
-    checksum += mult++ * Store[x][y];
-    checksum += mult++ * Store2[x][y];
-    checksum += mult++ * StorePlayer[x][y];
-    checksum += mult++ * ExplodePhase[x][y];
-    checksum += mult++ * AmoebaNr[x][y];
-    checksum += mult++ * JustStopped[x][y];
-    checksum += mult++ * Stop[x][y];
-    */
-  }
-
-  if (counter == 3 && first_game)
-    first_game = FALSE;
-
-  return checksum;
-}
-#endif
-#endif
-
-
 
 
 void GetPlayerConfig()
@@ -773,6 +722,7 @@ void InitGame()
 
       GfxFrame[x][y] = 0;
       GfxAction[x][y] = ACTION_DEFAULT;
+      GfxRandom[x][y] = SimpleRND(1000000);
     }
   }
 
@@ -1460,7 +1410,9 @@ void DrawDynamite(int x, int y)
 
 void CheckDynamite(int x, int y)
 {
+#if 0
   int element = Feld[x][y];
+#endif
 
   if (MovDelay[x][y] != 0)	/* dynamite is still waiting to explode */
   {
@@ -1468,7 +1420,9 @@ void CheckDynamite(int x, int y)
 
     if (MovDelay[x][y] != 0)
     {
+#if 0
       if (checkDrawLevelGraphicAnimation(x, y, el2img(element)))
+#endif
 	DrawDynamite(x, y);
 
       PlaySoundLevelAction(x, y, ACTION_ACTIVE);
@@ -1802,27 +1756,27 @@ void Bang(int x, int y)
   }
 }
 
-void Blurb(int x, int y)
+void SplashAcid(int x, int y)
 {
   int element = Feld[x][y];
 
   if (element != EL_ACID_SPLASH_LEFT &&
-      element != EL_ACID_SPLASH_RIGHT)	/* start */
+      element != EL_ACID_SPLASH_RIGHT)
   {
     PlaySoundLevel(x, y, SND_ACID_SPLASHING);
+
     if (IN_LEV_FIELD(x-1, y) && IS_FREE(x-1, y) &&
 	(!IN_LEV_FIELD(x-1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x-1, y-1))))
-    {
       Feld[x-1][y] = EL_ACID_SPLASH_LEFT;
-    }
+
     if (IN_LEV_FIELD(x+1, y) && IS_FREE(x+1, y) &&
 	(!IN_LEV_FIELD(x+1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
-    {
       Feld[x+1][y] = EL_ACID_SPLASH_RIGHT;
-    }
   }
+
+#if 0
   else								/* go on */
   {
     int graphic = (element == EL_ACID_SPLASH_LEFT ?
@@ -1849,6 +1803,7 @@ void Blurb(int x, int y)
       }
     }
   }
+#endif
 }
 
 static void InitBeltMovement()
@@ -2171,7 +2126,7 @@ void Impact(int x, int y)
 
   if (!lastline && smashed == EL_ACID)	/* element falls into acid */
   {
-    Blurb(x, y);
+    SplashAcid(x, y);
     return;
   }
 
@@ -2905,7 +2860,7 @@ void StartMoving(int x, int y)
     }
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_ACID)
     {
-      Blurb(x, y);
+      SplashAcid(x, y);
 
       InitMovingField(x, y, MV_DOWN);
       started_moving = TRUE;
@@ -3044,8 +2999,12 @@ void StartMoving(int x, int y)
       MovDelay[x][y]--;
 
       if (element == EL_ROBOT ||
-	  element == EL_YAMYAM || element == EL_DARK_YAMYAM)
+	  element == EL_YAMYAM ||
+	  element == EL_DARK_YAMYAM)
       {
+#if 1
+	ContinueLevelElementAnimation(x, y, element);
+#else
 	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
 	{
 	  int graphic = el2img(element);
@@ -3053,7 +3012,11 @@ void StartMoving(int x, int y)
 
 	  DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
 	}
+#endif
 
+#if 1
+	PlaySoundLevelAction(x, y, ACTION_WAITING);
+#else
 	if (MovDelay[x][y] % 4 == 3)
 	{
 	  if (element == EL_YAMYAM)
@@ -3061,9 +3024,10 @@ void StartMoving(int x, int y)
 	  else if (element == EL_DARK_YAMYAM)
 	    PlaySoundLevel(x, y, SND_DARK_YAMYAM_WAITING);
 	}
+#endif
       }
       else if (element == EL_SP_ELECTRON)
-	DrawLevelElementAnimation(x, y, element);
+	ContinueLevelElementAnimation(x, y, element);
       else if (element == EL_DRAGON)
       {
 	int i;
@@ -3140,7 +3104,7 @@ void StartMoving(int x, int y)
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_ACID)
     {
-      Blurb(x, y);
+      SplashAcid(x, y);
       Store[x][y] = EL_ACID;
     }
     else if (element == EL_PENGUIN && IN_LEV_FIELD(newx, newy))
@@ -3321,11 +3285,11 @@ void StartMoving(int x, int y)
 	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
 	DrawLevelField(x, y);
       else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
-	DrawLevelElementAnimation(x, y, element);
+	ContinueLevelElementAnimation(x, y, element);
       else if (element == EL_SATELLITE)
-	DrawLevelElementAnimation(x, y, element);
+	ContinueLevelElementAnimation(x, y, element);
       else if (element == EL_SP_ELECTRON)
-	DrawLevelElementAnimation(x, y, element);
+	ContinueLevelElementAnimation(x, y, element);
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
@@ -3461,6 +3425,7 @@ void ContinueMoving(int x, int y)
     MovDelay[newx][newy] = 0;
 
     GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
+    GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
     GfxAction[x][y] = ACTION_DEFAULT;
 
 #if 0
@@ -3999,38 +3964,6 @@ static void StopRobotWheel(int x, int y)
     ZX = ZY = -1;
 }
 
-#if 1
-void RobotWheel(int x, int y)
-{
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-    if (MovDelay[x][y])
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_ROBOT_WHEEL_ACTIVE, -1);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_ROBOT_WHEEL_ACTIVE, frame);
-      }
-
-      PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVE);
-
-      return;
-    }
-  }
-
-  Feld[x][y] = EL_ROBOT_WHEEL;
-  DrawLevelField(x, y);
-
-  if (ZX == x && ZY == y)
-    ZX = ZY = -1;
-}
-#endif
-
 static void InitTimegateWheel(int x, int y)
 {
   MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
@@ -4041,104 +3974,11 @@ static void RunTimegateWheel(int x, int y)
   PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
 }
 
-#if 1
-void TimegateWheel(int x, int y)
-{
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-    if (MovDelay[x][y])
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_TIMEGATE_SWITCH_ACTIVE, -1);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_SWITCH_ACTIVE, frame);
-      }
-
-      PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
-
-      return;
-    }
-  }
-
-  Feld[x][y] = EL_TIMEGATE_SWITCH;
-  DrawLevelField(x, y);
-
-  /* THIS HAS NO EFFECT AT ALL! */
-#if 1
-  /* !!! THIS LOOKS WRONG !!! */
-  if (ZX == x && ZY == y)
-    ZX = ZY = -1;
-#endif
-
-}
-#endif
-
-#if 1
-void NussKnacken(int x, int y)
-{
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 7;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-    if (MovDelay[x][y])
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_NUT_CRACKING,
-					     6 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_NUT_CRACKING, frame);
-      }
-
-      return;
-    }
-  }
-
-  Feld[x][y] = EL_EMERALD;
-  DrawLevelField(x, y);
-}
-#endif
-
-#if 1
-void BreakingPearl(int x, int y)
-{
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 9;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-    if (MovDelay[x][y])
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_PEARL_BREAKING,
-					     8 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_PEARL_BREAKING, frame);
-      }
-
-      return;
-    }
-  }
-
-  Feld[x][y] = EL_EMPTY;
-  DrawLevelField(x, y);
-}
-#endif
-
 void SiebAktivieren(int x, int y, int type)
 {
   int graphic = (type == 1 ? IMG_MAGIC_WALL_FULL : IMG_BD_MAGIC_WALL_FULL);
 
-  DrawLevelGraphicAnimation(x, y, graphic);
+  ContinueLevelGraphicAnimation(x, y, graphic);
 }
 
 void CheckExit(int x, int y)
@@ -4162,169 +4002,6 @@ void CheckExitSP(int x, int y)
 
   PlaySoundLevelNearest(x, y, SND_SP_EXIT_OPENING);
 }
-
-#if 1
-void AusgangstuerOeffnen(int x, int y)
-{
-  int delay = 6;
-
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5 * delay;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    int tuer;
-
-    MovDelay[x][y]--;
-    tuer = MovDelay[x][y] / delay;
-
-    if (!(MovDelay[x][y] % delay))
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_EXIT_OPENING,
-					     29 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_EXIT_OPENING, frame);
-      }
-    }
-
-    if (MovDelay[x][y])
-      return;
-  }
-
-  Feld[x][y] = EL_EXIT_OPEN;
-  DrawLevelField(x, y);
-}
-#endif
-
-#if 1
-void OpenSwitchgate(int x, int y)
-{
-  int delay = 6;
-
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5 * delay;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-
-    if (!(MovDelay[x][y] % delay))
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_OPENING,
-					     29 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_OPENING, frame);
-      }
-    }
-
-    if (MovDelay[x][y])
-      return;
-  }
-
-  Feld[x][y] = EL_SWITCHGATE_OPEN;
-  DrawLevelField(x, y);
-}
-#endif
-
-#if 1
-void CloseSwitchgate(int x, int y)
-{
-  int delay = 6;
-
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5 * delay;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-
-    if (!(MovDelay[x][y] % delay))
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_SWITCHGATE_CLOSING,
-					     29 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_CLOSING, frame);
-      }
-    }
-
-    if (MovDelay[x][y])
-      return;
-  }
-
-  Feld[x][y] = EL_SWITCHGATE_CLOSED;
-  DrawLevelField(x, y);
-}
-#endif
-
-#if 1
-void OpenTimegate(int x, int y)
-{
-  int delay = 6;
-
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5 * delay;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-
-    if (!(MovDelay[x][y] % delay))
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_TIMEGATE_OPENING,
-					     29 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_OPENING, frame);
-      }
-    }
-
-    if (MovDelay[x][y])
-      return;
-  }
-
-  Feld[x][y] = EL_TIMEGATE_OPEN;
-  DrawLevelField(x, y);
-}
-#endif
-
-#if 1
-void CloseTimegate(int x, int y)
-{
-  int delay = 6;
-
-  if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5 * delay;
-
-  if (MovDelay[x][y])		/* wait some time before next frame */
-  {
-    MovDelay[x][y]--;
-
-    if (!(MovDelay[x][y] % delay))
-    {
-      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(IMG_TIMEGATE_CLOSING,
-					     29 - MovDelay[x][y]);
-
-	DrawGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_CLOSING, frame);
-      }
-    }
-
-    if (MovDelay[x][y])
-      return;
-  }
-
-  Feld[x][y] = EL_TIMEGATE_CLOSED;
-  DrawLevelField(x, y);
-}
-#endif
 
 static void CloseAllOpenTimegates()
 {
@@ -4634,79 +4311,6 @@ static void WarnBuggyBase(int x, int y)
   }
 }
 
-#if 1
-void CheckBuggyBase(int x, int y)
-{
-  int element = Feld[x][y];
-
-  if (element == EL_SP_BUGGY_BASE)
-  {
-    if (MovDelay[x][y] == 0)	/* wait some time before activating base */
-    {
-      GfxFrame[x][y] = 0;
-
-      InitBuggyBase(x, y);
-    }
-
-    MovDelay[x][y]--;
-
-    if (MovDelay[x][y] != 0)
-    {
-      DrawLevelElementAnimation(x, y, element);
-    }
-    else
-    {
-      Feld[x][y] = EL_SP_BUGGY_BASE_ACTIVATING;
-      DrawLevelField(x, y);
-    }
-  }
-  else if (element == EL_SP_BUGGY_BASE_ACTIVATING)
-  {
-    if (MovDelay[x][y] == 0)	/* display activation warning of buggy base */
-    {
-      GfxFrame[x][y] = 0;
-
-      InitBuggyBase(x, y);
-    }
-
-    MovDelay[x][y]--;
-
-    if (MovDelay[x][y] != 0)
-    {
-      DrawLevelElementAnimation(x, y, element);
-    }
-    else
-    {
-      Feld[x][y] = EL_SP_BUGGY_BASE_ACTIVE;
-      DrawLevelField(x, y);
-    }
-  }
-  else if (element == EL_SP_BUGGY_BASE_ACTIVE)
-  {
-    if (MovDelay[x][y] == 0)	/* start activating buggy base */
-    {
-      GfxFrame[x][y] = 0;
-
-      InitBuggyBase(x, y);
-    }
-
-    MovDelay[x][y]--;
-
-    if (MovDelay[x][y] != 0)
-    {
-      DrawLevelElementAnimation(x, y, element);
-
-      WarnBuggyBase(x, y);
-    }
-    else
-    {
-      Feld[x][y] = EL_SP_BUGGY_BASE;
-      DrawLevelField(x, y);
-    }
-  }
-}
-#endif
-
 static void InitTrap(int x, int y)
 {
   MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
@@ -4727,71 +4331,6 @@ static void ChangeActiveTrap(int x, int y)
       DrawCrumbledSand(SCREENX(x), SCREENY(y));
 }
 
-#if 1
-void CheckTrap(int x, int y)
-{
-  int element = Feld[x][y];
-
-  if (element == EL_TRAP)
-  {
-    if (MovDelay[x][y] == 0)	/* wait some time before activating trap */
-      MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
-
-    MovDelay[x][y]--;
-
-    if (MovDelay[x][y] != 0)
-    {
-      /* do nothing while waiting */
-    }
-    else
-    {
-      Feld[x][y] = EL_TRAP_ACTIVE;
-      PlaySoundLevel(x, y, SND_TRAP_ACTIVATING);
-    }
-  }
-  else if (element == EL_TRAP_ACTIVE)
-  {
-    int delay = 4;
-    int num_frames = 8;
-
-    if (MovDelay[x][y] == 0)	/* start activating trap */
-    {
-      MovDelay[x][y] = num_frames * delay;
-      GfxFrame[x][y] = 0;
-    }
-
-    MovDelay[x][y]--;
-
-    if (MovDelay[x][y] != 0)
-    {
-      if (DrawLevelElementAnimation(x, y, element))
-	DrawCrumbledSand(SCREENX(x), SCREENY(y));
-    }
-    else
-    {
-      Feld[x][y] = EL_TRAP;
-      DrawLevelField(x, y);
-    }
-  }
-}
-#endif
-
-#if 1
-static void DrawBeltAnimation(int x, int y, int element)
-{
-  int belt_nr = getBeltNrFromBeltActiveElement(element);
-  int belt_dir = game.belt_dir[belt_nr];
-
-  if (belt_dir != MV_NO_MOVING)
-  {
-    DrawLevelElementAnimation(x, y, element);
-
-    if (!(FrameCounter % 2))
-      PlaySoundLevelAction(x, y, ACTION_ACTIVE);
-  }
-}
-#endif
-
 static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
@@ -4810,7 +4349,7 @@ static void ChangeElement(int x, int y)
   if (MovDelay[x][y] != 0)		/* continue element change */
   {
     if (IS_ANIMATED(el2img(element)))
-      DrawLevelElementAnimation(x, y, element);
+      ContinueLevelElementAnimation(x, y, element);
 
     if (changing_element[element].change_function)
       changing_element[element].change_function(x, y);
@@ -5110,12 +4649,14 @@ void GameActions()
     element = Feld[x][y];
     graphic = el2img(element);
 
+    SetRandomAnimationValue(x, y);
+
     if (IS_INACTIVE(element))
     {
 
 #if 1
       if (IS_ANIMATED(graphic))
-	DrawLevelGraphicAnimation(x, y, graphic);
+	ContinueLevelGraphicAnimation(x, y, graphic);
 #endif
 
       continue;
@@ -5130,11 +4671,11 @@ void GameActions()
       if (Feld[x][y] == EL_EMERALD &&
 	  IS_ANIMATED(graphic) &&
 	  !IS_MOVING(x, y))
-	DrawLevelGraphicAnimation(x, y, graphic);
+	ContinueLevelGraphicAnimation(x, y, graphic);
 #else
       if (IS_ANIMATED(graphic) &&
 	  !IS_MOVING(x, y))
-	DrawLevelGraphicAnimation(x, y, graphic);
+	ContinueLevelGraphicAnimation(x, y, graphic);
 #endif
 #endif
 
@@ -5152,7 +4693,7 @@ void GameActions()
 	      element == EL_SHIELD_NORMAL ||
 	      element == EL_SHIELD_DEADLY) &&
 	     IS_ANIMATED(graphic))
-      DrawLevelGraphicAnimation(x, y, graphic);
+      ContinueLevelGraphicAnimation(x, y, graphic);
 #endif
 
     else if (IS_MOVING(x, y))
@@ -5181,9 +4722,11 @@ void GameActions()
     else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
       TimegateWheel(x, y);
 #endif
+#if 0
     else if (element == EL_ACID_SPLASH_LEFT ||
 	     element == EL_ACID_SPLASH_RIGHT)
-      Blurb(x, y);
+      SplashAcid(x, y);
+#endif
 #if 0
     else if (element == EL_NUT_CRACKING)
       NussKnacken(x, y);
@@ -5234,7 +4777,7 @@ void GameActions()
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
     else if (IS_ANIMATED(graphic))
-      DrawLevelGraphicAnimation(x, y, graphic);
+      ContinueLevelGraphicAnimation(x, y, graphic);
 #endif
 
     if (IS_BELT_ACTIVE(element))
@@ -5588,7 +5131,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   {
     if (element == EL_ACID && dx == 0 && dy == 1)
     {
-      Blurb(jx, jy);
+      SplashAcid(jx, jy);
       Feld[jx][jy] = EL_PLAYER1;
       InitMovingField(jx, jy, MV_DOWN);
       Store[jx][jy] = EL_ACID;

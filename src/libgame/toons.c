@@ -64,7 +64,7 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   {
     /* note: expect different frames for the same delay cycle! */
 
-    frame = SimpleRND(num_frames);
+    frame = anim.simple_random_value % num_frames;
   }
 
   if (mode & ANIM_REVERSE)		/* use reverse animation direction */

@@ -70,6 +70,7 @@ void DrawBackground(int, int, int, int);
 void MarkTileDirty(int, int);
 void SetBorderElement();
 
+void SetRandomAnimationValue(int, int);
 int getGraphicAnimationFrame(int, int);
 void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
 boolean checkDrawGraphicAnimation(int, int, int);
@@ -77,6 +78,8 @@ boolean checkDrawLevelGraphicAnimation(int, int, int);
 boolean DrawGraphicAnimation(int, int, int);
 boolean DrawLevelGraphicAnimation(int, int, int);
 boolean DrawLevelElementAnimation(int, int, int);
+void ContinueLevelGraphicAnimation(int, int, int);
+void ContinueLevelElementAnimation(int, int, int);
 
 void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
