@@ -55,6 +55,7 @@ unsigned long		Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 unsigned long		ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			CheckCollision[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaCnt[MAX_NUM_AMOEBA];
 short			AmoebaCnt2[MAX_NUM_AMOEBA];

@@ -96,6 +96,9 @@
 /* values for other actions */
 #define MOVE_STEPSIZE_NORMAL	(TILEX / MOVE_DELAY_NORMAL_SPEED)
 
+#define GET_DX_FROM_DIR(d)	((d) == MV_LEFT ? -1 : (d) == MV_RIGHT ? 1 : 0)
+#define GET_DY_FROM_DIR(d)	((d) == MV_UP   ? -1 : (d) == MV_DOWN  ? 1 : 0)
+
 #define	INIT_GFX_RANDOM()	(SimpleRND(1000000))
 
 #define GET_NEW_PUSH_DELAY(e)	(   (element_info[e].push_delay_fixed) + \
@@ -1633,6 +1636,7 @@ void InitGame()
       AmoebaNr[x][y] = 0;
       WasJustMoving[x][y] = 0;
       WasJustFalling[x][y] = 0;
+      CheckCollision[x][y] = 0;
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
 
@@ -2517,6 +2521,10 @@ static void RemoveField(int x, int y)
   ChangeDelay[x][y] = 0;
   ChangePage[x][y] = -1;
   Pushed[x][y] = FALSE;
+
+#if 0
+  ExplodeField[x][y] = EX_TYPE_NONE;
+#endif
 
   GfxElement[x][y] = EL_UNDEFINED;
   GfxAction[x][y] = ACTION_DEFAULT;
@@ -3939,6 +3947,7 @@ void Impact(int x, int y)
     return;
   }
 
+  /* !!! not sufficient for all cases -- see EL_PEARL below !!! */
   /* only reset graphic animation if graphic really changes after impact */
   if (impact &&
       el_act_dir2img(element, GfxAction[x][y], MV_DOWN) != el2img(element))
@@ -3954,6 +3963,8 @@ void Impact(int x, int y)
   }
   else if (impact && element == EL_PEARL)
   {
+    ResetGfxAnimation(x, y);
+
     Feld[x][y] = EL_PEARL_BREAKING;
     PlayLevelSound(x, y, SND_PEARL_BREAKING);
     return;
@@ -4073,6 +4084,8 @@ void Impact(int x, int y)
 	}
 	else if (smashed == EL_PEARL)
 	{
+	  ResetGfxAnimation(x, y);
+
 	  Feld[x][y + 1] = EL_PEARL_BREAKING;
 	  PlayLevelSound(x, y, SND_PEARL_BREAKING);
 	  return;
@@ -5046,12 +5059,16 @@ void StartMoving(int x, int y)
 #endif
     }
 #if 1
-    else if ((game.engine_version < VERSION_IDENT(2,2,0,7) &&
-	      CAN_SMASH(element) && WasJustMoving[x][y] && !Pushed[x][y + 1] &&
-	      (Feld[x][y + 1] == EL_BLOCKED)) ||
+    else if ((game.engine_version >= VERSION_IDENT(3,1,0,0) &&
+	      CheckCollision[x][y] && !IS_FREE(x, y + 1)) ||
+
 	     (game.engine_version >= VERSION_IDENT(3,0,7,0) &&
 	      CAN_SMASH(element) && WasJustFalling[x][y] &&
-	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))))
+	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))) ||
+
+	     (game.engine_version < VERSION_IDENT(2,2,0,7) &&
+	      CAN_SMASH(element) && WasJustMoving[x][y] && !Pushed[x][y + 1] &&
+	      (Feld[x][y + 1] == EL_BLOCKED)))
 
 #else
 #if 1
@@ -5213,9 +5230,15 @@ void StartMoving(int x, int y)
 #endif
 
 #if 1
+
+#if 1
+    if (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
+	CheckCollision[x][y] && IN_LEV_FIELD_AND_NOT_FREE(newx, newy))
+#else
     if (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
 	WasJustMoving[x][y] && IN_LEV_FIELD(newx, newy) &&
 	(Feld[newx][newy] == EL_BLOCKED || IS_PLAYER(newx, newy)))
+#endif
     {
 #if 0
       printf("::: element %d '%s' WasJustMoving %d [%d, %d, %d, %d]\n",
@@ -5602,6 +5625,9 @@ void StartMoving(int x, int y)
 	  RemoveField(newx, newy);
 	  DrawLevelField(newx, newy);
 	}
+
+	/* if digged element was about to explode, prevent the explosion */
+	ExplodeField[newx][newy] = EX_TYPE_NONE;
 
 	PlayLevelSoundAction(x, y, action);
       }
@@ -6059,10 +6085,16 @@ void ContinueMoving(int x, int y)
 
   if (!pushed_by_player)
   {
+    int nextx = newx + dx, nexty = newy + dy;
+    boolean check_collision_again = IN_LEV_FIELD_AND_IS_FREE(nextx, nexty);
+
     WasJustMoving[newx][newy] = 3;
 
     if (CAN_FALL(element) && direction == MV_DOWN)
       WasJustFalling[newx][newy] = 3;
+
+    if ((!CAN_FALL(element) || direction == MV_DOWN) && check_collision_again)
+      CheckCollision[newx][newy] = 2;
   }
 
   if (DONT_TOUCH(element))	/* object may be nasty to player or others */
@@ -7219,6 +7251,8 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     {
       boolean is_empty;
       boolean is_diggable;
+      boolean is_collectible;
+      boolean is_removable;
       boolean is_destructible;
       int ex = x + xx - 1;
       int ey = y + yy - 1;
@@ -7260,11 +7294,15 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 				      IS_WALKABLE(content_element)));
 #endif
       is_diggable = (is_empty || IS_DIGGABLE(e));
+      is_collectible = (is_empty || IS_COLLECTIBLE(e));
+      is_removable = (is_diggable || is_collectible);
       is_destructible = (is_empty || !IS_INDESTRUCTIBLE(e));
 
       can_replace[xx][yy] =
-	((change->replace_when == CP_WHEN_EMPTY && is_empty) ||
-	 (change->replace_when == CP_WHEN_DIGGABLE && is_diggable) ||
+	((change->replace_when == CP_WHEN_EMPTY        && is_empty) ||
+	 (change->replace_when == CP_WHEN_DIGGABLE     && is_diggable) ||
+	 (change->replace_when == CP_WHEN_COLLECTIBLE  && is_collectible) ||
+	 (change->replace_when == CP_WHEN_REMOVABLE    && is_removable) ||
 	 (change->replace_when == CP_WHEN_DESTRUCTIBLE && is_destructible));
 
       if (!can_replace[xx][yy])
@@ -8179,6 +8217,8 @@ void GameActions()
       WasJustMoving[x][y]--;
     if (WasJustFalling[x][y] > 0)
       WasJustFalling[x][y]--;
+    if (CheckCollision[x][y] > 0)
+      CheckCollision[x][y]--;
 
     GfxFrame[x][y]++;
 
@@ -10740,7 +10780,8 @@ int DigField(struct PlayerInfo *player,
 	  ShowEnvelope(element - EL_ENVELOPE_1);
 #endif
 	}
-	else if (IS_DROPPABLE(element))	/* can be collected and dropped */
+	else if (IS_DROPPABLE(element) ||
+		 IS_THROWABLE(element))	/* can be collected and dropped */
 	{
 	  int i;
 
@@ -11170,10 +11211,10 @@ boolean DropElement(struct PlayerInfo *player)
     CH_SIDE_TOP,	/* dropping up    */
     CH_SIDE_BOTTOM,	/* dropping down  */
   };
-  int jx = player->jx, jy = player->jy;
+  int old_element, new_element;
+  int dropx = player->jx, dropy = player->jy;
   int drop_direction = player->MovDir;
   int drop_side = trigger_sides[MV_DIR_BIT(drop_direction)];
-  int old_element = Feld[jx][jy];
   int drop_element = (player->inventory_size > 0 ?
 		      player->inventory_element[player->inventory_size - 1] :
 		      player->inventory_infinite_element != EL_UNDEFINED ?
@@ -11181,7 +11222,18 @@ boolean DropElement(struct PlayerInfo *player)
 		      player->dynabombs_left > 0 ?
 		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
 		      EL_UNDEFINED);
-  int new_element = drop_element;	/* default: element does not change */
+
+  if (IS_THROWABLE(drop_element))
+  {
+    dropx += GET_DX_FROM_DIR(drop_direction);
+    dropy += GET_DY_FROM_DIR(drop_direction);
+
+    if (!IN_LEV_FIELD(dropx, dropy))
+      return FALSE;
+  }
+
+  old_element = Feld[dropx][dropy];	/* old element at dropping position */
+  new_element = drop_element;		/* default: no change when dropping */
 
   /* check if player is active, not moving and ready to drop */
   if (!player->active || player->MovPos || player->drop_delay > 0)
@@ -11214,10 +11266,10 @@ boolean DropElement(struct PlayerInfo *player)
 #endif
 
   if (old_element != EL_EMPTY)
-    Back[jx][jy] = old_element;		/* store old element on this field */
+    Back[dropx][dropy] = old_element;	/* store old element on this field */
 
-  ResetGfxAnimation(jx, jy);
-  ResetRandomAnimationValue(jx, jy);
+  ResetGfxAnimation(dropx, dropy);
+  ResetRandomAnimationValue(dropx, dropy);
 
   if (player->inventory_size > 0 ||
       player->inventory_infinite_element != EL_UNDEFINED)
@@ -11238,34 +11290,35 @@ boolean DropElement(struct PlayerInfo *player)
 	new_element = EL_SP_DISK_RED_ACTIVE;
     }
 
-    Feld[jx][jy] = new_element;
+    Feld[dropx][dropy] = new_element;
 
-    if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
-      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
+    if (IN_SCR_FIELD(SCREENX(dropx), SCREENY(dropy)))
+      DrawGraphicThruMask(SCREENX(dropx), SCREENY(dropy),
+			  el2img(Feld[dropx][dropy]), 0);
 
-    PlayLevelSoundAction(jx, jy, ACTION_DROPPING);
+    PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
 
 #if 1
     /* needed if previous element just changed to "empty" in the last frame */
-    Changed[jx][jy] = 0;		/* allow another change */
+    Changed[dropx][dropy] = 0;		/* allow another change */
 #endif
 
 #if 1
     /* !!! TEST ONLY !!! */
-    CheckElementChangeByPlayer(jx, jy, new_element, CE_DROPPED_BY_PLAYER,
+    CheckElementChangeByPlayer(dropx, dropy, new_element, CE_DROPPED_BY_PLAYER,
 			       player->index_bit, drop_side);
-    CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
+    CheckTriggeredElementChangeByPlayer(dropx, dropy, new_element,
 					CE_OTHER_GETS_DROPPED,
 					player->index_bit, drop_side);
 #else
-    CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
+    CheckTriggeredElementChangeByPlayer(dropx, dropy, new_element,
 					CE_OTHER_GETS_DROPPED,
 					player->index_bit, drop_side);
-    CheckElementChangeByPlayer(jx, jy, new_element, CE_DROPPED_BY_PLAYER,
+    CheckElementChangeByPlayer(dropx, dropy, new_element, CE_DROPPED_BY_PLAYER,
 			       player->index_bit, drop_side);
 #endif
 
-    TestIfElementTouchesCustomElement(jx, jy);
+    TestIfElementTouchesCustomElement(dropx, dropy);
   }
   else		/* player is dropping a dyna bomb */
   {
@@ -11275,30 +11328,31 @@ boolean DropElement(struct PlayerInfo *player)
     new_element = EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr;
 #endif
 
-    Feld[jx][jy] = new_element;
+    Feld[dropx][dropy] = new_element;
 
-    if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
-      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
+    if (IN_SCR_FIELD(SCREENX(dropx), SCREENY(dropy)))
+      DrawGraphicThruMask(SCREENX(dropx), SCREENY(dropy),
+			  el2img(Feld[dropx][dropy]), 0);
 
-    PlayLevelSoundAction(jx, jy, ACTION_DROPPING);
+    PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
   }
 
 
 
 #if 1
 
-  if (Feld[jx][jy] == new_element)	/* uninitialized unless CE change */
+  if (Feld[dropx][dropy] == new_element) /* uninitialized unless CE change */
   {
 #if 1
-    InitField_WithBug1(jx, jy, FALSE);
+    InitField_WithBug1(dropx, dropy, FALSE);
 #else
-    InitField(jx, jy, FALSE);
-    if (CAN_MOVE(Feld[jx][jy]))
-      InitMovDir(jx, jy);
+    InitField(dropx, dropy, FALSE);
+    if (CAN_MOVE(Feld[dropx][dropy]))
+      InitMovDir(dropx, dropy);
 #endif
   }
 
-  new_element = Feld[jx][jy];		/* element might have changed */
+  new_element = Feld[dropx][dropy];	/* element might have changed */
 
   if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
       element_info[new_element].move_pattern == MV_WHEN_DROPPED)
@@ -11306,37 +11360,46 @@ boolean DropElement(struct PlayerInfo *player)
 #if 0
     int move_stepsize = element_info[new_element].move_stepsize;
 #endif
-    int direction, dx, dy, nextx, nexty;
+    int move_direction, nextx, nexty;
 
     if (element_info[new_element].move_direction_initial == MV_START_AUTOMATIC)
-      MovDir[jx][jy] = player->MovDir;
+      MovDir[dropx][dropy] = drop_direction;
 
-    direction = MovDir[jx][jy];
-    dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
-    dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
-    nextx = jx + dx;
-    nexty = jy + dy;
+    move_direction = MovDir[dropx][dropy];
+    nextx = dropx + GET_DX_FROM_DIR(move_direction);
+    nexty = dropy + GET_DY_FROM_DIR(move_direction);
+
+#if 1
+      Changed[dropx][dropy] = 0;	/* allow another change */
+      CheckCollision[dropx][dropy] = 2;
+#else
 
     if (IN_LEV_FIELD(nextx, nexty) && IS_FREE(nextx, nexty))
     {
 #if 0
-      WasJustMoving[jx][jy] = 3;
+      WasJustMoving[dropx][dropy] = 3;
 #else
-      InitMovingField(jx, jy, direction);
-      ContinueMoving(jx, jy);
+#if 1
+      InitMovingField(dropx, dropy, move_direction);
+      ContinueMoving(dropx, dropy);
+#endif
 #endif
     }
+#if 1
     else
     {
-      Changed[jx][jy] = 0;		/* allow another change */
+      Changed[dropx][dropy] = 0;	/* allow another change */
 
 #if 1
-      TestIfElementHitsCustomElement(jx, jy, direction);
+      TestIfElementHitsCustomElement(dropx, dropy, move_direction);
 #else
-      CheckElementChangeBySide(jx, jy, new_element, touched_element,
-			       CE_HITTING_SOMETHING, direction);
+      CheckElementChangeBySide(dropx, dropy, new_element, touched_element,
+			       CE_HITTING_SOMETHING, move_direction);
 #endif
     }
+#endif
+
+#endif
 
 #if 0
     player->drop_delay = 2 * TILEX / move_stepsize + 1;

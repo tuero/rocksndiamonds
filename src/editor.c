@@ -1221,6 +1221,7 @@ static struct ValueTextInfo options_walk_to_action[] =
   { EP_DIGGABLE,		"diggable"			},
   { EP_COLLECTIBLE_ONLY,	"collectible"			},
   { EP_DROPPABLE,		"collectible & droppable"	},
+  { EP_THROWABLE,		"collectible & throwable"	},
   { EP_PUSHABLE,		"pushable"			},
 
   { -1,				NULL				}
@@ -1244,10 +1245,10 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_TURNING_LEFT_RIGHT,	"turning left, right"		},
   { MV_TURNING_RIGHT_LEFT,	"turning right, left"		},
   { MV_TURNING_RANDOM,		"turning random"		},
-  { MV_WHEN_PUSHED,		"when pushed"			},
-  { MV_WHEN_DROPPED,		"when dropped"			},
   { MV_MAZE_RUNNER,		"maze runner style"		},
   { MV_MAZE_HUNTER,		"maze hunter style"		},
+  { MV_WHEN_PUSHED,		"when pushed"			},
+  { MV_WHEN_DROPPED,		"when dropped/thrown"		},
 
   { -1,				NULL				}
 };
@@ -1338,24 +1339,19 @@ static struct ValueTextInfo options_time_units[] =
 
 static struct ValueTextInfo options_change_direct_action[] =
 {
-  { CE_TOUCHED_BY_PLAYER,	"touched by player ..."		},
-  { CE_PRESSED_BY_PLAYER,	"pressed by player ..."		},
-  { CE_PUSHED_BY_PLAYER,	"pushed by player ..."		},
-  { CE_ENTERED_BY_PLAYER,	"entered by player ..."		},
-  { CE_LEFT_BY_PLAYER,		"left by player ..."		},
-  { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
-  { CE_SWITCHED,		"switched ..."			},
+  { CE_TOUCHED_BY_PLAYER,	"touched by player"		},
+  { CE_PRESSED_BY_PLAYER,	"pressed by player"		},
+  { CE_PUSHED_BY_PLAYER,	"pushed by player"		},
+  { CE_ENTERED_BY_PLAYER,	"entered by player"		},
+  { CE_LEFT_BY_PLAYER,		"left by player"		},
+  { CE_DROPPED_BY_PLAYER,	"dropped/thrown by player"	},
+  { CE_SWITCHED,		"switched"			},
 #if 1
-  { CE_HITTING_SOMETHING,	"hitting something ..."		},
-  { CE_HIT_BY_SOMETHING,	"hit by something ..."		},
+  { CE_HITTING_SOMETHING,	"hitting something"		},
+  { CE_HIT_BY_SOMETHING,	"hit by something"		},
 #else
-  { CE_HITTING_SOMETHING,	"collision ..."			},
+  { CE_HITTING_SOMETHING,	"collision"			},
 #endif
-
-#if 0
-  { CE_BLOCKED,			"blocked ..."			},
-#endif
-
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
 
@@ -1364,20 +1360,20 @@ static struct ValueTextInfo options_change_direct_action[] =
 
 static struct ValueTextInfo options_change_other_action[] =
 {
-  { CE_OTHER_GETS_TOUCHED,	"player touches ..."		},
-  { CE_OTHER_GETS_PRESSED,	"player presses ..."		},
-  { CE_OTHER_GETS_PUSHED,	"player pushes ..."		},
-  { CE_OTHER_GETS_ENTERED,	"player enters ..."		},
-  { CE_OTHER_GETS_LEFT,		"player leaves ..."		},
+  { CE_OTHER_GETS_TOUCHED,	"player touches"		},
+  { CE_OTHER_GETS_PRESSED,	"player presses"		},
+  { CE_OTHER_GETS_PUSHED,	"player pushes"			},
+  { CE_OTHER_GETS_ENTERED,	"player enters"			},
+  { CE_OTHER_GETS_LEFT,		"player leaves"			},
   { CE_OTHER_GETS_DIGGED,	"player digs"			},
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
-  { CE_OTHER_GETS_DROPPED,	"player drops"			},
-  { CE_OTHER_IS_TOUCHING,	"touching ..."			},
+  { CE_OTHER_GETS_DROPPED,	"player drops/throws"		},
+  { CE_OTHER_IS_TOUCHING,	"touching"			},
 #if 1
-  { CE_OTHER_IS_HITTING,	"hitting ..."			},
-  { CE_OTHER_GETS_HIT,		"hit by ..."			},
+  { CE_OTHER_IS_HITTING,	"hitting"			},
+  { CE_OTHER_GETS_HIT,		"hit by"			},
 #endif
-  { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
+  { CE_OTHER_IS_SWITCHING,	"switch of"			},
   { CE_OTHER_IS_CHANGING,	"change by page of"		},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
 
@@ -1451,6 +1447,8 @@ static struct ValueTextInfo options_change_replace_when[] =
 {
   { CP_WHEN_EMPTY,		"empty"				},
   { CP_WHEN_DIGGABLE,		"diggable"			},
+  { CP_WHEN_COLLECTIBLE,	"collectible"			},
+  { CP_WHEN_REMOVABLE,		"removable"			},
   { CP_WHEN_DESTRUCTIBLE,	"destructible"			},
 
   { -1,				NULL				}
@@ -1637,7 +1635,7 @@ static struct
     -1,
     options_change_trigger_side,
     &custom_element_change.trigger_side,
-    "... at", "side",			"element side that causes change"
+    "at", "side",			"element side that causes change"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
@@ -5811,12 +5809,14 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (IS_DIGGABLE(element) ? EP_DIGGABLE :
      IS_COLLECTIBLE_ONLY(element) ? EP_COLLECTIBLE_ONLY :
      IS_DROPPABLE(element) ? EP_DROPPABLE :
+     IS_THROWABLE(element) ? EP_THROWABLE :
      IS_PUSHABLE(element) ? EP_PUSHABLE :
      custom_element.walk_to_action);
   custom_element_properties[EP_WALK_TO_OBJECT] =
     (IS_DIGGABLE(element) ||
      IS_COLLECTIBLE_ONLY(element) ||
      IS_DROPPABLE(element) ||
+     IS_THROWABLE(element) ||
      IS_PUSHABLE(element));
 
   /* set smash targets selectbox help value */
@@ -5875,7 +5875,6 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SWITCHED) ? CE_SWITCHED :
      HAS_CHANGE_EVENT(element, CE_HITTING_SOMETHING) ? CE_HITTING_SOMETHING :
      HAS_CHANGE_EVENT(element, CE_HIT_BY_SOMETHING) ? CE_HIT_BY_SOMETHING :
-     HAS_CHANGE_EVENT(element, CE_BLOCKED) ? CE_BLOCKED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      custom_element_change.direct_action);
@@ -5987,6 +5986,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_DIGGABLE] = FALSE;
   custom_element_properties[EP_COLLECTIBLE_ONLY] = FALSE;
   custom_element_properties[EP_DROPPABLE] = FALSE;
+  custom_element_properties[EP_THROWABLE] = FALSE;
   custom_element_properties[EP_PUSHABLE] = FALSE;
   custom_element_properties[custom_element.walk_to_action] =
     custom_element_properties[EP_WALK_TO_OBJECT];
@@ -6041,7 +6041,6 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_SWITCHED] = FALSE;
   custom_element_change_events[CE_HITTING_SOMETHING] = FALSE;
   custom_element_change_events[CE_HIT_BY_SOMETHING] = FALSE;
-  custom_element_change_events[CE_BLOCKED] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
@@ -6755,14 +6754,16 @@ static void DrawPropertiesInfo()
     { EP_PASSABLE_OVER,		"- player can pass over it"		},
     { EP_PASSABLE_INSIDE,	"- player can pass through it"		},
     { EP_PASSABLE_UNDER,	"- player can pass under it"		},
+    { EP_PROTECTED,		"- player is protected by it"		},
 
     { EP_DIGGABLE,		"- can be digged away"			},
     { EP_COLLECTIBLE,		"- can be collected"			},
     { EP_DROPPABLE,		"- can be dropped after collecting"	},
+    { EP_THROWABLE,		"- can be thrown after collecting"	},
     { EP_PUSHABLE,		"- can be pushed"			},
 
-    { EP_CAN_MOVE,		"- can move"				},
     { EP_CAN_FALL,		"- can fall"				},
+    { EP_CAN_MOVE,		"- can move"				},
 
     { EP_CAN_SMASH_PLAYER,	"- can smash player"			},
 #if 0
@@ -6770,7 +6771,7 @@ static void DrawPropertiesInfo()
 #endif
     { EP_CAN_SMASH_EVERYTHING,	"- can smash everything smashable"	},
 
-    { EP_SLIPPERY,		"- slippery for falling objects"	},
+    { EP_SLIPPERY,		"- slippery for falling elements"	},
     { EP_EM_SLIPPERY_WALL,	"- slippery for some gems (EM style)"	},
 
     { EP_DONT_RUN_INTO,		"- deadly when running into"		},
@@ -6787,6 +6788,7 @@ static void DrawPropertiesInfo()
 
     /* pre-defined properties */
     { EP_CAN_PASS_MAGIC_WALL,	"- can pass magic walls"		},
+    { EP_SWITCHABLE,		"- can be switched"			},
     { EP_HAS_CONTENT,		"- can contain other elements"		},
 
     { -1,			NULL					}

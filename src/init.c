@@ -2258,6 +2258,11 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_throwable[] =
+  {
+    -1
+  };
+
   static int ep_player[] =
   {
     EL_PLAYER_1,
@@ -3058,6 +3063,7 @@ void InitElementPropertiesStatic()
     { ep_pushable,		EP_PUSHABLE		},
     { ep_can_explode_cross,	EP_CAN_EXPLODE_CROSS	},
     { ep_protected,		EP_PROTECTED		},
+    { ep_throwable,		EP_THROWABLE		},
 
     { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
@@ -3260,7 +3266,8 @@ void InitElementPropertiesEngine(int engine_version)
 
     /* ---------- COLLECTIBLE ---------------------------------------------- */
     SET_PROPERTY(i, EP_COLLECTIBLE, (IS_COLLECTIBLE_ONLY(i) ||
-				     IS_DROPPABLE(i)));
+				     IS_DROPPABLE(i) ||
+				     IS_THROWABLE(i)));
 
     /* ---------- SNAPPABLE ------------------------------------------------ */
     SET_PROPERTY(i, EP_SNAPPABLE, (IS_DIGGABLE(i) ||

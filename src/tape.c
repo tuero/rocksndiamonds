@@ -1152,6 +1152,17 @@ void TapeQuickSave()
 
 void TapeQuickLoad()
 {
+  if (tape.recording && !Request("Stop recording and load tape ?",
+				 REQ_ASK | REQ_STAY_CLOSED))
+  {
+    BlitBitmap(bitmap_db_door, bitmap_db_door,
+	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+    OpenDoor(DOOR_OPEN_1);
+
+    return;
+  }
+
   if (game_status == GAME_MODE_PLAYING || game_status == GAME_MODE_MAIN)
   {
     TapeStop();

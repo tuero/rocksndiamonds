@@ -2311,8 +2311,8 @@ boolean Request(char *text, unsigned int req_state)
     if (!(req_state & REQ_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
     {
       BlitBitmap(bitmap_db_door, bitmap_db_door,
-		 DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
-		 DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
+		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
       OpenDoor(DOOR_OPEN_1);
     }
   }

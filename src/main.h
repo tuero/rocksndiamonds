@@ -89,6 +89,7 @@
 #define EP_CAN_EXPLODE_CROSS	25
 #define EP_PROTECTED		26
 #define EP_CAN_MOVE_INTO_ACID	27
+#define EP_THROWABLE		28
 
 /* values for pre-defined properties */
 #define EP_PLAYER		32
@@ -196,9 +197,8 @@
 #define CE_HIT_BY_SOMETHING	27
 #define CE_OTHER_IS_HITTING	28
 #define CE_OTHER_GETS_HIT	29
-#define CE_BLOCKED		30
 
-#define NUM_CHANGE_EVENTS	31
+#define NUM_CHANGE_EVENTS	30
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -242,6 +242,8 @@
 #define CP_WHEN_EMPTY		0
 #define CP_WHEN_DIGGABLE	1
 #define CP_WHEN_DESTRUCTIBLE	2
+#define CP_WHEN_COLLECTIBLE	3
+#define CP_WHEN_REMOVABLE	4
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER	4
@@ -330,6 +332,7 @@
 #define CAN_EXPLODE_CROSS(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_CROSS)
 #define IS_PROTECTED(e)		HAS_PROPERTY(e, EP_PROTECTED)
 #define CAN_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_CAN_MOVE_INTO_ACID)
+#define IS_THROWABLE(e)		HAS_PROPERTY(e, EP_THROWABLE)
 
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
@@ -1865,6 +1868,7 @@ extern unsigned long		Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long		ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			CheckCollision[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];
 extern short			AmoebaCnt2[MAX_NUM_AMOEBA];

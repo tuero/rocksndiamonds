@@ -1,3 +1,10 @@
+2004-04-10
+	* added "collectible" and "removable" to extended replacement types
+	  (where "removable" replaces "diggable" and "collectible" elements)
+	* added "collectible & throwable" (to throw element to the next field)
+	* fixed bug with CEs digging elements that are just about to explode
+	* changed mouse cursor now always being visible when game is paused
+
 2004-04-09
 	* added possibility to push/press accessible elements from a side that
 	  is not accessible

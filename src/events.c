@@ -112,7 +112,7 @@ void EventLoop(void)
     else
     {
       /* when playing, display a special mouse pointer inside the playfield */
-      if (game_status == GAME_MODE_PLAYING)
+      if (game_status == GAME_MODE_PLAYING && !tape.pausing)
       {
 	if (!playfield_cursor_set && cursor_inside_playfield &&
 	    DelayReached(&playfield_cursor_delay, 1000))
