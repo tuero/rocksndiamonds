@@ -100,6 +100,7 @@
 #define EP_BIT_BELT_SWITCH	(1 << 2)
 #define EP_BIT_TUBE		(1 << 3)
 #define EP_BIT_EM_SLIPPERY_WALL	(1 << 4)
+#define EP_BIT_CAN_BE_CRUMBLED	(1 << 5)
 
 #define EP_BITMASK_DEFAULT	0
 
@@ -141,6 +142,7 @@
 #define IS_BELT_SWITCH(e)	(Properties2[e] & EP_BIT_BELT_SWITCH)
 #define IS_TUBE(e)		(Properties2[e] & EP_BIT_TUBE)
 #define IS_EM_SLIPPERY_WALL(e)	(Properties2[e] & EP_BIT_EM_SLIPPERY_WALL)
+#define CAN_BE_CRUMBLED(e)	(Properties2[e] & EP_BIT_CAN_BE_CRUMBLED)
 
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
 	 			 (e) <= EL_CUSTOM_END)
@@ -861,13 +863,12 @@
 #define COOKIE_PREFIX		"ROCKSNDIAMONDS"
 #define FILENAME_PREFIX		"Rocks"
 
-#define USERDATA_DIR_STRING	"Userdata"
 #if defined(PLATFORM_UNIX)
 #define USERDATA_DIRECTORY	".rocksndiamonds"
 #elif defined(PLATFORM_WIN32)
-#define USERDATA_DIRECTORY	PROGRAM_TITLE_STRING " " USERDATA_DIR_STRING
+#define USERDATA_DIRECTORY	PROGRAM_TITLE_STRING
 #else
-#define USERDATA_DIRECTORY	USERDATA_DIR_STRING
+#define USERDATA_DIRECTORY	"userdata"
 #endif
 
 #define X11_ICON_FILENAME	"rocks_icon.xbm"

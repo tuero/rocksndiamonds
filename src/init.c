@@ -423,6 +423,9 @@ void InitElementGraphicInfo()
     int direction = element_to_graphic[i].direction;
     int graphic   = element_to_graphic[i].graphic;
 
+    if (graphic_info[graphic].bitmap == NULL)
+      continue;
+
     if (action < 0)
       action = ACTION_DEFAULT;
 
@@ -440,6 +443,9 @@ void InitElementGraphicInfo()
     int direction = property_mapping[i].ext2_index;
     int special   = property_mapping[i].ext3_index;
     int graphic   = property_mapping[i].artwork_index;
+
+    if (graphic_info[graphic].bitmap == NULL)
+      continue;
 
     if (element >= MAX_NUM_ELEMENTS || special != -1)
       continue;
@@ -473,13 +479,18 @@ void InitElementGraphicInfo()
 
     for (act=0; act<NUM_ACTIONS; act++)
     {
+      boolean act_empty = (act == ACTION_DIGGING ||
+			   act == ACTION_SNAPPING ||
+			   act == ACTION_COLLECTING);
+
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
 	int default_direction_graphic = element_info[i].graphic[act];
 
 	/* no graphic for current action -- use default direction graphic */
 	if (default_direction_graphic == -1)
-	  default_direction_graphic = default_action_direction_graphic[dir];
+	  default_direction_graphic =
+	    (act_empty ? IMG_EMPTY : default_action_direction_graphic[dir]);
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
@@ -488,7 +499,8 @@ void InitElementGraphicInfo()
 
       /* no graphic for this specific action -- use default action graphic */
       if (element_info[i].graphic[act] == -1)
-	element_info[i].graphic[act] = default_action_graphic;
+	element_info[i].graphic[act] =
+	  (act_empty ? IMG_EMPTY : default_action_graphic);
     }
   }
 
@@ -1014,9 +1026,9 @@ static void InitSoundInfo()
 
 static void ReinitializeGraphics()
 {
+  InitGraphicInfo();			/* graphic properties mapping */
   InitElementGraphicInfo();		/* element game graphic mapping */
   InitElementSpecialGraphicInfo();	/* element special graphic mapping */
-  InitGraphicInfo();			/* graphic properties mapping */
 
   InitElementSmallImages();		/* create editor and preview images */
   InitFontGraphicInfo();		/* initialize text drawing functions */
@@ -1030,8 +1042,8 @@ static void ReinitializeGraphics()
 
 static void ReinitializeSounds()
 {
-  InitElementSoundInfo();	/* element game sound mapping */
   InitSoundInfo();		/* sound properties mapping */
+  InitElementSoundInfo();	/* element game sound mapping */
 
 #if 1
   InitElementSoundInfo();	/* element game sound mapping */
@@ -2119,6 +2131,20 @@ void InitElementProperties()
   };
   static int ep_tube_num = SIZEOF_ARRAY_INT(ep_tube);
 
+  static int ep_em_slippery_wall[] =
+  {
+  };
+  static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
+
+  static int ep_can_be_crumbled[] =
+  {
+    EL_SAND,
+    EL_LANDMINE,
+    EL_TRAP,
+    EL_TRAP_ACTIVE
+  };
+  static int ep_can_be_crumbled_num = SIZEOF_ARRAY_INT(ep_can_be_crumbled);
+
   static long ep1_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -2158,7 +2184,9 @@ void InitElementProperties()
     EP_BIT_BELT,
     EP_BIT_BELT_ACTIVE,
     EP_BIT_BELT_SWITCH,
-    EP_BIT_TUBE
+    EP_BIT_TUBE,
+    EP_BIT_EM_SLIPPERY_WALL,
+    EP_BIT_CAN_BE_CRUMBLED
   };
   static int *ep1_array[] =
   {
@@ -2199,7 +2227,9 @@ void InitElementProperties()
     ep_belt,
     ep_belt_active,
     ep_belt_switch,
-    ep_tube
+    ep_tube,
+    ep_em_slippery_wall,
+    ep_can_be_crumbled
   };
   static int *ep1_num[] =
   {
@@ -2240,7 +2270,9 @@ void InitElementProperties()
     &ep_belt_num,
     &ep_belt_active_num,
     &ep_belt_switch_num,
-    &ep_tube_num
+    &ep_tube_num,
+    &ep_em_slippery_wall_num,
+    &ep_can_be_crumbled_num
   };
   static int num_properties1 = SIZEOF_ARRAY(ep1_num, int *);
   static int num_properties2 = SIZEOF_ARRAY(ep2_num, int *);

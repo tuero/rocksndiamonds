@@ -1690,7 +1690,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
     if (phase == delay)
-      DrawCrumbledSand(SCREENX(x), SCREENY(y));
+      DrawLevelFieldCrumbledSand(x, y);
 
     if (IS_PFORTE(Store[x][y]))
     {
@@ -3399,7 +3399,7 @@ void ContinueMoving(int x, int y)
 	yy = y + xy[i][1];
 
 	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_SAND)
-	  DrawLevelField(xx, yy);	/* for "DrawCrumbledSand()" */
+	  DrawLevelField(xx, yy);	/* for "crumbled sand" */
       }
     }
 
@@ -4384,7 +4384,7 @@ static void ChangeActiveTrap(int x, int y)
 
   /* if new animation frame was drawn, correct crumbled sand border */
   if (IS_NEW_FRAME(GfxFrame[x][y], graphic))
-    DrawCrumbledSand(SCREENX(x), SCREENY(y));
+    DrawLevelFieldCrumbledSand(x, y);
 }
 
 static void ChangeElement(int x, int y)
@@ -5255,7 +5255,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     else if (old_jx == jx && old_jy != jy)
       player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
-    DrawLevelField(jx, jy);	/* for "DrawCrumbledSand()" */
+    DrawLevelField(jx, jy);	/* for "crumbled sand" */
 
     player->last_move_dir = player->MovDir;
     player->is_moving = TRUE;
@@ -5730,8 +5730,11 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BUGGY_BASE_ACTIVATING:
       RemoveField(x, y);
 #if 1
-      if (mode != DF_SNAP && element == EL_SAND)
-	GfxElement[x][y] = EL_SAND;
+      if (mode != DF_SNAP && element != EL_EMPTY)
+      {
+	GfxElement[x][y] = (CAN_BE_CRUMBLED(element) ? EL_SAND : element);
+	player->is_digging = TRUE;
+      }
 #endif
       PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
       break;
@@ -5746,6 +5749,13 @@ int DigField(struct PlayerInfo *player,
     case EL_PEARL:
     case EL_CRYSTAL:
       RemoveField(x, y);
+#if 1
+      if (mode != DF_SNAP)
+      {
+	GfxElement[x][y] = element;
+	player->is_collecting = TRUE;
+      }
+#endif
       local_player->gems_still_needed -= (element == EL_DIAMOND ? 3 :
 					  element == EL_PEARL ? 5 :
 					  element == EL_CRYSTAL ? 8 : 1);
@@ -6376,12 +6386,7 @@ int DigField(struct PlayerInfo *player,
   player->push_delay = 0;
 
   if (Feld[x][y] != element)		/* really digged/collected something */
-  {
-    if (GfxElement[x][y] == EL_SAND)
-      player->is_digging = TRUE;
-    else
-      player->is_collecting = TRUE;
-  }
+    player->is_collecting = !player->is_digging;
 
   return MF_MOVING;
 }

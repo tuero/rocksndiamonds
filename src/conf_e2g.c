@@ -489,10 +489,6 @@ element_to_graphic[] =
     IMG_SAND
   },
   {
-    EL_SAND_CRUMBLED,				-1, -1,
-    IMG_SAND_CRUMBLED
-  },
-  {
     EL_SAND,					ACTION_DIGGING, MV_BIT_LEFT,
     IMG_SAND_DIGGING_LEFT
   },
@@ -507,6 +503,26 @@ element_to_graphic[] =
   {
     EL_SAND,					ACTION_DIGGING, MV_BIT_DOWN,
     IMG_SAND_DIGGING_DOWN
+  },
+  {
+    EL_SAND_CRUMBLED,				-1, -1,
+    IMG_SAND_CRUMBLED
+  },
+  {
+    EL_SAND_CRUMBLED,				ACTION_DIGGING, MV_BIT_LEFT,
+    IMG_SAND_CRUMBLED_DIGGING_LEFT
+  },
+  {
+    EL_SAND_CRUMBLED,				ACTION_DIGGING, MV_BIT_RIGHT,
+    IMG_SAND_CRUMBLED_DIGGING_RIGHT
+  },
+  {
+    EL_SAND_CRUMBLED,				ACTION_DIGGING, MV_BIT_UP,
+    IMG_SAND_CRUMBLED_DIGGING_UP
+  },
+  {
+    EL_SAND_CRUMBLED,				ACTION_DIGGING, MV_BIT_DOWN,
+    IMG_SAND_CRUMBLED_DIGGING_DOWN
   },
   {
     EL_WALL,					-1, -1,
@@ -549,6 +565,10 @@ element_to_graphic[] =
     IMG_EMERALD_FALLING
   },
   {
+    EL_EMERALD,					ACTION_COLLECTING, -1,
+    IMG_EMERALD_COLLECTING
+  },
+  {
     EL_DIAMOND,					-1, -1,
     IMG_DIAMOND
   },
@@ -559,6 +579,10 @@ element_to_graphic[] =
   {
     EL_DIAMOND,					ACTION_FALLING, -1,
     IMG_DIAMOND_FALLING
+  },
+  {
+    EL_DIAMOND,					ACTION_COLLECTING, -1,
+    IMG_DIAMOND_COLLECTING
   },
   {
     EL_BOMB,					-1, -1,

@@ -542,7 +542,8 @@ void DrawPlayer(struct PlayerInfo *player)
   int graphic;
   int frame = 0;
   boolean player_is_moving = (last_jx != jx || last_jy != jy ? TRUE : FALSE);
-  int current_action = ACTION_DEFAULT;
+  int move_dir = player->MovDir;
+  int action = ACTION_DEFAULT;
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
@@ -560,13 +561,13 @@ void DrawPlayer(struct PlayerInfo *player)
   if (element == EL_EXPLOSION)
     return;
 
-  current_action = (player->Pushing ? ACTION_PUSHING :
-		    player->is_digging ? ACTION_DIGGING :
-		    player->is_collecting ? ACTION_COLLECTING :
-		    player->is_moving ? ACTION_MOVING :
-		    player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
+  action = (player->Pushing ? ACTION_PUSHING :
+	    player->is_digging ? ACTION_DIGGING :
+	    player->is_collecting ? ACTION_COLLECTING :
+	    player->is_moving ? ACTION_MOVING :
+	    player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
 
-  InitPlayerGfxAnimation(player, current_action, player->MovDir);
+  InitPlayerGfxAnimation(player, action, move_dir);
 
   /* ----------------------------------------------------------------------- */
   /* draw things in the field the player is leaving, if needed               */
@@ -622,52 +623,16 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
-      int old_element = GfxElement[jx][jy];
-      int old_graphic =
-	el_act_dir2img(old_element, ACTION_DIGGING, player->MovDir);
-      int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
-
-#if 0
-      Bitmap *src_bitmap;
-      int src_x, src_y;
-      int width = TILEX, height = TILEY;
-      int cx = 0, cy = 0;
-
-      if (player->MovDir == MV_UP)
+      if (GfxElement[jx][jy] == EL_SAND)
+	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
+      else
       {
-	cy = player->GfxPos;
-	height -= cy;
-      }
-      else if (player->MovDir == MV_DOWN)
-      {
-	cy = 0;
-	height = TILEY - player->GfxPos;
-      }
-      else if (player->MovDir == MV_LEFT)
-      {
-	cx = player->GfxPos;
-	width -= cx;
-      }
-      else if (player->MovDir == MV_RIGHT)
-      {
-	cx = 0;
-	width = TILEX - player->GfxPos;
-      }
+	int old_element = GfxElement[jx][jy];
+	int old_graphic = el_act_dir2img(old_element, action, move_dir);
+	int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
 
-      getGraphicSource(old_graphic, frame, &src_bitmap, &src_x, &src_y);
-
-      BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
-		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-#else
-#if 0
-      printf("::: %d, %d, %d, %d => %d, %d [%d, %d, %d]\n",
-	     old_element, ACTION_DIGGING, player->MovDir, player->Frame,
-	     old_graphic, frame,
-	     player->MovPos, player->GfxPos, player->StepFrame);
-#endif
-
-      DrawGraphic(sx, sy, old_graphic, frame);
-#endif
+	DrawGraphic(sx, sy, old_graphic, frame);
+      }
     }
     else
     {
@@ -686,22 +651,21 @@ void DrawPlayer(struct PlayerInfo *player)
     static int last_horizontal_dir = MV_LEFT;
     int direction;
 
-    if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
-      last_horizontal_dir = player->MovDir;
+    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
+      last_horizontal_dir = move_dir;
 
-    direction = (player->snapped ? player->MovDir : last_horizontal_dir);
+    direction = (player->snapped ? move_dir : last_horizontal_dir);
 
     graphic = el_act_dir2img(EL_SP_MURPHY, player->GfxAction, direction);
   }
   else
-    graphic = el_act_dir2img(player->element_nr, player->GfxAction,
-			     player->MovDir);
+    graphic = el_act_dir2img(player->element_nr, player->GfxAction, move_dir);
 
   frame = getGraphicAnimationFrame(graphic, player->Frame);
 
   if (player->GfxPos)
   {
-    if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
+    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
       sxx = player->GfxPos;
     else
       syy = player->GfxPos;
@@ -742,7 +706,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
       if ((sxx || syy) && IS_PUSHABLE(element))
       {
-	graphic = el_act_dir2img(element, ACTION_MOVING, player->MovDir);
+	graphic = el_act_dir2img(element, ACTION_MOVING, move_dir);
 	frame = getGraphicAnimationFrame(graphic, player->Frame);
       }
 
@@ -1199,14 +1163,14 @@ void DrawLevelFieldThruMask(int x, int y)
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
-void DrawCrumbledSand(int x, int y)
+static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int i, width, height, cx,cy;
-  int lx = LEVELX(x), ly = LEVELY(y);
-  int element, graphic;
-  int snip = 4;
+  int sx = SCREENX(x), sy = SCREENY(y);
+  int element;
+  int width, height, cx, cy, i;
+  int snip = TILEX / 8;	/* number of border pixels from "crumbled graphic" */
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -1215,46 +1179,27 @@ void DrawCrumbledSand(int x, int y)
     { 0, +1 }
   };
 
-  if (!IN_LEV_FIELD(lx, ly))
+  if (!IN_LEV_FIELD(x, y))
     return;
 
-  element = Feld[lx][ly];
+  element = (GfxElement[x][y] != EL_UNDEFINED ? GfxElement[x][y] : Feld[x][y]);
 
-  if (element == EL_SAND ||
-#if 1
-      (element == EL_EMPTY_SPACE && GfxElement[lx][ly] == EL_SAND) ||
-#endif
-      element == EL_LANDMINE ||
-      element == EL_TRAP ||
-      element == EL_TRAP_ACTIVE)
+  /* crumble field itself */
+  if (CAN_BE_CRUMBLED(element))
   {
-    if (!IN_SCR_FIELD(x, y))
+    if (!IN_SCR_FIELD(sx, sy))
       return;
 
-    graphic = IMG_SAND_CRUMBLED;
-
-    src_bitmap = graphic_info[graphic].bitmap;
-    src_x = graphic_info[graphic].src_x;
-    src_y = graphic_info[graphic].src_y;
+    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
     for(i=0; i<4; i++)
     {
-      int lxx, lyy;
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
 
-      lxx = lx + xy[i][0];
-      lyy = ly + xy[i][1];
-      if (!IN_LEV_FIELD(lxx, lyy))
-	element = EL_STEELWALL;
-      else
-	element = Feld[lxx][lyy];
+      element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : EL_STEELWALL);
 
-      if (element == EL_SAND ||
-#if 1
-	  (element == EL_EMPTY_SPACE && GfxElement[lxx][lyy] == EL_SAND) ||
-#endif
-	  element == EL_LANDMINE ||
-	  element == EL_TRAP ||
-	  element == EL_TRAP_ACTIVE)
+      if (CAN_BE_CRUMBLED(element))	/* neighbour is of same type */
 	continue;
 
       if (i == 1 || i == 2)
@@ -1273,37 +1218,25 @@ void DrawCrumbledSand(int x, int y)
       }
 
       BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
-		 width, height, FX + x * TILEX + cx, FY + y * TILEY + cy);
+		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
     }
 
-    MarkTileDirty(x, y);
+    MarkTileDirty(sx, sy);
   }
-  else
+  else		/* crumble neighbour fields */
   {
-    graphic = IMG_SAND_CRUMBLED;
-
-    src_bitmap = graphic_info[graphic].bitmap;
-    src_x = graphic_info[graphic].src_x;
-    src_y = graphic_info[graphic].src_y;
+    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
     for(i=0; i<4; i++)
     {
-      int xx, yy, lxx, lyy;
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+      int sxx = sx + xy[i][0];
+      int syy = sy + xy[i][1];
 
-      xx = x + xy[i][0];
-      yy = y + xy[i][1];
-      lxx = lx + xy[i][0];
-      lyy = ly + xy[i][1];
-
-      if (!IN_LEV_FIELD(lxx, lyy) ||
-	  (Feld[lxx][lyy] != EL_SAND &&
-#if 1
-	   !(Feld[lxx][lyy] == EL_EMPTY_SPACE && GfxElement[lxx][lyy] == EL_SAND) &&
-#endif
-	   Feld[lxx][lyy] != EL_LANDMINE &&
-	   Feld[lxx][lyy] != EL_TRAP &&
-	   Feld[lxx][lyy] != EL_TRAP_ACTIVE) ||
-	  !IN_SCR_FIELD(xx, yy))
+      if (!IN_LEV_FIELD(xx, yy) ||
+	  !IN_SCR_FIELD(sxx, syy) ||
+	  !CAN_BE_CRUMBLED(Feld[xx][yy]))
 	continue;
 
       if (i == 1 || i == 2)
@@ -1322,11 +1255,29 @@ void DrawCrumbledSand(int x, int y)
       }
 
       BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
-		 width, height, FX + xx * TILEX + cx, FY + yy * TILEY + cy);
+		 width, height, FX + sxx * TILEX + cx, FY + syy * TILEY + cy);
 
-      MarkTileDirty(xx, yy);
+      MarkTileDirty(sxx, syy);
     }
   }
+}
+
+void DrawLevelFieldCrumbledSand(int x, int y)
+{
+  DrawLevelFieldCrumbledSandExt(x, y, IMG_SAND_CRUMBLED, 0);
+}
+
+void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
+				       int step_frame)
+{
+  int graphic1 = el_act_dir2img(EL_SAND,          ACTION_DIGGING, direction);
+  int graphic2 = el_act_dir2img(EL_SAND_CRUMBLED, ACTION_DIGGING, direction);
+  int frame1 = getGraphicAnimationFrame(graphic1, step_frame);
+  int frame2 = getGraphicAnimationFrame(graphic2, step_frame);
+  int sx = SCREENX(x), sy = SCREENY(y);
+
+  DrawGraphic(sx, sy, graphic1, frame1);
+  DrawLevelFieldCrumbledSandExt(x, y, graphic2, frame2);
 }
 
 static int getBorderElement(int x, int y)
@@ -1355,7 +1306,7 @@ static int getBorderElement(int x, int y)
 void DrawScreenElement(int x, int y, int element)
 {
   DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, NO_MASKING);
-  DrawCrumbledSand(x, y);
+  DrawLevelFieldCrumbledSand(LEVELX(x), LEVELY(y));
 }
 
 void DrawLevelElement(int x, int y, int element)
