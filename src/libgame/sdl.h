@@ -28,6 +28,9 @@
 #define TARGET_STRING		"SDL"
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 
+#define CURSOR_MAX_WIDTH	32
+#define CURSOR_MAX_HEIGHT	32
+
 
 /* SDL type definitions */
 
@@ -65,6 +68,15 @@ struct SDLSurfaceInfo
   SDL_Surface *surface_masked;
   GC gc;
   GC stored_clip_gc;
+};
+
+struct MouseCursorInfo
+{
+  int width, height;
+  int hot_x, hot_y;
+
+  char data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
+  char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
 struct XY
@@ -339,7 +351,7 @@ void SDLZoomBitmap(Bitmap *, Bitmap *);
 
 Bitmap *SDLLoadImage(char *);
 
-void SDLSetMouseCursor(const char **);
+void SDLSetMouseCursor(struct MouseCursorInfo *);
 
 inline void SDLOpenAudio(void);
 inline void SDLCloseAudio(void);

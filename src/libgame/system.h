@@ -144,9 +144,6 @@
 #define CURSOR_DEFAULT		0
 #define CURSOR_PLAYFIELD	1
 
-#define CURSOR_MAX_WIDTH	32
-#define CURSOR_MAX_HEIGHT	32
-
 
 /* maximum number of parallel players supported by libgame functions */
 #define MAX_PLAYERS		4
@@ -361,15 +358,6 @@ struct JoystickInfo
 {
   int status;
   int fd[MAX_PLAYERS];		/* file descriptor of player's joystick */
-};
-
-struct MouseCursorInfo
-{
-  int width, height;
-  int hot_x, hot_y;
-
-  char data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
-  char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
 struct SetupJoystickInfo

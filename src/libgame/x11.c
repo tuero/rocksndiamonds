@@ -429,82 +429,46 @@ inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
 
 #if defined(TARGET_X11_NATIVE)
 
-static Cursor create_cursor(const char **image)
+static Cursor create_cursor(struct MouseCursorInfo *cursor_info)
 {
   Pixmap pixmap_data, pixmap_mask;
   XColor color_fg, color_bg;
   Cursor cursor;
 
-  int i, row, col;
-  char data[4*32];
-  char mask[4*32];
-  int hot_x, hot_y;
-
-  int data_width = 32, data_height = 32;
-  int mask_width = 32, mask_height = 32;
-
-  i = -1;
-  for (row=0; row<32; ++row)
-  {
-    for (col=0; col<32; ++col)
-    {
-      if (col % 8)
-      {
-        data[i] <<= 1;
-        mask[i] <<= 1;
-      }
-      else
-      {
-        i++;
-        data[i] = mask[i] = 0;
-      }
-
-      switch (image[4+row][col])
-      {
-        case 'X':
-	  data[i] |= 0x01;
-	  mask[i] |= 0x01;
-	  break;
-        case '.':
-	  mask[i] |= 0x01;
-	  break;
-        case ' ':
-	  break;
-      }
-    }
-  }
-
-  sscanf(image[4+row], "%d,%d", &hot_x, &hot_y);
-
   /* shape and mask are single plane pixmaps */
-  pixmap_data = XCreatePixmapFromBitmapData(display, window->drawable, data,
-					    data_width, data_height, 1, 0, 1);
-  pixmap_mask = XCreatePixmapFromBitmapData(display, window->drawable, mask,
-					    mask_width, mask_height, 1, 0, 1);
+  pixmap_data =
+    XCreatePixmapFromBitmapData(display, window->drawable, cursor_info->data,
+				cursor_info->width, cursor_info->height,
+				1, 0, 1);
+  pixmap_mask =
+    XCreatePixmapFromBitmapData(display, window->drawable, cursor_info->mask,
+				cursor_info->width, cursor_info->height,
+				1, 0, 1);
 
   XParseColor(display, cmap, "black", &color_fg);
   XParseColor(display, cmap, "white", &color_bg);
 
   cursor = XCreatePixmapCursor(display, pixmap_data, pixmap_mask,
-			       &color_fg, &color_bg, hot_x, hot_y);
+			       &color_fg, &color_bg,
+			       cursor_info->hot_x, cursor_info->hot_y);
 
   return cursor;
 }
 
-void X11SetMouseCursor(const char **cursor_image)
+void X11SetMouseCursor(struct MouseCursorInfo *cursor_info)
 {
-  static const char **last_cursor_image = NULL;
+  static struct MouseCursorInfo *last_cursor_info = NULL;
   static Cursor cursor_default = None;
   static Cursor cursor_current = None;
 
-  if (cursor_image != NULL && cursor_image != last_cursor_image)
+  if (cursor_info != NULL && cursor_info != last_cursor_info)
   {
-    cursor_current = create_cursor(cursor_image);
-    last_cursor_image = cursor_image;
+    cursor_current = create_cursor(cursor_info);
+    last_cursor_info = cursor_info;
   }
 
   XDefineCursor(display, window->drawable,
-		cursor_image ? cursor_current : cursor_default);
+		cursor_info ? cursor_current : cursor_default);
 }
 #endif	/* TARGET_X11_NATIVE */
 

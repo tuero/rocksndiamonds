@@ -29,6 +29,11 @@
 #define KEY_PRESSED		TRUE
 
 
+static boolean cursor_inside_playfield = FALSE;
+static boolean playfield_cursor_set = FALSE;
+static unsigned long playfield_cursor_delay = 0;
+
+
 /* event filter especially needed for SDL event filtering due to
    delay problems with lots of mouse motion events when mouse button
    not pressed (X11 can handle this with 'PointerMotionHintMask') */
@@ -39,18 +44,19 @@ int FilterMouseMotionEvents(const Event *event)
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
 
-  /* when playing, display a different mouse pointer inside the playfield */
   if (game_status == PLAYING)
   {
-    static boolean inside_field = FALSE;
     MotionEvent *motion = (MotionEvent *)event;
 
-    if ((motion->x >= SX && motion->x < SX + SXSIZE &&
-	 motion->y >= SY && motion->y < SY + SYSIZE) != inside_field)
-    {
-      inside_field = !inside_field;
+    cursor_inside_playfield =
+      (motion->x >= SX && motion->x < SX + SXSIZE &&
+       motion->y >= SY && motion->y < SY + SYSIZE);
 
-      SetMouseCursor(inside_field ? CURSOR_PLAYFIELD : CURSOR_DEFAULT);
+    if (playfield_cursor_set)
+    {
+      SetMouseCursor(CURSOR_DEFAULT);
+      DelayReached(&playfield_cursor_delay, 0);
+      playfield_cursor_set = FALSE;
     }
   }
 
@@ -111,7 +117,17 @@ void EventLoop(void)
       }
     }
     else
+    {
+      /* when playing, display a special mouse pointer inside the playfield */
+      if (game_status == PLAYING && cursor_inside_playfield &&
+	  DelayReached(&playfield_cursor_delay, 1000))
+      {
+	SetMouseCursor(CURSOR_PLAYFIELD);
+	playfield_cursor_set = TRUE;
+      }
+
       HandleNoEvent();
+    }
 
     /* don't use all CPU time when idle; the main loop while playing
        has its own synchronization and is CPU friendly, too */

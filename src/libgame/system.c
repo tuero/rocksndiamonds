@@ -855,84 +855,79 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
 /* mouse pointer functions                                                   */
 /* ------------------------------------------------------------------------- */
 
-/* cursor bitmap in XPM format */
+/* XPM */
 static const char *cursor_image_playfield[] =
 {
   /* width height num_colors chars_per_pixel */
-  "    32    32        3            1",
+  "    16    16        3            1",
 
   /* colors */
   "X c #000000",
   ". c #ffffff",
   "  c None",
 
-  " X                              ",
-  "X.X                             ",
-  " X                              ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
-  "                                ",
+  /* pixels */
+  " X              ",
+  "X.X             ",
+  " X              ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+
+  /* hot spot */
   "1,1"
 };
+
+#if defined(TARGET_SDL)
+static const int cursor_bit_order = BIT_ORDER_MSB;
+#elif defined(TARGET_X11_NATIVE)
+static const int cursor_bit_order = BIT_ORDER_LSB;
+#endif
 
 static struct MouseCursorInfo *get_cursor_from_image(const char **image)
 {
   struct MouseCursorInfo *cursor;
-  int row, col, i;
+  boolean bit_order_msb = (cursor_bit_order == BIT_ORDER_MSB);
+  int header_lines = 4;
+  int x, y, i;
 
   cursor = checked_calloc(sizeof(struct MouseCursorInfo));
 
+  sscanf(image[0], " %d %d ", &cursor->width, &cursor->height);
+
   i = -1;
-  for (row=0; row<32; ++row)
+  for (y=0; y < cursor->width; y++)
   {
-    for (col=0; col<32; ++col)
+    for (x=0; x < cursor->height; x++)
     {
-      if (col % 8)
-      {
-        cursor->data[i] <<= 1;
-        cursor->mask[i] <<= 1;
-      }
-      else
+      int bit_nr = x % 8;
+      int bit_mask = 0x01 << (bit_order_msb ? 7 - bit_nr : bit_nr );
+
+      if (bit_nr == 0)
       {
         i++;
         cursor->data[i] = cursor->mask[i] = 0;
       }
 
-      switch (image[4+row][col])
+      switch (image[header_lines + y][x])
       {
         case 'X':
-	  cursor->data[i] |= 0x01;
-	  cursor->mask[i] |= 0x01;
+	  cursor->data[i] |= bit_mask;
+	  cursor->mask[i] |= bit_mask;
 	  break;
 
         case '.':
-	  cursor->mask[i] |= 0x01;
+	  cursor->mask[i] |= bit_mask;
 	  break;
 
         case ' ':
@@ -941,17 +936,14 @@ static struct MouseCursorInfo *get_cursor_from_image(const char **image)
     }
   }
 
-  sscanf(image[4+row], "%d,%d", &cursor->hot_x, &cursor->hot_y);
-
-  cursor->width = 32;
-  cursor->height = 32;
+  sscanf(image[header_lines + y], "%d,%d", &cursor->hot_x, &cursor->hot_y);
 
   return cursor;
 }
 
 void SetMouseCursor(int mode)
 {
-  struct MouseCursorInfo *cursor_playfield = NULL;
+  static struct MouseCursorInfo *cursor_playfield = NULL;
 
   if (cursor_playfield == NULL)
     cursor_playfield = get_cursor_from_image(cursor_image_playfield);

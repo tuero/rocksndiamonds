@@ -51,6 +51,10 @@
 #define BYTE_ORDER_BIG_ENDIAN		0
 #define BYTE_ORDER_LITTLE_ENDIAN	1
 
+/* values for cursor bitmap creation */
+#define BIT_ORDER_MSB			0
+#define BIT_ORDER_LSB			1
+
 /* values for createDirectory() */
 #define PERMS_PRIVATE			0
 #define PERMS_PUBLIC			1

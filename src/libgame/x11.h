@@ -45,6 +45,9 @@
 
 #define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE
 
+#define CURSOR_MAX_WIDTH	32
+#define CURSOR_MAX_HEIGHT	32
+
 
 /* X11 type definitions */
 
@@ -78,6 +81,15 @@ struct X11DrawableInfo
   GC line_gc[2];	/* GC for foreground and background line drawing     */
   GC stored_clip_gc;	/* GC for masked drawing (used for whole Pixmap)     */
   GC clip_gc;		/* can be 'stored_clip_gc' or one-tile-only clip GC  */
+};
+
+struct MouseCursorInfo
+{
+  int width, height;
+  int hot_x, hot_y;
+
+  char data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
+  char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
 struct XY
@@ -321,7 +333,7 @@ inline Pixel X11GetPixel(Bitmap *, int, int);
 inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
 
 #if defined(TARGET_X11_NATIVE)
-void X11SetMouseCursor(const char **);
+void X11SetMouseCursor(struct MouseCursorInfo *);
 #endif
 
 #endif /* X11_H */
