@@ -307,8 +307,8 @@
 /* textbutton identifiers */
 #define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 1)
 
-#define GADGET_ID_PROPERTIES_MAIN	(GADGET_ID_TEXTBUTTON_FIRST + 0)
-#define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 1)
+#define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
+#define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
 #define GADGET_ID_PROPERTIES_ADVANCED	(GADGET_ID_TEXTBUTTON_FIRST + 2)
 
 /* gadgets for scrolling of drawing area */
@@ -410,8 +410,8 @@
 #define ED_NUM_SELECTBOX			1
 
 /* values for textbutton gadgets */
-#define ED_TEXTBUTTON_ID_PROPERTIES_MAIN	0
-#define ED_TEXTBUTTON_ID_PROPERTIES_INFO	1
+#define ED_TEXTBUTTON_ID_PROPERTIES_INFO	0
+#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG	1
 #define ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED	2
 
 #define ED_NUM_TEXTBUTTON			3
@@ -469,8 +469,8 @@
 #define ED_MODE_PROPERTIES		2
 
 /* sub-screens in the element properties section */
-#define ED_MODE_PROPERTIES_MAIN		ED_TEXTBUTTON_ID_PROPERTIES_MAIN
 #define ED_MODE_PROPERTIES_INFO		ED_TEXTBUTTON_ID_PROPERTIES_INFO
+#define ED_MODE_PROPERTIES_CONFIG	ED_TEXTBUTTON_ID_PROPERTIES_CONFIG
 #define ED_MODE_PROPERTIES_ADVANCED	ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED
 
 /* how many steps can be cancelled */
@@ -690,21 +690,21 @@ static struct
 {
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(1),
-    GADGET_ID_PROPERTIES_MAIN,
-    11, "Properties",
-    "Edit element properties"
+    GADGET_ID_PROPERTIES_INFO,
+    11, "Information",
+    "Show information about element"
   },
   {
     ED_SETTINGS_XPOS + 166,		ED_COUNTER_YPOS(1),
-    GADGET_ID_PROPERTIES_INFO,
-    11, "Description",
-    "Show element description"
+    GADGET_ID_PROPERTIES_CONFIG,
+    11, "Configure",
+    "Configure element properties"
   },
   {
     ED_SETTINGS_XPOS + 332,		ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_ADVANCED,
     11, "Advanced",
-    "Advanced element features"
+    "Advanced element configuration"
   },
 };
 
@@ -2886,7 +2886,7 @@ void DrawLevelEd()
   else
   {
     edit_mode = ED_MODE_DRAWING;
-    edit_mode_properties = ED_MODE_PROPERTIES_MAIN;
+    edit_mode_properties = ED_MODE_PROPERTIES_INFO;
 
     ResetUndoBuffer();
 
@@ -3237,47 +3237,6 @@ static void DrawLevelInfoWindow()
   DrawRandomPlacementBackgroundArea();
 }
 
-static void DrawPropertiesTabulatorGadgets()
-{
-  struct GadgetInfo *gd_gi = level_editor_gadget[GADGET_ID_PROPERTIES_MAIN];
-  struct GadgetDesign *gd = &gd_gi->alt_design[GD_BUTTON_UNPRESSED];
-  int gd_x = gd->x + gd_gi->border.width / 2;
-  int gd_y = gd->y + gd_gi->height - 1;
-  Pixel line_color = GetPixel(gd->bitmap, gd_x, gd_y);
-  int id_first = ED_TEXTBUTTON_ID_PROPERTIES_MAIN;
-  int id_last = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
-  int i;
-
-  /* draw additional "advanced" tabulator for custom elements */
-  if (IS_CUSTOM_ELEMENT(properties_element))
-    id_last = ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED;
-
-  for (i=id_first; i <= id_last; i++)
-  {
-    int gadget_id = textbutton_info[i].gadget_id;
-    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-    boolean active = (i != edit_mode_properties);
-    Pixel color = (active ? BLACK_PIXEL : line_color);
-
-    /* draw solid or black line below tabulator button */
-    FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, color);
-
-    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
-    MapTextbuttonGadget(i);
-  }
-
-  /* draw little border line below tabulator buttons */
-  FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
-		3 * gd_gi->width + 2 * ED_GADGET_DISTANCE, ED_GADGET_DISTANCE,
-		line_color);
-
-#if 0
-		SX + ED_SETTINGS_XPOS,
-		SY + ED_COUNTER_YPOS(1) + ED_TEXTBUTTON_YSIZE + 1,
-		SXSIZE - 2 * ED_SETTINGS_XPOS, 2, line_color);
-#endif
-}
-
 static void DrawAmoebaContentArea()
 {
   int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
@@ -3385,82 +3344,85 @@ static void DrawElementContentAreas()
 #define TEXT_SPEED		"Speed of amoeba growth"
 #define TEXT_DURATION		"Duration when activated"
 
-static void DrawPropertiesMain()
+static struct
+{
+  int element;
+  int *value;
+  char *text;
+} elements_with_counter[] =
+{
+  { EL_EMERALD,		&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
+  { EL_BD_DIAMOND,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
+  { EL_EMERALD_YELLOW,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
+  { EL_EMERALD_RED,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
+  { EL_EMERALD_PURPLE,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING	},
+  { EL_DIAMOND,		&level.score[SC_DIAMANT],	TEXT_COLLECTING	},
+  { EL_BUG_RIGHT,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BUG_UP,		&level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BUG_LEFT,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BUG_DOWN,	&level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_RIGHT,&level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_UP,   &level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_LEFT, &level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY_DOWN, &level.score[SC_KAEFER],	TEXT_SMASHING	},
+  { EL_SPACESHIP_RIGHT,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_SPACESHIP_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_SPACESHIP_LEFT,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_SPACESHIP_DOWN,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_RIGHT,&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_LEFT, &level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY_DOWN, &level.score[SC_FLIEGER],	TEXT_SMASHING	},
+  { EL_YAMYAM,		&level.score[SC_MAMPFER],	TEXT_SMASHING	},
+  { EL_DARK_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING	},
+  { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING	},
+  { EL_PACMAN_RIGHT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
+  { EL_PACMAN_UP,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
+  { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
+  { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
+  { EL_NUT,		&level.score[SC_KOKOSNUSS],	TEXT_CRACKING	},
+  { EL_DYNAMITE,	&level.score[SC_DYNAMIT],	TEXT_COLLECTING	},
+  { EL_KEY_1,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_KEY_2,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_KEY_3,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_KEY_4,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_EM_KEY_1_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING	},
+  { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_SPEED	},
+  { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_SPEED	},
+  { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_SPEED	},
+  { EL_BD_AMOEBA,	&level.amoeba_speed,		TEXT_SPEED	},
+  { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
+  { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION	},
+  { -1,			NULL,				NULL		}
+};
+
+static boolean checkPropertiesConfig()
+{
+  int i;
+
+  if (IS_GEM(properties_element) ||
+      IS_CUSTOM_ELEMENT(properties_element) ||
+      HAS_CONTENT(properties_element))
+    return TRUE;
+  else
+    for (i=0; elements_with_counter[i].element != -1; i++)
+      if (elements_with_counter[i].element == properties_element)
+	return TRUE;
+
+  return FALSE;
+}
+
+static void DrawPropertiesConfig()
 {
   int counter_id = ED_COUNTER_ID_ELEM_SCORE;
-  int num_elements_in_level;
-  float percentage;
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
-  static struct
-  {
-    int element;
-    int *value;
-    char *text;
-  } elements_with_counter[] =
-  {
-    { EL_EMERALD,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_BD_DIAMOND,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EMERALD_YELLOW,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EMERALD_RED,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EMERALD_PURPLE,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_DIAMOND,	&level.score[SC_DIAMANT],	TEXT_COLLECTING },
-    { EL_BUG_RIGHT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BUG_UP,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BUG_LEFT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BUG_DOWN,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BD_BUTTERFLY_RIGHT,&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BD_BUTTERFLY_UP,   &level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BD_BUTTERFLY_LEFT, &level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_BD_BUTTERFLY_DOWN, &level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_SPACESHIP_RIGHT,&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_SPACESHIP_UP,	 &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_SPACESHIP_LEFT, &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_SPACESHIP_DOWN, &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_BD_FIREFLY_RIGHT,&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_BD_FIREFLY_UP,	  &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_BD_FIREFLY_LEFT, &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_BD_FIREFLY_DOWN, &level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
-    { EL_DARK_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
-    { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING },
-    { EL_PACMAN_RIGHT,	&level.score[SC_PACMAN],	TEXT_SMASHING },
-    { EL_PACMAN_UP,	&level.score[SC_PACMAN],	TEXT_SMASHING },
-    { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING },
-    { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING },
-    { EL_NUT,		&level.score[SC_KOKOSNUSS],	TEXT_CRACKING },
-    { EL_DYNAMITE,	&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
-    { EL_KEY_1,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_KEY_2,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_KEY_3,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_KEY_4,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_EM_KEY_1_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_BD_AMOEBA,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION },
-    { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION },
-    { -1, NULL, NULL }
-  };
-
-  num_elements_in_level = 0;
-  for (y=0; y<lev_fieldy; y++) 
-    for (x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] == properties_element)
-	num_elements_in_level++;
-  percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
-
-  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, FONT_TEXT_1, "In this level:");
-  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(FONT_TEXT_1), 5 * TILEY,
-	    FONT_TEXT_2, "%d (%.2f%%)", num_elements_in_level,
-	    percentage);
 
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
@@ -3623,21 +3585,33 @@ char *getElementDescriptionFilename(int element)
   return NULL;
 }
 
-static int PrintElementDescriptionFromFile(char *filename)
+static boolean PrintInfoText(char *text, int font_nr, int screen_line)
 {
-  int font_nr = FONT_TEXT_2;
-  int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int pad_x = ED_SETTINGS_XPOS;
   int pad_y = 5 * TILEY;
   int sx = SX + pad_x;
   int sy = SY + pad_y;
-  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
-  int screen_line_nr = 0;
+
+  if (screen_line >= max_lines_per_screen)
+    return FALSE;
+
+  DrawText(sx, sy + screen_line * font_height, text, font_nr);
+
+  return TRUE;
+}
+
+static int PrintElementDescriptionFromFile(char *filename, int screen_line)
+{
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int pad_x = ED_SETTINGS_XPOS;
+  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   char line[MAX_LINE_LEN];
   char buffer[max_chars_per_line + 1];
   int buffer_len;
+  int lines_printed = 0;
   FILE *file;
 
   if (filename == NULL)
@@ -3739,38 +3713,89 @@ static int PrintElementDescriptionFromFile(char *filename)
 
       if (print_buffer)
       {
-	DrawText(sx, sy + screen_line_nr * font_height, buffer, FONT_TEXT_2);
+	if (!PrintInfoText(buffer, font_nr, screen_line + lines_printed))
+	  return lines_printed;
 
 	last_line_was_empty = (buffer_len == 0);
+	lines_printed++;
 
 	buffer[0] = '\0';
 	buffer_len = 0;
 	print_buffer = FALSE;
-
-	if (++screen_line_nr >= max_lines_per_screen)
-	  return screen_line_nr;	/* currently too much text gets cut */
       }
     }
   }
 
-  if (buffer_len > 0)
-  {
-    DrawText(sx, sy + screen_line_nr * font_height, buffer, FONT_TEXT_2);
-    screen_line_nr++;
-  }
-
   fclose(file);
 
-  return screen_line_nr;
+  if (buffer_len > 0)
+    if (PrintInfoText(buffer, font_nr, screen_line + lines_printed))
+      lines_printed++;
+
+  return lines_printed;
+}
+
+static void DrawPropertiesTabulatorGadgets()
+{
+  struct GadgetInfo *gd_gi = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
+  struct GadgetDesign *gd = &gd_gi->alt_design[GD_BUTTON_UNPRESSED];
+  int gd_x = gd->x + gd_gi->border.width / 2;
+  int gd_y = gd->y + gd_gi->height - 1;
+  Pixel line_color = GetPixel(gd->bitmap, gd_x, gd_y);
+  int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+  int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+  int i;
+
+  /* draw additional "configure" tabulator for configurable elements */
+  if (checkPropertiesConfig())
+    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
+
+  /* draw additional "advanced" tabulator for custom elements */
+  if (IS_CUSTOM_ELEMENT(properties_element))
+    id_last = ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED;
+
+  for (i=id_first; i <= id_last; i++)
+  {
+    int gadget_id = textbutton_info[i].gadget_id;
+    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+    boolean active = (i != edit_mode_properties);
+    Pixel color = (active ? BLACK_PIXEL : line_color);
+
+    /* draw solid or black line below tabulator button */
+    FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, color);
+
+    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
+    MapTextbuttonGadget(i);
+  }
+
+  /* draw little border line below tabulator buttons */
+  FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
+		3 * gd_gi->width + 2 * ED_GADGET_DISTANCE, ED_GADGET_DISTANCE,
+		line_color);
 }
 
 static void DrawPropertiesInfo()
 {
   char *filename = getElementDescriptionFilename(properties_element);
+  int num_elements_in_level;
+  float percentage;
+  int screen_line = 2;
+  int x, y;
 
-  if (PrintElementDescriptionFromFile(filename) == 0)
-    DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY,
-	     "No description available.", FONT_TEXT_1);
+  num_elements_in_level = 0;
+  for (y=0; y<lev_fieldy; y++) 
+    for (x=0; x<lev_fieldx; x++)
+      if (Feld[x][y] == properties_element)
+	num_elements_in_level++;
+  percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
+
+  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, FONT_TEXT_1, "In this level:");
+  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(FONT_TEXT_1), 5 * TILEY,
+	    FONT_TEXT_2, "%d (%.2f%%)", num_elements_in_level, percentage);
+
+  PrintInfoText("Description:", FONT_TEXT_1, screen_line);
+  if (PrintElementDescriptionFromFile(filename, screen_line + 1) == 0)
+    PrintInfoText("No description available.", FONT_TEXT_1, screen_line);
 }
 
 static void DrawPropertiesAdvanced()
@@ -3786,7 +3811,11 @@ static void DrawPropertiesWindow()
   /* make sure that previous properties edit mode exists for this element */
   if (edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED &&
       !IS_CUSTOM_ELEMENT(properties_element))
-    edit_mode_properties = ED_MODE_PROPERTIES_MAIN;
+    edit_mode_properties = ED_MODE_PROPERTIES_CONFIG;
+
+  if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG &&
+      !checkPropertiesConfig())
+    edit_mode_properties = ED_MODE_PROPERTIES_INFO;
 
   UnmapLevelEditorWindowGadgets();
 
@@ -3802,7 +3831,7 @@ static void DrawPropertiesWindow()
   DrawGraphicAnimationExt(drawto,
 			  SX + xstart * MINI_TILEX,
 			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-			  el2edimg(properties_element), -1, NO_MASKING);
+			  el2img(properties_element), -1, NO_MASKING);
 
   FrameCounter = 0;	/* restart animation frame counter */
 
@@ -3811,10 +3840,10 @@ static void DrawPropertiesWindow()
 
   DrawPropertiesTabulatorGadgets();
 
-  if (edit_mode_properties == ED_MODE_PROPERTIES_MAIN)
-    DrawPropertiesMain();
-  else if (edit_mode_properties == ED_MODE_PROPERTIES_INFO)
+  if (edit_mode_properties == ED_MODE_PROPERTIES_INFO)
     DrawPropertiesInfo();
+  else if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG)
+    DrawPropertiesConfig();
   else	/* edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED */
     DrawPropertiesAdvanced();
 }
@@ -4742,7 +4771,7 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 {
-  if (gi->custom_type_id >= ED_TEXTBUTTON_ID_PROPERTIES_MAIN &&
+  if (gi->custom_type_id >= ED_TEXTBUTTON_ID_PROPERTIES_INFO &&
       gi->custom_type_id <= ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED)
   {
     edit_mode_properties = gi->custom_type_id;
@@ -5176,7 +5205,7 @@ void HandleLevelEditorIdle()
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  el2edimg(properties_element), -1, NO_MASKING);
+			  el2img(properties_element), -1, NO_MASKING);
 
   MarkTileDirty(xpos, ypos);
   MarkTileDirty(xpos, ypos + 1);
