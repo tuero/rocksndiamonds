@@ -208,6 +208,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
     if (IS_CUSTOM_ELEMENT(element))
     {
+      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+
       element_info[element].collect_score = 10;		/* special default */
       element_info[element].collect_count = 1;		/* special default */
 

@@ -148,10 +148,10 @@
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 /* movement enter/leave element */
 #define ED_AREA_ELEM_CONTENT4a_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4a_YPOS	(ED_SETTINGS_YPOS(9) + \
+#define ED_AREA_ELEM_CONTENT4a_YPOS	(ED_SETTINGS_YPOS(10) + \
 					 ED_GADGET_DISTANCE)
 #define ED_AREA_ELEM_CONTENT4b_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4b_YPOS	(ED_SETTINGS_YPOS(9) + \
+#define ED_AREA_ELEM_CONTENT4b_YPOS	(ED_SETTINGS_YPOS(10) + \
 					 ED_GADGET_DISTANCE)
 /* custom change trigger element */
 #define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(5) + \
@@ -450,16 +450,17 @@
 #define GADGET_ID_CUSTOM_ACCESS_TYPE	(GADGET_ID_SELECTBOX_FIRST + 9)
 #define GADGET_ID_CUSTOM_ACCESS_LAYER	(GADGET_ID_SELECTBOX_FIRST + 10)
 #define GADGET_ID_CUSTOM_ACCESS_PROTECTED (GADGET_ID_SELECTBOX_FIRST + 11)
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 12)
-#define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 13)
-#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 14)
-#define GADGET_ID_CHANGE_SIDES		(GADGET_ID_SELECTBOX_FIRST + 15)
-#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 16)
-#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 17)
-#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 18)
+#define GADGET_ID_CUSTOM_ACCESS_DIRECTION (GADGET_ID_SELECTBOX_FIRST + 12)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 13)
+#define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 14)
+#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 15)
+#define GADGET_ID_CHANGE_SIDES		(GADGET_ID_SELECTBOX_FIRST + 16)
+#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 17)
+#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 18)
+#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 19)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 19)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 20)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -624,24 +625,25 @@
 #define ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE	0
 #define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	1
 #define ED_SELECTBOX_ID_CUSTOM_ACCESS_PROTECTED	2
-#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	3
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	4
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	5
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	6
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE	7
-#define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	8
-#define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	9
-#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	10
-#define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	11
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	12
-#define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	13
-#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	14
-#define ED_SELECTBOX_ID_CHANGE_SIDES		15
-#define ED_SELECTBOX_ID_CHANGE_POWER		16
-#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	17
-#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	18
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_DIRECTION	3
+#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	4
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	5
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	6
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	7
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE	8
+#define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	9
+#define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	10
+#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	11
+#define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	12
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	13
+#define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	14
+#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	15
+#define ED_SELECTBOX_ID_CHANGE_SIDES		16
+#define ED_SELECTBOX_ID_CHANGE_POWER		17
+#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	18
+#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	19
 
-#define ED_NUM_SELECTBOX			19
+#define ED_NUM_SELECTBOX			20
 
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE
@@ -967,7 +969,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ------------ */
 
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
     GADGET_ID_CUSTOM_SCORE_TEXT,	GADGET_ID_NONE,
@@ -975,7 +977,7 @@ static struct
     NULL,				"score", " "
   },
   {
-    -1,					ED_SETTINGS_YPOS(5),
+    -1,					ED_SETTINGS_YPOS(6),
     MIN_COLLECT_COUNT,			MAX_COLLECT_COUNT,
     GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
     GADGET_ID_CUSTOM_GEMCOUNT_TEXT,	GADGET_ID_CUSTOM_SCORE_UP,
@@ -983,7 +985,7 @@ static struct
     NULL,				"count", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
     0,					999,
     GADGET_ID_PUSH_DELAY_FIX_DOWN,	GADGET_ID_PUSH_DELAY_FIX_UP,
     GADGET_ID_PUSH_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -991,7 +993,7 @@ static struct
     NULL,				"push delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(6),
+    -1,					ED_SETTINGS_YPOS(7),
     0,					999,
     GADGET_ID_PUSH_DELAY_RND_DOWN,	GADGET_ID_PUSH_DELAY_RND_UP,
     GADGET_ID_PUSH_DELAY_RND_TEXT,	GADGET_ID_PUSH_DELAY_FIX_UP,
@@ -999,7 +1001,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
     0,					999,
     GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
     GADGET_ID_MOVE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1007,7 +1009,7 @@ static struct
     NULL,				"move delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(11),
+    -1,					ED_SETTINGS_YPOS(12),
     0,					999,
     GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
     GADGET_ID_MOVE_DELAY_RND_TEXT,	GADGET_ID_MOVE_DELAY_FIX_UP,
@@ -1031,7 +1033,7 @@ static struct
     GADGET_ID_IGNITION_DELAY_DOWN,	GADGET_ID_IGNITION_DELAY_UP,
     GADGET_ID_IGNITION_DELAY_TEXT,	GADGET_ID_NONE,
     &custom_element.ignition_delay,
-    NULL,				"ignition delay", NULL
+    NULL,				"ignition delay", "(by fire)"
   },
 
   /* ---------- element settings: configure (group elements) --------------- */
@@ -1142,6 +1144,26 @@ static struct ValueTextInfo options_access_protected[] =
 {
   { 0,				"unprotected"			},
   { 1,				"protected"			},
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_access_direction[] =
+{
+  { MV_LEFT,			"left"				},
+  { MV_RIGHT,			"right"				},
+  { MV_UP,			"up"				},
+  { MV_DOWN,			"down"				},
+  { MV_LEFT  | MV_UP,		"left + up"			},
+  { MV_LEFT  | MV_DOWN,		"left + down"			},
+  { MV_RIGHT | MV_UP,		"right + up"			},
+  { MV_RIGHT | MV_DOWN,		"right + down"			},
+  { MV_HORIZONTAL,		"horizontal"			},
+  { MV_VERTICAL,		"vertical"			},
+  { MV_HORIZONTAL | MV_UP,	"horizontal + up"		},
+  { MV_HORIZONTAL | MV_DOWN,	"horizontal + down"		},
+  { MV_VERTICAL   | MV_LEFT,	"vertical + left"		},
+  { MV_VERTICAL   | MV_RIGHT,	"vertical + right"		},
+  { MV_ALL_DIRECTIONS,		"all directions"		},
   { -1,				NULL				}
 };
 
@@ -1368,6 +1390,14 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    GADGET_ID_CUSTOM_ACCESS_DIRECTION,	GADGET_ID_NONE,
+    -1,
+    options_access_direction,
+    &custom_element.access_direction,
+    "from", NULL,			"access direction for this field"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_WALK_TO_ACTION,	GADGET_ID_NONE,
     -1,
     options_walk_to_action,
@@ -1375,7 +1405,7 @@ static struct
     NULL, NULL,				"diggable/collectible/pushable"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_MOVE_PATTERN,	GADGET_ID_NONE,
     -1,
     options_move_pattern,
@@ -1383,7 +1413,7 @@ static struct
     "can move", NULL,			"element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_MOVE_DIRECTION,	GADGET_ID_NONE,
     -1,
     options_move_direction,
@@ -1391,7 +1421,7 @@ static struct
     "starts moving", NULL,		"initial element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_MOVE_STEPSIZE,	GADGET_ID_NONE,
     -1,
     options_move_stepsize,
@@ -1399,7 +1429,7 @@ static struct
     "move/fall speed", NULL,		"speed of element movement"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,	GADGET_ID_NONE,
     -1,
     options_move_leave_type,
@@ -1407,7 +1437,7 @@ static struct
     "can dig:    can", ":",		"leave behind or change element"
   },
   {
-    -1,					ED_SETTINGS_YPOS(12),
+    -1,					ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_SMASH_TARGETS,	GADGET_ID_CUSTOM_CAN_SMASH,
     -1,
     options_smash_targets,
@@ -1415,7 +1445,7 @@ static struct
     "can smash", NULL,			"elements that can be smashed"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_SLIPPERY_TYPE,	GADGET_ID_NONE,
     -1,
     options_slippery_type,
@@ -1804,31 +1834,31 @@ static struct
     NULL, NULL,				"player can walk to or pass this field"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_WALK_TO_OBJECT,	GADGET_ID_NONE,
     &custom_element_properties[EP_WALK_TO_OBJECT],
     NULL, NULL,				"player can dig/collect/push element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_CAN_MOVE,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE],
     NULL, NULL,				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_FALL],
     NULL, "can fall",			"element can fall down"
   },
   {
-    -1,					ED_SETTINGS_YPOS(12),
+    -1,					ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_SMASH],
     " ", NULL,				"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
     &custom_element_properties[EP_SLIPPERY],
     NULL, NULL,				"other elements can fall down from it"

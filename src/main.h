@@ -1566,6 +1566,8 @@ struct ElementInfo
   boolean use_gfx_element;	/* use custom graphic element */
   short gfx_element;		/* optional custom graphic element */
 
+  int access_direction;		/* accessible from which direction */
+
   int collect_score;		/* score value for collecting */
   int collect_count;		/* count value for collecting */
 

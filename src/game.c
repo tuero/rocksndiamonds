@@ -2361,8 +2361,9 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
-void RelocatePlayer(int x, int y, int element)
+void RelocatePlayer(int x, int y, int element_raw)
 {
+  int element = (element_raw == EL_SP_MURPHY ? EL_PLAYER_1 : element_raw);
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.index_search);
@@ -2444,14 +2445,21 @@ void RelocatePlayer(int x, int y, int element)
 void Explode(int ex, int ey, int phase, int mode)
 {
   int x, y;
+#if 0
   int num_phase = 9;
+#endif
+
+  /* !!! eliminate this variable !!! */
   int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+
+#if 1
+  int last_phase;
+#else
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
   int first_phase_after_start = EX_PHASE_START + 1;
+#endif
   int border_element;
-
-  int last_phase_TEST = last_phase;
 
   if (game.explosions_delayed)
   {
@@ -2714,7 +2722,11 @@ void Explode(int ex, int ey, int phase, int mode)
   {
     boolean border_explosion = FALSE;
 
+#if 1
+    if (IS_PLAYER(x, y) && PLAYERINFO(x, y)->present)
+#else
     if (IS_PLAYER(x, y))
+#endif
     {
       KillHeroUnlessExplosionProtected(x, y);
       border_explosion = TRUE;
@@ -2825,7 +2837,7 @@ void Explode(int ex, int ey, int phase, int mode)
     if (GFX_CRUMBLED(element))
       DrawLevelFieldCrumbledSandNeighbours(x, y);
 
-    if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
+    if (IS_PLAYER(x, y) && !PLAYERINFO(x, y)->present)
       StorePlayer[x][y] = 0;
 
     if (ELEM_IS_PLAYER(element))
@@ -3348,11 +3360,19 @@ inline static int getElementMoveStepsize(int x, int y)
   /* special values for move stepsize for spring and things on conveyor belt */
   if (horiz_move)
   {
+#if 1
+    if (element == EL_SPRING)
+      step = sign * MOVE_STEPSIZE_NORMAL * 2;
+    else if (CAN_FALL(element) && !CAN_MOVE(element) &&
+	     y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+      step = sign * MOVE_STEPSIZE_NORMAL / 2;
+#else
     if (CAN_FALL(element) &&
 	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
       step = sign * MOVE_STEPSIZE_NORMAL / 2;
     else if (element == EL_SPRING)
       step = sign * MOVE_STEPSIZE_NORMAL * 2;
+#endif
   }
 
   return step;
@@ -4303,8 +4323,8 @@ void StartMoving(int x, int y)
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
-    if ((x > 0 && IS_PLAYER(x - 1, y)) ||
-	(x < lev_fieldx-1 && IS_PLAYER(x + 1, y)))
+    if ((x > 0              && IS_PLAYER(x - 1, y)) ||
+	(x < lev_fieldx - 1 && IS_PLAYER(x + 1, y)))
       if (JustBeingPushed(x, y))
 	return;
 
@@ -4558,7 +4578,11 @@ void StartMoving(int x, int y)
 	started_moving = TRUE;
       }
     }
+#if 1
+    else if (IS_BELT_ACTIVE(Feld[x][y + 1]) && !CAN_MOVE(element))
+#else
     else if (IS_BELT_ACTIVE(Feld[x][y + 1]))
+#endif
     {
       boolean left_is_free  = (x > 0 && IS_FREE(x - 1, y));
       boolean right_is_free = (x < lev_fieldx - 1 && IS_FREE(x + 1, y));
@@ -6640,11 +6664,41 @@ static boolean CheckElementSideChange(int x, int y, int element, int side,
     element = Feld[x][y];
   }
 
+#if 1
+  if (page < 0)
+  {
+    boolean change_element = FALSE;
+    int i;
+
+    for (i = 0; i < element_info[element].num_change_pages; i++)
+    {
+      struct ElementChangeInfo *change = &element_info[element].change_page[i];
+
+      if (change->can_change &&
+	  change->events & CH_EVENT_BIT(trigger_event) &&
+	  change->sides & side)
+      {
+	change_element = TRUE;
+	page = i;
+
+	break;
+      }
+    }
+
+    if (!change_element)
+      return FALSE;
+  }
+
+#else
+
+  /* !!! this check misses pages with same event, but different side !!! */
+
   if (page < 0)
     page = element_info[element].event_page_nr[trigger_event];
 
   if (!(element_info[element].change_page[page].sides & side))
     return FALSE;
+#endif
 
   ChangeDelay[x][y] = 1;
   ChangeEvent[x][y] = CH_EVENT_BIT(trigger_event);
@@ -8845,6 +8899,7 @@ int DigField(struct PlayerInfo *player,
 			dx == +1 ? MV_RIGHT :
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
+  int opposite_direction = MV_DIR_OPPOSITE(move_direction);
   int dig_side = change_sides[MV_DIR_BIT(move_direction)];
   int element;
 
@@ -8903,6 +8958,10 @@ int DigField(struct PlayerInfo *player,
     if (!(tube_leave_directions[i][1] & move_direction))
       return MF_NO_ACTION;	/* tube has no opening in this direction */
   }
+
+  if (IS_CUSTOM_ELEMENT(Feld[jx][jy]) && IS_WALKABLE(Feld[jx][jy]) &&
+      !(element_info[Feld[jx][jy]].access_direction & move_direction))
+    return MF_NO_ACTION;	/* field has no opening in this direction */
 
   element = Feld[x][y];
 
@@ -9025,6 +9084,10 @@ int DigField(struct PlayerInfo *player,
       {
 	int sound_action = ACTION_WALKING;
 
+	if (IS_CUSTOM_ELEMENT(element) &&
+	    !(element_info[element].access_direction & opposite_direction))
+	  return MF_NO_ACTION;	/* field not accessible from this direction */
+
 	if (element >= EL_GATE_1 && element <= EL_GATE_4)
 	{
 	  if (!player->key[element - EL_GATE_1])
@@ -9058,6 +9121,10 @@ int DigField(struct PlayerInfo *player,
       {
 	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
 	  return MF_NO_ACTION;
+
+	if (IS_CUSTOM_ELEMENT(element) &&
+	    !(element_info[element].access_direction & opposite_direction))
+	  return MF_NO_ACTION;	/* field not accessible from this direction */
 
 #if 1
 	if (CAN_MOVE(element))	/* only fixed elements can be passed! */
