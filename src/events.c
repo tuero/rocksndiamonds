@@ -423,6 +423,9 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == PLAYING)
   {
+    /* only needed for single-step tape recording mode */
+    static boolean clear_button_2[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
+    static boolean bomb_placed[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
     int pnr;
 
     for (pnr=0; pnr<MAX_PLAYERS; pnr++)
@@ -439,10 +442,46 @@ void HandleKey(Key key, int key_status)
 	if (key == *key_info[i].key_custom)
 	  key_action |= key_info[i].action;
 
+      if (tape.single_step && clear_button_2[pnr])
+      {
+	stored_player[pnr].action &= ~MV_BUTTON_2;
+	clear_button_2[pnr] = FALSE;
+      }
+
       if (key_status == KEY_PRESSED)
 	stored_player[pnr].action |= key_action;
       else
 	stored_player[pnr].action &= ~key_action;
+
+      if (tape.single_step && tape.recording && tape.pausing)
+      {
+	if (key_status == KEY_PRESSED &&
+	    (key_action & (MV_MOTION | MV_BUTTON_1)))
+	{
+	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+	  if (key_action & MV_MOTION)
+	  {
+	    if (stored_player[pnr].action & MV_BUTTON_2)
+	      bomb_placed[pnr] = TRUE;
+	  }
+	}
+	else if (key_status == KEY_RELEASED &&
+		 (key_action & MV_BUTTON_2))
+	{
+	  if (!bomb_placed[pnr])
+	  {
+	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+	    stored_player[pnr].action |= MV_BUTTON_2;
+	    clear_button_2[pnr] = TRUE;
+	  }
+
+	  bomb_placed[pnr] = FALSE;
+	}
+      }
+      else if (tape.recording && tape.pausing)
+	TapeTogglePause(TAPE_TOGGLE_MANUAL);
     }
   }
   else

@@ -159,12 +159,13 @@ boolean FrameReached(unsigned long *frame_counter_var,
 {
   unsigned long actual_frame_counter = FrameCounter;
 
-  if (actual_frame_counter < *frame_counter_var+frame_delay &&
+  if (actual_frame_counter < *frame_counter_var + frame_delay &&
       actual_frame_counter >= *frame_counter_var)
-    return(FALSE);
+    return FALSE;
 
   *frame_counter_var = actual_frame_counter;
-  return(TRUE);
+
+  return TRUE;
 }
 
 boolean DelayReached(unsigned long *counter_var,
@@ -174,10 +175,11 @@ boolean DelayReached(unsigned long *counter_var,
 
   if (actual_counter < *counter_var + delay &&
       actual_counter >= *counter_var)
-    return(FALSE);
+    return FALSE;
 
   *counter_var = actual_counter;
-  return(TRUE);
+
+  return TRUE;
 }
 
 void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)

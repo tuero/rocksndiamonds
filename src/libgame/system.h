@@ -52,12 +52,16 @@
 #define DEFAULT_KEY_SAVE_GAME	KSYM_F1
 #define DEFAULT_KEY_LOAD_GAME	KSYM_F2
 
-/* values for move directions */
+/* values for move directions and special "button" keys */
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << 0)
 #define MV_RIGHT		(1 << 1)
 #define MV_UP			(1 << 2)
 #define MV_DOWN	       		(1 << 3)
+#define MV_BUTTON_1		(1 << 4)
+#define MV_BUTTON_2		(1 << 5)
+#define MV_MOTION		(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
+#define MV_BUTTON		(MV_BUTTON_1 | MV_BUTTON_2)
 
 /* values for button status */
 #define MB_NOT_PRESSED		FALSE

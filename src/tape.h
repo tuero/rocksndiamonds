@@ -16,6 +16,11 @@
 
 #include "main.h"
 
+
+/* values for TapeTogglePause() */
+#define	TAPE_TOGGLE_MANUAL	TRUE
+#define	TAPE_TOGGLE_AUTOMATIC	FALSE
+
 /* some positions in the video tape control window */
 #define VIDEO_DISPLAY1_XPOS	5
 #define VIDEO_DISPLAY1_YPOS	5
@@ -83,7 +88,7 @@ void TapeStartRecording(void);
 void TapeHaltRecording(void);
 void TapeStopRecording(void);
 void TapeRecordAction(byte *);
-void TapeTogglePause(void);
+void TapeTogglePause(boolean);
 void TapeStartPlaying(void);
 void TapeStopPlaying(void);
 byte *TapePlayAction(void);

@@ -156,7 +156,7 @@
 #define IS_DRAWABLE(e)		((e) < EL_BLOCKED)
 #define IS_NOT_DRAWABLE(e)	((e) >= EL_BLOCKED)
 #define TAPE_IS_EMPTY(x)	((x).length == 0)
-#define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing &&!(x).pausing)
+#define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing)
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_SPIELER1])
 #define SHIELD_ON(p)		((p)->shield_passive_time_left > 0)
@@ -234,11 +234,11 @@ struct PlayerInfo
   boolean LevelSolved, GameOver;
   boolean snapped;
 
-  unsigned long move_delay;
-  int move_delay_value;
-
   int last_move_dir;
   int is_moving;
+
+  unsigned long move_delay;
+  int move_delay_value;
 
   unsigned long push_delay;
   unsigned long push_delay_value;
@@ -304,6 +304,7 @@ struct TapeInfo
   boolean fast_forward;
   boolean index_search;
   boolean quick_resume;
+  boolean single_step;
   boolean changed;
   boolean player_participates[MAX_PLAYERS];
   int num_participating_players;

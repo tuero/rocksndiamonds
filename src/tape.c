@@ -290,29 +290,50 @@ void DrawCompleteVideoDisplay()
 /* tape control functions                                                    */
 /* ========================================================================= */
 
-void TapeStartRecording()
+void TapeErase()
 {
-  time_t zeit1 = time(NULL);
-  struct tm *zeit2 = localtime(&zeit1);
+  time_t epoch_seconds = time(NULL);
+  struct tm *time = localtime(&epoch_seconds);
   int i;
 
-  if (!TAPE_IS_STOPPED(tape))
-    TapeStop();
-
-  tape.level_nr = level_nr;
   tape.length = 0;
   tape.counter = 0;
+
+  tape.level_nr = level_nr;
   tape.pos[tape.counter].delay = 0;
-  tape.recording = TRUE;
-  tape.playing = FALSE;
-  tape.pausing = FALSE;
   tape.changed = TRUE;
-  tape.date = 10000*(zeit2->tm_year%100) + 100*zeit2->tm_mon + zeit2->tm_mday;
-  tape.random_seed = InitRND(NEW_RANDOMIZE);
+  tape.date = 10000*(time->tm_year % 100) + 100*time->tm_mon + time->tm_mday;
   tape.game_version = GAME_VERSION_ACTUAL;
+  tape.random_seed = InitRND(NEW_RANDOMIZE);
 
   for(i=0; i<MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
+}
+
+static void TapeRewind()
+{
+  tape.counter = 0;
+  tape.delay_played = 0;
+  tape.pause_before_death = FALSE;
+  tape.recording = FALSE;
+  tape.playing = FALSE;
+  tape.fast_forward = FALSE;
+  tape.index_search = FALSE;
+  tape.quick_resume = FALSE;
+  tape.single_step = FALSE;
+
+  InitRND(tape.random_seed);
+}
+
+void TapeStartRecording()
+{
+  if (!TAPE_IS_STOPPED(tape))
+    TapeStop();
+
+  TapeErase();
+  TapeRewind();
+
+  tape.recording = TRUE;
 
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
@@ -423,16 +444,21 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
   }
 }
 
-void TapeTogglePause()
+void TapeTogglePause(boolean toggle_manual)
 {
   unsigned long state;
 
+#if 0
   if (!tape.recording && !tape.playing)
     return;
+#endif
 
   tape.pausing = !tape.pausing;
   tape.fast_forward = FALSE;
   tape.pause_before_death = FALSE;
+
+  if (tape.single_step && toggle_manual)
+    tape.single_step = FALSE;
 
   state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
   if (tape.playing)
@@ -455,7 +481,7 @@ void TapeTogglePause()
       tape.quick_resume = FALSE;
 
       TapeAppendRecording();
-      TapeTogglePause();
+      TapeTogglePause(toggle_manual);
     }
   }
 }
@@ -468,17 +494,9 @@ void TapeStartPlaying()
   if (!TAPE_IS_STOPPED(tape))
     TapeStop();
 
-  tape.counter = 0;
-  tape.delay_played = 0;
-  tape.pause_before_death = FALSE;
-  tape.recording = FALSE;
-  tape.playing = TRUE;
-  tape.pausing = FALSE;
-  tape.fast_forward = FALSE;
-  tape.index_search = FALSE;
-  tape.quick_resume = FALSE;
+  TapeRewind();
 
-  InitRND(tape.random_seed);
+  tape.playing = TRUE;
 
   DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
@@ -530,7 +548,7 @@ byte *TapePlayAction()
 
     if (TimePlayed > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
-      TapeTogglePause();
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
       return NULL;
     }
   }
@@ -538,7 +556,7 @@ byte *TapePlayAction()
   if (tape.counter >= tape.length)	/* end of tape reached */
   {
     if (tape.index_search)
-      TapeTogglePause();
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
     else
       TapeStop();
 
@@ -571,11 +589,6 @@ void TapeStop()
   }
 }
 
-void TapeErase()
-{
-  tape.length = 0;
-}
-
 unsigned int GetTapeLength()
 {
   unsigned int tape_length = 0;
@@ -596,9 +609,22 @@ void TapeIndexSearch()
 
   if (!tape.fast_forward || tape.pause_before_death)
   {
+    tape.pausing = FALSE;
+
     SetDrawDeactivationMask(REDRAW_FIELD | REDRAW_DOOR_1);
     audio.sound_deactivated = TRUE;
   }
+}
+
+void TapeSingleStep()
+{
+  if (options.network)
+    return;
+
+  if (!tape.pausing)
+    TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
+  tape.single_step = !tape.single_step;
 }
 
 void TapeQuickSave()
@@ -799,7 +825,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       if (tape.playing)
 	TapeIndexSearch();
       else if (tape.recording)
-	;	/* setting index mark -- not yet implemented */
+	TapeSingleStep();
       break;
 
     case TAPE_CTRL_ID_STOP:
@@ -807,7 +833,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       break;
 
     case TAPE_CTRL_ID_PAUSE:
-      TapeTogglePause();
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
       break;
 
     case TAPE_CTRL_ID_RECORD:
@@ -818,7 +844,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
 	  TapeAppendRecording();
 	else
-	  TapeTogglePause();
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
       break;
 
@@ -834,7 +860,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       {
 	if (tape.pausing)			/* PAUSE -> PLAY */
 	{
-	  TapeTogglePause();
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
 	}
 	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
 	{

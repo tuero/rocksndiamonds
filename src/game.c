@@ -502,15 +502,15 @@ void InitGame()
 
     player->frame_reset_delay = 0;
 
-    player->push_delay = 0;
-    player->push_delay_value = 5;
-
-    player->move_delay = 0;
     player->last_move_dir = MV_NO_MOVING;
     player->is_moving = FALSE;
 
+    player->move_delay = -1;	/* no initial move delay */
     player->move_delay_value =
       (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
+    player->push_delay = 0;
+    player->push_delay_value = 5;
 
     player->snapped = FALSE;
 
@@ -4289,6 +4289,15 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       moved = MoveFigure(player, dx, dy);
     }
 
+    if (tape.single_step && tape.recording && !tape.pausing)
+    {
+      if (button1 || (bombed && !moved))
+      {
+	TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+	SnapField(player, 0, 0);		/* stop snapping */
+      }
+    }
+
 #if 0
     if (tape.recording && (moved || snapped || bombed))
     {
@@ -4396,7 +4405,7 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
-  if (tape.playing && tape.index_search)
+  if (tape.playing && tape.index_search && !tape.pausing)
     action_delay_value = 0;
 
   /* ---------- main game synchronization point ---------- */
@@ -5194,6 +5203,10 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
       if (!local_player->friends_still_needed)
 	player->LevelSolved = player->GameOver = TRUE;
     }
+
+    if (tape.single_step && tape.recording && !tape.pausing &&
+	!player->programmed_action)
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
   }
 }
 
@@ -6508,7 +6521,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 #endif
       }
       else
-	TapeTogglePause();
+	TapeTogglePause(TAPE_TOGGLE_MANUAL);
       break;
 
     case GAME_CTRL_ID_PLAY:
