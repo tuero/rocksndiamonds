@@ -1,5 +1,13 @@
+2004-03-26
+	* added option to make growing elements grow into anything diggable
+	  (for the various amoeba types, biomaze and "game of life")
+
 2004-03-24
 	* fixed bug with movable elements not moving after left behind by CEs
+	* changed gravity movement to anything diggable, not only sand/base
+	* optionally allowing passing to walkable element, not only empty space
+	* added option "can pass to walkable element" for players
+	* finally fixed gravity movement (hopefully)
 
 2004-03-23
 	* fixed bug with movable elements not moving anymore after falling down

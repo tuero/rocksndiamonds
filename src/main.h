@@ -113,43 +113,44 @@
 #define EP_AMOEBALIVE		51
 #define EP_HAS_CONTENT		52
 #define EP_CAN_TURN_EACH_MOVE	53
-#define EP_ACTIVE_BOMB		54
-#define EP_INACTIVE		55
+#define EP_CAN_GROW		54
+#define EP_ACTIVE_BOMB		55
+#define EP_INACTIVE		56
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	56
+#define EP_EM_SLIPPERY_WALL	57
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_GFX_CRUMBLED		57
+#define EP_GFX_CRUMBLED		58
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	58
-#define EP_ACCESSIBLE_INSIDE	59
-#define EP_ACCESSIBLE_UNDER	60
-#define EP_WALKABLE		61
-#define EP_PASSABLE		62
-#define EP_ACCESSIBLE		63
-#define EP_COLLECTIBLE		64
-#define EP_SNAPPABLE		65
-#define EP_WALL			66
-#define EP_SOLID_FOR_PUSHING	67
-#define EP_DRAGONFIRE_PROOF	68
-#define EP_EXPLOSION_PROOF	69
-#define EP_CAN_SMASH		70
-#define EP_CAN_EXPLODE		71
-#define EP_CAN_EXPLODE_3X3	72
-#define EP_SP_PORT		73
-#define EP_CAN_EXPLODE_BY_DRAGONFIRE	74
-#define EP_CAN_EXPLODE_BY_EXPLOSION	75
-#define EP_COULD_MOVE_INTO_ACID		76
-#define EP_MAYBE_DONT_COLLIDE_WITH	77
+#define EP_ACCESSIBLE_OVER	59
+#define EP_ACCESSIBLE_INSIDE	60
+#define EP_ACCESSIBLE_UNDER	61
+#define EP_WALKABLE		62
+#define EP_PASSABLE		63
+#define EP_ACCESSIBLE		64
+#define EP_COLLECTIBLE		65
+#define EP_SNAPPABLE		66
+#define EP_WALL			67
+#define EP_SOLID_FOR_PUSHING	68
+#define EP_DRAGONFIRE_PROOF	69
+#define EP_EXPLOSION_PROOF	70
+#define EP_CAN_SMASH		71
+#define EP_CAN_EXPLODE		72
+#define EP_CAN_EXPLODE_3X3	73
+#define EP_SP_PORT		74
+#define EP_CAN_EXPLODE_BY_DRAGONFIRE	75
+#define EP_CAN_EXPLODE_BY_EXPLOSION	76
+#define EP_COULD_MOVE_INTO_ACID		77
+#define EP_MAYBE_DONT_COLLIDE_WITH	78
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	78
-#define EP_WALK_TO_OBJECT	79
-#define EP_DEADLY		80
+#define EP_EXPLODE_RESULT	79
+#define EP_WALK_TO_OBJECT	80
+#define EP_DEADLY		81
 
-#define NUM_ELEMENT_PROPERTIES	81
+#define NUM_ELEMENT_PROPERTIES	82
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -358,6 +359,7 @@
 #define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)
 #define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
 #define CAN_TURN_EACH_MOVE(e)	HAS_PROPERTY(e, EP_CAN_TURN_EACH_MOVE)
+#define CAN_GROW(e)		HAS_PROPERTY(e, EP_CAN_GROW)
 #define IS_ACTIVE_BOMB(e)	HAS_PROPERTY(e, EP_ACTIVE_BOMB)
 #define IS_INACTIVE(e)		HAS_PROPERTY(e, EP_INACTIVE)
 
@@ -400,6 +402,12 @@
 
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
+
+#define IS_GATE(e)		((e) >= EL_GATE_1 &&			\
+	 			 (e) <= EL_GATE_4)
+
+#define IS_GATE_GRAY(e)		((e) >= EL_GATE_1_GRAY &&		\
+	 			 (e) <= EL_GATE_4_GRAY)
 
 #define IS_EM_GATE(e)		((e) >= EL_EM_GATE_1 &&			\
 	 			 (e) <= EL_EM_GATE_4)
@@ -1461,6 +1469,7 @@ struct LevelInfo
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
+  boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */

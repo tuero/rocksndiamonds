@@ -111,6 +111,9 @@
 	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
 	 (e) == EL_TRIGGER_PLAYER  ? (ch)->actual_trigger_player : (e))
 
+#define CAN_GROW_INTO(e)						\
+	(e == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
+
 #define ELEMENT_CAN_ENTER_FIELD_BASE_X(x, y, condition)			\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition)))
@@ -996,9 +999,10 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
   /* this case is in fact a combination of not less than three bugs:
      first, it calls InitMovDir() for elements that can move, although this is
      already done by InitField(); then, it checks the element that was at this
-     field _before_ the call to InitField() (which can change it)
-
- */
+     field _before_ the call to InitField() (which can change it); lastly, it
+     was not called for "mole with direction" elements, which were treated as
+     "cannot move" due to (fixed) wrong element initialization in "src/init.c"
+  */
 }
 
 inline void DrawGameValue_Emeralds(int value)
@@ -3416,12 +3420,16 @@ void DynaExplode(int ex, int ey)
 
       Explode(x, y, EX_PHASE_START, EX_TYPE_BORDER);
 
-      /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
-      if (element != EL_EMPTY &&
-	  element != EL_SAND &&
-	  element != EL_EXPLOSION &&
-	  !dynabomb_xl)
+#if 1
+      if (element != EL_EMPTY && element != EL_EXPLOSION &&
+	  !CAN_GROW_INTO(element) && !dynabomb_xl)
 	break;
+#else
+      /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
+      if (element != EL_EMPTY && element != EL_EXPLOSION &&
+	  element != EL_SAND && !dynabomb_xl)
+	break;
+#endif
     }
   }
 }
@@ -6449,6 +6457,15 @@ void AmoebeAbleger(int ax, int ay)
     if (!IN_LEV_FIELD(x, y))
       return;
 
+#if 1
+    if (IS_FREE(x, y) ||
+	CAN_GROW_INTO(Feld[x][y]) ||
+	Feld[x][y] == EL_QUICKSAND_EMPTY)
+    {
+      newax = x;
+      neway = y;
+    }
+#else
     /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
     if (IS_FREE(x, y) ||
 	Feld[x][y] == EL_SAND || Feld[x][y] == EL_QUICKSAND_EMPTY)
@@ -6456,6 +6473,7 @@ void AmoebeAbleger(int ax, int ay)
       newax = x;
       neway = y;
     }
+#endif
 
     if (newax == ax && neway == ay)
       return;
@@ -6474,6 +6492,16 @@ void AmoebeAbleger(int ax, int ay)
       if (!IN_LEV_FIELD(x, y))
 	continue;
 
+#if 1
+      if (IS_FREE(x, y) ||
+	  CAN_GROW_INTO(Feld[x][y]) ||
+	  Feld[x][y] == EL_QUICKSAND_EMPTY)
+      {
+	newax = x;
+	neway = y;
+	break;
+      }
+#else
       /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (IS_FREE(x, y) ||
 	  Feld[x][y] == EL_SAND || Feld[x][y] == EL_QUICKSAND_EMPTY)
@@ -6482,6 +6510,7 @@ void AmoebeAbleger(int ax, int ay)
 	neway = y;
 	break;
       }
+#endif
       else if (IS_PLAYER(x, y))
 	waiting_for_player = TRUE;
     }
@@ -6619,6 +6648,20 @@ void Life(int ax, int ay)
 	changed = TRUE;
       }
     }
+#if 1
+    else if (IS_FREE(xx, yy) || CAN_GROW_INTO(Feld[xx][yy]))
+    {					/* free border field */
+      if (nachbarn >= life[2] && nachbarn <= life[3])
+      {
+	Feld[xx][yy] = element;
+	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);
+	if (!Stop[xx][yy])
+	  DrawLevelField(xx, yy);
+	Stop[xx][yy] = TRUE;
+	changed = TRUE;
+      }
+    }
+#else
     /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
     else if (IS_FREE(xx, yy) || Feld[xx][yy] == EL_SAND)
     {					/* free border field */
@@ -6632,6 +6675,7 @@ void Life(int ax, int ay)
 	changed = TRUE;
       }
     }
+#endif
   }
 
   if (changed)
@@ -8315,6 +8359,21 @@ void GameActions()
 #endif
       element = Feld[x][y];
 
+#if 1
+      if (!IS_PLAYER(x,y) &&
+	  (element == EL_EMPTY ||
+	   CAN_GROW_INTO(element) ||
+	   element == EL_QUICKSAND_EMPTY ||
+	   element == EL_ACID_SPLASH_LEFT ||
+	   element == EL_ACID_SPLASH_RIGHT))
+      {
+	if ((IN_LEV_FIELD(x, y-1) && Feld[x][y-1] == EL_AMOEBA_WET) ||
+	    (IN_LEV_FIELD(x-1, y) && Feld[x-1][y] == EL_AMOEBA_WET) ||
+	    (IN_LEV_FIELD(x+1, y) && Feld[x+1][y] == EL_AMOEBA_WET) ||
+	    (IN_LEV_FIELD(x, y+1) && Feld[x][y+1] == EL_AMOEBA_WET))
+	  Feld[x][y] = EL_AMOEBA_DROP;
+      }
+#else
       /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (!IS_PLAYER(x,y) &&
 	  (element == EL_EMPTY ||
@@ -8329,6 +8388,7 @@ void GameActions()
 	    (IN_LEV_FIELD(x, y+1) && Feld[x][y+1] == EL_AMOEBA_WET))
 	  Feld[x][y] = EL_AMOEBA_DROP;
       }
+#endif
 
       random = random * 129 + 1;
     }
@@ -8702,6 +8762,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     int move_dir_horizontal = player->action & MV_HORIZONTAL;
     int move_dir_vertical   = player->action & MV_VERTICAL;
 #endif
+
 #if 1
     boolean player_is_snapping = player->effective_action & JOY_BUTTON_1;
 #else
@@ -8746,6 +8807,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
       (IN_LEV_FIELD(jx, jy + 1) &&
        (IS_FREE(jx, jy + 1)));
 #endif
+
 #if 0
     boolean player_is_moving_to_valid_field =
       (
@@ -10380,12 +10442,12 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;	/* player cannot walk here due to gravity */
 #endif
 
-	if (element >= EL_GATE_1 && element <= EL_GATE_4)
+	if (IS_GATE(element))
 	{
 	  if (!player->key[element - EL_GATE_1])
 	    return MF_NO_ACTION;
 	}
-	else if (element >= EL_GATE_1_GRAY && element <= EL_GATE_4_GRAY)
+	else if (IS_GATE_GRAY(element))
 	{
 	  if (!player->key[element - EL_GATE_1_GRAY])
 	    return MF_NO_ACTION;
@@ -11050,11 +11112,20 @@ boolean DropElement(struct PlayerInfo *player)
     Changed[jx][jy] = 0;		/* allow another change */
 #endif
 
+#if 1
+    /* !!! TEST ONLY !!! */
+    CheckElementChangePlayer(jx, jy, new_element, CE_DROPPED_BY_PLAYER,
+			     player->index_bit, drop_side);
+    CheckTriggeredElementChangePlayer(jx, jy, new_element,
+				      CE_OTHER_GETS_DROPPED,
+				      player->index_bit, drop_side);
+#else
     CheckTriggeredElementChangePlayer(jx, jy, new_element,
 				      CE_OTHER_GETS_DROPPED,
 				      player->index_bit, drop_side);
     CheckElementChangePlayer(jx, jy, new_element, CE_DROPPED_BY_PLAYER,
 			     player->index_bit, drop_side);
+#endif
 
     TestIfElementTouchesCustomElement(jx, jy);
   }

@@ -1585,6 +1585,7 @@ static int get_special_property_bit(int element, int property_bit_nr)
     { EL_PLAYER_3,		0	},
     { EL_PLAYER_4,		0	},
     { EL_SP_MURPHY,		0	},
+    { EL_SOKOBAN_FIELD_PLAYER,	0	},
 
     /* all element that can move may be able to also move into acid */
     { EL_BUG,			1	},
@@ -1733,6 +1734,7 @@ void InitElementPropertiesStatic()
     EL_INVISIBLE_SAND_ACTIVE,
 
     /* !!! currently not diggable, but handled by 'ep_dont_run_into' !!! */
+    /* (if amoeba can grow into anything diggable, maybe keep these out) */
 #if 0
     EL_LANDMINE,
     EL_TRAP_ACTIVE,
@@ -2261,6 +2263,7 @@ void InitElementPropertiesStatic()
     EL_PLAYER_3,
     EL_PLAYER_4,
     EL_SP_MURPHY,
+    EL_SOKOBAN_FIELD_PLAYER,
     -1
   };
 
@@ -2322,6 +2325,9 @@ void InitElementPropertiesStatic()
     EL_EXIT_OPEN,
     EL_STEELWALL,
     EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4,
     EL_BD_FIREFLY,
     EL_BD_FIREFLY_1,
     EL_BD_FIREFLY_2,
@@ -2405,7 +2411,11 @@ void InitElementPropertiesStatic()
     EL_SOKOBAN_OBJECT,
     EL_SOKOBAN_FIELD_EMPTY,
     EL_SOKOBAN_FIELD_FULL,
+    EL_SOKOBAN_FIELD_PLAYER,
     EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4,
     EL_INVISIBLE_STEELWALL,
     -1
   };
@@ -2836,6 +2846,18 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_can_grow[] =
+  {
+    EL_BD_AMOEBA,
+    EL_AMOEBA_DROP,
+    EL_AMOEBA_WET,
+    EL_AMOEBA_DRY,
+    EL_AMOEBA_FULL,
+    EL_GAME_OF_LIFE,
+    EL_BIOMAZE,
+    -1
+  };
+
   static int ep_active_bomb[] =
   {
     EL_DYNAMITE_ACTIVE,
@@ -3057,6 +3079,7 @@ void InitElementPropertiesStatic()
     { ep_amoebalive,		EP_AMOEBALIVE		},
     { ep_has_content,		EP_HAS_CONTENT		},
     { ep_can_turn_each_move,	EP_CAN_TURN_EACH_MOVE	},
+    { ep_can_grow,		EP_CAN_GROW		},
     { ep_active_bomb,		EP_ACTIVE_BOMB		},
     { ep_inactive,		EP_INACTIVE		},
 
