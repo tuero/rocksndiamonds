@@ -41,6 +41,7 @@ typedef Uint32			Pixel;
 typedef SDL_Cursor	       *Cursor;
 
 typedef SDLKey			Key;
+typedef unsigned int		KeyMod;
 
 typedef SDL_Event		Event;
 typedef SDL_MouseButtonEvent	ButtonEvent;
@@ -330,6 +331,21 @@ struct XY
 #define KSYM_FKEY_FIRST		KSYM_F1
 #define KSYM_FKEY_LAST		KSYM_F15
 #define KSYM_NUM_FKEYS		(KSYM_FKEY_LAST - KSYM_FKEY_FIRST + 1)
+
+#define KMOD_None		None
+#define KMOD_Shift_L		KMOD_LSHIFT
+#define KMOD_Shift_R		KMOD_RSHIFT
+#define KMOD_Control_L		KMOD_LCTRL
+#define KMOD_Control_R		KMOD_RCTRL
+#define KMOD_Meta_L		KMOD_LMETA
+#define KMOD_Meta_R		KMOD_RMETA
+#define KMOD_Alt_L		KMOD_LALT
+#define KMOD_Alt_R		KMOD_RALT
+
+#define KMOD_Shift		(KMOD_Shift_L   | KMOD_Shift_R)
+#define KMOD_Control		(KMOD_Control_L | KMOD_Control_R)
+#define KMOD_Meta		(KMOD_Meta_L    | KMOD_Meta_R)
+#define KMOD_Alt		(KMOD_Alt_L     | KMOD_Alt_R)
 
 
 /* SDL function definitions */

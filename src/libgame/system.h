@@ -68,6 +68,24 @@
 #define DEFAULT_KEY_LOAD_GAME	KSYM_F2
 #define DEFAULT_KEY_TOGGLE_PAUSE KSYM_space
 
+/* values for key_status */
+#define KEY_NOT_PRESSED		FALSE
+#define KEY_RELEASED		FALSE
+#define KEY_PRESSED		TRUE
+
+/* values for button status */
+#define MB_NOT_PRESSED		FALSE
+#define MB_NOT_RELEASED		TRUE
+#define MB_RELEASED		FALSE
+#define MB_PRESSED		TRUE
+#define MB_MENU_CHOICE		FALSE
+#define MB_MENU_MARK		TRUE
+#define MB_MENU_INITIALIZE	(-1)
+#define MB_MENU_LEAVE		(-2)
+#define MB_LEFTBUTTON		1
+#define MB_MIDDLEBUTTON		2
+#define MB_RIGHTBUTTON		3
+
 
 /* values for basic move directions (effective at runtime) */
 #define MV_BIT_LEFT		0
@@ -116,19 +134,6 @@
 #define MV_ALONG_RIGHT_SIDE	(1 << MV_BIT_ALONG_RIGHT_SIDE)
 #define MV_TURNING_LEFT		(1 << MV_BIT_TURNING_LEFT)
 #define MV_TURNING_RIGHT	(1 << MV_BIT_TURNING_RIGHT)
-
-/* values for button status */
-#define MB_NOT_PRESSED		FALSE
-#define MB_NOT_RELEASED		TRUE
-#define MB_RELEASED		FALSE
-#define MB_PRESSED		TRUE
-#define MB_MENU_CHOICE		FALSE
-#define MB_MENU_MARK		TRUE
-#define MB_MENU_INITIALIZE	(-1)
-#define MB_MENU_LEAVE		(-2)
-#define MB_LEFTBUTTON		1
-#define MB_MIDDLEBUTTON		2
-#define MB_RIGHTBUTTON		3
 
 
 /* values for animation mode (frame order and direction) */
@@ -754,6 +759,8 @@ inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);
 inline void NextEvent(Event *event);
 inline Key GetEventKey(KeyEvent *, boolean);
+inline KeyMod HandleKeyModState(Key, int);
+inline KeyMod GetKeyModState();
 inline boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
 inline void InitJoysticks();

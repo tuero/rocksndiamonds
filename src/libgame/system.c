@@ -1070,6 +1070,64 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 #endif
 }
 
+inline KeyMod HandleKeyModState(Key key, int key_status)
+{
+#if !defined(TARGET_SDL)
+  static KeyMod current_modifiers = KMOD_None;
+
+  if (key != KSYM_UNDEFINED)	/* new key => check for modifier key change */
+  {
+    KeyMod new_modifier = KMOD_None;
+
+    switch(key)
+    {
+      case KSYM_Shift_L:
+	new_modifier = KMOD_Shift_L;
+	break;
+      case KSYM_Shift_R:
+	new_modifier = KMOD_Shift_R;
+	break;
+      case KSYM_Control_L:
+	new_modifier = KMOD_Control_L;
+	break;
+      case KSYM_Control_R:
+	new_modifier = KMOD_Control_R;
+	break;
+      case KSYM_Meta_L:
+	new_modifier = KMOD_Meta_L;
+	break;
+      case KSYM_Meta_R:
+	new_modifier = KMOD_Meta_R;
+	break;
+      case KSYM_Alt_L:
+	new_modifier = KMOD_Alt_L;
+	break;
+      case KSYM_Alt_R:
+	new_modifier = KMOD_Alt_R;
+	break;
+      default:
+	break;
+    }
+
+    if (key_status == KEY_PRESSED)
+      current_modifiers |= new_modifier;
+    else
+      current_modifiers &= ~new_modifier;
+  }
+
+  return current_modifiers;
+#endif
+}
+
+inline KeyMod GetKeyModState()
+{
+#if defined(TARGET_SDL)
+  return (KeyMod)SDL_GetModState();
+#else
+  return HandleKeyModState(KSYM_UNDEFINED, 0);
+#endif
+}
+
 inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 {
   if (event->type != EVENT_CLIENTMESSAGE)

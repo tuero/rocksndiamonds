@@ -23,11 +23,6 @@
 #include "tape.h"
 #include "network.h"
 
-/* values for key_status */
-#define KEY_NOT_PRESSED		FALSE
-#define KEY_RELEASED		FALSE
-#define KEY_PRESSED		TRUE
-
 
 static boolean cursor_inside_playfield = FALSE;
 static boolean playfield_cursor_set = FALSE;
@@ -311,7 +306,9 @@ void HandleKeyEvent(KeyEvent *event)
   int key_status = (event->type==EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
   boolean with_modifiers = (game_status == GAME_MODE_PLAYING ? FALSE : TRUE);
   Key key = GetEventKey(event, with_modifiers);
+  Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
 
+  HandleKeyModState(keymod, key_status);
   HandleKey(key, key_status);
 }
 

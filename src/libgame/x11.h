@@ -58,6 +58,7 @@ typedef struct X11DrawableInfo	DrawBuffer;
 /* "Cursor" is already defined */
 
 typedef KeySym			Key;
+typedef unsigned int		KeyMod;
 
 typedef XEvent			Event;
 typedef XButtonEvent		ButtonEvent;
@@ -314,6 +315,21 @@ struct XY
 #define KSYM_FKEY_FIRST		KSYM_F1
 #define KSYM_FKEY_LAST		KSYM_F24
 #define KSYM_NUM_FKEYS		(KSYM_FKEY_LAST - KSYM_FKEY_FIRST + 1)
+
+#define KMOD_None		None
+#define KMOD_Shift_L		0x0001
+#define KMOD_Shift_R		0x0002
+#define KMOD_Control_L		0x0040
+#define KMOD_Control_R		0x0080
+#define KMOD_Meta_L		0x0400
+#define KMOD_Meta_R		0x0800
+#define KMOD_Alt_L		0x0100
+#define KMOD_Alt_R		0x0200
+
+#define KMOD_Shift		(KMOD_Shift_L   | KMOD_Shift_R)
+#define KMOD_Control		(KMOD_Control_L | KMOD_Control_R)
+#define KMOD_Meta		(KMOD_Meta_L    | KMOD_Meta_R)
+#define KMOD_Alt		(KMOD_Alt_L     | KMOD_Alt_R)
 
 
 /* X11 function definitions */

@@ -375,7 +375,7 @@ struct
   int element;
   int gem_count;
 }
-gem_count_list[] =
+collect_gem_count_list[] =
 {
   { EL_EMERALD,		1 },
   { EL_BD_DIAMOND,	1 },
@@ -392,7 +392,6 @@ gem_count_list[] =
 
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
-static int gem_count[MAX_NUM_ELEMENTS];
 
 #define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
 #define IS_JUST_CHANGING(x, y)	(ChangeDelay[x][y] != 0)
@@ -818,11 +817,13 @@ static void InitGameEngine()
 
   /* initialize gem count values for each element */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    gem_count[i] = 0;
+    if (!IS_CUSTOM_ELEMENT(i))
+      element_info[i].collect_gem_count = 0;
 
   /* add gem count values for all elements from pre-defined list */
-  for (i=0; gem_count_list[i].element != EL_UNDEFINED; i++)
-    gem_count[gem_count_list[i].element] = gem_count_list[i].gem_count;
+  for (i=0; collect_gem_count_list[i].element != EL_UNDEFINED; i++)
+    element_info[collect_gem_count_list[i].element].collect_gem_count =
+      collect_gem_count_list[i].gem_count;
 }
 
 
@@ -6460,10 +6461,12 @@ void RemoveHero(struct PlayerInfo *player)
 }
 
 /*
+  =============================================================================
   checkDiagonalPushing()
   -----------------------------------------------------------------------------
   check if diagonal input device direction results in pushing of object
   (by checking if the alternative direction is walkable, diggable, ...)
+  =============================================================================
 */
 
 static boolean checkDiagonalPushing(struct PlayerInfo *player,
@@ -6486,10 +6489,12 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
 }
 
 /*
+  =============================================================================
   DigField()
   -----------------------------------------------------------------------------
   x, y:			field next to player (non-diagonal) to try to dig to
   real_dx, real_dy:	direction as read from input device (can be diagonal)
+  =============================================================================
 */
 
 int DigField(struct PlayerInfo *player,
@@ -6563,248 +6568,12 @@ int DigField(struct PlayerInfo *player,
 
   element = Feld[x][y];
 
-#if 1
   if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
       game.engine_version >= VERSION_IDENT(2,2,0))
     return MF_NO_ACTION;
-#endif
 
   switch (element)
   {
-#if 0
-    case EL_EMPTY:
-      PlaySoundLevelElementAction(x, y, player->element_nr, ACTION_MOVING);
-      break;
-#endif
-
-#if 0
-    case EL_SAND:
-    case EL_INVISIBLE_SAND:
-    case EL_INVISIBLE_SAND_ACTIVE:
-    case EL_TRAP:
-    case EL_SP_BASE:
-    case EL_SP_BUGGY_BASE:
-    case EL_SP_BUGGY_BASE_ACTIVATING:
-      RemoveField(x, y);
-
-      if (mode != DF_SNAP && element != EL_EMPTY)
-      {
-	GfxElement[x][y] = (CAN_BE_CRUMBLED(element) ? EL_SAND : element);
-	player->is_digging = TRUE;
-      }
-
-      PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
-      break;
-#endif
-
-#if 0
-
-    case EL_EMERALD:
-    case EL_BD_DIAMOND:
-    case EL_EMERALD_YELLOW:
-    case EL_EMERALD_RED:
-    case EL_EMERALD_PURPLE:
-    case EL_DIAMOND:
-    case EL_SP_INFOTRON:
-    case EL_PEARL:
-    case EL_CRYSTAL:
-      RemoveField(x, y);
-
-      if (mode != DF_SNAP)
-      {
-	GfxElement[x][y] = element;
-	player->is_collecting = TRUE;
-      }
-
-      local_player->gems_still_needed -= (element == EL_DIAMOND ? 3 :
-					  element == EL_PEARL ? 5 :
-					  element == EL_CRYSTAL ? 8 : 1);
-      if (local_player->gems_still_needed < 0)
-	local_player->gems_still_needed = 0;
-      RaiseScoreElement(element);
-      DrawText(DX_EMERALDS, DY_EMERALDS,
-	       int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-#endif
-
-#if 0
-
-    case EL_SPEED_PILL:
-      RemoveField(x, y);
-      player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_SPEED_PILL_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-#endif
-
-
-#if 0
-    case EL_ENVELOPE:
-      Feld[x][y] = EL_EMPTY;
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_ENVELOPE_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-#endif
-
-#if 0
-
-    case EL_EXTRA_TIME:
-      RemoveField(x, y);
-      if (level.time > 0)
-      {
-	TimeLeft += 10;
-	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
-      }
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MIDDLE);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-#endif
-
-#if 0
-    case EL_SHIELD_NORMAL:
-      RemoveField(x, y);
-      player->shield_normal_time_left += 10;
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_SHIELD_NORMAL_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-    case EL_SHIELD_DEADLY:
-      RemoveField(x, y);
-      player->shield_normal_time_left += 10;
-      player->shield_deadly_time_left += 10;
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_SHIELD_DEADLY_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-#endif
-
-#if 0
-    case EL_DYNAMITE:
-    case EL_SP_DISK_RED:
-      RemoveField(x, y);
-      player->dynamite++;
-      player->use_disk_red_graphic = (element == EL_SP_DISK_RED);
-      RaiseScoreElement(EL_DYNAMITE);
-      DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
-	       FONT_TEXT_2);
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-#endif
-
-#if 0
-    case EL_DYNABOMB_INCREASE_NUMBER:
-      RemoveField(x, y);
-      player->dynabomb_count++;
-      player->dynabombs_left++;
-      RaiseScoreElement(EL_DYNAMITE);
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_NUMBER_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-    case EL_DYNABOMB_INCREASE_SIZE:
-      RemoveField(x, y);
-      player->dynabomb_size++;
-      RaiseScoreElement(EL_DYNAMITE);
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_SIZE_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-
-    case EL_DYNABOMB_INCREASE_POWER:
-      RemoveField(x, y);
-      player->dynabomb_xl = TRUE;
-      RaiseScoreElement(EL_DYNAMITE);
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_POWER_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-#endif
-
-#if 0
-    case EL_KEY_1:
-    case EL_KEY_2:
-    case EL_KEY_3:
-    case EL_KEY_4:
-    {
-      int key_nr = element - EL_KEY_1;
-      int graphic = el2edimg(element);
-
-      RemoveField(x, y);
-      player->key[key_nr] = TRUE;
-      RaiseScoreElement(element);
-      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 graphic);
-      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 graphic);
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-    }
-
-    case EL_EM_KEY_1:
-    case EL_EM_KEY_2:
-    case EL_EM_KEY_3:
-    case EL_EM_KEY_4:
-    {
-      int key_nr = element - EL_EM_KEY_1;
-      int graphic = el2edimg(EL_KEY_1 + key_nr);
-
-      RemoveField(x, y);
-      player->key[key_nr] = TRUE;
-      RaiseScoreElement(element);
-      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 graphic);
-      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 graphic);
-#if 1
-      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
-#else
-      PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
-#endif
-      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
-      break;
-    }
-#endif
-
     case EL_ROBOT_WHEEL:
       Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
       ZX = x;
@@ -6905,175 +6674,6 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-#if 0
-
-      /* the following elements cannot be pushed by "snapping" */
-    case EL_ROCK:
-    case EL_BOMB:
-    case EL_DX_SUPABOMB:
-    case EL_NUT:
-    case EL_TIME_ORB_EMPTY:
-    case EL_SP_ZONK:
-    case EL_SP_DISK_ORANGE:
-    case EL_SPRING:
-      if (mode == DF_SNAP)
-	return MF_NO_ACTION;
-
-      /* no "break" -- fall through to next case */
-
-      /* the following elements can be pushed by "snapping" */
-    case EL_BD_ROCK:
-      if (dy)
-	return MF_NO_ACTION;
-
-      if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
-	  !(element == EL_SPRING && use_spring_bug))
-	return MF_NO_ACTION;
-
-      player->Pushing = TRUE;
-
-#if 0
-      if (element == EL_ROCK)
-	printf("::: wanna push [%d] [%d]\n",
-	       FrameCounter, player->push_delay_value);
-#endif
-
-      if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
-	return MF_NO_ACTION;
-
-      if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
-	return MF_NO_ACTION;
-
-
-      if (player->push_delay == 0)
-	player->push_delay = FrameCounter;
-
-#if 0
-      printf("want push... %d [%d]\n", FrameCounter, player->push_delay_value);
-#endif
-
-#if 0
-      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !tape.playing &&
-	  element != EL_SPRING)
-	return MF_NO_ACTION;
-#else
-      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
-	  element != EL_SPRING)
-	return MF_NO_ACTION;
-#endif
-
-      if (mode == DF_SNAP)
-      {
-	InitMovingField(x, y, move_direction);
-	ContinueMoving(x, y);
-      }
-      else
-      {
-#if 1
-	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
-			       dx > 0 ? MV_RIGHT :
-			       dy < 0 ? MV_UP : MV_DOWN));
-	MovPos[x][y] = (dx != 0 ? dx : dy);
-#else
-	RemoveField(x, y);
-	Feld[x + dx][y + dy] = element;
-#endif
-      }
-
-#if 0
-      printf("pushing %d/%d ... %d [%d]\n", dx, dy,
-	     FrameCounter, player->push_delay_value);
-#endif
-
-#if 0
-      if (element == EL_SPRING)
-      {
-	Feld[x + dx][y + dy] = EL_SPRING;
-	MovDir[x + dx][y + dy] = move_direction;
-      }
-#endif
-
-      player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
-
-      DrawLevelField(x + dx, y + dy);
-      PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
-
-      CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
-
-      break;
-
-#endif
-
-#if 0
-    case EL_GATE_1:
-    case EL_GATE_2:
-    case EL_GATE_3:
-    case EL_GATE_4:
-      if (!player->key[element - EL_GATE_1])
-	return MF_NO_ACTION;
-      break;
-
-    case EL_GATE_1_GRAY:
-    case EL_GATE_2_GRAY:
-    case EL_GATE_3_GRAY:
-    case EL_GATE_4_GRAY:
-      if (!player->key[element - EL_GATE_1_GRAY])
-	return MF_NO_ACTION;
-      break;
-
-    case EL_EM_GATE_1:
-    case EL_EM_GATE_2:
-    case EL_EM_GATE_3:
-    case EL_EM_GATE_4:
-      if (!player->key[element - EL_EM_GATE_1])
-	return MF_NO_ACTION;
-      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
-	return MF_NO_ACTION;
-
-      /* automatically move to the next field with double speed */
-      player->programmed_action = move_direction;
-      DOUBLE_PLAYER_SPEED(player);
-
-      PlaySoundLevel(x, y, SND_CLASS_GATE_PASSING);
-      break;
-
-    case EL_EM_GATE_1_GRAY:
-    case EL_EM_GATE_2_GRAY:
-    case EL_EM_GATE_3_GRAY:
-    case EL_EM_GATE_4_GRAY:
-      if (!player->key[element - EL_EM_GATE_1_GRAY])
-	return MF_NO_ACTION;
-      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
-	return MF_NO_ACTION;
-
-      /* automatically move to the next field with double speed */
-      player->programmed_action = move_direction;
-      DOUBLE_PLAYER_SPEED(player);
-
-#if 1
-      PlaySoundLevelAction(x, y, ACTION_PASSING);
-#else
-      PlaySoundLevel(x, y, SND_GATE_PASSING);
-#endif
-      break;
-#endif
-
-#if 0
-    case EL_SWITCHGATE_OPEN:
-    case EL_TIMEGATE_OPEN:
-      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
-	return MF_NO_ACTION;
-
-      /* automatically move to the next field with double speed */
-      player->programmed_action = move_direction;
-      DOUBLE_PLAYER_SPEED(player);
-
-      PlaySoundLevelElementAction(x, y, element, ACTION_PASSING);
-      break;
-#endif
-
     case EL_SP_PORT_LEFT:
     case EL_SP_PORT_RIGHT:
     case EL_SP_PORT_UP:
@@ -7159,28 +6759,6 @@ int DigField(struct PlayerInfo *player,
       }
       break;
 
-#if 0
-    case EL_EXIT_CLOSED:
-    case EL_SP_EXIT_CLOSED:
-    case EL_EXIT_OPENING:
-      return MF_NO_ACTION;
-      break;
-#endif
-
-#if 0
-    case EL_EXIT_OPEN:
-    case EL_SP_EXIT_OPEN:
-      if (mode == DF_SNAP)
-	return MF_NO_ACTION;
-
-      if (element == EL_EXIT_OPEN)
-	PlaySoundLevel(x, y, SND_CLASS_EXIT_PASSING);
-      else
-	PlaySoundLevel(x, y, SND_CLASS_SP_EXIT_PASSING);
-
-      break;
-#endif
-
     case EL_LAMP:
       Feld[x][y] = EL_LAMP_ACTIVE;
       local_player->lights_still_needed--;
@@ -7197,168 +6775,6 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MIDDLE);
       return MF_ACTION;
       break;
-
-#if 0
-
-#if 0
-    case EL_SOKOBAN_FIELD_EMPTY:
-      break;
-#endif
-
-    case EL_SOKOBAN_OBJECT:
-    case EL_SOKOBAN_FIELD_FULL:
-    case EL_SATELLITE:
-    case EL_SP_DISK_YELLOW:
-    case EL_BALLOON:
-      if (mode == DF_SNAP)
-	return MF_NO_ACTION;
-
-      player->Pushing = TRUE;
-
-      if (!IN_LEV_FIELD(x+dx, y+dy)
-	  || (!IS_FREE(x+dx, y+dy)
-	      && (Feld[x+dx][y+dy] != EL_SOKOBAN_FIELD_EMPTY
-		  || !IS_SB_ELEMENT(element))))
-	return MF_NO_ACTION;
-
-      if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
-	return MF_NO_ACTION;
-
-      if (player->push_delay == 0)
-	player->push_delay = FrameCounter;
-#if 0
-      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !tape.playing && element != EL_BALLOON)
-	return MF_NO_ACTION;
-#else
-      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
-	  element != EL_BALLOON)
-	return MF_NO_ACTION;
-#endif
-
-      if (IS_SB_ELEMENT(element))
-      {
-#if 1
-	if (element == EL_SOKOBAN_FIELD_FULL)
-	{
-	  Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
-	  local_player->sokobanfields_still_needed++;
-	}
-
-	if (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY)
-	{
-	  Back[x + dx][y + dy] = EL_SOKOBAN_FIELD_EMPTY;
-	  local_player->sokobanfields_still_needed--;
-	}
-
-	Feld[x][y] = EL_SOKOBAN_OBJECT;
-
-	if (Back[x][y] == Back[x + dx][y + dy])
-	  PlaySoundLevelAction(x, y, ACTION_PUSHING);
-	else if (Back[x][y] != 0)
-	  PlaySoundLevelElementAction(x, y, EL_SOKOBAN_FIELD_FULL,
-				      ACTION_EMPTYING);
-	else
-	  PlaySoundLevelElementAction(x + dx, y + dy, EL_SOKOBAN_FIELD_EMPTY,
-				      ACTION_FILLING);
-
-	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
-			       dx > 0 ? MV_RIGHT :
-			       dy < 0 ? MV_UP : MV_DOWN));
-	MovPos[x][y] = (dx != 0 ? dx : dy);
-
-#if 0
-	printf("::: %s -> %s [%s -> %s]\n",
-	       element_info[Feld[x][y]].token_name,
-	       element_info[Feld[x + dx][y + dy]].token_name,
-	       element_info[Back[x][y]].token_name,
-	       element_info[Back[x + dx][y + dy]].token_name);
-#endif
-
-#else
-	if (element == EL_SOKOBAN_FIELD_FULL)
-	{
-	  Feld[x][y] = EL_SOKOBAN_FIELD_EMPTY;
-	  local_player->sokobanfields_still_needed++;
-	}
-	else
-	  RemoveField(x, y);
-
-	if (Feld[x+dx][y+dy] == EL_SOKOBAN_FIELD_EMPTY)
-	{
-	  Feld[x+dx][y+dy] = EL_SOKOBAN_FIELD_FULL;
-	  local_player->sokobanfields_still_needed--;
-	  if (element == EL_SOKOBAN_OBJECT)
-#if 1
-	    PlaySoundLevelAction(x+dx, y+dy, ACTION_FILLING);
-#else
-	    PlaySoundLevel(x, y, SND_CLASS_SOKOBAN_FIELD_FILLING);
-#endif
-	  else
-#if 1
-	    PlaySoundLevelAction(x+dx, y+dy, ACTION_PUSHING);
-#else
-	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
-#endif
-	}
-	else
-	{
-	  Feld[x+dx][y+dy] = EL_SOKOBAN_OBJECT;
-	  if (element == EL_SOKOBAN_FIELD_FULL)
-#if 1
-	    PlaySoundLevelAction(x+dx, y+dy, ACTION_EMPTYING);
-#else
-	    PlaySoundLevel(x, y, SND_SOKOBAN_FIELD_EMPTYING);
-#endif
-	  else
-#if 1
-	    PlaySoundLevelAction(x+dx, y+dy, ACTION_PUSHING);
-#else
-	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
-#endif
-	}
-#endif
-      }
-      else
-      {
-#if 1
-	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
-			       dx > 0 ? MV_RIGHT :
-			       dy < 0 ? MV_UP : MV_DOWN));
-	MovPos[x][y] = (dx != 0 ? dx : dy);
-#else
-	RemoveField(x, y);
-	Feld[x + dx][y + dy] = element;
-#endif
-	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
-      }
-
-      player->push_delay_value = (element == EL_BALLOON ? 0 : 2);
-
-      DrawLevelField(x, y);
-      DrawLevelField(x + dx, y + dy);
-
-      if (IS_SB_ELEMENT(element) &&
-	  local_player->sokobanfields_still_needed == 0 &&
-	  game.emulation == EMU_SOKOBAN)
-      {
-	player->LevelSolved = player->GameOver = TRUE;
-	PlaySoundLevel(x, y, SND_GAME_SOKOBAN_SOLVING);
-      }
-
-      CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
-
-      break;
-
-#endif
-
-#if 0
-    case EL_PENGUIN:
-    case EL_PIG:
-    case EL_DRAGON:
-      break;
-#endif
 
     default:
 
@@ -7488,9 +6904,10 @@ int DigField(struct PlayerInfo *player,
 			     el2edimg(EL_KEY_1 + key_nr));
 	  redraw_mask |= REDRAW_DOOR_1;
 	}
-	else if (gem_count[element] > 0)
+	else if (element_info[element].collect_gem_count > 0)
 	{
-	  local_player->gems_still_needed -= gem_count[element];
+	  local_player->gems_still_needed -=
+	    element_info[element].collect_gem_count;
 	  if (local_player->gems_still_needed < 0)
 	    local_player->gems_still_needed = 0;
 
@@ -7909,7 +7326,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_KEY]);
       break;
     default:
-      RaiseScore(element_info[element].score);
+      RaiseScore(element_info[element].collect_score);
       break;
   }
 }

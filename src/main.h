@@ -1201,7 +1201,8 @@ struct ElementInfo
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */
 
-  int score;			/* score for collection, smashing, ... */
+  int collect_score;		/* score value for collecting */
+  int collect_gem_count;	/* gem count value for collecting */
 
   int push_delay_fixed;		/* constant frame delay for pushing */
   int push_delay_random;	/* additional random frame delay for pushing */

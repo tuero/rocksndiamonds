@@ -828,6 +828,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     int border_xsize = gi->border.xsize;
     int border_ysize = gi->border.ysize;
     int button_size = gi->border.xsize_selectbutton;
+    int bottom_screen_border = gfx.sy + gfx.sysize - font_height;
     Bitmap *src_bitmap;
     int src_x, src_y;
 
@@ -848,10 +849,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
     gi->selectbox.x = gi->x;
     gi->selectbox.y = gi->y + gi->height;
-    if (gi->selectbox.y + gi->selectbox.height > gfx.real_sy + gfx.full_sysize)
+    if (gi->selectbox.y + gi->selectbox.height > bottom_screen_border)
       gi->selectbox.y = gi->y - gi->selectbox.height;
     if (gi->selectbox.y < 0)
-      gi->selectbox.y = gfx.real_sy + gfx.full_sysize - gi->selectbox.height;
+      gi->selectbox.y = bottom_screen_border - gi->selectbox.height;
 
     getFontCharSource(font_nr, FONT_ASCII_CURSOR, &src_bitmap, &src_x, &src_y);
     src_x += font_width / 2;
