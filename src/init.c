@@ -55,6 +55,8 @@ static char *image_filename[NUM_PICTURES] =
 #endif
 }; 
 
+static Bitmap *bitmap_font_initial = NULL;
+
 static void InitSetup(void);
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
@@ -113,12 +115,14 @@ void OpenAll(void)
 
   InitEventFilter(FilterMouseMotionEvents);
 
-  InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
   InitElementInfo();
 
+  InitGfx();
+
   InitLevelInfo();
   InitLevelArtworkInfo();
+
   InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
   InitGadgets();		/* needs images + number of level series */
@@ -199,6 +203,12 @@ static void ReinitializeGraphics()
 	       new_graphic_info[IMG_MENU_FONT_MEDIUM].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
+
+  if (bitmap_font_initial)
+  {
+    FreeBitmap(bitmap_font_initial);
+    bitmap_font_initial = NULL;
+  }
 }
 
 static void InitImages()
@@ -398,7 +408,9 @@ void FreeTileClipmasks()
 
 void InitGfx()
 {
+#if 0
   int i;
+#endif
 
   /* initialize some global variables */
   global.frames_per_second = 0;
@@ -415,32 +427,40 @@ void InitGfx()
   /* create additional image buffers for double-buffering */
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
-#if 1
-  pix[PIX_DB_FIELD] = bitmap_db_field;
-  pix[PIX_DB_DOOR]  = bitmap_db_door;
-#endif
 
+#if 0
   pix[PIX_FONT_SMALL] = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
 
   InitFontInfo(NULL, NULL, pix[PIX_FONT_SMALL], NULL);
+#else
+  bitmap_font_initial = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
+
+  InitFontInfo(NULL, NULL, bitmap_font_initial, NULL);
+#endif
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 
+#if 0
   for (i=0; i<NUM_PICTURES; i++)
   {
+#if 0
     if (i != PIX_FONT_SMALL)
+#endif
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
 
       pix[i] = LoadCustomImage(image_filename[i]);
     }
   }
+#endif
 
+#if 0
   InitFontInfo(pix[PIX_FONT_BIG], pix[PIX_FONT_MEDIUM], pix[PIX_FONT_SMALL],
 	       pix[PIX_FONT_EM]);
+#endif
 
   InitTileClipmasks();
 }
@@ -527,17 +547,21 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
+#if 0
     int i;
+#endif
 
     setLevelArtworkDir(artwork.gfx_first);
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
+#if 0
     for (i=0; i<NUM_PICTURES; i++)
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
       ReloadCustomImage(pix[i], image_filename[i]);
     }
+#endif
 
     ReinitializeGraphics();
 
@@ -2546,7 +2570,9 @@ void Execute_Debug_Command(char *command)
 
 void CloseAllAndExit(int exit_value)
 {
+#if 0
   int i;
+#endif
 
   StopSounds();
   FreeAllSounds();
@@ -2556,8 +2582,10 @@ void CloseAllAndExit(int exit_value)
   FreeAllImages();
 
   FreeTileClipmasks();
+#if 0
   for (i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
+#endif
 
   CloseVideoDisplay();
   ClosePlatformDependantStuff();

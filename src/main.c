@@ -19,7 +19,9 @@
 #include "events.h"
 
 GC		tile_clip_gc;
+#if 0
 Bitmap	       *pix[NUM_BITMAPS];
+#endif
 Bitmap	       *bitmap_db_field, *bitmap_db_door;
 Pixmap		tile_clipmask[NUM_TILES];
 DrawBuffer     *fieldbuffer;

@@ -125,6 +125,9 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
 		 font_size == FS_SMALL		? font.bitmap_small	:
 		 font.bitmap_small);
 
+  if (font_bitmap == NULL)
+    return;
+
   if (font_type == FC_SPECIAL2)
     font_starty = (font_size == FS_BIG ? 0 : FONT1_YSIZE) * 5;
   else

@@ -1624,7 +1624,9 @@ struct NewGraphicInfo
 };
 
 extern GC		tile_clip_gc;
+#if 0
 extern Bitmap	       *pix[];
+#endif
 extern Bitmap	       *bitmap_db_field, *bitmap_db_door;
 extern Pixmap		tile_clipmask[];
 extern DrawBuffer      *fieldbuffer;
