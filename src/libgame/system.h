@@ -236,6 +236,9 @@ struct AudioSystemInfo
   boolean sound_enabled;
   boolean sound_deactivated;	/* for temporarily disabling sound */
 
+  void (*func_reload_sounds)(void);
+  void (*func_reload_music)(void);
+
   int soundserver_pipe[2];
   int soundserver_pid;
   char *device_name;
@@ -477,6 +480,8 @@ void ReloadCustomImage(Bitmap *, char *);
 inline void OpenAudio(void);
 inline void CloseAudio(void);
 inline void SetAudioMode(boolean);
+inline void SetAudioReloadFunctions(void (*func_reload_sounds)(void),
+				    void (*func_reload_music)(void));
 
 inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);

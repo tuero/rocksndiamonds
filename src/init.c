@@ -151,20 +151,56 @@ void InitNetworkServer()
 #endif
 }
 
+static void ReloadCustomSounds()
+{
+  int i;
+
+  printf("DEBUG: reloading sounds '%s' [%d] ...\n",
+	 artwork.sounds_set_current, audio.soundserver_pid);
+
+#if 1
+  FreeAllSounds();
+
+  InitSoundList(NUM_SOUNDS);
+  for(i=0; i<NUM_SOUNDS; i++)
+    LoadSoundToList(sound_name[i], i);
+#endif
+}
+
+static void ReloadCustomMusic()
+{
+  printf("DEBUG: reloading music '%s' [%d] ...\n",
+	 artwork.music_set_current, audio.soundserver_pid);
+
+#if 1
+  FreeAllMusic();
+
+  LoadCustomMusic();
+#endif
+}
+
 void InitSound()
 {
   int i;
 
   OpenAudio();
+  SetAudioReloadFunctions(ReloadCustomSounds, ReloadCustomMusic);
 
+#if 1
   InitSoundList(NUM_SOUNDS);
 
   for(i=0; i<NUM_SOUNDS; i++)
     LoadSoundToList(sound_name[i], i);
 
   LoadCustomMusic();
+#endif
 
   StartSoundserver();
+
+#if 0
+  InitReloadSounds(artwork.snd_current->name);
+  InitReloadMusic(artwork.mus_current->name);
+#endif
 }
 
 void InitTileClipmasks()

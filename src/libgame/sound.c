@@ -227,16 +227,82 @@ void SoundServer(void)
 
     if (snd_ctrl.reload_sounds || snd_ctrl.reload_music)
     {
-      for(i=0; i<MAX_SOUNDS_PLAYING; i++)
-	playlist[i] = emptySoundControl;
-      playing_sounds = 0;
+      char *set_name = checked_malloc(snd_ctrl.data_len);
+      TreeInfo **ti_ptr =
+	(snd_ctrl.reload_sounds ? &artwork.snd_current : &artwork.mus_current);
+      TreeInfo *ti = *ti_ptr;
+      unsigned long str_size1, str_size2, str_size3;
+
+      printf("B\n");
+
+      if (leveldir_current == NULL)
+	leveldir_current = checked_calloc(sizeof(TreeInfo));
+      printf("B.1\n");
+      if (ti == NULL)
+	ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
+      printf("B.2\n");
+      if (leveldir_current->fullpath != NULL)
+	free(leveldir_current->fullpath);
+      printf("B.3 ['%s']\n", ti->basepath);
+#if 0
+      if (ti->basepath != NULL)
+	free(ti->basepath);
+#endif
+      printf("B.4\n");
+      if (ti->fullpath != NULL)
+	free(ti->fullpath);
+      printf("B.5\n");
+
+      printf("C\n");
+
+      if (read(audio.soundserver_pipe[0], set_name,
+	       snd_ctrl.data_len) != snd_ctrl.data_len ||
+	  read(audio.soundserver_pipe[0], leveldir_current,
+	       sizeof(TreeInfo)) != sizeof(TreeInfo) ||
+	  read(audio.soundserver_pipe[0], ti,
+	       sizeof(TreeInfo)) != sizeof(TreeInfo) ||
+	  read(audio.soundserver_pipe[0], &str_size1,
+	       sizeof(unsigned long)) != sizeof(unsigned long) ||
+	  read(audio.soundserver_pipe[0], &str_size2,
+	       sizeof(unsigned long)) != sizeof(unsigned long) ||
+	  read(audio.soundserver_pipe[0], &str_size3,
+	       sizeof(unsigned long)) != sizeof(unsigned long))
+	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+
+      printf("D\n");
+
+      leveldir_current->fullpath = checked_calloc(str_size1);
+      ti->basepath = checked_calloc(str_size2);
+      ti->fullpath = checked_calloc(str_size3);
+
+      if (read(audio.soundserver_pipe[0], leveldir_current->fullpath,
+	       str_size1) != str_size1 ||
+	  read(audio.soundserver_pipe[0], ti->basepath,
+	       str_size2) != str_size2 ||
+	  read(audio.soundserver_pipe[0], ti->fullpath,
+	       str_size3) != str_size3)
+	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+
+      printf("E\n");
+
+      InitPlaylist();
 
       close(audio.device_fd);
 
+      printf("X\n");
+
       if (snd_ctrl.reload_sounds)
-	ReloadSounds();
+      {
+	artwork.sounds_set_current = set_name;
+	audio.func_reload_sounds();
+      }
       else
-	ReloadMusic();
+      {
+	artwork.music_set_current = set_name;
+	audio.func_reload_music();
+      }
+
+      free(set_name);
 
       continue;
     }
@@ -317,9 +383,9 @@ void SoundServer(void)
 	if (snd_ctrl.active)	/* new sound has arrived */
 	  SoundServer_InsertNewSound(snd_ctrl);
 
-	while(playing_sounds &&
-	      select(audio.soundserver_pipe[0] + 1,
-		     &sound_fdset, NULL, NULL, &delay) < 1)
+	while (playing_sounds &&
+	       select(audio.soundserver_pipe[0] + 1,
+		      &sound_fdset, NULL, NULL, &delay) < 1)
 	{	
 	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
@@ -442,9 +508,9 @@ void SoundServer(void)
       {
 	playing_sounds = 1;
 
-	while(playing_sounds &&
-	      select(audio.soundserver_pipe[0] + 1,
-		     &sound_fdset, NULL, NULL, &delay) < 1)
+	while (playing_sounds &&
+	       select(audio.soundserver_pipe[0] + 1,
+		      &sound_fdset, NULL, NULL, &delay) < 1)
 	{	
 	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
@@ -956,16 +1022,6 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 /* ========================================================================= */
 /* THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS                          */
 
-void ReloadSounds()
-{
-  printf("reloading sounds ...\n");
-}
-
-void ReloadMusic()
-{
-  printf("reloading music ...\n");
-}
-
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		16	/* size of WAV file header */
 
@@ -1096,6 +1152,8 @@ SoundInfo *LoadCustomSound(char *basename)
     Error(ERR_WARN, "cannot find sound file '%s'", basename);
     return FALSE;
   }
+
+  printf("-> '%s'\n", filename);
 
   return Load_WAV(filename);
 }
@@ -1372,8 +1430,8 @@ void StopSoundExt(int nr, int method)
       Mix_HaltMusic();
   }
 
-#else
-#if !defined(PLATFORM_MSDOS)
+#elif !defined(PLATFORM_MSDOS)
+
   if (audio.soundserver_pid == 0)	/* we are child process */
     return;
 
@@ -1386,59 +1444,75 @@ void StopSoundExt(int nr, int method)
 #else
   sound_handler(snd_ctrl);
 #endif
+}
+
+static void InitReloadSoundsOrMusic(char *set_name, int type)
+{
+  struct SoundControl snd_ctrl = emptySoundControl;
+  TreeInfo *ti =
+    (type == SND_RELOAD_SOUNDS ? artwork.snd_current : artwork.mus_current);
+  unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
+  unsigned long str_size2 = strlen(ti->basepath) + 1;
+  unsigned long str_size3 = strlen(ti->fullpath) + 1;
+
+  if (!audio.sound_available)
+    return;
+
+  if (leveldir_current == NULL)
+    Error(ERR_EXIT, "leveldir_current == NULL");
+
+  snd_ctrl.reload_sounds = (type == SND_RELOAD_SOUNDS);
+  snd_ctrl.reload_music  = (type == SND_RELOAD_MUSIC);
+  snd_ctrl.data_len = strlen(set_name) + 1;
+
+#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
+  if (type == SND_RELOAD_SOUNDS)
+    audio.audio.func_reload_sounds();
+  else
+    audio.audio.func_reload_music();
+#elif defined(PLATFORM_UNIX)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
+  if (write(audio.soundserver_pipe[1], &snd_ctrl,
+	    sizeof(snd_ctrl)) < 0 ||
+      write(audio.soundserver_pipe[1], set_name,
+	    snd_ctrl.data_len) < 0 ||
+      write(audio.soundserver_pipe[1], leveldir_current,
+	    sizeof(TreeInfo)) < 0 ||
+      write(audio.soundserver_pipe[1], ti,
+	    sizeof(TreeInfo)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size1,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size2,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size3,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], leveldir_current->fullpath,
+	    str_size1) < 0 ||
+      write(audio.soundserver_pipe[1], ti->basepath,
+	    str_size2) < 0 ||
+      write(audio.soundserver_pipe[1], ti->fullpath,
+	    str_size3) < 0)
+  {
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
+    audio.sound_available = audio.sound_enabled = FALSE;
+    return;
+  }
+
+  printf("A\n");
+
 #endif
 }
 
 void InitReloadSounds(char *set_name)
 {
-  struct SoundControl snd_ctrl = emptySoundControl;
-
-  if (!audio.sound_available)
-    return;
-
-  snd_ctrl.reload_sounds = TRUE;
-
-#if defined(TARGET_SDL)
-  ReloadSounds();
-#elif defined(PLATFORM_UNIX)
-  if (audio.soundserver_pid == 0)	/* we are child process */
-    return;
-
-  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
-  {
-    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
-    audio.sound_available = audio.sound_enabled = FALSE;
-    return;
-  }
-#elif defined(PLATFORM_MSDOS)
-  sound_handler(snd_ctrl);
-#endif
+  InitReloadSoundsOrMusic(set_name, SND_RELOAD_SOUNDS);
 }
 
 void InitReloadMusic(char *set_name)
 {
-  struct SoundControl snd_ctrl = emptySoundControl;
-
-  if (!audio.sound_available)
-    return;
-
-  snd_ctrl.reload_music = TRUE;
-
-#if defined(TARGET_SDL)
-  ReloadMusic();
-#elif defined(PLATFORM_UNIX)
-  if (audio.soundserver_pid == 0)	/* we are child process */
-    return;
-
-  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
-  {
-    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
-    audio.sound_available = audio.sound_enabled = FALSE;
-    return;
-  }
-#elif defined(PLATFORM_MSDOS)
-  sound_handler(snd_ctrl);
-#endif
+  InitReloadSoundsOrMusic(set_name, SND_RELOAD_MUSIC);
 }
 
 void FreeSound(SoundInfo *sound)
@@ -1493,6 +1567,7 @@ void FreeAllSounds()
     FreeSound(Sound[i]);
 
   free(Sound);
+  Sound = NULL;
 }
 
 void FreeAllMusic()
@@ -1506,6 +1581,7 @@ void FreeAllMusic()
     FreeMusic(Music[i]);
 
   free(Music);
+  Music = NULL;
 }
 
 /* THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS                          */

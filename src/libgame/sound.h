@@ -133,6 +133,9 @@
 #define SSND_MUSIC		(SSND_FADE_MUSIC | SSND_STOP_MUSIC)
 #define SSND_ALL		(SSND_FADE_ALL | SSND_STOP_ALL)
 
+#define SND_RELOAD_SOUNDS	1
+#define SND_RELOAD_MUSIC	2
+
 #define SND_TYPE_NONE		0
 #define SND_TYPE_WAV		1
 
@@ -207,7 +210,7 @@ struct SoundControl
   int playingtime;
   long playingpos;
 
-  long data_len;
+  unsigned long data_len;
   byte *data_ptr;
 
 #if defined(PLATFORM_MSDOS)
@@ -225,8 +228,8 @@ void StartSoundserver(void);
 void SoundServer(void);
 
 /* sound client functions */
-void ReloadSounds(void);
-void ReloadMusic(void);
+void ReloadSounds(char *);
+void ReloadMusic(char *);
 SoundInfo *LoadCustomSound(char *);
 void InitSoundList(int);
 void LoadSoundToList(char *, int);
