@@ -1,5 +1,5 @@
-Release Version 2.2.0 [?? ??? ????]
------------------------------------
+Pre-Release Version 2.2.0rc1 [31 DEC 2002]
+------------------------------------------
 	- level series artwork now configurable via level series config file
 	- single graphics and animations can now be replaced with different
 	  ones (independantly from default image files which may be larger)
@@ -7,6 +7,12 @@ Release Version 2.2.0 [?? ??? ????]
 	- element animation length, speed and mode now freely configurable
 	- automatic tape playing function for game engine and level testing
 	- missing steel wall graphic added (thanks to Equinox Tetrachloride)
+	- added new contributed levels from the following players:
+	  + Abby King (14 levels)
+	  + Andreas Buschbeck (80 levels with complete artwork set)
+	  + David Hutchinson (25 levels with graphics set)
+	  + Equinox Tetrachloride (150 levels guaranteed to be solvable)
+	  + Sylvan Hancock (39 levels)
 
 Release Version 2.1.1 [13 AUG 2002]
 -----------------------------------
@@ -16,7 +22,7 @@ Release Version 2.1.1 [13 AUG 2002]
 	- default keys for "snap field" and "place bomb" fixed for Mac OS X
 	- added new contributed levels from the following players:
 	  + Alan Bond
-	  + Gerrit Holl
+	  + Gerrit Holl and Timen van den Berg
 
 Release Version 2.1.0 [05 AUG 2002]
 -----------------------------------
@@ -190,8 +196,8 @@ Version 0.9b2 [21 NOV 1995] [NOT RELEASED]
 ------------------------------------------
 	- new game elements
 
-Prerelease Version 0.9b [4 NOV 1995]
-------------------------------------
+Pre-Release Version 0.9b [4 NOV 1995]
+-------------------------------------
 	- the game is now completely Freeware
 	- the game is now better playable by keyboard
 	  (in the last version, the player was making more than
@@ -206,6 +212,6 @@ Prerelease Version 0.9b [4 NOV 1995]
 	- FreeBSD sound and joystick support (thanks to Jean-Marc
 	  Zucconi)
 
-Prerelease Version 0.9 [23 OCT 1995]
-------------------------------------
+Pre-Release Version 0.9 [23 OCT 1995]
+-------------------------------------
 	- first (pre)release version

@@ -876,16 +876,34 @@ static void InitGraphicInfo()
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: first frame of graphic animation object %d outside of image bitmap file '%s' (%d,%d)",
-	    i, src_bitmap->source_filename, src_x, src_y);
+    {
+      Error(ERR_RETURN, "custom artwork configuration error:");
+      Error(ERR_RETURN, "- config file: '%s'",
+	    getImageConfigFilename());
+      Error(ERR_RETURN, "- config token: '%s'",
+	    getTokenFromImageID(i));
+      Error(ERR_RETURN, "- image file: '%s'",
+	    src_bitmap->source_filename);
+      Error(ERR_EXIT, "error: first animation frame out of bounds (%d,%d)",
+	    src_x, src_y);
+    }
 
     last_frame = new_graphic_info[i].anim_frames - 1;
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: last frame of graphic animation object %d outside of image bitmap file '%s' (%d,%d)",
-	    i, src_bitmap->source_filename, src_x, src_y);
+    {
+      Error(ERR_RETURN, "custom artwork configuration error:");
+      Error(ERR_RETURN, "- config file: '%s'",
+	    getImageConfigFilename());
+      Error(ERR_RETURN, "- config token: '%s'",
+	    getTokenFromImageID(i));
+      Error(ERR_RETURN, "- image file: '%s'",
+	    src_bitmap->source_filename);
+      Error(ERR_EXIT, "error: last animation frame out of bounds (%d,%d)",
+	    src_x, src_y);
+    }
   }
 }
 

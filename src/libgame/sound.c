@@ -956,11 +956,16 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     unsigned long playing_current = Counter();
     int longest = 0, longest_nr = audio.first_sound_channel;
 
+#if 0
+#if DEBUG
+    /* print some debugging information about audio channel usage */
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
       Error(ERR_RETURN, "Mixer_InsertSound: %d [%d]: %ld (%ld)",
 	    i, mixer[i].active, mixer[i].data_len, (long)mixer[i].data_ptr);
     }
+#endif
+#endif
 
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
@@ -1639,7 +1644,8 @@ static void *Load_WAV(char *filename)
 	return NULL;
       }
 
-      if (header.num_channels != 1)
+      if (header.num_channels != 1 &&
+	  header.num_channels != 2)
       {
 	Error(ERR_WARN, "sound file '%s': number of %d channels not supported",
 	      filename, header.num_channels);

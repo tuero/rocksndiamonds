@@ -74,6 +74,8 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 struct FileInfo *getCurrentImageList();
 Bitmap *getBitmapFromImageID(int);
+char *getTokenFromImageID(int);
+char *getImageConfigFilename();
 void InitImageList(struct ConfigInfo *, struct ConfigInfo *, int);
 void ReloadCustomImages();
 void FreeAllImages();

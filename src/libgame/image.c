@@ -14,6 +14,7 @@
 #include "image.h"
 #include "pcx.h"
 #include "misc.h"
+#include "setup.h"
 
 
 /* ========================================================================= */
@@ -705,6 +706,18 @@ Bitmap *getBitmapFromImageID(int graphic)
   ImageInfo **img_info = (ImageInfo **)image_info->artwork_list;
 
   return img_info[graphic]->bitmap;
+}
+
+char *getTokenFromImageID(int graphic)
+{
+  struct FileInfo *file_list = (struct FileInfo *)image_info->file_list;
+
+  return file_list[graphic].token;
+}
+
+char *getImageConfigFilename()
+{
+  return getCustomArtworkConfigFilename(image_info->type);
 }
 
 void InitImageList(struct ConfigInfo *config_list,
