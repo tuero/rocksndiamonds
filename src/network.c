@@ -236,7 +236,7 @@ void SendToServer_StartPlaying()
   buffer[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
   buffer[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
 
-  strcpy(&buffer[10], leveldir[leveldir_nr].name);
+  strcpy((char *)&buffer[10], leveldir[leveldir_nr].name);
 
   SendBufferToServer(10 + strlen(leveldir[leveldir_nr].name)+1);
 }
@@ -364,7 +364,7 @@ static void Handle_OP_PLAYER_NAME(unsigned int len)
   buffer[len] = 0;
   Error(ERR_NETWORK_CLIENT, "client %d calls itself \"%s\"",
 	buffer[0], &buffer[2]);
-  strncpy(player->name, &buffer[2], MAX_PLAYER_NAME_LEN);
+  strncpy(player->name, (char *)&buffer[2], MAX_PLAYER_NAME_LEN);
 }
 
 static void Handle_OP_PLAYER_CONNECTED()
@@ -413,13 +413,13 @@ static void Handle_OP_START_PLAYING()
 {
   int new_level_nr, new_leveldir_nr;
   unsigned long new_random_seed;
-  unsigned char *new_leveldir_name;
+  char *new_leveldir_name;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
   new_leveldir_nr = (buffer[4] << 8) + buffer[5];
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
-  new_leveldir_name = &buffer[10];
+  new_leveldir_name = (char *)&buffer[10];
 
   printf("OP_START_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT,

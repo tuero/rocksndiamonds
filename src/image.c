@@ -76,7 +76,7 @@ static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
     dst_ptr += bytes_per_row;	/* continue with leftmost byte of next row */
   }
 
-  mask_pixmap = XCreateBitmapFromData(display, window, mask_data,
+  mask_pixmap = XCreateBitmapFromData(display, window, (char *)mask_data,
 				      image->width, image->height);
   free(mask_data);
 
@@ -375,7 +375,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   ximage->byte_order = MSBFirst;
 
   src_ptr = image->data;
-  dst_ptr = ximage->data;
+  dst_ptr = (byte *)ximage->data;
 
   switch (visual->class)
   {

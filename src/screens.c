@@ -158,7 +158,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 		 (x == 15 && level_nr < leveldir[leveldir_nr].levels - 1)) &&
       button)
   {
-    static long level_delay = 0;
+    static unsigned long level_delay = 0;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int new_level_nr, old_level_nr = level_nr;
     int font_color = (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW);
@@ -656,7 +656,7 @@ void DrawHelpScreen()
 
 void HandleHelpScreen(int button)
 {
-  static long hs_delay = 0;
+  static unsigned long hs_delay = 0;
   int num_helpscreen_els_pages =
     (num_helpscreen_els + MAX_HELPSCREEN_ELS-1) / MAX_HELPSCREEN_ELS;
   int button_released = !button;
@@ -710,7 +710,6 @@ void HandleHelpScreen(int button)
 void HandleTypeName(int newxpos, KeySym key)
 {
   static int xpos = 0, ypos = 2;
-  unsigned char ascii;
 
   if (newxpos)
   {
@@ -723,9 +722,11 @@ void HandleTypeName(int newxpos, KeySym key)
   if (((key >= XK_A && key <= XK_Z) || (key >= XK_a && key <= XK_z)) && 
       xpos < MAX_NAMELEN - 1)
   {
+    char ascii;
+
     if (key >= XK_A && key <= XK_Z)
       ascii = 'A' + (char)(key - XK_A);
-    if (key >= XK_a && key <= XK_z)
+    else
       ascii = 'a' + (char)(key - XK_a);
 
     setup.player_name[xpos] = ascii;
@@ -800,7 +801,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 3;
   static int first_entry = 0;
-  static long choose_delay = 0;
+  static unsigned long choose_delay = 0;
   static int redraw = TRUE;
   int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
   int num_page_entries;
@@ -1388,7 +1389,7 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 
   if (y == 3 && ((x == 1 && !button) || ((x == 11 || x == 13) && button)))
   {
-    static long delay = 0;
+    static unsigned long delay = 0;
 
     if (!DelayReached(&delay, 150))
       goto out;

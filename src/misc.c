@@ -337,14 +337,14 @@ void GetOptions(char *argv[])
     char *option_arg = NULL;
     int option_len = strlen(option);
 
+    if (option_len >= MAX_OPTION_LEN)
+      Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
+
     strcpy(option_str, option);			/* copy argument into buffer */
     option = option_str;
 
     if (strcmp(option, "--") == 0)		/* stop scanning arguments */
       break;
-
-    if (option_len >= MAX_OPTION_LEN)
-      Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
 
     if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
       option++;
@@ -384,8 +384,6 @@ void GetOptions(char *argv[])
       options.display_name = option_arg;
       if (option_arg == next_option)
 	options_left++;
-
-      printf("--display == '%s'\n", options.display_name);
     }
     else if (strncmp(option, "-basepath", option_len) == 0)
     {
@@ -395,8 +393,6 @@ void GetOptions(char *argv[])
       options.base_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
-
-      printf("--basepath == '%s'\n", options.base_directory);
 
       /* adjust path for level directory accordingly */
       options.level_directory =
@@ -410,42 +406,32 @@ void GetOptions(char *argv[])
       options.level_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
-
-      printf("--levels == '%s'\n", options.level_directory);
     }
     else if (strncmp(option, "-network", option_len) == 0)
     {
-      printf("--network\n");
-
       options.network = TRUE;
     }
     else if (strncmp(option, "-serveronly", option_len) == 0)
     {
-      printf("--serveronly\n");
-
       options.serveronly = TRUE;
     }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
-      printf("--verbose\n");
-
       options.verbose = TRUE;
     }
     else if (*option == '-')
+    {
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option_str);
+    }
     else if (options.server_host == NULL)
     {
       options.server_host = *options_left;
-
-      printf("server.name == '%s'\n", options.server_host);
     }
     else if (options.server_port == 0)
     {
       options.server_port = atoi(*options_left);
       if (options.server_port < 1024)
 	Error(ERR_EXIT_HELP, "bad port number '%d'", options.server_port);
-
-      printf("port == %d\n", options.server_port);
     }
     else
       Error(ERR_EXIT_HELP, "too many arguments");

@@ -632,7 +632,7 @@ void DrawPlayerButton(unsigned long state, int mode)
 {
   Drawable dest_drawto;
   int dest_xoffset, dest_yoffset;
-  int graphic;
+  int graphic = GFX_SPIELER1;	/* default */
   int graphic_offset = (PLAYER_BUTTON_XSIZE - TILEX/2)/2;
   int xpos, ypos;
   int cx = DOOR_GFX_PAGEX4, cy = 0;

@@ -44,9 +44,22 @@ SCORE_ENTRIES = MANY_PER_NAME
 # you shouldn't need to change anything below                                 #
 #-----------------------------------------------------------------------------#
 
-PROGNAME = ../rocksndiamonds
+ifdef COMSPEC
+PLATFORM = dos
+else
+PLATFORM = unix
+endif
 
+ifeq ($(PLATFORM),unix)
 RM = rm -f
+PROGNAME = ../rocksndiamonds
+LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
+else
+RM = del
+PROGNAME = ..\rocks.exe
+LIBS = -lm -lalleg
+endif
+
 CPP = $(CC) -E
 
 CONFIG_GAME_DIR = -DGAME_DIR="\"$(GAME_DIR)\""
@@ -55,9 +68,10 @@ CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
 CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(CONFIG_SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
 
-# DEBUG = -DDEBUG -g -ansi -pedantic -Wall
-DEBUG = -DDEBUG -g -Wall
-# DEBUG = -O6
+# DEBUG = -DDEBUG -g -Wall -ansi -pedantic
+# DEBUG = -DDEBUG -g -Wall
+DEBUG = -O3 -Wall
+# DEBUG = -O3
 
 # SYSTEM = -Aa -D_HPUX_SOURCE -Dhpux	# for HP-UX (obsolete)
 # SYSTEM = -DSYSV -Ae			# for HP-UX
@@ -72,7 +86,8 @@ DEBUG = -DDEBUG -g -Wall
 # LIBS = -L/usr/X11R6/lib -lX11 -lm
 
 # LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
-LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
+
+# LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)

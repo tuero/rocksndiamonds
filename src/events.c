@@ -662,7 +662,7 @@ void HandleJoystick()
     case SETUP:
     case SETUPINPUT:
     {
-      static long joystickmove_delay = 0;
+      static unsigned long joystickmove_delay = 0;
 
       if (joystick && !button && !DelayReached(&joystickmove_delay, 150))
 	newbutton = dx = dy = 0;

@@ -107,8 +107,8 @@ void DoAnimation()
 
 void HandleAnimation(int mode)
 {
-  static long animstart_delay = -1;
-  static long animstart_delay_value = 0;
+  static unsigned long animstart_delay = -1;
+  static unsigned long animstart_delay_value = 0;
   static boolean anim_restart = TRUE;
   static boolean reset_delay = TRUE;
   static int toon_nr = 0;
@@ -195,8 +195,8 @@ boolean AnimateToon(int toon_nr, boolean restart)
   static int delta_x = 0, delta_y = 0;
   static int frame = 0, frame_step = 1;
   static boolean horiz_move, vert_move;
-  static long anim_delay = 0;
-  static int anim_delay_value = 0;
+  static unsigned long anim_delay = 0;
+  static unsigned long anim_delay_value = 0;
   static int width,height;
   static int pad_x,pad_y;
   static int cut_x,cut_y;

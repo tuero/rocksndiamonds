@@ -831,6 +831,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
     src_x  = (graphic % HEROES_PER_LINE) * TILEX + cx;
     src_y  = (graphic / HEROES_PER_LINE) * TILEY + cy;
   }
+  else	/* big font graphics currently not allowed (and not needed) */
+    return;
 
   dest_x = FX + x * TILEX + dx;
   dest_y = FY + y * TILEY + dy;
@@ -1599,11 +1601,11 @@ unsigned int GetDoorState()
 
 unsigned int MoveDoor(unsigned int door_state)
 {
-  static unsigned int door1 = DOOR_OPEN_1;
-  static unsigned int door2 = DOOR_CLOSE_2;
-  static long door_delay = 0;
+  static int door1 = DOOR_OPEN_1;
+  static int door2 = DOOR_CLOSE_2;
+  static unsigned long door_delay = 0;
   int x, start, stepsize = 2;
-  long door_delay_value = stepsize * 5;
+  unsigned long door_delay_value = stepsize * 5;
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);

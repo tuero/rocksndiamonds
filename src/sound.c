@@ -118,8 +118,9 @@ void SoundServer()
     if (playing_sounds || snd_ctrl.active)
     {
       struct timeval delay = { 0, 0 };
-      char *sample_ptr;
-      long sample_size, max_sample_size;
+      byte *sample_ptr;
+      long sample_size;
+      long max_sample_size; /* MIGHT BE USED UNINITIALIZED!  TO BE FIXED! */
       long fragment_size;
       boolean stereo;
 
@@ -251,12 +252,12 @@ void SoundServer()
       }
     }
 
-#else	/* von '#ifdef VOXWARE' */
+#else /* !VOXWARE */
 
     if (snd_ctrl.active && !snd_ctrl.loop)
     {
       struct timeval delay = { 0, 0 };
-      char *sample_ptr;
+      byte *sample_ptr;
       long sample_size, max_sample_size = SND_BLOCKSIZE;
       long sample_rate = 8000;	/* standard "/dev/audio" sampling rate */
       int wait_percent = 90;	/* wait 90% of the real playing time */
@@ -272,9 +273,9 @@ void SoundServer()
 	  FD_SET(sound_pipe[0], &sound_fdset);
 
 	  /* get pointer and size of the actual sound sample */
-	  sample_ptr = snd_ctrl.data_ptr+snd_ctrl.playingpos;
+	  sample_ptr = snd_ctrl.data_ptr + snd_ctrl.playingpos;
 	  sample_size =
-	    MIN(max_sample_size,snd_ctrl.data_len-snd_ctrl.playingpos);
+	    MIN(max_sample_size, snd_ctrl.data_len - snd_ctrl.playingpos);
 	  snd_ctrl.playingpos += sample_size;
 
 	  /* fill the first mixing buffer with original sample */
@@ -305,7 +306,7 @@ void SoundServer()
       }
     }
 
-#endif	/* von '#ifdef VOXWARE' */
+#endif /* !VOXWARE */
 
   }
 #endif
@@ -707,7 +708,7 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
   char filename[256];
 #ifndef MSDOS
   struct SoundHeader_8SVX *sound_header;
-  unsigned char *ptr;
+  char *ptr;
   char *sound_ext = "8svx";
 #else
   char *sound_ext = "wav";
@@ -760,9 +761,9 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
     return(FALSE);
   }
 
-  ptr = snd_info->file_ptr + 12;
+  ptr = (char *)snd_info->file_ptr + 12;
 
-  while(ptr < (unsigned char *)(snd_info->file_ptr + snd_info->file_len))
+  while(ptr < (char *)(snd_info->file_ptr + snd_info->file_len))
   {
     if (!strncmp(ptr,"VHDR",4))
     {
@@ -781,7 +782,7 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
     }
     else if (!strncmp(ptr,"BODY",4))
     {
-      snd_info->data_ptr = ptr + 8;
+      snd_info->data_ptr = (byte *)ptr + 8;
       snd_info->data_len = be2long((unsigned long *)(ptr + 4));
       return(TRUE);
     }
@@ -794,7 +795,7 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
   }
 
   return(FALSE);
-#else
+#else /* MSDOS */
   snd_info->sample_ptr = load_sample(filename);
   if(!snd_info->sample_ptr)
   {
@@ -803,7 +804,7 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
     return(FALSE);
   }
   return(TRUE);
-#endif  // von  #ifndef MSDOS
+#endif /* MSDOS */
 }
 
 void PlaySound(int nr)

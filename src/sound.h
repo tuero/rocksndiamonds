@@ -131,9 +131,9 @@ struct SoundHeader_WAV
 
 struct SoundInfo
 { 
-  unsigned char *name;
-  unsigned char *file_ptr;
-  char *data_ptr;
+  char *name;
+  byte *file_ptr;
+  byte *data_ptr;
   long file_len, data_len;
 #ifdef MSDOS
   SAMPLE *sample_ptr;
@@ -153,7 +153,7 @@ struct SoundControl
   int playingtime;
   long playingpos;
   long data_len;
-  char *data_ptr;
+  byte *data_ptr;
 #ifdef MSDOS
   int voice;
 #endif

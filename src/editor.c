@@ -694,7 +694,7 @@ void LevelEd(int mx, int my, int button)
   }
   else				/********** EDIT/CTRL-FENSTER **********/
   {
-    static long choice_delay = 0;
+    static unsigned long choice_delay = 0;
     int choice = CheckElemButtons(mx,my,button);
     int elem_pos = choice-ED_BUTTON_ELEM;
 

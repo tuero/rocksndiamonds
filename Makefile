@@ -11,14 +11,10 @@
 # you shouldn't need to change anything below                                 #
 #-----------------------------------------------------------------------------#
 
-PROGNAME = rocksndiamonds
-SRC_DIR = src
-
 MAKE = make
-RM = rm -f
-MV = mv -f
 
-MAKE_CMD = $(MAKE) -C $(SRC_DIR)
+SRC_DIR = src
+MAKE_CMD = @$(MAKE) -C $(SRC_DIR)
 
 
 all:
@@ -30,13 +26,13 @@ clean:
 backup:
 	./Scripts/make_backup.sh
 
-dist: dist-unix dist-dos
-
 dist-unix:
 	./Scripts/make_dist_unix.sh .
 
 dist-dos:
 	./Scripts/make_dist_dos.sh .
+
+dist: dist-unix dist-dos
 
 depend:
 	$(MAKE_CMD) depend

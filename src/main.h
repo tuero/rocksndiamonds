@@ -300,15 +300,15 @@ struct PlayerInfo
   boolean gone, LevelSolved, GameOver;
   boolean snapped;
 
-  long move_delay;
+  unsigned long move_delay;
   int last_move_dir;
 
-  long push_delay;
-  int push_delay_value;
+  unsigned long push_delay;
+  unsigned long push_delay_value;
 
   int frame_reset_delay;
 
-  long actual_frame_counter;
+  unsigned long actual_frame_counter;
 
   int score;
   int gems_still_needed;
@@ -1059,7 +1059,7 @@ extern int		num_bg_loops;
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#define VERSION_STRING		"1.2 preview 1"
+#define VERSION_STRING		"1.2.0"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
 #define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"

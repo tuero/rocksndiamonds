@@ -34,7 +34,7 @@ static int onceonly = 0;
 struct NetworkServerPlayerInfo
 {
   int fd;
-  unsigned char player_name[16];
+  char player_name[16];
   unsigned char number;
   struct NetworkServerPlayerInfo *next;
   char active;
@@ -283,7 +283,8 @@ static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *player,
   for (i=0; i<len-2; i++)
   {
     if (player->player_name[i] < ' ' || 
-	(player->player_name[i] > 0x7e && player->player_name[i] <= 0xa0))
+	((unsigned char)(player->player_name[i]) > 0x7e &&
+	 (unsigned char)(player->player_name[i]) <= 0xa0))
     {
       player->player_name[i] = 0;
       break;
@@ -348,7 +349,7 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
     v->action_received = FALSE;
   }
 
-  broadcast(NULL, 10 + strlen(&buffer[10])+1, 0);
+  broadcast(NULL, 10 + strlen((char *)&buffer[10])+1, 0);
 }
 
 static void Handle_OP_PAUSE_PLAYING(struct NetworkServerPlayerInfo *player)

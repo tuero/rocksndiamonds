@@ -155,7 +155,7 @@ static char *getScoreDir(char *level_subdir)
 static char *getLevelFilename(int nr)
 {
   static char *filename = NULL;
-  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+  char basename[MAX_FILENAME_LEN];
 
   if (filename != NULL)
     free(filename);
@@ -173,7 +173,7 @@ static char *getLevelFilename(int nr)
 static char *getTapeFilename(int nr)
 {
   static char *filename = NULL;
-  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+  char basename[MAX_FILENAME_LEN];
 
   if (filename != NULL)
     free(filename);
@@ -187,7 +187,7 @@ static char *getTapeFilename(int nr)
 static char *getScoreFilename(int nr)
 {
   static char *filename = NULL;
-  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+  char basename[MAX_FILENAME_LEN];
 
   if (filename != NULL)
     free(filename);

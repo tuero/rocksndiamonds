@@ -160,14 +160,14 @@ void InitSound()
   */
 
 #endif
-#else
+#else /* MSDOS */
   sound_loops_allowed = TRUE;
 
   /*
   setup.sound_loops_on = TRUE;
   */
 
-#endif
+#endif /* MSDOS */
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
@@ -188,7 +188,11 @@ void InitSoundServer()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifndef MSDOS
+#ifdef MSDOS
+  SoundServer();
+  return;
+#endif
+
   if (pipe(sound_pipe)<0)
   {
     Error(ERR_WARN, "cannot create pipe - no sounds");
@@ -212,9 +216,6 @@ void InitSoundServer()
   }
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
-#else
-  SoundServer();
-#endif
 }
 
 void InitJoysticks()
@@ -255,7 +256,8 @@ void InitJoysticks()
 
     joystick_status = JOYSTICK_AVAILABLE;
   }
-#else
+
+#else /* MSDOS */
 
   /* try to access two joysticks; if that fails, try to access just one */
   if (install_joystick(JOY_TYPE_2PADS) == 0 ||
@@ -533,7 +535,7 @@ void InitGfx()
 #ifdef MSDOS
   DrawInitText("MSDOS version done by Guido Schulz",210,FC_BLUE);
   rest(200);
-#endif MSDOS
+#endif /* MSDOS */
   DrawInitText("Loading graphics:",120,FC_GREEN);
 
   for(i=0; i<NUM_PICTURES; i++)
@@ -659,13 +661,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char *picturemask_ext = "Mask.xbm";
 #else
   int pcx_err;
-
-#if 1
   char *picture_ext = ".pcx";
-#else
-  char *picture_ext = ".gif";
-#endif
-
 #endif
 
   /* Grafik laden */
@@ -678,7 +674,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifdef MSDOS
     rest(100);
-#endif MSDOS
+#endif /* MSDOS */
 
 #if DEBUG_TIMING
     debug_print_timestamp(1, NULL);	/* initialize timestamp function */
