@@ -105,10 +105,14 @@ static void setLevelInfoToDefaults()
   {
     int element = EL_CUSTOM_START + i;
 
-    for(j=0; j<MAX_ELEMENT_NAME_LEN; j++)
+    for(j=0; j<MAX_ELEMENT_NAME_LEN + 1; j++)
       element_info[element].description[j] = '\0';
-    strcpy(element_info[element].description,
-	   element_info[element].editor_description);
+    if (element_info[element].custom_description != NULL)
+      strncpy(element_info[element].description,
+	      element_info[element].custom_description, MAX_ELEMENT_NAME_LEN);
+    else
+      strcpy(element_info[element].description,
+	     element_info[element].editor_description);
 
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;

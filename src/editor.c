@@ -2384,10 +2384,10 @@ static char *getElementInfoText(int element)
 
   if (element < NUM_FILE_ELEMENTS)
   {
-    if (element_info[element].custom_description != NULL)
-      info_text = element_info[element].custom_description;
-    else if (strlen(element_info[element].description) > 0)
+    if (strlen(element_info[element].description) > 0)
       info_text = element_info[element].description;
+    else if (element_info[element].custom_description != NULL)
+      info_text = element_info[element].custom_description;
     else if (element_info[element].editor_description != NULL)
       info_text = element_info[element].editor_description;
   }
@@ -5926,7 +5926,11 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
   strcpy(textinput_info[type_id].value, gi->text.value);
 
   if (type_id == ED_TEXTINPUT_ID_ELEMENT_NAME)
+  {
     CopyCustomElementPropertiesToGame(properties_element);
+
+    ModifyEditorElementList();	/* update changed button info text */
+  }
 }
 
 static void HandleSelectboxGadgets(struct GadgetInfo *gi)
