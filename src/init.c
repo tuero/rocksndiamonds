@@ -2829,6 +2829,12 @@ void InitElementPropertiesEngine(int engine_version)
 	     element_info[i].token_name,
 	     element_info[i].crumbled[ACTION_DEFAULT]);
 #endif
+
+    /* ---------- CAN_CHANGE ----------------------------------------------- */
+    SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */
+    for (j=0; j < element_info[i].num_change_pages; j++)
+      if (element_info[i].change_page[j].can_change)
+	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
   }
 
 #if 0

@@ -1609,7 +1609,7 @@ static struct
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_CAN_CHANGE,	GADGET_ID_NONE,
-    &custom_element_properties[EP_CAN_CHANGE],
+    &custom_element_change.can_change,
     NULL, "element changes to:",	"element can change to other element"
   },
   {
@@ -6680,18 +6680,19 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
 
-  if (type_id == ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE)
+  if (type_id == ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE ||
+      type_id == ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE)
   {
-    if (element_info[properties_element].current_change_page > 0)
-      element_info[properties_element].current_change_page--;
+    struct ElementInfo *ei = &element_info[properties_element];
+    int step = BUTTON_STEPSIZE(gi->event.button);
 
-    DrawPropertiesWindow();
-  }
-  else if (type_id == ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE)
-  {
-    if (element_info[properties_element].current_change_page <
-	element_info[properties_element].num_change_pages - 1)
-      element_info[properties_element].current_change_page++;
+    step *= (type_id == ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE ? -1 : +1);
+    ei->current_change_page += step;
+
+    if (ei->current_change_page < 0)
+      ei->current_change_page = 0;
+    else if (ei->current_change_page >= ei->num_change_pages)
+      ei->current_change_page = ei->num_change_pages - 1;
 
     DrawPropertiesWindow();
   }

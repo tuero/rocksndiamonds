@@ -62,37 +62,39 @@ void setElementChangePages(struct ElementInfo *ei, int change_pages)
   ei->change = &ei->change_page[ei->current_change_page];
 }
 
-void setElementChangeInfoToDefaults(struct ElementChangeInfo *eci)
+void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 {
   int x, y;
 
-  eci->events = CE_BITMASK_DEFAULT;
-  eci->target_element = EL_EMPTY_SPACE;
+  change->can_change = FALSE;
 
-  eci->delay_fixed = 0;
-  eci->delay_random = 0;
-  eci->delay_frames = -1;	/* later set to reliable default value */
+  change->events = CE_BITMASK_DEFAULT;
+  change->target_element = EL_EMPTY_SPACE;
 
-  eci->trigger_element = EL_EMPTY_SPACE;
+  change->delay_fixed = 0;
+  change->delay_random = 0;
+  change->delay_frames = -1;	/* later set to reliable default value */
 
-  eci->explode = FALSE;
-  eci->use_content = FALSE;
-  eci->only_complete = FALSE;
-  eci->use_random_change = FALSE;
-  eci->random = 0;
-  eci->power = CP_NON_DESTRUCTIVE;
+  change->trigger_element = EL_EMPTY_SPACE;
+
+  change->explode = FALSE;
+  change->use_content = FALSE;
+  change->only_complete = FALSE;
+  change->use_random_change = FALSE;
+  change->random = 0;
+  change->power = CP_NON_DESTRUCTIVE;
 
   for(x=0; x<3; x++)
     for(y=0; y<3; y++)
-      eci->content[x][y] = EL_EMPTY_SPACE;
+      change->content[x][y] = EL_EMPTY_SPACE;
 
-  eci->player_action = 0;
-  eci->collide_action = 0;
-  eci->other_action = 0;
+  change->player_action = 0;
+  change->collide_action = 0;
+  change->other_action = 0;
 
-  eci->pre_change_function = NULL;
-  eci->change_function = NULL;
-  eci->post_change_function = NULL;
+  change->pre_change_function = NULL;
+  change->change_function = NULL;
+  change->post_change_function = NULL;
 }
 
 static void setLevelInfoToDefaults(struct LevelInfo *level)
@@ -838,6 +840,18 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
 	  SET_CHANGE_EVENT(element, j, TRUE);
 	}
       }
+    }
+  }
+
+  /* initialize "can_change" field for old levels with only one change page */
+  if (level->game_version <= VERSION_IDENT(3,0,2))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      if (CAN_CHANGE(element))
+	element_info[element].change->can_change = TRUE;
     }
   }
 

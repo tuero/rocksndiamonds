@@ -185,9 +185,12 @@
 
 #define CH_EVENT_BIT(c)		(1 << (c))
 #define CH_EVENT_VAR(e)		(element_info[e].change->events)
+#define CH_ANY_EVENT_VAR(e)	(element_info[e].change_events)
 
 #define HAS_CHANGE_EVENT(e,c)	(IS_CUSTOM_ELEMENT(e) &&		  \
 				 (CH_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
+#define HAS_ANY_CHANGE_EVENT(e,c) (IS_CUSTOM_ELEMENT(e) &&		  \
+				 (CH_ANY_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
 #define SET_CHANGE_EVENT(e,c,v)	(IS_CUSTOM_ELEMENT(e) ?			  \
 				 ((v) ?					  \
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
@@ -1233,6 +1236,8 @@ struct DoorInfo
 
 struct ElementChangeInfo
 {
+  boolean can_change;		/* use or ignore this change info */
+
   unsigned long events;		/* bitfield for change events */
 
   short target_element;		/* target element after change */
@@ -1317,9 +1322,12 @@ struct ElementInfo
   int num_change_pages;		/* actual number of change pages */
   int current_change_page;	/* currently edited change page */
 
-  /* ---------- internal values used in game at runtime ---------- */
+  /* ---------- internal values used at runtime when playing ---------- */
 
   unsigned long change_events;	/* bitfield for combined change events */
+
+  int event_page_num[NUM_CHANGE_EVENTS]; /* page number for each event */
+  struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   /* ---------- internal values used in level editor ---------- */
 
