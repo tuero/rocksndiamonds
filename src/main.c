@@ -96,7 +96,9 @@ int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
 int		ZX,ZY, ExitX,ExitY;
 int		AllPlayersGone;
 int		FrameCounter, TimeFrames, TimeLeft;
-int		MampferMax, MampferNr, SiebAktiv;
+int		MampferMax, MampferNr;
+boolean		SiebAktiv;
+int		SiebCount;
 
 boolean		network_player_action_received = FALSE;
 

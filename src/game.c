@@ -389,7 +389,9 @@ void InitGame()
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
-  AllPlayersGone = SiebAktiv = FALSE;
+  AllPlayersGone = FALSE;
+  SiebAktiv = FALSE;
+  SiebCount = 0;
 
   for (i=0; i<MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
@@ -1290,8 +1292,22 @@ void Impact(int x, int y)
   if (!lastline && object_hit)		/* check which object was hit */
   {
     if (CAN_CHANGE(element) && 
-	(smashed == EL_SIEB_LEER || smashed == EL_SIEB2_LEER) && !SiebAktiv)
-      SiebAktiv = level.dauer_sieb * FRAMES_PER_SECOND;
+	(smashed == EL_SIEB_INAKTIV || smashed == EL_SIEB2_INAKTIV))
+    {
+      int x, y;
+      int activated_magic_wall =
+	(smashed == EL_SIEB_INAKTIV ? EL_SIEB_LEER : EL_SIEB2_LEER);
+
+      /* activate magic wall / mill */
+
+      for (y=0; y<lev_fieldy; y++)
+	for (x=0; x<lev_fieldx; x++)
+	  if (Feld[x][y] == smashed)
+	    Feld[x][y] = activated_magic_wall;
+
+      SiebCount = level.dauer_sieb * FRAMES_PER_SECOND;
+      SiebAktiv = TRUE;
+    }
 
     if (IS_PLAYER(x, y+1))
     {
@@ -1884,7 +1900,7 @@ void StartMoving(int x, int y)
 	Store2[x][y] = 0;
       }
     }
-    else if (SiebAktiv && CAN_CHANGE(element) &&
+    else if (CAN_CHANGE(element) &&
 	     (Feld[x][y+1] == EL_SIEB_LEER || Feld[x][y+1] == EL_SIEB2_LEER))
     {
       InitMovingField(x, y, MV_DOWN);
@@ -2794,10 +2810,9 @@ void NussKnacken(int x, int y)
 
 void SiebAktivieren(int x, int y, int typ)
 {
-  if (!(SiebAktiv % 4) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-    DrawGraphic(SCREENX(x), SCREENY(y),
-		(typ == 1 ? GFX_SIEB_VOLL :
-		 GFX_SIEB2_VOLL) + 3 - (SiebAktiv % 16) / 4);
+  int graphic = (typ == 1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL) + 3;
+
+  DrawGraphicAnimation(x, y, graphic, 4, 4, ANIM_REVERSE);
 }
 
 void AusgangstuerPruefen(int x, int y)
@@ -3446,29 +3461,35 @@ void GameActions()
 
   if (SiebAktiv)
   {
-    if (!(SiebAktiv%4))
+    if (!(SiebCount % 4))
       PlaySoundLevel(sieb_x, sieb_y, SND_MIEP);
-    SiebAktiv--;
-    if (!SiebAktiv)
+
+    if (SiebCount > 0)
     {
-      for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+      SiebCount--;
+      if (!SiebCount)
       {
-	element = Feld[x][y];
-	if (element == EL_SIEB_LEER || element == EL_SIEB_VOLL)
+	for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
 	{
-	  Feld[x][y] = EL_SIEB_TOT;
-	  DrawLevelField(x, y);
+	  element = Feld[x][y];
+	  if (element == EL_SIEB_LEER || element == EL_SIEB_VOLL)
+	  {
+	    Feld[x][y] = EL_SIEB_TOT;
+	    DrawLevelField(x, y);
+	  }
+	  else if (element == EL_SIEB2_LEER || element == EL_SIEB2_VOLL)
+	  {
+	    Feld[x][y] = EL_SIEB2_TOT;
+	    DrawLevelField(x, y);
+	  }
 	}
-	else if (element == EL_SIEB2_LEER || element == EL_SIEB2_VOLL)
-	{
-	  Feld[x][y] = EL_SIEB2_TOT;
-	  DrawLevelField(x, y);
-	}
+
+	SiebAktiv = FALSE;
       }
     }
   }
 
-  if (TimeLeft>0 && TimeFrames>=(1000/GameFrameDelay) && !tape.pausing)
+  if (TimeLeft > 0 && TimeFrames >= (1000 / GameFrameDelay) && !tape.pausing)
   {
     TimeFrames = 0;
     TimeLeft--;
@@ -3610,7 +3631,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   jy = player->jy = new_jy;
   StorePlayer[jx][jy] = player->element_nr;
 
-  player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
+  player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / MoveSpeed);
 
   ScrollFigure(player, SCROLL_INIT);
 
@@ -3634,9 +3655,14 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     /* should only happen if pre-1.2 tape recordings are played */
     /* this is only for backward compatibility */
 
+    int old_move_speed = MoveSpeed;
+
 #if DEBUG
     printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES.\n");
 #endif
+
+    /* scroll remaining steps with finest movement resolution */
+    MoveSpeed = 8;
 
     while (player->MovPos)
     {
@@ -3646,6 +3672,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       DrawAllPlayers();
       BackToFront();
     }
+
+    MoveSpeed = old_move_speed;
   }
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
@@ -3780,7 +3808,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   else if (!FrameReached(&player->actual_frame_counter, 1))
     return;
 
-  player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX/8;
+  player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX / MoveSpeed;
   player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
@@ -3820,7 +3848,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
   if (ScreenMovPos)
   {
-    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX/8;
+    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX / MoveSpeed;
     ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
     redraw_mask |= REDRAW_FIELD;
   }

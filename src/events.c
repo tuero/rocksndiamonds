@@ -552,6 +552,22 @@ void HandleKey(KeySym key, int key_status)
 	  break;
 #endif
 
+#if 1
+	case XK_m:
+	  if (MoveSpeed == 8)
+	  {
+	    MoveSpeed = 4;
+	    ScrollStepSize = TILEX/4;
+	  }
+	  else
+	  {
+	    MoveSpeed = 8;
+	    ScrollStepSize = TILEX/8;
+	  }
+	  printf("MoveSpeed == %d\n", MoveSpeed);
+	  break;
+#endif
+
 	case XK_f:
 	  ScrollStepSize = TILEX/8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);

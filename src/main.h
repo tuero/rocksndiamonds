@@ -437,7 +437,9 @@ extern int		BX1,BY1, BX2,BY2;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimeLeft;
-extern int		MampferMax, MampferNr, SiebAktiv;
+extern int		MampferMax, MampferNr;
+extern boolean		SiebAktiv;
+extern int		SiebCount;
 
 extern boolean		network_player_action_received;
 
@@ -548,8 +550,10 @@ extern int		num_bg_loops;
 #define EL_MORAST_VOLL		17
 #define EL_TROPFEN		18
 #define EL_BOMBE		19
-#define EL_SIEB_LEER		20
-#define EL_SIEB_VOLL		21
+#define EL_SIEB_INAKTIV		20
+
+#define EL_UNUSED_21		21
+
 #define EL_SALZSAEURE		22
 #define EL_AMOEBE_NASS		23
 #define EL_AMOEBE_NORM		24
@@ -589,8 +593,10 @@ extern int		num_bg_loops;
 #define EL_ERZ_EDEL_BD		58
 #define EL_ERZ_EDEL_GELB	59
 #define EL_MAMPFER2		60
-#define EL_SIEB2_LEER		61
-#define EL_SIEB2_VOLL		62
+#define EL_SIEB2_INAKTIV	61
+
+#define EL_UNUSED_62		62
+
 #define EL_DYNABOMB		63
 #define EL_DYNABOMB_NR		64
 #define EL_DYNABOMB_SZ		65
@@ -641,10 +647,14 @@ extern int		num_bg_loops;
 #define EL_BADEWANNE3		102
 #define EL_BADEWANNE4		103
 #define EL_BADEWANNE5		104
-#define EL_SIEB_TOT		105
-#define EL_AUSGANG_ACT		106
+
+#define EL_UNUSED_105		105
+#define EL_UNUSED_106		106
+
 #define EL_AUSGANG_AUF		107
-#define EL_SIEB2_TOT		108
+
+#define EL_UNUSED_108		108
+
 #define EL_AMOEBA2DIAM		109
 #define EL_MAULWURF		110
 #define EL_PINGUIN		111
@@ -751,16 +761,25 @@ extern int		num_bg_loops;
 #define EL_UNUSED_254		254
 #define EL_UNUSED_255		255
 
-/* "unreal" runtime elements */
-#define EL_BLOCKED		300
-#define EL_EXPLODING		301
-#define EL_CRACKINGNUT		302
-#define EL_BLURB_LEFT		303
-#define EL_BLURB_RIGHT		304
-#define EL_AMOEBING		305
-#define EL_MAUERND		306
-#define EL_BURNING		307
-#define EL_PLAYER_IS_LEAVING	308
+/* "real" (and therefore drawable) runtime elements */
+#define EL_SIEB_LEER		300
+#define EL_SIEB2_LEER		301
+#define EL_SIEB_VOLL		302
+#define EL_SIEB2_VOLL		303
+#define EL_SIEB_TOT		304
+#define EL_SIEB2_TOT		305
+#define EL_AUSGANG_ACT		306
+
+/* "unreal" (and therefore not drawable) runtime elements */
+#define EL_BLOCKED		400
+#define EL_EXPLODING		401
+#define EL_CRACKINGNUT		402
+#define EL_BLURB_LEFT		403
+#define EL_BLURB_RIGHT		404
+#define EL_AMOEBING		405
+#define EL_MAUERND		406
+#define EL_BURNING		407
+#define EL_PLAYER_IS_LEAVING	408
 
 /* game graphics:
 **	  0 - 209: graphics from "RocksScreen"
@@ -871,9 +890,10 @@ extern int		num_bg_loops;
 #define GFX_SOKOBAN_FELD_VOLL	123
 #define GFX_GEBLUBBER		124
 /* Zeile 8 (128) */
-#define GFX_SIEB_LEER		128
-#define GFX_SIEB_VOLL		GFX_SIEB_LEER
-#define GFX_SIEB_TOT		GFX_SIEB_LEER
+#define GFX_SIEB_INAKTIV	128
+#define GFX_SIEB_LEER		GFX_SIEB_INAKTIV
+#define GFX_SIEB_VOLL		GFX_SIEB_INAKTIV
+#define GFX_SIEB_TOT		GFX_SIEB_INAKTIV
 #define GFX_ERZ_EDEL		132
 #define GFX_ERZ_DIAM		133
 #define GFX_ERZ_EDEL_ROT	134
@@ -906,9 +926,10 @@ extern int		num_bg_loops;
 #define GFX_MAUER_L1		GFX_MAUER_LEFT
 #define GFX_MAUER_L		170
 #define GFX_MAUER_LEBT		171
-#define GFX_SIEB2_LEER		172
-#define GFX_SIEB2_VOLL		GFX_SIEB2_LEER
-#define GFX_SIEB2_TOT		GFX_SIEB2_LEER
+#define GFX_SIEB2_INAKTIV	172
+#define GFX_SIEB2_LEER		GFX_SIEB2_INAKTIV
+#define GFX_SIEB2_VOLL		GFX_SIEB2_INAKTIV
+#define GFX_SIEB2_TOT		GFX_SIEB2_INAKTIV
 /* Zeile 11 (176) */
 #define	GFX_AUSGANG_ZU		176
 #define	GFX_AUSGANG_ACT		177

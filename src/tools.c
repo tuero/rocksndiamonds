@@ -122,10 +122,26 @@ void BackToFront()
       }
 
       if (setup.soft_scrolling ||
-	  ABS(ScreenGfxPos) + ScrollStepSize == TILEX ||
-	  ABS(ScreenGfxPos) == ScrollStepSize ||
+	  ABS(ScreenMovPos) + ScrollStepSize == TILEX ||
+	  ABS(ScreenMovPos) == ScrollStepSize ||
 	  redraw_tiles > REDRAWTILES_THRESHOLD)
+      {
 	XCopyArea(display, buffer, window, gc, fx, fy, SXSIZE, SYSIZE, SX, SY);
+
+#ifdef DEBUG
+#if 0
+	printf("redrawing all (ScreenGfxPos == %d) because %s\n",
+	       ScreenGfxPos,
+	       (setup.soft_scrolling ?
+		"setup.soft_scrolling" :
+		ABS(ScreenGfxPos) + ScrollStepSize == TILEX ?
+		"ABS(ScreenGfxPos) + ScrollStepSize == TILEX" :
+		ABS(ScreenGfxPos) == ScrollStepSize ?
+		"ABS(ScreenGfxPos) == ScrollStepSize" :
+		"redraw_tiles > REDRAWTILES_THRESHOLD"));
+#endif
+#endif
+      }
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
@@ -974,10 +990,10 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     if (element != EL_SP_INFOTRON)
       graphic += phase * (element == EL_FELSBROCKEN ? 2 : 1);
   }
-  else if ((element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
-	    element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL) && SiebAktiv)
+  else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
+	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)
   {
-    graphic += 3 - (SiebAktiv % 8) / 2;
+    graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
   }
   else if (IS_AMOEBOID(element))
   {
@@ -1836,6 +1852,7 @@ int el2gfx(int element)
     case EL_MORAST_VOLL:	return GFX_MORAST_VOLL;
     case EL_TROPFEN:		return GFX_TROPFEN;
     case EL_BOMBE:		return GFX_BOMBE;
+    case EL_SIEB_INAKTIV:	return GFX_SIEB_INAKTIV;
     case EL_SIEB_LEER:		return GFX_SIEB_LEER;
     case EL_SIEB_VOLL:		return GFX_SIEB_VOLL;
     case EL_SIEB_TOT:		return GFX_SIEB_TOT;
@@ -1896,6 +1913,7 @@ int el2gfx(int element)
     case EL_ERZ_EDEL_ROT:	return GFX_ERZ_EDEL_ROT;
     case EL_ERZ_EDEL_LILA:	return GFX_ERZ_EDEL_LILA;
     case EL_MAMPFER2:		return GFX_MAMPFER2;
+    case EL_SIEB2_INAKTIV:	return GFX_SIEB2_INAKTIV;
     case EL_SIEB2_LEER:		return GFX_SIEB2_LEER;
     case EL_SIEB2_VOLL:		return GFX_SIEB2_VOLL;
     case EL_SIEB2_TOT:		return GFX_SIEB2_TOT;
