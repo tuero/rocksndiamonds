@@ -136,8 +136,73 @@ static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
     dst_ptr += bytes_per_row;	/* continue with leftmost byte of next row */
   }
 
-  mask_pixmap = XCreateBitmapFromData(display, window, (char *)mask_data,
-				      image->width, image->height);
+  if ((mask_pixmap = XCreateBitmapFromData(display, window, (char *)mask_data,
+					   image->width, image->height))
+      == None)
+    Error(ERR_EXIT, "Image_to_Mask(): XCreateBitmapFromData() failed");
+
+  free(mask_data);
+
+  return mask_pixmap;
+}
+
+Pixmap Pixmap_to_Mask(Pixmap src_pixmap, int src_width, int src_height)
+{
+  XImage *src_ximage;
+  byte *src_ptr, *dst_ptr, *dst_ptr2;
+  int bits_per_pixel;
+  int bytes_per_pixel;
+  unsigned int bytes_per_row;
+  unsigned int x, y, i;
+  byte bitmask;
+  byte *mask_data;
+  Pixmap mask_pixmap;
+
+  /* copy source pixmap to temporary image */
+  if ((src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
+			      AllPlanes, ZPixmap)) == NULL)
+    Error(ERR_EXIT, "Pixmap_to_Mask(): XGetImage() failed");
+
+  bits_per_pixel = src_ximage->bits_per_pixel;
+  bytes_per_pixel = (bits_per_pixel + 7) / 8;
+
+  bytes_per_row = (src_width + 7) / 8;
+  mask_data = checked_calloc(bytes_per_row * src_height);
+
+  src_ptr = (byte *)src_ximage->data;
+  dst_ptr = mask_data;
+
+  /* create bitmap data which can be used by 'XCreateBitmapFromData()'
+   * directly to create a pixmap of depth 1 for use as a clip mask for
+   * the corresponding image pixmap
+   */
+
+  for (y = 0; y < src_height; y++)
+  {
+    bitmask = 0x01;		/* start with leftmost bit in the byte     */
+    dst_ptr2 = dst_ptr;		/* start with leftmost byte in the row     */
+
+    for (x = 0; x < src_width; x++)
+    {
+      for (i = 0; i < bytes_per_pixel; i++)
+	if (*src_ptr++)		/* source pixel solid? (pixel index != 0)  */
+	  *dst_ptr2 |= bitmask;	/* then write a bit into the image mask    */
+
+      if ((bitmask <<= 1) == 0)	/* bit at rightmost byte position reached? */
+      {
+	bitmask = 0x01;		/* start again with leftmost bit position  */
+	dst_ptr2++;		/* continue with next byte in image mask   */
+      }
+    }
+
+    dst_ptr += bytes_per_row;	/* continue with leftmost byte of next row */
+  }
+
+  if ((mask_pixmap = XCreateBitmapFromData(display, window->drawable,
+					   (char *)mask_data,
+					   src_width, src_height)) == None)
+    Error(ERR_EXIT, "Pixmap_to_Mask(): XCreateBitmapFromData() failed");
+
   free(mask_data);
 
   return mask_pixmap;
@@ -607,15 +672,18 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   }
 
   /* copy source pixmap to temporary image */
-  src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
-			 AllPlanes, ZPixmap);
+  if ((src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
+			      AllPlanes, ZPixmap)) == NULL)
+    Error(ERR_EXIT, "ZoomPixmap(): XGetImage() failed");
 
   bits_per_pixel = src_ximage->bits_per_pixel;
   bytes_per_pixel = (bits_per_pixel + 7) / 8;
 
-  dst_ximage = XCreateImage(display, visual, src_ximage->depth, ZPixmap,
-			    0, NULL, dst_width, dst_height,
-			    8, dst_width * bytes_per_pixel);
+  if ((dst_ximage = XCreateImage(display, visual, src_ximage->depth, ZPixmap,
+				 0, NULL, dst_width, dst_height,
+				 8, dst_width * bytes_per_pixel)) == NULL)
+    Error(ERR_EXIT, "ZoomPixmap(): XCreateImage() failed");
+
   dst_ximage->data =
     checked_malloc(dst_width * dst_height * bytes_per_pixel);
   dst_ximage->byte_order = src_ximage->byte_order;
@@ -638,6 +706,33 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   {
     row_skip = src_width * bytes_per_pixel;
 
+#if 0
+    printf("::: %d, %d -> %d, %d [%d / %d]\n[%ld -> %ld (%ld)] [%ld -> %ld (%ld)]\n",
+	   src_width, src_height,
+	   dst_width, dst_height,
+	   zoom_factor, bytes_per_pixel,
+	   src_ptr,
+	   src_ptr + src_width * src_height * bytes_per_pixel,
+	   src_width * src_height * bytes_per_pixel,
+	   dst_ptr,
+	   dst_ptr + dst_width * dst_height * bytes_per_pixel,
+	   dst_width * dst_height * bytes_per_pixel);
+
+    printf("A\n");
+
+    for (i = 0; i < src_width * src_height * bytes_per_pixel;
+	 i++)
+    {
+      byte x = *(byte *)(src_ptr + i);
+
+      printf("::: %d ...\n", i);
+
+      x = x * 1;
+    }
+
+    printf("B\n");
+#endif
+
     /* scale image up by scaling factor 'zoom_factor' */
     for (y = 0; y < src_height; y++)
     {
@@ -646,11 +741,19 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
 	if (yy > 0)
 	  src_ptr -= row_skip;
 
+#if 0
+	printf("::: [%d -> %ld / %ld]\n", y, src_ptr, dst_ptr);
+#endif
+
 	for (x = 0; x < src_width; x++)
 	{
 	  for (xx = 0; xx < zoom_factor; xx++)
 	    for (i = 0; i < bytes_per_pixel; i++)
+#if 1
 	      *dst_ptr++ = *(src_ptr + i);
+#else
+	      *dst_ptr++ = 0;
+#endif
 
 	  src_ptr += i;
 	}

@@ -31,6 +31,7 @@
 #include <errno.h>
 
 #include "../libgame/platform.h"
+#include "../libgame/libgame.h"
 
 #include "global.h"
 #include "display.h"
@@ -167,6 +168,14 @@ static const int sound_volume[SAMPLE_MAX] = {
 	100,20,100,100,100,100,100,20,100,100,
 	100
 };
+
+static void xdebug(char *msg)
+{
+#if 1
+  XSync(display, False);
+  printf("EM DEBUG: %s\n", msg);
+#endif
+}
 
 int open_all(void)
 {
@@ -347,9 +356,101 @@ int open_all(void)
 
 #if 1
 	for (i = 0; i < 4; i++)
+	{
+	  Pixmap clip_mask;
+
+	  if ((clip_mask = XCreatePixmap(display, window->drawable,
+					 pcxBitmaps[i]->width * 2,
+					 pcxBitmaps[i]->height * 2, 1))
+	      == None)
+	  {
+	    printf("::: cannot create clip mask");
+	    return 1;
+	  }
+
+#if 0
+	  {
+	    XGCValues clip_gc_values;
+	    unsigned long clip_gc_valuemask;
+	    GC gc;
+
+	    clip_gc_values.graphics_exposures = False;
+	    clip_gc_valuemask = GCGraphicsExposures;
+	    if ((gc = XCreateGC(display, clip_mask,
+				clip_gc_valuemask, &clip_gc_values)) == None)
+	    {
+	      printf("X	CreateGC failed\n");
+	      exit(1);
+	    }
+
+	    XFillRectangle(display, clip_mask, gc, 0, 0,
+			   pcxBitmaps[i]->width * 2,
+			   pcxBitmaps[i]->height * 2);
+	  }
+#endif
+
+#if 0
+	  {
+	    byte * src_ptr;
+	    int src_width = pcxBitmaps[i]->width;
+	    int src_height = pcxBitmaps[i]->height;
+
+#if 0
+	    printf("::: %d, %d [%ld -> %ld (%ld)]\n",
+		   src_width, src_height,
+		   src_ptr,
+		   src_ptr + src_width * src_height * 1,
+		   src_width * src_height * 1);
+#endif
+
+#if 0
+	    for (i = src_ptr; i < src_ptr + src_width * src_height * 1; i++)
+	    {
+	      byte x = *(byte *)i;
+
+	      x = x * 1;
+	    }
+#endif
+	  }
+#endif
+
 	  pcxBitmapsX2[i] = ZoomBitmap(pcxBitmaps[i],
 				       pcxBitmaps[i]->width * 2,
 				       pcxBitmaps[i]->height * 2);
+
+#if 1
+
+#if 0
+	  printf("::: CREATING NEW CLIPMASKS ...\n");
+#endif
+#if 1
+	  clip_mask = Pixmap_to_Mask(pcxBitmapsX2[i]->drawable,
+				     pcxBitmapsX2[i]->width,
+				     pcxBitmapsX2[i]->height);
+#endif
+#if 0
+	  printf("::: CREATING NEW CLIPMASKS DONE\n");
+#endif
+
+	  pcxBitmapsX2[i]->clip_mask = clip_mask;
+
+#if 0
+	  printf("::: %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
+		 pcxBitmaps[i]->gc,
+		 pcxBitmaps[i]->clip_mask, pcxBitmapsX2[i]->clip_mask,
+		 pcxBitmaps[i]->width, pcxBitmaps[i]->height,
+		 pcxBitmapsX2[i]->width, pcxBitmapsX2[i]->height);
+#endif
+
+#if 0
+	  ZoomPixmap(display, pcxBitmaps[i]->gc,
+		     pcxBitmaps[i]->clip_mask, pcxBitmapsX2[i]->clip_mask,
+		     pcxBitmaps[i]->width, pcxBitmaps[i]->height,
+		     pcxBitmapsX2[i]->width, pcxBitmapsX2[i]->height);
+#endif
+
+#endif
+	}
 
 	objBitmap = pcxBitmapsX2[0];
 	botBitmap = pcxBitmapsX2[1];
@@ -360,10 +461,12 @@ int open_all(void)
 	botPixmap = pcxBitmapsX2[1]->drawable;
 	sprPixmap = pcxBitmapsX2[2]->drawable;
 	ttlPixmap = pcxBitmapsX2[3]->drawable;
+#if 1
 	objmaskBitmap = pcxBitmapsX2[0]->clip_mask;
 	botmaskBitmap = pcxBitmapsX2[1]->clip_mask;
 	sprmaskBitmap = pcxBitmapsX2[2]->clip_mask;
 	ttlmaskBitmap = pcxBitmapsX2[3]->clip_mask;
+#endif
 #endif
 
 #if 1
@@ -435,6 +538,335 @@ int open_all(void)
 	for(i = 0; i < 3; i++) westKeyCode[i] = keycodes[i + 9];
 	for(i = 0; i < 3; i++) fireKeyCode[i] = keycodes[i + 12];
 	for(i = 0; i < 1; i++) escKeyCode[i] = keycodes[i + 15];
+
+	/* ----------------------------------------------------------------- */
+
+#if 0
+	{
+	  Bitmap *bm = pcxBitmaps[2];
+	  Pixmap clip_mask = bm->clip_mask;
+
+	  if (clip_mask)
+	  {
+#if 1
+	    int width = bm->width;
+	    int height = bm->height;
+#else
+	    int width = 16 * 4;
+	    int height = 16 * 4;
+#endif
+	    XImage *src_ximage = XGetImage(display, clip_mask, 0, 0,
+					   width, height, AllPlanes, ZPixmap);
+	    XImage *dst_ximage = XGetImage(display, xwindow, 0, 0,
+					   width, height, AllPlanes, ZPixmap);
+	    int x, y;
+
+	    if (src_ximage == NULL)
+	    {
+	      printf("src_ximage failed\n");
+	      exit(1);
+	    }
+
+	    if (dst_ximage == NULL)
+	    {
+	      printf("dst_ximage failed\n");
+	      exit(1);
+	    }
+
+	    printf("::: DISPLAY CLIP MASK ...\n");
+
+	    for (x=0; x<width; x++)
+	    {
+	      for (y=0; y<height; y++)
+	      {
+		unsigned long pixel = XGetPixel(src_ximage, x, y);
+
+		if (pixel != BlackPixel(display, screen))
+		  pixel = WhitePixel(display, screen);
+
+		XPutPixel(dst_ximage, x, y, pixel);
+	      }
+	    }
+
+	    printf("::: DISPLAY CLIP MASK NOW\n");
+
+	    XPutImage(display, xwindow, screenGC, dst_ximage, 0, 0,
+		      0, 13 * TILEY, width, height);
+
+	    printf("::: DISPLAY CLIP MASK DONE\n");
+	  }
+	}
+#endif
+
+	/* ----------------------------------------------------------------- */
+
+#if 0
+	{
+	  int ii = 2;
+
+	  XGCValues clip_gc_values;
+	  unsigned long clip_gc_valuemask;
+
+#if 1
+	  GC gc = screenGC;
+#else
+#if 1
+	  GC gc = pcxBitmaps[ii]->stored_clip_gc;
+#else
+	  GC gc = pcxBitmaps[ii]->gc;
+#endif
+#endif
+	  Pixmap src_pixmap = pcxBitmaps[ii]->clip_mask;
+	  Pixmap dst_pixmap = pcxBitmapsX2[ii]->clip_mask;
+	  int src_width = pcxBitmaps[ii]->width;
+	  int src_height = pcxBitmaps[ii]->height;
+	  int dst_width = pcxBitmapsX2[ii]->width;
+	  int dst_height = pcxBitmapsX2[ii]->height;
+
+  XImage *src_ximage, *dst_ximage;
+  byte *src_ptr, *dst_ptr;
+  int bits_per_pixel;
+  int bytes_per_pixel;
+  int x, y, xx, yy, i;
+#if 1
+  boolean scale_down = (src_width > dst_width);
+  int zoom_factor;
+#else
+  int zoom_factor = src_width / dst_width;	/* currently very limited! */
+#endif
+  int row_skip, col_skip;
+
+  printf("::: %d\n", scale_down);
+
+  xdebug("::: ZOOM STEP 1");
+
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  if ((gc = XCreateGC(display, pcxBitmaps[ii]->clip_mask,
+		      clip_gc_valuemask, &clip_gc_values)) == None)
+  {
+    printf("XCreateGC failed\n");
+    exit(1);
+  }
+
+  xdebug("::: ZOOM STEP 2");
+
+  if (scale_down)
+  {
+    zoom_factor = src_width / dst_width;
+
+    /* adjust source image size to integer multiple of destination size */
+    src_width  = dst_width  * zoom_factor;
+    src_height = dst_height * zoom_factor;
+  }
+  else
+  {
+    zoom_factor = dst_width / src_width;
+
+    /* no adjustment needed when scaling up (some pixels may be left blank) */
+  }
+
+  /* copy source pixmap to temporary image */
+  if ((src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
+			      AllPlanes, ZPixmap)) == NULL)
+    Error(ERR_EXIT, "ZoomPixmap(): XGetImage() failed");
+
+  bits_per_pixel = src_ximage->bits_per_pixel;
+  bytes_per_pixel = (bits_per_pixel + 7) / 8;
+
+  printf("::: bits_per_pixel == %d\n", bits_per_pixel);
+
+  if ((dst_ximage = XCreateImage(display, visual, src_ximage->depth, ZPixmap,
+				 0, NULL, dst_width, dst_height,
+				 8, dst_width * bytes_per_pixel)) == NULL)
+    Error(ERR_EXIT, "ZoomPixmap(): XCreateImage() failed");
+
+  dst_ximage->data =
+    checked_malloc(dst_width * dst_height * bytes_per_pixel);
+  dst_ximage->byte_order = src_ximage->byte_order;
+
+  src_ptr = (byte *)src_ximage->data;
+  dst_ptr = (byte *)dst_ximage->data;
+
+  if (scale_down)
+  {
+    col_skip = (zoom_factor - 1) * bytes_per_pixel;
+    row_skip = col_skip * src_width;
+
+    /* scale image down by scaling factor 'zoom_factor' */
+    for (y = 0; y < src_height; y += zoom_factor, src_ptr += row_skip)
+      for (x = 0; x < src_width; x += zoom_factor, src_ptr += col_skip)
+	for (i = 0; i < bytes_per_pixel; i++)
+	  *dst_ptr++ = *src_ptr++;
+  }
+  else
+  {
+    row_skip = src_width * bytes_per_pixel;
+
+#if 1
+    printf("::: %d, %d -> %d, %d [%d / %d]\n[%ld -> %ld (%ld)] [%ld -> %ld (%ld)]\n",
+	   src_width, src_height,
+	   dst_width, dst_height,
+	   zoom_factor, bytes_per_pixel,
+	   src_ptr,
+	   src_ptr + src_width * src_height * bytes_per_pixel,
+	   src_width * src_height * bytes_per_pixel,
+	   dst_ptr,
+	   dst_ptr + dst_width * dst_height * bytes_per_pixel,
+	   dst_width * dst_height * bytes_per_pixel);
+#endif
+
+#if 0
+    printf("A\n");
+
+    for (i = 0; i < src_width * src_height * bytes_per_pixel;
+	 i++)
+    {
+      byte x = *(byte *)(src_ptr + i);
+
+      printf("::: %d ...\n", i);
+
+      x = x * 1;
+    }
+
+    printf("B\n");
+#endif
+
+    /* scale image up by scaling factor 'zoom_factor' */
+    for (y = 0; y < src_height; y++)
+    {
+      for (yy = 0; yy < zoom_factor; yy++)
+      {
+	if (yy > 0)
+	  src_ptr -= row_skip;
+
+#if 0
+	printf("::: [%d -> %ld / %ld]\n", y, src_ptr, dst_ptr);
+#endif
+
+	for (x = 0; x < src_width; x++)
+	{
+	  for (xx = 0; xx < zoom_factor; xx++)
+	    for (i = 0; i < bytes_per_pixel; i++)
+#if 1
+	    {
+#if 0
+	      printf("::: %d\n", *(src_ptr + i));
+#endif
+
+	      *dst_ptr++ = *(src_ptr + i);
+	    }
+#else
+	      *dst_ptr++ = 0;
+#endif
+
+	  src_ptr += i;
+	}
+      }
+    }
+  }
+
+  xdebug("::: ZOOM STEP 9");
+
+  /* copy scaled image to destination pixmap */
+  XPutImage(display, dst_pixmap, gc, dst_ximage, 0, 0, 0, 0,
+	    dst_width, dst_height);
+
+  /* free temporary images */
+  X11DestroyImage(src_ximage);
+  X11DestroyImage(dst_ximage);
+
+
+  xdebug("::: ZOOM DONE");
+
+	}
+#endif
+
+	/* ----------------------------------------------------------------- */
+
+#if 0
+	{
+	  Bitmap *bm = pcxBitmapsX2[2];
+	  Pixmap clip_mask = bm->clip_mask;
+
+	  if (clip_mask)
+	  {
+#if 0
+	    int width = bm->width;
+	    int height = bm->height;
+#else
+	    int width = 16 * 4;
+	    int height = 16 * 4;
+#endif
+	    XImage *src_ximage = XGetImage(display, clip_mask, 0, 0,
+					   width, height, AllPlanes, ZPixmap);
+	    XImage *dst_ximage = XGetImage(display, xwindow, 0, 0,
+					   width, height, AllPlanes, ZPixmap);
+	    int x, y;
+
+	    if (src_ximage == NULL)
+	    {
+	      printf("src_ximage failed\n");
+	      exit(1);
+	    }
+
+	    if (dst_ximage == NULL)
+	    {
+	      printf("dst_ximage failed\n");
+	      exit(1);
+	    }
+
+	    printf("::: DISPLAY CLIP MASK ...\n");
+
+	    for (x=0; x<width; x++)
+	    {
+	      for (y=0; y<height; y++)
+	      {
+		unsigned long pixel = XGetPixel(src_ximage, x, y);
+
+		if (pixel != BlackPixel(display, screen))
+		  pixel = WhitePixel(display, screen);
+
+		XPutPixel(dst_ximage, x, y, pixel);
+	      }
+	    }
+
+	    printf("::: DISPLAY CLIP MASK NOW\n");
+
+	    XPutImage(display, xwindow, screenGC, dst_ximage, 0, 0,
+		      0, 13 * TILEY + height, width, height);
+
+	    printf("::: DISPLAY CLIP MASK DONE\n");
+	  }
+	}
+#endif
+
+	/* ----------------------------------------------------------------- */
+
+#if 0
+	  {
+	    XImage *dst_ximage;
+
+	    printf("::: GET IMAGE ...\n");
+
+	    dst_ximage = XGetImage(display, xwindow, 0, 0,
+				   16, 16, AllPlanes, ZPixmap);
+	    if (dst_ximage == NULL)
+	    {
+	      printf("dst_ximage failed\n");
+	      exit(1);
+	    }
+
+	    printf("::: PUT IMAGE ...\n");
+
+	    XPutImage(display, xwindow, screenGC, dst_ximage, 0, 0,
+		      0, 13 * TILEY, 10, 10);
+
+	    printf("::: PUT IMAGE DONE\n");
+	  }
+#endif
+
+	/* ----------------------------------------------------------------- */
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 	if(arg_silence == 0) {

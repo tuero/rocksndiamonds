@@ -24,7 +24,7 @@ static unsigned short screentiles[14][22]; /* tiles currently on screen */
 static unsigned int colours[8];
 static unsigned int colour_anim;
 
-void xdebug(char *msg)
+static void xdebug(char *msg)
 {
 #if 0
   XSync(display, False);
@@ -182,6 +182,55 @@ static void blitplayer(struct PLAYER *ply)
 		x, y - 14 * TILEY);
       XSetClipMask(display, screenGC, None);
     }
+
+
+#if 0
+
+#if 0
+    printf("::: %ld, %ld\n", objmaskBitmap, sprmaskBitmap);
+#endif
+
+    if (sprmaskBitmap)
+    {
+      int width = 16 * 4;
+      int height = 16 * 4;
+      XImage *src_ximage = XGetImage(display, sprmaskBitmap, 0, 0,
+				     width, height, AllPlanes, ZPixmap);
+      XImage *dst_ximage = XGetImage(display, xwindow, 0, 0,
+				     width, height, AllPlanes, ZPixmap);
+      int x, y;
+
+      if (src_ximage == NULL)
+      {
+	printf("src_ximage failed\n");
+	exit(1);
+      }
+
+      if (dst_ximage == NULL)
+      {
+	printf("dst_ximage failed\n");
+	exit(1);
+      }
+
+      for (x=0; x<width; x++)
+      {
+	for (y=0; y<height; y++)
+	{
+	  unsigned long pixel = XGetPixel(src_ximage, x, y);
+
+	  if (pixel != BlackPixel(display, screen))
+	    pixel = WhitePixel(display, screen);
+
+	  XPutPixel(dst_ximage, x, y, pixel);
+	}
+      }
+
+      XPutImage(display, xwindow, screenGC, dst_ximage, 0, 0, 0, 13 * TILEY,
+		width, height);
+    }
+#endif
+
+
   }
 }
 

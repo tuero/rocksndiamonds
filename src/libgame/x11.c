@@ -106,8 +106,8 @@ static DrawWindow *X11InitWindow()
 #endif
   int screen_width, screen_height;
   int win_xpos, win_ypos;
-  unsigned long pen_fg = WhitePixel(display,screen);
-  unsigned long pen_bg = BlackPixel(display,screen);
+  unsigned long pen_fg = WhitePixel(display, screen);
+  unsigned long pen_bg = BlackPixel(display, screen);
   const int width = video.width, height = video.height;
   int i;
 
