@@ -370,8 +370,7 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   X11FreeBitmapPointers(bitmap);
 #endif
 
-  if (bitmap->source_filename)
-    free(bitmap->source_filename);
+  checked_free(bitmap->source_filename);
   bitmap->source_filename = NULL;
 }
 

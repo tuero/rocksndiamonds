@@ -2025,7 +2025,7 @@ boolean Request(char *text, unsigned int req_state)
   for (ty = 0; ty < MAX_REQUEST_LINES; ty++)
   {
     char text_line[max_request_line_len + 1];
-    int tx, tl, tc;
+    int tx, tl, tc = 0;
 
     if (!*text)
       break;

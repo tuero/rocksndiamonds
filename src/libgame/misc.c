@@ -90,8 +90,7 @@ char *i_to_a(unsigned int i)
 {
   static char *a = NULL;
 
-  if (a != NULL)
-    free(a);
+  checked_free(a);
 
   if (i > 2147483647)	/* yes, this is a kludge */
     i = 2147483647;
@@ -501,8 +500,7 @@ char *getStringToLower(char *s)
 
 void setString(char **old_value, char *new_value)
 {
-  if (*old_value != NULL)
-    free(*old_value);
+  checked_free(*old_value);
 
   *old_value = getStringCopy(new_value);
 }
@@ -784,7 +782,7 @@ void Error(int mode, char *format, ...)
 
 
 /* ------------------------------------------------------------------------- */
-/* memory allocation functions                                               */
+/* checked memory allocation and freeing functions                           */
 /* ------------------------------------------------------------------------- */
 
 void *checked_malloc(unsigned long size)
@@ -819,6 +817,12 @@ void *checked_realloc(void *ptr, unsigned long size)
     Error(ERR_EXIT, "cannot allocate %d bytes -- out of memory", size);
 
   return ptr;
+}
+
+void checked_free(void *ptr)
+{
+  if (ptr != NULL)	/* this check should be done by free() anyway */
+    free(ptr);
 }
 
 
@@ -1480,8 +1484,7 @@ boolean fileHasPrefix(char *basename, char *prefix)
   static char *basename_lower = NULL;
   int basename_length, prefix_length;
 
-  if (basename_lower != NULL)
-    free(basename_lower);
+  checked_free(basename_lower);
 
   if (basename == NULL || prefix == NULL)
     return FALSE;
@@ -1503,8 +1506,7 @@ boolean fileHasSuffix(char *basename, char *suffix)
   static char *basename_lower = NULL;
   int basename_length, suffix_length;
 
-  if (basename_lower != NULL)
-    free(basename_lower);
+  checked_free(basename_lower);
 
   if (basename == NULL || suffix == NULL)
     return FALSE;

@@ -8918,13 +8918,10 @@ void InitPlayLevelSound()
 {
   int num_sounds = getSoundListSize();
 
-  if (loop_sound_frame != NULL)
-    free(loop_sound_frame);
+  checked_free(loop_sound_frame);
+  checked_free(loop_sound_volume);
 
-  if (loop_sound_volume != NULL)
-    free(loop_sound_volume);
-
-  loop_sound_frame = checked_calloc(num_sounds * sizeof(int));
+  loop_sound_frame  = checked_calloc(num_sounds * sizeof(int));
   loop_sound_volume = checked_calloc(num_sounds * sizeof(int));
 }
 

@@ -112,7 +112,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
@@ -136,7 +136,7 @@ SRCS =	main.c		\
 	conf_gfx.c	\
 	conf_snd.c	\
 	conf_mus.c	\
-	conf_dem.c	\
+	conf_hlp.c	\
 	init.c		\
 	config.c	\
 	events.c	\
@@ -154,7 +154,7 @@ OBJS =	main.o		\
 	conf_gfx.o	\
 	conf_snd.o	\
 	conf_mus.o	\
-	conf_dem.o	\
+	conf_hlp.o	\
 	init.o		\
 	config.o	\
 	events.o	\

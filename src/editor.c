@@ -3075,8 +3075,7 @@ static void ReinitializeElementList()
   int pos = 0;
   int i, j;
 
-  if (editor_elements != NULL)
-    free(editor_elements);
+  checked_free(editor_elements);
 
   if (!initialized)
   {
@@ -5533,8 +5532,7 @@ char *getElementDescriptionFilename(int element)
   static char *filename = NULL;
   char basename[MAX_FILENAME_LEN];
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   /* 1st try: look for element description file for exactly this element */
   sprintf(basename, "%s.txt", element_info[element].token_name);

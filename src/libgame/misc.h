@@ -109,6 +109,7 @@ void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
+void checked_free(void *);
 
 inline void swap_numbers(int *, int *);
 inline void swap_number_pairs(int *, int *, int *, int *);

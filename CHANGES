@@ -1,4 +1,4 @@
-Release Version 3.0.8 [13 DEC 2003]
+Release Version 3.0.8 [14 DEC 2003]
 -----------------------------------
 	- added "musicinfo.conf" for menu and level music configuration
 	- added "editorsetup.conf" for editor element list configuration
@@ -16,6 +16,23 @@ Release Version 3.0.8 [13 DEC 2003]
 	- fixed bug with double nut cracking sound
 	- fixed a very nasty bug in dragon turning code in TurnRoundExt()
 	- finally fixed tape recording when player is created from CE change
+	- added new contributed levels from the following players:
+	  + Audrius Saikunas (4 levels)
+	  + Efraim Yawitz (20 levels)
+	  + Krystian Abramowicz (100 levels)
+	  + Paul E Collins (formerly known as Equinox Tetrachloride; 64 levels)
+	  + Sebastian Simon (12 levels)
+	- amazing new level set:
+	  + "BD2K3" from Alan Bond
+	  + 43 levels full of BD nostalgia, action and fantastic effects
+	  + overwhelming use of custom elements
+	  + complete artwork set with graphics, sounds and music
+	  + available as a separate download from www.artsoft.org
+	- another great level set was updated:
+	  + "jue2" from Jürgen Bonhagen
+	  + 15 new mind-boggling levels full of new challenges for your brain
+	  + complete artwork set with graphics and sounds
+	  + available for downloading from "http://www.jb-line.de/rnd.html"
 
 Release Version 3.0.7 [10 NOV 2003]
 -----------------------------------

@@ -378,8 +378,7 @@ Status XStringListToTextProperty(char **list, int count,
 
 void XFree(void *data)
 {
-  if (data)
-    free(data);
+  checked_free(data);
 }
 
 GC XCreateGC(Display *display, Drawable d, unsigned long value_mask,
@@ -598,11 +597,9 @@ void XFreePixmap(Display *display, Pixmap pixmap)
 
 void XFreeGC(Display *display, GC gc)
 {
-  XGCValues *gcv;
+  XGCValues *gcv = (XGCValues *)gc;
 
-  gcv = (XGCValues *)gc;
-  if (gcv)
-    free(gcv);
+  checked_free(gcv);
 }
 
 void XUnmapWindow(Display *display, Window window)
@@ -616,11 +613,8 @@ void XCloseDisplay(Display *display)
   if (is_screen_bitmap(bitmap))
     destroy_bitmap(bitmap);
 
-  if (display->screens)
-    free(display->screens);
-
-  if (display)
-    free(display);
+  checked_free(display->screens);
+  checked_free(display);
 
   /* return to text mode (or DOS box on Windows screen) */
   set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);

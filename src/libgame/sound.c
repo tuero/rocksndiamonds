@@ -569,8 +569,7 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
 				     &setup.override_level_sounds :
 				     &setup.override_level_music);
 
-  if (set_identifier)
-    free(set_identifier);
+  checked_free(set_identifier);
 
   set_identifier = checked_malloc(snd_ctrl->data_len);
 
@@ -579,16 +578,12 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
 
   if (ti == NULL)
     ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
-  if (leveldir_current->fullpath != NULL)
-    free(leveldir_current->fullpath);
-  if (leveldir_current->sounds_path != NULL)
-    free(leveldir_current->sounds_path);
-  if (leveldir_current->music_path != NULL)
-    free(leveldir_current->music_path);
-  if (ti->basepath != NULL)
-    free(ti->basepath);
-  if (ti->fullpath != NULL)
-    free(ti->fullpath);
+
+  checked_free(leveldir_current->fullpath);
+  checked_free(leveldir_current->sounds_path);
+  checked_free(leveldir_current->music_path);
+  checked_free(ti->basepath);
+  checked_free(ti->fullpath);
 
   if (read(audio.mixer_pipe[0], set_identifier,
 	   snd_ctrl->data_len) != snd_ctrl->data_len ||
@@ -2387,8 +2382,7 @@ void FreeSound(void *ptr)
 #endif
   }
 
-  if (sound->source_filename)
-    free(sound->source_filename);
+  checked_free(sound->source_filename);
 
   free(sound);
 }

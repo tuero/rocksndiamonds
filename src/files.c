@@ -2919,7 +2919,7 @@ static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
       getStringCopy(value != NULL && *value != '\0' ? value : UNKNOWN_NAME);
   }
 
-  tmp_music_file_info.basename = basename;
+  tmp_music_file_info.basename = getStringCopy(basename);
   tmp_music_file_info.music = music;
   tmp_music_file_info.is_sound = is_sound;
 
@@ -2975,23 +2975,17 @@ void LoadMusicInfo()
   {
     next = music_file_info->next;
 
-    if (music_file_info->title_header)
-      free(music_file_info->title_header);
-    if (music_file_info->artist_header)
-      free(music_file_info->artist_header);
-    if (music_file_info->album_header)
-      free(music_file_info->album_header);
-    if (music_file_info->year_header)
-      free(music_file_info->year_header);
+    checked_free(music_file_info->basename);
 
-    if (music_file_info->title)
-      free(music_file_info->title);
-    if (music_file_info->artist)
-      free(music_file_info->artist);
-    if (music_file_info->album)
-      free(music_file_info->album);
-    if (music_file_info->year)
-      free(music_file_info->year);
+    checked_free(music_file_info->title_header);
+    checked_free(music_file_info->artist_header);
+    checked_free(music_file_info->album_header);
+    checked_free(music_file_info->year_header);
+
+    checked_free(music_file_info->title);
+    checked_free(music_file_info->artist);
+    checked_free(music_file_info->album);
+    checked_free(music_file_info->year);
 
     free(music_file_info);
 

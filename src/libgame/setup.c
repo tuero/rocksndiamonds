@@ -97,8 +97,7 @@ static char *getUserLevelDir(char *level_subdir)
   char *data_dir = getUserDataDir();
   char *userlevel_subdir = LEVELS_DIRECTORY;
 
-  if (userlevel_dir)
-    free(userlevel_dir);
+  checked_free(userlevel_dir);
 
   if (level_subdir != NULL)
     userlevel_dir = getPath3(data_dir, userlevel_subdir, level_subdir);
@@ -114,8 +113,7 @@ static char *getScoreDir(char *level_subdir)
   char *data_dir = getCommonDataDir();
   char *score_subdir = SCORES_DIRECTORY;
 
-  if (score_dir)
-    free(score_dir);
+  checked_free(score_dir);
 
   if (level_subdir != NULL)
     score_dir = getPath3(data_dir, score_subdir, level_subdir);
@@ -131,8 +129,7 @@ static char *getLevelSetupDir(char *level_subdir)
   char *data_dir = getUserDataDir();
   char *levelsetup_subdir = LEVELSETUP_DIRECTORY;
 
-  if (levelsetup_dir)
-    free(levelsetup_dir);
+  checked_free(levelsetup_dir);
 
   if (level_subdir != NULL)
     levelsetup_dir = getPath3(data_dir, levelsetup_subdir, level_subdir);
@@ -149,8 +146,7 @@ static char *getLevelDirFromTreeInfo(TreeInfo *node)
   if (node == NULL)
     return options.level_directory;
 
-  if (level_dir)
-    free(level_dir);
+  checked_free(level_dir);
 
   level_dir = getPath2((node->user_defined ? getUserLevelDir(NULL) :
 			options.level_directory), node->fullpath);
@@ -169,8 +165,7 @@ static char *getTapeDir(char *level_subdir)
   char *data_dir = getUserDataDir();
   char *tape_subdir = TAPES_DIRECTORY;
 
-  if (tape_dir)
-    free(tape_dir);
+  checked_free(tape_dir);
 
   if (level_subdir != NULL)
     tape_dir = getPath3(data_dir, tape_subdir, level_subdir);
@@ -186,8 +181,7 @@ static char *getSolutionTapeDir()
   char *data_dir = getCurrentLevelDir();
   char *tape_subdir = TAPES_DIRECTORY;
 
-  if (tape_dir)
-    free(tape_dir);
+  checked_free(tape_dir);
 
   tape_dir = getPath2(data_dir, tape_subdir);
 
@@ -201,8 +195,7 @@ static char *getDefaultGraphicsDir(char *graphics_subdir)
   if (graphics_subdir == NULL)
     return options.graphics_directory;
 
-  if (graphics_dir)
-    free(graphics_dir);
+  checked_free(graphics_dir);
 
   graphics_dir = getPath2(options.graphics_directory, graphics_subdir);
 
@@ -216,8 +209,7 @@ static char *getDefaultSoundsDir(char *sounds_subdir)
   if (sounds_subdir == NULL)
     return options.sounds_directory;
 
-  if (sounds_dir)
-    free(sounds_dir);
+  checked_free(sounds_dir);
 
   sounds_dir = getPath2(options.sounds_directory, sounds_subdir);
 
@@ -231,8 +223,7 @@ static char *getDefaultMusicDir(char *music_subdir)
   if (music_subdir == NULL)
     return options.music_directory;
 
-  if (music_dir)
-    free(music_dir);
+  checked_free(music_dir);
 
   music_dir = getPath2(options.music_directory, music_subdir);
 
@@ -290,8 +281,7 @@ static char *getSetupArtworkDir(TreeInfo *ti)
 {
   static char *artwork_dir = NULL;
 
-  if (artwork_dir != NULL)
-    free(artwork_dir);
+  checked_free(artwork_dir);
 
   artwork_dir = getPath2(ti->basepath, ti->fullpath);
 
@@ -309,8 +299,7 @@ char *setLevelArtworkDir(TreeInfo *ti)
   artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
   artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
 
-  if (*artwork_path_ptr != NULL)
-    free(*artwork_path_ptr);
+  checked_free(*artwork_path_ptr);
 
   if ((level_artwork = getTreeInfoFromIdentifier(ti, *artwork_set_ptr)))
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
@@ -325,8 +314,7 @@ char *setLevelArtworkDir(TreeInfo *ti)
 
     char *dir = getPath2(getCurrentLevelDir(), ARTWORK_DIRECTORY(ti->type));
 
-    if (*artwork_set_ptr != NULL)
-      free(*artwork_set_ptr);
+    checked_free(*artwork_set_ptr);
 
     if (fileExists(dir))
     {
@@ -366,8 +354,7 @@ char *getLevelFilename(int nr)
   static char *filename = NULL;
   char basename[MAX_FILENAME_LEN];
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   if (nr < 0)
     sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
@@ -384,8 +371,7 @@ char *getTapeFilename(int nr)
   static char *filename = NULL;
   char basename[MAX_FILENAME_LEN];
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
   filename = getPath2(getTapeDir(leveldir_current->filename), basename);
@@ -398,8 +384,7 @@ char *getSolutionTapeFilename(int nr)
   static char *filename = NULL;
   char basename[MAX_FILENAME_LEN];
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
   filename = getPath2(getSolutionTapeDir(), basename);
@@ -412,8 +397,7 @@ char *getScoreFilename(int nr)
   static char *filename = NULL;
   char basename[MAX_FILENAME_LEN];
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   sprintf(basename, "%03d.%s", nr, SCOREFILE_EXTENSION);
   filename = getPath2(getScoreDir(leveldir_current->filename), basename);
@@ -425,8 +409,7 @@ char *getSetupFilename()
 {
   static char *filename = NULL;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   filename = getPath2(getSetupDir(), SETUP_FILENAME);
 
@@ -437,8 +420,7 @@ char *getEditorSetupFilename()
 {
   static char *filename = NULL;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   filename = getPath2(getSetupDir(), EDITORSETUP_FILENAME);
 
@@ -449,8 +431,7 @@ char *getHelpAnimFilename()
 {
   static char *filename = NULL;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   filename = getPath2(getCurrentLevelDir(), HELPANIM_FILENAME);
 
@@ -461,8 +442,7 @@ char *getHelpTextFilename()
 {
   static char *filename = NULL;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   filename = getPath2(getCurrentLevelDir(), HELPTEXT_FILENAME);
 
@@ -488,8 +468,7 @@ char *getLevelSetInfoFilename()
 
   for (i = 0; basenames[i] != NULL; i++)
   {
-    if (filename != NULL)
-      free(filename);
+    checked_free(filename);
 
     filename = getPath2(getCurrentLevelDir(), basenames[i]);
     if (fileExists(filename))
@@ -518,8 +497,7 @@ static char *getCorrectedArtworkBasename(char *basename)
     {
       static char *msdos_filename = NULL;
 
-      if (msdos_filename != NULL)
-	free(msdos_filename);
+      checked_free(msdos_filename);
 
       msdos_filename = getStringCopy(basename_corrected);
       strncpy(&msdos_filename[8], &basename[strlen(basename) - (1+3)], 1+3 +1);
@@ -537,8 +515,7 @@ char *getCustomImageFilename(char *basename)
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   basename = getCorrectedArtworkBasename(basename);
 
@@ -596,8 +573,7 @@ char *getCustomSoundFilename(char *basename)
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   basename = getCorrectedArtworkBasename(basename);
 
@@ -655,8 +631,7 @@ char *getCustomMusicFilename(char *basename)
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   basename = getCorrectedArtworkBasename(basename);
 
@@ -730,8 +705,7 @@ char *getCustomArtworkLevelConfigFilename(int type)
 {
   static char *filename = NULL;
 
-  if (filename != NULL)
-    free(filename);
+  checked_free(filename);
 
   filename = getPath2(getLevelArtworkDir(type), ARTWORKINFO_FILENAME(type));
 
@@ -743,8 +717,7 @@ char *getCustomMusicDirectory(void)
   static char *directory = NULL;
   boolean skip_setup_artwork = FALSE;
 
-  if (directory != NULL)
-    free(directory);
+  checked_free(directory);
 
   if (!setup.override_level_music)
   {
@@ -1268,12 +1241,12 @@ void freeSetupFileList(SetupFileList *list)
   if (list == NULL)
     return;
 
-  if (list->token)
-    free(list->token);
-  if (list->value)
-    free(list->value);
+  checked_free(list->token);
+  checked_free(list->value);
+
   if (list->next)
     freeSetupFileList(list->next);
+
   free(list);
 }
 
@@ -1295,8 +1268,7 @@ SetupFileList *setListEntry(SetupFileList *list, char *token, char *value)
 
   if (strcmp(list->token, token) == 0)
   {
-    if (list->value)
-      free(list->value);
+    checked_free(list->value);
 
     list->value = getStringCopy(value);
 
@@ -1805,40 +1777,26 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
 
 static void freeTreeInfo(TreeInfo *ldi)
 {
-  if (ldi->filename)
-    free(ldi->filename);
-  if (ldi->fullpath)
-    free(ldi->fullpath);
-  if (ldi->basepath)
-    free(ldi->basepath);
-  if (ldi->identifier)
-    free(ldi->identifier);
+  checked_free(ldi->filename);
+  checked_free(ldi->fullpath);
+  checked_free(ldi->basepath);
+  checked_free(ldi->identifier);
 
-  if (ldi->name)
-    free(ldi->name);
-  if (ldi->name_sorting)
-    free(ldi->name_sorting);
-  if (ldi->author)
-    free(ldi->author);
+  checked_free(ldi->name);
+  checked_free(ldi->name_sorting);
+  checked_free(ldi->author);
 
-  if (ldi->class_desc)
-    free(ldi->class_desc);
+  checked_free(ldi->class_desc);
 
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
-    if (ldi->graphics_set)
-      free(ldi->graphics_set);
-    if (ldi->sounds_set)
-      free(ldi->sounds_set);
-    if (ldi->music_set)
-      free(ldi->music_set);
+    checked_free(ldi->graphics_set);
+    checked_free(ldi->sounds_set);
+    checked_free(ldi->music_set);
 
-    if (ldi->graphics_path)
-      free(ldi->graphics_path);
-    if (ldi->sounds_path)
-      free(ldi->sounds_path);
-    if (ldi->music_path)
-      free(ldi->music_path);
+    checked_free(ldi->graphics_path);
+    checked_free(ldi->sounds_path);
+    checked_free(ldi->music_path);
   }
 }
 
@@ -1872,8 +1830,7 @@ void setSetupInfo(struct TokenInfo *token_info,
       break;
 
     case TYPE_STRING:
-      if (*(char **)setup_value != NULL)
-	free(*(char **)setup_value);
+      checked_free(*(char **)setup_value);
       *(char **)setup_value = getStringCopy(token_value);
       break;
 
@@ -2437,8 +2394,7 @@ static TreeInfo *getDummyArtworkInfo(int type)
   artwork_new->fullpath = getStringCopy(UNDEFINED_FILENAME);
   artwork_new->basepath = getStringCopy(UNDEFINED_FILENAME);
 
-  if (artwork_new->name != NULL)
-    free(artwork_new->name);
+  checked_free(artwork_new->name);
 
   artwork_new->identifier   = getStringCopy(UNDEFINED_FILENAME);
   artwork_new->name         = getStringCopy(UNDEFINED_FILENAME);

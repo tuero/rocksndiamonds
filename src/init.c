@@ -614,9 +614,9 @@ void InitElementGraphicInfo()
 
     for (act = 0; act < NUM_ACTIONS; act++)
     {
-      boolean act_remove = ((IS_DIGGABLE(i)    && act == ACTION_DIGGING)  ||
-			    (IS_SNAPPABLE(i)   && act == ACTION_SNAPPING) ||
-			    (IS_COLLECTIBLE(i) && act == ACTION_COLLECTING));
+      boolean act_remove = (act == ACTION_DIGGING ||
+			    act == ACTION_SNAPPING ||
+			    act == ACTION_COLLECTING);
       boolean act_turning = (act == ACTION_TURNING_FROM_LEFT ||
 			     act == ACTION_TURNING_FROM_RIGHT ||
 			     act == ACTION_TURNING_FROM_UP ||
@@ -967,8 +967,7 @@ static void InitGraphicInfo()
   GC copy_clipmask_gc = None;
 #endif
 
-  if (graphic_info != NULL)
-    free(graphic_info);
+  checked_free(graphic_info);
 
   graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
 
@@ -1265,8 +1264,7 @@ static void InitSoundInfo()
   int num_sounds = getSoundListSize();
   int i, j;
 
-  if (sound_info != NULL)
-    free(sound_info);
+  checked_free(sound_info);
 
   sound_effect_properties = checked_calloc(num_sounds * sizeof(int));
   sound_info = checked_calloc(num_sounds * sizeof(struct SoundInfo));
@@ -1497,8 +1495,7 @@ static void InitMusicInfo()
   int num_music = getMusicListSize();
   int i, j;
 
-  if (music_info != NULL)
-    free(music_info);
+  checked_free(music_info);
 
   music_info = checked_calloc(num_music * sizeof(struct MusicInfo));
 
