@@ -2112,7 +2112,7 @@ void InitMovDir(int x, int y)
 	{
 #if 1
 	  /* use random direction as default start direction */
-	  if (game.engine_version >= VERSION_IDENT(3,1,0,2))
+	  if (game.engine_version >= VERSION_IDENT(3,1,0,0))
 	    MovDir[x][y] = 1 << RND(4);
 #endif
 
@@ -2923,9 +2923,19 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   TestIfPlayerTouchesCustomElement(jx, jy);
 #endif
 
-#if 1
+#if 0
+  printf("::: %d,%d: %d\n", jx, jy-1, Changed[jx][jy-1]);
+#endif
+
+#if 0
+#if 0
+  /* needed to allow change of walkable custom element by entering player */
+  if (!(Changed[jx][jy] & CH_EVENT_BIT(CE_ENTERED_BY_PLAYER)))
+    Changed[jx][jy] = 0;	/* allow another change (but prevent loop) */
+#else
   /* needed to allow change of walkable custom element by entering player */
   Changed[jx][jy] = 0;		/* allow another change */
+#endif
 #endif
 
 #if 0
@@ -5426,7 +5436,7 @@ void StartMoving(int x, int y)
 
 #if 1
     if (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
-	CheckCollision[x][y] && IN_LEV_FIELD_AND_NOT_FREE(newx, newy))
+	CheckCollision[x][y] && !IN_LEV_FIELD_AND_IS_FREE(newx, newy))
 #else
     if (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
 	WasJustMoving[x][y] && IN_LEV_FIELD(newx, newy) &&
@@ -7463,7 +7473,9 @@ static void ChangeElementNowExt(int x, int y, int target_element)
       DrawLevelFieldCrumbledSandNeighbours(x, y);
   }
 
+#if 0
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
+#endif
 
 #if 0
   TestIfBadThingTouchesHero(x, y);
@@ -7471,8 +7483,13 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   TestIfElementTouchesCustomElement(x, y);
 #endif
 
+  /* "Changed[][]" not set yet to allow "entered by player" change one time */
   if (ELEM_IS_PLAYER(target_element))
     RelocatePlayer(x, y, target_element);
+
+#if 1
+  Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
+#endif
 
 #if 1
   TestIfBadThingTouchesHero(x, y);
@@ -7559,6 +7576,16 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
 	continue;
       }
+
+#if 0
+      if (Changed[ex][ey])	/* do not change already changed elements */
+      {
+	can_replace[xx][yy] = FALSE;
+	complete_replace = FALSE;
+
+	continue;
+      }
+#endif
 
       e = Feld[ex][ey];
 
@@ -9818,7 +9845,8 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       TestIfPlayerTouchesCustomElement(jx, jy);
 #if 1
 #if 1
-      /* needed because pushed element has not yet reached its destination */
+      /* needed because pushed element has not yet reached its destination,
+	 so it would trigger a change event at its previous field location */
       if (!player->is_pushing)
 #endif
 	TestIfElementTouchesCustomElement(jx, jy);	/* for empty space */
@@ -11761,11 +11789,11 @@ boolean DropElement(struct PlayerInfo *player)
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
 
 #if 1
-      Changed[dropx][dropy] = 0;	/* allow another change */
-      CheckCollision[dropx][dropy] = 2;
+    Changed[dropx][dropy] = 0;		/* allow another change */
+    CheckCollision[dropx][dropy] = 2;
 #else
 
-    if (IN_LEV_FIELD(nextx, nexty) && IS_FREE(nextx, nexty))
+    if (IN_LEV_FIELD_AND_IS_FREE(nextx, nexty))
     {
 #if 0
       WasJustMoving[dropx][dropy] = 3;
@@ -11776,7 +11804,8 @@ boolean DropElement(struct PlayerInfo *player)
 #endif
 #endif
     }
-#if 1
+#if 0
+    /* !!! commented out from 3.1.0-4 to 3.1.0-5 !!! */
     else
     {
       Changed[dropx][dropy] = 0;	/* allow another change */

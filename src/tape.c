@@ -962,7 +962,7 @@ byte *TapePlayAction()
 	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
     }
 
-    if (TimePlayed > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
+    if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
       return NULL;
@@ -1558,9 +1558,15 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	}
 	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
+#if 1
+	  if (tape.warp_forward)
+	    TapeStopWarpForward();
+#else
+	  tape.warp_forward = FALSE;
+#endif
 	  tape.fast_forward = FALSE;
 	  tape.pause_before_death = FALSE;
-	  tape.warp_forward = FALSE;
+
 #if 1
 	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF | VIDEO_STATE_PLAY_ON, 0);
 #else

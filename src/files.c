@@ -228,6 +228,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].use_gfx_element = FALSE;
       element_info[element].gfx_element = EL_EMPTY_SPACE;
+
+      element_info[element].modified_settings = FALSE;
     }
 
     if (IS_CUSTOM_ELEMENT(element) ||
@@ -282,8 +284,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       /* now set default properties */
       SET_PROPERTY(element, EP_CAN_MOVE_INTO_ACID, TRUE);
-
-      element_info[element].modified_settings = FALSE;
     }
 
     if (IS_GROUP_ELEMENT(element) ||
@@ -2272,7 +2272,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   }
 
   /* initialize "can_explode" field for old levels which did not store this */
-  if (level->game_version <= VERSION_IDENT(3,1,0,2))
+  if (level->game_version <= VERSION_IDENT(3,1,0,0))
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {

@@ -1,3 +1,14 @@
+2004-05-10
+	* fixed bug with missing initialization of "modified" flag for GEs
+
+2004-05-09
+	* fixed bug that caused endless recursion loop when relocating player
+	* fixed tape recorder bug in "step mode" when using "pause before end"
+	* fixed tape recorder bug when changing from "warp forward" mode
+
+2004-05-08
+	* fixed bug with "when touching" for pushed elements at last position
+
 2004-05-05
 	* fixed bug that caused two activated toolbox buttons in level editor
 	* fixed bug with exploding dynabomb under player due to other explosion
