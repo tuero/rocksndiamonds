@@ -68,11 +68,17 @@
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_BUTTONS + ED_NUM_CTRL2_BUTTONS)
 
-/* values for other gadgets */
-#define ED_SCORE_XPOS		TILEX
-#define ED_SCORE_YPOS		(7 * TILEY)
+/* values for counter gadgets */
 #define ED_COUNT_VALUE_XOFFSET	5
 #define ED_COUNT_VALUE_YOFFSET	3
+#define ED_COUNT_SCORE_XPOS	(TILEX)
+#define ED_COUNT_SCORE_YPOS	(14 * MINI_TILEY)
+#define ED_COUNT_ELEMCONT_XPOS	(TILEX)
+#define ED_COUNT_ELEMCONT_YPOS	(17 * MINI_TILEY)
+
+/* values for element content drawing areas */
+#define ED_AREA_ELEMCONT_XPOS	(TILEX)
+#define ED_AREA_ELEMCONT_YPOS	(10 * TILEY)
 
 /* control button identifiers */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
@@ -101,16 +107,21 @@
 /* counter button identifiers */
 #define ED_CTRL_ID_SCORE_DOWN		22
 #define ED_CTRL_ID_SCORE_UP		23
+#define ED_CTRL_ID_ELEMCONT_DOWN	24
+#define ED_CTRL_ID_ELEMCONT_UP		25
 
 /* drawing area identifiers */
-#define ED_CTRL_ID_DRAWING_LEVEL	24
+#define ED_CTRL_ID_DRAWING_LEVEL	26
+#define ED_CTRL_ID_ELEMCONT_0		27
+#define ED_CTRL_ID_ELEMCONT_7		34
 
-#define ED_NUM_GADGETS			25
+#define ED_NUM_GADGETS			35
 
 /* values for counter gadgets */
 #define ED_COUNTER_SCORE		0
+#define ED_COUNTER_ELEMCONT		1
 
-#define ED_NUM_COUNTERS			1
+#define ED_NUM_COUNTERS			2
 
 static struct
 {
@@ -118,7 +129,10 @@ static struct
   int gadget_id;
 } counter_info[ED_NUM_COUNTERS] =
 {
-  { ED_SCORE_XPOS,	ED_SCORE_YPOS,		ED_CTRL_ID_SCORE_DOWN }
+  { ED_COUNT_SCORE_XPOS,	ED_COUNT_SCORE_YPOS,
+    ED_CTRL_ID_SCORE_DOWN },
+  { ED_COUNT_ELEMCONT_XPOS,	ED_COUNT_ELEMCONT_YPOS,
+    ED_CTRL_ID_ELEMCONT_DOWN }
 };
 
 /* forward declaration for internal use */
@@ -134,6 +148,7 @@ static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 
+static short ElementContent[8][3][3];
 static short OrigBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
@@ -149,6 +164,7 @@ static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
 
 /* pointer to score value */
 static int *gadget_score_value;
+static int *gadget_areas_value;
 
 static int level_xpos,level_ypos;
 static int edit_mode;
@@ -584,43 +600,46 @@ static void CreateControlButtons()
   }
 }
 
-static void CreateCounterButtons(int counter_id)
+static void CreateCounterButtons()
 {
-  int i;
+  int i, j;
 
-  for (i=0; i<2; i++)
+  for (i=0; i<ED_NUM_COUNTERS; i++)
   {
-    Pixmap gd_pixmap = pix[PIX_DOOR];
-    struct GadgetInfo *gi;
-    int gd_xoffset;
-    int gd_x1, gd_x2, gd_y;
-    int id = counter_info[counter_id].gadget_id + i;
-    unsigned long event_mask;
+    for (j=0; j<2; j++)
+    {
+      Pixmap gd_pixmap = pix[PIX_DOOR];
+      struct GadgetInfo *gi;
+      int gd_xoffset;
+      int gd_x1, gd_x2, gd_y;
+      int id = counter_info[i].gadget_id + j;
+      unsigned long event_mask;
 
-    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    gd_xoffset = (i == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
-    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
-    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
-    gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
+      gd_xoffset = (j == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
+      gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+      gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+      gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
 
-    gi = CreateGadget(GDI_CUSTOM_ID, id,
-		      GDI_X, SX + counter_info[counter_id].x + gd_xoffset,
-		      GDI_Y, SY + counter_info[counter_id].y,
-		      GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
-		      GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
-		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
-		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
-		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleCounterButtons,
-		      GDI_END);
+      gi = CreateGadget(GDI_CUSTOM_ID, id,
+			GDI_X, SX + counter_info[i].x + gd_xoffset,
+			GDI_Y, SY + counter_info[i].y,
+			GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
+			GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
+			GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+			GDI_STATE, GD_BUTTON_UNPRESSED,
+			GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+			GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+			GDI_EVENT_MASK, event_mask,
+			GDI_CALLBACK, HandleCounterButtons,
+			GDI_END);
 
-    if (gi == NULL)
-      Error(ERR_EXIT, "cannot create gadget");
+      if (gi == NULL)
+	Error(ERR_EXIT, "cannot create gadget");
 
-    level_editor_gadget[id] = gi;
+      level_editor_gadget[id] = gi;
+    }
   }
 }
 
@@ -628,12 +647,14 @@ static void CreateDrawingAreas()
 {
   struct GadgetInfo *gi;
   unsigned long event_mask;
+  int id = ED_CTRL_ID_DRAWING_LEVEL;
+  int i;
 
   event_mask =
     GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
     GD_EVENT_OFF_BORDERS;
 
-  gi = CreateGadget(GDI_CUSTOM_ID, ED_CTRL_ID_DRAWING_LEVEL,
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX,
 		    GDI_Y, SY,
 		    GDI_WIDTH, SXSIZE,
@@ -647,7 +668,30 @@ static void CreateDrawingAreas()
   if (gi == NULL)
     Error(ERR_EXIT, "cannot create gadget");
 
-  level_editor_gadget[ED_CTRL_ID_DRAWING_LEVEL] = gi;
+  level_editor_gadget[id] = gi;
+
+  for (i=0; i<8; i++)
+  {
+    int id = ED_CTRL_ID_ELEMCONT_0 + i;
+    int gx = SX + ED_AREA_ELEMCONT_XPOS + 5 * (i % 4) * MINI_TILEX;
+    int gy = SX + ED_AREA_ELEMCONT_YPOS + 6 * (i / 4) * MINI_TILEY;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_X, gx,
+		      GDI_Y, gy,
+		      GDI_WIDTH, 3 * MINI_TILEX,
+		      GDI_HEIGHT, 3 * MINI_TILEY,
+		      GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		      GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK, HandleDrawingAreas,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id] = gi;
+  }
 }
 
 static void CreateLevelEditorGadgets()
@@ -656,7 +700,7 @@ static void CreateLevelEditorGadgets()
     return;
 
   CreateControlButtons();
-  CreateCounterButtons(ED_COUNTER_SCORE);
+  CreateCounterButtons();
   CreateDrawingAreas();
 
   level_editor_gadgets_created = TRUE;
@@ -670,17 +714,27 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
 }
 
-static void MapCounterButtons(int counter_id)
+static void MapCounterButtons(int id)
 {
   int i;
 
   for (i=0; i<2; i++)
-    MapGadget(level_editor_gadget[counter_info[counter_id].gadget_id + i]);
+    MapGadget(level_editor_gadget[counter_info[id].gadget_id + i]);
+}
+
+static void MapDrawingArea(int id)
+{
+  MapGadget(level_editor_gadget[id]);
 }
 
 static void MapMainDrawingArea()
 {
-  MapGadget(level_editor_gadget[ED_CTRL_ID_DRAWING_LEVEL]);
+  MapDrawingArea(ED_CTRL_ID_DRAWING_LEVEL);
+}
+
+static void UnmapDrawingArea(int id)
+{
+  UnmapGadget(level_editor_gadget[id]);
 }
 
 void UnmapLevelEditorWindowGadgets()
@@ -1697,6 +1751,72 @@ static void DrawDrawingWindow()
   DrawMiniLevel(level_xpos, level_ypos);
 }
 
+static void DrawElementContentAreas()
+{
+  static int num_areas = 8;
+  int i, x, y;
+
+  for (i=0; i<8; i++)
+    UnmapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
+
+  /* display counter to choose number of element content areas */
+  gadget_areas_value = &num_areas;
+  DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
+  x = counter_info[ED_COUNTER_ELEMCONT].x + DXSIZE;
+  y = counter_info[ED_COUNTER_ELEMCONT].y;
+  DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
+	    FC_YELLOW, "number of content areas");
+  MapCounterButtons(ED_COUNTER_ELEMCONT);
+
+  XFillRectangle(display, backbuffer, gc,
+		 SX, SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEX,
+		 SXSIZE, 12 * MINI_TILEY);
+
+  /* draw some decorative border for the objects */
+  for (i=0; i<num_areas; i++)
+  {
+    for (y=0; y<4; y++)
+      for (x=0; x<4; x++)
+	DrawMiniElement(ED_AREA_ELEMCONT_XPOS / MINI_TILEX + 5 * (i % 4) + x,
+			ED_AREA_ELEMCONT_YPOS / MINI_TILEY + 6 * (i / 4) + y,
+			EL_ERDREICH);
+
+    XFillRectangle(display, drawto, gc,
+		   SX + ED_AREA_ELEMCONT_XPOS
+		   + 5 * (i % 4) * MINI_TILEX + MINI_TILEX/2 - 1,
+		   SY + ED_AREA_ELEMCONT_YPOS
+		   + 6 * (i / 4) * MINI_TILEY + MINI_TILEY/2 - 1,
+		   3 * MINI_TILEX + 2, 3 * MINI_TILEY + 2);
+  }
+
+  /* copy border to the right location */
+  XCopyArea(display, drawto, drawto, gc,
+	    SX + ED_AREA_ELEMCONT_XPOS - MINI_TILEX/2,
+	    SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEY/2,
+	    (5 * 4 + 1) * MINI_TILEX,
+	    12 * MINI_TILEY,
+	    SX + ED_AREA_ELEMCONT_XPOS - MINI_TILEX,
+	    SY + ED_AREA_ELEMCONT_YPOS - MINI_TILEY);
+
+  for (i=0; i<num_areas; i++)
+  {
+    for (y=0; y<3; y++)
+      for (x=0; x<3; x++)
+	DrawMiniElement(ED_AREA_ELEMCONT_XPOS / MINI_TILEX + 5 * (i % 4) + x,
+			ED_AREA_ELEMCONT_YPOS / MINI_TILEY + 6 * (i / 4) + y,
+			EL_EDELSTEIN_BD);
+
+    DrawTextF(ED_AREA_ELEMCONT_XPOS
+	      + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
+	      ED_AREA_ELEMCONT_YPOS
+	      + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
+	      FC_YELLOW, "%d", i + 1);
+  }
+
+  for (i=0; i<num_areas; i++)
+    MapDrawingArea(ED_CTRL_ID_ELEMCONT_0 + i);
+}
+
 static void DrawPropertiesWindow(int element)
 {
   int i, x, y;
@@ -1755,34 +1875,53 @@ static void DrawPropertiesWindow(int element)
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
+  /* draw some decorative border for the object */
+  for (y=0; y<3; y++)
+    for (x=0; x<3; x++)
+      DrawMiniElement(2 + x , 2 + y, EL_ERDREICH);
+
+  XFillRectangle(display, drawto, gc,
+		 SX + TILEX + MINI_TILEX/2 - 1,
+		 SY + TILEY + MINI_TILEY/2 - 1,
+		 TILEX + 2, TILEY + 2);
+
+  /* copy border to the right location */
+  XCopyArea(display, drawto, drawto, gc,
+	    SX + TILEX, SY + TILEY,
+	    2 * TILEX, 2 * TILEY,
+	    SX + TILEX - MINI_TILEX/2, SY + TILEY - MINI_TILEY/2);
+
   DrawGraphic(1, 1, el2gfx(element));
   DrawText(SX + 3*TILEX, SY + 5*TILEY/4, "Element Properties",
 	   FS_SMALL, FC_YELLOW);
 
   num_elements_in_level = 0;
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++)
+  for (y=0; y<lev_fieldy; y++) 
+    for (x=0; x<lev_fieldx; x++)
       if (Feld[x][y] == element)
 	num_elements_in_level++;
 
   DrawTextF(TILEX, 5*TILEY, FC_YELLOW, "%d x contained in level",
 	    num_elements_in_level);
 
+  /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
   {
     if (elements_with_counter[i].element == element)
     {
-      int x = SX + counter_info[ED_COUNTER_SCORE].x + DXSIZE;
-      int y = SY + counter_info[ED_COUNTER_SCORE].y;
+      int x = counter_info[ED_COUNTER_SCORE].x + DXSIZE;
+      int y = counter_info[ED_COUNTER_SCORE].y;
 
       gadget_score_value = elements_with_counter[i].counter_value;
       DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
-      DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
-	       elements_with_counter[i].text, FS_SMALL, FC_YELLOW);
+      DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
+		FC_YELLOW, elements_with_counter[i].text);
       MapCounterButtons(ED_COUNTER_SCORE);
       break;
     }
   }
+
+  DrawElementContentAreas();
 }
 
 static void swap_numbers(int *i1, int *i2)
@@ -1901,7 +2040,6 @@ static void DrawFilledBox(int from_x, int from_y, int to_x, int to_y,
 
 static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
 {
-  unsigned long border_color = ReadPixel(pix[PIX_SMALLFONT], 2, 16);
   int from_sx, from_sy;
   int to_sx, to_sy;
 
@@ -1912,18 +2050,18 @@ static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
     swap_numbers(&from_y, &to_y);
 
   from_sx = SX + from_x * MINI_TILEX;
-  from_sy = SY + from_y * MINI_TILEX;
+  from_sy = SY + from_y * MINI_TILEY;
   to_sx = SX + to_x * MINI_TILEX + MINI_TILEX - 1;
-  to_sy = SY + to_y * MINI_TILEX + MINI_TILEY - 1;
+  to_sy = SY + to_y * MINI_TILEY + MINI_TILEY - 1;
 
-  XSetForeground(display, gc, border_color);
+  XSetForeground(display, gc, WhitePixel(display, screen));
 
   XDrawLine(display, drawto, gc, from_sx, from_sy, to_sx, from_sy);
   XDrawLine(display, drawto, gc, to_sx, from_sy, to_sx, to_sy);
   XDrawLine(display, drawto, gc, to_sx, to_sy, from_sx, to_sy);
   XDrawLine(display, drawto, gc, from_sx, to_sy, from_sx, from_sy);
 
-  XSetForeground(display, gc, BlackPixel(display,screen));
+  XSetForeground(display, gc, BlackPixel(display, screen));
 
   if (from_x == to_x && from_y == to_y)
     MarkTileDirty(from_x/2, from_y/2);
@@ -1939,6 +2077,55 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
   else
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
+
+/* values for CopyBrushExt() */
+#define CB_AREA_TO_BRUSH	0
+#define CB_BRUSH_TO_LEVEL	1
+
+static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
+{
+  static short brush_buffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+  static brush_from_x, brush_from_y;
+  static brush_to_x, brush_to_y;
+  int x, y;
+
+  if (from_x > to_x)
+    swap_numbers(&from_x, &to_x);
+
+  if (from_y > to_y)
+    swap_numbers(&from_y, &to_y);
+
+  if (mode == CB_AREA_TO_BRUSH)
+  {
+    for (y=from_y; y<=to_y; y++)
+      for (x=from_x; x<=to_x; x++)
+	brush_buffer[x][y] = Feld[x][y];
+
+    brush_from_x = from_x;
+    brush_from_y = from_y;
+    brush_to_x = to_x;
+    brush_to_y = to_y;
+  }
+  else
+  {
+    for (y=brush_from_y; y<=brush_to_y; y++)
+      for (x=brush_from_x; x<=brush_to_x; x++)
+	Feld[x][y] = brush_buffer[x][y];
+    CopyLevelToUndoBuffer();
+  }
+}
+
+static void CopyAreaToBrush(int from_x, int from_y, int to_x, int to_y)
+{
+  CopyBrushExt(from_x, from_y, to_x, to_y, CB_AREA_TO_BRUSH);
+}
+
+#if 0
+static void CopyBrushToLevel()
+{
+  CopyBrushExt(0, 0, 0, 0, CB_BRUSH_TO_LEVEL);
+}
+#endif
 
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
@@ -2112,35 +2299,48 @@ static void RandomPlacement(int button)
   }
 
   DrawMiniLevel(level_xpos, level_ypos);
+  CopyLevelToUndoBuffer();
 }
 
 static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
+  static boolean draw_with_brush = FALSE;
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
   boolean button_release_event;
+  boolean draw_level = (gi->custom_id == ED_CTRL_ID_DRAWING_LEVEL);
   int new_element;
   int button = gi->event.button;
   int sx = gi->event.x, sy = gi->event.y;
   int lx, ly;
   int x, y;
 
+  /*
   if (edit_mode != ED_MODE_DRAWING)
     return;
+  */
 
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
-  sx = (sx < 0 ? 0 : sx > 2*SCR_FIELDX - 1 ? 2*SCR_FIELDX - 1 : sx);
-  sy = (sy < 0 ? 0 : sy > 2*SCR_FIELDY - 1 ? 2*SCR_FIELDY - 1 : sy);
-  lx = sx + level_xpos;
-  ly = sy + level_ypos;
+  if (draw_level)
+  {
+    sx = (sx < 0 ? 0 : sx > 2*SCR_FIELDX - 1 ? 2*SCR_FIELDX - 1 : sx);
+    sy = (sy < 0 ? 0 : sy > 2*SCR_FIELDY - 1 ? 2*SCR_FIELDY - 1 : sy);
+    lx = sx + level_xpos;
+    ly = sy + level_ypos;
 
-  lx = (lx < 0 ? 0 : lx > lev_fieldx - 1 ? lev_fieldx - 1 : lx);
-  ly = (ly < 0 ? 0 : ly > lev_fieldy - 1 ? lev_fieldy - 1 : ly);
-  sx = lx - level_xpos;
-  sy = ly - level_ypos;
+    lx = (lx < 0 ? 0 : lx > lev_fieldx - 1 ? lev_fieldx - 1 : lx);
+    ly = (ly < 0 ? 0 : ly > lev_fieldy - 1 ? lev_fieldy - 1 : ly);
+    sx = lx - level_xpos;
+    sy = ly - level_ypos;
+  }
+  else
+  {
+    sx = (sx < 0 ? 0 : sx > 2 ? 2 : sx);
+    sy = (sy < 0 ? 0 : sy > 2 ? 2 : sy);
+  }
 
   if (button_press_event)
     started_inside_drawing_area = inside_drawing_area;
@@ -2148,49 +2348,62 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   if (!started_inside_drawing_area)
     return;
 
-  if ((!button && !button_release_event) ||
-      sx > lev_fieldx || sy > lev_fieldy ||
-      (sx == 0 && level_xpos<0) ||
-      (sx == 2*SCR_FIELDX - 1 && level_xpos > lev_fieldx - 2*SCR_FIELDX) ||
-      (sy == 0 && level_ypos < 0) ||
-      (sy == 2*SCR_FIELDY - 1 && level_ypos > lev_fieldy - 2*SCR_FIELDY))
+  if (!button && !button_release_event)
     return;
 
   new_element = (button == 1 ? new_element1 :
 		 button == 2 ? new_element2 :
 		 button == 3 ? new_element3 : 0);
 
+  if (!draw_level && drawing_function != ED_CTRL_ID_SINGLE_ITEMS)
+    return;
+
   switch (drawing_function)
   {
     case ED_CTRL_ID_SINGLE_ITEMS:
-      if (button_release_event)
-	CopyLevelToUndoBuffer();
-
-      if (!button)
-	break;
-
-      if (new_element != Feld[lx][ly])
+      if (draw_level)
       {
-	if (new_element == EL_SPIELFIGUR)
+	if (button_release_event)
+	  CopyLevelToUndoBuffer();
+
+	if (!button)
+	  break;
+
+	if (new_element != Feld[lx][ly])
 	{
-	  /* remove player at old position */
-	  for(y=0; y<lev_fieldy; y++)
+	  if (new_element == EL_SPIELFIGUR)
 	  {
-	    for(x=0; x<lev_fieldx; x++)
+	    /* remove player at old position */
+	    for(y=0; y<lev_fieldy; y++)
 	    {
-	      if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1)
+	      for(x=0; x<lev_fieldx; x++)
 	      {
-		Feld[x][y] = EL_LEERRAUM;
-		if (x - level_xpos >= 0 && x - level_xpos < 2*SCR_FIELDX &&
-		    y - level_ypos >= 0 && y - level_ypos < 2*SCR_FIELDY)
-		  DrawMiniElement(x - level_xpos, y - level_ypos, EL_LEERRAUM);
+		if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1)
+		{
+		  Feld[x][y] = EL_LEERRAUM;
+		  if (x - level_xpos >= 0 && x - level_xpos < 2*SCR_FIELDX &&
+		      y - level_ypos >= 0 && y - level_ypos < 2*SCR_FIELDY)
+		    DrawMiniElement(x - level_xpos, y - level_ypos,
+				    EL_LEERRAUM);
+		}
 	      }
 	    }
 	  }
-	}
 
-	Feld[lx][ly] = new_element;
-	DrawMiniElement(sx, sy, new_element);
+	  Feld[lx][ly] = new_element;
+	  DrawMiniElement(sx, sy, new_element);
+	}
+      }
+      else
+      {
+	DrawMiniGraphicExt(drawto, gc,
+			   gi->x + sx * MINI_TILEX,
+			   gi->y + sy * MINI_TILEY,
+			   el2gfx(new_element));
+	DrawMiniGraphicExt(window, gc,
+			   gi->x + sx * MINI_TILEX,
+			   gi->y + sy * MINI_TILEY,
+			   el2gfx(new_element));
       }
       break;
 
@@ -2242,7 +2455,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	else if (button_release_event)
 	{
 	  draw_func(start_sx, start_sy, sx, sy, new_element, TRUE);
-	  CopyLevelToUndoBuffer();
+	  if (drawing_function == ED_CTRL_ID_BRUSH)
+	  {
+	    CopyAreaToBrush(start_sx, start_sy, sx, sy);
+	    draw_with_brush = TRUE;
+	  }
+	  else
+	    CopyLevelToUndoBuffer();
 	}
 	else if (last_sx != sx || last_sy != sy)
 	{
@@ -2290,6 +2509,18 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 	*gadget_score_value = 255;
 
       DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
+      break;
+
+    case ED_CTRL_ID_ELEMCONT_DOWN:
+    case ED_CTRL_ID_ELEMCONT_UP:
+      *gadget_areas_value += (id == ED_CTRL_ID_ELEMCONT_DOWN ? -step : step);
+      if (*gadget_areas_value < 1)
+	*gadget_areas_value = 1;
+      else if (*gadget_areas_value > 8)
+	*gadget_areas_value = 8;
+
+      DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
+      DrawElementContentAreas();
       break;
 
     default:
@@ -2404,7 +2635,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case ED_CTRL_ID_RANDOM_PLACEMENT:
       RandomPlacement(button);
-      CopyLevelToUndoBuffer();
       break;
 
     case ED_CTRL_ID_UNDO:

@@ -308,16 +308,18 @@ int CheckCountButtons(int, int, int);
 #define GDI_RADIO_NR			8
 #define GDI_RADIO_PRESSED		9
 #define GDI_NUMBER_VALUE		10
-#define GDI_TEXT_VALUE			11
-#define GDI_DESIGN_UNPRESSED		12
-#define GDI_DESIGN_PRESSED		13
-#define GDI_ALT_DESIGN_UNPRESSED	14
-#define GDI_ALT_DESIGN_PRESSED		15
-#define GDI_EVENT_MASK			16
-#define GDI_EVENT			17
-#define GDI_CALLBACK			18
-#define GDI_AREA_SIZE			19
-#define GDI_ITEM_SIZE			20
+#define GDI_NUMBER_MIN			11
+#define GDI_NUMBER_MAX			12
+#define GDI_TEXT_VALUE			13
+#define GDI_DESIGN_UNPRESSED		14
+#define GDI_DESIGN_PRESSED		15
+#define GDI_ALT_DESIGN_UNPRESSED	16
+#define GDI_ALT_DESIGN_PRESSED		17
+#define GDI_EVENT_MASK			18
+#define GDI_EVENT			19
+#define GDI_CALLBACK			20
+#define GDI_AREA_SIZE			21
+#define GDI_ITEM_SIZE			22
 
 typedef void (*gadget_callback_function)(void *);
 
