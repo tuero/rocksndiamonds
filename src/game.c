@@ -606,8 +606,9 @@ static void InitGameEngine()
 
 #if 0
     printf("level %d: level version == %06d\n", level_nr, level.game_version);
-    printf("          tape version == %06d [%s]\n",
-	   tape.engine_version, (tape.playing ? "PLAYING" : "RECORDING"));
+    printf("          tape version == %06d [%s] [file: %06d]\n",
+	   tape.engine_version, (tape.playing ? "PLAYING" : "RECORDING"),
+	   tape.file_version);
     printf("       => game.engine_version == %06d\n", game.engine_version);
 #endif
 

@@ -1067,7 +1067,7 @@ void DumpTape(struct TapeInfo *tape)
 
   printf("\n");
   printf("-------------------------------------------------------------------------------\n");
-  printf("Tape of Level %d (file version %06d, game version %06d\n",
+  printf("Tape of Level %d (file version %06d, game version %06d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
   printf("-------------------------------------------------------------------------------\n");
 

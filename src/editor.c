@@ -3641,6 +3641,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
     case ED_COUNTER_ID_SELECT_LEVEL:
       LoadLevel(level_nr);
+      TapeErase();
       ResetUndoBuffer();
       DrawEditModeWindow();
       break;
