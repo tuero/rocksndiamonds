@@ -222,34 +222,65 @@ void DrawGameButton(unsigned long state)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawYesNoButton(unsigned long state)
+void DrawYesNoButton(unsigned long state, int mode)
 {
-  int pos, cx = DOOR_GFX_PAGEX4, cy = 0;
+  Drawable dest_drawto;
+  int dest_xoffset, dest_yoffset;
+  int xpos, cx = DOOR_GFX_PAGEX4;
 
-  pos = (state & BUTTON_OK ? OK_BUTTON_XPOS : NO_BUTTON_XPOS);
+  if (mode == DB_INIT)
+  {
+    dest_drawto = pix[PIX_DB_DOOR];
+    dest_xoffset = DOOR_GFX_PAGEX1;
+    dest_yoffset = 0;
+  }
+  else
+  {
+    dest_drawto = drawto;
+    dest_xoffset = DX;
+    dest_yoffset = DY;
+  }
+
+  xpos = (state & BUTTON_OK ? OK_BUTTON_XPOS : NO_BUTTON_XPOS);
 
   if (state & BUTTON_PRESSED)
     cx = DOOR_GFX_PAGEX3;
 
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + pos,cy + OK_BUTTON_GFX_YPOS,
-	    OK_BUTTON_XSIZE,OK_BUTTON_YSIZE,
-	    DX + pos,DY + OK_BUTTON_YPOS);
+  XCopyArea(display, pix[PIX_DOOR], dest_drawto, gc,
+	    cx + xpos, OK_BUTTON_GFX_YPOS,
+	    OK_BUTTON_XSIZE, OK_BUTTON_YSIZE,
+	    dest_xoffset + xpos, dest_yoffset + OK_BUTTON_YPOS);
 
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawConfirmButton(unsigned long state)
+void DrawConfirmButton(unsigned long state, int mode)
 {
-  int cx = DOOR_GFX_PAGEX4, cy = 0;
+  Drawable dest_drawto;
+  int dest_xoffset, dest_yoffset;
+  int cx = DOOR_GFX_PAGEX4;
+
+  if (mode == DB_INIT)
+  {
+    dest_drawto = pix[PIX_DB_DOOR];
+    dest_xoffset = DOOR_GFX_PAGEX1;
+    dest_yoffset = 0;
+  }
+  else
+  {
+    dest_drawto = drawto;
+    dest_xoffset = DX;
+    dest_yoffset = DY;
+  }
 
   if (state & BUTTON_PRESSED)
     cx = DOOR_GFX_PAGEX3;
 
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + CONFIRM_BUTTON_XPOS,cy + CONFIRM_BUTTON_GFX_YPOS,
-	    CONFIRM_BUTTON_XSIZE,CONFIRM_BUTTON_YSIZE,
-	    DX + CONFIRM_BUTTON_XPOS,DY + CONFIRM_BUTTON_YPOS);
+  XCopyArea(display, pix[PIX_DOOR], dest_drawto, gc,
+	    cx + CONFIRM_BUTTON_XPOS, CONFIRM_BUTTON_GFX_YPOS,
+	    CONFIRM_BUTTON_XSIZE, CONFIRM_BUTTON_YSIZE,
+	    dest_xoffset + CONFIRM_BUTTON_XPOS,
+	    dest_yoffset + CONFIRM_BUTTON_YPOS);
 
   redraw_mask |= REDRAW_DOOR_1;
 }
@@ -296,7 +327,7 @@ void DrawPlayerButton(unsigned long state, int mode)
     graphic_offset += 1;
   }
 
-  XCopyArea(display,pix[PIX_DOOR],dest_drawto,gc,
+  XCopyArea(display, pix[PIX_DOOR], dest_drawto, gc,
 	    cx + PLAYER_BUTTON_GFX_XPOS, cy + PLAYER_BUTTON_GFX_YPOS,
 	    PLAYER_BUTTON_XSIZE, PLAYER_BUTTON_YSIZE,
 	    dest_xoffset + xpos, dest_yoffset + ypos);
@@ -694,7 +725,7 @@ int CheckYesNoButtons(int mx, int my, int button)
       {
 	choice = YESNO_BUTTON(mx);
 	pressed = TRUE;
-	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED, DB_NORMAL);
       }
     }
     else			/* Mausbewegung bei gedrückter Maustaste */
@@ -703,12 +734,12 @@ int CheckYesNoButtons(int mx, int my, int button)
 	  choice>=0 && pressed)
       {
 	pressed = FALSE;
-	DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED, DB_NORMAL);
       }
       else if (ON_YESNO_BUTTON(mx,my) && YESNO_BUTTON(mx)==choice && !pressed)
       {
 	pressed = TRUE;
-	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED, DB_NORMAL);
       }
     }
   }
@@ -716,7 +747,7 @@ int CheckYesNoButtons(int mx, int my, int button)
   {
     if (ON_YESNO_BUTTON(mx,my) && YESNO_BUTTON(mx)==choice && pressed)
     {
-      DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED);
+      DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED, DB_NORMAL);
       return_code = choice+1;
       choice = -1;
       pressed = FALSE;
@@ -746,7 +777,7 @@ int CheckConfirmButton(int mx, int my, int button)
       {
 	choice = 0;
 	pressed = TRUE;
-	DrawConfirmButton(BUTTON_PRESSED);
+	DrawConfirmButton(BUTTON_PRESSED, DB_NORMAL);
       }
     }
     else			/* Mausbewegung bei gedrückter Maustaste */
@@ -754,12 +785,12 @@ int CheckConfirmButton(int mx, int my, int button)
       if (!ON_CONFIRM_BUTTON(mx,my) && choice>=0 && pressed)
       {
 	pressed = FALSE;
-	DrawConfirmButton(BUTTON_RELEASED);
+	DrawConfirmButton(BUTTON_RELEASED, DB_NORMAL);
       }
       else if (ON_CONFIRM_BUTTON(mx,my) && !pressed)
       {
 	pressed = TRUE;
-	DrawConfirmButton(BUTTON_PRESSED);
+	DrawConfirmButton(BUTTON_PRESSED, DB_NORMAL);
       }
     }
   }
@@ -767,7 +798,7 @@ int CheckConfirmButton(int mx, int my, int button)
   {
     if (ON_CONFIRM_BUTTON(mx,my) && pressed)
     {
-      DrawConfirmButton(BUTTON_RELEASED);
+      DrawConfirmButton(BUTTON_RELEASED, DB_NORMAL);
       return_code = BUTTON_CONFIRM;
       choice = -1;
       pressed = FALSE;

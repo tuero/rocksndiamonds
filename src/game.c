@@ -134,19 +134,9 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
-
-
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
-
-
-
-  /*
-  printf("BLURB\n");
-  */
-
-
 
   ZX = ZY = -1;
 
