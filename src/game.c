@@ -100,41 +100,30 @@ static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
 
+void PlaySoundLevel(int, int, int);
+void PlaySoundLevelAction(int, int, int);
+
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
-static boolean is_loop_sound[NUM_SOUND_EFFECTS];
-static boolean is_loop_sound_initialized = FALSE;
-static int loop_sounds[] =
+static char *loop_sound_actions[] =
 {
-  SND_BD_MAGIC_WALL_RUNNING,
-  SND_BD_BUTTERFLY_MOVING,
-  SND_BD_FIREFLY_MOVING,
-  SND_SP_SNIKSNAK_MOVING,
-  SND_SP_ELECTRON_MOVING,
-  SND_DYNAMITE_BURNING,
-  SND_BUG_MOVING,
-  SND_SPACESHIP_MOVING,
-  SND_YAMYAM_MOVING,
-  SND_YAMYAM_WAITING,
-  SND_ROBOT_WHEEL_RUNNING,
-  SND_MAGIC_WALL_RUNNING,
-  SND_BALLOON_MOVING,
-  SND_MOLE_MOVING,
-  SND_TIMEGATE_WHEEL_RUNNING,
-  SND_CONVEYOR_BELT_RUNNING,
-  SND_DYNABOMB_BURNING,
-  SND_PACMAN_MOVING,
-  SND_PENGUIN_MOVING,
-  SND_PIG_MOVING,
-  SND_DRAGON_MOVING,
-  SND_DRAGON_BREATHING_FIRE
+  ".waiting",
+  ".moving",
+  ".running",
+  ".burning",
+  ".growing",
+  ".attacking"
 };
+static boolean is_loop_sound[NUM_SOUND_EFFECTS];
+static boolean sound_info_initialized = FALSE;
 
 #define IS_LOOP_SOUND(x)	(is_loop_sound[x])
 
+#define SND_MOVING		1
+#define SND_WAITING		2
 
 
 #ifdef DEBUG
@@ -729,17 +718,34 @@ void InitGame()
   }
 
   /* initialize sound effect properties */
-  if (!is_loop_sound_initialized)
+  if (!sound_info_initialized)
   {
-    int i;
+    int i, j;
 
     for (i=0; i<NUM_SOUND_EFFECTS; i++)
+    {
       is_loop_sound[i] = FALSE;
 
-    for (i=0; i<SIZEOF_ARRAY_INT(loop_sounds); i++)
-      is_loop_sound[loop_sounds[i]] = TRUE;
+      for (j=0; j<SIZEOF_ARRAY(loop_sound_actions, char *); j++)
+      {
+	int len_effect_text = strlen(sound_effects[i].text);
+	int len_action_text = strlen(loop_sound_actions[j]);
 
-    is_loop_sound_initialized = TRUE;
+	if (len_effect_text > len_action_text &&
+	    strcmp(&sound_effects[i].text[len_effect_text - len_action_text],
+		   loop_sound_actions[j]) == 0)
+	  is_loop_sound[i] = TRUE;
+      }
+    }
+
+    for (i=0; i<NUM_SOUND_EFFECTS; i++)
+    {
+      for (j=0; j<NUM_LEVEL_ELEMENTS; j++)
+      {
+      }
+    }
+
+    sound_info_initialized = TRUE;
   }
 
   game.version = (tape.playing ? tape.game_version : level.game_version);
@@ -2777,6 +2783,7 @@ void StartMoving(int x, int y)
       if (element!=EL_MAMPFER && element!=EL_MAMPFER2 && element!=EL_PACMAN)
       {
 	TurnRound(x, y);
+
 	if (MovDelay[x][y] && (element == EL_KAEFER ||
 			       element == EL_FLIEGER ||
 			       element == EL_SP_SNIKSNAK ||
@@ -2854,42 +2861,13 @@ void StartMoving(int x, int y)
 	}
       }
 
-      if (MovDelay[x][y])
-	return;
-    }
+      if (MovDelay[x][y])	/* element still has to wait some time */
+      {
+	PlaySoundLevelAction(x, y, SND_WAITING);
 
-    if (element == EL_KAEFER)
-      PlaySoundLevel(x, y, SND_BUG_MOVING);
-    else if (element == EL_FLIEGER)
-      PlaySoundLevel(x, y, SND_SPACESHIP_MOVING);
-    else if (element == EL_BUTTERFLY)
-      PlaySoundLevel(x, y, SND_BD_BUTTERFLY_MOVING);
-    else if (element == EL_FIREFLY)
-      PlaySoundLevel(x, y, SND_BD_FIREFLY_MOVING);
-    else if (element == EL_SP_SNIKSNAK)
-      PlaySoundLevel(x, y, SND_SP_SNIKSNAK_MOVING);
-    else if (element == EL_SP_ELECTRON)
-      PlaySoundLevel(x, y, SND_SP_ELECTRON_MOVING);
-    else if (element == EL_MAMPFER)
-      PlaySoundLevel(x, y, SND_YAMYAM_MOVING);
-    else if (element == EL_MAMPFER2)
-      PlaySoundLevel(x, y, SND_DARK_YAMYAM_MOVING);
-    else if (element == EL_BALLOON)
-      PlaySoundLevel(x, y, SND_BALLOON_MOVING);
-    else if (element == EL_SPRING_MOVING)
-      PlaySoundLevel(x, y, SND_SPRING_MOVING);
-    else if (element == EL_MOLE)
-      PlaySoundLevel(x, y, SND_MOLE_MOVING);
-    else if (element == EL_SONDE)
-      PlaySoundLevel(x, y, SND_SATELLITE_MOVING);
-    else if (element == EL_PACMAN)
-      PlaySoundLevel(x, y, SND_PACMAN_MOVING);
-    else if (element == EL_PINGUIN)
-      PlaySoundLevel(x, y, SND_PENGUIN_MOVING);
-    else if (element == EL_SCHWEIN)
-      PlaySoundLevel(x, y, SND_PIG_MOVING);
-    else if (element == EL_DRACHE)
-      PlaySoundLevel(x, y, SND_DRAGON_MOVING);
+	return;
+      }
+    }
 
     /* now make next step */
 
@@ -3005,7 +2983,7 @@ void StartMoving(int x, int y)
 	  else
 	    DrawLevelField(x, y);
 
-	  PlaySoundLevel(x, y, SND_DRAGON_BREATHING_FIRE);
+	  PlaySoundLevel(x, y, SND_DRAGON_ATTACKING);
 
 	  MovDelay[x][y] = 50;
 	  Feld[newx][newy] = EL_BURNING;
@@ -3102,13 +3080,14 @@ void StartMoving(int x, int y)
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
 
+      PlaySoundLevelAction(x, y, SND_WAITING);
+
       return;
     }
 
-    if (element == EL_ROBOT && IN_SCR_FIELD(x, y))
-      PlaySoundLevel(x, y, SND_ROBOT_MOVING);
-
     InitMovingField(x, y, MovDir[x][y]);
+
+    PlaySoundLevelAction(x, y, SND_MOVING);
   }
 
   if (MovDir[x][y])
@@ -5996,6 +5975,7 @@ int DigField(struct PlayerInfo *player,
 			    element == EL_BALLOON_SEND_UP    ? MV_UP :
 			    element == EL_BALLOON_SEND_DOWN  ? MV_DOWN :
 			    MV_NO_MOVING);
+      PlaySoundLevel(x, y, SND_BALLOON_SWITCH_ACTIVATING);
 
       return MF_ACTION;
       break;
@@ -6235,6 +6215,8 @@ int DigField(struct PlayerInfo *player,
 
 	if (!(tube_enter_directions[i][1] & move_direction))
 	  return MF_NO_ACTION;	/* tube has no opening in this direction */
+
+	PlaySoundLevel(x, y, SND_TUBE_PASSING);
       }
       break;
 
@@ -6512,6 +6494,84 @@ void PlaySoundLevel(int x, int y, int nr)
   }
 
   PlaySoundExt(nr, volume, stereo_position, type);
+}
+
+void PlaySoundLevelAction(int x, int y, int action)
+{
+  int element = Feld[x][y];
+
+  if (action == SND_MOVING)
+  {
+    if (element == EL_KAEFER)
+      PlaySoundLevel(x, y, SND_BUG_MOVING);
+    else if (element == EL_FLIEGER)
+      PlaySoundLevel(x, y, SND_SPACESHIP_MOVING);
+    else if (element == EL_BUTTERFLY)
+      PlaySoundLevel(x, y, SND_BD_BUTTERFLY_MOVING);
+    else if (element == EL_FIREFLY)
+      PlaySoundLevel(x, y, SND_BD_FIREFLY_MOVING);
+    else if (element == EL_SP_SNIKSNAK)
+      PlaySoundLevel(x, y, SND_SP_SNIKSNAK_MOVING);
+    else if (element == EL_SP_ELECTRON)
+      PlaySoundLevel(x, y, SND_SP_ELECTRON_MOVING);
+    else if (element == EL_MAMPFER)
+      PlaySoundLevel(x, y, SND_YAMYAM_MOVING);
+    else if (element == EL_MAMPFER2)
+      PlaySoundLevel(x, y, SND_DARK_YAMYAM_MOVING);
+    else if (element == EL_BALLOON)
+      PlaySoundLevel(x, y, SND_BALLOON_MOVING);
+    else if (element == EL_SPRING_MOVING)
+      PlaySoundLevel(x, y, SND_SPRING_MOVING);
+    else if (element == EL_MOLE)
+      PlaySoundLevel(x, y, SND_MOLE_MOVING);
+    else if (element == EL_SONDE)
+      PlaySoundLevel(x, y, SND_SATELLITE_MOVING);
+    else if (element == EL_PACMAN)
+      PlaySoundLevel(x, y, SND_PACMAN_MOVING);
+    else if (element == EL_PINGUIN)
+      PlaySoundLevel(x, y, SND_PENGUIN_MOVING);
+    else if (element == EL_SCHWEIN)
+      PlaySoundLevel(x, y, SND_PIG_MOVING);
+    else if (element == EL_DRACHE)
+      PlaySoundLevel(x, y, SND_DRAGON_MOVING);
+    else if (element == EL_ROBOT)
+      PlaySoundLevel(x, y, SND_ROBOT_STEPPING);
+  }
+  else if (action == SND_WAITING)
+  {
+    if (element == EL_KAEFER)
+      PlaySoundLevel(x, y, SND_BUG_WAITING);
+    else if (element == EL_FLIEGER)
+      PlaySoundLevel(x, y, SND_SPACESHIP_WAITING);
+    else if (element == EL_BUTTERFLY)
+      PlaySoundLevel(x, y, SND_BD_BUTTERFLY_WAITING);
+    else if (element == EL_FIREFLY)
+      PlaySoundLevel(x, y, SND_BD_FIREFLY_WAITING);
+    else if (element == EL_SP_SNIKSNAK)
+      PlaySoundLevel(x, y, SND_SP_SNIKSNAK_WAITING);
+    else if (element == EL_SP_ELECTRON)
+      PlaySoundLevel(x, y, SND_SP_ELECTRON_WAITING);
+    else if (element == EL_MAMPFER)
+      PlaySoundLevel(x, y, SND_YAMYAM_WAITING);
+    else if (element == EL_MAMPFER2)
+      PlaySoundLevel(x, y, SND_DARK_YAMYAM_WAITING);
+    else if (element == EL_BALLOON)
+      PlaySoundLevel(x, y, SND_BALLOON_WAITING);
+    else if (element == EL_MOLE)
+      PlaySoundLevel(x, y, SND_MOLE_WAITING);
+    else if (element == EL_SONDE)
+      PlaySoundLevel(x, y, SND_SATELLITE_WAITING);
+    else if (element == EL_PACMAN)
+      PlaySoundLevel(x, y, SND_PACMAN_WAITING);
+    else if (element == EL_PINGUIN)
+      PlaySoundLevel(x, y, SND_PENGUIN_WAITING);
+    else if (element == EL_SCHWEIN)
+      PlaySoundLevel(x, y, SND_PIG_WAITING);
+    else if (element == EL_DRACHE)
+      PlaySoundLevel(x, y, SND_DRAGON_WAITING);
+    else if (element == EL_ROBOT)
+      PlaySoundLevel(x, y, SND_ROBOT_WAITING);
+  }
 }
 
 void RaiseScore(int value)

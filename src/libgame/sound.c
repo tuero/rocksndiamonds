@@ -71,6 +71,8 @@
 #define SOUND_VOLUME_LEFT(x)		(stereo_volume[x])
 #define SOUND_VOLUME_RIGHT(x)		(stereo_volume[SOUND_MAX_LEFT2RIGHT-x])
 
+#define SAME_SOUND_NR(x,y)		((x).nr == (y).nr)
+#define SAME_SOUND_DATA(x,y)		((x).data_ptr == (y).data_ptr)
 
 #if 0
 struct SoundHeader_SUN
@@ -826,9 +828,9 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
   }
 
-  /* check if sound is already being played (and how often) */
+  /* check if (and how often) this sound sample is already playing */
   for (k=0, i=audio.first_sound_channel; i<audio.num_channels; i++)
-    if (mixer[i].active && mixer[i].nr == snd_ctrl.nr)
+    if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       k++;
 
 #if 0
@@ -840,7 +842,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   {
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
-      if (mixer[i].active && mixer[i].nr == snd_ctrl.nr)
+      if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       {
 #if 0
 	printf("RESETTING EXPIRATION FOR SOUND %d\n", snd_ctrl.nr);
@@ -866,6 +868,10 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
   }
 
+#if 0
+  printf("PLAYING NEW SOUND %d\n", snd_ctrl.nr);
+#endif
+
   /* don't play sound more than n times simultaneously (with n == 2 for now) */
   if (k >= 2)
   {
@@ -878,7 +884,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
       int playing_time = playing_current - mixer[i].playing_starttime;
       int actual;
 
-      if (!mixer[i].active || mixer[i].nr != snd_ctrl.nr)
+      if (!mixer[i].active || !SAME_SOUND_NR(mixer[i], snd_ctrl))
 	continue;
 
       actual = 1000 * playing_time / mixer[i].data_len;
@@ -1008,7 +1014,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     }
 
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-      if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+      if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_FadeChannel(i);
   }
   else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
@@ -1020,7 +1026,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     }
 
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-      if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+      if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_StopChannel(i);
 
 #if defined(AUDIO_UNIX_NATIVE)

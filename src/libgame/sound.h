@@ -121,6 +121,7 @@ struct SoundEffectInfo
 {
   char *text;
   char *default_filename;
+
   char *filename;
 };
 

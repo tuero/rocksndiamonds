@@ -1273,8 +1273,8 @@ static char *getElementInfoText(int element)
 {
   char *info_text = "unknown";
 
-  if (element < num_element_info)
-    info_text = element_info[element];
+  if (element < NUM_LEVEL_ELEMENTS)
+    info_text = element_info[element].editor_description;
   else
     Error(ERR_WARN, "no element description for element %d", element);
 
