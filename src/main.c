@@ -225,6 +225,7 @@ struct SoundEffectInfo sound_effects[] =
   { "amoeba.dropping",			SND_FILE_UNDEFINED	},
   { "acid.splashing",			"blurb.wav"		},
   { "quicksand.filling",		SND_FILE_UNDEFINED	},
+  { "quicksand.slipping_through",	SND_FILE_UNDEFINED	},
   { "quicksand.emptying",		SND_FILE_UNDEFINED	},
   { "exit.opening",			"oeffnen.wav"		},
   { "exit.entering",			"buing.wav"		},
@@ -263,8 +264,8 @@ struct SoundEffectInfo sound_effects[] =
   { "timegate.passing",			"gate.wav"		},
   { "conveyor_belt_switch.activating",	SND_FILE_UNDEFINED	},
   { "conveyor_belt.running",		SND_FILE_UNDEFINED	},
-  { "light.activating",			SND_FILE_UNDEFINED	},
-  { "light.deactivating",		SND_FILE_UNDEFINED	},
+  { "light_switch.activating",		SND_FILE_UNDEFINED	},
+  { "light_switch.deactivating",	SND_FILE_UNDEFINED	},
 
   /* sounds for DX Boulderdash style elements and actions */
   { "dx_bomb.pushing",			"pusch.wav"		},

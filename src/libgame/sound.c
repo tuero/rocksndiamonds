@@ -662,7 +662,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   snd_info = (snd_ctrl.music ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
   if (snd_info == NULL)
   {
-#if 1
+#if 0
     printf("sound/music %d undefined\n", snd_ctrl.nr);
 #endif
     return;
