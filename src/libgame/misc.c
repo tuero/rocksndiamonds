@@ -1569,6 +1569,10 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   }
   else if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {
+#if 0
+      printf("[adding new artwork '%s']\n", filename);
+#endif
+
     (*listnode)->num_references = 1;
     addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
 		  *listnode);

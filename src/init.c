@@ -189,14 +189,23 @@ void InitNetworkServer()
 #endif
 }
 
+static void ReinitializeGraphics()
+{
+  ReloadCustomImages();		/* load custom image files */
+
+  InitGraphicInfo();		/* initialize graphic info from config file */
+
+  InitFontInfo(new_graphic_info[IMG_MENU_FONT_BIG].bitmap,
+	       new_graphic_info[IMG_MENU_FONT_MEDIUM].bitmap,
+	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
+	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
+}
+
 static void InitImages()
 {
   InitImageList(image_config, image_config_suffix, NUM_IMAGE_FILES);
 
-  /* load custom images */
-  ReloadCustomImages();
-
-  InitGraphicInfo();
+  ReinitializeGraphics();
 }
 
 static void InitMixer()
@@ -301,6 +310,7 @@ static void InitTileClipmasks()
   tile_clip_gc = XCreateGC(display, window->drawable,
 			   clip_gc_valuemask, &clip_gc_values);
 
+#if 0
   for (i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i]->clip_mask)
@@ -312,6 +322,7 @@ static void InitTileClipmasks()
 					 clip_gc_valuemask, &clip_gc_values);
     }
   }
+#endif
 
 #if defined(TARGET_X11_NATIVE)
 
@@ -371,6 +382,7 @@ void FreeTileClipmasks()
     XFreeGC(display, tile_clip_gc);
   tile_clip_gc = None;
 
+#if 0
   for (i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i] != NULL && pix[i]->stored_clip_gc)
@@ -379,6 +391,8 @@ void FreeTileClipmasks()
       pix[i]->stored_clip_gc = None;
     }
   }
+#endif
+
 #endif /* TARGET_X11 */
 }
 
@@ -439,7 +453,8 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(pix[PIX_BACK], backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
+	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
@@ -524,8 +539,7 @@ void ReloadCustomArtwork()
       ReloadCustomImage(pix[i], image_filename[i]);
     }
 
-    ReloadCustomImages();
-    InitGraphicInfo();
+    ReinitializeGraphics();
 
     FreeTileClipmasks();
     InitTileClipmasks();
