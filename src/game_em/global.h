@@ -7,7 +7,9 @@
 #define EM_SND_DIR	"sounds.EM"
 #define EM_LVL_DIR	"levels.EM"
 
-#define MAXNAME 1024 /* arbitrary maximum length of filenames (cos i am lazy) */
+/* arbitrary maximum length of filenames (cos i am lazy) */
+#define MAXNAME 1024
+
 extern void snprintf_overflow(char *);
 
 extern int debug;
@@ -44,7 +46,8 @@ void title_initscreen(void);
 void title_blitscore(void);
 void title_animscreen(void);
 void title_blitants(unsigned int y);
-void title_string(unsigned int y, unsigned int left, unsigned int right, char *string);
+void title_string(unsigned int y, unsigned int left, unsigned int right,
+		  char *string);
 
 void sound_play(void);
 
