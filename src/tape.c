@@ -776,8 +776,10 @@ void TapeHaltRecording()
 
 void TapeStopRecording()
 {
+#if 0
   if (!tape.recording)
     return;
+#endif
 
   TapeHaltRecording();
 
@@ -923,8 +925,10 @@ static void TapeStartGamePlaying()
 
 void TapeStopPlaying()
 {
+#if 0
   if (!tape.playing)
     return;
+#endif
 
   tape.playing = FALSE;
   tape.pausing = FALSE;

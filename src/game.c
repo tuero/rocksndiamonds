@@ -28,9 +28,10 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_MOVEMENT	FALSE
-#define USE_NEW_MOVE_DELAY	TRUE   *1
-#define USE_NEW_PUSH_DELAY	TRUE   *1
+#define USE_NEW_MOVE_STYLE	TRUE	*0
+#define USE_NEW_MOVE_DELAY	TRUE	*1
+#define USE_NEW_PUSH_DELAY	TRUE	*1
+#define USE_NEW_BLOCK_STYLE	TRUE	*1
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -391,6 +392,18 @@ struct ChangingElementInfo
 
 static struct ChangingElementInfo change_delay_list[] =
 {
+#if USE_NEW_BLOCK_STYLE
+#if 0
+  {
+    EL_PLAYER_IS_LEAVING,
+    EL_EMPTY,
+    -1,		/* delay for blocking field left by player set at runtime */
+    NULL,
+    NULL,
+    NULL
+  },
+#endif
+#endif
   {
     EL_NUT_BREAKING,
     EL_EMERALD,
@@ -761,12 +774,21 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
   {
     struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER_1];
     int jx = player->jx, jy = player->jy;
+    int sp_block_delay = 7;
+    int em_block_delay = 7;
+    int sp_no_block_delay = 1;
+    int em_no_block_delay = 1;
 
     player->present = TRUE;
 
     player->block_last_field = (element == EL_SP_MURPHY ?
 				level.sp_block_last_field :
 				level.block_last_field);
+
+    player->block_delay_value =
+      (element == EL_SP_MURPHY ?
+       (player->block_last_field ? sp_block_delay : sp_no_block_delay) :
+       (player->block_last_field ? em_block_delay : em_no_block_delay));
 
     if (!options.network || player->connected)
     {
@@ -1385,8 +1407,13 @@ static void InitGameEngine()
     {
       if (IS_SP_ELEMENT(i))
       {
+#if USE_NEW_MOVE_STYLE
+	element_info[i].push_delay_fixed  = 7;	/* just enough to escape ... */
+	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
+#else
 	element_info[i].push_delay_fixed  = 6;	/* just enough to escape ... */
 	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
+#endif
       }
     }
   }
@@ -1511,7 +1538,10 @@ void InitGame()
 
     player->use_murphy_graphic = FALSE;
 
-    player->block_last_field = FALSE;
+    player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
+    player->block_delay = 0;
+    player->block_delay_value = -1;	/* initialized in InitPlayerField() */
+
     player->can_fall_into_acid = CAN_MOVE_INTO_ACID(player->element_nr);
 
     player->actual_frame_counter = 0;
@@ -6400,7 +6430,7 @@ void ContinueMoving(int x, int y)
   else if (element == EL_PENGUIN)
     TestIfFriendTouchesBadThing(newx, newy);
 
-#if USE_NEW_MOVEMENT
+#if USE_NEW_MOVE_STYLE
 #if 0
   if (CAN_FALL(element) && direction == MV_DOWN &&
       (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
@@ -8627,6 +8657,14 @@ void GameActions()
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
+    /* this must be handled before main playfield loop */
+    if (Feld[x][y] == EL_PLAYER_IS_LEAVING)
+    {
+      MovDelay[x][y]--;
+      if (MovDelay[x][y] <= 0)
+	RemoveField(x, y);
+    }
+
 #if DEBUG
     if (ChangePage[x][y] != -1 && ChangeDelay[x][y] != 1)
     {
@@ -9830,13 +9868,13 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     */
     player->is_moving = FALSE;
 
-#if USE_NEW_MOVEMENT
+#if USE_NEW_MOVE_STYLE
     /* player is ALLOWED to move, but CANNOT move (something blocks his way) */
     /* ensure that the player is also allowed to move in the next frame */
     /* (currently, the player is forced to wait eight frames before he can try
        again!!!) */
 
-    player->move_delay = -1;	/* allow direct movement in the next frame */
+    player->move_delay = 0;	/* allow direct movement in the next frame */
 #endif
   }
 
@@ -9871,13 +9909,26 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
-#if USE_NEW_MOVEMENT
+#if USE_NEW_BLOCK_STYLE
+    if (player->block_delay_value > 0 &&
+	Feld[last_jx][last_jy] == EL_EMPTY)
+    {
+      Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
+#if 1
+      MovDelay[last_jx][last_jy] = player->block_delay_value + 1;
+#else
+      ChangeDelay[last_jx][last_jy] = player->block_last_field_delay;
+#endif
+    }
+#else
+#if USE_NEW_MOVE_STYLE
     if (player->block_last_field &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 #else
     if (Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
+#endif
 #endif
 
 #if 0
@@ -9892,9 +9943,16 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
+#if USE_NEW_BLOCK_STYLE
+#else
   if (!player->block_last_field &&
       Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
+#if 1
+    RemoveField(last_jx, last_jy);
+#else
     Feld[last_jx][last_jy] = EL_EMPTY;
+#endif
+#endif
 
   /* before DrawPlayer() to draw correct player graphic for this case */
   if (player->MovPos == 0)
@@ -9931,9 +9989,16 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     }
 #endif
 
+#if USE_NEW_BLOCK_STYLE
+#else
     if (player->block_last_field &&
 	Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
+#if 1
+      RemoveField(last_jx, last_jy);
+#else
       Feld[last_jx][last_jy] = EL_EMPTY;
+#endif
+#endif
 
     player->last_jx = jx;
     player->last_jy = jy;

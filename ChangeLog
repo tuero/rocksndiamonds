@@ -1,3 +1,6 @@
+2004-06-12
+	* fixed bug when pressing "stop, pause, stop, play" on tape recorder
+
 2004-06-11
 	* fixed bug with wrong door state after trying to quickload empty tape
 	* fixed waste of static memory usage of the binary, making it smaller

@@ -1381,6 +1381,9 @@ struct PlayerInfo
   boolean use_murphy_graphic;
 
   boolean block_last_field;
+  int block_delay;
+  int block_delay_value;
+
   boolean can_fall_into_acid;
 
   boolean LevelSolved, GameOver;
