@@ -87,6 +87,7 @@ void InitPlatformDependantStuff(void)
 #endif
 
 #if !defined(PLATFORM_UNIX)
+  program.userdata_directory = "userdata";
   initErrorFile();
 #endif
 
@@ -573,50 +574,44 @@ Bitmap *LoadImage(char *basename)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline boolean OpenAudio(struct AudioSystemInfo *audio)
+inline void OpenAudio(void)
 {
-  audio->sound_available = FALSE;
-  audio->loops_available = FALSE;
-  audio->sound_enabled = FALSE;
-  audio->soundserver_pipe[0] = audio->soundserver_pipe[1] = 0;
-  audio->soundserver_pid = 0;
-  audio->device_name = NULL;
-  audio->device_fd = 0;
+  /* always start with reliable default values */
+  audio.sound_available = FALSE;
+  audio.music_available = FALSE;
+  audio.loops_available = FALSE;
+  audio.mods_available = FALSE;
+  audio.sound_enabled = FALSE;
+
+  audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
+  audio.soundserver_pid = 0;
+  audio.device_name = NULL;
+  audio.device_fd = 0;
+
+  audio.channels = 0;
+  audio.music_channel = 0;
+  audio.music_nr = 0;
 
 #if defined(TARGET_SDL)
-  if (SDLOpenAudio())
-  {
-    audio->sound_available = TRUE;
-    audio->loops_available = TRUE;
-    audio->sound_enabled = TRUE;
-  }
+  SDLOpenAudio();
 #elif defined(PLATFORM_MSDOS)
-  if (MSDOSOpenAudio())
-  {
-    audio->sound_available = TRUE;
-    audio->loops_available = TRUE;
-    audio->sound_enabled = TRUE;
-  }
+  MSDOSOpenAudio();
 #elif defined(PLATFORM_UNIX)
-  UnixOpenAudio(audio);
+  UnixOpenAudio();
 #endif
-
-  return audio->sound_available;
 }
 
-inline void CloseAudio(struct AudioSystemInfo *audio)
+inline void CloseAudio(void)
 {
 #if defined(TARGET_SDL)
   SDLCloseAudio();
 #elif defined(PLATFORM_MSDOS)
   MSDOSCloseAudio();
 #elif defined(PLATFORM_UNIX)
-  UnixCloseAudio(audio);
+  UnixCloseAudio();
 #endif
 
-  audio->sound_available = FALSE;
-  audio->loops_available = FALSE;
-  audio->sound_enabled = FALSE;
+  audio.sound_enabled = FALSE;
 }
 
 inline void SetAudioMode(boolean enabled)

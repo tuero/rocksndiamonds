@@ -138,7 +138,7 @@ Image *Read_PCX_to_Image(char *filename)
 
   errno_pcx = PCX_Success;
 
-  if (!(file = fopen(filename, "r")))
+  if (!(file = fopen(filename, MODE_READ)))
   {
     errno_pcx = PCX_OpenFailed;
     return NULL;

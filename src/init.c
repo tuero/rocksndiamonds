@@ -132,7 +132,7 @@ void InitSound()
 {
   int i;
 
-  OpenAudio(&audio);
+  OpenAudio();
 
   AllocSoundArray(NUM_SOUNDS);
 

@@ -456,7 +456,7 @@ void LoadLevel(int level_nr)
   /* always start with reliable default values */
   setLevelInfoToDefaults();
 
-  if (!(file = fopen(filename, "r")))
+  if (!(file = fopen(filename, MODE_READ)))
   {
     Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
     return;
@@ -620,7 +620,7 @@ void SaveLevel(int level_nr)
   char *oldest_possible_cookie;
   FILE *file;
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot save level file '%s'", filename);
     return;
@@ -730,7 +730,7 @@ void LoadTape(int level_nr)
   /* at least one (default: the first) player participates in every tape */
   num_participating_players = 1;
 
-  if (!(file = fopen(filename, "r")))
+  if (!(file = fopen(filename, MODE_READ)))
     return;
 
   /* check file identifier */
@@ -892,7 +892,7 @@ void SaveTape(int level_nr)
     }
   }
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot save level recording file '%s'", filename);
     return;
@@ -952,7 +952,7 @@ void LoadScore(int level_nr)
     highscore[i].Score = 0;
   }
 
-  if (!(file = fopen(filename, "r")))
+  if (!(file = fopen(filename, MODE_READ)))
     return;
 
   /* check file identifier */
@@ -997,7 +997,7 @@ void SaveScore(int level_nr)
 
   InitScoreDirectory(leveldir_current->filename);
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot save score for level %d", level_nr);
     return;
@@ -1304,7 +1304,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
 
   FILE *file;
 
-  if (!(file = fopen(filename, "r")))
+  if (!(file = fopen(filename, MODE_READ)))
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
     return NULL;
@@ -1782,7 +1782,7 @@ static void SaveUserLevelInfo()
 
   filename = getPath2(getUserLevelDir(getLoginName()), LEVELINFO_FILENAME);
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write level info file '%s'", filename);
     free(filename);
@@ -1926,7 +1926,7 @@ void SaveSetup()
 
   filename = getPath2(getSetupDir(), SETUP_FILENAME);
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
     free(filename);
@@ -2014,7 +2014,7 @@ void SaveLevelSetup_LastSeries()
 
   filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
     free(filename);
@@ -2159,7 +2159,7 @@ void SaveLevelSetup_SeriesInfo()
 
   filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
 
-  if (!(file = fopen(filename, "w")))
+  if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
     free(filename);
@@ -2178,3 +2178,5 @@ void SaveLevelSetup_SeriesInfo()
 
   chmod(filename, SETUP_PERMS);
 }
+/*  LocalWords:  Rocks'n
+ */

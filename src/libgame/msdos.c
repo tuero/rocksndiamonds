@@ -952,9 +952,15 @@ void AllegroDrawLine(Drawable d, int from_x, int from_y, int to_x, int to_y,
   freeze_mouse_flag = FALSE;
 }
 
-Bool MSDOSOpenAudio(void)
+void MSDOSOpenAudio(void)
 {
-  return allegro_init_audio();
+  if (allegro_init_audio())
+  {
+    audio.sound_available = TRUE;
+    audio.music_available = TRUE;
+    audio.loops_available = TRUE;
+    audio.sound_enabled = TRUE;
+  }
 }
 
 void MSDOSCloseAudio(void)

@@ -12,6 +12,7 @@
 ***********************************************************/
 
 #include "system.h"
+#include "sound.h"
 #include "misc.h"
 
 
@@ -705,24 +706,40 @@ Bitmap *SDLLoadImage(char *filename)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline boolean SDLOpenAudio(void)
+inline void SDLOpenAudio(void)
 {
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {
     Error(ERR_WARN, "SDL_InitSubSystem() failed: %s", SDL_GetError());
-    return FALSE;
+    return;
   }
 
-  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 512) < 0)
+  if (Mix_OpenAudio(DEFAULT_AUDIO_SAMPLE_RATE, AUDIO_S16,
+		    AUDIO_STEREO_CHANNELS,
+		    DEFAULT_AUDIO_FRAGMENT_SIZE) < 0)
   {
     Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
-    return FALSE;
+    return;
   }
 
-  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
-  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
+  audio.sound_available = TRUE;
+  audio.music_available = TRUE;
+  audio.loops_available = TRUE;
+  audio.sound_enabled = TRUE;
 
-  return TRUE;
+  /* determine number of available channels */
+  audio.channels = Mix_AllocateChannels(MIX_CHANNELS);
+
+  if (!audio.mods_available)	/* reserve first channel for music loops */
+  {
+    if (Mix_ReserveChannels(1) == 1)
+      audio.music_channel = 0;
+    else
+      audio.music_available = FALSE;
+  }
+
+  Mix_Volume(-1, SOUND_MAX_VOLUME);
+  Mix_VolumeMusic(SOUND_MAX_VOLUME);
 }
 
 inline void SDLCloseAudio(void)

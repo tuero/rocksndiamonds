@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "system.h"
 #include "sound.h"
 #include "misc.h"
 
@@ -81,7 +82,7 @@ int OpenAudioDevice(char *audio_device_name)
   return audio_fd;
 }
 
-void UnixOpenAudio(struct AudioSystemInfo *audio)
+void UnixOpenAudio(void)
 {
   static char *audio_device_name[] =
   {
@@ -104,19 +105,20 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
 
   close(audio_fd);
 
-  audio->device_name = audio_device_name[i];
-  audio->sound_available = TRUE;
-  audio->sound_enabled = TRUE;
+  audio.device_name = audio_device_name[i];
+  audio.sound_available = TRUE;
+  audio.sound_enabled = TRUE;
 
 #if defined(AUDIO_STREAMING_DSP)
-  audio->loops_available = TRUE;
+  audio.music_available = TRUE;
+  audio.loops_available = TRUE;
 #endif
 }
 
-void UnixCloseAudio(struct AudioSystemInfo *audio)
+void UnixCloseAudio(void)
 {
-  if (audio->device_fd)
-    close(audio->device_fd);
+  if (audio.device_fd)
+    close(audio.device_fd);
 }
 
 #endif	/* PLATFORM_UNIX */
@@ -202,26 +204,34 @@ void SoundServer()
       byte *sample_ptr;
       long sample_size;
       static long max_sample_size = 0;
-      static long fragment_size = 0;
-      /* Even if the stereo flag is used as being boolean, it must be
-	 defined as an integer, else 'ioctl()' will fail! */
+      static long fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
+      int sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
       int stereo = TRUE;
-#if 0
-      int sample_rate = 8000;
-#else
-      int sample_rate = 22050;
-#endif
+      /* 'ioctl()' expects pointer to integer value for stereo flag
+	 (boolean is defined as 'char', which will not work here) */
 
       if (playing_sounds ||
 	  (audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
-	  /* 2 buffers / 512 bytes, giving 1/16 second resolution */
-	  /* (with stereo the effective buffer size will shrink to 256) */
-	  fragment_size = 0x00020009;
+	  unsigned long fragment_spec = 0;
 
-	  if (ioctl(audio.device_fd,SNDCTL_DSP_SETFRAGMENT,&fragment_size) < 0)
+	  /* determine logarithm (log2) of the fragment size */
+	  for (fragment_spec=0; (1 << fragment_spec) < fragment_size;
+	       fragment_spec++);
+
+	  /* use two fragments (play one fragment, prepare the other);
+	     one fragment would result in interrupted audio output, more
+	     than two fragments would raise audio output latency to much */
+	  fragment_spec |= 0x00020000;
+
+	  /* Example for fragment specification:
+	     - 2 buffers / 512 bytes (giving 1/16 second resolution for 8 kHz)
+	     - (with stereo the effective buffer size will shrink to 256)
+	     => fragment_size = 0x00020009 */
+
+	  if (ioctl(audio.device_fd,SNDCTL_DSP_SETFRAGMENT,&fragment_spec) < 0)
 	    Error(ERR_EXIT_SOUND_SERVER,
 		  "cannot set fragment size of /dev/dsp - no sounds");
 
@@ -262,7 +272,7 @@ void SoundServer()
 	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
 	  /* first clear the last premixing buffer */
-	  memset(premix_last_buffer,0,fragment_size*sizeof(int));
+	  memset(premix_last_buffer, 0, fragment_size * sizeof(int));
 
 	  for(i=0;i<MAX_SOUNDS_PLAYING;i++)
 	  {
@@ -345,7 +355,7 @@ void SoundServer()
 	  }
 
 	  /* put last mixing buffer to final playing buffer */
-	  for(i=0;i<fragment_size;i++)
+	  for(i=0; i<fragment_size; i++)
 	  {
 	    if (premix_last_buffer[i]<-255)
 	      playing_buffer[i] = 0;
@@ -356,7 +366,7 @@ void SoundServer()
 	  }
 
 	  /* finally play the sound fragment */
-	  write(audio.device_fd, playing_buffer,fragment_size);
+	  write(audio.device_fd, playing_buffer, fragment_size);
 	}
 
 	/* if no sounds playing, free device for other sound programs */
@@ -834,7 +844,7 @@ boolean LoadSound(int sound_nr, char *sound_name)
 
 #if !defined(PLATFORM_MSDOS)
 
-  if ((file = fopen(filename, "r")) == NULL)
+  if ((file = fopen(filename, MODE_READ)) == NULL)
   {
     Error(ERR_WARN, "cannot open sound file '%s' - no sounds", filename);
     return FALSE;
@@ -903,6 +913,28 @@ boolean LoadSound(int sound_nr, char *sound_name)
   return TRUE;
 }
 
+void PlayMusic(int nr)
+{
+  if (!audio.music_available)
+    return;
+
+#if defined(TARGET_SDL)
+  if (audio.mods_available)
+  {
+    Mix_VolumeMusic(SOUND_MAX_VOLUME);
+    /* start playing module */
+  }
+  else	/* play music loop */
+  {
+    Mix_Volume(audio.music_channel, SOUND_MAX_VOLUME);
+    Mix_PlayChannel(audio.music_channel, Sound[nr].mix_chunk, -1);
+  }
+#else
+  audio.music_nr = nr;
+  PlaySoundLoop(nr);
+#endif
+}
+
 void PlaySound(int nr)
 {
   PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, PSND_NO_LOOP);
@@ -944,23 +976,29 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   snd_ctrl.data_len	= Sound[nr].data_len;
 
 #if defined(TARGET_SDL)
-
-  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
-  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
-
+  Mix_Volume(-1, SOUND_MAX_VOLUME);
   Mix_PlayChannel(-1, Sound[nr].mix_chunk, (loop ? -1 : 0));
-
-#else
-#if !defined(PLATFORM_MSDOS)
+#elif defined(PLATFORM_UNIX)
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
-#else
+#elif defined(PLATFORM_MSDOS)
   sound_handler(snd_ctrl);
 #endif
+}
+
+void FadeMusic(void)
+{
+#if defined(TARGET_SDL)
+  if (audio.mods_available)
+    Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
+  else
+    Mix_FadeOutChannel(audio.music_channel, SOUND_FADING_INTERVAL);
+#else
+  FadeSound(audio.music_nr);
 #endif
 }
 
@@ -972,6 +1010,18 @@ void FadeSound(int nr)
 void FadeSounds()
 {
   StopSoundExt(-1, SSND_FADE_ALL_SOUNDS);
+}
+
+void StopMusic(void)
+{
+#if defined(TARGET_SDL)
+  if (audio.mods_available)
+    Mix_HaltMusic();
+  else
+    Mix_HaltChannel(audio.music_channel);
+#else
+  StopSound(audio.music_nr);
+#endif
 }
 
 void StopSound(int nr)
@@ -1006,13 +1056,23 @@ void StopSoundExt(int nr, int method)
 
   if (SSND_FADING(method))
   {
-    Mix_FadeOutChannel(-1, 1000);
-    Mix_FadeOutMusic(1000);
+    int i;
+
+    for (i=0; i<audio.channels; i++)
+      if (i != audio.music_channel || snd_ctrl.stop_all_sounds)
+	Mix_FadeOutChannel(i, SOUND_FADING_INTERVAL);
+    if (snd_ctrl.stop_all_sounds)
+      Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
   }
   else
   {
-    Mix_HaltChannel(-1);
-    Mix_HaltMusic();
+    int i;
+
+    for (i=0; i<audio.channels; i++)
+      if (i != audio.music_channel || snd_ctrl.stop_all_sounds)
+	Mix_HaltChannel(i);
+    if (snd_ctrl.stop_all_sounds)
+      Mix_HaltMusic();
   }
 
 #else

@@ -733,7 +733,7 @@ void XAutoRepeatOff(Display *);
 
 void AllegroDrawLine(Drawable, int, int, int, int, Pixel);
 
-Bool MSDOSOpenAudio(void);
+void MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);
 
 void NetworkServer(int, int);

@@ -30,10 +30,15 @@
 
 /* contant definitions */
 
-#define DEFAULT_DEPTH			0
+/* the additional 'b' is needed for Win32 to open files in binary mode */
+#define MODE_READ		"rb"
+#define MODE_WRITE		"wb"
+#define MODE_APPEND		"ab"
 
-#define FULLSCREEN_NOT_AVAILABLE	FALSE
-#define FULLSCREEN_AVAILABLE		TRUE
+#define DEFAULT_DEPTH		0
+
+#define FULLSCREEN_NOT_AVAILABLE FALSE
+#define FULLSCREEN_AVAILABLE	 TRUE
 
 /* values for button_status */
 #define MB_NOT_PRESSED		FALSE
@@ -166,12 +171,19 @@ struct VideoSystemInfo
 struct AudioSystemInfo
 {
   boolean sound_available;
+  boolean music_available;
   boolean loops_available;
+  boolean mods_available;
   boolean sound_enabled;
+
   int soundserver_pipe[2];
   int soundserver_pid;
   char *device_name;
   int device_fd;
+
+  int channels;
+  int music_channel;
+  int music_nr;
 };
 
 struct GfxInfo
@@ -290,8 +302,8 @@ inline boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
 
-inline boolean OpenAudio(struct AudioSystemInfo *);
-inline void CloseAudio(struct AudioSystemInfo *);
+inline void OpenAudio(void);
+inline void CloseAudio(void);
 inline void SetAudioMode(boolean);
 
 inline void InitEventFilter(EventFilter);

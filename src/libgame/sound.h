@@ -37,10 +37,37 @@
 #define AUDIO_STREAMING_DSP
 #endif
 
-#if !defined(PLATFORM_MSDOS)
-#define MAX_SOUNDS_PLAYING	16
+#define AUDIO_SAMPLE_RATE_8000			8000
+#define AUDIO_SAMPLE_RATE_22050			22050
+
+#define AUDIO_FRAGMENT_SIZE_512			512
+#define AUDIO_FRAGMENT_SIZE_1024		1024
+#define AUDIO_FRAGMENT_SIZE_2048		2048
+#define AUDIO_FRAGMENT_SIZE_4096		4096
+
+#define AUDIO_MONO_CHANNEL			1
+#define AUDIO_STEREO_CHANNELS			2
+
+#if defined(TARGET_SDL)
+/* one second fading interval == 1000 ticks (milliseconds) */
+#define SOUND_FADING_INTERVAL			1000
+#define SOUND_MAX_VOLUME			(SDL_MIX_MAXVOLUME / 4)
+#endif
+
+#define DEFAULT_AUDIO_SAMPLE_RATE		AUDIO_SAMPLE_RATE_22050
+#define DEFAULT_AUDIO_FRAGMENT_SIZE_UNIX	AUDIO_FRAGMENT_SIZE_512
+#define DEFAULT_AUDIO_FRAGMENT_SIZE_WIN32	AUDIO_FRAGMENT_SIZE_2048
+
+#if defined(PLATFORM_UNIX)
+#define DEFAULT_AUDIO_FRAGMENT_SIZE	DEFAULT_AUDIO_FRAGMENT_SIZE_UNIX
 #else
-#define MAX_SOUNDS_PLAYING	8
+#define DEFAULT_AUDIO_FRAGMENT_SIZE	DEFAULT_AUDIO_FRAGMENT_SIZE_WIN32
+#endif
+
+#if !defined(PLATFORM_MSDOS)
+#define MAX_SOUNDS_PLAYING			16
+#else
+#define MAX_SOUNDS_PLAYING			8
 #endif
 
 #if !defined(PLATFORM_HPUX)
@@ -153,8 +180,8 @@ struct SoundControl
 };
 
 /* general sound functions */
-void UnixOpenAudio(struct AudioSystemInfo *);
-void UnixCloseAudio(struct AudioSystemInfo *);
+void UnixOpenAudio(void);
+void UnixCloseAudio(void);
 
 /* sound server functions */ 
 void SoundServer(void);
@@ -162,12 +189,15 @@ void SoundServer(void);
 /* sound client functions */
 void AllocSoundArray(int);
 boolean LoadSound(int, char *);
+void PlayMusic(int);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);
 void PlaySoundExt(int, int, int, boolean);
+void FadeMusic(void);
 void FadeSound(int);
 void FadeSounds(void);
+void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);

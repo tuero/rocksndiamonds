@@ -1314,7 +1314,7 @@ FILE *openErrorFile()
   FILE *error_file;
 
   filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, "a");
+  error_file = fopen(filename, MODE_APPEND);
   free(filename);
 
   return error_file;
@@ -1326,7 +1326,7 @@ void dumpErrorFile()
   FILE *error_file;
 
   filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, "r");
+  error_file = fopen(filename, MODE_READ);
   free(filename);
 
   if (error_file != NULL)
