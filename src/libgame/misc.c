@@ -1745,6 +1745,9 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	setString(&file_list[i].default_parameter[j], suffix_list[j].value);
 	setString(&file_list[i].parameter[j], suffix_list[j].value);
       }
+
+      file_list[i].redefined = FALSE;
+      file_list[i].fallback_to_default = FALSE;
     }
   }
 
@@ -1918,6 +1921,9 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   new_list_entry->default_filename = NULL;
   new_list_entry->filename = NULL;
   new_list_entry->parameter = checked_calloc(parameter_array_size);
+
+  new_list_entry->redefined = FALSE;
+  new_list_entry->fallback_to_default = FALSE;
 
   read_token_parameters(extra_file_hash, suffix_list, new_list_entry);
 }
@@ -2376,6 +2382,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       setString(&file_list[i].parameter[j], file_list[i].default_parameter[j]);
 
     file_list[i].redefined = FALSE;
+    file_list[i].fallback_to_default = FALSE;
   }
 
   /* free previous dynamic artwork file array */
@@ -2444,6 +2451,116 @@ static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
   }
 }
 
+#if 1
+static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
+				    struct ListNodeInfo **listnode,
+				    struct FileInfo *file_list_entry)
+{
+  char *init_text[] =
+  {
+    "Loading graphics:",
+    "Loading sounds:",
+    "Loading music:"
+  };
+
+  ListNode *node;
+  char *basename = file_list_entry->filename;
+  char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "cannot find artwork file '%s'", basename);
+
+    basename = file_list_entry->default_filename;
+
+    /* dynamic artwork has no default filename / skip empty default artwork */
+    if (basename == NULL || strcmp(basename, UNDEFINED_FILENAME) == 0)
+      return;
+
+    file_list_entry->fallback_to_default = TRUE;
+
+    Error(ERR_WARN, "trying default artwork file '%s'", basename);
+
+    filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+    if (filename == NULL)
+    {
+      int error_mode = ERR_WARN;
+
+      /* we can get away without sounds and music, but not without graphics */
+      if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+	error_mode = ERR_EXIT;
+
+      Error(error_mode, "cannot find default artwork file '%s'", basename);
+
+      return;
+    }
+  }
+
+  /* check if the old and the new artwork file are the same */
+  if (*listnode && strcmp((*listnode)->source_filename, filename) == 0)
+  {
+    /* The old and new artwork are the same (have the same filename and path).
+       This usually means that this artwork does not exist in this artwork set
+       and a fallback to the existing artwork is done. */
+
+#if 0
+    printf("[artwork '%s' already exists (same list entry)]\n", filename);
+#endif
+
+    return;
+  }
+
+  /* delete existing artwork file entry */
+  deleteArtworkListEntry(artwork_info, listnode);
+
+  /* check if the new artwork file already exists in the list of artworks */
+  if ((node = getNodeFromKey(artwork_info->content_list, filename)) != NULL)
+  {
+#if 0
+      printf("[artwork '%s' already exists (other list entry)]\n", filename);
+#endif
+
+      *listnode = (struct ListNodeInfo *)node->content;
+      (*listnode)->num_references++;
+
+      return;
+  }
+
+#if 0
+  printf("::: %s: '%s'\n", init_text[artwork_info->type], basename);
+#endif
+
+  DrawInitText(init_text[artwork_info->type], 120, FC_GREEN);
+  DrawInitText(basename, 150, FC_YELLOW);
+
+  if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
+  {
+#if 0
+      printf("[adding new artwork '%s']\n", filename);
+#endif
+
+    (*listnode)->num_references = 1;
+    addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
+		  *listnode);
+  }
+  else
+  {
+    int error_mode = ERR_WARN;
+
+#if 1
+    /* we can get away without sounds and music, but not without graphics */
+    if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+      error_mode = ERR_EXIT;
+#endif
+
+    Error(error_mode, "cannot load artwork file '%s'", basename);
+    return;
+  }
+}
+
+#else
+
 static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 				    struct ListNodeInfo **listnode,
 				    char *basename)
@@ -2463,6 +2580,9 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     int error_mode = ERR_WARN;
 
 #if 1
+    /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
+    /* before failing, try fallback to default artwork */
+#else
     /* we can get away without sounds and music, but not without graphics */
     if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
       error_mode = ERR_EXIT;
@@ -2533,6 +2653,27 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     return;
   }
 }
+#endif
+
+#if 1
+static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
+			      struct FileInfo *file_list_entry)
+{
+#if 0
+  printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
+#endif
+
+  if (strcmp(file_list_entry->filename, UNDEFINED_FILENAME) == 0)
+  {
+    deleteArtworkListEntry(artwork_info, listnode);
+    return;
+  }
+
+  replaceArtworkListEntry(artwork_info, listnode, file_list_entry);
+}
+
+#else
 
 static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      struct ListNodeInfo **listnode,
@@ -2550,6 +2691,38 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 
   replaceArtworkListEntry(artwork_info, listnode, basename);
 }
+#endif
+
+#if 1
+static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
+			      struct FileInfo *file_list_entry)
+{
+#if 0
+  if (artwork_info->artwork_list == NULL ||
+      list_pos >= artwork_info->num_file_list_entries)
+    return;
+#endif
+
+#if 0
+  printf("loading artwork '%s' ...  [%d]\n",
+	 basename, getNumNodes(artwork_info->content_list));
+#endif
+
+#if 1
+  LoadCustomArtwork(artwork_info, listnode, file_list_entry);
+#else
+  LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
+		    basename);
+#endif
+
+#if 0
+  printf("loading artwork '%s' done [%d]\n",
+	 basename, getNumNodes(artwork_info->content_list));
+#endif
+}
+
+#else
 
 static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 			      struct ListNodeInfo **listnode,
@@ -2578,6 +2751,7 @@ static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 	 basename, getNumNodes(artwork_info->content_list));
 #endif
 }
+#endif
 
 void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
@@ -2600,18 +2774,34 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
       printf("::: '%s' -> '%s'\n", file_list[i].token, file_list[i].filename);
 #endif
 
+#if 1
+    LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
+		      &file_list[i]);
+#else
     LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      file_list[i].filename, i);
+#endif
 
 #if 0
+    /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
     if (artwork_info->artwork_list[i] == NULL &&
-	strcmp(file_list[i].default_filename, file_list[i].filename) != 0)
+	strcmp(file_list[i].filename, UNDEFINED_FILENAME) != 0 &&
+	strcmp(file_list[i].default_filename, file_list[i].filename) != 0 &&
+	strcmp(file_list[i].default_filename, UNDEFINED_FILENAME) != 0)
     {
       Error(ERR_WARN, "trying default artwork file '%s'",
 	    file_list[i].default_filename);
 
       LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 			file_list[i].default_filename, i);
+
+      /* even the fallback to default artwork was not successful -- fail now */
+      if (artwork_info->artwork_list[i] == NULL &&
+	  artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+	Error(ERR_EXIT, "cannot find artwork file '%s' or default file '%s'",
+	      file_list[i].filename, file_list[i].default_filename);
+
+      file_list[i].fallback_to_default = TRUE;
     }
 #endif
   }
@@ -2623,14 +2813,21 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 
   for (i = 0; i < num_dynamic_file_list_entries; i++)
   {
+#if 1
+    LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
+		      &dynamic_file_list[i]);
+#else
     LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
 		      dynamic_file_list[i].filename, i);
+#endif
 
 #if 0
     printf("::: '%s', '0x%08x'\n",
 	   dynamic_file_list[i].filename,
 	   dynamic_file_list[i].default_filename);
 #endif
+
+    /* dynamic artwork does not have default filename! */
   }
 
 #if 0

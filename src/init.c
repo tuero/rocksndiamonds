@@ -1010,6 +1010,49 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   int anim_frames_per_line = 1;
   int i;
 
+#if 1
+#if 1
+
+  /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
+  /* if fallback to default artwork is done, also use the default parameters */
+  if (image->fallback_to_default)
+  {
+#if 0
+    printf("::: FALLBACK for %d\n", graphic_copy_from);
+#endif
+
+    parameter_raw = image->default_parameter;
+  }
+
+#else
+
+  /* !!! ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
+  /* (better try to set a "fallback -> use default parameters" flag) */
+  if (src_bitmap)
+  {
+    int len_source_filename = strlen(src_bitmap->source_filename);
+    int len_default_filename = strlen(image->default_filename);
+    int pos_basename = len_source_filename - len_default_filename;
+    char *source_basename = &src_bitmap->source_filename[pos_basename];
+
+#if 0
+    printf("::: src_bitmap->source_filename -> '%s'\n",
+	   src_bitmap->source_filename);
+    printf("::: image->default_filename     -> '%s'\n",
+	   image->default_filename);
+    printf("::: image->filename             -> '%s'\n",
+	   image->filename);
+#endif
+
+    /* check if there was a fallback to the default artwork file */
+    if (strcmp(image->filename, image->default_filename) != 0 &&
+	pos_basename >= 0 &&
+	strcmp(source_basename, image->default_filename) == 0)
+      parameter_raw = image->default_parameter;
+  }
+#endif
+#endif
+
   /* get integer values from string parameters */
   for (i = 0; i < NUM_GFX_ARGS; i++)
   {

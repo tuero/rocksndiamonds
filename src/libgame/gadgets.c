@@ -1068,7 +1068,11 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     getFontCharSource(font_nr, FONT_ASCII_CURSOR, &src_bitmap, &src_x, &src_y);
     src_x += font_width / 2;
     src_y += font_height / 2;
-    gi->selectbox.inverse_color = GetPixel(src_bitmap, src_x, src_y);
+
+    /* there may be esoteric cases with missing or too small font bitmap */
+    if (src_bitmap != NULL &&
+	src_x < src_bitmap->width && src_y < src_bitmap->height)
+      gi->selectbox.inverse_color = GetPixel(src_bitmap, src_x, src_y);
 
     /* always start with closed selectbox */
     gi->selectbox.open = FALSE;

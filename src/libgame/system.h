@@ -727,6 +727,7 @@ struct FileInfo
   char **parameter;				/* array of file parameters */
 
   boolean redefined;
+  boolean fallback_to_default;
 };
 
 struct SetupFileList

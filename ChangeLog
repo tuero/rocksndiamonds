@@ -1,3 +1,7 @@
+2005-02-02
+	* improved fallback handling when configured artwork is not available
+	  (now using default artwork instead of exiting when files not found)
+
 2005-02-01
 	* fixed bug on level selection screen when dragging scrollbar
 
