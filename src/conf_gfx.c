@@ -12,6 +12,7 @@
 ***********************************************************/
 
 #include "libgame/libgame.h"
+#include "main.h"
 
 
 struct ConfigInfo image_config_suffix[] =
@@ -20,15 +21,17 @@ struct ConfigInfo image_config_suffix[] =
   { ".ypos",				"0"			},
   { ".offset",				"32"			},
   { ".vertical",			"0"			},
+  { ".xoffset",				GFX_ARG_UNDEFINED	},
+  { ".yoffset",				GFX_ARG_UNDEFINED	},
   { ".frames",				"1"			},
-  { ".start_frame",			"-1"			},
+  { ".start_frame",			GFX_ARG_UNDEFINED	},
   { ".delay",				"1"			},
   { ".mode_loop",			"0"			},
   { ".mode_linear",			"0"			},
   { ".mode_pingpong",			"0"			},
   { ".mode_pingpong2",			"0"			},
   { ".mode_reverse",			"0"			},
-  { ".global_sync",			"-1"			},
+  { ".global_sync",			GFX_ARG_UNDEFINED	},
 
   { NULL,				NULL			}
 };
@@ -647,7 +650,6 @@ struct ConfigInfo image_config[] =
   { "dynamite.active.frames",			"7"			},
   { "dynamite.active.delay",			"12"			},
   { "dynamite.active.mode_linear",		"1"			},
-  { "dynamite.active.global_sync",		"0"			},
 
   { "wall_emerald",				"RocksElements.pcx"	},
   { "wall_emerald.xpos",			"4"			},
@@ -812,13 +814,13 @@ struct ConfigInfo image_config[] =
   { "acid_splash_left.ypos",			"10"			},
   { "acid_splash_left.frames",			"4"			},
   { "acid_splash_left.delay",			"2"			},
-  { "acid_splash_left.global_sync",		"0"			},
+  { "acid_splash_left.active.mode_linear",	"1"			},
   { "acid_splash_right",			"RocksHeroes.pcx"	},
   { "acid_splash_right.xpos",			"12"			},
   { "acid_splash_right.ypos",			"10"			},
   { "acid_splash_right.frames",			"4"			},
   { "acid_splash_right.delay",			"2"			},
-  { "acid_splash_right.global_sync",		"0"			},
+  { "acid_splash_right.active.mode_linear",	"1"			},
 
   { "amoeba_drop",				"RocksElements.pcx"	},
   { "amoeba_drop.xpos",				"5"			},
@@ -830,7 +832,6 @@ struct ConfigInfo image_config[] =
   { "amoeba.creating.frames",			"3"			},
   { "amoeba.creating.delay",			"2"			},
   { "amoeba.creating.mode_linear",		"1"			},
-  { "amoeba.creating.global_sync",		"0"			},
   { "amoeba.shrinking",				"RocksElements.pcx"	},
   { "amoeba.shrinking.xpos",			"5"			},
   { "amoeba.shrinking.ypos",			"6"			},
@@ -838,7 +839,6 @@ struct ConfigInfo image_config[] =
   { "amoeba.shrinking.delay",			"2"			},
   { "amoeba.shrinking.mode_linear",		"1"			},
   { "amoeba.shrinking.mode_reverse",		"1"			},
-  { "amoeba.shrinking.global_sync",		"0"			},
   { "amoeba_wet",				"RocksElements.pcx"	},
   { "amoeba_wet.xpos",				"8"			},
   { "amoeba_wet.ypos",				"6"			},
@@ -1666,28 +1666,24 @@ struct ConfigInfo image_config[] =
   { "wall_growing_active_left.frames",		"3"			},
   { "wall_growing_active_left.delay",		"6"			},
   { "wall_growing_active_left.mode_linear",	"1"			},
-  { "wall_growing_active_left.global_sync",	"0"			},
   { "wall_growing_active_right",		"RocksElements.pcx"	},
   { "wall_growing_active_right.xpos",		"5"			},
   { "wall_growing_active_right.ypos",		"10"			},
   { "wall_growing_active_right.frames",		"3"			},
   { "wall_growing_active_right.delay",		"6"			},
   { "wall_growing_active_right.mode_linear",	"1"			},
-  { "wall_growing_active_right.global_sync",	"0"			},
   { "wall_growing_active_up",			"RocksHeroes.pcx"	},
   { "wall_growing_active_up.xpos",		"3"			},
   { "wall_growing_active_up.ypos",		"12"			},
   { "wall_growing_active_up.frames",		"3"			},
   { "wall_growing_active_up.delay",		"6"			},
   { "wall_growing_active_up.mode_linear",	"1"			},
-  { "wall_growing_active_up.global_sync",	"0"			},
   { "wall_growing_active_down",			"RocksHeroes.pcx"	},
   { "wall_growing_active_down.xpos",		"0"			},
   { "wall_growing_active_down.ypos",		"12"			},
   { "wall_growing_active_down.frames",		"3"			},
   { "wall_growing_active_down.delay",		"6"			},
   { "wall_growing_active_down.mode_linear",	"1"			},
-  { "wall_growing_active_down.global_sync",	"0"			},
 
   { "black_orb",				"RocksElements.pcx"	},
   { "black_orb.xpos",				"13"			},
@@ -2407,7 +2403,7 @@ struct ConfigInfo image_config[] =
   { "explosion.ypos",				"4"			},
   { "explosion.frames",				"8"			},
   { "explosion.delay",				"2"			},
-  { "explosion.global_sync",			"0"			},
+  { "explosion.mode_linear",			"1"			},
 
   { "twinkle_blue",				"RocksHeroes.pcx"	},
   { "twinkle_blue.xpos",			"9"			},
@@ -2581,13 +2577,6 @@ struct ConfigInfo image_config[] =
   { "info.font_em_5.ypos",			"4"			},
   { "info.font_em_5.frames",			"4"			},
   { "info.font_em_5.delay",			"10"			},
-
-  { "old.pix_elements",				"RocksElements.pcx"	},
-  { "old.pix_heroes",				"RocksHeroes.pcx"	},
-  { "old.pix_sp",				"RocksSP.pcx"		},
-  { "old.pix_dc",				"RocksDC.pcx"		},
-  { "old.pix_more",				"RocksMore.pcx"		},
-  { "old.pix_font_em",				"RocksFontEM.pcx"	},
 
   { NULL,					NULL			}
 };

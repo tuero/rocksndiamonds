@@ -1439,7 +1439,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   }
 
   if (list_pos != num_file_list_entries - 1)
-    Error(ERR_EXIT, "inconsistant config list information -- please fix");
+    Error(ERR_EXIT, "inconsistant config list information (%d != %d) -- please fix", list_pos, num_file_list_entries - 1);
 
   return file_list;
 }

@@ -1391,17 +1391,22 @@
 #define GFX_ARG_YPOS				1
 #define GFX_ARG_OFFSET				2
 #define GFX_ARG_VERTICAL			3
-#define GFX_ARG_FRAMES				4
-#define GFX_ARG_START_FRAME			5
-#define GFX_ARG_DELAY				6
-#define GFX_ARG_MODE_LOOP			7
-#define GFX_ARG_MODE_LINEAR			8
-#define GFX_ARG_MODE_PINGPONG			9
-#define GFX_ARG_MODE_PINGPONG2			10
-#define GFX_ARG_MODE_REVERSE			11
-#define GFX_ARG_GLOBAL_SYNC			12
+#define GFX_ARG_XOFFSET				4
+#define GFX_ARG_YOFFSET				5
+#define GFX_ARG_FRAMES				6
+#define GFX_ARG_START_FRAME			7
+#define GFX_ARG_DELAY				8
+#define GFX_ARG_MODE_LOOP			9
+#define GFX_ARG_MODE_LINEAR			10
+#define GFX_ARG_MODE_PINGPONG			11
+#define GFX_ARG_MODE_PINGPONG2			12
+#define GFX_ARG_MODE_REVERSE			13
+#define GFX_ARG_GLOBAL_SYNC			14
 
-#define NUM_GFX_ARGS				13
+#define NUM_GFX_ARGS				15
+
+#define GFX_ARG_UNDEFINED			"-1000000"
+#define GFX_ARG_UNDEFINED_VALUE			(atoi(GFX_ARG_UNDEFINED))
 
 
 /* values for sound configuration suffixes */

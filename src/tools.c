@@ -790,7 +790,7 @@ void DrawGraphicAnimation(int x, int y, int graphic)
   MarkTileDirty(x, y);
 }
 
-#if 1
+#if 0
 void getOldGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
   if (graphic >= 0 && graphic_info[graphic].bitmap != NULL)

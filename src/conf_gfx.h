@@ -664,13 +664,7 @@
 #define IMG_INFO_FONT_EM_3			643
 #define IMG_INFO_FONT_EM_4			644
 #define IMG_INFO_FONT_EM_5			645
-#define IMG_OLD_PIX_ELEMENTS			646
-#define IMG_OLD_PIX_HEROES			647
-#define IMG_OLD_PIX_SP				648
-#define IMG_OLD_PIX_DC				649
-#define IMG_OLD_PIX_MORE			650
-#define IMG_OLD_PIX_FONT_EM			651
 
-#define NUM_IMAGE_FILES				652
+#define NUM_IMAGE_FILES				646
 
 #endif	/* CONF_GFX_H */

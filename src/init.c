@@ -649,369 +649,6 @@ void InitGadgets()
 
 void InitElementInfo()
 {
-#if 0
-  static struct
-  {
-    int element;
-    int graphic;
-  }
-  element_to_graphic[] =
-  {
-    { EL_EMPTY,				GFX_LEERRAUM		},
-    { EL_SAND,				GFX_ERDREICH		},
-    { EL_WALL,				GFX_MAUERWERK		},
-    { EL_WALL_CRUMBLED,			GFX_FELSBODEN		},
-    { EL_ROCK,				GFX_FELSBROCKEN		},
-    { EL_EMERALD,			GFX_EDELSTEIN		},
-    { EL_EXIT_CLOSED,			GFX_AUSGANG_ZU		},
-    { EL_EXIT_OPENING,			GFX_AUSGANG_ACT		},
-    { EL_EXIT_OPEN,			GFX_AUSGANG_AUF		},
-    { EL_SP_EXIT_OPEN,			GFX_SP_EXIT		},
-    { EL_PLAYER1,			GFX_SPIELER1		},
-    { EL_PLAYER2,			GFX_SPIELER2		},
-    { EL_PLAYER3,			GFX_SPIELER3		},
-    { EL_PLAYER4,			GFX_SPIELER4		},
-    { EL_BUG,				GFX_KAEFER		},
-    { EL_BUG_RIGHT,			GFX_KAEFER_RIGHT	},
-    { EL_BUG_UP,			GFX_KAEFER_UP		},
-    { EL_BUG_LEFT,			GFX_KAEFER_LEFT		},
-    { EL_BUG_DOWN,			GFX_KAEFER_DOWN		},
-    { EL_SPACESHIP,			GFX_FLIEGER		},
-    { EL_SPACESHIP_RIGHT,		GFX_FLIEGER_RIGHT	},
-    { EL_SPACESHIP_UP,			GFX_FLIEGER_UP		},
-    { EL_SPACESHIP_LEFT,		GFX_FLIEGER_LEFT	},
-    { EL_SPACESHIP_DOWN,		GFX_FLIEGER_DOWN	},
-    { EL_BD_BUTTERFLY,			GFX_BUTTERFLY		},
-    { EL_BD_BUTTERFLY_RIGHT,		GFX_BUTTERFLY_RIGHT	},
-    { EL_BD_BUTTERFLY_UP,		GFX_BUTTERFLY_UP	},
-    { EL_BD_BUTTERFLY_LEFT,		GFX_BUTTERFLY_LEFT	},
-    { EL_BD_BUTTERFLY_DOWN,		GFX_BUTTERFLY_DOWN	},
-    { EL_BD_FIREFLY,			GFX_FIREFLY		},
-    { EL_BD_FIREFLY_RIGHT,		GFX_FIREFLY_RIGHT	},
-    { EL_BD_FIREFLY_UP,			GFX_FIREFLY_UP		},
-    { EL_BD_FIREFLY_LEFT,		GFX_FIREFLY_LEFT	},
-    { EL_BD_FIREFLY_DOWN,		GFX_FIREFLY_DOWN	},
-    { EL_YAMYAM,			GFX_MAMPFER		},
-    { EL_ROBOT,				GFX_ROBOT		},
-    { EL_STEELWALL,			GFX_BETON		},
-    { EL_DIAMOND,			GFX_DIAMANT		},
-    { EL_QUICKSAND_EMPTY,		GFX_MORAST_LEER		},
-    { EL_QUICKSAND_FULL,		GFX_MORAST_VOLL		},
-    { EL_QUICKSAND_EMPTYING,		GFX_MORAST_LEER		},
-    { EL_AMOEBA_DROP,			GFX_TROPFEN		},
-    { EL_BOMB,				GFX_BOMBE		},
-    { EL_MAGIC_WALL,			GFX_MAGIC_WALL_OFF	},
-    { EL_MAGIC_WALL_ACTIVE,		GFX_MAGIC_WALL_EMPTY	},
-    { EL_MAGIC_WALL_EMPTYING,		GFX_MAGIC_WALL_EMPTY	},
-    { EL_MAGIC_WALL_FULL,		GFX_MAGIC_WALL_FULL	},
-    { EL_MAGIC_WALL_DEAD,		GFX_MAGIC_WALL_DEAD	},
-    { EL_ACID,				GFX_SALZSAEURE		},
-    { EL_AMOEBA_DEAD,			GFX_AMOEBE_TOT		},
-    { EL_AMOEBA_WET,			GFX_AMOEBE_NASS		},
-    { EL_AMOEBA_DRY,			GFX_AMOEBE_NORM		},
-    { EL_AMOEBA_FULL,			GFX_AMOEBE_VOLL		},
-    { EL_BD_AMOEBA,			GFX_AMOEBE_BD		},
-    { EL_AMOEBA_TO_DIAMOND,		GFX_AMOEBA2DIAM		},
-    { EL_AMOEBA_DRIPPING,		GFX_AMOEBE_NASS		},
-    { EL_NUT,				GFX_KOKOSNUSS		},
-    { EL_GAMEOFLIFE,			GFX_LIFE		},
-    { EL_BIOMAZE,			GFX_LIFE_ASYNC		},
-    { EL_DYNAMITE_ACTIVE,		GFX_DYNAMIT		},
-    { EL_STONEBLOCK,			GFX_BADEWANNE		},
-    { EL_ACIDPOOL_TOPLEFT,		GFX_BADEWANNE1		},
-    { EL_ACIDPOOL_TOPRIGHT,		GFX_BADEWANNE2		},
-    { EL_ACIDPOOL_BOTTOMLEFT,		GFX_BADEWANNE3		},
-    { EL_ACIDPOOL_BOTTOM,		GFX_BADEWANNE4		},
-    { EL_ACIDPOOL_BOTTOMRIGHT,		GFX_BADEWANNE5		},
-    { EL_ROBOT_WHEEL,			GFX_ABLENK_AUS		},
-    { EL_ROBOT_WHEEL_ACTIVE,		GFX_ABLENK_EIN		},
-    { EL_KEY1,				GFX_SCHLUESSEL1		},
-    { EL_KEY2,				GFX_SCHLUESSEL2		},
-    { EL_KEY3,				GFX_SCHLUESSEL3		},
-    { EL_KEY4,				GFX_SCHLUESSEL4		},
-    { EL_GATE1,				GFX_PFORTE1		},
-    { EL_GATE2,				GFX_PFORTE2		},
-    { EL_GATE3,				GFX_PFORTE3		},
-    { EL_GATE4,				GFX_PFORTE4		},
-    { EL_GATE1_GRAY,			GFX_PFORTE1X		},
-    { EL_GATE2_GRAY,			GFX_PFORTE2X		},
-    { EL_GATE3_GRAY,			GFX_PFORTE3X		},
-    { EL_GATE4_GRAY,			GFX_PFORTE4X		},
-    { EL_DYNAMITE,			GFX_DYNAMIT_AUS		},
-    { EL_PACMAN,			GFX_PACMAN		},
-    { EL_PACMAN_RIGHT,			GFX_PACMAN_RIGHT	},
-    { EL_PACMAN_UP,			GFX_PACMAN_UP		},
-    { EL_PACMAN_LEFT,			GFX_PACMAN_LEFT		},
-    { EL_PACMAN_DOWN,			GFX_PACMAN_DOWN		},
-    { EL_INVISIBLE_WALL,		GFX_UNSICHTBAR		},
-    { EL_INVISIBLE_WALL_ACTIVE,		GFX_UNSICHTBAR_ON	},
-    { EL_WALL_EMERALD,			GFX_ERZ_EDEL		},
-    { EL_WALL_DIAMOND,			GFX_ERZ_DIAM		},
-    { EL_LAMP,				GFX_BIRNE_AUS		},
-    { EL_LAMP_ACTIVE,			GFX_BIRNE_EIN		},
-    { EL_TIME_ORB_FULL,			GFX_ZEIT_VOLL		},
-    { EL_TIME_ORB_EMPTY,		GFX_ZEIT_LEER		},
-    { EL_WALL_GROWING,			GFX_MAUER_LEBT		},
-    { EL_WALL_GROWING_X,		GFX_MAUER_X		},
-    { EL_WALL_GROWING_Y,		GFX_MAUER_Y		},
-    { EL_WALL_GROWING_XY,		GFX_MAUER_XY		},
-    { EL_BD_DIAMOND,			GFX_EDELSTEIN_BD	},
-    { EL_EMERALD_YELLOW,		GFX_EDELSTEIN_GELB	},
-    { EL_EMERALD_RED,			GFX_EDELSTEIN_ROT	},
-    { EL_EMERALD_PURPLE,		GFX_EDELSTEIN_LILA	},
-    { EL_WALL_BD_DIAMOND,		GFX_ERZ_EDEL_BD		},
-    { EL_WALL_EMERALD_YELLOW,		GFX_ERZ_EDEL_GELB	},
-    { EL_WALL_EMERALD_RED,		GFX_ERZ_EDEL_ROT	},
-    { EL_WALL_EMERALD_PURPLE,		GFX_ERZ_EDEL_LILA	},
-    { EL_DARK_YAMYAM,			GFX_MAMPFER2		},
-    { EL_BD_MAGIC_WALL,			GFX_MAGIC_WALL_BD_OFF	},
-    { EL_BD_MAGIC_WALL_ACTIVE,		GFX_MAGIC_WALL_BD_EMPTY	},
-    { EL_BD_MAGIC_WALL_EMPTYING,	GFX_MAGIC_WALL_BD_EMPTY	},
-    { EL_BD_MAGIC_WALL_FULL,		GFX_MAGIC_WALL_BD_FULL	},
-    { EL_BD_MAGIC_WALL_DEAD,		GFX_MAGIC_WALL_BD_DEAD	},
-    { EL_DYNABOMB_PLAYER1_ACTIVE,	GFX_DYNABOMB		},
-    { EL_DYNABOMB_PLAYER2_ACTIVE,	GFX_DYNABOMB		},
-    { EL_DYNABOMB_PLAYER3_ACTIVE,	GFX_DYNABOMB		},
-    { EL_DYNABOMB_PLAYER4_ACTIVE,	GFX_DYNABOMB		},
-    { EL_DYNABOMB_NR,			GFX_DYNABOMB_NR		},
-    { EL_DYNABOMB_SZ,			GFX_DYNABOMB_SZ		},
-    { EL_DYNABOMB_XL,			GFX_DYNABOMB_XL		},
-    { EL_SOKOBAN_OBJECT,		GFX_SOKOBAN_OBJEKT	},
-    { EL_SOKOBAN_FIELD_EMPTY,		GFX_SOKOBAN_FELD_LEER	},
-    { EL_SOKOBAN_FIELD_FULL,		GFX_SOKOBAN_FELD_VOLL	},
-    { EL_MOLE,				GFX_MOLE		},
-    { EL_PENGUIN,			GFX_PINGUIN		},
-    { EL_PIG,				GFX_SCHWEIN		},
-    { EL_DRAGON,			GFX_DRACHE		},
-    { EL_SATELLITE,			GFX_SONDE		},
-    { EL_ARROW_BLUE_LEFT,		GFX_PFEIL_LEFT		},
-    { EL_ARROW_BLUE_RIGHT,		GFX_PFEIL_RIGHT		},
-    { EL_ARROW_BLUE_UP,			GFX_PFEIL_UP		},
-    { EL_ARROW_BLUE_DOWN,		GFX_PFEIL_DOWN		},
-    { EL_SPEED_PILL,			GFX_SPEED_PILL		},
-    { EL_SP_TERMINAL_ACTIVE,		GFX_SP_TERMINAL		},
-    { EL_SP_BUGGY_BASE_ACTIVE,		GFX_SP_BUG_ACTIVE	},
-    { EL_SP_ZONK,			GFX_SP_ZONK		},
-    { EL_INVISIBLE_STEELWALL,		GFX_INVISIBLE_STEEL	},
-    { EL_INVISIBLE_STEELWALL_ACTIVE,	GFX_INVISIBLE_STEEL_ON	},
-    { EL_BLACK_ORB,			GFX_BLACK_ORB		},
-    { EL_EM_GATE1,			GFX_EM_GATE_1		},
-    { EL_EM_GATE2,			GFX_EM_GATE_2		},
-    { EL_EM_GATE3,			GFX_EM_GATE_3		},
-    { EL_EM_GATE4,			GFX_EM_GATE_4		},
-    { EL_EM_GATE1_GRAY,			GFX_EM_GATE_1X		},
-    { EL_EM_GATE2_GRAY,			GFX_EM_GATE_2X		},
-    { EL_EM_GATE3_GRAY,			GFX_EM_GATE_3X		},
-    { EL_EM_GATE4_GRAY,			GFX_EM_GATE_4X		},
-    { EL_EM_KEY1_FILE,			GFX_EM_KEY_1		},
-    { EL_EM_KEY2_FILE,			GFX_EM_KEY_2		},
-    { EL_EM_KEY3_FILE,			GFX_EM_KEY_3		},
-    { EL_EM_KEY4_FILE,			GFX_EM_KEY_4		},
-    { EL_EM_KEY1,			GFX_EM_KEY_1		},
-    { EL_EM_KEY2,			GFX_EM_KEY_2		},
-    { EL_EM_KEY3,			GFX_EM_KEY_3		},
-    { EL_EM_KEY4,			GFX_EM_KEY_4		},
-    { EL_PEARL,				GFX_PEARL		},
-    { EL_CRYSTAL,			GFX_CRYSTAL		},
-    { EL_WALL_PEARL,			GFX_WALL_PEARL		},
-    { EL_WALL_CRYSTAL,			GFX_WALL_CRYSTAL	},
-    { EL_DOOR_WHITE,			GFX_DOOR_WHITE		},
-    { EL_DOOR_WHITE_GRAY,		GFX_DOOR_WHITE_GRAY	},
-    { EL_KEY_WHITE,			GFX_KEY_WHITE		},
-    { EL_SHIELD_NORMAL,			GFX_SHIELD_PASSIVE	},
-    { EL_SHIELD_DEADLY,			GFX_SHIELD_ACTIVE	},
-    { EL_EXTRA_TIME,			GFX_EXTRA_TIME		},
-    { EL_SWITCHGATE_OPEN,		GFX_SWITCHGATE_OPEN	},
-    { EL_SWITCHGATE_CLOSED,		GFX_SWITCHGATE_CLOSED	},
-    { EL_SWITCHGATE_SWITCH_UP,		GFX_SWITCHGATE_SWITCH_1	},
-    { EL_SWITCHGATE_SWITCH_DOWN,	GFX_SWITCHGATE_SWITCH_2	},
-    { EL_CONVEYOR_BELT1_LEFT,		GFX_BELT1_LEFT		},
-    { EL_CONVEYOR_BELT1_MIDDLE,		GFX_BELT1_MIDDLE	},
-    { EL_CONVEYOR_BELT1_RIGHT,		GFX_BELT1_RIGHT		},
-    { EL_CONVEYOR_BELT1_LEFT_ACTIVE,	GFX_BELT1_LEFT		},
-    { EL_CONVEYOR_BELT1_MIDDLE_ACTIVE,	GFX_BELT1_MIDDLE	},
-    { EL_CONVEYOR_BELT1_RIGHT_ACTIVE,	GFX_BELT1_RIGHT		},
-    { EL_CONVEYOR_BELT1_SWITCH_LEFT,	GFX_BELT1_SWITCH_LEFT	},
-    { EL_CONVEYOR_BELT1_SWITCH_MIDDLE,	GFX_BELT1_SWITCH_MIDDLE	},
-    { EL_CONVEYOR_BELT1_SWITCH_RIGHT,	GFX_BELT1_SWITCH_RIGHT	},
-    { EL_CONVEYOR_BELT2_LEFT,		GFX_BELT2_LEFT		},
-    { EL_CONVEYOR_BELT2_MIDDLE,		GFX_BELT2_MIDDLE	},
-    { EL_CONVEYOR_BELT2_RIGHT,		GFX_BELT2_RIGHT		},
-    { EL_CONVEYOR_BELT2_LEFT_ACTIVE,	GFX_BELT2_LEFT		},
-    { EL_CONVEYOR_BELT2_MIDDLE_ACTIVE,	GFX_BELT2_MIDDLE	},
-    { EL_CONVEYOR_BELT2_RIGHT_ACTIVE,	GFX_BELT2_RIGHT		},
-    { EL_CONVEYOR_BELT2_SWITCH_LEFT,	GFX_BELT2_SWITCH_LEFT	},
-    { EL_CONVEYOR_BELT2_SWITCH_MIDDLE,	GFX_BELT2_SWITCH_MIDDLE	},
-    { EL_CONVEYOR_BELT2_SWITCH_RIGHT,	GFX_BELT2_SWITCH_RIGHT	},
-    { EL_CONVEYOR_BELT3_LEFT,		GFX_BELT3_LEFT		},
-    { EL_CONVEYOR_BELT3_MIDDLE,		GFX_BELT3_MIDDLE	},
-    { EL_CONVEYOR_BELT3_RIGHT,		GFX_BELT3_RIGHT		},
-    { EL_CONVEYOR_BELT3_LEFT_ACTIVE,	GFX_BELT3_LEFT		},
-    { EL_CONVEYOR_BELT3_MIDDLE_ACTIVE,	GFX_BELT3_MIDDLE	},
-    { EL_CONVEYOR_BELT3_RIGHT_ACTIVE,	GFX_BELT3_RIGHT		},
-    { EL_CONVEYOR_BELT3_SWITCH_LEFT,	GFX_BELT3_SWITCH_LEFT	},
-    { EL_CONVEYOR_BELT3_SWITCH_MIDDLE,	GFX_BELT3_SWITCH_MIDDLE	},
-    { EL_CONVEYOR_BELT3_SWITCH_RIGHT,	GFX_BELT3_SWITCH_RIGHT	},
-    { EL_CONVEYOR_BELT4_LEFT,		GFX_BELT4_LEFT		},
-    { EL_CONVEYOR_BELT4_MIDDLE,		GFX_BELT4_MIDDLE	},
-    { EL_CONVEYOR_BELT4_RIGHT,		GFX_BELT4_RIGHT		},
-    { EL_CONVEYOR_BELT4_LEFT_ACTIVE,	GFX_BELT4_LEFT		},
-    { EL_CONVEYOR_BELT4_MIDDLE_ACTIVE,	GFX_BELT4_MIDDLE	},
-    { EL_CONVEYOR_BELT4_RIGHT_ACTIVE,	GFX_BELT4_RIGHT		},
-    { EL_CONVEYOR_BELT4_SWITCH_LEFT,	GFX_BELT4_SWITCH_LEFT	},
-    { EL_CONVEYOR_BELT4_SWITCH_MIDDLE,	GFX_BELT4_SWITCH_MIDDLE	},
-    { EL_CONVEYOR_BELT4_SWITCH_RIGHT,	GFX_BELT4_SWITCH_RIGHT	},
-    { EL_LANDMINE,			GFX_LANDMINE		},
-    { EL_ENVELOPE,			GFX_ENVELOPE		},
-    { EL_LIGHT_SWITCH,			GFX_LIGHT_SWITCH_OFF	},
-    { EL_LIGHT_SWITCH_ACTIVE,		GFX_LIGHT_SWITCH_ON	},
-    { EL_SIGN_EXCLAMATION,		GFX_SIGN_EXCLAMATION	},
-    { EL_SIGN_RADIOACTIVITY,		GFX_SIGN_RADIOACTIVITY	},
-    { EL_SIGN_STOP,			GFX_SIGN_STOP		},
-    { EL_SIGN_WHEELCHAIR,		GFX_SIGN_WHEELCHAIR	},
-    { EL_SIGN_PARKING,			GFX_SIGN_PARKING	},
-    { EL_SIGN_ONEWAY,			GFX_SIGN_ONEWAY		},
-    { EL_SIGN_HEART,			GFX_SIGN_HEART		},
-    { EL_SIGN_TRIANGLE,			GFX_SIGN_TRIANGLE	},
-    { EL_SIGN_ROUND,			GFX_SIGN_ROUND		},
-    { EL_SIGN_EXIT,			GFX_SIGN_EXIT		},
-    { EL_SIGN_YINYANG,			GFX_SIGN_YINYANG	},
-    { EL_SIGN_OTHER,			GFX_SIGN_OTHER		},
-    { EL_MOLE_LEFT,			GFX_MOLE_LEFT		},
-    { EL_MOLE_RIGHT,			GFX_MOLE_RIGHT		},
-    { EL_MOLE_UP,			GFX_MOLE_UP		},
-    { EL_MOLE_DOWN,			GFX_MOLE_DOWN		},
-    { EL_STEELWALL_SLANTED,		GFX_STEEL_SLANTED	},
-    { EL_INVISIBLE_SAND,		GFX_SAND_INVISIBLE	},
-    { EL_INVISIBLE_SAND_ACTIVE,		GFX_SAND_INVISIBLE_ON	},
-    { EL_DX_UNKNOWN_15,			GFX_DX_UNKNOWN_15	},
-    { EL_DX_UNKNOWN_42,			GFX_DX_UNKNOWN_42	},
-    { EL_TIMEGATE_OPEN,			GFX_TIMEGATE_OPEN	},
-    { EL_TIMEGATE_CLOSED,		GFX_TIMEGATE_CLOSED	},
-    { EL_TIMEGATE_SWITCH_ACTIVE,	GFX_TIMEGATE_SWITCH	},
-    { EL_TIMEGATE_SWITCH,		GFX_TIMEGATE_SWITCH	},
-    { EL_BALLOON,			GFX_BALLOON		},
-    { EL_BALLOON_SEND_LEFT,		GFX_BALLOON_SEND_LEFT	},
-    { EL_BALLOON_SEND_RIGHT,		GFX_BALLOON_SEND_RIGHT	},
-    { EL_BALLOON_SEND_UP,		GFX_BALLOON_SEND_UP	},
-    { EL_BALLOON_SEND_DOWN,		GFX_BALLOON_SEND_DOWN	},
-    { EL_BALLOON_SEND_ANY_DIRECTION,	GFX_BALLOON_SEND_ANY	},
-    { EL_EMC_STEELWALL1,		GFX_EMC_STEEL_WALL_1	},
-    { EL_EMC_STEELWALL2,		GFX_EMC_STEEL_WALL_2	},
-    { EL_EMC_STEELWALL3,		GFX_EMC_STEEL_WALL_3	},
-    { EL_EMC_STEELWALL4,		GFX_EMC_STEEL_WALL_4	},
-    { EL_EMC_WALL_PILLAR_UPPER,		GFX_EMC_WALL_1		},
-    { EL_EMC_WALL_PILLAR_MIDDLE,	GFX_EMC_WALL_2		},
-    { EL_EMC_WALL_PILLAR_LOWER,		GFX_EMC_WALL_3		},
-    { EL_EMC_WALL4,			GFX_EMC_WALL_4		},
-    { EL_EMC_WALL5,			GFX_EMC_WALL_5		},
-    { EL_EMC_WALL6,			GFX_EMC_WALL_6		},
-    { EL_EMC_WALL7,			GFX_EMC_WALL_7		},
-    { EL_EMC_WALL8,			GFX_EMC_WALL_8		},
-    { EL_TUBE_ALL,			GFX_TUBE_CROSS		},
-    { EL_TUBE_VERTICAL,			GFX_TUBE_VERTICAL	},
-    { EL_TUBE_HORIZONTAL,		GFX_TUBE_HORIZONTAL	},
-    { EL_TUBE_VERTICAL_LEFT,		GFX_TUBE_VERT_LEFT	},
-    { EL_TUBE_VERTICAL_RIGHT,		GFX_TUBE_VERT_RIGHT	},
-    { EL_TUBE_HORIZONTAL_UP,		GFX_TUBE_HORIZ_UP	},
-    { EL_TUBE_HORIZONTAL_DOWN,		GFX_TUBE_HORIZ_DOWN	},
-    { EL_TUBE_LEFT_UP,			GFX_TUBE_LEFT_UP	},
-    { EL_TUBE_LEFT_DOWN,		GFX_TUBE_LEFT_DOWN	},
-    { EL_TUBE_RIGHT_UP,			GFX_TUBE_RIGHT_UP	},
-    { EL_TUBE_RIGHT_DOWN,		GFX_TUBE_RIGHT_DOWN	},
-    { EL_SPRING,			GFX_SPRING		},
-    { EL_SPRING_MOVING,			GFX_SPRING		},
-    { EL_TRAP,				GFX_TRAP_INACTIVE	},
-    { EL_TRAP_ACTIVE,			GFX_TRAP_ACTIVE		},
-    { EL_BD_WALL,			GFX_BD_WALL		},
-    { EL_BD_ROCK,			GFX_BD_ROCK		},
-    { EL_DX_SUPABOMB,			GFX_DX_SUPABOMB		},
-    { EL_SP_MURPHY_CLONE,		GFX_SP_MURPHY_CLONE	},
-    { -1,				-1			}
-  };
-
-  static struct
-  {
-    int element;
-    int graphic_left;
-    int graphic_right;
-    int graphic_up;
-    int graphic_down;
-  }
-  element_to_direction_graphic[] =
-  {
-    {
-      EL_PLAYER1,
-      IMG_PLAYER1_LEFT,		IMG_PLAYER1_RIGHT,
-      IMG_PLAYER1_UP,		IMG_PLAYER1_DOWN
-    },
-    {
-      EL_PLAYER2,
-      IMG_PLAYER2_LEFT,		IMG_PLAYER2_RIGHT,
-      IMG_PLAYER2_UP,		IMG_PLAYER2_DOWN
-    },
-    {
-      EL_PLAYER3,
-      IMG_PLAYER3_LEFT,		IMG_PLAYER3_RIGHT,
-      IMG_PLAYER3_UP,		IMG_PLAYER3_DOWN
-    },
-    {
-      EL_PLAYER4,
-      IMG_PLAYER4_LEFT,		IMG_PLAYER4_RIGHT,
-      IMG_PLAYER4_UP,		IMG_PLAYER4_DOWN
-    },
-    {
-      EL_SP_MURPHY,
-      IMG_SP_MURPHY_LEFT,	IMG_SP_MURPHY_RIGHT,
-      IMG_SP_MURPHY_UP,		IMG_SP_MURPHY_DOWN
-    },
-    {
-      EL_SP_SNIKSNAK,
-      IMG_SP_SNIKSNAK_LEFT,	IMG_SP_SNIKSNAK_RIGHT,
-      IMG_SP_SNIKSNAK_UP,	IMG_SP_SNIKSNAK_DOWN
-    },
-    {
-      EL_BUG,
-      IMG_BUG_LEFT,		IMG_BUG_RIGHT,
-      IMG_BUG_UP,		IMG_BUG_DOWN
-    },
-    {
-      EL_SPACESHIP,
-      IMG_SPACESHIP_LEFT,	IMG_SPACESHIP_RIGHT,
-      IMG_SPACESHIP_UP,		IMG_SPACESHIP_DOWN
-    },
-    {
-      EL_PACMAN,
-      IMG_PACMAN_LEFT,		IMG_PACMAN_RIGHT,
-      IMG_PACMAN_UP,		IMG_PACMAN_DOWN
-    },
-    {
-      EL_MOLE,
-      IMG_MOLE_LEFT,		IMG_MOLE_RIGHT,
-      IMG_MOLE_UP,		IMG_MOLE_DOWN
-    },
-    {
-      EL_PENGUIN,
-      IMG_PENGUIN_LEFT,		IMG_PENGUIN_RIGHT,
-      IMG_PENGUIN_UP,		IMG_PENGUIN_DOWN
-    },
-    {
-      EL_PIG,
-      IMG_PIG_LEFT,		IMG_PIG_RIGHT,
-      IMG_PIG_UP,		IMG_PIG_DOWN
-    },
-    {
-      EL_DRAGON,
-      IMG_DRAGON_LEFT,		IMG_DRAGON_RIGHT,
-      IMG_DRAGON_UP,		IMG_DRAGON_DOWN
-    },
-    {
-      -1,
-      -1,			-1,
-      -1,			-1
-    }
-  };
-#endif
 
   int i, act, dir;
 
@@ -1027,65 +664,13 @@ void InitElementInfo()
     }
   }
 
-#if 0
-  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    element_info[i].graphic[GFX_ACTION_DEFAULT] =
-      GFX_CHAR_START + (i - EL_CHAR_START);
-#else
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
       IMG_CHAR_START + (i - EL_CHAR_START);
-#endif
 
   for (i=EL_GENERIC_START; i<=EL_GENERIC_END; i++)
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
       IMG_GENERIC_START + (i - EL_GENERIC_START);
-
-#if 0
-  for (i=EL_SP_START; i<=EL_SP_END; i++)
-  {
-    int nr_element = i - EL_SP_START;
-    int gfx_per_line = 8;
-    int nr_graphic =
-      (nr_element / gfx_per_line) * SP_PER_LINE +
-      (nr_element % gfx_per_line);
-
-    element_info[i].graphic[GFX_ACTION_DEFAULT] =
-      GFX_START_ROCKSSP + nr_graphic;
-  }
-#endif
-
-#if 0
-  /* this overrides some of the above default settings (GFX_SP_ZONK etc.) */
-  i = 0;
-  while (element_to_graphic[i].element > -1)
-  {
-    int element = element_to_graphic[i].element;
-    int graphic = element_to_graphic[i].graphic;
-
-    element_info[element].graphic[GFX_ACTION_DEFAULT] = graphic;
-    i++;
-  }
-
-  /* this initializes special graphics for left/right/up/down directions */
-  i = 0;
-  while (element_to_direction_graphic[i].element > -1)
-  {
-    int element = element_to_direction_graphic[i].element;
-
-    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_LEFT] =
-      element_to_direction_graphic[i].graphic_left;
-    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_RIGHT] =
-      element_to_direction_graphic[i].graphic_right;
-    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_UP] =
-      element_to_direction_graphic[i].graphic_up;
-    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_DOWN] =
-      element_to_direction_graphic[i].graphic_down;
-
-    element_info[element].has_direction_graphic[GFX_ACTION_DEFAULT] = TRUE;
-    i++;
-  }
-#else
 
   i = 0;
   while (element_to_graphic[i].element > -1)
@@ -1150,8 +735,6 @@ void InitElementInfo()
 	element_info[i].graphic[act] = default_action_graphic;
     }
   }
-
-#endif
 }
 
 static void InitGraphicInfo()
@@ -1159,23 +742,10 @@ static void InitGraphicInfo()
   static int gfx_action[NUM_IMAGE_FILES];
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int last_frame;
+  int first_frame, last_frame;
   int i;
 
   image_files = getCurrentImageList();
-
-#if 0
-  for (i=0; i<MAX_GRAPHICS; i++)
-  {
-    /* always start with reliable default values */
-    graphic_info[i].bitmap = NULL;
-    graphic_info[i].src_x = 0;
-    graphic_info[i].src_y = 0;
-
-    getGraphicSource(i, &graphic_info[i].bitmap,
-		     &graphic_info[i].src_x, &graphic_info[i].src_y);
-  }
-#endif
 
   /* set temporary graphics action field to default value */
   for (i=0; i<NUM_IMAGE_FILES; i++)
@@ -1214,6 +784,12 @@ static void InitGraphicInfo()
       new_graphic_info[i].offset_y = parameter[GFX_ARG_OFFSET];
     }
 
+    /* optionally, the x and y offset of frames can be specified directly */
+    if (parameter[GFX_ARG_XOFFSET] != GFX_ARG_UNDEFINED_VALUE)
+      new_graphic_info[i].offset_x = parameter[GFX_ARG_XOFFSET];
+    if (parameter[GFX_ARG_YOFFSET] != GFX_ARG_UNDEFINED_VALUE)
+      new_graphic_info[i].offset_y = parameter[GFX_ARG_YOFFSET];
+
     new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
 
     new_graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
@@ -1238,94 +814,44 @@ static void InitGraphicInfo()
     if (parameter[GFX_ARG_MODE_REVERSE])
       new_graphic_info[i].anim_mode |= ANIM_REVERSE;
 
-#if 1
     /* set first frame of animation after determining animation mode */
     new_graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
-    if (new_graphic_info[i].anim_start_frame == -1)
+
+    /* automatically determine correct start frame, if not defined */
+    if (parameter[GFX_ARG_START_FRAME] == GFX_ARG_UNDEFINED_VALUE)
       new_graphic_info[i].anim_start_frame = 0;
     else if (new_graphic_info[i].anim_mode & ANIM_REVERSE)
       new_graphic_info[i].anim_start_frame =
-	new_graphic_info[i].anim_frames
-	- new_graphic_info[i].anim_start_frame - 1;
-#else
-    /* set first frame of animation after determining animation mode */
-    new_graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
-    if (parameter[GFX_ARG_START_FRAME] == -1)	/* default: start with ... */
-    {
-      if (parameter[GFX_ARG_MODE_REVERSE])
-	new_graphic_info[i].anim_start_frame =
-	  new_graphic_info[i].anim_frames - 1;		/* ... last frame */
-      else
-	new_graphic_info[i].anim_start_frame = 0;	/* ... first frame */
-    }
-#endif
+	new_graphic_info[i].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
 
-#if 1
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
-    if (parameter[GFX_ARG_GLOBAL_SYNC] == -1)
+
+    /* set global_sync for all animations with undefined "animation action" */
+    if (parameter[GFX_ARG_GLOBAL_SYNC] == GFX_ARG_UNDEFINED_VALUE)
       new_graphic_info[i].anim_global_sync =
 	(gfx_action[i] == GFX_ACTION_DEFAULT ? TRUE : FALSE);
-#else
-    /* animation synchronized with global frame counter, not move position */
-    new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
-#endif
 
-    /* now check if the loaded image is large enough for the animation */
-    last_frame = new_graphic_info[i].anim_frames - 1;
+    /* "linear" animations are never globally synchronized */
+    if (parameter[GFX_ARG_MODE_LINEAR])
+      new_graphic_info[i].anim_global_sync = FALSE;
 
-    getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
-    if (src_x + TILEX > src_bitmap->width ||
+    /* now check if no animation frames are outside of the loaded image */
+
+    first_frame = 0;
+    getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
+    if (src_x < 0 || src_y < 0 ||
+	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d (normal size)", src_bitmap->source_filename, i);
+      Error(ERR_EXIT, "InitGraphicInfo: first frame of graphic animation object %d outside of image bitmap file '%s'", i, src_bitmap->source_filename);
 
-#if 0
-    getMiniGraphicSource(i, &src_bitmap, &src_x, &src_y);
-    if (src_x + MINI_TILEX > src_bitmap->width ||
-	src_y + MINI_TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d ('mini' size)", src_bitmap->source_filename, i);
-
-    getMicroGraphicSource(i, &src_bitmap, &src_x, &src_y);
-    if (src_x + MICRO_TILEX > src_bitmap->width ||
-	src_y + MICRO_TILEY > src_bitmap->height)
-      Error(ERR_EXIT, "InitGraphicInfo: image bitmap '%s' too small for graphic object %d ('micro' size)", src_bitmap->source_filename, i);
-#endif
-
-#if 0
-    {
-      int j;
-
-      if (i == IMG_EMERALD)
-      {
-	for (j=0; j<NUM_GFX_ARGS; j++)
-	  printf("%s -> %d\n", image_config_suffix[j].token, parameter[j]);
-	printf("-> %d\n", new_graphic_info[i].anim_frames);
-	printf("\n");
-      }
-    }
-#endif
-
+    last_frame = new_graphic_info[i].anim_frames - 1;
+    getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
+    if (src_x < 0 || src_y < 0 ||
+	src_x + TILEX > src_bitmap->width ||
+	src_y + TILEY > src_bitmap->height)
+      Error(ERR_EXIT, "InitGraphicInfo: last frame of graphic animation object %d outside of image bitmap file '%s'", i, src_bitmap->source_filename);
   }
-
-
-#if 0
-  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFX_ARG_NUM_FRAMES]);
-  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFX_ARG_NUM_FRAMES]);
-
-  graphic_info[GFX_ABLENK].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
-  graphic_info[GFX_ABLENK].src_x = 0;
-  graphic_info[GFX_ABLENK].src_y = 0;
-
-  graphic_info[GFX_ABLENK + 1].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
-  graphic_info[GFX_ABLENK + 2].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
-  graphic_info[GFX_ABLENK + 3].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
-  graphic_info[GFX_ABLENK + 1].src_x = 1 * TILEX;
-  graphic_info[GFX_ABLENK + 2].src_x = 2 * TILEX;
-  graphic_info[GFX_ABLENK + 3].src_x = 3 * TILEX;
-  graphic_info[GFX_ABLENK + 1].src_y = 0;
-  graphic_info[GFX_ABLENK + 2].src_y = 0;
-  graphic_info[GFX_ABLENK + 3].src_y = 0;
-#endif
 }
 
 static void InitSoundInfo()
@@ -2607,22 +2133,13 @@ void Execute_Debug_Command(char *command)
 
 void CloseAllAndExit(int exit_value)
 {
-#if 0
-  int i;
-#endif
-
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();
   CloseAudio();		/* called after freeing sounds (needed for SDL) */
 
   FreeAllImages();
-
   FreeTileClipmasks();
-#if 0
-  for (i=0; i<NUM_BITMAPS; i++)
-    FreeBitmap(pix[i]);
-#endif
 
   if (bitmap_font_initial)
     FreeBitmap(bitmap_font_initial);
