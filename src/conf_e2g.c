@@ -645,6 +645,10 @@ element_to_graphic[] =
     IMG_ROBOT
   },
   {
+    EL_ROBOT,					-1, GFX_ACTION_MOVING,
+    IMG_ROBOT_MOVING
+  },
+  {
     EL_ROBOT_WHEEL,				-1, -1,
     IMG_ROBOT_WHEEL
   },
