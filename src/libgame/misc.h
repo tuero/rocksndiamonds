@@ -138,6 +138,8 @@ FILE *openErrorFile();
 void dumpErrorFile();
 #endif
 
+void printf_line(char, int);
+
 void debug_print_timestamp(int, char *);
 
 #endif /* MISC_H */

@@ -357,8 +357,10 @@ inline boolean DrawingDeactivated(int x, int y, int width, int height)
 {
   if (gfx.draw_deactivation_mask != REDRAW_NONE)
   {
-    if ((gfx.draw_deactivation_mask & REDRAW_FIELD) &&
-	x < gfx.sx + gfx.sxsize)
+    if (gfx.draw_deactivation_mask & REDRAW_ALL)
+      return TRUE;
+    else if ((gfx.draw_deactivation_mask & REDRAW_FIELD) &&
+	     x < gfx.sx + gfx.sxsize)
       return TRUE;
     else if ((gfx.draw_deactivation_mask & REDRAW_DOORS) &&
 	     x > gfx.dx)

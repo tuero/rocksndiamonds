@@ -2807,6 +2807,8 @@ static boolean JustBeingPushed(int x, int y)
 
 void StartMoving(int x, int y)
 {
+  static boolean use_spring_bug = TRUE;
+  boolean started_moving = FALSE;	/* some elements can fall _and_ move */
   int element = Feld[x][y];
 
   if (Stop[x][y])
@@ -2814,7 +2816,7 @@ void StartMoving(int x, int y)
 
   GfxAction[x][y] = GFX_ACTION_DEFAULT;
 
-  if (CAN_FALL(element) && y<lev_fieldy-1)
+  if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
     if ((x>0 && IS_PLAYER(x-1, y)) || (x<lev_fieldx-1 && IS_PLAYER(x+1, y)))
       if (JustBeingPushed(x, y))
@@ -2825,6 +2827,8 @@ void StartMoving(int x, int y)
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+
 	Feld[x][y] = EL_QUICKSAND_EMPTYING;
 	Store[x][y] = EL_ROCK;
 	PlaySoundLevel(x, y, SND_QUICKSAND_EMPTYING);
@@ -2852,6 +2856,8 @@ void StartMoving(int x, int y)
 	     Feld[x][y+1] == EL_QUICKSAND_EMPTY)
     {
       InitMovingField(x, y, MV_DOWN);
+      started_moving = TRUE;
+
       Feld[x][y] = EL_QUICKSAND_FILLING;
       Store[x][y] = element;
       PlaySoundLevel(x, y, SND_QUICKSAND_FILLING);
@@ -2861,6 +2867,8 @@ void StartMoving(int x, int y)
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+
 	Feld[x][y] = EL_MAGIC_WALL_EMPTYING;
 	Store[x][y] = EL_CHANGED(Store[x][y]);
       }
@@ -2887,6 +2895,8 @@ void StartMoving(int x, int y)
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+
 	Feld[x][y] = EL_BD_MAGIC_WALL_EMPTYING;
 	Store[x][y] = EL_CHANGED2(Store[x][y]);
       }
@@ -2913,6 +2923,8 @@ void StartMoving(int x, int y)
 	      Feld[x][y+1] == EL_BD_MAGIC_WALL_ACTIVE))
     {
       InitMovingField(x, y, MV_DOWN);
+      started_moving = TRUE;
+
       Feld[x][y] =
 	(Feld[x][y+1] == EL_MAGIC_WALL_ACTIVE ? EL_MAGIC_WALL_FILLING :
 	 EL_BD_MAGIC_WALL_FILLING);
@@ -2921,7 +2933,10 @@ void StartMoving(int x, int y)
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_ACID)
     {
       Blurb(x, y);
+
       InitMovingField(x, y, MV_DOWN);
+      started_moving = TRUE;
+
       Store[x][y] = EL_ACID;
     }
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_BLOCKED &&
@@ -2929,9 +2944,18 @@ void StartMoving(int x, int y)
     {
       Impact(x, y);
     }
+    else if (IS_FREE(x, y+1) && element == EL_SPRING && use_spring_bug)
+    {
+      if (MovDir[x][y] == MV_NO_MOVING)
+      {
+	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+      }
+    }
     else if (IS_FREE(x, y+1))
     {
       InitMovingField(x, y, MV_DOWN);
+      started_moving = TRUE;
     }
     else if (element == EL_AMOEBA_DROP)
     {
@@ -2969,6 +2993,7 @@ void StartMoving(int x, int y)
 	  left = !(right = RND(2));
 
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
+	started_moving = TRUE;
       }
     }
     else if (IS_BELT_ACTIVE(Feld[x][y+1]))
@@ -2982,12 +3007,15 @@ void StartMoving(int x, int y)
 	  (belt_dir == MV_RIGHT && right_is_free))
       {
 	InitMovingField(x, y, belt_dir);
+	started_moving = TRUE;
+
 	GfxAction[x][y] = GFX_ACTION_DEFAULT;
       }
     }
   }
 
-  if (CAN_MOVE(element))	/* not "else if" because of EL_SPRING */
+  /* not "else if" because of EL_SPRING */
+  if (CAN_MOVE(element) && !started_moving)
   {
     int newx, newy;
 
@@ -2997,8 +3025,19 @@ void StartMoving(int x, int y)
 	&& JustBeingPushed(x, y))
       return;
 
+#if 0
+#if 0
     if (element == EL_SPRING && MovDir[x][y] == MV_DOWN)
       Feld[x][y + 1] = EL_EMPTY;	/* was set to EL_BLOCKED above */
+#else
+    if (element == EL_SPRING && MovDir[x][y] != MV_NO_MOVING)
+    {
+      Moving2Blocked(x, y, &newx, &newy);
+      if (Feld[newx][newy] == EL_BLOCKED)
+	Feld[newx][newy] = EL_EMPTY;	/* was set to EL_BLOCKED above */
+    }
+#endif
+#endif
 
     if (!MovDelay[x][y])	/* start new movement phase */
     {
@@ -4927,8 +4966,6 @@ void GameActions()
 #endif
 #endif
 
-
-
   FrameCounter++;
   TimeFrames++;
 
@@ -5475,7 +5512,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     int original_move_delay_value = player->move_delay_value;
 
 #if DEBUG
-    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES.\n");
+    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES. [%ld]\n",
+	   tape.counter);
 #endif
 
     /* scroll remaining steps with finest movement resolution */

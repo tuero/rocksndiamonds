@@ -1618,6 +1618,9 @@ struct GameInfo
 
 struct GlobalInfo
 {
+  char *autoplay_leveldir;
+  int autoplay_level_nr;
+
   float frames_per_second;
   boolean fps_slowdown;
   int fps_slowdown_factor;

@@ -436,6 +436,34 @@ char *getStringToLower(char *s)
   return s_copy;
 }
 
+static void printUsage()
+{
+  printf("\n"
+	 "Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
+	 "\n"
+	 "Options:\n"
+	 "  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
+	 "  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
+	 "  -l, --level DIRECTORY            alternative level DIRECTORY\n"
+	 "  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
+	 "  -s, --sounds DIRECTORY           alternative sounds DIRECTORY\n"
+	 "  -m, --music DIRECTORY            alternative music DIRECTORY\n"
+	 "  -n, --network                    network multiplayer game\n"
+	 "      --serveronly                 only start network server\n"
+	 "  -v, --verbose                    verbose mode\n"
+	 "      --debug                      display debugging information\n"
+	 "  -e, --execute COMMAND            execute batch COMMAND:\n"
+	 "\n"
+	 "Valid commands for '--execute' option:\n"
+	 "  \"print graphicsinfo.conf\"        print default graphics config\n"
+	 "  \"print soundsinfo.conf\"          print default sounds config\n"
+	 "  \"print musicinfo.conf\"           print default music config\n"
+	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
+	 "  \"autoplay LEVELDIR\"              play level tapes for LEVELDIR\n"
+	 "\n",
+	 program.command_basename);
+}
+
 void GetOptions(char *argv[])
 {
   char **options_left = &argv[1];
@@ -450,12 +478,11 @@ void GetOptions(char *argv[])
   options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
   options.sounds_directory = RO_BASE_PATH "/" SOUNDS_DIRECTORY;
   options.music_directory = RO_BASE_PATH "/" MUSIC_DIRECTORY;
-  options.autoplay_leveldir = NULL;
+  options.execute_command = NULL;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.debug_command = NULL;
 
   while (*options_left)
   {
@@ -493,23 +520,7 @@ void GetOptions(char *argv[])
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
     else if (strncmp(option, "-help", option_len) == 0)
     {
-      printf("Usage: %s [options] [<server host> [<server port>]]\n"
-	     "Options:\n"
-	     "  -d, --display <host>[:<scr>]  X server display\n"
-	     "  -b, --basepath <directory>    alternative base directory\n"
-	     "  -l, --level <directory>       alternative level directory\n"
-	     "  -g, --graphics <directory>    alternative graphics directory\n"
-	     "  -s, --sounds <directory>      alternative sounds directory\n"
-	     "  -m, --music <directory>       alternative music directory\n"
-	     "  -a, --autoplay <level series> automatically play level tapes\n"
-	     "  -n, --network                 network multiplayer game\n"
-	     "      --serveronly              only start network server\n"
-	     "  -v, --verbose                 verbose mode\n"
-	     "      --debug                   display debugging information\n",
-	     program.command_basename);
-
-      if (options.debug)
-	printf("      --debug-command <command> execute special command\n");
+      printUsage();
 
       exit(0);
     }
@@ -573,15 +584,6 @@ void GetOptions(char *argv[])
       if (option_arg == next_option)
 	options_left++;
     }
-    else if (strncmp(option, "-autoplay", option_len) == 0)
-    {
-      if (option_arg == NULL)
-	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
-
-      options.autoplay_leveldir = option_arg;
-      if (option_arg == next_option)
-	options_left++;
-    }
     else if (strncmp(option, "-network", option_len) == 0)
     {
       options.network = TRUE;
@@ -598,12 +600,12 @@ void GetOptions(char *argv[])
     {
       options.debug = TRUE;
     }
-    else if (strncmp(option, "-debug-command", option_len) == 0)
+    else if (strncmp(option, "-execute", option_len) == 0)
     {
       if (option_arg == NULL)
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
-      options.debug_command = option_arg;
+      options.execute_command = option_arg;
       if (option_arg == next_option)
 	options_left++;
     }
@@ -1797,6 +1799,21 @@ void dumpErrorFile()
   }
 }
 #endif
+
+
+/* ========================================================================= */
+/* some generic helper functions                                             */
+/* ========================================================================= */
+
+void printf_line(char line_char, int line_length)
+{
+  int i;
+
+  for (i=0; i<line_length; i++)
+    printf("%c", line_char);
+
+  printf("\n");
+}
 
 
 /* ========================================================================= */

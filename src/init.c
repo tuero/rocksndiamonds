@@ -57,6 +57,7 @@ static char *image_filename[NUM_PICTURES] =
 
 static Bitmap *bitmap_font_initial = NULL;
 
+static void InitGlobal(void);
 static void InitSetup(void);
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
@@ -73,16 +74,14 @@ static void InitElementProperties(void);
 static void InitElementInfo(void);
 static void InitGraphicInfo(void);
 static void InitSoundInfo();
-static void Execute_Debug_Command(char *);
+static void Execute_Command(char *);
 
 void OpenAll(void)
 {
-  if (options.debug_command)
-  {
-    Execute_Debug_Command(options.debug_command);
+  InitGlobal();		/* initialize some global variables */
 
-    exit(0);
-  }
+  if (options.execute_command)
+    Execute_Command(options.execute_command);
 
   if (options.serveronly)
   {
@@ -130,9 +129,24 @@ void OpenAll(void)
   InitGfxBackground();
   InitToons();
 
+  if (global.autoplay_leveldir)
+  {
+    AutoPlayTape();
+    return;
+  }
+
   DrawMainMenu();
 
   InitNetworkServer();
+}
+
+void InitGlobal()
+{
+  global.autoplay_leveldir = NULL;
+
+  global.frames_per_second = 0;
+  global.fps_slowdown = FALSE;
+  global.fps_slowdown_factor = 1;
 }
 
 void InitSetup()
@@ -406,11 +420,6 @@ void InitGfx()
 #if 0
   int i;
 #endif
-
-  /* initialize some global variables */
-  global.frames_per_second = 0;
-  global.fps_slowdown = FALSE;
-  global.fps_slowdown_factor = 1;
 
   /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
@@ -2078,9 +2087,9 @@ void InitElementProperties()
     Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
-void Execute_Debug_Command(char *command)
+void Execute_Command(char *command)
 {
-  if (strcmp(command, "create graphicsinfo.conf") == 0)
+  if (strcmp(command, "print graphicsinfo.conf") == 0)
   {
     int i;
 
@@ -2096,8 +2105,10 @@ void Execute_Debug_Command(char *command)
       printf("# %s\n",
 	     getFormattedSetupEntry(image_config[i].token,
 				    image_config[i].value));
+
+    exit(0);
   }
-  else if (strcmp(command, "create soundsinfo.conf") == 0)
+  else if (strcmp(command, "print soundsinfo.conf") == 0)
   {
     int i;
 
@@ -2113,21 +2124,48 @@ void Execute_Debug_Command(char *command)
       printf("# %s\n",
 	     getFormattedSetupEntry(sound_config[i].token,
 				    sound_config[i].value));
+
+    exit(0);
   }
-  else if (strcmp(command, "create musicinfo.conf") == 0)
+  else if (strcmp(command, "print musicinfo.conf") == 0)
   {
     printf("# (Currently only \"name\" and \"sort_priority\" recognized.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+
+    exit(0);
   }
-  else if (strcmp(command, "help") == 0)
+  else if (strncmp(command, "dump tape ", 10) == 0)
   {
-    printf("The following commands are recognized:\n");
-    printf("   \"create graphicsinfo.conf\"\n");
-    printf("   \"create soundsinfo.conf\"\n");
-    printf("   \"create musicinfo.conf\"\n");
+    char *filename = &command[10];
+
+    if (access(filename, F_OK) != 0)
+      Error(ERR_EXIT, "cannot open file '%s'", filename);
+
+    LoadTapeFromFilename(filename);
+    DumpTape(&tape);
+
+    exit(0);
+  }
+  else if (strncmp(command, "autoplay ", 9) == 0)
+  {
+    char *str_copy = getStringCopy(&command[9]);
+    char *str_ptr = strchr(str_copy, ' ');
+
+    global.autoplay_leveldir = str_copy;
+    global.autoplay_level_nr = -1;
+
+    if (str_ptr != NULL)
+    {
+      *str_ptr++ = '\0';			/* terminate leveldir string */
+      global.autoplay_level_nr = atoi(str_ptr);	/* get level_nr value */
+    }
+  }
+  else
+  {
+    Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
   }
 }
 

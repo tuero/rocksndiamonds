@@ -846,9 +846,8 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
   return chunk_size;
 }
 
-void LoadTape(int level_nr)
+void LoadTapeFromFilename(char *filename)
 {
-  char *filename = getTapeFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char chunk_name[CHUNK_ID_LEN + 1];
   FILE *file;
@@ -964,6 +963,13 @@ void LoadTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
+void LoadTape(int level_nr)
+{
+  char *filename = getTapeFilename(level_nr);
+
+  LoadTapeFromFilename(filename);
+}
+
 static void SaveTape_VERS(FILE *file, struct TapeInfo *tape)
 {
   putFileVersion(file, tape->file_version);
@@ -1073,16 +1079,17 @@ void DumpTape(struct TapeInfo *tape)
     return;
   }
 
-  printf("\n");
-  printf("-------------------------------------------------------------------------------\n");
+  printf_line('-', 79);
   printf("Tape of Level %d (file version %06d, game version %06d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
-  printf("-------------------------------------------------------------------------------\n");
+  printf_line('-', 79);
 
   for(i=0; i<tape->length; i++)
   {
     if (i >= MAX_TAPELEN)
       break;
+
+    printf("%03d: ", i);
 
     for(j=0; j<MAX_PLAYERS; j++)
     {
@@ -1104,7 +1111,7 @@ void DumpTape(struct TapeInfo *tape)
     printf("(%03d)\n", tape->pos[i].delay);
   }
 
-  printf("-------------------------------------------------------------------------------\n");
+  printf_line('-', 79);
 }
 
 

@@ -247,14 +247,12 @@ struct OptionInfo
   char *graphics_directory;
   char *sounds_directory;
   char *music_directory;
-  char *autoplay_leveldir;
+  char *execute_command;
 
   boolean serveronly;
   boolean network;
   boolean verbose;
   boolean debug;
-
-  char *debug_command;
 };
 
 struct VideoSystemInfo

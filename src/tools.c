@@ -2244,8 +2244,15 @@ unsigned int MoveDoor(unsigned int door_state)
   {
     stepsize = 20;
     door_delay_value = 0;
+
     StopSound(SND_MENU_DOOR_OPENING);
     StopSound(SND_MENU_DOOR_CLOSING);
+  }
+
+  if (global.autoplay_leveldir)
+  {
+    door_state |= DOOR_NO_DELAY;
+    door_state &= ~DOOR_CLOSE_ALL;
   }
 
   if (door_state & DOOR_ACTION)
@@ -2266,7 +2273,8 @@ unsigned int MoveDoor(unsigned int door_state)
       Bitmap *bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 
-      WaitUntilDelayReached(&door_delay, door_delay_value);
+      if (!(door_state & DOOR_NO_DELAY))
+	WaitUntilDelayReached(&door_delay, door_delay_value);
 
       if (door_state & DOOR_ACTION_1)
       {
