@@ -40,6 +40,24 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
+static char *print_if_not_empty(int element)
+{
+  static char *s = NULL;
+  char *token_name = element_info[element].token_name;
+
+  if (s != NULL)
+    free(s);
+
+  s = checked_malloc(strlen(token_name) + 10 + 1);
+
+  if (element != EL_EMPTY)
+    sprintf(s, "%d\t['%s']", element, token_name);
+  else
+    sprintf(s, "%d", element);
+
+  return s;
+}
+
 void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
@@ -57,12 +75,12 @@ void DumpTile(int x, int y)
     return;
   }
 
-  printf("  Feld:        %d ['%s']\n", Feld[x][y],
+  printf("  Feld:        %d\t['%s']\n", Feld[x][y],
 	 element_info[Feld[x][y]].token_name);
-  printf("  Back:        %d\n", Back[x][y]);
-  printf("  Store:       %d\n", Store[x][y]);
-  printf("  Store2:      %d\n", Store2[x][y]);
-  printf("  StorePlayer: %d\n", StorePlayer[x][y]);
+  printf("  Back:        %s\n", print_if_not_empty(Back[x][y]));
+  printf("  Store:       %s\n", print_if_not_empty(Store[x][y]));
+  printf("  Store2:      %s\n", print_if_not_empty(Store2[x][y]));
+  printf("  StorePlayer: %s\n", print_if_not_empty(StorePlayer[x][y]));
   printf("  MovPos:      %d\n", MovPos[x][y]);
   printf("  MovDir:      %d\n", MovDir[x][y]);
   printf("  MovDelay:    %d\n", MovDelay[x][y]);

@@ -3050,13 +3050,24 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
 #endif
 
+#if 1
+      if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)) &&
+	  (game.engine_version < VERSION_IDENT(3,1,0,0) ||
+	   (x == ex && y == ey)))
+#else
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
+#endif
       {
 	if (IS_ACTIVE_BOMB(element))
 	{
 	  /* re-activate things under the bomb like gate or penguin */
+#if 1
+	  Feld[x][y] = (Back[x][y] ? Back[x][y] : EL_EMPTY);
+	  Back[x][y] = 0;
+#else
 	  Feld[x][y] = (Store[x][y] ? Store[x][y] : EL_EMPTY);
 	  Store[x][y] = 0;
+#endif
 	}
 
 	continue;
@@ -3254,8 +3265,13 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 1
 
   border_element = Store2[x][y];
+#if 1
+  if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y))
+    border_element = StorePlayer[x][y];
+#else
   if (IS_PLAYER(x, y))
     border_element = StorePlayer[x][y];
+#endif
 
 #if 0
   printf("::: phase == %d\n", phase);
@@ -3267,7 +3283,12 @@ void Explode(int ex, int ey, int phase, int mode)
     boolean border_explosion = FALSE;
 
 #if 1
+#if 1
+    if (IS_PLAYER(x, y) && PLAYERINFO(x, y)->present &&
+	!PLAYER_EXPLOSION_PROTECTED(x, y))
+#else
     if (IS_PLAYER(x, y) && PLAYERINFO(x, y)->present)
+#endif
 #else
     if (IS_PLAYER(x, y))
 #endif
