@@ -319,6 +319,8 @@ struct PlayerInfo
 
 struct LevelInfo
 {
+  int file_version;	/* version of file this level was stored with */
+  int game_version;	/* version of game engine to play this level */
   int fieldx;
   int fieldy;
   int time;
@@ -340,6 +342,9 @@ struct LevelInfo
 
 struct TapeInfo
 {
+  int file_version;	/* version of file this level tape was stored with */
+  int game_version;	/* version of game engine to play this tape´s level */
+  int version;
   int level_nr;
   unsigned long random_seed;
   unsigned long date;
@@ -361,6 +366,7 @@ struct TapeInfo
 
 struct GameInfo
 {
+  int version;
   int emulation;
   int yam_content_nr;
   boolean magic_wall_active;
@@ -901,6 +907,8 @@ extern int		num_element_info;
 #define EL_TRAP_ACTIVE		522
 #define EL_SPRING_MOVING	523
 #define EL_SP_MURPHY_CLONE	524
+#define EL_QUICKSAND_FILLING	525
+#define EL_QUICKSAND_DROPPING	526
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -1524,6 +1532,24 @@ extern int		num_element_info;
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
+
+/* file version numbers for resource files (levels, tapes, score, setup, etc.)
+** currently supported/known file version numbers:
+**	1.0 (old)
+**	1.2 (still in use)
+**	1.4 (still in use)
+**	2.0 (actual)
+*/
+#define FILE_VERSION_1_0	10
+#define FILE_VERSION_1_2	12
+#define FILE_VERSION_1_4	14
+#define FILE_VERSION_2_0	20
+#define FILE_VERSION_ACTUAL	FILE_VERSION_2_0
+#define GAME_VERSION_1_0	FILE_VERSION_1_0
+#define GAME_VERSION_1_2	FILE_VERSION_1_2
+#define GAME_VERSION_1_4	FILE_VERSION_1_4
+#define GAME_VERSION_2_0	FILE_VERSION_2_0
+#define GAME_VERSION_ACTUAL	GAME_VERSION_2_0
 
 /* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
 #define ANIM_NORMAL		0

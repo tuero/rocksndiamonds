@@ -671,9 +671,32 @@ void InitGame()
     }
   }
 
+  game.version = (tape.playing ? tape.game_version : level.game_version);
   game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
+
+  /* dynamically adjust element properties according to game engine version */
+  {
+    static int ep_slippery[] =
+    {
+      EL_BETON,
+      EL_MAUERWERK,
+      EL_MAUER_LEBT,
+      EL_MAUER_X,
+      EL_MAUER_Y,
+      EL_MAUER_XY
+    };
+    static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
+
+    for (i=0; i<ep_slippery_num; i++)
+    {
+      if (game.version >= GAME_VERSION_2_0)
+	Elementeigenschaften1[ep_slippery[i]] |= EP_BIT_SLIPPERY;
+      else
+	Elementeigenschaften1[ep_slippery[i]] &= ~EP_BIT_SLIPPERY;
+    }
+  }
 
   if (BorderElement == EL_LEERRAUM)
   {
@@ -2539,6 +2562,9 @@ void StartMoving(int x, int y)
       Feld[x][y] = EL_AMOEBING;
       Store[x][y] = EL_AMOEBE_NASS;
     }
+    /* Store[x][y+1] must be zero, because:
+       (EL_MORAST_VOLL -> EL_FELSBROCKEN): Store[x][y+1] == EL_MORAST_LEER
+    */
 #if OLD_GAME_BEHAVIOUR
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
 #else

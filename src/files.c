@@ -22,16 +22,19 @@
 #include "tape.h"
 #include "joystick.h"
 
-#define MAX_FILENAME_LEN	256	/* maximal filename length */
+#define MAX_FILENAME_LEN	256	/* maximal filename length   */
 #define MAX_LINE_LEN		1000	/* maximal input line length */
 #define CHUNK_ID_LEN		4	/* IFF style chunk id length */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header */
 #define LEVEL_HEADER_UNUSED	15	/* unused level header bytes */
-#define TAPE_HEADER_SIZE	20	/* size of tape file header */
-#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes */
-#define FILE_VERSION_1_0	10	/* 1.0 file version (old) */
+#define TAPE_HEADER_SIZE	20	/* size of tape file header  */
+#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes  */
+
+#if 0
+#define FILE_VERSION_1_0	10	/* 1.0 file version (old)          */
 #define FILE_VERSION_1_2	12	/* 1.2 file version (still in use) */
-#define FILE_VERSION_1_4	14	/* 1.4 file version (new) */
+#define FILE_VERSION_1_4	14	/* 1.4 file version (new)          */
+#endif
 
 /* file identifier strings */
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
@@ -190,6 +193,53 @@ char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_CONTRIBUTION(n) ?	6 : \
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
+
+static int getFileVersionFromCookieString(const char *cookie)
+{
+  const char *ptr_cookie1, *ptr_cookie2;
+  const char *pattern1 = "_FILE_VERSION_";
+  const char *pattern2 = "?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_pattern1 = strlen(pattern1);
+  const int len_pattern2 = strlen(pattern2);
+  const int len_pattern = len_pattern1 + len_pattern2;
+  int version_major, version_minor;
+
+  if (len_cookie <= len_pattern)
+    return -1;
+
+  ptr_cookie1 = &cookie[len_cookie - len_pattern];
+  ptr_cookie2 = &cookie[len_cookie - len_pattern2];
+
+  if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
+    return -1;
+
+  if (ptr_cookie2[0] <= '0' || ptr_cookie2[0] >= '9' ||
+      ptr_cookie2[1] != '.' ||
+      ptr_cookie2[2] <= '0' || ptr_cookie2[2] >= '9')
+    return -1;
+
+  version_major = ptr_cookie2[0] - '0';
+  version_minor = ptr_cookie2[2] - '0';
+
+  return (version_major * 10 + version_minor);
+}
+
+boolean checkCookieString(const char *cookie, const char *template)
+{
+  const char *pattern = "_FILE_VERSION_?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_template = strlen(template);
+  const int len_pattern = strlen(pattern);
+
+  if (len_cookie != len_template)
+    return FALSE;
+
+  if (strncmp(cookie, template, len_cookie - len_pattern) != 0)
+    return FALSE;
+
+  return TRUE;
+}
 
 char *getLevelClassDescription(struct LevelDirInfo *ldi)
 {
@@ -359,6 +409,9 @@ static void setLevelInfoToDefaults()
 {
   int i, x, y;
 
+  level.file_version = FILE_VERSION_ACTUAL;
+  level.game_version = GAME_VERSION_ACTUAL;
+
   lev_fieldx = level.fieldx = STD_LEV_FIELDX;
   lev_fieldy = level.fieldy = STD_LEV_FIELDY;
 
@@ -449,7 +502,7 @@ void LoadLevel(int level_nr)
   char cookie[MAX_LINE_LEN];
   char chunk[CHUNK_ID_LEN + 1];
   boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
-  int file_version = FILE_VERSION_1_4;	/* last version of level files */
+  int file_version = FILE_VERSION_ACTUAL;
   int chunk_length;
   FILE *file;
 
@@ -467,6 +520,7 @@ void LoadLevel(int level_nr)
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
     cookie[strlen(cookie) - 1] = '\0';
 
+#if 0
   if (strcmp(cookie, LEVEL_COOKIE_10) == 0)	/* old 1.0 level format */
     file_version = FILE_VERSION_1_0;
   else if (strcmp(cookie, LEVEL_COOKIE_12) == 0)/* 1.2 (8 bit) level format */
@@ -477,6 +531,18 @@ void LoadLevel(int level_nr)
     fclose(file);
     return;
   }
+#else
+  if (!checkCookieString(cookie, LEVEL_COOKIE))	/* unknown file format */
+  {
+    Error(ERR_WARN, "unknown format of level file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  file_version = getFileVersionFromCookieString(cookie);
+#endif
+
+  level.file_version = file_version;
 
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
@@ -599,13 +665,26 @@ void LoadLevel(int level_nr)
 
   fclose(file);
 
-  /* player was faster than monsters in pre-1.0 levels */
-  if (file_version == FILE_VERSION_1_0 &&
-      IS_LEVELCLASS_CONTRIBUTION(leveldir_current))
+  if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
+      IS_LEVELCLASS_USER(leveldir_current))
   {
-    Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
-    Error(ERR_WARN, "using high speed movement for player");
-    level.double_speed = TRUE;
+    /* for user contributed and private levels, use the version of
+       the game engine the levels were created for */
+    level.game_version = file_version;
+
+    /* player was faster than monsters in pre-1.0 levels */
+    if (file_version == FILE_VERSION_1_0)
+    {
+      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
+      Error(ERR_WARN, "using high speed movement for player");
+      level.double_speed = TRUE;
+    }
+  }
+  else
+  {
+    /* always use the latest version of the game engine for all but
+       user contributed and private levels */
+    level.game_version = GAME_VERSION_ACTUAL;
   }
 
   /* determine border element for this level */
@@ -716,10 +795,12 @@ void LoadTape(int level_nr)
   char chunk[CHUNK_ID_LEN + 1];
   FILE *file;
   int num_participating_players;
-  int file_version = FILE_VERSION_1_2;	/* last version of tape files */
+  int file_version = FILE_VERSION_ACTUAL; /* last version of tape files */
   int chunk_length;
 
   /* always start with reliable default values (empty tape) */
+  tape.file_version = FILE_VERSION_ACTUAL;
+  tape.game_version = GAME_VERSION_ACTUAL;
   TapeErase();
 
   /* default values (also for pre-1.2 tapes) with only the first player */
@@ -738,6 +819,7 @@ void LoadTape(int level_nr)
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
     cookie[strlen(cookie) - 1] = '\0';
 
+#if 0
   if (strcmp(cookie, TAPE_COOKIE_10) == 0)	/* old 1.0 tape format */
     file_version = FILE_VERSION_1_0;
   else if (strcmp(cookie, TAPE_COOKIE) != 0)	/* unknown tape format */
@@ -746,6 +828,19 @@ void LoadTape(int level_nr)
     fclose(file);
     return;
   }
+#else
+  if (!checkCookieString(cookie, TAPE_COOKIE))	/* unknown file format */
+  {
+    Error(ERR_WARN, "unknown format of tape file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  file_version = getFileVersionFromCookieString(cookie);
+#endif
+
+  tape.file_version = file_version;
+  tape.game_version = file_version;
 
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
@@ -960,12 +1055,21 @@ void LoadScore(int level_nr)
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
     cookie[strlen(cookie) - 1] = '\0';
 
+#if 0
   if (strcmp(cookie, SCORE_COOKIE) != 0)
   {
     Error(ERR_WARN, "wrong file identifier of score file '%s'", filename);
     fclose(file);
     return;
   }
+#else
+  if (!checkCookieString(cookie, SCORE_COOKIE))	/* unknown file format */
+  {
+    Error(ERR_WARN, "unknown format of score file '%s'", filename);
+    fclose(file);
+    return;
+  }
+#endif
 
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
