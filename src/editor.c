@@ -3478,7 +3478,8 @@ static void MapSelectboxGadget(int id)
   int x = selectbox_info[id].x + xoffset_left;
   int y = selectbox_info[id].y + yoffset_left;
 
-  DrawTextF(x, y, FONT_TEXT_1, selectbox_info[id].text_left);
+  if (selectbox_info[id].text_left)
+    DrawTextF(x, y, FONT_TEXT_1, selectbox_info[id].text_left);
 
   if (selectbox_info[id].text_right)
   {
@@ -3509,7 +3510,9 @@ static void MapRadiobuttonGadget(int id)
   boolean checked =
     (*radiobutton_info[id].value == radiobutton_info[id].checked_value);
 
-  DrawTextF(x, y, FONT_TEXT_1, radiobutton_info[id].text_right);
+  if (radiobutton_info[id].text_right)
+    DrawTextF(x, y, FONT_TEXT_1, radiobutton_info[id].text_right);
+
   ModifyGadget(level_editor_gadget[radiobutton_info[id].gadget_id],
 	       GDI_CHECKED, checked, GDI_END);
 
@@ -3523,7 +3526,9 @@ static void MapCheckbuttonGadget(int id)
   int x = checkbutton_info[id].x + xoffset_right;
   int y = checkbutton_info[id].y + yoffset_right;
 
-  DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[id].text_right);
+  if (checkbutton_info[id].text_right)
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[id].text_right);
+
   ModifyGadget(level_editor_gadget[checkbutton_info[id].gadget_id],
 	       GDI_CHECKED, *checkbutton_info[id].value,
 	       GDI_Y, SY + checkbutton_info[id].y, GDI_END);

@@ -1924,8 +1924,17 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
 #if 1
+
+#if 1
       if (IS_EXPLOSION_PROOF(element))
 	continue;
+#else
+      /* indestructible elements can only explode in center (but not flames) */
+      if ((IS_EXPLOSION_PROOF(element) && (x != ex || y != ey)) ||
+	  element == EL_FLAMES)
+	continue;
+#endif
+
 #else
       if ((IS_INDESTRUCTIBLE(element) &&
 	   (game.engine_version < VERSION_IDENT(2,2,0) ||
@@ -1947,8 +1956,13 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
       /* save walkable background elements while explosion on same tile */
+#if 1
       if (IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
+#else
+      if (IS_INDESTRUCTIBLE(element) && IS_WALKABLE(element))
+	Back[x][y] = element;
+#endif
 
       /* ignite explodable elements reached by other explosion */
       if (element == EL_EXPLOSION)
@@ -3426,7 +3440,9 @@ void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
-  GfxAction[x][y] = ACTION_DEFAULT;
+  /* !!! this should be handled more generic (not only for more) !!! */
+  if (element != EL_MOLE && GfxAction[x][y] != ACTION_DIGGING)
+    GfxAction[x][y] = ACTION_DEFAULT;
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
@@ -4005,6 +4021,11 @@ void StartMoving(int x, int y)
       {
 	Feld[newx][newy] = EL_AMOEBA_SHRINKING;
 	PlaySoundLevel(x, y, SND_MOLE_DIGGING);
+
+	ResetGfxAnimation(x, y);
+	GfxAction[x][y] = ACTION_DIGGING;
+	DrawLevelField(x, y);
+
 	MovDelay[newx][newy] = 0;	/* start amoeba shrinking delay */
 	return;				/* wait for shrinking amoeba */
       }
@@ -5635,9 +5656,10 @@ void GameActions()
 #if 1
       graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
 #if 0
-      if (element == EL_PACMAN)
-	printf("::: %d, %d, %d\n",
-	       IS_ANIMATED(graphic), IS_MOVING(x, y), Stop[x][y]);
+      if (element == EL_MOLE)
+	printf("::: %d, %d, %d [%d]\n",
+	       IS_ANIMATED(graphic), IS_MOVING(x, y), Stop[x][y],
+	       GfxAction[x][y]);
 #endif
 #if 0
       if (element == EL_YAMYAM)
@@ -5653,7 +5675,7 @@ void GameActions()
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
 #if 0
-	if (element == EL_YAMYAM)
+	if (element == EL_MOLE)
 	  printf("::: %d, %d\n", graphic, GfxFrame[x][y]);
 #endif
       }

@@ -1072,9 +1072,9 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 
 inline KeyMod HandleKeyModState(Key key, int key_status)
 {
-#if !defined(TARGET_SDL)
   static KeyMod current_modifiers = KMOD_None;
 
+#if !defined(TARGET_SDL)
   if (key != KSYM_UNDEFINED)	/* new key => check for modifier key change */
   {
     KeyMod new_modifier = KMOD_None;
@@ -1114,9 +1114,9 @@ inline KeyMod HandleKeyModState(Key key, int key_status)
     else
       current_modifiers &= ~new_modifier;
   }
+#endif
 
   return current_modifiers;
-#endif
 }
 
 inline KeyMod GetKeyModState()

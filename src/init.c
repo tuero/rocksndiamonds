@@ -966,8 +966,10 @@ static void set_sound_parameters(int sound, char **parameter_raw)
 
 static void InitSoundInfo()
 {
+#if 0
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
+#endif
   int *sound_effect_properties;
   int num_sounds = getSoundListSize();
   int i, j;
@@ -1033,6 +1035,8 @@ static void InitSoundInfo()
 
   free(sound_effect_properties);
 
+#if 0
+  /* !!! now handled in InitElementSoundInfo() !!! */
   /* initialize element/sound mapping from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
   {
@@ -1043,8 +1047,12 @@ static void InitSoundInfo()
     if (action < 0)
       action = ACTION_DEFAULT;
 
+    printf("::: %d: %d, %d, %d ['%s']\n",
+	   i, element, action, sound, element_info[element].token_name);
+
     element_info[element].sound[action] = sound;
   }
+#endif
 
 #if 0
   /* TEST ONLY */
