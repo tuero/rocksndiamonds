@@ -11,7 +11,7 @@
 *  network.c                                               *
 ***********************************************************/
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 
 #include <signal.h>
 #include <sys/time.h>
@@ -615,4 +615,4 @@ void HandleNetworking()
   }
 }
 
-#endif /* !MSDOS */
+#endif /* !MSDOS && !WIN32 */

@@ -35,9 +35,9 @@ inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
   dst_rect.h = height;
 
   SDL_BlitSurface(src_surface, &src_rect, dst_surface, &dst_rect);
-#if 1
-  SDL_UpdateRect(dst_surface, dst_x, dst_y, width, height);
-#endif
+
+  if (dst_surface == window)
+    SDL_UpdateRect(dst_surface, dst_x, dst_y, width, height);
 }
 
 inline void SDLFillRectangle(SDL_Surface *surface, int x, int y,

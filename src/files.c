@@ -63,7 +63,31 @@
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
+#endif
+
+#if defined(MSDOS) || defined(WIN32)
 #define ERROR_FILENAME		"error.out"
+#endif
+
+#ifdef WIN32
+#ifndef S_IRGRP
+#define S_IRGRP S_IRUSR
+#endif
+#ifndef S_IROTH
+#define S_IROTH S_IRUSR
+#endif
+#ifndef S_IWGRP
+#define S_IWGRP S_IWUSR
+#endif
+#ifndef S_IWOTH
+#define S_IWOTH S_IWUSR
+#endif
+#ifndef S_IXGRP
+#define S_IXGRP S_IXUSR
+#endif
+#ifndef S_IXOTH
+#define S_IXOTH S_IXUSR
+#endif
 #endif
 
 /* file permissions for newly written files */
@@ -323,7 +347,11 @@ static char *getScoreFilename(int nr)
 static void createDirectory(char *dir, char *text)
 {
   if (access(dir, F_OK) != 0)
+#ifdef WIN32
+    if (mkdir(dir) != 0)
+#else
     if (mkdir(dir, USERDATA_DIR_MODE) != 0)
+#endif
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 }
 
@@ -2185,7 +2213,7 @@ void SaveLevelSetup_SeriesInfo()
   chmod(filename, SETUP_PERMS);
 }
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
 void initErrorFile()
 {
   char *filename;

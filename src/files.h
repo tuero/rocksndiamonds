@@ -33,7 +33,7 @@ void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);
 void SaveLevelSetup_SeriesInfo(void);
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
 void initErrorFile();
 FILE *openErrorFile();
 void dumpErrorFile();

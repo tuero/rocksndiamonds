@@ -41,7 +41,9 @@ struct IconFileInfo
   char *picturemask_filename;
 };
 
+#ifndef USE_SDL_LIBRARY
 static int sound_process_id = 0;
+#endif
 
 static void InitLevelAndPlayerInfo(void);
 static void InitNetworkServer(void);
@@ -56,13 +58,17 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
   initErrorFile();
 #endif
 
   if (options.serveronly)
   {
+#ifdef WIN32
+    Error(ERR_WARN, "networking not supported in Windows version");
+#else
     NetworkServer(options.server_port, options.serveronly);
+#endif
 
     /* never reached */
     exit(0);
@@ -119,14 +125,14 @@ void InitLevelAndPlayerInfo()
 
 void InitNetworkServer()
 {
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   int nr_wanted;
 #endif
 
   if (!options.network)
     return;
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(options.server_host, options.server_port))
@@ -172,7 +178,7 @@ void InitSound()
 
 #else /* !USE_SDL_LIBRARY */
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   if (access(sound_device_name, W_OK) != 0)
   {
     Error(ERR_WARN, "cannot access sound device - no sounds");
@@ -198,14 +204,14 @@ void InitSound()
   */
 
 #endif
-#else /* MSDOS */
+#else /* MSDOS || WIN32 */
   sound_loops_allowed = TRUE;
 
   /*
   setup.sound_loops_on = TRUE;
   */
 
-#endif /* MSDOS */
+#endif /* MSDOS || WIN32 */
 #endif /* !USE_SDL_LIBRARY */
 
   for(i=0; i<NUM_SOUNDS; i++)
@@ -230,11 +236,9 @@ void InitSoundServer()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifdef USE_SDL_LIBRARY
-  return;
-#endif
+#ifndef USE_SDL_LIBRARY
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 
   if (pipe(sound_pipe)<0)
   {
@@ -260,11 +264,13 @@ void InitSoundServer()
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
 
-#else /* MSDOS */
+#else /* MSDOS || WIN32 */
 
   SoundServer();
 
 #endif /* MSDOS */
+
+#endif /* !USE_SDL_LIBRARY */
 }
 
 void InitJoysticks()
@@ -2193,12 +2199,17 @@ void CloseAllAndExit(int exit_value)
 {
   int i;
 
+#ifdef USE_SDL_LIBRARY
+  StopSounds();
+  FreeSounds(NUM_SOUNDS);
+#else
   if (sound_process_id)
   {
     StopSounds();
     kill(sound_process_id, SIGTERM);
     FreeSounds(NUM_SOUNDS);
   }
+#endif
 
   for(i=0; i<NUM_BITMAPS; i++)
   {

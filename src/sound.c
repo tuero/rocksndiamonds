@@ -23,7 +23,7 @@ static struct SoundControl emptySoundControl =
   -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE, 0,0L,0L,NULL
 };
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
 #ifdef VOXWARE
@@ -32,21 +32,22 @@ static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
 #endif /* VOXWARE */
 static unsigned char playing_buffer[SND_BLOCKSIZE];
-#endif /* MSDOS */
+#endif /* !MSDOS && !WIN32 */
 
 /* forward declaration of internal functions */
 #ifdef VOXWARE
 static void SoundServer_InsertNewSound(struct SoundControl);
 #endif
-#ifndef VOXWARE
-#ifndef MSDOS
+
+#if !defined(VOXWARE) && !defined(MSDOS) && !defined(WIN32)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
 #endif
-#endif
+
 #ifdef HPUX_AUDIO
 static void HPUX_Audio_Control();
 #endif
+
 #ifdef MSDOS
 static void SoundServer_InsertNewSound(struct SoundControl);
 static void SoundServer_StopSound(int);
@@ -56,7 +57,7 @@ static void SoundServer_StopAllSounds();
 void SoundServer()
 {
   int i;
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   struct SoundControl snd_ctrl;
   fd_set sound_fdset;
 
@@ -67,7 +68,7 @@ void SoundServer()
     playlist[i] = emptySoundControl;
   playing_sounds = 0;
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   stereo_volume[PSND_MAX_LEFT2RIGHT] = 0;
   for(i=0;i<PSND_MAX_LEFT2RIGHT;i++)
     stereo_volume[i] =
@@ -137,7 +138,11 @@ void SoundServer()
       /* Even if the stereo flag is used as being boolean, it must be
 	 defined as an integer, else 'ioctl()' will fail! */
       int stereo = TRUE;
+#if 0
       int sample_rate = 8000;
+#else
+      int sample_rate = 22050;
+#endif
 
       if (playing_sounds || (sound_device=open(sound_device_name,O_WRONLY))>=0)
       {
@@ -347,7 +352,9 @@ void SoundServer()
 #endif /* !VOXWARE */
 
   }
-#endif /* !MSDOS */
+
+#endif /* !MSDOS && !WIN32 */
+
 }
 
 #ifdef MSDOS
@@ -403,6 +410,7 @@ static void sound_handler(struct SoundControl snd_ctrl)
 }
 #endif /* MSDOS */
 
+#ifndef WIN32
 static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 {
   int i, k;
@@ -511,6 +519,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     }
   }
 }
+#endif /* !WIN32 */
 
 /*
 void SoundServer_FadeSound(int nr)
@@ -526,6 +535,7 @@ void SoundServer_FadeSound(int nr)
 }
 */
 
+#ifndef WIN32
 #ifdef MSDOS
 static void SoundServer_StopSound(int nr)
 {
@@ -570,6 +580,7 @@ static void SoundServer_StopAllSounds()
 #endif
 }
 #endif /* MSDOS */
+#endif /* !WIN32 */
 
 #ifdef HPUX_AUDIO
 static void HPUX_Audio_Control()
@@ -594,8 +605,8 @@ static void HPUX_Audio_Control()
 }
 #endif /* HPUX_AUDIO */
 
-#ifndef VOXWARE
-#ifndef MSDOS
+#if !defined(VOXWARE) && !defined(MSDOS) && !defined(WIN32)
+
 /* these two are stolen from "sox"... :) */
 
 /*
@@ -699,8 +710,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
   return(sample);
 }
-#endif /* !MSDOS */
-#endif /* !VOXWARE */
+#endif /* !VOXWARE && !MSDOS && !WIN32 */
 
 /*** THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 

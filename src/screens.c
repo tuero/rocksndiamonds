@@ -327,7 +327,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (setup.autorecord)
 	  TapeStartRecording();
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else
@@ -1904,8 +1904,12 @@ void CustomizeKeyboard(int player_nr)
 	      break;
 	    }
 
+	    /* all keys configured -- wait for "Escape" or "Return" key */
+	    if (step_nr == 6)
+	      break;
+
 	    /* press 'Enter' to keep the existing key binding */
-	    if (key == KEY_Return || step_nr == 6)
+	    if (key == KEY_Return)
 	      key = *customize_step[step_nr].key;
 
 	    /* check if key already used */

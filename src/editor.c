@@ -3511,7 +3511,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  {
 	    CopyAreaToBrush(start_sx, start_sy, sx, sy, button);
 	    CopyBrushToCursor(sx, sy);
-	    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],MB_LEFT);
+	    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],
+			  MB_LEFTBUTTON);
 	    draw_with_brush = TRUE;
 	  }
 	  else if (drawing_function == GADGET_ID_TEXT)
@@ -3540,7 +3541,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
     case GADGET_ID_PICK_ELEMENT:
       if (button_release_event)
-	ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
+	ClickOnGadget(level_editor_gadget[last_drawing_function],
+		      MB_LEFTBUTTON);
       else
 	PickDrawingElement(button, Feld[lx][ly]);
 
@@ -3943,7 +3945,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	}
 
 	if (drawing_function == GADGET_ID_PICK_ELEMENT)
-	  ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
+	  ClickOnGadget(level_editor_gadget[last_drawing_function],
+			MB_LEFTBUTTON);
       }
 #ifdef DEBUG
       else if (gi->event.type == GD_EVENT_PRESSED)
@@ -3962,7 +3965,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 void HandleLevelEditorKeyInput(Key key)
 {
   char letter = getCharFromKey(key);
-  int button = MB_LEFT;
+  int button = MB_LEFTBUTTON;
 
   if (drawing_function == GADGET_ID_TEXT &&
       DrawLevelText(0, 0, 0, TEXT_QUERY_TYPING) == TRUE)
@@ -3994,11 +3997,11 @@ void HandleLevelEditorKeyInput(Key key)
 	break;
       case KEY_Page_Up:
 	id = GADGET_ID_SCROLL_LIST_UP;
-	button = 3;
+	button = MB_RIGHTBUTTON;
 	break;
       case KEY_Page_Down:
 	id = GADGET_ID_SCROLL_LIST_DOWN;
-	button = 3;
+	button = MB_RIGHTBUTTON;
 	break;
 
       default:

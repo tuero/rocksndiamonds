@@ -502,7 +502,7 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
@@ -4240,7 +4240,7 @@ void GameActions()
 #endif
     */
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
 #endif
@@ -4277,7 +4277,7 @@ void GameActions()
       stored_player[i].effective_action = stored_player[i].action;
   }
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   if (network_playing)
     SendToServer_MovePlayer(summarized_player_action);
 #endif
@@ -6162,7 +6162,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 	  Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 	if (options.network)
 	  SendToServer_StopPlaying();
 	else
@@ -6179,7 +6179,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PAUSE:
       if (options.network)
       {
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
 	else
@@ -6193,7 +6193,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PLAY:
       if (tape.pausing)
       {
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else

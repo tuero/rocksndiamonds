@@ -11,13 +11,16 @@
 *  misc.c                                                  *
 ***********************************************************/
 
-#include <pwd.h>
 #include <time.h>
 #include <sys/time.h>
-#include <sys/param.h>
 #include <sys/types.h>
 #include <stdarg.h>
 #include <ctype.h>
+
+#ifndef WIN32
+#include <pwd.h>
+#include <sys/param.h>
+#endif
 
 #include "misc.h"
 #include "init.h"
@@ -39,11 +42,31 @@ END_OF_FUNCTION(increment_counter);
 #endif
 
 
-
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
+#ifdef USE_SDL_LIBRARY
+
+static unsigned long mainCounter(int mode)
+{
+  static unsigned long base_ms = 0;
+  unsigned long current_ms;
+  unsigned long counter_ms;
+
+  current_ms = SDL_GetTicks();
+
+  /* reset base time in case of counter initializing or wrap-around */
+  if (mode == INIT_COUNTER || current_ms < base_ms)
+    base_ms = current_ms;
+
+  counter_ms = current_ms - base_ms;
+
+  return counter_ms;		/* return milliseconds since last init */
+}
+
+#else /* !USE_SDL_LIBRARY */
 #ifndef MSDOS
+
 static unsigned long mainCounter(int mode)
 {
   static struct timeval base_time = { 0, 0 };
@@ -52,6 +75,7 @@ static unsigned long mainCounter(int mode)
 
   gettimeofday(&current_time, NULL);
 
+  /* reset base time in case of counter initializing or wrap-around */
   if (mode == INIT_COUNTER || current_time.tv_sec < base_time.tv_sec)
     base_time = current_time;
 
@@ -60,7 +84,9 @@ static unsigned long mainCounter(int mode)
 
   return counter_ms;		/* return milliseconds since last init */
 }
-#endif
+
+#endif /* !MSDOS */
+#endif /* !USE_SDL_LIBRARY */
 
 void InitCounter()		/* set counter back to zero */
 {
@@ -87,7 +113,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
 
 #ifdef MSDOS
-  /* donït use select() to perform waiting operations under DOS/Windows
+  /* don't use select() to perform waiting operations under DOS/Windows
      environment; always use a busy loop for waiting instead */
   do_busy_waiting = TRUE;
 #endif
@@ -107,6 +133,9 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   }
   else
   {
+#ifdef USE_SDL_LIBRARY
+    SDL_Delay(milliseconds_delay);
+#else /* !USE_SDL_LIBRARY */
     struct timeval delay;
 
     delay.tv_sec  = milliseconds_delay / 1000;
@@ -114,6 +143,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
 
     if (select(0, NULL, NULL, NULL, &delay) != 0)
       Error(ERR_WARN, "sleep_milliseconds(): select() failed");
+#endif /* !USE_SDL_LIBRARY */
   }
 }
 
@@ -198,12 +228,25 @@ char *int2str(int number, int size)
 
 unsigned int SimpleRND(unsigned int max)
 {
+#ifdef USE_SDL_LIBRARY
+
+  static unsigned long root = 654321;
+  unsigned long current_ms;
+
+  current_ms = SDL_GetTicks();
+  root = root * 4253261 + current_ms;
+  return (root % max);
+
+#else /* !USE_SDL_LIBRARY */
+
   static unsigned long root = 654321;
   struct timeval current_time;
 
-  gettimeofday(&current_time,NULL);
+  gettimeofday(&current_time, NULL);
   root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
   return (root % max);
+
+#endif /* !USE_SDL_LIBRARY */
 }
 
 #ifdef DEBUG
@@ -226,34 +269,56 @@ unsigned int RND(unsigned int max)
 
 unsigned int InitRND(long seed)
 {
-  struct timeval current_time;
+#ifdef USE_SDL_LIBRARY
+  unsigned long current_ms;
 
   if (seed == NEW_RANDOMIZE)
   {
-    gettimeofday(&current_time,NULL);
-    srandom_linux_libc((unsigned int) current_time.tv_usec);
-    return (unsigned int)current_time.tv_usec;
+    current_ms = SDL_GetTicks();
+    srandom_linux_libc((unsigned int) current_ms);
+    return (unsigned int) current_ms;
   }
   else
   {
     srandom_linux_libc((unsigned int) seed);
-    return (unsigned int)seed;
+    return (unsigned int) seed;
   }
+#else /* !USE_SDL_LIBRARY */
+  struct timeval current_time;
+
+  if (seed == NEW_RANDOMIZE)
+  {
+    gettimeofday(&current_time, NULL);
+    srandom_linux_libc((unsigned int) current_time.tv_usec);
+    return (unsigned int) current_time.tv_usec;
+  }
+  else
+  {
+    srandom_linux_libc((unsigned int) seed);
+    return (unsigned int) seed;
+  }
+#endif /* !USE_SDL_LIBRARY */
 }
 
 char *getLoginName()
 {
+#ifdef WIN32
+  return ANONYMOUS_NAME;
+#else
   struct passwd *pwd;
 
   if ((pwd = getpwuid(getuid())) == NULL)
     return ANONYMOUS_NAME;
   else
     return pwd->pw_name;
+#endif
 }
 
 char *getRealName()
 {
-#ifndef MSDOS
+#if defined(MSDOS) || defined(WIN32)
+  return ANONYMOUS_NAME;
+#else
   struct passwd *pwd;
 
   if ((pwd = getpwuid(getuid())) == NULL || strlen(pwd->pw_gecos) == 0)
@@ -283,14 +348,14 @@ char *getRealName()
 
     return real_name;
   }
-#else
-  return ANONYMOUS_NAME;
 #endif
 }
 
 char *getHomeDir()
 {
-#ifndef MSDOS
+#if defined(MSDOS) || defined(WIN32)
+  return ".";
+#else
   static char *home_dir = NULL;
 
   if (!home_dir)
@@ -307,8 +372,6 @@ char *getHomeDir()
   }
 
   return home_dir;
-#else
-  return ".";
 #endif
 }
 
@@ -524,7 +587,7 @@ void Error(int mode, char *format, ...)
   if (mode & ERR_WARN && !options.verbose)
     return;
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
   if ((error = openErrorFile()) == NULL)
   {
     printf("Cannot write to error output file!\n");
@@ -722,8 +785,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KEY_Meta_R,	"XK_Meta_R",		"right meta" },
     { KEY_Alt_L,	"XK_Alt_L",		"left alt" },
     { KEY_Alt_R,	"XK_Alt_R",		"right alt" },
-    { KEY_Mode_switch,	"XK_Mode_switch",	"mode switch" },
-    { KEY_Multi_key,	"XK_Multi_key",		"multi key" },
+    { KEY_Super_L,	"XK_Super_L",		"left super" },	 /* Win-L */
+    { KEY_Super_R,	"XK_Super_R",		"right super" }, /* Win-R */
+    { KEY_Mode_switch,	"XK_Mode_switch",	"mode switch" }, /* Alt-R */
+    { KEY_Multi_key,	"XK_Multi_key",		"multi key" },	 /* Ctrl-R */
 
     /* some special keys */
     { KEY_BackSpace,	"XK_BackSpace",		"backspace" },
@@ -734,7 +799,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KEY_End,		"XK_End",		"end" },
     { KEY_Page_Up,	"XK_Page_Up",		"page up" },
     { KEY_Page_Down,	"XK_Page_Down",		"page down" },
-
+    { KEY_Menu,		"XK_Menu",		"menu" },	 /* Win-Menu */
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
     { KEY_space,	"XK_space",		"space" },

@@ -1675,9 +1675,9 @@ extern char		*element_info[];
 #define MB_MENU_CHOICE		FALSE
 #define MB_MENU_MARK		TRUE
 #define MB_MENU_INITIALIZE	(-1)
-#define MB_LEFT			1
-#define MB_MIDDLE		2
-#define MB_RIGHT		3
+#define MB_LEFTBUTTON		1
+#define MB_MIDDLEBUTTON		2
+#define MB_RIGHTBUTTON		3
 
 /* values for redraw_mask */
 #define REDRAW_ALL		(1 << 0)

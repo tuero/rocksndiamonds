@@ -1783,7 +1783,7 @@ boolean Request(char *text, unsigned int req_state)
   int mx, my, ty, result = -1;
   unsigned int old_door_state;
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   /* pause network game while waiting for request to answer */
   if (options.network &&
       game_status == PLAYING &&
@@ -2007,7 +2007,7 @@ boolean Request(char *text, unsigned int req_state)
 
   RemapAllGadgets();
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   /* continue network game after request */
   if (options.network &&
       game_status == PLAYING &&

@@ -93,6 +93,8 @@ typedef XClientMessageEvent	ClientMessageEvent;
 #define KEY_Meta_R		XK_Meta_R
 #define KEY_Alt_L		XK_Alt_L
 #define KEY_Alt_R		XK_Alt_R
+#define KEY_Super_L		XK_Super_L
+#define KEY_Super_R		XK_Super_R
 #define KEY_Mode_switch		XK_Mode_switch
 #define KEY_Multi_key		XK_Multi_key
 
@@ -104,6 +106,7 @@ typedef XClientMessageEvent	ClientMessageEvent;
 #define KEY_End			XK_End
 #define KEY_Page_Up		XK_Page_Up
 #define KEY_Page_Down		XK_Page_Down
+#define KEY_Menu		XK_Menu
 
 #define KEY_space		XK_space
 #define KEY_exclam		XK_exclam

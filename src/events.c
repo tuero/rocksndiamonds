@@ -714,7 +714,7 @@ void HandleNoXEvent()
     return;
   }
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
   if (options.network)
     HandleNetworking();
 #endif

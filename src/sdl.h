@@ -96,8 +96,10 @@ typedef int			Colormap;
 #define KEY_Meta_R		SDLK_RMETA
 #define KEY_Alt_L		SDLK_LALT
 #define KEY_Alt_R		SDLK_RALT
+#define KEY_Super_L		SDLK_LSUPER
+#define KEY_Super_R		SDLK_RSUPER
 #define KEY_Mode_switch		SDLK_MODE
-#define KEY_Multi_key		KEY_UNDEFINED		/* undefined */
+#define KEY_Multi_key		SDLK_RCTRL
 
 #define KEY_BackSpace		SDLK_BACKSPACE
 #define KEY_Delete		SDLK_DELETE
@@ -107,6 +109,7 @@ typedef int			Colormap;
 #define KEY_End			SDLK_END
 #define KEY_Page_Up		SDLK_PAGEUP
 #define KEY_Page_Down		SDLK_PAGEDOWN
+#define KEY_Menu		SDLK_MENU
 
 #define KEY_space		SDLK_SPACE
 #define KEY_exclam		SDLK_EXCLAIM

@@ -11,7 +11,7 @@
 *  network.c                                               *
 ***********************************************************/
 
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(WIN32)
 
 #include <fcntl.h>
 #include <sys/time.h>
@@ -661,4 +661,4 @@ void NetworkServer(int port, int serveronly)
   }
 }
 
-#endif /* !MSDOS */
+#endif /* !MSDOS && !WIN32 */
