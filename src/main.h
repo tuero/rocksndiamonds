@@ -377,6 +377,7 @@ struct GameInfo
   int belt_dir_nr[4];
   int switchgate_pos;
   int balloon_dir;
+  boolean explosions_delayed;
 };
 
 struct GlobalInfo
@@ -418,6 +419,7 @@ extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 

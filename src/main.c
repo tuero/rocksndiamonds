@@ -58,6 +58,7 @@ boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 

@@ -41,9 +41,10 @@
 
 /* for Explode() */
 #define EX_PHASE_START		0
-#define EX_NORMAL		0
-#define EX_CENTER		1
-#define EX_BORDER		2
+#define EX_NO_EXPLOSION		0
+#define EX_NORMAL		1
+#define EX_CENTER		2
+#define EX_BORDER		3
 
 /* special positions in the game control window (relative to control window) */
 #define XX_LEVEL		37
@@ -533,6 +534,7 @@ void InitGame()
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
   game.balloon_dir = MV_NO_MOVING;
+  game.explosions_delayed = TRUE;
 
   for (i=0; i<4; i++)
   {
@@ -554,6 +556,7 @@ void InitGame()
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
+      ExplodeField[x][y] = EX_NO_EXPLOSION;
     }
   }
 
@@ -1279,6 +1282,12 @@ void Explode(int ex, int ey, int phase, int mode)
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
   int first_phase_after_start = EX_PHASE_START + 1;
+
+  if (game.explosions_delayed)
+  {
+    ExplodeField[ex][ey] = mode;
+    return;
+  }
 
   if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
   {
@@ -4418,7 +4427,7 @@ void GameActions()
       ContinueMoving(x, y);
     else if (IS_ACTIVE_BOMB(element))
       CheckDynamite(x, y);
-    else if (element == EL_EXPLODING)
+    else if (element == EL_EXPLODING && !game.explosions_delayed)
       Explode(x, y, Frame[x][y], EX_NORMAL);
     else if (element == EL_AMOEBING)
       AmoebeWaechst(x, y);
@@ -4507,6 +4516,22 @@ void GameActions()
 	sieb_y = y;
       }
     }
+  }
+
+  if (game.explosions_delayed)
+  {
+    game.explosions_delayed = FALSE;
+
+    for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+    {
+      if (ExplodeField[x][y])
+	Explode(x, y, EX_PHASE_START, ExplodeField[x][y]);
+      else if (Feld[x][y] == EL_EXPLODING)
+	Explode(x, y, Frame[x][y], EX_NORMAL);
+      ExplodeField[x][y] = EX_NO_EXPLOSION;
+    }
+
+    game.explosions_delayed = TRUE;
   }
 
   if (game.magic_wall_active)
