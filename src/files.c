@@ -827,15 +827,15 @@ void LoadScore(int level_nr)
     fscanf(file, "%d", &highscore[i].Score);
     fgets(line, MAX_LINE_LEN, file);
 
-    if (line[strlen(line)-1] == '\n')
-      line[strlen(line)-1] = '\0';
+    if (line[strlen(line) - 1] == '\n')
+      line[strlen(line) - 1] = '\0';
 
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
       if (*line_ptr != ' ' && *line_ptr != '\t' && *line_ptr != '\0')
       {
-	strncpy(highscore[i].Name, line_ptr, MAX_NAMELEN - 1);
-	highscore[i].Name[MAX_NAMELEN - 1] = '\0';
+	strncpy(highscore[i].Name, line_ptr, MAX_PLAYER_NAME_LEN);
+	highscore[i].Name[MAX_PLAYER_NAME_LEN] = '\0';
 	break;
       }
     }
@@ -1572,11 +1572,11 @@ void LoadSetup()
     freeSetupFileList(setup_file_list);
 
     /* needed to work around problems with fixed length strings */
-    if (strlen(setup.player_name) >= MAX_NAMELEN)
-      setup.player_name[MAX_NAMELEN - 1] = '\0';
-    else if (strlen(setup.player_name) < MAX_NAMELEN - 1)
+    if (strlen(setup.player_name) > MAX_PLAYER_NAME_LEN)
+      setup.player_name[MAX_PLAYER_NAME_LEN] = '\0';
+    else if (strlen(setup.player_name) < MAX_PLAYER_NAME_LEN)
     {
-      char *new_name = checked_malloc(MAX_NAMELEN);
+      char *new_name = checked_malloc(MAX_PLAYER_NAME_LEN + 1);
 
       strcpy(new_name, setup.player_name);
       free(setup.player_name);

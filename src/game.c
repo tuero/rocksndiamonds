@@ -897,15 +897,16 @@ int NewHiScore()
 #ifdef ONE_PER_NAME
       put_into_list:
 #endif
-      strncpy(highscore[k].Name, setup.player_name, MAX_NAMELEN - 1);
-      highscore[k].Name[MAX_NAMELEN - 1] = '\0';
+      strncpy(highscore[k].Name, setup.player_name, MAX_PLAYER_NAME_LEN);
+      highscore[k].Name[MAX_PLAYER_NAME_LEN] = '\0';
       highscore[k].Score = local_player->score; 
       position = k;
       break;
     }
 
 #ifdef ONE_PER_NAME
-    else if (!strncmp(setup.player_name, highscore[k].Name, MAX_NAMELEN - 1))
+    else if (!strncmp(setup.player_name, highscore[k].Name,
+		      MAX_PLAYER_NAME_LEN))
       break;	/* player already there with a higher score */
 #endif
 

@@ -33,12 +33,10 @@
 #include "screens.h"
 #include "misc.h"
 
-#define MAX_PLAYER_NAME_LEN 14
-
 struct NetworkClientPlayerInfo
 {
   byte nr;
-  char name[MAX_PLAYER_NAME_LEN + 2];
+  char name[MAX_PLAYER_NAME_LEN + 1];
   struct NetworkClientPlayerInfo *next;
 };
 

@@ -763,7 +763,7 @@ void HandleTypeName(int newxpos, KeySym key)
   }
 
   if (((key >= XK_A && key <= XK_Z) || (key >= XK_a && key <= XK_z)) && 
-      xpos < MAX_NAMELEN - 1)
+      xpos < MAX_PLAYER_NAME_LEN)
   {
     char ascii;
 

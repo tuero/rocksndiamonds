@@ -201,7 +201,7 @@ typedef unsigned char byte;
 #define NUM_PIXMAPS		10
 
 /* boundaries of arrays etc. */
-#define MAX_NAMELEN		(10+1)
+#define MAX_PLAYER_NAME_LEN	10
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
@@ -227,7 +227,7 @@ typedef unsigned char byte;
 
 struct HiScore
 {
-  char Name[MAX_NAMELEN];
+  char Name[MAX_PLAYER_NAME_LEN + 1];
   int Score;
 };
 
