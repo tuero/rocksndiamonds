@@ -753,11 +753,11 @@ static void InitGameEngine()
   InitElementPropertiesEngine(game.engine_version);
 
 #if 0
-    printf("level %d: level version == %06d\n", level_nr, level.game_version);
-    printf("          tape version == %06d [%s] [file: %06d]\n",
-	   tape.engine_version, (tape.playing ? "PLAYING" : "RECORDING"),
-	   tape.file_version);
-    printf("       => game.engine_version == %06d\n", game.engine_version);
+  printf("level %d: level version == %06d\n", level_nr, level.game_version);
+  printf("          tape version == %06d [%s] [file: %06d]\n",
+	 tape.engine_version, (tape.playing ? "PLAYING" : "RECORDING"),
+	 tape.file_version);
+  printf("       => game.engine_version == %06d\n", game.engine_version);
 #endif
 
   /* ---------- initialize player's initial move delay --------------------- */
@@ -1581,8 +1581,13 @@ void GameWon()
   if (local_player->MovPos)
     return;
 
+#if 1
+  if (tape.auto_play)		/* tape might already be stopped here */
+    tape.auto_play_level_solved = TRUE;
+#else
   if (tape.playing && tape.auto_play)
     tape.auto_play_level_solved = TRUE;
+#endif
 
   local_player->LevelSolved = FALSE;
 
@@ -1987,165 +1992,6 @@ void CheckDynamite(int x, int y)
 #endif
 
   Bang(x, y);
-}
-
-void ShowEnvelope()
-{
-  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
-  boolean draw_masked = graphic_info[graphic].draw_masked;
-  int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
-  int font_nr = FONT_TEXT_1;
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int i, x, y;
-
-  /* open envelope window horizontally */
-  for (i = 2; i <= level.envelope_xsize + 2; i += 2)
-  {
-    int startx = (SXSIZE / font_width - i) / 2;
-    int starty = (SYSIZE / font_height) / 2 - 1;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < 2; y++) for (x=0; x < i; x++)
-    {
-      int sx = SX + (startx + x) * font_width;
-      int sy = SY + (starty + y) * font_height;
-      int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
-
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-
-    /* special case: envelope has odd width */
-    if (level.envelope_xsize % 2 && i == 2)
-      i--;
-  }
-
-  /* open envelope window vertically */
-  for (i = 2; i <= level.envelope_ysize + 2; i += 2)
-  {
-    int xsize = level.envelope_xsize + 2;
-    int startx = (SXSIZE / font_width - (xsize - 1)) / 2;
-    int starty = (SYSIZE / font_height - i) / 2;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < i; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + (startx + x) * font_width;
-      int sy = SY + (starty + y) * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
-
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
-
-    DrawTextToTextArea(SX + (startx + 1) * font_width,
-		       SY + (starty + 1) * font_height, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i - 2, mask_mode);
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-
-    /* special case: envelope has odd height */
-    if (level.envelope_ysize % 2 && i == 2)
-      i--;
-  }
-
-  if (tape.playing)
-    Delay(1000);
-  else
-    WaitForEventToContinue();
-
-  /* close envelope window vertically */
-  for (i = level.envelope_ysize + 2; i >= 2; i -= 2)
-  {
-    int xsize = level.envelope_xsize + 2;
-    int startx = (SXSIZE / font_width - (xsize - 1)) / 2;
-    int starty = (SYSIZE / font_height - i) / 2;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < i; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + (startx + x) * font_width;
-      int sy = SY + (starty + y) * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
-
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
-
-    DrawTextToTextArea(SX + (startx + 1) * font_width,
-		       SY + (starty + 1) * font_height, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i - 2, mask_mode);
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-
-    /* special case: envelope has odd height */
-    if (level.envelope_ysize % 2 && i == level.envelope_ysize + 2)
-      i++;
-  }
-
-  /* close envelope window horizontally */
-  for (i = level.envelope_xsize + 2; i >= 2; i -= 2)
-  {
-    int startx = (SXSIZE / font_width - i) / 2;
-    int starty = (SYSIZE / font_height) / 2 - 1;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < 2; y++) for (x=0; x < i; x++)
-    {
-      int sx = SX + (startx + x) * font_width;
-      int sy = SY + (starty + y) * font_height;
-      int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
-
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-
-    /* special case: envelope has odd width */
-    if (level.envelope_xsize % 2 && i == level.envelope_xsize + 2)
-      i++;
-  }
-
-  SetDrawtoField(DRAW_BUFFERED);
-
-  redraw_mask |= REDRAW_FIELD;
-  BackToFront();
 }
 
 void RelocatePlayer(int x, int y, int element)

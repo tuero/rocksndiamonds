@@ -331,7 +331,7 @@ static void gotoTopLevelDir()
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
-  static int choice = 0;
+  static int choice = 5;
   int x = 0;
   int y = choice;
 

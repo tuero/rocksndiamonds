@@ -3443,8 +3443,8 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input.ypos",		"0"			},
 
   { "game.envelope_background",			"RocksScreen.pcx"	},
-  { "game.envelope_background.xpos",		"0"			},
-  { "game.envelope_background.ypos",		"0"			},
+  { "game.envelope_background.x",		"0"			},
+  { "game.envelope_background.y",		"0"			},
   { "game.envelope_background.width",		"560"			},
   { "game.envelope_background.height",		"560"			},
 

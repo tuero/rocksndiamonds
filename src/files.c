@@ -927,7 +927,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   int i, j;
 
   /* map custom element change events that have changed in newer versions
-     (these following values have accidentally changed in version 3.0.1) */
+     (these following values were accidentally changed in version 3.0.1) */
   if (level->game_version <= VERSION_IDENT(3,0,0))
   {
     for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
