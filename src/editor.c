@@ -103,7 +103,8 @@
 #define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
 #define ED_AREA_ELEM_CONTENT2_XPOS	(20 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT2_YPOS	ED_COUNTER_YPOS2(4)
+#define ED_AREA_ELEM_CONTENT2_YPOS	(ED_COUNTER_YPOS2(5) + \
+					 ED_GADGET_DISTANCE)
 
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
@@ -663,7 +664,7 @@ static struct
     "element content",			NULL
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(5),
+    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(6),
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
@@ -671,7 +672,7 @@ static struct
     NULL,				"units (fixed)"
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(6),
+    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(7),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
@@ -707,8 +708,8 @@ static struct
 
 static struct ValueTextInfo options_change_time_units[] =
 {
-  { 1,	"frames"		},
   { 50,	"seconds"		},
+  { 1,	"frames"		},
   { -1,	NULL			}
 };
 static int index_change_time_units = 0;
@@ -735,12 +736,12 @@ static struct
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
   {
-    ED_SELECTBOX_CHANGE_UNITS_XPOS,	ED_COUNTER_YPOS2(7),
+    ED_SELECTBOX_CHANGE_UNITS_XPOS,	ED_COUNTER_YPOS2(8),
     GADGET_ID_CHANGE_TIME_UNITS,
     0,
     options_change_time_units, &index_change_time_units,
     &custom_element_change.delay_frames,
-    "time units measured in", "time units for change"
+    "delay units given in", "time units for change"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
@@ -916,10 +917,10 @@ static struct
     "restrict random placement to",	"set random placement restriction"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS,			0,	/* set at runtime */
     GADGET_ID_STICK_ELEMENT,
     &stick_element_properties_window,
-    "stick window to edit content",	"stick window to edit content"
+    "stick this screen to edit content","stick this screen to edit content"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
@@ -994,19 +995,19 @@ static struct
     "player can walk under",		"player can walk under this element"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(4),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(5),
     GADGET_ID_CUSTOM_CHANGEABLE,
     &custom_element_properties[EP_CHANGEABLE],
     "element changes to    after:",	"element can change to other element"
   },
   {
-    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(5),
+    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(6),
     GADGET_ID_CHANGE_DELAY_FIXED,
     &custom_element_change_events[CE_DELAY_FIXED],
     "delay of",				"element changes after fixed delay"
   },
   {
-    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(6),
+    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(7),
     GADGET_ID_CHANGE_DELAY_RANDOM,
     &custom_element_change_events[CE_DELAY_RANDOM],
     "delay of",				"element changes after random delay"
@@ -3185,6 +3186,9 @@ static void ModifyEditorSelectbox(int selectbox_id, int new_value)
     if (selectbox_info[selectbox_id].options[i].value == new_value)
       new_index_value = i;
 
+  *selectbox_info[selectbox_id].value =
+    selectbox_info[selectbox_id].options[new_index_value].value;
+
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
 }
 
@@ -3380,6 +3384,7 @@ static void DrawAmoebaContentArea()
 
 static void DrawCustomChangedArea()
 {
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGED];
 #if 0
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
@@ -3408,7 +3413,14 @@ static void DrawCustomChangedArea()
   ElementContent[0][0][0] = custom_element_change.successor;
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
+#if 1
+  DrawMiniGraphicExt(drawto,
+		     gi->x,
+		     gi->y,
+		     el2edimg(ElementContent[0][0][0]));
+#else
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+#endif
 
 #if 0
   DrawText(area_sx + TILEX, area_sy + 1, "Element after change", FONT_TEXT_1);
@@ -3609,12 +3621,14 @@ static void DrawPropertiesConfig()
   {
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+    checkbutton_info[i].y = ED_COUNTER_YPOS(4);
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+		 GDI_CHECKED, *checkbutton_info[i].value,
+		 GDI_Y, SY + checkbutton_info[i].y, GDI_END);
     MapCheckbuttonGadget(i);
 
     if (HAS_CONTENT(properties_element))
@@ -3984,12 +3998,14 @@ static void DrawPropertiesAdvanced()
 
   /* draw stickybutton gadget */
   i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+  checkbutton_info[i].y = ED_COUNTER_YPOS2(4);
   x = checkbutton_info[i].x + xoffset_right2;
   y = checkbutton_info[i].y + yoffset_right2;
 
   DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
   ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-	       GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+	       GDI_CHECKED, *checkbutton_info[i].value,
+	       GDI_Y, SY + checkbutton_info[i].y, GDI_END);
   MapCheckbuttonGadget(i);
 
   /* draw counter gadgets */
