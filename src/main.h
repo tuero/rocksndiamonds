@@ -174,7 +174,6 @@ typedef unsigned char byte;
 				 EL_FELSBROCKEN)
 #define IS_DRAWABLE(e)		((e) < EL_BLOCKED)
 #define IS_NOT_DRAWABLE(e)	((e) >= EL_BLOCKED)
-#define TIMESIZE		(TimeLeft * 100 / level.time)
 #define TAPE_IS_EMPTY(x)	((x).length == 0)
 #define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing &&!(x).pausing)
 
@@ -441,7 +440,7 @@ extern int		MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
-extern int		FrameCounter, TimeFrames, TimeLeft;
+extern int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
 extern int		MampferMax, MampferNr;
 extern boolean		SiebAktiv;
 extern int		SiebCount;
@@ -775,6 +774,7 @@ extern int		num_bg_loops;
 #define EL_SIEB2_TOT		305
 #define EL_AUSGANG_ACT		306
 #define EL_SP_TERMINAL_ACTIVE	307
+#define EL_SP_BUG_ACTIVE	308
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		400
@@ -1060,8 +1060,10 @@ extern int		num_bg_loops;
 #define GFX_SP_CHIP_UPPER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 6)
 #define GFX_SP_CHIP_LOWER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 7)
 
+#define GFX_SP_BUG_WARNING	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +15)
 #define GFX_SP_EXPLODE_EMPTY	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE + 8)
 #define GFX_SP_EXPLODE_INFOTRON	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 8)
+#define GFX_SP_BUG_ACTIVE	(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE + 8)
 #define GFX_SP_SNIKSNAK_LEFT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE + 8)
 #define GFX_SP_SNIKSNAK_RIGHT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE +12)
 #define GFX_SP_SNIKSNAK_UP	(GFX_START_ROCKSMORE +  9 * MORE_PER_LINE + 8)
@@ -1156,8 +1158,17 @@ extern int		num_bg_loops;
 #define SND_WARNTON		49
 #define SND_WHOOSH		50
 #define SND_ZISCH		51
+#define SND_SP_BASE		52
+#define SND_SP_INFOTRON		53
+#define SND_SP_ZONKDOWN		54
+#define SND_SP_ZONKPUSH		55
+#define SND_SP_BUG		56
+#define SND_SP_BOOM		57
+#define SND_SP_BOOOM		58
+#define SND_SP_EXIT		59
+#define SND_EMPTY		60
 
-#define NUM_SOUNDS		52
+#define NUM_SOUNDS		61
 
 /* default input keys */
 #define KEY_UNDEFINDED		XK_VoidSymbol

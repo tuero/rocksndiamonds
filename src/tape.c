@@ -199,7 +199,7 @@ boolean TapePlayDelay()
 	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
     }
 
-    if (level.time-TimeLeft > tape.length_seconds - PAUSE_SECONDS_BEFORE_DEATH)
+    if (TimePlayed > tape.length_seconds - PAUSE_SECONDS_BEFORE_DEATH)
     {
       TapeTogglePause();
       return(FALSE);

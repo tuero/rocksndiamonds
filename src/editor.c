@@ -1671,7 +1671,9 @@ void LevelEd(int mx, int my, int button)
 
 	    for(y=0;y<lev_fieldy;y++) 
 	      for(x=0;x<lev_fieldx;x++)
-		if (Feld[x][y]==EL_SPIELFIGUR || Feld[x][y]==EL_SPIELER1) 
+		if (Feld[x][y] == EL_SPIELFIGUR ||
+		    Feld[x][y] == EL_SPIELER1 ||
+		    Feld[x][y] == EL_SP_MURPHY) 
 		  figur_vorhanden = TRUE;
 
 	    if (!figur_vorhanden)
@@ -2928,7 +2930,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       for(y=0; y<lev_fieldy; y++) 
 	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1) 
+	  if (Feld[x][y] == EL_SPIELFIGUR ||
+	      Feld[x][y] == EL_SPIELER1 ||
+	      Feld[x][y] == EL_SP_MURPHY) 
 	    player_present = TRUE;
 
       if (!player_present)
@@ -2948,7 +2952,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_TEST:
       for(y=0; y<lev_fieldy; y++) 
 	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1) 
+	  if (Feld[x][y] == EL_SPIELFIGUR ||
+	      Feld[x][y] == EL_SPIELER1 ||
+	      Feld[x][y] == EL_SP_MURPHY) 
 	    player_present = TRUE;
 
       if (!player_present)

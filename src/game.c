@@ -392,6 +392,7 @@ void InitGame()
   MampferNr = 0;
   FrameCounter = 0;
   TimeFrames = 0;
+  TimePlayed = 0;
   TimeLeft = level.time;
 
   ScreenMovDir = MV_NO_MOVING;
@@ -744,13 +745,36 @@ void GameWon()
     {
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
-      if (TimeLeft && !(TimeLeft % 10))
+      if (TimeLeft > 0 && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimeLeft > 100 && !(TimeLeft % 10))
 	TimeLeft -= 10;
       else
 	TimeLeft--;
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+      BackToFront();
+      Delay(10);
+    }
+
+    if (setup.sound_loops)
+      StopSound(SND_SIRR);
+  }
+  else if (level.time == 0)		/* level without time limit */
+  {
+    if (setup.sound_loops)
+      PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
+
+    while(TimePlayed < 999)
+    {
+      if (!setup.sound_loops)
+	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
+      if (TimePlayed < 999 && !(TimePlayed % 10))
+	RaiseScore(level.score[SC_ZEITBONUS]);
+      if (TimePlayed < 900 && !(TimePlayed % 10))
+	TimePlayed += 10;
+      else
+	TimePlayed++;
+      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FS_SMALL, FC_YELLOW);
       BackToFront();
       Delay(10);
     }
@@ -794,7 +818,7 @@ void GameWon()
   BackToFront();
 }
 
-boolean NewHiScore()
+int NewHiScore()
 {
   int k, l;
   int position = -1;
@@ -1218,7 +1242,10 @@ void Bang(int x, int y)
 {
   int element = Feld[x][y];
 
-  PlaySoundLevel(x, y, SND_ROAAAR);
+  if (game_emulation == EMU_SUPAPLEX)
+    PlaySoundLevel(x, y, SND_SP_BOOOM);
+  else
+    PlaySoundLevel(x, y, SND_ROAAAR);
 
   if (IS_PLAYER(x, y))	/* remove objects that might cause smaller explosion */
     element = EL_LEERRAUM;
@@ -1434,6 +1461,7 @@ void Impact(int x, int y)
       case EL_EDELSTEIN_ROT:
       case EL_EDELSTEIN_LILA:
       case EL_DIAMANT:
+      case EL_SP_INFOTRON:
         sound = SND_PLING;
 	break;
       case EL_KOKOSNUSS:
@@ -1441,6 +1469,9 @@ void Impact(int x, int y)
 	break;
       case EL_FELSBROCKEN:
 	sound = SND_KLOPF;
+	break;
+      case EL_SP_ZONK:
+	sound = SND_SP_ZONKDOWN;
 	break;
       case EL_SCHLUESSEL:
       case EL_SCHLUESSEL1:
@@ -3157,6 +3188,68 @@ void CheckForDragon(int x, int y)
   }
 }
 
+static void CheckBuggyBase(int x, int y)
+{
+  int element = Feld[x][y];
+
+  if (element == EL_SP_BUG)
+  {
+    if (!MovDelay[x][y])	/* start activating buggy base */
+      MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
+
+    if (MovDelay[x][y])		/* wait some time before activating base */
+    {
+      MovDelay[x][y]--;
+      if (MovDelay[x][y] < 5 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+	DrawGraphic(SCREENX(x), SCREENY(y), GFX_SP_BUG_WARNING);
+      if (MovDelay[x][y])
+	return;
+
+      Feld[x][y] = EL_SP_BUG_ACTIVE;
+    }
+  }
+  else if (element == EL_SP_BUG_ACTIVE)
+  {
+    if (!MovDelay[x][y])	/* start activating buggy base */
+      MovDelay[x][y] = 1 * FRAMES_PER_SECOND + RND(1 * FRAMES_PER_SECOND);
+
+    if (MovDelay[x][y])		/* wait some time before activating base */
+    {
+      MovDelay[x][y]--;
+      if (MovDelay[x][y])
+      {
+	int i;
+	static int xy[4][2] =
+	{
+	  { 0, -1 },
+	  { -1, 0 },
+	  { +1, 0 },
+	  { 0, +1 }
+	};
+
+	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+	  DrawGraphic(SCREENX(x),SCREENY(y), GFX_SP_BUG_ACTIVE + SimpleRND(4));
+
+	for (i=0; i<4; i++)
+	{
+	  int xx = x + xy[i][0], yy = y + xy[i][1];
+
+	  if (IS_PLAYER(xx, yy))
+	  {
+	    PlaySoundLevel(x, y, SND_SP_BUG);
+	    break;
+	  }
+	}
+
+	return;
+      }
+
+      Feld[x][y] = EL_SP_BUG;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
@@ -3400,9 +3493,9 @@ void GameActions()
     extern unsigned int last_RND();
 
     printf("DEBUG: %03d last RND was %d \t [state checksum is %d]\n",
-	   level.time - TimeLeft,
+	   TimePlayed,
 	   last_RND(),
-	   getStateCheckSum(level.time - TimeLeft));
+	   getStateCheckSum(TimePlayed));
   }
   */
 #endif
@@ -3495,6 +3588,8 @@ void GameActions()
       MauerAbleger(x, y);
     else if (element == EL_BURNING)
       CheckForDragon(x, y);
+    else if (element == EL_SP_BUG || element == EL_SP_BUG_ACTIVE)
+      CheckBuggyBase(x, y);
     else if (element == EL_SP_TERMINAL)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
@@ -3557,22 +3652,29 @@ void GameActions()
     }
   }
 
-  if (TimeLeft > 0 && TimeFrames >= (1000 / GameFrameDelay) && !tape.pausing)
+  if (TimeFrames >= (1000 / GameFrameDelay) && !tape.pausing)
   {
     TimeFrames = 0;
-    TimeLeft--;
+    TimePlayed++;
 
     if (tape.recording || tape.playing)
-      DrawVideoDisplay(VIDEO_STATE_TIME_ON, level.time-TimeLeft);
+      DrawVideoDisplay(VIDEO_STATE_TIME_ON, TimePlayed);
 
-    if (TimeLeft<=10)
-      PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
+    if (TimeLeft > 0)
+    {
+      TimeLeft--;
 
-    DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+      if (TimeLeft <= 10)
+	PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
 
-    if (!TimeLeft)
-      for (i=0; i<MAX_PLAYERS; i++)
-	KillHero(&stored_player[i]);
+      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+
+      if (!TimeLeft)
+	for (i=0; i<MAX_PLAYERS; i++)
+	  KillHero(&stored_player[i]);
+    }
+    else if (level.time == 0)		/* level without time limit */
+      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FS_SMALL, FC_YELLOW);
   }
 
   DrawAllPlayers();
@@ -4153,10 +4255,18 @@ int DigField(struct PlayerInfo *player,
   switch(element)
   {
     case EL_LEERRAUM:
+      PlaySoundLevel(x, y, SND_EMPTY);
       break;
 
     case EL_ERDREICH:
       Feld[x][y] = EL_LEERRAUM;
+      PlaySoundLevel(x, y, SND_SCHLURF);
+      break;
+
+    case EL_SP_BASE:
+    case EL_SP_BUG:
+      Feld[x][y] = EL_LEERRAUM;
+      PlaySoundLevel(x, y, SND_SP_BASE);
       break;
 
     case EL_EDELSTEIN:
@@ -4174,7 +4284,10 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevel(x, y, SND_PONG);
+      if (element == EL_SP_INFOTRON)
+	PlaySoundLevel(x, y, SND_SP_INFOTRON);
+      else
+	PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_SPEED_PILL:
@@ -4192,7 +4305,10 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevel(x, y, SND_PONG);
+      if (element == EL_SP_DISK_RED)
+	PlaySoundLevel(x, y, SND_SP_INFOTRON);
+      else
+	PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_DYNABOMB_NR:
@@ -4269,7 +4385,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 
       player->LevelSolved = player->GameOver = TRUE;
-      PlaySoundLevel(x, y, SND_BUING);
+      PlaySoundStereo(SND_SP_EXIT, PSND_MAX_RIGHT);
       break;
 
     case EL_FELSBROCKEN:
@@ -4308,6 +4424,8 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevel(x+dx, y+dy, SND_PUSCH);
       else if (element == EL_KOKOSNUSS)
 	PlaySoundLevel(x+dx, y+dy, SND_KNURK);
+      else if (IS_SP_ELEMENT(element))
+	PlaySoundLevel(x+dx, y+dy, SND_SP_ZONKPUSH);
       else
 	PlaySoundLevel(x+dx, y+dy, SND_KLOPF);
       break;
@@ -4487,12 +4605,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     default:
-      if (IS_EATABLE(element))		/* other kinds of 'dirt' */
-	Feld[x][y] = EL_LEERRAUM;
-      else
-	return MF_NO_ACTION;
-
-      break;
+      return MF_NO_ACTION;
   }
 
   player->push_delay = 0;

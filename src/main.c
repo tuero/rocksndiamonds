@@ -95,7 +95,7 @@ int		MoveSpeed = 8;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
 int		ZX,ZY, ExitX,ExitY;
 int		AllPlayersGone;
-int		FrameCounter, TimeFrames, TimeLeft;
+int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
 int		MampferMax, MampferNr;
 boolean		SiebAktiv;
 int		SiebCount;
@@ -167,7 +167,16 @@ char *sound_name[NUM_SOUNDS] =
   "voyager",
   "warnton",
   "whoosh",
-  "zisch"
+  "zisch",
+  "base",
+  "infotron",
+  "zonkdown",
+  "zonkpush",
+  "bug",
+  "boom",
+  "booom",
+  "exit",
+  "empty"
 };
 
 /* background music */

@@ -1953,6 +1953,7 @@ int el2gfx(int element)
     case EL_PFEIL_U:		return GFX_PFEIL_U;
     case EL_SPEED_PILL:		return GFX_SPEED_PILL;
     case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
+    case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
 
     default:
     {

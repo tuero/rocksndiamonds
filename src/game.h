@@ -21,7 +21,7 @@ void InitGame(void);
 void InitMovDir(int, int);
 void InitAmoebaNr(int, int);
 void GameWon(void);
-boolean NewHiScore(void);
+int NewHiScore(void);
 void InitMovingField(int, int, int);
 void Moving2Blocked(int, int, int *, int *);
 void Blocked2Moving(int, int, int *, int *);

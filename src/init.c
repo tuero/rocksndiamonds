@@ -1136,7 +1136,7 @@ void InitElementProperties()
     EL_SALZSAEURE,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
-    EL_SP_BUG
+    EL_SP_BUG_ACTIVE
   };
   static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
 
