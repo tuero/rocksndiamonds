@@ -1144,6 +1144,7 @@ void FadeSound(int nr)
 
 void FadeSounds()
 {
+  FadeMusic();
   StopSoundExt(-1, SSND_FADE_ALL_SOUNDS);
 }
 

@@ -99,7 +99,7 @@ void DrawText(int x, int y, char *text, int font_size, int font_type)
 
   if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
-  else if (y < gfx.vy)
+  else if (y < gfx.vy || gfx.vy == 0)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
