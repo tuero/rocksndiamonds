@@ -29,7 +29,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	13	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	11	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CHUNK_CNT3_HEADER	16	/* size of level CNT3 header  */
@@ -150,6 +150,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->double_speed = FALSE;
   level->initial_gravity = FALSE;
   level->em_slippery_gems = FALSE;
+  level->block_last_field = FALSE;
+  level->sp_block_last_field = TRUE;
 
   level->use_custom_template = FALSE;
 
@@ -625,6 +627,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->sp_block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   level->use_custom_template	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
@@ -2137,6 +2141,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->initial_gravity ? 1 : 0));
   putFile8Bit(file, (level->encoding_16bit_field ? 1 : 0));
   putFile8Bit(file, (level->em_slippery_gems ? 1 : 0));
+  putFile8Bit(file, (level->block_last_field ? 1 : 0));
+  putFile8Bit(file, (level->sp_block_last_field ? 1 : 0));
 
   putFile8Bit(file, (level->use_custom_template ? 1 : 0));
 
@@ -2638,24 +2644,26 @@ void DumpLevel(struct LevelInfo *level)
 	 level->file_version, level->game_version);
   printf_line("-", 79);
 
-  printf("Level Author: '%s'\n", level->author);
-  printf("Level Title:  '%s'\n", level->name);
+  printf("Level author: '%s'\n", level->author);
+  printf("Level title:  '%s'\n", level->name);
   printf("\n");
-  printf("Playfield Size: %d x %d\n", level->fieldx, level->fieldy);
+  printf("Playfield size: %d x %d\n", level->fieldx, level->fieldy);
   printf("\n");
-  printf("Level Time:  %d seconds\n", level->time);
+  printf("Level time:  %d seconds\n", level->time);
   printf("Gems needed: %d\n", level->gems_needed);
   printf("\n");
-  printf("Time for Magic Wall: %d seconds\n", level->time_magic_wall);
-  printf("Time for Wheel:      %d seconds\n", level->time_wheel);
-  printf("Time for Light:      %d seconds\n", level->time_light);
-  printf("Time for Timegate:   %d seconds\n", level->time_timegate);
+  printf("Time for magic wall: %d seconds\n", level->time_magic_wall);
+  printf("Time for wheel:      %d seconds\n", level->time_wheel);
+  printf("Time for light:      %d seconds\n", level->time_light);
+  printf("Time for timegate:   %d seconds\n", level->time_timegate);
   printf("\n");
-  printf("Amoeba Speed: %d\n", level->amoeba_speed);
+  printf("Amoeba speed: %d\n", level->amoeba_speed);
   printf("\n");
-  printf("Gravity:                %s\n", (level->initial_gravity ? "yes" : "no"));
-  printf("Double Speed Movement:  %s\n", (level->double_speed ? "yes" : "no"));
-  printf("EM style slippery gems: %s\n", (level->em_slippery_gems ? "yes" : "no"));
+  printf("Initial gravity:             %s\n", (level->initial_gravity ? "yes" : "no"));
+  printf("Double speed movement:       %s\n", (level->double_speed ? "yes" : "no"));
+  printf("EM style slippery gems:      %s\n", (level->em_slippery_gems ? "yes" : "no"));
+  printf("Player blocks last field:    %s\n", (level->block_last_field ? "yes" : "no"));
+  printf("SP player blocks last field: %s\n", (level->sp_block_last_field ? "yes" : "no"));
 
   printf_line("-", 79);
 }

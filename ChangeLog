@@ -1,3 +1,9 @@
+2004-01-30
+	* added option to block last field when player is moving (for Supaplex)
+	* adjusted push delay of Supaplex elements
+	* removed delays for envelopes etc. when replaying with maximum speed
+	* fixed bug when dropping element on a field that just changed to empty
+
 2004-01-29
 	* fixed bug: infotron can now smash yellow disks
 	* fixed bug: when gravity active, port above player can now be entered

@@ -1619,8 +1619,10 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   boolean draw_masked = graphic_info[graphic].draw_masked;
   int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.index_search);
   unsigned long anim_delay = 0;
-  int anim_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int anim_delay_value = (no_delay ? 0 : frame_delay_value);
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
@@ -1669,7 +1671,9 @@ void ShowEnvelope(int envelope_nr)
   int sound_opening = element_info[element].sound[ACTION_OPENING];
   int sound_closing = element_info[element].sound[ACTION_CLOSING];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  int wait_delay_value = (ffwd_delay ? 500 : 1000);
+  boolean no_delay = (tape.index_search);
+  int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
+  int wait_delay_value = (no_delay ? 0 : normal_delay_value);
   int anim_mode = graphic_info[graphic].anim_mode;
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);

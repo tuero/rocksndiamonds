@@ -606,6 +606,10 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
 
     player->present = TRUE;
 
+    player->block_last_field = (element == EL_SP_MURPHY ?
+				level.sp_block_last_field :
+				level.block_last_field);
+
     if (!options.network || player->connected)
     {
       player->active = TRUE;
@@ -1105,6 +1109,19 @@ static void InitGameEngine()
     element_info[e].push_delay_random = push_delay_list[i].push_delay_random;
   }
 
+  /* set push delay value for Supaplex elements for newer engine versions */
+  if (game.engine_version >= VERSION_IDENT(3,0,9,0))
+  {
+    for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    {
+      if (IS_SP_ELEMENT(i))
+      {
+	element_info[i].push_delay_fixed  = 6;
+	element_info[i].push_delay_random = 0;
+      }
+    }
+  }
+
   /* ---------- initialize move stepsize ----------------------------------- */
 
   /* initialize move stepsize values to default */
@@ -1209,6 +1226,8 @@ void InitGame()
     player->StepFrame = 0;
 
     player->use_murphy_graphic = FALSE;
+
+    player->block_last_field = FALSE;
 
     player->actual_frame_counter = 0;
 
@@ -2319,6 +2338,10 @@ void CheckDynamite(int x, int y)
 void RelocatePlayer(int x, int y, int element)
 {
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.index_search);
+  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int wait_delay_value = (no_delay ? 0 : frame_delay_value);
 
   if (player->GameOver)		/* do not reanimate dead player */
     return;
@@ -2339,7 +2362,7 @@ void RelocatePlayer(int x, int y, int element)
       DrawPlayer(player);
 
       BackToFront();
-      Delay(GAME_FRAME_DELAY);
+      Delay(wait_delay_value);
     }
 
     DrawPlayer(player);		/* needed here only to cleanup last field */
@@ -2383,11 +2406,11 @@ void RelocatePlayer(int x, int y, int element)
       /* scroll in two steps of half tile size to make things smoother */
       BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
       FlushDisplay();
-      Delay(GAME_FRAME_DELAY);
+      Delay(wait_delay_value);
 
       /* scroll second step to align at full tile size */
       BackToFront();
-      Delay(GAME_FRAME_DELAY);
+      Delay(wait_delay_value);
     }
   }
 }
@@ -7991,6 +8014,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 #if 0
     DrawPlayer(player);
 #endif
+
     return;
   }
   else if (!FrameReached(&player->actual_frame_counter, 1))
@@ -7999,7 +8023,8 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
-  if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
+  if (!player->block_last_field &&
+      Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_EMPTY;
 
   /* before DrawPlayer() to draw correct player graphic for this case */
@@ -8036,6 +8061,10 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       player->move_delay = 0;
     }
 #endif
+
+    if (player->block_last_field &&
+	Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
+      Feld[last_jx][last_jy] = EL_EMPTY;
 
     player->last_jx = jx;
     player->last_jy = jy;
@@ -9498,6 +9527,11 @@ boolean DropElement(struct PlayerInfo *player)
 
     PlayLevelSoundAction(jx, jy, ACTION_DROPPING);
 
+#if 1
+    /* needed if previous element just changed to "empty" in the last frame */
+    Changed[jx][jy] = 0;		/* allow another change */
+#endif
+
     CheckTriggeredElementChange(jx, jy, new_element, CE_OTHER_GETS_DROPPED);
     CheckElementChange(jx, jy, new_element, CE_DROPPED_BY_PLAYER);
 
@@ -9555,7 +9589,7 @@ boolean DropElement(struct PlayerInfo *player)
     }
     else
     {
-      Changed[jx][jy] = 0;            /* allow another change */
+      Changed[jx][jy] = 0;		/* allow another change */
 
 #if 1
       TestIfElementHitsCustomElement(jx, jy, direction);

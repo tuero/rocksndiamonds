@@ -410,9 +410,10 @@
 
 
 /* fundamental game speed values */
+#define ONE_SECOND_DELAY	1000	/* delay value for one second */
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
-#define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
+#define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
@@ -1254,6 +1255,8 @@ struct PlayerInfo
 
   boolean use_murphy_graphic;
 
+  boolean block_last_field;
+
   boolean LevelSolved, GameOver;
 
   int last_move_dir;
@@ -1357,6 +1360,8 @@ struct LevelInfo
   boolean double_speed;
   boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
+  boolean block_last_field;	/* player blocks previous field while moving */
+  boolean sp_block_last_field;	/* player blocks previous field while moving */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
