@@ -363,7 +363,7 @@ void InitFontGraphicInfo()
   /* ---------- initialize font bitmap array ---------- */
 
   if (font_bitmap_info != NULL)
-    free(font_bitmap_info);
+    FreeFontInfo(font_bitmap_info);
 
   font_bitmap_info =
     checked_calloc(num_font_bitmaps * sizeof(struct FontBitmapInfo));

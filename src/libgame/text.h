@@ -53,6 +53,7 @@
 /* font structure definitions */
 
 void InitFontInfo(struct FontBitmapInfo *, int, int (*function)(int));
+void FreeFontInfo(struct FontBitmapInfo *);
 
 int getFontWidth(int);
 int getFontHeight(int);

@@ -329,7 +329,6 @@ struct FontBitmapInfo
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap *clip_mask;		/* single-char-only clip mask array for X11 */
-  int last_num_chars;		/* to free last font clip masks */
 #endif
 };
 

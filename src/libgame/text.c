@@ -27,33 +27,10 @@ static GC	font_clip_gc = None;
 
 static void InitFontClipmasks()
 {
-  static int last_num_fonts = 0;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
   GC copy_clipmask_gc;
   int i, j;
-
-  if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
-    return;
-
-  for (i=0; i < last_num_fonts; i++)
-  {
-    if (gfx.font_bitmap_info[i].clip_mask)
-    {
-      for (j=0; j < gfx.font_bitmap_info[i].last_num_chars; j++)
-	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
-      free(gfx.font_bitmap_info[i].clip_mask);
-    }
-
-    gfx.font_bitmap_info[i].clip_mask = NULL;
-    gfx.font_bitmap_info[i].last_num_chars = 0;
-  }
-
-  last_num_fonts = gfx.num_fonts;
-
-  if (font_clip_gc)
-    XFreeGC(display, font_clip_gc);
-  font_clip_gc = None;
 
   /* This stuff is needed because X11 (XSetClipOrigin(), to be precise) is
      often very slow when preparing a masked XCopyArea() for big Pixmaps.
@@ -80,7 +57,6 @@ static void InitFontClipmasks()
 
     gfx.font_bitmap_info[i].clip_mask =
       checked_calloc(gfx.font_bitmap_info[i].num_chars * sizeof(Pixmap));
-    gfx.font_bitmap_info[i].last_num_chars = gfx.font_bitmap_info[i].num_chars;
 
     for (j=0; j < gfx.font_bitmap_info[i].num_chars; j++)
     {
@@ -103,6 +79,31 @@ static void InitFontClipmasks()
 
   XFreeGC(display, copy_clipmask_gc);
 }
+
+static void FreeFontClipmasks()
+{
+  int i, j;
+
+  if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
+    return;
+
+  for (i=0; i < gfx.num_fonts; i++)
+  {
+    if (gfx.font_bitmap_info[i].clip_mask)
+    {
+      for (j=0; j < gfx.font_bitmap_info[i].num_chars; j++)
+	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
+      free(gfx.font_bitmap_info[i].clip_mask);
+    }
+
+    gfx.font_bitmap_info[i].clip_mask = NULL;
+    gfx.font_bitmap_info[i].num_chars = 0;
+  }
+
+  if (font_clip_gc)
+    XFreeGC(display, font_clip_gc);
+  font_clip_gc = None;
+}
 #endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
 
 void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
@@ -115,6 +116,18 @@ void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
 #endif
+}
+
+void FreeFontInfo(struct FontBitmapInfo *font_bitmap_info)
+{
+  if (font_bitmap_info == NULL)
+    return;
+
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
+  FreeFontClipmasks();
+#endif
+
+  free(font_bitmap_info);
 }
 
 int getFontWidth(int font_nr)
