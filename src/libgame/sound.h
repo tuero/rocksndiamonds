@@ -145,6 +145,8 @@ void StopSoundExt(int, int);
 
 int getSoundListSize();
 struct FileInfo *getSoundListEntry(int);
+int getSoundListPropertyMappingSize();
+struct PropertyMapping *getSoundListPropertyMapping();
 void InitSoundList(struct ConfigInfo *, int, struct ConfigInfo *,
 		   char **, char **, char **);
 void InitReloadCustomSounds(char *);

@@ -1780,6 +1780,16 @@ struct FileInfo *getSoundListEntry(int pos)
 	  &sound_info->dynamic_file_list[list_pos]);
 }
 
+int getSoundListPropertyMappingSize()
+{
+  return sound_info->num_property_mapping_entries;
+}
+
+struct PropertyMapping *getSoundListPropertyMapping()
+{
+  return sound_info->property_mapping;
+}
+
 void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
 		   char **base_prefixes,
@@ -1796,14 +1806,14 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->num_file_list_entries = num_file_list_entries;
   sound_info->num_dynamic_file_list_entries = 0;
 
-  sound_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i].token != NULL; i++)
-    sound_info->num_suffix_list_entries++;
-
   sound_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   sound_info->dynamic_file_list = NULL;
+
+  sound_info->num_suffix_list_entries = 0;
+  for (i=0; config_suffix_list[i].token != NULL; i++)
+    sound_info->num_suffix_list_entries++;
 
   sound_info->suffix_list = config_suffix_list;
 
@@ -1824,6 +1834,10 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->base_prefixes = base_prefixes;
   sound_info->ext1_suffixes = ext1_suffixes;
   sound_info->ext2_suffixes = ext2_suffixes;
+
+  sound_info->num_property_mapping_entries = 0;
+
+  sound_info->property_mapping = NULL;
 
   /* ---------- initialize artwork reference and content lists ---------- */
 

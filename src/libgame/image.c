@@ -734,6 +734,16 @@ char *getImageConfigFilename()
   return getCustomArtworkConfigFilename(image_info->type);
 }
 
+int getImageListPropertyMappingSize()
+{
+  return image_info->num_property_mapping_entries;
+}
+
+struct PropertyMapping *getImageListPropertyMapping()
+{
+  return image_info->property_mapping;
+}
+
 void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
 		   char **base_prefixes,
@@ -750,14 +760,14 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->num_file_list_entries = num_file_list_entries;
   image_info->num_dynamic_file_list_entries = 0;
 
-  image_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i].token != NULL; i++)
-    image_info->num_suffix_list_entries++;
-
   image_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   image_info->dynamic_file_list = NULL;
+
+  image_info->num_suffix_list_entries = 0;
+  for (i=0; config_suffix_list[i].token != NULL; i++)
+    image_info->num_suffix_list_entries++;
 
   image_info->suffix_list = config_suffix_list;
 
@@ -778,6 +788,10 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->base_prefixes = base_prefixes;
   image_info->ext1_suffixes = ext1_suffixes;
   image_info->ext2_suffixes = ext2_suffixes;
+
+  image_info->num_property_mapping_entries = 0;
+
+  image_info->property_mapping = NULL;
 
   /* ---------- initialize artwork reference and content lists ---------- */
 

@@ -1709,6 +1709,25 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   read_token_parameters(extra_file_list, suffix_list, new_list_entry);
 }
 
+static void add_property_mapping(struct PropertyMapping **list,
+				 int *num_list_entries,
+				 int base_index, int ext1_index,int ext2_index,
+				 int artwork_index)
+{
+  struct PropertyMapping *new_list_entry;
+
+  (*num_list_entries)++;
+  *list = checked_realloc(*list,
+			  *num_list_entries * sizeof(struct PropertyMapping));
+  new_list_entry = &(*list)[*num_list_entries - 1];
+
+  new_list_entry->base_index = base_index;
+  new_list_entry->ext1_index = ext1_index;
+  new_list_entry->ext2_index = ext2_index;
+
+  new_list_entry->artwork_index = artwork_index;
+}
+
 void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
@@ -1762,6 +1781,15 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 			  &artwork_info->num_dynamic_file_list_entries);
   }
 
+  /* free previous property mapping */
+  if (artwork_info->property_mapping != NULL)
+  {
+    free(artwork_info->property_mapping);
+
+    artwork_info->property_mapping = NULL;
+    artwork_info->num_property_mapping_entries = 0;
+  }
+
   if (filename == NULL)
     return;
 
@@ -1795,9 +1823,17 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   for (list = extra_file_list; list != NULL; list = list->next)
   {
-    struct FileInfo **dynamic_file_list = &artwork_info->dynamic_file_list;
+    struct FileInfo **dynamic_file_list =
+      &artwork_info->dynamic_file_list;
     int *num_dynamic_file_list_entries =
       &artwork_info->num_dynamic_file_list_entries;
+    struct PropertyMapping **property_mapping =
+      &artwork_info->property_mapping;
+    int *num_property_mapping_entries =
+      &artwork_info->num_property_mapping_entries;
+    int current_summarized_file_list_entry =
+      artwork_info->num_file_list_entries +
+      artwork_info->num_dynamic_file_list_entries;
     char *token = list->token;
     int len_token = strlen(token);
     int start_pos;
@@ -1848,6 +1884,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 				    suffix_list,
 				    num_suffix_list_entries,
 				    token);
+	add_property_mapping(property_mapping,
+			     num_property_mapping_entries,
+			     i, -1, -1,
+			     current_summarized_file_list_entry);
 	continue;
       }
 
@@ -1878,6 +1918,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 				      suffix_list,
 				      num_suffix_list_entries,
 				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       i, j, -1,
+			       current_summarized_file_list_entry);
 	  continue;
 	}
 
@@ -1907,6 +1951,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 					suffix_list,
 					num_suffix_list_entries,
 					token);
+	    add_property_mapping(property_mapping,
+				 num_property_mapping_entries,
+				 i, j, k,
+				 current_summarized_file_list_entry);
 	    continue;
 	  }
 	}

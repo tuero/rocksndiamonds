@@ -76,6 +76,8 @@ struct FileInfo *getImageListEntry(int);
 Bitmap *getBitmapFromImageID(int);
 char *getTokenFromImageID(int);
 char *getImageConfigFilename();
+int getImageListPropertyMappingSize();
+struct PropertyMapping *getImageListPropertyMapping();
 void InitImageList(struct ConfigInfo *, int, struct ConfigInfo *,
 		   char **, char **, char **);
 void ReloadCustomImages();

@@ -73,7 +73,8 @@ static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
 static void InitElementProperties(void);
-static void InitElementInfo(void);
+static void InitElementGraphicInfo(void);
+static void InitElementSoundInfo(void);
 static void InitGraphicInfo(void);
 static void InitSoundInfo();
 static void Execute_Command(char *);
@@ -119,7 +120,6 @@ void OpenAll(void)
   InitEventFilter(FilterMouseMotionEvents);
 
   InitElementProperties();
-  InitElementInfo();
 
   InitGfx();
 
@@ -242,7 +242,8 @@ static void InitMixer()
 
 static void ReinitializeGraphics()
 {
-  InitGraphicInfo();	/* initialize graphic info from config file */
+  InitElementGraphicInfo();	/* initialize element/graphic config info */
+  InitGraphicInfo();		/* initialize graphic info from config file */
 
   InitFontInfo(bitmap_font_initial,
 	       graphic_info[IMG_FONT_BIG].bitmap,
@@ -259,9 +260,10 @@ static void ReinitializeGraphics()
 
 static void ReinitializeSounds()
 {
-  InitSoundInfo();	/* initialize sounds info from config file */
+  InitElementSoundInfo();	/* initialize element/sound config info */
+  InitSoundInfo();		/* initialize sounds info from config file */
 
-  InitPlaySoundLevel();
+  InitPlaySoundLevel();		/* initialize internal game sound values */
 }
 
 static void ReinitializeMusic()
@@ -698,8 +700,10 @@ void InitGadgets()
   gadgets_initialized = TRUE;
 }
 
-void InitElementInfo()
+void InitElementGraphicInfo()
 {
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
   int i, act, dir;
 
   /* set values to -1 to identify later as "uninitialized" values */
@@ -722,27 +726,38 @@ void InitElementInfo()
     element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CUSTOM_START + (i - EL_CUSTOM_START);
 
-  i = 0;
-  while (element_to_graphic[i].element > -1)
+  /* initialize element/graphic mapping from static configuration */
+  for (i=0; element_to_graphic[i].element > -1; i++)
   {
     int element   = element_to_graphic[i].element;
-    int direction = element_to_graphic[i].direction;
     int action    = element_to_graphic[i].action;
+    int direction = element_to_graphic[i].direction;
     int graphic   = element_to_graphic[i].graphic;
 
     if (action < 0)
       action = ACTION_DEFAULT;
 
     if (direction > -1)
-    {
-      direction = MV_DIR_BIT(direction);
-
       element_info[element].direction_graphic[action][direction] = graphic;
-    }
     else
       element_info[element].graphic[action] = graphic;
+  }
 
-    i++;
+  /* initialize element/graphic mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element   = property_mapping[i].base_index;
+    int action    = property_mapping[i].ext1_index;
+    int direction = property_mapping[i].ext2_index;
+    int graphic   = property_mapping[i].artwork_index;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    if (direction > -1)
+      element_info[element].direction_graphic[action][direction] = graphic;
+    else
+      element_info[element].graphic[action] = graphic;
   }
 
   /* now set all '-1' values to element specific default values */
@@ -783,6 +798,11 @@ void InitElementInfo()
 	element_info[i].graphic[act] = default_action_graphic;
     }
   }
+}
+
+static void InitElementSoundInfo()
+{
+  /* soon to come */
 }
 
 static void set_graphic_parameters(int graphic, int *parameter)
@@ -1015,14 +1035,11 @@ static void InitSoundInfo()
     struct FileInfo *sound = getSoundListEntry(i);
     int len_effect_text = strlen(sound->token);
 
-#if 1
     sound_effect_properties[i] = ACTION_OTHER;
     sound_info[i].loop = FALSE;
-#endif
 
     /* determine all loop sounds and identify certain sound classes */
 
-#if 1
     for (j=0; element_action_info[j].suffix; j++)
     {
       int len_action_text = strlen(element_action_info[j].suffix);
@@ -1037,11 +1054,9 @@ static void InitSoundInfo()
 	  sound_info[i].loop = TRUE;
       }
     }
-#endif
 
     /* associate elements and some selected sound actions */
 
-#if 1
     for (j=0; j<MAX_NUM_ELEMENTS; j++)
     {
       if (element_info[j].sound_class_name)
@@ -1059,7 +1074,6 @@ static void InitSoundInfo()
 	}
       }
     }
-#endif
 
     set_sound_parameters(i, sound->parameter);
   }

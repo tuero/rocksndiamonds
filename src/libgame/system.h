@@ -511,6 +511,15 @@ struct ListNodeInfo
   int num_references;
 };
 
+struct PropertyMapping
+{
+  int base_index;
+  int ext1_index;
+  int ext2_index;
+
+  int artwork_index;
+};
+
 struct ArtworkListInfo
 {
   int type;					/* type of artwork */
@@ -518,10 +527,10 @@ struct ArtworkListInfo
   int num_file_list_entries;
   int num_dynamic_file_list_entries;
 
-  int num_suffix_list_entries;
-
   struct FileInfo *file_list;			/* static artwork file array */
   struct FileInfo *dynamic_file_list;		/* dynamic artwrk file array */
+
+  int num_suffix_list_entries;
 
   struct ConfigInfo *suffix_list;		/* parameter suffixes array */
 
@@ -532,6 +541,10 @@ struct ArtworkListInfo
   char **base_prefixes;				/* base token prefixes array */
   char **ext1_suffixes;				/* property suffixes array 1 */
   char **ext2_suffixes;				/* property suffixes array 2 */
+
+  int num_property_mapping_entries;
+
+  struct PropertyMapping *property_mapping;	/* mapping token -> artwork */
 
   int sizeof_artwork_list_entry;
 
