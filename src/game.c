@@ -96,6 +96,55 @@
 #define GET_NEW_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				 RND(element_info[e].move_delay_random))
 
+#define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(condition) ||			\
+					(DONT_COLLIDE_WITH(e) &&	\
+					 IS_FREE_OR_PLAYER(x, y))))
+
+#define ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(condition)))
+
+#define ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, 1)
+
+#define ELEMENT_CAN_ENTER_FIELD_OR_ACID(e, x, y)			\
+	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, (Feld[x][y] == EL_ACID))
+
+#define ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, (Feld[x][y] == EL_ACID))
+
+#define ENEMY_CAN_ENTER_FIELD(x, y) (IN_LEV_FIELD(x, y) && IS_FREE(x, y))
+
+#define YAMYAM_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					Feld[x][y] == EL_DIAMOND))
+
+#define DARK_YAMYAM_CAN_ENTER_FIELD(x, y)				\
+		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
+
+#define PACMAN_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					IS_AMOEBOID(Feld[x][y])))
+
+#define PIG_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					IS_FOOD_PIG(Feld[x][y])))
+
+#define PENGUIN_CAN_ENTER_FIELD(x, y)					\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					IS_FOOD_PIG(Feld[x][y]) ||	\
+					Feld[x][y] == EL_EXIT_OPEN ||	\
+					Feld[x][y] == EL_ACID))
+
+#define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
+
+#define IN_LEV_FIELD_AND_IS_FREE(x, y)  (IN_LEV_FIELD(x, y) &&  IS_FREE(x, y))
+#define IN_LEV_FIELD_AND_NOT_FREE(x, y) (IN_LEV_FIELD(x, y) && !IS_FREE(x, y))
+
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
@@ -115,6 +164,7 @@ static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
 
 static void CheckTriggeredElementChange(int, int);
+static void CheckPlayerElementChange(int, int, int, int);
 static void ChangeElementDoIt(int, int, int);
 
 static void PlaySoundLevel(int, int, int);
@@ -2390,14 +2440,7 @@ void Impact(int x, int y)
     DrawLevelField(x, y);
   }
 
-#if 1
   if (impact && CAN_EXPLODE_IMPACT(element))
-#else
-  if ((element == EL_BOMB ||
-       element == EL_SP_DISK_ORANGE ||
-       element == EL_DX_SUPABOMB) &&
-      (lastline || object_hit))		/* element is bomb */
-#endif
   {
     Bang(x, y);
     return;
@@ -2434,11 +2477,7 @@ void Impact(int x, int y)
     return;
   }
 
-#if 1
   if (object_hit)		/* check which object was hit */
-#else
-  if (!lastline && object_hit)		/* check which object was hit */
-#endif
   {
     if (CAN_PASS_MAGIC_WALL(element) && 
 	(smashed == EL_MAGIC_WALL ||
@@ -2496,35 +2535,15 @@ void Impact(int x, int y)
       Bang(x, y + 1);
       return;
     }
-#if 1
     else if (CAN_SMASH_EVERYTHING(element))
-#else
-    else if (element == EL_ROCK ||
-	     element == EL_SP_ZONK ||
-	     element == EL_BD_ROCK)
-#endif
     {
       if (IS_CLASSIC_ENEMY(smashed) ||
-#if 1
 	  CAN_EXPLODE_SMASHED(smashed))
-#else
-	  smashed == EL_BOMB ||
-	  smashed == EL_SP_DISK_ORANGE ||
-	  smashed == EL_DX_SUPABOMB ||
-	  smashed == EL_SATELLITE ||
-	  smashed == EL_PIG ||
-	  smashed == EL_DRAGON ||
-	  smashed == EL_MOLE)
-#endif
       {
 	Bang(x, y + 1);
 	return;
       }
-#if 1
       else if (!IS_MOVING(x, y + 1) && !IS_BLOCKED(x, y + 1))
-#else
-      else if (!IS_MOVING(x, y + 1))
-#endif
       {
 	if (smashed == EL_LAMP ||
 	    smashed == EL_LAMP_ACTIVE)
@@ -2547,11 +2566,7 @@ void Impact(int x, int y)
 	}
 	else if (smashed == EL_DIAMOND)
 	{
-#if 1
 	  Feld[x][y + 1] = EL_DIAMOND_BREAKING;
-#else
-	  Feld[x][y + 1] = EL_EMPTY;
-#endif
 	  PlaySoundLevel(x, y, SND_DIAMOND_BREAKING);
 	  return;
 	}
@@ -2621,7 +2636,9 @@ void TurnRound(int x, int y)
     { MV_UP,	MV_DOWN,	MV_LEFT	 },
     { 0,	0,		0	 },
     { MV_LEFT,	MV_RIGHT,	MV_DOWN	 },
-    { 0,0,0 },	{ 0,0,0 },	{ 0,0,0	 },
+    { 0,	0,		0	 },
+    { 0,	0,		0	 },
+    { 0,	0,		0	 },
     { MV_RIGHT,	MV_LEFT,	MV_UP	 }
   };
 
@@ -2640,15 +2657,15 @@ void TurnRound(int x, int y)
   int right_x = x + right_dx, right_y = y + right_dy;
   int move_x  = x + move_dx,  move_y  = y + move_dy;
 
+  int xx, yy;
+
   if (element == EL_BUG || element == EL_BD_BUTTERFLY)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	IS_FREE(right_x, right_y))
+    if (ENEMY_CAN_ENTER_FIELD(right_x, right_y))
       MovDir[x][y] = right_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     !IS_FREE(move_x, move_y))
+    else if (!ENEMY_CAN_ENTER_FIELD(move_x, move_y))
       MovDir[x][y] = left_dir;
 
     if (element == EL_BUG && MovDir[x][y] != old_move_dir)
@@ -2661,15 +2678,14 @@ void TurnRound(int x, int y)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	IS_FREE(left_x, left_y))
+    if (ENEMY_CAN_ENTER_FIELD(left_x, left_y))
       MovDir[x][y] = left_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     !IS_FREE(move_x, move_y))
+    else if (!ENEMY_CAN_ENTER_FIELD(move_x, move_y))
       MovDir[x][y] = right_dir;
 
     if ((element == EL_SPACESHIP ||
-	 element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+	 element == EL_SP_SNIKSNAK ||
+	 element == EL_SP_ELECTRON)
 	&& MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = 9;
     else if (element == EL_BD_FIREFLY)	    /* && MovDir[x][y] == right_dir) */
@@ -2677,16 +2693,8 @@ void TurnRound(int x, int y)
   }
   else if (element == EL_YAMYAM)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE;
-
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE_OR_PLAYER(left_x, left_y) ||
-	 Feld[left_x][left_y] == EL_DIAMOND))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE_OR_PLAYER(right_x, right_y) ||
-	 Feld[right_x][right_y] == EL_DIAMOND))
-      can_turn_right = TRUE;
+    boolean can_turn_left  = YAMYAM_CAN_ENTER_FIELD(left_x, left_y);
+    boolean can_turn_right = YAMYAM_CAN_ENTER_FIELD(right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -2697,20 +2705,12 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 16+16*RND(3);
+    MovDelay[x][y] = 16 + 16 * RND(3);
   }
   else if (element == EL_DARK_YAMYAM)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE;
-
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE_OR_PLAYER(left_x, left_y) ||
-	 IS_FOOD_DARK_YAMYAM(Feld[left_x][left_y])))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE_OR_PLAYER(right_x, right_y) ||
-	 IS_FOOD_DARK_YAMYAM(Feld[right_x][right_y])))
-      can_turn_right = TRUE;
+    boolean can_turn_left  = DARK_YAMYAM_CAN_ENTER_FIELD(left_x, left_y);
+    boolean can_turn_right = DARK_YAMYAM_CAN_ENTER_FIELD(right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -2721,20 +2721,12 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 16+16*RND(3);
+    MovDelay[x][y] = 16 + 16 * RND(3);
   }
   else if (element == EL_PACMAN)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE;
-
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE_OR_PLAYER(left_x, left_y) ||
-	 IS_AMOEBOID(Feld[left_x][left_y])))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE_OR_PLAYER(right_x, right_y) ||
-	 IS_AMOEBOID(Feld[right_x][right_y])))
-      can_turn_right = TRUE;
+    boolean can_turn_left  = PACMAN_CAN_ENTER_FIELD(left_x, left_y);
+    boolean can_turn_right = PACMAN_CAN_ENTER_FIELD(right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -2745,56 +2737,45 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 6+RND(40);
+    MovDelay[x][y] = 6 + RND(40);
   }
   else if (element == EL_PIG)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
-    boolean should_turn_left = FALSE, should_turn_right = FALSE;
-    boolean should_move_on = FALSE;
+    boolean can_turn_left  = PIG_CAN_ENTER_FIELD(left_x, left_y);
+    boolean can_turn_right = PIG_CAN_ENTER_FIELD(right_x, right_y);
+    boolean can_move_on    = PIG_CAN_ENTER_FIELD(move_x, move_y);
+    boolean should_turn_left, should_turn_right, should_move_on;
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE(left_x, left_y) || IS_FOOD_PIG(Feld[left_x][left_y])))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE(right_x, right_y) || IS_FOOD_PIG(Feld[right_x][right_y])))
-      can_turn_right = TRUE;
-    if (IN_LEV_FIELD(move_x, move_y) &&
-	(IS_FREE(move_x, move_y) || IS_FOOD_PIG(Feld[move_x][move_y])))
-      can_move_on = TRUE;
-
-    if (can_turn_left &&
-	(!can_move_on ||
-	 (IN_LEV_FIELD(x+back_dx+left_dx, y+back_dy+left_dy) &&
-	  !IS_FREE(x+back_dx+left_dx, y+back_dy+left_dy))))
-      should_turn_left = TRUE;
-    if (can_turn_right &&
-	(!can_move_on ||
-	 (IN_LEV_FIELD(x+back_dx+right_dx, y+back_dy+right_dy) &&
-	  !IS_FREE(x+back_dx+right_dx, y+back_dy+right_dy))))
-      should_turn_right = TRUE;
-    if (can_move_on &&
-	(!can_turn_left || !can_turn_right ||
-	 (IN_LEV_FIELD(x+move_dx+left_dx, y+move_dy+left_dy) &&
-	  !IS_FREE(x+move_dx+left_dx, y+move_dy+left_dy)) ||
-	 (IN_LEV_FIELD(x+move_dx+right_dx, y+move_dy+right_dy) &&
-	  !IS_FREE(x+move_dx+right_dx, y+move_dy+right_dy))))
-      should_move_on = TRUE;
+    should_turn_left = (can_turn_left &&
+			(!can_move_on ||
+			 IN_LEV_FIELD_AND_NOT_FREE(x + back_dx + left_dx,
+						   y + back_dy + left_dy)));
+    should_turn_right = (can_turn_right &&
+			 (!can_move_on ||
+			  IN_LEV_FIELD_AND_NOT_FREE(x + back_dx + right_dx,
+						    y + back_dy + right_dy)));
+    should_move_on = (can_move_on &&
+		      (!can_turn_left ||
+		       !can_turn_right ||
+		       IN_LEV_FIELD_AND_NOT_FREE(x + move_dx + left_dx,
+						 y + move_dy + left_dy) ||
+		       IN_LEV_FIELD_AND_NOT_FREE(x + move_dx + right_dx,
+						 y + move_dy + right_dy)));
 
     if (should_turn_left || should_turn_right || should_move_on)
     {
       if (should_turn_left && should_turn_right && should_move_on)
-	MovDir[x][y] = (rnd < rnd_value/3 ? left_dir :
-			rnd < 2*rnd_value/3 ? right_dir :
+	MovDir[x][y] = (rnd < rnd_value / 3     ? left_dir :
+			rnd < 2 * rnd_value / 3 ? right_dir :
 			old_move_dir);
       else if (should_turn_left && should_turn_right)
-	MovDir[x][y] = (rnd < rnd_value/2 ? left_dir : right_dir);
+	MovDir[x][y] = (rnd < rnd_value / 2 ? left_dir : right_dir);
       else if (should_turn_left && should_move_on)
-	MovDir[x][y] = (rnd < rnd_value/2 ? left_dir : old_move_dir);
+	MovDir[x][y] = (rnd < rnd_value / 2 ? left_dir : old_move_dir);
       else if (should_turn_right && should_move_on)
-	MovDir[x][y] = (rnd < rnd_value/2 ? right_dir : old_move_dir);
+	MovDir[x][y] = (rnd < rnd_value / 2 ? right_dir : old_move_dir);
       else if (should_turn_left)
 	MovDir[x][y] = left_dir;
       else if (should_turn_right)
@@ -2802,69 +2783,67 @@ void TurnRound(int x, int y)
       else if (should_move_on)
 	MovDir[x][y] = old_move_dir;
     }
-    else if (can_move_on && rnd > rnd_value/8)
+    else if (can_move_on && rnd > rnd_value / 8)
       MovDir[x][y] = old_move_dir;
     else if (can_turn_left && can_turn_right)
-      MovDir[x][y] = (rnd < rnd_value/2 ? left_dir : right_dir);
-    else if (can_turn_left && rnd > rnd_value/8)
+      MovDir[x][y] = (rnd < rnd_value / 2 ? left_dir : right_dir);
+    else if (can_turn_left && rnd > rnd_value / 8)
       MovDir[x][y] = left_dir;
     else if (can_turn_right && rnd > rnd_value/8)
       MovDir[x][y] = right_dir;
     else
       MovDir[x][y] = back_dir;
 
-    if (!IS_FREE(x+move_xy[MovDir[x][y]].x, y+move_xy[MovDir[x][y]].y) &&
-	!IS_FOOD_PIG(Feld[x+move_xy[MovDir[x][y]].x][y+move_xy[MovDir[x][y]].y]))
+    xx = x + move_xy[MovDir[x][y]].x;
+    yy = y + move_xy[MovDir[x][y]].y;
+
+    if (!IS_FREE(xx, yy) && !IS_FOOD_PIG(Feld[xx][yy]))
       MovDir[x][y] = old_move_dir;
 
     MovDelay[x][y] = 0;
   }
   else if (element == EL_DRAGON)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
+    boolean can_turn_left  = IN_LEV_FIELD_AND_IS_FREE(left_x, left_y);
+    boolean can_turn_right = IN_LEV_FIELD_AND_IS_FREE(right_x, right_y);
+    boolean can_move_on    = IN_LEV_FIELD_AND_IS_FREE(move_x, move_y);
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
-    if (IN_LEV_FIELD(left_x, left_y) && IS_FREE(left_x, left_y))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) && IS_FREE(right_x, right_y))
-      can_turn_right = TRUE;
-    if (IN_LEV_FIELD(move_x, move_y) && IS_FREE(move_x, move_y))
-      can_move_on = TRUE;
-
-    if (can_move_on && rnd > rnd_value/8)
+    if (can_move_on && rnd > rnd_value / 8)
       MovDir[x][y] = old_move_dir;
     else if (can_turn_left && can_turn_right)
-      MovDir[x][y] = (rnd < rnd_value/2 ? left_dir : right_dir);
-    else if (can_turn_left && rnd > rnd_value/8)
+      MovDir[x][y] = (rnd < rnd_value / 2 ? left_dir : right_dir);
+    else if (can_turn_left && rnd > rnd_value / 8)
       MovDir[x][y] = left_dir;
-    else if (can_turn_right && rnd > rnd_value/8)
+    else if (can_turn_right && rnd > rnd_value / 8)
       MovDir[x][y] = right_dir;
     else
       MovDir[x][y] = back_dir;
 
-    if (!IS_FREE(x+move_xy[MovDir[x][y]].x, y+move_xy[MovDir[x][y]].y))
+    xx = x + move_xy[MovDir[x][y]].x;
+    yy = y + move_xy[MovDir[x][y]].y;
+
+    if (!IS_FREE(xx, yy))
       MovDir[x][y] = old_move_dir;
 
     MovDelay[x][y] = 0;
   }
   else if (element == EL_MOLE)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
-
-    if (IN_LEV_FIELD(move_x, move_y) &&
-	(IS_FREE(move_x, move_y) || IS_AMOEBOID(Feld[move_x][move_y]) ||
-	 Feld[move_x][move_y] == EL_AMOEBA_SHRINKING))
-      can_move_on = TRUE;
-
+    boolean can_move_on =
+      (MOLE_CAN_ENTER_FIELD(move_x, move_y,
+			    IS_AMOEBOID(Feld[move_x][move_y]) ||
+			    Feld[move_x][move_y] == EL_AMOEBA_SHRINKING));
     if (!can_move_on)
     {
-      if (IN_LEV_FIELD(left_x, left_y) &&
-	  (IS_FREE(left_x, left_y) || IS_AMOEBOID(Feld[left_x][left_y])))
-	can_turn_left = TRUE;
-      if (IN_LEV_FIELD(right_x, right_y) &&
-	  (IS_FREE(right_x, right_y) || IS_AMOEBOID(Feld[right_x][right_y])))
-	can_turn_right = TRUE;
+      boolean can_turn_left =
+	(MOLE_CAN_ENTER_FIELD(left_x, left_y,
+			      IS_AMOEBOID(Feld[left_x][left_y])));
+
+      boolean can_turn_right =
+	(MOLE_CAN_ENTER_FIELD(right_x, right_y,
+			      IS_AMOEBOID(Feld[right_x][right_y])));
 
       if (can_turn_left && can_turn_right)
 	MovDir[x][y] = (RND(2) ? left_dir : right_dir);
@@ -2884,9 +2863,9 @@ void TurnRound(int x, int y)
   }
   else if (element == EL_SPRING)
   {
-    if ((MovDir[x][y] == MV_LEFT || MovDir[x][y] == MV_RIGHT) &&
-	(!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y) ||
-	 (IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))))
+    if (MovDir[x][y] & MV_HORIZONTAL &&
+	(!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y) ||
+	 IN_LEV_FIELD_AND_IS_FREE(x, y + 1)))
       MovDir[x][y] = MV_NO_MOVING;
 
     MovDelay[x][y] = 0;
@@ -2914,7 +2893,8 @@ void TurnRound(int x, int y)
 	if (!player->active)
 	  continue;
 
-	if (attr_x == -1 || ABS(jx-x)+ABS(jy-y) < ABS(attr_x-x)+ABS(attr_y-y))
+	if (attr_x == -1 ||
+	    ABS(jx - x) + ABS(jy - y) < ABS(attr_x - x) + ABS(attr_y - y))
 	{
 	  attr_x = jx;
 	  attr_y = jy;
@@ -2972,11 +2952,11 @@ void TurnRound(int x, int y)
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && IS_FREE_OR_PLAYER(newx, newy))
-	MovDelay[x][y] = 8+8*!RND(3);
+	MovDelay[x][y] = 8 + 8 * !RND(3);
       else
 	MovDelay[x][y] = 16;
     }
-    else
+    else if (element == EL_PENGUIN)
     {
       int newx, newy;
 
@@ -2991,24 +2971,43 @@ void TurnRound(int x, int y)
 	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (IN_LEV_FIELD(newx, newy) &&
-	    (IS_FREE(newx, newy) ||
-	     Feld[newx][newy] == EL_ACID ||
-	     (element == EL_PENGUIN &&
-	      (Feld[newx][newy] == EL_EXIT_OPEN ||
-	       IS_FOOD_PENGUIN(Feld[newx][newy])))))
+	if (PENGUIN_CAN_ENTER_FIELD(newx, newy))
 	  return;
 
 	MovDir[x][y] =
 	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (IN_LEV_FIELD(newx, newy) &&
-	    (IS_FREE(newx, newy) ||
-	     Feld[newx][newy] == EL_ACID ||
-	     (element == EL_PENGUIN &&
-	      (Feld[newx][newy] == EL_EXIT_OPEN ||
-	       IS_FOOD_PENGUIN(Feld[newx][newy])))))
+	if (PENGUIN_CAN_ENTER_FIELD(newx, newy))
+	  return;
+
+	MovDir[x][y] = old_move_dir;
+	return;
+      }
+    }
+    else	/* (element == EL_SATELLITE) */
+    {
+      int newx, newy;
+
+      MovDelay[x][y] = 1;
+
+      if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL)
+      {
+	boolean first_horiz = RND(2);
+	int new_move_dir = MovDir[x][y];
+
+	MovDir[x][y] =
+	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
+	Moving2Blocked(x, y, &newx, &newy);
+
+	if (ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(newx, newy))
+	  return;
+
+	MovDir[x][y] =
+	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
+	Moving2Blocked(x, y, &newx, &newy);
+
+	if (ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(newx, newy))
 	  return;
 
 	MovDir[x][y] = old_move_dir;
@@ -3018,16 +3017,8 @@ void TurnRound(int x, int y)
   }
   else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
   {
-    boolean can_turn_left = FALSE, can_turn_right = FALSE;
-
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE(left_x, left_y) ||
-	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
-      can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE(right_x, right_y) ||
-	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
-      can_turn_right = TRUE;
+    boolean can_turn_left  = ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right = ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -3059,13 +3050,9 @@ void TurnRound(int x, int y)
   }
   else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE)
   {
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	(IS_FREE(left_x, left_y) ||
-	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
+    if (ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y))
       MovDir[x][y] = left_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     (!IS_FREE(move_x, move_y) &&
-	      (!DONT_COLLIDE_WITH(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
+    else if (!ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = right_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3073,13 +3060,9 @@ void TurnRound(int x, int y)
   }
   else if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
   {
-    if (IN_LEV_FIELD(right_x, right_y) &&
-	(IS_FREE(right_x, right_y) ||
-	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
+    if (ELEMENT_CAN_ENTER_FIELD(element, right_x, right_y))
       MovDir[x][y] = right_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     (!IS_FREE(move_x, move_y) &&
-	      (!DONT_COLLIDE_WITH(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
+    else if (!ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = left_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3110,7 +3093,8 @@ void TurnRound(int x, int y)
 	if (!player->active)
 	  continue;
 
-	if (attr_x == -1 || ABS(jx-x)+ABS(jy-y) < ABS(attr_x-x)+ABS(attr_y-y))
+	if (attr_x == -1 ||
+	    ABS(jx - x) + ABS(jy - y) < ABS(attr_x - x) + ABS(attr_y - y))
 	{
 	  attr_x = jx;
 	  attr_y = jy;
@@ -3139,20 +3123,14 @@ void TurnRound(int x, int y)
 	new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
       Moving2Blocked(x, y, &newx, &newy);
 
-      if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
-				       (DONT_COLLIDE_WITH(element) &&
-					IS_FREE_OR_PLAYER(newx, newy)) ||
-				       Feld[newx][newy] == EL_ACID))
+      if (ELEMENT_CAN_ENTER_FIELD_OR_ACID(element, newx, newy))
 	return;
 
       MovDir[x][y] =
 	new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
       Moving2Blocked(x, y, &newx, &newy);
 
-      if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
-				       (DONT_COLLIDE_WITH(element) &&
-					IS_FREE_OR_PLAYER(newx, newy)) ||
-				       Feld[newx][newy] == EL_ACID))
+      if (ELEMENT_CAN_ENTER_FIELD_OR_ACID(element, newx, newy))
 	return;
 
       MovDir[x][y] = old_move_dir;
@@ -4962,7 +4940,7 @@ static void CheckTriggeredElementChange(int trigger_element, int trigger_event)
 
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    if (!HAS_CHANGE_EVENT(i, trigger_event) ||
+    if (!CAN_CHANGE(i) || !HAS_CHANGE_EVENT(i, trigger_event) ||
 	element_info[i].change.trigger != trigger_element)
       continue;
 
@@ -4975,6 +4953,24 @@ static void CheckTriggeredElementChange(int trigger_element, int trigger_event)
       }
     }
   }
+}
+
+static void CheckPlayerElementChange(int x, int y, int element,
+				     int trigger_event)
+{
+  if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, trigger_event))
+    return;
+
+  if (trigger_event == CE_PUSHED_BY_PLAYER)
+  {
+#if 0
+    /* !!! does not work -- debug !!! */
+    ChangeDelay[x][y] = 2;	/* give one frame (+1) to start pushing */
+    ChangeElement(x, y);
+#endif
+  }
+  else
+    ChangeElementDoIt(x, y, element_info[element].change.successor);
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -7092,6 +7088,8 @@ int DigField(struct PlayerInfo *player,
 	  player->is_collecting = TRUE;
 	}
 
+	RaiseScoreElement(element);
+
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
@@ -7139,8 +7137,13 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
+	CheckPlayerElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
 
 	break;
+      }
+      else
+      {
+	CheckPlayerElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
       }
 
       return MF_NO_ACTION;
@@ -7449,6 +7452,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_KEY]);
       break;
     default:
+      RaiseScore(element_info[element].score);
       break;
   }
 }
