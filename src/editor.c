@@ -1271,6 +1271,9 @@ static struct ValueTextInfo options_move_stepsize[] =
   { 4,				"normal"			},
   { 8,				"fast"				},
   { 16,				"very fast"			},
+#if 1
+  { 32,				"even faster"			},
+#endif
 
   { -1,				NULL				}
 };
@@ -1317,7 +1320,7 @@ static struct ValueTextInfo options_deadliness[] =
 static struct ValueTextInfo options_consistency[] =
 {
   { EP_CAN_EXPLODE_3X3,		"can explode 3x3"		},
-  { EP_CAN_EXPLODE_DYNA,	"can explode 3+3"		},
+  { EP_CAN_EXPLODE_CROSS,	"can explode 3+3"		},
   { EP_CAN_EXPLODE_1X1,		"can explode 1x1"		},
   { EP_INDESTRUCTIBLE,		"indestructible"		},
 
@@ -5484,7 +5487,7 @@ static int setSelectboxValue(int selectbox_id, int new_value)
 
 static void copy_custom_element_settings(int element_from, int element_to)
 {
-#if 1
+#if 0
   struct ElementInfo ei_to_old = element_info[element_to];
   struct ElementInfo *ei_from = &element_info[element_from];
   struct ElementInfo *ei_to = &element_info[element_to];
@@ -5526,7 +5529,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
   for (i = 0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
     ei_to->description[i] = ei_from->description[i];
 
-  /* ---------- copy element properties ---------- */
+  /* ---------- copy element base properties ---------- */
   Properties[element_to][EP_BITFIELD_BASE] =
     Properties[element_from][EP_BITFIELD_BASE];
 
@@ -5534,6 +5537,8 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   ei_to->use_gfx_element = ei_from->use_gfx_element;
   ei_to->gfx_element = ei_from->gfx_element;
+
+  ei_to->access_direction = ei_from->access_direction;
 
   ei_to->collect_score = ei_from->collect_score;
   ei_to->collect_count = ei_from->collect_count;
@@ -5547,49 +5552,33 @@ static void copy_custom_element_settings(int element_from, int element_to)
   ei_to->move_direction_initial = ei_from->move_direction_initial;
   ei_to->move_stepsize = ei_from->move_stepsize;
 
+  ei_to->move_enter_element = ei_from->move_enter_element;
+  ei_to->move_leave_element = ei_from->move_leave_element;
+  ei_to->move_leave_type = ei_from->move_leave_type;
+
   ei_to->slippery_type = ei_from->slippery_type;
 
   for (y = 0; y < 3; y++)
     for (x = 0; x < 3; x++)
       ei_to->content[x][y] = ei_from->content[x][y];
 
+  ei_to->explosion_delay = ei_from->explosion_delay;
+  ei_to->ignition_delay = ei_from->ignition_delay;
+
+  /* ---------- reinitialize and copy change pages ---------- */
+
   ei_to->num_change_pages = ei_from->num_change_pages;
+  ei_to->current_change_page = ei_from->current_change_page;
+
   setElementChangePages(ei_to, ei_to->num_change_pages);
 
   for (i=0; i < ei_to->num_change_pages; i++)
-  {
-    struct ElementChangeInfo *change_to = &ei_to->change_page[i];
-    struct ElementChangeInfo *change_from = &ei_from->change_page[i];
+    ei_to->change_page[i] = ei_from->change_page[i];
 
-    /* always start with reliable default values */
-    setElementChangeInfoToDefaults(change_to);
+  /* ---------- copy group element info ---------- */
+  if (ei_from->group != NULL && ei_to->group != NULL)	/* group or internal */
+    *ei_to->group = *ei_from->group;
 
-    change_to->events = change_from->events;
-
-    change_to->target_element = change_from->target_element;
-
-    change_to->delay_fixed = change_from->delay_fixed;
-    change_to->delay_random = change_from->delay_random;
-    change_to->delay_frames = change_from->delay_frames;
-
-    change_to->trigger_element = change_from->trigger_element;
-
-    change_to->explode = change_from->explode;
-    change_to->use_content = change_from->use_content;
-    change_to->only_if_complete = change_from->only_if_complete;
-    change_to->use_random_change = change_from->use_random_change;
-
-    change_to->random_percentage = change_from->random_percentage;
-    change_to->replace_when = change_from->replace_when;
-
-    for (y = 0; y < 3; y++)
-      for (x = 0; x < 3; x++)
-	change_to->target_content[x][y] = change_from->target_content[x][y];
-
-    change_to->can_change = change_from->can_change;
-
-    change_to->trigger_side = change_from->trigger_side;
-  }
 #endif
 
   /* mark this custom element as modified */
@@ -5796,13 +5785,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
      CAN_EXPLODE_1X1(element) ? EP_CAN_EXPLODE_1X1 :
      CAN_EXPLODE_3X3(element) ? EP_CAN_EXPLODE_3X3 :
-     CAN_EXPLODE_DYNA(element) ? EP_CAN_EXPLODE_DYNA :
+     CAN_EXPLODE_CROSS(element) ? EP_CAN_EXPLODE_CROSS :
      custom_element.consistency);
   custom_element_properties[EP_EXPLODE_RESULT] =
     (IS_INDESTRUCTIBLE(element) ||
      CAN_EXPLODE_1X1(element) ||
      CAN_EXPLODE_3X3(element) ||
-     CAN_EXPLODE_DYNA(element));
+     CAN_EXPLODE_CROSS(element));
 
   /* special case: sub-settings dependent from main setting */
   if (CAN_EXPLODE_BY_FIRE(element))
@@ -5958,7 +5947,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_1X1] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_3X3] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_DYNA] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_CROSS] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
@@ -5968,7 +5957,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* special case: sub-settings dependent from main setting */
   if (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
       custom_element_properties[EP_CAN_EXPLODE_3X3] ||
-      custom_element_properties[EP_CAN_EXPLODE_DYNA])
+      custom_element_properties[EP_CAN_EXPLODE_CROSS])
   {
     custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
       custom_element.can_explode_by_fire;

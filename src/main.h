@@ -86,7 +86,7 @@
 #define EP_DROPPABLE		22
 #define EP_CAN_EXPLODE_1X1	23
 #define EP_PUSHABLE		24
-#define EP_CAN_EXPLODE_DYNA	25
+#define EP_CAN_EXPLODE_CROSS	25
 #define EP_PROTECTED		26
 #define EP_CAN_MOVE_INTO_ACID	27
 
@@ -324,7 +324,7 @@
 #define IS_DROPPABLE(e)		HAS_PROPERTY(e, EP_DROPPABLE)
 #define CAN_EXPLODE_1X1(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_1X1)
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
-#define CAN_EXPLODE_DYNA(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_DYNA)
+#define CAN_EXPLODE_CROSS(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_CROSS)
 #define IS_PROTECTED(e)		HAS_PROPERTY(e, EP_PROTECTED)
 #define CAN_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_CAN_MOVE_INTO_ACID)
 
@@ -1564,13 +1564,13 @@ struct ElementChangeInfo
 
   boolean explode;		/* explode instead of change */
 
+  /* ---------- internal values used at runtime when playing ---------- */
+
   /* functions that are called before, while and after the change of an
      element -- currently only used for non-custom elements */
   void (*pre_change_function)(int x, int y);
   void (*change_function)(int x, int y);
   void (*post_change_function)(int x, int y);
-
-  /* ---------- internal values used at runtime when playing ---------- */
 
   short actual_trigger_element;	/* element that actually triggered change */
   int actual_trigger_player;	/* player which actually triggered change */

@@ -43,10 +43,12 @@
 
 /* for Explode() */
 #define EX_PHASE_START		0
-#define EX_NO_EXPLOSION		0
-#define EX_NORMAL		1
-#define EX_CENTER		2
-#define EX_BORDER		3
+#define EX_TYPE_NONE		0
+#define EX_TYPE_NORMAL		(1 << 0)
+#define EX_TYPE_CENTER		(1 << 1)
+#define EX_TYPE_BORDER		(1 << 2)
+#define EX_TYPE_CROSS		(1 << 3)
+#define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
 /* special positions in the game control window (relative to control window) */
 #define XX_LEVEL		37
@@ -1613,7 +1615,7 @@ void InitGame()
 
       ExplodePhase[x][y] = 0;
       ExplodeDelay[x][y] = 0;
-      ExplodeField[x][y] = EX_NO_EXPLOSION;
+      ExplodeField[x][y] = EX_TYPE_NONE;
 
       RunnerVisit[x][y] = 0;
       PlayerVisit[x][y] = 0;
@@ -2846,11 +2848,12 @@ void Explode(int ex, int ey, int phase, int mode)
     /* --- This is only really needed (and now handled) in "Impact()". --- */
     /* do not explode moving elements that left the explode field in time */
     if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
-	center_element == EL_EMPTY && (mode == EX_NORMAL || mode == EX_CENTER))
+	center_element == EL_EMPTY &&
+	(mode == EX_TYPE_NORMAL || mode == EX_TYPE_CENTER))
       return;
 #endif
 
-    if (mode == EX_NORMAL || mode == EX_CENTER)
+    if (mode == EX_TYPE_NORMAL || mode == EX_TYPE_CENTER)
       PlayLevelSoundAction(ex, ey, ACTION_EXPLODING);
 
     /* remove things displayed in background while burning dynamite */
@@ -2885,11 +2888,20 @@ void Explode(int ex, int ey, int phase, int mode)
       int element;
 
 #if 1
-      if (!IN_LEV_FIELD(x, y) || (mode != EX_NORMAL && (x != ex || y != ey)))
+#if 1
+      if (!IN_LEV_FIELD(x, y) ||
+	  (mode & EX_TYPE_SINGLE_TILE && (x != ex || y != ey)) ||
+	  (mode == EX_TYPE_CROSS      && (x != ex && y != ey)))
 	continue;
 #else
       if (!IN_LEV_FIELD(x, y) ||
-	  ((mode != EX_NORMAL || center_element == EL_AMOEBA_TO_DIAMOND) &&
+	  (mode != EX_TYPE_NORMAL && (x != ex || y != ey)))
+	continue;
+#endif
+#else
+      if (!IN_LEV_FIELD(x, y) ||
+	  ((mode != EX_TYPE_NORMAL ||
+	    center_element == EL_AMOEBA_TO_DIAMOND) &&
 	   (x != ex || y != ey)))
 	continue;
 #endif
@@ -3028,7 +3040,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_EMPTY;
 
       if (x != ex || y != ey ||
-	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_BORDER)
+	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_TYPE_BORDER)
 	Store2[x][y] = element;
 
 #if 0
@@ -3355,7 +3367,7 @@ void DynaExplode(int ex, int ey)
     player->dynabombs_left++;
   }
 
-  Explode(ex, ey, EX_PHASE_START, EX_CENTER);
+  Explode(ex, ey, EX_PHASE_START, EX_TYPE_CENTER);
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
   {
@@ -3374,7 +3386,7 @@ void DynaExplode(int ex, int ey)
       if (element == EL_EXPLOSION && IS_ACTIVE_BOMB(Store2[x][y]))
 	continue;
 
-      Explode(x, y, EX_PHASE_START, EX_BORDER);
+      Explode(x, y, EX_PHASE_START, EX_TYPE_BORDER);
 
       /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (element != EL_EMPTY &&
@@ -3434,7 +3446,7 @@ void Bang(int x, int y)
     case EL_PACMAN:
     case EL_MOLE:
       RaiseScoreElement(element);
-      Explode(x, y, EX_PHASE_START, EX_NORMAL);
+      Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
       break;
     case EL_DYNABOMB_PLAYER_1_ACTIVE:
     case EL_DYNABOMB_PLAYER_2_ACTIVE:
@@ -3452,17 +3464,21 @@ void Bang(int x, int y)
     case EL_AMOEBA_TO_DIAMOND:
 #endif
       if (IS_PLAYER(x, y))
-	Explode(x, y, EX_PHASE_START, EX_NORMAL);
+	Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
       else
-	Explode(x, y, EX_PHASE_START, EX_CENTER);
+	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
       break;
     default:
-      if (CAN_EXPLODE_DYNA(element))
+      if (CAN_EXPLODE_CROSS(element))
+#if 1
+	Explode(x, y, EX_PHASE_START, EX_TYPE_CROSS);
+#else
 	DynaExplode(x, y);
+#endif
       else if (CAN_EXPLODE_1X1(element))
-	Explode(x, y, EX_PHASE_START, EX_CENTER);
+	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
       else
-	Explode(x, y, EX_PHASE_START, EX_NORMAL);
+	Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
       break;
   }
 
@@ -8101,7 +8117,7 @@ void GameActions()
       CheckDynamite(x, y);
 #if 0
     else if (element == EL_EXPLOSION && !game.explosions_delayed)
-      Explode(x, y, ExplodePhase[x][y], EX_NORMAL);
+      Explode(x, y, ExplodePhase[x][y], EX_TYPE_NORMAL);
 #endif
     else if (element == EL_AMOEBA_GROWING)
       AmoebeWaechst(x, y);
@@ -8217,9 +8233,9 @@ void GameActions()
       if (ExplodeField[x][y])
 	Explode(x, y, EX_PHASE_START, ExplodeField[x][y]);
       else if (element == EL_EXPLOSION)
-	Explode(x, y, ExplodePhase[x][y], EX_NORMAL);
+	Explode(x, y, ExplodePhase[x][y], EX_TYPE_NORMAL);
 
-      ExplodeField[x][y] = EX_NO_EXPLOSION;
+      ExplodeField[x][y] = EX_TYPE_NONE;
     }
 
     game.explosions_delayed = TRUE;
@@ -8919,24 +8935,22 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
 
 #if 1
+      CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+					CE_OTHER_GETS_LEFT,
+					player->index_bit, leave_side);
+
       if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
-      {
-	CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
-					  CE_OTHER_GETS_LEFT,
-					  player->index_bit, leave_side);
 	CheckElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
 				 CE_LEFT_BY_PLAYER,
 				 player->index_bit, leave_side);
-      }
+
+      CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
+					CE_OTHER_GETS_ENTERED,
+					player->index_bit, enter_side);
 
       if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
-      {
-	CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
-					  CE_OTHER_GETS_ENTERED,
-					  player->index_bit, enter_side);
 	CheckElementChangePlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
 				 player->index_bit, enter_side);
-      }
 #endif
 
     }
@@ -9072,24 +9086,22 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       int old_jy = last_jy;
 
 #if 1
+      CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+					CE_OTHER_GETS_LEFT,
+					player->index_bit, leave_side);
+
       if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
-      {
-	CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
-					  CE_OTHER_GETS_LEFT,
-					  player->index_bit, leave_side);
 	CheckElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
 				 CE_LEFT_BY_PLAYER,
 				 player->index_bit, leave_side);
-      }
+
+      CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
+					CE_OTHER_GETS_ENTERED,
+					player->index_bit, enter_side);
 
       if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
-      {
-	CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
-					  CE_OTHER_GETS_ENTERED,
-					  player->index_bit, enter_side);
 	CheckElementChangePlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
 				 player->index_bit, enter_side);
-      }
 #endif
 
     }
@@ -10233,7 +10245,7 @@ int DigField(struct PlayerInfo *player,
 	PlayLevelSoundElementAction(x, y, element, ACTION_DIGGING);
 
 	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_DIGGED,
-					  player->index_bit, CH_SIDE_ANY);
+					  player->index_bit, dig_side);
 
 #if 1
 	if (mode == DF_SNAP)
@@ -10333,7 +10345,7 @@ int DigField(struct PlayerInfo *player,
 
 	CheckTriggeredElementChangePlayer(x, y, element,
 					  CE_OTHER_GETS_COLLECTED,
-					  player->index_bit, CH_SIDE_ANY);
+					  player->index_bit, dig_side);
 
 #if 1
 	if (mode == DF_SNAP)
@@ -10698,7 +10710,16 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
 boolean DropElement(struct PlayerInfo *player)
 {
+  static int trigger_sides[4] =
+  {
+    CH_SIDE_LEFT,	/* dropping left  */
+    CH_SIDE_RIGHT,	/* dropping right */
+    CH_SIDE_TOP,	/* dropping up    */
+    CH_SIDE_BOTTOM,	/* dropping down  */
+  };
   int jx = player->jx, jy = player->jy;
+  int drop_direction = player->MovDir;
+  int drop_side = trigger_sides[MV_DIR_BIT(drop_direction)];
   int old_element = Feld[jx][jy];
   int new_element = (player->inventory_size > 0 ?
 		     player->inventory_element[player->inventory_size - 1] :
@@ -10777,9 +10798,9 @@ boolean DropElement(struct PlayerInfo *player)
 
     CheckTriggeredElementChangePlayer(jx, jy, new_element,
 				      CE_OTHER_GETS_DROPPED,
-				      player->index_bit, CH_SIDE_ANY);
+				      player->index_bit, drop_side);
     CheckElementChangePlayer(jx, jy, new_element, CE_DROPPED_BY_PLAYER,
-			     player->index_bit, CH_SIDE_ANY);
+			     player->index_bit, drop_side);
 
     TestIfElementTouchesCustomElement(jx, jy);
   }

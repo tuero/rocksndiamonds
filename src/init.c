@@ -2234,7 +2234,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_dyna[] =
+  static int ep_can_explode_cross[] =
   {
     -1
   };
@@ -3026,7 +3026,7 @@ void InitElementPropertiesStatic()
     { ep_droppable,		EP_DROPPABLE		},
     { ep_can_explode_1x1,	EP_CAN_EXPLODE_1X1	},
     { ep_pushable,		EP_PUSHABLE		},
-    { ep_can_explode_dyna,	EP_CAN_EXPLODE_DYNA	},
+    { ep_can_explode_cross,	EP_CAN_EXPLODE_CROSS	},
     { ep_protected,		EP_PROTECTED		},
 
     { ep_player,		EP_PLAYER		},
@@ -3320,7 +3320,7 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
 					 !CAN_EXPLODE_1X1(i) &&
-					 !CAN_EXPLODE_DYNA(i)));
+					 !CAN_EXPLODE_CROSS(i)));
 
     /* ---------- CAN_EXPLODE_BY_DRAGONFIRE -------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_DRAGONFIRE, CAN_EXPLODE_BY_FIRE(i));
@@ -3357,7 +3357,7 @@ void InitElementPropertiesEngine(int engine_version)
       printf("::: %d, %d, %d -> %d\n",
 	     CAN_EXPLODE_1X1(i),
 	     CAN_EXPLODE_3X3(i),
-	     CAN_EXPLODE_DYNA(i),
+	     CAN_EXPLODE_CROSS(i),
 	     CAN_EXPLODE(i));
 #endif
 
