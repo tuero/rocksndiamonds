@@ -7576,6 +7576,15 @@ void GameActions()
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
 #if 1
+  if (recorded_player_action == NULL && tape.pausing)
+    return;
+#endif
+
+#if 0
+  printf("::: %d\n", stored_player[0].action);
+#endif
+
+#if 0
   if (recorded_player_action != NULL)
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].action = recorded_player_action[i];
@@ -7596,6 +7605,12 @@ void GameActions()
 
   if (!options.network && !setup.team_mode)
     local_player->effective_action = summarized_player_action;
+
+#if 1
+  if (recorded_player_action != NULL)
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].effective_action = recorded_player_action[i];
+#endif
 
 #if 1
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -7630,6 +7645,11 @@ void GameActions()
     /* overwrite programmed action with tape action */
     if (stored_player[i].programmed_action)
       actual_player_action = stored_player[i].programmed_action;
+#endif
+
+#if 0
+    if (stored_player[i].programmed_action)
+      printf("::: %d\n", stored_player[i].programmed_action);
 #endif
 
     if (recorded_player_action)

@@ -434,6 +434,10 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
     return;
   }
 
+#if 0
+  printf("::: %05d: recording action: %d\n", FrameCounter, action[0]);
+#endif
+
   if (tape.pos[tape.counter].delay > 0)		/* already stored action */
   {
     boolean changed_events = FALSE;
@@ -453,6 +457,11 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 
   if (tape.pos[tape.counter].delay == 0)	/* store new action */
   {
+
+#if 0
+    printf("::: %05d: new sequence\n", FrameCounter);
+#endif
+
     for (i = 0; i < MAX_PLAYERS; i++)
       tape.pos[tape.counter].action[i] = action[i];
 
@@ -491,7 +500,9 @@ void TapeTogglePause(boolean toggle_manual)
       tape.quick_resume = FALSE;
 
       TapeAppendRecording();
+#if 0
       TapeTogglePause(toggle_manual);
+#endif
     }
   }
 }
@@ -586,11 +597,22 @@ byte *TapePlayAction()
     tape.delay_played = 0;
   }
 
+#if 0
+  printf("::: %05d: replaying action: %d\n", FrameCounter, action[0]);
+#endif
+
   return action;
 }
 
 void TapeStop()
 {
+#if 0
+  if (tape.recording)
+    printf("::: stopped recording: %d\n", FrameCounter);
+  else if (tape.playing)
+    printf("::: stopped playing:   %d\n\n", FrameCounter);
+#endif
+
   TapeStopRecording();
   TapeStopPlaying();
 
