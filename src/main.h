@@ -195,7 +195,7 @@ typedef unsigned char byte;
 #define MAX_LEVNAMLEN		32
 #define MAX_LEVSCORE_ENTRIES	16
 #define NUM_FREE_LVHD_BYTES	18
-#define MAX_TAPELEN		10000
+#define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 
 #define MAX_LEVDIR_FILENAME	(64+1)
 #define MAX_LEVDIR_NAME		(16+1)

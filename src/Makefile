@@ -44,7 +44,7 @@ SCORE_ENTRIES = MANY_PER_NAME
 # you shouldn't need to change anything below                                 #
 #-----------------------------------------------------------------------------#
 
-PROGNAME = rocksndiamonds
+PROGNAME = ../rocksndiamonds
 
 RM = rm -f
 CPP = $(CC) -E

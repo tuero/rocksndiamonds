@@ -16,21 +16,18 @@ SRC_DIR = src
 
 MAKE = make
 RM = rm -f
+MV = mv -f
 
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
 
-all:	$(PROGNAME)
-
-$(PROGNAME):
+all:
 	$(MAKE_CMD)
 
 clean:
 	$(MAKE_CMD) clean
-	$(RM) $(PROGNAME)
 
 backup:
-	$(MAKE) clean
 	./scripts/make_backup.sh
 
 depend:
