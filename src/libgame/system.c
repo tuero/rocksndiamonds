@@ -89,6 +89,11 @@ void InitPlatformDependantStuff(void)
 #if !defined(PLATFORM_UNIX)
   initErrorFile();
 #endif
+
+#if defined(TARGET_SDL)
+  if (SDL_Init(SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE) < 0)
+    Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
+#endif
 }
 
 void ClosePlatformDependantStuff(void)

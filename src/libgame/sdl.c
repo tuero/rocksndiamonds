@@ -24,8 +24,8 @@
 inline void SDLInitVideoDisplay(void)
 {
   /* initialize SDL video */
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
+  if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+    Error(ERR_EXIT, "SDL_InitSubSystem() failed: %s", SDL_GetError());
 
   /* set default SDL depth */
   video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
@@ -707,9 +707,9 @@ Bitmap *SDLLoadImage(char *filename)
 
 inline boolean SDLOpenAudio(void)
 {
-  if (SDL_Init(SDL_INIT_AUDIO) < 0)
+  if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {
-    Error(ERR_WARN, "SDL_Init() failed: %s", SDL_GetError());
+    Error(ERR_WARN, "SDL_InitSubSystem() failed: %s", SDL_GetError());
     return FALSE;
   }
 

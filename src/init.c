@@ -62,11 +62,11 @@ void OpenAll(void)
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
-  InitEventFilter(FilterMouseMotionEvents);
-
   InitVideoDisplay();
   InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
 		  setup.fullscreen);
+
+  InitEventFilter(FilterMouseMotionEvents);
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
