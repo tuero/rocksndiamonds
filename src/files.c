@@ -1011,8 +1011,13 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   /* ... bits 16 - 31 of "move_pattern" (not nice, but downward compatible) */
   ei->move_pattern |= (getFile16BitBE(file) << 16);
 
+  ei->access_direction = getFile8Bit(file);
+
+  ei->explosion_delay = getFile8Bit(file);
+  ei->ignition_delay = getFile8Bit(file);
+
   /* some free bytes for future custom property values and padding */
-  ReadUnusedBytesFromFile(file, 5);
+  ReadUnusedBytesFromFile(file, 2);
 
   /* read change property values */
 
@@ -2582,8 +2587,13 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   /* ... bits 16 - 31 of "move_pattern" (not nice, but downward compatible) */
   putFile16BitBE(file, (ei->move_pattern >> 16) & 0xffff);
 
+  putFile8Bit(file, ei->access_direction);
+
+  putFile8Bit(file, ei->explosion_delay);
+  putFile8Bit(file, ei->ignition_delay);
+
   /* some free bytes for future custom property values and padding */
-  WriteUnusedBytesToFile(file, 5);
+  WriteUnusedBytesToFile(file, 2);
 
   /* write change property values */
 

@@ -127,13 +127,14 @@
 
 /* values for element content drawing areas */
 /* amoeba content */
-#define ED_AREA_ELEM_CONTENT_XPOS	( 2 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
+#define ED_AREA_AMOEBA_CONTENT_XPOS	ED_SETTINGS_XPOS(0)
+#define ED_AREA_AMOEBA_CONTENT_YPOS	(ED_SETTINGS_YPOS(2) + \
+					 ED_GADGET_DISTANCE)
 
 /* yamyam content */
-#define ED_AREA_YAMYAM_CONTENT_XPOS(n)	(ED_AREA_ELEM_CONTENT_XPOS + \
+#define ED_AREA_YAMYAM_CONTENT_XPOS(n)	(2 * MINI_TILEX + \
 					 5 * (n % 4) * MINI_TILEX)
-#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(ED_AREA_ELEM_CONTENT_YPOS + \
+#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(22 * MINI_TILEY + \
 					 6 * (n / 4) * MINI_TILEY)
 
 /* custom change target */
@@ -1785,21 +1786,21 @@ static struct
   /* ---------- element settings: configure (various elements) ------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		0,	/* set at runtime */
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
     GADGET_ID_STICK_ELEMENT,		GADGET_ID_NONE,
     &stick_element_properties_window,
     NULL,
     "stick this screen to edit content","stick this screen to edit content"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_EM_SLIPPERY_GEMS,		GADGET_ID_NONE,
     &level.em_slippery_gems,
     NULL,
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
     GADGET_ID_BLOCK_LAST_FIELD,		GADGET_ID_NONE,
     &level.block_last_field,
     NULL,
@@ -2021,10 +2022,10 @@ static struct
   /* ---------- amoeba content --------------------------------------------- */
 
   {
-    ED_AREA_ELEM_CONTENT_XPOS,		ED_AREA_ELEM_CONTENT_YPOS,
+    ED_AREA_AMOEBA_CONTENT_XPOS,	ED_AREA_AMOEBA_CONTENT_YPOS,
     1, 1,
     GADGET_ID_AMOEBA_CONTENT,		GADGET_ID_NONE,
-    NULL, "content of amoeba",		NULL
+    "content:", NULL,			NULL
   },
 
   /* ---------- custom graphic --------------------------------------------- */
@@ -4835,8 +4836,10 @@ void FreeLevelEditorGadgets()
 static void MapCounterButtons(int id)
 {
   int gadget_id_down = counterbutton_info[id].gadget_id_down;
+  int gadget_id_text = counterbutton_info[id].gadget_id_text;
   int gadget_id_up   = counterbutton_info[id].gadget_id_up;
   struct GadgetInfo *gi_down = level_editor_gadget[gadget_id_down];
+  struct GadgetInfo *gi_text = level_editor_gadget[gadget_id_text];
   struct GadgetInfo *gi_up   = level_editor_gadget[gadget_id_up];
 #if 0
   char infotext[MAX_OUTPUT_LINESIZE + 1];
@@ -4857,6 +4860,17 @@ static void MapCounterButtons(int id)
   int y = gi_up->y + yoffset;
 #endif
 
+#if 1
+  /* special case needed for "score" counter gadget */
+  if (id == ED_COUNTER_ID_ELEMENT_SCORE)
+  {
+    ModifyGadget(gi_down, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
+    ModifyGadget(gi_text, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
+    ModifyGadget(gi_up,   GDI_Y, SY + counterbutton_info[id].y, GDI_END);
+    y = gi_up->y + yoffset;
+  }
+#endif
+
   if (counterbutton_info[id].text_above)
     DrawText(x, y_above, counterbutton_info[id].text_above, FONT_TEXT_1);
 
@@ -4868,9 +4882,9 @@ static void MapCounterButtons(int id)
 
   ModifyEditorCounter(id, *counterbutton_info[id].value);
 
-  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_down]);
-  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_text]);
-  MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_up]);
+  MapGadget(gi_down);
+  MapGadget(gi_text);
+  MapGadget(gi_up);
 }
 
 static void MapControlButtons()
@@ -6644,8 +6658,14 @@ static void DrawPropertiesConfig()
     {
       int counter_id = ED_COUNTER_ID_ELEMENT_SCORE;
 
+      if (HAS_CONTENT(properties_element))	/* needs stickybutton */
+	counterbutton_info[counter_id].y = ED_SETTINGS_YPOS(1);
+      else
+	counterbutton_info[counter_id].y = ED_SETTINGS_YPOS(0);
+
       counterbutton_info[counter_id].value = elements_with_counter[i].value;
       counterbutton_info[counter_id].text_right= elements_with_counter[i].text;
+
       MapCounterButtons(counter_id);
 
       break;
@@ -6655,9 +6675,7 @@ static void DrawPropertiesConfig()
   if (HAS_CONTENT(properties_element))
   {
     /* draw stickybutton gadget */
-    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-    checkbutton_info[i].y = ED_COUNTER_YPOS(4);
-    MapCheckbuttonGadget(i);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
     if (IS_AMOEBOID(properties_element))
       MapDrawingArea(ED_DRAWING_ID_AMOEBA_CONTENT);
@@ -6692,9 +6710,7 @@ static void DrawPropertiesConfig()
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
     /* draw stickybutton gadget */
-    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-    checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
-    MapCheckbuttonGadget(i);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
     if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_1)
     {
@@ -6748,9 +6764,7 @@ static void DrawPropertiesConfig()
   else if (IS_GROUP_ELEMENT(properties_element))
   {
     /* draw stickybutton gadget */
-    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-    checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
-    MapCheckbuttonGadget(i);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
     /* draw checkbutton gadgets */
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC);
@@ -6794,9 +6808,7 @@ static void DrawPropertiesChange()
   int i;
 
   /* draw stickybutton gadget */
-  i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-  checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
-  MapCheckbuttonGadget(i);
+  MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
   /* draw checkbutton gadgets */
   for (i =  ED_CHECKBUTTON_ID_CHANGE_FIRST;

@@ -2089,6 +2089,16 @@ void InitElementPropertiesStatic()
 
   static int ep_protected[] =
   {
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    EL_SWITCHGATE_OPEN,
+    EL_TIMEGATE_OPEN,
     -1
   };
 
@@ -3241,6 +3251,18 @@ void InitElementPropertiesEngine(int engine_version)
       element_info[element].push_delay_fixed = game.default_push_delay_fixed;
     if (element_info[element].push_delay_random == -1)
       element_info[element].push_delay_random = game.default_push_delay_random;
+  }
+
+  /* set some other uninitialized values of custom elements in older levels */
+  if (engine_version < VERSION_IDENT(3,0,9,0))
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      element_info[element].explosion_delay = 18;
+      element_info[element].ignition_delay = 8;
+    }
   }
 #endif
 

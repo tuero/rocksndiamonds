@@ -497,6 +497,28 @@ collect_count_list[] =
   { EL_UNDEFINED,		0 },
 };
 
+struct
+{
+  int element;
+  int direction;
+}
+tube_access[] =
+{
+  { EL_TUBE_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
+  { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
+  { EL_TUBE_VERTICAL_LEFT,	MV_LEFT |            MV_UP | MV_DOWN },
+  { EL_TUBE_VERTICAL_RIGHT,	          MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_TUBE_HORIZONTAL_UP,	MV_LEFT | MV_RIGHT | MV_UP           },
+  { EL_TUBE_HORIZONTAL_DOWN,	MV_LEFT | MV_RIGHT |         MV_DOWN },
+  { EL_TUBE_LEFT_UP,		MV_LEFT |            MV_UP           },
+  { EL_TUBE_LEFT_DOWN,		MV_LEFT |                    MV_DOWN },
+  { EL_TUBE_RIGHT_UP,		          MV_RIGHT | MV_UP           },
+  { EL_TUBE_RIGHT_DOWN,		          MV_RIGHT |         MV_DOWN },
+
+  { EL_UNDEFINED,		0				     }
+};
+
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
 
 #define IS_AUTO_CHANGING(e)	(element_info[e].change_events & \
@@ -1157,6 +1179,18 @@ static void InitGameEngine()
   for (i = 0; collect_count_list[i].element != EL_UNDEFINED; i++)
     element_info[collect_count_list[i].element].collect_count =
       collect_count_list[i].count;
+
+  /* ---------- initialize access direction -------------------------------- */
+
+  /* initialize access direction values to default */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    if (!IS_CUSTOM_ELEMENT(i))
+      element_info[i].access_direction = MV_ALL_DIRECTIONS;
+
+  /* set access direction value for certain elements from pre-defined list */
+  for (i = 0; tube_access[i].element != EL_UNDEFINED; i++)
+    element_info[tube_access[i].element].access_direction =
+      tube_access[i].direction;
 }
 
 
@@ -2731,8 +2765,10 @@ void Explode(int ex, int ey, int phase, int mode)
       KillHeroUnlessExplosionProtected(x, y);
       border_explosion = TRUE;
 
+#if 0
       if (phase == last_phase)
 	printf("::: IS_PLAYER\n");
+#endif
     }
     else if (CAN_EXPLODE_BY_EXPLOSION(border_element))
     {
@@ -2741,8 +2777,10 @@ void Explode(int ex, int ey, int phase, int mode)
       Bang(x, y);
       border_explosion = TRUE;
 
+#if 0
       if (phase == last_phase)
 	printf("::: CAN_EXPLODE_BY_EXPLOSION\n");
+#endif
     }
     else if (border_element == EL_AMOEBA_TO_DIAMOND)
     {
@@ -2750,11 +2788,13 @@ void Explode(int ex, int ey, int phase, int mode)
       Store2[x][y] = 0;
       border_explosion = TRUE;
 
+#if 0
       if (phase == last_phase)
 	printf("::: EL_AMOEBA_TO_DIAMOND [%d, %d] [%d]\n",
 	       element_info[border_element].explosion_delay,
 	       element_info[border_element].ignition_delay,
 	       phase);
+#endif
     }
 
 #if 1
@@ -7773,9 +7813,14 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 	 canEnterSupaplexPort(new_jx, new_jy, dx, dy))));
     /* !!! extend EL_SAND to anything diggable !!! */
 
+    boolean player_is_standing_on_valid_field =
+      (IS_WALKABLE_INSIDE(Feld[jx][jy]) ||
+       (IS_WALKABLE(Feld[jx][jy]) &&
+	!(element_info[Feld[jx][jy]].access_direction & MV_DOWN)));
+
     if (field_under_player_is_free &&
-	!player_is_moving_to_valid_field &&
-	!IS_WALKABLE_INSIDE(Feld[jx][jy]))
+	!player_is_standing_on_valid_field &&
+	!player_is_moving_to_valid_field)
       player->programmed_action = MV_DOWN;
   }
 }
@@ -8901,6 +8946,7 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int opposite_direction = MV_DIR_OPPOSITE(move_direction);
   int dig_side = change_sides[MV_DIR_BIT(move_direction)];
+  int old_element = Feld[jx][jy];
   int element;
 
   if (player->MovPos == 0)
@@ -8922,6 +8968,8 @@ int DigField(struct PlayerInfo *player,
 
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
+
+#if 0
 
 #if 0
   if (IS_TUBE(Feld[jx][jy]) || IS_TUBE(Back[jx][jy]))
@@ -8959,8 +9007,15 @@ int DigField(struct PlayerInfo *player,
       return MF_NO_ACTION;	/* tube has no opening in this direction */
   }
 
-  if (IS_CUSTOM_ELEMENT(Feld[jx][jy]) && IS_WALKABLE(Feld[jx][jy]) &&
-      !(element_info[Feld[jx][jy]].access_direction & move_direction))
+#else
+
+  if (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0))
+    old_element = Back[jx][jy];
+
+#endif
+
+  if (IS_WALKABLE(old_element) &&
+      !(element_info[old_element].access_direction & move_direction))
     return MF_NO_ACTION;	/* field has no opening in this direction */
 
   element = Feld[x][y];
@@ -9035,6 +9090,7 @@ int DigField(struct PlayerInfo *player,
       PlayLevelSound(x, y, SND_CLASS_SP_PORT_PASSING);
       break;
 
+#if 0
     case EL_TUBE_ANY:
     case EL_TUBE_VERTICAL:
     case EL_TUBE_HORIZONTAL:
@@ -9077,6 +9133,7 @@ int DigField(struct PlayerInfo *player,
 	PlayLevelSound(x, y, SND_CLASS_TUBE_WALKING);
       }
       break;
+#endif
 
     default:
 
@@ -9084,8 +9141,7 @@ int DigField(struct PlayerInfo *player,
       {
 	int sound_action = ACTION_WALKING;
 
-	if (IS_CUSTOM_ELEMENT(element) &&
-	    !(element_info[element].access_direction & opposite_direction))
+	if (!(element_info[element].access_direction & opposite_direction))
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
 
 	if (element >= EL_GATE_1 && element <= EL_GATE_4)

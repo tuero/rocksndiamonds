@@ -2526,6 +2526,38 @@ element_to_graphic[] =
     IMG_UNKNOWN
   },
   {
+    EL_BD_BUTTERFLY_DOWN,		-1, -1, FALSE,
+    IMG_BD_BUTTERFLY
+  },
+  {
+    EL_BD_BUTTERFLY_LEFT,		-1, -1, FALSE,
+    IMG_BD_BUTTERFLY
+  },
+  {
+    EL_BD_BUTTERFLY_RIGHT,		-1, -1, FALSE,
+    IMG_BD_BUTTERFLY
+  },
+  {
+    EL_BD_BUTTERFLY_UP,			-1, -1, FALSE,
+    IMG_BD_BUTTERFLY
+  },
+  {
+    EL_BD_FIREFLY_DOWN,			-1, -1, FALSE,
+    IMG_BD_FIREFLY
+  },
+  {
+    EL_BD_FIREFLY_LEFT,			-1, -1, FALSE,
+    IMG_BD_FIREFLY
+  },
+  {
+    EL_BD_FIREFLY_RIGHT,		-1, -1, FALSE,
+    IMG_BD_FIREFLY
+  },
+  {
+    EL_BD_FIREFLY_UP,			-1, -1, FALSE,
+    IMG_BD_FIREFLY
+  },
+  {
     EL_DOOR_WHITE,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },

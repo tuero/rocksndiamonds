@@ -1,3 +1,32 @@
+2004-02-17
+	* fixed bug which caused all CE change pages to be ignored which had
+	  the same change event, but used a different element side
+	  (reported by Simon Forsberg)
+
+	* fixed bug which caused elements that can move and fall and that are
+	  transported by a conveyor belt to continue moving into that direction
+	  after leaving the conveyor belt, regardless of their own movement
+	  type; only elements which can not move are transported now
+	  (reported by Simon Forsberg)
+
+	* fixed bug which could cause an array overflow in RelocatePlayer()
+	  (reported by Niko Böhm)
+
+	* changed Emerald Mine style "passable / over" elements to "protected"
+	  (fixing unsolvable level 10 of "Bondmine 9" with bug beside gate)
+
+	* added new option to select from which side a "walkable/passable"
+	  element can be entered
+
+2004-02-16
+	* added explosion and ignition delay for elements that can explode
+
+2004-02-05
+	* fixed bug which caused player not being protected against enemies
+	  when a CE was "walkable / inside" and was not "indestructible"
+	* added "walkable/passable" fields to be "protected/unprotected"
+	  against enemies, even if not accessible "inside" but "over/under"
+
 2004-02-04
 	* corrected move pattern to 32 bit and initial move direction to 8 bit
 
@@ -6,6 +35,7 @@
 
 2004-02-02
 	* added some special EMC mappings to Emerald Mine level loader
+	  (also covering previously unknown element in level 0 of "Bondmine 8")
 
 2004-01-30
 	* added option to block last field when player is moving (for Supaplex)
