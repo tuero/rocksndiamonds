@@ -428,36 +428,14 @@ static int getFileTypeFromBasename(char *basename)
   return LEVEL_FILE_TYPE_UNKNOWN;
 }
 
-static char *getSingleLevelBasename(int nr, int type)
+static char *getSingleLevelBasename(int nr)
 {
   static char basename[MAX_FILENAME_LEN];
-  char *level_filename = getStringCopy(leveldir_current->level_filename);
 
-  if (level_filename == NULL)
-    level_filename = getStringCat2("%03d.", LEVELFILE_EXTENSION);
+  if (nr < 0)
+    sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
   else
-    type = LEVEL_FILE_TYPE_UNKNOWN;	/* force specified file name/pattern */
-
-  switch (type)
-  {
-    case LEVEL_FILE_TYPE_RND:
-      if (nr < 0)
-	sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
-      else
-	sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
-      break;
-
-    case LEVEL_FILE_TYPE_EM:
-      sprintf(basename, "%d", nr);
-      break;
-
-    case LEVEL_FILE_TYPE_UNKNOWN:
-    default:
-      sprintf(basename, level_filename, nr);
-      break;
-  }
-
-  free(level_filename);
+    sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
 
   return basename;
 }
@@ -500,9 +478,9 @@ static char *getPackedLevelBasename(int type)
   return basename;
 }
 
-static char *getSingleLevelFilename(int nr, int type)
+static char *getSingleLevelFilename(int nr)
 {
-  return getLevelFilenameFromBasename(getSingleLevelBasename(nr, type));
+  return getLevelFilenameFromBasename(getSingleLevelBasename(nr));
 }
 
 #if 0
@@ -514,15 +492,33 @@ static char *getPackedLevelFilename(int type)
 
 char *getDefaultLevelFilename(int nr)
 {
-  return getSingleLevelFilename(nr, LEVEL_FILE_TYPE_RND);
+  return getSingleLevelFilename(nr);
 }
 
+#if 0
 static void setLevelFileInfo_SingleLevelFilename(struct LevelFileInfo *lfi,
 						 int type)
 {
   lfi->type = type;
   lfi->packed = FALSE;
   lfi->basename = getSingleLevelBasename(lfi->nr, lfi->type);
+  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+}
+#endif
+
+static void setLevelFileInfo_FormatLevelFilename(struct LevelFileInfo *lfi,
+						 int type, char *format, ...)
+{
+  static char basename[MAX_FILENAME_LEN];
+  va_list ap;
+
+  va_start(ap, format);
+  vsprintf(basename, format, ap);
+  va_end(ap);
+
+  lfi->type = type;
+  lfi->packed = FALSE;
+  lfi->basename = basename;
   lfi->filename = getLevelFilenameFromBasename(lfi->basename);
 }
 
@@ -564,7 +560,8 @@ static int getFiletypeFromID(char *filetype_id)
   return filetype;
 }
 
-static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
+#if 0
+static void OLD_determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 {
   /* special case: level number is negative => check for level template file */
   if (lfi->nr < 0)
@@ -602,6 +599,79 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 
   /* no known level file found -- try to use default values */
   setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
+}
+#endif
+
+static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
+{
+  int nr = lfi->nr;
+
+  /* special case: level number is negative => check for level template file */
+  if (nr < 0)
+  {
+    setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
+					 "template.%s", LEVELFILE_EXTENSION);
+
+    /* no fallback if template file not existing */
+    return;
+  }
+
+  /* special case: check for file name/pattern specified in "levelinfo.conf" */
+  if (leveldir_current->level_filename != NULL)
+  {
+    int filetype = getFiletypeFromID(leveldir_current->level_filetype);
+
+    setLevelFileInfo_FormatLevelFilename(lfi, filetype,
+					 leveldir_current->level_filename, nr);
+    if (fileExists(lfi->filename))
+      return;
+  }
+
+  /* check for native Rocks'n'Diamonds level file */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
+				       "%03d.%s", nr, LEVELFILE_EXTENSION);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* check for Emerald Mine level file (V1) */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "a%c%c",
+				       'a' + (nr / 10) % 26, '0' + nr % 10);
+  if (fileExists(lfi->filename))
+    return;
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "A%c%c",
+				       'A' + (nr / 10) % 26, '0' + nr % 10);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* check for Emerald Mine level file (V2 to V5) */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "%d", nr);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* check for Emerald Mine level file (V6 / single mode) */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "%02ds", nr);
+  if (fileExists(lfi->filename))
+    return;
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "%02dS", nr);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* check for Emerald Mine level file (V6 / teamwork mode) */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "%02dt", nr);
+  if (fileExists(lfi->filename))
+    return;
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_EM, "%02dT", nr);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* check for various packed level file formats */
+  setLevelFileInfo_PackedLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
+  if (fileExists(lfi->filename))
+    return;
+
+  /* no known level file found -- use default values (and fail later) */
+  setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
+				       "%03d.%s", nr, LEVELFILE_EXTENSION);
 }
 
 static void determineLevelFileInfo_Filetype(struct LevelFileInfo *lfi)

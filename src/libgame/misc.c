@@ -1504,6 +1504,9 @@ void dumpList(ListNode *node_first)
 
 boolean fileExists(char *filename)
 {
+  if (filename == NULL)
+    return FALSE;
+
 #if 0
   printf("checking file '%s'\n", filename);
 #endif

@@ -1,3 +1,6 @@
+2004-10-26
+	* added auto-detection for various types of Emerald Mine level files
+
 2004-10-17
 	* fixed bug with scrollbars getting too small when list is very large
 
