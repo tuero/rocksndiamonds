@@ -1,3 +1,8 @@
+2004-04-23
+	* fixed dynabombs exploding now into anything diggable
+	* fixed Supaplex style gravity movement into buggy base now impossible
+	* added pressing key "space" as valid action to select menu options
+
 2004-04-20
 	* added "replace when walkable" to relocate player to walkable element
 	* added "enter"/"leave" event for elements affected by relocation

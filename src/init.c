@@ -3367,9 +3367,14 @@ void InitElementPropertiesEngine(int engine_version)
 				     CAN_EXPLODE_IMPACT(i)));
 
     /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
+#if 0
+    SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (!CAN_EXPLODE_1X1(i) &&
+					 !CAN_EXPLODE_CROSS(i)));
+#else
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
 					 !CAN_EXPLODE_1X1(i) &&
 					 !CAN_EXPLODE_CROSS(i)));
+#endif
 
     /* ---------- CAN_EXPLODE_BY_DRAGONFIRE -------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_DRAGONFIRE, CAN_EXPLODE_BY_FIRE(i));

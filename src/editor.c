@@ -5859,12 +5859,18 @@ static void CopyCustomElementPropertiesToEditor(int element)
      CAN_EXPLODE_CROSS(element));
 
   /* special case: sub-settings dependent from main setting */
+#if 0
+  custom_element.can_explode_by_fire = CAN_EXPLODE_BY_FIRE(element);
+  custom_element.can_explode_smashed = CAN_EXPLODE_SMASHED(element);
+  custom_element.can_explode_impact  = CAN_EXPLODE_IMPACT(element);
+#else
   if (CAN_EXPLODE_BY_FIRE(element))
     custom_element.can_explode_by_fire = TRUE;
   if (CAN_EXPLODE_SMASHED(element))
     custom_element.can_explode_smashed = TRUE;
   if (CAN_EXPLODE_IMPACT(element))
     custom_element.can_explode_impact  = TRUE;
+#endif
 
   /* ---------- element settings: advanced (custom elements) --------------- */
 
@@ -5946,6 +5952,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
   int access_type_and_layer;
+  boolean can_explode;
 
   /* mark that this custom element has been modified */
   custom_element.modified_settings = TRUE;
@@ -6022,6 +6029,17 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_EXPLODE_RESULT];
 
   /* special case: sub-settings dependent from main setting */
+#if 0
+  can_explode = (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
+		 custom_element_properties[EP_CAN_EXPLODE_3X3] ||
+		 custom_element_properties[EP_CAN_EXPLODE_CROSS]);
+  custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
+    (can_explode && custom_element.can_explode_by_fire);
+  custom_element_properties[EP_CAN_EXPLODE_SMASHED] =
+    (can_explode && custom_element.can_explode_smashed);
+  custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
+    (can_explode && custom_element.can_explode_impact);
+#else
   if (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
       custom_element_properties[EP_CAN_EXPLODE_3X3] ||
       custom_element_properties[EP_CAN_EXPLODE_CROSS])
@@ -6033,6 +6051,7 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
       custom_element.can_explode_impact;
   }
+#endif
 
   /* ---------- element settings: advanced (custom elements) --------------- */
 

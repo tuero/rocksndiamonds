@@ -690,6 +690,7 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_INFO:
       switch(key)
       {
+	case KSYM_space:
 	case KSYM_Return:
 	  if (game_status == GAME_MODE_MAIN)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
@@ -736,6 +737,7 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_SCORES:
       switch(key)
       {
+	case KSYM_space:
 	case KSYM_Return:
 	case KSYM_Escape:
 	  game_status = GAME_MODE_MAIN;
