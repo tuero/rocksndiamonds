@@ -2266,7 +2266,7 @@ static int editor_el_sokoban[] =
   EL_SOKOBAN_OBJECT,
   EL_SOKOBAN_FIELD_EMPTY,
   EL_SOKOBAN_FIELD_FULL,
-  EL_STEELWALL,
+  EL_SOKOBAN_FIELD_PLAYER,
 };
 static int *editor_hl_sokoban_ptr = editor_hl_sokoban;
 static int *editor_el_sokoban_ptr = editor_el_sokoban;
@@ -4876,6 +4876,40 @@ static int setSelectboxValue(int selectbox_id, int new_value)
 
 static void copy_custom_element_settings(int element_from, int element_to)
 {
+#if 1
+  struct ElementInfo ei_to_old = element_info[element_to];
+  struct ElementInfo *ei_from = &element_info[element_from];
+  struct ElementInfo *ei_to = &element_info[element_to];
+  int i;
+
+  /* ---------- copy whole element structure ---------- */
+  *ei_to = *ei_from;
+
+  /* ---------- restore structure pointers which cannot be copied ---------- */
+  ei_to->token_name         = ei_to_old.token_name;
+  ei_to->class_name         = ei_to_old.class_name;
+  ei_to->editor_description = ei_to_old.editor_description;
+  ei_to->custom_description = ei_to_old.custom_description;
+  ei_to->change_page        = ei_to_old.change_page;
+  ei_to->change             = ei_to_old.change;
+  ei_to->group              = ei_to_old.group;
+
+  /* ---------- copy element base properties ---------- */
+  Properties[element_to][EP_BITFIELD_BASE] =
+    Properties[element_from][EP_BITFIELD_BASE];
+
+  /* ---------- reinitialize and copy change pages ---------- */
+  setElementChangePages(ei_to, ei_to->num_change_pages);
+
+  for (i=0; i < ei_to->num_change_pages; i++)
+    ei_to->change_page[i] = ei_from->change_page[i];
+
+  /* ---------- copy group element info ---------- */
+  if (ei_from->group != NULL && ei_to->group != NULL)	/* group or internal */
+    *ei_to->group = *ei_from->group;
+
+#else
+
   struct ElementInfo *ei_from = &element_info[element_from];
   struct ElementInfo *ei_to = &element_info[element_to];
   int i, x, y;
@@ -4948,6 +4982,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
     change_to->sides = change_from->sides;
   }
+#endif
 
   /* mark this custom element as modified */
   ei_to->modified_settings = TRUE;
@@ -4967,7 +5002,7 @@ static void replace_custom_element_in_settings(int element_from,
 	if (ei->content[x][y] == element_from)
 	  ei->content[x][y] = element_to;
 
-    for (j=0; j < ei->num_change_pages; j++)
+    for (j = 0; j < ei->num_change_pages; j++)
     {
       struct ElementChangeInfo *change = &ei->change_page[j];
 
@@ -4982,6 +5017,11 @@ static void replace_custom_element_in_settings(int element_from,
 	  if (change->content[x][y] == element_from)
 	    change->content[x][y] = element_to;
     }
+
+    if (ei->group != NULL)				/* group or internal */
+      for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
+	if (ei->group->element[j] == element_from)
+	  ei->group->element[j] = element_to;
   }
 }
 
@@ -4996,8 +5036,22 @@ static void replace_custom_element_in_playfield(int element_from,
 	Feld[x][y] = element_to;
 }
 
-static void CopyCustomElement(int element_old, int element_new, int copy_mode)
+static boolean CopyCustomElement(int element_old, int element_new,
+				 int copy_mode)
 {
+  if (IS_CUSTOM_ELEMENT(element_old) && !IS_CUSTOM_ELEMENT(element_new))
+  {
+    Request("Please choose custom element !", REQ_CONFIRM);
+
+    return FALSE;
+  }
+  else if (IS_GROUP_ELEMENT(element_old) && !IS_GROUP_ELEMENT(element_new))
+  {
+    Request("Please choose group element !", REQ_CONFIRM);
+
+    return FALSE;
+  }
+
   if (copy_mode == GADGET_ID_CUSTOM_COPY_FROM)
   {
     copy_custom_element_settings(element_new, element_old);
@@ -5008,21 +5062,23 @@ static void CopyCustomElement(int element_old, int element_new, int copy_mode)
   }
   else if (copy_mode == GADGET_ID_CUSTOM_EXCHANGE)
   {
-    copy_custom_element_settings(element_old, EL_DUMMY);
+    copy_custom_element_settings(element_old, EL_INTERNAL_EDITOR);
     copy_custom_element_settings(element_new, element_old);
-    copy_custom_element_settings(EL_DUMMY, element_new);
+    copy_custom_element_settings(EL_INTERNAL_EDITOR, element_new);
 
-    replace_custom_element_in_settings(element_old, EL_DUMMY);
+    replace_custom_element_in_settings(element_old, EL_INTERNAL_EDITOR);
     replace_custom_element_in_settings(element_new, element_old);
-    replace_custom_element_in_settings(EL_DUMMY, element_new);
+    replace_custom_element_in_settings(EL_INTERNAL_EDITOR, element_new);
 
-    replace_custom_element_in_playfield(element_old, EL_DUMMY);
+    replace_custom_element_in_playfield(element_old, EL_INTERNAL_EDITOR);
     replace_custom_element_in_playfield(element_new, element_old);
-    replace_custom_element_in_playfield(EL_DUMMY, element_new);
+    replace_custom_element_in_playfield(EL_INTERNAL_EDITOR, element_new);
   }
 
   UpdateCustomElementGraphicGadgets();
   DrawPropertiesWindow();
+
+  return TRUE;
 }
 
 static void CopyCustomElementPropertiesToEditor(int element)
@@ -6400,7 +6456,8 @@ static void DrawPropertiesWindow()
   UnmapLevelEditorToolboxDrawingGadgets();
   UnmapLevelEditorToolboxCustomGadgets();
 
-  if (IS_CUSTOM_ELEMENT(properties_element))
+  if (IS_CUSTOM_ELEMENT(properties_element) ||
+      IS_GROUP_ELEMENT(properties_element))
     MapLevelEditorToolboxCustomGadgets();
 
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
@@ -7627,6 +7684,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     edit_mode = ED_MODE_DRAWING;
   }
 
+  /* element copy mode active, but no element button pressed => deactivate */
+  if (last_custom_copy_mode != -1 && id < ED_NUM_CTRL_BUTTONS)
+    last_custom_copy_mode = -1;
+
   switch (id)
   {
     case GADGET_ID_SCROLL_LEFT:
@@ -7925,13 +7986,14 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	if (last_custom_copy_mode != -1)
 	{
-	  CopyCustomElement(properties_element, new_element,
-			    last_custom_copy_mode);
+	  if (CopyCustomElement(properties_element, new_element,
+				last_custom_copy_mode))
+	  {
+	    ClickOnGadget(level_editor_gadget[last_drawing_function],
+			  MB_LEFTBUTTON);
 
-	  ClickOnGadget(level_editor_gadget[last_drawing_function],
-			MB_LEFTBUTTON);
-
-	  last_custom_copy_mode = -1;
+	    last_custom_copy_mode = -1;
+	  }
 
 	  break;
 	}

@@ -553,9 +553,7 @@
 #define EL_DARK_YAMYAM			60
 #define EL_BD_MAGIC_WALL		61
 #define EL_INVISIBLE_STEELWALL		62
-
-#define EL_UNUSED_63			63
-
+#define EL_SOKOBAN_FIELD_PLAYER		63
 #define EL_DYNABOMB_INCREASE_NUMBER	64
 #define EL_DYNABOMB_INCREASE_SIZE	65
 #define EL_DYNABOMB_INCREASE_POWER	66
@@ -936,9 +934,14 @@
 #define EL_BD_DEFAULT				(EL_FIRST_DUMMY + 22)
 #define EL_SP_DEFAULT				(EL_FIRST_DUMMY + 23)
 #define EL_SB_DEFAULT				(EL_FIRST_DUMMY + 24)
-#define EL_DUMMY				(EL_FIRST_DUMMY + 25)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 26)
+/* internal elements (only used for internal purposes like copying) */
+#define EL_FIRST_INTERNAL			(EL_FIRST_DUMMY + 25)
+
+#define EL_INTERNAL_EDITOR			(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_DUMMY			(EL_FIRST_INTERNAL + 1)
+
+#define MAX_NUM_ELEMENTS			(EL_FIRST_INTERNAL + 2)
 
 
 /* values for graphics/sounds action types */
@@ -1465,6 +1468,8 @@ struct ElementGroupInfo
 {
   int num_elements;			/* number of elements in this group */
   short element[MAX_ELEMENTS_IN_GROUP];	/* list of elements in this group */
+
+  /* ---------- internal values used at runtime when playing ---------- */
 
   /* the following is the same as above, but with recursively resolved group
      elements (group elements may also contain further group elements!) */

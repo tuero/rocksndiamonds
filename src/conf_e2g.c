@@ -454,6 +454,10 @@ element_to_graphic[] =
     IMG_SOKOBAN_FIELD_FULL
   },
   {
+    EL_SOKOBAN_FIELD_PLAYER,		-1, -1, FALSE,
+    IMG_SOKOBAN_FIELD_PLAYER
+  },
+  {
     EL_EMPTY_SPACE,			-1, -1, FALSE,
     IMG_EMPTY_SPACE
   },

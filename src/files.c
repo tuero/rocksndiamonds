@@ -240,7 +240,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].modified_settings = FALSE;
     }
-    else if (IS_GROUP_ELEMENT(element))
+    else if (IS_GROUP_ELEMENT(element) || element == EL_INTERNAL_EDITOR)
     {
       /* initialize memory for list of elements in group */
       if (element_info[element].group == NULL)
@@ -741,7 +741,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     {
       Error(ERR_WARN, "invalid custom element number %d", element);
 
-      element = EL_DUMMY;
+      element = EL_INTERNAL_DUMMY;
     }
 
     for (j = 0; j < MAX_ELEMENT_NAME_LEN; j++)

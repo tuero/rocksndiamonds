@@ -436,9 +436,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "invisible steel wall"
   },
   {
-    "unused_63",
-    "unused",
-    "(not used)"
+    "sokoban_field_player",
+    "sokoban",
+    "sokoban field with player"
   },
   {
     "dynabomb_increase_number",
@@ -3830,8 +3830,13 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "dummy",
-    "dummy",
+    "internal/editor",
+    "internal",
+    "-"
+  },
+  {
+    "internal/dummy",
+    "internal",
     "-"
   },
 

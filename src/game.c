@@ -101,11 +101,20 @@
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
 
+#if 1
+#define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(condition) ||			\
+					(DONT_COLLIDE_WITH(e) &&	\
+					 IS_PLAYER(x, y) &&		\
+					 !PLAYER_PROTECTED(x, y))))
+#else
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition) ||			\
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_FREE_OR_PLAYER(x, y))))
+#endif
 
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -625,6 +634,18 @@ static void InitField(int x, int y, boolean init_game)
       InitPlayerField(x, y, element, init_game);
       break;
 
+    case EL_SOKOBAN_FIELD_PLAYER:
+      element = Feld[x][y] = EL_PLAYER_1;
+      InitField(x, y, init_game);
+
+      element = Feld[x][y] = EL_SOKOBAN_FIELD_EMPTY;
+      InitField(x, y, init_game);
+      break;
+
+    case EL_SOKOBAN_FIELD_EMPTY:
+      local_player->sokobanfields_still_needed++;
+      break;
+
     case EL_STONEBLOCK:
       if (x < lev_fieldx-1 && Feld[x+1][y] == EL_ACID)
 	Feld[x][y] = EL_ACID_POOL_TOPLEFT;
@@ -700,10 +721,6 @@ static void InitField(int x, int y, boolean init_game)
 
     case EL_LAMP:
       local_player->lights_still_needed++;
-      break;
-
-    case EL_SOKOBAN_FIELD_EMPTY:
-      local_player->sokobanfields_still_needed++;
       break;
 
     case EL_PENGUIN:
@@ -4685,44 +4702,63 @@ void StartMoving(int x, int y)
       }
     }
 
+#if 1
+
     /*
     else if (move_pattern & MV_MAZE_RUNNER_STYLE && IN_LEV_FIELD(newx, newy))
     */
 
     else if (IS_CUSTOM_ELEMENT(element) &&
-	     CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
+	     CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy)
+
+#if 0
+ &&
+	     !IS_FREE(newx, newy)
+#endif
+
+)
     {
-      int new_element = Feld[newx][newy];
-      int sound;
+#if 0
+      printf("::: '%s' digs '%s' [%d]\n",
+	     element_info[element].token_name,
+	     element_info[Feld[newx][newy]].token_name,
+	     StorePlayer[newx][newy]);
+#endif
 
-      /* no element can dig solid indestructible elements */
-      if (IS_INDESTRUCTIBLE(new_element) &&
-	  !IS_DIGGABLE(new_element) &&
-	  !IS_COLLECTIBLE(new_element))
-	return;
-
-      if (AmoebaNr[newx][newy] &&
-	  (new_element == EL_AMOEBA_FULL ||
-	   new_element == EL_BD_AMOEBA ||
-	   new_element == EL_AMOEBA_GROWING))
+      if (!IS_FREE(newx, newy))
       {
-	AmoebaCnt[AmoebaNr[newx][newy]]--;
-	AmoebaCnt2[AmoebaNr[newx][newy]]--;
+	int new_element = Feld[newx][newy];
+	int sound;
+
+	/* no element can dig solid indestructible elements */
+	if (IS_INDESTRUCTIBLE(new_element) &&
+	    !IS_DIGGABLE(new_element) &&
+	    !IS_COLLECTIBLE(new_element))
+	  return;
+
+	if (AmoebaNr[newx][newy] &&
+	    (new_element == EL_AMOEBA_FULL ||
+	     new_element == EL_BD_AMOEBA ||
+	     new_element == EL_AMOEBA_GROWING))
+	{
+	  AmoebaCnt[AmoebaNr[newx][newy]]--;
+	  AmoebaCnt2[AmoebaNr[newx][newy]]--;
+	}
+
+	if (IS_MOVING(newx, newy))
+	  RemoveMovingField(newx, newy);
+	else
+	{
+	  RemoveField(newx, newy);
+	  DrawLevelField(newx, newy);
+	}
+
+	sound = (IS_DIGGABLE(new_element) ? ACTION_DIGGING :
+		 IS_COLLECTIBLE(new_element) ? ACTION_COLLECTING :
+		 ACTION_BREAKING);
+
+	PlayLevelSoundAction(x, y, sound);
       }
-
-      if (IS_MOVING(newx, newy))
-	RemoveMovingField(newx, newy);
-      else
-      {
-	RemoveField(newx, newy);
-	DrawLevelField(newx, newy);
-      }
-
-      sound = (IS_DIGGABLE(new_element) ? ACTION_DIGGING :
-	       IS_COLLECTIBLE(new_element) ? ACTION_COLLECTING :
-	       ACTION_BREAKING);
-
-      PlayLevelSoundAction(x, y, sound);
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
       {
@@ -4730,6 +4766,9 @@ void StartMoving(int x, int y)
 	PlayerVisit[x][y] /= 8;		/* expire player visit path */
       }
     }
+
+#endif
+
     else if (element == EL_DRAGON && IN_LEV_FIELD(newx, newy))
     {
       if (!IS_FREE(newx, newy))
@@ -5017,6 +5056,7 @@ void ContinueMoving(int x, int y)
 
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
+#if 1
   if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y))
   {
     int new_element = element_info[element].move_leave_element;
@@ -5033,6 +5073,7 @@ void ContinueMoving(int x, int y)
 	DrawLevelFieldCrumbledSandNeighbours(x, y);
     }
   }
+#endif
 
 #if 0
   /* 2.1.1 (does not work correctly for spring) */

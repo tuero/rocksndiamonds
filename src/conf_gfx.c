@@ -624,6 +624,14 @@ struct ConfigInfo image_config[] =
   { "sokoban_field_full.ypos",			"7"			},
   { "sokoban_field_full.frames",		"1"			},
 
+  { "sokoban_field_player",			"RocksHeroes.pcx"	},
+  { "sokoban_field_player.xpos",		"0"			},
+  { "sokoban_field_player.ypos",		"15"			},
+  { "sokoban_field_player.frames",		"1"			},
+  { "sokoban_field_player.EDITOR",		"RocksHeroes.pcx"	},
+  { "sokoban_field_player.EDITOR.xpos",		"1"			},
+  { "sokoban_field_player.EDITOR.ypos",		"15"			},
+
   /* images for Emerald Mine style elements and actions */
 
   { "empty_space",				"RocksSP.pcx"		},
