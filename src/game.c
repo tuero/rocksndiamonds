@@ -192,7 +192,7 @@ static unsigned int getStateCheckSum(int counter)
     checksum += mult++ * Store[x][y];
     checksum += mult++ * Store2[x][y];
     checksum += mult++ * StorePlayer[x][y];
-    checksum += mult++ * Frame[x][y];
+    checksum += mult++ * ExplodePhase[x][y];
     checksum += mult++ * AmoebaNr[x][y];
     checksum += mult++ * JustStopped[x][y];
     checksum += mult++ * Stop[x][y];
@@ -797,12 +797,14 @@ void InitGame()
       Feld[x][y] = Ur[x][y];
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = 0;
-      Frame[x][y] = 0;
-      GfxAction[x][y] = GFX_ACTION_DEFAULT;
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
+      ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
+
+      GfxFrame[x][y] = 0;
+      GfxAction[x][y] = GFX_ACTION_DEFAULT;
     }
   }
 
@@ -1337,6 +1339,9 @@ void InitMovingField(int x, int y, int direction)
   int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
 
+  if (!JustStopped[x][y] || direction != MovDir[x][y])
+    GfxFrame[x][y] = 0;
+
   MovDir[x][y] = direction;
   MovDir[newx][newy] = direction;
 
@@ -1652,7 +1657,7 @@ void Explode(int ex, int ey, int phase, int mode)
       Feld[x][y] = EL_EXPLOSION;
       MovDir[x][y] = MovPos[x][y] = 0;
       AmoebaNr[x][y] = 0;
-      Frame[x][y] = 1;
+      ExplodePhase[x][y] = 1;
       Stop[x][y] = TRUE;
     }
 
@@ -1668,7 +1673,7 @@ void Explode(int ex, int ey, int phase, int mode)
   x = ex;
   y = ey;
 
-  Frame[x][y] = (phase < last_phase ? phase + 1 : 0);
+  ExplodePhase[x][y] = (phase < last_phase ? phase + 1 : 0);
 
   if (phase == first_phase_after_start)
   {
@@ -4975,6 +4980,8 @@ void GameActions()
     if (JustStopped[x][y] > 0)
       JustStopped[x][y]--;
 
+    GfxFrame[x][y]++;
+
 #if DEBUG
     if (IS_BLOCKED(x, y))
     {
@@ -5042,7 +5049,7 @@ void GameActions()
       CheckDynamite(x, y);
 #if 0
     else if (element == EL_EXPLOSION && !game.explosions_delayed)
-      Explode(x, y, Frame[x][y], EX_NORMAL);
+      Explode(x, y, ExplodePhase[x][y], EX_NORMAL);
 #endif
     else if (element == EL_AMOEBA_CREATING)
       AmoebeWaechst(x, y);
@@ -5182,7 +5189,7 @@ void GameActions()
       if (ExplodeField[x][y])
 	Explode(x, y, EX_PHASE_START, ExplodeField[x][y]);
       else if (element == EL_EXPLOSION)
-	Explode(x, y, Frame[x][y], EX_NORMAL);
+	Explode(x, y, ExplodePhase[x][y], EX_NORMAL);
 
       ExplodeField[x][y] = EX_NO_EXPLOSION;
     }

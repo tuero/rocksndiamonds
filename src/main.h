@@ -1688,15 +1688,17 @@ extern short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+extern short		ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
+
+extern int		GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 

@@ -757,7 +757,7 @@ void DrawPlayer(struct PlayerInfo *player)
 		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
 		   IMG_SP_EXPLOSION);
     int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
-    int phase = Frame[last_jx][last_jy] - 1;
+    int phase = ExplodePhase[last_jx][last_jy] - 1;
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
     if (phase >= delay)
@@ -801,8 +801,10 @@ void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
 
 void DrawGraphicAnimation(int x, int y, int graphic)
 {
+  int ux = LEVELX(x), uy = LEVELY(y);
+
   if (!IN_SCR_FIELD(x, y) ||
-      (FrameCounter % new_graphic_info[graphic].anim_delay) != 0)
+      (GfxFrame[ux][uy] % new_graphic_info[graphic].anim_delay) != 0)
     return;
 
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
@@ -1307,7 +1309,11 @@ inline static int getFramePosition(int x, int y)
   else if (IS_MOVING(x, y) || CAN_MOVE(element) || CAN_FALL(element))
     frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
 #else
+
   frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
+
+  frame_pos = GfxFrame[x][y];
+
 #endif
 
   return frame_pos;
