@@ -837,8 +837,8 @@ void HandleHelpScreen(int button)
       for(i=0;i<MAX_HELPSCREEN_ELS;i++)
 	helpscreen_step[i] = helpscreen_frame[i] = helpscreen_delay[i] = 0;
       helpscreen_state++;
-      DrawHelpScreenElText(helpscreen_state*MAX_HELPSCREEN_ELS);
-      DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
+      DrawHelpScreenElText(helpscreen_state * MAX_HELPSCREEN_ELS);
+      DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
     }
     else if (helpscreen_state <
 	     num_helpscreen_els_pages + num_helpscreen_music - 1)
@@ -869,9 +869,15 @@ void HandleHelpScreen(int button)
   {
     if (DelayReached(&hs_delay,GAME_FRAME_DELAY * 2))
     {
-      if (helpscreen_state<num_helpscreen_els_pages)
+      if (helpscreen_state < num_helpscreen_els_pages)
 	DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
     }
+
+    /* !!! workaround for playing "music" that is really a sound loop (and
+       must therefore periodically be reactivated with the current sound
+       engine !!! */
+    PlaySoundLoop(SND_MENU_INFO_SCREEN);
+
     DoAnimation();
   }
 

@@ -140,6 +140,7 @@ static struct
   { ".burning",		SND_ACTION_BURNING,	TRUE },
   { ".growing",		SND_ACTION_UNKNOWN,	TRUE },
   { ".attacking",	SND_ACTION_UNKNOWN,	TRUE },
+  { ".activated",	SND_ACTION_UNKNOWN,	TRUE },
 
   /* other (non-loop) sound actions are optional */
   { ".stepping",	SND_ACTION_MOVING,	FALSE }, /* discrete moving */
@@ -4795,14 +4796,18 @@ void GameActions()
     else if (element == EL_SHIELD_PASSIVE)
     {
       DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_NORMAL);
+#if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_PASSIVE_ACTIVATED);
+#endif
     }
     else if (element == EL_SHIELD_ACTIVE)
     {
       DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_NORMAL);
+#if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_ACTIVE_ACTIVATED);
+#endif
     }
 
     if (game.magic_wall_active)
@@ -4966,6 +4971,19 @@ void GameActions()
       CloseAllOpenTimegates();
   }
 
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    if (SHIELD_ON(player))
+    {
+      if (player->shield_active_time_left)
+	PlaySoundLevel(player->jx, player->jy, SND_SHIELD_ACTIVE_ACTIVATED);
+      else if (player->shield_passive_time_left)
+	PlaySoundLevel(player->jx, player->jy, SND_SHIELD_PASSIVE_ACTIVATED);
+    }
+  }
+
   if (TimeFrames >= (1000 / GameFrameDelay))
   {
     TimeFrames = 0;
@@ -4973,12 +4991,14 @@ void GameActions()
 
     for (i=0; i<MAX_PLAYERS; i++)
     {
-      if (SHIELD_ON(&stored_player[i]))
-      {
-	stored_player[i].shield_passive_time_left--;
+      struct PlayerInfo *player = &stored_player[i];
 
-	if (stored_player[i].shield_active_time_left > 0)
-	  stored_player[i].shield_active_time_left--;
+      if (SHIELD_ON(player))
+      {
+	player->shield_passive_time_left--;
+
+	if (player->shield_active_time_left > 0)
+	  player->shield_active_time_left--;
       }
     }
 

@@ -810,7 +810,12 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 #endif
 
   if (IS_MUSIC(snd_ctrl))
+  {
+    if (num_music == 0)
+      return;
+
     snd_ctrl.nr = snd_ctrl.nr % num_music;
+  }
   else if (snd_ctrl.nr >= num_sounds)
     return;
 
