@@ -722,8 +722,14 @@ void InitElementGraphicInfo()
 
     if (default_graphic == -1)
       default_graphic = IMG_UNKNOWN;
+#if 1
+    if (default_crumbled == -1)
+      default_crumbled = default_graphic;
+#else
+    /* !!! THIS LOOKS CRAPPY FOR SAND ETC. WITHOUT CRUMBLED GRAPHICS !!! */
     if (default_crumbled == -1)
       default_crumbled = IMG_EMPTY;
+#endif
 
     for (dir = 0; dir < NUM_DIRECTIONS; dir++)
     {
@@ -734,8 +740,14 @@ void InitElementGraphicInfo()
 
       if (default_direction_graphic[dir] == -1)
 	default_direction_graphic[dir] = default_graphic;
+#if 1
+      if (default_direction_crumbled[dir] == -1)
+	default_direction_crumbled[dir] = default_direction_graphic[dir];
+#else
+      /* !!! THIS LOOKS CRAPPY FOR SAND ETC. WITHOUT CRUMBLED GRAPHICS !!! */
       if (default_direction_crumbled[dir] == -1)
 	default_direction_crumbled[dir] = default_crumbled;
+#endif
     }
 
     for (act = 0; act < NUM_ACTIONS; act++)
@@ -783,8 +795,14 @@ void InitElementGraphicInfo()
 
       if (default_action_graphic == -1)
 	default_action_graphic = default_graphic;
+#if 1
+      if (default_action_crumbled == -1)
+	default_action_crumbled = default_action_graphic;
+#else
+      /* !!! THIS LOOKS CRAPPY FOR SAND ETC. WITHOUT CRUMBLED GRAPHICS !!! */
       if (default_action_crumbled == -1)
 	default_action_crumbled = default_crumbled;
+#endif
 
       for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
@@ -799,19 +817,30 @@ void InitElementGraphicInfo()
 	     act_turning ?
 	     element_info[i].direction_graphic[ACTION_TURNING][dir] :
 	     default_direction_graphic[dir]);
+#if 1
+	if (default_action_direction_crumbled == -1)
+	  default_action_direction_crumbled = default_action_direction_graphic;
+#else
 	if (default_action_direction_crumbled == -1)
 	  default_action_direction_crumbled =
 	    (act_remove ? default_remove_graphic :
 	     act_turning ?
 	     element_info[i].direction_crumbled[ACTION_TURNING][dir] :
 	     default_direction_crumbled[dir]);
+#endif
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
 	    default_action_direction_graphic;
+#if 1
+	if (element_info[i].direction_crumbled[act][dir] == -1)
+	  element_info[i].direction_crumbled[act][dir] =
+	    element_info[i].direction_graphic[act][dir];
+#else
 	if (element_info[i].direction_crumbled[act][dir] == -1)
 	  element_info[i].direction_crumbled[act][dir] =
 	    default_action_direction_crumbled;
+#endif
       }
 
       /* no graphic for this specific action -- use default action graphic */
@@ -820,11 +849,16 @@ void InitElementGraphicInfo()
 	  (act_remove ? default_remove_graphic :
 	   act_turning ? element_info[i].graphic[ACTION_TURNING] :
 	   default_action_graphic);
+#if 1
+      if (element_info[i].crumbled[act] == -1)
+	element_info[i].crumbled[act] = element_info[i].graphic[act];
+#else
       if (element_info[i].crumbled[act] == -1)
 	element_info[i].crumbled[act] =
 	  (act_remove ? default_remove_graphic :
 	   act_turning ? element_info[i].crumbled[ACTION_TURNING] :
 	   default_action_crumbled);
+#endif
     }
   }
 
@@ -3824,8 +3858,15 @@ void InitElementPropertiesEngine(int engine_version)
 	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
 
     /* ---------- GFX_CRUMBLED --------------------------------------------- */
+#if 1
+    SET_PROPERTY(i, EP_GFX_CRUMBLED,
+		 element_info[i].crumbled[ACTION_DEFAULT] !=
+		 element_info[i].graphic[ACTION_DEFAULT]);
+#else
+    /* !!! THIS LOOKS CRAPPY FOR SAND ETC. WITHOUT CRUMBLED GRAPHICS !!! */
     SET_PROPERTY(i, EP_GFX_CRUMBLED,
 		 element_info[i].crumbled[ACTION_DEFAULT] != IMG_EMPTY);
+#endif
   }
 
 #if 0

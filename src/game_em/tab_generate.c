@@ -4597,6 +4597,12 @@ void create_obj_graphics_info_em()
       g->width = TILEX;
       g->height = TILEY;
 
+      g->has_crumbled_graphics = FALSE;
+      g->crumbled_bitmap = NULL;
+      g->crumbled_src_x = 0;
+      g->crumbled_src_y = 0;
+      g->crumbled_border_size = 0;
+
       /* create unique graphic identifier to decide if tile must be redrawn */
       g->unique_identifier = obj;
     }
@@ -4646,6 +4652,14 @@ void create_spr_graphics_info_em()
 	g->dst_offset_y = 0;
 	g->width = TILEX;
 	g->height = TILEY;
+
+	g->has_crumbled_graphics = FALSE;
+	g->crumbled_bitmap = NULL;
+	g->crumbled_src_x = 0;
+	g->crumbled_src_y = 0;
+	g->crumbled_border_size = 0;
+
+	g->unique_identifier = 0;
       }
     }
   }

@@ -14,6 +14,7 @@ unsigned int screen_y;
 
 /* tiles currently on screen */
 static unsigned int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
+static unsigned int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 
 /* copy the entire screen to the window at the scroll position
@@ -76,27 +77,92 @@ void blitscreen(void)
 
 static void animscreen(void)
 {
-  unsigned int x, y, dx, dy;
-  unsigned int obj;
+  unsigned int x, y, i;
   unsigned int left = screen_x / TILEX;
   unsigned int top = screen_y / TILEY;
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
 
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {
-    dy = y % MAX_BUF_YSIZE;
-
     for (x = left; x < left + MAX_BUF_XSIZE; x++)
     {
+      int dx = x % MAX_BUF_XSIZE;
+      int dy = y % MAX_BUF_YSIZE;    
       int tile = Draw[y][x];
       struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
-
-      dx = x % MAX_BUF_XSIZE;
+      unsigned int obj;
+      unsigned int crm = 0;
 
 #if 1
+
+#if 1
+      /* re-calculate crumbled state of this tile */
+      if (g->has_crumbled_graphics)
+      {
+	for (i = 0; i < 4; i++)
+	{
+	  int xx = x + xy[i][0];
+	  int yy = y + xy[i][1];
+	  int tile_next;
+
+	  if (xx < 0 || xx >= EM_MAX_CAVE_WIDTH ||
+	      yy < 0 || yy >= EM_MAX_CAVE_HEIGHT)
+	    continue;
+
+	  tile_next = Draw[yy][xx];
+
+	  if (!graphic_info_em_object[tile_next][frame].has_crumbled_graphics)
+	    crm |= (1 << i);
+	}
+      }
+#else
+      /* re-calculate crumbled state of this tile */
+      if (tile == Xgrass ||
+	  tile == Xdirt ||
+	  tile == Xfake_grass ||
+	  tile == Xfake_grassB)
+      {
+	for (i = 0; i < 4; i++)
+	{
+	  int xx = x + xy[i][0];
+	  int yy = y + xy[i][1];
+	  int tile2;
+
+	  if (xx < 0 || xx >= EM_MAX_CAVE_WIDTH ||
+	      yy < 0 || yy >= EM_MAX_CAVE_HEIGHT)
+	    continue;
+
+	  tile2 = Draw[yy][xx];
+
+	  if (tile2 == Xgrass ||
+	      tile2 == Xdirt ||
+	      tile2 == Xfake_grass ||
+	      tile2 == Xfake_grassB ||
+	      tile2 == Ygrass_nB ||
+	      tile2 == Ygrass_eB ||
+	      tile2 == Ygrass_sB ||
+	      tile2 == Ygrass_wB ||
+	      tile2 == Ydirt_nB ||
+	      tile2 == Ydirt_eB ||
+	      tile2 == Ydirt_sB ||
+	      tile2 == Ydirt_wB)
+	    continue;
+
+	  crm |= (1 << i);
+	}
+      }
+#endif
+
       /* create unique graphic identifier to decide if tile must be redrawn */
       obj = g->unique_identifier;
 
-      if (1 || screentiles[dy][dx] != obj)
+      if (screentiles[dy][dx] != obj || crumbled_state[dy][dx] != crm)
       {
 	int dst_x = dx * TILEX;
 	int dst_y = dy * TILEY;
@@ -110,7 +176,83 @@ static void animscreen(void)
 		     g->width, g->height,
 		     dst_x + g->dst_offset_x, dst_y + g->dst_offset_y);
 
+#if 1
+	/* add crumbling graphic, if needed */
+	if (crm)
+	{
+	  for (i = 0; i < 4; i++)
+	  {
+	    if (crm & (1 << i))
+	    {
+	      int width, height, cx, cy;
+
+	      if (i == 1 || i == 2)
+	      {
+		width = g->crumbled_border_size;
+		height = TILEY;
+		cx = (i == 2 ? TILEX - g->crumbled_border_size : 0);
+		cy = 0;
+	      }
+	      else
+	      {
+		width = TILEX;
+		height = g->crumbled_border_size;
+		cx = 0;
+		cy = (i == 3 ? TILEY - g->crumbled_border_size : 0);
+	      }
+
+	      if (width > 0 && height > 0)
+		BlitBitmap(g->crumbled_bitmap, screenBitmap,
+			   g->crumbled_src_x + cx, g->crumbled_src_y + cy,
+			   width, height, dst_x + cx, dst_y + cy);
+	    }
+	  }
+	}
+#else
+	/* add crumbling graphic, if needed */
+	if (crm)
+	{
+	  int crumbled_border_size;
+
+	  tile = (tile == Xgrass ? Ygrass_crumbled :
+		  tile == Xdirt ? Ydirt_crumbled :
+		  tile == Xfake_grass ? Yfake_grass_crumbled :
+		  tile == Xfake_grassB ? Yfake_grassB_crumbled : 0);
+	  g = &graphic_info_em_object[tile][frame];
+	  crumbled_border_size = g->border_size;
+
+	  for (i = 0; i < 4; i++)
+	  {
+	    if (crm & (1 << i))
+	    {
+	      int width, height, cx, cy;
+
+	      if (i == 1 || i == 2)
+	      {
+		width = crumbled_border_size;
+		height = TILEY;
+		cx = (i == 2 ? TILEX - crumbled_border_size : 0);
+		cy = 0;
+	      }
+	      else
+	      {
+		width = TILEX;
+		height = crumbled_border_size;
+		cx = 0;
+		cy = (i == 3 ? TILEY - crumbled_border_size : 0);
+	      }
+
+	      if (width > 0 && height > 0)
+		BlitBitmap(g->bitmap, screenBitmap,
+			   g->src_x + cx, g->src_y + cy, width, height,
+			   dst_x + cx, dst_y + cy);
+	    }
+	  }
+	}
+#endif
+
 	screentiles[dy][dx] = obj;
+	crumbled_state[dy][dx] = crm;
       }
 #else
       obj = map_obj[frame][tile];
@@ -337,8 +479,13 @@ void game_initscreen(void)
   screen_y = 0;
 
   for (y = 0; y < MAX_BUF_YSIZE; y++)
+  {
     for (x = 0; x < MAX_BUF_XSIZE; x++)
+    {
       screentiles[y][x] = -1;
+      crumbled_state[y][x] = 0;
+    }
+  }
 
   DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
 			DISPLAY_TIME(lev.time + 4));

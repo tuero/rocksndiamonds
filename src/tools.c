@@ -5729,7 +5729,8 @@ void InitGraphicInfo_EM(void)
       Bitmap *src_bitmap;
       int src_x, src_y;
       /* ensure to get symmetric 3-frame, 2-delay animations as used in EM */
-      boolean special_animation = (g->anim_frames == 3 &&
+      boolean special_animation = (action != ACTION_DEFAULT &&
+				   g->anim_frames == 3 &&
 				   g->anim_delay == 2 &&
 				   g->anim_mode & ANIM_LINEAR);
       int sync_frame = (i == Xdrip_stretch ? 7 :
@@ -5852,7 +5853,31 @@ void InitGraphicInfo_EM(void)
       g_em->dst_offset_y = 0;
       g_em->width  = TILEX;
       g_em->height = TILEY;
+
+      g_em->has_crumbled_graphics = FALSE;
+      g_em->crumbled_bitmap = NULL;
+      g_em->crumbled_src_x = 0;
+      g_em->crumbled_src_y = 0;
+      g_em->crumbled_border_size = 0;
 #endif
+
+#if 1
+      if (element_info[effective_element].crumbled[ACTION_DEFAULT] !=
+	  element_info[effective_element].graphic[ACTION_DEFAULT])
+#else
+      if (element_info[effective_element].crumbled[effective_action] !=
+	  element_info[effective_element].graphic[effective_action])
+#endif
+      {
+	int crumbled_graphic = el_act2crm(effective_element, effective_action);
+	struct GraphicInfo *g_crumbled = &graphic_info[crumbled_graphic];
+
+	g_em->has_crumbled_graphics = TRUE;
+	g_em->crumbled_bitmap = g_crumbled->bitmap;
+	g_em->crumbled_src_x = g_crumbled->src_x;
+	g_em->crumbled_src_y = g_crumbled->src_y;
+	g_em->crumbled_border_size = g_crumbled->border_size;
+      }
 
 #if 1
       if (!g->double_movement && (effective_action == ACTION_FALLING ||
