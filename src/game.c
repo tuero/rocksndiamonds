@@ -1392,6 +1392,15 @@ void StartMoving(int x, int y)
 
   if (CAN_FALL(element) && y<lev_fieldy-1)
   {
+    if (PlayerPushing && PlayerMovPos)
+    {
+      int nextJX = JX + (JX - lastJX);
+      int nextJY = JY + (JY - lastJY);
+
+      if (x == nextJX && y == nextJY)
+	return;
+    }
+
     if (element==EL_MORAST_VOLL)
     {
       if (IS_FREE(x,y+1))
@@ -3035,6 +3044,19 @@ void ScrollFigure(int init)
     DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
     */
 
+
+    if (PlayerPushing)
+    {
+      int nextJX = JX + (JX - lastJX);
+      int nextJY = JY + (JY - lastJY);
+
+      if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
+	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
+      else
+	DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
+  }
+
+
     DrawPlayerField();
 
     return;
@@ -3069,7 +3091,21 @@ void ScrollFigure(int init)
   else
     DrawLevelField(oldJX,oldJY);
 
+  if (PlayerPushing)
+  {
+    int nextJX = JX + (JX - lastJX);
+    int nextJY = JY + (JY - lastJY);
 
+    if (PlayerMovPos)
+    {
+      if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
+	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
+      else
+	DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
+    }
+    else
+      DrawLevelElement(nextJX,nextJY, Feld[nextJX][nextJY]);
+  }
 
   if (!PlayerMovPos)
   {
@@ -3268,7 +3304,8 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
   static long push_delay = 0;
   static int push_delay_value = 5;
 
-  PlayerPushing = FALSE;
+  if (!PlayerMovPos)
+    PlayerPushing = FALSE;
 
   if (mode == DF_NO_PUSH)
   {

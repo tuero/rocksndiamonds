@@ -507,6 +507,26 @@ void DrawPlayerField()
     */
 
 
+
+  if (PlayerPushing && PlayerMovPos)
+  {
+    int nextJX = JX + (JX - lastJX);
+    int nextJY = JY + (JY - lastJY);
+    int px = SCROLLX(nextJX), py = SCROLLY(nextJY);
+
+    if (Feld[JX][JY] == EL_SOKOBAN_FELD_LEER ||
+	Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
+      DrawGraphicShiftedThruMask(px,py,sxx,syy,
+				 GFX_SOKOBAN_OBJEKT,
+				 CUT_NO_CUTTING);
+    else
+      DrawGraphicShifted(px,py,sxx,syy,
+			 el2gfx(Feld[nextJX][nextJY]),
+			 CUT_NO_CUTTING);
+  }
+
+
+
   /* draw things in front of player (EL_DYNAMIT || EL_DYNABOMB) */
 
   if (element == EL_DYNAMIT || element == EL_DYNABOMB)
