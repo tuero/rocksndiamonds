@@ -947,6 +947,7 @@ void InitElementProperties()
     EL_SP_CHIP_RIGHT,
     EL_SP_CHIP_UPPER,
     EL_SP_CHIP_LOWER,
+    EL_SPEED_PILL
   };
   static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
 

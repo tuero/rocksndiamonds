@@ -339,6 +339,7 @@ struct LevelInfo
   int dauer_sieb;
   int dauer_ablenk;
   int amoebe_inhalt;
+  boolean high_speed;
 };
 
 struct LevelDirInfo
@@ -551,9 +552,7 @@ extern int		num_bg_loops;
 #define EL_TROPFEN		18
 #define EL_BOMBE		19
 #define EL_SIEB_INAKTIV		20
-
-#define EL_UNUSED_21		21
-
+#define EL_SPEED_PILL		21
 #define EL_SALZSAEURE		22
 #define EL_AMOEBE_NASS		23
 #define EL_AMOEBE_NORM		24
@@ -916,6 +915,7 @@ extern int		num_bg_loops;
 #define GFX_EDELSTEIN_ROT	152
 #define GFX_EDELSTEIN_LILA	154
 #define GFX_DYNABOMB_XL		156
+#define GFX_SPEED_PILL		158
 #define GFX_SONDE		159
 /* Zeile 10 (160) */
 #define GFX_EDELSTEIN_BD	163

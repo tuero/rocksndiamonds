@@ -389,6 +389,17 @@ void InitGame()
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
+  if (level.high_speed)
+  {
+    MoveSpeed = 4;
+    ScrollStepSize = TILEX/4;
+  }
+  else
+  {
+    MoveSpeed = 8;
+    ScrollStepSize = TILEX/8;
+  }
+
   AllPlayersGone = FALSE;
   SiebAktiv = FALSE;
   SiebCount = 0;
@@ -4106,6 +4117,13 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
+      PlaySoundLevel(x, y, SND_PONG);
+      break;
+
+    case EL_SPEED_PILL:
+      RemoveField(x, y);
+      MoveSpeed = 4;
+      ScrollStepSize = TILEX/4;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 

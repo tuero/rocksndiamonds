@@ -1933,6 +1933,7 @@ int el2gfx(int element)
     case EL_PFEIL_R:		return GFX_PFEIL_R;
     case EL_PFEIL_O:		return GFX_PFEIL_O;
     case EL_PFEIL_U:		return GFX_PFEIL_U;
+    case EL_SPEED_PILL:		return GFX_SPEED_PILL;
     default:
     {
       if (IS_CHAR(element))

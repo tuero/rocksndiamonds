@@ -253,6 +253,8 @@ static void setLevelInfoToDefaults()
   level.dauer_ablenk = 10;
   level.amoebe_inhalt = EL_DIAMANT;
 
+  level.high_speed = FALSE;
+
   strcpy(level.name, "Nameless Level");
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
@@ -395,6 +397,13 @@ void LoadLevel(int level_nr)
 
   if (level.time <= 10)		/* minimum playing time of each level */
     level.time = 10;
+
+  if (file_version == FILE_VERSION_1_0)
+  {
+    Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
+    Error(ERR_WARN, "using high speed movement for player");
+    level.high_speed = TRUE;
+  }
 }
 
 void SaveLevel(int level_nr)

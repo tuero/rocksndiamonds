@@ -364,6 +364,11 @@ int editor_element[] =
   EL_MAUER_Y,
   EL_MAUER_XY,
 
+  EL_SPEED_PILL,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+
   EL_CHAR_A + ('S' - 'A'),
   EL_CHAR_A + ('O' - 'A'),
   EL_CHAR_A + ('K' - 'A'),
