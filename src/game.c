@@ -144,9 +144,14 @@
 					Feld[x][y] == EL_EXIT_OPEN ||	\
 					Feld[x][y] == EL_ACID))
 
+#if 1
+#define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
+		(IN_LEV_FIELD(x, y) && IS_FREE(x, y))
+#else
 #define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
+#endif
 
 #define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
@@ -1124,6 +1129,8 @@ void InitGame()
     player->push_delay = 0;
     player->push_delay_value = game.initial_push_delay_value;
 
+    player->drop_delay = 0;
+
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
 
@@ -1607,7 +1614,10 @@ void InitMovDir(int x, int y)
 	  MovDir[x][y] = element_info[element].move_direction_initial;
 	else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS ||
 		 element_info[element].move_pattern == MV_TURNING_LEFT ||
-		 element_info[element].move_pattern == MV_TURNING_RIGHT)
+		 element_info[element].move_pattern == MV_TURNING_RIGHT ||
+		 element_info[element].move_pattern == MV_TURNING_LEFT_RIGHT ||
+		 element_info[element].move_pattern == MV_TURNING_RIGHT_LEFT ||
+		 element_info[element].move_pattern == MV_TURNING_RANDOM)
 	  MovDir[x][y] = 1 << RND(4);
 	else if (element_info[element].move_pattern == MV_HORIZONTAL)
 	  MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
@@ -2136,6 +2146,9 @@ void RelocatePlayer(int x, int y, int element)
 {
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
 
+  if (player->GameOver)		/* do not reanimate dead player */
+    return;
+
 #if 1
   RemoveField(x, y);		/* temporarily remove newly placed player */
   DrawLevelField(x, y);
@@ -2524,6 +2537,12 @@ void Explode(int ex, int ey, int phase, int mode)
 		   IMG_SP_EXPLOSION);
 #endif
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
+
+#if 0
+    printf("::: %d ['%s'] -> %d\n", GfxElement[x][y],
+	   element_info[GfxElement[x][y]].token_name,
+	   graphic);
+#endif
 
     if (phase == delay)
       DrawLevelFieldCrumbledSand(x, y);
@@ -3680,9 +3699,12 @@ inline static void TurnRoundExt(int x, int y)
       }
     }
   }
-  else if (move_pattern == MV_ALL_DIRECTIONS ||
-	   move_pattern == MV_TURNING_LEFT ||
-	   move_pattern == MV_TURNING_RIGHT)
+  else if (move_pattern == MV_TURNING_LEFT ||
+	   move_pattern == MV_TURNING_RIGHT ||
+	   move_pattern == MV_TURNING_LEFT_RIGHT ||
+	   move_pattern == MV_TURNING_RIGHT_LEFT ||
+	   move_pattern == MV_TURNING_RANDOM ||
+	   move_pattern == MV_ALL_DIRECTIONS)
   {
     boolean can_turn_left  = ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
     boolean can_turn_right = ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
@@ -3691,6 +3713,14 @@ inline static void TurnRoundExt(int x, int y)
       MovDir[x][y] = left_dir;
     else if (move_pattern == MV_TURNING_RIGHT)
       MovDir[x][y] = right_dir;
+    else if (move_pattern == MV_TURNING_LEFT_RIGHT)
+      MovDir[x][y] = (can_turn_left || !can_turn_right ? left_dir : right_dir);
+    else if (move_pattern == MV_TURNING_RIGHT_LEFT)
+      MovDir[x][y] = (can_turn_right || !can_turn_left ? right_dir : left_dir);
+    else if (move_pattern == MV_TURNING_RANDOM)
+      MovDir[x][y] = (can_turn_left && !can_turn_right ? left_dir :
+		      can_turn_right && !can_turn_left ? right_dir :
+		      RND(2) ? left_dir : right_dir);
     else if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
     else if (can_turn_left)
@@ -4267,7 +4297,10 @@ void StartMoving(int x, int y)
 	  element != EL_PACMAN &&
 	  !(move_pattern & MV_ANY_DIRECTION) &&
 	  move_pattern != MV_TURNING_LEFT &&
-	  move_pattern != MV_TURNING_RIGHT)
+	  move_pattern != MV_TURNING_RIGHT &&
+	  move_pattern != MV_TURNING_LEFT_RIGHT &&
+	  move_pattern != MV_TURNING_RIGHT_LEFT &&
+	  move_pattern != MV_TURNING_RANDOM)
       {
 	TurnRound(x, y);
 
@@ -4502,7 +4535,11 @@ void StartMoving(int x, int y)
     else if ((move_pattern & MV_MAZE_RUNNER_STYLE ||
 	      element == EL_MAZE_RUNNER) && IN_LEV_FIELD(newx, newy))
     {
+#if 1
+      if (IS_FREE(newx, newy))
+#else
       if (IS_FOOD_DARK_YAMYAM(Feld[newx][newy]))
+#endif
       {
 	if (IS_MOVING(newx, newy))
 	  RemoveMovingField(newx, newy);
@@ -4881,8 +4918,10 @@ void ContinueMoving(int x, int y)
 
   if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
   {
+    int hitting_element = Feld[newx][newy];
+
     /* !!! fix side (direction) orientation here and elsewhere !!! */
-    CheckElementSideChange(newx, newy, Feld[newx][newy],
+    CheckElementSideChange(newx, newy, hitting_element,
 			   direction, CE_COLLISION_ACTIVE, -1);
 
 #if 0
@@ -4899,7 +4938,6 @@ void ContinueMoving(int x, int y)
       int opposite_direction = opposite_directions[move_dir_bit];
       int hitting_side = direction;
       int touched_side = opposite_direction;
-      int hitting_element = Feld[newx][newy];
       int touched_element = MovingOrBlocked2Element(nextx, nexty);
       boolean object_hit = (!IS_MOVING(nextx, nexty) ||
 			    MovDir[nextx][nexty] != direction ||
@@ -4909,7 +4947,7 @@ void ContinueMoving(int x, int y)
       {
 	int i;
 
-	CheckElementSideChange(nextx, nexty, Feld[nextx][nexty],
+	CheckElementSideChange(nextx, nexty, touched_element,
 			       opposite_direction, CE_COLLISION_PASSIVE, -1);
 
 	if (IS_CUSTOM_ELEMENT(hitting_element) &&
@@ -7094,6 +7132,9 @@ void GameActions()
 
     if (stored_player[i].MovPos != 0)
       stored_player[i].StepFrame += move_frames;
+
+    if (stored_player[i].drop_delay > 0)
+      stored_player[i].drop_delay--;
   }
 #endif
 
@@ -7292,6 +7333,8 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
     (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
   player->step_counter++;
+
+  player->drop_delay = 0;
 
   PlayerVisit[jx][jy] = FrameCounter;
 
@@ -8848,8 +8891,9 @@ boolean DropElement(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
   int old_element;
+  int new_element;
 
-  if (!player->active || player->MovPos)
+  if (!player->active || player->MovPos || player->drop_delay > 0)
     return FALSE;
 
   old_element = Feld[jx][jy];
@@ -8871,14 +8915,24 @@ boolean DropElement(struct PlayerInfo *player)
   if (old_element != EL_EMPTY)
     Back[jx][jy] = old_element;		/* store old element on this field */
 
+
+
+  /* !!! CHANGE !!! CHANGE !!! */
+
+#if 0
   MovDelay[jx][jy] = 96;
+#endif
+
+  /* !!! CHANGE !!! CHANGE !!! */
+
+
 
   ResetGfxAnimation(jx, jy);
   ResetRandomAnimationValue(jx, jy);
 
   if (player->inventory_size > 0)
   {
-    int new_element = player->inventory_element[--player->inventory_size];
+    new_element = player->inventory_element[--player->inventory_size];
 
     Feld[jx][jy] = (new_element == EL_DYNAMITE ? EL_DYNAMITE_ACTIVE :
 		    new_element == EL_SP_DISK_RED ? EL_SP_DISK_RED_ACTIVE :
@@ -8908,7 +8962,51 @@ boolean DropElement(struct PlayerInfo *player)
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
 
     PlayLevelSoundAction(jx, jy, ACTION_DROPPING);
+
+    MovDelay[jx][jy] = 96;
   }
+
+
+
+#if 1
+  InitField(jx, jy, FALSE);
+  if (CAN_MOVE(Feld[jx][jy]))
+    InitMovDir(jx, jy);
+
+  new_element = Feld[jx][jy];
+
+  if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
+      element_info[new_element].move_pattern == MV_PROJECTILE)
+  {
+    int direction, dx, dy, nextx, nexty;
+
+    if (element_info[new_element].move_direction_initial == MV_NO_MOVING)
+      MovDir[jx][jy] = player->MovDir;
+
+    direction = MovDir[jx][jy];
+    dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+    dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+    nextx = jx + dx;
+    nexty = jy + dy;
+
+    if (IN_LEV_FIELD(nextx, nexty) && IS_FREE(nextx, nexty))
+    {
+      InitMovingField(jx, jy, MovDir[jx][jy]);
+      ContinueMoving(jx, jy);
+    }
+    else
+    {
+      Changed[jx][jy] = 0;            /* allow another change */
+      CheckElementSideChange(jx, jy, new_element,
+			     direction, CE_COLLISION_ACTIVE, -1);
+    }
+  }
+
+#endif
+
+  player->drop_delay = 8 + 8 + 8;
+
+
 
   return TRUE;
 }

@@ -229,6 +229,10 @@
 #define MV_BIT_WHEN_PUSHED	10
 #define MV_BIT_MAZE_RUNNER	11
 #define MV_BIT_MAZE_HUNTER	12
+#define MV_BIT_PROJECTILE	13
+#define MV_BIT_TURNING_LEFT_RIGHT 14
+#define MV_BIT_TURNING_RIGHT_LEFT 15
+#define MV_BIT_TURNING_RANDOM	16
 
 /* values for special move patterns for custom elements */
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
@@ -245,6 +249,10 @@
 #define MV_MAZE_RUNNER		(1 << MV_BIT_MAZE_RUNNER)
 #define MV_MAZE_HUNTER		(1 << MV_BIT_MAZE_HUNTER)
 #define MV_MAZE_RUNNER_STYLE	(MV_MAZE_RUNNER | MV_MAZE_HUNTER)
+#define MV_PROJECTILE		(1 << MV_BIT_PROJECTILE)
+#define MV_TURNING_LEFT_RIGHT	(1 << MV_BIT_TURNING_LEFT_RIGHT)
+#define MV_TURNING_RIGHT_LEFT	(1 << MV_BIT_TURNING_RIGHT_LEFT)
+#define MV_TURNING_RANDOM	(1 << MV_BIT_TURNING_RANDOM)
 
 /* values for slippery property for custom elements */
 #define SLIPPERY_ANY_RANDOM	0
@@ -1177,7 +1185,7 @@ struct PlayerInfo
 {
   boolean present;		/* player present in level playfield */
   boolean connected;		/* player connected (locally or via network) */
-  boolean active;		/* player (present && connected) */
+  boolean active;		/* player present and connected */
 
   int index_nr, client_nr, element_nr;
 
@@ -1235,6 +1243,8 @@ struct PlayerInfo
   unsigned long push_delay_value;
 
   unsigned long actual_frame_counter;
+
+  int drop_delay;
 
   int step_counter;
 

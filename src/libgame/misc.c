@@ -1880,6 +1880,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   new_list_entry = &(*list)[*num_list_entries - 1];
 
   new_list_entry->token = getStringCopy(token);
+  new_list_entry->default_filename = NULL;
   new_list_entry->filename = NULL;
   new_list_entry->parameter = checked_calloc(parameter_array_size);
 
@@ -2549,8 +2550,16 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 #endif
 
   for (i = 0; i < num_dynamic_file_list_entries; i++)
+  {
     LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
 		      dynamic_file_list[i].filename, i);
+
+#if 0
+    printf("::: '%s', '0x%08x'\n",
+	   dynamic_file_list[i].filename,
+	   dynamic_file_list[i].default_filename);
+#endif
+  }
 
 #if 0
   dumpList(artwork_info->content_list);

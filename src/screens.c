@@ -2395,7 +2395,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
     { &custom_key.up,    "Joystick Up"    },
     { &custom_key.down,  "Joystick Down"  },
     { &custom_key.snap,  "Button 1"       },
-    { &custom_key.bomb,  "Button 2"       }
+    { &custom_key.drop,  "Button 2"       }
   };
   static char *joystick_name[MAX_PLAYERS] =
   {
@@ -2440,7 +2440,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   DrawText(mSX+2*32, mSY+8*32, ":", FONT_VALUE_OLD);
   DrawText(mSX+2*32, mSY+9*32, ":", FONT_VALUE_OLD);
   DrawText(mSX+32, mSY+10*32, "Snap Field:", FONT_VALUE_OLD);
-  DrawText(mSX+32, mSY+12*32, "Place Bomb:", FONT_VALUE_OLD);
+  DrawText(mSX+32, mSY+12*32, "Drop Element:", FONT_VALUE_OLD);
 
   for (i = 0; i < 6; i++)
   {
@@ -2586,12 +2586,12 @@ void CustomizeKeyboard(int player_nr)
     char *text;
   } customize_step[] =
   {
-    { &custom_key.left,  "Move Left"  },
-    { &custom_key.right, "Move Right" },
-    { &custom_key.up,    "Move Up"    },
-    { &custom_key.down,  "Move Down"  },
-    { &custom_key.snap,  "Snap Field" },
-    { &custom_key.bomb,  "Place Bomb" }
+    { &custom_key.left,  "Move Left"	},
+    { &custom_key.right, "Move Right"	},
+    { &custom_key.up,    "Move Up"	},
+    { &custom_key.down,  "Move Down"	},
+    { &custom_key.snap,  "Snap Field"	},
+    { &custom_key.drop,  "Drop Element"	}
   };
 
   /* read existing key bindings from player setup */

@@ -1,4 +1,10 @@
 
+2003-12-27
+	* changed default snap/drop keys from left/right Shift to Control keys
+
+2003-12-27
+	* fixed bug with dead player getting reanimated from custom element
+
 2003-12-14
 	* fixed bug with wrong penguin graphics (when entering exit)
 

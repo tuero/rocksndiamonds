@@ -55,10 +55,10 @@
 #define DEFAULT_KEY_DOWN	KSYM_Down
 #if defined(PLATFORM_MACOSX)
 #define DEFAULT_KEY_SNAP	KSYM_Control_L
-#define DEFAULT_KEY_BOMB	KSYM_KP_Enter
+#define DEFAULT_KEY_DROP	KSYM_KP_Enter
 #else
-#define DEFAULT_KEY_SNAP	KSYM_Shift_L
-#define DEFAULT_KEY_BOMB	KSYM_Shift_R
+#define DEFAULT_KEY_SNAP	KSYM_Control_L
+#define DEFAULT_KEY_DROP	KSYM_Control_R
 #endif
 #define DEFAULT_KEY_OKAY	KSYM_Return
 #define DEFAULT_KEY_CANCEL	KSYM_Escape
@@ -521,18 +521,13 @@ struct SetupJoystickInfo
 
   int xleft, xmiddle, xright;
   int yupper, ymiddle, ylower;
-  int snap;
-  int bomb;
+  int snap, drop;
 };
 
 struct SetupKeyboardInfo
 {
-  Key left;
-  Key right;
-  Key up;
-  Key down;
-  Key snap;
-  Key bomb;
+  Key left, right, up, down;
+  Key snap, drop;
 };
 
 struct SetupInputInfo

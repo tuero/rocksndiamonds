@@ -1070,11 +1070,16 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_ALONG_RIGHT_SIDE,	"along right side"		},
   { MV_TURNING_LEFT,		"turning left"			},
   { MV_TURNING_RIGHT,		"turning right"			},
+  { MV_TURNING_LEFT_RIGHT,	"turning left, right"		},
+  { MV_TURNING_RIGHT_LEFT,	"turning right, left"		},
+  { MV_TURNING_RANDOM,		"turning random"		},
   { MV_WHEN_PUSHED,		"when pushed"			},
-#if 0
+#if 1
   { MV_MAZE_RUNNER,		"maze runner style"		},
   { MV_MAZE_HUNTER,		"maze hunter style"		},
 #endif
+  { MV_PROJECTILE,		"projectile style"		},
+  { MV_PROJECTILE,		"projectile style"		},
   { -1,				NULL				}
 };
 

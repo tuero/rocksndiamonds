@@ -2329,13 +2329,13 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_PLAYER_JOY_YMIDDLE		6
 #define SETUP_TOKEN_PLAYER_JOY_YLOWER		7
 #define SETUP_TOKEN_PLAYER_JOY_SNAP		8
-#define SETUP_TOKEN_PLAYER_JOY_BOMB		9
+#define SETUP_TOKEN_PLAYER_JOY_DROP		9
 #define SETUP_TOKEN_PLAYER_KEY_LEFT		10
 #define SETUP_TOKEN_PLAYER_KEY_RIGHT		11
 #define SETUP_TOKEN_PLAYER_KEY_UP		12
 #define SETUP_TOKEN_PLAYER_KEY_DOWN		13
 #define SETUP_TOKEN_PLAYER_KEY_SNAP		14
-#define SETUP_TOKEN_PLAYER_KEY_BOMB		15
+#define SETUP_TOKEN_PLAYER_KEY_DROP		15
 
 #define NUM_PLAYER_SETUP_TOKENS			16
 
@@ -2418,13 +2418,13 @@ static struct TokenInfo player_setup_tokens[] =
   { TYPE_INTEGER, &sii.joy.ymiddle,	".joy.ymiddle"			},
   { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
   { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
-  { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
+  { TYPE_INTEGER, &sii.joy.drop,	".joy.place_bomb"		},
   { TYPE_KEY_X11, &sii.key.left,	".key.move_left"		},
   { TYPE_KEY_X11, &sii.key.right,	".key.move_right"		},
   { TYPE_KEY_X11, &sii.key.up,		".key.move_up"			},
   { TYPE_KEY_X11, &sii.key.down,	".key.move_down"		},
   { TYPE_KEY_X11, &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEY_X11, &sii.key.bomb,	".key.place_bomb"		}
+  { TYPE_KEY_X11, &sii.key.drop,	".key.place_bomb"		}
 };
 
 static struct TokenInfo system_setup_tokens[] =
@@ -2513,13 +2513,13 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
     si->input[i].joy.ylower  = JOYSTICK_YLOWER;
     si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
-    si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+    si->input[i].joy.drop  = (i == 0 ? JOY_BUTTON_2 : 0);
     si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KSYM_UNDEFINED);
     si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KSYM_UNDEFINED);
     si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KSYM_UNDEFINED);
     si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KSYM_UNDEFINED);
     si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
-    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KSYM_UNDEFINED);
+    si->input[i].key.drop  = (i == 0 ? DEFAULT_KEY_DROP  : KSYM_UNDEFINED);
   }
 
   si->system.sdl_audiodriver = getStringCopy(ARG_DEFAULT);
