@@ -3026,6 +3026,7 @@ int el2gfx_OLD(int element)
     case EL_EXIT_CLOSED:		return GFX_AUSGANG_ZU;
     case EL_AUSGANG_ACT:		return GFX_AUSGANG_ACT;
     case EL_EXIT_OPEN:			return GFX_AUSGANG_AUF;
+    case EL_SP_EXIT_OPEN:		return GFX_SP_EXIT;
     case EL_PLAYER:			return GFX_SPIELFIGUR;
     case EL_PLAYER1:			return GFX_SPIELER1;
     case EL_PLAYER2:			return GFX_SPIELER2;

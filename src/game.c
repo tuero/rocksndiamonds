@@ -3910,18 +3910,32 @@ void SiebAktivieren(int x, int y, int typ)
 
 void AusgangstuerPruefen(int x, int y)
 {
-  if (!local_player->gems_still_needed &&
-      !local_player->sokobanfields_still_needed &&
-      !local_player->lights_still_needed)
-  {
-    Feld[x][y] = EL_AUSGANG_ACT;
+  if (local_player->gems_still_needed > 0 ||
+      local_player->sokobanfields_still_needed > 0 ||
+      local_player->lights_still_needed > 0)
+    return;
 
-    PlaySoundLevel(x < LEVELX(BX1) ? LEVELX(BX1) :
-		   (x > LEVELX(BX2) ? LEVELX(BX2) : x),
-		   y < LEVELY(BY1) ? LEVELY(BY1) :
-		   (y > LEVELY(BY2) ? LEVELY(BY2) : y),
-		   SND_EXIT_OPENING);
-  }
+  Feld[x][y] = EL_AUSGANG_ACT;
+
+  PlaySoundLevel(x < LEVELX(BX1) ? LEVELX(BX1) :
+		 (x > LEVELX(BX2) ? LEVELX(BX2) : x),
+		 y < LEVELY(BY1) ? LEVELY(BY1) :
+		 (y > LEVELY(BY2) ? LEVELY(BY2) : y),
+		 SND_EXIT_OPENING);
+}
+
+void AusgangstuerPruefen_SP(int x, int y)
+{
+  if (local_player->gems_still_needed > 0)
+    return;
+
+  Feld[x][y] = EL_SP_EXIT_OPEN;
+
+  PlaySoundLevel(x < LEVELX(BX1) ? LEVELX(BX1) :
+		 (x > LEVELX(BX2) ? LEVELX(BX2) : x),
+		 y < LEVELY(BY1) ? LEVELY(BY1) :
+		 (y > LEVELY(BY2) ? LEVELY(BY2) : y),
+		 SND_SP_EXIT_OPENING);
 }
 
 void AusgangstuerOeffnen(int x, int y)
@@ -4771,10 +4785,14 @@ void GameActions()
       BreakingPearl(x, y);
     else if (element == EL_EXIT_CLOSED)
       AusgangstuerPruefen(x, y);
+    else if (element == EL_SP_EXIT_CLOSED)
+      AusgangstuerPruefen_SP(x, y);
     else if (element == EL_AUSGANG_ACT)
       AusgangstuerOeffnen(x, y);
     else if (element == EL_EXIT_OPEN)
       AusgangstuerBlinken(x, y);
+    else if (element == EL_SP_EXIT_OPEN)
+      ;		/* !!! ADD SOME (OPTIONAL) ANIMATIONS HERE !!! */
     else if (element == EL_MAUERND)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
@@ -5436,11 +5454,13 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     player->last_jx = jx;
     player->last_jy = jy;
 
-    if (Feld[jx][jy] == EL_EXIT_OPEN)
+    if (Feld[jx][jy] == EL_EXIT_OPEN ||
+	Feld[jx][jy] == EL_SP_EXIT_OPEN)
     {
       RemoveHero(player);
 
-      if (!local_player->friends_still_needed)
+      if (local_player->friends_still_needed == 0 ||
+	  Feld[jx][jy] == EL_SP_EXIT_OPEN)
 	player->LevelSolved = player->GameOver = TRUE;
     }
 
@@ -6056,14 +6076,6 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_SP_EXIT_CLOSED:
-      if (local_player->gems_still_needed > 0)
-	return MF_NO_ACTION;
-
-      player->LevelSolved = player->GameOver = TRUE;
-      PlaySoundStereo(SND_SP_EXIT_PASSING, SOUND_MAX_RIGHT);
-      break;
-
       /* the following elements cannot be pushed by "snapping" */
     case EL_ROCK:
     case EL_BOMB:
@@ -6274,16 +6286,20 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_EXIT_CLOSED:
+    case EL_SP_EXIT_CLOSED:
     case EL_AUSGANG_ACT:
-      /* door is not (yet) open */
       return MF_NO_ACTION;
       break;
 
     case EL_EXIT_OPEN:
+    case EL_SP_EXIT_OPEN:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
 
-      PlaySoundLevel(x, y, SND_EXIT_PASSING);
+      if (element == EL_EXIT_OPEN)
+	PlaySoundLevel(x, y, SND_EXIT_PASSING);
+      else
+	PlaySoundLevel(x, y, SND_SP_EXIT_PASSING);
 
       break;
 
