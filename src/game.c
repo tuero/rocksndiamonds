@@ -1114,8 +1114,10 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
     {
+      /* put moving element to center field (and let it explode there) */
       center_element = MovingOrBlocked2Element(ex, ey);
       RemoveMovingField(ex, ey);
+      Feld[ex][ey] = center_element;
     }
 
     for (y=ey-1; y<=ey+1; y++) for(x=ex-1; x<=ex+1; x++)

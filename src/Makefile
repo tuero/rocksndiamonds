@@ -59,7 +59,7 @@ PROGNAME = ../rocksndiamonds
 LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
 else
 RM = del
-PROGNAME = ..\rocks.exe
+PROGNAME = ../rocks.exe
 LIBS = -lm -lalleg
 endif
 
