@@ -586,6 +586,8 @@ void DrawPlayer(struct PlayerInfo *player)
 	graphic = GFX_MURPHY_GO_LEFT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
 	graphic = GFX_MURPHY_GO_RIGHT;
+      else
+	graphic = GFX_MURPHY_GO_LEFT;
 
       graphic += getGraphicAnimationPhase(3, 2, ANIM_OSCILLATE);
     }
