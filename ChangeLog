@@ -1,5 +1,6 @@
 2004-05-05
 	* fixed bug that caused two activated toolbox buttons in level editor
+	* fixed bug with exploding dynabomb under player due to other explosion
 
 2004-05-02
 	* fixed bug with creating walkable custom element under player (again)

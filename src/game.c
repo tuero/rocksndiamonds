@@ -3059,9 +3059,16 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
 #else
       /* indestructible elements can only explode in center (but not flames) */
+#if 1
+      if ((IS_EXPLOSION_PROOF(element) && (x != ex || y != ey ||
+					   mode == EX_TYPE_BORDER)) ||
+	  element == EL_FLAMES)
+	continue;
+#else
       if ((IS_EXPLOSION_PROOF(element) && (x != ex || y != ey)) ||
 	  element == EL_FLAMES)
 	continue;
+#endif
 #endif
 
 #else
@@ -3075,7 +3082,7 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 1
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)) &&
 	  (game.engine_version < VERSION_IDENT(3,1,0,0) ||
-	   (x == ex && y == ey)))
+	   (x == ex && y == ey && mode != EX_TYPE_BORDER)))
 #else
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
 #endif
@@ -3090,6 +3097,12 @@ void Explode(int ex, int ey, int phase, int mode)
 	  Feld[x][y] = (Store[x][y] ? Store[x][y] : EL_EMPTY);
 	  Store[x][y] = 0;
 #endif
+
+#if 0
+	printf("::: %d,%d: %d %s [%d, %d]\n", x, y, Feld[x][y],
+	       element_info[Feld[x][y]].token_name,
+	       Store[x][y], Store2[x][y]);
+#endif
 	}
 
 	continue;
@@ -3101,9 +3114,15 @@ void Explode(int ex, int ey, int phase, int mode)
 	Back[x][y] = element;
 #else
 #if 1
+#if 1
+      if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element) &&
+	  (x != ex || y != ey || mode == EX_TYPE_BORDER))
+	Back[x][y] = element;
+#else
       if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element) &&
 	  (x != ex || y != ey))
 	Back[x][y] = element;
+#endif
 #else
       if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
@@ -3192,9 +3211,14 @@ void Explode(int ex, int ey, int phase, int mode)
       else
 	Store[x][y] = EL_EMPTY;
 
-      if (x != ex || y != ey ||
-	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_TYPE_BORDER)
+      if (x != ex || y != ey || mode == EX_TYPE_BORDER ||
+	  center_element == EL_AMOEBA_TO_DIAMOND)
 	Store2[x][y] = element;
+
+#if 0
+      printf("::: %d,%d: %d %s\n", x, y, Store2[x][y],
+	     element_info[Store2[x][y]].token_name);
+#endif
 
 #if 0
       if (AmoebaNr[x][y] &&
@@ -3241,6 +3265,11 @@ void Explode(int ex, int ey, int phase, int mode)
     if (center_element == EL_YAMYAM)
       game.yamyam_content_nr =
 	(game.yamyam_content_nr + 1) % level.num_yamyam_contents;
+
+#if 0
+  printf("::: %d,%d: %d %s [%d]\n", ex + 1, ey, Feld[ex + 1][ey],
+	 element_info[Feld[ex + 1][ey]].token_name, Store2[ex + 1][ey]);
+#endif
 
     return;
   }
@@ -3296,6 +3325,11 @@ void Explode(int ex, int ey, int phase, int mode)
 #endif
 
 #if 0
+  printf("::: %d,%d: %d %s [%d]\n", x, y, border_element,
+	 element_info[border_element].token_name, Store2[x][y]);
+#endif
+
+#if 0
   printf("::: phase == %d\n", phase);
 #endif
 
@@ -3325,6 +3359,11 @@ void Explode(int ex, int ey, int phase, int mode)
     }
     else if (CAN_EXPLODE_BY_EXPLOSION(border_element))
     {
+#if 0
+      printf("::: %d,%d: %d %s\n", x, y, border_element,
+	     element_info[border_element].token_name);
+#endif
+
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
       Bang(x, y);
