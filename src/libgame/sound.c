@@ -179,6 +179,29 @@ void UnixCloseAudio(void)
     kill(audio.mixer_pid, SIGTERM);
 }
 
+static void WriteSoundControlToPipe(struct SoundControl snd_ctrl)
+{
+  if (audio.mixer_pid == 0)		/* we are child process */
+    return;
+
+  if (write(audio.mixer_pipe[1], &snd_ctrl, sizeof(struct SoundControl)) < 0)
+  {
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
+    audio.sound_available = audio.sound_enabled = FALSE;
+    return;
+  }
+}
+
+static void ReadSoundControlFromPipe(struct SoundControl *snd_ctrl)
+{
+  if (audio.mixer_pid != 0)		/* we are parent process */
+    return;
+
+  if (read(audio.mixer_pipe[0], snd_ctrl, sizeof(struct SoundControl))
+      != sizeof(struct SoundControl))
+    Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+}
+
 static void WriteReloadInfoToPipe(char *set_name, int type)
 {
   struct SoundControl snd_ctrl;
@@ -517,6 +540,20 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
 {
   int i;
 
+#if defined(PLATFORM_MSDOS)
+  for (i=0; i<audio.num_channels; i++)
+  {
+    if (!mixer[i].active || IS_LOOP(mixer[i]))
+      continue;
+
+    mixer[i].playingpos = voice_get_position(mixer[i].voice);
+    mixer[i].volume = voice_get_volume(mixer[i].voice);
+
+    if (mixer[i].playingpos == -1 || mixer[i].volume == 0)
+      Mixer_RemoveSound(i);
+  }
+#endif /* PLATFORM_MSDOS */
+
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
     ReadReloadInfoFromPipe(snd_ctrl);
@@ -848,9 +885,8 @@ void Mixer_Main()
     select(audio.mixer_pipe[0] + 1, &mixer_fdset, NULL, NULL, NULL);
     if (!FD_ISSET(audio.mixer_pipe[0], &mixer_fdset))
       continue;
-    if (read(audio.mixer_pipe[0], &snd_ctrl, sizeof(snd_ctrl))
-	!= sizeof(snd_ctrl))
-      Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+
+    ReadSoundControlFromPipe(&snd_ctrl);
 
     HandleSoundRequest(snd_ctrl);
 
@@ -900,27 +936,6 @@ void Mixer_Main()
   }
 }
 #endif /* PLATFORM_UNIX */
-
-#if defined(PLATFORM_MSDOS)
-static void sound_handler(struct SoundControl snd_ctrl)
-{
-  for (i=0; i<audio.num_channels; i++)
-  {
-    if (!mixer[i].active || mixer[i].loop)
-      continue;
-
-    mixer[i].playingpos = voice_get_position(mixer[i].voice);
-    mixer[i].volume = voice_get_volume(mixer[i].voice);
-    if (mixer[i].playingpos == -1 || !mixer[i].volume)
-    {
-      deallocate_voice(mixer[i].voice);
-      Mixer_RemoveSound(i);
-    }
-  }
-
-  HandleSoundRequest(snd_ctrl);
-}
-#endif /* PLATFORM_MSDOS */
 
 
 /* ------------------------------------------------------------------------- */
@@ -1575,17 +1590,13 @@ void PlaySoundExt(int nr, int volume, int stereo, int state)
     Mix_PlayChannel(-1, Sound[nr]->data_ptr, (state & SND_CTRL_LOOP ? -1 : 0));
   }
 #elif defined(PLATFORM_UNIX)
-  if (audio.mixer_pid == 0)		/* we are child process */
-    return;
 
-  if (write(audio.mixer_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
-  {
-    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
-    audio.sound_available = audio.sound_enabled = FALSE;
-    return;
-  }
+  WriteSoundControlToPipe(snd_ctrl);
+
 #elif defined(PLATFORM_MSDOS)
-  sound_handler(snd_ctrl);
+
+  HandleSoundRequest(snd_ctrl);
+
 #endif
 }
 
@@ -1677,17 +1688,12 @@ void StopSoundExt(int nr, int state)
 
 #elif !defined(PLATFORM_MSDOS)
 
-  if (audio.mixer_pid == 0)		/* we are child process */
-    return;
+  WriteSoundControlToPipe(snd_ctrl);
 
-  if (write(audio.mixer_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
-  {
-    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
-    audio.sound_available = audio.sound_enabled = FALSE;
-    return;
-  }
 #else /* PLATFORM_MSDOS */
-  sound_handler(snd_ctrl);
+
+  HandleSoundRequest(snd_ctrl);
+
 #endif
 }
 
