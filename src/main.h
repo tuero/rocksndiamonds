@@ -1029,16 +1029,22 @@
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
 #define PROGRAM_VERSION_PATCH	7
-#define PROGRAM_VERSION_RELEASE	0
+#define PROGRAM_VERSION_BUILD	1
+
+#if 0
 #define PROGRAM_VERSION_STRING	"3.0.7"
+#endif
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_RIGHTS_STRING	"Copyright ©1995-2003 by"
+#define PROGRAM_COPYRIGHT_STRING "Copyright ©1995-2003 by Holger Schemel"
+
+#if 0
 #define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
 #define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
-#define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
+#endif
+
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX		"ROCKSNDIAMONDS"
 #define FILENAME_PREFIX		"Rocks"
@@ -1062,10 +1068,10 @@
 **	1.4 (still in use)
 **	2.0 (actual)
 */
-#define FILE_VERSION_1_0	VERSION_IDENT(1,0,0)
-#define FILE_VERSION_1_2	VERSION_IDENT(1,2,0)
-#define FILE_VERSION_1_4	VERSION_IDENT(1,4,0)
-#define FILE_VERSION_2_0	VERSION_IDENT(2,0,0)
+#define FILE_VERSION_1_0	VERSION_IDENT(1,0,0,0)
+#define FILE_VERSION_1_2	VERSION_IDENT(1,2,0,0)
+#define FILE_VERSION_1_4	VERSION_IDENT(1,4,0,0)
+#define FILE_VERSION_2_0	VERSION_IDENT(2,0,0,0)
 
 /* file version does not change for every program version, but is changed
    when new features are introduced that are incompatible with older file
@@ -1077,10 +1083,10 @@
 #define GAME_VERSION_1_4	FILE_VERSION_1_4
 #define GAME_VERSION_2_0	FILE_VERSION_2_0
 
-#define GAME_VERSION_ACTUAL	RELEASE_IDENT(PROGRAM_VERSION_MAJOR, \
+#define GAME_VERSION_ACTUAL	VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
 					      PROGRAM_VERSION_MINOR, \
 					      PROGRAM_VERSION_PATCH, \
-					      PROGRAM_VERSION_RELEASE)
+					      PROGRAM_VERSION_BUILD)
 
 /* values for game_emulation */
 #define EMU_NONE		0
@@ -1255,6 +1261,7 @@ struct GameInfo
   int emulation;
   int initial_move_delay;
   int initial_move_delay_value;
+  int initial_push_delay_value;
 
   /* variable within running game */
   int yamyam_content_nr;

@@ -800,12 +800,18 @@ static void InitGameEngine()
 
   /* dynamically adjust player properties according to game engine version */
   game.initial_move_delay =
-    (game.engine_version <= VERSION_IDENT(2,0,1) ? INITIAL_MOVE_DELAY_ON :
+    (game.engine_version <= VERSION_IDENT(2,0,1,0) ? INITIAL_MOVE_DELAY_ON :
      INITIAL_MOVE_DELAY_OFF);
 
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
+  /* ---------- initialize player's initial push delay --------------------- */
+
+  /* dynamically adjust player properties according to game engine version */
+  game.initial_push_delay_value =
+    (game.engine_version < VERSION_IDENT(3,0,7,1) ? 5 : -1);
 
   /* ---------- initialize changing elements ------------------------------- */
 
@@ -1059,7 +1065,7 @@ void InitGame()
     player->move_delay_value = game.initial_move_delay_value;
 
     player->push_delay = 0;
-    player->push_delay_value = 5;
+    player->push_delay_value = game.initial_push_delay_value;
 
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
@@ -2149,7 +2155,7 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 0
     /* --- This is only really needed (and now handled) in "Impact()". --- */
     /* do not explode moving elements that left the explode field in time */
-    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) &&
+    if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
 	center_element == EL_EMPTY && (mode == EX_NORMAL || mode == EX_CENTER))
       return;
 #endif
@@ -2204,7 +2210,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
 #else
       if ((IS_INDESTRUCTIBLE(element) &&
-	   (game.engine_version < VERSION_IDENT(2,2,0) ||
+	   (game.engine_version < VERSION_IDENT(2,2,0,0) ||
 	    (!IS_WALKABLE_OVER(element) && !IS_WALKABLE_UNDER(element)))) ||
 	  element == EL_FLAMES)
 	continue;
@@ -2965,7 +2971,7 @@ void Impact(int x, int y)
 					 MovPos[x][y + 1] <= TILEY / 2));
 
     /* do not smash moving elements that left the smashed field in time */
-    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) && IS_MOVING(x, y + 1) &&
+    if (game.engine_version >= VERSION_IDENT(2,2,0,7) && IS_MOVING(x, y + 1) &&
 	ABS(MovPos[x][y + 1] + getElementMoveStepsize(x, y + 1)) >= TILEX)
       object_hit = FALSE;
 
@@ -3735,7 +3741,7 @@ static boolean JustBeingPushed(int x, int y)
 
 void StartMoving(int x, int y)
 {
-  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
+  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
   boolean started_moving = FALSE;	/* some elements can fall _and_ move */
   int element = Feld[x][y];
 
@@ -3891,16 +3897,16 @@ void StartMoving(int x, int y)
 #endif
     }
 #if 1
-    else if ((game.engine_version < RELEASE_IDENT(2,2,0,7) &&
+    else if ((game.engine_version < VERSION_IDENT(2,2,0,7) &&
 	      CAN_SMASH(element) && WasJustMoving[x][y] && !Pushed[x][y + 1] &&
 	      (Feld[x][y + 1] == EL_BLOCKED)) ||
-	     (game.engine_version >= VERSION_IDENT(3,0,7) &&
+	     (game.engine_version >= VERSION_IDENT(3,0,7,0) &&
 	      CAN_SMASH(element) && WasJustFalling[x][y] &&
 	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))))
 
 #else
 #if 1
-    else if (game.engine_version < RELEASE_IDENT(2,2,0,7) &&
+    else if (game.engine_version < VERSION_IDENT(2,2,0,7) &&
 	     CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
 	     WasJustMoving[x][y] && !Pushed[x][y + 1])
 #else
@@ -5769,9 +5775,18 @@ static boolean CheckTriggeredElementSideChange(int lx, int ly,
       struct ElementChangeInfo *change = &element_info[element].change_page[j];
 
       if (change->can_change &&
+#if 1
+	  change->events & CH_EVENT_BIT(trigger_event) &&
+#endif
 	  change->sides & trigger_side &&
 	  change->trigger_element == trigger_element)
       {
+#if 0
+	if (!(change->events & CH_EVENT_BIT(trigger_event)))
+	  printf("::: !!! %d triggers %d: using wrong page %d [event %d]\n",
+		 trigger_element-EL_CUSTOM_START+1, i+1, j, trigger_event);
+#endif
+
 	change_element = TRUE;
 	page = j;
 
@@ -6000,7 +6015,7 @@ void GameActions()
 #endif
 
 #if 1
-  if (game.engine_version < RELEASE_IDENT(2,2,0,7))
+  if (game.engine_version < VERSION_IDENT(2,2,0,7))
   {
     for (i=0; i<MAX_PLAYERS; i++)
     {
@@ -6886,7 +6901,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->is_moving = FALSE;
   }
 
-  if (game.engine_version < VERSION_IDENT(3,0,7))
+  if (game.engine_version < VERSION_IDENT(3,0,7,0))
   {
     TestIfHeroTouchesBadThing(jx, jy);
     TestIfPlayerTouchesCustomElement(jx, jy);
@@ -6963,7 +6978,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	player->LevelSolved = player->GameOver = TRUE;
     }
 
-    if (game.engine_version >= VERSION_IDENT(3,0,7))
+    if (game.engine_version >= VERSION_IDENT(3,0,7,0))
     {
       TestIfHeroTouchesBadThing(jx, jy);
       TestIfPlayerTouchesCustomElement(jx, jy);
@@ -7049,7 +7064,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
     if (IS_PLAYER(x, y))
     {
-      if (game.engine_version < VERSION_IDENT(3,0,7))
+      if (game.engine_version < VERSION_IDENT(3,0,7,0))
 	border_element = Feld[xx][yy];		/* may be moving! */
       else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
 	border_element = Feld[xx][yy];
@@ -7065,7 +7080,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     }
     else if (IS_PLAYER(xx, yy))
     {
-      if (game.engine_version >= VERSION_IDENT(3,0,7))
+      if (game.engine_version >= VERSION_IDENT(3,0,7,0))
       {
 	struct PlayerInfo *player = PLAYERINFO(xx, yy);
 
@@ -7123,7 +7138,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-    if (game.engine_version < VERSION_IDENT(3,0,7))
+    if (game.engine_version < VERSION_IDENT(3,0,7,0))
       border_element = Feld[xx][yy];	/* may be moving! */
     else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
       border_element = Feld[xx][yy];
@@ -7303,7 +7318,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 	if (bad_element == EL_ROBOT && player->is_moving)
 	  continue;	/* robot does not kill player if he is moving */
 
-	if (game.engine_version >= VERSION_IDENT(3,0,7))
+	if (game.engine_version >= VERSION_IDENT(3,0,7,0))
 	{
 	  if (player->MovPos != 0 && !(player->MovDir & touch_dir[i]))
 	    continue;		/* center and border element do not touch */
@@ -7513,7 +7528,7 @@ int DigField(struct PlayerInfo *player,
     CH_SIDE_BOTTOM,	/* moving up    */
     CH_SIDE_TOP,	/* moving down  */
   };
-  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
+  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
@@ -7548,7 +7563,7 @@ int DigField(struct PlayerInfo *player,
   if (IS_TUBE(Feld[jx][jy]) || IS_TUBE(Back[jx][jy]))
 #else
   if (IS_TUBE(Feld[jx][jy]) ||
-      (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0)))
+      (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0)))
 #endif
   {
     int i = 0;
@@ -7583,7 +7598,7 @@ int DigField(struct PlayerInfo *player,
   element = Feld[x][y];
 
   if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
-      game.engine_version >= VERSION_IDENT(2,2,0))
+      game.engine_version >= VERSION_IDENT(2,2,0,0))
     return MF_NO_ACTION;
 
   switch (element)
@@ -7888,9 +7903,36 @@ int DigField(struct PlayerInfo *player,
 	if (element == EL_SPRING && MovDir[x][y] != MV_NO_MOVING)
 	  return MF_NO_ACTION;
 #endif
-	if (!player->is_pushing &&
-	    game.engine_version >= RELEASE_IDENT(2,2,0,7))
+
+#if 1
+	if (game.engine_version >= VERSION_IDENT(3,0,7,1))
+	{
+	  if (player->push_delay_value == -1)
+	    player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	}
+	else if (game.engine_version >= VERSION_IDENT(2,2,0,7))
+	{
+	  if (!player->is_pushing)
+	    player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	}
+
+	/*
+	if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
+	    (game.engine_version < VERSION_IDENT(3,0,7,1) ||
+	     !player_is_pushing))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	*/
+#else
+	if (!player->is_pushing &&
+	    game.engine_version >= VERSION_IDENT(2,2,0,7))
+	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+#endif
+
+#if 0
+	printf("::: push delay: %ld [%d, %d] [%d]\n",
+	       player->push_delay_value, FrameCounter, game.engine_version,
+	       player->is_pushing);
+#endif
 
 	player->is_pushing = TRUE;
 
@@ -7911,11 +7953,15 @@ int DigField(struct PlayerInfo *player,
 	    element != EL_SPRING && element != EL_BALLOON)
 	{
 	  /* make sure that there is no move delay before next try to push */
-	  if (game.engine_version >= VERSION_IDENT(3,0,7))
+	  if (game.engine_version >= VERSION_IDENT(3,0,7,1))
 	    player->move_delay = INITIAL_MOVE_DELAY_OFF;
 
 	  return MF_NO_ACTION;
 	}
+
+#if 0
+	printf("::: NOW PUSHING... [%d]\n", FrameCounter);
+#endif
 
 	if (IS_SB_ELEMENT(element))
 	{
@@ -7963,8 +8009,10 @@ int DigField(struct PlayerInfo *player,
 	Pushed[x][y] = TRUE;
 	Pushed[nextx][nexty] = TRUE;
 
-	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
+	if (game.engine_version < VERSION_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	else
+	  player->push_delay_value = -1;	/* get new value later */
 
 	CheckTriggeredElementSideChange(x, y, element, dig_side,
 					CE_OTHER_GETS_PUSHED);
@@ -8104,7 +8152,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
 
-  if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0))
+  if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0,0))
     return FALSE;
 
   if (!player->active || !IN_LEV_FIELD(x, y))

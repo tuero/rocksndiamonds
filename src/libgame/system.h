@@ -269,12 +269,11 @@
 
 
 /* macros for version handling */
-#define VERSION_IDENT(x,y,z)	((x) * 1000000 + (y) * 10000 + (z) * 100)
-#define RELEASE_IDENT(x,y,z,r)	(VERSION_IDENT(x,y,z) + (r))
 #define VERSION_MAJOR(x)	((x) / 1000000)
 #define VERSION_MINOR(x)	(((x) % 1000000) / 10000)
 #define VERSION_PATCH(x)	(((x) % 10000) / 100)
-#define VERSION_RELEASE(x)	((x) % 100)
+#define VERSION_BUILD(x)	((x) % 100)
+#define VERSION_IDENT(a,b,c,d)	((a) * 1000000 + (b) * 10000 + (c) * 100 + (d))
 
 
 /* macros for parent/child process identification */

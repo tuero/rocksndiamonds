@@ -984,28 +984,26 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 
 int getFileVersion(FILE *file)
 {
-  int version_major, version_minor, version_patch, version_release;
+  int version_major = fgetc(file);
+  int version_minor = fgetc(file);
+  int version_patch = fgetc(file);
+  int version_build = fgetc(file);
 
-  version_major   = fgetc(file);
-  version_minor   = fgetc(file);
-  version_patch   = fgetc(file);
-  version_release = fgetc(file);
-
-  return RELEASE_IDENT(version_major, version_minor, version_patch,
-		       version_release);
+  return VERSION_IDENT(version_major, version_minor, version_patch,
+		       version_build);
 }
 
 void putFileVersion(FILE *file, int version)
 {
-  int version_major   = VERSION_MAJOR(version);
-  int version_minor   = VERSION_MINOR(version);
-  int version_patch   = VERSION_PATCH(version);
-  int version_release = VERSION_RELEASE(version);
+  int version_major = VERSION_MAJOR(version);
+  int version_minor = VERSION_MINOR(version);
+  int version_patch = VERSION_PATCH(version);
+  int version_build = VERSION_BUILD(version);
 
-  fputc(version_major,   file);
-  fputc(version_minor,   file);
-  fputc(version_patch,   file);
-  fputc(version_release, file);
+  fputc(version_major, file);
+  fputc(version_minor, file);
+  fputc(version_patch, file);
+  fputc(version_build, file);
 }
 
 void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)

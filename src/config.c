@@ -16,15 +16,56 @@
 #include "config.h"
 #include "conftime.h"
 
-/* use timestamp created at compile-time */
-#define PROGRAM_BUILD_STRING	PROGRAM_IDENT_STRING " " COMPILE_DATE_STRING
+
+char *getProgramVersionString()
+{
+  static char program_version_string[32];
+
 #ifdef DEBUG
-#undef WINDOW_TITLE_STRING
-#define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_BUILD_STRING
+  sprintf(program_version_string, "%d.%d.%d-%d",
+	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
+	  PROGRAM_VERSION_BUILD);
+#else
+  sprintf(program_version_string, "%d.%d.%d",
+	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH);
 #endif
 
+  return program_version_string;
+}
+
+char *getProgramInitString()
+{
+  static char *program_init_string = NULL;
+
+  if (program_init_string == NULL)
+  {
+    program_init_string = checked_malloc(strlen(PROGRAM_TITLE_STRING) + 1 +
+					 strlen(getProgramVersionString()) +1 +
+					 strlen(TARGET_STRING) + 1);
+
+    sprintf(program_init_string, "%s %s %s",
+	    PROGRAM_TITLE_STRING, getProgramVersionString(), TARGET_STRING);
+  }
+
+  return program_init_string;
+}
 
 char *getWindowTitleString()
 {
-  return WINDOW_TITLE_STRING;
+#ifdef DEBUG
+  static char *window_title_string = NULL;
+
+  if (window_title_string == NULL)
+  {
+    window_title_string = checked_malloc(strlen(getProgramInitString()) + 1 +
+					 strlen(COMPILE_DATE_STRING) + 1);
+
+    sprintf(window_title_string, "%s %s",
+	    getProgramInitString(), COMPILE_DATE_STRING);
+  }
+
+  return window_title_string;
+#else
+  return getProgramInitString();
+#endif
 }

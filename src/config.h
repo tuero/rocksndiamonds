@@ -16,6 +16,8 @@
 
 #include "main.h"
 
+char *getProgramVersionString(void);
+char *getProgramInitString(void);
 char *getWindowTitleString(void);
 
 #endif	/* CONFIG_H */

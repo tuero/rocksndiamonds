@@ -24,6 +24,7 @@
 #include "network.h"
 #include "netserv.h"
 #include "cartoons.h"
+#include "config.h"
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
@@ -2839,7 +2840,7 @@ void InitElementPropertiesEngine(int engine_version)
       SET_PROPERTY(i, EP_WALL, TRUE);
 
     /* ---------- SOLID_FOR_PUSHING ---------------------------------------- */
-    if (engine_version < VERSION_IDENT(2,2,0))
+    if (engine_version < VERSION_IDENT(2,2,0,0))
       SET_PROPERTY(i, EP_SOLID_FOR_PUSHING, IS_HISTORIC_SOLID(i));
     else
       SET_PROPERTY(i, EP_SOLID_FOR_PUSHING, (!IS_WALKABLE(i) &&
@@ -2857,7 +2858,7 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
     if (i == EL_FLAMES)
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, TRUE);
-    else if (engine_version < VERSION_IDENT(2,2,0))
+    else if (engine_version < VERSION_IDENT(2,2,0,0))
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, IS_INDESTRUCTIBLE(i));
     else
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
@@ -2944,8 +2945,33 @@ void InitElementPropertiesEngine(int engine_version)
     /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
     SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
 		 (level.em_slippery_gems &&
-		  engine_version > VERSION_IDENT(2,0,1)));
+		  engine_version > VERSION_IDENT(2,0,1,0)));
   }
+
+#if 1
+  /* set default push delay values (corrected since version 3.0.7-1) */
+  if (engine_version < VERSION_IDENT(3,0,7,1))
+  {
+    game.default_push_delay_fixed = 2;
+    game.default_push_delay_random = 8;
+  }
+  else
+  {
+    game.default_push_delay_fixed = 8;
+    game.default_push_delay_random = 8;
+  }
+
+  /* set uninitialized push delay values of custom elements in older levels */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (element_info[element].push_delay_fixed == -1)
+      element_info[element].push_delay_fixed = game.default_push_delay_fixed;
+    if (element_info[element].push_delay_random == -1)
+      element_info[element].push_delay_random = game.default_push_delay_random;
+  }
+#endif
 }
 
 static void InitGlobal()
@@ -3256,8 +3282,8 @@ void InitGfx()
 
   InitFontGraphicInfo();
 
-  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
-  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
+  DrawInitText(getProgramInitString(), 20, FC_YELLOW);
+  DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 

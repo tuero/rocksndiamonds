@@ -1,4 +1,5 @@
 2003-10-19
+	* unavailable setup options now marked as "n/a" instead of "off"
 	* new boolean directive "latest_engine" for "levelinfo.conf": when set
 	  to "true", levels are always played with the latest game engine,
 	  which is desired for levels that are imported from other games; all
@@ -8,6 +9,7 @@
 2003-10-18
 	* fixed serious bug in code for delayed element pushing
 	* fixed little bug in animation frame selection for pushed elements
+	* speed-up of reading config file for verbose output
 
 2003-10-08
 	* added configuration option for opening and closing Supaplex exit

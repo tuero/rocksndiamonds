@@ -947,7 +947,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     printf("\n::: This level is private or contributed: '%s'\n", filename);
 #endif
 
-#if 1
+#if 0
     printf("\n::: Use the stored game engine version for this level\n");
 #endif
 
@@ -972,7 +972,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     }
 
     /* Default behaviour for EM style gems was "slippery" only in 2.0.1 */
-    if (level->game_version == VERSION_IDENT(2,0,1))
+    if (level->game_version == VERSION_IDENT(2,0,1,0))
       level->em_slippery_gems = TRUE;
   }
   else
@@ -982,7 +982,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	   leveldir_current->sort_priority, filename);
 #endif
 
-#if 1
+#if 0
     printf("\n::: Use latest game engine version for this level.\n");
 #endif
 
@@ -1023,7 +1023,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 
   /* map custom element change events that have changed in newer versions
      (these following values were accidentally changed in version 3.0.1) */
-  if (level->game_version <= VERSION_IDENT(3,0,0))
+  if (level->game_version <= VERSION_IDENT(3,0,0,0))
   {
     for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
@@ -1067,7 +1067,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   }
 
   /* initialize "can_change" field for old levels with only one change page */
-  if (level->game_version <= VERSION_IDENT(3,0,2))
+  if (level->game_version <= VERSION_IDENT(3,0,2,0))
   {
     for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
@@ -1078,8 +1078,9 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
-  /* set default push delay values (corrected since version 3.0.7) */
-  if (level->game_version < VERSION_IDENT(3,0,7))
+#if 0
+  /* set default push delay values (corrected since version 3.0.7-1) */
+  if (level->game_version < VERSION_IDENT(3,0,7,1))
   {
     game.default_push_delay_fixed = 2;
     game.default_push_delay_random = 8;
@@ -1100,6 +1101,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     if (element_info[element].push_delay_random == -1)
       element_info[element].push_delay_random = game.default_push_delay_random;
   }
+#endif
 
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
@@ -1116,7 +1118,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
     {
       int element = level->field[x][y];
 
-      if (level->game_version <= VERSION_IDENT(2,2,0))
+      if (level->game_version <= VERSION_IDENT(2,2,0,0))
       {
 	/* map game font elements */
 	element = (element == EL_CHAR('[')  ? EL_CHAR_AUMLAUT :
@@ -1125,7 +1127,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
 		   element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
       }
 
-      if (level->game_version < VERSION_IDENT(3,0,0))
+      if (level->game_version < VERSION_IDENT(3,0,0,0))
       {
 	/* map Supaplex gravity tube elements */
 	element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :

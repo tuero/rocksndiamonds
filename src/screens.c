@@ -155,13 +155,13 @@ static void PlaySound_Menu_Continue(int sound)
 
 void DrawHeadline()
 {
-  int text1_width = getTextWidth(PROGRAM_TITLE_STRING,   FONT_TITLE_1);
-  int text2_width = getTextWidth(WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
+  int text1_width = getTextWidth(PROGRAM_TITLE_STRING,     FONT_TITLE_1);
+  int text2_width = getTextWidth(PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2);
   int x1 = SX + (SXSIZE - text1_width) / 2;
   int x2 = SX + (SXSIZE - text2_width) / 2;
 
-  DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
-  DrawText(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
+  DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,     FONT_TITLE_1);
+  DrawText(x2, SY + 46, PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -1929,23 +1929,25 @@ static void drawSetupValue(int pos)
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
   int font_nr = FONT_VALUE_1;
-  char *value_string = getSetupValue(setup_info[pos].type & ~TYPE_GHOSTED,
-				     setup_info[pos].value);
+  int type = setup_info[pos].type;
+  void *value = setup_info[pos].value;
+  char *value_string = (!(type & TYPE_GHOSTED) ? getSetupValue(type, value) :
+			"n/a");
 
   if (value_string == NULL)
     return;
 
-  if (setup_info[pos].type & TYPE_KEY)
+  if (type & TYPE_KEY)
   {
     xpos = 3;
 
-    if (setup_info[pos].type & TYPE_QUERY)
+    if (type & TYPE_QUERY)
     {
       value_string = "<press key>";
       font_nr = FONT_INPUT_1_ACTIVE;
     }
   }
-  else if (setup_info[pos].type & TYPE_STRING)
+  else if (type & TYPE_STRING)
   {
     int max_value_len = (SCR_FIELDX - 2) * 2;
 
@@ -1955,10 +1957,9 @@ static void drawSetupValue(int pos)
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
-  else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE)
+  else if (type & TYPE_BOOLEAN_STYLE)
   {
-    font_nr = (*(boolean *)(setup_info[pos].value) ? FONT_OPTION_ON :
-	       FONT_OPTION_OFF);
+    font_nr = (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
   }
 
   DrawText(mSX + xpos * 32, mSY + ypos * 32,

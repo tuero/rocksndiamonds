@@ -1053,7 +1053,7 @@ int getFileVersionFromCookieString(const char *cookie)
   version_major = ptr_cookie2[0] - '0';
   version_minor = ptr_cookie2[2] - '0';
 
-  return VERSION_IDENT(version_major, version_minor, 0);
+  return VERSION_IDENT(version_major, version_minor, 0, 0);
 }
 
 boolean checkCookieString(const char *cookie, const char *template)
