@@ -328,7 +328,7 @@ static char *getLevelFilenameFromBasename(char *basename)
 
 static int getFileTypeFromBasename(char *basename)
 {
-  char *filename = getLevelFilenameFromBasename(basename);
+  static char *filename = NULL;
   struct stat file_status;
 
   /* ---------- try to determine file type from filename ---------- */
@@ -339,6 +339,9 @@ static int getFileTypeFromBasename(char *basename)
     return LEVEL_FILE_TYPE_SP;
 
   /* ---------- try to determine file type from filesize ---------- */
+
+  checked_free(filename);
+  filename = getPath2(getCurrentLevelDir(), basename);
 
   if (stat(filename, &file_status) == 0)
   {
@@ -353,10 +356,10 @@ static int getFileTypeFromBasename(char *basename)
 static char *getSingleLevelBasename(int nr, int type)
 {
   static char basename[MAX_FILENAME_LEN];
+  char *level_filename = getStringCopy(leveldir_current->level_filename);
 
-  if (leveldir_current->level_filename == NULL)
-    leveldir_current->level_filename =
-      getStringCat2("%03d.", LEVELFILE_EXTENSION);
+  if (level_filename == NULL)
+    level_filename = getStringCat2("%03d.", LEVELFILE_EXTENSION);
 
   switch (type)
   {
@@ -373,9 +376,11 @@ static char *getSingleLevelBasename(int nr, int type)
 
     case LEVEL_FILE_TYPE_UNKNOWN:
     default:
-      sprintf(basename, leveldir_current->level_filename, nr);
+      sprintf(basename, level_filename, nr);
       break;
   }
+
+  free(level_filename);
 
   return basename;
 }
