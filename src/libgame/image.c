@@ -718,7 +718,7 @@ static void *Load_PCX(char *filename)
 {
   ImageInfo *img_info;
 
-#if 1
+#if 0
   printf("loading PCX file '%s'\n", filename);
 #endif
 
@@ -800,9 +800,16 @@ Bitmap *getBitmapFromImageID(int pos)
 
 char *getTokenFromImageID(int graphic)
 {
+#if 0
+  /* !!! this does not work for dynamic artwork (crash!) !!! */
   struct FileInfo *file_list = (struct FileInfo *)image_info->file_list;
 
   return file_list[graphic].token;
+#else
+  struct FileInfo *file_list = getImageListEntry(graphic);
+
+  return (file_list != NULL ? file_list->token : NULL);
+#endif
 }
 
 char *getImageConfigFilename()

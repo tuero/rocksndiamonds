@@ -758,6 +758,12 @@ static void InitGraphicInfo()
     printf("::: image: '%s'\n", image->token);
 #endif
 
+#if 0
+    printf("::: image # %d: '%s' ['%s']\n",
+	   i, image->token,
+	   getTokenFromImageID(i));
+#endif
+
     set_graphic_parameters(i, image->parameter);
 
     /* now check if no animation frames are outside of the loaded image */

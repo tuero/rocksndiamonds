@@ -1893,7 +1893,7 @@ void Explode(int ex, int ey, int phase, int mode)
       PlaySoundLevelAction(ex, ey, ACTION_EXPLODING);
 
     /* remove things displayed in background while burning dynamite */
-    if (!IS_INDESTRUCTIBLE(Back[ex][ey]))
+    if (Back[ex][ey] != EL_EMPTY && !IS_INDESTRUCTIBLE(Back[ex][ey]))
       Back[ex][ey] = 0;
 
     if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
@@ -1927,7 +1927,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
 #if 1
 
-#if 1
+#if 0
       if (IS_EXPLOSION_PROOF(element))
 	continue;
 #else
@@ -1958,11 +1958,11 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
       /* save walkable background elements while explosion on same tile */
-#if 1
+#if 0
       if (IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
 #else
-      if (IS_INDESTRUCTIBLE(element) && IS_WALKABLE(element))
+      if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
 #endif
 
@@ -2135,6 +2135,9 @@ void Explode(int ex, int ey, int phase, int mode)
     if (CAN_MOVE(element))
       InitMovDir(x, y);
     DrawLevelField(x, y);
+
+    if (CAN_BE_CRUMBLED(element))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
       StorePlayer[x][y] = 0;
@@ -4055,7 +4058,8 @@ void StartMoving(int x, int y)
       TurnRound(x, y);
 
 #if 1
-      DrawLevelElementAnimation(x, y, element);
+      if (GFX_ELEMENT(element) != EL_SAND)
+	DrawLevelElementAnimation(x, y, element);
 #else
       if (element == EL_BUG ||
 	  element == EL_SPACESHIP ||

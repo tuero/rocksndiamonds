@@ -1200,7 +1200,8 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   if (!IN_LEV_FIELD(x, y))
     return;
 
-  element = (GfxElement[x][y] != EL_UNDEFINED ? GfxElement[x][y] : Feld[x][y]);
+  element = (GfxElement[x][y] != EL_UNDEFINED && Feld[x][y] != EL_EXPLOSION ?
+	     GfxElement[x][y] : Feld[x][y]);
 
   /* crumble field itself */
   if (CAN_BE_CRUMBLED(element) && !IS_MOVING(x, y))
@@ -1220,6 +1221,13 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       /* check if neighbour field is of same type */
       if (CAN_BE_CRUMBLED(element) && !IS_MOVING(xx, yy))
 	continue;
+
+#if 0
+      if (Feld[x][y] == EL_CUSTOM_START + 123)
+	printf("::: crumble [%d] THE CHAOS ENGINE (%d, %d): %d, %d\n",
+	       i, Feld[x][y], element,
+	       CAN_BE_CRUMBLED(element), IS_MOVING(x, y));
+#endif
 
       if (i == 1 || i == 2)
       {

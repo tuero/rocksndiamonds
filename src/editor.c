@@ -4789,30 +4789,6 @@ static void DrawPropertiesInfo()
   properties[] =
   {
     /* configurable properties */
-    { EP_INDESTRUCTIBLE,	"- undestructible"			},
-    { EP_SLIPPERY,		"- slippery for falling objects"	},
-    { EP_EM_SLIPPERY_WALL,	"- slippery for some gems (EM style)"	},
-
-    { EP_DIGGABLE,		"- diggable"				},
-    { EP_COLLECTIBLE,		"- collectible"				},
-    { EP_PUSHABLE,		"- pushable"				},
-
-    { EP_CAN_MOVE,		"- can move"				},
-    { EP_CAN_FALL,		"- can fall"				},
-#if 0
-    { EP_CAN_SMASH,		"- can smash"				},
-#endif
-    { EP_CAN_SMASH_PLAYER,	"- can smash player"			},
-    { EP_CAN_SMASH_ENEMIES,	"- can smash good and bad guys"		},
-    { EP_CAN_SMASH_EVERYTHING,	"- can smash everything smashable"	},
-    { EP_CAN_EXPLODE,		"- can explode"				},
-    { EP_CAN_EXPLODE_BY_FIRE,	"  - by fire or explosions"		},
-    { EP_CAN_EXPLODE_SMASHED,	"  - when smashed"			},
-    { EP_CAN_EXPLODE_IMPACT,	"  - on impact"				},
-
-    { EP_DONT_RUN_INTO,		"- deadly when running into"		},
-    { EP_DONT_COLLIDE_WITH,	"- deadly when colliding with"		},
-    { EP_DONT_TOUCH,		"- deadly when touching"		},
 
     { EP_WALKABLE_OVER,		"- player can walk over it"		},
     { EP_WALKABLE_INSIDE,	"- player can walk inside it"		},
@@ -4820,6 +4796,34 @@ static void DrawPropertiesInfo()
     { EP_PASSABLE_OVER,		"- player can pass over it"		},
     { EP_PASSABLE_INSIDE,	"- player can pass through it"		},
     { EP_PASSABLE_UNDER,	"- player can pass under it"		},
+
+    { EP_DIGGABLE,		"- diggable"				},
+    { EP_COLLECTIBLE,		"- collectible"				},
+    { EP_PUSHABLE,		"- pushable"				},
+
+    { EP_CAN_MOVE,		"- can move"				},
+    { EP_CAN_FALL,		"- can fall"				},
+
+    { EP_CAN_SMASH_PLAYER,	"- can smash player"			},
+#if 0
+    { EP_CAN_SMASH_ENEMIES,	"- can smash good and bad guys"		},
+#endif
+    { EP_CAN_SMASH_EVERYTHING,	"- can smash everything smashable"	},
+
+    { EP_SLIPPERY,		"- slippery for falling objects"	},
+    { EP_EM_SLIPPERY_WALL,	"- slippery for some gems (EM style)"	},
+
+    { EP_DONT_RUN_INTO,		"- deadly when running into"		},
+    { EP_DONT_COLLIDE_WITH,	"- deadly when colliding with"		},
+    { EP_DONT_TOUCH,		"- deadly when touching"		},
+
+    { EP_INDESTRUCTIBLE,	"- undestructible"			},
+
+    { EP_CAN_EXPLODE_BY_FIRE,	"- can explode by fire or explosions"	},
+    { EP_CAN_EXPLODE_SMASHED,	"- can explode when smashed"		},
+    { EP_CAN_EXPLODE_IMPACT,	"- can explode on impact"		},
+
+    { EP_CAN_CHANGE,		"- can change to other element"		},
 
     /* pre-defined properties */
     { EP_CAN_PASS_MAGIC_WALL,	"- can pass magic walls"		},
