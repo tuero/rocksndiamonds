@@ -47,56 +47,6 @@
 /* level file functions                                                      */
 /* ========================================================================= */
 
-void setElementChangePages(struct ElementInfo *ei, int change_pages)
-{
-  int change_page_size = sizeof(struct ElementChangeInfo);
-
-  ei->num_change_pages = MAX(1, change_pages);
-
-  ei->change_page =
-    checked_realloc(ei->change_page, ei->num_change_pages * change_page_size);
-
-  if (ei->current_change_page >= ei->num_change_pages)
-    ei->current_change_page = ei->num_change_pages - 1;
-
-  ei->change = &ei->change_page[ei->current_change_page];
-}
-
-void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
-{
-  int x, y;
-
-  change->can_change = FALSE;
-
-  change->events = CE_BITMASK_DEFAULT;
-  change->target_element = EL_EMPTY_SPACE;
-
-  change->delay_fixed = 0;
-  change->delay_random = 0;
-  change->delay_frames = -1;	/* later set to reliable default value */
-
-  change->trigger_element = EL_EMPTY_SPACE;
-
-  change->explode = FALSE;
-  change->use_content = FALSE;
-  change->only_complete = FALSE;
-  change->use_random_change = FALSE;
-  change->random = 0;
-  change->power = CP_NON_DESTRUCTIVE;
-
-  for(x=0; x<3; x++)
-    for(y=0; y<3; y++)
-      change->content[x][y] = EL_EMPTY_SPACE;
-
-  change->player_action = 0;
-  change->collide_action = 0;
-  change->other_action = 0;
-
-  change->pre_change_function = NULL;
-  change->change_function = NULL;
-  change->post_change_function = NULL;
-}
-
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   int i, j, x, y;
@@ -137,10 +87,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   strcpy(level->name, NAMELESS_LEVEL_NAME);
   strcpy(level->author, ANONYMOUS_NAME);
 
-  level->envelope[0] = '\0';
-  level->envelope_xsize = MAX_ENVELOPE_XSIZE;
-  level->envelope_ysize = MAX_ENVELOPE_YSIZE;
-
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = 10;
 
@@ -154,17 +100,11 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->field[0][0] = EL_PLAYER_1;
   level->field[STD_LEV_FIELDX - 1][STD_LEV_FIELDY - 1] = EL_EXIT_CLOSED;
 
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-  {
-    setElementChangePages(&element_info[i], 1);
-    setElementChangeInfoToDefaults(element_info[i].change);
-  }
-
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
 
-    for(j=0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
+    for(j=0; j<MAX_ELEMENT_NAME_LEN + 1; j++)
       element_info[element].description[j] = '\0';
     if (element_info[element].custom_description != NULL)
       strncpy(element_info[element].description,
@@ -194,18 +134,39 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       for(y=0; y<3; y++)
 	element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
+    element_info[element].change.events = CE_BITMASK_DEFAULT;
+    element_info[element].change.target_element = EL_EMPTY_SPACE;
+
+    element_info[element].change.delay_fixed = 0;
+    element_info[element].change.delay_random = 0;
+    element_info[element].change.delay_frames = -1;	/* use default */
+
+    element_info[element].change.trigger_element = EL_EMPTY_SPACE;
+
+    element_info[element].change.explode = FALSE;
+    element_info[element].change.use_content = FALSE;
+    element_info[element].change.only_complete = FALSE;
+    element_info[element].change.use_random_change = FALSE;
+    element_info[element].change.random = 0;
+    element_info[element].change.power = CP_NON_DESTRUCTIVE;
+
+    for(x=0; x<3; x++)
+      for(y=0; y<3; y++)
+	element_info[element].change.content[x][y] = EL_EMPTY_SPACE;
+
     element_info[element].access_type = 0;
     element_info[element].access_layer = 0;
     element_info[element].walk_to_action = 0;
     element_info[element].smash_targets = 0;
     element_info[element].deadliness = 0;
     element_info[element].consistency = 0;
+    element_info[element].change_player_action = 0;
+    element_info[element].change_collide_action = 0;
+    element_info[element].change_other_action = 0;
 
     element_info[element].can_explode_by_fire = FALSE;
     element_info[element].can_explode_smashed = FALSE;
     element_info[element].can_explode_impact = FALSE;
-
-    element_info[element].current_change_page = 0;
 
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
@@ -493,7 +454,7 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
     int custom_target_element = getFile16BitBE(file);
 
     if (IS_CUSTOM_ELEMENT(element))
-      element_info[element].change->target_element = custom_target_element;
+      element_info[element].change.target_element = custom_target_element;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
@@ -554,29 +515,29 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 	element_info[element].content[x][y] =
 	  checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change->events = getFile32BitBE(file);
+    element_info[element].change.events = getFile32BitBE(file);
 
-    element_info[element].change->target_element =
+    element_info[element].change.target_element =
       checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change->delay_fixed = getFile16BitBE(file);
-    element_info[element].change->delay_random = getFile16BitBE(file);
-    element_info[element].change->delay_frames = getFile16BitBE(file);
+    element_info[element].change.delay_fixed = getFile16BitBE(file);
+    element_info[element].change.delay_random = getFile16BitBE(file);
+    element_info[element].change.delay_frames = getFile16BitBE(file);
 
-    element_info[element].change->trigger_element =
+    element_info[element].change.trigger_element =
       checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change->explode = getFile8Bit(file);
-    element_info[element].change->use_content = getFile8Bit(file);
-    element_info[element].change->only_complete = getFile8Bit(file);
-    element_info[element].change->use_random_change = getFile8Bit(file);
+    element_info[element].change.explode = getFile8Bit(file);
+    element_info[element].change.use_content = getFile8Bit(file);
+    element_info[element].change.only_complete = getFile8Bit(file);
+    element_info[element].change.use_random_change = getFile8Bit(file);
 
-    element_info[element].change->random = getFile8Bit(file);
-    element_info[element].change->power = getFile8Bit(file);
+    element_info[element].change.random = getFile8Bit(file);
+    element_info[element].change.power = getFile8Bit(file);
 
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	element_info[element].change->content[x][y] =
+	element_info[element].change.content[x][y] =
 	  checkLevelElement(getFile16BitBE(file));
 
     element_info[element].slippery_type = getFile8Bit(file);
@@ -843,18 +804,6 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
     }
   }
 
-  /* initialize "can_change" field for old levels with only one change page */
-  if (level->game_version <= VERSION_IDENT(3,0,2))
-  {
-    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    {
-      int element = EL_CUSTOM_START + i;
-
-      if (CAN_CHANGE(element))
-	element_info[element].change->can_change = TRUE;
-    }
-  }
-
   /* copy elements to runtime playfield array */
   for(x=0; x<MAX_LEV_FIELDX; x++)
     for(y=0; y<MAX_LEV_FIELDY; y++)
@@ -1066,12 +1015,12 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (element_info[element].change->target_element != EL_EMPTY_SPACE)
+    if (element_info[element].change.target_element != EL_EMPTY_SPACE)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile16BitBE(file, element_info[element].change->target_element);
+	putFile16BitBE(file, element_info[element].change.target_element);
       }
 
       check++;
@@ -1127,27 +1076,27 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	  for(x=0; x<3; x++)
 	    putFile16BitBE(file, element_info[element].content[x][y]);
 
-	putFile32BitBE(file, element_info[element].change->events);
+	putFile32BitBE(file, element_info[element].change.events);
 
-	putFile16BitBE(file, element_info[element].change->target_element);
+	putFile16BitBE(file, element_info[element].change.target_element);
 
-	putFile16BitBE(file, element_info[element].change->delay_fixed);
-	putFile16BitBE(file, element_info[element].change->delay_random);
-	putFile16BitBE(file, element_info[element].change->delay_frames);
+	putFile16BitBE(file, element_info[element].change.delay_fixed);
+	putFile16BitBE(file, element_info[element].change.delay_random);
+	putFile16BitBE(file, element_info[element].change.delay_frames);
 
-	putFile16BitBE(file, element_info[element].change->trigger_element);
+	putFile16BitBE(file, element_info[element].change.trigger_element);
 
-	putFile8Bit(file, element_info[element].change->explode);
-	putFile8Bit(file, element_info[element].change->use_content);
-	putFile8Bit(file, element_info[element].change->only_complete);
-	putFile8Bit(file, element_info[element].change->use_random_change);
+	putFile8Bit(file, element_info[element].change.explode);
+	putFile8Bit(file, element_info[element].change.use_content);
+	putFile8Bit(file, element_info[element].change.only_complete);
+	putFile8Bit(file, element_info[element].change.use_random_change);
 
-	putFile8Bit(file, element_info[element].change->random);
-	putFile8Bit(file, element_info[element].change->power);
+	putFile8Bit(file, element_info[element].change.random);
+	putFile8Bit(file, element_info[element].change.power);
 
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
-	    putFile16BitBE(file, element_info[element].change->content[x][y]);
+	    putFile16BitBE(file, element_info[element].change.content[x][y]);
 
 	putFile8Bit(file, element_info[element].slippery_type);
 

@@ -25,12 +25,11 @@
 #define GD_TYPE_CHECK_BUTTON		(1 << 2)
 #define GD_TYPE_RADIO_BUTTON		(1 << 3)
 #define GD_TYPE_DRAWING_AREA		(1 << 4)
-#define GD_TYPE_TEXT_INPUT_ALPHANUMERIC	(1 << 5)
-#define GD_TYPE_TEXT_INPUT_NUMERIC	(1 << 6)
-#define GD_TYPE_TEXT_AREA		(1 << 7)
-#define GD_TYPE_SELECTBOX		(1 << 8)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 9)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 10)
+#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 5)
+#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 6)
+#define GD_TYPE_SELECTBOX		(1 << 7)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 8)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 9)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
 					 GD_TYPE_TEXT_BUTTON | \
@@ -38,8 +37,8 @@
 					 GD_TYPE_RADIO_BUTTON)
 #define GD_TYPE_SCROLLBAR		(GD_TYPE_SCROLLBAR_VERTICAL | \
 					 GD_TYPE_SCROLLBAR_HORIZONTAL)
-#define GD_TYPE_TEXT_INPUT		(GD_TYPE_TEXT_INPUT_ALPHANUMERIC | \
-					 GD_TYPE_TEXT_INPUT_NUMERIC)
+#define GD_TYPE_TEXTINPUT		(GD_TYPE_TEXTINPUT_ALPHANUMERIC | \
+					 GD_TYPE_TEXTINPUT_NUMERIC)
 
 /* gadget events */
 #define GD_EVENT_PRESSED		(1 << 0)
@@ -159,17 +158,6 @@ struct GadgetTextInput
   int size;				/* maximal size of input text */
 };
 
-struct GadgetTextArea
-{
-  char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
-  int cursor_position;			/* actual text cursor position */
-  int cursor_x;				/* actual x cursor position */
-  int cursor_y;				/* actual y cursor position */
-  int cursor_x_preferred;		/* "preferred" x cursor position */
-  int size;				/* maximal size of input text */
-  int xsize, ysize;			/* size of text area (in chars) */
-};
-
 struct GadgetSelectbox
 {
   struct ValueTextInfo *options;	/* pointer to text/value array */
@@ -228,8 +216,7 @@ struct GadgetInfo
   gadget_function callback_action;	/* function for gadget action */
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
   struct GadgetTextButton textbutton;	/* fields for text button gadget */
-  struct GadgetTextInput textinput;	/* fields for text input gadget */
-  struct GadgetTextArea textarea;	/* fields for text area gadget */
+  struct GadgetTextInput text;		/* fields for text input gadget */
   struct GadgetSelectbox selectbox;	/* fields for selectbox gadget */
   struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */
   struct GadgetInfo *next;		/* next list entry */

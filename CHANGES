@@ -3,6 +3,7 @@ Release Version 3.0.3 [?? ??? ????]
 	- fixed bug (missing array boundary check) which could crash the game
 	- fixed problem with setting mouse cursor in SDL version in fullscreen
 	- fixed problem with flickering when drawing toon animations
+	- fixed problem with player animation when snapping and moving
 
 Release Version 3.0.2 [22 AUG 2003]
 -----------------------------------

@@ -16,9 +16,6 @@
 
 #include "main.h"
 
-void setElementChangePages(struct ElementInfo *, int);
-void setElementChangeInfoToDefaults(struct ElementChangeInfo *);
-
 boolean LevelFileExists(int);
 void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
