@@ -87,6 +87,7 @@
 #define EP_CAN_EXPLODE_1X1	23
 #define EP_PUSHABLE		24
 #define EP_CAN_EXPLODE_DYNA	25
+#define EP_PROTECTED		26
 
 /* values for pre-defined properties */
 #define EP_PLAYER		32
@@ -298,6 +299,7 @@
 #define CAN_EXPLODE_1X1(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_1X1)
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 #define CAN_EXPLODE_DYNA(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_DYNA)
+#define IS_PROTECTED(e)		HAS_PROPERTY(e, EP_PROTECTED)
 
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
@@ -431,7 +433,7 @@
 #define MAX_ENVELOPE_YSIZE	20
 #define MAX_ENVELOPE_TEXT_LEN	(MAX_ENVELOPE_XSIZE * MAX_ENVELOPE_YSIZE)
 #define MIN_CHANGE_PAGES	1
-#define MAX_CHANGE_PAGES	16
+#define MAX_CHANGE_PAGES	32
 #define MIN_ELEMENTS_IN_GROUP	1
 #define MAX_ELEMENTS_IN_GROUP	16
 
@@ -1577,6 +1579,7 @@ struct ElementInfo
 
   int access_type;		/* walkable or passable */
   int access_layer;		/* accessible over/inside/under */
+  int access_protected;		/* protection against deadly elements */
   int walk_to_action;		/* diggable/collectible/pushable */
   int smash_targets;		/* can smash player/enemies/everything */
   int deadliness;		/* deadly when running/colliding/touching */

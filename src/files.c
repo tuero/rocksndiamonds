@@ -231,6 +231,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].access_type = 0;
       element_info[element].access_layer = 0;
+      element_info[element].access_protected = 0;
       element_info[element].walk_to_action = 0;
       element_info[element].smash_targets = 0;
       element_info[element].deadliness = 0;
