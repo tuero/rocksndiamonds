@@ -41,7 +41,6 @@
 
 struct ToonScreenInfo
 {
-  Bitmap **toon_bitmap_array;
   Bitmap *save_buffer;
   void (*update_function)(void);
   void (*prepare_backbuffer_function)(void);
@@ -56,17 +55,23 @@ struct ToonScreenInfo
 
 struct ToonInfo
 {
-  int bitmap_nr;
+  int graphic;
   int width, height;
   int src_x, src_y;
-  int frames;
-  int frames_per_second;
+  int anim_frames;
+  int move_delay;
   int stepsize;
-  int mode;
+  int anim_mode;
   int direction;
   int position;
+
+  int anim_delay;
+  int start_frame;
+  Bitmap *bitmap;	/* dynamically initialized */
 };
 
+
+int getAnimationFrame(int, int, int, int, int);
 
 void InitToonScreen();
 void InitAnimation(void);

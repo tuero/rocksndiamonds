@@ -23,8 +23,56 @@
 
 static struct ToonScreenInfo screen_info;
 
-void InitToonScreen(Bitmap **toon_bitmap_array,
-		    Bitmap *save_buffer,
+
+/* ========================================================================= */
+/* generic animation frame calculation                                       */
+/* ========================================================================= */
+
+int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
+		      int sync_frame)
+{
+  int frame = 0;
+
+  sync_frame += start_frame * delay;
+
+  if (mode & ANIM_LOOP)			/* normal, looping animation */
+  {
+    frame = (sync_frame % (delay * num_frames)) / delay;
+  }
+  else if (mode & ANIM_LINEAR)		/* normal, non-looping animation */
+  {
+    frame = sync_frame / delay;
+
+    if (frame > num_frames - 1)
+      frame = num_frames - 1;
+  }
+  else if (mode & ANIM_PINGPONG)	/* use border frames once */
+  {
+    int max_anim_frames = 2 * num_frames - 2;
+
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame);
+  }
+  else if (mode & ANIM_PINGPONG2)	/* use border frames twice */
+  {
+    int max_anim_frames = 2 * num_frames;
+
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
+  }
+
+  if (mode & ANIM_REVERSE)		/* use reverse animation direction */
+    frame = num_frames - frame - 1;
+
+  return frame;
+}
+
+
+/* ========================================================================= */
+/* toon animation functions                                                  */
+/* ========================================================================= */
+
+void InitToonScreen(Bitmap *save_buffer,
 		    void (*update_function)(void),
 		    void (*prepare_backbuffer_function)(void),
 		    boolean (*redraw_needed_function)(void),
@@ -32,7 +80,6 @@ void InitToonScreen(Bitmap **toon_bitmap_array,
 		    int startx, int starty,
 		    int width, int height)
 {
-  screen_info.toon_bitmap_array = toon_bitmap_array;
   screen_info.save_buffer = save_buffer;
   screen_info.update_function = update_function;
   screen_info.prepare_backbuffer_function = prepare_backbuffer_function;
@@ -81,9 +128,10 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 
 boolean AnimateToon(int toon_nr, boolean restart)
 {
+  static unsigned long animation_frame_counter = 0;
   static int pos_x = 0, pos_y = 0;
   static int delta_x = 0, delta_y = 0;
-  static int frame = 0, frame_step = 1;
+  static int frame = 0;
   static boolean horiz_move, vert_move;
   static unsigned long anim_delay = 0;
   static unsigned long anim_delay_value = 0;
@@ -92,18 +140,19 @@ boolean AnimateToon(int toon_nr, boolean restart)
   static int cut_x,cut_y;
   static int src_x, src_y;
   static int dest_x, dest_y;
-
   struct ToonInfo *anim = &screen_info.toons[toon_nr];
-  int bitmap_nr = screen_info.toons[toon_nr].bitmap_nr;
-  Bitmap *anim_bitmap = screen_info.toon_bitmap_array[bitmap_nr];
+  Bitmap *anim_bitmap = screen_info.toons[toon_nr].bitmap;
   GC anim_clip_gc = anim_bitmap->stored_clip_gc;
 
   if (restart)
   {
     horiz_move = (anim->direction & (ANIMDIR_LEFT | ANIMDIR_RIGHT));
     vert_move = (anim->direction & (ANIMDIR_UP | ANIMDIR_DOWN));
-    anim_delay_value = 1000/anim->frames_per_second;
-    frame = 0;
+    anim_delay_value = anim->move_delay;
+
+    frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
+			      anim->anim_mode, anim->start_frame,
+			      animation_frame_counter++);
 
     if (horiz_move)
     {
@@ -189,7 +238,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   width  = anim->width;
   height = anim->height;
 
-  if (pos_x<0)
+  if (pos_x < 0)
   {
     dest_x = 0;
     width += pos_x;
@@ -198,7 +247,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   else if (pos_x > screen_info.width - anim->width)
     width -= (pos_x - (screen_info.width - anim->width));
 
-  if (pos_y<0)
+  if (pos_y < 0)
   {
     dest_y = 0;
     height += pos_y;
@@ -216,18 +265,10 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
   pos_x += delta_x;
   pos_y += delta_y;
-  frame += frame_step;
 
-  if (frame<0 || frame>=anim->frames)
-  {
-    if (anim->mode == ANIM_PINGPONG)
-    {
-      frame_step *= -1;
-      frame = (frame<0 ? 1 : anim->frames-2);
-    }
-    else
-      frame = (frame<0 ? anim->frames-1 : 0);
-  }
+  frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
+			    anim->anim_mode, anim->start_frame,
+			    animation_frame_counter++);
 
   return FALSE;
 }

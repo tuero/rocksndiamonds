@@ -32,7 +32,6 @@
 #define NUM_TOOL_BUTTONS	7
 
 /* forward declaration for internal use */
-static int getGraphicAnimationPhase(int, int, int);
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
 
@@ -382,6 +381,39 @@ void ClearWindow()
   }
 
   redraw_mask |= REDRAW_FIELD;
+}
+
+static int getGraphicAnimationPhase(int frames, int delay, int mode)
+{
+  int phase;
+
+  if (mode & ANIM_PINGPONG)
+  {
+    int max_anim_frames = 2 * frames - 2;
+
+    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
+    phase = (phase < frames ? phase : max_anim_frames - phase);
+  }
+  else
+    phase = (FrameCounter % (delay * frames)) / delay;
+
+  if (mode & ANIM_REVERSE)
+    phase = -phase;
+
+  return phase;
+}
+
+inline int getGraphicAnimationFrame(int graphic, int sync_frame)
+{
+  /* animation synchronized with global frame counter, not move position */
+  if (new_graphic_info[graphic].anim_global_sync || sync_frame < 0)
+    sync_frame = FrameCounter;
+
+  return getAnimationFrame(new_graphic_info[graphic].anim_frames,
+			   new_graphic_info[graphic].anim_delay,
+			   new_graphic_info[graphic].anim_mode,
+			   new_graphic_info[graphic].anim_start_frame,
+			   sync_frame);
 }
 
 void MarkTileDirty(int x, int y)
@@ -734,71 +766,6 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 
   MarkTileDirty(sx,sy);
-}
-
-static int getGraphicAnimationPhase(int frames, int delay, int mode)
-{
-  int phase;
-
-  if (mode & ANIM_PINGPONG)
-  {
-    int max_anim_frames = 2 * frames - 2;
-
-    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
-    phase = (phase < frames ? phase : max_anim_frames - phase);
-  }
-  else
-    phase = (FrameCounter % (delay * frames)) / delay;
-
-  if (mode & ANIM_REVERSE)
-    phase = -phase;
-
-  return phase;
-}
-
-int getGraphicAnimationFrame(int graphic, int sync_frame)
-{
-  int num_frames = new_graphic_info[graphic].anim_frames;
-  int delay = new_graphic_info[graphic].anim_delay;
-  int mode = new_graphic_info[graphic].anim_mode;
-  int frame = 0;
-
-  /* animation synchronized with global frame counter, not move position */
-  if (new_graphic_info[graphic].anim_global_sync || sync_frame < 0)
-    sync_frame = FrameCounter;
-
-  sync_frame += new_graphic_info[graphic].anim_start_frame * delay;
-
-  if (mode & ANIM_LOOP)			/* normal, looping animation */
-  {
-    frame = (sync_frame % (delay * num_frames)) / delay;
-  }
-  else if (mode & ANIM_LINEAR)		/* normal, non-looping animation */
-  {
-    frame = sync_frame / delay;
-
-    if (frame > num_frames - 1)
-      frame = num_frames - 1;
-  }
-  else if (mode & ANIM_PINGPONG)	/* use border frames once */
-  {
-    int max_anim_frames = 2 * num_frames - 2;
-
-    frame = (sync_frame % (delay * max_anim_frames)) / delay;
-    frame = (frame < num_frames ? frame : max_anim_frames - frame);
-  }
-  else if (mode & ANIM_PINGPONG2)	/* use border frames twice */
-  {
-    int max_anim_frames = 2 * num_frames;
-
-    frame = (sync_frame % (delay * max_anim_frames)) / delay;
-    frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
-  }
-
-  if (mode & ANIM_REVERSE)		/* use reverse animation direction */
-    frame = num_frames - frame - 1;
-
-  return frame;
 }
 
 void DrawGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
