@@ -114,7 +114,7 @@
 #define EP_INACTIVE		54
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	35
+#define EP_EM_SLIPPERY_WALL	55
 
 /* values for special graphics properties (no effect on game engine) */
 #define EP_GFX_CRUMBLED		56
