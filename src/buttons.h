@@ -264,4 +264,101 @@ int CheckCtrlButtons(int, int, int);
 int CheckElemButtons(int, int, int);
 int CheckCountButtons(int, int, int);
 
+
+/* NEW GADGET STUFF -------------------------------------------------------- */
+
+
+/* gadget types */
+#define GD_TYPE_NORMAL_BUTTON		(1<<0)
+#define GD_TYPE_TWO_STATE_BUTTON	(1<<1)
+#define GD_TYPE_DRAWING_AREA		(1<<2)
+#define GD_TYPE_TEXTINPUT		(1<<3)
+#define GD_TYPE_TEXTOUTPUT		(1<<4)
+#define GD_TYPE_NUMBERINPUT		(1<<5)
+#define GD_TYPE_NUMBEROUTPUT		(1<<6)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1<<7)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1<<8)
+
+/* gadget events */
+#define GD_EVENT_PRESSED		(1<<0)
+#define GD_EVENT_RELEASED		(1<<1)
+#define GD_EVENT_MOVING			(1<<2)
+
+/* gadget button states */
+#define GD_BUTTON_UNPRESSED		0
+#define GD_BUTTON_PRESSED		1
+
+/* gadget structure constants */
+#define MAX_GADGET_TEXTSIZE		1024
+
+/* gadget creation tags */
+#define GDI_END				0
+#define GDI_X				1
+#define GDI_Y				2
+#define GDI_WIDTH			3
+#define GDI_HEIGHT			4
+#define GDI_TYPE			5
+#define GDI_STATE			6
+#define GDI_ALT_STATE			7
+#define GDI_NUMBER_VALUE		8
+#define GDI_TEXT_VALUE			9
+#define GDI_DESIGN_UNPRESSED		10
+#define GDI_DESIGN_PRESSED		11
+#define GDI_ALT_DESIGN_UNPRESSED	12
+#define GDI_ALT_DESIGN_PRESSED		13
+#define GDI_EVENT			14
+#define GDI_CALLBACK			15
+
+typedef void (*gadget_callback_function)(void *);
+
+struct GadgetDesign
+{
+  Pixmap pixmap;			/* Pixmap with gadget surface */
+  int x, y;				/* position of rectangle in Pixmap */
+};
+
+struct GadgetInfo
+{
+  int x, y;				/* gadget position */
+  int width, height;			/* gadget size */
+  unsigned long type;			/* type (button, text input, ...) */
+  unsigned long state;			/* state (pressed, released, ...) */
+  boolean alt_state;			/* alternative state */
+  boolean mapped;			/* gadget is active */
+  long number_value;
+  char text_value[MAX_GADGET_TEXTSIZE];
+  struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
+  struct GadgetDesign alt_design[2];	/* alternative design */
+  unsigned long event;			/* actual gadget event */
+  gadget_callback_function callback;
+  struct GadgetInfo *next;		/* next list entry */
+};
+
+
+#if 0
+struct NewGadget
+{
+  int x, y;				/* screen position */
+  int width, height;			/* screen size */
+  unsigned long type;			/* type (button, text input, ...) */
+  struct GadgetDesign *design[2];	/* 0: normal; 1: pressed */
+  struct GadgetDesign *alt_design[2];	/* alternative design */
+  unsigned long value_mask;		/* actual gadget event */
+};
+#endif
+
+struct GadgetEvent
+{
+  unsigned long state;			/* state (pressed, released, ...) */
+  int x,y;				/* position inside drawing area */
+};
+
+struct GadgetInfo *CreateGadget(int, ...);
+void FreeGadget(struct GadgetInfo *);
+
+void MapGadget(struct GadgetInfo *);
+void UnmapGadget(struct GadgetInfo *);
+
+void HandleGadgets(int, int, int);
+
 #endif

@@ -20,6 +20,7 @@
 #include "misc.h"
 #include "tape.h"
 #include "joystick.h"
+#include "buttons.h"
 #include "network.h"
 
 /* values for key_status */
@@ -279,6 +280,7 @@ void HandleButton(int mx, int my, int button)
     old_mx = mx;
     old_my = my;
 
+    HandleGadgets(mx,my, button);
     HandleVideoButtons(mx,my, button);
     HandleSoundButtons(mx,my, button);
     HandleGameButtons(mx,my, button);

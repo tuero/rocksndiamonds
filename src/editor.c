@@ -419,6 +419,22 @@ void DrawLevelEd()
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
 }
 
+
+
+void test_func(struct GadgetInfo *gi)
+{
+  if (gi->event == GD_EVENT_PRESSED)
+    printf("test_func: GD_EVENT_PRESSED\n");
+  else if (gi->event == GD_EVENT_RELEASED)
+    printf("test_func: GD_EVENT_RELEASED\n");
+  else 
+    printf("test_func: ?\n");
+}
+
+
+
+
+
 void DrawControlWindow()
 {
   int i,x,y;
@@ -575,6 +591,32 @@ void DrawControlWindow()
 	   int2str(level.fieldx,3),FS_SMALL,FC_YELLOW);
   DrawText(ED_SIZE_VALUE_XPOS,ED_SIZE_VALUE_YPOS+1*ED_SIZE_GADGET_YSIZE,
 	   int2str(level.fieldy,3),FS_SMALL,FC_YELLOW);
+
+  {
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    int gd_x1 = DOOR_GFX_PAGEX4 + ED_BUTTON_MINUS_XPOS;
+    int gd_x2 = DOOR_GFX_PAGEX3 + ED_BUTTON_MINUS_XPOS;
+    int gd_y = DOOR_GFX_PAGEY1 + ED_BUTTON_MINUS_YPOS;
+    struct GadgetInfo *gi;
+
+    gi = CreateGadget(GDI_X, 100,
+		      GDI_Y, 100,
+		      GDI_WIDTH, ED_BUTTON_MINUS_XSIZE,
+		      GDI_HEIGHT, ED_BUTTON_MINUS_YSIZE,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_CALLBACK, test_func,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    MapGadget(gi);
+  }
+
+
 }
 
 void ScrollMiniLevel(int from_x, int from_y, int scroll)

@@ -11,6 +11,8 @@
 *  buttons.c                                               *
 ***********************************************************/
 
+#include <stdarg.h>
+
 #include "buttons.h"
 #include "tools.h"
 #include "misc.h"
@@ -1460,4 +1462,236 @@ int CheckCountButtons(int mx, int my, int button)
 
   BackToFront();
   return(return_code);
+}
+
+
+/* NEW GADGET STUFF -------------------------------------------------------- */
+
+
+static struct GadgetInfo *gadget_list_first_entry = NULL;
+static struct GadgetInfo *gadget_list_last_entry = NULL;
+
+static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
+{
+  struct GadgetInfo *gi = gadget_list_first_entry;
+
+  while (gi)
+  {
+    if (mx >= gi->x && mx < gi->x + gi->width &&
+	my >= gi->y && my < gi->y + gi->height)
+      break;
+
+    gi = gi->next;
+  }
+
+  return gi;
+}
+
+struct GadgetInfo *CreateGadget(int first_tag, ...)
+{
+  struct GadgetInfo *new_gadget = checked_malloc(sizeof(struct GadgetInfo));
+  int tag = first_tag;
+  va_list ap;
+
+  va_start(ap, first_tag);
+
+  /* always start with reliable default values */
+  memset(new_gadget, 0, sizeof(struct GadgetInfo));
+
+  while (tag != GDI_END)
+  {
+    printf("tag: %d\n", tag);
+
+
+    switch(tag)
+    {
+      case GDI_X:
+	new_gadget->x = va_arg(ap, int);
+	break;
+      case GDI_Y:
+	new_gadget->y = va_arg(ap, int);
+	break;
+      case GDI_WIDTH:
+	new_gadget->width = va_arg(ap, int);
+	break;
+      case GDI_HEIGHT:
+	new_gadget->height = va_arg(ap, int);
+	break;
+      case GDI_TYPE:
+	new_gadget->type = va_arg(ap, unsigned long);
+	break;
+      case GDI_STATE:
+	new_gadget->state = va_arg(ap, unsigned long);
+	break;
+      case GDI_ALT_STATE:
+	new_gadget->state = va_arg(ap, boolean);
+	break;
+      case GDI_NUMBER_VALUE:
+	new_gadget->number_value = va_arg(ap, long);
+	break;
+      case GDI_TEXT_VALUE:
+	strcpy(new_gadget->text_value, va_arg(ap, char *));
+	break;
+      case GDI_DESIGN_UNPRESSED:
+	new_gadget->design[GD_BUTTON_UNPRESSED].pixmap = va_arg(ap, Pixmap);
+	new_gadget->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
+	new_gadget->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
+	break;
+      case GDI_DESIGN_PRESSED:
+	new_gadget->design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	new_gadget->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
+	new_gadget->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
+	break;
+      case GDI_ALT_DESIGN_UNPRESSED:
+	new_gadget->alt_design[GD_BUTTON_UNPRESSED].pixmap= va_arg(ap, Pixmap);
+	new_gadget->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
+	new_gadget->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
+	break;
+      case GDI_ALT_DESIGN_PRESSED:
+	new_gadget->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	new_gadget->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
+	new_gadget->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
+	break;
+      case GDI_CALLBACK:
+	new_gadget->callback = va_arg(ap, gadget_callback_function);
+	break;
+
+      default:
+	Error(ERR_EXIT, "CreateGadget(): unknown tag %d", tag);
+    }
+
+    tag = va_arg(ap, int);	/* read next tag */
+  }
+
+  va_end(ap);
+
+  /* check if gadget complete */
+  if (!new_gadget->design[GD_BUTTON_UNPRESSED].pixmap ||
+      !new_gadget->design[GD_BUTTON_PRESSED].pixmap)
+    Error(ERR_EXIT, "gadget incomplete (missing Pixmap)");
+
+  /* insert new gadget into gloabl gadget list */
+
+  if (gadget_list_last_entry)
+  {
+    gadget_list_last_entry->next = new_gadget;
+    gadget_list_last_entry = gadget_list_last_entry->next;
+  }
+  else
+  {
+    gadget_list_first_entry = gadget_list_last_entry = new_gadget;
+  }
+
+  return new_gadget;
+}
+
+void FreeGadget(struct GadgetInfo *gi)
+{
+  struct GadgetInfo *gi_previous = gadget_list_first_entry;
+
+  while (gi_previous && gi_previous->next != gi)
+    gi_previous = gi_previous->next;
+
+  if (gi == gadget_list_first_entry)
+    gadget_list_first_entry = gi->next;
+
+  if (gi == gadget_list_last_entry)
+    gadget_list_last_entry = gi_previous;
+
+  gi_previous->next = gi->next;
+  free(gi);
+}
+
+static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
+{
+  int state = (pressed ? 1 : 0);
+  struct GadgetDesign *gd = (gi->alt_state ?
+			     &gi->alt_design[state] :
+			     &gi->design[state]);
+
+  XCopyArea(display, gd->pixmap, drawto, gc,
+	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+
+  if (direct)
+    XCopyArea(display, gd->pixmap, window, gc,
+	      gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+}
+
+void MapGadget(struct GadgetInfo *gi)
+{
+  gi->mapped = TRUE;
+
+  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), TRUE);
+}
+
+void UnmapGadget(struct GadgetInfo *gi)
+{
+  gi->mapped = FALSE;
+}
+
+void HandleGadgets(int mx, int my, int button)
+{
+  static struct GadgetInfo *choice = NULL;
+  static boolean pressed = FALSE;
+  struct GadgetInfo *new_choice;
+
+  if (gadget_list_first_entry == NULL)
+    return;
+
+  new_choice = getGadgetInfoFromMousePosition(mx,my);
+
+  if (button)
+  {
+    if (!motion_status)		/* mouse button just pressed */
+    {
+      if (new_choice != NULL)
+      {
+	choice = new_choice;
+	choice->state = GD_BUTTON_PRESSED;
+	choice->event = GD_EVENT_PRESSED;
+	DrawGadget(choice, TRUE, TRUE);
+	choice->callback(choice);
+	pressed = TRUE;
+      }
+    }
+    else			/* mouse movement with pressed mouse button */
+    {
+      if ((new_choice == NULL || new_choice != choice) &&
+	  choice != NULL && pressed)
+      {
+	choice->state = GD_BUTTON_UNPRESSED;
+	DrawGadget(choice, FALSE, TRUE);
+	pressed = FALSE;
+      }
+      else if (new_choice != NULL && new_choice == choice)
+      {
+	if (!pressed)
+	  DrawGadget(choice, TRUE, TRUE);
+	choice->state = GD_BUTTON_PRESSED;
+
+	/*
+	choice->callback(choice);
+	*/
+
+	pressed = TRUE;
+      }
+    }
+  }
+  else				/* mouse button just released */
+  {
+    if (new_choice != NULL && new_choice == choice && pressed)
+    {
+      choice->state = GD_BUTTON_UNPRESSED;
+      choice->event = GD_EVENT_RELEASED;
+      DrawGadget(choice, FALSE, TRUE);
+      choice->callback(choice);
+      choice = NULL;
+      pressed = FALSE;
+    }
+    else
+    {
+      choice = NULL;
+      pressed = FALSE;
+    }
+  }
 }

@@ -103,7 +103,7 @@ int game_emulation = EMU_NONE;
 
 
 #ifdef DEBUG
-#if 1
+#if 0
 static unsigned int getStateCheckSum(int counter)
 {
   int x, y;
@@ -3250,7 +3250,7 @@ void GameActions()
 
 
 #ifdef DEBUG
-
+  /*
   if (TimeFrames == 0 && !local_player->gone)
   {
     extern unsigned int last_RND();
@@ -3260,7 +3260,7 @@ void GameActions()
 	   last_RND(),
 	   getStateCheckSum(level.time - TimeLeft));
   }
-
+  */
 #endif
 
 
