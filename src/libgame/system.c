@@ -868,6 +868,31 @@ static const char *cursor_image_playfield[] =
   ". c #ffffff",
   "  c None",
 
+#if 1
+  /* some people complained about a "white dot" on the screen and thought it
+     was a graphical error... OK, let's just remove the whole pointer :-) */
+
+  /* pixels */
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+  "                ",
+
+  /* hot spot */
+  "0,0"
+#else
   /* pixels */
   " X              ",
   "X.X             ",
@@ -888,6 +913,7 @@ static const char *cursor_image_playfield[] =
 
   /* hot spot */
   "1,1"
+#endif
 };
 
 #if defined(TARGET_SDL)

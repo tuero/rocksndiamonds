@@ -3119,6 +3119,11 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
 					 !CAN_EXPLODE_1X1(i) &&
 					 !CAN_EXPLODE_DYNA(i)));
+
+    /* ---------- SP_PORT -------------------------------------------------- */
+    SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
+				 IS_PASSABLE_INSIDE(i)));
+
 #if 0
     if (i == EL_CUSTOM_START + 253)
       printf("::: %d, %d, %d -> %d\n",

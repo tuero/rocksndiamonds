@@ -135,13 +135,14 @@
 #define EP_CAN_SMASH		69
 #define EP_CAN_EXPLODE		70
 #define EP_CAN_EXPLODE_3X3	71
+#define EP_SP_PORT		72
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	72
-#define EP_WALK_TO_OBJECT	73
-#define EP_DEADLY		74
+#define EP_EXPLODE_RESULT	73
+#define EP_WALK_TO_OBJECT	74
+#define EP_DEADLY		75
 
-#define NUM_ELEMENT_PROPERTIES	75
+#define NUM_ELEMENT_PROPERTIES	76
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -345,6 +346,7 @@
 #define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
 #define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
 #define CAN_EXPLODE_3X3(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_3X3)
+#define IS_SP_PORT(e)		HAS_PROPERTY(e, EP_SP_PORT)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\

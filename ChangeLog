@@ -1,5 +1,7 @@
 2004-01-29
 	* fixed bug: infotron can now smash yellow disks
+	* fixed bug: when gravity active, port above player can now be entered
+	* removed "one white dot" mouse pointer which irritated some people
 
 2004-01-26
 	* added "choice type" for group element selection

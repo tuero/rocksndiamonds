@@ -7550,10 +7550,8 @@ void ScrollLevel(int dx, int dy)
   redraw_mask |= REDRAW_FIELD;
 }
 
-static boolean canEnterSupaplexPort(int x, int y, int move_dir)
+static boolean canEnterSupaplexPort(int x, int y, int dx, int dy)
 {
-  int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
-  int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
   int nextx = x + dx, nexty = y + dy;
   int element = Feld[x][y];
 
@@ -7603,7 +7601,9 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     boolean player_is_moving_to_valid_field =
       (IN_LEV_FIELD(new_jx, new_jy) &&
        (Feld[new_jx][new_jy] == EL_SP_BASE ||
-	Feld[new_jx][new_jy] == EL_SAND));
+	Feld[new_jx][new_jy] == EL_SAND ||
+	(IS_SP_PORT(Feld[new_jx][new_jy]) &&
+	 canEnterSupaplexPort(new_jx, new_jy, dx, dy))));
     /* !!! extend EL_SAND to anything diggable !!! */
 
     if (field_under_player_is_free &&
@@ -8806,6 +8806,10 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_GRAVITY_PORT_RIGHT:
     case EL_SP_GRAVITY_PORT_UP:
     case EL_SP_GRAVITY_PORT_DOWN:
+#if 1
+      if (!canEnterSupaplexPort(x, y, dx, dy))
+	return MF_NO_ACTION;
+#else
       if ((dx == -1 &&
 	   element != EL_SP_PORT_LEFT &&
 	   element != EL_SP_GRAVITY_PORT_LEFT &&
@@ -8829,6 +8833,7 @@ int DigField(struct PlayerInfo *player,
 	  !IN_LEV_FIELD(nextx, nexty) ||
 	  !IS_FREE(nextx, nexty))
 	return MF_NO_ACTION;
+#endif
 
       if (element == EL_SP_GRAVITY_PORT_LEFT ||
 	  element == EL_SP_GRAVITY_PORT_RIGHT ||
