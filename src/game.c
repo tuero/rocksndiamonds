@@ -5030,7 +5030,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 
     if (field_under_player_is_free &&
 	!player_is_moving_to_valid_field &&
-	!IS_WALKABLE_UNDER(Feld[jx][jy]))
+	!IS_WALKABLE_THROUGH(Feld[jx][jy]))
       player->programmed_action = MV_DOWN;
   }
 }
@@ -5706,7 +5706,7 @@ int DigField(struct PlayerInfo *player,
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
 
-  if (IS_WALKABLE_UNDER(Feld[jx][jy]))
+  if (IS_WALKABLE_THROUGH(Feld[jx][jy]))
   {
     int i = 0;
     int tube_leave_directions[][2] =

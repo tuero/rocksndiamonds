@@ -1957,6 +1957,63 @@ void InitElementProperties()
     -1
   };
 
+  static int ep_walkable_through[] =
+  {
+    EL_TUBE_ANY,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN,
+    -1
+  };
+
+  static int ep_walkable_under[] =
+  {
+    -1
+  };
+
+  static int ep_passable_over[] =
+  {
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    EL_SWITCHGATE_OPEN,
+    EL_TIMEGATE_OPEN,
+    -1
+  };
+
+  static int ep_passable_through[] =
+  {
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_UP,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_GRAVITY_PORT_DOWN,
+    -1
+  };
+
+  static int ep_passable_under[] =
+  {
+    -1
+  };
+
   static int ep_diggable[] =
   {
     EL_SAND,
@@ -2003,32 +2060,6 @@ void InitElementProperties()
     EL_EXTRA_TIME,
     EL_ENVELOPE,
     EL_SPEED_PILL,
-    -1
-  };
-
-  static int ep_walkable_through[] =
-  {
-    EL_EM_GATE_1,
-    EL_EM_GATE_2,
-    EL_EM_GATE_3,
-    EL_EM_GATE_4,
-    EL_EM_GATE_1_GRAY,
-    EL_EM_GATE_2_GRAY,
-    EL_EM_GATE_3_GRAY,
-    EL_EM_GATE_4_GRAY,
-    EL_SP_PORT_LEFT,
-    EL_SP_PORT_RIGHT,
-    EL_SP_PORT_UP,
-    EL_SP_PORT_DOWN,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_ANY,
-    EL_SP_GRAVITY_PORT_LEFT,
-    EL_SP_GRAVITY_PORT_RIGHT,
-    EL_SP_GRAVITY_PORT_UP,
-    EL_SP_GRAVITY_PORT_DOWN,
-    EL_SWITCHGATE_OPEN,
-    EL_TIMEGATE_OPEN,
     -1
   };
 
@@ -2121,22 +2152,6 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_walkable_under[] =
-  {
-    EL_TUBE_ANY,
-    EL_TUBE_VERTICAL,
-    EL_TUBE_HORIZONTAL,
-    EL_TUBE_VERTICAL_LEFT,
-    EL_TUBE_VERTICAL_RIGHT,
-    EL_TUBE_HORIZONTAL_UP,
-    EL_TUBE_HORIZONTAL_DOWN,
-    EL_TUBE_LEFT_UP,
-    EL_TUBE_LEFT_DOWN,
-    EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN,
-    -1
-  };
-
   static int ep_sp_element[] =
   {
     EL_SP_EMPTY,
@@ -2197,11 +2212,6 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_solid_new[] =
-  {
-    -1
-  };
-
   static struct
   {
     int *elements;
@@ -2234,18 +2244,21 @@ void InitElementProperties()
     { ep_pushable,		EP_PUSHABLE		},
     { ep_player,		EP_PLAYER		},
     { ep_walkable_over,		EP_WALKABLE_OVER	},
+    { ep_walkable_through,	EP_WALKABLE_THROUGH	},
+    { ep_walkable_under,	EP_WALKABLE_UNDER	},
+    { ep_passable_over,		EP_PASSABLE_OVER	},
+    { ep_passable_through,	EP_PASSABLE_THROUGH	},
+    { ep_passable_under,	EP_PASSABLE_UNDER	},
+
     { ep_diggable,		EP_DIGGABLE		},
     { ep_collectible,		EP_COLLECTIBLE		},
-    { ep_walkable_through,	EP_WALKABLE_THROUGH	},
     { ep_over_player,		EP_OVER_PLAYER		},
     { ep_active_bomb,		EP_ACTIVE_BOMB		},
     { ep_belt,			EP_BELT			},
     { ep_belt_active,		EP_BELT_ACTIVE		},
     { ep_belt_switch,		EP_BELT_SWITCH		},
-    { ep_walkable_under,	EP_WALKABLE_UNDER	},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_has_content,		EP_HAS_CONTENT		},
-    { ep_solid_new,		EP_SOLID_NEW		},
     { NULL,			-1			}
   };
 
@@ -2271,7 +2284,7 @@ void InitElementProperties()
     EP_PLAYER,
     EP_HAS_CONTENT,
     EP_DIGGABLE,
-    EP_WALKABLE_THROUGH,
+    EP_PASSABLE_THROUGH,
     EP_OVER_PLAYER,
     EP_ACTIVE_BOMB,
 
@@ -2298,6 +2311,25 @@ void InitElementProperties()
   /* set properties of character elements */
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     SET_PROPERTY(i, EP_INACTIVE, TRUE);
+
+  /* set properties derived from other properties */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    if (IS_WALKABLE_OVER(i) || IS_WALKABLE_THROUGH(i) || IS_WALKABLE_UNDER(i))
+      SET_PROPERTY(i, EP_WALKABLE, TRUE);
+
+    if (IS_PASSABLE_OVER(i) || IS_PASSABLE_THROUGH(i) || IS_PASSABLE_UNDER(i))
+      SET_PROPERTY(i, EP_PASSABLE, TRUE);
+
+    if (IS_WALKABLE_OVER(i) || IS_PASSABLE_OVER(i))
+      SET_PROPERTY(i, EP_PLAYER_OVER, TRUE);
+
+    if (IS_WALKABLE_THROUGH(i) || IS_PASSABLE_THROUGH(i))
+      SET_PROPERTY(i, EP_PLAYER_INSIDE, TRUE);
+
+    if (IS_WALKABLE_UNDER(i) || IS_PASSABLE_UNDER(i))
+      SET_PROPERTY(i, EP_PLAYER_UNDER, TRUE);
+  }
 
 #if 0
   /* determine inactive elements (used for engine main loop optimization) */

@@ -745,16 +745,20 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 
   /* ----------------------------------------------------------------------- */
-  /* draw elements that stay over the player                                 */
+  /* draw elements the player is just walking/passing through/under          */
   /* ----------------------------------------------------------------------- */
 
   /* handle the field the player is leaving ... */
-  if (player_is_moving && IS_OVER_PLAYER(last_element))
+  if (player_is_moving && IS_PLAYER_INSIDE(last_element))
     DrawLevelField(last_jx, last_jy);
+  else if (player_is_moving && IS_PLAYER_UNDER(last_element))
+    DrawLevelFieldThruMask(last_jx, last_jy);
 
   /* ... and the field the player is entering */
-  if (IS_OVER_PLAYER(element))
+  if (IS_PLAYER_INSIDE(element))
     DrawLevelField(jx, jy);
+  else if (IS_PLAYER_UNDER(element))
+    DrawLevelFieldThruMask(jx, jy);
 
   if (setup.direct_draw)
   {
