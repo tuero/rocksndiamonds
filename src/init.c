@@ -263,9 +263,6 @@ static void ReinitializeGraphics()
 
 
   /* !!! TEST ONLY !!! */
-
-#if 1
-
   {
     Bitmap *tst_bitmap = graphic_info[IMG_SAND].bitmap;
     Bitmap *tmp_bitmap = ZoomBitmap(tst_bitmap,
@@ -276,31 +273,6 @@ static void ReinitializeGraphics()
 
     FreeBitmap(tmp_bitmap);
   }
-
-#else
-#ifdef TARGET_SDL
-
-  {
-    Bitmap tmp_bitmap;
-    SDL_Surface *dst = SDLZoomSurface(graphic_info[IMG_SAND].bitmap->surface,
-				      0.5, 0.5);
-    tmp_bitmap.surface = dst;
-
-    BlitBitmap(&tmp_bitmap, graphic_info[IMG_SAND].bitmap,
-	       0, 0, 256, 224, 0, 448);
-
-    SDL_FreeSurface(dst);
-  }
-
-#elif defined(PLATFORM_MSDOS)
-
-  stretch_blit((BITMAP *)(graphic_info[IMG_SAND].bitmap->drawable),
-	       (BITMAP *)(graphic_info[IMG_SAND].bitmap->drawable),
-	       0, 0, 512, 448,
-	       0, 448, 256, 224);
-
-#endif
-#endif
 }
 
 static void ReinitializeSounds()

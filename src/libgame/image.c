@@ -443,8 +443,8 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   display_bits_per_pixel = bitsPerPixelAtDepth(display, screen, depth);
   display_bytes_per_pixel = (display_bits_per_pixel + 7) / 8;
 
-  ximage = XCreateImage(display, visual, depth, ZPixmap, 0,
-			NULL, image->width, image->height,
+  ximage = XCreateImage(display, visual, depth, ZPixmap,
+			0, NULL, image->width, image->height,
 			8, image->width * display_bytes_per_pixel);
   ximage->data =
     checked_malloc(image->width * image->height * display_bytes_per_pixel);
@@ -563,6 +563,62 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   XDestroyImage(ximage);
 
   return ximageinfo;
+}
+
+/*
+  -----------------------------------------------------------------------------
+  ZoomPixmap
+
+  Important note: The scaling code currently only supports scaling down the
+  image by a power of 2 -- scaling up is currently not supported at all!
+  -----------------------------------------------------------------------------
+*/
+
+void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
+		int src_width, int src_height,
+		int dst_width, int dst_height)
+{
+  XImage *src_ximage, *dst_ximage;
+  byte *src_ptr, *dst_ptr;
+  int bits_per_pixel;
+  int bytes_per_pixel;
+  int x, y, i;
+  int zoom_factor = src_width / dst_width;	/* currently very limited! */
+  int row_skip, col_skip;
+
+  /* copy source pixmap to temporary image */
+  src_ximage = XGetImage(display, src_pixmap, 0, 0,
+			 src_width, src_height, AllPlanes, ZPixmap);
+
+  bits_per_pixel = src_ximage->bits_per_pixel;
+  bytes_per_pixel = (bits_per_pixel + 7) / 8;
+
+  dst_ximage = XCreateImage(display, visual, src_ximage->depth, ZPixmap,
+			    0, NULL, dst_width, dst_height,
+			    8, dst_width * bytes_per_pixel);
+  dst_ximage->data =
+    checked_malloc(dst_width * dst_height * bytes_per_pixel);
+  dst_ximage->byte_order = src_ximage->byte_order;
+
+  src_ptr = (byte *)src_ximage->data;
+  dst_ptr = (byte *)dst_ximage->data;
+
+  col_skip = (zoom_factor - 1) * bytes_per_pixel;
+  row_skip = col_skip * src_width;
+
+  /* scale image down by scaling factor 'zoom_factor' */
+  for (y=0; y < src_height; y += zoom_factor, src_ptr += row_skip)
+    for (x=0; x < src_width; x += zoom_factor, src_ptr += col_skip)
+      for (i=0; i<bytes_per_pixel; i++)
+	*dst_ptr++ = *src_ptr++;
+
+  /* copy scaled image to destination pixmap */
+  XPutImage(display, dst_pixmap, gc, dst_ximage, 0, 0, 0, 0,
+	    MIN(src_width, dst_width), MIN(src_height, dst_height));
+
+  /* free temporary images */
+  XDestroyImage(src_ximage);
+  XDestroyImage(dst_ximage);
 }
 
 void freeXImage(Image *image, XImageInfo *ximageinfo)

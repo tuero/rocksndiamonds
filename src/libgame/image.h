@@ -67,6 +67,9 @@ typedef struct
 Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);
+
+void ZoomPixmap(Display *, GC, Pixmap, Pixmap, int, int, int, int);
+
 int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 #endif /* TARGET_X11 */
