@@ -5969,8 +5969,12 @@ void InitGraphicInfo_EM(void)
 #endif
 
       /* create unique graphic identifier to decide if tile must be redrawn */
+      /* bit 31 - 16 (16 bit): EM style element
+	 bit 15 - 12 ( 4 bit): EM style frame
+	 bit 11 -  6 ( 6 bit): graphic width
+	 bit  5 -  0 ( 6 bit): graphic height */
       g_em->unique_identifier =
-	(i << 16) | (frame << 8) | g_em->width | g_em->height;
+	(i << 16) | (j << 12) | (g_em->width << 6) | g_em->height;
 
 #if DEBUG_EM_GFX
       if (g_em->bitmap != debug_bitmap ||
