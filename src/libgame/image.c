@@ -845,7 +845,7 @@ struct PropertyMapping *getImageListPropertyMapping()
 }
 
 void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
-		   struct ConfigInfo *config_suffix_list,
+		   struct ConfigTypeInfo *config_suffix_list,
 		   char **base_prefixes, char **ext1_suffixes,
 		   char **ext2_suffixes, char **ext3_suffixes,
 		   char **ignore_tokens)

@@ -3655,6 +3655,15 @@ void InitElementPropertiesEngine(int engine_version)
 
 static void InitGlobal()
 {
+  int i;
+
+  for (i = 0; i < MAX_NUM_ELEMENTS + 1; i++)
+  {
+    element_info[i].token_name = element_name_info[i].token_name;
+    element_info[i].class_name = element_name_info[i].class_name;
+    element_info[i].editor_description=element_name_info[i].editor_description;
+  }
+
   global.autoplay_leveldir = NULL;
   global.convert_leveldir = NULL;
 

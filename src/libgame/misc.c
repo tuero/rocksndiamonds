@@ -1707,7 +1707,7 @@ static void FreeCustomArtworkList(struct ArtworkListInfo *,
 				  struct ListNodeInfo ***, int *);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
-					   struct ConfigInfo *suffix_list,
+					   struct ConfigTypeInfo *suffix_list,
 					   char **ignore_tokens,
 					   int num_file_list_entries)
 {
@@ -1842,7 +1842,7 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
 #define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN_VALUE]"
 
 static void read_token_parameters(SetupFileHash *setup_file_hash,
-				  struct ConfigInfo *suffix_list,
+				  struct ConfigTypeInfo *suffix_list,
 				  struct FileInfo *file_list_entry)
 {
   /* check for config token that is the base token without any suffixes */
@@ -1895,7 +1895,7 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
 static void add_dynamic_file_list_entry(struct FileInfo **list,
 					int *num_list_entries,
 					SetupFileHash *extra_file_hash,
-					struct ConfigInfo *suffix_list,
+					struct ConfigTypeInfo *suffix_list,
 					int num_suffix_list_entries,
 					char *token)
 {
@@ -1944,7 +1944,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 					  char *filename)
 {
   struct FileInfo *file_list = artwork_info->file_list;
-  struct ConfigInfo *suffix_list = artwork_info->suffix_list;
+  struct ConfigTypeInfo *suffix_list = artwork_info->suffix_list;
   char **base_prefixes = artwork_info->base_prefixes;
   char **ext1_suffixes = artwork_info->ext1_suffixes;
   char **ext2_suffixes = artwork_info->ext2_suffixes;

@@ -694,6 +694,12 @@ struct ConfigInfo
 {
   char *token;
   char *value;
+};
+
+struct ConfigTypeInfo
+{
+  char *token;
+  char *value;
   int type;
 };
 
@@ -750,7 +756,7 @@ struct ArtworkListInfo
   struct FileInfo *dynamic_file_list;		/* dynamic artwrk file array */
 
   int num_suffix_list_entries;
-  struct ConfigInfo *suffix_list;		/* parameter suffixes array */
+  struct ConfigTypeInfo *suffix_list;		/* parameter suffixes array */
 
   int num_base_prefixes;
   int num_ext1_suffixes;

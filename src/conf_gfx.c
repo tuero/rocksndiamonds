@@ -19,7 +19,7 @@
    reliable default values. If that value is GFX_ARG_UNDEFINED, it will
    be dynamically determined, using some of the other list values. */
 
-struct ConfigInfo image_config_suffix[] =
+struct ConfigTypeInfo image_config_suffix[] =
 {
   { ".x",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".y",				ARG_UNDEFINED,	TYPE_INTEGER	},

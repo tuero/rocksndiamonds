@@ -29,6 +29,8 @@
 
 /* EXPERIMENTAL STUFF */
 #define USE_NEW_MOVEMENT	FALSE
+#define USE_NEW_MOVE_DELAY	TRUE   *1
+#define USE_NEW_PUSH_DELAY	TRUE   *1
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -294,6 +296,8 @@
 
 
 /* forward declaration for internal use */
+
+static void AdvanceFrameAndPlayerCounters(int);
 
 static boolean MovePlayerOneStep(struct PlayerInfo *, int, int, int, int);
 static boolean MovePlayer(struct PlayerInfo *, int, int);
@@ -1153,7 +1157,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
 
 /*
   =============================================================================
-  InitGameEngine()
+ InitGameEngine()
   -----------------------------------------------------------------------------
   initialize game engine due to level / tape version number
   =============================================================================
@@ -1189,6 +1193,15 @@ static void InitGameEngine()
 
   /* ---------- initialize player's initial move delay --------------------- */
 
+#if USE_NEW_MOVE_DELAY
+  /* dynamically adjust player properties according to level information */
+  game.initial_move_delay_value =
+    (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
+  /* dynamically adjust player properties according to game engine version */
+  game.initial_move_delay = (game.engine_version <= VERSION_IDENT(2,0,1,0) ?
+			     game.initial_move_delay_value : 0);
+#else
   /* dynamically adjust player properties according to game engine version */
   game.initial_move_delay =
     (game.engine_version <= VERSION_IDENT(2,0,1,0) ? INITIAL_MOVE_DELAY_ON :
@@ -1197,6 +1210,7 @@ static void InitGameEngine()
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+#endif
 
   /* ---------- initialize player's initial push delay --------------------- */
 
@@ -1573,8 +1587,13 @@ void InitGame()
 
     player->move_delay_reset_counter = 0;
 
-    player->push_delay = 0;
+#if USE_NEW_PUSH_DELAY
+    player->push_delay       = -1;	/* initialized when pushing starts */
     player->push_delay_value = game.initial_push_delay_value;
+#else
+    player->push_delay       = 0;
+    player->push_delay_value = game.initial_push_delay_value;
+#endif
 
     player->drop_delay = 0;
 
@@ -2890,7 +2909,12 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
     {
       ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
+
+#if USE_NEW_MOVE_DELAY
+      AdvanceFrameAndPlayerCounters(player->index_nr);
+#else
       FrameCounter++;
+#endif
 
       DrawPlayer(player);
 
@@ -8323,6 +8347,45 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 }
 #endif
 
+void AdvanceFrameAndPlayerCounters(int player_nr)
+{
+  int i;
+
+  /* advance frame counters (global frame counter and time frame counter) */
+  FrameCounter++;
+  TimeFrames++;
+
+  /* advance player counters (counters for move delay, move animation etc.) */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    boolean advance_player_counters = (player_nr == -1 || player_nr == i);
+    int move_frames =
+      MOVE_DELAY_NORMAL_SPEED /  stored_player[i].move_delay_value;
+
+    if (!advance_player_counters)	/* not all players may be affected */
+      continue;
+
+    stored_player[i].Frame += move_frames;
+
+    if (stored_player[i].MovPos != 0)
+      stored_player[i].StepFrame += move_frames;
+
+#if USE_NEW_MOVE_DELAY
+    if (stored_player[i].move_delay > 0)
+      stored_player[i].move_delay--;
+#endif
+
+#if USE_NEW_PUSH_DELAY
+    /* due to bugs in previous versions, counter must count up, not down */
+    if (stored_player[i].push_delay != -1)
+      stored_player[i].push_delay++;
+#endif
+
+    if (stored_player[i].drop_delay > 0)
+      stored_player[i].drop_delay--;
+  }
+}
+
 void GameActions()
 {
   static unsigned long action_delay = 0;
@@ -9014,7 +9077,9 @@ void GameActions()
 	   stored_player[0].StepFrame);
 #endif
 
-#if 1
+#if USE_NEW_MOVE_DELAY
+  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
+#else
   FrameCounter++;
   TimeFrames++;
 
@@ -9027,6 +9092,11 @@ void GameActions()
 
     if (stored_player[i].MovPos != 0)
       stored_player[i].StepFrame += move_frames;
+
+#if USE_NEW_MOVE_DELAY
+    if (stored_player[i].move_delay > 0)
+      stored_player[i].move_delay--;
+#endif
 
     if (stored_player[i].drop_delay > 0)
       stored_player[i].drop_delay--;
@@ -9513,7 +9583,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 	 player->move_delay + player->move_delay_value);
 #endif
 
+#if USE_NEW_MOVE_DELAY
+  if (player->move_delay > 0)
+#else
   if (!FrameReached(&player->move_delay, player->move_delay_value))
+#endif
   {
 #if 0
     printf("::: can NOT move\n");
@@ -9531,6 +9605,10 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
 #if 0
   printf("::: COULD move now\n");
+#endif
+
+#if USE_NEW_MOVE_DELAY
+  player->move_delay = -1;		/* set to "uninitialized" value */
 #endif
 
   /* store if player is automatically moved to next field */
@@ -9558,7 +9636,13 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     {
       ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
+
+#if USE_NEW_MOVE_DELAY
+      AdvanceFrameAndPlayerCounters(player->index_nr);
+#else
       FrameCounter++;
+#endif
+
       DrawAllPlayers();
       BackToFront();
     }
@@ -9755,6 +9839,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->move_delay = -1;	/* allow direct movement in the next frame */
 #endif
   }
+
+#if USE_NEW_MOVE_DELAY
+  if (player->move_delay == -1)		/* not yet initialized by DigField() */
+    player->move_delay = player->move_delay_value;
+#endif
 
   if (game.engine_version < VERSION_IDENT(3,0,7,0))
   {
@@ -10810,7 +10899,11 @@ int DigField(struct PlayerInfo *player,
     if (mode == DF_NO_PUSH)	/* player just stopped pushing */
     {
       player->is_switching = FALSE;
+#if USE_NEW_PUSH_DELAY
+      player->push_delay = -1;
+#else
       player->push_delay = 0;
+#endif
 
       return MF_NO_ACTION;
     }
@@ -11373,16 +11466,56 @@ int DigField(struct PlayerInfo *player,
 	if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	  return MF_NO_ACTION;
 
+#if USE_NEW_PUSH_DELAY
+
+#if 0
+	if ( (player->push_delay == -1) != (player->push_delay2 == 0) )
+	  printf("::: ALERT: %d, %d [%d / %d]\n",
+		 player->push_delay, player->push_delay2,
+		 FrameCounter, FrameCounter / 50);
+#endif
+
+	if (player->push_delay == -1)	/* new pushing; restart delay */
+	  player->push_delay = 0;
+#else
 	if (player->push_delay == 0)	/* new pushing; restart delay */
 	  player->push_delay = FrameCounter;
+#endif
 
+#if USE_NEW_PUSH_DELAY
+#if 0
+	if ( (player->push_delay > 0) != (!xxx_fr) )
+	  printf("::: PUSH BUG! %d, (%d -> %d) %d [%d / %d]\n",
+		 player->push_delay,
+		 xxx_pdv2, player->push_delay2, player->push_delay_value,
+		 FrameCounter, FrameCounter / 50);
+#endif
+
+#if 0
+	if (player->push_delay > 0 &&
+	    !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	    element != EL_SPRING && element != EL_BALLOON)
+#else
+	/* !!! */
+	if (player->push_delay < player->push_delay_value &&
+	    !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	    element != EL_SPRING && element != EL_BALLOON)
+#endif
+
+#else
 	if (!FrameReached(&player->push_delay, player->push_delay_value) &&
 	    !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	    element != EL_SPRING && element != EL_BALLOON)
+#endif
 	{
 	  /* make sure that there is no move delay before next try to push */
+#if USE_NEW_MOVE_DELAY
+	  if (game.engine_version >= VERSION_IDENT(3,0,7,1))
+	    player->move_delay = 0;
+#else
 	  if (game.engine_version >= VERSION_IDENT(3,0,7,1))
 	    player->move_delay = INITIAL_MOVE_DELAY_OFF;
+#endif
 
 	  return MF_NO_ACTION;
 	}
@@ -11608,7 +11741,11 @@ int DigField(struct PlayerInfo *player,
       return MF_NO_ACTION;
   }
 
+#if USE_NEW_PUSH_DELAY
+  player->push_delay = -1;
+#else
   player->push_delay = 0;
+#endif
 
   if (Feld[x][y] != element)		/* really digged/collected something */
     player->is_collecting = !player->is_digging;

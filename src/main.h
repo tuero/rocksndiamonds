@@ -1417,13 +1417,23 @@ struct PlayerInfo
 
   int show_envelope;
 
+#if 1	/* USE_NEW_MOVE_DELAY */
+  int move_delay;
+  int move_delay_value;
+#else
   unsigned long move_delay;
   int move_delay_value;
+#endif
 
   int move_delay_reset_counter;
 
+#if 1	/* USE_NEW_PUSH_DELAY */
+  int push_delay;
+  int push_delay_value;
+#else
   unsigned long push_delay;
   unsigned long push_delay_value;
+#endif
 
   unsigned long actual_frame_counter;
 
@@ -1660,6 +1670,15 @@ struct ElementGroupInfo
   short element_resolved[NUM_FILE_ELEMENTS];
 
   int choice_pos;		/* current element choice position */
+};
+
+struct ElementNameInfo
+{
+  /* ---------- token and description strings ---------- */
+
+  char *token_name;		/* element token used in config files */
+  char *class_name;		/* element class used in config files */
+  char *editor_description;	/* pre-defined description for level editor */
 };
 
 struct ElementInfo
@@ -1961,6 +1980,7 @@ extern struct GlobalInfo	global;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct ElementInfo	element_info[];
+extern struct ElementNameInfo	element_name_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
@@ -1973,12 +1993,12 @@ extern struct MusicInfo	       *music_info;
 extern struct MusicFileInfo    *music_file_info;
 extern struct HelpAnimInfo     *helpanim_info;
 extern SetupFileHash           *helptext_info;
+extern struct ConfigTypeInfo	image_config_suffix[];
+extern struct ConfigTypeInfo	sound_config_suffix[];
+extern struct ConfigTypeInfo	music_config_suffix[];
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];
-extern struct ConfigInfo	image_config_suffix[];
-extern struct ConfigInfo	sound_config_suffix[];
-extern struct ConfigInfo	music_config_suffix[];
 extern struct ConfigInfo	helpanim_config[];
 extern struct ConfigInfo	helptext_config[];
 

@@ -122,7 +122,10 @@ SetupFileHash          *helptext_info = NULL;
 /* element definitions                                                       */
 /* ------------------------------------------------------------------------- */
 
-struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
+struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1];
+
+/* this contains predefined structure elements to initialize "element_info" */
+struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
 {
   /* keyword to start parser: "ELEMENT_INFO_START" <-- do not change! */
 

@@ -19,7 +19,7 @@
    reliable default values. If that value is SND_ARG_UNDEFINED, it will
    be dynamically determined, using some of the other list values. */
 
-struct ConfigInfo sound_config_suffix[] =
+struct ConfigTypeInfo sound_config_suffix[] =
 {
   { ".mode_loop",			ARG_UNDEFINED,	TYPE_BOOLEAN	},
 
