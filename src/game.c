@@ -3164,6 +3164,11 @@ void Bang(int x, int y)
     case EL_PENGUIN:
     case EL_LAMP:
     case EL_LAMP_ACTIVE:
+
+#if 1
+    case EL_AMOEBA_TO_DIAMOND:
+#endif
+
       if (IS_PLAYER(x, y))
 	Explode(x, y, EX_PHASE_START, EX_NORMAL);
       else
