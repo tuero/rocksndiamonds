@@ -403,7 +403,6 @@ void LoadTape(int level_nr)
   char cookie[MAX_LINE_LEN];
   char chunk[CHUNK_ID_LEN + 1];
   FILE *file;
-  boolean player_participates[MAX_PLAYERS];
   int num_participating_players;
   int file_version = FILE_VERSION_1_2;	/* last version of tape files */
   int chunk_length;
@@ -464,11 +463,11 @@ void LoadTape(int level_nr)
     num_participating_players = 0;
     for(i=0; i<MAX_PLAYERS; i++)
     {
-      player_participates[i] = FALSE;
+      tape.player_participates[i] = FALSE;
 
       if (store_participating_players & (1 << i))
       {
-	player_participates[i] = TRUE;
+	tape.player_participates[i] = TRUE;
 	num_participating_players++;
       }
     }
@@ -511,7 +510,7 @@ void LoadTape(int level_nr)
       if (file_version == FILE_VERSION_1_0 && j > 0)
 	continue;
 
-      if (player_participates[j])
+      if (tape.player_participates[j])
 	tape.pos[i].action[j] = fgetc(file);
     }
 
@@ -559,11 +558,10 @@ void LoadTape(int level_nr)
 
 void SaveTape(int level_nr)
 {
-  int i, j;
+  int i;
   char filename[MAX_FILENAME_LEN];
   FILE *file;
   boolean new_tape = TRUE;
-  boolean player_participates[MAX_PLAYERS];
   byte store_participating_players;
   int num_participating_players;
   int chunk_length;
@@ -584,21 +582,12 @@ void SaveTape(int level_nr)
       return;
   }
 
-  for(i=0; i<MAX_PLAYERS; i++)
-    player_participates[i] = FALSE;
-
-  /* check which players participate in this tape recording */
-  for(i=0; i<tape.length; i++)
-    for(j=0; j<MAX_PLAYERS; j++)
-      if (tape.pos[i].action[j] != 0)
-	player_participates[j] = TRUE;
-
   /* count number of players and set corresponding bits for compact storage */
   store_participating_players = 0;
   num_participating_players = 0;
   for(i=0; i<MAX_PLAYERS; i++)
   {
-    if (player_participates[i])
+    if (tape.player_participates[i])
     {
       num_participating_players++;
       store_participating_players |= (1 << i);
@@ -656,7 +645,7 @@ void SaveTape(int level_nr)
     int j;
 
     for(j=0; j<MAX_PLAYERS; j++)
-      if (player_participates[j])
+      if (tape.player_participates[j])
 	fputc(tape.pos[i].action[j], file);
 
     fputc(tape.pos[i].delay, file);

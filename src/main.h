@@ -345,7 +345,7 @@ struct LevelDirInfo
   boolean readonly;
 };
 
-struct RecordingInfo
+struct TapeInfo
 {
   int level_nr;
   unsigned long random_seed;
@@ -358,6 +358,7 @@ struct RecordingInfo
   boolean recording, playing, pausing;
   boolean fast_forward;
   boolean changed;
+  boolean player_participates[MAX_PLAYERS];
   struct
   {
     byte action[MAX_PLAYERS];
@@ -438,7 +439,7 @@ extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
-extern struct RecordingInfo	tape;
+extern struct TapeInfo		tape;
 extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
 extern struct OptionInfo	options;

@@ -20,6 +20,7 @@ void TapeStartRecording()
 {
   time_t zeit1 = time(NULL);
   struct tm *zeit2 = localtime(&zeit1);
+  int i;
 
   if (!TAPE_IS_STOPPED(tape))
     TapeStop();
@@ -34,6 +35,9 @@ void TapeStartRecording()
   tape.changed = TRUE;
   tape.date = 10000*(zeit2->tm_year%100) + 100*zeit2->tm_mon + zeit2->tm_mday;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
+
+  for(i=0; i<MAX_PLAYERS; i++)
+    tape.player_participates[i] = FALSE;
 
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);

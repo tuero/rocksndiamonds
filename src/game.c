@@ -427,20 +427,38 @@ void InitGame()
     }
   }
 
-  /* when in single player mode, eliminate all but the first active player */
-  if (!options.network && !setup.team_mode)
+  if (tape.playing)
   {
+    /* when playing a tape, eliminate all players who do not participate */
+
+    for (i=0; i<MAX_PLAYERS; i++)
+    {
+      if (stored_player[i].active && !tape.player_participates[i])
+      {
+	struct PlayerInfo *player = &stored_player[i];
+	int jx = player->jx, jy = player->jy;
+
+	player->active = FALSE;
+	StorePlayer[jx][jy] = 0;
+	Feld[jx][jy] = EL_LEERRAUM;
+      }
+    }
+  }
+  else if (!options.network && !setup.team_mode)	/* && !tape.playing */
+  {
+    /* when in single player mode, eliminate all but the first active player */
+
     for (i=0; i<MAX_PLAYERS; i++)
     {
       if (stored_player[i].active)
       {
 	for (j=i+1; j<MAX_PLAYERS; j++)
 	{
-	  struct PlayerInfo *player = &stored_player[j];
-	  int jx = player->jx, jy = player->jy;
-
-	  if (player->active)
+	  if (stored_player[j].active)
 	  {
+	    struct PlayerInfo *player = &stored_player[j];
+	    int jx = player->jx, jy = player->jy;
+
 	    player->active = FALSE;
 	    StorePlayer[jx][jy] = 0;
 	    Feld[jx][jy] = EL_LEERRAUM;
@@ -448,6 +466,14 @@ void InitGame()
 	}
       }
     }
+  }
+
+  /* when recording the game, store which players take part in the game */
+  if (tape.recording)
+  {
+    for (i=0; i<MAX_PLAYERS; i++)
+      if (stored_player[i].active)
+	tape.player_participates[i] = TRUE;
   }
 
   if (options.verbose)
