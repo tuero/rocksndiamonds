@@ -870,7 +870,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
 	  group_element - EL_GROUP_START + 1);
 
     /* replace element which caused too deep recursion by question mark */
-    group->element_resolved[group->num_elements_resolved++] = EL_CHAR_QUESTION;
+    group->element_resolved[group->num_elements_resolved++] = EL_UNKNOWN;
 
     return;
   }

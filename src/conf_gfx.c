@@ -3132,6 +3132,11 @@ struct ConfigInfo image_config[] =
   { "arrow_down.ypos",				"8"			},
   { "arrow_down.frames",			"1"			},
 
+  { "unknown",					"RocksFontEM.pcx"	},
+  { "unknown.xpos",				"15"			},
+  { "unknown.ypos",				"1"			},
+  { "unknown.frames",				"1"			},
+
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
 #include "conf_grp.c"	/* include auto-generated data structure definitions */

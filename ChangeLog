@@ -1,3 +1,6 @@
+2004-02-02
+	* added some special EMC mappings to Emerald Mine level loader
+
 2004-01-30
 	* added option to block last field when player is moving (for Supaplex)
 	* adjusted push delay of Supaplex elements
@@ -5,7 +8,7 @@
 	* fixed bug when dropping element on a field that just changed to empty
 
 2004-01-29
-	* fixed bug: infotron can now smash yellow disks
+	* fixed bug: infotrons can now smash yellow disks
 	* fixed bug: when gravity active, port above player can now be entered
 	* removed "one white dot" mouse pointer which irritated some people
 

@@ -2522,6 +2522,10 @@ element_to_graphic[] =
     IMG_ARROW_DOWN
   },
   {
+    EL_UNKNOWN,				-1, -1, FALSE,
+    IMG_UNKNOWN
+  },
+  {
     EL_DOOR_WHITE,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },

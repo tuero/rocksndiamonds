@@ -598,7 +598,7 @@ void InitElementGraphicInfo()
     int default_direction_crumbled[NUM_DIRECTIONS];
 
     if (default_graphic == -1)
-      default_graphic = IMG_CHAR_QUESTION;
+      default_graphic = IMG_UNKNOWN;
     if (default_crumbled == -1)
       default_crumbled = IMG_EMPTY;
 
@@ -732,8 +732,8 @@ void InitElementGraphicInfo()
   if (options.verbose)
   {
     for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-      if (element_info[i].graphic[ACTION_DEFAULT] == IMG_CHAR_QUESTION &&
-	  i != EL_CHAR_QUESTION)
+      if (element_info[i].graphic[ACTION_DEFAULT] == IMG_UNKNOWN &&
+	  i != EL_UNKNOWN)
 	Error(ERR_RETURN, "warning: no graphic for element '%s' (%d)",
 	      element_info[i].token_name, i);
   }
@@ -2164,6 +2164,7 @@ void InitElementPropertiesStatic()
     EL_BD_BUTTERFLY_4,
     EL_BD_AMOEBA,
     EL_CHAR_QUESTION,
+    EL_UNKNOWN,
     -1
   };
 

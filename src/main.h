@@ -847,7 +847,9 @@
 #define EL_GROUP_END			655
 /* ---------- end of custom elements section ------------------------------- */
 
-#define NUM_FILE_ELEMENTS		656
+#define EL_UNKNOWN			656
+
+#define NUM_FILE_ELEMENTS		657
 
 
 /* "real" (and therefore drawable) runtime elements */

@@ -568,7 +568,7 @@ int getMappedElement(int element)
       {
 	Error(ERR_WARN, "invalid level element %d", element);
 
-	element = EL_CHAR_QUESTION;
+	element = EL_UNKNOWN;
       }
       break;
   }
@@ -577,7 +577,7 @@ int getMappedElement(int element)
   {
     Error(ERR_WARN, "invalid level element %d", element);
 
-    element = EL_CHAR_QUESTION;
+    element = EL_UNKNOWN;
   }
   else if (element == EL_PLAYER_OBSOLETE)
     element = EL_PLAYER_1;
@@ -1277,7 +1277,7 @@ static int map_em_element_yam(int element)
 
     default:
       Error(ERR_WARN, "invalid level element %d", element);
-      return EL_CHAR_QUESTION;
+      return EL_UNKNOWN;
   }
 }
 
@@ -1291,10 +1291,13 @@ static int map_em_element_field(int element)
   switch (element)
   {
     case 0x00:	return EL_ROCK;
+    case 0x01:	return EL_ROCK;				/* EMC */
     case 0x02:	return EL_DIAMOND;
     case 0x03:	return EL_DIAMOND;
     case 0x04:	return EL_ROBOT;
     case 0x05:	return EL_ROBOT;			/* EMC */
+    case 0x06:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x07:	return EL_EMPTY_SPACE;			/* EMC */
     case 0x08:	return EL_SPACESHIP_UP;
     case 0x09:	return EL_SPACESHIP_RIGHT;
     case 0x0a:	return EL_SPACESHIP_DOWN;
@@ -1303,7 +1306,9 @@ static int map_em_element_field(int element)
     case 0x0d:	return EL_SPACESHIP_RIGHT;
     case 0x0e:	return EL_SPACESHIP_DOWN;
     case 0x0f:	return EL_SPACESHIP_LEFT;
+
     case 0x10:	return EL_BOMB;
+    case 0x11:	return EL_BOMB;				/* EMC */
     case 0x12:	return EL_EMERALD;
     case 0x13:	return EL_EMERALD;
     case 0x14:	return EL_BUG_UP;
@@ -1315,34 +1320,115 @@ static int map_em_element_field(int element)
     case 0x1a:	return EL_BUG_DOWN;
     case 0x1b:	return EL_BUG_LEFT;
     case 0x1c:	return EL_AMOEBA_DROP;
+    case 0x1d:	return EL_AMOEBA_DROP;			/* EMC */
+    case 0x1e:	return EL_AMOEBA_DROP;			/* EMC */
+    case 0x1f:	return EL_AMOEBA_DROP;			/* EMC */
+
     case 0x20:	return EL_ROCK;
+    case 0x21:	return EL_BOMB;				/* EMC */
+    case 0x22:	return EL_DIAMOND;			/* EMC */
+    case 0x23:	return EL_EMERALD;			/* EMC */
     case 0x24:	return EL_MAGIC_WALL;
     case 0x25:	return EL_NUT;
+    case 0x26:	return EL_NUT;				/* EMC */
+    case 0x27:	return EL_NUT;				/* EMC */
 
       /* looks like magic wheel, but is _always_ activated */
     case 0x28:	return EL_ROBOT_WHEEL;			/* EMC */
 
-    case 0x29:	return EL_YAMYAM;
-    case 0x2a:	return EL_YAMYAM;
-    case 0x2b:	return EL_YAMYAM;			/* EMC */
-    case 0x2c:	return EL_YAMYAM;			/* EMC */
+    case 0x29:	return EL_YAMYAM;	/* up */
+    case 0x2a:	return EL_YAMYAM;	/* down */
+    case 0x2b:	return EL_YAMYAM;	/* left */	/* EMC */
+    case 0x2c:	return EL_YAMYAM;	/* right */	/* EMC */
     case 0x2d:	return EL_QUICKSAND_FULL;
+    case 0x2e:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x2f:	return EL_EMPTY_SPACE;			/* EMC */
+
+    case 0x30:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x31:	return EL_SAND;				/* EMC */
+    case 0x32:	return EL_SAND;				/* EMC */
+    case 0x33:	return EL_SAND;				/* EMC */
+    case 0x34:	return EL_QUICKSAND_FULL;		/* EMC */
+    case 0x35:	return EL_QUICKSAND_FULL;		/* EMC */
+    case 0x36:	return EL_QUICKSAND_FULL;		/* EMC */
+    case 0x37:	return EL_SAND;				/* EMC */
+    case 0x38:	return EL_ROCK;				/* EMC */
     case 0x39:	return EL_EXPANDABLE_WALL_HORIZONTAL;	/* EMC */
     case 0x3a:	return EL_EXPANDABLE_WALL_VERTICAL;	/* EMC */
-    case 0x3b:	return EL_DYNAMITE_ACTIVE;
-    case 0x3c:	return EL_DYNAMITE_ACTIVE;
-    case 0x3d:	return EL_DYNAMITE_ACTIVE;
-    case 0x3e:	return EL_DYNAMITE_ACTIVE;
+    case 0x3b:	return EL_DYNAMITE_ACTIVE;	/* 1 */
+    case 0x3c:	return EL_DYNAMITE_ACTIVE;	/* 2 */
+    case 0x3d:	return EL_DYNAMITE_ACTIVE;	/* 3 */
+    case 0x3e:	return EL_DYNAMITE_ACTIVE;	/* 4 */
     case 0x3f:	return EL_ACID_POOL_BOTTOM;
-    case 0x40:	return EL_EXIT_OPEN;
-    case 0x41:	return EL_EXIT_OPEN;
-    case 0x42:	return EL_EXIT_OPEN;
-    case 0x43:	return EL_BALLOON;
-    case 0x4e:	return EL_INVISIBLE_WALL;
-    case 0x65:	return EL_ACID;				/* EMC */
-    case 0x73:	return EL_SAND;				/* EMC */
+
+    case 0x40:	return EL_EXIT_OPEN;	/* 1 */
+    case 0x41:	return EL_EXIT_OPEN;	/* 2 */
+    case 0x42:	return EL_EXIT_OPEN;	/* 3 */
+    case 0x43:	return EL_BALLOON;			/* EMC */
+    case 0x44:	return EL_UNKNOWN;			/* EMC ("plant") */
+    case 0x45:	return EL_SPRING;			/* EMC */
+    case 0x46:	return EL_SPRING;	/* falling */	/* EMC */
+    case 0x47:	return EL_SPRING;	/* left */	/* EMC */
+    case 0x48:	return EL_SPRING;	/* right */	/* EMC */
+    case 0x49:	return EL_UNKNOWN;			/* EMC ("ball 1") */
+    case 0x4a:	return EL_UNKNOWN;			/* EMC ("ball 2") */
+    case 0x4b:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x4c:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x4d:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x4e:	return EL_INVISIBLE_WALL;		/* EMC (? "android") */
+    case 0x4f:	return EL_UNKNOWN;			/* EMC ("android") */
+
+    case 0x50:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x51:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x52:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x53:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x54:	return EL_UNKNOWN;			/* EMC ("android") */
+    case 0x55:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x56:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x57:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x58:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x59:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5a:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5b:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5c:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5d:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5e:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x5f:	return EL_EMPTY_SPACE;			/* EMC */
+
+    case 0x60:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x61:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x62:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x63:	return EL_SPRING;	/* left */	/* EMC */
+    case 0x64:	return EL_SPRING;	/* right */	/* EMC */
+    case 0x65:	return EL_ACID;		/* 1 */		/* EMC */
+    case 0x66:	return EL_ACID;		/* 2 */		/* EMC */
+    case 0x67:	return EL_ACID;		/* 3 */		/* EMC */
+    case 0x68:	return EL_ACID;		/* 4 */		/* EMC */
+    case 0x69:	return EL_ACID;		/* 5 */		/* EMC */
+    case 0x6a:	return EL_ACID;		/* 6 */		/* EMC */
+    case 0x6b:	return EL_ACID;		/* 7 */		/* EMC */
+    case 0x6c:	return EL_ACID;		/* 8 */		/* EMC */
+    case 0x6d:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x6e:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x6f:	return EL_EMPTY_SPACE;			/* EMC */
+
+    case 0x70:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x71:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x72:	return EL_NUT;		/* left */	/* EMC */
+    case 0x73:	return EL_SAND;				/* EMC (? "nut") */
     case 0x74:	return EL_STEELWALL;
-    case 0x7b:	return EL_ACID;
+    case 0x75:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x76:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x77:	return EL_BOMB;		/* left */	/* EMC */
+    case 0x78:	return EL_BOMB;		/* right */	/* EMC */
+    case 0x79:	return EL_ROCK;		/* left */	/* EMC */
+    case 0x7a:	return EL_ROCK;		/* right */	/* EMC */
+    case 0x7b:	return EL_ACID;				/* (? EMC "blank") */
+    case 0x7c:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x7d:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x7e:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0x7f:	return EL_EMPTY_SPACE;			/* EMC */
+
     case 0x80:	return EL_EMPTY;
     case 0x81:	return EL_WALL_SLIPPERY;
     case 0x82:	return EL_SAND;
@@ -1356,63 +1442,101 @@ static int map_em_element_field(int element)
     case 0x8a:	return EL_EM_GATE_2;
     case 0x8b:	return EL_EM_GATE_4;
     case 0x8c:	return EL_EM_GATE_3;
-    case 0x8d:	return EL_INVISIBLE_WALL;		/* EMC */
+    case 0x8d:	return EL_INVISIBLE_WALL;		/* EMC (? "dripper") */
     case 0x8e:	return EL_EM_GATE_1_GRAY;
     case 0x8f:	return EL_EM_GATE_2_GRAY;
+
     case 0x90:	return EL_EM_GATE_4_GRAY;
     case 0x91:	return EL_EM_GATE_3_GRAY;
     case 0x92:	return EL_MAGIC_WALL;
-    case 0x94:	return EL_QUICKSAND_EMPTY;
+    case 0x93:	return EL_ROBOT_WHEEL;
+    case 0x94:	return EL_QUICKSAND_EMPTY;		/* (? EMC "sand") */
     case 0x95:	return EL_ACID_POOL_TOPLEFT;
     case 0x96:	return EL_ACID_POOL_TOPRIGHT;
     case 0x97:	return EL_ACID_POOL_BOTTOMLEFT;
     case 0x98:	return EL_ACID_POOL_BOTTOMRIGHT;
-    case 0x99:	return EL_ACID;
-    case 0x9a:	return EL_AMOEBA_DEAD;
-    case 0x9b:	return EL_AMOEBA_DEAD;
-    case 0x9c:	return EL_AMOEBA_DEAD;
-    case 0x9d:	return EL_AMOEBA_DEAD;
+    case 0x99:	return EL_ACID;			/* (? EMC "fake blank") */
+    case 0x9a:	return EL_AMOEBA_DEAD;		/* 1 */
+    case 0x9b:	return EL_AMOEBA_DEAD;		/* 2 */
+    case 0x9c:	return EL_AMOEBA_DEAD;		/* 3 */
+    case 0x9d:	return EL_AMOEBA_DEAD;		/* 4 */
     case 0x9e:	return EL_EXIT_CLOSED;
-    case 0x9f:	return EL_CHAR_LESS;			/* EMC */
-    case 0x93:	return EL_ROBOT_WHEEL;
+    case 0x9f:	return EL_CHAR_LESS;		/* arrow left */
 
-      /* looks like normal dust, but behaves like wall */
-    case 0xa0:	return EL_WALL;				/* EMC */
-
-    case 0xa8:	return EL_EMC_WALL_1;			/* EMC */
-    case 0xa9:	return EL_EMC_WALL_2;			/* EMC */
-    case 0xaa:	return EL_EMC_WALL_3;			/* EMC */
-    case 0xab:	return EL_EMC_WALL_7;			/* EMC */
+      /* looks like normal sand, but behaves like wall */
+    case 0xa0:	return EL_UNKNOWN;		/* EMC ("fake grass") */
+    case 0xa1:	return EL_UNKNOWN;		/* EMC ("lenses") */
+    case 0xa2:	return EL_UNKNOWN;		/* EMC ("magnify") */
+    case 0xa3:	return EL_UNKNOWN;		/* EMC ("fake blank") */
+    case 0xa4:	return EL_UNKNOWN;		/* EMC ("fake grass") */
+    case 0xa5:	return EL_UNKNOWN;		/* EMC ("switch") */
+    case 0xa6:	return EL_UNKNOWN;		/* EMC ("switch") */
+    case 0xa7:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xa8:	return EL_EMC_WALL_1;			/* EMC ("decor 8") */
+    case 0xa9:	return EL_EMC_WALL_2;			/* EMC ("decor 9") */
+    case 0xaa:	return EL_EMC_WALL_3;			/* EMC ("decor 10") */
+    case 0xab:	return EL_EMC_WALL_7;			/* EMC ("decor 5") */
+    case 0xac:	return EL_CHAR_COMMA;			/* EMC */
+    case 0xad:	return EL_CHAR_QUOTEDBL;		/* EMC */
     case 0xae:	return EL_CHAR_MINUS;			/* EMC */
     case 0xaf:	return EL_DYNAMITE;
-    case 0xb0:	return EL_EMC_STEELWALL_1;		/* EMC */
-    case 0xb1:	return EL_EMC_WALL_8;			/* EMC */
 
-      /* (exact steel wall) */
-    case 0xb3:	return EL_STEELWALL;			/* EMC */
-
-    case 0xb4:	return EL_WALL_SLIPPERY;		/* EMC */
-    case 0xb5:	return EL_EMC_WALL_6;			/* EMC */
-    case 0xb6:	return EL_EMC_WALL_5;			/* EMC */
-    case 0xb7:	return EL_EMC_WALL_4;			/* EMC */
+    case 0xb0:	return EL_EMC_STEELWALL_1;		/* EMC ("steel 3") */
+    case 0xb1:	return EL_EMC_WALL_8;			/* EMC ("decor 6") */
+    case 0xb2:	return EL_UNKNOWN;			/* EMC ("decor 7") */
+    case 0xb3:	return EL_STEELWALL;		/* 2 */	/* EMC */
+    case 0xb4:	return EL_WALL_SLIPPERY;	/* 2 */	/* EMC */
+    case 0xb5:	return EL_EMC_WALL_6;			/* EMC ("decor 2") */
+    case 0xb6:	return EL_EMC_WALL_5;			/* EMC ("decor 4") */
+    case 0xb7:	return EL_EMC_WALL_4;			/* EMC ("decor 3") */
     case 0xb8:	return EL_BALLOON_SWITCH_ANY;		/* EMC */
     case 0xb9:	return EL_BALLOON_SWITCH_RIGHT;		/* EMC */
     case 0xba:	return EL_BALLOON_SWITCH_DOWN;		/* EMC */
     case 0xbb:	return EL_BALLOON_SWITCH_LEFT;		/* EMC */
     case 0xbc:	return EL_BALLOON_SWITCH_UP;		/* EMC */
-    case 0xbd:	return EL_SAND;				/* EMC */
+    case 0xbd:	return EL_SAND;				/* EMC ("dirt") */
+    case 0xbe:	return EL_UNKNOWN;			/* EMC ("plant") */
+    case 0xbf:	return EL_UNKNOWN;			/* EMC ("key 5") */
+
+    case 0xc0:	return EL_UNKNOWN;			/* EMC ("key 6") */
+    case 0xc1:	return EL_UNKNOWN;			/* EMC ("key 7") */
+    case 0xc2:	return EL_UNKNOWN;			/* EMC ("key 8") */
+    case 0xc3:	return EL_UNKNOWN;			/* EMC ("door 5") */
+    case 0xc4:	return EL_UNKNOWN;			/* EMC ("door 6") */
+    case 0xc5:	return EL_UNKNOWN;			/* EMC ("door 7") */
+    case 0xc6:	return EL_UNKNOWN;			/* EMC ("door 8") */
+    case 0xc7:	return EL_UNKNOWN;			/* EMC ("bumper") */
+
+      /* characters: see above */
+
     case 0xec:	return EL_CHAR_PERIOD;
     case 0xed:	return EL_CHAR_EXCLAM;
     case 0xee:	return EL_CHAR_COLON;
     case 0xef:	return EL_CHAR_QUESTION;
-    case 0xf0:	return EL_CHAR_GREATER;
-    case 0xf1:	return EL_CHAR_COPYRIGHT;
-    case 0xfe:	return EL_PLAYER_1;
-    case 0xff:	return EL_PLAYER_2;
+
+    case 0xf0:	return EL_CHAR_GREATER;			/* arrow right */
+    case 0xf1:	return EL_CHAR_COPYRIGHT;		/* EMC: "decor 1" */
+    case 0xf2:	return EL_UNKNOWN;		/* EMC ("fake door 5") */
+    case 0xf3:	return EL_UNKNOWN;		/* EMC ("fake door 6") */
+    case 0xf4:	return EL_UNKNOWN;		/* EMC ("fake door 7") */
+    case 0xf5:	return EL_UNKNOWN;		/* EMC ("fake door 8") */
+    case 0xf6:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xf7:	return EL_EMPTY_SPACE;			/* EMC */
+
+    case 0xf8:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xf9:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xfa:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xfb:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xfc:	return EL_EMPTY_SPACE;			/* EMC */
+    case 0xfd:	return EL_EMPTY_SPACE;			/* EMC */
+
+    case 0xfe:	return EL_PLAYER_1;			/* EMC: "blank" */
+    case 0xff:	return EL_PLAYER_2;			/* EMC: "blank" */
 
     default:
+      /* should never happen (all 8-bit value cases should be handled) */
       Error(ERR_WARN, "invalid level element %d", element);
-      return EL_CHAR_QUESTION;
+      return EL_UNKNOWN;
   }
 }
 
@@ -1561,7 +1685,7 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
 	Error(ERR_WARN, "in level %d, at position %d, %d:", nr, x, y);
 	Error(ERR_WARN, "invalid level element %d", element_old);
 
-	element_new = EL_CHAR_QUESTION;
+	element_new = EL_UNKNOWN;
       }
 
       level->field[x][y] = element_new;

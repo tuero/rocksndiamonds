@@ -3394,6 +3394,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "group",
     "group element 32"
   },
+  {
+    "unknown",
+    "unknown",
+    "unknown element"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
