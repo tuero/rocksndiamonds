@@ -205,7 +205,7 @@
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_PLAYER_1])
 #define SHIELD_ON(p)		((p)->shield_normal_time_left > 0)
-#define PROTECTED_FIELD(x,y)	(IS_WALKABLE_UNDER(Feld[x][y]) &&	\
+#define PROTECTED_FIELD(x,y)	(IS_WALKABLE_THROUGH(Feld[x][y]) &&	\
 				 IS_INDESTRUCTIBLE(Feld[x][y]))
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
