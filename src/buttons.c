@@ -1582,8 +1582,13 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	new_gadget->custom_id = va_arg(ap, int);
 	break;
 
-      case GDI_DESCRIPTION_TEXT:
-	new_gadget->description_text = va_arg(ap, char *);
+      case GDI_INFO_TEXT:
+	{
+	  int max_textsize = MAX_INFO_TEXTSIZE;
+
+	  strncpy(new_gadget->info_text, va_arg(ap, char *), max_textsize);
+	  new_gadget->info_text[max_textsize] = '\0';
+	}
 	break;
 
       case GDI_X:
@@ -2179,7 +2184,7 @@ void HandleGadgets(int mx, int my, int button)
   gadget_pressed_repeated =
     (button != 0 && last_gi != NULL && new_gi == last_gi);
 
-  gadget_released =		(button == 0 && last_gi != NULL);
+  gadget_released =		(release_event && last_gi != NULL);
   gadget_released_inside =	(gadget_released && new_gi == last_gi);
   gadget_released_off_borders =	(gadget_released && new_gi != last_gi);
 

@@ -305,6 +305,7 @@ int CheckCountButtons(int, int, int);
 
 /* gadget structure constants */
 #define MAX_GADGET_TEXTSIZE		1024
+#define MAX_INFO_TEXTSIZE		1024
 
 /* gadget creation tags */
 #define GDI_END				0
@@ -336,7 +337,7 @@ int CheckCountButtons(int, int, int);
 #define GDI_SCROLLBAR_ITEMS_MAX		26
 #define GDI_SCROLLBAR_ITEMS_VISIBLE	27
 #define GDI_SCROLLBAR_ITEM_POSITION	28
-#define GDI_DESCRIPTION_TEXT		29
+#define GDI_INFO_TEXT			29
 
 typedef void (*gadget_function)(void *);
 
@@ -387,7 +388,7 @@ struct GadgetInfo
 {
   int id;				/* internal gadget identifier */
   int custom_id;			/* custom gadget identifier */
-  char *description_text;		/* short text describing gadget */
+  char info_text[MAX_INFO_TEXTSIZE];	/* short popup info text */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
