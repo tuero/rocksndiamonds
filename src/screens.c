@@ -2945,19 +2945,64 @@ void HandleGameActions()
     return;
 
   /* !!! FIX THIS (START) !!! */
-  if (level.file_info.type == LEVEL_FILE_TYPE_EM)
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
+    byte *recorded_player_action;
     byte summarized_player_action = 0;
+    byte tape_action[MAX_PLAYERS];
     int i;
 
+    if (tape.pausing)
+      return;
+
+    recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
+
     for (i = 0; i < MAX_PLAYERS; i++)
+    {
       summarized_player_action |= stored_player[i].action;
 
-    if (em_main_handle_game(summarized_player_action) != 0)
+      if (!network_playing)
+	stored_player[i].effective_action = stored_player[i].action;
+    }
+
+    if (!options.network && !setup.team_mode)
+      local_player->effective_action = summarized_player_action;
+
+    if (recorded_player_action != NULL)
+      for (i = 0; i < MAX_PLAYERS; i++)
+	stored_player[i].effective_action = recorded_player_action[i];
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      tape_action[i] = stored_player[i].effective_action;
+
+      /* !!! (this does not happen in the EM engine) !!! */
+      if (tape.recording && tape_action[i] && !tape.player_participates[i])
+	tape.player_participates[i] = TRUE;  /* player just appeared from CE */
+    }
+
+    /* only save actions from input devices, but not programmed actions */
+    if (tape.recording)
+      TapeRecordAction(tape_action);
+
+    if (em_main_handle_game(local_player->effective_action) != 0)
     {
       game_status = GAME_MODE_MAIN;
       DrawMainMenu();
     }
+
+    if (TimeFrames >= FRAMES_PER_SECOND)
+    {
+      TimeFrames = 0;
+      TapeTime++;
+
+      if (tape.recording || tape.playing)
+	DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
+    }
+
+    TimeFrames++;
+
+    BackToFront();
   }
   else
   {

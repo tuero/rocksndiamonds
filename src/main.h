@@ -1478,6 +1478,8 @@ struct LevelInfo
 {
   struct LevelFileInfo file_info;
 
+  int game_engine_type;
+
   int file_version;	/* file format version the level is stored with    */
   int game_version;	/* game release version the level was created with */
 

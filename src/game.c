@@ -2061,7 +2061,7 @@ void InitGame()
   CloseDoor(DOOR_CLOSE_1);
 
   /* !!! FIX THIS (START) !!! */
-  if (level.file_info.type == LEVEL_FILE_TYPE_EM)
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     if (em_main_init_game(level_nr, level.file_info.filename) != 0)
     {
@@ -8595,6 +8595,7 @@ void GameActions()
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
 #if 1
+  /* !!! CHECK THIS (tape.pausing is always FALSE here!) !!! */
   if (recorded_player_action == NULL && tape.pausing)
     return;
 #endif

@@ -29,7 +29,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	1	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	0	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CHUNK_CNT3_HEADER	16	/* size of level CNT3 header  */
@@ -113,6 +113,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   static boolean clipboard_elements_initialized = FALSE;
 
   int i, j, x, y;
+
+  level->game_engine_type = GAME_ENGINE_TYPE_RND;
 
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
@@ -711,6 +713,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->instant_relocation	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->can_pass_to_walkable	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->grow_into_diggable	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  level->game_engine_type	= getFile8Bit(file);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -2118,6 +2122,7 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
     case LEVEL_FILE_TYPE_EM:
       LoadLevelFromFileInfo_EM(level, level_file_info);
+      level->game_engine_type = GAME_ENGINE_TYPE_EM;
       break;
 
     case LEVEL_FILE_TYPE_SP:
@@ -2128,6 +2133,9 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
       LoadLevelFromFileInfo_RND(level, level_file_info);
       break;
   }
+
+  if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
+    level->game_engine_type = GAME_ENGINE_TYPE_RND;
 }
 
 void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
@@ -2617,6 +2625,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->instant_relocation ? 1 : 0));
   putFile8Bit(file, (level->can_pass_to_walkable ? 1 : 0));
   putFile8Bit(file, (level->grow_into_diggable ? 1 : 0));
+
+  putFile8Bit(file, level->game_engine_type);
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }

@@ -4,8 +4,8 @@
  * fixes illegal tiles, acid, wheel, limits times, cleans flags.
  *
  * these tables weed out bad tiles for older caves (eg. wheel on -> wheel off)
- * and clean up v6 caves (acid, number limits) which should(!) be inconsequential,
- * but no doubt it will break some caves.
+ * and clean up v6 caves (acid, number limits) which should(!) be
+ * inconsequential, but no doubt it will break some caves.
  */
 
 #include "tile.h"
@@ -162,13 +162,13 @@ int clean_emerald(unsigned char *src, unsigned long *length)
  v4:
  v5:
 
- /* id */
+  /* id */
   src[2106] = 255;
   src[2107] = 54;
   src[2108] = 48;
   src[2109] = 48;
 
- /* time */
+  /* time */
   i = src[2094] * 10;
   src[2110] = i >> 8;
   src[2111] = i;
@@ -190,7 +190,7 @@ int clean_emerald(unsigned char *src, unsigned long *length)
     if (src[i] == 40)
       src[i] = 147;
 
- /* fix acid */
+  /* fix acid */
   for (i = 64; i < 2048; i++)
     if (src[i] == 63)
       src[i - 64] = 101;
@@ -200,10 +200,10 @@ int clean_emerald(unsigned char *src, unsigned long *length)
     if (src[i] == 63)
       src[i - 3] = 101;
 
+  /* fix acid in eater 2 */
   for (i = 2060; i < 2066; i++)
     if (src[i] == 63)
       src[i - 3] = 101;
-  /* fix acid in eater 2 */
 
   /* fix acid in eater 3 */
   for (i = 2069; i < 2075; i++)
@@ -246,28 +246,28 @@ int clean_emerald(unsigned char *src, unsigned long *length)
   src[2098] &= 7;
   src[src[2098] << 8 | src[2099]] = 128;
 
- /* ameuba speed */
+  /* ameuba speed */
   if ((src[2100] << 8 | src[2101]) > 9999)
   {
     src[2100] = 39;
     src[2101] = 15;
   }
 
- /* time wonderwall */
+  /* time wonderwall */
   if ((src[2102] << 8 | src[2103]) > 9999)
   {
     src[2102] = 39;
     src[2103] = 15;
   }
 
- /* time */
+  /* time */
   if ((src[2110] << 8 | src[2111]) > 9999)
   {
     src[2110] = 39;
     src[2111] = 15;
   }
 
- /* wind direction */
+  /* wind direction */
   i = src[2149];
   i &= 15;
   i &= -i;
@@ -280,7 +280,7 @@ int clean_emerald(unsigned char *src, unsigned long *length)
     src[2155] = 15;
   }
 
- /* time magnify */
+  /* time magnify */
   if ((src[2156] << 8 | src[2157]) > 9999)
   {
     src[2156] = 39;
@@ -693,7 +693,7 @@ void convert_emerald(unsigned char *src)
 
   for (temp = 1; temp < 2047; temp++)
   {
-    switch(src[temp])
+    switch (src[temp])
     {
       case 0x24:				/* wonderwall */
 	lev.wonderwall_state = 1;
