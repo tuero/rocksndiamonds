@@ -112,7 +112,7 @@ void DrawLevelField(int, int);
 
 void DrawMiniElement(int, int, int);
 void DrawMiniElementOrWall(int, int, int, int);
-void DrawEnvelopeBorder(int, int, int, int);
+void DrawEnvelopeBackground(int, int, int, int, int);
 
 void getMicroGraphicSource(int, Bitmap **, int *, int *);
 void DrawMicroElement(int, int, int);

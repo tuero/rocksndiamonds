@@ -1,15 +1,3 @@
-/***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
-*----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
-*               Holger Schemel                             *
-*               Detmolder Strasse 189                      *
-*               33604 Bielefeld                            *
-*               Germany                                    *
-*               e-mail: info@artsoft.org                   *
-*----------------------------------------------------------*
-* conf_gfx.h                                               *
-***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -1284,15 +1272,16 @@
 #define IMG_GLOBAL_DOOR					1263
 #define IMG_EDITOR_ELEMENT_BORDER			1264
 #define IMG_EDITOR_ELEMENT_BORDER_INPUT			1265
-#define IMG_BACKGROUND					1266
-#define IMG_BACKGROUND_MAIN				1267
-#define IMG_BACKGROUND_LEVELS				1268
-#define IMG_BACKGROUND_SCORES				1269
-#define IMG_BACKGROUND_EDITOR				1270
-#define IMG_BACKGROUND_INFO				1271
-#define IMG_BACKGROUND_SETUP				1272
-#define IMG_BACKGROUND_DOOR				1273
+#define IMG_GAME_ENVELOPE_BACKGROUND			1266
+#define IMG_BACKGROUND					1267
+#define IMG_BACKGROUND_MAIN				1268
+#define IMG_BACKGROUND_LEVELS				1269
+#define IMG_BACKGROUND_SCORES				1270
+#define IMG_BACKGROUND_EDITOR				1271
+#define IMG_BACKGROUND_INFO				1272
+#define IMG_BACKGROUND_SETUP				1273
+#define IMG_BACKGROUND_DOOR				1274
 
-#define NUM_IMAGE_FILES					1274
+#define NUM_IMAGE_FILES					1275
 
 #endif	/* CONF_GFX_H */

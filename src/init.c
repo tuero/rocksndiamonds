@@ -775,6 +775,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
+  graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
 
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
@@ -864,6 +865,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   if (parameter[GFX_ARG_DIGGABLE_LIKE] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].diggable_like = parameter[GFX_ARG_DIGGABLE_LIKE];
 
+  /* optional border size for "crumbling" diggable graphics */
+  if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].border_size = parameter[GFX_ARG_BORDER_SIZE];
+
   /* this is only used for toon animations */
   graphic_info[graphic].step_offset = parameter[GFX_ARG_STEP_OFFSET];
   graphic_info[graphic].step_delay  = parameter[GFX_ARG_STEP_DELAY];
@@ -871,6 +876,9 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* this is only used for drawing font characters */
   graphic_info[graphic].draw_x = parameter[GFX_ARG_DRAW_XOFFSET];
   graphic_info[graphic].draw_y = parameter[GFX_ARG_DRAW_YOFFSET];
+
+  /* this is only used for drawing envelope graphics */
+  graphic_info[graphic].draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 }
 
 static void InitGraphicInfo()

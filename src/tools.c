@@ -1204,7 +1204,11 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   int sx = SCREENX(x), sy = SCREENY(y);
   int element;
   int width, height, cx, cy, i;
+#if 1
+  int crumbled_border_size = graphic_info[graphic].border_size;
+#else
   int snip = TILEX / 8;	/* number of border pixels from "crumbled graphic" */
+#endif
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -1247,17 +1251,17 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       if (i == 1 || i == 2)
       {
-	width = snip;
+	width = crumbled_border_size;
 	height = TILEY;
-	cx = (i == 2 ? TILEX - snip : 0);
+	cx = (i == 2 ? TILEX - crumbled_border_size : 0);
 	cy = 0;
       }
       else
       {
 	width = TILEX;
-	height = snip;
+	height = crumbled_border_size;
 	cx = 0;
-	cy = (i == 3 ? TILEY - snip : 0);
+	cy = (i == 3 ? TILEY - crumbled_border_size : 0);
       }
 
       BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
@@ -1285,17 +1289,17 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       if (i == 1 || i == 2)
       {
-	width = snip;
+	width = crumbled_border_size;
 	height = TILEY;
-	cx = (i == 1 ? TILEX - snip : 0);
+	cx = (i == 1 ? TILEX - crumbled_border_size : 0);
 	cy = 0;
       }
       else
       {
 	width = TILEX;
-	height = snip;
+	height = crumbled_border_size;
 	cx = 0;
-	cy = (i==0 ? TILEY-snip : 0);
+	cy = (i == 0 ? TILEY - crumbled_border_size : 0);
       }
 
       BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
@@ -1525,8 +1529,44 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
-void DrawEnvelopeBorder(int sx, int sy, int ex, int ey)
+void DrawEnvelopeBackground(int dst_x, int dst_y, int ex, int ey, int font_nr)
 {
+#if 1
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+#if 0
+  int dst_x = SX + sx * font_width;
+  int dst_y = SY + sy * font_height;
+#endif
+  int width = graphic_info[graphic].width;
+  int height = graphic_info[graphic].height;
+  boolean draw_masked = graphic_info[graphic].draw_masked;
+
+  getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+
+  if (src_bitmap == NULL)
+  {
+    ClearRectangle(drawto, dst_x, dst_y, font_width, font_height);
+    return;
+  }
+
+  src_x += (ex == -1 ? 0 : ex == +1 ? width  - font_width  : font_width);
+  src_y += (ey == -1 ? 0 : ey == +1 ? height - font_height : font_height);
+
+  if (draw_masked)
+  {
+    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		  dst_x - src_x, dst_y - src_y);
+    BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, font_width, font_height,
+		     dst_x, dst_y);
+  }
+  else
+    BlitBitmap(src_bitmap, drawto, src_x, src_y, font_width, font_height,
+	       dst_x, dst_y);
+#else
   int border[8][2] =
   {
     { EL_STEELWALL_TOPLEFT,		EL_INVISIBLE_STEELWALL_TOPLEFT     },
@@ -1548,6 +1588,7 @@ void DrawEnvelopeBorder(int sx, int sy, int ex, int ey)
   int element = border[steel_position][steel_type];
 
   DrawMiniGraphic(sx, sy, el2edimg(element));
+#endif
 }
 
 void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)

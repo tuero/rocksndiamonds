@@ -1090,7 +1090,7 @@ void InitGame()
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
-      Changing[x][y] = FALSE;
+      Changed[x][y] = FALSE;
       ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
@@ -1991,13 +1991,19 @@ void CheckDynamite(int x, int y)
 
 void ShowEnvelope()
 {
+  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
+  boolean draw_masked = graphic_info[graphic].draw_masked;
+  int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
+  int font_nr = FONT_TEXT_1;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
   int i, x, y;
 
   /* open envelope window horizontally */
   for (i = 2; i <= level.envelope_xsize + 2; i += 2)
   {
-    int startx = (SXSIZE / MINI_TILEX - i) / 2;
-    int starty = (SYSIZE / MINI_TILEY) / 2 - 1;
+    int startx = (SXSIZE / font_width - i) / 2;
+    int starty = (SYSIZE / font_height) / 2 - 1;
 
     SetDrawtoField(DRAW_BUFFERED);
 
@@ -2007,24 +2013,30 @@ void ShowEnvelope()
 
     for (y=0; y < 2; y++) for (x=0; x < i; x++)
     {
+      int sx = SX + (startx + x) * font_width;
+      int sy = SY + (starty + y) * font_height;
       int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
       int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
 
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
     }
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
     Delay(GAME_FRAME_DELAY);
+
+    /* special case: envelope has odd width */
+    if (level.envelope_xsize % 2 && i == 2)
+      i--;
   }
 
   /* open envelope window vertically */
   for (i = 2; i <= level.envelope_ysize + 2; i += 2)
   {
     int xsize = level.envelope_xsize + 2;
-    int startx = (SXSIZE / MINI_TILEX - (xsize - 1)) / 2;
-    int starty = (SYSIZE / MINI_TILEY - i) / 2;
+    int startx = (SXSIZE / font_width - (xsize - 1)) / 2;
+    int starty = (SYSIZE / font_height - i) / 2;
 
     SetDrawtoField(DRAW_BUFFERED);
 
@@ -2034,20 +2046,26 @@ void ShowEnvelope()
 
     for (y=0; y < i; y++) for (x=0; x < xsize; x++)
     {
+      int sx = SX + (startx + x) * font_width;
+      int sy = SY + (starty + y) * font_height;
       int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
       int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
 
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
     }
 
-    DrawTextToTextArea(SX + (startx + 1) * MINI_TILEX,
-		       SY + (starty + 1) * MINI_TILEY, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i - 2);
+    DrawTextToTextArea(SX + (startx + 1) * font_width,
+		       SY + (starty + 1) * font_height, level.envelope,
+		       FONT_TEXT_1, level.envelope_xsize, i - 2, mask_mode);
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
     Delay(GAME_FRAME_DELAY);
+
+    /* special case: envelope has odd height */
+    if (level.envelope_ysize % 2 && i == 2)
+      i--;
   }
 
   if (tape.playing)
@@ -2059,8 +2077,8 @@ void ShowEnvelope()
   for (i = level.envelope_ysize + 2; i >= 2; i -= 2)
   {
     int xsize = level.envelope_xsize + 2;
-    int startx = (SXSIZE / MINI_TILEX - (xsize - 1)) / 2;
-    int starty = (SYSIZE / MINI_TILEY - i) / 2;
+    int startx = (SXSIZE / font_width - (xsize - 1)) / 2;
+    int starty = (SYSIZE / font_height - i) / 2;
 
     SetDrawtoField(DRAW_BUFFERED);
 
@@ -2070,27 +2088,33 @@ void ShowEnvelope()
 
     for (y=0; y < i; y++) for (x=0; x < xsize; x++)
     {
+      int sx = SX + (startx + x) * font_width;
+      int sy = SY + (starty + y) * font_height;
       int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
       int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
 
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
     }
 
-    DrawTextToTextArea(SX + (startx + 1) * MINI_TILEX,
-		       SY + (starty + 1) * MINI_TILEY, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i - 2);
+    DrawTextToTextArea(SX + (startx + 1) * font_width,
+		       SY + (starty + 1) * font_height, level.envelope,
+		       FONT_TEXT_1, level.envelope_xsize, i - 2, mask_mode);
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
     Delay(GAME_FRAME_DELAY);
+
+    /* special case: envelope has odd height */
+    if (level.envelope_ysize % 2 && i == level.envelope_ysize + 2)
+      i++;
   }
 
   /* close envelope window horizontally */
   for (i = level.envelope_xsize + 2; i >= 2; i -= 2)
   {
-    int startx = (SXSIZE / MINI_TILEX - i) / 2;
-    int starty = (SYSIZE / MINI_TILEY) / 2 - 1;
+    int startx = (SXSIZE / font_width - i) / 2;
+    int starty = (SYSIZE / font_height) / 2 - 1;
 
     SetDrawtoField(DRAW_BUFFERED);
 
@@ -2100,16 +2124,22 @@ void ShowEnvelope()
 
     for (y=0; y < 2; y++) for (x=0; x < i; x++)
     {
+      int sx = SX + (startx + x) * font_width;
+      int sy = SY + (starty + y) * font_height;
       int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
       int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
 
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
     }
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
     Delay(GAME_FRAME_DELAY);
+
+    /* special case: envelope has odd width */
+    if (level.envelope_xsize % 2 && i == level.envelope_xsize + 2)
+      i++;
   }
 
   SetDrawtoField(DRAW_BUFFERED);
@@ -5466,6 +5496,8 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   RemoveField(x, y);
   Feld[x][y] = target_element;
 
+  Changed[x][y] = TRUE;		/* no more changes in this frame */
+
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
 
@@ -5489,6 +5521,8 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 static void ChangeElementNow(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
+
+  Changed[x][y] = TRUE;		/* no more changes in this frame */
 
   CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
 
@@ -5570,9 +5604,9 @@ static void ChangeElementNow(int x, int y, int element, int page)
 
 	  something_has_changed = TRUE;
 
-	  /* for symmetry reasons, stop newly created border elements */
+	  /* for symmetry reasons, freeze newly created border elements */
 	  if (ex != x || ey != y)
-	    Stop[ex][ey] = TRUE;
+	    Stop[ex][ey] = TRUE;	/* no more moving in this frame */
 	}
       }
 
@@ -5641,9 +5675,11 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
   if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
     return FALSE;
 
+#if 0
   /* prevent this function from running into a loop */
   if (trigger_event == CE_OTHER_IS_CHANGING)
-    Changing[lx][ly] = TRUE;
+    Changed[lx][ly] = TRUE;
+#endif
 
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -5684,7 +5720,7 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
       if (x == lx && y == ly)	/* do not change trigger element itself */
 	continue;
 
-      if (Changing[x][y])	/* do not change just changing elements */
+      if (Changed[x][y])	/* do not change already changed elements */
 	continue;
 
       if (Feld[x][y] == element)
@@ -5692,14 +5728,18 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
 	ChangeDelay[x][y] = 1;
 	ChangeElement(x, y, page);
 
-	Changing[x][y] = TRUE;	/* do not change just changed elements */
+#if 0
+	Changed[x][y] = TRUE;	/* prevent element from being changed again */
+#endif
       }
     }
   }
 
+#if 0
   /* reset change prevention array */
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
-    Changing[x][y] = FALSE;
+    Changed[x][y] = FALSE;
+#endif
 
   return TRUE;
 }
@@ -5913,6 +5953,8 @@ void GameActions()
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
+    Changed[x][y] = FALSE;
+
     Stop[x][y] = FALSE;
     if (JustStopped[x][y] > 0)
       JustStopped[x][y]--;
@@ -5921,7 +5963,7 @@ void GameActions()
 
 #if 1
     /* reset finished pushing action (not done in ContinueMoving() to allow
-       continous pushing animation for elements without push delay) */
+       continous pushing animation for elements with zero push delay) */
     if (GfxAction[x][y] == ACTION_PUSHING && !IS_MOVING(x, y))
     {
       ResetGfxAnimation(x, y);
@@ -6777,7 +6819,9 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
 void TestIfPlayerTouchesCustomElement(int x, int y)
 {
+#if 0
   static boolean check_changing = FALSE;
+#endif
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6787,10 +6831,12 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   };
   int i;
 
+#if 0
   if (check_changing)	/* prevent this function from running into a loop */
     return;
 
   check_changing = TRUE;
+#endif
 
   for (i=0; i<4; i++)
   {
@@ -6814,12 +6860,16 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     }
   }
 
+#if 0
   check_changing = FALSE;
+#endif
 }
 
 void TestIfElementTouchesCustomElement(int x, int y)
 {
+#if 0
   static boolean check_changing = FALSE;
+#endif
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6832,10 +6882,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
   int center_element = Feld[x][y];
   int i, j;
 
+#if 0
   if (check_changing)	/* prevent this function from running into a loop */
     return;
 
   check_changing = TRUE;
+#endif
 
   for (i=0; i<4; i++)
   {
@@ -6892,7 +6944,9 @@ void TestIfElementTouchesCustomElement(int x, int y)
     CheckElementChangeExt(x, y, center_element, CE_OTHER_IS_TOUCHING,
 			  center_element_change_page);
 
+#if 0
   check_changing = FALSE;
+#endif
 }
 
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
@@ -7580,6 +7634,10 @@ int DigField(struct PlayerInfo *player,
 
 	PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
 
+	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_DIGGED);
+
+	TestIfElementTouchesCustomElement(x, y);
+
 	break;
       }
       else if (IS_COLLECTIBLE(element))
@@ -7670,6 +7728,8 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_COLLECTED);
+
+	TestIfElementTouchesCustomElement(x, y);
 
 	break;
       }
@@ -7909,6 +7969,8 @@ boolean DropElement(struct PlayerInfo *player)
 
     CheckTriggeredElementChange(jx, jy, new_element, CE_OTHER_GETS_DROPPED);
     CheckElementChange(jx, jy, new_element, CE_DROPPED_BY_PLAYER);
+
+    TestIfElementTouchesCustomElement(jx, jy);
   }
   else		/* player is dropping a dyna bomb */
   {

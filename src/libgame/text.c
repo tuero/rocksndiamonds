@@ -327,7 +327,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 }
 
 void DrawTextToTextArea(int x, int y, char *text, int font_nr,
-			int area_xsize, int area_ysize)
+			int area_xsize, int area_ysize, int mask_mode)
 {
   int area_line = 0;
   int font_height = getFontHeight(font_nr);
@@ -345,8 +345,11 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr,
 	break;
     buffer[i] = '\0';
 
-    DrawText(x, y + area_line * font_height, buffer, font_nr);
+    DrawTextExt(drawto, x, y + area_line * font_height, buffer, font_nr,
+		mask_mode);
 
     area_line++;
   }
+
+  redraw_mask |= REDRAW_FIELD;
 }

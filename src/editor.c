@@ -1106,10 +1106,10 @@ static struct ValueTextInfo options_time_units[] =
 
 static struct ValueTextInfo options_change_direct_action[] =
 {
-  { CE_TOUCHED_BY_PLAYER,	"player touches it"		},
-  { CE_PRESSED_BY_PLAYER,	"player presses it"		},
-  { CE_PUSHED_BY_PLAYER,	"player pushes it"		},
-  { CE_DROPPED_BY_PLAYER,	"player drops it"		},
+  { CE_TOUCHED_BY_PLAYER,	"touched by player"		},
+  { CE_PRESSED_BY_PLAYER,	"pressed by player"		},
+  { CE_PUSHED_BY_PLAYER,	"pushed by player"		},
+  { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
   { CE_COLLISION,		"collision"			},
   { CE_IMPACT,			"impact"			},
   { CE_SMASHED,			"smashed"			},
@@ -1121,9 +1121,10 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_TOUCHED,	"player touches"		},
   { CE_OTHER_GETS_PRESSED,	"player presses"		},
   { CE_OTHER_GETS_PUSHED,	"player pushes"			},
+  { CE_OTHER_GETS_DIGGED,	"player digs"			},
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
-  { CE_OTHER_IS_TOUCHING,	"it touches"			},
+  { CE_OTHER_IS_TOUCHING,	"touching"			},
   { CE_OTHER_IS_CHANGING,	"change of"			},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
   { -1,				NULL				}
@@ -4538,6 +4539,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DIGGED) ? CE_OTHER_GETS_DIGGED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
@@ -4652,6 +4654,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_DIGGED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =

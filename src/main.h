@@ -173,14 +173,13 @@
 #define CE_OTHER_GETS_PUSHED	13
 #define CE_OTHER_GETS_COLLECTED	14
 #define CE_OTHER_GETS_DROPPED	15
-
-/* values for activating change events (also stored in level file!) */
 #define CE_BY_PLAYER		16 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
 #define CE_BY_COLLISION		17 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
-#define CE_BY_OTHER_ACTION	18
-#define CE_BY_DIRECT_ACTION	19
+#define CE_BY_OTHER_ACTION	18	/* activates other element events */
+#define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
+#define CE_OTHER_GETS_DIGGED	20
 
-#define NUM_CHANGE_EVENTS	20
+#define NUM_CHANGE_EVENTS	21
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -923,15 +922,17 @@
 #define GFX_ARG_GLOBAL_SYNC			15
 #define GFX_ARG_CRUMBLED_LIKE			16
 #define GFX_ARG_DIGGABLE_LIKE			17
-#define GFX_ARG_STEP_OFFSET			18
-#define GFX_ARG_STEP_DELAY			19
-#define GFX_ARG_DIRECTION			20
-#define GFX_ARG_POSITION			21
-#define GFX_ARG_DRAW_XOFFSET			22
-#define GFX_ARG_DRAW_YOFFSET			23
-#define GFX_ARG_NAME				24
+#define GFX_ARG_BORDER_SIZE			18
+#define GFX_ARG_STEP_OFFSET			19
+#define GFX_ARG_STEP_DELAY			20
+#define GFX_ARG_DIRECTION			21
+#define GFX_ARG_POSITION			22
+#define GFX_ARG_DRAW_XOFFSET			23
+#define GFX_ARG_DRAW_YOFFSET			24
+#define GFX_ARG_DRAW_MASKED			25
+#define GFX_ARG_NAME				26
 
-#define NUM_GFX_ARGS				25
+#define NUM_GFX_ARGS				27
 
 
 /* values for sound configuration suffixes */
@@ -1371,11 +1372,14 @@ struct GraphicInfo
   boolean anim_global_sync;
   int crumbled_like;		/* element for cloning crumble graphics */
   int diggable_like;		/* element for cloning digging graphics */
+  int border_size;		/* border size for "crumbled" graphics */
 
   int step_offset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */
 
   int draw_x, draw_y;		/* optional offset for drawing fonts chars */
+
+  int draw_masked;		/* optional setting for drawing envelope gfx */
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
@@ -1437,7 +1441,7 @@ extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern boolean			Changing[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern boolean			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];

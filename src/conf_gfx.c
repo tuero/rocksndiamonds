@@ -39,12 +39,14 @@ struct ConfigInfo image_config_suffix[] =
   { ".global_sync",			"false",	TYPE_BOOLEAN },
   { ".crumbled_like",			ARG_UNDEFINED,	TYPE_TOKEN   },
   { ".diggable_like",			ARG_UNDEFINED,	TYPE_TOKEN   },
+  { ".border_size",			ARG_UNDEFINED,	TYPE_INTEGER },
   { ".step_offset",			"4",		TYPE_INTEGER },
   { ".step_delay",			"1",		TYPE_INTEGER },
   { ".direction",			ARG_UNDEFINED,	TYPE_STRING  },
   { ".position",			ARG_UNDEFINED,	TYPE_STRING  },
   { ".draw_xoffset",			"0",		TYPE_INTEGER },
   { ".draw_yoffset",			"0",		TYPE_INTEGER },
+  { ".draw_masked",			"false",	TYPE_BOOLEAN },
   { ".name",				ARG_UNDEFINED,	TYPE_STRING  },
 
   { NULL,				NULL,		0	     }
@@ -3439,6 +3441,12 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input",		"RocksElements.pcx"	},
   { "editor.element_border_input.xpos",		"0"			},
   { "editor.element_border_input.ypos",		"0"			},
+
+  { "game.envelope_background",			"RocksScreen.pcx"	},
+  { "game.envelope_background.xpos",		"0"			},
+  { "game.envelope_background.ypos",		"0"			},
+  { "game.envelope_background.width",		"560"			},
+  { "game.envelope_background.height",		"560"			},
 
   { "background",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},

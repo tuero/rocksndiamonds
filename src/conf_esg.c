@@ -1,15 +1,3 @@
-/***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
-*----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
-*               Holger Schemel                             *
-*               Detmolder Strasse 189                      *
-*               33604 Bielefeld                            *
-*               Germany                                    *
-*               e-mail: info@artsoft.org                   *
-*----------------------------------------------------------*
-* conf_esg.c                                               *
-***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
