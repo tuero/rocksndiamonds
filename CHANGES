@@ -1,5 +1,12 @@
-Release Version 2.1.1 [?? ??? ????]
+Release Version 2.1.1 [13 AUG 2002]
 -----------------------------------
+	- sound bug (causing crashes) fixed (reported by Keith Peterston)
+	- support for /dev/sound/dsp (devfs) added (thanks to Christoph Bauer)
+	- small NetBSD compilation bug fixed (thanks to Adam Ciarcinski)
+	- default keys for "snap field" and "place bomb" fixed for Mac OS X
+	- added new contributed levels from the following players:
+	  + Alan Bond
+	  + Gerrit Holl
 
 Release Version 2.1.0 [05 AUG 2002]
 -----------------------------------

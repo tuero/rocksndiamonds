@@ -66,8 +66,8 @@
 #define PLATFORM_BSDI
 #endif
 
-#if defined(sparc) || defined(sun)
-#define PLATFORM_SOLARIS
+#if defined(sparc) && defined(sun)
+#define PLATFORM_SUNOS
 #endif
 
 #if defined(__APPLE__) && defined(__MACH__)

@@ -51,8 +51,13 @@
 #define DEFAULT_KEY_RIGHT	KSYM_Right
 #define DEFAULT_KEY_UP		KSYM_Up
 #define DEFAULT_KEY_DOWN	KSYM_Down
+#if defined(PLATFORM_MACOSX)
+#define DEFAULT_KEY_SNAP	KSYM_Control_L
+#define DEFAULT_KEY_BOMB	KSYM_KP_Enter
+#else
 #define DEFAULT_KEY_SNAP	KSYM_Shift_L
 #define DEFAULT_KEY_BOMB	KSYM_Shift_R
+#endif
 #define DEFAULT_KEY_OKAY	KSYM_Return
 #define DEFAULT_KEY_CANCEL	KSYM_Escape
 

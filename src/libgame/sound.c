@@ -66,6 +66,7 @@
 #define MUS_TYPE_MOD			2
 
 #define DEVICENAME_DSP			"/dev/dsp"
+#define DEVICENAME_SOUND_DSP		"/dev/sound/dsp"
 #define DEVICENAME_AUDIO		"/dev/audio"
 #define DEVICENAME_AUDIOCTL		"/dev/audioCtl"
 
@@ -234,6 +235,7 @@ static boolean TestAudioDevices(void)
   static char *audio_device_name[] =
   {
     DEVICENAME_DSP,
+    DEVICENAME_SOUND_DSP,
     DEVICENAME_AUDIO
   };
   int audio_device_fd = -1;
@@ -350,7 +352,7 @@ static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
 
   if (ioctl(audio.device_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_spec) < 0)
     Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set fragment size of /dev/dsp -- no sounds");
+	  "cannot set fragment size of audio device -- no sounds");
 
   i = 0;
   afmt->format = 0;
@@ -366,7 +368,7 @@ static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
 
   if (afmt->format == 0)	/* no supported audio format found */
     Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set audio format of /dev/dsp -- no sounds");
+	  "cannot set audio format of audio device -- no sounds");
 
   /* try if we can use stereo sound */
   afmt->stereo = TRUE;
@@ -375,15 +377,15 @@ static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
 
   if (ioctl(audio.device_fd, SNDCTL_DSP_SPEED, &afmt->sample_rate) < 0)
     Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set sample rate of /dev/dsp -- no sounds");
+	  "cannot set sample rate of audio device -- no sounds");
 
   /* get the real fragmentation size; this should return 512 */
   if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size_query) < 0)
     Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot get fragment size of /dev/dsp -- no sounds");
+	  "cannot get fragment size of audio device -- no sounds");
   if (fragment_size_query != afmt->fragment_size)
     Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set fragment size of /dev/dsp -- no sounds");
+	  "cannot set fragment size of audio device -- no sounds");
 }
 #endif	/* AUDIO_LINUX_IOCTL */
 
@@ -397,8 +399,8 @@ static void InitAudioDevice_NetBSD(struct AudioFormatInfo *afmt)
   a_info.play.encoding = AUDIO_ENCODING_LINEAR8;
   a_info.play.precision = 8;
   a_info.play.channels = 2;
-  a_info.play.sample_rate = sample_rate;
-  a_info.blocksize = fragment_size;
+  a_info.play.sample_rate = afmt->sample_rate;
+  a_info.blocksize = afmt->fragment_size;
 
   afmt->format = AUDIO_FORMAT_U8;
   afmt->stereo = TRUE;
@@ -412,7 +414,7 @@ static void InitAudioDevice_NetBSD(struct AudioFormatInfo *afmt)
 
     if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
       Error(ERR_EXIT_SOUND_SERVER,
-	    "cannot set sample rate of /dev/audio -- no sounds");
+	    "cannot set sample rate of audio device -- no sounds");
   }
 }
 #endif /* PLATFORM_NETBSD */
@@ -425,7 +427,7 @@ static void InitAudioDevice_HPUX(struct AudioFormatInfo *afmt)
 
   audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
   if (audio_ctl == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl -- no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "cannot open audio device -- no sounds");
 
   if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
     Error(ERR_EXIT_SOUND_SERVER, "no audio info -- no sounds");
@@ -916,7 +918,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
      library, we use the current playing time (in milliseconds) instead. */
 
 #if DEBUG
-  /* Channel sanity check -- this should normally not be needed */
+  /* channel allocation sanity check -- should not be needed */
   if (mixer_active_channels ==
       audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
   {
