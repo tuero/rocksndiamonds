@@ -265,6 +265,11 @@
 #define IN_LEV_FIELD_AND_IS_FREE(x, y)  (IN_LEV_FIELD(x, y) &&  IS_FREE(x, y))
 #define IN_LEV_FIELD_AND_NOT_FREE(x, y) (IN_LEV_FIELD(x, y) && !IS_FREE(x, y))
 
+#define ACCESS_FROM(e, d)		(element_info[e].access_direction &(d))
+#define IS_WALKABLE_FROM(e, d)		(IS_WALKABLE(e)   && ACCESS_FROM(e, d))
+#define IS_PASSABLE_FROM(e, d)		(IS_PASSABLE(e)   && ACCESS_FROM(e, d))
+#define IS_ACCESSIBLE_FROM(e, d)	(IS_ACCESSIBLE(e) && ACCESS_FROM(e, d))
+
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
@@ -596,7 +601,7 @@ struct
   int element;
   int direction;
 }
-tube_access[] =
+access_direction_list[] =
 {
   { EL_TUBE_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
   { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
@@ -610,7 +615,19 @@ tube_access[] =
   { EL_TUBE_RIGHT_UP,		          MV_RIGHT | MV_UP           },
   { EL_TUBE_RIGHT_DOWN,		          MV_RIGHT |         MV_DOWN },
 
-  { EL_UNDEFINED,		0				     }
+  { EL_SP_PORT_LEFT,		          MV_RIGHT                   },
+  { EL_SP_PORT_RIGHT,		MV_LEFT                              },
+  { EL_SP_PORT_UP,		                             MV_DOWN },
+  { EL_SP_PORT_DOWN,		                     MV_UP           },
+  { EL_SP_PORT_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
+  { EL_SP_PORT_VERTICAL,	                     MV_UP | MV_DOWN },
+  { EL_SP_PORT_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_SP_GRAVITY_PORT_LEFT,	          MV_RIGHT                   },
+  { EL_SP_GRAVITY_PORT_RIGHT,	MV_LEFT                              },
+  { EL_SP_GRAVITY_PORT_UP,	                             MV_DOWN },
+  { EL_SP_GRAVITY_PORT_DOWN,	                     MV_UP           },
+
+  { EL_UNDEFINED,		MV_NO_MOVING			     }
 };
 
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
@@ -1377,15 +1394,15 @@ static void InitGameEngine()
 
   /* ---------- initialize access direction -------------------------------- */
 
-  /* initialize access direction values to default */
+  /* initialize access direction values to default (access from every side) */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (!IS_CUSTOM_ELEMENT(i))
       element_info[i].access_direction = MV_ALL_DIRECTIONS;
 
   /* set access direction value for certain elements from pre-defined list */
-  for (i = 0; tube_access[i].element != EL_UNDEFINED; i++)
-    element_info[tube_access[i].element].access_direction =
-      tube_access[i].direction;
+  for (i = 0; access_direction_list[i].element != EL_UNDEFINED; i++)
+    element_info[access_direction_list[i].element].access_direction =
+      access_direction_list[i].direction;
 }
 
 
@@ -2080,6 +2097,12 @@ void InitMovDir(int x, int y)
 	else if (move_pattern == MV_ALONG_LEFT_SIDE ||
 		 move_pattern == MV_ALONG_RIGHT_SIDE)
 	{
+#if 1
+	  /* use random direction as default start direction */
+	  if (game.engine_version >= VERSION_IDENT(3,1,0,2))
+	    MovDir[x][y] = 1 << RND(4);
+#endif
+
 	  for (i = 0; i < NUM_DIRECTIONS; i++)
 	  {
 	    int x1 = x + xy[i][0];
@@ -2094,11 +2117,6 @@ void InitMovDir(int x, int y)
 
 	      break;
 	    }
-
-#if 0
-	    if (MovDir[x][y] == MV_NO_MOVING)	/* no start direction found */
-	      MovDir[x][y] = 1 << RND(4);	/* => use random direction */
-#endif
 	  }
 	}		 
       }
@@ -8565,6 +8583,7 @@ void ScrollLevel(int dx, int dy)
   redraw_mask |= REDRAW_FIELD;
 }
 
+#if 0
 static boolean canEnterSupaplexPort(int x, int y, int dx, int dy)
 {
   int nextx = x + dx, nexty = y + dy;
@@ -8596,6 +8615,28 @@ static boolean canEnterSupaplexPort(int x, int y, int dx, int dy)
 
   return TRUE;
 }
+#endif
+
+static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
+{
+  int opposite_dir = MV_DIR_OPPOSITE(move_dir);
+  int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
+  int dy = (move_dir & MV_UP   ? -1 : move_dir & MV_DOWN  ? +1 : 0);
+  int newx = x + dx;
+  int newy = y + dy;
+  int nextx = newx + dx;
+  int nexty = newy + dy;
+  boolean next_field_must_be_free = TRUE;
+
+  return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
+	  (IS_DIGGABLE(Feld[newx][newy]) ||
+	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
+	   (IS_PASSABLE_FROM(Feld[newx][newy], opposite_dir) &&
+	    !CAN_MOVE(Feld[newx][newy]) &&
+	    IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
+	    IS_WALKABLE_FROM(Feld[nextx][nexty], move_dir) &&
+	    !(next_field_must_be_free && !IS_FREE(nextx, nexty)))));
+}
 
 static void CheckGravityMovement(struct PlayerInfo *player)
 {
@@ -8608,19 +8649,35 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     int move_dir_horizontal = player->action & MV_HORIZONTAL;
     int move_dir_vertical   = player->action & MV_VERTICAL;
 #endif
-    int move_dir =
-      (player->last_move_dir & MV_HORIZONTAL ?
-       (move_dir_vertical ? move_dir_vertical : move_dir_horizontal) :
-       (move_dir_horizontal ? move_dir_horizontal : move_dir_vertical));
-    int jx = player->jx, jy = player->jy;
-    int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
-    int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
-    int new_jx = jx + dx, new_jy = jy + dy;
 #if 1
     boolean player_is_snapping = player->effective_action & JOY_BUTTON_1;
 #else
     boolean player_is_snapping = player->action & JOY_BUTTON_1;
 #endif
+
+    int jx = player->jx, jy = player->jy;
+
+
+    boolean player_is_moving_to_valid_field =
+      (!player_is_snapping &&
+       (canMoveToValidFieldWithGravity(jx, jy, move_dir_horizontal) ||
+	canMoveToValidFieldWithGravity(jx, jy, move_dir_vertical)));
+
+#if 0
+    int move_dir =
+      (player->last_move_dir & MV_HORIZONTAL ?
+       (move_dir_vertical ? move_dir_vertical : move_dir_horizontal) :
+       (move_dir_horizontal ? move_dir_horizontal : move_dir_vertical));
+#endif
+
+#if 0
+    int opposite_dir = MV_DIR_OPPOSITE(move_dir);
+    int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
+    int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
+    int new_jx = jx + dx, new_jy = jy + dy;
+    int nextx = new_jx + dx, nexty = new_jy + dy;
+#endif
+
 #if 1
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
@@ -8631,22 +8688,34 @@ static void CheckGravityMovement(struct PlayerInfo *player)
       (IN_LEV_FIELD(jx, jy + 1) &&
        (IS_FREE(jx, jy + 1)));
 #endif
+#if 0
     boolean player_is_moving_to_valid_field =
       (
 #if 1
        !player_is_snapping &&
 #endif
+
+#if 1
+       IN_LEV_FIELD(new_jx, new_jy) &&
+       (IS_DIGGABLE(Feld[new_jx][new_jy]) ||
+	(IS_SP_PORT(Feld[new_jx][new_jy]) &&
+	 element_info[Feld[new_jx][new_jy]].access_direction & opposite_dir &&
+	 IN_LEV_FIELD(nextx, nexty) &&
+	 element_info[Feld[nextx][nexty]].access_direction & move_dir))
+#else
        IN_LEV_FIELD(new_jx, new_jy) &&
        (Feld[new_jx][new_jy] == EL_SP_BASE ||
 	Feld[new_jx][new_jy] == EL_SAND ||
 	(IS_SP_PORT(Feld[new_jx][new_jy]) &&
-	 canEnterSupaplexPort(new_jx, new_jy, dx, dy))));
+	 canEnterSupaplexPort(new_jx, new_jy, dx, dy)))
     /* !!! extend EL_SAND to anything diggable !!! */
+#endif
+       );
+#endif
 
     boolean player_is_standing_on_valid_field =
       (IS_WALKABLE_INSIDE(Feld[jx][jy]) ||
-       (IS_WALKABLE(Feld[jx][jy]) &&
-	!(element_info[Feld[jx][jy]].access_direction & MV_DOWN)));
+       (IS_WALKABLE(Feld[jx][jy]) && !ACCESS_FROM(Feld[jx][jy], MV_DOWN)));
 
 #if 0
     printf("::: checking gravity NOW [%d, %d, %d] [%d] [%d / %d] ...\n",
@@ -10101,8 +10170,10 @@ int DigField(struct PlayerInfo *player,
 
 #endif
 
-  if (IS_WALKABLE(old_element) &&
-      !(element_info[old_element].access_direction & move_direction))
+  if (IS_WALKABLE(old_element) && !ACCESS_FROM(old_element, move_direction))
+    return MF_NO_ACTION;	/* field has no opening in this direction */
+
+  if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
     return MF_NO_ACTION;	/* field has no opening in this direction */
 
   element = Feld[x][y];
@@ -10113,6 +10184,7 @@ int DigField(struct PlayerInfo *player,
 
   switch (element)
   {
+#if 0
     case EL_SP_PORT_LEFT:
     case EL_SP_PORT_RIGHT:
     case EL_SP_PORT_UP:
@@ -10180,6 +10252,7 @@ int DigField(struct PlayerInfo *player,
 
       PlayLevelSound(x, y, SND_CLASS_SP_PORT_PASSING);
       break;
+#endif
 
 #if 0
     case EL_TUBE_ANY:
@@ -10232,7 +10305,7 @@ int DigField(struct PlayerInfo *player,
       {
 	int sound_action = ACTION_WALKING;
 
-	if (!(element_info[element].access_direction & opposite_direction))
+	if (!ACCESS_FROM(element, opposite_direction))
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
 
 	if (element >= EL_GATE_1 && element <= EL_GATE_4)
@@ -10266,12 +10339,26 @@ int DigField(struct PlayerInfo *player,
       }
       else if (IS_PASSABLE(element))
       {
+	boolean next_field_must_be_free = TRUE;
+
+#if 1
+	if (!IN_LEV_FIELD(nextx, nexty) || IS_PLAYER(nextx, nexty) ||
+	    !IS_WALKABLE_FROM(Feld[nextx][nexty], move_direction) ||
+	    (next_field_must_be_free && !IS_FREE(nextx, nexty)))
+	  return MF_NO_ACTION;
+#else
 	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
 	  return MF_NO_ACTION;
+#endif
 
-	if (IS_CUSTOM_ELEMENT(element) &&
-	    !(element_info[element].access_direction & opposite_direction))
+#if 1
+	if (!ACCESS_FROM(element, opposite_direction))
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
+#else
+	if (IS_CUSTOM_ELEMENT(element) &&
+	    !ACCESS_FROM(element, opposite_direction))
+	  return MF_NO_ACTION;	/* field not accessible from this direction */
+#endif
 
 #if 1
 	if (CAN_MOVE(element))	/* only fixed elements can be passed! */
@@ -10287,6 +10374,14 @@ int DigField(struct PlayerInfo *player,
 	{
 	  if (!player->key[element - EL_EM_GATE_1_GRAY])
 	    return MF_NO_ACTION;
+	}
+	else if (IS_SP_PORT(element))
+	{
+	  if (element == EL_SP_GRAVITY_PORT_LEFT ||
+	      element == EL_SP_GRAVITY_PORT_RIGHT ||
+	      element == EL_SP_GRAVITY_PORT_UP ||
+	      element == EL_SP_GRAVITY_PORT_DOWN)
+	    game.gravity = !game.gravity;
 	}
 
 	/* automatically move to the next field with double speed */

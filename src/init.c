@@ -2832,7 +2832,7 @@ void InitElementPropertiesStatic()
 
   static int ep_can_turn_each_move[] =
   {
-    /* !!! do something !!! */
+    /* !!! do something with this one !!! */
     -1
   };
 

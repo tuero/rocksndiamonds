@@ -1,9 +1,15 @@
+2004-03-23
+	* bug fixed with movable elements not moving anymore after falling down
+
 2004-03-22
 	* fixed another bug with custom elements digging and leaving elements
 	* fixed bug with "along left/right side" and automatic start direction
 	* trigger elements now also displayed when "more custom" deactivated
 	* fixed bug with clipboard element initialized when loading new level
 	* added option "drop delay" to set delay before dropping next element
+
+2004-03-21
+	* uploaded pre-release (test) version 3.1.0-1 binary and source code
 
 2004-03-20
 	* added copy and paste functions for custom change pages
