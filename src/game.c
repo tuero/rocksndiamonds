@@ -89,6 +89,9 @@
 #define DOUBLE_PLAYER_SPEED(p)	(HALVE_MOVE_DELAY((p)->move_delay_value))
 #define HALVE_PLAYER_SPEED(p)	(DOUBLE_MOVE_DELAY((p)->move_delay_value))
 
+/* values for other actions */
+#define MOVE_STEPSIZE_NORMAL	(TILEX / MOVE_DELAY_NORMAL_SPEED)
+
 #define	INIT_GFX_RANDOM()	(SimpleRND(1000000))
 
 #define GET_NEW_PUSH_DELAY(e)	(   (element_info[e].push_delay_fixed) + \
@@ -164,6 +167,7 @@ static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
 
 static void TestIfPlayerTouchesCustomElement(int, int);
+static void TestIfElementTouchesCustomElement(int, int);
 
 static boolean CheckTriggeredElementChange(int, int);
 static boolean CheckElementChange(int, int, int, int);
@@ -375,21 +379,40 @@ push_delay_list[] =
 struct
 {
   int element;
+  int move_stepsize;
+}
+move_stepsize_list[] =
+{
+  { EL_AMOEBA_DROP,		2 },
+  { EL_AMOEBA_DROPPING,		2 },
+  { EL_QUICKSAND_FILLING,	1 },
+  { EL_QUICKSAND_EMPTYING,	1 },
+  { EL_MAGIC_WALL_FILLING,	2 },
+  { EL_BD_MAGIC_WALL_FILLING,	2 },
+  { EL_MAGIC_WALL_EMPTYING,	2 },
+  { EL_BD_MAGIC_WALL_EMPTYING,	2 },
+
+  { EL_UNDEFINED,		0 },
+};
+
+struct
+{
+  int element;
   int gem_count;
 }
 gem_count_list[] =
 {
-  { EL_EMERALD,		1 },
-  { EL_BD_DIAMOND,	1 },
-  { EL_EMERALD_YELLOW,	1 },
-  { EL_EMERALD_RED,	1 },
-  { EL_EMERALD_PURPLE,	1 },
-  { EL_DIAMOND,		3 },
-  { EL_SP_INFOTRON,	1 },
-  { EL_PEARL,		5 },
-  { EL_CRYSTAL,		8 },
+  { EL_EMERALD,			1 },
+  { EL_BD_DIAMOND,		1 },
+  { EL_EMERALD_YELLOW,		1 },
+  { EL_EMERALD_RED,		1 },
+  { EL_EMERALD_PURPLE,		1 },
+  { EL_DIAMOND,			3 },
+  { EL_SP_INFOTRON,		1 },
+  { EL_PEARL,			5 },
+  { EL_CRYSTAL,			8 },
 
-  { EL_UNDEFINED,	0 },
+  { EL_UNDEFINED,		0 },
 };
 
 static boolean changing_element[MAX_NUM_ELEMENTS];
@@ -399,7 +422,6 @@ static unsigned long trigger_events[MAX_NUM_ELEMENTS];
 #define IS_JUST_CHANGING(x, y)	(ChangeDelay[x][y] != 0)
 #define IS_CHANGING(x, y)	(IS_AUTO_CHANGING(Feld[x][y]) || \
 				 IS_JUST_CHANGING(x, y))
-#define TRIGGERS_BY_COLLECTING(e) (trigger_events[e] & CE_OTHER_COLLECTING)
 
 
 void GetPlayerConfig()
@@ -846,6 +868,21 @@ static void InitGameEngine()
 
     element_info[e].push_delay_fixed  = push_delay_list[i].push_delay_fixed;
     element_info[e].push_delay_random = push_delay_list[i].push_delay_random;
+  }
+
+  /* ---------- initialize move stepsize ----------------------------------- */
+
+  /* initialize move stepsize values to default */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    if (!IS_CUSTOM_ELEMENT(i))
+      element_info[i].move_stepsize = MOVE_STEPSIZE_NORMAL;
+
+  /* set move stepsize value for certain elements from pre-defined list */
+  for (i=0; move_stepsize_list[i].element != EL_UNDEFINED; i++)
+  {
+    int e = move_stepsize_list[i].element;
+
+    element_info[e].move_stepsize = move_stepsize_list[i].move_stepsize;
   }
 
   /* ---------- initialize gem count --------------------------------------- */
@@ -2219,7 +2256,7 @@ void Bang(int x, int y)
       break;
   }
 
-  CheckTriggeredElementChange(element, CE_OTHER_EXPLODING);
+  CheckTriggeredElementChange(element, CE_OTHER_IS_EXPLODING);
 }
 
 void SplashAcid(int x, int y)
@@ -3969,23 +4006,21 @@ void ContinueMoving(int x, int y)
   int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
   int nextx = newx + dx, nexty = newy + dy;
-  int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
 #if 1
+  int sign = (horiz_move ? dx : dy);
+  int step = sign * element_info[element].move_stepsize;
+#else
+  int step = (horiz_move ? dx : dy) * MOVE_STEPSIZE_NORMAL;
+#endif
   boolean pushed = Pushed[x][y];
-#else
-  struct PlayerInfo *player = (IS_PLAYER(x, y) ? PLAYERINFO(x, y) : NULL);
-#if 0
-  boolean pushing = (player != NULL && player->Pushing && player->MovPos != 0);
-#else
-  boolean pushing = (player != NULL && player->Pushing && player->is_moving);
-#endif
-#endif
 
-#if 0
-  if (player && player->is_moving && player->MovPos == 0)
-    printf("::: !!!\n");
-#endif
-
+#if 1
+  if (CAN_FALL(element) && horiz_move &&
+      y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+    step = sign * MOVE_STEPSIZE_NORMAL / 2;
+  else if (element == EL_SPRING && horiz_move)
+    step = sign * MOVE_STEPSIZE_NORMAL * 2;
+#else
   if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
     step /= 2;
   else if (element == EL_QUICKSAND_FILLING ||
@@ -4008,32 +4043,12 @@ void ContinueMoving(int x, int y)
   else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
     step*=2;
 #endif
+#endif
 
   MovPos[x][y] += step;
 
-#if 1
-#if 1
   if (pushed)		/* special case: moving object pushed by player */
-#else
-  if (pushing)		/* special case: moving object pushed by player */
-#endif
-#if 1
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
-#else
-    MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->GfxPos));
-#endif
-#endif
-
-#if 0
-  if (element == EL_SPRING)
-    printf("::: spring moves %d [%d: %d, %d, %d/%d]\n",
-	   MovPos[x][y],
-	   pushing,
-	   (player?player->Pushing:-42),
-	   (player?player->is_moving:-42),
-	   (player?player->MovPos:-42),
-	   (player?player->GfxPos:-42));
-#endif
 
   if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
   {
@@ -4141,7 +4156,6 @@ void ContinueMoving(int x, int y)
 
     ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
-#if 1
 #if 0
     /* 2.1.1 (does not work correctly for spring) */
     if (!CAN_MOVE(element))
@@ -4163,20 +4177,14 @@ void ContinueMoving(int x, int y)
 	(CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN))
       MovDir[newx][newy] = 0;
 #endif
-
-#endif
 #endif
 
     DrawLevelField(x, y);
     DrawLevelField(newx, newy);
 
-#if 0
-    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) || !pushing)
-#endif
-      Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
-#if 1
+    Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
+
     if (!pushed)	/* special case: moving object pushed by player */
-#endif
       JustStopped[newx][newy] = 3;
 
     if (DONT_TOUCH(element))	/* object may be nasty to player or others */
@@ -4188,29 +4196,15 @@ void ContinueMoving(int x, int y)
     else if (element == EL_PENGUIN)
       TestIfFriendTouchesBadThing(newx, newy);
 
-#if 1
     if (CAN_FALL(element) && direction == MV_DOWN &&
 	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
       Impact(x, newy);
-#else
-    if (CAN_SMASH(element) && direction == MV_DOWN &&
-	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
-      Impact(x, newy);
-#endif
 
-#if 0
-    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
-      CheckTriggeredElementChange(element, CE_COLLISION);
-#else
-#if 1
     if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
       CheckElementChange(newx, newy, element, CE_COLLISION);
-#else
-    if ((!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty)) &&
-	CAN_CHANGE(element) && HAS_CHANGE_EVENT(element, CE_COLLISION))
-      ChangeElementNow(newx, newy, element);
-#endif
-#endif
+
+    TestIfPlayerTouchesCustomElement(newx, newy);
+    TestIfElementTouchesCustomElement(newx, newy);
   }
   else				/* still moving on */
   {
@@ -5156,7 +5150,7 @@ static void ChangeElementNow(int x, int y, int element)
 {
   struct ElementChangeInfo *change = &element_info[element].change;
 
-  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_CHANGING);
+  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_IS_CHANGING);
 
   if (change->explode)
   {
@@ -6411,10 +6405,54 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
 
-    if (center_is_player && IN_LEV_FIELD(xx, yy))
+    if (!IN_LEV_FIELD(xx, yy))
+      continue;
+
+    if (center_is_player)
     {
-      CheckTriggeredElementChange(Feld[xx][yy], CE_OTHER_TOUCHING);
+      CheckTriggeredElementChange(Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
       CheckElementChange(xx, yy, Feld[xx][yy], CE_TOUCHED_BY_PLAYER);
+    }
+    else if (IS_PLAYER(xx, yy))
+    {
+      CheckTriggeredElementChange(Feld[x][y], CE_OTHER_GETS_TOUCHED);
+      CheckElementChange(x, y, Feld[x][y], CE_TOUCHED_BY_PLAYER);
+
+      break;
+    }
+  }
+}
+
+void TestIfElementTouchesCustomElement(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
+  boolean center_is_custom = (IS_CUSTOM_ELEMENT(Feld[x][y]));
+  int i;
+
+  for (i=0; i<4; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+
+    if (!IN_LEV_FIELD(xx, yy))
+      continue;
+
+    if (center_is_custom &&
+	Feld[xx][yy] == element_info[Feld[x][y]].change.trigger)
+    {
+      CheckElementChange(x, y, Feld[x][y], CE_OTHER_IS_TOUCHING);
+    }
+
+    if (IS_CUSTOM_ELEMENT(Feld[xx][yy]) &&
+	Feld[x][y] == element_info[Feld[xx][yy]].change.trigger)
+    {
+      CheckElementChange(xx, yy, Feld[xx][yy], CE_OTHER_IS_TOUCHING);
     }
   }
 }
@@ -7166,7 +7204,7 @@ int DigField(struct PlayerInfo *player,
 	RaiseScoreElement(element);
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
-	CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
+	CheckTriggeredElementChange(element, CE_OTHER_GETS_COLLECTED);
 
 	break;
       }
@@ -7256,14 +7294,14 @@ int DigField(struct PlayerInfo *player,
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
 
-	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
+	CheckTriggeredElementChange(element, CE_OTHER_GETS_PUSHED);
 	CheckElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
 
 	break;
       }
       else
       {
-	CheckTriggeredElementChange(element, CE_OTHER_PRESSING);
+	CheckTriggeredElementChange(element, CE_OTHER_GETS_PRESSED);
 	CheckElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
       }
 

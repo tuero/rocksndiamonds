@@ -162,19 +162,20 @@
 #define CE_COLLISION		4
 #define CE_IMPACT		5
 #define CE_SMASHED		6
-#define CE_OTHER_COLLECTING	7
-#define CE_OTHER_TOUCHING	8
-#define CE_OTHER_PRESSING	9
-#define CE_OTHER_PUSHING	10
-#define CE_OTHER_CHANGING	11
-#define CE_OTHER_EXPLODING	12
+#define CE_OTHER_IS_TOUCHING	7
+#define CE_OTHER_IS_CHANGING	8
+#define CE_OTHER_IS_EXPLODING	9
+#define CE_OTHER_GETS_TOUCHED	10
+#define CE_OTHER_GETS_PRESSED	11
+#define CE_OTHER_GETS_PUSHED	12
+#define CE_OTHER_GETS_COLLECTED	13
 
 /* values for internal purpose only (level editor) */
-#define CE_BY_PLAYER		13
-#define CE_BY_COLLISION		14
-#define CE_BY_OTHER		15
+#define CE_BY_PLAYER		14
+#define CE_BY_COLLISION		15
+#define CE_BY_OTHER		16
 
-#define NUM_CHANGE_EVENTS	16
+#define NUM_CHANGE_EVENTS	17
 
 #define CE_BITMASK_DEFAULT	0
 

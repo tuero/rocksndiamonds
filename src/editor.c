@@ -122,7 +122,7 @@
 #define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(12) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 /* custom change trigger element */
-#define ED_AREA_ELEM_CONTENT5_XPOS	(30 * MINI_TILEX + MINI_TILEX / 2)
+#define ED_AREA_ELEM_CONTENT5_XPOS	(28 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(7) + \
 					 ED_GADGET_DISTANCE)
 /* extended custom change target */
@@ -1000,13 +1000,14 @@ static int value_change_collide_action = 0;
 
 static struct ValueTextInfo options_change_other_action[] =
 {
-  { CE_OTHER_COLLECTING,	"collecting"			},
-  { CE_OTHER_TOUCHING,		"touching"			},
-  { CE_OTHER_PRESSING,		"pressing"			},
-  { CE_OTHER_PUSHING,		"pushing"			},
-  { CE_OTHER_CHANGING,		"change of"			},
-  { CE_OTHER_EXPLODING,		"explosion of"			},
-  { -1,				NULL				}
+  { CE_OTHER_IS_TOUCHING,		"touching"			},
+  { CE_OTHER_IS_CHANGING,		"change of"			},
+  { CE_OTHER_IS_EXPLODING,		"explosion of"			},
+  { CE_OTHER_GETS_TOUCHED,		"player touches"		},
+  { CE_OTHER_GETS_PRESSED,		"player presses"		},
+  { CE_OTHER_GETS_PUSHED,		"player pushes"			},
+  { CE_OTHER_GETS_COLLECTED,		"player collects"		},
+  { -1,				NULL					}
 };
 static int value_change_other_action = 0;
 
@@ -1135,7 +1136,7 @@ static struct
     -1,
     options_change_other_action,
     &value_change_other_action,
-    NULL, "other element:", "type of other element action"
+    NULL, "element:", "type of other element action"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
@@ -3682,7 +3683,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
-     CE_PRESSED_BY_PLAYER);
+     CE_TOUCHED_BY_PLAYER);
 
   /* set change by impact/smash selectbox help value */
   value_change_collide_action =
@@ -3693,13 +3694,14 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* set change by other element action selectbox help value */
   value_change_other_action =
-    (HAS_CHANGE_EVENT(element, CE_OTHER_EXPLODING) ? CE_OTHER_EXPLODING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_CHANGING) ? CE_OTHER_CHANGING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_PUSHING) ? CE_OTHER_PUSHING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_PRESSING) ? CE_OTHER_PRESSING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_TOUCHING) ? CE_OTHER_TOUCHING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_COLLECTING) ? CE_OTHER_COLLECTING :
-     CE_OTHER_COLLECTING);
+    (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
+     CE_OTHER_IS_TOUCHING);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3762,12 +3764,13 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_change_events[CE_BY_COLLISION];
 
   /* set other element action change event from checkbox and selectbox */
-  custom_element_change_events[CE_OTHER_COLLECTING] = FALSE;
-  custom_element_change_events[CE_OTHER_TOUCHING] = FALSE;
-  custom_element_change_events[CE_OTHER_PRESSING] = FALSE;
-  custom_element_change_events[CE_OTHER_PUSHING] = FALSE;
-  custom_element_change_events[CE_OTHER_CHANGING] = FALSE;
-  custom_element_change_events[CE_OTHER_EXPLODING] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[value_change_other_action] =
     custom_element_change_events[CE_BY_OTHER];
 
