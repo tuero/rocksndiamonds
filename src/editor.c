@@ -39,7 +39,7 @@
 #define CHOICE_DELAY_VALUE	100
 
 /* how many steps can be cancelled */
-#define NUM_UNDO_STEPS		10
+#define NUM_UNDO_STEPS		(10 + 1)
 
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 236
@@ -551,6 +551,23 @@ void HandleLevelEditorControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_RANDOM_PLACEMENT:
     case ED_CTRL_ID_BRUSH:
       drawing_function = id;
+      break;
+
+    case ED_CTRL_ID_UNDO:
+      if (undo_buffer_steps == 0)
+      {
+	Request("Undo buffer empty !", REQ_CONFIRM);
+	break;
+      }
+
+      undo_buffer_position =
+	(undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
+      undo_buffer_steps--;
+
+      for(x=0; x<lev_fieldx; x++)
+	for(y=0; y<lev_fieldy; y++)
+	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
+      DrawMiniLevel(level_xpos,level_ypos);
       break;
 
     case ED_CTRL_ID_CLEAR:
@@ -1982,7 +1999,7 @@ void HandleDrawingFunction(int mx, int my, int button)
   {
     undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
 
-    if (undo_buffer_steps < NUM_UNDO_STEPS)
+    if (undo_buffer_steps < NUM_UNDO_STEPS - 1)
       undo_buffer_steps++;
 
     for(x=0; x<lev_fieldx; x++)
@@ -1991,6 +2008,10 @@ void HandleDrawingFunction(int mx, int my, int button)
 
     copy_to_undo_buffer = FALSE;
 
+
+
+    /*
     printf("state saved to undo buffer %d\n", undo_buffer_position);
+    */
   }
 }
