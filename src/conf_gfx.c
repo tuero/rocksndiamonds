@@ -3708,10 +3708,10 @@ struct ConfigInfo image_config[] =
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},
 
-  { "[player].boring_delay_fixed",		"0"			},
-  { "[player].boring_delay_random",		"0"			},
-  { "[player].sleeping_delay_fixed",		"0"			},
-  { "[player].sleeping_delay_random",		"0"			},
+  { "[player].boring_delay_fixed",		"-1"			},
+  { "[player].boring_delay_random",		"-1"			},
+  { "[player].sleeping_delay_fixed",		"-1"			},
+  { "[player].sleeping_delay_random",		"-1"			},
 
   { NULL,					NULL			}
 };

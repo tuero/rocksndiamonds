@@ -993,7 +993,7 @@ void InitGame()
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
-  int i, j, x, y;
+  int i, j, k, x, y;
 
   InitGameEngine();
 
@@ -1010,7 +1010,7 @@ void InitGame()
   /* don't play tapes over network */
   network_playing = (options.network && !tape.playing);
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i=0; i < MAX_PLAYERS; i++)
   {
     struct PlayerInfo *player = &stored_player[i];
 
@@ -1030,7 +1030,7 @@ void InitGame()
     player->lights_still_needed = 0;
     player->friends_still_needed = 0;
 
-    for (j=0; j<4; j++)
+    for (j=0; j < 4; j++)
       player->key[j] = FALSE;
 
     player->dynabomb_count = 0;
@@ -1065,6 +1065,45 @@ void InitGame()
 
     player->frame_counter_bored = -1;
     player->frame_counter_sleeping = -1;
+
+    player->anim_delay_counter = 0;
+    player->post_delay_counter = 0;
+
+    player->special_action_bored = ACTION_DEFAULT;
+    player->special_action_sleeping = ACTION_DEFAULT;
+
+    player->num_special_action_bored = 0;
+    player->num_special_action_sleeping = 0;
+
+    /* determine number of special actions for bored and sleeping animation */
+    for (j=ACTION_BORING_1; j <= ACTION_BORING_8; j++)
+    {
+      boolean found = FALSE;
+
+      for (k=0; k < NUM_DIRECTIONS; k++)
+	if (el_act_dir2img(player->element_nr, j, k) !=
+	    el_act_dir2img(player->element_nr, ACTION_DEFAULT, k))
+	  found = TRUE;
+
+      if (found)
+	player->num_special_action_bored++;
+      else
+	break;
+    }
+    for (j=ACTION_SLEEPING_1; j <= ACTION_SLEEPING_3; j++)
+    {
+      boolean found = FALSE;
+
+      for (k=0; k < NUM_DIRECTIONS; k++)
+	if (el_act_dir2img(player->element_nr, j, k) !=
+	    el_act_dir2img(player->element_nr, ACTION_DEFAULT, k))
+	  found = TRUE;
+
+      if (found)
+	player->num_special_action_sleeping++;
+      else
+	break;
+    }
 
     player->switch_x = -1;
     player->switch_y = -1;
@@ -5964,25 +6003,29 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
     if (!was_waiting)		/* not waiting -> waiting */
     {
       player->is_waiting = TRUE;
-      player->is_bored = FALSE;
-      player->is_sleeping = FALSE;
 
       player->frame_counter_bored =
-	(FrameCounter +
-	 game.player_boring_delay_fixed +
-	 SimpleRND(game.player_boring_delay_random));
+	FrameCounter +
+	game.player_boring_delay_fixed +
+	SimpleRND(game.player_boring_delay_random);
       player->frame_counter_sleeping =
-	(FrameCounter +
-	 game.player_sleeping_delay_fixed +
-	 SimpleRND(game.player_sleeping_delay_random));
+	FrameCounter +
+	game.player_sleeping_delay_fixed +
+	SimpleRND(game.player_sleeping_delay_random);
 
       InitPlayerGfxAnimation(player, ACTION_WAITING, player->MovDir);
     }
 
-    if (FrameCounter >= player->frame_counter_bored)
-      player->is_bored = TRUE;
-    if (FrameCounter >= player->frame_counter_sleeping)
+    if (game.player_sleeping_delay_fixed != -1 &&
+	game.player_sleeping_delay_random != -1 &&
+	player->anim_delay_counter == 0 &&
+	player->post_delay_counter == 0 &&
+	FrameCounter >= player->frame_counter_sleeping)
       player->is_sleeping = TRUE;
+    else if (game.player_boring_delay_fixed != -1 &&
+	     game.player_boring_delay_random != -1 &&
+	     FrameCounter >= player->frame_counter_bored)
+      player->is_bored = TRUE;
 
     action = (player->is_sleeping ? ACTION_SLEEPING :
 	      player->is_bored ? ACTION_BORING : ACTION_WAITING);
@@ -6000,6 +6043,9 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
     player->frame_counter_bored = -1;
     player->frame_counter_sleeping = -1;
+
+    player->anim_delay_counter = 0;
+    player->post_delay_counter = 0;
   }
 }
 

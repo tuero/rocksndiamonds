@@ -930,13 +930,13 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
     graphic_info[graphic].anim_delay_fixed =
       parameter[GFX_ARG_ANIM_DELAY_FIXED];
   if (parameter[GFX_ARG_ANIM_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
-    graphic_info[graphic].anim_delay_fixed =
+    graphic_info[graphic].anim_delay_random =
       parameter[GFX_ARG_ANIM_DELAY_RANDOM];
   if (parameter[GFX_ARG_POST_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
-    graphic_info[graphic].anim_delay_fixed =
+    graphic_info[graphic].post_delay_fixed =
       parameter[GFX_ARG_POST_DELAY_FIXED];
   if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
-    graphic_info[graphic].anim_delay_fixed =
+    graphic_info[graphic].post_delay_random =
       parameter[GFX_ARG_POST_DELAY_RANDOM];
 
   /* this is only used for toon animations */

@@ -1199,6 +1199,15 @@ struct PlayerInfo
   int frame_counter_bored;
   int frame_counter_sleeping;
 
+  int anim_delay_counter;
+  int post_delay_counter;
+
+  int special_action_bored;
+  int special_action_sleeping;
+
+  int num_special_action_bored;
+  int num_special_action_sleeping;
+
   int switch_x, switch_y;
 
   int show_envelope;
