@@ -1867,7 +1867,7 @@ static int edit_mode_properties;
 
 static int element_shift = 0;
 
-static int editor_hl_boulderdash[] =
+static int editor_el_boulderdash[] =
 {
   EL_CHAR('B'),
   EL_CHAR('O'),
@@ -1883,10 +1883,7 @@ static int editor_hl_boulderdash[] =
   EL_CHAR('A'),
   EL_CHAR('S'),
   EL_CHAR('H'),
-};
 
-static int editor_el_boulderdash[] =
-{
   EL_PLAYER_1,
   EL_EMPTY,
   EL_SAND,
@@ -1912,10 +1909,9 @@ static int editor_el_boulderdash[] =
   EL_BD_FIREFLY_DOWN,
   EL_EMPTY,
 };
-static int num_editor_hl_boulderdash = SIZEOF_ARRAY_INT(editor_hl_boulderdash);
 static int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
 
-static int editor_hl_emerald_mine[] =
+static int editor_el_emerald_mine[] =
 {
   EL_CHAR('E'),
   EL_CHAR('M'),
@@ -1931,10 +1927,7 @@ static int editor_hl_emerald_mine[] =
   EL_CHAR('I'),
   EL_CHAR('N'),
   EL_CHAR('E'),
-};
 
-static int editor_el_emerald_mine[] =
-{
   EL_PLAYER_1,
   EL_PLAYER_2,
   EL_PLAYER_3,
@@ -2010,19 +2003,15 @@ static int editor_el_emerald_mine[] =
   EL_EM_GATE_3_GRAY,
   EL_EM_GATE_4_GRAY,
 };
-static int num_editor_hl_emerald_mine=SIZEOF_ARRAY_INT(editor_hl_emerald_mine);
-static int num_editor_el_emerald_mine=SIZEOF_ARRAY_INT(editor_el_emerald_mine);
+static int num_editor_el_emerald_mine = SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
-static int editor_hl_more[] =
+static int editor_el_more[] =
 {
   EL_CHAR('M'),
   EL_CHAR('O'),
   EL_CHAR('R'),
   EL_CHAR('E'),
-};
 
-static int editor_el_more[] =
-{
   EL_KEY_1,
   EL_KEY_2,
   EL_KEY_3,
@@ -2118,10 +2107,9 @@ static int editor_el_more[] =
   EL_EMC_WALL_6,
   EL_EMC_WALL_7,
 };
-static int num_editor_hl_more = SIZEOF_ARRAY_INT(editor_hl_more);
 static int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
 
-static int editor_hl_sokoban[] =
+static int editor_el_sokoban[] =
 {
   EL_CHAR('S'),
   EL_CHAR('O'),
@@ -2132,19 +2120,15 @@ static int editor_hl_sokoban[] =
   EL_CHAR('B'),
   EL_CHAR('A'),
   EL_CHAR('N'),
-};
 
-static int editor_el_sokoban[] =
-{
   EL_SOKOBAN_OBJECT,
   EL_SOKOBAN_FIELD_EMPTY,
   EL_SOKOBAN_FIELD_FULL,
   EL_STEELWALL,
 };
-static int num_editor_hl_sokoban = SIZEOF_ARRAY_INT(editor_hl_sokoban);
 static int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
 
-static int editor_hl_supaplex[] =
+static int editor_el_supaplex[] =
 {
   EL_CHAR('S'),
   EL_CHAR('U'),
@@ -2155,10 +2139,7 @@ static int editor_hl_supaplex[] =
   EL_CHAR('L'),
   EL_CHAR('E'),
   EL_CHAR('X'),
-};
 
-static int editor_el_supaplex[] =
-{
   EL_SP_EMPTY,
   EL_SP_ZONK,
   EL_SP_BASE,
@@ -2209,10 +2190,9 @@ static int editor_el_supaplex[] =
   EL_SP_CHIP_TOP,
   EL_SP_CHIP_BOTTOM,
 };
-static int num_editor_hl_supaplex = SIZEOF_ARRAY_INT(editor_hl_supaplex);
 static int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
 
-static int editor_hl_diamond_caves[] =
+static int editor_el_diamond_caves[] =
 {
   EL_CHAR('D'),
   EL_CHAR('I'),
@@ -2233,10 +2213,7 @@ static int editor_hl_diamond_caves[] =
   EL_CHAR(' '),
   EL_CHAR('I'),
   EL_CHAR('I'),
-};
 
-static int editor_el_diamond_caves[] =
-{
   EL_PEARL,
   EL_CRYSTAL,
   EL_WALL_PEARL,
@@ -2297,10 +2274,9 @@ static int editor_el_diamond_caves[] =
   EL_EXTRA_TIME,
   EL_EMPTY,
 };
-static int num_editor_hl_diamond_caves = SIZEOF_ARRAY_INT(editor_hl_diamond_caves);
 static int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
 
-static int editor_hl_dx_boulderdash[] =
+static int editor_el_dx_boulderdash[] =
 {
   EL_CHAR('D'),
   EL_CHAR('X'),
@@ -2321,10 +2297,7 @@ static int editor_hl_dx_boulderdash[] =
   EL_CHAR('A'),
   EL_CHAR('S'),
   EL_CHAR('H'),
-};
 
-static int editor_el_dx_boulderdash[] =
-{
   EL_SPRING,
   EL_TUBE_RIGHT_DOWN,
   EL_TUBE_HORIZONTAL_DOWN,
@@ -2345,19 +2318,15 @@ static int editor_el_dx_boulderdash[] =
   EL_EMPTY,
   EL_EMPTY
 };
-static int num_editor_hl_dx_boulderdash = SIZEOF_ARRAY_INT(editor_hl_dx_boulderdash);
 static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
 
-static int editor_hl_chars[] =
+static int editor_el_chars[] =
 {
   EL_CHAR('T'),
   EL_CHAR('E'),
   EL_CHAR('X'),
   EL_CHAR('T'),
-};
 
-static int editor_el_chars[] =
-{
   EL_CHAR(' '),
   EL_CHAR('!'),
   EL_CHAR('"'),
@@ -2448,10 +2417,9 @@ static int editor_el_chars[] =
   EL_CHAR(FONT_ASCII_CURSOR),
   EL_CHAR(' ')
 };
-static int num_editor_hl_chars = SIZEOF_ARRAY_INT(editor_hl_chars);
 static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
-static int editor_hl_custom[] =
+static int editor_el_custom[] =
 {
   EL_CHAR('C'),
   EL_CHAR('U'),
@@ -2472,10 +2440,7 @@ static int editor_hl_custom[] =
   EL_CHAR('N'),
   EL_CHAR('T'),
   EL_CHAR('S'),
-};
 
-static int editor_el_custom[] =
-{
   EL_CUSTOM_START + 0,
   EL_CUSTOM_START + 1,
   EL_CUSTOM_START + 2,
@@ -2636,12 +2601,7 @@ static int editor_el_custom[] =
   EL_CUSTOM_START + 126,
   EL_CUSTOM_START + 127
 };
-static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
 static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
-
-static int editor_hl_custom_more[] =
-{
-};
 
 static int editor_el_custom_more[] =
 {
@@ -2805,7 +2765,6 @@ static int editor_el_custom_more[] =
   EL_CUSTOM_START + 254,
   EL_CUSTOM_START + 255
 };
-static int num_editor_hl_custom_more = SIZEOF_ARRAY_INT(editor_hl_custom_more);
 static int num_editor_el_custom_more = SIZEOF_ARRAY_INT(editor_el_custom_more);
 
 static int *editor_elements = NULL;	/* dynamically allocated */
@@ -2814,10 +2773,6 @@ static int num_editor_elements = 0;	/* dynamically determined */
 static struct
 {
   boolean *setup_value;
-
-  int *headline_list;
-  int *headline_list_size;
-
   int *element_list;
   int *element_list_size;
 
@@ -2825,61 +2780,28 @@ static struct
 }
 editor_elements_info[] =
 {
-  {
-    &setup.editor.el_boulderdash,
-    editor_hl_boulderdash,		&num_editor_hl_boulderdash,
-    editor_el_boulderdash,		&num_editor_el_boulderdash
-  },
-  {
-    &setup.editor.el_emerald_mine,
-    editor_hl_emerald_mine,		&num_editor_hl_emerald_mine,
-    editor_el_emerald_mine,		&num_editor_el_emerald_mine
-  },
-  {
-    &setup.editor.el_more,
-    editor_hl_more,			&num_editor_hl_more,
-    editor_el_more,			&num_editor_el_more
-  },
-  {
-    &setup.editor.el_sokoban,
-    editor_hl_sokoban,			&num_editor_hl_sokoban,
-    editor_el_sokoban,			&num_editor_el_sokoban
-  },
-  {
-    &setup.editor.el_supaplex,
-    editor_hl_supaplex,			&num_editor_hl_supaplex,
-    editor_el_supaplex,			&num_editor_el_supaplex
-  },
-  {
-    &setup.editor.el_diamond_caves,
-    editor_hl_diamond_caves,		&num_editor_hl_diamond_caves,
-    editor_el_diamond_caves,		&num_editor_el_diamond_caves
-  },
-  {
-    &setup.editor.el_dx_boulderdash,
-    editor_hl_dx_boulderdash,		&num_editor_hl_dx_boulderdash,
-    editor_el_dx_boulderdash,		&num_editor_el_dx_boulderdash
-  },
-  {
-    &setup.editor.el_chars,
-    editor_hl_chars,			&num_editor_hl_chars,
-    editor_el_chars,			&num_editor_el_chars
-  },
-  {
-    &setup.editor.el_custom,
-    editor_hl_custom,			&num_editor_hl_custom,
-    editor_el_custom,			&num_editor_el_custom
-  },
-  {
-    &setup.editor.el_custom_more,
-    editor_hl_custom_more,		&num_editor_hl_custom_more,
-    editor_el_custom_more,		&num_editor_el_custom_more
-  },
-  {
-    NULL,
-    NULL,				NULL,
-    NULL,				NULL
-  }
+  { &setup.editor.el_boulderdash,	editor_el_boulderdash,
+    &num_editor_el_boulderdash						},
+  { &setup.editor.el_emerald_mine,	editor_el_emerald_mine,
+    &num_editor_el_emerald_mine						},
+  { &setup.editor.el_more,		editor_el_more,
+    &num_editor_el_more							},
+  { &setup.editor.el_sokoban,		editor_el_sokoban,
+    &num_editor_el_sokoban						},
+  { &setup.editor.el_supaplex,		editor_el_supaplex,
+    &num_editor_el_supaplex						},
+  { &setup.editor.el_diamond_caves,	editor_el_diamond_caves,
+    &num_editor_el_diamond_caves					},
+  { &setup.editor.el_dx_boulderdash,	editor_el_dx_boulderdash,
+    &num_editor_el_dx_boulderdash					},
+  { &setup.editor.el_chars,		editor_el_chars,
+    &num_editor_el_chars						},
+  { &setup.editor.el_custom,		editor_el_custom,
+    &num_editor_el_custom						},
+  { &setup.editor.el_custom_more,	editor_el_custom_more,
+    &num_editor_el_custom_more						},
+  { NULL,				NULL,
+    NULL								}
 };
 
 
@@ -2901,15 +2823,8 @@ static void ReinitializeElementList()
 
   /* determine size of element list */
   for (i=0; editor_elements_info[i].setup_value != NULL; i++)
-  {
     if (*editor_elements_info[i].setup_value)
-    {
-      if (setup.editor.el_headlines)
-	num_editor_elements += *editor_elements_info[i].headline_list_size;
-
       num_editor_elements += *editor_elements_info[i].element_list_size;
-    }
-  }
 
   if (num_editor_elements < ED_NUM_ELEMENTLIST_BUTTONS)
   {
@@ -2924,17 +2839,9 @@ static void ReinitializeElementList()
 
   /* fill element list */
   for (i=0; editor_elements_info[i].setup_value != NULL; i++)
-  {
     if (*editor_elements_info[i].setup_value)
-    {
-      if (setup.editor.el_headlines)
-	for (j=0; j < *editor_elements_info[i].headline_list_size; j++)
-	  editor_elements[pos++] = editor_elements_info[i].headline_list[j];
-
-      for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+      for (j=0; j<*editor_elements_info[i].element_list_size; j++)
 	editor_elements[pos++] = editor_elements_info[i].element_list[j];
-    }
-  }
 
   /* correct position of element list scrollbar */
   if (element_shift < 0)
@@ -2945,20 +2852,14 @@ static void ReinitializeElementList()
 
 static void ReinitializeElementListButtons()
 {
-  static boolean last_setup_value_headlines = FALSE;
   static boolean initialization_needed = TRUE;
   int i;
 
   if (!initialization_needed)	/* check if editor element setup has changed */
-  {
-    if (last_setup_value_headlines != setup.editor.el_headlines)
-      initialization_needed = TRUE;
-
     for (i=0; editor_elements_info[i].setup_value != NULL; i++)
       if (editor_elements_info[i].last_setup_value !=
 	  *editor_elements_info[i].setup_value)
 	initialization_needed = TRUE;
-  }
 
   if (!initialization_needed)
     return;
@@ -2967,7 +2868,6 @@ static void ReinitializeElementListButtons()
   CreateLevelEditorGadgets();
 
   /* store current setup values for next invocation of this function */
-  last_setup_value_headlines = setup.editor.el_headlines;
   for (i=0; editor_elements_info[i].setup_value != NULL; i++)
     editor_elements_info[i].last_setup_value =
       *editor_elements_info[i].setup_value;

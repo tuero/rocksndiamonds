@@ -81,17 +81,18 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 /* toon animation functions                                                  */
 /* ========================================================================= */
 
-static int get_toon_direction(char *direction_raw)
+static int get_toon_direction(char *direction_string_raw)
 {
-  static char *direction = NULL;
+  char *direction_string = getStringToLower(direction_string_raw);
+  int direction = (strcmp(direction_string, "left")  == 0 ? MV_LEFT :
+		   strcmp(direction_string, "right") == 0 ? MV_RIGHT :
+		   strcmp(direction_string, "up")    == 0 ? MV_UP :
+		   strcmp(direction_string, "down")  == 0 ? MV_DOWN :
+		   MV_NO_MOVING);
 
-  /* !!! MEMORY LEAK HERE! FIX IT! !!! */
-  setString(&direction, getStringToLower(direction_raw));
+  free(direction_string);
 
-  return (strcmp(direction, "left")  == 0 ? MV_LEFT :
-	  strcmp(direction, "right") == 0 ? MV_RIGHT :
-	  strcmp(direction, "up")    == 0 ? MV_UP :
-	  strcmp(direction, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
+  return direction;
 }
 
 void InitToonScreen(Bitmap *save_buffer,

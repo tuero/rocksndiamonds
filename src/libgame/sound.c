@@ -314,7 +314,7 @@ static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
   /* "ioctl()" expects pointer to 'int' value for stereo flag
      (boolean is defined as 'char', which will not work here) */
   unsigned int fragment_spec = 0;
-  int fragment_size_query;
+  int fragment_size_query = -1;
   int stereo = TRUE;
   struct
   {
@@ -506,6 +506,8 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
 
   if (leveldir_current == NULL)		/* should never happen */
     Error(ERR_EXIT, "leveldir_current == NULL");
+
+  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
 
   snd_ctrl.active = FALSE;
   snd_ctrl.state = type;
@@ -2038,6 +2040,8 @@ void PlaySoundExt(int nr, int volume, int stereo_position, int state)
   else if (stereo_position > SOUND_MAX_RIGHT)
     stereo_position = SOUND_MAX_RIGHT;
 
+  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
+
   snd_ctrl.active = TRUE;
   snd_ctrl.nr = nr;
   snd_ctrl.volume = volume;
@@ -2091,6 +2095,8 @@ void StopSoundExt(int nr, int state)
 
   if (!audio.sound_available)
     return;
+
+  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
 
   snd_ctrl.active = FALSE;
   snd_ctrl.nr = nr;

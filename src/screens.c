@@ -1813,8 +1813,6 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_custom,	"Custom:"	},
   { TYPE_SWITCH,	&setup.editor.el_custom_more,	"More Custom:"	},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},
-  { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };

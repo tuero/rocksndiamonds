@@ -3687,7 +3687,6 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
   { ".EDITOR",		GAME_MODE_EDITOR,		},
   { ".INFO",		GAME_MODE_INFO,			},
   { ".SETUP",		GAME_MODE_SETUP,		},
-  { ".PLAYING",		GAME_MODE_PLAYING,		},
   { ".DOOR",		GAME_MODE_PSEUDO_DOOR,		},
   { ".PREVIEW",		GAME_MODE_PSEUDO_PREVIEW,	},
   { ".CRUMBLED",	GAME_MODE_PSEUDO_CRUMBLED,	},

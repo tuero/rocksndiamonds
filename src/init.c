@@ -554,22 +554,24 @@ void InitElementGraphicInfo()
   {
     for (act=0; act<NUM_ACTIONS; act++)
     {
-      if (graphic_info[element_info[i].graphic[act]].bitmap == NULL)
+      int graphic;
+
+      graphic = element_info[i].graphic[act];
+      if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	element_info[i].graphic[act] = -1;
 
-      if (graphic_info[element_info[i].crumbled[act]].bitmap == NULL)
+      graphic = element_info[i].crumbled[act];
+      if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	element_info[i].crumbled[act] = -1;
 
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
-	int graphic;
-
 	graphic = element_info[i].direction_graphic[act][dir];
-	if (graphic_info[graphic].bitmap == NULL)
+	if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	  element_info[i].direction_graphic[act][dir] = -1;
 
 	graphic = element_info[i].direction_crumbled[act][dir];
-	if (graphic_info[graphic].bitmap == NULL)
+	if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	  element_info[i].direction_crumbled[act][dir] = -1;
       }
     }
@@ -891,6 +893,10 @@ static void InitGraphicInfo()
     free(graphic_info);
 
   graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
+
+#if 0
+  printf("::: graphic_info: %d entries\n", num_images);
+#endif
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)

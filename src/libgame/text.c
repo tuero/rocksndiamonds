@@ -330,7 +330,7 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr,
 			int area_xsize, int area_ysize)
 {
   int area_line = 0;
-  int font_height = getFontHeight(font_nr);
+  int font_height = getFontWidth(font_nr);
 
   if (text == NULL)
     return;

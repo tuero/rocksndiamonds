@@ -76,10 +76,6 @@ font_to_graphic[] =
     IMG_FONT_TEXT_1_PREVIEW
   },
   {
-    FONT_TEXT_1,				GFX_SPECIAL_ARG_PLAYING,
-    IMG_FONT_TEXT_1_PLAYING
-  },
-  {
     FONT_TEXT_1,				GFX_SPECIAL_ARG_SCORES,
     IMG_FONT_TEXT_1_SCORES
   },

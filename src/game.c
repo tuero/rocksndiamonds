@@ -1989,75 +1989,6 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
-void ShowEnvelope()
-{
-  int i, x, y;
-
-  /* open envelope window horizontally */
-  for (i=2; i <= level.envelope_xsize + 2; i += 2)
-  {
-    int startx = (SXSIZE / MINI_TILEX - i) / 2;
-    int starty = (SYSIZE / MINI_TILEY) / 2 - 1;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < 2; y++) for (x=0; x < i; x++)
-    {
-      int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
-
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
-    }
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-  }
-
-  /* open envelope window vertically */
-  for (i=2; i <= level.envelope_ysize + 2; i += 2)
-  {
-    int xsize = level.envelope_xsize + 2;
-    int startx = (SXSIZE / MINI_TILEX - (xsize - 1)) / 2;
-    int starty = (SYSIZE / MINI_TILEY - i) / 2;
-
-    SetDrawtoField(DRAW_BUFFERED);
-
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (y=0; y < i; y++) for (x=0; x < xsize; x++)
-    {
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
-
-      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
-    }
-
-    DrawTextToTextArea(SX + (startx + 1) * MINI_TILEX,
-		       SY + (starty + 1) * MINI_TILEY, level.envelope,
-		       FONT_TEXT_1, level.envelope_xsize, i - 2);
-
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    BackToFront();
-
-    Delay(GAME_FRAME_DELAY);
-  }
-
-  Delay(3000);
-
-  SetDrawtoField(DRAW_BUFFERED);
-
-  redraw_mask |= REDRAW_FIELD;
-  BackToFront();
-}
-
 void RelocatePlayer(int x, int y, int element)
 {
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
@@ -6790,7 +6721,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
-	HAS_ANY_CHANGE_EVENT(center_element, CE_OTHER_IS_TOUCHING) &&
+	element_info[center_element].change_events & CE_OTHER_IS_TOUCHING &&
 	!change_center_element)
     {
       for (j=0; j < element_info[center_element].num_change_pages; j++)
@@ -6798,7 +6729,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	struct ElementChangeInfo *change =
 	  &element_info[center_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->events & CE_OTHER_IS_TOUCHING &&
 	    change->trigger_element == border_element)
 	{
 	  change_center_element = TRUE;
@@ -6811,14 +6742,14 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of border element */
     if (IS_CUSTOM_ELEMENT(border_element) &&
-	HAS_ANY_CHANGE_EVENT(border_element, CE_OTHER_IS_TOUCHING))
+	element_info[border_element].change_events & CE_OTHER_IS_TOUCHING)
     {
       for (j=0; j < element_info[border_element].num_change_pages; j++)
       {
 	struct ElementChangeInfo *change =
 	  &element_info[border_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->events & CE_OTHER_IS_TOUCHING &&
 	    change->trigger_element == center_element)
 	{
 	  CheckElementChangeExt(xx,yy, border_element,CE_OTHER_IS_TOUCHING, j);
@@ -7579,10 +7510,6 @@ int DigField(struct PlayerInfo *player,
 	  DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			     el2edimg(EL_KEY_1 + key_nr));
 	  redraw_mask |= REDRAW_DOOR_1;
-	}
-	else if (element == EL_ENVELOPE)
-	{
-	  ShowEnvelope();
 	}
 	else if (IS_DROPPABLE(element))	/* can be collected and dropped */
 	{
