@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2000 Artsoft Entertainment                      *
+* (c) 1994-2001 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -181,6 +181,9 @@ void InitPlaylist(void)
 
 void StartSoundserver(void)
 {
+  if (!audio.sound_available)
+    return;
+
 #if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
   if (!ForkAudioProcess())
     audio.sound_available = FALSE;
@@ -873,6 +876,9 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   int i;
 #endif
 
+  if (!audio.sound_available)
+    return FALSE;
+
   num_sounds++;
   Sound = checked_realloc(Sound, num_sounds * sizeof(struct SampleInfo));
 
@@ -999,6 +1005,9 @@ int LoadMusic(void)
   char *music_directory = getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
   int num_wav_music = 0;
   int num_mod_music = 0;
+
+  if (!audio.sound_available)
+    return 0;
 
   if ((dir = opendir(music_directory)) == NULL)
   {
@@ -1128,6 +1137,9 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 void FadeMusic(void)
 {
 #if defined(TARGET_SDL)
+  if (!audio.sound_available)
+    return;
+
   if (audio.mods_available)
     Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
   else

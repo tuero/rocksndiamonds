@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2000 Artsoft Entertainment                      *
+* (c) 1995-2001 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -1513,7 +1513,7 @@ extern int		num_element_info;
 #define PROGRAM_VERSION_STRING	"2.0.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2000 by"
+#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2001 by"
 #define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
 #define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING

@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2000 Artsoft Entertainment                      *
+* (c) 1994-2001 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
