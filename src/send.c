@@ -1,8 +1,5 @@
 
-/* send.c
- *
- * send an Image to an X pixmap
- */
+/* send.c */
 
 #include "xli.h"
 

@@ -1,18 +1,5 @@
 
-/* gif.c:
- *
- * adapted from code by kirk johnson (tuna@athena.mit.edu).  most of this
- * code is unchanged. -- jim frost 12.31.89
- *
- * gifin.c
- * kirk johnson
- * november 1989
- *
- * routines for reading GIF files
- *
- * Copyright 1989 Kirk L. Johnson (see the included file
- * "kljcpyrght.h" for complete copyright information)
- */
+/* gif.c */
 
 #define GIF_C
 
@@ -150,7 +137,7 @@ static int gifin_open_file(FILE *s)
   buf[GIF_SIG_LEN] = '\0';
   if (strcmp((char *) buf, GIF_SIG) == 0)
     gifin_version = GIF87a;
-  else if(strcmp((char *) buf, GIF_SIG_89) == 0)
+  else if (strcmp((char *) buf, GIF_SIG_89) == 0)
     gifin_version = GIF89a;
   else
     return GIFIN_ERR_BAD_SIG;
@@ -364,7 +351,7 @@ static int gifin_get_pixel(pel)
         pstk[place] = first;
       }
 
-      if((errno = gifin_add_string(prev_code, first)) != GIFIN_SUCCESS)
+      if ((errno = gifin_add_string(prev_code, first)) != GIFIN_SUCCESS)
         return errno;
       prev_code = code;
     }
@@ -481,77 +468,64 @@ static int gifin_add_string(int p, int e)
   return GIFIN_SUCCESS;
 }
 
-/* these are the routines added for interfacing to xli
- */
-
-/* tell someone what the image we're loading is.  this could be a little more
- * descriptive but I don't care
- */
-
-static void tellAboutImage(char *name)
-{
-  printf("\n%s:\n  %dx%d %s%s image with %d colors\n",
-	 name, gifin_img_width, gifin_img_height,
-	 (gifin_interlace_flag ? "interlaced " : ""),
-	 gif_version_name[gifin_version],
-	 (gifin_l_cmap_flag ? gifin_l_ncolors : gifin_g_ncolors));
-}
-
 Image *gifLoad(char *fullname)
 {
-  FILE *zf;
+  FILE *f;
   Image *image;
   int x, y, pixel, pass, scanlen;
   byte *pixptr, *pixline;
   int errno;
 
-  if (!(zf = fopen(fullname,"r")))
+  if (!(f = fopen(fullname,"r")))
   {
     perror("gifLoad");
     return(NULL);
   }
 
-  if ((gifin_open_file(zf) != GIFIN_SUCCESS) || /* read GIF header */
-      (gifin_open_image() != GIFIN_SUCCESS))    /* read image header */
+  if ((gifin_open_file(f) != GIFIN_SUCCESS) ||	/* read GIF header */
+      (gifin_open_image() != GIFIN_SUCCESS))	/* read image header */
   {
     printf("gifin_open_file or gifin_open_image failed!\n");
 
     gifin_close_file();
-    fclose(zf);
+    fclose(f);
     return(NULL);
   }
 
-  /*
-  tellAboutImage(fullname);
-  */
+  printf("%s:\n   %dx%d %s%s image with %d colors at depth %d\n",
+	 fullname, gifin_img_width, gifin_img_height,
+	 (gifin_interlace_flag ? "interlaced " : ""),
+	 gif_version_name[gifin_version],
+	 (gifin_l_cmap_flag ? gifin_l_ncolors : gifin_g_ncolors),
+	 (gifin_l_cmap_flag ? gifin_l_pixel_bits : gifin_g_pixel_bits));
 
-  image= newRGBImage(gifin_img_width, gifin_img_height, (gifin_l_cmap_flag ?
-							 gifin_l_pixel_bits :
-							 gifin_g_pixel_bits));
-  image->title= dupString(fullname);
+  image = newRGBImage(gifin_img_width, gifin_img_height, (gifin_l_cmap_flag ?
+							  gifin_l_pixel_bits :
+							  gifin_g_pixel_bits));
+  image->title = dupString(fullname);
 
   /* if image has a local colormap, override global colormap
    */
 
   if (gifin_l_cmap_flag)
   {
-    for (x= 0; x < gifin_l_ncolors; x++)
+    for (x=0; x<gifin_l_ncolors; x++)
     {
-      image->rgb.red[x]= gifin_l_cmap[GIF_RED][x] << 8;
-      image->rgb.green[x]= gifin_l_cmap[GIF_GRN][x] << 8;
-      image->rgb.blue[x]= gifin_l_cmap[GIF_BLU][x] << 8;
+      image->rgb.red[x] = gifin_l_cmap[GIF_RED][x] << 8;
+      image->rgb.green[x] = gifin_l_cmap[GIF_GRN][x] << 8;
+      image->rgb.blue[x] = gifin_l_cmap[GIF_BLU][x] << 8;
     }
-    image->rgb.used= gifin_l_ncolors;
+    image->rgb.used = gifin_l_ncolors;
   }
   else
   {
-    for (x= 0; x < gifin_g_ncolors; x++)
+    for (x=0; x<gifin_g_ncolors; x++)
     {
-      image->rgb.red[x]= gifin_g_cmap[GIF_RED][x] << 8;
-      image->rgb.green[x]= gifin_g_cmap[GIF_GRN][x] << 8;
-      image->rgb.blue[x]= gifin_g_cmap[GIF_BLU][x] << 8;
+      image->rgb.red[x] = gifin_g_cmap[GIF_RED][x] << 8;
+      image->rgb.green[x] = gifin_g_cmap[GIF_GRN][x] << 8;
+      image->rgb.blue[x] = gifin_g_cmap[GIF_BLU][x] << 8;
     }
-    image->rgb.used= gifin_g_ncolors;
+    image->rgb.used = gifin_g_ncolors;
   }
 
   /* interlaced image -- futz with the vertical trace.  i wish i knew what
@@ -561,26 +535,27 @@ Image *gifLoad(char *fullname)
 
   if (gifin_interlace_flag)
   {
-    scanlen= image->height * image->pixlen;
+    scanlen = image->height * image->pixlen;
 
     /* interlacing takes four passes to read, each starting at a different
      * vertical point.
      */
 
-    for (pass= 0; pass < 4; pass++)
+    for (pass=0; pass<4; pass++)
     {
-      y= interlace_start[pass];
-      scanlen= image->width * image->pixlen * interlace_rate[pass];
-      pixline= image->data + (y * image->width * image->pixlen);
+      y = interlace_start[pass];
+      scanlen = image->width * image->pixlen * interlace_rate[pass];
+      pixline = image->data + (y * image->width * image->pixlen);
       while (y < gifin_img_height)
       {
-	pixptr= pixline;
-	for (x= 0; x < gifin_img_width; x++)
+	pixptr = pixline;
+	for (x=0; x<gifin_img_width; x++)
 	{
 	  if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS)
 	  {
 	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", fullname, get_err_string(errno));
-	    y = gifin_img_height; x = gifin_img_width;
+	    y = gifin_img_height;
+	    x = gifin_img_width;
 	  }
 	  valToMem(pixel, pixptr, image->pixlen);
 	  pixptr += image->pixlen;
@@ -595,16 +570,17 @@ Image *gifLoad(char *fullname)
     /* not an interlaced image, just read in sequentially
      */
 
-    if(image->pixlen == 1)      /* the usual case */
+    if (image->pixlen == 1)      /* the usual case */
     {
-      pixptr= image->data;
-      for (y= 0; y < gifin_img_height; y++)
-        for (x= 0; x < gifin_img_width; x++)
+      pixptr = image->data;
+      for (y=0; y<gifin_img_height; y++)
+        for (x=0; x<gifin_img_width; x++)
 	{
           if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS)
 	  {
 	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", fullname, get_err_string(errno));
-            y = gifin_img_height; x = gifin_img_width;
+            y = gifin_img_height;
+	    x = gifin_img_width;
           }
           valToMem(pixel, pixptr, 1);
           pixptr += 1;
@@ -612,14 +588,15 @@ Image *gifLoad(char *fullname)
     }
     else			/* less ususal case */
     {
-      pixptr= image->data;
-      for (y= 0; y < gifin_img_height; y++)
-        for (x= 0; x < gifin_img_width; x++)
+      pixptr = image->data;
+      for (y=0; y<gifin_img_height; y++)
+        for (x=0; x<gifin_img_width; x++)
 	{
           if ((errno = gifin_get_pixel(&pixel)) != GIFIN_SUCCESS)
 	  {
 	    fprintf(stderr, "gifLoad: %s - Short read within image data, '%s'\n", fullname, get_err_string(errno));
-            y = gifin_img_height; x = gifin_img_width;
+            y = gifin_img_height;
+	    x = gifin_img_width;
           }
           valToMem(pixel, pixptr, image->pixlen);
           pixptr += image->pixlen;
@@ -628,7 +605,7 @@ Image *gifLoad(char *fullname)
   }
 
   gifin_close_file();
-  fclose(zf);
+  fclose(f);
 
   return(image);
 }

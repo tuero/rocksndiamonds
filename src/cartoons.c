@@ -140,9 +140,16 @@ void HandleAnimation(int mode)
       }
 
       if (soft_scrolling_on && game_status==PLAYING)
+      {
+	int fx = FX, fy = FY;
+
+        fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+        fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+
 	XCopyArea(display,fieldbuffer,backbuffer,gc,
-		  FX,FY, SXSIZE,SYSIZE,
+		  fx,fy, SXSIZE,SYSIZE,
 		  SX,SY);
+      }
 
       return;
       break;

@@ -993,7 +993,7 @@ extern char		*progname;
 #define LEVELREC_COOKIE_LEN	(strlen(LEVELREC_COOKIE)+1)
 #define JOYSTICK_COOKIE_LEN	(strlen(JOYSTICK_COOKIE)+1)
 
-#define VERSION_STRING		"1.1"
+#define VERSION_STRING		"1.2"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
 #define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"

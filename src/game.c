@@ -1791,7 +1791,13 @@ void StartMoving(int x, int y)
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x,y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element==EL_SONDE)
-	DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+      {
+	int nextJX = JX + (JX - lastJX);
+	int nextJY = JY + (JY - lastJY);
+
+	if (!(PlayerPushing && PlayerGfxPos && x == nextJX && y == nextJY))
+	  DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+      }
 
       return;
     }

@@ -108,15 +108,6 @@ void BackToFront()
       XCopyArea(display,buffer,window,gc,
 		fx,fy, SXSIZE,SYSIZE,
 		SX,SY);
-
-
-
-#if 0
-      printf("FULL SCREEN REDRAW [%d]\n", ScreenMovPos);
-#endif
-
-
-
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
@@ -1474,6 +1465,9 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	      result = 0;
 	      break;
 	  }
+	  break;
+	case KeyRelease:
+	  key_joystick_mapping = 0;
 	  break;
 	case FocusIn:
 	case FocusOut:

@@ -1,13 +1,5 @@
 
-/* new.c:
- *
- * functions to allocate and deallocate structures and structure data
- *
- * jim frost 09.29.89
- *
- * Copyright 1989, 1991 Jim Frost.
- * See included file "copyright.h" for complete copyright information.
- */
+/* new.c */
 
 #include "xli.h"
 
