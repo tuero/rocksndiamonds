@@ -31,6 +31,8 @@
 #include "tape.h"
 #include "files.h"
 #include "tools.h"
+#include "buttons.h"
+#include "screens.h"
 #include "misc.h"
 
 #define MAXNICKLEN 14
@@ -49,6 +51,8 @@ struct user me =
   NULL
 };
 
+static char msgbuf[300];
+
 /* server stuff */
 
 int sfd;
@@ -56,7 +60,7 @@ unsigned char realbuf[512], readbuf[MAX_BUFFER_SIZE], writbuf[MAX_BUFFER_SIZE];
 unsigned char *buf = realbuf + 4;
 int nread = 0, nwrite = 0;
 
-void sysmsg(char *s)
+static void sysmsg(char *s)
 {
   if (verbose)
   {
@@ -65,7 +69,7 @@ void sysmsg(char *s)
   }
 }
 
-void *mmalloc(int n)
+static void *mmalloc(int n)
 {
   void *r;
 
@@ -75,7 +79,7 @@ void *mmalloc(int n)
   return r;
 }
 
-void u_sleep(int i)
+static void u_sleep(int i)
 {
   struct timeval tm;
   tm.tv_sec = i / 1000000;
@@ -83,7 +87,7 @@ void u_sleep(int i)
   select(0, NULL, NULL, NULL, &tm);
 }
 
-void flushbuf()
+static void flushbuf()
 {
   if (nwrite)
   {
@@ -92,7 +96,7 @@ void flushbuf()
   }
 }
 
-void sendbuf(int len)
+static void sendbuf(int len)
 {
   if (!standalone)
   {
@@ -139,12 +143,12 @@ char *get_user_name(unsigned char c)
   return("no name");
 }
 
-void InitNetworkServer(int port)
+static void StartNetworkServer(int port)
 {
   switch (fork())
   {
     case 0:
-      NetworkServer(port, !serveronly);
+      NetworkServer(port, serveronly);
 
       /* never reached */
       exit(0);
@@ -198,7 +202,7 @@ BOOL ConnectToServer(char *host, int port)
     {
       printf("No rocksndiamonds server on localhost - starting up one ...\n");
 
-      InitNetworkServer(port);
+      StartNetworkServer(port);
 
       for (i=0; i<6; i++)
       {
@@ -270,6 +274,27 @@ void SendToServer_StartPlaying()
   sendbuf(10 + strlen(leveldir[leveldir_nr].name)+1);
 }
 
+void SendToServer_PausePlaying()
+{
+  buf[1] = OP_PAUSE_PLAYING;
+
+  sendbuf(2);
+}
+
+void SendToServer_ContinuePlaying()
+{
+  buf[1] = OP_CONTINUE_PLAYING;
+
+  sendbuf(2);
+}
+
+void SendToServer_StopPlaying()
+{
+  buf[1] = OP_STOP_PLAYING;
+
+  sendbuf(2);
+}
+
 void SendToServer_MovePlayer(byte player_action)
 {
   buf[1] = OP_MOVE_FIGURE;
@@ -278,11 +303,245 @@ void SendToServer_MovePlayer(byte player_action)
   sendbuf(3);
 }
 
-void handlemessages()
+static void Handle_OP_BAD_PROTOCOL_VERSION()
+{
+  Error(ERR_RETURN, "protocol version mismatch");
+  Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
+	buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
+}
+
+static void Handle_OP_YOUR_NUMBER()
+{
+  int new_client_nr = buf[2];
+  int new_index_nr = new_client_nr - 1;
+
+  printf("OP_YOUR_NUMBER: %d\n", buf[0]);
+  me.nr = new_client_nr;
+
+  stored_player[new_index_nr] = *local_player;
+  local_player = &stored_player[new_index_nr];
+
+  TestPlayer = new_index_nr;
+
+  if (me.nr > MAX_PLAYERS)
+    Error(ERR_EXIT, "sorry - no more than %d players", MAX_PLAYERS);
+
+  sprintf(msgbuf, "you get client # %d", new_client_nr);
+  sysmsg(msgbuf);
+}
+
+static void Handle_OP_NUMBER_WANTED()
+{
+  int client_nr_wanted = buf[2];
+  int new_client_nr = buf[3];
+  int new_index_nr = new_client_nr - 1;
+
+  printf("OP_NUMBER_WANTED: %d\n", buf[0]);
+
+  if (new_client_nr != client_nr_wanted)
+  {
+    char *color[] = { "yellow", "red", "green", "blue" };
+
+    sprintf(msgbuf, "Sorry ! You are %s player !",
+	    color[new_index_nr]);
+    Request(msgbuf, REQ_CONFIRM);
+
+    sprintf(msgbuf, "cannot switch -- you keep client # %d",
+	    new_client_nr);
+    sysmsg(msgbuf);
+  }
+  else
+  {
+    if (me.nr != client_nr_wanted)
+      sprintf(msgbuf, "switching to client # %d", new_client_nr);
+    else
+      sprintf(msgbuf, "keeping client # %d", new_client_nr);
+    sysmsg(msgbuf);
+
+    me.nr = new_client_nr;
+
+    stored_player[new_index_nr] = *local_player;
+    local_player = &stored_player[new_index_nr];
+
+    TestPlayer = new_index_nr;
+  }
+}
+
+static void Handle_OP_NICKNAME(unsigned int len)
+{
+  struct user *u;
+
+  printf("OP_NICKNAME: %d\n", buf[0]);
+  u = finduser(buf[0]);
+  buf[len] = 0;
+  sprintf(msgbuf, "client %d calls itself \"%s\"", buf[0], &buf[2]);
+  sysmsg(msgbuf);
+  strncpy(u->name, &buf[2], MAXNICKLEN);
+}
+
+static void Handle_OP_PLAYER_CONNECTED()
+{
+  struct user *u, *v = NULL;
+
+  printf("OP_PLAYER_CONNECTED: %d\n", buf[0]);
+  sprintf(msgbuf, "new client %d connected", buf[0]);
+  sysmsg(msgbuf);
+
+  for (u = &me; u; u = u->next)
+  {
+    if (u->nr == buf[0])
+      Error(ERR_EXIT, "multiplayer server sent duplicate player id");
+    else
+      v = u;
+  }
+
+  v->next = u = mmalloc(sizeof(struct user));
+  u->nr = buf[0];
+  u->name[0] = '\0';
+  u->next = NULL;
+}
+
+static void Handle_OP_PLAYER_DISCONNECTED()
+{
+  struct user *u, *v;
+
+  printf("OP_PLAYER_DISCONNECTED: %d\n", buf[0]);
+  u = finduser(buf[0]);
+  sprintf(msgbuf, "client %d (%s) disconnected",
+	  buf[0], get_user_name(buf[0]));
+  sysmsg(msgbuf);
+
+  for (v = &me; v; v = v->next)
+    if (v->next == u)
+      v->next = u->next;
+  free(u);
+}
+
+static void Handle_OP_START_PLAYING()
+{
+  int new_level_nr, new_leveldir_nr;
+  unsigned long new_random_seed;
+  unsigned char *new_leveldir_name;
+
+  /*
+    if (game_status == PLAYING)
+    break;
+  */
+
+  new_level_nr = (buf[2] << 8) + buf[3];
+  new_leveldir_nr = (buf[4] << 8) + buf[5];
+  new_random_seed =
+    (buf[6] << 24) | (buf[7] << 16) | (buf[8] << 8) | (buf[9]);
+  new_leveldir_name = &buf[10];
+
+  printf("OP_START_PLAYING: %d\n", buf[0]);
+  sprintf(msgbuf, "client %d starts game [level %d from levedir %d (%s)]\n",
+	  buf[0],
+	  new_level_nr,
+	  new_leveldir_nr,
+	  new_leveldir_name);
+  sysmsg(msgbuf);
+
+
+  if (strcmp(leveldir[new_leveldir_nr].name, new_leveldir_name) != 0)
+    Error(ERR_RETURN, "no such level directory: '%s'",new_leveldir_name);
+
+  leveldir_nr = new_leveldir_nr;
+
+  local_player->leveldir_nr = leveldir_nr;
+  LoadPlayerInfo(PLAYER_LEVEL);
+  SavePlayerInfo(PLAYER_SETUP);
+
+  level_nr = new_level_nr;
+
+  TapeErase();
+  LoadLevelTape(level_nr);
+
+  GetPlayerConfig();
+  LoadLevel(level_nr);
+
+
+
+  if (autorecord_on)
+    TapeStartRecording();
+
+
+
+  if (tape.recording)
+    tape.random_seed = new_random_seed;
+
+  InitRND(new_random_seed);
+
+
+  /*
+    printf("tape.random_seed == %d\n", tape.random_seed);
+  */
+
+  game_status = PLAYING;
+  InitGame();
+}
+
+static void Handle_OP_PAUSE_PLAYING()
+{
+  printf("OP_PAUSE_PLAYING: %d\n", buf[0]);
+  sprintf(msgbuf, "client %d pauses game", buf[0]);
+  sysmsg(msgbuf);
+
+  tape.pausing = TRUE;
+  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+}
+
+static void Handle_OP_CONTINUE_PLAYING()
+{
+  printf("OP_CONTINUE_PLAYING: %d\n", buf[0]);
+  sprintf(msgbuf, "client %d continues game", buf[0]);
+  sysmsg(msgbuf);
+
+  tape.pausing = FALSE;
+  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+}
+
+static void Handle_OP_STOP_PLAYING()
+{
+  printf("OP_STOP_PLAYING: %d\n", buf[0]);
+  sprintf(msgbuf, "client %d stops game", buf[0]);
+  sysmsg(msgbuf);
+}
+
+static void Handle_OP_MOVE_FIGURE()
+{
+  int frame_nr;
+  int i;
+
+  frame_nr =
+    (buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | (buf[5]);
+
+  if (frame_nr != FrameCounter)
+  {
+    Error(ERR_RETURN, "client and servers frame counters out of sync");
+    Error(ERR_RETURN, "frame counter of client is %d", FrameCounter);
+    Error(ERR_RETURN, "frame counter of server is %d", frame_nr);
+    Error(ERR_EXIT,   "this should not happen -- please debug");
+  }
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    if (stored_player[i].active)
+      network_player_action[i] = buf[6 + i];
+  }
+
+  network_player_action_received = TRUE;
+
+  /*
+    sprintf(msgbuf, "frame %d: client %d moves player [0x%02x]",
+    FrameCounter, buf[0], buf[2]);
+    sysmsg(msgbuf);
+  */
+}
+
+static void handlemessages()
 {
   unsigned int len;
-  struct user *u, *v = NULL;
-  static char msgbuf[300];
 
   while (nread >= 4 && nread >= 4 + readbuf[3])
   {
@@ -296,221 +555,48 @@ void handlemessages()
 
     switch(buf[1])
     {
-      case OP_YOUR_NUMBER:
-      {
-	int new_client_nr = buf[2];
-	int new_index_nr = new_client_nr - 1;
-
-	printf("OP_YOUR_NUMBER: %d\n", buf[0]);
-	me.nr = new_client_nr;
-
-	stored_player[new_index_nr] = *local_player;
-	local_player = &stored_player[new_index_nr];
-
-	TestPlayer = new_index_nr;
-
-	if (me.nr > MAX_PLAYERS)
-	  Error(ERR_EXIT, "sorry - no more than %d players", MAX_PLAYERS);
-
-	sprintf(msgbuf, "you get client # %d", new_client_nr);
-	sysmsg(msgbuf);
-
+      case OP_BAD_PROTOCOL_VERSION:
+	Handle_OP_BAD_PROTOCOL_VERSION();
 	break;
-      }
+
+      case OP_YOUR_NUMBER:
+	Handle_OP_YOUR_NUMBER();
+	break;
 
       case OP_NUMBER_WANTED:
-      {
-	int client_nr_wanted = buf[2];
-	int new_client_nr = buf[3];
-	int new_index_nr = new_client_nr - 1;
-
-	printf("OP_NUMBER_WANTED: %d\n", buf[0]);
-
-	if (new_client_nr != client_nr_wanted)
-	{
-	  char *color[] = { "yellow", "red", "green", "blue" };
-
-	  sprintf(msgbuf, "Sorry ! You are %s player !",
-		  color[new_index_nr]);
-	  Request(msgbuf, REQ_CONFIRM);
-
-	  sprintf(msgbuf, "cannot switch -- you keep client # %d",
-		  new_client_nr);
-	  sysmsg(msgbuf);
-	}
-	else
-	{
-	  if (me.nr != client_nr_wanted)
-	    sprintf(msgbuf, "switching to client # %d", new_client_nr);
-	  else
-	    sprintf(msgbuf, "keeping client # %d", new_client_nr);
-	  sysmsg(msgbuf);
-
-	  me.nr = new_client_nr;
-
-	  stored_player[new_index_nr] = *local_player;
-	  local_player = &stored_player[new_index_nr];
-
-	  TestPlayer = new_index_nr;
-	}
-
-	break;
-      }
-
-      case OP_PLAYER_CONNECTED:
-	printf("OP_PLAYER_CONNECTED: %d\n", buf[0]);
-	sprintf(msgbuf, "new client %d connected", buf[0]);
-	sysmsg(msgbuf);
-
-	for (u = &me; u; u = u->next)
-	{
-	  if (u->nr == buf[0])
-	    Error(ERR_EXIT, "multiplayer server sent duplicate player id");
-	  else
-	    v = u;
-	}
-
-	v->next = u = mmalloc(sizeof(struct user));
-	u->nr = buf[0];
-	u->name[0] = '\0';
-	u->next = NULL;
-
+	Handle_OP_NUMBER_WANTED();
 	break;
 
       case OP_NICKNAME:
-	printf("OP_NICKNAME: %d\n", buf[0]);
-	u = finduser(buf[0]);
-	buf[len] = 0;
-	sprintf(msgbuf, "client %d calls itself \"%s\"", buf[0], &buf[2]);
-	sysmsg(msgbuf);
-	strncpy(u->name, &buf[2], MAXNICKLEN);
+	Handle_OP_NICKNAME(len);
+	break;
+
+      case OP_PLAYER_CONNECTED:
+	Handle_OP_PLAYER_CONNECTED();
 	break;
       
-      case OP_GONE:
-	printf("OP_GONE: %d\n", buf[0]);
-	u = finduser(buf[0]);
-	sprintf(msgbuf, "client %d (%s) disconnected",
-		buf[0], get_user_name(buf[0]));
-	sysmsg(msgbuf);
-
-	for (v = &me; v; v = v->next)
-	  if (v->next == u)
-	    v->next = u->next;
-	free(u);
-
-	break;
-
-      case OP_BAD_PROTOCOL_VERSION:
-	Error(ERR_RETURN, "protocol version mismatch");
-	Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
-	      buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
+      case OP_PLAYER_DISCONNECTED:
+	Handle_OP_PLAYER_DISCONNECTED();
 	break;
 
       case OP_START_PLAYING:
-      {
-	int new_level_nr, new_leveldir_nr;
-	unsigned long new_random_seed;
-	unsigned char *new_leveldir_name;
-
-	/*
-	if (game_status == PLAYING)
-	  break;
-	*/
-
-	new_level_nr = (buf[2] << 8) + buf[3];
-	new_leveldir_nr = (buf[4] << 8) + buf[5];
-	new_random_seed =
-	  (buf[6] << 24) | (buf[7] << 16) | (buf[8] << 8) | (buf[9]);
-	new_leveldir_name = &buf[10];
-
-	printf("OP_START_PLAYING: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d starts game [level %d from levedir %d (%s)]\n",
-		buf[0],
-		new_level_nr,
-		new_leveldir_nr,
-		new_leveldir_name);
-	sysmsg(msgbuf);
-
-
-	if (strcmp(leveldir[new_leveldir_nr].name, new_leveldir_name) != 0)
-	  Error(ERR_RETURN, "no such level directory: '%s'",new_leveldir_name);
-
-	leveldir_nr = new_leveldir_nr;
-
-	local_player->leveldir_nr = leveldir_nr;
-	LoadPlayerInfo(PLAYER_LEVEL);
-	SavePlayerInfo(PLAYER_SETUP);
-
-	level_nr = new_level_nr;
-
-	TapeErase();
-	LoadLevelTape(level_nr);
-
-	GetPlayerConfig();
-	LoadLevel(level_nr);
-
-	/*
-	if (autorecord_on)
-	  TapeStartRecording();
-	*/
-
-	if (tape.recording)
-	  tape.random_seed = new_random_seed;
-
-	InitRND(new_random_seed);
-
-
-	/*
-	printf("tape.random_seed == %d\n", tape.random_seed);
-	*/
-
-	game_status = PLAYING;
-	InitGame();
-
+	Handle_OP_START_PLAYING();
 	break;
-      }
+
+      case OP_PAUSE_PLAYING:
+	Handle_OP_PAUSE_PLAYING();
+	break;
+
+      case OP_CONTINUE_PLAYING:
+	Handle_OP_CONTINUE_PLAYING();
+	break;
+
+      case OP_STOP_PLAYING:
+	Handle_OP_STOP_PLAYING();
+	break;
 
       case OP_MOVE_FIGURE:
-      {
-	int frame_nr;
-	int i;
-
-	frame_nr =
-	  (buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | (buf[5]);
-
-	if (frame_nr != FrameCounter)
-	{
-	  Error(ERR_RETURN, "client and servers frame counters out of sync");
-	  Error(ERR_RETURN, "frame counter of client is %d", FrameCounter);
-	  Error(ERR_RETURN, "frame counter of server is %d", frame_nr);
-	  Error(ERR_EXIT,   "this should not happen -- please debug");
-	}
-
-	for (i=0; i<MAX_PLAYERS; i++)
-	{
-	  if (stored_player[i].active)
-	    network_player_action[i] = buf[6 + i];
-	}
-
-	network_player_action_received = TRUE;
-
-	sprintf(msgbuf, "frame %d: client %d moves player [0x%02x]",
-		FrameCounter, buf[0], buf[2]);
-	sysmsg(msgbuf);
-
-	break;
-      }
-
-      case OP_PAUSE:
-	printf("OP_PAUSE: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d pauses game", buf[0]);
-	sysmsg(msgbuf);
-	break;
-
-      case OP_CONT:
-	printf("OP_CONT: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d continues game", buf[0]);
-	sysmsg(msgbuf);
+	Handle_OP_MOVE_FIGURE();
 	break;
 
       case OP_WON:

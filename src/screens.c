@@ -1516,20 +1516,35 @@ void HandleGameButtons(int mx, int my, int button)
     case BUTTON_GAME_PAUSE:
       if (tape.pausing)
       {
-	tape.pausing = FALSE;
-	DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	if (standalone)
+	{
+	  tape.pausing = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	}
+	else
+	  SendToServer_ContinuePlaying();
       }
       else
       {
-	tape.pausing = TRUE;
-	DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+	if (standalone)
+	{
+	  tape.pausing = TRUE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+	}
+	else
+	  SendToServer_PausePlaying();
       }
       break;
     case BUTTON_GAME_PLAY:
       if (tape.pausing)
       {
-	tape.pausing = FALSE;
-	DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	if (standalone)
+	{
+	  tape.pausing = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	}
+	else
+	  SendToServer_ContinuePlaying();
       }
       break;
     default:

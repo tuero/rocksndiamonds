@@ -23,6 +23,7 @@
 #include "gfxload.h"
 #include "gifload.h"
 #include "network.h"
+#include "netserv.h"
 
 #ifdef DEBUG
 /*
@@ -56,6 +57,14 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
+  if (serveronly)
+  {
+    NetworkServer(server_port, serveronly);
+
+    /* never reached */
+    exit(0);
+  }
+
   InitLevelAndPlayerInfo();
 
   InitCounter();

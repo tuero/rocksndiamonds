@@ -2913,6 +2913,13 @@ void GameActions(byte player_action)
     }
   }
 
+
+  if (tape.pausing || (tape.playing && !TapePlayDelay()))
+    return;
+  else if (tape.recording)
+    TapeRecordDelay();
+
+
   if (tape.playing)
     recorded_player_action = TapePlayAction();
   else
@@ -2959,10 +2966,12 @@ void GameActions(byte player_action)
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
+  /*
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
   else if (tape.recording)
     TapeRecordDelay();
+  */
 
   FrameCounter++;
   TimeFrames++;
