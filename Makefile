@@ -1,48 +1,49 @@
-#=============================================================================#
-# Makefile for Rocks'n'Diamonds                                               #
-# (c) 1995-2002 Holger Schemel, info@artsoft.org                              #
-#=============================================================================#
+# =============================================================================
+# Rocks'n'Diamonds Makefile
+# -----------------------------------------------------------------------------
+# (c) 1995-2003 Holger Schemel <info@artsoft.org>
+# =============================================================================
 
-#-----------------------------------------------------------------------------#
-# configuration section                                                       #
-#-----------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------
+# configuration
+# -----------------------------------------------------------------------------
 
-# specify command name of your favorite ANSI C compiler
+# command name of your favorite ANSI C compiler
 # (this must be set to "cc" for some systems)
 CC = gcc
 
-# specify command name of GNU make on your system
+# command name of GNU make on your system
 # (this must be set to "gmake" for some systems)
 MAKE = make
 
-# specify path to X11 on your system
+# path to X11 on your system
 X11_PATH = /usr/X11R6
 
-# specify directory for read-only game data (like graphics, sounds, levels)
-# default is '.', so you can play without installing game data somewhere
+# directory for read-only game data (like graphics, sounds, levels)
+# default is '.' to be able to run program without installation
 # RO_GAME_DIR = /usr/games
 
-# specify directory for writable game data (like highscore files)
-# default is '.', so you can play without installing game data somewhere
+# directory for writable game data (like highscore files)
+# default is '.' to be able to run program without installation
 # RW_GAME_DIR = /var/games
 
-# uncomment this if your system has no joystick include file
+# uncomment if system has no joystick include file
 # JOYSTICK = -DNO_JOYSTICK
 
-# choose if you want to allow many global score file entries for one player
-# default is 'MANY_PER_NAME'
-# when installing the game in a multi user environment, choose this
+# choose if more than one global score file entry for one player is allowed
+# (default: MANY_PER_NAME)
+# uncomment to install game in multi-user environment
 # SCORE_ENTRIES = ONE_PER_NAME
-# when installing the game in a single user environment, choose this
+# uncomment to install game in single-user environment (default)
 # SCORE_ENTRIES = MANY_PER_NAME
 
-# specify paths for cross-compiling (only needed for MS-DOS and Win32 build)
+# paths for cross-compiling (only needed for non-native MS-DOS and Win32 build)
 CROSS_PATH_MSDOS=/usr/local/cross-msdos/i386-msdosdjgpp
 CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 
-#-----------------------------------------------------------------------------#
-# you should not need to change anything below                                #
-#-----------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------
+# there should be no need to change anything below
+# -----------------------------------------------------------------------------
 
 .EXPORT_ALL_VARIABLES:
 
@@ -51,6 +52,11 @@ MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
 DEFAULT_TARGET = x11
 # DEFAULT_TARGET = sdl
+
+
+# -----------------------------------------------------------------------------
+# build targets
+# -----------------------------------------------------------------------------
 
 all:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET)
@@ -83,9 +89,9 @@ clean:
 	@$(MAKE_CMD) clean
 
 
-#-----------------------------------------------------------------------------#
-# development only stuff                                                      #
-#-----------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------
+# development only
+# -----------------------------------------------------------------------------
 
 auto-conf:
 	@$(MAKE_CMD) auto-conf

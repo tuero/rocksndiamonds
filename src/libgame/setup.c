@@ -45,30 +45,30 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_EM(n) ?			FC_YELLOW :  \
 			 IS_LEVELCLASS_SP(n) ?			FC_GREEN :   \
 			 IS_LEVELCLASS_DX(n) ?			FC_YELLOW :  \
-			 IS_LEVELCLASS_CONTRIBUTION(n) ?	FC_GREEN :   \
-			 IS_LEVELCLASS_USER(n) ?		FC_RED :     \
+			 IS_LEVELCLASS_CONTRIB(n) ?		FC_GREEN :   \
+			 IS_LEVELCLASS_PRIVATE(n) ?		FC_RED :     \
 			 FC_BLUE)
 
-#define LEVELSORTING(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		0 : \
-			 IS_LEVELCLASS_CLASSICS(n) ?		1 : \
-			 IS_LEVELCLASS_BD(n) ?			2 : \
-			 IS_LEVELCLASS_EM(n) ?			3 : \
-			 IS_LEVELCLASS_SP(n) ?			4 : \
-			 IS_LEVELCLASS_DX(n) ?			5 : \
-			 IS_LEVELCLASS_CONTRIBUTION(n) ?	6 : \
-			 IS_LEVELCLASS_USER(n) ?		7 : \
+#define LEVELSORTING(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		0 :	\
+			 IS_LEVELCLASS_CLASSICS(n) ?		1 :	\
+			 IS_LEVELCLASS_BD(n) ?			2 :	\
+			 IS_LEVELCLASS_EM(n) ?			3 :	\
+			 IS_LEVELCLASS_SP(n) ?			4 :	\
+			 IS_LEVELCLASS_DX(n) ?			5 :	\
+			 IS_LEVELCLASS_CONTRIB(n) ?		6 :	\
+			 IS_LEVELCLASS_PRIVATE(n) ?		7 :	\
 			 9)
 
 #define ARTWORKCOLOR(n)	(IS_ARTWORKCLASS_CLASSICS(n) ?		FC_RED :     \
-			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	FC_YELLOW :  \
+			 IS_ARTWORKCLASS_CONTRIB(n) ?		FC_YELLOW :  \
+			 IS_ARTWORKCLASS_PRIVATE(n) ?		FC_RED :     \
 			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_GREEN :   \
-			 IS_ARTWORKCLASS_USER(n) ?		FC_RED :     \
 			 FC_BLUE)
 
-#define ARTWORKSORTING(n) (IS_ARTWORKCLASS_CLASSICS(n) ?	0 : \
-			   IS_ARTWORKCLASS_CONTRIBUTION(n) ?	1 : \
-			   IS_ARTWORKCLASS_LEVEL(n) ?		2 : \
-			   IS_ARTWORKCLASS_USER(n) ?		3 : \
+#define ARTWORKSORTING(n) (IS_ARTWORKCLASS_CLASSICS(n) ?	0 :	\
+			   IS_ARTWORKCLASS_LEVEL(n) ?		1 :	\
+			   IS_ARTWORKCLASS_CONTRIB(n) ?		2 :	\
+			   IS_ARTWORKCLASS_PRIVATE(n) ?		3 :	\
 			   9)
 
 #define TOKEN_VALUE_POSITION		40
@@ -1405,13 +1405,14 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_LEVELS		5
 #define LEVELINFO_TOKEN_FIRST_LEVEL	6
 #define LEVELINFO_TOKEN_SORT_PRIORITY	7
-#define LEVELINFO_TOKEN_LEVEL_GROUP	8
-#define LEVELINFO_TOKEN_READONLY	9
-#define LEVELINFO_TOKEN_GRAPHICS_SET	10
-#define LEVELINFO_TOKEN_SOUNDS_SET	11
-#define LEVELINFO_TOKEN_MUSIC_SET	12
+#define LEVELINFO_TOKEN_LATEST_ENGINE	8
+#define LEVELINFO_TOKEN_LEVEL_GROUP	9
+#define LEVELINFO_TOKEN_READONLY	10
+#define LEVELINFO_TOKEN_GRAPHICS_SET	11
+#define LEVELINFO_TOKEN_SOUNDS_SET	12
+#define LEVELINFO_TOKEN_MUSIC_SET	13
 
-#define NUM_LEVELINFO_TOKENS		13
+#define NUM_LEVELINFO_TOKENS		14
 
 static LevelDirTree ldi;
 
@@ -1426,6 +1427,7 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_INTEGER, &ldi.levels,		"levels"	},
   { TYPE_INTEGER, &ldi.first_level,	"first_level"	},
   { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"	},
+  { TYPE_BOOLEAN, &ldi.latest_engine,	"latest_engine"	},
   { TYPE_BOOLEAN, &ldi.level_group,	"level_group"	},
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"	},
   { TYPE_STRING,  &ldi.graphics_set,	"graphics_set"	},
@@ -1459,6 +1461,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
   ldi->author = getStringCopy(ANONYMOUS_NAME);
 
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
+  ldi->latest_engine = FALSE;			/* default: get from level */
   ldi->parent_link = FALSE;
   ldi->user_defined = FALSE;
   ldi->color = 0;
@@ -1517,6 +1520,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->author = getStringCopy(parent->author);
 
   ldi->sort_priority = parent->sort_priority;
+  ldi->latest_engine = parent->latest_engine;
   ldi->parent_link = FALSE;
   ldi->user_defined = parent->user_defined;
   ldi->color = parent->color;
@@ -1722,6 +1726,7 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
   setString(&ti_new->fullpath, node_parent->fullpath);
 
   ti_new->sort_priority = node_parent->sort_priority;
+  ti_new->latest_engine = node_parent->latest_engine;
 
   setString(&ti_new->class_desc, getLevelClassDescription(ti_new));
 #else
@@ -1733,6 +1738,7 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
   ti_new->fullpath = getStringCopy(node_parent->fullpath);
 
   ti_new->sort_priority = node_parent->sort_priority;
+  ti_new->latest_engine = node_parent->latest_engine;
 
   ti_new->class_desc = getLevelClassDescription(ti_new);
 #endif
@@ -2088,7 +2094,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 #else
 	artwork_new->identifier = getStringCopy("private");
 #endif
-	artwork_new->sort_priority = ARTWORKCLASS_USER;
+	artwork_new->sort_priority = ARTWORKCLASS_PRIVATE;
       }
       else
       {
@@ -2431,7 +2437,7 @@ static void SaveUserLevelInfo()
   setString(&level_info->author, getRealName());
   level_info->levels = 100;
   level_info->first_level = 1;
-  level_info->sort_priority = LEVELCLASS_USER_START;
+  level_info->sort_priority = LEVELCLASS_PRIVATE_START;
   level_info->readonly = FALSE;
   setString(&level_info->graphics_set, GFX_CLASSIC_SUBDIR);
   setString(&level_info->sounds_set,   SND_CLASSIC_SUBDIR);
@@ -2441,7 +2447,7 @@ static void SaveUserLevelInfo()
   ldi.author = getStringCopy(getRealName());
   ldi.levels = 100;
   ldi.first_level = 1;
-  ldi.sort_priority = LEVELCLASS_USER_START;
+  ldi.sort_priority = LEVELCLASS_PRIVATE_START;
   ldi.readonly = FALSE;
   ldi.graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
   ldi.sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);

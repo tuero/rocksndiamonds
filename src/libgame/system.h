@@ -628,6 +628,8 @@ struct TreeInfo
   int last_level;	/* last level number (automatically calculated) */
   int sort_priority;	/* sort levels by 'sort_priority' and then by name */
 
+  boolean latest_engine;/* force level set to use the latest game engine */
+
   boolean level_group;	/* directory contains more level series directories */
   boolean parent_link;	/* entry links back to parent directory */
   boolean user_defined;	/* user defined levels are stored in home directory */

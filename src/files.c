@@ -242,12 +242,12 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 	strcpy(level->author, PROGRAM_AUTHOR_STRING);
 	break;
 
-      case LEVELCLASS_CONTRIBUTION:
-	strncpy(level->author, leveldir_current->name,MAX_LEVEL_AUTHOR_LEN);
+      case LEVELCLASS_CONTRIB:
+	strncpy(level->author, leveldir_current->name, MAX_LEVEL_AUTHOR_LEN);
 	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
 	break;
 
-      case LEVELCLASS_USER:
+      case LEVELCLASS_PRIVATE:
 	strncpy(level->author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
 	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
 	break;
@@ -930,16 +930,31 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
+#if 0
+  printf("::: sort_priority: %d\n", leveldir_current->sort_priority);
+#endif
+
   /* determine correct game engine version of current level */
-  if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
-      IS_LEVELCLASS_USER(leveldir_current))
+#if 1
+  if (!leveldir_current->latest_engine)
+#else
+  if (IS_LEVELCLASS_CONTRIB(leveldir_current) ||
+      IS_LEVELCLASS_PRIVATE(leveldir_current) ||
+      IS_LEVELCLASS_UNDEFINED(leveldir_current))
+#endif
   {
 #if 0
     printf("\n::: This level is private or contributed: '%s'\n", filename);
 #endif
 
-    /* For user contributed and private levels, use the version of
-       the game engine the levels were created for.
+#if 1
+    printf("\n::: Use the stored game engine version for this level\n");
+#endif
+
+    /* For all levels which are not forced to use the latest game engine
+       version (normally user contributed, private and undefined levels),
+       use the version of the game engine the levels were created for.
+
        Since 2.0.1, the game engine version is now directly stored
        in the level file (chunk "VERS"), so there is no need anymore
        to set the game version from the file version (except for old,
@@ -949,7 +964,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     /* do some special adjustments to support older level versions */
     if (level->file_version == FILE_VERSION_1_0)
     {
-      Error(ERR_WARN, "level file '%s'has version number 1.0", filename);
+      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
       Error(ERR_WARN, "using high speed movement for player");
 
       /* player was faster than monsters in (pre-)1.0 levels */
@@ -967,12 +982,22 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	   leveldir_current->sort_priority, filename);
 #endif
 
-    /* Always use the latest version of the game engine for all but
-       user contributed and private levels; this allows for actual
-       corrections in the game engine to take effect for existing,
-       converted levels (from "classic" or other existing games) to
-       make the game emulation more accurate, while (hopefully) not
-       breaking existing levels created from other players. */
+#if 1
+    printf("\n::: Use latest game engine version for this level.\n");
+#endif
+
+    /* For all levels which are forced to use the latest game engine version
+       (normally all but user contributed, private and undefined levels), set
+       the game engine version to the actual version; this allows for actual
+       corrections in the game engine to take effect for existing, converted
+       levels (from "classic" or other existing games) to make the emulation
+       of the corresponding game more accurate, while (hopefully) not breaking
+       existing levels created from other players. */
+
+#if 0
+    printf("::: changing engine from %d to %d\n",
+	   level->game_version, GAME_VERSION_ACTUAL);
+#endif
 
     level->game_version = GAME_VERSION_ACTUAL;
 
@@ -986,6 +1011,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     if (level->file_version < FILE_VERSION_2_0)
       level->em_slippery_gems = TRUE;
   }
+
+#if 0
+  printf("::: => %d\n", level->game_version);
+#endif
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
