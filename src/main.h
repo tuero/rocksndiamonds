@@ -542,6 +542,7 @@
 #define MIN_ELEMENT_CONTENTS	1
 #define STD_ELEMENT_CONTENTS	4
 #define MAX_ELEMENT_CONTENTS	8
+#define NUM_MAGIC_BALL_CONTENTS	8
 
 #define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
 
@@ -966,39 +967,39 @@
 
 /* the following EMC style elements are currently not implemented in R'n'D */
 #define EL_BALLOON_SWITCH_NONE		667
-#define EL_EMC_LEVEL_BORDER		668
-#define EL_EMC_ANDROID			669
-#define EL_EMC_GRASS			670
-#define EL_EMC_MAGIC_BALL		671
-#define EL_EMC_MAGIC_BALL_SWITCH	672
-#define EL_EMC_GATE_5			673
-#define EL_EMC_GATE_6			674
-#define EL_EMC_GATE_7			675
-#define EL_EMC_GATE_8			676
-#define EL_EMC_GATE_5_GRAY		677
-#define EL_EMC_GATE_6_GRAY		678
-#define EL_EMC_GATE_7_GRAY		679
-#define EL_EMC_GATE_8_GRAY		680
-#define EL_EMC_KEY_5			681
-#define EL_EMC_KEY_6			682
-#define EL_EMC_KEY_7			683
-#define EL_EMC_KEY_8			684
-#define EL_EMC_BUMPER			685
-#define EL_EMC_PLANT			686
-#define EL_EMC_LENSES			687
-#define EL_EMC_MAGNIFIER		688
-#define EL_EMC_WALL_9			689
-#define EL_EMC_WALL_10			690
-#define EL_EMC_WALL_11			691
-#define EL_EMC_WALL_12			692
-#define EL_EMC_WALL_13			693
-#define EL_EMC_WALL_14			694
-#define EL_EMC_WALL_15			695
-#define EL_EMC_WALL_16			696
-#define EL_EMC_WALL_SLIPPERY_1		697
-#define EL_EMC_WALL_SLIPPERY_2		698
-#define EL_EMC_WALL_SLIPPERY_3		699
-#define EL_EMC_WALL_SLIPPERY_4		700
+#define EL_EM_GATE_5			668
+#define EL_EM_GATE_6			669
+#define EL_EM_GATE_7			670
+#define EL_EM_GATE_8			671
+#define EL_EM_GATE_5_GRAY		672
+#define EL_EM_GATE_6_GRAY		673
+#define EL_EM_GATE_7_GRAY		674
+#define EL_EM_GATE_8_GRAY		675
+#define EL_EM_KEY_5			676
+#define EL_EM_KEY_6			677
+#define EL_EM_KEY_7			678
+#define EL_EM_KEY_8			679
+#define EL_EMC_ANDROID			680
+#define EL_EMC_GRASS			681
+#define EL_EMC_MAGIC_BALL		682
+#define EL_EMC_MAGIC_BALL_SWITCH	683
+#define EL_EMC_SPRING_BUMPER		684
+#define EL_EMC_PLANT			685
+#define EL_EMC_LENSES			686
+#define EL_EMC_MAGNIFIER		687
+#define EL_EMC_WALL_9			688
+#define EL_EMC_WALL_10			689
+#define EL_EMC_WALL_11			690
+#define EL_EMC_WALL_12			691
+#define EL_EMC_WALL_13			692
+#define EL_EMC_WALL_14			693
+#define EL_EMC_WALL_15			694
+#define EL_EMC_WALL_16			695
+#define EL_EMC_WALL_SLIPPERY_1		696
+#define EL_EMC_WALL_SLIPPERY_2		697
+#define EL_EMC_WALL_SLIPPERY_3		698
+#define EL_EMC_WALL_SLIPPERY_4		699
+#define EL_EMC_DRIPPER			700
 
 #define NUM_FILE_ELEMENTS		701
 
@@ -1552,6 +1553,21 @@ struct LevelInfo
   int time_wheel;
   int time_light;
   int time_timegate;
+
+  /* values for the new EMC elements */
+  int android_move_time;
+  int android_clone_time;
+  boolean ball_random;
+  boolean ball_state_initial;
+  int ball_time;
+  int lenses_score;
+  int magnify_score;
+  int slurp_score;
+  int lenses_time;
+  int magnify_time;
+  int wind_direction_initial;
+  int ball_content[NUM_MAGIC_BALL_CONTENTS][3][3];
+  boolean android_array[16];
 
   int can_move_into_acid_bits;	/* bitfield to store property for elements */
   int dont_collide_with_bits;	/* bitfield to store property for elements */

@@ -162,6 +162,25 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->use_spring_bug = FALSE;
   level->use_step_counter = FALSE;
 
+  /* values for the new EMC elements */
+  level->android_move_time = 10;
+  level->android_clone_time = 10;
+  level->ball_random = FALSE;
+  level->ball_state_initial = FALSE;
+  level->ball_time = 10;
+  level->lenses_score = 10;
+  level->magnify_score = 10;
+  level->slurp_score = 10;
+  level->lenses_time = 10;
+  level->magnify_time = 10;
+  level->wind_direction_initial = MV_NO_MOVING;
+  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+    for (x = 0; x < 3; x++)
+      for (y = 0; y < 3; y++)
+	level->ball_content[i][x][y] = EL_EMPTY;
+  for (i = 0; i < 16; i++)
+    level->android_array[i] = FALSE;
+
   level->use_custom_template = FALSE;
 
   for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
@@ -1769,16 +1788,27 @@ static void OLD_LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 
 void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 {
+  static int ball_xy[8][2] =
+  {
+    { 0, 0 },
+    { 1, 0 },
+    { 2, 0 },
+    { 0, 1 },
+    { 2, 1 },
+    { 0, 2 },
+    { 1, 2 },
+    { 2, 2 },
+  };
   struct LevelInfo_EM *level_em = level->native_em_level;
   struct LEVEL *lev = level_em->lev;
   struct PLAYER *ply1 = level_em->ply1;
   struct PLAYER *ply2 = level_em->ply2;
-  int i, x, y;
+  int i, j, x, y;
 
   lev->width  = MIN(level->fieldx, EM_MAX_CAVE_WIDTH);
   lev->height = MIN(level->fieldy, EM_MAX_CAVE_HEIGHT);
 
-  lev->time_initial = level->time;
+  lev->time_initial     = level->time;
   lev->required_initial = level->gems_needed;
 
   lev->emerald_score	= level->score[SC_EMERALD];
@@ -1801,6 +1831,27 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->wonderwall_time_initial	= level->time_magic_wall;
   lev->wheel_time		= level->time_wheel;
 
+  lev->android_move_time	= level->android_move_time;
+  lev->android_clone_time	= level->android_clone_time;
+  lev->ball_random		= level->ball_random;
+  lev->ball_state_initial	= level->ball_state_initial;
+  lev->ball_time		= level->ball_time;
+  lev->lenses_score		= level->lenses_score;
+  lev->magnify_score		= level->magnify_score;
+  lev->slurp_score		= level->slurp_score;
+  lev->lenses_time		= level->lenses_time;
+  lev->magnify_time		= level->magnify_time;
+  lev->wind_direction_initial	= level->wind_direction_initial;
+
+  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      lev->ball_array[i][j] =
+	map_element_RND_to_EM(level->
+			      ball_content[i][ball_xy[j][0]][ball_xy[j][1]]);
+
+  for (i = 0; i < 16; i++)
+    lev->android_array[i] = FALSE;	/* !!! YET TO COME !!! */
+
   /* first fill the complete playfield with the default border element */
   for (y = 0; y < EM_MAX_CAVE_HEIGHT; y++)
     for (x = 0; x < EM_MAX_CAVE_WIDTH; x++)
@@ -1811,6 +1862,9 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   {
     int new_element = map_element_RND_to_EM(level->field[x][y]);
 
+    if (level->field[x][y] == EL_AMOEBA_DEAD)
+      new_element = map_element_RND_to_EM(EL_AMOEBA_WET);
+
     level_em->cave[x + 1][y + 1] = new_element;
   }
 
@@ -1820,34 +1874,47 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   ply2->x_initial = 0;
   ply2->y_initial = 0;
 
-  /* at last, set the two players to their positions in the playfield */
+  /* initialize player positions and delete players from the playfield */
   for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
   {
     if (level->field[x][y] == EL_PLAYER_1)
     {
       ply1->x_initial = x + 1;
       ply1->y_initial = y + 1;
+      level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
     }
     else if (level->field[x][y] == EL_PLAYER_2)
     {
       ply2->x_initial = x + 1;
       ply2->y_initial = y + 1;
+      level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
     }
   }
 }
 
 void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
 {
+  static int ball_xy[8][2] =
+  {
+    { 0, 0 },
+    { 1, 0 },
+    { 2, 0 },
+    { 0, 1 },
+    { 2, 1 },
+    { 0, 2 },
+    { 1, 2 },
+    { 2, 2 },
+  };
   struct LevelInfo_EM *level_em = level->native_em_level;
   struct LEVEL *lev = level_em->lev;
   struct PLAYER *ply1 = level_em->ply1;
   struct PLAYER *ply2 = level_em->ply2;
-  int i, x, y;
+  int i, j, x, y;
 
   level->fieldx = MIN(lev->width,  MAX_LEV_FIELDX);
   level->fieldy = MIN(lev->height, MAX_LEV_FIELDY);
 
-  level->time = lev->time_initial;
+  level->time        = lev->time_initial;
   level->gems_needed = lev->required_initial;
 
   sprintf(level->name, "Level %d", level->file_info.nr);
@@ -1874,6 +1941,27 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->time_magic_wall	= lev->wonderwall_time_initial;
   level->time_wheel		= lev->wheel_time;
 
+  level->android_move_time	= lev->android_move_time;
+  level->android_clone_time	= lev->android_clone_time;
+  level->ball_random		= lev->ball_random;
+  level->ball_state_initial	= lev->ball_state_initial;
+  level->ball_time		= lev->ball_time;
+  level->lenses_score		= lev->lenses_score;
+  level->magnify_score		= lev->magnify_score;
+  level->slurp_score		= lev->slurp_score;
+  level->lenses_time		= lev->lenses_time;
+  level->magnify_time		= lev->magnify_time;
+  level->wind_direction_initial	= lev->wind_direction_initial;
+
+  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      level->ball_content[i][ball_xy[j][0]][ball_xy[j][1]] =
+	map_element_EM_to_RND(lev->ball_array[i][j]);
+
+  for (i = 0; i < 16; i++)
+    level->android_array[i] = FALSE;	/* !!! YET TO COME !!! */
+
+  /* convert the playfield (some elements need special treatment) */
   for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
   {
     int new_element = map_element_EM_to_RND(level_em->cave[x + 1][y + 1]);
@@ -1884,7 +1972,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
     level->field[x][y] = new_element;
   }
 
-  /* if both players are set to the same field, use the first player */
+  /* in case of both players set to the same field, use the first player */
   level->field[ply2->x_initial - 1][ply2->y_initial - 1] = EL_PLAYER_2;
   level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
 }

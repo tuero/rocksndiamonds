@@ -3465,9 +3465,64 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "stop moving balloon"
   },
   {
-    "emc_level_border",
-    "wall",
-    "level border steelwall",
+    "em_gate_5",
+    "gate",
+    "door 5 (EMC style)",
+  },
+  {
+    "em_gate_6",
+    "gate",
+    "door 6 (EMC style)",
+  },
+  {
+    "em_gate_7",
+    "gate",
+    "door 7 (EMC style)",
+  },
+  {
+    "em_gate_8",
+    "gate",
+    "door 8 (EMC style)",
+  },
+  {
+    "em_gate_5_gray",
+    "gate",
+    "gray door (EMC style, key 5)",
+  },
+  {
+    "em_gate_6_gray",
+    "gate",
+    "gray door (EMC style, key 6)",
+  },
+  {
+    "em_gate_7_gray",
+    "gate",
+    "gray door (EMC style, key 7)",
+  },
+  {
+    "em_gate_8_gray",
+    "gate",
+    "gray door (EMC style, key 8)",
+  },
+  {
+    "em_key_5",
+    "key",
+    "key 5 (EMC style)",
+  },
+  {
+    "em_key_6",
+    "key",
+    "key 6 (EMC style)",
+  },
+  {
+    "em_key_7",
+    "key",
+    "key 7 (EMC style)",
+  },
+  {
+    "em_key_8",
+    "key",
+    "key 8 (EMC style)",
   },
   {
     "emc_android",
@@ -3490,69 +3545,9 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "magic ball switch",
   },
   {
-    "emc_gate_5",
-    "gate",
-    "door 5 (EMC style)",
-  },
-  {
-    "emc_gate_6",
-    "gate",
-    "door 6 (EMC style)",
-  },
-  {
-    "emc_gate_7",
-    "gate",
-    "door 7 (EMC style)",
-  },
-  {
-    "emc_gate_8",
-    "gate",
-    "door 8 (EMC style)",
-  },
-  {
-    "emc_gate_5_gray",
-    "gate",
-    "gray door (EMC style, key 5)",
-  },
-  {
-    "emc_gate_6_gray",
-    "gate",
-    "gray door (EMC style, key 6)",
-  },
-  {
-    "emc_gate_7_gray",
-    "gate",
-    "gray door (EMC style, key 7)",
-  },
-  {
-    "emc_gate_8_gray",
-    "gate",
-    "gray door (EMC style, key 8)",
-  },
-  {
-    "emc_key_5",
-    "key",
-    "key 5 (EMC style)",
-  },
-  {
-    "emc_key_6",
-    "key",
-    "key 6 (EMC style)",
-  },
-  {
-    "emc_key_7",
-    "key",
-    "key 7 (EMC style)",
-  },
-  {
-    "emc_key_8",
-    "key",
-    "key 8 (EMC style)",
-  },
-  {
-    "emc_bumper",
-    "emc_bumper",
-    "bumper",
+    "emc_spring_bumper",
+    "emc_spring_bumper",
+    "spring bumper",
   },
   {
     "emc_plant",
@@ -3628,6 +3623,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "emc_wall_slippery_4",
     "wall",
     "slippery wall"
+  },
+  {
+    "emc_dripper",
+    "dripper",
+    "dripper"
   },
 
   /* ----------------------------------------------------------------------- */

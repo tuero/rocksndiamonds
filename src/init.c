@@ -1795,6 +1795,7 @@ void InitElementPropertiesStatic()
     EL_TRAP,
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE,
+    EL_EMC_GRASS,
 
     /* !!! currently not diggable, but handled by 'ep_dont_run_into' !!! */
     /* (if amoeba can grow into anything diggable, maybe keep these out) */
@@ -1802,6 +1803,7 @@ void InitElementPropertiesStatic()
     EL_LANDMINE,
     EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
+    EL_EMC_PLANT,
 #endif
     -1
   };
@@ -1822,6 +1824,10 @@ void InitElementPropertiesStatic()
     EL_EM_KEY_2,
     EL_EM_KEY_3,
     EL_EM_KEY_4,
+    EL_EM_KEY_5,
+    EL_EM_KEY_6,
+    EL_EM_KEY_7,
+    EL_EM_KEY_8,
     EL_DYNAMITE,
     EL_DYNABOMB_INCREASE_NUMBER,
     EL_DYNABOMB_INCREASE_SIZE,
@@ -1839,6 +1845,8 @@ void InitElementPropertiesStatic()
     EL_ENVELOPE_3,
     EL_ENVELOPE_4,
     EL_SPEED_PILL,
+    EL_EMC_LENSES,
+    EL_EMC_MAGNIFIER,
     -1
   };
 
@@ -1867,6 +1875,7 @@ void InitElementPropertiesStatic()
     EL_LANDMINE,
     EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
+    EL_EMC_PLANT,
 #endif
     -1
   };
@@ -2032,6 +2041,10 @@ void InitElementPropertiesStatic()
     EL_STEELWALL_SLIPPERY,
     EL_PEARL,
     EL_CRYSTAL,
+    EL_EMC_WALL_SLIPPERY_1,
+    EL_EMC_WALL_SLIPPERY_2,
+    EL_EMC_WALL_SLIPPERY_3,
+    EL_EMC_WALL_SLIPPERY_4,
     -1
   };
 
@@ -2060,6 +2073,7 @@ void InitElementPropertiesStatic()
     EL_SP_ELECTRON,
     EL_BALLOON,
     EL_SPRING,
+    EL_EMC_ANDROID,
     -1
   };
 
@@ -2240,10 +2254,18 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2,
     EL_EM_GATE_3,
     EL_EM_GATE_4,
+    EL_EM_GATE_5,
+    EL_EM_GATE_6,
+    EL_EM_GATE_7,
+    EL_EM_GATE_8,
     EL_EM_GATE_1_GRAY,
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
+    EL_EM_GATE_5_GRAY,
+    EL_EM_GATE_6_GRAY,
+    EL_EM_GATE_7_GRAY,
+    EL_EM_GATE_8_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
     -1
@@ -2304,6 +2326,7 @@ void InitElementPropertiesStatic()
     EL_SATELLITE,
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
+    EL_EMC_ANDROID,
     -1
   };
 
@@ -2332,10 +2355,18 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2,
     EL_EM_GATE_3,
     EL_EM_GATE_4,
+    EL_EM_GATE_5,
+    EL_EM_GATE_6,
+    EL_EM_GATE_7,
+    EL_EM_GATE_8,
     EL_EM_GATE_1_GRAY,
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
+    EL_EM_GATE_5_GRAY,
+    EL_EM_GATE_6_GRAY,
+    EL_EM_GATE_7_GRAY,
+    EL_EM_GATE_8_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
 
@@ -2429,6 +2460,7 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_OFF_PORT_RIGHT,
     EL_SP_GRAVITY_OFF_PORT_UP,
     EL_SP_GRAVITY_OFF_PORT_DOWN,
+    EL_EMC_GRASS,
     -1
   };
 
@@ -2485,6 +2517,7 @@ void InitElementPropertiesStatic()
     EL_BALLOON_SWITCH_ANY,
     EL_LAMP,
     EL_TIME_ORB_FULL,
+    EL_EMC_MAGIC_BALL_SWITCH,
     -1
   };
 
@@ -2995,10 +3028,18 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2,
     EL_EM_GATE_3,
     EL_EM_GATE_4,
+    EL_EM_GATE_5,
+    EL_EM_GATE_6,
+    EL_EM_GATE_7,
+    EL_EM_GATE_8,
     EL_EM_GATE_1_GRAY,
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
+    EL_EM_GATE_5_GRAY,
+    EL_EM_GATE_6_GRAY,
+    EL_EM_GATE_7_GRAY,
+    EL_EM_GATE_8_GRAY,
     -1
   };
 
@@ -3080,6 +3121,10 @@ void InitElementPropertiesStatic()
     EL_EM_KEY_2,
     EL_EM_KEY_3,
     EL_EM_KEY_4,
+    EL_EM_KEY_5,
+    EL_EM_KEY_6,
+    EL_EM_KEY_7,
+    EL_EM_KEY_8,
     EL_GATE_1,
     EL_GATE_2,
     EL_GATE_3,
@@ -3092,10 +3137,18 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2,
     EL_EM_GATE_3,
     EL_EM_GATE_4,
+    EL_EM_GATE_5,
+    EL_EM_GATE_6,
+    EL_EM_GATE_7,
+    EL_EM_GATE_8,
     EL_EM_GATE_1_GRAY,
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
+    EL_EM_GATE_5_GRAY,
+    EL_EM_GATE_6_GRAY,
+    EL_EM_GATE_7_GRAY,
+    EL_EM_GATE_8_GRAY,
     EL_DYNAMITE,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_WALL,
@@ -3197,6 +3250,10 @@ void InitElementPropertiesStatic()
     EL_EMC_STEELWALL_2,
     EL_EMC_STEELWALL_3,
     EL_EMC_STEELWALL_4,
+    EL_EMC_WALL_SLIPPERY_1,
+    EL_EMC_WALL_SLIPPERY_2,
+    EL_EMC_WALL_SLIPPERY_3,
+    EL_EMC_WALL_SLIPPERY_4,
     EL_EMC_WALL_1,
     EL_EMC_WALL_2,
     EL_EMC_WALL_3,
@@ -3205,6 +3262,14 @@ void InitElementPropertiesStatic()
     EL_EMC_WALL_6,
     EL_EMC_WALL_7,
     EL_EMC_WALL_8,
+    EL_EMC_WALL_9,
+    EL_EMC_WALL_10,
+    EL_EMC_WALL_11,
+    EL_EMC_WALL_12,
+    EL_EMC_WALL_13,
+    EL_EMC_WALL_14,
+    EL_EMC_WALL_15,
+    EL_EMC_WALL_16,
     -1
   };
 

@@ -9,8 +9,6 @@
 #include "file.h"
 
 
-struct cave_node *cave_list;
-
 static void setLevelInfoToDefaults_EM(void)
 {
   native_em_level.lev = &lev;
@@ -28,7 +26,7 @@ static void setLevelInfoToDefaults_EM(void)
 }
 
 
-/* attempt load a cave
+/* load cave
  * 
  * completely initializes the level structure, ready for a game
  */

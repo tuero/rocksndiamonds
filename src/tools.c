@@ -3902,19 +3902,19 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xdoor_5,				TRUE,
-    EL_EMC_GATE_5,			-1, -1
+    EL_EM_GATE_5,			-1, -1
   },
   {
     Xdoor_6,				TRUE,
-    EL_EMC_GATE_6,			-1, -1
+    EL_EM_GATE_6,			-1, -1
   },
   {
     Xdoor_7,				TRUE,
-    EL_EMC_GATE_7,			-1, -1
+    EL_EM_GATE_7,			-1, -1
   },
   {
     Xdoor_8,				TRUE,
-    EL_EMC_GATE_8,			-1, -1
+    EL_EM_GATE_8,			-1, -1
   },
   {
     Xkey_1,				TRUE,
@@ -3934,19 +3934,19 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xkey_5,				TRUE,
-    EL_EMC_KEY_5,			-1, -1
+    EL_EM_KEY_5,			-1, -1
   },
   {
     Xkey_6,				TRUE,
-    EL_EMC_KEY_6,			-1, -1
+    EL_EM_KEY_6,			-1, -1
   },
   {
     Xkey_7,				TRUE,
-    EL_EMC_KEY_7,			-1, -1
+    EL_EM_KEY_7,			-1, -1
   },
   {
     Xkey_8,				TRUE,
-    EL_EMC_KEY_8,			-1, -1
+    EL_EM_KEY_8,			-1, -1
   },
   {
     Xwind_n,				TRUE,
@@ -4014,11 +4014,11 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xbumper,				TRUE,
-    EL_EMC_BUMPER,			-1, -1
+    EL_EMC_SPRING_BUMPER,		-1, -1
   },
   {
     XbumperB,				FALSE,
-    EL_EMC_BUMPER,			-1, -1
+    EL_EMC_SPRING_BUMPER,		-1, -1
   },
   {
     Xwheel,				TRUE,
@@ -4117,8 +4117,8 @@ mapping_EM_to_RND_list[] =
     EL_EMC_MAGNIFIER,			-1, -1
   },
   {
-    Xdripper,				FALSE,
-    EL_UNKNOWN,				-1, -1
+    Xdripper,				TRUE,
+    EL_EMC_DRIPPER,			-1, -1
   },
   {
     XdripperB,				FALSE,
@@ -4158,19 +4158,19 @@ mapping_EM_to_RND_list[] =
   },
   {
     Xfake_door_5,			TRUE,
-    EL_EMC_GATE_5_GRAY,			-1, -1
+    EL_EM_GATE_5_GRAY,			-1, -1
   },
   {
     Xfake_door_6,			TRUE,
-    EL_EMC_GATE_6_GRAY,			-1, -1
+    EL_EM_GATE_6_GRAY,			-1, -1
   },
   {
     Xfake_door_7,			TRUE,
-    EL_EMC_GATE_7_GRAY,			-1, -1
+    EL_EM_GATE_7_GRAY,			-1, -1
   },
   {
     Xfake_door_8,			TRUE,
-    EL_EMC_GATE_8_GRAY,			-1, -1
+    EL_EM_GATE_8_GRAY,			-1, -1
   },
   {
     Xsteel_1,				TRUE,
@@ -4451,16 +4451,6 @@ mapping_EM_to_RND_list[] =
   {
     Xalpha_copyr,			TRUE,
     EL_CHAR('©'),			-1, -1
-  },
-
-  {
-    Zplayer,				TRUE,
-    EL_PLAYER_1,			-1, -1
-  },
-
-  {
-    ZBORDER,				TRUE,
-    EL_EMC_LEVEL_BORDER,		-1, -1
   },
 
   {

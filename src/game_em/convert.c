@@ -423,7 +423,11 @@ static unsigned short remap_emerald[256] =
 
 void convert_em_level(unsigned char *src)
 {
-  unsigned int x, y, temp;
+  static int eater_offset[8] =
+  {
+    0x800, 0x809, 0x812, 0x81B, 0x840, 0x849, 0x852, 0x85B
+  };
+  unsigned int i, x, y, temp;
 
   temp = ((src[0x83E] << 8 | src[0x83F]) * 25 + 3) / 4;
   if (temp == 0 || temp > 9999)
@@ -486,22 +490,9 @@ void convert_em_level(unsigned char *src)
   lev.wonderwall_state_initial = 0;
   lev.wonderwall_time_initial = src[0x836] << 8 | src[0x837];
 
-  for (x = 0; x < 9; x++)
-    lev.eater_array[0][x] = remap_emerald[src[0x800 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[1][x] = remap_emerald[src[0x809 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[2][x] = remap_emerald[src[0x812 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[3][x] = remap_emerald[src[0x81B + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[4][x] = remap_emerald[src[0x840 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[5][x] = remap_emerald[src[0x849 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[6][x] = remap_emerald[src[0x852 + x]];
-  for (x = 0; x < 9; x++)
-    lev.eater_array[7][x] = remap_emerald[src[0x85B + x]];
+  for (i = 0; i < 8; i++)
+    for (x = 0; x < 9; x++)
+      lev.eater_array[i][x] = remap_emerald[src[eater_offset[i] + x]];
 
   temp = remap_emerald[src[0x86F]];
   for (y = 0; y < 8; y++)
@@ -513,14 +504,14 @@ void convert_em_level(unsigned char *src)
     }
     else
     {
-      lev.ball_array[y][1] = (src[0x873] & 1) ? temp : Xblank;  /* north */
-      lev.ball_array[y][6] = (src[0x873] & 2) ? temp : Xblank;  /* south */
-      lev.ball_array[y][3] = (src[0x873] & 4) ? temp : Xblank;  /* west */
-      lev.ball_array[y][4] = (src[0x873] & 8) ? temp : Xblank;  /* east */
+      lev.ball_array[y][1] = (src[0x873] & 1)  ? temp : Xblank; /* north */
+      lev.ball_array[y][6] = (src[0x873] & 2)  ? temp : Xblank; /* south */
+      lev.ball_array[y][3] = (src[0x873] & 4)  ? temp : Xblank; /* west */
+      lev.ball_array[y][4] = (src[0x873] & 8)  ? temp : Xblank; /* east */
       lev.ball_array[y][7] = (src[0x873] & 16) ? temp : Xblank; /* southeast */
       lev.ball_array[y][5] = (src[0x873] & 32) ? temp : Xblank; /* southwest */
       lev.ball_array[y][2] = (src[0x873] & 64) ? temp : Xblank; /* northeast */
-      lev.ball_array[y][0] = (src[0x873] & 128) ? temp : Xblank;/* northwest */
+      lev.ball_array[y][0] = (src[0x873] & 128)? temp : Xblank; /* northwest */
     }
   }
 
