@@ -344,8 +344,11 @@ inline void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
 inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
 inline void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
 inline Pixel SDLGetPixel(Bitmap *, int, int);
+inline void SDLPutPixel(Bitmap *, int, int, Pixel);
 
 inline void SDLInvertArea(Bitmap *, int, int, int, int, Uint32);
+inline void SDLCopyInverseMasked(Bitmap *, Bitmap *, int, int, int, int,
+				 int, int);
 
 void SDLZoomBitmap(Bitmap *, Bitmap *);
 

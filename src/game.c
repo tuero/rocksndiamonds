@@ -948,7 +948,6 @@ void InitGame()
     PlayMusic(level_nr);
 
   KeyboardAutoRepeatOff();
-  SetMouseCursor(CURSOR_PLAYFIELD);
 
   if (options.debug)
   {

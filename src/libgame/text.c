@@ -111,16 +111,10 @@ void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
   gfx.num_fonts = num_fonts;
   gfx.font_bitmap_info = font_bitmap_info;
   gfx.select_font_function = select_font_function;
-  gfx.inverse_text_color = WHITE_PIXEL;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
 #endif
-}
-
-void SetInverseTextColor(Pixel inverse_text_color)
-{
-  gfx.inverse_text_color = inverse_text_color;
 }
 
 int getFontWidth(int font_nr)
@@ -217,7 +211,7 @@ void DrawText(int x, int y, char *text, int font_nr)
   int mask_mode = BLIT_OPAQUE;
 
   if (DrawingOnBackground(x, y))
-    mask_mode = BLIT_MASKED;
+    mask_mode = BLIT_ON_BACKGROUND;
 
   DrawTextExt(drawto, x, y, text, font_nr, mask_mode);
 
@@ -253,15 +247,6 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 
     if (mask_mode == BLIT_INVERSE)	/* special mode for text gadgets */
     {
-#if defined(TARGET_SDL)
-      /* blit normally (non-masked) */
-      BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y,
-		 font_width, font_height, dst_x, dst_y);
-
-      /* invert character */
-      SDLInvertArea(dst_bitmap, dst_x, dst_y, font_width, font_height,
-		    gfx.inverse_text_color);
-#else
       /* first step: draw solid colored rectangle (use "cursor" character) */
       if (strlen(text) == 1)	/* only one char inverted => draw cursor */
       {
@@ -275,6 +260,11 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		   font_width, font_height, dst_x, dst_y);
       }
 
+#if defined(TARGET_SDL)
+      /* second step: draw masked inverted character */
+      SDLCopyInverseMasked(src_bitmap, dst_bitmap, src_x, src_y,
+			   font_width, font_height, dst_x, dst_y);
+#else
       /* second step: draw masked black rectangle (use "space" character) */
       SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
 		    dst_x - src_x, dst_y - src_y);
@@ -282,11 +272,14 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		       font_width, font_height, dst_x, dst_y);
 #endif
     }
-    else if (mask_mode == BLIT_MASKED)
+    else if (mask_mode == BLIT_MASKED || mask_mode == BLIT_ON_BACKGROUND)
     {
-      /* clear font character background */
-      ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,
-				 font_width, font_height);
+      if (mask_mode == BLIT_ON_BACKGROUND)
+      {
+	/* clear font character background */
+	ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,
+				   font_width, font_height);
+      }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
       /* use special font tile clipmasks */

@@ -199,7 +199,6 @@ void DrawMainMenu()
 
   KeyboardAutoRepeatOn();
   ActivateJoystick();
-  SetMouseCursor(CURSOR_DEFAULT);
 
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);
@@ -258,7 +257,7 @@ void DrawMainMenu()
   DrawText(mSX + 32, mSY + 8*32, "Setup", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 9*32, "Quit", FONT_MENU_1);
 
-  DrawText(mSX + 32 + name_width, mSY + 2*32, setup.player_name, FONT_INPUT);
+  DrawText(mSX + 32 + name_width, mSY + 2*32, setup.player_name, FONT_INPUT_1);
   DrawText(mSX + level_width + 5 * 32, mSY + 3*32, int2str(level_nr,3),
 	   FONT_VALUE_1);
 
@@ -1242,7 +1241,7 @@ void HandleHelpScreen(int button)
 void HandleTypeName(int newxpos, Key key)
 {
   static int xpos = 0, ypos = 2;
-  int font_width = getFontWidth(FONT_INPUT_ACTIVE);
+  int font_width = getFontWidth(FONT_INPUT_1_ACTIVE);
   int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
   int startx = mSX + 32 + name_width;
   int starty = mSY + ypos * 32;
@@ -1251,8 +1250,8 @@ void HandleTypeName(int newxpos, Key key)
   {
     xpos = newxpos;
 
-    DrawText(startx, starty, setup.player_name, FONT_INPUT_ACTIVE);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_ACTIVE);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT_1_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_1_ACTIVE);
 
     return;
   }
@@ -1272,20 +1271,20 @@ void HandleTypeName(int newxpos, Key key)
     setup.player_name[xpos + 1] = 0;
     xpos++;
 
-    DrawText(startx, starty, setup.player_name, FONT_INPUT_ACTIVE);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_ACTIVE);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT_1_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_1_ACTIVE);
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
 
-    DrawText(startx + xpos * font_width, starty, "_ ", FONT_INPUT_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_ ", FONT_INPUT_1_ACTIVE);
   }
   else if (key == KSYM_Return && xpos > 0)
   {
-    DrawText(startx, starty, setup.player_name, FONT_INPUT);
-    DrawText(startx + xpos * font_width, starty, " ", FONT_INPUT_ACTIVE);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT_1);
+    DrawText(startx + xpos * font_width, starty, " ", FONT_INPUT_1_ACTIVE);
 
     SaveSetup();
     game_status = MAINMENU;
@@ -2010,7 +2009,7 @@ static void drawSetupValue(int pos)
     if (setup_info[pos].type & TYPE_QUERY)
     {
       value_string = "<press key>";
-      font_nr = FONT_INPUT_ACTIVE;
+      font_nr = FONT_INPUT_1_ACTIVE;
     }
   }
   else if (setup_info[pos].type & TYPE_STRING)
@@ -2312,7 +2311,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
   custom_key = setup.input[player_nr].key;
 
-  DrawText(mSX+11*32, mSY+2*32, int2str(player_nr + 1, 1), FONT_INPUT_ACTIVE);
+  DrawText(mSX+11*32, mSY+2*32, int2str(player_nr +1, 1), FONT_INPUT_1_ACTIVE);
 #if 1
   DrawGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			 PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
@@ -2512,9 +2511,9 @@ void CustomizeKeyboard(int player_nr)
 
   step_nr = 0;
   DrawText(mSX, mSY + (2+2*step_nr)*32,
-	   customize_step[step_nr].text, FONT_INPUT_ACTIVE);
+	   customize_step[step_nr].text, FONT_INPUT_1_ACTIVE);
   DrawText(mSX, mSY + (2+2*step_nr+1)*32,
-	   "Key:", FONT_INPUT_ACTIVE);
+	   "Key:", FONT_INPUT_1_ACTIVE);
   DrawText(mSX + 4*32, mSY + (2+2*step_nr+1)*32,
 	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
 
@@ -2577,9 +2576,9 @@ void CustomizeKeyboard(int player_nr)
 
 	    /* query next key binding */
 	    DrawText(mSX, mSY+(2+2*step_nr)*32,
-		     customize_step[step_nr].text, FONT_INPUT_ACTIVE);
+		     customize_step[step_nr].text, FONT_INPUT_1_ACTIVE);
 	    DrawText(mSX, mSY+(2+2*step_nr+1)*32,
-		     "Key:", FONT_INPUT_ACTIVE);
+		     "Key:", FONT_INPUT_1_ACTIVE);
 	    DrawText(mSX + 4*32, mSY+(2+2*step_nr+1)*32,
 		     getKeyNameFromKey(*customize_step[step_nr].key),
 		     FONT_VALUE_OLD);

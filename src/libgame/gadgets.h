@@ -21,16 +21,18 @@
 
 /* gadget types */
 #define GD_TYPE_NORMAL_BUTTON		(1 << 0)
-#define GD_TYPE_CHECK_BUTTON		(1 << 1)
-#define GD_TYPE_RADIO_BUTTON		(1 << 2)
-#define GD_TYPE_DRAWING_AREA		(1 << 3)
-#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 4)
-#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 5)
-#define GD_TYPE_SELECTBOX		(1 << 6)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 7)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 8)
+#define GD_TYPE_TEXT_BUTTON		(1 << 1)
+#define GD_TYPE_CHECK_BUTTON		(1 << 2)
+#define GD_TYPE_RADIO_BUTTON		(1 << 3)
+#define GD_TYPE_DRAWING_AREA		(1 << 4)
+#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 5)
+#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 6)
+#define GD_TYPE_SELECTBOX		(1 << 7)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 8)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 9)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
+					 GD_TYPE_TEXT_BUTTON | \
 					 GD_TYPE_CHECK_BUTTON | \
 					 GD_TYPE_RADIO_BUTTON)
 #define GD_TYPE_SCROLLBAR		(GD_TYPE_SCROLLBAR_VERTICAL | \
@@ -75,36 +77,38 @@
 #define GDI_TEXT_VALUE			14
 #define GDI_TEXT_SIZE			15
 #define GDI_TEXT_FONT			16
-#define GDI_SELECTBOX_VALUES		17
-#define GDI_SELECTBOX_INDEX		18
-#define GDI_DESIGN_UNPRESSED		19
-#define GDI_DESIGN_PRESSED		20
-#define GDI_ALT_DESIGN_UNPRESSED	21
-#define GDI_ALT_DESIGN_PRESSED		22
-#define GDI_BORDER_SIZE			23
-#define GDI_BORDER_SIZE_SELECTBUTTON	24
-#define GDI_TEXTINPUT_DESIGN_WIDTH	25
-#define GDI_DECORATION_DESIGN		26
-#define GDI_DECORATION_POSITION		27
-#define GDI_DECORATION_SIZE		28
-#define GDI_DECORATION_SHIFTING		29
-#define GDI_EVENT_MASK			30
-#define GDI_EVENT			31
-#define GDI_CALLBACK_INFO		32
-#define GDI_CALLBACK_ACTION		33
-#define GDI_AREA_SIZE			34
-#define GDI_ITEM_SIZE			35
-#define GDI_SCROLLBAR_ITEMS_MAX		36
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	37
-#define GDI_SCROLLBAR_ITEM_POSITION	38
-#define GDI_INFO_TEXT			39
+#define GDI_TEXT_FONT_ACTIVE		17
+#define GDI_SELECTBOX_OPTIONS		18
+#define GDI_SELECTBOX_INDEX		19
+#define GDI_DESIGN_UNPRESSED		20
+#define GDI_DESIGN_PRESSED		21
+#define GDI_ALT_DESIGN_UNPRESSED	22
+#define GDI_ALT_DESIGN_PRESSED		23
+#define GDI_BORDER_SIZE			24
+#define GDI_BORDER_SIZE_SELECTBUTTON	25
+#define GDI_DESIGN_WIDTH		26
+#define GDI_DECORATION_DESIGN		27
+#define GDI_DECORATION_POSITION		28
+#define GDI_DECORATION_SIZE		29
+#define GDI_DECORATION_SHIFTING		30
+#define GDI_EVENT_MASK			31
+#define GDI_EVENT			32
+#define GDI_CALLBACK_INFO		33
+#define GDI_CALLBACK_ACTION		34
+#define GDI_AREA_SIZE			35
+#define GDI_ITEM_SIZE			36
+#define GDI_SCROLLBAR_ITEMS_MAX		37
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	38
+#define GDI_SCROLLBAR_ITEM_POSITION	39
+#define GDI_INFO_TEXT			40
+#define GDI_ACTIVE			41
 
 typedef void (*gadget_function)(void *);
 
 struct GadgetBorder
 {
-  int size;				/* size of gadget border */
-  int size_selectbutton;		/* for selectbox gadgets */
+  int xsize, ysize;			/* size of gadget border */
+  int xsize_selectbutton;		/* for selectbox gadgets */
   int width;				/* for selectbox/text input gadgets */
 };
 
@@ -137,24 +141,27 @@ struct GadgetDrawingArea
   int item_xsize, item_ysize;		/* size of each item in drawing area */
 };
 
+struct GadgetTextButton
+{
+  char value[MAX_GADGET_TEXTSIZE];	/* text written on the button */
+  int size;				/* maximal size of button text */
+};
+
 struct GadgetTextInput
 {
   char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
+  int cursor_position;			/* actual text cursor position */
   int number_value;			/* integer value, if numeric */
   int number_min;			/* minimal allowed numeric value */
   int number_max;			/* maximal allowed numeric value */
   int size;				/* maximal size of input text */
-  int font_type;			/* font to use for text input */
-  int cursor_position;			/* actual cursor position */
-  Pixel inverse_color;			/* color for highlighting */
 };
 
 struct GadgetSelectbox
 {
-  const char **values;			/* pointer to array of text strings */
+  struct ValueTextInfo *options;	/* pointer to text/value array */
   int index;				/* index of actual text string */
   int size;				/* maximal size of text strings */
-  int font_type;			/* font to use for text input */
 
   /* automatically determined values */
   int x, y;				/* open selectbox position */
@@ -193,7 +200,10 @@ struct GadgetInfo
   unsigned long state;			/* state (pressed, released, ...) */
   boolean checked;			/* check/radio button state */
   int radio_nr;				/* number of radio button series */
-  boolean mapped;			/* gadget is active */
+  boolean mapped;			/* gadget is mapped on the screen */
+  boolean active;			/* gadget is active */
+  int font;				/* font to use when inactive */
+  int font_active;			/* font to use when active */
   struct GadgetBorder border;		/* gadget border design */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
@@ -203,6 +213,7 @@ struct GadgetInfo
   gadget_function callback_info;	/* function for pop-up info text */
   gadget_function callback_action;	/* function for gadget action */
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
+  struct GadgetTextButton textbutton;	/* fields for text button gadget */
   struct GadgetTextInput text;		/* fields for text input gadget */
   struct GadgetSelectbox selectbox;	/* fields for selectbox gadget */
   struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */

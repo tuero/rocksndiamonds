@@ -811,18 +811,20 @@
 #define FONT_TEXT_2				9
 #define FONT_TEXT_3				10
 #define FONT_TEXT_4				11
-#define FONT_INPUT				12
-#define FONT_INPUT_ACTIVE			13
-#define FONT_OPTION_OFF				14
-#define FONT_OPTION_ON				15
-#define FONT_VALUE_1				16
-#define FONT_VALUE_2				17
-#define FONT_VALUE_OLD				18
-#define FONT_LEVEL_NUMBER			19
-#define FONT_TAPE_RECORDER			20
-#define FONT_GAME_INFO				21
+#define FONT_INPUT_1				12
+#define FONT_INPUT_1_ACTIVE			13
+#define FONT_INPUT_2				14
+#define FONT_INPUT_2_ACTIVE			15
+#define FONT_OPTION_OFF				16
+#define FONT_OPTION_ON				17
+#define FONT_VALUE_1				18
+#define FONT_VALUE_2				19
+#define FONT_VALUE_OLD				20
+#define FONT_LEVEL_NUMBER			21
+#define FONT_TAPE_RECORDER			22
+#define FONT_GAME_INFO				23
 
-#define NUM_FONTS				22
+#define NUM_FONTS				24
 #define NUM_INITIAL_FONTS			4
 
 /* values for game_status */

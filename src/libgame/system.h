@@ -43,6 +43,7 @@
 #define BLIT_OPAQUE		0
 #define BLIT_MASKED		1
 #define BLIT_INVERSE		2
+#define BLIT_ON_BACKGROUND	3
 
 #define FULLSCREEN_NOT_AVAILABLE FALSE
 #define FULLSCREEN_AVAILABLE	 TRUE
@@ -353,7 +354,6 @@ struct GfxInfo
   int num_fonts;
   struct FontBitmapInfo *font_bitmap_info;
   int (*select_font_function)(int);
-  Pixel inverse_text_color;
 
   int anim_random_frame;
 };
@@ -527,6 +527,12 @@ struct ArtworkInfo
   char *gfx_current_identifier;
   char *snd_current_identifier;
   char *mus_current_identifier;
+};
+
+struct ValueTextInfo
+{
+  int value;
+  char *text;
 };
 
 struct ConfigInfo

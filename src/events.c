@@ -40,24 +40,21 @@ static unsigned long playfield_cursor_delay = 0;
 
 int FilterMouseMotionEvents(const Event *event)
 {
+  MotionEvent *motion;
+
   /* non-motion events are directly passed to event handler functions */
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
 
-  if (game_status == PLAYING)
+  motion = (MotionEvent *)event;
+  cursor_inside_playfield = (motion->x >= SX && motion->x < SX + SXSIZE &&
+			     motion->y >= SY && motion->y < SY + SYSIZE);
+
+  if (game_status == PLAYING && playfield_cursor_set)
   {
-    MotionEvent *motion = (MotionEvent *)event;
-
-    cursor_inside_playfield =
-      (motion->x >= SX && motion->x < SX + SXSIZE &&
-       motion->y >= SY && motion->y < SY + SYSIZE);
-
-    if (playfield_cursor_set)
-    {
-      SetMouseCursor(CURSOR_DEFAULT);
-      DelayReached(&playfield_cursor_delay, 0);
-      playfield_cursor_set = FALSE;
-    }
+    SetMouseCursor(CURSOR_DEFAULT);
+    playfield_cursor_set = FALSE;
+    DelayReached(&playfield_cursor_delay, 0);
   }
 
   /* skip mouse motion events without pressed button outside level editor */
@@ -119,11 +116,19 @@ void EventLoop(void)
     else
     {
       /* when playing, display a special mouse pointer inside the playfield */
-      if (game_status == PLAYING && cursor_inside_playfield &&
-	  DelayReached(&playfield_cursor_delay, 1000))
+      if (game_status == PLAYING)
       {
-	SetMouseCursor(CURSOR_PLAYFIELD);
-	playfield_cursor_set = TRUE;
+	if (!playfield_cursor_set && cursor_inside_playfield &&
+	    DelayReached(&playfield_cursor_delay, 1000))
+	{
+	  SetMouseCursor(CURSOR_PLAYFIELD);
+	  playfield_cursor_set = TRUE;
+	}
+      }
+      else if (playfield_cursor_set)
+      {
+	SetMouseCursor(CURSOR_DEFAULT);
+	playfield_cursor_set = FALSE;
       }
 
       HandleNoEvent();

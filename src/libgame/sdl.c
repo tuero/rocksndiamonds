@@ -363,12 +363,12 @@ inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
 }
 #endif
 
-inline Pixel SDLGetPixel(Bitmap *dst_bitmap, int x, int y)
+inline Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 {
-  SDL_Surface *surface = dst_bitmap->surface;
+  SDL_Surface *surface = src_bitmap->surface;
 
 #ifdef FULLSCREEN_BUG
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  if (src_bitmap == backbuffer || src_bitmap == window)
   {
     x += video_xoffset;
     y += video_yoffset;
@@ -864,6 +864,11 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
 
+inline void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
+{
+  sge_PutPixel(dst_bitmap->surface, x, y, pixel);
+}
+
 
 /*
   -----------------------------------------------------------------------------
@@ -874,7 +879,6 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
 			  int width, int height, Uint32 color)
 {
-  SDL_Surface *surface = bitmap->surface;
   int x, y;
 
   for (y=src_y; y < src_y + height; y++)
@@ -883,7 +887,25 @@ inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
     {
       Uint32 pixel = SDLGetPixel(bitmap, x, y);
 
-      sge_PutPixel(surface, x, y, pixel == BLACK_PIXEL ? color : BLACK_PIXEL);
+      SDLPutPixel(bitmap, x, y, pixel == BLACK_PIXEL ? color : BLACK_PIXEL);
+    }
+  }
+}
+
+inline void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+				 int src_x, int src_y, int width, int height,
+				 int dst_x, int dst_y)
+{
+  int x, y;
+
+  for (y=0; y < height; y++)
+  {
+    for (x=0; x < width; x++)
+    {
+      Uint32 pixel = SDLGetPixel(src_bitmap, src_x + x, src_y + y);
+
+      if (pixel != BLACK_PIXEL)
+	SDLPutPixel(dst_bitmap, dst_x + x, dst_y + y, BLACK_PIXEL);
     }
   }
 }
