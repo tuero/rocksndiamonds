@@ -639,7 +639,9 @@ void InitElementGraphicInfo()
 	if (act == ACTION_FALLING)	/* special case */
 	  graphic = element_info[i].graphic[act];
 
-	if (graphic != -1 && graphic_info[graphic].double_movement)
+	if (graphic != -1 &&
+	    graphic_info[graphic].double_movement &&
+	    graphic_info[graphic].swap_double_tiles != 0)
 	{
 	  struct GraphicInfo *g = &graphic_info[graphic];
 	  int src_x_front = g->src_x;
@@ -650,20 +652,40 @@ void InitElementGraphicInfo()
 						   g->offset_y != 0);
 	  boolean front_is_left_or_upper = (src_x_front < src_x_back ||
 					    src_y_front < src_y_back);
+#if 0
+	  boolean second_tile_is_back =
+	    ((move_dir == MV_BIT_LEFT  && front_is_left_or_upper) ||
+	     (move_dir == MV_BIT_UP    && front_is_left_or_upper));
+	  boolean second_tile_is_front =
+	    ((move_dir == MV_BIT_RIGHT && front_is_left_or_upper) ||
+	     (move_dir == MV_BIT_DOWN  && front_is_left_or_upper));
+	  boolean second_tile_should_be_front =
+	    (g->second_tile_is_start == 0);
+	  boolean second_tile_should_be_back =
+	    (g->second_tile_is_start == 1);
+#endif
+	  boolean swap_movement_tiles_always = (g->swap_double_tiles == 1);
+	  boolean swap_movement_tiles_autodetected =
+	    (!frames_are_ordered_diagonally &&
+	     ((move_dir == MV_BIT_LEFT  && !front_is_left_or_upper) ||
+	      (move_dir == MV_BIT_UP    && !front_is_left_or_upper) ||
+	      (move_dir == MV_BIT_RIGHT &&  front_is_left_or_upper) ||
+	      (move_dir == MV_BIT_DOWN  &&  front_is_left_or_upper)));
 	  Bitmap *dummy;
 
 #if 0
-	  printf("::: CHECKING ELEMENT %d ('%s'), ACTION '%s', DIRECTION %d\n",
+	  printf("::: CHECKING element %d ('%s'), '%s', dir %d [(%d -> %d, %d), %d => %d]\n",
 		 i, element_info[i].token_name,
-		 element_action_info[act].suffix, move_dir);
+		 element_action_info[act].suffix, move_dir,
+		 g->swap_double_tiles,
+		 swap_movement_tiles_never,
+		 swap_movement_tiles_always,
+		 swap_movement_tiles_autodetected,
+		 swap_movement_tiles);
 #endif
 
 	  /* swap frontside and backside graphic tile coordinates, if needed */
-	  if (!frames_are_ordered_diagonally &&
-	      ((move_dir == MV_BIT_LEFT  && !front_is_left_or_upper) ||
-	       (move_dir == MV_BIT_RIGHT && front_is_left_or_upper) ||
-	       (move_dir == MV_BIT_UP    && !front_is_left_or_upper) ||
-	       (move_dir == MV_BIT_DOWN  && front_is_left_or_upper)))
+	  if (swap_movement_tiles_always || swap_movement_tiles_autodetected)
 	  {
 	    /* get current (wrong) backside tile coordinates */
 	    getGraphicSourceExt(graphic, 0, &dummy, &src_x_back, &src_y_back,
@@ -676,6 +698,9 @@ void InitElementGraphicInfo()
 	    /* invert tile offset to point to new backside tile coordinates */
 	    g->offset2_x *= -1;
 	    g->offset2_y *= -1;
+
+	    /* do not swap front and backside tiles again after correction */
+	    g->swap_double_tiles = 0;
 
 #if 0
 	    printf("    CORRECTED\n");
@@ -962,6 +987,7 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
   graphic_info[graphic].offset2_x = 0;	/* one or both of these values ... */
   graphic_info[graphic].offset2_y = 0;	/* ... will be corrected later */
+  graphic_info[graphic].swap_double_tiles = -1;	/* auto-detect tile swapping */
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
@@ -1048,6 +1074,10 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
     graphic_info[graphic].offset2_x = parameter[GFX_ARG_2ND_XOFFSET];
   if (parameter[GFX_ARG_2ND_YOFFSET] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].offset2_y = parameter[GFX_ARG_2ND_YOFFSET];
+
+  /* optionally, the second movement tile can be specified as start tile */
+  if (parameter[GFX_ARG_2ND_SWAP_TILES] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].swap_double_tiles= parameter[GFX_ARG_2ND_SWAP_TILES];
 
   /* automatically determine correct number of frames, if not defined */
   if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)

@@ -36,6 +36,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".2nd_offset",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".2nd_xoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".2nd_yoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".2nd_swap_tiles",			ARG_UNDEFINED,	TYPE_BOOLEAN	},
   { ".frames",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".frames_per_line",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".start_frame",			ARG_UNDEFINED,	TYPE_INTEGER	},

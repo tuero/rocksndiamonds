@@ -1218,30 +1218,31 @@
 #define GFX_ARG_2ND_OFFSET		12
 #define GFX_ARG_2ND_XOFFSET		13
 #define GFX_ARG_2ND_YOFFSET		14
-#define GFX_ARG_FRAMES			15
-#define GFX_ARG_FRAMES_PER_LINE		16
-#define GFX_ARG_START_FRAME		17
-#define GFX_ARG_DELAY			18
-#define GFX_ARG_ANIM_MODE		19
-#define GFX_ARG_GLOBAL_SYNC		20
-#define GFX_ARG_CRUMBLED_LIKE		21
-#define GFX_ARG_DIGGABLE_LIKE		22
-#define GFX_ARG_BORDER_SIZE		23
-#define GFX_ARG_STEP_OFFSET		24
-#define GFX_ARG_STEP_DELAY		25
-#define GFX_ARG_DIRECTION		26
-#define GFX_ARG_POSITION		27
-#define GFX_ARG_DRAW_XOFFSET		28
-#define GFX_ARG_DRAW_YOFFSET		29
-#define GFX_ARG_DRAW_MASKED		30
-#define GFX_ARG_ANIM_DELAY_FIXED	31
-#define GFX_ARG_ANIM_DELAY_RANDOM	32
-#define GFX_ARG_POST_DELAY_FIXED	33
-#define GFX_ARG_POST_DELAY_RANDOM	34
-#define GFX_ARG_NAME			35
-#define GFX_ARG_SCALE_UP_FACTOR		36
+#define GFX_ARG_2ND_SWAP_TILES		15	
+#define GFX_ARG_FRAMES			16
+#define GFX_ARG_FRAMES_PER_LINE		17
+#define GFX_ARG_START_FRAME		18
+#define GFX_ARG_DELAY			19
+#define GFX_ARG_ANIM_MODE		20
+#define GFX_ARG_GLOBAL_SYNC		21
+#define GFX_ARG_CRUMBLED_LIKE		22
+#define GFX_ARG_DIGGABLE_LIKE		23
+#define GFX_ARG_BORDER_SIZE		24
+#define GFX_ARG_STEP_OFFSET		25
+#define GFX_ARG_STEP_DELAY		26
+#define GFX_ARG_DIRECTION		27
+#define GFX_ARG_POSITION		28
+#define GFX_ARG_DRAW_XOFFSET		29
+#define GFX_ARG_DRAW_YOFFSET		30
+#define GFX_ARG_DRAW_MASKED		31
+#define GFX_ARG_ANIM_DELAY_FIXED	32
+#define GFX_ARG_ANIM_DELAY_RANDOM	33
+#define GFX_ARG_POST_DELAY_FIXED	34
+#define GFX_ARG_POST_DELAY_RANDOM	35
+#define GFX_ARG_NAME			36
+#define GFX_ARG_SCALE_UP_FACTOR		37
 
-#define NUM_GFX_ARGS			37
+#define NUM_GFX_ARGS			38
 
 
 /* values for sound configuration suffixes */
@@ -1906,6 +1907,7 @@ struct GraphicInfo
   int offset_x, offset_y;	/* x/y offset to next animation frame */
   int offset2_x, offset2_y;	/* x/y offset to second movement tile */
   boolean double_movement;	/* animation has second movement tile */
+  int swap_double_tiles;	/* explicitely force or forbid tile swapping */
   int anim_frames;
   int anim_frames_per_line;
   int anim_start_frame;
