@@ -812,6 +812,19 @@ char *getTokenFromImageID(int graphic)
 #endif
 }
 
+int getImageIDFromToken(char *token)
+{
+  struct FileInfo *file_list = image_info->file_list;
+  int num_list_entries = image_info->num_file_list_entries;
+  int i;
+
+  for (i=0; i < num_list_entries; i++)
+    if (strcmp(file_list[i].token, token) == 0)
+      return i;
+
+  return -1;
+}
+
 char *getImageConfigFilename()
 {
   return getCustomArtworkConfigFilename(image_info->type);

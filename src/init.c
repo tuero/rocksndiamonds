@@ -411,24 +411,30 @@ void InitElementGraphicInfo()
     for (act=0; act<NUM_ACTIONS; act++)
     {
       element_info[i].graphic[act] = -1;
+      element_info[i].crumbled[act] = -1;
 
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      {
 	element_info[i].direction_graphic[act][dir] = -1;
+	element_info[i].direction_crumbled[act][dir] = -1;
+      }
     }
   }
 
   /* initialize normal element/graphic mapping from static configuration */
   for (i=0; element_to_graphic[i].element > -1; i++)
   {
-    int element   = element_to_graphic[i].element;
-    int action    = element_to_graphic[i].action;
-    int direction = element_to_graphic[i].direction;
-    int graphic   = element_to_graphic[i].graphic;
+    int element      = element_to_graphic[i].element;
+    int action       = element_to_graphic[i].action;
+    int direction    = element_to_graphic[i].direction;
+    boolean crumbled = element_to_graphic[i].crumbled;
+    int graphic      = element_to_graphic[i].graphic;
 
     if (graphic_info[graphic].bitmap == NULL)
       continue;
 
-    if ((action > -1 || direction > -1) && el2img(element) != -1)
+    if ((action > -1 || direction > -1 || crumbled == TRUE) &&
+	el2img(element) != -1)
     {
       boolean base_redefined = getImageListEntry(el2img(element))->redefined;
       boolean act_dir_redefined = getImageListEntry(graphic)->redefined;
@@ -444,10 +450,20 @@ void InitElementGraphicInfo()
     if (action < 0)
       action = ACTION_DEFAULT;
 
-    if (direction > -1)
-      element_info[element].direction_graphic[action][direction] = graphic;
+    if (crumbled)
+    {
+      if (direction > -1)
+	element_info[element].direction_crumbled[action][direction] = graphic;
+      else
+	element_info[element].crumbled[action] = graphic;
+    }
     else
-      element_info[element].graphic[action] = graphic;
+    {
+      if (direction > -1)
+	element_info[element].direction_graphic[action][direction] = graphic;
+      else
+	element_info[element].graphic[action] = graphic;
+    }
   }
 
   /* initialize normal element/graphic mapping from dynamic configuration */
@@ -458,6 +474,13 @@ void InitElementGraphicInfo()
     int direction = property_mapping[i].ext2_index;
     int special   = property_mapping[i].ext3_index;
     int graphic   = property_mapping[i].artwork_index;
+    boolean crumbled = FALSE;
+
+    if (special == GFX_SPECIAL_ARG_CRUMBLED)
+    {
+      special = -1;
+      crumbled = TRUE;
+    }
 
     if (graphic_info[graphic].bitmap == NULL)
       continue;
@@ -468,32 +491,87 @@ void InitElementGraphicInfo()
     if (action < 0)
       action = ACTION_DEFAULT;
 
-    if (direction < 0)
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
-	element_info[element].direction_graphic[action][dir] = -1;
+    if (crumbled)
+    {
+      if (direction < 0)
+	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	  element_info[element].direction_crumbled[action][dir] = -1;
 
-    if (direction > -1)
-      element_info[element].direction_graphic[action][direction] = graphic;
+      if (direction > -1)
+	element_info[element].direction_crumbled[action][direction] = graphic;
+      else
+	element_info[element].crumbled[action] = graphic;
+    }
     else
-      element_info[element].graphic[action] = graphic;
+    {
+      if (direction < 0)
+	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	  element_info[element].direction_graphic[action][dir] = -1;
+
+      if (direction > -1)
+	element_info[element].direction_graphic[action][direction] = graphic;
+      else
+	element_info[element].graphic[action] = graphic;
+    }
+  }
+
+  /* now copy all graphics that are defined to be cloned from other graphics */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    int graphic = element_info[i].graphic[ACTION_DEFAULT];
+    int crumbled_like, diggable_like;
+
+    if (graphic == -1)
+      continue;
+
+    crumbled_like = graphic_info[graphic].crumbled_like;
+    diggable_like = graphic_info[graphic].diggable_like;
+
+    if (crumbled_like != -1 && element_info[i].crumbled[ACTION_DEFAULT] == -1)
+    {
+      for (act=0; act<NUM_ACTIONS; act++)
+	element_info[i].crumbled[act] =
+	  element_info[crumbled_like].crumbled[act];
+      for (act=0; act<NUM_ACTIONS; act++)
+	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	  element_info[i].direction_crumbled[act][dir] =
+	    element_info[crumbled_like].direction_crumbled[act][dir];
+    }
+
+    if (diggable_like != -1 && element_info[i].graphic[ACTION_DIGGING] == -1)
+    {
+      element_info[i].graphic[ACTION_DIGGING] =
+	element_info[diggable_like].graphic[ACTION_DIGGING];
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	element_info[i].direction_graphic[ACTION_DIGGING][dir] =
+	  element_info[diggable_like].direction_graphic[ACTION_DIGGING][dir];
+    }
   }
 
   /* now set all '-1' values to element specific default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     int default_graphic = element_info[i].graphic[ACTION_DEFAULT];
+    int default_crumbled = element_info[i].crumbled[ACTION_DEFAULT];
     int default_direction_graphic[NUM_DIRECTIONS];
+    int default_direction_crumbled[NUM_DIRECTIONS];
 
     if (default_graphic == -1)
       default_graphic = IMG_CHAR_QUESTION;
+    if (default_crumbled == -1)
+      default_crumbled = IMG_EMPTY;
 
     for (dir=0; dir<NUM_DIRECTIONS; dir++)
     {
       default_direction_graphic[dir] =
 	element_info[i].direction_graphic[ACTION_DEFAULT][dir];
+      default_direction_crumbled[dir] =
+	element_info[i].direction_crumbled[ACTION_DEFAULT][dir];
 
       if (default_direction_graphic[dir] == -1)
 	default_direction_graphic[dir] = default_graphic;
+      if (default_direction_crumbled[dir] == -1)
+	default_direction_crumbled[dir] = default_crumbled;
     }
 
     for (act=0; act<NUM_ACTIONS; act++)
@@ -504,6 +582,7 @@ void InitElementGraphicInfo()
 
       /* generic default action graphic (defined by "[default]" directive) */
       int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
+      int default_action_crumbled = element_info[EL_DEFAULT].crumbled[act];
 
       /* look for special default action graphic (classic game specific) */
       if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].graphic[act] != -1)
@@ -513,27 +592,46 @@ void InitElementGraphicInfo()
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].graphic[act] != -1)
 	default_action_graphic = element_info[EL_SB_DEFAULT].graphic[act];
 
+      if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].crumbled[act] != -1)
+	default_action_crumbled = element_info[EL_BD_DEFAULT].crumbled[act];
+      if (IS_SP_ELEMENT(i) && element_info[EL_SP_DEFAULT].crumbled[act] != -1)
+	default_action_crumbled = element_info[EL_SP_DEFAULT].crumbled[act];
+      if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].crumbled[act] != -1)
+	default_action_crumbled = element_info[EL_SB_DEFAULT].crumbled[act];
+
       if (default_action_graphic == -1)
 	default_action_graphic = default_graphic;
+      if (default_action_crumbled == -1)
+	default_action_crumbled = default_crumbled;
 
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
 	int default_action_direction_graphic = element_info[i].graphic[act];
+	int default_action_direction_crumbled = element_info[i].crumbled[act];
 
 	/* no graphic for current action -- use default direction graphic */
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
 	    (act_remove ? IMG_EMPTY : default_direction_graphic[dir]);
+	if (default_action_direction_crumbled == -1)
+	  default_action_direction_crumbled =
+	    (act_remove ? IMG_EMPTY : default_direction_crumbled[dir]);
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
 	    default_action_direction_graphic;
+	if (element_info[i].direction_crumbled[act][dir] == -1)
+	  element_info[i].direction_crumbled[act][dir] =
+	    default_action_direction_crumbled;
       }
 
       /* no graphic for this specific action -- use default action graphic */
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] =
 	  (act_remove ? IMG_EMPTY : default_action_graphic);
+      if (element_info[i].crumbled[act] == -1)
+	element_info[i].crumbled[act] =
+	  (act_remove ? IMG_EMPTY : default_action_crumbled);
     }
   }
 
@@ -597,6 +695,17 @@ void InitElementSpecialGraphicInfo()
   }
 }
 
+static int get_element_from_token(char *token)
+{
+  int i;
+
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    if (strcmp(element_info[i].token_name, token) == 0)
+      return i;
+
+  return -1;
+}
+
 static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
@@ -607,9 +716,14 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
   /* get integer values from string parameters */
   for (i=0; i < NUM_GFX_ARGS; i++)
+  {
     parameter[i] =
       get_parameter_value(image_config_suffix[i].token, parameter_raw[i],
 			  image_config_suffix[i].type);
+
+    if (image_config_suffix[i].type == TYPE_TOKEN)
+      parameter[i] = get_element_from_token(parameter_raw[i]);
+  }
 
   graphic_info[graphic].bitmap = src_bitmap;
 
@@ -620,6 +734,8 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].height = TILEY;
   graphic_info[graphic].offset_x = 0;	/* one or both of these values ... */
   graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
+  graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
+  graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
 
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
@@ -700,6 +816,14 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
   /* animation synchronized with global frame counter, not move position */
   graphic_info[graphic].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+
+  /* optional element for cloning crumble graphics */
+  if (parameter[GFX_ARG_CRUMBLED_LIKE] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].crumbled_like = parameter[GFX_ARG_CRUMBLED_LIKE];
+
+  /* optional element for cloning digging graphics */
+  if (parameter[GFX_ARG_DIGGABLE_LIKE] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].diggable_like = parameter[GFX_ARG_DIGGABLE_LIKE];
 
   /* this is only used for toon animations */
   graphic_info[graphic].step_offset = parameter[GFX_ARG_STEP_OFFSET];
@@ -2648,6 +2772,17 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||
 				     CAN_EXPLODE_SMASHED(i) ||
 				     CAN_EXPLODE_IMPACT(i)));
+
+    /* ---------- CAN_BE_CRUMBLED ------------------------------------------ */
+    SET_PROPERTY(i, EP_CAN_BE_CRUMBLED,
+		 element_info[i].crumbled[ACTION_DEFAULT] != IMG_EMPTY);
+
+#if 0
+    if (CAN_BE_CRUMBLED(i))
+      printf("::: '%s' can be crumbled [%d]\n",
+	     element_info[i].token_name,
+	     element_info[i].crumbled[ACTION_DEFAULT]);
+#endif
   }
 
 #if 0

@@ -78,6 +78,7 @@ int getImageListSize();
 struct FileInfo *getImageListEntry(int);
 Bitmap *getBitmapFromImageID(int);
 char *getTokenFromImageID(int);
+int getImageIDFromToken(char *);
 char *getImageConfigFilename();
 int getImageListPropertyMappingSize();
 struct PropertyMapping *getImageListPropertyMapping();

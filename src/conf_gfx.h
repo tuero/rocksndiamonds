@@ -1,15 +1,3 @@
-/***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
-*----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
-*               Holger Schemel                             *
-*               Detmolder Strasse 189                      *
-*               33604 Bielefeld                            *
-*               Germany                                    *
-*               e-mail: info@artsoft.org                   *
-*----------------------------------------------------------*
-* conf_gfx.h                                               *
-***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -132,10 +120,10 @@
 #define IMG_SAND_DIGGING_UP				111
 #define IMG_SAND_DIGGING_DOWN				112
 #define IMG_SAND_CRUMBLED				113
-#define IMG_SAND_CRUMBLED_DIGGING_LEFT			114
-#define IMG_SAND_CRUMBLED_DIGGING_RIGHT			115
-#define IMG_SAND_CRUMBLED_DIGGING_UP			116
-#define IMG_SAND_CRUMBLED_DIGGING_DOWN			117
+#define IMG_SAND_DIGGING_LEFT_CRUMBLED			114
+#define IMG_SAND_DIGGING_RIGHT_CRUMBLED			115
+#define IMG_SAND_DIGGING_UP_CRUMBLED			116
+#define IMG_SAND_DIGGING_DOWN_CRUMBLED			117
 #define IMG_WALL					118
 #define IMG_WALL_CRUMBLED				119
 #define IMG_STEELWALL					120

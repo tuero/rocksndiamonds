@@ -879,8 +879,9 @@
 #define GFX_SPECIAL_ARG_SETUP			5
 #define GFX_SPECIAL_ARG_DOOR			6
 #define GFX_SPECIAL_ARG_PREVIEW			7
+#define GFX_SPECIAL_ARG_CRUMBLED		8
 
-#define NUM_SPECIAL_GFX_ARGS			8
+#define NUM_SPECIAL_GFX_ARGS			9
 
 
 /* values for image configuration suffixes */
@@ -900,15 +901,17 @@
 #define GFX_ARG_DELAY				13
 #define GFX_ARG_ANIM_MODE			14
 #define GFX_ARG_GLOBAL_SYNC			15
-#define GFX_ARG_STEP_OFFSET			16
-#define GFX_ARG_STEP_DELAY			17
-#define GFX_ARG_DIRECTION			18
-#define GFX_ARG_POSITION			19
-#define GFX_ARG_DRAW_XOFFSET			20
-#define GFX_ARG_DRAW_YOFFSET			21
-#define GFX_ARG_NAME				22
+#define GFX_ARG_CRUMBLED_LIKE			16
+#define GFX_ARG_DIGGABLE_LIKE			17
+#define GFX_ARG_STEP_OFFSET			18
+#define GFX_ARG_STEP_DELAY			19
+#define GFX_ARG_DIRECTION			20
+#define GFX_ARG_POSITION			21
+#define GFX_ARG_DRAW_XOFFSET			22
+#define GFX_ARG_DRAW_YOFFSET			23
+#define GFX_ARG_NAME				24
 
-#define NUM_GFX_ARGS				23
+#define NUM_GFX_ARGS				25
 
 
 /* values for sound configuration suffixes */
@@ -960,11 +963,12 @@
 #define GAME_MODE_SETUP				5
 #define GAME_MODE_PSEUDO_DOOR			6
 #define GAME_MODE_PSEUDO_PREVIEW		7
+#define GAME_MODE_PSEUDO_CRUMBLED		8
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PLAYING			8
-#define GAME_MODE_PSEUDO_TYPENAME		9
-#define GAME_MODE_QUIT				10
+#define GAME_MODE_PLAYING			9
+#define GAME_MODE_PSEUDO_TYPENAME		10
+#define GAME_MODE_QUIT				11
 
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	2
@@ -1252,6 +1256,11 @@ struct ElementInfo
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
 				/* special graphics for left/right/up/down */
+
+  int crumbled[NUM_ACTIONS];	/* crumbled graphics for several actions */
+  int direction_crumbled[NUM_ACTIONS][NUM_DIRECTIONS];
+				/* crumbled graphics for left/right/up/down */
+
   int special_graphic[NUM_SPECIAL_GFX_ARGS];
   				/* special graphics for certain screens */
 
@@ -1320,6 +1329,8 @@ struct GraphicInfo
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
+  int crumbled_like;		/* element for cloning crumble graphics */
+  int diggable_like;		/* element for cloning digging graphics */
 
   int step_offset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */

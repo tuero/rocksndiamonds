@@ -34,6 +34,7 @@
 /* forward declaration for internal use */
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
+static int el_act_dir2crm(int, int, int);
 
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
@@ -658,8 +659,13 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
+#if 1
+      if (CAN_BE_CRUMBLED(GfxElement[jx][jy]))
+	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
+#else
       if (GfxElement[jx][jy] == EL_SAND)
 	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
+#endif
       else
       {
 	int old_element = GfxElement[jx][jy];
@@ -1298,8 +1304,13 @@ void DrawLevelFieldCrumbledSand(int x, int y)
 void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
 				       int step_frame)
 {
+#if 1
+  int graphic1 = el_act_dir2img(GfxElement[x][y], ACTION_DIGGING, direction);
+  int graphic2 = el_act_dir2crm(GfxElement[x][y], ACTION_DIGGING, direction);
+#else
   int graphic1 = el_act_dir2img(EL_SAND,          ACTION_DIGGING, direction);
   int graphic2 = el_act_dir2img(EL_SAND_CRUMBLED, ACTION_DIGGING, direction);
+#endif
   int frame1 = getGraphicAnimationFrame(graphic1, step_frame);
   int frame2 = getGraphicAnimationFrame(graphic2, step_frame);
   int sx = SCREENX(x), sy = SCREENY(y);
@@ -2444,6 +2455,14 @@ int el_act_dir2img(int element, int action, int direction)
   direction = MV_DIR_BIT(direction);
 
   return element_info[element].direction_graphic[action][direction];
+}
+
+static int el_act_dir2crm(int element, int action, int direction)
+{
+  element = GFX_ELEMENT(element);
+  direction = MV_DIR_BIT(direction);
+
+  return element_info[element].direction_crumbled[action][direction];
 }
 
 int el_act2img(int element, int action)

@@ -30,6 +30,7 @@
 #include "setup.h"
 #include "random.h"
 #include "text.h"
+#include "image.h"
 
 
 /* ------------------------------------------------------------------------- */
