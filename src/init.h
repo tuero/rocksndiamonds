@@ -16,9 +16,10 @@
 
 #include "main.h"
 
+void setMoveIntoAcidProperty(struct LevelInfo *, int, boolean);
+boolean getMoveIntoAcidProperty(struct LevelInfo *, int);
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
-int get_special_property_bit(int, int);
 
 void ReloadCustomArtwork(int);
 

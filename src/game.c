@@ -101,20 +101,21 @@
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
 
-#if 1
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition) ||			\
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_PLAYER(x, y) &&		\
 					 !PLAYER_ENEMY_PROTECTED(x, y))))
-#else
-#define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
+
+#define ELEMENT_CAN_ENTER_FIELD_GENERIC_X(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition) ||			\
+					(CAN_MOVE_INTO_ACID(e) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
 					(DONT_COLLIDE_WITH(e) &&	\
-					 IS_FREE_OR_PLAYER(x, y))))
-#endif
+					 IS_PLAYER(x, y) &&		\
+					 !PLAYER_ENEMY_PROTECTED(x, y))))
 
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -153,17 +154,6 @@
 					Feld[x][y] == EL_EXIT_OPEN ||	\
 					Feld[x][y] == EL_ACID))
 
-#if 0
-#if 1
-#define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
-		(IN_LEV_FIELD(x, y) && IS_FREE(x, y))
-#else
-#define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
-		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
-#endif
-#endif
-
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
 #define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
@@ -172,22 +162,17 @@
 #define IS_EQUAL_OR_IN_GROUP(e, ge)					\
 	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
 
-#if 1
 #define CE_ENTER_FIELD_COND(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
 		 (Feld[x][y] == EL_ACID ||				\
 		  IS_EQUAL_OR_IN_GROUP(Feld[x][y], MOVE_ENTER_EL(e))))
-#else
-#define CE_ENTER_FIELD_COND(e, x, y)					\
+
+#define CE_ENTER_FIELD_COND_X(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
-		 (Feld[x][y] == EL_ACID ||				\
-		  Feld[x][y] == MOVE_ENTER_EL(e) ||			\
-		  (IS_GROUP_ELEMENT(MOVE_ENTER_EL(e)) &&		\
-		   IS_IN_GROUP_EL(Feld[x][y], MOVE_ENTER_EL(e)))))
-#endif
+		 IS_EQUAL_OR_IN_GROUP(Feld[x][y], MOVE_ENTER_EL(e)))
 
 #define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
+	ELEMENT_CAN_ENTER_FIELD_GENERIC_X(e, x, y, CE_ENTER_FIELD_COND_X(e, x, y))
 
 #define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
@@ -4943,6 +4928,12 @@ void StartMoving(int x, int y)
 #endif
 
     }
+#if 1
+    else if (CAN_MOVE_INTO_ACID(element) && MovDir[x][y] == MV_DOWN &&
+	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID)
+
+#else
+
     else if ((element == EL_PENGUIN ||
 	      element == EL_ROBOT ||
 	      element == EL_SATELLITE ||
@@ -4950,6 +4941,7 @@ void StartMoving(int x, int y)
 	      IS_CUSTOM_ELEMENT(element)) &&
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_ACID)
+#endif
     {
       SplashAcid(x, y);
       Store[x][y] = EL_ACID;

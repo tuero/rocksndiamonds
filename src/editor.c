@@ -4875,19 +4875,18 @@ static void MapCounterButtons(int id)
   int x_right = gi_up->x + gi_up->width + xoffset_right;
   int y_above = gi_down->y - yoffset_above;
   int x = gi_down->x;
-  int y = gi_up->y + yoffset;
+  int y;	/* set after gadget position was modified */
 #endif
 
-#if 1
-  /* special case needed for "score" counter gadget */
+  /* set position for "score" counter gadget */
   if (id == ED_COUNTER_ID_ELEMENT_SCORE)
   {
     ModifyGadget(gi_down, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
     ModifyGadget(gi_text, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
     ModifyGadget(gi_up,   GDI_Y, SY + counterbutton_info[id].y, GDI_END);
-    y = gi_up->y + yoffset;
   }
-#endif
+
+  y = gi_up->y + yoffset;
 
   if (counterbutton_info[id].text_above)
     DrawText(x, y_above, counterbutton_info[id].text_above, FONT_TEXT_1);
@@ -5089,22 +5088,22 @@ static void MapCheckbuttonGadget(int id)
   int yoffset = ED_BORDER_SIZE;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
-  int y = gi->y + yoffset;
+  int y;	/* set after gadget position was modified */
 
-  /* special case needed for "stickybutton" and "can move into acid" gadgets */
+  /* set position for "stickybutton" and "can move into acid" gadgets */
   if (id == ED_CHECKBUTTON_ID_STICK_ELEMENT ||
       id == ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID)
-  {
-    ModifyGadget(gi, GDI_CHECKED, *checkbutton_info[id].value,
-		 GDI_Y, SY + checkbutton_info[id].y, GDI_END);
-    y = gi->y + yoffset;
-  }
+    ModifyGadget(gi, GDI_Y, SY + checkbutton_info[id].y, GDI_END);
+
+  y = gi->y + yoffset;
 
   if (checkbutton_info[id].text_left)
     DrawText(x_left, y, checkbutton_info[id].text_left, FONT_TEXT_1);
 
   if (checkbutton_info[id].text_right)
     DrawText(x_right, y, checkbutton_info[id].text_right, FONT_TEXT_1);
+
+  ModifyGadget(gi, GDI_CHECKED, *checkbutton_info[id].value, GDI_END);
 
   MapGadget(gi);
 }
@@ -5664,6 +5663,13 @@ static void CopyGroupElementPropertiesToEditor(int element)
 
 static void CopyClassicElementPropertiesToEditor(int element)
 {
+#if 1
+  if (COULD_MOVE_INTO_ACID(element))
+    custom_element_properties[EP_CAN_MOVE_INTO_ACID] =
+      getMoveIntoAcidProperty(&level, element);
+
+#else
+
   if (COULD_MOVE_INTO_ACID(element))
   {
     int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
@@ -5672,6 +5678,7 @@ static void CopyClassicElementPropertiesToEditor(int element)
       custom_element_properties[EP_CAN_MOVE_INTO_ACID] =
 	((level.can_move_into_acid & (1 << bit_nr)) != 0);
   }
+#endif
 }
 
 static void CopyElementPropertiesToEditor(int element)
@@ -5832,6 +5839,12 @@ static void CopyGroupElementPropertiesToGame(int element)
 
 static void CopyClassicElementPropertiesToGame(int element)
 {
+#if 1
+  if (COULD_MOVE_INTO_ACID(element))
+    setMoveIntoAcidProperty(&level, element,
+			    custom_element_properties[EP_CAN_MOVE_INTO_ACID]);
+#else
+
   if (COULD_MOVE_INTO_ACID(element))
   {
     int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
@@ -5844,6 +5857,7 @@ static void CopyClassicElementPropertiesToGame(int element)
 	level.can_move_into_acid |= (1 << bit_nr);
     }
   }
+#endif
 }
 
 static void CopyElementPropertiesToGame(int element)
@@ -6752,10 +6766,12 @@ static void DrawPropertiesConfig()
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS);
 
   if (COULD_MOVE_INTO_ACID(properties_element) &&
-      !IS_CUSTOM_ELEMENT(properties_element))
+      (!IS_CUSTOM_ELEMENT(properties_element) ||
+       edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2))
   {
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
-      ED_SETTINGS_YPOS(HAS_CONTENT(properties_element) ? 1 : 0);
+      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
+		       HAS_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
   }
@@ -6814,6 +6830,8 @@ static void DrawPropertiesConfig()
     }
     else if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2)
     {
+      /* set position for special checkbutton for "can move into acid" */
+
       /* draw checkbutton gadgets */
       for (i =  ED_CHECKBUTTON_ID_CUSTOM2_FIRST;
 	   i <= ED_CHECKBUTTON_ID_CUSTOM2_LAST; i++)

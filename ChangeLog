@@ -1,5 +1,7 @@
 2004-02-21
 	* "spring push bug" reintroduced as configurable element property
+	* fixed bug with missing properties for "mole"
+	* fixed bug that showed up when fixing the above "mole" properties bug
 
 2004-02-17
 	* fixed bug which caused all CE change pages to be ignored which had

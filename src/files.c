@@ -29,7 +29,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	10	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	8	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CHUNK_CNT3_HEADER	16	/* size of level CNT3 header  */
@@ -121,14 +121,6 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->post_change_function = NULL;
 }
 
-static void setMoveIntoAcid(struct LevelInfo *level, int element)
-{
-  int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
-
-  if (bit_nr > -1)
-    level->can_move_into_acid |= (1 << bit_nr);
-}
-
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   int i, j, x, y;
@@ -164,6 +156,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->em_slippery_gems = FALSE;
   level->block_last_field = FALSE;
   level->sp_block_last_field = TRUE;
+
   level->use_spring_bug = FALSE;
 
   level->can_move_into_acid = ~0;	/* everything can move into acid */
@@ -266,6 +259,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       /* start with no properties at all */
       for (j = 0; j < NUM_EP_BITFIELDS; j++)
 	Properties[element][j] = EP_BITMASK_DEFAULT;
+
+      /* now set default properties */
+      SET_PROPERTY(element, EP_CAN_MOVE_INTO_ACID, TRUE);
 
       element_info[element].modified_settings = FALSE;
     }
@@ -655,6 +651,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->sp_block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   level->use_spring_bug		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  level->can_move_into_acid	= getFile16BitBE(file);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -2044,12 +2042,17 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
     if (level->game_version < VERSION_IDENT(3,0,9,0))
     {
+      int i;
+
       level->can_move_into_acid = 0;	/* nothing can move into acid */
 
-      setMoveIntoAcid(level, EL_ROBOT);
-      setMoveIntoAcid(level, EL_SATELLITE);
-      setMoveIntoAcid(level, EL_PENGUIN);
-      setMoveIntoAcid(level, EL_BALLOON);
+      setMoveIntoAcidProperty(level, EL_ROBOT,     TRUE);
+      setMoveIntoAcidProperty(level, EL_SATELLITE, TRUE);
+      setMoveIntoAcidProperty(level, EL_PENGUIN,   TRUE);
+      setMoveIntoAcidProperty(level, EL_BALLOON,   TRUE);
+
+      for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+	SET_PROPERTY(EL_CUSTOM_START + i, EP_CAN_MOVE_INTO_ACID, TRUE);
     }
   }
   else
@@ -2318,6 +2321,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->sp_block_last_field ? 1 : 0));
 
   putFile8Bit(file, (level->use_spring_bug ? 1 : 0));
+
+  putFile16BitBE(file, level->can_move_into_acid);
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }

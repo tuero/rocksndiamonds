@@ -2356,8 +2356,10 @@ unsigned int MoveDoor(unsigned int door_state)
     stepsize = 20;		/* must be choosen to always draw last frame */
     door_delay_value = 0;
 
+#if 0
     StopSound(SND_DOOR_OPENING);
     StopSound(SND_DOOR_CLOSING);
+#endif
   }
 
   if (global.autoplay_leveldir)
@@ -2375,7 +2377,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	       door_1.anim_mode == ANIM_VERTICAL ? DYSIZE : DXSIZE);
     int x;
 
-    if (!(door_state & DOOR_NO_DELAY))
+    if (!(door_state & DOOR_NO_DELAY) && !setup.quick_doors)
     {
       /* opening door sound has priority over simultaneously closing door */
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
@@ -2558,11 +2560,13 @@ unsigned int MoveDoor(unsigned int door_state)
     }
   }
 
+#if 0
   if (setup.quick_doors)
   {
     StopSound(SND_DOOR_OPENING);
     StopSound(SND_DOOR_CLOSING);
   }
+#endif
 
   if (door_state & DOOR_ACTION_1)
     door1 = door_state & DOOR_ACTION_1;
