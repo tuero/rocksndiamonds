@@ -270,7 +270,7 @@ void InitElementSmallImages()
       InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
 #endif
 
-#if 1
+#if 0
   /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
   for (i = IMG_EMC_OBJECT; i <= IMG_EMC_SPRITE; i++)
     InitElementSmallImagesScaledUp(i);

@@ -5495,6 +5495,19 @@ int get_next_element(int element)
   }
 }
 
+#if 1
+int el_act_dir2img(int element, int action, int direction)
+{
+  element = GFX_ELEMENT(element);
+
+  if (direction == MV_NO_MOVING)
+    return element_info[element].graphic[action];
+
+  direction = MV_DIR_BIT(direction);
+
+  return element_info[element].direction_graphic[action][direction];
+}
+#else
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -5502,7 +5515,21 @@ int el_act_dir2img(int element, int action, int direction)
 
   return element_info[element].direction_graphic[action][direction];
 }
+#endif
 
+#if 1
+static int el_act_dir2crm(int element, int action, int direction)
+{
+  element = GFX_ELEMENT(element);
+
+  if (direction == MV_NO_MOVING)
+    return element_info[element].crumbled[action];
+
+  direction = MV_DIR_BIT(direction);
+
+  return element_info[element].direction_crumbled[action][direction];
+}
+#else
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -5510,6 +5537,7 @@ static int el_act_dir2crm(int element, int action, int direction)
 
   return element_info[element].direction_crumbled[action][direction];
 }
+#endif
 
 int el_act2img(int element, int action)
 {
@@ -5720,10 +5748,12 @@ void InitGraphicInfo_EM(void)
 			      action_active ? action :
 			      action_other ? action :
 			      ACTION_DEFAULT);
-      int graphic = (direction == MV_NO_MOVING ?
-		     el_act2img(effective_element, effective_action) :
-		     el_act_dir2img(effective_element, effective_action,
+      int graphic = (el_act_dir2img(effective_element, effective_action,
 				    direction));
+      int crumbled = (el_act_dir2crm(effective_element, effective_action,
+				     direction));
+      int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
+      int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
       struct GraphicInfo *g = &graphic_info[graphic];
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
@@ -5861,16 +5891,9 @@ void InitGraphicInfo_EM(void)
       g_em->crumbled_border_size = 0;
 #endif
 
-#if 1
-      if (element_info[effective_element].crumbled[ACTION_DEFAULT] !=
-	  element_info[effective_element].graphic[ACTION_DEFAULT])
-#else
-      if (element_info[effective_element].crumbled[effective_action] !=
-	  element_info[effective_element].graphic[effective_action])
-#endif
+      if (base_crumbled != base_graphic && crumbled != IMG_EMPTY_SPACE)
       {
-	int crumbled_graphic = el_act2crm(effective_element, effective_action);
-	struct GraphicInfo *g_crumbled = &graphic_info[crumbled_graphic];
+	struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
 
 	g_em->has_crumbled_graphics = TRUE;
 	g_em->crumbled_bitmap = g_crumbled->bitmap;
@@ -5949,8 +5972,9 @@ void InitGraphicInfo_EM(void)
 	  last_i = i;
 	}
 
-	printf("::: EMC GFX ERROR for element %d -> %d ('%s')",
-	       i, element, element_info[element].token_name);
+	printf("::: EMC GFX ERROR for element %d -> %d ('%s') [%d, %d]",
+	       i, element, element_info[element].token_name,
+	       effective_action, direction);
 
 	if (element != effective_element)
 	  printf(" [%d ('%s')]",
