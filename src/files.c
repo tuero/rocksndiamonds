@@ -49,6 +49,7 @@
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
+#define LEVELFILE_EXTENSION	"level"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
 #else
@@ -56,6 +57,7 @@
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
+#define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"rec"
 #define SCOREFILE_EXTENSION	"sco"
 #endif
@@ -150,6 +152,52 @@ static char *getScoreDir(char *level_subdir)
   return score_dir;
 }
 
+static char *getLevelFilename(int nr)
+{
+  static char *filename = NULL;
+  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+
+  if (filename != NULL)
+    free(filename);
+
+  sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
+  filename = getPath3((leveldir[leveldir_nr].user_defined ?
+		       getUserLevelDir("") :
+		       options.level_directory),
+		      leveldir[leveldir_nr].filename,
+		      basename);
+
+  return filename;
+}
+
+static char *getTapeFilename(int nr)
+{
+  static char *filename = NULL;
+  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+
+  if (filename != NULL)
+    free(filename);
+
+  sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
+  filename = getPath2(getTapeDir(leveldir[leveldir_nr].filename), basename);
+
+  return filename;
+}
+
+static char *getScoreFilename(int nr)
+{
+  static char *filename = NULL;
+  char basename[20 + strlen(LEVELFILE_EXTENSION)];
+
+  if (filename != NULL)
+    free(filename);
+
+  sprintf(basename, "%03d.%s", nr, SCOREFILE_EXTENSION);
+  filename = getPath2(getScoreDir(leveldir[leveldir_nr].filename), basename);
+
+  return filename;
+}
+
 static void createDirectory(char *dir, char *text)
 {
   if (access(dir, F_OK) != 0)
@@ -221,7 +269,7 @@ static void setLevelInfoToDefaults()
 void LoadLevel(int level_nr)
 {
   int i, x, y;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getLevelFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char chunk[CHUNK_ID_LEN + 1];
   int file_version = FILE_VERSION_1_2;	/* last version of level files */
@@ -230,13 +278,6 @@ void LoadLevel(int level_nr)
 
   /* always start with reliable default values */
   setLevelInfoToDefaults();
-
-  if (leveldir[leveldir_nr].user_defined)
-    sprintf(filename, "%s/%s/%d",
-	    getUserLevelDir(""), leveldir[leveldir_nr].filename, level_nr);
-  else
-    sprintf(filename, "%s/%s/%d",
-	    options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
   if (!(file = fopen(filename, "r")))
   {
@@ -327,16 +368,9 @@ void LoadLevel(int level_nr)
 void SaveLevel(int level_nr)
 {
   int i, x, y;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getLevelFilename(level_nr);
   FILE *file;
   int chunk_length;
-
-  if (leveldir[leveldir_nr].user_defined)
-    sprintf(filename, "%s/%s/%d",
-	    getUserLevelDir(""), leveldir[leveldir_nr].filename, level_nr);
-  else
-    sprintf(filename, "%s/%s/%d",
-	    options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
   if (!(file = fopen(filename, "w")))
   {
@@ -399,17 +433,13 @@ void SaveLevel(int level_nr)
 void LoadTape(int level_nr)
 {
   int i, j;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getTapeFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char chunk[CHUNK_ID_LEN + 1];
   FILE *file;
   int num_participating_players;
   int file_version = FILE_VERSION_1_2;	/* last version of tape files */
   int chunk_length;
-
-  sprintf(filename, "%s/%d.%s",
-	  getTapeDir(leveldir[leveldir_nr].filename),
-	  level_nr, TAPEFILE_EXTENSION);
 
   if (!(file = fopen(filename, "r")))
     return;
@@ -559,7 +589,7 @@ void LoadTape(int level_nr)
 void SaveTape(int level_nr)
 {
   int i;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getTapeFilename(level_nr);
   FILE *file;
   boolean new_tape = TRUE;
   byte store_participating_players;
@@ -567,10 +597,6 @@ void SaveTape(int level_nr)
   int chunk_length;
 
   InitTapeDirectory(leveldir[leveldir_nr].filename);
-
-  sprintf(filename, "%s/%d.%s",
-	  getTapeDir(leveldir[leveldir_nr].filename),
-	  level_nr, TAPEFILE_EXTENSION);
 
   /* if a tape still exists, ask to overwrite it */
   if ((file = fopen(filename, "r")))
@@ -664,28 +690,26 @@ void SaveTape(int level_nr)
 void LoadScore(int level_nr)
 {
   int i;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getScoreFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char line[MAX_LINE_LEN];
   char *line_ptr;
   FILE *file;
 
-  /* start with empty score table */
+  /* always start with reliable default values */
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
     strcpy(highscore[i].Name, EMPTY_ALIAS);
     highscore[i].Score = 0;
   }
 
-  sprintf(filename, "%s/%d.%s",
-	  getScoreDir(leveldir[leveldir_nr].filename),
-	  level_nr, SCOREFILE_EXTENSION);
-
   if (!(file = fopen(filename, "r")))
     return;
 
   /* check file identifier */
   fgets(cookie, MAX_LINE_LEN, file);
+  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
+    cookie[strlen(cookie) - 1] = '\0';
 
   if (strcmp(cookie, SCORE_COOKIE) != 0)
   {
@@ -719,14 +743,10 @@ void LoadScore(int level_nr)
 void SaveScore(int level_nr)
 {
   int i;
-  char filename[MAX_FILENAME_LEN];
+  char *filename = getScoreFilename(level_nr);
   FILE *file;
 
   InitScoreDirectory(leveldir[leveldir_nr].filename);
-
-  sprintf(filename, "%s/%d.%s",
-	  getScoreDir(leveldir[leveldir_nr].filename),
-	  level_nr, SCOREFILE_EXTENSION);
 
   if (!(file = fopen(filename, "w")))
   {

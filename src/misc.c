@@ -229,9 +229,20 @@ char *getHomeDir()
 
 char *getPath2(char *path1, char *path2)
 {
-  char *complete_path = checked_malloc(strlen(path1) + strlen(path2) + 2);
+  char *complete_path = checked_malloc(strlen(path1) + 1 +
+				       strlen(path2) + 1);
 
   sprintf(complete_path, "%s/%s", path1, path2);
+  return complete_path;
+}
+
+char *getPath3(char *path1, char *path2, char *path3)
+{
+  char *complete_path = checked_malloc(strlen(path1) + 1 +
+				       strlen(path2) + 1 +
+				       strlen(path3) + 1);
+
+  sprintf(complete_path, "%s/%s/%s", path1, path2, path3);
   return complete_path;
 }
 

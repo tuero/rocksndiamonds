@@ -1,15 +1,15 @@
-/*
- *   A server for a multi-player version of Tetris
- *
- *   Copyright (C) 1996 Roger Espel Llima <roger.espel.llima@pobox.com>
- *
- *   Started: 10 Oct 1996
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation. See the file COPYING for details.
- *
- */
+/***********************************************************
+*  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
+*----------------------------------------------------------*
+*  (c) 1995-98 Artsoft Entertainment                       *
+*              Holger Schemel                              *
+*              Oststrasse 11a                              *
+*              33604 Bielefeld                             *
+*              phone: ++49 +521 290471                     *
+*              email: aeglos@valinor.owl.de                *
+*----------------------------------------------------------*
+*  network.c                                               *
+***********************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -236,16 +236,16 @@ static void new_connect(int fd)
 
 static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
 {
-  if (len != 5 || buf[2] != PROT_VERS_1 || buf[3] != PROT_VERS_2)
+  if (len != 5 || buf[2] != PROTOCOL_VERSION_1 || buf[3] != PROTOCOL_VERSION_2)
   {
     if (options.verbose)
       printf("RND_SERVER: client %d (%s) has wrong protocol version %d.%d.%d\n", u->number, u->nick, buf[2], buf[3], buf[4]);
 
     buf[0] = 0;
     buf[1] = OP_BADVERS;
-    buf[2] = PROT_VERS_1;
-    buf[3] = PROT_VERS_2;
-    buf[4] = PROT_VERS_3;
+    buf[2] = PROTOCOL_VERSION_1;
+    buf[3] = PROTOCOL_VERSION_2;
+    buf[4] = PROTOCOL_VERSION_3;
     sendtoone(u, 5);
     flushuser(u);
 
@@ -582,7 +582,7 @@ void NetworkServer(int port, int serveronly)
     printf("rocksndiamonds network server: started up, listening on port %d\n",
 	   port);
     printf("rocksndiamonds network server: using protocol version %d.%d.%d\n",
-	   PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
+	   PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
   }
 
   while(1)

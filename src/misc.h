@@ -42,6 +42,7 @@ unsigned int InitRND(long);
 char *getLoginName(void);
 char *getHomeDir(void);
 char *getPath2(char *, char *);
+char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
 void MarkTileDirty(int, int);

@@ -238,9 +238,9 @@ void SendToServer_Nickname(char *nickname)
 void SendToServer_ProtocolVersion()
 {
   buf[1] = OP_PROTOCOL_VERSION;
-  buf[2] = PROT_VERS_1;
-  buf[3] = PROT_VERS_2;
-  buf[4] = PROT_VERS_3;
+  buf[2] = PROTOCOL_VERSION_1;
+  buf[3] = PROTOCOL_VERSION_2;
+  buf[4] = PROTOCOL_VERSION_3;
 
   sendbuf(5);
 }
@@ -306,7 +306,8 @@ static void Handle_OP_BAD_PROTOCOL_VERSION()
 {
   Error(ERR_WARN, "protocol version mismatch");
   Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
-	buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
+	buf[2], buf[3],
+	PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
 }
 
 static void Handle_OP_YOUR_NUMBER()
