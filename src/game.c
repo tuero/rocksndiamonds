@@ -5310,7 +5310,8 @@ static void ChangeActiveTrap(int x, int y)
 
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
-#if 0	/* !!! let the player exacpe from a suddenly unaccessible element */
+#if 1
+  /* check if the new element is unaccessible for the player */
   if (IS_PLAYER(x, y) && !IS_ACCESSIBLE(target_element))
   {
     Bang(x, y);
@@ -6340,6 +6341,10 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   can_move = DigField(player, new_jx, new_jy, real_dx, real_dy, DF_DIG);
   if (can_move != MF_MOVING)
     return can_move;
+
+  /* check if DigField() has caused relocation of the player */
+  if (player->jx != jx || player->jy != jy)
+    return MF_NO_ACTION;
 
   StorePlayer[jx][jy] = 0;
   player->last_jx = jx;
