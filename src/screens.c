@@ -1362,6 +1362,10 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 static struct TokenInfo *setup_info;
 static int num_setup_info;
 
+static char *graphics_set_name;
+static char *sounds_set_name;
+static char *music_set_name;
+
 static void execSetupMain()
 {
   setup_mode = SETUP_MODE_MAIN;
@@ -1391,9 +1395,14 @@ static void execSetupArtwork()
   /* needed if last screen (setup choice) changed graphics, sounds or music */
   ReloadCustomArtwork();
 
-  setup.graphics_set = artwork.gfx_current->name;
-  setup.sounds_set = artwork.snd_current->name;
-  setup.music_set = artwork.mus_current->name;
+  setup.graphics_set = artwork.gfx_current->identifier;
+  setup.sounds_set = artwork.snd_current->identifier;
+  setup.music_set = artwork.mus_current->identifier;
+
+  /* needed for displaying artwork name instead of artwork identifier */
+  graphics_set_name = artwork.gfx_current->name;
+  sounds_set_name = artwork.snd_current->name;
+  music_set_name = artwork.mus_current->name;
 
   setup_mode = SETUP_MODE_ARTWORK;
   DrawSetupScreen();
@@ -1497,11 +1506,11 @@ static struct TokenInfo setup_info_sound[] =
 static struct TokenInfo setup_info_artwork[] =
 {
   { TYPE_ENTER_MENU,	execSetupChooseGraphics,"Custom Graphics"	},
-  { TYPE_STRING,	&setup.graphics_set,	""			},
+  { TYPE_STRING,	&graphics_set_name,	""			},
   { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"		},
-  { TYPE_STRING,	&setup.sounds_set,	""			},
+  { TYPE_STRING,	&sounds_set_name,	""			},
   { TYPE_ENTER_MENU,	execSetupChooseMusic,	"Custom Music"		},
-  { TYPE_STRING,	&setup.music_set,	""			},
+  { TYPE_STRING,	&music_set_name,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_STRING,	NULL,			"Override Level Artwork:"},
   { TYPE_YES_NO,	&setup.override_level_graphics,	"Graphics:"	},

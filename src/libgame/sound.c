@@ -492,7 +492,7 @@ static void ReadSoundControlFromMainProcess(SoundControl *snd_ctrl)
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 }
 
-static void WriteReloadInfoToPipe(char *set_name, int type)
+static void WriteReloadInfoToPipe(char *set_identifier, int type)
 {
   SoundControl snd_ctrl;
   TreeInfo *ti = (type == SND_CTRL_RELOAD_SOUNDS ? artwork.snd_current :
@@ -512,11 +512,11 @@ static void WriteReloadInfoToPipe(char *set_name, int type)
 
   snd_ctrl.active = FALSE;
   snd_ctrl.state = type;
-  snd_ctrl.data_len = strlen(set_name) + 1;
+  snd_ctrl.data_len = strlen(set_identifier) + 1;
 
   if (write(audio.mixer_pipe[1], &snd_ctrl,
 	    sizeof(snd_ctrl)) < 0 ||
-      write(audio.mixer_pipe[1], set_name,
+      write(audio.mixer_pipe[1], set_identifier,
 	    snd_ctrl.data_len) < 0 ||
       write(audio.mixer_pipe[1], &override_level_artwork,
 	    sizeof(boolean)) < 0 ||
@@ -549,15 +549,15 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
 		       &artwork.snd_current : &artwork.mus_current);
   TreeInfo *ti = *ti_ptr;
   unsigned long str_size1, str_size2, str_size3;
-  static char *set_name = NULL;
+  static char *set_identifier = NULL;
   boolean *override_level_artwork = (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS ?
 				     &setup.override_level_sounds :
 				     &setup.override_level_music);
 
-  if (set_name)
-    free(set_name);
+  if (set_identifier)
+    free(set_identifier);
 
-  set_name = checked_malloc(snd_ctrl->data_len);
+  set_identifier = checked_malloc(snd_ctrl->data_len);
 
   if (leveldir_current == NULL)
     leveldir_current = checked_calloc(sizeof(TreeInfo));
@@ -570,7 +570,7 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
   if (ti->fullpath != NULL)
     free(ti->fullpath);
 
-  if (read(audio.mixer_pipe[0], set_name,
+  if (read(audio.mixer_pipe[0], set_identifier,
 	   snd_ctrl->data_len) != snd_ctrl->data_len ||
       read(audio.mixer_pipe[0], override_level_artwork,
 	   sizeof(boolean)) != sizeof(boolean) ||
@@ -599,9 +599,9 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
   if (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS)
-    artwork.sounds_set_current_name = set_name;
+    artwork.snd_current_identifier = set_identifier;
   else
-    artwork.music_set_current_name = set_name;
+    artwork.mus_current_identifier = set_identifier;
 }
 
 #endif /* AUDIO_UNIX_NATIVE */
@@ -2183,25 +2183,25 @@ static void ReloadCustomMusic()
   LoadCustomMusic();
 }
 
-void InitReloadSounds(char *set_name)
+void InitReloadSounds(char *set_identifier)
 {
   if (!audio.sound_available)
     return;
 
 #if defined(AUDIO_UNIX_NATIVE)
-  WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_SOUNDS);
+  WriteReloadInfoToPipe(set_identifier, SND_CTRL_RELOAD_SOUNDS);
 #else
   ReloadCustomSounds();
 #endif
 }
 
-void InitReloadMusic(char *set_name)
+void InitReloadMusic(char *set_identifier)
 {
   if (!audio.music_available)
     return;
 
 #if defined(AUDIO_UNIX_NATIVE)
-  WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_MUSIC);
+  WriteReloadInfoToPipe(set_identifier, SND_CTRL_RELOAD_MUSIC);
 #else
   ReloadCustomMusic();
 #endif

@@ -238,9 +238,9 @@ void SendToServer_StartPlaying()
   buffer[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
   buffer[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
 
-  strcpy((char *)&buffer[10], leveldir_current->filename);
+  strcpy((char *)&buffer[10], leveldir_current->identifier);
 
-  SendBufferToServer(10 + strlen(leveldir_current->filename) + 1);
+  SendBufferToServer(10 + strlen(leveldir_current->identifier) + 1);
 }
 
 void SendToServer_PausePlaying()
@@ -417,27 +417,28 @@ static void Handle_OP_START_PLAYING()
   int new_level_nr;
   int dummy;				/* !!! HAS NO MEANING ANYMORE !!! */
   unsigned long new_random_seed;
-  char *new_leveldir_filename;
+  char *new_leveldir_identifier;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
   dummy = (buffer[4] << 8) + buffer[5];
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
-  new_leveldir_filename = (char *)&buffer[10];
+  new_leveldir_identifier = (char *)&buffer[10];
 
-  new_leveldir = getTreeInfoFromFilename(leveldir_first,new_leveldir_filename);
+  new_leveldir = getTreeInfoFromIdentifier(leveldir_first,
+					   new_leveldir_identifier);
   if (new_leveldir == NULL)
   {
-    Error(ERR_WARN, "no such level directory: '%s'", new_leveldir_filename);
+    Error(ERR_WARN, "no such level identifier: '%s'", new_leveldir_identifier);
 
     new_leveldir = leveldir_first;
-    Error(ERR_WARN, "using default level directory: '%s'", new_leveldir->name);
+    Error(ERR_WARN, "using default level set: '%s'", new_leveldir->identifier);
   }
 
   printf("OP_START_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT,
-	"client %d starts game [level %d from leveldir '%s']\n",
-	buffer[0], new_level_nr, new_leveldir->name);
+	"client %d starts game [level %d from level identifier '%s']\n",
+	buffer[0], new_level_nr, new_leveldir->identifier);
 
   leveldir_current = new_leveldir;
   level_nr = new_level_nr;

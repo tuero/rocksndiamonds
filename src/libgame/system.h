@@ -377,22 +377,25 @@ struct TreeInfo
 
   /* fields for "type == TREE_TYPE_LEVEL_DIR" */
 
-  char *filename;	/* level series single directory name */
-  char *fullpath;	/* complete path relative to level directory */
-  char *basepath;	/* absolute base path of level directory */
-  char *name;		/* level series name, as displayed on main screen */
-  char *name_short;	/* optional short name for level selection screen */
-  char *name_sorting;	/* optional sorting name for correct level sorting */
-  char *author;		/* level series author name levels without author */
-  char *imported_from;	/* optional comment for imported level series */
+  char *filename;	/* tree info sub-directory basename (may be ".") */
+  char *fullpath;	/* complete path relative to tree base directory */
+  char *basepath;	/* absolute base path of tree base directory */
+  char *identifier;	/* identifier string for configuration files */
+  char *name;		/* tree info name, as displayed in selection menues */
+  char *name_sorting;	/* optional sorting name for correct name sorting */
+  char *author;		/* level or artwork author name */
+  char *imported_from;	/* optional comment for imported levels or artwork */
+
   int levels;		/* number of levels in level series */
   int first_level;	/* first level number (to allow start with 0 or 1) */
   int last_level;	/* last level number (automatically calculated) */
   int sort_priority;	/* sort levels by 'sort_priority' and then by name */
+
   boolean level_group;	/* directory contains more level series directories */
   boolean parent_link;	/* entry links back to parent directory */
   boolean user_defined;	/* user defined levels are stored in home directory */
   boolean readonly;	/* readonly levels can not be changed with editor */
+
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
   int handicap_level;	/* number of the lowest unsolved level */
@@ -414,9 +417,9 @@ struct ArtworkInfo
   MusicDirTree *mus_first;
   MusicDirTree *mus_current;
 
-  char *graphics_set_current_name;
-  char *sounds_set_current_name;
-  char *music_set_current_name;
+  char *gfx_current_identifier;
+  char *snd_current_identifier;
+  char *mus_current_identifier;
 };
 
 

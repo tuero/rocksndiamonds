@@ -195,7 +195,7 @@ TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *);
 int numTreeInfoInGroup(TreeInfo *);
 int posTreeInfo(TreeInfo *);
 TreeInfo *getTreeInfoFromPos(TreeInfo *, int);
-TreeInfo *getTreeInfoFromFilename(TreeInfo *, char *);
+TreeInfo *getTreeInfoFromIdentifier(TreeInfo *, char *);
 void dumpTreeInfo(TreeInfo *, int);
 void sortTreeInfo(TreeInfo **,
 		  int (*compare_function)(const void *, const void *));

@@ -179,8 +179,8 @@ static void InitMixer()
 static void InitSound()
 {
   /* load custom sounds and music */
-  InitReloadSounds(artwork.snd_current->name);
-  InitReloadMusic(artwork.mus_current->name);
+  InitReloadSounds(artwork.snd_current->identifier);
+  InitReloadMusic(artwork.mus_current->identifier);
 
   /* initialize sound effect lookup table for element actions */
   InitGameSound();
@@ -411,32 +411,41 @@ void InitGfxBackground()
 
 void ReloadCustomArtwork()
 {
-  static char *leveldir_current_filename = NULL;
+  static char *leveldir_current_identifier = NULL;
   static boolean last_override_level_graphics = FALSE;
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
 
-  if (leveldir_current_filename != leveldir_current->filename)
+#if 0
+  printf("graphics --> '%s' ('%s')\n",
+	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
+  printf("sounds   --> '%s' ('%s')\n",
+	 artwork.snd_current_identifier, artwork.snd_current->filename);
+  printf("music    --> '%s' ('%s')\n",
+	 artwork.mus_current_identifier, artwork.mus_current->filename);
+#endif
+
+  if (leveldir_current_identifier != leveldir_current->identifier)
   {
-    char *filename_old = leveldir_current_filename;
-    char *filename_new = leveldir_current->filename;
+    char *identifier_old = leveldir_current_identifier;
+    char *identifier_new = leveldir_current->identifier;
 
     /* force reload of custom artwork after new level series was selected,
        but reload only that part of the artwork that really has changed */
-    if (getTreeInfoFromFilename(artwork.gfx_first, filename_old) !=
-	getTreeInfoFromFilename(artwork.gfx_first, filename_new))
-      artwork.graphics_set_current_name = NULL;
-    if (getTreeInfoFromFilename(artwork.snd_first, filename_old) !=
-	getTreeInfoFromFilename(artwork.snd_first, filename_new))
-      artwork.sounds_set_current_name = NULL;
-    if (getTreeInfoFromFilename(artwork.mus_first, filename_new) !=
-	getTreeInfoFromFilename(artwork.mus_first, filename_new))
-      artwork.music_set_current_name = NULL;
+    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
+	getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
+      artwork.gfx_current_identifier = NULL;
+    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
+	getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
+      artwork.snd_current_identifier = NULL;
+    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
+	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
+      artwork.mus_current_identifier = NULL;
 
-    leveldir_current_filename = leveldir_current->filename;
+    leveldir_current_identifier = leveldir_current->identifier;
   }
 
-  if (artwork.graphics_set_current_name != artwork.gfx_current->name ||
+  if (artwork.gfx_current_identifier != artwork.gfx_current->identifier ||
       last_override_level_graphics != setup.override_level_graphics)
   {
     int i;
@@ -457,25 +466,25 @@ void ReloadCustomArtwork()
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
 
-    artwork.graphics_set_current_name = artwork.gfx_current->name;
+    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
     last_override_level_graphics = setup.override_level_graphics;
   }
 
-  if (artwork.sounds_set_current_name != artwork.snd_current->name ||
+  if (artwork.snd_current_identifier != artwork.snd_current->identifier ||
       last_override_level_sounds != setup.override_level_sounds)
   {
-    InitReloadSounds(artwork.snd_current->name);
+    InitReloadSounds(artwork.snd_current->identifier);
 
-    artwork.sounds_set_current_name = artwork.snd_current->name;
+    artwork.snd_current_identifier = artwork.snd_current->identifier;
     last_override_level_sounds = setup.override_level_sounds;
   }
 
-  if (artwork.music_set_current_name != artwork.mus_current->name ||
+  if (artwork.mus_current_identifier != artwork.mus_current->identifier ||
       last_override_level_music != setup.override_level_music)
   {
-    InitReloadMusic(artwork.mus_current->name);
+    InitReloadMusic(artwork.mus_current->identifier);
 
-    artwork.music_set_current_name = artwork.mus_current->name;
+    artwork.mus_current_identifier = artwork.mus_current->identifier;
     last_override_level_music = setup.override_level_music;
   }
 }

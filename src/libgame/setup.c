@@ -631,9 +631,9 @@ TreeInfo *getTreeInfoFromPos(TreeInfo *node, int pos)
   return node_default;
 }
 
-TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
+TreeInfo *getTreeInfoFromIdentifier(TreeInfo *node, char *identifier)
 {
-  if (filename == NULL)
+  if (identifier == NULL)
     return NULL;
 
   while (node)
@@ -642,20 +642,14 @@ TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
     {
       TreeInfo *node_group;
 
-      node_group = getTreeInfoFromFilenameExt(node->node_group, filename);
+      node_group = getTreeInfoFromIdentifier(node->node_group, identifier);
 
       if (node_group)
 	return node_group;
     }
     else if (!node->parent_link)
     {
-      if (strcmp(filename, node->filename) == 0)
-	return node;
-
-      /* special case when looking for level series artwork:
-	 node->name_short contains level series filename */
-      if (strcmp(node->filename, ".") == 0 &&
-	  strcmp(filename, node->name_short) == 0)
+      if (strcmp(identifier, node->identifier) == 0)
 	return node;
     }
 
@@ -663,11 +657,6 @@ TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
   }
 
   return NULL;
-}
-
-TreeInfo *getTreeInfoFromFilename(TreeInfo *ti, char *filename)
-{
-  return getTreeInfoFromFilenameExt(ti, filename);
 }
 
 void dumpTreeInfo(TreeInfo *node, int depth)
@@ -682,7 +671,7 @@ void dumpTreeInfo(TreeInfo *node, int depth)
       printf(" ");
 
     printf("filename == '%s' (%s) [%s] (%d)\n",
-	   node->filename, node->name, node->name_short, node->sort_priority);
+	   node->filename, node->name, node->identifier, node->sort_priority);
 
     if (node->node_group != NULL)
       dumpTreeInfo(node->node_group, depth + 1);
@@ -1179,8 +1168,8 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 #define TOKEN_STR_HANDICAP_LEVEL	"handicap_level"
 
 /* level directory info */
-#define LEVELINFO_TOKEN_NAME		0
-#define LEVELINFO_TOKEN_NAME_SHORT	1
+#define LEVELINFO_TOKEN_IDENTIFIER	0
+#define LEVELINFO_TOKEN_NAME		1
 #define LEVELINFO_TOKEN_NAME_SORTING	2
 #define LEVELINFO_TOKEN_AUTHOR		3
 #define LEVELINFO_TOKEN_IMPORTED_FROM	4
@@ -1197,8 +1186,8 @@ static LevelDirTree ldi;
 static struct TokenInfo levelinfo_tokens[] =
 {
   /* level directory info */
+  { TYPE_STRING,  &ldi.identifier,	"identifier"	},
   { TYPE_STRING,  &ldi.name,		"name"		},
-  { TYPE_STRING,  &ldi.name_short,	"name_short"	},
   { TYPE_STRING,  &ldi.name_sorting,	"name_sorting"	},
   { TYPE_STRING,  &ldi.author,		"author"	},
   { TYPE_STRING,  &ldi.imported_from,	"imported_from"	},
@@ -1229,8 +1218,8 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
   ldi->filename = NULL;
   ldi->fullpath = NULL;
   ldi->basepath = NULL;
+  ldi->identifier = NULL;
   ldi->name = getStringCopy(ANONYMOUS_NAME);
-  ldi->name_short = NULL;
   ldi->name_sorting = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
 
@@ -1275,8 +1264,8 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->filename = NULL;
   ldi->fullpath = NULL;
   ldi->basepath = NULL;
+  ldi->identifier = NULL;
   ldi->name = getStringCopy(ANONYMOUS_NAME);
-  ldi->name_short = NULL;
   ldi->name_sorting = NULL;
   ldi->author = getStringCopy(parent->author);
   ldi->imported_from = getStringCopy(parent->imported_from);
@@ -1381,8 +1370,8 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
   ti_new->node_parent = node_parent;
   ti_new->parent_link = TRUE;
 
+  ti_new->identifier = getStringCopy(node_parent->identifier);
   ti_new->name = ".. (parent directory)";
-  ti_new->name_short = getStringCopy(ti_new->name);
   ti_new->name_sorting = getStringCopy(ti_new->name);
 
   ti_new->filename = "..";
@@ -1444,8 +1433,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   DrawInitText(leveldir_new->name, 150, FC_YELLOW);
 
-  if (leveldir_new->name_short == NULL)
-    leveldir_new->name_short = getStringCopy(leveldir_new->name);
+  if (leveldir_new->identifier == NULL)
+    leveldir_new->identifier = getStringCopy(leveldir_new->filename);
 
   if (leveldir_new->name_sorting == NULL)
     leveldir_new->name_sorting = getStringCopy(leveldir_new->name);
@@ -1662,8 +1651,8 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     DrawInitText(artwork_new->name, 150, FC_YELLOW);
 #endif
 
-    if (artwork_new->name_short == NULL)
-      artwork_new->name_short = getStringCopy(artwork_new->name);
+    if (artwork_new->identifier == NULL)
+      artwork_new->identifier = getStringCopy(artwork_new->filename);
 
     if (artwork_new->name_sorting == NULL)
       artwork_new->name_sorting = getStringCopy(artwork_new->name);
@@ -1696,22 +1685,25 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     {
       if (artwork_new->user_defined)
       {
-	artwork_new->name = getStringCopy("private");
+	artwork_new->identifier = getStringCopy("private");
 	artwork_new->sort_priority = ARTWORKCLASS_USER;
       }
       else
       {
-	artwork_new->name = getStringCopy("classic");
+	artwork_new->identifier = getStringCopy("classic");
 	artwork_new->sort_priority = ARTWORKCLASS_CLASSICS;
       }
 
+      /* set to new values after changing ".sort_priority" */
       artwork_new->color = ARTWORKCOLOR(artwork_new);
       artwork_new->class_desc = getLevelClassDescription(artwork_new);
     }
     else
-      artwork_new->name = getStringCopy(artwork_new->filename);
+    {
+      artwork_new->identifier = getStringCopy(artwork_new->filename);
+    }
 
-    artwork_new->name_short = getStringCopy(artwork_new->name);
+    artwork_new->name = getStringCopy(artwork_new->identifier);
     artwork_new->name_sorting = getStringCopy(artwork_new->name);
   }
 
@@ -1797,8 +1789,8 @@ static TreeInfo *getDummyArtworkInfo(int type)
   if (artwork_new->name != NULL)
     free(artwork_new->name);
 
+  artwork_new->identifier   = getStringCopy(NOT_AVAILABLE);
   artwork_new->name         = getStringCopy(NOT_AVAILABLE);
-  artwork_new->name_short   = getStringCopy(NOT_AVAILABLE);
   artwork_new->name_sorting = getStringCopy(NOT_AVAILABLE);
 
   return artwork_new;
@@ -1838,28 +1830,28 @@ void LoadArtworkInfo()
 
   /* before sorting, the first entries will be from the user directory */
   artwork.gfx_current =
-    getTreeInfoFromFilename(artwork.gfx_first, setup.graphics_set);
+    getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
   if (artwork.gfx_current == NULL)
     artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
 
   artwork.snd_current =
-    getTreeInfoFromFilename(artwork.snd_first, setup.sounds_set);
+    getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
   if (artwork.snd_current == NULL)
     artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
 
   artwork.mus_current =
-    getTreeInfoFromFilename(artwork.mus_first, setup.music_set);
+    getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
   if (artwork.mus_current == NULL)
     artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
-  artwork.graphics_set_current_name = artwork.gfx_current->name;
-  artwork.sounds_set_current_name = artwork.snd_current->name;
-  artwork.music_set_current_name = artwork.mus_current->name;
+  artwork.gfx_current_identifier = artwork.gfx_current->identifier;
+  artwork.snd_current_identifier = artwork.snd_current->identifier;
+  artwork.mus_current_identifier = artwork.mus_current->identifier;
 
 #if 0
-  printf("graphics set == %s\n\n", artwork.graphics_set_current_name);
-  printf("sounds set == %s\n\n", artwork.sounds_set_current_name);
-  printf("music set == %s\n\n", artwork.music_set_current_name);
+  printf("graphics set == %s\n\n", artwork.gfx_current_identifier);
+  printf("sounds set == %s\n\n", artwork.snd_current_identifier);
+  printf("music set == %s\n\n", artwork.mus_current_identifier);
 #endif
 
   sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
@@ -1898,13 +1890,13 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 
       if (topnode_last != *artwork_node)
       {
+	free((*artwork_node)->identifier);
 	free((*artwork_node)->name);
 	free((*artwork_node)->name_sorting);
-	free((*artwork_node)->name_short);
 
+	(*artwork_node)->identifier   = getStringCopy(level_node->filename);
 	(*artwork_node)->name         = getStringCopy(level_node->name);
 	(*artwork_node)->name_sorting = getStringCopy(level_node->name);
-	(*artwork_node)->name_short   = getStringCopy(level_node->filename);
 
 	(*artwork_node)->sort_priority = level_node->sort_priority;
 	(*artwork_node)->color = LEVELCOLOR((*artwork_node));
@@ -1927,6 +1919,31 @@ void LoadLevelArtworkInfo()
   LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first);
   LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first);
   LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first);
+
+  /* needed for reloading level artwork not known at ealier stage */
+  if (strcmp(artwork.gfx_current_identifier, setup.graphics_set) != 0)
+  {
+    artwork.gfx_current =
+      getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
+    if (artwork.gfx_current == NULL)
+      artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
+  }
+
+  if (strcmp(artwork.snd_current_identifier, setup.sounds_set) != 0)
+  {
+    artwork.snd_current =
+      getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
+    if (artwork.snd_current == NULL)
+      artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
+  }
+
+  if (strcmp(artwork.mus_current_identifier, setup.music_set) != 0)
+  {
+    artwork.mus_current =
+      getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
+    if (artwork.mus_current == NULL)
+      artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
+  }
 
   sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
@@ -1968,7 +1985,7 @@ static void SaveUserLevelInfo()
 						 getCookie("LEVELINFO")));
 
   for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
-    if (i != LEVELINFO_TOKEN_NAME_SHORT &&
+    if (i != LEVELINFO_TOKEN_IDENTIFIER &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
 	i != LEVELINFO_TOKEN_IMPORTED_FROM)
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
@@ -2081,8 +2098,8 @@ void LoadLevelSetup_LastSeries()
     char *last_level_series =
       getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
-    leveldir_current = getTreeInfoFromFilename(leveldir_first,
-					       last_level_series);
+    leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
+						 last_level_series);
     if (leveldir_current == NULL)
       leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
