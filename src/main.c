@@ -136,17 +136,6 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
-#if 0
-/* sound effects: setup file identifiers and corresponding default filenames */
-struct SoundEffectInfo sound_effects[NUM_SOUND_EFFECTS] =
-{
-  { "infotron_collecting",		"infotron.wav"		}, /* TEST */
-  { "zonk_falling",			SND_FILE_UNDEFINED	}, /* TEST */
-  { "zonk_pushing",			"zonkpush.wav"		}, /* TEST */
-  { "player_screaming",			"autsch.wav"		}  /* TEST */
-};
-#endif
-
 struct SoundEffectInfo sound_effects[] =
 {
   /* sounds for Boulder Dash style elements and actions */

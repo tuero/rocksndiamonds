@@ -76,6 +76,7 @@
 #define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
+#if 0
 #define IS_LOOP_SOUND(s)	((s) == SND_BD_MAGIC_WALL_RUNNING ||	\
 	 			 (s) == SND_BD_BUTTERFLY_MOVING ||	\
 				 (s) == SND_BD_FIREFLY_MOVING ||	\
@@ -98,6 +99,7 @@
 	 			 (s) == SND_PIG_MOVING ||	\
 				 (s) == SND_DRAGON_MOVING ||	\
 	 			 (s) == SND_DRAGON_BREATHING_FIRE)
+#endif
 
 /* values for player movement speed (which is in fact a delay value) */
 #define MOVE_DELAY_NORMAL_SPEED	8
@@ -127,6 +129,36 @@ static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
+
+static boolean is_loop_sound[NUM_SOUND_EFFECTS];
+static boolean is_loop_sound_initialized = FALSE;
+static int loop_sounds[] =
+{
+  SND_BD_MAGIC_WALL_RUNNING,
+  SND_BD_BUTTERFLY_MOVING,
+  SND_BD_FIREFLY_MOVING,
+  SND_SP_SNIKSNAK_MOVING,
+  SND_SP_ELECTRON_MOVING,
+  SND_DYNAMITE_BURNING,
+  SND_BUG_MOVING,
+  SND_SPACESHIP_MOVING,
+  SND_YAMYAM_MOVING,
+  SND_YAMYAM_WAITING,
+  SND_ROBOT_WHEEL_RUNNING,
+  SND_MAGIC_WALL_RUNNING,
+  SND_BALLOON_MOVING,
+  SND_MOLE_MOVING,
+  SND_TIMEGATE_WHEEL_RUNNING,
+  SND_CONVEYOR_BELT_RUNNING,
+  SND_DYNABOMB_BURNING,
+  SND_PACMAN_MOVING,
+  SND_PENGUIN_MOVING,
+  SND_PIG_MOVING,
+  SND_DRAGON_MOVING,
+  SND_DRAGON_BREATHING_FIRE
+};
+
+#define IS_LOOP_SOUND(x)	(is_loop_sound[x])
 
 
 
@@ -719,6 +751,20 @@ void InitGame()
       if (local_player == player)
 	printf("Player 	%d is local player.\n", i+1);
     }
+  }
+
+  /* initialize sound effect properties */
+  if (!is_loop_sound_initialized)
+  {
+    int i;
+
+    for (i=0; i<NUM_SOUND_EFFECTS; i++)
+      is_loop_sound[i] = FALSE;
+
+    for (i=0; i<SIZEOF_ARRAY_INT(loop_sounds); i++)
+      is_loop_sound[loop_sounds[i]] = TRUE;
+
+    is_loop_sound_initialized = TRUE;
   }
 
   game.version = (tape.playing ? tape.game_version : level.game_version);

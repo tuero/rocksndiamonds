@@ -2091,8 +2091,10 @@ void FreeAllSounds()
   if (Sound == NULL)
     return;
 
+#if 0
   printf("%s: FREEING SOUNDS ...\n",
 	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+#endif
 
   for(i=0; i<num_sounds; i++)
     deleteSoundEntry(&Sound[i]);
@@ -2100,8 +2102,10 @@ void FreeAllSounds()
     FreeSound(Sound[i]);
   */
 
+#if 0
   printf("%s: FREEING SOUNDS -- DONE\n",
 	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+#endif
 
   free(Sound);
 
