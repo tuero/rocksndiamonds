@@ -334,12 +334,6 @@ void HandleButton(int mx, int my, int button)
   {
     old_mx = mx;
     old_my = my;
-
-    /*
-    HandleVideoButtons(mx,my, button);
-    HandleSoundButtons(mx,my, button);
-    HandleGameButtons(mx,my, button);
-    */
   }
 
   HandleGadgets(mx, my, button);

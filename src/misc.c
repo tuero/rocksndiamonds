@@ -579,6 +579,46 @@ void *checked_calloc(unsigned long size)
   return ptr;
 }
 
+void getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length,
+		  int byte_order)
+{
+  const int chunk_identifier_length = 4;
+
+  fgets(chunk_buffer, chunk_identifier_length + 1, file);
+
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+    *chunk_length = ((fgetc(file) << 24) |
+		     (fgetc(file) << 16) |
+		     (fgetc(file) <<  8)  |
+		     (fgetc(file) <<  0));
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+    *chunk_length = ((fgetc(file) <<  0) |
+		     (fgetc(file) <<  8) |
+		     (fgetc(file) << 16)  |
+		     (fgetc(file) << 24));
+}
+
+void putFileChunk(FILE *file, char *chunk_name, int chunk_length,
+		  int byte_order)
+{
+  fputs(chunk_name, file);
+
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+  {
+    fputc((chunk_length >> 24) & 0xff, file);
+    fputc((chunk_length >> 16) & 0xff, file);
+    fputc((chunk_length >>  8) & 0xff, file);
+    fputc((chunk_length >>  0) & 0xff, file);
+  }
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+  {
+    fputc((chunk_length >>  0) & 0xff, file);
+    fputc((chunk_length >>  8) & 0xff, file);
+    fputc((chunk_length >> 16) & 0xff, file);
+    fputc((chunk_length >> 24) & 0xff, file);
+  }
+}
+
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
 #define TRANSLATE_X11KEYNAME_TO_KEYSYM	2

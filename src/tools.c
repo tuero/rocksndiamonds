@@ -1862,12 +1862,7 @@ boolean Request(char *text, unsigned int req_state)
 	    DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
 
   /* clear door drawing field */
-#if 0
-  XFillRectangle(display, pix[PIX_DB_DOOR], gc,
-		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE);
-#else
   XFillRectangle(display, drawto, gc, DX, DY, DXSIZE, DYSIZE);
-#endif
 
   /* write text for request */
   for(ty=0; ty<13; ty++)
@@ -1892,36 +1887,11 @@ boolean Request(char *text, unsigned int req_state)
     }
     sprintf(txt, text); 
     txt[tl] = 0;
-#if 0
-    DrawTextExt(pix[PIX_DB_DOOR], gc,
-		DOOR_GFX_PAGEX1 + 51 - (tl * 14)/2, SY + ty * 16,
-		txt, FS_SMALL, FC_YELLOW);
-#else
     DrawTextExt(drawto, gc,
 		DX + 51 - (tl * 14)/2, DY + 8 + ty * 16,
 		txt, FS_SMALL, FC_YELLOW);
-#endif
     text += tl + (tc == 32 ? 1 : 0);
   }
-
-#if 0
-  if (req_state & REQ_ASK)
-  {
-    DrawYesNoButton(BUTTON_OK, DB_INIT);
-    DrawYesNoButton(BUTTON_NO, DB_INIT);
-  }
-  else if (req_state & REQ_CONFIRM)
-  {
-    DrawConfirmButton(BUTTON_CONFIRM, DB_INIT);
-  }
-  else if (req_state & REQ_PLAYER)
-  {
-    DrawPlayerButton(BUTTON_PLAYER_1, DB_INIT);
-    DrawPlayerButton(BUTTON_PLAYER_2, DB_INIT);
-    DrawPlayerButton(BUTTON_PLAYER_3, DB_INIT);
-    DrawPlayerButton(BUTTON_PLAYER_4, DB_INIT);
-  }
-#else
 
   if (req_state & REQ_ASK)
   {
@@ -1944,8 +1914,6 @@ boolean Request(char *text, unsigned int req_state)
   XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
 	    DX, DY, DXSIZE, DYSIZE,
 	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-#endif
 
   OpenDoor(DOOR_OPEN_1);
   ClearEventQueue();
@@ -1974,11 +1942,6 @@ boolean Request(char *text, unsigned int req_state)
 	case ButtonRelease:
 	case MotionNotify:
 	{
-
-#if 0
-	  int choice;
-#endif
-
 	  if (event.type == MotionNotify)
 	  {
 	    Window root, child;
@@ -2007,46 +1970,6 @@ boolean Request(char *text, unsigned int req_state)
 	    else
 	      button_status = MB_RELEASED;
 	  }
-
-
-
-#if 0
-	  if (req_state & REQ_ASK)
-	    choice = CheckYesNoButtons(mx,my,button_status);
-	  else if (req_state & REQ_CONFIRM)
-	    choice = CheckConfirmButton(mx,my,button_status);
-	  else
-	    choice = CheckPlayerButtons(mx,my,button_status);
-
-	  switch(choice)
-	  {
-	    case BUTTON_OK:
-	      result = TRUE;
-	      break;
-	    case BUTTON_NO:
-	      result = FALSE;
-	      break;
-	    case BUTTON_CONFIRM:
-	      result = TRUE | FALSE;
-	      break;
-
-	    case BUTTON_PLAYER_1:
-	      result = 1;
-	      break;
-	    case BUTTON_PLAYER_2:
-	      result = 2;
-	      break;
-	    case BUTTON_PLAYER_3:
-	      result = 3;
-	      break;
-	    case BUTTON_PLAYER_4:
-	      result = 4;
-	      break;
-
-	    default:
-	      break;
-	  }
-#else
 
 	  /* this sets 'request_gadget_id' */
 	  HandleGadgets(mx, my, button_status);
@@ -2079,7 +2002,6 @@ boolean Request(char *text, unsigned int req_state)
 	    default:
 	      break;
 	  }
-#endif
 
 	  break;
 	}

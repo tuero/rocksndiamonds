@@ -125,22 +125,11 @@ struct SoundHeader_8SVX
   char magic_8SVX[4];
 };
 
-struct SoundHeader_WAV
-{
-  char magic_RIFF[4];
-  unsigned long header_size;
-  char magic_WAVE[4];
-  char some_stuff[24];
-  char magic_DATA[4];
-  unsigned long data_size;
-};
-
 struct SoundInfo
 { 
   char *name;
-  byte *file_ptr;
   byte *data_ptr;
-  long file_len, data_len;
+  long data_len;
 #ifdef MSDOS
   SAMPLE *sample_ptr;
 #endif

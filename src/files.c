@@ -275,27 +275,6 @@ static void InitUserLevelDirectory(char *level_subdir)
   }
 }
 
-static void getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length)
-{
-  fgets(chunk_buffer, CHUNK_ID_LEN + 1, file);
-
-  *chunk_length =
-    (fgetc(file) << 24) |
-    (fgetc(file) << 16) |
-    (fgetc(file) <<  8)  |
-    (fgetc(file) <<  0);
-}
-
-static void putFileChunk(FILE *file, char *chunk_name, int chunk_length)
-{
-  fputs(chunk_name, file);
-
-  fputc((chunk_length >> 24) & 0xff, file);
-  fputc((chunk_length >> 16) & 0xff, file);
-  fputc((chunk_length >>  8) & 0xff, file);
-  fputc((chunk_length >>  0) & 0xff, file);
-}
-
 static void setLevelInfoToDefaults()
 {
   int i, x, y;
@@ -406,7 +385,7 @@ void LoadLevel(int level_nr)
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length);
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     if (strcmp(chunk, "HEAD") || chunk_length != LEVEL_HEADER_SIZE)
     {
       Error(ERR_WARN, "wrong 'HEAD' chunk of level file '%s'", filename);
@@ -456,7 +435,7 @@ void LoadLevel(int level_nr)
   /* read chunk "BODY" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length);
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
 
     /* look for optional author chunk */
     if (strcmp(chunk, "AUTH") == 0 && chunk_length == MAX_LEVEL_AUTHOR_LEN)
@@ -465,7 +444,7 @@ void LoadLevel(int level_nr)
 	level.author[i]	= fgetc(file);
       level.author[MAX_LEVEL_NAME_LEN] = 0;
 
-      getFileChunk(file, chunk, &chunk_length);
+      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     }
 
     /* look for optional content chunk */
@@ -481,7 +460,7 @@ void LoadLevel(int level_nr)
 	  for(x=0; x<3; x++)
 	    level.mampfer_inhalt[i][x][y] = fgetc(file);
 
-      getFileChunk(file, chunk, &chunk_length);
+      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     }
 
     /* next check body chunk identifier and chunk length */
@@ -530,7 +509,7 @@ void SaveLevel(int level_nr)
   fputs(LEVEL_COOKIE, file);		/* file identifier */
   fputc('\n', file);
 
-  putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE);
+  putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
 
   fputc(level.fieldx, file);
   fputc(level.fieldy, file);
@@ -557,12 +536,12 @@ void SaveLevel(int level_nr)
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
     fputc(0, file);
 
-  putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN);
+  putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
 
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
     fputc(level.author[i], file);
 
-  putFileChunk(file, "CONT", 4 + 8 * 3 * 3);
+  putFileChunk(file, "CONT", 4 + 8 * 3 * 3, BYTE_ORDER_BIG_ENDIAN);
 
   fputc(EL_MAMPFER, file);
   fputc(MampferMax, file);
@@ -574,7 +553,7 @@ void SaveLevel(int level_nr)
       for(x=0; x<3; x++)
 	fputc(level.mampfer_inhalt[i][x][y], file);
 
-  putFileChunk(file, "BODY", lev_fieldx * lev_fieldy);
+  putFileChunk(file, "BODY", lev_fieldx * lev_fieldy, BYTE_ORDER_BIG_ENDIAN);
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++) 

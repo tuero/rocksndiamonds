@@ -250,25 +250,6 @@
 
 void DrawVideoDisplay(unsigned long, unsigned long);
 void DrawCompleteVideoDisplay(void);
-void DrawSoundDisplay(unsigned long);
-void DrawGameButton(unsigned long);
-void DrawYesNoButton(unsigned long, int);
-void DrawConfirmButton(unsigned long, int);
-void DrawPlayerButton(unsigned long, int);
-void DrawEditButton(unsigned long state);
-void DrawCtrlButton(unsigned long state);
-void DrawElemButton(int, int);
-void DrawCountButton(int, int);
-int CheckVideoButtons(int, int, int);
-int CheckSoundButtons(int, int, int);
-int CheckGameButtons(int, int, int);
-int CheckYesNoButtons(int, int, int);
-int CheckConfirmButton(int, int, int);
-int CheckPlayerButtons(int, int, int);
-int CheckEditButtons(int, int, int);
-int CheckCtrlButtons(int, int, int);
-int CheckElemButtons(int, int, int);
-int CheckCountButtons(int, int, int);
 
 
 /* NEW GADGET STUFF -------------------------------------------------------- */
