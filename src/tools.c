@@ -5728,6 +5728,10 @@ void InitGraphicInfo_EM(void)
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
       int src_x, src_y;
+      /* ensure to get symmetric 3-frame, 2-delay animations as used in EM */
+      boolean special_animation = (g->anim_frames == 3 &&
+				   g->anim_delay == 2 &&
+				   g->anim_mode & ANIM_LINEAR);
       int sync_frame = (i == Xdrip_stretch ? 7 :
 			i == Xdrip_stretchB ? 7 :
 			i == Ydrip_s2 ? j + 8 :
@@ -5819,6 +5823,7 @@ void InitGraphicInfo_EM(void)
 			i == Xboom_2 && j == 5 ? 12 :
 			i == Xboom_2 && j == 6 ? 12 :
 			i == Xboom_2 && j == 7 ? 12 :
+			special_animation && j == 4 ? 3 :
 			effective_action != action ? 0 :
 			j);
 
