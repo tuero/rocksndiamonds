@@ -265,4 +265,9 @@ typedef XClientMessageEvent	ClientMessageEvent;
 #define KEY_F23			XK_F23
 #define KEY_F24			XK_F24
 
+
+/* X11 function definitions */
+
+inline void X11InitBufferedDisplay(DrawBuffer *, DrawWindow *);
+
 #endif /* X11_H */

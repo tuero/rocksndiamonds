@@ -35,11 +35,13 @@ struct PictureFileInfo
   boolean picture_with_mask;
 };
 
+#if 0
 struct IconFileInfo
 {
   char *picture_filename;
   char *picturemask_filename;
 };
+#endif
 
 #ifndef USE_SDL_LIBRARY
 static int sound_process_id = 0;
@@ -48,10 +50,14 @@ static int sound_process_id = 0;
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
+#if 0
 static void InitDisplay(void);
+#endif
 static void InitSound(void);
 static void InitSoundServer(void);
+#if 0
 static void InitWindow(int, char **);
+#endif
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void LoadGfx(int, struct PictureFileInfo *);
@@ -87,13 +93,27 @@ void OpenAll(int argc, char *argv[])
   signal(SIGINT, CloseAllAndExit);
   signal(SIGTERM, CloseAllAndExit);
 
+
+  InitBufferedDisplay(&backbuffer, &window);
+  InitEventFilter(FilterMouseMotionEvents);
+
+
+
+#if 0
+
   InitDisplay();
   InitWindow(argc, argv);
 
+#if 0
 #ifndef USE_SDL_LIBRARY
   XMapWindow(display, window);
   FlushDisplay();
 #endif
+#endif
+
+#endif
+
+
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
@@ -395,6 +415,10 @@ void InitJoysticks()
 #endif /* !USE_SDL_LIBRARY */
 }
 
+
+
+#if 0
+
 void InitDisplay()
 {
 #ifdef USE_SDL_LIBRARY
@@ -591,6 +615,10 @@ void InitWindow(int argc, char *argv[])
 #endif /* !USE_SDL_LIBRARY */
 }
 
+#endif
+
+
+
 void InitGfx()
 {
   int i, j;
@@ -702,45 +730,17 @@ void InitGfx()
 
   /* create additional image buffers for double-buffering */
 
+#if 0
+  pix[PIX_DB_BACK] = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+#endif
+  pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+  pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+
+
+
+#if 0
+
 #ifdef USE_SDL_LIBRARY
-
-  /* create some native image surfaces for double-buffer purposes */
-
-  /* create double-buffer surface for background image */
-  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
-					    WIN_XSIZE, WIN_YSIZE,
-					    WIN_SDL_DEPTH, 0, 0, 0, 0))
-      == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-  if ((pix[PIX_DB_BACK] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(sdl_image_tmp);
-
-  /* create double-buffer surface for door image */
-  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
-					    3 * DXSIZE, DYSIZE + VYSIZE,
-					    WIN_SDL_DEPTH, 0, 0, 0, 0))
-      == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-  if ((pix[PIX_DB_DOOR] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(sdl_image_tmp);
-
-  /* create double-buffer surface for field image */
-  if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
-					    FXSIZE, FYSIZE,
-					    WIN_SDL_DEPTH, 0, 0, 0, 0))
-      == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-  if ((pix[PIX_DB_FIELD] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(sdl_image_tmp);
 
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
@@ -758,22 +758,11 @@ void InitGfx()
   window = pix[PIX_DB_BACK];		/* 'window' is only symbolic buffer */
   pix[PIX_DB_BACK] = backbuffer;	/* 'backbuffer' is SDL screen buffer */
 
-#else /* !USE_SDL_LIBRARY */
-
-  pix[PIX_DB_BACK] = XCreatePixmap(display, window,
-				   WIN_XSIZE,WIN_YSIZE,
-				   XDefaultDepth(display,screen));
-  pix[PIX_DB_DOOR] = XCreatePixmap(display, window,
-				   3*DXSIZE,DYSIZE+VYSIZE,
-				   XDefaultDepth(display,screen));
-  pix[PIX_DB_FIELD] = XCreatePixmap(display, window,
-				    FXSIZE,FYSIZE,
-				    XDefaultDepth(display,screen));
-
-  if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR] || !pix[PIX_DB_FIELD])
-    Error(ERR_EXIT, "cannot create additional pixmaps");
-
 #endif /* !USE_SDL_LIBRARY */
+
+#endif
+
+
 
 #if DEBUG_TIMING
   debug_print_timestamp(0, NULL);	/* initialize timestamp function */

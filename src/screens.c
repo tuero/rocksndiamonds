@@ -86,6 +86,9 @@ void DrawMainMenu()
 
   /* needed if last screen was the setup screen and fullscreen state changed */
   ChangeVideoModeIfNeeded();
+#ifdef USE_SDL_LIBRARY
+  SetDrawtoField(DRAW_BACKBUFFER);
+#endif
 
   /* map gadgets for main menu screen */
   MapTapeButtons();

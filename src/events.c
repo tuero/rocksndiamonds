@@ -33,7 +33,7 @@
    delay problems with lots of mouse motion events when mouse
    button not pressed */
 
-int EventFilter(const Event *event)
+int FilterMouseMotionEvents(const Event *event)
 {
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
@@ -55,7 +55,7 @@ void EventLoop(void)
 
       NextEvent(&event);
 
-      if (EventFilter(&event))
+      if (FilterMouseMotionEvents(&event))
       {
   	switch(event.type)
   	{

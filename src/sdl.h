@@ -27,6 +27,11 @@
 #endif
 
 
+/* definitions needed for "system.c" */
+
+#define SURFACE_FLAGS		(SDL_SWSURFACE)
+
+
 /* system dependent definitions */
 
 #define PLATFORM_STRING		"SDL"
@@ -298,6 +303,8 @@ typedef int			Colormap;
 
 /* SDL function definitions */
 
+inline void SDLInitBufferedDisplay(DrawBuffer *, DrawWindow *);
+inline boolean SDLSetVideoMode(Bitmap *, DrawWindow *);
 inline void SDLCopyArea(SDL_Surface *, SDL_Surface *,
                         int, int, int, int, int, int);
 inline void SDLFillRectangle(SDL_Surface *, int, int, int, int, unsigned int);

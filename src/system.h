@@ -15,10 +15,6 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#if !defined(USE_SDL_LIBRARY)
-#define USE_X11_LIBRARY
-#endif
-
 #if defined(XPM_INCLUDE_FILE) && !defined(MSDOS)
 #define USE_XPM_LIBRARY
 #include XPM_INCLUDE_FILE
@@ -28,15 +24,32 @@
 #include "msdos.h"
 #endif
 
-#define FULLSCREEN_NOT_AVAILABLE	FALSE
-#define FULLSCREEN_AVAILABLE		TRUE
-
 #if defined(USE_SDL_LIBRARY)
 #include "sdl.h"
 #elif defined(USE_X11_LIBRARY)
 #include "x11.h"
 #endif
 
+
+/* system-wide contant definitions */
+
+#define DEFAULT_DEPTH			0
+
+#define FULLSCREEN_NOT_AVAILABLE	FALSE
+#define FULLSCREEN_AVAILABLE		TRUE
+
+
+/* system-wide type definitions */
+
+typedef int (*EventFilter)(const Event *);
+
+
+/* system-wide function definitions */
+
+inline void InitEventFilter(EventFilter);
+inline void InitBufferedDisplay(DrawBuffer *, DrawWindow *);
+inline int GetDisplayDepth(void);
+inline Bitmap CreateBitmap(int, int, int);
 inline void ClearRectangle(Bitmap, int, int, int, int);
 inline void BlitBitmap(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void SetClipMask(GC, Pixmap);

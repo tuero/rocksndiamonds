@@ -56,7 +56,7 @@ endif
 SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)
 SDL_LDFLAGS := $(SDL_EXTRA_LIBS) $(shell sdl-config --libs)
 
-X11_CFLAGS = $(X11_INCL)
+X11_CFLAGS = -DUSE_X11_LIBRARY $(X11_INCL)
 X11_LDFLAGS = $(X11_LIBS) -lX11
 
 ifeq ($(USE_SDL),true)

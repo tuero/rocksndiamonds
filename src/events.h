@@ -16,7 +16,7 @@
 
 #include "main.h"
 
-int EventFilter(const Event *);
+int FilterMouseMotionEvents(const Event *);
 void EventLoop(void);
 void HandleOtherEvents(Event *);
 void ClearEventQueue(void);

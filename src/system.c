@@ -14,7 +14,60 @@
 
 #include "main.h"
 #include "misc.h"
-#include "tools.h"
+
+inline void InitEventFilter(EventFilter filter_function)
+{
+#ifdef USE_SDL_LIBRARY
+  /* set event filter to filter out certain events */
+  SDL_SetEventFilter(filter_function);
+#endif
+}
+
+inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
+{
+#ifdef USE_SDL_LIBRARY
+  SDLInitBufferedDisplay(backbuffer, window);
+#else
+  X11InitBufferedDisplay(backbuffer, window);
+#endif
+}
+
+inline int GetDisplayDepth(void)
+{
+#ifdef USE_SDL_LIBRARY
+  return SDL_GetVideoSurface()->format->BitsPerPixel;
+#else
+  return XDefaultDepth(display, screen);
+#endif
+}
+
+inline Bitmap CreateBitmap(int width, int height, int depth)
+{
+  int real_depth = (depth == DEFAULT_DEPTH ? GetDisplayDepth() : depth);
+
+#ifdef USE_SDL_LIBRARY
+  SDL_Surface *surface_tmp, *surface_native;
+
+  if ((surface_tmp = SDL_CreateRGBSurface(SURFACE_FLAGS, width, height,
+					  real_depth, 0, 0, 0, 0))
+      == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+  if ((surface_native = SDL_DisplayFormat(surface_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  SDL_FreeSurface(surface_tmp);
+
+  return surface_native;
+#else
+  Pixmap pixmap;
+
+  if (!(pixmap = XCreatePixmap(display, window, width, height, real_depth)))
+    Error(ERR_EXIT, "cannot create pixmap");
+
+  return pixmap;
+#endif
+}
 
 inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
 {
@@ -187,63 +240,11 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 
 inline boolean SetVideoMode(void)
 {
+#ifdef USE_SDL_LIBRARY
+  return SDLSetVideoMode(&backbuffer, &window);
+#else
   boolean success = TRUE;
 
-#ifdef USE_SDL_LIBRARY
-  if (setup.fullscreen && !fullscreen_enabled && fullscreen_available)
-  {
-    /* switch display to fullscreen mode, if available */
-    DrawWindow window_old = backbuffer;
-    DrawWindow window_new;
-
-    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				       SDL_HWSURFACE|SDL_FULLSCREEN))
-	== NULL)
-    {
-      /* switching display to fullscreen mode failed */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-
-      /* do not try it again */
-      fullscreen_available = FALSE;
-      success = FALSE;
-    }
-    else
-    {
-      if (window_old)
-	SDL_FreeSurface(window_old);
-      backbuffer = window_new;
-
-      fullscreen_enabled = TRUE;
-      success = TRUE;
-    }
-  }
-
-  if ((!setup.fullscreen && fullscreen_enabled) || !backbuffer)
-  {
-    /* switch display to window mode */
-    DrawWindow window_old = backbuffer;
-    DrawWindow window_new;
-
-    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				       SDL_HWSURFACE))
-	== NULL)
-    {
-      /* switching display to window mode failed -- should not happen */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-
-      success = FALSE;
-    }
-    else
-    {
-      if (window_old)
-	SDL_FreeSurface(window_old);
-      backbuffer = window_new;
-
-      fullscreen_enabled = FALSE;
-      success = TRUE;
-    }
-  }
-#else
   if (setup.fullscreen && fullscreen_available)
   {
     Error(ERR_WARN, "fullscreen not available in X11 version");
@@ -253,9 +254,9 @@ inline boolean SetVideoMode(void)
 
     success = FALSE;
   }
-#endif
 
   return success;
+#endif
 }
 
 inline void ChangeVideoModeIfNeeded(void)
@@ -264,7 +265,6 @@ inline void ChangeVideoModeIfNeeded(void)
   if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
       (!setup.fullscreen && fullscreen_enabled))
     SetVideoMode();
-  SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 }
 
