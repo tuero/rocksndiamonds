@@ -690,7 +690,7 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
 {
   int phase;
 
-  if (mode == ANIM_PINGPONG)
+  if (mode & ANIM_PINGPONG)
   {
     int max_anim_frames = 2 * frames - 2;
 
@@ -700,7 +700,7 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   else
     phase = (FrameCounter % (delay * frames)) / delay;
 
-  if (mode == ANIM_REVERSE)
+  if (mode & ANIM_REVERSE)
     phase = -phase;
 
   return phase;
@@ -765,9 +765,9 @@ void DrawGraphicAnimationExt(int x, int y, int graphic,
 
 void DrawNewGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
 {
+#if 0
   int delay = new_graphic_info[graphic].anim_delay;
 
-#if 0
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
 #else
   if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -1500,7 +1500,7 @@ inline static int getGfxAction(int x, int y)
 }
 
 void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
-			  int cut_mode, int mask_mode)
+			     int cut_mode, int mask_mode)
 {
   int ux = LEVELX(x), uy = LEVELY(y);
   int move_dir = MovDir[ux][uy];
@@ -1521,9 +1521,15 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     if (left_stopped && right_stopped)
       graphic = IMG_WALL;
     else if (left_stopped)
+    {
       graphic = IMG_WALL_GROWING_ACTIVE_RIGHT;
+      frame = new_graphic_info[graphic].anim_frames - 1;
+    }
     else if (right_stopped)
+    {
       graphic = IMG_WALL_GROWING_ACTIVE_LEFT;
+      frame = new_graphic_info[graphic].anim_frames - 1;
+    }
   }
 #if 0
   else if ((element == EL_ROCK ||
@@ -2109,7 +2115,7 @@ void DrawLevel()
 
   for(x=BX1; x<=BX2; x++)
     for(y=BY1; y<=BY2; y++)
-      DrawScreenField(x, y);
+      DrawNewScreenField(x, y);
 
   redraw_mask |= REDRAW_FIELD;
 }

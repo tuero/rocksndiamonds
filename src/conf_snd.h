@@ -193,4 +193,4 @@
 
 #define NUM_SOUND_FILES				172
 
-#endif	/* SND_DEFS_H */
+#endif	/* CONF_SND_H */

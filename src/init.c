@@ -937,10 +937,17 @@ void InitElementInfo()
     }
   }
 
+#if 0
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
       GFX_CHAR_START + (i - EL_CHAR_START);
+#else
+  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
+    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+      IMG_CHAR_START + (i - EL_CHAR_START);
+#endif
 
+#if 0
   for (i=EL_SP_START; i<=EL_SP_END; i++)
   {
     int nr_element = i - EL_SP_START;
@@ -952,6 +959,7 @@ void InitElementInfo()
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
       GFX_START_ROCKSSP + nr_graphic;
   }
+#endif
 
 #if 0
   /* this overrides some of the above default settings (GFX_SP_ZONK etc.) */
@@ -1017,7 +1025,7 @@ void InitElementInfo()
     int default_action_direction_graphic[NUM_MV_DIRECTIONS];
 
     if (default_action_graphic == -1)
-      default_action_graphic = EL_CHAR_QUESTION;
+      default_action_graphic = IMG_CHAR_QUESTION;
 
     for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
     {

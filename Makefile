@@ -90,6 +90,7 @@ clean:
 auto-conf:
 	./Scripts/create_element_defs.pl --graphics > src/conf_gfx.h
 	./Scripts/create_element_defs.pl --sounds   > src/conf_snd.h
+	./Scripts/create_element_defs.pl --chars    > src/conf_chr.c
 	./Scripts/create_element_defs.pl --el2gfx   > src/conf_e2g.c
 
 run:

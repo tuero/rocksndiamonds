@@ -1421,6 +1421,10 @@ element_to_graphic[] =
     IMG_WALL_BD_DIAMOND
   },
   {
+    EL_WALL_GROWING,				-1, -1,
+    IMG_WALL_GROWING
+  },
+  {
     EL_WALL_GROWING_XY,				-1, -1,
     IMG_WALL_GROWING_XY
   },
@@ -1493,6 +1497,10 @@ element_to_graphic[] =
     IMG_DYNABOMB_XL
   },
   {
+    EL_PIG,					-1, -1,
+    IMG_PIG
+  },
+  {
     EL_PIG,					MV_DOWN, -1,
     IMG_PIG_DOWN
   },
@@ -1541,6 +1549,10 @@ element_to_graphic[] =
     IMG_PIG_RIGHT_EATING
   },
   {
+    EL_DRAGON,					-1, -1,
+    IMG_DRAGON
+  },
+  {
     EL_DRAGON,					MV_DOWN, -1,
     IMG_DRAGON_DOWN
   },
@@ -1587,6 +1599,10 @@ element_to_graphic[] =
   {
     EL_DRAGON,					MV_RIGHT, GFX_ACTION_ATTACKING,
     IMG_DRAGON_RIGHT_ATTACKING
+  },
+  {
+    EL_MOLE,					-1, -1,
+    IMG_MOLE
   },
   {
     EL_MOLE_DOWN,				-1, -1,
@@ -1683,6 +1699,10 @@ element_to_graphic[] =
   {
     EL_MOLE,					MV_RIGHT, GFX_ACTION_DIGGING,
     IMG_MOLE_RIGHT_DIGGING
+  },
+  {
+    EL_PENGUIN,					-1, -1,
+    IMG_PENGUIN
   },
   {
     EL_PENGUIN,					MV_DOWN, -1,
@@ -2149,10 +2169,6 @@ element_to_graphic[] =
     IMG_ARROW_RED_DOWN
   },
   {
-    EL_CHAR_QUESTION,				-1, -1,
-    IMG_CHAR_QUESTION
-  },
-  {
     EL_DOOR_WHITE,				-1, -1,
     IMG_CHAR_QUESTION
   },
@@ -2234,4 +2250,4 @@ element_to_graphic[] =
   },
 };
 
-#endif	/* GFX_LIST_H */
+#endif	/* CONF_E2G_C */

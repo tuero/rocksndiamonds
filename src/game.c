@@ -1968,7 +1968,7 @@ static void ToggleBeltSwitch(int x, int y)
   int belt_nr = getBeltNrFromBeltSwitchElement(element);
   int belt_dir_nr = (game.belt_dir_nr[belt_nr] + 1) % 4;
   int belt_dir = belt_move_dir[belt_dir_nr];
-  int xx, yy;
+  int xx, yy, i;
 
   if (!IS_BELT_SWITCH(element))
     return;
@@ -1978,6 +1978,18 @@ static void ToggleBeltSwitch(int x, int y)
 
   if (belt_dir_nr == 3)
     belt_dir_nr = 1;
+
+  /* set frame order for belt animation graphic according to belt direction */
+  for (i=0; i<3; i++)
+  {
+    int element = belt_base_active_element[belt_nr] + i;
+    int graphic = el2img(element);
+
+    if (belt_dir == MV_LEFT)
+      new_graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+    else
+      new_graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+  }
 
   for (yy=0; yy<lev_fieldy; yy++)
   {
@@ -4409,48 +4421,58 @@ void MauerWaechst(int x, int y)
   int delay = 6;
 
   if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 3*delay;
+    MovDelay[x][y] = 3 * delay;
 
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
     int phase;
 
     MovDelay[x][y]--;
-    phase = 2-MovDelay[x][y]/delay;
+    phase = 2 - MovDelay[x][y] / delay;
+#if 0
     if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
       DrawGraphic(SCREENX(x), SCREENY(y),
 		  (MovDir[x][y] == MV_LEFT  ? GFX_MAUER_LEFT  :
 		   MovDir[x][y] == MV_RIGHT ? GFX_MAUER_RIGHT :
 		   MovDir[x][y] == MV_UP    ? GFX_MAUER_UP    :
 		                              GFX_MAUER_DOWN  ) + phase);
+#else
+    if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+    {
+      int graphic = el_dir2img(Feld[x][y], MovDir[x][y]);
+      int frame = getNewGraphicAnimationFrame(graphic, 17 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       if (MovDir[x][y] == MV_LEFT)
       {
-	if (IN_LEV_FIELD(x-1, y) && IS_MAUER(Feld[x-1][y]))
-	  DrawLevelField(x-1, y);
+	if (IN_LEV_FIELD(x - 1, y) && IS_MAUER(Feld[x - 1][y]))
+	  DrawNewLevelField(x - 1, y);
       }
       else if (MovDir[x][y] == MV_RIGHT)
       {
-	if (IN_LEV_FIELD(x+1, y) && IS_MAUER(Feld[x+1][y]))
-	  DrawLevelField(x+1, y);
+	if (IN_LEV_FIELD(x + 1, y) && IS_MAUER(Feld[x + 1][y]))
+	  DrawNewLevelField(x + 1, y);
       }
       else if (MovDir[x][y] == MV_UP)
       {
-	if (IN_LEV_FIELD(x, y-1) && IS_MAUER(Feld[x][y-1]))
-	  DrawLevelField(x, y-1);
+	if (IN_LEV_FIELD(x, y - 1) && IS_MAUER(Feld[x][y - 1]))
+	  DrawNewLevelField(x, y - 1);
       }
       else
       {
-	if (IN_LEV_FIELD(x, y+1) && IS_MAUER(Feld[x][y+1]))
-	  DrawLevelField(x, y+1);
+	if (IN_LEV_FIELD(x, y + 1) && IS_MAUER(Feld[x][y + 1]))
+	  DrawNewLevelField(x, y + 1);
       }
 
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
       MovDir[x][y] = MV_NO_MOVING;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4491,7 +4513,12 @@ void MauerAbleger(int ax, int ay)
       Store[ax][ay-1] = element;
       MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
+#if 0
   	DrawGraphic(SCREENX(ax), SCREENY(ay-1), GFX_MAUER_UP);
+#else
+  	DrawNewGraphic(SCREENX(ax), SCREENY(ay - 1),
+		       IMG_WALL_GROWING_ACTIVE_UP, 0);
+#endif
       new_wall = TRUE;
     }
     if (unten_frei)
@@ -4500,7 +4527,12 @@ void MauerAbleger(int ax, int ay)
       Store[ax][ay+1] = element;
       MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
+#if 0
   	DrawGraphic(SCREENX(ax), SCREENY(ay+1), GFX_MAUER_DOWN);
+#else
+  	DrawNewGraphic(SCREENX(ax), SCREENY(ay + 1),
+		       IMG_WALL_GROWING_ACTIVE_DOWN, 0);
+#endif
       new_wall = TRUE;
     }
   }
@@ -4514,7 +4546,12 @@ void MauerAbleger(int ax, int ay)
       Store[ax-1][ay] = element;
       MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
+#if 0
   	DrawGraphic(SCREENX(ax-1), SCREENY(ay), GFX_MAUER_LEFT);
+#else
+  	DrawNewGraphic(SCREENX(ax - 1), SCREENY(ay),
+		       IMG_WALL_GROWING_ACTIVE_LEFT, 0);
+#endif
       new_wall = TRUE;
     }
 
@@ -4524,13 +4561,18 @@ void MauerAbleger(int ax, int ay)
       Store[ax+1][ay] = element;
       MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
+#if 0
   	DrawGraphic(SCREENX(ax+1), SCREENY(ay), GFX_MAUER_RIGHT);
+#else
+  	DrawNewGraphic(SCREENX(ax + 1), SCREENY(ay),
+		       IMG_WALL_GROWING_ACTIVE_RIGHT, 0);
+#endif
       new_wall = TRUE;
     }
   }
 
   if (element == EL_WALL_GROWING && (links_frei || rechts_frei))
-    DrawLevelField(ax, ay);
+    DrawNewLevelField(ax, ay);
 
   if (!IN_LEV_FIELD(ax, ay-1) || IS_MAUER(Feld[ax][ay-1]))
     oben_massiv = TRUE;
@@ -4591,7 +4633,7 @@ void CheckForDragon(int x, int y)
   	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_FLAMES)
   	{
 	  Feld[xx][yy] = EL_EMPTY;
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
   	}
   	else
   	  break;
@@ -4613,7 +4655,11 @@ static void CheckBuggyBase(int x, int y)
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y] < 5 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	DrawGraphic(SCREENX(x), SCREENY(y), GFX_SP_BUG_WARNING);
+#else
+        DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_SP_BUGGY_BASE, 0);
+#endif
       if (MovDelay[x][y])
 	return;
 
@@ -4640,7 +4686,16 @@ static void CheckBuggyBase(int x, int y)
 	};
 
 	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	  DrawGraphic(SCREENX(x),SCREENY(y), GFX_SP_BUG_ACTIVE + SimpleRND(4));
+#else
+	{
+	  int graphic = IMG_SP_BUGGY_BASE_ACTIVE;
+	  int frame = getNewGraphicAnimationFrame(graphic, SimpleRND(100));
+
+          DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+	}
+#endif
 
 	for (i=0; i<4; i++)
 	{
@@ -4657,7 +4712,7 @@ static void CheckBuggyBase(int x, int y)
       }
 
       Feld[x][y] = EL_SP_BUGGY_BASE;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4704,7 +4759,15 @@ static void CheckTrap(int x, int y)
 
 	  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
 	  {
+#if 0
 	    DrawGraphic(SCREENX(x),SCREENY(y), GFX_TRAP_INACTIVE + phase - 1);
+#else
+	    int graphic = IMG_TRAP_ACTIVE;
+	    int frame = getNewGraphicAnimationFrame(graphic,
+						    31 - MovDelay[x][y]);
+
+	    DrawNewGraphic(SCREENX(x),SCREENY(y), graphic, frame);
+#endif
 	    ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
 	  }
 	}
@@ -4713,7 +4776,7 @@ static void CheckTrap(int x, int y)
       }
 
       Feld[x][y] = EL_TRAP;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4725,11 +4788,17 @@ static void DrawBeltAnimation(int x, int y, int element)
 
   if (belt_dir != MV_NO_MOVING)
   {
+#if 0
     int delay = 2;
     int mode = ANIM_LOOP | (belt_dir == MV_LEFT ? 0 : ANIM_REVERSE);
     int graphic = el2gfx(element) + (belt_dir == MV_LEFT ? 0 : 7);
 
     DrawGraphicAnimation(x, y, graphic, 8, delay, mode);
+#else
+    int graphic = el2img(element);
+
+    DrawNewGraphicAnimation(x, y, graphic);
+#endif
 
     if (!(FrameCounter % 2))
       PlaySoundLevel(x, y, SND_CONVEYOR_BELT_ACTIVE);
@@ -5084,10 +5153,19 @@ void GameActions()
     else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
     else if (element == EL_SP_TERMINAL)
+#if 0
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_LOOP);
+#else
+      DrawNewGraphicAnimation(x, y, IMG_SP_TERMINAL);
+#endif
     else if (element == EL_SP_TERMINAL_ACTIVE)
     {
+#if 0
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_LOOP);
+#else
+      DrawNewGraphicAnimation(x, y, IMG_SP_TERMINAL_ACTIVE);
+#endif
+
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SP_TERMINAL_ACTIVE);
@@ -5104,10 +5182,19 @@ void GameActions()
     else if (element == EL_TIMEGATE_CLOSING)
       CloseTimegate(x, y);
     else if (element == EL_EXTRA_TIME)
+#if 0
       DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_LOOP);
+#else
+      DrawNewGraphicAnimation(x, y, IMG_EXTRA_TIME);
+#endif
     else if (element == EL_SHIELD_NORMAL)
     {
+#if 0
       DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_LOOP);
+#else
+      DrawNewGraphicAnimation(x, y, IMG_SHIELD_NORMAL);
+#endif
+
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_PASSIVE_ACTIVATED);
@@ -5115,7 +5202,12 @@ void GameActions()
     }
     else if (element == EL_SHIELD_DEADLY)
     {
+#if 0
       DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_LOOP);
+#else
+      DrawNewGraphicAnimation(x, y, IMG_SHIELD_DEADLY);
+#endif
+
 #if 0
       if (!(FrameCounter % 4))
 	PlaySoundLevel(x, y, SND_SHIELD_DEADLY_ACTIVE);
@@ -5237,13 +5329,13 @@ void GameActions()
 	      element == EL_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_MAGIC_WALL_DEAD;
-	    DrawLevelField(x, y);
+	    DrawNewLevelField(x, y);
 	  }
 	  else if (element == EL_BD_MAGIC_WALL_ACTIVE ||
 		   element == EL_BD_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
-	    DrawLevelField(x, y);
+	    DrawNewLevelField(x, y);
 	  }
 	}
 
@@ -5397,13 +5489,14 @@ void ScrollLevel(int dx, int dy)
   {
     x = (dx == 1 ? BX1 : BX2);
     for (y=BY1; y<=BY2; y++)
-      DrawScreenField(x, y);
+      DrawNewScreenField(x, y);
   }
+
   if (dy)
   {
     y = (dy == 1 ? BY1 : BY2);
     for (x=BX1; x<=BX2; x++)
-      DrawScreenField(x, y);
+      DrawNewScreenField(x, y);
   }
 
   redraw_mask |= REDRAW_FIELD;
@@ -5644,7 +5737,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     else if (old_jx == jx && old_jy != jy)
       player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
-    DrawLevelField(jx, jy);	/* for "ErdreichAnbroeckeln()" */
+    DrawNewLevelField(jx, jy);	/* for "ErdreichAnbroeckeln()" */
 
     player->last_move_dir = player->MovDir;
     player->is_moving = TRUE;
@@ -6243,7 +6336,7 @@ int DigField(struct PlayerInfo *player,
       Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
       ZX = x;
       ZY = y;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
       PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVATING);
       return MF_ACTION;
       break;
@@ -6399,7 +6492,7 @@ int DigField(struct PlayerInfo *player,
 
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
-      DrawLevelField(x+dx, y+dy);
+      DrawNewLevelField(x + dx, y + dy);
       PlaySoundLevelElementAction(x, y, element, SND_ACTION_PUSHING);
       break;
 
@@ -6569,7 +6662,7 @@ int DigField(struct PlayerInfo *player,
     case EL_LAMP:
       Feld[x][y] = EL_LAMP_ACTIVE;
       local_player->lights_still_needed--;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
       PlaySoundLevel(x, y, SND_LAMP_ACTIVATING);
       return MF_ACTION;
       break;
@@ -6578,7 +6671,7 @@ int DigField(struct PlayerInfo *player,
       Feld[x][y] = EL_TIME_ORB_EMPTY;
       TimeLeft += 10;
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
       PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MAX_RIGHT);
       return MF_ACTION;
       break;
@@ -6663,8 +6756,8 @@ int DigField(struct PlayerInfo *player,
 
       player->push_delay_value = (element == EL_BALLOON ? 0 : 2);
 
-      DrawLevelField(x, y);
-      DrawLevelField(x+dx, y+dy);
+      DrawNewLevelField(x, y);
+      DrawNewLevelField(x + dx, y + dy);
 
       if (IS_SB_ELEMENT(element) &&
 	  local_player->sokobanfields_still_needed == 0 &&
@@ -6722,7 +6815,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 
   player->snapped = TRUE;
-  DrawLevelField(x, y);
+  DrawNewLevelField(x, y);
   BackToFront();
 
   return TRUE;
@@ -6754,10 +6847,18 @@ boolean PlaceBomb(struct PlayerInfo *player)
 	     FS_SMALL, FC_YELLOW);
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
     {
+#if 0
       if (game.emulation == EMU_SUPAPLEX)
 	DrawGraphic(SCREENX(jx), SCREENY(jy), GFX_SP_DISK_RED);
       else
 	DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), GFX_DYNAMIT);
+#else
+      if (game.emulation == EMU_SUPAPLEX)
+	DrawNewGraphic(SCREENX(jx), SCREENY(jy), IMG_SP_DISK_RED, 0);
+      else
+	DrawNewGraphicThruMask(SCREENX(jx), SCREENY(jy),
+			       IMG_DYNAMITE_ACTIVE, 0);
+#endif
     }
 
     PlaySoundLevel(jx, jy, SND_DYNAMITE_DROPPING);
@@ -6769,7 +6870,12 @@ boolean PlaceBomb(struct PlayerInfo *player)
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
+#if 0
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), GFX_DYNABOMB);
+#else
+      DrawNewGraphicThruMask(SCREENX(jx), SCREENY(jy),
+			     el2img(Feld[jx][jy]), 0);
+#endif
 
     PlaySoundLevel(jx, jy, SND_DYNABOMB_DROPPING);
   }
