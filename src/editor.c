@@ -736,7 +736,7 @@ int editor_element[] =
   EL_CHAR('U'),
   EL_CHAR('L'),
 
-  EL_CHAR_MINUS,
+  EL_CHAR('-'),
   EL_CHAR('D'),
   EL_CHAR('E'),
   EL_CHAR('R'),
@@ -774,7 +774,7 @@ int editor_element[] =
   EL_CHAR('E'),
   EL_CHAR('M'),
   EL_CHAR('E'),
-  EL_CHAR_MINUS,
+  EL_CHAR('-'),
 
   EL_CHAR('R'),
   EL_CHAR('A'),
@@ -936,7 +936,7 @@ int editor_element[] =
   EL_CHAR('K'),
   EL_CHAR('O'),
 
-  EL_CHAR_MINUS,
+  EL_CHAR('-'),
   EL_CHAR('B'),
   EL_CHAR('A'),
   EL_CHAR('N'),
@@ -945,11 +945,6 @@ int editor_element[] =
   EL_SOKOBAN_FELD_LEER,
   EL_SOKOBAN_FELD_VOLL,
   EL_BETON,
-
-  EL_LEERRAUM,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
 
   EL_CHAR('S'),
   EL_CHAR('U'),
@@ -1010,6 +1005,56 @@ int editor_element[] =
   EL_SP_HARD_BASE6,
   EL_SP_CHIP_UPPER,
   EL_SP_CHIP_LOWER,
+
+  EL_CHAR('D'),
+  EL_CHAR('I'),
+  EL_CHAR('A'),
+  EL_CHAR('-'),
+
+  EL_CHAR('M'),
+  EL_CHAR('O'),
+  EL_CHAR('N'),
+  EL_CHAR('D'),
+
+  EL_CHAR('C'),
+  EL_CHAR('A'),
+  EL_CHAR('V'),
+  EL_CHAR('E'),
+
+  EL_CHAR('S'),
+  EL_CHAR(' '),
+  EL_CHAR('I'),
+  EL_CHAR('I'),
+
+  EL_BELT1_LEFT,
+  EL_BELT1_MIDDLE,
+  EL_BELT1_RIGHT,
+  EL_BELT1_SWITCH_M,
+
+  EL_BELT2_LEFT,
+  EL_BELT2_MIDDLE,
+  EL_BELT2_RIGHT,
+  EL_BELT2_SWITCH_M,
+
+  EL_BELT3_LEFT,
+  EL_BELT3_MIDDLE,
+  EL_BELT3_RIGHT,
+  EL_BELT3_SWITCH_M,
+
+  EL_BELT4_LEFT,
+  EL_BELT4_MIDDLE,
+  EL_BELT4_RIGHT,
+  EL_BELT4_SWITCH_M,
+
+  EL_BELT1_SWITCH_L,
+  EL_BELT2_SWITCH_L,
+  EL_BELT3_SWITCH_L,
+  EL_BELT4_SWITCH_L,
+
+  EL_BELT1_SWITCH_R,
+  EL_BELT2_SWITCH_R,
+  EL_BELT3_SWITCH_R,
+  EL_BELT4_SWITCH_R,
 
   /*
   EL_CHAR('D'),

@@ -24,6 +24,9 @@
 #define PCX_NoMemory		-4
 #define PCX_ColorFailed		-5
 
+/* global PCX error value */
+extern int errno_pcx;
+
 Image *Read_PCX_to_Image(char *);
 
 #endif	/* PCX_H */

@@ -23,6 +23,9 @@
 #include "joystick.h"
 #include "network.h"
 
+/* this switch controls how rocks move horizontally */
+#define OLD_GAME_BEHAVIOUR	FALSE
+
 /* for DigField() */
 #define DF_NO_PUSH		0
 #define DF_DIG			1
@@ -144,7 +147,7 @@ static unsigned int getStateCheckSum(int counter)
     checksum += mult++ * StorePlayer[x][y];
     checksum += mult++ * Frame[x][y];
     checksum += mult++ * AmoebaNr[x][y];
-    checksum += mult++ * JustHit[x][y];
+    checksum += mult++ * JustStopped[x][y];
     checksum += mult++ * Stop[x][y];
     */
   }
@@ -366,6 +369,7 @@ void InitGame()
     player->MovDir = MV_NO_MOVING;
     player->MovPos = 0;
     player->Pushing = FALSE;
+    player->Switching = FALSE;
     player->GfxPos = 0;
     player->Frame = 0;
 
@@ -419,6 +423,8 @@ void InitGame()
   AllPlayersGone = FALSE;
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
+  for (i=0; i<4; i++)
+    game.belt_dir[i] = MV_NO_MOVING;
 
   for (i=0; i<MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
@@ -432,7 +438,7 @@ void InitGame()
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = 0;
       Frame[x][y] = 0;
       AmoebaNr[x][y] = 0;
-      JustHit[x][y] = 0;
+      JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
     }
   }
@@ -2105,7 +2111,8 @@ void StartMoving(int x, int y)
       InitMovingField(x, y, MV_DOWN);
       Store[x][y] = EL_SALZSAEURE;
     }
-    else if (CAN_SMASH(element) && Feld[x][y+1] == EL_BLOCKED && JustHit[x][y])
+    else if (CAN_SMASH(element) && Feld[x][y+1] == EL_BLOCKED &&
+	     JustStopped[x][y])
     {
       Impact(x, y);
     }
@@ -2118,7 +2125,12 @@ void StartMoving(int x, int y)
       Feld[x][y] = EL_AMOEBING;
       Store[x][y] = EL_AMOEBE_NASS;
     }
+#if OLD_GAME_BEHAVIOUR
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
+#else
+    else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1] &&
+	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1])
+#endif
     {
       boolean left  = (x>0 && IS_FREE(x-1, y) &&
 		       (IS_FREE(x-1, y+1) || Feld[x-1][y+1] == EL_SALZSAEURE));
@@ -2431,12 +2443,14 @@ void ContinueMoving(int x, int y)
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX/8;
 
-  if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
-    step*=2;
-  else if (element == EL_TROPFEN)
+  if (element == EL_TROPFEN)
     step/=2;
   else if (Store[x][y] == EL_MORAST_VOLL || Store[x][y] == EL_MORAST_LEER)
     step/=4;
+#if OLD_GAME_BEHAVIOUR
+  else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
+    step*=2;
+#endif
 
   MovPos[x][y] += step;
 
@@ -2500,7 +2514,7 @@ void ContinueMoving(int x, int y)
     DrawLevelField(newx, newy);
 
     Stop[newx][newy] = TRUE;
-    JustHit[x][newy] = 3;
+    JustStopped[newx][newy] = 3;
 
     if (DONT_TOUCH(element))	/* object may be nasty to player or others */
     {
@@ -3566,8 +3580,8 @@ void GameActions()
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
     Stop[x][y] = FALSE;
-    if (JustHit[x][y]>0)
-      JustHit[x][y]--;
+    if (JustStopped[x][y] > 0)
+      JustStopped[x][y]--;
 
 #if DEBUG
     if (IS_BLOCKED(x, y))
@@ -4355,6 +4369,7 @@ int DigField(struct PlayerInfo *player,
 
   if (mode == DF_NO_PUSH)
   {
+    player->Switching = FALSE;
     player->push_delay = 0;
     return MF_NO_ACTION;
   }
@@ -4364,7 +4379,7 @@ int DigField(struct PlayerInfo *player,
 
   element = Feld[x][y];
 
-  switch(element)
+  switch (element)
   {
     case EL_LEERRAUM:
       PlaySoundLevel(x, y, SND_EMPTY);
@@ -4506,6 +4521,72 @@ int DigField(struct PlayerInfo *player,
 	      Feld[xx][yy] = EL_SP_TERMINAL_ACTIVE;
 	  }
 	}
+
+	return MF_ACTION;
+      }
+      break;
+
+    case EL_BELT1_SWITCH_L:
+    case EL_BELT1_SWITCH_M:
+    case EL_BELT1_SWITCH_R:
+    case EL_BELT2_SWITCH_L:
+    case EL_BELT2_SWITCH_M:
+    case EL_BELT2_SWITCH_R:
+    case EL_BELT3_SWITCH_L:
+    case EL_BELT3_SWITCH_M:
+    case EL_BELT3_SWITCH_R:
+    case EL_BELT4_SWITCH_L:
+    case EL_BELT4_SWITCH_M:
+    case EL_BELT4_SWITCH_R:
+      {
+	static int belt_base_element[4] =
+	{
+	  EL_BELT1_SWITCH_L,
+	  EL_BELT2_SWITCH_L,
+	  EL_BELT3_SWITCH_L,
+	  EL_BELT4_SWITCH_L
+	};
+	static int belt_move_dir[3] =
+	{
+	  MV_LEFT,
+	  MV_NO_MOVING,
+	  MV_RIGHT
+	};
+
+	int belt_nr = (element < EL_BELT2_SWITCH_L ? 0 :
+		       element < EL_BELT3_SWITCH_L ? 1 :
+		       element < EL_BELT4_SWITCH_L ? 2 : 3);
+	int belt_dir_nr = element - belt_base_element[belt_nr];
+	int belt_dir_nr_next = (belt_dir_nr + 1) % 3;
+	int belt_dir_next = belt_move_dir[belt_dir_nr_next];
+	int xx, yy;
+
+	if (player->Switching)
+	  return MF_ACTION;
+
+	game.belt_dir[belt_nr] = belt_dir_next;
+
+	for (yy=0; yy<lev_fieldy; yy++)
+	{
+	  for (xx=0; xx<lev_fieldx; xx++)
+	  {
+	    if (IS_BELT_SWITCH(Feld[xx][yy]))
+	    {
+	      int e = Feld[xx][yy];
+	      int e_belt_nr = (e < EL_BELT2_SWITCH_L ? 0 :
+			       e < EL_BELT3_SWITCH_L ? 1 :
+			       e < EL_BELT4_SWITCH_L ? 2 : 3);
+
+	      if (e_belt_nr == belt_nr)
+	      {
+		Feld[xx][yy] = belt_base_element[belt_nr] + belt_dir_nr_next;
+		DrawLevelField(xx, yy);
+	      }
+	    }
+	  }
+	}
+
+	player->Switching = TRUE;
 
 	return MF_ACTION;
       }

@@ -95,6 +95,7 @@ typedef unsigned char byte;
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
+/* values for 'Elementeigenschaften1' */
 #define EP_BIT_AMOEBALIVE	(1 << 0)
 #define EP_BIT_AMOEBOID		(1 << 1)
 #define EP_BIT_SCHLUESSEL	(1 << 2)
@@ -128,38 +129,44 @@ typedef unsigned char byte;
 #define EP_BIT_OVER_PLAYER	(1 << 30)
 #define EP_BIT_ACTIVE_BOMB	(1 << 31)
 
-#define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
-#define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
-#define IS_SCHLUESSEL(e)	(Elementeigenschaften[e] & EP_BIT_SCHLUESSEL)
-#define IS_PFORTE(e)		(Elementeigenschaften[e] & EP_BIT_PFORTE)
-#define IS_SOLID(e)		(Elementeigenschaften[e] & EP_BIT_SOLID)
-#define IS_MASSIVE(e)		(Elementeigenschaften[e] & EP_BIT_MASSIVE)
-#define IS_SLIPPERY(e)		(Elementeigenschaften[e] & EP_BIT_SLIPPERY)
-#define IS_ENEMY(e)		(Elementeigenschaften[e] & EP_BIT_ENEMY)
-#define IS_MAUER(e)		(Elementeigenschaften[e] & EP_BIT_MAUER)
-#define CAN_FALL(e)		(Elementeigenschaften[e] & EP_BIT_CAN_FALL)
-#define CAN_SMASH(e)		(Elementeigenschaften[e] & EP_BIT_CAN_SMASH)
-#define CAN_CHANGE(e)		(Elementeigenschaften[e] & EP_BIT_CAN_CHANGE)
-#define CAN_MOVE(e)		(Elementeigenschaften[e] & EP_BIT_CAN_MOVE)
-#define COULD_MOVE(e)		(Elementeigenschaften[e] & EP_BIT_COULD_MOVE)
-#define DONT_TOUCH(e)		(Elementeigenschaften[e] & EP_BIT_DONT_TOUCH)
-#define DONT_GO_TO(e)		(Elementeigenschaften[e] & EP_BIT_DONT_GO_TO)
-#define IS_MAMPF2(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF2)
-#define IS_CHAR(e)		(Elementeigenschaften[e] & EP_BIT_CHAR)
-#define IS_BD_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_BD_ELEMENT)
-#define IS_SB_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SB_ELEMENT)
-#define IS_GEM(e)		(Elementeigenschaften[e] & EP_BIT_GEM)
-#define IS_INACTIVE(e)		(Elementeigenschaften[e] & EP_BIT_INACTIVE)
-#define IS_EXPLOSIVE(e)		(Elementeigenschaften[e] & EP_BIT_EXPLOSIVE)
-#define IS_MAMPF3(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF3)
-#define IS_PUSHABLE(e)		(Elementeigenschaften[e] & EP_BIT_PUSHABLE)
-#define ELEM_IS_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_PLAYER)
-#define HAS_CONTENT(e)		(Elementeigenschaften[e] & EP_BIT_HAS_CONTENT)
-#define IS_EATABLE(e)		(Elementeigenschaften[e] & EP_BIT_EATABLE)
-#define IS_SP_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SP_ELEMENT)
-#define IS_QUICK_GATE(e)	(Elementeigenschaften[e] & EP_BIT_QUICK_GATE)
-#define IS_OVER_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_OVER_PLAYER)
-#define IS_ACTIVE_BOMB(e)	(Elementeigenschaften[e] & EP_BIT_ACTIVE_BOMB)
+/* values for 'Elementeigenschaften2' */
+#define EP_BIT_BELT		(1 << 0)
+#define EP_BIT_BELT_SWITCH	(1 << 1)
+
+#define IS_AMOEBALIVE(e)	(Elementeigenschaften1[e] & EP_BIT_AMOEBALIVE)
+#define IS_AMOEBOID(e)		(Elementeigenschaften1[e] & EP_BIT_AMOEBOID)
+#define IS_SCHLUESSEL(e)	(Elementeigenschaften1[e] & EP_BIT_SCHLUESSEL)
+#define IS_PFORTE(e)		(Elementeigenschaften1[e] & EP_BIT_PFORTE)
+#define IS_SOLID(e)		(Elementeigenschaften1[e] & EP_BIT_SOLID)
+#define IS_MASSIVE(e)		(Elementeigenschaften1[e] & EP_BIT_MASSIVE)
+#define IS_SLIPPERY(e)		(Elementeigenschaften1[e] & EP_BIT_SLIPPERY)
+#define IS_ENEMY(e)		(Elementeigenschaften1[e] & EP_BIT_ENEMY)
+#define IS_MAUER(e)		(Elementeigenschaften1[e] & EP_BIT_MAUER)
+#define CAN_FALL(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_FALL)
+#define CAN_SMASH(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_SMASH)
+#define CAN_CHANGE(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_CHANGE)
+#define CAN_MOVE(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_MOVE)
+#define COULD_MOVE(e)		(Elementeigenschaften1[e] & EP_BIT_COULD_MOVE)
+#define DONT_TOUCH(e)		(Elementeigenschaften1[e] & EP_BIT_DONT_TOUCH)
+#define DONT_GO_TO(e)		(Elementeigenschaften1[e] & EP_BIT_DONT_GO_TO)
+#define IS_MAMPF2(e)		(Elementeigenschaften1[e] & EP_BIT_MAMPF2)
+#define IS_CHAR(e)		(Elementeigenschaften1[e] & EP_BIT_CHAR)
+#define IS_BD_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_BD_ELEMENT)
+#define IS_SB_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_SB_ELEMENT)
+#define IS_GEM(e)		(Elementeigenschaften1[e] & EP_BIT_GEM)
+#define IS_INACTIVE(e)		(Elementeigenschaften1[e] & EP_BIT_INACTIVE)
+#define IS_EXPLOSIVE(e)		(Elementeigenschaften1[e] & EP_BIT_EXPLOSIVE)
+#define IS_MAMPF3(e)		(Elementeigenschaften1[e] & EP_BIT_MAMPF3)
+#define IS_PUSHABLE(e)		(Elementeigenschaften1[e] & EP_BIT_PUSHABLE)
+#define ELEM_IS_PLAYER(e)	(Elementeigenschaften1[e] & EP_BIT_PLAYER)
+#define HAS_CONTENT(e)		(Elementeigenschaften1[e] & EP_BIT_HAS_CONTENT)
+#define IS_EATABLE(e)		(Elementeigenschaften1[e] & EP_BIT_EATABLE)
+#define IS_SP_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_SP_ELEMENT)
+#define IS_QUICK_GATE(e)	(Elementeigenschaften1[e] & EP_BIT_QUICK_GATE)
+#define IS_OVER_PLAYER(e)	(Elementeigenschaften1[e] & EP_BIT_OVER_PLAYER)
+#define IS_ACTIVE_BOMB(e)	(Elementeigenschaften1[e] & EP_BIT_ACTIVE_BOMB)
+#define IS_BELT(e)		(Elementeigenschaften2[e] & EP_BIT_BELT)
+#define IS_BELT_SWITCH(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_SWITCH)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -167,6 +174,7 @@ typedef unsigned char byte;
 #define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_LEERRAUM)
 
 #define IS_MOVING(x,y)		(MovPos[x][y] != 0)
+#define IS_FALLING(x,y)		(MovPos[x][y] != 0 && MovDir[x][y] == MV_DOWN)
 #define IS_BLOCKED(x,y)		(Feld[x][y] == EL_BLOCKED)
 
 #define EL_CHANGED(e)		((e) == EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
@@ -184,20 +192,21 @@ typedef unsigned char byte;
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_SPIELER1])
 
-/* Pixmaps with Xpm or X11 Bitmap files */
+/* Pixmaps with graphic file */
 #define PIX_BACK		0
 #define PIX_DOOR		1
 #define PIX_HEROES		2
 #define PIX_TOONS		3
-#define PIX_MORE		4
-#define	PIX_BIGFONT		5
-#define PIX_SMALLFONT		6
-/* Pixmaps without them */
-#define PIX_DB_BACK		7
-#define PIX_DB_DOOR		8
-#define PIX_DB_FIELD		9
+#define PIX_SP			4
+#define PIX_DC			5
+#define	PIX_BIGFONT		6
+#define PIX_SMALLFONT		7
+/* Pixmaps without graphic file */
+#define PIX_DB_BACK		8
+#define PIX_DB_DOOR		9
+#define PIX_DB_FIELD		10
 
-#define NUM_PICTURES		7
+#define NUM_PICTURES		8
 #define NUM_PIXMAPS		10
 
 /* boundaries of arrays etc. */
@@ -320,6 +329,7 @@ struct PlayerInfo
   int Frame;
 
   boolean Pushing;
+  boolean Switching;
   boolean LevelSolved, GameOver;
   boolean snapped;
 
@@ -408,6 +418,7 @@ struct GameInfo
   int yam_content_nr;
   boolean magic_wall_active;
   int magic_wall_time_left;
+  int belt_dir[4];
 };
 
 struct GlobalInfo
@@ -462,10 +473,11 @@ extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-extern unsigned long	Elementeigenschaften[MAX_ELEMENTS];
+extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
+extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
@@ -562,20 +574,30 @@ extern char		*element_info[];
 #define GFX_PER_LINE		16
 #define MINI_GFX_PER_LINE	32
 #define MICRO_GFX_PER_LINE	128
+
 #define HEROES_PER_LINE		16
-#define MINI_MORE_STARTX	0
-#define MINI_MORE_STARTY	352
-#define MICRO_MORE_STARTX	0
-#define MICRO_MORE_STARTY	448
-#define MORE_PER_LINE		16
-#define MINI_MORE_PER_LINE	16
-#define MICRO_MORE_PER_LINE	64
+#define MINI_SP_STARTX		0
+#define MINI_SP_STARTY		352
+#define MICRO_SP_STARTX		0
+#define MICRO_SP_STARTY		448
+#define SP_PER_LINE		16
+#define MINI_SP_PER_LINE	16
+#define MICRO_SP_PER_LINE	64
+
+#define MINI_DC_STARTX		256
+#define MINI_DC_STARTY		0
+#define MICRO_DC_STARTX		0
+#define MICRO_DC_STARTY		0
+#define DC_PER_LINE		8
+#define MINI_DC_PER_LINE	8
+#define MICRO_DC_PER_LINE	32
+
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
 /* game elements:
-**	  0 - 255: real elements, stored in level file
-**	256 - 511: flag elements, only used at runtime
+**	  0 - 1000: real elements, stored in level file
+**     1000 - 2000: flag elements, only used at runtime
 */
 /* "real" level elements */
 #define EL_LEERRAUM		0
@@ -826,44 +848,57 @@ extern char		*element_info[];
 #define EL_KEY_WHITE		262
 #define EL_FORCE_FIELD		263
 #define EL_EXTRA_TIME		264
-#define EL_SWITCH_GATE_OPEN	265
-#define EL_SWITCH_GATE_CLOSED	266
-#define EL_SWITCH_GATE_SWITCH	267
-#define EL_TIME_GATE		268
-#define EL_TIME_GATE_WHEEL	269
-#define EL_BELT_GREEN_LEFT	270
-#define EL_BELT_GREEN_MIDDLE	271
-#define EL_BELT_GREEN_RIGHT	272
-#define EL_BELT_GREEN_SWITCH	273
-#define EL_BELT_RED_LEFT	274
-#define EL_BELT_RED_MIDDLE	275
-#define EL_BELT_RED_RIGHT	276
-#define EL_BELT_RED_SWITCH	277
-#define EL_BELT_BLUE_LEFT	278
-#define EL_BELT_BLUE_MIDDLE	279
-#define EL_BELT_BLUE_RIGHT	280
-#define EL_BELT_BLUE_SWITCH	281
-#define EL_LANDMINE		282
-#define EL_ENVELOPE		283
-#define EL_LIGHT_SWITCH		284
-#define EL_SIGN_EXCLAMATION	285
-#define EL_SIGN_RADIOACTIVITY	286
-#define EL_SIGN_STOP		287
-#define EL_SIGN_WHEELCHAIR	288
-#define EL_SIGN_PARKING		289
-#define EL_SIGN_ONEWAY		290
-#define EL_SIGN_HEART		291
-#define EL_SIGN_TRIANGLE	292
-#define EL_SIGN_ROUND		293
-#define EL_SIGN_EXIT		294
-#define EL_SIGN_YINYANG		295
-#define EL_SIGN_OTHER		296
-#define EL_MOLE_LEFT		297
-#define EL_MOLE_RIGHT		298
-#define EL_MOLE_UP		299
-#define EL_MOLE_DOWN		300
-#define EL_STEEL_SLANTED	301
-#define EL_SAND_INVISIBLE	302
+#define EL_SWITCHGATE_OPEN	265
+#define EL_SWITCHGATE_CLOSED	266
+#define EL_SWITCHGATE_SWITCH_L	267
+#define EL_SWITCHGATE_SWITCH_R	268
+#define EL_TIME_GATE		269
+#define EL_TIME_GATE_WHEEL	270
+#define EL_BELT1_LEFT		271
+#define EL_BELT1_MIDDLE		272
+#define EL_BELT1_RIGHT		273
+#define EL_BELT1_SWITCH_L	274
+#define EL_BELT1_SWITCH_M	275
+#define EL_BELT1_SWITCH_R	276
+#define EL_BELT2_LEFT		277
+#define EL_BELT2_MIDDLE		278
+#define EL_BELT2_RIGHT		279
+#define EL_BELT2_SWITCH_L	280
+#define EL_BELT2_SWITCH_M	281
+#define EL_BELT2_SWITCH_R	282
+#define EL_BELT3_LEFT		283
+#define EL_BELT3_MIDDLE		284
+#define EL_BELT3_RIGHT		285
+#define EL_BELT3_SWITCH_L	286
+#define EL_BELT3_SWITCH_M	287
+#define EL_BELT3_SWITCH_R	288
+#define EL_BELT4_LEFT		289
+#define EL_BELT4_MIDDLE		290
+#define EL_BELT4_RIGHT		291
+#define EL_BELT4_SWITCH_L	292
+#define EL_BELT4_SWITCH_M	293
+#define EL_BELT4_SWITCH_R	294
+#define EL_LANDMINE		295
+#define EL_ENVELOPE		296
+#define EL_LIGHT_SWITCH		297
+#define EL_SIGN_EXCLAMATION	298
+#define EL_SIGN_RADIOACTIVITY	299
+#define EL_SIGN_STOP		300
+#define EL_SIGN_WHEELCHAIR	301
+#define EL_SIGN_PARKING		302
+#define EL_SIGN_ONEWAY		303
+#define EL_SIGN_HEART		304
+#define EL_SIGN_TRIANGLE	305
+#define EL_SIGN_ROUND		306
+#define EL_SIGN_EXIT		307
+#define EL_SIGN_YINYANG		308
+#define EL_SIGN_OTHER		309
+#define EL_MOLE_LEFT		310
+#define EL_MOLE_RIGHT		311
+#define EL_MOLE_UP		312
+#define EL_MOLE_DOWN		313
+#define EL_STEEL_SLANTED	314
+#define EL_SAND_INVISIBLE	315
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_SIEB_LEER		1000
@@ -898,20 +933,23 @@ extern char		*element_info[];
 /* game graphics:
 **	  0 -  255: graphics from "RocksScreen"
 **	256 -  511: graphics from "RocksFont"
-**	512 -  767: graphics from "RocksMore"
-**	768 - 1023: graphics from "RocksHeroes"
+**	512 -  767: graphics from "RocksHeroes"
+**	768 - 1023: graphics from "RocksSP"
+**     1024 - 1279: graphics from "RocksDC"
 */
 
 #define GFX_START_ROCKSSCREEN	0
 #define GFX_END_ROCKSSCREEN	255
 #define GFX_START_ROCKSFONT	256
 #define GFX_END_ROCKSFONT	511
-#define GFX_START_ROCKSMORE	512
-#define GFX_END_ROCKSMORE	767
-#define GFX_START_ROCKSHEROES	768
-#define GFX_END_ROCKSHEROES	1023
+#define GFX_START_ROCKSHEROES	512
+#define GFX_END_ROCKSHEROES	767
+#define GFX_START_ROCKSSP	768
+#define GFX_END_ROCKSSP		1023
+#define GFX_START_ROCKSDC	1024
+#define GFX_END_ROCKSDC		1279
 
-#define NUM_TILES		1024
+#define NUM_TILES		1280
 
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
@@ -1146,90 +1184,116 @@ extern char		*element_info[];
 #define GFX_FLAMMEN_UP		(GFX_START_ROCKSHEROES +14*HEROES_PER_LINE + 8)
 #define GFX_FLAMMEN_DOWN	(GFX_START_ROCKSHEROES +15*HEROES_PER_LINE + 8)
 
-/* graphics from "RocksMore" */
-#define GFX_SP_EMPTY		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  0)
+/* graphics from "RocksSP" */
+#define GFX_SP_EMPTY		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  0)
 /*
-#define GFX_SP_ZONK		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  1)
+#define GFX_SP_ZONK		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  1)
 */
-#define GFX_SP_BASE		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  2)
-#define GFX_SP_MURPHY		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  3)
-#define GFX_SP_INFOTRON		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  4)
-#define GFX_SP_CHIP_SINGLE	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  5)
-#define GFX_SP_HARD_GRAY	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  6)
-#define GFX_SP_EXIT		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  7)
-#define GFX_SP_DISK_ORANGE	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  0)
-#define GFX_SP_PORT1_RIGHT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  1)
-#define GFX_SP_PORT1_DOWN	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  2)
-#define GFX_SP_PORT1_LEFT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  3)
-#define GFX_SP_PORT1_UP		(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  4)
-#define GFX_SP_PORT2_RIGHT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  5)
-#define GFX_SP_PORT2_DOWN	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  6)
-#define GFX_SP_PORT2_LEFT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  7)
-#define GFX_SP_PORT2_UP		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  0)
-#define GFX_SP_SNIKSNAK		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  1)
-#define GFX_SP_DISK_YELLOW	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  2)
-#define GFX_SP_TERMINAL		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  3)
-#define GFX_SP_DISK_RED		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  4)
-#define GFX_SP_PORT_Y		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  5)
-#define GFX_SP_PORT_X		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  6)
-#define GFX_SP_PORT_XY		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  7)
-#define GFX_SP_ELECTRON		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  0)
-#define GFX_SP_BUG		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  1)
-#define GFX_SP_CHIP_LEFT	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  2)
-#define GFX_SP_CHIP_RIGHT	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  3)
-#define GFX_SP_HARD_BASE1	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  4)
-#define GFX_SP_HARD_GREEN	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  5)
-#define GFX_SP_HARD_BLUE	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  6)
-#define GFX_SP_HARD_RED		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  7)
-#define GFX_SP_HARD_YELLOW	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  0)
-#define GFX_SP_HARD_BASE2	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  1)
-#define GFX_SP_HARD_BASE3	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  2)
-#define GFX_SP_HARD_BASE4	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  3)
-#define GFX_SP_HARD_BASE5	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  4)
-#define GFX_SP_HARD_BASE6	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  5)
-#define GFX_SP_CHIP_UPPER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  6)
-#define GFX_SP_CHIP_LOWER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  7)
+#define GFX_SP_BASE		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  2)
+#define GFX_SP_MURPHY		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  3)
+#define GFX_SP_INFOTRON		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  4)
+#define GFX_SP_CHIP_SINGLE	(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  5)
+#define GFX_SP_HARD_GRAY	(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  6)
+#define GFX_SP_EXIT		(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  7)
+#define GFX_SP_DISK_ORANGE	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  0)
+#define GFX_SP_PORT1_RIGHT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  1)
+#define GFX_SP_PORT1_DOWN	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  2)
+#define GFX_SP_PORT1_LEFT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  3)
+#define GFX_SP_PORT1_UP		(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  4)
+#define GFX_SP_PORT2_RIGHT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  5)
+#define GFX_SP_PORT2_DOWN	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  6)
+#define GFX_SP_PORT2_LEFT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  7)
+#define GFX_SP_PORT2_UP		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  0)
+#define GFX_SP_SNIKSNAK		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  1)
+#define GFX_SP_DISK_YELLOW	(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  2)
+#define GFX_SP_TERMINAL		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  3)
+#define GFX_SP_DISK_RED		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  4)
+#define GFX_SP_PORT_Y		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  5)
+#define GFX_SP_PORT_X		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  6)
+#define GFX_SP_PORT_XY		(GFX_START_ROCKSSP +  2 * SP_PER_LINE +  7)
+#define GFX_SP_ELECTRON		(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  0)
+#define GFX_SP_BUG		(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  1)
+#define GFX_SP_CHIP_LEFT	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  2)
+#define GFX_SP_CHIP_RIGHT	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  3)
+#define GFX_SP_HARD_BASE1	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  4)
+#define GFX_SP_HARD_GREEN	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  5)
+#define GFX_SP_HARD_BLUE	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  6)
+#define GFX_SP_HARD_RED		(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  7)
+#define GFX_SP_HARD_YELLOW	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  0)
+#define GFX_SP_HARD_BASE2	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  1)
+#define GFX_SP_HARD_BASE3	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  2)
+#define GFX_SP_HARD_BASE4	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  3)
+#define GFX_SP_HARD_BASE5	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  4)
+#define GFX_SP_HARD_BASE6	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  5)
+#define GFX_SP_CHIP_UPPER	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  6)
+#define GFX_SP_CHIP_LOWER	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  7)
 
-#define GFX_INVISIBLE_STEEL	(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  3)
-#define GFX_UNSICHTBAR		(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  7)
-#define GFX_SP_ZONK		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  0)
+#define GFX_INVISIBLE_STEEL	(GFX_START_ROCKSSP +  5 * SP_PER_LINE +  3)
+#define GFX_UNSICHTBAR		(GFX_START_ROCKSSP +  5 * SP_PER_LINE +  7)
+#define GFX_SP_ZONK		(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  0)
 
-#define GFX_EM_KEY_1		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  4)
-#define GFX_EM_KEY_2		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  5)
-#define GFX_EM_KEY_3		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  6)
-#define GFX_EM_KEY_4		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  7)
-#define GFX_EM_GATE_1		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  0)
-#define GFX_EM_GATE_2		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  1)
-#define GFX_EM_GATE_3		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  2)
-#define GFX_EM_GATE_4		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  3)
-#define GFX_EM_GATE_1X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  4)
-#define GFX_EM_GATE_2X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  5)
-#define GFX_EM_GATE_3X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  6)
-#define GFX_EM_GATE_4X		(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  7)
+#define GFX_EM_KEY_1		(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  4)
+#define GFX_EM_KEY_2		(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  5)
+#define GFX_EM_KEY_3		(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  6)
+#define GFX_EM_KEY_4		(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  7)
+#define GFX_EM_GATE_1		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  0)
+#define GFX_EM_GATE_2		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  1)
+#define GFX_EM_GATE_3		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  2)
+#define GFX_EM_GATE_4		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  3)
+#define GFX_EM_GATE_1X		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  4)
+#define GFX_EM_GATE_2X		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  5)
+#define GFX_EM_GATE_3X		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  6)
+#define GFX_EM_GATE_4X		(GFX_START_ROCKSSP +  7 * SP_PER_LINE +  7)
 
-#define GFX_MURPHY_GO_LEFT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  8)
-#define GFX_MURPHY_ANY_LEFT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  9)
-#define GFX_MURPHY_GO_RIGHT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE + 11)
-#define GFX_MURPHY_ANY_RIGHT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE + 12)
-#define GFX_MURPHY_SNAP_UP	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE + 14)
-#define GFX_MURPHY_SNAP_DOWN	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE + 15)
-#define GFX_MURPHY_SNAP_RIGHT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  8)
-#define GFX_MURPHY_SNAP_LEFT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  9)
-#define GFX_MURPHY_PUSH_RIGHT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE + 10)
-#define GFX_MURPHY_PUSH_LEFT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE + 11)
+#define GFX_MURPHY_GO_LEFT	(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  8)
+#define GFX_MURPHY_ANY_LEFT	(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  9)
+#define GFX_MURPHY_GO_RIGHT	(GFX_START_ROCKSSP +  0 * SP_PER_LINE + 11)
+#define GFX_MURPHY_ANY_RIGHT	(GFX_START_ROCKSSP +  0 * SP_PER_LINE + 12)
+#define GFX_MURPHY_SNAP_UP	(GFX_START_ROCKSSP +  0 * SP_PER_LINE + 14)
+#define GFX_MURPHY_SNAP_DOWN	(GFX_START_ROCKSSP +  0 * SP_PER_LINE + 15)
+#define GFX_MURPHY_SNAP_RIGHT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  8)
+#define GFX_MURPHY_SNAP_LEFT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE +  9)
+#define GFX_MURPHY_PUSH_RIGHT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE + 10)
+#define GFX_MURPHY_PUSH_LEFT	(GFX_START_ROCKSSP +  1 * SP_PER_LINE + 11)
 
-#define GFX_SP_BUG_WARNING	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE + 15)
-#define GFX_SP_EXPLODE_EMPTY	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  8)
-#define GFX_SP_EXPLODE_INFOTRON	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  8)
-#define GFX_SP_BUG_ACTIVE	(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  8)
-#define GFX_SP_SNIKSNAK_LEFT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE +  8)
-#define GFX_SP_SNIKSNAK_RIGHT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE + 12)
-#define GFX_SP_SNIKSNAK_UP	(GFX_START_ROCKSMORE +  9 * MORE_PER_LINE +  8)
-#define GFX_SP_SNIKSNAK_DOWN	(GFX_START_ROCKSMORE +  9 * MORE_PER_LINE + 12)
+#define GFX_SP_BUG_WARNING	(GFX_START_ROCKSSP +  2 * SP_PER_LINE + 15)
+#define GFX_SP_EXPLODE_EMPTY	(GFX_START_ROCKSSP +  3 * SP_PER_LINE +  8)
+#define GFX_SP_EXPLODE_INFOTRON	(GFX_START_ROCKSSP +  4 * SP_PER_LINE +  8)
+#define GFX_SP_BUG_ACTIVE	(GFX_START_ROCKSSP +  6 * SP_PER_LINE +  8)
+#define GFX_SP_SNIKSNAK_LEFT	(GFX_START_ROCKSSP +  8 * SP_PER_LINE +  8)
+#define GFX_SP_SNIKSNAK_RIGHT	(GFX_START_ROCKSSP +  8 * SP_PER_LINE + 12)
+#define GFX_SP_SNIKSNAK_UP	(GFX_START_ROCKSSP +  9 * SP_PER_LINE +  8)
+#define GFX_SP_SNIKSNAK_DOWN	(GFX_START_ROCKSSP +  9 * SP_PER_LINE + 12)
 
-#define GFX2_SP_ELECTRON	(GFX_START_ROCKSMORE + 10 * MORE_PER_LINE +  8)
-#define GFX2_SP_TERMINAL	(GFX_START_ROCKSMORE + 11 * MORE_PER_LINE +  8)
-#define GFX2_SP_TERMINAL_ACTIVE	(GFX_START_ROCKSMORE + 12 * MORE_PER_LINE +  8)
+#define GFX2_SP_ELECTRON	(GFX_START_ROCKSSP + 10 * SP_PER_LINE +  8)
+#define GFX2_SP_TERMINAL	(GFX_START_ROCKSSP + 11 * SP_PER_LINE +  8)
+#define GFX2_SP_TERMINAL_ACTIVE	(GFX_START_ROCKSSP + 12 * SP_PER_LINE +  8)
+
+/* graphics from "RocksDC" */
+#define GFX_BELT1_MIDDLE	(GFX_START_ROCKSDC +  0 * DC_PER_LINE +  0)
+#define GFX_BELT1_LEFT		(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  0)
+#define GFX_BELT1_RIGHT		(GFX_START_ROCKSDC +  2 * DC_PER_LINE +  0)
+#define GFX_BELT2_MIDDLE	(GFX_START_ROCKSDC +  3 * DC_PER_LINE +  0)
+#define GFX_BELT2_LEFT		(GFX_START_ROCKSDC +  4 * DC_PER_LINE +  0)
+#define GFX_BELT2_RIGHT		(GFX_START_ROCKSDC +  5 * DC_PER_LINE +  0)
+#define GFX_BELT3_MIDDLE	(GFX_START_ROCKSDC +  6 * DC_PER_LINE +  0)
+#define GFX_BELT3_LEFT		(GFX_START_ROCKSDC +  7 * DC_PER_LINE +  0)
+#define GFX_BELT3_RIGHT		(GFX_START_ROCKSDC +  8 * DC_PER_LINE +  0)
+#define GFX_BELT4_MIDDLE	(GFX_START_ROCKSDC +  9 * DC_PER_LINE +  0)
+#define GFX_BELT4_LEFT		(GFX_START_ROCKSDC + 10 * DC_PER_LINE +  0)
+#define GFX_BELT4_RIGHT		(GFX_START_ROCKSDC + 11 * DC_PER_LINE +  0)
+#define GFX_BELT1_SWITCH_L	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  0)
+#define GFX_BELT2_SWITCH_L	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  1)
+#define GFX_BELT3_SWITCH_L	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  2)
+#define GFX_BELT4_SWITCH_L	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  3)
+#define GFX_BELT1_SWITCH_M	(GFX_START_ROCKSDC + 13 * DC_PER_LINE +  0)
+#define GFX_BELT2_SWITCH_M	(GFX_START_ROCKSDC + 13 * DC_PER_LINE +  1)
+#define GFX_BELT3_SWITCH_M	(GFX_START_ROCKSDC + 13 * DC_PER_LINE +  2)
+#define GFX_BELT4_SWITCH_M	(GFX_START_ROCKSDC + 13 * DC_PER_LINE +  3)
+#define GFX_BELT1_SWITCH_R	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  0)
+#define GFX_BELT2_SWITCH_R	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  1)
+#define GFX_BELT3_SWITCH_R	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  2)
+#define GFX_BELT4_SWITCH_R	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  3)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
@@ -1273,23 +1337,40 @@ extern char		*element_info[];
 #define GFX_KEY_WHITE		GFX_CHAR_FRAGE
 #define GFX_FORCE_FIELD		GFX_CHAR_FRAGE
 #define GFX_EXTRA_TIME		GFX_CHAR_FRAGE
-#define GFX_SWITCH_GATE_OPEN	GFX_CHAR_FRAGE
-#define GFX_SWITCH_GATE_CLOSED	GFX_CHAR_FRAGE
-#define GFX_SWITCH_GATE_SWITCH	GFX_CHAR_FRAGE
+#define GFX_SWITCHGATE_OPEN	GFX_CHAR_FRAGE
+#define GFX_SWITCHGATE_CLOSED	GFX_CHAR_FRAGE
+#define GFX_SWITCHGATE_SWITCH_L	GFX_CHAR_FRAGE
+#define GFX_SWITCHGATE_SWITCH_R	GFX_CHAR_FRAGE
 #define GFX_TIME_GATE		GFX_CHAR_FRAGE
 #define GFX_TIME_GATE_WHEEL	GFX_CHAR_FRAGE
-#define GFX_BELT_GREEN_LEFT	GFX_CHAR_FRAGE
-#define GFX_BELT_GREEN_MIDDLE	GFX_CHAR_FRAGE
-#define GFX_BELT_GREEN_RIGHT	GFX_CHAR_FRAGE
-#define GFX_BELT_GREEN_SWITCH	GFX_CHAR_FRAGE
-#define GFX_BELT_RED_LEFT	GFX_CHAR_FRAGE
-#define GFX_BELT_RED_MIDDLE	GFX_CHAR_FRAGE
-#define GFX_BELT_RED_RIGHT	GFX_CHAR_FRAGE
-#define GFX_BELT_RED_SWITCH	GFX_CHAR_FRAGE
-#define GFX_BELT_BLUE_LEFT	GFX_CHAR_FRAGE
-#define GFX_BELT_BLUE_MIDDLE	GFX_CHAR_FRAGE
-#define GFX_BELT_BLUE_RIGHT	GFX_CHAR_FRAGE
-#define GFX_BELT_BLUE_SWITCH	GFX_CHAR_FRAGE
+
+/*
+#define GFX_BELT1_LEFT		GFX_CHAR_FRAGE
+#define GFX_BELT1_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT1_RIGHT		GFX_CHAR_FRAGE
+#define GFX_BELT1_SWITCH_L	GFX_CHAR_FRAGE
+#define GFX_BELT1_SWITCH_M	GFX_CHAR_FRAGE
+#define GFX_BELT1_SWITCH_R	GFX_CHAR_FRAGE
+#define GFX_BELT2_LEFT		GFX_CHAR_FRAGE
+#define GFX_BELT2_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT2_RIGHT		GFX_CHAR_FRAGE
+#define GFX_BELT2_SWITCH_L	GFX_CHAR_FRAGE
+#define GFX_BELT2_SWITCH_M	GFX_CHAR_FRAGE
+#define GFX_BELT2_SWITCH_R	GFX_CHAR_FRAGE
+#define GFX_BELT3_LEFT		GFX_CHAR_FRAGE
+#define GFX_BELT3_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT3_RIGHT		GFX_CHAR_FRAGE
+#define GFX_BELT3_SWITCH_L	GFX_CHAR_FRAGE
+#define GFX_BELT3_SWITCH_M	GFX_CHAR_FRAGE
+#define GFX_BELT3_SWITCH_R	GFX_CHAR_FRAGE
+#define GFX_BELT4_LEFT		GFX_CHAR_FRAGE
+#define GFX_BELT4_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT4_RIGHT		GFX_CHAR_FRAGE
+#define GFX_BELT4_SWITCH_L	GFX_CHAR_FRAGE
+#define GFX_BELT4_SWITCH_M	GFX_CHAR_FRAGE
+#define GFX_BELT4_SWITCH_R	GFX_CHAR_FRAGE
+*/
+
 #define GFX_LANDMINE		GFX_CHAR_FRAGE
 #define GFX_ENVELOPE		GFX_CHAR_FRAGE
 #define GFX_LIGHT_SWITCH	GFX_CHAR_FRAGE

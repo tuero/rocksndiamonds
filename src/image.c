@@ -514,7 +514,7 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
 
   /* read the graphic file in PCX format to image structure */
   if ((image = Read_PCX_to_Image(filename)) == NULL)
-    return PCX_FileInvalid;
+    return errno_pcx;
 
 #if DEBUG_TIMING
   printf("%s:\n", filename);
@@ -548,7 +548,7 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   *pixmap = ximageinfo->pixmap;
   *pixmap_mask = ximageinfo->pixmap_mask;
 
-  return(PCX_Success);
+  return PCX_Success;
 }
 
 #endif /* !MSDOS */

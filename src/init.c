@@ -480,7 +480,8 @@ void InitGfx()
     { "Door",	TRUE },
     { "Heroes",	TRUE },
     { "Toons",	TRUE },
-    { "More",	TRUE },
+    { "SP",	TRUE },
+    { "DC",	TRUE },
     { "Font",	FALSE },
     { "Font2",	FALSE }
   }; 
@@ -491,7 +492,8 @@ void InitGfx()
     { "RocksDoor",	TRUE },
     { "RocksHeroes",	TRUE },
     { "RocksToons",	TRUE },
-    { "RocksMore",	TRUE },
+    { "RocksSP",	TRUE },
+    { "RocksDC",	TRUE },
     { "RocksFont",	FALSE },
     { "RocksFont2",	FALSE }
   }; 
@@ -1553,7 +1555,41 @@ void InitElementProperties()
   };
   static int ep_active_bomb_num = sizeof(ep_active_bomb)/sizeof(int);
 
-  static long ep_bit[] =
+  static int ep_belt[] =
+  {
+    EL_BELT1_LEFT,
+    EL_BELT1_MIDDLE,
+    EL_BELT1_RIGHT,
+    EL_BELT2_LEFT,
+    EL_BELT2_MIDDLE,
+    EL_BELT2_RIGHT,
+    EL_BELT3_LEFT,
+    EL_BELT3_MIDDLE,
+    EL_BELT3_RIGHT,
+    EL_BELT4_LEFT,
+    EL_BELT4_MIDDLE,
+    EL_BELT4_RIGHT,
+  };
+  static int ep_belt_num = sizeof(ep_belt)/sizeof(int);
+
+  static int ep_belt_switch[] =
+  {
+    EL_BELT1_SWITCH_L,
+    EL_BELT1_SWITCH_M,
+    EL_BELT1_SWITCH_R,
+    EL_BELT2_SWITCH_L,
+    EL_BELT2_SWITCH_M,
+    EL_BELT2_SWITCH_R,
+    EL_BELT3_SWITCH_L,
+    EL_BELT3_SWITCH_M,
+    EL_BELT3_SWITCH_R,
+    EL_BELT4_SWITCH_L,
+    EL_BELT4_SWITCH_M,
+    EL_BELT4_SWITCH_R,
+  };
+  static int ep_belt_switch_num = sizeof(ep_belt_switch)/sizeof(int);
+
+  static long ep1_bit[] =
   {
     EP_BIT_AMOEBALIVE,
     EP_BIT_AMOEBOID,
@@ -1587,7 +1623,12 @@ void InitElementProperties()
     EP_BIT_OVER_PLAYER,
     EP_BIT_ACTIVE_BOMB
   };
-  static int *ep_array[] =
+  static long ep2_bit[] =
+  {
+    EP_BIT_BELT,
+    EP_BIT_BELT_SWITCH
+  };
+  static int *ep1_array[] =
   {
     ep_amoebalive,
     ep_amoeboid,
@@ -1621,7 +1662,12 @@ void InitElementProperties()
     ep_over_player,
     ep_active_bomb
   };
-  static int *ep_num[] =
+  static int *ep2_array[] =
+  {
+    ep_belt,
+    ep_belt_switch
+  };
+  static int *ep1_num[] =
   {
     &ep_amoebalive_num,
     &ep_amoeboid_num,
@@ -1655,16 +1701,29 @@ void InitElementProperties()
     &ep_over_player_num,
     &ep_active_bomb_num
   };
-  static int num_properties = sizeof(ep_num)/sizeof(int *);
+  static int *ep2_num[] =
+  {
+    &ep_belt_num,
+    &ep_belt_switch_num
+  };
+  static int num_properties1 = sizeof(ep1_num)/sizeof(int *);
+  static int num_properties2 = sizeof(ep2_num)/sizeof(int *);
 
   for(i=0; i<MAX_ELEMENTS; i++)
-    Elementeigenschaften[i] = 0;
+  {
+    Elementeigenschaften1[i] = 0;
+    Elementeigenschaften2[i] = 0;
+  }
 
-  for(i=0; i<num_properties; i++)
-    for(j=0; j<*(ep_num[i]); j++)
-      Elementeigenschaften[(ep_array[i])[j]] |= ep_bit[i];
+  for(i=0; i<num_properties1; i++)
+    for(j=0; j<*(ep1_num[i]); j++)
+      Elementeigenschaften1[(ep1_array[i])[j]] |= ep1_bit[i];
+  for(i=0; i<num_properties2; i++)
+    for(j=0; j<*(ep2_num[i]); j++)
+      Elementeigenschaften2[(ep2_array[i])[j]] |= ep2_bit[i];
+
   for(i=EL_CHAR_START; i<EL_CHAR_END; i++)
-    Elementeigenschaften[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
+    Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
 void CloseAllAndExit(int exit_value)

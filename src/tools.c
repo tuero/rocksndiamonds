@@ -741,19 +741,26 @@ void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
     *x = SX + (graphic % GFX_PER_LINE) * TILEX;
     *y = SY + (graphic / GFX_PER_LINE) * TILEY;
   }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
-  {
-    graphic -= GFX_START_ROCKSMORE;
-    *pixmap_nr = PIX_MORE;
-    *x = (graphic % MORE_PER_LINE) * TILEX;
-    *y = (graphic / MORE_PER_LINE) * TILEY;
-  }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
     *pixmap_nr = PIX_HEROES;
     *x = (graphic % HEROES_PER_LINE) * TILEX;
     *y = (graphic / HEROES_PER_LINE) * TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
+  {
+    graphic -= GFX_START_ROCKSSP;
+    *pixmap_nr = PIX_SP;
+    *x = (graphic % SP_PER_LINE) * TILEX;
+    *y = (graphic / SP_PER_LINE) * TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
+  {
+    graphic -= GFX_START_ROCKSDC;
+    *pixmap_nr = PIX_DC;
+    *x = (graphic % DC_PER_LINE) * TILEX;
+    *y = (graphic / DC_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
@@ -765,7 +772,7 @@ void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
   }
   else
   {
-    *pixmap_nr = PIX_MORE;
+    *pixmap_nr = PIX_SP;
     *x = 0;
     *y = 0;
   }
@@ -860,13 +867,20 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
     *x = MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX;
     *y = MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY;
   }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
-    graphic -= GFX_START_ROCKSMORE;
-    graphic -= ((graphic / MORE_PER_LINE) * MORE_PER_LINE) / 2;
-    *pixmap = pix[PIX_MORE];
-    *x = MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX;
-    *y = MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY;
+    graphic -= GFX_START_ROCKSSP;
+    graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
+    *pixmap = pix[PIX_SP];
+    *x = MINI_SP_STARTX + (graphic % MINI_SP_PER_LINE) * MINI_TILEX;
+    *y = MINI_SP_STARTY + (graphic / MINI_SP_PER_LINE) * MINI_TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
+  {
+    graphic -= GFX_START_ROCKSDC;
+    *pixmap = pix[PIX_DC];
+    *x = MINI_DC_STARTX + (graphic % MINI_DC_PER_LINE) * MINI_TILEX;
+    *y = MINI_DC_STARTY + (graphic / MINI_DC_PER_LINE) * MINI_TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
@@ -878,9 +892,9 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
   }
   else
   {
-    *pixmap = pix[PIX_MORE];
-    *x = MINI_MORE_STARTX;
-    *y = MINI_MORE_STARTY;
+    *pixmap = pix[PIX_SP];
+    *x = MINI_SP_STARTX;
+    *y = MINI_SP_STARTY;
   }
 }
 
@@ -1459,13 +1473,22 @@ void DrawMicroElement(int xpos, int ypos, int element)
 
   graphic = el2gfx(element);
 
-  if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
-    graphic -= GFX_START_ROCKSMORE;
-    graphic -= ((graphic / MORE_PER_LINE) * MORE_PER_LINE) / 2;
-    XCopyArea(display, pix[PIX_MORE], drawto, gc,
-	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
-	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
+    graphic -= GFX_START_ROCKSSP;
+    graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
+    XCopyArea(display, pix[PIX_SP], drawto, gc,
+	      MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) *MICRO_TILEX,
+	      MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) *MICRO_TILEY,
+	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  }
+  else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
+  {
+    graphic -= GFX_START_ROCKSDC;
+    graphic -= ((graphic / DC_PER_LINE) * DC_PER_LINE) / 2;
+    XCopyArea(display, pix[PIX_DC], drawto, gc,
+	      MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) *MICRO_TILEX,
+	      MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) *MICRO_TILEY,
 	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else
@@ -2455,23 +2478,36 @@ int el2gfx(int element)
     case EL_KEY_WHITE:		return GFX_KEY_WHITE;
     case EL_FORCE_FIELD:	return GFX_FORCE_FIELD;
     case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
-    case EL_SWITCH_GATE_OPEN:	return GFX_SWITCH_GATE_OPEN;
-    case EL_SWITCH_GATE_CLOSED:	return GFX_SWITCH_GATE_CLOSED;
-    case EL_SWITCH_GATE_SWITCH:	return GFX_SWITCH_GATE_SWITCH;
+    case EL_SWITCHGATE_OPEN:	return GFX_SWITCHGATE_OPEN;
+    case EL_SWITCHGATE_CLOSED:	return GFX_SWITCHGATE_CLOSED;
+    case EL_SWITCHGATE_SWITCH_L:return GFX_SWITCHGATE_SWITCH_L;
+    case EL_SWITCHGATE_SWITCH_R:return GFX_SWITCHGATE_SWITCH_R;
     case EL_TIME_GATE:		return GFX_TIME_GATE;
     case EL_TIME_GATE_WHEEL:	return GFX_TIME_GATE_WHEEL;
-    case EL_BELT_GREEN_LEFT:	return GFX_BELT_GREEN_LEFT;
-    case EL_BELT_GREEN_MIDDLE:	return GFX_BELT_GREEN_MIDDLE;
-    case EL_BELT_GREEN_RIGHT:	return GFX_BELT_GREEN_RIGHT;
-    case EL_BELT_GREEN_SWITCH:	return GFX_BELT_GREEN_SWITCH;
-    case EL_BELT_RED_LEFT:	return GFX_BELT_RED_LEFT;
-    case EL_BELT_RED_MIDDLE:	return GFX_BELT_RED_MIDDLE;
-    case EL_BELT_RED_RIGHT:	return GFX_BELT_RED_RIGHT;
-    case EL_BELT_RED_SWITCH:	return GFX_BELT_RED_SWITCH;
-    case EL_BELT_BLUE_LEFT:	return GFX_BELT_BLUE_LEFT;
-    case EL_BELT_BLUE_MIDDLE:	return GFX_BELT_BLUE_MIDDLE;
-    case EL_BELT_BLUE_RIGHT:	return GFX_BELT_BLUE_RIGHT;
-    case EL_BELT_BLUE_SWITCH:	return GFX_BELT_BLUE_SWITCH;
+    case EL_BELT1_LEFT:		return GFX_BELT1_LEFT;
+    case EL_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
+    case EL_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
+    case EL_BELT1_SWITCH_L:	return GFX_BELT1_SWITCH_L;
+    case EL_BELT1_SWITCH_M:	return GFX_BELT1_SWITCH_M;
+    case EL_BELT1_SWITCH_R:	return GFX_BELT1_SWITCH_R;
+    case EL_BELT2_LEFT:		return GFX_BELT2_LEFT;
+    case EL_BELT2_MIDDLE:	return GFX_BELT2_MIDDLE;
+    case EL_BELT2_RIGHT:	return GFX_BELT2_RIGHT;
+    case EL_BELT2_SWITCH_L:	return GFX_BELT2_SWITCH_L;
+    case EL_BELT2_SWITCH_M:	return GFX_BELT2_SWITCH_M;
+    case EL_BELT2_SWITCH_R:	return GFX_BELT2_SWITCH_R;
+    case EL_BELT3_LEFT:		return GFX_BELT3_LEFT;
+    case EL_BELT3_MIDDLE:	return GFX_BELT3_MIDDLE;
+    case EL_BELT3_RIGHT:	return GFX_BELT3_RIGHT;
+    case EL_BELT3_SWITCH_L:	return GFX_BELT3_SWITCH_L;
+    case EL_BELT3_SWITCH_M:	return GFX_BELT3_SWITCH_M;
+    case EL_BELT3_SWITCH_R:	return GFX_BELT3_SWITCH_R;
+    case EL_BELT4_LEFT:		return GFX_BELT4_LEFT;
+    case EL_BELT4_MIDDLE:	return GFX_BELT4_MIDDLE;
+    case EL_BELT4_RIGHT:	return GFX_BELT4_RIGHT;
+    case EL_BELT4_SWITCH_L:	return GFX_BELT4_SWITCH_L;
+    case EL_BELT4_SWITCH_M:	return GFX_BELT4_SWITCH_M;
+    case EL_BELT4_SWITCH_R:	return GFX_BELT4_SWITCH_R;
     case EL_LANDMINE:		return GFX_LANDMINE;
     case EL_ENVELOPE:		return GFX_ENVELOPE;
     case EL_LIGHT_SWITCH:	return GFX_LIGHT_SWITCH;
@@ -2503,10 +2539,10 @@ int el2gfx(int element)
 	int nr_element = element - EL_SP_START;
 	int gfx_per_line = 8;
 	int nr_graphic =
-	  (nr_element / gfx_per_line) * MORE_PER_LINE +
+	  (nr_element / gfx_per_line) * SP_PER_LINE +
 	  (nr_element % gfx_per_line);
 
-	return GFX_START_ROCKSMORE + nr_graphic;
+	return GFX_START_ROCKSSP + nr_graphic;
       }
       else
 	return -1;

@@ -78,10 +78,11 @@ short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-unsigned long	Elementeigenschaften[MAX_ELEMENTS];
+unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
+unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
@@ -196,7 +197,7 @@ int num_bg_loops = sizeof(background_loop)/sizeof(int);
 
 char *element_info[] =
 {
-  "empty space",
+  "empty space",				/* 0 */
   "sand",
   "normal wall",
   "round wall",
@@ -206,7 +207,7 @@ char *element_info[] =
   "closed exit",
   "player",
   "bug",
-  "spaceship",
+  "spaceship",					/* 10 */
   "yam yam",
   "robot",
   "steel wall",
@@ -216,7 +217,7 @@ char *element_info[] =
   "quicksand with rock",
   "amoeba drop",
   "bomb",
-  "magic wall",
+  "magic wall",					/* 20 */
   "speed ball",
   "acid pool",
   "dropping amoeba",
@@ -226,7 +227,7 @@ char *element_info[] =
   "biomaze",
   "burning dynamite",
   "unknown",
-  "magic wheel",
+  "magic wheel",				/* 30 */
   "running wire",
   "red key",
   "yellow key",
@@ -236,7 +237,7 @@ char *element_info[] =
   "yellow door",
   "green door",
   "blue door",
-  "gray door (opened by red key)",
+  "gray door (opened by red key)",		/* 40 */
   "gray door (opened by yellow key)",
   "gray door (opened by green key)",
   "gray door (opened by blue key)",
@@ -246,7 +247,7 @@ char *element_info[] =
   "light bulb (dark)",
   "ligh bulb (glowing)",
   "wall with emerald",
-  "wall with diamond",
+  "wall with diamond",				/* 50 */
   "amoeba with content",
   "amoeba (BD style)",
   "time orb (full)",
@@ -256,7 +257,7 @@ char *element_info[] =
   "yellow emerald",
   "wall with BD style diamond",
   "wall with yellow emerald",
-  "dark yam yam",
+  "dark yam yam",				/* 60 */
   "magic wall (BD style)",
   "invisible steel wall",
   "dynabomb",
@@ -266,7 +267,7 @@ char *element_info[] =
   "sokoban object",
   "sokoban empty field",
   "sokoban field with object",
-  "butterfly (starts moving right)",
+  "butterfly (starts moving right)",		/* 70 */
   "butterfly (starts moving up)",
   "butterfly (starts moving left)",
   "butterfly (starts moving down)",
@@ -276,7 +277,7 @@ char *element_info[] =
   "firefly (starts moving down)",
   "butterfly",
   "firefly",
-  "yellow player",
+  "yellow player",				/* 80 */
   "red player",
   "green player",
   "blue player",
@@ -286,7 +287,7 @@ char *element_info[] =
   "bug (starts moving down)",
   "spaceship (starts moving right)",
   "spaceship (starts moving up)",
-  "spaceship (starts moving left)",
+  "spaceship (starts moving left)",		/* 90 */
   "spaceship (starts moving down)",
   "pac man (starts moving right)",
   "pac man (starts moving up)",
@@ -296,7 +297,7 @@ char *element_info[] =
   "violet emerald",
   "wall with red emerald",
   "wall with violet emerald",
-  "unknown",
+  "unknown",					/* 100 */
   "unknown",
   "unknown",
   "unknown",
@@ -306,7 +307,7 @@ char *element_info[] =
   "open exit",
   "unknown",
   "amoeba",
-  "mole",
+  "mole",					/* 110 */
   "penguin",
   "satellite",
   "arrow left",
@@ -316,7 +317,7 @@ char *element_info[] =
   "pig",
   "fire breathing dragon",
   "unknown",
-  "letter ' '",
+  "letter ' '",					/* 120 */
   "letter '!'",
   "letter '\"'",
   "letter '#'",
@@ -326,7 +327,7 @@ char *element_info[] =
   "letter '''",
   "letter '('",
   "letter ')'",
-  "letter '*'",
+  "letter '*'",					/* 130 */
   "letter '+'",
   "letter ','",
   "letter '-'",
@@ -336,7 +337,7 @@ char *element_info[] =
   "letter '1'",
   "letter '2'",
   "letter '3'",
-  "letter '4'",
+  "letter '4'",					/* 140 */
   "letter '5'",
   "letter '6'",
   "letter '7'",
@@ -346,7 +347,7 @@ char *element_info[] =
   "letter ';'",
   "letter '<'",
   "letter '='",
-  "letter '>'",
+  "letter '>'",					/* 150 */
   "letter '?'",
   "letter '@'",
   "letter 'A'",
@@ -356,7 +357,7 @@ char *element_info[] =
   "letter 'E'",
   "letter 'F'",
   "letter 'G'",
-  "letter 'H'",
+  "letter 'H'",					/* 160 */
   "letter 'I'",
   "letter 'J'",
   "letter 'K'",
@@ -366,7 +367,7 @@ char *element_info[] =
   "letter 'O'",
   "letter 'P'",
   "letter 'Q'",
-  "letter 'R'",
+  "letter 'R'",					/* 170 */
   "letter 'S'",
   "letter 'T'",
   "letter 'U'",
@@ -376,7 +377,7 @@ char *element_info[] =
   "letter 'Y'",
   "letter 'Z'",
   "letter 'Ä'",
-  "letter 'Ö'",
+  "letter 'Ö'",					/* 180 */
   "letter 'Ü'",
   "letter '^'",
   "letter ''",
@@ -386,6 +387,7 @@ char *element_info[] =
   "letter ''",
   "letter ''",
   "letter ''",
+  "letter ''",					/* 190 */
   "letter ''",
   "letter ''",
   "letter ''",
@@ -395,8 +397,7 @@ char *element_info[] =
   "letter ''",
   "letter ''",
   "letter ''",
-  "letter ''",
-  "growing wall (horizontally)",
+  "growing wall (horizontally)",		/* 200 */
   "growing wall (vertically)",
   "growing wall (all directions)",
   "unused",
@@ -406,7 +407,7 @@ char *element_info[] =
   "unused",
   "unused",
   "unused",
-  "empty space",
+  "empty space",				/* 210 */
   "zonk",
   "base",
   "murphy",
@@ -416,7 +417,7 @@ char *element_info[] =
   "exit",
   "orange disk",
   "port (leading right)",
-  "port (leading down)",
+  "port (leading down)",			/* 220 */
   "port (leading left)",
   "port (leading up)",
   "port (leading right)",
@@ -426,7 +427,7 @@ char *element_info[] =
   "snik snak",
   "yellow disk",
   "terminal",
-  "red disk",
+  "red disk",					/* 230 */
   "port (vertically)",
   "port (horizontally)",
   "port (all directions)",
@@ -436,7 +437,7 @@ char *element_info[] =
   "chip (right half)",
   "hardware",
   "hardware",
-  "hardware",
+  "hardware",					/* 240 */
   "hardware",
   "hardware",
   "hardware",
@@ -446,7 +447,7 @@ char *element_info[] =
   "hardware",
   "chip (upper half)",
   "chip (lower half)",
-  "unknown",
+  "unknown",					/* 250 */
   "unknown",
   "unknown",
   "unknown",
@@ -455,38 +456,51 @@ char *element_info[] =
 
   /* 256 */
 
-  "pearl",
+  "pearl",					/* (256) */
   "crystal",
   "wall with pearl",
   "wall with crystal",
-  "white door",
+  "white door",					/* 260 */
   "gray door (opened by white key)",
   "white key",
   "force field",
   "extra time",
   "switch gate (open)",
   "switch gate (closed)",
-  "switch for switch gate",
+  "switch for switch gate (open)",
+  "switch for switch gate (closed)",
   "time gate",
-  "time gate with magic wheel",
-  "green conveyor belt (left)",
-  "green conveyor belt (middle)",
-  "green conveyor belt (right)",
-  "switch for green conveyor belt",
+  "time gate with magic wheel",			/* 270 */
   "red conveyor belt (left)",
   "red conveyor belt (middle)",
   "red conveyor belt (right)",
-  "switch for red conveyor belt",
+  "switch for red conveyor belt (left)",
+  "switch for red conveyor belt (middle)",
+  "switch for red conveyor belt (right)",
+  "yellow conveyor belt (left)",
+  "yellow conveyor belt (middle)",
+  "yellow conveyor belt (right)",
+  "switch for yellow conveyor belt (left)",	/* 280 */
+  "switch for yellow conveyor belt (middle)",
+  "switch for yellow conveyor belt (right)",
+  "green conveyor belt (left)",
+  "green conveyor belt (middle)",
+  "green conveyor belt (right)",
+  "switch for green conveyor belt (left)",
+  "switch for green conveyor belt (middle)",
+  "switch for green conveyor belt (right)",
   "blue conveyor belt (left)",
-  "blue conveyor belt (middle)",
+  "blue conveyor belt (middle)",		/* 290 */
   "blue conveyor belt (right)",
-  "switch for blue conveyor belt",
+  "switch for blue conveyor belt (left)",
+  "switch for blue conveyor belt (middle)",
+  "switch for blue conveyor belt (right)",
   "land mine",
   "mail envelope",
   "light switch",
   "sign (exclamation)",
   "sign (radio activity)",
-  "sign (stop)",
+  "sign (stop)",				/* 300 */
   "sign (wheel chair)",
   "sign (parking)",
   "sign (one way)",
@@ -496,7 +510,7 @@ char *element_info[] =
   "sign (exit)",
   "sign (yin yang)",
   "sign (other)",
-  "mole (starts moving left)",
+  "mole (starts moving left)",			/* 310 */
   "mole (starts moving right)",
   "mole (starts moving up)",
   "mole (starts moving down)",
@@ -506,7 +520,7 @@ char *element_info[] =
   "-",
   "-",
   "-",
-  "-",
+  "-",						/* 320 */
   "-",
   "-",
   "-",

@@ -45,6 +45,9 @@ struct PCX_Header
   unsigned char filler[58];	/* fill to struct size of 128          */
 };
 
+/* global PCX error value */
+int errno_pcx = PCX_Success;
+
 static byte *PCX_ReadBitmap(Image *image, byte *buffer_ptr, byte *buffer_last)
 {
   /* Run Length Encoding: If the two high bits are set,
@@ -127,12 +130,18 @@ Image *Read_PCX_to_Image(char *filename)
   int width, height, depth;
   int i;
 
+  errno_pcx = PCX_Success;
+
   if (!(file = fopen(filename, "r")))
+  {
+    errno_pcx = PCX_OpenFailed;
     return NULL;
+  }
 
   if (fseek(file, 0, SEEK_END) == -1)
   {
     fclose(file);
+    errno_pcx = PCX_ReadFailed;
     return NULL;
   }
 
@@ -143,6 +152,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     /* PCX file is too short to contain a valid PCX header */
     fclose(file);
+    errno_pcx = PCX_FileInvalid;
     return NULL;
   }
 
@@ -151,6 +161,7 @@ Image *Read_PCX_to_Image(char *filename)
   if (fread(file_buffer, 1, file_length, file) != file_length)
   {
     fclose(file);
+    errno_pcx = PCX_ReadFailed;
     return NULL;
   }
 
@@ -177,6 +188,7 @@ Image *Read_PCX_to_Image(char *filename)
       width < 0 || height < 0)
   {
     free(file_buffer);
+    errno_pcx = PCX_FileInvalid;
     return NULL;
   }
 
@@ -204,6 +216,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     free(file_buffer);
     freeImage(image);
+    errno_pcx = PCX_FileInvalid;
     return NULL;
   }
 
@@ -211,6 +224,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     /* PCX file is too short to contain a valid 256 colors colormap */
     fclose(file);
+    errno_pcx = PCX_ColorFailed;
     return NULL;
   }
 
@@ -219,6 +233,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     free(file_buffer);
     freeImage(image);
+    errno_pcx = PCX_ColorFailed;
     return NULL;
   }
 
