@@ -44,6 +44,7 @@ short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -2797,7 +2798,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "acid_splash_left",
+    "nut_breaking",
+    "-",
+    "-"
+  },
+  {
+    "diamond_breaking",
     "-",
     "-"
   },

@@ -835,6 +835,7 @@ void InitGame()
     {
       Feld[x][y] = Ur[x][y];
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
+      ChangeDelay[x][y] = 0;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
@@ -1530,6 +1531,7 @@ static void RemoveField(int x, int y)
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
+  ChangeDelay[x][y] = 0;
 }
 
 void RemoveMovingField(int x, int y)
@@ -1566,6 +1568,7 @@ void RemoveMovingField(int x, int y)
   Feld[newx][newy] = EL_EMPTY;
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
   MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
+  ChangeDelay[oldx][oldy] = ChangeDelay[newx][newy] = 0;
   GfxAction[oldx][oldy] = GfxAction[newx][newy] = ACTION_DEFAULT;
 
   DrawLevelField(oldx, oldy);
@@ -1846,7 +1849,7 @@ void Explode(int ex, int ey, int phase, int mode)
       element = Feld[x][y] = Back[x][y];
     Back[x][y] = 0;
 
-    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = ChangeDelay[x][y] = 0;
     InitField(x, y, FALSE);
     if (CAN_MOVE(element))
       InitMovDir(x, y);
@@ -2358,7 +2361,7 @@ void Impact(int x, int y)
     Bang(x, y);
     return;
   }
-  else if (element == EL_PEARL)
+  else if (impact && element == EL_PEARL)
   {
     Feld[x][y] = EL_PEARL_BREAKING;
     PlaySoundLevel(x, y, SND_PEARL_BREAKING);
@@ -2467,7 +2470,11 @@ void Impact(int x, int y)
 	Bang(x, y + 1);
 	return;
       }
+#if 1
+      else if (!IS_MOVING(x, y + 1) && !IS_BLOCKED(x, y + 1))
+#else
       else if (!IS_MOVING(x, y + 1))
+#endif
       {
 	if (smashed == EL_LAMP ||
 	    smashed == EL_LAMP_ACTIVE)
@@ -2490,7 +2497,11 @@ void Impact(int x, int y)
 	}
 	else if (smashed == EL_DIAMOND)
 	{
+#if 1
+	  Feld[x][y+1] = EL_DIAMOND_BREAKING;
+#else
 	  Feld[x][y+1] = EL_EMPTY;
+#endif
 	  PlaySoundLevel(x, y, SND_DIAMOND_BREAKING);
 	  return;
 	}
@@ -3282,7 +3293,7 @@ void StartMoving(int x, int y)
 	started_moving = TRUE;
       }
     }
-    else if (IS_FREE(x, y+1))
+    else if (IS_FREE(x, y+1) || Feld[x][y+1] == EL_DIAMOND_BREAKING)
     {
       if (JustStopped[x][y])	/* prevent animation from being restarted */
 	MovDir[x][y] = MV_DOWN;
@@ -3764,6 +3775,7 @@ void ContinueMoving(int x, int y)
   {
     Feld[x][y] = EL_EMPTY;
     Feld[newx][newy] = element;
+    MovPos[x][y] = 0;	/* force "not moving" for "crumbled sand" */
 
     if (element == EL_MOLE)
     {
@@ -3842,6 +3854,9 @@ void ContinueMoving(int x, int y)
     Store[x][y] = 0;
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     MovDelay[newx][newy] = 0;
+
+    /* copy element change control values to new field */
+    ChangeDelay[newx][newy] = ChangeDelay[x][y];
 
     /* copy animation control values to new field */
     GfxFrame[newx][newy]  = GfxFrame[x][y];
@@ -4381,7 +4396,7 @@ void Life(int ax, int ay)
 
 static void InitRobotWheel(int x, int y)
 {
-  MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
+  ChangeDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
 }
 
 static void RunRobotWheel(int x, int y)
@@ -4397,7 +4412,7 @@ static void StopRobotWheel(int x, int y)
 
 static void InitTimegateWheel(int x, int y)
 {
-  MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
+  ChangeDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
 }
 
 static void RunTimegateWheel(int x, int y)
@@ -4723,7 +4738,7 @@ static void InitBuggyBase(int x, int y)
   int element = Feld[x][y];
   int activating_delay = FRAMES_PER_SECOND / 4;
 
-  MovDelay[x][y] =
+  ChangeDelay[x][y] =
     (element == EL_SP_BUGGY_BASE ?
      2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND) - activating_delay :
      element == EL_SP_BUGGY_BASE_ACTIVATING ?
@@ -4758,7 +4773,7 @@ static void WarnBuggyBase(int x, int y)
 
 static void InitTrap(int x, int y)
 {
-  MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
+  ChangeDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
 }
 
 static void ActivateTrap(int x, int y)
@@ -4779,19 +4794,16 @@ static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (IS_MOVING(x, y))			/* never change a running system :-) */
-    return;
-
-  if (MovDelay[x][y] == 0)		/* initialize element change */
+  if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
-    MovDelay[x][y] = changing_element[element].change_delay + 1;
+    ChangeDelay[x][y] = changing_element[element].change_delay + 1;
 
     if (IS_CUSTOM_ELEMENT(element) && HAS_CHANGE_EVENT(element, CE_DELAY))
     {
       int max_random_delay = element_info[element].change.delay_random;
       int delay_frames = element_info[element].change.delay_frames;
 
-      MovDelay[x][y] += RND(max_random_delay * delay_frames);
+      ChangeDelay[x][y] += RND(max_random_delay * delay_frames);
     }
 
     ResetGfxAnimation(x, y);
@@ -4801,29 +4813,67 @@ static void ChangeElement(int x, int y)
       changing_element[element].pre_change_function(x, y);
   }
 
-  MovDelay[x][y]--;
+  ChangeDelay[x][y]--;
 
-  if (MovDelay[x][y] != 0)		/* continue element change */
+  if (ChangeDelay[x][y] != 0)		/* continue element change */
   {
-    if (IS_ANIMATED(el2img(element)))
-      DrawLevelElementAnimationIfNeeded(x, y, element);
+    int graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+
+    if (IS_ANIMATED(graphic))
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
     if (changing_element[element].change_function)
       changing_element[element].change_function(x, y);
   }
   else					/* finish element change */
   {
+    if (IS_MOVING(x, y))		/* never change a running system ;-) */
+    {
+      ChangeDelay[x][y] = 1;		/* try change after next move step */
+
+      return;
+    }
+
+    RemoveField(x, y);
     Feld[x][y] = changing_element[element].next_element;
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
-#if 1
     InitField(x, y, FALSE);
-    if (CAN_MOVE(element))
+    if (CAN_MOVE(Feld[x][y]))
       InitMovDir(x, y);
-#endif
+
     DrawLevelField(x, y);
+
+    if (CAN_BE_CRUMBLED(Feld[x][y]))
+    {
+      int sx = SCREENX(x), sy = SCREENY(y);
+      static int xy[4][2] =
+      {
+	{ 0, -1 },
+	{ -1, 0 },
+	{ +1, 0 },
+	{ 0, +1 }
+      };
+      int i;
+
+      for(i=0; i<4; i++)
+      {
+	int xx = x + xy[i][0];
+	int yy = y + xy[i][1];
+	int sxx = sx + xy[i][0];
+	int syy = sy + xy[i][1];
+
+	if (!IN_LEV_FIELD(xx, yy) ||
+	    !IN_SCR_FIELD(sxx, syy) ||
+	    !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
+	    IS_MOVING(xx, yy))
+	  continue;
+
+	DrawLevelField(xx, yy);
+      }
+    }
 
     if (changing_element[element].post_change_function)
       changing_element[element].post_change_function(x, y);
@@ -5060,6 +5110,16 @@ void GameActions()
       continue;
     }
 
+#if 1
+    /* this may take place after moving, so 'element' may have changed */
+    if (IS_AUTO_CHANGING(element))
+    {
+      ChangeElement(x, y);
+      element = Feld[x][y];
+      graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+    }
+#endif
+
     if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element)))
     {
       StartMoving(x, y);
@@ -5145,8 +5205,8 @@ void GameActions()
     else if (IS_ANIMATED(graphic) && !IS_AUTO_CHANGING(element))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
-#if 1
-    /* this may take place after moving, therefore element may have changed */
+#if 0
+    /* this may take place after moving, so 'element' may have changed */
     if (IS_AUTO_CHANGING(Feld[x][y]))
       ChangeElement(x, y);
 #endif

@@ -105,26 +105,26 @@
 					 n * ED_COUNTER_YDISTANCE - 2)
 
 /* values for element content drawing areas */
+/* amoeba content */
 #define ED_AREA_ELEM_CONTENT_XPOS	( 2 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
+/* custom change target */
 #define ED_AREA_ELEM_CONTENT2_XPOS	(20 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE)
-
+/* optional custom graphic */
 #define ED_AREA_ELEM_CONTENT3_XPOS	(24 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT3_YPOS	(ED_SETTINGS_YPOS(1) + \
 					 ED_GADGET_DISTANCE)
-
-#if 1
+/* custom element content */
 #define ED_AREA_ELEM_CONTENT4_XPOS	(29 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
-#else
-#define ED_AREA_ELEM_CONTENT4_XPOS	(17 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(11) + \
-					 ED_GADGET_DISTANCE - MINI_TILEY)
-#endif
+/* custom change trigger element */
+#define ED_AREA_ELEM_CONTENT5_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(7) + \
+					 ED_GADGET_DISTANCE)
 
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
@@ -345,11 +345,12 @@
 #define GADGET_ID_AMOEBA_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 9)
 #define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 10)
 #define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 11)
-#define GADGET_ID_CUSTOM_CHANGED	(GADGET_ID_DRAWING_AREA_FIRST + 12)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 13)
+#define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 12)
+#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 13)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 14)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 14)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 15)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -367,10 +368,11 @@
 #define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 7)
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 8)
 #define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 9)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 10)
+#define GADGET_ID_CHANGE_IMPACT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 10)
+#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 11)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 12)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -420,9 +422,11 @@
 #define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 20)
 #define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 21)
 #define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_CHANGE_IMPACT_SMASHED	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 24)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 25)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -505,15 +509,16 @@
 #define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	7
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	8
 #define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	9
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		10
+#define ED_SELECTBOX_ID_CHANGE_IMPACT_ACTION	10
+#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	11
 
-#define ED_NUM_SELECTBOX			11
+#define ED_NUM_SELECTBOX			12
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
 
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
-#define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_CAUSE
+#define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_OTHER_ACTION
 
 /* values for textbutton gadgets */
 #define ED_TEXTBUTTON_ID_PROPERTIES_INFO	0
@@ -545,8 +550,10 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	18
 #define ED_CHECKBUTTON_ID_CHANGE_DELAY		19
 #define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	20
+#define ED_CHECKBUTTON_ID_CHANGE_IMPACT_SMASHED	21
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	22
 
-#define ED_NUM_CHECKBUTTONS			21
+#define ED_NUM_CHECKBUTTONS			23
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -555,7 +562,7 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_WALKABLE
 
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
-#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER
+#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_BY_OTHER
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -909,22 +916,29 @@ static struct ValueTextInfo options_time_units[] =
 
 static struct ValueTextInfo options_change_player_action[] =
 {
-  { CE_PRESSED_BY_PLAYER,	"pressed"			},
   { CE_TOUCHED_BY_PLAYER,	"touched"			},
+  { CE_PRESSED_BY_PLAYER,	"pressed"			},
+  { CE_PUSHED_BY_PLAYER,	"pushed"			},
   { -1,				NULL				}
 };
 static int value_change_player_action = 0;
 
-static struct ValueTextInfo options_change_cause[] =
+static struct ValueTextInfo options_change_impact_action[] =
 {
-  { 1,				"specified delay"		},
-  { 2,				"impact (active)"		},
-  { 3,				"impact (passive)"		},
-  { 4,				"touched by player"		},
-  { 5,				"pressed by player"		},
+  { CE_IMPACT,			"on impact"			},
+  { CE_SMASHED,			"when smashed"			},
   { -1,				NULL				}
 };
-static int value_change_cause = 0;
+static int value_change_impact_action = 0;
+
+static struct ValueTextInfo options_change_other_action[] =
+{
+  { CE_OTHER_COLLECTING,	"collecting"			},
+  { CE_OTHER_PUSHING,		"pushing"			},
+  { CE_OTHER_CHANGING,		"change of"			},
+  { -1,				NULL				}
+};
+static int value_change_other_action = 0;
 
 static struct
 {
@@ -1017,12 +1031,20 @@ static struct
     NULL, "by player", "type of player contact"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
-    GADGET_ID_CHANGE_CAUSE,
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(6),
+    GADGET_ID_CHANGE_IMPACT_ACTION,
     -1,
-    options_change_cause,
-    &value_change_cause,
-    "test:", NULL, "test-selectbox entry"
+    options_change_impact_action,
+    &value_change_impact_action,
+    NULL, NULL, "change after impact or smash"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CHANGE_OTHER_ACTION,
+    -1,
+    options_change_other_action,
+    &value_change_other_action,
+    NULL, "other element:", "type of other element action"
   },
 };
 
@@ -1297,6 +1319,18 @@ static struct
     GADGET_ID_CHANGE_BY_PLAYER,
     &custom_element_change_events[CE_BY_PLAYER],
     NULL,				"element changes by player contact"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
+    GADGET_ID_CHANGE_IMPACT_SMASHED,
+    &custom_element_change_events[CE_IMPACT_SMASHED],
+    NULL,				"element changes by impact or smash"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CHANGE_BY_OTHER,
+    &custom_element_change_events[CE_BY_OTHER],
+    NULL,				"element changes by other element"
   },
 };
 
@@ -2729,7 +2763,7 @@ static void CreateDrawingAreas()
   level_editor_gadget[id] = gi;
 
   /* ... one for each custom element change target element ... */
-  id = GADGET_ID_CUSTOM_CHANGED;
+  id = GADGET_ID_CUSTOM_CHANGE_TARGET;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX + ED_AREA_ELEM_CONTENT2_XPOS,
 		    GDI_Y, SY + ED_AREA_ELEM_CONTENT2_YPOS,
@@ -2747,8 +2781,26 @@ static void CreateDrawingAreas()
 
   level_editor_gadget[id] = gi;
 
-  /* ... and one for random placement background restrictions */
+  /* ... one for each custom element change trigger element ... */
+  id = GADGET_ID_CUSTOM_CHANGE_TRIGGER;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_X, SX + ED_AREA_ELEM_CONTENT5_XPOS,
+		    GDI_Y, SY + ED_AREA_ELEM_CONTENT5_YPOS,
+		    GDI_WIDTH, MINI_TILEX,
+		    GDI_HEIGHT, MINI_TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
+		    GDI_END);
 
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+
+  /* ... and one for random placement background restrictions */
   id = GADGET_ID_RANDOM_BACKGROUND;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX + ED_AREA_RANDOM_BACKGROUND_XPOS,
@@ -3469,9 +3521,16 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* set change by player selectbox help value */
   value_change_player_action =
-    (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
+    (HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      CE_PRESSED_BY_PLAYER);
+
+  /* set change by impact/smash selectbox help value */
+  value_change_impact_action =
+    (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
+     HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
+     CE_IMPACT);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3515,9 +3574,15 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_WALKABLE];
 
   /* set player change event from checkbox and selectbox */
-  custom_element.change.events &= ~CE_PRESSED_BY_PLAYER;
   custom_element.change.events &= ~CE_TOUCHED_BY_PLAYER;
+  custom_element.change.events &= ~CE_PRESSED_BY_PLAYER;
+  custom_element.change.events &= ~CE_PUSHED_BY_PLAYER;
   custom_element.change.events |= value_change_player_action;
+
+  /* set player change event from checkbox and selectbox */
+  custom_element.change.events &= ~CE_IMPACT;
+  custom_element.change.events &= ~CE_SMASHED;
+  custom_element.change.events |= value_change_impact_action;
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
@@ -3936,9 +4001,9 @@ static void DrawCustomContentArea()
   MapDrawingArea(GADGET_ID_CUSTOM_CONTENT);
 }
 
-static void DrawCustomChangedArea()
+static void DrawCustomChangeTargetArea()
 {
-  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGED];
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGE_TARGET];
   int xpos = ED_AREA_ELEM_CONTENT2_XPOS;
   int ypos = ED_AREA_ELEM_CONTENT2_YPOS;
   int area_sx = SX + xpos;
@@ -3956,7 +4021,30 @@ static void DrawCustomChangedArea()
   DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		     el2edimg(custom_element.change.successor));
 
-  MapDrawingArea(GADGET_ID_CUSTOM_CHANGED);
+  MapDrawingArea(GADGET_ID_CUSTOM_CHANGE_TARGET);
+}
+
+static void DrawCustomChangeTriggerArea()
+{
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGE_TRIGGER];
+  int xpos = ED_AREA_ELEM_CONTENT5_XPOS;
+  int ypos = ED_AREA_ELEM_CONTENT5_YPOS;
+  int area_sx = SX + xpos;
+  int area_sy = SY + ypos;
+
+  if (!IS_CUSTOM_ELEMENT(properties_element))
+  {
+    /* this should never happen */
+    Error(ERR_WARN, "element %d is no custom element", properties_element);
+
+    return;
+  }
+
+  DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
+  DrawMiniGraphicExt(drawto, gi->x, gi->y,
+		     el2edimg(custom_element.change.trigger));
+
+  MapDrawingArea(GADGET_ID_CUSTOM_CHANGE_TRIGGER);
 }
 
 static void DrawElementContentAreas()
@@ -4520,7 +4608,8 @@ static void DrawPropertiesAdvanced()
 
   /* draw drawing area gadgets */
   DrawCustomGraphicElementArea();
-  DrawCustomChangedArea();
+  DrawCustomChangeTargetArea();
+  DrawCustomChangeTriggerArea();
 }
 
 static void DrawElementName(int x, int y, int element)
@@ -5362,9 +5451,14 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  custom_element.content[sx][sy] = new_element;
 	  element_info[properties_element] = custom_element;
 	}
-	else if (id == GADGET_ID_CUSTOM_CHANGED)
+	else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	{
 	  custom_element.change.successor = new_element;
+	  element_info[properties_element] = custom_element;
+	}
+	else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
+	{
+	  custom_element.change.trigger = new_element;
 	  element_info[properties_element] = custom_element;
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
@@ -5477,8 +5571,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	PickDrawingElement(button, custom_element.gfx_element);
       else if (id == GADGET_ID_CUSTOM_CONTENT)
 	PickDrawingElement(button, custom_element.content[sx][sy]);
-      else if (id == GADGET_ID_CUSTOM_CHANGED)
+      else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	PickDrawingElement(button, custom_element.change.successor);
+      else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
+	PickDrawingElement(button, custom_element.change.trigger);
       else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	PickDrawingElement(button, random_placement_background_element);
       else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
@@ -6207,9 +6303,12 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CONTENT)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"%s", getElementInfoText(custom_element.content[sx][sy]));
-    else if (id == GADGET_ID_CUSTOM_CHANGED)
+    else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"%s", getElementInfoText(custom_element.change.successor));
+    else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+		"%s", getElementInfoText(custom_element.change.trigger));
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"%s", getElementInfoText(random_placement_background_element));
@@ -6233,9 +6332,12 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CONTENT)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"Custom element content position: %d, %d", sx, sy);
-    else if (id == GADGET_ID_CUSTOM_CHANGED)
+    else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"New element after change");
+    else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+		"Other element triggering change");
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"Random placement background");

@@ -155,13 +155,21 @@
 
 /* values for change events for custom elements */
 #define CE_DELAY		0
-#define CE_PRESSED_BY_PLAYER	1
-#define CE_TOUCHED_BY_PLAYER	2
+#define CE_TOUCHED_BY_PLAYER	1
+#define CE_PRESSED_BY_PLAYER	2
+#define CE_PUSHED_BY_PLAYER	3
+#define CE_IMPACT		4
+#define CE_SMASHED		5
+#define CE_OTHER_COLLECTING	6
+#define CE_OTHER_PUSHING	7
+#define CE_OTHER_CHANGING	8
 
 /* values for internal purpose only (level editor) */
-#define CE_BY_PLAYER		3
+#define CE_BY_PLAYER		9
+#define CE_IMPACT_SMASHED	10
+#define CE_BY_OTHER		11
 
-#define NUM_CHANGE_EVENTS	4
+#define NUM_CHANGE_EVENTS	12
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -749,19 +757,20 @@
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)
 #define EL_NUT_BREAKING			(EL_FIRST_RUNTIME_UNREAL + 2)
-#define EL_ACID_SPLASH_LEFT		(EL_FIRST_RUNTIME_UNREAL + 3)
-#define EL_ACID_SPLASH_RIGHT		(EL_FIRST_RUNTIME_UNREAL + 4)
-#define EL_AMOEBA_GROWING		(EL_FIRST_RUNTIME_UNREAL + 5)
-#define EL_AMOEBA_SHRINKING		(EL_FIRST_RUNTIME_UNREAL + 6)
-#define EL_EXPANDABLE_WALL_GROWING	(EL_FIRST_RUNTIME_UNREAL + 7)
-#define EL_FLAMES			(EL_FIRST_RUNTIME_UNREAL + 8)
-#define EL_PLAYER_IS_LEAVING		(EL_FIRST_RUNTIME_UNREAL + 9)
-#define EL_QUICKSAND_FILLING		(EL_FIRST_RUNTIME_UNREAL + 10)
-#define EL_MAGIC_WALL_FILLING		(EL_FIRST_RUNTIME_UNREAL + 11)
-#define EL_BD_MAGIC_WALL_FILLING	(EL_FIRST_RUNTIME_UNREAL + 12)
+#define EL_DIAMOND_BREAKING		(EL_FIRST_RUNTIME_UNREAL + 3)
+#define EL_ACID_SPLASH_LEFT		(EL_FIRST_RUNTIME_UNREAL + 4)
+#define EL_ACID_SPLASH_RIGHT		(EL_FIRST_RUNTIME_UNREAL + 5)
+#define EL_AMOEBA_GROWING		(EL_FIRST_RUNTIME_UNREAL + 6)
+#define EL_AMOEBA_SHRINKING		(EL_FIRST_RUNTIME_UNREAL + 7)
+#define EL_EXPANDABLE_WALL_GROWING	(EL_FIRST_RUNTIME_UNREAL + 8)
+#define EL_FLAMES			(EL_FIRST_RUNTIME_UNREAL + 9)
+#define EL_PLAYER_IS_LEAVING		(EL_FIRST_RUNTIME_UNREAL + 10)
+#define EL_QUICKSAND_FILLING		(EL_FIRST_RUNTIME_UNREAL + 11)
+#define EL_MAGIC_WALL_FILLING		(EL_FIRST_RUNTIME_UNREAL + 12)
+#define EL_BD_MAGIC_WALL_FILLING	(EL_FIRST_RUNTIME_UNREAL + 13)
 
 /* dummy elements (never used as game elements, only used as graphics) */
-#define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 13)
+#define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 14)
 
 #define EL_STEELWALL_TOPLEFT			(EL_FIRST_DUMMY + 0)
 #define EL_STEELWALL_TOPRIGHT			(EL_FIRST_DUMMY + 1)
@@ -1151,6 +1160,8 @@ struct ElementChangeInfo
   int delay_random;		/* added frame delay before changed (random) */
   int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
+  short trigger;		/* custom element triggering change */
+
   short successor;		/* new custom element after change */
 };
 
@@ -1279,6 +1290,7 @@ extern short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
