@@ -14,8 +14,8 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include "main.h"
 #include <math.h>
+#include "main.h"
 
 #ifdef linux
 #include <linux/soundcard.h>

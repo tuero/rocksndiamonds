@@ -47,6 +47,8 @@ int     	width, height;
 
 char	       *server_host = NULL;
 int		server_port = 0;
+int		networking = FALSE;
+int		standalone = TRUE;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;
@@ -66,7 +68,6 @@ int		fading_on = FALSE;
 int		autorecord_on = FALSE;
 int		joystick_nr = 0;
 int		quick_doors = FALSE;
-int		networking = FALSE;
 
 BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;

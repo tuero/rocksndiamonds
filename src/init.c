@@ -11,11 +11,19 @@
 *  init.c                                                  *
 ***********************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <errno.h>
 
 #include "init.h"
 #include "misc.h"
@@ -96,15 +104,50 @@ void OpenAll(int argc, char *argv[])
 int norestart = 0;
 int nospeedup = 0;
 
+#define DEFAULTPORT 19503
+
+#define PROT_VERS_1 1
+#define PROT_VERS_2 0
+#define PROT_VERS_3 1
+
+#define OP_NICK 1
+#define OP_PLAY 2
+#define OP_FALL 3
+#define OP_DRAW 4
+#define OP_LOST 5
+#define OP_GONE 6
+#define OP_CLEAR 7
+#define OP_NEW 8
+#define OP_LINES 9
+#define OP_GROW 10
+#define OP_MODE 11
+#define OP_LEVEL 12
+#define OP_BOT 13
+#define OP_KILL 14
+#define OP_PAUSE 15
+#define OP_CONT 16
+#define OP_VERSION 17
+#define OP_BADVERS 18
+#define OP_MSG 19
+#define OP_YOUARE 20
+#define OP_LINESTO 21
+#define OP_WON 22
+#define OP_ZERO 23
+
 /* server stuff */
 
-#define DEFAULTPORT	19503
 #define BUFLEN		4096
 
 int sfd;
 unsigned char realbuf[512], readbuf[BUFLEN], writbuf[BUFLEN];
 unsigned char *buf = realbuf + 4;
 int nread = 0, nwrite = 0;
+
+void sysmsg(char *s)
+{
+  printf("** %s\n", s);
+  fflush(stdout);
+}
 
 void fatal(char *s)
 {
@@ -118,6 +161,29 @@ void u_sleep(int i)
   tm.tv_sec = i / 1000000;
   tm.tv_usec = i % 1000000;
   select(0, NULL, NULL, NULL, &tm);
+}
+
+void flushbuf()
+{
+  if (nwrite)
+  {
+    write(sfd, writbuf, nwrite);
+    nwrite = 0;
+  }
+}
+
+void sendbuf(int len)
+{
+  if (!standalone)
+  {
+    realbuf[0] = realbuf[1] = realbuf[2] = 0;
+    realbuf[3] = (unsigned char)len;
+    buf[0] = 0;
+    if (nwrite + 4 + len >= BUFLEN)
+      fatal("Internal error: send buffer overflow");
+    memcpy(writbuf + nwrite, realbuf, 4 + len);
+    nwrite += 4 + len;
+  }
 }
 
 void startserver()
@@ -144,10 +210,11 @@ void startserver()
 
       fprintf(stderr, "Can't start server '%s'.\n",
 #ifdef XTRISPATH
-	XTRISPATH "/xtserv");
+	XTRISPATH "/rnd_server"
 #else
-	"xtserv");
+	"rnd_server"
 #endif
+	      );
 
       _exit(1);
     
@@ -191,7 +258,7 @@ void connect2server(char *host, int port)
   {
     if (!host)
     {
-      printf("No xtris server on localhost - starting up one ...\n");
+      printf("No rocksndiamonds server on localhost - starting up one ...\n");
       startserver();
       for (i=0; i<6; i++)
       {
@@ -212,12 +279,34 @@ void connect2server(char *host, int port)
   }
 }
 
+static void send_nickname(char *nickname)
+{
+  static char msgbuf[300];
+
+  buf[1] = OP_NICK;
+  memcpy(&buf[2], nickname, strlen(nickname));
+  sendbuf(2 + strlen(nickname));
+  sprintf(msgbuf, "you set your nick to %s", nickname);
+  sysmsg(msgbuf);
+}
+
 void InitServer()
 {
   if (server_port == 0)
     server_port = DEFAULTPORT;
 
-  connect2server(server_host, server_port);
+  standalone = FALSE;
+
+  if (!standalone)
+    connect2server(server_host, server_port);
+
+  send_nickname("dummyplayer");
+
+  buf[1] = OP_VERSION;
+  buf[2] = PROT_VERS_1;
+  buf[3] = PROT_VERS_2;
+  buf[4] = PROT_VERS_3;
+  sendbuf(5);
 }
 
 /* TEST STUFF -------------------------------------------------------------- */

@@ -14,9 +14,8 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-#include "main.h"
-
 #include <sys/time.h>
+#include "main.h"
 
 /* for SetDrawtoField */
 #define DRAW_DIRECT	0

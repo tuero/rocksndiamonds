@@ -100,7 +100,7 @@ $(SERVNAME):	$(SERVNAME).c
 	$(CC) $(CFLAGS) -c $*.c
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(PROGNAME) $(SERVNAME) $(OBJS)
 
 backup:
 	./make_backup.sh

@@ -14,6 +14,13 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #ifndef MSDOS
 #define XK_MISCELLANY
 #define XK_LATIN1
@@ -31,13 +38,6 @@
 #else
 #include "msdos.h"
 #endif  /* #ifndef MSDOS */
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 
 typedef int BOOL;
 
@@ -323,6 +323,8 @@ extern int     		width, height;
 
 extern char	       *server_host;
 extern int		server_port;
+extern int		networking;
+extern int		standalone;
 
 extern int		game_status;
 extern int		game_emulation;
@@ -341,7 +343,6 @@ extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
 extern int		quick_doors;
-extern int		networking;
 
 extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;

@@ -11,17 +11,17 @@
 *  misc.c                                                  *
 ***********************************************************/
 
-#include "misc.h"
-#include "tools.h"
-#include "sound.h"
-#include "random.h"
-
 #include <pwd.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
 #include <sys/param.h>
 #include <sys/types.h>
+
+#include "misc.h"
+#include "tools.h"
+#include "sound.h"
+#include "random.h"
 
 static unsigned long mainCounter(int mode)
 {
