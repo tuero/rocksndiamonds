@@ -1533,6 +1533,71 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   return file_list;
 }
 
+static void CheckArtworkConfig(struct ArtworkListInfo *artwork_info)
+{
+  struct FileInfo *file_list = artwork_info->file_list;
+  struct ConfigInfo *suffix_list = artwork_info->suffix_list;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
+  int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
+  char *filename = getCustomArtworkConfigFilename(artwork_info->type);
+  struct SetupFileList *setup_file_list;
+  char *known_token_value = "[KNOWN_TOKEN]";
+  int i, j;
+
+  if (!options.verbose)
+    return;
+
+  if (filename == NULL)
+    return;
+
+  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+    return;
+
+  for (i=0; i<num_file_list_entries; i++)
+  {
+    /* check for config token that is the base token without any suffixes */
+    if (getTokenValue(setup_file_list, file_list[i].token) != NULL)
+    {
+      /* mark token as well known from default config */
+      setTokenValue(setup_file_list, file_list[i].token, known_token_value);
+    }
+
+    /* check for config tokens that can be build by base token and suffixes */
+    for (j=0; j<num_suffix_list_entries; j++)
+    {
+      char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
+
+      if (getTokenValue(setup_file_list, token) != NULL)
+      {
+	/* mark token as well known from default config */
+	setTokenValue(setup_file_list, token, known_token_value);
+      }
+
+      free(token);
+    }
+  }
+
+  /* set some additional tokens to "known" */
+  setTokenValue(setup_file_list, "name", known_token_value);
+  setTokenValue(setup_file_list, "sort_priority", known_token_value);
+
+  /* check for each token in config file if it is defined in default config */
+  while (setup_file_list != NULL)
+  {
+    if (strcmp(setup_file_list->value, known_token_value) != 0)
+    {
+      Error(ERR_RETURN, "custom artwork configuration warning:");
+      Error(ERR_RETURN, "- config file: '%s'", filename);
+      Error(ERR_RETURN, "- config token: '%s'", setup_file_list->token);
+      Error(ERR_WARN, "token not recognized");
+    }
+
+    setup_file_list = setup_file_list->next;
+  }
+
+  freeSetupFileList(setup_file_list);
+}
+
 static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
@@ -1561,47 +1626,47 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if (filename == NULL)
     return;
 
-  if ((setup_file_list = loadSetupFileList(filename)))
+  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+    return;
+
+  for (i=0; i<num_file_list_entries; i++)
   {
-    for (i=0; i<num_file_list_entries; i++)
-    {
-      char *filename = getTokenValue(setup_file_list, file_list[i].token);
+    char *filename = getTokenValue(setup_file_list, file_list[i].token);
 
-      if (filename)
-	for (j=0; j<num_suffix_list_entries; j++)
-	  file_list[i].parameter[j] =
-	    get_parameter_value(suffix_list[j].type, suffix_list[j].value);
-      else
-	filename = file_list[i].default_filename;
-
-      file_list[i].filename = getStringCopy(filename);
-
+    if (filename)
       for (j=0; j<num_suffix_list_entries; j++)
-      {
-	char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
-	char *value = getTokenValue(setup_file_list, token);
+	file_list[i].parameter[j] =
+	  get_parameter_value(suffix_list[j].type, suffix_list[j].value);
+    else
+      filename = file_list[i].default_filename;
 
-	if (value != NULL)
-	  file_list[i].parameter[j] =
-	    get_parameter_value(suffix_list[j].type, value);
+    file_list[i].filename = getStringCopy(filename);
 
-	free(token);
-      }
+    for (j=0; j<num_suffix_list_entries; j++)
+    {
+      char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
+      char *value = getTokenValue(setup_file_list, token);
+
+      if (value != NULL)
+	file_list[i].parameter[j] =
+	  get_parameter_value(suffix_list[j].type, value);
+
+      free(token);
     }
+  }
 
-    freeSetupFileList(setup_file_list);
+  freeSetupFileList(setup_file_list);
 
 #if 0
-    for (i=0; i<num_file_list_entries; i++)
-    {
-      printf("'%s' ", file_list[i].token);
-      if (file_list[i].filename)
-	printf("-> '%s'\n", file_list[i].filename);
-      else
-	printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
-    }
-#endif
+  for (i=0; i<num_file_list_entries; i++)
+  {
+    printf("'%s' ", file_list[i].token);
+    if (file_list[i].filename)
+      printf("-> '%s'\n", file_list[i].filename);
+    else
+      printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
   }
+#endif
 }
 
 static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
@@ -1784,6 +1849,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   struct FileInfo *file_list = artwork_info->file_list;
   int i;
 
+  CheckArtworkConfig(artwork_info);
   LoadArtworkConfig(artwork_info);
 
 #if 0

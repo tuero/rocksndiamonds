@@ -1069,8 +1069,8 @@ char *getTokenValue(struct SetupFileList *setup_file_list, char *token)
     return getTokenValue(setup_file_list->next, token);
 }
 
-static void setTokenValue(struct SetupFileList *setup_file_list,
-			  char *token, char *value)
+void setTokenValue(struct SetupFileList *setup_file_list,
+		   char *token, char *value)
 {
   if (!setup_file_list)
     return;
