@@ -3620,7 +3620,8 @@ void StartMoving(int x, int y)
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
-    if ((x>0 && IS_PLAYER(x-1, y)) || (x<lev_fieldx-1 && IS_PLAYER(x+1, y)))
+    if ((x > 0 && IS_PLAYER(x - 1, y)) ||
+	(x < lev_fieldx-1 && IS_PLAYER(x + 1, y)))
       if (JustBeingPushed(x, y))
 	return;
 
@@ -4021,7 +4022,8 @@ void StartMoving(int x, int y)
 
     Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
-    if (DONT_COLLIDE_WITH(element) && IS_PLAYER(newx, newy) &&
+    if (DONT_COLLIDE_WITH(element) &&
+	IN_LEV_FIELD(newx, newy) && IS_PLAYER(newx, newy) &&
 	!PLAYER_PROTECTED(newx, newy))
     {
 #if 1

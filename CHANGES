@@ -1,3 +1,7 @@
+Release Version 3.0.3 [?? ??? ????]
+-----------------------------------
+	- fixed bug (missing boundary check) which could crash the game
+
 Release Version 3.0.2 [22 AUG 2003]
 -----------------------------------
 	- fixed bug with messing up custom element properties in 3.0.0 levels
