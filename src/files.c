@@ -19,7 +19,14 @@
 #include "tape.h"
 #include "joystick.h"
 
-static char *getUserdataDir()
+#define MAX_LINE_LEN			1000
+
+static char *getGlobalDataDir()
+{
+  return GAME_DIR;
+}
+
+static char *getUserDataDir()
 {
   static char *userdata_dir = NULL;
 
@@ -37,14 +44,14 @@ static char *getUserdataDir()
 
 static char *getSetupDir()
 {
-  return getUserdataDir();
+  return getUserDataDir();
 }
 
 static char *getTapeDir(char *level_subdir)
 {
   static char *tape_dir = NULL;
-  char *data_dir = getUserdataDir();
-  char *tape_subdir = TAPEDATA_DIRECTORY;
+  char *data_dir = getUserDataDir();
+  char *tape_subdir = TAPES_DIRECTORY;
 
   if (tape_dir)
     free(tape_dir);
@@ -57,6 +64,23 @@ static char *getTapeDir(char *level_subdir)
   return tape_dir;
 }
 
+static char *getScoreDir(char *level_subdir)
+{
+  static char *score_dir = NULL;
+  char *data_dir = getGlobalDataDir();
+  char *score_subdir = SCORES_DIRECTORY;
+
+  if (score_dir)
+    free(score_dir);
+
+  score_dir = checked_malloc(strlen(data_dir) + strlen(score_subdir) +
+			     strlen(level_subdir) + 3);
+  sprintf(score_dir, "%s/%s%s%s", data_dir, score_subdir,
+	  (strlen(level_subdir) > 0 ? "/" : ""), level_subdir);
+
+  return score_dir;
+}
+
 static void createDirectory(char *dir, char *text)
 {
   if (access(dir, F_OK) != 0)
@@ -64,15 +88,21 @@ static void createDirectory(char *dir, char *text)
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 }
 
-void InitUserdataDirectory()
+static void InitUserDataDirectory()
 {
-  createDirectory(getUserdataDir(), "user data");
+  createDirectory(getUserDataDir(), "user data");
 }
 
 static void InitTapeDirectory(char *level_subdir)
 {
-  createDirectory(getTapeDir(""), "main tape data");
-  createDirectory(getTapeDir(level_subdir), "level tape data");
+  createDirectory(getTapeDir(""), "main tape");
+  createDirectory(getTapeDir(level_subdir), "level tape");
+}
+
+static void InitScoreDirectory(char *level_subdir)
+{
+  createDirectory(getScoreDir(""), "main score");
+  createDirectory(getScoreDir(level_subdir), "level score");
 }
 
 boolean LoadLevelInfo()
@@ -82,16 +112,16 @@ boolean LoadLevelInfo()
   char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename,"%s/%s",level_directory,LEVDIR_FILENAME);
+  sprintf(filename, "%s/%s", options.level_directory, LEVDIR_FILENAME);
 
-  if (!(file=fopen(filename,"r")))
+  if (!(file = fopen(filename, "r")))
   {
     Error(ERR_WARN, "cannot read level info '%s'", filename);
     return(FALSE);
   }
 
-  fscanf(file,"%s\n",cookie);
-  if (strcmp(cookie,LEVELDIR_COOKIE))	/* ungültiges Format? */
+  fscanf(file, "%s\n", cookie);
+  if (strcmp(cookie, LEVELDIR_COOKIE))
   {
     Error(ERR_WARN, "wrong format of level info file");
     fclose(file);
@@ -100,12 +130,12 @@ boolean LoadLevelInfo()
 
   num_leveldirs = 0;
   leveldir_nr = 0;
-  for(i=0;i<MAX_LEVDIR_ENTRIES;i++)
+  for(i=0; i<MAX_LEVDIR_ENTRIES; i++)
   {
-    fscanf(file,"%s",leveldir[i].filename);
-    fscanf(file,"%s",leveldir[i].name);
-    fscanf(file,"%d",&leveldir[i].levels);
-    fscanf(file,"%d",&leveldir[i].readonly);
+    fscanf(file, "%s", leveldir[i].filename);
+    fscanf(file, "%s", leveldir[i].name);
+    fscanf(file, "%d", &leveldir[i].levels);
+    fscanf(file, "%d", &leveldir[i].readonly);
     if (feof(file))
       break;
 
@@ -123,22 +153,22 @@ boolean LoadLevelInfo()
 
 void LoadLevel(int level_nr)
 {
-  int i,x,y;
+  int i, x, y;
   char filename[MAX_FILENAME_LEN];
   char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename,"%s/%s/%d",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+  sprintf(filename, "%s/%s/%d",
+	  options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
-  if (!(file = fopen(filename,"r")))
+  if (!(file = fopen(filename, "r")))
     Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
   else
   {
-    fgets(cookie,LEVEL_COOKIE_LEN,file);
+    fgets(cookie, LEVEL_COOKIE_LEN, file);
     fgetc(file);
 
-    if (strcmp(cookie,LEVEL_COOKIE))	/* ungültiges Format? */
+    if (strcmp(cookie,LEVEL_COOKIE))
     {
       Error(ERR_WARN, "wrong format of level file '%s'", filename);
       fclose(file);
@@ -153,34 +183,34 @@ void LoadLevel(int level_nr)
 
     level.time		= (fgetc(file)<<8) | fgetc(file);
     level.edelsteine	= (fgetc(file)<<8) | fgetc(file);
-    for(i=0;i<MAX_LEVNAMLEN;i++)
+    for(i=0; i<MAX_LEVNAMLEN; i++)
       level.name[i]	= fgetc(file);
     level.name[MAX_LEVNAMLEN-1] = 0;
-    for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
+    for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
       level.score[i]	= fgetc(file);
-    for(i=0;i<4;i++)
-      for(y=0;y<3;y++)
-	for(x=0;x<3;x++)
+    for(i=0; i<4; i++)
+      for(y=0; y<3; y++)
+	for(x=0; x<3; x++)
 	  level.mampfer_inhalt[i][x][y] = fgetc(file);
     level.tempo_amoebe	= fgetc(file);
     level.dauer_sieb	= fgetc(file);
     level.dauer_ablenk	= fgetc(file);
     level.amoebe_inhalt = fgetc(file);
 
-    for(i=0;i<NUM_FREE_LVHD_BYTES;i++)	/* Rest frei / Headergröße 80 Bytes */
+    for(i=0; i<NUM_FREE_LVHD_BYTES; i++) /* Rest frei / Headergröße 80 Bytes */
       fgetc(file);
 
-    for(y=0;y<MAX_LEV_FIELDY;y++) 
-      for(x=0;x<MAX_LEV_FIELDX;x++) 
+    for(y=0; y<MAX_LEV_FIELDY; y++) 
+      for(x=0; x<MAX_LEV_FIELDX; x++) 
 	Feld[x][y] = Ur[x][y] = EL_ERDREICH;
 
-    for(y=0;y<lev_fieldy;y++) 
-      for(x=0;x<lev_fieldx;x++) 
+    for(y=0; y<lev_fieldy; y++) 
+      for(x=0; x<lev_fieldx; x++) 
 	Feld[x][y] = Ur[x][y] = fgetc(file);
 
     fclose(file);
 
-    if (level.time<=10)	/* Mindestspieldauer */
+    if (level.time <= 10)	/* Mindestspieldauer */
       level.time = 10;
   }
   else
@@ -190,20 +220,20 @@ void LoadLevel(int level_nr)
 
     level.time		= 100;
     level.edelsteine	= 0;
-    strncpy(level.name,"Nameless Level",MAX_LEVNAMLEN-1);
-    for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
+    strcpy(level.name, "Nameless Level");
+    for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
       level.score[i]	= 10;
-    for(i=0;i<4;i++)
-      for(y=0;y<3;y++)
-	for(x=0;x<3;x++)
+    for(i=0; i<4; i++)
+      for(y=0; y<3; y++)
+	for(x=0; x<3; x++)
 	  level.mampfer_inhalt[i][x][y] = EL_FELSBROCKEN;
     level.tempo_amoebe	= 10;
     level.dauer_sieb	= 10;
     level.dauer_ablenk	= 10;
     level.amoebe_inhalt = EL_DIAMANT;
 
-    for(y=0;y<STD_LEV_FIELDY;y++) 
-      for(x=0;x<STD_LEV_FIELDX;x++) 
+    for(y=0; y<STD_LEV_FIELDY; y++) 
+      for(x=0; x<STD_LEV_FIELDX; x++) 
 	Feld[x][y] = Ur[x][y] = EL_ERDREICH;
     Feld[0][0] = Ur[0][0] = EL_SPIELFIGUR;
     Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
@@ -213,55 +243,55 @@ void LoadLevel(int level_nr)
 
 void SaveLevel(int level_nr)
 {
-  int i,x,y;
+  int i, x, y;
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename,"%s/%s/%d",
-	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+  sprintf(filename, "%s/%s/%d",
+	  options.level_directory, leveldir[leveldir_nr].filename, level_nr);
 
-  if (!(file=fopen(filename,"w")))
+  if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot save level file '%s'", filename);
     return;
   }
 
   fputs(LEVEL_COOKIE,file);		/* Formatkennung */
-  fputc(0x0a,file);
+  fputc(0x0a, file);
 
-  fputc(level.fieldx,file);
-  fputc(level.fieldy,file);
-  fputc(level.time / 256,file);
-  fputc(level.time % 256,file);
-  fputc(level.edelsteine / 256,file);
-  fputc(level.edelsteine % 256,file);
+  fputc(level.fieldx, file);
+  fputc(level.fieldy, file);
+  fputc(level.time / 256, file);
+  fputc(level.time % 256, file);
+  fputc(level.edelsteine / 256, file);
+  fputc(level.edelsteine % 256, file);
 
-  for(i=0;i<MAX_LEVNAMLEN;i++)
-    fputc(level.name[i],file);
-  for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
-    fputc(level.score[i],file);
-  for(i=0;i<4;i++)
-    for(y=0;y<3;y++)
-      for(x=0;x<3;x++)
-	fputc(level.mampfer_inhalt[i][x][y],file);
-  fputc(level.tempo_amoebe,file);
-  fputc(level.dauer_sieb,file);
-  fputc(level.dauer_ablenk,file);
-  fputc(level.amoebe_inhalt,file);
+  for(i=0; i<MAX_LEVNAMLEN; i++)
+    fputc(level.name[i], file);
+  for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
+    fputc(level.score[i], file);
+  for(i=0; i<4; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	fputc(level.mampfer_inhalt[i][x][y], file);
+  fputc(level.tempo_amoebe, file);
+  fputc(level.dauer_sieb, file);
+  fputc(level.dauer_ablenk, file);
+  fputc(level.amoebe_inhalt, file);
 
-  for(i=0;i<NUM_FREE_LVHD_BYTES;i++)	/* Rest frei / Headergröße 80 Bytes */
-    fputc(0,file);
+  for(i=0; i<NUM_FREE_LVHD_BYTES; i++)	/* Rest frei / Headergröße 80 Bytes */
+    fputc(0, file);
 
-  for(y=0;y<lev_fieldy;y++) 
-    for(x=0;x<lev_fieldx;x++) 
-      fputc(Ur[x][y],file);
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++) 
+      fputc(Ur[x][y], file);
 
   fclose(file);
 
   chmod(filename, LEVEL_PERMS);
 }
 
-void LoadLevelTape(int level_nr)
+void LoadTape(int level_nr)
 {
   int i;
   char filename[MAX_FILENAME_LEN];
@@ -364,7 +394,7 @@ void LoadLevelTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
-void SaveLevelTape(int level_nr)
+void SaveTape(int level_nr)
 {
   int i;
   char filename[MAX_FILENAME_LEN];
@@ -431,121 +461,90 @@ void SaveLevelTape(int level_nr)
     Request("tape saved !",REQ_CONFIRM);
 }
 
-boolean CreateNewScoreFile()
-{
-  int i,j,k;
-  char filename[MAX_FILENAME_LEN];
-  char empty_alias[MAX_NAMELEN];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%s",
-	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
-
-  if (!(file=fopen(filename,"w")))
-    return(FALSE);
-
-  for(i=0;i<MAX_NAMELEN;i++)
-    empty_alias[i] = 0;
-  strncpy(empty_alias,EMPTY_ALIAS,MAX_NAMELEN-1);
-
-  fputs(SCORE_COOKIE,file);		/* Formatkennung */
-  for(i=0;i<leveldir[leveldir_nr].levels;i++)
-  {
-    for(j=0;j<MAX_SCORE_ENTRIES;j++)
-    {
-      for(k=0;k<MAX_NAMELEN;k++)
-	fputc(empty_alias[k],file);
-      fputc(0,file);
-      fputc(0,file);
-    }
-  }
-  fclose(file);
-
-  chmod(filename, SCORE_PERMS);
-  return(TRUE);
-}
-
 void LoadScore(int level_nr)
 {
-  int i,j;
+  int i;
   char filename[MAX_FILENAME_LEN];
   char cookie[MAX_FILENAME_LEN];
+  char line[MAX_LINE_LEN];
+  char *line_ptr;
   FILE *file;
 
-  sprintf(filename,"%s/%s/%s",
-	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
-
-  if (!(file = fopen(filename,"r")))
+  /* start with empty score table */
+  for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
-    if (!CreateNewScoreFile())
-      Error(ERR_WARN, "cannot create score file '%s'", filename);
-    else if (!(file = fopen(filename,"r"))) 
-      Error(ERR_WARN, "cannot read score for level %d", level_nr);
+    strcpy(highscore[i].Name, EMPTY_ALIAS);
+    highscore[i].Score = 0;
   }
 
-  if (file)
-  {
-    fgets(cookie,SCORE_COOKIE_LEN,file);
-    if (strcmp(cookie,SCORE_COOKIE))	/* ungültiges Format? */
-    {
-      Error(ERR_WARN, "wrong format of score file '%s'", filename);
-      fclose(file);
-      file = NULL;
-    }
-  }
+  sprintf(filename, "%s/%d.%s",
+	  getScoreDir(leveldir[leveldir_nr].filename),
+	  level_nr, SCOREFILE_EXTENSION);
 
-  if (file)
+  if (!(file = fopen(filename, "r")))
+    return;
+
+  fgets(cookie, SCORE_COOKIE_LEN, file);
+
+  if (strcmp(cookie, SCORE_COOKIE) != 0)
   {
-    fseek(file,
-	  SCORE_COOKIE_LEN-1+level_nr*(MAX_SCORE_ENTRIES*(MAX_NAMELEN+2)),
-	  SEEK_SET);
-    for(i=0;i<MAX_SCORE_ENTRIES;i++)
-    {
-      for(j=0;j<MAX_NAMELEN;j++)
-	highscore[i].Name[j] = fgetc(file);
-      highscore[i].Score = (fgetc(file)<<8) | fgetc(file);
-    }
+    Error(ERR_WARN, "wrong format of score file '%s'", filename);
     fclose(file);
+    return;
   }
-  else
+
+  for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
-    for(i=0;i<MAX_SCORE_ENTRIES;i++)
+    int position_nr;
+
+    fscanf(file, "%d", &position_nr);
+    fscanf(file, "%d", &highscore[i].Score);
+    fgets(line, MAX_LINE_LEN, file);
+
+    if (line[strlen(line)-1] == '\n')
+      line[strlen(line)-1] = '\0';
+
+    for (line_ptr = line; *line_ptr; line_ptr++)
     {
-      strcpy(highscore[i].Name,EMPTY_ALIAS);
-      highscore[i].Score = 0;
+      if (*line_ptr != ' ' && *line_ptr != '\t' && *line_ptr != '\0')
+      {
+	strncpy(highscore[i].Name, line_ptr, MAX_NAMELEN - 1);
+	highscore[i].Name[MAX_NAMELEN - 1] = '\0';
+	break;
+      }
     }
   }
+
+  fclose(file);
 }
 
 void SaveScore(int level_nr)
 {
-  int i,j;
+  int i;
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-  sprintf(filename,"%s/%s/%s",
-	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
+  sprintf(filename, "%s/%d.%s",
+	  getScoreDir(leveldir[leveldir_nr].filename),
+	  level_nr, SCOREFILE_EXTENSION);
 
-  if (!(file=fopen(filename,"r+")))
+  InitScoreDirectory(leveldir[leveldir_nr].filename);
+
+  if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot save score for level %d", level_nr);
     return;
   }
 
-  fseek(file,
-	SCORE_COOKIE_LEN-1+level_nr*(MAX_SCORE_ENTRIES*(MAX_NAMELEN+2)),
-	SEEK_SET);
-  for(i=0;i<MAX_SCORE_ENTRIES;i++)
-  {
-    for(j=0;j<MAX_NAMELEN;j++)
-      fputc(highscore[i].Name[j],file);
-    fputc(highscore[i].Score / 256,file);
-    fputc(highscore[i].Score % 256,file);
-  }
-  fclose(file);
-}
+  fprintf(file, "%s\n\n", SCORE_COOKIE);
 
-#define MAX_LINE_LEN			1000
+  for(i=0; i<MAX_SCORE_ENTRIES; i++)
+    fprintf(file, "%d %d %s\n", i+1, highscore[i].Score, highscore[i].Name);
+
+  fclose(file);
+
+  chmod(filename, SCORE_PERMS);
+}
 
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
 #define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
@@ -1139,6 +1138,8 @@ void SaveSetup()
 
   sprintf(filename, "%s/%s", getSetupDir(), SETUP_FILENAME);
 
+  InitUserDataDirectory();
+
   if (!(file = fopen(filename, "w")))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
@@ -1221,6 +1222,8 @@ void SaveLevelSetup()
 		leveldir[leveldir_nr].filename, int2str(level_nr, 0));
 
   sprintf(filename, "%s/%s", getSetupDir(), LEVELSETUP_FILENAME);
+
+  InitUserDataDirectory();
 
   if (!(file = fopen(filename, "w")))
   {

@@ -89,7 +89,7 @@ void DrawMainMenu()
 
   TapeStop();
   if (TAPE_IS_EMPTY(tape))
-    LoadLevelTape(level_nr);
+    LoadTape(level_nr);
   DrawCompleteVideoDisplay();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
@@ -168,7 +168,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
 
     TapeErase();
-    LoadLevelTape(level_nr);
+    LoadTape(level_nr);
     DrawCompleteVideoDisplay();
 
     /* needed because DrawMicroLevel() takes some time */
@@ -822,7 +822,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       SaveLevelSetup();
 
       TapeErase();
-      LoadLevelTape(level_nr);
+      LoadTape(level_nr);
 
       game_status = MAINMENU;
       DrawMainMenu();
@@ -849,7 +849,7 @@ void DrawHallOfFame(int pos)
   DrawText(SX+64,SY+10,"Hall Of Fame",FS_BIG,FC_YELLOW);
   sprintf(txt,"HighScores of Level %d",level_nr);
   DrawText(SX+256-strlen(txt)*7,SY+48,txt,FS_SMALL,FC_RED);
-  for(y=0;y<MAX_SCORE_ENTRIES;y++)
+  for(y=0; y<15; y++)
   {
     DrawText(SX,SY+64+y*32,".................",FS_BIG,
 	     (y==pos ? FC_RED : FC_GREEN));
@@ -1946,14 +1946,14 @@ void HandleVideoButtons(int mx, int my, int button)
       TapeStop();
       if (TAPE_IS_EMPTY(tape))
       {
-	LoadLevelTape(level_nr);
+	LoadTape(level_nr);
 	if (TAPE_IS_EMPTY(tape))
 	  Request("No tape for this level !",REQ_CONFIRM);
       }
       else
       {
 	if (tape.changed)
-	  SaveLevelTape(tape.level_nr);
+	  SaveTape(tape.level_nr);
 	TapeErase();
       }
       DrawCompleteVideoDisplay();

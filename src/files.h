@@ -16,15 +16,14 @@
 
 #include "main.h"
 
-void InitUserdataDirectory();
-
 boolean LoadLevelInfo(void);
+
 void LoadLevel(int);
 void SaveLevel(int);
-void LoadLevelTape(int);
-void SaveLevelTape(int);
 
-boolean CreateNewScoreFile(void);
+void LoadTape(int);
+void SaveTape(int);
+
 void LoadScore(int);
 void SaveScore(int);
 

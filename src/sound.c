@@ -627,7 +627,8 @@ boolean LoadSound(struct SoundInfo *snd_info)
   struct SoundHeader_8SVX *sound_header;
   unsigned char *ptr;
 
-  sprintf(filename,"%s/%s.%s",SND_PATH,snd_info->name,sound_ext);
+  sprintf(filename, "%s/%s/%s.%s",
+	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);
 
 #ifndef MSDOS
   if (!(file=fopen(filename,"r")))

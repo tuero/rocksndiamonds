@@ -500,7 +500,7 @@ static void Handle_OP_START_PLAYING()
   level_nr = new_level_nr;
 
   TapeErase();
-  LoadLevelTape(level_nr);
+  LoadTape(level_nr);
 
   /*
   GetPlayerConfig();

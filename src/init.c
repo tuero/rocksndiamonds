@@ -65,7 +65,6 @@ void OpenAll(int argc, char *argv[])
     exit(0);
   }
 
-  InitUserdataDirectory();
   InitLevelAndPlayerInfo();
 
   InitCounter();
@@ -357,14 +356,18 @@ void InitWindow(int argc, char *argv[])
     XChangeProperty(display, window, proto_atom, XA_ATOM, 32,
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
-  sprintf(icon_filename,"%s/%s",GFX_PATH,icon_pic.picture_filename);
+  sprintf(icon_filename, "%s/%s/%s",
+	  options.base_directory, GRAPHICS_DIRECTORY,
+	  icon_pic.picture_filename);
   XReadBitmapFile(display,window,icon_filename,
 		  &icon_width,&icon_height,
 		  &icon_pixmap,&icon_hot_x,&icon_hot_y);
   if (!icon_pixmap)
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
-  sprintf(icon_filename,"%s/%s",GFX_PATH,icon_pic.picturemask_filename);
+  sprintf(icon_filename, "%s/%s/%s",
+	  options.base_directory, GRAPHICS_DIRECTORY,
+	  icon_pic.picturemask_filename);
   XReadBitmapFile(display,window,icon_filename,
 		  &icon_width,&icon_height,
 		  &iconmask_pixmap,&icon_hot_x,&icon_hot_y);
@@ -649,9 +652,10 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   /* Grafik laden */
   if (pic->picture_filename)
   {
-    sprintf(basefilename,"%s%s",pic->picture_filename,picture_ext);
-    DrawInitText(basefilename,150,FC_YELLOW);
-    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+    sprintf(basefilename, "%s%s", pic->picture_filename, picture_ext);
+    DrawInitText(basefilename, 150, FC_YELLOW);
+    sprintf(filename, "%s/%s/%s",
+	    options.base_directory, GRAPHICS_DIRECTORY, basefilename);
 
 #ifdef MSDOS
     rest(100);
@@ -729,9 +733,10 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifdef XPM_INCLUDE_FILE
 
-    sprintf(basefilename,"%s%s",pic->picture_filename,picturemask_ext);
-    DrawInitText(basefilename,150,FC_YELLOW);
-    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+    sprintf(basefilename, "%s%s", pic->picture_filename, picturemask_ext);
+    DrawInitText(basefilename, 150, FC_YELLOW);
+    sprintf(filename, "%s/%s/%s",
+	    options.base_directory, GRAPHICS_DIRECTORY, basefilename);
 
 #ifdef DEBUG_TIMING
     count1 = Counter();

@@ -195,7 +195,7 @@ typedef unsigned char byte;
 #define MAX_LEVDIR_FILENAME	(64+1)
 #define MAX_LEVDIR_NAME		(16+1)
 #define MAX_LEVDIR_ENTRIES	15
-#define MAX_SCORE_ENTRIES	15
+#define MAX_SCORE_ENTRIES	100
 
 #define MAX_OPTION_LEN		256
 #define MAX_FILENAME_LEN	256
@@ -213,6 +213,8 @@ struct OptionInfo
   char *display_name;
   char *server_host;
   int server_port;
+  char *base_directory;
+  char *level_directory;
   boolean serveronly;
   boolean network;
   boolean verbose;
@@ -379,7 +381,6 @@ extern int		sound_device;
 extern char	       *sound_device_name;
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
-extern char	       *level_directory;
 extern int     		width, height;
 
 extern char	       *program_name;
@@ -1068,57 +1069,33 @@ extern int		num_bg_loops;
 #define EMU_BOULDERDASH		1
 #define EMU_SOKOBAN		2
 
-
 #ifndef GAME_DIR
 #define GAME_DIR		"."
 #endif
 
-#ifndef GFX_PATH
-#define GFX_PATH		GAME_DIR "/graphics"
-#endif
-#ifndef SND_PATH
-#define SND_PATH		GAME_DIR "/sounds"
-#endif
-#ifndef LEVEL_PATH
-#define LEVEL_PATH		GAME_DIR "/levels"
-#endif
-#ifndef SCORE_PATH
-#define SCORE_PATH		LEVEL_PATH
-#endif
-#ifndef NAMES_PATH
-#define NAMES_PATH		LEVEL_PATH
-#endif
-#ifndef CONFIG_PATH
-#define CONFIG_PATH		GAME_DIR
-#endif
-#ifndef JOYDAT_PATH
-#define JOYDAT_PATH		GAME_DIR
-#endif
-#ifndef SETUP_PATH
-#define SETUP_PATH		GAME_DIR
-#endif
+#define BASE_PATH		GAME_DIR
+
+#define GRAPHICS_DIRECTORY	"graphics"
+#define SOUNDS_DIRECTORY	"sounds"
+#define LEVELS_DIRECTORY	"levels"
+#define TAPES_DIRECTORY		"tapes"
+#define SCORES_DIRECTORY	"scores"
 
 #ifndef MSDOS
 #define USERDATA_DIRECTORY	".rocksndiamonds"
-#define TAPEDATA_DIRECTORY	"tapes"
-#define SCORE_FILENAME		"ROCKS.score"
 #define LEVDIR_FILENAME		"ROCKS.levelinfo"
-#define JOYDAT_FILENAME		"ROCKS.joystick"
 #define SETUP_FILENAME		"setup"
 #define LEVELSETUP_FILENAME	"setup.level"
 #define TAPEFILE_EXTENSION	"tape"
+#define SCOREFILE_EXTENSION	"score"
 #else
 #define USERDATA_DIRECTORY	"userdata"
-#define TAPEDATA_DIRECTORY	"tapes"
-#define SCORE_FILENAME		"ROCKS.sco"
 #define LEVDIR_FILENAME		"ROCKS.lev"
-#define JOYDAT_FILENAME		"ROCKS.joy"
 #define SETUP_FILENAME		"setup"
 #define LEVELSETUP_FILENAME	"setup.lev"
 #define TAPEFILE_EXTENSION	"rec"
+#define SCOREFILE_EXTENSION	"sco"
 #endif
-
-#define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
 
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
 #define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
@@ -1133,12 +1110,10 @@ extern int		num_bg_loops;
 #define SETUP_PERMS		LEVEL_PERMS
 
 /* old cookies */
-#define NAMES_COOKIE_10		"ROCKSNDIAMONDS_NAMES_FILE_VERSION_1.0"
 #define LEVELREC_COOKIE_10	"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
 
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
-#define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.0"
-#define NAMES_COOKIE		"ROCKSNDIAMONDS_NAMES_FILE_VERSION_1.1"
+#define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 #define LEVELDIR_COOKIE		"ROCKSNDIAMONDS_LEVELDIR_FILE_VERSION_1.0"
 #define LEVELREC_COOKIE		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.2"
 #define JOYSTICK_COOKIE		"ROCKSNDIAMONDS_JOYSTICK_FILE_VERSION_1.0"
@@ -1146,7 +1121,6 @@ extern int		num_bg_loops;
 #define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
 #define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE)+1)
 #define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE)+1)
-#define NAMES_COOKIE_LEN	(strlen(NAMES_COOKIE)+1)
 #define LEVELDIR_COOKIE_LEN	(strlen(LEVELDIR_COOKIE)+1)
 #define LEVELREC_COOKIE_LEN	(strlen(LEVELREC_COOKIE)+1)
 #define JOYSTICK_COOKIE_LEN	(strlen(JOYSTICK_COOKIE)+1)

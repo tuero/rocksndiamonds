@@ -24,7 +24,13 @@
 #include <allegro.h>
 #include <time.h>
 
-// Allegro keyboard mapping
+/* some file path definitions */
+
+#define JOYDAT_PATH		GAME_DIR
+#define JOYDAT_FILENAME		"ROCKS.joy"
+#define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
+
+/* Allegro keyboard mapping */
 
 #define OSD_KEY_ESC         1        /* keyboard scan codes */
 #define OSD_KEY_1           2        /* (courtesy of allegro.h) */
@@ -136,7 +142,7 @@
 
 #define OSD_MAX_KEY         115
 
-// X11 keyboard mapping
+/* X11 keyboard mapping */
 
 #define XK_KP_Enter	OSD_KEY_ENTER_PAD
 #define XK_KP_0		OSD_KEY_0_PAD
@@ -439,33 +445,33 @@ typedef union _XEvent {
 
 
 extern void XMapWindow(Display*, Window);
-//extern void XFlush(Display*);
+// extern void XFlush(Display*);
 extern Display *XOpenDisplay(char*);
-//extern char *XDisplayName(char*);
+// extern char *XDisplayName(char*);
 extern Window XCreateSimpleWindow(Display*, Window, int, int, unsigned int, unsigned int, unsigned int, unsigned long, unsigned long);
 extern int XReadBitmapFile(Display*, Drawable, char*, unsigned int*, unsigned int*, Pixmap*, int*, int*);
 extern Status XStringListToTextProperty(char**, int, XTextProperty*);
-//extern void XSetWMProperties(Display*, Window, XTextProperty*, XTextProperty*, char**, int, XSizeHints*, XWMHints*, XClassHint*);
+// extern void XSetWMProperties(Display*, Window, XTextProperty*, XTextProperty*, char**, int, XSizeHints*, XWMHints*, XClassHint*);
 extern void XFree(void*);
-//extern void XSelectInput(Display*, Window, long);
+// extern void XSelectInput(Display*, Window, long);
 extern GC XCreateGC(Display*, Drawable, unsigned long, XGCValues*);
 extern void XFillRectangle(Display*, Drawable, GC, int, int, unsigned int, unsigned int);
 extern Pixmap XCreatePixmap(Display*, Drawable, unsigned int, unsigned int, unsigned int);
-//extern int XDefaultDepth(Display*, int);
+// extern int XDefaultDepth(Display*, int);
 extern inline void XCopyArea(Display*, Drawable, Drawable, GC, int, int, unsigned int, unsigned int, int, int);
 extern int XpmReadFileToPixmap(Display*, Drawable, char*, Pixmap*, Pixmap*, XpmAttributes*);
-//extern void XFreeColors(Display*, Colormap, unsigned long*, int, unsigned long);
-//extern void XpmFreeAttributes(XpmAttributes*);
+// extern void XFreeColors(Display*, Colormap, unsigned long*, int, unsigned long);
+// extern void XpmFreeAttributes(XpmAttributes*);
 extern void XFreePixmap(Display*, Pixmap);
 extern void XFreeGC(Display*, GC);
 extern void XCloseDisplay(Display*);
 extern int XPending(Display*);
 extern void XNextEvent(Display*, XEvent*);
-//extern void XSync(Display*, Bool);
-//extern void XAutoRepeatOn(Display*);
-//extern void XAutoRepeatOff(Display*);
+// extern void XSync(Display*, Bool);
+// extern void XAutoRepeatOn(Display*);
+// extern void XAutoRepeatOff(Display*);
 extern KeySym XLookupKeysym(XKeyEvent*, int);
-//extern void XSetClipOrigin(Display*, GC, int, int);
-//extern XImage *XGetImage(Display*, Drawable, int, int, unsigned int, unsigned int, unsigned long, int);
+// extern void XSetClipOrigin(Display*, GC, int, int);
+// extern XImage *XGetImage(Display*, Drawable, int, int, unsigned int, unsigned int, unsigned long, int);
 
 BITMAP *load_gif(char *filename, RGB *pal);

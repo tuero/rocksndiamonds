@@ -230,6 +230,8 @@ void GetOptions(char *argv[])
   options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
+  options.base_directory = BASE_PATH;
+  options.level_directory = BASE_PATH "/" LEVELS_DIRECTORY;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -273,6 +275,7 @@ void GetOptions(char *argv[])
       printf("Usage: %s [options] [server.name [port]]\n"
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
+	     "  -b, --basepath directory      alternative base directory\n"
 	     "  -l, --levels directory        alternative level directory\n"
 	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
@@ -291,16 +294,33 @@ void GetOptions(char *argv[])
 
       printf("--display == '%s'\n", options.display_name);
     }
+    else if (strncmp(option, "-basepath", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.base_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+
+      printf("--basepath == '%s'\n", options.base_directory);
+
+      /* adjust path for level directory accordingly */
+      options.level_directory = checked_malloc(strlen(options.base_directory) +
+					       strlen(LEVELS_DIRECTORY) + 2);
+      sprintf(options.level_directory, "%s/%s",
+	      options.base_directory, LEVELS_DIRECTORY);
+    }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
       if (option_arg == NULL)
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
-      level_directory = option_arg;
+      options.level_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
 
-      printf("--levels == '%s'\n", level_directory);
+      printf("--levels == '%s'\n", options.level_directory);
     }
     else if (strncmp(option, "-network", option_len) == 0)
     {

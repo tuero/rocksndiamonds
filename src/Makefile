@@ -1,32 +1,59 @@
-#
-# Makefile fuer "Rocks'n'Diamonds -- McDuffin Strikes Back"
-#
+#=============================================================================#
+# Makefile for Rocks'n'Diamonds 1.2                                           #
+# (c) 1995-98 Holger Schemel, aeglos@valinor.owl.de                           #
+#=============================================================================#
 
-PROGNAME = rocksndiamonds
-# SERVNAME = rnd_server
+#-----------------------------------------------------------------------------#
+# configuration section                                                       #
+#-----------------------------------------------------------------------------#
 
-RM = rm -f
+# change this to your favorite ANSI C compiler
 CC = gcc
-CPP = $(CC) -E
-# CC = cc				# for HP-UX and others
 
-GAME_DIR = -DGAME_DIR=\".\"		# path of the game and its data
-# JOYSTICK = -DNO_JOYSTICK		# no joystick
-# SOUNDS = -DNO_SOUNDS			# no sounds
-# SCORE_ENTRIES = -DONE_PER_NAME	# only one score entry per name
-SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
+# on Solaris and similar systems, you'll need to uncomment this
+# EXTRA_LIBS = -lnsl -lsocket 
+
+# specify X11 library path on your system
+XLIB_PATH = /usr/X11/lib
+
+# change this to the directory where you want to install game data like levels
+GAME_DIR = .
+
+# uncomment this if your system has no joystick include file
+# JOYSTICK = -DNO_JOYSTICK
+
+# uncomment this if your system has no sound
+# SOUNDS = -DNO_SOUNDS
+
+# choose if you want to allow many global score file entries for one player
+# when installing the game in a multi user environment, choose this
+# SCORE_ENTRIES = ONE_PER_NAME
+# when installing the game in a single user environment, choose this
+SCORE_ENTRIES = MANY_PER_NAME
 
 # The XPM-Library is no longer needed to build this program,
 # but is used to load graphics if XPM_INCLUDE_FILE is defined,
 # because the GIF loading routines are still a bit beta.
-# If you use the Xpm library, convert the GIF files to Xpm
-# files (and the mask files ('*Maske.gif') to xbm files).
+# If you want to use the Xpm library, convert the GIF files to Xpm
+# files (and you need corresponding mask files in xbm format).
 
 # XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
 # EXTRA_X11_LIBS = -lXpm
 
-CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
-	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
+#-----------------------------------------------------------------------------#
+# you shouldn't need to change anything below                                 #
+#-----------------------------------------------------------------------------#
+
+PROGNAME = rocksndiamonds
+
+RM = rm -f
+CPP = $(CC) -E
+
+CONFIG_GAME_DIR = -DGAME_DIR="\"$(GAME_DIR)\""
+CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
+
+CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
+	 $(CONFIG_SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
 
 # DEBUG = -DDEBUG -g -ansi -pedantic -Wall
 DEBUG = -DDEBUG -g -Wall
@@ -44,7 +71,8 @@ DEBUG = -DDEBUG -g -Wall
 # LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
 # LIBS = -L/usr/X11R6/lib -lX11 -lm
 
-LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm
+# LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
+LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -93,14 +121,10 @@ OBJS =	main.o		\
 	network.o	\
 	netserv.o
 
-# all:	$(PROGNAME) $(SERVNAME)
 all:	$(PROGNAME)
 
 $(PROGNAME):	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
-
-# $(SERVNAME):	$(SERVNAME).c
-# 	$(CC) $(CFLAGS) $(SERVNAME).c $(LIBS) -o $(SERVNAME)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c

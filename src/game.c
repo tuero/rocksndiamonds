@@ -544,7 +544,7 @@ void GameWon()
   if (tape.recording)
   {
     TapeStop();
-    SaveLevelTape(tape.level_nr);	/* Ask to save tape */
+    SaveTape(tape.level_nr);		/* Ask to save tape */
   }
 
   if ((hi_pos=NewHiScore()) >= 0) 
