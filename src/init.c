@@ -2539,16 +2539,17 @@ void InitGfx()
   if (filename_font_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
-  /* initialize screen properties */
-  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
-  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
-  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
-
   /* create additional image buffers for double-buffering */
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+
+  /* initialize screen properties */
+  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		   bitmap_db_field);
+  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 

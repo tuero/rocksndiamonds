@@ -135,6 +135,29 @@ int getFontHeight(int font_nr)
   return gfx.font_bitmap_info[font_bitmap_id].height;
 }
 
+boolean getFontChar(int font_nr, char c, int *src_x, int *src_y)
+{
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+  struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+
+  if ((c >= 32 && c <= 95) || c == '°' || c == '´' || c == '|')
+  {
+    *src_x = font->src_x + ((c - 32) % FONT_CHARS_PER_LINE) * font->width;
+    *src_y = font->src_y + ((c - 32) / FONT_CHARS_PER_LINE) * font->height;
+
+    /* map '°' and 'TM' signs and cursor */
+    if (c == '°' || c == '´' || c == '|')
+    {
+      *src_x = font->src_x + FONT_CHARS_PER_LINE * font->width;
+      *src_y = font->src_y + (c == '°' ? 1 : c == '´' ? 2 : 3) * font->height;
+    }
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 void DrawInitText(char *text, int ypos, int font_nr)
 {
   if (window &&
@@ -202,6 +225,8 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   int font_bitmap_id = gfx.select_font_function(font_nr);
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
   boolean print_inverse = FALSE;
+  boolean print_inverse_cursor = FALSE;
+  int src_x, src_y;
 
   if (font->bitmap == NULL)
     return;
@@ -217,6 +242,9 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     if (c == '~')
     {
       print_inverse = TRUE;
+      if (strlen(text) == 1)
+	print_inverse_cursor = TRUE;
+
       continue;
     }
 
@@ -233,6 +261,10 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     else if (c == '\\')			/* bad luck ... */
       c = '/';
 
+#if 1
+    if (getFontChar(font_nr, c, &src_x, &src_y))
+    {
+#else
     if ((c >= 32 && c <= 95) || c == '°' || c == '´' || c == '|')
     {
       int src_x= font->src_x + ((c - 32) % FONT_CHARS_PER_LINE) * font->width;
@@ -243,14 +275,16 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 	src_x = font->src_x + FONT_CHARS_PER_LINE * font->width;
 	src_y = font->src_y + (c == '°' ? 1 : c == '´' ? 2 : 3) * font->height;
       }
+#endif
 
       if (print_inverse)	/* special mode for text gadgets */
       {
 	/* first step: draw solid colored rectangle (use "cursor" character) */
-	BlitBitmap(font->bitmap, dst_bitmap,
-		   font->src_x + FONT_CHARS_PER_LINE * font->width,
-		   font->src_y + 3 * font->height,
-		   font->width, font->height, dst_x, dst_y);
+	if (print_inverse_cursor)
+	  BlitBitmap(font->bitmap, dst_bitmap,
+		     font->src_x + FONT_CHARS_PER_LINE * font->width,
+		     font->src_y + 3 * font->height,
+		     font->width, font->height, dst_x, dst_y);
 
 	/* second step: draw masked black rectangle (use "space" character) */
 	SetClipOrigin(font->bitmap, font->bitmap->stored_clip_gc,

@@ -129,7 +129,8 @@ void ClosePlatformDependantStuff(void)
 
 void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
 		      int real_sx, int real_sy,
-		      int full_sxsize, int full_sysize)
+		      int full_sxsize, int full_sysize,
+		      Bitmap *field_save_buffer)
 {
   gfx.sx = sx;
   gfx.sy = sy;
@@ -139,6 +140,8 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   gfx.real_sy = real_sy;
   gfx.full_sxsize = full_sxsize;
   gfx.full_sysize = full_sysize;
+
+  gfx.field_save_buffer = field_save_buffer;
 
   gfx.background_bitmap = NULL;
   gfx.background_bitmap_mask = REDRAW_NONE;
@@ -479,6 +482,31 @@ inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 #endif
 }
 
+inline void DrawRectangle(Bitmap *bitmap, int x, int y, int width, int height,
+			  Pixel color)
+{
+  if (DrawingDeactivated(x, y, width, height))
+    return;
+
+#ifdef TARGET_SDL
+  SDLFillRectangle(bitmap, x, y, width, height, color);
+#else
+  XSetForeground(display, bitmap->gc, color);
+  XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
+  XSetForeground(display, bitmap->gc, BlackPixel(display, screen));
+#endif
+}
+
+#if 1
+inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
+{
+#ifdef TARGET_SDL
+  DrawRectangle(bitmap, x, y, width, height, 0x000000);
+#else
+  DrawRectangle(bitmap, x, y, width, height, 0x000000);
+#endif
+}
+#else
 inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
   if (DrawingDeactivated(x, y, width, height))
@@ -490,6 +518,7 @@ inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
   XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
 #endif
 }
+#endif
 
 inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
 				       int width, int height)

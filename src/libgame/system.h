@@ -328,6 +328,8 @@ struct GfxInfo
   int draw_deactivation_mask;
   int draw_background_mask;
 
+  Bitmap *field_save_buffer;
+
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
@@ -636,7 +638,7 @@ void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependantStuff(void);
 void ClosePlatformDependantStuff(void);
 
-void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
+void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
@@ -652,6 +654,7 @@ inline Bitmap *CreateBitmapStruct(void);
 inline Bitmap *CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap *);
 inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
+inline void DrawRectangle(Bitmap *, int, int, int, int, Pixel);
 inline void ClearRectangle(Bitmap *, int, int, int, int);
 inline void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
 inline void SetClipMask(Bitmap *, GC, Pixmap);

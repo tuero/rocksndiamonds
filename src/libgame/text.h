@@ -44,6 +44,8 @@ void InitFontInfo(struct FontBitmapInfo *, int,
 		  int (*select_font_function)(int));
 int getFontWidth(int);
 int getFontHeight(int);
+boolean getFontChar(int, char, int *, int *);
+
 void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);

@@ -573,7 +573,8 @@ static char *test_values[] =
   "test 1",
   "test 2",
   "dieser test-text ist viel zu lang fuer die selectbox",
-  "letzter text"
+  "letzter text",
+  NULL
 };
 static int test_index = 0;
 
@@ -2216,7 +2217,8 @@ static void CreateSelectboxGadgets()
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = selectbox_info[i].gadget_id;
 
-    event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+    event_mask = GD_EVENT_RELEASED |
+      GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
     gd_x = DOOR_GFX_PAGEX4 + ED_SELECTBOX_XPOS;
     gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
@@ -3395,8 +3397,8 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
   }
 }
 
-static void DrawRectangle(int from_x, int from_y, int to_x, int to_y,
-			  int element, boolean change_level)
+static void DrawBox(int from_x, int from_y, int to_x, int to_y,
+		    int element, boolean change_level)
 {
   DrawLine(from_x, from_y, from_x, to_y, element, change_level);
   DrawLine(from_x, to_y, to_x, to_y, element, change_level);
@@ -3518,7 +3520,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 		       int element, boolean change_level)
 {
   if (element == -1 || change_level)
-    DrawRectangle(from_x, from_y, to_x, to_y, -1, FALSE);
+    DrawBox(from_x, from_y, to_x, to_y, -1, FALSE);
   else
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
@@ -4098,7 +4100,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	else if (drawing_function == GADGET_ID_ARC)
 	  draw_func = DrawArc;
 	else if (drawing_function == GADGET_ID_RECTANGLE)
-	  draw_func = DrawRectangle;
+	  draw_func = DrawBox;
 	else if (drawing_function == GADGET_ID_FILLED_BOX)
 	  draw_func = DrawFilledBox;
 	else if (drawing_function == GADGET_ID_GRAB_BRUSH)

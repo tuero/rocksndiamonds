@@ -154,6 +154,17 @@ struct GadgetSelectbox
   int index;				/* index of actual text string */
   int size;				/* maximal size of text strings */
   int font_type;			/* font to use for text input */
+
+  /* automatically determined values */
+  int x, y;				/* open selectbox position */
+  int width, height;			/* open selectbox size */
+  int num_values;			/* number of text strings */
+  Pixel reverse_color;			/* color for highlighting */
+
+  /* runtime values */
+  boolean open;				/* opening state of selectbox */
+  boolean stay_open;			/* open after button release */
+  int current_index;			/* index of text while selecting */
 };
 
 struct GadgetScrollbar
