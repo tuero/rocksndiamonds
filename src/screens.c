@@ -1007,7 +1007,8 @@ void DrawHelpScreenElText(int element, int action, int direction, int ypos)
   int ystep = TILEY + 4;
   char *text;
 
-  text = getListEntry(demo_anim_text, element_info[element].token_name);
+  text = getHashEntry(demo_anim_text, element_info[element].token_name);
+
   if (text == NULL)
   {
     char token[MAX_LINE_LEN];
@@ -1020,15 +1021,31 @@ void DrawHelpScreenElText(int element, int action, int direction, int ypos)
     if (direction != -1)
       strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
 
-    text = getListEntry(demo_anim_text, token);
+    text = getHashEntry(demo_anim_text, token);
 
     if (text == NULL)
-      text = "[Oops! No Text found!]";
+      text = "No description available";
   }
 
 #if 1
+
+#if 1
+
+  if (strlen(text) <= 34)
+    ystart += getFontHeight(FONT_TEXT_2) / 2;
+
+#if 0
+  DrawTextWrapped(xstart, ystart+1 + ypos * ystep, text, FONT_LEVEL_NUMBER,
+		  34, 2);
+#else
+  DrawTextWrapped(xstart, ystart+1 + ypos * ystep, text, FONT_TEXT_2, 34, 2);
+#endif
+
+#else
   DrawTextToTextArea(xstart, ystart + ypos * ystep, text, FONT_TEXT_2, 34,
 		     34, 2, BLIT_ON_BACKGROUND);
+#endif
+
 #else
   if (strlen(text) > 25)
     text[25] = '\0';

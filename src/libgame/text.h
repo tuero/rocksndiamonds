@@ -69,5 +69,7 @@ void DrawTextSCentered(int, int, char *);
 void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 void DrawTextToTextArea(int, int, char *, int, int, int, int, int);
+boolean RenderLineToBuffer(char **, char *, int *, boolean, int);
+void DrawTextWrapped(int, int, char *, int, int, int);
 
 #endif	/* TEXT_H */

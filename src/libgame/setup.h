@@ -67,7 +67,7 @@ struct TokenInfo
 
 /* some definitions for list and hash handling */
 typedef struct SetupFileList SetupFileList;
-typedef struct hashtable SetupFileHash;
+typedef struct hashtable     SetupFileHash;
 
 #define BEGIN_HASH_ITERATION(hash, itr)				\
   if (hash != NULL && hashtable_count(hash) > 0)		\

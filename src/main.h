@@ -1668,7 +1668,7 @@ extern struct SoundInfo	       *sound_info;
 extern struct MusicInfo	       *music_info;
 extern struct MusicFileInfo    *music_file_info;
 extern struct DemoAnimInfo     *demo_anim_info;
-extern struct SetupFileList    *demo_anim_text;
+extern SetupFileHash           *demo_anim_text;
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];

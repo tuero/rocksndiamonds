@@ -3236,30 +3236,25 @@ void LoadDemoAnimText()
   int i;
 
   if (demo_anim_text != NULL)
-    freeSetupFileList(demo_anim_text);
+    freeSetupFileHash(demo_anim_text);
 
-  if ((demo_anim_text = loadSetupFileList(filename)) == NULL)
+  if ((demo_anim_text = loadSetupFileHash(filename)) == NULL)
   {
     /* use reliable default values from static configuration */
-    SetupFileList *insert_ptr;
+    demo_anim_text = newSetupFileHash();
 
-    insert_ptr = demo_anim_text =
-      newSetupFileList(demo_anim_text_config[0].token,
-		       demo_anim_text_config[0].value);
-
-    for (i=1; demo_anim_text_config[i].token; i++)
-      insert_ptr = addListEntry(insert_ptr,
-				demo_anim_text_config[i].token,
-				demo_anim_text_config[i].value);
+    for (i=0; demo_anim_text_config[i].token; i++)
+      setHashEntry(demo_anim_text, demo_anim_text_config[i].token,
+		   demo_anim_text_config[i].value);
   }
 
 #if 0
   /* TEST ONLY */
+  BEGIN_HASH_ITERATION(demo_anim_text, itr)
   {
-    SetupFileList *list;
-
-    for (list = demo_anim_text; list != NULL; list = list->next)
-      printf("::: '%s' => '%s'\n", list->token, list->value);
+    printf("::: '%s' => '%s'\n",
+	   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));
   }
+  END_HASH_ITERATION(hash, itr)
 #endif
 }

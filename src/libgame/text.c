@@ -364,3 +364,103 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr, int line_length,
 
   redraw_mask |= REDRAW_FIELD;
 }
+
+boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
+			   int *dst_buffer_len, boolean last_line_was_empty,
+			   int max_chars_per_line)
+{
+  char *text_ptr = *src_buffer_ptr;
+  char *buffer = dst_buffer;
+  int buffer_len = *dst_buffer_len;
+  boolean buffer_filled = FALSE;
+
+  while (*text_ptr)
+  {
+    char *word_ptr;
+    int word_len;
+
+    /* skip leading whitespaces */
+    while (*text_ptr == ' ' || *text_ptr == '\t')
+      text_ptr++;
+
+    word_ptr = text_ptr;
+    word_len = 0;
+
+    /* look for end of next word */
+    while (*word_ptr != ' ' && *word_ptr != '\t' && *word_ptr != '\0')
+    {
+      word_ptr++;
+      word_len++;
+    }
+
+    if (word_len == 0)
+    {
+      continue;
+    }
+    else if (*text_ptr == '\n')		/* special case: force empty line */
+    {
+      if (buffer_len == 0)
+	text_ptr++;
+
+      /* prevent printing of multiple empty lines */
+      if (buffer_len > 0 || !last_line_was_empty)
+	buffer_filled = TRUE;
+    }
+    else if (word_len < max_chars_per_line - buffer_len)
+    {
+      /* word fits into text buffer -- add word */
+
+      if (buffer_len > 0)
+	buffer[buffer_len++] = ' ';
+
+      strncpy(&buffer[buffer_len], text_ptr, word_len);
+      buffer_len += word_len;
+      buffer[buffer_len] = '\0';
+      text_ptr += word_len;
+    }
+    else if (buffer_len > 0)
+    {
+      /* not enough space left for word in text buffer -- print buffer */
+
+      buffer_filled = TRUE;
+    }
+    else
+    {
+      /* word does not fit at all into empty text buffer -- cut word */
+
+      strncpy(buffer, text_ptr, max_chars_per_line);
+      buffer[max_chars_per_line] = '\0';
+      text_ptr += max_chars_per_line;
+      buffer_filled = TRUE;
+    }
+
+    if (buffer_filled)
+      break;
+  }
+
+  *src_buffer_ptr = text_ptr;
+  *dst_buffer_len = buffer_len;
+
+  return buffer_filled;
+}
+
+void DrawTextWrapped(int x, int y, char *text, int font_nr, int line_length,
+		     int max_lines)
+{
+  char *text_ptr = text;
+  char buffer[line_length + 1];
+  int buffer_len;
+  int current_line = 0;
+  int font_height = getFontHeight(font_nr);
+
+  while (*text_ptr && current_line < max_lines)
+  {
+    buffer[0] = '\0';
+    buffer_len = 0;
+
+    RenderLineToBuffer(&text_ptr, buffer, &buffer_len, TRUE, line_length);
+
+    DrawText(x, y + current_line * font_height, buffer, font_nr);
+    current_line++;
+  }
+}
