@@ -1523,6 +1523,11 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
   return gi;
 }
 
+static void default_callback_function(void *ptr)
+{
+  return;
+}
+
 struct GadgetInfo *CreateGadget(int first_tag, ...)
 {
   struct GadgetInfo *new_gadget = checked_malloc(sizeof(struct GadgetInfo));
@@ -1532,76 +1537,136 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   va_start(ap, first_tag);
 
   /* always start with reliable default values */
-  memset(new_gadget, 0, sizeof(struct GadgetInfo));
-
-  new_gadget->id = getNewGadgetID();
+  memset(new_gadget, 0, sizeof(struct GadgetInfo));	/* zero all fields */
+  new_gadget->id = getNewGadgetID();			/* new gadget id */
+  new_gadget->callback = default_callback_function;	/* dummy function */
 
   while (tag != GDI_END)
   {
-
-
-
-#if 0
-    printf("tag: %d\n", tag);
-#endif
-
-
-
     switch(tag)
     {
-      case GDI_ID:
-	new_gadget->id = va_arg(ap, int);
+      case GDI_CUSTOM_ID:
+	new_gadget->custom_id = va_arg(ap, int);
 	break;
+
       case GDI_X:
 	new_gadget->x = va_arg(ap, int);
 	break;
+
       case GDI_Y:
 	new_gadget->y = va_arg(ap, int);
 	break;
+
       case GDI_WIDTH:
 	new_gadget->width = va_arg(ap, int);
 	break;
+
       case GDI_HEIGHT:
 	new_gadget->height = va_arg(ap, int);
 	break;
+
       case GDI_TYPE:
 	new_gadget->type = va_arg(ap, unsigned long);
 	break;
+
       case GDI_STATE:
 	new_gadget->state = va_arg(ap, unsigned long);
 	break;
+
       case GDI_ALT_STATE:
 	new_gadget->state = va_arg(ap, boolean);
 	break;
+
       case GDI_NUMBER_VALUE:
 	new_gadget->number_value = va_arg(ap, long);
 	break;
+
       case GDI_TEXT_VALUE:
 	strcpy(new_gadget->text_value, va_arg(ap, char *));
 	break;
+
       case GDI_DESIGN_UNPRESSED:
 	new_gadget->design[GD_BUTTON_UNPRESSED].pixmap = va_arg(ap, Pixmap);
 	new_gadget->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	new_gadget->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
+
       case GDI_DESIGN_PRESSED:
 	new_gadget->design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
 	new_gadget->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	new_gadget->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
+
       case GDI_ALT_DESIGN_UNPRESSED:
 	new_gadget->alt_design[GD_BUTTON_UNPRESSED].pixmap= va_arg(ap, Pixmap);
 	new_gadget->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	new_gadget->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
+
       case GDI_ALT_DESIGN_PRESSED:
 	new_gadget->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
 	new_gadget->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	new_gadget->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
+
       case GDI_EVENT_MASK:
 	new_gadget->event_mask = va_arg(ap, unsigned long);
 	break;
+
+      case GDI_AREA_SIZE:
+	new_gadget->drawing.area_xsize = va_arg(ap, int);
+	new_gadget->drawing.area_ysize = va_arg(ap, int);
+
+	/* determine dependent values for drawing area gadget, if needed */
+	if (new_gadget->width == 0 &&
+	    new_gadget->height == 0 &&
+	    new_gadget->drawing.item_xsize !=0 &&
+	    new_gadget->drawing.item_ysize !=0)
+	{
+	  new_gadget->width =
+	    new_gadget->drawing.area_xsize * new_gadget->drawing.item_xsize;
+	  new_gadget->height =
+	    new_gadget->drawing.area_ysize * new_gadget->drawing.item_ysize;
+	}
+	else if (new_gadget->drawing.item_xsize == 0 &&
+		 new_gadget->drawing.item_ysize == 0 &&
+		 new_gadget->width != 0 &&
+		 new_gadget->height != 0)
+	{
+	  new_gadget->drawing.item_xsize =
+	    new_gadget->width / new_gadget->drawing.area_xsize;
+	  new_gadget->drawing.item_ysize =
+	    new_gadget->height / new_gadget->drawing.area_ysize;
+	}
+	break;
+
+      case GDI_ITEM_SIZE:
+	new_gadget->drawing.item_xsize = va_arg(ap, int);
+	new_gadget->drawing.item_ysize = va_arg(ap, int);
+
+	/* determine dependent values for drawing area gadget, if needed */
+	if (new_gadget->width == 0 &&
+	    new_gadget->height == 0 &&
+	    new_gadget->drawing.area_xsize !=0 &&
+	    new_gadget->drawing.area_ysize !=0)
+	{
+	  new_gadget->width =
+	    new_gadget->drawing.area_xsize * new_gadget->drawing.item_xsize;
+	  new_gadget->height =
+	    new_gadget->drawing.area_ysize * new_gadget->drawing.item_ysize;
+	}
+	else if (new_gadget->drawing.area_xsize == 0 &&
+		 new_gadget->drawing.area_ysize == 0 &&
+		 new_gadget->width != 0 &&
+		 new_gadget->height != 0)
+	{
+	  new_gadget->drawing.area_xsize =
+	    new_gadget->width / new_gadget->drawing.item_xsize;
+	  new_gadget->drawing.area_ysize =
+	    new_gadget->height / new_gadget->drawing.item_ysize;
+	}
+	break;
+
       case GDI_CALLBACK:
 	new_gadget->callback = va_arg(ap, gadget_callback_function);
 	break;
@@ -1616,8 +1681,9 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   va_end(ap);
 
   /* check if gadget complete */
-  if (!new_gadget->design[GD_BUTTON_UNPRESSED].pixmap ||
-      !new_gadget->design[GD_BUTTON_PRESSED].pixmap)
+  if (new_gadget->type != GD_TYPE_DRAWING_AREA &&
+      (!new_gadget->design[GD_BUTTON_UNPRESSED].pixmap ||
+       !new_gadget->design[GD_BUTTON_PRESSED].pixmap))
     Error(ERR_EXIT, "gadget incomplete (missing Pixmap)");
 
   /* insert new gadget into gloabl gadget list */
@@ -1659,6 +1725,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
+  if (gi->type != GD_TYPE_NORMAL_BUTTON)
+    return;
+
   XCopyArea(display, gd->pixmap, drawto, gc,
 	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
 
@@ -1690,14 +1759,145 @@ void UnmapGadget(struct GadgetInfo *gi)
 void HandleGadgets(int mx, int my, int button)
 {
   static struct GadgetInfo *gi = NULL;
+  static unsigned long pressed_delay = 0;
+
+#if 0
   static boolean pressed = FALSE;
+#endif
+
   struct GadgetInfo *new_gi;
+  boolean gadget_pressed;
+  boolean gadget_pressed_repeated;
+  boolean gadget_moving_inside;
+  boolean gadget_moving_outside;
+  boolean gadget_released;
 
   if (gadget_list_first_entry == NULL)
     return;
 
   new_gi = getGadgetInfoFromMousePosition(mx,my);
 
+  gadget_pressed =
+    (button != 0 && gi == NULL && new_gi != NULL);
+  gadget_pressed_repeated =
+    (button != 0 && gi != NULL && new_gi == gi);
+  gadget_moving_inside =
+    (button != 0 && gi != NULL && new_gi == gi && motion_status);
+  gadget_moving_outside =
+    (button != 0 && gi != NULL && new_gi != gi && motion_status);
+  gadget_released =
+    (button == 0 && gi != NULL && new_gi == gi);
+
+  if (gi)
+  {
+    gi->event.x = mx - gi->x;
+    gi->event.y = my - gi->y;
+
+    if (gi->type == GD_TYPE_DRAWING_AREA)
+    {
+      gi->event.x /= gi->drawing.item_xsize;
+      gi->event.y /= gi->drawing.item_ysize;
+    }
+  }
+
+  if (gadget_pressed)
+  {
+    gi = new_gi;
+
+    DrawGadget(gi, TRUE, TRUE);
+
+    gi->state = GD_BUTTON_PRESSED;
+    gi->event.type = GD_EVENT_PRESSED;
+    gi->event.button = button;
+
+    /* initialize delay counter */
+    pressed_delay = 0;
+    DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
+
+
+    /*
+    printf("new gadget pressed\n");
+    */
+
+
+    if (gi->event_mask & GD_EVENT_PRESSED)
+      gi->callback(gi);
+  }
+
+  if (gadget_pressed_repeated)
+  {
+    if (gi->event_mask & GD_EVENT_PRESSED_REPEATED &&
+	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
+    {
+
+
+      /*
+	printf("gadget pressed (repeated)\n");
+      */
+
+
+	gi->callback(gi);
+    }
+  }
+
+  if (gadget_moving_inside)
+  {
+    if (gi->state == GD_BUTTON_UNPRESSED)
+      DrawGadget(gi, TRUE, TRUE);
+
+    gi->state = GD_BUTTON_PRESSED;
+    gi->event.type = GD_EVENT_MOVING;
+
+
+    /*
+    printf("inside gadget\n");
+    */
+
+    if (gi->event_mask & GD_EVENT_MOVING)
+      gi->callback(gi);
+  }
+
+  if (gadget_moving_outside)
+  {
+    if (gi->state == GD_BUTTON_PRESSED)
+      DrawGadget(gi, FALSE, TRUE);
+
+    gi->state = GD_BUTTON_UNPRESSED;
+    gi->event.type = GD_EVENT_MOVING;
+
+
+    /*
+    printf("outside gadget\n");
+    */
+
+
+    if (gi->event_mask & GD_EVENT_MOVING)
+      gi->callback(gi);
+  }
+
+  if (gadget_released)
+  {
+    DrawGadget(gi, FALSE, TRUE);
+
+    gi->state = GD_BUTTON_UNPRESSED;
+    gi->event.type = GD_EVENT_RELEASED;
+
+
+    /*
+    printf("gadget released\n");
+    */
+
+
+    if (gi->event_mask & GD_EVENT_RELEASED)
+      gi->callback(gi);
+  }
+
+  if (button == 0)
+    gi = NULL;
+
+
+
+#if 0
   if (button)
   {
     if (!motion_status)		/* mouse button just pressed */
@@ -1710,6 +1910,14 @@ void HandleGadgets(int mx, int my, int button)
 	gi->event.button = button;
 	DrawGadget(gi, TRUE, TRUE);
 
+	/* initialize delay counter */
+	pressed_delay = 0;
+	DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
+
+
+	printf("new gadget pressed\n");
+
+
 	if (gi->event_mask & GD_EVENT_PRESSED)
 	  gi->callback(gi);
 
@@ -1718,19 +1926,36 @@ void HandleGadgets(int mx, int my, int button)
     }
     else			/* mouse movement with pressed mouse button */
     {
-      if ((new_gi == NULL || new_gi != gi) &&
-	  gi != NULL && pressed)
+      if (new_gi != gi && gi != NULL)
       {
+	if (pressed)
+	  DrawGadget(gi, FALSE, TRUE);
 	gi->state = GD_BUTTON_UNPRESSED;
-	DrawGadget(gi, FALSE, TRUE);
+	gi->event.type = GD_EVENT_MOVING;
+
+
+	printf("outside gadget\n");
+
+
+
+
+	if (gi->event_mask & GD_EVENT_MOVING)
+	  gi->callback(gi);
+
 	pressed = FALSE;
       }
-      else if (new_gi != NULL && new_gi == gi)
+      else if (new_gi == gi && gi != NULL)
       {
 	if (!pressed)
 	  DrawGadget(gi, TRUE, TRUE);
 	gi->state = GD_BUTTON_PRESSED;
 	gi->event.type = GD_EVENT_MOVING;
+
+
+	printf("inside gadget\n");
+
+
+
 
 	if (gi->event_mask & GD_EVENT_MOVING)
 	  gi->callback(gi);
@@ -1738,25 +1963,40 @@ void HandleGadgets(int mx, int my, int button)
 	pressed = TRUE;
       }
     }
+
+    if (gi != NULL &&
+	gi->event_mask & GD_EVENT_PRESSED_REPEATED &&
+	gi->state == GD_BUTTON_PRESSED &&
+	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
+    {
+	printf("gadget pressed (repeated)\n");
+
+
+	gi->callback(gi);
+    }
   }
   else				/* mouse button just released */
   {
-    if (new_gi != NULL && new_gi == gi && pressed)
+    if (new_gi == gi && gi != NULL && pressed)
     {
       gi->state = GD_BUTTON_UNPRESSED;
       gi->event.type = GD_EVENT_RELEASED;
       DrawGadget(gi, FALSE, TRUE);
 
+
+      printf("gadget released\n");
+
+
+
       if (gi->event_mask & GD_EVENT_RELEASED)
 	gi->callback(gi);
+    }
 
-      gi = NULL;
-      pressed = FALSE;
-    }
-    else
-    {
-      gi = NULL;
-      pressed = FALSE;
-    }
+    gi = NULL;
+    pressed = FALSE;
   }
+#endif
+
+
+
 }

@@ -270,21 +270,23 @@ void HandleButton(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
 
-  if (mx<0 || my<0)
+  if (button < 0)
   {
     mx = old_mx;
     my = old_my;
+    button = -button;
   }
   else
   {
     old_mx = mx;
     old_my = my;
 
-    HandleGadgets(mx,my, button);
     HandleVideoButtons(mx,my, button);
     HandleSoundButtons(mx,my, button);
     HandleGameButtons(mx,my, button);
   }
+
+  HandleGadgets(mx, my, button);
 
   switch(game_status)
   {
@@ -610,7 +612,7 @@ void HandleNoXEvent()
 {
   if (button_status && game_status != PLAYING)
   {
-    HandleButton(-1,-1, button_status);
+    HandleButton(0, 0, -button_status);
     return;
   }
 

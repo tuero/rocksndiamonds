@@ -286,6 +286,8 @@ int CheckCountButtons(int, int, int);
 #define GD_EVENT_PRESSED		(1<<0)
 #define GD_EVENT_RELEASED		(1<<1)
 #define GD_EVENT_MOVING			(1<<2)
+#define GD_EVENT_REPEATED		(1<<3)
+#define GD_EVENT_PRESSED_REPEATED	(GD_EVENT_PRESSED | GD_EVENT_REPEATED)
 
 /* gadget button states */
 #define GD_BUTTON_UNPRESSED		0
@@ -296,7 +298,7 @@ int CheckCountButtons(int, int, int);
 
 /* gadget creation tags */
 #define GDI_END				0
-#define GDI_ID				1
+#define GDI_CUSTOM_ID			1
 #define GDI_X				2
 #define GDI_Y				3
 #define GDI_WIDTH			4
@@ -313,6 +315,8 @@ int CheckCountButtons(int, int, int);
 #define GDI_EVENT_MASK			15
 #define GDI_EVENT			16
 #define GDI_CALLBACK			17
+#define GDI_AREA_SIZE			18
+#define GDI_ITEM_SIZE			19
 
 typedef void (*gadget_callback_function)(void *);
 
@@ -326,11 +330,19 @@ struct GadgetEvent
 {
   unsigned long type;			/* event type */
   int button;				/* button number for button events */
+  int x, y;				/* gadget position at event time */
+};
+
+struct GadgetDrawingArea
+{
+  int area_xsize, area_ysize;		/* size of drawing area (in items) */
+  int item_xsize, item_ysize;		/* size of each item in drawing area */
 };
 
 struct GadgetInfo
 {
-  int id;				/* gadget identifier */
+  int id;				/* internal gadget identifier */
+  int custom_id;			/* custom gadget identifier */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
@@ -344,6 +356,7 @@ struct GadgetInfo
   unsigned long event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
   gadget_callback_function callback;
+  struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
   struct GadgetInfo *next;		/* next list entry */
 };
 
