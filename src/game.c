@@ -2653,10 +2653,15 @@ void Explode(int ex, int ey, int phase, int mode)
       int yy = y - ey + 1;
       int element;
 
+#if 1
+      if (!IN_LEV_FIELD(x, y) || (mode != EX_NORMAL && (x != ex || y != ey)))
+	continue;
+#else
       if (!IN_LEV_FIELD(x, y) ||
 	  ((mode != EX_NORMAL || center_element == EL_AMOEBA_TO_DIAMOND) &&
 	   (x != ex || y != ey)))
 	continue;
+#endif
 
       element = Feld[x][y];
 
