@@ -70,7 +70,7 @@ void OpenAll(int argc, char *argv[])
   InitCounter();
   InitSound();
   InitSoundServer();
-  InitJoystick();
+  InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
   signal(SIGINT, CloseAllAndExit);
@@ -96,8 +96,13 @@ void InitLevelAndPlayerInfo()
 
   /* choose default local player */
   local_player = &stored_player[0];
+
   for (i=0; i<MAX_PLAYERS; i++)
+  {
+    stored_player[i].joystick_fd = -1;	/* joystick device closed */
     stored_player[i].connected = FALSE;
+  }
+
   local_player->connected = TRUE;
 
   if (!LoadLevelInfo())			/* global level info */
@@ -119,7 +124,7 @@ void InitNetworkServer()
   if (!ConnectToServer(options.server_host, options.server_port))
     Error(ERR_EXIT, "cannot connect to multiplayer server");
 
-  SendToServer_Nickname(local_player->alias_name);
+  SendToServer_Nickname(setup.alias_name);
   SendToServer_ProtocolVersion();
 
   if (nr_wanted)
@@ -216,33 +221,44 @@ void InitSoundServer()
 #endif
 }
 
-void InitJoystick()
+void InitJoysticks()
 {
-  int joystick_nr = setup.input[0].joystick_nr;
+  int i;
 
   if (global_joystick_status == JOYSTICK_OFF)
     return;
 
+  joystick_status = JOYSTICK_OFF;
+
 #ifndef MSDOS
-  if (access(joystick_device_name[joystick_nr], R_OK) < 0)
+  for (i=0; i<MAX_PLAYERS; i++)
   {
-    Error(ERR_WARN, "cannot access joystick device '%s'",
-	  joystick_device_name[joystick_nr]);
-    joystick_status = JOYSTICK_OFF;
-    return;
-  }
+    char *device_name = setup.input[i].joy.device_name;
 
-  if ((joystick_device =
-       open(joystick_device_name[joystick_nr], O_RDONLY)) < 0)
-  {
-    Error(ERR_WARN, "cannot open joystick device '%s'",
-	  joystick_device_name[joystick_nr]);
-    joystick_status = JOYSTICK_OFF;
-    return;
-  }
+    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
+    if (stored_player[i].joystick_fd != -1)
+    {
+      close(stored_player[i].joystick_fd);
+      stored_player[i].joystick_fd = -1;
+    }
 
-  joystick_status = JOYSTICK_AVAILABLE;
-  LoadJoystickData();
+    if (!setup.input[i].use_joystick)
+      continue;
+
+    if (access(device_name, R_OK) < 0)
+    {
+      Error(ERR_WARN, "cannot access joystick device '%s'", device_name);
+      continue;
+    }
+
+    if ((stored_player[i].joystick_fd = open(device_name, O_RDONLY)) < 0)
+    {
+      Error(ERR_WARN, "cannot open joystick device '%s'", device_name);
+      continue;
+    }
+
+    joystick_status = JOYSTICK_AVAILABLE;
+  }
 #else
   joystick_status = JOYSTICK_AVAILABLE;
 #endif

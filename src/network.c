@@ -502,12 +502,15 @@ static void Handle_OP_START_PLAYING()
   TapeErase();
   LoadLevelTape(level_nr);
 
+  /*
   GetPlayerConfig();
+  */
+
   LoadLevel(level_nr);
 
 
 
-  if (setup.autorecord_on)
+  if (setup.autorecord)
     TapeStartRecording();
 
 

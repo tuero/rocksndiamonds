@@ -24,6 +24,7 @@
 #include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
+#include "init.h"
 
 #ifdef MSDOS
 extern unsigned char get_ascii(KeySym);
@@ -51,7 +52,7 @@ void DrawMainMenu()
   ClearWindow();
   DrawHeadline();
   DrawText(SX + 32,    SY + 2*32, "Name:", FS_BIG, FC_GREEN);
-  DrawText(SX + 6*32,  SY + 2*32, local_player->alias_name, FS_BIG, FC_RED);
+  DrawText(SX + 6*32,  SY + 2*32, setup.alias_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
 	   (level_nr<leveldir[leveldir_nr].levels ? FC_RED : FC_YELLOW));
@@ -196,7 +197,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       if (y==3)
       {
 	game_status = TYPENAME;
-	HandleTypeName(strlen(local_player->alias_name),0);
+	HandleTypeName(strlen(setup.alias_name),0);
       }
       else if (y==4)
       {
@@ -226,7 +227,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==8)
       {
-	if (setup.autorecord_on)
+	if (setup.autorecord)
 	  TapeStartRecording();
 
 	if (options.network)
@@ -700,7 +701,7 @@ void HandleTypeName(int newxpos, KeySym key)
   if (newxpos)
   {
     xpos = newxpos;
-    DrawText(SX+6*32, SY+ypos*32, local_player->alias_name, FS_BIG, FC_YELLOW);
+    DrawText(SX+6*32, SY+ypos*32, setup.alias_name, FS_BIG, FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
     return;
   }
@@ -717,25 +718,25 @@ void HandleTypeName(int newxpos, KeySym key)
   if((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
   {
 #endif
-    local_player->alias_name[xpos] = ascii;
-    local_player->alias_name[xpos+1] = 0;
+    setup.alias_name[xpos] = ascii;
+    setup.alias_name[xpos+1] = 0;
     xpos++;
     DrawTextExt(drawto,gc,SX+6*32,SY+ypos*32,
-		local_player->alias_name,FS_BIG,FC_YELLOW);
+		setup.alias_name,FS_BIG,FC_YELLOW);
     DrawTextExt(window,gc,SX+6*32,SY+ypos*32,
-		local_player->alias_name,FS_BIG,FC_YELLOW);
+		setup.alias_name,FS_BIG,FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
   }
   else if ((key==XK_Delete || key==XK_BackSpace) && xpos>0)
   {
     xpos--;
-    local_player->alias_name[xpos] = 0;
+    setup.alias_name[xpos] = 0;
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
     DrawGraphic(xpos+7,ypos,GFX_LEERRAUM);
   }
   else if (key==XK_Return && xpos>0)
   {
-    DrawText(SX+6*32,SY+ypos*32,local_player->alias_name,FS_BIG,FC_RED);
+    DrawText(SX+6*32,SY+ypos*32,setup.alias_name,FS_BIG,FC_RED);
     DrawGraphic(xpos+6,ypos,GFX_LEERRAUM);
 
     SaveSetup();
@@ -821,6 +822,9 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     else
     {
       leveldir_nr = y-3;
+      level_nr =
+	getLastPlayedLevelOfLevelSeries(leveldir[leveldir_nr].filename);
+
       SaveLevelSetup();
 
       TapeErase();
@@ -888,24 +892,24 @@ void DrawSetupScreen()
   static struct setup
   {
     boolean *value;
-    char *text, *mode[2];
+    char *text;
   } setup_info[] =
   {
-    { &setup.sound_on,		"Sound:",	{ "on", "off" } },
-    { &setup.sound_loops_on,	" Sound Loops:",{ "on", "off" } },
-    { &setup.sound_music_on,	" Game Music:", { "on", "off" } },
-    { &setup.toons_on,		"Toons:",	{ "on", "off" } },
-    { &setup.direct_draw_on,	"Buffered gfx:",{ "off","on"  } },
-    { &setup.scroll_delay_on,	"Scroll Delay:",{ "on", "off" } },
-    { &setup.soft_scrolling_on,	"Soft Scroll.:",{ "on", "off" } },
-    { &setup.fading_on,		"Fading:",	{ "on", "off" } },
-    { &setup.quick_doors,	"Quick Doors:",	{ "on", "off" } },
-    { &setup.autorecord_on,	"Auto-Record:",	{ "on", "off" } },
-    { NULL,			"Input Devices",{ "",   ""    } },
-    { NULL,			"",		{ "",   ""    } },
-    { NULL,			"",		{ "",   ""    } },
-    { NULL,			"Exit",		{ "",   ""    } },
-    { NULL,			"Save and exit",{ "",   ""    } }
+    { &setup.sound,		"Sound:",	},
+    { &setup.sound_loops,	" Sound Loops:"	},
+    { &setup.sound_music,	" Game Music:"	},
+    { &setup.toons,		"Toons:"	},
+    { &setup.double_buffering,	"Buffered gfx:"	},
+    { &setup.scroll_delay,	"Scroll Delay:"	},
+    { &setup.soft_scrolling,	"Soft Scroll.:"	},
+    { &setup.fading,		"Fading:"	},
+    { &setup.quick_doors,	"Quick Doors:"	},
+    { &setup.autorecord,	"Auto-Record:"	},
+    { NULL,			"Input Devices"	},
+    { NULL,			""		},
+    { NULL,			""		},
+    { NULL,			"Exit"		},
+    { NULL,			"Save and exit"	}
   };
 
   CloseDoor(DOOR_CLOSE_2);
@@ -925,11 +929,9 @@ void DrawSetupScreen()
     if (setup_info[base].value)
     {
       int setting_value = *setup_info[base].value;
-      int setting_pos = (setting_value != 0 ? 0 : 1);
-      int fc_on = (strcmp(setup_info[base].mode[setting_pos], "on") == 0);
 
-      DrawText(SX+14*32, SY+i*32, setup_info[base].mode[setting_pos],
-	       FS_BIG, (fc_on ? FC_YELLOW : FC_BLUE));
+      DrawText(SX+14*32, SY+i*32, (setting_value ? "on" : "off"),
+	       FS_BIG, (setting_value ? FC_YELLOW : FC_BLUE));
     }
   }
 
@@ -1003,81 +1005,82 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
       if (y==3 && sound_status==SOUND_AVAILABLE)
       {
-	if (setup.sound_on)
+	if (setup.sound)
 	{
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
 	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
-	  setup.sound_loops_on = FALSE;
-	  setup.sound_music_on = FALSE;
+	  setup.sound_loops = FALSE;
+	  setup.sound_music = FALSE;
 	}
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.sound_on = !setup.sound_on;
+	setup.sound = !setup.sound;
       }
       else if (y==4 && sound_loops_allowed)
       {
-	if (setup.sound_loops_on)
+	if (setup.sound_loops)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound_on = TRUE;
+	  setup.sound = TRUE;
 	}
-	setup.sound_loops_on = !setup.sound_loops_on;
+	setup.sound_loops = !setup.sound_loops;
       }
       else if (y==5 && sound_loops_allowed)
       {
-	if (setup.sound_music_on)
+	if (setup.sound_music)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
-	  setup.sound_on = TRUE;
+	  setup.sound = TRUE;
 	}
-	setup.sound_music_on = !setup.sound_music_on;
+	setup.sound_music = !setup.sound_music;
       }
       else if (y==6)
       {
-	if (setup.toons_on)
+	if (setup.toons)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.toons_on = !setup.toons_on;
+	setup.toons = !setup.toons;
       }
       else if (y==7)
       {
-	if (!setup.direct_draw_on)
+	if (setup.double_buffering)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.direct_draw_on = !setup.direct_draw_on;
+	setup.double_buffering = !setup.double_buffering;
+	setup.direct_draw = !setup.double_buffering;
       }
       else if (y==8)
       {
-	if (setup.scroll_delay_on)
+	if (setup.scroll_delay)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.scroll_delay_on = !setup.scroll_delay_on;
+	setup.scroll_delay = !setup.scroll_delay;
       }
       else if (y==9)
       {
-	if (setup.soft_scrolling_on)
+	if (setup.soft_scrolling)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.soft_scrolling_on = !setup.soft_scrolling_on;
+	setup.soft_scrolling = !setup.soft_scrolling;
       }
       else if (y==10)
       {
-	if (setup.fading_on)
+	if (setup.fading)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.fading_on = !setup.fading_on;
+	setup.fading = !setup.fading;
       }
       else if (y==11)
       {
@@ -1089,11 +1092,11 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==12)
       {
-	if (setup.autorecord_on)
+	if (setup.autorecord)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	setup.autorecord_on = !setup.autorecord_on;
+	setup.autorecord = !setup.autorecord;
       }
       else if (y==13)
       {
@@ -1106,7 +1109,11 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
         if (y==pos_end)
 	{
 	  SaveSetup();
+
+	  /*
 	  SaveJoystickData();
+	  */
+
 	}
 
 	game_status = MAINMENU;
@@ -1142,6 +1149,45 @@ void DrawSetupInputScreen()
   HandleSetupInputScreen(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
+static int getJoystickNrFromDeviceName(char *device_name)
+{
+  char c;
+  int joystick_nr = 0;
+
+  if (device_name == NULL || device_name[0] == '\0')
+    return 0;
+
+  c = device_name[strlen(device_name) - 1];
+
+  if (c >= '0' && c <= '9')
+    joystick_nr = (int)(c - '0');
+
+  if (joystick_nr < 0 || joystick_nr >= MAX_PLAYERS)
+    joystick_nr = 0;
+
+  return joystick_nr;
+}
+
+static void setJoystickDeviceToNr(char *device_name, int device_nr)
+{
+  if (device_name == NULL)
+    return;
+
+  if (device_nr < 0 || device_nr >= MAX_PLAYERS)
+    device_nr = 0;
+
+  if (strlen(device_name) > 1)
+  {
+    char c1 = device_name[strlen(device_name) - 1];
+    char c2 = device_name[strlen(device_name) - 2];
+
+    if (c1 >= '0' && c1 <= '9' && !(c2 >= '0' && c2 <= '9'))
+      device_name[strlen(device_name) - 1] = '0' + (char)(device_nr % 10);
+  }
+  else
+    strcpy(device_name, joystick_device_name[device_nr]);
+}
+
 static void drawPlayerSetupInputInfo(int player_nr)
 {
   int i;
@@ -1159,6 +1205,13 @@ static void drawPlayerSetupInputInfo(int player_nr)
     { &custom_key.snap,  "Button 1"       },
     { &custom_key.bomb,  "Button 2"       }
   };
+  static char *joystick_name[MAX_PLAYERS] =
+  {
+    "Joystick1",
+    "Joystick2",
+    "Joystick3",
+    "Joystick4"
+  };
 
   custom_key = setup.input[player_nr].key;
 
@@ -1167,9 +1220,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
   if (setup.input[player_nr].use_joystick)
   {
+    char *device_name = setup.input[player_nr].joy.device_name;
+
     DrawText(SX+8*32, SY+3*32,
-	     (setup.input[player_nr].joystick_nr == 0 ?
-	      "Joystick1" : "Joystick2"),
+	     joystick_name[getJoystickNrFromDeviceName(device_name)],
 	     FS_BIG, FC_YELLOW);
     DrawText(SX+32, SY+4*32, "Calibrate", FS_BIG, FC_GREEN);
   }
@@ -1271,7 +1325,7 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
   {
     static long delay = 0;
 
-    if (!DelayReached(&delay,150))
+    if (!DelayReached(&delay, 150))
       goto out;
 
     player_nr = (player_nr + (x == 11 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;
@@ -1294,6 +1348,33 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
     {
       if (y == 4)
       {
+	char *device_name = setup.input[player_nr].joy.device_name;
+
+	if (!setup.input[player_nr].use_joystick)
+	{
+	  int new_device_nr = (dx >= 0 ? 0 : MAX_PLAYERS - 1);
+
+	  setJoystickDeviceToNr(device_name, new_device_nr);
+	  setup.input[player_nr].use_joystick = TRUE;
+	}
+	else
+	{
+	  int device_nr = getJoystickNrFromDeviceName(device_name);
+	  int new_device_nr = device_nr + (dx >= 0 ? +1 : -1);
+
+	  if (new_device_nr < 0 || new_device_nr >= MAX_PLAYERS)
+	    setup.input[player_nr].use_joystick = FALSE;
+	  else
+	    setJoystickDeviceToNr(device_name, new_device_nr);
+	}
+
+
+	/*
+	InitJoysticks();
+	*/
+
+
+#if 0
 	int one_joystick_nr       = (dx >= 0 ? 0 : 1);
 	int the_other_joystick_nr = (dx >= 0 ? 1 : 0);
 
@@ -1309,13 +1390,17 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 	  setup.input[player_nr].use_joystick = TRUE;
 	  setup.input[player_nr].joystick_nr = one_joystick_nr;
 	}
+#endif
 
 	drawPlayerSetupInputInfo(player_nr);
       }
       else if (y == 5)
       {
 	if (setup.input[player_nr].use_joystick)
-	  CalibrateJoystick(setup.input[player_nr].joystick_nr);
+	{
+	  InitJoysticks();
+	  CalibrateJoystick(player_nr);
+	}
 	else
 	  CustomizeKeyboard(player_nr);
 
@@ -1323,6 +1408,8 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y == pos_end)
       {
+	InitJoysticks();
+
 	game_status = SETUP;
 	DrawSetupScreen();
 	redraw = TRUE;
@@ -1464,7 +1551,7 @@ void CustomizeKeyboard(int player_nr)
   DrawSetupInputScreen();
 }
 
-void CalibrateJoystick(int joystick_nr)
+void CalibrateJoystick(int player_nr)
 {
 #ifdef __FreeBSD__
   struct joystick joy_ctrl;
@@ -1481,6 +1568,7 @@ void CalibrateJoystick(int joystick_nr)
   char joy_nr[4];
 #endif
 
+  int joystick_fd = stored_player[player_nr].joystick_fd;
   int new_joystick_xleft = 128, new_joystick_xright = 128;
   int new_joystick_yupper = 128, new_joystick_ylower = 128;
   int new_joystick_xmiddle, new_joystick_ymiddle;
@@ -1491,6 +1579,9 @@ void CalibrateJoystick(int joystick_nr)
   int result = -1;
 
   if (joystick_status == JOYSTICK_OFF)
+    return;
+
+  if (!setup.input[player_nr].use_joystick || joystick_fd < 0)
     return;
 
   ClearWindow();
@@ -1509,7 +1600,7 @@ void CalibrateJoystick(int joystick_nr)
     }
   }
 
-  joy = Joystick();
+  joy = Joystick(player_nr);
   last_x = (joy & JOY_LEFT ? -1 : joy & JOY_RIGHT ? +1 : 0);
   last_y = (joy & JOY_UP   ? -1 : joy & JOY_DOWN  ? +1 : 0);
   DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_ROT);
@@ -1522,7 +1613,7 @@ void CalibrateJoystick(int joystick_nr)
   joy_ctrl.buttons = 0;
 #endif
 
-  while(Joystick() & JOY_BUTTON);
+  while(Joystick(player_nr) & JOY_BUTTON);
 
   InitAnimation();
 
@@ -1564,7 +1655,7 @@ void CalibrateJoystick(int joystick_nr)
       }
     }
 
-    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    if (read(joystick_fd, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
     {
       joystick_status = JOYSTICK_OFF;
       goto error_out;
@@ -1580,16 +1671,16 @@ void CalibrateJoystick(int joystick_nr)
     new_joystick_ymiddle =
       new_joystick_yupper + (new_joystick_ylower - new_joystick_yupper) / 2;
 
-    joystick[joystick_nr].xleft = new_joystick_xleft;
-    joystick[joystick_nr].yupper = new_joystick_yupper;
-    joystick[joystick_nr].xright = new_joystick_xright;
-    joystick[joystick_nr].ylower = new_joystick_ylower;
-    joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
-    joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
+    setup.input[player_nr].joy.xleft = new_joystick_xleft;
+    setup.input[player_nr].joy.yupper = new_joystick_yupper;
+    setup.input[player_nr].joy.xright = new_joystick_xright;
+    setup.input[player_nr].joy.ylower = new_joystick_ylower;
+    setup.input[player_nr].joy.xmiddle = new_joystick_xmiddle;
+    setup.input[player_nr].joy.ymiddle = new_joystick_ymiddle;
 
     CheckJoystickData();
 
-    joy = Joystick();
+    joy = Joystick(player_nr);
 
     if (joy & JOY_BUTTON && check_remaining == 0)
       result = 1;
@@ -1613,13 +1704,13 @@ void CalibrateJoystick(int joystick_nr)
 
 #if 0
       printf("LEFT / MIDDLE / RIGHT == %d / %d / %d\n",
-	     joystick[joystick_nr].xleft,
-	     joystick[joystick_nr].xmiddle,
-	     joystick[joystick_nr].xright);
+	     setup.input[player_nr].joy.xleft,
+	     setup.input[player_nr].joy.xmiddle,
+	     setup.input[player_nr].joy.xright);
       printf("UP / MIDDLE / DOWN == %d / %d / %d\n",
-	     joystick[joystick_nr].yupper,
-	     joystick[joystick_nr].ymiddle,
-	     joystick[joystick_nr].ylower);
+	     setup.input[player_nr].joy.yupper,
+	     setup.input[player_nr].joy.ymiddle,
+	     setup.input[player_nr].joy.ylower);
 #endif
     }
 
@@ -1633,7 +1724,7 @@ void CalibrateJoystick(int joystick_nr)
   StopAnimation();
 
   DrawSetupInputScreen();
-  while(Joystick() & JOY_BUTTON);
+  while(Joystick(player_nr) & JOY_BUTTON);
   return;
 
   error_out:
@@ -1645,6 +1736,10 @@ void CalibrateJoystick(int joystick_nr)
   Delay(3000);
   DrawSetupInputScreen();
 }
+
+
+
+#if 0
 
 void CalibrateJoystick_OLD()
 {
@@ -1757,12 +1852,12 @@ void CalibrateJoystick_OLD()
   new_joystick_xmiddle = joy_ctrl.x;
   new_joystick_ymiddle = joy_ctrl.y;
 
-  joystick[joystick_nr].xleft = new_joystick_xleft;
-  joystick[joystick_nr].yupper = new_joystick_yupper;
-  joystick[joystick_nr].xright = new_joystick_xright;
-  joystick[joystick_nr].ylower = new_joystick_ylower;
-  joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
-  joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
+  setup.input[player_nr].joy.xleft = new_joystick_xleft;
+  setup.input[player_nr].joy.yupper = new_joystick_yupper;
+  setup.input[player_nr].joy.xright = new_joystick_xright;
+  setup.input[player_nr].joy.ylower = new_joystick_ylower;
+  setup.input[player_nr].joy.xmiddle = new_joystick_xmiddle;
+  setup.input[player_nr].joy.ymiddle = new_joystick_ymiddle;
 
   CheckJoystickData();
 
@@ -1817,6 +1912,10 @@ void CalibrateJoystick_OLD()
   Delay(3000);
   DrawSetupScreen();
 }
+
+#endif
+
+
 
 void HandleGameActions()
 {
@@ -1944,15 +2043,15 @@ void HandleSoundButtons(int mx, int my, int button)
   switch(CheckSoundButtons(mx,my,button))
   {
     case BUTTON_SOUND_MUSIC:
-      if (setup.sound_music_on)
+      if (setup.sound_music)
       { 
-	setup.sound_music_on = FALSE;
+	setup.sound_music = FALSE;
 	FadeSound(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_OFF);
       }
       else if (sound_loops_allowed)
       { 
-	setup.sound_on = setup.sound_music_on = TRUE;
+	setup.sound = setup.sound_music = TRUE;
 	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_ON);
       }
@@ -1961,14 +2060,14 @@ void HandleSoundButtons(int mx, int my, int button)
       break;
 
     case BUTTON_SOUND_LOOPS:
-      if (setup.sound_loops_on)
+      if (setup.sound_loops)
       { 
-	setup.sound_loops_on = FALSE;
+	setup.sound_loops = FALSE;
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_OFF);
       }
       else if (sound_loops_allowed)
       { 
-	setup.sound_on = setup.sound_loops_on = TRUE;
+	setup.sound = setup.sound_loops = TRUE;
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_ON);
       }
       else
@@ -1976,14 +2075,14 @@ void HandleSoundButtons(int mx, int my, int button)
       break;
 
     case BUTTON_SOUND_SIMPLE:
-      if (setup.sound_simple_on)
+      if (setup.sound_simple)
       { 
-	setup.sound_simple_on = FALSE;
+	setup.sound_simple = FALSE;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       }
       else if (sound_status==SOUND_AVAILABLE)
       { 
-	setup.sound_on = setup.sound_simple_on = TRUE;
+	setup.sound = setup.sound_simple = TRUE;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_ON);
       }
       else

@@ -42,7 +42,14 @@ int		sound_pipe[2];
 int		sound_device;
 char	       *sound_device_name = SOUND_DEVICE;
 int		joystick_device = 0;
-char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
+char	       *joystick_device_name[MAX_PLAYERS] =
+{
+  DEV_JOYSTICK_0,
+  DEV_JOYSTICK_1,
+  DEV_JOYSTICK_2,
+  DEV_JOYSTICK_3
+};
+
 char	       *level_directory = LEVEL_PATH;
 int     	width, height;
 
@@ -107,14 +114,6 @@ struct OptionInfo	options;
 struct SetupInfo	setup;
 struct SetupFileList	*setup_list = NULL;
 struct SetupFileList	*level_setup_list = NULL;
-
-struct JoystickInfo joystick[2] =
-{
-  { JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-    JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE },
-  { JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-    JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE }
-};
 
 /* data needed for playing sounds */
 char *sound_name[NUM_SOUNDS] =

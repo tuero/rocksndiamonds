@@ -220,6 +220,9 @@ struct OptionInfo
 
 struct SetupJoystickInfo
 {
+  char device_name[MAX_FILENAME_LEN];
+  int xleft, xmiddle, xright;
+  int yupper, ymiddle, ylower;
   int snap;
   int bomb;
 };
@@ -234,26 +237,32 @@ struct SetupKeyboardInfo
   KeySym bomb;
 };
 
+struct SetupInputInfo
+{
+  boolean use_joystick;
+  struct SetupJoystickInfo joy;
+  struct SetupKeyboardInfo key;
+};
+
 struct SetupInfo
 {
-  boolean sound_on;
-  boolean sound_loops_on;
-  boolean sound_music_on;
-  boolean sound_simple_on;
-  boolean toons_on;
-  boolean direct_draw_on;
-  boolean scroll_delay_on;
-  boolean soft_scrolling_on;
-  boolean fading_on;
-  boolean autorecord_on;
+  boolean sound;
+  boolean sound_loops;
+  boolean sound_music;
+  boolean sound_simple;
+  boolean toons;
+  boolean double_buffering;
+  boolean direct_draw;		/* !double_buffering (redundant!) */
+  boolean scroll_delay;
+  boolean soft_scrolling;
+  boolean fading;
+  boolean autorecord;
   boolean quick_doors;
-  struct
-  {
-    boolean use_joystick;
-    int joystick_nr;
-    struct SetupJoystickInfo joy;
-    struct SetupKeyboardInfo key;
-  } input[MAX_PLAYERS];
+
+  char login_name[MAX_NAMELEN];
+  char alias_name[MAX_NAMELEN];
+
+  struct SetupInputInfo input[MAX_PLAYERS];
 };
 
 struct SetupFileList
@@ -274,8 +283,7 @@ struct PlayerInfo
   byte action;			/* action from server or for local playing */
   byte potential_action;	/* must go to network server first */
 
-  char login_name[MAX_NAMELEN];
-  char alias_name[MAX_NAMELEN];
+  int joystick_fd;		/* file descriptor of player's joystick */
 
   int jx,jy, last_jx,last_jy;
   int MovDir, MovPos, GfxPos;
@@ -348,12 +356,6 @@ struct RecordingInfo
   } pos[MAX_TAPELEN];
 };
 
-struct JoystickInfo
-{
-  int xleft, xright, xmiddle;
-  int yupper, ylower, ymiddle;
-};
-
 extern Display	       *display;
 extern Visual	       *visual;
 extern int		screen;
@@ -373,7 +375,7 @@ extern int		sound_pipe[2];
 extern int		sound_device;
 extern char	       *sound_device_name;
 extern int		joystick_device;
-extern char	       *joystick_device_name[2];
+extern char	       *joystick_device_name[];
 extern char	       *level_directory;
 extern int     		width, height;
 

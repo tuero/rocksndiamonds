@@ -598,9 +598,9 @@ int CheckSoundButtons(int mx, int my, int button)
   static boolean pressed = FALSE;
   int sound_state[3];
 
-  sound_state[0] = BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music_on);
-  sound_state[1] = BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops_on);
-  sound_state[2] = BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple_on);
+  sound_state[0] = BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music);
+  sound_state[1] = BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops);
+  sound_state[2] = BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple);
 
   if (button)
   {

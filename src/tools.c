@@ -33,7 +33,7 @@ extern boolean wait_for_vsync;
 
 void SetDrawtoField(int mode)
 {
-  if (mode == DRAW_BUFFERED && setup.soft_scrolling_on)
+  if (mode == DRAW_BUFFERED && setup.soft_scrolling)
   {
     FX = TILEX;
     FY = TILEY;
@@ -66,7 +66,7 @@ void BackToFront()
   int x,y;
   Drawable buffer = (drawto_field != window ? drawto_field : backbuffer);
 
-  if (setup.direct_draw_on && game_status == PLAYING)
+  if (setup.direct_draw && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
@@ -107,7 +107,7 @@ void BackToFront()
     {
       int fx = FX, fy = FY;
 
-      if (setup.soft_scrolling_on)
+      if (setup.soft_scrolling)
       {
 	fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
 	fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
@@ -189,7 +189,7 @@ void FadeToFront()
 /*
   long fading_delay = 300;
 
-  if (setup.fading_on && (redraw_mask & REDRAW_FIELD))
+  if (setup.fading && (redraw_mask & REDRAW_FIELD))
   {
 */
 
@@ -257,7 +257,7 @@ void ClearWindow()
   XFillRectangle(display,backbuffer,gc,
 		 REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
 
-  if (setup.soft_scrolling_on && game_status==PLAYING)
+  if (setup.soft_scrolling && game_status==PLAYING)
   {
     XFillRectangle(display,fieldbuffer,gc,
 		   0,0, FXSIZE,FYSIZE);
@@ -266,7 +266,7 @@ void ClearWindow()
   else
     SetDrawtoField(DRAW_BACKBUFFER);
 
-  if (setup.direct_draw_on && game_status==PLAYING)
+  if (setup.direct_draw && game_status==PLAYING)
   {
     XFillRectangle(display,window,gc,
 		   REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
@@ -357,11 +357,6 @@ void DrawPlayer(struct PlayerInfo *player)
   int element = Feld[jx][jy];
   int graphic, phase;
 
-  /*
-  if (!player->active || player->gone || !IN_SCR_FIELD(sx,sy))
-    return;
-  */
-
   if (!player->active || player->gone ||
       !IN_SCR_FIELD(SCREENX(last_jx),SCREENY(last_jy)))
     return;
@@ -410,7 +405,7 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!IN_SCR_FIELD(sx,sy))
     return;
 
-  if (setup.direct_draw_on)
+  if (setup.direct_draw)
     SetDrawtoField(DRAW_BUFFERED);
 
   /* draw things behind the player, if needed */
@@ -442,7 +437,7 @@ void DrawPlayer(struct PlayerInfo *player)
       syy = player->GfxPos;
   }
 
-  if (!setup.soft_scrolling_on && ScreenMovPos)
+  if (!setup.soft_scrolling && ScreenMovPos)
     sxx = syy = 0;
 
   DrawGraphicShiftedThruMask(sx,sy, sxx,syy, graphic, NO_CUTTING);
@@ -503,7 +498,7 @@ void DrawPlayer(struct PlayerInfo *player)
 			  GFX_EXPLOSION + ((phase-1)/delay-1));
   }
 
-  if (setup.direct_draw_on)
+  if (setup.direct_draw)
   {
     int dest_x = SX + SCREENX(MIN(jx,last_jx))*TILEX;
     int dest_y = SY + SCREENY(MIN(jy,last_jy))*TILEY;
@@ -1234,7 +1229,7 @@ void DrawLevel()
     for(y=BY1; y<=BY2; y++)
       DrawScreenField(x,y);
 
-  if (setup.soft_scrolling_on)
+  if (setup.soft_scrolling)
     XCopyArea(display,fieldbuffer,backbuffer,gc,
 	      FX,FY, SXSIZE,SYSIZE,
 	      SX,SY);
@@ -1480,9 +1475,9 @@ boolean Request(char *text, unsigned int req_state)
 	  break;
       }
     }
-    else if (JoystickButton() == JOY_BUTTON_NEW_PRESSED)
+    else if (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED)
     {
-      int joy=Joystick();
+      int joy = AnyJoystick();
 
       if (joy & JOY_BUTTON_1)
 	result = 1;

@@ -189,7 +189,7 @@ void HandleExposeEvent(XExposeEvent *event)
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
 
-  if (setup.direct_draw_on && game_status==PLAYING)
+  if (setup.direct_draw && game_status==PLAYING)
   {
     int xx,yy;
     int x1 = (x-SX)/TILEX, y1 = (y-SY)/TILEY;
@@ -206,7 +206,7 @@ void HandleExposeEvent(XExposeEvent *event)
     SetDrawtoField(DRAW_DIRECT);
   }
 
-  if (setup.soft_scrolling_on && game_status == PLAYING)
+  if (setup.soft_scrolling && game_status == PLAYING)
   {
     int fx = FX, fy = FY;
 
@@ -794,7 +794,7 @@ void HandleKey(KeySym key, int key_status)
 	  }
 	  */
 
-	  printf("direct_draw_on == %d\n", setup.direct_draw_on);
+	  printf("direct_draw == %d\n", setup.direct_draw);
 
 	  break;
 
@@ -877,9 +877,34 @@ void HandleNoXEvent()
   }
 }
 
+static int HandleJoystickForAllPlayers()
+{
+  int i;
+  int result = 0;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    byte joy_action = 0;
+
+    if (!setup.input[i].use_joystick)
+      continue;
+
+    joy_action = Joystick(i);
+
+    result |= joy_action;
+
+    if (network_playing)
+      local_player->potential_action |= joy_action;
+    else
+      stored_player[i].action |= joy_action;
+  }
+
+  return result;
+}
+
 void HandleJoystick()
 {
-  int joystick	= Joystick();
+  int joystick	= HandleJoystickForAllPlayers();
   int keyboard	= key_joystick_mapping;
   int joy	= (joystick | keyboard);
   int left	= joy & JOY_LEFT;
@@ -887,7 +912,7 @@ void HandleJoystick()
   int up	= joy & JOY_UP;
   int down	= joy & JOY_DOWN;
   int button	= joy & JOY_BUTTON;
-  int newbutton	= (JoystickButton() == JOY_BUTTON_NEW_PRESSED);
+  int newbutton	= (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED);
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
 

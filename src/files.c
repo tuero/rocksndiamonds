@@ -467,6 +467,10 @@ void SaveScore(int level_nr)
   fclose(file);
 }
 
+
+
+#if 0
+
 void LoadJoystickData()
 {
   int i;
@@ -540,6 +544,10 @@ void SaveJoystickData()
 
 }
 
+#endif
+
+
+
 /* ------------------------------------------------------------------------- */
 /* new setup functions                                                       */
 /* ------------------------------------------------------------------------- */
@@ -564,53 +572,84 @@ void SaveJoystickData()
 #define SETUP_TOKEN_SOUND_MUSIC		2
 #define SETUP_TOKEN_SOUND_SIMPLE	3
 #define SETUP_TOKEN_TOONS		4
-#define SETUP_TOKEN_DIRECT_DRAW		5
+#define SETUP_TOKEN_DOUBLE_BUFFERING	5
 #define SETUP_TOKEN_SCROLL_DELAY	6
 #define SETUP_TOKEN_SOFT_SCROLLING	7
 #define SETUP_TOKEN_FADING		8
 #define SETUP_TOKEN_AUTORECORD		9
 #define SETUP_TOKEN_QUICK_DOORS		10
-#define SETUP_TOKEN_USE_JOYSTICK	11
-#define SETUP_TOKEN_JOYSTICK_NR		12
-#define SETUP_TOKEN_JOY_SNAP		13
-#define SETUP_TOKEN_JOY_BOMB		14
-#define SETUP_TOKEN_KEY_LEFT		15
-#define SETUP_TOKEN_KEY_RIGHT		16
-#define SETUP_TOKEN_KEY_UP		17
-#define SETUP_TOKEN_KEY_DOWN		18
-#define SETUP_TOKEN_KEY_SNAP		19
-#define SETUP_TOKEN_KEY_BOMB		20
+#define SETUP_TOKEN_ALIAS_NAMES		11
 
-#define NUM_SETUP_TOKENS		21
+#define SETUP_TOKEN_USE_JOYSTICK	12
+#define SETUP_TOKEN_JOY_DEVICE_NAME	13
+#define SETUP_TOKEN_JOY_XLEFT		14
+#define SETUP_TOKEN_JOY_XMIDDLE		15
+#define SETUP_TOKEN_JOY_XRIGHT		16
+#define SETUP_TOKEN_JOY_YUPPER		17
+#define SETUP_TOKEN_JOY_YMIDDLE		18
+#define SETUP_TOKEN_JOY_YLOWER		19
+#define SETUP_TOKEN_JOY_SNAP		20
+#define SETUP_TOKEN_JOY_BOMB		21
+#define SETUP_TOKEN_KEY_LEFT		22
+#define SETUP_TOKEN_KEY_RIGHT		23
+#define SETUP_TOKEN_KEY_UP		24
+#define SETUP_TOKEN_KEY_DOWN		25
+#define SETUP_TOKEN_KEY_SNAP		26
+#define SETUP_TOKEN_KEY_BOMB		27
 
+#define NUM_SETUP_TOKENS		28
+
+#define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_SOUND
+#define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_ALIAS_NAMES
+
+#define FIRST_PLAYER_SETUP_TOKEN	SETUP_TOKEN_USE_JOYSTICK
+#define LAST_PLAYER_SETUP_TOKEN		SETUP_TOKEN_KEY_BOMB
+
+#define TYPE_BOOLEAN			1
+#define TYPE_SWITCH			2
+#define TYPE_KEYSYM			3
+#define TYPE_INTEGER			4
+#define TYPE_STRING			5
+
+static struct SetupInfo si;
+static struct SetupInputInfo sii;
 static struct
 {
-  char *token, *value_true, *value_false;
-} setup_info[] =
+  int type;
+  void *value;
+  char *text;
+} token_info[] =
 {
-  { "sound",			"on", "off" },
-  { "repeating_sound_loops",	"on", "off" },
-  { "background_music",		"on", "off" },
-  { "simple_sound_effects",	"on", "off" },
-  { "toons",			"on", "off" },
-  { "double_buffering", 	"off", "on" },
-  { "scroll_delay",		"on", "off" },
-  { "soft_scrolling",		"on", "off" },
-  { "screen_fading",		"on", "off" },
-  { "automatic_tape_recording",	"on", "off" },
-  { "quick_doors",		"on", "off" },
+  { TYPE_SWITCH,  &si.sound,		"sound"				},
+  { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
+  { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
+  { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
+  { TYPE_SWITCH,  &si.toons,		"toons"				},
+  { TYPE_SWITCH,  &si.double_buffering,	"double_buffering"		},
+  { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
+  { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
+  { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
+  { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
+  { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
+  { TYPE_STRING,  &si.alias_name,	"alias_name"			},
 
   /* for each player: */
-  { ".use_joystick",		"true", "false" },
-  { ".joystick_device",		"second", "first" },
-  { ".joy.snap_field",		"", "" },
-  { ".joy.place_bomb",		"", "" },
-  { ".key.move_left",		"", "" },
-  { ".key.move_right",		"", "" },
-  { ".key.move_up",		"", "" },
-  { ".key.move_down",		"", "" },
-  { ".key.snap_field",		"", "" },
-  { ".key.place_bomb",		"", "" }
+  { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
+  { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
+  { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
+  { TYPE_INTEGER, &sii.joy.xmiddle,	".joy.xmiddle"			},
+  { TYPE_INTEGER, &sii.joy.xright,	".joy.xright"			},
+  { TYPE_INTEGER, &sii.joy.yupper,	".joy.yupper"			},
+  { TYPE_INTEGER, &sii.joy.ymiddle,	".joy.ymiddle"			},
+  { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
+  { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
+  { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
+  { TYPE_KEYSYM,  &sii.key.left,	".key.move_left"		},
+  { TYPE_KEYSYM,  &sii.key.right,	".key.move_right"		},
+  { TYPE_KEYSYM,  &sii.key.up,		".key.move_up"			},
+  { TYPE_KEYSYM,  &sii.key.down,	".key.move_down"		},
+  { TYPE_KEYSYM,  &sii.key.snap,	".key.snap_field"		},
+  { TYPE_KEYSYM,  &sii.key.bomb,	".key.place_bomb"		}
 };
 
 static char *string_tolower(char *s)
@@ -655,7 +694,7 @@ static int get_string_integer_value(char *s)
       if (strcmp(string_tolower(s), number_text[i][j]) == 0)
 	return i;
 
-  return -1;
+  return atoi(s);
 }
 
 static boolean get_string_boolean_value(char *s)
@@ -669,18 +708,31 @@ static boolean get_string_boolean_value(char *s)
     return FALSE;
 }
 
+
+
+#if 0
+
 static char *getSetupToken(int token_nr)
 {
-  return setup_info[token_nr].token;
+  return token_info[token_nr].text;
 }
 
 static char *getSetupValue(int token_nr, boolean token_value)
 {
+  return (token_value == TRUE ? "true" : "false");
+
+  /*
   if (token_value == TRUE)
-    return setup_info[token_nr].value_true;
+    return token_info[token_nr].value_true;
   else
-    return setup_info[token_nr].value_false;
+    return token_info[token_nr].value_false;
+  */
+
 }
+
+#endif
+
+
 
 static char *getFormattedSetupEntry(char *token, char *value)
 {
@@ -696,6 +748,10 @@ static char *getFormattedSetupEntry(char *token, char *value)
 
   return entry;
 }
+
+
+
+#if 0
 
 static char *getSetupEntry(char *prefix, int token_nr, int token_value)
 {
@@ -738,6 +794,9 @@ static char *getSetupEntryWithComment(char *prefix,int token_nr, KeySym keysym)
 
   return entry;
 }
+
+#endif
+
 
 static void freeSetupFileList(struct SetupFileList *setup_file_list)
 {
@@ -838,13 +897,6 @@ static struct SetupFileList *loadSetupFileList(char *filename)
   struct SetupFileList *setup_file_list = newSetupFileList("", "");
   struct SetupFileList *first_valid_list_entry;
 
-
-
-  /*
-  struct SetupFileList **next_entry = &setup_file_list;
-  */
-
-
   FILE *file;
 
   if (!(file = fopen(filename, "r")))
@@ -907,19 +959,6 @@ static struct SetupFileList *loadSetupFileList(char *filename)
 
     if (*token && *value)
       updateSetupFileListEntry(setup_file_list, token, value);
-
-
-#if 0
-    {
-      /* allocate new token/value pair */
-
-      *next_entry = newSetupFileList(token, value);
-      next_entry = &((*next_entry)->next);
-    }
-#endif
-
-
-
   }
 
   fclose(file);
@@ -969,8 +1008,8 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   int player_nr = 0;
   char *token;
   char *token_value;
-  int token_integer_value;
   boolean token_boolean_value;
+  int token_integer_value;
   int token_player_prefix_len;
 
   if (!setup_file_list)
@@ -978,8 +1017,8 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
 
   token = setup_file_list->token;
   token_value = setup_file_list->value;
-  token_integer_value = get_string_integer_value(token_value);
   token_boolean_value = get_string_boolean_value(token_value);
+  token_integer_value = get_string_integer_value(token_value);
 
   token_player_prefix_len = strlen(TOKEN_STR_PLAYER_PREFIX);
 
@@ -997,7 +1036,7 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
 
   for (i=0; i<NUM_SETUP_TOKENS; i++)
   {
-    if (strcmp(token, setup_info[i].token) == 0)
+    if (strcmp(token, token_info[i].text) == 0)
     {
       token_nr = i;
       break;
@@ -1012,51 +1051,74 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   switch (token_nr)
   {
     case SETUP_TOKEN_SOUND:
-      setup.sound_on = token_boolean_value;
+      setup.sound = token_boolean_value;
       break;
     case SETUP_TOKEN_SOUND_LOOPS:
-      setup.sound_loops_on = token_boolean_value;
+      setup.sound_loops = token_boolean_value;
       break;
     case SETUP_TOKEN_SOUND_MUSIC:
-      setup.sound_music_on = token_boolean_value;
+      setup.sound_music = token_boolean_value;
       break;
     case SETUP_TOKEN_SOUND_SIMPLE:
-      setup.sound_simple_on = token_boolean_value;
+      setup.sound_simple = token_boolean_value;
       break;
     case SETUP_TOKEN_TOONS:
-      setup.toons_on = token_boolean_value;
+      setup.toons = token_boolean_value;
       break;
-    case SETUP_TOKEN_DIRECT_DRAW:
-      setup.direct_draw_on = !token_boolean_value;
+    case SETUP_TOKEN_DOUBLE_BUFFERING:
+      setup.double_buffering = token_boolean_value;
       break;
     case SETUP_TOKEN_SCROLL_DELAY:
-      setup.scroll_delay_on = token_boolean_value;
+      setup.scroll_delay = token_boolean_value;
       break;
     case SETUP_TOKEN_SOFT_SCROLLING:
-      setup.soft_scrolling_on = token_boolean_value;
+      setup.soft_scrolling = token_boolean_value;
       break;
     case SETUP_TOKEN_FADING:
-      setup.fading_on = token_boolean_value;
+      setup.fading = token_boolean_value;
       break;
     case SETUP_TOKEN_AUTORECORD:
-      setup.autorecord_on = token_boolean_value;
+      setup.autorecord = token_boolean_value;
       break;
     case SETUP_TOKEN_QUICK_DOORS:
       setup.quick_doors = token_boolean_value;
       break;
 
+    case SETUP_TOKEN_ALIAS_NAME:
+      strncpy(setup.alias_name, token_value, MAX_NAMELEN-1);
+      setup.alias_name[MAX_NAMELEN-1] = '\0';
+      break;
+
     case SETUP_TOKEN_USE_JOYSTICK:
       setup.input[player_nr].use_joystick = token_boolean_value;
       break;
-    case SETUP_TOKEN_JOYSTICK_NR:
-      if (token_integer_value < 0 || token_integer_value > 1)
-	token_integer_value = 1;
-      setup.input[player_nr].joystick_nr = token_integer_value - 1;
+    case SETUP_TOKEN_JOY_DEVICE_NAME:
+      strncpy(setup.input[player_nr].joy.device_name, token_value,
+	      MAX_FILENAME_LEN-1);
+      setup.input[player_nr].joy.device_name[MAX_FILENAME_LEN-1] = '\0';
       break;
     case SETUP_TOKEN_JOY_SNAP:
       setup.input[player_nr].joy.snap = getJoySymbolFromJoyName(token_value);
       break;
-    case SETUP_TOKEN_JOY_BOMB    :
+    case SETUP_TOKEN_JOY_XLEFT:
+      setup.input[player_nr].joy.xleft = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_XMIDDLE:
+      setup.input[player_nr].joy.xmiddle = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_XRIGHT:
+      setup.input[player_nr].joy.xright = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_YUPPER:
+      setup.input[player_nr].joy.yupper = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_YMIDDLE:
+      setup.input[player_nr].joy.ymiddle = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_YLOWER:
+      setup.input[player_nr].joy.ylower = token_integer_value;
+      break;
+    case SETUP_TOKEN_JOY_BOMB:
       setup.input[player_nr].joy.bomb = getJoySymbolFromJoyName(token_value);
       break;
     case SETUP_TOKEN_KEY_LEFT:
@@ -1078,11 +1140,6 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
       setup.input[player_nr].key.bomb = getKeySymFromX11KeyName(token_value);
       break;
 
-    case SETUP_TOKEN_ALIAS_NAME:
-      strncpy(local_player->alias_name, token_value, MAX_NAMELEN-1);
-      local_player->alias_name[MAX_NAMELEN-1] = '\0';
-      break;
-
     case TOKEN_INVALID:
       Error(ERR_WARN, "unknown token '%s' not recognized", token);
       break;
@@ -1095,6 +1152,46 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   decodeSetupFileList(setup_file_list->next);
 }
 
+int getLevelSeriesNrFromLevelSeriesName(char *level_series_name)
+{
+  int i;
+
+  if (!level_series_name)
+    return 0;
+
+  for (i=0; i<num_leveldirs; i++)
+    if (strcmp(level_series_name, leveldir[i].filename) == 0)
+      return i;
+
+  return 0;
+}
+
+int getLastPlayedLevelOfLevelSeries(char *level_series_name)
+{
+  char *token_value;
+  int level_series_nr = getLevelSeriesNrFromLevelSeriesName(level_series_name);
+  int last_level_nr = 0;
+
+  if (!level_series_name)
+    return 0;
+
+  token_value = getSetupFileListEntry(level_setup_list, level_series_name);
+
+  if (token_value)
+  {
+    int highest_level_nr = leveldir[level_series_nr].levels - 1;
+
+    last_level_nr = atoi(token_value);
+
+    if (last_level_nr < 0)
+      last_level_nr = 0;
+    if (last_level_nr > highest_level_nr)
+      last_level_nr = highest_level_nr;
+  }
+
+  return last_level_nr;
+}
+
 void LoadSetup()
 {
   int i;
@@ -1103,28 +1200,34 @@ void LoadSetup()
 
   /* always start with reliable default setup values */
 
-  strncpy(local_player->login_name, GetLoginName(), MAX_NAMELEN-1);
-  local_player->login_name[MAX_NAMELEN-1] = '\0';
-
-  strncpy(local_player->alias_name, GetLoginName(), MAX_NAMELEN-1);
-  local_player->alias_name[MAX_NAMELEN-1] = '\0';
-
-  setup.sound_on = TRUE;
-  setup.sound_loops_on = FALSE;
-  setup.sound_music_on = FALSE;
-  setup.sound_simple_on = FALSE;
-  setup.toons_on = TRUE;
-  setup.direct_draw_on = FALSE;
-  setup.scroll_delay_on = FALSE;
-  setup.soft_scrolling_on = TRUE;
-  setup.fading_on = FALSE;
-  setup.autorecord_on = FALSE;
+  setup.sound = TRUE;
+  setup.sound_loops = FALSE;
+  setup.sound_music = FALSE;
+  setup.sound_simple = FALSE;
+  setup.toons = TRUE;
+  setup.double_buffering = TRUE;
+  setup.direct_draw = !setup.double_buffering;
+  setup.scroll_delay = FALSE;
+  setup.soft_scrolling = TRUE;
+  setup.fading = FALSE;
+  setup.autorecord = FALSE;
   setup.quick_doors = FALSE;
+
+  strncpy(setup.login_name, GetLoginName(), MAX_NAMELEN-1);
+  setup.login_name[MAX_NAMELEN-1] = '\0';
+  strncpy(setup.alias_name, GetLoginName(), MAX_NAMELEN-1);
+  setup.alias_name[MAX_NAMELEN-1] = '\0';
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
     setup.input[i].use_joystick = FALSE;
-    setup.input[i].joystick_nr = 0;
+    strcpy(setup.input[i].joy.device_name, joystick_device_name[i]);
+    setup.input[i].joy.xleft   = JOYSTICK_XLEFT;
+    setup.input[i].joy.xmiddle = JOYSTICK_XMIDDLE;
+    setup.input[i].joy.xright  = JOYSTICK_XRIGHT;
+    setup.input[i].joy.yupper  = JOYSTICK_YUPPER;
+    setup.input[i].joy.ymiddle = JOYSTICK_YMIDDLE;
+    setup.input[i].joy.ylower  = JOYSTICK_YLOWER;
     setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
     setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
     setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
@@ -1149,71 +1252,16 @@ void LoadSetup()
     checkSetupFileListIdentifier(setup_file_list, SETUP_COOKIE);
     decodeSetupFileList(setup_file_list);
 
+    setup.direct_draw = !setup.double_buffering;
+
     freeSetupFileList(setup_file_list);
   }
   else
-    Error(ERR_RETURN, "using default setup values");
+    Error(ERR_WARN, "using default setup values");
 }
-
-void LoadLevelSetup()
-{
-  char filename[MAX_FILENAME_LEN];
-
-  /* always start with reliable default setup values */
-
-  leveldir_nr = 0;
-  level_nr = 0;
-
-  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
-
-  if (level_setup_list)
-    freeSetupFileList(level_setup_list);
-
-  level_setup_list = loadSetupFileList(filename);
-
-  if (level_setup_list)
-  {
-    int i;
-
-    char *last_level_series =
-      getSetupFileListEntry(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
-
-    if (last_level_series)
-    {
-      for (i=0; i<num_leveldirs; i++)
-      {
-	if (strcmp(last_level_series, leveldir[i].filename) == 0)
-	{
-	  char *token_value =
-	    getSetupFileListEntry(level_setup_list, last_level_series);
-
-	  leveldir_nr = i;
-
-	  if (token_value)
-	  {
-	    level_nr = atoi(token_value);
-
-	    if (level_nr < 0)
-	      level_nr = 0;
-	    if (level_nr > leveldir[leveldir_nr].levels - 1)
-	      level_nr = leveldir[leveldir_nr].levels - 1;
-	  }
-
-	  break;
-	}
-      }
-    }
 
 
 #if 0
-    printSetupFileList(level_setup_list);
-#endif
-
-    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
-  }
-  else
-    Error(ERR_RETURN, "using default setup values");
-}
 
 void SaveSetup()
 {
@@ -1236,34 +1284,34 @@ void SaveSetup()
 
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SOUND,
-			setup.sound_on));
+			setup.sound));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SOUND_LOOPS,
-			setup.sound_loops_on));
+			setup.sound_loops));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SOUND_MUSIC,
-			setup.sound_music_on));
+			setup.sound_music));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SOUND_SIMPLE,
-			setup.sound_simple_on));
+			setup.sound_simple));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_TOONS,
-			setup.toons_on));
+			setup.toons));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_DIRECT_DRAW,
-			setup.direct_draw_on));
+			setup.direct_draw));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SCROLL_DELAY,
-			setup.scroll_delay_on));
+			setup.scroll_delay));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_SOFT_SCROLLING,
-			setup.soft_scrolling_on));
+			setup.soft_scrolling));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_FADING,
-			setup.fading_on));
+			setup.fading));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_AUTORECORD,
-			setup.autorecord_on));
+			setup.autorecord));
   fprintf(file, "%s\n",
 	  getSetupEntry("", SETUP_TOKEN_QUICK_DOORS,
 			setup.quick_doors));
@@ -1272,7 +1320,7 @@ void SaveSetup()
 
   fprintf(file, "%s\n",
 	  getFormattedSetupEntry(TOKEN_STR_ALIAS_NAME,
-				 local_player->alias_name));
+				 setup.alias_name));
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
@@ -1285,10 +1333,29 @@ void SaveSetup()
     fprintf(file, "%s\n",
 	    getSetupEntry(prefix, SETUP_TOKEN_USE_JOYSTICK,
 			  setup.input[i].use_joystick));
-    fprintf(file, "%s\n",
-	    getSetupEntry(prefix, SETUP_TOKEN_JOYSTICK_NR,
-			  setup.input[i].joystick_nr));
 
+    fprintf(file, "%s%s:      %s\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_DEVICE_NAME),
+	    setup.input[i].joy.device_name);
+
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_XLEFT),
+	    setup.input[i].joy.xleft);
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_XMIDDLE),
+	    setup.input[i].joy.xmiddle);
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_XRIGHT),
+	    setup.input[i].joy.xright);
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_YUPPER),
+	    setup.input[i].joy.yupper);
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_YMIDDLE),
+	    setup.input[i].joy.ymiddle);
+    fprintf(file, "%s%s:      %d\n", prefix,
+	    getSetupToken(SETUP_TOKEN_JOY_YLOWER),
+	    setup.input[i].joy.ylower);
     fprintf(file, "%s%s:      %s\n", prefix,
 	    getSetupToken(SETUP_TOKEN_JOY_SNAP),
 	    getJoyNameFromJoySymbol(setup.input[i].joy.snap));
@@ -1319,6 +1386,148 @@ void SaveSetup()
   fclose(file);
 
   chmod(filename, SETUP_PERMS);
+}
+
+#endif
+
+
+
+static char *getSetupLine(char *prefix, int token_nr)
+{
+  int i;
+  static char entry[MAX_LINE_LEN];
+  int token_type = token_info[token_nr].type;
+  void *token_value = token_info[token_nr].value;
+  char *token_text = token_info[token_nr].text;
+
+  /* start with the prefix, token and some spaces to format output line */
+  sprintf(entry, "%s%s:", prefix, token_text);
+  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
+    strcat(entry, " ");
+
+  /* continue with the token's value (which can have different types) */
+  switch (token_type)
+  {
+    case TYPE_BOOLEAN:
+      strcat(entry, (*(boolean *)token_value ? "true" : "false"));
+      break;
+
+    case TYPE_SWITCH:
+      strcat(entry, (*(boolean *)token_value ? "on" : "off"));
+      break;
+
+    case TYPE_KEYSYM:
+      {
+	KeySym keysym = *(KeySym *)token_value;
+	char *keyname = getKeyNameFromKeySym(keysym);
+
+	strcat(entry, getX11KeyNameFromKeySym(keysym));
+	for (i=strlen(entry); i<50; i++)
+	  strcat(entry, " ");
+
+	/* add comment, if useful */
+	if (strcmp(keyname, "(undefined)") != 0 &&
+	    strcmp(keyname, "(unknown)") != 0)
+	{
+	  strcat(entry, "# ");
+	  strcat(entry, keyname);
+	}
+      }
+      break;
+
+    case TYPE_INTEGER:
+      {
+	char buffer[MAX_LINE_LEN];
+
+	sprintf(buffer, "%d", *(int *)token_value);
+	strcat(entry, buffer);
+      }
+      break;
+
+    case TYPE_STRING:
+      strcat(entry, *(char **)token_value);
+      break;
+
+    default:
+      break;
+  }
+
+  return entry;
+}
+
+void SaveSetup()
+{
+  int i, pnr;
+  char filename[MAX_FILENAME_LEN];
+  FILE *file;
+
+  sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
+
+  if (!(file = fopen(filename, "w")))
+  {
+    Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    return;
+  }
+
+  fprintf(file, "%s:              %s\n",
+	  TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE);
+
+  fprintf(file, "\n");
+
+  for (i=FIRST_GLOBAL_SETUP_TOKEN; i<=LAST_GLOBAL_SETUP_TOKEN; i++)
+    fprintf(file, "%s\n", getSetupLine("", i));
+
+  for (pnr=0; pnr<MAX_PLAYERS; pnr++)
+  {
+    char prefix[30];
+
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, i + 1);
+    fprintf(file, "\n");
+
+    for (i=FIRST_PLAYER_SETUP_TOKEN; i<=LAST_PLAYER_SETUP_TOKEN; i++)
+    {
+      sii = setup.input[pnr];
+      fprintf(file, "%s\n", getSetupLine(prefix, i));
+    }
+  }
+
+  fclose(file);
+
+  chmod(filename, SETUP_PERMS);
+}
+
+void LoadLevelSetup()
+{
+  char filename[MAX_FILENAME_LEN];
+
+  /* always start with reliable default setup values */
+
+  leveldir_nr = 0;
+  level_nr = 0;
+
+  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
+
+  if (level_setup_list)
+    freeSetupFileList(level_setup_list);
+
+  level_setup_list = loadSetupFileList(filename);
+
+  if (level_setup_list)
+  {
+    char *last_level_series =
+      getSetupFileListEntry(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
+
+    leveldir_nr = getLevelSeriesNrFromLevelSeriesName(last_level_series);
+    level_nr = getLastPlayedLevelOfLevelSeries(last_level_series);
+
+#if 0
+    printSetupFileList(level_setup_list);
+#endif
+
+    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+  }
+  else
+    Error(ERR_WARN, "using default setup values");
 }
 
 void SaveLevelSetup()

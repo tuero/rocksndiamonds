@@ -25,27 +25,18 @@
 
 void GetPlayerConfig()
 {
-  int old_joystick_nr = setup.input[0].joystick_nr;
-
   if (sound_status == SOUND_OFF)
-    setup.sound_on = FALSE;
+    setup.sound = FALSE;
 
   if (!sound_loops_allowed)
   {
-    setup.sound_loops_on = FALSE;
-    setup.sound_music_on = FALSE;
+    setup.sound_loops = FALSE;
+    setup.sound_music = FALSE;
   }
 
-  setup.sound_simple_on = setup.sound_on;
+  setup.sound_simple = setup.sound;
 
-#ifndef MSDOS
-  if (setup.input[0].joystick_nr != old_joystick_nr)
-  {
-    if (joystick_device)
-      close(joystick_device);
-    InitJoystick();
-  }
-#endif
+  InitJoysticks();
 }
 
 void InitGame()
@@ -350,9 +341,9 @@ void InitGame()
   DrawGameButton(BUTTON_GAME_STOP);
   DrawGameButton(BUTTON_GAME_PAUSE);
   DrawGameButton(BUTTON_GAME_PLAY);
-  DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music_on));
-  DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops_on));
-  DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple_on));
+  DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music));
+  DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops));
+  DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple));
   XCopyArea(display,drawto,pix[PIX_DB_DOOR],gc,
 	    DX+GAME_CONTROL_XPOS,DY+GAME_CONTROL_YPOS,
 	    GAME_CONTROL_XSIZE,2*GAME_CONTROL_YSIZE,
@@ -361,7 +352,7 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_1);
 
-  if (setup.sound_music_on)
+  if (setup.sound_music)
     PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 
   XAutoRepeatOff(display);
@@ -490,12 +481,12 @@ void GameWon()
 
   if (TimeLeft)
   {
-    if (setup.sound_loops_on)
+    if (setup.sound_loops)
       PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
 
     while(TimeLeft > 0)
     {
-      if (!setup.sound_loops_on)
+      if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
       if (TimeLeft && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
@@ -508,7 +499,7 @@ void GameWon()
       Delay(10);
     }
 
-    if (setup.sound_loops_on)
+    if (setup.sound_loops)
       StopSound(SND_SIRR);
   }
 
@@ -554,7 +545,7 @@ boolean NewHiScore()
 
   LoadScore(level_nr);
 
-  if (!strcmp(local_player->alias_name,EMPTY_ALIAS) ||
+  if (!strcmp(setup.alias_name,EMPTY_ALIAS) ||
       local_player->score < highscore[MAX_SCORE_ENTRIES-1].Score) 
     return(-1);
 
@@ -570,7 +561,7 @@ boolean NewHiScore()
 
 #ifdef ONE_PER_NAME
 	for(l=k;l<MAX_SCORE_ENTRIES;l++)
-	  if (!strcmp(local_player->alias_name,highscore[l].Name))
+	  if (!strcmp(setup.alias_name,highscore[l].Name))
 	    m = l;
 	if (m==k)	/* Spieler überschreibt seine alte Position */
 	  goto put_into_list;
@@ -586,14 +577,14 @@ boolean NewHiScore()
 #ifdef ONE_PER_NAME
       put_into_list:
 #endif
-      sprintf(highscore[k].Name,local_player->alias_name);
+      sprintf(highscore[k].Name,setup.alias_name);
       highscore[k].Score = local_player->score; 
       position = k;
       break;
     }
 
 #ifdef ONE_PER_NAME
-    else if (!strcmp(local_player->alias_name,highscore[k].Name))
+    else if (!strcmp(setup.alias_name,highscore[k].Name))
       break;	/* Spieler schon mit besserer Punktzahl in der Liste */
 #endif
 
@@ -2597,7 +2588,7 @@ void EdelsteinFunkeln(int x, int y)
     {
       MovDelay[x][y]--;
 
-      if (setup.direct_draw_on && MovDelay[x][y])
+      if (setup.direct_draw && MovDelay[x][y])
 	SetDrawtoField(DRAW_BUFFERED);
 
       DrawGraphic(SCREENX(x),SCREENY(y), el2gfx(Feld[x][y]));
@@ -2611,7 +2602,7 @@ void EdelsteinFunkeln(int x, int y)
 
 	DrawGraphicThruMask(SCREENX(x),SCREENY(y), GFX_FUNKELN_WEISS + phase);
 
-	if (setup.direct_draw_on)
+	if (setup.direct_draw)
 	{
 	  int dest_x,dest_y;
 
@@ -3157,12 +3148,8 @@ static boolean AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
-  int softscroll_offset = (setup.soft_scrolling_on ? TILEX : 0);
+  int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
   int x,y;
-
-  /*
-  ScreenGfxPos = local_player->GfxPos;
-  */
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -3273,24 +3260,11 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   jx = player->jx;
   jy = player->jy;
 
-
-
-  /*
-  if (moved & MF_MOVING && player == local_player)
-  */
-
   if (moved & MF_MOVING && !ScreenMovPos &&
       (player == local_player || !options.network))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
-    int offset = (setup.scroll_delay_on ? 3 : 0);
-
-    /*
-    if (player == local_player)
-    {
-      printf("MOVING LOCAL PLAYER && SCROLLING\n");
-    }
-    */
+    int offset = (setup.scroll_delay ? 3 : 0);
 
     if (!IN_VIS_FIELD(SCREENX(jx),SCREENY(jy)))
     {
@@ -3304,12 +3278,6 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     {
       if (jx != old_jx)		/* player has moved horizontally */
       {
-	/*
-	if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
-	    jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
-	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
-	*/
-
  	if ((player->MovDir == MV_LEFT && scroll_x > jx-MIDPOSX+offset) ||
 	    (player->MovDir == MV_RIGHT && scroll_x < jx-MIDPOSX-offset))
 	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
@@ -3328,12 +3296,6 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       }
       else			/* player has moved vertically */
       {
-	/*
-	if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
-	    jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
-	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
-	*/
-
 	if ((player->MovDir == MV_UP && scroll_y > jy-MIDPOSY+offset) ||
 	    (player->MovDir == MV_DOWN && scroll_y < jy-MIDPOSY-offset))
 	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
@@ -3351,22 +3313,6 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 	  scroll_y = old_scroll_y;
       }
     }
-
-#if 0
-    if (player == local_player)
-    {
-      if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
-	  jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
-	scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
-      if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
-	  jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
-	scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
-
-      /* don't scroll more than one field at a time */
-      scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
-      scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
-    }
-#endif
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
@@ -3591,10 +3537,6 @@ void TestIfHeroHitsBadThing(int x, int y)
 
 void TestIfBadThingHitsHero(int x, int y)
 {
-  /*
-  TestIfGoodThingHitsBadThing(JX,JY);
-  */
-
   TestIfBadThingHitsGoodThing(x,y);
 }
 
@@ -4062,8 +4004,8 @@ void PlaySoundLevel(int x, int y, int sound_nr)
   int volume, stereo;
   int silence_distance = 8;
 
-  if ((!setup.sound_simple_on && !IS_LOOP_SOUND(sound_nr)) ||
-      (!setup.sound_loops_on && IS_LOOP_SOUND(sound_nr)))
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound_nr)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(sound_nr)))
     return;
 
   if (!IN_LEV_FIELD(x,y) ||
@@ -4072,6 +4014,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
     return;
 
   volume = PSND_MAX_VOLUME;
+
 #ifndef MSDOS
   stereo = (sx-SCR_FIELDX/2)*12;
 #else

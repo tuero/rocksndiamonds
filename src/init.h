@@ -18,6 +18,6 @@
 
 void OpenAll(int, char **);
 void CloseAllAndExit(int);
-void InitJoystick(void);
+void InitJoysticks(void);
 
 #endif

@@ -114,7 +114,7 @@ void HandleAnimation(int mode)
   static int toon_nr = 0;
   int draw_mode;
 
-  if (!setup.toons_on)
+  if (!setup.toons)
     return;
 
   switch(mode)
@@ -124,7 +124,7 @@ void HandleAnimation(int mode)
       reset_delay = TRUE;
 
       /* Fill empty backbuffer for animation functions */
-      if (setup.direct_draw_on && game_status == PLAYING)
+      if (setup.direct_draw && game_status == PLAYING)
       {
 	int xx,yy;
 
@@ -138,7 +138,7 @@ void HandleAnimation(int mode)
 	SetDrawtoField(DRAW_DIRECT);
       }
 
-      if (setup.soft_scrolling_on && game_status == PLAYING)
+      if (setup.soft_scrolling && game_status == PLAYING)
       {
 	int fx = FX, fy = FY;
 
@@ -158,12 +158,12 @@ void HandleAnimation(int mode)
       redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
       /* Redraw background even when in direct drawing mode */
-      draw_mode = setup.direct_draw_on;
-      setup.direct_draw_on = FALSE;
+      draw_mode = setup.direct_draw;
+      setup.direct_draw = FALSE;
 
       BackToFront();
 
-      setup.direct_draw_on = draw_mode;
+      setup.direct_draw = draw_mode;
 
       return;
       break;
