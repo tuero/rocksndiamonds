@@ -516,9 +516,9 @@ void HandleKey(KeySym key, int key_status)
 	case XK_8:
 	case XK_9:
 	  if (key == XK_0)
-	    GameSpeed = 50;
+	    GameSpeed = 500;
 	  else
-	    GameSpeed = key - XK_0;
+	    GameSpeed = (key - XK_0) * 10;
 	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 

@@ -1538,8 +1538,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
-      while(!DelayReached(&door_delay, door_delay_value/10))
-	Delay(1);
+      WaitUntilDelayReached(&door_delay, door_delay_value);
 
       if (door_state & DOOR_ACTION_1)
       {

@@ -22,14 +22,12 @@
 
 #define NEW_RANDOMIZE		-1
 
-void microsleep(unsigned long);
-long mainCounter(int);
 void InitCounter(void);
-long Counter(void);
-void WaitCounter(long);
-void Delay(long);
-BOOL DelayReached(long *, int);
-BOOL FrameReached(long *, int);
+unsigned long Counter(void);
+void Delay(unsigned long);
+BOOL FrameReached(unsigned long *, unsigned long);
+BOOL DelayReached(unsigned long *, unsigned long);
+void WaitUntilDelayReached(unsigned long *, unsigned long);
 char *int2str(int, int);
 unsigned int SimpleRND(unsigned int);
 unsigned int RND(unsigned int);

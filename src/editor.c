@@ -19,6 +19,8 @@
 #include "buttons.h"
 #include "files.h"
 
+#define CHOICE_DELAY_VALUE	100
+
 static int level_xpos,level_ypos;
 static BOOL edit_mode;
 static BOOL name_typing;
@@ -676,7 +678,7 @@ void LevelEd(int mx, int my, int button)
     if (((choice == ED_BUTTON_EUP && element_shift>0) ||
 	 (choice == ED_BUTTON_EDOWN &&
 	  element_shift<elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)) &&
-	DelayReached(&choice_delay,10))
+	DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
     {
       int i, step;
 
@@ -746,7 +748,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_LEFT:
 	  if (level_xpos>=0)
 	  {
-	    if (!DelayReached(&choice_delay,10))
+	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
 	      break;
 	    if (lev_fieldx<2*SCR_FIELDX-2)
 	      break;
@@ -763,7 +765,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_RIGHT:
 	  if (level_xpos<=lev_fieldx-2*SCR_FIELDX)
 	  {
-	    if (!DelayReached(&choice_delay,10))
+	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
 	      break;
 	    if (lev_fieldx<2*SCR_FIELDX-2)
 	      break;
@@ -780,7 +782,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_UP:
 	  if (level_ypos>=0)
 	  {
-	    if (!DelayReached(&choice_delay,10))
+	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
 	      break;
 	    if (lev_fieldy<2*SCR_FIELDY-2)
 	      break;
@@ -797,7 +799,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_DOWN:
 	  if (level_ypos<=lev_fieldy-2*SCR_FIELDY)
 	  {
-	    if (!DelayReached(&choice_delay,10))
+	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
 	      break;
 	    if (lev_fieldy<2*SCR_FIELDY-2)
 	      break;
@@ -864,7 +866,8 @@ void LevelEd(int mx, int my, int button)
       int choice = CheckCountButtons(mx,my,button);
       int step = (button==1 ? 1 : button==2 ? 5 : button==3 ? 10 : 0);
 
-      if (choice>=0 && choice<36 && DelayReached(&choice_delay,10))
+      if (choice >= 0 && choice < 36 &&
+	  DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
       {
 	if (!(choice % 2))
 	  step = -step;

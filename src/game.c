@@ -2041,7 +2041,7 @@ void AmoebeWaechst(int x, int y)
   {
     MovDelay[x][y] = 7;
 
-    if (DelayReached(&sound_delay,sound_delay_value))
+    if (DelayReached(&sound_delay, sound_delay_value))
     {
       PlaySoundLevel(x,y,SND_AMOEBE);
       sound_delay_value = 30;
@@ -2597,8 +2597,8 @@ void GameActions()
   if (PlayerMovPos)
     ScrollFigure(0);
 
-  while(!DelayReached(&action_delay, action_delay_value))
-    Delay(5);
+  /* main game synchronization point */
+  WaitUntilDelayReached(&action_delay, action_delay_value);
 
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
@@ -2727,7 +2727,7 @@ void GameActions()
     }
   }
 
-  if (TimeLeft>0 && TimeFrames>=(100/GameSpeed) && !tape.pausing)
+  if (TimeLeft>0 && TimeFrames>=(1000/GameSpeed) && !tape.pausing)
   {
     TimeFrames = 0;
     TimeLeft--;

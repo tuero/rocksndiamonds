@@ -24,19 +24,45 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-void microsleep(unsigned long usec)
+static unsigned long mainCounter(int mode)
 {
-  if (usec < 5000)
+  static struct timeval base_time = { 0, 0 };
+  struct timeval current_time;
+  unsigned long counter_ms;
+
+  gettimeofday(&current_time, NULL);
+
+  if (mode == INIT_COUNTER || current_time.tv_sec < base_time.tv_sec)
+    base_time = current_time;
+
+  counter_ms = (current_time.tv_sec  - base_time.tv_sec)  * 1000
+             + (current_time.tv_usec - base_time.tv_usec) / 1000;
+
+  return counter_ms;		/* return milliseconds since last init */
+}
+
+void InitCounter()		/* set counter back to zero */
+{
+  mainCounter(INIT_COUNTER);
+}
+
+unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
+{
+  return(mainCounter(READ_COUNTER));
+}
+
+static void sleep_milliseconds(unsigned long milliseconds_delay)
+{
+  if (milliseconds_delay < 5 || !cpu_friendly)
   {
     /* we want to wait less than 5 ms -- if we assume that we have a
        kernel timer resolution of 10 ms, we would wait far to long;
        therefore it's better to do a short interval of busy waiting
        to get our sleeping time more accurate */
 
-    long base_counter = Counter(), actual_counter = Counter();
-    long delay = usec/1000;
+    unsigned long base_counter = Counter(), actual_counter = Counter();
 
-    while (actual_counter < base_counter+delay &&
+    while (actual_counter < base_counter + milliseconds_delay &&
 	   actual_counter >= base_counter)
       actual_counter = Counter();
   }
@@ -44,79 +70,52 @@ void microsleep(unsigned long usec)
   {
     struct timeval delay;
 
-    delay.tv_sec  = usec / 1000000;
-    delay.tv_usec = usec % 1000000;
+    delay.tv_sec  = milliseconds_delay / 1000;
+    delay.tv_usec = 1000 * (milliseconds_delay % 1000);
 
-    if (select(0,NULL,NULL,NULL,&delay) != 0)
-      fprintf(stderr,"%s: in function microsleep: select failed!\n",
+    if (select(0, NULL, NULL, NULL, &delay) != 0)
+      fprintf(stderr,"%s: in function sleep_milliseconds: select() failed!\n",
 	      progname);
   }
 }
 
-long mainCounter(int mode)
+void Delay(unsigned long delay)	/* Sleep specified number of milliseconds */
 {
-  static struct timeval base_time = { 0, 0 };
-  struct timeval current_time;
-  long counter_ms;
-
-  gettimeofday(&current_time,NULL);
-  if (mode == INIT_COUNTER || current_time.tv_sec < base_time.tv_sec)
-    base_time = current_time;
-
-  counter_ms = (current_time.tv_sec - base_time.tv_sec)*1000
-             + (current_time.tv_usec - base_time.tv_usec)/1000;
-
-  return counter_ms;		/* return milliseconds since last init */
+  sleep_milliseconds(delay);
 }
 
-void InitCounter() /* set counter back to zero */
+BOOL FrameReached(unsigned long *frame_counter_var, unsigned long frame_delay)
 {
-  mainCounter(INIT_COUNTER);
-}
+  unsigned long actual_frame_counter = FrameCounter;
 
-long Counter()	/* get milliseconds since last call of InitCounter() */
-{
-  return(mainCounter(READ_COUNTER));
-}
-
-void WaitCounter(long value) 	/* wait for counter to reach value */
-{
-  long wait;
-
-  while((wait=value-Counter())>0)
-    microsleep(wait * 1000);
-}
-
-void Delay(long value)		/* Delay 'value' milliseconds */
-{
-  microsleep(value * 1000);
-}
-
-BOOL DelayReached(long *counter_var, int delay)
-{
-  long actual_counter = Counter();
-
-  if (actual_counter >= *counter_var+delay || actual_counter < *counter_var)
-  {
-    *counter_var = actual_counter;
-    return(TRUE);
-  }
-  else
+  if (actual_frame_counter < *frame_counter_var+frame_delay &&
+      actual_frame_counter >= *frame_counter_var)
     return(FALSE);
+
+  *frame_counter_var = actual_frame_counter;
+  return(TRUE);
 }
 
-BOOL FrameReached(long *frame_counter_var, int frame_delay)
+BOOL DelayReached(unsigned long *counter_var, unsigned long delay)
 {
-  long actual_frame_counter = FrameCounter;
+  unsigned long actual_counter = Counter();
 
-  if (actual_frame_counter >= *frame_counter_var+frame_delay ||
-      actual_frame_counter < *frame_counter_var)
-  {
-    *frame_counter_var = actual_frame_counter;
-    return(TRUE);
-  }
-  else
+  if (actual_counter < *counter_var + delay &&
+      actual_counter >= *counter_var)
     return(FALSE);
+
+  *counter_var = actual_counter;
+  return(TRUE);
+}
+
+void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
+{
+  unsigned long actual_counter = Counter();
+
+  if (actual_counter < *counter_var + delay && actual_counter >= *counter_var)
+    sleep_milliseconds(*counter_var + delay - actual_counter);
+
+  *counter_var = actual_counter;
 }
 
 char *int2str(int ct, int nr)

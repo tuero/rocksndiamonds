@@ -181,7 +181,7 @@ void HandleAnimation(int mode)
 
   if (anim_restart)
   {
-    if (!DelayReached(&animstart_delay,animstart_delay_value))
+    if (!DelayReached(&animstart_delay, animstart_delay_value))
       return;
 
     toon_nr = SimpleRND(NUM_TOONS);
@@ -232,7 +232,7 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
       JUMPER_FPS,
       JUMPER_STEPSIZE,
       ANIM_NORMAL,
-      ANIMDIR_LEFT,
+      ANIMDIR_RIGHT,
       ANIMPOS_DOWN
     },
     {
@@ -461,7 +461,7 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
       pos_y >=  FULL_SYSIZE  + anim->stepsize)
     return(TRUE);
 
-  if (!DelayReached(&anim_delay,anim_delay_value))
+  if (!DelayReached(&anim_delay, anim_delay_value))
   {
     if (game_status==HELPSCREEN && !restart)
       DrawAnim(anim_pixmap,anim_clip_gc,

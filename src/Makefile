@@ -97,7 +97,7 @@ clean:
 	$(RM) $(OBJS)
 
 BACKUP_DIR = /home/aeglos/BACKUP/rnd
-BACKUP_DATE = `date +%y%m%d`
+BACKUP_DATE = `date +%Y%m%d`
 BACKUP_FILE = $(BACKUP_DIR)/rnd-$(BACKUP_DATE).tgz
 
 backup:

@@ -302,6 +302,7 @@ extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
 extern int		quick_doors;
+extern int		cpu_friendly;
 
 extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;

@@ -64,6 +64,7 @@ int		fading_on = FALSE;
 int		autorecord_on = FALSE;
 int		joystick_nr = 0;
 int		quick_doors = FALSE;
+int		cpu_friendly = TRUE;
 
 BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;

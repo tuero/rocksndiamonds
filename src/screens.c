@@ -146,7 +146,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (new_level_nr>leveldir[leveldir_nr].levels-1)
       new_level_nr = leveldir[leveldir_nr].levels-1;
 
-    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,15))
+    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,150))
       goto out;
 
     level_nr = new_level_nr;
