@@ -4235,7 +4235,6 @@ int DigField(struct PlayerInfo *player,
     case EL_ZEIT_LEER:
     case EL_SP_ZONK:
     case EL_SP_DISK_ORANGE:
-    case EL_SP_DISK_YELLOW:
       if (dy || mode == DF_SNAP)
 	return MF_NO_ACTION;
 
@@ -4286,6 +4285,42 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
       break;
 
+    case EL_SP_PORT1_LEFT:
+    case EL_SP_PORT2_LEFT:
+    case EL_SP_PORT1_RIGHT:
+    case EL_SP_PORT2_RIGHT:
+    case EL_SP_PORT1_UP:
+    case EL_SP_PORT2_UP:
+    case EL_SP_PORT1_DOWN:
+    case EL_SP_PORT2_DOWN:
+    case EL_SP_PORT_X:
+    case EL_SP_PORT_Y:
+    case EL_SP_PORT_XY:
+      if ((dx == -1 &&
+	   element != EL_SP_PORT1_LEFT &&
+	   element != EL_SP_PORT2_LEFT &&
+	   element != EL_SP_PORT_X &&
+	   element != EL_SP_PORT_XY) ||
+	  (dx == +1 &&
+	   element != EL_SP_PORT1_RIGHT &&
+	   element != EL_SP_PORT2_RIGHT &&
+	   element != EL_SP_PORT_X &&
+	   element != EL_SP_PORT_XY) ||
+	  (dy == -1 &&
+	   element != EL_SP_PORT1_UP &&
+	   element != EL_SP_PORT2_UP &&
+	   element != EL_SP_PORT_Y &&
+	   element != EL_SP_PORT_XY) ||
+	  (dy == +1 &&
+	   element != EL_SP_PORT1_DOWN &&
+	   element != EL_SP_PORT2_DOWN &&
+	   element != EL_SP_PORT_Y &&
+	   element != EL_SP_PORT_XY) ||
+	  !IN_LEV_FIELD(x + dx, y + dy) ||
+	  !IS_FREE(x + dx, y + dy))
+	return MF_NO_ACTION;
+      break;
+
     case EL_AUSGANG_ZU:
     case EL_AUSGANG_ACT:
       /* door is not (yet) open */
@@ -4331,6 +4366,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SOKOBAN_FELD_VOLL:
     case EL_SOKOBAN_OBJEKT:
     case EL_SONDE:
+    case EL_SP_DISK_YELLOW:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
 
