@@ -446,6 +446,18 @@ void *checked_malloc(unsigned long size)
   return ptr;
 }
 
+void *checked_calloc(unsigned long size)
+{
+  void *ptr;
+
+  ptr = calloc(1, size);
+
+  if (ptr == NULL)
+    Error(ERR_EXIT, "cannot allocate %d bytes -- out of memory", size);
+
+  return ptr;
+}
+
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
 #define TRANSLATE_X11KEYNAME_TO_KEYSYM	2

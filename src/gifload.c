@@ -14,7 +14,7 @@
 #ifndef MSDOS
 #include "gifload.h"
 
-#include "xli.h"
+#include "image.h"
 
 #ifdef DEBUG
 /*
@@ -25,7 +25,6 @@
 
 
 extern long Counter(void);
-
 
 
 int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
@@ -43,7 +42,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #endif
 
   /* load GIF file */
-  if (!(image = gifLoad(filename)))
+  if (!(image = Read_GIF_to_Image(filename)))
   {
     printf("Loading GIF image failed -- maybe no GIF...\n");
     exit(1);
@@ -77,7 +76,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
   depth = DefaultDepth(display, screen);
 
   /* convert internal image structure to X11 XImage */
-  if (!(ximageinfo = imageToXImage(display, screen, visual, depth, image)))
+  if (!(ximageinfo = Image_to_XImage(display, screen, visual, depth, image)))
   {
     fprintf(stderr, "Cannot convert Image to XImage.\n");
     exit(1);
@@ -94,7 +93,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
     XSetWindowColormap(display, window, ximageinfo->cmap);
 
   /* convert XImage to Pixmap */
-  if ((*pixmap = ximageToPixmap(display, window, ximageinfo)) == None)
+  if ((*pixmap = XImage_to_Pixmap(display, window, ximageinfo)) == None)
   {
     fprintf(stderr, "Cannot convert XImage to Pixmap.\n");
     exit(1);
@@ -118,7 +117,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #endif
 
   /* convert internal image structure to X11 XImage */
-  if (!(ximageinfo_mask = imageToXImage(display, screen, visual, depth,
+  if (!(ximageinfo_mask = Image_to_XImage(display, screen, visual, depth,
 					image_mask)))
   {
     fprintf(stderr, "Cannot convert Image to XImage.\n");
@@ -133,7 +132,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #endif
 
   /* convert XImage to Pixmap */
-  if ((*pixmap_mask = ximageToPixmap(display, window, ximageinfo_mask)) == None)
+  if ((*pixmap_mask = XImage_to_Pixmap(display, window, ximageinfo_mask)) == None)
   {
     fprintf(stderr, "Cannot convert XImage to Pixmap.\n");
     exit(1);

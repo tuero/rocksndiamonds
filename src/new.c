@@ -1,7 +1,8 @@
 
 /* new.c */
 
-#include "xli.h"
+#include "image.h"
+#include "misc.h"
 
 /* this table is useful for quick conversions between depth and ncolors
  */
@@ -35,26 +36,14 @@ unsigned long DepthToColorsTable[] =
   /* 24 */ 16777216
 };
 
-char *dupString(char *s)
-{
-  char *d;
-
-  if (!s)
-    return(NULL);
-
-  d = (char *)lmalloc(strlen(s) + 1);
-  strcpy(d, s);
-  return(d);
-}
-
 void newRGBMapData(RGBMap *rgb, unsigned int size)
 {
   rgb->used = 0;
   rgb->size = size;
   rgb->compressed = FALSE;
-  rgb->red = (Intensity *)lmalloc(sizeof(Intensity) * size);
-  rgb->green = (Intensity *)lmalloc(sizeof(Intensity) * size);
-  rgb->blue = (Intensity *)lmalloc(sizeof(Intensity) * size);
+  rgb->red = (Intensity *)checked_malloc(sizeof(Intensity) * size);
+  rgb->green = (Intensity *)checked_malloc(sizeof(Intensity) * size);
+  rgb->blue = (Intensity *)checked_malloc(sizeof(Intensity) * size);
 }
 
 void freeRGBMapData(RGBMap *rgb)
@@ -69,9 +58,8 @@ Image *newBitImage(unsigned int width, unsigned int height)
   Image        *image;
   unsigned int  linelen;
 
-  image = (Image *)lmalloc(sizeof(Image));
+  image = (Image *)checked_malloc(sizeof(Image));
   image->type = IBITMAP;
-  image->title = NULL;
   newRGBMapData(&(image->rgb), (unsigned int)2);
   *(image->rgb.red)= *(image->rgb.green) = *(image->rgb.blue)= 65535;
   *(image->rgb.red + 1)= *(image->rgb.green + 1) = *(image->rgb.blue + 1)= 0;
@@ -80,7 +68,7 @@ Image *newBitImage(unsigned int width, unsigned int height)
   image->height = height;
   image->depth = 1;
   linelen = ((width + 7) / 8);
-  image->data = (unsigned char *)lcalloc(linelen * height);
+  image->data = (unsigned char *)checked_calloc(linelen * height);
   return(image);
 }
 
@@ -93,25 +81,19 @@ Image *newRGBImage(unsigned int width, unsigned int height, unsigned int depth)
     depth = 1;		/* sometimes interpreted as `one color' */
   pixlen = ((depth+7) / 8);
   numcolors = depthToColors(depth);
-  image = (Image *)lmalloc(sizeof(Image));
+  image = (Image *)checked_malloc(sizeof(Image));
   image->type = IRGB;
-  image->title = NULL;
   newRGBMapData(&(image->rgb), numcolors);
   image->width = width;
   image->height = height;
   image->depth = depth;
   image->pixlen = pixlen;
-  image->data = (unsigned char *)lmalloc(width * height * pixlen);
+  image->data = (unsigned char *)checked_malloc(width * height * pixlen);
   return(image);
 }
 
 void freeImageData(Image *image)
 {
-  if (image->title)
-  {
-    free((byte *)image->title);
-    image->title= NULL;
-  }
   freeRGBMapData(&(image->rgb));
   free(image->data);
 }
@@ -120,38 +102,4 @@ void freeImage(Image *image)
 {
   freeImageData(image);
   free((byte *)image);
-}
-
-byte *lmalloc(unsigned int size)
-{
-  byte *area;
-
-  if (size == 0)
-  {
-    size = 1;
-  }
-  if (!(area = (byte *)malloc(size)))
-  {
-    fprintf(stderr, "Out of memory!\n");
-    exit(1);
-  }
-
-  return(area);
-}
-
-byte *lcalloc(unsigned int size)
-{
-  byte *area;
-
-  if (size == 0)
-  {
-    size = 1;
-  }
-  if (!(area = (byte *)calloc(1, size)))
-  {
-    fprintf(stderr, "Out of memory!\n");
-    exit(1);
-  }
-
-  return(area);
 }

@@ -45,6 +45,7 @@ void MarkTileDirty(int, int);
 void GetOptions(char **);
 void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
+void *checked_calloc(unsigned long);
 char *getKeyNameFromKeySym(KeySym);
 char *getX11KeyNameFromKeySym(KeySym);
 KeySym getKeySymFromX11KeyName(char *);

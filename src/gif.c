@@ -3,8 +3,8 @@
 
 #define GIF_C
 
-#include "xli.h"
 #include "gif.h"
+#include "image.h"
 
 #define PUSH_PIXEL(p)                                       \
 {                                                           \
@@ -468,7 +468,7 @@ static int gifin_add_string(int p, int e)
   return GIFIN_SUCCESS;
 }
 
-Image *gifLoad(char *fullname)
+Image *Read_GIF_to_Image(char *fullname)
 {
   FILE *f;
   Image *image;
@@ -508,7 +508,6 @@ Image *gifLoad(char *fullname)
   image = newRGBImage(gifin_img_width, gifin_img_height, (gifin_l_cmap_flag ?
 							  gifin_l_pixel_bits :
 							  gifin_g_pixel_bits));
-  image->title = dupString(fullname);
 
   /* if image has a local colormap, override global colormap
    */
