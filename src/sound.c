@@ -54,6 +54,21 @@ static void SoundServer_StopSound(int);
 static void SoundServer_StopAllSounds();
 #endif
 
+int OpenAudio(char *audio_device_name)
+{
+  int audio_fd;
+
+  /* try to open audio device in non-blocking mode */
+  if ((audio_fd = open(audio_device_name, O_WRONLY | O_NONBLOCK)) < 0)
+    return audio_fd;
+
+  /* re-open audio device in blocking mode */
+  close(audio_fd);
+  audio_fd = open(audio_device_name, O_WRONLY);
+
+  return audio_fd;
+}
+
 void SoundServer()
 {
   int i;
@@ -144,7 +159,8 @@ void SoundServer()
       int sample_rate = 22050;
 #endif
 
-      if (playing_sounds || (sound_device=open(sound_device_name,O_WRONLY))>=0)
+      if (playing_sounds ||
+	  (sound_device = OpenAudio(sound_device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
@@ -306,7 +322,7 @@ void SoundServer()
       int wait_percent = 90;	/* wait 90% of the real playing time */
       int i;
 
-      if ((sound_device=open(sound_device_name,O_WRONLY))>=0)
+      if ((sound_device = OpenAudio(sound_device_name)) >= 0)
       {
 	playing_sounds = 1;
 

@@ -160,6 +160,7 @@ struct SoundControl
 };
 
 /* start sound server */
+int OpenAudio(char *);
 void SoundServer(void);
 
 /* client functions */

@@ -1,5 +1,9 @@
+Version 1.5.0
+-------------
+	- SDL!!!
+	- trying to open already busy audio device does not block the game
 
-Release Version 1.3.5 [?? SEP 1999]
+Release Version 1.4.0 [27 OCT 1999]
 -----------------------------------
 	- new Boulderdash elements for better game emulation
 	- new cool medium-sized crystal font

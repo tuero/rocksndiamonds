@@ -193,7 +193,7 @@ void InitSound()
     return;
   }
 
-  if ((sound_device = open(sound_device_name,O_WRONLY))<0)
+  if ((sound_device = OpenAudio(sound_device_name)) < 0)
   {
     Error(ERR_WARN, "cannot open sound device - no sounds");
     sound_status = SOUND_OFF;
