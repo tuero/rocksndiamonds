@@ -560,10 +560,10 @@ void InitGame()
     SBY_Lower = lev_fieldy - SCR_FIELDY + 1;
   }
 
-  if (lev_fieldx < SCR_FIELDX)
+  if (lev_fieldx + (SBX_Left == -1 ? 2 : 0) <= SCR_FIELDX)
     SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
 
-  if (lev_fieldy < SCR_FIELDY)
+  if (lev_fieldy + (SBY_Upper == -1 ? 2 : 0) <= SCR_FIELDY)
     SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
 
   scroll_x = SBX_Left;
