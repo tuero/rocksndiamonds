@@ -1924,10 +1924,6 @@ void LoadCustomMusic_NoConf(void)
     {
       struct FileInfo *music = getMusicListEntry(i);
 
-#if 0
-      printf("::: -> '%s'\n", music->filename);
-#endif
-
       if (strcmp(basename, music->filename) == 0)
       {
 	music_already_used = TRUE;
@@ -1938,10 +1934,9 @@ void LoadCustomMusic_NoConf(void)
     if (music_already_used)
       continue;
 
-#if 0
+#if 1
     if (FileIsSound(basename) || FileIsMusic(basename))
-      printf("DEBUG: loading music '%s' ... [%d]\n",
-	     basename, music_already_used);
+      printf("DEBUG: loading music '%s' ...\n", basename);
 #endif
 
     if (draw_init_text)

@@ -200,6 +200,7 @@ char *getEditorSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
+char *getCustomMusicFilename(char *);
 char *getCustomArtworkFilename(char *, int);
 char *getCustomArtworkConfigFilename(int);
 char *getCustomArtworkLevelConfigFilename(int);

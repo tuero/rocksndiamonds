@@ -41,5 +41,6 @@ void SaveSetup();
 void LoadCustomElementDescriptions();
 void LoadSpecialMenuDesignSettings();
 void LoadUserDefinedEditorElementList(int **, int *);
+void LoadMusicInfo();
 
 #endif	/* FILES_H */

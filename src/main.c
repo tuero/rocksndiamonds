@@ -104,6 +104,7 @@ struct DoorInfo		door_1, door_2;
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
+struct MusicFileInfo   *music_file_info = NULL;
 
 
 /* ------------------------------------------------------------------------- */

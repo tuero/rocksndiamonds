@@ -981,8 +981,13 @@ void DrawHelpScreenElText(int start)
 
 void DrawHelpScreenMusicText(int num)
 {
+  struct MusicFileInfo *list = music_file_info;
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
+  int i;
+
+  for (i=0; i < num && list; i++)
+    list = list->next;
 
   FadeSoundsAndMusic();
   ClearWindow();
@@ -990,6 +995,14 @@ void DrawHelpScreenMusicText(int num)
 
   DrawTextFCentered(100, FONT_TEXT_1, "The game background music loops:");
 
+#if 1
+  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
+  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
+  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
+  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
+  DrawTextFCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
+  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
+#else
   DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
   DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][0]);
@@ -999,6 +1012,7 @@ void DrawHelpScreenMusicText(int num)
   DrawTextFCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
   DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][2]);
+#endif
 
   DrawTextFCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
@@ -1070,6 +1084,7 @@ void DrawHelpScreenContactText()
 
 void DrawHelpScreen()
 {
+  struct MusicFileInfo *list;
   int i;
 
   UnmapAllGadgets();
@@ -1079,6 +1094,12 @@ void DrawHelpScreen()
     helpscreen_step[i] = helpscreen_frame[i] = 0;
   helpscreen_musicpos = 0;
   helpscreen_state = 0;
+
+  LoadMusicInfo();
+
+  num_helpscreen_music = 0;
+  for (list = music_file_info; list != NULL; list = list->next)
+    num_helpscreen_music++;
 
   DrawHelpScreenElText(0);
   DrawHelpScreenElAction(0);

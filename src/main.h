@@ -1483,6 +1483,18 @@ struct MusicPrefixInfo
   boolean is_loop_music;
 };
 
+struct MusicFileInfo
+{
+  char *context;
+
+  char *title;
+  char *artist;
+  char *album;
+  char *year;
+
+  struct MusicFileInfo *next;
+};
+
 struct ElementActionInfo
 {
   char *suffix;
@@ -1595,6 +1607,7 @@ extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct MusicInfo	       *music_info;
+extern struct MusicFileInfo    *music_file_info;
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];

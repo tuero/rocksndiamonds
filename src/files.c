@@ -13,6 +13,7 @@
 
 #include <ctype.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <math.h>
 
 #include "libgame/libgame.h"
@@ -2842,5 +2843,178 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
   for (i=0; i < *num_elements; i++)
     printf("editor: element '%s' [%d]\n",
 	   element_info[(*elements)[i]].token_name, (*elements)[i]);
+#endif
+}
+
+static struct MusicFileInfo *get_music_file_info(char *basename)
+{
+  SetupFileHash *setup_file_hash = NULL;
+  struct MusicFileInfo tmp_music_file_info, *new_music_file_info;
+  char *filename_music = getCustomMusicFilename(basename);
+  char *filename_prefix, *filename_info;
+  struct
+  {
+    char *token;
+    char **value_ptr;
+  }
+  token_to_value_ptr[] =
+  {
+    { "title",	&tmp_music_file_info.title	},
+    { "artist",	&tmp_music_file_info.artist	},
+    { "album",	&tmp_music_file_info.album	},
+    { "year",	&tmp_music_file_info.year	},
+    { NULL,	NULL				},
+  };
+  int i;
+
+  if (filename_music == NULL)
+    return NULL;
+
+  /* ---------- try to replace file extension ---------- */
+
+  filename_prefix = getStringCopy(filename_music);
+  if (strrchr(filename_prefix, '.') != NULL)
+    *strrchr(filename_prefix, '.') = '\0';
+  filename_info = getStringCat2(filename_prefix, ".txt");
+
+#if 0
+  printf("trying to load file '%s'...\n", filename_info);
+#endif
+
+  if (fileExists(filename_info))
+    setup_file_hash = loadSetupFileHash(filename_info);
+
+  free(filename_prefix);
+  free(filename_info);
+
+  if (setup_file_hash == NULL)
+  {
+    /* ---------- try to add file extension ---------- */
+
+    filename_prefix = getStringCopy(filename_music);
+    filename_info = getStringCat2(filename_prefix, ".txt");
+
+#if 0
+    printf("trying to load file '%s'...\n", filename_info);
+#endif
+
+    if (fileExists(filename_info))
+      setup_file_hash = loadSetupFileHash(filename_info);
+
+    free(filename_prefix);
+    free(filename_info);
+  }
+
+  if (setup_file_hash == NULL)
+    return NULL;
+
+  /* ---------- music file info found ---------- */
+
+  for (i = 0; token_to_value_ptr[i].token != NULL; i++)
+  {
+    char *value = getHashEntry(setup_file_hash, token_to_value_ptr[i].token);
+
+    if (value != NULL)
+      *token_to_value_ptr[i].value_ptr = getStringCopy(value);
+  }
+
+  new_music_file_info = checked_calloc(sizeof(struct MusicFileInfo));
+  *new_music_file_info = tmp_music_file_info;
+
+  return new_music_file_info;
+}
+
+void LoadMusicInfo()
+{
+  char *music_directory = getCustomMusicDirectory();
+  int num_music = getMusicListSize();
+  DIR *dir;
+  struct dirent *dir_entry;
+  struct FileInfo *music;
+  struct MusicFileInfo *next, **new;
+  int i;
+
+  while (music_file_info != NULL)
+  {
+    next = music_file_info->next;
+
+    if (music_file_info->context)
+      free(music_file_info->context);
+    if (music_file_info->title)
+      free(music_file_info->title);
+    if (music_file_info->artist)
+      free(music_file_info->artist);
+    if (music_file_info->album)
+      free(music_file_info->album);
+    if (music_file_info->year)
+      free(music_file_info->year);
+
+    free(music_file_info);
+
+    music_file_info = next;
+  }
+
+  new = &music_file_info;
+
+  for (i=0; i < num_music; i++)
+  {
+    music = getMusicListEntry(i);
+
+    if (strcmp(music->filename, UNDEFINED_FILENAME) == 0)
+      continue;
+
+#if 0
+    printf("::: -> '%s'\n", music->filename);
+#endif
+
+    *new = get_music_file_info(music->filename);
+    if (*new != NULL)
+      new = &(*new)->next;
+  }
+
+  if ((dir = opendir(music_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+    return;
+  }
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
+  {
+    char *basename = dir_entry->d_name;
+    boolean music_already_used = FALSE;
+    int i;
+
+    for (i=0; i < num_music; i++)
+    {
+      music = getMusicListEntry(i);
+
+      if (strcmp(basename, music->filename) == 0)
+      {
+	music_already_used = TRUE;
+	break;
+      }
+    }
+
+    if (music_already_used)
+      continue;
+
+    if (!FileIsSound(basename) && !FileIsMusic(basename))
+      continue;
+
+#if 0
+    printf("::: -> '%s'\n", basename);
+#endif
+
+    *new = get_music_file_info(basename);
+    if (*new != NULL)
+      new = &(*new)->next;
+  }
+
+  closedir(dir);
+
+#if 0
+  /* TEST-ONLY */
+  for (next = music_file_info; next != NULL; next = next->next)
+    printf("::: title == '%s'\n", next->title);
 #endif
 }
