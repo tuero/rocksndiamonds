@@ -1,5 +1,10 @@
+Release Version 3.0.1 [?? ??? ????]
+-----------------------------------
+	- fixed bug with missing graphic for active red disk bomb
+	- added custom element property for dropping collected elements
+
 Release Version 3.0.0 [05 AUG 2003]
-------------------------------------------
+-----------------------------------
 	- final version bumped to 3.0.0 due to the massive changes
 	- graphics and sounds now completely and dynamically customizable
 	- custom elements now have lots of configurable properties

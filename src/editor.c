@@ -1020,7 +1020,8 @@ static struct ValueTextInfo options_deadliness[] =
 
 static struct ValueTextInfo options_consistency[] =
 {
-  { EP_CAN_EXPLODE,		"can explode"			},
+  { EP_CAN_EXPLODE_3X3,		"can explode 3x3"		},
+  { EP_CAN_EXPLODE_1X1,		"can explode 1x1"		},
   { EP_INDESTRUCTIBLE,		"indestructible"		},
   { -1,				NULL				}
 };
@@ -3868,6 +3869,21 @@ static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
       dst[x][y] = src[x][y];
 }
 
+static int SetSelectboxValue(int selectbox_id, int new_value)
+{
+  int new_index_value = 0;
+  int i;
+
+  for(i=0; selectbox_info[selectbox_id].options[i].text != NULL; i++)
+    if (selectbox_info[selectbox_id].options[i].value == new_value)
+      new_index_value = i;
+
+  *selectbox_info[selectbox_id].value =
+    selectbox_info[selectbox_id].options[new_index_value].value;
+
+  return new_index_value;
+}
+
 static void CopyCustomElementPropertiesToEditor(int element)
 {
   int i;
@@ -3876,6 +3892,10 @@ static void CopyCustomElementPropertiesToEditor(int element)
   InitElementPropertiesEngine(level.game_version);
 
   custom_element = element_info[element];
+
+  /* needed to initially set selectbox value variables to reliable defaults */
+  for (i=0; i < ED_NUM_SELECTBOX; i++)
+    SetSelectboxValue(i, *selectbox_info[i].value);
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     custom_element_properties[i] = HAS_PROPERTY(element, i);
@@ -3938,11 +3958,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
   /* set consistency selectbox help value */
   custom_element.consistency =
     (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
-     CAN_EXPLODE(element) ? EP_CAN_EXPLODE :
+     CAN_EXPLODE_1X1(element) ? EP_CAN_EXPLODE_1X1 :
+     CAN_EXPLODE_3X3(element) ? EP_CAN_EXPLODE_3X3 :
      custom_element.consistency);
   custom_element_properties[EP_EXPLODE_RESULT] =
     (IS_INDESTRUCTIBLE(element) ||
-     CAN_EXPLODE(element));
+     CAN_EXPLODE_1X1(element) ||
+     CAN_EXPLODE_3X3(element));
 
   /* special case: sub-settings dependent from main setting */
   if (CAN_EXPLODE_BY_FIRE(element))
@@ -4047,7 +4069,8 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   /* set consistency property from checkbox and selectbox */
   custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_1X1] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_3X3] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
@@ -4055,7 +4078,8 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_EXPLODE_RESULT];
 
   /* special case: sub-settings dependent from main setting */
-  if (custom_element_properties[EP_CAN_EXPLODE])
+  if (custom_element_properties[EP_CAN_EXPLODE_3X3] ||
+      custom_element_properties[EP_CAN_EXPLODE_1X1])
   {
     custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
       custom_element.can_explode_by_fire;
@@ -4290,15 +4314,7 @@ static void ModifyEditorSelectbox(int selectbox_id, int new_value)
 {
   int gadget_id = selectbox_info[selectbox_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-  int new_index_value = 0;
-  int i;
-
-  for(i=0; selectbox_info[selectbox_id].options[i].text != NULL; i++)
-    if (selectbox_info[selectbox_id].options[i].value == new_value)
-      new_index_value = i;
-
-  *selectbox_info[selectbox_id].value =
-    selectbox_info[selectbox_id].options[new_index_value].value;
+  int new_index_value = SetSelectboxValue(selectbox_id, new_value);
 
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
 }

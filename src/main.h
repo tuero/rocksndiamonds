@@ -85,7 +85,7 @@
 #define EP_PASSABLE_INSIDE	20
 #define EP_PASSABLE_UNDER	21
 #define EP_DROPPABLE		22
-#define EP_UNUSED_23		23
+#define EP_CAN_EXPLODE_1X1	23
 #define EP_PUSHABLE		24
 
 /* values for special configurable properties (depending on level settings) */
@@ -134,13 +134,14 @@
 #define EP_EXPLOSION_PROOF	68
 #define EP_CAN_SMASH		69
 #define EP_CAN_EXPLODE		70
+#define EP_CAN_EXPLODE_3X3	71
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	71
-#define EP_WALK_TO_OBJECT	72
-#define EP_DEADLY		73
+#define EP_EXPLODE_RESULT	72
+#define EP_WALK_TO_OBJECT	73
+#define EP_DEADLY		74
 
-#define NUM_ELEMENT_PROPERTIES	74
+#define NUM_ELEMENT_PROPERTIES	75
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -248,6 +249,7 @@
 #define IS_PASSABLE_INSIDE(e)	HAS_PROPERTY(e, EP_PASSABLE_INSIDE)
 #define IS_PASSABLE_UNDER(e)	HAS_PROPERTY(e, EP_PASSABLE_UNDER)
 #define IS_DROPPABLE(e)		HAS_PROPERTY(e, EP_DROPPABLE)
+#define CAN_EXPLODE_1X1(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_1X1)
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 
 /* macros for special configurable properties */
@@ -296,6 +298,7 @@
 #define IS_EXPLOSION_PROOF(e)	HAS_PROPERTY(e, EP_EXPLOSION_PROOF)
 #define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
 #define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
+#define CAN_EXPLODE_3X3(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_3X3)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\

@@ -495,6 +495,59 @@ static int getBeltDirFromBeltSwitchElement(int element)
   return belt_move_dir[belt_dir_nr];
 }
 
+static void InitPlayerField(int x, int y, int element, boolean init_game)
+{
+  if (element == EL_SP_MURPHY)
+  {
+    if (init_game)
+    {
+      if (stored_player[0].present)
+      {
+	Feld[x][y] = EL_SP_MURPHY_CLONE;
+
+	return;
+      }
+      else
+      {
+	stored_player[0].use_murphy_graphic = TRUE;
+      }
+
+      Feld[x][y] = EL_PLAYER_1;
+    }
+  }
+
+  if (init_game)
+  {
+    struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER_1];
+    int jx = player->jx, jy = player->jy;
+
+    player->present = TRUE;
+
+    if (!options.network || player->connected)
+    {
+      player->active = TRUE;
+
+      /* remove potentially duplicate players */
+      if (StorePlayer[jx][jy] == Feld[x][y])
+	StorePlayer[jx][jy] = 0;
+
+      StorePlayer[x][y] = Feld[x][y];
+
+      if (options.debug)
+      {
+	printf("Player %d activated.\n", player->element_nr);
+	printf("[Local player is %d and currently %s.]\n",
+	       local_player->element_nr,
+	       local_player->active ? "active" : "not active");
+      }
+    }
+
+    Feld[x][y] = EL_EMPTY;
+    player->jx = player->last_jx = x;
+    player->jy = player->last_jy = y;
+  }
+}
+
 static void InitField(int x, int y, boolean init_game)
 {
   int element = Feld[x][y];
@@ -502,55 +555,11 @@ static void InitField(int x, int y, boolean init_game)
   switch (element)
   {
     case EL_SP_MURPHY:
-      if (init_game)
-      {
-	if (stored_player[0].present)
-	{
-	  Feld[x][y] = EL_SP_MURPHY_CLONE;
-	  break;
-	}
-	else
-	{
-	  stored_player[0].use_murphy_graphic = TRUE;
-	}
-
-	Feld[x][y] = EL_PLAYER_1;
-      }
-      /* no break! */
     case EL_PLAYER_1:
     case EL_PLAYER_2:
     case EL_PLAYER_3:
     case EL_PLAYER_4:
-      if (init_game)
-      {
-	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER_1];
-	int jx = player->jx, jy = player->jy;
-
-	player->present = TRUE;
-
-	if (!options.network || player->connected)
-	{
-	  player->active = TRUE;
-
-	  /* remove potentially duplicate players */
-	  if (StorePlayer[jx][jy] == Feld[x][y])
-	    StorePlayer[jx][jy] = 0;
-
-	  StorePlayer[x][y] = Feld[x][y];
-
-	  if (options.debug)
-	  {
-	    printf("Player %d activated.\n", player->element_nr);
-	    printf("[Local player is %d and currently %s.]\n",
-		   local_player->element_nr,
-		   local_player->active ? "active" : "not active");
-	  }
-	}
-
-	Feld[x][y] = EL_EMPTY;
-	player->jx = player->last_jx = x;
-	player->jy = player->last_jy = y;
-      }
+      InitPlayerField(x, y, element, init_game);
       break;
 
     case EL_STONEBLOCK:
@@ -1207,16 +1216,88 @@ void InitGame()
   if (lev_fieldy + (SBY_Upper == -1 ? 2 : 0) <= SCR_FIELDY)
     SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
 
-  scroll_x = SBX_Left;
-  scroll_y = SBY_Upper;
-  if (local_player->jx >= SBX_Left + MIDPOSX)
-    scroll_x = (local_player->jx <= SBX_Right + MIDPOSX ?
-		local_player->jx - MIDPOSX :
-		SBX_Right);
-  if (local_player->jy >= SBY_Upper + MIDPOSY)
-    scroll_y = (local_player->jy <= SBY_Lower + MIDPOSY ?
-		local_player->jy - MIDPOSY :
-		SBY_Lower);
+  /* if local player not found, look for custom element that might create
+     the player (make some assumptions about the right custom element) */
+  if (!local_player->present)
+  {
+    int start_x = 0, start_y = 0;
+    int found_rating = 0;
+
+    for(y=0; y < lev_fieldy; y++)
+    {
+      for(x=0; x < lev_fieldx; x++)
+      {
+	int element = Feld[x][y];
+
+	if (IS_CUSTOM_ELEMENT(element))
+	{
+	  int xx, yy;
+
+	  for(yy=0; yy < 3; yy++)
+	  {
+	    for(xx=0; xx < 3; xx++)
+	    {
+	      int content;
+	      boolean is_player;
+
+	      content = element_info[element].content[xx][yy];
+	      is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+
+	      if (is_player && found_rating < 2)
+	      {
+		start_x = x + xx - 1;
+		start_y = y + yy - 1;
+
+		found_rating = 2;
+	      }
+
+	      content = element_info[element].change.content[xx][yy];
+	      is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+
+	      if (is_player && found_rating < 1)
+	      {
+		start_x = x + xx - 1;
+		start_y = y + yy - 1;
+
+		found_rating = 1;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    scroll_x = (start_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		start_x > SBX_Right + MIDPOSX ? SBX_Right :
+		start_x - MIDPOSX);
+
+    scroll_y = (start_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		start_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		start_y - MIDPOSY);
+  }
+  else
+  {
+#if 1
+    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		local_player->jx - MIDPOSX);
+
+    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		local_player->jy - MIDPOSY);
+#else
+    scroll_x = SBX_Left;
+    scroll_y = SBY_Upper;
+    if (local_player->jx >= SBX_Left + MIDPOSX)
+      scroll_x = (local_player->jx <= SBX_Right + MIDPOSX ?
+		  local_player->jx - MIDPOSX :
+		  SBX_Right);
+    if (local_player->jy >= SBY_Upper + MIDPOSY)
+      scroll_y = (local_player->jy <= SBY_Lower + MIDPOSY ?
+		  local_player->jy - MIDPOSY :
+		  SBY_Lower);
+#endif
+  }
 
   CloseDoor(DOOR_CLOSE_1);
 
@@ -1863,6 +1944,40 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
+void RelocatePlayer(int x, int y, int element)
+{
+  struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
+
+  if (player->present)
+  {
+    while (player->MovPos)
+    {
+      ScrollFigure(player, SCROLL_GO_ON);
+      ScrollScreen(NULL, SCROLL_GO_ON);
+      FrameCounter++;
+      DrawAllPlayers();
+      BackToFront();
+    }
+
+    RemoveField(player->jx, player->jy);
+  }
+
+  InitPlayerField(x, y, element, TRUE);
+
+  if (player == local_player)
+  {
+    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		local_player->jx - MIDPOSX);
+
+    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		local_player->jy - MIDPOSY);
+  }
+
+  DrawLevel();
+}
+
 void Explode(int ex, int ey, int phase, int mode)
 {
   int x, y;
@@ -2142,6 +2257,9 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
       StorePlayer[x][y] = 0;
+
+    if (ELEM_IS_PLAYER(element))
+      RelocatePlayer(x, y, element);
   }
   else if (phase >= delay && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
@@ -2290,7 +2408,10 @@ void Bang(int x, int y)
 	Explode(x, y, EX_PHASE_START, EX_CENTER);
       break;
     default:
-      Explode(x, y, EX_PHASE_START, EX_NORMAL);
+      if (CAN_EXPLODE_1X1(element))
+	Explode(x, y, EX_PHASE_START, EX_CENTER);
+      else
+	Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
   }
 
