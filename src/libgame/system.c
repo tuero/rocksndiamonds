@@ -821,7 +821,7 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   src_height = src_bitmap->height;
 
   tmp_width  = src_width;
-  tmp_height = src_height + src_height / 2;
+  tmp_height = src_height + (src_height + 1) / 2;     /* prevent odd height */
 
   tmp_bitmap = CreateBitmap(tmp_width, tmp_height, DEFAULT_DEPTH);
 
@@ -838,9 +838,11 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   FreeBitmap(tmp_bitmap_8);
 
 #if defined(TARGET_SDL)
+  /* !!! what about the old src_bitmap->surface ??? FIX ME !!! */
   src_bitmap->surface = tmp_bitmap->surface;
   tmp_bitmap->surface = NULL;
 #else
+  /* !!! see above !!! */
   src_bitmap->drawable = tmp_bitmap->drawable;
   tmp_bitmap->drawable = None;
 #endif

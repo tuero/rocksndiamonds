@@ -586,9 +586,13 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   int zoom_factor = src_width / dst_width;	/* currently very limited! */
   int row_skip, col_skip;
 
+  /* adjust source image size to integer multiple of destination image size */
+  src_width  = dst_width  * zoom_factor;
+  src_height = dst_height * zoom_factor;
+
   /* copy source pixmap to temporary image */
-  src_ximage = XGetImage(display, src_pixmap, 0, 0,
-			 src_width, src_height, AllPlanes, ZPixmap);
+  src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
+			 AllPlanes, ZPixmap);
 
   bits_per_pixel = src_ximage->bits_per_pixel;
   bytes_per_pixel = (bits_per_pixel + 7) / 8;
@@ -609,12 +613,12 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   /* scale image down by scaling factor 'zoom_factor' */
   for (y=0; y < src_height; y += zoom_factor, src_ptr += row_skip)
     for (x=0; x < src_width; x += zoom_factor, src_ptr += col_skip)
-      for (i=0; i<bytes_per_pixel; i++)
+      for (i=0; i < bytes_per_pixel; i++)
 	*dst_ptr++ = *src_ptr++;
 
   /* copy scaled image to destination pixmap */
   XPutImage(display, dst_pixmap, gc, dst_ximage, 0, 0, 0, 0,
-	    MIN(src_width, dst_width), MIN(src_height, dst_height));
+	    dst_width, dst_height);
 
   /* free temporary images */
   XDestroyImage(src_ximage);

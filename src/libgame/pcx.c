@@ -19,7 +19,7 @@
 #include "misc.h"
 
 
-#define PCX_DEBUG		FALSE
+#define PCX_DEBUG		0
 
 #define PCX_MAGIC		0x0a	/* first byte in a PCX image file    */
 #define PCX_SUPPORTED_VERSION	5	/* last acceptable version number    */
@@ -167,8 +167,12 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
 
 	  for (j = 7; j >= 0; j--)
 	  {
-	    byte bit = (value >> j) & 1;
+	    byte bit;
 
+	    if (i * 8 + j >= width)	/* skip padding bits */
+	      continue;
+
+	    bit = (value >> j) & 1;
 	    bitmap_ptr[x++] |= bit << plane;
 	  }
 	}
@@ -332,6 +336,7 @@ Image *Read_PCX_to_Image(char *filename)
 #if PCX_DEBUG
   if (options.verbose)
   {
+    printf("\n");
     printf("%s is a %dx%d PC Paintbrush image\n", filename, width, height);
     printf("depth: %d\n", depth);
     printf("bits_per_pixel: %d\n", pcx.bits_per_pixel);
@@ -371,7 +376,6 @@ Image *Read_PCX_to_Image(char *filename)
   if (pcx_depth == 8)
   {
     /* determine number of used colormap entries for 8-bit PCX images */
-    image->rgb.used = 0;
     for (i=0; i<PCX_MAXCOLORS; i++)
       if (image->rgb.color_used[i])
 	image->rgb.used++;
@@ -379,7 +383,7 @@ Image *Read_PCX_to_Image(char *filename)
 
 #if PCX_DEBUG
   if (options.verbose)
-    printf("Read_PCX_to_Image: %d colors found\n", image->rgb.used);
+    printf("Read_PCX_to_Image: %d colors in colormap\n", image->rgb.used);
 #endif
 
   return image;
