@@ -36,18 +36,12 @@
 #define TAPE_HEADER_UNUSED	7	/* unused tape header bytes   */
 
 /* file identifier strings */
-#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_2.0"
+#define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
+#define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
-#define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_2.0"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
 #define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
 #define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
-/* old file identifiers for backward compatibility */
-#define LEVEL_COOKIE_10		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
-#define LEVEL_COOKIE_12		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
-#define LEVEL_COOKIE_14		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
-#define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
-#define TAPE_COOKIE_12		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
 
 /* file names and filename extensions */
 #if !defined(PLATFORM_MSDOS)
@@ -66,39 +60,6 @@
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
-#endif
-
-#if 0
-#if defined(PLATFORM_WIN32)
-#ifndef S_IRGRP
-#define S_IRGRP S_IRUSR
-#endif
-#ifndef S_IROTH
-#define S_IROTH S_IRUSR
-#endif
-#ifndef S_IWGRP
-#define S_IWGRP S_IWUSR
-#endif
-#ifndef S_IWOTH
-#define S_IWOTH S_IWUSR
-#endif
-#ifndef S_IXGRP
-#define S_IXGRP S_IXUSR
-#endif
-#ifndef S_IXOTH
-#define S_IXOTH S_IXUSR
-#endif
-#endif	/* PLATFORM_WIN32 */
-
-/* file permissions for newly written files */
-#define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
-#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
-#define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
-
-#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
-#define SCORE_PERMS		LEVEL_PERMS
-#define TAPE_PERMS		LEVEL_PERMS
-#define SETUP_PERMS		LEVEL_PERMS
 #endif
 
 /* sort priorities of level series (also used as level series classes) */
@@ -560,203 +521,6 @@ static int checkLevelElement(int element)
   return element;
 }
 
-void OLD_LoadLevel(int level_nr)
-{
-  int i, x, y;
-  char *filename = getLevelFilename(level_nr);
-  char cookie[MAX_LINE_LEN];
-  char chunk_name[CHUNK_ID_LEN + 1];
-  boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
-  int file_version = FILE_VERSION_ACTUAL;
-  int chunk_size;
-  FILE *file;
-
-  /* always start with reliable default values */
-  setLevelInfoToDefaults();
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
-    return;
-  }
-
-  /* check file identifier */
-  fgets(cookie, MAX_LINE_LEN, file);
-  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
-    cookie[strlen(cookie) - 1] = '\0';
-
-#if 0
-  if (strcmp(cookie, LEVEL_COOKIE_10) == 0)	/* old 1.0 level format */
-    file_version = FILE_VERSION_1_0;
-  else if (strcmp(cookie, LEVEL_COOKIE_12) == 0)/* 1.2 (8 bit) level format */
-    file_version = FILE_VERSION_1_2;
-  else if (strcmp(cookie, LEVEL_COOKIE) != 0)	/* unknown level format */
-  {
-    Error(ERR_WARN, "wrong file identifier of level file '%s'", filename);
-    fclose(file);
-    return;
-  }
-#else
-  if (!checkCookieString(cookie, LEVEL_COOKIE))	/* unknown file format */
-  {
-    Error(ERR_WARN, "unknown format of level file '%s'", filename);
-    fclose(file);
-    return;
-  }
-
-  file_version = getFileVersionFromCookieString(cookie);
-#endif
-
-  level.file_version = file_version;
-
-  /* read chunk "HEAD" */
-  if (file_version >= FILE_VERSION_1_2)
-  {
-    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk_name, "HEAD") || chunk_size != LEVEL_HEADER_SIZE)
-    {
-      Error(ERR_WARN, "wrong 'HEAD' chunk of level file '%s'", filename);
-      fclose(file);
-      return;
-    }
-  }
-
-  lev_fieldx = level.fieldx = fgetc(file);
-  lev_fieldy = level.fieldy = fgetc(file);
-
-  level.time        = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  level.gems_needed = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-
-  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    level.name[i] = fgetc(file);
-  level.name[MAX_LEVEL_NAME_LEN] = 0;
-
-  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    level.score[i] = fgetc(file);
-
-  level.num_yam_contents = STD_ELEMENT_CONTENTS;
-  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
-  {
-    for(y=0; y<3; y++)
-    {
-      for(x=0; x<3; x++)
-      {
-	if (i < STD_ELEMENT_CONTENTS)
-	  level.yam_content[i][x][y] = checkLevelElement(fgetc(file));
-	else
-	  level.yam_content[i][x][y] = EL_LEERRAUM;
-      }
-    }
-  }
-
-  level.amoeba_speed	= fgetc(file);
-  level.time_magic_wall	= fgetc(file);
-  level.time_wheel	= fgetc(file);
-  level.amoeba_content	= checkLevelElement(fgetc(file));
-  level.double_speed	= (fgetc(file) == 1 ? TRUE : FALSE);
-  level.gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
-
-  encoding_16bit	= (fgetc(file) == 1 ? TRUE : FALSE);
-
-  for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* skip unused header bytes */
-    fgetc(file);
-
-  if (file_version >= FILE_VERSION_1_2)
-  {
-    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-
-    /* look for optional author chunk */
-    if (strcmp(chunk_name, "AUTH") == 0 && chunk_size == MAX_LEVEL_AUTHOR_LEN)
-    {
-      for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
-	level.author[i]	= fgetc(file);
-      level.author[MAX_LEVEL_NAME_LEN] = 0;
-
-      getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    }
-
-    /* look for optional content chunk */
-    if (strcmp(chunk_name, "CONT") == 0 &&
-	chunk_size == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
-    {
-      fgetc(file);
-      level.num_yam_contents = fgetc(file);
-      fgetc(file);
-      fgetc(file);
-
-      if (level.num_yam_contents < 1 ||
-	  level.num_yam_contents > MAX_ELEMENT_CONTENTS)
-      {
-#if DEBUG
-	printf("WARNING: num_yam_contents == %d (corrected)\n",
-	       level.num_yam_contents);
-#endif
-	level.num_yam_contents = STD_ELEMENT_CONTENTS;
-      }
-
-      for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
-	for(y=0; y<3; y++)
-	  for(x=0; x<3; x++)
-	    level.yam_content[i][x][y] =
-	      checkLevelElement(encoding_16bit ?
-				getFile16BitInteger(file,
-						    BYTE_ORDER_BIG_ENDIAN) :
-				fgetc(file));
-
-      getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    }
-
-    /* next check body chunk identifier and chunk size */
-    if (strcmp(chunk_name, "BODY") != 0 ||
-	chunk_size != lev_fieldx * lev_fieldy)
-    {
-      Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
-      fclose(file);
-      return;
-    }
-  }
-
-  /* clear all other level fields (needed if resized in level editor later) */
-  for(x=0; x<MAX_LEV_FIELDX; x++)
-    for(y=0; y<MAX_LEV_FIELDY; y++)
-      Feld[x][y] = Ur[x][y] = EL_LEERRAUM;
-
-  /* now read in the valid level fields from level file */
-  for(y=0; y<lev_fieldy; y++)
-    for(x=0; x<lev_fieldx; x++)
-      Feld[x][y] = Ur[x][y] =
-	checkLevelElement(encoding_16bit ?
-			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
-			  fgetc(file));
-
-  fclose(file);
-
-  if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
-      IS_LEVELCLASS_USER(leveldir_current))
-  {
-    /* for user contributed and private levels, use the version of
-       the game engine the levels were created for */
-    level.game_version = file_version;
-
-    /* player was faster than monsters in pre-1.0 levels */
-    if (file_version == FILE_VERSION_1_0)
-    {
-      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
-      Error(ERR_WARN, "using high speed movement for player");
-      level.double_speed = TRUE;
-    }
-  }
-  else
-  {
-    /* always use the latest version of the game engine for all but
-       user contributed and private levels */
-    level.game_version = GAME_VERSION_ACTUAL;
-  }
-
-  /* determine border element for this level */
-  SetBorderElement();
-}
-
 static int LoadLevel_VERS(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   ReadChunk_VERS(file, &(level->file_version), &(level->game_version));
@@ -942,26 +706,6 @@ void LoadLevel(int level_nr)
     return;
   }
 
-#if 0
-  /* check file identifier */
-  fgets(cookie, MAX_LINE_LEN, file);
-  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
-    cookie[strlen(cookie) - 1] = '\0';
-
-  if (!checkCookieString(cookie, LEVEL_COOKIE))	/* unknown file format */
-  {
-    Error(ERR_WARN, "unknown format of level file '%s'", filename);
-    fclose(file);
-    return;
-  }
-
-  if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
-  {
-    Error(ERR_WARN, "unsupported version of level file '%s'", filename);
-    fclose(file);
-    return;
-  }
-#else
   getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
   if (strcmp(chunk_name, "RND1") == 0)
   {
@@ -982,7 +726,7 @@ void LoadLevel(int level_nr)
     if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
       cookie[strlen(cookie) - 1] = '\0';
 
-    if (!checkCookieString(cookie, LEVEL_COOKIE)) /* unknown file format */
+    if (!checkCookieString(cookie, LEVEL_COOKIE_TMPL))
     {
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
       fclose(file);
@@ -996,7 +740,6 @@ void LoadLevel(int level_nr)
       return;
     }
   }
-#endif
 
   if (level.file_version < FILE_VERSION_1_2)
   {
@@ -1088,106 +831,6 @@ void LoadLevel(int level_nr)
 
   /* determine border element for this level */
   SetBorderElement();
-}
-
-void OLD_SaveLevel(int level_nr)
-{
-  int i, x, y;
-  char *filename = getLevelFilename(level_nr);
-#if 0
-  boolean encoding_16bit_amoeba = FALSE;
-  boolean encoding_16bit_yamyam = FALSE;
-#endif
-  boolean encoding_16bit = FALSE;	/* default: only 8-bit elements */
-  char *oldest_possible_cookie;
-  FILE *file;
-
-  if (!(file = fopen(filename, MODE_WRITE)))
-  {
-    Error(ERR_WARN, "cannot save level file '%s'", filename);
-    return;
-  }
-
-  /* check yam content for 16-bit elements */
-  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
-    for(y=0; y<3; y++)
-      for(x=0; x<3; x++)
-	if (level.yam_content[i][x][y] > 255)
-	  encoding_16bit = TRUE;
-
-  /* check level field for 16-bit elements */
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++) 
-      if (Ur[x][y] > 255)
-	encoding_16bit = TRUE;
-
-  oldest_possible_cookie = (encoding_16bit ? LEVEL_COOKIE : LEVEL_COOKIE_12);
-
-  fputs(oldest_possible_cookie, file);		/* file identifier */
-  fputc('\n', file);
-
-  putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
-
-  fputc(level.fieldx, file);
-  fputc(level.fieldy, file);
-
-  putFile16BitInteger(file, level.time, BYTE_ORDER_BIG_ENDIAN);
-  putFile16BitInteger(file, level.gems_needed, BYTE_ORDER_BIG_ENDIAN);
-
-  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    fputc(level.name[i], file);
-  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    fputc(level.score[i], file);
-  for(i=0; i<STD_ELEMENT_CONTENTS; i++)
-    for(y=0; y<3; y++)
-      for(x=0; x<3; x++)
-	fputc(encoding_16bit ? EL_LEERRAUM : level.yam_content[i][x][y], file);
-  fputc(level.amoeba_speed, file);
-  fputc(level.time_magic_wall, file);
-  fputc(level.time_wheel, file);
-  fputc(level.amoeba_content, file);
-  fputc((level.double_speed ? 1 : 0), file);
-  fputc((level.gravity ? 1 : 0), file);
-
-  fputc((encoding_16bit ? 1 : 0), file);
-
-  for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
-    fputc(0, file);
-
-  putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
-
-  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
-    fputc(level.author[i], file);
-
-  putFileChunk(file, "CONT", 4 + MAX_ELEMENT_CONTENTS * 3 * 3,
-	       BYTE_ORDER_BIG_ENDIAN);
-
-  fputc(EL_MAMPFER, file);
-  fputc(level.num_yam_contents, file);
-  fputc(0, file);
-  fputc(0, file);
-
-  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
-    for(y=0; y<3; y++)
-      for(x=0; x<3; x++)
-	if (encoding_16bit)
-	  putFile16BitInteger(file, level.yam_content[i][x][y],
-			      BYTE_ORDER_BIG_ENDIAN);
-	else
-	  fputc(level.yam_content[i][x][y], file);
-
-  putFileChunk(file, "BODY", lev_fieldx * lev_fieldy, BYTE_ORDER_BIG_ENDIAN);
-
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++) 
-      if (encoding_16bit)
-	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
-      else
-	fputc(Ur[x][y], file);
-
-  fclose(file);
-
-  SetFilePermissions_Level(filename);
 }
 
 static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
@@ -1351,32 +994,17 @@ void SaveLevel(int level_nr)
   body_chunk_size =
     level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
 
-#if 0
-  fputs(LEVEL_COOKIE, file);		/* file identifier */
-  fputc('\n', file);
-#else
   putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
   putFileChunk(file, "CAVE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
 
   putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
   WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
-#endif
 
   putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_HEAD(file, &level);
 
   putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_AUTH(file, &level);
-
-#if 0
-  if (level.encoding_16bit_field)	/* obsolete since new "CNT2" chunk */
-  {
-    chunk_size = 4 + 2 * (MAX_ELEMENT_CONTENTS * 3 * 3);
-
-    putFileChunk(file, "CONT", chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    SaveLevel_CONT(file, &level);
-  }
-#endif
 
   putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_BODY(file, &level);
@@ -1423,216 +1051,6 @@ static void setTapeInfoToDefaults()
   tape.recording = FALSE;
   tape.playing = FALSE;
   tape.pausing = FALSE;
-}
-
-void OLD_LoadTape(int level_nr)
-{
-  int i, j;
-  char *filename = getTapeFilename(level_nr);
-  char cookie[MAX_LINE_LEN];
-  char chunk_name[CHUNK_ID_LEN + 1];
-  FILE *file;
-  int num_participating_players;
-  int file_version = FILE_VERSION_ACTUAL; /* last version of tape files */
-  int chunk_size;
-
-  /* always start with reliable default values (empty tape) */
-  tape.file_version = FILE_VERSION_ACTUAL;
-  tape.game_version = GAME_VERSION_ACTUAL;
-  TapeErase();
-
-  /* default values (also for pre-1.2 tapes) with only the first player */
-  tape.player_participates[0] = TRUE;
-  for(i=1; i<MAX_PLAYERS; i++)
-    tape.player_participates[i] = FALSE;
-
-  /* at least one (default: the first) player participates in every tape */
-  num_participating_players = 1;
-
-  if (!(file = fopen(filename, MODE_READ)))
-    return;
-
-  /* check file identifier */
-  fgets(cookie, MAX_LINE_LEN, file);
-  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
-    cookie[strlen(cookie) - 1] = '\0';
-
-#if 0
-  if (strcmp(cookie, TAPE_COOKIE_10) == 0)	/* old 1.0 tape format */
-    file_version = FILE_VERSION_1_0;
-  else if (strcmp(cookie, TAPE_COOKIE) != 0)	/* unknown tape format */
-  {
-    Error(ERR_WARN, "wrong file identifier of tape file '%s'", filename);
-    fclose(file);
-    return;
-  }
-#else
-  if (!checkCookieString(cookie, TAPE_COOKIE))	/* unknown file format */
-  {
-    Error(ERR_WARN, "unknown format of tape file '%s'", filename);
-    fclose(file);
-    return;
-  }
-
-  file_version = getFileVersionFromCookieString(cookie);
-#endif
-
-  tape.file_version = file_version;
-  tape.game_version = file_version;
-
-  /* read chunk "HEAD" */
-  if (file_version >= FILE_VERSION_1_2)
-  {
-    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk_name, "HEAD") || chunk_size != TAPE_HEADER_SIZE)
-    {
-      Error(ERR_WARN, "wrong 'HEAD' chunk of tape file '%s'", filename);
-      fclose(file);
-      return;
-    }
-  }
-
-  tape.random_seed = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  tape.date        = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  tape.length      = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-
-  /* read header fields that are new since version 1.2 */
-  if (file_version >= FILE_VERSION_1_2)
-  {
-    byte store_participating_players = fgetc(file);
-
-    for(i=0; i<TAPE_HEADER_UNUSED; i++)		/* skip unused header bytes */
-      fgetc(file);
-
-    /* since version 1.2, tapes store which players participate in the tape */
-    num_participating_players = 0;
-    for(i=0; i<MAX_PLAYERS; i++)
-    {
-      tape.player_participates[i] = FALSE;
-
-      if (store_participating_players & (1 << i))
-      {
-	tape.player_participates[i] = TRUE;
-	num_participating_players++;
-      }
-    }
-  }
-
-  tape.level_nr = level_nr;
-  tape.counter = 0;
-  tape.changed = FALSE;
-
-  tape.recording = FALSE;
-  tape.playing = FALSE;
-  tape.pausing = FALSE;
-
-  /* read chunk "BODY" */
-  if (file_version >= FILE_VERSION_1_2)
-  {
-    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk_name, "BODY") ||
-	chunk_size != (num_participating_players + 1) * tape.length)
-    {
-      Error(ERR_WARN, "wrong 'BODY' chunk of tape file '%s'", filename);
-      fclose(file);
-      return;
-    }
-  }
-
-#if DEBUG
-  printf("\nTAPE OF LEVEL %d\n", level_nr);
-#endif
-
-  for(i=0; i<tape.length; i++)
-  {
-    if (i >= MAX_TAPELEN)
-      break;
-
-    for(j=0; j<MAX_PLAYERS; j++)
-    {
-      tape.pos[i].action[j] = MV_NO_MOVING;
-
-      if (tape.player_participates[j])
-	tape.pos[i].action[j] = fgetc(file);
-
-#if DEBUG
-      {
-	int x = tape.pos[i].action[j];
-
-	printf("%d:%02x ", j, x);
-	printf("[%c%c%c%c|%c%c] - ",
-	       (x & JOY_LEFT ? '<' : ' '),
-	       (x & JOY_RIGHT ? '>' : ' '),
-	       (x & JOY_UP ? '^' : ' '),
-	       (x & JOY_DOWN ? 'v' : ' '),
-	       (x & JOY_BUTTON_1 ? '1' : ' '),
-	       (x & JOY_BUTTON_2 ? '2' : ' '));
-      }
-#endif
-
-    }
-
-    tape.pos[i].delay = fgetc(file);
-
-#if DEBUG
-    printf("[%03d]\n", tape.pos[i].delay);
-#endif
-
-    if (file_version == FILE_VERSION_1_0)
-    {
-      /* eliminate possible diagonal moves in old tapes */
-      /* this is only for backward compatibility */
-
-      byte joy_dir[4] = { JOY_LEFT, JOY_RIGHT, JOY_UP, JOY_DOWN };
-      byte action = tape.pos[i].action[0];
-      int k, num_moves = 0;
-
-      for (k=0; k<4; k++)
-      {
-	if (action & joy_dir[k])
-	{
-	  tape.pos[i + num_moves].action[0] = joy_dir[k];
-	  if (num_moves > 0)
-	    tape.pos[i + num_moves].delay = 0;
-	  num_moves++;
-	}
-      }
-
-      if (num_moves > 1)
-      {
-	num_moves--;
-	i += num_moves;
-	tape.length += num_moves;
-      }
-    }
-    else if (file_version < FILE_VERSION_2_0)
-    {
-      if (tape.pos[i].delay > 1)
-      {
-	/* action part */
-	tape.pos[i + 1] = tape.pos[i];
-	tape.pos[i + 1].delay = 1;
-
-	/* delay part */
-	for(j=0; j<MAX_PLAYERS; j++)
-	  tape.pos[i].action[j] = MV_NO_MOVING;
-	tape.pos[i].delay--;
-
-	i++;
-	tape.length++;
-      }
-    }
-
-    if (feof(file))
-      break;
-  }
-
-  fclose(file);
-
-  if (i != tape.length)
-    Error(ERR_WARN, "level recording file '%s' corrupted", filename);
-
-  tape.length_seconds = GetTapeLength();
 }
 
 static int LoadTape_VERS(FILE *file, int chunk_size, struct TapeInfo *tape)
@@ -1770,26 +1188,6 @@ void LoadTape(int level_nr)
   if (!(file = fopen(filename, MODE_READ)))
     return;
 
-#if 0
-  /* check file identifier */
-  fgets(cookie, MAX_LINE_LEN, file);
-  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
-    cookie[strlen(cookie) - 1] = '\0';
-
-  if (!checkCookieString(cookie, TAPE_COOKIE))	/* unknown file format */
-  {
-    Error(ERR_WARN, "unknown format of tape file '%s'", filename);
-    fclose(file);
-    return;
-  }
-
-  if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
-  {
-    Error(ERR_WARN, "unsupported version of level file '%s'", filename);
-    fclose(file);
-    return;
-  }
-#else
   getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
   if (strcmp(chunk_name, "RND1") == 0)
   {
@@ -1810,7 +1208,7 @@ void LoadTape(int level_nr)
     if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
       cookie[strlen(cookie) - 1] = '\0';
 
-    if (!checkCookieString(cookie, TAPE_COOKIE)) /* unknown file format */
+    if (!checkCookieString(cookie, TAPE_COOKIE_TMPL))
     {
       Error(ERR_WARN, "unknown format of tape file '%s'", filename);
       fclose(file);
@@ -1824,7 +1222,6 @@ void LoadTape(int level_nr)
       return;
     }
   }
-#endif
 
   tape.game_version = tape.file_version;
 
@@ -1894,81 +1291,6 @@ void LoadTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
-void OLD_SaveTape(int level_nr)
-{
-  int i;
-  char *filename = getTapeFilename(level_nr);
-  FILE *file;
-  boolean new_tape = TRUE;
-  byte store_participating_players;
-  int num_participating_players;
-
-  InitTapeDirectory(leveldir_current->filename);
-
-  /* if a tape still exists, ask to overwrite it */
-  if (access(filename, F_OK) == 0)
-  {
-    new_tape = FALSE;
-    if (!Request("Replace old tape ?", REQ_ASK))
-      return;
-  }
-
-  /* count number of players and set corresponding bits for compact storage */
-  store_participating_players = 0;
-  num_participating_players = 0;
-  for(i=0; i<MAX_PLAYERS; i++)
-  {
-    if (tape.player_participates[i])
-    {
-      num_participating_players++;
-      store_participating_players |= (1 << i);
-    }
-  }
-
-  if (!(file = fopen(filename, MODE_WRITE)))
-  {
-    Error(ERR_WARN, "cannot save level recording file '%s'", filename);
-    return;
-  }
-
-  fputs(TAPE_COOKIE, file);		/* file identifier */
-  fputc('\n', file);
-
-  putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
-
-  putFile32BitInteger(file, tape.random_seed, BYTE_ORDER_BIG_ENDIAN);
-  putFile32BitInteger(file, tape.date, BYTE_ORDER_BIG_ENDIAN);
-  putFile32BitInteger(file, tape.length, BYTE_ORDER_BIG_ENDIAN);
-
-  fputc(store_participating_players, file);
-
-  for(i=0; i<TAPE_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
-    fputc(0, file);
-
-  putFileChunk(file, "BODY", (num_participating_players + 1) * tape.length,
-	       BYTE_ORDER_BIG_ENDIAN);
-
-  for(i=0; i<tape.length; i++)
-  {
-    int j;
-
-    for(j=0; j<MAX_PLAYERS; j++)
-      if (tape.player_participates[j])
-	fputc(tape.pos[i].action[j], file);
-
-    fputc(tape.pos[i].delay, file);
-  }
-
-  fclose(file);
-
-  SetFilePermissions_Tape(filename);
-
-  tape.changed = FALSE;
-
-  if (new_tape)
-    Request("tape saved !", REQ_CONFIRM);
-}
-
 static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
 {
   int i;
@@ -2034,16 +1356,11 @@ void SaveTape(int level_nr)
 
   body_chunk_size = (num_participating_players + 1) * tape.length;
 
-#if 0
-  fputs(TAPE_COOKIE, file);		/* file identifier */
-  fputc('\n', file);
-#else
   putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
   putFileChunk(file, "TAPE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
 
   putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
   WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
-#endif
 
   putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
   SaveTape_HEAD(file, &tape);
@@ -2129,21 +1446,12 @@ void LoadScore(int level_nr)
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
     cookie[strlen(cookie) - 1] = '\0';
 
-#if 0
-  if (strcmp(cookie, SCORE_COOKIE) != 0)
-  {
-    Error(ERR_WARN, "wrong file identifier of score file '%s'", filename);
-    fclose(file);
-    return;
-  }
-#else
-  if (!checkCookieString(cookie, SCORE_COOKIE))	/* unknown file format */
+  if (!checkCookieString(cookie, SCORE_COOKIE))
   {
     Error(ERR_WARN, "unknown format of score file '%s'", filename);
     fclose(file);
     return;
   }
-#endif
 
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
@@ -2205,12 +1513,6 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_SOUND_LOOPS		2
 #define SETUP_TOKEN_SOUND_MUSIC		3
 #define SETUP_TOKEN_SOUND_SIMPLE	4
-
-#if 0
-#define SETUP_TOKEN_TOONS		5
-#define SETUP_TOKEN_DOUBLE_BUFFERING	6
-#endif
-
 #define SETUP_TOKEN_SCROLL_DELAY	5
 #define SETUP_TOKEN_SOFT_SCROLLING	6
 #define SETUP_TOKEN_FADING		7
@@ -2282,12 +1584,6 @@ static struct
   { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
   { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
   { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
-
-#if 0
-  { TYPE_SWITCH,  &si.toons,		"toons"				},
-  { TYPE_SWITCH,  &si.double_buffering,	"double_buffering"		},
-#endif
-
   { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
   { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
   { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
