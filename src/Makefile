@@ -22,7 +22,7 @@ ifdef X11_PATH			# path to X11 specified by top level Makefile
 XINC_PATH = $(X11_PATH)/include
 XLIB_PATH = $(X11_PATH)/lib
 X11_INCL = -I$(XINC_PATH)
-X11_LIBS = -L$(XLIB_PATH)
+X11_LIBS = -L$(XLIB_PATH) -lX11
 endif
 
 AR = ar
@@ -55,7 +55,7 @@ endif
 
 ifeq ($(PLATFORM),macosx)
 PLATFORM = unix
-TARGET=sdl
+TARGET = sdl
 endif
 
 ifeq ($(PLATFORM),os2)
@@ -64,7 +64,7 @@ PROGNAME = ../$(PROGBASE).exe
 EXTRA_CFLAGS = -Zbin-files -D__ST_MT_ERRNO__ -Zmtd -fomit-frame-pointer
 EXTRA_LDFLAGS = -lsocket
 PLATFORM = unix
-TARGET=x11
+TARGET = x11
 endif
 
 ifeq ($(PLATFORM),unix)
@@ -85,16 +85,13 @@ endif
 
 ifeq ($(TARGET),x11)
 SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
-SYS_LDFLAGS = $(X11_LIBS) -lX11
+SYS_LDFLAGS = $(X11_LIBS)
 endif
 
 ifeq ($(TARGET),sdl)
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
-ifeq ($(PLATFORM),macosx)
-SYS_LDFLAGS = -lSDL_image -lSDL_mixer -lsmpeg $(shell sdl-config --libs)
-else
-SYS_LDFLAGS = -lSDL_image -lSDL_mixer -lSDL_net $(shell sdl-config --libs)
-endif
+SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
+SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --libs)
 endif
 
 ifeq ($(TARGET),allegro)
@@ -121,7 +118,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes

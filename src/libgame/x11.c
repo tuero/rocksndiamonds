@@ -425,12 +425,14 @@ inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
 
 inline void X11DestroyImage(XImage *ximage)
 {
+#if defined(TARGET_X11_NATIVE)
   /* this seems to be needed for OS/2, but does not hurt on other platforms */
   if (ximage->data != NULL)
   {
     free(ximage->data);
     ximage->data = NULL;
   }
+#endif	/* TARGET_X11_NATIVE */
 
   XDestroyImage(ximage);
 }

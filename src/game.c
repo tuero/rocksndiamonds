@@ -10051,7 +10051,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
   int center_element = Feld[x][y];	/* should always be non-moving! */
-  int border_trigger_element;
+  int border_trigger_element = EL_UNDEFINED;
   int i, j;
 
   for (i = 0; i < NUM_DIRECTIONS; i++)

@@ -1,3 +1,6 @@
+2004-06-07
+	* fixed bug with crash when writing user levelinfo.conf the first time
+
 2004-06-06
 	* added option "convert LEVELDIR [NR]" to command line batch commands
 	* re-converted Supaplex levels to apply latest engine fixes

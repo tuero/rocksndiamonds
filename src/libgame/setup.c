@@ -1593,23 +1593,23 @@ static LevelDirTree ldi;
 static struct TokenInfo levelinfo_tokens[] =
 {
   /* level directory info */
-  { TYPE_STRING,  &ldi.identifier,	"identifier"	},
-  { TYPE_STRING,  &ldi.name,		"name"		},
-  { TYPE_STRING,  &ldi.name_sorting,	"name_sorting"	},
-  { TYPE_STRING,  &ldi.author,		"author"	},
-  { TYPE_STRING,  &ldi.imported_from,	"imported_from"	},
-  { TYPE_INTEGER, &ldi.levels,		"levels"	},
-  { TYPE_INTEGER, &ldi.first_level,	"first_level"	},
-  { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"	},
-  { TYPE_BOOLEAN, &ldi.latest_engine,	"latest_engine"	},
-  { TYPE_BOOLEAN, &ldi.level_group,	"level_group"	},
-  { TYPE_BOOLEAN, &ldi.readonly,	"readonly"	},
-  { TYPE_STRING,  &ldi.graphics_set,	"graphics_set"	},
-  { TYPE_STRING,  &ldi.sounds_set,	"sounds_set"	},
-  { TYPE_STRING,  &ldi.music_set,	"music_set"	},
-  { TYPE_STRING,  &ldi.level_filename,	"filename"	},
-  { TYPE_STRING,  &ldi.level_filetype,	"filetype"	},
-  { TYPE_STRING,  &ldi.handicap,	"handicap"	}
+  { TYPE_STRING,	&ldi.identifier,	"identifier"	},
+  { TYPE_STRING,	&ldi.name,		"name"		},
+  { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"	},
+  { TYPE_STRING,	&ldi.author,		"author"	},
+  { TYPE_STRING,	&ldi.imported_from,	"imported_from"	},
+  { TYPE_INTEGER,	&ldi.levels,		"levels"	},
+  { TYPE_INTEGER,	&ldi.first_level,	"first_level"	},
+  { TYPE_INTEGER,	&ldi.sort_priority,	"sort_priority"	},
+  { TYPE_BOOLEAN,	&ldi.latest_engine,	"latest_engine"	},
+  { TYPE_BOOLEAN,	&ldi.level_group,	"level_group"	},
+  { TYPE_BOOLEAN,	&ldi.readonly,		"readonly"	},
+  { TYPE_STRING,	&ldi.graphics_set,	"graphics_set"	},
+  { TYPE_STRING,	&ldi.sounds_set,	"sounds_set"	},
+  { TYPE_STRING,	&ldi.music_set,		"music_set"	},
+  { TYPE_STRING,	&ldi.level_filename,	"filename"	},
+  { TYPE_STRING,	&ldi.level_filetype,	"filetype"	},
+  { TYPE_BOOLEAN,	&ldi.handicap,		"handicap"	}
 };
 
 static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
@@ -1786,6 +1786,8 @@ static void freeTreeInfo(TreeInfo *ldi)
 
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
+    checked_free(ldi->imported_from);
+
     checked_free(ldi->graphics_set);
     checked_free(ldi->sounds_set);
     checked_free(ldi->music_set);
@@ -1793,6 +1795,9 @@ static void freeTreeInfo(TreeInfo *ldi)
     checked_free(ldi->graphics_path);
     checked_free(ldi->sounds_path);
     checked_free(ldi->music_path);
+
+    checked_free(ldi->level_filename);
+    checked_free(ldi->level_filetype);
   }
 }
 
@@ -2628,7 +2633,9 @@ static void SaveUserLevelInfo()
   for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
     if (i != LEVELINFO_TOKEN_IDENTIFIER &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
-	i != LEVELINFO_TOKEN_IMPORTED_FROM)
+	i != LEVELINFO_TOKEN_IMPORTED_FROM &&
+	i != LEVELINFO_TOKEN_FILENAME &&
+	i != LEVELINFO_TOKEN_FILETYPE)
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
 
   fclose(file);

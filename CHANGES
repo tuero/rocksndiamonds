@@ -1,5 +1,23 @@
-Release Version 3.1.0 [?? ??? ????]
+Release Version 3.1.0 [07 JUN 2004]
 -----------------------------------
+	- fixed obvious bug with wrong "Murphy" graphics (when digging etc.)
+	- fixed a lot of Emerald Mine and Supaplex game engine emulation bugs
+	- re-converted Emerald Mine and Supaplex levels to apply engine fixes
+	- changed default snap/drop keys from left/right Shift to Control keys
+	- added level loader for loading native Emerald Mine levels
+	- added level loader for loading native Supaplex packed levels
+	- added group elements for multiple matches and random element creation
+	- added elements that can be digged or left behind by custom elements
+	- added element "Sokoban field with player" missing for Sokoban levels
+	- added custom element features to allow building of teleporters
+	- added option to use step limit instead of time limit for level
+	- added pressing "space" key as valid action to select menu options
+	- added clipboard (cut and paste buttons) for custom and group elements
+	- added shortcut to dump brush (type ":DB" in editor) for use in forum
+	- added network multiplayer code for Windows (still only command line)
+	- replaced old tutorial level set with far better one by Niko Böhm
+	- "contributions" levels now separate package to make base set smaller
+	- too many bugfixes and changes to list them all here (see ChangeLog)
 
 Release Version 3.0.8 [14 DEC 2003]
 -----------------------------------
