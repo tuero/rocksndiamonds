@@ -690,8 +690,6 @@ static void setTapeInfoToDefaults()
   int i;
 
   /* always start with reliable default values (empty tape) */
-  tape.file_version = FILE_VERSION_ACTUAL;
-  tape.game_version = GAME_VERSION_ACTUAL;
   TapeErase();
 
   /* default values (also for pre-1.2 tapes) with only the first player */
@@ -731,8 +729,7 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
   if (tape->file_version >= FILE_VERSION_1_2)
   {
     byte store_participating_players = fgetc(file);
-
-    ReadUnusedBytesFromFile(file, TAPE_HEADER_UNUSED);
+    int engine_version;
 
     /* since version 1.2, tapes store which players participate in the tape */
     tape->num_participating_players = 0;
@@ -747,7 +744,11 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
       }
     }
 
-    ReadUnusedBytesFromFile(file, 4);
+    ReadUnusedBytesFromFile(file, TAPE_HEADER_UNUSED);
+
+    engine_version = getFileVersion(file);
+    if (engine_version > 0)
+      tape->engine_version = engine_version;
   }
 
   return chunk_size;
@@ -977,9 +978,10 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
 
   fputc(store_participating_players, file);
 
+  /* unused bytes not at the end here for 4-byte alignment of engine_version */
   WriteUnusedBytesToFile(file, TAPE_HEADER_UNUSED);
 
-  WriteUnusedBytesToFile(file, 4);
+  putFileVersion(file, tape->engine_version);
 }
 
 static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)

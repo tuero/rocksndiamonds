@@ -599,29 +599,10 @@ void InitGameSound()
 
 static void InitGameEngine()
 {
-  boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
-  boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
-  boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
-  int i, x, y;
-
-  for(y=0; y<lev_fieldy; y++)
-  {
-    for(x=0; x<lev_fieldx; x++)
-    {
-      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
-	emulate_bd = FALSE;
-      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
-	emulate_sb = FALSE;
-      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
-	emulate_sp = FALSE;
-    }
-  }
+  int i;
 
   game.engine_version = (tape.playing ? tape.engine_version :
 			 level.game_version);
-  game.emulation = (emulate_bd ? EMU_BOULDERDASH :
-		    emulate_sb ? EMU_SOKOBAN :
-		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
 #if 0
     printf("level %d: level version == %06d\n", level_nr, level.game_version);
@@ -681,6 +662,9 @@ static void InitGameEngine()
 
 void InitGame()
 {
+  boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
+  boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
+  boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
   int i, j, x, y;
 
   InitGameEngine();
@@ -817,8 +801,23 @@ void InitGame()
   }
 
   for(y=0; y<lev_fieldy; y++)
+  {
     for(x=0; x<lev_fieldx; x++)
+    {
+      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
+	emulate_bd = FALSE;
+      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
+	emulate_sb = FALSE;
+      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
+	emulate_sp = FALSE;
+
       InitField(x, y, TRUE);
+    }
+  }
+
+  game.emulation = (emulate_bd ? EMU_BOULDERDASH :
+		    emulate_sb ? EMU_SOKOBAN :
+		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
   /* correct non-moving belts to start moving left */
   for (i=0; i<4; i++)
@@ -5199,7 +5198,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 #else
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
-      !(tape.playing && tape.game_version < GAME_VERSION_2_0))
+      !(tape.playing && tape.file_version < FILE_VERSION_2_0))
     return FALSE;
 #endif
 
@@ -6063,7 +6062,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.game_version < GAME_VERSION_2_0) &&
+	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	  element != EL_SPRING)
 	return MF_NO_ACTION;
 #endif
@@ -6305,7 +6304,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.game_version < GAME_VERSION_2_0) &&
+	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	  element != EL_BALLOON)
 	return MF_NO_ACTION;
 #endif
