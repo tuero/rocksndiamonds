@@ -1,5 +1,7 @@
 Pre-Release Version 2.2.0rc7 [?? ??? ????]
 ------------------------------------------
+	- fixed bug when picking element in the editor
+	- added more custom elements properties
 
 Pre-Release Version 2.2.0rc6 [22 APR 2003]
 ------------------------------------------

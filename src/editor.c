@@ -5020,7 +5020,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_FLOOD_FILL:
     case GADGET_ID_GRAB_BRUSH:
     case GADGET_ID_PICK_ELEMENT:
-      last_drawing_function = drawing_function;
+      if (drawing_function != GADGET_ID_PICK_ELEMENT)
+	last_drawing_function = drawing_function;
       drawing_function = id;
       draw_with_brush = FALSE;
       break;

@@ -5153,24 +5153,6 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 
 #if 0
-  {
-    static boolean done = FALSE;
-    static old_count = -1;
-
-    if (FrameCounter < old_count)
-      done = FALSE;
-
-    if (FrameCounter < 100)
-    {
-      printf("::: wanna move [%d] [%d]\n",
-	     FrameCounter, player->push_delay_value);
-      done = TRUE;
-      old_count = FrameCounter;
-    }
-  }
-#endif
-
-#if 0
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
       !tape.playing)
     return FALSE;
@@ -5756,24 +5738,6 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
-#if 0
-  {
-    static boolean done = FALSE;
-
-    if (FrameCounter < 10)
-      done = FALSE;
-
-    if (!done &&
-	real_dx == -1 &&
-	FrameCounter > 10)
-    {
-      printf("::: wanna move left [%d] [%d]\n",
-	     FrameCounter, player->push_delay_value);
-      done = TRUE;
-    }
-  }
-#endif
-
   if (player->MovPos == 0)
   {
     player->is_digging = FALSE;
@@ -5787,6 +5751,7 @@ int DigField(struct PlayerInfo *player,
   {
     player->Switching = FALSE;
     player->push_delay = 0;
+
     return MF_NO_ACTION;
   }
 
@@ -5830,6 +5795,12 @@ int DigField(struct PlayerInfo *player,
   }
 
   element = Feld[x][y];
+
+#if 1
+  if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
+      game.engine_version >= VERSION_IDENT(2,2,0))
+    return MF_NO_ACTION;
+#endif
 
   switch (element)
   {
@@ -6529,6 +6500,9 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
 
+  if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0))
+    return FALSE;
+
   if (!player->active || !IN_LEV_FIELD(x, y))
     return FALSE;
 
@@ -6559,7 +6533,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 		    dy < 0 ? MV_UP :
 		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
 
-  if (!DigField(player, x, y, 0, 0, DF_SNAP))
+  if (DigField(player, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
     return FALSE;
 
   player->snapped = TRUE;

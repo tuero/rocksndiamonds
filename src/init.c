@@ -1474,6 +1474,37 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_switchable[] =
+  {
+    EL_ROBOT_WHEEL,
+    EL_SP_TERMINAL,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
+    EL_SWITCHGATE_SWITCH_UP,
+    EL_SWITCHGATE_SWITCH_DOWN,
+    EL_LIGHT_SWITCH,
+    EL_LIGHT_SWITCH_ACTIVE,
+    EL_TIMEGATE_SWITCH,
+    EL_BALLOON_SWITCH_LEFT,
+    EL_BALLOON_SWITCH_RIGHT,
+    EL_BALLOON_SWITCH_UP,
+    EL_BALLOON_SWITCH_DOWN,
+    EL_BALLOON_SWITCH_ANY,
+    EL_LAMP,
+    EL_TIME_ORB_FULL,
+    -1
+  };
+
   static int ep_dont_touch[] =
   {
     EL_BUG,
@@ -2216,6 +2247,7 @@ void InitElementPropertiesStatic()
     { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
     { ep_can_move,		EP_CAN_MOVE		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
+    { ep_switchable,		EP_SWITCHABLE		},
     { ep_dont_touch,		EP_DONT_TOUCH		},
     { ep_enemy,			EP_ENEMY		},
     { ep_dont_go_to,		EP_DONT_GO_TO		},
@@ -2355,6 +2387,12 @@ void InitElementPropertiesEngine(int engine_version)
 
     SET_PROPERTY(i, EP_ACCESSIBLE, (IS_WALKABLE(i) ||
 				    IS_PASSABLE(i)));
+
+    /* ---------- SNAPPABLE ------------------------------------------------ */
+    SET_PROPERTY(i, EP_SNAPPABLE, (IS_DIGGABLE(i) ||
+				   IS_COLLECTIBLE(i) ||
+				   IS_SWITCHABLE(i) ||
+				   i == EL_BD_ROCK));
 
     /* ---------- WALL ----------------------------------------------------- */
     SET_PROPERTY(i, EP_WALL, TRUE);	/* default: element is wall */
