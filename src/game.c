@@ -591,6 +591,18 @@ void InitGame()
   DrawAllPlayers();
   FadeToFront();
 
+
+#if 1
+
+  if (setup.soft_scrolling)
+    XCopyArea(display, fieldbuffer, backbuffer, gc,
+	      FX, FY, SXSIZE, SYSIZE, SX, SY);
+
+  redraw_mask |= REDRAW_FROM_BACKBUFFER;
+
+#endif
+
+
   /* copy default game door content to main double buffer */
   XCopyArea(display, pix[PIX_DOOR], drawto, gc,
 	    DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);

@@ -94,12 +94,6 @@ void BackToFront()
   if (redraw_mask & REDRAW_FIELD)
     redraw_mask &= ~REDRAW_TILES;
 
-  /*
-  if (redraw_mask & REDRAW_FIELD ||
-      (ScreenGfxPos && setup.soft_scrolling && game_status == PLAYING))
-    redraw_mask &= ~REDRAW_TILES;
-  */
-
   if (!redraw_mask)
     return;
 
@@ -109,12 +103,6 @@ void BackToFront()
      although we could go on doing calculations for the next frame */
 
   XSync(display, FALSE);
-
-  /*
-#ifdef MSDOS
-  wait_for_vsync = TRUE;
-#endif
-  */
 
   if (redraw_mask & REDRAW_ALL)
   {
@@ -443,10 +431,10 @@ void DrawAllPlayers()
 
 void DrawPlayerField(int x, int y)
 {
-  if (!IS_PLAYER(x,y))
+  if (!IS_PLAYER(x, y))
     return;
 
-  DrawPlayer(PLAYERINFO(x,y));
+  DrawPlayer(PLAYERINFO(x, y));
 }
 
 void DrawPlayer(struct PlayerInfo *player)
@@ -477,10 +465,6 @@ void DrawPlayer(struct PlayerInfo *player)
     return;
 
   /* draw things in the field the player is leaving, if needed */
-
-  /*
-  if (last_jx != jx || last_jy != jy)
-  */
 
   if (player_is_moving)
   {
@@ -654,10 +638,6 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(sx, sy, graphic + phase);
   }
 
-  /*
-  if ((last_jx != jx || last_jy != jy) && last_element == EL_EXPLODING)
-  */
-
   if (player_is_moving && last_element == EL_EXPLODING)
   {
     int phase = Frame[last_jx][last_jy];
@@ -792,56 +772,12 @@ void DrawGraphic(int x, int y, int graphic)
 
 void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
-
-#if 1
-
   int pixmap_nr;
   int src_x, src_y;
 
   getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
   XCopyArea(display, pix[pixmap_nr], d, gc,
 	    src_x, src_y, TILEX, TILEY, x, y);
-
-#else
-
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
-  {
-    graphic -= GFX_START_ROCKSSCREEN;
-    XCopyArea(display, pix[PIX_BACK], d, gc,
-	      SX + (graphic % GFX_PER_LINE) * TILEX,
-	      SY + (graphic / GFX_PER_LINE) * TILEY,
-	      TILEX, TILEY, x, y);
-  }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
-  {
-    graphic -= GFX_START_ROCKSMORE;
-    XCopyArea(display, pix[PIX_MORE], d, gc,
-	      (graphic % MORE_PER_LINE) * TILEX,
-	      (graphic / MORE_PER_LINE) * TILEY,
-	      TILEX, TILEY, x, y);
-  }
-  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
-  {
-    graphic -= GFX_START_ROCKSHEROES;
-    XCopyArea(display, pix[PIX_HEROES], d, gc,
-	      (graphic % HEROES_PER_LINE) * TILEX,
-	      (graphic / HEROES_PER_LINE) * TILEY,
-	      TILEX, TILEY, x, y);
-  }
-  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
-  {
-    graphic -= GFX_START_ROCKSFONT;
-    XCopyArea(display, pix[PIX_BIGFONT], d, gc,
-	      (graphic % FONT_CHARS_PER_LINE) * TILEX,
-	      (graphic / FONT_CHARS_PER_LINE) * TILEY +
-	      FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY,
-	      TILEX, TILEY, x, y);
-  }
-  else
-    XFillRectangle(display, d, gc, x, y, TILEX, TILEY);
-
-#endif
-
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
@@ -861,9 +797,6 @@ void DrawGraphicThruMask(int x, int y, int graphic)
 
 void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
 {
-
-#if 1
-
   int tile = graphic;
   int pixmap_nr;
   int src_x, src_y;
@@ -876,46 +809,6 @@ void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
   getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
   src_pixmap = pix[pixmap_nr];
   drawing_gc = clip_gc[pixmap_nr];
-
-#else
-
-  int src_x, src_y;
-  int tile = graphic;
-  Pixmap src_pixmap;
-  GC drawing_gc;
-
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
-  {
-    src_pixmap = pix[PIX_BACK];
-    drawing_gc = clip_gc[PIX_BACK];
-    graphic -= GFX_START_ROCKSSCREEN;
-    src_x  = SX + (graphic % GFX_PER_LINE) * TILEX;
-    src_y  = SY + (graphic / GFX_PER_LINE) * TILEY;
-  }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
-  {
-    src_pixmap = pix[PIX_MORE];
-    drawing_gc = clip_gc[PIX_MORE];
-    graphic -= GFX_START_ROCKSMORE;
-    src_x  = (graphic % MORE_PER_LINE) * TILEX;
-    src_y  = (graphic / MORE_PER_LINE) * TILEY;
-  }
-  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
-  {
-    src_pixmap = pix[PIX_HEROES];
-    drawing_gc = clip_gc[PIX_HEROES];
-    graphic -= GFX_START_ROCKSHEROES;
-    src_x  = (graphic % HEROES_PER_LINE) * TILEX;
-    src_y  = (graphic / HEROES_PER_LINE) * TILEY;
-  }
-  else
-  {
-    DrawGraphicExt(d, gc, dest_x,dest_y, graphic);
-    return;
-  }
-
-#endif
-
 
   if (tile_clipmask[tile] != None)
   {
@@ -977,48 +870,12 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
 
 void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
-
-#if 1
-
   Pixmap pixmap;
   int src_x, src_y;
 
   getMiniGraphicSource(graphic, &pixmap, &src_x, &src_y);
   XCopyArea(display, pixmap, d, gc,
 	    src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
-
-#else
-
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
-  {
-    graphic -= GFX_START_ROCKSSCREEN;
-    XCopyArea(display, pix[PIX_BACK], d, gc,
-	      MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX,
-	      MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY,
-	      MINI_TILEX, MINI_TILEY, x, y);
-  }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
-  {
-    graphic -= GFX_START_ROCKSMORE;
-    XCopyArea(display, pix[PIX_MORE], d, gc,
-	      MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX,
-	      MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY,
-	      MINI_TILEX, MINI_TILEY, x, y);
-  }
-  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
-  {
-    graphic -= GFX_START_ROCKSFONT;
-    XCopyArea(display, pix[PIX_SMALLFONT], d, gc,
-	      (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE,
-	      (graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE +
-	      FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT,
-	      MINI_TILEX, MINI_TILEY, x, y);
-  }
-  else
-    XFillRectangle(display, d, gc, x, y, MINI_TILEX, MINI_TILEY);
-
-#endif
-
 }
 
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
@@ -1028,6 +885,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int cx = 0, cy = 0;
   int src_x, src_y, dest_x, dest_y;
   int tile = graphic;
+  int pixmap_nr;
   Pixmap src_pixmap;
   GC drawing_gc;
 
@@ -1101,32 +959,9 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
       MarkTileDirty(x, y + SIGN(dy));
   }
 
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
-  {
-    src_pixmap = pix[PIX_BACK];
-    drawing_gc = clip_gc[PIX_BACK];
-    graphic -= GFX_START_ROCKSSCREEN;
-    src_x  = SX + (graphic % GFX_PER_LINE) * TILEX + cx;
-    src_y  = SY + (graphic / GFX_PER_LINE) * TILEY + cy;
-  }
-  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
-  {
-    src_pixmap = pix[PIX_MORE];
-    drawing_gc = clip_gc[PIX_MORE];
-    graphic -= GFX_START_ROCKSMORE;
-    src_x  = (graphic % MORE_PER_LINE) * TILEX + cx;
-    src_y  = (graphic / MORE_PER_LINE) * TILEY + cy;
-  }
-  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
-  {
-    src_pixmap = pix[PIX_HEROES];
-    drawing_gc = clip_gc[PIX_HEROES];
-    graphic -= GFX_START_ROCKSHEROES;
-    src_x  = (graphic % HEROES_PER_LINE) * TILEX + cx;
-    src_y  = (graphic / HEROES_PER_LINE) * TILEY + cy;
-  }
-  else	/* big font graphics currently not allowed (and not needed) */
-    return;
+  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
+  src_pixmap = pix[pixmap_nr];
+  drawing_gc = clip_gc[pixmap_nr];
 
   dest_x = FX + x * TILEX + dx;
   dest_y = FY + y * TILEY + dy;
@@ -1608,24 +1443,6 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 
     if (steel_position != -1)
       DrawMiniGraphic(sx, sy, border[steel_position][steel_type]);
-
-
-#if 0
-    if (x == -1 && y == -1)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_LEFT);
-    else if (x == lev_fieldx && y == -1)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_RIGHT);
-    else if (x == -1 && y == lev_fieldy)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_LEFT);
-    else if (x == lev_fieldx && y == lev_fieldy)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_RIGHT);
-    else if (x == -1 || x == lev_fieldx)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_VERTICAL);
-    else if (y == -1 || y == lev_fieldy)
-      DrawMiniGraphic(sx, sy, GFX_STEEL_HORIZONTAL);
-#endif
-
-
   }
 }
 
@@ -1664,11 +1481,21 @@ void DrawLevel()
     for(y=BY1; y<=BY2; y++)
       DrawScreenField(x, y);
 
+
+#if 1
+
+  redraw_mask |= REDRAW_FIELD;
+
+#else
+
   if (setup.soft_scrolling)
     XCopyArea(display, fieldbuffer, backbuffer, gc,
 	      FX, FY, SXSIZE, SYSIZE, SX, SY);
 
   redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
+
+#endif
+
 }
 
 void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
@@ -2229,15 +2056,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	redraw_mask |= REDRAW_DOOR_2;
       }
 
-
-
-#if 1
       BackToFront();
-#else
-      XCopyArea(display, drawto, window, gc, DX, DY, DXSIZE, DYSIZE, DX, DY);
-#endif
-
-
 
       if (game_status == MAINMENU)
 	DoAnimation();
@@ -2436,105 +2255,6 @@ static void UnmapToolButtons()
 static void HandleToolButtons(struct GadgetInfo *gi)
 {
   request_gadget_id = gi->custom_id;
-
-
-#if 0
-  int id = gi->custom_id;
-
-  if (game_status != PLAYING)
-    return;
-
-  switch (id)
-  {
-    case GAME_CTRL_ID_STOP:
-      if (AllPlayersGone)
-      {
-	CloseDoor(DOOR_CLOSE_1);
-	game_status = MAINMENU;
-	DrawMainMenu();
-	break;
-      }
-
-      if (Request("Do you really want to quit the game ?",
-		  REQ_ASK | REQ_STAY_CLOSED))
-      { 
-#ifndef MSDOS
-	if (options.network)
-	  SendToServer_StopPlaying();
-	else
-#endif
-	{
-	  game_status = MAINMENU;
-	  DrawMainMenu();
-	}
-      }
-      else
-	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
-      break;
-
-    case GAME_CTRL_ID_PAUSE:
-      if (options.network)
-      {
-#ifndef MSDOS
-	if (tape.pausing)
-	  SendToServer_ContinuePlaying();
-	else
-	  SendToServer_PausePlaying();
-#endif
-      }
-      else
-	TapeTogglePause();
-      break;
-
-    case GAME_CTRL_ID_PLAY:
-      if (tape.pausing)
-      {
-#ifndef MSDOS
-	if (options.network)
-	  SendToServer_ContinuePlaying();
-	else
-#endif
-	{
-	  tape.pausing = FALSE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
-	}
-      }
-      break;
-
-    case SOUND_CTRL_ID_MUSIC:
-      if (setup.sound_music)
-      { 
-	setup.sound_music = FALSE;
-	FadeSound(background_loop[level_nr % num_bg_loops]);
-      }
-      else if (sound_loops_allowed)
-      { 
-	setup.sound = setup.sound_music = TRUE;
-	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
-      }
-      break;
-
-    case SOUND_CTRL_ID_LOOPS:
-      if (setup.sound_loops)
-	setup.sound_loops = FALSE;
-      else if (sound_loops_allowed)
-	setup.sound = setup.sound_loops = TRUE;
-      break;
-
-    case SOUND_CTRL_ID_SIMPLE:
-      if (setup.sound_simple)
-	setup.sound_simple = FALSE;
-      else if (sound_status==SOUND_AVAILABLE)
-	setup.sound = setup.sound_simple = TRUE;
-      break;
-
-    default:
-      break;
-  }
-#endif
-
-
-
 }
 
 int el2gfx(int element)

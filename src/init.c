@@ -628,44 +628,11 @@ void InitGfx()
       int tile = tile_needs_clipping[i].start + j;
       int graphic = tile;
       int src_x, src_y;
-      Pixmap src_pixmap;
-
-#if 0
-      if (graphic >= GFX_START_ROCKSSCREEN &&
-	  graphic <= GFX_END_ROCKSSCREEN)
-      {
-	src_pixmap = clipmask[PIX_BACK];
-	graphic -= GFX_START_ROCKSSCREEN;
-	src_x = SX + (graphic % GFX_PER_LINE) * TILEX;
-	src_y = SY + (graphic / GFX_PER_LINE) * TILEY;
-      }
-      else if (graphic >= GFX_START_ROCKSHEROES &&
-	       graphic <= GFX_END_ROCKSHEROES)
-      {
-	src_pixmap = clipmask[PIX_HEROES];
-	graphic -= GFX_START_ROCKSHEROES;
-	src_x = (graphic % HEROES_PER_LINE) * TILEX;
-	src_y = (graphic / HEROES_PER_LINE) * TILEY;
-      }
-      else if (graphic >= GFX_START_ROCKSFONT &&
-	       graphic <= GFX_END_ROCKSFONT)
-      {
-	src_pixmap = clipmask[PIX_BIGFONT];
-	graphic -= GFX_START_ROCKSFONT;
-	src_x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
-	src_y = (graphic / FONT_CHARS_PER_LINE) * TILEY +
-	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY;
-      }
-      else
-	break;
-#else
-
       int pixmap_nr;
+      Pixmap src_pixmap;
 
       getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
       src_pixmap = clipmask[pixmap_nr];
-
-#endif
 
       tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
 
