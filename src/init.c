@@ -2071,14 +2071,14 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_by_fire[] =
+  static int ep_explodes_by_fire[] =
   {
-    /* same elements as in 'ep_can_explode_impact' */
+    /* same elements as in 'ep_explodes_impact' */
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
 
-    /* same elements as in 'ep_can_explode_smashed' */
+    /* same elements as in 'ep_explodes_smashed' */
     EL_SATELLITE,
     EL_PIG,
     EL_DRAGON,
@@ -2107,9 +2107,9 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_smashed[] =
+  static int ep_explodes_smashed[] =
   {
-    /* same elements as in 'ep_can_explode_impact' */
+    /* same elements as in 'ep_explodes_impact' */
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
@@ -2122,7 +2122,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_impact[] =
+  static int ep_explodes_impact[] =
   {
     EL_BOMB,
     EL_SP_DISK_ORANGE,
@@ -2214,7 +2214,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_1x1[] =
+  static int ep_explodes_1x1_old[] =
   {
     -1
   };
@@ -2238,13 +2238,27 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode_cross[] =
+  static int ep_explodes_cross_old[] =
   {
     -1
   };
 
   static int ep_protected[] =
   {
+    /* same elements as in 'ep_walkable_inside' */
+    EL_TUBE_ANY,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN,
+
+    /* same elements as in 'ep_passable_over' */
     EL_EM_GATE_1,
     EL_EM_GATE_2,
     EL_EM_GATE_3,
@@ -2255,11 +2269,60 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
+
+    /* same elements as in 'ep_passable_inside' */
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_UP,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_GRAVITY_PORT_DOWN,
     -1
   };
 
   static int ep_throwable[] =
   {
+    -1
+  };
+
+  static int ep_can_explode[] =
+  {
+    /* same elements as in 'ep_explodes_impact' */
+    EL_BOMB,
+    EL_SP_DISK_ORANGE,
+    EL_DX_SUPABOMB,
+
+    /* same elements as in 'ep_explodes_smashed' */
+    EL_SATELLITE,
+    EL_PIG,
+    EL_DRAGON,
+    EL_MOLE,
+
+    /* elements that can explode by explosion or by dragonfire */
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNAMITE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
+    EL_SP_DISK_RED_ACTIVE,
+    EL_BUG,
+    EL_PENGUIN,
+    EL_SP_DISK_RED,
+    EL_SP_DISK_YELLOW,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+
+    /* elements that can explode only by explosion */
+    EL_BLACK_ORB,
     -1
   };
 
@@ -3058,9 +3121,9 @@ void InitElementPropertiesStatic()
     { ep_can_smash_player,	EP_CAN_SMASH_PLAYER	},
     { ep_can_smash_enemies,	EP_CAN_SMASH_ENEMIES	},
     { ep_can_smash_everything,	EP_CAN_SMASH_EVERYTHING	},
-    { ep_can_explode_by_fire,	EP_CAN_EXPLODE_BY_FIRE	},
-    { ep_can_explode_smashed,	EP_CAN_EXPLODE_SMASHED	},
-    { ep_can_explode_impact,	EP_CAN_EXPLODE_IMPACT	},
+    { ep_explodes_by_fire,	EP_EXPLODES_BY_FIRE	},
+    { ep_explodes_smashed,	EP_EXPLODES_SMASHED	},
+    { ep_explodes_impact,	EP_EXPLODES_IMPACT	},
     { ep_walkable_over,		EP_WALKABLE_OVER	},
     { ep_walkable_inside,	EP_WALKABLE_INSIDE	},
     { ep_walkable_under,	EP_WALKABLE_UNDER	},
@@ -3068,11 +3131,12 @@ void InitElementPropertiesStatic()
     { ep_passable_inside,	EP_PASSABLE_INSIDE	},
     { ep_passable_under,	EP_PASSABLE_UNDER	},
     { ep_droppable,		EP_DROPPABLE		},
-    { ep_can_explode_1x1,	EP_CAN_EXPLODE_1X1	},
+    { ep_explodes_1x1_old,	EP_EXPLODES_1X1_OLD	},
     { ep_pushable,		EP_PUSHABLE		},
-    { ep_can_explode_cross,	EP_CAN_EXPLODE_CROSS	},
+    { ep_explodes_cross_old,	EP_EXPLODES_CROSS_OLD	},
     { ep_protected,		EP_PROTECTED		},
     { ep_throwable,		EP_THROWABLE		},
+    { ep_can_explode,		EP_CAN_EXPLODE		},
 
     { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
@@ -3184,7 +3248,7 @@ void InitElementPropertiesEngine(int engine_version)
     EP_DONT_TOUCH,
     EP_DONT_RUN_INTO,
     EP_GEM,
-    EP_CAN_EXPLODE_BY_FIRE,
+    EP_EXPLODES_BY_FIRE,
     EP_PUSHABLE,
     EP_PLAYER,
     EP_HAS_CONTENT,
@@ -3304,7 +3368,7 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_DIGGABLE(i) &&
 					     !IS_COLLECTIBLE(i)));
 
-#if 1
+#if 0
     /* ---------- PROTECTED ------------------------------------------------ */
     if (IS_ACCESSIBLE_INSIDE(i))
       SET_PROPERTY(i, EP_PROTECTED, TRUE);
@@ -3361,11 +3425,14 @@ void InitElementPropertiesEngine(int engine_version)
 				   CAN_SMASH_ENEMIES(i) ||
 				   CAN_SMASH_EVERYTHING(i)));
 
+#if 0
     /* ---------- CAN_EXPLODE ---------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||
 				     CAN_EXPLODE_SMASHED(i) ||
 				     CAN_EXPLODE_IMPACT(i)));
+#endif
 
+#if 0
     /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
 #if 0
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (!CAN_EXPLODE_1X1(i) &&
@@ -3375,6 +3442,19 @@ void InitElementPropertiesEngine(int engine_version)
 					 !CAN_EXPLODE_1X1(i) &&
 					 !CAN_EXPLODE_CROSS(i)));
 #endif
+#endif
+
+    /* ---------- CAN_EXPLODE_BY_FIRE -------------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE_BY_FIRE, (CAN_EXPLODE(i) &&
+					     EXPLODES_BY_FIRE(i)));
+
+    /* ---------- CAN_EXPLODE_SMASHED -------------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE_SMASHED, (CAN_EXPLODE(i) &&
+					     EXPLODES_SMASHED(i)));
+
+    /* ---------- CAN_EXPLODE_IMPACT --------------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE_IMPACT, (CAN_EXPLODE(i) &&
+					    EXPLODES_IMPACT(i)));
 
     /* ---------- CAN_EXPLODE_BY_DRAGONFIRE -------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_DRAGONFIRE, CAN_EXPLODE_BY_FIRE(i));
@@ -3409,15 +3489,6 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
 				 IS_PASSABLE_INSIDE(i)));
-
-#if 0
-    if (i == EL_CUSTOM_START + 253)
-      printf("::: %d, %d, %d -> %d\n",
-	     CAN_EXPLODE_1X1(i),
-	     CAN_EXPLODE_3X3(i),
-	     CAN_EXPLODE_CROSS(i),
-	     CAN_EXPLODE(i));
-#endif
 
     /* ---------- CAN_CHANGE ----------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */

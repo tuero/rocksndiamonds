@@ -254,6 +254,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
+      element_info[element].explosion_type = EXPLODES_3X3;
       element_info[element].explosion_delay = 16;
       element_info[element].ignition_delay = 8;
 
@@ -267,7 +268,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].walk_to_action = 0;
       element_info[element].smash_targets = 0;
       element_info[element].deadliness = 0;
-      element_info[element].consistency = 0;
 
       element_info[element].can_explode_by_fire = FALSE;
       element_info[element].can_explode_smashed = FALSE;
@@ -1086,9 +1086,10 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   ei->explosion_delay = getFile8Bit(file);
   ei->ignition_delay = getFile8Bit(file);
+  ei->explosion_type = getFile8Bit(file);
 
   /* some free bytes for future custom property values and padding */
-  ReadUnusedBytesFromFile(file, 2);
+  ReadUnusedBytesFromFile(file, 1);
 
   /* read change property values */
 
@@ -2269,6 +2270,22 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
+  /* initialize "can_explode" field for old levels which did not store this */
+  if (level->game_version <= VERSION_IDENT(3,1,0,2))
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      if (EXPLODES_1X1_OLD(element))
+	element_info[element].explosion_type = EXPLODES_1X1;
+
+      SET_PROPERTY(element, EP_CAN_EXPLODE, (EXPLODES_BY_FIRE(element) ||
+					     EXPLODES_SMASHED(element) ||
+					     EXPLODES_IMPACT(element)));
+    }
+  }
+
 #if 0
   /* set default push delay values (corrected since version 3.0.7-1) */
   if (level->game_version < VERSION_IDENT(3,0,7,1))
@@ -2760,9 +2777,10 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
   putFile8Bit(file, ei->explosion_delay);
   putFile8Bit(file, ei->ignition_delay);
+  putFile8Bit(file, ei->explosion_type);
 
   /* some free bytes for future custom property values and padding */
-  WriteUnusedBytesToFile(file, 2);
+  WriteUnusedBytesToFile(file, 1);
 
   /* write change property values */
 

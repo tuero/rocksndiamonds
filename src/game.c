@@ -3067,8 +3067,14 @@ void Explode(int ex, int ey, int phase, int mode)
       if (IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
 #else
+#if 1
+      if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element) &&
+	  (x != ex || y != ey))
+	Back[x][y] = element;
+#else
       if (IS_WALKABLE(element) && IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
+#endif
 #endif
 
       /* ignite explodable elements reached by other explosion */
@@ -3593,13 +3599,21 @@ void Bang(int x, int y)
 	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
       break;
     default:
+#if 1
+      if (element_info[element].explosion_type == EXPLODES_CROSS)
+#else
       if (CAN_EXPLODE_CROSS(element))
+#endif
 #if 1
 	Explode(x, y, EX_PHASE_START, EX_TYPE_CROSS);
 #else
 	DynaExplode(x, y);
 #endif
+#if 1
+      else if (element_info[element].explosion_type == EXPLODES_1X1)
+#else
       else if (CAN_EXPLODE_1X1(element))
+#endif
 	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
       else
 	Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);

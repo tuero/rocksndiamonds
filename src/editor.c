@@ -429,7 +429,7 @@
 
 #define GADGET_ID_TIME_OR_STEPS		(GADGET_ID_SELECTBOX_FIRST + 0)
 #define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 1)
-#define GADGET_ID_CUSTOM_CONSISTENCY	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_CUSTOM_EXPLOSION_TYPE	(GADGET_ID_SELECTBOX_FIRST + 2)
 #define GADGET_ID_CUSTOM_DEADLINESS	(GADGET_ID_SELECTBOX_FIRST + 3)
 #define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 4)
 #define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 5)
@@ -507,30 +507,31 @@
 #define GADGET_ID_CAN_FALL_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 13)
 #define GADGET_ID_CAN_MOVE_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 14)
 #define GADGET_ID_DONT_COLLIDE_WITH	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CUSTOM_EXPLODE_RESULT	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 19)
-#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 20)
-#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 21)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 22)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 23)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 24)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 25)
-#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 26)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 27)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 28)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 29)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 30)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 31)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 32)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 33)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 34)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 35)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 27)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 31)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 32)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 33)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 34)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 35)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 37)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 38)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -638,7 +639,7 @@
 #define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	10
 #define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	11
 #define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	12
-#define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	13
+#define ED_SELECTBOX_ID_CUSTOM_EXPLOSION_TYPE	13
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	14
 #define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	15
 #define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	16
@@ -657,7 +658,7 @@
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE
 #define ED_SELECTBOX_ID_CUSTOM2_FIRST	ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS
-#define ED_SELECTBOX_ID_CUSTOM2_LAST	ED_SELECTBOX_ID_CUSTOM_CONSISTENCY
+#define ED_SELECTBOX_ID_CUSTOM2_LAST	ED_SELECTBOX_ID_CUSTOM_EXPLOSION_TYPE
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM1_FIRST
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM2_LAST
 
@@ -717,20 +718,21 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	20
 #define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	21
 #define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		22
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	23
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	24
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	25
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	26
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	27
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		28
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	29
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	30
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	31
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	32
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	33
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	34
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	23
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	24
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	25
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	26
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	27
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	28
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		29
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	30
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	31
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	32
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	33
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	34
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	35
 
-#define ED_NUM_CHECKBUTTONS			35
+#define ED_NUM_CHECKBUTTONS			36
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -1319,12 +1321,14 @@ static struct ValueTextInfo options_deadliness[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_consistency[] =
+static struct ValueTextInfo options_explosion_type[] =
 {
-  { EP_CAN_EXPLODE_3X3,		"can explode 3x3"		},
-  { EP_CAN_EXPLODE_CROSS,	"can explode 3+3"		},
-  { EP_CAN_EXPLODE_1X1,		"can explode 1x1"		},
+  { EXPLODES_3X3,		"3x3"				},
+  { EXPLODES_CROSS,		"3+3"				},
+  { EXPLODES_1X1,		"1x1"				},
+#if 0
   { EP_INDESTRUCTIBLE,		"indestructible"		},
+#endif
 
   { -1,				NULL				}
 };
@@ -1600,11 +1604,11 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
-    GADGET_ID_CUSTOM_CONSISTENCY,	GADGET_ID_NONE,
+    GADGET_ID_CUSTOM_EXPLOSION_TYPE,	GADGET_ID_NONE,
     -1,
-    options_consistency,
-    &custom_element.consistency,
-    NULL, NULL,				"consistency/destructibility"
+    options_explosion_type,
+    &custom_element.explosion_type,
+    "can explode", NULL,		"explosion type"
   },
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -2087,27 +2091,33 @@ static struct
     NULL, NULL,				"element can kill the player"
   },
   {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
+    &custom_element_properties[EP_INDESTRUCTIBLE],
+    NULL, "indestructible",		"element is indestructible"
+  },
+  {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
-    GADGET_ID_CUSTOM_EXPLODE_RESULT,	GADGET_ID_NONE,
-    &custom_element_properties[EP_EXPLODE_RESULT],
-    NULL, NULL,				"set consistency/destructibility"
+    GADGET_ID_CUSTOM_CAN_EXPLODE,	GADGET_ID_NONE,
+    &custom_element_properties[EP_CAN_EXPLODE],
+    NULL, NULL,				"element can explode"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,	GADGET_ID_NONE,
-    &custom_element.can_explode_by_fire,
+    &custom_element_properties[EP_EXPLODES_BY_FIRE],
     NULL, "by fire",			"element can explode by fire/explosion"
   },
   {
     -1,					ED_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,	GADGET_ID_CUSTOM_EXPLODE_FIRE,
-    &custom_element.can_explode_smashed,
+    &custom_element_properties[EP_EXPLODES_SMASHED],
     " ", "smashed",			"element can explode when smashed"
   },
   {
     -1,					ED_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,	GADGET_ID_CUSTOM_EXPLODE_SMASH,
-    &custom_element.can_explode_impact,
+    &custom_element_properties[EP_EXPLODES_IMPACT],
     " ", "impact",			"element can explode on impact"
   },
 
@@ -5845,19 +5855,28 @@ static void CopyCustomElementPropertiesToEditor(int element)
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
-  /* set consistency selectbox help value */
-  custom_element.consistency =
-    (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
+#if 0
+  /* set explosion type selectbox help value */
+  custom_element.explosion_type =
+    (
+#if 0
+     IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
+#endif
      CAN_EXPLODE_1X1(element) ? EP_CAN_EXPLODE_1X1 :
      CAN_EXPLODE_3X3(element) ? EP_CAN_EXPLODE_3X3 :
      CAN_EXPLODE_CROSS(element) ? EP_CAN_EXPLODE_CROSS :
-     custom_element.consistency);
-  custom_element_properties[EP_EXPLODE_RESULT] =
-    (IS_INDESTRUCTIBLE(element) ||
+     custom_element.explosion_type);
+  custom_element_properties[EP_CAN_EXPLODE_AT_ALL] =
+    (
+#if 0
+     IS_INDESTRUCTIBLE(element) ||
+#endif
      CAN_EXPLODE_1X1(element) ||
      CAN_EXPLODE_3X3(element) ||
      CAN_EXPLODE_CROSS(element));
+#endif
 
+#if 0
   /* special case: sub-settings dependent from main setting */
 #if 0
   custom_element.can_explode_by_fire = CAN_EXPLODE_BY_FIRE(element);
@@ -5870,6 +5889,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
     custom_element.can_explode_smashed = TRUE;
   if (CAN_EXPLODE_IMPACT(element))
     custom_element.can_explode_impact  = TRUE;
+#endif
 #endif
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -5952,7 +5972,9 @@ static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
   int access_type_and_layer;
+#if 0
   boolean can_explode;
+#endif
 
   /* mark that this custom element has been modified */
   custom_element.modified_settings = TRUE;
@@ -6017,17 +6039,22 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[custom_element.deadliness] =
     custom_element_properties[EP_DEADLY];
 
-  /* set consistency property from checkbox and selectbox */
+#if 0
+  /* set explosion type property from checkbox and selectbox */
+#if 0
   custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
+#endif
   custom_element_properties[EP_CAN_EXPLODE_1X1] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_3X3] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_CROSS] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
-  custom_element_properties[custom_element.consistency] =
-    custom_element_properties[EP_EXPLODE_RESULT];
+  custom_element_properties[custom_element.explosion_type] =
+    custom_element_properties[EP_CAN_EXPLODE_AT_ALL];
+#endif
 
+#if 0
   /* special case: sub-settings dependent from main setting */
 #if 0
   can_explode = (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
@@ -6051,6 +6078,7 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
       custom_element.can_explode_impact;
   }
+#endif
 #endif
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -6465,7 +6493,7 @@ static void DrawCustomContentArea()
   int id = ED_DRAWING_ID_CUSTOM_CONTENT;
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
   int x1 = right_gadget_border[GADGET_ID_CUSTOM_DEADLINESS];
-  int x2 = right_gadget_border[GADGET_ID_CUSTOM_CONSISTENCY];
+  int x2 = right_gadget_border[GADGET_ID_CUSTOM_EXPLOSION_TYPE];
   int x3 = right_gadget_border[GADGET_ID_CUSTOM_EXPLODE_IMPACT];
   int xoffset = ED_DRAWINGAREA_TEXT_DISTANCE;
 
@@ -7063,7 +7091,7 @@ static void DrawPropertiesConfig()
   {
     /* set position for checkbutton for "can move into acid" */
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
-      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
+      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 7 :
 		       HAS_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
