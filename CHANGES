@@ -1,6 +1,7 @@
 
-Release Version 1.2 [WILL HOPEFULLY SOON BE RELEASED...]
+Release Version 1.2.0 [5 DEC 1998]
 --------------------------------------------------------
+	- DOS/Windows version
 	- new WAV sound loader
 	- new PCX graphics loader
 	- network multiplayer games with upto four players
@@ -36,12 +37,12 @@ Release Version 1.2 [WILL HOPEFULLY SOON BE RELEASED...]
 	  level directory, standalone server execution and verbose
 	  execution
 
-Release Version 1.1 [NOT RELEASED]
+Release Version 1.1 [???] [NOT RELEASED]
 ----------------------------------
 	- new (but broken) GIF graphics loader to be independent
 	  from the XPM library and replace all graphics by GIFs.
 
-Release Version 1.0 [9 APR 97] [NOT RELEASED]
+Release Version 1.0 [9 APR 1997] [NOT RELEASED]
 ---------------------------------------------
 	- the game now contains many really playable levels,
 	  not only a few levels for testing
@@ -58,7 +59,11 @@ Release Version 1.0 [9 APR 97] [NOT RELEASED]
 	  to make it possible to go on with a game at any tape
 	  position
 
-Prerelease Version 0.9b [4 NOV 95]
+Prerelease Version 0.9b2 [21 NOV 1995] [NOT RELEASED]
+---------------------------------------------------
+	- new game elements
+
+Prerelease Version 0.9b [4 NOV 1995]
 ----------------------------------
 	- the game is now completely Freeware
 	- the game is now better playable by keyboard
@@ -74,6 +79,6 @@ Prerelease Version 0.9b [4 NOV 95]
 	- FreeBSD sound and joystick support (thanks to Jean-Marc
 	  Zucconi)
 
-Prerelease Version 0.9 [23 OCT 95]
+Prerelease Version 0.9 [23 OCT 1995]
 ----------------------------------
 	- first (pre)release version

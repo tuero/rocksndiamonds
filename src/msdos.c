@@ -741,14 +741,18 @@ int XPending(Display *display)
   /* mouse button event */
   if (mouse_b != last_mouse_b)
   {
-    for (i=1; i<4; i<<=1)
+    for (i=0; i<3; i++)		/* check all three mouse buttons */
     {
-      if ((last_mouse_b & i) != (mouse_b & i))
+      int bitmask = (1 << i);
+
+      if ((last_mouse_b & bitmask) != (mouse_b & bitmask))
       {
+	int mapping[3] = { 1, 3, 2 };
+
 	pending_events++;
         xbutton = (XButtonEvent *)&event_buffer[pending_events];
-        xbutton->type = (mouse_b & i ? ButtonPress : ButtonRelease);
-        xbutton->button = i;
+        xbutton->type = (mouse_b & bitmask ? ButtonPress : ButtonRelease);
+        xbutton->button = mapping[i];
 	xbutton->x = mouse_x - display->screens[display->default_screen].x;
 	xbutton->y = mouse_y - display->screens[display->default_screen].y;
       }

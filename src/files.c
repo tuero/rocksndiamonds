@@ -1151,16 +1151,16 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->player_name = getStringCopy(getLoginName());
 
   si->sound = TRUE;
-  si->sound_loops = FALSE;
-  si->sound_music = FALSE;
-  si->sound_simple = FALSE;
+  si->sound_loops = TRUE;
+  si->sound_music = TRUE;
+  si->sound_simple = TRUE;
   si->toons = TRUE;
   si->double_buffering = TRUE;
   si->direct_draw = !si->double_buffering;
-  si->scroll_delay = FALSE;
+  si->scroll_delay = TRUE;
   si->soft_scrolling = TRUE;
   si->fading = FALSE;
-  si->autorecord = FALSE;
+  si->autorecord = TRUE;
   si->quick_doors = FALSE;
 
   for (i=0; i<MAX_PLAYERS; i++)

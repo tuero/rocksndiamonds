@@ -445,6 +445,10 @@ void Error(int mode, char *format, ...)
   char *process_name = "";
   FILE *error = stderr;
 
+  /* display warnings only when running in verbose mode */
+  if (mode & ERR_WARN && !options.verbose)
+    return;
+
 #ifdef MSDOS
   if ((error = openErrorFile()) == NULL)
   {

@@ -804,6 +804,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   static unsigned long choose_delay = 0;
   static int redraw = TRUE;
   int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
+  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_page_entries;
 
   if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
@@ -851,7 +852,13 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (first_entry > 0 &&
 	(dy || DelayReached(&choose_delay, 150)))
     {
+#if 0
       first_entry--;
+#else
+      first_entry -= step;
+      if (first_entry < 0)
+	first_entry = 0;
+#endif
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
@@ -863,7 +870,13 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (first_entry + num_page_entries < num_leveldirs &&
 	(dy || DelayReached(&choose_delay, 150)))
     {
+#if 0
       first_entry++;
+#else
+      first_entry += step;
+      if (first_entry + num_page_entries > num_leveldirs)
+	first_entry = num_leveldirs - num_page_entries;
+#endif
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry + num_page_entries - 1);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
@@ -1120,12 +1133,18 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==7)
       {
+#if 0
 	if (setup.double_buffering)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.double_buffering = !setup.double_buffering;
 	setup.direct_draw = !setup.double_buffering;
+#else
+	DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	setup.double_buffering = TRUE;
+	setup.direct_draw = !setup.double_buffering;
+#endif
       }
       else if (y==8)
       {
