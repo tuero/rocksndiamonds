@@ -120,7 +120,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_UPPER
   },
   {
-    IMG_PLAYER1_LEFT_MOVING,
+    IMG_PLAYER1_MOVING_LEFT,
     -1, -1,
     -1, -1,
     -1,
@@ -131,7 +131,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_PLAYER1_RIGHT_MOVING,
+    IMG_PLAYER1_MOVING_RIGHT,
     -1, -1,
     -1, -1,
     -1,
@@ -142,7 +142,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_PENGUIN_LEFT_MOVING,
+    IMG_PENGUIN_MOVING_LEFT,
     -1, -1,
     -1, -1,
     -1,
@@ -153,7 +153,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_PENGUIN_RIGHT_MOVING,
+    IMG_PENGUIN_MOVING_RIGHT,
     -1, -1,
     -1, -1,
     -1,
@@ -164,7 +164,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_MOLE_LEFT_MOVING,
+    IMG_MOLE_MOVING_LEFT,
     -1, -1,
     -1, -1,
     -1,
@@ -175,7 +175,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_MOLE_RIGHT_MOVING,
+    IMG_MOLE_MOVING_RIGHT,
     -1, -1,
     -1, -1,
     -1,
@@ -186,7 +186,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_PIG_LEFT_MOVING,
+    IMG_PIG_MOVING_LEFT,
     -1, -1,
     -1, -1,
     -1,
@@ -197,7 +197,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_PIG_RIGHT_MOVING,
+    IMG_PIG_MOVING_RIGHT,
     -1, -1,
     -1, -1,
     -1,
@@ -208,7 +208,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_DRAGON_LEFT_MOVING,
+    IMG_DRAGON_MOVING_LEFT,
     -1, -1,
     -1, -1,
     -1,
@@ -219,7 +219,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_DRAGON_RIGHT_MOVING,
+    IMG_DRAGON_MOVING_RIGHT,
     -1, -1,
     -1, -1,
     -1,

@@ -626,37 +626,37 @@ void DrawPlayer(struct PlayerInfo *player)
     if (player->Pushing)
     {
       if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_LEFT_PUSHING;
+	graphic = IMG_SP_MURPHY_PUSHING_LEFT;
       else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_RIGHT_PUSHING;
+	graphic = IMG_SP_MURPHY_PUSHING_RIGHT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_LEFT_PUSHING;
+	graphic = IMG_SP_MURPHY_PUSHING_LEFT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_RIGHT_PUSHING;
+	graphic = IMG_SP_MURPHY_PUSHING_RIGHT;
     }
     else if (player->snapped)
     {
       if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_LEFT_SNAPPING;
+	graphic = IMG_SP_MURPHY_SNAPPING_LEFT;
       else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_RIGHT_SNAPPING;
+	graphic = IMG_SP_MURPHY_SNAPPING_RIGHT;
       else if (player->MovDir == MV_UP)
-	graphic = IMG_SP_MURPHY_UP_SNAPPING;
+	graphic = IMG_SP_MURPHY_SNAPPING_UP;
       else if (player->MovDir == MV_DOWN)
-	graphic = IMG_SP_MURPHY_DOWN_SNAPPING;
+	graphic = IMG_SP_MURPHY_SNAPPING_DOWN;
     }
     else if (action_moving)
     {
       if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_LEFT_MOVING;
+	graphic = IMG_SP_MURPHY_MOVING_LEFT;
       else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_RIGHT_MOVING;
+	graphic = IMG_SP_MURPHY_MOVING_RIGHT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_LEFT_MOVING;
+	graphic = IMG_SP_MURPHY_MOVING_LEFT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_RIGHT_MOVING;
+	graphic = IMG_SP_MURPHY_MOVING_RIGHT;
       else
-	graphic = IMG_SP_MURPHY_LEFT_MOVING;
+	graphic = IMG_SP_MURPHY_MOVING_LEFT;
 
       frame = getGraphicAnimationFrame(graphic, -1);
     }
@@ -667,20 +667,20 @@ void DrawPlayer(struct PlayerInfo *player)
   else
   {
     if (player->MovDir == MV_LEFT)
-      graphic = (player->Pushing ? IMG_PLAYER1_LEFT_PUSHING :
-		 player->is_moving ? IMG_PLAYER1_LEFT_MOVING :
+      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_LEFT :
+		 player->is_moving ? IMG_PLAYER1_MOVING_LEFT :
 		 IMG_PLAYER1_LEFT);
     else if (player->MovDir == MV_RIGHT)
-      graphic = (player->Pushing ? IMG_PLAYER1_RIGHT_PUSHING :
-		 player->is_moving ? IMG_PLAYER1_RIGHT_MOVING :
+      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_RIGHT :
+		 player->is_moving ? IMG_PLAYER1_MOVING_RIGHT :
 		 IMG_PLAYER1_RIGHT);
     else if (player->MovDir == MV_UP)
-      graphic = (player->Pushing ? IMG_PLAYER1_UP_PUSHING :
-		 player->is_moving ? IMG_PLAYER1_UP_MOVING :
+      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_UP :
+		 player->is_moving ? IMG_PLAYER1_MOVING_UP :
 		 IMG_PLAYER1_UP);
     else	/* MV_DOWN || MV_NO_MOVING */
-      graphic = (player->Pushing ? IMG_PLAYER1_DOWN_PUSHING :
-		 player->is_moving ? IMG_PLAYER1_DOWN_MOVING :
+      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_DOWN :
+		 player->is_moving ? IMG_PLAYER1_MOVING_DOWN :
 		 IMG_PLAYER1_DOWN);
 
     graphic = PLAYER_NR_GFX(graphic, player->index_nr);

@@ -3070,10 +3070,10 @@ void StartMoving(int x, int y)
 	int dir = MovDir[x][y];
 	int dx = (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
 	int dy = (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
-	int graphic = (dir == MV_LEFT	? IMG_FLAMES_LEFT1 :
-		       dir == MV_RIGHT	? IMG_FLAMES_RIGHT1 :
-		       dir == MV_UP	? IMG_FLAMES_UP1 :
-		       dir == MV_DOWN	? IMG_FLAMES_DOWN1 : IMG_EMPTY);
+	int graphic = (dir == MV_LEFT	? IMG_FLAMES1_LEFT :
+		       dir == MV_RIGHT	? IMG_FLAMES1_RIGHT :
+		       dir == MV_UP	? IMG_FLAMES1_UP :
+		       dir == MV_DOWN	? IMG_FLAMES1_DOWN : IMG_EMPTY);
 	int frame = getGraphicAnimationFrame(graphic, -1);
 
 	for (i=1; i<=3; i++)
