@@ -95,7 +95,7 @@
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
 /* values for the setting windows */
-#define ED_SETTINGS_XPOS		(MINI_TILEX + 8 * 1)
+#define ED_SETTINGS_XPOS		(MINI_TILEX + 8)
 #define ED_SETTINGS2_XPOS		MINI_TILEX
 #define ED_SETTINGS_YPOS		MINI_TILEY
 #define ED_SETTINGS2_YPOS		(ED_SETTINGS_YPOS + 12 * TILEY - 2)
@@ -1221,7 +1221,7 @@ static void CreateControlButtons()
     deco_ypos = (ED_ELEMENTLIST_YSIZE - MINI_TILEY) / 2;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
-		      GDI_INFO_TEXT, "choose element",
+		      GDI_INFO_TEXT, element_info[editor_element[i]],
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
 		      GDI_WIDTH, ED_ELEMENTLIST_XSIZE,
@@ -2334,7 +2334,7 @@ static void DrawPropertiesWindow()
 	    SY + ystart * MINI_TILEY - MINI_TILEY/2);
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    font_color, "Current Element");
+	    font_color, element_info[properties_element]);
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3506,11 +3506,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetDesign *design = &gi->deco.design;
+	struct GadgetDesign *gd = &gi->deco.design;
+	int element = editor_element[element_shift + i];
 
 	UnmapGadget(gi);
-	getMiniGraphicSource(el2gfx(editor_element[element_shift + i]),
-			     &design->pixmap, &design->x, &design->y);
+	getMiniGraphicSource(el2gfx(element), &gd->pixmap, &gd->x, &gd->y);
+	ModifyGadget(gi, GDI_INFO_TEXT, element_info[element], GDI_END);
 	MapGadget(gi);
       }
       break;

@@ -472,6 +472,7 @@ extern struct SetupFileList	*level_setup_list;
 extern char		*sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
+extern char		*element_info[];
 
 
 /* often used screen positions */
