@@ -1071,6 +1071,8 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_TURNING_LEFT,		"turning left"			},
   { MV_TURNING_RIGHT,		"turning right"			},
   { MV_WHEN_PUSHED,		"when pushed"			},
+  { MV_MAZE_RUNNER,		"maze runner style"		},
+  { MV_MAZE_HUNTER,		"maze hunter style"		},
   { -1,				NULL				}
 };
 
@@ -1146,9 +1148,10 @@ static struct ValueTextInfo options_change_direct_action[] =
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
   { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
   { CE_SWITCHED,		"switched ..."			},
-  { CE_COLLISION,		"collision ..."			},
-  { CE_IMPACT,			"impact"			},
-  { CE_SMASHED,			"smashed"			},
+  { CE_COLLISION_ACTIVE,	"hitting something ..."		},
+  { CE_COLLISION_PASSIVE,	"hit by something ..."		},
+  { CE_IMPACT,			"impact (on something)"		},
+  { CE_SMASHED,			"smashed (from above)"		},
   { -1,				NULL				}
 };
 
@@ -1163,6 +1166,8 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
   { CE_OTHER_IS_TOUCHING,	"touching ..."			},
+  { CE_OTHER_IS_COLL_ACTIVE,	"hitting ..."			},
+  { CE_OTHER_IS_COLL_PASSIVE,	"hit by ..."			},
   { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
   { CE_OTHER_IS_CHANGING,	"change of"			},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
@@ -1177,7 +1182,7 @@ static struct ValueTextInfo options_change_sides[] =
   { CH_SIDE_BOTTOM,		"bottom side"			},
   { CH_SIDE_LEFT_RIGHT,		"left/right side"		},
   { CH_SIDE_TOP_BOTTOM,		"top/bottom side"		},
-  { CH_SIDE_ANY,		"all sides"			},
+  { CH_SIDE_ANY,		"any side"			},
   { -1,				NULL				}
 };
 
@@ -2133,7 +2138,7 @@ static int editor_el_more[] =
   EL_BD_FIREFLY,
 
   EL_MOLE_LEFT,
-  EL_EMPTY,
+  EL_MAZE_RUNNER,
   EL_MOLE_RIGHT,
   EL_PACMAN,
 
@@ -4967,7 +4972,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_LEFT_BY_PLAYER) ? CE_LEFT_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_DROPPED_BY_PLAYER) ? CE_DROPPED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_SWITCHED) ? CE_SWITCHED :
-     HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
+     HAS_CHANGE_EVENT(element, CE_COLLISION_ACTIVE) ? CE_COLLISION_ACTIVE :
+     HAS_CHANGE_EVENT(element, CE_COLLISION_PASSIVE) ? CE_COLLISION_PASSIVE :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      custom_element_change.direct_action);
@@ -4983,6 +4989,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_COLL_ACTIVE) ? CE_OTHER_IS_COLL_ACTIVE :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_COLL_PASSIVE) ? CE_OTHER_IS_COLL_PASSIVE :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_SWITCHING) ? CE_OTHER_IS_SWITCHING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
@@ -5085,7 +5093,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_LEFT_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_DROPPED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_SWITCHED] = FALSE;
-  custom_element_change_events[CE_COLLISION] = FALSE;
+  custom_element_change_events[CE_COLLISION_ACTIVE] = FALSE;
+  custom_element_change_events[CE_COLLISION_PASSIVE] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
@@ -5101,6 +5110,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
   custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_COLL_ACTIVE] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_COLL_PASSIVE] = FALSE;
   custom_element_change_events[CE_OTHER_IS_SWITCHING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;
@@ -6817,7 +6828,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
   /* clicking into drawing area with pressed Control key picks element */
   if (GetKeyModState() & KMOD_Control)
+  {
+    last_drawing_function = drawing_function;
     actual_drawing_function = GADGET_ID_PICK_ELEMENT;
+  }
 
   switch (actual_drawing_function)
   {

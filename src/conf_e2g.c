@@ -2050,6 +2050,10 @@ element_to_graphic[] =
     IMG_STONEBLOCK
   },
   {
+    EL_MAZE_RUNNER,			-1, -1, FALSE,
+    IMG_MAZE_RUNNER
+  },
+  {
     EL_PLAYER_1,			-1, -1, FALSE,
     IMG_PLAYER_1
   },

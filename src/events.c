@@ -438,6 +438,8 @@ void HandleButton(int mx, int my, int button)
 	  printf("      GfxElement[%d][%d] == %d\n", x,y, GfxElement[x][y]);
 	  printf("      GfxAction[%d][%d] == %d\n", x,y, GfxAction[x][y]);
 	  printf("      GfxFrame[%d][%d] == %d\n", x,y, GfxFrame[x][y]);
+	  printf("      RunnerVisit[%d][%d] == %d\n", x,y, RunnerVisit[x][y]);
+	  printf("      PlayerVisit[%d][%d] == %d\n", x,y, PlayerVisit[x][y]);
 	  printf("\n");
 	}
       }

@@ -60,6 +60,8 @@ short			AmoebaCnt[MAX_NUM_AMOEBA];
 short			AmoebaCnt2[MAX_NUM_AMOEBA];
 short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 
@@ -434,9 +436,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "invisible steel wall"
   },
   {
-    "unused_63",
-    "unused",
-    "(not used)"
+    "maze_runner",
+    "maze_runner",
+    "maze runner"
   },
   {
     "dynabomb_increase_number",

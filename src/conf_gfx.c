@@ -2467,6 +2467,11 @@ struct ConfigInfo image_config[] =
   { "stoneblock.ypos",				"1"			},
   { "stoneblock.frames",			"1"			},
 
+  { "maze_runner",				"RocksHeroes.pcx"	},
+  { "maze_runner.xpos",				"15"			},
+  { "maze_runner.ypos",				"8"			},
+  { "maze_runner.frames",			"1"			},
+
   /* images for other elements and actions */
 
   { "player_1",					"RocksHeroes.pcx"	},

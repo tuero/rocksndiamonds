@@ -161,7 +161,7 @@
 #define CE_PRESSED_BY_PLAYER	2
 #define CE_PUSHED_BY_PLAYER	3
 #define CE_DROPPED_BY_PLAYER	4
-#define CE_COLLISION		5
+#define CE_COLLISION_ACTIVE	5
 #define CE_IMPACT		6
 #define CE_SMASHED		7
 #define CE_OTHER_IS_TOUCHING	8
@@ -172,8 +172,8 @@
 #define CE_OTHER_GETS_PUSHED	13
 #define CE_OTHER_GETS_COLLECTED	14
 #define CE_OTHER_GETS_DROPPED	15
-#define CE_BY_PLAYER		16	/* obsolete; now CE_BY_DIRECT_ACTION */
-#define CE_BY_COLLISION		17	/* obsolete; now CE_BY_DIRECT_ACTION */
+#define CE_BY_PLAYER_OBSOLETE	16	/* obsolete; now CE_BY_DIRECT_ACTION */
+#define CE_BY_COLLISION_OBSOLETE 17	/* obsolete; now CE_BY_DIRECT_ACTION */
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_OTHER_GETS_DIGGED	20
@@ -183,8 +183,11 @@
 #define CE_OTHER_GETS_LEFT	24
 #define CE_SWITCHED		25
 #define CE_OTHER_IS_SWITCHING	26
+#define CE_COLLISION_PASSIVE	27
+#define CE_OTHER_IS_COLL_ACTIVE	28
+#define CE_OTHER_IS_COLL_PASSIVE 29
 
-#define NUM_CHANGE_EVENTS	27
+#define NUM_CHANGE_EVENTS	30
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -224,6 +227,8 @@
 #define MV_BIT_TURNING_LEFT	8
 #define MV_BIT_TURNING_RIGHT	9
 #define MV_BIT_WHEN_PUSHED	10
+#define MV_BIT_MAZE_RUNNER	11
+#define MV_BIT_MAZE_HUNTER	12
 
 /* values for special move patterns for custom elements */
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
@@ -237,6 +242,9 @@
 #define MV_TURNING_LEFT		(1 << MV_BIT_TURNING_LEFT)
 #define MV_TURNING_RIGHT	(1 << MV_BIT_TURNING_RIGHT)
 #define MV_WHEN_PUSHED		(1 << MV_BIT_WHEN_PUSHED)
+#define MV_MAZE_RUNNER		(1 << MV_BIT_MAZE_RUNNER)
+#define MV_MAZE_HUNTER		(1 << MV_BIT_MAZE_HUNTER)
+#define MV_MAZE_RUNNER_STYLE	(MV_MAZE_RUNNER | MV_MAZE_HUNTER)
 
 /* values for slippery property for custom elements */
 #define SLIPPERY_ANY_RANDOM	0
@@ -514,7 +522,7 @@
 #define EL_BD_MAGIC_WALL		61
 #define EL_INVISIBLE_STEELWALL		62
 
-#define EL_UNUSED_63			63
+#define EL_MAZE_RUNNER			63
 
 #define EL_DYNABOMB_INCREASE_NUMBER	64
 #define EL_DYNABOMB_INCREASE_SIZE	65
@@ -1227,6 +1235,8 @@ struct PlayerInfo
 
   unsigned long actual_frame_counter;
 
+  int step_counter;
+
   int score;
   int gems_still_needed;
   int sokobanfields_still_needed;
@@ -1615,6 +1625,8 @@ extern short			AmoebaCnt[MAX_NUM_AMOEBA];
 extern short			AmoebaCnt2[MAX_NUM_AMOEBA];
 extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 

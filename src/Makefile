@@ -41,6 +41,7 @@ PROGNAME = ../$(PROGBASE).exe
 SYS_CFLAGS = -DTARGET_X11
 SYS_LDFLAGS = -s -lalleg
 
+
 else				# Unix or cross-compiling for MS-DOS and Win32
 
 RM = rm -f
@@ -76,7 +77,8 @@ endif
 
 ifeq ($(TARGET),x11)
 SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
-SYS_LDFLAGS = $(X11_LIBS) -lX11
+# SYS_LDFLAGS = $(X11_LIBS) -lX11
+SYS_LDFLAGS = $(XLIB_PATH)/libX11.a
 endif
 
 ifeq ($(TARGET),sdl)

@@ -1032,7 +1032,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
 
       /* order of checking and copying events to be mapped is important */
-      for (j = CE_BY_OTHER_ACTION; j >= CE_BY_PLAYER; j--)
+      for (j = CE_BY_OTHER_ACTION; j >= CE_BY_PLAYER_OBSOLETE; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 2))
 	{
@@ -1042,7 +1042,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
 
       /* order of checking and copying events to be mapped is important */
-      for (j = CE_OTHER_GETS_COLLECTED; j >= CE_COLLISION; j--)
+      for (j = CE_OTHER_GETS_COLLECTED; j >= CE_COLLISION_ACTIVE; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 1))
 	{
@@ -1058,11 +1058,11 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   {
     int element = EL_CUSTOM_START + i;
 
-    if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER) ||
-	HAS_CHANGE_EVENT(element, CE_BY_COLLISION))
+    if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE) ||
+	HAS_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE))
     {
-      SET_CHANGE_EVENT(element, CE_BY_PLAYER, FALSE);
-      SET_CHANGE_EVENT(element, CE_BY_COLLISION, FALSE);
+      SET_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE, FALSE);
+      SET_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE, FALSE);
 
       SET_CHANGE_EVENT(element, CE_BY_DIRECT_ACTION, TRUE);
     }
@@ -2945,9 +2945,18 @@ void LoadMusicInfo()
 
   new = &music_file_info;
 
+  printf("::: num_music == %d\n", num_music);
+
   for (i = 0; i < num_music; i++)
   {
     music = getMusicListEntry(i);
+
+#if 0
+    printf("::: %d [%08x]\n", i, music->filename);
+#endif
+
+    if (music->filename == NULL)
+      continue;
 
     if (strcmp(music->filename, UNDEFINED_FILENAME) == 0)
       continue;
@@ -2980,6 +2989,9 @@ void LoadMusicInfo()
     for (i = 0; i < num_music; i++)
     {
       music = getMusicListEntry(i);
+
+      if (music->filename == NULL)
+	continue;
 
       if (strcmp(basename, music->filename) == 0)
       {

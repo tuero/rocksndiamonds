@@ -144,6 +144,10 @@
 					Feld[x][y] == EL_EXIT_OPEN ||	\
 					Feld[x][y] == EL_ACID))
 
+#define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
+
 #define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
 
@@ -1050,6 +1054,8 @@ void InitGame()
 
     player->actual_frame_counter = 0;
 
+    player->step_counter = 0;
+
     player->last_move_dir = MV_NO_MOVING;
 
     player->is_waiting = FALSE;
@@ -1195,6 +1201,9 @@ void InitGame()
 
       ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
+
+      RunnerVisit[x][y] = 0;
+      PlayerVisit[x][y] = 0;
 
       GfxFrame[x][y] = 0;
       GfxRandom[x][y] = INIT_GFX_RANDOM();
@@ -3273,6 +3282,8 @@ inline static void TurnRoundExt(int x, int y)
   };
 
   int element = Feld[x][y];
+  int move_pattern = element_info[element].move_pattern;
+
   int old_move_dir = MovDir[x][y];
   int left_dir  = turn[old_move_dir].left;
   int right_dir = turn[old_move_dir].right;
@@ -3667,16 +3678,16 @@ inline static void TurnRoundExt(int x, int y)
       }
     }
   }
-  else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS ||
-	   element_info[element].move_pattern == MV_TURNING_LEFT ||
-	   element_info[element].move_pattern == MV_TURNING_RIGHT)
+  else if (move_pattern == MV_ALL_DIRECTIONS ||
+	   move_pattern == MV_TURNING_LEFT ||
+	   move_pattern == MV_TURNING_RIGHT)
   {
     boolean can_turn_left  = ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
     boolean can_turn_right = ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
-    if (element_info[element].move_pattern == MV_TURNING_LEFT)
+    if (move_pattern == MV_TURNING_LEFT)
       MovDir[x][y] = left_dir;
-    else if (element_info[element].move_pattern == MV_TURNING_RIGHT)
+    else if (move_pattern == MV_TURNING_RIGHT)
       MovDir[x][y] = right_dir;
     else if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -3689,24 +3700,24 @@ inline static void TurnRoundExt(int x, int y)
 
     MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
-  else if (element_info[element].move_pattern == MV_HORIZONTAL ||
-	   element_info[element].move_pattern == MV_VERTICAL)
+  else if (move_pattern == MV_HORIZONTAL ||
+	   move_pattern == MV_VERTICAL)
   {
-    if (element_info[element].move_pattern & old_move_dir)
+    if (move_pattern & old_move_dir)
       MovDir[x][y] = back_dir;
-    else if (element_info[element].move_pattern == MV_HORIZONTAL)
+    else if (move_pattern == MV_HORIZONTAL)
       MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
-    else if (element_info[element].move_pattern == MV_VERTICAL)
+    else if (move_pattern == MV_VERTICAL)
       MovDir[x][y] = (RND(2) ? MV_UP : MV_DOWN);
 
     MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
-  else if (element_info[element].move_pattern & MV_ANY_DIRECTION)
+  else if (move_pattern & MV_ANY_DIRECTION)
   {
-    MovDir[x][y] = element_info[element].move_pattern;
+    MovDir[x][y] = move_pattern;
     MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
-  else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE)
+  else if (move_pattern == MV_ALONG_LEFT_SIDE)
   {
     if (ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y))
       MovDir[x][y] = left_dir;
@@ -3716,7 +3727,7 @@ inline static void TurnRoundExt(int x, int y)
     if (MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
-  else if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
+  else if (move_pattern == MV_ALONG_RIGHT_SIDE)
   {
     if (ELEMENT_CAN_ENTER_FIELD(element, right_x, right_y))
       MovDir[x][y] = right_dir;
@@ -3726,13 +3737,12 @@ inline static void TurnRoundExt(int x, int y)
     if (MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
-  else if (element_info[element].move_pattern == MV_TOWARDS_PLAYER ||
-	   element_info[element].move_pattern == MV_AWAY_FROM_PLAYER)
+  else if (move_pattern == MV_TOWARDS_PLAYER ||
+	   move_pattern == MV_AWAY_FROM_PLAYER)
   {
     int attr_x = -1, attr_y = -1;
     int newx, newy;
-    boolean move_away =
-      (element_info[element].move_pattern == MV_AWAY_FROM_PLAYER);
+    boolean move_away = (move_pattern == MV_AWAY_FROM_PLAYER);
 
     if (AllPlayersGone)
     {
@@ -3794,12 +3804,83 @@ inline static void TurnRoundExt(int x, int y)
       MovDir[x][y] = old_move_dir;
     }
   }
-  else if (element_info[element].move_pattern == MV_WHEN_PUSHED)
+  else if (move_pattern == MV_WHEN_PUSHED)
   {
     if (!IN_LEV_FIELD_AND_IS_FREE(move_x, move_y))
       MovDir[x][y] = MV_NO_MOVING;
 
     MovDelay[x][y] = 0;
+  }
+  else if (move_pattern & MV_MAZE_RUNNER_STYLE ||
+	   element == EL_MAZE_RUNNER)
+  {
+    static int test_xy[7][2] =
+    {
+      { 0, -1 },
+      { -1, 0 },
+      { +1, 0 },
+      { 0, +1 },
+      { 0, -1 },
+      { -1, 0 },
+      { +1, 0 },
+    };
+    static int test_dir[7] =
+    {
+      MV_UP,
+      MV_LEFT,
+      MV_RIGHT,
+      MV_DOWN,
+      MV_UP,
+      MV_LEFT,
+      MV_RIGHT,
+    };
+    boolean hunter_mode = (move_pattern == MV_MAZE_HUNTER);
+    int move_preference = -1000000;	/* start with very low preference */
+    int new_move_dir = MV_NO_MOVING;
+    int start_test = RND(4);
+    int i;
+
+    for (i = 0; i < 4; i++)
+    {
+      int move_dir = test_dir[start_test + i];
+      int move_dir_preference;
+
+      xx = x + test_xy[start_test + i][0];
+      yy = y + test_xy[start_test + i][1];
+
+      if (hunter_mode && IN_LEV_FIELD(xx, yy) &&
+	  (IS_PLAYER(xx, yy) || Feld[xx][yy] == EL_PLAYER_IS_LEAVING))
+      {
+	new_move_dir = move_dir;
+
+	break;
+      }
+
+      if (!MAZE_RUNNER_CAN_ENTER_FIELD(xx, yy))
+	continue;
+
+      move_dir_preference = -1 * RunnerVisit[xx][yy];
+      if (hunter_mode && PlayerVisit[xx][yy] > 0)
+	move_dir_preference = PlayerVisit[xx][yy];
+
+      if (move_dir_preference > move_preference)
+      {
+	/* prefer field that has not been visited for the longest time */
+	move_preference = move_dir_preference;
+	new_move_dir = move_dir;
+      }
+      else if (move_dir_preference == move_preference &&
+	       move_dir == old_move_dir)
+      {
+	/* prefer last direction when all directions are preferred equally */
+	move_preference = move_dir_preference;
+	new_move_dir = move_dir;
+      }
+    }
+
+    MovDir[x][y] = new_move_dir;
+    if (old_move_dir != new_move_dir)
+      MovDelay[x][y] = 9;
   }
 }
 
@@ -4141,6 +4222,7 @@ void StartMoving(int x, int y)
   /* not "else if" because of elements that can fall and move (EL_SPRING) */
   if (CAN_MOVE(element) && !started_moving)
   {
+    int move_pattern = element_info[element].move_pattern;
     int newx, newy;
 
 #if 1
@@ -4181,9 +4263,9 @@ void StartMoving(int x, int y)
       if (element != EL_YAMYAM &&
 	  element != EL_DARK_YAMYAM &&
 	  element != EL_PACMAN &&
-	  !(element_info[element].move_pattern & MV_ANY_DIRECTION) &&
-	  element_info[element].move_pattern != MV_TURNING_LEFT &&
-	  element_info[element].move_pattern != MV_TURNING_RIGHT)
+	  !(move_pattern & MV_ANY_DIRECTION) &&
+	  move_pattern != MV_TURNING_LEFT &&
+	  move_pattern != MV_TURNING_RIGHT)
       {
 	TurnRound(x, y);
 
@@ -4409,6 +4491,35 @@ void StartMoving(int x, int y)
 	  DrawLevelField(x, y);
 	return;
       }
+    }
+    else if ((move_pattern & MV_MAZE_RUNNER_STYLE ||
+	      element == EL_MAZE_RUNNER) && IN_LEV_FIELD(newx, newy))
+    {
+      if (IS_FOOD_DARK_YAMYAM(Feld[newx][newy]))
+      {
+	if (IS_MOVING(newx, newy))
+	  RemoveMovingField(newx, newy);
+	else
+	{
+	  Feld[newx][newy] = EL_EMPTY;
+	  DrawLevelField(newx, newy);
+	}
+
+	PlayLevelSound(x, y, SND_DARK_YAMYAM_DIGGING);
+      }
+      else if (!IS_FREE(newx, newy))
+      {
+#if 0
+	if (IS_PLAYER(x, y))
+	  DrawPlayerField(x, y);
+	else
+	  DrawLevelField(x, y);
+#endif
+	return;
+      }
+
+      RunnerVisit[x][y] = FrameCounter;
+      PlayerVisit[x][y] /= 8;		/* expire player visit path */
     }
     else if (element == EL_DRAGON && IN_LEV_FIELD(newx, newy))
     {
@@ -4762,8 +4873,79 @@ void ContinueMoving(int x, int y)
 #endif
 
   if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
-    CheckElementSideChange(newx, newy, Feld[newx][newy], direction,
-			   CE_COLLISION, -1);
+  {
+    /* !!! fix side (direction) orientation here and elsewhere !!! */
+    CheckElementSideChange(newx, newy, Feld[newx][newy],
+			   direction, CE_COLLISION_ACTIVE, -1);
+
+    if (IN_LEV_FIELD(nextx, nexty))
+    {
+      static int opposite_directions[] =
+      {
+	MV_RIGHT,
+	MV_LEFT,
+	MV_DOWN,
+	MV_UP
+      };
+      int move_dir_bit = MV_DIR_BIT(direction);
+      int opposite_direction = opposite_directions[move_dir_bit];
+      int hitting_side = direction;
+      int touched_side = opposite_direction;
+      int hitting_element = Feld[newx][newy];
+      int touched_element = MovingOrBlocked2Element(nextx, nexty);
+      boolean object_hit = (!IS_MOVING(nextx, nexty) ||
+			    MovDir[nextx][nexty] != direction ||
+			    ABS(MovPos[nextx][nexty]) <= TILEY / 2);
+
+      if (object_hit)
+      {
+	int i;
+
+	CheckElementSideChange(nextx, nexty, Feld[nextx][nexty],
+			       opposite_direction, CE_COLLISION_PASSIVE, -1);
+
+	if (IS_CUSTOM_ELEMENT(hitting_element) &&
+	    HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_COLL_ACTIVE))
+	{
+	  for (i = 0; i < element_info[hitting_element].num_change_pages; i++)
+	  {
+	    struct ElementChangeInfo *change =
+	      &element_info[hitting_element].change_page[i];
+
+	    if (change->can_change &&
+		change->events & CH_EVENT_BIT(CE_OTHER_IS_COLL_ACTIVE) &&
+		change->sides & touched_side &&
+		change->trigger_element == touched_element)
+	    {
+	      CheckElementSideChange(newx, newy, hitting_element,
+				     CH_SIDE_ANY, CE_OTHER_IS_COLL_ACTIVE, i);
+	      break;
+	    }
+	  }
+	}
+
+	if (IS_CUSTOM_ELEMENT(touched_element) &&
+	    HAS_ANY_CHANGE_EVENT(touched_element, CE_OTHER_IS_COLL_PASSIVE))
+	{
+	  for (i = 0; i < element_info[touched_element].num_change_pages; i++)
+	  {
+	    struct ElementChangeInfo *change =
+	      &element_info[touched_element].change_page[i];
+
+	    if (change->can_change &&
+		change->events & CH_EVENT_BIT(CE_OTHER_IS_COLL_PASSIVE) &&
+		change->sides & hitting_side &&
+		change->trigger_element == hitting_element)
+	    {
+	      CheckElementSideChange(nextx, nexty, touched_element,
+				     CH_SIDE_ANY, CE_OTHER_IS_COLL_PASSIVE, i);
+	      break;
+	    }
+	  }
+	}
+      }
+    }
+  }
 
   TestIfPlayerTouchesCustomElement(newx, newy);
   TestIfElementTouchesCustomElement(newx, newy);
@@ -7001,6 +7183,10 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   player->MovPos =
     (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
+  player->step_counter++;
+
+  PlayerVisit[jx][jy] = FrameCounter;
+
   ScrollPlayer(player, SCROLL_INIT);
 
 #if 0
@@ -7442,7 +7628,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
   };
   static int change_sides[4][2] =
   {
-    /* center side       border side */
+    /* center side	border side */
     { CH_SIDE_TOP,	CH_SIDE_BOTTOM	},	/* check top    */
     { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* check left   */
     { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
