@@ -112,43 +112,44 @@
 #define EP_AMOEBOID		50
 #define EP_AMOEBALIVE		51
 #define EP_HAS_CONTENT		52
-#define EP_ACTIVE_BOMB		53
-#define EP_INACTIVE		54
+#define EP_CAN_TURN_EACH_MOVE	53
+#define EP_ACTIVE_BOMB		54
+#define EP_INACTIVE		55
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	55
+#define EP_EM_SLIPPERY_WALL	56
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_GFX_CRUMBLED		56
+#define EP_GFX_CRUMBLED		57
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	57
-#define EP_ACCESSIBLE_INSIDE	58
-#define EP_ACCESSIBLE_UNDER	59
-#define EP_WALKABLE		60
-#define EP_PASSABLE		61
-#define EP_ACCESSIBLE		62
-#define EP_COLLECTIBLE		63
-#define EP_SNAPPABLE		64
-#define EP_WALL			65
-#define EP_SOLID_FOR_PUSHING	66
-#define EP_DRAGONFIRE_PROOF	67
-#define EP_EXPLOSION_PROOF	68
-#define EP_CAN_SMASH		69
-#define EP_CAN_EXPLODE		70
-#define EP_CAN_EXPLODE_3X3	71
-#define EP_SP_PORT		72
-#define EP_CAN_EXPLODE_BY_DRAGONFIRE	73
-#define EP_CAN_EXPLODE_BY_EXPLOSION	74
-#define EP_COULD_MOVE_INTO_ACID		75
-#define EP_MAYBE_DONT_COLLIDE_WITH	76
+#define EP_ACCESSIBLE_OVER	58
+#define EP_ACCESSIBLE_INSIDE	59
+#define EP_ACCESSIBLE_UNDER	60
+#define EP_WALKABLE		61
+#define EP_PASSABLE		62
+#define EP_ACCESSIBLE		63
+#define EP_COLLECTIBLE		64
+#define EP_SNAPPABLE		65
+#define EP_WALL			66
+#define EP_SOLID_FOR_PUSHING	67
+#define EP_DRAGONFIRE_PROOF	68
+#define EP_EXPLOSION_PROOF	69
+#define EP_CAN_SMASH		70
+#define EP_CAN_EXPLODE		71
+#define EP_CAN_EXPLODE_3X3	72
+#define EP_SP_PORT		73
+#define EP_CAN_EXPLODE_BY_DRAGONFIRE	74
+#define EP_CAN_EXPLODE_BY_EXPLOSION	75
+#define EP_COULD_MOVE_INTO_ACID		76
+#define EP_MAYBE_DONT_COLLIDE_WITH	77
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	77
-#define EP_WALK_TO_OBJECT	78
-#define EP_DEADLY		79
+#define EP_EXPLODE_RESULT	78
+#define EP_WALK_TO_OBJECT	79
+#define EP_DEADLY		80
 
-#define NUM_ELEMENT_PROPERTIES	80
+#define NUM_ELEMENT_PROPERTIES	81
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -356,6 +357,7 @@
 #define IS_AMOEBOID(e)		HAS_PROPERTY(e, EP_AMOEBOID)
 #define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)
 #define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
+#define CAN_TURN_EACH_MOVE(e)	HAS_PROPERTY(e, EP_CAN_TURN_EACH_MOVE)
 #define IS_ACTIVE_BOMB(e)	HAS_PROPERTY(e, EP_ACTIVE_BOMB)
 #define IS_INACTIVE(e)		HAS_PROPERTY(e, EP_INACTIVE)
 

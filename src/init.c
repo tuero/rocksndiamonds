@@ -2830,6 +2830,12 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_can_turn_each_move[] =
+  {
+    /* !!! do something !!! */
+    -1
+  };
+
   static int ep_active_bomb[] =
   {
     EL_DYNAMITE_ACTIVE,
@@ -3050,6 +3056,7 @@ void InitElementPropertiesStatic()
     { ep_amoeboid,		EP_AMOEBOID		},
     { ep_amoebalive,		EP_AMOEBALIVE		},
     { ep_has_content,		EP_HAS_CONTENT		},
+    { ep_can_turn_each_move,	EP_CAN_TURN_EACH_MOVE	},
     { ep_active_bomb,		EP_ACTIVE_BOMB		},
     { ep_inactive,		EP_INACTIVE		},
 

@@ -2095,7 +2095,7 @@ void InitMovDir(int x, int y)
 	      break;
 	    }
 
-#if 1
+#if 0
 	    if (MovDir[x][y] == MV_NO_MOVING)	/* no start direction found */
 	      MovDir[x][y] = 1 << RND(4);	/* => use random direction */
 #endif
@@ -5965,9 +5965,18 @@ void ContinueMoving(int x, int y)
     MovDir[newx][newy] = 0;
   */
 
+#if 0
   if (!CAN_MOVE(element) ||
       (CAN_FALL(element) && direction == MV_DOWN))
     GfxDir[x][y] = MovDir[newx][newy] = 0;
+#else
+  if (!CAN_MOVE(element) ||
+      (CAN_FALL(element) && direction == MV_DOWN &&
+       (element == EL_SPRING ||
+	element_info[element].move_pattern == MV_WHEN_PUSHED ||
+	element_info[element].move_pattern == MV_WHEN_DROPPED)))
+    GfxDir[x][y] = MovDir[newx][newy] = 0;
+#endif
 
 #endif
 #endif
