@@ -1478,8 +1478,10 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
 	void (*menu_callback_function)(void) = setup_info[y].value;
 
 	menu_callback_function();
+	break;	/* absolutely needed because 'setup_info' has changed! */
       }
     }
+
     return;
   }
 

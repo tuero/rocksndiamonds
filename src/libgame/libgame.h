@@ -24,6 +24,7 @@
 #include "text.h"
 #include "sound.h"
 #include "joystick.h"
+#include "toons.h"
 #include "image.h"
 #include "pcx.h"
 #include "setup.h"

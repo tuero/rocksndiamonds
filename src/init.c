@@ -23,6 +23,7 @@
 #include "files.h"
 #include "network.h"
 #include "netserv.h"
+#include "cartoons.h"
 
 static char *image_filename[NUM_PICTURES] =
 {
@@ -38,13 +39,12 @@ static char *image_filename[NUM_PICTURES] =
   "RocksFont3.pcx"
 }; 
 
-static void InitPlayerInfo(void);
 static void InitSetup(void);
+static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
 static void InitGfx(void);
-static void InitCustomGraphics(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
 static void InitElementProperties(void);
@@ -87,9 +87,9 @@ void OpenAll(void)
   InitLevelInfo();
   InitGadgets();		/* needs to know number of level series */
 
-  InitCustomGraphics();
-
   InitGfxBackground();
+  InitToons();
+
   DrawMainMenu();
 
   InitNetworkServer();
@@ -337,49 +337,6 @@ void InitGfx()
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
 
   InitTileClipmasks();
-}
-
-void LoadCustomGraphics()
-{
-#if 0
-  int i;
-
-  for(i=0; i<NUM_PICTURES; i++)
-  {
-    Bitmap *new_pic = 
-    pix_custom[i] = LoadImage(image_filename[i]);
-  }
-#endif
-}
-
-void InitCustomGraphics()
-{
-#if 0
-  static char *filename = NULL;
-
-  /* look for optional directory ~/.<program>/graphics */
-  filename = getPath2(getUserDataDir(), GRAPHICS_DIRECTORY);
-  if (access(dir, F_OK) == 0)
-  {
-  }
-
-
-
-
-(leveldir_current->user_defined ?
-		       getUserLevelDir("") :
-		       options.level_directory),
-		      leveldir_current->fullpath,
-		      basename);
-
-
-
-  filename = getPath3((leveldir_current->user_defined ?
-		       getUserLevelDir("") :
-		       options.level_directory),
-		      leveldir_current->fullpath,
-		      basename);
-#endif
 }
 
 void InitGfxBackground()

@@ -14,8 +14,6 @@
 #ifndef CARTOONS_H
 #define CARTOONS_H
 
-void InitAnimation(void);
-void StopAnimation(void);
-void DoAnimation(void);
+void InitToons(void);
 
 #endif
