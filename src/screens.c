@@ -333,7 +333,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (setup.autorecord)
 	  TapeStartRecording();
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else
@@ -828,15 +828,16 @@ void HandleTypeName(int newxpos, Key key)
     return;
   }
 
-  if (((key >= KEY_A && key <= KEY_Z) || (key >= KEY_a && key <= KEY_z)) && 
+  if (((key >= KSYM_A && key <= KSYM_Z) ||
+       (key >= KSYM_a && key <= KSYM_z)) && 
       xpos < MAX_PLAYER_NAME_LEN)
   {
     char ascii;
 
-    if (key >= KEY_A && key <= KEY_Z)
-      ascii = 'A' + (char)(key - KEY_A);
+    if (key >= KSYM_A && key <= KSYM_Z)
+      ascii = 'A' + (char)(key - KSYM_A);
     else
-      ascii = 'a' + (char)(key - KEY_a);
+      ascii = 'a' + (char)(key - KSYM_a);
 
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos + 1] = 0;
@@ -847,14 +848,14 @@ void HandleTypeName(int newxpos, Key key)
 		setup.player_name, FS_BIG, FC_YELLOW);
     DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
   }
-  else if ((key == KEY_Delete || key == KEY_BackSpace) && xpos > 0)
+  else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
     DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
     DrawGraphic(xpos + 7, ypos, GFX_LEERRAUM);
   }
-  else if (key == KEY_Return && xpos > 0)
+  else if (key == KSYM_Return && xpos > 0)
   {
     DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_RED);
     DrawGraphic(xpos + 6, ypos, GFX_LEERRAUM);
@@ -1042,7 +1043,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     else
       x = y = 0;	/* no action */
 
-    if (ABS(dy) == SCR_FIELDY)	/* handle KEY_Page_Up, KEY_Page_Down */
+    if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
     {
       dy = SIGN(dy);
       step = num_page_entries - 1;
@@ -1230,7 +1231,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (ABS(dy) == SCR_FIELDY)	/* handle KEY_Page_Up, KEY_Page_Down */
+  if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
     step = MAX_LEVEL_SERIES_ON_SCREEN - 1;
 
   if (dy < 0)
@@ -1563,7 +1564,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  SaveJoystickData();
 	  */
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 	  save_joystick_data(JOYSTICK_FILENAME);
 #endif
 
@@ -1917,7 +1918,7 @@ void CustomizeKeyboard(int player_nr)
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, TRUE);
 
-	    if (key == KEY_Escape || (key == KEY_Return && step_nr == 6))
+	    if (key == KSYM_Escape || (key == KSYM_Return && step_nr == 6))
 	    {
 	      finished = TRUE;
 	      break;
@@ -1928,7 +1929,7 @@ void CustomizeKeyboard(int player_nr)
 	      break;
 
 	    /* press 'Enter' to keep the existing key binding */
-	    if (key == KEY_Return)
+	    if (key == KSYM_Return)
 	      key = *customize_step[step_nr].key;
 
 	    /* check if key already used */
@@ -2008,7 +2009,7 @@ void CalibrateJoystick(int player_nr)
   } joy_ctrl;
 #endif
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   int new_joystick_xleft = 128, new_joystick_xright = 128;
   int new_joystick_yupper = 128, new_joystick_ylower = 128;
   int new_joystick_xmiddle, new_joystick_ymiddle;
@@ -2030,7 +2031,7 @@ void CalibrateJoystick(int player_nr)
 
   ClearWindow();
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   DrawText(SX,      SY +  6*32, " ROTATE JOYSTICK ", FS_BIG, FC_YELLOW);
   DrawText(SX,      SY +  7*32, "IN ALL DIRECTIONS", FS_BIG, FC_YELLOW);
   DrawText(SX + 16, SY +  9*32, "  IF ALL BALLS  ",  FS_BIG, FC_YELLOW);
@@ -2085,12 +2086,12 @@ void CalibrateJoystick(int player_nr)
 	case EVENT_KEYPRESS:
 	  switch(GetEventKey((KeyEvent *)&event, TRUE))
 	  {
-	    case KEY_Return:
+	    case KSYM_Return:
 	      if (check_remaining == 0)
 		result = 1;
 	      break;
 
-	    case KEY_Escape:
+	    case KSYM_Escape:
 	      result = 0;
 	      break;
 
@@ -2109,9 +2110,9 @@ void CalibrateJoystick(int player_nr)
       }
     }
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 
-#ifdef USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
     joy_ctrl.x = Get_SDL_Joystick_Axis(joystick_fd, 0);
     joy_ctrl.y = Get_SDL_Joystick_Axis(joystick_fd, 1);
 #else
@@ -2148,7 +2149,7 @@ void CalibrateJoystick(int player_nr)
     {
       result = 1;
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
       if (calibration_step == 1)
       {
 	remove_joystick();
@@ -2189,7 +2190,7 @@ void CalibrateJoystick(int player_nr)
 
     if (x != last_x || y != last_y)
     {
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
       DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_GELB);
 #else
       DrawGraphic(xpos + last_x, ypos + last_y, GFX_KUGEL_BLAU);

@@ -11,7 +11,9 @@
 *  network.c                                               *
 ***********************************************************/
 
-#if !defined(MSDOS) && !defined(WIN32)
+#include "platform.h"
+
+#if defined(PLATFORM_UNIX)
 
 #include <signal.h>
 #include <sys/time.h>
@@ -615,4 +617,4 @@ void HandleNetworking()
   }
 }
 
-#endif /* !MSDOS && !WIN32 */
+#endif /* PLATFORM_UNIX */

@@ -18,6 +18,8 @@
 #include <allegro.h>
 #include <time.h>
 
+/* symbol 'window' is defined in DJGPP cross-compiler in libc.a(conio.o) */
+#define window window_djgpp
 
 /* system dependent definitions */
 

@@ -18,7 +18,7 @@
 #include "joystick.h"
 #include "misc.h"
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 static int JoystickPosition(int middle, int margin, int actual)
 {
   long range, pos;
@@ -40,7 +40,7 @@ static int JoystickPosition(int middle, int margin, int actual)
 }
 #endif
 
-#ifdef USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
 
 static SDL_Joystick *sdl_joystick[MAX_PLAYERS] = { NULL, NULL, NULL, NULL };
 static int sdl_js_axis[MAX_PLAYERS][2]   = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
@@ -205,7 +205,7 @@ int Joystick(int player_nr)
   return result;
 }
 
-#else /* !USE_SDL_JOYSTICK */
+#else /* !TARGET_SDL */
 
 void CheckJoystickData()
 {
@@ -231,7 +231,7 @@ void CheckJoystickData()
   }
 }
 
-#ifndef MSDOS
+#if defined(PLATFORM_UNIX)
 int Joystick(int player_nr)
 {
 #ifdef __FreeBSD__
@@ -304,7 +304,7 @@ int Joystick(int player_nr)
   return result;
 }
 
-#else /* MSDOS */
+#else /* PLATFORM_MSDOS */
 
 /* allegro global variables for joystick control */
 extern int num_joysticks;
@@ -325,7 +325,7 @@ int Joystick(int player_nr)
     return 0;
 
   /* the allegro global variable 'num_joysticks' contains the number
-     of joysticks found at initialization under MSDOS / Windows */
+     of joysticks found at initialization under MS-DOS / Windows */
 
 #if 0
   if (joystick_nr >= num_joysticks || !setup.input[player_nr].use_joystick)
@@ -361,9 +361,9 @@ int Joystick(int player_nr)
 
   return result;
 }
-#endif /* MSDOS */
+#endif /* PLATFORM_MSDOS */
 
-#endif /* !USE_SDL_JOYSTICK */
+#endif /* !TARGET_SDL */
 
 int JoystickButton(int player_nr)
 {

@@ -15,15 +15,9 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#if defined(MSDOS)
-#define PLATFORM_MSDOS
-#elif defined(WIN32)
-#define PLATFORM_WIN32
-#else
-#define PLATFORM_UNIX
-#endif
+#include "platform.h"
 
-#if defined(MSDOS)
+#if defined(PLATFORM_MSDOS)
 #include "msdos.h"
 #endif
 
@@ -73,5 +67,6 @@ inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);
 inline void NextEvent(Event *event);
 inline Key GetEventKey(KeyEvent *, boolean);
+inline boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
 #endif /* SYSTEM_H */

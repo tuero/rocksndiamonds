@@ -25,30 +25,45 @@ RM = del
 PROGNAME = ../rocks.exe
 
 SYS_CFLAGS = -DTARGET_X11
-SYS_LDFLAGS = -s -lalleg -lm
+SYS_LDFLAGS = -s -lalleg
 
-else				# Unix; Win32 cross-compiling
+else				# Unix or cross-compiling for MS-DOS and Win32
 
 RM = rm -f
 PROGNAME = ../rocksndiamonds
 
 ifeq ($(PLATFORM),solaris)
 EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
+PLATFORM = unix
 endif
 
-ifeq ($(PLATFORM),win32)
+ifeq ($(PLATFORM),unix)
+PROFILING = -pg
+endif
+
+ifeq ($(PLATFORM),cross-msdos)
+PROGNAME = ../rocks.exe
+TARGET = allegro
+endif
+
+ifeq ($(PLATFORM),cross-win32)
 PROGNAME = ../rocksndiamonds.exe
 TARGET = sdl
-else
-PROFILING = -pg
+endif
+
+ifeq ($(TARGET),x11)
+SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
+SYS_LDFLAGS = $(X11_LIBS) -lX11
 endif
 
 ifeq ($(TARGET),sdl)
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
-SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs) -lm
-else
-SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
-SYS_LDFLAGS = $(X11_LIBS) -lX11 -lm
+SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs)
+endif
+
+ifeq ($(TARGET),allegro)
+SYS_CFLAGS = -DTARGET_X11 -I$(CROSS_PATH_MSDOS)/include
+SYS_LDFLAGS = -lalleg
 endif
 
 endif				# (PLATFORM != msdos)
@@ -80,7 +95,7 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3
 
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
-LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS)
+LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 
 SRCS =	main.c		\
 	init.c		\

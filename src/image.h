@@ -51,11 +51,10 @@ typedef struct
   byte         *data;		/* image data                          */
 } Image;
 
-int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
-
 Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);
+int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 #endif /* !TARGET_SDL */
 #endif	/* IMAGE_H */

@@ -45,7 +45,7 @@
 #define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
 
 /* file names and filename extensions */
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 #define USERDATA_DIRECTORY	".rocksndiamonds"
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
@@ -65,11 +65,11 @@
 #define SCOREFILE_EXTENSION	"sco"
 #endif
 
-#if defined(MSDOS) || defined(WIN32)
+#if !defined(PLATFORM_UNIX)
 #define ERROR_FILENAME		"error.out"
 #endif
 
-#ifdef WIN32
+#if defined(PLATFORM_WIN32)
 #ifndef S_IRGRP
 #define S_IRGRP S_IRUSR
 #endif
@@ -88,7 +88,7 @@
 #ifndef S_IXOTH
 #define S_IXOTH S_IXUSR
 #endif
-#endif
+#endif	/* PLATFORM_WIN32 */
 
 /* file permissions for newly written files */
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
@@ -347,7 +347,7 @@ static char *getScoreFilename(int nr)
 static void createDirectory(char *dir, char *text)
 {
   if (access(dir, F_OK) != 0)
-#ifdef WIN32
+#if defined(PLATFORM_WIN32)
     if (mkdir(dir) != 0)
 #else
     if (mkdir(dir, USERDATA_DIR_MODE) != 0)
@@ -1543,12 +1543,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].joy.ylower  = JOYSTICK_YLOWER;
     si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
     si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINED);
-    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINED);
-    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINED);
-    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINED);
-    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINED);
-    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINED);
+    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KSYM_UNDEFINED);
+    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KSYM_UNDEFINED);
+    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KSYM_UNDEFINED);
+    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KSYM_UNDEFINED);
+    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
+    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KSYM_UNDEFINED);
   }
 }
 
@@ -2216,7 +2216,7 @@ void SaveLevelSetup_SeriesInfo()
   chmod(filename, SETUP_PERMS);
 }
 
-#if defined(MSDOS) || defined(WIN32)
+#if !defined(PLATFORM_UNIX)
 void initErrorFile()
 {
   char *filename;

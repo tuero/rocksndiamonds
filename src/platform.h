@@ -8,35 +8,18 @@
 *              phone: ++49 +521 290471                     *
 *              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
-*  files.h                                                 *
+*  platform.h                                              *
 ***********************************************************/
 
-#ifndef FILES_H
-#define FILES_H
+#ifndef PLATFORM_H
+#define PLATFORM_H
 
-#include "main.h"
-
-void LoadLevel(int);
-void SaveLevel(int);
-
-void LoadTape(int);
-void SaveTape(int);
-
-void LoadScore(int);
-void SaveScore(int);
-
-void LoadLevelInfo(void);
-void LoadSetup(void);
-void SaveSetup(void);
-void LoadLevelSetup_LastSeries(void);
-void SaveLevelSetup_LastSeries(void);
-void LoadLevelSetup_SeriesInfo(void);
-void SaveLevelSetup_SeriesInfo(void);
-
-#if !defined(PLATFORM_UNIX)
-void initErrorFile();
-FILE *openErrorFile();
-void dumpErrorFile();
+#if defined(MSDOS)
+#define PLATFORM_MSDOS
+#elif defined(WIN32)
+#define PLATFORM_WIN32
+#else
+#define PLATFORM_UNIX
 #endif
 
-#endif	/* FILES_H */
+#endif /* PLATFORM_H */

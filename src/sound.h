@@ -45,14 +45,14 @@ extern void ioctl(long, long, void *);
 #define HPUX_AUDIO
 #endif /* _HPUX_SOURCE */
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 #define MAX_SOUNDS_PLAYING	16
 #else
 #define MAX_SOUNDS_PLAYING	8
 #endif
 
 /* some values for PlaySound(), StopSound() and friends */
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 #define PSND_SILENCE		0
 #define PSND_MAX_VOLUME_BITS	7
 #define PSND_MIN_VOLUME		0
@@ -131,11 +131,11 @@ struct SoundInfo
   byte *data_ptr;
   long data_len;
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
   SAMPLE *sample_ptr;
 #endif
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   Mix_Chunk *mix_chunk;
 #endif
 };
@@ -154,7 +154,8 @@ struct SoundControl
   long playingpos;
   long data_len;
   byte *data_ptr;
-#ifdef MSDOS
+
+#if defined(PLATFORM_MSDOS)
   int voice;
 #endif
 };

@@ -416,7 +416,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       {
 	TapeStartRecording();
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else

@@ -12,7 +12,7 @@
 *  x11.c                                                   *
 ***********************************************************/
 
-#ifdef TARGET_X11
+#if defined(TARGET_X11)
 
 #include "main.h"
 #include "misc.h"
@@ -25,7 +25,7 @@ struct IconFileInfo
 
 static void X11InitDisplay()
 {
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   XVisualInfo vinfo_template, *vinfo;
   int num_visuals;
 #endif
@@ -41,7 +41,7 @@ static void X11InitDisplay()
   depth  = DefaultDepth(display, screen);
   cmap   = DefaultColormap(display, screen);
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   /* look for good enough visual */
   vinfo_template.screen = screen;
   vinfo_template.class = (depth == 8 ? PseudoColor : TrueColor);
@@ -66,7 +66,7 @@ static void X11InitDisplay()
     printf("Sorry, cannot get appropriate visual.\n");
     exit(-1);
   }
-#endif /* !MSDOS */
+#endif /* !PLATFORM_MSDOS */
 }
 
 static DrawWindow X11InitWindow()
@@ -75,7 +75,7 @@ static DrawWindow X11InitWindow()
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned long gc_valuemask;
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   XTextProperty windowName, iconName;
   Pixmap icon_pixmap, iconmask_pixmap;
   unsigned int icon_width, icon_height;
@@ -95,7 +95,7 @@ static DrawWindow X11InitWindow()
   unsigned long pen_bg = BlackPixel(display,screen);
   const int width = WIN_XSIZE, height = WIN_YSIZE;
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   static struct IconFileInfo icon_pic =
   {
     "rocks_icon.xbm",
@@ -113,7 +113,7 @@ static DrawWindow X11InitWindow()
 			       win_xpos, win_ypos, width, height, border_width,
 			       pen_fg, pen_bg);
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   proto_atom = XInternAtom(display, "WM_PROTOCOLS", FALSE);
   delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", FALSE);
   if ((proto_atom != None) && (delete_atom != None))

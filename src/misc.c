@@ -11,13 +11,15 @@
 *  misc.c                                                  *
 ***********************************************************/
 
+#include "platform.h"
+
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <stdarg.h>
 #include <ctype.h>
 
-#ifndef WIN32
+#if !defined(PLATFORM_WIN32)
 #include <pwd.h>
 #include <sys/param.h>
 #endif
@@ -30,7 +32,7 @@
 #include "joystick.h"
 #include "files.h"
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 volatile unsigned long counter = 0;
 
 void increment_counter()
@@ -46,7 +48,6 @@ END_OF_FUNCTION(increment_counter);
 #define MAX_OPTION_LEN		256
 
 #ifdef TARGET_SDL
-
 static unsigned long mainCounter(int mode)
 {
   static unsigned long base_ms = 0;
@@ -65,8 +66,8 @@ static unsigned long mainCounter(int mode)
 }
 
 #else /* !TARGET_SDL */
-#ifndef MSDOS
 
+#if defined(PLATFORM_UNIX)
 static unsigned long mainCounter(int mode)
 {
   static struct timeval base_time = { 0, 0 };
@@ -84,13 +85,12 @@ static unsigned long mainCounter(int mode)
 
   return counter_ms;		/* return milliseconds since last init */
 }
-
-#endif /* !MSDOS */
+#endif /* PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
 
 void InitCounter()		/* set counter back to zero */
 {
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   mainCounter(INIT_COUNTER);
 #else
   LOCK_VARIABLE(counter);
@@ -101,7 +101,7 @@ void InitCounter()		/* set counter back to zero */
 
 unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
 {
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   return mainCounter(READ_COUNTER);
 #else
   return (counter * 10);
@@ -112,7 +112,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
 {
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
   /* don't use select() to perform waiting operations under DOS/Windows
      environment; always use a busy loop for waiting instead */
   do_busy_waiting = TRUE;
@@ -133,9 +133,9 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   }
   else
   {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
     SDL_Delay(milliseconds_delay);
-#else /* !TARGET_SDL */
+#else
     struct timeval delay;
 
     delay.tv_sec  = milliseconds_delay / 1000;
@@ -143,7 +143,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
 
     if (select(0, NULL, NULL, NULL, &delay) != 0)
       Error(ERR_WARN, "sleep_milliseconds(): select() failed");
-#endif /* !TARGET_SDL */
+#endif
   }
 }
 
@@ -228,25 +228,21 @@ char *int2str(int number, int size)
 
 unsigned int SimpleRND(unsigned int max)
 {
-#ifdef TARGET_SDL
-
+#if defined(TARGET_SDL)
   static unsigned long root = 654321;
   unsigned long current_ms;
 
   current_ms = SDL_GetTicks();
   root = root * 4253261 + current_ms;
   return (root % max);
-
-#else /* !TARGET_SDL */
-
+#else
   static unsigned long root = 654321;
   struct timeval current_time;
 
   gettimeofday(&current_time, NULL);
   root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
   return (root % max);
-
-#endif /* !TARGET_SDL */
+#endif
 }
 
 #ifdef DEBUG
@@ -269,7 +265,7 @@ unsigned int RND(unsigned int max)
 
 unsigned int InitRND(long seed)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   unsigned long current_ms;
 
   if (seed == NEW_RANDOMIZE)
@@ -283,7 +279,7 @@ unsigned int InitRND(long seed)
     srandom_linux_libc((unsigned int) seed);
     return (unsigned int) seed;
   }
-#else /* !TARGET_SDL */
+#else
   struct timeval current_time;
 
   if (seed == NEW_RANDOMIZE)
@@ -297,12 +293,12 @@ unsigned int InitRND(long seed)
     srandom_linux_libc((unsigned int) seed);
     return (unsigned int) seed;
   }
-#endif /* !TARGET_SDL */
+#endif
 }
 
 char *getLoginName()
 {
-#ifdef WIN32
+#if defined(PLATFORM_WIN32)
   return ANONYMOUS_NAME;
 #else
   struct passwd *pwd;
@@ -316,9 +312,7 @@ char *getLoginName()
 
 char *getRealName()
 {
-#if defined(MSDOS) || defined(WIN32)
-  return ANONYMOUS_NAME;
-#else
+#if defined(PLATFORM_UNIX)
   struct passwd *pwd;
 
   if ((pwd = getpwuid(getuid())) == NULL || strlen(pwd->pw_gecos) == 0)
@@ -348,14 +342,14 @@ char *getRealName()
 
     return real_name;
   }
+#else /* !PLATFORM_UNIX */
+  return ANONYMOUS_NAME;
 #endif
 }
 
 char *getHomeDir()
 {
-#if defined(MSDOS) || defined(WIN32)
-  return ".";
-#else
+#if defined(PLATFORM_UNIX)
   static char *home_dir = NULL;
 
   if (!home_dir)
@@ -372,6 +366,8 @@ char *getHomeDir()
   }
 
   return home_dir;
+#else
+  return ".";
 #endif
 }
 
@@ -597,7 +593,7 @@ void Error(int mode, char *format, ...)
   if (mode & ERR_WARN && !options.verbose)
     return;
 
-#if defined(MSDOS) || defined(WIN32)
+#if !defined(PLATFORM_UNIX)
   if ((error = openErrorFile()) == NULL)
   {
     printf("Cannot write to error output file!\n");
@@ -749,9 +745,9 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_length,
   putFile32BitInteger(file, chunk_length, byte_order);
 }
 
-#define TRANSLATE_KEY_TO_KEYNAME	0
-#define TRANSLATE_KEY_TO_X11KEYNAME	1
-#define TRANSLATE_X11KEYNAME_TO_KEY	2
+#define TRANSLATE_KEYSYM_TO_KEYNAME	0
+#define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
+#define TRANSLATE_X11KEYNAME_TO_KEYSYM	2
 
 void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 {
@@ -763,100 +759,100 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
   } translate_key[] =
   {
     /* normal cursor keys */
-    { KEY_Left,		"XK_Left",		"cursor left" },
-    { KEY_Right,	"XK_Right",		"cursor right" },
-    { KEY_Up,		"XK_Up",		"cursor up" },
-    { KEY_Down,		"XK_Down",		"cursor down" },
+    { KSYM_Left,	"XK_Left",		"cursor left" },
+    { KSYM_Right,	"XK_Right",		"cursor right" },
+    { KSYM_Up,		"XK_Up",		"cursor up" },
+    { KSYM_Down,	"XK_Down",		"cursor down" },
 
     /* keypad cursor keys */
-#ifdef KEY_KP_Left
-    { KEY_KP_Left,	"XK_KP_Left",		"keypad left" },
-    { KEY_KP_Right,	"XK_KP_Right",		"keypad right" },
-    { KEY_KP_Up,	"XK_KP_Up",		"keypad up" },
-    { KEY_KP_Down,	"XK_KP_Down",		"keypad down" },
+#ifdef KSYM_KP_Left
+    { KSYM_KP_Left,	"XK_KP_Left",		"keypad left" },
+    { KSYM_KP_Right,	"XK_KP_Right",		"keypad right" },
+    { KSYM_KP_Up,	"XK_KP_Up",		"keypad up" },
+    { KSYM_KP_Down,	"XK_KP_Down",		"keypad down" },
 #endif
 
     /* other keypad keys */
-#ifdef KEY_KP_Enter
-    { KEY_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
-    { KEY_KP_Add,	"XK_KP_Add",		"keypad +" },
-    { KEY_KP_Subtract,	"XK_KP_Subtract",	"keypad -" },
-    { KEY_KP_Multiply,	"XK_KP_Multiply",	"keypad mltply" },
-    { KEY_KP_Divide,	"XK_KP_Divide",		"keypad /" },
-    { KEY_KP_Separator,	"XK_KP_Separator",	"keypad ," },
+#ifdef KSYM_KP_Enter
+    { KSYM_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
+    { KSYM_KP_Add,	"XK_KP_Add",		"keypad +" },
+    { KSYM_KP_Subtract,	"XK_KP_Subtract",	"keypad -" },
+    { KSYM_KP_Multiply,	"XK_KP_Multiply",	"keypad mltply" },
+    { KSYM_KP_Divide,	"XK_KP_Divide",		"keypad /" },
+    { KSYM_KP_Separator,"XK_KP_Separator",	"keypad ," },
 #endif
 
     /* modifier keys */
-    { KEY_Shift_L,	"XK_Shift_L",		"left shift" },
-    { KEY_Shift_R,	"XK_Shift_R",		"right shift" },
-    { KEY_Control_L,	"XK_Control_L",		"left control" },
-    { KEY_Control_R,	"XK_Control_R",		"right control" },
-    { KEY_Meta_L,	"XK_Meta_L",		"left meta" },
-    { KEY_Meta_R,	"XK_Meta_R",		"right meta" },
-    { KEY_Alt_L,	"XK_Alt_L",		"left alt" },
-    { KEY_Alt_R,	"XK_Alt_R",		"right alt" },
-    { KEY_Super_L,	"XK_Super_L",		"left super" },	 /* Win-L */
-    { KEY_Super_R,	"XK_Super_R",		"right super" }, /* Win-R */
-    { KEY_Mode_switch,	"XK_Mode_switch",	"mode switch" }, /* Alt-R */
-    { KEY_Multi_key,	"XK_Multi_key",		"multi key" },	 /* Ctrl-R */
+    { KSYM_Shift_L,	"XK_Shift_L",		"left shift" },
+    { KSYM_Shift_R,	"XK_Shift_R",		"right shift" },
+    { KSYM_Control_L,	"XK_Control_L",		"left control" },
+    { KSYM_Control_R,	"XK_Control_R",		"right control" },
+    { KSYM_Meta_L,	"XK_Meta_L",		"left meta" },
+    { KSYM_Meta_R,	"XK_Meta_R",		"right meta" },
+    { KSYM_Alt_L,	"XK_Alt_L",		"left alt" },
+    { KSYM_Alt_R,	"XK_Alt_R",		"right alt" },
+    { KSYM_Super_L,	"XK_Super_L",		"left super" },	 /* Win-L */
+    { KSYM_Super_R,	"XK_Super_R",		"right super" }, /* Win-R */
+    { KSYM_Mode_switch,	"XK_Mode_switch",	"mode switch" }, /* Alt-R */
+    { KSYM_Multi_key,	"XK_Multi_key",		"multi key" },	 /* Ctrl-R */
 
     /* some special keys */
-    { KEY_BackSpace,	"XK_BackSpace",		"backspace" },
-    { KEY_Delete,	"XK_Delete",		"delete" },
-    { KEY_Insert,	"XK_Insert",		"insert" },
-    { KEY_Tab,		"XK_Tab",		"tab" },
-    { KEY_Home,		"XK_Home",		"home" },
-    { KEY_End,		"XK_End",		"end" },
-    { KEY_Page_Up,	"XK_Page_Up",		"page up" },
-    { KEY_Page_Down,	"XK_Page_Down",		"page down" },
-    { KEY_Menu,		"XK_Menu",		"menu" },	 /* Win-Menu */
+    { KSYM_BackSpace,	"XK_BackSpace",		"backspace" },
+    { KSYM_Delete,	"XK_Delete",		"delete" },
+    { KSYM_Insert,	"XK_Insert",		"insert" },
+    { KSYM_Tab,		"XK_Tab",		"tab" },
+    { KSYM_Home,	"XK_Home",		"home" },
+    { KSYM_End,		"XK_End",		"end" },
+    { KSYM_Page_Up,	"XK_Page_Up",		"page up" },
+    { KSYM_Page_Down,	"XK_Page_Down",		"page down" },
+    { KSYM_Menu,	"XK_Menu",		"menu" },	 /* Win-Menu */
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
-    { KEY_space,	"XK_space",		"space" },
-    { KEY_exclam,	"XK_exclam",		"!" },
-    { KEY_quotedbl,	"XK_quotedbl",		"\"" },
-    { KEY_numbersign,	"XK_numbersign",	"#" },
-    { KEY_dollar,	"XK_dollar",		"$" },
-    { KEY_percent,	"XK_percent",		"%" },
-    { KEY_ampersand,	"XK_ampersand",		"&" },
-    { KEY_apostrophe,	"XK_apostrophe",	"'" },
-    { KEY_parenleft,	"XK_parenleft",		"(" },
-    { KEY_parenright,	"XK_parenright",	")" },
-    { KEY_asterisk,	"XK_asterisk",		"*" },
-    { KEY_plus,		"XK_plus",		"+" },
-    { KEY_comma,	"XK_comma",		"," },
-    { KEY_minus,	"XK_minus",		"-" },
-    { KEY_period,	"XK_period",		"." },
-    { KEY_slash,	"XK_slash",		"/" },
-    { KEY_colon,	"XK_colon",		":" },
-    { KEY_semicolon,	"XK_semicolon",		";" },
-    { KEY_less,		"XK_less",		"<" },
-    { KEY_equal,	"XK_equal",		"=" },
-    { KEY_greater,	"XK_greater",		">" },
-    { KEY_question,	"XK_question",		"?" },
-    { KEY_at,		"XK_at",		"@" },
+    { KSYM_space,	"XK_space",		"space" },
+    { KSYM_exclam,	"XK_exclam",		"!" },
+    { KSYM_quotedbl,	"XK_quotedbl",		"\"" },
+    { KSYM_numbersign,	"XK_numbersign",	"#" },
+    { KSYM_dollar,	"XK_dollar",		"$" },
+    { KSYM_percent,	"XK_percent",		"%" },
+    { KSYM_ampersand,	"XK_ampersand",		"&" },
+    { KSYM_apostrophe,	"XK_apostrophe",	"'" },
+    { KSYM_parenleft,	"XK_parenleft",		"(" },
+    { KSYM_parenright,	"XK_parenright",	")" },
+    { KSYM_asterisk,	"XK_asterisk",		"*" },
+    { KSYM_plus,	"XK_plus",		"+" },
+    { KSYM_comma,	"XK_comma",		"," },
+    { KSYM_minus,	"XK_minus",		"-" },
+    { KSYM_period,	"XK_period",		"." },
+    { KSYM_slash,	"XK_slash",		"/" },
+    { KSYM_colon,	"XK_colon",		":" },
+    { KSYM_semicolon,	"XK_semicolon",		";" },
+    { KSYM_less,	"XK_less",		"<" },
+    { KSYM_equal,	"XK_equal",		"=" },
+    { KSYM_greater,	"XK_greater",		">" },
+    { KSYM_question,	"XK_question",		"?" },
+    { KSYM_at,		"XK_at",		"@" },
 
     /* more ASCII keys */
-    { KEY_bracketleft,	"XK_bracketleft",	"[" },
-    { KEY_backslash,	"XK_backslash",		"backslash" },
-    { KEY_bracketright,	"XK_bracketright",	"]" },
-    { KEY_asciicircum,	"XK_asciicircum",	"circumflex" },
-    { KEY_underscore,	"XK_underscore",	"_" },
-    { KEY_grave,	"XK_grave",		"grave" },
-    { KEY_quoteleft,	"XK_quoteleft",		"quote left" },
-    { KEY_braceleft,	"XK_braceleft",		"brace left" },
-    { KEY_bar,		"XK_bar",		"bar" },
-    { KEY_braceright,	"XK_braceright",	"brace right" },
-    { KEY_asciitilde,	"XK_asciitilde",	"ascii tilde" },
+    { KSYM_bracketleft,	"XK_bracketleft",	"[" },
+    { KSYM_backslash,	"XK_backslash",		"backslash" },
+    { KSYM_bracketright,"XK_bracketright",	"]" },
+    { KSYM_asciicircum,	"XK_asciicircum",	"circumflex" },
+    { KSYM_underscore,	"XK_underscore",	"_" },
+    { KSYM_grave,	"XK_grave",		"grave" },
+    { KSYM_quoteleft,	"XK_quoteleft",		"quote left" },
+    { KSYM_braceleft,	"XK_braceleft",		"brace left" },
+    { KSYM_bar,		"XK_bar",		"bar" },
+    { KSYM_braceright,	"XK_braceright",	"brace right" },
+    { KSYM_asciitilde,	"XK_asciitilde",	"ascii tilde" },
 
     /* special (non-ASCII) keys */
-    { KEY_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
-    { KEY_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
-    { KEY_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
-    { KEY_adiaeresis,	"XK_adiaeresis",	"ä" },
-    { KEY_odiaeresis,	"XK_odiaeresis",	"ö" },
-    { KEY_udiaeresis,	"XK_udiaeresis",	"ü" },
-    { KEY_ssharp,	"XK_ssharp",		"sharp s" },
+    { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
+    { KSYM_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
+    { KSYM_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
+    { KSYM_adiaeresis,	"XK_adiaeresis",	"ä" },
+    { KSYM_odiaeresis,	"XK_odiaeresis",	"ö" },
+    { KSYM_udiaeresis,	"XK_udiaeresis",	"ü" },
+    { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
 
     /* end-of-array identifier */
     { 0,                NULL,			NULL }
@@ -864,22 +860,22 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
   int i;
 
-  if (mode == TRANSLATE_KEY_TO_KEYNAME)
+  if (mode == TRANSLATE_KEYSYM_TO_KEYNAME)
   {
     static char name_buffer[30];
     Key key = *keysym;
 
-    if (key >= KEY_A && key <= KEY_Z)
-      sprintf(name_buffer, "%c", 'A' + (char)(key - KEY_A));
-    else if (key >= KEY_a && key <= KEY_z)
-      sprintf(name_buffer, "%c", 'a' + (char)(key - KEY_a));
-    else if (key >= KEY_0 && key <= KEY_9)
-      sprintf(name_buffer, "%c", '0' + (char)(key - KEY_0));
-    else if (key >= KEY_KP_0 && key <= KEY_KP_9)
-      sprintf(name_buffer, "keypad %c", '0' + (char)(key - KEY_KP_0));
-    else if (key >= KEY_F1 && key <= KEY_F24)
-      sprintf(name_buffer, "function F%d", (int)(key - KEY_F1 + 1));
-    else if (key == KEY_UNDEFINED)
+    if (key >= KSYM_A && key <= KSYM_Z)
+      sprintf(name_buffer, "%c", 'A' + (char)(key - KSYM_A));
+    else if (key >= KSYM_a && key <= KSYM_z)
+      sprintf(name_buffer, "%c", 'a' + (char)(key - KSYM_a));
+    else if (key >= KSYM_0 && key <= KSYM_9)
+      sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
+    else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
+      sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
+    else if (key >= KSYM_F1 && key <= KSYM_F24)
+      sprintf(name_buffer, "function F%d", (int)(key - KSYM_F1 + 1));
+    else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "(undefined)");
     else
     {
@@ -901,22 +897,22 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
     *name = name_buffer;
   }
-  else if (mode == TRANSLATE_KEY_TO_X11KEYNAME)
+  else if (mode == TRANSLATE_KEYSYM_TO_X11KEYNAME)
   {
     static char name_buffer[30];
     Key key = *keysym;
 
-    if (key >= KEY_A && key <= KEY_Z)
-      sprintf(name_buffer, "XK_%c", 'A' + (char)(key - KEY_A));
-    else if (key >= KEY_a && key <= KEY_z)
-      sprintf(name_buffer, "XK_%c", 'a' + (char)(key - KEY_a));
-    else if (key >= KEY_0 && key <= KEY_9)
-      sprintf(name_buffer, "XK_%c", '0' + (char)(key - KEY_0));
-    else if (key >= KEY_KP_0 && key <= KEY_KP_9)
-      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KEY_KP_0));
-    else if (key >= KEY_F1 && key <= KEY_F24)
-      sprintf(name_buffer, "XK_F%d", (int)(key - KEY_F1 + 1));
-    else if (key == KEY_UNDEFINED)
+    if (key >= KSYM_A && key <= KSYM_Z)
+      sprintf(name_buffer, "XK_%c", 'A' + (char)(key - KSYM_A));
+    else if (key >= KSYM_a && key <= KSYM_z)
+      sprintf(name_buffer, "XK_%c", 'a' + (char)(key - KSYM_a));
+    else if (key >= KSYM_0 && key <= KSYM_9)
+      sprintf(name_buffer, "XK_%c", '0' + (char)(key - KSYM_0));
+    else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
+      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KSYM_KP_0));
+    else if (key >= KSYM_F1 && key <= KSYM_F24)
+      sprintf(name_buffer, "XK_F%d", (int)(key - KSYM_F1 + 1));
+    else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "[undefined]");
     else
     {
@@ -938,9 +934,9 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
     *x11name = name_buffer;
   }
-  else if (mode == TRANSLATE_X11KEYNAME_TO_KEY)
+  else if (mode == TRANSLATE_X11KEYNAME_TO_KEYSYM)
   {
-    Key key = KEY_UNDEFINED;
+    Key key = KSYM_UNDEFINED;
     char *name_ptr = *x11name;
 
     if (strncmp(name_ptr, "XK_", 3) == 0 && strlen(name_ptr) == 4)
@@ -948,18 +944,18 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       char c = name_ptr[3];
 
       if (c >= 'A' && c <= 'Z')
-	key = KEY_A + (Key)(c - 'A');
+	key = KSYM_A + (Key)(c - 'A');
       else if (c >= 'a' && c <= 'z')
-	key = KEY_a + (Key)(c - 'a');
+	key = KSYM_a + (Key)(c - 'a');
       else if (c >= '0' && c <= '9')
-	key = KEY_0 + (Key)(c - '0');
+	key = KSYM_0 + (Key)(c - '0');
     }
     else if (strncmp(name_ptr, "XK_KP_", 6) == 0 && strlen(name_ptr) == 7)
     {
       char c = name_ptr[6];
 
       if (c >= '0' && c <= '9')
-	key = KEY_0 + (Key)(c - '0');
+	key = KSYM_0 + (Key)(c - '0');
     }
     else if (strncmp(name_ptr, "XK_F", 4) == 0 && strlen(name_ptr) <= 6)
     {
@@ -972,7 +968,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 	d = atoi(&name_ptr[4]);
 
       if (d >=1 && d <= 24)
-	key = KEY_F1 + (Key)(d - 1);
+	key = KSYM_F1 + (Key)(d - 1);
     }
     else if (strncmp(name_ptr, "XK_", 3) == 0)
     {
@@ -1027,7 +1023,7 @@ char *getKeyNameFromKey(Key key)
 {
   char *name;
 
-  translate_keyname(&key, NULL, &name, TRANSLATE_KEY_TO_KEYNAME);
+  translate_keyname(&key, NULL, &name, TRANSLATE_KEYSYM_TO_KEYNAME);
   return name;
 }
 
@@ -1035,7 +1031,7 @@ char *getX11KeyNameFromKey(Key key)
 {
   char *x11name;
 
-  translate_keyname(&key, &x11name, NULL, TRANSLATE_KEY_TO_X11KEYNAME);
+  translate_keyname(&key, &x11name, NULL, TRANSLATE_KEYSYM_TO_X11KEYNAME);
   return x11name;
 }
 
@@ -1043,7 +1039,7 @@ Key getKeyFromX11KeyName(char *x11name)
 {
   Key key;
 
-  translate_keyname(&key, &x11name, NULL, TRANSLATE_X11KEYNAME_TO_KEY);
+  translate_keyname(&key, &x11name, NULL, TRANSLATE_X11KEYNAME_TO_KEYSYM);
   return key;
 }
 

@@ -74,7 +74,7 @@
 #endif
 
 
-#ifdef USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
 SDL_Joystick *Get_SDL_Joystick(int);
 boolean Open_SDL_Joystick(int);
 void Close_SDL_Joystick(int);
@@ -89,4 +89,4 @@ int JoystickButton(int);
 int AnyJoystick(void);
 int AnyJoystickButton(void);
 
-#endif
+#endif	/* JOYSTICK_H */

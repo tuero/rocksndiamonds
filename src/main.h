@@ -41,13 +41,15 @@ typedef unsigned char byte;
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
 #define WIN_SDL_DEPTH	16	/* !!! change this !!! */
-#ifndef MSDOS
+
+#if !defined(PLATFORM_MSDOS)
 #define WIN_XPOS	0
 #define WIN_YPOS	0
-#else	/* MSDOS */
+#else
 #define WIN_XPOS	((XRES - WIN_XSIZE) / 2)
 #define WIN_YPOS	((YRES - WIN_YSIZE) / 2)
-#endif	/* MSDOS */
+#endif
+
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
@@ -1592,14 +1594,14 @@ extern int		num_element_info;
 #define NUM_SOUNDS		62
 
 /* default input keys */
-#define DEFAULT_KEY_LEFT	KEY_Left
-#define DEFAULT_KEY_RIGHT	KEY_Right
-#define DEFAULT_KEY_UP		KEY_Up
-#define DEFAULT_KEY_DOWN	KEY_Down
-#define DEFAULT_KEY_SNAP	KEY_Shift_L
-#define DEFAULT_KEY_BOMB	KEY_Shift_R
-#define DEFAULT_KEY_OKAY	KEY_Return
-#define DEFAULT_KEY_CANCEL	KEY_Escape
+#define DEFAULT_KEY_LEFT	KSYM_Left
+#define DEFAULT_KEY_RIGHT	KSYM_Right
+#define DEFAULT_KEY_UP		KSYM_Up
+#define DEFAULT_KEY_DOWN	KSYM_Down
+#define DEFAULT_KEY_SNAP	KSYM_Shift_L
+#define DEFAULT_KEY_BOMB	KSYM_Shift_R
+#define DEFAULT_KEY_OKAY	KSYM_Return
+#define DEFAULT_KEY_CANCEL	KSYM_Escape
 
 /* directions for moving */
 #define MV_NO_MOVING		0

@@ -11,14 +11,43 @@
 *  image.c                                                 *
 ***********************************************************/
 
-#ifndef TARGET_SDL
+#if defined(TARGET_X11)
 
 #include "image.h"
 #include "pcx.h"
 #include "misc.h"
 
-/* exclude all except newImage() and freeImage() */
-#ifndef MSDOS
+/* for MS-DOS/Allegro, exclude all except newImage() and freeImage() */
+
+Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
+{
+  Image *image;
+  const unsigned int bytes_per_pixel = 1;
+  int i;
+
+  if (depth > 8)
+    Error(ERR_EXIT, "images with more than 256 colors are not supported");
+
+  depth = 8;
+  image = checked_malloc(sizeof(Image));
+  image->data = checked_malloc(width * height * bytes_per_pixel);
+  image->width = width;
+  image->height = height;
+  image->depth = depth;
+  image->rgb.used = 0;
+  for (i=0; i<MAX_COLORS; i++)
+    image->rgb.color_used[i] = FALSE;
+
+  return image;
+}
+
+void freeImage(Image *image)
+{
+  free(image->data);
+  free(image);
+}
+
+#if defined(PLATFORM_UNIX)
 
 /* extra colors to try allocating in private color maps to minimize flashing */
 #define NOFLASH_COLORS 256
@@ -469,38 +498,6 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   free(ximageinfo);
 }
 
-#endif /* !MSDOS */
-
-Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
-{
-  Image *image;
-  const unsigned int bytes_per_pixel = 1;
-  int i;
-
-  if (depth > 8)
-    Error(ERR_EXIT, "images with more than 256 colors are not supported");
-
-  depth = 8;
-  image = checked_malloc(sizeof(Image));
-  image->data = checked_malloc(width * height * bytes_per_pixel);
-  image->width = width;
-  image->height = height;
-  image->depth = depth;
-  image->rgb.used = 0;
-  for (i=0; i<MAX_COLORS; i++)
-    image->rgb.color_used[i] = FALSE;
-
-  return image;
-}
-
-void freeImage(Image *image)
-{
-  free(image->data);
-  free(image);
-}
-
-#ifndef MSDOS
-
 int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
 		       Pixmap *pixmap, Pixmap *pixmap_mask)
 {
@@ -553,5 +550,5 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   return PCX_Success;
 }
 
-#endif /* !MSDOS */
-#endif /* !TARGET_SDL */
+#endif	/* PLATFORM_UNIX */
+#endif	/* TARGET_X11 */

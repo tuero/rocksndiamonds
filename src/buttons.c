@@ -1307,30 +1307,30 @@ void HandleGadgetsKeyInput(Key key)
     gi->text.cursor_position++;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == KEY_Left && cursor_pos > 0)
+  else if (key == KSYM_Left && cursor_pos > 0)
   {
     gi->text.cursor_position--;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == KEY_Right && cursor_pos < text_length)
+  else if (key == KSYM_Right && cursor_pos < text_length)
   {
     gi->text.cursor_position++;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == KEY_BackSpace && cursor_pos > 0)
+  else if (key == KSYM_BackSpace && cursor_pos > 0)
   {
     strcpy(text, gi->text.value);
     strcpy(&gi->text.value[cursor_pos - 1], &text[cursor_pos]);
     gi->text.cursor_position--;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == KEY_Delete && cursor_pos < text_length)
+  else if (key == KSYM_Delete && cursor_pos < text_length)
   {
     strcpy(text, gi->text.value);
     strcpy(&gi->text.value[cursor_pos], &text[cursor_pos + 1]);
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == KEY_Return)
+  else if (key == KSYM_Return)
   {
     CheckRangeOfNumericInputGadget(gi);
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);

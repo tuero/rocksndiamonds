@@ -52,16 +52,16 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
-#if defined(MSDOS) || defined(WIN32)
+#if !defined(PLATFORM_UNIX)
   initErrorFile();
 #endif
 
   if (options.serveronly)
   {
-#ifdef WIN32
-    Error(ERR_WARN, "networking not supported in Windows version");
-#else
+#if defined(PLATFORM_UNIX)
     NetworkServer(options.server_port, options.serveronly);
+#else
+    Error(ERR_WARN, "networking not supported in Windows version");
 #endif
 
     /* never reached */
@@ -121,14 +121,14 @@ void InitLevelInfo()
 
 void InitNetworkServer()
 {
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   int nr_wanted;
 #endif
 
   if (!options.network)
     return;
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(options.server_host, options.server_port))
@@ -149,7 +149,7 @@ void InitSound()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   if (InitAudio())
   {
     sound_status = SOUND_AVAILABLE;
@@ -161,7 +161,7 @@ void InitSound()
   }
 #else /* !TARGET_SDL */
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   if ((sound_status = CheckAudio(sound_device_name)) == SOUND_OFF)
     return;
 
@@ -169,10 +169,10 @@ void InitSound()
   sound_loops_allowed = TRUE;
 #endif
 
-#else /* MSDOS || WIN32 */
+#else /* !PLATFORM_UNIX */
   sound_loops_allowed = TRUE;
 
-#endif /* MSDOS || WIN32 */
+#endif /* !PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
 
   for(i=0; i<NUM_SOUNDS; i++)
@@ -193,9 +193,8 @@ void InitSoundServer()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifndef TARGET_SDL
-
-#if !defined(MSDOS) && !defined(WIN32)
+#if !defined(TARGET_SDL)
+#if defined(PLATFORM_UNIX)
 
   if (pipe(sound_pipe)<0)
   {
@@ -221,18 +220,17 @@ void InitSoundServer()
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
 
-#else /* MSDOS || WIN32 */
+#else /* !PLATFORM_UNIX */
 
   SoundServer();
 
-#endif /* MSDOS */
-
+#endif /* !PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
 }
 
 void InitJoysticks()
 {
-#ifdef USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
   static boolean sdl_joystick_subsystem_initialized = FALSE;
 #endif
 
@@ -243,7 +241,7 @@ void InitJoysticks()
 
   joystick_status = JOYSTICK_OFF;
 
-#ifdef USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
 
   if (!sdl_joystick_subsystem_initialized)
   {
@@ -283,9 +281,9 @@ void InitJoysticks()
     joystick_status = JOYSTICK_AVAILABLE;
   }
 
-#else /* !USE_SDL_JOYSTICK */
+#else /* !TARGET_SDL */
 
-#ifndef MSDOS
+#if defined(PLATFORM_UNIX)
   for (i=0; i<MAX_PLAYERS; i++)
   {
     char *device_name = setup.input[i].joy.device_name;
@@ -315,7 +313,7 @@ void InitJoysticks()
     joystick_status = JOYSTICK_AVAILABLE;
   }
 
-#else /* MSDOS */
+#else /* !PLATFORM_UNIX */
 
   /* try to access two joysticks; if that fails, try to access just one */
   if (install_joystick(JOY_TYPE_2PADS) == 0 ||
@@ -346,7 +344,7 @@ void InitGfx()
 {
   int i, j;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDL_Surface *sdl_image_tmp;
 #else
   GC copy_clipmask_gc;
@@ -354,21 +352,7 @@ void InitGfx()
   unsigned long clip_gc_valuemask;
 #endif
 
-#ifdef MSDOS
-  static struct PictureFileInfo pic[NUM_PICTURES] =
-  {
-    { "Screen",	TRUE },
-    { "Door",	TRUE },
-    { "Heroes",	TRUE },
-    { "Toons",	TRUE },
-    { "SP",	TRUE },
-    { "DC",	TRUE },
-    { "More",	TRUE },
-    { "Font",	FALSE },
-    { "Font2",	FALSE },
-    { "Font3",	FALSE }
-  }; 
-#else
+#if !defined(PLATFORM_MSDOS)
   static struct PictureFileInfo pic[NUM_PICTURES] =
   {
     { "RocksScreen",	TRUE },
@@ -381,6 +365,20 @@ void InitGfx()
     { "RocksFont",	FALSE },
     { "RocksFont2",	FALSE },
     { "RocksFont3",	FALSE }
+  }; 
+#else
+  static struct PictureFileInfo pic[NUM_PICTURES] =
+  {
+    { "Screen",	TRUE },
+    { "Door",	TRUE },
+    { "Heroes",	TRUE },
+    { "Toons",	TRUE },
+    { "SP",	TRUE },
+    { "DC",	TRUE },
+    { "More",	TRUE },
+    { "Font",	FALSE },
+    { "Font2",	FALSE },
+    { "Font3",	FALSE }
   }; 
 #endif
 
@@ -444,10 +442,10 @@ void InitGfx()
   LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
   DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
   rest(200);
-#endif /* MSDOS */
+#endif
   DrawInitText("Loading graphics:",120,FC_GREEN);
 
   for(i=0; i<NUM_PICTURES; i++)
@@ -456,7 +454,7 @@ void InitGfx()
 
   /* create additional image buffers for masking of graphics */
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 
   /* initialize surface array to 'NULL' */
   for(i=0; i<NUM_TILES; i++)
@@ -570,11 +568,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char basefilename[256];
   char filename[256];
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDL_Surface *sdl_image_tmp;
-#else /* !TARGET_SDL */
+#else
   int pcx_err;
-#endif /* !TARGET_SDL */
+#endif
   char *picture_ext = ".pcx";
 
   /* Grafik laden */
@@ -585,11 +583,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     sprintf(filename, "%s/%s/%s",
 	    options.ro_base_directory, GRAPHICS_DIRECTORY, basefilename);
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
     rest(100);
-#endif /* MSDOS */
+#endif
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
     /* load image to temporary surface */
     if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
       Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
@@ -639,11 +637,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #endif /* !TARGET_SDL */
   }
 
-#ifndef TARGET_SDL
-  /* zugehörige Maske laden (wenn vorhanden) */
+#if defined(TARGET_X11)
+  /* check if clip mask was correctly created */
   if (pic->picture_with_mask && !clipmask[pos])
     Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
-#endif /* !TARGET_SDL */
+#endif
 }
 
 void InitGadgets()
@@ -1807,7 +1805,7 @@ void CloseAllAndExit(int exit_value)
 {
   int i;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   StopSounds();
   FreeSounds(NUM_SOUNDS);
 #else
@@ -1824,7 +1822,7 @@ void CloseAllAndExit(int exit_value)
     if (pix[i])
       FreeBitmap(pix[i]);
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
     FreeBitmap(pix_masked[i]);
 #else
     if (clipmask[i])
@@ -1834,7 +1832,7 @@ void CloseAllAndExit(int exit_value)
 #endif
   }
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   KeyboardAutoRepeatOn();
 #else
   if (gc)
@@ -1847,7 +1845,7 @@ void CloseAllAndExit(int exit_value)
   }
 #endif
 
-#if defined(MSDOS) || defined(WIN32)
+#if !defined(PLATFORM_UNIX)
   dumpErrorFile();
 #endif
 

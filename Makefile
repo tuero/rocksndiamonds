@@ -35,8 +35,9 @@ X11_PATH = /usr/X11
 # when installing the game in a single user environment, choose this
 # SCORE_ENTRIES = MANY_PER_NAME
 
-# specify path for cross-compiling (only needed for Win32 build)
-CROSS_PATH=/usr/local/cross-tools/i386-mingw32/bin
+# specify paths for cross-compiling (only needed for MS-DOS and Win32 build)
+CROSS_PATH_MSDOS=/usr/local/cross-msdos/i386-msdosdjgpp
+CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 
 #-----------------------------------------------------------------------------#
 # you should not need to change anything below                                #
@@ -64,8 +65,11 @@ solaris:
 msdos:
 	@$(MAKE_CMD) PLATFORM=msdos
 
-win32:
-	@PATH=$(CROSS_PATH):${PATH} $(MAKE_CMD) PLATFORM=win32
+cross-msdos:
+	@PATH=$(CROSS_PATH_MSDOS)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-msdos
+
+cross-win32:
+	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
 
 clean:
 	@$(MAKE_CMD) clean

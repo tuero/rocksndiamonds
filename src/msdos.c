@@ -12,7 +12,9 @@
 *  msdos.c                                                 *
 ***********************************************************/
 
-#ifdef MSDOS
+#include "platform.h"
+
+#if defined(PLATFORM_MSDOS)
 
 #include "main.h"
 #include "misc.h"
@@ -917,4 +919,4 @@ void NetworkServer(int port, int serveronly)
   Error(ERR_WARN, "networking not supported in DOS version");
 }
 
-#endif /* MSDOS */
+#endif /* PLATFORM_MSDOS */

@@ -27,7 +27,7 @@
 #include "cartoons.h"
 #include "network.h"
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 extern boolean wait_for_vsync;
 #endif
 
@@ -1827,7 +1827,7 @@ boolean Request(char *text, unsigned int req_state)
   int mx, my, ty, result = -1;
   unsigned int old_door_state;
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   /* pause network game while waiting for request to answer */
   if (options.network &&
       game_status == PLAYING &&
@@ -1991,11 +1991,11 @@ boolean Request(char *text, unsigned int req_state)
 	case EVENT_KEYPRESS:
 	  switch(GetEventKey((KeyEvent *)&event, TRUE))
 	  {
-	    case KEY_Return:
+	    case KSYM_Return:
 	      result = 1;
 	      break;
 
-	    case KEY_Escape:
+	    case KSYM_Escape:
 	      result = 0;
 	      break;
 
@@ -2051,7 +2051,7 @@ boolean Request(char *text, unsigned int req_state)
 
   RemapAllGadgets();
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   /* continue network game after request */
   if (options.network &&
       game_status == PLAYING &&

@@ -11,7 +11,9 @@
 *  network.c                                               *
 ***********************************************************/
 
-#if !defined(MSDOS) && !defined(WIN32)
+#include "platform.h"
+
+#if defined(PLATFORM_UNIX)
 
 #include <fcntl.h>
 #include <sys/time.h>
@@ -661,4 +663,4 @@ void NetworkServer(int port, int serveronly)
   }
 }
 
-#endif /* !MSDOS && !WIN32 */
+#endif /* PLATFORM_UNIX */

@@ -23,37 +23,38 @@ static struct SoundControl emptySoundControl =
   -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE, 0,0L,0L,NULL
 };
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
 #ifdef VOXWARE
 static char premix_left_buffer[SND_BLOCKSIZE];
 static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
-#endif /* VOXWARE */
+#endif
 static unsigned char playing_buffer[SND_BLOCKSIZE];
-#endif /* !MSDOS && !WIN32 */
+#endif
 
 /* forward declaration of internal functions */
 #ifdef VOXWARE
 static void SoundServer_InsertNewSound(struct SoundControl);
-#endif
-
-#if !defined(VOXWARE) && !defined(MSDOS) && !defined(WIN32)
+#else
+#if defined(PLATFORM_UNIX)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
+#endif
 #endif
 
 #ifdef HPUX_AUDIO
 static void HPUX_Audio_Control();
 #endif
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 static void SoundServer_InsertNewSound(struct SoundControl);
 static void SoundServer_StopSound(int);
 static void SoundServer_StopAllSounds();
 #endif
 
+#if defined(PLATFORM_UNIX)
 int OpenAudio(char *audio_device_name)
 {
   int audio_fd;
@@ -94,11 +95,12 @@ boolean UnixInitAudio(void)
 {
   return TRUE;
 }
+#endif	/* PLATFORM_UNIX */
 
 void SoundServer()
 {
   int i;
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   struct SoundControl snd_ctrl;
   fd_set sound_fdset;
 
@@ -109,7 +111,7 @@ void SoundServer()
     playlist[i] = emptySoundControl;
   playing_sounds = 0;
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   stereo_volume[PSND_MAX_LEFT2RIGHT] = 0;
   for(i=0;i<PSND_MAX_LEFT2RIGHT;i++)
     stereo_volume[i] =
@@ -395,11 +397,11 @@ void SoundServer()
 
   }
 
-#endif /* !MSDOS && !WIN32 */
+#endif /* PLATFORM_UNIX */
 
 }
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 static void sound_handler(struct SoundControl snd_ctrl)
 {
   int i;
@@ -450,9 +452,9 @@ static void sound_handler(struct SoundControl snd_ctrl)
   if (snd_ctrl.active)
     SoundServer_InsertNewSound(snd_ctrl);
 }
-#endif /* MSDOS */
+#endif /* PLATFORM_MSDOS */
 
-#ifndef WIN32
+#if !defined(PLATFORM_WIN32)
 static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 {
   int i, k;
@@ -464,7 +466,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 
     for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     {
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
       int actual = 100 * playlist[i].playingpos / playlist[i].data_len;
 #else
       int actual = playlist[i].playingpos;
@@ -476,7 +478,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 	longest_nr=i;
       }
     }
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
     voice_set_volume(playlist[longest_nr].voice, 0);
     deallocate_voice(playlist[longest_nr].voice);
 #endif
@@ -500,7 +502,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       {
 	playlist[i].fade_sound = FALSE;
 	playlist[i].volume = PSND_MAX_VOLUME;
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
         playlist[i].loop = PSND_LOOP;
         voice_stop_volumeramp(playlist[i].voice);
         voice_ramp_volume(playlist[i].voice, playlist[i].volume, 1000);
@@ -523,7 +525,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       if (!playlist[i].active || playlist[i].nr != snd_ctrl.nr)
 	continue;
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
       actual = 100 * playlist[i].playingpos / playlist[i].data_len;
 #else
       actual = playlist[i].playingpos;
@@ -534,7 +536,8 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 	longest_nr=i;
       }
     }
-#ifdef MSDOS
+
+#if defined(PLATFORM_MSDOS)
     voice_set_volume(playlist[longest_nr].voice, 0);
     deallocate_voice(playlist[longest_nr].voice);
 #endif
@@ -549,7 +552,8 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     {
       playlist[i] = snd_ctrl;
       playing_sounds++;
-#ifdef MSDOS
+
+#if defined(PLATFORM_MSDOS)
       playlist[i].voice = allocate_voice(Sound[snd_ctrl.nr].sample_ptr);
       if(snd_ctrl.loop)
         voice_set_playmode(playlist[i].voice, PLAYMODE_LOOP);
@@ -561,7 +565,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     }
   }
 }
-#endif /* !WIN32 */
+#endif /* !PLATFORM_WIN32 */
 
 /*
 void SoundServer_FadeSound(int nr)
@@ -577,8 +581,8 @@ void SoundServer_FadeSound(int nr)
 }
 */
 
-#ifndef WIN32
-#ifdef MSDOS
+#if !defined(PLATFORM_WIN32)
+#if defined(PLATFORM_MSDOS)
 static void SoundServer_StopSound(int nr)
 {
   int i;
@@ -589,7 +593,7 @@ static void SoundServer_StopSound(int nr)
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     if (playlist[i].nr == nr)
     {
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
       voice_set_volume(playlist[i].voice, 0);
       deallocate_voice(playlist[i].voice);
 #endif
@@ -597,7 +601,7 @@ static void SoundServer_StopSound(int nr)
       playing_sounds--;
     }
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   if (!playing_sounds)
     close(sound_device);
 #endif
@@ -609,7 +613,7 @@ static void SoundServer_StopAllSounds()
 
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
   {
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
     voice_set_volume(playlist[i].voice, 0);
     deallocate_voice(playlist[i].voice);
 #endif
@@ -617,12 +621,12 @@ static void SoundServer_StopAllSounds()
   }
   playing_sounds = 0;
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   close(sound_device);
 #endif
 }
-#endif /* MSDOS */
-#endif /* !WIN32 */
+#endif /* PLATFORM_MSDOS */
+#endif /* !PLATFORM_WIN32 */
 
 #ifdef HPUX_AUDIO
 static void HPUX_Audio_Control()
@@ -647,7 +651,7 @@ static void HPUX_Audio_Control()
 }
 #endif /* HPUX_AUDIO */
 
-#if !defined(VOXWARE) && !defined(MSDOS) && !defined(WIN32)
+#if !defined(VOXWARE) && defined(PLATFORM_UNIX)
 
 /* these two are stolen from "sox"... :) */
 
@@ -752,7 +756,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
   return(sample);
 }
-#endif /* !VOXWARE && !MSDOS && !WIN32 */
+#endif /* !VOXWARE && PLATFORM_UNIX */
 
 /*** THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
@@ -767,8 +771,8 @@ boolean LoadSound(struct SoundInfo *snd_info)
 {
   char filename[256];
   char *sound_ext = "wav";
-#ifndef TARGET_SDL
-#ifndef MSDOS
+#if !defined(TARGET_SDL)
+#if !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
   int chunk_length, dummy;
@@ -781,7 +785,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 	  options.ro_base_directory, SOUNDS_DIRECTORY,
 	  snd_info->name, sound_ext);
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 
   snd_info->mix_chunk = Mix_LoadWAV(filename);
   if (snd_info->mix_chunk == NULL)
@@ -792,7 +796,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 
 #else /* !TARGET_SDL */
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
 
   if ((file = fopen(filename, "r")) == NULL)
   {
@@ -848,7 +852,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
   for (i=0; i<snd_info->data_len; i++)
     snd_info->data_ptr[i] = snd_info->data_ptr[i] ^ 0x80;
 
-#else /* MSDOS */
+#else /* PLATFORM_MSDOS */
 
   snd_info->sample_ptr = load_sample(filename);
   if (!snd_info->sample_ptr)
@@ -857,7 +861,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
     return FALSE;
   }
 
-#endif /* MSDOS */
+#endif /* PLATFORM_MSDOS */
 #endif /* !TARGET_SDL */
 
   return TRUE;
@@ -903,7 +907,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   snd_ctrl.data_ptr	= Sound[nr].data_ptr;
   snd_ctrl.data_len	= Sound[nr].data_len;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 
   Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
   Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
@@ -911,7 +915,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   Mix_PlayChannel(-1, Sound[nr].mix_chunk, (loop ? -1 : 0));
 
 #else
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
@@ -962,7 +966,7 @@ void StopSoundExt(int nr, int method)
     snd_ctrl.stop_sound = TRUE;
   }
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 
   if (SSND_FADING(method))
   {
@@ -976,7 +980,7 @@ void StopSoundExt(int nr, int method)
   }
 
 #else
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
@@ -997,7 +1001,7 @@ void FreeSounds(int num_sounds)
     return;
 
   for(i=0; i<num_sounds; i++)
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
     free(Sound[i].data_ptr);
 #else
     destroy_sample(Sound[i].sample_ptr);

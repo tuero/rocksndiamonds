@@ -505,7 +505,7 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
@@ -4243,7 +4243,7 @@ void GameActions()
 #endif
     */
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
 #endif
@@ -4280,7 +4280,7 @@ void GameActions()
       stored_player[i].effective_action = stored_player[i].action;
   }
 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
   if (network_playing)
     SendToServer_MovePlayer(summarized_player_action);
 #endif
@@ -5950,7 +5950,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
 
   volume = PSND_MAX_VOLUME;
 
-#ifndef MSDOS
+#if !defined(PLATFORM_MSDOS)
   stereo = (sx - SCR_FIELDX/2) * 12;
 #else
   stereo = PSND_MIDDLE + (2 * sx - (SCR_FIELDX - 1)) * 5;
@@ -6184,7 +6184,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 	  Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 	if (options.network)
 	  SendToServer_StopPlaying();
 	else
@@ -6201,7 +6201,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PAUSE:
       if (options.network)
       {
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
 	else
@@ -6215,7 +6215,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PLAY:
       if (tape.pausing)
       {
-#if !defined(MSDOS) && !defined(WIN32)
+#if defined(PLATFORM_UNIX)
 	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else

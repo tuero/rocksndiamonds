@@ -19,7 +19,7 @@
 #include "joystick.h"
 #include "misc.h"
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
 #include <fcntl.h>
 #endif
 
@@ -569,7 +569,7 @@ int num_element_info = sizeof(element_info)/sizeof(char *);
 /* | SDL TEST STUFF                                                        | */
 /* +-----------------------------------------------------------------------+ */
 
-#ifdef	USE_SDL_JOYSTICK
+#if defined(TARGET_SDL)
 
 SDL_Surface *sdl_screen, *sdl_image_tmp, *sdl_image, *sdl_image_masked;
 SDL_Surface *sdl_image2_tmp, *sdl_image2, *sdl_image2_masked;
@@ -933,7 +933,7 @@ void TEST_SDL_JOYSTICK()
   SDL_QuitSubSystem(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 }
 
-#endif	/* USE_SDL_JOYSTICK */
+#endif	/* TARGET_SDL */
 
 /* +-----------------------------------------------------------------------+ */
 /* | SDL TEST STUFF                                                        | */
@@ -945,7 +945,7 @@ int main(int argc, char *argv[])
 {
   program_name = (strrchr(argv[0],'/') ? strrchr(argv[0],'/') + 1 : argv[0]);
 
-#ifdef MSDOS
+#if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
 #endif
 
@@ -955,7 +955,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if 0
-#ifdef USE_SDL_JOYSTICK
+#ifdef TARGET_SDL
   /*
   TEST_SDL_BLIT_RECT((WIN_XSIZE - TILEX)/2, (WIN_YSIZE - TILEY)/2);
   TEST_SDL_EVENT_LOOP();

@@ -16,15 +16,8 @@
 #define SDL_H
 
 #include "SDL.h"
-
-#if SDL_MAJOR_VERSION >= 1 && SDL_MINOR_VERSION >= 1
 #include "SDL_image.h"
 #include "SDL_mixer.h"
-#define USE_SDL_JOYSTICK
-#else
-#include "IMG.h"
-#include "mixer.h"
-#endif
 
 
 /* definitions needed for "system.c" */
@@ -77,98 +70,98 @@ typedef int			Colormap;
 #define EVENT_MAPNOTIFY		SDL_USEREVENT + 4
 #define EVENT_UNMAPNOTIFY	SDL_USEREVENT + 5
 
-#define KEY_UNDEFINED		SDLK_UNKNOWN
+#define KSYM_UNDEFINED		SDLK_UNKNOWN
 
-#define KEY_Return		SDLK_RETURN
-#define KEY_Escape		SDLK_ESCAPE
+#define KSYM_Return		SDLK_RETURN
+#define KSYM_Escape		SDLK_ESCAPE
 
-#define KEY_Left		SDLK_LEFT
-#define KEY_Right		SDLK_RIGHT
-#define KEY_Up			SDLK_UP
-#define KEY_Down		SDLK_DOWN
+#define KSYM_Left		SDLK_LEFT
+#define KSYM_Right		SDLK_RIGHT
+#define KSYM_Up			SDLK_UP
+#define KSYM_Down		SDLK_DOWN
 
 #ifdef SDLK_KP_LEFT
-#define KEY_KP_Left		SDLK_KP_LEFT
-#define KEY_KP_Right		SDLK_KP_RIGHT
-#define KEY_KP_Up		SDLK_KP_UP
-#define KEY_KP_Down		SDLK_KP_DOWN
+#define KSYM_KP_Left		SDLK_KP_LEFT
+#define KSYM_KP_Right		SDLK_KP_RIGHT
+#define KSYM_KP_Up		SDLK_KP_UP
+#define KSYM_KP_Down		SDLK_KP_DOWN
 #endif
 
-#define KEY_KP_Enter		SDLK_KP_ENTER
-#define KEY_KP_Add		SDLK_KP_PLUS
-#define KEY_KP_Subtract		SDLK_KP_MINUS
-#define KEY_KP_Multiply		SDLK_KP_MULTIPLY
-#define KEY_KP_Divide		SDLK_KP_DIVIDE
-#define KEY_KP_Separator	SDLK_KP_PERIOD
+#define KSYM_KP_Enter		SDLK_KP_ENTER
+#define KSYM_KP_Add		SDLK_KP_PLUS
+#define KSYM_KP_Subtract	SDLK_KP_MINUS
+#define KSYM_KP_Multiply	SDLK_KP_MULTIPLY
+#define KSYM_KP_Divide		SDLK_KP_DIVIDE
+#define KSYM_KP_Separator	SDLK_KP_PERIOD
 
-#define KEY_Shift_L		SDLK_LSHIFT
-#define KEY_Shift_R		SDLK_RSHIFT
-#define KEY_Control_L		SDLK_LCTRL
-#define KEY_Control_R		SDLK_RCTRL
-#define KEY_Meta_L		SDLK_LMETA
-#define KEY_Meta_R		SDLK_RMETA
-#define KEY_Alt_L		SDLK_LALT
-#define KEY_Alt_R		SDLK_RALT
-#define KEY_Super_L		SDLK_LSUPER
-#define KEY_Super_R		SDLK_RSUPER
-#define KEY_Mode_switch		SDLK_MODE
-#define KEY_Multi_key		SDLK_RCTRL
+#define KSYM_Shift_L		SDLK_LSHIFT
+#define KSYM_Shift_R		SDLK_RSHIFT
+#define KSYM_Control_L		SDLK_LCTRL
+#define KSYM_Control_R		SDLK_RCTRL
+#define KSYM_Meta_L		SDLK_LMETA
+#define KSYM_Meta_R		SDLK_RMETA
+#define KSYM_Alt_L		SDLK_LALT
+#define KSYM_Alt_R		SDLK_RALT
+#define KSYM_Super_L		SDLK_LSUPER
+#define KSYM_Super_R		SDLK_RSUPER
+#define KSYM_Mode_switch	SDLK_MODE
+#define KSYM_Multi_key		SDLK_RCTRL
 
-#define KEY_BackSpace		SDLK_BACKSPACE
-#define KEY_Delete		SDLK_DELETE
-#define KEY_Insert		SDLK_INSERT
-#define KEY_Tab			SDLK_TAB
-#define KEY_Home		SDLK_HOME
-#define KEY_End			SDLK_END
-#define KEY_Page_Up		SDLK_PAGEUP
-#define KEY_Page_Down		SDLK_PAGEDOWN
-#define KEY_Menu		SDLK_MENU
+#define KSYM_BackSpace		SDLK_BACKSPACE
+#define KSYM_Delete		SDLK_DELETE
+#define KSYM_Insert		SDLK_INSERT
+#define KSYM_Tab		SDLK_TAB
+#define KSYM_Home		SDLK_HOME
+#define KSYM_End		SDLK_END
+#define KSYM_Page_Up		SDLK_PAGEUP
+#define KSYM_Page_Down		SDLK_PAGEDOWN
+#define KSYM_Menu		SDLK_MENU
 
-#define KEY_space		SDLK_SPACE
-#define KEY_exclam		SDLK_EXCLAIM
-#define KEY_quotedbl		SDLK_QUOTEDBL
-#define KEY_numbersign		SDLK_HASH
-#define KEY_dollar		SDLK_DOLLAR
-#define KEY_percent		KEY_UNDEFINED		/* undefined */
-#define KEY_ampersand		SDLK_AMPERSAND
-#define KEY_apostrophe		SDLK_QUOTE
-#define KEY_parenleft		SDLK_LEFTPAREN
-#define KEY_parenright		SDLK_RIGHTPAREN
-#define KEY_asterisk		SDLK_ASTERISK
-#define KEY_plus		SDLK_PLUS
-#define KEY_comma		SDLK_COMMA
-#define KEY_minus		SDLK_MINUS
-#define KEY_period		SDLK_PERIOD
-#define KEY_slash		SDLK_SLASH
+#define KSYM_space		SDLK_SPACE
+#define KSYM_exclam		SDLK_EXCLAIM
+#define KSYM_quotedbl		SDLK_QUOTEDBL
+#define KSYM_numbersign		SDLK_HASH
+#define KSYM_dollar		SDLK_DOLLAR
+#define KSYM_percent		KSYM_UNDEFINED		/* undefined */
+#define KSYM_ampersand		SDLK_AMPERSAND
+#define KSYM_apostrophe		SDLK_QUOTE
+#define KSYM_parenleft		SDLK_LEFTPAREN
+#define KSYM_parenright		SDLK_RIGHTPAREN
+#define KSYM_asterisk		SDLK_ASTERISK
+#define KSYM_plus		SDLK_PLUS
+#define KSYM_comma		SDLK_COMMA
+#define KSYM_minus		SDLK_MINUS
+#define KSYM_period		SDLK_PERIOD
+#define KSYM_slash		SDLK_SLASH
 
-#define KEY_colon		SDLK_COLON
-#define KEY_semicolon		SDLK_SEMICOLON
-#define KEY_less		SDLK_LESS
-#define KEY_equal		SDLK_EQUALS
-#define KEY_greater		SDLK_GREATER
-#define KEY_question		SDLK_QUESTION
-#define KEY_at			SDLK_AT
+#define KSYM_colon		SDLK_COLON
+#define KSYM_semicolon		SDLK_SEMICOLON
+#define KSYM_less		SDLK_LESS
+#define KSYM_equal		SDLK_EQUALS
+#define KSYM_greater		SDLK_GREATER
+#define KSYM_question		SDLK_QUESTION
+#define KSYM_at			SDLK_AT
 
-#define KEY_bracketleft		SDLK_LEFTBRACKET
-#define KEY_backslash		SDLK_BACKSLASH
-#define KEY_bracketright	SDLK_RIGHTBRACKET
-#define KEY_asciicircum		SDLK_CARET
-#define KEY_underscore		SDLK_UNDERSCORE
-#define KEY_grave		SDLK_BACKQUOTE
+#define KSYM_bracketleft	SDLK_LEFTBRACKET
+#define KSYM_backslash		SDLK_BACKSLASH
+#define KSYM_bracketright	SDLK_RIGHTBRACKET
+#define KSYM_asciicircum	SDLK_CARET
+#define KSYM_underscore		SDLK_UNDERSCORE
+#define KSYM_grave		SDLK_BACKQUOTE
 
-#define KEY_quoteleft		KEY_UNDEFINED		/* undefined */
-#define KEY_braceleft		KEY_UNDEFINED		/* undefined */
-#define KEY_bar			KEY_UNDEFINED		/* undefined */
-#define KEY_braceright		KEY_UNDEFINED		/* undefined */
-#define KEY_asciitilde		KEY_UNDEFINED		/* undefined */
+#define KSYM_quoteleft		KSYM_UNDEFINED		/* undefined */
+#define KSYM_braceleft		KSYM_UNDEFINED		/* undefined */
+#define KSYM_bar		KSYM_UNDEFINED		/* undefined */
+#define KSYM_braceright		KSYM_UNDEFINED		/* undefined */
+#define KSYM_asciitilde		KSYM_UNDEFINED		/* undefined */
 
-#define KEY_Adiaeresis		SDLK_WORLD_36
-#define KEY_Odiaeresis		SDLK_WORLD_54
-#define KEY_Udiaeresis		SDLK_WORLD_60
-#define KEY_adiaeresis		SDLK_WORLD_68
-#define KEY_odiaeresis		SDLK_WORLD_86
-#define KEY_udiaeresis		SDLK_WORLD_92
-#define KEY_ssharp		SDLK_WORLD_63
+#define KSYM_Adiaeresis		SDLK_WORLD_36
+#define KSYM_Odiaeresis		SDLK_WORLD_54
+#define KSYM_Udiaeresis		SDLK_WORLD_60
+#define KSYM_adiaeresis		SDLK_WORLD_68
+#define KSYM_odiaeresis		SDLK_WORLD_86
+#define KSYM_udiaeresis		SDLK_WORLD_92
+#define KSYM_ssharp		SDLK_WORLD_63
 
 #ifndef SDLK_A
 #define SDLK_A			65
@@ -199,106 +192,106 @@ typedef int			Colormap;
 #define SDLK_Z			90
 #endif
 
-#define KEY_A			SDLK_A
-#define KEY_B			SDLK_B
-#define KEY_C			SDLK_C
-#define KEY_D			SDLK_D
-#define KEY_E			SDLK_E
-#define KEY_F			SDLK_F
-#define KEY_G			SDLK_G
-#define KEY_H			SDLK_H
-#define KEY_I			SDLK_I
-#define KEY_J			SDLK_J
-#define KEY_K			SDLK_K
-#define KEY_L			SDLK_L
-#define KEY_M			SDLK_M
-#define KEY_N			SDLK_N
-#define KEY_O			SDLK_O
-#define KEY_P			SDLK_P
-#define KEY_Q			SDLK_Q
-#define KEY_R			SDLK_R
-#define KEY_S			SDLK_S
-#define KEY_T			SDLK_T
-#define KEY_U			SDLK_U
-#define KEY_V			SDLK_V
-#define KEY_W			SDLK_W
-#define KEY_X			SDLK_X
-#define KEY_Y			SDLK_Y
-#define KEY_Z			SDLK_Z
+#define KSYM_A			SDLK_A
+#define KSYM_B			SDLK_B
+#define KSYM_C			SDLK_C
+#define KSYM_D			SDLK_D
+#define KSYM_E			SDLK_E
+#define KSYM_F			SDLK_F
+#define KSYM_G			SDLK_G
+#define KSYM_H			SDLK_H
+#define KSYM_I			SDLK_I
+#define KSYM_J			SDLK_J
+#define KSYM_K			SDLK_K
+#define KSYM_L			SDLK_L
+#define KSYM_M			SDLK_M
+#define KSYM_N			SDLK_N
+#define KSYM_O			SDLK_O
+#define KSYM_P			SDLK_P
+#define KSYM_Q			SDLK_Q
+#define KSYM_R			SDLK_R
+#define KSYM_S			SDLK_S
+#define KSYM_T			SDLK_T
+#define KSYM_U			SDLK_U
+#define KSYM_V			SDLK_V
+#define KSYM_W			SDLK_W
+#define KSYM_X			SDLK_X
+#define KSYM_Y			SDLK_Y
+#define KSYM_Z			SDLK_Z
 
-#define KEY_a			SDLK_a
-#define KEY_b			SDLK_b
-#define KEY_c			SDLK_c
-#define KEY_d			SDLK_d
-#define KEY_e			SDLK_e
-#define KEY_f			SDLK_f
-#define KEY_g			SDLK_g
-#define KEY_h			SDLK_h
-#define KEY_i			SDLK_i
-#define KEY_j			SDLK_j
-#define KEY_k			SDLK_k
-#define KEY_l			SDLK_l
-#define KEY_m			SDLK_m
-#define KEY_n			SDLK_n
-#define KEY_o			SDLK_o
-#define KEY_p			SDLK_p
-#define KEY_q			SDLK_q
-#define KEY_r			SDLK_r
-#define KEY_s			SDLK_s
-#define KEY_t			SDLK_t
-#define KEY_u			SDLK_u
-#define KEY_v			SDLK_v
-#define KEY_w			SDLK_w
-#define KEY_x			SDLK_x
-#define KEY_y			SDLK_y
-#define KEY_z			SDLK_z
+#define KSYM_a			SDLK_a
+#define KSYM_b			SDLK_b
+#define KSYM_c			SDLK_c
+#define KSYM_d			SDLK_d
+#define KSYM_e			SDLK_e
+#define KSYM_f			SDLK_f
+#define KSYM_g			SDLK_g
+#define KSYM_h			SDLK_h
+#define KSYM_i			SDLK_i
+#define KSYM_j			SDLK_j
+#define KSYM_k			SDLK_k
+#define KSYM_l			SDLK_l
+#define KSYM_m			SDLK_m
+#define KSYM_n			SDLK_n
+#define KSYM_o			SDLK_o
+#define KSYM_p			SDLK_p
+#define KSYM_q			SDLK_q
+#define KSYM_r			SDLK_r
+#define KSYM_s			SDLK_s
+#define KSYM_t			SDLK_t
+#define KSYM_u			SDLK_u
+#define KSYM_v			SDLK_v
+#define KSYM_w			SDLK_w
+#define KSYM_x			SDLK_x
+#define KSYM_y			SDLK_y
+#define KSYM_z			SDLK_z
 
-#define KEY_0			SDLK_0
-#define KEY_1			SDLK_1
-#define KEY_2			SDLK_2
-#define KEY_3			SDLK_3
-#define KEY_4			SDLK_4
-#define KEY_5			SDLK_5
-#define KEY_6			SDLK_6
-#define KEY_7			SDLK_7
-#define KEY_8			SDLK_8
-#define KEY_9			SDLK_9
+#define KSYM_0			SDLK_0
+#define KSYM_1			SDLK_1
+#define KSYM_2			SDLK_2
+#define KSYM_3			SDLK_3
+#define KSYM_4			SDLK_4
+#define KSYM_5			SDLK_5
+#define KSYM_6			SDLK_6
+#define KSYM_7			SDLK_7
+#define KSYM_8			SDLK_8
+#define KSYM_9			SDLK_9
 
-#define KEY_KP_0		SDLK_KP0
-#define KEY_KP_1		SDLK_KP1
-#define KEY_KP_2		SDLK_KP2
-#define KEY_KP_3		SDLK_KP3
-#define KEY_KP_4		SDLK_KP4
-#define KEY_KP_5		SDLK_KP5
-#define KEY_KP_6		SDLK_KP6
-#define KEY_KP_7		SDLK_KP7
-#define KEY_KP_8		SDLK_KP8
-#define KEY_KP_9		SDLK_KP9
+#define KSYM_KP_0		SDLK_KP0
+#define KSYM_KP_1		SDLK_KP1
+#define KSYM_KP_2		SDLK_KP2
+#define KSYM_KP_3		SDLK_KP3
+#define KSYM_KP_4		SDLK_KP4
+#define KSYM_KP_5		SDLK_KP5
+#define KSYM_KP_6		SDLK_KP6
+#define KSYM_KP_7		SDLK_KP7
+#define KSYM_KP_8		SDLK_KP8
+#define KSYM_KP_9		SDLK_KP9
 
-#define KEY_F1			SDLK_F1
-#define KEY_F2			SDLK_F2
-#define KEY_F3			SDLK_F3
-#define KEY_F4			SDLK_F4
-#define KEY_F5			SDLK_F5
-#define KEY_F6			SDLK_F6
-#define KEY_F7			SDLK_F7
-#define KEY_F8			SDLK_F8
-#define KEY_F9			SDLK_F9
-#define KEY_F10			SDLK_F10
-#define KEY_F11			SDLK_F11
-#define KEY_F12			SDLK_F12
-#define KEY_F13			SDLK_F13
-#define KEY_F14			SDLK_F14
-#define KEY_F15			SDLK_F15
-#define KEY_F16			KEY_UNDEFINED
-#define KEY_F17			KEY_UNDEFINED
-#define KEY_F18			KEY_UNDEFINED
-#define KEY_F19			KEY_UNDEFINED
-#define KEY_F20			KEY_UNDEFINED
-#define KEY_F21			KEY_UNDEFINED
-#define KEY_F22			KEY_UNDEFINED
-#define KEY_F23			KEY_UNDEFINED
-#define KEY_F24			KEY_UNDEFINED
+#define KSYM_F1			SDLK_F1
+#define KSYM_F2			SDLK_F2
+#define KSYM_F3			SDLK_F3
+#define KSYM_F4			SDLK_F4
+#define KSYM_F5			SDLK_F5
+#define KSYM_F6			SDLK_F6
+#define KSYM_F7			SDLK_F7
+#define KSYM_F8			SDLK_F8
+#define KSYM_F9			SDLK_F9
+#define KSYM_F10		SDLK_F10
+#define KSYM_F11		SDLK_F11
+#define KSYM_F12		SDLK_F12
+#define KSYM_F13		SDLK_F13
+#define KSYM_F14		SDLK_F14
+#define KSYM_F15		SDLK_F15
+#define KSYM_F16		KSYM_UNDEFINED
+#define KSYM_F17		KSYM_UNDEFINED
+#define KSYM_F18		KSYM_UNDEFINED
+#define KSYM_F19		KSYM_UNDEFINED
+#define KSYM_F20		KSYM_UNDEFINED
+#define KSYM_F21		KSYM_UNDEFINED
+#define KSYM_F22		KSYM_UNDEFINED
+#define KSYM_F23		KSYM_UNDEFINED
+#define KSYM_F24		KSYM_UNDEFINED
 
 
 /* SDL function definitions */
