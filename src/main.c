@@ -137,7 +137,7 @@ char *sound_name[NUM_SOUNDS] =
 };
 
 /* this is used to reduce memory usage of the different animation types */
-int anim_action_mapping[] =
+int graphics_action_mapping[] =
 {
   0,		/* GFX_ACTION_UNKNOWN		(0)  */
   0,		/* GFX_ACTION_DEFAULT		(1)  */

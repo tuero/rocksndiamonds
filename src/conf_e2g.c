@@ -21,6 +21,9 @@
 static struct
 {
     int element;
+    int direction;
+    int action;
+
     int graphic;
 }
 element_to_graphic[] =

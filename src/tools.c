@@ -3314,6 +3314,12 @@ int el2gfx_OLD(int element)
 
 int el2gfx(int element)
 {
+#if 1
+  int graphic_OLD = el2gfx_OLD(element);
+
+  return graphic_OLD;
+#else
+
   int graphic_NEW = element_info[element].graphic[GFX_ACTION_DEFAULT];
 
 #if DEBUG
@@ -3332,10 +3338,17 @@ int el2gfx(int element)
 #endif
 
   return graphic_NEW;
+#endif
 }
 
 int el2img(int element)
 {
+#if 1
+  int graphic_NEW = element_info[element].graphic[GFX_ACTION_DEFAULT];
+
+  return graphic_NEW;
+#else
+
   switch(element)
   {
     case EL_BD_BUTTERFLY:	return IMG_BD_BUTTERFLY;
@@ -3347,16 +3360,31 @@ int el2img(int element)
   }
 
   return IMG_EMPTY_SPACE;
+#endif
 }
 
 int el_dir2img(int element, int direction)
 {
-  if (element_info[element].has_direction_graphic[GFX_ACTION_DEFAULT])
-  {
-    int i = LOG_MV_DIR(direction);
+  int action = GFX_ACTION_DEFAULT;
 
-    return element_info[element].direction_graphic[GFX_ACTION_DEFAULT][i];
+  if (element_info[element].has_direction_graphic[action])
+  {
+    int direction = MV_DIR_BIT(direction);
+
+    return element_info[element].direction_graphic[action][direction];
   }
   else
     return el2img(element);
+}
+
+int el_dir_act2img(int element, int direction, int action)
+{
+  if (element_info[element].has_direction_graphic[action])
+  {
+    int direction = MV_DIR_BIT(direction);
+
+    return element_info[element].direction_graphic[action][direction];
+  }
+  else
+    return el_dir2img(element, direction);
 }

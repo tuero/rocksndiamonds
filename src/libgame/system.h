@@ -71,6 +71,7 @@
 #define MV_BIT_RIGHT		1
 #define MV_BIT_UP		2
 #define MV_BIT_DOWN	       	3
+#define NUM_MV_DIRECTIONS	4
 
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
@@ -83,7 +84,7 @@
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
 
-#define LOG_MV_DIR(x)		((x) == MV_LEFT  ? MV_BIT_LEFT  :	\
+#define MV_DIR_BIT(x)		((x) == MV_LEFT  ? MV_BIT_LEFT  :	\
 				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
 				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
 

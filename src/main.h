@@ -1567,7 +1567,7 @@ struct ElementInfo
   int graphic[NUM_GFX_ACTIONS_MAPPED];
 
 				/* special graphics for left/right/up/down */
-  int direction_graphic[NUM_GFX_ACTIONS_MAPPED][4];
+  int direction_graphic[NUM_GFX_ACTIONS_MAPPED][NUM_MV_DIRECTIONS];
   boolean has_direction_graphic[NUM_GFX_ACTIONS_MAPPED];
 };
 
@@ -1638,6 +1638,8 @@ extern boolean		SiebAktiv;
 extern int		SiebCount;
 
 extern boolean		network_player_action_received;
+
+extern int		graphics_action_mapping[];
 
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;

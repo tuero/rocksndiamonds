@@ -26,6 +26,9 @@
 #include "cartoons.h"
 #include "config.h"
 
+#include "conf_e2g.c"	/* include auto-generated data structure definitions */
+
+
 static char *image_filename[NUM_PICTURES] =
 {
   "RocksScreen.pcx",
@@ -556,8 +559,7 @@ void InitGadgets()
 
 void InitElementInfo()
 {
-  int i, j;
-
+#if 0
   static struct
   {
     int element;
@@ -919,13 +921,19 @@ void InitElementInfo()
       -1,			-1
     }
   };
+#endif
+
+  int i, j, k;
 
   /* always start with reliable default values */
   for(i=0; i<MAX_ELEMENTS; i++)
   {
     for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
     {
-      element_info[i].graphic[j] = GFX_LEERRAUM;
+      element_info[i].graphic[j] = IMG_EMPTY_SPACE;
+
+      for(k=0; k<NUM_MV_DIRECTIONS; k++)
+	element_info[i].direction_graphic[j][k] = IMG_EMPTY_SPACE;
       element_info[i].has_direction_graphic[j] = FALSE;
     }
   }
@@ -946,6 +954,7 @@ void InitElementInfo()
       GFX_START_ROCKSSP + nr_graphic;
   }
 
+#if 0
   /* this overrides some of the above default settings (GFX_SP_ZONK etc.) */
   i = 0;
   while (element_to_graphic[i].element > -1)
@@ -975,6 +984,33 @@ void InitElementInfo()
     element_info[element].has_direction_graphic[GFX_ACTION_DEFAULT] = TRUE;
     i++;
   }
+#else
+  i = 0;
+  while (element_to_graphic[i].element > -1)
+  {
+    int element   = element_to_graphic[i].element;
+    int direction = element_to_graphic[i].direction;
+    int action    = element_to_graphic[i].action;
+    int graphic   = element_to_graphic[i].graphic;
+
+    if (action > -1)
+      action = graphics_action_mapping[action];
+    else
+      action = GFX_ACTION_DEFAULT;
+
+    if (direction > -1)
+    {
+      direction = MV_DIR_BIT(direction);
+
+      element_info[element].direction_graphic[action][direction] = graphic;
+      element_info[element].has_direction_graphic[action] = TRUE;
+    }
+    else
+      element_info[element].graphic[action] = graphic;
+
+    i++;
+  }
+#endif
 }
 
 static void InitGraphicInfo()
