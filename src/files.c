@@ -106,15 +106,15 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->trigger_element = EL_EMPTY_SPACE;
 
   change->explode = FALSE;
-  change->use_content = FALSE;
-  change->only_complete = FALSE;
-  change->use_random_change = FALSE;
-  change->random = 100;
-  change->power = CP_NON_DESTRUCTIVE;
+  change->use_target_content = FALSE;
+  change->only_if_complete = FALSE;
+  change->use_random_replace = FALSE;
+  change->random_percentage = 100;
+  change->replace_when = CP_WHEN_EMPTY;
 
   for (x = 0; x < 3; x++)
     for (y = 0; y < 3; y++)
-      change->content[x][y] = EL_EMPTY_SPACE;
+      change->target_content[x][y] = EL_EMPTY_SPACE;
 
   change->direct_action = 0;
   change->other_action = 0;
@@ -203,7 +203,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     setElementChangePages(&element_info[element], 1);
     setElementChangeInfoToDefaults(element_info[element].change);
 
-    if (IS_CUSTOM_ELEMENT(element) || IS_GROUP_ELEMENT(element))
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
     {
       for (j = 0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
 	element_info[element].description[j] = '\0';
@@ -219,7 +221,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].gfx_element = EL_EMPTY_SPACE;
     }
 
-    if (IS_CUSTOM_ELEMENT(element))
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
     {
       element_info[element].access_direction = MV_ALL_DIRECTIONS;
 
@@ -270,7 +273,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].modified_settings = FALSE;
     }
-    else if (IS_GROUP_ELEMENT(element) || element == EL_INTERNAL_EDITOR)
+
+    if (IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
     {
       /* initialize memory for list of elements in group */
       if (element_info[element].group == NULL)
@@ -965,16 +970,16 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
       getMappedElement(getFile16BitBE(file));
 
     element_info[element].change->explode = getFile8Bit(file);
-    element_info[element].change->use_content = getFile8Bit(file);
-    element_info[element].change->only_complete = getFile8Bit(file);
-    element_info[element].change->use_random_change = getFile8Bit(file);
+    element_info[element].change->use_target_content = getFile8Bit(file);
+    element_info[element].change->only_if_complete = getFile8Bit(file);
+    element_info[element].change->use_random_replace = getFile8Bit(file);
 
-    element_info[element].change->random = getFile8Bit(file);
-    element_info[element].change->power = getFile8Bit(file);
+    element_info[element].change->random_percentage = getFile8Bit(file);
+    element_info[element].change->replace_when = getFile8Bit(file);
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	element_info[element].change->content[x][y] =
+	element_info[element].change->target_content[x][y] =
 	  getMappedElement(getFile16BitBE(file));
 
     element_info[element].slippery_type = getFile8Bit(file);
@@ -1088,16 +1093,16 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     change->trigger_element = getMappedElement(getFile16BitBE(file));
 
     change->explode = getFile8Bit(file);
-    change->use_content = getFile8Bit(file);
-    change->only_complete = getFile8Bit(file);
-    change->use_random_change = getFile8Bit(file);
+    change->use_target_content = getFile8Bit(file);
+    change->only_if_complete = getFile8Bit(file);
+    change->use_random_replace = getFile8Bit(file);
 
-    change->random = getFile8Bit(file);
-    change->power = getFile8Bit(file);
+    change->random_percentage = getFile8Bit(file);
+    change->replace_when = getFile8Bit(file);
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	change->content[x][y] = getMappedElement(getFile16BitBE(file));
+	change->target_content[x][y] = getMappedElement(getFile16BitBE(file));
 
     change->can_change = getFile8Bit(file);
 
@@ -2645,12 +2650,12 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	putFile16BitBE(file, element_info[element].change->trigger_element);
 
 	putFile8Bit(file, element_info[element].change->explode);
-	putFile8Bit(file, element_info[element].change->use_content);
-	putFile8Bit(file, element_info[element].change->only_complete);
-	putFile8Bit(file, element_info[element].change->use_random_change);
+	putFile8Bit(file, element_info[element].change->use_target_content);
+	putFile8Bit(file, element_info[element].change->only_if_complete);
+	putFile8Bit(file, element_info[element].change->use_random_replace);
 
-	putFile8Bit(file, element_info[element].change->random);
-	putFile8Bit(file, element_info[element].change->power);
+	putFile8Bit(file, element_info[element].change->random_percentage);
+	putFile8Bit(file, element_info[element].change->replace_when);
 
 	for (y = 0; y < 3; y++)
 	  for (x = 0; x < 3; x++)
@@ -2745,16 +2750,16 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile16BitBE(file, change->trigger_element);
 
     putFile8Bit(file, change->explode);
-    putFile8Bit(file, change->use_content);
-    putFile8Bit(file, change->only_complete);
-    putFile8Bit(file, change->use_random_change);
+    putFile8Bit(file, change->use_target_content);
+    putFile8Bit(file, change->only_if_complete);
+    putFile8Bit(file, change->use_random_replace);
 
-    putFile8Bit(file, change->random);
-    putFile8Bit(file, change->power);
+    putFile8Bit(file, change->random_percentage);
+    putFile8Bit(file, change->replace_when);
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	putFile16BitBE(file, change->content[x][y]);
+	putFile16BitBE(file, change->target_content[x][y]);
 
     putFile8Bit(file, change->can_change);
 

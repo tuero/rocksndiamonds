@@ -3866,12 +3866,17 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "internal/editor",
+    "internal_clipboard_custom",
     "internal",
-    "-"
+    "empty custom element"
   },
   {
-    "internal/dummy",
+    "internal_clipboard_group",
+    "internal",
+    "empty group element"
+  },
+  {
+    "internal_dummy",
     "internal",
     "-"
   },

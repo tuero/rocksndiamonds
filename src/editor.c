@@ -47,6 +47,8 @@
 #define ED_CTRL1_BUTTONS_GFX_YPOS 	236
 #define ED_CTRL2_BUTTONS_GFX_YPOS 	236
 #define ED_CTRL3_BUTTONS_GFX_YPOS 	324
+#define ED_CTRL4_BUTTONS_GFX_XPOS 	44
+#define ED_CTRL4_BUTTONS_GFX_YPOS 	214
 #define ED_CTRL1_BUTTONS_ALT_GFX_YPOS 	142
 #define ED_CTRL3_BUTTONS_ALT_GFX_YPOS 	302
 
@@ -62,6 +64,10 @@
 #define ED_CTRL3_BUTTON_YSIZE		22
 #define ED_CTRL3_BUTTONS_XPOS		6
 #define ED_CTRL3_BUTTONS_YPOS		6
+#define ED_CTRL4_BUTTON_XSIZE		22
+#define ED_CTRL4_BUTTON_YSIZE		22
+#define ED_CTRL4_BUTTONS_XPOS		6
+#define ED_CTRL4_BUTTONS_YPOS		6
 
 #define ED_CTRL1_BUTTONS_HORIZ		4
 #define ED_CTRL1_BUTTONS_VERT		4
@@ -69,14 +75,19 @@
 #define ED_CTRL2_BUTTONS_VERT		2
 #define ED_CTRL3_BUTTONS_HORIZ		3
 #define ED_CTRL3_BUTTONS_VERT		1
+#define ED_CTRL4_BUTTONS_HORIZ		2
+#define ED_CTRL4_BUTTONS_VERT		1
 
 #define ED_NUM_CTRL1_BUTTONS   (ED_CTRL1_BUTTONS_HORIZ * ED_CTRL1_BUTTONS_VERT)
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL3_BUTTONS   (ED_CTRL3_BUTTONS_HORIZ * ED_CTRL3_BUTTONS_VERT)
-#define ED_NUM_CTRL1_2_BUTTONS (ED_NUM_CTRL1_BUTTONS + ED_NUM_CTRL2_BUTTONS)
+#define ED_NUM_CTRL4_BUTTONS   (ED_CTRL4_BUTTONS_HORIZ * ED_CTRL4_BUTTONS_VERT)
+#define ED_NUM_CTRL1_2_BUTTONS (ED_NUM_CTRL1_BUTTONS   + ED_NUM_CTRL2_BUTTONS)
+#define ED_NUM_CTRL1_3_BUTTONS (ED_NUM_CTRL1_2_BUTTONS + ED_NUM_CTRL3_BUTTONS)
 #define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_BUTTONS + \
 				ED_NUM_CTRL2_BUTTONS + \
-				ED_NUM_CTRL3_BUTTONS)
+				ED_NUM_CTRL3_BUTTONS + \
+				ED_NUM_CTRL4_BUTTONS)
 
 /* values for the element list */
 #define ED_ELEMENTLIST_XPOS		5
@@ -327,9 +338,11 @@
 #define GADGET_ID_CUSTOM_COPY_FROM	(GADGET_ID_TOOLBOX_FIRST + 22)
 #define GADGET_ID_CUSTOM_COPY_TO	(GADGET_ID_TOOLBOX_FIRST + 23)
 #define GADGET_ID_CUSTOM_EXCHANGE	(GADGET_ID_TOOLBOX_FIRST + 24)
+#define GADGET_ID_CUSTOM_COPY		(GADGET_ID_TOOLBOX_FIRST + 25)
+#define GADGET_ID_CUSTOM_PASTE		(GADGET_ID_TOOLBOX_FIRST + 26)
 
 /* counter button identifiers */
-#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 25)
+#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 27)
 
 #define GADGET_ID_SELECT_LEVEL_DOWN	(GADGET_ID_COUNTER_FIRST + 0)
 #define GADGET_ID_SELECT_LEVEL_TEXT	(GADGET_ID_COUNTER_FIRST + 1)
@@ -459,7 +472,7 @@
 #define GADGET_ID_CHANGE_SIDE		(GADGET_ID_SELECTBOX_FIRST + 17)
 #define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 18)
 #define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 19)
-#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 20)
+#define GADGET_ID_CHANGE_REPLACE_WHEN	(GADGET_ID_SELECTBOX_FIRST + 20)
 #define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 21)
 #define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 22)
 
@@ -650,7 +663,7 @@
 #define ED_SELECTBOX_ID_CHANGE_SIDE		17
 #define ED_SELECTBOX_ID_CHANGE_PLAYER		18
 #define ED_SELECTBOX_ID_CHANGE_PAGE		19
-#define ED_SELECTBOX_ID_CHANGE_POWER		20
+#define ED_SELECTBOX_ID_CHANGE_REPLACE_WHEN	20
 #define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	21
 #define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	22
 
@@ -866,6 +879,9 @@ static struct
   { '\0',	"copy settings from other element"	},
   { '\0',	"copy settings to other element"	},
   { '\0',	"exchange settings with other element"	},
+
+  { '\0',	"copy settings from this element"	},
+  { '\0',	"paste settings to this element"	},
 };
 
 static int random_placement_value = 10;
@@ -1088,7 +1104,7 @@ static struct
     0,					100,
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
-    &custom_element_change.random,
+    &custom_element_change.random_percentage,
     NULL,				"use random replace:", "%"
   },
 };
@@ -1420,11 +1436,11 @@ static struct ValueTextInfo options_change_trigger_page[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_power[] =
+static struct ValueTextInfo options_change_replace_when[] =
 {
-  { CP_NON_DESTRUCTIVE,		"empty"				},
-  { CP_HALF_DESTRUCTIVE,	"diggable"			},
-  { CP_FULL_DESTRUCTIVE,	"destructible"			},
+  { CP_WHEN_EMPTY,		"empty"				},
+  { CP_WHEN_DIGGABLE,		"diggable"			},
+  { CP_WHEN_DESTRUCTIBLE,	"destructible"			},
 
   { -1,				NULL				}
 };
@@ -1630,10 +1646,10 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
-    GADGET_ID_CHANGE_POWER,		GADGET_ID_NONE,
+    GADGET_ID_CHANGE_REPLACE_WHEN,	GADGET_ID_NONE,
     -1,
-    options_change_power,
-    &custom_element_change.power,
+    options_change_replace_when,
+    &custom_element_change.replace_when,
     "replace when", NULL,		"which elements can be replaced"
   },
   {
@@ -2082,19 +2098,19 @@ static struct
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CHANGE_USE_CONTENT,	GADGET_ID_NONE,
-    &custom_element_change.use_content,
+    &custom_element_change.use_target_content,
     NULL, "use extended change target:","element changes to more elements"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
-    &custom_element_change.only_complete,
+    &custom_element_change.only_if_complete,
     NULL, "replace all or nothing",	"only replace when all can be changed"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
-    &custom_element_change.use_random_change,
+    &custom_element_change.use_random_replace,
     NULL, NULL,				"use percentage for random replace"
   },
 };
@@ -3969,7 +3985,7 @@ static void DrawDrawingArea(int id)
       for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(custom_element_change.content[x][y]));
+			   el2edimg(custom_element_change.target_content[x][y]));
   else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.trigger_element));
@@ -4079,7 +4095,7 @@ static void CreateControlButtons()
 
       gd_xoffset = ED_CTRL1_BUTTONS_XPOS + x * ED_CTRL1_BUTTON_XSIZE;
       gd_yoffset = ED_CTRL1_BUTTONS_YPOS + y * ED_CTRL1_BUTTON_YSIZE;
-      width = ED_CTRL1_BUTTON_XSIZE;
+      width  = ED_CTRL1_BUTTON_XSIZE;
       height = ED_CTRL1_BUTTON_YSIZE;
 
       gd_x1 = DOOR_GFX_PAGEX8 + gd_xoffset;
@@ -4094,7 +4110,7 @@ static void CreateControlButtons()
 
       gd_xoffset = ED_CTRL2_BUTTONS_XPOS + x * ED_CTRL2_BUTTON_XSIZE;
       gd_yoffset = ED_CTRL2_BUTTONS_YPOS + y * ED_CTRL2_BUTTON_YSIZE;
-      width = ED_CTRL2_BUTTON_XSIZE;
+      width  = ED_CTRL2_BUTTON_XSIZE;
       height = ED_CTRL2_BUTTON_YSIZE;
 
       gd_x1 = DOOR_GFX_PAGEX8 + gd_xoffset;
@@ -4102,20 +4118,35 @@ static void CreateControlButtons()
       gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL2_BUTTONS_GFX_YPOS + gd_yoffset;
       gd_y2 = 0;	/* no alternative graphic for these buttons */
     }
-    else
+    else if (id < ED_NUM_CTRL1_3_BUTTONS)
     {
       int x = (i - ED_NUM_CTRL1_2_BUTTONS) % ED_CTRL3_BUTTONS_HORIZ + 1;
       int y = (i - ED_NUM_CTRL1_2_BUTTONS) / ED_CTRL3_BUTTONS_HORIZ;
 
       gd_xoffset = ED_CTRL3_BUTTONS_XPOS + x * ED_CTRL3_BUTTON_XSIZE;
       gd_yoffset = ED_CTRL3_BUTTONS_YPOS + y * ED_CTRL3_BUTTON_YSIZE;
-      width = ED_CTRL3_BUTTON_XSIZE;
+      width  = ED_CTRL3_BUTTON_XSIZE;
       height = ED_CTRL3_BUTTON_YSIZE;
 
       gd_x1 = DOOR_GFX_PAGEX6 + gd_xoffset;
       gd_x2 = DOOR_GFX_PAGEX5 + gd_xoffset;
       gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_GFX_YPOS     + gd_yoffset;
       gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
+    }
+    else
+    {
+      int x = (i - ED_NUM_CTRL1_3_BUTTONS) % ED_CTRL4_BUTTONS_HORIZ;
+      int y = (i - ED_NUM_CTRL1_3_BUTTONS) / ED_CTRL4_BUTTONS_HORIZ + 3;
+
+      gd_xoffset = ED_CTRL4_BUTTONS_XPOS + x * ED_CTRL4_BUTTON_XSIZE;
+      gd_yoffset = ED_CTRL4_BUTTONS_YPOS + y * ED_CTRL4_BUTTON_YSIZE;
+      width  = ED_CTRL4_BUTTON_XSIZE;
+      height = ED_CTRL4_BUTTON_YSIZE;
+
+      gd_x1 = DOOR_GFX_PAGEX6 + ED_CTRL4_BUTTONS_GFX_XPOS + gd_xoffset;
+      gd_x2 = DOOR_GFX_PAGEX5 + ED_CTRL4_BUTTONS_GFX_XPOS + gd_xoffset;
+      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL4_BUTTONS_GFX_YPOS + gd_yoffset;
+      gd_y2 = 0;	/* no alternative graphic for these buttons */
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -5286,7 +5317,9 @@ static void MapOrUnmapLevelEditorToolboxCustomGadgets(boolean map)
   {
     if (i == GADGET_ID_CUSTOM_COPY_FROM ||
         i == GADGET_ID_CUSTOM_COPY_TO ||
-        i == GADGET_ID_CUSTOM_EXCHANGE)
+        i == GADGET_ID_CUSTOM_EXCHANGE ||
+        i == GADGET_ID_CUSTOM_COPY ||
+        i == GADGET_ID_CUSTOM_PASTE)
     {
       if (map)
 	MapGadget(level_editor_gadget[i]);
@@ -5534,15 +5567,15 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
     change_to->explode = change_from->explode;
     change_to->use_content = change_from->use_content;
-    change_to->only_complete = change_from->only_complete;
+    change_to->only_if_complete = change_from->only_if_complete;
     change_to->use_random_change = change_from->use_random_change;
 
-    change_to->random = change_from->random;
-    change_to->power = change_from->power;
+    change_to->random_percentage = change_from->random_percentage;
+    change_to->replace_when = change_from->replace_when;
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	change_to->content[x][y] = change_from->content[x][y];
+	change_to->target_content[x][y] = change_from->target_content[x][y];
 
     change_to->can_change = change_from->can_change;
 
@@ -5580,8 +5613,8 @@ static void replace_custom_element_in_settings(int element_from,
 
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)
-	  if (change->content[x][y] == element_from)
-	    change->content[x][y] = element_to;
+	  if (change->target_content[x][y] == element_from)
+	    change->target_content[x][y] = element_to;
     }
 
     if (ei->group != NULL)				/* group or internal */
@@ -5605,7 +5638,19 @@ static void replace_custom_element_in_playfield(int element_from,
 static boolean CopyCustomElement(int element_old, int element_new,
 				 int copy_mode)
 {
-  if (IS_CUSTOM_ELEMENT(element_old) && !IS_CUSTOM_ELEMENT(element_new))
+  if (copy_mode == GADGET_ID_CUSTOM_COPY)
+  {
+    element_new = (IS_CUSTOM_ELEMENT(element_old) ?
+		   EL_INTERNAL_CLIPBOARD_CUSTOM : EL_INTERNAL_CLIPBOARD_GROUP);
+    copy_mode = GADGET_ID_CUSTOM_COPY_TO;
+  }
+  else if (copy_mode == GADGET_ID_CUSTOM_PASTE)
+  {
+    element_old = (IS_CUSTOM_ELEMENT(element_new) ?
+		   EL_INTERNAL_CLIPBOARD_CUSTOM : EL_INTERNAL_CLIPBOARD_GROUP);
+    copy_mode = GADGET_ID_CUSTOM_COPY_TO;
+  }
+  else if (IS_CUSTOM_ELEMENT(element_old) && !IS_CUSTOM_ELEMENT(element_new))
   {
     Request("Please choose custom element !", REQ_CONFIRM);
 
@@ -5628,17 +5673,17 @@ static boolean CopyCustomElement(int element_old, int element_new,
   }
   else if (copy_mode == GADGET_ID_CUSTOM_EXCHANGE)
   {
-    copy_custom_element_settings(element_old, EL_INTERNAL_EDITOR);
+    copy_custom_element_settings(element_old, EL_INTERNAL_DUMMY);
     copy_custom_element_settings(element_new, element_old);
-    copy_custom_element_settings(EL_INTERNAL_EDITOR, element_new);
+    copy_custom_element_settings(EL_INTERNAL_DUMMY, element_new);
 
-    replace_custom_element_in_settings(element_old, EL_INTERNAL_EDITOR);
+    replace_custom_element_in_settings(element_old, EL_INTERNAL_DUMMY);
     replace_custom_element_in_settings(element_new, element_old);
-    replace_custom_element_in_settings(EL_INTERNAL_EDITOR, element_new);
+    replace_custom_element_in_settings(EL_INTERNAL_DUMMY, element_new);
 
-    replace_custom_element_in_playfield(element_old, EL_INTERNAL_EDITOR);
+    replace_custom_element_in_playfield(element_old, EL_INTERNAL_DUMMY);
     replace_custom_element_in_playfield(element_new, element_old);
-    replace_custom_element_in_playfield(EL_INTERNAL_EDITOR, element_new);
+    replace_custom_element_in_playfield(EL_INTERNAL_DUMMY, element_new);
   }
 
   UpdateCustomElementGraphicGadgets();
@@ -6352,7 +6397,7 @@ static void DrawCustomChangeContentArea()
   int id = ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT;
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
   int x1 = right_gadget_border[GADGET_ID_CHANGE_USE_CONTENT];
-  int x2 = right_gadget_border[GADGET_ID_CHANGE_POWER];
+  int x2 = right_gadget_border[GADGET_ID_CHANGE_REPLACE_WHEN];
   int x3 = right_gadget_border[GADGET_ID_CHANGE_ONLY_COMPLETE];
   int xoffset = ED_DRAWINGAREA_TEXT_DISTANCE;
 
@@ -8038,7 +8083,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
 	{
-	  custom_element_change.content[sx][sy] = new_element;
+	  custom_element_change.target_content[sx][sy] = new_element;
 
 	  CopyCustomElementPropertiesToGame(properties_element);
 	}
@@ -8171,7 +8216,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	PickDrawingElement(button, custom_element_change.target_element);
       else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-	PickDrawingElement(button, custom_element_change.content[sx][sy]);
+	PickDrawingElement(button, custom_element_change.target_content[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	PickDrawingElement(button, custom_element_change.trigger_element);
       else if (id == GADGET_ID_GROUP_CONTENT)
@@ -8635,6 +8680,14 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_CUSTOM_EXCHANGE:
       last_custom_copy_mode = id;
       last_drawing_function = drawing_function;
+      break;
+
+    case GADGET_ID_CUSTOM_COPY:
+      CopyCustomElement(properties_element, -1, id);
+      break;
+
+    case GADGET_ID_CUSTOM_PASTE:
+      CopyCustomElement(-1, properties_element, id);
       break;
 
     case GADGET_ID_UNDO:
@@ -9107,7 +9160,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       element = custom_element_change.target_element;
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      element = custom_element_change.content[sx][sy];
+      element = custom_element_change.target_content[sx][sy];
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       element = custom_element_change.trigger_element;
     else if (id == GADGET_ID_GROUP_CONTENT)

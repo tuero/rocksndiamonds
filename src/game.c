@@ -1859,7 +1859,7 @@ void InitGame()
 
 	for (i = 0; i < element_info[element].num_change_pages; i++)
 	{
-	  content = element_info[element].change_page[i].content[xx][yy];
+	  content= element_info[element].change_page[i].target_content[xx][yy];
 	  is_player = ELEM_IS_PLAYER(content);
 
 	  if (is_player && (found_rating < 1 || element < found_element))
@@ -6905,35 +6905,38 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     return TRUE;
   }
 
-  if (change->use_content)
+  if (change->use_target_content)
   {
-    boolean complete_change = TRUE;
-    boolean can_change[3][3];
+    boolean complete_replace = TRUE;
+    boolean can_replace[3][3];
     int xx, yy;
 
     for (yy = 0; yy < 3; yy++) for (xx = 0; xx < 3 ; xx++)
     {
-      boolean half_destructible;
+      boolean is_empty;
+      boolean is_diggable;
+      boolean is_destructible;
       int ex = x + xx - 1;
       int ey = y + yy - 1;
+      int content_element = change->target_content[xx][yy];
       int e;
 
-      can_change[xx][yy] = TRUE;
+      can_replace[xx][yy] = TRUE;
 
       if (ex == x && ey == y)	/* do not check changing element itself */
 	continue;
 
-      if (change->content[xx][yy] == EL_EMPTY_SPACE)
+      if (content_element == EL_EMPTY_SPACE)
       {
-	can_change[xx][yy] = FALSE;	/* do not change empty borders */
+	can_replace[xx][yy] = FALSE;	/* do not replace border with space */
 
 	continue;
       }
 
       if (!IN_LEV_FIELD(ex, ey))
       {
-	can_change[xx][yy] = FALSE;
-	complete_change = FALSE;
+	can_replace[xx][yy] = FALSE;
+	complete_replace = FALSE;
 
 	continue;
       }
@@ -6943,39 +6946,62 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
       if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
 	e = MovingOrBlocked2Element(ex, ey);
 
-      half_destructible = (IS_FREE(ex, ey) || IS_DIGGABLE(e));
+#if 1
+      is_empty = (IS_FREE(ex, ey) || (IS_PLAYER(ex, ey) &&
+				      IS_WALKABLE(content_element)));
+      is_diggable = (is_empty || IS_DIGGABLE(e));
+      is_destructible = (is_empty || !IS_INDESTRUCTIBLE(e));
 
-      if ((change->power <= CP_NON_DESTRUCTIVE  && !IS_FREE(ex, ey)) ||
-	  (change->power <= CP_HALF_DESTRUCTIVE && !half_destructible) ||
-	  (change->power <= CP_FULL_DESTRUCTIVE && IS_INDESTRUCTIBLE(e)))
+      can_replace[xx][yy] =
+	((change->replace_when == CP_WHEN_EMPTY && is_empty) ||
+	 (change->replace_when == CP_WHEN_DIGGABLE && is_diggable) ||
+	 (change->replace_when == CP_WHEN_DESTRUCTIBLE && is_destructible));
+
+      if (!can_replace[xx][yy])
+	complete_replace = FALSE;
+#else
+      empty_for_element = (IS_FREE(ex, ey) || (IS_FREE_OR_PLAYER(ex, ey) &&
+					       IS_WALKABLE(content_element)));
+#if 1
+      half_destructible = (empty_for_element || IS_DIGGABLE(e));
+#else
+      half_destructible = (IS_FREE(ex, ey) || IS_DIGGABLE(e));
+#endif
+
+      if ((change->replace_when <= CP_WHEN_EMPTY  && !empty_for_element) ||
+	  (change->replace_when <= CP_WHEN_DIGGABLE && !half_destructible) ||
+	  (change->replace_when <= CP_WHEN_DESTRUCTIBLE && IS_INDESTRUCTIBLE(e)))
       {
-	can_change[xx][yy] = FALSE;
-	complete_change = FALSE;
+	can_replace[xx][yy] = FALSE;
+	complete_replace = FALSE;
       }
+#endif
     }
 
-    if (!change->only_complete || complete_change)
+    if (!change->only_if_complete || complete_replace)
     {
       boolean something_has_changed = FALSE;
 
-      if (change->only_complete && change->use_random_change &&
-	  RND(100) < change->random)
+      if (change->only_if_complete && change->use_random_replace &&
+	  RND(100) < change->random_percentage)
 	return FALSE;
 
       for (yy = 0; yy < 3; yy++) for (xx = 0; xx < 3 ; xx++)
       {
 	int ex = x + xx - 1;
 	int ey = y + yy - 1;
+	int content_element;
 
-	if (can_change[xx][yy] && (!change->use_random_change ||
-				   RND(100) < change->random))
+	if (can_replace[xx][yy] && (!change->use_random_replace ||
+				    RND(100) < change->random_percentage))
 	{
 	  if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
 	    RemoveMovingField(ex, ey);
 
 	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
-	  target_element = GET_TARGET_ELEMENT(change->content[xx][yy], change);
+	  content_element = change->target_content[xx][yy];
+	  target_element = GET_TARGET_ELEMENT(content_element, change);
 
 	  ChangeElementNowExt(ex, ey, target_element);
 

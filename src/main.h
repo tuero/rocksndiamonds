@@ -236,9 +236,9 @@
 #define CH_PAGE_ANY		(0xffffffff)
 
 /* values for change power for custom elements */
-#define CP_NON_DESTRUCTIVE	0
-#define CP_HALF_DESTRUCTIVE	1
-#define CP_FULL_DESTRUCTIVE	2
+#define CP_WHEN_EMPTY		0
+#define CP_WHEN_DIGGABLE	1
+#define CP_WHEN_DESTRUCTIBLE	2
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER	4
@@ -390,16 +390,19 @@
 #define IS_GROUP_ELEMENT(e)	((e) >= EL_GROUP_START &&		\
 	 			 (e) <= EL_GROUP_END)
 
+#define IS_INTERNAL_ELEMENT(e)	((e) >= EL_INTERNAL_START &&		\
+	 			 (e) <= EL_INTERNAL_END)
+
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
-#define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
+#define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
-#define IS_FREE(x,y)		(Feld[x][y] == EL_EMPTY && !IS_PLAYER(x,y))
-#define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_EMPTY)
+#define IS_FREE(x, y)		(Feld[x][y] == EL_EMPTY && !IS_PLAYER(x, y))
+#define IS_FREE_OR_PLAYER(x, y)	(Feld[x][y] == EL_EMPTY)
 
 #define IS_MOVING(x,y)		(MovPos[x][y] != 0)
 #define IS_FALLING(x,y)		(MovPos[x][y] != 0 && MovDir[x][y] == MV_DOWN)
@@ -1011,10 +1014,14 @@
 /* internal elements (only used for internal purposes like copying) */
 #define EL_FIRST_INTERNAL			(EL_FIRST_DUMMY + 25)
 
-#define EL_INTERNAL_EDITOR			(EL_FIRST_INTERNAL + 0)
-#define EL_INTERNAL_DUMMY			(EL_FIRST_INTERNAL + 1)
+#define EL_INTERNAL_CLIPBOARD_CUSTOM		(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_CLIPBOARD_GROUP		(EL_FIRST_INTERNAL + 1)
+#define EL_INTERNAL_DUMMY			(EL_FIRST_INTERNAL + 2)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_INTERNAL + 2)
+#define EL_INTERNAL_START			(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_END				(EL_FIRST_INTERNAL + 2)
+
+#define MAX_NUM_ELEMENTS			(EL_FIRST_INTERNAL + 3)
 
 
 /* values for graphics/sounds action types */
@@ -1546,12 +1553,12 @@ struct ElementChangeInfo
 
   short trigger_element;	/* element triggering change */
 
-  int content[3][3];		/* new elements after extended change */
-  boolean use_content;		/* use extended change content */
-  boolean only_complete;	/* only use complete content */
-  boolean use_random_change;	/* use random value for setting content */
-  int random;			/* random value for setting content */
-  int power;			/* power of extended change */
+  int target_content[3][3];	/* elements for extended change target */
+  boolean use_target_content;	/* use extended change target */
+  boolean only_if_complete;	/* only use complete target content */
+  boolean use_random_replace;	/* use random value for replacing elements */
+  int random_percentage;	/* random value for replacing elements */
+  int replace_when;		/* type of elements that can be replaced */
 
   boolean explode;		/* explode instead of change */
 

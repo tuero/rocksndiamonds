@@ -1,3 +1,7 @@
+2004-03-15
+	* added trigger element and trigger player to use as target elements
+	* added copy and paste editor functions for custom and group elements
+
 2004-03-14
 	* fixed graphical bug when displaying explosion animations
 	* fixed bug when appending to tapes, resulting in broken tapes
