@@ -7339,6 +7339,10 @@ static void DrawPropertiesConfig()
       counterbutton_info[counter_id].value = elements_with_counter[i].value;
       counterbutton_info[counter_id].text_right= elements_with_counter[i].text;
 
+      /* !!! CHANGE THIS FOR CERTAIN ELEMENTS !!! */
+      counterbutton_info[counter_id].min_value = MIN_SCORE;
+      counterbutton_info[counter_id].max_value = MAX_SCORE;
+
       MapCounterButtons(counter_id);
 
       num_element_counters++;

@@ -1092,7 +1092,7 @@ static void InitGraphicInfo()
 	    src_x, src_y);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
 
-#if 1
+#if 0
       Error(ERR_RETURN, "scale_up_factor == %d", scale_up_factor);
 #endif
 
