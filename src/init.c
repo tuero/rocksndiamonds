@@ -1497,7 +1497,9 @@ void InitElementProperties()
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
     EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER
+    EL_SP_CHIP_LOWER,
+    /* additional elements that appeared in newer Supaplex levels */
+    EL_UNSICHTBAR
   };
   static int ep_sp_element_num = sizeof(ep_sp_element)/sizeof(int);
 

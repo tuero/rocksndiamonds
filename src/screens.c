@@ -28,18 +28,18 @@
 
 /* for DrawSetupScreen(), HandleSetupScreen() */
 #define SETUP_SCREEN_POS_START		2
-#define SETUP_SCREEN_POS_END		16
+#define SETUP_SCREEN_POS_END		(SCR_FIELDY - 1)
 #define SETUP_SCREEN_POS_EMPTY1		(SETUP_SCREEN_POS_END - 2)
 #define SETUP_SCREEN_POS_EMPTY2		(SETUP_SCREEN_POS_END - 2)
 
 /* for HandleSetupInputScreen() */
 #define SETUPINPUT_SCREEN_POS_START	2
-#define SETUPINPUT_SCREEN_POS_END	15
+#define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 2)
 #define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
 #define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
 /* for HandleChooseLevel() */
-#define MAX_LEVEL_SERIES_ON_SCREEN	15
+#define MAX_LEVEL_SERIES_ON_SCREEN	(SCR_FIELDY - 2)
 
 #ifdef MSDOS
 extern unsigned char get_ascii(KeySym);
@@ -820,7 +820,7 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
   for(i=0; i<num_page_entries; i++)
   {
-    strncpy(buffer, leveldir[first_entry + i].name , SCR_FIELDX - 1);
+    strncpy(buffer, leveldir[first_entry + i].name_short , SCR_FIELDX - 1);
     buffer[SCR_FIELDX - 1] = '\0';
     DrawText(SX + 32, SY + (i + 2) * 32, buffer,
 	     FS_BIG, leveldir[first_entry + i].color);
@@ -852,7 +852,7 @@ static void drawChooseLevelInfo(int leveldir_nr)
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 3;
-  static int first_entry = 0;
+  static int first_entry = -1;
   static unsigned long choose_delay = 0;
   static int redraw = TRUE;
   int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
@@ -866,17 +866,15 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
-    redraw = TRUE;
-    choice = leveldir_nr + 3 - first_entry;
-
-    if (choice > num_page_entries + 2)
+    if (first_entry == -1)
     {
-      choice = num_page_entries + 2;
-      first_entry = num_leveldirs - num_page_entries;
+      first_entry = leveldir_nr - num_page_entries + 1;
+      choice = leveldir_nr - first_entry + 3;
     }
 
     drawChooseLevelList(first_entry, num_page_entries);
     drawChooseLevelInfo(leveldir_nr);
+    redraw = TRUE;
   }
 
   if (redraw)
@@ -896,7 +894,15 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       y = choice + dy;
     }
     else
-      x = y = 0;
+      x = y = 0;	/* no action */
+
+    if (ABS(dy) == SCR_FIELDY)	/* handle XK_Page_Up, XK_Page_Down */
+    {
+      dy = SIGN(dy);
+      step = num_page_entries - 1;
+      x = 1;
+      y = (dy < 0 ? 2 : num_page_entries + 3);
+    }
   }
 
   if (x == 1 && y == 2)
@@ -904,13 +910,10 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (first_entry > 0 &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
-#if 0
-      first_entry--;
-#else
       first_entry -= step;
       if (first_entry < 0)
 	first_entry = 0;
-#endif
+
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
@@ -922,13 +925,10 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (first_entry + num_page_entries < num_leveldirs &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
-#if 0
-      first_entry++;
-#else
       first_entry += step;
       if (first_entry + num_page_entries > num_leveldirs)
 	first_entry = num_leveldirs - num_page_entries;
-#endif
+
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry + num_page_entries - 1);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);

@@ -68,7 +68,8 @@ void EventLoop(void)
     if (game_status != PLAYING)
     {
       XSync(display, FALSE);
-      Delay(10);
+      if (!XPending(display))	/* delay only if no pending events */
+	Delay(10);
     }
 
     /* refresh window contents from drawing buffer, if needed */
@@ -527,6 +528,16 @@ void HandleKey(KeySym key, int key_status)
 	    HandleSetupScreen(0,0, 0,0, MB_MENU_CHOICE);
 	  else if (game_status == SETUPINPUT)
 	    HandleSetupInputScreen(0,0, 0,0, MB_MENU_CHOICE);
+	  break;
+
+        case XK_Page_Up:
+          if (game_status == CHOOSELEVEL)
+            HandleChooseLevel(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+	  break;
+
+        case XK_Page_Down:
+          if (game_status == CHOOSELEVEL)
+            HandleChooseLevel(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
 	default:

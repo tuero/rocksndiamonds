@@ -975,6 +975,7 @@ static struct
 
   /* level directory info */
   { TYPE_STRING,  &ldi.name,		"name"				},
+  { TYPE_STRING,  &ldi.name_short,	"name_short"			},
   { TYPE_STRING,  &ldi.author,		"author"			},
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
   { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
@@ -1240,6 +1241,7 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
   ldi->name = getStringCopy(ANONYMOUS_NAME);
+  ldi->name_short = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
   ldi->levels = 0;
   ldi->first_level = 0;
@@ -1462,6 +1464,10 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 	setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
       leveldir[current_entry] = ldi;
 
+      if (leveldir[current_entry].name_short == NULL)
+	leveldir[current_entry].name_short =
+	  getStringCopy(leveldir[current_entry].name);
+
       leveldir[current_entry].filename = getStringCopy(dir_entry->d_name);
       leveldir[current_entry].last_level =
 	leveldir[current_entry].first_level +
@@ -1532,6 +1538,7 @@ static void SaveUserLevelInfo()
   setLevelDirInfoToDefaults(&ldi);
 
   ldi.name = getLoginName();
+  ldi.name_short = getLoginName();
   ldi.author = getRealName();
   ldi.levels = 100;
   ldi.first_level = 1;
