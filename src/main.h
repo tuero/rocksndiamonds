@@ -887,8 +887,9 @@
 #define EL_BD_DEFAULT				(EL_FIRST_DUMMY + 22)
 #define EL_SP_DEFAULT				(EL_FIRST_DUMMY + 23)
 #define EL_SB_DEFAULT				(EL_FIRST_DUMMY + 24)
+#define EL_DUMMY				(EL_FIRST_DUMMY + 25)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 25)
+#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 26)
 
 
 /* values for graphics/sounds action types */

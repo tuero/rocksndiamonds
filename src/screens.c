@@ -291,9 +291,9 @@ void DrawMainMenu()
 
   if (leveldir_current->readonly)
   {
-    DrawTextF(mSX + level_width + 9 * 32 - 2,
+    DrawTextS(mSX + level_width + 9 * 32 - 2,
 	      mSY + 3 * 32 + 1 - 7, FONT_TEXT_3, "READ");
-    DrawTextF(mSX + level_width + 9 * 32 - 2,
+    DrawTextS(mSX + level_width + 9 * 32 - 2,
 	      mSY + 3 * 32 + 1 + 7, FONT_TEXT_3, "ONLY");
   }
 
@@ -994,7 +994,7 @@ void DrawHelpScreenElText(int start)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT_TEXT_1, "The game elements:");
+  DrawTextSCentered(100, FONT_TEXT_1, "The game elements:");
 
   for(i=start; i < start + MAX_HELPSCREEN_ELS && i < num_helpscreen_els; i++)
   {
@@ -1005,7 +1005,7 @@ void DrawHelpScreenElText(int start)
 	     helpscreen_eltext[i][1], FONT_TEXT_2);
   }
 
-  DrawTextFCentered(ybottom, FONT_TEXT_4,
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 }
 
@@ -1023,28 +1023,28 @@ void DrawHelpScreenMusicText(int num)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT_TEXT_1, "The game background music loops:");
+  DrawTextSCentered(100, FONT_TEXT_1, "The game background music loops:");
 
 #if 1
-  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
+  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
   DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
-  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
+  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
   DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
-  DrawTextFCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
+  DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
   DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
 #else
-  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
+  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
   DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][0]);
-  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
+  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
   DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3,
 		    "%s", helpscreen_music[num][1]);
-  DrawTextFCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
+  DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
   DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][2]);
 #endif
 
-  DrawTextFCentered(ybottom, FONT_TEXT_4,
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 
 #if 0
@@ -1061,16 +1061,16 @@ void DrawHelpScreenCreditsText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT_TEXT_1, "Credits:");
-  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "DOS port of the game:");
-  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "Guido Schulz");
-  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "Additional toons:");
-  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "Karl Hörnell");
-  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(100, FONT_TEXT_1, "Credits:");
+  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "DOS port of the game:");
+  DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3, "Guido Schulz");
+  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "Additional toons:");
+  DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3, "Karl Hörnell");
+  DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
 		    "...and many thanks to all contributors");
-  DrawTextFCentered(ystart + 6 * ystep, FONT_TEXT_2, "of new levels!");
+  DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2, "of new levels!");
 
-  DrawTextFCentered(ybottom, FONT_TEXT_4,
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 }
 
@@ -1082,33 +1082,33 @@ void DrawHelpScreenContactText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT_TEXT_1, "Program information:");
+  DrawTextSCentered(100, FONT_TEXT_1, "Program information:");
 
-  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
 		    "This game is Freeware!");
-  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_2,
 		    "If you like it, send e-mail to:");
-  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_3,
+  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_3,
 		    "info@artsoft.org");
-  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_2,
 		    "or SnailMail to:");
-  DrawTextFCentered(ystart + 4 * ystep + 0, FONT_TEXT_3,
+  DrawTextSCentered(ystart + 4 * ystep + 0, FONT_TEXT_3,
 		    "Holger Schemel");
-  DrawTextFCentered(ystart + 4 * ystep + 20, FONT_TEXT_3,
+  DrawTextSCentered(ystart + 4 * ystep + 20, FONT_TEXT_3,
 		    "Detmolder Strasse 189");
-  DrawTextFCentered(ystart + 4 * ystep + 40, FONT_TEXT_3,
+  DrawTextSCentered(ystart + 4 * ystep + 40, FONT_TEXT_3,
 		    "33604 Bielefeld");
-  DrawTextFCentered(ystart + 4 * ystep + 60, FONT_TEXT_3,
+  DrawTextSCentered(ystart + 4 * ystep + 60, FONT_TEXT_3,
 		    "Germany");
 
-  DrawTextFCentered(ystart + 7 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_2,
 		    "If you have created new levels,");
-  DrawTextFCentered(ystart + 8 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_2,
 		    "send them to me to include them!");
-  DrawTextFCentered(ystart + 9 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart + 9 * ystep, FONT_TEXT_2,
 		    ":-)");
 
-  DrawTextFCentered(ybottom, FONT_TEXT_4,
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for main menu");
 }
 
@@ -2261,7 +2261,7 @@ void DrawSetupScreen_Input()
 
 #if 0
   DeactivateJoystickForCalibration();
-  DrawTextFCentered(SYSIZE - 20, FONT_TEXT_4,
+  DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		    "Joysticks deactivated on this screen");
 #endif
 

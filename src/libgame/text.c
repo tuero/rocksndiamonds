@@ -191,6 +191,21 @@ void DrawInitText(char *text, int ypos, int font_nr)
   }
 }
 
+void DrawTextF(int x, int y, int font_nr, char *format, ...)
+{
+  char buffer[MAX_OUTPUT_LINESIZE + 1];
+  va_list ap;
+
+  va_start(ap, format);
+  vsprintf(buffer, format, ap);
+  va_end(ap);
+
+  if (strlen(buffer) > MAX_OUTPUT_LINESIZE)
+    Error(ERR_EXIT, "string too long in DrawTextF() -- aborting");
+
+  DrawText(gfx.sx + x, gfx.sy + y, buffer, font_nr);
+}
+
 void DrawTextFCentered(int y, int font_nr, char *format, ...)
 {
   char buffer[MAX_OUTPUT_LINESIZE + 1];
@@ -207,19 +222,15 @@ void DrawTextFCentered(int y, int font_nr, char *format, ...)
 	   gfx.sy + y, buffer, font_nr);
 }
 
-void DrawTextF(int x, int y, int font_nr, char *format, ...)
+void DrawTextS(int x, int y, int font_nr, char *text)
 {
-  char buffer[MAX_OUTPUT_LINESIZE + 1];
-  va_list ap;
+  DrawText(gfx.sx + x, gfx.sy + y, text, font_nr);
+}
 
-  va_start(ap, format);
-  vsprintf(buffer, format, ap);
-  va_end(ap);
-
-  if (strlen(buffer) > MAX_OUTPUT_LINESIZE)
-    Error(ERR_EXIT, "string too long in DrawTextF() -- aborting");
-
-  DrawText(gfx.sx + x, gfx.sy + y, buffer, font_nr);
+void DrawTextSCentered(int y, int font_nr, char *text)
+{
+  DrawText(gfx.sx + (gfx.sxsize - getTextWidth(text, font_nr)) / 2,
+	   gfx.sy + y, text, font_nr);
 }
 
 void DrawText(int x, int y, char *text, int font_nr)

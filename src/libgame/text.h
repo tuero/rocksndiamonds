@@ -64,6 +64,8 @@ void getFontCharSource(int, char, Bitmap **, int *, int *);
 void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
+void DrawTextS(int, int, int, char *);
+void DrawTextSCentered(int, int, char *);
 void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 void DrawTextToTextArea(int, int, char *, int, int, int, int, int);

@@ -3666,6 +3666,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "sb_default",
     "-"
   },
+  {
+    "dummy",
+    "dummy",
+    "-"
+  },
 
   /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
 

@@ -614,7 +614,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     {
       Error(ERR_WARN, "invalid custom element number %d", element);
 
-      element = EL_DEFAULT;	/* dummy element used for artwork config */
+      element = EL_DUMMY;
     }
 
     for(j=0; j<MAX_ELEMENT_NAME_LEN; j++)
@@ -697,7 +697,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   {
     Error(ERR_WARN, "invalid custom element number %d", element);
 
-    element = EL_DEFAULT;	/* dummy element used for artwork config */
+    element = EL_DUMMY;
   }
 
   ei = &element_info[element];
