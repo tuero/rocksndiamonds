@@ -3496,9 +3496,9 @@ void GameActions()
     else if (element == EL_BURNING)
       CheckForDragon(x, y);
     else if (element == EL_SP_TERMINAL)
-      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 10, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
-      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 2, ANIM_NORMAL);
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
 
     if (SiebAktiv)
     {

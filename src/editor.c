@@ -101,7 +101,7 @@
 #define ED_CTRL_ID_RANDOM_PLACEMENT	12
 #define ED_CTRL_ID_BRUSH		13
 #define ED_CTRL_ID_WRAP_DOWN		14
-#define ED_CTRL_ID_UNUSED2		15
+#define ED_CTRL_ID_PICK_ELEMENT		15
 #define ED_CTRL_ID_UNDO			16
 #define ED_CTRL_ID_INFO			17
 #define ED_CTRL_ID_SAVE			18
@@ -153,6 +153,7 @@ static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
 static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
+static int last_drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 static int properties_element = 0;
 
 static short ElementContent[MAX_ELEMCONT][3][3];
@@ -607,7 +608,8 @@ static void CreateControlButtons()
 	id == ED_CTRL_ID_RECTANGLE ||
 	id == ED_CTRL_ID_FILLED_BOX ||
 	id == ED_CTRL_ID_FLOOD_FILL ||
-	id == ED_CTRL_ID_BRUSH)
+	id == ED_CTRL_ID_BRUSH ||
+	id == ED_CTRL_ID_PICK_ELEMENT)
     {
       button_type = GD_TYPE_RADIO_BUTTON;
       radio_button_nr = 1;
@@ -1149,6 +1151,39 @@ void AdjustLevelScrollPosition()
     level_ypos = -1;
 }
 
+static void PickDrawingElement(int button, int element)
+{
+  if (button < 1 || button > 3)
+    return;
+
+  if (button == 1)
+  {
+    new_element1 = element;
+    DrawMiniGraphicExt(drawto, gc,
+		       DX + ED_WIN_MB_LEFT_XPOS,
+		       DY + ED_WIN_MB_LEFT_YPOS,
+		       el2gfx(new_element1));
+  }
+  else if (button == 2)
+  {
+    new_element2 = element;
+    DrawMiniGraphicExt(drawto, gc,
+		       DX + ED_WIN_MB_MIDDLE_XPOS,
+		       DY + ED_WIN_MB_MIDDLE_YPOS,
+		       el2gfx(new_element2));
+  }
+  else
+  {
+    new_element3 = element;
+    DrawMiniGraphicExt(drawto, gc,
+		       DX + ED_WIN_MB_RIGHT_XPOS,
+		       DY + ED_WIN_MB_RIGHT_YPOS,
+		       el2gfx(new_element3));
+  }
+
+  redraw_mask |= REDRAW_DOOR_1;
+}
+
 void LevelEd(int mx, int my, int button)
 {
   static int last_button = 0;
@@ -1249,26 +1284,7 @@ void LevelEd(int mx, int my, int button)
       else
 	new_element = EL_LEERRAUM;
 
-      if (last_button==1)
-	new_element1 = new_element;
-      else if (last_button==2)
-	new_element2 = new_element;
-      else if (last_button==3)
-	new_element3 = new_element;
-
-      DrawMiniGraphicExt(drawto,gc,
-			 DX+ED_WIN_MB_LEFT_XPOS,
-			 DY+ED_WIN_MB_LEFT_YPOS,
-			 el2gfx(new_element1));
-      DrawMiniGraphicExt(drawto,gc,
-			 DX+ED_WIN_MB_MIDDLE_XPOS,
-			 DY+ED_WIN_MB_MIDDLE_YPOS,
-			 el2gfx(new_element2));
-      DrawMiniGraphicExt(drawto,gc,
-			 DX+ED_WIN_MB_RIGHT_XPOS,
-			 DY+ED_WIN_MB_RIGHT_YPOS,
-			 el2gfx(new_element3));
-      redraw_mask |= REDRAW_DOOR_1;
+      PickDrawingElement(last_button, new_element);
 
       if (!HAS_CONTENT(properties_element))
       {
@@ -2642,6 +2658,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
+    case ED_CTRL_ID_PICK_ELEMENT:
+      if (button_press_event)
+	PickDrawingElement(button, Feld[lx][ly]);
+      if (button_release_event)
+	ClickOnGadget(level_editor_gadget[last_drawing_function]);
+      break;
+
     default:
       break;
   }
@@ -2716,6 +2739,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_FLOOD_FILL:
     case ED_CTRL_ID_BRUSH:
+    case ED_CTRL_ID_PICK_ELEMENT:
+      last_drawing_function = drawing_function;
       drawing_function = id;
       break;
 

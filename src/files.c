@@ -73,6 +73,17 @@
 #define TAPE_PERMS		LEVEL_PERMS
 #define SETUP_PERMS		LEVEL_PERMS
 
+/* sort priorities of level series (also used as level series classes) */
+#define LEVELCLASS_TUTORIAL_START	10
+#define LEVELCLASS_TUTORIAL_END		99
+#define LEVELCLASS_CLASSICS_START	100
+#define LEVELCLASS_CLASSICS_END		199
+#define LEVELCLASS_CONTRIBUTION_START	200
+#define LEVELCLASS_CONTRIBUTION_END	299
+#define LEVELCLASS_USER_START		300
+#define LEVELCLASS_USER_END		399
+#define LEVELCLASS_UNDEFINED		999
+
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
 
@@ -400,7 +411,9 @@ void LoadLevel(int level_nr)
     level.time = 10;
 #endif
 
-  if (file_version == FILE_VERSION_1_0)
+  if (file_version == FILE_VERSION_1_0 &&
+      leveldir[leveldir_nr].sort_priority >= LEVELCLASS_CONTRIBUTION_START &&
+      leveldir[leveldir_nr].sort_priority <= LEVELCLASS_CONTRIBUTION_END)
   {
     Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
     Error(ERR_WARN, "using high speed movement for player");
@@ -873,8 +886,9 @@ void SaveScore(int level_nr)
 /* level directory info */
 #define LEVELINFO_TOKEN_NAME		29
 #define LEVELINFO_TOKEN_LEVELS		30
-#define LEVELINFO_TOKEN_SORT_PRIORITY	31
-#define LEVELINFO_TOKEN_READONLY	32
+#define LEVELINFO_TOKEN_FIRST_LEVEL	31
+#define LEVELINFO_TOKEN_SORT_PRIORITY	32
+#define LEVELINFO_TOKEN_READONLY	33
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TEAM_MODE
@@ -937,6 +951,7 @@ static struct
   /* level directory info */
   { TYPE_STRING,  &ldi.name,		"name"				},
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
+  { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
   { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"			}
 };
@@ -1200,7 +1215,8 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
   ldi->name = getStringCopy("non-existing");
   ldi->levels = 0;
-  ldi->sort_priority = 999;	/* default: least priority */
+  ldi->first_level = 0;
+  ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
   ldi->readonly = TRUE;
 }
 
@@ -1338,14 +1354,12 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
 
   if (token_value)
   {
-    int highest_level_nr = leveldir[level_series_nr].levels - 1;
-
     last_level_nr = atoi(token_value);
 
-    if (last_level_nr < 0)
-      last_level_nr = 0;
-    if (last_level_nr > highest_level_nr)
-      last_level_nr = highest_level_nr;
+    if (last_level_nr < leveldir[level_series_nr].first_level)
+      last_level_nr = leveldir[level_series_nr].first_level;
+    if (last_level_nr > leveldir[level_series_nr].last_level)
+      last_level_nr = leveldir[level_series_nr].last_level;
   }
 
   return last_level_nr;
@@ -1422,6 +1436,9 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
       leveldir[current_entry] = ldi;
 
       leveldir[current_entry].filename = getStringCopy(dir_entry->d_name);
+      leveldir[current_entry].last_level =
+	leveldir[current_entry].first_level +
+	leveldir[current_entry].levels - 1;
       leveldir[current_entry].user_defined =
 	(level_directory == options.level_directory ? FALSE : TRUE);
 
@@ -1485,7 +1502,8 @@ static void SaveUserLevelInfo()
 
   ldi.name = getLoginName();
   ldi.levels = 100;
-  ldi.sort_priority = 300;
+  ldi.first_level = 0;
+  ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
 
   fprintf(file, "%s\n\n",

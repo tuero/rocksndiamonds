@@ -1749,6 +1749,19 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     redraw_mask |= REDRAW_ALL;
 }
 
+void ClickOnGadget(struct GadgetInfo *gi)
+{
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
+
+  /* simulate pressing mouse button over specified gadget */
+  HandleGadgets(gi->x, gi->y, 1);
+
+  /* simulate releasing mouse button over specified gadget */
+  HandleGadgets(gi->x, gi->y, 0);
+}
+
 void MapGadget(struct GadgetInfo *gi)
 {
   if (gi == NULL)
@@ -1769,10 +1782,10 @@ void UnmapGadget(struct GadgetInfo *gi)
 
 void HandleGadgets(int mx, int my, int button)
 {
-  static struct GadgetInfo *gi = NULL;
+  static struct GadgetInfo *last_gi = NULL;
   static unsigned long pressed_delay = 0;
 
-  struct GadgetInfo *new_gi;
+  struct GadgetInfo *new_gi, *gi;
   boolean gadget_pressed;
   boolean gadget_pressed_repeated;
   boolean gadget_moving;
@@ -1783,23 +1796,28 @@ void HandleGadgets(int mx, int my, int button)
   if (gadget_list_first_entry == NULL)
     return;
 
-  new_gi = getGadgetInfoFromMousePosition(mx,my);
+  new_gi = getGadgetInfoFromMousePosition(mx, my);
 
   gadget_pressed =
-    (button != 0 && gi == NULL && new_gi != NULL && !motion_status);
+    (button != 0 && last_gi == NULL && new_gi != NULL && !motion_status);
   gadget_pressed_repeated =
-    (button != 0 && gi != NULL && new_gi == gi);
+    (button != 0 && last_gi != NULL && new_gi == last_gi);
   gadget_moving =
-    (button != 0 && gi != NULL && new_gi == gi && motion_status);
+    (button != 0 && last_gi != NULL && new_gi == last_gi && motion_status);
   gadget_moving_off_borders =
-    (button != 0 && gi != NULL && new_gi != gi && motion_status);
+    (button != 0 && last_gi != NULL && new_gi != last_gi && motion_status);
   gadget_released =
-    (button == 0 && gi != NULL && new_gi == gi);
+    (button == 0 && last_gi != NULL && new_gi == last_gi);
   gadget_released_off_borders =
-    (button == 0 && gi != NULL && new_gi != gi);
+    (button == 0 && last_gi != NULL && new_gi != last_gi);
 
   if (gadget_pressed)
-    gi = new_gi;
+    last_gi = new_gi;
+
+  gi = last_gi;
+
+  if (button == 0)
+    last_gi = NULL;
 
   if (gi)
   {
@@ -1903,7 +1921,4 @@ void HandleGadgets(int mx, int my, int button)
 	gi->event_mask & GD_EVENT_OFF_BORDERS)
       gi->callback(gi);
   }
-
-  if (button == 0)
-    gi = NULL;
 }

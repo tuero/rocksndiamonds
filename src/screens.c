@@ -89,12 +89,20 @@ void DrawMainMenu()
 
   DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
 
+  DrawTextF(7*32 + 6, 3*32 + 9, FC_RED, "%d-%d",
+	    leveldir[leveldir_nr].first_level,
+	    leveldir[leveldir_nr].last_level);
+
+  if (leveldir[leveldir_nr].readonly)
+  {
+    DrawTextF(15*32 + 6, 3*32 + 9 - 7, FC_RED, "READ");
+    DrawTextF(15*32 + 6, 3*32 + 9 + 7, FC_RED, "ONLY");
+  }
+
   for(i=2; i<10; i++)
     DrawGraphic(0, i, GFX_KUGEL_BLAU);
   DrawGraphic(10, 3, GFX_PFEIL_L);
   DrawGraphic(14, 3, GFX_PFEIL_R);
-
-  DrawTextF(15*32 + 6, 3*32 + 9, FC_RED, "%d", leveldir[leveldir_nr].levels);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -165,8 +173,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (y == 4 && ((x == 11 && level_nr > 0) ||
-		 (x == 15 && level_nr < leveldir[leveldir_nr].levels - 1)) &&
+  if (y == 4 && ((x == 11 && level_nr > leveldir[leveldir_nr].first_level) ||
+		 (x == 15 && level_nr < leveldir[leveldir_nr].last_level)) &&
       button)
   {
     static unsigned long level_delay = 0;
@@ -175,10 +183,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     int font_color = (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW);
 
     new_level_nr = level_nr + (x == 11 ? -step : +step);
-    if (new_level_nr < 0)
-      new_level_nr = 0;
-    if (new_level_nr > leveldir[leveldir_nr].levels - 1)
-      new_level_nr = leveldir[leveldir_nr].levels - 1;
+    if (new_level_nr < leveldir[leveldir_nr].first_level)
+      new_level_nr = leveldir[leveldir_nr].first_level;
+    if (new_level_nr > leveldir[leveldir_nr].last_level)
+      new_level_nr = leveldir[leveldir_nr].last_level;
 
     if (old_level_nr == new_level_nr ||
 	!DelayReached(&level_delay, GADGET_FRAME_DELAY))

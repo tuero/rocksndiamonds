@@ -368,6 +368,8 @@ struct GadgetInfo
 struct GadgetInfo *CreateGadget(int, ...);
 void FreeGadget(struct GadgetInfo *);
 
+void ClickOnGadget(struct GadgetInfo *);
+
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
 

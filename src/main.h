@@ -349,6 +349,8 @@ struct LevelDirInfo
   char *filename;
   char *name;
   int levels;
+  int first_level;
+  int last_level;
   int sort_priority;
   boolean user_defined;
   boolean readonly;
@@ -787,17 +789,17 @@ extern int		num_bg_loops;
 
 /* game graphics:
 **	  0 -  255: graphics from "RocksScreen"
-**	256 -  511: graphics from "RocksMore"
-**	512 -  767: graphics from "RocksFont"
+**	256 -  511: graphics from "RocksFont"
+**	512 -  767: graphics from "RocksMore"
 **	768 - 1023: graphics from "RocksHeroes"
 */
 
 #define GFX_START_ROCKSSCREEN	0
 #define GFX_END_ROCKSSCREEN	255
-#define GFX_START_ROCKSMORE	256
-#define GFX_END_ROCKSMORE	511
-#define GFX_START_ROCKSFONT	512
-#define GFX_END_ROCKSFONT	767
+#define GFX_START_ROCKSFONT	256
+#define GFX_END_ROCKSFONT	511
+#define GFX_START_ROCKSMORE	512
+#define GFX_END_ROCKSMORE	767
 #define GFX_START_ROCKSHEROES	768
 #define GFX_END_ROCKSHEROES	1023
 
@@ -1211,10 +1213,10 @@ extern int		num_bg_loops;
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#define VERSION_STRING		"1.2.0"
+#define VERSION_STRING		"1.2.1"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
-#define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"
+#define COPYRIGHT_STRING	"Copyright ^1995-99 by Holger Schemel"
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
