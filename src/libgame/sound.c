@@ -773,15 +773,26 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     SendSoundControlToMixerProcess(&snd_ctrl);
     return;
   }
-#elif defined(TARGET_SDL)
-  for (i=0; i<audio.num_channels; i++)
-    if (!Mix_Playing(i))
-      Mixer_StopChannel(i);
-#elif defined(TARGET_ALLEGRO)
+#endif
+
   for (i=0; i<audio.num_channels; i++)
   {
-    if (!mixer[i].active || IS_LOOP(mixer[i]))
+    if (!mixer[i].active)
       continue;
+
+    if (i != audio.music_channel &&
+	DelayReached(&mixer[i].playing_starttime, SOUND_LOOP_EXPIRATION_TIME))
+    {
+      Mixer_StopChannel(i);
+      continue;
+    }
+
+#if defined(TARGET_SDL)
+
+    if (!Mix_Playing(i))
+      Mixer_StopChannel(i);
+
+#elif defined(TARGET_ALLEGRO)
 
     mixer[i].playing_pos = voice_get_position(mixer[i].voice);
     mixer[i].volume = voice_get_volume(mixer[i].voice);
@@ -789,8 +800,9 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     /* sound sample has completed playing or was completely faded out */
     if (mixer[i].playing_pos == -1 || mixer[i].volume == 0)
       Mixer_StopChannel(i);
-  }
+
 #endif /* TARGET_ALLEGRO */
+  }
 
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {

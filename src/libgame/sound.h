@@ -65,6 +65,9 @@
 #define AUDIO_FORMAT_LE				(1 << 2)
 #define AUDIO_FORMAT_BE				(1 << 3)
 
+/* expiration time (in milliseconds) for sound loops */
+#define SOUND_LOOP_EXPIRATION_TIME		200
+
 #if defined(TARGET_SDL)
 /* one second fading interval == 1000 ticks (milliseconds) */
 #define SOUND_FADING_INTERVAL			1000
