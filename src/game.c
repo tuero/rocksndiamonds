@@ -129,12 +129,12 @@ void InitGame()
   local_player->active = TRUE;
   local_player->local = TRUE;
 
-  network_player_action_stored = FALSE;
+  network_player_action_received = FALSE;
 
 
 
   /* initial null action */
-  SendToServer_MovePlayer(0,0);
+  SendToServer_MovePlayer(MV_NO_MOVING);
 
 
 
@@ -2874,10 +2874,8 @@ void GameActions(byte player_action)
   int i, x,y, element;
   int *recorded_player_action;
 
-
   if (game_status != PLAYING)
     return;
-
 
 #ifdef DEBUG
   action_delay_value =
@@ -2887,21 +2885,16 @@ void GameActions(byte player_action)
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
 #endif
 
-  /*
-  HandleNetworking();
-
-  if (game_status != PLAYING)
-    return;
-  */
-
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
 
-  if (!network_player_action_stored)
+  if (!standalone && !network_player_action_received)
   {
+    /*
 #ifdef DEBUG
     printf("DEBUG: try to get network player actions in time\n");
 #endif
+    */
 
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
@@ -2909,11 +2902,13 @@ void GameActions(byte player_action)
     if (game_status != PLAYING)
       return;
 
-    if (!network_player_action_stored)
+    if (!network_player_action_received)
     {
+      /*
 #ifdef DEBUG
       printf("DEBUG: failed to get network player actions in time\n");
 #endif
+      */
       return;
     }
   }
@@ -2923,13 +2918,17 @@ void GameActions(byte player_action)
   else
     recorded_player_action = NULL;
 
-
-  SendToServer_MovePlayer(player_action, FrameCounter);
-
+  if (!standalone)
+    SendToServer_MovePlayer(player_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
+    int actual_player_action =
+      (standalone ? player_action : network_player_action[i]);
+
+    /*
     int actual_player_action = network_player_action[i];
+    */
 
     /*
     int actual_player_action = player_action;
@@ -2942,6 +2941,9 @@ void GameActions(byte player_action)
       actual_player_action = 0;
     */
 
+    if (standalone && i != TestPlayer)
+      actual_player_action = 0;
+
     /* TEST TEST TEST */
 
     if (recorded_player_action)
@@ -2953,7 +2955,7 @@ void GameActions(byte player_action)
     network_player_action[i] = 0;
   }
 
-  network_player_action_stored = FALSE;
+  network_player_action_received = FALSE;
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
@@ -2965,10 +2967,11 @@ void GameActions(byte player_action)
   FrameCounter++;
   TimeFrames++;
 
+
   /*
-  printf("advancing FrameCounter to %d\n",
-	 FrameCounter);
+  printf("FrameCounter == %d, RND(100) == %d\n", FrameCounter, RND(100));
   */
+
 
   for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
   {

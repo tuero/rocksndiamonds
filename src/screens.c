@@ -685,7 +685,9 @@ void CheckCheat()
 {
   int old_handicap = local_player->handicap;
 
+#if 0
   if (!strcmp(local_player->alias_name,"Artsoft"))
+#endif
     local_player->handicap = leveldir[leveldir_nr].levels-1;
 
   if (local_player->handicap != old_handicap)

@@ -150,6 +150,11 @@ void sendbuf(int len)
       fatal("Internal error: send buffer overflow");
     memcpy(writbuf + nwrite, realbuf, 4 + len);
     nwrite += 4 + len;
+
+
+    flushbuf();
+
+
   }
 }
 
@@ -296,6 +301,7 @@ void SendToServer_ProtocolVersion()
   buf[2] = PROT_VERS_1;
   buf[3] = PROT_VERS_2;
   buf[4] = PROT_VERS_3;
+
   sendbuf(5);
 }
 
@@ -303,46 +309,36 @@ void SendToServer_NrWanted(int nr_wanted)
 {
   buf[1] = OP_NRWANTED;
   buf[2] = nr_wanted;
+
   sendbuf(3);
 }
 
 void SendToServer_StartPlaying()
 {
+  unsigned long new_random_seed = InitRND(NEW_RANDOMIZE);
+
   buf[1] = OP_PLAY;
   buf[2] = (byte)(level_nr >> 8);
   buf[3] = (byte)(level_nr & 0xff);
   buf[4] = (byte)(leveldir_nr >> 8);
   buf[5] = (byte)(leveldir_nr & 0xff);
-  strcpy(&buf[6], leveldir[leveldir_nr].name);
-  sendbuf(strlen(leveldir[leveldir_nr].name)+1 + 6);
+
+  buf[6] = (unsigned char)((new_random_seed >> 24) & 0xff);
+  buf[7] = (unsigned char)((new_random_seed >> 16) & 0xff);
+  buf[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
+  buf[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
+
+  strcpy(&buf[10], leveldir[leveldir_nr].name);
+
+  sendbuf(10 + strlen(leveldir[leveldir_nr].name)+1);
 }
 
-void SendToServer_MovePlayer(byte player_action, unsigned long frame_nr)
+void SendToServer_MovePlayer(byte player_action)
 {
   buf[1] = OP_MOVE;
   buf[2] = player_action;
 
   sendbuf(3);
-
-  /*
-  buf[3] = (byte)((frame_nr >> 24) & 0xff);
-  buf[4] = (byte)((frame_nr >> 16) & 0xff);
-  buf[5] = (byte)((frame_nr >>  8) & 0xff);
-  buf[6] = (byte)((frame_nr >>  0) & 0xff);
-
-  sendbuf(7);
-  */
-
-  /*
-  printf("%d: %x, %x, %x, %x\n", frame_nr, buf[3], buf[4], buf[5], buf[6]);
-  */
-
-
-
-  flushbuf();
-
-
-
 }
 
 void handlemessages()
@@ -474,43 +470,59 @@ void handlemessages()
 	break;
 
       case OP_PLAY:
+      {
+	int new_level_nr, new_leveldir_nr;
+	unsigned long new_random_seed;
+	unsigned char *new_leveldir_name;
+
+	new_level_nr = (buf[2] << 8) + buf[3];
+	new_leveldir_nr = (buf[4] << 8) + buf[5];
+	new_random_seed =
+	  (buf[6] << 24) | (buf[7] << 16) | (buf[8] << 8) | (buf[9]);
+	new_leveldir_name = &buf[10];
+
 	printf("OP_PLAY: %d\n", buf[0]);
 	sprintf(msgbuf, "client %d starts game [level %d from levedir %d (%s)]\n",
 		buf[0],
-		(buf[2] << 8) + buf[3],
-		(buf[4] << 8) + buf[5],
-		&buf[6]);
+		new_level_nr,
+		new_leveldir_nr,
+		new_leveldir_name);
 	sysmsg(msgbuf);
 
-	if (strcmp(leveldir[(buf[4] << 8) + buf[5]].name, &buf[6]) == 0)
-	{
-	  leveldir_nr = (buf[4] << 8) + buf[5];
 
-	  local_player->leveldir_nr = leveldir_nr;
-	  LoadPlayerInfo(PLAYER_LEVEL);
-	  SavePlayerInfo(PLAYER_SETUP);
+	if (strcmp(leveldir[new_leveldir_nr].name, new_leveldir_name) != 0)
+	  Error(ERR_RETURN, "no such level directory: '%s'",new_leveldir_name);
 
-	  level_nr = (buf[2] << 8) + buf[3];
+	leveldir_nr = new_leveldir_nr;
 
-	  TapeErase();
-	  LoadLevelTape(level_nr);
+	local_player->leveldir_nr = leveldir_nr;
+	LoadPlayerInfo(PLAYER_LEVEL);
+	SavePlayerInfo(PLAYER_SETUP);
 
-	  GetPlayerConfig();
-	  LoadLevel(level_nr);
+	level_nr = new_level_nr;
 
-	  {
-	    if (autorecord_on)
-	      TapeStartRecording();
+	TapeErase();
+	LoadLevelTape(level_nr);
 
-	    game_status = PLAYING;
-	    InitGame();
-	  }
-	}
-	else
-	{
-	  Error(ERR_RETURN, "no such level directory: '%s'", &buf[6]);
-	}
+	GetPlayerConfig();
+	LoadLevel(level_nr);
+
+	if (autorecord_on)
+	  TapeStartRecording();
+
+	tape.random_seed = new_random_seed;
+
+	InitRND(tape.random_seed);
+
+	/*
+	printf("tape.random_seed == %d\n", tape.random_seed);
+	*/
+
+	game_status = PLAYING;
+	InitGame();
+
 	break;
+      }
 
       case OP_MOVE:
       {
@@ -520,27 +532,21 @@ void handlemessages()
 	frame_nr =
 	  (buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | (buf[5]);
 
+	if (frame_nr != FrameCounter)
+	{
+	  Error(ERR_RETURN, "client and servers frame counters out of sync");
+	  Error(ERR_RETURN, "frame counter of client is %d", FrameCounter);
+	  Error(ERR_RETURN, "frame counter of server is %d", frame_nr);
+	  Error(ERR_EXIT,   "this should not happen -- please debug");
+	}
+
 	for (i=0; i<MAX_PLAYERS; i++)
 	{
 	  if (stored_player[i].active)
 	    network_player_action[i] = buf[6 + i];
 	}
 
-	network_player_action_stored = TRUE;
-
-	/*
-	printf("FrameCounter == %d, frame_nr = %d\n",
-	       FrameCounter, frame_nr);
-	*/
-
-	/*
-	if (buf[2])
-	*/
-
-
-	/*
-	printf("OP_MOVE: %d\n", buf[0]);
-	*/
+	network_player_action_received = TRUE;
 
 	sprintf(msgbuf, "frame %d: client %d moves player [0x%02x]",
 		FrameCounter, buf[0], buf[2]);

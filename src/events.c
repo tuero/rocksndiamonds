@@ -62,6 +62,21 @@ void EventLoop(void)
 	  break;
       }
     }
+
+    HandleNoXEvent();
+
+    /* don't use all CPU time when idle; the main loop while playing
+       has its own synchronization and is CPU friendly, too */
+
+    if (game_status != PLAYING)
+    {
+      XSync(display, FALSE);
+      Delay(10);
+    }
+
+
+
+#if 0
     else			/* got no event, but don't be lazy... */
     {
       HandleNoXEvent();
@@ -75,6 +90,9 @@ void EventLoop(void)
 	Delay(10);
       }
     }
+#endif
+
+
 
     if (game_status == EXITGAME)
       return;
@@ -314,7 +332,13 @@ void HandleButton(int mx, int my, int button)
       HandleSetupScreen(mx,my,0,0,button);
       break;
     case PLAYING:
+
+      /* --> NoXEvent() will follow */
+
+      /*
       HandleGameActions(0);
+      */
+
       break;
     default:
       break;
@@ -730,11 +754,6 @@ void HandleJoystick()
 {
   int joystick	= Joystick();
   int keyboard	= key_joystick_mapping;
-
-  /*
-  int joy	= (tape.playing ? TapePlayAction() : (joystick | keyboard));
-  */
-
   int joy	= (joystick | keyboard);
   int left	= joy & JOY_LEFT;
   int right	= joy & JOY_RIGHT;
@@ -787,11 +806,6 @@ void HandleJoystick()
 
       if (tape.pausing || AllPlayersGone)
 	joy = 0;
-
-      /*
-      if (!network_player_action_stored)
-	SendToServer_MovePlayer(joy, 0);
-      */
 
       HandleGameActions((byte)joy);
       break;

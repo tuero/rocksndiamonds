@@ -21,7 +21,7 @@ void SendToServer_Nickname(char *);
 void SendToServer_ProtocolVersion(void);
 void SendToServer_NrWanted(int);
 void SendToServer_StartPlaying(void);
-void SendToServer_MovePlayer(byte, unsigned long);
+void SendToServer_MovePlayer(byte);
 void HandleNetworking(void);
 
 #endif

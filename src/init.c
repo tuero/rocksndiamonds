@@ -96,8 +96,6 @@ void InitNetworkServer()
 {
   int nr_wanted;
 
-  standalone = FALSE;
-
   if (standalone)
     return;
 

@@ -613,7 +613,7 @@ void DrawGraphicThruMask(int x, int y, int graphic)
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
   {
-    printf("DrawGraphicThruMask(): x = %d, y = %d\n",x,y);
+    printf("DrawGraphicThruMask(): x = %d,y = %d, graphic = %d\n",x,y,graphic);
     printf("DrawGraphicThruMask(): This should never happen!\n");
     return;
   }

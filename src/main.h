@@ -273,7 +273,7 @@ struct LevelDirInfo
 struct RecordingInfo
 {
   int level_nr;
-  unsigned int random_seed;
+  unsigned long random_seed;
   unsigned long date;
   unsigned long counter;
   unsigned long length;
@@ -377,7 +377,7 @@ extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
 
 extern byte		network_player_action[];
-extern BOOL		network_player_action_stored;
+extern BOOL		network_player_action_received;
 extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];

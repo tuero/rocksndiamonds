@@ -260,6 +260,12 @@ void GetOptions(char *argv[])
 
       printf("--levels == '%s'\n", level_directory);
     }
+    else if (strncmp(option, "-network", option_len) == 0)
+    {
+      printf("--network\n");
+
+      standalone = FALSE;
+    }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
       printf("--verbose\n");
