@@ -876,7 +876,11 @@ void InitElementProperties()
     EL_SCHLUESSEL1,
     EL_SCHLUESSEL2,
     EL_SCHLUESSEL3,
-    EL_SCHLUESSEL4
+    EL_SCHLUESSEL4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4
   };
   static int ep_schluessel_num = sizeof(ep_schluessel)/sizeof(int);
 
@@ -1131,6 +1135,10 @@ void InitElementProperties()
     EL_SCHLUESSEL2,
     EL_SCHLUESSEL3,
     EL_SCHLUESSEL4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4,
     EL_BOMBE,
     EL_KOKOSNUSS,
     EL_TROPFEN,
@@ -1318,6 +1326,10 @@ void InitElementProperties()
     EL_SCHLUESSEL2,
     EL_SCHLUESSEL3,
     EL_SCHLUESSEL4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4,
     EL_PFORTE1,
     EL_PFORTE2,
     EL_PFORTE3,

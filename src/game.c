@@ -312,6 +312,19 @@ static void InitField(int x, int y, boolean init_game)
       Feld[x][y] = EL_LEERRAUM;
       break;
 
+    case EL_EM_KEY_1_FILE:
+      Feld[x][y] = EL_EM_KEY_1;
+      break;
+    case EL_EM_KEY_2_FILE:
+      Feld[x][y] = EL_EM_KEY_2;
+      break;
+    case EL_EM_KEY_3_FILE:
+      Feld[x][y] = EL_EM_KEY_3;
+      break;
+    case EL_EM_KEY_4_FILE:
+      Feld[x][y] = EL_EM_KEY_4;
+      break;
+
     default:
       break;
   }
@@ -974,6 +987,29 @@ int MovingOrBlocked2Element(int x, int y)
     return element;
 }
 
+static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
+{
+  /* like MovingOrBlocked2Element(), but if element is moving
+     and (x,y) is the field the moving element is just leaving,
+     return EL_BLOCKED instead of the element value */
+  int element = Feld[x][y];
+
+  if (IS_MOVING(x, y))
+  {
+    if (element == EL_BLOCKED)
+    {
+      int oldx, oldy;
+
+      Blocked2Moving(x, y, &oldx, &oldy);
+      return Feld[oldx][oldy];
+    }
+    else
+      return EL_BLOCKED;
+  }
+  else
+    return element;
+}
+
 static void RemoveField(int x, int y)
 {
   Feld[x][y] = EL_LEERRAUM;
@@ -1535,6 +1571,10 @@ void Impact(int x, int y)
       case EL_SCHLUESSEL2:
       case EL_SCHLUESSEL3:
       case EL_SCHLUESSEL4:
+      case EL_EM_KEY_1:
+      case EL_EM_KEY_2:
+      case EL_EM_KEY_3:
+      case EL_EM_KEY_4:
 	sound = SND_KINK;
 	break;
       case EL_ZEIT_VOLL:
@@ -3850,7 +3890,11 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
     return MF_NO_ACTION;
 
+#if 0
   element = MovingOrBlocked2Element(new_jx, new_jy);
+#else
+  element = MovingOrBlocked2ElementIfNotLeaving(new_jx, new_jy);
+#endif
 
   if (DONT_GO_TO(element))
   {
@@ -4177,7 +4221,11 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     if (!IN_LEV_FIELD(x, y))
       continue;
 
+#if 0
     element = Feld[x][y];
+#else
+    element = MovingOrBlocked2ElementIfNotLeaving(x, y);
+#endif
 
     if (DONT_TOUCH(element))
     {
@@ -4472,7 +4520,27 @@ int DigField(struct PlayerInfo *player,
     case EL_SCHLUESSEL3:
     case EL_SCHLUESSEL4:
     {
-      int key_nr = element-EL_SCHLUESSEL1;
+      int key_nr = element - EL_SCHLUESSEL1;
+
+      RemoveField(x, y);
+      player->key[key_nr] = TRUE;
+      RaiseScoreElement(EL_SCHLUESSEL);
+      DrawMiniGraphicExt(drawto, gc,
+			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1+key_nr);
+      DrawMiniGraphicExt(window, gc,
+			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1+key_nr);
+      PlaySoundLevel(x, y, SND_PONG);
+      break;
+    }
+
+    case EL_EM_KEY_1:
+    case EL_EM_KEY_2:
+    case EL_EM_KEY_3:
+    case EL_EM_KEY_4:
+    {
+      int key_nr = element - EL_EM_KEY_1;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;

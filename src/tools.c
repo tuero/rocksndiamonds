@@ -2757,6 +2757,14 @@ int el2gfx(int element)
     case EL_EM_GATE_2X:		return GFX_EM_GATE_2X;
     case EL_EM_GATE_3X:		return GFX_EM_GATE_3X;
     case EL_EM_GATE_4X:		return GFX_EM_GATE_4X;
+    case EL_EM_KEY_1_FILE:	return GFX_EM_KEY_1;
+    case EL_EM_KEY_2_FILE:	return GFX_EM_KEY_2;
+    case EL_EM_KEY_3_FILE:	return GFX_EM_KEY_3;
+    case EL_EM_KEY_4_FILE:	return GFX_EM_KEY_4;
+    case EL_EM_KEY_1:		return GFX_EM_KEY_1;
+    case EL_EM_KEY_2:		return GFX_EM_KEY_2;
+    case EL_EM_KEY_3:		return GFX_EM_KEY_3;
+    case EL_EM_KEY_4:		return GFX_EM_KEY_4;
 
     default:
     {

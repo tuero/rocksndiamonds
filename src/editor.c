@@ -776,10 +776,10 @@ int editor_element[] =
   EL_AMOEBE_NASS,
   EL_AMOEBE_NORM,
 
-  EL_SCHLUESSEL1,
-  EL_SCHLUESSEL2,
-  EL_SCHLUESSEL3,
-  EL_SCHLUESSEL4,
+  EL_EM_KEY_1_FILE,
+  EL_EM_KEY_2_FILE,
+  EL_EM_KEY_3_FILE,
+  EL_EM_KEY_4_FILE,
 
   EL_EM_GATE_1,
   EL_EM_GATE_2,
@@ -795,6 +795,11 @@ int editor_element[] =
   EL_CHAR('O'),
   EL_CHAR('R'),
   EL_CHAR('E'),
+
+  EL_SCHLUESSEL1,
+  EL_SCHLUESSEL2,
+  EL_SCHLUESSEL3,
+  EL_SCHLUESSEL4,
 
   EL_PFORTE1,
   EL_PFORTE2,
@@ -2328,6 +2333,10 @@ static void DrawPropertiesWindow()
     { EL_SCHLUESSEL2,	&level.score[9],	TEXT_COLLECTING },
     { EL_SCHLUESSEL3,	&level.score[9],	TEXT_COLLECTING },
     { EL_SCHLUESSEL4,	&level.score[9],	TEXT_COLLECTING },
+    { EL_EM_KEY_1_FILE,	&level.score[9],	TEXT_COLLECTING },
+    { EL_EM_KEY_2_FILE,	&level.score[9],	TEXT_COLLECTING },
+    { EL_EM_KEY_3_FILE,	&level.score[9],	TEXT_COLLECTING },
+    { EL_EM_KEY_4_FILE,	&level.score[9],	TEXT_COLLECTING },
     { EL_AMOEBE_NASS,	&level.tempo_amoebe,	TEXT_SPEED },
     { EL_AMOEBE_NORM,	&level.tempo_amoebe,	TEXT_SPEED },
     { EL_AMOEBE_VOLL,	&level.tempo_amoebe,	TEXT_SPEED },

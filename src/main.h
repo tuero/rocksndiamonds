@@ -689,7 +689,7 @@ extern char		*element_info[];
 #define EL_SCHWEIN		117
 #define EL_DRACHE		118
 
-#define EL_UNUSED_119		119
+#define EL_EM_KEY_1_FILE	119
 
 #define EL_CHAR_START		120
 #define EL_CHAR_ASCII0		(EL_CHAR_START-32)
@@ -739,9 +739,9 @@ extern char		*element_info[];
 #define EL_EM_GATE_3		205
 #define EL_EM_GATE_4		206
 
-#define EL_UNUSED_207		207
-#define EL_UNUSED_208		208
-#define EL_UNUSED_209		209
+#define EL_EM_KEY_2_FILE	207
+#define EL_EM_KEY_3_FILE	208
+#define EL_EM_KEY_4_FILE	209
 
 #define EL_SP_START		210
 #define EL_SP_EMPTY		(EL_SP_START + 0)
@@ -804,6 +804,10 @@ extern char		*element_info[];
 #define EL_AUSGANG_ACT		306
 #define EL_SP_TERMINAL_ACTIVE	307
 #define EL_SP_BUG_ACTIVE	308
+#define EL_EM_KEY_1		309
+#define EL_EM_KEY_2		310
+#define EL_EM_KEY_3		311
+#define EL_EM_KEY_4		312
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		400
