@@ -159,7 +159,8 @@ int open_all(void)
       return(1);
     }
 
-    close(sound_pipe[sound_pid == 0]); sound_pipe[sound_pid == 0] = -1;
+    close(sound_pipe[sound_pid == 0]);
+    sound_pipe[sound_pid == 0] = -1;
     if (sound_pid == 0)
       _exit(sound_thread());
 

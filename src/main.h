@@ -1289,8 +1289,10 @@
 
 /* values for sound configuration suffixes */
 #define SND_ARG_MODE_LOOP			0
+#define SND_ARG_VOLUME				1
+#define SND_ARG_PRIORITY			2
 
-#define NUM_SND_ARGS				1
+#define NUM_SND_ARGS				3
 
 
 /* values for music configuration suffixes */
@@ -1942,6 +1944,8 @@ struct GraphicInfo
 struct SoundInfo
 {
   boolean loop;
+  int volume;
+  int priority;
 };
 
 struct MusicInfo

@@ -22,6 +22,8 @@
 struct ConfigTypeInfo sound_config_suffix[] =
 {
   { ".mode_loop",			ARG_UNDEFINED,	TYPE_BOOLEAN	},
+  { ".volume",				"100",		TYPE_INTEGER	},
+  { ".priority",			"0",		TYPE_INTEGER	},
 
   { NULL,				NULL,		0		}
 };

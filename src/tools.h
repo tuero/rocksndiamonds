@@ -137,6 +137,9 @@ void UndrawSpecialEditorDoor();
 void CreateToolButtons();
 void FreeToolButtons();
 
+int map_element_RND_to_EM(int);
+int map_element_EM_to_RND(int);
+
 int get_next_element(int);
 int el_act_dir2img(int, int, int);
 int el_act2img(int, int);

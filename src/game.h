@@ -76,6 +76,7 @@ boolean SnapField(struct PlayerInfo *, int, int);
 boolean DropElement(struct PlayerInfo *);
 
 void InitPlayLevelSound();
+void PlayLevelSound_EM(int, int, int, int);
 
 void RaiseScore(int);
 void RaiseScoreElement(int);

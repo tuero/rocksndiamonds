@@ -339,6 +339,7 @@ int sound_thread(void)
     free(audio_buffer);
   if (mix_buffer)
     free(mix_buffer);
+
   goto loop; /* back to top */
 
  fail:

@@ -12394,6 +12394,11 @@ static void PlayLevelMusic()
     PlayMusic(MAP_NOCONF_MUSIC(level_nr));	/* from music dir */
 }
 
+void PlayLevelSound_EM(int x, int y, int element, int action)
+{
+  PlayLevelSoundElementAction(x, y, element, action);
+}
+
 void RaiseScore(int value)
 {
   local_player->score += value;
