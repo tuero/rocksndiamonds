@@ -435,7 +435,8 @@ void UnmapGadget(struct GadgetInfo *);
 void UnmapAllGadgets();
 void RemapAllGadgets();
 
-void ClickOnGadget(struct GadgetInfo *);
+boolean anyTextGadgetActive();
+void ClickOnGadget(struct GadgetInfo *, int);
 
 void HandleGadgets(int, int, int);
 void HandleGadgetsKeyInput(KeySym);

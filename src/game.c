@@ -405,16 +405,8 @@ void InitGame()
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
-  if (level.high_speed)
-  {
-    MoveSpeed = 4;
-    ScrollStepSize = TILEX/4;
-  }
-  else
-  {
-    MoveSpeed = 8;
-    ScrollStepSize = TILEX/8;
-  }
+  MoveSpeed = (level.double_speed ? 4 : 8);
+  ScrollStepSize = TILEX / MoveSpeed;
 
   AllPlayersGone = FALSE;
   SiebAktiv = FALSE;

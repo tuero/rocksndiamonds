@@ -26,7 +26,7 @@
 #define MAX_LINE_LEN		1000	/* maximal input line length */
 #define CHUNK_ID_LEN		4	/* IFF style chunk id length */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header */
-#define LEVEL_HEADER_UNUSED	18	/* unused level header bytes */
+#define LEVEL_HEADER_UNUSED	17	/* unused level header bytes */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header */
 #define TAPE_HEADER_UNUSED	7	/* unused tape header bytes */
 #define FILE_VERSION_1_0	10	/* old 1.0 file version */
@@ -308,8 +308,7 @@ static void setLevelInfoToDefaults()
   level.dauer_sieb = 10;
   level.dauer_ablenk = 10;
   level.amoebe_inhalt = EL_DIAMANT;
-
-  level.high_speed = FALSE;
+  level.double_speed = FALSE;
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     level.name[i] = '\0';
@@ -441,7 +440,8 @@ void LoadLevel(int level_nr)
   level.tempo_amoebe	= fgetc(file);
   level.dauer_sieb	= fgetc(file);
   level.dauer_ablenk	= fgetc(file);
-  level.amoebe_inhalt = fgetc(file);
+  level.amoebe_inhalt	= fgetc(file);
+  level.double_speed	= (fgetc(file) == 1 ? TRUE : FALSE);
 
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* skip unused header bytes */
     fgetc(file);
@@ -504,7 +504,7 @@ void LoadLevel(int level_nr)
   {
     Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
     Error(ERR_WARN, "using high speed movement for player");
-    level.high_speed = TRUE;
+    level.double_speed = TRUE;
   }
 }
 
@@ -544,6 +544,7 @@ void SaveLevel(int level_nr)
   fputc(level.dauer_sieb, file);
   fputc(level.dauer_ablenk, file);
   fputc(level.amoebe_inhalt, file);
+  fputc((level.double_speed ? 1 : 0), file);
 
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
     fputc(0, file);

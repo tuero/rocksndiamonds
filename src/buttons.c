@@ -2273,14 +2273,19 @@ void RemapAllGadgets()
   MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_REMAP);
 }
 
-void ClickOnGadget(struct GadgetInfo *gi)
+boolean anyTextGadgetActive()
+{
+  return (last_gi && last_gi->type & GD_TYPE_TEXTINPUT && last_gi->mapped);
+}
+
+void ClickOnGadget(struct GadgetInfo *gi, int button)
 {
   /* simulate releasing mouse button over last gadget, if still pressed */
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
   /* simulate pressing mouse button over specified gadget */
-  HandleGadgets(gi->x, gi->y, 1);
+  HandleGadgets(gi->x, gi->y, button);
 
   /* simulate releasing mouse button over specified gadget */
   HandleGadgets(gi->x, gi->y, 0);
@@ -2325,8 +2330,7 @@ void HandleGadgets(int mx, int my, int button)
   last_my = my;
 
   /* special treatment for text and number input gadgets */
-  if (last_gi && last_gi->type & GD_TYPE_TEXTINPUT && last_gi->mapped &&
-      button != 0 && !motion_status)
+  if (anyTextGadgetActive() && button != 0 && !motion_status)
   {
     struct GadgetInfo *gi = last_gi;
 

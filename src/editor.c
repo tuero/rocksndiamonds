@@ -94,21 +94,18 @@
 #define ED_NUM_ELEMENTLIST_BUTTONS	(ED_ELEMENTLIST_BUTTONS_HORIZ * \
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
-/* values for element properties window */
-#define ED_PROPERTIES_XPOS		(TILEX - MINI_TILEX/2)
-
-/* values for level information window */
-#define ED_LEVELINFO_XPOS		(TILEX - MINI_TILEX/2)
-#define ED_LEVELINFO_YPOS		(TILEY - MINI_TILEY/2)
+/* values for the setting windows */
+#define ED_SETTINGS_XPOS		MINI_TILEX
+#define ED_SETTINGS_YPOS		MINI_TILEY
+#define ED_SETTINGS2_YPOS		(ED_SETTINGS_YPOS + 12 * TILEY)
 
 /* values for counter gadgets */
-#define ED_COUNT_VALUE_XOFFSET		5
-#define ED_COUNT_VALUE_YOFFSET		3
-#define ED_COUNT_ELEM_SCORE_XPOS	ED_PROPERTIES_XPOS
+#define ED_COUNT_ELEM_SCORE_XPOS	ED_SETTINGS_XPOS
 #define ED_COUNT_ELEM_SCORE_YPOS	(14 * MINI_TILEY)
-#define ED_COUNT_ELEM_CONTENT_XPOS	ED_PROPERTIES_XPOS
+#define ED_COUNT_ELEM_CONTENT_XPOS	ED_SETTINGS_XPOS
 #define ED_COUNT_ELEM_CONTENT_YPOS	(17 * MINI_TILEY)
-#define ED_COUNTER_YSTART		(ED_LEVELINFO_YPOS + 3 * TILEY)
+
+#define ED_COUNTER_YSTART		(ED_SETTINGS_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE)
@@ -150,13 +147,13 @@
 #define ED_CHECKBUTTON_XSIZE		ED_BUTTON_COUNT_XSIZE
 #define ED_CHECKBUTTON_YSIZE		ED_BUTTON_COUNT_YSIZE
 #define ED_CHECKBUTTON_UNCHECKED_XPOS	ED_BUTTON_MINUS_XPOS
-#define ED_CHECKBUTTON_UNCHECKED_YPOS	ED_BUTTON_MINUS_YPOS
+#define ED_CHECKBUTTON_UNCHECKED_YPOS	(ED_BUTTON_MINUS_YPOS + 22)
 #define ED_CHECKBUTTON_CHECKED_XPOS	ED_BUTTON_PLUS_XPOS
-#define ED_CHECKBUTTON_CHECKED_YPOS	ED_BUTTON_PLUS_YPOS
+#define ED_CHECKBUTTON_CHECKED_YPOS	(ED_BUTTON_PLUS_YPOS + 22)
 
-/* control button identifiers */
 #define GADGET_ID_NONE			-1
 
+/* drawing toolbox buttons */
 #define GADGET_ID_SINGLE_ITEMS		0
 #define GADGET_ID_CONNECTED_ITEMS	1
 #define GADGET_ID_LINE			2
@@ -238,11 +235,12 @@
 #define GADGET_ID_ELEMENTLIST_FIRST	66
 #define GADGET_ID_ELEMENTLIST_LAST	105
 
-/* checkbuttons for level settings */
+/* buttons for level settings */
 #define GADGET_ID_RANDOM_PERCENTAGE	106
 #define GADGET_ID_RANDOM_QUANTITY	107
+#define GADGET_ID_DOUBLE_SPEED		108
 
-#define NUM_EDITOR_GADGETS		108
+#define NUM_EDITOR_GADGETS		109
 
 /* radio button numbers */
 #define RADIO_NR_NONE			0
@@ -254,10 +252,13 @@
 #define ED_COUNTER_ID_ELEM_CONTENT	1
 #define ED_COUNTER_ID_LEVEL_XSIZE	2
 #define ED_COUNTER_ID_LEVEL_YSIZE	3
-#define ED_COUNTER_ID_LEVEL_RANDOM	4
-#define ED_COUNTER_ID_LEVEL_COLLECT	5
-#define ED_COUNTER_ID_LEVEL_TIMELIMIT	6
-#define ED_COUNTER_ID_LEVEL_TIMESCORE	7
+#define ED_COUNTER_ID_LEVEL_COLLECT	4
+#define ED_COUNTER_ID_LEVEL_TIMELIMIT	5
+#define ED_COUNTER_ID_LEVEL_TIMESCORE	6
+#define ED_COUNTER_ID_LEVEL_RANDOM	7
+
+#define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
+#define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
 
 #define ED_NUM_COUNTERBUTTONS		8
 
@@ -281,13 +282,21 @@
 #define ED_TEXTINPUT_ID_LEVEL_NAME	0
 #define ED_TEXTINPUT_ID_LEVEL_AUTHOR	1
 
+#define ED_TEXTINPUT_ID_LEVEL_FIRST	ED_TEXTINPUT_ID_LEVEL_NAME
+#define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
+
 #define ED_NUM_TEXTINPUT		2
 
 /* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_PERCENTAGE	0
-#define ED_CHECKBUTTON_QUANTITY		1
+#define ED_CHECKBUTTON_DOUBLE_SPEED	0
 
-#define ED_NUM_CHECKBUTTONS		2
+#define ED_NUM_CHECKBUTTONS		1
+
+/* values for radiobutton gadgets */
+#define ED_RADIOBUTTON_PERCENTAGE	0
+#define ED_RADIOBUTTON_QUANTITY		1
+
+#define ED_NUM_RADIOBUTTONS		2
 
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
@@ -347,7 +356,7 @@ static struct
   int gadget_id_down, gadget_id_up;
   int gadget_id_text;
   int **counter_value;
-  char *infotext;
+  char *infotext_above, *infotext_right;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
   {
@@ -356,7 +365,7 @@ static struct
     GADGET_ID_ELEM_SCORE_DOWN,		GADGET_ID_ELEM_SCORE_UP,
     GADGET_ID_ELEM_SCORE_TEXT,
     &gadget_elem_score_value,
-    "element score"
+    "element score",			NULL
   },
   {
     ED_COUNT_ELEM_CONTENT_XPOS,		ED_COUNT_ELEM_CONTENT_YPOS,
@@ -364,55 +373,55 @@ static struct
     GADGET_ID_ELEM_CONTENT_DOWN,	GADGET_ID_ELEM_CONTENT_UP,
     GADGET_ID_ELEM_CONTENT_TEXT,
     &gadget_elem_content_value,
-    "element content"
+    "element content",			NULL
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(0),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(2),
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
     GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
     GADGET_ID_LEVEL_XSIZE_TEXT,
     &gadget_level_xsize_value,
-    "playfield width"
+    "playfield size",			"width",
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(1),
+    ED_SETTINGS_XPOS + 2 * DXSIZE,	ED_COUNTER_YPOS(2),
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
     GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
     GADGET_ID_LEVEL_YSIZE_TEXT,
     &gadget_level_ysize_value,
-    "playfield height"
+    NULL,				"height",
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(2),
-    1,					100,
-    GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
-    GADGET_ID_LEVEL_RANDOM_TEXT,
-    &gadget_level_random_value,
-    "random elements"
-  },
-  {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(3),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(3),
     0,					999,
     GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
     GADGET_ID_LEVEL_COLLECT_TEXT,
     &gadget_level_collect_value,
-    "number of emeralds to collect"
+    "number of emeralds to collect",	NULL
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
     0,					999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,
     &gadget_level_timelimit_value,
-    "time available to solve level"
+    "time available to solve level",	"(0 => no time limit)"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(5),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(5),
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
     &gadget_level_timescore_value,
-    "score for each 10 seconds left"
+    "score for each 10 seconds left",	NULL
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
+    1,					100,
+    GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
+    GADGET_ID_LEVEL_RANDOM_TEXT,
+    &gadget_level_random_value,
+    "random elements",			"in"
   }
 };
 
@@ -420,21 +429,24 @@ static struct
 {
   int x, y;
   int gadget_id;
+  int size;
   char *value;
   char *infotext;
 } textinput_info[ED_NUM_TEXTINPUT] =
 {
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(6),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(0),
     GADGET_ID_LEVEL_NAME,
+    MAX_LEVEL_NAME_LEN,
     level.name,
-    "Level Title"
+    "Title"
   },
   {
-    ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(7),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(1),
     GADGET_ID_LEVEL_AUTHOR,
+    MAX_LEVEL_AUTHOR_LEN,
     level.author,
-    "Level Author"
+    "Author"
   }
 };
 
@@ -474,13 +486,13 @@ static struct
     ED_ELEMENTLIST_UP_XPOS, ED_ELEMENTLIST_UP_ALT_YPOS,
     ED_ELEMENTLIST_UP_XPOS, ED_ELEMENTLIST_UP_YPOS,
     GADGET_ID_ELEMENTLIST_UP,
-    "scroll element list up"
+    "scroll element list up ('Page Up')"
   },
   {
     ED_ELEMENTLIST_DOWN_XPOS, ED_ELEMENTLIST_DOWN_ALT_YPOS,
     ED_ELEMENTLIST_DOWN_XPOS, ED_ELEMENTLIST_DOWN_YPOS,
     GADGET_ID_ELEMENTLIST_DOWN,
-    "scroll element list down"
+    "scroll element list down ('Page Down')"
   }
 };
 
@@ -527,21 +539,37 @@ static struct
   int *value;
   int checked_value;
   char *text, *infotext;
-} checkbutton_info[ED_NUM_CHECKBUTTONS] =
+} radiobutton_info[ED_NUM_RADIOBUTTONS] =
 {
   {
-    ED_LEVELINFO_XPOS + 160,		ED_COUNTER_YPOS(2),
+    ED_SETTINGS_XPOS + 160,		ED_COUNTER_YPOS(8),
     GADGET_ID_RANDOM_PERCENTAGE,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_PERCENTAGE,
-    "percentage", "use percentage for random elements"
+    "percentage",			"use percentage for random elements"
   },
   {
-    ED_LEVELINFO_XPOS + 340,		ED_COUNTER_YPOS(2),
+    ED_SETTINGS_XPOS + 340,		ED_COUNTER_YPOS(8),
     GADGET_ID_RANDOM_QUANTITY,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_QUANTITY,
-    "quantity", "use quantity for random elements"
+    "quantity",				"use quantity for random elements"
+  }
+};
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+  boolean *value;
+  char *text, *infotext;
+} checkbutton_info[ED_NUM_CHECKBUTTONS] =
+{
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(6) - MINI_TILEY,
+    GADGET_ID_DOUBLE_SPEED,
+    &level.double_speed,
+    "double speed movement",		"set movement speed of player"
   }
 };
 
@@ -592,7 +620,7 @@ static int undo_buffer_steps = 0;
 
 static int edit_mode;
 
-static int counter_xsize = DXSIZE + 20;
+static int counter_xsize = DXSIZE + FONT2_XSIZE - 2 * ED_GADGET_DISTANCE;
 
 int element_shift = 0;
 
@@ -1384,7 +1412,7 @@ static void CreateTextInputGadgets()
 		      GDI_Y, SY + textinput_info[i].y,
 		      GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
 		      GDI_TEXT_VALUE, textinput_info[i].value,
-		      GDI_TEXT_SIZE, 30,
+		      GDI_TEXT_SIZE, textinput_info[i].size,
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
 		      GDI_DESIGN_BORDER, ED_BORDER_SIZE,
@@ -1459,32 +1487,55 @@ static void CreateScrollbarGadgets()
 
 static void CreateCheckbuttonGadgets()
 {
+  Pixmap gd_pixmap = pix[PIX_DOOR];
+  struct GadgetInfo *gi;
+  unsigned long event_mask;
+  int gd_x1, gd_x2, gd_x3, gd_x4, gd_y1, gd_y2;
+  boolean checked;
   int i;
 
-  /* create toolbox buttons */
+  event_mask = GD_EVENT_PRESSED;
+
+  gd_x1 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_UNCHECKED_XPOS;
+  gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
+  gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
+  gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
+  gd_y1 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_UNCHECKED_YPOS;
+  gd_y2 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_CHECKED_YPOS;
+
+  for (i=0; i<ED_NUM_RADIOBUTTONS; i++)
+  {
+    int id = radiobutton_info[i].gadget_id;
+
+    checked =
+      (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, radiobutton_info[i].infotext,
+		      GDI_X, SX + radiobutton_info[i].x,
+		      GDI_Y, SY + radiobutton_info[i].y,
+		      GDI_WIDTH, ED_CHECKBUTTON_XSIZE,
+		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
+		      GDI_TYPE, GD_TYPE_RADIO_BUTTON,
+		      GDI_RADIO_NR, radiobutton_info[i].radio_button_nr,
+		      GDI_CHECKED, checked,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y2,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y2,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleControlButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id] = gi;
+  }
+
   for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
   {
-    Pixmap gd_pixmap = pix[PIX_DOOR];
-    struct GadgetInfo *gi;
-    unsigned long event_mask;
-    int gd_x1, gd_x2, gd_x3, gd_x4, gd_y1, gd_y2;
-    int button_type;
-    boolean checked;
     int id = checkbutton_info[i].gadget_id;
-
-    event_mask = GD_EVENT_PRESSED;
-
-    button_type = (checkbutton_info[i].radio_button_nr == RADIO_NR_NONE ?
-		   GD_TYPE_CHECK_BUTTON : GD_TYPE_RADIO_BUTTON);
-    checked =
-      (*checkbutton_info[i].value == checkbutton_info[i].checked_value);
-
-    gd_x1 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-    gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-    gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
-    gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
-    gd_y1 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_UNCHECKED_YPOS;
-    gd_y2 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_CHECKED_YPOS;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
@@ -1492,9 +1543,8 @@ static void CreateCheckbuttonGadgets()
 		      GDI_Y, SY + checkbutton_info[i].y,
 		      GDI_WIDTH, ED_CHECKBUTTON_XSIZE,
 		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
-		      GDI_TYPE, button_type,
-		      GDI_RADIO_NR, checkbutton_info[i].radio_button_nr,
-		      GDI_CHECKED, checked,
+		      GDI_TYPE, GD_TYPE_CHECK_BUTTON,
+		      GDI_CHECKED, *checkbutton_info[i].value,
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
 		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y2,
@@ -1545,6 +1595,11 @@ static void MapDrawingArea(int id)
 static void MapTextInputGadget(int id)
 {
   MapGadget(level_editor_gadget[textinput_info[id].gadget_id]);
+}
+
+static void MapRadiobuttonGadget(int id)
+{
+  MapGadget(level_editor_gadget[radiobutton_info[id].gadget_id]);
 }
 
 static void MapCheckbuttonGadget(int id)
@@ -1888,21 +1943,6 @@ static void PickDrawingElement(int button, int element)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-static void DrawCounterValueField(int counter_id, int value)
-{
-  int x = SX + counterbutton_info[counter_id].x + ED_WIN_COUNT_XPOS;
-  int y = SY + counterbutton_info[counter_id].y;
-
-  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-	    DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS,
-	    DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS,
-	    ED_WIN_COUNT_XSIZE, ED_WIN_COUNT_YSIZE,
-	    x, y);
-
-  DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
-	   int2str(value, 3), FS_SMALL, FC_YELLOW);
-}
-
 static void DrawDrawingWindow()
 {
   ClearWindow();
@@ -1918,15 +1958,22 @@ static void DrawDrawingWindow()
 static void DrawLevelInfoWindow()
 {
   char infotext[1024];
-  int infotext_yoffset = MINI_TILEX + ED_GADGET_DISTANCE;
-  int infotext_yoffset2 = ED_BORDER_SIZE;
+  int xoffset_above = 0;
+  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
+  int xoffset_right = counter_xsize;
+  int yoffset_right = ED_BORDER_SIZE;
+  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int yoffset_right2 = ED_BORDER_SIZE;
+  int font_color = FC_GREEN;
   int i, x, y;
 
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
-  DrawTextF(ED_LEVELINFO_XPOS, ED_LEVELINFO_YPOS, FC_YELLOW,
-	    "Level Information");
+  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS_YPOS,
+	   "Level Settings", FS_BIG, FC_YELLOW);
+  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS2_YPOS,
+	   "Editor Settings", FS_BIG, FC_YELLOW);
 
   gadget_level_xsize_value = &lev_fieldx;
   gadget_level_ysize_value = &lev_fieldy;
@@ -1936,50 +1983,70 @@ static void DrawLevelInfoWindow()
   gadget_level_timescore_value = &level.score[10];
 
   /* draw counter gadgets */
-  for (i=ED_COUNTER_ID_LEVEL_XSIZE; i<=ED_COUNTER_ID_LEVEL_TIMESCORE; i++)
+  for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
   {
-    x = counterbutton_info[i].x;
-    y = counterbutton_info[i].y - infotext_yoffset;
+    if (counterbutton_info[i].infotext_above)
+    {
+      x = counterbutton_info[i].x + xoffset_above;
+      y = counterbutton_info[i].y + yoffset_above;
 
-    sprintf(infotext, "%s:", counterbutton_info[i].infotext);
-    infotext[MAX_INFOTEXT_LEN] = '\0';
+      sprintf(infotext, "%s:", counterbutton_info[i].infotext_above);
+      infotext[MAX_INFOTEXT_LEN] = '\0';
+      DrawTextF(x, y, font_color, infotext);
+    }
 
-    DrawTextF(x, y, FC_YELLOW, infotext);
+    if (counterbutton_info[i].infotext_right)
+    {
+      x = counterbutton_info[i].x + xoffset_right;
+      y = counterbutton_info[i].y + yoffset_right;
+
+      sprintf(infotext, "%s", counterbutton_info[i].infotext_right);
+      infotext[MAX_INFOTEXT_LEN] = '\0';
+      DrawTextF(x, y, font_color, infotext);
+    }
+
     ModifyEditorCounter(i, **counterbutton_info[i].counter_value);
     MapCounterButtons(i);
   }
 
   /* draw text input gadgets */
-  for (i=ED_TEXTINPUT_ID_LEVEL_NAME; i<=ED_TEXTINPUT_ID_LEVEL_AUTHOR; i++)
+  for (i=ED_TEXTINPUT_ID_LEVEL_FIRST; i<=ED_TEXTINPUT_ID_LEVEL_LAST; i++)
   {
-    x = textinput_info[i].x;
-    y = textinput_info[i].y - infotext_yoffset;
+    x = textinput_info[i].x + xoffset_above;
+    y = textinput_info[i].y + yoffset_above;
 
     sprintf(infotext, "%s:", textinput_info[i].infotext);
     infotext[MAX_INFOTEXT_LEN] = '\0';
 
-    DrawTextF(x, y, FC_YELLOW, infotext);
+    DrawTextF(x, y, font_color, infotext);
     ModifyEditorTextInput(i, textinput_info[i].value);
     MapTextInputGadget(i);
   }
 
-  x = counterbutton_info[ED_COUNTER_ID_LEVEL_RANDOM].x + counter_xsize;
-  y = counterbutton_info[ED_COUNTER_ID_LEVEL_RANDOM].y + infotext_yoffset2;
+  /* draw radiobutton gadgets */
+  for (i=0; i<ED_NUM_RADIOBUTTONS; i++)
+  {
+    boolean checked =
+      (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
 
-  DrawTextF(x, y, FC_YELLOW, "in");
+    x = radiobutton_info[i].x + xoffset_right2;
+    y = radiobutton_info[i].y + yoffset_right2;
+
+    DrawTextF(x, y, font_color, radiobutton_info[i].text);
+    ModifyGadget(level_editor_gadget[radiobutton_info[i].gadget_id],
+		 GDI_CHECKED, checked, GDI_END);
+    MapRadiobuttonGadget(i);
+  }
 
   /* draw checkbutton gadgets */
   for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
   {
-    boolean checked =
-      (*checkbutton_info[i].value == checkbutton_info[i].checked_value);
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
 
-    x = checkbutton_info[i].x + ED_CHECKBUTTON_XSIZE + ED_GADGET_DISTANCE;
-    y = checkbutton_info[i].y + infotext_yoffset2;
-
-    DrawTextF(x, y, FC_YELLOW, checkbutton_info[i].text);
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, checked, GDI_END);
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
   }
 }
@@ -1991,6 +2058,9 @@ static void DrawElementContentAreas()
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
+  int xoffset_right = counter_xsize;
+  int yoffset_right = ED_BORDER_SIZE;
+  int font_color = FC_GREEN;
   int i, x, y;
 
   for (i=0; i<MAX_ELEM_CONTENT; i++)
@@ -2003,11 +2073,10 @@ static void DrawElementContentAreas()
 
   /* display counter to choose number of element content areas */
   gadget_elem_content_value = num_areas;
-  DrawCounterValueField(ED_COUNTER_ID_ELEM_CONTENT,*gadget_elem_content_value);
-  x = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].x + counter_xsize;
-  y = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].y;
-  DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
-	    FC_YELLOW, "number of content areas");
+
+  x = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].x + xoffset_right;
+  y = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].y + yoffset_right;
+  DrawTextF(x, y, font_color, "number of content areas");
   ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT, *gadget_elem_content_value);
   MapCounterButtons(ED_COUNTER_ID_ELEM_CONTENT);
 
@@ -2036,11 +2105,11 @@ static void DrawElementContentAreas()
 	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
-	   "Content", FS_SMALL, FC_YELLOW);
+	   "Content", FS_SMALL, font_color);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 1 * MINI_TILEY + 1,
-	   "when", FS_SMALL, FC_YELLOW);
+	   "when", FS_SMALL, font_color);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
-	   "smashed", FS_SMALL, FC_YELLOW);
+	   "smashed", FS_SMALL, font_color);
 
   for (i=0; i<*num_areas; i++)
   {
@@ -2051,7 +2120,7 @@ static void DrawElementContentAreas()
 
     DrawTextF(area_sx - SX + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
 	      area_sy - SY + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
-	      FC_YELLOW, "%d", i + 1);
+	      font_color, "%d", i + 1);
   }
 
   for (i=0; i<*num_areas; i++)
@@ -2064,6 +2133,7 @@ static void DrawAmoebaContentArea()
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
+  int font_color = FC_GREEN;
   int x, y;
 
   ElementContent[0][0][0] = level.amoebe_inhalt;
@@ -2083,7 +2153,7 @@ static void DrawAmoebaContentArea()
 	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
   DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
-	   FS_SMALL, FC_YELLOW);
+	   FS_SMALL, font_color);
 
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
@@ -2098,9 +2168,14 @@ static void DrawAmoebaContentArea()
 
 static void DrawPropertiesWindow()
 {
-  int i, x, y;
   int num_elements_in_level;
   float percentage;
+  int xoffset_right = counter_xsize;
+  int yoffset_right = ED_BORDER_SIZE;
+  int xstart = 2;
+  int ystart = 4;
+  int font_color = FC_GREEN;
+  int i, x, y;
   static struct
   {
     int element;
@@ -2155,25 +2230,40 @@ static void DrawPropertiesWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
+  DrawText(SX + ED_SETTINGS_XPOS, SY + ED_SETTINGS_YPOS,
+	   "Element Settings", FS_BIG, FC_YELLOW);
+
   /* draw some decorative border for the object */
   for (y=0; y<3; y++)
     for (x=0; x<3; x++)
-      DrawMiniElement(2 + x , 2 + y, EL_ERDREICH);
+      DrawMiniElement(xstart + x , ystart + y, EL_ERDREICH);
 
   XFillRectangle(display, drawto, gc,
-		 SX + TILEX + MINI_TILEX/2 - 1,
-		 SY + TILEY + MINI_TILEY/2 - 1,
+		 SX + xstart * MINI_TILEX + MINI_TILEX/2 - 1,
+		 SY + ystart * MINI_TILEY + MINI_TILEY/2 - 1,
 		 TILEX + 2, TILEY + 2);
 
   /* copy border to the right location */
   XCopyArea(display, drawto, drawto, gc,
-	    SX + TILEX, SY + TILEY,
+	    SX + xstart * MINI_TILEX,
+	    SY + ystart * MINI_TILEY,
 	    2 * TILEX, 2 * TILEY,
-	    SX + TILEX - MINI_TILEX/2, SY + TILEY - MINI_TILEY/2);
+	    SX + xstart * MINI_TILEX - MINI_TILEX/2,
+	    SY + ystart * MINI_TILEY - MINI_TILEY/2);
 
-  DrawGraphic(1, 1, el2gfx(properties_element));
-  DrawText(SX + 3*TILEX, SY + 5*TILEY/4, "Element Properties",
-	   FS_SMALL, FC_YELLOW);
+  DrawGraphic(xstart/2, ystart/2, el2gfx(properties_element));
+
+
+  /* copy the whole stuff to the definitive location */
+  XCopyArea(display, drawto, drawto, gc,
+	    SX + xstart * MINI_TILEX - MINI_TILEX/2,
+	    SY + ystart * MINI_TILEY - MINI_TILEY,
+	    2 * TILEX, 2 * TILEY,
+	    SX + xstart * MINI_TILEX - MINI_TILEX,
+	    SY + ystart * MINI_TILEY - MINI_TILEY/2);
+
+  DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
+	    font_color, "Element Properties");
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -2182,26 +2272,21 @@ static void DrawPropertiesWindow()
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextF(ED_PROPERTIES_XPOS, 5*TILEY, FC_YELLOW,
-	    "%d x contained in level (%.2f %%)",
-	    num_elements_in_level, percentage);
+  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, font_color, "In this level:");
+  DrawTextF(ED_SETTINGS_XPOS + 15 * FONT2_XSIZE, 5 * TILEY, FC_YELLOW,
+	    "%d (%.2f%%)", num_elements_in_level, percentage);
 
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
   {
     if (elements_with_counter[i].element == properties_element)
     {
-      int x = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].x + counter_xsize;
-      int y = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].y;
+      int x = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].x + xoffset_right;
+      int y = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].y + yoffset_right;
 
       gadget_elem_score_value = elements_with_counter[i].counter_value;
 
-      /*
-      DrawCounterValueField(ED_COUNTER_ID_SCORE, *gadget_score_value);
-      */
-
-      DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
-		FC_YELLOW, elements_with_counter[i].text);
+      DrawTextF(x, y, font_color, elements_with_counter[i].text);
       ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE, *gadget_elem_score_value);
       MapCounterButtons(ED_COUNTER_ID_ELEM_SCORE);
       break;
@@ -3042,7 +3127,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  {
 	    CopyAreaToBrush(start_sx, start_sy, sx, sy, button);
 	    CopyBrushToCursor(sx, sy);
-	    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS]);
+	    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],MB_LEFT);
 	    draw_with_brush = TRUE;
 	  }
 	  else if (drawing_function == GADGET_ID_TEXT)
@@ -3073,7 +3158,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       if (button_press_event)
 	PickDrawingElement(button, Feld[lx][ly]);
       if (button_release_event)
-	ClickOnGadget(level_editor_gadget[last_drawing_function]);
+	ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
       break;
 
     default:
@@ -3420,7 +3505,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_CLEAR:
       for(x=0; x<MAX_LEV_FIELDX; x++) 
 	for(y=0; y<MAX_LEV_FIELDY; y++) 
-	  Feld[x][y] = new_element3;
+	  Feld[x][y] = (button == 1 ? EL_LEERRAUM : new_element);
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
       DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
@@ -3545,13 +3630,17 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_RANDOM_PERCENTAGE:
-      *checkbutton_info[ED_CHECKBUTTON_PERCENTAGE].value =
-	checkbutton_info[ED_CHECKBUTTON_PERCENTAGE].checked_value;
+      *radiobutton_info[ED_RADIOBUTTON_PERCENTAGE].value =
+	radiobutton_info[ED_RADIOBUTTON_PERCENTAGE].checked_value;
       break;
 
     case GADGET_ID_RANDOM_QUANTITY:
-      *checkbutton_info[ED_CHECKBUTTON_QUANTITY].value =
-	checkbutton_info[ED_CHECKBUTTON_QUANTITY].checked_value;
+      *radiobutton_info[ED_RADIOBUTTON_QUANTITY].value =
+	radiobutton_info[ED_RADIOBUTTON_QUANTITY].checked_value;
+      break;
+
+    case GADGET_ID_DOUBLE_SPEED:
+      *checkbutton_info[ED_CHECKBUTTON_DOUBLE_SPEED].value ^= TRUE;
       break;
 
     default:
@@ -3586,52 +3675,59 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 void HandleLevelEditorKeyInput(KeySym key)
 {
-  if (edit_mode == ED_MODE_DRAWING)
+  char letter = getCharFromKeySym(key);
+  int button = MB_LEFT;
+
+  if (drawing_function == GADGET_ID_TEXT)
   {
-    char letter = getCharFromKeySym(key);
+    if (letter)
+      DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
+    else if (key == XK_Delete || key == XK_BackSpace)
+      DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
+    else if (key == XK_Return)
+      DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+  }
+  else if (button_status == MB_RELEASED)
+  {
+    int i, id;
 
-    if (drawing_function == GADGET_ID_TEXT)
+    switch (key)
     {
-      if (letter)
-	DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
-      else if (key == XK_Delete || key == XK_BackSpace)
-	DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
-      else if (key == XK_Return)
-	DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+      case XK_Left:
+	id = GADGET_ID_SCROLL_LEFT;
+	break;
+      case XK_Right:
+	id = GADGET_ID_SCROLL_RIGHT;
+	break;
+      case XK_Up:
+	id = GADGET_ID_SCROLL_UP;
+	break;
+      case XK_Down:
+	id = GADGET_ID_SCROLL_DOWN;
+	break;
+      case XK_Page_Up:
+	id = GADGET_ID_ELEMENTLIST_UP;
+	button = 3;
+	break;
+      case XK_Page_Down:
+	id = GADGET_ID_ELEMENTLIST_DOWN;
+	button = 3;
+	break;
+
+      default:
+	id = GADGET_ID_NONE;
+	break;
     }
-    else if (button_status == MB_RELEASED)
-    {
-      int i, id;
 
-      switch (key)
-      {
-        case XK_Left:
-	  id = GADGET_ID_SCROLL_LEFT;
-	  break;
-        case XK_Right:
-	  id = GADGET_ID_SCROLL_RIGHT;
-	  break;
-        case XK_Up:
-	  id = GADGET_ID_SCROLL_UP;
-	  break;
-        case XK_Down:
-	  id = GADGET_ID_SCROLL_DOWN;
-	  break;
-
-        default:
-	  id = GADGET_ID_NONE;
-	  break;
-      }
-
-      if (id != GADGET_ID_NONE)
-	ClickOnGadget(level_editor_gadget[id]);
-      else if (letter == '.')
-	ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS]);
-      else
-	for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-	  if (letter && letter == control_info[i].shortcut)
-	    ClickOnGadget(level_editor_gadget[i]);
-    }
+    if (id != GADGET_ID_NONE)
+      ClickOnGadget(level_editor_gadget[id], button);
+    else if (letter == '.')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
+    else
+      for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+	if (letter && letter == control_info[i].shortcut)
+	  if (!anyTextGadgetActive())
+	    ClickOnGadget(level_editor_gadget[i], button);
   }
 }
 

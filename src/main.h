@@ -343,7 +343,7 @@ struct LevelInfo
   int dauer_sieb;
   int dauer_ablenk;
   int amoebe_inhalt;
-  boolean high_speed;
+  boolean double_speed;
 };
 
 struct LevelDirInfo
@@ -1270,13 +1270,8 @@ extern int		num_bg_loops;
 #define MB_MENU_MARK		TRUE
 #define MB_MENU_INITIALIZE	(-1)
 #define MB_LEFT			1
-#ifdef MSDOS
-#define MB_MIDDLE		4
-#define MB_RIGHT		2
-#else
 #define MB_MIDDLE		2
 #define MB_RIGHT		3
-#endif
 
 /* values for redraw_mask */
 #define REDRAW_ALL		(1 << 0)

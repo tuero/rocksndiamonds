@@ -1036,7 +1036,8 @@ void DrawSetupScreen()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
-  DrawText(SX+16, SY+16, "SETUP",FS_BIG,FC_YELLOW);
+
+  DrawText(SX + 16, SY + 16, "SETUP",FS_BIG,FC_YELLOW);
 
   for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
   {
