@@ -99,6 +99,7 @@ void TapeErase(void);
 unsigned int GetTapeLength(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
+void InsertSolutionTape(void);
 
 void AutoPlayTape(void);
 

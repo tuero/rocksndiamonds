@@ -29,6 +29,7 @@ void DumpLevel(struct LevelInfo *);
 
 void LoadTapeFromFilename(char *);
 void LoadTape(int);
+void LoadSolutionTape(int);
 void SaveTape(int);
 void DumpTape(struct TapeInfo *);
 

@@ -687,6 +687,19 @@ void TapeQuickLoad()
   }
 }
 
+void InsertSolutionTape()
+{
+  if (!TAPE_IS_EMPTY(tape))
+    return;
+
+  LoadSolutionTape(level_nr);
+
+  if (TAPE_IS_EMPTY(tape))
+    Request("No solution tape for this level !", REQ_CONFIRM);
+
+  DrawCompleteVideoDisplay();
+}
+
 
 /* ------------------------------------------------------------------------- *
  * tape autoplay functions
@@ -768,7 +781,7 @@ void AutoPlayTape()
       continue;
     }
 
-    LoadTape(level_nr);
+    LoadSolutionTape(level_nr);
     if (TAPE_IS_EMPTY(tape))
     {
       printf("(no tape)\n");

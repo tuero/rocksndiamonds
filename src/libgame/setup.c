@@ -108,23 +108,6 @@ static char *getUserLevelDir(char *level_subdir)
   return userlevel_dir;
 }
 
-static char *getTapeDir(char *level_subdir)
-{
-  static char *tape_dir = NULL;
-  char *data_dir = getUserDataDir();
-  char *tape_subdir = TAPES_DIRECTORY;
-
-  if (tape_dir)
-    free(tape_dir);
-
-  if (level_subdir != NULL)
-    tape_dir = getPath3(data_dir, tape_subdir, level_subdir);
-  else
-    tape_dir = getPath2(data_dir, tape_subdir);
-
-  return tape_dir;
-}
-
 static char *getScoreDir(char *level_subdir)
 {
   static char *score_dir = NULL;
@@ -178,6 +161,37 @@ static char *getLevelDirFromTreeInfo(TreeInfo *node)
 static char *getCurrentLevelDir()
 {
   return getLevelDirFromTreeInfo(leveldir_current);
+}
+
+static char *getTapeDir(char *level_subdir)
+{
+  static char *tape_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *tape_subdir = TAPES_DIRECTORY;
+
+  if (tape_dir)
+    free(tape_dir);
+
+  if (level_subdir != NULL)
+    tape_dir = getPath3(data_dir, tape_subdir, level_subdir);
+  else
+    tape_dir = getPath2(data_dir, tape_subdir);
+
+  return tape_dir;
+}
+
+static char *getSolutionTapeDir()
+{
+  static char *tape_dir = NULL;
+  char *data_dir = getCurrentLevelDir();
+  char *tape_subdir = TAPES_DIRECTORY;
+
+  if (tape_dir)
+    free(tape_dir);
+
+  tape_dir = getPath2(data_dir, tape_subdir);
+
+  return tape_dir;
 }
 
 static char *getDefaultGraphicsDir(char *graphics_subdir)
@@ -375,6 +389,20 @@ char *getTapeFilename(int nr)
 
   sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
   filename = getPath2(getTapeDir(leveldir_current->filename), basename);
+
+  return filename;
+}
+
+char *getSolutionTapeFilename(int nr)
+{
+  static char *filename = NULL;
+  char basename[MAX_FILENAME_LEN];
+
+  if (filename != NULL)
+    free(filename);
+
+  sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
+  filename = getPath2(getSolutionTapeDir(), basename);
 
   return filename;
 }

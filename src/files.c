@@ -2011,6 +2011,13 @@ void LoadTape(int level_nr)
   LoadTapeFromFilename(filename);
 }
 
+void LoadSolutionTape(int level_nr)
+{
+  char *filename = getSolutionTapeFilename(level_nr);
+
+  LoadTapeFromFilename(filename);
+}
+
 static void SaveTape_VERS(FILE *file, struct TapeInfo *tape)
 {
   putFileVersion(file, tape->file_version);

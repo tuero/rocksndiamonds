@@ -5015,7 +5015,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   if (level.use_custom_template)
   {
-    if (Request("Copy and modify level tem- plate ?", REQ_ASK))
+    if (Request("Copy and modify level template ?", REQ_ASK))
     {
       level.use_custom_template = FALSE;
       ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
@@ -7196,11 +7196,11 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     boolean new_template = (!LevelFileExists(-1));
 
     if (new_template ||
-	Request("Save this tem- plate and kill the old ?", REQ_ASK))
+	Request("Save this template and kill the old ?", REQ_ASK))
       SaveLevelTemplate();
 
     if (new_template)
-      Request("Tem- plate saved !", REQ_CONFIRM);
+      Request("Template saved !", REQ_CONFIRM);
   }
   else if (type_id == ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE &&
 	   custom_element.num_change_pages < MAX_CHANGE_PAGES)
@@ -7283,7 +7283,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   {
     if (level.use_custom_template && !LevelFileExists(-1))
     {
-      Request("No level tem- plate found !", REQ_CONFIRM);
+      Request("No level template found !", REQ_CONFIRM);
 
       level.use_custom_template = FALSE;
       ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);

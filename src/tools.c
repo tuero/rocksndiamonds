@@ -2003,13 +2003,31 @@ void WaitForEventToContinue()
 }
 
 #define MAX_REQUEST_LINES		13
-#define MAX_REQUEST_LINE_LEN		7
+#define MAX_REQUEST_LINE_FONT1_LEN	7
+#define MAX_REQUEST_LINE_FONT2_LEN	10
 
 boolean Request(char *text, unsigned int req_state)
 {
   int mx, my, ty, result = -1;
   unsigned int old_door_state;
   int last_game_status = game_status;	/* save current game status */
+  int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
+  int font_nr = FONT_TEXT_2;
+  int max_word_len = 0;
+  char *text_ptr;
+
+  for (text_ptr = text; *text_ptr; text_ptr++)
+  {
+    max_word_len = (*text_ptr != ' ' ? max_word_len + 1 : 0);
+
+    if (max_word_len > MAX_REQUEST_LINE_FONT1_LEN)
+    {
+      max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
+      font_nr = FONT_LEVEL_NUMBER;
+
+      break;
+    }
+  }
 
 #if 1
   SetMouseCursor(CURSOR_DEFAULT);
@@ -2049,13 +2067,13 @@ boolean Request(char *text, unsigned int req_state)
   /* write text for request */
   for (ty = 0; ty < MAX_REQUEST_LINES; ty++)
   {
-    char text_line[MAX_REQUEST_LINE_LEN + 1];
+    char text_line[max_request_line_len + 1];
     int tx, tl, tc;
 
     if (!*text)
       break;
 
-    for (tl = 0, tx = 0; tx < MAX_REQUEST_LINE_LEN; tl++, tx++)
+    for (tl = 0, tx = 0; tx < max_request_line_len; tl++, tx++)
     {
       tc = *(text + tx);
       if (!tc || tc == ' ')
@@ -2072,9 +2090,9 @@ boolean Request(char *text, unsigned int req_state)
     strncpy(text_line, text, tl);
     text_line[tl] = 0;
 
-    DrawText(DX + (DXSIZE - tl * getFontWidth(FONT_TEXT_2)) / 2,
-	     DY + 8 + ty * (getFontHeight(FONT_TEXT_2) + 2),
-	     text_line, FONT_TEXT_2);
+    DrawText(DX + (DXSIZE - tl * getFontWidth(font_nr)) / 2,
+	     DY + 8 + ty * (getFontHeight(font_nr) + 2),
+	     text_line, font_nr);
 
     text += tl + (tc == ' ' ? 1 : 0);
   }

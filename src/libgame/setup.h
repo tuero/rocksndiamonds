@@ -196,6 +196,7 @@ typedef struct hashtable     SetupFileHash;
 char *setLevelArtworkDir(TreeInfo *);
 char *getLevelFilename(int);
 char *getTapeFilename(int);
+char *getSolutionTapeFilename(int);
 char *getScoreFilename(int);
 char *getSetupFilename(void);
 char *getEditorSetupFilename(void);

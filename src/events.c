@@ -449,6 +449,63 @@ void HandleButton(int mx, int my, int button)
   }
 }
 
+static boolean is_string_suffix(char *string, char *suffix)
+{
+  int string_len = strlen(string);
+  int suffix_len = strlen(suffix);
+
+  if (suffix_len > string_len)
+    return FALSE;
+
+  return (strcmp(&string[string_len - suffix_len], suffix) == 0);
+}
+
+#define MAX_CHEAT_INPUT_LEN	32
+
+static void HandleKeysCheating(Key key)
+{
+  static char cheat_input[2 * MAX_CHEAT_INPUT_LEN + 1] = "";
+  char letter = getCharFromKey(key);
+  int cheat_input_len = strlen(cheat_input);
+  int i;
+
+  if (letter == 0)
+    return;
+
+  if (cheat_input_len >= 2 * MAX_CHEAT_INPUT_LEN)
+  {
+    for (i = 0; i < MAX_CHEAT_INPUT_LEN + 1; i++)
+      cheat_input[i] = cheat_input[MAX_CHEAT_INPUT_LEN + i];
+
+    cheat_input_len = MAX_CHEAT_INPUT_LEN;
+  }
+
+  cheat_input[cheat_input_len++] = letter;
+  cheat_input[cheat_input_len] = '\0';
+
+#if 0
+  printf("::: '%s' [%d]\n", cheat_input, cheat_input_len);
+#endif
+
+#if 1
+  if (is_string_suffix(cheat_input, ":insert solution tape"))
+    InsertSolutionTape();
+#else
+  if (is_string_suffix(cheat_input, ":ist"))
+    InsertSolutionTape();
+#endif
+
+#ifdef DEBUG
+  else if (is_string_suffix(cheat_input, ":dump tape"))
+    DumpTape(&tape);
+  else if (is_string_suffix(cheat_input, ".q"))
+    for (i = 0; i < MAX_INVENTORY_SIZE; i++)
+      if (local_player->inventory_size < MAX_INVENTORY_SIZE)
+	local_player->inventory_element[local_player->inventory_size++] =
+	  EL_DYNAMITE;
+#endif
+}
+
 void HandleKey(Key key, int key_status)
 {
   int joy = 0;
@@ -575,6 +632,8 @@ void HandleKey(Key key, int key_status)
       TapeQuickLoad();
     else if (key == setup.shortcut.toggle_pause)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
+    HandleKeysCheating(key);
   }
 
   if (HandleGadgetsKeyInput(key))
@@ -632,12 +691,6 @@ void HandleKey(Key key, int key_status)
 	  else if (game_status == GAME_MODE_INFO)
 	    HandleInfoScreen(0,0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
-
-#ifdef DEBUG
-        case KSYM_t:
-	  DumpTape(&tape);
-	  break;
-#endif
 
 	default:
 	  break;
@@ -782,20 +835,6 @@ void HandleKey(Key key, int key_status)
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
-	case KSYM_Q:
-	case KSYM_q:
-	  {
-	    int i;
-
-	    for (i = 0; i < MAX_INVENTORY_SIZE; i++)
-	      if (local_player->inventory_size < MAX_INVENTORY_SIZE)
-		local_player->inventory_element[local_player->inventory_size++] =
-		  EL_DYNAMITE;
-	  }
-
-	  break;
-
-
 #if 0
 
 	case KSYM_z:
@@ -822,6 +861,7 @@ void HandleKey(Key key, int key_status)
       }
       break;
     }
+
     default:
       if (key == KSYM_Escape)
       {
