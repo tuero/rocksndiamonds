@@ -1352,6 +1352,9 @@ static struct ValueTextInfo options_change_direct_action[] =
 #else
   { CE_HITTING_SOMETHING,	"collision"			},
 #endif
+#if 1
+  { CE_BLOCKED,			"blocked"			},
+#endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
 
@@ -5875,6 +5878,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SWITCHED) ? CE_SWITCHED :
      HAS_CHANGE_EVENT(element, CE_HITTING_SOMETHING) ? CE_HITTING_SOMETHING :
      HAS_CHANGE_EVENT(element, CE_HIT_BY_SOMETHING) ? CE_HIT_BY_SOMETHING :
+     HAS_CHANGE_EVENT(element, CE_BLOCKED) ? CE_BLOCKED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      custom_element_change.direct_action);
@@ -6041,6 +6045,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_SWITCHED] = FALSE;
   custom_element_change_events[CE_HITTING_SOMETHING] = FALSE;
   custom_element_change_events[CE_HIT_BY_SOMETHING] = FALSE;
+  custom_element_change_events[CE_BLOCKED] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =

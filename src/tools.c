@@ -302,10 +302,10 @@ void BackToFront()
   if (redraw_mask & REDRAW_TILES)
   {
     for (x = 0; x < SCR_FIELDX; x++)
-      for (y =0 ; y < SCR_FIELDY; y++)
+      for (y = 0 ; y < SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
 	  BlitBitmap(buffer, window,
-		     FX + x * TILEX, FX + y * TILEY, TILEX, TILEY,
+		     FX + x * TILEX, FY + y * TILEY, TILEX, TILEY,
 		     SX + x * TILEX, SY + y * TILEY);
   }
 

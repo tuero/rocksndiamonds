@@ -5097,6 +5097,8 @@ void StartMoving(int x, int y)
       WasJustFalling[x][y] = 0;
 #endif
 
+      CheckCollision[x][y] = 0;
+
       Impact(x, y);
     }
     else if (IS_FREE(x, y + 1) && element == EL_SPRING && level.use_spring_bug)
@@ -5211,10 +5213,23 @@ void StartMoving(int x, int y)
   }
 
   /* not "else if" because of elements that can fall and move (EL_SPRING) */
+#if 0
+  if (CAN_MOVE(element) && !started_moving && MovDir[x][y] != MV_NO_MOVING)
+#else
   if (CAN_MOVE(element) && !started_moving)
+#endif
   {
     int move_pattern = element_info[element].move_pattern;
     int newx, newy;
+
+#if DEBUG
+    if (MovDir[x][y] == MV_NO_MOVING)
+    {
+      printf("StartMoving(): %d,%d: element %d ['%s'] not moving\n",
+	     x, y, element, element_info[element].token_name);
+      printf("StartMoving(): This should never happen!\n");
+    }
+#endif
 
     Moving2Blocked(x, y, &newx, &newy);
 
@@ -5253,6 +5268,8 @@ void StartMoving(int x, int y)
 #if 1
       WasJustMoving[x][y] = 0;
 #endif
+
+      CheckCollision[x][y] = 0;
 
       TestIfElementHitsCustomElement(x, y, MovDir[x][y]);
 
@@ -5808,6 +5825,25 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
+      if (move_pattern & MV_ANY_DIRECTION &&
+	  move_pattern == MovDir[x][y])
+      {
+	int blocking_element =
+	  (IN_LEV_FIELD(newx, newy) ? Feld[newx][newy] : BorderElement);
+
+#if 0
+	printf("::: '%s' is blocked by '%s'! [%d,%d -> %d,%d]\n",
+	       element_info[element].token_name,
+	       element_info[blocking_element].token_name,
+	       x, y, newx, newy);
+#endif
+
+	CheckElementChangeBySide(x, y, element, blocking_element, CE_BLOCKED,
+				 MovDir[x][y]);
+
+	element = Feld[x][y];	/* element might have changed */
+      }
+
 #if 1
       if (GFX_ELEMENT(element) != EL_SAND)     /* !!! FIX THIS (crumble) !!! */
 	DrawLevelElementAnimation(x, y, element);
@@ -6080,7 +6116,12 @@ void ContinueMoving(int x, int y)
   /* prevent elements on conveyor belt from moving on in last direction */
   if (pushed_by_conveyor && CAN_FALL(element) &&
       direction & MV_HORIZONTAL)
-    MovDir[newx][newy] = 0;
+  {
+    if (CAN_MOVE(element))
+      InitMovDir(newx, newy);
+    else
+      MovDir[newx][newy] = 0;
+  }
 #endif
 
   if (!pushed_by_player)
