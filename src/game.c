@@ -7441,6 +7441,11 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
       IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(target_element))
   {
+#if 0
+    printf("::: BOOOM! [%d, '%s']\n", target_element,
+	   element_info[target_element].token_name);
+#endif
+
     Bang(x, y);
     return;
   }
@@ -7618,6 +7623,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 #endif
 
 #endif
+
       is_walkable     = (is_empty || IS_WALKABLE(e));
       is_diggable     = (is_empty || IS_DIGGABLE(e));
       is_collectible  = (is_empty || IS_COLLECTIBLE(e));
@@ -7625,12 +7631,13 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
       is_removable    = (is_diggable || is_collectible);
 
       can_replace[xx][yy] =
-	((change->replace_when == CP_WHEN_EMPTY        && is_empty) ||
-	 (change->replace_when == CP_WHEN_WALKABLE     && is_walkable) ||
-	 (change->replace_when == CP_WHEN_DIGGABLE     && is_diggable) ||
-	 (change->replace_when == CP_WHEN_COLLECTIBLE  && is_collectible) ||
-	 (change->replace_when == CP_WHEN_REMOVABLE    && is_removable) ||
-	 (change->replace_when == CP_WHEN_DESTRUCTIBLE && is_destructible));
+	(((change->replace_when == CP_WHEN_EMPTY        && is_empty) ||
+	  (change->replace_when == CP_WHEN_WALKABLE     && is_walkable) ||
+	  (change->replace_when == CP_WHEN_DIGGABLE     && is_diggable) ||
+	  (change->replace_when == CP_WHEN_COLLECTIBLE  && is_collectible) ||
+	  (change->replace_when == CP_WHEN_REMOVABLE    && is_removable) ||
+	  (change->replace_when == CP_WHEN_DESTRUCTIBLE && is_destructible)) &&
+	 !(IS_PLAYER(ex, ey) && ELEM_IS_PLAYER(content_element)));
 
       if (!can_replace[xx][yy])
 	complete_replace = FALSE;
