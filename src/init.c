@@ -528,6 +528,15 @@ void InitGfx()
     { GFX_SPIELER4_RIGHT, 4 },
     { GFX_SPIELER4_PUSH_LEFT, 4 },
     { GFX_SPIELER4_PUSH_RIGHT, 4 },
+    { GFX_SP_MURPHY, 1 },
+    { GFX_MURPHY_GO_LEFT, 3 },
+    { GFX_MURPHY_GO_RIGHT, 3 },
+    { GFX_MURPHY_SNAP_UP, 1 },
+    { GFX_MURPHY_SNAP_DOWN, 1 },
+    { GFX_MURPHY_SNAP_RIGHT, 1 },
+    { GFX_MURPHY_SNAP_LEFT, 1 },
+    { GFX_MURPHY_PUSH_RIGHT, 1 },
+    { GFX_MURPHY_PUSH_LEFT, 1 },
     { GFX_GEBLUBBER, 4 },
     { GFX_DYNAMIT, 7 },
     { GFX_DYNABOMB, 4 },
@@ -593,6 +602,7 @@ void InitGfx()
       int src_x, src_y;
       Pixmap src_pixmap;
 
+#if 0
       if (graphic >= GFX_START_ROCKSSCREEN &&
 	  graphic <= GFX_END_ROCKSSCREEN)
       {
@@ -620,6 +630,14 @@ void InitGfx()
       }
       else
 	break;
+#else
+
+      int pixmap_nr;
+
+      getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
+      src_pixmap = clipmask[pixmap_nr];
+
+#endif
 
       tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
 

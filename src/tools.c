@@ -117,9 +117,9 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_ALL)
   {
-    XCopyArea(display,backbuffer,window,gc,
-	      0,0, WIN_XSIZE,WIN_YSIZE,
-	      0,0);
+    XCopyArea(display, backbuffer, window, gc,
+	      0, 0, WIN_XSIZE, WIN_YSIZE,
+	      0, 0);
     redraw_mask = 0;
   }
 
@@ -127,9 +127,9 @@ void BackToFront()
   {
     if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
-      XCopyArea(display,backbuffer,window,gc,
-		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-		REAL_SX,REAL_SY);
+      XCopyArea(display, backbuffer, window, gc,
+		REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		REAL_SX, REAL_SY);
     }
     else
     {
@@ -169,9 +169,9 @@ void BackToFront()
   if (redraw_mask & REDRAW_DOORS)
   {
     if (redraw_mask & REDRAW_DOOR_1)
-      XCopyArea(display,backbuffer,window,gc,
-		DX,DY, DXSIZE,DYSIZE,
-		DX,DY);
+      XCopyArea(display, backbuffer, window, gc,
+		DX, DY, DXSIZE, DYSIZE,
+		DX, DY);
     if (redraw_mask & REDRAW_DOOR_2)
     {
       if ((redraw_mask & REDRAW_DOOR_2) == REDRAW_DOOR_2)
@@ -419,7 +419,7 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 
 	XSetClipOrigin(display, clip_gc[font_pixmap],
 		       dest_x - src_x, dest_y - src_y);
-	XCopyArea(display, pix[font_pixmap], drawto, clip_gc[font_pixmap],
+	XCopyArea(display, pix[font_pixmap], d, clip_gc[font_pixmap],
 		  0, 0, font_width, font_height, dest_x, dest_y);
       }
       else
@@ -518,17 +518,95 @@ void DrawPlayer(struct PlayerInfo *player)
 
   /* draw player himself */
 
-  if (player->MovDir == MV_LEFT)
-    graphic = (player->Pushing ? GFX_SPIELER1_PUSH_LEFT : GFX_SPIELER1_LEFT);
-  else if (player->MovDir == MV_RIGHT)
-    graphic = (player->Pushing ? GFX_SPIELER1_PUSH_RIGHT : GFX_SPIELER1_RIGHT);
-  else if (player->MovDir == MV_UP)
-    graphic = GFX_SPIELER1_UP;
-  else	/* MV_DOWN || MV_NO_MOVING */
-    graphic = GFX_SPIELER1_DOWN;
+  if (game_emulation == EMU_SUPAPLEX)
+  {
+#if 0
+    if (player->MovDir == MV_LEFT)
+      graphic =
+	(player->Pushing ? GFX_MURPHY_PUSH_LEFT : GFX_MURPHY_LEFT);
+    else if (player->MovDir == MV_RIGHT)
+      graphic =
+	(player->Pushing ? GFX_MURPHY_PUSH_RIGHT : GFX_MURPHY_RIGHT);
+    else if (player->MovDir == MV_UP)
+      graphic = GFX_MURPHY_UP;
+    else if (player->MovDir == MV_DOWN)
+      graphic = GFX_MURPHY_DOWN;
+    else	/* MV_NO_MOVING */
+      graphic = GFX_SP_MURPHY;
 
-  graphic += player->index_nr * 3*HEROES_PER_LINE;
-  graphic += player->Frame;
+
+    /*
+    if (player->snapped)
+      graphic = GFX_SPIELER1_PUSH_LEFT;
+    else
+      graphic = GFX_SPIELER1_PUSH_RIGHT;
+    */
+#endif
+
+    static last_dir = MV_LEFT;
+
+    if (player->Pushing)
+    {
+      if (player->MovDir == MV_LEFT)
+	graphic = GFX_MURPHY_PUSH_LEFT;
+      else if (player->MovDir == MV_RIGHT)
+	graphic = GFX_MURPHY_PUSH_RIGHT;
+      else if (last_dir == MV_LEFT)
+	graphic = GFX_MURPHY_ANY_LEFT;
+      else if (last_dir == MV_RIGHT)
+	graphic = GFX_MURPHY_ANY_RIGHT;
+      else
+	graphic = GFX_SP_MURPHY;
+    }
+    else if (player->snapped)
+    {
+      if (player->MovDir == MV_LEFT)
+	graphic = GFX_MURPHY_SNAP_LEFT;
+      else if (player->MovDir == MV_RIGHT)
+	graphic = GFX_MURPHY_SNAP_RIGHT;
+      else if (player->MovDir == MV_UP)
+	graphic = GFX_MURPHY_SNAP_UP;
+      else if (player->MovDir == MV_DOWN)
+	graphic = GFX_MURPHY_SNAP_DOWN;
+      else
+	graphic = GFX_SP_MURPHY;
+    }
+    else
+    {
+      if (player->MovDir == MV_LEFT)
+	graphic = GFX_MURPHY_ANY_LEFT;
+      else if (player->MovDir == MV_RIGHT)
+	graphic = GFX_MURPHY_ANY_RIGHT;
+      else if (last_dir == MV_LEFT)
+	graphic = GFX_MURPHY_ANY_LEFT;
+      else if (last_dir == MV_RIGHT)
+	graphic = GFX_MURPHY_ANY_RIGHT;
+      else
+	graphic = GFX_SP_MURPHY;
+    }
+
+    if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
+      last_dir = player->MovDir;
+
+    if (!player->Pushing && !player->snapped && player->MovDir != MV_NO_MOVING)
+      graphic -= player->Frame % 2;
+  }
+  else
+  {
+    if (player->MovDir == MV_LEFT)
+      graphic =
+	(player->Pushing ? GFX_SPIELER1_PUSH_LEFT : GFX_SPIELER1_LEFT);
+    else if (player->MovDir == MV_RIGHT)
+      graphic =
+	(player->Pushing ? GFX_SPIELER1_PUSH_RIGHT : GFX_SPIELER1_RIGHT);
+    else if (player->MovDir == MV_UP)
+      graphic = GFX_SPIELER1_UP;
+    else	/* MV_DOWN || MV_NO_MOVING */
+      graphic = GFX_SPIELER1_DOWN;
+
+    graphic += player->index_nr * 3 * HEROES_PER_LINE;
+    graphic += player->Frame;
+  }
 
   if (player->GfxPos)
   {
@@ -664,6 +742,45 @@ void DrawGraphicAnimationThruMask(int x, int y, int graphic,
   DrawGraphicAnimationExt(x, y, graphic, frames, delay, mode, USE_MASKING);
 }
 
+void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
+{
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
+    *pixmap_nr = PIX_BACK;
+    *x = SX + (graphic % GFX_PER_LINE) * TILEX;
+    *y = SY + (graphic / GFX_PER_LINE) * TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    *pixmap_nr = PIX_MORE;
+    *x = (graphic % MORE_PER_LINE) * TILEX;
+    *y = (graphic / MORE_PER_LINE) * TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
+  {
+    graphic -= GFX_START_ROCKSHEROES;
+    *pixmap_nr = PIX_HEROES;
+    *x = (graphic % HEROES_PER_LINE) * TILEX;
+    *y = (graphic / HEROES_PER_LINE) * TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
+  {
+    graphic -= GFX_START_ROCKSFONT;
+    *pixmap_nr = PIX_BIGFONT;
+    *x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
+    *y = ((graphic / FONT_CHARS_PER_LINE) * TILEY +
+	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY);
+  }
+  else
+  {
+    *pixmap_nr = PIX_MORE;
+    *x = 0;
+    *y = 0;
+  }
+}
+
 void DrawGraphic(int x, int y, int graphic)
 {
 #if DEBUG
@@ -681,6 +798,18 @@ void DrawGraphic(int x, int y, int graphic)
 
 void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
+
+#if 1
+
+  int pixmap_nr;
+  int src_x, src_y;
+
+  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
+  XCopyArea(display, pix[pixmap_nr], d, gc,
+	    src_x, src_y, TILEX, TILEY, x, y);
+
+#else
+
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
@@ -716,6 +845,9 @@ void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
   }
   else
     XFillRectangle(display, d, gc, x, y, TILEX, TILEY);
+
+#endif
+
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
@@ -735,6 +867,21 @@ void DrawGraphicThruMask(int x, int y, int graphic)
 
 void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
 {
+
+#if 1
+
+  int tile = graphic;
+  int pixmap_nr;
+  int src_x, src_y;
+  Pixmap src_pixmap;
+  GC drawing_gc;
+
+  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
+  src_pixmap = pix[pixmap_nr];
+  drawing_gc = clip_gc[pixmap_nr];
+
+#else
+
   int src_x, src_y;
   int tile = graphic;
   Pixmap src_pixmap;
@@ -770,11 +917,14 @@ void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
     return;
   }
 
+#endif
+
+
   if (tile_clipmask[tile] != None)
   {
     XSetClipMask(display, tile_clip_gc, tile_clipmask[tile]);
     XSetClipOrigin(display, tile_clip_gc, dest_x, dest_y);
-    XCopyArea(display, src_pixmap, drawto_field, tile_clip_gc,
+    XCopyArea(display, src_pixmap, d, tile_clip_gc,
 	      src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
   else
@@ -784,7 +934,7 @@ void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
 #endif
 
     XSetClipOrigin(display, drawing_gc, dest_x-src_x, dest_y-src_y);
-    XCopyArea(display, src_pixmap, drawto_field, drawing_gc,
+    XCopyArea(display, src_pixmap, d, drawing_gc,
 	      src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
 }
@@ -817,7 +967,7 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
     *pixmap = pix[PIX_SMALLFONT];
     *x = (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE;
     *y = ((graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE +
-	  FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT);
+	      FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT);
   }
   else
   {
@@ -829,6 +979,18 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
 
 void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
+
+#if 1
+
+  Pixmap pixmap;
+  int src_x, src_y;
+
+  getMiniGraphicSource(graphic, &pixmap, &src_x, &src_y);
+  XCopyArea(display, pixmap, d, gc,
+	    src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
+
+#else
+
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
@@ -856,6 +1018,9 @@ void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
   }
   else
     XFillRectangle(display, d, gc, x, y, MINI_TILEX, MINI_TILEY);
+
+#endif
+
 }
 
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,

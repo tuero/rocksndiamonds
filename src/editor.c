@@ -104,7 +104,7 @@
 #define ED_COUNT_ELEM_SCORE_XPOS	ED_SETTINGS_XPOS
 #define ED_COUNT_ELEM_SCORE_YPOS	(14 * MINI_TILEY)
 #define ED_COUNT_ELEM_CONTENT_XPOS	ED_SETTINGS_XPOS
-#define ED_COUNT_ELEM_CONTENT_YPOS	(17 * MINI_TILEY)
+#define ED_COUNT_ELEM_CONTENT_YPOS	(19 * MINI_TILEY)
 
 #define ED_COUNTER_YSTART		(ED_SETTINGS_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
@@ -118,7 +118,7 @@
 
 /* values for element content drawing areas */
 #define ED_AREA_ELEM_CONTENT_XPOS	( 2 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT_YPOS	(20 * MINI_TILEY)
+#define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
@@ -154,9 +154,9 @@
 #define ED_CHECKBUTTON_XSIZE		ED_BUTTON_COUNT_XSIZE
 #define ED_CHECKBUTTON_YSIZE		ED_BUTTON_COUNT_YSIZE
 #define ED_CHECKBUTTON_UNCHECKED_XPOS	ED_BUTTON_MINUS_XPOS
-#define ED_CHECKBUTTON_UNCHECKED_YPOS	(ED_BUTTON_MINUS_YPOS + 22)
 #define ED_CHECKBUTTON_CHECKED_XPOS	ED_BUTTON_PLUS_XPOS
-#define ED_CHECKBUTTON_CHECKED_YPOS	(ED_BUTTON_PLUS_YPOS + 22)
+#define ED_CHECKBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 22)
+#define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 88)
 
 #define GADGET_ID_NONE			-1
 
@@ -247,11 +247,12 @@
 #define GADGET_ID_RANDOM_QUANTITY	107
 #define GADGET_ID_RANDOM_RESTRICTED	108
 #define GADGET_ID_DOUBLE_SPEED		109
+#define GADGET_ID_STICK_ELEMENT		110
 
 /* another drawing area for random placement */
-#define GADGET_ID_RANDOM_BACKGROUND	110
+#define GADGET_ID_RANDOM_BACKGROUND	111
 
-#define NUM_EDITOR_GADGETS		111
+#define NUM_EDITOR_GADGETS		112
 
 /* radio button numbers */
 #define RADIO_NR_NONE			0
@@ -268,24 +269,24 @@
 #define ED_COUNTER_ID_LEVEL_TIMESCORE	6
 #define ED_COUNTER_ID_LEVEL_RANDOM	7
 
+#define ED_NUM_COUNTERBUTTONS		8
+
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
 
-#define ED_NUM_COUNTERBUTTONS		8
-
 /* values for scrollbutton gadgets */
-#define ED_SCROLLBUTTON_AREA_UP		0
-#define ED_SCROLLBUTTON_AREA_DOWN	1
-#define ED_SCROLLBUTTON_AREA_LEFT	2
-#define ED_SCROLLBUTTON_AREA_RIGHT	3
-#define ED_SCROLLBUTTON_LIST_UP		4
-#define ED_SCROLLBUTTON_LIST_DOWN	5
+#define ED_SCROLLBUTTON_ID_AREA_UP	0
+#define ED_SCROLLBUTTON_ID_AREA_DOWN	1
+#define ED_SCROLLBUTTON_ID_AREA_LEFT	2
+#define ED_SCROLLBUTTON_ID_AREA_RIGHT	3
+#define ED_SCROLLBUTTON_ID_LIST_UP	4
+#define ED_SCROLLBUTTON_ID_LIST_DOWN	5
 
 #define ED_NUM_SCROLLBUTTONS		6
 
 /* values for scrollbar gadgets */
-#define ED_SCROLLBAR_HORIZONTAL		0
-#define ED_SCROLLBAR_VERTICAL		1
+#define ED_SCROLLBAR_ID_HORIZONTAL	0
+#define ED_SCROLLBAR_ID_VERTICAL	1
 
 #define ED_NUM_SCROLLBARS		2
 
@@ -293,22 +294,29 @@
 #define ED_TEXTINPUT_ID_LEVEL_NAME	0
 #define ED_TEXTINPUT_ID_LEVEL_AUTHOR	1
 
+#define ED_NUM_TEXTINPUT		2
+
 #define ED_TEXTINPUT_ID_LEVEL_FIRST	ED_TEXTINPUT_ID_LEVEL_NAME
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
 
-#define ED_NUM_TEXTINPUT		2
-
 /* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_DOUBLE_SPEED	0
-#define ED_CHECKBUTTON_RANDOM_RESTRICTED 1
+#define ED_CHECKBUTTON_ID_DOUBLE_SPEED		0
+#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	1
+#define ED_CHECKBUTTON_ID_STICK_ELEMENT		2
 
-#define ED_NUM_CHECKBUTTONS		2
+#define ED_NUM_CHECKBUTTONS			3
+
+#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
+#define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 /* values for radiobutton gadgets */
-#define ED_RADIOBUTTON_PERCENTAGE	0
-#define ED_RADIOBUTTON_QUANTITY		1
+#define ED_RADIOBUTTON_ID_PERCENTAGE	0
+#define ED_RADIOBUTTON_ID_QUANTITY		1
 
 #define ED_NUM_RADIOBUTTONS		2
+
+#define ED_RADIOBUTTON_ID_LEVEL_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
+#define ED_RADIOBUTTON_ID_LEVEL_LAST	ED_RADIOBUTTON_ID_QUANTITY
 
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
@@ -544,6 +552,7 @@ static int random_placement_value = 10;
 static int random_placement_method = RANDOM_USE_QUANTITY;
 static int random_placement_background_element = EL_ERDREICH;
 static boolean random_placement_background_restricted = FALSE;
+static boolean stick_element_properties_window = FALSE;
 
 static struct
 {
@@ -590,6 +599,12 @@ static struct
     GADGET_ID_RANDOM_RESTRICTED,
     &random_placement_background_restricted,
     "restrict random placement to",	"set random placement restriction"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    GADGET_ID_STICK_ELEMENT,
+    &stick_element_properties_window,
+    "stick window to edit content",	"stick window to edit content"
   }
 };
 
@@ -1530,7 +1545,7 @@ static void CreateCheckbuttonGadgets()
   Pixmap gd_pixmap = pix[PIX_DOOR];
   struct GadgetInfo *gi;
   unsigned long event_mask;
-  int gd_x1, gd_x2, gd_x3, gd_x4, gd_y1, gd_y2;
+  int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
   boolean checked;
   int i;
 
@@ -1540,8 +1555,7 @@ static void CreateCheckbuttonGadgets()
   gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
   gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
   gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
-  gd_y1 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_UNCHECKED_YPOS;
-  gd_y2 = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_CHECKED_YPOS;
+  gd_y  = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_YPOS;
 
   for (i=0; i<ED_NUM_RADIOBUTTONS; i++)
   {
@@ -1559,10 +1573,10 @@ static void CreateCheckbuttonGadgets()
 		      GDI_TYPE, GD_TYPE_RADIO_BUTTON,
 		      GDI_RADIO_NR, radiobutton_info[i].radio_button_nr,
 		      GDI_CHECKED, checked,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y2,
-		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
@@ -1577,6 +1591,11 @@ static void CreateCheckbuttonGadgets()
   {
     int id = checkbutton_info[i].gadget_id;
 
+    if (id == GADGET_ID_STICK_ELEMENT)
+      gd_y  = DOOR_GFX_PAGEY1 + ED_STICKYBUTTON_YPOS;
+    else
+      gd_y  = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_YPOS;
+
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
 		      GDI_X, SX + checkbutton_info[i].x,
@@ -1585,10 +1604,10 @@ static void CreateCheckbuttonGadgets()
 		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
 		      GDI_TYPE, GD_TYPE_CHECK_BUTTON,
 		      GDI_CHECKED, *checkbutton_info[i].value,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y2,
-		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
@@ -1655,9 +1674,11 @@ static void MapMainDrawingArea()
 
   for (i=0; i<ED_NUM_SCROLLBUTTONS; i++)
   {
-    if (((i == ED_SCROLLBUTTON_AREA_LEFT || i == ED_SCROLLBUTTON_AREA_RIGHT) &&
+    if (((i == ED_SCROLLBUTTON_ID_AREA_LEFT ||
+	  i == ED_SCROLLBUTTON_ID_AREA_RIGHT) &&
 	 no_horizontal_scrollbar) ||
-	((i == ED_SCROLLBUTTON_AREA_UP || i == ED_SCROLLBUTTON_AREA_DOWN) &&
+	((i == ED_SCROLLBUTTON_ID_AREA_UP ||
+	  i == ED_SCROLLBUTTON_ID_AREA_DOWN) &&
 	 no_vertical_scrollbar))
       continue;
 
@@ -1666,8 +1687,8 @@ static void MapMainDrawingArea()
 
   for (i=0; i<ED_NUM_SCROLLBARS; i++)
   {
-    if ((i == ED_SCROLLBAR_HORIZONTAL && no_horizontal_scrollbar) ||
-	(i == ED_SCROLLBAR_VERTICAL && no_vertical_scrollbar))
+    if ((i == ED_SCROLLBAR_ID_HORIZONTAL && no_horizontal_scrollbar) ||
+	(i == ED_SCROLLBAR_ID_VERTICAL && no_vertical_scrollbar))
       continue;
 
     MapGadget(level_editor_gadget[scrollbar_info[i].gadget_id]);
@@ -1869,14 +1890,14 @@ static void AdjustDrawingAreaGadgets()
   xoffset = (ed_fieldx == MAX_ED_FIELDX ? ED_SCROLLBUTTON_XSIZE : 0);
   yoffset = (ed_fieldy == MAX_ED_FIELDY ? ED_SCROLLBUTTON_YSIZE : 0);
 
-  x = SX + scrollbutton_info[ED_SCROLLBUTTON_AREA_RIGHT].x + xoffset;
-  y = SX + scrollbutton_info[ED_SCROLLBUTTON_AREA_DOWN].y + yoffset;
+  x = SX + scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].x + xoffset;
+  y = SX + scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_DOWN].y + yoffset;
 
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_RIGHT], GDI_X, x, GDI_END);
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_DOWN], GDI_Y, y, GDI_END);
 
-  width = scrollbar_info[ED_SCROLLBAR_HORIZONTAL].width + xoffset;
-  height = scrollbar_info[ED_SCROLLBAR_VERTICAL].height + yoffset;
+  width = scrollbar_info[ED_SCROLLBAR_ID_HORIZONTAL].width + xoffset;
+  height = scrollbar_info[ED_SCROLLBAR_ID_VERTICAL].height + yoffset;
 
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
 	       GDI_WIDTH, width,
@@ -2093,7 +2114,7 @@ static void DrawLevelInfoWindow()
   }
 
   /* draw radiobutton gadgets */
-  for (i=0; i<ED_NUM_RADIOBUTTONS; i++)
+  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i<=ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
   {
     boolean checked =
       (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
@@ -2108,7 +2129,7 @@ static void DrawLevelInfoWindow()
   }
 
   /* draw checkbutton gadgets */
-  for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
+  for (i=ED_CHECKBUTTON_ID_LEVEL_FIRST; i<=ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
   {
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
@@ -2206,7 +2227,7 @@ static void DrawElementContentAreas()
 
   /* copy border to the right location */
   XCopyArea(display, drawto, drawto, gc,
-	    area_sx, area_sy, (5 * 4 + 1) * MINI_TILEX, 12 * MINI_TILEY,
+	    area_sx, area_sy, (5 * 4 + 1) * MINI_TILEX, 11 * MINI_TILEY,
 	    area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
 
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
@@ -2244,6 +2265,8 @@ static void DrawPropertiesWindow()
   float percentage;
   int xoffset_right = counter_xsize;
   int yoffset_right = ED_BORDER_SIZE;
+  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int yoffset_right2 = ED_BORDER_SIZE;
   int xstart = 2;
   int ystart = 4;
   int font_color = FC_GREEN;
@@ -2366,6 +2389,20 @@ static void DrawPropertiesWindow()
 
   if (HAS_CONTENT(properties_element))
   {
+
+#if 1
+    /* draw stickybutton gadget */
+    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
+#endif
+
+
     if (IS_AMOEBOID(properties_element))
       DrawAmoebaContentArea();
     else
@@ -3723,21 +3760,25 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_RANDOM_PERCENTAGE:
-      *radiobutton_info[ED_RADIOBUTTON_PERCENTAGE].value =
-	radiobutton_info[ED_RADIOBUTTON_PERCENTAGE].checked_value;
+      *radiobutton_info[ED_RADIOBUTTON_ID_PERCENTAGE].value =
+	radiobutton_info[ED_RADIOBUTTON_ID_PERCENTAGE].checked_value;
       break;
 
     case GADGET_ID_RANDOM_QUANTITY:
-      *radiobutton_info[ED_RADIOBUTTON_QUANTITY].value =
-	radiobutton_info[ED_RADIOBUTTON_QUANTITY].checked_value;
+      *radiobutton_info[ED_RADIOBUTTON_ID_QUANTITY].value =
+	radiobutton_info[ED_RADIOBUTTON_ID_QUANTITY].checked_value;
       break;
 
     case GADGET_ID_RANDOM_RESTRICTED:
-      *checkbutton_info[ED_CHECKBUTTON_RANDOM_RESTRICTED].value ^= TRUE;
+      *checkbutton_info[ED_CHECKBUTTON_ID_RANDOM_RESTRICTED].value ^= TRUE;
       break;
 
     case GADGET_ID_DOUBLE_SPEED:
-      *checkbutton_info[ED_CHECKBUTTON_DOUBLE_SPEED].value ^= TRUE;
+      *checkbutton_info[ED_CHECKBUTTON_ID_DOUBLE_SPEED].value ^= TRUE;
+      break;
+
+    case GADGET_ID_STICK_ELEMENT:
+      *checkbutton_info[ED_CHECKBUTTON_ID_STICK_ELEMENT].value ^= TRUE;
       break;
 
     default:
@@ -3749,7 +3790,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	PickDrawingElement(button, new_element);
 
-	if (!HAS_CONTENT(properties_element))
+	if (!HAS_CONTENT(properties_element) ||
+	    !stick_element_properties_window)
 	{
 	  properties_element = new_element;
 	  if (edit_mode == ED_MODE_PROPERTIES)
@@ -3881,22 +3923,22 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   int sy = gi->event.y;
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
+  int min_sx = 0, min_sy = 0;
+  int max_sx = gi->drawing.area_xsize - 1;
+  int max_sy = gi->drawing.area_ysize - 1;
 
   ClearEditorGadgetInfoText();
+
+  /* make sure to stay inside drawing area boundaries */
+  sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
+  sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
 
   if (id == GADGET_ID_DRAWING_LEVEL)
   {
     if (button_status)
     {
-      int min_sx = 0, min_sy = 0;
-      int max_sx = gi->drawing.area_xsize - 1;
-      int max_sy = gi->drawing.area_ysize - 1;
       int min_lx = 0, min_ly = 0;
       int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
-
-      /* make sure to stay inside drawing area boundaries */
-      sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
-      sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
 
       /* get positions inside level field */
       lx = sx + level_xpos;
@@ -3986,6 +4028,6 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	      "Random placement background");
   else
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
-	      "Cruncher %d content: %d, %d",
+	      "Content area %d position: %d, %d",
 	      id - GADGET_ID_ELEM_CONTENT_0 + 1, sx, sy);
 }
