@@ -78,6 +78,10 @@ static int setup_mode = SETUP_MODE_MAIN;
 		   game_status <= GAME_MODE_SETUP ?	\
 		   menu.draw_yoffset[game_status] : menu.draw_yoffset_default))
 
+#define NUM_MENU_ENTRIES_ON_SCREEN (menu.list_size[game_status] > 2 ?	\
+				    menu.list_size[game_status] :	\
+				    MAX_MENU_ENTRIES_ON_SCREEN)
+
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 #define NUM_SCROLLBAR_BITMAPS		2
 static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
@@ -298,10 +302,10 @@ static void gotoTopLevelDir()
       int num_page_entries;
       int cl_first, cl_cursor;
 
-      if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
+      if (num_leveldirs <= NUM_MENU_ENTRIES_ON_SCREEN)
 	num_page_entries = num_leveldirs;
       else
-	num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
+	num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
 
       cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
       cl_cursor = leveldir_pos - cl_first;
@@ -1194,7 +1198,7 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
   int items_max, items_visible, item_position;
 
   items_max = numTreeInfoInGroup(ti);
-  items_visible = MAX_MENU_ENTRIES_ON_SCREEN;
+  items_visible = NUM_MENU_ENTRIES_ON_SCREEN;
   item_position = first_entry;
 
   if (item_position > items_max - items_visible)
@@ -1295,10 +1299,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int num_entries = numTreeInfoInGroup(ti);
   int num_page_entries;
 
-  if (num_entries <= MAX_MENU_ENTRIES_ON_SCREEN)
+  if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
   else
-    num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
+    num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -1532,7 +1536,7 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
   DrawText(mSX + 80, mSY + 8, "Hall Of Fame", FONT_TITLE_1);
   DrawTextFCentered(46, FONT_TITLE_2, "HighScores of Level %d", level_nr);
 
-  for(i=0; i<MAX_MENU_ENTRIES_ON_SCREEN; i++)
+  for(i=0; i<NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
     int entry = first_entry + i;
     boolean active = (entry == highlight_position);
@@ -1570,7 +1574,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   }
 
   if (ABS(dy) == SCROLL_PAGE)		/* handle scrolling one page */
-    step = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+    step = NUM_MENU_ENTRIES_ON_SCREEN - 1;
 
   if (dy < 0)
   {
@@ -1586,11 +1590,11 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   }
   else if (dy > 0)
   {
-    if (first_entry + MAX_MENU_ENTRIES_ON_SCREEN < MAX_SCORE_ENTRIES)
+    if (first_entry + NUM_MENU_ENTRIES_ON_SCREEN < MAX_SCORE_ENTRIES)
     {
       first_entry += step;
-      if (first_entry + MAX_MENU_ENTRIES_ON_SCREEN > MAX_SCORE_ENTRIES)
-	first_entry = MAX(0, MAX_SCORE_ENTRIES - MAX_MENU_ENTRIES_ON_SCREEN);
+      if (first_entry + NUM_MENU_ENTRIES_ON_SCREEN > MAX_SCORE_ENTRIES)
+	first_entry = MAX(0, MAX_SCORE_ENTRIES - NUM_MENU_ENTRIES_ON_SCREEN);
 
       drawHallOfFameList(first_entry, highlight_position);
       return;
@@ -1981,7 +1985,7 @@ static void DrawSetupScreen_Generic()
   DrawText(mSX + 16, mSY + 16, title_string, FONT_TITLE_1);
 
   num_setup_info = 0;
-  for(i=0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+  for(i=0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
     void *value_ptr = setup_info[i].value;
     int ypos = MENU_SCREEN_START_YPOS + i;
@@ -2877,7 +2881,7 @@ static void CreateScreenScrollbars()
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
     unsigned long event_mask;
-    int num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN;
+    int num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
     int id = scrollbar_info[i].gadget_id;
 
     items_max = num_page_entries;
@@ -2981,7 +2985,7 @@ void MapChooseTreeGadgets(TreeInfo *ti)
   int num_entries = numTreeInfoInGroup(ti);
   int i;
 
-  if (num_entries <= MAX_MENU_ENTRIES_ON_SCREEN)
+  if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     return;
 
   for (i=0; i<NUM_SCREEN_GADGETS; i++)

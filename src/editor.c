@@ -122,7 +122,7 @@
 #define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 /* custom change trigger element */
-#define ED_AREA_ELEM_CONTENT5_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT5_XPOS	(30 * MINI_TILEX + MINI_TILEX / 2)
 #define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(7) + \
 					 ED_GADGET_DISTANCE)
 
@@ -936,6 +936,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_COLLECTING,	"collecting"			},
   { CE_OTHER_PUSHING,		"pushing"			},
   { CE_OTHER_CHANGING,		"change of"			},
+  { CE_OTHER_EXPLODING,		"explosion of"			},
   { -1,				NULL				}
 };
 static int value_change_other_action = 0;
@@ -3534,7 +3535,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* set change by other element action selectbox help value */
   value_change_other_action =
-    (HAS_CHANGE_EVENT(element, CE_OTHER_CHANGING) ? CE_OTHER_CHANGING :
+    (HAS_CHANGE_EVENT(element, CE_OTHER_EXPLODING) ? CE_OTHER_EXPLODING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_CHANGING) ? CE_OTHER_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_PUSHING) ? CE_OTHER_PUSHING :
      HAS_CHANGE_EVENT(element, CE_OTHER_COLLECTING) ? CE_OTHER_COLLECTING :
      CE_OTHER_COLLECTING);
@@ -3597,6 +3599,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_COLLECTING] = FALSE;
   custom_element_change_events[CE_OTHER_PUSHING] = FALSE;
   custom_element_change_events[CE_OTHER_CHANGING] = FALSE;
+  custom_element_change_events[CE_OTHER_EXPLODING] = FALSE;
   custom_element_change_events[value_change_other_action] =
     custom_element_change_events[CE_BY_OTHER];
 

@@ -3445,6 +3445,8 @@ struct ConfigInfo image_config[] =
   { "menu.draw_xoffset.SETUP",			"0"			},
   { "menu.draw_yoffset.SETUP",			"0"			},
 
+  { "menu.list_size",				"-1"			},
+
   { "door.step_offset",				"2"			},
   { "door.step_delay",				"10"			},
 

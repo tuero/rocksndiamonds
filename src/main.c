@@ -2798,12 +2798,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "nut_breaking",
+    "diamond_breaking",
     "-",
     "-"
   },
   {
-    "diamond_breaking",
+    "acid_splash_left",
     "-",
     "-"
   },
@@ -2937,6 +2937,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-",
     "-"
   },
+  {
+    "internal_default_element",
+    "DEFAULT",
+    "-"
+  },
 
   /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
 
@@ -3011,6 +3016,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 struct TokenIntPtrInfo image_config_vars[] =
 {
   { "global.num_toons",		&global.num_toons			   },
+
   { "menu.draw_xoffset",	&menu.draw_xoffset_default		   },
   { "menu.draw_yoffset",	&menu.draw_yoffset_default		   },
   { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]   },
@@ -3025,6 +3031,12 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]   },
   { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]  },
   { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]  },
+
+  { "menu.list_size",		&menu.list_size_default			   },
+  { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	   },
+  { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	   },
+  { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	   },
+
   { "door.step_offset",		&door.step_offset			   },
   { "door.step_delay",		&door.step_delay			   },
 

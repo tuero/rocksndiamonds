@@ -28,6 +28,15 @@ struct ConfigInfo sound_config_suffix[] =
 
 struct ConfigInfo sound_config[] =
 {
+  /* some default sounds */
+  { "[DEFAULT].digging",		"schlurf.wav"		},
+  { "[DEFAULT].collecting",		"pong.wav"		},
+  { "[DEFAULT].snapping",		"pong.wav"		},
+  { "[DEFAULT].pushing",		"pusch.wav"		},
+  { "[DEFAULT].impact",			"klopf.wav"		},
+  { "[DEFAULT].passing",		"gate.wav"		},
+  { "[DEFAULT].exploding",		"roaaar.wav"		},
+
   /* sounds for Boulder Dash style elements and actions */
   { "bd_diamond.collecting",		"pong.wav"		},
   { "bd_diamond.impact",		"pling.wav"		},

@@ -1929,16 +1929,19 @@ void LoadSpecialMenuDesignSettings()
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
-  /* special case: initialize with default values that may be overwrittem */
+  /* special case: initialize with default values that may be overwritten */
   for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
     char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset");
     char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset");
+    char *list_size = getHashEntry(setup_file_hash, "menu.list_size");
 
     if (value_x != NULL)
       menu.draw_xoffset[i] = get_integer_from_string(value_x);
     if (value_y != NULL)
       menu.draw_yoffset[i] = get_integer_from_string(value_y);
+    if (list_size != NULL)
+      menu.list_size[i] = get_integer_from_string(list_size);
   }
 
   /* read (and overwrite with) values that may be specified in config file */

@@ -872,22 +872,6 @@ static void InitElementSoundInfo()
 	  element_info[j].sound[action] = sound;
   }
 
-  /* initialize element/sound mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
-  {
-    int element = property_mapping[i].base_index;
-    int action  = property_mapping[i].ext1_index;
-    int sound   = property_mapping[i].artwork_index;
-
-    if (element >= MAX_NUM_ELEMENTS)
-      continue;
-
-    if (action < 0)
-      action = ACTION_DEFAULT;
-
-    element_info[element].sound[action] = sound;
-  }
-
   /* initialize element class/sound mapping from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
   {
@@ -907,16 +891,33 @@ static void InitElementSoundInfo()
 	element_info[j].sound[action] = sound;
   }
 
+  /* initialize element/sound mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element = property_mapping[i].base_index;
+    int action  = property_mapping[i].ext1_index;
+    int sound   = property_mapping[i].artwork_index;
+
+    if (element >= MAX_NUM_ELEMENTS)
+      continue;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    element_info[element].sound[action] = sound;
+  }
+
   /* now set all '-1' values to element specific default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    int default_action_sound = element_info[i].sound[ACTION_DEFAULT];
-
     for (act=0; act < NUM_ACTIONS; act++)
     {
       /* no sound for this specific action -- use default action sound */
       if (element_info[i].sound[act] == -1)
-	element_info[i].sound[act] = default_action_sound;
+	element_info[i].sound[act] =
+	  (element_info[i].sound[ACTION_DEFAULT] != -1 ?
+	   element_info[i].sound[ACTION_DEFAULT] :
+	   element_info[EL_INTERNAL_DEFAULT_ELEMENT].sound[act]);
     }
   }
 }
@@ -1076,10 +1077,6 @@ static void ReinitializeSounds()
 {
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
-
-#if 1
-  InitElementSoundInfo();	/* element game sound mapping */
-#endif
 
   InitPlaySoundLevel();		/* internal game sound settings */
 }
@@ -2777,6 +2774,16 @@ static void InitArtworkInfo()
   LoadArtworkInfo();
 }
 
+static char *get_string_in_brackets(char *string)
+{
+  char *string_in_brackets = checked_malloc(strlen(string) + 3);
+
+  sprintf(string_in_brackets, "[%s]", string);
+
+  return string_in_brackets;
+}
+
+#if 0
 static char *get_element_class_token(int element)
 {
   char *element_class_name = element_info[element].class_name;
@@ -2787,10 +2794,21 @@ static char *get_element_class_token(int element)
   return element_class_token;
 }
 
+static char *get_action_class_token(int action)
+{
+  char *action_class_name = &element_action_info[action].suffix[1];
+  char *action_class_token = checked_malloc(strlen(action_class_name) + 3);
+
+  sprintf(action_class_token, "[%s]", action_class_name);
+
+  return action_class_token;
+}
+#endif
+
 static void InitArtworkConfig()
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
-  static char *sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS + 1];
+  static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
@@ -2841,8 +2859,9 @@ static void InitArtworkConfig()
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[i] = element_info[i].token_name;
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    sound_id_prefix[MAX_NUM_ELEMENTS + i] = get_element_class_token(i);
-  sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS] = NULL;
+    sound_id_prefix[MAX_NUM_ELEMENTS + i] =
+      get_string_in_brackets(element_info[i].class_name);
+  sound_id_prefix[2 * MAX_NUM_ELEMENTS] = NULL;
 
   for (i=0; i<NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;

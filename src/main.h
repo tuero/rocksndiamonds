@@ -163,13 +163,14 @@
 #define CE_OTHER_COLLECTING	6
 #define CE_OTHER_PUSHING	7
 #define CE_OTHER_CHANGING	8
+#define CE_OTHER_EXPLODING	9
 
 /* values for internal purpose only (level editor) */
-#define CE_BY_PLAYER		9
-#define CE_IMPACT_SMASHED	10
-#define CE_BY_OTHER		11
+#define CE_BY_PLAYER		10
+#define CE_IMPACT_SMASHED	11
+#define CE_BY_OTHER		12
 
-#define NUM_CHANGE_EVENTS	12
+#define NUM_CHANGE_EVENTS	13
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -788,8 +789,9 @@
 #define EL_DYNABOMB_ACTIVE			(EL_FIRST_DUMMY + 13)
 #define EL_SHIELD_NORMAL_ACTIVE			(EL_FIRST_DUMMY + 14)
 #define EL_SHIELD_DEADLY_ACTIVE			(EL_FIRST_DUMMY + 15)
+#define EL_INTERNAL_DEFAULT_ELEMENT		(EL_FIRST_DUMMY + 16)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 16)
+#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 17)
 
 
 /* values for graphics/sounds action types */
@@ -1144,6 +1146,9 @@ struct MenuInfo
   int draw_yoffset_default;
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
   int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
+
+  int list_size_default;
+  int list_size[NUM_SPECIAL_GFX_ARGS];
 };
 
 struct DoorInfo
