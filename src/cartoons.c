@@ -129,14 +129,14 @@ void HandleAnimation(int mode)
       {
 	int xx,yy;
 
-	drawto_field = backbuffer;
+	SetDrawtoField(DRAW_BACKBUFFER);
 
 	for(xx=0;xx<SCR_FIELDX;xx++)
 	  for(yy=0;yy<SCR_FIELDY;yy++)
 	    DrawScreenField(xx,yy);
 	DrawPlayerField();
 
-	drawto_field = window;
+	SetDrawtoField(DRAW_DIRECT);
       }
 
       return;

@@ -75,6 +75,7 @@ void InitGame()
   TimeFrames = 0;
   TimeLeft = level.time;
   PlayerMovDir = MV_NO_MOVING;
+  PlayerMovPos = 0;
   PlayerFrame = 0;
   PlayerPushing = FALSE;
   PlayerGone = LevelSolved = GameOver = SiebAktiv = FALSE;
@@ -2386,7 +2387,7 @@ void EdelsteinFunkeln(int x, int y)
       MovDelay[x][y]--;
 
       if (direct_draw_on && MovDelay[x][y])
-	drawto_field = backbuffer;
+	SetDrawtoField(DRAW_BUFFERED);
 
       DrawGraphic(SCROLLX(x),SCROLLY(y), el2gfx(Feld[x][y]));
 
@@ -2397,8 +2398,8 @@ void EdelsteinFunkeln(int x, int y)
 
 	src_x  = SX+GFX_PER_LINE*TILEX;
 	src_y  = SY+(phase > 2 ? 4-phase : phase)*TILEY;
-	dest_x = SX+SCROLLX(x)*TILEX;
-	dest_y = SY+SCROLLY(y)*TILEY;
+	dest_x = FX+SCROLLX(x)*TILEX;
+	dest_y = FY+SCROLLY(y)*TILEY;
 
 	XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
 	XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
@@ -2406,9 +2407,9 @@ void EdelsteinFunkeln(int x, int y)
 
 	if (direct_draw_on)
 	{
-	  XCopyArea(display,backbuffer,window,gc,
+	  XCopyArea(display,drawto_field,window,gc,
 		    dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
-	  drawto_field = window;
+	  SetDrawtoField(DRAW_DIRECT);
 	}
       }
     }
@@ -2564,7 +2565,23 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : Gamespeed);
 
+  /*
   if (DelayReached(&action_delay, action_delay_value))
+  */
+
+
+
+  if (PlayerMovPos)
+    ScrollFigure(0);
+
+  DrawPlayerField();
+
+
+
+
+  if (!DelayReached(&action_delay, action_delay_value))
+    return;
+
   {
     int x,y,element;
     int sieb_x = 0, sieb_y = 0;
@@ -2696,6 +2713,14 @@ void GameActions()
 	}
       }
     }
+
+    /*
+    if (PlayerMovPos)
+      ScrollFigure(0);
+
+    DrawPlayerField();
+    */
+
   }
 
   if (TimeLeft>0 && TimeFrames>=25 && !tape.pausing)
@@ -2715,32 +2740,53 @@ void GameActions()
       KillHero();
   }
 
+  /*
+  if (PlayerMovPos)
+    ScrollFigure(0);
+    */
+
+
+  /*
+  DrawPlayerField();
+  */
+
+
   BackToFront();
 }
 
 void ScrollLevel(int dx, int dy)
 {
   int x,y;
+  int softscroll_offset = (FX == TILEX ? TILEX : 0);
+
+  if (soft_scrolling_on)
+  {
+    ScreenMovPos = PlayerMovPos;
+    redraw_mask |= REDRAW_FIELD;
+  }
 
   XCopyArea(display,drawto_field,drawto_field,gc,
-	    SX+TILEX*(dx==-1),SY+TILEY*(dy==-1),
-	    SXSIZE-TILEX*(dx!=0),SYSIZE-TILEY*(dy!=0),
-	    SX+TILEX*(dx==1),SY+TILEY*(dy==1));
+	    FX + TILEX*(dx==-1) - softscroll_offset,
+	    FY + TILEY*(dy==-1) - softscroll_offset,
+	    SXSIZE - TILEX*(dx!=0) + 2*softscroll_offset,
+	    SYSIZE - TILEY*(dy!=0) + 2*softscroll_offset,
+	    FX + TILEX*(dx==1) - softscroll_offset,
+	    FY + TILEY*(dy==1) - softscroll_offset);
 
   if (dx)
   {
-    x = (dx==1 ? 0 : SCR_FIELDX-1);
-    for(y=0;y<SCR_FIELDY;y++)
+    x = (dx==1 ? BX1 : BX2);
+    for(y=BY1; y<=BY2; y++)
       DrawScreenField(x,y);
   }
   if (dy)
   {
-    y = (dy==1 ? 0 : SCR_FIELDY-1);
-    for(x=0;x<SCR_FIELDX;x++)
+    y = (dy==1 ? BY1 : BY2);
+    for(x=BX1; x<=BX2; x++)
       DrawScreenField(x,y);
   }
 
-  redraw_mask|=REDRAW_FIELD;
+  redraw_mask |= REDRAW_FIELD;
 }
 
 BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
@@ -2802,7 +2848,6 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   JX2 = oldJX;
   JY2 = oldJY;
 
-  PlayerMovPos = TILEX/4;
   PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 3*TILEX/4;
 
   ScrollFigure(-1);
@@ -2897,7 +2942,9 @@ BOOL MoveFigure(int dx, int dy)
 
   TestIfHeroHitsBadThing();
 
+  /*
   BackToFront();
+  */
 
   if (PlayerGone)
     RemoveHero();
@@ -2908,10 +2955,29 @@ BOOL MoveFigure(int dx, int dy)
 void ScrollFigure(int init)
 {
   static long actual_frame_counter;
+  static int oldX = -1, oldY = -1;
 
   if (init)
   {
+    if (PlayerMovPos && oldX != -1 && oldY != -1)
+    {
+      DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
+      DrawPlayerField();
+    }
+
+    oldX = JX2;
+    oldY = JY2;
     actual_frame_counter = FrameCounter;
+
+    redraw[redraw_x1 + oldX][redraw_y1 + oldY] = 1;
+    redraw_tiles++;
+
+    /*
+    DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
+    */
+
+    DrawPlayerField();
+
     return;
   }
   else if (!FrameReached(&actual_frame_counter,1))
@@ -2919,8 +2985,20 @@ void ScrollFigure(int init)
 
   PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/4;
 
-  DrawLevelElement(JX2,JY2, Feld[JX2][JY2]);
+  if (ScreenMovPos)
+  {
+    ScreenMovPos = PlayerMovPos;
+    redraw_mask |= REDRAW_FIELD;
+  }
+
+  DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
   DrawPlayerField();
+
+  if (!PlayerMovPos)
+  {
+    JX2 = JX;
+    JY2 = JY;
+  }
 }
 
 void TestIfGoodThingHitsBadThing(int goodx, int goody)
@@ -3493,7 +3571,6 @@ void RaiseScore(int value)
 {
   Score += value;
   DrawText(DX_SCORE,DY_SCORE,int2str(Score,5),FS_SMALL,FC_YELLOW);
-  BackToFront();
 }
 
 void RaiseScoreElement(int element)

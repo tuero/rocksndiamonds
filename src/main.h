@@ -46,6 +46,8 @@ typedef int BOOL;
 #define WIN_YSIZE	560
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
+#define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
+#define MAX_BUF_YSIZE	(SCR_FIELDY + 2)
 
 #define MIN_LEV_FIELDX	(SCR_FIELDX-2)
 #define MIN_LEV_FIELDY	(SCR_FIELDY-2)
@@ -62,7 +64,7 @@ typedef int BOOL;
 #define SCROLLY(a)	((a)-scroll_y)
 #define UNSCROLLX(a)	((a)+scroll_x)
 #define UNSCROLLY(a)	((a)+scroll_y)
-#define IN_SCR_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
+#define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
 /*
@@ -275,12 +277,14 @@ extern int		sound_simple_on;
 extern int		toons_on;
 extern int		direct_draw_on;
 extern int		scroll_delay_on;
+extern int		soft_scrolling_on;
 extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
 extern int		quick_doors;
 
-extern BOOL		redraw[SCR_FIELDX][SCR_FIELDY];
+extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+extern int		redraw_x1, redraw_y1;
 extern int		redraw_mask;
 extern int		redraw_tiles;
 
@@ -301,6 +305,8 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
+extern int		FX,FY, ScreenMovPos;
+extern int		BX1,BY1, BX2,BY2;
 extern int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
 extern int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 extern int		PlayerGone,LevelSolved,GameOver;
@@ -344,6 +350,8 @@ extern char		*progname;
 #define MIDPOSY			(SCR_FIELDY/2)
 #define SXSIZE			(SCR_FIELDX*TILEX)
 #define SYSIZE			(SCR_FIELDY*TILEY)
+#define FXSIZE			((SCR_FIELDX+2)*TILEX)
+#define FYSIZE			((SCR_FIELDY+2)*TILEY)
 #define DXSIZE			100
 #define DYSIZE			280
 #define VXSIZE			DXSIZE
@@ -991,7 +999,7 @@ extern char		*progname;
 #define REDRAW_DOOR_2	(REDRAW_VIDEO_1 | REDRAW_VIDEO_2 | REDRAW_VIDEO_3)
 #define REDRAW_DOORS	(REDRAW_DOOR_1 | REDRAW_DOOR_2)
 #define REDRAW_MAIN	(REDRAW_FIELD | REDRAW_TILES | REDRAW_MICROLEV)
-#define REDRAWTILES_TH		SCR_FIELDX*SCR_FIELDY/2
+#define REDRAWTILES_THRESHOLD	SCR_FIELDX*SCR_FIELDY/2
 
 /* positions in the game control window */
 #define XX_LEVEL		37

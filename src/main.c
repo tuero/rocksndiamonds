@@ -54,12 +54,14 @@ int		sound_simple_on = FALSE;
 int		toons_on = TRUE;
 int		direct_draw_on = FALSE;
 int		scroll_delay_on = FALSE;
+int		soft_scrolling_on = TRUE;
 int		fading_on = FALSE;
 int		autorecord_on = FALSE;
 int		joystick_nr = 0;
 int		quick_doors = FALSE;
 
-BOOL		redraw[SCR_FIELDX][SCR_FIELDY];
+BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+int		redraw_x1 = 0, redraw_y1 = 0;
 int		redraw_mask;
 int		redraw_tiles;
 
@@ -80,6 +82,8 @@ long		Elementeigenschaften[MAX_ELEMENTS];
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
+int		FX = SX, FY = SY, ScreenMovPos = 0;
+int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
 int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
 int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 int		PlayerGone,LevelSolved,GameOver;

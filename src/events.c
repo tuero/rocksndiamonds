@@ -149,7 +149,7 @@ void HandleExposeEvent(XExposeEvent *event)
     int x1 = (x-SX)/TILEX, y1 = (y-SY)/TILEY;
     int x2 = (x-SX+width)/TILEX, y2 = (y-SY+height)/TILEY;
 
-    drawto_field = backbuffer;
+    SetDrawtoField(DRAW_BACKBUFFER);
 
     for(xx=0;xx<SCR_FIELDX;xx++)
       for(yy=0;yy<SCR_FIELDY;yy++)
@@ -157,7 +157,7 @@ void HandleExposeEvent(XExposeEvent *event)
 	  DrawScreenField(xx,yy);
     DrawPlayerField();
 
-    drawto_field = window;
+    SetDrawtoField(DRAW_DIRECT);
   }
 
   XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
@@ -263,8 +263,8 @@ void HandleButton(int mx, int my, int button)
 }
 
 int Gamespeed = 4;
-int Movemethod = 0;
-int Movespeed[2] = { 10, 3 };
+int Movemethod = 1;
+int Movespeed[2] = { 10, 4 };
 char *Movespeed_text[2] = { "asynchron", "syncron" };
 
 void HandleKey(KeySym key, int key_status)
@@ -361,6 +361,8 @@ void HandleKey(KeySym key, int key_status)
     case XK_Control_R:
     case XK_Alt_R:
     case XK_Meta_R:
+    case XK_Mode_switch:
+    case XK_Multi_key:
     case XK_B:			/* (Bombe legen) */
     case XK_b:
       joy |= JOY_BUTTON_2;
@@ -377,10 +379,10 @@ void HandleKey(KeySym key, int key_status)
       key_joystick_mapping &= ~joy;
 
     HandleJoystick();
-
-    if (game_status != PLAYING)
-      key_joystick_mapping = 0;
   }
+
+  if (game_status != PLAYING)
+    key_joystick_mapping = 0;
 
   if (key_status == KEY_RELEASED)
     return;
@@ -488,7 +490,7 @@ void HandleKey(KeySym key, int key_status)
 	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
 	case XK_l:
-	  Gamespeed = 10;
+	  Gamespeed = 50;
 	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
 
@@ -496,7 +498,6 @@ void HandleKey(KeySym key, int key_status)
 	case XK_q:
 	  Dynamite = 1000;
 	  break;
-#endif
 
 	case XK_x:
 
@@ -520,11 +521,11 @@ void HandleKey(KeySym key, int key_status)
 		  {
   		    if (DelayReached(&scroll_delay, scroll_delay_value))
   		    {
-  		      XCopyArea(display,backbuffer,window,gc,
+  		      XCopyArea(display,fieldbuffer,window,gc,
   				SX+xxx,SY,
   				SXSIZE-xxx,SYSIZE,
   				SX,SY);
-  		      XCopyArea(display,backbuffer,window,gc,
+  		      XCopyArea(display,fieldbuffer,window,gc,
   				SX,SY,
   				xxx,SYSIZE,
   				SX+SXSIZE-xxx,SY);
@@ -553,6 +554,22 @@ void HandleKey(KeySym key, int key_status)
 
 	  break;
 
+	case XK_y:
+	  {
+	    printf("FX = %d, FY = %d\n", FX,FY);
+
+	    XCopyArea(display,fieldbuffer,window,gc,
+		      0,0,
+		      MIN(WIN_XSIZE,FXSIZE),MIN(WIN_YSIZE,FYSIZE),
+		      0,0);
+	    XFlush(display);
+	    XSync(display,FALSE);
+	    Delay(1000000);
+	  }
+
+	  break;
+#endif
+
 	default:
 	  break;
       }
@@ -565,7 +582,7 @@ void HandleKey(KeySym key, int key_status)
 
 void HandleNoXEvent()
 {
-  if (button_status && game_status!=PLAYING)
+  if (button_status && game_status != PLAYING)
   {
     HandleButton(-1,-1,button_status);
     return;
@@ -646,10 +663,15 @@ void HandleJoystick()
       }
 
 
-
+#if 0
       if (PlayerMovPos)
+      {
 	ScrollFigure(0);
-
+	/*
+	BackToFront();
+	*/
+      }
+#endif
 
 
       if (tape.pausing || PlayerGone)
@@ -706,7 +728,11 @@ void HandleJoystick()
 	}
       }
 
+
+      /*
       DrawPlayerField();
+      */
+
 
       break;
     }

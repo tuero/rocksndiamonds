@@ -362,7 +362,7 @@ void InitGfx()
 				   3*DXSIZE,DYSIZE+VYSIZE,
 				   XDefaultDepth(display,screen));
   pix[PIX_DB_FIELD] = XCreatePixmap(display, window,
-				    SXSIZE+2*TILEX,SYSIZE+2*TILEY,
+				    FXSIZE,FYSIZE,
 				    XDefaultDepth(display,screen));
 
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
@@ -386,8 +386,9 @@ void InitGfx()
     }
   }
 
-  drawto = drawto_field = backbuffer = pix[PIX_DB_BACK];
+  drawto = backbuffer = pix[PIX_DB_BACK];
   fieldbuffer = pix[PIX_DB_FIELD];
+  SetDrawtoField(DRAW_BACKBUFFER);
 
   XCopyArea(display,pix[PIX_BACK],backbuffer,gc,
 	    0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
@@ -396,11 +397,11 @@ void InitGfx()
   XFillRectangle(display,pix[PIX_DB_DOOR],gc,
 		 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
 
-  for(i=0;i<SCR_FIELDX;i++)
-    for(j=0;j<SCR_FIELDY;j++)
-      redraw[i][j]=0;
-  redraw_tiles=0;
-  redraw_mask=REDRAW_ALL;
+  for(i=0; i<MAX_BUF_XSIZE; i++)
+    for(j=0; j<MAX_BUF_YSIZE; j++)
+      redraw[i][j] = 0;
+  redraw_tiles = 0;
+  redraw_mask = REDRAW_ALL;
 }
 
 void LoadGfx(int pos, struct PictureFileInfo *pic)

@@ -19,6 +19,11 @@
 
 #include <sys/time.h>
 
+/* für SetDrawtoField */
+#define DRAW_DIRECT	0
+#define DRAW_BUFFERED	1
+#define DRAW_BACKBUFFER	2
+
 /* für DrawElementShifted */
 #define CUT_NO_CUTTING	0
 #define CUT_ABOVE	1
@@ -48,6 +53,7 @@
 #define AYS_STAY_CLOSED	16
 #define AYS_STAY_OPEN	32
 
+void SetDrawtoField(int);
 void BackToFront();
 void FadeToFront();
 void ClearWindow();

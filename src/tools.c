@@ -27,41 +27,152 @@
 
 #include <math.h>
 
+void SetDrawtoField(int mode)
+{
+  if (mode == DRAW_BUFFERED && soft_scrolling_on)
+  {
+    FX = TILEX;
+    FY = TILEY;
+    BX1 = -1;
+    BY1 = -1;
+    BX2 = SCR_FIELDX;
+    BY2 = SCR_FIELDY;
+    redraw_x1 = 1;
+    redraw_y1 = 1;
+
+    drawto_field = fieldbuffer;
+  }
+  else	/* DRAW_DIRECT, DRAW_BACKBUFFER */
+  {
+    FX = SX;
+    FY = SY;
+    BX1 = 0;
+    BY1 = 0;
+    BX2 = SCR_FIELDX - 1;
+    BY2 = SCR_FIELDY - 1;
+    redraw_x1 = 0;
+    redraw_y1 = 0;
+
+    drawto_field = (mode == DRAW_DIRECT ? window :  backbuffer);
+  }
+}
+
 void BackToFront()
 {
   int x,y;
+  Drawable buffer = (drawto_field != window ? drawto_field : backbuffer);
 
-  if (direct_draw_on && game_status==PLAYING)
+  if (direct_draw_on && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
+
+
+
+  /*
+  if (ScreenMovPos && redraw_mask & REDRAW_FIELD)
+  {
+    redraw_mask |= REDRAW_FIELD;
+
+    printf("FULL SCREEN REDRAW FORCED by ScreenMovPos == %d\n", ScreenMovPos);
+  }
+  */
+
+
+
+  /*
+  if (ScreenMovPos && redraw_mask & REDRAW_TILES)
+  {
+    redraw_mask |= REDRAW_FIELD;
+
+    printf("FULL SCREEN REDRAW FORCED by ScreenMovPos == %d\n", ScreenMovPos);
+  }
+  */
+
+
+  /*
+  if (ScreenMovPos && !(redraw_mask & REDRAW_FIELD))
+  {
+    printf("OOPS!\n");
+
+    *((int *)NULL) = 0;
+  }
+  */
+
+  /*
+  if (IN_SCR_FIELD(JX2,JY2))
+    redraw[redraw_x1 + JX2][redraw_y1 + JY2] = 0;
+    */
+
+
+  if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
+    redraw_mask |= REDRAW_FIELD;
+
+  if (redraw_mask & REDRAW_FIELD)
+    redraw_mask &= ~REDRAW_TILES;
+
+  /*
+  {
+    static int lastFrame = 0;
+
+    printf("FrameCounter: %d\n", FrameCounter);
+
+    if (FrameCounter != lastFrame + 1)
+    {
+      printf("SYNC LOST! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+      if (FrameCounter > 100)
+	*((int *)NULL) = 0;
+    }
+
+    lastFrame = FrameCounter;
+  }
+  */
 
   if (!redraw_mask)
     return;
 
-  if (redraw_mask & REDRAW_ALL ||
-      (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS))
+  if (redraw_mask & REDRAW_ALL)
   {
     XCopyArea(display,backbuffer,window,gc,
 	      0,0, WIN_XSIZE,WIN_YSIZE,
 	      0,0);
     redraw_mask = 0;
   }
-  else if (redraw_mask & REDRAW_FIELD)
+
+  if (redraw_mask & REDRAW_FIELD)
   {
-    XCopyArea(display,backbuffer,window,gc,
-	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-	      REAL_SX,REAL_SY);
+    int fx = FX + (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+    int fy = FY + (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+
+    if (game_status == PLAYING)
+    {
+      XCopyArea(display,buffer,window,gc,
+		fx,fy, SXSIZE,SYSIZE,
+		SX,SY);
+
+      /*
+      printf("FULL SCREEN REDRAW / ScreenMovPos == %d\n", ScreenMovPos);
+      */
+
+    }
+    else
+      XCopyArea(display,backbuffer,window,gc,
+		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
+		REAL_SX,REAL_SY);
     redraw_mask &= ~REDRAW_MAIN;
   }
-  else if (redraw_mask & REDRAW_DOORS)
+
+  if (redraw_mask & REDRAW_DOORS)
   {
     if (redraw_mask & REDRAW_DOOR_1)
       XCopyArea(display,backbuffer,window,gc,
-		DX,DY, DXSIZE,DYSIZE, DX,DY);
+		DX,DY, DXSIZE,DYSIZE,
+		DX,DY);
     if (redraw_mask & REDRAW_DOOR_2)
     {
       if ((redraw_mask & REDRAW_DOOR_2) == REDRAW_DOOR_2)
 	XCopyArea(display,backbuffer,window,gc,
-		  VX,VY, VXSIZE,VYSIZE, VX,VY);
+		  VX,VY, VXSIZE,VYSIZE,
+		  VX,VY);
       else
       {
 	if (redraw_mask & REDRAW_VIDEO_1)
@@ -97,23 +208,21 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_TILES)
   {
-    if (redraw_tiles>REDRAWTILES_TH)
-      XCopyArea(display,backbuffer,window,gc,SX,SY,SXSIZE,SYSIZE,SX,SY);
-    else
-      for(x=0;x<SCR_FIELDX;x++)
-	for(y=0;y<SCR_FIELDY;y++)
-	  if (redraw[x][y])
-	    XCopyArea(display,backbuffer,window,gc,
-		      SX+x*TILEX,SY+y*TILEY,TILEX,TILEY,SX+x*TILEX,SY+y*TILEY);
+    for(x=0; x<SCR_FIELDX; x++)
+      for(y=0; y<SCR_FIELDY; y++)
+	if (redraw[redraw_x1 + x][redraw_y1 + y])
+	  XCopyArea(display,buffer,window,gc,
+		    FX+x*TILEX,FX+y*TILEY, TILEX,TILEY,
+		    SX+x*TILEX,SY+y*TILEY);
   }
 
   XFlush(display);
 
-  for(x=0;x<SCR_FIELDX;x++)
-    for(y=0;y<SCR_FIELDY;y++)
-      redraw[x][y]=0;
-  redraw_tiles=0;
-  redraw_mask=0;
+  for(x=0; x<MAX_BUF_XSIZE; x++)
+    for(y=0; y<MAX_BUF_YSIZE; y++)
+      redraw[x][y] = 0;
+  redraw_tiles = 0;
+  redraw_mask = 0;
 }
 
 void FadeToFront()
@@ -187,26 +296,35 @@ void FadeToFront()
 
 void ClearWindow()
 {
-  drawto_field = backbuffer;
-  XFillRectangle(display,drawto_field,gc,
-		 REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
-  redraw_mask|=REDRAW_FIELD;
+  XFillRectangle(display,backbuffer,gc,
+		 REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
+
+  if (soft_scrolling_on && game_status==PLAYING)
+  {
+    XFillRectangle(display,fieldbuffer,gc,
+		   0,0, FXSIZE,FYSIZE);
+    SetDrawtoField(DRAW_BUFFERED);
+  }
+  else
+    SetDrawtoField(DRAW_BACKBUFFER);
 
   if (direct_draw_on && game_status==PLAYING)
   {
-    drawto_field = window;
-    XFillRectangle(display,drawto_field,gc,
-		   REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
+    XFillRectangle(display,window,gc,
+		   REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
+    SetDrawtoField(DRAW_DIRECT);
   }
+
+  redraw_mask |= REDRAW_FIELD;
 }
 
 void DrawText(int x, int y, char *text, int font, int col)
 {
   DrawTextExt(drawto, gc, x, y, text, font, col);
-  if (x<DX)
-    redraw_mask|=REDRAW_FIELD;
-  else if (y<VY)
-    redraw_mask|=REDRAW_DOOR_1;
+  if (x < DX)
+    redraw_mask |= REDRAW_FIELD;
+  else if (y < VY)
+    redraw_mask |= REDRAW_DOOR_1;
 }
 
 void DrawTextExt(Drawable d, GC gc, int x, int y,
@@ -281,7 +399,7 @@ void DrawPlayerField()
     return;
 
   if (direct_draw_on)
-    drawto_field = backbuffer;
+    SetDrawtoField(DRAW_BUFFERED);
 
   /* draw things behind the player (EL_PFORTE* || mole/penguin/pig/dragon) */
 
@@ -320,7 +438,7 @@ void DrawPlayerField()
 
 
   if (draw_thru_mask)
-    DrawGraphicThruMask(sx + sxx, sy + syy, graphic);
+    DrawGraphicThruMask(sx, sy, graphic);
   else
     DrawGraphicShifted(sx,sy,sxx,syy,graphic,CUT_NO_CUTTING);
   /*
@@ -353,9 +471,9 @@ void DrawPlayerField()
     int dest_x = SX+SCROLLX(x)*TILEX;
     int dest_y = SY+SCROLLY(y)*TILEY;
 
-    XCopyArea(display,backbuffer,window,gc,
+    XCopyArea(display,drawto_field,window,gc,
 	      dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
-    drawto_field = window;
+    SetDrawtoField(DRAW_DIRECT);
   }
 }
 
@@ -411,13 +529,13 @@ void DrawGraphic(int x, int y, int graphic)
 
   DrawGraphicExt(drawto_field, gc, x, y, graphic);
   redraw_tiles++;
-  redraw[x][y] = TRUE;
+  redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
   redraw_mask |= REDRAW_TILES;
 }
 
 void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
-  DrawGraphicExtHiRes(d, gc, SX+x*TILEX, SY+y*TILEY, graphic);
+  DrawGraphicExtHiRes(d, gc, FX+x*TILEX, FY+y*TILEY, graphic);
 }
 
 void DrawGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
@@ -469,8 +587,8 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     graphic -= GFX_START_ROCKSSCREEN;
     src_x  = SX+(graphic % GFX_PER_LINE)*TILEX;
     src_y  = SY+(graphic / GFX_PER_LINE)*TILEY;
-    dest_x = SX+x*TILEX;
-    dest_y = SY+y*TILEY;
+    dest_x = FX+x*TILEX;
+    dest_y = FY+y*TILEY;
 
     XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
     XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
@@ -481,8 +599,8 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     graphic -= GFX_START_ROCKSHEROES;
     src_x  = (graphic % HEROES_PER_LINE)*TILEX;
     src_y  = (graphic / HEROES_PER_LINE)*TILEY;
-    dest_x = SX+x*TILEX;
-    dest_y = SY+y*TILEY;
+    dest_x = FX+x*TILEX;
+    dest_y = FY+y*TILEY;
 
     XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
     XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
@@ -495,7 +613,7 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   }
 
   redraw_tiles++;
-  redraw[x][y]=TRUE;
+  redraw[redraw_x1 + x][redraw_y1 + y]=TRUE;
   redraw_mask|=REDRAW_TILES;
 }
 
@@ -545,7 +663,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
 
-  if (graphic<0)
+  if (graphic < 0)
   {
     DrawGraphic(x,y,graphic);
     return;
@@ -553,66 +671,66 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
 
   if (dx || dy)			/* Verschiebung der Grafik? */
   {
-    if (x<0)			/* Element kommt von links ins Bild */
+    if (x < BX1)		/* Element kommt von links ins Bild */
     {
-      x=0;
-      width=dx;
-      cx=TILEX-dx;
-      dx=0;
+      x = BX1;
+      width = dx;
+      cx = TILEX - dx;
+      dx = 0;
     }
-    else if (x==SCR_FIELDX)	/* Element kommt von rechts ins Bild */
+    else if (x > BX2)		/* Element kommt von rechts ins Bild */
     {
-      x=SCR_FIELDX-1;
-      width=-dx;
-      dx=TILEX+dx;
+      x = BX2;
+      width = -dx;
+      dx = TILEX + dx;
     }
-    else if (x==0 && dx<0)	/* Element verl‰ﬂt links das Bild */
+    else if (x==BX1 && dx<0)	/* Element verl‰ﬂt links das Bild */
     {
-      width+=dx;
-      cx=-dx;
-      dx=0;
+      width += dx;
+      cx = -dx;
+      dx = 0;
     }
-    else if (x==SCR_FIELDX-1 && dx>0)	/* El. verl‰ﬂt rechts das Bild */
-      width-=dx;
+    else if (x==BX2 && dx>0)	/* Element verl‰ﬂt rechts das Bild */
+      width -= dx;
     else if (dx)		/* allg. Bewegung in x-Richtung */
-      redraw[x+SIGN(dx)][y]=TRUE;
+      redraw[redraw_x1 + x + SIGN(dx)][redraw_y1 + y] = TRUE;
 
-    if (y<0)			/* Element kommt von oben ins Bild */
+    if (y < BY1)		/* Element kommt von oben ins Bild */
     {
       if (cut_mode==CUT_BELOW)	/* Element oberhalb des Bildes */
 	return;
 
-      y=0;
-      height=dy;
-      cy=TILEY-dy;
-      dy=0;
+      y = BY1;
+      height = dy;
+      cy = TILEY - dy;
+      dy = 0;
     }
-    else if (y==SCR_FIELDY)	/* Element kommt von unten ins Bild */
+    else if (y > BY2)		/* Element kommt von unten ins Bild */
     {
-      y=SCR_FIELDY-1;
-      height=-dy;
-      dy=TILEY+dy;
+      y = BY2;
+      height = -dy;
+      dy = TILEY + dy;
     }
-    else if (y==0 && dy<0)	/* Element verl‰ﬂt oben das Bild */
+    else if (y==BY1 && dy<0)	/* Element verl‰ﬂt oben das Bild */
     {
-      height+=dy;
-      cy=-dy;
-      dy=0;
+      height += dy;
+      cy = -dy;
+      dy = 0;
     }
-    else if (dy>0 && cut_mode==CUT_ABOVE)
+    else if (dy > 0 && cut_mode==CUT_ABOVE)
     {
-      if (y==SCR_FIELDY-1)	/* Element unterhalb des Bildes */
+      if (y == BY2)		/* Element unterhalb des Bildes */
 	return;
 
-      height=dy;
-      cy=TILEY-dy;
-      dy=TILEY;
-      redraw[x][y+1]=TRUE;
+      height = dy;
+      cy = TILEY-dy;
+      dy = TILEY;
+      redraw[redraw_x1 + x][redraw_y1 + y + 1] = TRUE;
     }				/* Element verl‰ﬂt unten das Bild */
-    else if (dy>0 && (y==SCR_FIELDY-1 || cut_mode==CUT_BELOW))
-      height-=dy;
+    else if (dy > 0 && (y == BY2 || cut_mode==CUT_BELOW))
+      height -= dy;
     else if (dy)		/* allg. Bewegung in y-Richtung */
-      redraw[x][y+SIGN(dy)]=TRUE;
+      redraw[redraw_x1 + x][redraw_y1 + y + SIGN(dy)] = TRUE;
   }
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
@@ -621,7 +739,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
     XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
 	      SX+(graphic % GFX_PER_LINE)*TILEX+cx,
 	      SY+(graphic / GFX_PER_LINE)*TILEY+cy,
-	      width,height, SX+x*TILEX+dx,SY+y*TILEY+dy);
+	      width,height, FX+x*TILEX+dx,FY+y*TILEY+dy);
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
@@ -629,7 +747,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
     XCopyArea(display,pix[PIX_HEROES],drawto_field,gc,
 	      (graphic % HEROES_PER_LINE)*TILEX+cx,
 	      (graphic / HEROES_PER_LINE)*TILEY+cy,
-	      width,height, SX+x*TILEX+dx,SY+y*TILEY+dy);
+	      width,height, FX+x*TILEX+dx,FY+y*TILEY+dy);
   }
 
 #if DEBUG
@@ -642,8 +760,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
 #endif
 
   redraw_tiles++;
-  redraw[x][y]=TRUE;
-  redraw_mask|=REDRAW_TILES;
+  redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
+  redraw_mask |= REDRAW_TILES;
 }
 
 void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
@@ -658,11 +776,11 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
   {
     graphic += 4*!phase;
 
-    if (dir==MV_UP)
+    if (dir == MV_UP)
       graphic += 1;
-    else if (dir==MV_LEFT)
+    else if (dir == MV_LEFT)
       graphic += 2;
-    else if (dir==MV_DOWN)
+    else if (dir == MV_DOWN)
       graphic += 3;
   }
   else if (element==EL_MAULWURF || element==EL_PINGUIN ||
@@ -794,11 +912,11 @@ void ErdreichAnbroeckeln(int x, int y)
       XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
 		SX+(graphic % GFX_PER_LINE)*TILEX+cx,
 		SY+(graphic / GFX_PER_LINE)*TILEY+cy,
-		width,height, SX+x*TILEX+cx,SY+y*TILEY+cy);
+		width,height, FX+x*TILEX+cx,FY+y*TILEY+cy);
     }
 
     redraw_tiles++;
-    redraw[x][y]=TRUE;
+    redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
   }
   else
   {
@@ -840,10 +958,10 @@ void ErdreichAnbroeckeln(int x, int y)
       XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
 		SX+(graphic % GFX_PER_LINE)*TILEX+cx,
 		SY+(graphic / GFX_PER_LINE)*TILEY+cy,
-		width,height, SX+xx*TILEX+cx,SY+yy*TILEY+cy);
+		width,height, FX+xx*TILEX+cx,FY+yy*TILEY+cy);
 
       redraw_tiles++;
-      redraw[xx][yy]=TRUE;
+      redraw[redraw_x1 + xx][redraw_y1 + yy] = TRUE;
     }
   }
 }
@@ -1004,8 +1122,8 @@ void DrawLevel()
 
   ClearWindow();
 
-  for(x=0;x<SCR_FIELDX;x++)
-    for(y=0;y<SCR_FIELDY;y++)
+  for(x=BX1; x<=BX2; x++)
+    for(y=BY1; y<=BY2; y++)
       DrawScreenField(x,y);
 
   redraw_mask |= REDRAW_FIELD;
