@@ -155,7 +155,7 @@ void DrawMainMenu()
   /* needed if last screen was the setup screen and fullscreen state changed */
   ToggleFullscreenIfNeeded();
 
-  /* needed if last screen (setup/level) changed graphics, sounds or music */
+  /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork();
 
 #ifdef TARGET_SDL
@@ -1370,23 +1370,25 @@ static void execSetupGame()
 
 static void execSetupGraphics()
 {
-  setup.graphics_set = artwork.gfx_current->name;
-
   setup_mode = SETUP_MODE_GRAPHICS;
   DrawSetupScreen();
 }
 
 static void execSetupSound()
 {
-  setup.sounds_set = artwork.snd_current->name;
-  setup.music_set = artwork.mus_current->name;
-
   setup_mode = SETUP_MODE_SOUND;
   DrawSetupScreen();
 }
 
 static void execSetupArtwork()
 {
+  /* needed if last screen (setup choice) changed graphics, sounds or music */
+  ReloadCustomArtwork();
+
+  setup.graphics_set = artwork.gfx_current->name;
+  setup.sounds_set = artwork.snd_current->name;
+  setup.music_set = artwork.mus_current->name;
+
   setup_mode = SETUP_MODE_ARTWORK;
   DrawSetupScreen();
 }
@@ -1661,7 +1663,7 @@ static void DrawSetupScreen_Generic()
   else if (setup_mode == SETUP_MODE_ARTWORK)
   {
     setup_info = setup_info_artwork;
-    title_string = "Setup Sound";
+    title_string = "Custom Artwork";
   }
   else if (setup_mode == SETUP_MODE_SHORTCUT)
   {

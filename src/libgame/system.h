@@ -115,6 +115,9 @@
 /* default name for unknown player names */
 #define ANONYMOUS_NAME		"anonymous"
 
+/* default text for non-existant artwork */
+#define NOT_AVAILABLE		"(not available)"
+
 /* default name for new levels */
 #define NAMELESS_LEVEL_NAME	"nameless level"
 

@@ -553,13 +553,9 @@ boolean validLevelSeries(TreeInfo *node)
 TreeInfo *getFirstValidTreeInfoEntry(TreeInfo *node)
 {
   if (node == NULL)
-  {
-    if (node->node_top)		/* start with first tree entry */
-      return getFirstValidTreeInfoEntry(*node->node_top);
-    else
-      return NULL;
-  }
-  else if (node->node_group)	/* enter level group (step down into tree) */
+    return NULL;
+
+  if (node->node_group)		/* enter level group (step down into tree) */
     return getFirstValidTreeInfoEntry(node->node_group);
   else if (node->parent_link)	/* skip start entry of level group */
   {
@@ -641,6 +637,12 @@ TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
     else if (!node->parent_link)
     {
       if (strcmp(filename, node->filename) == 0)
+	return node;
+
+      /* special case when looking for level series artwork:
+	 node->name_short contains level series filename */
+      if (strcmp(node->filename, ".") == 0 &&
+	  strcmp(filename, node->name_short) == 0)
 	return node;
     }
 
@@ -1631,7 +1633,9 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
       artwork_new->name = getStringCopy(artwork_new->filename);
     }
 
+#if 0
     DrawInitText(artwork_new->name, 150, FC_YELLOW);
+#endif
 
     if (artwork_new->name_short == NULL)
       artwork_new->name_short = getStringCopy(artwork_new->name);
@@ -1685,6 +1689,8 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     artwork_new->name_short = getStringCopy(artwork_new->name);
     artwork_new->name_sorting = getStringCopy(artwork_new->name);
   }
+
+  DrawInitText(artwork_new->name, 150, FC_YELLOW);
 
   pushTreeInfo(node_first, artwork_new);
 
@@ -1752,6 +1758,27 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 	  base_directory);
 }
 
+static TreeInfo *getDummyArtworkInfo(int type)
+{
+  /* this is only needed when there is completely no artwork available */
+  TreeInfo *artwork_new = newTreeInfo();
+
+  setTreeInfoToDefaults(artwork_new, type);
+
+  artwork_new->filename = getStringCopy(NOT_AVAILABLE);
+  artwork_new->fullpath = getStringCopy(NOT_AVAILABLE);
+  artwork_new->basepath = getStringCopy(NOT_AVAILABLE);
+
+  if (artwork_new->name != NULL)
+    free(artwork_new->name);
+
+  artwork_new->name         = getStringCopy(NOT_AVAILABLE);
+  artwork_new->name_short   = getStringCopy(NOT_AVAILABLE);
+  artwork_new->name_sorting = getStringCopy(NOT_AVAILABLE);
+
+  return artwork_new;
+}
+
 void LoadArtworkInfo()
 {
   DrawInitText("Looking for custom artwork:", 120, FC_GREEN);
@@ -1777,6 +1804,13 @@ void LoadArtworkInfo()
 				getUserMusicDir(),
 				TREE_TYPE_MUSIC_DIR);
 
+  if (artwork.gfx_first == NULL)
+    artwork.gfx_first = getDummyArtworkInfo(TREE_TYPE_GRAPHICS_DIR);
+  if (artwork.snd_first == NULL)
+    artwork.snd_first = getDummyArtworkInfo(TREE_TYPE_SOUNDS_DIR);
+  if (artwork.mus_first == NULL)
+    artwork.mus_first = getDummyArtworkInfo(TREE_TYPE_MUSIC_DIR);
+
   /* before sorting, the first entries will be from the user directory */
   artwork.gfx_current =
     getTreeInfoFromFilename(artwork.gfx_first, setup.graphics_set);
@@ -1786,12 +1820,12 @@ void LoadArtworkInfo()
   artwork.snd_current =
     getTreeInfoFromFilename(artwork.snd_first, setup.sounds_set);
   if (artwork.snd_current == NULL)
-  artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
+    artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
 
   artwork.mus_current =
     getTreeInfoFromFilename(artwork.mus_first, setup.music_set);
   if (artwork.mus_current == NULL)
-  artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
+    artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
   artwork.graphics_set_current_name = artwork.gfx_current->name;
   artwork.sounds_set_current_name = artwork.snd_current->name;

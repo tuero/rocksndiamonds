@@ -411,19 +411,29 @@ void InitGfxBackground()
 
 void ReloadCustomArtwork()
 {
-  static char *leveldir_current_name = NULL;
+  static char *leveldir_current_filename = NULL;
   static boolean last_override_level_graphics = FALSE;
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
 
-  if (leveldir_current_name != leveldir_current->name)
+  if (leveldir_current_filename != leveldir_current->filename)
   {
-    /* force reload of custom artwork after new level series was selected */
-    artwork.graphics_set_current_name = NULL;
-    artwork.sounds_set_current_name = NULL;
-    artwork.music_set_current_name = NULL;
+    char *filename_old = leveldir_current_filename;
+    char *filename_new = leveldir_current->filename;
 
-    leveldir_current_name = leveldir_current->name;
+    /* force reload of custom artwork after new level series was selected,
+       but reload only that part of the artwork that really has changed */
+    if (getTreeInfoFromFilename(artwork.gfx_first, filename_old) !=
+	getTreeInfoFromFilename(artwork.gfx_first, filename_new))
+      artwork.graphics_set_current_name = NULL;
+    if (getTreeInfoFromFilename(artwork.snd_first, filename_old) !=
+	getTreeInfoFromFilename(artwork.snd_first, filename_new))
+      artwork.sounds_set_current_name = NULL;
+    if (getTreeInfoFromFilename(artwork.mus_first, filename_new) !=
+	getTreeInfoFromFilename(artwork.mus_first, filename_new))
+      artwork.music_set_current_name = NULL;
+
+    leveldir_current_filename = leveldir_current->filename;
   }
 
   if (artwork.graphics_set_current_name != artwork.gfx_current->name ||
@@ -443,7 +453,9 @@ void ReloadCustomArtwork()
     InitTileClipmasks();
     InitGfxBackground();
 
-    SetDoorState(DOOR_OPEN_1 | DOOR_CLOSE_2);
+    /* force redraw of (open or closed) door graphics */
+    SetDoorState(DOOR_OPEN_ALL);
+    CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
 
     artwork.graphics_set_current_name = artwork.gfx_current->name;
     last_override_level_graphics = setup.override_level_graphics;
