@@ -114,6 +114,7 @@ static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
 
+static void CheckTriggeredElementChange(int, int);
 static void ChangeElementDoIt(int, int, int);
 
 static void PlaySoundLevel(int, int, int);
@@ -2023,6 +2024,8 @@ void Bang(int x, int y)
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
   }
+
+  CheckTriggeredElementChange(element, CE_OTHER_EXPLODING);
 }
 
 void SplashAcid(int x, int y)
@@ -4848,10 +4851,12 @@ static void ChangeActiveTrap(int x, int y)
     DrawLevelFieldCrumbledSand(x, y);
 }
 
-static void ChangeElementDoIt(int x, int y, int element)
+static void ChangeElementDoIt(int x, int y, int element_new)
 {
+  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_CHANGING);
+
   RemoveField(x, y);
-  Feld[x][y] = element;
+  Feld[x][y] = element_new;
 
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
@@ -6747,6 +6752,9 @@ int DigField(struct PlayerInfo *player,
 
       DrawLevelField(x + dx, y + dy);
       PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
+
+      CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
+
       break;
 
     case EL_GATE_1:
@@ -7032,6 +7040,8 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevel(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
 
+      CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
+
       break;
 
     case EL_PENGUIN:
@@ -7115,6 +7125,8 @@ int DigField(struct PlayerInfo *player,
 
 	DrawLevelField(x + dx, y + dy);
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
+
+	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
 
 	break;
       }
