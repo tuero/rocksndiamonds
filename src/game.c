@@ -736,6 +736,7 @@ void InitGame()
       GfxFrame[x][y] = 0;
       GfxAction[x][y] = ACTION_DEFAULT;
       GfxRandom[x][y] = INIT_GFX_RANDOM();
+      GfxElement[x][y] = EL_UNDEFINED;
     }
   }
 
@@ -4463,7 +4464,8 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
-    InitPlayerGfxAnimation(player, ACTION_DEFAULT);
+    if (player->MovPos == 0)
+      InitPlayerGfxAnimation(player, ACTION_DEFAULT);
 
     if (player->MovPos == 0)	/* needed for tape.playing */
       player->is_moving = FALSE;
@@ -4564,11 +4566,13 @@ void GameActions()
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
+#if 0
   FrameCounter++;
   TimeFrames++;
 
   for (i=0; i<MAX_PLAYERS; i++)
     stored_player[i].Frame++;
+#endif
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
@@ -4608,6 +4612,10 @@ void GameActions()
       ResetRandomAnimationValue(x, y);
 
     SetRandomAnimationValue(x, y);
+
+#if 1
+    PlaySoundLevelActionIfLoop(x, y, GfxAction[x][y]);
+#endif
 
     if (IS_INACTIVE(element))
     {
@@ -4889,6 +4897,14 @@ void GameActions()
 
     redraw_mask |= REDRAW_FPS;
   }
+
+#if 1
+  FrameCounter++;
+  TimeFrames++;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].Frame++;
+#endif
 }
 
 static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
@@ -5184,7 +5200,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     }
   }
 
-#if 0
+#if 1
 #if 1
   InitPlayerGfxAnimation(player, ACTION_DEFAULT);
 #else
@@ -5669,6 +5685,10 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BASE:
     case EL_SP_BUGGY_BASE:
     case EL_SP_BUGGY_BASE_ACTIVATING:
+#if 1
+      if (mode != DF_SNAP && element == EL_SAND)
+	GfxElement[x][y] = Feld[x][y];
+#endif
       RemoveField(x, y);
       PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
       break;

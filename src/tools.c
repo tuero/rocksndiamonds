@@ -607,10 +607,65 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (Store[jx][jy])
     DrawLevelElement(jx, jy, Store[jx][jy]);
-  else if (!IS_ACTIVE_BOMB(element))
-    DrawLevelField(jx, jy);
-  else
+  else if (IS_ACTIVE_BOMB(element))
     DrawLevelElement(jx, jy, EL_EMPTY);
+  else
+  {
+    if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
+    {
+      int old_element = GfxElement[jx][jy];
+      int old_graphic =
+	el_act_dir2img(old_element, ACTION_DIGGING, player->MovDir);
+      int frame = getGraphicAnimationFrame(old_graphic, player->Frame);
+#if 0
+      Bitmap *src_bitmap;
+      int src_x, src_y;
+      int width = TILEX, height = TILEY;
+      int cx = 0, cy = 0;
+
+      if (player->MovDir == MV_UP)
+      {
+	cy = player->GfxPos;
+	height -= cy;
+      }
+      else if (player->MovDir == MV_DOWN)
+      {
+	cy = 0;
+	height = TILEY - player->GfxPos;
+      }
+      else if (player->MovDir == MV_LEFT)
+      {
+	cx = player->GfxPos;
+	width -= cx;
+      }
+      else if (player->MovDir == MV_RIGHT)
+      {
+	cx = 0;
+	width = TILEX - player->GfxPos;
+      }
+
+      getGraphicSource(old_graphic, frame, &src_bitmap, &src_x, &src_y);
+
+      BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
+		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+#else
+#if 0
+      printf("::: %d, %d, %d, %d => %d, %d [%d]\n",
+	     old_element, ACTION_DIGGING, player->MovDir, player->Frame,
+	     old_graphic, frame,
+	     player->GfxPos);
+#endif
+
+      DrawGraphic(sx, sy, old_graphic, frame);
+#endif
+    }
+    else
+    {
+      GfxElement[jx][jy] = EL_UNDEFINED;
+
+      DrawLevelField(jx, jy);
+    }
+  }
 
   /* ----------------------------------------------------------------------- */
   /* draw player himself                                                     */
@@ -1161,6 +1216,9 @@ void DrawCrumbledSand(int x, int y)
   element = Feld[lx][ly];
 
   if (element == EL_SAND ||
+#if 1
+      (element == EL_EMPTY_SPACE && GfxElement[lx][ly] == EL_SAND) ||
+#endif
       element == EL_LANDMINE ||
       element == EL_TRAP ||
       element == EL_TRAP_ACTIVE)
@@ -1186,6 +1244,9 @@ void DrawCrumbledSand(int x, int y)
 	element = Feld[lxx][lyy];
 
       if (element == EL_SAND ||
+#if 1
+	  (element == EL_EMPTY_SPACE && GfxElement[lxx][lyy] == EL_SAND) ||
+#endif
 	  element == EL_LANDMINE ||
 	  element == EL_TRAP ||
 	  element == EL_TRAP_ACTIVE)
@@ -1231,6 +1292,9 @@ void DrawCrumbledSand(int x, int y)
 
       if (!IN_LEV_FIELD(lxx, lyy) ||
 	  (Feld[lxx][lyy] != EL_SAND &&
+#if 1
+	   !(Feld[lxx][lyy] == EL_EMPTY_SPACE && GfxElement[lxx][lyy] == EL_SAND) &&
+#endif
 	   Feld[lxx][lyy] != EL_LANDMINE &&
 	   Feld[lxx][lyy] != EL_TRAP &&
 	   Feld[lxx][lyy] != EL_TRAP_ACTIVE) ||

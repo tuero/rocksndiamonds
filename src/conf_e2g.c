@@ -489,6 +489,22 @@ element_to_graphic[] =
     IMG_SAND_CRUMBLED
   },
   {
+    EL_SAND,					ACTION_DIGGING, MV_BIT_LEFT,
+    IMG_SAND_DIGGING_LEFT
+  },
+  {
+    EL_SAND,					ACTION_DIGGING, MV_BIT_RIGHT,
+    IMG_SAND_DIGGING_RIGHT
+  },
+  {
+    EL_SAND,					ACTION_DIGGING, MV_BIT_UP,
+    IMG_SAND_DIGGING_UP
+  },
+  {
+    EL_SAND,					ACTION_DIGGING, MV_BIT_DOWN,
+    IMG_SAND_DIGGING_DOWN
+  },
+  {
     EL_WALL,					-1, -1,
     IMG_WALL
   },

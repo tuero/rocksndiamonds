@@ -1170,6 +1170,7 @@ extern unsigned long		Properties2[MAX_NUM_ELEMENTS];
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;

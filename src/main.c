@@ -60,6 +60,7 @@ unsigned long		Properties2[MAX_NUM_ELEMENTS];
 int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
