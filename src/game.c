@@ -216,7 +216,7 @@ static struct ChangingElementInfo changing_element_list[] =
 
   { EL_TRAP,			EL_TRAP_ACTIVE,		 0,
     InitTrap, NULL, ActivateTrap },
-  { EL_TRAP_ACTIVE,		EL_TRAP,		32,
+  { EL_TRAP_ACTIVE,		EL_TRAP,		31,
     NULL, ChangeActiveTrap, NULL },
 
   { EL_ROBOT_WHEEL_ACTIVE,	EL_ROBOT_WHEEL,		 0,
@@ -4129,7 +4129,7 @@ static void StopRobotWheel(int x, int y)
     ZX = ZY = -1;
 }
 
-#if 0
+#if 1
 void RobotWheel(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
@@ -4171,7 +4171,7 @@ static void RunTimegateWheel(int x, int y)
   PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
 }
 
-#if 0
+#if 1
 void TimegateWheel(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
@@ -4199,7 +4199,7 @@ void TimegateWheel(int x, int y)
   DrawLevelField(x, y);
 
   /* THIS HAS NO EFFECT AT ALL! */
-#if 0
+#if 1
   /* !!! THIS LOOKS WRONG !!! */
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
@@ -4208,7 +4208,7 @@ void TimegateWheel(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void NussKnacken(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
@@ -4236,7 +4236,7 @@ void NussKnacken(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void BreakingPearl(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
@@ -4293,7 +4293,7 @@ void CheckExitSP(int x, int y)
   PlaySoundLevelNearest(x, y, SND_SP_EXIT_OPENING);
 }
 
-#if 0
+#if 1
 void AusgangstuerOeffnen(int x, int y)
 {
   int delay = 6;
@@ -4328,7 +4328,7 @@ void AusgangstuerOeffnen(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void OpenSwitchgate(int x, int y)
 {
   int delay = 6;
@@ -4360,7 +4360,7 @@ void OpenSwitchgate(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void CloseSwitchgate(int x, int y)
 {
   int delay = 6;
@@ -4392,7 +4392,7 @@ void CloseSwitchgate(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void OpenTimegate(int x, int y)
 {
   int delay = 6;
@@ -4424,7 +4424,7 @@ void OpenTimegate(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 void CloseTimegate(int x, int y)
 {
   int delay = 6;
@@ -4764,7 +4764,7 @@ static void WarnBuggyBase(int x, int y)
   }
 }
 
-#if 0
+#if 1
 static void CheckBuggyBase(int x, int y)
 {
   int element = Feld[x][y];
@@ -4857,7 +4857,7 @@ static void ChangeActiveTrap(int x, int y)
       DrawCrumbledSand(SCREENX(x), SCREENY(y));
 }
 
-#if 0
+#if 1
 static void CheckTrap(int x, int y)
 {
   int element = Feld[x][y];
@@ -4906,7 +4906,7 @@ static void CheckTrap(int x, int y)
 }
 #endif
 
-#if 0
+#if 1
 static void DrawBeltAnimation(int x, int y, int element)
 {
   int belt_nr = getBeltNrFromBeltActiveElement(element);
@@ -5342,9 +5342,21 @@ void GameActions()
 	     element == EL_SP_BUGGY_BASE_ACTIVATING ||
 	     element == EL_SP_BUGGY_BASE_ACTIVE)
       CheckBuggyBase(x, y);
+#endif
+#if 0
     else if (element == EL_TRAP ||
 	     element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
+#endif
+#if 0
+    else if (element == EL_TRAP)
+      CheckTrap(x, y);
+#endif
+#if 0
+    else if (element == EL_TRAP_ACTIVE)
+      CheckTrap(x, y);
+#endif
+#if 0
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
     else if (element == EL_SWITCHGATE_OPENING)
