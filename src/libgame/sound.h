@@ -82,15 +82,18 @@
 #endif
 
 #if defined(TARGET_SDL)
-#define NUM_MIXER_CHANNELS			MIX_CHANNELS
+#define NUM_MIXER_CHANNELS		MIX_CHANNELS
 #else
-#define NUM_MIXER_CHANNELS			8
+#define NUM_MIXER_CHANNELS		8
 #endif
 
+#define MUSIC_CHANNEL			0
+#define FIRST_SOUND_CHANNEL		1
+
 #if !defined(PLATFORM_HPUX)
-#define SND_BLOCKSIZE 4096
+#define SND_BLOCKSIZE			4096
 #else
-#define SND_BLOCKSIZE 32768
+#define SND_BLOCKSIZE			32768
 #endif
 
 /* some values for PlaySound(), StopSound() and friends */
@@ -119,6 +122,7 @@
 
 #endif
 
+#if 0
 #define PSND_NO_LOOP		0
 #define PSND_LOOP		1
 #define PSND_MUSIC		2
@@ -140,6 +144,7 @@
 
 #define SND_RELOAD_SOUNDS	1
 #define SND_RELOAD_MUSIC	2
+#endif
 
 #define SND_TYPE_NONE		0
 #define SND_TYPE_WAV		1
@@ -217,13 +222,46 @@ struct SampleInfo
 typedef struct SampleInfo	SoundInfo;
 typedef struct SampleInfo	MusicInfo;
 
+#define SND_CTRL_NONE		(0)
+#define SND_CTRL_MUSIC		(1 << 0)
+#define SND_CTRL_LOOP		(1 << 1)
+#define SND_CTRL_FADE		(1 << 2)
+#define SND_CTRL_STOP		(1 << 3)
+#define SND_CTRL_ALL_SOUNDS	(1 << 4)
+#define SND_CTRL_RELOAD_SOUNDS	(1 << 5)
+#define SND_CTRL_RELOAD_MUSIC	(1 << 6)
+
+#define SND_CTRL_PLAY_SOUND	(SND_CTRL_NONE)
+#define SND_CTRL_PLAY_LOOP	(SND_CTRL_LOOP)
+#define SND_CTRL_PLAY_MUSIC	(SND_CTRL_LOOP | SND_CTRL_MUSIC)
+
+#define SND_CTRL_FADE_SOUND	(SND_CTRL_FADE)
+#define SND_CTRL_FADE_MUSIC	(SND_CTRL_FADE | SND_CTRL_MUSIC)
+#define SND_CTRL_FADE_ALL	(SND_CTRL_FADE | SND_CTRL_ALL_SOUNDS)
+
+#define SND_CTRL_STOP_SOUND	(SND_CTRL_STOP)
+#define SND_CTRL_STOP_MUSIC	(SND_CTRL_STOP | SND_CTRL_MUSIC)
+#define SND_CTRL_STOP_ALL	(SND_CTRL_STOP | SND_CTRL_ALL_SOUNDS)
+
+#define IS_MUSIC(x)		((x).state & SND_CTRL_MUSIC)
+#define IS_LOOP(x)		((x).state & SND_CTRL_LOOP)
+#define IS_FADING(x)		((x).state & SND_CTRL_FADE)
+#define IS_STOPPING(x)		((x).state & SND_CTRL_STOP)
+#define IS_RELOADING(x)		((x).state & (SND_CTRL_RELOAD_SOUNDS | \
+					      SND_CTRL_RELOAD_MUSIC))
+#define ALL_SOUNDS(x)		((x).state & SND_CTRL_ALL_SOUNDS)
+
 struct SoundControl
 {
+  boolean active;
+
   int nr;
   int volume;
   int stereo;
 
-  boolean active;
+#if 1
+  int state;
+#else
   boolean loop;
   boolean music;
   boolean fade_sound;
@@ -231,6 +269,7 @@ struct SoundControl
   boolean stop_all_sounds;
   boolean reload_sounds;
   boolean reload_music;
+#endif
 
   int playingtime;
   long playingpos;
@@ -259,7 +298,7 @@ void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);
 void PlaySoundMusic(int);
-void PlaySoundExt(int, int, int, boolean);
+void PlaySoundExt(int, int, int, int);
 void FadeMusic(void);
 void FadeSound(int);
 void FadeSounds(void);

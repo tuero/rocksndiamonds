@@ -58,7 +58,11 @@ static int playing_sounds = 0;
 static struct SoundControl playlist[NUM_MIXER_CHANNELS];
 static struct SoundControl emptySoundControl =
 {
+#if 1
+  FALSE, -1, 0, 0, FALSE, 0, 0, 0, NULL
+#else
   -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE, 0,0, 0,NULL
+#endif
 };
 
 #if defined(PLATFORM_UNIX)
@@ -94,21 +98,30 @@ static void FreeSound(void *);
 #if defined(PLATFORM_UNIX)
 static int OpenAudioDevice(char *audio_device_name)
 {
-  int audio_fd;
+  int audio_device_fd;
 
   /* check if desired audio device is accessible */
   if (access(audio_device_name, W_OK) != 0)
     return -1;
 
   /* try to open audio device in non-blocking mode */
-  if ((audio_fd = open(audio_device_name, O_WRONLY | O_NONBLOCK)) < 0)
-    return audio_fd;
+  if ((audio_device_fd = open(audio_device_name, O_WRONLY | O_NONBLOCK)) < 0)
+    return audio_device_fd;
 
   /* re-open audio device in blocking mode */
-  close(audio_fd);
-  audio_fd = open(audio_device_name, O_WRONLY);
+  close(audio_device_fd);
+  audio_device_fd = open(audio_device_name, O_WRONLY);
 
-  return audio_fd;
+  return audio_device_fd;
+}
+
+static void CloseAudioDevice(int *audio_device_fd)
+{
+  if (*audio_device_fd == 0)
+    return;
+
+  close(*audio_device_fd);
+  *audio_device_fd = -1;
 }
 
 static boolean TestAudioDevices(void)
@@ -118,21 +131,21 @@ static boolean TestAudioDevices(void)
     DEVICENAME_DSP,
     DEVICENAME_AUDIO
   };
-  int audio_fd = -1;
+  int audio_device_fd = -1;
   int i;
 
   /* look for available audio devices, starting with preferred ones */
   for (i=0; i<sizeof(audio_device_name)/sizeof(char *); i++)
-    if ((audio_fd = OpenAudioDevice(audio_device_name[i])) >= 0)
+    if ((audio_device_fd = OpenAudioDevice(audio_device_name[i])) >= 0)
       break;
 
-  if (audio_fd < 0)
+  if (audio_device_fd < 0)
   {
     Error(ERR_WARN, "cannot open audio device -- no sound");
     return FALSE;
   }
 
-  close(audio_fd);
+  close(audio_device_fd);
 
   audio.device_name = audio_device_name[i];
 
@@ -201,57 +214,158 @@ void InitPlaylist(void)
   playing_sounds = 0;
 }
 
-#if 0
+#if 1
+static void PlaylistRemoveSound(int pos)
+{
+  if (!playing_sounds || !playlist[pos].active)
+    return;
+
+  playlist[pos] = emptySoundControl;
+  playing_sounds--;
+
+  if (!playing_sounds)
+    CloseAudioDevice(&audio.device_fd);
+}
+
+static void WriteReloadInfoToPipe(char *set_name, int type)
+{
+  struct SoundControl snd_ctrl = emptySoundControl;
+  TreeInfo *ti = (type == SND_CTRL_RELOAD_SOUNDS ? artwork.snd_current :
+		  artwork.mus_current);
+  unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
+  unsigned long str_size2 = strlen(ti->basepath) + 1;
+  unsigned long str_size3 = strlen(ti->fullpath) + 1;
+
+  snd_ctrl.state = type;
+  snd_ctrl.data_len = strlen(set_name) + 1;
+
+  if (write(audio.soundserver_pipe[1], &snd_ctrl,
+	    sizeof(snd_ctrl)) < 0 ||
+      write(audio.soundserver_pipe[1], set_name,
+	    snd_ctrl.data_len) < 0 ||
+      write(audio.soundserver_pipe[1], leveldir_current,
+	    sizeof(TreeInfo)) < 0 ||
+      write(audio.soundserver_pipe[1], ti,
+	    sizeof(TreeInfo)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size1,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size2,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], &str_size3,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.soundserver_pipe[1], leveldir_current->fullpath,
+	    str_size1) < 0 ||
+      write(audio.soundserver_pipe[1], ti->basepath,
+	    str_size2) < 0 ||
+      write(audio.soundserver_pipe[1], ti->fullpath,
+	    str_size3) < 0)
+  {
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
+    audio.sound_available = audio.sound_enabled = FALSE;
+    return;
+  }
+}
+
+static void ReadReloadInfoFromPipe(struct SoundControl snd_ctrl)
+{
+  TreeInfo **ti_ptr = ((snd_ctrl.state & SND_CTRL_RELOAD_SOUNDS) ?
+		       &artwork.snd_current : &artwork.mus_current);
+  TreeInfo *ti = *ti_ptr;
+  unsigned long str_size1, str_size2, str_size3;
+  static char *set_name = NULL;
+
+  if (set_name)
+    free(set_name);
+
+  set_name = checked_malloc(snd_ctrl.data_len);
+
+  if (leveldir_current == NULL)
+    leveldir_current = checked_calloc(sizeof(TreeInfo));
+  if (ti == NULL)
+    ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
+  if (leveldir_current->fullpath != NULL)
+    free(leveldir_current->fullpath);
+  if (ti->basepath != NULL)
+    free(ti->basepath);
+  if (ti->fullpath != NULL)
+    free(ti->fullpath);
+
+  if (read(audio.soundserver_pipe[0], set_name,
+	   snd_ctrl.data_len) != snd_ctrl.data_len ||
+      read(audio.soundserver_pipe[0], leveldir_current,
+	   sizeof(TreeInfo)) != sizeof(TreeInfo) ||
+      read(audio.soundserver_pipe[0], ti,
+	   sizeof(TreeInfo)) != sizeof(TreeInfo) ||
+      read(audio.soundserver_pipe[0], &str_size1,
+	   sizeof(unsigned long)) != sizeof(unsigned long) ||
+      read(audio.soundserver_pipe[0], &str_size2,
+	   sizeof(unsigned long)) != sizeof(unsigned long) ||
+      read(audio.soundserver_pipe[0], &str_size3,
+	   sizeof(unsigned long)) != sizeof(unsigned long))
+    Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+
+  leveldir_current->fullpath = checked_calloc(str_size1);
+  ti->basepath = checked_calloc(str_size2);
+  ti->fullpath = checked_calloc(str_size3);
+
+  if (read(audio.soundserver_pipe[0], leveldir_current->fullpath,
+	   str_size1) != str_size1 ||
+      read(audio.soundserver_pipe[0], ti->basepath,
+	   str_size2) != str_size2 ||
+      read(audio.soundserver_pipe[0], ti->fullpath,
+	   str_size3) != str_size3)
+    Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
+
+  if (snd_ctrl.state & SND_CTRL_RELOAD_SOUNDS)
+    artwork.sounds_set_current = set_name;
+  else
+    artwork.music_set_current = set_name;
+}
+
 static void HandleSoundRequest(struct SoundControl snd_ctrl)
 {
   int i;
 
-  if (snd_ctrl.fade_sound)
+  if (IS_RELOADING(snd_ctrl))
   {
-    if (!playing_sounds)
-      continue;
+    ReadReloadInfoFromPipe(snd_ctrl);
+    InitPlaylist();
+    CloseAudioDevice(&audio.device_fd);
 
-    if (snd_ctrl.music)
-      playlist[audio.music_channel].fade_sound = TRUE;
+    if (snd_ctrl.state & SND_CTRL_RELOAD_SOUNDS)
+      ReloadCustomSounds();
     else
-      for(i=0; i<NUM_MIXER_CHANNELS; i++)
-	if (snd_ctrl.stop_all_sounds ||
-	    (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr))
-	  playlist[i].fade_sound = TRUE;
+      ReloadCustomMusic();
   }
-  else if (snd_ctrl.stop_all_sounds)
+  else if (IS_FADING(snd_ctrl))
   {
     if (!playing_sounds)
-      continue;
+      return;
 
-    for(i=0; i<NUM_MIXER_CHANNELS; i++)
-      playlist[i] = emptySoundControl;
-    playing_sounds = 0;
+    if (IS_MUSIC(snd_ctrl))
+    {
+      playlist[MUSIC_CHANNEL].state |= SND_CTRL_FADE;
+      return;
+    }
 
-    close(audio.device_fd);
+    for(i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
+      if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+	playlist[i].state |= SND_CTRL_FADE;
   }
-  else if (snd_ctrl.stop_sound)
+  else if (IS_STOPPING(snd_ctrl))
   {
     if (!playing_sounds)
-      continue;
+      return;
 
-    if (snd_ctrl.music)
+    if (IS_MUSIC(snd_ctrl))
     {
-      playlist[audio.music_channel] = emptySoundControl;
-      playing_sounds--;
+      PlaylistRemoveSound(MUSIC_CHANNEL);
+      return;
     }
 
-    for(i=0; i<NUM_MIXER_CHANNELS; i++)
-    {
-      if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
-      {
-	playlist[i] = emptySoundControl;
-	playing_sounds--;
-      }
-    }
-
-    if (!playing_sounds)
-      close(audio.device_fd);
+    for(i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
+      if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+	PlaylistRemoveSound(i);
   }
 }
 #endif
@@ -301,128 +415,12 @@ void SoundServer(void)
 	!= sizeof(snd_ctrl))
       Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
-    if (snd_ctrl.reload_sounds || snd_ctrl.reload_music)
-    {
-      char *set_name = checked_malloc(snd_ctrl.data_len);
-      TreeInfo **ti_ptr =
-	(snd_ctrl.reload_sounds ? &artwork.snd_current : &artwork.mus_current);
-      TreeInfo *ti = *ti_ptr;
-      unsigned long str_size1, str_size2, str_size3;
+    HandleSoundRequest(snd_ctrl);
 
-      if (leveldir_current == NULL)
-	leveldir_current = checked_calloc(sizeof(TreeInfo));
-      if (ti == NULL)
-	ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
-      if (leveldir_current->fullpath != NULL)
-	free(leveldir_current->fullpath);
-      if (ti->basepath != NULL)
-	free(ti->basepath);
-      if (ti->fullpath != NULL)
-	free(ti->fullpath);
-
-      if (read(audio.soundserver_pipe[0], set_name,
-	       snd_ctrl.data_len) != snd_ctrl.data_len ||
-	  read(audio.soundserver_pipe[0], leveldir_current,
-	       sizeof(TreeInfo)) != sizeof(TreeInfo) ||
-	  read(audio.soundserver_pipe[0], ti,
-	       sizeof(TreeInfo)) != sizeof(TreeInfo) ||
-	  read(audio.soundserver_pipe[0], &str_size1,
-	       sizeof(unsigned long)) != sizeof(unsigned long) ||
-	  read(audio.soundserver_pipe[0], &str_size2,
-	       sizeof(unsigned long)) != sizeof(unsigned long) ||
-	  read(audio.soundserver_pipe[0], &str_size3,
-	       sizeof(unsigned long)) != sizeof(unsigned long))
-	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
-
-      leveldir_current->fullpath = checked_calloc(str_size1);
-      ti->basepath = checked_calloc(str_size2);
-      ti->fullpath = checked_calloc(str_size3);
-
-      if (read(audio.soundserver_pipe[0], leveldir_current->fullpath,
-	       str_size1) != str_size1 ||
-	  read(audio.soundserver_pipe[0], ti->basepath,
-	       str_size2) != str_size2 ||
-	  read(audio.soundserver_pipe[0], ti->fullpath,
-	       str_size3) != str_size3)
-	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
-
-      InitPlaylist();
-
-      close(audio.device_fd);
-
-      if (snd_ctrl.reload_sounds)
-      {
-	artwork.sounds_set_current = set_name;
-	ReloadCustomSounds();
-      }
-      else
-      {
-	artwork.music_set_current = set_name;
-	ReloadCustomMusic();
-      }
-
-      free(set_name);
-
+    if (IS_RELOADING(snd_ctrl))
       continue;
-    }
 
 #if defined(AUDIO_STREAMING_DSP)
-
-#if 0
-    HandleSoundRequest(snd_ctrl);
-#else
-
-    if (snd_ctrl.fade_sound)
-    {
-      if (!playing_sounds)
-	continue;
-
-      if (snd_ctrl.music)
-	playlist[audio.music_channel].fade_sound = TRUE;
-      else
-	for(i=0; i<NUM_MIXER_CHANNELS; i++)
-	  if (snd_ctrl.stop_all_sounds ||
-	      (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr))
-	    playlist[i].fade_sound = TRUE;
-    }
-    else if (snd_ctrl.stop_all_sounds)
-    {
-      if (!playing_sounds)
-	continue;
-
-      for(i=0; i<NUM_MIXER_CHANNELS; i++)
-	playlist[i] = emptySoundControl;
-      playing_sounds = 0;
-
-      close(audio.device_fd);
-    }
-    else if (snd_ctrl.stop_sound)
-    {
-      if (!playing_sounds)
-	continue;
-
-      if (snd_ctrl.music)
-      {
-	if (playlist[audio.music_channel].active)
-	{
-	  playlist[audio.music_channel] = emptySoundControl;
-	  playing_sounds--;
-	}
-      }
-
-      for(i=0; i<NUM_MIXER_CHANNELS; i++)
-      {
-	if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
-	{
-	  playlist[i] = emptySoundControl;
-	  playing_sounds--;
-	}
-      }
-
-      if (!playing_sounds)
-	close(audio.device_fd);
-    }
-#endif
 
     if (playing_sounds || snd_ctrl.active)
     {
@@ -483,7 +481,7 @@ void SoundServer(void)
 		  ((short *)sample_ptr)[sample_pos + j];
 
 	    /* are we about to restart a looping sound? */
-	    if (playlist[i].loop && sample_size < max_sample_size)
+	    if (IS_LOOP(playlist[i]) && sample_size < max_sample_size)
 	    {
 	      while (sample_size < max_sample_size)
 	      {
@@ -505,7 +503,7 @@ void SoundServer(void)
 	    }
 
 	    /* decrease volume if sound is fading out */
-	    if (playlist[i].fade_sound &&
+	    if (IS_FADING(playlist[i]) &&
 		playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
 	      playlist[i].volume -= SOUND_FADING_VOLUME_STEP;
 
@@ -545,7 +543,7 @@ void SoundServer(void)
 	    /* delete completed sound entries from the playlist */
 	    if (playlist[i].playingpos >= playlist[i].data_len)
 	    {
-	      if (playlist[i].loop)
+	      if (IS_LOOP(playlist[i]))
 		playlist[i].playingpos = 0;
 	      else
 	      {
@@ -600,7 +598,7 @@ void SoundServer(void)
 
 #else /* !AUDIO_STREAMING_DSP */
 
-    if (snd_ctrl.active && !snd_ctrl.loop)
+    if (snd_ctrl.active && !IS_LOOP(snd_ctrl))
     {
       struct timeval delay = { 0, 0 };
       byte *sample_ptr;
@@ -675,7 +673,7 @@ static void sound_handler(struct SoundControl snd_ctrl)
 	playlist[i].fade_sound = TRUE;
 	if (voice_check(playlist[i].voice))
 	  voice_ramp_volume(playlist[i].voice, 1000, 0);
-	playlist[i].loop = PSND_NO_LOOP;
+	playlist[i].state &= ~SND_CTRL_IS_LOOP;
       }
   }
   else if (snd_ctrl.stop_all_sounds)
@@ -715,55 +713,7 @@ static void sound_handler(struct SoundControl snd_ctrl)
 #if defined(TARGET_SDL)
 static void sound_handler_SDL(struct SoundControl snd_ctrl)
 {
-  int i;
-
-  if (snd_ctrl.fade_sound)
-  {
-    if (!playing_sounds)
-      return;
-
-    for (i=0; i<NUM_MIXER_CHANNELS; i++)
-      if ((snd_ctrl.stop_all_sounds ||
-	   (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr) ||
-	   (i == audio.music_channel && snd_ctrl.music)) &&
-	  !playlist[i].fade_sound)
-      {
-	playlist[i].fade_sound = TRUE;
-	if (voice_check(playlist[i].voice))
-	  voice_ramp_volume(playlist[i].voice, 1000, 0);
-	playlist[i].loop = PSND_NO_LOOP;
-      }
-  }
-  else if (snd_ctrl.stop_all_sounds)
-  {
-    if (!playing_sounds)
-      return;
-    SoundServer_StopAllSounds();
-  }
-  else if (snd_ctrl.stop_sound)
-  {
-    if (!playing_sounds)
-      return;
-    SoundServer_StopSound(snd_ctrl);
-  }
-
-  for (i=0; i<NUM_MIXER_CHANNELS; i++)
-  {
-    if (!playlist[i].active || playlist[i].loop)
-      continue;
-
-    playlist[i].playingpos = voice_get_position(playlist[i].voice);
-    playlist[i].volume = voice_get_volume(playlist[i].voice);
-    if (playlist[i].playingpos == -1 || !playlist[i].volume)
-    {
-      deallocate_voice(playlist[i].voice);
-      playlist[i] = emptySoundControl;
-      playing_sounds--;
-    }
-  }
-
-  if (snd_ctrl.active)
-    SoundServer_InsertNewSound(snd_ctrl);
+  /* copy sound_handler() here ... */
 }
 #endif /* TARGET_SDL */
 #endif
@@ -774,12 +724,16 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   SoundInfo *snd_info;
   int i, k;
 
-  if (snd_ctrl.music)
+#if 0
+  printf("NEW SOUND %d HAS ARRIVED [%d]\n", snd_ctrl.nr, num_sounds);
+#endif
+
+  if (IS_MUSIC(snd_ctrl))
     snd_ctrl.nr = snd_ctrl.nr % num_music;
   else if (snd_ctrl.nr >= num_sounds)
     return;
 
-  snd_info = (snd_ctrl.music ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
+  snd_info = (IS_MUSIC(snd_ctrl) ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
   if (snd_info == NULL)
   {
 #if 0
@@ -813,7 +767,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   {
     int longest = 0, longest_nr = 0;
 
-    for (i=0; i<NUM_MIXER_CHANNELS; i++)
+    for (i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
     {
 #if !defined(PLATFORM_MSDOS)
       int actual = 100 * playlist[i].playingpos / playlist[i].data_len;
@@ -821,7 +775,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       int actual = playlist[i].playingpos;
 #endif
 
-      if (i != audio.music_channel && !playlist[i].loop && actual > longest)
+      if (!IS_LOOP(playlist[i]) && actual > longest)
       {
 	longest = actual;
 	longest_nr = i;
@@ -836,22 +790,21 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   }
 
   /* check if sound is already being played (and how often) */
-  for (k=0,i=0; i<NUM_MIXER_CHANNELS; i++)
-    if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
+  for (k=0, i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
+    if (playlist[i].nr == snd_ctrl.nr)
       k++;
 
   /* restart loop sounds only if they are just fading out */
-  if (k >= 1 && snd_ctrl.loop)
+  if (k >= 1 && IS_LOOP(snd_ctrl))
   {
-    for(i=0; i<NUM_MIXER_CHANNELS; i++)
+    for(i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
     {
-      if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr &&
-	  playlist[i].fade_sound)
+      if (playlist[i].nr == snd_ctrl.nr && IS_FADING(playlist[i]))
       {
-	playlist[i].fade_sound = FALSE;
+	playlist[i].state &= ~SND_CTRL_FADE;
 	playlist[i].volume = PSND_MAX_VOLUME;
 #if defined(PLATFORM_MSDOS)
-        playlist[i].loop = PSND_LOOP;
+        playlist[i].state |= SND_CTRL_LOOP;
         voice_stop_volumeramp(playlist[i].voice);
         voice_ramp_volume(playlist[i].voice, playlist[i].volume, 1000);
 #endif
@@ -867,13 +820,11 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     int longest = 0, longest_nr = 0;
 
     /* look for oldest equal sound */
-    for(i=0; i<NUM_MIXER_CHANNELS; i++)
+    for(i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
     {
       int actual;
 
-      if (!playlist[i].active ||
-	  i == audio.music_channel ||
-	  playlist[i].nr != snd_ctrl.nr)
+      if (!playlist[i].active || playlist[i].nr != snd_ctrl.nr)
 	continue;
 
 #if !defined(PLATFORM_MSDOS)
@@ -899,8 +850,16 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   /* add new sound to playlist */
   for(i=0; i<NUM_MIXER_CHANNELS; i++)
   {
+#if 0
+    printf("CHECKING CHANNEL %d FOR SOUND %d ...\n", i, snd_ctrl.nr);
+#endif
+
+    /*
     if (!playlist[i].active ||
-	(snd_ctrl.music && i == audio.music_channel))
+	(IS_MUSIC(snd_ctrl) && i == MUSIC_CHANNEL))
+    */
+    if ((i == MUSIC_CHANNEL && IS_MUSIC(snd_ctrl)) ||
+	(i != MUSIC_CHANNEL && !playlist[i].active))
     {
       snd_ctrl.data_ptr = snd_info->data_ptr;
       snd_ctrl.data_len = snd_info->data_len;
@@ -914,7 +873,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 #endif
 
 #if 1
-      if (snd_ctrl.music && i == audio.music_channel && playlist[i].active)
+      if (IS_MUSIC(snd_ctrl) && i == MUSIC_CHANNEL && playlist[i].active)
       {
 	printf("THIS SHOULD NEVER HAPPEN! [adding music twice]\n");
 
@@ -927,6 +886,10 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 
       playlist[i] = snd_ctrl;
       playing_sounds++;
+
+#if 0
+      printf("NEW SOUND %d ADDED TO PLAYLIST\n", snd_ctrl.nr);
+#endif
 
 #if defined(PLATFORM_MSDOS)
       playlist[i].voice = allocate_voice((SAMPLE *)playlist[i].data_ptr);
@@ -1605,25 +1568,25 @@ void PlayMusic(int nr)
 
 void PlaySound(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, PSND_NO_LOOP);
+  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundStereo(int nr, int stereo)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, stereo, PSND_NO_LOOP);
+  PlaySoundExt(nr, PSND_MAX_VOLUME, stereo, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundLoop(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, PSND_LOOP);
+  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_LOOP);
 }
 
 void PlaySoundMusic(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, PSND_MUSIC);
+  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_MUSIC);
 }
 
-void PlaySoundExt(int nr, int volume, int stereo, boolean loop_type)
+void PlaySoundExt(int nr, int volume, int stereo, int state)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
@@ -1642,24 +1605,17 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop_type)
   else if (stereo > PSND_MAX_RIGHT)
     stereo = PSND_MAX_RIGHT;
 
-  snd_ctrl.nr		= nr;
-  snd_ctrl.volume	= volume;
-  snd_ctrl.stereo	= stereo;
-  snd_ctrl.loop		= (loop_type != PSND_NO_LOOP);
-  snd_ctrl.music	= (loop_type == PSND_MUSIC);
-  snd_ctrl.active	= TRUE;
-
-#if 0
-  /* now only used internally in sound server child process */
-  snd_ctrl.data_ptr	= Sound[nr].data_ptr;
-  snd_ctrl.data_len	= Sound[nr].data_len;
-#endif
+  snd_ctrl.active = TRUE;
+  snd_ctrl.nr     = nr;
+  snd_ctrl.volume = volume;
+  snd_ctrl.stereo = stereo;
+  snd_ctrl.state  = state;
 
 #if defined(TARGET_SDL)
   if (Sound[nr])
   {
     Mix_Volume(-1, SOUND_MAX_VOLUME);
-    Mix_PlayChannel(-1, Sound[nr]->data_ptr, (loop_type ? -1 : 0));
+    Mix_PlayChannel(-1, Sound[nr]->data_ptr, (state & SND_CTRL_LOOP ? -1 : 0));
   }
 #elif defined(PLATFORM_UNIX)
   if (audio.soundserver_pid == 0)	/* we are child process */
@@ -1685,19 +1641,19 @@ void FadeMusic(void)
   Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
   Mix_FadeOutChannel(audio.music_channel, SOUND_FADING_INTERVAL);
 #else
-  StopSoundExt(-1, SSND_FADE_MUSIC);
+  StopSoundExt(-1, SND_CTRL_FADE_MUSIC);
 #endif
 }
 
 void FadeSound(int nr)
 {
-  StopSoundExt(nr, SSND_FADE_SOUND);
+  StopSoundExt(nr, SND_CTRL_FADE_SOUND);
 }
 
 void FadeSounds()
 {
   FadeMusic();
-  StopSoundExt(-1, SSND_FADE_ALL);
+  StopSoundExt(-1, SND_CTRL_FADE_ALL);
 }
 
 void StopMusic(void)
@@ -1709,51 +1665,41 @@ void StopMusic(void)
   Mix_HaltMusic();
   Mix_HaltChannel(audio.music_channel);
 #else
-  StopSoundExt(-1, SSND_STOP_MUSIC);
+  StopSoundExt(-1, SND_CTRL_STOP_MUSIC);
 #endif
 }
 
 void StopSound(int nr)
 {
-  StopSoundExt(nr, SSND_STOP_SOUND);
+  StopSoundExt(nr, SND_CTRL_STOP_SOUND);
 }
 
 void StopSounds()
 {
-  StopSoundExt(-1, SSND_STOP_ALL);
+  StopMusic();
+  StopSoundExt(-1, SND_CTRL_STOP_ALL);
 }
 
-void StopSoundExt(int nr, int method)
+void StopSoundExt(int nr, int state)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
   if (!audio.sound_available)
     return;
 
-  if (method & SSND_FADING)
-    snd_ctrl.fade_sound = TRUE;
-
-  if (method & SSND_ALL)
-    snd_ctrl.stop_all_sounds = TRUE;
-  else
-  {
-    snd_ctrl.stop_sound = TRUE;
-    snd_ctrl.nr = nr;
-  }
-
-  if (method & SSND_MUSIC)
-    snd_ctrl.music = TRUE;
+  snd_ctrl.nr    = nr;
+  snd_ctrl.state = state;
 
 #if defined(TARGET_SDL)
 
-  if (method & SSND_FADING)
+  if (state & SND_CTRL_FADE)
   {
     int i;
 
     for (i=0; i<audio.channels; i++)
       if (i != audio.music_channel || snd_ctrl.music)
 	Mix_FadeOutChannel(i, SOUND_FADING_INTERVAL);
-    if (snd_ctrl.music)
+    if (state & SND_CTRL_MUSIC)
       Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
   }
   else
@@ -1763,7 +1709,7 @@ void StopSoundExt(int nr, int method)
     for (i=0; i<audio.channels; i++)
       if (i != audio.music_channel || snd_ctrl.music)
 	Mix_HaltChannel(i);
-    if (snd_ctrl.music)
+    if (state & SND_CTRL_MUSIC)
       Mix_HaltMusic();
   }
 
@@ -1902,6 +1848,10 @@ static void ReloadCustomSounds()
 
   LoadSoundsInfo();
 
+#if 0
+  printf("DEBUG: reloading %d sounds ...\n", num_sounds);
+#endif
+
   for(i=0; i<num_sounds; i++)
   {
     if (sound_effect[i].filename)
@@ -1932,20 +1882,22 @@ static void ReloadCustomMusic()
 
 static void InitReloadSoundsOrMusic(char *set_name, int type)
 {
+#if 0
 #if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
   struct SoundControl snd_ctrl = emptySoundControl;
-  TreeInfo *ti =
-    (type == SND_RELOAD_SOUNDS ? artwork.snd_current : artwork.mus_current);
+  TreeInfo *ti = (state == SND_CTRL_RELOAD_SOUNDS ? artwork.snd_current :
+		  artwork.mus_current);
   unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
   unsigned long str_size2 = strlen(ti->basepath) + 1;
   unsigned long str_size3 = strlen(ti->fullpath) + 1;
+#endif
 #endif
 
   if (!audio.sound_available)
     return;
 
 #if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
-  if (type == SND_RELOAD_SOUNDS)
+  if (type == SND_CTRL_RELOAD_SOUNDS)
     ReloadCustomSounds();
   else
     ReloadCustomMusic();
@@ -1956,8 +1908,11 @@ static void InitReloadSoundsOrMusic(char *set_name, int type)
   if (leveldir_current == NULL)		/* should never happen */
     Error(ERR_EXIT, "leveldir_current == NULL");
 
-  snd_ctrl.reload_sounds = (type == SND_RELOAD_SOUNDS);
-  snd_ctrl.reload_music  = (type == SND_RELOAD_MUSIC);
+#if 1
+  WriteReloadInfoToPipe(set_name, type);
+#else
+
+  snd_ctrl.state = type;
   snd_ctrl.data_len = strlen(set_name) + 1;
 
   if (write(audio.soundserver_pipe[1], &snd_ctrl,
@@ -1986,16 +1941,18 @@ static void InitReloadSoundsOrMusic(char *set_name, int type)
     return;
   }
 #endif
+
+#endif
 }
 
 void InitReloadSounds(char *set_name)
 {
-  InitReloadSoundsOrMusic(set_name, SND_RELOAD_SOUNDS);
+  InitReloadSoundsOrMusic(set_name, SND_CTRL_RELOAD_SOUNDS);
 }
 
 void InitReloadMusic(char *set_name)
 {
-  InitReloadSoundsOrMusic(set_name, SND_RELOAD_MUSIC);
+  InitReloadSoundsOrMusic(set_name, SND_CTRL_RELOAD_MUSIC);
 }
 
 void FreeSound(void *ptr)

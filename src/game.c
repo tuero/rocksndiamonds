@@ -1003,7 +1003,7 @@ void GameWon()
   {
     if (!tape.playing && setup.sound_loops)
       PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
-		   PSND_LOOP);
+		   SND_CTRL_PLAY_LOOP);
 
     while (TimeLeft > 0)
     {
@@ -1029,7 +1029,7 @@ void GameWon()
   {
     if (!tape.playing && setup.sound_loops)
       PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
-		   PSND_LOOP);
+		   SND_CTRL_PLAY_LOOP);
 
     while (TimePlayed < 999)
     {
@@ -6460,7 +6460,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
     volume -= volume * (dx > dy ? dx : dy) / silence_distance;
   }
 
-  PlaySoundExt(sound_nr, volume, stereo, PSND_NO_LOOP);
+  PlaySoundExt(sound_nr, volume, stereo, SND_CTRL_PLAY_SOUND);
 }
 
 void RaiseScore(int value)

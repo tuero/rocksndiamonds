@@ -745,7 +745,7 @@ inline void OpenAudio(void)
   audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
   audio.soundserver_pid = -1;
   audio.device_name = NULL;
-  audio.device_fd = 0;
+  audio.device_fd = -1;
 
   audio.channels = 0;
   audio.music_channel = 0;
