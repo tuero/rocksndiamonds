@@ -83,14 +83,14 @@ BOOL LoadLevelInfo()
 
   if (!(file=fopen(filename,"r")))
   {
-    fprintf(stderr,"%s: cannot load level info '%s'!\n",progname,filename);
+    Error(ERR_RETURN, "cannot load level info '%s'", filename);
     return(FALSE);
   }
 
   fscanf(file,"%s\n",cookie);
   if (strcmp(cookie,LEVELDIR_COOKIE))	/* ungültiges Format? */
   {
-    fprintf(stderr,"%s: wrong format of level info file!\n",progname);
+    Error(ERR_RETURN, "wrong format of level info file");
     fclose(file);
     return(FALSE);
   }
@@ -111,7 +111,7 @@ BOOL LoadLevelInfo()
 
   if (!num_leveldirs)
   {
-    fprintf(stderr,"%s: empty level info '%s'!\n",progname,filename);
+    Error(ERR_RETURN, "empty level info '%s'", filename);
     return(FALSE);
   }
 
@@ -128,10 +128,10 @@ void LoadLevel(int level_nr)
   sprintf(filename,"%s/%s/%d",
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
-  if (!(file=fopen(filename,"r")))
+  if (!(file = fopen(filename,"r")))
   {
 /*
-    fprintf(stderr,"%s: cannot load level '%s'!\n",progname,filename);
+    Error(ERR_RETURN, "cannot load level '%s'", filename);
 */
   }
   else
@@ -141,8 +141,7 @@ void LoadLevel(int level_nr)
 
     if (strcmp(cookie,LEVEL_COOKIE))	/* ungültiges Format? */
     {
-      fprintf(stderr,"%s: wrong format of level file '%s'!\n",
-	      progname,filename);
+      Error(ERR_RETURN, "wrong format of level file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -237,8 +236,7 @@ void LoadLevelTape(int level_nr)
       levelrec_10 = TRUE;
     else if (strcmp(cookie,LEVELREC_COOKIE))	/* unknown tape format */
     {
-      fprintf(stderr,"%s: wrong format of level recording file '%s'!\n",
-	      progname,filename);
+      Error(ERR_RETURN, "wrong format of level recording file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -288,8 +286,7 @@ void LoadLevelTape(int level_nr)
   fclose(file);
 
   if (i != tape.length)
-    fprintf(stderr,"%s: level recording file '%s' corrupted!\n",
-	    progname,filename);
+    Error(ERR_RETURN, "level recording file '%s' corrupted", filename);
 
   tape.length_seconds = GetTapeLength();
 }
@@ -304,18 +301,12 @@ void LoadScore(int level_nr)
   sprintf(filename,"%s/%s/%s",
 	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
 
-  if (!(file=fopen(filename,"r")))
+  if (!(file = fopen(filename,"r")))
   {
     if (!CreateNewScoreFile())
-    {
-      fprintf(stderr,"%s: cannot create score file '%s'!\n",
-	      progname,filename);
-    }
-    else if (!(file=fopen(filename,"r"))) 
-    {
-      fprintf(stderr,"%s: cannot load score for level %d!\n",
-	      progname,level_nr);
-    }
+      Error(ERR_RETURN, "cannot create score file '%s'", filename);
+    else if (!(file = fopen(filename,"r"))) 
+      Error(ERR_RETURN, "cannot load score for level %d", level_nr);
   }
 
   if (file)
@@ -323,7 +314,7 @@ void LoadScore(int level_nr)
     fgets(cookie,SCORE_COOKIE_LEN,file);
     if (strcmp(cookie,SCORE_COOKIE))	/* ungültiges Format? */
     {
-      fprintf(stderr,"%s: wrong format of score file!\n",progname);
+      Error(ERR_RETURN, "wrong format of score file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -379,18 +370,12 @@ void LoadPlayerInfo(int mode)
 
   new_player = default_player;
 
-  if (!(file=fopen(filename,"r")))
+  if (!(file = fopen(filename,"r")))
   {
     if (!CreateNewNamesFile(mode))
-    {
-      fprintf(stderr,"%s: cannot create names file '%s'!\n",
-	      progname,filename);
-    }
-    else if (!(file=fopen(filename,"r"))) 
-    {
-      fprintf(stderr,"%s: cannot load player information '%s'!\n",
-	      progname,filename);
-    }
+      Error(ERR_RETURN, "cannot create names file '%s'", filename);
+    else if (!(file = fopen(filename,"r"))) 
+      Error(ERR_RETURN, "cannot load player information file '%s'", filename);
   }
 
   if (file)
@@ -400,8 +385,7 @@ void LoadPlayerInfo(int mode)
       version_10_file = TRUE;
     else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
     {
-      fprintf(stderr,"%s: wrong format of names file '%s'!\n",
-	      progname,filename);
+      Error(ERR_RETURN, "wrong format of names file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -437,11 +421,9 @@ void LoadPlayerInfo(int mode)
       new_player = default_player;
 
       fclose(file);
-      if (!(file=fopen(filename,"a")))
-      {
-	fprintf(stderr,"%s: cannot append new player to names file '%s'!\n",
-		progname,filename);
-      }
+      if (!(file = fopen(filename,"a")))
+	Error(ERR_RETURN, "cannot append new player to names file '%s'",
+	      filename);
       else
       {
 	for(i=0;i<MAX_NAMELEN;i++)
@@ -495,7 +477,7 @@ void SaveLevel(int level_nr)
 
   if (!(file=fopen(filename,"w")))
   {
-    fprintf(stderr,"%s: cannot save level file '%s'!\n",progname,filename);
+    Error(ERR_RETURN, "cannot save level file '%s'", filename);
     return;
   }
 
@@ -561,8 +543,7 @@ void SaveLevelTape(int level_nr)
 
   if (!(file=fopen(filename,"w")))
   {
-    fprintf(stderr,"%s: cannot save level recording file '%s'!\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot save level recording file '%s'", filename);
     return;
   }
 
@@ -615,8 +596,7 @@ void SaveScore(int level_nr)
 
   if (!(file=fopen(filename,"r+")))
   {
-    fprintf(stderr,"%s: cannot save score for level %d!\n",
-	    progname,level_nr);
+    Error(ERR_RETURN, "cannot save score for level %d", level_nr);
     return;
   }
 
@@ -648,10 +628,9 @@ void SavePlayerInfo(int mode)
   else
     sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
 
-  if (!(file=fopen(filename,"r+")))
+  if (!(file = fopen(filename,"r+")))
   {
-    fprintf(stderr,"%s: cannot save player information '%s'!\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot save player information to file '%s'", filename);
     return;
   }
 
@@ -660,8 +639,7 @@ void SavePlayerInfo(int mode)
     version_10_file = TRUE;
   else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
   {
-    fprintf(stderr,"%s: wrong format of names file '%s'!\n",
-	    progname,filename);
+    Error(ERR_RETURN, "wrong format of names file '%s'", filename);
     fclose(file);
     return;
   }
@@ -731,7 +709,7 @@ void LoadJoystickData()
   fscanf(file,"%s",cookie);
   if (strcmp(cookie,JOYSTICK_COOKIE))	/* ungültiges Format? */
   {
-    fprintf(stderr,"%s: wrong format of joystick file!\n",progname);
+    Error(ERR_RETURN, "wrong format of joystick file '%s'", JOYDAT_FILE);
     fclose(file);
     return;
   }
@@ -765,7 +743,8 @@ void SaveJoystickData()
 
   if (!(file=fopen(JOYDAT_FILE,"w")))
   {
-    fprintf(stderr,"%s: cannot save joystick calibration data!\n",progname);
+    Error(ERR_RETURN, "cannot save joystick calibration data to file '%s'",
+	  JOYDAT_FILE);
     return;
   }
 

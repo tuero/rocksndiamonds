@@ -46,7 +46,7 @@ static int sound_process_id = 0;
 
 static void InitServer(void);
 static void InitLevelAndPlayerInfo(void);
-static void InitDisplay(int, char **);
+static void InitDisplay(void);
 static void InitSound(void);
 static void InitSoundProcess(void);
 static void InitWindow(int, char **);
@@ -68,7 +68,7 @@ void OpenAll(int argc, char *argv[])
   signal(SIGINT, CloseAll);
   signal(SIGTERM, CloseAll);
 
-  InitDisplay(argc, argv);
+  InitDisplay();
   InitWindow(argc, argv);
 
   XMapWindow(display, window);
@@ -93,17 +93,13 @@ void InitLevelAndPlayerInfo()
 
 void InitServer()
 {
-  standalone = FALSE;
+  standalone = FALSE + TRUE;
 
   if (standalone)
     return;
 
   if (!ConnectToServer(server_host, server_port))
-  {
-    fprintf(stderr,"%s: cannot connect to multiplayer server.\n", 
-	    progname);
-    exit(-1);
-  }
+    Error(ERR_EXIT, "cannot connect to multiplayer server");
 
   SendNicknameToServer(local_player->alias_name);
   SendProtocolVersionToServer();
@@ -119,15 +115,15 @@ void InitSound()
 #ifndef MSDOS
   if (access(sound_device_name,W_OK)<0)
   {
-    fprintf(stderr,"%s: cannot access sound device - no sounds\n",progname);
-    sound_status=SOUND_OFF;
+    Error(ERR_RETURN, "cannot access sound device - no sounds");
+    sound_status = SOUND_OFF;
     return;
   }
 
   if ((sound_device=open(sound_device_name,O_WRONLY))<0)
   {
-    fprintf(stderr,"%s: cannot open sound device - no sounds\n",progname);
-    sound_status=SOUND_OFF;
+    Error(ERR_RETURN, "cannot open sound device - no sounds");
+    sound_status = SOUND_OFF;
     return;
   }
 
@@ -165,14 +161,14 @@ void InitSoundProcess()
 #ifndef MSDOS
   if (pipe(sound_pipe)<0)
   {
-    fprintf(stderr,"%s: cannot create pipe - no sounds\n",progname);
+    Error(ERR_RETURN, "cannot create pipe - no sounds");
     sound_status=SOUND_OFF;
     return;
   }
 
   if ((sound_process_id=fork())<0)
   {       
-    fprintf(stderr,"%s: cannot create child process - no sounds\n",progname);
+    Error(ERR_RETURN, "cannot create child process - no sounds");
     sound_status=SOUND_OFF;
     return;
   }
@@ -194,16 +190,16 @@ void InitJoystick()
 #ifndef MSDOS
   if (access(joystick_device_name[joystick_nr],R_OK)<0)
   {
-    fprintf(stderr,"%s: cannot access joystick device '%s'\n",
-	    progname,joystick_device_name[joystick_nr]);
+    Error(ERR_RETURN, "cannot access joystick device '%s'",
+	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
 
   if ((joystick_device=open(joystick_device_name[joystick_nr],O_RDONLY))<0)
   {
-    fprintf(stderr,"%s: cannot open joystick device '%s'\n",
-	    progname,joystick_device_name[joystick_nr]);
+    Error(ERR_RETURN, "cannot open joystick device '%s'",
+	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
@@ -215,37 +211,16 @@ void InitJoystick()
 #endif
 }
 
-void InitDisplay(int argc, char *argv[])
+void InitDisplay()
 {
-  char *display_name = NULL;
   XVisualInfo vinfo_template, *vinfo;
   int num_visuals;
   unsigned int depth;
-  int i;
-
-  /* get X server to connect to, if given as an argument */
-  for (i=1;i<argc-1;i++)
-  {
-    char *dispstr="-display";
-    int len=MAX(strlen(dispstr),strlen(argv[i]));
-
-    if (len<4)
-      continue;
-    else if (!strncmp(argv[i],dispstr,len))
-    {
-      display_name=argv[i+1];
-      break;
-    }
-  }
 
   /* connect to X server */
-  if (!(display=XOpenDisplay(display_name)))
-  {
-    fprintf(stderr,"%s: cannot connect to X server %s\n", 
-	    progname, XDisplayName(display_name));
-    exit(-1);
-  }
-  
+  if (!(display = XOpenDisplay(display_name)))
+    Error(ERR_EXIT,"cannot connect to X server %s",XDisplayName(display_name));
+
   screen = DefaultScreen(display);
   visual = DefaultVisual(display, screen);
   depth  = DefaultDepth(display, screen);
@@ -332,22 +307,14 @@ void InitWindow(int argc, char *argv[])
 		  &icon_width,&icon_height,
 		  &icon_pixmap,&icon_hot_x,&icon_hot_y);
   if (!icon_pixmap)
-  {
-    fprintf(stderr, "%s: cannot read icon bitmap file '%s'.\n",
-	    progname,icon_filename);
-    exit(-1);
-  }
+    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
   sprintf(icon_filename,"%s/%s",GFX_PATH,icon_pic.picturemask_filename);
   XReadBitmapFile(display,window,icon_filename,
 		  &icon_width,&icon_height,
 		  &iconmask_pixmap,&icon_hot_x,&icon_hot_y);
   if (!iconmask_pixmap)
-  {
-    fprintf(stderr, "%s: cannot read icon bitmap file '%s'.\n",
-	    progname,icon_filename);
-    exit(-1);
-  }
+    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
   size_hints.width  = size_hints.min_width  = size_hints.max_width  = width;
   size_hints.height = size_hints.min_height = size_hints.max_height = height;
@@ -361,18 +328,10 @@ void InitWindow(int argc, char *argv[])
   }
 
   if (!XStringListToTextProperty(&window_name, 1, &windowName))
-  {
-    fprintf(stderr, "%s: structure allocation for windowName failed.\n",
-	    progname);
-    exit(-1);
-  }
+    Error(ERR_EXIT, "structure allocation for windowName failed");
 
   if (!XStringListToTextProperty(&icon_name, 1, &iconName))
-  {
-    fprintf(stderr, "%s: structure allocation for iconName failed.\n",
-	    progname);
-    exit(-1);
-  }
+    Error(ERR_EXIT, "structure allocation for iconName failed");
 
   wm_hints.initial_state = NormalState;
   wm_hints.input = True;
@@ -380,7 +339,7 @@ void InitWindow(int argc, char *argv[])
   wm_hints.icon_mask = iconmask_pixmap;
   wm_hints.flags = StateHint | IconPixmapHint | IconMaskHint | InputHint;
 
-  class_hints.res_name = progname;
+  class_hints.res_name = program_name;
   class_hints.res_class = "Rocks'n'Diamonds";
 
   XSetWMProperties(display, window, &windowName, &iconName, 
@@ -579,11 +538,7 @@ void InitGfx()
   }
 
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
-  {
-    fprintf(stderr, "%s: cannot create additional Pixmaps!\n",progname);
-    CloseAll();
-    exit(-1);
-  }
+    Error(ERR_EXIT, "cannot create additional pixmaps");
 
   for(i=0;i<NUM_PIXMAPS;i++)
   {
@@ -727,12 +682,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #endif
 
     if (!pix[pos])
-    {
-      fprintf(stderr, "%s: cannot get graphics for '%s'.\n",
-	      progname, pic->picture_filename);
-      CloseAll();
-      exit(-1);
-    }
+      Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
@@ -784,12 +734,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #endif
 
     if (!clipmask[pos])
-    {
-      fprintf(stderr, "%s: cannot get clipmask for '%s'.\n",
-	      progname, pic->picture_filename);
-      CloseAll();
-      exit(-1);
-    }
+      Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
   }
 }
 

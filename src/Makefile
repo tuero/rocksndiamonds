@@ -23,6 +23,7 @@ SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
 # files (and the mask files ('*Maske.gif') to xbm files).
 
 # XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
+# EXTRA_X11_LIBS = -lXpm
 
 CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
@@ -41,7 +42,9 @@ DEBUG = -DDEBUG -g -Wall
 #					# for SunOS and others
 
 # LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
-LIBS = -L/usr/X11R6/lib -lX11 -lm
+# LIBS = -L/usr/X11R6/lib -lX11 -lm
+
+LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -61,7 +64,6 @@ SRCS =	main.c		\
 	joystick.c	\
 	cartoons.c	\
 	random.c	\
-	gfxload.c	\
 	gifload.c	\
 	gif.c		\
 	send.c		\
@@ -83,7 +85,6 @@ OBJS =	main.o		\
 	joystick.o	\
 	cartoons.o	\
 	random.o	\
-	gfxload.o	\
 	gifload.o	\
 	gif.o		\
 	send.o		\

@@ -321,6 +321,7 @@ extern char	       *joystick_device_name[2];
 extern char	       *level_directory;
 extern int     		width, height;
 
+extern char	       *display_name;
 extern char	       *server_host;
 extern int		server_port;
 extern int		networking;
@@ -392,7 +393,7 @@ extern char		*sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
 
-extern char		*progname;
+extern char		*program_name;
 
 
 /* often used screen positions */

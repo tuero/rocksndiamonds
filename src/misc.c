@@ -17,8 +17,10 @@
 #include <sys/time.h>
 #include <sys/param.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 #include "misc.h"
+#include "init.h"
 #include "tools.h"
 #include "sound.h"
 #include "random.h"
@@ -73,8 +75,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
     delay.tv_usec = 1000 * (milliseconds_delay % 1000);
 
     if (select(0, NULL, NULL, NULL, &delay) != 0)
-      fprintf(stderr,"%s: in function sleep_milliseconds: select() failed!\n",
-	      progname);
+      Error(ERR_RETURN, "sleep_milliseconds(): select() failed");
   }
 }
 
@@ -185,5 +186,61 @@ void MarkTileDirty(int x, int y)
     redraw[xx][yy] = TRUE;
     redraw_tiles++;
     redraw_mask |= REDRAW_TILES;
+  }
+}
+
+void Error(BOOL fatal_error, char *format_str, ...)
+{
+  FILE *output_stream = stderr;
+  va_list ap;
+  char *format_ptr;
+  char *s_value;
+  int i_value;
+  double d_value;
+
+  va_start(ap, format_str);	/* ap points to first unnamed argument */
+
+  fprintf(output_stream, "%s: ", program_name);
+
+  for(format_ptr=format_str; *format_ptr; format_ptr++)
+  {
+    if (*format_ptr != '%')
+    {
+      fprintf(output_stream, "%c", *format_ptr);
+      continue;
+    }
+
+    switch(*++format_ptr)
+    {
+      case 'd':
+	i_value = va_arg(ap, int);
+	fprintf(output_stream, "%d", i_value);
+	break;
+
+      case 'f':
+	d_value = va_arg(ap, double);
+	fprintf(output_stream, "%f", d_value);
+	break;
+
+      case 's':
+	s_value = va_arg(ap, char *);
+	fprintf(output_stream, "%s", s_value);
+	break;
+
+      default:
+	fprintf(stderr, "\nfatal(): invalid format string: %s\n", format_str);
+	exit(-1);
+    }
+  }
+
+  va_end(ap);
+
+  fprintf(output_stream, "\n");
+
+  if (fatal_error)
+  {
+    fprintf(output_stream, "%s: aborting\n", program_name);
+    CloseAll();
+    exit(1);
   }
 }

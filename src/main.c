@@ -17,6 +17,7 @@
 #include "events.h"
 #include "sound.h"
 #include "joystick.h"
+#include "misc.h"
 
 #ifdef MSDOS
 #include <fcntl.h>
@@ -192,42 +193,42 @@ int background_loop[] =
 };
 int num_bg_loops = sizeof(background_loop)/sizeof(int);
 
-char 		*progname;
+char 		*program_name;
 
 #define MAX_OPTION_LEN	1024
 
 static void fatal_option()
 {
   fprintf(stderr,"Try '%s --help' for more information.\n",
-	  progname);
+	  program_name);
   exit(1);
 }
 
 static void fatal_unrecognized_option(char *option)
 {
   fprintf(stderr,"%s: unrecognized option '%s'\n",
-	  progname, option);
+	  program_name, option);
   fatal_option();
 }
 
 static void fatal_option_requires_argument(char *option)
 {
   fprintf(stderr,"%s: option '%s' requires an argument\n",
-	  progname, option);
+	  program_name, option);
   fatal_option();
 }
 
-static void fatal_invalid_argument(char *option)
+static void fatal_invalid_option_argument(char *option)
 {
   fprintf(stderr,"%s: option '%s' has invalid argument\n",
-	  progname, option);
+	  program_name, option);
   fatal_option();
 }
 
 static void fatal_too_many_arguments()
 {
   fprintf(stderr,"%s: too many arguments\n",
-	  progname);
+	  program_name);
   fatal_option();
 }
 
@@ -237,31 +238,27 @@ int main(int argc, char *argv[])
 {
   char **options_left = &argv[1];
 
-  progname = &argv[0][strlen(argv[0])];
-  while (progname != argv[0])
-    if (*progname-- == '/')
-      break;
+  program_name = (strrchr(argv[0],'/') ? strrchr(argv[0],'/') + 1 : argv[0]);
 
-  while (options_left)
+  while (*options_left)
   {
     char option_str[MAX_OPTION_LEN];
     char *option = options_left[0];
     char *next_option = options_left[1];
     char *option_arg = NULL;
-    int option_len;
+    int option_len = strlen(option);
 
-    if (strcmp(option, "--") == 0)		/* end of argument list */
+    strcpy(option_str, option);			/* copy argument into buffer */
+    option = option_str;
+
+    if (strcmp(option, "--") == 0)		/* stop scanning arguments */
       break;
-
-    if (strncmp(option, "--", 2))		/* treat '--' like '-' */
-      option++;
-    option_len = strlen(option);
 
     if (option_len >= MAX_OPTION_LEN)
       fatal_unrecognized_option(option);
 
-    strcpy(option_str, option);
-    option = option_str;
+    if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
+      option++;
 
     option_arg = strchr(option, '=');
     if (option_arg == NULL)			/* no '=' in option */
@@ -270,49 +267,66 @@ int main(int argc, char *argv[])
     {
       *option_arg++ = '\0';			/* cut argument from option */
       if (*option_arg == '\0')			/* no argument after '=' */
-	fatal_invalid_argument(option);
+	fatal_invalid_option_argument(option);
     }
 
-    if (strncmp(option, "-help", option_len) == 0)
+    option_len = strlen(option);
+
+    if (strcmp(option, "-") == 0)
+      fatal_unrecognized_option(option);
+    else if (strncmp(option, "-help", option_len) == 0)
     {
-      printf("Usage: rocksndiamonds [options] [server.name [port]]\n"
+      printf("Usage: %s [options] [server.name [port]]\n"
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
 	     "  -l, --levels directory        alternative level directory\n"
-	     "  -v, --verbose                 verbose mode\n");
+	     "  -v, --verbose                 verbose mode\n",
+	     program_name);
       exit(0);
     }
     else if (strncmp(option, "-display", option_len) == 0)
     {
       if (option_arg == NULL)
-	fatal_option_requires_argument(option);
+	fatal_option_requires_argument(option_str);
 
       display_name = option_arg;
       if (option_arg == next_option)
 	options_left++;
+
+      printf("--display == '%s'\n", display_name);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
       if (option_arg == NULL)
-	fatal_option_requires_argument(option);
+	fatal_option_requires_argument(option_str);
 
       level_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
+
+      printf("--levels == '%s'\n", level_directory);
     }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
+      printf("--verbose\n");
+
       verbose = TRUE;
     }
     else if (*option == '-')
-      fatal_unrecognized_option(option);
+      fatal_unrecognized_option(option_str);
     else if (server_host == NULL)
+    {
       server_host = *options_left;
+
+      printf("server.name == '%s'\n", server_host);
+    }
     else if (server_port == 0)
     {
       server_port = atoi(*options_left);
       if (server_port < 1024)
         fatal("Bad port number");
+
+      printf("port == %d\n", server_port);
     }
     else
       fatal_too_many_arguments();
@@ -320,7 +334,10 @@ int main(int argc, char *argv[])
     options_left++;
   }
 
-
+  /*
+  printf("All went fine -- exiting\n");
+  exit(0);
+  */
 
   /*
   if (argc>1)

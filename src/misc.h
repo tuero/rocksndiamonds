@@ -21,6 +21,9 @@
 
 #define NEW_RANDOMIZE		-1
 
+#define ERR_RETURN		0
+#define ERR_EXIT		1
+
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);
@@ -33,5 +36,6 @@ unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *GetLoginName(void);
 void MarkTileDirty(int, int);
+void Error(BOOL, char *, ...);
 
 #endif

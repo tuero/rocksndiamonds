@@ -12,6 +12,8 @@
 ***********************************************************/
 
 #include "sound.h"
+#include "misc.h"
+
 #ifdef MSDOS
 extern void sound_handler(struct SoundControl);
 #endif
@@ -71,10 +73,7 @@ void SoundServer()
     if (!FD_ISSET(sound_pipe[0], &sound_fdset))
       continue;
     if (read(sound_pipe[0], &snd_ctrl, sizeof(snd_ctrl)) != sizeof(snd_ctrl))
-    {
-      fprintf(stderr,"%s: broken pipe - no sounds\n",progname);
-      exit(0);
-    }
+      Error(ERR_EXIT, "broken pipe - no sounds");
 
 #ifdef VOXWARE
 
@@ -484,22 +483,13 @@ void HPUX_Audio_Control()
 
   audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
   if (audio_ctl == -1)
-  {
-    fprintf(stderr,"%s: cannot open /dev/audioCtl - no sounds\n",progname);
-    exit(0);
-  }
+    Error(ERR_EXIT, "cannot open /dev/audioCtl - no sounds");
 
   if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
-  {
-    fprintf(stderr,"%s: no audio info - no sounds\n",progname);
-    exit(0);
-  }
+    Error(ERR_EXIT, "no audio info - no sounds");
 
   if (ioctl(audio_ctl, AUDIO_SET_DATA_FORMAT, AUDIO_FORMAT_ULAW) == -1)
-  {
-    fprintf(stderr,"%s: ulaw audio not available - no sounds\n",progname);
-    exit(0);
-  }
+    Error(ERR_EXIT, "ulaw audio not available - no sounds");
 
   ioctl(audio_ctl, AUDIO_SET_CHANNELS, 1);
   ioctl(audio_ctl, AUDIO_SET_SAMPLE_RATE, 8000);
@@ -642,15 +632,13 @@ BOOL LoadSound(struct SoundInfo *snd_info)
 #ifndef MSDOS
   if (!(file=fopen(filename,"r")))
   {
-    fprintf(stderr,"%s: cannot open sound file '%s' - no sounds\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot open sound file '%s' - no sounds", filename);
     return(FALSE);
   }
 
   if (fseek(file,0,SEEK_END)<0)
   {
-    fprintf(stderr,"%s: cannot read sound file '%s' - no sounds\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -660,16 +648,14 @@ BOOL LoadSound(struct SoundInfo *snd_info)
 
   if (!(snd_info->file_ptr=malloc(snd_info->file_len)))
   {
-    fprintf(stderr,"%s: out of memory (this shouldn't happen :) - no sounds\n",
-	    progname);
+    Error(ERR_RETURN, "out of memory (this shouldn't happen :) - no sounds");
     fclose(file);
     return(FALSE);
   }
 
   if (fread(snd_info->file_ptr,1,snd_info->file_len,file)!=snd_info->file_len)
   {
-    fprintf(stderr,"%s: cannot read sound file '%s' - no sounds\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -682,8 +668,8 @@ BOOL LoadSound(struct SoundInfo *snd_info)
       snd_info->file_len != be2long(&sound_header->chunk_size)+8 ||
       strncmp(sound_header->magic_8SVX,"8SVX",4))
   {
-    fprintf(stderr,"%s: '%s' is not an IFF/8SVX file or broken- no sounds\n",
-	    progname,filename);
+    Error(ERR_RETURN, "'%s' is not an IFF/8SVX file or broken - no sounds",
+	  filename);
     return(FALSE);
   }
 
@@ -725,8 +711,7 @@ BOOL LoadSound(struct SoundInfo *snd_info)
   snd_info->sample_ptr = load_sample(filename);
   if(!snd_info->sample_ptr)
   {
-    fprintf(stderr,"%s: cannot read sound file '%s' - no sounds\n",
-	    progname,filename);
+    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -777,8 +762,8 @@ void PlaySoundExt(int nr, int volume, int stereo, BOOL loop)
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
-    fprintf(stderr,"%s: cannot pipe to child process - no sounds\n",progname);
-    sound_status=SOUND_OFF;
+    Error(ERR_RETURN, "cannot pipe to child process - no sounds");
+    sound_status = SOUND_OFF;
     return;
   }
 #else
@@ -827,8 +812,8 @@ void StopSoundExt(int nr, int method)
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
-    fprintf(stderr,"%s: cannot pipe to child process - no sounds\n",progname);
-    sound_status=SOUND_OFF;
+    Error(ERR_RETURN, "cannot pipe to child process - no sounds");
+    sound_status = SOUND_OFF;
     return;
   }
 #else
