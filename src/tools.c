@@ -434,7 +434,10 @@ void DrawPlayer(struct PlayerInfo *player)
     if (Store[last_jx][last_jy] && IS_DRAWABLE(last_element))
     {
       DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
-      DrawLevelFieldThruMask(last_jx, last_jy);
+      if (last_element == EL_DYNAMITE_ACTIVE)
+	DrawDynamite(last_jx, last_jy);
+      else
+	DrawLevelFieldThruMask(last_jx, last_jy);
     }
     else if (last_element == EL_DYNAMITE_ACTIVE)
       DrawDynamite(last_jx, last_jy);
@@ -467,6 +470,8 @@ void DrawPlayer(struct PlayerInfo *player)
     DrawLevelElement(jx, jy, Store[jx][jy]);
   else if (!IS_ACTIVE_BOMB(element))
     DrawLevelField(jx, jy);
+  else
+    DrawLevelElement(jx, jy, EL_LEERRAUM);
 
   /* draw player himself */
 

@@ -1463,6 +1463,9 @@ void Explode(int ex, int ey, int phase, int mode)
     if (CAN_MOVE(element) || COULD_MOVE(element))
       InitMovDir(x, y);
     DrawLevelField(x, y);
+
+    if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
+      StorePlayer[x][y] = 0;
   }
   else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
@@ -1476,7 +1479,15 @@ void Explode(int ex, int ey, int phase, int mode)
     if (phase == delay)
       ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
 
-    DrawGraphic(SCREENX(x), SCREENY(y), graphic + (phase / delay - 1));
+    graphic += (phase / delay - 1);
+
+    if (IS_PFORTE(Store[x][y]))
+    {
+      DrawLevelElement(x, y, Store[x][y]);
+      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic);
+    }
+    else
+      DrawGraphic(SCREENX(x), SCREENY(y), graphic);
   }
 }
 
@@ -4443,7 +4454,7 @@ void GameActions()
       AmoebeWaechst(x, y);
     else if (element == EL_DEAMOEBING)
       AmoebeSchrumpft(x, y);
-#if 1
+#if 0
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
 #endif
@@ -4530,7 +4541,7 @@ void GameActions()
     }
   }
 
-#if 0
+#if 1
   /* new experimental amoeba growth stuff*/
 #if 1
   if (!(FrameCounter % 8))
@@ -4538,9 +4549,9 @@ void GameActions()
   {
     static unsigned long random = 1684108901;
 
-    for (i = 0; i < level.amoeba_speed * 4; i++)
+    for (i = 0; i < level.amoeba_speed * 28 / 8; i++)
     {
-#if 1
+#if 0
       x = (random >> 10) % lev_fieldx;
       y = (random >> 20) % lev_fieldy;
 #else
@@ -5337,7 +5348,8 @@ void RemoveHero(struct PlayerInfo *player)
   player->present = FALSE;
   player->active = FALSE;
 
-  StorePlayer[jx][jy] = 0;
+  if (!ExplodeField[jx][jy])
+    StorePlayer[jx][jy] = 0;
 
   for (i=0; i<MAX_PLAYERS; i++)
     if (stored_player[i].active)
