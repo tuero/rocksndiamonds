@@ -744,7 +744,13 @@ static void DrawGraphicAnimationShiftedThruMask(int sx, int sy,
 
 void getGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  if (graphic >= 0 && graphic_info[graphic].bitmap != NULL)
+  {
+    *bitmap = graphic_info[graphic].bitmap;
+    *x = graphic_info[graphic].src_x;
+    *y = graphic_info[graphic].src_y;
+  }
+  else if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
     *bitmap = pix[PIX_BACK];
@@ -2713,8 +2719,10 @@ int el2gfx_OLD(int element)
 
 int el2gfx(int element)
 {
-  int graphic_OLD = el2gfx_OLD(element);
   int graphic_NEW = element_info[element].graphic;
+
+#if DEBUG
+  int graphic_OLD = el2gfx_OLD(element);
 
   if (element >= MAX_ELEMENTS)
   {
@@ -2726,6 +2734,7 @@ int el2gfx(int element)
     Error(ERR_WARN, "el2gfx: graphic_NEW (%d) != graphic_OLD (%d)",
 	  graphic_NEW, graphic_OLD);
   }
+#endif
 
   return graphic_NEW;
 }

@@ -100,7 +100,6 @@ void OpenAll(void)
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
   InitElementInfo();
-  InitGraphicInfo();
 
   InitLevelInfo();
   InitLevelArtworkInfo();
@@ -180,6 +179,7 @@ static void InitImages()
 
   /* load custom images */
   ReloadCustomImages();
+  InitGraphicInfo();
 }
 
 static void InitMixer()
@@ -497,6 +497,7 @@ void ReloadCustomArtwork()
     }
 
     ReloadCustomImages();
+    InitGraphicInfo();
 
     FreeTileClipmasks();
     InitTileClipmasks();
@@ -855,17 +856,16 @@ void InitGraphicInfo()
   /* always start with reliable default values */
   for(i=0; i<MAX_GRAPHICS; i++)
   {
-    graphic_info[i].bitmap = pix[PIX_SP];	/* graphic that ... */
-    graphic_info[i].src_x = 0;			/* ... contains ... */
-    graphic_info[i].src_y = 0;			/* ... empty space. */
+    graphic_info[i].bitmap = NULL;
+    graphic_info[i].src_x = 0;
+    graphic_info[i].src_y = 0;
     graphic_info[i].anim_frames = 1;
     graphic_info[i].anim_delay = 0;
     graphic_info[i].anim_mode = ANIM_NORMAL;
-  }
 
-  for(i=0; i<MAX_GRAPHICS; i++)
     getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
+  }
 }
 
 void InitElementProperties()

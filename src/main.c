@@ -142,6 +142,9 @@ struct ArtworkConfigInfo image_config[] =
   { "bd_diamond",			"bd_diamond.pcx"	},
   { "bd_diamond.frame_xpos",		"0"			},
   { "bd_diamond.num_frames",		"1"			},
+  { "robot_wheel",			"bd_diamond.pcx"	},
+  { "robot_wheel.frame_xpos",		"0"			},
+  { "robot_wheel.num_frames",		"4"			},
 };
 
 struct ArtworkConfigInfo sound_config[] =
