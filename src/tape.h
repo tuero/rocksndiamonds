@@ -80,6 +80,7 @@ void DrawVideoDisplay(unsigned long, unsigned long);
 void DrawCompleteVideoDisplay(void);
 
 void TapeStartRecording(void);
+void TapeHaltRecording(void);
 void TapeStopRecording(void);
 void TapeRecordAction(byte *);
 void TapeTogglePause(void);
@@ -89,6 +90,9 @@ byte *TapePlayAction(void);
 void TapeStop(void);
 void TapeErase(void);
 unsigned int GetTapeLength(void);
+void TapeIndexSearch(void);
+void TapeQuickSave(void);
+void TapeQuickLoad(void);
 
 void CreateTapeButtons();
 void MapTapeEjectButton();

@@ -486,6 +486,14 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
+  /* special shortcuts for quick game tape saving and loading */
+  if (game_status == MAINMENU || game_status == PLAYING)
+  {
+    if (key == KSYM_F1)		/* save game */
+      TapeQuickSave();
+    else if (key == KSYM_F2)	/* load game */
+      TapeQuickLoad();
+  }
 
 
 #ifndef DEBUG

@@ -322,7 +322,42 @@ void TapeStartRecording()
   SetDrawDeactivationMask(REDRAW_NONE);
 }
 
-void TapeStopRecording()
+static void TapeStartGameRecording()
+{
+  TapeStartRecording();
+
+#if defined(PLATFORM_UNIX)
+  if (options.network)
+    SendToServer_StartPlaying();
+  else
+#endif
+  {
+    game_status = PLAYING;
+    StopAnimation();
+    InitGame();
+  }
+}
+
+static void TapeAppendRecording()
+{
+  if (!tape.playing || !tape.pausing)
+    return;
+
+  if (tape.game_version != GAME_VERSION_ACTUAL &&
+      !Request("This may break old version tape ! Append anyway ?",
+	       REQ_ASK))
+    return;
+
+  tape.pos[tape.counter].delay = tape.delay_played;
+  tape.playing = FALSE;
+  tape.recording = TRUE;
+  tape.changed = TRUE;
+  tape.game_version = GAME_VERSION_ACTUAL;
+
+  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
+}
+
+void TapeHaltRecording()
 {
   if (!tape.recording)
     return;
@@ -330,6 +365,15 @@ void TapeStopRecording()
   tape.counter++;
   tape.length = tape.counter;
   tape.length_seconds = GetTapeLength();
+}
+
+void TapeStopRecording()
+{
+  if (!tape.recording)
+    return;
+
+  TapeHaltRecording();
+
   tape.recording = FALSE;
   tape.pausing = FALSE;
 
@@ -344,7 +388,7 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
   if (!tape.recording || tape.pausing)
     return;
 
-  if (tape.counter >= MAX_TAPELEN-1)
+  if (tape.counter >= MAX_TAPELEN - 1)
   {
     TapeStopRecording();
     return;
@@ -405,6 +449,14 @@ void TapeTogglePause()
 
     SetDrawDeactivationMask(REDRAW_NONE);
     RedrawPlayfield(TRUE, 0,0,0,0);
+
+    if (tape.quick_resume)
+    {
+      tape.quick_resume = FALSE;
+
+      TapeAppendRecording();
+      TapeTogglePause();
+    }
   }
 }
 
@@ -424,6 +476,7 @@ void TapeStartPlaying()
   tape.pausing = FALSE;
   tape.fast_forward = FALSE;
   tape.index_search = FALSE;
+  tape.quick_resume = FALSE;
 
   InitRND(tape.random_seed);
 
@@ -433,6 +486,15 @@ void TapeStartPlaying()
   MapTapeIndexButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
+}
+
+static void TapeStartGamePlaying()
+{
+  TapeStartPlaying();
+
+  game_status = PLAYING;
+  StopAnimation();
+  InitGame();
 }
 
 void TapeStopPlaying()
@@ -526,6 +588,51 @@ unsigned int GetTapeLength()
 
   return(tape_length * GAME_FRAME_DELAY / 1000);
 }
+
+void TapeIndexSearch()
+{
+  tape.index_search = TRUE;
+
+  if (!tape.fast_forward || tape.pause_before_death)
+    SetDrawDeactivationMask(REDRAW_FIELD);
+}
+
+void TapeQuickSave()
+{
+  if (game_status == PLAYING)
+  {
+    if (tape.recording)
+      TapeHaltRecording();	/* prepare tape for saving on-the-fly */
+
+    if (TAPE_IS_EMPTY(tape))
+      Request("No tape that can be saved !", REQ_CONFIRM);
+    else
+      SaveTape(tape.level_nr);
+  }
+  else if (game_status == MAINMENU)
+    Request("No game that can be saved !", REQ_CONFIRM);
+}
+
+void TapeQuickLoad()
+{
+  if (game_status == PLAYING || game_status == MAINMENU)
+  {
+    TapeStop();
+    TapeErase();
+
+    LoadTape(level_nr);
+    if (!TAPE_IS_EMPTY(tape))
+    {
+      TapeStartGamePlaying();
+      TapeIndexSearch();
+
+      tape.quick_resume = TRUE;
+    }
+    else
+      Request("No tape for this level !", REQ_CONFIRM);
+  }
+}
+
 
 /* ---------- new tape button stuff ---------------------------------------- */
 
@@ -685,17 +792,10 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       break;
 
     case TAPE_CTRL_ID_INDEX:
-      if (tape.recording)
-	printf("Setting index mark ...\n");
-      else if (tape.playing)
-      {
-	printf("Going to index mark ...\n");
-
-	tape.index_search = TRUE;
-
-	if (!tape.fast_forward || tape.pause_before_death)
-	  SetDrawDeactivationMask(REDRAW_FIELD);
-      }
+      if (tape.playing)
+	TapeIndexSearch();
+      else if (tape.recording)
+	;	/* setting index mark -- not yet implemented */
       break;
 
     case TAPE_CTRL_ID_STOP:
@@ -708,37 +808,11 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 
     case TAPE_CTRL_ID_RECORD:
       if (TAPE_IS_STOPPED(tape))
-      {
-	TapeStartRecording();
-
-#if defined(PLATFORM_UNIX)
-	if (options.network)
-	  SendToServer_StartPlaying();
-	else
-#endif
-	{
-	  game_status = PLAYING;
-	  StopAnimation();
-	  InitGame();
-	}
-      }
+	TapeStartGameRecording();
       else if (tape.pausing)
       {
 	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
-	{
-	  if (tape.game_version != GAME_VERSION_ACTUAL &&
-	      !Request("This may break old version tape ! Append anyway ?",
-		       REQ_ASK))
-	    break;
-
-	  tape.pos[tape.counter].delay = tape.delay_played;
-	  tape.playing = FALSE;
-	  tape.recording = TRUE;
-	  tape.changed = TRUE;
-	  tape.game_version = GAME_VERSION_ACTUAL;
-
-	  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
-	}
+	  TapeAppendRecording();
 	else
 	  TapeTogglePause();
       }
@@ -750,27 +824,25 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 
       if (TAPE_IS_STOPPED(tape))
       {
-	TapeStartPlaying();
-
-	game_status = PLAYING;
-	StopAnimation();
-	InitGame();
+	TapeStartGamePlaying();
       }
       else if (tape.playing)
       {
 	if (tape.pausing)			/* PAUSE -> PLAY */
+	{
 	  TapeTogglePause();
+	}
 	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
 	{
 	  tape.fast_forward = TRUE;
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
 	}
-	else if (!tape.pause_before_death)	/* FFWD PLAY -> + AUTO PAUSE */
+	else if (!tape.pause_before_death)	/* FFWD PLAY -> AUTO PAUSE */
 	{
 	  tape.pause_before_death = TRUE;
 	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
 	}
-	else					/* -> NORMAL PLAY */
+	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
 	  tape.fast_forward = FALSE;
 	  tape.pause_before_death = FALSE;

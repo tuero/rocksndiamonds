@@ -303,9 +303,11 @@ struct TapeInfo
   boolean recording, playing, pausing;
   boolean fast_forward;
   boolean index_search;
+  boolean quick_resume;
   boolean changed;
   boolean player_participates[MAX_PLAYERS];
   int num_participating_players;
+
   struct
   {
     byte action[MAX_PLAYERS];
