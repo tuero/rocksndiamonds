@@ -102,7 +102,7 @@ static void KillHeroUnlessProtected(int, int);
 
 void PlaySoundLevel(int, int, int);
 void PlaySoundLevelAction(int, int, int);
-void PlaySoundLevelActionElement(int, int, int, int);
+void PlaySoundLevelElementAction(int, int, int, int);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -2162,7 +2162,7 @@ void Impact(int x, int y)
 
   /* play sound of object that hits the ground */
   if (lastline || object_hit)
-    PlaySoundLevelActionElement(x, y, SND_ACTION_IMPACT, element);
+    PlaySoundLevelElementAction(x, y, element, SND_ACTION_IMPACT);
 }
 
 void TurnRound(int x, int y)
@@ -3444,9 +3444,9 @@ void AmoebeWaechst(int x, int y)
     if (DelayReached(&sound_delay, sound_delay_value))
     {
       if (Store[x][y] == EL_AMOEBE_BD)
-	PlaySoundLevel(x, y, SND_BD_AMOEBA_GROWING);
+	PlaySoundLevel(x, y, SND_BD_AMOEBA_CREATING);
       else
-	PlaySoundLevel(x, y, SND_AMOEBA_GROWING);
+	PlaySoundLevel(x, y, SND_AMOEBA_CREATING);
       sound_delay_value = 30;
     }
   }
@@ -3711,8 +3711,8 @@ void Life(int ax, int ay)
   }
 
   if (changed)
-    PlaySoundLevel(ax, ay, element == EL_LIFE ? SND_GAMEOFLIFE_GROWING :
-		   SND_BIOMAZE_GROWING);
+    PlaySoundLevel(ax, ay, element == EL_LIFE ? SND_GAMEOFLIFE_CREATING :
+		   SND_BIOMAZE_CREATING);
 }
 
 void RobotWheel(int x, int y)
@@ -5742,7 +5742,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BASE:
     case EL_SP_BUG:
       RemoveField(x, y);
-      PlaySoundLevelActionElement(x, y, SND_ACTION_DIGGING, element);
+      PlaySoundLevelElementAction(x, y, element, SND_ACTION_DIGGING);
       break;
 
     case EL_EDELSTEIN:
@@ -5764,7 +5764,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevelActionElement(x, y, SND_ACTION_COLLECTING, element);
+      PlaySoundLevelElementAction(x, y, element, SND_ACTION_COLLECTING);
       break;
 
     case EL_SPEED_PILL:
@@ -5809,7 +5809,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevelActionElement(x, y, SND_ACTION_COLLECTING, element);
+      PlaySoundLevelElementAction(x, y, element, SND_ACTION_COLLECTING);
       break;
 
     case EL_DYNABOMB_NR:
@@ -6039,7 +6039,7 @@ int DigField(struct PlayerInfo *player,
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
       DrawLevelField(x+dx, y+dy);
-      PlaySoundLevelActionElement(x, y, SND_ACTION_PUSHING, element);
+      PlaySoundLevelElementAction(x, y, element, SND_ACTION_PUSHING);
       break;
 
     case EL_PFORTE1:
@@ -6099,7 +6099,7 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-      PlaySoundLevelActionElement(x, y, SND_ACTION_PASSING, element);
+      PlaySoundLevelElementAction(x, y, element, SND_ACTION_PASSING);
       break;
 
     case EL_SP_PORT1_LEFT:
@@ -6293,7 +6293,7 @@ int DigField(struct PlayerInfo *player,
       {
 	RemoveField(x, y);
 	Feld[x+dx][y+dy] = element;
-	PlaySoundLevelActionElement(x, y, SND_ACTION_PUSHING, element);
+	PlaySoundLevelElementAction(x, y, element, SND_ACTION_PUSHING);
       }
 
       player->push_delay_value = (element == EL_BALLOON ? 0 : 2);
@@ -6460,10 +6460,10 @@ void PlaySoundLevel(int x, int y, int nr)
 
 void PlaySoundLevelAction(int x, int y, int sound_action)
 {
-  PlaySoundLevelActionElement(x, y, sound_action, Feld[x][y]);
+  PlaySoundLevelElementAction(x, y, Feld[x][y], sound_action);
 }
 
-void PlaySoundLevelActionElement(int x, int y, int sound_action, int element)
+void PlaySoundLevelElementAction(int x, int y, int element, int sound_action)
 {
   int sound_effect = element_action_sound[element][sound_action];
 

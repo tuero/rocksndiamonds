@@ -395,15 +395,19 @@ char *getCustomSoundFilename(char *basename)
   if (filename != NULL)
     free(filename);
 
+#if 0
   /* 1st try: look for special artwork in current level series directory */
   filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
   if (fileExists(filename))
     return filename;
+#endif
 
+#if 0
   /* 2nd try: look for special artwork in private artwork directory */
   filename = getPath2(getUserSoundsDir(), basename);
   if (fileExists(filename))
     return filename;
+#endif
 
   /* 3rd try: look for special artwork in configured artwork directory */
   filename = getPath2(getSetupArtworkDir(artwork.snd_current), basename);
@@ -691,7 +695,8 @@ void dumpTreeInfo(TreeInfo *node, int depth)
     for (i=0; i<(depth + 1) * 3; i++)
       printf(" ");
 
-    printf("filename == '%s' [%s]\n", node->filename, node->name);
+    printf("filename == '%s' (%s) [%s]\n",
+	   node->filename, node->name, node->name_short);
 
     if (node->node_group != NULL)
       dumpTreeInfo(node->node_group, depth + 1);
@@ -1407,7 +1412,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   if (setup_file_list == NULL)
   {
-    Error(ERR_WARN, "ignoring level directory '%s'", level_directory);
+    Error(ERR_WARN, "ignoring level directory '%s'", directory_path);
 
     free(directory_path);
     free(filename);
@@ -1430,6 +1435,12 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     setSetupInfo(levelinfo_tokens, i,
 		 getTokenValue(setup_file_list, levelinfo_tokens[i].text));
   *leveldir_new = ldi;
+
+  if (strcmp(leveldir_new->name, ANONYMOUS_NAME) == 0)
+  {
+    free(leveldir_new->name);
+    leveldir_new->name = getStringCopy(leveldir_new->filename);
+  }
 
   DrawInitText(leveldir_new->name, 150, FC_YELLOW);
 
@@ -1527,6 +1538,11 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 
     free(directory_path);
 
+    if (strcmp(directory_name, GRAPHICS_DIRECTORY) == 0 ||
+	strcmp(directory_name, SOUNDS_DIRECTORY) == 0 ||
+	strcmp(directory_name, MUSIC_DIRECTORY) == 0)
+      continue;
+
     valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
 						    level_directory,
 						    directory_name);
@@ -1585,7 +1601,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   int i;
 
   if (access(filename, F_OK) == 0)		/* file exists */
-    loadSetupFileList(filename);
+    setup_file_list = loadSetupFileList(filename);
 
   if (setup_file_list == NULL)	/* no config file -- look for artwork files */
   {
@@ -1613,8 +1629,8 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
     if (!valid_file_found)
     {
-      if (options.debug)
-	Error(ERR_WARN, "ignoring artwork directory '%s'", base_directory);
+      if (strcmp(directory_name, ".") != 0)
+	Error(ERR_WARN, "ignoring artwork directory '%s'", directory_path);
 
       free(directory_path);
       free(filename);
@@ -1644,6 +1660,12 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
       setSetupInfo(levelinfo_tokens, i,
 		   getTokenValue(setup_file_list, levelinfo_tokens[i].text));
     *artwork_new = ldi;
+
+    if (strcmp(artwork_new->name, ANONYMOUS_NAME) == 0)
+    {
+      free(artwork_new->name);
+      artwork_new->name = getStringCopy(artwork_new->filename);
+    }
 
     DrawInitText(artwork_new->name, 150, FC_YELLOW);
 
@@ -1683,9 +1705,18 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     if (strcmp(artwork_new->filename, ".") == 0)
     {
       if (artwork_new->user_defined)
+      {
 	artwork_new->name = getStringCopy("private");
+	artwork_new->sort_priority = LEVELCLASS_USER;
+      }
       else
-	artwork_new->name = getStringCopy("default");
+      {
+	artwork_new->name = getStringCopy("classic");
+	artwork_new->sort_priority = LEVELCLASS_CLASSICS;
+      }
+
+      artwork_new->color = LEVELCOLOR(artwork_new);
+      artwork_new->class_desc = getLevelClassDescription(artwork_new);
     }
     else
       artwork_new->name = getStringCopy(artwork_new->filename);
@@ -1824,6 +1855,69 @@ void LoadArtworkInfo()
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
+#endif
+}
+
+void LoadArtworkInfoFromLevelInfo(TreeInfo *node)
+{
+  while (node)
+  {
+    char *path = getPath3((node->user_defined ?
+			   getUserLevelDir(NULL) : options.level_directory),
+			  node->fullpath, SOUNDS_DIRECTORY);
+
+#if 0
+    if (!node->parent_link)
+      printf("CHECKING '%s' ['%s', '%s'] ...\n", path,
+	     node->filename, node->name);
+#endif
+
+    if (!node->parent_link)
+    {
+      TreeInfo *topnode_last = artwork.snd_first;
+
+      LoadArtworkInfoFromArtworkDir(&artwork.snd_first, NULL,
+				    path,
+				    TREE_TYPE_SOUNDS_DIR);
+
+      if (topnode_last != artwork.snd_first)
+      {
+#if 0
+	printf("NEW NODE: '%s'\n", artwork.snd_first->name);
+#endif
+
+	free(artwork.snd_first->name);
+	free(artwork.snd_first->name_sorting);
+	free(artwork.snd_first->name_short);
+
+	artwork.snd_first->name         = getStringCopy(node->name);
+	artwork.snd_first->name_sorting = getStringCopy(node->name);
+	artwork.snd_first->name_short   = getStringCopy(node->filename);
+
+	artwork.snd_first->sort_priority = node->sort_priority;
+	artwork.snd_first->color = LEVELCOLOR(artwork.snd_first);
+      }
+    }
+
+    free(path);
+
+    if (node->node_group != NULL)
+      LoadArtworkInfoFromLevelInfo(node->node_group);
+
+    node = node->next;
+  }
+}
+
+void LoadLevelArtworkInfo()
+{
+  DrawInitText("Looking for custom level artwork:", 120, FC_GREEN);
+
+  LoadArtworkInfoFromLevelInfo(leveldir_first);
+
+  sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
+
+#if 1
+  dumpTreeInfo(artwork.snd_first, 0);
 #endif
 }
 

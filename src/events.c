@@ -584,11 +584,15 @@ void HandleKey(Key key, int key_status)
         case KSYM_Page_Up:
           if (game_status == CHOOSELEVEL)
             HandleChooseLevel(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+	  else if (game_status == SETUP)
+	    HandleSetupScreen(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
         case KSYM_Page_Down:
           if (game_status == CHOOSELEVEL)
             HandleChooseLevel(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
+	  else if (game_status == SETUP)
+	    HandleSetupScreen(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
 #ifdef DEBUG
@@ -850,11 +854,11 @@ void HandleJoystick()
 	  !DelayReached(&joystickmove_delay, GADGET_FRAME_DELAY))
 	newbutton = dx = dy = 0;
 
-      if (game_status==MAINMENU)
+      if (game_status == MAINMENU)
 	HandleMainMenu(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
-      else if (game_status==CHOOSELEVEL)
+      else if (game_status == CHOOSELEVEL)
         HandleChooseLevel(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
-      else if (game_status==SETUP)
+      else if (game_status == SETUP)
 	HandleSetupScreen(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       break;
     }

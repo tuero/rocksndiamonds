@@ -44,6 +44,7 @@ static void InitSetup(void);
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
+static void InitLevelArtworkInfo(void);
 static void InitNetworkServer(void);
 static void InitMixer(void);
 static void InitSound(void);
@@ -97,6 +98,7 @@ void OpenAll(void)
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
   InitLevelInfo();
+  InitLevelArtworkInfo();
   InitGadgets();		/* needs to know number of level series */
   InitSound();			/* needs to know current level directory */
 
@@ -138,6 +140,11 @@ void InitLevelInfo()
 void InitArtworkInfo()
 {
   LoadArtworkInfo();
+}
+
+void InitLevelArtworkInfo()
+{
+  LoadLevelArtworkInfo();
 }
 
 void InitNetworkServer()

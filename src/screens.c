@@ -2430,13 +2430,13 @@ static struct
     SC_SCROLLBUTTON_XPOS + 0 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
     SC_SCROLL_UP_XPOS,					SC_SCROLL_UP_YPOS,
     SCREEN_CTRL_ID_SCROLL_UP,
-    "scroll level series up"
+    "scroll up"
   },
   {
     SC_SCROLLBUTTON_XPOS + 1 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
     SC_SCROLL_DOWN_XPOS,				SC_SCROLL_DOWN_YPOS,
     SCREEN_CTRL_ID_SCROLL_DOWN,
-    "scroll level series down"
+    "scroll down"
   }
 };
 
@@ -2601,21 +2601,30 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
 
-  if (game_status != CHOOSELEVEL)
+  if (game_status != CHOOSELEVEL && game_status != SETUP)
     return;
 
   switch (id)
   {
     case SCREEN_CTRL_ID_SCROLL_UP:
-      HandleChooseLevel(SX,SY + 32, 0,0, MB_MENU_MARK);
+      if (game_status == CHOOSELEVEL)
+	HandleChooseLevel(SX,SY + 32, 0,0, MB_MENU_MARK);
+      else if (game_status == SETUP)
+	HandleSetupScreen(SX,SY + 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_DOWN:
-      HandleChooseLevel(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+      if (game_status == CHOOSELEVEL)
+	HandleChooseLevel(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+      else if (game_status == SETUP)
+	HandleSetupScreen(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:
-      HandleChooseLevel(0,0, 999,gi->event.item_position, MB_MENU_INITIALIZE);
+      if (game_status == CHOOSELEVEL)
+	HandleChooseLevel(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
+      else if (game_status == SETUP)
+	HandleSetupScreen(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
       break;
 
     default:
