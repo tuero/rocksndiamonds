@@ -1246,6 +1246,10 @@ struct TapeInfo
 
 struct GameInfo
 {
+  /* values for engine initialization */
+  int default_push_delay_fixed;
+  int default_push_delay_random;
+
   /* constant within running game */
   int engine_version;
   int emulation;
