@@ -777,12 +777,12 @@ void AutoPlayTape()
   printf_line('=', 79);
   printf("Number of levels played: %d\n", num_levels_played);
   printf("Number of levels solved: %d (%d%%)\n", num_levels_solved,
-	 num_levels_solved * 100 / num_levels_played);
+	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
   printf_line('-', 79);
   printf("Summary (for automatic parsing by scripts):\n");
   printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
 	 autoplay_leveldir->identifier, num_levels_solved, num_levels_played,
-	 num_levels_solved * 100 / num_levels_played);
+	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
   if (num_levels_played != num_levels_solved)
   {
     printf(", FAILED:");

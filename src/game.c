@@ -122,19 +122,6 @@ static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 /* sound definitions                                                         */
 /* ------------------------------------------------------------------------- */
 
-#define SND_ACTION_UNKNOWN		0
-#define SND_ACTION_WAITING		1
-#define SND_ACTION_MOVING		2
-#define SND_ACTION_DIGGING		3
-#define SND_ACTION_COLLECTING		4
-#define SND_ACTION_PASSING		5
-#define SND_ACTION_IMPACT		6
-#define SND_ACTION_PUSHING		7
-#define SND_ACTION_ACTIVATING		8
-#define SND_ACTION_ACTIVE		9
-
-#define NUM_SND_ACTIONS			10
-
 static struct
 {
   char *text;
@@ -143,23 +130,23 @@ static struct
 } sound_action_properties[] =
 {
   /* insert _all_ loop sound actions here */
-  { ".waiting",		SND_ACTION_WAITING,	TRUE },
-  { ".moving",		SND_ACTION_MOVING,	TRUE }, /* continuos moving */
-  { ".active",		SND_ACTION_ACTIVE,	TRUE },
-  { ".growing",		SND_ACTION_UNKNOWN,	TRUE },
-  { ".attacking",	SND_ACTION_UNKNOWN,	TRUE },
+  { ".waiting",		ACTION_WAITING,		TRUE },
+  { ".moving",		ACTION_MOVING,		TRUE }, /* continuos moving */
+  { ".active",		ACTION_ACTIVE,		TRUE },
+  { ".growing",		ACTION_GROWING,		TRUE },
+  { ".attacking",	ACTION_ATTACKING,	TRUE },
 
   /* other (non-loop) sound actions are optional */
-  { ".stepping",	SND_ACTION_MOVING,	FALSE }, /* discrete moving */
-  { ".digging",		SND_ACTION_DIGGING,	FALSE },
-  { ".collecting",	SND_ACTION_COLLECTING,	FALSE },
-  { ".passing",		SND_ACTION_PASSING,	FALSE },
-  { ".impact",		SND_ACTION_IMPACT,	FALSE },
-  { ".pushing",		SND_ACTION_PUSHING,	FALSE },
-  { ".activating",	SND_ACTION_ACTIVATING,	FALSE },
+  { ".stepping",	ACTION_MOVING,		FALSE }, /* discrete moving */
+  { ".digging",		ACTION_DIGGING,		FALSE },
+  { ".collecting",	ACTION_COLLECTING,	FALSE },
+  { ".passing",		ACTION_PASSING,		FALSE },
+  { ".impact",		ACTION_IMPACT,		FALSE },
+  { ".pushing",		ACTION_PUSHING,		FALSE },
+  { ".activating",	ACTION_ACTIVATING,	FALSE },
   { NULL,		0,			0 },
 };
-static int element_action_sound[MAX_NUM_ELEMENTS][NUM_SND_ACTIONS];
+static int element_action_sound[MAX_NUM_ELEMENTS][NUM_ACTIONS];
 static boolean is_loop_sound[NUM_SOUND_FILES];
 
 #define IS_LOOP_SOUND(x)	(is_loop_sound[x])
@@ -597,14 +584,14 @@ void InitGameSound()
 
   /* initialize sound effect for all elements to "no sound" */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    for (j=0; j<NUM_SND_ACTIONS; j++)
+    for (j=0; j<NUM_ACTIONS; j++)
       element_action_sound[i][j] = -1;
 
   for (i=0; i<NUM_SOUND_FILES; i++)
   {
     int len_effect_text = strlen(sound_files[i].token);
 
-    sound_effect_properties[i] = SND_ACTION_UNKNOWN;
+    sound_effect_properties[i] = ACTION_OTHER;
     is_loop_sound[i] = FALSE;
 
     /* determine all loop sounds and identify certain sound classes */
@@ -653,7 +640,7 @@ void InitGameSound()
   /* TEST ONLY */
   {
     int element = EL_SAND;
-    int sound_action = SND_ACTION_DIGGING;
+    int sound_action = ACTION_DIGGING;
     int j = 0;
 
     while (sound_action_properties[j].text)
@@ -909,7 +896,7 @@ void InitGame()
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
       GfxFrame[x][y] = 0;
-      GfxAction[x][y] = GFX_ACTION_DEFAULT;
+      GfxAction[x][y] = ACTION_DEFAULT;
     }
   }
 
@@ -1454,9 +1441,9 @@ void InitMovingField(int x, int y, int direction)
     Feld[newx][newy] = EL_BLOCKED;
 
   if (direction == MV_DOWN && CAN_FALL(element))
-    GfxAction[x][y] = GFX_ACTION_FALLING;
+    GfxAction[x][y] = ACTION_FALLING;
   else
-    GfxAction[x][y] = GFX_ACTION_MOVING;
+    GfxAction[x][y] = ACTION_MOVING;
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -1567,7 +1554,7 @@ void RemoveMovingField(int x, int y)
   Feld[newx][newy] = EL_EMPTY;
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
   MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
-  GfxAction[oldx][oldy] = GfxAction[newx][newy] = GFX_ACTION_DEFAULT;
+  GfxAction[oldx][oldy] = GfxAction[newx][newy] = ACTION_DEFAULT;
 
   DrawLevelField(oldx, oldy);
   DrawLevelField(newx, newy);
@@ -1608,7 +1595,7 @@ void CheckDynamite(int x, int y)
       if (checkDrawLevelGraphicAnimation(x, y, el2img(element)))
 	DrawDynamite(x, y);
 
-      PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
+      PlaySoundLevelAction(x, y, ACTION_ACTIVE);
 
       return;
     }
@@ -2462,7 +2449,7 @@ void Impact(int x, int y)
 
   /* play sound of object that hits the ground */
   if (lastline || object_hit)
-    PlaySoundLevelElementAction(x, y, element, SND_ACTION_IMPACT);
+    PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);
 }
 
 void TurnRound(int x, int y)
@@ -2917,7 +2904,7 @@ void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
-  GfxAction[x][y] = GFX_ACTION_DEFAULT;
+  GfxAction[x][y] = ACTION_DEFAULT;
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
@@ -3112,7 +3099,7 @@ void StartMoving(int x, int y)
 	InitMovingField(x, y, belt_dir);
 	started_moving = TRUE;
 
-	GfxAction[x][y] = GFX_ACTION_DEFAULT;
+	GfxAction[x][y] = ACTION_DEFAULT;
       }
     }
   }
@@ -3240,7 +3227,7 @@ void StartMoving(int x, int y)
 
       if (MovDelay[x][y])	/* element still has to wait some time */
       {
-	PlaySoundLevelAction(x, y, SND_ACTION_WAITING);
+	PlaySoundLevelAction(x, y, ACTION_WAITING);
 
 	return;
       }
@@ -3460,14 +3447,14 @@ void StartMoving(int x, int y)
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
 
-      PlaySoundLevelAction(x, y, SND_ACTION_WAITING);
+      PlaySoundLevelAction(x, y, ACTION_WAITING);
 
       return;
     }
 
     InitMovingField(x, y, MovDir[x][y]);
 
-    PlaySoundLevelAction(x, y, SND_ACTION_MOVING);
+    PlaySoundLevelAction(x, y, ACTION_MOVING);
   }
 
   if (MovDir[x][y])
@@ -3591,7 +3578,7 @@ void ContinueMoving(int x, int y)
     MovDelay[newx][newy] = 0;
 
     GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
-    GfxAction[x][y] = GFX_ACTION_DEFAULT;
+    GfxAction[x][y] = ACTION_DEFAULT;
 
 #if 0
     if (!CAN_MOVE(element))
@@ -3629,11 +3616,11 @@ void ContinueMoving(int x, int y)
   else				/* still moving on */
   {
 #if 0
-    if (GfxAction[x][y] == GFX_ACTION_DEFAULT)
+    if (GfxAction[x][y] == ACTION_DEFAULT)
     {
       printf("reset GfxAction...\n");
 
-      GfxAction[x][y] = GFX_ACTION_MOVING;
+      GfxAction[x][y] = ACTION_MOVING;
     }
 #endif
 
@@ -4917,7 +4904,7 @@ static void DrawBeltAnimation(int x, int y, int element)
     DrawLevelElementAnimation(x, y, element);
 
     if (!(FrameCounter % 2))
-      PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
+      PlaySoundLevelAction(x, y, ACTION_ACTIVE);
   }
 }
 #endif
@@ -5366,7 +5353,7 @@ void GameActions()
 #endif
 
     if (IS_BELT_ACTIVE(element))
-      PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
+      PlaySoundLevelAction(x, y, ACTION_ACTIVE);
 
     if (game.magic_wall_active)
     {
@@ -6367,7 +6354,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BUGGY_BASE:
     case EL_SP_BUGGY_BASE_ACTIVATING:
       RemoveField(x, y);
-      PlaySoundLevelElementAction(x, y, element, SND_ACTION_DIGGING);
+      PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
       break;
 
     case EL_EMERALD:
@@ -6389,7 +6376,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevelElementAction(x, y, element, SND_ACTION_COLLECTING);
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       break;
 
     case EL_SPEED_PILL:
@@ -6434,7 +6421,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
 	       FS_SMALL, FC_YELLOW);
-      PlaySoundLevelElementAction(x, y, element, SND_ACTION_COLLECTING);
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       break;
 
     case EL_DYNABOMB_NR:
@@ -6656,7 +6643,7 @@ int DigField(struct PlayerInfo *player,
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
       DrawLevelField(x + dx, y + dy);
-      PlaySoundLevelElementAction(x, y, element, SND_ACTION_PUSHING);
+      PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       break;
 
     case EL_GATE1:
@@ -6716,7 +6703,7 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-      PlaySoundLevelElementAction(x, y, element, SND_ACTION_PASSING);
+      PlaySoundLevelElementAction(x, y, element, ACTION_PASSING);
       break;
 
     case EL_SP_PORT1_LEFT:
@@ -6914,7 +6901,7 @@ int DigField(struct PlayerInfo *player,
       {
 	RemoveField(x, y);
 	Feld[x+dx][y+dy] = element;
-	PlaySoundLevelElementAction(x, y, element, SND_ACTION_PUSHING);
+	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       }
 
       player->push_delay_value = (element == EL_BALLOON ? 0 : 2);

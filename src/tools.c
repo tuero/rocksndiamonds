@@ -742,7 +742,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
       if ((sxx || syy) && IS_PUSHABLE(element))
       {
-	graphic = el_dir_act2img(element, player->MovDir, GFX_ACTION_MOVING);
+	graphic = el_dir_act2img(element, player->MovDir, ACTION_MOVING);
 #if 1
 	frame = getGraphicAnimationFrame(graphic, player->GfxPos);
 
@@ -1140,13 +1140,13 @@ inline static int getFramePosition(int x, int y)
 
 inline static int getGfxAction(int x, int y)
 {
-  int gfx_action = GFX_ACTION_DEFAULT;
+  int gfx_action = ACTION_DEFAULT;
 
 #if 0
-  if (GfxAction[x][y] != GFX_ACTION_DEFAULT)
+  if (GfxAction[x][y] != ACTION_DEFAULT)
     gfx_action = GfxAction[x][y];
   else if (IS_MOVING(x, y))
-    gfx_action = GFX_ACTION_MOVING;
+    gfx_action = ACTION_MOVING;
 #else
   gfx_action = GfxAction[x][y];
 #endif
@@ -2480,7 +2480,7 @@ int get_next_element(int element)
 
 int el2img(int element)
 {
-  int graphic = element_info[element].graphic[GFX_ACTION_DEFAULT];
+  int graphic = element_info[element].graphic[ACTION_DEFAULT];
 
 #if DEBUG
   if (graphic < 0)
@@ -2493,7 +2493,7 @@ int el2img(int element)
 
 int el_dir2img(int element, int direction)
 {
-  return el_dir_act2img(element, direction, GFX_ACTION_DEFAULT);
+  return el_dir_act2img(element, direction, ACTION_DEFAULT);
 }
 
 int el_dir_act2img(int element, int direction, int action)

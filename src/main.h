@@ -757,29 +757,30 @@
 #define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 36)
 
 
-/* values for animation action types */
-#define GFX_ACTION_DEFAULT		0
-#define GFX_ACTION_WAITING		1
-#define GFX_ACTION_FALLING		2
-#define GFX_ACTION_MOVING		3
-#define GFX_ACTION_DIGGING		4
-#define GFX_ACTION_SNAPPING		5
-#define GFX_ACTION_COLLECTING		6
-#define GFX_ACTION_PUSHING		7
-#define GFX_ACTION_PASSING		8
-#define GFX_ACTION_IMPACT		9
-#define GFX_ACTION_CRACKING		10
-#define GFX_ACTION_BREAKING		11
-#define GFX_ACTION_ACTIVATING		12
-#define GFX_ACTION_OPENING		13
-#define GFX_ACTION_CLOSING		14
-#define GFX_ACTION_EATING		15
-#define GFX_ACTION_ATTACKING		16
-#define GFX_ACTION_GROWING		17
-#define GFX_ACTION_SHRINKING		18
-#define GFX_ACTION_OTHER		19
+/* values for graphics/sounds action types */
+#define ACTION_DEFAULT				0
+#define ACTION_WAITING				1
+#define ACTION_FALLING				2
+#define ACTION_MOVING				3
+#define ACTION_DIGGING				4
+#define ACTION_SNAPPING				5
+#define ACTION_COLLECTING			6
+#define ACTION_PUSHING				7
+#define ACTION_PASSING				8
+#define ACTION_IMPACT				9
+#define ACTION_CRACKING				10
+#define ACTION_BREAKING				11
+#define ACTION_ACTIVATING			12
+#define ACTION_OPENING				13
+#define ACTION_CLOSING				14
+#define ACTION_EATING				15
+#define ACTION_ATTACKING			16
+#define ACTION_GROWING				17
+#define ACTION_SHRINKING			18
+#define ACTION_ACTIVE				19
+#define ACTION_OTHER				20
 
-#define NUM_GFX_ACTIONS			20
+#define NUM_ACTIONS				21
 
 
 /* values for image configuration suffixes */
@@ -1030,10 +1031,10 @@ struct ElementInfo
   char *editor_description;	/* short description for level editor */
 
 				/* default graphics for several actions */
-  int graphic[NUM_GFX_ACTIONS];
+  int graphic[NUM_ACTIONS];
 
 				/* special graphics for left/right/up/down */
-  int direction_graphic[NUM_GFX_ACTIONS][NUM_MV_DIRECTIONS];
+  int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
 };
 
 struct GraphicInfo

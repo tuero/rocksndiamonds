@@ -692,21 +692,21 @@ void InitElementInfo()
   /* set values to -1 to identify later as "uninitialized" values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act<NUM_GFX_ACTIONS; act++)
+    for (act=0; act<NUM_ACTIONS; act++)
     {
       element_info[i].graphic[act] = -1;
 
-      for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
 	element_info[i].direction_graphic[act][dir] = -1;
     }
   }
 
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+    element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CHAR_START + (i - EL_CHAR_START);
 
   for (i=EL_CUSTOM_START; i<=EL_CUSTOM_END; i++)
-    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+    element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CUSTOM_START + (i - EL_CUSTOM_START);
 
   i = 0;
@@ -718,7 +718,7 @@ void InitElementInfo()
     int graphic   = element_to_graphic[i].graphic;
 
     if (action < 0)
-      action = GFX_ACTION_DEFAULT;
+      action = ACTION_DEFAULT;
 
     if (direction > -1)
     {
@@ -735,24 +735,24 @@ void InitElementInfo()
   /* now set all '-1' values to element specific default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    int default_action_graphic = element_info[i].graphic[GFX_ACTION_DEFAULT];
-    int default_action_direction_graphic[NUM_MV_DIRECTIONS];
+    int default_action_graphic = element_info[i].graphic[ACTION_DEFAULT];
+    int default_action_direction_graphic[NUM_DIRECTIONS];
 
     if (default_action_graphic == -1)
       default_action_graphic = IMG_CHAR_QUESTION;
 
-    for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+    for (dir=0; dir<NUM_DIRECTIONS; dir++)
     {
       default_action_direction_graphic[dir] =
-	element_info[i].direction_graphic[GFX_ACTION_DEFAULT][dir];
+	element_info[i].direction_graphic[ACTION_DEFAULT][dir];
 
       if (default_action_direction_graphic[dir] == -1)
 	default_action_direction_graphic[dir] = default_action_graphic;
     }
 
-    for (act=0; act<NUM_GFX_ACTIONS; act++)
+    for (act=0; act<NUM_ACTIONS; act++)
     {
-      for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
 	int default_direction_graphic = element_info[i].graphic[act];
 
@@ -790,7 +790,7 @@ static void InitGraphicInfo()
 
   /* set temporary graphics action field to default value */
   for (i=0; i<NUM_IMAGE_FILES; i++)
-    gfx_action[i] = GFX_ACTION_DEFAULT;
+    gfx_action[i] = ACTION_DEFAULT;
 
   /* set temporary graphics action field from element_to_graphic list */
   i = 0;
@@ -800,7 +800,7 @@ static void InitGraphicInfo()
     int graphic   = element_to_graphic[i].graphic;
 
     if (action == -1)
-      action = GFX_ACTION_DEFAULT;
+      action = ACTION_DEFAULT;
 
     gfx_action[graphic] = action;
 
@@ -900,7 +900,7 @@ static void InitGraphicInfo()
     /* set global_sync for all animations with undefined "animation action" */
     if (parameter[GFX_ARG_GLOBAL_SYNC] == GFX_ARG_UNDEFINED_VALUE)
       graphic_info[i].anim_global_sync =
-	(gfx_action[i] == GFX_ACTION_DEFAULT ? TRUE : FALSE);
+	(gfx_action[i] == ACTION_DEFAULT ? TRUE : FALSE);
 
     /* "linear" animations are never globally synchronized */
     if (parameter[GFX_ARG_MODE_LINEAR])

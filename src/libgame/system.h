@@ -71,7 +71,7 @@
 #define MV_BIT_RIGHT		1
 #define MV_BIT_UP		2
 #define MV_BIT_DOWN	       	3
-#define NUM_MV_DIRECTIONS	4
+#define NUM_DIRECTIONS		4
 
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
