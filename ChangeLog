@@ -1,3 +1,9 @@
+2004-06-20
+	* fixed engine change that broke 3.0.8 levels like "Walpurgis Gardens"
+	* fixed the above fix because it broke level set "machine" (*sigh*)
+	* fixed random element placement in level editor to work as expected
+	* fixed undefined graphic of runtime element "EL_AMOEBA_TO_DIAMOND"
+
 2004-06-15
 	* re-recorded tape for BD2K3, level 010 (broken due to bugfix)
 

@@ -1580,6 +1580,10 @@ struct GameInfo
   int initial_move_delay_value;
   int initial_push_delay_value;
 
+  /* flags to handle bugs in and changes between different engine versions */
+  /* (for the latest engine version, these flags should always be "FALSE") */
+  boolean use_bug_change_when_pushing;
+
   /* variable within running game */
   int yamyam_content_nr;
   boolean magic_wall_active;

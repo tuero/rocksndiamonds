@@ -3606,6 +3606,8 @@ void DumpTape(struct TapeInfo *tape)
   printf_line("-", 79);
   printf("Tape of Level %03d (file version %08d, game version %08d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
+  printf("                  (effective engine version %08d)\n",
+	 tape->engine_version);
   printf("Level series identifier: '%s'\n", tape->level_identifier);
   printf_line("-", 79);
 

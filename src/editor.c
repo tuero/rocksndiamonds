@@ -7996,37 +7996,38 @@ static void CopyLevelToUndoBuffer(int mode)
 static void RandomPlacement(int new_element)
 {
   static boolean free_position[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-  int num_free_positions;
-  int num_percentage;
-  int num_elements;
+  int num_free_positions = 0;
+  int num_percentage, num_elements;
   int x, y;
 
-  /* determine number of free positions for the new elements */
-  /* (maybe this statement should be formatted a bit more readable...) */
-  num_free_positions = 0;
-  for (x = 0; x < lev_fieldx; x++)
-    for (y = 0; y < lev_fieldy; y++)
-      if ((free_position[x][y] =
-	   ((random_placement_background_restricted &&
-	     Feld[x][y] == random_placement_background_element) ||
-	    (!random_placement_background_restricted &&
-	     Feld[x][y] != new_element))) == TRUE)
-	num_free_positions++;
+  /* determine number of free positions for randomly placing the new element */
+  for (x = 0; x < lev_fieldx; x++) for (y = 0; y < lev_fieldy; y++)
+  {
+    free_position[x][y] =
+      (random_placement_background_restricted ?
+       Feld[x][y] == random_placement_background_element :
+       Feld[x][y] != new_element);
+
+    if (free_position[x][y])
+      num_free_positions++;
+  }
 
   /* determine number of new elements to place there */
   num_percentage = num_free_positions * random_placement_value / 100;
   num_elements = (random_placement_method == RANDOM_USE_PERCENTAGE ?
 		  num_percentage : random_placement_value);
 
-  /* if not more free positions than elements to place, fill whole level */
-  if (num_elements >= num_free_positions)
+  /* if less free positions than elements to place, fill all these positions */
+  if (num_free_positions < num_elements)
   {
     for (x = 0; x < lev_fieldx; x++)
       for (y = 0; y < lev_fieldy; y++)
-	Feld[x][y] = new_element;
+	if (free_position[x][y])
+	  Feld[x][y] = new_element;
 
     DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
     CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+
     return;
   }
 

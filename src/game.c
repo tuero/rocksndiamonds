@@ -37,6 +37,8 @@
 #define USE_NEW_SP_SLIPPERY	TRUE	* USE_NEW_STUFF		* 1
 #define USE_NEW_RANDOMIZE	TRUE	* USE_NEW_STUFF		* 1
 
+#define USE_PUSH_BUGFIX		TRUE	* 1
+
 /* for DigField() */
 #define DF_NO_PUSH		0
 #define DF_DIG			1
@@ -1193,6 +1195,40 @@ static void InitGameEngine()
   /* set game engine from tape file when re-playing, else from level file */
   game.engine_version = (tape.playing ? tape.engine_version :
 			 level.game_version);
+
+  /* ---------------------------------------------------------------------- */
+  /* set flags for bugs and changes according to active game engine version */
+  /* ---------------------------------------------------------------------- */
+
+  /*
+    Type of bug/change:
+    Before 3.1.0, custom elements that "change when pushing" changed directly
+    after the player started pushing them (until then handled in "DigField()").
+    Since 3.1.0, these custom elements are not changed until the "pushing"
+    move of the element is finished (now handled in "ContinueMoving()").
+
+    Affected levels/tapes:
+    The first condition is generally needed for all levels/tapes before version
+    3.1.0, which might use the old behaviour before it was changed; known tapes
+    that are affected are some tapes from the level set "Walpurgis Gardens" by
+    Jamie Cullen.
+    The second condition is an exception from the above case and is needed for
+    the special case of tapes recorded with game (not engine!) version 3.1.0 or
+    above (including some development versions of 3.1.0), but before it was
+    known that this change would break tapes like the above and was fixed in
+    3.1.1, so that the changed behaviour was active although the engine version
+    while recording maybe was before 3.1.0. There is at least one tape that is
+    affected by this exception, which is the tape for the one-level set "Bug
+    Machine" by Juergen Bonhagen.
+  */
+
+  game.use_bug_change_when_pushing =
+    (game.engine_version < VERSION_IDENT(3,1,0,0) &&
+     !(tape.playing &&
+       tape.game_version >= VERSION_IDENT(3,1,0,0) &&
+       tape.game_version <  VERSION_IDENT(3,1,1,0)));
+
+  /* ---------------------------------------------------------------------- */
 
   /* dynamically adjust element properties according to game engine version */
   InitElementPropertiesEngine(game.engine_version);
@@ -4636,7 +4672,7 @@ inline static void TurnRoundExt(int x, int y)
     yy = y + move_xy[MovDir[x][y]].y;
 
 #if 1
-    /* !!! this bugfix breaks at least BD2K3, level 010 !!! */
+    /* !!! this bugfix breaks at least BD2K3, level 010 !!! [re-recorded] */
     if (!IN_LEV_FIELD(xx, yy) ||
         (!IS_FREE(xx, yy) && !IS_FOOD_PIG(Feld[xx][yy])))
       MovDir[x][y] = old_move_dir;
@@ -6492,7 +6528,17 @@ void ContinueMoving(int x, int y)
 #endif
 
 #if 1
+
+#if USE_PUSH_BUGFIX
+#if 1
+  if (pushed_by_player && !game.use_bug_change_when_pushing)
+#else
+  if (pushed_by_player && game.engine_version >= VERSION_IDENT(3,1,0,0))
+#endif
+#else
   if (pushed_by_player)
+#endif
+
   {
 #if 1
     int dig_side = MV_DIR_OPPOSITE(direction);
@@ -8652,7 +8698,7 @@ void GameActions()
 #endif
 
 #if 1
-  /* for downwards compatibility, the following code emulates a fixed bug that
+  /* for backwards compatibility, the following code emulates a fixed bug that
      occured when pushing elements (causing elements that just made their last
      pushing step to already (if possible) make their first falling step in the
      same game frame, which is bad); this code is also needed to use the famous
@@ -11701,12 +11747,28 @@ int DigField(struct PlayerInfo *player,
 	else
 	  player->push_delay_value = -1;	/* get new value later */
 
+#if USE_PUSH_BUGFIX
+	/* now: check for element change _after_ element has been pushed! */
+#if 1
+	if (game.use_bug_change_when_pushing)
+#else
+	if (game.engine_version < VERSION_IDENT(3,1,0,0))
+#endif
+	{
+	  CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
+				     player->index_bit, dig_side);
+	  CheckTriggeredElementChangeByPlayer(x,y,element,CE_OTHER_GETS_PUSHED,
+					      player->index_bit, dig_side);
+	}
+
+#else
+
 #if 1
 	/* check for element change _after_ element has been pushed! */
 #else
 
 #if 1
-      /* !!! TEST ONLY !!! */
+	/* !!! TEST ONLY !!! */
 	CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				   player->index_bit, dig_side);
 	CheckTriggeredElementChangeByPlayer(x, y, element,CE_OTHER_GETS_PUSHED,
@@ -11717,6 +11779,8 @@ int DigField(struct PlayerInfo *player,
 	CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				   player->index_bit, dig_side);
 #endif
+#endif
+
 #endif
 
 	break;

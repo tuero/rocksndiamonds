@@ -561,6 +561,11 @@ void InitElementGraphicInfo()
   }
 
 #if 1
+  /* set hardcoded definitions for some runtime elements without graphic */
+  element_info[EL_AMOEBA_TO_DIAMOND].graphic[ACTION_DEFAULT] = IMG_AMOEBA_DEAD;
+#endif
+
+#if 1
   /* now set all undefined/invalid graphics to -1 to set to default after it */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -646,6 +651,7 @@ void InitElementGraphicInfo()
 	default_action_crumbled = element_info[EL_SB_DEFAULT].crumbled[act];
 
 #if 1
+      /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
       /* !!! make this better !!! */
       if (i == EL_EMPTY_SPACE)
       {
