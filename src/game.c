@@ -2830,6 +2830,14 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   int element = Feld[jx][jy];
   boolean player_relocated = (old_jx != jx || old_jy != jy);
 
+  int move_dir_horiz = (jx < old_jx ? MV_LEFT : jx > old_jx ? MV_RIGHT : 0);
+  int move_dir_vert  = (jy < old_jy ? MV_UP   : jy > old_jy ? MV_DOWN  : 0);
+#if 1
+  int enter_side_horiz = MV_DIR_OPPOSITE(move_dir_horiz);
+  int enter_side_vert  = MV_DIR_OPPOSITE(move_dir_vert);
+  int leave_side_horiz = move_dir_horiz;
+  int leave_side_vert  = move_dir_vert;
+#else
   static int trigger_sides[4][2] =
   {
     /* enter side               leave side */
@@ -2838,13 +2846,12 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
     { CH_SIDE_BOTTOM,		CH_SIDE_TOP	},	/* moving up    */
     { CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
   };
-  int move_dir_horiz = (jx < old_jx ? MV_LEFT : jx > old_jx ? MV_RIGHT : 0);
-  int move_dir_vert  = (jy < old_jy ? MV_UP   : jy > old_jy ? MV_DOWN  : 0);
   int enter_side_horiz = trigger_sides[MV_DIR_BIT(move_dir_horiz)][0];
   int enter_side_vert  = trigger_sides[MV_DIR_BIT(move_dir_vert)][0];
-  int enter_side = enter_side_horiz | enter_side_vert;
   int leave_side_horiz = trigger_sides[MV_DIR_BIT(move_dir_horiz)][1];
   int leave_side_vert  = trigger_sides[MV_DIR_BIT(move_dir_vert)][1];
+#endif
+  int enter_side = enter_side_horiz | enter_side_vert;
   int leave_side = leave_side_horiz | leave_side_vert;
 
   if (player->GameOver)		/* do not reanimate dead player */
@@ -2912,6 +2919,14 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
 #if 1
   /* needed to allow change of walkable custom element by entering player */
   Changed[jx][jy] = 0;		/* allow another change */
+#endif
+
+#if 0
+  printf("::: player entering %d, %d from %s ...\n", jx, jy,
+	 enter_side == MV_LEFT  ? "left" :
+	 enter_side == MV_RIGHT ? "right" :
+	 enter_side == MV_UP    ? "top" :
+	 enter_side == MV_DOWN  ? "bottom" : "oops! no idea!");
 #endif
 
 #if 1
@@ -6296,6 +6311,9 @@ void ContinueMoving(int x, int y)
 #if 1
   if (pushed_by_player)
   {
+#if 1
+    int dig_side = MV_DIR_OPPOSITE(direction);
+#else
     static int trigger_sides[4] =
     {
       CH_SIDE_RIGHT,	/* moving left  */
@@ -6304,6 +6322,7 @@ void ContinueMoving(int x, int y)
       CH_SIDE_TOP,	/* moving down  */
     };
     int dig_side = trigger_sides[MV_DIR_BIT(direction)];
+#endif
     struct PlayerInfo *player = PLAYERINFO(x, y);
 
     CheckElementChangeByPlayer(newx, newy, element, CE_PUSHED_BY_PLAYER,
@@ -7508,8 +7527,15 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 		  (IS_WALKABLE(e) && ELEM_IS_PLAYER(content_element) &&
 		   !IS_MOVING(ex, ey) && !IS_BLOCKED(ex, ey)));
 #else
+
+#if 0
       is_empty = (IS_FREE(ex, ey) ||
 		  (IS_PLAYER(ex, ey) && IS_WALKABLE(content_element)));
+#else
+      is_empty = (IS_FREE(ex, ey) ||
+		  (IS_FREE_OR_PLAYER(ex, ey) && IS_WALKABLE(content_element)));
+#endif
+
 #endif
       is_walkable     = (is_empty || IS_WALKABLE(e));
       is_diggable     = (is_empty || IS_DIGGABLE(e));
@@ -9051,6 +9077,14 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 #if 1
   return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
 	  IS_GRAVITY_REACHABLE(Feld[newx][newy]) &&
+	  (!IS_SP_PORT(Feld[newx][newy]) || move_dir == MV_UP) &&
+	  (IS_DIGGABLE(Feld[newx][newy]) ||
+	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
+	   canPassField(newx, newy, move_dir)));
+#else
+#if 1
+  return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
+	  IS_GRAVITY_REACHABLE(Feld[newx][newy]) &&
 	  (IS_DIGGABLE(Feld[newx][newy]) ||
 	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
 	   canPassField(newx, newy, move_dir)));
@@ -9069,6 +9103,7 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 	    IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
 	    IS_WALKABLE_FROM(Feld[nextx][nexty], move_dir) &&
 	    (level.can_pass_to_walkable || IS_FREE(nextx, nexty)))));
+#endif
 #endif
 #endif
 }
@@ -9525,6 +9560,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     if (game.engine_version < VERSION_IDENT(3,1,0,0))
 #endif
     {
+      int move_direction = player->MovDir;
+#if 1
+      int enter_side = MV_DIR_OPPOSITE(move_direction);
+      int leave_side = move_direction;
+#else
       static int trigger_sides[4][2] =
       {
 	/* enter side           leave side */
@@ -9533,9 +9573,9 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 	{ CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
 	{ CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
       };
-      int move_direction = player->MovDir;
       int enter_side = trigger_sides[MV_DIR_BIT(move_direction)][0];
       int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
+#endif
       int old_element = Feld[old_jx][old_jy];
       int new_element = Feld[jx][jy];
 
@@ -9680,6 +9720,11 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     if (game.engine_version >= VERSION_IDENT(3,1,0,0))
 #endif
     {
+      int move_direction = player->MovDir;
+#if 1
+      int enter_side = MV_DIR_OPPOSITE(move_direction);
+      int leave_side = move_direction;
+#else
       static int trigger_sides[4][2] =
       {
 	/* enter side           leave side */
@@ -9688,9 +9733,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	{ CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
 	{ CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
       };
-      int move_direction = player->MovDir;
       int enter_side = trigger_sides[MV_DIR_BIT(move_direction)][0];
       int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
+#endif
       int old_jx = last_jx;
       int old_jy = last_jy;
       int old_element = Feld[old_jx][old_jy];
@@ -10570,13 +10615,6 @@ int DigField(struct PlayerInfo *player,
 	     int oldx, int oldy, int x, int y,
 	     int real_dx, int real_dy, int mode)
 {
-  static int trigger_sides[4] =
-  {
-    CH_SIDE_RIGHT,	/* moving left  */
-    CH_SIDE_LEFT,	/* moving right */
-    CH_SIDE_BOTTOM,	/* moving up    */
-    CH_SIDE_TOP,	/* moving down  */
-  };
 #if 0
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
 #endif
@@ -10590,7 +10628,18 @@ int DigField(struct PlayerInfo *player,
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int opposite_direction = MV_DIR_OPPOSITE(move_direction);
+#if 1
+  int dig_side = MV_DIR_OPPOSITE(move_direction);
+#else
+  static int trigger_sides[4] =
+  {
+    CH_SIDE_RIGHT,	/* moving left  */
+    CH_SIDE_LEFT,	/* moving right */
+    CH_SIDE_BOTTOM,	/* moving up    */
+    CH_SIDE_TOP,	/* moving down  */
+  };
   int dig_side = trigger_sides[MV_DIR_BIT(move_direction)];
+#endif
   int old_element = Feld[jx][jy];
   int element;
 
@@ -11253,7 +11302,13 @@ int DigField(struct PlayerInfo *player,
       else if (IS_SWITCHABLE(element))
       {
 	if (PLAYER_SWITCHING(player, x, y))
+	{
+	  CheckTriggeredElementChangeByPlayer(x,y, element,
+					      CE_OTHER_GETS_PRESSED,
+					      player->index_bit, dig_side);
+
 	  return MF_ACTION;
+	}
 
 	player->is_switching = TRUE;
 	player->switch_x = x;
@@ -11339,6 +11394,13 @@ int DigField(struct PlayerInfo *player,
 	  PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MIDDLE);
 #endif
 	}
+
+	CheckTriggeredElementChangeByPlayer(x, y, element,
+					    CE_OTHER_IS_SWITCHING,
+					    player->index_bit, dig_side);
+
+	CheckTriggeredElementChangeByPlayer(x,y, element,CE_OTHER_GETS_PRESSED,
+					    player->index_bit, dig_side);
 
 	return MF_ACTION;
       }
@@ -11477,6 +11539,12 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
 boolean DropElement(struct PlayerInfo *player)
 {
+  int old_element, new_element;
+  int dropx = player->jx, dropy = player->jy;
+  int drop_direction = player->MovDir;
+#if 1
+  int drop_side = drop_direction;
+#else
   static int trigger_sides[4] =
   {
     CH_SIDE_LEFT,	/* dropping left  */
@@ -11484,10 +11552,8 @@ boolean DropElement(struct PlayerInfo *player)
     CH_SIDE_TOP,	/* dropping up    */
     CH_SIDE_BOTTOM,	/* dropping down  */
   };
-  int old_element, new_element;
-  int dropx = player->jx, dropy = player->jy;
-  int drop_direction = player->MovDir;
   int drop_side = trigger_sides[MV_DIR_BIT(drop_direction)];
+#endif
   int drop_element = (player->inventory_size > 0 ?
 		      player->inventory_element[player->inventory_size - 1] :
 		      player->inventory_infinite_element != EL_UNDEFINED ?

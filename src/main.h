@@ -1255,11 +1255,11 @@
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	1
 #define PROGRAM_VERSION_PATCH	0
-#define PROGRAM_VERSION_BUILD	3
+#define PROGRAM_VERSION_BUILD	4
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING "Copyright ©1995-2003 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING "Copyright ©1995-2004 by Holger Schemel"
 
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX		"ROCKSNDIAMONDS"
@@ -1689,6 +1689,7 @@ struct ElementInfo
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */
   int move_stepsize;		/* step size element moves with */
+
   int move_enter_element;	/* element that can be entered (and removed) */
   int move_leave_element;	/* element that can be left behind */
   int move_leave_type;		/* change (limited) or leave (unlimited) */

@@ -5651,6 +5651,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
     for (x = 0; x < 3; x++)
       ei_to->content[x][y] = ei_from->content[x][y];
 
+  ei_to->explosion_type = ei_from->explosion_type;
   ei_to->explosion_delay = ei_from->explosion_delay;
   ei_to->ignition_delay = ei_from->ignition_delay;
 

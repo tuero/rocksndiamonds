@@ -248,6 +248,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].move_pattern = MV_ALL_DIRECTIONS;
       element_info[element].move_direction_initial = MV_START_AUTOMATIC;
       element_info[element].move_stepsize = TILEX / 8;
+
       element_info[element].move_enter_element = EL_EMPTY_SPACE;
       element_info[element].move_leave_element = EL_EMPTY_SPACE;
       element_info[element].move_leave_type = LEAVE_TYPE_UNLIMITED;

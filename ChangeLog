@@ -1,3 +1,16 @@
+2004-05-02
+	* fixed bug with creating walkable custom element under player (again)
+	* fixed bug with not copying explosion type when copying CEs in editor
+	* fixed graphical bug when drawing player in setup menu (input devices)
+	* fixed graphical bug when the player is pushing an accessible element
+	* fixed bug with classic switchable elements triggering CE changes
+	* fixed bug with entering/leaving walkable element in RelocatePlayer()
+	* added special behaviour of Supaplex ports with gravity enabled
+
+2004-04-30
+	* fixed bug with broken tubes after placing/exploding dynamite in them
+	* fixed bug with exploding dynamite under player due to other explosion
+
 2004-04-27
 	* added option "handicap" for "levelinfo.conf" (thanks to Niko Böhm)
 	* added network multiplayer code for Windows (thanks to Niko Böhm)

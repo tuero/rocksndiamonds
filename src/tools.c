@@ -61,7 +61,7 @@ static char *print_if_not_empty(int element)
 void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
-  int sy = SCREENX(y);
+  int sy = SCREENY(y);
 
   printf_line("-", 79);
   printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
@@ -890,11 +890,27 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw elements the player is just walking/passing through/under          */
   /* ----------------------------------------------------------------------- */
 
-  /* handle the field the player is leaving ... */
-  if (player_is_moving && IS_ACCESSIBLE_INSIDE(last_element))
-    DrawLevelField(last_jx, last_jy);
-  else if (player_is_moving && IS_ACCESSIBLE_UNDER(last_element))
-    DrawLevelFieldThruMask(last_jx, last_jy);
+  if (player_is_moving)
+  {
+    /* handle the field the player is leaving ... */
+    if (IS_ACCESSIBLE_INSIDE(last_element))
+      DrawLevelField(last_jx, last_jy);
+    else if (IS_ACCESSIBLE_UNDER(last_element))
+      DrawLevelFieldThruMask(last_jx, last_jy);
+  }
+
+#if 1
+  /* do not redraw accessible elements if the player is just pushing them */
+  if (!player_is_moving || !player->is_pushing)
+  {
+    /* ... and the field the player is entering */
+    if (IS_ACCESSIBLE_INSIDE(element))
+      DrawLevelField(jx, jy);
+    else if (IS_ACCESSIBLE_UNDER(element))
+      DrawLevelFieldThruMask(jx, jy);
+  }
+
+#else
 
 #if 0
   /* !!! I have forgotton what this should be good for !!! */
@@ -908,6 +924,7 @@ void DrawPlayer(struct PlayerInfo *player)
     else if (IS_ACCESSIBLE_UNDER(element))
       DrawLevelFieldThruMask(jx, jy);
   }
+#endif
 
   if (setup.direct_draw)
   {
@@ -2880,7 +2897,7 @@ int get_next_element(int element)
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);
+  direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
 
   return element_info[element].direction_graphic[action][direction];
 }
@@ -2888,7 +2905,7 @@ int el_act_dir2img(int element, int action, int direction)
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);
+  direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
 
   return element_info[element].direction_crumbled[action][direction];
 }

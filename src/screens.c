@@ -2409,6 +2409,8 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
   DrawText(mSX+11*32, mSY+2*32, int2str(player_nr +1, 1), FONT_INPUT_1_ACTIVE);
 #if 1
+  ClearRectangleOnBackground(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
+			     TILEX, TILEY);
   DrawGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			 PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
 #else
