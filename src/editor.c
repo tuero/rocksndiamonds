@@ -959,7 +959,9 @@ static struct ValueTextInfo options_move_stepsize[] =
 static struct ValueTextInfo options_smash_targets[] =
 {
   { EP_CAN_SMASH_PLAYER,	"player"			},
+#if 0
   { EP_CAN_SMASH_ENEMIES,	"enemies"			},
+#endif
   { EP_CAN_SMASH_EVERYTHING,	"everything"			},
   { -1,				NULL				}
 };

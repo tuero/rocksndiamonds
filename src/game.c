@@ -1918,7 +1918,9 @@ void Explode(int ex, int ey, int phase, int mode)
       if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
       {
 	element = MovingOrBlocked2Element(x, y);
-	RemoveMovingField(x, y);
+
+	if (!IS_EXPLOSION_PROOF(element))
+	  RemoveMovingField(x, y);
       }
 
 #if 1
@@ -2768,6 +2770,13 @@ void Impact(int x, int y)
       Bang(x, y + 1);
       return;
     }
+#if 0
+    else if (CAN_SMASH_ENEMIES(element) && IS_CLASSIC_ENEMY(smashed))
+    {
+      Bang(x, y + 1);
+      return;
+    }
+#endif
     else if (CAN_SMASH_EVERYTHING(element))
     {
       if (IS_CLASSIC_ENEMY(smashed) ||
@@ -5119,6 +5128,10 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 
   if (CAN_BE_CRUMBLED(Feld[x][y]))
     DrawLevelFieldCrumbledSandNeighbours(x, y);
+
+  TestIfBadThingTouchesHero(x, y);
+  TestIfPlayerTouchesCustomElement(x, y);
+  TestIfElementTouchesCustomElement(x, y);
 }
 
 static void ChangeElementNow(int x, int y, int element)
@@ -5173,6 +5186,9 @@ static void ChangeElementNow(int x, int y, int element)
 
       e = Feld[ex][ey];
 
+      if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
+	e = MovingOrBlocked2Element(ex, ey);
+
       half_destructible = (IS_FREE(ex, ey) || IS_DIGGABLE(e));
 
       if ((change->power <= CP_NON_DESTRUCTIVE  && !IS_FREE(ex, ey)) ||
@@ -5198,6 +5214,9 @@ static void ChangeElementNow(int x, int y, int element)
 	if (can_change[xx][yy] && (!change->use_random_change ||
 				   RND(change->random) == 0))
 	{
+	  if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
+	    RemoveMovingField(ex, ey);
+
 	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
 
 	  /* for symmetry reasons, stop newly created border elements */
