@@ -4,6 +4,7 @@ Release Version 2.0.2 [XX XXX XXXX]
 	- changed default slipping behaviour of gems back to 2.0.0 style;
 	  this is now an element property for gems in the level editor,
 	  although existing converted levels use the new EM gems behaviour
+	- behaviour of "Escape" key in level editor now more intuitive
 
 Release Version 2.0.1 [19 MAR 2002]
 -----------------------------------

@@ -157,6 +157,8 @@ struct OptionInfo
   char *rw_base_directory;
   char *level_directory;
   char *graphics_directory;
+  char *sounds_directory;
+  char *music_directory;
   boolean serveronly;
   boolean network;
   boolean verbose;

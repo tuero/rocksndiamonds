@@ -4018,10 +4018,12 @@ void HandleLevelEditorKeyInput(Key key)
       DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
     else if (key == KSYM_Return)
       DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+    else if (key == KSYM_Escape)
+      DrawLevelText(0, 0, 0, TEXT_END);
   }
   else if (button_status == MB_RELEASED)
   {
-    int i, id;
+    int i, id = GADGET_ID_NONE;
 
     switch (key)
     {
@@ -4046,8 +4048,20 @@ void HandleLevelEditorKeyInput(Key key)
 	button = MB_RIGHTBUTTON;
 	break;
 
+      case KSYM_Escape:
+        if (edit_mode == ED_MODE_DRAWING)
+	{
+	  game_status = MAINMENU;
+	  DrawMainMenu();
+	}
+        else
+	{
+	  DrawDrawingWindow();
+	  edit_mode = ED_MODE_DRAWING;
+	}
+        break;
+
       default:
-	id = GADGET_ID_NONE;
 	break;
     }
 
@@ -4082,6 +4096,9 @@ void HandleEditorGadgetInfoText(void *ptr)
     return;
 
   ClearEditorGadgetInfoText();
+
+  if (gi->event.type == GD_EVENT_INFO_LEAVING)
+    return;
 
   /* misuse this function to delete brush cursor, if needed */
   if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
@@ -4129,6 +4146,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   int max_sy = gi->drawing.area_ysize - 1;
 
   ClearEditorGadgetInfoText();
+
+  if (gi->event.type == GD_EVENT_INFO_LEAVING)
+    return;
 
   /* make sure to stay inside drawing area boundaries */
   sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);

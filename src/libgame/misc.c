@@ -426,6 +426,8 @@ void GetOptions(char *argv[])
   options.rw_base_directory = RW_BASE_PATH;
   options.level_directory = RO_BASE_PATH "/" LEVELS_DIRECTORY;
   options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
+  options.sounds_directory = RO_BASE_PATH "/" SOUNDS_DIRECTORY;
+  options.music_directory = RO_BASE_PATH "/" MUSIC_DIRECTORY;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -469,12 +471,14 @@ void GetOptions(char *argv[])
     {
       printf("Usage: %s [options] [server.name [port]]\n"
 	     "Options:\n"
-	     "  -d, --display machine:0       X server display\n"
-	     "  -b, --basepath directory      alternative base directory\n"
-	     "  -l, --level directory         alternative level directory\n"
-	     "  -g, --graphics directory      alternative graphics directory\n"
+	     "  -d, --display <host>[:<scr>]  X server display\n"
+	     "  -b, --basepath <directory>    alternative base directory\n"
+	     "  -l, --level <directory>       alternative level directory\n"
+	     "  -g, --graphics <directory>    alternative graphics directory\n"
+	     "  -s, --sounds <directory>      alternative graphics directory\n"
+	     "  -m, --music <directory>       alternative graphics directory\n"
 	     "  -n, --network                 network multiplayer game\n"
-	     "  -s, --serveronly              only start network server\n"
+	     "      --serveronly              only start network server\n"
 	     "  -v, --verbose                 verbose mode\n"
 	     "      --debug                   display debugging information\n",
 	     program.command_basename);
@@ -519,6 +523,24 @@ void GetOptions(char *argv[])
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       options.graphics_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-sounds", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.sounds_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-music", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.music_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
     }

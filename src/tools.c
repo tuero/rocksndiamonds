@@ -2282,13 +2282,6 @@ static struct
   }
 };
 
-#if 0
-static void DoNotDisplayInfoText(void *ptr)
-{
-  return;
-}
-#endif
-
 void CreateToolButtons()
 {
   int i;
@@ -2335,11 +2328,6 @@ void CreateToolButtons()
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
-
-#if 0
-		      GDI_CALLBACK_INFO, DoNotDisplayInfoText,
-#endif
-
 		      GDI_CALLBACK_ACTION, HandleToolButtons,
 		      GDI_END);
 

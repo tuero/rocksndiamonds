@@ -511,9 +511,9 @@ void HandleKey(Key key, int key_status)
   }
 
   /* allow quick escape to the main menu with the Escape key */
-  if (key == KSYM_Escape && game_status != MAINMENU)
+  if (key == KSYM_Escape &&
+      game_status != MAINMENU && game_status != LEVELED)
   {
-    CloseDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
     game_status = MAINMENU;
     DrawMainMenu();
     return;
@@ -605,7 +605,7 @@ void HandleKey(Key key, int key_status)
       break;
 
     case LEVELED:
-      if (!anyTextGadgetActiveOrJustFinished)
+      if (!anyTextGadgetActiveOrJustFinished || key == KSYM_Escape)
 	HandleLevelEditorKeyInput(key);
       break;
 

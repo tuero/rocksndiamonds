@@ -917,7 +917,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 static boolean LoadSoundExt(char *sound_name, boolean is_music)
 {
   struct SampleInfo *snd_info;
-  char filename[256];
+  char *filename;
 #if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
@@ -935,14 +935,15 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   snd_info = &Sound[num_sounds - 1];
   snd_info->name = sound_name;
 
-  sprintf(filename, "%s/%s/%s", options.ro_base_directory,
-	  (is_music ? MUSIC_DIRECTORY : SOUNDS_DIRECTORY), snd_info->name);
+  filename = getPath2((is_music ? options.music_directory :
+		       options.sounds_directory), snd_info->name);
 
 #if defined(TARGET_SDL)
 
   if ((snd_info->mix_chunk = Mix_LoadWAV(filename)) == NULL)
   {
     Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
+    free(filename);
     return FALSE;
   }
 
@@ -951,6 +952,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
     Error(ERR_WARN, "cannot open sound file '%s' -- no sounds", filename);
+    free(filename);
     return FALSE;
   }
 
@@ -960,6 +962,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
     fclose(file);
+    free(filename);
     return FALSE;
   }
 
@@ -969,6 +972,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "missing 'WAVE' chunk of sound file '%s'", filename);
     fclose(file);
+    free(filename);
     return FALSE;
   }
 
@@ -982,6 +986,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "missing 'data' chunk of sound file '%s'", filename);
     fclose(file);
+    free(filename);
     return FALSE;
   }
 
@@ -994,6 +999,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
     fclose(file);
+    free(filename);
     return FALSE;
   }
 
@@ -1013,6 +1019,8 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 
 #endif
 
+  free(filename);
+
   return TRUE;
 }
 
@@ -1025,7 +1033,7 @@ boolean LoadMod(char *mod_name)
 {
 #if defined(TARGET_SDL)
   struct SampleInfo *mod_info;
-  char filename[256];
+  char *filename;
 
   num_mods++;
   Mod = checked_realloc(Mod, num_mods * sizeof(struct SampleInfo));
@@ -1033,14 +1041,16 @@ boolean LoadMod(char *mod_name)
   mod_info = &Mod[num_mods - 1];
   mod_info->name = mod_name;
 
-  sprintf(filename, "%s/%s/%s", options.ro_base_directory,
-	  MUSIC_DIRECTORY, mod_info->name);
+  filename = getPath2(options.music_directory, mod_info->name);
 
   if ((mod_info->mix_music = Mix_LoadMUS(filename)) == NULL)
   {
     Error(ERR_WARN, "cannot read music file '%s' -- no music", filename);
+    free(filename);
     return FALSE;
   }
+
+  free(filename);
 
   return TRUE;
 #else
@@ -1052,18 +1062,17 @@ int LoadMusic(void)
 {
   DIR *dir;
   struct dirent *dir_entry;
-  char *music_directory = getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
   int num_wav_music = 0;
   int num_mod_music = 0;
 
   if (!audio.sound_available)
     return 0;
 
-  if ((dir = opendir(music_directory)) == NULL)
+  if ((dir = opendir(options.music_directory)) == NULL)
   {
-    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+    Error(ERR_WARN, "cannot read music directory '%s'",
+	  options.music_directory);
     audio.music_available = FALSE;
-    free(music_directory);
     return 0;
   }
 
@@ -1092,9 +1101,7 @@ int LoadMusic(void)
 
   if (num_wav_music == 0 && num_mod_music == 0)
     Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
-	  music_directory);
-
-  free(music_directory);
+	  options.music_directory);
 
   num_music = (num_mod_music > 0 ? num_mod_music : num_wav_music);
 

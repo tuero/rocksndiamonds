@@ -82,11 +82,6 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 
 static void default_callback_info(void *ptr)
 {
-#if 0
-  if (game_status == LEVELED)
-    HandleEditorGadgetInfoText(ptr);
-#endif
-
   return;
 }
 
@@ -851,15 +846,27 @@ void HandleGadgets(int mx, int my, int button)
   if (last_info_gi != new_gi ||
       (new_gi && new_gi->type == GD_TYPE_DRAWING_AREA && changed_position))
   {
-    last_info_gi = new_gi;
-
     if (new_gi != NULL && (button == 0 || new_gi == last_gi))
     {
-      new_gi->event.type = 0;
+      new_gi->event.type = GD_EVENT_INFO_ENTERING;
       new_gi->callback_info(new_gi);
     }
-    else
+    else if (last_info_gi != NULL)
+    {
+      last_info_gi->event.type = GD_EVENT_INFO_LEAVING;
+      last_info_gi->callback_info(last_info_gi);
+
+#if 0
       default_callback_info(NULL);
+
+      printf("It seems that we are leaving gadget [%s]!\n",
+	     (last_info_gi != NULL &&
+	      last_info_gi->info_text != NULL ?
+	      last_info_gi->info_text : ""));
+#endif
+    }
+
+    last_info_gi = new_gi;
   }
 
   if (gadget_pressed)
