@@ -63,7 +63,7 @@ extern struct SoundControl emptySoundControl;
 
 static BITMAP *Read_PCX_to_AllegroBitmap(char *);
 
-static void allegro_drivers()
+static void allegro_init_drivers()
 {
   int i;
 
@@ -89,12 +89,17 @@ static void allegro_drivers()
 
   last_joystick_state = 0;
   joystick_event = FALSE;
+}
 
-  sysinfo.audio_available = TRUE;
+static boolean allegro_init_audio()
+{
   reserve_voices(MAX_SOUNDS_PLAYING, 0);
+
   if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL) == -1)
     if (install_sound(DIGI_SB, MIDI_NONE, NULL) == -1)
-      sysinfo.audio_available = FALSE;
+      return FALSE;
+
+  return TRUE;
 }
 
 static boolean hide_mouse(Display *display, int x, int y,
@@ -325,7 +330,7 @@ Display *XOpenDisplay(char *display_name)
   display->mouse_ptr = mouse_bitmap;
 
   allegro_init();
-  allegro_drivers();
+  allegro_init_drivers();
   set_color_depth(8);
 
   /* force Windows 95 to switch to fullscreen mode */
@@ -913,6 +918,11 @@ void XAutoRepeatOn(Display *display)
 void XAutoRepeatOff(Display *display)
 {
   keyboard_auto_repeat = FALSE;
+}
+
+boolean MSDOSInitAudio(void)
+{
+  return allegro_init_audio();
 }
 
 void NetworkServer(int port, int serveronly)

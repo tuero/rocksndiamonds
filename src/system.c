@@ -14,6 +14,7 @@
 
 #include "main.h"
 #include "misc.h"
+#include "sound.h"
 
 
 /* ========================================================================= */
@@ -233,19 +234,33 @@ inline void ChangeVideoModeIfNeeded(void)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline boolean InitAudio(void)
+inline struct AudioSystemInfo InitAudio(void)
 {
-  sysinfo.audio_available = TRUE;
-  sysinfo.audio_loops_available = FALSE;
+  struct AudioSystemInfo audio;
 
-  if (!sysinfo.audio_available)
-    return FALSE;
+  audio.sound_available = FALSE;
+  audio.loops_available = FALSE;
+  audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
+  audio.soundserver_pid = 0;
+  audio.device_fd = 0;
 
-#ifdef TARGET_SDL
-  return SDLInitAudio();
-#else
-  return TRUE;
+#if defined(TARGET_SDL)
+  if (SDLInitAudio())
+  {
+    audio.sound_available = TRUE;
+    audio.loops_available = TRUE;
+  }
+#elif defined(PLATFORM_MSDOS)
+  if (MSDOSInitAudio())
+  {
+    audio.sound_available = TRUE;
+    audio.loops_available = TRUE;
+  }
+#elif defined(PLATFORM_UNIX)
+  UnixInitAudio(&audio);
 #endif
+
+  return audio;
 }
 
 

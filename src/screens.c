@@ -1409,7 +1409,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     {
       int yy = y-1;
 
-      if (y == 3 && sysinfo.audio_available)
+      if (y == 3 && audio.sound_available)
       {
 	if (setup.sound)
 	{
@@ -1423,7 +1423,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.sound = !setup.sound;
       }
-      else if (y == 4 && sysinfo.audio_loops_available)
+      else if (y == 4 && audio.loops_available)
       {
 	if (setup.sound_loops)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1435,7 +1435,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	}
 	setup.sound_loops = !setup.sound_loops;
       }
-      else if (y == 5 && sysinfo.audio_loops_available)
+      else if (y == 5 && audio.loops_available)
       {
 	if (setup.sound_music)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);

@@ -167,10 +167,10 @@ static unsigned int getStateCheckSum(int counter)
 
 void GetPlayerConfig()
 {
-  if (!sysinfo.audio_available)
+  if (!audio.sound_available)
     setup.sound = FALSE;
 
-  if (!sysinfo.audio_loops_available)
+  if (!audio.loops_available)
   {
     setup.sound_loops = FALSE;
     setup.sound_music = FALSE;
@@ -6233,7 +6233,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 	setup.sound_music = FALSE;
 	FadeSound(background_loop[level_nr % num_bg_loops]);
       }
-      else if (sysinfo.audio_loops_available)
+      else if (audio.loops_available)
       { 
 	setup.sound = setup.sound_music = TRUE;
 	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
@@ -6243,14 +6243,14 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case SOUND_CTRL_ID_LOOPS:
       if (setup.sound_loops)
 	setup.sound_loops = FALSE;
-      else if (sysinfo.audio_loops_available)
+      else if (audio.loops_available)
 	setup.sound = setup.sound_loops = TRUE;
       break;
 
     case SOUND_CTRL_ID_SIMPLE:
       if (setup.sound_simple)
 	setup.sound_simple = FALSE;
-      else if (sysinfo.audio_available)
+      else if (audio.sound_available)
 	setup.sound = setup.sound_simple = TRUE;
       break;
 

@@ -43,13 +43,13 @@ typedef int (*EventFilter)(const Event *);
 
 /* structure definitions */
 
-struct SystemInfo
+struct AudioSystemInfo
 {
-  boolean audio_available;
-  boolean audio_loops_available;
-  int audio_process_id;
-  int audio_process_pipe[2];
-  int audio_fd;
+  boolean sound_available;
+  boolean loops_available;
+  int soundserver_pipe[2];
+  int soundserver_pid;
+  int device_fd;
 };
 
 
@@ -73,7 +73,7 @@ inline boolean PointerInWindow(DrawWindow);
 inline boolean SetVideoMode(void);
 inline void ChangeVideoModeIfNeeded(void);
 
-inline boolean InitAudio(void);
+inline struct AudioSystemInfo InitAudio(void);
 
 inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);

@@ -530,7 +530,7 @@ extern struct JoystickInfo	joystick[];
 extern struct OptionInfo	options;
 extern struct SetupInfo		setup;
 extern struct GameInfo		game;
-extern struct SystemInfo	sysinfo;
+extern struct AudioSystemInfo	audio;
 extern struct GlobalInfo	global;
 
 extern char		*sound_name[];

@@ -142,35 +142,7 @@ void InitSound()
 {
   int i;
 
-  /* REMOVE THIS! (gone to system.c:InitAudio) */
-  if (!sysinfo.audio_available)
-    return;
-
-#if defined(TARGET_SDL)
-  if (InitAudio())
-  {
-    sysinfo.audio_available = TRUE;
-    sysinfo.audio_loops_available = TRUE;
-  }
-  else
-  {
-    sysinfo.audio_available = FALSE;
-  }
-#else /* !TARGET_SDL */
-
-#if defined(PLATFORM_UNIX)
-  if (!(sysinfo.audio_available = CheckAudio(sound_device_name)))
-    return;
-
-#ifdef VOXWARE
-  sysinfo.audio_loops_available = TRUE;
-#endif
-
-#else /* !PLATFORM_UNIX */
-  sysinfo.audio_loops_available = TRUE;
-
-#endif /* !PLATFORM_UNIX */
-#endif /* !TARGET_SDL */
+  audio = InitAudio();
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
@@ -178,8 +150,8 @@ void InitSound()
 
     if (!LoadSound(&Sound[i]))
     {
-      sysinfo.audio_available = FALSE;
-      sysinfo.audio_loops_available = FALSE;
+      audio.sound_available = FALSE;
+      audio.loops_available = FALSE;
       return;
     }
   }
@@ -187,27 +159,27 @@ void InitSound()
 
 void InitSoundServer()
 {
-  if (!sysinfo.audio_available)
+  if (!audio.sound_available)
     return;
 
 #if !defined(TARGET_SDL)
 #if defined(PLATFORM_UNIX)
 
-  if (pipe(sysinfo.audio_process_pipe) < 0)
+  if (pipe(audio.soundserver_pipe) < 0)
   {
     Error(ERR_WARN, "cannot create pipe - no sounds");
-    sysinfo.audio_available = FALSE;
+    audio.sound_available = FALSE;
     return;
   }
 
-  if ((sysinfo.audio_process_id = fork()) < 0)
+  if ((audio.soundserver_pid = fork()) < 0)
   {       
     Error(ERR_WARN, "cannot create sound server process - no sounds");
-    sysinfo.audio_available = FALSE;
+    audio.sound_available = FALSE;
     return;
   }
 
-  if (!sysinfo.audio_process_id)	/* we are child */
+  if (audio.soundserver_pid == 0)	/* we are child */
   {
     SoundServer();
 
@@ -215,7 +187,7 @@ void InitSoundServer()
     exit(0);
   }
   else					/* we are parent */
-    close(sysinfo.audio_process_pipe[0]); /* no reading from pipe needed */
+    close(audio.soundserver_pipe[0]); /* no reading from pipe needed */
 
 #else /* !PLATFORM_UNIX */
 
@@ -1806,10 +1778,10 @@ void CloseAllAndExit(int exit_value)
   StopSounds();
   FreeSounds(NUM_SOUNDS);
 #else
-  if (sysinfo.audio_process_id)
+  if (audio.soundserver_pid)
   {
     StopSounds();
-    kill(sysinfo.audio_process_id, SIGTERM);
+    kill(audio.soundserver_pid, SIGTERM);
     FreeSounds(NUM_SOUNDS);
   }
 #endif

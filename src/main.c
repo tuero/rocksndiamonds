@@ -107,7 +107,7 @@ struct TapeInfo		tape;
 struct OptionInfo	options;
 struct SetupInfo	setup;
 struct GameInfo		game;
-struct SystemInfo	sysinfo;
+struct AudioSystemInfo	audio;
 struct GlobalInfo	global;
 
 /* data needed for playing sounds */

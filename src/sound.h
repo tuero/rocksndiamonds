@@ -163,7 +163,7 @@ struct SoundControl
 /* general sound functions */
 int OpenAudio(char *);
 int CheckAudio(char *);
-boolean UnixInitAudio(void);
+void UnixInitAudio(struct AudioSystemInfo *);
 
 /* sound server functions */ 
 void SoundServer(void);
