@@ -171,7 +171,7 @@ void InitSound()
     }
   }
 
-  num_bg_loops = LoadMusic();
+  num_bg_loops = LoadCustomMusic();
 
   StartSoundserver();
 }

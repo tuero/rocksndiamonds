@@ -142,6 +142,7 @@ char *getSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
+char *getCustomMusicDirectory(void);
 
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);

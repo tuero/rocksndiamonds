@@ -422,6 +422,41 @@ char *getCustomSoundFilename(char *basename)
   return NULL;					/* cannot find image file */
 }
 
+char *getCustomMusicDirectory(void)
+{
+  static char *directory = NULL;
+
+  if (directory != NULL)
+    free(directory);
+
+  /* 1st try: look for special artwork in current level series directory */
+  directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
+  if (fileExists(directory))
+    return directory;
+
+  /* 2nd try: look for special artwork in private artwork directory */
+  directory = getStringCopy(getUserMusicDir());
+  if (fileExists(directory))
+    return directory;
+
+  /* 3rd try: look for special artwork in configured artwork directory */
+  directory = getStringCopy(getSetupArtworkDir(artwork.mus_current));
+  if (fileExists(directory))
+    return directory;
+
+  /* 4th try: look for default artwork in new default artwork directory */
+  directory = getStringCopy(getDefaultMusicDir(MUSIC_SUBDIR));
+  if (fileExists(directory))
+    return directory;
+
+  /* 5th try: look for default artwork in old default artwork directory */
+  directory = getStringCopy(options.music_directory);
+  if (fileExists(directory))
+    return directory;
+
+  return NULL;					/* cannot find image file */
+}
+
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);

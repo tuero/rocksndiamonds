@@ -940,10 +940,9 @@ void ReloadMusic()
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		16	/* size of WAV file header */
 
-static boolean LoadSoundExt(char *sound_name, boolean is_music)
+static boolean Load_WAV(char *filename)
 {
   struct SampleInfo *snd_info;
-  char *filename;
 #if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk_name[CHUNK_ID_LEN + 1];
@@ -961,21 +960,12 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   snd_info = &Sound[num_sounds - 1];
   snd_info->data_len = 0;
   snd_info->data_ptr = NULL;
-#if 0
-  snd_info->name = sound_name;
-#endif
-
-  if (is_music)
-    filename = getPath2(options.music_directory, sound_name);
-  else
-    filename = getStringCopy(sound_name);
 
 #if defined(TARGET_SDL)
 
   if ((snd_info->mix_chunk = Mix_LoadWAV(filename)) == NULL)
   {
     Error(ERR_WARN, "cannot read sound file '%s'", filename);
-    free(filename);
     return FALSE;
   }
 
@@ -984,7 +974,6 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
     Error(ERR_WARN, "cannot open sound file '%s'", filename);
-    free(filename);
     return FALSE;
   }
 
@@ -994,7 +983,6 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
     fclose(file);
-    free(filename);
     return FALSE;
   }
 
@@ -1004,7 +992,6 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   {
     Error(ERR_WARN, "missing 'WAVE' type ID of sound file '%s'", filename);
     fclose(file);
-    free(filename);
     return FALSE;
   }
 
@@ -1035,7 +1022,6 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
       {
 	Error(ERR_WARN,"cannot read 'data' chunk of sound file '%s'",filename);
 	fclose(file);
-	free(filename);
 	return FALSE;
       }
 
@@ -1052,7 +1038,6 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   if (snd_info->data_ptr == NULL)
   {
     Error(ERR_WARN, "missing 'data' chunk of sound file '%s'", filename);
-    free(filename);
     return FALSE;
   }
 
@@ -1070,14 +1055,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 
 #endif
 
-  free(filename);
-
   return TRUE;
-}
-
-boolean LoadSound(char *sound_name)
-{
-  return LoadSoundExt(sound_name, FALSE);
 }
 
 boolean LoadCustomSound(char *basename)
@@ -1090,10 +1068,10 @@ boolean LoadCustomSound(char *basename)
     return FALSE;
   }
 
-  return LoadSound(filename);
+  return Load_WAV(filename);
 }
 
-boolean LoadMod(char *mod_name)
+static boolean Load_MOD(char *mod_name)
 {
 #if defined(TARGET_SDL)
   struct SampleInfo *mod_info;
@@ -1122,8 +1100,9 @@ boolean LoadMod(char *mod_name)
 #endif
 }
 
-int LoadMusic(void)
+int LoadCustomMusic(void)
 {
+  char *music_directory = getCustomMusicDirectory();
   DIR *dir;
   struct dirent *dir_entry;
   int num_wav_music = 0;
@@ -1132,22 +1111,23 @@ int LoadMusic(void)
   if (!audio.sound_available)
     return 0;
 
-  if ((dir = opendir(options.music_directory)) == NULL)
+  if ((dir = opendir(music_directory)) == NULL)
   {
-    Error(ERR_WARN, "cannot read music directory '%s'",
-	  options.music_directory);
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
     audio.music_available = FALSE;
     return 0;
   }
 
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {
-    char *filename = dir_entry->d_name;
+    char *filename = getPath2(music_directory, dir_entry->d_name);
 
-    if (FileIsSound(filename) && LoadSoundExt(filename, TRUE))
+    if (FileIsSound(filename) && Load_WAV(filename))
       num_wav_music++;
-    else if (FileIsMusic(filename) && LoadMod(filename))
+    else if (FileIsMusic(filename) && Load_MOD(filename))
       num_mod_music++;
+
+    free(filename);
   }
 
   closedir(dir);
