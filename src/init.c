@@ -1640,10 +1640,10 @@ void setMoveIntoAcidProperty(struct LevelInfo *level, int element, boolean set)
 
   if (bit_nr > -1)
   {
-    level->can_move_into_acid &= ~(1 << bit_nr);
+    level->can_move_into_acid_bits &= ~(1 << bit_nr);
 
     if (set)
-      level->can_move_into_acid |= (1 << bit_nr);
+      level->can_move_into_acid_bits |= (1 << bit_nr);
   }
 }
 
@@ -1652,7 +1652,7 @@ boolean getMoveIntoAcidProperty(struct LevelInfo *level, int element)
   int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
 
   if (bit_nr > -1)
-    return ((level->can_move_into_acid & (1 << bit_nr)) != 0);
+    return ((level->can_move_into_acid_bits & (1 << bit_nr)) != 0);
 
   return FALSE;
 }

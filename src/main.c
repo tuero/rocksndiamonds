@@ -90,7 +90,7 @@ int			ZX, ZY;
 int			ExitX, ExitY;
 int			AllPlayersGone;
 
-int			TimeFrames, TimePlayed, TimeLeft;
+int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 
 boolean			network_player_action_received = FALSE;
 

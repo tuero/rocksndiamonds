@@ -1372,6 +1372,7 @@ struct PlayerInfo
   int shield_deadly_time_left;
 
   int inventory_element[MAX_INVENTORY_SIZE];
+  int inventory_infinite_element;
   int inventory_size;
 };
 
@@ -1422,7 +1423,7 @@ struct LevelInfo
   int time_light;
   int time_timegate;
 
-  int can_move_into_acid;	/* bits indicate property for element groups */
+  int can_move_into_acid_bits;	/* bits indicate property for element groups */
 
   boolean double_speed;
   boolean initial_gravity;
@@ -1430,6 +1431,8 @@ struct LevelInfo
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
   boolean use_spring_bug;	/* for compatibility with old levels */
+
+  int use_step_counter;		/* count steps instead of seconds for level */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
@@ -1843,7 +1846,7 @@ extern int			ZX, ZY;
 extern int			ExitX, ExitY;
 extern int			AllPlayersGone;
 
-extern int			TimeFrames, TimePlayed, TimeLeft;
+extern int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 extern boolean			SiebAktiv;
 extern int			SiebCount;
 

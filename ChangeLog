@@ -1,3 +1,10 @@
+2004-02-28
+	* use unlimited number of droppable elements when "count" set to zero
+	* added option to use step limit instead of time limit for level
+
+2004-02-27
+	* added player and change page as trigger for custom element change
+
 2004-02-24
 	* fixed bug with exploding amoeba (explosion 3x3 instead of 1x1)
 

@@ -241,6 +241,7 @@ int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
+static void CheckGravityMovementWhenNotMoving(struct PlayerInfo *);
 static void KillHeroUnlessEnemyProtected(int, int);
 static void KillHeroUnlessExplosionProtected(int, int);
 
@@ -1471,6 +1472,7 @@ void InitGame()
     player->shield_normal_time_left = 0;
     player->shield_deadly_time_left = 0;
 
+    player->inventory_infinite_element = EL_UNDEFINED;
     player->inventory_size = 0;
 
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
@@ -1494,6 +1496,7 @@ void InitGame()
   TimeFrames = 0;
   TimePlayed = 0;
   TimeLeft = level.time;
+  TapeTime = 0;
 
   ScreenMovDir = MV_NO_MOVING;
   ScreenMovPos = 0;
@@ -7177,6 +7180,10 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
     printf("::: player %d acts [%d]\n", player->index_nr, FrameCounter);
 #endif
 
+#if 0
+    /* !!! TEST !!! */
+    CheckGravityMovement(player);
+#endif
     if (button1)
       snapped = SnapField(player, dx, dy);
     else
@@ -7214,7 +7221,7 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
-    CheckGravityMovement(player);
+    CheckGravityMovementWhenNotMoving(player);
 
     if (player->MovPos == 0)
       SetPlayerWaiting(player, TRUE);
@@ -7295,7 +7302,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
-    CheckGravityMovement(player);
+    CheckGravityMovementWhenNotMoving(player);
 
     if (player->MovPos == 0)
       InitPlayerGfxAnimation(player, ACTION_DEFAULT, player->MovDir);
@@ -7395,11 +7402,29 @@ void GameActions()
   {
     int actual_player_action = stored_player[i].effective_action;
 
+#if 1
+    /* OLD: overwrite programmed action with tape action (BAD!!!) */
     if (stored_player[i].programmed_action)
       actual_player_action = stored_player[i].programmed_action;
+#endif
 
     if (recorded_player_action)
+    {
+#if 0
+      if (stored_player[i].programmed_action &&
+	  stored_player[i].programmed_action != recorded_player_action[i])
+	printf("::: %d <-> %d\n",
+	       stored_player[i].programmed_action, recorded_player_action[i]);
+#endif
+
       actual_player_action = recorded_player_action[i];
+    }
+
+#if 0
+    /* NEW: overwrite tape action with programmed action */
+    if (stored_player[i].programmed_action)
+      actual_player_action = stored_player[i].programmed_action;
+#endif
 
     tape_action[i] = PlayerActions(&stored_player[i], actual_player_action);
 
@@ -7833,39 +7858,44 @@ void GameActions()
   if (TimeFrames >= FRAMES_PER_SECOND)
   {
     TimeFrames = 0;
-    TimePlayed++;
+    TapeTime++;
 
-    for (i = 0; i < MAX_PLAYERS; i++)
+    if (!level.use_step_counter)
     {
-      struct PlayerInfo *player = &stored_player[i];
+      TimePlayed++;
 
-      if (SHIELD_ON(player))
+      for (i = 0; i < MAX_PLAYERS; i++)
       {
-	player->shield_normal_time_left--;
+	struct PlayerInfo *player = &stored_player[i];
 
-	if (player->shield_deadly_time_left > 0)
-	  player->shield_deadly_time_left--;
+	if (SHIELD_ON(player))
+	{
+	  player->shield_normal_time_left--;
+
+	  if (player->shield_deadly_time_left > 0)
+	    player->shield_deadly_time_left--;
+	}
       }
+
+      if (TimeLeft > 0)
+      {
+	TimeLeft--;
+
+	if (TimeLeft <= 10 && setup.time_limit)
+	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+
+	DrawGameValue_Time(TimeLeft);
+
+	if (!TimeLeft && setup.time_limit)
+	  for (i = 0; i < MAX_PLAYERS; i++)
+	    KillHero(&stored_player[i]);
+      }
+      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+	DrawGameValue_Time(TimePlayed);
     }
 
     if (tape.recording || tape.playing)
-      DrawVideoDisplay(VIDEO_STATE_TIME_ON, TimePlayed);
-
-    if (TimeLeft > 0)
-    {
-      TimeLeft--;
-
-      if (TimeLeft <= 10 && setup.time_limit)
-	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
-
-      DrawGameValue_Time(TimeLeft);
-
-      if (!TimeLeft && setup.time_limit)
-	for (i = 0; i < MAX_PLAYERS; i++)
-	  KillHero(&stored_player[i]);
-    }
-    else if (level.time == 0 && !AllPlayersGone) /* level without time limit */
-      DrawGameValue_Time(TimePlayed);
+      DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   }
 
   DrawAllPlayers();
@@ -8067,6 +8097,27 @@ static void CheckGravityMovement(struct PlayerInfo *player)
   }
 }
 
+static void CheckGravityMovementWhenNotMoving(struct PlayerInfo *player)
+{
+#if 1
+  return CheckGravityMovement(player);
+#endif
+
+  if (game.gravity && !player->programmed_action)
+  {
+    int jx = player->jx, jy = player->jy;
+    boolean field_under_player_is_free =
+      (IN_LEV_FIELD(jx, jy + 1) && IS_FREE(jx, jy + 1));
+    boolean player_is_standing_on_valid_field =
+      (IS_WALKABLE_INSIDE(Feld[jx][jy]) ||
+       (IS_WALKABLE(Feld[jx][jy]) &&
+	!(element_info[Feld[jx][jy]].access_direction & MV_DOWN)));
+
+    if (field_under_player_is_free && !player_is_standing_on_valid_field)
+      player->programmed_action = MV_DOWN;
+  }
+}
+
 /*
   MovePlayerOneStep()
   -----------------------------------------------------------------------------
@@ -8214,9 +8265,16 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       !tape.playing)
     return FALSE;
 #else
+
+#if 1
+  if (!FrameReached(&player->move_delay, player->move_delay_value))
+    return FALSE;
+#else
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
       !(tape.playing && tape.file_version < FILE_VERSION_2_0))
     return FALSE;
+#endif
+
 #endif
 
   /* remove the last programmed player action */
@@ -8407,7 +8465,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   }
   else
   {
-    CheckGravityMovement(player);
+    CheckGravityMovementWhenNotMoving(player);
 
     /*
     player->last_move_dir = MV_NO_MOVING;
@@ -8524,6 +8582,42 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
       if (!player->active)
 	RemoveHero(player);
+    }
+
+    if (level.use_step_counter)
+    {
+      int i;
+
+      TimePlayed++;
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+
+	if (SHIELD_ON(player))
+	{
+	  player->shield_normal_time_left--;
+
+	  if (player->shield_deadly_time_left > 0)
+	    player->shield_deadly_time_left--;
+	}
+      }
+
+      if (TimeLeft > 0)
+      {
+	TimeLeft--;
+
+	if (TimeLeft <= 10 && setup.time_limit)
+	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+
+	DrawGameValue_Time(TimeLeft);
+
+	if (!TimeLeft && setup.time_limit)
+	  for (i = 0; i < MAX_PLAYERS; i++)
+	    KillHero(&stored_player[i]);
+      }
+      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+	DrawGameValue_Time(TimePlayed);
     }
 
     if (tape.single_step && tape.recording && !tape.pausing &&
@@ -9562,9 +9656,12 @@ int DigField(struct PlayerInfo *player,
 	{
 	  int i;
 
-	  for (i = 0; i < element_info[element].collect_count; i++)
-	    if (player->inventory_size < MAX_INVENTORY_SIZE)
-	      player->inventory_element[player->inventory_size++] = element;
+	  if (element_info[element].collect_count == 0)
+	    player->inventory_infinite_element = element;
+	  else
+	    for (i = 0; i < element_info[element].collect_count; i++)
+	      if (player->inventory_size < MAX_INVENTORY_SIZE)
+		player->inventory_element[player->inventory_size++] = element;
 
 	  DrawGameValue_Dynamite(local_player->inventory_size);
 	}
@@ -9945,25 +10042,43 @@ boolean DropElement(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
   int old_element = Feld[jx][jy];
-  int new_element;
+  int new_element = (player->inventory_size > 0 ?
+		     player->inventory_element[player->inventory_size - 1] :
+		     player->inventory_infinite_element != EL_UNDEFINED ?
+		     player->inventory_infinite_element :
+		     player->dynabombs_left > 0 ?
+		     EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
+		     EL_UNDEFINED);
 
   /* check if player is active, not moving and ready to drop */
   if (!player->active || player->MovPos || player->drop_delay > 0)
     return FALSE;
 
   /* check if player has anything that can be dropped */
-  if (player->inventory_size == 0 && player->dynabombs_left == 0)
+#if 1
+  if (new_element == EL_UNDEFINED)
     return FALSE;
+#else
+  if (player->inventory_size == 0 &&
+      player->inventory_infinite_element == EL_UNDEFINED &&
+      player->dynabombs_left == 0)
+    return FALSE;
+#endif
 
   /* check if anything can be dropped at the current position */
   if (IS_ACTIVE_BOMB(old_element) || old_element == EL_EXPLOSION)
     return FALSE;
 
   /* collected custom elements can only be dropped on empty fields */
+#if 1
+  if (IS_CUSTOM_ELEMENT(new_element) && old_element != EL_EMPTY)
+    return FALSE;
+#else
   if (player->inventory_size > 0 &&
       IS_CUSTOM_ELEMENT(player->inventory_element[player->inventory_size - 1])
       && old_element != EL_EMPTY)
     return FALSE;
+#endif
 
   if (old_element != EL_EMPTY)
     Back[jx][jy] = old_element;		/* store old element on this field */
@@ -9971,19 +10086,26 @@ boolean DropElement(struct PlayerInfo *player)
   ResetGfxAnimation(jx, jy);
   ResetRandomAnimationValue(jx, jy);
 
-  if (player->inventory_size > 0)
+  if (player->inventory_size > 0 ||
+      player->inventory_infinite_element != EL_UNDEFINED)
   {
-    player->inventory_size--;
-    new_element = player->inventory_element[player->inventory_size];
+    if (player->inventory_size > 0)
+    {
+      player->inventory_size--;
 
-    if (new_element == EL_DYNAMITE)
-      new_element = EL_DYNAMITE_ACTIVE;
-    else if (new_element == EL_SP_DISK_RED)
-      new_element = EL_SP_DISK_RED_ACTIVE;
+#if 0
+      new_element = player->inventory_element[player->inventory_size];
+#endif
+
+      DrawGameValue_Dynamite(local_player->inventory_size);
+
+      if (new_element == EL_DYNAMITE)
+	new_element = EL_DYNAMITE_ACTIVE;
+      else if (new_element == EL_SP_DISK_RED)
+	new_element = EL_SP_DISK_RED_ACTIVE;
+    }
 
     Feld[jx][jy] = new_element;
-
-    DrawGameValue_Dynamite(local_player->inventory_size);
 
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
@@ -10006,7 +10128,10 @@ boolean DropElement(struct PlayerInfo *player)
   else		/* player is dropping a dyna bomb */
   {
     player->dynabombs_left--;
+
+#if 0
     new_element = EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr;
+#endif
 
     Feld[jx][jy] = new_element;
 
