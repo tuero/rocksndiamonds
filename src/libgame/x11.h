@@ -38,18 +38,6 @@
 #define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE
 
 
-/* structure definitions */
-
-struct X11DrawableInfo
-{
-  Drawable drawable;
-  Drawable clip_mask;
-  GC gc;		/* GC for normal drawing (inheritated from 'window') */
-  GC stored_clip_gc;	/* GC for masked drawing (used for whole Pixmap)     */
-  GC clip_gc;		/* can be 'stored_clip_gc' or one-tile-only clip GC  */
-};
-
-
 /* X11 type definitions */
 
 typedef struct X11DrawableInfo *Bitmap;
@@ -65,6 +53,18 @@ typedef XKeyEvent		KeyEvent;
 typedef XExposeEvent		ExposeEvent;
 typedef XFocusChangeEvent	FocusChangeEvent;
 typedef XClientMessageEvent	ClientMessageEvent;
+
+
+/* structure definitions */
+
+struct X11DrawableInfo
+{
+  Drawable drawable;
+  Drawable clip_mask;
+  GC gc;		/* GC for normal drawing (inheritated from 'window') */
+  GC stored_clip_gc;	/* GC for masked drawing (used for whole Pixmap)     */
+  GC clip_gc;		/* can be 'stored_clip_gc' or one-tile-only clip GC  */
+};
 
 
 /* X11 symbol definitions */

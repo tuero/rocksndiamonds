@@ -33,15 +33,6 @@
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 
 
-/* structure definitions */
-
-struct SDLSurfaceInfo
-{
-  SDL_Surface *surface;
-  SDL_Surface *surface_masked;
-};
-
-
 /* SDL type definitions */
 
 typedef struct SDLSurfaceInfo  *Bitmap;
@@ -63,6 +54,17 @@ typedef int			Pixmap;
 typedef int			Display;
 typedef int			Visual;
 typedef int			Colormap;
+
+
+/* structure definitions */
+
+struct SDLSurfaceInfo
+{
+  SDL_Surface *surface;
+  SDL_Surface *surface_masked;
+  GC gc;
+  GC stored_clip_gc;
+};
 
 
 /* SDL symbol definitions */

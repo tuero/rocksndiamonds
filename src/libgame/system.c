@@ -162,13 +162,13 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
   if (!(pixmap = XCreatePixmap(display, window->drawable,
 			       width, height, real_depth)))
     Error(ERR_EXIT, "cannot create pixmap");
-
   new_bitmap->drawable = pixmap;
-#endif
 
   if (window == NULL)
     Error(ERR_EXIT, "Window GC needed for Bitmap -- create Window first");
   new_bitmap->gc = window->gc;
+
+#endif
 
   return new_bitmap;
 }
@@ -283,7 +283,7 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
 #ifdef TARGET_SDL
-  SDLDrawSimpleLine(bitmap->drawable, from_x, from_y, to_x, to_y, 0xffffff);
+  SDLDrawSimpleLine(bitmap->surface, from_x, from_y, to_x, to_y, 0xffffff);
 #else
   XSetForeground(display, bitmap->gc, WhitePixel(display, screen));
   XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);

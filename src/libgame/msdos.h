@@ -21,6 +21,9 @@
 /* symbol 'window' is defined in DJGPP cross-compiler in libc.a(conio.o) */
 #define window window_djgpp
 
+/* symbol 'font' is defined in "allegro.h" */
+#define font font_allegro
+
 /* system dependent definitions */
 
 #define TARGET_STRING		"DOS"
@@ -690,6 +693,7 @@ int XReadBitmapFile(Display *, Drawable, char *,
 		    unsigned int *, unsigned int *, Pixmap *, int *, int *);
 void XFreePixmap(Display *, Pixmap);
 void XFreeGC(Display *, GC);
+void XUnmapWindow(Display *, Window);
 void XCloseDisplay(Display *);
 void XNextEvent(Display *, XEvent *);
 int XPending(Display *);
@@ -698,6 +702,7 @@ int XLookupString(XKeyEvent *, char *, int, KeySym *, XComposeStatus *);
 void XSetForeground(Display *, GC, unsigned long);
 void XDrawLine(Display *, Drawable, GC, int, int, int, int);
 void XDestroyImage(XImage *);
+void XDestroyWindow(Display *, Window);
 Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
 		   int *, int *, unsigned int *);
 void XAutoRepeatOn(Display *);

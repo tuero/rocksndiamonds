@@ -65,10 +65,11 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   {
     /* switch display to fullscreen mode, if available */
     DrawWindow window_old = *backbuffer;
-    DrawWindow window_new;
+    DrawWindow window_new = CreateBitmapStruct();
 
-    if ((window_new = SDL_SetVideoMode(video.width, video.height, video.depth,
-				       surface_flags)) == NULL)
+    if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
+						video.depth, surface_flags))
+	== NULL)
     {
       /* switching display to fullscreen mode failed */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -80,7 +81,7 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
     else
     {
       if (window_old)
-	SDL_FreeSurface(window_old);
+	FreeBitmap(window_old);
       *backbuffer = window_new;
 
       video.fullscreen_enabled = TRUE;
@@ -92,10 +93,11 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   {
     /* switch display to window mode */
     DrawWindow window_old = *backbuffer;
-    DrawWindow window_new;
+    DrawWindow window_new = CreateBitmapStruct();
 
-    if ((window_new = SDL_SetVideoMode(video.width, video.height, video.depth,
-				       surface_flags)) == NULL)
+    if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
+						video.depth, surface_flags))
+	== NULL)
     {
       /* switching display to window mode failed -- should not happen */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -105,7 +107,7 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
     else
     {
       if (window_old)
-	SDL_FreeSurface(window_old);
+	FreeBitmap(window_old);
       *backbuffer = window_new;
 
       video.fullscreen_enabled = FALSE;

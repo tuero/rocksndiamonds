@@ -15,10 +15,6 @@
 
 #include "libgame.h"
 
-#if 1
-#include "main_TMP.h"
-#endif
-
 
 /* ========================================================================= */
 /* exported variables                                                        */

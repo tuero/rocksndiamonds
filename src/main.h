@@ -448,9 +448,9 @@ extern GC		tile_clip_gc;
 extern Bitmap		pix[];
 #if 0
 extern Bitmap		pix_masked[];
-#endif
+
 extern Bitmap		tile_masked[];
-#if 0
+
 extern Pixmap		clipmask[];
 #endif
 extern Pixmap		tile_clipmask[];

@@ -642,6 +642,10 @@ void XFreeGC(Display *display, GC gc)
     free(gcv);
 }
 
+void XUnmapWindow(Display *display, Window window)
+{
+}
+
 void XCloseDisplay(Display *display)
 {
   BITMAP *bitmap = video_bitmap;
@@ -884,6 +888,10 @@ void XDrawLine(Display *display, Drawable d, GC gc,
 }
 
 void XDestroyImage(XImage *ximage)
+{
+}
+
+void XDestroyWindow(Display *display, Window window)
 {
 }
 

@@ -328,11 +328,9 @@ void InitDisplay()
 
 void InitGfx()
 {
-  int i, j;
+  int i;
 
-#if defined(TARGET_SDL)
-  SDL_Surface *sdl_image_tmp;
-#else
+#if defined(TARGET_X11)
   GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
@@ -368,6 +366,7 @@ void InitGfx()
   }; 
 #endif
 
+#ifdef TARGET_X11
   static struct
   {
     int start;
@@ -419,6 +418,7 @@ void InitGfx()
     { GFX2_SHIELD_ACTIVE, 3 },
     { -1, 0 }
   };
+#endif
 
   /* initialize playfield properties */
 
@@ -454,6 +454,7 @@ void InitGfx()
 
 #if defined(TARGET_SDL)
 
+#if 0
   /* initialize surface array to 'NULL' */
   for(i=0; i<NUM_TILES; i++)
     tile_masked[i] = NULL;
@@ -463,6 +464,7 @@ void InitGfx()
   {
     for(j=0; j<tile_needs_clipping[i].count; j++)
     {
+      SDL_Surface *sdl_image_tmp;
       int tile = tile_needs_clipping[i].start + j;
       int graphic = tile;
       int src_x, src_y;
@@ -470,7 +472,7 @@ void InitGfx()
       Bitmap src_bitmap;
 
       getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-      src_bitmap = pix_masked[bitmap_nr];
+      src_bitmap = pix[bitmap_nr];
 
       /* create surface for masked tile graphic */
       if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, TILEX, TILEY,
@@ -489,6 +491,7 @@ void InitGfx()
       BlitBitmap(src_bitmap, tile_masked[tile], src_x,src_y, TILEX,TILEY, 0,0);
     }
   }
+#endif
 
 #else /* !TARGET_SDL */
 
@@ -523,6 +526,8 @@ void InitGfx()
   /* create only those clipping Pixmaps we really need */
   for(i=0; tile_needs_clipping[i].start>=0; i++)
   {
+    int j;
+
     for(j=0; j<tile_needs_clipping[i].count; j++)
     {
       int tile = tile_needs_clipping[i].start + j;
@@ -596,13 +601,13 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
 
     /* create native non-transparent surface for current image */
-    if ((pix[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    if ((pix[pos]->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
     /* create native transparent surface for current image */
     SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
 		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
-    if ((pix_masked[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    if ((pix[pos]->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
     /* free temporary surface */

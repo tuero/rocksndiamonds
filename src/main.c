@@ -36,9 +36,9 @@ GC		tile_clip_gc;
 Bitmap		pix[NUM_BITMAPS];
 #if 0
 Bitmap		pix_masked[NUM_BITMAPS];
-#endif
+
 Bitmap		tile_masked[NUM_TILES];
-#if 0
+
 Pixmap		clipmask[NUM_BITMAPS];
 #endif
 Pixmap		tile_clipmask[NUM_TILES];
@@ -602,6 +602,8 @@ int num_element_info = sizeof(element_info)/sizeof(char *);
 
 
 
+#if 0
+
 /* +-----------------------------------------------------------------------+ */
 /* | SDL TEST STUFF                                                        | */
 /* +-----------------------------------------------------------------------+ */
@@ -975,6 +977,8 @@ void TEST_SDL_JOYSTICK()
 /* +-----------------------------------------------------------------------+ */
 /* | SDL TEST STUFF                                                        | */
 /* +-----------------------------------------------------------------------+ */
+
+#endif
 
 
 
