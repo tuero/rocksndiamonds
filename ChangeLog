@@ -1,3 +1,14 @@
+2004-08-07
+	* fixed bug in gadget code which caused reset of CEs in level editor
+	  (example: pressing 'b' [grab brush] on CE config page erased values)
+	  (solution: check if gadgets in ClickOnGadget() are really mapped)
+
+2004-07-29
+	* fixed maze runner style CEs to use the configured move delay value
+
+2004-06-27
+	* added Aaron Davidson's tutorial level set to the "Tutorials" section
+
 2004-06-20
 	* fixed engine change that broke 3.0.8 levels like "Walpurgis Gardens"
 	* fixed the above fix because it broke level set "machine" (*sigh*)

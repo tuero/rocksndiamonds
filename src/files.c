@@ -313,6 +313,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   level->no_valid_file = FALSE;
 
+  level->changed = FALSE;
+
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
@@ -2374,6 +2376,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   }
 
   /* initialize "can_explode" field for old levels which did not store this */
+  /* !!! CHECK THIS -- "<= 3,1,0,0" IS PROBABLY WRONG !!! */
   if (level->game_version <= VERSION_IDENT(3,1,0,0))
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -2386,6 +2389,22 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       SET_PROPERTY(element, EP_CAN_EXPLODE, (EXPLODES_BY_FIRE(element) ||
 					     EXPLODES_SMASHED(element) ||
 					     EXPLODES_IMPACT(element)));
+    }
+  }
+
+  /* correct previously hard-coded move delay values for maze runner style */
+  if (level->game_version < VERSION_IDENT(3,1,1,0))
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      if (element_info[element].move_pattern & MV_MAZE_RUNNER_STYLE)
+      {
+	/* previously hard-coded and therefore ignored */
+	element_info[element].move_delay_fixed = 9;
+	element_info[element].move_delay_random = 0;
+      }
     }
   }
 

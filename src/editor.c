@@ -5509,6 +5509,8 @@ static void ResetUndoBuffer()
   undo_buffer_position = -1;
   undo_buffer_steps = -1;
   CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+
+  level.changed = FALSE;
 }
 
 static void DrawEditModeWindow()
@@ -5526,21 +5528,26 @@ static void DrawEditModeWindow()
 
 static boolean LevelChanged()
 {
-  boolean level_changed = FALSE;
+  boolean field_changed = FALSE;
   int x, y;
+
+  if (leveldir_current->readonly)
+    return FALSE;
 
   for (y = 0; y < lev_fieldy; y++) 
     for (x = 0; x < lev_fieldx; x++)
       if (Feld[x][y] != level.field[x][y])
-	level_changed = TRUE;
+	field_changed = TRUE;
 
-  return level_changed;
+  return (level.changed || field_changed);
 }
 
 static boolean LevelContainsPlayer()
 {
   boolean player_found = FALSE;
   int x, y;
+
+  return TRUE;		/* !!! CURRENTLY DEACTIVATED !!! */
 
   for (y = 0; y < lev_fieldy; y++) 
     for (x = 0; x < lev_fieldx; x++)
@@ -5741,6 +5748,8 @@ static boolean CopyCustomElement(int element_old, int element_new,
     element_old = (IS_CUSTOM_ELEMENT(element_new) ?
 		   EL_INTERNAL_CLIPBOARD_CUSTOM : EL_INTERNAL_CLIPBOARD_GROUP);
     copy_mode = GADGET_ID_CUSTOM_COPY_TO;
+
+    level.changed = TRUE;
   }
   else if (IS_CUSTOM_ELEMENT(element_old) && !IS_CUSTOM_ELEMENT(element_new))
   {
@@ -5753,6 +5762,10 @@ static boolean CopyCustomElement(int element_old, int element_new,
     Request("Please choose group element !", REQ_CONFIRM);
 
     return FALSE;
+  }
+  else
+  {
+    level.changed = TRUE;
   }
 
   if (copy_mode == GADGET_ID_CUSTOM_COPY_FROM)
@@ -5999,6 +6012,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   /* mark that this custom element has been modified */
   custom_element.modified_settings = TRUE;
+  level.changed = TRUE;
 
   if (level.use_custom_template)
   {
@@ -6156,6 +6170,7 @@ static void CopyGroupElementPropertiesToGame(int element)
 
   /* mark that this group element has been modified */
   element_info[element].modified_settings = TRUE;
+  level.changed = TRUE;
 }
 
 static void CopyClassicElementPropertiesToGame(int element)
@@ -7903,6 +7918,8 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
 	  DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
 	else
 	  DrawLevelText(0, 0, 0, TEXT_END);
+
+	level.changed = TRUE;
       }
       break;
 
@@ -7991,6 +8008,8 @@ static void CopyLevelToUndoBuffer(int mode)
   SetBorderElement();
   if (BorderElement != last_border_element)
     DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+
+  level.changed = TRUE;
 }
 
 static void RandomPlacement(int new_element)
@@ -8024,24 +8043,21 @@ static void RandomPlacement(int new_element)
       for (y = 0; y < lev_fieldy; y++)
 	if (free_position[x][y])
 	  Feld[x][y] = new_element;
-
-    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
-    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
-
-    return;
   }
-
-  while (num_elements > 0)
+  else
   {
-    x = RND(lev_fieldx);
-    y = RND(lev_fieldy);
-
-    /* don't place element at the same position twice */
-    if (free_position[x][y])
+    while (num_elements > 0)
     {
-      free_position[x][y] = FALSE;
-      Feld[x][y] = new_element;
-      num_elements--;
+      x = RND(lev_fieldx);
+      y = RND(lev_fieldy);
+
+      /* don't place element at the same position twice */
+      if (free_position[x][y])
+      {
+	free_position[x][y] = FALSE;
+	Feld[x][y] = new_element;
+	num_elements--;
+      }
     }
   }
 
@@ -8414,6 +8430,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     {
       if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
 	ModifyEditorCounter(counter_id, *counter_value);
+
       return;
     }
   }
@@ -8422,6 +8439,16 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     *counter_value = gi->textinput.number_value;
   else
     ModifyEditorCounter(counter_id, *counter_value + step);
+
+  if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
+  {
+      LoadLevel(level_nr);
+      TapeErase();
+      ResetUndoBuffer();
+      DrawEditModeWindow();
+
+      return;
+  }
 
   switch (counter_id)
   {
@@ -8445,13 +8472,6 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       lev_fieldy = level.fieldy;
       break;
 
-    case ED_COUNTER_ID_SELECT_LEVEL:
-      LoadLevel(level_nr);
-      TapeErase();
-      ResetUndoBuffer();
-      DrawEditModeWindow();
-      break;
-
     default:
       break;
   }
@@ -8461,6 +8481,8 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
        counter_id <= ED_COUNTER_ID_CHANGE_LAST))
     CopyElementPropertiesToGame(properties_element);
+
+  level.changed = TRUE;
 }
 
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
@@ -8475,6 +8497,8 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
 
     ModifyEditorElementList();	/* update changed button info text */
   }
+
+  level.changed = TRUE;
 }
 
 static void HandleTextAreaGadgets(struct GadgetInfo *gi)
@@ -8482,6 +8506,8 @@ static void HandleTextAreaGadgets(struct GadgetInfo *gi)
   int type_id = gi->custom_type_id;
 
   strcpy(textarea_info[type_id].value, gi->textarea.value);
+
+  level.changed = TRUE;
 }
 
 static void HandleSelectboxGadgets(struct GadgetInfo *gi)
@@ -8502,7 +8528,11 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 	   (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
 	    type_id <= ED_SELECTBOX_ID_CHANGE_LAST) ||
 	   (type_id == ED_SELECTBOX_ID_GROUP_CHOICE_MODE))
+  {
     CopyElementPropertiesToGame(properties_element);
+
+    level.changed = TRUE;
+  }
 }
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
@@ -8543,6 +8573,8 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     setElementChangeInfoToDefaults(ei->change);
 
     DrawPropertiesWindow();
+
+    level.changed = TRUE;
   }
   else if (type_id == ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE &&
 	   custom_element.num_change_pages > MIN_CHANGE_PAGES)
@@ -8556,6 +8588,8 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     setElementChangePages(ei, ei->num_change_pages - 1);
 
     DrawPropertiesWindow();
+
+    level.changed = TRUE;
   }
 }
 
@@ -8589,8 +8623,12 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
       element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0] =
 	ei->change_page[current_change_page];
     else if (type_id == ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE)
+    {
       ei->change_page[current_change_page] =
 	element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0];
+
+      level.changed = TRUE;
+    }
 
     DrawPropertiesWindow();
   }
@@ -8600,6 +8638,8 @@ static void HandleRadiobuttons(struct GadgetInfo *gi)
 {
   *radiobutton_info[gi->custom_type_id].value =
     radiobutton_info[gi->custom_type_id].checked_value;
+
+  level.changed = TRUE;
 }
 
 static void HandleCheckbuttons(struct GadgetInfo *gi)
@@ -8642,6 +8682,8 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
     DrawEditModeWindow();
   }
+
+  level.changed = TRUE;
 }
 
 static void HandleControlButtons(struct GadgetInfo *gi)
@@ -8907,6 +8949,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       for (x = 0; x < MAX_LEV_FIELDX; x++) 
 	for (y = 0; y < MAX_LEV_FIELDY; y++) 
 	  Feld[x][y] = (button == 1 ? EL_EMPTY : new_element);
+
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
       DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
@@ -8919,7 +8962,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	break;
       }
 
-      if (!LevelContainsPlayer)
+      if (!LevelContainsPlayer())
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
@@ -8936,11 +8979,13 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	if (new_level)
 	  Request("Level saved !", REQ_CONFIRM);
+
+	level.changed = FALSE;
       }
       break;
 
     case GADGET_ID_TEST:
-      if (!LevelContainsPlayer)
+      if (!LevelContainsPlayer())
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {

@@ -152,6 +152,7 @@ struct GadgetTextButton
 struct GadgetTextInput
 {
   char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
+  char last_value[MAX_GADGET_TEXTSIZE];	/* last text string in input field */
   int cursor_position;			/* actual text cursor position */
   int number_value;			/* integer value, if numeric */
   int number_min;			/* minimal allowed numeric value */
@@ -162,6 +163,7 @@ struct GadgetTextInput
 struct GadgetTextArea
 {
   char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
+  char last_value[MAX_GADGET_TEXTSIZE];	/* last text string in input field */
   int cursor_position;			/* actual text cursor position */
   int cursor_x;				/* actual x cursor position */
   int cursor_y;				/* actual y cursor position */
@@ -247,6 +249,7 @@ void UnmapAllGadgets();
 void RemapAllGadgets();
 
 boolean anyTextGadgetActive();
+
 void ClickOnGadget(struct GadgetInfo *, int);
 
 boolean HandleGadgets(int, int, int);

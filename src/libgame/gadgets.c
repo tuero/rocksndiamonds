@@ -776,6 +776,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
       case GDI_NUMBER_VALUE:
 	gi->textinput.number_value = va_arg(ap, long);
 	sprintf(gi->textinput.value, "%d", gi->textinput.number_value);
+	strcpy(gi->textinput.last_value, gi->textinput.value);
 	gi->textinput.cursor_position = strlen(gi->textinput.value);
 	break;
 
@@ -785,6 +786,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	{
 	  gi->textinput.number_value = gi->textinput.number_min;
 	  sprintf(gi->textinput.value, "%d", gi->textinput.number_value);
+	  strcpy(gi->textinput.last_value, gi->textinput.value);
 	}
 	break;
 
@@ -794,6 +796,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	{
 	  gi->textinput.number_value = gi->textinput.number_max;
 	  sprintf(gi->textinput.value, "%d", gi->textinput.number_value);
+	  strcpy(gi->textinput.last_value, gi->textinput.value);
 	}
 	break;
 
@@ -805,12 +808,15 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	    max_textsize = MIN(gi->textinput.size, MAX_GADGET_TEXTSIZE - 1);
 
 	  strncpy(gi->textinput.value, va_arg(ap, char *), max_textsize);
+	  strcpy(gi->textinput.last_value, gi->textinput.value);
+
 	  gi->textinput.value[max_textsize] = '\0';
 	  gi->textinput.cursor_position = strlen(gi->textinput.value);
 
 	  /* same tag also used for other gadget definitions */
 	  strcpy(gi->textbutton.value, gi->textinput.value);
 	  strcpy(gi->textarea.value, gi->textinput.value);
+	  strcpy(gi->textarea.last_value, gi->textinput.value);
 	}
 	break;
 
@@ -821,10 +827,17 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
 	  gi->textinput.size = max_textsize;
 	  gi->textinput.value[max_textsize] = '\0';
+	  strcpy(gi->textinput.last_value, gi->textinput.value);
 
 	  /* same tag also used for other gadget definitions */
-	  strcpy(gi->textbutton.value, gi->textinput.value);
-	  gi->textbutton.size = gi->textinput.size;
+
+	  gi->textarea.size = max_textsize;
+	  gi->textarea.value[max_textsize] = '\0';
+	  strcpy(gi->textarea.last_value, gi->textinput.value);
+
+	  gi->textbutton.size = max_textsize;
+	  gi->textbutton.value[max_textsize] = '\0';
+
 	  gi->selectbox.size = gi->textinput.size;
 	}
 	break;
@@ -1336,6 +1349,9 @@ boolean anyTextGadgetActive()
 
 void ClickOnGadget(struct GadgetInfo *gi, int button)
 {
+  if (!gi->mapped)
+    return;
+
   /* simulate releasing mouse button over last gadget, if still pressed */
   if (button_status)
     HandleGadgets(-1, -1, 0);
@@ -1429,14 +1445,35 @@ boolean HandleGadgets(int mx, int my, int button)
       button != 0 && !motion_status && new_gi != last_gi)
 #endif
   {
-    CheckRangeOfNumericInputGadget(last_gi);	/* in case of numeric gadget */
+    struct GadgetInfo *gi = last_gi;
+    boolean gadget_changed = (gi->event_mask & GD_EVENT_TEXT_LEAVING);
 
-    DrawGadget(last_gi, DG_UNPRESSED, last_gi->direct_draw);
+    /* check if text gadget has changed its value */
+    if (gi->type & GD_TYPE_TEXT_INPUT)
+    {
+      CheckRangeOfNumericInputGadget(gi);
 
-    last_gi->event.type = GD_EVENT_TEXT_LEAVING;
+      if (strcmp(gi->textinput.value, gi->textinput.last_value) != 0)
+	strcpy(gi->textinput.last_value, gi->textinput.value);
+      else
+	gadget_changed = FALSE;
+    }
 
-    if (last_gi->event_mask & GD_EVENT_TEXT_LEAVING)
-      last_gi->callback_action(last_gi);
+    /* selectbox does not change its value when closed by clicking outside */
+    if (gi->type & GD_TYPE_SELECTBOX)
+      gadget_changed = FALSE;
+
+    DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
+
+    gi->event.type = GD_EVENT_TEXT_LEAVING;
+
+#if 1
+    if (gadget_changed && !(gi->type & GD_TYPE_SELECTBOX))
+      gi->callback_action(gi);
+#else
+    if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
+      gi->callback_action(gi);
+#endif
 
     last_gi = NULL;
 
@@ -1781,20 +1818,29 @@ boolean HandleGadgets(int mx, int my, int button)
   if (gadget_released_inside)
   {
     boolean deactivate_gadget = TRUE;
+    boolean gadget_changed = TRUE;
 
     if (gi->type & GD_TYPE_SELECTBOX)
     {
 #if 1
       if (mouse_released_where_pressed ||
 	  !gadget_released_inside_select_area)	     /* selectbox stays open */
+      {
 	deactivate_gadget = FALSE;
+	gadget_changed = FALSE;
+      }
 #else
       if (gadget_released_inside_select_line ||
 	  gadget_released_off_borders)		     /* selectbox stays open */
+      {
 	deactivate_gadget = FALSE;
+	gadget_changed = FALSE;
+      }
 #endif
-      else
+      else if (gi->selectbox.index != gi->selectbox.current_index)
 	gi->selectbox.index = gi->selectbox.current_index;
+      else
+	gadget_changed = FALSE;
     }
 
     if (deactivate_gadget &&
@@ -1805,8 +1851,15 @@ boolean HandleGadgets(int mx, int my, int button)
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;
 
+#if 1
+    if ((gi->event_mask & GD_EVENT_RELEASED) && gadget_changed)
+    {
+      gi->callback_action(gi);
+    }
+#else
     if ((gi->event_mask & GD_EVENT_RELEASED) && deactivate_gadget)
       gi->callback_action(gi);
+#endif
   }
 
   if (gadget_released_off_borders)
@@ -1856,10 +1909,24 @@ boolean HandleGadgetsKeyInput(Key key)
 
   if (key == KSYM_Return)	/* valid for both text input and selectbox */
   {
+    boolean gadget_changed = (gi->event_mask & GD_EVENT_TEXT_RETURN);
+
     if (gi->type & GD_TYPE_TEXT_INPUT)
+    {
       CheckRangeOfNumericInputGadget(gi);
+
+      if (strcmp(gi->textinput.value, gi->textinput.last_value) != 0)
+	strcpy(gi->textinput.last_value, gi->textinput.value);
+      else
+	gadget_changed = FALSE;
+    }
     else if (gi->type & GD_TYPE_SELECTBOX)
-      gi->selectbox.index = gi->selectbox.current_index;
+    {
+      if (gi->selectbox.index != gi->selectbox.current_index)
+	gi->selectbox.index = gi->selectbox.current_index;
+      else
+	gadget_changed = FALSE;
+    }
 
     if (gi->type & GD_TYPE_TEXT_AREA)
     {
@@ -1876,8 +1943,13 @@ boolean HandleGadgetsKeyInput(Key key)
       last_gi = NULL;
     }
 
+#if 1
+    if (gadget_changed)
+      gi->callback_action(gi);
+#else
     if (gi->event_mask & GD_EVENT_TEXT_RETURN)
       gi->callback_action(gi);
+#endif
   }
   else if (gi->type & GD_TYPE_TEXT_INPUT)	/* only valid for text input */
   {

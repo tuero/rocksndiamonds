@@ -37,7 +37,7 @@
 #define USE_NEW_SP_SLIPPERY	TRUE	* USE_NEW_STUFF		* 1
 #define USE_NEW_RANDOMIZE	TRUE	* USE_NEW_STUFF		* 1
 
-#define USE_PUSH_BUGFIX		TRUE	* 1
+#define USE_PUSH_BUGFIX		TRUE	* USE_NEW_STUFF		* 1
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -5145,7 +5145,13 @@ inline static void TurnRoundExt(int x, int y)
 
     MovDir[x][y] = new_move_dir;
     if (old_move_dir != new_move_dir)
+    {
+#if 1
+      MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+#else
       MovDelay[x][y] = 9;
+#endif
+    }
   }
 }
 
