@@ -981,22 +981,36 @@ static void InitGraphicInfo()
 
     /* always start with reliable default values */
     new_graphic_info[i].bitmap = getBitmapFromImageID(i);
-    new_graphic_info[i].src_x = parameter[GFXARG_XPOS] * TILEX;
-    new_graphic_info[i].src_y = parameter[GFXARG_YPOS] * TILEY;
-    new_graphic_info[i].anim_frames = parameter[GFXARG_FRAMES];
-    new_graphic_info[i].anim_delay = parameter[GFXARG_DELAY];
-    new_graphic_info[i].anim_vertical = parameter[GFXARG_VERTICAL];
-    new_graphic_info[i].anim_mode =
-      (parameter[GFXARG_PINGPONG] ? ANIM_PINGPONG :
-       parameter[GFXARG_REVERSE]  ? ANIM_REVERSE  : ANIM_NORMAL);
+    new_graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
+    new_graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
 
+    new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
+
+    new_graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
     if (new_graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
       new_graphic_info[i].anim_delay = 1;
+
+    /* basically, animation can be either normal or reverse direction */
+    if (parameter[GFX_ARG_REVERSE])
+      new_graphic_info[i].anim_mode = ANIM_REVERSE;
+    else
+      new_graphic_info[i].anim_mode = ANIM_NORMAL;
+
+    /* additionally, animation can be either pingpong or pingpong2 layout */
+    if (parameter[GFX_ARG_PINGPONG])
+      new_graphic_info[i].anim_mode |= ANIM_PINGPONG;
+    else if (parameter[GFX_ARG_PINGPONG2])
+      new_graphic_info[i].anim_mode |= ANIM_PINGPONG2;
+
+    /* animation synchronized with global frame counter, not move position */
+    new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+
+    new_graphic_info[i].anim_vertical = parameter[GFX_ARG_VERTICAL];
   }
 
 #if 0
-  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFXARG_NUM_FRAMES]);
-  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFXARG_NUM_FRAMES]);
+  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFX_ARG_NUM_FRAMES]);
+  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFX_ARG_NUM_FRAMES]);
 
   graphic_info[GFX_ABLENK].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
   graphic_info[GFX_ABLENK].src_x = 0;

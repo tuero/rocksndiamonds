@@ -2847,7 +2847,10 @@ void StartMoving(int x, int y)
       {
 	TurnRound(x, y);
 
-	if (MovDelay[x][y] && (element == EL_KAEFER))
+	if (MovDelay[x][y] && (element == EL_KAEFER ||
+			       element == EL_FLIEGER ||
+			       element == EL_SP_SNIKSNAK ||
+			       element == EL_SP_ELECTRON))
 	  DrawNewLevelField(x, y);
 	else if (MovDelay[x][y] && (element == EL_KAEFER ||
 			       element == EL_FLIEGER ||
@@ -3115,7 +3118,7 @@ void StartMoving(int x, int y)
       else	/* element == EL_PACMAN */
       {
 	Feld[newx][newy] = EL_LEERRAUM;
-	DrawLevelField(newx, newy);
+	DrawNewLevelField(newx, newy);
 	PlaySoundLevel(x, y, SND_PACMAN_EATING_AMOEBA);
       }
     }
@@ -3132,7 +3135,8 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
-      if (element == EL_KAEFER)
+      if (element == EL_KAEFER || element == EL_FLIEGER ||
+	  element == EL_SP_SNIKSNAK)
 #if 0
 	DrawLevelField(x, y);
 #else
@@ -3161,7 +3165,7 @@ void StartMoving(int x, int y)
 #if 0
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 #else
-	DrawNewGraphicAnimation(x, y, IMG_SP_ELECTRON_MOVING);
+	DrawNewGraphicAnimation(x, y, IMG_SP_ELECTRON);
 #endif
 
       if (DONT_TOUCH(element))
@@ -3300,7 +3304,9 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 
-    if (element == EL_KAEFER)
+    if (element == EL_KAEFER || element == EL_FLIEGER ||
+	element == EL_SP_SNIKSNAK || element == EL_PACMAN ||
+	element == EL_SP_ELECTRON)
     {
       DrawNewLevelField(x, y);
       DrawNewLevelField(newx, newy);
@@ -3329,7 +3335,9 @@ void ContinueMoving(int x, int y)
   }
   else				/* still moving on */
   {
-    if (element == EL_KAEFER)
+    if (element == EL_KAEFER || element == EL_FLIEGER ||
+	element == EL_SP_SNIKSNAK || element == EL_PACMAN ||
+	element == EL_SP_ELECTRON)
       DrawNewLevelField(x, y);
     else
       DrawLevelField(x, y);

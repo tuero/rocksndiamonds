@@ -706,27 +706,38 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   return phase;
 }
 
-static int getNewGraphicAnimationFrame(int graphic)
+static int getNewGraphicAnimationFrame(int graphic, int sync_frame)
 {
-  int frames = new_graphic_info[graphic].anim_frames;
+  int num_frames = new_graphic_info[graphic].anim_frames;
   int delay = new_graphic_info[graphic].anim_delay;
   int mode = new_graphic_info[graphic].anim_mode;
-  int phase;
+  int frame;
 
-  if (mode == ANIM_PINGPONG)
+  /* animation synchronized with global frame counter, not move position */
+  if (new_graphic_info[graphic].anim_global_sync || sync_frame < 0)
+    sync_frame = FrameCounter;
+
+  if (mode & ANIM_PINGPONG)		/* use border frames once */
   {
-    int max_anim_frames = 2 * frames - 2;
+    int max_anim_frames = 2 * num_frames - 2;
 
-    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
-    phase = (phase < frames ? phase : max_anim_frames - phase);
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame);
   }
-  else
-    phase = (FrameCounter % (delay * frames)) / delay;
+  else if (mode & ANIM_PINGPONG2)	/* use border frames twice */
+  {
+    int max_anim_frames = 2 * num_frames;
 
-  if (mode == ANIM_REVERSE)
-    phase = (frames - 1) - phase;
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
+  }
+  else	/* mode == ANIM_NORMAL || mode == ANIM_REVERSE */
+    frame = (sync_frame % (delay * num_frames)) / delay;
 
-  return phase;
+  if (mode & ANIM_REVERSE)		/* use reverse animation direction */
+    frame = num_frames - frame - 1;
+
+  return frame;
 }
 
 void DrawGraphicAnimationExt(int x, int y, int graphic,
@@ -749,7 +760,7 @@ void DrawNewGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
 
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
-    int frame = getNewGraphicAnimationFrame(graphic);
+    int frame = getNewGraphicAnimationFrame(graphic, -1);
 
     if (mask_mode == USE_MASKING)
       DrawNewGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
@@ -1448,18 +1459,23 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
   int ux = LEVELX(x), uy = LEVELY(y);
-  int dir = MovDir[ux][uy];
-  int graphic = el_dir2img(element, dir);
-  int frame = getNewGraphicAnimationFrame(graphic);
-  int phase8 = ABS(MovPos[ux][uy]) / (TILEX / 8);
+  int move_dir = MovDir[ux][uy];
+  int move_pos = ABS(MovPos[ux][uy]) / (TILEX / 8);
+  int graphic = el_dir2img(element, move_dir);
+  int frame = getNewGraphicAnimationFrame(graphic, move_pos);
+  int phase8 = move_pos;
   int phase4 = phase8 / 2;
   int phase2  = phase8 / 4;
 
-  if (element == EL_KAEFER)
+  int dir = move_dir;	/* !!! THROW AWAY LATER !!! */
+
+  if (0)
   {
     ;
   }
-  else if (element == EL_PACMAN || element == EL_KAEFER || element == EL_FLIEGER)
+#if 0
+  else if (element == EL_PACMAN || element == EL_KAEFER ||
+	   element == EL_FLIEGER)
   {
     graphic += 1 * !phase2;
 
@@ -1485,12 +1501,9 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_SP_ELECTRON)
   {
-#if 1
     graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
-#else
-    graphic = GFX2_SP_ELECTRON + getNewGraphicAnimationFrame(graphic);
-#endif
   }
+#endif
   else if (element == EL_MOLE || element == EL_PINGUIN ||
 	   element == EL_SCHWEIN || element == EL_DRACHE)
   {
@@ -1518,7 +1531,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 #if 1
     graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
 #else
-    graphic = GFX_SONDE_START + getNewGraphicAnimationFrame(graphic);
+    graphic = GFX_SONDE_START + getNewGraphicAnimationFrame(graphic, move_pos);
 #endif
   }
   else if (element == EL_SALZSAEURE)
@@ -1526,7 +1539,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 #if 1
     graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
 #else
-    graphic = GFX_GEBLUBBER + getNewGraphicAnimationFrame(graphic);
+    graphic = GFX_GEBLUBBER + getNewGraphicAnimationFrame(graphic, move_pos);
 #endif
   }
   else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
@@ -1571,7 +1584,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 #if 1
     graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
 #else
-    graphic += 3 + getNewGraphicAnimationFrame(graphic);
+    graphic += 3 + getNewGraphicAnimationFrame(graphic, move_pos);
 #endif
   }
   else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
@@ -3309,6 +3322,7 @@ int el2img(int element)
   {
     case EL_BUTTERFLY:		return IMG_BD_BUTTERFLY;
     case EL_FIREFLY:		return IMG_BD_FIREFLY;
+    case EL_SP_ELECTRON:	return IMG_SP_ELECTRON;
 
     default:
       break;

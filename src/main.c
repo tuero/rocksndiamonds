@@ -136,6 +136,25 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
+/* this is used to reduce memory usage of the different animation types */
+int anim_action_mapping[] =
+{
+  0,		/* GFX_ACTION_UNKNOWN		(0)  */
+  0,		/* GFX_ACTION_DEFAULT		(1)  */
+  0,		/* GFX_ACTION_WAITING		(2)  */
+
+  1,		/* GFX_ACTION_MOVING		(3)  */
+  2,		/* GFX_ACTION_DIGGING		(4)  */
+  3,		/* GFX_ACTION_COLLECTING	(5)  */
+  4,		/* GFX_ACTION_PUSHING		(6)  */
+
+  5,		/* GFX_ACTION_PASSING		(7)  */
+  5,		/* GFX_ACTION_IMPACT		(8)  */
+  5,		/* GFX_ACTION_ACTIVATING	(9)  */
+  5,		/* GFX_ACTION_BURNING		(10) */
+  5		/* GFX_ACTION_OTHER		(11) */
+};
+
 struct ConfigInfo image_config_suffix[] =
 {
   { ".xpos",				"0"			},
@@ -145,6 +164,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".pingpong",			"0"			},
   { ".pingpong2",			"0"			},
   { ".reverse",				"0"			},
+  { ".global_sync",			"0"			},
   { ".vertical",			"0"			},
 
   { NULL,				NULL			}
@@ -343,18 +363,22 @@ struct ConfigInfo image_config[] =
   { "spaceship_right.xpos",			"8"			},
   { "spaceship_right.ypos",			"3"			},
   { "spaceship_right.frames",			"2"			},
+  { "spaceship_right.delay",			"4"			},
   { "spaceship_up",				"RocksElements.pcx"	},
   { "spaceship_up.xpos",			"10"			},
   { "spaceship_up.ypos",			"3"			},
   { "spaceship_up.frames",			"2"			},
+  { "spaceship_up.delay",			"4"			},
   { "spaceship_left",				"RocksElements.pcx"	},
   { "spaceship_left.xpos",			"12"			},
   { "spaceship_left.ypos",			"3"			},
   { "spaceship_left.frames",			"2"			},
+  { "spaceship_left.delay",			"4"			},
   { "spaceship_down",				"RocksElements.pcx"	},
   { "spaceship_down.xpos",			"14"			},
   { "spaceship_down.ypos",			"3"			},
   { "spaceship_down.frames",			"2"			},
+  { "spaceship_down.delay",			"4"			},
 
   { "bug_right",				"RocksElements.pcx"	},
   { "bug_right.xpos",				"8"			},
@@ -381,18 +405,26 @@ struct ConfigInfo image_config[] =
   { "pacman_right.xpos",			"8"			},
   { "pacman_right.ypos",			"5"			},
   { "pacman_right.frames",			"2"			},
+  { "pacman_right.reverse",			"1"			},
+  { "pacman_right.delay",			"4"			},
   { "pacman_up",				"RocksElements.pcx"	},
   { "pacman_up.xpos",				"10"			},
   { "pacman_up.ypos",				"5"			},
   { "pacman_up.frames",				"2"			},
+  { "pacman_up.reverse",			"1"			},
+  { "pacman_up.delay",				"4"			},
   { "pacman_left",				"RocksElements.pcx"	},
   { "pacman_left.xpos",				"12"			},
   { "pacman_left.ypos",				"5"			},
   { "pacman_left.frames",			"2"			},
+  { "pacman_left.reverse",			"1"			},
+  { "pacman_left.delay",			"4"			},
   { "pacman_down",				"RocksElements.pcx"	},
   { "pacman_down.xpos",				"14"			},
   { "pacman_down.ypos",				"5"			},
   { "pacman_down.frames",			"2"			},
+  { "pacman_down.reverse",			"1"			},
+  { "pacman_down.delay",			"4"			},
 
   { "explosion",				"RocksElements.pcx"	},
   { "explosion.xpos",				"0"			},
@@ -1488,67 +1520,39 @@ struct ConfigInfo image_config[] =
   { "sp_sniksnak_left",				"RocksSP.pcx"		},
   { "sp_sniksnak_left.xpos",			"8"			},
   { "sp_sniksnak_left.ypos",			"8"			},
-  { "sp_sniksnak_left.frames",			"1"			},
-  { "sp_sniksnak_left.moving",			"RocksSP.pcx"		},
-  { "sp_sniksnak_left.moving.xpos",		"8"			},
-  { "sp_sniksnak_left.moving.ypos",		"8"			},
-  { "sp_sniksnak_left.moving.frames",		"4"			},
-  { "sp_sniksnak_left.moving.pingpong",		"1"			},
+  { "sp_sniksnak_left.frames",			"4"			},
+  { "sp_sniksnak_left.pingpong2",		"1"			},
   { "sp_sniksnak_right",			"RocksSP.pcx"		},
   { "sp_sniksnak_right.xpos",			"12"			},
   { "sp_sniksnak_right.ypos",			"8"			},
-  { "sp_sniksnak_right.frames",			"1"			},
-  { "sp_sniksnak_right.moving",			"RocksSP.pcx"		},
-  { "sp_sniksnak_right.moving.xpos",		"12"			},
-  { "sp_sniksnak_right.moving.ypos",		"8"			},
-  { "sp_sniksnak_right.moving.frames",		"4"			},
-  { "sp_sniksnak_right.moving.pingpong",	"1"			},
+  { "sp_sniksnak_right.frames",			"4"			},
+  { "sp_sniksnak_right.pingpong2",		"1"			},
   { "sp_sniksnak_up",				"RocksSP.pcx"		},
   { "sp_sniksnak_up.xpos",			"8"			},
   { "sp_sniksnak_up.ypos",			"9"			},
-  { "sp_sniksnak_up.frames",			"1"			},
-  { "sp_sniksnak_up.moving",			"RocksSP.pcx"		},
-  { "sp_sniksnak_up.moving.xpos",		"8"			},
-  { "sp_sniksnak_up.moving.ypos",		"9"			},
-  { "sp_sniksnak_up.moving.frames",		"4"			},
-  { "sp_sniksnak_up.moving.pingpong",		"1"			},
+  { "sp_sniksnak_up.frames",			"4"			},
+  { "sp_sniksnak_up.pingpong2",			"1"			},
   { "sp_sniksnak_down",				"RocksSP.pcx"		},
   { "sp_sniksnak_down.xpos",			"12"			},
   { "sp_sniksnak_down.ypos",			"9"			},
-  { "sp_sniksnak_down.frames",			"1"			},
-  { "sp_sniksnak_down.moving",			"RocksSP.pcx"		},
-  { "sp_sniksnak_down.moving.xpos",		"12"			},
-  { "sp_sniksnak_down.moving.ypos",		"9"			},
-  { "sp_sniksnak_down.moving.frames",		"4"			},
-  { "sp_sniksnak_down.moving.pingpong",		"1"			},
+  { "sp_sniksnak_down.frames",			"4"			},
+  { "sp_sniksnak_down.pingpong2",		"1"			},
 
   { "sp_electron",				"RocksSP.pcx"		},
   { "sp_electron.xpos",				"8"			},
   { "sp_electron.ypos",				"10"			},
   { "sp_electron.frames",			"8"			},
   { "sp_electron.delay",			"2"			},
-  { "sp_electron.moving",			"RocksSP.pcx"		},
-  { "sp_electron.moving.xpos",			"8"			},
-  { "sp_electron.moving.ypos",			"10"			},
-  { "sp_electron.moving.frames",		"8"			},
-  { "sp_electron.delay",			"2"			},
+  { "sp_electron.global_sync",			"1"			},
 
   { "sp_terminal",				"RocksSP.pcx"		},
-  { "sp_terminal.xpos",				"3"			},
-  { "sp_terminal.ypos",				"2"			},
-  { "sp_terminal.frames",			"1"			},
-  { "sp_terminal.running",			"RocksSP.pcx"		},
-  { "sp_terminal.running.xpos",			"8"			},
-  { "sp_terminal.running.ypos",			"11"			},
-  { "sp_terminal.running.frames",		"7"			},
+  { "sp_terminal.xpos",				"8"			},
+  { "sp_terminal.ypos",				"11"			},
+  { "sp_terminal.frames",			"7"			},
   { "sp_terminal_active",			"RocksSP.pcx"		},
   { "sp_terminal_active.xpos",			"8"			},
   { "sp_terminal_active.ypos",			"12"			},
-  { "sp_terminal_active.frames",		"1"			},
-  { "sp_terminal_active.running",		"RocksSP.pcx"		},
-  { "sp_terminal_active.running.xpos",		"8"			},
-  { "sp_terminal_active.running.ypos",		"12"			},
-  { "sp_terminal_active.running.frames",	"7"			},
+  { "sp_terminal_active.frames",		"7"			},
 
   { "sp_buggy_base",				"RocksSP.pcx"		},
   { "sp_buggy_base.xpos",			"1"			},
@@ -2174,24 +2178,7 @@ struct ConfigInfo image_config[] =
   { "dx_bomb.ypos",				"1"			},
   { "dx_bomb.frames",				"1"			},
 
-#if 0
-  { "",				"RocksMore.pcx"		},
-  { ".xpos",			""			},
-  { ".ypos",			""			},
-  { ".frames",			""			},
-#endif
-
-#if 0
-  /* images for Boulder Dash style elements and actions */
-  { "bd_diamond",			"bd_diamond.pcx"	},
-  { "bd_diamond.frame_xpos",		"0"			},
-  { "bd_diamond.num_frames",		"1"			},
-  { "robot_wheel",			"bd_diamond.pcx"	},
-  { "robot_wheel.frame_xpos",		"0"			},
-  { "robot_wheel.num_frames",		"4"			},
-#endif
-
-  { NULL,				NULL			}
+  { NULL,					NULL			}
 };
 
 struct ConfigInfo sound_config[] =
