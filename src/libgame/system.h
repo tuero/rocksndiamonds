@@ -333,6 +333,9 @@ struct SetupInfo
   char *graphics_set;
   char *sounds_set;
   char *music_set;
+  boolean override_level_graphics;
+  boolean override_level_sounds;
+  boolean override_level_music;
 
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
@@ -395,9 +398,9 @@ struct ArtworkInfo
   MusicDirTree *mus_first;
   MusicDirTree *mus_current;
 
-  char *graphics_set_current;
-  char *sounds_set_current;
-  char *music_set_current;
+  char *graphics_set_current_name;
+  char *sounds_set_current_name;
+  char *music_set_current_name;
 };
 
 

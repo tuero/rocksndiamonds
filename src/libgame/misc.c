@@ -111,10 +111,12 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
 {
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
 
+#if 0
 #if defined(PLATFORM_MSDOS)
   /* don't use select() to perform waiting operations under DOS
      environment; always use a busy loop for waiting instead */
   do_busy_waiting = TRUE;
+#endif
 #endif
 
   if (do_busy_waiting)
@@ -134,6 +136,8 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   {
 #if defined(TARGET_SDL)
     SDL_Delay(milliseconds_delay);
+#elif defined(TARGET_ALLEGRO)
+    rest(milliseconds_delay);
 #else
     struct timeval delay;
 
@@ -1196,12 +1200,19 @@ boolean FileIsSound(char *basename)
 
 boolean FileIsMusic(char *basename)
 {
+  /* "music" can be a WAV (loop) file or (if compiled with SDL) a MOD file */
+
+  if (FileIsSound(basename))
+    return TRUE;
+
+#if defined(TARGET_SDL)
   if (strlen(basename) > 4 &&
       (strcmp(&basename[strlen(basename) - 4], ".mod") == 0 ||
        strcmp(&basename[strlen(basename) - 4], ".MOD") == 0 ||
        strncmp(basename, "mod.", 4) == 0 ||
        strncmp(basename, "MOD.", 4) == 0))
     return TRUE;
+#endif
 
   return FALSE;
 }

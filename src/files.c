@@ -1157,57 +1157,60 @@ void SaveScore(int level_nr)
 /* setup file functions                                                      */
 /* ========================================================================= */
 
-#define TOKEN_STR_PLAYER_PREFIX		"player_"
+#define TOKEN_STR_PLAYER_PREFIX			"player_"
 
 /* global setup */
-#define SETUP_TOKEN_PLAYER_NAME		0
-#define SETUP_TOKEN_SOUND		1
-#define SETUP_TOKEN_SOUND_LOOPS		2
-#define SETUP_TOKEN_SOUND_MUSIC		3
-#define SETUP_TOKEN_SOUND_SIMPLE	4
-#define SETUP_TOKEN_TOONS		5
-#define SETUP_TOKEN_SCROLL_DELAY	6
-#define SETUP_TOKEN_SOFT_SCROLLING	7
-#define SETUP_TOKEN_FADING		8
-#define SETUP_TOKEN_AUTORECORD		9
-#define SETUP_TOKEN_QUICK_DOORS		10
-#define SETUP_TOKEN_TEAM_MODE		11
-#define SETUP_TOKEN_HANDICAP		12
-#define SETUP_TOKEN_TIME_LIMIT		13
-#define SETUP_TOKEN_FULLSCREEN		14
-#define SETUP_TOKEN_ASK_ON_ESCAPE	15
-#define SETUP_TOKEN_GRAPHICS_SET	16
-#define SETUP_TOKEN_SOUNDS_SET		17
-#define SETUP_TOKEN_MUSIC_SET		18
+#define SETUP_TOKEN_PLAYER_NAME			0
+#define SETUP_TOKEN_SOUND			1
+#define SETUP_TOKEN_SOUND_LOOPS			2
+#define SETUP_TOKEN_SOUND_MUSIC			3
+#define SETUP_TOKEN_SOUND_SIMPLE		4
+#define SETUP_TOKEN_TOONS			5
+#define SETUP_TOKEN_SCROLL_DELAY		6
+#define SETUP_TOKEN_SOFT_SCROLLING		7
+#define SETUP_TOKEN_FADING			8
+#define SETUP_TOKEN_AUTORECORD			9
+#define SETUP_TOKEN_QUICK_DOORS			10
+#define SETUP_TOKEN_TEAM_MODE			11
+#define SETUP_TOKEN_HANDICAP			12
+#define SETUP_TOKEN_TIME_LIMIT			13
+#define SETUP_TOKEN_FULLSCREEN			14
+#define SETUP_TOKEN_ASK_ON_ESCAPE		15
+#define SETUP_TOKEN_GRAPHICS_SET		16
+#define SETUP_TOKEN_SOUNDS_SET			17
+#define SETUP_TOKEN_MUSIC_SET			18
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	19
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	20
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	21
 
-#define NUM_GLOBAL_SETUP_TOKENS		19
+#define NUM_GLOBAL_SETUP_TOKENS			22
 
 /* shortcut setup */
-#define SETUP_TOKEN_SAVE_GAME		0
-#define SETUP_TOKEN_LOAD_GAME		1
-#define SETUP_TOKEN_TOGGLE_PAUSE	2
+#define SETUP_TOKEN_SAVE_GAME			0
+#define SETUP_TOKEN_LOAD_GAME			1
+#define SETUP_TOKEN_TOGGLE_PAUSE		2
 
-#define NUM_SHORTCUT_SETUP_TOKENS	3
+#define NUM_SHORTCUT_SETUP_TOKENS		3
 
 /* player setup */
-#define SETUP_TOKEN_USE_JOYSTICK	0
-#define SETUP_TOKEN_JOY_DEVICE_NAME	1
-#define SETUP_TOKEN_JOY_XLEFT		2
-#define SETUP_TOKEN_JOY_XMIDDLE		3
-#define SETUP_TOKEN_JOY_XRIGHT		4
-#define SETUP_TOKEN_JOY_YUPPER		5
-#define SETUP_TOKEN_JOY_YMIDDLE		6
-#define SETUP_TOKEN_JOY_YLOWER		7
-#define SETUP_TOKEN_JOY_SNAP		8
-#define SETUP_TOKEN_JOY_BOMB		9
-#define SETUP_TOKEN_KEY_LEFT		10
-#define SETUP_TOKEN_KEY_RIGHT		11
-#define SETUP_TOKEN_KEY_UP		12
-#define SETUP_TOKEN_KEY_DOWN		13
-#define SETUP_TOKEN_KEY_SNAP		14
-#define SETUP_TOKEN_KEY_BOMB		15
+#define SETUP_TOKEN_USE_JOYSTICK		0
+#define SETUP_TOKEN_JOY_DEVICE_NAME		1
+#define SETUP_TOKEN_JOY_XLEFT			2
+#define SETUP_TOKEN_JOY_XMIDDLE			3
+#define SETUP_TOKEN_JOY_XRIGHT			4
+#define SETUP_TOKEN_JOY_YUPPER			5
+#define SETUP_TOKEN_JOY_YMIDDLE			6
+#define SETUP_TOKEN_JOY_YLOWER			7
+#define SETUP_TOKEN_JOY_SNAP			8
+#define SETUP_TOKEN_JOY_BOMB			9
+#define SETUP_TOKEN_KEY_LEFT			10
+#define SETUP_TOKEN_KEY_RIGHT			11
+#define SETUP_TOKEN_KEY_UP			12
+#define SETUP_TOKEN_KEY_DOWN			13
+#define SETUP_TOKEN_KEY_SNAP			14
+#define SETUP_TOKEN_KEY_BOMB			15
 
-#define NUM_PLAYER_SETUP_TOKENS		16
+#define NUM_PLAYER_SETUP_TOKENS			16
 
 static struct SetupInfo si;
 static struct SetupShortcutInfo ssi;
@@ -1235,14 +1238,17 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
   { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
   { TYPE_STRING, &si.music_set,		"music_set"			},
+  { TYPE_SWITCH, &si.override_level_graphics, "override_level_graphics"	},
+  { TYPE_SWITCH, &si.override_level_sounds,   "override_level_sounds"	},
+  { TYPE_SWITCH, &si.override_level_music,    "override_level_music"	},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
 {
   /* shortcut setup */
-  { TYPE_KEY_X11, &ssi.save_game,		"shortcut.save_game"	},
-  { TYPE_KEY_X11, &ssi.load_game,		"shortcut.load_game"	},
-  { TYPE_KEY_X11, &ssi.toggle_pause,		"shortcut.toggle_pause"	}
+  { TYPE_KEY_X11, &ssi.save_game,	"shortcut.save_game"		},
+  { TYPE_KEY_X11, &ssi.load_game,	"shortcut.load_game"		},
+  { TYPE_KEY_X11, &ssi.toggle_pause,	"shortcut.toggle_pause"		}
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -1293,6 +1299,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->graphics_set = getStringCopy(GRAPHICS_SUBDIR);
   si->sounds_set = getStringCopy(SOUNDS_SUBDIR);
   si->music_set = getStringCopy(MUSIC_SUBDIR);
+  si->override_level_graphics = FALSE;
+  si->override_level_sounds = FALSE;
+  si->override_level_music = FALSE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;

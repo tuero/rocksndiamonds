@@ -497,6 +497,9 @@ static void WriteReloadInfoToPipe(char *set_name, int type)
   unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
   unsigned long str_size2 = strlen(ti->basepath) + 1;
   unsigned long str_size3 = strlen(ti->fullpath) + 1;
+  boolean override_level_artwork = (type == SND_CTRL_RELOAD_SOUNDS ?
+				    setup.override_level_sounds :
+				    setup.override_level_music);
 
   if (IS_CHILD_PROCESS(audio.mixer_pid))
     return;
@@ -512,6 +515,8 @@ static void WriteReloadInfoToPipe(char *set_name, int type)
 	    sizeof(snd_ctrl)) < 0 ||
       write(audio.mixer_pipe[1], set_name,
 	    snd_ctrl.data_len) < 0 ||
+      write(audio.mixer_pipe[1], &override_level_artwork,
+	    sizeof(boolean)) < 0 ||
       write(audio.mixer_pipe[1], leveldir_current,
 	    sizeof(TreeInfo)) < 0 ||
       write(audio.mixer_pipe[1], ti,
@@ -542,6 +547,9 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
   TreeInfo *ti = *ti_ptr;
   unsigned long str_size1, str_size2, str_size3;
   static char *set_name = NULL;
+  boolean *override_level_artwork = (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS ?
+				     &setup.override_level_sounds :
+				     &setup.override_level_music);
 
   if (set_name)
     free(set_name);
@@ -561,6 +569,8 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
 
   if (read(audio.mixer_pipe[0], set_name,
 	   snd_ctrl->data_len) != snd_ctrl->data_len ||
+      read(audio.mixer_pipe[0], override_level_artwork,
+	   sizeof(boolean)) != sizeof(boolean) ||
       read(audio.mixer_pipe[0], leveldir_current,
 	   sizeof(TreeInfo)) != sizeof(TreeInfo) ||
       read(audio.mixer_pipe[0], ti,
@@ -586,9 +596,9 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
   if (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS)
-    artwork.sounds_set_current = set_name;
+    artwork.sounds_set_current_name = set_name;
   else
-    artwork.music_set_current = set_name;
+    artwork.music_set_current_name = set_name;
 }
 
 #endif /* AUDIO_UNIX_NATIVE */
@@ -1831,12 +1841,21 @@ static MusicInfo *Load_MOD(char *filename)
 void LoadCustomMusic(void)
 {
   static boolean draw_init_text = TRUE;		/* only draw at startup */
+  static char *last_music_directory = NULL;
   char *music_directory = getCustomMusicDirectory();
   DIR *dir;
   struct dirent *dir_entry;
 
   if (!audio.sound_available)
     return;
+
+  if (last_music_directory != NULL &&
+      strcmp(last_music_directory, music_directory) == 0)
+    return;	/* old and new music directory are the same */
+
+  last_music_directory = music_directory;
+
+  FreeAllMusic();
 
   if ((dir = opendir(music_directory)) == NULL)
   {
@@ -2108,7 +2127,7 @@ static void ReloadCustomSounds()
   int i;
 
 #if 0
-  printf("DEBUG: reloading sounds '%s' ...\n", artwork.sounds_set_current);
+  printf("DEBUG: reloading sounds '%s' ...\n",artwork.sounds_set_current_name);
 #endif
 
   LoadSoundsInfo();
@@ -2145,10 +2164,13 @@ static void ReloadCustomSounds()
 static void ReloadCustomMusic()
 {
 #if 0
-  printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current);
+  printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current_name);
 #endif
 
+#if 0
+  /* this is done directly in LoadCustomMusic() now */
   FreeAllMusic();
+#endif
 
   LoadCustomMusic();
 }

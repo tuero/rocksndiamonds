@@ -2100,9 +2100,10 @@ unsigned int MoveDoor(unsigned int door_state)
   {
     if (!(door_state & DOOR_NO_DELAY))
     {
+      /* opening door sound has priority over simultaneously closing door */
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
 	PlaySoundStereo(SND_MENU_DOOR_OPENING, SOUND_MAX_RIGHT);
-      if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
+      else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
 	PlaySoundStereo(SND_MENU_DOOR_CLOSING, SOUND_MAX_RIGHT);
     }
 

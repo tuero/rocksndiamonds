@@ -409,7 +409,23 @@ void InitGfxBackground()
 
 void ReloadCustomArtwork()
 {
-  if (artwork.graphics_set_current != artwork.gfx_current->name)
+  static char *leveldir_current_name = NULL;
+  static boolean last_override_level_graphics = FALSE;
+  static boolean last_override_level_sounds = FALSE;
+  static boolean last_override_level_music = FALSE;
+
+  if (leveldir_current_name != leveldir_current->name)
+  {
+    /* force reload of custom artwork after new level series was selected */
+    artwork.graphics_set_current_name = NULL;
+    artwork.sounds_set_current_name = NULL;
+    artwork.music_set_current_name = NULL;
+
+    leveldir_current_name = leveldir_current->name;
+  }
+
+  if (artwork.graphics_set_current_name != artwork.gfx_current->name ||
+      last_override_level_graphics != setup.override_level_graphics)
   {
     int i;
 
@@ -427,21 +443,26 @@ void ReloadCustomArtwork()
 
     SetDoorState(DOOR_OPEN_1 | DOOR_CLOSE_2);
 
-    artwork.graphics_set_current = artwork.gfx_current->name;
+    artwork.graphics_set_current_name = artwork.gfx_current->name;
+    last_override_level_graphics = setup.override_level_graphics;
   }
 
-  if (artwork.sounds_set_current != artwork.snd_current->name)
+  if (artwork.sounds_set_current_name != artwork.snd_current->name ||
+      last_override_level_sounds != setup.override_level_sounds)
   {
     InitReloadSounds(artwork.snd_current->name);
 
-    artwork.sounds_set_current = artwork.snd_current->name;
+    artwork.sounds_set_current_name = artwork.snd_current->name;
+    last_override_level_sounds = setup.override_level_sounds;
   }
 
-  if (artwork.music_set_current != artwork.mus_current->name)
+  if (artwork.music_set_current_name != artwork.mus_current->name ||
+      last_override_level_music != setup.override_level_music)
   {
     InitReloadMusic(artwork.mus_current->name);
 
-    artwork.music_set_current = artwork.mus_current->name;
+    artwork.music_set_current_name = artwork.mus_current->name;
+    last_override_level_music = setup.override_level_music;
   }
 }
 

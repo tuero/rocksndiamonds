@@ -385,32 +385,30 @@ char *getCustomImageFilename(char *basename)
 
   basename = getCorrectedImageBasename(basename);
 
-  /* 1st try: look for special artwork in current level series directory */
-  filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
-  if (fileExists(filename))
-    return filename;
+  if (!setup.override_level_graphics)
+  {
+    /* 1st try: look for special artwork in current level series directory */
+    filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
+    if (fileExists(filename))
+      return filename;
+  }
 
-  /* 2nd try: look for special artwork in private artwork directory */
-  filename = getPath2(getUserGraphicsDir(), basename);
-  if (fileExists(filename))
-    return filename;
-
-  /* 3rd try: look for special artwork in configured artwork directory */
+  /* 2nd try: look for special artwork in configured artwork directory */
   filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
   if (fileExists(filename))
     return filename;
 
-  /* 4th try: look for default artwork in new default artwork directory */
+  /* 3rd try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
-  /* 5th try: look for default artwork in old default artwork directory */
+  /* 4th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.graphics_directory, basename);
   if (fileExists(filename))
     return filename;
 
-  return NULL;					/* cannot find image file */
+  return NULL;		/* cannot find specified artwork file anywhere */
 }
 
 char *getCustomSoundFilename(char *basename)
@@ -420,36 +418,30 @@ char *getCustomSoundFilename(char *basename)
   if (filename != NULL)
     free(filename);
 
-#if 0
-  /* 1st try: look for special artwork in current level series directory */
-  filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
-  if (fileExists(filename))
-    return filename;
-#endif
+  if (!setup.override_level_sounds)
+  {
+    /* 1st try: look for special artwork in current level series directory */
+    filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
+    if (fileExists(filename))
+      return filename;
+  }
 
-#if 0
-  /* 2nd try: look for special artwork in private artwork directory */
-  filename = getPath2(getUserSoundsDir(), basename);
-  if (fileExists(filename))
-    return filename;
-#endif
-
-  /* 3rd try: look for special artwork in configured artwork directory */
+  /* 2nd try: look for special artwork in configured artwork directory */
   filename = getPath2(getSetupArtworkDir(artwork.snd_current), basename);
   if (fileExists(filename))
     return filename;
 
-  /* 4th try: look for default artwork in new default artwork directory */
+  /* 3rd try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultSoundsDir(SOUNDS_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
-  /* 5th try: look for default artwork in old default artwork directory */
+  /* 4th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.sounds_directory, basename);
   if (fileExists(filename))
     return filename;
 
-  return NULL;					/* cannot find image file */
+  return NULL;		/* cannot find specified artwork file anywhere */
 }
 
 char *getCustomSoundConfigFilename()
@@ -464,32 +456,30 @@ char *getCustomMusicDirectory(void)
   if (directory != NULL)
     free(directory);
 
-  /* 1st try: look for special artwork in current level series directory */
-  directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
-  if (fileExists(directory))
-    return directory;
+  if (!setup.override_level_music)
+  {
+    /* 1st try: look for special artwork in current level series directory */
+    directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
+    if (fileExists(directory))
+      return directory;
+  }
 
-  /* 2nd try: look for special artwork in private artwork directory */
-  directory = getStringCopy(getUserMusicDir());
-  if (fileExists(directory))
-    return directory;
-
-  /* 3rd try: look for special artwork in configured artwork directory */
+  /* 2nd try: look for special artwork in configured artwork directory */
   directory = getStringCopy(getSetupArtworkDir(artwork.mus_current));
   if (fileExists(directory))
     return directory;
 
-  /* 4th try: look for default artwork in new default artwork directory */
+  /* 3rd try: look for default artwork in new default artwork directory */
   directory = getStringCopy(getDefaultMusicDir(MUSIC_SUBDIR));
   if (fileExists(directory))
     return directory;
 
-  /* 5th try: look for default artwork in old default artwork directory */
+  /* 4th try: look for default artwork in old default artwork directory */
   directory = getStringCopy(options.music_directory);
   if (fileExists(directory))
     return directory;
 
-  return NULL;					/* cannot find image file */
+  return NULL;		/* cannot find specified artwork file anywhere */
 }
 
 void InitTapeDirectory(char *level_subdir)
@@ -1847,14 +1837,14 @@ void LoadArtworkInfo()
   if (artwork.mus_current == NULL)
   artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
-  artwork.graphics_set_current = artwork.gfx_current->name;
-  artwork.sounds_set_current = artwork.snd_current->name;
-  artwork.music_set_current = artwork.mus_current->name;
+  artwork.graphics_set_current_name = artwork.gfx_current->name;
+  artwork.sounds_set_current_name = artwork.snd_current->name;
+  artwork.music_set_current_name = artwork.mus_current->name;
 
 #if 0
-  printf("graphics set == %s\n\n", artwork.graphics_set_current);
-  printf("sounds set == %s\n\n", artwork.sounds_set_current);
-  printf("music set == %s\n\n", artwork.music_set_current);
+  printf("graphics set == %s\n\n", artwork.graphics_set_current_name);
+  printf("sounds set == %s\n\n", artwork.sounds_set_current_name);
+  printf("music set == %s\n\n", artwork.music_set_current_name);
 #endif
 
   sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
@@ -1977,6 +1967,9 @@ static void SaveUserLevelInfo()
 char *getSetupValue(int type, void *value)
 {
   static char value_string[MAX_LINE_LEN];
+
+  if (value == NULL)
+    return NULL;
 
   switch (type)
   {
