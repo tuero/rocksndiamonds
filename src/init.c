@@ -3378,6 +3378,13 @@ void InitElementPropertiesEngine(int engine_version)
       element_info[element].ignition_delay = 8;
     }
   }
+
+  /* set element properties that were handled incorrectly in older levels */
+  if (engine_version < VERSION_IDENT(3,0,9,0))
+  {
+    SET_PROPERTY(EL_SP_SNIKSNAK, EP_DONT_COLLIDE_WITH, FALSE);
+    SET_PROPERTY(EL_SP_ELECTRON, EP_DONT_COLLIDE_WITH, FALSE);
+  }
 #endif
 
   /* this is needed because some graphics depend on element properties */

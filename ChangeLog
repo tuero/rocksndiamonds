@@ -1,6 +1,12 @@
+2004-03-09
+	* changed tape recording to only record input, not programmed actions
+	* YET TO COME ... added option ... for sp_sniksnak and sp_electron
+
 2004-03-08
 	* fixed totally broken (every 8th frame skipped) step-by-step recording
 	* fixed bug with requester not displayed when quick-loading interrupted
+	* added option "can fall into acid (with gravity)" for player elements
+	* fixed bug with player not falling when snapping down with gravity
 
 2004-03-07
 	* fixed bug which messed up key config when using keypad number keys

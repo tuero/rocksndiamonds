@@ -3174,7 +3174,9 @@ void LoadTapeFromFilename(char *filename)
   {
     tape.no_valid_file = TRUE;
 
+#if 0
     Error(ERR_WARN, "cannot read tape '%s' -- using empty tape", filename);
+#endif
 
     return;
   }

@@ -3947,6 +3947,7 @@ inline static void TurnRoundExt(int x, int y)
     else if (element == EL_BD_BUTTERFLY)     /* && MovDir[x][y] == left_dir) */
       MovDelay[x][y] = 1;
   }
+#if 0
   else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY ||
 	   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
   {
@@ -3965,6 +3966,34 @@ inline static void TurnRoundExt(int x, int y)
     else if (element == EL_BD_FIREFLY)	    /* && MovDir[x][y] == right_dir) */
       MovDelay[x][y] = 1;
   }
+#else
+  else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY)
+  {
+    TestIfBadThingTouchesOtherBadThing(x, y);
+
+    if (ENEMY_CAN_ENTER_FIELD(element, left_x, left_y))
+      MovDir[x][y] = left_dir;
+    else if (!ENEMY_CAN_ENTER_FIELD(element, move_x, move_y))
+      MovDir[x][y] = right_dir;
+
+    if (element == EL_SPACESHIP	&& MovDir[x][y] != old_move_dir)
+      MovDelay[x][y] = 9;
+    else if (element == EL_BD_FIREFLY)	    /* && MovDir[x][y] == right_dir) */
+      MovDelay[x][y] = 1;
+  }
+  else if (element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+  {
+    TestIfBadThingTouchesOtherBadThing(x, y);
+
+    if (ELEMENT_CAN_ENTER_FIELD_GENERIC(element, left_x, left_y, 0))
+      MovDir[x][y] = left_dir;
+    else if (!ELEMENT_CAN_ENTER_FIELD_GENERIC(element, move_x, move_y, 0))
+      MovDir[x][y] = right_dir;
+
+    if (MovDir[x][y] != old_move_dir)
+      MovDelay[x][y] = 9;
+  }
+#endif
   else if (element == EL_YAMYAM)
   {
     boolean can_turn_left  = YAMYAM_CAN_ENTER_FIELD(left_x, left_y);
@@ -7468,12 +7497,30 @@ void GameActions()
   if (!options.network && !setup.team_mode)
     local_player->effective_action = summarized_player_action;
 
+#if 1
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    tape_action[i] = stored_player[i].effective_action;
+
+    if (tape.recording && tape_action[i] && !tape.player_participates[i])
+      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+  }
+
+  /* only save actions from input devices, but not programmed actions */
+  if (tape.recording)
+    TapeRecordAction(tape_action);
+#endif
+
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     int actual_player_action = stored_player[i].effective_action;
 
 #if 1
-    /* !!! TEST !!! */
+    /* !!! THIS BREAKS THE FOLLOWING TAPES: !!!
+       - rnd_equinox_tetrachloride 048
+       - rnd_equinox_tetrachloride_ii 096
+       - rnd_emanuel_schmieg 002
+    */
     if (stored_player[i].MovPos == 0)
       CheckGravityMovement(&stored_player[i]);
 #endif
@@ -7510,15 +7557,19 @@ void GameActions()
 	     stored_player[i].MovPos, actual_player_action, FrameCounter);
 #endif
 
+#if 1
+    PlayerActions(&stored_player[i], actual_player_action);
+#else
     tape_action[i] = PlayerActions(&stored_player[i], actual_player_action);
 
     if (tape.recording && tape_action[i] && !tape.player_participates[i])
       tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+#endif
 
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
 
-#if 1
+#if 0
   if (tape.recording)
     TapeRecordAction(tape_action);
 #endif
