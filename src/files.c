@@ -95,7 +95,10 @@ static void setLevelInfoToDefaults()
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    level.custom_element_successor[i] = EL_EMPTY_SPACE;
     Properties1[EL_CUSTOM_START + i] = EP_BITMASK_DEFAULT;
+  }
 
   BorderElement = EL_STEELWALL;
 
@@ -342,6 +345,33 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int num_changed_custom_elements = getFile16BitBE(file);
+  int chunk_size_expected = 2 + num_changed_custom_elements * 4;
+  int i;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size - 2);
+    return chunk_size_expected;
+  }
+
+  for (i=0; i < num_changed_custom_elements; i++)
+  {
+    int element = getFile16BitBE(file);
+    int custom_element_successor = getFile16BitBE(file);
+    int i = element - EL_CUSTOM_START;
+
+    if (IS_CUSTOM_ELEMENT(element))
+      level->custom_element_successor[i] = custom_element_successor;
+    else
+      Error(ERR_WARN, "invalid custom element number %d", element);
+  }
+
+  return chunk_size;
+}
+
 void LoadLevelFromFilename(char *filename)
 {
   char cookie[MAX_LINE_LEN];
@@ -421,6 +451,7 @@ void LoadLevelFromFilename(char *filename)
       { "CONT", -1,			LoadLevel_CONT },
       { "CNT2", LEVEL_CHUNK_CNT2_SIZE,	LoadLevel_CNT2 },
       { "CUS1", -1,			LoadLevel_CUS1 },
+      { "CUS2", -1,			LoadLevel_CUS2 },
       {  NULL,  0,			NULL }
     };
 
@@ -684,7 +715,8 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 	putFile16BitBE(file, content_array[i][x][y]);
 }
 
-static void SaveLevel_CUS1(FILE *file, int num_changed_custom_elements)
+static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
+			   int num_changed_custom_elements)
 {
   int i, check = 0;
 
@@ -710,11 +742,39 @@ static void SaveLevel_CUS1(FILE *file, int num_changed_custom_elements)
     Error(ERR_WARN, "inconsistent number of custom element properties");
 }
 
+static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
+			   int num_changed_custom_elements)
+{
+  int i, check = 0;
+
+  putFile16BitBE(file, num_changed_custom_elements);
+
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (level->custom_element_successor[i] != EL_EMPTY_SPACE)
+    {
+      if (check < num_changed_custom_elements)
+      {
+	putFile16BitBE(file, element);
+	putFile16BitBE(file, level->custom_element_successor[i]);
+      }
+
+      check++;
+    }
+  }
+
+  if (check != num_changed_custom_elements)	/* should not happen */
+    Error(ERR_WARN, "inconsistent number of custom element successors");
+}
+
 void SaveLevel(int level_nr)
 {
   char *filename = getLevelFilename(level_nr);
   int body_chunk_size;
-  int num_changed_custom_elements = 0;
+  int num_changed_custom_elements1 = 0;
+  int num_changed_custom_elements2 = 0;
   int i, x, y;
   FILE *file;
 
@@ -754,7 +814,12 @@ void SaveLevel(int level_nr)
   /* check for non-standard custom elements and calculate "CUS1" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
     if (Properties1[EL_CUSTOM_START + i] != EP_BITMASK_DEFAULT)
-      num_changed_custom_elements++;
+      num_changed_custom_elements1++;
+
+  /* check for non-standard custom elements and calculate "CUS2" chunk size */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    if (level.custom_element_successor[i] != EL_EMPTY_SPACE)
+      num_changed_custom_elements2++;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
@@ -784,10 +849,16 @@ void SaveLevel(int level_nr)
     SaveLevel_CNT2(file, &level, EL_BD_AMOEBA);
   }
 
-  if (num_changed_custom_elements > 0)
+  if (num_changed_custom_elements1 > 0)
   {
-    putFileChunkBE(file, "CUS1", 2 + num_changed_custom_elements * 6);
-    SaveLevel_CUS1(file, num_changed_custom_elements);
+    putFileChunkBE(file, "CUS1", 2 + num_changed_custom_elements1 * 6);
+    SaveLevel_CUS1(file, &level, num_changed_custom_elements1);
+  }
+
+  if (num_changed_custom_elements2 > 0)
+  {
+    putFileChunkBE(file, "CUS2", 2 + num_changed_custom_elements2 * 4);
+    SaveLevel_CUS2(file, &level, num_changed_custom_elements2);
   }
 
   fclose(file);

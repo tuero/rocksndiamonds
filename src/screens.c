@@ -710,9 +710,11 @@ static int helpscreen_action[] =
   IMG_EXPLOSION,			16,
   IMG_EMPTY_SPACE,			20,			HA_NEXT,
 
-  EL_DYNABOMB_INCREASE_NUMBER,		-1,			HA_NEXT,
+  IMG_DYNABOMB_INCREASE_NUMBER,		-1,			HA_NEXT,
 
-  EL_DYNABOMB_INCREASE_SIZE,		-1,			HA_NEXT,
+  IMG_DYNABOMB_INCREASE_SIZE,		-1,			HA_NEXT,
+
+  IMG_DYNABOMB_INCREASE_POWER,		-1,			HA_NEXT,
 
   IMG_SPACESHIP_RIGHT,			16,
   IMG_SPACESHIP_UP,			16,
@@ -842,6 +844,7 @@ static char *helpscreen_eltext[][2] =
  {"Dyna Bomb: Explodes in 4 directions","with variable explosion size"},
  {"Dyna Bomb: Increases the number of",	"dyna bombs available at a time"},
  {"Dyna Bomb: Increases the size of",	"explosion of dyna bombs"},
+ {"Dyna Bomb: Increases the power of",	"explosion of dyna bombs"},
  {"Spaceship: Moves at the left side",	"of walls; don't touch it!"},
  {"Bug: Moves at the right side",	"of walls; don't touch it!"},
  {"Butterfly: Moves at the right side",	"of walls; don't touch it!"},

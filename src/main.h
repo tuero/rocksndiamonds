@@ -987,6 +987,8 @@ struct LevelInfo
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
+  short custom_element_successor[NUM_CUSTOM_ELEMENTS];
+
   boolean no_level_file;
 };
 
