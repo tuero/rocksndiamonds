@@ -18,11 +18,6 @@
 
 /* values for graphics configuration (custom elements) */
 
-  { "custom_0",					"RocksElements.pcx"	},
-  { "custom_0.xpos",				"5"			},
-  { "custom_0.ypos",				"0"			},
-  { "custom_0.frames",				"1"			},
-
   { "custom_1",					"RocksElements.pcx"	},
   { "custom_1.xpos",				"5"			},
   { "custom_1.ypos",				"0"			},
@@ -657,6 +652,11 @@
   { "custom_127.xpos",				"5"			},
   { "custom_127.ypos",				"0"			},
   { "custom_127.frames",			"1"			},
+
+  { "custom_128",				"RocksElements.pcx"	},
+  { "custom_128.xpos",				"5"			},
+  { "custom_128.ypos",				"0"			},
+  { "custom_128.frames",			"1"			},
 
 
 #endif	/* CONF_CUS_C */

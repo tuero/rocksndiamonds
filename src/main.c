@@ -541,7 +541,6 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "dx_bomb",			"stable bomb (DX style)"	},
   { NULL,			"-"				},
   { NULL,			"-"				},
-  { "custom",			"custom element 0"		},
   { "custom",			"custom element 1"		},
   { "custom",			"custom element 2"		},
   { "custom",			"custom element 3"		},
@@ -669,6 +668,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 125"		},
   { "custom",			"custom element 126"		},
   { "custom",			"custom element 127"		},
+  { "custom",			"custom element 128"		},
 
   { NULL,			"-"				}
 
