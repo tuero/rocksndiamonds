@@ -352,7 +352,7 @@ int cleanup_em_level(unsigned char *src, int length)
   /* size of v6 cave */
   length = 2172;
 
-#if 0
+#if 1
   printf("::: EM level file version: %d\n", file_version);
 #endif
 

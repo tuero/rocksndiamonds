@@ -50,8 +50,8 @@ CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
-DEFAULT_TARGET = x11
-# DEFAULT_TARGET = sdl
+# DEFAULT_TARGET = x11
+DEFAULT_TARGET = sdl
 
 
 # -----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ run: all
 	@./rocksndiamonds --verbose
 
 gdb: all
-	@gdb ./rocksndiamonds
+	@gdb -batch -x GDB_COMMANDS ./rocksndiamonds
 
 valgrind: all
 	@valgrind -v --leak-check=yes ./rocksndiamonds 2> valgrind.out

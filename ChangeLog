@@ -1,3 +1,6 @@
+2005-02-14
+	* added editor element descriptions written by Aaron Davidson
+
 2005-02-02
 	* improved fallback handling when configured artwork is not available
 	  (now using default artwork instead of exiting when files not found)
