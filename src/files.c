@@ -101,6 +101,12 @@ static void setLevelInfoToDefaults()
 
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
+
+    element_info[element].push_delay_fixed = 2;		/* special default */
+    element_info[element].push_delay_random = 8;	/* special default */
+    element_info[element].move_delay_fixed = 0;
+    element_info[element].move_delay_random = 0;
+
     element_info[element].move_pattern = MV_ALL_DIRECTIONS;
     element_info[element].move_direction_initial = MV_NO_MOVING;
     element_info[element].move_stepsize = TILEX / 8;
@@ -1208,6 +1214,10 @@ void LoadTapeFromFilename(char *filename)
   fclose(file);
 
   tape.length_seconds = GetTapeLength();
+
+#if 0
+  printf("tape version: %d\n", tape.game_version);
+#endif
 }
 
 void LoadTape(int level_nr)

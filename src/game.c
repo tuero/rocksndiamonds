@@ -828,7 +828,6 @@ void InitGame()
     player->actual_frame_counter = 0;
 
     player->last_move_dir = MV_NO_MOVING;
-    player->is_moving = FALSE;
 
     player->is_moving = FALSE;
     player->is_waiting = FALSE;
@@ -1505,8 +1504,10 @@ static void ResetGfxAnimation(int x, int y)
 void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
-  int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
-  int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int newx = x + dx;
+  int newy = y + dy;
 
   if (!JustStopped[x][y] || direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
@@ -3313,11 +3314,17 @@ void StartMoving(int x, int y)
       GfxAction[x][y + 1] = ACTION_ACTIVE;
 #endif
     }
+#if 1
     else if (CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
 	     JustStopped[x][y])
     {
+      /*
+      printf("::: %d\n", MovDir[x][y]);
+      */
+
       Impact(x, y);
     }
+#endif
     else if (IS_FREE(x, y + 1) && element == EL_SPRING && use_spring_bug)
     {
       if (MovDir[x][y] == MV_NO_MOVING)
@@ -3351,7 +3358,7 @@ void StartMoving(int x, int y)
 	     element != EL_DX_SUPABOMB)
 #endif
 #else
-    else if ((IS_SLIPPERY(Feld[x][y + 1]) ||
+    else if (((IS_SLIPPERY(Feld[x][y + 1]) && !IS_PLAYER(x, y + 1)) ||
 	      (IS_EM_SLIPPERY_WALL(Feld[x][y + 1]) && IS_GEM(element))) &&
 	     !IS_FALLING(x, y + 1) && !JustStopped[x][y + 1] &&
 	     element != EL_DX_SUPABOMB && element != EL_SP_DISK_ORANGE)
@@ -3371,6 +3378,11 @@ void StartMoving(int x, int y)
 
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
 	started_moving = TRUE;
+
+#if 0
+	if (element == EL_BOMB)
+	  printf("::: SLIP DOWN [%d]\n", FrameCounter);
+#endif
       }
     }
     else if (IS_BELT_ACTIVE(Feld[x][y + 1]))
@@ -3778,6 +3790,8 @@ void ContinueMoving(int x, int y)
   int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
+  struct PlayerInfo *player = (IS_PLAYER(x, y) ? PLAYERINFO(x, y) : NULL);
+  boolean pushing = (player != NULL && player->Pushing && player->is_moving);
 
   if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
     step /= 2;
@@ -3803,6 +3817,16 @@ void ContinueMoving(int x, int y)
 #endif
 
   MovPos[x][y] += step;
+
+#if 1
+  if (pushing)		/* special case: moving object pushed by player */
+    MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->GfxPos));
+#endif
+
+#if 0
+  if (pushing)
+    printf("::: OOPS! pushing '%s'\n", element_info[element].token_name);
+#endif
 
   if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
   {
@@ -3917,8 +3941,14 @@ void ContinueMoving(int x, int y)
     DrawLevelField(x, y);
     DrawLevelField(newx, newy);
 
-    Stop[newx][newy] = TRUE;
-    JustStopped[newx][newy] = 3;
+#if 0
+    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) || !pushing)
+#endif
+      Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
+#if 1
+    if (!pushing)
+#endif
+      JustStopped[newx][newy] = 3;
 
     if (DONT_TOUCH(element))	/* object may be nasty to player or others */
     {
@@ -4961,16 +4991,7 @@ static void CheckPlayerElementChange(int x, int y, int element,
   if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, trigger_event))
     return;
 
-  if (trigger_event == CE_PUSHED_BY_PLAYER)
-  {
-#if 0
-    /* !!! does not work -- debug !!! */
-    ChangeDelay[x][y] = 2;	/* give one frame (+1) to start pushing */
-    ChangeElement(x, y);
-#endif
-  }
-  else
-    ChangeElementDoIt(x, y, element_info[element].change.successor);
+  ChangeElementDoIt(x, y, element_info[element].change.successor);
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -5137,6 +5158,30 @@ void GameActions()
 
   for (i=0; i<MAX_PLAYERS; i++)
     stored_player[i].Frame++;
+#endif
+
+#if 1
+  if (game.engine_version < RELEASE_IDENT(2,2,0,7))
+  {
+    for (i=0; i<MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+      int x = player->jx;
+      int y = player->jy;
+
+      if (player->active && player->Pushing && player->is_moving &&
+	  IS_MOVING(x, y))
+      {
+	ContinueMoving(x, y);
+
+	/* continue moving after pushing (this is actually a bug) */
+	if (!IS_MOVING(x, y))
+	{
+	  Stop[x][y] = FALSE;
+	}
+      }
+    }
+  }
 #endif
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
@@ -6328,7 +6373,14 @@ int DigField(struct PlayerInfo *player,
   }
 
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
+  {
+#if 0
+    if (FrameCounter == 437)
+      printf("::: ---> IS_MOVING %d\n", MovDir[x][y]);
+#endif
+
     return MF_NO_ACTION;
+  }
 
 #if 0
   if (IS_TUBE(Feld[jx][jy]) || IS_TUBE(Back[jx][jy]))
@@ -6722,8 +6774,14 @@ int DigField(struct PlayerInfo *player,
       if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	return MF_NO_ACTION;
 
+
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
+
+#if 0
+      printf("want push... %d [%d]\n", FrameCounter, player->push_delay_value);
+#endif
+
 #if 0
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
 	  !tape.playing &&
@@ -6743,9 +6801,21 @@ int DigField(struct PlayerInfo *player,
       }
       else
       {
+#if 1
+	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
+			       dx > 0 ? MV_RIGHT :
+			       dy < 0 ? MV_UP : MV_DOWN));
+	MovPos[x][y] = (dx != 0 ? dx : dy);
+#else
 	RemoveField(x, y);
 	Feld[x + dx][y + dy] = element;
+#endif
       }
+
+#if 0
+      printf("pushing %d/%d ... %d [%d]\n", dx, dy,
+	     FrameCounter, player->push_delay_value);
+#endif
 
       if (element == EL_SPRING)
       {
@@ -7123,8 +7193,15 @@ int DigField(struct PlayerInfo *player,
 	    !(tape.playing && tape.file_version < FILE_VERSION_2_0))
 	  return MF_NO_ACTION;
 
+#if 1
+	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
+			       dx > 0 ? MV_RIGHT :
+			       dy < 0 ? MV_UP : MV_DOWN));
+	MovPos[x][y] = (dx != 0 ? dx : dy);
+#else
 	RemoveField(x, y);
 	Feld[x + dx][y + dy] = element;
+#endif
 
 #if 1
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
@@ -7137,7 +7214,7 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
-	CheckPlayerElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
+	CheckPlayerElementChange(x + dx, y + dy, element, CE_PUSHED_BY_PLAYER);
 
 	break;
       }

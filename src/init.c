@@ -2659,6 +2659,7 @@ void InitElementPropertiesEngine(int engine_version)
 		  engine_version > VERSION_IDENT(2,0,1)));
   }
 
+#if 0
   /* dynamically adjust element properties according to game engine version */
 #if 0
   if (engine_version < RELEASE_IDENT(2,2,0,7))
@@ -2672,6 +2673,7 @@ void InitElementPropertiesEngine(int engine_version)
       element_info[element].push_delay_random = 8;
     }
   }
+#endif
 }
 
 static void InitGlobal()

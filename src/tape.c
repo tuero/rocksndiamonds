@@ -316,6 +316,11 @@ void TapeErase()
   tape.game_version = GAME_VERSION_ACTUAL;
   tape.engine_version = level.game_version;
 
+#if 0
+  printf("::: tape.engine_version = level.game_version = %d \n",
+	 level.game_version);
+#endif
+
   for(i=0; i<MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
 }
