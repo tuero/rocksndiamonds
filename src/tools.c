@@ -739,10 +739,14 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player_is_moving && last_element == EL_EXPLOSION)
   {
+#if 1
+    int graphic = el_act2img(GfxElement[last_jx][last_jy], ACTION_EXPLODING);
+#else
     int stored = Store[last_jx][last_jy];
     int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
 		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
 		   IMG_SP_EXPLOSION);
+#endif
     int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
     int phase = ExplodePhase[last_jx][last_jy] - 1;
     int frame = getGraphicAnimationFrame(graphic, phase - delay);

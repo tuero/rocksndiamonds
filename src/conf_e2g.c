@@ -181,6 +181,10 @@ element_to_graphic[] =
     IMG_BD_FIREFLY_MOVING
   },
   {
+    EL_SP_DEFAULT,				ACTION_EXPLODING, -1,
+    IMG_SP_DEFAULT_EXPLODING
+  },
+  {
     EL_SP_EMPTY_SPACE,				-1, -1,
     IMG_SP_EMPTY_SPACE
   },
@@ -419,6 +423,10 @@ element_to_graphic[] =
   {
     EL_SP_ELECTRON,				-1, -1,
     IMG_SP_ELECTRON
+  },
+  {
+    EL_SP_ELECTRON,				ACTION_EXPLODING, -1,
+    IMG_SP_ELECTRON_EXPLODING
   },
   {
     EL_SP_TERMINAL,				-1, -1,
@@ -2349,8 +2357,8 @@ element_to_graphic[] =
     IMG_PLAYER_4_SNAPPING_RIGHT
   },
   {
-    EL_EXPLOSION,				-1, -1,
-    IMG_EXPLOSION
+    EL_DEFAULT,					ACTION_EXPLODING, -1,
+    IMG_DEFAULT_EXPLODING
   },
   {
     EL_STEELWALL_TOPLEFT,			-1, -1,

@@ -481,19 +481,19 @@ void InitElementGraphicInfo()
   /* now set all '-1' values to element specific default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    int default_action_graphic = element_info[i].graphic[ACTION_DEFAULT];
-    int default_action_direction_graphic[NUM_DIRECTIONS];
+    int default_graphic = element_info[i].graphic[ACTION_DEFAULT];
+    int default_direction_graphic[NUM_DIRECTIONS];
 
-    if (default_action_graphic == -1)
-      default_action_graphic = IMG_CHAR_QUESTION;
+    if (default_graphic == -1)
+      default_graphic = IMG_CHAR_QUESTION;
 
     for (dir=0; dir<NUM_DIRECTIONS; dir++)
     {
-      default_action_direction_graphic[dir] =
+      default_direction_graphic[dir] =
 	element_info[i].direction_graphic[ACTION_DEFAULT][dir];
 
-      if (default_action_direction_graphic[dir] == -1)
-	default_action_direction_graphic[dir] = default_action_graphic;
+      if (default_direction_graphic[dir] == -1)
+	default_direction_graphic[dir] = default_graphic;
     }
 
     for (act=0; act<NUM_ACTIONS; act++)
@@ -502,18 +502,32 @@ void InitElementGraphicInfo()
 			    act == ACTION_SNAPPING ||
 			    act == ACTION_COLLECTING);
 
+      /* generic default action graphic (defined by "[default]" directive) */
+      int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
+
+      /* look for special default action graphic (classic game specific) */
+      if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].graphic[act] != -1)
+	default_action_graphic = element_info[EL_BD_DEFAULT].graphic[act];
+      if (IS_SP_ELEMENT(i) && element_info[EL_SP_DEFAULT].graphic[act] != -1)
+	default_action_graphic = element_info[EL_SP_DEFAULT].graphic[act];
+      if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].graphic[act] != -1)
+	default_action_graphic = element_info[EL_SB_DEFAULT].graphic[act];
+
+      if (default_action_graphic == -1)
+	default_action_graphic = default_graphic;
+
       for (dir=0; dir<NUM_DIRECTIONS; dir++)
       {
-	int default_direction_graphic = element_info[i].graphic[act];
+	int default_action_direction_graphic = element_info[i].graphic[act];
 
 	/* no graphic for current action -- use default direction graphic */
-	if (default_direction_graphic == -1)
-	  default_direction_graphic =
-	    (act_remove ? IMG_EMPTY : default_action_direction_graphic[dir]);
+	if (default_action_direction_graphic == -1)
+	  default_action_direction_graphic =
+	    (act_remove ? IMG_EMPTY : default_direction_graphic[dir]);
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
-	    default_direction_graphic;
+	    default_action_direction_graphic;
       }
 
       /* no graphic for this specific action -- use default action graphic */
@@ -912,12 +926,24 @@ static void InitElementSoundInfo()
   {
     for (act=0; act < NUM_ACTIONS; act++)
     {
+      /* generic default action sound (defined by "[default]" directive) */
+      int default_action_sound = element_info[EL_DEFAULT].sound[act];
+
+      /* look for special default action sound (classic game specific) */
+      if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].sound[act] != -1)
+	default_action_sound = element_info[EL_BD_DEFAULT].sound[act];
+      if (IS_SP_ELEMENT(i) && element_info[EL_SP_DEFAULT].sound[act] != -1)
+	default_action_sound = element_info[EL_SP_DEFAULT].sound[act];
+      if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].sound[act] != -1)
+	default_action_sound = element_info[EL_SB_DEFAULT].sound[act];
+
+      /* look for element specific default sound (independent from action) */
+      if (element_info[i].sound[ACTION_DEFAULT] != -1)
+	default_action_sound = element_info[i].sound[ACTION_DEFAULT];
+
       /* no sound for this specific action -- use default action sound */
       if (element_info[i].sound[act] == -1)
-	element_info[i].sound[act] =
-	  (element_info[i].sound[ACTION_DEFAULT] != -1 ?
-	   element_info[i].sound[ACTION_DEFAULT] :
-	   element_info[EL_INTERNAL_DEFAULT_ELEMENT].sound[act]);
+	element_info[i].sound[act] = default_action_sound;
     }
   }
 }
@@ -1717,6 +1743,11 @@ void InitElementPropertiesStatic()
     EL_INVISIBLE_WALL,
     /* more than one murphy in a level results in an inactive clone */
     EL_SP_MURPHY_CLONE,
+    /* runtime elements*/
+    EL_SP_DISK_RED_ACTIVE,
+    EL_SP_TERMINAL_ACTIVE,
+    EL_SP_BUGGY_BASE_ACTIVATING,
+    EL_SP_BUGGY_BASE_ACTIVE,
     -1
   };
 

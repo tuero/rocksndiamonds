@@ -2938,8 +2938,23 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "internal_default_element",
-    "DEFAULT",
+    "[default]",
+    "default",
+    "-"
+  },
+  {
+    "[bd_default]",
+    "bd_default",
+    "-"
+  },
+  {
+    "[sp_default]",
+    "sp_default",
+    "-"
+  },
+  {
+    "[sb_default]",
+    "sb_default",
     "-"
   },
 

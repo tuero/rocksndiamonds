@@ -1791,7 +1791,11 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
       Feld[x][y] = EL_EXPLOSION;
+#if 1
+      GfxElement[x][y] = center_element;
+#else
       GfxElement[x][y] = EL_UNDEFINED;
+#endif
       MovDir[x][y] = MovPos[x][y] = 0;
       AmoebaNr[x][y] = 0;
       ExplodePhase[x][y] = 1;
@@ -1846,6 +1850,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
+    GfxElement[x][y] = EL_UNDEFINED;
 
     if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
       element = Feld[x][y] = Back[x][y];
@@ -1862,10 +1867,14 @@ void Explode(int ex, int ey, int phase, int mode)
   }
   else if (phase >= delay && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
+#if 1
+    int graphic = el_act2img(GfxElement[x][y], ACTION_EXPLODING);
+#else
     int stored = Store[x][y];
     int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
 		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
 		   IMG_SP_EXPLOSION);
+#endif
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
     if (phase == delay)
@@ -1942,10 +1951,22 @@ void Bang(int x, int y)
 {
   int element = Feld[x][y];
 
+  if (IS_PLAYER(x, y))
+  {
+    struct PlayerInfo *player = PLAYERINFO(x, y);
+
+    element = Feld[x][y] = (player->use_murphy_graphic ? EL_SP_MURPHY :
+			    player->element_nr);
+  }
+
+#if 1
+  PlaySoundLevelAction(x, y, ACTION_EXPLODING);
+#else
   if (game.emulation == EMU_SUPAPLEX)
     PlaySoundLevel(x, y, SND_SP_ELEMENT_EXPLODING);
   else
     PlaySoundLevel(x, y, SND_ELEMENT_EXPLODING);
+#endif
 
 #if 0
   if (IS_PLAYER(x, y))	/* remove objects that might cause smaller explosion */
@@ -6210,7 +6231,11 @@ void BuryHero(struct PlayerInfo *player)
   if (!player->active)
     return;
 
+#if 1
+  PlaySoundLevelElementAction(jx, jy, player->element_nr, ACTION_DYING);
+#else
   PlaySoundLevel(jx, jy, SND_CLASS_PLAYER_DYING);
+#endif
   PlaySoundLevel(jx, jy, SND_GAME_LOSING);
 
   player->GameOver = TRUE;

@@ -29,13 +29,15 @@ struct ConfigInfo sound_config_suffix[] =
 struct ConfigInfo sound_config[] =
 {
   /* some default sounds */
-  { "[DEFAULT].digging",		"schlurf.wav"		},
-  { "[DEFAULT].collecting",		"pong.wav"		},
-  { "[DEFAULT].snapping",		"pong.wav"		},
-  { "[DEFAULT].pushing",		"pusch.wav"		},
-  { "[DEFAULT].impact",			"klopf.wav"		},
-  { "[DEFAULT].passing",		"gate.wav"		},
-  { "[DEFAULT].exploding",		"roaaar.wav"		},
+  { "[default].digging",		"schlurf.wav"		},
+  { "[default].collecting",		"pong.wav"		},
+  { "[default].snapping",		"pong.wav"		},
+  { "[default].pushing",		"pusch.wav"		},
+  { "[default].impact",			"klopf.wav"		},
+  { "[default].passing",		"gate.wav"		},
+  { "[default].dying",			"autsch.wav"		},
+  { "[default].exploding",		"roaaar.wav"		},
+  { "[sp_default].exploding",		"booom.wav"		},
 
   /* sounds for Boulder Dash style elements and actions */
   { "bd_diamond.collecting",		"pong.wav"		},
@@ -208,11 +210,6 @@ struct ConfigInfo sound_config[] =
   { "dragon.moving",			UNDEFINED_FILENAME	},
   { "dragon.waiting",			UNDEFINED_FILENAME	},
   { "dragon.attacking",			UNDEFINED_FILENAME	},
-
-  /* sounds for generic elements and actions */
-  { "[player].dying",			"autsch.wav"		},
-  { "element.exploding",		"roaaar.wav"		},
-  { "sp_element.exploding",		"booom.wav"		},
 
   /* sounds not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_SOUNDS" <-- do not change! */

@@ -208,6 +208,13 @@ struct ConfigInfo image_config[] =
 
   /* images for Supaplex style elements and actions */
 
+  { "[sp_default].exploding",			"RocksSP.pcx"		},
+  { "[sp_default].exploding.xpos",		"8"			},
+  { "[sp_default].exploding.ypos",		"3"			},
+  { "[sp_default].exploding.frames",		"8"			},
+  { "[sp_default].exploding.delay",		"3"			},
+  { "[sp_default].exploding.anim_mode",		"linear"		},
+
   { "sp_empty_space",				"RocksSP.pcx"		},
   { "sp_empty_space.xpos",			"0"			},
   { "sp_empty_space.ypos",			"0"			},
@@ -485,6 +492,12 @@ struct ConfigInfo image_config[] =
   { "sp_electron.EDITOR",			"RocksSP.pcx"		},
   { "sp_electron.EDITOR.xpos",			"10"			},
   { "sp_electron.EDITOR.ypos",			"11"			},
+  { "sp_electron.exploding",			"RocksSP.pcx"		},
+  { "sp_electron.exploding.xpos",		"8"			},
+  { "sp_electron.exploding.ypos",		"4"			},
+  { "sp_electron.exploding.frames",		"8"			},
+  { "sp_electron.exploding.delay",		"3"			},
+  { "sp_electron.exploding.anim_mode",		"linear"		},
 
   { "sp_terminal",				"RocksSP.pcx"		},
   { "sp_terminal.xpos",				"0"			},
@@ -541,19 +554,6 @@ struct ConfigInfo image_config[] =
   { "sp_hardware_base_6.xpos",			"5"			},
   { "sp_hardware_base_6.ypos",			"4"			},
   { "sp_hardware_base_6.frames",		"1"			},
-
-  { "sp_explosion",				"RocksSP.pcx"		},
-  { "sp_explosion.xpos",			"8"			},
-  { "sp_explosion.ypos",			"3"			},
-  { "sp_explosion.frames",			"8"			},
-  { "sp_explosion.delay",			"3"			},
-  { "sp_explosion.anim_mode",			"linear"		},
-  { "sp_explosion_infotron",			"RocksSP.pcx"		},
-  { "sp_explosion_infotron.xpos",		"8"			},
-  { "sp_explosion_infotron.ypos",		"4"			},
-  { "sp_explosion_infotron.frames",		"8"			},
-  { "sp_explosion.delay",			"3"			},
-  { "sp_explosion.anim_mode",			"linear"		},
 
   /* images for Sokoban style elements and actions */
 
@@ -2798,12 +2798,12 @@ struct ConfigInfo image_config[] =
   { "player_4.snapping.right.ypos",		"10"			},
   { "player_4.snapping.right.frames",		"1"			},
 
-  { "explosion",				"RocksElements.pcx"	},
-  { "explosion.xpos",				"0"			},
-  { "explosion.ypos",				"4"			},
-  { "explosion.frames",				"8"			},
-  { "explosion.delay",				"2"			},
-  { "explosion.anim_mode",			"linear"		},
+  { "[default].exploding",			"RocksElements.pcx"	},
+  { "[default].exploding.xpos",			"0"			},
+  { "[default].exploding.ypos",			"4"			},
+  { "[default].exploding.frames",		"8"			},
+  { "[default].exploding.delay",		"2"			},
+  { "[default].exploding.anim_mode",		"linear"		},
 
   { "twinkle_blue",				"RocksHeroes.pcx"	},
   { "twinkle_blue.xpos",			"9"			},
