@@ -491,8 +491,8 @@ static void Mixer_PlayChannel(int channel)
   if (mixer[channel].type != MUS_TYPE_WAV)
     return;
 
-  mixer[channel].playingpos = 0;
-  mixer[channel].playingtime = 0;
+  mixer[channel].playing_pos = 0;
+  mixer[channel].playing_starttime = Counter();
 
 #if defined(TARGET_SDL)
   Mix_Volume(channel, SOUND_MAX_VOLUME);
@@ -507,7 +507,7 @@ static void Mixer_PlayChannel(int channel)
     voice_set_playmode(mixer[channel].voice, PLAYMODE_LOOP);
 
   voice_set_volume(mixer[channel].voice, mixer[channel].volume);
-  voice_set_pan(mixer[channel].voice, mixer[channel].stereo);
+  voice_set_pan(mixer[channel].voice, mixer[channel].stereo_position);
   voice_start(mixer[channel].voice);       
 #endif
 
@@ -538,7 +538,7 @@ static void Mixer_StopChannel(int channel)
 #endif
 #endif
 
-  if (!mixer_active_channels || !mixer[channel].active)
+  if (!mixer[channel].active)
     return;
 
 #if defined(TARGET_SDL)
@@ -563,23 +563,16 @@ static void Mixer_StopMusicChannel()
 
 static void Mixer_FadeChannel(int channel)
 {
-  if (!mixer_active_channels || !mixer[channel].active)
+  if (!mixer[channel].active)
     return;
 
   mixer[channel].state |= SND_CTRL_FADE;
 
 #if defined(TARGET_SDL)
-
-#if 1
   Mix_FadeOutChannel(channel, SOUND_FADING_INTERVAL);
-#else
-  Mix_ExpireChannel(channel, SOUND_FADING_INTERVAL);
-#endif
-
 #elif defined(PLATFORM_MSDOS)
   if (voice_check(mixer[channel].voice))
     voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL, 0);
-  mixer[channel].state &= ~SND_CTRL_IS_LOOP;
 #endif
 }
 
@@ -592,6 +585,24 @@ static void Mixer_FadeMusicChannel()
 #endif
 }
 
+static void Mixer_UnFadeChannel(int channel)
+{
+  if (!mixer[channel].active || !IS_FADING(mixer[channel]))
+    return;
+
+  mixer[channel].state &= ~SND_CTRL_FADE;
+  mixer[channel].volume = PSND_MAX_VOLUME;
+
+#if defined(TARGET_SDL)
+  Mix_ExpireChannel(channel, -1);
+  Mix_Volume(channel, SOUND_MAX_VOLUME);
+#elif defined(TARGET_ALLEGRO)
+  voice_stop_volumeramp(mixer[channel].voice);
+  voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL,
+		    mixer[channel].volume);
+#endif
+}
+
 static void Mixer_InsertSound(SoundControl snd_ctrl)
 {
   SoundInfo *snd_info;
@@ -599,6 +610,10 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 
 #if 0
   printf("NEW SOUND %d HAS ARRIVED [%d]\n", snd_ctrl.nr, num_sounds);
+#endif
+
+#if 0
+  printf("%d ACTIVE CHANNELS\n", mixer_active_channels);
 #endif
 
   if (IS_MUSIC(snd_ctrl))
@@ -625,45 +640,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
   }
 
-  if (mixer_active_channels == audio.num_channels)
-  {
-    for (i=0; i<audio.num_channels; i++)
-    {
-      if (mixer[i].data_ptr == NULL ||
-	  mixer[i].data_len == 0)
-      {
-#if 1
-	printf("THIS SHOULD NEVER HAPPEN! [%d]\n", i);
-#endif
-
-	Mixer_StopChannel(i);
-      }
-    }
-  }
-
-#if 0
-  printf("%d ACTIVE CHANNELS\n", mixer_active_channels);
-#endif
-
-  /* if all channels are active, remove oldest sound sample */
-  if (mixer_active_channels == audio.num_channels)
-  {
-    int longest = 0, longest_nr = audio.first_sound_channel;
-
-    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
-    {
-      int actual = 100 * mixer[i].playingpos / mixer[i].data_len;
-
-      if (!IS_LOOP(mixer[i]) && actual > longest)
-      {
-	longest = actual;
-	longest_nr = i;
-      }
-    }
-
-    Mixer_StopChannel(longest_nr);
-  }
-
   /* check if sound is already being played (and how often) */
   for (k=0, i=audio.first_sound_channel; i<audio.num_channels; i++)
     if (mixer[i].nr == snd_ctrl.nr)
@@ -673,18 +649,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   if (k >= 1 && IS_LOOP(snd_ctrl))
   {
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-    {
       if (mixer[i].nr == snd_ctrl.nr && IS_FADING(mixer[i]))
-      {
-	mixer[i].state &= ~SND_CTRL_FADE;
-	mixer[i].volume = PSND_MAX_VOLUME;
-#if defined(PLATFORM_MSDOS)
-        mixer[i].state |= SND_CTRL_LOOP;
-        voice_stop_volumeramp(mixer[i].voice);
-        voice_ramp_volume(mixer[i].voice, mixer[i].volume, 1000);
-#endif
-      }
-    }
+	Mixer_UnFadeChannel(i);
 
     return;
   }
@@ -692,19 +658,56 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* don't play sound more than n times simultaneously (with n == 2 for now) */
   if (k >= 2)
   {
+    unsigned long playing_current = Counter();
     int longest = 0, longest_nr = audio.first_sound_channel;
 
     /* look for oldest equal sound */
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
+      int playing_time = playing_current - mixer[i].playing_starttime;
       int actual;
 
       if (!mixer[i].active || mixer[i].nr != snd_ctrl.nr)
 	continue;
 
-      actual = 100 * mixer[i].playingpos / mixer[i].data_len;
+#if 1
+      actual = 1000 * playing_time / mixer[i].data_len;
+#else
+      actual = 100 * mixer[i].playing_pos / mixer[i].data_len;
+#endif
 
       if (actual >= longest)
+      {
+	longest = actual;
+	longest_nr = i;
+      }
+    }
+
+    Mixer_StopChannel(longest_nr);
+  }
+
+  /* If all (non-music) channels are active, stop the channel that has
+     played its sound sample most completely (in percent of the sample
+     length). As we cannot currently get the actual playing position
+     of the channel's sound sample when compiling with the SDL mixer
+     library, we use the current playing time (in milliseconds) instead. */
+
+  if (mixer_active_channels ==
+      audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
+  {
+    unsigned long playing_current = Counter();
+    int longest = 0, longest_nr = audio.first_sound_channel;
+
+    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    {
+#if 1
+      int playing_time = playing_current - mixer[i].playing_starttime;
+      int actual = 1000 * playing_time / mixer[i].data_len;
+#else
+      int actual = 100 * mixer[i].playing_pos / mixer[i].data_len;
+#endif
+
+      if (!IS_LOOP(mixer[i]) && actual > longest)
       {
 	longest = actual;
 	longest_nr = i;
@@ -780,10 +783,11 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     if (!mixer[i].active || IS_LOOP(mixer[i]))
       continue;
 
-    mixer[i].playingpos = voice_get_position(mixer[i].voice);
+    mixer[i].playing_pos = voice_get_position(mixer[i].voice);
     mixer[i].volume = voice_get_volume(mixer[i].voice);
 
-    if (mixer[i].playingpos == -1 || mixer[i].volume == 0)
+    /* sound sample has completed playing or was completely faded out */
+    if (mixer[i].playing_pos == -1 || mixer[i].volume == 0)
       Mixer_StopChannel(i);
   }
 #endif /* TARGET_ALLEGRO */
@@ -806,9 +810,6 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
   }
   else if (IS_FADING(snd_ctrl))		/* fade out existing sound or music */
   {
-    if (!mixer_active_channels)
-      return;
-
     if (IS_MUSIC(snd_ctrl))
     {
       Mixer_FadeMusicChannel();
@@ -821,9 +822,6 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
   }
   else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
   {
-    if (!mixer_active_channels)
-      return;
-
     if (IS_MUSIC(snd_ctrl))
     {
       Mixer_StopMusicChannel();
@@ -948,9 +946,9 @@ static void Mixer_Main_DSP()
     /* pointer, lenght and actual playing position of sound sample */
     sample_ptr = mixer[i].data_ptr;
     sample_len = mixer[i].data_len;
-    sample_pos = mixer[i].playingpos;
+    sample_pos = mixer[i].playing_pos;
     sample_size = MIN(max_sample_size, sample_len - sample_pos);
-    mixer[i].playingpos += sample_size;
+    mixer[i].playing_pos += sample_size;
 
     /* copy original sample to first mixing buffer */
     CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
@@ -973,7 +971,7 @@ static void Mixer_Main_DSP()
 	    premix_first_buffer[sample_size + j] =
 	      ((short *)sample_ptr)[j];
 
-	mixer[i].playingpos = restarted_sample_size;
+	mixer[i].playing_pos = restarted_sample_size;
 	sample_size += restarted_sample_size;
       }
     }
@@ -994,8 +992,8 @@ static void Mixer_Main_DSP()
     if (stereo)
     {
       int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
-      int left_volume = stereo_volume[middle_pos + mixer[i].stereo];
-      int right_volume= stereo_volume[middle_pos - mixer[i].stereo];
+      int left_volume = stereo_volume[middle_pos + mixer[i].stereo_position];
+      int right_volume= stereo_volume[middle_pos - mixer[i].stereo_position];
 
       for(j=0; j<sample_size; j++)
       {
@@ -1017,10 +1015,10 @@ static void Mixer_Main_DSP()
     }
 
     /* delete completed sound entries from the mixer */
-    if (mixer[i].playingpos >= mixer[i].data_len)
+    if (mixer[i].playing_pos >= mixer[i].data_len)
     {
       if (IS_LOOP(mixer[i]))
-	mixer[i].playingpos = 0;
+	mixer[i].playing_pos = 0;
       else
 	Mixer_StopChannel(i);
     }
@@ -1081,9 +1079,9 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
   /* pointer, lenght and actual playing position of sound sample */
   sample_ptr = mixer[i].data_ptr;
   sample_len = mixer[i].data_len;
-  sample_pos = mixer[i].playingpos;
+  sample_pos = mixer[i].playing_pos;
   sample_size = MIN(max_sample_size, sample_len - sample_pos);
-  mixer[i].playingpos += sample_size;
+  mixer[i].playing_pos += sample_size;
 
   /* copy original sample to first mixing buffer */
   CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
@@ -1104,7 +1102,7 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 #endif
 
   /* delete completed sound entries from the mixer */
-  if (mixer[i].playingpos >= mixer[i].data_len)
+  if (mixer[i].playing_pos >= mixer[i].data_len)
     Mixer_StopChannel(i);
 
   for(i=0; i<sample_size; i++)
@@ -1627,9 +1625,9 @@ void PlaySound(int nr)
   PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_SOUND);
 }
 
-void PlaySoundStereo(int nr, int stereo)
+void PlaySoundStereo(int nr, int stereo_position)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, stereo, SND_CTRL_PLAY_SOUND);
+  PlaySoundExt(nr, PSND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundLoop(int nr)
@@ -1642,7 +1640,7 @@ void PlaySoundMusic(int nr)
   PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_MUSIC);
 }
 
-void PlaySoundExt(int nr, int volume, int stereo, int state)
+void PlaySoundExt(int nr, int volume, int stereo_position, int state)
 {
   SoundControl snd_ctrl;
 
@@ -1656,23 +1654,23 @@ void PlaySoundExt(int nr, int volume, int stereo, int state)
   else if (volume > PSND_MAX_VOLUME)
     volume = PSND_MAX_VOLUME;
 
-  if (stereo < PSND_MAX_LEFT)
-    stereo = PSND_MAX_LEFT;
-  else if (stereo > PSND_MAX_RIGHT)
-    stereo = PSND_MAX_RIGHT;
+  if (stereo_position < PSND_MAX_LEFT)
+    stereo_position = PSND_MAX_LEFT;
+  else if (stereo_position > PSND_MAX_RIGHT)
+    stereo_position = PSND_MAX_RIGHT;
 
   snd_ctrl.active = TRUE;
-  snd_ctrl.nr     = nr;
+  snd_ctrl.nr = nr;
   snd_ctrl.volume = volume;
-  snd_ctrl.stereo = stereo;
-  snd_ctrl.state  = state;
+  snd_ctrl.stereo_position = stereo_position;
+  snd_ctrl.state = state;
 
   HandleSoundRequest(snd_ctrl);
 }
 
 void FadeMusic(void)
 {
-  if (!audio.sound_available)
+  if (!audio.music_available)
     return;
 
   StopSoundExt(-1, SND_CTRL_FADE_MUSIC);
@@ -1716,8 +1714,8 @@ void StopSoundExt(int nr, int state)
     return;
 
   snd_ctrl.active = FALSE;
-  snd_ctrl.nr     = nr;
-  snd_ctrl.state  = state;
+  snd_ctrl.nr = nr;
+  snd_ctrl.state = state;
 
   HandleSoundRequest(snd_ctrl);
 }

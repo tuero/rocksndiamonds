@@ -267,12 +267,12 @@ struct SoundControl
 
   int nr;
   int volume;
-  int stereo;
+  int stereo_position;
 
   int state;
 
-  int playingtime;
-  long playingpos;
+  unsigned long playing_starttime;
+  unsigned long playing_pos;
 
   int type;
   int format;
