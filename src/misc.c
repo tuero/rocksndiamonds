@@ -468,6 +468,8 @@ void GetOptions(char *argv[])
 
   /* initialize some more global variables */
   global.frames_per_second = 0;
+  global.fps_slowdown = FALSE;
+  global.fps_slowdown_factor = 1;
 
   while (*options_left)
   {

@@ -99,48 +99,35 @@ void BackToFront()
   if (!redraw_mask)
     return;
 
-
-
-  if (1 &&   game_status == PLAYING)
+  if (global.fps_slowdown && game_status == PLAYING)
   {
-    static boolean last_frame_skipped = 0;
-    int fps_slowdown_factor = 2;
-    boolean skip_even_when_not_scrolling = 1;
+    static boolean last_frame_skipped = FALSE;
+    boolean skip_even_when_not_scrolling = TRUE;
     boolean just_scrolling = (ScreenMovDir != 0);
-    boolean p = 0;
+    boolean verbose = FALSE;
 
-    /*
-    printf("ScreenMovDir = %d\n", ScreenMovDir);
-    */
-
-    /*
-    printf("ScreenGfxPos = %d\n", ScreenGfxPos);
-    */
-
-    if (fps_slowdown_factor > 1 &&
-	(FrameCounter % fps_slowdown_factor) &&
+    if (global.fps_slowdown_factor > 1 &&
+	(FrameCounter % global.fps_slowdown_factor) &&
 	(just_scrolling || skip_even_when_not_scrolling))
     {
       redraw_mask &= ~REDRAW_MAIN;
 
-      if (p)
-	printf("FRAME SKIPPED\n");
+      last_frame_skipped = TRUE;
 
-      last_frame_skipped = 1;
+      if (verbose)
+	printf("FRAME SKIPPED\n");
     }
     else
     {
       if (last_frame_skipped)
 	redraw_mask |= REDRAW_FIELD;
 
-      last_frame_skipped = 0;
+      last_frame_skipped = FALSE;
 
-      if (p)
+      if (verbose)
 	printf("frame not skipped\n");
     }
   }
-
-
 
   /* synchronize X11 graphics at this point; if we would synchronize the
      display immediately after the buffer switching (after the XFlush),
@@ -254,8 +241,13 @@ void BackToFront()
   if (redraw_mask & REDRAW_FPS)		/* display frames per second */
   {
     char text[100];
+    char info1[100];
 
-    sprintf(text, "%.1f fps", global.frames_per_second);
+    sprintf(info1, " (only every %d. frame)", global.fps_slowdown_factor);
+    if (!global.fps_slowdown)
+      info1[0] = '\0';
+
+    sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
     DrawTextExt(window, gc, SX, SY, text, FS_SMALL, FC_YELLOW);
   }
 

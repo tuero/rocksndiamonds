@@ -445,6 +445,8 @@ struct GameInfo
 struct GlobalInfo
 {
   float frames_per_second;
+  boolean fps_slowdown;
+  int fps_slowdown_factor;
 };
 
 extern Display	       *display;
