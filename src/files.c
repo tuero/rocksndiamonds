@@ -35,7 +35,7 @@
 /* file identifier strings */
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_2.0"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
-#define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
+#define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_2.0"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
 #define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
 #define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
@@ -44,6 +44,7 @@
 #define LEVEL_COOKIE_12		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
 #define LEVEL_COOKIE_14		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
 #define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
+#define TAPE_COOKIE_12		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
 
 /* file names and filename extensions */
 #if !defined(PLATFORM_MSDOS)
@@ -1410,6 +1411,10 @@ void LoadTape(int level_nr)
     }
   }
 
+#if DEBUG
+  printf("\nTAPE OF LEVEL %d\n", level_nr);
+#endif
+
   for(i=0; i<tape.length; i++)
   {
     if (i >= MAX_TAPELEN)
@@ -1421,9 +1426,29 @@ void LoadTape(int level_nr)
 
       if (tape.player_participates[j])
 	tape.pos[i].action[j] = fgetc(file);
+
+#if DEBUG
+      {
+	int x = tape.pos[i].action[j];
+
+	printf("%d:%02x ", j, x);
+	printf("[%c%c%c%c|%c%c] - ",
+	       (x & JOY_LEFT ? '<' : ' '),
+	       (x & JOY_RIGHT ? '>' : ' '),
+	       (x & JOY_UP ? '^' : ' '),
+	       (x & JOY_DOWN ? 'v' : ' '),
+	       (x & JOY_BUTTON_1 ? '1' : ' '),
+	       (x & JOY_BUTTON_2 ? '2' : ' '));
+      }
+#endif
+
     }
 
     tape.pos[i].delay = fgetc(file);
+
+#if DEBUG
+    printf("[%03d]\n", tape.pos[i].delay);
+#endif
 
     if (file_version == FILE_VERSION_1_0)
     {
@@ -1450,6 +1475,23 @@ void LoadTape(int level_nr)
 	num_moves--;
 	i += num_moves;
 	tape.length += num_moves;
+      }
+    }
+    else if (file_version < FILE_VERSION_2_0)
+    {
+      if (tape.pos[i].delay > 1)
+      {
+	/* action part */
+	tape.pos[i + 1] = tape.pos[i];
+	tape.pos[i + 1].delay = 1;
+
+	/* delay part */
+	for(j=0; j<MAX_PLAYERS; j++)
+	  tape.pos[i].action[j] = MV_NO_MOVING;
+	tape.pos[i].delay--;
+
+	i++;
+	tape.length++;
       }
     }
 

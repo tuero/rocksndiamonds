@@ -1022,13 +1022,19 @@ void GameWon()
     game_status = HALLOFFAME;
     DrawHallOfFame(hi_pos);
     if (raise_level)
+    {
       level_nr++;
+      TapeErase();
+    }
   }
   else
   {
     game_status = MAINMENU;
     if (raise_level)
+    {
       level_nr++;
+      TapeErase();
+    }
     DrawMainMenu();
   }
 
@@ -4203,7 +4209,6 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   static int num_stored_actions = 0;
   static boolean save_tape_entry = FALSE;
   boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
-  int jx = player->jx, jy = player->jy;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
   int up	= player_action & JOY_UP;
@@ -4221,7 +4226,9 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 
   if (player_action)
   {
+#if 0
     save_tape_entry = TRUE;
+#endif
     player->frame_reset_delay = 0;
 
     if (button1)
@@ -4233,15 +4240,22 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       moved = MoveFigure(player, dx, dy);
     }
 
+#if 0
     if (tape.recording && (moved || snapped || bombed))
     {
       if (bombed && !moved)
 	player_action &= JOY_BUTTON;
 
       stored_player_action[player->index_nr] = player_action;
+#if 1
+      save_tape_entry = TRUE;
+#endif
     }
     else if (tape.playing && snapped)
       SnapField(player, 0, 0);			/* stop snapping */
+#else
+    stored_player_action[player->index_nr] = player_action;
+#endif
   }
   else
   {
@@ -4274,16 +4288,26 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       player->Frame = 0;
   }
 
+#if 0
   if (tape.recording && num_stored_actions >= MAX_PLAYERS && save_tape_entry)
   {
     TapeRecordAction(stored_player_action);
     num_stored_actions = 0;
     save_tape_entry = FALSE;
   }
+#else
+  if (tape.recording && num_stored_actions >= MAX_PLAYERS)
+  {
+    TapeRecordAction(stored_player_action);
+    num_stored_actions = 0;
+  }
+#endif
 
+#if 0
   if (tape.playing && !tape.pausing && !player_action &&
       tape.counter < tape.length)
   {
+    int jx = player->jx, jy = player->jy;
     int next_joy =
       tape.pos[tape.counter].action[player->index_nr] & (JOY_LEFT|JOY_RIGHT);
 
@@ -4307,6 +4331,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       }
     }
   }
+#endif
 }
 
 void GameActions()
@@ -4909,9 +4934,15 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   if (!player->active || (!dx && !dy))
     return FALSE;
 
+#if 0
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
       !tape.playing)
     return FALSE;
+#else
+  if (!FrameReached(&player->move_delay, player->move_delay_value) &&
+      !(tape.playing && tape.file_version < FILE_VERSION_2_0))
+    return FALSE;
+#endif
 
   /* remove the last programmed player action */
   player->programmed_action = 0;
@@ -5761,9 +5792,16 @@ int DigField(struct PlayerInfo *player,
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
+#if 0
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
 	  !tape.playing && element != EL_SPRING)
 	return MF_NO_ACTION;
+#else
+      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
+	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	  element != EL_SPRING)
+	return MF_NO_ACTION;
+#endif
 
       RemoveField(x, y);
       Feld[x+dx][y+dy] = element;
@@ -5996,9 +6034,16 @@ int DigField(struct PlayerInfo *player,
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
+#if 0
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
 	  !tape.playing && element != EL_BALLOON)
 	return MF_NO_ACTION;
+#else
+      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
+	  !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	  element != EL_BALLOON)
+	return MF_NO_ACTION;
+#endif
 
       if (IS_SB_ELEMENT(element))
       {

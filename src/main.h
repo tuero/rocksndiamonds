@@ -278,7 +278,7 @@ struct PlayerInfo
   int index_nr, client_nr, element_nr;
 
   byte action;			/* action from local input device */
-  byte effective_action;	/* action aknowledged from network server
+  byte effective_action;	/* action acknowledged from network server
 				   or summarized over all configured input
 				   devices when in single player mode */
   byte programmed_action;	/* action forced by game itself (like moving

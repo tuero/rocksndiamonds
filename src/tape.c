@@ -18,6 +18,7 @@
 #include "tools.h"
 #include "files.h"
 #include "network.h"
+#include "cartoons.h"
 
 /* tape button identifiers */
 #define TAPE_CTRL_ID_EJECT		0
@@ -315,13 +316,17 @@ void TapeStartRecording()
 
 void TapeStopRecording()
 {
+#if 0
   int i;
+#endif
 
   if (!tape.recording)
     return;
 
+#if 0
   for(i=0; i<MAX_PLAYERS; i++)
     tape.pos[tape.counter].action[i] = 0;
+#endif
 
   tape.counter++;
   tape.length = tape.counter;
@@ -331,6 +336,7 @@ void TapeStopRecording()
   DrawVideoDisplay(VIDEO_STATE_REC_OFF, 0);
 }
 
+#if 0
 void TapeRecordAction(byte joy[MAX_PLAYERS])
 {
   int i;
@@ -351,6 +357,49 @@ void TapeRecordAction(byte joy[MAX_PLAYERS])
   tape.pos[tape.counter].delay = 0;
 }
 
+#else
+
+void TapeRecordAction(byte action[MAX_PLAYERS])
+{
+  int i;
+
+  if (!tape.recording || tape.pausing)
+    return;
+
+  if (tape.counter >= MAX_TAPELEN-1)
+  {
+    TapeStopRecording();
+    return;
+  }
+
+  if (tape.pos[tape.counter].delay > 0)		/* already stored action */
+  {
+    boolean changed_events = FALSE;
+
+    for(i=0; i<MAX_PLAYERS; i++)
+      if (tape.pos[tape.counter].action[i] != action[i])
+	changed_events = TRUE;
+
+    if (changed_events || tape.pos[tape.counter].delay >= 255)
+    {
+      tape.counter++;
+      tape.pos[tape.counter].delay = 0;
+    }
+    else
+      tape.pos[tape.counter].delay++;
+  }
+
+  if (tape.pos[tape.counter].delay == 0)	/* store new action */
+  {
+    for(i=0; i<MAX_PLAYERS; i++)
+      tape.pos[tape.counter].action[i] = action[i];
+
+    tape.pos[tape.counter].delay++;
+  }
+}
+#endif
+
+#if 0
 void TapeRecordDelay()
 {
   int i;
@@ -375,6 +424,13 @@ void TapeRecordDelay()
     tape.pos[tape.counter].delay = 0;
   }
 }
+
+#else
+
+void TapeRecordDelay()
+{
+}
+#endif
 
 void TapeTogglePause()
 {
@@ -426,6 +482,7 @@ void TapeStopPlaying()
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF, 0);
 }
 
+#if 0
 byte *TapePlayAction()
 {
   static byte joy[MAX_PLAYERS];
@@ -457,6 +514,54 @@ byte *TapePlayAction()
   return(joy);
 }
 
+#else
+
+byte *TapePlayAction()
+{
+  static byte action[MAX_PLAYERS];
+  int i;
+
+  if (!tape.playing || tape.pausing)
+    return NULL;
+
+  if (tape.pause_before_death)	/* STOP 10s BEFORE PLAYER GETS KILLED... */
+  {
+    if (!(FrameCounter % 20))
+    {
+      if ((FrameCounter / 20) % 2)
+	DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
+      else
+	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+    }
+
+    if (TimePlayed > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
+    {
+      TapeTogglePause();
+      return NULL;
+    }
+  }
+
+  if (tape.counter >= tape.length)
+  {
+    TapeStop();
+    return NULL;
+  }
+
+  for(i=0; i<MAX_PLAYERS; i++)
+    action[i] = tape.pos[tape.counter].action[i];
+
+  tape.delay_played++;
+  if (tape.delay_played >= tape.pos[tape.counter].delay)
+  {
+    tape.counter++;
+    tape.delay_played = 0;
+  }
+
+  return action;
+}
+#endif
+
+#if 0
 boolean TapePlayDelay()
 {
   if (!tape.playing || tape.pausing)
@@ -493,6 +598,14 @@ boolean TapePlayDelay()
   else
     return(FALSE);
 }
+
+#else
+
+boolean TapePlayDelay()
+{
+  return TRUE|FALSE;	/* ...it doesn't matter at all */
+}
+#endif
 
 void TapeStop()
 {
@@ -675,6 +788,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 #endif
 	{
 	  game_status = PLAYING;
+	  StopAnimation();
 	  InitGame();
 	}
       }
@@ -703,6 +817,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	TapeStartPlaying();
 
 	game_status = PLAYING;
+	StopAnimation();
 	InitGame();
       }
       else if (tape.playing)
