@@ -103,6 +103,8 @@ void OpenAll(void)
   InitGfxBackground();
   InitToons();
 
+  InitGameEngine();
+
   DrawMainMenu();
 
   InitNetworkServer();

@@ -108,22 +108,43 @@ static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
-static char *loop_sound_actions[] =
+#define SND_ACTION_UNKNOWN		0
+#define SND_ACTION_WAITING		1
+#define SND_ACTION_MOVING		2
+#define SND_ACTION_COLLECTING		3
+#define SND_ACTION_IMPACT		4
+#define SND_ACTION_PUSHING		5
+#define SND_ACTION_ACTIVATING		6
+
+#define NUM_SND_ACTIONS			7
+
+static struct
 {
-  ".waiting",
-  ".moving",
-  ".running",
-  ".burning",
-  ".growing",
-  ".attacking"
+  char *text;
+  int value;
+  boolean is_loop;
+} sound_action_properties[] =
+{
+  /* insert _all_ loop sound actions here */
+  { ".waiting",		SND_ACTION_WAITING,	TRUE },
+  { ".moving",		SND_ACTION_MOVING,	TRUE }, /* continuos moving */
+  { ".running",		SND_ACTION_UNKNOWN,	TRUE },
+  { ".burning",		SND_ACTION_UNKNOWN,	TRUE },
+  { ".growing",		SND_ACTION_UNKNOWN,	TRUE },
+  { ".attacking",	SND_ACTION_UNKNOWN,	TRUE },
+
+  /* other (non-loop) sound actions are optional */
+  { ".stepping",	SND_ACTION_MOVING,	FALSE }, /* discrete moving */
+  { ".collecting",	SND_ACTION_COLLECTING,	FALSE },
+  { ".impact",		SND_ACTION_IMPACT,	FALSE },
+  { ".pushing",		SND_ACTION_PUSHING,	FALSE },
+  { ".activating",	SND_ACTION_ACTIVATING,	FALSE },
+  { NULL,		0,			0 },
 };
+static int element_action_sound[NUM_LEVEL_ELEMENTS][NUM_SND_ACTIONS];
 static boolean is_loop_sound[NUM_SOUND_EFFECTS];
-static boolean sound_info_initialized = FALSE;
 
 #define IS_LOOP_SOUND(x)	(is_loop_sound[x])
-
-#define SND_MOVING		1
-#define SND_WAITING		2
 
 
 #ifdef DEBUG
@@ -464,6 +485,89 @@ void DrawGameDoorValues()
 	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 }
 
+void InitGameEngine()
+{
+  static int sound_effect_properties[NUM_SOUND_EFFECTS];
+  int i, j;
+
+#if 0
+  debug_print_timestamp(0, NULL);
+#endif
+
+  for (i=0; i<NUM_SND_ACTIONS; i++)
+    for (j=0; j<NUM_LEVEL_ELEMENTS; j++)
+      element_action_sound[j][i] = -1;
+
+  for (i=0; i<NUM_SOUND_EFFECTS; i++)
+  {
+    int len_effect_text = strlen(sound_effects[i].text);
+
+    sound_effect_properties[i] = SND_ACTION_UNKNOWN;
+    is_loop_sound[i] = FALSE;
+
+    /* determine all loop sounds and identify certain sound classes */
+
+    j = 0;
+    while (sound_action_properties[j].text)
+    {
+      int len_action_text = strlen(sound_action_properties[j].text);
+
+      if (len_action_text < len_effect_text &&
+	  strcmp(&sound_effects[i].text[len_effect_text - len_action_text],
+		 sound_action_properties[j].text) == 0)
+      {
+	sound_effect_properties[i] = sound_action_properties[j].value;
+
+	if (sound_action_properties[j].is_loop)
+	  is_loop_sound[i] = TRUE;
+      }
+
+      j++;
+    }
+
+    /* associate elements and some selected sound actions */
+
+    for (j=0; j<NUM_LEVEL_ELEMENTS; j++)
+    {
+      if (element_info[j].sound_class_name)
+      {
+	int len_class_text = strlen(element_info[j].sound_class_name);
+
+	if (len_class_text < len_effect_text &&
+	    strncmp(sound_effects[i].text,
+		    element_info[j].sound_class_name, len_class_text) == 0)
+	{
+	  int sound_action_value = sound_effect_properties[i];
+
+	  element_action_sound[j][sound_action_value] = i;
+	}
+      }
+    }
+  }
+
+#if 0
+  debug_print_timestamp(0, "InitGameEngine");
+#endif
+
+#if 0
+  /* TEST ONLY */
+  {
+    int element = EL_ROBOT;
+    int sound_action = SND_ACTION_COLLECTING;
+    int j = 0;
+
+    while (sound_action_properties[j].text)
+    {
+      if (sound_action_properties[j].value == sound_action)
+	printf("element %d, sound action '%s'  == %d\n",
+	       element, sound_action_properties[j].text,
+	       element_action_sound[element][sound_action]);
+      j++;
+    }
+  }
+#endif
+}
+
 void InitGame()
 {
   int i, j, x, y;
@@ -715,37 +819,6 @@ void InitGame()
       if (local_player == player)
 	printf("Player 	%d is local player.\n", i+1);
     }
-  }
-
-  /* initialize sound effect properties */
-  if (!sound_info_initialized)
-  {
-    int i, j;
-
-    for (i=0; i<NUM_SOUND_EFFECTS; i++)
-    {
-      is_loop_sound[i] = FALSE;
-
-      for (j=0; j<SIZEOF_ARRAY(loop_sound_actions, char *); j++)
-      {
-	int len_effect_text = strlen(sound_effects[i].text);
-	int len_action_text = strlen(loop_sound_actions[j]);
-
-	if (len_effect_text > len_action_text &&
-	    strcmp(&sound_effects[i].text[len_effect_text - len_action_text],
-		   loop_sound_actions[j]) == 0)
-	  is_loop_sound[i] = TRUE;
-      }
-    }
-
-    for (i=0; i<NUM_SOUND_EFFECTS; i++)
-    {
-      for (j=0; j<NUM_LEVEL_ELEMENTS; j++)
-      {
-      }
-    }
-
-    sound_info_initialized = TRUE;
   }
 
   game.version = (tape.playing ? tape.game_version : level.game_version);
@@ -2143,8 +2216,12 @@ void Impact(int x, int y)
         break;
     }
 
+#if 1
+    PlaySoundLevelAction(x, y, SND_ACTION_IMPACT);
+#else
     if (sound >= 0)
       PlaySoundLevel(x, y, sound);
+#endif
   }
 }
 
@@ -2863,7 +2940,7 @@ void StartMoving(int x, int y)
 
       if (MovDelay[x][y])	/* element still has to wait some time */
       {
-	PlaySoundLevelAction(x, y, SND_WAITING);
+	PlaySoundLevelAction(x, y, SND_ACTION_WAITING);
 
 	return;
       }
@@ -3080,14 +3157,14 @@ void StartMoving(int x, int y)
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
 
-      PlaySoundLevelAction(x, y, SND_WAITING);
+      PlaySoundLevelAction(x, y, SND_ACTION_WAITING);
 
       return;
     }
 
     InitMovingField(x, y, MovDir[x][y]);
 
-    PlaySoundLevelAction(x, y, SND_MOVING);
+    PlaySoundLevelAction(x, y, SND_ACTION_MOVING);
   }
 
   if (MovDir[x][y])
@@ -6496,11 +6573,16 @@ void PlaySoundLevel(int x, int y, int nr)
   PlaySoundExt(nr, volume, stereo_position, type);
 }
 
-void PlaySoundLevelAction(int x, int y, int action)
+void PlaySoundLevelAction(int x, int y, int sound_action)
 {
   int element = Feld[x][y];
+  int sound_effect = element_action_sound[element][sound_action];
 
-  if (action == SND_MOVING)
+#if 1
+  if (sound_effect != -1)
+    PlaySoundLevel(x, y, sound_effect);
+#else
+  if (sound_action == SND_ACTION_MOVING)
   {
     if (element == EL_KAEFER)
       PlaySoundLevel(x, y, SND_BUG_MOVING);
@@ -6537,7 +6619,7 @@ void PlaySoundLevelAction(int x, int y, int action)
     else if (element == EL_ROBOT)
       PlaySoundLevel(x, y, SND_ROBOT_STEPPING);
   }
-  else if (action == SND_WAITING)
+  else if (sound_action == SND_ACTION_WAITING)
   {
     if (element == EL_KAEFER)
       PlaySoundLevel(x, y, SND_BUG_WAITING);
@@ -6572,6 +6654,7 @@ void PlaySoundLevelAction(int x, int y, int action)
     else if (element == EL_ROBOT)
       PlaySoundLevel(x, y, SND_ROBOT_WAITING);
   }
+#endif
 }
 
 void RaiseScore(int value)
