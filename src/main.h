@@ -138,16 +138,17 @@
 #define EP_CAN_EXPLODE		70
 #define EP_CAN_EXPLODE_3X3	71
 #define EP_SP_PORT		72
-#define EP_CAN_EXPLODE_BY_DRAGONFIRE 73
-#define EP_CAN_EXPLODE_BY_EXPLOSION  74
-#define EP_COULD_MOVE_INTO_ACID	75
+#define EP_CAN_EXPLODE_BY_DRAGONFIRE	73
+#define EP_CAN_EXPLODE_BY_EXPLOSION	74
+#define EP_COULD_MOVE_INTO_ACID		75
+#define EP_MAYBE_DONT_COLLIDE_WITH	76
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	76
-#define EP_WALK_TO_OBJECT	77
-#define EP_DEADLY		78
+#define EP_EXPLODE_RESULT	77
+#define EP_WALK_TO_OBJECT	78
+#define EP_DEADLY		79
 
-#define NUM_ELEMENT_PROPERTIES	79
+#define NUM_ELEMENT_PROPERTIES	80
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -380,6 +381,7 @@
 #define CAN_EXPLODE_BY_EXPLOSION(e)	\
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_EXPLOSION)
 #define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
+#define MAYBE_DONT_COLLIDE_WITH(e)  HAS_PROPERTY(e, EP_MAYBE_DONT_COLLIDE_WITH)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
@@ -1200,8 +1202,8 @@
 /* program information and versioning definitions */
 
 #define PROGRAM_VERSION_MAJOR	3
-#define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	9
+#define PROGRAM_VERSION_MINOR	1
+#define PROGRAM_VERSION_PATCH	0
 #define PROGRAM_VERSION_BUILD	0
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
@@ -1313,6 +1315,7 @@ struct PlayerInfo
   boolean use_murphy_graphic;
 
   boolean block_last_field;
+  boolean can_fall_into_acid;
 
   boolean LevelSolved, GameOver;
 
@@ -1423,9 +1426,8 @@ struct LevelInfo
   int time_light;
   int time_timegate;
 
-  int can_move_into_acid_bits;	/* bits indicate property for element groups */
-
-  boolean player_can_fall_into_acid;
+  int can_move_into_acid_bits;	/* bitfield to store property for elements */
+  int dont_collide_with_bits;	/* bitfield to store property for elements */
 
   boolean double_speed;
   boolean initial_gravity;

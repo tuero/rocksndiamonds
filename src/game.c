@@ -103,11 +103,30 @@
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
 
-#define ELEMENT_CAN_ENTER_FIELD_BASE(e, x, y, condition)		\
+#define ELEMENT_CAN_ENTER_FIELD_BASE_X(x, y, condition)			\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(condition)))
+
+#define ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					(condition)))
+
+#define ELEMENT_CAN_ENTER_FIELD_BASE_3(e, x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
+					(CAN_MOVE_INTO_ACID(e) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
+					(condition)))
+
+#define ELEMENT_CAN_ENTER_FIELD_BASE_4(e, x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(condition) ||			\
+					(CAN_MOVE_INTO_ACID(e) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
+					(DONT_COLLIDE_WITH(e) &&	\
+					 IS_PLAYER(x, y) &&		\
+					 !PLAYER_ENEMY_PROTECTED(x, y))))
 
 #if 0
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
@@ -116,82 +135,102 @@
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_PLAYER(x, y) &&		\
 					 !PLAYER_ENEMY_PROTECTED(x, y))))
-#else
-#define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
-		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(condition) ||			\
-					(CAN_MOVE_INTO_ACID(e) &&	\
-					 Feld[x][y] == EL_ACID) ||	\
-					(DONT_COLLIDE_WITH(e) &&	\
-					 IS_PLAYER(x, y) &&		\
-					 !PLAYER_ENEMY_PROTECTED(x, y))))
 #endif
 
-#define ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, condition)		\
-		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(condition)))
-
 #define ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, 0)
+	ELEMENT_CAN_ENTER_FIELD_BASE_4(e, x, y, 0)
 
-#define ELEMENT_CAN_ENTER_FIELD_OR_ACID(e, x, y)			\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, (Feld[x][y] == EL_ACID))
-
-#define ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, (Feld[x][y] == EL_ACID))
+#if 1
+#define SATELLITE_CAN_ENTER_FIELD(x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(EL_SATELLITE, x, y, 0)
+#else
+#define SATELLITE_CAN_ENTER_FIELD(x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_X(x, y, Feld[x][y] == EL_ACID)
+#endif
 
 #if 0
 #define ENEMY_CAN_ENTER_FIELD(e, x, y) (IN_LEV_FIELD(x, y) && IS_FREE(x, y))
-#else
-#define ENEMY_CAN_ENTER_FIELD(e, x, y) ELEMENT_CAN_ENTER_FIELD_BASE(e, x, y, 0)
 #endif
 
-#define YAMYAM_CAN_ENTER_FIELD(x, y)					\
+#define ENEMY_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
+
+#if 1
+
+#define YAMYAM_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_3(e, x, y, Feld[x][y] == EL_DIAMOND)
+
+#define DARK_YAMYAM_CAN_ENTER_FIELD(e, x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_BASE_3(e, x,y, IS_FOOD_DARK_YAMYAM(Feld[x][y]))
+
+#define PACMAN_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_3(e, x, y, IS_AMOEBOID(Feld[x][y]))
+
+#define PIG_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, IS_FOOD_PIG(Feld[x][y]))
+
+#define PENGUIN_CAN_ENTER_FIELD(e, x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, (Feld[x][y] == EL_EXIT_OPEN ||\
+						 IS_FOOD_PENGUIN(Feld[x][y])))
+#define DRAGON_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
+
+#define MOLE_CAN_ENTER_FIELD(e, x, y, condition)			\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, (condition))
+
+#define SPRING_CAN_ENTER_FIELD(e, x, y)					\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
+
+#else
+
+#define YAMYAM_CAN_ENTER_FIELD(e, x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
-					(CAN_MOVE_INTO_ACID(EL_YAMYAM) && \
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					Feld[x][y] == EL_DIAMOND))
 
-#define DARK_YAMYAM_CAN_ENTER_FIELD(x, y)				\
+#define DARK_YAMYAM_CAN_ENTER_FIELD(e, x, y)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
-					(CAN_MOVE_INTO_ACID(EL_DARK_YAMYAM) &&\
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
 
-#define PACMAN_CAN_ENTER_FIELD(x, y)					\
+#define PACMAN_CAN_ENTER_FIELD(e, x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
-					(CAN_MOVE_INTO_ACID(EL_PACMAN) && \
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					IS_AMOEBOID(Feld[x][y])))
 
-#define PIG_CAN_ENTER_FIELD(x, y)					\
+#define PIG_CAN_ENTER_FIELD(e, x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(CAN_MOVE_INTO_ACID(EL_PIG) &&	\
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_PIG(Feld[x][y])))
 
-#define PENGUIN_CAN_ENTER_FIELD(x, y)					\
+#define PENGUIN_CAN_ENTER_FIELD(e, x, y)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(CAN_MOVE_INTO_ACID(EL_PENGUIN) && \
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					IS_FOOD_PENGUIN(Feld[x][y]) ||	\
 					Feld[x][y] == EL_EXIT_OPEN))
 
-#define DRAGON_CAN_ENTER_FIELD(x, y)					\
+#define DRAGON_CAN_ENTER_FIELD(e, x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(CAN_MOVE_INTO_ACID(EL_DRAGON) && \
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID)))
 
-#define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
+#define MOLE_CAN_ENTER_FIELD(e, x, y, condition)			\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(CAN_MOVE_INTO_ACID(EL_MOLE) &&	\
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID) ||	\
 					(condition)))
 
-#define SPRING_CAN_ENTER_FIELD(x, y)					\
+#define SPRING_CAN_ENTER_FIELD(e, x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					(CAN_MOVE_INTO_ACID(EL_SPRING) && \
+					(CAN_MOVE_INTO_ACID(e) &&	\
 					 Feld[x][y] == EL_ACID)))
+
+#endif
 
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
@@ -213,7 +252,7 @@
 #endif
 
 #define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
+	ELEMENT_CAN_ENTER_FIELD_BASE_4(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
 
 #define IN_LEV_FIELD_AND_IS_FREE(x, y)  (IN_LEV_FIELD(x, y) &&  IS_FREE(x, y))
 #define IN_LEV_FIELD_AND_NOT_FREE(x, y) (IN_LEV_FIELD(x, y) && !IS_FREE(x, y))
@@ -910,7 +949,7 @@ static inline void InitField_WithBug1(int x, int y, boolean init_game)
   InitField(x, y, init_game);
 
   /* not needed to call InitMovDir() -- already done by InitField()! */
-  if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+  if (game.engine_version < VERSION_IDENT(3,1,0,0) &&
       CAN_MOVE(Feld[x][y]))
     InitMovDir(x, y);
 }
@@ -922,7 +961,7 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
   InitField(x, y, init_game);
 
   /* not needed to call InitMovDir() -- already done by InitField()! */
-  if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+  if (game.engine_version < VERSION_IDENT(3,1,0,0) &&
       CAN_MOVE(old_element) &&
       (old_element < EL_MOLE_LEFT || old_element > EL_MOLE_DOWN))
     InitMovDir(x, y);
@@ -1260,14 +1299,14 @@ static void InitGameEngine()
   }
 
   /* set push delay value for Supaplex elements for newer engine versions */
-  if (game.engine_version >= VERSION_IDENT(3,0,9,0))
+  if (game.engine_version >= VERSION_IDENT(3,1,0,0))
   {
     for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     {
       if (IS_SP_ELEMENT(i))
       {
-	element_info[i].push_delay_fixed  = 6;
-	element_info[i].push_delay_random = 0;
+	element_info[i].push_delay_fixed  = 6;	/* just enough to escape ... */
+	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
       }
     }
   }
@@ -1391,6 +1430,7 @@ void InitGame()
     player->use_murphy_graphic = FALSE;
 
     player->block_last_field = FALSE;
+    player->can_fall_into_acid = CAN_MOVE_INTO_ACID(player->element_nr);
 
     player->actual_frame_counter = 0;
 
@@ -3070,7 +3110,7 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 1
     /* !!! not needed !!! */
 #if 1
-    if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+    if (game.engine_version < VERSION_IDENT(3,1,0,0) &&
 	CAN_MOVE(Feld[x][y]) && Feld[x][y] != EL_MOLE)
       InitMovDir(x, y);
 #else
@@ -3985,9 +4025,9 @@ inline static void TurnRoundExt(int x, int y)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
-    if (ELEMENT_CAN_ENTER_FIELD_GENERIC(element, left_x, left_y, 0))
+    if (ELEMENT_CAN_ENTER_FIELD_BASE_4(element, left_x, left_y, 0))
       MovDir[x][y] = left_dir;
-    else if (!ELEMENT_CAN_ENTER_FIELD_GENERIC(element, move_x, move_y, 0))
+    else if (!ELEMENT_CAN_ENTER_FIELD_BASE_4(element, move_x, move_y, 0))
       MovDir[x][y] = right_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3996,8 +4036,8 @@ inline static void TurnRoundExt(int x, int y)
 #endif
   else if (element == EL_YAMYAM)
   {
-    boolean can_turn_left  = YAMYAM_CAN_ENTER_FIELD(left_x, left_y);
-    boolean can_turn_right = YAMYAM_CAN_ENTER_FIELD(right_x, right_y);
+    boolean can_turn_left  = YAMYAM_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right = YAMYAM_CAN_ENTER_FIELD(element, right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -4012,8 +4052,10 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_DARK_YAMYAM)
   {
-    boolean can_turn_left  = DARK_YAMYAM_CAN_ENTER_FIELD(left_x, left_y);
-    boolean can_turn_right = DARK_YAMYAM_CAN_ENTER_FIELD(right_x, right_y);
+    boolean can_turn_left  = DARK_YAMYAM_CAN_ENTER_FIELD(element,
+							 left_x, left_y);
+    boolean can_turn_right = DARK_YAMYAM_CAN_ENTER_FIELD(element,
+							 right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -4028,8 +4070,8 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_PACMAN)
   {
-    boolean can_turn_left  = PACMAN_CAN_ENTER_FIELD(left_x, left_y);
-    boolean can_turn_right = PACMAN_CAN_ENTER_FIELD(right_x, right_y);
+    boolean can_turn_left  = PACMAN_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right = PACMAN_CAN_ENTER_FIELD(element, right_x, right_y);
 
     if (can_turn_left && can_turn_right)
       MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
@@ -4044,9 +4086,9 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_PIG)
   {
-    boolean can_turn_left  = PIG_CAN_ENTER_FIELD(left_x, left_y);
-    boolean can_turn_right = PIG_CAN_ENTER_FIELD(right_x, right_y);
-    boolean can_move_on    = PIG_CAN_ENTER_FIELD(move_x, move_y);
+    boolean can_turn_left  = PIG_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right = PIG_CAN_ENTER_FIELD(element, right_x, right_y);
+    boolean can_move_on    = PIG_CAN_ENTER_FIELD(element, move_x, move_y);
     boolean should_turn_left, should_turn_right, should_move_on;
     int rnd_value = 24;
     int rnd = RND(rnd_value);
@@ -4107,9 +4149,9 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_DRAGON)
   {
-    boolean can_turn_left  = DRAGON_CAN_ENTER_FIELD(left_x, left_y);
-    boolean can_turn_right = DRAGON_CAN_ENTER_FIELD(right_x, right_y);
-    boolean can_move_on    = DRAGON_CAN_ENTER_FIELD(move_x, move_y);
+    boolean can_turn_left  = DRAGON_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right = DRAGON_CAN_ENTER_FIELD(element, right_x, right_y);
+    boolean can_move_on    = DRAGON_CAN_ENTER_FIELD(element, move_x, move_y);
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
@@ -4157,17 +4199,17 @@ inline static void TurnRoundExt(int x, int y)
   else if (element == EL_MOLE)
   {
     boolean can_move_on =
-      (MOLE_CAN_ENTER_FIELD(move_x, move_y,
+      (MOLE_CAN_ENTER_FIELD(element, move_x, move_y,
 			    IS_AMOEBOID(Feld[move_x][move_y]) ||
 			    Feld[move_x][move_y] == EL_AMOEBA_SHRINKING));
     if (!can_move_on)
     {
       boolean can_turn_left =
-	(MOLE_CAN_ENTER_FIELD(left_x, left_y,
+	(MOLE_CAN_ENTER_FIELD(element, left_x, left_y,
 			      IS_AMOEBOID(Feld[left_x][left_y])));
 
       boolean can_turn_right =
-	(MOLE_CAN_ENTER_FIELD(right_x, right_y,
+	(MOLE_CAN_ENTER_FIELD(element, right_x, right_y,
 			      IS_AMOEBOID(Feld[right_x][right_y])));
 
       if (can_turn_left && can_turn_right)
@@ -4190,12 +4232,12 @@ inline static void TurnRoundExt(int x, int y)
   {
 #if 0
     if (MovDir[x][y] & MV_HORIZONTAL &&
-	!SPRING_CAN_ENTER_FIELD(move_x, move_y))
+	!SPRING_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = MV_NO_MOVING;
 #else
     if (MovDir[x][y] & MV_HORIZONTAL &&
-	(!SPRING_CAN_ENTER_FIELD(move_x, move_y) ||
-	 SPRING_CAN_ENTER_FIELD(x, y + 1)))
+	(!SPRING_CAN_ENTER_FIELD(element, move_x, move_y) ||
+	 SPRING_CAN_ENTER_FIELD(element, x, y + 1)))
       MovDir[x][y] = MV_NO_MOVING;
 #endif
 
@@ -4302,14 +4344,14 @@ inline static void TurnRoundExt(int x, int y)
 	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (PENGUIN_CAN_ENTER_FIELD(newx, newy))
+	if (PENGUIN_CAN_ENTER_FIELD(EL_PENGUIN, newx, newy))
 	  return;
 
 	MovDir[x][y] =
 	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (PENGUIN_CAN_ENTER_FIELD(newx, newy))
+	if (PENGUIN_CAN_ENTER_FIELD(EL_PENGUIN, newx, newy))
 	  return;
 
 	MovDir[x][y] = old_move_dir;
@@ -4331,14 +4373,14 @@ inline static void TurnRoundExt(int x, int y)
 	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(newx, newy))
+	if (SATELLITE_CAN_ENTER_FIELD(newx, newy))
 	  return;
 
 	MovDir[x][y] =
 	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(newx, newy))
+	if (SATELLITE_CAN_ENTER_FIELD(newx, newy))
 	  return;
 
 	MovDir[x][y] = old_move_dir;
@@ -4944,7 +4986,7 @@ void StartMoving(int x, int y)
 #endif
 
 #if 1
-    if (game.engine_version >= VERSION_IDENT(3,0,9,0) &&
+    if (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
 	WasJustMoving[x][y] && IN_LEV_FIELD(newx, newy) &&
 	(Feld[newx][newy] == EL_BLOCKED || IS_PLAYER(newx, newy)))
     {
@@ -5175,7 +5217,7 @@ void StartMoving(int x, int y)
     else if (CAN_MOVE_INTO_ACID(element) &&
 	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID &&
 	     (MovDir[x][y] == MV_DOWN ||
-	      game.engine_version > VERSION_IDENT(3,0,8,0)))
+	      game.engine_version >= VERSION_IDENT(3,1,0,0)))
 #else
     else if (CAN_MOVE_INTO_ACID(element) && MovDir[x][y] == MV_DOWN &&
 	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID)
@@ -7520,6 +7562,7 @@ void GameActions()
        - rnd_equinox_tetrachloride 048
        - rnd_equinox_tetrachloride_ii 096
        - rnd_emanuel_schmieg 002
+       - doctor_sloan_ww 020
     */
     if (stored_player[i].MovPos == 0)
       CheckGravityMovement(&stored_player[i]);
@@ -8215,7 +8258,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
        (IS_FREE(jx, jy + 1) ||
-	(Feld[jx][jy + 1] == EL_ACID && level.player_can_fall_into_acid)));
+	(Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)));
 #else
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&

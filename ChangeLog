@@ -1,6 +1,11 @@
+2004-03-13
+	* "can move into acid" property now for all elements independently
+	* "can fall into acid" property for player stored in same bitfield now
+	* added option for deadliness for sp_sniksnak and sp_electron
+	* version number set to 3.1.0 (finally!)
+
 2004-03-09
 	* changed tape recording to only record input, not programmed actions
-	* YET TO COME ... added option ... for sp_sniksnak and sp_electron
 
 2004-03-08
 	* fixed totally broken (every 8th frame skipped) step-by-step recording
@@ -154,10 +159,10 @@
 	* fixed bug with wrong "Murphy" graphics (when digging etc.)
 
 2003-12-14
-	* Version number set to 3.0.9.
+	* version number set to 3.0.9
 
 2003-12-14
-	* Version 3.0.8 released.
+	* version 3.0.8 released
 
 2003-12-13
 	* added function checked_free()
@@ -220,10 +225,10 @@
 	* enhanced sniksnak turning movement (two steps instead of only one)
 
 2003-11-10
-	* Version number set to 3.0.8.
+	* version number set to 3.0.8
 
 2003-11-10
-	* Version 3.0.7 released.
+	* version 3.0.7 released
 
 2003-11-09
 	* fixed reset of player animation frame when, for example,
@@ -270,10 +275,10 @@
 	* fixed bug with player not getting smashed by rock sometimes
 
 2003-10-06
-	* Version number set to 3.0.7.
+	* version number set to 3.0.7
 
 2003-10-06
-	* Version 3.0.6 released.
+	* version 3.0.6 released
 
 2003-10-05
 	* added support for MP3 music for SDL version through SMPEG library
@@ -292,10 +297,10 @@
 	* fixed element tokens for certain file elements with ".active" etc.
 
 2003-09-29
-	* Version number set to 3.0.6.
+	* version number set to 3.0.6
 
 2003-09-29
-	* Version 3.0.5 released.
+	* version 3.0.5 released
 
 2003-09-28
 	* now four envelope elements available
@@ -313,10 +318,10 @@
 	* enhanced (remaining low-resolution) Supaplex graphics
 
 2003-09-13
-	* Version number set to 3.0.5.
+	* version number set to 3.0.5
 
 2003-09-13
-	* Version 3.0.4 released.
+	* version 3.0.4 released
 
 2003-09-12	src/tools.c
 	* fixed bug in custom definition of crumbled element graphics
@@ -325,10 +330,10 @@
 	* fixed bug in multiple config pages code that caused crashes
 
 2003-09-08
-	* Version number set to 3.0.4.
+	* version number set to 3.0.4
 
 2003-09-08
-	* Version 3.0.3 released.
+	* version 3.0.3 released
 
 2003-09-07
 	* added music to Supaplex classic level set
@@ -354,10 +359,10 @@
 	* fixed bug (missing array boundary check) which could crash the game
 
 2003-08-23
-	* Version number set to 3.0.3.
+	* version number set to 3.0.3
 
 2003-08-22
-	* Version 3.0.2 released.
+	* version 3.0.2 released
 
 2003-08-21	src/game.c
 	* fixed bug with creating inaccessible elements at player position
@@ -370,10 +375,10 @@
 	* fixed bug with messing up custom element properties in 3.0.0 levels
 
 2003-08-18
-	* Version number set to 3.0.2.
+	* version number set to 3.0.2
 
 2003-08-18
-	* Version 3.0.1 released.
+	* version 3.0.1 released
 
 2003-08-17	(no source files affected)
 	* changed all "classic" PCX image files with 16 colors or less to
@@ -420,18 +425,18 @@
 	* fixed bug with missing graphic for active red disk bomb
 
 2003-08-07	src/files.c, src/editor.c src/game.c, src/main.h
-	* Extended variable "level.gravity" to "level.initial_gravity" and
+	* extended variable "level.gravity" to "level.initial_gravity" and
 	  "game.current_gravity" to prevent level setting from being changed
-	  by playing the level (keeping the runtime value after playing).
+	  by playing the level (keeping the runtime value after playing)
 
-	* Fixed graphics bug when digging element that has 'crumbled' graphic
-	  definition, but not 'diggable' graphic definition.
+	* fixed graphics bug when digging element that has 'crumbled' graphic
+	  definition, but not 'diggable' graphic definition
 
 2003-08-06
-	* Version number set to 3.0.1.
+	* version number set to 3.0.1
 
 2003-08-05
-	* Version 3.0.0 released.
+	* version 3.0.0 released
 
 2003-08-05
 	* various bug fixes; among others:
@@ -441,26 +446,26 @@
 	  - allow Murphy player graphic in levels with non-Supaplex elements
 
 2003-04-07
-	* Various changes.
-	* I have forgotten to document changes for some time.
+	* various changes
+	* I have forgotten to document changes for some time
 
 2002-12-31
-	* Pre-Release Version 2.2.0rc1 released.
+	* pre-release version 2.2.0rc1 released
 
 2002-08-25
-	* Version number set to 2.1.2.
+	* version number set to 2.1.2
 
 2002-08-13
-	* Version 2.1.1 released.
+	* version 2.1.1 released
 
 2002-08-10
-	* Version number set to 2.1.1.
+	* version number set to 2.1.1
 
 2002-08-05
-	* Version 2.1.0 released.
+	* version 2.1.0 released
 	
 2002-05-19
-	* Version number set to 2.1.0.
+	* version number set to 2.1.0
 
 2002-04-03 to 2002-05-19	(various source files)
 	* graphics, sounds and music now fully configurable

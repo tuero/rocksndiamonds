@@ -1569,70 +1569,132 @@ static void ReinitializeMusic()
   InitGameModeMusicInfo();	/* game mode music mapping */
 }
 
-static int get_special_property_bit(int element, int base_property_bit)
+static int get_special_property_bit(int element, int property_bit_nr)
 {
-  static struct
+  struct PropertyBitInfo
   {
     int element;
     int bit_nr;
-  } pb_can_move_into_acid[] =
+  };
+
+  static struct PropertyBitInfo pb_can_move_into_acid[] =
   {
-    /* all element that can move */
-    { EL_BUG,			0	},
-    { EL_BUG_LEFT,		0	},
-    { EL_BUG_RIGHT,		0	},
-    { EL_BUG_UP,		0	},
-    { EL_BUG_DOWN,		0	},
-    { EL_SPACESHIP,		0	},
-    { EL_SPACESHIP_LEFT,	0	},
-    { EL_SPACESHIP_RIGHT,	0	},
-    { EL_SPACESHIP_UP,		0	},
-    { EL_SPACESHIP_DOWN,	0	},
-    { EL_BD_BUTTERFLY,		1	},
-    { EL_BD_BUTTERFLY_LEFT,	1	},
-    { EL_BD_BUTTERFLY_RIGHT,	1	},
-    { EL_BD_BUTTERFLY_UP,	1	},
-    { EL_BD_BUTTERFLY_DOWN,	1	},
-    { EL_BD_FIREFLY,		1	},
-    { EL_BD_FIREFLY_LEFT,	1	},
-    { EL_BD_FIREFLY_RIGHT,	1	},
-    { EL_BD_FIREFLY_UP,		1	},
-    { EL_BD_FIREFLY_DOWN,	1	},
-    { EL_YAMYAM,		2	},
-    { EL_DARK_YAMYAM,		2	},
-    { EL_ROBOT,			3	},
-    { EL_PACMAN,		4	},
-    { EL_PACMAN_LEFT,		4	},
-    { EL_PACMAN_RIGHT,		4	},
-    { EL_PACMAN_UP,		4	},
-    { EL_PACMAN_DOWN,		4	},
-    { EL_MOLE,			4	},
-    { EL_MOLE_LEFT,		4	},
-    { EL_MOLE_RIGHT,		4	},
-    { EL_MOLE_UP,		4	},
-    { EL_MOLE_DOWN,		4	},
-    { EL_PENGUIN,		5	},
-    { EL_PIG,			6	},
-    { EL_DRAGON,		6	},
-    { EL_SATELLITE,		7	},
-    { EL_SP_SNIKSNAK,		8	},
-    { EL_SP_ELECTRON,		8	},
-    { EL_BALLOON,		9	},
-    { EL_SPRING,	        10	},
+    /* the player may be able fall into acid when gravity is activated */
+    { EL_PLAYER_1,		0	},
+    { EL_PLAYER_2,		0	},
+    { EL_PLAYER_3,		0	},
+    { EL_PLAYER_4,		0	},
+    { EL_SP_MURPHY,		0	},
+
+    /* all element that can move may be able to also move into acid */
+    { EL_BUG,			1	},
+    { EL_BUG_LEFT,		1	},
+    { EL_BUG_RIGHT,		1	},
+    { EL_BUG_UP,		1	},
+    { EL_BUG_DOWN,		1	},
+    { EL_SPACESHIP,		2	},
+    { EL_SPACESHIP_LEFT,	2	},
+    { EL_SPACESHIP_RIGHT,	2	},
+    { EL_SPACESHIP_UP,		2	},
+    { EL_SPACESHIP_DOWN,	2	},
+    { EL_BD_BUTTERFLY,		3	},
+    { EL_BD_BUTTERFLY_LEFT,	3	},
+    { EL_BD_BUTTERFLY_RIGHT,	3	},
+    { EL_BD_BUTTERFLY_UP,	3	},
+    { EL_BD_BUTTERFLY_DOWN,	3	},
+    { EL_BD_FIREFLY,		4	},
+    { EL_BD_FIREFLY_LEFT,	4	},
+    { EL_BD_FIREFLY_RIGHT,	4	},
+    { EL_BD_FIREFLY_UP,		4	},
+    { EL_BD_FIREFLY_DOWN,	4	},
+    { EL_YAMYAM,		5	},
+    { EL_DARK_YAMYAM,		6	},
+    { EL_ROBOT,			7	},
+    { EL_PACMAN,		8	},
+    { EL_PACMAN_LEFT,		8	},
+    { EL_PACMAN_RIGHT,		8	},
+    { EL_PACMAN_UP,		8	},
+    { EL_PACMAN_DOWN,		8	},
+    { EL_MOLE,			9	},
+    { EL_MOLE_LEFT,		9	},
+    { EL_MOLE_RIGHT,		9	},
+    { EL_MOLE_UP,		9	},
+    { EL_MOLE_DOWN,		9	},
+    { EL_PENGUIN,		10	},
+    { EL_PIG,			11	},
+    { EL_DRAGON,		12	},
+    { EL_SATELLITE,		13	},
+    { EL_SP_SNIKSNAK,		14	},
+    { EL_SP_ELECTRON,		15	},
+    { EL_BALLOON,		16	},
+    { EL_SPRING,	        17	},
 
     { -1,			-1	},
   };
+
+  static struct PropertyBitInfo pb_dont_collide_with[] =
+  {
+    { EL_SP_SNIKSNAK,		0	},
+    { EL_SP_ELECTRON,		1	},
+
+    { -1,			-1	},
+  };
+
+  static struct
+  {
+    int bit_nr;
+    struct PropertyBitInfo *pb_info;
+  } pb_definition[] =
+  {
+    { EP_CAN_MOVE_INTO_ACID,	pb_can_move_into_acid	},
+    { EP_DONT_COLLIDE_WITH,	pb_dont_collide_with	},
+
+    { -1,			NULL			},
+  };
+
+  struct PropertyBitInfo *pb_info = NULL;
   int i;
 
-  if (base_property_bit != EP_CAN_MOVE_INTO_ACID)
+  for (i = 0; pb_definition[i].bit_nr != -1; i++)
+    if (pb_definition[i].bit_nr == property_bit_nr)
+      pb_info = pb_definition[i].pb_info;
+
+  if (pb_info == NULL)
     return -1;
 
-  for (i = 0; pb_can_move_into_acid[i].element != -1; i++)
-    if (pb_can_move_into_acid[i].element == element)
-      return pb_can_move_into_acid[i].bit_nr;
+  for (i = 0; pb_info[i].element != -1; i++)
+    if (pb_info[i].element == element)
+      return pb_info[i].bit_nr;
 
   return -1;
 }
+
+#if 1
+void setBitfieldProperty(int *bitfield, int property_bit_nr, int element,
+			 boolean property_value)
+{
+  int bit_nr = get_special_property_bit(element, property_bit_nr);
+
+  if (bit_nr > -1)
+  {
+    if (property_value)
+      *bitfield |=  (1 << bit_nr);
+    else
+      *bitfield &= ~(1 << bit_nr);
+  }
+}
+
+boolean getBitfieldProperty(int *bitfield, int property_bit_nr, int element)
+{
+  int bit_nr = get_special_property_bit(element, property_bit_nr);
+
+  if (bit_nr > -1)
+    return ((*bitfield & (1 << bit_nr)) != 0);
+
+  return FALSE;
+}
+
+#else
 
 void setMoveIntoAcidProperty(struct LevelInfo *level, int element, boolean set)
 {
@@ -1656,6 +1718,7 @@ boolean getMoveIntoAcidProperty(struct LevelInfo *level, int element)
 
   return FALSE;
 }
+#endif
 
 void InitElementPropertiesStatic()
 {
@@ -3270,9 +3333,19 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_COULD_MOVE_INTO_ACID, (CAN_MOVE(i) ||
 					      IS_CUSTOM_ELEMENT(i)));
 
+    /* ---------- MAYBE_DONT_COLLIDE_WITH ---------------------------------- */
+    SET_PROPERTY(i, EP_MAYBE_DONT_COLLIDE_WITH, (i == EL_SP_SNIKSNAK ||
+						 i == EL_SP_ELECTRON));
+
     /* ---------- CAN_MOVE_INTO_ACID --------------------------------------- */
-    if (!IS_CUSTOM_ELEMENT(i))
-      SET_PROPERTY(i, EP_CAN_MOVE_INTO_ACID,getMoveIntoAcidProperty(&level,i));
+    if (COULD_MOVE_INTO_ACID(i) && !IS_CUSTOM_ELEMENT(i))
+      SET_PROPERTY(i, EP_CAN_MOVE_INTO_ACID,
+		   getMoveIntoAcidProperty(&level, i));
+
+    /* ---------- DONT_COLLIDE_WITH ---------------------------------------- */
+    if (MAYBE_DONT_COLLIDE_WITH(i))
+      SET_PROPERTY(i, EP_DONT_COLLIDE_WITH,
+		   getDontCollideWithProperty(&level, i));
 
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
@@ -3366,7 +3439,7 @@ void InitElementPropertiesEngine(int engine_version)
   }
 
   /* set some other uninitialized values of custom elements in older levels */
-  if (engine_version < VERSION_IDENT(3,0,9,0))
+  if (engine_version < VERSION_IDENT(3,1,0,0))
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
@@ -3379,12 +3452,15 @@ void InitElementPropertiesEngine(int engine_version)
     }
   }
 
+#if 0
   /* set element properties that were handled incorrectly in older levels */
-  if (engine_version < VERSION_IDENT(3,0,9,0))
+  if (engine_version < VERSION_IDENT(3,1,0,0))
   {
     SET_PROPERTY(EL_SP_SNIKSNAK, EP_DONT_COLLIDE_WITH, FALSE);
     SET_PROPERTY(EL_SP_ELECTRON, EP_DONT_COLLIDE_WITH, FALSE);
   }
+#endif
+
 #endif
 
   /* this is needed because some graphics depend on element properties */
