@@ -22,49 +22,54 @@ static unsigned int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
  * perhaps use mit-shm to speed this up
  */
 
-void blitscreen(void)
+void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
   unsigned int x = screen_x % (MAX_BUF_XSIZE * TILEX);
   unsigned int y = screen_y % (MAX_BUF_YSIZE * TILEY);
 
   if (x < 2 * TILEX && y < 2 * TILEY)
   {
-    BlitBitmap(screenBitmap, window, x, y,
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
 	       SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
   }
   else if (x < 2 * TILEX && y >= 2 * TILEY)
   {
-    BlitBitmap(screenBitmap, window, x, y,
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
 	       SCR_FIELDX * TILEX, MAX_BUF_YSIZE * TILEY - y,
 	       SX, SY);
-    BlitBitmap(screenBitmap, window, x, 0,
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
 	       SCR_FIELDX * TILEX, y - 2 * TILEY,
 	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
   }
   else if (x >= 2 * TILEX && y < 2 * TILEY)
   {
-    BlitBitmap(screenBitmap, window, x, y,
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
 	       MAX_BUF_XSIZE * TILEX - x, SCR_FIELDY * TILEY,
 	       SX, SY);
-    BlitBitmap(screenBitmap, window, 0, y,
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
 	       x - 2 * TILEX, SCR_FIELDY * TILEY,
 	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
   }
   else
   {
-    BlitBitmap(screenBitmap, window, x, y,
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
 	       MAX_BUF_XSIZE * TILEX - x, MAX_BUF_YSIZE * TILEY - y,
 	       SX, SY);
-    BlitBitmap(screenBitmap, window, 0, y,
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
 	       x - 2 * TILEX, MAX_BUF_YSIZE * TILEY - y,
 	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
-    BlitBitmap(screenBitmap, window, x, 0,
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
 	       MAX_BUF_XSIZE * TILEX - x, y - 2 * TILEY,
 	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
-    BlitBitmap(screenBitmap, window, 0, 0,
+    BlitBitmap(screenBitmap, target_bitmap, 0, 0,
 	       x - 2 * TILEX, y - 2 * TILEY,
 	       SX + MAX_BUF_XSIZE * TILEX - x, SY + MAX_BUF_YSIZE * TILEY - y);
   }
+}
+
+void blitscreen(void)
+{
+  BlitScreenToBitmap_EM(window);
 }
 
 static void DrawLevelField_EM(int x, int y, int sx, int sy,
@@ -362,11 +367,11 @@ void game_initscreen(void)
     }
   }
 
-  DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
-			DISPLAY_TIME(lev.time + 4));
+  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
+		    DISPLAY_TIME(lev.time + 4), ply1.keys | ply2.keys);
 }
 
-void game_animscreen(void)
+void RedrawPlayfield_EM()
 {
   unsigned int x,y;
 
@@ -394,4 +399,15 @@ void game_animscreen(void)
   blitscreen();
 
   FlushDisplay();
+}
+
+void game_animscreen(void)
+{
+  RedrawPlayfield_EM();
+}
+
+void DrawGameDoorValues_EM()
+{
+  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
+		    DISPLAY_TIME(lev.time), ply1.keys | ply2.keys);
 }

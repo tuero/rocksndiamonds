@@ -104,8 +104,8 @@ void GameActions_EM(byte action)
     synchro_3();
     sound_play();
 
-    DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
-			  DISPLAY_TIME(lev.time));
+    if (game_frame_delay_value > 0)	/* do not redraw values in warp mode */
+      DrawGameDoorValues_EM();
   }
 }
 

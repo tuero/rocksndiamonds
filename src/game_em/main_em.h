@@ -617,6 +617,11 @@ struct PLAYER
 
 #define FILE_VERSION_EM_ACTUAL	FILE_VERSION_EM_V6
 
+struct GlobalInfo_EM
+{
+  Bitmap *screenbuffer;
+};
+
 struct LevelInfo_EM
 {
   int file_version;

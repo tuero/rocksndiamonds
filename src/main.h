@@ -1326,9 +1326,9 @@
 /* program information and versioning definitions */
 
 #define PROGRAM_VERSION_MAJOR		3
-#define PROGRAM_VERSION_MINOR		1
-#define PROGRAM_VERSION_PATCH		1
-#define PROGRAM_VERSION_BUILD		0
+#define PROGRAM_VERSION_MINOR		2
+#define PROGRAM_VERSION_PATCH		0
+#define PROGRAM_VERSION_BUILD		1
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"

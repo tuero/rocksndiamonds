@@ -123,6 +123,14 @@ void SetDrawtoField(int mode)
 
 void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 {
+  if (game_status == GAME_MODE_PLAYING &&
+      level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    RedrawPlayfield_EM();
+
+    return;
+  }
+
   if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {
     if (force_redraw)
@@ -2218,6 +2226,12 @@ boolean Request(char *text, unsigned int req_state)
       break;
     }
   }
+
+#if 1
+  if (game_status == GAME_MODE_PLAYING &&
+      level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    BlitScreenToBitmap_EM(backbuffer);
+#endif
 
 #if 1
   /* disable deactivated drawing when quick-loading level tape recording */
@@ -5590,8 +5604,17 @@ int el2preimg(int element)
 
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
-  return (GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
-	  GameFrameDelay);
+  int game_frame_delay_value;
+
+  game_frame_delay_value =
+    (tape.playing && tape.fast_forward ? FfwdFrameDelay :
+     GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
+     GameFrameDelay);
+
+  if (tape.playing && tape.warp_forward && !tape.pausing)
+    game_frame_delay_value = 0;
+
+  return game_frame_delay_value;
 }
 
 unsigned int InitRND(long seed)

@@ -2953,6 +2953,19 @@ void HandleGameActions()
     byte tape_action[MAX_PLAYERS];
     int i;
 
+    if (level.native_em_level->lev->home == 0)	/* all players at home */
+    {
+      GameWon();
+
+      if (!TAPE_IS_STOPPED(tape))
+	TapeStop();
+
+      if (game_status != GAME_MODE_PLAYING)
+	return;
+    }
+
+    /* --- game actions --- */
+
     if (tape.pausing)
       return;
 

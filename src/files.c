@@ -2508,7 +2508,10 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
 
-  CopyNativeLevel_Native_to_RND(level);
+  if (level_file_info->type == LEVEL_FILE_TYPE_RND)
+    CopyNativeLevel_RND_to_Native(level);
+  else
+    CopyNativeLevel_Native_to_RND(level);
 }
 
 void LoadLevelFromFilename(struct LevelInfo *level, char *filename)

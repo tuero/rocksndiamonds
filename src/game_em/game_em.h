@@ -23,6 +23,7 @@
 
 #include "main_em.h"
 
+extern struct GlobalInfo_EM global_em_info;
 extern struct LevelInfo_EM native_em_level;
 extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[2][SPR_MAX][8];
@@ -38,5 +39,8 @@ extern unsigned int InitEngineRND_EM(long);
 extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *);
 
+extern void BlitScreenToBitmap_EM(Bitmap *);
+extern void RedrawPlayfield_EM();
+extern void DrawGameDoorValues_EM();
 
 #endif	/* GAME_EM_H */

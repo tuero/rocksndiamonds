@@ -4,7 +4,10 @@
  */
 
 #include <signal.h>
+
+#if !defined(TARGET_SDL)
 #include <sys/wait.h>
+#endif
 
 #include "main_em.h"
 
@@ -38,13 +41,15 @@ int play_x[SAMPLE_MAX];
 int play_y[SAMPLE_MAX];
 int play_element[SAMPLE_MAX];
 
+static boolean use_native_em_sound = 0;
+
+struct GlobalInfo_EM global_em_info;
+
 #if defined(AUDIO_UNIX_NATIVE)
 static int sound_pid = -1;
 int sound_pipe[2] = { -1, -1 };		/* for communication */
 short *sound_data[SAMPLE_MAX];		/* pointer to sound data */
 long sound_length[SAMPLE_MAX];		/* length of sound data */
-
-static boolean use_native_em_sound = 0;
 
 static const char *sound_names[SAMPLE_MAX] =
 {
@@ -148,6 +153,9 @@ int open_all(void)
 
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
 			      DEFAULT_DEPTH);
+
+  global_em_info.screenbuffer = screenBitmap;
+
 #endif
 
 #if 0
@@ -238,7 +246,9 @@ void em_open_all()
 {
   /* pre-calculate some data */
   tab_generate();
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
   ulaw_generate();
+#endif
 
   progname = "emerald mine";
 

@@ -23,7 +23,15 @@ static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static void PrepareBackbuffer()
 {
-  /* Fill empty backbuffer for animation functions */
+  if (game_status == GAME_MODE_PLAYING &&
+      level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    BlitScreenToBitmap_EM(backbuffer);
+
+    return;
+  }
+
+  /* fill empty backbuffer for animation functions */
   if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
   {
     int xx, yy;

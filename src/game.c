@@ -1062,12 +1062,12 @@ inline void DrawGameValue_Dynamite(int value)
   DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
 }
 
-inline void DrawGameValue_Keys(struct PlayerInfo *player)
+inline void DrawGameValue_Keys(int key[4])
 {
   int i;
 
   for (i = 0; i < MAX_KEYS; i++)
-    if (player->key[i])
+    if (key[i])
       DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
 			 el2edimg(EL_KEY_1 + i));
 }
@@ -1109,27 +1109,43 @@ inline void DrawGameValue_Level(int value)
   }
 }
 
+void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
+		       int key_bits)
+{
+  int key[4];
+  int i;
+
+  for (i = 0; i < MAX_KEYS; i++)
+    key[i] = key_bits & (1 << i);
+
+  DrawGameValue_Emeralds(emeralds);
+  DrawGameValue_Dynamite(dynamite);
+  DrawGameValue_Score(score);
+  DrawGameValue_Time(time);
+
+  DrawGameValue_Keys(key);
+}
+
 void DrawGameDoorValues()
 {
   int i;
 
-  DrawGameValue_Level(level_nr);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    DrawGameDoorValues_EM();
 
-  for (i = 0; i < MAX_PLAYERS; i++)
-    DrawGameValue_Keys(&stored_player[i]);
+    return;
+  }
+
+  DrawGameValue_Level(level_nr);
 
   DrawGameValue_Emeralds(local_player->gems_still_needed);
   DrawGameValue_Dynamite(local_player->inventory_size);
   DrawGameValue_Score(local_player->score);
   DrawGameValue_Time(TimeLeft);
-}
 
-void DrawGameDoorValues_EM(int emeralds, int dynamite, int score, int time)
-{
-  DrawGameValue_Emeralds(emeralds);
-  DrawGameValue_Dynamite(dynamite);
-  DrawGameValue_Score(score);
-  DrawGameValue_Time(time);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    DrawGameValue_Keys(stored_player[i].key);
 }
 
 static void resolve_group_element(int group_element, int recursion_depth)
@@ -1699,6 +1715,7 @@ void InitGame()
 #endif
 
   ZX = ZY = -1;
+  ExitX = ExitY = -1;
 
   FrameCounter = 0;
   TimeFrames = 0;
@@ -2400,8 +2417,9 @@ void GameWon()
   }
 
   /* close exit door after last player */
-  if ((Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN) && AllPlayersGone)
+  if (AllPlayersGone && ExitX >= 0 && ExitY >= 0 &&
+      (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
+       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
   {
     int element = Feld[ExitX][ExitY];
 
@@ -2412,7 +2430,9 @@ void GameWon()
   }
 
   /* Hero disappears */
-  DrawLevelField(ExitX, ExitY);
+  if (ExitX >= 0 && ExitY >= 0)
+    DrawLevelField(ExitX, ExitY);
+
   BackToFront();
 
   if (tape.playing)
@@ -11532,7 +11552,7 @@ int DigField(struct PlayerInfo *player,
 
 	  player->key[key_nr] = TRUE;
 
-	  DrawGameValue_Keys(player);
+	  DrawGameValue_Keys(player->key);
 
 	  redraw_mask |= REDRAW_DOOR_1;
 	}

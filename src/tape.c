@@ -948,7 +948,7 @@ byte *TapePlayAction()
   if (!tape.playing || tape.pausing)
     return NULL;
 
-  if (tape.pause_before_death)	/* STOP 10s BEFORE PLAYER GETS KILLED... */
+  if (tape.pause_before_death)	/* stop 10 seconds before player gets killed */
   {
     if (!(FrameCounter % 20))
     {
@@ -969,6 +969,7 @@ byte *TapePlayAction()
     if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
       return NULL;
     }
   }
@@ -987,6 +988,7 @@ byte *TapePlayAction()
 	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
     }
   }
+
 #if 0
   /* !!! this makes things much slower !!! */
   else if (tape.warp_forward)
