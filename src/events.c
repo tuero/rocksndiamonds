@@ -258,9 +258,11 @@ void HandleFocusEvent(XFocusChangeEvent *event)
 
 void HandleClientMessageEvent(XClientMessageEvent *event)
 {
+#ifndef MSDOS
   if ((event->window == window) &&
       (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
     CloseAllAndExit(0);
+#endif
 }
 
 void HandleButton(int mx, int my, int button)
@@ -600,8 +602,10 @@ void HandleNoXEvent()
     return;
   }
 
+#ifndef MSDOS
   if (options.network)
     HandleNetworking();
+#endif
 
   HandleJoystick();
 

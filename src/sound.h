@@ -79,9 +79,6 @@ extern void ioctl(long, long, void *);
 #define SSND_STOPPING(x)	(x & (SSND_STOP_SOUND | SSND_STOP_ALL_SOUNDS))
 #define SSND_ALL(x)		(x&(SSND_FADE_ALL_SOUNDS|SSND_STOP_ALL_SOUNDS))
 
-#define	TRUE	1
-#define FALSE	0
-
 /* settings for sound path, sound device, etc. */
 #ifndef SND_PATH
 #define SND_PATH	"./sounds"

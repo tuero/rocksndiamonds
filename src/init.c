@@ -72,10 +72,19 @@ void OpenAll(int argc, char *argv[])
   InitDisplay();
   InitWindow(argc, argv);
 
+  print_debug("now map window");
+
   XMapWindow(display, window);
   XFlush(display);
 
+  print_debug("window mapped");
+
+  print_debug("now init gfx");
+
   InitGfx();
+
+  print_debug("gfx initialized");
+
   InitElementProperties();
 
   DrawMainMenu();
@@ -105,11 +114,14 @@ void InitLevelAndPlayerInfo()
 
 void InitNetworkServer()
 {
+#ifndef MSDOS
   int nr_wanted;
+#endif
 
   if (!options.network)
     return;
 
+#ifndef MSDOS
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(options.server_host, options.server_port))
@@ -120,6 +132,7 @@ void InitNetworkServer()
 
   if (nr_wanted)
     SendToServer_NrWanted(nr_wanted);
+#endif
 }
 
 void InitSound()
@@ -214,7 +227,9 @@ void InitSoundServer()
 
 void InitJoysticks()
 {
+#ifndef MSDOS
   int i;
+#endif
 
   if (global_joystick_status == JOYSTICK_OFF)
     return;
@@ -257,8 +272,10 @@ void InitJoysticks()
 
 void InitDisplay()
 {
+#ifndef MSDOS
   XVisualInfo vinfo_template, *vinfo;
   int num_visuals;
+#endif
   unsigned int depth;
 
   /* connect to X server */
@@ -271,6 +288,7 @@ void InitDisplay()
   depth  = DefaultDepth(display, screen);
   cmap   = DefaultColormap(display, screen);
 
+#ifndef MSDOS
   /* look for good enough visual */
   vinfo_template.screen = screen;
   vinfo_template.class = (depth == 8 ? PseudoColor : TrueColor);
@@ -295,25 +313,28 @@ void InitDisplay()
     printf("Sorry, cannot get appropriate visual.\n");
     exit(-1);
   }
+#endif
 }
 
 void InitWindow(int argc, char *argv[])
 {
   unsigned int border_width = 4;
+  XGCValues gc_values;
+  unsigned long gc_valuemask;
+#ifndef MSDOS
+  XTextProperty windowName, iconName;
   Pixmap icon_pixmap, iconmask_pixmap;
-  unsigned int icon_width,icon_height;
-  int icon_hot_x,icon_hot_y;
+  unsigned int icon_width, icon_height;
+  int icon_hot_x, icon_hot_y;
   char icon_filename[256];
   XSizeHints size_hints;
   XWMHints wm_hints;
   XClassHint class_hints;
-  XTextProperty windowName, iconName;
-  XGCValues gc_values;
-  unsigned long gc_valuemask;
   char *window_name = WINDOWTITLE_STRING;
   char *icon_name = WINDOWTITLE_STRING;
   long window_event_mask;
   Atom proto_atom = None, delete_atom = None;
+#endif
   int screen_width, screen_height;
   int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
   unsigned long pen_fg = WhitePixel(display,screen);
@@ -409,6 +430,10 @@ void InitWindow(int argc, char *argv[])
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
+
+
+
+  print_debug("OpenWindow finished");
 }
 
 void DrawInitText(char *text, int ypos, int color)
@@ -628,8 +653,18 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char *picturemask_ext = "Mask.xbm";
 #else
   int pcx_err;
+
+#if 1
   char *picture_ext = ".pcx";
+#else
+  char *picture_ext = ".gif";
 #endif
+
+#endif
+
+
+  print_debug("now load pic:");
+
 
   /* Grafik laden */
   if (pic->picture_filename)
@@ -674,25 +709,45 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else /* !USE_XPM_LIBRARY */
 
-    pcx_err = Read_PCX_to_Pixmaps(display, window, gc, filename,
-				  &pix[pos], &clipmask[pos]);
+
+
+    print_debug(filename);
+
+
+
+    pcx_err = Read_PCX_to_Pixmap(display, window, gc, filename,
+				 &pix[pos], &clipmask[pos]);
+
+
+    print_debug("ok-1");
+
+
     switch(pcx_err)
     {
       case PCX_Success:
+	print_debug("Success");
         break;
       case PCX_OpenFailed:
+	print_debug("OpenFailed");
         Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
       case PCX_ReadFailed:
+	print_debug("ReadFailed");
         Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
       case PCX_FileInvalid:
+	print_debug("FileInvalid");
 	Error(ERR_EXIT, "invalid PCX file '%s'", filename);
       case PCX_NoMemory:
+	print_debug("NoMemory");
 	Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
       case PCX_ColorFailed:
+	print_debug("ColorFailed");
 	Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
       default:
+	print_debug("default");
 	break;
     }
+
+    print_debug("ok-2");
 
 #if DEBUG_TIMING
     printf("SUMMARY LOADING PCX FILE %s:", filename);
@@ -701,8 +756,16 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #endif /* !USE_XPM_LIBRARY */
 
+
+    print_debug("-> 1");
+
+
+
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
+
+
+    print_debug("-> 2");
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
@@ -743,9 +806,16 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #endif /* USE_XPM_LIBRARY */
 
+
+    if (!clipmask[pos])
+      print_debug("Oops -- no clipmask");
+
     if (!clipmask[pos])
       Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
   }
+
+
+  print_debug("LoadGfx done");
 }
 
 void InitElementProperties()

@@ -238,9 +238,11 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
+#ifndef MSDOS
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
+#endif
 
   ZX = ZY = -1;
 
@@ -3122,8 +3124,44 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
+  /*
+  if (tape.playing && tape.fast_forward)
+  {
+    char buf[100];
+
+    sprintf(buf, "FFWD: %ld ms", action_delay_value);
+    print_debug(buf);
+  }
+  */
+
+
   /* main game synchronization point */
+
+
+
+
+#if 1
   WaitUntilDelayReached(&action_delay, action_delay_value);
+#else
+  /*
+  while (!DelayReached(&action_delay, action_delay_value));
+  */
+
+  while (!DelayReached(&action_delay, action_delay_value))
+  {
+    char buf[100];
+
+    sprintf(buf, "%ld %ld %ld",
+	    Counter(), action_delay, action_delay_value);
+    print_debug(buf);
+  }
+  print_debug("done");
+
+
+#endif
+
+
+
 
   if (network_playing && !network_player_action_received)
   {
@@ -3133,8 +3171,10 @@ void GameActions()
 #endif
     */
 
+#ifndef MSDOS
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
+#endif
 
     if (game_status != PLAYING)
       return;
@@ -3176,8 +3216,10 @@ void GameActions()
       stored_player[i].effective_action = stored_player[i].action;
   }
 
+#ifndef MSDOS
   if (network_playing)
     SendToServer_MovePlayer(summarized_player_action);
+#endif
 
   if (!options.network && !setup.team_mode)
     local_player->effective_action = summarized_player_action;

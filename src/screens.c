@@ -240,9 +240,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (setup.autorecord)
 	  TapeStartRecording();
 
+#ifndef MSDOS
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else
+#endif
 	{
 	  game_status = PLAYING;
 	  InitGame();
@@ -1202,6 +1204,11 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  SaveJoystickData();
 	  */
 
+#ifdef MSDOS
+	  save_joystick_data(JOYSTICK_FILENAME);
+#endif
+
+
 	}
 
 	game_status = MAINMENU;
@@ -1653,7 +1660,9 @@ void CalibrateJoystick(int player_nr)
 #endif
 
 #ifdef MSDOS
+  /*
   char joy_nr[4];
+  */
 #endif
 
   int joystick_fd = stored_player[player_nr].joystick_fd;
@@ -1743,11 +1752,13 @@ void CalibrateJoystick(int player_nr)
       }
     }
 
+#ifndef MSDOS
     if (read(joystick_fd, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
     {
       joystick_status = JOYSTICK_OFF;
       goto error_out;
     }
+#endif
 
     new_joystick_xleft  = MIN(new_joystick_xleft,  joy_ctrl.x);
     new_joystick_xright = MAX(new_joystick_xright, joy_ctrl.x);
@@ -1815,7 +1826,9 @@ void CalibrateJoystick(int player_nr)
   while(Joystick(player_nr) & JOY_BUTTON);
   return;
 
+#ifndef MSDOS
   error_out:
+#endif
 
   ClearWindow();
   DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
@@ -2058,9 +2071,11 @@ void HandleVideoButtons(int mx, int my, int button)
       {
 	TapeStartRecording();
 
+#ifndef MSDOS
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else
+#endif
 	{
 	  game_status = PLAYING;
 	  InitGame();
@@ -2203,9 +2218,11 @@ void HandleGameButtons(int mx, int my, int button)
       if (Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
+#ifndef MSDOS
 	if (options.network)
 	  SendToServer_StopPlaying();
 	else
+#endif
 	{
 	  game_status = MAINMENU;
 	  DrawMainMenu();
@@ -2218,10 +2235,12 @@ void HandleGameButtons(int mx, int my, int button)
     case BUTTON_GAME_PAUSE:
       if (options.network)
       {
+#ifndef MSDOS
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
 	else
 	  SendToServer_PausePlaying();
+#endif
       }
       else
 	TapeTogglePause();
@@ -2230,9 +2249,11 @@ void HandleGameButtons(int mx, int my, int button)
     case BUTTON_GAME_PLAY:
       if (tape.pausing)
       {
+#ifndef MSDOS
 	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else
+#endif
 	{
 	  tape.pausing = FALSE;
 	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);

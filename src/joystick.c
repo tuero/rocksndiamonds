@@ -42,6 +42,7 @@ void CheckJoystickData()
   }
 }
 
+#ifndef MSDOS
 static int JoystickPosition(int middle, int margin, int actual)
 {
   long range, pos;
@@ -61,9 +62,11 @@ static int JoystickPosition(int middle, int margin, int actual)
 
   return percentage;
 }
+#endif
 
 int Joystick(int player_nr)
 {
+#ifndef MSDOS
 #ifdef __FreeBSD__
   struct joystick joy_ctrl;
 #else
@@ -74,11 +77,15 @@ int Joystick(int player_nr)
     int y;
   } joy_ctrl;
 #endif
+#endif
 
   int joystick_fd = stored_player[player_nr].joystick_fd;
+
+#ifndef MSDOS
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result = 0;
+#endif
 
   if (joystick_status == JOYSTICK_OFF)
     return 0;

@@ -14,6 +14,9 @@
 #include "image.h"
 #include "misc.h"
 
+/* exclude all except newImage() and freeImage() */
+#ifndef MSDOS
+
 /* extra colors to try allocating in private color maps to minimize flashing */
 #define NOFLASH_COLORS 256
 
@@ -34,10 +37,10 @@
 
 static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
 {
-  unsigned char *src_ptr, *dst_ptr, *dst_ptr2;
+  byte *src_ptr, *dst_ptr, *dst_ptr2;
   unsigned int bytes_per_row;
   unsigned int x, y;
-  unsigned char bitmask;
+  byte bitmask;
   byte *mask_data;
   Pixmap mask_pixmap;
 
@@ -463,6 +466,8 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   free(ximageinfo);
 }
 
+#endif /* !MSDOS */
+
 Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
 {
   Image *image;
@@ -491,8 +496,10 @@ void freeImage(Image *image)
   free(image);
 }
 
-int Read_PCX_to_Pixmaps(Display *display, Window window, GC gc, char *filename,
-			Pixmap *pixmap, Pixmap *pixmap_mask)
+#ifndef MSDOS
+
+int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
+		       Pixmap *pixmap, Pixmap *pixmap_mask)
 {
   Image *image;
   XImageInfo *ximageinfo;
@@ -542,3 +549,5 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, GC gc, char *filename,
 
   return(PCX_Success);
 }
+
+#endif /* !MSDOS */

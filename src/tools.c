@@ -89,11 +89,13 @@ void BackToFront()
      this could mean that we have to wait for the graphics to complete,
      although we could go on doing calculations for the next frame */
 
-  XSync(display,FALSE);
+  XSync(display, FALSE);
 
+  /*
 #ifdef MSDOS
   wait_for_vsync = TRUE;
 #endif
+  */
 
   if (redraw_mask & REDRAW_ALL)
   {
@@ -1338,11 +1340,13 @@ boolean Request(char *text, unsigned int req_state)
   int mx, my, ty, result = -1;
   unsigned int old_door_state;
 
+#ifndef MSDOS
   /* pause network game while waiting for request to answer */
   if (options.network &&
       game_status == PLAYING &&
       req_state & REQUEST_WAIT_FOR)
     SendToServer_PausePlaying();
+#endif
 
   old_door_state = GetDoorState();
 
@@ -1544,11 +1548,13 @@ boolean Request(char *text, unsigned int req_state)
     }
   }
 
+#ifndef MSDOS
   /* continue network game after request */
   if (options.network &&
       game_status == PLAYING &&
       req_state & REQUEST_WAIT_FOR)
     SendToServer_ContinuePlaying();
+#endif
 
   return(result);
 }

@@ -56,7 +56,7 @@ typedef struct
 #define PCX_NoMemory		-4
 #define PCX_ColorFailed		-5
 
-int Read_PCX_to_Pixmaps(Display *, Window, GC, char *, Pixmap *, Pixmap *);
+int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 Image *Read_PCX_to_Image(char *);
 Image *newImage(unsigned int, unsigned int, unsigned int);

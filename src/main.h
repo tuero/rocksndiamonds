@@ -48,8 +48,8 @@ typedef unsigned char boolean;
 typedef unsigned char byte;
 
 #ifndef FALSE
-#define FALSE 0
-#define TRUE (!FALSE)
+#define FALSE		0
+#define TRUE		(!FALSE)
 #endif
 
 #define WIN_XSIZE	672

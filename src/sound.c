@@ -610,6 +610,7 @@ int ulaw_to_linear(unsigned char ulawbyte)
 
 /*** THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS ***/
 
+#ifndef MSDOS
 static unsigned long be2long(unsigned long *be)	/* big-endian -> longword */
 {
   unsigned char *ptr = (unsigned char *)be;
@@ -623,14 +624,17 @@ static unsigned long le2long(unsigned long *be)	/* little-endian -> longword */
 
   return(ptr[3]<<24 | ptr[2]<<16 | ptr[1]<<8 | ptr[0]);
 }
+#endif /* !MSDOS */
 
 boolean LoadSound(struct SoundInfo *snd_info)
 {
   FILE *file;
   char filename[256];
   char *sound_ext = "wav";
+#ifndef MSDOS
   struct SoundHeader_WAV *sound_header;
   int i;
+#endif
 
   sprintf(filename, "%s/%s/%s.%s",
 	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);
@@ -683,7 +687,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
   for (i=0; i<snd_info->data_len; i++)
     snd_info->data_ptr[i] = snd_info->data_ptr[i]^0x80;
 
-#else
+#else /* MSDOS */
 
   snd_info->sample_ptr = load_sample(filename);
   if (!snd_info->sample_ptr)
@@ -702,12 +706,12 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
   FILE *file;
   char filename[256];
 #ifndef MSDOS
+  struct SoundHeader_8SVX *sound_header;
+  unsigned char *ptr;
   char *sound_ext = "8svx";
 #else
   char *sound_ext = "wav";
 #endif
-  struct SoundHeader_8SVX *sound_header;
-  unsigned char *ptr;
 
   sprintf(filename, "%s/%s/%s.%s",
 	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);

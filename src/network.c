@@ -11,6 +11,8 @@
 *  network.c                                               *
 ***********************************************************/
 
+#ifndef MSDOS
+
 #include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
@@ -604,3 +606,5 @@ void HandleNetworking()
     HandleNetworkingMessages();
   }
 }
+
+#endif /* !MSDOS */

@@ -27,9 +27,24 @@
 #include "random.h"
 #include "joystick.h"
 
+
+#ifdef MSDOS
+volatile unsigned long counter = 0;
+
+void increment_counter()
+{
+  counter++;
+}
+
+END_OF_FUNCTION(increment_counter);
+#endif
+
+
+
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
+#ifndef MSDOS
 static unsigned long mainCounter(int mode)
 {
   static struct timeval base_time = { 0, 0 };
@@ -46,20 +61,39 @@ static unsigned long mainCounter(int mode)
 
   return counter_ms;		/* return milliseconds since last init */
 }
+#endif
 
 void InitCounter()		/* set counter back to zero */
 {
+#ifndef MSDOS
   mainCounter(INIT_COUNTER);
+#else
+  LOCK_VARIABLE(counter);
+  LOCK_FUNCTION(increment_counter);
+  install_int_ex(increment_counter, BPS_TO_TIMER(100));
+#endif
 }
 
 unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
 {
-  return(mainCounter(READ_COUNTER));
+#ifndef MSDOS
+  return mainCounter(READ_COUNTER);
+#else
+  return (counter * 10);
+#endif
 }
 
 static void sleep_milliseconds(unsigned long milliseconds_delay)
 {
-  if (milliseconds_delay < 5)
+  boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
+
+#ifdef MSDOS
+  /* donït use select() to perform waiting operations under DOS/Windows
+     environment; always use a busy loop for waiting instead */
+  do_busy_waiting = TRUE;
+#endif
+
+  if (do_busy_waiting)
   {
     /* we want to wait only a few ms -- if we assume that we have a
        kernel timer resolution of 10 ms, we would wait far to long;
@@ -209,6 +243,7 @@ char *getLoginName()
 
 char *getHomeDir()
 {
+#ifndef MSDOS
   static char *home_dir = NULL;
 
   if (!home_dir)
@@ -225,6 +260,9 @@ char *getHomeDir()
   }
 
   return home_dir;
+#else
+  return ".";
+#endif
 }
 
 char *getPath2(char *path1, char *path2)
@@ -418,7 +456,6 @@ void GetOptions(char *argv[])
 
 void Error(int mode, char *format, ...)
 {
-  FILE *output_stream = stderr;
   char *process_name = "";
 
   if (mode & ERR_SOUND_SERVER)
@@ -432,26 +469,30 @@ void Error(int mode, char *format, ...)
   {
     va_list ap;
 
-    fprintf(output_stream, "%s%s: ", program_name, process_name);
+    fprintf(stderr, "%s%s: ", program_name, process_name);
 
     if (mode & ERR_WARN)
-      fprintf(output_stream, "warning: ");
+      fprintf(stderr, "warning: ");
 
     va_start(ap, format);
-    vfprintf(output_stream, format, ap);
+    vfprintf(stderr, format, ap);
     va_end(ap);
   
-    fprintf(output_stream, "\n");
+    fprintf(stderr, "\n");
   }
   
   if (mode & ERR_HELP)
-    fprintf(output_stream, "%s: Try option '--help' for more information.\n",
+    fprintf(stderr, "%s: Try option '--help' for more information.\n",
 	    program_name);
 
   if (mode & ERR_EXIT)
   {
-    fprintf(output_stream, "%s%s: aborting\n", program_name, process_name);
-    CloseAllAndExit(1);
+    fprintf(stderr, "%s%s: aborting\n", program_name, process_name);
+
+    if (mode & ERR_FROM_SERVER)
+      exit(1);				/* child process: normal exit */
+    else
+      CloseAllAndExit(1);		/* main process: clean up stuff */
   }
 }
 
@@ -825,4 +866,29 @@ void debug_print_timestamp(int counter_nr, char *message)
 	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
 
   counter[counter_nr][1] = Counter();
+}
+
+void print_debug(char *s)
+{
+  FILE *f;
+
+  if (!s)
+  {
+    if ((f = fopen("debug.asc", "w")) == NULL)
+    {
+      printf("Cannot write to debug file!\n");
+      exit(1);
+    }
+    fclose(f);
+    return;
+  }
+
+  if ((f = fopen("debug.asc", "a")) == NULL)
+  {
+    printf("Cannot append to debug file!\n");
+    exit(1);
+  }
+
+  fprintf(f, "%s\r\n", s);
+  fclose(f);
 }

@@ -28,6 +28,7 @@
 #define ERR_SOUND_SERVER	(1 << 3)
 #define ERR_NETWORK_SERVER	(1 << 4)
 #define ERR_NETWORK_CLIENT	(1 << 5)
+#define ERR_FROM_SERVER		(ERR_SOUND_SERVER | ERR_NETWORK_SERVER)
 #define ERR_EXIT_HELP		(ERR_EXIT | ERR_HELP)
 #define ERR_EXIT_SOUND_SERVER	(ERR_EXIT | ERR_SOUND_SERVER)
 #define ERR_EXIT_NETWORK_SERVER	(ERR_EXIT | ERR_NETWORK_SERVER)
@@ -60,5 +61,7 @@ KeySym getKeySymFromX11KeyName(char *);
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 void debug_print_timestamp(int, char *);
+
+void print_debug(char *);
 
 #endif /* MISC_H */
