@@ -65,7 +65,12 @@ typedef int BOOL;
 #define IN_SCR_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
+/*
 #define IS_PLAYER(x,y)		(JX==(x) && JY==(y))
+*/
+
+#define IS_PLAYER(x,y)		((JX==(x) && JY==(y)) || (JX2==(x) && JY2==(y)))
+
 #define IS_FREE(x,y)		(Feld[x][y]==EL_LEERRAUM && !IS_PLAYER(x,y))
 #define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y]==EL_LEERRAUM)
 #define IS_MOVING(x,y)		(MovPos[x][y]!=0)
@@ -147,9 +152,10 @@ typedef int BOOL;
 /* Pixmaps without them */
 #define PIX_DB_BACK		6
 #define PIX_DB_DOOR		7
+#define PIX_DB_FIELD		8
 
 #define NUM_PICTURES		6
-#define NUM_PIXMAPS		8
+#define NUM_PIXMAPS		9
 
 /* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
@@ -245,7 +251,7 @@ extern Pixmap		pix[];
 extern XpmAttributes 	xpm_att[];
 #endif
 
-extern Drawable    	drawto, drawto_field, backbuffer;
+extern Drawable    	drawto, drawto_field, backbuffer, fieldbuffer;
 extern Colormap		cmap;
 
 extern int		sound_pipe[2];
@@ -295,8 +301,8 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-extern int		JX,JY, ZX,ZY, ExitX,ExitY;
-extern int		PlayerMovDir, PlayerFrame, PlayerPushing;
+extern int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
+extern int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 extern int		PlayerGone,LevelSolved,GameOver;
 extern int		FrameCounter,TimeFrames,TimeLeft,Score;
 extern int		Gems,SokobanFields,Lights,Friends;
@@ -951,7 +957,7 @@ extern char		*progname;
 #define VERSION_STRING		"1.1"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
-#define COPYRIGHT_STRING	"Copyright ^1995-97 by Holger Schemel"
+#define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"
 
 /* Leerer Login- und Alias-Name */
 #define EMPTY_LOGIN		"NO_LOGIN"

@@ -76,6 +76,9 @@ void GameActions(void);
 void ScrollLevel(int, int);
 BOOL MoveFigureOneStep(int, int, int, int);
 BOOL MoveFigure(int, int);
+
+void ScrollFigure(int);
+
 void TestIfGoodThingHitsBadThing(int, int);
 void TestIfBadThingHitsGoodThing(int, int);
 void TestIfHeroHitsBadThing(void);

@@ -29,7 +29,7 @@ Pixmap		clipmask[NUM_PIXMAPS];
 XpmAttributes 	xpm_att[NUM_PICTURES];
 #endif
 
-Drawable        drawto, drawto_field, backbuffer;
+Drawable        drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
 
 int		sound_pipe[2];
@@ -80,8 +80,8 @@ long		Elementeigenschaften[MAX_ELEMENTS];
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-int		JX,JY, ZX,ZY, ExitX,ExitY;
-int		PlayerMovDir, PlayerFrame, PlayerPushing;
+int		JX,JY, JX2,JY2, ZX,ZY, ExitX,ExitY;
+int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
 int		PlayerGone,LevelSolved,GameOver;
 int		FrameCounter,TimeFrames,TimeLeft,Score;
 int		Gems,SokobanFields,Lights,Friends;

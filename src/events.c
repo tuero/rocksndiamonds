@@ -265,6 +265,7 @@ void HandleButton(int mx, int my, int button)
 int Gamespeed = 4;
 int Movemethod = 0;
 int Movespeed[2] = { 10, 3 };
+char *Movespeed_text[2] = { "asynchron", "syncron" };
 
 void HandleKey(KeySym key, int key_status)
 {
@@ -351,9 +352,15 @@ void HandleKey(KeySym key, int key_status)
       joy |= JOY_BUTTON_1 | JOY_DOWN;
       break;
     case XK_Shift_L:		/* Linker Feuerknopf */
+    case XK_Control_L:
+    case XK_Alt_L:
+    case XK_Meta_L:
       joy |= JOY_BUTTON_1;
       break;
     case XK_Shift_R:		/* Rechter Feuerknopf */
+    case XK_Control_R:
+    case XK_Alt_R:
+    case XK_Meta_R:
     case XK_B:			/* (Bombe legen) */
     case XK_b:
       joy |= JOY_BUTTON_2;
@@ -456,14 +463,16 @@ void HandleKey(KeySym key, int key_status)
 	case XK_8:
 	case XK_9:
 	  Movespeed[Movemethod] = (Movemethod == 0 ? 4 : 0) + (key - XK_0);
-	  printf("method == %d, speed == %d\n",
-		 Movemethod, Movespeed[Movemethod]);
+	  printf("method == %d, speed == %d (%s)\n",
+		 Movemethod, Movespeed[Movemethod],
+		 Movespeed_text[Movemethod]);
 	  break;
 
 	case XK_a:
 	  Movemethod = !Movemethod;
-	  printf("method == %d, speed == %d\n",
-		 Movemethod, Movespeed[Movemethod]);
+	  printf("method == %d, speed == %d (%s)\n",
+		 Movemethod, Movespeed[Movemethod],
+		 Movespeed_text[Movemethod]);
 	  break;
 
 	case XK_f:
@@ -490,9 +499,13 @@ void HandleKey(KeySym key, int key_status)
 #endif
 
 	case XK_x:
-	  /*
+
 	  {
-	    int i,j,k, num_steps = 4, step_size = TILEX / num_steps;
+	    int i,j,k, num_steps = 16, step_size = TILEX / num_steps;
+	    static long scroll_delay=0;
+	    long scroll_delay_value = 4*4 / num_steps;
+
+	    printf("Scroll test\n");
 
 	    for(i=0;i<10;i++)
 	    {
@@ -501,24 +514,43 @@ void HandleKey(KeySym key, int key_status)
 		for(k=0;k<num_steps;k++)
 		{
 		  int xxx = j*TILEX+k*step_size;
+		  int done = 0;
 
-		  XCopyArea(display,backbuffer,window,gc,
-			    REAL_SX+xxx,REAL_SY,
-			    FULL_SXSIZE-xxx,FULL_SYSIZE,
-			    REAL_SX,REAL_SY);
-		  XCopyArea(display,backbuffer,window,gc,
-			    REAL_SX,REAL_SY,
-			    xxx,FULL_SYSIZE,
-			    REAL_SX+FULL_SXSIZE-xxx,REAL_SY);
+		  while(!done)
+		  {
+  		    if (DelayReached(&scroll_delay, scroll_delay_value))
+  		    {
+  		      XCopyArea(display,backbuffer,window,gc,
+  				SX+xxx,SY,
+  				SXSIZE-xxx,SYSIZE,
+  				SX,SY);
+  		      XCopyArea(display,backbuffer,window,gc,
+  				SX,SY,
+  				xxx,SYSIZE,
+  				SX+SXSIZE-xxx,SY);
+  
+  		      XFlush(display);
+  		      XSync(display,FALSE);
 
-		  XFlush(display);
-		  XSync(display,FALSE);
+		      done = 1;
+  		    }
+		    else
+		    {
+		      Delay(1000);
+		    }
+		  }
+  
+		  /*
+		  Delay(160000 / num_steps);
+		  */
+		  /*
 		  Delay(120000 / num_steps);
+		  */
 		}
 	      }
 	    }
 	  }
-	  */
+
 	  break;
 
 	default:
@@ -612,6 +644,13 @@ void HandleJoystick()
 	DrawMainMenu();
 	return;
       }
+
+
+
+      if (PlayerMovPos)
+	ScrollFigure(0);
+
+
 
       if (tape.pausing || PlayerGone)
 	joy = 0;

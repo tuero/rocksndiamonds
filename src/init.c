@@ -361,6 +361,9 @@ void InitGfx()
   pix[PIX_DB_DOOR] = XCreatePixmap(display, window,
 				   3*DXSIZE,DYSIZE+VYSIZE,
 				   XDefaultDepth(display,screen));
+  pix[PIX_DB_FIELD] = XCreatePixmap(display, window,
+				    SXSIZE+2*TILEX,SYSIZE+2*TILEY,
+				    XDefaultDepth(display,screen));
 
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
   {
@@ -384,6 +387,7 @@ void InitGfx()
   }
 
   drawto = drawto_field = backbuffer = pix[PIX_DB_BACK];
+  fieldbuffer = pix[PIX_DB_FIELD];
 
   XCopyArea(display,pix[PIX_BACK],backbuffer,gc,
 	    0,0, WIN_XSIZE,WIN_YSIZE, 0,0);

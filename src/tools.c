@@ -258,6 +258,9 @@ void DrawPlayerField()
 {
   int x = JX, y = JY;
   int sx = SCROLLX(x), sy = SCROLLY(y);
+
+  int sxx = 0, syy = 0;
+
   int element = Feld[x][y];
   int graphic, phase;
   BOOL draw_thru_mask = FALSE;
@@ -306,10 +309,24 @@ void DrawPlayerField()
 
   graphic += PlayerFrame;
 
+
+  if (PlayerMovPos)
+  {
+    if (PlayerMovDir == MV_LEFT || PlayerMovDir == MV_RIGHT)
+      sxx = PlayerMovPos;
+    else
+      syy = PlayerMovPos;
+  }
+
+
   if (draw_thru_mask)
-    DrawGraphicThruMask(sx,sy, graphic);
+    DrawGraphicThruMask(sx + sxx, sy + syy, graphic);
   else
-    DrawGraphic(sx,sy, graphic);
+    DrawGraphicShifted(sx,sy,sxx,syy,graphic,CUT_NO_CUTTING);
+  /*
+    DrawGraphic(sx + sxx, sy + syy, graphic);
+    */
+
 
   /* draw things in front of player (EL_DYNAMIT || EL_DYNABOMB) */
 

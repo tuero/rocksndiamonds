@@ -779,10 +779,18 @@ static int ConvertXImageDepth(Display *display, XImage **image)
     register int dwx, dwy;
     byte *data;
 
-    data = (byte *)malloc(width * height);
+    data = (byte *)malloc(width * height * depth);
     old_image = *image;
+
+    /*
     new_image = XCreateImage(display,visual,depth,
 			     ZPixmap,0,data,width,height,8,0);
+			     */
+
+    new_image = XGetImage(display,RootWindow(display,screen),
+			  0,0,width,height,0xffffffff,ZPixmap);
+
+
     if (!new_image)
       return(GIF_NoMemory);
 
@@ -811,13 +819,17 @@ static int ConvertXImageDepth(Display *display, XImage **image)
     }
     else	/* other format change than 8 bit -> 4 bit */
     {
-      register unsigned long pixel_value;
+      unsigned long pixel_value;
 
       for (dwx=0; dwx<width; dwx++)
       {
 	for (dwy=0; dwy<height; dwy++)
 	{
 	  pixel_value = XGetPixel(old_image, dwx, dwy);
+
+	  if (pixel_value > 0xff)
+	    printf("pixel = %lx", pixel_value);
+
 	  XPutPixel(new_image, dwx, dwy, pixel_value);
 	}
       }

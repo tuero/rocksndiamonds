@@ -20,7 +20,7 @@ SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
 # because the GIF loading routines are still a bit beta.
 # If you use the Xpm library, convert the GIF files to Xpm
 # files (and the mask files ('*Maske.gif') to xbm files).
-# XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
+XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
 
 CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
@@ -38,8 +38,8 @@ DEBUG = -DDEBUG -g -Wall
 # LIBS = -L/usr/local/X11/lib -lXpm -lX11 -lm -lsocket -R/usr/local/X11/lib
 #					# for SunOS and others
 
-# LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
-LIBS = -L/usr/X11R6/lib -lX11 -lm
+LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
+# LIBS = -L/usr/X11R6/lib -lX11 -lm
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -87,9 +87,13 @@ all:	$(OBJS)
 clean:
 	$(RM) $(OBJS)
 
+BACKUP_DIR = /home/aeglos/BACKUP/rnd
+BACKUP_DATE = `date +%y%m%d`
+BACKUP_FILE = $(BACKUP_DIR)/rnd-$(BACKUP_DATE).tgz
+
 backup:
-	@echo "tar cvzf /usr/AEGLOS/BACKUP/rnd-`date +%Y%m%d | cut -b 3-8`.tgz *.c *.h Makefile"
-	@tar cvzf /usr/AEGLOS/BACKUP/rnd-`date +%Y%m%d | cut -b 3-8`.tgz *.c *.h Makefile
+	@echo "tar cvzf $(BACKUP_FILE) *.c *.h Makefile"
+	@tar cvzf $(BACKUP_FILE) *.c *.h Makefile
 
 depend:
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend

@@ -2798,6 +2798,15 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   JX = newJX;
   JY = newJY;
 
+
+  JX2 = oldJX;
+  JY2 = oldJY;
+
+  PlayerMovPos = TILEX/4;
+  PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 3*TILEX/4;
+
+  ScrollFigure(-1);
+
   if (Store[oldJX][oldJY])
   {
     DrawGraphic(SCROLLX(oldJX),SCROLLY(oldJY),el2gfx(Store[oldJX][oldJY]));
@@ -2894,6 +2903,24 @@ BOOL MoveFigure(int dx, int dy)
     RemoveHero();
 
   return(moved);
+}
+
+void ScrollFigure(int init)
+{
+  static long actual_frame_counter;
+
+  if (init)
+  {
+    actual_frame_counter = FrameCounter;
+    return;
+  }
+  else if (!FrameReached(&actual_frame_counter,1))
+    return;
+
+  PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/4;
+
+  DrawLevelElement(JX2,JY2, Feld[JX2][JY2]);
+  DrawPlayerField();
 }
 
 void TestIfGoodThingHitsBadThing(int goodx, int goody)

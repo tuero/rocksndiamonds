@@ -1,23 +1,6 @@
 
-Release Version 1.0 [9 APR 97]
-------------------------------
-	- the game now contains many really playable levels,
-	  not only a few levels for testing
-	- the game is now even better playable by keyboard
-	  (now you have the same gameplay functionality
-	  compared to playing with a joystick. Especially
-	  there are diagonal directions with keyboard playing
-	  and the fire buttons are mapped to the shift keys)
-	- a lot of new elements for better emulation of levels
-	  from the games "Boulderdash", "Emerald Mine" and
-	  "Sokoban". New elements to build "Dynablaster" style
-	  levels.
-	- enhanced functionality of the level tape recorder
-	  to make it possible to go on with a game at any tape
-	  position
-
 Prerelease Version 0.9b [4 NOV 95]
-----------------------------------
+------------------------------------
 	- the game is now completely Freeware
 	- the game is now better playable by keyboard
 	  (in the last version, the player was making more than
