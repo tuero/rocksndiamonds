@@ -305,6 +305,8 @@ struct GfxInfo
 
   Bitmap *background_bitmap;
   int background_bitmap_mask;
+
+  boolean menu_main_hide_static_text;
 };
 
 struct FontInfo

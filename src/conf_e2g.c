@@ -93,22 +93,6 @@ element_to_graphic[] =
     IMG_BD_AMOEBA
   },
   {
-    EL_BD_AMOEBA_PART1,				-1, -1,
-    IMG_BD_AMOEBA_PART1
-  },
-  {
-    EL_BD_AMOEBA_PART2,				-1, -1,
-    IMG_BD_AMOEBA_PART2
-  },
-  {
-    EL_BD_AMOEBA_PART3,				-1, -1,
-    IMG_BD_AMOEBA_PART3
-  },
-  {
-    EL_BD_AMOEBA_PART4,				-1, -1,
-    IMG_BD_AMOEBA_PART4
-  },
-  {
     EL_BD_BUTTERFLY,				-1, -1,
     IMG_BD_BUTTERFLY
   },
@@ -793,80 +777,20 @@ element_to_graphic[] =
     IMG_AMOEBA_WET
   },
   {
-    EL_AMOEBA_WET_PART1,			-1, -1,
-    IMG_AMOEBA_WET_PART1
-  },
-  {
-    EL_AMOEBA_WET_PART2,			-1, -1,
-    IMG_AMOEBA_WET_PART2
-  },
-  {
-    EL_AMOEBA_WET_PART3,			-1, -1,
-    IMG_AMOEBA_WET_PART3
-  },
-  {
-    EL_AMOEBA_WET_PART4,			-1, -1,
-    IMG_AMOEBA_WET_PART4
+    EL_AMOEBA_DRIPPING,				-1, -1,
+    IMG_AMOEBA_DRIPPING
   },
   {
     EL_AMOEBA_DRY,				-1, -1,
     IMG_AMOEBA_DRY
   },
   {
-    EL_AMOEBA_DRY_PART1,			-1, -1,
-    IMG_AMOEBA_DRY_PART1
-  },
-  {
-    EL_AMOEBA_DRY_PART2,			-1, -1,
-    IMG_AMOEBA_DRY_PART2
-  },
-  {
-    EL_AMOEBA_DRY_PART3,			-1, -1,
-    IMG_AMOEBA_DRY_PART3
-  },
-  {
-    EL_AMOEBA_DRY_PART4,			-1, -1,
-    IMG_AMOEBA_DRY_PART4
-  },
-  {
     EL_AMOEBA_FULL,				-1, -1,
     IMG_AMOEBA_FULL
   },
   {
-    EL_AMOEBA_FULL_PART1,			-1, -1,
-    IMG_AMOEBA_FULL_PART1
-  },
-  {
-    EL_AMOEBA_FULL_PART2,			-1, -1,
-    IMG_AMOEBA_FULL_PART2
-  },
-  {
-    EL_AMOEBA_FULL_PART3,			-1, -1,
-    IMG_AMOEBA_FULL_PART3
-  },
-  {
-    EL_AMOEBA_FULL_PART4,			-1, -1,
-    IMG_AMOEBA_FULL_PART4
-  },
-  {
     EL_AMOEBA_DEAD,				-1, -1,
     IMG_AMOEBA_DEAD
-  },
-  {
-    EL_AMOEBA_DEAD_PART1,			-1, -1,
-    IMG_AMOEBA_DEAD_PART1
-  },
-  {
-    EL_AMOEBA_DEAD_PART2,			-1, -1,
-    IMG_AMOEBA_DEAD_PART2
-  },
-  {
-    EL_AMOEBA_DEAD_PART3,			-1, -1,
-    IMG_AMOEBA_DEAD_PART3
-  },
-  {
-    EL_AMOEBA_DEAD_PART4,			-1, -1,
-    IMG_AMOEBA_DEAD_PART4
   },
   {
     EL_EM_KEY1,					-1, -1,

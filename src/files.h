@@ -33,5 +33,6 @@ void LoadSetup(void);
 void SaveSetup(void);
 
 void LoadCustomElementDescriptions();
+void LoadSpecialMenuDesignSettings();
 
 #endif	/* FILES_H */

@@ -286,6 +286,7 @@ static void InitImages()
   ReinitializeGraphics();
 
   LoadCustomElementDescriptions();
+  LoadSpecialMenuDesignSettings();
 }
 
 static void InitSound()
@@ -631,6 +632,7 @@ void ReloadCustomArtwork()
     ReinitializeGraphics();
 
     LoadCustomElementDescriptions();
+    LoadSpecialMenuDesignSettings();
 
     FreeTileClipmasks();
     InitTileClipmasks();
@@ -834,6 +836,19 @@ void InitElementGraphicInfo()
 	element_info[i].graphic[act] = default_action_graphic;
     }
   }
+
+#if 0
+#if DEBUG
+  if (options.verbose)
+  {
+    for (i=0; i<MAX_NUM_ELEMENTS; i++)
+      if (element_info[i].graphic[ACTION_DEFAULT] == IMG_CHAR_QUESTION &&
+	  i != EL_CHAR_QUESTION)
+	Error(ERR_RETURN, "warning: no graphic for element '%s' (%d)",
+	      element_info[i].token_name, i);
+  }
+#endif
+#endif
 }
 
 void InitElementSpecialGraphicInfo()

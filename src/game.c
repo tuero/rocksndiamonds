@@ -102,7 +102,9 @@
 #define NUM_GAME_BUTTONS		6
 
 /* forward declaration for internal use */
+#if 0
 static void ResetGfxAnimation(int, int);
+#endif
 
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
@@ -1254,18 +1256,22 @@ int NewHiScore()
 
 static void ResetRandomAnimationValue(int x, int y)
 {
-  int element = Feld[x][y];
-  int graphic = el2img(element);
-
-  /* reset random value not until one full delay cycle has reached */
-  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-      GfxFrame[x][y] > ANIM_DELAY(graphic))
-    GfxRandom[x][y] = INIT_GFX_RANDOM();
+  GfxRandom[x][y] = INIT_GFX_RANDOM();
 }
 
 static void ResetGfxAnimation(int x, int y)
 {
-  ResetRandomAnimationValue(x, y);
+#if 0
+#if 1
+  int element = Feld[x][y];
+  int graphic = el2img(element);
+
+  /* reset random value not until one full delay cycle was reached */
+  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+      GfxFrame[x][y] > ANIM_DELAY(graphic))
+#endif
+    ResetRandomAnimationValue(x, y);
+#endif
 
   GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
@@ -2189,6 +2195,8 @@ void Impact(int x, int y)
     {
       Feld[x][y] = EL_AMOEBA_CREATING;
       Store[x][y] = EL_AMOEBA_WET;
+
+      ResetRandomAnimationValue(x, y);
     }
     return;
   }
@@ -4380,6 +4388,7 @@ static void ChangeElement(int x, int y)
     MovDelay[x][y] = changing_element[element].change_delay + 1;
 
     ResetGfxAnimation(x, y);
+    ResetRandomAnimationValue(x, y);
 
     if (changing_element[element].pre_change_function)
       changing_element[element].pre_change_function(x, y);
@@ -4400,6 +4409,7 @@ static void ChangeElement(int x, int y)
     Feld[x][y] = changing_element[element].next_element;
 
     ResetGfxAnimation(x, y);
+    ResetRandomAnimationValue(x, y);
 
     DrawLevelField(x, y);
 
@@ -4697,7 +4707,7 @@ void GameActions()
 #endif
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-	IS_NEW_FRAME(GfxFrame[x][y], graphic))
+	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
       ResetRandomAnimationValue(x, y);
 
     SetRandomAnimationValue(x, y);
@@ -6452,6 +6462,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   MovDelay[jx][jy] = 96;
 
   ResetGfxAnimation(jx, jy);
+  ResetRandomAnimationValue(jx, jy);
 
   if (player->dynamite)
   {

@@ -114,12 +114,21 @@ static void drawCursorXY(int xpos, int ypos, int graphic)
   drawCursorExt(xpos, ypos, -1, graphic);
 }
 
+void DrawTextStatic(int x, int y, char *text, int font_size, int font_type)
+{
+  if (game_status == MAINMENU && gfx.menu_main_hide_static_text)
+    return;
+
+  DrawText(x, y, text, font_size, font_type);
+}
+
 void DrawHeadline()
 {
-  int x = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING) * FONT1_XSIZE) / 2;
+  int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * FONT1_XSIZE) / 2;
+  int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * FONT2_XSIZE) / 2;
 
-  DrawText(x, SY + 8, PROGRAM_TITLE_STRING, FS_BIG, FC_YELLOW);
-  DrawTextFCentered(46, FC_RED, WINDOW_SUBTITLE_STRING);
+  DrawTextStatic(x1, SY + 8,  PROGRAM_TITLE_STRING,   FS_BIG,   FC_YELLOW);
+  DrawTextStatic(x2, SY + 46, WINDOW_SUBTITLE_STRING, FS_SMALL, FC_RED);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -206,17 +215,17 @@ void DrawMainMenu()
 
   DrawHeadline();
 
-  DrawText(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
   DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
-  DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
 	   (leveldir_current->readonly ? FC_RED : FC_YELLOW));
-  DrawText(SX + 32,    SY + 4*32, "Hall Of Fame", FS_BIG, FC_GREEN);
-  DrawText(SX + 32,    SY + 5*32, "Level Creator", FS_BIG, FC_GREEN);
-  DrawText(SY + 32,    SY + 6*32, "Info Screen", FS_BIG, FC_GREEN);
-  DrawText(SX + 32,    SY + 7*32, "Start Game", FS_BIG, FC_GREEN);
-  DrawText(SX + 32,    SY + 8*32, "Setup", FS_BIG, FC_GREEN);
-  DrawText(SX + 32,    SY + 9*32, "Quit", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 4*32, "Hall Of Fame", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 5*32, "Level Creator", FS_BIG, FC_GREEN);
+  DrawTextStatic(SY + 32,    SY + 6*32, "Info Screen", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 7*32, "Start Game", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 8*32, "Setup", FS_BIG, FC_GREEN);
+  DrawTextStatic(SX + 32,    SY + 9*32, "Quit", FS_BIG, FC_GREEN);
 
   DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
@@ -241,8 +250,8 @@ void DrawMainMenu()
   drawCursorXY(14, 1, IMG_ARROW_BLUE_RIGHT);
 #endif
 
-  DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
-	   FS_SMALL, FC_RED);
+  DrawTextStatic(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
+		 FS_SMALL, FC_RED);
 
   if (leveldir_current->name)
   {

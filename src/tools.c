@@ -1155,6 +1155,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
       frame = graphic_info[graphic].anim_frames - 1;
     }
   }
+#if 0
   else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
   {
     graphic = (element == EL_BD_AMOEBA ? IMG_BD_AMOEBA_PART1 :
@@ -1165,6 +1166,16 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 
     graphic += (x + 2 * y + 4) % 4;
   }
+#endif
+
+#if 0
+  if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
+  {
+    if (Feld[lx][ly] == EL_AMOEBA_DRIPPING)
+      printf("---> %d -> %d / %d [%d]\n",
+	     element, graphic, frame, GfxRandom[lx][ly]);
+  }
+#endif
 
   if (dx || dy)
     DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
