@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-10T16:43:50Z
  *
  * cave data structures
@@ -17,6 +14,9 @@
 #include "tile.h"
 #include "level.h"
 #include "file.h"
+
+
+#if defined(TARGET_X11)
 
 struct cave_node *cave_list;
 

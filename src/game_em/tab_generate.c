@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-04-19T13:26:05Z
  *
  * construct some tables to be included directly in emerald mine source.
@@ -16,6 +13,9 @@
 
 #include <stdio.h>
 #include "tile.h"
+
+
+#if defined(TARGET_X11)
 
 /* ---------------------------------------------------------------------- */
 
@@ -4274,6 +4274,7 @@ SPR_still,1, 113,113,113,113,113,113,113,113,
 SPR_MAX
 };
 
+#if 0
 int ttl_map[] = {
 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -4284,6 +4285,7 @@ int ttl_map[] = {
 -1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31, /* abcdefghijklmno */
 32,33,34,35,36,37,38,39,40,41,42,-1,-1,-1,-1,-1  /* pqrstuvwxyz */
 };
+#endif
 
 /* ---------------------------------------------------------------------- */
 
@@ -4649,6 +4651,7 @@ void create_spr()
 
 void create_ttl()
 {
+#if 0
   int i, j, k;
   int buffer[128];
 
@@ -4660,14 +4663,21 @@ void create_ttl()
     }
     else
     {
+#if 1
+      j = (ttl_map[i] % 22) * (14 * 2);
+      k = (ttl_map[i] / 22);
+      buffer[i] = k * (320 * 2) + j;
+#else
       j = (ttl_map[i] % 22) * 14;
       k = (ttl_map[i] / 22);
       buffer[i] = k * 320 + j;
+#endif
     }
   }
 
   for (i = 0; i < 128; i++)
     map_ttl[i] = buffer[i];
+#endif
 }
 
 void tab_generate()

@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-13T14:36:17Z
  *
  * graphics manipulation crap
@@ -14,6 +11,9 @@
 #include "level.h"
 
 #include <stdio.h>
+
+
+#if defined(TARGET_X11)
 
 unsigned int frame; /* current frame */
 unsigned int screen_x; /* current scroll position */
@@ -67,21 +67,21 @@ void blitscreen(void)
 		 display, screenPixmap, xwindow, screenGC);
 #endif
 
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 12 * TILEY, 0, 0);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 12 * TILEY, SX, SY);
 	} else if (x < 2 * TILEX && y >= 2 * TILEY) {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 14 * TILEY - y, 0, 0);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 20 * TILEX, y - 2 * TILEY, 0, 14 * TILEY - y);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 14 * TILEY - y, SX, SY);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 20 * TILEX, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
 	} else if (x >= 2 * TILEX && y < 2 * TILEY) {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 12 * TILEY, 0, 0);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 12 * TILEY, 22 * TILEX - x, 0);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 12 * TILEY, SX, SY);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 12 * TILEY, SX + 22 * TILEX - x, SY);
 	} else {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 14 * TILEY - y, 0, 0);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 14 * TILEY - y, 22 * TILEX - x, 0);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 22 * TILEX - x, y - 2 * TILEY, 0, 14 * TILEY - y);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, 0, x - 2 * TILEX, y - 2 * TILEY, 22 * TILEX - x, 14 * TILEY - y);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 14 * TILEY - y, SX, SY);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 14 * TILEY - y, SX + 22 * TILEX - x, SY);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 22 * TILEX - x, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
+		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, 0, x - 2 * TILEX, y - 2 * TILEY, SX + 22 * TILEX - x, SY + 14 * TILEY - y);
 	}
 
-	XCopyArea(display, scorePixmap, xwindow, scoreGC, 0, 0, 20 * TILEX, SCOREY, 0, 12 * TILEY);
+	XCopyArea(display, scorePixmap, xwindow, scoreGC, 0, 0, 20 * TILEX, SCOREY, SX, SY + 12 * TILEY);
 	XFlush(display);
 
 	xdebug("blitscreen - done");
@@ -182,55 +182,6 @@ static void blitplayer(struct PLAYER *ply)
 		x, y - 14 * TILEY);
       XSetClipMask(display, screenGC, None);
     }
-
-
-#if 0
-
-#if 0
-    printf("::: %ld, %ld\n", objmaskBitmap, sprmaskBitmap);
-#endif
-
-    if (sprmaskBitmap)
-    {
-      int width = 16 * 4;
-      int height = 16 * 4;
-      XImage *src_ximage = XGetImage(display, sprmaskBitmap, 0, 0,
-				     width, height, AllPlanes, ZPixmap);
-      XImage *dst_ximage = XGetImage(display, xwindow, 0, 0,
-				     width, height, AllPlanes, ZPixmap);
-      int x, y;
-
-      if (src_ximage == NULL)
-      {
-	printf("src_ximage failed\n");
-	exit(1);
-      }
-
-      if (dst_ximage == NULL)
-      {
-	printf("dst_ximage failed\n");
-	exit(1);
-      }
-
-      for (x=0; x<width; x++)
-      {
-	for (y=0; y<height; y++)
-	{
-	  unsigned long pixel = XGetPixel(src_ximage, x, y);
-
-	  if (pixel != BlackPixel(display, screen))
-	    pixel = WhitePixel(display, screen);
-
-	  XPutPixel(dst_ximage, x, y, pixel);
-	}
-      }
-
-      XPutImage(display, xwindow, screenGC, dst_ximage, 0, 0, 0, 13 * TILEY,
-		width, height);
-    }
-#endif
-
-
   }
 }
 
@@ -240,37 +191,15 @@ void game_initscreen(void)
 
 	xdebug("game_initscreen");
 
-#if 0
-	printf("--> M5.1: xwindow == %ld\n", xwindow);
-#endif
-
 	frame = 6;
 	screen_x = 0;
 	screen_y = 0;
 
-#if 0
-	printf("--> M5.2: &window == %ld\n", &window);
-	printf("--> M5.2: xwindow == %ld\n", xwindow);
-	printf("--> M5.2: &xwindow == %ld\n", &xwindow);
-	printf("--> M5.2: screen == %ld\n", screen);
-	printf("--> M5.2: &screentiles[0][0] == %ld\n", &screentiles[0][0]);
-#endif
-
 	for (y = 0; y < 14; y++) {
 		for (x = 0; x < 22; x++) {
-#if 0
-		  printf("--> M5.2.A: xwindow == %ld [%d,%d]\n", xwindow, x,y);
-#endif
 			screentiles[y][x] = -1;
-#if 0
-		  printf("--> M5.2.B: xwindow == %ld [%d,%d]\n", xwindow, x,y);
-#endif
 		}
 	}
-
-#if 0
-	printf("--> M5.3: xwindow == %ld\n", xwindow);
-#endif
 
 	colour_shuffle();
 	colours[0] += 16;
@@ -278,18 +207,10 @@ void game_initscreen(void)
 	colours[2] += 16;
 	colour_anim = 0;
 
-#if 0
-	printf("--> M5.4: xwindow == %ld\n", xwindow);
-#endif
-
 	XFillRectangle(display, scorePixmap, scoreGC, 0, 0, 20 * TILEX, SCOREY);
 	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 11 * SCOREX, colours[0] * SCOREY, 3 * SCOREX, SCOREY, 1 * SCOREX, 0); /* 0-63 time */
 	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 18 * SCOREX, colours[0] * SCOREY, 6 * SCOREX, SCOREY, 15 * SCOREX, 0); /* 112-207 diamonds */
 	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 14 * SCOREX, colours[0] * SCOREY, 4 * SCOREX, SCOREY, 32 * SCOREX, 0); /* 256-319 score */
-
-#if 0
-	printf("--> M5.X: xwindow == %ld\n", xwindow);
-#endif
 }
 
 void game_blitscore(void)
@@ -419,31 +340,62 @@ void title_animscreen(void)
 	Random = Random * 129 + 1;
 }
 
-void title_string(unsigned int y, unsigned int left, unsigned int right, char *string)
+static int ttl_map[] =
 {
-	int i;
-	unsigned int x;
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,0,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,2,3,4,-1,      /* !',-. */
+  5,6,7,8,9,10,11,12,13,14,15,-1,-1,-1,-1,16,      /* 0123456789:? */
+  -1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31, /* ABCDEFGHIJKLMNO */
+  32,33,34,35,36,37,38,39,40,41,42,-1,-1,-1,-1,-1, /* PQRSTUVWXYZ */
+  -1,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31, /* abcdefghijklmno */
+  32,33,34,35,36,37,38,39,40,41,42,-1,-1,-1,-1,-1  /* pqrstuvwxyz */
+};
 
-	xdebug("title_string");
+void title_string(unsigned int y, unsigned int left, unsigned int right,
+		  char *string)
+{
+  int i;
+  unsigned int x;
 
-	y *= TILEY; left *= SCOREX; right *= SCOREX;
-	x = (left + right - strlen(string) * 12) / 2;
-	if (x < left || x >= right) x = left;
+  xdebug("title_string");
 
-	XCopyArea(display, ttlPixmap, screenPixmap, screenGC, left, y, right - left, TILEY, left, y);
-	if (ttlmaskBitmap) XSetClipMask(display, screenGC, ttlmaskBitmap);
-	for (i = 0; string[i] && x < right; i++) {
-		unsigned short ch_pos, ch_x, ch_y;
-		ch_pos = map_ttl[string[i] & 127];
-		if (ch_pos < 640) {
-			ch_x = (ch_pos % 320);
-			ch_y = (ch_pos / 320 + 12) * TILEY;
-			if (ttlmaskBitmap) XSetClipOrigin(display, screenGC, x - ch_x, y - ch_y);
-			XCopyArea(display, ttlPixmap, screenPixmap, screenGC, ch_x, ch_y, 12, TILEY, x, y);
-		}
-		x += 12;
-	}
-	XSetClipMask(display, screenGC, None);
+  y *= TILEY;
+  left *= SCOREX;
+  right *= SCOREX;
+
+  x = (left + right - strlen(string) * MENUFONTX) / 2;
+  if (x < left || x >= right) x = left;
+
+  /* restore background graphic where text will be drawn */
+  XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
+	    left, y, right - left, MENUFONTY, left, y);
+
+  if (ttlmaskBitmap)
+    XSetClipMask(display, screenGC, ttlmaskBitmap);
+
+  for (i = 0; string[i] && x < right; i++)
+  {
+    int ch_pos, ch_x, ch_y;
+
+    ch_pos = ttl_map[string[i] & 127];
+
+    if (ch_pos == -1 || ch_pos > 22 * 2)
+      continue;				/* no graphic for this character */
+
+    ch_x = (ch_pos % 22) * GFXMENUFONTX;
+    ch_y = (ch_pos / 22 + 12) * TILEY;
+
+    if (ttlmaskBitmap)
+      XSetClipOrigin(display, screenGC, x - ch_x, y - ch_y);
+
+    XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
+	      ch_x, ch_y, MENUFONTX, MENUFONTY, x, y);
+
+    x += MENUFONTX;
+  }
+
+  XSetClipMask(display, screenGC, None);
 }
 
 #endif

@@ -1,20 +1,34 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#if 1
-#define TILEX 32
-#define TILEY 32
-#else
-#define TILEX 16
-#define TILEY 16
-#endif
-#define SCOREX 8
-#define SCOREY 9
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+
+#define ORIG_TILEX		16
+#define ORIG_TILEY		16
+#define ORIG_SCOREX		8
+#define ORIG_SCOREY		9
+#define ORIG_GFXMENUFONTX	14
+#define ORIG_GFXMENUFONTY	16
+#define ORIG_MENUFONTX		12
+#define ORIG_MENUFONTY		16
+
+#define ZOOM_FACTOR		2
+
+#define TILEX			(ORIG_TILEX		* ZOOM_FACTOR)
+#define TILEY			(ORIG_TILEY		* ZOOM_FACTOR)
+#define SCOREX			(ORIG_SCOREX		* ZOOM_FACTOR)
+#define SCOREY			(ORIG_SCOREY		* ZOOM_FACTOR)
+#define GFXMENUFONTX		(ORIG_GFXMENUFONTX	* ZOOM_FACTOR)
+#define GFXMENUFONTY		(ORIG_GFXMENUFONTY	* ZOOM_FACTOR)
+#define MENUFONTX		(ORIG_MENUFONTX		* ZOOM_FACTOR)
+#define MENUFONTY		(ORIG_MENUFONTY		* ZOOM_FACTOR)
+
+/* often used screen positions */
+#define SX			8
+#define SY			8
 
 #if 0
 

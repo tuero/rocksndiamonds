@@ -194,13 +194,13 @@ CNFS_CMD = ../Scripts/create_element_defs.pl
 
 TIMESTAMP_FILE = conftime.h
 
-LIBGAMEDIR = libgame
-LIBGAME = $(LIBGAMEDIR)/libgame.a
+LIBGAME_DIR = libgame
+LIBGAME = $(LIBGAME_DIR)/libgame.a
 
-LIBEMDIR = libem
-LIBEM = $(LIBEMDIR)/libem.a
+GAME_EM_DIR = game_em
+GAME_EM = $(GAME_EM_DIR)/game_em.a
 
-RNDLIBS = $(LIBGAME) $(LIBEM)
+RNDLIBS = $(LIBGAME) $(GAME_EM)
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
@@ -213,20 +213,20 @@ endif
 # build targets
 # -----------------------------------------------------------------------------
 
-all: libgame_dir libem_dir $(PROGNAME)
+all: libgame_dir game_em_dir $(PROGNAME)
 
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
 
 libgame_dir:
-	@$(MAKE) -C $(LIBGAMEDIR)
+	@$(MAKE) -C $(LIBGAME_DIR)
 $(LIBGAME):
-	@$(MAKE) -C $(LIBGAMEDIR)
+	@$(MAKE) -C $(LIBGAME_DIR)
 
-libem_dir:
-	@$(MAKE) -C $(LIBEMDIR)
-$(LIBEM):
-	@$(MAKE) -C $(LIBEMDIR)
+game_em_dir:
+	@$(MAKE) -C $(GAME_EM_DIR)
+$(GAME_EM):
+	@$(MAKE) -C $(GAME_EM_DIR)
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -243,7 +243,7 @@ conf_snd.h: conf_snd.c
 conf_mus.h: conf_mus.c
 	@$(MAKE) auto-conf
 
-$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(LIBEM)
+$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM)
 	@date '+"[%Y-%m-%d %H:%M]"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
@@ -256,11 +256,11 @@ $(ICON):
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 clean-obj:
-	$(MAKE) -C $(LIBGAMEDIR) clean
-	$(MAKE) -C $(LIBEMDIR) clean
+	$(MAKE) -C $(LIBGAME_DIR) clean
+	$(MAKE) -C $(GAME_EM_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
-	$(RM) $(LIBEM)
+	$(RM) $(GAME_EM)
 
 clean-ico:
 	$(RM) $(ICONBASE).ico
@@ -280,8 +280,8 @@ clean: clean-obj clean-ico clean-bin
 dist-clean: clean-obj
 
 depend:
-	$(MAKE) -C $(LIBGAMEDIR) depend
-	$(MAKE) -C $(LIBEMDIR) depend
+	$(MAKE) -C $(LIBGAME_DIR) depend
+	$(MAKE) -C $(GAME_EM_DIR) depend
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
 
 ifeq (.depend,$(wildcard .depend))

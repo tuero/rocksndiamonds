@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* third part of synchro.
  *
  * handle global elements.
@@ -11,6 +8,9 @@
 #include "tile.h"
 #include "level.h"
 #include "sample.h"
+
+
+#if defined(TARGET_X11)
 
 void synchro_3(void)
 {

@@ -636,6 +636,8 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 
   Important note: The scaling code currently only supports scaling of the image
   up or down by a power of 2 -- other scaling factors currently not supported!
+  Also not supported is scaling of pixmap masks (with depth 1); to scale them,
+  better use Pixmap_to_Mask() for now.
   -----------------------------------------------------------------------------
 */
 
@@ -648,13 +650,9 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   int bits_per_pixel;
   int bytes_per_pixel;
   int x, y, xx, yy, i;
-#if 1
-  boolean scale_down = (src_width > dst_width);
-  int zoom_factor;
-#else
-  int zoom_factor = src_width / dst_width;	/* currently very limited! */
-#endif
   int row_skip, col_skip;
+  int zoom_factor;
+  boolean scale_down = (src_width > dst_width);
 
   if (scale_down)
   {
@@ -706,33 +704,6 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   {
     row_skip = src_width * bytes_per_pixel;
 
-#if 0
-    printf("::: %d, %d -> %d, %d [%d / %d]\n[%ld -> %ld (%ld)] [%ld -> %ld (%ld)]\n",
-	   src_width, src_height,
-	   dst_width, dst_height,
-	   zoom_factor, bytes_per_pixel,
-	   src_ptr,
-	   src_ptr + src_width * src_height * bytes_per_pixel,
-	   src_width * src_height * bytes_per_pixel,
-	   dst_ptr,
-	   dst_ptr + dst_width * dst_height * bytes_per_pixel,
-	   dst_width * dst_height * bytes_per_pixel);
-
-    printf("A\n");
-
-    for (i = 0; i < src_width * src_height * bytes_per_pixel;
-	 i++)
-    {
-      byte x = *(byte *)(src_ptr + i);
-
-      printf("::: %d ...\n", i);
-
-      x = x * 1;
-    }
-
-    printf("B\n");
-#endif
-
     /* scale image up by scaling factor 'zoom_factor' */
     for (y = 0; y < src_height; y++)
     {
@@ -741,19 +712,11 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
 	if (yy > 0)
 	  src_ptr -= row_skip;
 
-#if 0
-	printf("::: [%d -> %ld / %ld]\n", y, src_ptr, dst_ptr);
-#endif
-
 	for (x = 0; x < src_width; x++)
 	{
 	  for (xx = 0; xx < zoom_factor; xx++)
 	    for (i = 0; i < bytes_per_pixel; i++)
-#if 1
 	      *dst_ptr++ = *(src_ptr + i);
-#else
-	      *dst_ptr++ = 0;
-#endif
 
 	  src_ptr += i;
 	}

@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-13T15:29:40Z
  *
  * handle input from x11 and keyboard and joystick
@@ -21,6 +18,9 @@
 #include "global.h"
 #include "display.h"
 #include "level.h"
+
+
+#if defined(TARGET_X11)
 
 unsigned long Random;
 

@@ -1,12 +1,12 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-10T17:39:15Z
  *
  * handle sounds in emerald mine
  */
 
 #include "../libgame/platform.h"
+
+
+#if defined(TARGET_X11)
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 

@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* first part of synchro.
  *
  * game logic for players.
@@ -11,6 +8,9 @@
 #include "tile.h"
 #include "level.h"
 #include "sample.h"
+
+
+#if defined(TARGET_X11)
 
 static void player(struct PLAYER *);
 static int test(struct PLAYER *);

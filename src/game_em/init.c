@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-10T18:03:54Z
  *
  * open X11 display and sound
@@ -36,6 +33,9 @@
 #include "global.h"
 #include "display.h"
 #include "sample.h"
+
+
+#if defined(TARGET_X11)
 
 #if 0
 Display *display;
@@ -169,6 +169,7 @@ static const int sound_volume[SAMPLE_MAX] = {
 	100
 };
 
+#if 0
 static void xdebug(char *msg)
 {
 #if 1
@@ -176,6 +177,7 @@ static void xdebug(char *msg)
   printf("EM DEBUG: %s\n", msg);
 #endif
 }
+#endif
 
 int open_all(void)
 {
@@ -414,9 +416,12 @@ int open_all(void)
 	  }
 #endif
 
-	  pcxBitmapsX2[i] = ZoomBitmap(pcxBitmaps[i],
-				       pcxBitmaps[i]->width * 2,
-				       pcxBitmaps[i]->height * 2);
+	  if (ZOOM_FACTOR > 1)
+	    pcxBitmapsX2[i] = ZoomBitmap(pcxBitmaps[i],
+					 pcxBitmaps[i]->width  * ZOOM_FACTOR,
+					 pcxBitmaps[i]->height * ZOOM_FACTOR);
+	  else
+	    pcxBitmapsX2[i] = pcxBitmaps[i];
 
 #if 1
 

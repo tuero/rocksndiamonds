@@ -1,5 +1,5 @@
 # =============================================================================
-# Rocks'n'Diamonds Makefile (libem)
+# Rocks'n'Diamonds Makefile (game_em)
 # -----------------------------------------------------------------------------
 # (c) 1995-2004 Holger Schemel <info@artsoft.org>
 # -----------------------------------------------------------------------------
@@ -36,25 +36,25 @@ OBJS =	cave.o		\
 	tab_generate.o	\
 	ulaw_generate.o
 
-LIBEM = libem.a
+GAME_EM = game_em.a
 
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
-all: $(LIBEM)
+all: $(GAME_EM)
 
-$(LIBEM): $(OBJS)
-	$(AR) cru $(LIBEM) $(OBJS)
-	$(RANLIB) $(LIBEM)
+$(GAME_EM): $(OBJS)
+	$(AR) cru $(GAME_EM) $(OBJS)
+	$(RANLIB) $(GAME_EM)
 
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(LIBEM)
+	$(RM) $(GAME_EM)
 
 
 # -----------------------------------------------------------------------------

@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-20T09:41:18Z
  *
  * identify all emerald mine caves and turn them into v6 format.
@@ -10,6 +7,13 @@
  * and clean up v6 caves (acid, number limits) which should(!) be inconsequential,
  * but no doubt it will break some caves.
  */
+
+#include "tile.h"
+#include "level.h"
+
+
+#if defined(TARGET_X11)
+
 static unsigned char remap_v6[256] = { /* filter crap for v6 */
 	0,0,2,2,4,4,118,118,8,9,10,11,12,13,14,15,16,16,18,18,20,21,22,23,24,25,26,27,28,
 	28,118,28,0,16,2,18,36,37,37,37,40,41,42,43,44,45,128,128,128,148,148,148,45,45,45,
@@ -163,9 +167,6 @@ v6:
  *   rolling spring is now turned into regular spring. it appears the emc editor only uses
  *   the force code for initially moving spring. i will follow this in my editor.
  */
-
-#include "tile.h"
-#include "level.h"
 
 static unsigned short remap_emerald[256] = {
 	Xstone, Xstone, Xdiamond, Xdiamond, Xalien, Xalien, Xblank, Xblank,

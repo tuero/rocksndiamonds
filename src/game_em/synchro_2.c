@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* second part of synchro.
  *
  * game logic for monsters.
@@ -14,6 +11,9 @@
 #include "tile.h"
 #include "level.h"
 #include "sample.h"
+
+
+#if defined(TARGET_X11)
 
 extern unsigned int screen_x;
 extern unsigned int screen_y;

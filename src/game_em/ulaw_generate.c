@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* 2000-08-10T04:29:10Z
  *
  * generate ulaw<->linear conversion tables to be included
@@ -8,6 +5,9 @@
  */
 
 #include "../libgame/platform.h"
+
+
+#if defined(TARGET_X11)
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 

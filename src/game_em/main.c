@@ -1,6 +1,3 @@
-
-#if defined(TARGET_X11)
-
 /* Emerald Mine
  * 
  * David Tritscher
@@ -17,6 +14,9 @@
 #include <errno.h>
 
 #include "global.h"
+
+
+#if defined(TARGET_X11)
 
 char *progname;
 char *arg_basedir;
