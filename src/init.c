@@ -228,8 +228,6 @@ void InitDisplay(int argc, char *argv[])
   visual = DefaultVisual(display, screen);
   depth  = DefaultDepth(display, screen);
   cmap   = DefaultColormap(display, screen);
-  pen_fg = WhitePixel(display,screen);
-  pen_bg = BlackPixel(display,screen);
 
   /* look for good enough visual */
   vinfo_template.screen = screen;
@@ -276,6 +274,8 @@ void InitWindow(int argc, char *argv[])
   Atom proto_atom = None, delete_atom = None;
   int screen_width, screen_height;
   int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
+  unsigned long pen_fg = WhitePixel(display,screen);
+  unsigned long pen_bg = BlackPixel(display,screen);
 
 #ifndef MSDOS
   static struct IconFileInfo icon_pic =
@@ -373,8 +373,8 @@ void InitWindow(int argc, char *argv[])
                       ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
                       KeyPressMask | KeyReleaseMask;
   XSelectInput(display, window, window_event_mask);
-
 #endif
+
   /* create GC for drawing with window depth */
   gc_values.graphics_exposures = False;
   gc_values.foreground = pen_bg;
@@ -397,8 +397,10 @@ void DrawInitText(char *text, int ypos, int color)
 void InitGfx()
 {
   int i,j;
+  GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
+
 #ifdef MSDOS
   static struct PictureFileInfo pic[NUM_PICTURES] =
   {
@@ -421,6 +423,27 @@ void InitGfx()
   }; 
 #endif
 
+  static struct
+  {
+    int start;
+    int count;
+  }
+  tile_needs_clipping[] =
+  {
+    { GFX_SPIELER_UP, 4 },
+    { GFX_SPIELER_DOWN, 4 },
+    { GFX_SPIELER_LEFT, 4 },
+    { GFX_SPIELER_RIGHT, 4 },
+    { GFX_SPIELER_PUSH_LEFT, 4 },
+    { GFX_SPIELER_PUSH_RIGHT, 4 },
+    { GFX_GEBLUBBER, 4 },
+    { GFX_DYNAMIT, 7 },
+    { GFX_DYNABOMB, 4 },
+    { GFX_SOKOBAN_OBJEKT, 1 },
+    { GFX_MASK_SPARKLING, 3 },
+    { -1, 0 }
+  };
+
 #ifdef DEBUG_TIMING
   long count1, count2;
   count1 = Counter();
@@ -435,13 +458,13 @@ void InitGfx()
 #endif MSDOS
   DrawInitText("Loading graphics:",120,FC_GREEN);
 
-  for(i=0;i<NUM_PICTURES;i++)
-    if (i!=PIX_SMALLFONT)
+  for(i=0; i<NUM_PICTURES; i++)
+    if (i != PIX_SMALLFONT)
       LoadGfx(i,&pic[i]);
 
 #ifdef DEBUG_TIMING
   count2 = Counter();
-  printf("SUMMARY: %.2f SECONDS LOADING TIME\n",(float)(count2-count1)/100.0);
+  printf("SUMMARY: %.2f SECONDS LOADING TIME\n",(float)(count2-count1)/1000.0);
 #endif
 
 
@@ -455,6 +478,72 @@ void InitGfx()
 				    FXSIZE,FYSIZE,
 				    XDefaultDepth(display,screen));
 
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  copy_clipmask_gc =
+    XCreateGC(display,clipmask[PIX_BACK],clip_gc_valuemask,&clip_gc_values);
+
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  tile_clip_gc =
+    XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
+
+  /* initialize pixmap array to Pixmap 'None' */
+  for(i=0; i<NUM_TILES; i++)
+    tile_clipmask[i] = None;
+
+  /* create only those clipping Pixmaps we really need */
+  for(i=0; tile_needs_clipping[i].start>=0; i++)
+  {
+    for(j=0; j<tile_needs_clipping[i].count; j++)
+    {
+      int tile = tile_needs_clipping[i].start + j;
+      int graphic = tile;
+      int src_x, src_y;
+      Pixmap src_pixmap;
+
+      if (tile_needs_clipping[i].start == GFX_MASK_SPARKLING)
+      {
+	/* special case -- should be cleaned up sometimes... */
+	src_pixmap = clipmask[PIX_BACK];
+	src_x  = SX + GFX_PER_LINE*TILEX;
+	src_y  = SY + j*TILEY;
+      }
+      else if (graphic >= GFX_START_ROCKSSCREEN &&
+	       graphic <= GFX_END_ROCKSSCREEN)
+      {
+	src_pixmap = clipmask[PIX_BACK];
+	graphic -= GFX_START_ROCKSSCREEN;
+	src_x = SX + (graphic % GFX_PER_LINE) * TILEX;
+	src_y = SY + (graphic / GFX_PER_LINE) * TILEY;
+      }
+      else if (graphic >= GFX_START_ROCKSHEROES &&
+	       graphic <= GFX_END_ROCKSHEROES)
+      {
+	src_pixmap = clipmask[PIX_HEROES];
+	graphic -= GFX_START_ROCKSHEROES;
+	src_x = (graphic % HEROES_PER_LINE) * TILEX;
+	src_y = (graphic / HEROES_PER_LINE) * TILEY;
+      }
+      else if (graphic >= GFX_START_ROCKSFONT &&
+	       graphic <= GFX_END_ROCKSFONT)
+      {
+	src_pixmap = clipmask[PIX_BIGFONT];
+	graphic -= GFX_START_ROCKSFONT;
+	src_x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
+	src_y = (graphic / FONT_CHARS_PER_LINE) * TILEY +
+	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY;
+      }
+      else
+	break;
+
+      tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
+
+      XCopyArea(display,src_pixmap,tile_clipmask[tile],copy_clipmask_gc,
+		src_x,src_y, TILEX,TILEY, 0,0);
+    }
+  }
+
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
   {
     fprintf(stderr, "%s: cannot create additional Pixmaps!\n",progname);
@@ -467,11 +556,8 @@ void InitGfx()
     if (clipmask[i])
     {
       clip_gc_values.graphics_exposures = False;
-      clip_gc_values.foreground = pen_fg;
-      clip_gc_values.background = pen_bg;
       clip_gc_values.clip_mask = clipmask[i];
-      clip_gc_valuemask =
-	GCGraphicsExposures | GCForeground | GCBackground | GCClipMask;
+      clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
       clip_gc[i] = XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
     }
   }
@@ -562,7 +648,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef DEBUG_TIMING
     count2 = Counter();
     printf("XPM LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/100.0);
+	   filename,(float)(count2-count1)/1000.0);
 #endif
 
 #else 
@@ -601,7 +687,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef DEBUG_TIMING
     count2 = Counter();
     printf("GIF LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/100.0);
+	   filename,(float)(count2-count1)/1000.0);
 #endif
 
 #endif
@@ -658,7 +744,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef DEBUG_TIMING
     count2 = Counter();
     printf("XBM LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/100.0);
+	   filename,(float)(count2-count1)/1000.0);
 #endif
 
 #endif

@@ -408,12 +408,12 @@ void DrawElemButton(int button_nr, int button_state)
     XCopyArea(display,pix[PIX_DOOR],drawto,gc,
 	      from_x,from_y, size_x,size_y, to_x,to_y);
 
-    DrawMiniGraphicExtHiRes(drawto,gc,
-			    DX+ED_BUTTON_ELEM_XPOS+3+shift + 
-			    (elem_pos % MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
-			    DY+ED_BUTTON_ELEM_YPOS+3-shift +
-			    (elem_pos / MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
-			    graphic);
+    DrawMiniGraphicExt(drawto,gc,
+		       DX+ED_BUTTON_ELEM_XPOS+3+shift + 
+		       (elem_pos % MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
+		       DY+ED_BUTTON_ELEM_YPOS+3-shift +
+		       (elem_pos / MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
+		       graphic);
   }
 
   redraw_mask |= REDRAW_DOOR_1;

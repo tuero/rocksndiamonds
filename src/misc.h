@@ -18,8 +18,7 @@
 #include "main.h"
 
 #define INIT_COUNTER		0
-#define READ_COUNTER_100	1
-#define READ_COUNTER_1000	2
+#define READ_COUNTER		1
 
 #define NEW_RANDOMIZE		-1
 
@@ -27,9 +26,7 @@ void microsleep(unsigned long);
 long mainCounter(int);
 void InitCounter(void);
 long Counter(void);
-long Counter2(void);
 void WaitCounter(long);
-void WaitCounter2(long);
 void Delay(long);
 BOOL DelayReached(long *, int);
 BOOL FrameReached(long *, int);

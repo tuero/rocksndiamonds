@@ -27,9 +27,9 @@ Display        *display;
 Visual	       *visual;
 int		screen;
 Window  	window;
-GC		gc, clip_gc[NUM_PIXMAPS];
+GC		gc, clip_gc[NUM_PIXMAPS], tile_clip_gc;
 Pixmap		pix[NUM_PIXMAPS];
-Pixmap		clipmask[NUM_PIXMAPS];
+Pixmap		clipmask[NUM_PIXMAPS], tile_clipmask[NUM_TILES];
 
 #ifdef XPM_INCLUDE_FILE
 XpmAttributes 	xpm_att[NUM_PICTURES];
@@ -45,7 +45,6 @@ int		joystick_device = 0;
 char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
 char	       *level_directory = LEVEL_PATH;
 int     	width, height;
-unsigned long	pen_fg, pen_bg;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;

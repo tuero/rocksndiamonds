@@ -175,7 +175,7 @@ void HandleAnimation(int mode)
   if (reset_delay)
   {
     animstart_delay = Counter();
-    animstart_delay_value = SimpleRND(500);
+    animstart_delay_value = SimpleRND(3000);
     reset_delay = FALSE;
   }
 
@@ -406,7 +406,7 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
   {
     horiz_move = (anim->direction & (ANIMDIR_LEFT | ANIMDIR_RIGHT));
     vert_move = (anim->direction & (ANIMDIR_UP | ANIMDIR_DOWN));
-    anim_delay_value = 100/anim->frames_per_second;
+    anim_delay_value = 1000/anim->frames_per_second;
     frame = 0;
 
     if (horiz_move)

@@ -33,12 +33,12 @@ void microsleep(unsigned long usec)
        therefore it's better to do a short interval of busy waiting
        to get our sleeping time more accurate */
 
-    long base_counter = Counter2(), actual_counter = Counter2();
+    long base_counter = Counter(), actual_counter = Counter();
     long delay = usec/1000;
 
     while (actual_counter < base_counter+delay &&
 	   actual_counter >= base_counter)
-      actual_counter = Counter2();
+      actual_counter = Counter();
   }
   else
   {
@@ -66,10 +66,7 @@ long mainCounter(int mode)
   counter_ms = (current_time.tv_sec - base_time.tv_sec)*1000
              + (current_time.tv_usec - base_time.tv_usec)/1000;
 
-  if (mode == READ_COUNTER_100)
-    return(counter_ms/10);	/* return 1/100 secs since last init */
-  else	/*    READ_COUNTER_1000 */
-    return(counter_ms);		/* return 1/1000 secs since last init */
+  return counter_ms;		/* return milliseconds since last init */
 }
 
 void InitCounter() /* set counter back to zero */
@@ -77,14 +74,9 @@ void InitCounter() /* set counter back to zero */
   mainCounter(INIT_COUNTER);
 }
 
-long Counter()	/* returns 1/100 secs since last call of InitCounter() */
+long Counter()	/* get milliseconds since last call of InitCounter() */
 {
-  return(mainCounter(READ_COUNTER_100));
-}
-
-long Counter2()	/* returns 1/1000 secs since last call of InitCounter() */
-{
-  return(mainCounter(READ_COUNTER_1000));
+  return(mainCounter(READ_COUNTER));
 }
 
 void WaitCounter(long value) 	/* wait for counter to reach value */
@@ -92,20 +84,12 @@ void WaitCounter(long value) 	/* wait for counter to reach value */
   long wait;
 
   while((wait=value-Counter())>0)
-    microsleep(wait*10000);
+    microsleep(wait * 1000);
 }
 
-void WaitCounter2(long value) 	/* wait for counter to reach value */
+void Delay(long value)		/* Delay 'value' milliseconds */
 {
-  long wait;
-
-  while((wait=value-Counter2())>0)
-    microsleep(wait*1000);
-}
-
-void Delay(long value)
-{
-  microsleep(value);
+  microsleep(value * 1000);
 }
 
 BOOL DelayReached(long *counter_var, int delay)
@@ -125,8 +109,8 @@ BOOL FrameReached(long *frame_counter_var, int frame_delay)
 {
   long actual_frame_counter = FrameCounter;
 
-  if (actual_frame_counter >= *frame_counter_var+frame_delay
-      || actual_frame_counter < *frame_counter_var)
+  if (actual_frame_counter >= *frame_counter_var+frame_delay ||
+      actual_frame_counter < *frame_counter_var)
   {
     *frame_counter_var = actual_frame_counter;
     return(TRUE);

@@ -53,7 +53,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   LOADING '%s' IN %.2f SECONDS\n",
-	 filename, (float)(count2-count1)/100.0);
+	 filename, (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -69,7 +69,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   COMPRESSING IMAGE COLORMAP IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -87,7 +87,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   CONVERTING IMAGE TO XIMAGE IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -104,7 +104,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   CONVERTING IMAGE TO PIXMAP IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -114,7 +114,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   CONVERTING IMAGE TO MASK IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -129,7 +129,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   CONVERTING MASK TO XIMAGE IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 
@@ -143,7 +143,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #ifdef DEBUG_TIMING
   count2 = Counter();
   printf("   CONVERTING MASK TO PIXMAP IN %.2f SECONDS\n",
-	 (float)(count2-count1)/100.0);
+	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
 

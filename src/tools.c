@@ -187,7 +187,7 @@ void BackToFront()
 void FadeToFront()
 {
 /*
-  long fading_delay = 300000;
+  long fading_delay = 300;
 
   if (fading_on && (redraw_mask & REDRAW_FIELD))
   {
@@ -208,7 +208,7 @@ void FadeToFront()
 		  REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
       }
       XFlush(display);
-      Delay(10000);
+      Delay(10);
     }
 */
 
@@ -513,13 +513,30 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   return(phase);
 }
 
-void DrawGraphicAnimation(int x, int y, int graphic,
-			  int frames, int delay, int mode)
+void DrawGraphicAnimationExt(int x, int y, int graphic,
+			     int frames, int delay, int mode, int mask_mode)
 {
   int phase = getGraphicAnimationPhase(frames, delay, mode);
 
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);
+  {
+    if (mask_mode == USE_MASKING)
+      DrawGraphicThruMask(SCROLLX(x),SCROLLY(y), graphic + phase);
+    else
+      DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);
+  }
+}
+
+void DrawGraphicAnimation(int x, int y, int graphic,
+			  int frames, int delay, int mode)
+{
+  DrawGraphicAnimationExt(x,y, graphic, frames,delay,mode, NO_MASKING);
+}
+
+void DrawGraphicAnimationThruMask(int x, int y, int graphic,
+				  int frames, int delay, int mode)
+{
+  DrawGraphicAnimationExt(x,y, graphic, frames,delay,mode, USE_MASKING);
 }
 
 void DrawGraphic(int x, int y, int graphic)
@@ -534,40 +551,35 @@ void DrawGraphic(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicExt(drawto_field, gc, x, y, graphic);
+  DrawGraphicExt(drawto_field, gc, FX+x*TILEX, FY+y*TILEY, graphic);
   MarkTileDirty(x,y);
 }
 
 void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
-  DrawGraphicExtHiRes(d, gc, FX+x*TILEX, FY+y*TILEY, graphic);
-}
-
-void DrawGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
-{
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
     XCopyArea(display,pix[PIX_BACK],d,gc,
-	      SX+(graphic % GFX_PER_LINE)*TILEX,
-	      SY+(graphic / GFX_PER_LINE)*TILEY,
+	      SX + (graphic % GFX_PER_LINE) * TILEX,
+	      SY + (graphic / GFX_PER_LINE) * TILEY,
 	      TILEX,TILEY, x,y);
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
     XCopyArea(display,pix[PIX_HEROES],d,gc,
-	      (graphic % HEROES_PER_LINE)*TILEX,
-	      (graphic / HEROES_PER_LINE)*TILEY,
+	      (graphic % HEROES_PER_LINE) * TILEX,
+	      (graphic / HEROES_PER_LINE) * TILEY,
 	      TILEX,TILEY, x,y);
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
     XCopyArea(display,pix[PIX_BIGFONT],d,gc,
-	      (graphic % FONT_CHARS_PER_LINE)*TILEX,
-	      (graphic / FONT_CHARS_PER_LINE)*TILEY +
-	      FC_SPECIAL1*TILEY*FONT_LINES_PER_FONT,
+	      (graphic % FONT_CHARS_PER_LINE) * TILEX,
+	      (graphic / FONT_CHARS_PER_LINE) * TILEY +
+	      FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY,
 	      TILEX,TILEY, x,y);
   }
   else
@@ -577,6 +589,9 @@ void DrawGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
 void DrawGraphicThruMask(int x, int y, int graphic)
 {
   int src_x,src_y, dest_x,dest_y;
+  int tile = graphic;
+  Pixmap src_pixmap;
+  GC drawing_gc;
 
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
@@ -589,27 +604,19 @@ void DrawGraphicThruMask(int x, int y, int graphic)
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
+    src_pixmap = pix[PIX_BACK];
+    drawing_gc = clip_gc[PIX_BACK];
     graphic -= GFX_START_ROCKSSCREEN;
     src_x  = SX+(graphic % GFX_PER_LINE)*TILEX;
     src_y  = SY+(graphic / GFX_PER_LINE)*TILEY;
-    dest_x = FX+x*TILEX;
-    dest_y = FY+y*TILEY;
-
-    XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
-    XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
-	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
+    src_pixmap = pix[PIX_HEROES];
+    drawing_gc = clip_gc[PIX_HEROES];
     graphic -= GFX_START_ROCKSHEROES;
     src_x  = (graphic % HEROES_PER_LINE)*TILEX;
     src_y  = (graphic / HEROES_PER_LINE)*TILEY;
-    dest_x = FX+x*TILEX;
-    dest_y = FY+y*TILEY;
-
-    XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
-    XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
-	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
   }
   else
   {
@@ -617,32 +624,37 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     return;
   }
 
+  dest_x = FX + x*TILEX;
+  dest_y = FY + y*TILEY;
+
+  if (tile_clipmask[tile] != None)
+  {
+    XSetClipMask(display, tile_clip_gc, tile_clipmask[tile]);
+    XSetClipOrigin(display, tile_clip_gc, dest_x,dest_y);
+    XCopyArea(display, src_pixmap, drawto_field, tile_clip_gc,
+	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+  }
+  else
+  {
+#if DEBUG
+    printf("DrawGraphicThruMask(): tile '%d' needs clipping!\n", tile);
+#endif
+
+    XSetClipOrigin(display, drawing_gc, dest_x-src_x, dest_y-src_y);
+    XCopyArea(display, src_pixmap, drawto_field, drawing_gc,
+	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+  }
+
   MarkTileDirty(x,y);
-}
-
-void DrawScreenElementThruMask(int x, int y, int element)
-{
-  DrawGraphicThruMask(x,y,el2gfx(element));
-}
-
-void DrawLevelElementThruMask(int x, int y, int element)
-{
-  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawScreenElementThruMask(SCROLLX(x),SCROLLY(y),element);
 }
 
 void DrawMiniGraphic(int x, int y, int graphic)
 {
-  DrawMiniGraphicExt(drawto, gc, x, y, graphic);
+  DrawMiniGraphicExt(drawto,gc, SX+x*MINI_TILEX,SY+y*MINI_TILEY, graphic);
   MarkTileDirty(x/2, y/2);
 }
 
 void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
-{
-  DrawMiniGraphicExtHiRes(d,gc, SX+x*MINI_TILEX,SY+y*MINI_TILEY, graphic);
-}
-
-void DrawMiniGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
@@ -671,6 +683,9 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
   int src_x,src_y, dest_x,dest_y;
+  int tile = graphic;
+  Pixmap src_pixmap;
+  GC drawing_gc;
 
   if (graphic < 0)
   {
@@ -744,40 +759,23 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
+    src_pixmap = pix[PIX_BACK];
+    drawing_gc = clip_gc[PIX_BACK];
     graphic -= GFX_START_ROCKSSCREEN;
     src_x  = SX+(graphic % GFX_PER_LINE)*TILEX+cx;
     src_y  = SY+(graphic / GFX_PER_LINE)*TILEY+cy;
-    dest_x = FX+x*TILEX+dx;
-    dest_y = FY+y*TILEY+dy;
-
-    if (mask_mode == USE_MASKING)
-    {
-      XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
-      XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
-		src_x,src_y, width,height, dest_x,dest_y);
-    }
-    else
-      XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
-		src_x,src_y, width,height, dest_x,dest_y);
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
+    src_pixmap = pix[PIX_HEROES];
+    drawing_gc = clip_gc[PIX_HEROES];
     graphic -= GFX_START_ROCKSHEROES;
     src_x  = (graphic % HEROES_PER_LINE)*TILEX+cx;
     src_y  = (graphic / HEROES_PER_LINE)*TILEY+cy;
-    dest_x = FX+x*TILEX+dx;
-    dest_y = FY+y*TILEY+dy;
-
-    if (mask_mode == USE_MASKING)
-    {
-      XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
-      XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
-		src_x,src_y, width,height, dest_x,dest_y);
-    }
-    else
-      XCopyArea(display,pix[PIX_HEROES],drawto_field,gc,
-		src_x,src_y, width,height, dest_x,dest_y);
   }
+
+  dest_x = FX + x*TILEX + dx;
+  dest_y = FY + y*TILEY + dy;
 
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
@@ -788,6 +786,30 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   }
 #endif
 
+  if (mask_mode == USE_MASKING)
+  {
+    if (tile_clipmask[tile] != None)
+    {
+      XSetClipMask(display, tile_clip_gc, tile_clipmask[tile]);
+      XSetClipOrigin(display, tile_clip_gc, dest_x,dest_y);
+      XCopyArea(display, src_pixmap, drawto_field, tile_clip_gc,
+		src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+    }
+    else
+    {
+#if DEBUG
+      printf("DrawGraphicShifted(): tile '%d' needs clipping!\n", tile);
+#endif
+
+      XSetClipOrigin(display, drawing_gc, dest_x-src_x, dest_y-src_y);
+      XCopyArea(display, src_pixmap, drawto_field, drawing_gc,
+		src_x,src_y, width,height, dest_x,dest_y);
+    }
+  }
+  else
+    XCopyArea(display, src_pixmap, drawto_field, gc,
+	      src_x,src_y, width,height, dest_x,dest_y);
+
   MarkTileDirty(x,y);
 }
 
@@ -797,8 +819,8 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
   DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, USE_MASKING);
 }
 
-void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
-			      int cut_mode)
+void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
+			  int cut_mode, int mask_mode)
 {
   int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
   int graphic = el2gfx(element);
@@ -843,6 +865,10 @@ void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
   {
     graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
+  else if (element==EL_SALZSAEURE)
+  {
+    graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
+  }
   else if (element==EL_BUTTERFLY || element==EL_FIREFLY)
   {
     graphic += !phase;
@@ -879,16 +905,41 @@ void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
   }
 
   if (dx || dy)
-    DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, NO_MASKING);
+    DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, mask_mode);
+  else if (mask_mode == USE_MASKING)
+    DrawGraphicThruMask(x,y, graphic);
   else
     DrawGraphic(x,y, graphic);
+}
+
+void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
+			 int cut_mode, int mask_mode)
+{
+  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    DrawScreenElementExt(SCROLLX(x),SCROLLY(y), dx,dy, element,
+			 cut_mode, mask_mode);
+}
+
+void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
+			      int cut_mode)
+{
+  DrawScreenElementExt(x,y, dx,dy, element, cut_mode, NO_MASKING);
 }
 
 void DrawLevelElementShifted(int x, int y, int dx, int dy, int element,
 			     int cut_mode)
 {
-  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-    DrawScreenElementShifted(SCROLLX(x),SCROLLY(y), dx,dy, element, cut_mode);
+  DrawLevelElementExt(x,y, dx,dy, element, cut_mode, NO_MASKING);
+}
+
+void DrawScreenElementThruMask(int x, int y, int element)
+{
+  DrawScreenElementExt(x,y, 0,0, element, NO_CUTTING, USE_MASKING);
+}
+
+void DrawLevelElementThruMask(int x, int y, int element)
+{
+  DrawLevelElementExt(x,y, 0,0, element, NO_CUTTING, USE_MASKING);
 }
 
 void ErdreichAnbroeckeln(int x, int y)
@@ -998,7 +1049,7 @@ void ErdreichAnbroeckeln(int x, int y)
 
 void DrawScreenElement(int x, int y, int element)
 {
-  DrawScreenElementShifted(x,y, 0,0, element, NO_CUTTING);
+  DrawScreenElementExt(x,y, 0,0, element, NO_CUTTING, NO_MASKING);
   ErdreichAnbroeckeln(x,y);
 }
 
@@ -1032,9 +1083,13 @@ void DrawScreenField(int x, int y)
 	Store[ux][uy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (Store[ux][uy]==EL_MORAST_VOLL ||
+
+#if 0
+	Store[ux][uy]==EL_SALZSAEURE ||
+#endif
+
 	Store[ux][uy]==EL_SIEB_VOLL ||
-	Store[ux][uy]==EL_SIEB2_VOLL ||
-	Store[ux][uy]==EL_SALZSAEURE)
+	Store[ux][uy]==EL_SIEB2_VOLL)
       cut_mode = CUT_BELOW;
 
     if (cut_mode==CUT_ABOVE)
@@ -1046,6 +1101,12 @@ void DrawScreenField(int x, int y)
       DrawScreenElementShifted(x,y, MovPos[ux][uy],0, element, NO_CUTTING);
     else
       DrawScreenElementShifted(x,y, 0,MovPos[ux][uy], element, cut_mode);
+
+#if 1
+    if (Store[ux][uy] == EL_SALZSAEURE)
+      DrawLevelElementThruMask(ux,uy+1, EL_SALZSAEURE);
+#endif
+
   }
   else if (IS_BLOCKED(ux,uy))
   {
@@ -1290,7 +1351,7 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
   while(result<0)
   {
     DoAnimation();
-    Delay(10000);
+    Delay(10);
 
     if (XPending(display))
     {
@@ -1447,7 +1508,7 @@ unsigned int MoveDoor(unsigned int door_state)
   static unsigned int door2 = DOOR_CLOSE_2;
   static long door_delay = 0;
   int x, start, stepsize = 2;
-  long door_delay_value = stepsize * 5000;
+  long door_delay_value = stepsize * 5;
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
@@ -1477,8 +1538,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
-      while(!DelayReached(&door_delay, door_delay_value/10000))
-	Delay(1000);
+      while(!DelayReached(&door_delay, door_delay_value/10))
+	Delay(1);
 
       if (door_state & DOOR_ACTION_1)
       {

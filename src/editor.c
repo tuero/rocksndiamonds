@@ -350,26 +350,26 @@ void DrawLevelEd()
     else
       graphic = GFX_LEERRAUM;
 
-    DrawMiniGraphicExtHiRes(pix[PIX_DB_DOOR],gc,
-			    DOOR_GFX_PAGEX1+ED_BUTTON_ELEM_XPOS+3 + 
-			    (i%MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
-			    DOOR_GFX_PAGEY1+ED_BUTTON_ELEM_YPOS+3 +
-			    (i/MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
-			    graphic);
+    DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
+		       DOOR_GFX_PAGEX1+ED_BUTTON_ELEM_XPOS+3 + 
+		       (i%MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
+		       DOOR_GFX_PAGEY1+ED_BUTTON_ELEM_YPOS+3 +
+		       (i/MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
+		       graphic);
   }
 
-  DrawMiniGraphicExtHiRes(pix[PIX_DB_DOOR],gc,
-			  DOOR_GFX_PAGEX1+ED_WIN_MB_LEFT_XPOS,
-			  DOOR_GFX_PAGEY1+ED_WIN_MB_LEFT_YPOS,
-			  el2gfx(new_element1));
-  DrawMiniGraphicExtHiRes(pix[PIX_DB_DOOR],gc,
-			  DOOR_GFX_PAGEX1+ED_WIN_MB_MIDDLE_XPOS,
-			  DOOR_GFX_PAGEY1+ED_WIN_MB_MIDDLE_YPOS,
-			  el2gfx(new_element2));
-  DrawMiniGraphicExtHiRes(pix[PIX_DB_DOOR],gc,
-			  DOOR_GFX_PAGEX1+ED_WIN_MB_RIGHT_XPOS,
-			  DOOR_GFX_PAGEY1+ED_WIN_MB_RIGHT_YPOS,
-			  el2gfx(new_element3));
+  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
+		     DOOR_GFX_PAGEX1+ED_WIN_MB_LEFT_XPOS,
+		     DOOR_GFX_PAGEY1+ED_WIN_MB_LEFT_YPOS,
+		     el2gfx(new_element1));
+  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
+		     DOOR_GFX_PAGEX1+ED_WIN_MB_MIDDLE_XPOS,
+		     DOOR_GFX_PAGEY1+ED_WIN_MB_MIDDLE_YPOS,
+		     el2gfx(new_element2));
+  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
+		     DOOR_GFX_PAGEX1+ED_WIN_MB_RIGHT_XPOS,
+		     DOOR_GFX_PAGEY1+ED_WIN_MB_RIGHT_YPOS,
+		     el2gfx(new_element3));
   DrawTextExt(pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX2+ED_WIN_LEVELNR_XPOS,
 	      DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS,
@@ -709,18 +709,18 @@ void LevelEd(int mx, int my, int button)
       else if (last_button==3)
 	new_element3 = new_element;
 
-      DrawMiniGraphicExtHiRes(drawto,gc,
-			      DX+ED_WIN_MB_LEFT_XPOS,
-			      DY+ED_WIN_MB_LEFT_YPOS,
-			      el2gfx(new_element1));
-      DrawMiniGraphicExtHiRes(drawto,gc,
-			      DX+ED_WIN_MB_MIDDLE_XPOS,
-			      DY+ED_WIN_MB_MIDDLE_YPOS,
-			      el2gfx(new_element2));
-      DrawMiniGraphicExtHiRes(drawto,gc,
-			      DX+ED_WIN_MB_RIGHT_XPOS,
-			      DY+ED_WIN_MB_RIGHT_YPOS,
-			      el2gfx(new_element3));
+      DrawMiniGraphicExt(drawto,gc,
+			 DX+ED_WIN_MB_LEFT_XPOS,
+			 DY+ED_WIN_MB_LEFT_YPOS,
+			 el2gfx(new_element1));
+      DrawMiniGraphicExt(drawto,gc,
+			 DX+ED_WIN_MB_MIDDLE_XPOS,
+			 DY+ED_WIN_MB_MIDDLE_YPOS,
+			 el2gfx(new_element2));
+      DrawMiniGraphicExt(drawto,gc,
+			 DX+ED_WIN_MB_RIGHT_XPOS,
+			 DY+ED_WIN_MB_RIGHT_YPOS,
+			 el2gfx(new_element3));
       redraw_mask |= REDRAW_DOOR_1;
     }
   

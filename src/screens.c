@@ -481,8 +481,7 @@ void DrawHelpScreenElAction(int start)
     }
     j++;
 
-    DrawGraphicExtHiRes(drawto,gc,xstart,ystart+(i-start)*ystep,
-			graphic+frame);
+    DrawGraphicExt(drawto, gc, xstart, ystart+(i-start)*ystep, graphic+frame);
     i++;
   }
 
@@ -1176,7 +1175,7 @@ void CalibrateJoystick()
       joystick_status=JOYSTICK_OFF;
       goto error_out;
     }
-    Delay(10000);
+    Delay(10);
   }
 
   new_joystick_xleft = joy_ctrl.x;
@@ -1205,7 +1204,7 @@ void CalibrateJoystick()
       joystick_status=JOYSTICK_OFF;
       goto error_out;
     }
-    Delay(10000);
+    Delay(10);
   }
 
   new_joystick_xright = joy_ctrl.x;
@@ -1233,7 +1232,7 @@ void CalibrateJoystick()
       joystick_status=JOYSTICK_OFF;
       goto error_out;
     }
-    Delay(10000);
+    Delay(10);
   }
 
   new_joystick_xmiddle = joy_ctrl.x;
@@ -1296,7 +1295,7 @@ void CalibrateJoystick()
   DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
   DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
   BackToFront();
-  Delay(3000000);
+  Delay(3000);
   DrawSetupScreen();
 }
 

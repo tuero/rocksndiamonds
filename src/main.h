@@ -266,10 +266,9 @@ extern Display	       *display;
 extern Visual	       *visual;
 extern int		screen;
 extern Window  		window;
-extern GC		gc, clip_gc[];
-extern XImage 	       *image[];
-extern Pixmap		clipmask[];
+extern GC		gc, clip_gc[], tile_clip_gc;
 extern Pixmap		pix[];
+extern Pixmap		clipmask[], tile_clipmask[];
 
 #ifdef XPM_INCLUDE_FILE
 extern XpmAttributes 	xpm_att[];
@@ -285,7 +284,6 @@ extern int		joystick_device;
 extern char	       *joystick_device_name[2];
 extern char	       *level_directory;
 extern int     		width, height;
-extern unsigned long	pen_fg, pen_bg;
 
 extern int		game_status;
 extern int		game_emulation;
@@ -603,6 +601,8 @@ extern char		*progname;
 #define GFX_START_ROCKSHEROES	512
 #define GFX_END_ROCKSHEROES	767
 
+#define NUM_TILES		768
+
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
 #define GFX_LEERRAUM		(-1)
@@ -750,6 +750,10 @@ extern char		*progname;
 #define GFX_FIREFLY_O		205
 #define GFX_FIREFLY_L		206
 #define GFX_FIREFLY_U		207
+
+/* CHANGE THIS!!!! (NO REGULAR POSITIONS...) */
+#define GFX_MASK_SPARKLING	210
+/* CHANGE THIS!!!! (NO REGULAR POSITIONS...) */
 
 #define GFX_SCHLUESSEL		GFX_SCHLUESSEL1
 #define GFX_SPIELFIGUR		GFX_SPIELER1

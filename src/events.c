@@ -72,7 +72,7 @@ void EventLoop(void)
       if (game_status != PLAYING)
       {
 	XSync(display, FALSE);
-	Delay(10000);
+	Delay(10);
       }
     }
 
@@ -592,15 +592,15 @@ void HandleKey(KeySym key, int key_status)
   		    }
 		    else
 		    {
-		      Delay(1000);
+		      Delay(1);
 		    }
 		  }
   
 		  /*
-		  Delay(160000 / num_steps);
+		  Delay(160 / num_steps);
 		  */
 		  /*
-		  Delay(120000 / num_steps);
+		  Delay(120 / num_steps);
 		  */
 		}
 	      }
@@ -619,7 +619,7 @@ void HandleKey(KeySym key, int key_status)
 		      0,0);
 	    XFlush(display);
 	    XSync(display,FALSE);
-	    Delay(1000000);
+	    Delay(1000);
 	  }
 
 	  break;

@@ -375,7 +375,7 @@ void GameWon()
 	TimeLeft--;
       DrawText(DX_TIME,DY_TIME,int2str(TimeLeft,3),FS_SMALL,FC_YELLOW);
       BackToFront();
-      Delay(10000);
+      Delay(10);
     }
 
     if (sound_loops_on)
@@ -488,7 +488,7 @@ void InitMovingField(int x, int y, int direction)
 
   MovDir[x][y] = direction;
   MovDir[newx][newy] = direction;
-  if (Feld[newx][newy]==EL_LEERRAUM)
+  if (Feld[newx][newy] == EL_LEERRAUM)
     Feld[newx][newy] = EL_BLOCKED;
 }
 
@@ -865,7 +865,7 @@ void Blurb(int x, int y)
     if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
     {
       MovDelay[x][y]--;
-      if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
 	DrawGraphic(SCROLLX(x),SCROLLY(y),graphic+4-MovDelay[x][y]/2);
 
       if (!MovDelay[x][y])
@@ -2051,7 +2051,7 @@ void AmoebeWaechst(int x, int y)
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
       DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AMOEBING+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
@@ -2312,7 +2312,10 @@ void Birne(int x, int y)
 
 void Blubber(int x, int y)
 {
-  DrawGraphicAnimation(x,y, GFX_GEBLUBBER, 4, 10, ANIM_NORMAL);
+  if (y > 0 && IS_MOVING(x,y-1) && MovDir[x][y-1] == MV_DOWN)
+    DrawLevelField(x,y-1);
+  else
+    DrawGraphicAnimation(x,y, GFX_GEBLUBBER, 4, 10, ANIM_NORMAL);
 }
 
 void NussKnacken(int x, int y)
@@ -2323,7 +2326,7 @@ void NussKnacken(int x, int y)
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     MovDelay[x][y]--;
-    if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
       DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_CRACKINGNUT+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
@@ -2409,13 +2412,24 @@ void EdelsteinFunkeln(int x, int y)
 	int src_x,src_y, dest_x,dest_y;
 	int phase = (MovDelay[x][y]-1)/2;
 
-	src_x  = SX+GFX_PER_LINE*TILEX;
-	src_y  = SY+(phase > 2 ? 4-phase : phase)*TILEY;
-	dest_x = FX+SCROLLX(x)*TILEX;
-	dest_y = FY+SCROLLY(y)*TILEY;
+	if (phase > 2)
+	  phase = 4-phase;
 
+	src_x  = SX + GFX_PER_LINE*TILEX;
+	src_y  = SY + phase*TILEY;
+	dest_x = FX + SCROLLX(x)*TILEX;
+	dest_y = FY + SCROLLY(y)*TILEY;
+
+	/*
 	XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
 	XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
+		  src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+		  */
+
+	XSetClipMask(display, tile_clip_gc,
+		     tile_clipmask[GFX_MASK_SPARKLING + phase]);
+	XSetClipOrigin(display, tile_clip_gc, dest_x,dest_y);
+	XCopyArea(display, pix[PIX_BACK], drawto_field, tile_clip_gc,
 		  src_x,src_y, TILEX,TILEY, dest_x,dest_y);
 
 	if (direct_draw_on)
@@ -2584,7 +2598,7 @@ void GameActions()
     ScrollFigure(0);
 
   while(!DelayReached(&action_delay, action_delay_value))
-    Delay(5000);
+    Delay(5);
 
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
@@ -2892,9 +2906,14 @@ void ScrollFigure(int init)
     PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
     actual_frame_counter = FrameCounter;
 
+    /*
     if (Feld[lastJX][lastJY] == EL_LEERRAUM &&
 	IN_LEV_FIELD(lastJX,lastJY-1) &&
 	CAN_FALL(Feld[lastJX][lastJY-1]))
+      Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
+      */
+
+    if (Feld[lastJX][lastJY] == EL_LEERRAUM)
       Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
 
     DrawPlayerField();
@@ -3199,12 +3218,12 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       Feld[x][y] = EL_LEERRAUM;
       Key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
-      DrawMiniGraphicExtHiRes(drawto,gc,
-			      DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
-			      GFX_SCHLUESSEL1+key_nr);
-      DrawMiniGraphicExtHiRes(window,gc,
-			      DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
-			      GFX_SCHLUESSEL1+key_nr);
+      DrawMiniGraphicExt(drawto,gc,
+			 DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
+			 GFX_SCHLUESSEL1+key_nr);
+      DrawMiniGraphicExt(window,gc,
+			 DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
+			 GFX_SCHLUESSEL1+key_nr);
       PlaySoundLevel(x,y,SND_PONG);
       break;
     }
