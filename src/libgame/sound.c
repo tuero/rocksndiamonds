@@ -1065,8 +1065,8 @@ void PlayMusic(int nr)
 #if defined(TARGET_SDL)
   if (audio.mods_available)	/* play MOD music */
   {
-    Mix_VolumeMusic(SOUND_MAX_VOLUME);
     Mix_PlayMusic(Mod[nr].mix_music, -1);
+    Mix_VolumeMusic(SOUND_MAX_VOLUME);	/* must be _after_ Mix_PlayMusic()! */
   }
   else				/* play WAV music loop */
   {

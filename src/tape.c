@@ -77,7 +77,7 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 #define VIDEO_TIME_YSIZE	16
 
 /* special */
-#define VIDEO_PBEND_LABEL_XPOS	6
+#define VIDEO_PBEND_LABEL_XPOS	5
 #define VIDEO_PBEND_LABEL_YPOS	220
 #define VIDEO_PBEND_LABEL_XSIZE	35
 #define VIDEO_PBEND_LABEL_YSIZE	30

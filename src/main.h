@@ -299,6 +299,7 @@ struct PlayerInfo
   int move_delay_value;
 
   int last_move_dir;
+  int is_moving;
 
   unsigned long push_delay;
   unsigned long push_delay_value;
