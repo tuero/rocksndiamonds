@@ -135,7 +135,7 @@
 
 #define PENGUIN_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
-					IS_FOOD_PIG(Feld[x][y]) ||	\
+					IS_FOOD_PENGUIN(Feld[x][y]) ||	\
 					Feld[x][y] == EL_EXIT_OPEN ||	\
 					Feld[x][y] == EL_ACID))
 
