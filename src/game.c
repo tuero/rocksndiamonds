@@ -821,6 +821,33 @@ static void InitGameEngine()
     ei->change_events |= CH_EVENT_BIT(CE_DELAY);
   }
 
+  /* set summarized change event CE_TOUCHING_ANY_SIDE_OF */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    struct ElementInfo *ei = &element_info[EL_CUSTOM_START + i];
+
+    for (j=0; j < ei->num_change_pages; j++)
+    {
+      if (!ei->change_page[j].can_change)
+	continue;
+
+      /* check for change event of touching other element on some side */
+      if (ei->change_page[j].events & (CH_EVENT_BIT(CE_TOUCHING_ANY_SIDE_OF |
+						    CE_TOUCHING_LEFT_OF |
+						    CE_TOUCHING_RIGHT_OF |
+						    CE_TOUCHING_TOP_OF |
+						    CE_TOUCHING_BOTTOM_OF)))
+	ei->change_page[j].events |= CH_EVENT_BIT(CE_TOUCHING_SOME_SIDE);
+
+      /* add change event for each side when event exists for any side */
+      if (ei->change_page[j].events & CH_EVENT_BIT(CE_TOUCHING_ANY_SIDE_OF))
+	ei->change_page[j].events |= (CH_EVENT_BIT(CE_TOUCHING_LEFT_OF) |
+				      CH_EVENT_BIT(CE_TOUCHING_RIGHT_OF) |
+				      CH_EVENT_BIT(CE_TOUCHING_TOP_OF) |
+				      CH_EVENT_BIT(CE_TOUCHING_BOTTOM_OF));
+    }
+  }
+
 #if 1
   /* add change events from custom element configuration */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -1022,6 +1049,8 @@ void InitGame()
     player->is_digging = FALSE;
     player->is_collecting = FALSE;
 
+    player->show_envelope = FALSE;
+
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
 
@@ -1098,7 +1127,10 @@ void InitGame()
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
-      Changed[x][y] = FALSE;
+
+      Changed[x][y] = CE_BITMASK_DEFAULT;
+      ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
+
       ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
@@ -2363,6 +2395,8 @@ void Explode(int ex, int ey, int phase, int mode)
     if (CAN_MOVE(element))
       InitMovDir(x, y);
     DrawLevelField(x, y);
+
+    TestIfElementTouchesCustomElement(x, y);
 
     if (CAN_BE_CRUMBLED(element))
       DrawLevelFieldCrumbledSandNeighbours(x, y);
@@ -4409,6 +4443,12 @@ void ContinueMoving(int x, int y)
 
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
+    Changed[newx][newy] = Changed[x][y];
+    ChangeEvent[newx][newy] = ChangeEvent[x][y];
+
+    ChangeDelay[x][y] = 0;
+    Changed[x][y] = CE_BITMASK_DEFAULT;
+    ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
     /* copy animation control values to new field */
     GfxFrame[newx][newy]  = GfxFrame[x][y];
@@ -4465,6 +4505,10 @@ void ContinueMoving(int x, int y)
 
     if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
       CheckElementChange(newx, newy, element, CE_COLLISION);
+
+#if 1
+    TestIfElementTouchesCustomElement(x, y);		/* for empty space */
+#endif
 
     TestIfPlayerTouchesCustomElement(newx, newy);
     TestIfElementTouchesCustomElement(newx, newy);
@@ -5379,7 +5423,7 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   RemoveField(x, y);
   Feld[x][y] = target_element;
 
-  Changed[x][y] = TRUE;		/* no more changes in this frame */
+  Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
@@ -5405,10 +5449,20 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
 
-  if (Changed[x][y])		/* do not change already changed elements */
-    return FALSE;
+  /* always use default change event to prevent running into a loop */
+  if (ChangeEvent[x][y] == CE_BITMASK_DEFAULT)
+    ChangeEvent[x][y] = CH_EVENT_BIT(CE_DELAY);
 
-  Changed[x][y] = TRUE;		/* no more changes in this frame */
+  /* do not change already changed elements with same change event */
+#if 0
+  if (Changed[x][y] & ChangeEvent[x][y])
+    return FALSE;
+#else
+  if (Changed[x][y])
+    return FALSE;
+#endif
+
+  Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
   CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
 
@@ -5618,6 +5672,7 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
       if (Feld[x][y] == element)
       {
 	ChangeDelay[x][y] = 1;
+	ChangeEvent[x][y] = CH_EVENT_BIT(trigger_event);
 	ChangeElement(x, y, page);
 
 #if 0
@@ -5646,6 +5701,7 @@ static boolean CheckElementChangeExt(int x, int y, int element,
     Blocked2Moving(x, y, &x, &y);
 
   ChangeDelay[x][y] = 1;
+  ChangeEvent[x][y] = CH_EVENT_BIT(trigger_event);
   ChangeElement(x, y, page);
 
   return TRUE;
@@ -5845,7 +5901,8 @@ void GameActions()
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
-    Changed[x][y] = FALSE;
+    Changed[x][y] = CE_BITMASK_DEFAULT;
+    ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
     Stop[x][y] = FALSE;
     if (JustStopped[x][y] > 0)
@@ -6259,6 +6316,15 @@ void GameActions()
       stored_player[i].StepFrame += move_frames;
   }
 #endif
+
+#if 1
+  if (local_player->show_envelope && local_player->MovPos == 0)
+  {
+    ShowEnvelope();
+
+    local_player->show_envelope = FALSE;
+  }
+#endif
 }
 
 static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
@@ -6650,7 +6716,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   DrawPlayer(player);	/* needed here only to cleanup last field */
 #endif
 
-  if (player->MovPos == 0)
+  if (player->MovPos == 0)	/* player reached destination field */
   {
     if (IS_PASSABLE(Feld[last_jx][last_jy]))
     {
@@ -6769,8 +6835,16 @@ void TestIfElementTouchesCustomElement(int x, int y)
     { +1, 0 },
     { 0, +1 }
   };
+  static int touching_side[4][2] =
+  {
+    { CE_TOUCHING_TOP_OF,	CE_TOUCHING_BOTTOM_OF	},
+    { CE_TOUCHING_LEFT_OF,	CE_TOUCHING_RIGHT_OF	},
+    { CE_TOUCHING_RIGHT_OF,	CE_TOUCHING_LEFT_OF	},
+    { CE_TOUCHING_BOTTOM_OF,	CE_TOUCHING_TOP_OF	}
+  };
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
+  int center_element_change_event = 0;
   int center_element = Feld[x][y];
   int i, j;
 
@@ -6785,6 +6859,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
+    int change_event_center = touching_side[i][0];
+    int change_event_border = touching_side[i][1];
     int border_element;
 
     if (!IN_LEV_FIELD(xx, yy))
@@ -6794,7 +6870,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
-	HAS_ANY_CHANGE_EVENT(center_element, CE_OTHER_IS_TOUCHING) &&
+	HAS_ANY_CHANGE_EVENT(center_element, change_event_border) &&
 	!change_center_element)
     {
       for (j=0; j < element_info[center_element].num_change_pages; j++)
@@ -6802,11 +6878,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	struct ElementChangeInfo *change =
 	  &element_info[center_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->events & CH_EVENT_BIT(change_event_border) &&
 	    change->trigger_element == border_element)
 	{
 	  change_center_element = TRUE;
 	  center_element_change_page = j;
+	  center_element_change_event = change_event_border;
 
 	  break;
 	}
@@ -6815,17 +6892,17 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of border element */
     if (IS_CUSTOM_ELEMENT(border_element) &&
-	HAS_ANY_CHANGE_EVENT(border_element, CE_OTHER_IS_TOUCHING))
+	HAS_ANY_CHANGE_EVENT(border_element, change_event_center))
     {
       for (j=0; j < element_info[border_element].num_change_pages; j++)
       {
 	struct ElementChangeInfo *change =
 	  &element_info[border_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->events & CH_EVENT_BIT(change_event_center) &&
 	    change->trigger_element == center_element)
 	{
-	  CheckElementChangeExt(xx,yy, border_element,CE_OTHER_IS_TOUCHING, j);
+	  CheckElementChangeExt(xx,yy, border_element, change_event_center, j);
 	  break;
 	}
       }
@@ -6833,7 +6910,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
   }
 
   if (change_center_element)
-    CheckElementChangeExt(x, y, center_element, CE_OTHER_IS_TOUCHING,
+    CheckElementChangeExt(x, y, center_element, center_element_change_event,
 			  center_element_change_page);
 
 #if 0
@@ -7528,7 +7605,7 @@ int DigField(struct PlayerInfo *player,
 
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_DIGGED);
 
-	TestIfElementTouchesCustomElement(x, y);
+	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
 
 	break;
       }
@@ -7592,7 +7669,11 @@ int DigField(struct PlayerInfo *player,
 	}
 	else if (element == EL_ENVELOPE)
 	{
+#if 1
+	  player->show_envelope = TRUE;
+#else
 	  ShowEnvelope();
+#endif
 	}
 	else if (IS_DROPPABLE(element))	/* can be collected and dropped */
 	{
@@ -7621,7 +7702,7 @@ int DigField(struct PlayerInfo *player,
 
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_COLLECTED);
 
-	TestIfElementTouchesCustomElement(x, y);
+	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
 
 	break;
       }

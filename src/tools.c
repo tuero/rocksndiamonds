@@ -688,6 +688,13 @@ void DrawPlayer(struct PlayerInfo *player)
     }
     else
     {
+#if 0
+      if (player->is_collecting && GfxElement[jx][jy] == EL_ENVELOPE)
+      {
+	ShowEnvelope();
+      }
+#endif
+
       GfxElement[jx][jy] = EL_UNDEFINED;
 
       DrawLevelField(jx, jy);

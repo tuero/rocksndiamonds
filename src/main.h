@@ -165,7 +165,7 @@
 #define CE_COLLISION		5
 #define CE_IMPACT		6
 #define CE_SMASHED		7
-#define CE_OTHER_IS_TOUCHING	8
+#define CE_TOUCHING_ANY_SIDE_OF	8
 #define CE_OTHER_IS_CHANGING	9
 #define CE_OTHER_IS_EXPLODING	10
 #define CE_OTHER_GETS_TOUCHED	11
@@ -178,8 +178,15 @@
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_OTHER_GETS_DIGGED	20
+#define CE_TOUCHING_LEFT_OF	21
+#define CE_TOUCHING_RIGHT_OF	22
+#define CE_TOUCHING_TOP_OF	23
+#define CE_TOUCHING_BOTTOM_OF	24
 
-#define NUM_CHANGE_EVENTS	21
+/* values for derived change events (determined from properties above) */
+#define CE_TOUCHING_SOME_SIDE	25	/* summarized left/right/up/down/any */
+
+#define NUM_CHANGE_EVENTS	26
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -1095,6 +1102,8 @@ struct PlayerInfo
   boolean is_digging;
   boolean is_collecting;
 
+  boolean show_envelope;
+
   unsigned long move_delay;
   int move_delay_value;
 
@@ -1442,7 +1451,8 @@ extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern boolean			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern unsigned long		Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern unsigned long		ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];

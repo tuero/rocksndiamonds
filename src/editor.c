@@ -1124,7 +1124,11 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_DIGGED,	"player digs"			},
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
-  { CE_OTHER_IS_TOUCHING,	"touching"			},
+  { CE_TOUCHING_ANY_SIDE_OF,	"touching"			},
+  { CE_TOUCHING_LEFT_OF,	"touching left of"		},
+  { CE_TOUCHING_RIGHT_OF,	"touching right of"		},
+  { CE_TOUCHING_TOP_OF,		"touching top of"		},
+  { CE_TOUCHING_BOTTOM_OF,	"touching bottom of"		},
   { CE_OTHER_IS_CHANGING,	"change of"			},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
   { -1,				NULL				}
@@ -4542,7 +4546,11 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DIGGED) ? CE_OTHER_GETS_DIGGED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_ANY_SIDE_OF) ? CE_TOUCHING_ANY_SIDE_OF :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_LEFT_OF) ? CE_TOUCHING_LEFT_OF :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_RIGHT_OF) ? CE_TOUCHING_RIGHT_OF :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_TOP_OF) ? CE_TOUCHING_TOP_OF :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_BOTTOM_OF) ? CE_TOUCHING_BOTTOM_OF :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
      custom_element_change.other_action);
@@ -4648,7 +4656,11 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
   /* set other element action change event from checkbox and selectbox */
-  custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
+  custom_element_change_events[CE_TOUCHING_ANY_SIDE_OF] = FALSE;
+  custom_element_change_events[CE_TOUCHING_LEFT_OF] = FALSE;
+  custom_element_change_events[CE_TOUCHING_RIGHT_OF] = FALSE;
+  custom_element_change_events[CE_TOUCHING_TOP_OF] = FALSE;
+  custom_element_change_events[CE_TOUCHING_BOTTOM_OF] = FALSE;
   custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
