@@ -213,6 +213,8 @@ static boolean MovePlayer(struct PlayerInfo *, int, int);
 static void ScrollPlayer(struct PlayerInfo *, int);
 static void ScrollScreen(struct PlayerInfo *, int);
 
+int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
+
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
@@ -1349,7 +1351,7 @@ void InitGame()
 
     player->inventory_size = 0;
 
-    DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
+    DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
 
     player->LevelSolved = FALSE;
@@ -3400,7 +3402,7 @@ inline static int getElementMoveStepsize(int x, int y)
   /* special values for move stepsize for spring and things on conveyor belt */
   if (horiz_move)
   {
-#if 1
+#if 0
     if (element == EL_SPRING)
       step = sign * MOVE_STEPSIZE_NORMAL * 2;
     else if (CAN_FALL(element) && !CAN_MOVE(element) &&
@@ -4618,7 +4620,7 @@ void StartMoving(int x, int y)
 	started_moving = TRUE;
       }
     }
-#if 1
+#if 0
     else if (IS_BELT_ACTIVE(Feld[x][y + 1]) && !CAN_MOVE(element))
 #else
     else if (IS_BELT_ACTIVE(Feld[x][y + 1]))
@@ -4632,10 +4634,23 @@ void StartMoving(int x, int y)
       if ((belt_dir == MV_LEFT  && left_is_free) ||
 	  (belt_dir == MV_RIGHT && right_is_free))
       {
+#if 1
+	int nextx = (belt_dir == MV_LEFT ? x - 1 : x + 1);
+#endif
+
 	InitMovingField(x, y, belt_dir);
 	started_moving = TRUE;
 
+#if 1
+	Pushed[x][y] = TRUE;
+	Pushed[nextx][y] = TRUE;
+#endif
+
 	GfxAction[x][y] = ACTION_DEFAULT;
+      }
+      else
+      {
+	MovDir[x][y] = 0;	/* if element was moving, stop it */
       }
     }
   }
@@ -4922,7 +4937,7 @@ void StartMoving(int x, int y)
       }
       else if (IS_FOOD_PENGUIN(Feld[newx][newy]))
       {
-	if (DigField(local_player, newx, newy, 0, 0, DF_DIG) == MF_MOVING)
+	if (DigField(local_player, x, y, newx, newy, 0,0, DF_DIG) == MF_MOVING)
 	  DrawLevelField(newx, newy);
 	else
 	  GfxDir[x][y] = MovDir[x][y] = MV_NO_MOVING;
@@ -5212,12 +5227,25 @@ void ContinueMoving(int x, int y)
 #if 0
   int nextx = newx + dx, nexty = newy + dy;
 #endif
+#if 1
+  boolean pushed = (Pushed[x][y] && IS_PLAYER(x, y));
+  boolean pushed_by_conveyor = (Pushed[x][y] && !IS_PLAYER(x, y));
+#else
   boolean pushed = Pushed[x][y];
+#endif
 
   MovPos[x][y] += getElementMoveStepsize(x, y);
 
+#if 0
+  if (pushed && IS_PLAYER(x, y))
+  {
+    /* special case: moving object pushed by player */
+    MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
+  }
+#else
   if (pushed)		/* special case: moving object pushed by player */
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
+#endif
 
   if (ABS(MovPos[x][y]) < TILEX)
   {
@@ -5373,6 +5401,13 @@ void ContinueMoving(int x, int y)
       element_info[element].move_pattern & MV_ANY_DIRECTION &&
       !(element_info[element].move_pattern & direction))
     TurnRound(newx, newy);
+
+#if 1
+  /* prevent elements on conveyor belt from moving on in last direction */
+  if (pushed_by_conveyor && CAN_FALL(element) &&
+      direction & MV_HORIZONTAL)
+    MovDir[newx][newy] = 0;
+#endif
 
   if (!pushed)	/* special case: moving object pushed by player */
   {
@@ -6989,7 +7024,7 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 
     /* no actions for this player (no input at player's configured device) */
 
-    DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
+    DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
@@ -7070,7 +7105,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 
     /* no actions for this player (no input at player's configured device) */
 
-    DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
+    DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
@@ -7893,7 +7928,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
     return MF_MOVING;
   }
 
-  can_move = DigField(player, new_jx, new_jy, real_dx, real_dy, DF_DIG);
+  can_move = DigField(player, jx, jy, new_jx, new_jy, real_dx,real_dy, DF_DIG);
   if (can_move != MF_MOVING)
     return can_move;
 
@@ -8927,7 +8962,8 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
 */
 
 int DigField(struct PlayerInfo *player,
-	     int x, int y, int real_dx, int real_dy, int mode)
+	     int oldx, int oldy, int x, int y,
+	     int real_dx, int real_dy, int mode)
 {
   static int change_sides[4] =
   {
@@ -8937,7 +8973,7 @@ int DigField(struct PlayerInfo *player,
     CH_SIDE_TOP,	/* moving down  */
   };
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
-  int jx = player->jx, jy = player->jy;
+  int jx = oldx, jy = oldy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
   int move_direction = (dx == -1 ? MV_LEFT :
@@ -9668,7 +9704,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->is_dropping = FALSE;
 
-  if (DigField(player, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
+  if (DigField(player, jx, jy, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
     return FALSE;
 
   player->is_snapping = TRUE;

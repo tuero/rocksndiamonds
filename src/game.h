@@ -72,7 +72,6 @@ void TestIfBadThingTouchesOtherBadThing(int, int);
 void KillHero(struct PlayerInfo *);
 void BuryHero(struct PlayerInfo *);
 void RemoveHero(struct PlayerInfo *);
-int DigField(struct PlayerInfo *, int, int, int, int, int);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean DropElement(struct PlayerInfo *);
 
