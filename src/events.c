@@ -126,7 +126,9 @@ void HandleOtherEvents(Event *event)
       break;
 
     case EVENT_UNMAPNOTIFY:
+#if 0
       SleepWhileUnmapped();
+#endif
       break;
 
     case EVENT_FOCUSIN:

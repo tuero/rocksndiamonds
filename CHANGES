@@ -1,6 +1,12 @@
-Release Version 2.1.2 [?? ??? ????]
+Release Version 2.2.0 [?? ??? ????]
 -----------------------------------
 	- level series artwork now configurable via level series config file
+	- single graphics and animations can now be replaced with different
+	  ones (independantly from default image files which may be larger)
+	  by defining and using additional image files
+	- element animation length, speed and mode now freely configurable
+	- automatic tape playing function for game engine and level testing
+	- missing steel wall graphic added (thanks to Equinox Tetrachloride)
 
 Release Version 2.1.1 [13 AUG 2002]
 -----------------------------------
