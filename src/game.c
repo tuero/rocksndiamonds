@@ -6498,6 +6498,7 @@ int DigField(struct PlayerInfo *player,
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
+  int nextx = x + dx, nexty = y + dy;
   int move_direction = (dx == -1 ? MV_LEFT :
 			dx == +1 ? MV_RIGHT :
 			dy == -1 ? MV_UP :
@@ -6522,14 +6523,7 @@ int DigField(struct PlayerInfo *player,
   }
 
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
-  {
-#if 0
-    if (FrameCounter == 437)
-      printf("::: ---> IS_MOVING %d\n", MovDir[x][y]);
-#endif
-
     return MF_NO_ACTION;
-  }
 
 #if 0
   if (IS_TUBE(Feld[jx][jy]) || IS_TUBE(Back[jx][jy]))
@@ -7111,8 +7105,8 @@ int DigField(struct PlayerInfo *player,
 	   element != EL_SP_GRAVITY_PORT_DOWN &&
 	   element != EL_SP_PORT_VERTICAL &&
 	   element != EL_SP_PORT_ANY) ||
-	  !IN_LEV_FIELD(x + dx, y + dy) ||
-	  !IS_FREE(x + dx, y + dy))
+	  !IN_LEV_FIELD(nextx, nexty) ||
+	  !IS_FREE(nextx, nexty))
 	return MF_NO_ACTION;
 
       /* automatically move to the next field with double speed */
@@ -7401,7 +7395,7 @@ int DigField(struct PlayerInfo *player,
       }
       else if (IS_PASSABLE(element))
       {
-	if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
 	  return MF_NO_ACTION;
 
 	if (element >= EL_EM_GATE_1 && element <= EL_EM_GATE_4)
@@ -7532,9 +7526,9 @@ int DigField(struct PlayerInfo *player,
 
 	player->Pushing = TRUE;
 
-	if (!(IN_LEV_FIELD(x + dx, y + dy) &&
-	      (IS_FREE(x + dx, y + dy) ||
-	       (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY &&
+	if (!(IN_LEV_FIELD(nextx, nexty) &&
+	      (IS_FREE(nextx, nexty) ||
+	       (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY &&
 		IS_SB_ELEMENT(element)))))
 	  return MF_NO_ACTION;
 
@@ -7557,21 +7551,21 @@ int DigField(struct PlayerInfo *player,
 	    local_player->sokobanfields_still_needed++;
 	  }
 
-	  if (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY)
+	  if (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY)
 	  {
-	    Back[x + dx][y + dy] = EL_SOKOBAN_FIELD_EMPTY;
+	    Back[nextx][nexty] = EL_SOKOBAN_FIELD_EMPTY;
 	    local_player->sokobanfields_still_needed--;
 	  }
 
 	  Feld[x][y] = EL_SOKOBAN_OBJECT;
 
-	  if (Back[x][y] == Back[x + dx][y + dy])
+	  if (Back[x][y] == Back[nextx][nexty])
 	    PlaySoundLevelAction(x, y, ACTION_PUSHING);
 	  else if (Back[x][y] != 0)
 	    PlaySoundLevelElementAction(x, y, EL_SOKOBAN_FIELD_FULL,
 					ACTION_EMPTYING);
 	  else
-	    PlaySoundLevelElementAction(x + dx, y + dy, EL_SOKOBAN_FIELD_EMPTY,
+	    PlaySoundLevelElementAction(nextx, nexty, EL_SOKOBAN_FIELD_EMPTY,
 					ACTION_FILLING);
 
 	  if (local_player->sokobanfields_still_needed == 0 &&
@@ -7592,7 +7586,7 @@ int DigField(struct PlayerInfo *player,
 	  MovPos[x][y] = (dx != 0 ? dx : dy);
 
 	Pushed[x][y] = TRUE;
-	Pushed[x + dx][y + dy] = TRUE;
+	Pushed[nextx][nexty] = TRUE;
 
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
@@ -7622,6 +7616,10 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
+  int snap_direction = (dx == -1 ? MV_LEFT :
+			dx == +1 ? MV_RIGHT :
+			dy == -1 ? MV_UP :
+			dy == +1 ? MV_DOWN : MV_NO_MOVING);
 
   if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0))
     return FALSE;
@@ -7651,10 +7649,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   if (player->snapped)
     return FALSE;
 
-  player->MovDir = (dx < 0 ? MV_LEFT :
-		    dx > 0 ? MV_RIGHT :
-		    dy < 0 ? MV_UP :
-		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
+  player->MovDir = snap_direction;
 
   if (DigField(player, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
     return FALSE;
