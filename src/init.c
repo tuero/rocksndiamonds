@@ -254,6 +254,7 @@ static void InitSound()
 
 static void InitTileClipmasks()
 {
+#if 0
 #if defined(TARGET_X11)
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
@@ -388,10 +389,12 @@ static void InitTileClipmasks()
 
 #endif /* TARGET_X11_NATIVE */
 #endif /* TARGET_X11 */
+#endif
 }
 
 void FreeTileClipmasks()
 {
+#if 0
 #if defined(TARGET_X11)
   int i;
 
@@ -420,6 +423,7 @@ void FreeTileClipmasks()
 #endif
 
 #endif /* TARGET_X11 */
+#endif
 }
 
 void InitGfx()
@@ -689,7 +693,7 @@ void InitElementInfo()
   int i, act, dir;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for (i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     for (act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
     {
@@ -734,7 +738,7 @@ void InitElementInfo()
   }
 
   /* now set all '-1' values to element specific default values */
-  for (i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     int default_action_graphic = element_info[i].graphic[GFX_ACTION_DEFAULT];
     int default_action_direction_graphic[NUM_MV_DIRECTIONS];
@@ -2186,21 +2190,21 @@ void InitElementProperties()
   static int num_properties1 = SIZEOF_ARRAY(ep1_num, int *);
   static int num_properties2 = SIZEOF_ARRAY(ep2_num, int *);
 
-  for (i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    Elementeigenschaften1[i] = 0;
-    Elementeigenschaften2[i] = 0;
+    Properties1[i] = 0;
+    Properties2[i] = 0;
   }
 
   for (i=0; i<num_properties1; i++)
     for (j=0; j<*(ep1_num[i]); j++)
-      Elementeigenschaften1[(ep1_array[i])[j]] |= ep1_bit[i];
+      Properties1[(ep1_array[i])[j]] |= ep1_bit[i];
   for (i=0; i<num_properties2; i++)
     for (j=0; j<*(ep2_num[i]); j++)
-      Elementeigenschaften2[(ep2_array[i])[j]] |= ep2_bit[i];
+      Properties2[(ep2_array[i])[j]] |= ep2_bit[i];
 
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
+    Properties1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
 void Execute_Command(char *command)

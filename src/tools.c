@@ -364,7 +364,7 @@ void FadeToFront()
 
 void SetMainBackgroundImage(int graphic)
 {
-  SetMainBackgroundBitmap(graphic == IMG_NONE ? NULL :
+  SetMainBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
 			  new_graphic_info[graphic].bitmap ?
 			  new_graphic_info[graphic].bitmap :
 			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
@@ -372,7 +372,7 @@ void SetMainBackgroundImage(int graphic)
 
 void SetDoorBackgroundImage(int graphic)
 {
-  SetDoorBackgroundBitmap(graphic == IMG_NONE ? NULL :
+  SetDoorBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
 			  new_graphic_info[graphic].bitmap ?
 			  new_graphic_info[graphic].bitmap :
 			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
@@ -788,10 +788,10 @@ void DrawPlayer(struct PlayerInfo *player)
   MarkTileDirty(sx,sy);
 }
 
-void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
-			     int graphic, int mask_mode)
+inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+				    int graphic, int sync_frame, int mask_mode)
 {
-  int frame = getGraphicAnimationFrame(graphic, -1);
+  int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
   if (mask_mode == USE_MASKING)
     DrawGraphicThruMaskExt(dst_bitmap, x, y, graphic, frame);
@@ -799,17 +799,27 @@ void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-void DrawGraphicAnimation(int x, int y, int graphic)
+inline void DrawGraphicAnimation(int x, int y, int graphic)
 {
-  int ux = LEVELX(x), uy = LEVELY(y);
+  int lx = LEVELX(x), ly = LEVELY(y);
 
   if (!IN_SCR_FIELD(x, y) ||
-      (GfxFrame[ux][uy] % new_graphic_info[graphic].anim_delay) != 0)
+      (GfxFrame[lx][ly] % new_graphic_info[graphic].anim_delay) != 0)
     return;
 
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
-			  graphic, NO_MASKING);
+			  graphic, GfxFrame[lx][ly], NO_MASKING);
   MarkTileDirty(x, y);
+}
+
+void DrawLevelGraphicAnimation(int x, int y, int graphic)
+{
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+}
+
+void DrawLevelElementAnimation(int x, int y, int element)
+{
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
 }
 
 #if 0
@@ -2967,9 +2977,9 @@ int el2gfx(int element)
 #if DEBUG
   int graphic_OLD = el2gfx_OLD(element);
 
-  if (element >= MAX_ELEMENTS)
+  if (element >= MAX_NUM_ELEMENTS)
   {
-    Error(ERR_WARN, "el2gfx: element == %d >= MAX_ELEMENTS", element);
+    Error(ERR_WARN, "el2gfx: element == %d >= MAX_NUM_ELEMENTS", element);
   }
 
   if (graphic_NEW != graphic_OLD)

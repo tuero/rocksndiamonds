@@ -114,6 +114,11 @@ static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
+
+/* ------------------------------------------------------------------------- */
+/* sound definitions                                                         */
+/* ------------------------------------------------------------------------- */
+
 #define SND_ACTION_UNKNOWN		0
 #define SND_ACTION_WAITING		1
 #define SND_ACTION_MOVING		2
@@ -155,6 +160,32 @@ static int element_action_sound[MAX_NUM_ELEMENTS][NUM_SND_ACTIONS];
 static boolean is_loop_sound[NUM_SOUND_FILES];
 
 #define IS_LOOP_SOUND(x)	(is_loop_sound[x])
+
+
+/* -------------------------------------------------------------------------
+   definition of elements that automatically change to other elements after
+   a specified time, eventually calling a function when changing
+   ------------------------------------------------------------------------- */
+
+struct ChangingElementInfo
+{
+  int base_element;
+  int next_element;
+  int change_delay;
+  void (*changer_function)(int x, int y);
+};
+
+static struct ChangingElementInfo changing_element_list[] =
+{
+  { EL_NUT_CRACKING,		EL_EMERALD,		6, NULL		},
+  { EL_PEARL_BREAKING,		EL_EMPTY,		8, NULL		},
+  { EL_UNDEFINED,		EL_UNDEFINED,	       -1, NULL		}
+};
+
+static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
+
+#define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
+
 
 
 #ifdef DEBUG
@@ -518,6 +549,7 @@ void InitGameSound()
   debug_print_timestamp(0, NULL);
 #endif
 
+  /* initialize sound effect for all elements to "no sound" */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     for (j=0; j<NUM_SND_ACTIONS; j++)
       element_action_sound[i][j] = -1;
@@ -639,18 +671,41 @@ static void InitGameEngine()
     for (i=0; i<ep_em_slippery_wall_num; i++)
     {
       if (level.em_slippery_gems)	/* special EM style gems behaviour */
-	Elementeigenschaften2[ep_em_slippery_wall[i]] |=
+	Properties2[ep_em_slippery_wall[i]] |=
 	  EP_BIT_EM_SLIPPERY_WALL;
       else
-	Elementeigenschaften2[ep_em_slippery_wall[i]] &=
+	Properties2[ep_em_slippery_wall[i]] &=
 	  ~EP_BIT_EM_SLIPPERY_WALL;
     }
 
     /* "EL_WALL_GROWING_ACTIVE" wasn't slippery for EM gems in version 2.0.1 */
     if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
-      Elementeigenschaften2[EL_WALL_GROWING_ACTIVE] |= EP_BIT_EM_SLIPPERY_WALL;
+      Properties2[EL_WALL_GROWING_ACTIVE] |= EP_BIT_EM_SLIPPERY_WALL;
     else
-      Elementeigenschaften2[EL_WALL_GROWING_ACTIVE] &=~EP_BIT_EM_SLIPPERY_WALL;
+      Properties2[EL_WALL_GROWING_ACTIVE] &=~EP_BIT_EM_SLIPPERY_WALL;
+  }
+
+  /* initialize changing elements information */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    changing_element[i].base_element = EL_UNDEFINED;
+    changing_element[i].next_element = EL_UNDEFINED;
+    changing_element[i].change_delay = -1;
+    changing_element[i].changer_function = NULL;
+  }
+
+  i = 0;
+  while (changing_element_list[i].base_element != EL_UNDEFINED)
+  {
+    struct ChangingElementInfo *ce = &changing_element_list[i];
+    int element = ce->base_element;
+
+    changing_element[element].base_element     = ce->base_element;
+    changing_element[element].next_element     = ce->next_element;
+    changing_element[element].change_delay     = ce->change_delay;
+    changing_element[element].changer_function = ce->changer_function;
+
+    i++;
   }
 }
 
@@ -3095,7 +3150,7 @@ void StartMoving(int x, int y)
 	}
       }
       else if (element == EL_SP_ELECTRON)
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_ELECTRON);
+	DrawLevelElementAnimation(x, y, element);
       else if (element == EL_DRAGON)
       {
 	int i;
@@ -3353,11 +3408,11 @@ void StartMoving(int x, int y)
 	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
 	DrawLevelField(x, y);
       else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
+	DrawLevelElementAnimation(x, y, element);
       else if (element == EL_SATELLITE)
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SATELLITE);
+	DrawLevelElementAnimation(x, y, element);
       else if (element == EL_SP_ELECTRON)
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_ELECTRON);
+	DrawLevelElementAnimation(x, y, element);
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
@@ -4132,7 +4187,7 @@ void SiebAktivieren(int x, int y, int type)
 {
   int graphic = (type == 1 ? IMG_MAGIC_WALL_FULL : IMG_BD_MAGIC_WALL_FULL);
 
-  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+  DrawLevelGraphicAnimation(x, y, graphic);
 }
 
 void AusgangstuerPruefen(int x, int y)
@@ -4343,7 +4398,7 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (Feld[x][y] == EL_BD_DIAMOND)
-    DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_BD_DIAMOND);
+    DrawLevelElementAnimation(x, y, el2img(Feld[x][y]));
   else
   {
     if (!MovDelay[x][y])	/* next animation frame */
@@ -4359,7 +4414,7 @@ void EdelsteinFunkeln(int x, int y)
 #if 0
       DrawGraphic(SCREENX(x), SCREENY(y), el2img(Feld[x][y]), 0);
 #else
-      DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(Feld[x][y]));
+      DrawLevelElementAnimation(x, y, Feld[x][y]);
 #endif
 
       if (MovDelay[x][y])
@@ -4712,13 +4767,41 @@ static void DrawBeltAnimation(int x, int y, int element)
 
   if (belt_dir != MV_NO_MOVING)
   {
-    int graphic = el2img(element);
-
-    DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+    DrawLevelElementAnimation(x, y, element);
 
     if (!(FrameCounter % 2))
-      PlaySoundLevel(x, y, SND_CONVEYOR_BELT_ACTIVE);
+      PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
   }
+}
+
+static void ChangeElement(int x, int y)
+{
+  int element = Feld[x][y];
+  int change_delay = changing_element[element].change_delay;
+
+  if (!MovDelay[x][y])			/* next animation frame */
+  {
+    MovDelay[x][y] = change_delay + 1;
+    GfxFrame[x][y] = 0;
+  }
+
+  if (MovDelay[x][y])			/* wait some time before next frame */
+  {
+    MovDelay[x][y]--;
+
+    if (MovDelay[x][y])
+    {
+      DrawLevelElementAnimation(x, y, element);
+
+      return;
+    }
+  }
+
+  Feld[x][y] = changing_element[element].next_element;
+  DrawLevelField(x, y);
+
+  if (changing_element[element].changer_function)
+    changing_element[element].changer_function(x, y);
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -5009,7 +5092,7 @@ void GameActions()
 
 #if 1
       if (new_graphic_info[graphic].anim_frames > 1)
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+	DrawLevelGraphicAnimation(x, y, graphic);
 #endif
 
       continue;
@@ -5023,7 +5106,7 @@ void GameActions()
       if (Feld[x][y] == EL_EMERALD &&
 	  new_graphic_info[graphic].anim_frames > 1 &&
 	  !IS_MOVING(x, y))
-	DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+	DrawLevelGraphicAnimation(x, y, graphic);
 #endif
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
@@ -5040,7 +5123,7 @@ void GameActions()
 	      element == EL_SHIELD_NORMAL ||
 	      element == EL_SHIELD_DEADLY) &&
 	     new_graphic_info[graphic].anim_frames > 1)
-      DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+      DrawLevelGraphicAnimation(x, y, graphic);
 #endif
 
     else if (IS_MOVING(x, y))
@@ -5070,10 +5153,12 @@ void GameActions()
     else if (element == EL_ACID_SPLASH_LEFT ||
 	     element == EL_ACID_SPLASH_RIGHT)
       Blurb(x, y);
+#if 0
     else if (element == EL_NUT_CRACKING)
       NussKnacken(x, y);
     else if (element == EL_PEARL_BREAKING)
       BreakingPearl(x, y);
+#endif
     else if (element == EL_EXIT_CLOSED)
       AusgangstuerPruefen(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
@@ -5093,8 +5178,10 @@ void GameActions()
       CheckBuggyBase(x, y);
     else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
+#if 0
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
+#endif
     else if (element == EL_SWITCHGATE_OPENING)
       OpenSwitchgate(x, y);
     else if (element == EL_SWITCHGATE_CLOSING)
@@ -5104,10 +5191,16 @@ void GameActions()
     else if (element == EL_TIMEGATE_CLOSING)
       CloseTimegate(x, y);
 
+    else if (IS_AUTO_CHANGING(element))
+      ChangeElement(x, y);
+
 #if 1
     else if (new_graphic_info[graphic].anim_frames > 1)
-      DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+      DrawLevelGraphicAnimation(x, y, graphic);
 #endif
+
+    if (IS_BELT_ACTIVE(element))
+      PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
 
     if (game.magic_wall_active)
     {

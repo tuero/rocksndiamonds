@@ -18,12 +18,14 @@
 #include "game.h"
 #include "events.h"
 
-GC		tile_clip_gc;
 #if 0
+GC		tile_clip_gc;
 Bitmap	       *pix[NUM_BITMAPS];
 #endif
 Bitmap	       *bitmap_db_field, *bitmap_db_door;
+#if 0
 Pixmap		tile_clipmask[NUM_TILES];
+#endif
 DrawBuffer     *fieldbuffer;
 DrawBuffer     *drawto_field;
 
@@ -50,8 +52,9 @@ short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 short		ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
-unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
+
+unsigned long	Properties1[MAX_NUM_ELEMENTS];
+unsigned long	Properties2[MAX_NUM_ELEMENTS];
 
 int		GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -172,8 +175,10 @@ int graphics_action_mapping[] =
 struct FileInfo *image_files;
 struct FileInfo *sound_files;
 
-struct ElementInfo element_info[MAX_ELEMENTS] =
+struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 {
+  /* "real" level file elements */
+
   { "empty_space",		"empty space"			},      /* 0 */
   { "sand",			"sand"				},
   { "wall",			"normal wall"			},
@@ -543,7 +548,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "dx_bomb",			"stable bomb (DX style)"	},
   { NULL,			"-"				},
   { NULL,			"-"				},
-  { "custom",			"custom element 1"		},
+  { "custom",			"custom element 1"		},    /* 360 */
   { "custom",			"custom element 2"		},
   { "custom",			"custom element 3"		},
   { "custom",			"custom element 4"		},
@@ -553,7 +558,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 8"		},
   { "custom",			"custom element 9"		},
   { "custom",			"custom element 10"		},
-  { "custom",			"custom element 11"		},
+  { "custom",			"custom element 11"		},    /* 370 */
   { "custom",			"custom element 12"		},
   { "custom",			"custom element 13"		},
   { "custom",			"custom element 14"		},
@@ -563,7 +568,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 18"		},
   { "custom",			"custom element 19"		},
   { "custom",			"custom element 20"		},
-  { "custom",			"custom element 21"		},
+  { "custom",			"custom element 21"		},    /* 380 */
   { "custom",			"custom element 22"		},
   { "custom",			"custom element 23"		},
   { "custom",			"custom element 24"		},
@@ -573,7 +578,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 28"		},
   { "custom",			"custom element 29"		},
   { "custom",			"custom element 30"		},
-  { "custom",			"custom element 31"		},
+  { "custom",			"custom element 31"		},    /* 390 */
   { "custom",			"custom element 32"		},
   { "custom",			"custom element 33"		},
   { "custom",			"custom element 34"		},
@@ -583,7 +588,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 38"		},
   { "custom",			"custom element 39"		},
   { "custom",			"custom element 40"		},
-  { "custom",			"custom element 41"		},
+  { "custom",			"custom element 41"		},    /* 400 */
   { "custom",			"custom element 42"		},
   { "custom",			"custom element 43"		},
   { "custom",			"custom element 44"		},
@@ -593,7 +598,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 48"		},
   { "custom",			"custom element 49"		},
   { "custom",			"custom element 50"		},
-  { "custom",			"custom element 51"		},
+  { "custom",			"custom element 51"		},    /* 410 */
   { "custom",			"custom element 52"		},
   { "custom",			"custom element 53"		},
   { "custom",			"custom element 54"		},
@@ -603,7 +608,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 58"		},
   { "custom",			"custom element 59"		},
   { "custom",			"custom element 60"		},
-  { "custom",			"custom element 61"		},
+  { "custom",			"custom element 61"		},    /* 420 */
   { "custom",			"custom element 62"		},
   { "custom",			"custom element 63"		},
   { "custom",			"custom element 64"		},
@@ -613,7 +618,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 68"		},
   { "custom",			"custom element 69"		},
   { "custom",			"custom element 70"		},
-  { "custom",			"custom element 71"		},
+  { "custom",			"custom element 71"		},    /* 430 */
   { "custom",			"custom element 72"		},
   { "custom",			"custom element 73"		},
   { "custom",			"custom element 74"		},
@@ -623,7 +628,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 78"		},
   { "custom",			"custom element 79"		},
   { "custom",			"custom element 80"		},
-  { "custom",			"custom element 81"		},
+  { "custom",			"custom element 81"		},    /* 440 */
   { "custom",			"custom element 82"		},
   { "custom",			"custom element 83"		},
   { "custom",			"custom element 84"		},
@@ -633,7 +638,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 88"		},
   { "custom",			"custom element 89"		},
   { "custom",			"custom element 90"		},
-  { "custom",			"custom element 91"		},
+  { "custom",			"custom element 91"		},    /* 450 */
   { "custom",			"custom element 92"		},
   { "custom",			"custom element 93"		},
   { "custom",			"custom element 94"		},
@@ -643,7 +648,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 98"		},
   { "custom",			"custom element 99"		},
   { "custom",			"custom element 100"		},
-  { "custom",			"custom element 101"		},
+  { "custom",			"custom element 101"		},    /* 460 */
   { "custom",			"custom element 102"		},
   { "custom",			"custom element 103"		},
   { "custom",			"custom element 104"		},
@@ -653,7 +658,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 108"		},
   { "custom",			"custom element 109"		},
   { "custom",			"custom element 110"		},
-  { "custom",			"custom element 111"		},
+  { "custom",			"custom element 111"		},    /* 470 */
   { "custom",			"custom element 112"		},
   { "custom",			"custom element 113"		},
   { "custom",			"custom element 114"		},
@@ -663,7 +668,7 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 118"		},
   { "custom",			"custom element 119"		},
   { "custom",			"custom element 120"		},
-  { "custom",			"custom element 121"		},
+  { "custom",			"custom element 121"		},    /* 480 */
   { "custom",			"custom element 122"		},
   { "custom",			"custom element 123"		},
   { "custom",			"custom element 124"		},
@@ -672,14 +677,59 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "custom",			"custom element 127"		},
   { "custom",			"custom element 128"		},
 
-  { NULL,			"-"				}
+  /* "real" (and therefore drawable) runtime elements */
 
-  /*
-  "-------------------------------",
-  */
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},    /* 490 */
+  { "magic_wall",		"-"				},
+  { "wall",			"-"				},
+  { "wall",			"-"				},
+  { "exit",			"-"				},
+  { "sp_terminal",		"-"				},
+  { "sp_buggy_base",		"-"				},
+  { "key",			"-"				},
+  { "key",			"-"				},
+  { "key",			"-"				},
+  { "key",			"-"				},    /* 500 */
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "switchgate",		"-"				},
+  { "switchgate",		"-"				},
+  { "timegate",			"-"				},
+  { "timegate",			"-"				},
+  { "pearl",			"-"				},
+  { "trap",			"-"				},    /* 510 */
+  { "murphy_clone",		"-"				},
+  { "quicksand",		"-"				},
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},
+  { "amoeba",			"-"				},
+  { "sp_exit",			"-"				},
+  { "wall",			"-"				},
+  { "sand",			"-"				},
+  { "wall",			"-"				},
+  { "conveyor_belt",		"-"				},    /* 520 */
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},    /* 530 */
+  { "conveyor_belt",		"-"				},
+
+  { NULL,			"-"				}
 };
 
+#if 0
 struct GraphicInfo graphic_info[MAX_GRAPHICS];
+#endif
 struct NewGraphicInfo new_graphic_info[NUM_IMAGE_FILES];
 
 

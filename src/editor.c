@@ -2650,7 +2650,7 @@ static void PickDrawingElement(int button, int element)
 
 static void DrawDrawingWindow()
 {
-  SetMainBackgroundImage(IMG_NONE);
+  SetMainBackgroundImage(IMG_UNDEFINED);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
@@ -2956,7 +2956,7 @@ static void DrawPropertiesWindow()
   DrawGraphicAnimationExt(drawto,
 			  SX + xstart * MINI_TILEX,
 			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-			  el2img(properties_element), NO_MASKING);
+			  el2img(properties_element), -1, NO_MASKING);
 
   FrameCounter = 0;	/* restart animation frame counter */
 
@@ -4347,7 +4347,7 @@ void HandleLevelEditorIdle()
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  el2img(properties_element), NO_MASKING);
+			  el2img(properties_element), -1, NO_MASKING);
 
 #else
   DrawGraphicAnimationExt(drawto,
@@ -4355,7 +4355,7 @@ void HandleLevelEditorIdle()
 			  SY + ypos * TILEY + MINI_TILEY / 2,
 			  el_dir_act2img(properties_element,
 					 MV_NO_MOVING,
-					 ...));
+					 ...), -1, NO_MASKING);
 #endif
 
   MarkTileDirty(xpos, ypos);

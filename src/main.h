@@ -30,7 +30,7 @@
 #include "conf_gfx.h"
 #include "conf_snd.h"
 
-#define IMG_NONE		(-1)
+#define IMG_UNDEFINED		(-1)
 #define IMG_EMPTY		IMG_EMPTY_SPACE
 #define IMG_SP_EMPTY		IMG_SP_EMPTY_SPACE
 #define IMG_CHAR_START		IMG_CHAR_SPACE
@@ -58,7 +58,7 @@
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
-/* values for 'Elementeigenschaften1' */
+/* values for 'Properties1' */
 #define EP_BIT_AMOEBALIVE	(1 << 0)
 #define EP_BIT_AMOEBOID		(1 << 1)
 #define EP_BIT_SCHLUESSEL	(1 << 2)
@@ -92,51 +92,51 @@
 #define EP_BIT_OVER_PLAYER	(1 << 30)
 #define EP_BIT_ACTIVE_BOMB	(1 << 31)
 
-/* values for 'Elementeigenschaften2' */
+/* values for 'Properties2' */
 #define EP_BIT_BELT		(1 << 0)
 #define EP_BIT_BELT_ACTIVE	(1 << 1)
 #define EP_BIT_BELT_SWITCH	(1 << 2)
 #define EP_BIT_TUBE		(1 << 3)
 #define EP_BIT_EM_SLIPPERY_WALL	(1 << 4)
 
-#define IS_AMOEBALIVE(e)	(Elementeigenschaften1[e] & EP_BIT_AMOEBALIVE)
-#define IS_AMOEBOID(e)		(Elementeigenschaften1[e] & EP_BIT_AMOEBOID)
-#define IS_SCHLUESSEL(e)	(Elementeigenschaften1[e] & EP_BIT_SCHLUESSEL)
-#define IS_PFORTE(e)		(Elementeigenschaften1[e] & EP_BIT_PFORTE)
-#define IS_SOLID(e)		(Elementeigenschaften1[e] & EP_BIT_SOLID)
-#define IS_MASSIVE(e)		(Elementeigenschaften1[e] & EP_BIT_MASSIVE)
-#define IS_SLIPPERY(e)		(Elementeigenschaften1[e] & EP_BIT_SLIPPERY)
-#define IS_ENEMY(e)		(Elementeigenschaften1[e] & EP_BIT_ENEMY)
-#define IS_MAUER(e)		(Elementeigenschaften1[e] & EP_BIT_MAUER)
-#define CAN_FALL(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_FALL)
-#define CAN_SMASH(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_SMASH)
-#define CAN_CHANGE(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_CHANGE)
-#define CAN_MOVE(e)		(Elementeigenschaften1[e] & EP_BIT_CAN_MOVE)
-#define COULD_MOVE(e)		(Elementeigenschaften1[e] & EP_BIT_COULD_MOVE)
-#define DONT_TOUCH(e)		(Elementeigenschaften1[e] & EP_BIT_DONT_TOUCH)
-#define DONT_GO_TO(e)		(Elementeigenschaften1[e] & EP_BIT_DONT_GO_TO)
-#define IS_MAMPF2(e)		(Elementeigenschaften1[e] & EP_BIT_MAMPF2)
-#define IS_CHAR(e)		(Elementeigenschaften1[e] & EP_BIT_CHAR)
-#define IS_BD_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_BD_ELEMENT)
-#define IS_SB_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_SB_ELEMENT)
-#define IS_GEM(e)		(Elementeigenschaften1[e] & EP_BIT_GEM)
-#define IS_INACTIVE(e)		(Elementeigenschaften1[e] & EP_BIT_INACTIVE)
-#define IS_EXPLOSIVE(e)		(Elementeigenschaften1[e] & EP_BIT_EXPLOSIVE)
-#define IS_MAMPF3(e)		(Elementeigenschaften1[e] & EP_BIT_MAMPF3)
-#define IS_PUSHABLE(e)		(Elementeigenschaften1[e] & EP_BIT_PUSHABLE)
-#define ELEM_IS_PLAYER(e)	(Elementeigenschaften1[e] & EP_BIT_PLAYER)
-#define HAS_CONTENT(e)		(Elementeigenschaften1[e] & EP_BIT_HAS_CONTENT)
-#define IS_EATABLE(e)		(Elementeigenschaften1[e] & EP_BIT_EATABLE)
-#define IS_SP_ELEMENT(e)	(Elementeigenschaften1[e] & EP_BIT_SP_ELEMENT)
-#define IS_QUICK_GATE(e)	(Elementeigenschaften1[e] & EP_BIT_QUICK_GATE)
-#define IS_OVER_PLAYER(e)	(Elementeigenschaften1[e] & EP_BIT_OVER_PLAYER)
-#define IS_ACTIVE_BOMB(e)	(Elementeigenschaften1[e] & EP_BIT_ACTIVE_BOMB)
+#define IS_AMOEBALIVE(e)	(Properties1[e] & EP_BIT_AMOEBALIVE)
+#define IS_AMOEBOID(e)		(Properties1[e] & EP_BIT_AMOEBOID)
+#define IS_SCHLUESSEL(e)	(Properties1[e] & EP_BIT_SCHLUESSEL)
+#define IS_PFORTE(e)		(Properties1[e] & EP_BIT_PFORTE)
+#define IS_SOLID(e)		(Properties1[e] & EP_BIT_SOLID)
+#define IS_MASSIVE(e)		(Properties1[e] & EP_BIT_MASSIVE)
+#define IS_SLIPPERY(e)		(Properties1[e] & EP_BIT_SLIPPERY)
+#define IS_ENEMY(e)		(Properties1[e] & EP_BIT_ENEMY)
+#define IS_MAUER(e)		(Properties1[e] & EP_BIT_MAUER)
+#define CAN_FALL(e)		(Properties1[e] & EP_BIT_CAN_FALL)
+#define CAN_SMASH(e)		(Properties1[e] & EP_BIT_CAN_SMASH)
+#define CAN_CHANGE(e)		(Properties1[e] & EP_BIT_CAN_CHANGE)
+#define CAN_MOVE(e)		(Properties1[e] & EP_BIT_CAN_MOVE)
+#define COULD_MOVE(e)		(Properties1[e] & EP_BIT_COULD_MOVE)
+#define DONT_TOUCH(e)		(Properties1[e] & EP_BIT_DONT_TOUCH)
+#define DONT_GO_TO(e)		(Properties1[e] & EP_BIT_DONT_GO_TO)
+#define IS_MAMPF2(e)		(Properties1[e] & EP_BIT_MAMPF2)
+#define IS_CHAR(e)		(Properties1[e] & EP_BIT_CHAR)
+#define IS_BD_ELEMENT(e)	(Properties1[e] & EP_BIT_BD_ELEMENT)
+#define IS_SB_ELEMENT(e)	(Properties1[e] & EP_BIT_SB_ELEMENT)
+#define IS_GEM(e)		(Properties1[e] & EP_BIT_GEM)
+#define IS_INACTIVE(e)		(Properties1[e] & EP_BIT_INACTIVE)
+#define IS_EXPLOSIVE(e)		(Properties1[e] & EP_BIT_EXPLOSIVE)
+#define IS_MAMPF3(e)		(Properties1[e] & EP_BIT_MAMPF3)
+#define IS_PUSHABLE(e)		(Properties1[e] & EP_BIT_PUSHABLE)
+#define ELEM_IS_PLAYER(e)	(Properties1[e] & EP_BIT_PLAYER)
+#define HAS_CONTENT(e)		(Properties1[e] & EP_BIT_HAS_CONTENT)
+#define IS_EATABLE(e)		(Properties1[e] & EP_BIT_EATABLE)
+#define IS_SP_ELEMENT(e)	(Properties1[e] & EP_BIT_SP_ELEMENT)
+#define IS_QUICK_GATE(e)	(Properties1[e] & EP_BIT_QUICK_GATE)
+#define IS_OVER_PLAYER(e)	(Properties1[e] & EP_BIT_OVER_PLAYER)
+#define IS_ACTIVE_BOMB(e)	(Properties1[e] & EP_BIT_ACTIVE_BOMB)
 
-#define IS_BELT(e)		(Elementeigenschaften2[e] & EP_BIT_BELT)
-#define IS_BELT_ACTIVE(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_ACTIVE)
-#define IS_BELT_SWITCH(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_SWITCH)
-#define IS_TUBE(e)		(Elementeigenschaften2[e] & EP_BIT_TUBE)
-#define IS_EM_SLIPPERY_WALL(e)	(Elementeigenschaften2[e] & EP_BIT_EM_SLIPPERY_WALL)
+#define IS_BELT(e)		(Properties2[e] & EP_BIT_BELT)
+#define IS_BELT_ACTIVE(e)	(Properties2[e] & EP_BIT_BELT_ACTIVE)
+#define IS_BELT_SWITCH(e)	(Properties2[e] & EP_BIT_BELT_SWITCH)
+#define IS_TUBE(e)		(Properties2[e] & EP_BIT_TUBE)
+#define IS_EM_SLIPPERY_WALL(e)	(Properties2[e] & EP_BIT_EM_SLIPPERY_WALL)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -217,8 +217,10 @@
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_SCORE_ENTRIES	100
+#if 0
 #define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
 #define MAX_GRAPHICS		1536		/* see below: NUM_TILES */
+#endif
 #define MAX_NUM_AMOEBA		100
 
 /* values for elements with content */
@@ -315,7 +317,9 @@
 **	  0 <= element < xxx: real elements, stored in level file
 **      xxx <= element < yyy: flag elements, only used at runtime
 */
-/* "real" level elements */
+/* "real" level file elements */
+#define EL_UNDEFINED			-1
+
 #define EL_EMPTY_SPACE			0
 #define EL_EMPTY			EL_EMPTY_SPACE
 #define EL_SAND				1
@@ -816,7 +820,9 @@
 #define GFX_START_ROCKSMORE		1280
 #define GFX_END_ROCKSMORE		1535
 
+#if 0
 #define NUM_TILES			1536	/* see above: MAX_GRAPHICS */
+#endif
 
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
@@ -1662,8 +1668,8 @@ struct NewGraphicInfo
 #endif
 };
 
-extern GC		tile_clip_gc;
 #if 0
+extern GC		tile_clip_gc;
 extern Bitmap	       *pix[];
 #endif
 extern Bitmap	       *bitmap_db_field, *bitmap_db_door;
@@ -1694,8 +1700,9 @@ extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 extern short		ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
-extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
+
+extern unsigned long	Properties1[MAX_NUM_ELEMENTS];
+extern unsigned long	Properties2[MAX_NUM_ELEMENTS];
 
 extern int		GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -1728,7 +1735,9 @@ extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
+#if 0
 extern struct GraphicInfo	graphic_info[];
+#endif
 extern struct NewGraphicInfo	new_graphic_info[];
 extern struct ConfigInfo	image_config[], sound_config[];
 extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];

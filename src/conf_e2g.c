@@ -561,7 +561,7 @@ element_to_graphic[] =
     IMG_NUT_MOVING_RIGHT
   },
   {
-    EL_NUT_CRACKING,				-1, GFX_ACTION_CRACKING,
+    EL_NUT_CRACKING,				-1, -1,
     IMG_NUT_CRACKING
   },
   {
@@ -749,7 +749,7 @@ element_to_graphic[] =
     IMG_AMOEBA_CREATING
   },
   {
-    EL_AMOEBA_SHRINKING,			-1, GFX_ACTION_SHRINKING,
+    EL_AMOEBA_SHRINKING,			-1, -1,
     IMG_AMOEBA_SHRINKING
   },
   {
@@ -885,7 +885,7 @@ element_to_graphic[] =
     IMG_EXIT_CLOSED
   },
   {
-    EL_EXIT_OPENING,				-1, GFX_ACTION_OPENING,
+    EL_EXIT_OPENING,				-1, -1,
     IMG_EXIT_OPENING
   },
   {
@@ -1213,7 +1213,7 @@ element_to_graphic[] =
     IMG_SWITCHGATE_CLOSED
   },
   {
-    EL_SWITCHGATE_OPENING,			-1, GFX_ACTION_OPENING,
+    EL_SWITCHGATE_OPENING,			-1, -1,
     IMG_SWITCHGATE_OPENING
   },
   {
@@ -1221,7 +1221,7 @@ element_to_graphic[] =
     IMG_SWITCHGATE_OPEN
   },
   {
-    EL_SWITCHGATE_CLOSING,			-1, GFX_ACTION_CLOSING,
+    EL_SWITCHGATE_CLOSING,			-1, -1,
     IMG_SWITCHGATE_CLOSING
   },
   {
@@ -1229,7 +1229,7 @@ element_to_graphic[] =
     IMG_TIMEGATE_CLOSED
   },
   {
-    EL_TIMEGATE_OPENING,			-1, GFX_ACTION_OPENING,
+    EL_TIMEGATE_OPENING,			-1, -1,
     IMG_TIMEGATE_OPENING
   },
   {
@@ -1237,7 +1237,7 @@ element_to_graphic[] =
     IMG_TIMEGATE_OPEN
   },
   {
-    EL_TIMEGATE_CLOSING,			-1, GFX_ACTION_CLOSING,
+    EL_TIMEGATE_CLOSING,			-1, -1,
     IMG_TIMEGATE_CLOSING
   },
   {
@@ -1245,7 +1245,7 @@ element_to_graphic[] =
     IMG_PEARL
   },
   {
-    EL_PEARL_BREAKING,				-1, GFX_ACTION_BREAKING,
+    EL_PEARL_BREAKING,				-1, -1,
     IMG_PEARL_BREAKING
   },
   {
