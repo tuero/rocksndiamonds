@@ -70,8 +70,12 @@ char	       *program_name = NULL;
 int		game_status = MAINMENU;
 boolean		level_editor_test_game = FALSE;
 boolean		network_playing = FALSE;
+
+#if 0
 int		button_status = MB_NOT_PRESSED;
 boolean		motion_status = FALSE;
+#endif
+
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;

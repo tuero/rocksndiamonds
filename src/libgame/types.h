@@ -22,4 +22,20 @@ typedef unsigned char byte;
 #define TRUE		(!FALSE)
 #endif
 
+#ifndef MIN
+#define MIN(a,b) 	((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) 	((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef ABS
+#define ABS(a)		((a) < 0 ? -(a) : (a))
+#endif
+
+#ifndef SIGN
+#define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
+#endif
+
 #endif /* TYPES_H */

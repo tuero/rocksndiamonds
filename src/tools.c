@@ -25,6 +25,7 @@
 #include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
+#include "tape.h"
 
 #if defined(PLATFORM_MSDOS)
 extern boolean wait_for_vsync;

@@ -23,7 +23,7 @@ struct ProgramInfo	program;
 struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
-struct PlayfieldInfo	playfield;
+struct GfxInfo		gfx;
 
 Display        *display = NULL;
 Visual	       *visual = NULL;
@@ -34,8 +34,11 @@ DrawWindow	window = NULL;
 DrawBuffer	backbuffer = NULL;
 DrawBuffer	drawto = NULL;
 
-int		redraw_mask;
-int		redraw_tiles;
+int		button_status = MB_NOT_PRESSED;
+boolean		motion_status = FALSE;
+
+int		redraw_mask = REDRAW_NONE;
+int		redraw_tiles = 0;
 
 int		FrameCounter = 0;
 
@@ -59,42 +62,42 @@ inline void InitProgramInfo(char *command_name, char *program_title,
   program.msdos_pointer_filename = msdos_pointer_filename;
 }
 
-inline void InitPlayfieldInfo(int sx, int sy, int sxsize, int sysize,
-			      int real_sx, int real_sy,
-			      int full_sxsize, int full_sysize)
+inline void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
+			     int real_sx, int real_sy,
+			     int full_sxsize, int full_sysize)
 {
-  playfield.sx = sx;
-  playfield.sy = sy;
-  playfield.sxsize = sxsize;
-  playfield.sysize = sysize;
-  playfield.real_sx = real_sx;
-  playfield.real_sy = real_sy;
-  playfield.full_sxsize = full_sxsize;
-  playfield.full_sysize = full_sysize;
+  gfx.sx = sx;
+  gfx.sy = sy;
+  gfx.sxsize = sxsize;
+  gfx.sysize = sysize;
+  gfx.real_sx = real_sx;
+  gfx.real_sy = real_sy;
+  gfx.full_sxsize = full_sxsize;
+  gfx.full_sysize = full_sysize;
 }
 
-inline void InitDoor1Info(int dx, int dy, int dxsize, int dysize)
+inline void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
 {
-  playfield.dx = dx;
-  playfield.dy = dy;
-  playfield.dxsize = dxsize;
-  playfield.dysize = dysize;
+  gfx.dx = dx;
+  gfx.dy = dy;
+  gfx.dxsize = dxsize;
+  gfx.dysize = dysize;
 }
 
-inline void InitDoor2Info(int vx, int vy, int vxsize, int vysize)
+inline void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
 {
-  playfield.vx = vx;
-  playfield.vy = vy;
-  playfield.vxsize = vxsize;
-  playfield.vysize = vysize;
+  gfx.vx = vx;
+  gfx.vy = vy;
+  gfx.vxsize = vxsize;
+  gfx.vysize = vysize;
 }
 
-inline void InitScrollbufferInfo(int scrollbuffer_width,
-				 int scrollbuffer_height)
+inline void InitGfxScrollbufferInfo(int scrollbuffer_width,
+				    int scrollbuffer_height)
 {
   /* currently only used by MSDOS code to alloc VRAM buffer, if available */
-  playfield.scrollbuffer_width = scrollbuffer_width;
-  playfield.scrollbuffer_height = scrollbuffer_height;
+  gfx.scrollbuffer_width = scrollbuffer_width;
+  gfx.scrollbuffer_height = scrollbuffer_height;
 }
 
 inline static int GetRealDepth(int depth)

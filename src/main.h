@@ -62,6 +62,7 @@
 
 #define MAX_PLAYERS	4
 
+#if 0
 #ifndef MIN
 #define MIN(a,b) 	((a) < (b) ? (a) : (b))
 #endif
@@ -73,6 +74,7 @@
 #endif
 #ifndef SIGN
 #define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
+#endif
 #endif
 
 #define SCREENX(a)	((a) - scroll_x)
@@ -226,7 +228,9 @@
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
+#if 0
 #define GADGET_FRAME_DELAY	150	/* delay between gadget actions */
+#endif
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
@@ -475,8 +479,12 @@ extern char	       *program_name;
 extern int		game_status;
 extern boolean		level_editor_test_game;
 extern boolean		network_playing;
+
+#if 0
 extern int		button_status;
 extern boolean		motion_status;
+#endif
+
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
 
@@ -1703,6 +1711,7 @@ extern int		num_element_info;
 /* default name for new levels */
 #define NAMELESS_LEVEL_NAME	"nameless level"
 
+#if 0
 /* values for button_status */
 #define MB_NOT_PRESSED		FALSE
 #define MB_RELEASED		FALSE
@@ -1713,6 +1722,7 @@ extern int		num_element_info;
 #define MB_LEFTBUTTON		1
 #define MB_MIDDLEBUTTON		2
 #define MB_RIGHTBUTTON		3
+#endif
 
 #if 0
 /* values for redraw_mask */
@@ -1739,6 +1749,7 @@ extern int		num_element_info;
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 #endif
 
+#if 0
 /* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
    PAGEX1: 1. buffer for DOOR_1
@@ -1757,6 +1768,7 @@ extern int		num_element_info;
 #define DOOR_GFX_PAGEX8		(7 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		0
 #define DOOR_GFX_PAGEY2		DYSIZE
+#endif
 
 /* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
 #define ANIM_NORMAL		0

@@ -17,7 +17,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include "libgame.h"
+#include "platform.h"
 
 #if !defined(PLATFORM_WIN32)
 #include <pwd.h>

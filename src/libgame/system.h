@@ -37,8 +37,19 @@
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
 
+/* values for button_status */
+#define MB_NOT_PRESSED		FALSE
+#define MB_RELEASED		FALSE
+#define MB_PRESSED		TRUE
+#define MB_MENU_CHOICE		FALSE
+#define MB_MENU_MARK		TRUE
+#define MB_MENU_INITIALIZE	(-1)
+#define MB_LEFTBUTTON		1
+#define MB_MIDDLEBUTTON		2
+#define MB_RIGHTBUTTON		3
 
 /* values for redraw_mask */
+#define REDRAW_NONE		(0)
 #define REDRAW_ALL		(1 << 0)
 #define REDRAW_FIELD		(1 << 1)
 #define REDRAW_TILES		(1 << 2)
@@ -112,7 +123,7 @@ struct AudioSystemInfo
   int device_fd;
 };
 
-struct PlayfieldInfo
+struct GfxInfo
 {
   int sx, sy;
   int sxsize, sysize;
@@ -136,7 +147,7 @@ extern struct ProgramInfo	program;
 extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
-extern struct PlayfieldInfo	playfield;
+extern struct GfxInfo		gfx;
 
 extern Display	       *display;
 extern Visual	       *visual;
@@ -146,6 +157,9 @@ extern Colormap		cmap;
 extern DrawWindow	window;
 extern DrawBuffer	backbuffer;
 extern DrawBuffer	drawto;
+
+extern int		button_status;
+extern boolean		motion_status;
 
 extern int		redraw_mask;
 extern int		redraw_tiles;
@@ -158,10 +172,10 @@ extern int		FrameCounter;
 inline void InitProgramInfo(char *, char *, char *, char *, char *, char *,
 			    char *);
 
-inline void InitPlayfieldInfo(int, int, int, int, int, int, int, int);
-inline void InitDoor1Info(int, int, int, int);
-inline void InitDoor2Info(int, int, int, int);
-inline void InitScrollbufferInfo(int, int);
+inline void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
+inline void InitGfxDoor1Info(int, int, int, int);
+inline void InitGfxDoor2Info(int, int, int, int);
+inline void InitGfxScrollbufferInfo(int, int);
 
 inline void InitVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);

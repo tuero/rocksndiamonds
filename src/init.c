@@ -420,13 +420,13 @@ void InitGfx()
   };
 #endif
 
-  /* initialize playfield properties */
+  /* initialize screen properties */
 
-  InitPlayfieldInfo(SX, SY, SXSIZE, SYSIZE,
-		    REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  InitDoor1Info(DX, DY, DXSIZE, DYSIZE);
-  InitDoor2Info(VX, VY, VXSIZE, VYSIZE);
-  InitScrollbufferInfo(FXSIZE, FYSIZE);
+  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
 
   /* create additional image buffers for double-buffering */
 

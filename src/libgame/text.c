@@ -76,8 +76,8 @@ void DrawTextFCentered(int y, int font_type, char *format, ...)
   vsprintf(buffer, format, ap);
   va_end(ap);
 
-  DrawText(playfield.sx + (playfield.sxsize - strlen(buffer) * font_width) / 2,
-	   playfield.sy + y, buffer, FS_SMALL, font_type);
+  DrawText(gfx.sx + (gfx.sxsize - strlen(buffer) * font_width) / 2,
+	   gfx.sy + y, buffer, FS_SMALL, font_type);
 }
 
 void DrawTextF(int x, int y, int font_type, char *format, ...)
@@ -89,16 +89,16 @@ void DrawTextF(int x, int y, int font_type, char *format, ...)
   vsprintf(buffer, format, ap);
   va_end(ap);
 
-  DrawText(playfield.sx + x, playfield.sy + y, buffer, FS_SMALL, font_type);
+  DrawText(gfx.sx + x, gfx.sy + y, buffer, FS_SMALL, font_type);
 }
 
 void DrawText(int x, int y, char *text, int font_size, int font_type)
 {
   DrawTextExt(drawto, x, y, text, font_size, font_type);
 
-  if (x < playfield.dx)
+  if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
-  else if (y < playfield.vy)
+  else if (y < gfx.vy)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
