@@ -1358,9 +1358,11 @@ static struct ValueTextInfo options_change_direct_action[] =
 #else
   { CE_HITTING_SOMETHING,	"collision"			},
 #endif
-#if 1
+
+#if 0
   { CE_BLOCKED,			"blocked"			},
 #endif
+
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
 

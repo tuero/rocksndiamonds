@@ -22,7 +22,9 @@ ifdef X11_PATH			# path to X11 specified by top level Makefile
 XINC_PATH = $(X11_PATH)/include
 XLIB_PATH = $(X11_PATH)/lib
 X11_INCL = -I$(XINC_PATH)
-X11_LIBS = -L$(XLIB_PATH) -lX11
+# X11_LIBS = -L$(XLIB_PATH) -lX11
+# !!! remove Xpm dependency !!!
+X11_LIBS = -L$(XLIB_PATH) -lX11 -lXpm
 endif
 
 AR = ar
@@ -194,8 +196,13 @@ CNFS_CMD = ../Scripts/create_element_defs.pl
 
 TIMESTAMP_FILE = conftime.h
 
-LIBDIR = libgame
-LIBGAME = $(LIBDIR)/libgame.a
+LIBGAMEDIR = libgame
+LIBGAME = $(LIBGAMEDIR)/libgame.a
+
+LIBEMDIR = libem
+LIBEM = $(LIBEMDIR)/libem.a
+
+RNDLIBS = $(LIBGAME) $(LIBEM)
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
@@ -208,15 +215,20 @@ endif
 # build targets
 # -----------------------------------------------------------------------------
 
-all: libgame_dir $(PROGNAME)
+all: libgame_dir libem_dir $(PROGNAME)
 
-$(PROGNAME): $(LIBGAME) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
-	$(CC) $(PROFILING) $(OBJS) $(ICON) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
+$(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
+	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
 
 libgame_dir:
-	@$(MAKE) -C $(LIBDIR)
+	@$(MAKE) -C $(LIBGAMEDIR)
 $(LIBGAME):
-	@$(MAKE) -C $(LIBDIR)
+	@$(MAKE) -C $(LIBGAMEDIR)
+
+libem_dir:
+	@$(MAKE) -C $(LIBEMDIR)
+$(LIBEM):
+	@$(MAKE) -C $(LIBEMDIR)
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -233,7 +245,7 @@ conf_snd.h: conf_snd.c
 conf_mus.h: conf_mus.c
 	@$(MAKE) auto-conf
 
-$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME)
+$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(LIBEM)
 	@date '+"[%Y-%m-%d %H:%M]"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
@@ -246,9 +258,11 @@ $(ICON):
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 clean-obj:
-	$(MAKE) -C $(LIBDIR) clean
+	$(MAKE) -C $(LIBGAMEDIR) clean
+	$(MAKE) -C $(LIBEMDIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
+	$(RM) $(LIBEM)
 
 clean-ico:
 	$(RM) $(ICONBASE).ico
@@ -268,7 +282,8 @@ clean: clean-obj clean-ico clean-bin
 dist-clean: clean-obj
 
 depend:
-	$(MAKE) -C $(LIBDIR) depend
+	$(MAKE) -C $(LIBGAMEDIR) depend
+	$(MAKE) -C $(LIBEMDIR) depend
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
 
 ifeq (.depend,$(wildcard .depend))

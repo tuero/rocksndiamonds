@@ -23,6 +23,7 @@
 #include <fcntl.h>
 
 #include "libgame/libgame.h"
+#include "libem/libem.h"
 
 #include "conf_gfx.h"	/* include auto-generated data structure definitions */
 #include "conf_snd.h"	/* include auto-generated data structure definitions */

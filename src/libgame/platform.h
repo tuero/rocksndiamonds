@@ -58,14 +58,17 @@
 
 #if defined(__FreeBSD__)
 #define PLATFORM_FREEBSD
+#define PLATFORM_BSD
 #endif
 
 #if defined(__NetBSD__)
 #define PLATFORM_NETBSD
+#define PLATFORM_BSD
 #endif
 
 #if defined(__bsdi__)
 #define PLATFORM_BSDI
+#define PLATFORM_BSD
 #endif
 
 #if defined(sparc) && defined(sun)
