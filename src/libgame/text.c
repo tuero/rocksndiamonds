@@ -27,7 +27,7 @@ static GC	font_clip_gc = None;
 
 static void InitFontClipmasks()
 {
-  static boolean clipmasks_initialized = FALSE;
+  static int last_num_fonts = 0;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
   GC copy_clipmask_gc;
@@ -36,27 +36,20 @@ static void InitFontClipmasks()
   if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
     return;
 
-  if (!clipmasks_initialized)
-  {
-    for (i=0; i < gfx.num_fonts; i++)
-    {
-      gfx.font_bitmap_info[i].clip_mask = NULL;
-      gfx.font_bitmap_info[i].last_num_chars = 0;
-    }
-
-    clipmasks_initialized = TRUE;
-  }
-
-  for (i=0; i < gfx.num_fonts; i++)
+  for (i=0; i < last_num_fonts; i++)
   {
     if (gfx.font_bitmap_info[i].clip_mask)
+    {
       for (j=0; j < gfx.font_bitmap_info[i].last_num_chars; j++)
 	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
-    free(gfx.font_bitmap_info[i].clip_mask);
+      free(gfx.font_bitmap_info[i].clip_mask);
+    }
 
     gfx.font_bitmap_info[i].clip_mask = NULL;
     gfx.font_bitmap_info[i].last_num_chars = 0;
   }
+
+  last_num_fonts = gfx.num_fonts;
 
   if (font_clip_gc)
     XFreeGC(display, font_clip_gc);
@@ -241,10 +234,9 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  boolean print_inverse = FALSE;
-  boolean print_inverse_cursor = FALSE;
   Bitmap *src_bitmap;
   int src_x, src_y;
+  char *text_ptr = text;
 
   if (font->bitmap == NULL)
     return;
@@ -253,22 +245,13 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   dst_x += font->draw_x;
   dst_y += font->draw_y;
 
-  while (*text)
+  while (*text_ptr)
   {
-    char c = *text++;
-
-    if (c == '~')
-    {
-      print_inverse = TRUE;
-      if (strlen(text) == 1)
-	print_inverse_cursor = TRUE;
-
-      continue;
-    }
+    char c = *text_ptr++;
 
     getFontCharSource(font_nr, c, &src_bitmap, &src_x, &src_y);
 
-    if (print_inverse)		/* special mode for text gadgets */
+    if (mask_mode == BLIT_INVERSE)	/* special mode for text gadgets */
     {
 #if defined(TARGET_SDL)
       /* blit normally (non-masked) */
@@ -280,7 +263,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		    gfx.inverse_text_color);
 #else
       /* first step: draw solid colored rectangle (use "cursor" character) */
-      if (print_inverse_cursor)
+      if (strlen(text) == 1)	/* only one char inverted => draw cursor */
       {
 	Bitmap *cursor_bitmap;
 	int cursor_x, cursor_y;

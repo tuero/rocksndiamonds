@@ -137,7 +137,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
       {
 	int i;
 	char cursor_letter;
-	char cursor_string[3];
+	char cursor_string[2];
 	char text[MAX_GADGET_TEXTSIZE + 1];
 	int font_type = gi->text.font_type;
 	int font_width = getFontWidth(font_type);
@@ -168,9 +168,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		    font_type, BLIT_MASKED);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
-	cursor_string[0] = '~';
-	cursor_string[1] = (cursor_letter != '\0' ? cursor_letter : ' ');
-	cursor_string[2] = '\0';
+	cursor_string[0] = (cursor_letter != '\0' ? cursor_letter : ' ');
+	cursor_string[1] = '\0';
 
 	SetInverseTextColor(gi->text.inverse_color);
 
@@ -179,7 +178,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  DrawTextExt(drawto,
 		      gi->x + border + gi->text.cursor_position * font_width,
 		      gi->y + border, cursor_string,
-		      font_type, BLIT_MASKED);
+		      font_type, BLIT_INVERSE);
       }
       break;
 
@@ -324,6 +323,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  /* selectbox text values */
 	  for (i=0; i < gi->selectbox.num_values; i++)
 	  {
+	    int mask_mode;
+
 	    if (i == gi->selectbox.current_index)
 	    {
 	      FillRectangle(drawto,
@@ -332,22 +333,25 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			    gi->selectbox.width - 2 * border, font_height,
 			    gi->selectbox.inverse_color);
 
-	      text[0] = '~';
-	      strncpy(&text[1], gi->selectbox.values[i], gi->selectbox.size);
+	      strncpy(text, gi->selectbox.values[i], gi->selectbox.size);
 	      text[1 + gi->selectbox.size] = '\0';
 
 	      SetInverseTextColor(gi->selectbox.inverse_color);
+
+	      mask_mode = BLIT_INVERSE;
 	    }
 	    else
 	    {
 	      strncpy(text, gi->selectbox.values[i], gi->selectbox.size);
 	      text[gi->selectbox.size] = '\0';
+
+	      mask_mode = BLIT_MASKED;
 	    }
 
 	    DrawTextExt(drawto,
 			gi->selectbox.x + border,
 			gi->selectbox.y + border + i * font_height, text,
-			font_type, BLIT_MASKED);
+			font_type, mask_mode);
 	  }
 
 	  redraw_selectbox = TRUE;
