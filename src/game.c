@@ -5010,7 +5010,12 @@ static void CheckPlayerElementChange(int x, int y, int element,
   if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, trigger_event))
     return;
 
+#if 1
+  ChangeDelay[x][y] = 1;
+  ChangeElement(x, y);
+#else
   ChangeElementDoIt(x, y, element_info[element].change.successor);
+#endif
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -6366,6 +6371,7 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
 int DigField(struct PlayerInfo *player,
 	     int x, int y, int real_dx, int real_dy, int mode)
 {
+  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
   int move_direction = (dx == -1 ? MV_LEFT :
@@ -6777,6 +6783,10 @@ int DigField(struct PlayerInfo *player,
       /* the following elements can be pushed by "snapping" */
     case EL_BD_ROCK:
       if (dy)
+	return MF_NO_ACTION;
+
+      if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
+	  !(element == EL_SPRING && use_spring_bug))
 	return MF_NO_ACTION;
 
       player->Pushing = TRUE;
@@ -7195,6 +7205,9 @@ int DigField(struct PlayerInfo *player,
 	if (CAN_FALL(element) && dy)
 	  return MF_NO_ACTION;
 
+	if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))
+	  return MF_NO_ACTION;
+
 	if (!player->Pushing &&
 	    game.engine_version >= RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
@@ -7235,7 +7248,11 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
+#if 1
+	CheckPlayerElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
+#else
 	CheckPlayerElementChange(x + dx, y + dy, element, CE_PUSHED_BY_PLAYER);
+#endif
 
 	break;
       }

@@ -707,7 +707,7 @@ void DrawPlayer(struct PlayerInfo *player)
 				 NO_CUTTING);
     else
     {
-#if 0
+#if 1
       int element = Feld[jx][jy];
 #else
       int element = Feld[next_jx][next_jy];
