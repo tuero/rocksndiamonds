@@ -427,10 +427,10 @@ struct GadgetInfo
 struct GadgetInfo *CreateGadget(int, ...);
 void FreeGadget(struct GadgetInfo *);
 
+void ModifyGadget(struct GadgetInfo *, int, ...);
+void RedrawGadget(struct GadgetInfo *);
+
 void ClickOnGadget(struct GadgetInfo *);
-void AdjustScrollbar(struct GadgetInfo *, int, int);
-void ModifyTextInputTextValue(struct GadgetInfo *, char *);
-void ModifyTextInputNumberValue(struct GadgetInfo *, int);
 
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);

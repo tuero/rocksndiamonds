@@ -126,9 +126,11 @@ void BackToFront()
   if (redraw_mask & REDRAW_FIELD)
   {
     if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
+    {
       XCopyArea(display,backbuffer,window,gc,
 		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
 		REAL_SX,REAL_SY);
+    }
     else
     {
       int fx = FX, fy = FY;
@@ -1682,8 +1684,6 @@ boolean Request(char *text, unsigned int req_state)
     text += tl + (tc == 32 ? 1 : 0);
   }
 
-
-
 #if 0
   if (req_state & REQ_ASK)
   {
@@ -1727,8 +1727,6 @@ boolean Request(char *text, unsigned int req_state)
 
 #endif
 
-
-
   OpenDoor(DOOR_OPEN_1);
   ClearEventQueue();
 
@@ -1756,7 +1754,10 @@ boolean Request(char *text, unsigned int req_state)
 	case ButtonRelease:
 	case MotionNotify:
 	{
+
+#if 0
 	  int choice;
+#endif
 
 	  if (event.type == MotionNotify)
 	  {
@@ -2087,7 +2088,15 @@ unsigned int MoveDoor(unsigned int door_state)
 	redraw_mask |= REDRAW_DOOR_2;
       }
 
+
+
+#if 1
       BackToFront();
+#else
+      XCopyArea(display, drawto, window, gc, DX, DY, DXSIZE, DYSIZE, DX, DY);
+#endif
+
+
 
       if (game_status == MAINMENU)
 	DoAnimation();

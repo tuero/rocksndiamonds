@@ -1611,6 +1611,12 @@ int CheckCountButtons(int mx, int my, int button)
 /* NEW GADGET STUFF -------------------------------------------------------- */
 
 
+/* values for DrawGadget() */
+#define DG_UNPRESSED		0
+#define DG_PRESSED		1
+#define DG_BUFFERED		0
+#define DG_DIRECT		1
+
 static struct GadgetInfo *gadget_list_first_entry = NULL;
 static struct GadgetInfo *gadget_list_last_entry = NULL;
 static int next_free_gadget_id = 1;
@@ -1675,335 +1681,6 @@ static void default_callback_info(void *ptr)
 static void default_callback_action(void *ptr)
 {
   return;
-}
-
-struct GadgetInfo *CreateGadget(int first_tag, ...)
-{
-  struct GadgetInfo *new_gadget = checked_malloc(sizeof(struct GadgetInfo));
-  int tag = first_tag;
-  va_list ap;
-
-  va_start(ap, first_tag);
-
-  /* always start with reliable default values */
-  memset(new_gadget, 0, sizeof(struct GadgetInfo));	/* zero all fields */
-  new_gadget->id = getNewGadgetID();
-  new_gadget->callback_info = default_callback_info;
-  new_gadget->callback_action = default_callback_action;
-
-  while (tag != GDI_END)
-  {
-    switch(tag)
-    {
-      case GDI_CUSTOM_ID:
-	new_gadget->custom_id = va_arg(ap, int);
-	break;
-
-      case GDI_INFO_TEXT:
-	{
-	  int max_textsize = MAX_INFO_TEXTSIZE;
-
-	  strncpy(new_gadget->info_text, va_arg(ap, char *), max_textsize);
-	  new_gadget->info_text[max_textsize] = '\0';
-	}
-	break;
-
-      case GDI_X:
-	new_gadget->x = va_arg(ap, int);
-	break;
-
-      case GDI_Y:
-	new_gadget->y = va_arg(ap, int);
-	break;
-
-      case GDI_WIDTH:
-	new_gadget->width = va_arg(ap, int);
-	break;
-
-      case GDI_HEIGHT:
-	new_gadget->height = va_arg(ap, int);
-	break;
-
-      case GDI_TYPE:
-	new_gadget->type = va_arg(ap, unsigned long);
-	break;
-
-      case GDI_STATE:
-	new_gadget->state = va_arg(ap, unsigned long);
-	break;
-
-      case GDI_CHECKED:
-	new_gadget->checked = va_arg(ap, boolean);
-	break;
-
-      case GDI_RADIO_NR:
-	new_gadget->radio_nr = va_arg(ap, unsigned long);
-	break;
-
-      case GDI_NUMBER_VALUE:
-	new_gadget->text.number_value = va_arg(ap, long);
-	sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
-	new_gadget->text.cursor_position = strlen(new_gadget->text.value);
-	break;
-
-      case GDI_NUMBER_MIN:
-	new_gadget->text.number_min = va_arg(ap, long);
-	if (new_gadget->text.number_value < new_gadget->text.number_min)
-	{
-	  new_gadget->text.number_value = new_gadget->text.number_min;
-	  sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
-	}
-	break;
-
-      case GDI_NUMBER_MAX:
-	new_gadget->text.number_max = va_arg(ap, long);
-	if (new_gadget->text.number_value > new_gadget->text.number_max)
-	{
-	  new_gadget->text.number_value = new_gadget->text.number_max;
-	  sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
-	}
-	break;
-
-      case GDI_TEXT_VALUE:
-	{
-	  int max_textsize = MAX_GADGET_TEXTSIZE;
-
-	  if (new_gadget->text.size)
-	    max_textsize = MIN(new_gadget->text.size, MAX_GADGET_TEXTSIZE - 1);
-
-	  strncpy(new_gadget->text.value, va_arg(ap, char *), max_textsize);
-	  new_gadget->text.value[max_textsize] = '\0';
-	  new_gadget->text.cursor_position = strlen(new_gadget->text.value);
-	}
-	break;
-
-      case GDI_TEXT_SIZE:
-	{
-	  int tag_value = va_arg(ap, int);
-	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE - 1);
-
-	  new_gadget->text.size = max_textsize;
-	  new_gadget->text.value[max_textsize] = '\0';
-
-	  if (new_gadget->width == 0 && new_gadget->height == 0)
-	  {
-	    new_gadget->width = (new_gadget->text.size + 1) * FONT2_XSIZE + 6;
-	    new_gadget->height = ED_WIN_COUNT_YSIZE;
-	  }
-	}
-	break;
-
-      case GDI_DESIGN_UNPRESSED:
-	new_gadget->design[GD_BUTTON_UNPRESSED].pixmap = va_arg(ap, Pixmap);
-	new_gadget->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
-	new_gadget->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
-	break;
-
-      case GDI_DESIGN_PRESSED:
-	new_gadget->design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
-	new_gadget->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
-	new_gadget->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
-	break;
-
-      case GDI_ALT_DESIGN_UNPRESSED:
-	new_gadget->alt_design[GD_BUTTON_UNPRESSED].pixmap= va_arg(ap, Pixmap);
-	new_gadget->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
-	new_gadget->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
-	break;
-
-      case GDI_ALT_DESIGN_PRESSED:
-	new_gadget->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
-	new_gadget->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
-	new_gadget->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
-	break;
-
-      case GDI_DESIGN_BORDER:
-	new_gadget->design_border = va_arg(ap, int);
-	break;
-
-      case GDI_DECORATION_DESIGN:
-	new_gadget->deco.design.pixmap = va_arg(ap, Pixmap);
-	new_gadget->deco.design.x = va_arg(ap, int);
-	new_gadget->deco.design.y = va_arg(ap, int);
-	break;
-
-      case GDI_DECORATION_POSITION:
-	new_gadget->deco.x = va_arg(ap, int);
-	new_gadget->deco.y = va_arg(ap, int);
-	break;
-
-      case GDI_DECORATION_SIZE:
-	new_gadget->deco.width = va_arg(ap, int);
-	new_gadget->deco.height = va_arg(ap, int);
-	break;
-
-      case GDI_DECORATION_SHIFTING:
-	new_gadget->deco.xshift = va_arg(ap, int);
-	new_gadget->deco.yshift = va_arg(ap, int);
-	break;
-
-      case GDI_EVENT_MASK:
-	new_gadget->event_mask = va_arg(ap, unsigned long);
-	break;
-
-      case GDI_AREA_SIZE:
-	new_gadget->drawing.area_xsize = va_arg(ap, int);
-	new_gadget->drawing.area_ysize = va_arg(ap, int);
-
-	/* determine dependent values for drawing area gadget, if needed */
-	if (new_gadget->width == 0 &&
-	    new_gadget->height == 0 &&
-	    new_gadget->drawing.item_xsize !=0 &&
-	    new_gadget->drawing.item_ysize !=0)
-	{
-	  new_gadget->width =
-	    new_gadget->drawing.area_xsize * new_gadget->drawing.item_xsize;
-	  new_gadget->height =
-	    new_gadget->drawing.area_ysize * new_gadget->drawing.item_ysize;
-	}
-	else if (new_gadget->drawing.item_xsize == 0 &&
-		 new_gadget->drawing.item_ysize == 0 &&
-		 new_gadget->width != 0 &&
-		 new_gadget->height != 0)
-	{
-	  new_gadget->drawing.item_xsize =
-	    new_gadget->width / new_gadget->drawing.area_xsize;
-	  new_gadget->drawing.item_ysize =
-	    new_gadget->height / new_gadget->drawing.area_ysize;
-	}
-	break;
-
-      case GDI_ITEM_SIZE:
-	new_gadget->drawing.item_xsize = va_arg(ap, int);
-	new_gadget->drawing.item_ysize = va_arg(ap, int);
-
-	/* determine dependent values for drawing area gadget, if needed */
-	if (new_gadget->width == 0 &&
-	    new_gadget->height == 0 &&
-	    new_gadget->drawing.area_xsize !=0 &&
-	    new_gadget->drawing.area_ysize !=0)
-	{
-	  new_gadget->width =
-	    new_gadget->drawing.area_xsize * new_gadget->drawing.item_xsize;
-	  new_gadget->height =
-	    new_gadget->drawing.area_ysize * new_gadget->drawing.item_ysize;
-	}
-	else if (new_gadget->drawing.area_xsize == 0 &&
-		 new_gadget->drawing.area_ysize == 0 &&
-		 new_gadget->width != 0 &&
-		 new_gadget->height != 0)
-	{
-	  new_gadget->drawing.area_xsize =
-	    new_gadget->width / new_gadget->drawing.item_xsize;
-	  new_gadget->drawing.area_ysize =
-	    new_gadget->height / new_gadget->drawing.item_ysize;
-	}
-	break;
-
-      case GDI_SCROLLBAR_ITEMS_MAX:
-	new_gadget->scrollbar.items_max = va_arg(ap, int);
-	break;
-
-      case GDI_SCROLLBAR_ITEMS_VISIBLE:
-	new_gadget->scrollbar.items_visible = va_arg(ap, int);
-	break;
-
-      case GDI_SCROLLBAR_ITEM_POSITION:
-	new_gadget->scrollbar.item_position = va_arg(ap, int);
-	break;
-
-      case GDI_CALLBACK_INFO:
-	new_gadget->callback_info = va_arg(ap, gadget_function);
-	break;
-
-      case GDI_CALLBACK_ACTION:
-	new_gadget->callback_action = va_arg(ap, gadget_function);
-	break;
-
-      default:
-	Error(ERR_EXIT, "CreateGadget(): unknown tag %d", tag);
-    }
-
-    tag = va_arg(ap, int);	/* read next tag */
-  }
-
-  va_end(ap);
-
-  /* check if gadget complete */
-  if (new_gadget->type != GD_TYPE_DRAWING_AREA &&
-      (!new_gadget->design[GD_BUTTON_UNPRESSED].pixmap ||
-       !new_gadget->design[GD_BUTTON_PRESSED].pixmap))
-    Error(ERR_EXIT, "gadget incomplete (missing Pixmap)");
-
-  if (new_gadget->type & GD_TYPE_SCROLLBAR)
-  {
-    struct GadgetScrollbar *gs = &new_gadget->scrollbar;
-
-    if (new_gadget->width == 0 || new_gadget->height == 0 ||
-	gs->items_max == 0 || gs->items_visible == 0)
-      Error(ERR_EXIT, "scrollbar gadget incomplete (missing tags)");
-
-    /* calculate internal scrollbar values */
-    gs->size_max = (new_gadget->type == GD_TYPE_SCROLLBAR_VERTICAL ?
-		    new_gadget->height : new_gadget->width);
-    gs->size = gs->size_max * gs->items_visible / gs->items_max;
-    gs->position = gs->size_max * gs->item_position / gs->items_max;
-    gs->position_max = gs->size_max - gs->size;
-  }
-
-  /* insert new gadget into global gadget list */
-  if (gadget_list_last_entry)
-  {
-    gadget_list_last_entry->next = new_gadget;
-    gadget_list_last_entry = gadget_list_last_entry->next;
-  }
-  else
-    gadget_list_first_entry = gadget_list_last_entry = new_gadget;
-
-  return new_gadget;
-}
-
-void FreeGadget(struct GadgetInfo *gi)
-{
-  struct GadgetInfo *gi_previous = gadget_list_first_entry;
-
-  while (gi_previous && gi_previous->next != gi)
-    gi_previous = gi_previous->next;
-
-  if (gi == gadget_list_first_entry)
-    gadget_list_first_entry = gi->next;
-
-  if (gi == gadget_list_last_entry)
-    gadget_list_last_entry = gi_previous;
-
-  gi_previous->next = gi->next;
-  free(gi);
-}
-
-/* values for DrawGadget() */
-#define DG_UNPRESSED	0
-#define DG_PRESSED	1
-#define DG_BUFFERED	0
-#define DG_DIRECT	1
-
-static void CheckRangeOfNumericInputGadget(struct GadgetInfo *gi)
-{
-  if (gi->type != GD_TYPE_TEXTINPUT_NUMERIC)
-    return;
-
-  gi->text.number_value = atoi(gi->text.value);
-
-  if (gi->text.number_value < gi->text.number_min)
-    gi->text.number_value = gi->text.number_min;
-  if (gi->text.number_value > gi->text.number_max)
-    gi->text.number_value = gi->text.number_max;
-
-  sprintf(gi->text.value, "%d", gi->text.number_value);
-
-  if (gi->text.cursor_position < 0)
-    gi->text.cursor_position = 0;
-  else if (gi->text.cursor_position > strlen(gi->text.value))
-    gi->text.cursor_position = strlen(gi->text.value);
 }
 
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
@@ -2166,69 +1843,355 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     XCopyArea(display, drawto, window, gc,
 	      gi->x, gi->y, gi->width, gi->height, gi->x, gi->y);
   else
-    redraw_mask |= REDRAW_ALL;
+    redraw_mask |= (gi->x < SX + SXSIZE ? REDRAW_FIELD :
+		    gi->y < DY + DYSIZE ? REDRAW_DOOR_1 :
+		    gi->y > VY ? REDRAW_DOOR_2 : REDRAW_DOOR_3);
 }
 
-void ClickOnGadget(struct GadgetInfo *gi)
+static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 {
-  /* simulate releasing mouse button over last gadget, if still pressed */
-  if (button_status)
-    HandleGadgets(-1, -1, 0);
+  int tag = first_tag;
 
-  /* simulate pressing mouse button over specified gadget */
-  HandleGadgets(gi->x, gi->y, 1);
+  while (tag != GDI_END)
+  {
+    switch(tag)
+    {
+      case GDI_CUSTOM_ID:
+	gi->custom_id = va_arg(ap, int);
+	break;
 
-  /* simulate releasing mouse button over specified gadget */
-  HandleGadgets(gi->x, gi->y, 0);
+      case GDI_INFO_TEXT:
+	{
+	  int max_textsize = MAX_INFO_TEXTSIZE;
+
+	  strncpy(gi->info_text, va_arg(ap, char *), max_textsize);
+	  gi->info_text[max_textsize] = '\0';
+	}
+	break;
+
+      case GDI_X:
+	gi->x = va_arg(ap, int);
+	break;
+
+      case GDI_Y:
+	gi->y = va_arg(ap, int);
+	break;
+
+      case GDI_WIDTH:
+	gi->width = va_arg(ap, int);
+	break;
+
+      case GDI_HEIGHT:
+	gi->height = va_arg(ap, int);
+	break;
+
+      case GDI_TYPE:
+	gi->type = va_arg(ap, unsigned long);
+	break;
+
+      case GDI_STATE:
+	gi->state = va_arg(ap, unsigned long);
+	break;
+
+      case GDI_CHECKED:
+	gi->checked = va_arg(ap, boolean);
+	break;
+
+      case GDI_RADIO_NR:
+	gi->radio_nr = va_arg(ap, unsigned long);
+	break;
+
+      case GDI_NUMBER_VALUE:
+	gi->text.number_value = va_arg(ap, long);
+	sprintf(gi->text.value, "%d", gi->text.number_value);
+	gi->text.cursor_position = strlen(gi->text.value);
+	break;
+
+      case GDI_NUMBER_MIN:
+	gi->text.number_min = va_arg(ap, long);
+	if (gi->text.number_value < gi->text.number_min)
+	{
+	  gi->text.number_value = gi->text.number_min;
+	  sprintf(gi->text.value, "%d", gi->text.number_value);
+	}
+	break;
+
+      case GDI_NUMBER_MAX:
+	gi->text.number_max = va_arg(ap, long);
+	if (gi->text.number_value > gi->text.number_max)
+	{
+	  gi->text.number_value = gi->text.number_max;
+	  sprintf(gi->text.value, "%d", gi->text.number_value);
+	}
+	break;
+
+      case GDI_TEXT_VALUE:
+	{
+	  int max_textsize = MAX_GADGET_TEXTSIZE;
+
+	  if (gi->text.size)
+	    max_textsize = MIN(gi->text.size, MAX_GADGET_TEXTSIZE - 1);
+
+	  strncpy(gi->text.value, va_arg(ap, char *), max_textsize);
+	  gi->text.value[max_textsize] = '\0';
+	  gi->text.cursor_position = strlen(gi->text.value);
+	}
+	break;
+
+      case GDI_TEXT_SIZE:
+	{
+	  int tag_value = va_arg(ap, int);
+	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE - 1);
+
+	  gi->text.size = max_textsize;
+	  gi->text.value[max_textsize] = '\0';
+
+	  if (gi->width == 0 && gi->height == 0)
+	  {
+	    gi->width = (gi->text.size + 1) * FONT2_XSIZE + 6;
+	    gi->height = ED_WIN_COUNT_YSIZE;
+	  }
+	}
+	break;
+
+      case GDI_DESIGN_UNPRESSED:
+	gi->design[GD_BUTTON_UNPRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
+	gi->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
+	break;
+
+      case GDI_DESIGN_PRESSED:
+	gi->design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
+	gi->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
+	break;
+
+      case GDI_ALT_DESIGN_UNPRESSED:
+	gi->alt_design[GD_BUTTON_UNPRESSED].pixmap= va_arg(ap, Pixmap);
+	gi->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
+	gi->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
+	break;
+
+      case GDI_ALT_DESIGN_PRESSED:
+	gi->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
+	gi->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
+	break;
+
+      case GDI_DESIGN_BORDER:
+	gi->design_border = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_DESIGN:
+	gi->deco.design.pixmap = va_arg(ap, Pixmap);
+	gi->deco.design.x = va_arg(ap, int);
+	gi->deco.design.y = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_POSITION:
+	gi->deco.x = va_arg(ap, int);
+	gi->deco.y = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_SIZE:
+	gi->deco.width = va_arg(ap, int);
+	gi->deco.height = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_SHIFTING:
+	gi->deco.xshift = va_arg(ap, int);
+	gi->deco.yshift = va_arg(ap, int);
+	break;
+
+      case GDI_EVENT_MASK:
+	gi->event_mask = va_arg(ap, unsigned long);
+	break;
+
+      case GDI_AREA_SIZE:
+	gi->drawing.area_xsize = va_arg(ap, int);
+	gi->drawing.area_ysize = va_arg(ap, int);
+
+	/* determine dependent values for drawing area gadget, if needed */
+	if (gi->width == 0 && gi->height == 0 &&
+	    gi->drawing.item_xsize !=0 && gi->drawing.item_ysize !=0)
+	{
+	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
+	  gi->height = gi->drawing.area_ysize * gi->drawing.item_ysize;
+	}
+	else if (gi->drawing.item_xsize == 0 && gi->drawing.item_ysize == 0 &&
+		 gi->width != 0 && gi->height != 0)
+	{
+	  gi->drawing.item_xsize = gi->width / gi->drawing.area_xsize;
+	  gi->drawing.item_ysize = gi->height / gi->drawing.area_ysize;
+	}
+	break;
+
+      case GDI_ITEM_SIZE:
+	gi->drawing.item_xsize = va_arg(ap, int);
+	gi->drawing.item_ysize = va_arg(ap, int);
+
+	/* determine dependent values for drawing area gadget, if needed */
+	if (gi->width == 0 && gi->height == 0 &&
+	    gi->drawing.area_xsize !=0 && gi->drawing.area_ysize !=0)
+	{
+	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
+	  gi->height = gi->drawing.area_ysize * gi->drawing.item_ysize;
+	}
+	else if (gi->drawing.area_xsize == 0 && gi->drawing.area_ysize == 0 &&
+		 gi->width != 0 && gi->height != 0)
+	{
+	  gi->drawing.area_xsize = gi->width / gi->drawing.item_xsize;
+	  gi->drawing.area_ysize = gi->height / gi->drawing.item_ysize;
+	}
+	break;
+
+      case GDI_SCROLLBAR_ITEMS_MAX:
+	gi->scrollbar.items_max = va_arg(ap, int);
+	break;
+
+      case GDI_SCROLLBAR_ITEMS_VISIBLE:
+	gi->scrollbar.items_visible = va_arg(ap, int);
+	break;
+
+      case GDI_SCROLLBAR_ITEM_POSITION:
+	gi->scrollbar.item_position = va_arg(ap, int);
+	break;
+
+      case GDI_CALLBACK_INFO:
+	gi->callback_info = va_arg(ap, gadget_function);
+	break;
+
+      case GDI_CALLBACK_ACTION:
+	gi->callback_action = va_arg(ap, gadget_function);
+	break;
+
+      default:
+	Error(ERR_EXIT, "HandleGadgetTags(): unknown tag %d", tag);
+    }
+
+    tag = va_arg(ap, int);	/* read next tag */
+  }
+
+  /* check if gadget complete */
+  if (gi->type != GD_TYPE_DRAWING_AREA &&
+      (!gi->design[GD_BUTTON_UNPRESSED].pixmap ||
+       !gi->design[GD_BUTTON_PRESSED].pixmap))
+    Error(ERR_EXIT, "gadget incomplete (missing Pixmap)");
+
+  /* adjust gadget values in relation to other gadget values */
+
+  if (gi->type & GD_TYPE_TEXTINPUT_NUMERIC)
+  {
+    struct GadgetTextInput *text = &gi->text;
+    int value = text->number_value;
+
+    text->number_value = (value < text->number_min ? text->number_min :
+			  value > text->number_max ? text->number_max :
+			  value);
+
+    sprintf(text->value, "%d", text->number_value);
+  }
+
+  if (gi->type & GD_TYPE_SCROLLBAR)
+  {
+    struct GadgetScrollbar *gs = &gi->scrollbar;
+
+    if (gi->width == 0 || gi->height == 0 ||
+	gs->items_max == 0 || gs->items_visible == 0)
+      Error(ERR_EXIT, "scrollbar gadget incomplete (missing tags)");
+
+    /* calculate internal scrollbar values */
+    gs->size_max = (gi->type == GD_TYPE_SCROLLBAR_VERTICAL ?
+		    gi->height : gi->width);
+    gs->size = gs->size_max * gs->items_visible / gs->items_max;
+    gs->position = gs->size_max * gs->item_position / gs->items_max;
+    gs->position_max = gs->size_max - gs->size;
+
+    /* finetuning for maximal right/bottom position */
+    if (gs->item_position == gs->items_max - gs->items_visible)
+      gs->position = gs->position_max;
+  }
 }
 
-void AdjustScrollbar(struct GadgetInfo *gi, int items_max, int item_pos)
+void ModifyGadget(struct GadgetInfo *gi, int first_tag, ...)
 {
-  struct GadgetScrollbar *gs = &gi->scrollbar;
+  va_list ap;
 
-  gs->items_max = items_max;
-  gs->item_position = item_pos;
+  va_start(ap, first_tag);
+  HandleGadgetTags(gi, first_tag, ap);
+  va_end(ap);
 
-  gs->size = gs->size_max * gs->items_visible / gs->items_max;
-  gs->position = gs->size_max * gs->item_position / gs->items_max;
-  gs->position_max = gs->size_max - gs->size;
+  RedrawGadget(gi);
+}
 
-  /* finetuning for maximal right/bottom position */
-  if (gs->item_position == gs->items_max - gs->items_visible)
-    gs->position = gs->position_max;
-
+void RedrawGadget(struct GadgetInfo *gi)
+{
   if (gi->mapped)
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+    DrawGadget(gi, gi->state, DG_DIRECT);
 }
 
-void ModifyTextInputTextValue(struct GadgetInfo *gi, char *new_text)
+struct GadgetInfo *CreateGadget(int first_tag, ...)
 {
-  struct GadgetTextInput *text = &gi->text;
-  int max_textsize = MAX_GADGET_TEXTSIZE;
+  struct GadgetInfo *new_gadget = checked_malloc(sizeof(struct GadgetInfo));
+  va_list ap;
 
-  if (text->size)
-    max_textsize = MIN(text->size, MAX_GADGET_TEXTSIZE - 1);
+  /* always start with reliable default values */
+  memset(new_gadget, 0, sizeof(struct GadgetInfo));	/* zero all fields */
+  new_gadget->id = getNewGadgetID();
+  new_gadget->callback_info = default_callback_info;
+  new_gadget->callback_action = default_callback_action;
 
-  strncpy(text->value, new_text, max_textsize);
-  text->value[max_textsize] = '\0';
-  text->cursor_position = strlen(text->value);
+  va_start(ap, first_tag);
+  HandleGadgetTags(new_gadget, first_tag, ap);
+  va_end(ap);
 
-  if (gi->mapped)
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+  /* insert new gadget into global gadget list */
+  if (gadget_list_last_entry)
+  {
+    gadget_list_last_entry->next = new_gadget;
+    gadget_list_last_entry = gadget_list_last_entry->next;
+  }
+  else
+    gadget_list_first_entry = gadget_list_last_entry = new_gadget;
+
+  return new_gadget;
 }
 
-void ModifyTextInputNumberValue(struct GadgetInfo *gi, int new_value)
+void FreeGadget(struct GadgetInfo *gi)
 {
-  struct GadgetTextInput *text = &gi->text;
+  struct GadgetInfo *gi_previous = gadget_list_first_entry;
 
-  text->number_value = (new_value < text->number_min ? text->number_min :
-			new_value > text->number_max ? text->number_max :
-			new_value);
+  while (gi_previous && gi_previous->next != gi)
+    gi_previous = gi_previous->next;
 
-  sprintf(text->value, "%d", text->number_value);
+  if (gi == gadget_list_first_entry)
+    gadget_list_first_entry = gi->next;
 
-  if (gi->mapped)
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+  if (gi == gadget_list_last_entry)
+    gadget_list_last_entry = gi_previous;
+
+  gi_previous->next = gi->next;
+  free(gi);
+}
+
+static void CheckRangeOfNumericInputGadget(struct GadgetInfo *gi)
+{
+  if (gi->type != GD_TYPE_TEXTINPUT_NUMERIC)
+    return;
+
+  gi->text.number_value = atoi(gi->text.value);
+
+  if (gi->text.number_value < gi->text.number_min)
+    gi->text.number_value = gi->text.number_min;
+  if (gi->text.number_value > gi->text.number_max)
+    gi->text.number_value = gi->text.number_max;
+
+  sprintf(gi->text.value, "%d", gi->text.number_value);
+
+  if (gi->text.cursor_position < 0)
+    gi->text.cursor_position = 0;
+  else if (gi->text.cursor_position > strlen(gi->text.value))
+    gi->text.cursor_position = strlen(gi->text.value);
 }
 
 /* global pointer to gadget actually in use (when mouse button pressed) */
@@ -2308,6 +2271,19 @@ void UnmapAllGadgets()
 void RemapAllGadgets()
 {
   MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_REMAP);
+}
+
+void ClickOnGadget(struct GadgetInfo *gi)
+{
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
+
+  /* simulate pressing mouse button over specified gadget */
+  HandleGadgets(gi->x, gi->y, 1);
+
+  /* simulate releasing mouse button over specified gadget */
+  HandleGadgets(gi->x, gi->y, 0);
 }
 
 void HandleGadgets(int mx, int my, int button)
@@ -2516,7 +2492,8 @@ void HandleGadgets(int mx, int my, int button)
 	  changed_position = TRUE;
 	}
 
-	AdjustScrollbar(gi, gs->items_max, gs->item_position);
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, gs->item_position,
+		     GDI_END);
 
 	gi->state = GD_BUTTON_UNPRESSED;
 	gi->event.type = GD_EVENT_MOVING;

@@ -1779,7 +1779,8 @@ void AdjustEditorScrollbar(int id)
   if (item_position > items_max - items_visible)
     item_position = items_max - items_visible;
 
-  AdjustScrollbar(gi, items_max, item_position);
+  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
 void ModifyEditorTextInput(int textinput_id, char *new_text)
@@ -1787,7 +1788,7 @@ void ModifyEditorTextInput(int textinput_id, char *new_text)
   int gadget_id = textinput_info[textinput_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-  ModifyTextInputTextValue(gi, new_text);
+  ModifyGadget(gi, GDI_TEXT_VALUE, new_text, GDI_END);
 }
 
 void ModifyEditorCounter(int counter_id, int new_value)
@@ -1796,7 +1797,7 @@ void ModifyEditorCounter(int counter_id, int new_value)
   int gadget_id = counterbutton_info[counter_id].gadget_id_text;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-  ModifyTextInputNumberValue(gi, new_value);
+  ModifyGadget(gi, GDI_NUMBER_VALUE, new_value, GDI_END);
 
   if (counter_value != NULL)
     *counter_value = gi->text.number_value;
@@ -3419,9 +3420,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
   int id = gi->custom_id;
-  boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
   boolean button_release_event;
+  boolean inside_drawing_area = !gi->event.off_borders;
   boolean draw_level = (id == GADGET_ID_DRAWING_LEVEL);
   int new_element;
   int button = gi->event.button;
@@ -3453,6 +3454,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     /* get positions inside level field */
     lx = sx + level_xpos;
     ly = sy + level_ypos;
+
+    if (!IN_LEV_FIELD(lx, ly))
+      inside_drawing_area = FALSE;
 
     /* make sure to stay inside level field boundaries */
     lx = (lx < min_lx ? min_lx : lx > max_lx ? max_lx : lx);
@@ -3820,7 +3824,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetScrollbar *gs = &gi->scrollbar;
 
 	if (lev_fieldx < ED_FIELDX - 2)
 	  break;
@@ -3833,7 +3836,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
 
-	AdjustScrollbar(gi, gs->items_max, level_xpos + 1);
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
       }
       break;
 
@@ -3842,7 +3845,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetScrollbar *gs = &gi->scrollbar;
 
 	if (lev_fieldx < ED_FIELDX - 2)
 	  break;
@@ -3855,7 +3857,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
 
-	AdjustScrollbar(gi, gs->items_max, level_xpos + 1);
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
       }
       break;
 
@@ -3864,7 +3866,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetScrollbar *gs = &gi->scrollbar;
 
 	if (lev_fieldy < ED_FIELDY - 2)
 	  break;
@@ -3877,7 +3878,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
 
-	AdjustScrollbar(gi, gs->items_max, level_ypos + 1);
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
       }
       break;
 
@@ -3886,7 +3887,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetScrollbar *gs = &gi->scrollbar;
 
 	if (lev_fieldy < ED_FIELDY - 2)
 	  break;
@@ -3899,7 +3899,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
 
-	AdjustScrollbar(gi, gs->items_max, level_ypos + 1);
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
       }
       break;
 
