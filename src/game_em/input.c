@@ -28,6 +28,8 @@ struct PLAYER ply1;
 struct PLAYER ply2;
 struct LEVEL lev;
 
+struct LevelInfo_EM native_em_level;
+
 unsigned short **Boom;
 unsigned short **Cave;
 unsigned short **Next;
@@ -150,12 +152,21 @@ void game_init_vars(void)
 
 int game_play_init(int level_nr, char *filename)
 {
+#if 0
   if (filename != NULL)
   {
+#endif
+
     player_level = level_nr;
 
-    if (cave_convert(filename) != 0)
+#if 1
+    prepare_em_level();
+#else
+    if (!LoadNativeLevel_EM(filename))
       return 1;
+#endif
+
+#if 0
   }
   else	/* !!! SOON OBSOLETE !!! */
   {
@@ -170,6 +181,7 @@ int game_play_init(int level_nr, char *filename)
     if (cave_convert(name) != 0)
       return 1;
   }
+#endif
 
   game_initscreen();
   game_blitscore();

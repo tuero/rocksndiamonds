@@ -54,17 +54,23 @@ void em_close_all()
 
 int em_main_init_game(int level_nr, char *filename)
 {
+#if 0
   if (skip_menu)
   {
+#endif
+
     em_game_status = EM_GAME_STATUS_PLAY;
     if (game_play_init(level_nr, filename) != 0)
       return 1;
+
+#if 0
   }
   else
   {
     em_game_status = EM_GAME_STATUS_MENU;
     game_menu_init();
   }
+#endif
 
   return 0;
 }

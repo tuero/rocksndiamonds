@@ -51,7 +51,8 @@ void title_string(unsigned int y, unsigned int left, unsigned int right,
 
 void sound_play(void);
 
-int cave_convert(char *filename);
+int cave_convert(char *);
+boolean LoadNativeLevel_EM(char *);
 
 void game_init_vars(void);
 int game_play_init(int, char *);
@@ -61,8 +62,9 @@ void synchro_1(void);
 void synchro_2(void);
 void synchro_3(void);
 
-int clean_emerald(unsigned char *src, unsigned long *length);
-void convert_emerald(unsigned char *src);
+boolean cleanup_em_level(unsigned char *src, int *length);
+void    convert_em_level(unsigned char *src);
+void    prepare_em_level(void);
 
 int sound_thread(void);
 int read_sample(char *name, short **data, long *length);

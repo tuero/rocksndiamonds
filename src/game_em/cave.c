@@ -20,21 +20,33 @@
 
 struct cave_node *cave_list;
 
-static void clear(void);
+static void setLevelInfoToDefaults_EM(void)
+{
+  lev.width = 64;
+  lev.height = 32;
+
+  ply1.x_initial = 0;
+  ply1.y_initial = 0;
+
+  ply2.x_initial = 0;
+  ply2.y_initial = 0;
+}
+
 
 /* attempt load a cave
  * 
  * completely initializes the level structure, ready for a game
  */
-int cave_convert(char *filename)
+int OLD_cave_convert(char *filename)
 {
   int result;
   FILE *file;
   int actual;
-  unsigned long length;
+  int length;
   unsigned char buffer[16384];
 
-  clear();
+  /* always start with reliable default values */
+  setLevelInfoToDefaults_EM();
 
   file = fopen(filename, "rb");
   if (file == 0)
@@ -58,7 +70,7 @@ int cave_convert(char *filename)
   fclose(file);
   file = 0;
 
-  if (clean_emerald(buffer, &length))
+  if (!cleanup_em_level(buffer, &length))
   {
     fprintf(stderr, "%s: \"%s\": %s\n", progname, filename,
 	    "unrecognized format");
@@ -66,7 +78,8 @@ int cave_convert(char *filename)
     goto fail;
   }
 
-  convert_emerald(buffer);
+  convert_em_level(buffer);
+  prepare_em_level();
 
   result = 0;
 
@@ -78,35 +91,46 @@ int cave_convert(char *filename)
   return(result);
 }
 
-static void clear(void)
-{
-  lev.home = 1; /* number of players */
-  lev.width = 0;
-  lev.height = 0;
-  lev.time = 0;
-  lev.required = 0;
-  lev.score = 0;
+#define MAX_EM_LEVEL_SIZE		16384
 
-  ply1.num = 0;
-  ply1.alive = (lev.home >= 1);
-  ply1.dynamite = 0;
-  ply1.dynamite_cnt = 0;
-  ply1.keys = 0;
-  ply1.anim = 0;
-  ply1.oldx = ply1.x = 0;
-  ply1.oldy = ply1.y = 0;
-  ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = ply1.joy_fire = 0;
-  ply1.joy_stick = ply1.joy_spin = 0;
-  ply2.num = 1;
-  ply2.alive = (lev.home >= 2);
-  ply2.dynamite = 0;
-  ply2.dynamite_cnt = 0;
-  ply2.keys = 0;
-  ply2.anim = 0;
-  ply2.oldx = ply2.x = 0;
-  ply2.oldy = ply2.y = 0;
-  ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = ply2.joy_fire = 0;
-  ply2.joy_stick = ply2.joy_spin = 0;
+boolean LoadNativeLevel_EM(char *filename)
+{
+  unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
+  int raw_leveldata_length;
+  FILE *file;
+
+  /* always start with reliable default values */
+  setLevelInfoToDefaults_EM();
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  raw_leveldata_length = fread(raw_leveldata, 1, MAX_EM_LEVEL_SIZE, file);
+
+  fclose(file);
+
+  if (raw_leveldata_length <= 0)
+  {
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  if (!cleanup_em_level(raw_leveldata, &raw_leveldata_length))
+  {
+    Error(ERR_WARN, "unknown EM level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  convert_em_level(raw_leveldata);
+  prepare_em_level();
+
+  return TRUE;
 }
 
 void read_cave_list(void)

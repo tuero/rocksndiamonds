@@ -8,6 +8,7 @@
  * inconsequential, but no doubt it will break some caves.
  */
 
+#include "global.h"
 #include "tile.h"
 #include "level.h"
 
@@ -89,7 +90,7 @@ static unsigned char remap_v4eater[28] =
   146,147,175,65,66,64,2,18
 };
 
-int clean_emerald(unsigned char *src, unsigned long *length)
+boolean cleanup_em_level(unsigned char *src, int *length)
 {
   unsigned int i;
 
@@ -156,7 +157,7 @@ int clean_emerald(unsigned char *src, unsigned long *length)
     goto v3;
   }
 
-  return 1;		/* unrecognized cave */
+  return FALSE;		/* unrecognized cave */
 
  v3:
  v4:
@@ -185,7 +186,6 @@ int clean_emerald(unsigned char *src, unsigned long *length)
   for (i = 0; i < 2048; i++)
     if (src[i] == 40)
       break;
-
   for (i++; i < 2048; i++)
     if (src[i] == 40)
       src[i] = 147;
@@ -323,7 +323,7 @@ int clean_emerald(unsigned char *src, unsigned long *length)
   /* size of v6 cave */
   *length = 2172;
 
-  return 0;
+  return TRUE;
 }
 
 /* 2000-07-30T00:26:00Z
@@ -423,69 +423,70 @@ static unsigned short remap_emerald[256] =
   Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank,
 };
 
-void convert_emerald(unsigned char *src)
+void convert_em_level(unsigned char *src)
 {
   unsigned int x, y, temp;
-
-  lev.width = 64;
-  lev.height = 32;
 
   temp = ((src[0x83E] << 8 | src[0x83F]) * 25 + 3) / 4;
   if (temp == 0 || temp > 9999)
     temp = 9999;
-  lev.time = temp;
-  lev.required = src[0x82F];
+  lev.time_initial = temp;
+  lev.required_initial = src[0x82F];
 
   temp = src[0x830] << 8 | src[0x831];
-  ply1.oldx = ply1.x = (temp & 63) + 1;
-  ply1.oldy = ply1.y = (temp >> 6 & 31) + 1;
+  ply1.x_initial = (temp & 63) + 1;
+  ply1.y_initial = (temp >> 6 & 31) + 1;
   temp = src[0x832] << 8 | src[0x833];
-  ply2.oldx = ply2.x = (temp & 63) + 1;
-  ply2.oldy = ply2.y = (temp >> 6 & 31) + 1;
-
-  lev.alien_score = src[0x826];
+  ply2.x_initial = (temp & 63) + 1;
+  ply2.y_initial = (temp >> 6 & 31) + 1;
 
   temp = (src[0x834] << 8 | src[0x835]) * 28;
   if (temp > 9999)
     temp = 9999;
   lev.ameuba_time = temp;
-  lev.android_move_cnt = lev.android_move_time = src[0x874] << 8 | src[0x875];
-  lev.android_clone_cnt= lev.android_clone_time = src[0x876] << 8 | src[0x877];
-  lev.ball_pos = 0;
+
+  lev.android_move_time = src[0x874] << 8 | src[0x875];
+  lev.android_clone_time = src[0x876] << 8 | src[0x877];
+
   lev.ball_random = src[0x872] & 1 ? 1 : 0;
-  lev.ball_state = src[0x872] & 128 ? 1 : 0;
-  lev.ball_cnt = lev.ball_time = src[0x870] << 8 | src[0x871];
-  lev.bug_score = src[0x828];
-  lev.diamond_score = src[0x825];
-  lev.dynamite_score = src[0x82B];
-  lev.eater_pos = 0;
-  lev.eater_score = src[0x829];
+  lev.ball_state_initial = src[0x872] & 128 ? 1 : 0;
+  lev.ball_time = src[0x870] << 8 | src[0x871];
+
   lev.emerald_score = src[0x824];
-  lev.exit_score = src[0x82D] * 8 / 5;
-  lev.key_score = src[0x82C];
-  lev.lenses_cnt = 0;
-  lev.lenses_score = src[0x867];
-  lev.lenses_time = src[0x86A] << 8 | src[0x86B];
-  lev.magnify_cnt = 0;
-  lev.magnify_score = src[0x868];
-  lev.magnify_time = src[0x86C] << 8 | src[0x86D];
-  lev.nut_score = src[0x82A];
-  lev.shine_cnt = 0;
-  lev.slurp_score = src[0x869];
+  lev.diamond_score = src[0x825];
+  lev.alien_score = src[0x826];
   lev.tank_score = src[0x827];
-  lev.wheel_cnt = 0;
-  lev.wheel_x = 1;
-  lev.wheel_y = 1;
+  lev.bug_score = src[0x828];
+  lev.eater_score = src[0x829];
+  lev.nut_score = src[0x82A];
+  lev.dynamite_score = src[0x82B];
+  lev.key_score = src[0x82C];
+  lev.exit_score = src[0x82D] * 8 / 5;
+  lev.lenses_score = src[0x867];
+  lev.magnify_score = src[0x868];
+  lev.slurp_score = src[0x869];
+
+  lev.lenses_time = src[0x86A] << 8 | src[0x86B];
+  lev.lenses_cnt_initial = 0;
+
+  lev.magnify_time = src[0x86C] << 8 | src[0x86D];
+  lev.magnify_cnt_initial = 0;
+
   lev.wheel_time = src[0x838] << 8 | src[0x839];
-  lev.wind_cnt = src[0x865] & 15 ? 9999 : 0;
-  temp = src[0x865];
-  lev.wind_direction = (temp & 8 ? 0 :
-			temp & 1 ? 1 :
-			temp & 2 ? 2 :
-			temp & 4 ? 3 : 0);
+  lev.wheel_cnt_initial = 0;
+  lev.wheel_x_initial = 1;
+  lev.wheel_y_initial = 1;
+
   lev.wind_time = 9999;
-  lev.wonderwall_state = 0;
-  lev.wonderwall_time = src[0x836] << 8 | src[0x837];
+  lev.wind_cnt_initial = src[0x865] & 15 ? lev.wind_time : 0;
+  temp = src[0x865];
+  lev.wind_direction_initial = (temp & 8 ? 0 :
+				temp & 1 ? 1 :
+				temp & 2 ? 2 :
+				temp & 4 ? 3 : 0);
+
+  lev.wonderwall_state_initial = 0;
+  lev.wonderwall_time_initial = src[0x836] << 8 | src[0x837];
 
   for (x = 0; x < 9; x++)
     lev.eater_array[0][x] = remap_emerald[src[0x800 + x]];
@@ -696,14 +697,14 @@ void convert_emerald(unsigned char *src)
     switch (src[temp])
     {
       case 0x24:				/* wonderwall */
-	lev.wonderwall_state = 1;
-	lev.wonderwall_time = 9999;
+	lev.wonderwall_state_initial = 1;
+	lev.wonderwall_time_initial = 9999;
 	break;
 
       case 0x28:				/* wheel */
-	lev.wheel_x = temp & 63;
-	lev.wheel_y = temp >> 6;
-	lev.wheel_cnt = lev.wheel_time;
+	lev.wheel_x_initial = temp & 63;
+	lev.wheel_y_initial = temp >> 6;
+	lev.wheel_cnt_initial = lev.wheel_time;
 	break;
 
 #ifndef BAD_ROLL
@@ -749,28 +750,47 @@ void convert_emerald(unsigned char *src)
 #endif
 
       case 0xA3:				/* fake blank */
-	lev.lenses_cnt = 9999;
+	lev.lenses_cnt_initial = 9999;
 	break;
 
       case 0xA4:				/* fake grass */
-	lev.magnify_cnt = 9999;
+	lev.magnify_cnt_initial = 9999;
 	break;
     }
   }
 
+  lev.home_initial = 1;		/* initial number of players in this level */
+
+  ply1.alive_initial = (lev.home_initial >= 1);
+  ply2.alive_initial = (lev.home_initial >= 2);
+
+  /* first fill the complete playfield with the default border element */
   for (y = 0; y < HEIGHT; y++)
     for (x = 0; x < WIDTH; x++)
-      Cave[y][x] = ZBORDER;
+      native_em_level.cave[x][y] = ZBORDER;
 
+  /* then copy the real level contents from level file into the playfield */
   temp = 0;
   for (y = 0; y < lev.height; y++)
     for (x = 0; x < lev.width; x++)
-      Cave[y+1][x+1] = remap_emerald[src[temp++]];
+      native_em_level.cave[x + 1][y + 1] = remap_emerald[src[temp++]];
 
-  if (ply1.alive)
-    Cave[ply1.y][ply1.x] = Zplayer;
-  if (ply2.alive)
-    Cave[ply2.y][ply2.x] = Zplayer;
+  /* at last, set the two players at their positions in the playfield */
+  if (ply1.alive_initial)
+    native_em_level.cave[ply1.x_initial][ply1.y_initial] = Zplayer;
+  if (ply2.alive_initial)
+    native_em_level.cave[ply2.x_initial][ply2.y_initial] = Zplayer;
+}
+
+void prepare_em_level(void)
+{
+  unsigned int x, y;
+
+  /* reset all runtime variables to their initial values */
+
+  for (y = 0; y < HEIGHT; y++)
+    for (x = 0; x < WIDTH; x++)
+      Cave[y][x] = native_em_level.cave[x][y];
 
   for (y = 0; y < HEIGHT; y++)
     for (x = 0; x < WIDTH; x++)
@@ -779,6 +799,57 @@ void convert_emerald(unsigned char *src)
   for (y = 0; y < HEIGHT; y++)
     for (x = 0; x < WIDTH; x++)
       Draw[y][x] = Cave[y][x];
+
+  lev.time = lev.time_initial;
+  lev.required = lev.required_initial;
+  lev.score = 0;
+
+  lev.android_move_cnt  = lev.android_move_time;
+  lev.android_clone_cnt = lev.android_clone_time;
+
+  lev.ball_pos = 0;
+  lev.ball_state = lev.ball_state_initial;
+  lev.ball_cnt = lev.ball_time;
+
+  lev.eater_pos = 0;
+  lev.shine_cnt = 0;
+
+  lev.lenses_cnt = lev.lenses_cnt_initial;
+  lev.magnify_cnt = lev.magnify_cnt_initial;
+
+  lev.wheel_cnt = lev.wheel_cnt_initial;
+  lev.wheel_x   = lev.wheel_x_initial;
+  lev.wheel_y   = lev.wheel_y_initial;
+
+  lev.wind_cnt       = lev.wind_cnt_initial;
+  lev.wind_direction = lev.wind_direction_initial;
+
+  lev.wonderwall_state = lev.wonderwall_state_initial;
+  lev.wonderwall_time  = lev.wonderwall_time_initial;
+
+  lev.home = lev.home_initial;
+
+  ply1.num = 0;
+  ply1.alive = ply1.alive_initial;
+  ply1.dynamite = 0;
+  ply1.dynamite_cnt = 0;
+  ply1.keys = 0;
+  ply1.anim = 0;
+  ply1.oldx = ply1.x = ply1.x_initial;
+  ply1.oldy = ply1.y = ply1.y_initial;
+  ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = ply1.joy_fire = 0;
+  ply1.joy_stick = ply1.joy_spin = 0;
+
+  ply2.num = 1;
+  ply2.alive = ply2.alive_initial;
+  ply2.dynamite = 0;
+  ply2.dynamite_cnt = 0;
+  ply2.keys = 0;
+  ply2.anim = 0;
+  ply2.oldx = ply2.x = ply2.x_initial;
+  ply2.oldy = ply2.y = ply2.y_initial;
+  ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = ply2.joy_fire = 0;
+  ply2.joy_stick = ply2.joy_spin = 0;
 }
 
 #endif

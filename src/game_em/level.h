@@ -1,10 +1,13 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include "main_em.h"
 #include "tile.h"
 
-#define WIDTH  102
-#define HEIGHT 102
+#define WIDTH		EM_MAX_CAVE_WIDTH
+#define HEIGHT		EM_MAX_CAVE_HEIGHT
+
+#if 0
 
 struct LEVEL
 {
@@ -82,11 +85,15 @@ struct PLAYER
   unsigned joy_spin:1;
 };
 
+#endif
+
 extern unsigned long Random;
 
 extern struct PLAYER ply1;
 extern struct PLAYER ply2;
 extern struct LEVEL lev;
+
+extern struct LevelInfo_EM native_em_level;
 
 extern unsigned short **Boom;
 extern unsigned short **Cave;

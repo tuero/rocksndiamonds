@@ -187,6 +187,11 @@ int open_all(void)
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 
+#if 1
+  /* disable sound */
+  arg_silence = 1;
+#endif
+
   if (arg_silence == 0)
   {
     for (i = 0; i < SAMPLE_MAX; i++)

@@ -1343,6 +1343,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 /* functions for loading EM level                                            */
 /* ------------------------------------------------------------------------- */
 
+#if 0
+
 static int map_em_element_yam(int element)
 {
   switch (element)
@@ -1655,16 +1657,13 @@ static int map_em_element_field(int element)
 #define EM_LEVEL_XSIZE			64
 #define EM_LEVEL_YSIZE			32
 
-static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+static void OLD_LoadLevelFromFileInfo_EM(struct LevelInfo *level,
+					 struct LevelFileInfo *level_file_info)
 {
   char *filename = level_file_info->filename;
   FILE *file;
   unsigned char leveldata[EM_LEVEL_SIZE];
   unsigned char *header = &leveldata[EM_LEVEL_XSIZE * EM_LEVEL_YSIZE];
-  unsigned char code0 = 0x65;
-  unsigned char code1 = 0x11;
-  boolean level_is_crypted = FALSE;
   int nr = level_file_info->nr;
   int i, x, y;
 
@@ -1677,7 +1676,7 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
     return;
   }
 
-  for(i = 0; i < EM_LEVEL_SIZE; i++)
+  for (i = 0; i < EM_LEVEL_SIZE; i++)
     leveldata[i] = fgetc(file);
 
   fclose(file);
@@ -1688,20 +1687,20 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   if ((leveldata[0] == 0xf1 ||
        leveldata[0] == 0xf5) && leveldata[2] == 0xe7 && leveldata[3] == 0xee)
   {
-    level_is_crypted = TRUE;
+    unsigned char code0 = 0x65;
+    unsigned char code1 = 0x11;
 
     if (leveldata[0] == 0xf5)	/* error in crypted Emerald Mine 2 levels */
       leveldata[0] = 0xf1;
-  }
 
-  if (level_is_crypted)		/* decode crypted level data */
-  {
-    for(i = 0; i < EM_LEVEL_SIZE; i++)
+    /* decode crypted level data */
+
+    for (i = 0; i < EM_LEVEL_SIZE; i++)
     {
       leveldata[i] ^= code0;
       leveldata[i] -= code1;
 
-      code0  = (code0 + 7) & 0xff;
+      code0 = (code0 + 7) & 0xff;
     }
   }
 
@@ -1734,9 +1733,9 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 
   level->num_yamyam_contents = 4;
 
-  for(i = 0; i < level->num_yamyam_contents; i++)
-    for(y = 0; y < 3; y++)
-      for(x = 0; x < 3; x++)
+  for (i = 0; i < level->num_yamyam_contents; i++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	level->yamyam_content[i][x][y] =
 	  map_em_element_yam(header[i * 9 + y * 3 + x]);
 
@@ -1763,6 +1762,18 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   y = (header[50] * 256 + header[51]) / EM_LEVEL_XSIZE;
   level->field[x][y] = EL_PLAYER_2;
 }
+
+#else
+
+static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  if (!LoadNativeLevel_EM(level_file_info->filename))
+    level->no_valid_file = TRUE;
+}
+
+#endif
+
 
 /* ------------------------------------------------------------------------- */
 /* functions for loading SP level                                            */
@@ -1915,13 +1926,13 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
   level->time_wheel = 0;
   level->amoeba_content = EL_EMPTY;
 
-  for(i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
+  for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = 0;		/* !!! CORRECT THIS !!! */
 
   /* there are no yamyams in supaplex levels */
-  for(i = 0; i < level->num_yamyam_contents; i++)
-    for(y = 0; y < 3; y++)
-      for(x = 0; x < 3; x++)
+  for (i = 0; i < level->num_yamyam_contents; i++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	level->yamyam_content[i][x][y] = EL_EMPTY;
 }
 

@@ -18,7 +18,7 @@
 
 
 /* ========================================================================= */
-/* functions exported from main program to game_em                           */
+/* functions and definitions imported from main program to game_em           */
 /* ========================================================================= */
 
 #include "../libgame/libgame.h"
@@ -28,8 +28,10 @@ extern void DrawGameDoorValues_EM(int, int, int, int);
 
 
 /* ========================================================================= */
-/* functions exported from game_em to main program                           */
+/* functions and definitions exported from game_em to main program           */
 /* ========================================================================= */
+
+#include "main_em.h"
 
 extern void em_open_all();
 extern void em_close_all();
@@ -37,5 +39,7 @@ extern void em_close_all();
 extern int em_main_init_game(int, char *);
 extern int em_main_handle_game(byte);
 
+boolean LoadNativeLevel_EM(char *);
 
-#endif /* GAME_EM_H */
+
+#endif	/* GAME_EM_H */

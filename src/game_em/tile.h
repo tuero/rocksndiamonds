@@ -1,6 +1,10 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include "main_em.h"
+
+#if 0
+
 /* 2000-07-30T11:06:03Z
  */
 
@@ -414,6 +418,8 @@ enum
 
   TILE_MAX
 };
+
+#endif
 
 enum
 {
