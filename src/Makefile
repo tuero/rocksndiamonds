@@ -34,10 +34,25 @@ ifeq ($(PLATFORM),solaris)
 EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
-USE_SDL = true
-# USE_SDL = false
+ifeq ($(PLATFORM),windows)
+PROGNAME = ../rocksndiamonds.exe
+TARGET = sdl
+else
+PROFILING = -pg
+endif
+
+ifeq ($(TARGET),sdl_old_10)
+TARGET = sdl
 USE_SDL_OLD_LIBS = true
-# USE_SDL_OLD_LIBS = false
+else
+USE_SDL_OLD_LIBS = false
+endif
+
+ifeq ($(TARGET),sdl)
+USE_SDL = true
+else
+USE_SDL = false
+endif
 
 ifeq ($(USE_SDL_OLD_LIBS),true)
 SDL_EXTRA_LIBS = -lIMG -lmixer
@@ -62,7 +77,7 @@ endif
 INCL = $(SYS_CFLAGS)
 LIBS = $(SYS_LDFLAGS) $(EXTRA_LIBS) -lm
 
-endif
+endif				# (PLATFORM != dos)
 
 
 ifdef RO_GAME_DIR		# path to read-only game data specified
@@ -81,9 +96,11 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(SOUNDS) $(JOYSTICK)
+DEBUG = -DDEBUG -g
 
-# OPTIONS = -DDEBUG -g -Wall -ansi -pedantic	# only for debugging purposes
-OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
+OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
+# OPTIONS = $(DEBUG) -O3 -Wall			# only for debugging purposes
+# OPTIONS = $(DEBUG) -Wall -ansi -pedantic	# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
@@ -143,11 +160,12 @@ OBJS =	main.o		\
 all:	$(PROGNAME)
 
 $(PROGNAME):	$(OBJS)
-	$(CC) $(OBJS) $(LIBS) -o $(PROGNAME)
+	$(CC) $(PROFILING) $(OBJS) $(LIBS) -o $(PROGNAME)
 
 .c.o:
-	$(CC) $(CFLAGS) -c $*.c
+	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 clean:
 	$(RM) *.o
+	$(RM) ../*.exe
 	$(RM) $(PROGNAME)

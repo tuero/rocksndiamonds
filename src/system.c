@@ -160,23 +160,23 @@ inline void NextEvent(Event *event)
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #ifdef USE_SDL_LIBRARY
-  /*
+#if 0
   printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
 	 (int)event->keysym.unicode,
 	 (int)event->keysym.sym,
 	 (int)SDL_GetModState());
-  */
+#endif
 
   if (with_modifiers && event->keysym.unicode != 0)
     return event->keysym.unicode;
   else
     return event->keysym.sym;
 #else
-  /*
+#if 0
   printf("with modifiers == '0x%04x', without modifiers == '0x%04x'\n",
 	 (int)XLookupKeysym(event, event->state),
 	 (int)XLookupKeysym(event, 0));
-  */
+#endif
 
   if (with_modifiers)
     return XLookupKeysym(event, event->state);

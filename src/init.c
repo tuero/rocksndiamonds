@@ -170,7 +170,7 @@ void InitSound()
     return;
   }
 
-  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 256) < 0)
+  if (Mix_OpenAudio(22050, AUDIO_S16, 2, 512) < 0)
   {
     Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
     sound_status = SOUND_OFF;

@@ -62,9 +62,9 @@ inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
 			      int to_x, int to_y, unsigned int color)
 {
   SDL_Rect rect;
-  unsigned int color_r = (color >> 2) && 0xff;
-  unsigned int color_g = (color >> 1) && 0xff;
-  unsigned int color_b = (color >> 0) && 0xff;
+  unsigned int color_r = (color >> 2) & 0xff;
+  unsigned int color_g = (color >> 1) & 0xff;
+  unsigned int color_b = (color >> 0) & 0xff;
 
   if (from_x > to_x)
     swap_numbers(&from_x, &to_x);
