@@ -29,7 +29,9 @@ static unsigned int getStateCheckSum(int counter)
   int x, y;
   unsigned int mult = 1;
   unsigned int checksum = 0;
+  /*
   static short lastFeld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+  */
   static boolean first_game = TRUE;
 
   for (y=0; y<lev_fieldy; y++) for(x=0; x<lev_fieldx; x++)
@@ -631,7 +633,7 @@ boolean NewHiScore()
   {
     if (local_player->score > highscore[k].Score)
     {
-      /* Spieler kommt in Highscore-Liste */
+      /* player has made it to the hall of fame */
 
       if (k < MAX_SCORE_ENTRIES - 1)
       {
@@ -641,7 +643,7 @@ boolean NewHiScore()
 	for (l=k; l<MAX_SCORE_ENTRIES; l++)
 	  if (!strcmp(setup.player_name, highscore[l].Name))
 	    m = l;
-	if (m == k)	/* Spieler überschreibt seine alte Position */
+	if (m == k)	/* player's new highscore overwrites his old one */
 	  goto put_into_list;
 #endif
 
@@ -664,7 +666,7 @@ boolean NewHiScore()
 
 #ifdef ONE_PER_NAME
     else if (!strncmp(setup.player_name, highscore[k].Name, MAX_NAMELEN - 1))
-      break;	/* Spieler schon mit besserer Punktzahl in der Liste */
+      break;	/* player already there with a higher score */
 #endif
 
   }
@@ -808,7 +810,7 @@ void DrawDynamite(int x, int y)
 
 void CheckDynamite(int x, int y)
 {
-  if (MovDelay[x][y])		/* neues Dynamit / in Wartezustand */
+  if (MovDelay[x][y])		/* dynamite is still waiting to explode */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y])
@@ -836,7 +838,7 @@ void Explode(int ex, int ey, int phase, int mode)
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
 
-  if (phase == 0)			/* Feld 'Store' initialisieren */
+  if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
   {
     int center_element = Feld[ex][ey];
 
@@ -996,7 +998,7 @@ void DynaExplode(int ex, int ey)
 
   Store2[ex][ey] = 0;	/* delete player information */
 
-  Explode(ex, ey, 0, EX_CENTER);
+  Explode(ex, ey, EX_PHASE_START, EX_CENTER);
 
   for (i=0; i<4; i++)
   {
@@ -1010,7 +1012,7 @@ void DynaExplode(int ex, int ey)
 	break;
 
       element = Feld[x][y];
-      Explode(x, y, 0, EX_BORDER);
+      Explode(x, y, EX_PHASE_START, EX_BORDER);
 
       if (element != EL_LEERRAUM &&
 	  element != EL_ERDREICH &&
@@ -1029,6 +1031,9 @@ void Bang(int x, int y)
 
   PlaySoundLevel(x, y, SND_ROAAAR);
 
+  if (IS_PLAYER(x, y))	/* remove objects that might cause smaller explosion */
+    element = EL_LEERRAUM;
+
   switch(element)
   {
     case EL_KAEFER:
@@ -1040,7 +1045,7 @@ void Bang(int x, int y)
     case EL_ROBOT:
     case EL_PACMAN:
       RaiseScoreElement(element);
-      Explode(x, y, 0, EX_NORMAL);
+      Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
     case EL_DYNABOMB:
     case EL_DYNABOMB_NR:
@@ -1048,12 +1053,14 @@ void Bang(int x, int y)
     case EL_DYNABOMB_XL:
       DynaExplode(x, y);
       break;
+    case EL_MAULWURF:
+    case EL_PINGUIN:
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
-      Explode(x, y, 0, EX_CENTER);
+      Explode(x, y, EX_PHASE_START, EX_CENTER);
       break;
     default:
-      Explode(x, y, 0, EX_NORMAL);
+      Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
   }
 }
@@ -1062,7 +1069,7 @@ void Blurb(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (element!=EL_BLURB_LEFT && element!=EL_BLURB_RIGHT) /* Anfang */
+  if (element != EL_BLURB_LEFT && element != EL_BLURB_RIGHT)	/* start */
   {
     PlaySoundLevel(x, y, SND_BLURB);
     if (IN_LEV_FIELD(x-1, y) && IS_FREE(x-1, y) &&
@@ -1078,14 +1085,14 @@ void Blurb(int x, int y)
       Feld[x+1][y] = EL_BLURB_RIGHT;
     }
   }
-  else							 /* Blubbern */
+  else								/* go on */
   {
     int graphic = (element==EL_BLURB_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
 
-    if (!MovDelay[x][y])	/* neue Phase / noch nicht gewartet */
+    if (!MovDelay[x][y])	/* initialize animation counter */
       MovDelay[x][y] = 9;
 
-    if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+    if (MovDelay[x][y])		/* continue animation */
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -1107,8 +1114,7 @@ void Impact(int x, int y)
   int element = Feld[x][y];
   int smashed = 0;
 
-  /* Element darunter berührt? */
-  if (!lastline)
+  if (!lastline)	/* check if element below was hit */
   {
     if (Feld[x][y+1] == EL_PLAYER_IS_LEAVING)
       return;
@@ -1120,22 +1126,19 @@ void Impact(int x, int y)
       smashed = MovingOrBlocked2Element(x, y+1);
   }
 
-  /* Auftreffendes Element fällt in Salzsäure */
-  if (!lastline && smashed == EL_SALZSAEURE)
+  if (!lastline && smashed == EL_SALZSAEURE)	/* element falls into acid */
   {
     Blurb(x, y);
     return;
   }
 
-  /* Auftreffendes Element ist Bombe */
-  if (element == EL_BOMBE && (lastline || object_hit))
+  if (element == EL_BOMBE && (lastline || object_hit))	/* element is bomb */
   {
     Bang(x, y);
     return;
   }
 
-  /* Auftreffendes Element ist Säuretropfen */
-  if (element == EL_TROPFEN && (lastline || object_hit))
+  if (element == EL_TROPFEN && (lastline || object_hit))	/* acid drop */
   {
     if (object_hit && IS_PLAYER(x, y+1))
       KillHero(PLAYERINFO(x, y+1));
@@ -1149,8 +1152,7 @@ void Impact(int x, int y)
     return;
   }
 
-  /* Welches Element kriegt was auf die Rübe? */
-  if (!lastline && object_hit)
+  if (!lastline && object_hit)		/* check which object was hit */
   {
     if (CAN_CHANGE(element) && 
 	(smashed == EL_SIEB_LEER || smashed == EL_SIEB2_LEER) && !SiebAktiv)
@@ -1206,7 +1208,7 @@ void Impact(int x, int y)
     }
   }
 
-  /* Geräusch beim Durchqueren des Siebes */
+  /* play sound of magic wall / mill */
   if (!lastline &&
       (Feld[x][y+1] == EL_SIEB_LEER || Feld[x][y+1] == EL_SIEB2_LEER))
   {
@@ -1214,7 +1216,7 @@ void Impact(int x, int y)
     return;
   }
 
-  /* Geräusch beim Auftreffen */
+  /* play sound of object that hits the ground */
   if (lastline || object_hit)
   {
     int sound;
@@ -1797,11 +1799,10 @@ void StartMoving(int x, int y)
     if (element == EL_SONDE && JustBeingPushed(x, y))
       return;
 
-    if (!MovDelay[x][y])	/* neuer Schritt / noch nicht gewartet */
+    if (!MovDelay[x][y])	/* start new movement phase */
     {
-      /* Alle Figuren, die nach jeden Schritt die Richtung wechseln können.
-       * (MAMPFER, MAMPFER2 und PACMAN laufen bis zur nächsten Wand.)
-       */
+      /* all objects that can change their move direction after each step */
+      /* (MAMPFER, MAMPFER2 and PACMAN go straight until they hit a wall  */
 
       if (element!=EL_MAMPFER && element!=EL_MAMPFER2 && element!=EL_PACMAN)
       {
@@ -1811,7 +1812,7 @@ void StartMoving(int x, int y)
       }
     }
 
-    if (MovDelay[x][y])		/* neuer Schritt / in Wartezustand */
+    if (MovDelay[x][y])		/* wait some time before next movement */
     {
       MovDelay[x][y]--;
 
@@ -1886,13 +1887,13 @@ void StartMoving(int x, int y)
       PlaySoundLevel(x, y, SND_ROEHR);
     }
 
-    /* neuer Schritt / Wartezustand beendet */
+    /* now make next step */
 
-    Moving2Blocked(x, y, &newx, &newy);	/* wohin soll's gehen? */
+    Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
     if (IS_ENEMY(element) && IS_PLAYER(newx, newy))
     {
-      /* Spieler erwischt */
+      /* enemy got the player */
       MovDir[x][y] = 0;
       KillHero(PLAYERINFO(newx, newy));
       return;
@@ -2046,7 +2047,9 @@ void StartMoving(int x, int y)
       DrawLevelField(newx, newy);
     }
     else if (!IN_LEV_FIELD(newx, newy) || !IS_FREE(newx, newy))
-    {					/* gegen Wand gelaufen */
+    {
+      /* object was running against a wall */
+
       TurnRound(x, y);
 
       if (element == EL_KAEFER || element == EL_FLIEGER)
@@ -2088,7 +2091,7 @@ void ContinueMoving(int x, int y)
 
   MovPos[x][y] += step;
 
-  if (ABS(MovPos[x][y])>=TILEX)		/* Zielfeld erreicht */
+  if (ABS(MovPos[x][y])>=TILEX)		/* object reached its destination */
   {
     Feld[x][y] = EL_LEERRAUM;
     Feld[newx][newy] = element;
@@ -2148,7 +2151,7 @@ void ContinueMoving(int x, int y)
     Stop[newx][newy] = TRUE;
     JustHit[x][newy] = 3;
 
-    if (DONT_TOUCH(element))	/* Käfer oder Flieger */
+    if (DONT_TOUCH(element))	/* object may be nasty to player or others */
     {
       TestIfBadThingHitsHero(newx, newy);
       TestIfBadThingHitsFriend(newx, newy);
@@ -2161,7 +2164,7 @@ void ContinueMoving(int x, int y)
 	(newy == lev_fieldy-1 || !IS_FREE(x, newy+1)))
       Impact(x, newy);
   }
-  else				/* noch in Bewegung */
+  else				/* still moving on */
     DrawLevelField(x, y);
 }
 
@@ -2305,7 +2308,7 @@ void AmoebeWaechst(int x, int y)
   static long sound_delay = 0;
   static int sound_delay_value = 0;
 
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* start new growing cycle */
   {
     MovDelay[x][y] = 7;
 
@@ -2316,7 +2319,7 @@ void AmoebeWaechst(int x, int y)
     }
   }
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before growing bigger */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -2351,17 +2354,17 @@ void AmoebeAbleger(int ax, int ay)
     return;
   }
 
-  if (!MovDelay[ax][ay])	/* neue Amoebe / noch nicht gewartet */
+  if (!MovDelay[ax][ay])	/* start making new amoeba field */
     MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25/(1+level.tempo_amoebe));
 
-  if (MovDelay[ax][ay])		/* neue Amoebe / in Wartezustand */
+  if (MovDelay[ax][ay])		/* wait some time before making new amoeba */
   {
     MovDelay[ax][ay]--;
     if (MovDelay[ax][ay])
       return;
   }
 
-  if (element == EL_AMOEBE_NASS)	/* tropfende Amöbe */
+  if (element == EL_AMOEBE_NASS)	/* object is an acid / amoeba drop */
   {
     int start = RND(4);
     int x = ax+xy[start][0];
@@ -2380,7 +2383,7 @@ void AmoebeAbleger(int ax, int ay)
     if (newax == ax && neway == ay)
       return;
   }
-  else				/* normale oder "gefüllte" Amöbe */
+  else				/* normal or "filled" amoeba */
   {
     int start = RND(4);
     boolean waiting_for_player = FALSE;
@@ -2413,7 +2416,7 @@ void AmoebeAbleger(int ax, int ay)
 	DrawLevelField(ax, ay);
 	AmoebaCnt[AmoebaNr[ax][ay]]--;
 
-	if (AmoebaCnt[AmoebaNr[ax][ay]]<=0)	/* Amöbe vollständig tot */
+	if (AmoebaCnt[AmoebaNr[ax][ay]]<=0)	/* amoeba is completely dead */
 	{
 	  if (element == EL_AMOEBE_VOLL)
 	    AmoebeUmwandeln(ax, ay);
@@ -2463,17 +2466,17 @@ void AmoebeAbleger(int ax, int ay)
 void Life(int ax, int ay)
 {
   int x1, y1, x2, y2;
-  static int life[4] = { 2, 3, 3, 3 };	/* "Life"-Parameter */
+  static int life[4] = { 2, 3, 3, 3 };	/* parameters for "game of life" */
   int life_time = 40;
   int element = Feld[ax][ay];
 
   if (Stop[ax][ay])
     return;
 
-  if (!MovDelay[ax][ay])	/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[ax][ay])	/* start new "game of life" cycle */
     MovDelay[ax][ay] = life_time;
 
-  if (MovDelay[ax][ay])		/* neue Phase / in Wartezustand */
+  if (MovDelay[ax][ay])		/* wait some time before next cycle */
   {
     MovDelay[ax][ay]--;
     if (MovDelay[ax][ay])
@@ -2502,7 +2505,7 @@ void Life(int ax, int ay)
 	nachbarn++;
     }
 
-    if (xx == ax && yy == ay)		/* mittleres Feld mit Amoebe */
+    if (xx == ax && yy == ay)		/* field in the middle */
     {
       if (nachbarn<life[0] || nachbarn>life[1])
       {
@@ -2513,7 +2516,7 @@ void Life(int ax, int ay)
       }
     }
     else if (IS_FREE(xx, yy) || Feld[xx][yy] == EL_ERDREICH)
-    {					/* Randfeld ohne Amoebe */
+    {					/* free border field */
       if (nachbarn>=life[2] && nachbarn<=life[3])
       {
 	Feld[xx][yy] = element;
@@ -2528,10 +2531,10 @@ void Life(int ax, int ay)
 
 void Ablenk(int x, int y)
 {
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* next animation frame */
     MovDelay[x][y] = level.dauer_ablenk * FRAMES_PER_SECOND;
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y])
@@ -2552,10 +2555,10 @@ void Ablenk(int x, int y)
 
 void Birne(int x, int y)
 {
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* next animation frame */
     MovDelay[x][y] = 800;
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y])
@@ -2589,10 +2592,10 @@ void Blubber(int x, int y)
 
 void NussKnacken(int x, int y)
 {
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* next animation frame */
     MovDelay[x][y] = 7;
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -2634,10 +2637,10 @@ void AusgangstuerOeffnen(int x, int y)
 {
   int delay = 6;
 
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* next animation frame */
     MovDelay[x][y] = 5*delay;
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before next frame */
   {
     int tuer;
 
@@ -2668,10 +2671,10 @@ void EdelsteinFunkeln(int x, int y)
     DrawGraphicAnimation(x, y, GFX_EDELSTEIN_BD, 4, 4, ANIM_REVERSE);
   else
   {
-    if (!MovDelay[x][y])	/* neue Phase / noch nicht gewartet */
+    if (!MovDelay[x][y])	/* next animation frame */
       MovDelay[x][y] = 11 * !SimpleRND(500);
 
-    if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+    if (MovDelay[x][y])		/* wait some time before next frame */
     {
       MovDelay[x][y]--;
 
@@ -2709,10 +2712,10 @@ void MauerWaechst(int x, int y)
 {
   int delay = 6;
 
-  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+  if (!MovDelay[x][y])		/* next animation frame */
     MovDelay[x][y] = 3*delay;
 
-  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  if (MovDelay[x][y])		/* wait some time before next frame */
   {
     int phase;
 
@@ -2764,10 +2767,10 @@ void MauerAbleger(int ax, int ay)
   boolean oben_massiv = FALSE, unten_massiv = FALSE;
   boolean links_massiv = FALSE, rechts_massiv = FALSE;
 
-  if (!MovDelay[ax][ay])	/* neue Mauer / noch nicht gewartet */
+  if (!MovDelay[ax][ay])	/* start building new wall */
     MovDelay[ax][ay] = 6;
 
-  if (MovDelay[ax][ay])		/* neue Mauer / in Wartezustand */
+  if (MovDelay[ax][ay])		/* wait some time before building new wall */
   {
     MovDelay[ax][ay]--;
     if (MovDelay[ax][ay])
@@ -3093,6 +3096,7 @@ void GameActions()
 
 
 #ifdef DEBUG
+  /*
   if (TimeFrames == 0 && !local_player->gone)
   {
     extern unsigned int last_RND();
@@ -3102,13 +3106,16 @@ void GameActions()
 	   last_RND(),
 	   getStateCheckSum(level.time - TimeLeft));
   }
+  */
 #endif
 
 
 
 #ifdef DEBUG
+  /*
   if (GameFrameDelay >= 500)
     printf("FrameCounter == %d\n", FrameCounter);
+  */
 #endif
 
 
@@ -3517,7 +3524,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     else if (old_jx == jx && old_jy != jy)
       player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
-    DrawLevelField(jx, jy);	/* für "ErdreichAnbroeckeln()" */
+    DrawLevelField(jx, jy);	/* for "ErdreichAnbroeckeln()" */
 
     player->last_move_dir = player->MovDir;
   }
@@ -3970,7 +3977,7 @@ int DigField(struct PlayerInfo *player,
 
     case EL_AUSGANG_ZU:
     case EL_AUSGANG_ACT:
-      /* Tür ist (noch) nicht offen! */
+      /* door is not (yet) open */
       return MF_NO_ACTION;
       break;
 

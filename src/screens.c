@@ -577,6 +577,45 @@ void DrawHelpScreenCreditsText()
   ClearWindow();
   DrawHeadline();
 
+  sprintf(text,"Credits:");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
+	   text,FS_SMALL,FC_GREEN);
+
+  sprintf(text,"DOS/Windows port of the game:");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+0*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"Guido Schulz");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+1*ystep,
+	   text,FS_SMALL,FC_RED);
+
+  sprintf(text,"Additional toons:");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+2*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"Karl Hörnell");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+3*ystep,
+	   text,FS_SMALL,FC_RED);
+
+  sprintf(text,"...and many thanks to all contributors");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+5*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"of new levels!");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+6*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+
+  sprintf(text,"Press any key or button for next page");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
+	   text,FS_SMALL,FC_BLUE);
+}
+
+void DrawHelpScreenContactText()
+{
+  int ystart = 150, ystep = 30;
+  char text[FULL_SXSIZE/FONT2_XSIZE+10];
+
+  FadeSounds();
+  ClearWindow();
+  DrawHeadline();
+
   sprintf(text,"Program information:");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
 	   text,FS_SMALL,FC_GREEN);
@@ -649,7 +688,7 @@ void HandleHelpScreen(int button)
 
   if (button_released)
   {
-    if (helpscreen_state<num_helpscreen_els_pages-1)
+    if (helpscreen_state < num_helpscreen_els_pages - 1)
     {
       for(i=0;i<MAX_HELPSCREEN_ELS;i++)
 	helpscreen_step[i] = helpscreen_frame[i] = helpscreen_delay[i] = 0;
@@ -657,15 +696,20 @@ void HandleHelpScreen(int button)
       DrawHelpScreenElText(helpscreen_state*MAX_HELPSCREEN_ELS);
       DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
     }
-    else if (helpscreen_state<num_helpscreen_els_pages+num_bg_loops-1)
+    else if (helpscreen_state < num_helpscreen_els_pages + num_bg_loops - 1)
     {
       helpscreen_state++;
-      DrawHelpScreenMusicText(helpscreen_state-num_helpscreen_els_pages);
+      DrawHelpScreenMusicText(helpscreen_state - num_helpscreen_els_pages);
     }
-    else if (helpscreen_state==num_helpscreen_els_pages+num_bg_loops-1)
+    else if (helpscreen_state == num_helpscreen_els_pages + num_bg_loops - 1)
     {
       helpscreen_state++;
       DrawHelpScreenCreditsText();
+    }
+    else if (helpscreen_state == num_helpscreen_els_pages + num_bg_loops)
+    {
+      helpscreen_state++;
+      DrawHelpScreenContactText();
     }
     else
     {

@@ -27,7 +27,8 @@
 #define SCROLL_INIT		0
 #define SCROLL_GO_ON		1
 
-/* explosion position marks */
+/* explosion position and phase marks */
+#define EX_PHASE_START		0
 #define EX_NORMAL		0
 #define EX_CENTER		1
 #define EX_BORDER		2
