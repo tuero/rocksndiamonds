@@ -1267,7 +1267,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   int line_len;
   char line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
-  void *setup_file_data, *insert_ptr;
+  void *setup_file_data, *insert_ptr = NULL;
   FILE *file;
 
   if (use_hash)

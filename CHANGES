@@ -1,5 +1,21 @@
-Release Version 3.0.7 [?? ??? ????]
+Release Version 3.0.7 [10 NOV 2003]
 -----------------------------------
+	- fixed incorrectly displayed animation for attacking dragon
+	- fixed bug with not setting initial gravity for each new game
+	- fixed bug with teleportation of player by custom element change
+	- fixed bug with player not getting smashed by rock sometimes
+	- fixed serious bug in code for delayed element pushing
+	- fixed little bug in animation frame selection for pushed elements
+	- fixed bug when pushing element that can move away to the side
+	- fixed tape recording when player is created from CE element change
+	- fixed player animation frame reset for identical animations
+	- unavailable setup options now marked as "n/a" instead of "off"
+	- prevent "extended" changed elements from delay change in same frame
+	- speed-up of reading config file for verbose output
+	- added configuration option for opening and closing Supaplex exit
+	- added configuration option for moving up/down animation for Murphy
+	- added animation for "turning" action (for elements with move delay)
+	- added turning animations for bug, spaceship and sniksnak
 
 Release Version 3.0.6 [06 OCT 2003]
 -----------------------------------
