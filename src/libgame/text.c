@@ -25,6 +25,7 @@
 #define NUM_FONT_COLORS		4
 #define NUM_FONT_CHARS		(FONT_LINES_PER_FONT * FONT_CHARS_PER_LINE)
 
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 static GC	tile_clip_gc = None;
 static Pixmap	tile_clipmask[NUM_FONTS][NUM_FONT_COLORS][NUM_FONT_CHARS];
 
@@ -40,7 +41,6 @@ static struct
 
 static void InitFontClipmasks()
 {
-#if defined(TARGET_X11_NATIVE)
   static boolean clipmasks_initialized = FALSE;
   boolean fonts_initialized = TRUE;
   XGCValues clip_gc_values;
@@ -105,9 +105,8 @@ static void InitFontClipmasks()
   XFreeGC(display, copy_clipmask_gc);
 
   clipmasks_initialized = TRUE;
-
-#endif /* TARGET_X11_NATIVE */
 }
+#endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
 
 void InitFontInfo(Bitmap *bitmap_initial,
 		  Bitmap *bitmap_big, Bitmap *bitmap_medium,
@@ -119,7 +118,9 @@ void InitFontInfo(Bitmap *bitmap_initial,
   font.bitmap_small = bitmap_small;
   font.bitmap_tile = bitmap_tile;
 
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
+#endif
 }
 
 int getFontWidth(int font_size, int font_type)
@@ -295,6 +296,7 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
 		   dest_x - gfx.real_sx, dest_y - gfx.real_sy,
 		   font_width, font_height, dest_x, dest_y);
 
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 	/* use special font tile clipmasks, if available */
 	if (font_size == FS_BIG || font_size == FS_MEDIUM)
 	{
@@ -310,6 +312,10 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
 	  SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
 			dest_x - src_x, dest_y - src_y);
 	}
+#else
+	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
+		      dest_x - src_x, dest_y - src_y);
+#endif
 
 	BlitBitmapMasked(font_bitmap, bitmap, src_x, src_y,
 			 font_width, font_height, dest_x, dest_y);

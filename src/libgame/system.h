@@ -296,9 +296,11 @@ struct GfxInfo
   int vx, vy;
   int vxsize, vysize;
 
-  boolean draw_deactivation_mask;
+  int draw_deactivation_mask;
+  int draw_background_mask;
 
   Bitmap *background_bitmap;
+  int background_bitmap_mask;
 };
 
 struct FontInfo
@@ -565,8 +567,10 @@ void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
-void SetDrawDeactivationMask(int );
-void SetBackgroundBitmap(Bitmap *);
+void SetDrawDeactivationMask(int);
+void SetDrawBackgroundMask(int);
+void SetMainBackgroundBitmap(Bitmap *);
+void SetDoorBackgroundBitmap(Bitmap *);
 
 inline void InitVideoDisplay(void);
 inline void CloseVideoDisplay(void);

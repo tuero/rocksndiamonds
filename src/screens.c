@@ -71,7 +71,10 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 static Bitmap *scrollbar_bitmap[4];
+#endif
+
 
 static void drawCursorExt(int xpos, int ypos, int color, int graphic)
 {
@@ -132,7 +135,7 @@ static void ToggleFullscreenIfNeeded()
     setup.fullscreen = video.fullscreen_enabled;
 
     /* redraw background to newly created backbuffer */
-    BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, backbuffer,
+    BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
 	       0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
 
     /* restore old door content */
@@ -151,10 +154,13 @@ void DrawMainMenu()
 
   UnmapAllGadgets();
   FadeSounds();
+
   KeyboardAutoRepeatOn();
   ActivateJoystick();
+
   SetDrawDeactivationMask(REDRAW_NONE);
-  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
+  SetDrawBackgroundMask(REDRAW_FIELD);
+
   audio.sound_deactivated = FALSE;
 
   /* needed if last screen was the playing screen, invoked from level editor */
@@ -195,10 +201,11 @@ void DrawMainMenu()
   GetPlayerConfig();
   LoadLevel(level_nr);
 
-  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
+  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
   ClearWindow();
 
   DrawHeadline();
+
   DrawText(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
   DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
@@ -2829,10 +2836,10 @@ static struct
 
 static struct
 {
-#if 0
-  int gfx_unpressed, gfx_pressed;
-#else
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Bitmap **gfx_unpressed, **gfx_pressed;
+#else
+  int gfx_unpressed, gfx_pressed;
 #endif
   int x, y;
   int width, height;
@@ -2842,10 +2849,10 @@ static struct
 } scrollbar_info[NUM_SCREEN_SCROLLBARS] =
 {
   {
-#if 0
-    IMG_SCROLLBAR_BLUE, IMG_SCROLLBAR_RED,
-#else
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     &scrollbar_bitmap[0], &scrollbar_bitmap[1],
+#else
+    IMG_SCROLLBAR_BLUE, IMG_SCROLLBAR_RED,
 #endif
     SX + SC_SCROLL_VERTICAL_XPOS, SY + SC_SCROLL_VERTICAL_YPOS,
     SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,
@@ -2917,7 +2924,7 @@ static void CreateScreenScrollbars()
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
-#if 0
+#if !defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     int gfx_unpressed, gfx_pressed;
 #endif
     int gd_x1, gd_x2, gd_y1, gd_y2;
@@ -2933,7 +2940,14 @@ static void CreateScreenScrollbars()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
-#if 0
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
+    gd_bitmap_unpressed = *scrollbar_info[i].gfx_unpressed;
+    gd_bitmap_pressed   = *scrollbar_info[i].gfx_pressed;
+    gd_x1 = 0;
+    gd_y1 = 0;
+    gd_x2 = 0;
+    gd_y2 = 0;
+#else
     gfx_unpressed = scrollbar_info[i].gfx_unpressed;
     gfx_pressed   = scrollbar_info[i].gfx_pressed;
     gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
@@ -2942,13 +2956,6 @@ static void CreateScreenScrollbars()
     gd_y1 = new_graphic_info[gfx_unpressed].src_y;
     gd_x2 = new_graphic_info[gfx_pressed].src_x;
     gd_y2 = new_graphic_info[gfx_pressed].src_y;
-#else
-    gd_bitmap_unpressed = *scrollbar_info[i].gfx_unpressed;
-    gd_bitmap_pressed   = *scrollbar_info[i].gfx_pressed;
-    gd_x1 = 0;
-    gd_y1 = 0;
-    gd_x2 = 0;
-    gd_y2 = 0;
 #endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -2979,39 +2986,26 @@ static void CreateScreenScrollbars()
 
 void CreateScreenGadgets()
 {
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   int i;
 
   for (i=0; i<4; i++)
   {
     scrollbar_bitmap[i] = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
 
-#if defined(TARGET_X11_NATIVE)
     /* copy pointers to clip mask and GC */
     scrollbar_bitmap[i]->clip_mask =
       new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_mask;
     scrollbar_bitmap[i]->stored_clip_gc =
       new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_gc;
-#endif
 
     BlitBitmap(new_graphic_info[IMG_SCROLLBAR_BLUE + i].bitmap,
 	       scrollbar_bitmap[i],
 	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_x,
 	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_y,
 	       TILEX, TILEY, 0, 0);
-
-#ifdef TARGET_SDL
-    SDL_SetColorKey(scrollbar_bitmap[i]->surface, SDL_SRCCOLORKEY,
-		    SDL_MapRGB(scrollbar_bitmap[i]->surface->format,
-			       0x00, 0x00, 0x00));
-    if ((scrollbar_bitmap[i]->surface_masked =
-	 SDL_DisplayFormat(scrollbar_bitmap[i]->surface)) == NULL)
-    {
-      SetError("SDL_DisplayFormat(): %s", SDL_GetError());
-      Error(ERR_EXIT, "CreateScreenGadgets() failed: %s", GetError());
-    }
-    SDL_SetColorKey(scrollbar_bitmap[i]->surface, 0, 0);
-#endif
   }
+#endif
 
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
@@ -3021,16 +3015,16 @@ void FreeScreenGadgets()
 {
   int i;
 
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   for (i=0; i<4; i++)
   {
-#if defined(TARGET_X11_NATIVE)
     /* prevent freeing clip mask and GC twice */
     scrollbar_bitmap[i]->clip_mask = None;
     scrollbar_bitmap[i]->stored_clip_gc = None;
-#endif
 
     FreeBitmap(scrollbar_bitmap[i]);
   }
+#endif
 
   for (i=0; i<NUM_SCREEN_GADGETS; i++)
     FreeGadget(screen_gadget[i]);

@@ -54,7 +54,7 @@
 struct ToonInfo toons[NUM_TOONS] =
 {
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     DWARF_XSIZE, DWARF_YSIZE,
     DWARF_X, DWARF_Y,
     DWARF_FRAMES,
@@ -65,7 +65,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     DWARF_XSIZE, DWARF_YSIZE,
     DWARF_X, DWARF2_Y,
     DWARF_FRAMES,
@@ -76,7 +76,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     JUMPER_XSIZE, JUMPER_YSIZE,
     JUMPER_X, JUMPER_Y,
     JUMPER_FRAMES,
@@ -87,7 +87,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_DOWN
   },
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     CLOWN_XSIZE, CLOWN_YSIZE,
     CLOWN_X, CLOWN_Y,
     CLOWN_FRAMES,
@@ -98,7 +98,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_ANY
   },
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     BIRD_XSIZE, BIRD_YSIZE,
     BIRD1_X, BIRD1_Y,
     BIRD_FRAMES,
@@ -109,7 +109,7 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMPOS_UPPER
   },
   {
-    IMG_MENU_TOONS,
+    IMG_GLOBAL_TOONS,
     BIRD_XSIZE, BIRD_YSIZE,
     BIRD2_X, BIRD2_Y,
     BIRD_FRAMES,

@@ -2583,14 +2583,17 @@ struct ConfigInfo image_config[] =
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
-  { "menu.frame",				"RocksScreen.pcx"	},
-  { "menu.background",				UNDEFINED_FILENAME	},
-  { "menu.door",				"RocksDoor.pcx"		},
-  { "menu.toons",				"RocksToons.pcx"	},
-  { "menu.font_big",				"RocksFontBig.pcx"	},
-  { "menu.font_small",				"RocksFontSmall.pcx"	},
-  { "menu.font_medium",				"RocksFontMedium.pcx"	},
-  { "menu.font_em",				"RocksFontEM.pcx"	},
+  { "global.border",				"RocksScreen.pcx"	},
+  { "global.door",				"RocksDoor.pcx"		},
+  { "global.toons",				"RocksToons.pcx"	},
+
+  { "font.big",					"RocksFontBig.pcx"	},
+  { "font.medium",				"RocksFontMedium.pcx"	},
+  { "font.small",				"RocksFontSmall.pcx"	},
+  { "font.em",					"RocksFontEM.pcx"	},
+
+  { "background.default",			UNDEFINED_FILENAME	},
+  { "background.door",				UNDEFINED_FILENAME	},
 
   { "info.font_em_1",				"RocksFontEM.pcx"	},
   { "info.font_em_1.xpos",			"0"			},

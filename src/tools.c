@@ -362,32 +362,13 @@ void FadeToFront()
   BackToFront();
 }
 
-void DrawBackground(int x, int y, int width, int height)
+void DrawBackground(int dest_x, int dest_y, int width, int height)
 {
-  /* some sanity checks */
-  if (x < REAL_SX)
-  {
-    width -= (REAL_SX - x);
-    x = REAL_SX;
-  }
-
-  if (y < REAL_SY)
-  {
-    height -= (REAL_SY - y);
-    y = REAL_SY;
-  }
-
-  if (width > FULL_SXSIZE)
-    width = FULL_SXSIZE;
-
-  if (height > FULL_SYSIZE)
-    height = FULL_SYSIZE;
-
-  if (DrawingOnBackground(x, y) && game_status != PLAYING)
-    BlitBitmap(gfx.background_bitmap, backbuffer, x - REAL_SX, y - REAL_SY,
-	       width, height, x, y);
+  if (DrawingOnBackground(dest_x, dest_y) && game_status != PLAYING)
+    BlitBitmap(gfx.background_bitmap, backbuffer, dest_x, dest_y,
+	       width, height, dest_x, dest_y);
   else
-    ClearRectangle(backbuffer, x, y, width, height);
+    ClearRectangle(backbuffer, dest_x, dest_y, width, height);
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -1990,8 +1971,10 @@ boolean Request(char *text, unsigned int req_state)
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
 	     DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
 
+  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
+
   /* clear door drawing field */
-  ClearRectangle(drawto, DX, DY, DXSIZE, DYSIZE);
+  DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
   /* write text for request */
   for(ty=0; ty < MAX_REQUEST_LINES; ty++)
@@ -2019,8 +2002,8 @@ boolean Request(char *text, unsigned int req_state)
     strncpy(text_line, text, tl);
     text_line[tl] = 0;
 
-    DrawTextExt(drawto, DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
-		text_line, FS_SMALL, FC_YELLOW, FONT_OPAQUE);
+    DrawText(DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
+	     text_line, FS_SMALL, FC_YELLOW);
 
     text += tl + (tc == ' ' ? 1 : 0);
   }
@@ -2054,7 +2037,11 @@ boolean Request(char *text, unsigned int req_state)
 #endif
 
   if (!(req_state & REQUEST_WAIT_FOR))
-    return(FALSE);
+  {
+    SetDrawBackgroundMask(REDRAW_FIELD);
+
+    return FALSE;
+  }
 
   if (game_status != MAINMENU)
     InitAnimation();
@@ -2062,6 +2049,8 @@ boolean Request(char *text, unsigned int req_state)
   button_status = MB_RELEASED;
 
   request_gadget_id = -1;
+
+  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
   while(result < 0)
   {
@@ -2198,6 +2187,8 @@ boolean Request(char *text, unsigned int req_state)
 
   RemapAllGadgets();
 
+  SetDrawBackgroundMask(REDRAW_FIELD);
+
 #if defined(PLATFORM_UNIX)
   /* continue network game after request */
   if (options.network &&
@@ -2206,7 +2197,7 @@ boolean Request(char *text, unsigned int req_state)
     SendToServer_ContinuePlaying();
 #endif
 
-  return(result);
+  return result;
 }
 
 unsigned int OpenDoor(unsigned int door_state)
@@ -2310,7 +2301,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
-      Bitmap *bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
+      Bitmap *bitmap = new_graphic_info[IMG_GLOBAL_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 
       if (!(door_state & DOOR_NO_DELAY))
@@ -2416,10 +2407,10 @@ unsigned int MoveDoor(unsigned int door_state)
 void DrawSpecialEditorDoor()
 {
   /* draw bigger toolbox window */
-  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
 	     EX - 4, EY - 12);
-  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
 	     EX - 4, VY - 4, EXSIZE + 8, EYSIZE - VYSIZE + 4,
 	     EX - 4, EY - 4);
 
@@ -2429,7 +2420,7 @@ void DrawSpecialEditorDoor()
 void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
-  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
 	     EX - 4, EY - 12, EXSIZE + 8, EYSIZE - VYSIZE + 12,
 	     EX - 4, EY - 12);
 
@@ -2559,7 +2550,7 @@ void CreateToolButtons()
 
   for (i=0; i<NUM_TOOL_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
+    Bitmap *gd_bitmap = new_graphic_info[IMG_GLOBAL_DOOR].bitmap;
     Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;

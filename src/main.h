@@ -1655,7 +1655,7 @@ struct NewGraphicInfo
   int anim_mode;
   boolean anim_global_sync;
 
-#if defined(TARGET_X11_NATIVE)
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
   GC clip_gc;			/* single-graphic-only clip gc for X11 */
 #endif

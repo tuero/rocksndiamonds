@@ -215,12 +215,15 @@ static void ReinitializeGraphics()
   InitGraphicInfo();		/* initialize graphic info from config file */
 
   InitFontInfo(bitmap_font_initial,
-	       new_graphic_info[IMG_MENU_FONT_BIG].bitmap,
-	       new_graphic_info[IMG_MENU_FONT_MEDIUM].bitmap,
-	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
-	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
+	       new_graphic_info[IMG_FONT_BIG].bitmap,
+	       new_graphic_info[IMG_FONT_MEDIUM].bitmap,
+	       new_graphic_info[IMG_FONT_SMALL].bitmap,
+	       new_graphic_info[IMG_FONT_EM].bitmap);
 
-  SetBackgroundBitmap(NULL);
+  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+  SetDoorBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DOOR].bitmap ?
+			  new_graphic_info[IMG_BACKGROUND_DOOR].bitmap :
+			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
 
   InitGadgets();
   InitToons();
@@ -483,7 +486,7 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, backbuffer,
+  BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
 	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
@@ -780,7 +783,7 @@ static void InitGraphicInfo()
   int src_x, src_y;
   int first_frame, last_frame;
   int i;
-#if defined(TARGET_X11_NATIVE)
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap src_pixmap;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
@@ -808,7 +811,7 @@ static void InitGraphicInfo()
     i++;
   }
 
-#if defined(TARGET_X11_NATIVE)
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
   {
     for (i=0; i<NUM_IMAGE_FILES; i++)
@@ -933,7 +936,7 @@ static void InitGraphicInfo()
 	    src_x, src_y);
     }
 
-#if defined(TARGET_X11_NATIVE)
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     /* currently we need only a tile clip mask from the first frame */
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
 
@@ -960,7 +963,7 @@ static void InitGraphicInfo()
 #endif
   }
 
-#if defined(TARGET_X11_NATIVE)
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (copy_clipmask_gc)
     XFreeGC(display, copy_clipmask_gc);
 #endif

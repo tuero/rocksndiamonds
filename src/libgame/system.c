@@ -155,7 +155,11 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   gfx.full_sxsize = full_sxsize;
   gfx.full_sysize = full_sysize;
 
+  gfx.background_bitmap = NULL;
+  gfx.background_bitmap_mask = REDRAW_NONE;
+
   SetDrawDeactivationMask(REDRAW_NONE);		/* do not deactivate drawing */
+  SetDrawBackgroundMask(REDRAW_NONE);		/* deactivate masked drawing */
 }
 
 void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
@@ -186,9 +190,88 @@ void SetDrawDeactivationMask(int draw_deactivation_mask)
   gfx.draw_deactivation_mask = draw_deactivation_mask;
 }
 
-void SetBackgroundBitmap(Bitmap *background_bitmap)
+void SetDrawBackgroundMask(int draw_background_mask)
 {
-  gfx.background_bitmap = background_bitmap;
+  gfx.draw_background_mask = draw_background_mask;
+}
+
+static void DrawBitmapFromTile(Bitmap *bitmap, Bitmap *tile,
+			       int dest_x, int dest_y, int width, int height)
+{
+  int bitmap_xsize = width;
+  int bitmap_ysize = height;
+  int tile_xsize = tile->width;
+  int tile_ysize = tile->height;
+  int tile_xsteps = (bitmap_xsize + tile_xsize - 1) / tile_xsize;
+  int tile_ysteps = (bitmap_ysize + tile_ysize - 1) / tile_ysize;
+  int x, y;
+
+  for (y=0; y < tile_ysteps; y++)
+  {
+    for (x=0; x < tile_xsteps; x++)
+    {
+      int draw_x = dest_x + x * tile_xsize;
+      int draw_y = dest_y + y * tile_ysize;
+      int draw_xsize = MIN(tile_xsize, bitmap_xsize - x * tile_xsize);
+      int draw_ysize = MIN(tile_ysize, bitmap_ysize - y * tile_ysize);
+
+      BlitBitmap(tile, bitmap, 0, 0, draw_xsize, draw_ysize, draw_x, draw_y);
+    }
+  }
+}
+
+void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
+{
+  static Bitmap *main_bitmap_tile = NULL;
+  static Bitmap *door_bitmap_tile = NULL;
+
+  if (mask == REDRAW_FIELD)
+  {
+    if (background_bitmap_tile == main_bitmap_tile)
+      return;		/* main background tile has not changed */
+
+    main_bitmap_tile = background_bitmap_tile;
+  }
+  else if (mask == REDRAW_DOOR_1)
+  {
+    if (background_bitmap_tile == door_bitmap_tile)
+      return;	/* main background tile has not changed */
+
+    door_bitmap_tile = background_bitmap_tile;
+  }
+  else		/* should not happen */
+    return;
+
+  if (background_bitmap_tile)
+    gfx.background_bitmap_mask |= mask;
+  else
+    gfx.background_bitmap_mask &= ~mask;
+
+  if (gfx.background_bitmap == NULL)
+    gfx.background_bitmap = CreateBitmap(video.width, video.height,
+					 DEFAULT_DEPTH);
+
+  if (background_bitmap_tile == NULL)	/* empty background requested */
+    return;
+
+  if (mask == REDRAW_FIELD)
+    DrawBitmapFromTile(gfx.background_bitmap, background_bitmap_tile,
+		       gfx.real_sx, gfx.real_sy,
+		       gfx.full_sxsize, gfx.full_sysize);
+  else
+    DrawBitmapFromTile(gfx.background_bitmap, background_bitmap_tile,
+		       gfx.dx, gfx.dy,
+		       gfx.dxsize, gfx.dysize);
+}
+
+void SetMainBackgroundBitmap(Bitmap *background_bitmap_tile)
+{
+  SetBackgroundBitmap(background_bitmap_tile, REDRAW_FIELD);
+}
+
+void SetDoorBackgroundBitmap(Bitmap *background_bitmap_tile)
+{
+  SetBackgroundBitmap(background_bitmap_tile, REDRAW_DOOR_1);
 }
 
 
@@ -287,6 +370,9 @@ inline Bitmap *CreateBitmap(int width, int height, int depth)
   new_bitmap->line_gc[1] = window->line_gc[1];
 #endif
 
+  new_bitmap->width = width;
+  new_bitmap->height = height;
+
   return new_bitmap;
 }
 
@@ -359,33 +445,36 @@ inline void CloseWindow(DrawWindow *window)
 #endif
 }
 
-inline boolean DrawingDeactivated(int x, int y, int width, int height)
+static inline boolean CheckDrawingArea(int x, int y, int width, int height,
+				       int draw_mask)
 {
-  if (gfx.draw_deactivation_mask != REDRAW_NONE)
-  {
-    if (gfx.draw_deactivation_mask & REDRAW_ALL)
-      return TRUE;
-    else if ((gfx.draw_deactivation_mask & REDRAW_FIELD) &&
-	     x < gfx.sx + gfx.sxsize)
-      return TRUE;
-    else if ((gfx.draw_deactivation_mask & REDRAW_DOORS) &&
-	     x > gfx.dx)
-    {
-      if ((gfx.draw_deactivation_mask & REDRAW_DOOR_1) &&
-	  y < gfx.dy + gfx.dysize)
-	return TRUE;
-      else if ((gfx.draw_deactivation_mask & REDRAW_DOOR_2) &&
-	       y > gfx.vy)
-	return TRUE;
-    }
-  }
+  if (draw_mask == REDRAW_NONE)
+    return FALSE;
+
+  if (draw_mask & REDRAW_ALL)
+    return TRUE;
+
+  if ((draw_mask & REDRAW_FIELD) && x < gfx.real_sx + gfx.full_sxsize)
+    return TRUE;
+
+  if ((draw_mask & REDRAW_DOOR_1) && x >= gfx.dx && y < gfx.dy + gfx.dysize)
+    return TRUE;
+
+  if ((draw_mask & REDRAW_DOOR_2) && x >= gfx.dx && y >= gfx.vy)
+    return TRUE;
 
   return FALSE;
 }
 
+inline boolean DrawingDeactivated(int x, int y, int width, int height)
+{
+  return CheckDrawingArea(x, y, width, height, gfx.draw_deactivation_mask);
+}
+
 inline boolean DrawingOnBackground(int x, int y)
 {
-  return (gfx.background_bitmap != NULL && x < gfx.sx + gfx.sxsize);
+  return ((gfx.draw_background_mask & gfx.background_bitmap_mask) &&
+	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
 }
 
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -420,11 +509,11 @@ inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
 				       int width, int height)
 {
-  if (!DrawingOnBackground(x, y))
-    ClearRectangle(bitmap, x, y, width, height);
-  else
+  if (DrawingOnBackground(x, y))
     BlitBitmap(gfx.background_bitmap, bitmap,
 	       x - gfx.real_sx, y - gfx.real_sy, width, height, x, y);
+  else
+    ClearRectangle(bitmap, x, y, width, height);
 }
 
 #if 0
@@ -483,14 +572,10 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 				   int width, int height,
 				   int dst_x, int dst_y)
 {
-  if (!DrawingOnBackground(src_x, src_y))
-    BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, width, height,
-	       dst_x, dst_y);
-  else
+  if (DrawingOnBackground(src_x, src_y))
   {
     /* draw background */
-    BlitBitmap(gfx.background_bitmap, dst_bitmap,
-	       dst_x - gfx.real_sx, dst_y - gfx.real_sy, width, height,
+    BlitBitmap(gfx.background_bitmap, dst_bitmap, dst_x, dst_y, width, height,
 	       dst_x, dst_y);
 
     /* draw foreground */
@@ -499,6 +584,9 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 		     dst_x, dst_y);
   }
+  else
+    BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	       dst_x, dst_y);
 }
 
 inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,

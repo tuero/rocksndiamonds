@@ -974,7 +974,7 @@ void InitGame()
   FadeToFront();
 
   /* copy default game door content to main double buffer */
-  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   if (level_nr < 100)
@@ -6969,7 +6969,7 @@ void CreateGameButtons()
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
+    Bitmap *gd_bitmap = new_graphic_info[IMG_GLOBAL_DOOR].bitmap;
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;

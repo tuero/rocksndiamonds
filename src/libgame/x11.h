@@ -34,6 +34,15 @@
 #define TARGET_STRING		"X11"
 #endif
 
+#if defined(PLATFORM_UNIX)
+/* This triggers some stuff that is needed because X11 (XSetClipOrigin(),
+   to be precise) is often very slow when preparing a masked XCopyArea()
+   for big Pixmaps.
+   To prevent this, small (tile-sized) mask Pixmaps are created which will
+   then be set much faster with XSetClipOrigin() and speed things up a lot. */
+#define TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND
+#endif
+
 #define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE
 
 
