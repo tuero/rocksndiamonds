@@ -1,4 +1,6 @@
 
+#if defined(TARGET_X11)
+
 /* second part of synchro.
  *
  * game logic for monsters.
@@ -3811,3 +3813,5 @@ done:
 		void *temp = Cave; Cave = Next; Next = Draw; Draw = temp; /* triple buffering */
 	}
 }
+
+#endif

@@ -814,6 +814,7 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 
 void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
 {
+  Bitmap swap_bitmap;
   Bitmap *tmp_bitmap, *tmp_bitmap_2, *tmp_bitmap_8;
   int src_width, src_height;
   int tmp_width, tmp_height;
@@ -838,6 +839,8 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   FreeBitmap(tmp_bitmap_2);
   FreeBitmap(tmp_bitmap_8);
 
+#if 0
+
 #if defined(TARGET_SDL)
   /* !!! what about the old src_bitmap->surface ??? FIX ME !!! */
   src_bitmap->surface = tmp_bitmap->surface;
@@ -846,6 +849,20 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   /* !!! see above !!! */
   src_bitmap->drawable = tmp_bitmap->drawable;
   tmp_bitmap->drawable = None;
+#endif
+
+#else
+
+#if defined(TARGET_SDL)
+  swap_bitmap.surface = src_bitmap->surface;
+  src_bitmap->surface = tmp_bitmap->surface;
+  tmp_bitmap->surface = swap_bitmap.surface;
+#else
+  swap_bitmap.drawable = src_bitmap->drawable;
+  src_bitmap->drawable = tmp_bitmap->drawable;
+  tmp_bitmap->drawable = swap_bitmap.drawable;
+#endif
+
 #endif
 
   src_bitmap->height = tmp_bitmap->height;

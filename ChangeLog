@@ -1,3 +1,9 @@
+2004-08-16
+	* fixed big memory leak in function "CreateBitmapWithSmallBitmaps()"
+	  (which creates scaled down graphics for level editor and preview);
+	  there's still a memory leak somewhere in the artwork handling code
+	* added "scale image up" functionality to X11 version of zoom function
+
 2004-08-07
 	* fixed bug in gadget code which caused reset of CEs in level editor
 	  (example: pressing 'b' [grab brush] on CE config page erased values)

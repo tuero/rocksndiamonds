@@ -569,8 +569,8 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   -----------------------------------------------------------------------------
   ZoomPixmap
 
-  Important note: The scaling code currently only supports scaling down the
-  image by a power of 2 -- scaling up is currently not supported at all!
+  Important note: The scaling code currently only supports scaling of the image
+  up or down by a power of 2 -- other scaling factors currently not supported!
   -----------------------------------------------------------------------------
 */
 
@@ -582,13 +582,29 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   byte *src_ptr, *dst_ptr;
   int bits_per_pixel;
   int bytes_per_pixel;
-  int x, y, i;
+  int x, y, xx, yy, i;
+#if 1
+  boolean scale_down = (src_width > dst_width);
+  int zoom_factor;
+#else
   int zoom_factor = src_width / dst_width;	/* currently very limited! */
+#endif
   int row_skip, col_skip;
 
-  /* adjust source image size to integer multiple of destination image size */
-  src_width  = dst_width  * zoom_factor;
-  src_height = dst_height * zoom_factor;
+  if (scale_down)
+  {
+    zoom_factor = src_width / dst_width;
+
+    /* adjust source image size to integer multiple of destination size */
+    src_width  = dst_width  * zoom_factor;
+    src_height = dst_height * zoom_factor;
+  }
+  else
+  {
+    zoom_factor = dst_width / src_width;
+
+    /* no adjustment needed when scaling up (some pixels may be left blank) */
+  }
 
   /* copy source pixmap to temporary image */
   src_ximage = XGetImage(display, src_pixmap, 0, 0, src_width, src_height,
@@ -607,14 +623,40 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   src_ptr = (byte *)src_ximage->data;
   dst_ptr = (byte *)dst_ximage->data;
 
-  col_skip = (zoom_factor - 1) * bytes_per_pixel;
-  row_skip = col_skip * src_width;
+  if (scale_down)
+  {
+    col_skip = (zoom_factor - 1) * bytes_per_pixel;
+    row_skip = col_skip * src_width;
 
-  /* scale image down by scaling factor 'zoom_factor' */
-  for (y = 0; y < src_height; y += zoom_factor, src_ptr += row_skip)
-    for (x = 0; x < src_width; x += zoom_factor, src_ptr += col_skip)
-      for (i = 0; i < bytes_per_pixel; i++)
-	*dst_ptr++ = *src_ptr++;
+    /* scale image down by scaling factor 'zoom_factor' */
+    for (y = 0; y < src_height; y += zoom_factor, src_ptr += row_skip)
+      for (x = 0; x < src_width; x += zoom_factor, src_ptr += col_skip)
+	for (i = 0; i < bytes_per_pixel; i++)
+	  *dst_ptr++ = *src_ptr++;
+  }
+  else
+  {
+    row_skip = src_width * bytes_per_pixel;
+
+    /* scale image up by scaling factor 'zoom_factor' */
+    for (y = 0; y < src_height; y++)
+    {
+      for (yy = 0; yy < zoom_factor; yy++)
+      {
+	if (yy > 0)
+	  src_ptr -= row_skip;
+
+	for (x = 0; x < src_width; x++)
+	{
+	  for (xx = 0; xx < zoom_factor; xx++)
+	    for (i = 0; i < bytes_per_pixel; i++)
+	      *dst_ptr++ = *(src_ptr + i);
+
+	  src_ptr += i;
+	}
+      }
+    }
+  }
 
   /* copy scaled image to destination pixmap */
   XPutImage(display, dst_pixmap, gc, dst_ximage, 0, 0, 0, 0,

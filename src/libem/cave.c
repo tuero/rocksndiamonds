@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-10T16:43:50Z
  *
  * cave data structures
@@ -147,3 +150,5 @@ void free_cave_list(void)
 	}
 	cave_list = 0;
 }
+
+#endif

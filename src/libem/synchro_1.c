@@ -1,4 +1,6 @@
 
+#if defined(TARGET_X11)
+
 /* first part of synchro.
  *
  * game logic for players.
@@ -792,3 +794,5 @@ static void player(struct PLAYER *ply)
 		}
 	}
 }
+
+#endif

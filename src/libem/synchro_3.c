@@ -1,4 +1,6 @@
 
+#if defined(TARGET_X11)
+
 /* third part of synchro.
  *
  * handle global elements.
@@ -86,3 +88,5 @@ void synchro_3(void)
 		Next[y][x] = Cave[y][x];
 	}
 }
+
+#endif

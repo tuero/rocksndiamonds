@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* Emerald Mine
  * 
  * David Tritscher
@@ -99,3 +102,13 @@ void snprintf_overflow(char *description)
 	fprintf(stderr, "%s %s\n", "Fault occured while attempting to", description);
 	abort();
 }
+
+#else
+
+int em_main()
+{
+  /* temporary dummy until X11->SDL conversion finished */
+  return 0;
+}
+
+#endif

@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-10T04:29:10Z
  *
  * generate ulaw<->linear conversion tables to be included
@@ -174,3 +177,5 @@ unsigned char calc_linear_to_ulaw(int sample)
 }
 
 #endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
+
+#endif

@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-20T09:41:18Z
  *
  * identify all emerald mine caves and turn them into v6 format.
@@ -391,3 +394,5 @@ void convert_emerald(unsigned char *src)
 	for(y = 0; y < HEIGHT; y++) for(x = 0; x < WIDTH; x++) Next[y][x] = Cave[y][x];
 	for(y = 0; y < HEIGHT; y++) for(x = 0; x < WIDTH; x++) Draw[y][x] = Cave[y][x];
 }
+
+#endif

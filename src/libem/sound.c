@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-10T17:39:15Z
  *
  * handle sounds in emerald mine
@@ -335,3 +338,5 @@ fail:
 }
 
 #endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
+
+#endif

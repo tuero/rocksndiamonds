@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-04-19T13:26:05Z
  *
  * construct some tables to be included directly in emerald mine source.
@@ -4678,3 +4681,5 @@ void tab_generate()
   create_spr();
   create_ttl();
 }
+
+#endif

@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-10T18:03:54Z
  *
  * open X11 display and sound
@@ -117,6 +120,7 @@ static int gotWhite;
 
 #if 1
 static Bitmap *pcxBitmaps[4];
+static Bitmap *pcxBitmapsX2[4];
 #endif
 
 #if 0
@@ -339,6 +343,27 @@ int open_all(void)
 	botmaskBitmap = pcxBitmaps[1]->clip_mask;
 	sprmaskBitmap = pcxBitmaps[2]->clip_mask;
 	ttlmaskBitmap = pcxBitmaps[3]->clip_mask;
+#endif
+
+#if 0
+	for (i = 0; i < 4; i++)
+	  pcxBitmapsX2[i] = ZoomBitmap(pcxBitmaps[i],
+				       pcxBitmaps[i]->width * 2,
+				       pcxBitmaps[i]->height * 2);
+
+	objBitmap = pcxBitmapsX2[0];
+	botBitmap = pcxBitmapsX2[1];
+	sprBitmap = pcxBitmapsX2[2];
+	ttlBitmap = pcxBitmapsX2[3];
+
+	objPixmap = pcxBitmapsX2[0]->drawable;
+	botPixmap = pcxBitmapsX2[1]->drawable;
+	sprPixmap = pcxBitmapsX2[2]->drawable;
+	ttlPixmap = pcxBitmapsX2[3]->drawable;
+	objmaskBitmap = pcxBitmapsX2[0]->clip_mask;
+	botmaskBitmap = pcxBitmapsX2[1]->clip_mask;
+	sprmaskBitmap = pcxBitmapsX2[2]->clip_mask;
+	ttlmaskBitmap = pcxBitmapsX2[3]->clip_mask;
 #endif
 
 #if 1
@@ -577,3 +602,5 @@ static int xpmFreeColoursFunc(Display *display, Colormap colourmap, unsigned lon
 	if(colourmap != privateColourmap) XFreeColors(display, colourmap, pixels, npixels, 0);
 	return(1); /* non-zero for success */
 }
+
+#endif

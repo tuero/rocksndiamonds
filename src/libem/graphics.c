@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-13T14:36:17Z
  *
  * graphics manipulation crap
@@ -393,3 +396,5 @@ void title_string(unsigned int y, unsigned int left, unsigned int right, char *s
 	}
 	XSetClipMask(display, screenGC, None);
 }
+
+#endif

@@ -1,3 +1,6 @@
+
+#if defined(TARGET_X11)
+
 /* 2000-08-13T15:29:40Z
  *
  * handle input from x11 and keyboard and joystick
@@ -323,3 +326,5 @@ void input_eventloop(void)
 	input_esc = 0;
 	for(i = 0; i < 1; i++) if(keymatrix[escKeyCode[i] >> 3] & 1 << (escKeyCode[i] & 7)) input_esc = 1;
 }
+
+#endif
