@@ -692,7 +692,7 @@ void InitElementInfo()
   /* set values to -1 to identify later as "uninitialized" values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
+    for (act=0; act<NUM_GFX_ACTIONS; act++)
     {
       element_info[i].graphic[act] = -1;
 
@@ -717,9 +717,7 @@ void InitElementInfo()
     int action    = element_to_graphic[i].action;
     int graphic   = element_to_graphic[i].graphic;
 
-    if (action > -1)
-      action = graphics_action_mapping[action];
-    else
+    if (action < 0)
       action = GFX_ACTION_DEFAULT;
 
     if (direction > -1)
@@ -752,7 +750,7 @@ void InitElementInfo()
 	default_action_direction_graphic[dir] = default_action_graphic;
     }
 
-    for (act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
+    for (act=0; act<NUM_GFX_ACTIONS; act++)
     {
       for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
       {

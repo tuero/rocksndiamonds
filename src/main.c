@@ -84,37 +84,8 @@ struct TapeInfo		tape;
 struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
-
-
-/* this is used to reduce memory usage of the different animation types */
-int graphics_action_mapping[] =
-{
-  0,		/* GFX_ACTION_DEFAULT		(0)  */
-  0,		/* GFX_ACTION_WAITING		(1)  */
-
-  1,		/* GFX_ACTION_FALLING		(2)  */
-  2,		/* GFX_ACTION_MOVING		(3)  */
-  3,		/* GFX_ACTION_DIGGING		(4)  */
-  4,		/* GFX_ACTION_SNAPPING		(5)  */
-  5,		/* GFX_ACTION_COLLECTING	(6)  */
-  6,		/* GFX_ACTION_PUSHING		(7)  */
-
-  7,		/* GFX_ACTION_PASSING		(8)  */
-  7,		/* GFX_ACTION_IMPACT		(9)  */
-  7,		/* GFX_ACTION_CRACKING		(10) */
-  7,		/* GFX_ACTION_BREAKING		(11) */
-  7,		/* GFX_ACTION_ACTIVATING	(12) */
-  7,		/* GFX_ACTION_OPENING		(13) */
-  7,		/* GFX_ACTION_CLOSING		(14) */
-  7,		/* GFX_ACTION_EATING		(15) */
-  7,		/* GFX_ACTION_ATTACKING		(16) */
-  7,		/* GFX_ACTION_GROWING		(17) */
-  7,		/* GFX_ACTION_SHRINKING		(18) */
-  7		/* GFX_ACTION_OTHER		(19) */
-};
-
-struct FileInfo *image_files;
-struct FileInfo *sound_files;
+struct FileInfo	       *image_files;
+struct FileInfo	       *sound_files;
 
 struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 {

@@ -2516,7 +2516,6 @@ int el_dir_act2img(int element, int direction, int action)
   }
 #endif
 
-  action = graphics_action_mapping[action];
   direction = MV_DIR_BIT(direction);
 
   return element_info[element].direction_graphic[action][direction];

@@ -780,7 +780,6 @@
 #define GFX_ACTION_OTHER		19
 
 #define NUM_GFX_ACTIONS			20
-#define NUM_GFX_ACTIONS_MAPPED		8
 
 
 /* values for image configuration suffixes */
@@ -1031,10 +1030,10 @@ struct ElementInfo
   char *editor_description;	/* short description for level editor */
 
 				/* default graphics for several actions */
-  int graphic[NUM_GFX_ACTIONS_MAPPED];
+  int graphic[NUM_GFX_ACTIONS];
 
 				/* special graphics for left/right/up/down */
-  int direction_graphic[NUM_GFX_ACTIONS_MAPPED][NUM_MV_DIRECTIONS];
+  int direction_graphic[NUM_GFX_ACTIONS][NUM_MV_DIRECTIONS];
 };
 
 struct GraphicInfo
