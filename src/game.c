@@ -550,9 +550,6 @@ void InitGame()
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
-  /* determine border element for this level */
-  SetBorderElement();
-
   if (BorderElement == EL_LEERRAUM)
   {
     SBX_Left = 0;
@@ -607,8 +604,13 @@ void InitGame()
   XCopyArea(display, pix[PIX_DOOR], drawto, gc,
 	    DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
-  DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
-	   int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
+  if (level_nr < 100)
+    DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
+	     int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
+  else
+    DrawText(DX + XX_LEVEL - 1, DY + YY_LEVEL + 1,
+	     int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
+
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed,3), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,

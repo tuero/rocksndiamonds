@@ -316,12 +316,14 @@ void ClearWindow()
 
 void DrawTextFCentered(int y, int font_type, char *format, ...)
 {
-  char buffer[FULL_SXSIZE / FONT3_XSIZE + 10];
+  char buffer[FULL_SXSIZE / FONT5_XSIZE + 10];
   int font_xsize;
   va_list ap;
 
   font_xsize = (font_type < FC_SPECIAL1 ? FONT2_XSIZE :
-		font_type < FC_SPECIAL2 ? FONT3_XSIZE : FONT4_XSIZE);
+		font_type < FC_SPECIAL2 ? FONT3_XSIZE :
+		font_type < FC_SPECIAL3 ? FONT4_XSIZE :
+		FONT5_XSIZE);
 
   va_start(ap, format);
   vsprintf(buffer, format, ap);
@@ -333,7 +335,7 @@ void DrawTextFCentered(int y, int font_type, char *format, ...)
 
 void DrawTextF(int x, int y, int font_type, char *format, ...)
 {
-  char buffer[FULL_SXSIZE / FONT3_XSIZE + 10];
+  char buffer[FULL_SXSIZE / FONT5_XSIZE + 10];
   va_list ap;
 
   va_start(ap, format);
@@ -362,17 +364,25 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 
   if (font_size != FS_SMALL && font_size != FS_BIG)
     font_size = FS_SMALL;
-  if (font_type < FC_RED || font_type > FC_SPECIAL2)
+  if (font_type < FC_RED || font_type > FC_SPECIAL3)
     font_type = FC_RED;
 
   font_width = (font_size == FS_BIG ? FONT1_XSIZE :
 		font_type < FC_SPECIAL1 ? FONT2_XSIZE :
-		font_type < FC_SPECIAL2 ? FONT3_XSIZE : FONT4_XSIZE);
-  font_height = (font_size == FS_BIG ? FONT1_XSIZE :
-		 font_type < FC_SPECIAL2 ? FONT2_XSIZE : FONT4_XSIZE);
+		font_type < FC_SPECIAL2 ? FONT3_XSIZE :
+		font_type < FC_SPECIAL3 ? FONT4_XSIZE :
+		FONT5_XSIZE);
+  font_height = (font_size == FS_BIG ? FONT1_YSIZE :
+		 font_type < FC_SPECIAL1 ? FONT2_YSIZE :
+		 font_type < FC_SPECIAL2 ? FONT3_YSIZE :
+		 font_type < FC_SPECIAL3 ? FONT4_YSIZE :
+		 FONT5_YSIZE);
   font_pixmap = (font_size == FS_BIG ? PIX_BIGFONT : PIX_SMALLFONT);
   font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE : FONT2_YSIZE) *
 		FONT_LINES_PER_FONT);
+
+  if (font_type == FC_SPECIAL3)
+    font_start += (FONT4_YSIZE - FONT2_YSIZE) * FONT_LINES_PER_FONT + 3;
 
   while (*text)
   {
@@ -1513,9 +1523,6 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 {
   int x, y;
 
-  /* determine border element for this level */
-  SetBorderElement();
-
   XFillRectangle(display, drawto, gc,
 		 xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
 
@@ -1742,7 +1749,10 @@ boolean Request(char *text, unsigned int req_state)
 	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   OpenDoor(DOOR_OPEN_1);
+
+#if 0
   ClearEventQueue();
+#endif
 
   if (!(req_state & REQUEST_WAIT_FOR))
     return(FALSE);
@@ -2071,7 +2081,33 @@ unsigned int MoveDoor(unsigned int door_state)
   if (door_state & DOOR_ACTION_2)
     door2 = door_state & DOOR_ACTION_2;
 
-  return(door1 | door2);
+  return (door1 | door2);
+}
+
+void DrawSpecialEditorDoor()
+{
+  /* draw bigger toolbox window */
+  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX7, 60, 108, 56, EX - 4, EY - 12);
+
+  /* draw background for level selection gadgets */
+  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX7, 0, 108, 60, EX - 4, 0);
+
+  redraw_mask |= REDRAW_ALL;
+}
+
+void UndrawSpecialEditorDoor()
+{
+  /* draw normal tape recorder window */
+  XCopyArea(display, pix[PIX_BACK], drawto, gc,
+	    562, 344, 108, 56, EX - 4, EY - 12);
+
+  /* draw game title */
+  XCopyArea(display, pix[PIX_BACK], drawto, gc,
+	    562, 0, 108, 60, EX - 4, 0);
+
+  redraw_mask |= REDRAW_ALL;
 }
 
 int ReadPixel(Drawable d, int x, int y)
@@ -2188,6 +2224,11 @@ static struct
   }
 };
 
+static void DoNotDisplayInfoText(void *ptr)
+{
+  return;
+}
+
 void CreateToolButtons()
 {
   int i;
@@ -2235,6 +2276,7 @@ void CreateToolButtons()
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleToolButtons,
+		      GDI_CALLBACK_INFO, DoNotDisplayInfoText,
 		      GDI_END);
 
     if (gi == NULL)

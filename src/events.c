@@ -487,16 +487,6 @@ void HandleKey(KeySym key, int key_status)
   /* allow quick escape to the main menu with the Escape key */
   if (key == XK_Escape && game_status != MAINMENU)
   {
-    if (game_status == LEVELED)
-    {
-      /* draw smaller door */
-      XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-		DOOR_GFX_PAGEX7, 64,
-		108, 64,
-		EX - 4, EY - 12);
-      redraw_mask |= REDRAW_ALL;
-    }
-
     CloseDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
     game_status = MAINMENU;
     DrawMainMenu();

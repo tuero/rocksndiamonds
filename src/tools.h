@@ -105,6 +105,8 @@ unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
+void DrawSpecialEditorDoor();
+void UndrawSpecialEditorDoor();
 int ReadPixel(Drawable, int, int);
 
 void CreateToolButtons();

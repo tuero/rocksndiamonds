@@ -544,6 +544,8 @@ extern char		*element_info[];
 #define FONT3_YSIZE		14
 #define FONT4_XSIZE		16
 #define FONT4_YSIZE		16
+#define FONT5_XSIZE		10
+#define FONT5_YSIZE		12
 
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
@@ -1294,6 +1296,7 @@ extern char		*element_info[];
 #define FC_YELLOW		3
 #define FC_SPECIAL1		4
 #define FC_SPECIAL2		5
+#define FC_SPECIAL3		6
 
 /* values for game_status */
 #define EXITGAME		0

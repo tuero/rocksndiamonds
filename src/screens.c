@@ -70,6 +70,9 @@ void DrawMainMenu()
     return;
   }
 
+  /* needed if last screen was the editor screen */
+  UndrawSpecialEditorDoor();
+
   /* map gadgets for main menu screen */
   MapTapeButtons();
 
@@ -130,7 +133,10 @@ void DrawMainMenu()
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 
+#if 0
   ClearEventQueue();
+#endif
+
 }
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)

@@ -493,6 +493,9 @@ void LoadLevel(int level_nr)
     Error(ERR_WARN, "using high speed movement for player");
     level.double_speed = TRUE;
   }
+
+  /* determine border element for this level */
+  SetBorderElement();
 }
 
 void SaveLevel(int level_nr)

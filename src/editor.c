@@ -221,51 +221,54 @@
 #define GADGET_ID_LEVEL_TIMESCORE_DOWN	43
 #define GADGET_ID_LEVEL_TIMESCORE_TEXT	44
 #define GADGET_ID_LEVEL_TIMESCORE_UP	45
+#define GADGET_ID_SELECT_LEVEL_DOWN	46
+#define GADGET_ID_SELECT_LEVEL_TEXT	47
+#define GADGET_ID_SELECT_LEVEL_UP	48
 
 /* drawing area identifiers */
-#define GADGET_ID_DRAWING_LEVEL	46
-#define GADGET_ID_ELEM_CONTENT_0	47
-#define GADGET_ID_ELEM_CONTENT_1	48
-#define GADGET_ID_ELEM_CONTENT_2	49
-#define GADGET_ID_ELEM_CONTENT_3	50
-#define GADGET_ID_ELEM_CONTENT_4	51
-#define GADGET_ID_ELEM_CONTENT_5	52
-#define GADGET_ID_ELEM_CONTENT_6	53
-#define GADGET_ID_ELEM_CONTENT_7	54
-#define GADGET_ID_AMOEBA_CONTENT	55
+#define GADGET_ID_DRAWING_LEVEL		49
+#define GADGET_ID_ELEM_CONTENT_0	50
+#define GADGET_ID_ELEM_CONTENT_1	51
+#define GADGET_ID_ELEM_CONTENT_2	52
+#define GADGET_ID_ELEM_CONTENT_3	53
+#define GADGET_ID_ELEM_CONTENT_4	54
+#define GADGET_ID_ELEM_CONTENT_5	55
+#define GADGET_ID_ELEM_CONTENT_6	56
+#define GADGET_ID_ELEM_CONTENT_7	57
+#define GADGET_ID_AMOEBA_CONTENT	58
 
 /* text input identifiers */
-#define GADGET_ID_LEVEL_NAME		56
-#define GADGET_ID_LEVEL_AUTHOR		57
+#define GADGET_ID_LEVEL_NAME		59
+#define GADGET_ID_LEVEL_AUTHOR		60
 
 /* gadgets for scrolling of drawing area */
-#define GADGET_ID_SCROLL_UP		58
-#define GADGET_ID_SCROLL_DOWN		59
-#define GADGET_ID_SCROLL_LEFT		60
-#define GADGET_ID_SCROLL_RIGHT		61
-#define GADGET_ID_SCROLL_HORIZONTAL	62
-#define GADGET_ID_SCROLL_VERTICAL	63
+#define GADGET_ID_SCROLL_UP		61
+#define GADGET_ID_SCROLL_DOWN		62
+#define GADGET_ID_SCROLL_LEFT		63
+#define GADGET_ID_SCROLL_RIGHT		64
+#define GADGET_ID_SCROLL_HORIZONTAL	65
+#define GADGET_ID_SCROLL_VERTICAL	66
 
 /* gadgets for scrolling element list */
-#define GADGET_ID_ELEMENTLIST_UP	64
-#define GADGET_ID_ELEMENTLIST_DOWN	65
+#define GADGET_ID_ELEMENTLIST_UP	67
+#define GADGET_ID_ELEMENTLIST_DOWN	68
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	66
-#define GADGET_ID_ELEMENTLIST_LAST	105
+#define GADGET_ID_ELEMENTLIST_FIRST	69
+#define GADGET_ID_ELEMENTLIST_LAST	108
 
 /* buttons for level settings */
-#define GADGET_ID_RANDOM_PERCENTAGE	106
-#define GADGET_ID_RANDOM_QUANTITY	107
-#define GADGET_ID_RANDOM_RESTRICTED	108
-#define GADGET_ID_DOUBLE_SPEED		109
-#define GADGET_ID_GRAVITY		110
-#define GADGET_ID_STICK_ELEMENT		111
+#define GADGET_ID_RANDOM_PERCENTAGE	109
+#define GADGET_ID_RANDOM_QUANTITY	110
+#define GADGET_ID_RANDOM_RESTRICTED	111
+#define GADGET_ID_DOUBLE_SPEED		112
+#define GADGET_ID_GRAVITY		113
+#define GADGET_ID_STICK_ELEMENT		114
 
 /* another drawing area for random placement */
-#define GADGET_ID_RANDOM_BACKGROUND	112
+#define GADGET_ID_RANDOM_BACKGROUND	115
 
-#define NUM_EDITOR_GADGETS		113
+#define NUM_EDITOR_GADGETS		116
 
 /* radio button numbers */
 #define RADIO_NR_NONE			0
@@ -281,8 +284,9 @@
 #define ED_COUNTER_ID_LEVEL_TIMELIMIT	5
 #define ED_COUNTER_ID_LEVEL_TIMESCORE	6
 #define ED_COUNTER_ID_LEVEL_RANDOM	7
+#define ED_COUNTER_ID_SELECT_LEVEL	8
 
-#define ED_NUM_COUNTERBUTTONS		8
+#define ED_NUM_COUNTERBUTTONS		9
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
@@ -459,6 +463,14 @@ static struct
     GADGET_ID_LEVEL_RANDOM_TEXT,
     &random_placement_value,
     "random element placement",		"in"
+  },
+  {
+    DX - SX - 1,			0 - SY + 31,
+    1,					100,
+    GADGET_ID_SELECT_LEVEL_DOWN,	GADGET_ID_SELECT_LEVEL_UP,
+    GADGET_ID_SELECT_LEVEL_TEXT,
+    &level_nr,
+    NULL,				NULL
   }
 };
 
@@ -644,6 +656,8 @@ static int new_element3 = EL_ERDREICH;
 #define BUTTON_STEPSIZE(button) (button == 1 ? 1 : button == 2 ? 5 : 10)
 
 /* forward declaration for internal use */
+static void ModifyEditorCounter(int, int);
+static void ModifyEditorCounterLimits(int, int, int);
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
@@ -1318,15 +1332,39 @@ static void CreateCounterButtons()
 		counterbutton_info[i].gadget_id_up);
       int gd_xoffset;
       int gd_x, gd_x1, gd_x2, gd_y;
+      int x_size, y_size;
       unsigned long event_mask;
       char infotext[MAX_INFOTEXT_LEN + 1];
 
       event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-      gd_xoffset = (j == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
-      gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
-      gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
-      gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
+      if (i == ED_COUNTER_ID_SELECT_LEVEL)
+      {
+	int sid = (j == 0 ?
+		   ED_SCROLLBUTTON_ID_AREA_LEFT :
+		   ED_SCROLLBUTTON_ID_AREA_RIGHT);
+
+	event_mask |= GD_EVENT_RELEASED;
+
+	if (j == 1)
+	  xpos += ED_GADGET_DISTANCE;
+	ypos += ED_GADGET_DISTANCE;
+
+	gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[sid].xpos;
+	gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
+	gd_y  = DOOR_GFX_PAGEY1 + scrollbutton_info[sid].ypos;
+	x_size = ED_SCROLLBUTTON_XSIZE;
+	y_size = ED_SCROLLBUTTON_YSIZE;
+      }
+      else
+      {
+	gd_xoffset = (j == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
+	gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+	gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+	gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
+	x_size = ED_BUTTON_COUNT_XSIZE;
+	y_size = ED_BUTTON_COUNT_YSIZE;
+      }
 
       sprintf(infotext, "%s counter value by 1, 5 or 10",
 	      (j == 0 ? "decrease" : "increase"));
@@ -1336,8 +1374,8 @@ static void CreateCounterButtons()
 			GDI_INFO_TEXT, infotext,
 			GDI_X, xpos,
 			GDI_Y, ypos,
-			GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
-			GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
+			GDI_WIDTH, x_size,
+			GDI_HEIGHT, y_size,
 			GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 			GDI_STATE, GD_BUTTON_UNPRESSED,
 			GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
@@ -1357,8 +1395,19 @@ static void CreateCounterButtons()
 	id = counterbutton_info[i].gadget_id_text;
 	event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
-	gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
-	gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+	if (i == ED_COUNTER_ID_SELECT_LEVEL)
+	{
+	  xpos += ED_GADGET_DISTANCE;
+	  ypos -= ED_GADGET_DISTANCE;
+
+	  gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
+	  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+	}
+	else
+	{
+	  gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
+	  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+	}
 
 	gi = CreateGadget(GDI_CUSTOM_ID, id,
 			  GDI_CUSTOM_TYPE_ID, i,
@@ -1675,23 +1724,35 @@ void CreateLevelEditorGadgets()
   CreateCheckbuttonGadgets();
 }
 
-static void MapControlButtons()
-{
-  int i;
-
-  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-    MapGadget(level_editor_gadget[i]);
-  for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
-    MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
-  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_UP]);
-  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_DOWN]);
-}
-
 static void MapCounterButtons(int id)
 {
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_down]);
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_text]);
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_up]);
+}
+
+static void MapControlButtons()
+{
+  int counter_id;
+  int i;
+
+  /* map toolbox buttons */
+  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+    MapGadget(level_editor_gadget[i]);
+
+  /* map buttons to select elements */
+  for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
+    MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
+  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_UP]);
+  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_DOWN]);
+
+  /* map buttons to select level */
+  counter_id = ED_COUNTER_ID_SELECT_LEVEL;
+  ModifyEditorCounterLimits(counter_id,
+			    leveldir[leveldir_nr].first_level,
+			    leveldir[leveldir_nr].last_level);
+  ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
+  MapCounterButtons(counter_id);
 }
 
 static void MapDrawingArea(int id)
@@ -1755,7 +1816,7 @@ void UnmapLevelEditorWindowGadgets()
   int i;
 
   for (i=0; i<NUM_EDITOR_GADGETS; i++)
-    if (level_editor_gadget[i]->x < DX)
+    if (level_editor_gadget[i]->x < SX + SXSIZE)
       UnmapGadget(level_editor_gadget[i]);
 }
 
@@ -1767,10 +1828,53 @@ void UnmapLevelEditorGadgets()
     UnmapGadget(level_editor_gadget[i]);
 }
 
+static void ResetUndoBuffer()
+{
+  undo_buffer_position = -1;
+  undo_buffer_steps = -1;
+  CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+}
+
+static void DrawEditModeWindow()
+{
+  if (edit_mode == ED_MODE_INFO)
+    DrawLevelInfoWindow();
+  else if (edit_mode == ED_MODE_PROPERTIES)
+    DrawPropertiesWindow();
+  else	/* edit_mode == ED_MODE_DRAWING */
+    DrawDrawingWindow();
+}
+
+static boolean LevelChanged()
+{
+  boolean level_changed = FALSE;
+  int x, y;
+
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++)
+      if (Feld[x][y] != Ur[x][y])
+	level_changed = TRUE;
+
+  return level_changed;
+}
+
+static boolean LevelContainsPlayer()
+{
+  boolean player_found = FALSE;
+  int x, y;
+
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++)
+      if (Feld[x][y] == EL_SPIELFIGUR ||
+	  Feld[x][y] == EL_SPIELER1 ||
+	  Feld[x][y] == EL_SP_MURPHY) 
+	player_found = TRUE;
+
+  return player_found;
+}
+
 void DrawLevelEd()
 {
-  edit_mode = ED_MODE_DRAWING;
-
   CloseDoor(DOOR_CLOSE_ALL);
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
 
@@ -1790,11 +1894,11 @@ void DrawLevelEd()
   }
   else
   {
+    edit_mode = ED_MODE_DRAWING;
+
+    ResetUndoBuffer();
     level_xpos = -1;
     level_ypos = -1;
-    undo_buffer_position = -1;
-    undo_buffer_steps = -1;
-    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
   }
 
   /* copy default editor door content to main double buffer */
@@ -1832,10 +1936,7 @@ void DrawLevelEd()
 	    DY + ED_WIN_LEVELNR_YPOS);
 
   /* draw bigger door */
-  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-	    DOOR_GFX_PAGEX7, 0,
-	    108, 64,
-	    EX - 4, EY - 12);
+  DrawSpecialEditorDoor();
 
   /* draw new control window */
   XCopyArea(display, pix[PIX_DOOR], drawto, gc,
@@ -1851,14 +1952,57 @@ void DrawLevelEd()
   XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
 	    DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
+  /*
   DrawDrawingWindow();
+  */
+
+  DrawEditModeWindow();
+
+  /*
   FadeToFront();
+  */
+
 
   OpenDoor(DOOR_OPEN_1);
 
   /*
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
   */
+}
+
+void SelectNewLevelToEdit(struct GadgetInfo *gi)
+{
+  int gadget_id = gi->custom_id;
+  int counter_id = gi->custom_type_id;
+  int button = gi->event.button;
+  int *counter_value = counterbutton_info[counter_id].value;
+  int step = BUTTON_STEPSIZE(button) *
+    (gadget_id == counterbutton_info[counter_id].gadget_id_down ? -1 : +1);
+  int old_counter_value = *counter_value;
+  boolean released = (gi->event.type == GD_EVENT_RELEASED);
+
+  if (LevelChanged())
+  {
+    if (gi->event.type == GD_EVENT_PRESSED)
+      return;
+
+    if (!Request("Level has changed! Discard changes ?", REQ_ASK))
+    {
+      ModifyEditorCounter(counter_id, old_counter_value);
+      return;
+    }
+  }
+  else if (released)
+    return;
+
+  if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
+    *counter_value = gi->text.number_value;
+  else
+    ModifyEditorCounter(counter_id, *counter_value + step);
+
+  LoadLevel(level_nr);
+  ResetUndoBuffer();
+  DrawEditModeWindow();
 }
 
 static void AdjustDrawingAreaGadgets()
@@ -1983,6 +2127,14 @@ static void ModifyEditorCounter(int counter_id, int new_value)
 
   if (counter_value != NULL)
     *counter_value = gi->text.number_value;
+}
+
+static void ModifyEditorCounterLimits(int counter_id, int min, int max)
+{
+  int gadget_id = counterbutton_info[counter_id].gadget_id_text;
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  ModifyGadget(gi, GDI_NUMBER_MIN, min, GDI_NUMBER_MAX, max, GDI_END);
 }
 
 static void PickDrawingElement(int button, int element)
@@ -2962,7 +3114,7 @@ static void CopyLevelToUndoBuffer(int mode)
     for(y=0; y<lev_fieldy; y++)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
 
-  /* check if change of border style was forced by drawing operation */
+  /* check if drawing operation forces change of border style */
   last_border_element = BorderElement;
   SetBorderElement();
   if (BorderElement != last_border_element)
@@ -3288,6 +3440,12 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
   int step = BUTTON_STEPSIZE(button) *
     (gadget_id == counterbutton_info[counter_id].gadget_id_down ? -1 : +1);
 
+  if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
+  {
+    SelectNewLevelToEdit(gi);
+    return;
+  }
+
   if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
     *counter_value = gi->text.number_value;
   else
@@ -3323,8 +3481,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int button = gi->event.button;
   int step = BUTTON_STEPSIZE(button);
   int new_element = BUTTON_ELEMENT(button);
-  int player_present = FALSE;
-  int level_changed = FALSE;
   int i, x, y;
 
   if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
@@ -3552,19 +3708,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	break;
       }
 
-      for(y=0; y<lev_fieldy; y++) 
-	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] != Ur[x][y])
-	    level_changed = TRUE;
-
-      for(y=0; y<lev_fieldy; y++) 
-	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] == EL_SPIELFIGUR ||
-	      Feld[x][y] == EL_SPIELER1 ||
-	      Feld[x][y] == EL_SP_MURPHY) 
-	    player_present = TRUE;
-
-      if (!player_present)
+      if (!LevelContainsPlayer)
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
@@ -3579,14 +3723,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_TEST:
-      for(y=0; y<lev_fieldy; y++) 
-	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] == EL_SPIELFIGUR ||
-	      Feld[x][y] == EL_SPIELER1 ||
-	      Feld[x][y] == EL_SP_MURPHY) 
-	    player_present = TRUE;
-
-      if (!player_present)
+      if (!LevelContainsPlayer)
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
@@ -3599,13 +3736,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	    Ur[x][y] = Feld[x][y];
 
 	UnmapLevelEditorGadgets();
-
-	/* draw smaller door */
-	XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-		  DOOR_GFX_PAGEX7, 64,
-		  108, 64,
-		  EX - 4, EY - 12);
-	redraw_mask |= REDRAW_ALL;
+	UndrawSpecialEditorDoor();
 
 	CloseDoor(DOOR_CLOSE_ALL);
 
@@ -3622,12 +3753,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_EXIT:
-      for(y=0; y<lev_fieldy; y++) 
-	for(x=0; x<lev_fieldx; x++)
-	  if (Feld[x][y] != Ur[x][y])
-	    level_changed = TRUE;
-
-      if (!level_changed ||
+      if (!LevelChanged() ||
 	  Request("Level has changed! Exit without saving ?",
 		  REQ_ASK | REQ_STAY_OPEN))
       {
@@ -3636,13 +3762,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	/*
 	CloseDoor(DOOR_CLOSE_ALL);
 	*/
-
-	/* draw smaller door */
-	XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-		  DOOR_GFX_PAGEX7, 64,
-		  108, 64,
-		  EX - 4, EY - 12);
-	redraw_mask |= REDRAW_ALL;
 
 	game_status = MAINMENU;
 	DrawMainMenu();

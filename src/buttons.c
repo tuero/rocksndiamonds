@@ -899,7 +899,8 @@ static void MultiMapGadgets(int mode)
   {
     if ((mode & MULTIMAP_PLAYFIELD && gi->x < SX + SXSIZE) ||
 	(mode & MULTIMAP_DOOR_1 && gi->x >= DX && gi->y < DY + DYSIZE) ||
-	(mode & MULTIMAP_DOOR_1 && gi->x >= DX && gi->y > DY + DYSIZE))
+	(mode & MULTIMAP_DOOR_2 && gi->x >= DX && gi->y > DY + DYSIZE) ||
+	(mode & MULTIMAP_ALL) == MULTIMAP_ALL)
     {
       if (mode & MULTIMAP_UNMAP)
       {
@@ -1183,6 +1184,8 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_pressed_repeated)
   {
+    gi->event.type = GD_EVENT_PRESSED;
+
     if (gi->event_mask & GD_EVENT_REPEATED &&
 	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
       gi->callback_action(gi);
