@@ -231,8 +231,8 @@ Image *zoom(Image *oimage, unsigned int xzoom, unsigned int yzoom)
   }
 
   image->title = dupString(oimage->title);
-  lfree((byte *)xindex);
-  lfree((byte *)yindex);
+  free((byte *)xindex);
+  free((byte *)yindex);
 
   printf("done\n");
 
@@ -335,8 +335,8 @@ void compress(Image *image)
   image->rgb.used = next_index;
 
   /* clean up */
-  lfree(map);
-  lfree(used);
+  free(map);
+  free(used);
 
   /*
   if (badcount)
@@ -539,10 +539,10 @@ XImageInfo *imageToXImage(Display *disp, int scrn, Visual *visual,
 	   */
 
 	  fprintf(stderr, "imageToXImage: XAllocColor failed on a TrueColor/Directcolor visual\n");
-          lfree((byte *)redvalue);
-          lfree((byte *)greenvalue);
-          lfree((byte *)bluevalue);
-          lfree((byte *)ximageinfo);
+          free((byte *)redvalue);
+          free((byte *)greenvalue);
+          free((byte *)bluevalue);
+          free((byte *)ximageinfo);
 	  return(NULL);
 	}
 
@@ -828,9 +828,9 @@ XImageInfo *imageToXImage(Display *disp, int scrn, Visual *visual,
 
   if (redvalue)
   {
-    lfree((byte *)redvalue);
-    lfree((byte *)greenvalue);
-    lfree((byte *)bluevalue);
+    free((byte *)redvalue);
+    free((byte *)greenvalue);
+    free((byte *)bluevalue);
   }
 
   return(ximageinfo);
@@ -878,13 +878,13 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   {
     if (ximageinfo->no > 0 && !ximageinfo->rootimage)	/* don't free root colors */
       XFreeColors(ximageinfo->disp, ximageinfo->cmap, ximageinfo->index, ximageinfo->no, 0);
-    lfree(ximageinfo->index);
+    free(ximageinfo->index);
   }
   if (ximageinfo->gc)
     XFreeGC(ximageinfo->disp, ximageinfo->gc);
-  lfree((byte *)ximageinfo->ximage->data);
+  free((byte *)ximageinfo->ximage->data);
   ximageinfo->ximage->data= NULL;
   XDestroyImage(ximageinfo->ximage);
-  lfree((byte *)ximageinfo);
+  free((byte *)ximageinfo);
   /* should we free private color map to ??? */
 }

@@ -27,22 +27,14 @@
 #include <netdb.h>
 
 #include "netserv.h"
-
-
-
-extern int verbose;
-
-extern void copydown(char *, char *, int);
-extern void fatal(char *);
-
-
+#include "misc.h"
 
 static int clients = 0;
 static int bots = 0;
 static int onceonly = 0;
 static int timetoplay = 0;
 static int is_daemon = 0;
-static int level = 5;
+static int levelnr = 5;
 static int mode = -1;
 static int paused = 0;
 
@@ -91,7 +83,8 @@ static void syserr(char *s)
 static void addtobuffer(struct user *u, unsigned char *b, int len)
 {
   if (u->nwrite + len >= MAX_BUFFER_SIZE)
-    fatal("Internal error: send buffer overflow");
+    Error(ERR_EXIT, "internal error: network send buffer overflow");
+
   memcpy(u->writbuf + u->nwrite, b, len);
   u->nwrite += len;
 }
@@ -188,7 +181,7 @@ static void dropuser(struct user *u)
   if (clients == 0)
   {
     mode = -1;
-    level = 5;
+    levelnr = 5;
     timetoplay = 0;
   }
 }
@@ -198,9 +191,8 @@ static void new_connect(int fd)
   struct user *u, *v;
   unsigned char nxn;
 
-  u = malloc(sizeof (struct user));
-  if (!u)
-    fatal("Out of memory");
+  u = checked_malloc(sizeof (struct user));
+
   u->fd = fd;
   u->nick[0] = 0;
   u->next = user0;
@@ -362,11 +354,11 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
 	sendtoone(u, 2+strlen(v->nick));
       }
     }
-    if (level != 5)
+    if (levelnr != 5)
     {
       buf[0] = 0;
       buf[1] = OP_LEVEL;
-      buf[2] = level;
+      buf[2] = levelnr;
       sendtoone(u, 3);
     }
     if (mode >= 0)
@@ -697,7 +689,7 @@ void NetworkServer(int port, int serveronly)
 	  }
 	  memcpy(buf, &u->readbuf[4], len);
 	  u->nread -= 4 + len;
-	  copydown(u->readbuf, u->readbuf + 4 + len, u->nread);
+	  memmove(u->readbuf, u->readbuf + 4 + len, u->nread);
 
 	  buf[0] = u->number;
 	  if (!u->introduced && buf[1] != OP_NICKNAME)
@@ -785,7 +777,7 @@ void NetworkServer(int port, int serveronly)
 	      break;
 	    
 	    case OP_LEVEL:
-	      level = buf[2];
+	      levelnr = buf[2];
 	      if (verbose)
 		printf("RND_SERVER: client %d (%s) sets level %d\n", u->number, u->nick, buf[2]);
 	      broadcast(NULL, 3, 0);

@@ -59,9 +59,9 @@ void newRGBMapData(RGBMap *rgb, unsigned int size)
 
 void freeRGBMapData(RGBMap *rgb)
 {
-  lfree((byte *)rgb->red);
-  lfree((byte *)rgb->green);
-  lfree((byte *)rgb->blue);
+  free((byte *)rgb->red);
+  free((byte *)rgb->green);
+  free((byte *)rgb->blue);
 }
 
 Image *newBitImage(unsigned int width, unsigned int height)
@@ -109,17 +109,17 @@ void freeImageData(Image *image)
 {
   if (image->title)
   {
-    lfree((byte *)image->title);
+    free((byte *)image->title);
     image->title= NULL;
   }
   freeRGBMapData(&(image->rgb));
-  lfree(image->data);
+  free(image->data);
 }
 
 void freeImage(Image *image)
 {
   freeImageData(image);
-  lfree((byte *)image);
+  free((byte *)image);
 }
 
 byte *lmalloc(unsigned int size)
@@ -154,9 +154,4 @@ byte *lcalloc(unsigned int size)
   }
 
   return(area);
-}
-
-void lfree(byte *area)
-{
-  free(area);
 }

@@ -69,16 +69,6 @@ static void sysmsg(char *s)
   }
 }
 
-static void *mmalloc(int n)
-{
-  void *r;
-
-  r = malloc(n);
-  if (r == NULL)
-    fatal("Out of memory");
-  return r;
-}
-
 static void u_sleep(int i)
 {
   struct timeval tm;
@@ -104,7 +94,7 @@ static void sendbuf(int len)
     realbuf[3] = (unsigned char)len;
     buf[0] = 0;
     if (nwrite + 4 + len >= MAX_BUFFER_SIZE)
-      fatal("Internal error: send buffer overflow");
+      Error(ERR_EXIT, "internal error: network send buffer overflow");
     memcpy(writbuf + nwrite, realbuf, 4 + len);
     nwrite += 4 + len;
 
@@ -123,7 +113,8 @@ struct user *finduser(unsigned char c)
     if (u->nr == c)
       return u;
   
-  fatal("Protocol error: reference to non-existing user");
+  Error(ERR_EXIT, "protocol error: reference to non-existing user %d", c);
+
   return NULL; /* so that gcc -Wall doesn't complain */
 }
 
@@ -178,7 +169,8 @@ BOOL ConnectToServer(char *host, int port)
     {
       hp = gethostbyname(host);
       if (!hp)
-	fatal("Host not found");
+	Error(ERR_EXIT, "cannot locate host '%s'", host);
+
       s.sin_addr = *(struct in_addr *)(hp->h_addr_list[0]);
     }
   }
@@ -190,9 +182,11 @@ BOOL ConnectToServer(char *host, int port)
 
   s.sin_port = htons(port);
   s.sin_family = AF_INET;
+
   sfd = socket(PF_INET, SOCK_STREAM, 0);
   if (sfd < 0)
-    fatal("Out of file descriptors");
+    Error(ERR_EXIT, "out of file descriptors");
+
   if ((tcpproto = getprotobyname("tcp")) != NULL)
     setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
 
@@ -208,18 +202,22 @@ BOOL ConnectToServer(char *host, int port)
       {
 	u_sleep(500000);
 	close(sfd);
+
 	sfd = socket(PF_INET, SOCK_STREAM, 0);
 	if (sfd < 0)
-	  fatal("Out of file descriptors");
-	setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
+	  Error(ERR_EXIT, "out of file descriptors");
+
+	setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY,
+		   (char *)&on, sizeof(int));
+
 	if (connect(sfd, (struct sockaddr *)&s, sizeof(s)) >= 0)
 	  break;
       }
       if (i==6)
-	fatal("Can't connect to server");
+	Error(ERR_EXIT, "cannot connect to server");
     }
     else
-      fatal("Can't connect to server");
+      Error(ERR_EXIT, "cannot connect to server");
   }
 
   return(TRUE);
@@ -381,9 +379,8 @@ static void Handle_OP_NUMBER_WANTED()
     u = finduser(old_client_nr);
     u->nr = new_client_nr;
 
-    if (old_client_nr == local_player->client_nr) /* local player switched */
+    if (old_player == local_player)		/* local player switched */
       local_player = new_player;
-
 
 
     TestPlayer = new_index_nr;
@@ -432,7 +429,7 @@ static void Handle_OP_PLAYER_CONNECTED()
       v = u;
   }
 
-  v->next = u = mmalloc(sizeof(struct user));
+  v->next = u = checked_malloc(sizeof(struct user));
   u->nr = new_client_nr;
   u->name[0] = '\0';
   u->next = NULL;
@@ -583,7 +580,7 @@ static void Handle_OP_MOVE_FIGURE(unsigned int len)
   */
 }
 
-static void handlemessages()
+static void HandleNetworkingMessages()
 {
   unsigned int len;
 
@@ -591,11 +588,11 @@ static void handlemessages()
   {
     len = readbuf[3];
     if (readbuf[0] || readbuf[1] || readbuf[2])
-      fatal("Wrong server line length");
+      Error(ERR_EXIT, "wrong network server line length");
 
     memcpy(buf, &readbuf[4], len);
     nread -= 4 + len;
-    copydown(readbuf, readbuf + 4 + len, nread);
+    memmove(readbuf, readbuf + 4 + len, nread);
 
     switch(buf[1])
     {
@@ -689,10 +686,7 @@ void HandleNetworking()
   r = select(sfd + 1, &rfds, NULL, NULL, &tv);
 
   if (r < 0 && errno != EINTR)
-  {
-    perror("select");
-    fatal("fatal: select() failed");
-  }
+    Error(ERR_EXIT, "HandleNetworking(): select() failed");
 
   if (r < 0)
     FD_ZERO(&rfds);
@@ -704,11 +698,13 @@ void HandleNetworking()
     r = read(sfd, readbuf + nread, MAX_BUFFER_SIZE - nread);
 
     if (r < 0)
-      fatal("Error reading from server");
+      Error(ERR_EXIT, "error reading from network server");
+
     if (r == 0)
-      fatal("Connection to server lost");
+      Error(ERR_EXIT, "connection to network server lost");
+
     nread += r;
 
-    handlemessages();
+    HandleNetworkingMessages();
   }
 }

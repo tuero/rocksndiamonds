@@ -141,7 +141,6 @@ void   newRGBMapData();
 void   freeRGBMapData();
 byte  *lcalloc();
 byte  *lmalloc();
-void   lfree();
 
 Image *gifLoad();
 Image *monochrome();

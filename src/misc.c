@@ -370,15 +370,14 @@ void Error(int mode, char *format_str, ...)
   }
 }
 
-/* like memcpy, but guaranteed to handle overlap when s <= t */
-void copydown(char *s, char *t, int n)
+void *checked_malloc(unsigned long size)
 {
-  for (; n; n--)
-    *(s++) = *(t++);
-}
+  void *ptr;
 
-void fatal(char *s)
-{
-  fprintf(stderr, "%s.\n", s);
-  exit(1);
+  ptr = malloc(size);
+
+  if (ptr == NULL)
+    Error(ERR_EXIT, "cannot allocate %d bytes -- out of memory", size);
+
+  return ptr;
 }
