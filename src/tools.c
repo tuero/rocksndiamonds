@@ -894,7 +894,6 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
     graphic -= GFX_START_ROCKSSP;
-    graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
     *bitmap = pix[PIX_SP];
     *x = MINI_SP_STARTX + (graphic % MINI_SP_PER_LINE) * MINI_TILEX;
     *y = MINI_SP_STARTY + (graphic / MINI_SP_PER_LINE) * MINI_TILEY;
@@ -1255,6 +1254,8 @@ void DrawLevelFieldThruMask(int x, int y)
 
 void ErdreichAnbroeckeln(int x, int y)
 {
+  Bitmap *src_bitmap;
+  int src_x, src_y;
   int i, width, height, cx,cy;
   int ux = LEVELX(x), uy = LEVELY(y);
   int element, graphic;
@@ -1281,6 +1282,8 @@ void ErdreichAnbroeckeln(int x, int y)
       return;
 
     graphic = GFX_ERDENRAND;
+
+    getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
 
     for(i=0; i<4; i++)
     {
@@ -1314,9 +1317,7 @@ void ErdreichAnbroeckeln(int x, int y)
 	cy = (i == 3 ? TILEY - snip : 0);
       }
 
-      BlitBitmap(pix[PIX_BACK], drawto_field,
-		 SX + (graphic % GFX_PER_LINE) * TILEX + cx,
-		 SY + (graphic / GFX_PER_LINE) * TILEY + cy,
+      BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 		 width, height, FX + x * TILEX + cx, FY + y * TILEY + cy);
     }
 
@@ -1325,6 +1326,8 @@ void ErdreichAnbroeckeln(int x, int y)
   else
   {
     graphic = GFX_ERDENRAND;
+
+    getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
 
     for(i=0; i<4; i++)
     {
@@ -1358,9 +1361,7 @@ void ErdreichAnbroeckeln(int x, int y)
 	cy = (i==0 ? TILEY-snip : 0);
       }
 
-      BlitBitmap(pix[PIX_BACK], drawto_field,
-		 SX + (graphic % GFX_PER_LINE) * TILEX + cx,
-		 SY + (graphic / GFX_PER_LINE) * TILEY + cy,
+      BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 		 width, height, FX + xx * TILEX + cx, FY + yy * TILEY + cy);
 
       MarkTileDirty(xx, yy);
@@ -1552,7 +1553,6 @@ void DrawMicroElement(int xpos, int ypos, int element)
   if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
     graphic -= GFX_START_ROCKSSP;
-    graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
     BlitBitmap(pix[PIX_SP], drawto,
 	       MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) * MICRO_TILEX,
 	       MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) * MICRO_TILEY,
