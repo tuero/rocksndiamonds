@@ -1190,8 +1190,9 @@ void SaveScore(int level_nr)
 /* shortcut setup */
 #define SETUP_TOKEN_SAVE_GAME		0
 #define SETUP_TOKEN_LOAD_GAME		1
+#define SETUP_TOKEN_TOGGLE_PAUSE	2
 
-#define NUM_SHORTCUT_SETUP_TOKENS	2
+#define NUM_SHORTCUT_SETUP_TOKENS	3
 
 /* player setup */
 #define SETUP_TOKEN_USE_JOYSTICK	0
@@ -1245,7 +1246,8 @@ static struct TokenInfo shortcut_setup_tokens[] =
 {
   /* shortcut setup */
   { TYPE_KEY_X11, &ssi.save_game,		"shortcut.save_game"	},
-  { TYPE_KEY_X11, &ssi.load_game,		"shortcut.load_game"	}
+  { TYPE_KEY_X11, &ssi.load_game,		"shortcut.load_game"	},
+  { TYPE_KEY_X11, &ssi.toggle_pause,		"shortcut.toggle_pause"	}
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -1299,6 +1301,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
+  si->shortcut.toggle_pause = DEFAULT_KEY_TOGGLE_PAUSE;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {

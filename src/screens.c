@@ -1487,6 +1487,8 @@ static struct TokenInfo setup_info_shortcut[] =
   { TYPE_KEY,		&setup.shortcut.save_game,	""		},
   { TYPE_KEYTEXT,	NULL,			"Quick Load Game:",	},
   { TYPE_KEY,		&setup.shortcut.load_game,	""		},
+  { TYPE_KEYTEXT,	NULL,			"Toggle Pause:",	},
+  { TYPE_KEY,		&setup.shortcut.toggle_pause,	""		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
   { 0,			NULL,			NULL			}

@@ -4048,7 +4048,7 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[id], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
-    else if (key == KSYM_space || key == KSYM_Return)
+    else if (key == KSYM_Return || key == setup.shortcut.toggle_pause)
       ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
     else
       for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)

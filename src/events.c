@@ -444,7 +444,7 @@ void HandleKey(Key key, int key_status)
 
       if (tape.single_step && clear_button_2[pnr])
       {
-	stored_player[pnr].action &= ~MV_BUTTON_2;
+	stored_player[pnr].action &= ~KEY_BUTTON_2;
 	clear_button_2[pnr] = FALSE;
       }
 
@@ -456,31 +456,31 @@ void HandleKey(Key key, int key_status)
       if (tape.single_step && tape.recording && tape.pausing)
       {
 	if (key_status == KEY_PRESSED &&
-	    (key_action & (MV_MOTION | MV_BUTTON_1)))
+	    (key_action & (KEY_MOTION | KEY_BUTTON_1)))
 	{
 	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	  if (key_action & MV_MOTION)
+	  if (key_action & KEY_MOTION)
 	  {
-	    if (stored_player[pnr].action & MV_BUTTON_2)
+	    if (stored_player[pnr].action & KEY_BUTTON_2)
 	      bomb_placed[pnr] = TRUE;
 	  }
 	}
 	else if (key_status == KEY_RELEASED &&
-		 (key_action & MV_BUTTON_2))
+		 (key_action & KEY_BUTTON_2))
 	{
 	  if (!bomb_placed[pnr])
 	  {
 	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	    stored_player[pnr].action |= MV_BUTTON_2;
+	    stored_player[pnr].action |= KEY_BUTTON_2;
 	    clear_button_2[pnr] = TRUE;
 	  }
 
 	  bomb_placed[pnr] = FALSE;
 	}
       }
-      else if (tape.recording && tape.pausing)
+      else if (tape.recording && tape.pausing && (key_action & KEY_ACTION))
 	TapeTogglePause(TAPE_TOGGLE_MANUAL);
     }
   }
@@ -509,7 +509,7 @@ void HandleKey(Key key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if ((key == KSYM_Return || key == KSYM_space) &&
+  if ((key == KSYM_Return || key == setup.shortcut.toggle_pause) &&
       game_status == PLAYING && AllPlayersGone)
   {
     CloseDoor(DOOR_CLOSE_1);
@@ -531,13 +531,15 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-  /* special shortcuts for quick game tape saving and loading */
+  /* special key shortcuts */
   if (game_status == MAINMENU || game_status == PLAYING)
   {
     if (key == setup.shortcut.save_game)
       TapeQuickSave();
     else if (key == setup.shortcut.load_game)
       TapeQuickLoad();
+    else if (key == setup.shortcut.toggle_pause)
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
   }
 
 
@@ -564,7 +566,6 @@ void HandleKey(Key key, int key_status)
       switch(key)
       {
 	case KSYM_Return:
-	case KSYM_space:
 	  if (game_status == MAINMENU)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
           else if (game_status == CHOOSELEVEL)
@@ -609,7 +610,6 @@ void HandleKey(Key key, int key_status)
       switch(key)
       {
 	case KSYM_Return:
-	case KSYM_space:
 	  game_status = MAINMENU;
 	  DrawMainMenu();
 	  BackToFront();
