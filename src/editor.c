@@ -2025,6 +2025,14 @@ void CreateLevelEditorGadgets()
   CreateCheckbuttonGadgets();
 }
 
+void FreeLevelEditorGadgets()
+{
+  int i;
+
+  for (i=0; i<NUM_EDITOR_GADGETS; i++)
+    FreeGadget(level_editor_gadget[i]);
+}
+
 static void MapCounterButtons(int id)
 {
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_down]);

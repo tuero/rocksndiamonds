@@ -119,6 +119,7 @@ void UndrawSpecialEditorDoor();
 int ReadPixel(DrawBuffer *, int, int);
 
 void CreateToolButtons();
+void FreeToolButtons();
 
 int get_next_element(int);
 int el2gfx(int);

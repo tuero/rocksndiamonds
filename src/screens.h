@@ -42,6 +42,7 @@ void HandleSetupScreen(int, int, int, int, int);
 void HandleGameActions(void);
 
 void CreateScreenGadgets();
+void FreeScreenGadgets();
 void MapChooseTreeGadgets(TreeInfo *);
 void UnmapChooseTreeGadgets();
 

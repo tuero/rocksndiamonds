@@ -101,6 +101,7 @@ void TapeQuickLoad(void);
 void AutoPlayTape(void);
 
 void CreateTapeButtons();
+void FreeTapeButtons();
 void MapTapeEjectButton();
 void MapTapeIndexButton();
 void MapTapeButtons();

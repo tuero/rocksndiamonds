@@ -876,6 +876,14 @@ void CreateTapeButtons()
   }
 }
 
+void FreeTapeButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+    FreeGadget(tape_gadget[i]);
+}
+
 void MapTapeEjectButton()
 {
   UnmapGadget(tape_gadget[TAPE_CTRL_ID_INDEX]);

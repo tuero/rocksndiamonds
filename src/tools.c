@@ -1306,6 +1306,12 @@ inline static int getGfxAction(int x, int y)
   gfx_action = GfxAction[x][y];
 #endif
 
+#if DEBUG
+  if (gfx_action < 0)
+    printf("getGfxAction: THIS SHOULD NEVER HAPPEN: GfxAction[%d][%d] == %d\n",
+	   x, y, gfx_action);
+#endif
+
   return gfx_action;
 }
 
@@ -1313,11 +1319,23 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
   int ux = LEVELX(x), uy = LEVELY(y);
-  int move_dir = MovDir[ux][uy];
-  int move_pos = getFramePosition(ux, uy);
-  int gfx_action = getGfxAction(ux, uy);
-  int graphic = el_dir_act2img(element, move_dir, gfx_action);
-  int frame = getGraphicAnimationFrame(graphic, move_pos);
+  int graphic;
+  int frame;
+
+  if (IN_LEV_FIELD(ux, uy))
+  {
+    int move_dir = MovDir[ux][uy];
+    int move_pos = getFramePosition(ux, uy);
+    int gfx_action = getGfxAction(ux, uy);
+
+    graphic = el_dir_act2img(element, move_dir, gfx_action);
+    frame = getGraphicAnimationFrame(graphic, move_pos);
+  }
+  else
+  {
+    graphic = el2img(element);
+    frame = getGraphicAnimationFrame(graphic, 0);
+  }
 
   if (element == EL_WALL_GROWING)
   {
@@ -2566,6 +2584,14 @@ void CreateToolButtons()
   }
 }
 
+void FreeToolButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TOOL_BUTTONS; i++)
+    FreeGadget(tool_gadget[i]);
+}
+
 static void UnmapToolButtons()
 {
   int i;
@@ -2939,6 +2965,24 @@ int el_dir2img(int element, int direction)
 
 int el_dir_act2img(int element, int direction, int action)
 {
+#if DEBUG
+  if (element < 0)
+  {    
+    printf("el_dir_act2img: THIS SHOULD NEVER HAPPEN: element == %d\n",
+	   element);
+
+    return IMG_EMPTY;
+  }
+
+  if (action < 0)
+  {    
+    printf("el_dir_act2img: THIS SHOULD NEVER HAPPEN: action == %d\n",
+	   action);
+
+    return IMG_EMPTY;
+  }
+#endif
+
   action = graphics_action_mapping[action];
   direction = MV_DIR_BIT(direction);
 

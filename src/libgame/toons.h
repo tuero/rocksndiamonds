@@ -51,6 +51,8 @@ struct ToonScreenInfo
 
   int startx, starty;
   int width, height;
+
+  int frame_delay_value;
 };
 
 struct ToonInfo
@@ -73,7 +75,10 @@ struct ToonInfo
 
 int getAnimationFrame(int, int, int, int, int);
 
-void InitToonScreen();
+void InitToonScreen(Bitmap *, void (*update_function)(void),
+		    void (*prepare_backbuffer_function)(void),
+		    boolean (*redraw_needed_function)(void),
+		    struct ToonInfo *, int, int, int, int, int, int);
 void InitAnimation(void);
 void StopAnimation(void);
 void DoAnimation(void);

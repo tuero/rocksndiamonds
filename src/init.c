@@ -124,10 +124,11 @@ void OpenAll(void)
 
   InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
+#if 0
   InitGadgets();		/* needs images + number of level series */
+#endif
 
   InitGfxBackground();
-  InitToons();
 
   if (global.autoplay_leveldir)
   {
@@ -218,6 +219,9 @@ static void ReinitializeGraphics()
 	       new_graphic_info[IMG_MENU_FONT_MEDIUM].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
+
+  InitGadgets();
+  InitToons();
 }
 
 static void InitImages()
@@ -582,6 +586,10 @@ void ReloadCustomArtwork()
     }
 #endif
 
+#if 0
+    SyncDisplay();
+#endif
+
     ReinitializeGraphics();
 
     FreeTileClipmasks();
@@ -647,13 +655,29 @@ void ReloadCustomArtwork()
 #endif
 }
 
+void FreeGadgets()
+{
+  FreeLevelEditorGadgets();
+  FreeGameButtons();
+  FreeTapeButtons();
+  FreeToolButtons();
+  FreeScreenGadgets();
+}
+
 void InitGadgets()
 {
+  static boolean gadgets_initialized = FALSE;
+
+  if (gadgets_initialized)
+    FreeGadgets();
+
   CreateLevelEditorGadgets();
   CreateGameButtons();
   CreateTapeButtons();
   CreateToolButtons();
   CreateScreenGadgets();
+
+  gadgets_initialized = TRUE;
 }
 
 void InitElementInfo()

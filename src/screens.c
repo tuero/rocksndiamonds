@@ -2897,6 +2897,14 @@ void CreateScreenGadgets()
   CreateScreenScrollbars();
 }
 
+void FreeScreenGadgets()
+{
+  int i;
+
+  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+    FreeGadget(screen_gadget[i]);
+}
+
 void MapChooseTreeGadgets(TreeInfo *ti)
 {
   int num_entries = numTreeInfoInGroup(ti);

@@ -96,6 +96,7 @@ void RaiseScoreElement(int);
 void RequestQuitGame(boolean);
 
 void CreateGameButtons();
+void FreeGameButtons();
 void UnmapGameButtons();
 
 #endif

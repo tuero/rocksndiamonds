@@ -325,12 +325,11 @@ void InitToons()
       toons[i].anim_delay = 1;		/* no delay between frames */
       toons[i].start_frame = 0;		/* always start with first */
     }
-
-    toons[i].move_delay *= GAME_FRAME_DELAY;
   }
 
   InitToonScreen(bitmap_db_door,
 		 BackToFront, PrepareBackbuffer, ToonNeedsRedraw,
 		 toons, NUM_TOONS,
-		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		 GAME_FRAME_DELAY);
 }

@@ -7029,6 +7029,14 @@ void CreateGameButtons()
   }
 }
 
+void FreeGameButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_GAME_BUTTONS; i++)
+    FreeGadget(game_gadget[i]);
+}
+
 static void MapGameButtons()
 {
   int i;

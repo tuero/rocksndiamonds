@@ -576,14 +576,14 @@ void RedrawGadget(struct GadgetInfo *gi)
 
 struct GadgetInfo *CreateGadget(int first_tag, ...)
 {
-  struct GadgetInfo *new_gadget = checked_malloc(sizeof(struct GadgetInfo));
+  struct GadgetInfo *new_gadget = checked_calloc(sizeof(struct GadgetInfo));
   va_list ap;
 
   /* always start with reliable default values */
-  memset(new_gadget, 0, sizeof(struct GadgetInfo));	/* zero all fields */
   new_gadget->id = getNewGadgetID();
   new_gadget->callback_info = default_callback_info;
   new_gadget->callback_action = default_callback_action;
+  new_gadget->next = NULL;
 
   va_start(ap, first_tag);
   HandleGadgetTags(new_gadget, first_tag, ap);
@@ -614,7 +614,9 @@ void FreeGadget(struct GadgetInfo *gi)
   if (gi == gadget_list_last_entry)
     gadget_list_last_entry = gi_previous;
 
-  gi_previous->next = gi->next;
+  if (gi_previous)
+    gi_previous->next = gi->next;
+
   free(gi);
 }
 

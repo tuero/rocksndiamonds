@@ -78,7 +78,8 @@ void InitToonScreen(Bitmap *save_buffer,
 		    boolean (*redraw_needed_function)(void),
 		    struct ToonInfo *toons, int num_toons,
 		    int startx, int starty,
-		    int width, int height)
+		    int width, int height,
+		    int frame_delay_value)
 {
   screen_info.save_buffer = save_buffer;
   screen_info.update_function = update_function;
@@ -90,6 +91,7 @@ void InitToonScreen(Bitmap *save_buffer,
   screen_info.starty = starty;
   screen_info.width = width;
   screen_info.height = height;
+  screen_info.frame_delay_value = frame_delay_value;
 }
 
 void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
@@ -148,7 +150,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   {
     horiz_move = (anim->direction & (ANIMDIR_LEFT | ANIMDIR_RIGHT));
     vert_move = (anim->direction & (ANIMDIR_UP | ANIMDIR_DOWN));
-    anim_delay_value = anim->move_delay;
+    anim_delay_value = anim->move_delay * screen_info.frame_delay_value;
 
     frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
 			      anim->anim_mode, anim->start_frame,
