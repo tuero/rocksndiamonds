@@ -215,7 +215,7 @@ typedef unsigned char byte;
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
-#define MAX_LEVDIR_ENTRIES	100
+#define MAX_LEVDIR_ENTRIES	250		/* max. level directories */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
 #define MAX_NUM_AMOEBA		100
@@ -386,6 +386,7 @@ struct LevelDirInfo
   char *filename;	/* level series sub-directory inside level directory */
   char *name;		/* level series name, as displayed on main screen */
   char *name_short;	/* optional short name for level selection screen */
+  char *name_sorting;	/* optional sorting name for correct level sorting */
   char *author;		/* level series author name levels without author */
   char *imported_from;	/* optional comment for imported level series */
   int levels;		/* number of levels in level series */
@@ -431,6 +432,7 @@ struct GameInfo
   int belt_dir[4];
   int belt_dir_nr[4];
   int switchgate_pos;
+  int balloon_dir;
 };
 
 struct GlobalInfo
@@ -925,6 +927,27 @@ extern char		*element_info[];
 #define EL_TIMEGATE_SWITCH_ON	324
 #define EL_TIMEGATE_SWITCH_OFF	325
 
+#define EL_BALLOON		326
+#define EL_BALLOON_SEND_LEFT	327
+#define EL_BALLOON_SEND_RIGHT	328
+#define EL_BALLOON_SEND_UP	329
+#define EL_BALLOON_SEND_DOWN	330
+#define EL_BALLOON_SEND_ANY	331
+
+#define EL_EMC_STEEL_WALL_1	332
+#define EL_EMC_STEEL_WALL_2	333
+#define EL_EMC_STEEL_WALL_3 	334
+#define EL_EMC_STEEL_WALL_4	335
+#define EL_EMC_WALL_1		336
+#define EL_EMC_WALL_2		337
+#define EL_EMC_WALL_3		338
+#define EL_EMC_WALL_4		339
+#define EL_EMC_WALL_5		340
+#define EL_EMC_WALL_6		341
+#define EL_EMC_WALL_7		342
+#define EL_EMC_WALL_8		343
+
+
 /* "real" (and therefore drawable) runtime elements */
 #define EL_SIEB_LEER		500
 #define EL_SIEB2_LEER		501
@@ -1357,6 +1380,25 @@ extern char		*element_info[];
 #define GFX_SWITCHGATE_OPEN	(GFX_START_ROCKSDC +  5 * DC_PER_LINE + 12)
 #define GFX_TIMEGATE_CLOSED	(GFX_START_ROCKSDC +  6 * DC_PER_LINE +  8)
 #define GFX_TIMEGATE_OPEN	(GFX_START_ROCKSDC +  6 * DC_PER_LINE + 12)
+#define GFX_BALLOON_SEND_LEFT	(GFX_START_ROCKSDC +  7 * DC_PER_LINE +  8)
+#define GFX_BALLOON_SEND_RIGHT	(GFX_START_ROCKSDC +  7 * DC_PER_LINE +  9)
+#define GFX_BALLOON_SEND_UP	(GFX_START_ROCKSDC +  7 * DC_PER_LINE + 10)
+#define GFX_BALLOON_SEND_DOWN	(GFX_START_ROCKSDC +  7 * DC_PER_LINE + 11)
+#define GFX_BALLOON		(GFX_START_ROCKSDC +  7 * DC_PER_LINE + 12)
+#define GFX_BALLOON_SEND_ANY	(GFX_START_ROCKSDC +  0 * DC_PER_LINE + 15)
+
+#define GFX_EMC_STEEL_WALL_1	(GFX_START_ROCKSDC +  0 * DC_PER_LINE + 14)
+#define GFX_EMC_STEEL_WALL_2	(GFX_START_ROCKSDC +  0 * DC_PER_LINE + 14)
+#define GFX_EMC_STEEL_WALL_3 	(GFX_START_ROCKSDC +  0 * DC_PER_LINE + 14)
+#define GFX_EMC_STEEL_WALL_4	(GFX_START_ROCKSDC +  0 * DC_PER_LINE + 14)
+#define GFX_EMC_WALL_1		(GFX_START_ROCKSDC +  6 * DC_PER_LINE + 13)
+#define GFX_EMC_WALL_2		(GFX_START_ROCKSDC +  6 * DC_PER_LINE + 14)
+#define GFX_EMC_WALL_3		(GFX_START_ROCKSDC +  6 * DC_PER_LINE + 15)
+#define GFX_EMC_WALL_4		(GFX_START_ROCKSDC +  1 * DC_PER_LINE + 14)
+#define GFX_EMC_WALL_5		(GFX_START_ROCKSDC +  1 * DC_PER_LINE + 15)
+#define GFX_EMC_WALL_6		(GFX_START_ROCKSDC +  2 * DC_PER_LINE + 14)
+#define GFX_EMC_WALL_7		(GFX_START_ROCKSDC +  2 * DC_PER_LINE + 15)
+#define GFX_EMC_WALL_8		(GFX_START_ROCKSDC +  1 * DC_PER_LINE + 14)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
@@ -1410,6 +1452,7 @@ extern char		*element_info[];
 #define GFX_SIGN_OTHER		GFX_CHAR_FRAGE
 #define GFX_DX_UNKNOWN_15	GFX_CHAR_FRAGE
 #define GFX_DX_UNKNOWN_42	GFX_CHAR_FRAGE
+
 
 /* the names of the sounds */
 #define SND_ALCHEMY		0

@@ -347,6 +347,7 @@ char *getStringToLower(char *s)
 
   while (*s)
     *s_ptr++ = tolower(*s++);
+  *s_ptr = '\0';
 
   return s_copy;
 }

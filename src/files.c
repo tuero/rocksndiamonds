@@ -1061,12 +1061,13 @@ void SaveScore(int level_nr)
 /* level directory info */
 #define LEVELINFO_TOKEN_NAME		29
 #define LEVELINFO_TOKEN_NAME_SHORT	30
-#define LEVELINFO_TOKEN_AUTHOR		31
-#define LEVELINFO_TOKEN_IMPORTED_FROM	32
-#define LEVELINFO_TOKEN_LEVELS		33
-#define LEVELINFO_TOKEN_FIRST_LEVEL	34
-#define LEVELINFO_TOKEN_SORT_PRIORITY	35
-#define LEVELINFO_TOKEN_READONLY	36
+#define LEVELINFO_TOKEN_NAME_SORTING	31
+#define LEVELINFO_TOKEN_AUTHOR		32
+#define LEVELINFO_TOKEN_IMPORTED_FROM	33
+#define LEVELINFO_TOKEN_LEVELS		34
+#define LEVELINFO_TOKEN_FIRST_LEVEL	35
+#define LEVELINFO_TOKEN_SORT_PRIORITY	36
+#define LEVELINFO_TOKEN_READONLY	37
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TIME_LIMIT
@@ -1135,6 +1136,7 @@ static struct
   /* level directory info */
   { TYPE_STRING,  &ldi.name,		"name"				},
   { TYPE_STRING,  &ldi.name_short,	"name_short"			},
+  { TYPE_STRING,  &ldi.name_sorting,	"name_sorting"			},
   { TYPE_STRING,  &ldi.author,		"author"			},
   { TYPE_STRING,  &ldi.imported_from,	"imported_from"			},
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
@@ -1403,6 +1405,7 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
   ldi->filename = NULL;
   ldi->name = getStringCopy(ANONYMOUS_NAME);
   ldi->name_short = NULL;
+  ldi->name_sorting = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
   ldi->imported_from = NULL;
   ldi->levels = 0;
@@ -1548,8 +1551,8 @@ static int compareLevelDirInfoEntries(const void *object1, const void *object2)
 
   if (entry1->sort_priority == entry2->sort_priority)
   {
-    char *name1 = getStringToLower(entry1->name_short);
-    char *name2 = getStringToLower(entry2->name_short);
+    char *name1 = getStringToLower(entry1->name_sorting);
+    char *name2 = getStringToLower(entry2->name_sorting);
 
     compare_result = strcmp(name1, name2);
 
@@ -1604,6 +1607,8 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 
     if (setup_file_list)
     {
+      DrawInitText(dir_entry->d_name, 150, FC_YELLOW);
+
       checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
       setLevelDirInfoToDefaults(&leveldir[current_entry]);
 
@@ -1615,6 +1620,10 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
       if (leveldir[current_entry].name_short == NULL)
 	leveldir[current_entry].name_short =
 	  getStringCopy(leveldir[current_entry].name);
+
+      if (leveldir[current_entry].name_sorting == NULL)
+	leveldir[current_entry].name_sorting =
+	  getStringCopy(leveldir[current_entry].name_short);
 
       leveldir[current_entry].filename = getStringCopy(dir_entry->d_name);
       leveldir[current_entry].last_level =
@@ -1636,13 +1645,15 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
     free(filename);
   }
 
-  if (current_entry == MAX_LEVDIR_ENTRIES)
-    Error(ERR_WARN, "using %d level directories -- ignoring the rest",
-	  current_entry);
-
   closedir(dir);
 
-  if (current_entry == start_entry)
+  if (current_entry == MAX_LEVDIR_ENTRIES)
+  {
+    Error(ERR_WARN, "maximum of %d level directories reached", current_entry);
+    Error(ERR_WARN, "remaining level directories ignored in directory '%s'",
+	  level_directory);
+  }
+  else if (current_entry == start_entry)
     Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
 	  level_directory);
 
@@ -1655,6 +1666,8 @@ void LoadLevelInfo()
 
   num_leveldirs = 0;
   leveldir_nr = 0;
+
+  DrawInitText("Loading level series:", 120, FC_GREEN);
 
   num_leveldirs = LoadLevelInfoFromLevelDir(options.level_directory,
 					    num_leveldirs);
@@ -1698,7 +1711,9 @@ static void SaveUserLevelInfo()
 	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, LEVELINFO_COOKIE));
 
   for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
-    if (i != LEVELINFO_TOKEN_NAME_SHORT && i != LEVELINFO_TOKEN_IMPORTED_FROM)
+    if (i != LEVELINFO_TOKEN_NAME_SHORT &&
+	i != LEVELINFO_TOKEN_NAME_SORTING &&
+	i != LEVELINFO_TOKEN_IMPORTED_FROM)
       fprintf(file, "%s\n", getSetupLine("", i));
 
   fclose(file);
@@ -1923,6 +1938,55 @@ void SaveLevelSetup_LastSeries()
   chmod(filename, SETUP_PERMS);
 }
 
+static void checkSeriesInfo(int leveldir_nr)
+{
+  static char *level_directory = NULL;
+  DIR *dir;
+  struct dirent *dir_entry;
+
+  /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
+
+  level_directory = getPath2((leveldir[leveldir_nr].user_defined ?
+			      getUserLevelDir("") :
+			      options.level_directory),
+			     leveldir[leveldir_nr].filename);
+
+  if ((dir = opendir(level_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+    return;
+  }
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* last directory entry */
+  {
+    if (strlen(dir_entry->d_name) > 4 &&
+	dir_entry->d_name[3] == '.' &&
+	strcmp(&dir_entry->d_name[4], LEVELFILE_EXTENSION) == 0)
+    {
+      char levelnum_str[4];
+      int levelnum_value;
+
+      strncpy(levelnum_str, dir_entry->d_name, 3);
+      levelnum_str[3] = '\0';
+
+      levelnum_value = atoi(levelnum_str);
+
+      if (levelnum_value < leveldir[leveldir_nr].first_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir[leveldir_nr].first_level = levelnum_value;
+      }
+      else if (levelnum_value > leveldir[leveldir_nr].last_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir[leveldir_nr].last_level = levelnum_value;
+      }
+    }
+  }
+
+  closedir(dir);
+}
+
 void LoadLevelSetup_SeriesInfo(int leveldir_nr)
 {
   char *filename;
@@ -1932,6 +1996,8 @@ void LoadLevelSetup_SeriesInfo(int leveldir_nr)
   /* always start with reliable default values */
   level_nr = 0;
   leveldir[leveldir_nr].handicap_level = 0;
+
+  checkSeriesInfo(leveldir_nr);
 
   /* ----------------------------------------------------------------------- */
   /* ~/.rocksndiamonds/levelsetup/<level series>/levelsetup.conf             */

@@ -334,6 +334,17 @@ int getFontHeight(int font_size, int font_type)
 	  FONT2_YSIZE);
 }
 
+void DrawInitText(char *text, int ypos, int color)
+{
+  if (display && window && pix[PIX_SMALLFONT])
+  {
+    XFillRectangle(display, window, gc, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
+    DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
+		ypos,text,FS_SMALL,color);
+    XFlush(display);
+  }
+}
+
 void DrawTextFCentered(int y, int font_type, char *format, ...)
 {
   char buffer[FULL_SXSIZE / FONT5_XSIZE + 10];
@@ -2568,6 +2579,24 @@ int el2gfx(int element)
     case EL_TIMEGATE_CLOSED:	return GFX_TIMEGATE_CLOSED;
     case EL_TIMEGATE_SWITCH_ON:	return GFX_TIMEGATE_SWITCH;
     case EL_TIMEGATE_SWITCH_OFF:return GFX_TIMEGATE_SWITCH;
+    case EL_BALLOON:		return GFX_BALLOON;
+    case EL_BALLOON_SEND_LEFT:	return GFX_BALLOON_SEND_LEFT;
+    case EL_BALLOON_SEND_RIGHT:	return GFX_BALLOON_SEND_RIGHT;
+    case EL_BALLOON_SEND_UP:	return GFX_BALLOON_SEND_UP;
+    case EL_BALLOON_SEND_DOWN:	return GFX_BALLOON_SEND_DOWN;
+    case EL_BALLOON_SEND_ANY:	return GFX_BALLOON_SEND_ANY;
+    case EL_EMC_STEEL_WALL_1:	return GFX_EMC_STEEL_WALL_1;
+    case EL_EMC_STEEL_WALL_2:	return GFX_EMC_STEEL_WALL_2;
+    case EL_EMC_STEEL_WALL_3:	return GFX_EMC_STEEL_WALL_3;
+    case EL_EMC_STEEL_WALL_4:	return GFX_EMC_STEEL_WALL_4;
+    case EL_EMC_WALL_1:		return GFX_EMC_WALL_1;
+    case EL_EMC_WALL_2:		return GFX_EMC_WALL_2;
+    case EL_EMC_WALL_3:		return GFX_EMC_WALL_3;
+    case EL_EMC_WALL_4:		return GFX_EMC_WALL_4;
+    case EL_EMC_WALL_5:		return GFX_EMC_WALL_5;
+    case EL_EMC_WALL_6:		return GFX_EMC_WALL_6;
+    case EL_EMC_WALL_7:		return GFX_EMC_WALL_7;
+    case EL_EMC_WALL_8:		return GFX_EMC_WALL_8;
 
     default:
     {

@@ -64,6 +64,7 @@ void FadeToFront();
 void ClearWindow();
 int getFontWidth(int, int);
 int getFontHeight(int, int);
+void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawText(int, int, char *, int, int);

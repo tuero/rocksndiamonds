@@ -63,8 +63,6 @@ void OpenAll(int argc, char *argv[])
     exit(0);
   }
 
-  InitLevelAndPlayerInfo();
-
   InitCounter();
   InitSound();
   InitSoundServer();
@@ -81,8 +79,10 @@ void OpenAll(int argc, char *argv[])
   XFlush(display);
 
   InitGfx();
-  InitElementProperties();
+  InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
+
   InitGadgets();
+  InitLevelAndPlayerInfo();
 
   DrawMainMenu();
 
@@ -454,17 +454,6 @@ void InitWindow(int argc, char *argv[])
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
-}
-
-void DrawInitText(char *text, int ypos, int color)
-{
-  if (display && window && pix[PIX_SMALLFONT])
-  {
-    XFillRectangle(display,window,gc,0,ypos, WIN_XSIZE,FONT2_YSIZE);
-    DrawTextExt(window,gc,(WIN_XSIZE-strlen(text)*FONT2_XSIZE)/2,
-		ypos,text,FS_SMALL,color);
-    XFlush(display);
-  }
 }
 
 void InitGfx()
@@ -964,7 +953,19 @@ void InitElementProperties()
     EL_SIGN_EXIT,
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
-    EL_STEEL_SLANTED
+    EL_STEEL_SLANTED,
+    EL_EMC_STEEL_WALL_1,
+    EL_EMC_STEEL_WALL_2,
+    EL_EMC_STEEL_WALL_3,
+    EL_EMC_STEEL_WALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8
   };
   static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
 
@@ -1035,7 +1036,11 @@ void InitElementProperties()
     EL_SIGN_EXIT,
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
-    EL_STEEL_SLANTED
+    EL_STEEL_SLANTED,
+    EL_EMC_STEEL_WALL_1,
+    EL_EMC_STEEL_WALL_2,
+    EL_EMC_STEEL_WALL_3,
+    EL_EMC_STEEL_WALL_4
   };
   static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
 
@@ -1135,7 +1140,19 @@ void InitElementProperties()
     EL_SP_TERMINAL,
     EL_SP_EXIT,
     EL_INVISIBLE_STEEL,
-    EL_STEEL_SLANTED
+    EL_STEEL_SLANTED,
+    EL_EMC_STEEL_WALL_1,
+    EL_EMC_STEEL_WALL_2,
+    EL_EMC_STEEL_WALL_3,
+    EL_EMC_STEEL_WALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8
   };
   static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
 
@@ -1218,7 +1235,8 @@ void InitElementProperties()
     EL_DRACHE,
     EL_SONDE,
     EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON
+    EL_SP_ELECTRON,
+    EL_BALLOON
   };
   static int ep_can_move_num = sizeof(ep_can_move)/sizeof(int);
 
@@ -1471,7 +1489,19 @@ void InitElementProperties()
     EL_SIGN_EXIT,
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
-    EL_STEEL_SLANTED
+    EL_STEEL_SLANTED,
+    EL_EMC_STEEL_WALL_1,
+    EL_EMC_STEEL_WALL_2,
+    EL_EMC_STEEL_WALL_3,
+    EL_EMC_STEEL_WALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8
   };
   static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
 
@@ -1523,7 +1553,8 @@ void InitElementProperties()
     EL_SONDE,
     EL_SP_ZONK,
     EL_SP_DISK_ORANGE,
-    EL_SP_DISK_YELLOW
+    EL_SP_DISK_YELLOW,
+    EL_BALLOON
   };
   static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
 

@@ -519,6 +519,7 @@ void InitGame()
   game.light_time_left = 0;
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
+  game.balloon_dir = MV_NO_MOVING;
 
   for (i=0; i<4; i++)
   {
@@ -2213,6 +2214,11 @@ void TurnRound(int x, int y)
     if (MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = 9;
   }
+  else if (element == EL_BALLOON)
+  {
+    MovDir[x][y] = game.balloon_dir;
+    MovDelay[x][y] = 0;
+  }
   else if (element == EL_ROBOT || element == EL_SONDE || element == EL_PINGUIN)
   {
     int attr_x = -1, attr_y = -1;
@@ -2517,7 +2523,8 @@ void StartMoving(int x, int y)
   {
     int newx, newy;
 
-    if (element == EL_SONDE && JustBeingPushed(x, y))
+    if ((element == EL_SONDE || element == EL_BALLOON)
+	&& JustBeingPushed(x, y))
       return;
 
     if (!MovDelay[x][y])	/* start new movement phase */
@@ -2633,8 +2640,8 @@ void StartMoving(int x, int y)
 #endif
 
     }
-    else if ((element == EL_PINGUIN ||
-	      element == EL_ROBOT || element == EL_SONDE) &&
+    else if ((element == EL_PINGUIN || element == EL_ROBOT ||
+	      element == EL_SONDE || element == EL_BALLOON) &&
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_SALZSAEURE)
     {
@@ -2812,7 +2819,8 @@ void StartMoving(int x, int y)
       else if (element == EL_SP_ELECTRON)
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 
-      TestIfBadThingHitsHero(x, y);
+      if (DONT_TOUCH(element))
+	TestIfBadThingHitsHero(x, y);
 
       return;
     }
@@ -4061,7 +4069,8 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       if (IN_LEV_FIELD(jx+dx, jy) && IS_PUSHABLE(Feld[jx+dx][jy]))
       {
 	int el = Feld[jx+dx][jy];
-	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SONDE ? 2 : 10);
+	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SONDE ? 2 :
+			  el == EL_BALLOON ? 0 : 10);
 
 	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
 	{
@@ -5311,6 +5320,23 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
+    case EL_BALLOON_SEND_LEFT:
+    case EL_BALLOON_SEND_RIGHT:
+    case EL_BALLOON_SEND_UP:
+    case EL_BALLOON_SEND_DOWN:
+    case EL_BALLOON_SEND_ANY:
+      if (element == EL_BALLOON_SEND_ANY)
+	game.balloon_dir = move_direction;
+      else
+	game.balloon_dir = (element == EL_BALLOON_SEND_LEFT  ? MV_LEFT :
+			    element == EL_BALLOON_SEND_RIGHT ? MV_RIGHT :
+			    element == EL_BALLOON_SEND_UP    ? MV_UP :
+			    element == EL_BALLOON_SEND_DOWN  ? MV_DOWN :
+			    MV_NO_MOVING);
+
+      return MF_ACTION;
+      break;
+
     case EL_SP_EXIT:
       if (local_player->gems_still_needed > 0)
 	return MF_NO_ACTION;
@@ -5358,7 +5384,7 @@ int DigField(struct PlayerInfo *player,
       else if (IS_SP_ELEMENT(element))
 	PlaySoundLevel(x+dx, y+dy, SND_SP_ZONKPUSH);
       else
-	PlaySoundLevel(x+dx, y+dy, SND_KLOPF);
+	PlaySoundLevel(x+dx, y+dy, SND_PUSCH);	/* better than "SND_KLOPF" */
       break;
 
     case EL_PFORTE1:
@@ -5505,6 +5531,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SOKOBAN_OBJEKT:
     case EL_SONDE:
     case EL_SP_DISK_YELLOW:
+    case EL_BALLOON:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
 
@@ -5530,7 +5557,7 @@ int DigField(struct PlayerInfo *player,
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !tape.playing)
+	  !tape.playing && element != EL_BALLOON)
 	return MF_NO_ACTION;
 
       if (IS_SB_ELEMENT(element))
@@ -5559,11 +5586,14 @@ int DigField(struct PlayerInfo *player,
 	Feld[x+dx][y+dy] = element;
       }
 
-      player->push_delay_value = 2;
+      player->push_delay_value = (element == EL_BALLOON ? 0 : 2);
 
       DrawLevelField(x, y);
       DrawLevelField(x+dx, y+dy);
-      PlaySoundLevel(x+dx, y+dy, SND_PUSCH);
+      if (element == EL_BALLOON)
+	PlaySoundLevel(x+dx, y+dy, SND_SCHLURF);
+      else
+	PlaySoundLevel(x+dx, y+dy, SND_PUSCH);
 
       if (IS_SB_ELEMENT(element) &&
 	  local_player->sokobanfields_still_needed == 0 &&

@@ -524,8 +524,24 @@ char *element_info[] =
   "time gate (closed)",
   "switch for time gate",
   "switch for time gate",
-  "-",
-  "-",
+  "balloon",
+  "send balloon to the left",
+  "send balloon to the right",
+  "send balloon up",
+  "send balloon down",				/* 330 */
+  "send balloon in any direction",
+  "steel wall",
+  "steel wall",
+  "steel wall",
+  "steel wall",
+  "normal wall",
+  "normal wall",
+  "normal wall",
+  "normal wall",
+  "normal wall",				/* 340 */
+  "normal wall",
+  "normal wall",
+  "normal wall",
   "-"
 
   /*

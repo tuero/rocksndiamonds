@@ -15,6 +15,8 @@
 #include "image.h"
 #include "misc.h"
 
+#define PCX_DEBUG		FALSE
+
 #define PCX_MAGIC		0x0a	/* first byte in a PCX image file    */
 #define PCX_LAST_VERSION	5	/* last acceptable version number    */
 #define PCX_ENCODING		1	/* PCX encoding method               */
@@ -192,6 +194,7 @@ Image *Read_PCX_to_Image(char *filename)
     return NULL;
   }
 
+#if PCX_DEBUG
   if (options.verbose)
   {
     printf("%s is a %dx%d PC Paintbrush image with %d bitplanes\n",
@@ -204,6 +207,7 @@ Image *Read_PCX_to_Image(char *filename)
 	   (pcx.palette_type == 1 ? "color" :
 	    pcx.palette_type == 2 ? "grayscale" : "undefined"));
   }
+#endif
 
   /* allocate new image structure */
   image = newImage(width, height, depth);
@@ -245,8 +249,10 @@ Image *Read_PCX_to_Image(char *filename)
     if (image->rgb.color_used[i])
       image->rgb.used++;
 
+#if PCX_DEBUG
   if (options.verbose)
     printf("Read_PCX_to_Image: %d colors found\n", image->rgb.used);
+#endif
 
   return image;
 }
