@@ -513,7 +513,6 @@ void InitGame()
 
   ZX = ZY = -1;
 
-  game.yam_content_nr = 0;
   FrameCounter = 0;
   TimeFrames = 0;
   TimePlayed = 0;
@@ -526,6 +525,8 @@ void InitGame()
   ScrollStepSize = 0;	/* will be correctly initialized by ScrollScreen() */
 
   AllPlayersGone = FALSE;
+
+  game.yam_content_nr = 0;
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
   game.light_time_left = 0;
