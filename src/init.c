@@ -31,7 +31,7 @@
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
 
-struct FontInfo font_info_initial[NUM_INITIAL_FONTS];
+struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
 
 static void InitGlobal();
 static void InitSetup();
@@ -486,13 +486,13 @@ void InitGfx()
 	       strncmp(image_config[i].token, font_token, len_font_token) == 0)
       {
 	if (strcmp(&image_config[i].token[len_font_token], ".x") == 0)
-	  font_info_initial[j].src_x = atoi(image_config[i].value);
+	  font_initial[j].src_x = atoi(image_config[i].value);
 	else if (strcmp(&image_config[i].token[len_font_token], ".y") == 0)
-	  font_info_initial[j].src_y = atoi(image_config[i].value);
+	  font_initial[j].src_y = atoi(image_config[i].value);
 	else if (strcmp(&image_config[i].token[len_font_token], ".width") == 0)
-	  font_info_initial[j].width = atoi(image_config[i].value);
+	  font_initial[j].width = atoi(image_config[i].value);
 	else if (strcmp(&image_config[i].token[len_font_token],".height") == 0)
-	  font_info_initial[j].height = atoi(image_config[i].value);
+	  font_initial[j].height = atoi(image_config[i].value);
       }
     }
   }
@@ -514,7 +514,7 @@ void InitGfx()
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 
   for (j=0; j < NUM_INITIAL_FONTS; j++)
-    font_info_initial[j].bitmap = bitmap_font_initial;
+    font_initial[j].bitmap = bitmap_font_initial;
 
   InitFontGraphicInfo();
 
@@ -730,7 +730,7 @@ void InitElementSmallImages()
 
 void InitFontGraphicInfo()
 {
-  static struct FontInfo font_info[NUM_IMG_FONTS];
+  static struct FontBitmapInfo font_bitmap_info[NUM_IMG_FONTS];
   int num_fonts = NUM_IMG_FONTS;
   int i;
 
@@ -740,21 +740,21 @@ void InitFontGraphicInfo()
   for (i=0; i < num_fonts; i++)
   {
     if (i < NUM_INITIAL_FONTS)
-      font_info[i] = font_info_initial[i];
+      font_bitmap_info[i] = font_initial[i];
     else
     {
       /* copy font relevant information from graphics information */
-      font_info[i].bitmap = graphic_info[FIRST_IMG_FONT + i].bitmap;
-      font_info[i].src_x  = graphic_info[FIRST_IMG_FONT + i].src_x;
-      font_info[i].src_y  = graphic_info[FIRST_IMG_FONT + i].src_y;
-      font_info[i].width  = graphic_info[FIRST_IMG_FONT + i].width;
-      font_info[i].height = graphic_info[FIRST_IMG_FONT + i].height;
-      font_info[i].draw_x = graphic_info[FIRST_IMG_FONT + i].draw_x;
-      font_info[i].draw_y = graphic_info[FIRST_IMG_FONT + i].draw_y;
+      font_bitmap_info[i].bitmap = graphic_info[FIRST_IMG_FONT + i].bitmap;
+      font_bitmap_info[i].src_x  = graphic_info[FIRST_IMG_FONT + i].src_x;
+      font_bitmap_info[i].src_y  = graphic_info[FIRST_IMG_FONT + i].src_y;
+      font_bitmap_info[i].width  = graphic_info[FIRST_IMG_FONT + i].width;
+      font_bitmap_info[i].height = graphic_info[FIRST_IMG_FONT + i].height;
+      font_bitmap_info[i].draw_x = graphic_info[FIRST_IMG_FONT + i].draw_x;
+      font_bitmap_info[i].draw_y = graphic_info[FIRST_IMG_FONT + i].draw_y;
     }
   }
 
-  InitFontInfo(font_info, num_fonts);
+  InitFontInfo(font_bitmap_info, num_fonts);
 }
 
 void InitElementGraphicInfo()

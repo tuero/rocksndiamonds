@@ -107,7 +107,7 @@ static void InitFontClipmasks()
 }
 #endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
 
-void InitFontInfo(struct FontInfo *font_info, int num_fonts)
+void InitFontInfo(struct FontBitmapInfo *font_info, int num_fonts)
 {
   gfx.num_fonts = num_fonts;
   gfx.font = font_info;
@@ -189,7 +189,7 @@ void DrawText(int x, int y, char *text, int font)
 void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		 int font_nr, int mask_mode)
 {
-  struct FontInfo *font = &gfx.font[font_nr];
+  struct FontBitmapInfo *font = &gfx.font[font_nr];
   boolean print_inverse = FALSE;
 
   if (font->bitmap == NULL)

@@ -62,8 +62,7 @@
 
 /* font structure definitions */
 
-#if 1
-void InitFontInfo(struct FontInfo *, int);
+void InitFontInfo(struct FontBitmapInfo *, int);
 int getFontWidth(int);
 int getFontHeight(int);
 void DrawInitText(char *, int, int);
@@ -71,15 +70,5 @@ void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
-#else
-void InitFontInfo(Bitmap *, Bitmap *, Bitmap *, Bitmap *, Bitmap *);
-int getFontWidth(int, int);
-int getFontHeight(int, int);
-void DrawInitText(char *, int, int);
-void DrawTextF(int, int, int, char *, ...);
-void DrawTextFCentered(int, int, char *, ...);
-void DrawText(int, int, char *, int, int);
-void DrawTextExt(DrawBuffer *, int, int, char *, int, int, int);
-#endif
 
 #endif	/* TEXT_H */

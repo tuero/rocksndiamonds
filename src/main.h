@@ -1056,17 +1056,27 @@ struct ElementInfo
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
 
-				/* special graphics for left/right/up/down */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
+				/* special graphics for left/right/up/down */
 
-  				/* special graphics for certain screens */
   int special_graphic[NUM_SPECIAL_GFX_ARGS];
+  				/* special graphics for certain screens */
 
   int editor_graphic;		/* graphic displayed in level editor */
   int preview_graphic;		/* graphic displayed in level preview */
 
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
 };
+
+#if 0
+struct FontInfo
+{
+  int graphic;			/* default graphic for this font */
+
+  int special_graphic[NUM_SPECIAL_GFX_ARGS];
+  				/* special graphics for certain screens */
+};
+#endif
 
 struct GraphicInfo
 {

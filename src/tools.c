@@ -437,7 +437,7 @@ void SetBorderElement()
 
 void SetRandomAnimationValue(int x, int y)
 {
-  anim.random_frame = GfxRandom[x][y];
+  gfx.anim_random_frame = GfxRandom[x][y];
 }
 
 inline int getGraphicAnimationFrame(int graphic, int sync_frame)

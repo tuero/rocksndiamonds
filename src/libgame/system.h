@@ -290,7 +290,7 @@ struct AudioSystemInfo
   int first_sound_channel;
 };
 
-struct FontInfo
+struct FontBitmapInfo
 {
   Bitmap *bitmap;
   int src_x, src_y;		/* start position of animation frames */
@@ -325,12 +325,9 @@ struct GfxInfo
   boolean menu_main_hide_static_text;
 
   int num_fonts;
-  struct FontInfo *font;
-};
+  struct FontBitmapInfo *font;
 
-struct AnimInfo
-{
-  int random_frame;
+  int anim_random_frame;
 };
 
 struct JoystickInfo
