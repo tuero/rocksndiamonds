@@ -52,12 +52,6 @@
 #define SOUND_FADING_VOLUME_THRESHOLD	(SOUND_FADING_VOLUME_STEP * 2)
 #endif
 
-#if !defined(PLATFORM_HPUX)
-#define SND_BLOCKSIZE			4096
-#else
-#define SND_BLOCKSIZE			32768
-#endif
-
 #define SND_TYPE_NONE			0
 #define SND_TYPE_WAV			1
 
@@ -124,6 +118,7 @@ struct SampleInfo
   int format;
   void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
   long data_len;		/* number of samples, NOT number of bytes */
+  int num_channels;		/* mono: 1 channel, stereo: 2 channels */
 };
 typedef struct SampleInfo SoundInfo;
 typedef struct SampleInfo MusicInfo;
@@ -145,6 +140,7 @@ struct SoundControl
   int format;
   void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
   long data_len;		/* number of samples, NOT number of bytes */
+  int num_channels;		/* mono: 1 channel, stereo: 2 channels */
 
 #if defined(TARGET_ALLEGRO)
   int voice;
@@ -839,10 +835,11 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
 
   /* copy sound sample and format information */
-  snd_ctrl.type     = snd_info->type;
-  snd_ctrl.format   = snd_info->format;
-  snd_ctrl.data_ptr = snd_info->data_ptr;
-  snd_ctrl.data_len = snd_info->data_len;
+  snd_ctrl.type         = snd_info->type;
+  snd_ctrl.format       = snd_info->format;
+  snd_ctrl.data_ptr     = snd_info->data_ptr;
+  snd_ctrl.data_len     = snd_info->data_len;
+  snd_ctrl.num_channels = snd_info->num_channels;
 
   /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
@@ -1115,33 +1112,54 @@ void StartMixer(void)
 
 static void CopySampleToMixingBuffer(SoundControl *snd_ctrl,
 				     int sample_pos, int sample_size,
-				     short *buffer_ptr)
+				     short *buffer_base_ptr, int buffer_pos,
+				     int num_output_channels)
 {
-  void *sample_ptr = snd_ctrl->data_ptr;
-  int i;
+  short *buffer_ptr = buffer_base_ptr + num_output_channels * buffer_pos;
+  int num_channels = snd_ctrl->num_channels;
+  int stepsize = num_channels;
+  int output_stepsize = num_output_channels;
+  int i, j;
 
   if (snd_ctrl->format == AUDIO_FORMAT_U8)
-    for (i=0; i<sample_size; i++)
-      *buffer_ptr++ =
-	((short)(((byte *)sample_ptr)[sample_pos + i] ^ 0x80)) << 8;
+  {
+    byte *sample_ptr = (byte *)snd_ctrl->data_ptr + num_channels * sample_pos;
+
+    for (i=0; i<num_output_channels; i++)
+    {
+      int offset = (snd_ctrl->num_channels == 1 ? 0 : i);
+
+      for (j=0; j<sample_size; j++)
+	buffer_ptr[output_stepsize * j + i] =
+	  ((short)(sample_ptr[stepsize * j + offset] ^ 0x80)) << 8;
+    }
+  }
   else	/* AUDIO_FORMAT_S16 */
-    for (i=0; i<sample_size; i++)
-      *buffer_ptr++ =
-	((short *)sample_ptr)[sample_pos + i];
+  {
+    short *sample_ptr= (short *)snd_ctrl->data_ptr + num_channels * sample_pos;
+
+    for (i=0; i<num_output_channels; i++)
+    {
+      int offset = (snd_ctrl->num_channels == 1 ? 0 : i);
+
+      for (j=0; j<sample_size; j++)
+	buffer_ptr[output_stepsize * j + i] =
+	  sample_ptr[stepsize * j + offset];
+    }
+  }
 }
 
 #if defined(AUDIO_STREAMING_DSP)
 static void Mixer_Main_DSP()
 {
-  static short premix_first_buffer[SND_BLOCKSIZE];
-  static short premix_left_buffer[SND_BLOCKSIZE];
-  static short premix_right_buffer[SND_BLOCKSIZE];
-  static long premix_last_buffer[SND_BLOCKSIZE];
-  static byte playing_buffer[SND_BLOCKSIZE];
+  static short premix_first_buffer[DEFAULT_AUDIO_FRAGMENT_SIZE];
+  static long premix_last_buffer[DEFAULT_AUDIO_FRAGMENT_SIZE];
+  static byte playing_buffer[DEFAULT_AUDIO_FRAGMENT_SIZE];
   boolean stereo;
   int fragment_size;
   int sample_bytes;
   int max_sample_size;
+  int num_output_channels;
   int i, j;
 
   if (!mixer_active_channels)
@@ -1158,11 +1176,12 @@ static void Mixer_Main_DSP()
   stereo = afmt.stereo;
   fragment_size = afmt.fragment_size;
   sample_bytes = (afmt.format & AUDIO_FORMAT_U8 ? 1 : 2);
-  max_sample_size = fragment_size / ((stereo ? 2 : 1) * sample_bytes);
+  num_output_channels = (stereo ? 2 : 1);
+  max_sample_size = fragment_size / (num_output_channels * sample_bytes);
 
   /* first clear the last premixing buffer */
   memset(premix_last_buffer, 0,
-	 max_sample_size * (stereo ? 2 : 1) * sizeof(long));
+	 max_sample_size * num_output_channels * sizeof(long));
 
   for(i=0; i<audio.num_channels; i++)
   {
@@ -1189,7 +1208,7 @@ static void Mixer_Main_DSP()
 
     /* copy original sample to first mixing buffer */
     CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
-			     premix_first_buffer);
+			     premix_first_buffer, 0, num_output_channels);
 
     /* are we about to restart a looping sound? */
     if (IS_LOOP(mixer[i]) && sample_size < max_sample_size)
@@ -1199,14 +1218,9 @@ static void Mixer_Main_DSP()
 	int restarted_sample_size =
 	  MIN(max_sample_size - sample_size, sample_len);
 
-	if (mixer[i].format == AUDIO_FORMAT_U8)
-	  for (j=0; j<restarted_sample_size; j++)
-	    premix_first_buffer[sample_size + j] =
-	      ((short)(((byte *)sample_ptr)[j] ^ 0x80)) << 8;
-	else
-	  for (j=0; j<restarted_sample_size; j++)
-	    premix_first_buffer[sample_size + j] =
-	      ((short *)sample_ptr)[j];
+	CopySampleToMixingBuffer(&mixer[i], 0, restarted_sample_size,
+				 premix_first_buffer, sample_size,
+				 num_output_channels);
 
 	mixer[i].playing_pos = restarted_sample_size;
 	sample_size += restarted_sample_size;
@@ -1220,11 +1234,11 @@ static void Mixer_Main_DSP()
 
     /* adjust volume of actual sound sample */
     if (mixer[i].volume != SOUND_MAX_VOLUME)
-      for(j=0; j<sample_size; j++)
+      for(j=0; j<sample_size * num_output_channels; j++)
 	premix_first_buffer[j] =
 	  mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
-    /* fill the last mixing buffer with stereo or mono sound */
+    /* adjust left and right channel volume due to stereo sound position */
     if (stereo)
     {
       int left_volume  = SOUND_VOLUME_LEFT(mixer[i].stereo_position);
@@ -1232,20 +1246,16 @@ static void Mixer_Main_DSP()
 
       for(j=0; j<sample_size; j++)
       {
-	premix_left_buffer[j] =
-	  left_volume  * premix_first_buffer[j] / SOUND_MAX_LEFT2RIGHT;
-	premix_right_buffer[j] =
-	  right_volume * premix_first_buffer[j] / SOUND_MAX_LEFT2RIGHT;
-
-	premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
-	premix_last_buffer[2 * j + 1] += premix_right_buffer[j];
+	premix_first_buffer[2 * j + 0] =
+	  left_volume  * premix_first_buffer[2 * j + 0] / SOUND_MAX_LEFT2RIGHT;
+	premix_first_buffer[2 * j + 1] =
+	  right_volume * premix_first_buffer[2 * j + 1] / SOUND_MAX_LEFT2RIGHT;
       }
     }
-    else
-    {
-      for(j=0; j<sample_size; j++)
-	premix_last_buffer[j] += premix_first_buffer[j];
-    }
+
+    /* fill the last mixing buffer with stereo or mono sound */
+    for(j=0; j<sample_size * num_output_channels; j++)
+      premix_last_buffer[j] += premix_first_buffer[j];
 
     /* delete completed sound entries from the mixer */
     if (mixer[i].playing_pos >= mixer[i].data_len)
@@ -1260,7 +1270,7 @@ static void Mixer_Main_DSP()
   }
 
   /* prepare final playing buffer according to system audio format */
-  for(i=0; i<max_sample_size * (stereo ? 2 : 1); i++)
+  for(i=0; i<max_sample_size * num_output_channels; i++)
   {
     /* cut off at 17 bit value */
     if (premix_last_buffer[i] < -65535)
@@ -1298,9 +1308,10 @@ static void Mixer_Main_DSP()
 
 static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 {
-  static short premix_first_buffer[SND_BLOCKSIZE];
-  static byte playing_buffer[SND_BLOCKSIZE];
-  int max_sample_size = SND_BLOCKSIZE;
+  static short premix_first_buffer[DEFAULT_AUDIO_FRAGMENT_SIZE];
+  static byte playing_buffer[DEFAULT_AUDIO_FRAGMENT_SIZE];
+  int max_sample_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
+  int num_output_channels = 1;
   void *sample_ptr;
   int sample_len;
   int sample_pos;
@@ -1318,7 +1329,7 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 
   /* copy original sample to first mixing buffer */
   CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
-			   premix_first_buffer);
+			   premix_first_buffer, 0, num_output_channels);
 
   /* adjust volume of actual sound sample */
   if (mixer[i].volume != SOUND_MAX_VOLUME)
@@ -1550,6 +1561,7 @@ static void *Load_WAV(char *filename)
 #endif
   char chunk_name[CHUNK_ID_LEN + 1];
   int chunk_size;
+  int data_byte_len;
   FILE *file;
 #endif
 
@@ -1654,7 +1666,8 @@ static void *Load_WAV(char *filename)
 	return NULL;
       }
 
-      if (header.bits_per_sample != 8 && header.bits_per_sample != 16)
+      if (header.bits_per_sample != 8 &&
+	  header.bits_per_sample != 16)
       {
 	Error(ERR_WARN, "sound file '%s': %d bits per sample not supported",
 	      filename, header.bits_per_sample);
@@ -1680,7 +1693,9 @@ static void *Load_WAV(char *filename)
     }
     else if (strcmp(chunk_name, "data") == 0)
     {
-      snd_info->data_len = chunk_size;
+      data_byte_len = chunk_size;
+
+      snd_info->data_len = data_byte_len;
       snd_info->data_ptr = checked_malloc(snd_info->data_len);
 
       /* read sound data */
@@ -1694,8 +1709,8 @@ static void *Load_WAV(char *filename)
 	return NULL;
       }
 
-      /* check for odd number of sample bytes (data chunk is word aligned) */
-      if ((chunk_size % 2) == 1)
+      /* check for odd number of data bytes (data chunk is word aligned) */
+      if ((data_byte_len % 2) == 1)
 	ReadUnusedBytesFromFile(file, 1);
     }
     else	/* unknown chunk -- ignore */
@@ -1718,6 +1733,29 @@ static void *Load_WAV(char *filename)
     snd_info->format = AUDIO_FORMAT_S16;
     snd_info->data_len /= 2;		/* correct number of samples */
   }
+
+  snd_info->num_channels = header.num_channels;
+  if (header.num_channels == 2)
+    snd_info->data_len /= 2;		/* correct number of samples */
+
+#if 0
+  if (header.num_channels == 1)		/* convert mono sound to stereo */
+  {
+    void *buffer_ptr = checked_malloc(data_byte_len * 2);
+    void *sample_ptr = snd_info->data_ptr;
+    int sample_size = snd_info->data_len;
+    int i;
+
+    if (snd_ctrl->format == AUDIO_FORMAT_U8)
+      for (i=0; i<sample_size; i++)
+	*buffer_ptr++ =
+	  ((short)(((byte *)sample_ptr)[i] ^ 0x80)) << 8;
+    else	/* AUDIO_FORMAT_S16 */
+      for (i=0; i<sample_size; i++)
+	*buffer_ptr++ =
+	  ((short *)sample_ptr)[i];
+  }
+#endif
 
 #endif	/* AUDIO_UNIX_NATIVE */
 
