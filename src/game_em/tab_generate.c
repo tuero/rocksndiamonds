@@ -306,7 +306,12 @@ int obj_map[] =
   Xsand_stoneout_1, 1,
   Xsand_stoneout_1, 0,
   -1,
+
+#if 0
+  /* use normal "Xblank" instead of explicit x==0, y==2 empty space graphic */
   Ynut_sB, 7,
+#endif
+
   -1,
   -1,
   Ynut_sB, 6,

@@ -5689,7 +5689,6 @@ void InitGraphicInfo_EM(void)
       int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
 			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
 			       j < 7 ? element :
-			       i == Ynut_sB ? element :
 			       i == Xdrip_stretch ? element :
 			       i == Xdrip_stretchB ? element :
 			       i == Ydrip_s1 ? element :
@@ -5714,11 +5713,12 @@ void InitGraphicInfo_EM(void)
 			       i == Yspring_kill_w ? EL_SPRING :
 			       i == Yemerald_stone ? EL_EMERALD :
 			       i == Ydiamond_stone ? EL_ROCK :
+			       i == Xsand_stonein_4 ? EL_EMPTY :
+			       i == Xsand_stoneout_2 ? EL_ROCK :
 			       is_backside ? EL_EMPTY :
 			       action_removing ? EL_EMPTY :
 			       element);
       int effective_action = (j < 7 ? action :
-			      i == Ynut_sB ? action :
 			      i == Xdrip_stretch ? action :
 			      i == Xdrip_stretchB ? action :
 			      i == Ydrip_s1 ? action :
@@ -5811,22 +5811,22 @@ void InitGraphicInfo_EM(void)
 			i == Xsand_stonein_2 ? j + 9 :
 			i == Xsand_stonein_3 ? j + 17 :
 			i == Xsand_stonein_4 ? j + 25 :
-			i == Xsand_stoneout_1 && j == 0 ? 1 :
-			i == Xsand_stoneout_1 && j == 1 ? 1 :
-			i == Xsand_stoneout_1 && j == 2 ? 2 :
-			i == Xsand_stoneout_1 && j == 3 ? 4 :
-			i == Xsand_stoneout_1 && j == 4 ? 4 :
-			i == Xsand_stoneout_1 && j == 5 ? 6 :
-			i == Xsand_stoneout_1 && j == 6 ? 8 :
-			i == Xsand_stoneout_1 && j == 7 ? 8 :
-			i == Xsand_stoneout_2 && j == 0 ? 10 :
-			i == Xsand_stoneout_2 && j == 1 ? 12 :
-			i == Xsand_stoneout_2 && j == 2 ? 14 :
-			i == Xsand_stoneout_2 && j == 3 ? 16 :
-			i == Xsand_stoneout_2 && j == 4 ? 18 :
-			i == Xsand_stoneout_2 && j == 5 ? 22 :
-			i == Xsand_stoneout_2 && j == 6 ? 26 :
-			i == Xsand_stoneout_2 && j == 7 ? 30 :
+			i == Xsand_stoneout_1 && j == 0 ? 0 :
+			i == Xsand_stoneout_1 && j == 1 ? 0 :
+			i == Xsand_stoneout_1 && j == 2 ? 1 :
+			i == Xsand_stoneout_1 && j == 3 ? 2 :
+			i == Xsand_stoneout_1 && j == 4 ? 2 :
+			i == Xsand_stoneout_1 && j == 5 ? 3 :
+			i == Xsand_stoneout_1 && j == 6 ? 4 :
+			i == Xsand_stoneout_1 && j == 7 ? 4 :
+			i == Xsand_stoneout_2 && j == 0 ? 5 :
+			i == Xsand_stoneout_2 && j == 1 ? 6 :
+			i == Xsand_stoneout_2 && j == 2 ? 7 :
+			i == Xsand_stoneout_2 && j == 3 ? 8 :
+			i == Xsand_stoneout_2 && j == 4 ? 9 :
+			i == Xsand_stoneout_2 && j == 5 ? 11 :
+			i == Xsand_stoneout_2 && j == 6 ? 13 :
+			i == Xsand_stoneout_2 && j == 7 ? 15 :
 			i == Xboom_bug && j == 1 ? 2 :
 			i == Xboom_bug && j == 2 ? 2 :
 			i == Xboom_bug && j == 3 ? 4 :
@@ -5995,9 +5995,9 @@ void InitGraphicInfo_EM(void)
 	  last_i = i;
 	}
 
-	printf("::: EMC GFX ERROR for element %d -> %d ('%s') [%d, %d]",
+	printf("::: EMC GFX ERROR for element %d -> %d ('%s', '%s', %d)",
 	       i, element, element_info[element].token_name,
-	       effective_action, direction);
+	       element_action_info[effective_action].suffix, direction);
 
 	if (element != effective_element)
 	  printf(" [%d ('%s')]",
