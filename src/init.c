@@ -837,7 +837,7 @@ void InitElementGraphicInfo()
     }
   }
 
-#if 0
+#if 1
 #if DEBUG
   if (options.verbose)
   {
@@ -870,6 +870,11 @@ void InitElementSpecialGraphicInfo()
     int element = element_to_special_graphic[i].element;
     int special = element_to_special_graphic[i].special;
     int graphic = element_to_special_graphic[i].graphic;
+    boolean base_redefined = getImageListEntry(el2img(element))->redefined;
+    boolean special_redefined = getImageListEntry(graphic)->redefined;
+
+    if (base_redefined && !special_redefined)
+      continue;
 
     if (special == GFX_SPECIAL_ARG_EDITOR)
       element_info[element].editor_graphic = graphic;
@@ -904,16 +909,46 @@ static void set_graphic_parameters(int graphic, int *parameter)
 
   graphic_info[graphic].bitmap = src_bitmap;
 
-  graphic_info[graphic].src_x = parameter[GFX_ARG_XPOS] * TILEX;
-  graphic_info[graphic].src_y = parameter[GFX_ARG_YPOS] * TILEY;
-  graphic_info[graphic].offset_x = parameter[GFX_ARG_OFFSET];
-  graphic_info[graphic].offset_y = 0;
+  /* start with reliable default values */
+  graphic_info[graphic].src_x = 0;
+  graphic_info[graphic].src_y = 0;
+  graphic_info[graphic].width = TILEX;
+  graphic_info[graphic].height = TILEY;
+  graphic_info[graphic].offset_x = 0;	/* one or both of these values ... */
+  graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
 
-  /* animation frames are ordered vertically instead of horizontally */
-  if (parameter[GFX_ARG_VERTICAL])
+  /* optional x and y tile position of animation frame sequence */
+  if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].src_x = parameter[GFX_ARG_XPOS] * TILEX;
+  if (parameter[GFX_ARG_YPOS] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].src_y = parameter[GFX_ARG_YPOS] * TILEY;
+
+  /* optional x and y pixel position of animation frame sequence */
+  if (parameter[GFX_ARG_X] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].src_x = parameter[GFX_ARG_X];
+  if (parameter[GFX_ARG_Y] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].src_y = parameter[GFX_ARG_Y];
+
+  /* optional width and height of each animation frame */
+  if (parameter[GFX_ARG_WIDTH] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].width = parameter[GFX_ARG_WIDTH];
+  if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].height = parameter[GFX_ARG_HEIGHT];
+
+  /* correct x or y offset dependant of vertical or horizontal frame order */
+  if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
   {
-    graphic_info[graphic].offset_x = 0;
-    graphic_info[graphic].offset_y = parameter[GFX_ARG_OFFSET];
+    if (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE)
+      graphic_info[graphic].offset_y = parameter[GFX_ARG_OFFSET];
+    else
+      graphic_info[graphic].offset_y = graphic_info[graphic].height;
+  }
+  else					/* frames are ordered horizontally */
+  {
+    if (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE)
+      graphic_info[graphic].offset_x = parameter[GFX_ARG_OFFSET];
+    else
+      graphic_info[graphic].offset_x = graphic_info[graphic].width;
   }
 
   /* optionally, the x and y offset of frames can be specified directly */
@@ -967,11 +1002,18 @@ static void set_graphic_parameters(int graphic, int *parameter)
 
   /* animation synchronized with global frame counter, not move position */
   graphic_info[graphic].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+
+  /* this is only used for toon animations */
+  graphic_info[graphic].step_offset = parameter[GFX_ARG_STEP_OFFSET];
+  graphic_info[graphic].step_delay  = parameter[GFX_ARG_STEP_DELAY];
 }
 
 static void InitGraphicInfo()
 {
   static boolean clipmasks_initialized = FALSE;
+  int fallback_graphic = IMG_CHAR_EXCLAM;
+  struct FileInfo *fallback_image = getImageListEntry(fallback_graphic);
+  Bitmap *fallback_bitmap = getBitmapFromImageID(fallback_graphic);
   int num_images = getImageListSize();
   int i;
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -1034,9 +1076,15 @@ static void InitGraphicInfo()
 	    "error: first animation frame out of bounds (%d, %d)",
 	    src_x, src_y);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
+
+      if (i == fallback_graphic)
+	Error(ERR_EXIT, "fatal error: no fallback graphic available");
+
+      Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, image->default_parameter);
+      set_graphic_parameters(i, fallback_image->default_parameter);
+      graphic_info[i].bitmap = fallback_bitmap;
     }
 
     last_frame = graphic_info[i].anim_frames - 1;
@@ -1057,9 +1105,15 @@ static void InitGraphicInfo()
 	    "error: last animation frame (%d) out of bounds (%d, %d)",
 	    last_frame, src_x, src_y);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
+
+      if (i == fallback_graphic)
+	Error(ERR_EXIT, "fatal error: no fallback graphic available");
+
+      Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, image->default_parameter);
+      set_graphic_parameters(i, fallback_image->default_parameter);
+      graphic_info[i].bitmap = fallback_bitmap;
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)

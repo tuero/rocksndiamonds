@@ -159,10 +159,10 @@ boolean AnimateToon(int toon_nr, boolean restart)
   {
     horiz_move = (anim->direction & (ANIMDIR_LEFT | ANIMDIR_RIGHT));
     vert_move = (anim->direction & (ANIMDIR_UP | ANIMDIR_DOWN));
-    anim_delay_value = anim->move_delay * screen_info.frame_delay_value;
+    anim_delay_value = anim->step_delay * screen_info.frame_delay_value;
 
     frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
-			      anim->anim_mode, anim->start_frame,
+			      anim->anim_mode, anim->anim_start_frame,
 			      animation_frame_counter++);
 
     if (horiz_move)
@@ -178,12 +178,12 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
       if (anim->direction == ANIMDIR_RIGHT)
       {
-	delta_x = anim->stepsize;
+	delta_x = anim->step_offset;
 	pos_x = -anim->width + delta_x;
       }
       else
       {
-	delta_x = -anim->stepsize;
+	delta_x = -anim->step_offset;
 	pos_x = screen_info.width + delta_x;
       }
       delta_y = 0;
@@ -199,22 +199,22 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
       if (anim->direction == ANIMDIR_DOWN)
       {
-	delta_y = anim->stepsize;
+	delta_y = anim->step_offset;
 	pos_y = -anim->height + delta_y;
       }
       else
       {
-	delta_y = -anim->stepsize;
+	delta_y = -anim->step_offset;
 	pos_y = screen_info.width + delta_y;
       }
       delta_x = 0;
     }
   }
 
-  if (pos_x <= -anim->width        - anim->stepsize ||
-      pos_x >=  screen_info.width  + anim->stepsize ||
-      pos_y <= -anim->height       - anim->stepsize ||
-      pos_y >=  screen_info.height + anim->stepsize)
+  if (pos_x <= -anim->width        - anim->step_offset ||
+      pos_x >=  screen_info.width  + anim->step_offset ||
+      pos_y <= -anim->height       - anim->step_offset ||
+      pos_y >=  screen_info.height + anim->step_offset)
     return TRUE;
 
   if (!DelayReached(&anim_delay, anim_delay_value))
@@ -239,8 +239,8 @@ boolean AnimateToon(int toon_nr, boolean restart)
   else if (pos_y > screen_info.height)
     pos_y = screen_info.height;
 
-  pad_x = (horiz_move ? anim->stepsize : 0);
-  pad_y = (vert_move  ? anim->stepsize : 0);
+  pad_x = (horiz_move ? anim->step_offset : 0);
+  pad_y = (vert_move  ? anim->step_offset : 0);
   src_x = anim->src_x + frame * anim->width;
   src_y = anim->src_y;
   dest_x = pos_x;
@@ -278,7 +278,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   pos_y += delta_y;
 
   frame = getAnimationFrame(anim->anim_frames, anim->anim_delay,
-			    anim->anim_mode, anim->start_frame,
+			    anim->anim_mode, anim->anim_start_frame,
 			    animation_frame_counter++);
 
   return FALSE;

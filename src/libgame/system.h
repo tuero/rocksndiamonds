@@ -502,6 +502,8 @@ struct FileInfo
 
   int *default_parameter;			/* array of file parameters */
   int *parameter;				/* array of file parameters */
+
+  boolean redefined;
 };
 
 struct SetupFileList

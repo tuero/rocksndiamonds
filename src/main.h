@@ -793,24 +793,30 @@
 
 
 /* values for image configuration suffixes */
-#define GFX_ARG_XPOS				0
-#define GFX_ARG_YPOS				1
-#define GFX_ARG_OFFSET				2
-#define GFX_ARG_VERTICAL			3
-#define GFX_ARG_XOFFSET				4
-#define GFX_ARG_YOFFSET				5
-#define GFX_ARG_FRAMES				6
-#define GFX_ARG_START_FRAME			7
-#define GFX_ARG_DELAY				8
-#define GFX_ARG_MODE_LOOP			9
-#define GFX_ARG_MODE_LINEAR			10
-#define GFX_ARG_MODE_PINGPONG			11
-#define GFX_ARG_MODE_PINGPONG2			12
-#define GFX_ARG_MODE_RANDOM			13
-#define GFX_ARG_MODE_REVERSE			14
-#define GFX_ARG_GLOBAL_SYNC			15
+#define GFX_ARG_X				0
+#define GFX_ARG_Y				1
+#define GFX_ARG_XPOS				2
+#define GFX_ARG_YPOS				3
+#define GFX_ARG_WIDTH				4
+#define GFX_ARG_HEIGHT				5
+#define GFX_ARG_OFFSET				6
+#define GFX_ARG_VERTICAL			7
+#define GFX_ARG_XOFFSET				8
+#define GFX_ARG_YOFFSET				9
+#define GFX_ARG_FRAMES				10
+#define GFX_ARG_START_FRAME			11
+#define GFX_ARG_DELAY				12
+#define GFX_ARG_MODE_LOOP			13
+#define GFX_ARG_MODE_LINEAR			14
+#define GFX_ARG_MODE_PINGPONG			15
+#define GFX_ARG_MODE_PINGPONG2			16
+#define GFX_ARG_MODE_RANDOM			17
+#define GFX_ARG_MODE_REVERSE			18
+#define GFX_ARG_GLOBAL_SYNC			19
+#define GFX_ARG_STEP_OFFSET			20
+#define GFX_ARG_STEP_DELAY			21
 
-#define NUM_GFX_ARGS				16
+#define NUM_GFX_ARGS				22
 
 
 /* values for sound configuration suffixes */
@@ -1052,13 +1058,16 @@ struct ElementInfo
 struct GraphicInfo
 {
   Bitmap *bitmap;
-  int src_x, src_y;		/* derived from (tile sized) .xpos/.ypos */
+  int src_x, src_y;		/* start position of animation frames */
+  int width, height;		/* width/height of each animation frame */
   int offset_x, offset_y;	/* x/y offset to next animation frame */
   int anim_frames;
   int anim_start_frame;
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
+  int step_offset;		/* optional step offset of toon animations */
+  int step_delay;		/* optional step delay of toon animations */
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */

@@ -1675,6 +1675,8 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
 
     file_list_entry->filename = getStringCopy(filename);
 
+    file_list_entry->redefined = TRUE;
+
     /* mark config file token as well known from default config */
     setTokenValue(setup_file_list, file_list_entry->token, known_token_value);
   }
@@ -1782,6 +1784,8 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
     for (j=0; j<num_suffix_list_entries; j++)
       file_list[i].parameter[j] = file_list[i].default_parameter[j];
+
+    file_list[i].redefined = FALSE;
   }
 
   /* free previous dynamic artwork file array */

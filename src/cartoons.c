@@ -17,7 +17,11 @@
 
 
 /* values for toon definition */
+#if 0
 #define NUM_TOONS	18
+#else
+#define NUM_TOONS	6
+#endif
 
 #define DWARF_XSIZE	40
 #define DWARF_YSIZE	48
@@ -53,6 +57,7 @@
 
 struct ToonInfo toons[NUM_TOONS] =
 {
+#if 0
   {
     IMG_GLOBAL_TOONS,
     DWARF_XSIZE, DWARF_YSIZE,
@@ -119,6 +124,76 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMDIR_LEFT,
     ANIMPOS_UPPER
   },
+#else
+  {
+    IMG_TOON_1,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_RIGHT,
+    ANIMPOS_DOWN
+  },
+  {
+    IMG_TOON_2,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_LEFT,
+    ANIMPOS_DOWN
+  },
+  {
+    IMG_TOON_3,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_RIGHT,
+    ANIMPOS_DOWN
+  },
+  {
+    IMG_TOON_4,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_UP,
+    ANIMPOS_ANY
+  },
+  {
+    IMG_TOON_5,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_RIGHT,
+    ANIMPOS_UPPER
+  },
+  {
+    IMG_TOON_6,
+    -1, -1,
+    -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    ANIMDIR_LEFT,
+    ANIMPOS_UPPER
+  },
+#endif
+
+#if 0
   {
     IMG_PLAYER1_MOVING_LEFT,
     -1, -1,
@@ -251,6 +326,8 @@ struct ToonInfo toons[NUM_TOONS] =
     ANIMDIR_RIGHT,
     ANIMPOS_ANY
   },
+#endif
+
 };
 
 static void PrepareBackbuffer()
@@ -299,32 +376,19 @@ void InitToons()
 
     toons[i].bitmap = graphic_info[graphic].bitmap;
 
-    if (toons[i].src_x == -1 && toons[i].src_y == -1)
-    {
-      int anim_frames = graphic_info[graphic].anim_frames;
-      int anim_delay = graphic_info[graphic].anim_delay;
-      int anim_mode = graphic_info[graphic].anim_mode;
-      int start_frame = graphic_info[graphic].anim_start_frame;
+    toons[i].src_x = graphic_info[graphic].src_x;
+    toons[i].src_y = graphic_info[graphic].src_y;
 
-      toons[i].src_x = graphic_info[graphic].src_x;
-      toons[i].src_y = graphic_info[graphic].src_y;
+    toons[i].width  = graphic_info[graphic].width;
+    toons[i].height = graphic_info[graphic].height;
 
-      toons[i].width = TILEX;
-      toons[i].height = TILEY;
+    toons[i].anim_frames      = graphic_info[graphic].anim_frames;
+    toons[i].anim_delay       = graphic_info[graphic].anim_delay;
+    toons[i].anim_mode        = graphic_info[graphic].anim_mode;
+    toons[i].anim_start_frame = graphic_info[graphic].anim_start_frame;
 
-      toons[i].anim_frames = anim_frames;
-      toons[i].anim_delay = anim_delay;
-      toons[i].anim_mode = anim_mode;
-      toons[i].start_frame = start_frame;
-
-      toons[i].move_delay = 1;
-      toons[i].stepsize = TILEX / 8;
-    }
-    else
-    {
-      toons[i].anim_delay = 1;		/* no delay between frames */
-      toons[i].start_frame = 0;		/* always start with first */
-    }
+    toons[i].step_offset = graphic_info[graphic].step_offset;
+    toons[i].step_delay  = graphic_info[graphic].step_delay;
   }
 
   InitToonScreen(bitmap_db_door,
