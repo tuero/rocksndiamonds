@@ -259,6 +259,9 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   {
     char c = *text_ptr++;
 
+    if (c == '\n')
+      c = ' ';		/* print space instaed of newline */
+
     getFontCharSource(font_nr, c, &src_bitmap, &src_x, &src_y);
 
     if (mask_mode == BLIT_INVERSE)	/* special mode for text gadgets */
@@ -320,5 +323,30 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     }
 
     dst_x += font_width;
+  }
+}
+
+void DrawTextToTextArea(int x, int y, char *text, int font_nr,
+			int area_xsize, int area_ysize)
+{
+  int area_line = 0;
+  int font_height = getFontWidth(font_nr);
+
+  if (text == NULL)
+    return;
+
+  while (*text && area_line < area_ysize)
+  {
+    char buffer[MAX_OUTPUT_LINESIZE + 1];
+    int i;
+
+    for (i=0; i < area_xsize && *text; i++)
+      if ((buffer[i] = *text++) == '\n')
+	break;
+    buffer[i] = '\0';
+
+    DrawText(x, y + area_line * font_height, buffer, font_nr);
+
+    area_line++;
   }
 }

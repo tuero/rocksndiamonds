@@ -773,30 +773,20 @@ static void InitGameEngine()
   /* ---------- initialize changing elements ------------------------------- */
 
   /* initialize changing elements information */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
   {
-#if 1
-    element_info[i].change.pre_change_function = NULL;
-    element_info[i].change.change_function = NULL;
-    element_info[i].change.post_change_function = NULL;
+    /* this pointer might have been changed in the level editor */
+    element_info[i].change = &element_info[i].change_page[0];
 
     if (!IS_CUSTOM_ELEMENT(i))
     {
-      element_info[i].change.target_element = EL_EMPTY_SPACE;
-      element_info[i].change.delay_fixed = 0;
-      element_info[i].change.delay_random = 0;
-      element_info[i].change.delay_frames = 1;
+      element_info[i].change->target_element = EL_EMPTY_SPACE;
+      element_info[i].change->delay_fixed = 0;
+      element_info[i].change->delay_random = 0;
+      element_info[i].change->delay_frames = 1;
     }
 
     changing_element[i] = FALSE;
-#else
-    changing_element[i].base_element = EL_UNDEFINED;
-    changing_element[i].next_element = EL_UNDEFINED;
-    changing_element[i].change_delay = -1;
-    changing_element[i].pre_change_function = NULL;
-    changing_element[i].change_function = NULL;
-    changing_element[i].post_change_function = NULL;
-#endif
   }
 
   /* add changing elements from pre-defined list */
@@ -804,46 +794,28 @@ static void InitGameEngine()
   {
     int element = changing_element_list[i].element;
     struct ChangingElementInfo *ce = &changing_element_list[i];
-    struct ElementChangeInfo *change = &element_info[element].change;
+    struct ElementChangeInfo *change = element_info[element].change;
 
-#if 1
     change->target_element       = ce->target_element;
     change->delay_fixed          = ce->change_delay;
+
     change->pre_change_function  = ce->pre_change_function;
     change->change_function      = ce->change_function;
     change->post_change_function = ce->post_change_function;
 
     changing_element[element] = TRUE;
-#else
-    changing_element[element].base_element         = ce->base_element;
-    changing_element[element].next_element         = ce->next_element;
-    changing_element[element].change_delay         = ce->change_delay;
-    changing_element[element].pre_change_function  = ce->pre_change_function;
-    changing_element[element].change_function      = ce->change_function;
-    changing_element[element].post_change_function = ce->post_change_function;
-#endif
   }
 
   /* add changing elements from custom element configuration */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
-#if 0
-    struct ElementChangeInfo *change = &element_info[element].change;
-#endif
 
     /* only add custom elements that change after fixed/random frame delay */
     if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, CE_DELAY))
       continue;
 
-#if 1
     changing_element[element] = TRUE;
-#else
-    changing_element[element].base_element = element;
-    changing_element[element].next_element = change->target_element;
-    changing_element[element].change_delay = (change->delay_fixed *
-					      change->delay_frames);
-#endif
   }
 
   /* ---------- initialize trigger events ---------------------------------- */
@@ -855,8 +827,8 @@ static void InitGameEngine()
   /* add trigger events from element change event properties */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     if (HAS_CHANGE_EVENT(i, CE_BY_OTHER))
-      trigger_events[element_info[i].change.trigger_element] |=
-	element_info[i].change.events;
+      trigger_events[element_info[i].change->trigger_element] |=
+	element_info[i].change->events;
 
   /* ---------- initialize push delay -------------------------------------- */
 
@@ -1236,7 +1208,7 @@ void InitGame()
 
       if (CAN_CHANGE(element))
       {
-	content = element_info[element].change.target_element;
+	content = element_info[element].change->target_element;
 	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 3 || element < found_element))
@@ -1266,7 +1238,7 @@ void InitGame()
 	if (!CAN_CHANGE(element))
 	  continue;
 
-	content = element_info[element].change.content[xx][yy];
+	content = element_info[element].change->content[xx][yy];
 	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 1 || element < found_element))
@@ -5346,7 +5318,7 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 
 static void ChangeElementNow(int x, int y, int element)
 {
-  struct ElementChangeInfo *change = &element_info[element].change;
+  struct ElementChangeInfo *change = element_info[element].change;
 
 #if 0
   if (element >= EL_CUSTOM_START + 17 && element <= EL_CUSTOM_START + 39)
@@ -5467,7 +5439,7 @@ static void ChangeElement(int x, int y)
 #else
   int element = Feld[x][y];
 #endif
-  struct ElementChangeInfo *change = &element_info[element].change;
+  struct ElementChangeInfo *change = element_info[element].change;
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
@@ -5479,8 +5451,8 @@ static void ChangeElement(int x, int y)
 
     if (IS_CUSTOM_ELEMENT(element) && HAS_CHANGE_EVENT(element, CE_DELAY))
     {
-      int max_random_delay = element_info[element].change.delay_random;
-      int delay_frames = element_info[element].change.delay_frames;
+      int max_random_delay = element_info[element].change->delay_random;
+      int delay_frames = element_info[element].change->delay_frames;
 
       ChangeDelay[x][y] += RND(max_random_delay * delay_frames);
     }
@@ -5537,7 +5509,7 @@ static void ChangeElement(int x, int y)
     if (next_element != EL_UNDEFINED)
       ChangeElementNow(x, y, next_element);
     else
-      ChangeElementNow(x, y, element_info[element].change.target_element);
+      ChangeElementNow(x, y, element_info[element].change->target_element);
 
     if (changing_element[element].post_change_function)
       changing_element[element].post_change_function(x, y);
@@ -5560,7 +5532,7 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     if (!CAN_CHANGE(i) || !HAS_CHANGE_EVENT(i, trigger_event) ||
-	element_info[i].change.trigger_element != trigger_element)
+	element_info[i].change->trigger_element != trigger_element)
       continue;
 
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
@@ -6731,12 +6703,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
-	border_element == element_info[center_element].change.trigger_element)
+	border_element == element_info[center_element].change->trigger_element)
       change_center_element = TRUE;
 
     /* check for change of border element */
     if (IS_CUSTOM_ELEMENT(border_element) &&
-	center_element == element_info[border_element].change.trigger_element)
+	center_element == element_info[border_element].change->trigger_element)
       CheckElementChange(xx, yy, border_element, CE_OTHER_IS_TOUCHING);
   }
 
