@@ -1186,8 +1186,9 @@
 #define GFX_ARG_POST_DELAY_FIXED		28
 #define GFX_ARG_POST_DELAY_RANDOM		29
 #define GFX_ARG_NAME				30
+#define GFX_ARG_SCALE_UP			31
 
-#define NUM_GFX_ARGS				31
+#define NUM_GFX_ARGS				32
 
 
 /* values for sound configuration suffixes */
@@ -1817,6 +1818,7 @@ struct GraphicInfo
   int crumbled_like;		/* element for cloning crumble graphics */
   int diggable_like;		/* element for cloning digging graphics */
   int border_size;		/* border size for "crumbled" graphics */
+  int scale_up_factor;		/* optional factor for scaling image up */
 
   int anim_delay_fixed;		/* optional delay values for bored and   */
   int anim_delay_random;	/* sleeping player animations (animation */

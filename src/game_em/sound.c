@@ -3,7 +3,7 @@
  * handle sounds in emerald mine
  */
 
-#include "../libgame/platform.h"
+#include "game_em.h"
 
 
 #if defined(TARGET_X11)

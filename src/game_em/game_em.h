@@ -16,10 +16,25 @@
 
 #define GAME_EM_VERSION_1_0_0
 
+
+/* ========================================================================= */
+/* functions exported from main program to game_em                           */
+/* ========================================================================= */
+
+#include "../libgame/libgame.h"
+
+extern void DrawGameDoorValues_EM(int, int, int, int);
+
+
+/* ========================================================================= */
+/* functions exported from game_em to main program                           */
+/* ========================================================================= */
+
 extern void em_open_all();
 extern void em_close_all();
 
 extern int em_main_init_game(int, char *);
 extern int em_main_handle_game(byte);
+
 
 #endif /* GAME_EM_H */

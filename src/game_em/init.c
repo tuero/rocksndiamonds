@@ -27,8 +27,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../libgame/platform.h"
-#include "../libgame/libgame.h"
+#include "game_em.h"
 
 #include "global.h"
 #include "display.h"

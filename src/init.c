@@ -846,6 +846,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
+  graphic_info[graphic].scale_up_factor = 0;	/* default: no scaling up */
   graphic_info[graphic].anim_delay_fixed = 0;
   graphic_info[graphic].anim_delay_random = 0;
   graphic_info[graphic].post_delay_fixed = 0;
@@ -944,6 +945,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* optional border size for "crumbling" diggable graphics */
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].border_size = parameter[GFX_ARG_BORDER_SIZE];
+
+  /* optional zoom factor for scaling up the image to a larger size */
+  if (parameter[GFX_ARG_SCALE_UP] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP];
 
   /* this is only used for player "boring" and "sleeping" actions */
   if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)

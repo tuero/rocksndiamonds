@@ -6,6 +6,8 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
+#include "game_em.h"
+
 #define ORIG_TILEX		16
 #define ORIG_TILEY		16
 #define ORIG_SCOREX		8
@@ -51,8 +53,6 @@ extern Window window;
 #define xwindow window
 
 #else
-
-#include "../libgame/system.h"
 
 #define xwindow (window->drawable)
 

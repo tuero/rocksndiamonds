@@ -52,6 +52,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".post_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".post_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
+  { ".scale_up",			ARG_UNDEFINED,	TYPE_INTEGER	},
 
   { NULL,				NULL,		0		}
 };
@@ -3767,6 +3768,13 @@ struct ConfigInfo image_config[] =
   { "background.INFO[ELEMENTS]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
+
+  /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
+
+  { "emc_object",				"emc_object.pcx"	},
+  { "emc_score",				"emc_score.pcx"		},
+  { "emc_sprite",				"emc_sprite.pcx"	},
+  { "emc_title",				"emc_title.pcx"		},
 
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */

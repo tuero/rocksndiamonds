@@ -4,7 +4,7 @@
  * directly in emerald mine source
  */
 
-#include "../libgame/platform.h"
+#include "game_em.h"
 
 
 #if defined(TARGET_X11)

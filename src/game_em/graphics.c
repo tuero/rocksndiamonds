@@ -15,8 +15,6 @@
 
 #if defined(TARGET_X11)
 
-extern void DrawGameDoorValues_EM(int, int, int, int);
-
 unsigned int frame; /* current frame */
 unsigned int screen_x; /* current scroll position */
 unsigned int screen_y;
