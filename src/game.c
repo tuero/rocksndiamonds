@@ -8785,22 +8785,22 @@ void GameActions()
     TimeFrames = 0;
     TapeTime++;
 
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      if (SHIELD_ON(player))
+      {
+	player->shield_normal_time_left--;
+
+	if (player->shield_deadly_time_left > 0)
+	  player->shield_deadly_time_left--;
+      }
+    }
+
     if (!level.use_step_counter)
     {
       TimePlayed++;
-
-      for (i = 0; i < MAX_PLAYERS; i++)
-      {
-	struct PlayerInfo *player = &stored_player[i];
-
-	if (SHIELD_ON(player))
-	{
-	  player->shield_normal_time_left--;
-
-	  if (player->shield_deadly_time_left > 0)
-	    player->shield_deadly_time_left--;
-	}
-      }
 
       if (TimeLeft > 0)
       {
@@ -9707,19 +9707,6 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       int i;
 
       TimePlayed++;
-
-      for (i = 0; i < MAX_PLAYERS; i++)
-      {
-	struct PlayerInfo *player = &stored_player[i];
-
-	if (SHIELD_ON(player))
-	{
-	  player->shield_normal_time_left--;
-
-	  if (player->shield_deadly_time_left > 0)
-	    player->shield_deadly_time_left--;
-	}
-      }
 
       if (TimeLeft > 0)
       {

@@ -1,3 +1,8 @@
+2004-04-24
+	* fixed (removed) "indestructible" / "can explode" dependency in editor
+	* fixed (removed) "accessible inside" / "protected" dependency
+	* fixed (removed) "step mode" / "shield time" dependency
+
 2004-04-23
 	* fixed dynabombs exploding now into anything diggable
 	* fixed Supaplex style gravity movement into buggy base now impossible
