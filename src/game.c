@@ -2054,6 +2054,11 @@ void RelocatePlayer(int x, int y, int element)
 {
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
 
+#if 1
+  RemoveField(x, y);
+  DrawLevelField(x, y);
+#endif
+
   if (player->present)
   {
     while (player->MovPos)
@@ -2061,14 +2066,23 @@ void RelocatePlayer(int x, int y, int element)
       ScrollFigure(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
       FrameCounter++;
+
       DrawAllPlayers();
+
       BackToFront();
+      Delay(GAME_FRAME_DELAY);
     }
 
+    player->is_moving = FALSE;
+
+#if 0
     RemoveField(player->jx, player->jy);
+#endif
+
     DrawLevelField(player->jx, player->jy);
   }
 
+  Feld[x][y] = element;
   InitPlayerField(x, y, element, TRUE);
 
   if (player == local_player)
@@ -2100,7 +2114,7 @@ void RelocatePlayer(int x, int y, int element)
       ScrollLevel(dx, dy);
       DrawAllPlayers();
 
-      /* scroll in to steps of half tile size to make things smoother */
+      /* scroll in two steps of half tile size to make things smoother */
       BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
       FlushDisplay();
       Delay(GAME_FRAME_DELAY);
@@ -5680,7 +5694,7 @@ static void ChangeElement(int x, int y, int page)
   {
     if (ChangePage[x][y] != -1)		/* remember page from delayed change */
     {
-      page = ChangePage[x][y]    * 1;
+      page = ChangePage[x][y];
       ChangePage[x][y] = -1;
     }
 
@@ -5688,12 +5702,6 @@ static void ChangeElement(int x, int y, int page)
     {
       ChangeDelay[x][y] = 1;		/* try change after next move step */
       ChangePage[x][y] = page;		/* remember page to use for change */
-
-#if 0
-      if (page != 0)
-	printf("::: delayed change for element '%s'...\n",
-	       element_info[element].token_name);
-#endif
 
       return;
     }
@@ -6613,7 +6621,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
 
   ScrollFigure(player, SCROLL_INIT);
 
-#if 1
+#if 0
   if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
   {
     CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy], leave_side,
@@ -6795,6 +6803,44 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 #if 1
     player->Switching = FALSE;
 #endif
+
+
+#if 1
+    {
+      static int change_sides[4][2] =
+      {
+	/* enter side           leave side */
+	{ CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* moving left  */
+	{ CH_SIDE_LEFT,		CH_SIDE_RIGHT	},	/* moving right */
+	{ CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
+	{ CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
+      };
+      int move_direction = player->MovDir;
+      int enter_side = change_sides[MV_DIR_BIT(move_direction)][0];
+      int leave_side = change_sides[MV_DIR_BIT(move_direction)][1];
+
+#if 1
+      if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
+      {
+	CheckTriggeredElementSideChange(old_jx, old_jy, Feld[old_jx][old_jy],
+					leave_side, CE_OTHER_GETS_LEFT);
+	CheckElementSideChange(old_jx, old_jy, Feld[old_jx][old_jy],
+			       leave_side, CE_LEFT_BY_PLAYER, -1);
+      }
+
+      if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
+      {
+	CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy],
+					enter_side, CE_OTHER_GETS_ENTERED);
+	CheckElementSideChange(jx, jy, Feld[jx][jy],
+			       enter_side, CE_ENTERED_BY_PLAYER, -1);
+      }
+#endif
+
+    }
+#endif
+
+
   }
   else
   {
