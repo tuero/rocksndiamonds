@@ -18,15 +18,96 @@
 
 
 /* ========================================================================= */
-/* exported variables                                                        */
-/* ========================================================================= */
-
-struct FontInfo		font;
-
-
-/* ========================================================================= */
 /* font functions                                                            */
 /* ========================================================================= */
+
+#define NUM_FONTS		2
+#define NUM_FONT_COLORS		4
+#define NUM_FONT_CHARS		(FONT_LINES_PER_FONT * FONT_CHARS_PER_LINE)
+
+static GC	tile_clip_gc = None;
+static Pixmap	tile_clipmask[NUM_FONTS][NUM_FONT_COLORS][NUM_FONT_CHARS];
+
+static struct
+{
+  Bitmap **bitmap;
+  int xsize, ysize;
+} font_info[NUM_FONTS] =
+{
+  { &font.bitmap_big,		FONT1_XSIZE, FONT1_YSIZE },
+  { &font.bitmap_medium,	FONT6_XSIZE, FONT6_YSIZE }
+};
+
+static void InitFontClipmasks()
+{
+#if defined(TARGET_X11_NATIVE)
+  static boolean clipmasks_initialized = FALSE;
+  boolean fonts_initialized = TRUE;
+  XGCValues clip_gc_values;
+  unsigned long clip_gc_valuemask;
+  GC copy_clipmask_gc;
+  int i, j, k;
+
+  for (i=0; i<NUM_FONTS; i++)
+    if (*font_info[i].bitmap == NULL)
+      fonts_initialized = FALSE;
+
+  if (!fonts_initialized)
+    return;
+
+  if (clipmasks_initialized)
+    for (i=0; i<NUM_FONTS; i++)
+      for (j=0; j<NUM_FONT_COLORS; j++)
+	for (k=0; k<NUM_FONT_CHARS; k++)
+	  XFreePixmap(display, tile_clipmask[i][j][k]);
+
+  if (tile_clip_gc)
+    XFreeGC(display, tile_clip_gc);
+  tile_clip_gc = None;
+
+  /* This stuff is needed because X11 (XSetClipOrigin(), to be precise) is
+     often very slow when preparing a masked XCopyArea() for big Pixmaps.
+     To prevent this, create small (tile-sized) mask Pixmaps which will then
+     be set much faster with XSetClipOrigin() and speed things up a lot. */
+
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  tile_clip_gc = XCreateGC(display, window->drawable,
+			   clip_gc_valuemask, &clip_gc_values);
+
+  /* create graphic context structures needed for clipping */
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  copy_clipmask_gc = XCreateGC(display, (*font_info[0].bitmap)->clip_mask,
+			       clip_gc_valuemask, &clip_gc_values);
+
+  /* create only those clipping Pixmaps we really need */
+  for (i=0; i<NUM_FONTS; i++)
+    for (j=0; j<NUM_FONT_COLORS; j++)
+      for (k=0; k<NUM_FONT_CHARS; k++)
+  {
+    Bitmap *src_bitmap = *font_info[i].bitmap;
+    Pixmap src_pixmap = src_bitmap->clip_mask;
+    int xpos = k % FONT_CHARS_PER_LINE;
+    int ypos = k / FONT_CHARS_PER_LINE;
+    int xsize = font_info[i].xsize;
+    int ysize = font_info[i].ysize;
+    int src_x = xsize * xpos;
+    int src_y = ysize * (ypos + j * FONT_LINES_PER_FONT);
+
+    tile_clipmask[i][j][k] =
+      XCreatePixmap(display, window->drawable, xsize, ysize, 1);
+
+    XCopyArea(display, src_pixmap, tile_clipmask[i][j][k], copy_clipmask_gc,
+	      src_x, src_y, xsize, ysize, 0, 0);
+  }
+
+  XFreeGC(display, copy_clipmask_gc);
+
+  clipmasks_initialized = TRUE;
+
+#endif /* TARGET_X11_NATIVE */
+}
 
 void InitFontInfo(Bitmap *bitmap_initial,
 		  Bitmap *bitmap_big, Bitmap *bitmap_medium,
@@ -37,6 +118,8 @@ void InitFontInfo(Bitmap *bitmap_initial,
   font.bitmap_medium = bitmap_medium;
   font.bitmap_small = bitmap_small;
   font.bitmap_tile = bitmap_tile;
+
+  InitFontClipmasks();
 }
 
 int getFontWidth(int font_size, int font_type)
@@ -67,7 +150,7 @@ void DrawInitText(char *text, int ypos, int color)
   {
     ClearRectangle(window, 0, ypos, video.width, FONT2_YSIZE);
     DrawTextExt(window, (video.width - strlen(text) * FONT2_XSIZE)/2,
-		ypos, text, FS_INITIAL, color);
+		ypos, text, FS_INITIAL, color, FONT_OPAQUE);
     FlushDisplay();
   }
 }
@@ -100,7 +183,12 @@ void DrawTextF(int x, int y, int font_type, char *format, ...)
 
 void DrawText(int x, int y, char *text, int font_size, int font_type)
 {
-  DrawTextExt(drawto, x, y, text, font_size, font_type);
+  int mask_mode = FONT_OPAQUE;
+
+  if (DrawingOnBackground(x, y))
+    mask_mode = FONT_MASKED;
+
+  DrawTextExt(drawto, x, y, text, font_size, font_type, mask_mode);
 
   if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
@@ -109,7 +197,7 @@ void DrawText(int x, int y, char *text, int font_size, int font_type)
 }
 
 void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
-		 int font_size, int font_type)
+		 int font_size, int font_type, int mask_mode)
 {
   Bitmap *font_bitmap;
   int font_width, font_height, font_starty;
@@ -187,29 +275,49 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
 	}
       }
 
-      if (print_inverse)
+      if (print_inverse)	/* special mode for text gadgets */
       {
-	BlitBitmap(font_bitmap, bitmap,
-		   FONT_CHARS_PER_LINE * font_width,
+	/* first step: draw solid colored rectangle (use "cursor" character) */
+	BlitBitmap(font_bitmap, bitmap, FONT_CHARS_PER_LINE * font_width,
 		   3 * font_height + font_starty,
 		   font_width, font_height, x, y);
 
+	/* second step: draw masked black rectangle (use "space" character) */
 	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
 		      dest_x - src_x, dest_y - src_y);
 	BlitBitmapMasked(font_bitmap, bitmap,
 			 0, 0, font_width, font_height, dest_x, dest_y);
       }
-      else
+      else if (mask_mode == FONT_MASKED)
       {
-#if 1
-	BlitBitmap(font_bitmap, bitmap, src_x, src_y,
+	/* clear font character background */
+	BlitBitmap(gfx.background_bitmap, bitmap,
+		   dest_x - gfx.real_sx, dest_y - gfx.real_sy,
 		   font_width, font_height, dest_x, dest_y);
-#else
-	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
-		      dest_x - src_x, dest_y - src_y);
+
+	/* use special font tile clipmasks, if available */
+	if (font_size == FS_BIG || font_size == FS_MEDIUM)
+	{
+	  int font_nr = (font_size == FS_BIG ? 0 : 1);
+	  int font_char = (c >= 32 && c <= 95 ? c - 32 : 0);
+
+	  SetClipMask(font_bitmap, tile_clip_gc,
+		      tile_clipmask[font_nr][font_type][font_char]);
+	  SetClipOrigin(font_bitmap, tile_clip_gc, dest_x, dest_y);
+	}
+	else
+	{
+	  SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
+			dest_x - src_x, dest_y - src_y);
+	}
+
 	BlitBitmapMasked(font_bitmap, bitmap, src_x, src_y,
 			 font_width, font_height, dest_x, dest_y);
-#endif
+      }
+      else	/* normal, non-masked font blitting */
+      {
+	BlitBitmap(font_bitmap, bitmap, src_x, src_y,
+		   font_width, font_height, dest_x, dest_y);
       }
     }
 

@@ -71,31 +71,42 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 
-static void drawCursorExt(int pos, int color, int graphic)
+static void drawCursorExt(int xpos, int ypos, int color, int graphic)
 {
   static int cursor_array[SCR_FIELDY];
 
-  if (graphic)
-    cursor_array[pos] = graphic;
-
-  graphic = cursor_array[pos];
+  if (xpos == 0)
+  {
+    if (graphic != 0)
+      cursor_array[ypos] = graphic;
+    else
+      graphic = cursor_array[ypos];
+  }
 
   if (color == FC_RED)
     graphic = (graphic == IMG_ARROW_BLUE_LEFT  ? IMG_ARROW_RED_LEFT  :
 	       graphic == IMG_ARROW_BLUE_RIGHT ? IMG_ARROW_RED_RIGHT :
 	       IMG_BALL_RED);
 
-  DrawGraphic(0, MENU_SCREEN_START_YPOS + pos, graphic, 0);
+  ypos += MENU_SCREEN_START_YPOS;
+
+  DrawBackground(SX + xpos * 32, SY + ypos * 32, TILEX, TILEY);
+  DrawGraphicThruMask(xpos, ypos, graphic, 0);
 }
 
-static void initCursor(int pos, int graphic)
+static void initCursor(int ypos, int graphic)
 {
-  drawCursorExt(pos, FC_BLUE, graphic);
+  drawCursorExt(0, ypos, FC_BLUE, graphic);
 }
 
-static void drawCursor(int pos, int color)
+static void drawCursor(int ypos, int color)
 {
-  drawCursorExt(pos, color, 0);
+  drawCursorExt(0, ypos, color, 0);
+}
+
+static void drawCursorXY(int xpos, int ypos, int graphic)
+{
+  drawCursorExt(xpos, ypos, -1, graphic);
 }
 
 void DrawHeadline()
@@ -141,6 +152,7 @@ void DrawMainMenu()
   KeyboardAutoRepeatOn();
   ActivateJoystick();
   SetDrawDeactivationMask(REDRAW_NONE);
+  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
   audio.sound_deactivated = FALSE;
 
   /* needed if last screen was the playing screen, invoked from level editor */
@@ -181,7 +193,9 @@ void DrawMainMenu()
   GetPlayerConfig();
   LoadLevel(level_nr);
 
+  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
   ClearWindow();
+
   DrawHeadline();
   DrawText(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
   DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
@@ -210,8 +224,13 @@ void DrawMainMenu()
   for(i=0; i<8; i++)
     initCursor(i, (i == 1 || i == 6 ? IMG_ARROW_BLUE_RIGHT : IMG_BALL_BLUE));
 
+#if 0
   DrawGraphic(10, 3, IMG_ARROW_BLUE_LEFT, 0);
   DrawGraphic(14, 3, IMG_ARROW_BLUE_RIGHT, 0);
+#else
+  drawCursorXY(10, 1, IMG_ARROW_BLUE_LEFT);
+  drawCursorXY(14, 1, IMG_ARROW_BLUE_RIGHT);
+#endif
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -319,10 +338,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     level_nr = new_level_nr;
 
-    DrawTextExt(drawto, SX + 11 * 32, SY + 3 * 32,
-		int2str(level_nr, 3), FS_BIG, font_color);
-    DrawTextExt(window, SX + 11 * 32, SY + 3 * 32,
-		int2str(level_nr, 3), FS_BIG, font_color);
+    DrawText(SX + 11 * 32, SY + 3 * 32, int2str(level_nr, 3),
+	     FS_BIG, font_color);
 
     LoadLevel(level_nr);
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
@@ -1184,8 +1201,10 @@ void HandleTypeName(int newxpos, Key key)
   if (newxpos)
   {
     xpos = newxpos;
-    DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_YELLOW);
-    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
+    DrawText(SX + 6 * 32, SY + ypos * 32, setup.player_name,
+	     FS_BIG, FC_YELLOW);
+    drawCursorXY(xpos + 6, ypos - 2, IMG_BALL_RED);
+
     return;
   }
 
@@ -1203,23 +1222,23 @@ void HandleTypeName(int newxpos, Key key)
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos + 1] = 0;
     xpos++;
-    DrawTextExt(drawto, SX + 6*32, SY + ypos*32,
-		setup.player_name, FS_BIG, FC_YELLOW);
-    DrawTextExt(window, SX + 6*32, SY + ypos*32,
-		setup.player_name, FS_BIG, FC_YELLOW);
-    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
+
+    DrawText(SX + 6 * 32, SY + ypos * 32, setup.player_name,
+	     FS_BIG, FC_YELLOW);
+    drawCursorXY(xpos + 6, ypos - 2, IMG_BALL_RED);
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
-    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
-    DrawGraphic(xpos + 7, ypos, IMG_EMPTY, 0);
+
+    DrawBackground(SX + (xpos + 6) * 32, SY + ypos * 32, 2 * TILEX, TILEY);
+    drawCursorXY(xpos + 6, ypos - 2, IMG_BALL_RED);
   }
   else if (key == KSYM_Return && xpos > 0)
   {
-    DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_RED);
-    DrawGraphic(xpos + 6, ypos, IMG_EMPTY, 0);
+    DrawText(SX + 6 * 32, SY + ypos * 32, setup.player_name, FS_BIG, FC_RED);
+    DrawBackground(SX + (xpos + 6) * 32, SY + ypos * 32, TILEX, TILEY);
 
     SaveSetup();
     game_status = MAINMENU;
@@ -1267,7 +1286,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   char *title_string = NULL;
   int offset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : 16);
 
-  ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
+  DrawBackground(SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
 
   title_string =
@@ -1302,10 +1321,20 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   }
 
   if (first_entry > 0)
-    DrawGraphic(0, 1, IMG_ARROW_BLUE_UP, 0);
+  {
+    int ypos = 1;
+
+    DrawBackground(SX, SY + ypos * 32, TILEX, TILEY);
+    DrawGraphicThruMask(0, ypos, IMG_ARROW_BLUE_UP, 0);
+  }
 
   if (first_entry + num_page_entries < num_entries)
-    DrawGraphic(0, MAX_MENU_ENTRIES_ON_SCREEN + 1, IMG_ARROW_BLUE_DOWN, 0);
+  {
+    int ypos = MAX_MENU_ENTRIES_ON_SCREEN + 1;
+
+    DrawBackground(SX, SY + ypos * 32, TILEX, TILEY);
+    DrawGraphicThruMask(0, ypos, IMG_ARROW_BLUE_DOWN, 0);
+  }
 }
 
 static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
@@ -1319,7 +1348,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   node_first = getTreeInfoFirstGroupEntry(ti);
   node = getTreeInfoFromPos(node_first, entry_pos);
 
-  ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
+  DrawBackground(SX + 32, SY + 32, SXSIZE - 64, 32);
 
   if (node->parent_link)
     DrawTextFCentered(40, FC_RED, "leave group \"%s\"", node->class_desc);
@@ -2153,8 +2182,8 @@ void DrawSetupScreen_Input()
   initCursor(2, IMG_ARROW_BLUE_RIGHT);
   initCursor(13, IMG_ARROW_BLUE_LEFT);
 
-  DrawGraphic(10, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_LEFT, 0);
-  DrawGraphic(12, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_RIGHT, 0);
+  drawCursorXY(10, 0, IMG_ARROW_BLUE_LEFT);
+  drawCursorXY(12, 0, IMG_ARROW_BLUE_RIGHT);
 
   DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
@@ -2220,7 +2249,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FS_BIG, FC_RED);
-  DrawGraphic(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
+  DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
 
   if (setup.input[player_nr].use_joystick)
   {
@@ -2238,10 +2267,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 
   DrawText(SX+32, SY+5*32, "Actual Settings:", FS_BIG, FC_GREEN);
-  DrawGraphic(1, 6, IMG_ARROW_BLUE_LEFT, 0);
-  DrawGraphic(1, 7, IMG_ARROW_BLUE_RIGHT, 0);
-  DrawGraphic(1, 8, IMG_ARROW_BLUE_UP, 0);
-  DrawGraphic(1, 9, IMG_ARROW_BLUE_DOWN, 0);
+  drawCursorXY(1, 4, IMG_ARROW_BLUE_LEFT);
+  drawCursorXY(1, 5, IMG_ARROW_BLUE_RIGHT);
+  drawCursorXY(1, 6, IMG_ARROW_BLUE_UP);
+  drawCursorXY(1, 7, IMG_ARROW_BLUE_DOWN);
   DrawText(SX+2*32, SY+6*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+7*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+8*32, ":", FS_BIG, FC_BLUE);

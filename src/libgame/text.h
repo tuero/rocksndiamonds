@@ -50,19 +50,13 @@
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
+#define FONT_OPAQUE		0
+#define FONT_MASKED		1
+
 /* text output definitions */
 #define MAX_OUTPUT_LINESIZE	256
 
 /* font structure definitions */
-
-struct FontInfo
-{
-  Bitmap *bitmap_initial;
-  Bitmap *bitmap_big;
-  Bitmap *bitmap_medium;
-  Bitmap *bitmap_small;
-  Bitmap *bitmap_tile;
-};
 
 
 void InitFontInfo(Bitmap *, Bitmap *, Bitmap *, Bitmap *, Bitmap *);
@@ -72,6 +66,6 @@ void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawText(int, int, char *, int, int);
-void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
+void DrawTextExt(DrawBuffer *, int, int, char *, int, int, int);
 
 #endif	/* TEXT_H */

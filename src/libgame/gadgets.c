@@ -117,8 +117,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     case GD_TYPE_NORMAL_BUTTON:
     case GD_TYPE_CHECK_BUTTON:
     case GD_TYPE_RADIO_BUTTON:
-      BlitBitmap(gd->bitmap, drawto,
-		 gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+      BlitBitmapOnBackground(gd->bitmap, drawto,
+			     gd->x, gd->y, gi->width, gi->height,
+			     gi->x, gi->y);
       if (gi->deco.design.bitmap)
 	BlitBitmap(gi->deco.design.bitmap, drawto,
 		   gi->deco.design.x, gi->deco.design.y,
@@ -156,7 +157,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		   border, gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
-	DrawText(gi->x + border, gi->y + border, text, FS_SMALL, font_type);
+	DrawTextExt(drawto,
+		    gi->x + border, gi->y + border, text,
+		    FS_SMALL, font_type, FONT_OPAQUE);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
 	cursor_string[0] = '~';
@@ -165,8 +168,10 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 
 	/* draw cursor, if active */
 	if (pressed)
-	  DrawText(gi->x + border + gi->text.cursor_position * font_width,
-		   gi->y + border, cursor_string, FS_SMALL, font_type);
+	  DrawTextExt(drawto,
+		      gi->x + border + gi->text.cursor_position * font_width,
+		      gi->y + border, cursor_string,
+		      FS_SMALL, font_type, FONT_OPAQUE);
       }
       break;
 
@@ -183,33 +188,36 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int step_size_remain = size_body - num_steps * design_body;
 
 	/* clear scrollbar area */
-	ClearRectangle(backbuffer, gi->x, gi->y, gi->width, gi->height);
+	ClearRectangleOnBackground(backbuffer, gi->x, gi->y,
+				   gi->width, gi->height);
 
 	/* upper part of gadget */
-	BlitBitmap(gd->bitmap, drawto,
-		   gd->x, gd->y,
-		   gi->width, gi->border.size,
-		   xpos, ypos);
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x, gd->y,
+			       gi->width, gi->border.size,
+			       xpos, ypos);
 
 	/* middle part of gadget */
 	for (i=0; i<num_steps; i++)
-	  BlitBitmap(gd->bitmap, drawto,
-		     gd->x, gd->y + gi->border.size,
-		     gi->width, design_body,
-		     xpos, ypos + gi->border.size + i * design_body);
+	  BlitBitmapOnBackground(gd->bitmap, drawto,
+				 gd->x, gd->y + gi->border.size,
+				 gi->width, design_body,
+				 xpos, ypos + gi->border.size
+				 + i * design_body);
 
 	/* remaining middle part of gadget */
 	if (step_size_remain > 0)
-	  BlitBitmap(gd->bitmap, drawto,
-		     gd->x,  gd->y + gi->border.size,
-		     gi->width, step_size_remain,
-		     xpos, ypos + gi->border.size + num_steps * design_body);
+	  BlitBitmapOnBackground(gd->bitmap, drawto,
+				 gd->x,  gd->y + gi->border.size,
+				 gi->width, step_size_remain,
+				 xpos, ypos + gi->border.size
+				 + num_steps * design_body);
 
 	/* lower part of gadget */
-	BlitBitmap(gd->bitmap, drawto,
-		   gd->x, gd->y + design_full - gi->border.size,
-		   gi->width, gi->border.size,
-		   xpos, ypos + size_full - gi->border.size);
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x, gd->y + design_full - gi->border.size,
+			       gi->width, gi->border.size,
+			       xpos, ypos + size_full - gi->border.size);
       }
       break;
 

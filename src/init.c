@@ -220,6 +220,8 @@ static void ReinitializeGraphics()
 	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
 
+  SetBackgroundBitmap(NULL);
+
   InitGadgets();
   InitToons();
 }
@@ -772,11 +774,18 @@ void InitElementInfo()
 
 static void InitGraphicInfo()
 {
+  static boolean clipmasks_initialized = FALSE;
   static int gfx_action[NUM_IMAGE_FILES];
   Bitmap *src_bitmap;
   int src_x, src_y;
   int first_frame, last_frame;
   int i;
+#if defined(TARGET_X11_NATIVE)
+  Pixmap src_pixmap;
+  XGCValues clip_gc_values;
+  unsigned long clip_gc_valuemask;
+  GC copy_clipmask_gc = None;
+#endif
 
   image_files = getCurrentImageList();
 
@@ -798,6 +807,22 @@ static void InitGraphicInfo()
 
     i++;
   }
+
+#if defined(TARGET_X11_NATIVE)
+  if (clipmasks_initialized)
+  {
+    for (i=0; i<NUM_IMAGE_FILES; i++)
+    {
+      if (new_graphic_info[i].clip_mask)
+	XFreePixmap(display, new_graphic_info[i].clip_mask);
+      if (new_graphic_info[i].clip_gc)
+	XFreeGC(display, new_graphic_info[i].clip_gc);
+
+      new_graphic_info[i].clip_mask = None;
+      new_graphic_info[i].clip_gc = None;
+    }
+  }
+#endif
 
   for (i=0; i<NUM_IMAGE_FILES; i++)
   {
@@ -872,7 +897,7 @@ static void InitGraphicInfo()
     /* now check if no animation frames are outside of the loaded image */
 
     if (new_graphic_info[i].bitmap == NULL)
-      continue;				/* skip check for optional images */
+      continue;		/* skip check for optional images that are undefined */
 
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
@@ -907,7 +932,40 @@ static void InitGraphicInfo()
       Error(ERR_EXIT, "error: last animation frame out of bounds (%d,%d)",
 	    src_x, src_y);
     }
+
+#if defined(TARGET_X11_NATIVE)
+    /* currently we need only a tile clip mask from the first frame */
+    getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
+
+    if (copy_clipmask_gc == None)
+    {
+      clip_gc_values.graphics_exposures = False;
+      clip_gc_valuemask = GCGraphicsExposures;
+      copy_clipmask_gc = XCreateGC(display, src_bitmap->clip_mask,
+				   clip_gc_valuemask, &clip_gc_values);
+    }
+
+    new_graphic_info[i].clip_mask =
+      XCreatePixmap(display, window->drawable, TILEX, TILEY, 1);
+
+    src_pixmap = src_bitmap->clip_mask;
+    XCopyArea(display, src_pixmap, new_graphic_info[i].clip_mask,
+	      copy_clipmask_gc, src_x, src_y, TILEX, TILEY, 0, 0);
+
+    clip_gc_values.graphics_exposures = False;
+    clip_gc_values.clip_mask = new_graphic_info[i].clip_mask;
+    clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
+    new_graphic_info[i].clip_gc =
+      XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
+#endif
   }
+
+#if defined(TARGET_X11_NATIVE)
+  if (copy_clipmask_gc)
+    XFreeGC(display, copy_clipmask_gc);
+#endif
+
+  clipmasks_initialized = TRUE;
 }
 
 static void InitSoundInfo()

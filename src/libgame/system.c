@@ -36,6 +36,7 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+struct FontInfo		font;
 struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;
@@ -183,6 +184,11 @@ void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
 void SetDrawDeactivationMask(int draw_deactivation_mask)
 {
   gfx.draw_deactivation_mask = draw_deactivation_mask;
+}
+
+void SetBackgroundBitmap(Bitmap *background_bitmap)
+{
+  gfx.background_bitmap = background_bitmap;
 }
 
 
@@ -377,6 +383,11 @@ inline boolean DrawingDeactivated(int x, int y, int width, int height)
   return FALSE;
 }
 
+inline boolean DrawingOnBackground(int x, int y)
+{
+  return (gfx.background_bitmap != NULL && x < gfx.sx + gfx.sxsize);
+}
+
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		       int src_x, int src_y,
 		       int width, int height,
@@ -404,6 +415,16 @@ inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 #else
   XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
 #endif
+}
+
+inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
+				       int width, int height)
+{
+  if (!DrawingOnBackground(x, y))
+    ClearRectangle(bitmap, x, y, width, height);
+  else
+    BlitBitmap(gfx.background_bitmap, bitmap,
+	       x - gfx.real_sx, y - gfx.real_sy, width, height, x, y);
 }
 
 #if 0
@@ -455,6 +476,29 @@ inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
 	    src_bitmap->clip_gc, src_x, src_y, width, height, dst_x, dst_y);
 #endif
+}
+
+inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+				   int src_x, int src_y,
+				   int width, int height,
+				   int dst_x, int dst_y)
+{
+  if (!DrawingOnBackground(src_x, src_y))
+    BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	       dst_x, dst_y);
+  else
+  {
+    /* draw background */
+    BlitBitmap(gfx.background_bitmap, dst_bitmap,
+	       dst_x - gfx.real_sx, dst_y - gfx.real_sy, width, height,
+	       dst_x, dst_y);
+
+    /* draw foreground */
+    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		  dst_x - src_x, dst_y - src_y);
+    BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+		     dst_x, dst_y);
+  }
 }
 
 inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,

@@ -755,7 +755,7 @@
 #define IMG_CUSTOM_126				734
 #define IMG_CUSTOM_127				735
 #define IMG_MENU_FRAME				736
-#define IMG_MENU_BACK				737
+#define IMG_MENU_BACKGROUND			737
 #define IMG_MENU_DOOR				738
 #define IMG_MENU_TOONS				739
 #define IMG_MENU_FONT_BIG			740

@@ -297,6 +297,17 @@ struct GfxInfo
   int vxsize, vysize;
 
   boolean draw_deactivation_mask;
+
+  Bitmap *background_bitmap;
+};
+
+struct FontInfo
+{
+  Bitmap *bitmap_initial;
+  Bitmap *bitmap_big;
+  Bitmap *bitmap_medium;
+  Bitmap *bitmap_small;
+  Bitmap *bitmap_tile;
 };
 
 struct JoystickInfo
@@ -513,6 +524,7 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
+extern struct FontInfo		font;
 extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
 extern struct SetupInfo		setup;
@@ -554,6 +566,7 @@ void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
 void SetDrawDeactivationMask(int );
+void SetBackgroundBitmap(Bitmap *);
 
 inline void InitVideoDisplay(void);
 inline void CloseVideoDisplay(void);
@@ -563,9 +576,13 @@ inline Bitmap *CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap *);
 inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
 inline void ClearRectangle(Bitmap *, int, int, int, int);
+inline void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
 inline void SetClipMask(Bitmap *, GC, Pixmap);
 inline void SetClipOrigin(Bitmap *, GC, int, int);
 inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
+inline boolean DrawingOnBackground(int, int);
+inline void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int,
+				   int);
 inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
 inline Pixel GetPixel(Bitmap *, int, int);

@@ -2650,20 +2650,37 @@ static void PickDrawingElement(int button, int element)
 
 static void DrawDrawingWindow()
 {
+  SetBackgroundBitmap(NULL);
   ClearWindow();
-
-#if 1
-  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  redraw_mask |= REDRAW_FROM_BACKBUFFER;
-#endif
-
   UnmapLevelEditorWindowGadgets();
+
   AdjustDrawingAreaGadgets();
   AdjustLevelScrollPosition();
   AdjustEditorScrollbar(GADGET_ID_SCROLL_HORIZONTAL);
   AdjustEditorScrollbar(GADGET_ID_SCROLL_VERTICAL);
+
   DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   MapMainDrawingArea();
+}
+
+static void DrawElementBorder(int dest_x, int dest_y, int width, int height)
+{
+  int border_graphic = IMG_SAND;
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int num_mini_tilex = width / MINI_TILEX + 1;
+  int num_mini_tiley = width / MINI_TILEY + 1;
+  int x, y;
+
+  getMiniGraphicSource(border_graphic, &src_bitmap, &src_x, &src_y);
+
+  for (y=0; y < num_mini_tiley; y++)
+    for (x=0; x < num_mini_tilex; x++)
+      BlitBitmap(src_bitmap, drawto, src_x, src_y, MINI_TILEX, MINI_TILEY,
+		 dest_x - MINI_TILEX / 2 + x * MINI_TILEX,
+		 dest_y - MINI_TILEY / 2 + y * MINI_TILEY);
+
+  ClearRectangle(drawto, dest_x - 1, dest_y - 1, width + 2, height + 2);
 }
 
 static void DrawRandomPlacementBackgroundArea()
@@ -2672,24 +2689,10 @@ static void DrawRandomPlacementBackgroundArea()
   int area_y = ED_AREA_RANDOM_BACKGROUND_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_RANDOM_BACKGROUND_XPOS;
   int area_sy = SY + ED_AREA_RANDOM_BACKGROUND_YPOS;
-  int x, y;
 
   ElementContent[0][0][0] = random_placement_background_element;
 
-  /* draw decorative border for the object */
-  for (y=0; y<2; y++)
-    for (x=0; x<2; x++)
-      DrawMiniElement(area_x + x, area_y + y, EL_SAND);
-
-  ClearRectangle(drawto,
-		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
-		 MINI_TILEX + 2, MINI_TILEY + 2);
-
-  /* copy border to the right location */
-  BlitBitmap(drawto, drawto,
-	     area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
-	     area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
-
+  DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
   MapDrawingArea(GADGET_ID_RANDOM_BACKGROUND);
@@ -2707,6 +2710,7 @@ static void DrawLevelInfoWindow()
   int font_color = FC_GREEN;
   int i, x, y;
 
+  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
@@ -2794,28 +2798,14 @@ static void DrawAmoebaContentArea()
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
   int font_color = FC_GREEN;
-  int x, y;
 
   ElementContent[0][0][0] = level.amoeba_content;
 
-  /* draw decorative border for the object */
-  for (y=0; y<2; y++)
-    for (x=0; x<2; x++)
-      DrawMiniElement(area_x + x, area_y + y, EL_SAND);
-
-  ClearRectangle(drawto,
-		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
-		 MINI_TILEX + 2, MINI_TILEY + 2);
-
-  /* copy border to the right location */
-  BlitBitmap(drawto, drawto,
-	     area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY,
-	     area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
+  DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
+  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
   DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
 	   FS_SMALL, font_color);
-
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
   MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
 }
@@ -2849,28 +2839,12 @@ static void DrawElementContentAreas()
   MapCounterButtons(counter_id);
 
   /* delete content areas in case of reducing number of them */
-  ClearRectangle(backbuffer,
-		 SX, area_sy - MINI_TILEX,
-		 SXSIZE, 12 * MINI_TILEY);
+  DrawBackground(SX, area_sy - MINI_TILEX, SXSIZE, 12 * MINI_TILEY);
 
-  /* draw some decorative border for the objects */
   for (i=0; i<level.num_yam_contents; i++)
-  {
-    for (y=0; y<4; y++)
-      for (x=0; x<4; x++)
-	DrawMiniElement(area_x + 5 * (i % 4) + x, area_y + 6 * (i / 4) + y,
-			EL_SAND);
-
-    ClearRectangle(drawto,
-		   area_sx + 5 * (i % 4) * MINI_TILEX + MINI_TILEX/2 - 1,
-		   area_sy + 6 * (i / 4) * MINI_TILEY + MINI_TILEY/2 - 1,
-		   3 * MINI_TILEX + 2, 3 * MINI_TILEY + 2);
-  }
-
-  /* copy border to the right location */
-  BlitBitmap(drawto, drawto,
-	     area_sx, area_sy, (5 * 4 + 1) * MINI_TILEX, 11 * MINI_TILEY,
-	     area_sx - MINI_TILEX/2, area_sy - MINI_TILEY/2);
+    DrawElementBorder(area_sx + 5 * (i % 4) * MINI_TILEX,
+		      area_sy + 6 * (i / 4) * MINI_TILEY,
+		      3 * MINI_TILEX, 3 * MINI_TILEY);
 
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
 	   "Content", FS_SMALL, font_color);
@@ -2894,43 +2868,6 @@ static void DrawElementContentAreas()
   for (i=0; i<level.num_yam_contents; i++)
     MapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 }
-
-#if 0
-static void DrawPropertiesElement(int xstart, int ystart, int element)
-{
-  int x, y;
-
-  /* draw some decorative border for the object */
-  for (y=0; y<3; y++)
-    for (x=0; x<3; x++)
-      DrawMiniElement(xstart + x , ystart + y, EL_SAND);
-
-  ClearRectangle(drawto,
-		 SX + xstart * MINI_TILEX + MINI_TILEX/2 - 1,
-		 SY + ystart * MINI_TILEY + MINI_TILEY/2 - 1,
-		 TILEX + 2, TILEY + 2);
-
-  /* copy border to the right location */
-  BlitBitmap(drawto, drawto,
-	     SX + xstart * MINI_TILEX,
-	     SY + ystart * MINI_TILEY,
-	     2 * TILEX, 2 * TILEY,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
-
-  DrawGraphicAnimation(xstart / 2, ystart / 2, el2img(element));
-
-  /* copy the whole stuff to the definitive location */
-  BlitBitmap(drawto, drawto,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY,
-	     2 * TILEX, 2 * TILEY,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
-
-  FrameCounter++;	/* increase animation frame counter */
-}
-#endif
 
 #define TEXT_COLLECTING		"Score for collecting"
 #define TEXT_SMASHING		"Score for smashing"
@@ -3006,53 +2943,22 @@ static void DrawPropertiesWindow()
     { -1, NULL, NULL }
   };
 
+  SetBackgroundBitmap(new_graphic_info[IMG_MENU_BACKGROUND].bitmap);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
 	   "Element Settings", FS_BIG, FC_YELLOW);
 
-#if 1
-  /* draw some decorative border for the object */
-  for (y=0; y<3; y++)
-    for (x=0; x<3; x++)
-      DrawMiniElement(xstart + x , ystart + y, EL_SAND);
-
-  ClearRectangle(drawto,
-		 SX + xstart * MINI_TILEX + MINI_TILEX/2 - 1,
-		 SY + ystart * MINI_TILEY + MINI_TILEY/2 - 1,
-		 TILEX + 2, TILEY + 2);
-
-  /* copy border to the right location */
-  BlitBitmap(drawto, drawto,
-	     SX + xstart * MINI_TILEX,
-	     SY + ystart * MINI_TILEY,
-	     2 * TILEX, 2 * TILEY,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
-
-#if 0
-  DrawGraphic(xstart / 2, ystart / 2, el2img(properties_element), 0);
-#else
-  DrawGraphicAnimation(xstart / 2, ystart / 2, el2img(properties_element));
-#endif
-
-  /* copy the whole stuff to the definitive location */
-  BlitBitmap(drawto, drawto,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY,
-	     2 * TILEX, 2 * TILEY,
-	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
-	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
+  DrawElementBorder(SX + xstart * MINI_TILEX,
+		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
+		    TILEX, TILEY);
+  DrawGraphicAnimationExt(drawto,
+			  SX + xstart * MINI_TILEX,
+			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
+			  el2img(properties_element), NO_MASKING);
 
   FrameCounter = 0;	/* restart animation frame counter */
-
-#else
-
-  FrameCounter = 0;	/* restart animation frame counter */
-  DrawPropertiesElement(xstart, ystart, properties_element);
-
-#endif
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
 	    font_color, getElementInfoText(properties_element));
@@ -4436,15 +4342,23 @@ void HandleLevelEditorIdle()
   if (!DelayReached(&action_delay, action_delay_value))
     return;
 
-  FY += MINI_TILEY / 2;
 #if 1
-  DrawGraphicAnimation(xpos, ypos, el2img(properties_element));
+
+  DrawGraphicAnimationExt(drawto,
+			  SX + xpos * TILEX,
+			  SY + ypos * TILEY + MINI_TILEY / 2,
+			  el2img(properties_element), NO_MASKING);
+
 #else
-  DrawGraphicAnimation(xpos, ypos, el_dir_act2img(properties_element,
-						  MV_NO_MOVING,
-						  ...));
+  DrawGraphicAnimationExt(drawto,
+			  SX + xpos * TILEX,
+			  SY + ypos * TILEY + MINI_TILEY / 2,
+			  el_dir_act2img(properties_element,
+					 MV_NO_MOVING,
+					 ...));
 #endif
-  FY -= MINI_TILEY / 2;
+
+  MarkTileDirty(xpos, ypos);
   MarkTileDirty(xpos, ypos + 1);
 
   FrameCounter++;	/* increase animation frame counter */
@@ -4452,9 +4366,7 @@ void HandleLevelEditorIdle()
 
 void ClearEditorGadgetInfoText()
 {
-  ClearRectangle(drawto,
-		 INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
-  redraw_mask |= REDRAW_FIELD;
+  DrawBackground(INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
 }
 
 void HandleEditorGadgetInfoText(void *ptr)

@@ -983,7 +983,7 @@ void InitGame()
   else
   {
     DrawTextExt(drawto, DX + XX_EMERALDS, DY + YY_EMERALDS,
-		int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
+		int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3, FONT_OPAQUE);
     BlitBitmap(drawto, drawto,
 	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
 	       FONT5_XSIZE * 3, FONT5_YSIZE - 1,

@@ -279,7 +279,7 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
-    DrawTextExt(window, SX, SY, text, FS_SMALL, FC_YELLOW);
+    DrawTextExt(window, SX, SY, text, FS_SMALL, FC_YELLOW, FONT_OPAQUE);
   }
 
   FlushDisplay();
@@ -362,9 +362,39 @@ void FadeToFront()
   BackToFront();
 }
 
+void DrawBackground(int x, int y, int width, int height)
+{
+  /* some sanity checks */
+  if (x < REAL_SX)
+  {
+    width -= (REAL_SX - x);
+    x = REAL_SX;
+  }
+
+  if (y < REAL_SY)
+  {
+    height -= (REAL_SY - y);
+    y = REAL_SY;
+  }
+
+  if (width > FULL_SXSIZE)
+    width = FULL_SXSIZE;
+
+  if (height > FULL_SYSIZE)
+    height = FULL_SYSIZE;
+
+  if (DrawingOnBackground(x, y) && game_status != PLAYING)
+    BlitBitmap(gfx.background_bitmap, backbuffer, x - REAL_SX, y - REAL_SY,
+	       width, height, x, y);
+  else
+    ClearRectangle(backbuffer, x, y, width, height);
+
+  redraw_mask |= REDRAW_FIELD;
+}
+
 void ClearWindow()
 {
-  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
   if (setup.soft_scrolling && game_status == PLAYING)
   {
@@ -379,15 +409,6 @@ void ClearWindow()
     ClearRectangle(window, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
     SetDrawtoField(DRAW_DIRECT);
   }
-
-#if 1
-  if (game_status != PLAYING &&
-      new_graphic_info[IMG_MENU_BACK].bitmap != NULL)
-    BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
-	       0, 0, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
-#endif
-
-  redraw_mask |= REDRAW_FIELD;
 }
 
 static int getGraphicAnimationPhase(int frames, int delay, int mode)
@@ -1740,12 +1761,7 @@ void DrawMicroElement(int xpos, int ypos, int element)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int graphic;
-
-  if (element == EL_EMPTY)
-    return;
-
-  graphic = el2img(element);
+  int graphic = el2img(element);
 
   getMicroGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, drawto, src_x, src_y, MICRO_TILEX, MICRO_TILEY,
@@ -1780,7 +1796,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 {
   int x, y;
 
-  ClearRectangle(drawto, xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
+  DrawBackground(xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
 
   if (lev_fieldx < STD_LEV_FIELDX)
     xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
@@ -1799,7 +1815,8 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
       if (lx >= 0 && lx < lev_fieldx && ly >= 0 && ly < lev_fieldy)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
 			 Ur[lx][ly]);
-      else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1)
+      else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1
+	       && BorderElement != EL_EMPTY)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
 			 BorderElement);
     }
@@ -1821,7 +1838,7 @@ static void DrawMicroLevelLabelExt(int mode)
 {
   char label_text[MAX_MICROLABEL_SIZE + 1];
 
-  ClearRectangle(drawto, SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
+  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
 
   strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
 		       mode == MICROLABEL_CREATED_BY ? "created by" :
@@ -2003,7 +2020,7 @@ boolean Request(char *text, unsigned int req_state)
     text_line[tl] = 0;
 
     DrawTextExt(drawto, DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
-		text_line, FS_SMALL, FC_YELLOW);
+		text_line, FS_SMALL, FC_YELLOW, FONT_OPAQUE);
 
     text += tl + (tc == ' ' ? 1 : 0);
   }

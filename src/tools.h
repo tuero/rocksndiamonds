@@ -63,6 +63,7 @@ void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();
 void FadeToFront();
 void ClearWindow();
+void DrawBackground(int, int, int, int);
 
 void MarkTileDirty(int, int);
 void SetBorderElement();

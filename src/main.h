@@ -1654,6 +1654,11 @@ struct NewGraphicInfo
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
+
+#if defined(TARGET_X11_NATIVE)
+  Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
+  GC clip_gc;			/* single-graphic-only clip gc for X11 */
+#endif
 };
 
 extern GC		tile_clip_gc;

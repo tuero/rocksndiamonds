@@ -2584,7 +2584,7 @@ struct ConfigInfo image_config[] =
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
   { "menu.frame",				"RocksScreen.pcx"	},
-  { "menu.back",				UNDEFINED_FILENAME	},
+  { "menu.background",				UNDEFINED_FILENAME	},
   { "menu.door",				"RocksDoor.pcx"		},
   { "menu.toons",				"RocksToons.pcx"	},
   { "menu.font_big",				"RocksFontBig.pcx"	},
