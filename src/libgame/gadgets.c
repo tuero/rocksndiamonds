@@ -68,7 +68,7 @@ void DUMP_GADGET_MAP_STATE()
 {
   struct GadgetInfo *gi = gadget_list_first_entry;
 
-  while (gi)
+  while (gi != NULL)
   {
     printf("-XXX-1-> '%s': %s\n",
 	   gi->info_text, (gi->mapped ? "mapped" : "not mapped"));
@@ -80,22 +80,28 @@ void DUMP_GADGET_MAP_STATE()
 
 static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 {
-  struct GadgetInfo *gi = gadget_list_first_entry;
+  struct GadgetInfo *gi;
 
-  while (gi)
+  /* open selectboxes may overlap other active gadgets, so check them first */
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
   {
     if (gi->mapped && gi->active &&
-	((mx >= gi->x && mx < gi->x + gi->width &&
-	  my >= gi->y && my < gi->y + gi->height) ||
-	 (gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open &&
-	  mx >= gi->selectbox.x && mx < gi->selectbox.x+gi->selectbox.width &&
-	  my >= gi->selectbox.y && my < gi->selectbox.y+gi->selectbox.height)))
-      break;
-
-    gi = gi->next;
+	gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open &&
+	mx >= gi->selectbox.x && mx < gi->selectbox.x + gi->selectbox.width &&
+	my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
+      return gi;
   }
 
-  return gi;
+  /* check all other gadgets */
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+  {
+    if (gi->mapped && gi->active &&
+	mx >= gi->x && mx < gi->x + gi->width &&
+	my >= gi->y && my < gi->y + gi->height)
+      return gi;
+  }
+
+  return NULL;
 }
 
 static void default_callback_info(void *ptr)
@@ -1033,7 +1039,7 @@ static void MultiMapGadgets(int mode)
   static boolean map_state[MAX_NUM_GADGETS];
   int map_count = 0;
 
-  while (gi)
+  while (gi != NULL)
   {
     if ((mode & MULTIMAP_PLAYFIELD &&
 	 gi->x < gfx.sx + gfx.sxsize) ||
@@ -1267,7 +1273,7 @@ void HandleGadgets(int mx, int my, int button)
   if (button == 0 && !release_event)
     gi = new_gi;
 
-  if (gi)
+  if (gi != NULL)
   {
     int last_x = gi->event.x;
     int last_y = gi->event.y;

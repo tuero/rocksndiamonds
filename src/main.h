@@ -1032,6 +1032,8 @@ struct CustomElementChangeInfo
 
 struct CustomElementInfo
 {
+  boolean use_template;		/* use all properties from template file */
+
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */
 

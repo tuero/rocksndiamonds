@@ -69,13 +69,26 @@
 #define DEFAULT_KEY_TOGGLE_PAUSE KSYM_space
 
 
-/* values for move directions and special "button" keys */
+/* values for basic move directions (effective at runtime) */
 #define MV_BIT_LEFT		0
 #define MV_BIT_RIGHT		1
 #define MV_BIT_UP		2
 #define MV_BIT_DOWN	       	3
+
 #define NUM_DIRECTIONS		4
 
+/* values for special move patterns (stored in level files) */
+#define MV_BIT_HORIZONTAL	4
+#define MV_BIT_VERTICAL		5
+#define MV_BIT_ALL_DIRECTIONS	6
+#define MV_BIT_TOWARDS_PLAYER	7
+#define MV_BIT_AWAY_FROM_PLAYER	8
+#define MV_BIT_ALONG_LEFT_SIDE	9
+#define MV_BIT_ALONG_RIGHT_SIDE	10
+
+#define NUM_MOVE_PATTERNS	11
+
+/* values for move direction and special "button" key bitmasks */
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
