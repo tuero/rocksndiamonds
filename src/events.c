@@ -61,7 +61,7 @@ void EventLoop(void)
     else			/* got no event, but don't be lazy... */
     {
       HandleNoXEvent();
-      Delay(10000);		/* don't use all CPU time when idle */
+      Delay(1000);		/* don't use all CPU time when idle */
     }
 
     XSync(display,FALSE);
@@ -268,10 +268,8 @@ void HandleButton(int mx, int my, int button)
   }
 }
 
-int Gamespeed = 4;
-int Movemethod = 1;
-int Movespeed[2] = { 10, 4 };
-char *Movespeed_text[2] = { "asynchron", "syncron" };
+int GameSpeed = 2;
+int MoveSpeed = 8;
 
 void HandleKey(KeySym key, int key_status)
 {
@@ -470,34 +468,41 @@ void HandleKey(KeySym key, int key_status)
 	case XK_7:
 	case XK_8:
 	case XK_9:
-	  Movespeed[Movemethod] = (Movemethod == 0 ? 4 : 0) + (key - XK_0);
-	  printf("method == %d, speed == %d (%s)\n",
-		 Movemethod, Movespeed[Movemethod],
-		 Movespeed_text[Movemethod]);
+	  /*
+	  MoveSpeed = key - XK_0;
+	  printf("speed == %d\n", MoveSpeed);
+	  break;
+	  */
+
+	  if (key == XK_0)
+	    GameSpeed = 50;
+	  else
+	    GameSpeed = key - XK_0;
+	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 
 	case XK_a:
-	  Movemethod = !Movemethod;
-	  printf("method == %d, speed == %d (%s)\n",
-		 Movemethod, Movespeed[Movemethod],
-		 Movespeed_text[Movemethod]);
+	  if (ScrollSteps == TILEX/4)
+	    ScrollSteps = TILEX/8;
+	  else
+	    ScrollSteps = TILEX/4;
 	  break;
 
 	case XK_f:
-	  Gamespeed = 2;
-	  printf("gamespeed == %d\n", Gamespeed);
+	  GameSpeed = 2;
+	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 	case XK_g:
-	  Gamespeed = 3;
-	  printf("gamespeed == %d\n", Gamespeed);
+	  GameSpeed = 3;
+	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 	case XK_h:
-	  Gamespeed = 4;
-	  printf("gamespeed == %d\n", Gamespeed);
+	  GameSpeed = 4;
+	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 	case XK_l:
-	  Gamespeed = 50;
-	  printf("gamespeed == %d\n", Gamespeed);
+	  GameSpeed = 50;
+	  printf("GameSpeed == %d\n", GameSpeed);
 	  break;
 
 	case XK_Q:
@@ -508,13 +513,13 @@ void HandleKey(KeySym key, int key_status)
 	case XK_x:
 
 	  {
-	    int i,j,k, num_steps = 16, step_size = TILEX / num_steps;
+	    int i,j,k, num_steps = 8, step_size = TILEX / num_steps;
 	    static long scroll_delay=0;
 	    long scroll_delay_value = 4*4 / num_steps;
 
 	    printf("Scroll test\n");
 
-	    for(i=0;i<10;i++)
+	    for(i=0;i<3;i++)
 	    {
 	      for(j=0;j<SCR_FIELDX;j++)
 	      {

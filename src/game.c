@@ -23,9 +23,15 @@
 #include "tape.h"
 #include "joystick.h"
 
-extern int Gamespeed;
-extern int Movemethod;
-extern int Movespeed[2];
+
+
+int tst = 0;
+int tst2 = 0;
+
+
+
+extern int GameSpeed;
+extern int MoveSpeed;
 
 void GetPlayerConfig()
 {
@@ -78,6 +84,7 @@ void InitGame()
   ScreenMovPos = 0;
   PlayerMovDir = MV_NO_MOVING;
   PlayerMovPos = 0;
+  PlayerGfxPos = 0;
   PlayerFrame = 0;
   PlayerPushing = FALSE;
   PlayerGone = LevelSolved = GameOver = SiebAktiv = FALSE;
@@ -1008,13 +1015,6 @@ void Impact(int x, int y)
 	break;
       case EL_FELSBROCKEN:
 	sound = SND_KLOPF;
-
-
-
-	printf("FUMPF!\n");
-
-
-
 	break;
       case EL_SCHLUESSEL:
       case EL_SCHLUESSEL1:
@@ -1812,7 +1812,7 @@ void ContinueMoving(int x, int y)
   int dy = (direction==MV_UP   ? -1 : direction==MV_DOWN  ? +1 : 0);
   int horiz_move = (dx!=0);
   int newx = x + dx, newy = y + dy;
-  int step = (horiz_move ? dx : dy)*TILEX/4;
+  int step = (horiz_move ? dx : dy) * TILEX/8;
 
   if (CAN_FALL(element) && horiz_move)
     step*=2;
@@ -2348,7 +2348,11 @@ void AusgangstuerPruefen(int x, int y)
   if (!Gems && !SokobanFields && !Lights)
   {
     Feld[x][y] = EL_AUSGANG_ACT;
-    PlaySoundLevel(x,y,SND_OEFFNEN);
+
+    if (IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      PlaySoundLevel(x,y,SND_OEFFNEN);
+    else
+      PlaySoundLevel(JX,JY,SND_OEFFNEN);
   }
 }
 
@@ -2388,7 +2392,7 @@ void EdelsteinFunkeln(int x, int y)
 
   if (Feld[x][y] == EL_EDELSTEIN_BD)
   {
-    const int delay = 2;
+    const int delay = 4; /* war: 2 */
     const int frames = 4;
     int phase = (FrameCounter % (delay*frames)) / delay;
 
@@ -2569,7 +2573,7 @@ void CheckForDragon(int x, int y)
 
 void GameActions()
 {
-  static long action_delay=0;
+  static long action_delay = 0;
   long action_delay_value;
 
   if (game_status != PLAYING)
@@ -2581,11 +2585,12 @@ void GameActions()
 */
 
   action_delay_value =
-    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : Gamespeed);
+    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GameSpeed);
 
   /*
   if (DelayReached(&action_delay, action_delay_value))
   */
+
 
 
   if (PlayerMovPos)
@@ -2594,8 +2599,77 @@ void GameActions()
   DrawPlayerField();
 
 
+
+
+  tst++;
+
+  if (0)
+  {
+    static long last_Counter = 0;
+    long new_Counter = Counter();
+
+    printf("--> %ld / %ld [%d]\n",
+	   new_Counter - last_Counter,
+	   new_Counter,
+	   FrameCounter);
+    last_Counter = new_Counter;
+  }
+
+
+
+
+  /*
   if (!DelayReached(&action_delay, action_delay_value))
     return;
+    */
+
+
+  while(!DelayReached(&action_delay, action_delay_value))
+    Delay(1000);
+
+
+
+
+  /*
+  printf("-----------\n");
+  */
+
+
+
+  FrameCounter++;
+
+
+
+  /*
+  if (PlayerMovPos)
+    ScrollFigure(0);
+
+  DrawPlayerField();
+  */
+
+
+  tst2 = tst;
+  tst = 0;
+
+
+
+  if (0)
+  {
+    static long last_Counter = 0;
+    long new_Counter = Counter();
+
+    printf("--> %ld / %ld [%d]\n",
+	   new_Counter - last_Counter,
+	   new_Counter,
+	   FrameCounter);
+    last_Counter = new_Counter;
+  }
+
+
+  /*
+  printf("--> %ld / ", Counter());
+  */
+
 
   {
     int x,y,element;
@@ -2606,7 +2680,12 @@ void GameActions()
     else if (tape.recording)
       TapeRecordDelay();
 
+
+    /*
     FrameCounter++;
+    */
+
+
     TimeFrames++;
 
     for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
@@ -2730,7 +2809,13 @@ void GameActions()
     }
   }
 
-  if (TimeLeft>0 && TimeFrames>=25 && !tape.pausing)
+
+  /*
+  printf("%ld\n", Counter());
+  */
+
+
+  if (TimeLeft>0 && TimeFrames>=(100/GameSpeed) && !tape.pausing)
   {
     TimeFrames = 0;
     TimeLeft--;
@@ -2757,7 +2842,7 @@ void ScrollLevel(int dx, int dy)
   int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
   int x,y;
 
-  ScreenMovPos = PlayerMovPos;
+  ScreenMovPos = PlayerGfxPos;
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2828,7 +2913,7 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   JX = newJX;
   JY = newJY;
 
-  PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 3*TILEX/4;
+  PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
 
   ScrollFigure(-1);
 
@@ -2845,16 +2930,8 @@ BOOL MoveFigure(int dx, int dy)
   if (PlayerGone || (!dx && !dy))
     return(FALSE);
 
-  if (Movemethod == 0)
-  {
-    if (!DelayReached(&move_delay,Movespeed[0]) && !tape.playing)
-      return(FALSE);
-  }
-  else
-  {
-    if (!FrameReached(&move_delay,Movespeed[1]) && !tape.playing)
-      return(FALSE);
-  }
+  if (!FrameReached(&move_delay,MoveSpeed) && !tape.playing)
+    return(FALSE);
 
   if (last_move_dir & (MV_LEFT | MV_RIGHT))
   {
@@ -2912,11 +2989,33 @@ BOOL MoveFigure(int dx, int dy)
 
 void ScrollFigure(int init)
 {
-  static long actual_frame_counter;
+  static long actual_frame_counter = 0;
   static int oldJX = -1, oldJY = -1;
 
   if (init)
   {
+
+    PlayerGfxPos =
+      (TILEX/ScrollSteps) * (PlayerMovPos / (TILEX/ScrollSteps));
+
+
+
+    if (0)
+    {
+      static long last_Counter = 0;
+      long new_Counter = Counter();
+
+      printf("--> %ld / %ld [%d, %d]\n",
+	     new_Counter - last_Counter,
+	     new_Counter,
+	     FrameCounter,
+	     tst2);
+      last_Counter = new_Counter;
+    }
+
+
+
+
     if (oldJX != -1 && oldJY != -1)
       DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
 
@@ -2961,11 +3060,15 @@ void ScrollFigure(int init)
   else if (!FrameReached(&actual_frame_counter,1))
     return;
 
-  PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/4;
+  PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/8;
+
+
+  PlayerGfxPos =
+    (TILEX/ScrollSteps) * (PlayerMovPos / (TILEX/ScrollSteps));
 
   if (ScreenMovPos)
   {
-    ScreenMovPos = PlayerMovPos;
+    ScreenMovPos = PlayerGfxPos;
     redraw_mask |= REDRAW_FIELD;
   }
 
@@ -2993,7 +3096,7 @@ void ScrollFigure(int init)
     int nextJX = JX + (JX - lastJX);
     int nextJY = JY + (JY - lastJY);
 
-    if (PlayerMovPos)
+    if (PlayerGfxPos)
     {
       if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
 	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);

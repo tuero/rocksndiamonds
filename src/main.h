@@ -306,10 +306,11 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-extern int		FX,FY, ScreenMovPos;
+extern int		FX,FY, ScreenMovPos, ScrollSteps;
 extern int		BX1,BY1, BX2,BY2;
 extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
-extern int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
+extern int		PlayerMovDir, PlayerMovPos, PlayerPushing;
+extern int		PlayerFrame, PlayerGfxPos;
 extern int		PlayerGone,LevelSolved,GameOver;
 extern int		FrameCounter,TimeFrames,TimeLeft,Score;
 extern int		Gems,SokobanFields,Lights,Friends;

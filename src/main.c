@@ -82,14 +82,15 @@ long		Elementeigenschaften[MAX_ELEMENTS];
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-int		FX = SX, FY = SY, ScreenMovPos = 0;
+int		FX = SX, FY = SY, ScreenMovPos = 0, ScrollSteps = TILEX/4;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
 int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
-int		PlayerMovDir, PlayerMovPos, PlayerFrame, PlayerPushing;
-int		PlayerGone,LevelSolved,GameOver;
-int		FrameCounter,TimeFrames,TimeLeft,Score;
-int		Gems,SokobanFields,Lights,Friends;
-int		Dynamite,Key[4],MampferNr;
+int		PlayerMovDir, PlayerMovPos, PlayerPushing;
+int		PlayerFrame, PlayerGfxPos;
+int		PlayerGone, LevelSolved, GameOver;
+int		FrameCounter, TimeFrames, TimeLeft, Score;
+int		Gems, SokobanFields, Lights, Friends;
+int		Dynamite, Key[4], MampferNr;
 int		DynaBombCount, DynaBombSize, DynaBombsLeft, DynaBombXL;
 int		SiebAktiv;
 

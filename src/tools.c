@@ -101,15 +101,6 @@ void BackToFront()
       XCopyArea(display,buffer,window,gc,
 		fx,fy, SXSIZE,SYSIZE,
 		SX,SY);
-
-
-
-      printf("Full screen redraw (%d) (%ld)\n",
-	     ScreenMovPos,
-	     Counter());
-
-
-
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
@@ -402,12 +393,12 @@ void DrawPlayerField()
   graphic += PlayerFrame;
 
 
-  if (PlayerMovPos)
+  if (PlayerGfxPos)
   {
     if (PlayerMovDir == MV_LEFT || PlayerMovDir == MV_RIGHT)
-      sxx = PlayerMovPos;
+      sxx = PlayerGfxPos;
     else
-      syy = PlayerMovPos;
+      syy = PlayerGfxPos;
   }
 
 
@@ -433,7 +424,7 @@ void DrawPlayerField()
 
 
 
-  if (PlayerPushing && PlayerMovPos)
+  if (PlayerPushing && PlayerGfxPos)
   {
     int nextJX = JX + (JX - lastJX);
     int nextJY = JY + (JY - lastJY);
@@ -451,7 +442,7 @@ void DrawPlayerField()
 
       if (element == EL_FELSBROCKEN && sxx)
       {
-	int phase = PlayerMovPos / (TILEX/4);
+	int phase = PlayerGfxPos / (TILEX/4);
 
 	if (PlayerMovDir == MV_LEFT)
 	  graphic += phase;
