@@ -91,15 +91,6 @@
 #define SC_SCHLUESSEL		9
 #define SC_ZEITBONUS		10
 
-/* values for game_emulation */
-#define EMU_NONE		0
-#define EMU_BOULDERDASH		1
-#define EMU_SOKOBAN		2
-#define EMU_SUPAPLEX		3
-
-/* to control special behaviour of certain game elements */
-int game_emulation = EMU_NONE;
-
 
 
 
@@ -1002,7 +993,9 @@ void DrawDynamite(int x, int y)
       phase = 7 - phase;
   }
 
-  if (Store[x][y])
+  if (game_emulation == EMU_SUPAPLEX)
+    DrawGraphic(sx, sy, GFX_SP_DISK_RED);
+  else if (Store[x][y])
     DrawGraphicThruMask(sx, sy, graphic + phase);
   else
     DrawGraphic(sx, sy, graphic + phase);
@@ -4674,7 +4667,12 @@ boolean PlaceBomb(struct PlayerInfo *player)
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FS_SMALL, FC_YELLOW);
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
-      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), GFX_DYNAMIT);
+    {
+      if (game_emulation == EMU_SUPAPLEX)
+	DrawGraphic(SCREENX(jx), SCREENY(jy), GFX_SP_DISK_RED);
+      else
+	DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), GFX_DYNAMIT);
+    }
   }
   else
   {

@@ -109,16 +109,20 @@ void TapeRecordDelay()
 
 void TapeTogglePause()
 {
+  unsigned long state;
+
   if (!tape.recording && !tape.playing)
     return;
 
   tape.pausing = !tape.pausing;
   tape.fast_forward = FALSE;
   tape.pause_before_death = FALSE;
-  DrawVideoDisplay((tape.pausing ?
-		    VIDEO_STATE_PAUSE_ON :
-		    VIDEO_STATE_PAUSE_OFF) | VIDEO_STATE_PBEND_OFF,
-		   0);
+
+  state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+  if (tape.playing)
+    state |= VIDEO_STATE_PBEND_OFF;
+
+  DrawVideoDisplay(state, 0);
 }
 
 void TapeStartPlaying()

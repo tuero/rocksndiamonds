@@ -543,7 +543,10 @@ void DrawPlayer(struct PlayerInfo *player)
 	phase = 7 - phase;
     }
 
-    DrawGraphicThruMask(sx, sy, graphic + phase);
+    if (game_emulation == EMU_SUPAPLEX)
+      DrawGraphic(sx, sy, GFX_SP_DISK_RED);
+    else
+      DrawGraphicThruMask(sx, sy, graphic + phase);
   }
 
   if ((last_jx != jx || last_jy != jy) &&

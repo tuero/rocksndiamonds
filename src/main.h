@@ -445,6 +445,8 @@ extern int		MampferMax, MampferNr;
 extern boolean		SiebAktiv;
 extern int		SiebCount;
 
+extern int		game_emulation;
+
 extern boolean		network_player_action_received;
 
 extern struct LevelDirInfo	leveldir[];
@@ -1287,5 +1289,11 @@ extern int		num_bg_loops;
 #define ANIM_NORMAL	0
 #define ANIM_OSCILLATE	1
 #define ANIM_REVERSE	2
+
+/* values for game_emulation */
+#define EMU_NONE		0
+#define EMU_BOULDERDASH		1
+#define EMU_SOKOBAN		2
+#define EMU_SUPAPLEX		3
 
 #endif	/* MAIN_H */

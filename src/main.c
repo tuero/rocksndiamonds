@@ -100,6 +100,8 @@ int		MampferMax, MampferNr;
 boolean		SiebAktiv;
 int		SiebCount;
 
+int		game_emulation = EMU_NONE;
+
 boolean		network_player_action_received = FALSE;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
