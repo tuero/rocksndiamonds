@@ -649,18 +649,74 @@ struct ImageInfo
 {
   char *source_filename;
   int num_references;
+
+  Bitmap *bitmap;
 };
 typedef struct ImageInfo ImageInfo;
 
-static ImageInfo **ImageList = NULL;
-static struct ArtworkConfigInfo *image_config = NULL;
-static int num_images = 0;
+static struct ArtworkListInfo *image_info = NULL;
+
+static void *Load_PCX(char *filename)
+{
+  ImageInfo *img_info;
+
+#if 0
+  printf("loading PCX file '%s'\n", filename);
+#endif
+
+  img_info = checked_calloc(sizeof(ImageInfo));
+
+  if ((img_info->bitmap = LoadImage(filename)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read image file '%s': LoadImage() failed: %s",
+	  filename, GetError());
+    free(img_info);
+    return NULL;
+  }
+
+  img_info->source_filename = getStringCopy(filename);
+
+  return img_info;
+}
+
+static void FreeImage(void *ptr)
+{
+  ImageInfo *image = (ImageInfo *)ptr;
+
+  if (image == NULL)
+    return;
+
+  if (image->bitmap)
+    FreeBitmap(image->bitmap);
+
+  if (image->source_filename)
+    free(image->source_filename);
+
+  free(image);
+}
 
 void InitImageList(struct ArtworkConfigInfo *config_list, int num_list_entries)
 {
-  if (ImageList == NULL)
-    ImageList = checked_calloc(num_list_entries * sizeof(ImageInfo *));
+  if (image_info == NULL)
+    image_info = checked_calloc(sizeof(struct ArtworkListInfo));
 
-  image_config = config_list;
-  num_images = num_list_entries;
+  if (image_info->artwork_list == NULL)
+    image_info->artwork_list =
+      checked_calloc(num_list_entries * sizeof(ImageInfo *));
+
+  image_info->type = ARTWORK_TYPE_GRAPHICS;
+  image_info->num_list_entries = num_list_entries;
+  image_info->config_list = config_list;
+  image_info->file_list = NULL;
+  image_info->load_artwork = Load_PCX;
+  image_info->free_artwork = FreeImage;
+}
+
+void ReloadCustomImages()
+{
+#if 0
+  printf("DEBUG: reloading images '%s' ...\n", artwork.gfx_current_identifier);
+#endif
+
+  ReloadCustomArtworkList(image_info);
 }

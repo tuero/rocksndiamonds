@@ -1459,26 +1459,9 @@ extern struct ArtworkConfigInfo	image_config[], sound_config[];
 
 
 /* values for image configuration */
-#define GFX_BD_EMPTY_SPACE_DIGGING		0
-#define GFX_BD_SAND_DIGGING			1
-#define GFX_BD_DIAMOND_COLLECTING		2
-#define GFX_BD_DIAMOND_IMPACT			3
-#define GFX_BD_ROCK_PUSHING			4
-#define GFX_BD_ROCK_IMPACT			5
-#define GFX_BD_MAGIC_WALL_ACTIVATING		6
-#define GFX_BD_MAGIC_WALL_CHANGING		7
-#define GFX_BD_MAGIC_WALL_RUNNING		8
-#define GFX_BD_AMOEBA_WAITING			9
-#define GFX_BD_AMOEBA_CREATING			10
-#define GFX_BD_AMOEBA_TURNING_TO_GEM		11
-#define GFX_BD_AMOEBA_TURNING_TO_ROCK		12
-#define GFX_BD_BUTTERFLY_MOVING			13
-#define GFX_BD_BUTTERFLY_WAITING		14
-#define GFX_BD_FIREFLY_MOVING			15
-#define GFX_BD_FIREFLY_WAITING			16
-#define GFX_BD_EXIT_ENTERING			17
+#define GFX_BD_DIAMOND_WAITING			0
 
-#define NUM_IMAGE_CONFIG_ENTRIES		18
+#define NUM_IMAGE_CONFIG_ENTRIES		1
 
 
 /* values for sound configuration */

@@ -73,5 +73,6 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 
 void InitImageList(struct ArtworkConfigInfo *, int);
+void ReloadCustomImages();
 
 #endif	/* IMAGE_H */

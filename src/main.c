@@ -139,24 +139,7 @@ char *sound_name[NUM_SOUNDS] =
 struct ArtworkConfigInfo image_config[] =
 {
   /* graphics for Boulder Dash style elements and actions */
-  { "bd_empty_space.digging",		"empty.pcx"		},
-  { "bd_sand.digging",			"schlurf.pcx"		},
-  { "bd_diamond.collecting",		"pong.pcx"		},
-  { "bd_diamond.impact",		"pling.pcx"		},
-  { "bd_rock.pushing",			"pusch.pcx"		},
-  { "bd_rock.impact",			"klopf.pcx"		},
-  { "bd_magic_wall.activating",		"quirk.pcx"		},
-  { "bd_magic_wall.changing",		"quirk.pcx"		},
-  { "bd_magic_wall.running",		"miep.pcx"		},
-  { "bd_amoeba.waiting",		"amoebe.pcx"		},
-  { "bd_amoeba.creating",		"amoebe.pcx"		},
-  { "bd_amoeba.turning_to_gem",		"pling.pcx"		},
-  { "bd_amoeba.turning_to_rock",	"klopf.pcx"		},
-  { "bd_butterfly.moving",		"klapper.pcx"		},
-  { "bd_butterfly.waiting",		"klapper.pcx"		},
-  { "bd_firefly.moving",		"roehr.pcx"		},
-  { "bd_firefly.waiting",		"roehr.pcx"		},
-  { "bd_exit.entering",			"buing.pcx"		},
+  { "bd_diamond.waiting",		"bd_diamond.pcx"	},
 };
 
 struct ArtworkConfigInfo sound_config[] =

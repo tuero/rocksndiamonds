@@ -46,7 +46,7 @@ static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
 static void InitLevelArtworkInfo(void);
 static void InitNetworkServer(void);
-static void InitImageConfig();
+static void InitImages(void);
 static void InitMixer(void);
 static void InitSound(void);
 static void InitGfx(void);
@@ -87,7 +87,6 @@ void OpenAll(void)
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
 
   InitCounter();
-  InitImageConfig();
   InitMixer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
@@ -106,6 +105,7 @@ void OpenAll(void)
   InitLevelInfo();
   InitLevelArtworkInfo();
   InitGadgets();		/* needs to know number of level series */
+  InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
 
   InitGfxBackground();
@@ -174,9 +174,12 @@ void InitNetworkServer()
 #endif
 }
 
-static void InitImageConfig()
+static void InitImages()
 {
   InitImageList(image_config, NUM_IMAGE_CONFIG_ENTRIES);
+
+  /* load custom images */
+  ReloadCustomImages();
 }
 
 static void InitMixer()
@@ -274,8 +277,8 @@ static void InitTileClipmasks()
 
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
-  tile_clip_gc =
-    XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
+  tile_clip_gc = XCreateGC(display, window->drawable,
+			   clip_gc_valuemask, &clip_gc_values);
 
   for(i=0; i<NUM_BITMAPS; i++)
   {
@@ -294,9 +297,8 @@ static void InitTileClipmasks()
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
-  copy_clipmask_gc =
-    XCreateGC(display, pix[PIX_BACK]->clip_mask,
-	      clip_gc_valuemask, &clip_gc_values);
+  copy_clipmask_gc = XCreateGC(display, pix[PIX_BACK]->clip_mask,
+			       clip_gc_valuemask, &clip_gc_values);
 
   /* create only those clipping Pixmaps we really need */
   for(i=0; tile_needs_clipping[i].start>=0; i++)
@@ -493,6 +495,8 @@ void ReloadCustomArtwork()
       DrawInitText(image_filename[i], 150, FC_YELLOW);
       ReloadCustomImage(pix[i], image_filename[i]);
     }
+
+    ReloadCustomImages();
 
     FreeTileClipmasks();
     InitTileClipmasks();
@@ -2061,17 +2065,26 @@ void Execute_Debug_Command(char *command)
 {
   if (strcmp(command, "create graphicsinfo.conf") == 0)
   {
-    printf("# (Currently only \"name\" and \"sort_priority\" recognized.)\n");
+    int i;
+
+    printf("# You can configure additional/alternative image files here.\n");
+    printf("# (The images below are default and therefore commented out.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    printf("\n");
+
+    for (i=0; i<NUM_IMAGE_CONFIG_ENTRIES; i++)
+      printf("# %s\n",
+	     getFormattedSetupEntry(image_config[i].token,
+				    image_config[i].default_filename));
   }
   else if (strcmp(command, "create soundsinfo.conf") == 0)
   {
     int i;
 
-    printf("# You can configure additional/alternative sound effects here\n");
+    printf("# You can configure additional/alternative sound files here.\n");
     printf("# (The sounds below are default and therefore commented out.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
@@ -2091,6 +2104,13 @@ void Execute_Debug_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+  }
+  else if (strcmp(command, "help") == 0)
+  {
+    printf("The following commands are recognized:\n");
+    printf("   \"create graphicsinfo.conf\"\n");
+    printf("   \"create soundsinfo.conf\"\n");
+    printf("   \"create musicinfo.conf\"\n");
   }
 }
 
