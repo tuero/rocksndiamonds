@@ -114,8 +114,8 @@ void checked_free(void *);
 inline void swap_numbers(int *, int *);
 inline void swap_number_pairs(int *, int *, int *, int *);
 
-short getFile16BitInteger(FILE *, int);
-void putFile16BitInteger(FILE *, short, int);
+int getFile16BitInteger(FILE *, int);
+void putFile16BitInteger(FILE *, int, int);
 int getFile32BitInteger(FILE *, int);
 void putFile32BitInteger(FILE *, int, int);
 boolean getFileChunk(FILE *, char *, int *, int);

@@ -1793,15 +1793,15 @@ void InitMovDir(int x, int y)
 	int move_direction_initial = ei->move_direction_initial;
 	int move_pattern = ei->move_pattern;
 
-	if (move_direction_initial == MV_PREVIOUS)
+	if (move_direction_initial == MV_START_PREVIOUS)
 	{
 	  if (MovDir[x][y] != MV_NO_MOVING)
 	    return;
 
-	  move_direction_initial = MV_AUTOMATIC;
+	  move_direction_initial = MV_START_AUTOMATIC;
 	}
 
-	if (move_direction_initial == MV_RANDOM)
+	if (move_direction_initial == MV_START_RANDOM)
 	  MovDir[x][y] = 1 << RND(4);
 	else if (move_direction_initial & MV_ANY_DIRECTION)
 	  MovDir[x][y] = move_direction_initial;
@@ -6247,7 +6247,7 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
 
-  if (element_info[Feld[x][y]].move_direction_initial == MV_PREVIOUS)
+  if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
     MovDir[x][y] = previous_move_direction;
 
   InitField(x, y, FALSE);
@@ -9569,7 +9569,7 @@ boolean DropElement(struct PlayerInfo *player)
     int move_stepsize = element_info[new_element].move_stepsize;
     int direction, dx, dy, nextx, nexty;
 
-    if (element_info[new_element].move_direction_initial == MV_AUTOMATIC)
+    if (element_info[new_element].move_direction_initial == MV_START_AUTOMATIC)
       MovDir[jx][jy] = player->MovDir;
 
     direction = MovDir[jx][jy];

@@ -850,27 +850,27 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
   *y2 = help_y;
 }
 
-short getFile16BitInteger(FILE *file, int byte_order)
+int getFile16BitInteger(FILE *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
-    return ((fgetc(file) <<  8) |
-	    (fgetc(file) <<  0));
+    return ((fgetc(file) << 8) |
+	    (fgetc(file) << 0));
   else		 /* BYTE_ORDER_LITTLE_ENDIAN */
-    return ((fgetc(file) <<  0) |
-	    (fgetc(file) <<  8));
+    return ((fgetc(file) << 0) |
+	    (fgetc(file) << 8));
 }
 
-void putFile16BitInteger(FILE *file, short value, int byte_order)
+void putFile16BitInteger(FILE *file, int value, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
   {
-    fputc((value >>  8) & 0xff, file);
-    fputc((value >>  0) & 0xff, file);
+    fputc((value >> 8) & 0xff, file);
+    fputc((value >> 0) & 0xff, file);
   }
   else		 /* BYTE_ORDER_LITTLE_ENDIAN */
   {
-    fputc((value >>  0) & 0xff, file);
-    fputc((value >>  8) & 0xff, file);
+    fputc((value >> 0) & 0xff, file);
+    fputc((value >> 8) & 0xff, file);
   }
 }
 

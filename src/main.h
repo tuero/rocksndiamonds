@@ -222,7 +222,7 @@
 #define CP_HALF_DESTRUCTIVE	1
 #define CP_FULL_DESTRUCTIVE	2
 
-/* values for special move patterns (bits 0-3: basic move directions) */
+/* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER	4
 #define MV_BIT_AWAY_FROM_PLAYER	5
 #define MV_BIT_ALONG_LEFT_SIDE	6
@@ -236,15 +236,12 @@
 #define MV_BIT_TURNING_LEFT_RIGHT 14
 #define MV_BIT_TURNING_RIGHT_LEFT 15
 #define MV_BIT_TURNING_RANDOM	16
-#define MV_BIT_PREVIOUS		17
 
-/* values for special move patterns for custom elements */
+/* values for custom move patterns */
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
 #define MV_VERTICAL		(MV_UP | MV_DOWN)
 #define MV_ALL_DIRECTIONS	(MV_HORIZONTAL | MV_VERTICAL)
 #define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
-#define MV_RANDOM		(MV_ALL_DIRECTIONS)
-#define MV_AUTOMATIC		(MV_NO_MOVING)
 #define MV_TOWARDS_PLAYER	(1 << MV_BIT_TOWARDS_PLAYER)
 #define MV_AWAY_FROM_PLAYER	(1 << MV_BIT_AWAY_FROM_PLAYER)
 #define MV_ALONG_LEFT_SIDE	(1 << MV_BIT_ALONG_LEFT_SIDE)
@@ -259,7 +256,18 @@
 #define MV_TURNING_LEFT_RIGHT	(1 << MV_BIT_TURNING_LEFT_RIGHT)
 #define MV_TURNING_RIGHT_LEFT	(1 << MV_BIT_TURNING_RIGHT_LEFT)
 #define MV_TURNING_RANDOM	(1 << MV_BIT_TURNING_RANDOM)
-#define MV_PREVIOUS		(1 << MV_BIT_PREVIOUS)
+
+/* values for initial move direction (bits 0 - 3: basic move directions) */
+#define MV_START_BIT_PREVIOUS	4
+
+/* values for initial move direction */
+#define MV_START_AUTOMATIC	(MV_NO_MOVING)
+#define MV_START_LEFT		(MV_LEFT)
+#define MV_START_RIGHT		(MV_RIGHT)
+#define MV_START_UP		(MV_UP)
+#define MV_START_DOWN		(MV_DOWN)
+#define MV_START_RANDOM		(MV_ALL_DIRECTIONS)
+#define MV_START_PREVIOUS	(1 << MV_START_BIT_PREVIOUS)
 
 /* values for elements left behind by custom elements */
 #define LEAVE_TYPE_UNLIMITED	0

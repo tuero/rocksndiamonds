@@ -217,7 +217,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].move_delay_random = 0;
 
       element_info[element].move_pattern = MV_ALL_DIRECTIONS;
-      element_info[element].move_direction_initial = MV_AUTOMATIC;
+      element_info[element].move_direction_initial = MV_START_AUTOMATIC;
       element_info[element].move_stepsize = TILEX / 8;
       element_info[element].move_enter_element = EL_EMPTY_SPACE;
       element_info[element].move_leave_element = EL_EMPTY_SPACE;
@@ -988,6 +988,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->move_delay_fixed = getFile16BitBE(file);
   ei->move_delay_random = getFile16BitBE(file);
 
+  /* bits 0 - 15 of "move_pattern" ... */
   ei->move_pattern = getFile16BitBE(file);
   ei->move_direction_initial = getFile8Bit(file);
   ei->move_stepsize = getFile8Bit(file);
@@ -1002,8 +1003,11 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->move_leave_element = getMappedElement(getFile16BitBE(file));
   ei->move_leave_type = getFile8Bit(file);
 
+  /* ... bits 16 - 31 of "move_pattern" (not nice, but downward compatible) */
+  ei->move_pattern |= (getFile16BitBE(file) << 16);
+
   /* some free bytes for future custom property values and padding */
-  ReadUnusedBytesFromFile(file, 7);
+  ReadUnusedBytesFromFile(file, 5);
 
   /* read change property values */
 
@@ -2555,7 +2559,8 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   putFile16BitBE(file, ei->move_delay_fixed);
   putFile16BitBE(file, ei->move_delay_random);
 
-  putFile16BitBE(file, ei->move_pattern);
+  /* bits 0 - 15 of "move_pattern" ... */
+  putFile16BitBE(file, ei->move_pattern & 0xffff);
   putFile8Bit(file, ei->move_direction_initial);
   putFile8Bit(file, ei->move_stepsize);
 
@@ -2569,8 +2574,11 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   putFile16BitBE(file, ei->move_leave_element);
   putFile8Bit(file, ei->move_leave_type);
 
+  /* ... bits 16 - 31 of "move_pattern" (not nice, but downward compatible) */
+  putFile16BitBE(file, (ei->move_pattern >> 16) & 0xffff);
+
   /* some free bytes for future custom property values and padding */
-  WriteUnusedBytesToFile(file, 7);
+  WriteUnusedBytesToFile(file, 5);
 
   /* write change property values */
 

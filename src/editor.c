@@ -1146,13 +1146,13 @@ static struct ValueTextInfo options_move_pattern[] =
 
 static struct ValueTextInfo options_move_direction[] =
 {
-  { MV_AUTOMATIC,		"automatic"			},
-  { MV_LEFT,			"left"				},
-  { MV_RIGHT,			"right"				},
-  { MV_UP,			"up"				},
-  { MV_DOWN,			"down"				},
-  { MV_RANDOM,			"random"			},
-  { MV_PREVIOUS,		"previous"			},
+  { MV_START_AUTOMATIC,		"automatic"			},
+  { MV_START_LEFT,		"left"				},
+  { MV_START_RIGHT,		"right"				},
+  { MV_START_UP,		"up"				},
+  { MV_START_DOWN,		"down"				},
+  { MV_START_RANDOM,		"random"			},
+  { MV_START_PREVIOUS,		"previous"			},
   { -1,				NULL				}
 };
 
@@ -6858,12 +6858,19 @@ static void DrawPropertiesWindow()
 
 static void UpdateCustomElementGraphicGadgets()
 {
+  int i;
+
   ModifyEditorElementList();
   RedrawDrawingElements();
 
-  if (edit_mode == ED_MODE_PROPERTIES &&
-      edit_mode_properties == ED_MODE_PROPERTIES_CHANGE)
-    DrawPropertiesChangeDrawingAreas();
+  /* force redraw of all mapped drawing area gadgets */
+  for (i = 0; i < ED_NUM_DRAWING_AREAS; i++)
+  {
+    struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[i].gadget_id];
+
+    if (gi->mapped)
+      MapDrawingArea(i);
+  }
 }
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
@@ -8049,6 +8056,17 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
   *checkbutton_info[type_id].value ^= TRUE;
 
+  if (((type_id >= ED_CHECKBUTTON_ID_CUSTOM1_FIRST &&
+	type_id <= ED_CHECKBUTTON_ID_CUSTOM1_LAST) ||
+       (type_id >= ED_CHECKBUTTON_ID_CUSTOM2_FIRST &&
+	type_id <= ED_CHECKBUTTON_ID_CUSTOM2_LAST) ||
+       (type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
+	type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST)) &&
+      type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
+  {
+    CopyElementPropertiesToGame(properties_element);
+  }
+
   if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC)
   {
     UpdateCustomElementGraphicGadgets();
@@ -8070,15 +8088,6 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
     LoadLevelTemplate(level.use_custom_template ? -1 : level_nr);
 
     DrawEditModeWindow();
-  }
-  else if ((type_id >= ED_CHECKBUTTON_ID_CUSTOM1_FIRST &&
-	    type_id <= ED_CHECKBUTTON_ID_CUSTOM1_LAST) ||
-	   (type_id >= ED_CHECKBUTTON_ID_CUSTOM2_FIRST &&
-	    type_id <= ED_CHECKBUTTON_ID_CUSTOM2_LAST) ||
-	   (type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
-	    type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST))
-  {
-    CopyElementPropertiesToGame(properties_element);
   }
 }
 
