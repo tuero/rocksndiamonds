@@ -1,6 +1,12 @@
-Pre-Release Version 3.3.0 [?? ??? ????]
+Release Version 3.0.0 [02 AUG 2003]
 ------------------------------------------
+	- final version bumped to 3.0.0 due to the massive changes
+	- custom elements now have lots of configurable properties
+	- advanced custom element settings for powerful new elements
 	- fixed Supaplex gravity tubes
+	- added new contributed levels from the following players:
+	  + Juergen Bonhagen (with complete artwork set)
+	  + Andreas Buschbeck (with complete artwork set)
 
 Pre-Release Version 2.2.0rc7 [17 JUL 2003]
 ------------------------------------------

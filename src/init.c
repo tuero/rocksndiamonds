@@ -3195,7 +3195,16 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
+
+  TreeInfo *tst1 = getTreeInfoFromIdentifier(leveldir_first, "jue1");
+  TreeInfo *tst2 = getTreeInfoFromIdentifier(leveldir_first, "demojue");
+  printf("::: XXX 0 '%s' [%x, %x]\n", tst1->graphics_path,
+	 tst1->graphics_path, tst2->graphics_path);
+
+
   setLevelArtworkDir(artwork.gfx_first);
+
+  printf("::: XXX 1 '%s'\n", tst1->graphics_path);
 
 #if 0
   printf("::: InitImages for '%s' ['%s', '%s'] ['%s', '%s']\n",
@@ -3208,10 +3217,16 @@ static void InitImages()
 
   ReloadCustomImages();
 
+  printf("::: XXX 2 '%s'\n", tst1->graphics_path);
+
   LoadCustomElementDescriptions();
   LoadSpecialMenuDesignSettings();
 
+  printf("::: XXX 3 '%s'\n", tst1->graphics_path);
+
   ReinitializeGraphics();
+
+  printf("::: XXX 4 '%s'\n", tst1->graphics_path);
 }
 
 static void InitSound(char *identifier)

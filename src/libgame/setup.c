@@ -332,17 +332,39 @@ void setLevelArtworkDir(TreeInfo *ti)
   char **artwork_path_ptr, **artwork_set_ptr;
   TreeInfo *level_artwork;
 
+  TreeInfo *tst1 = getTreeInfoFromIdentifier(leveldir_first, "jue1");
+  printf("::: XXX 0.1 '%s'\n", tst1->graphics_path);
+
   if (ti == NULL || leveldir_current == NULL)
     return;
 
   artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
   artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
 
+  printf("::: ['%s', '%s']\n", tst1->identifier, leveldir_current->identifier);
+
+  printf("::: XXX 0.2 '%s' [%x]\n", tst1->graphics_path, tst1->graphics_path);
+
+#if 1
   if (*artwork_path_ptr != NULL)
+  {
+    if (ti->type == 0)
+      printf("::: free'ing '%s' [%x] [%x] [type %d] ...\n",
+	     *artwork_path_ptr, *artwork_path_ptr,
+	     leveldir_current->graphics_path, ti->type);
+
     free(*artwork_path_ptr);
+  }
+#endif
+
+  printf("::: XXX 0.3 '%s' [%x]\n", tst1->graphics_path, tst1->graphics_path);
 
   if ((level_artwork = getTreeInfoFromIdentifier(ti, *artwork_set_ptr)))
+  {
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
+
+    printf(":1: setting to '%s' [type %d] ...\n", *artwork_path_ptr, ti->type);
+  }
   else
   {
     /* No (or non-existing) artwork configured in "levelinfo.conf". This would
@@ -361,11 +383,19 @@ void setLevelArtworkDir(TreeInfo *ti)
     {
       *artwork_path_ptr = getStringCopy(getDefaultArtworkDir(ti->type));
       *artwork_set_ptr = getStringCopy(getDefaultArtworkSet(ti->type));
+
+      if (ti->type == 0)
+	printf(":2: setting to '%s' [type %d] ...\n",
+	       *artwork_path_ptr, ti->type);
     }
     else
     {
       *artwork_path_ptr = getStringCopy(UNDEFINED_FILENAME);
       *artwork_set_ptr = NULL;
+
+      if (ti->type == 0)
+	printf(":3: setting to '%s' [type %d] ...\n",
+	       *artwork_path_ptr, ti->type);
     }
 
     free(dir);
@@ -1497,12 +1527,14 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
     ldi->imported_from = NULL;
+
     ldi->graphics_set = NULL;
     ldi->sounds_set = NULL;
     ldi->music_set = NULL;
     ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
     ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+
     ldi->levels = 0;
     ldi->first_level = 0;
     ldi->last_level = 0;
@@ -1523,6 +1555,55 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
     return;
   }
 
+#if 1
+  /* copy all values from the parent structure */
+
+  ldi->type = parent->type;
+
+  ldi->node_top = parent->node_top;
+  ldi->node_parent = parent;
+  ldi->node_group = NULL;
+  ldi->next = NULL;
+
+  ldi->cl_first = -1;
+  ldi->cl_cursor = -1;
+
+  ldi->filename = NULL;
+  ldi->fullpath = NULL;
+  ldi->basepath = NULL;
+  ldi->identifier = NULL;
+  ldi->name = getStringCopy(ANONYMOUS_NAME);
+  ldi->name_sorting = NULL;
+  ldi->author = getStringCopy(parent->author);
+
+  ldi->sort_priority = parent->sort_priority;
+  ldi->parent_link = FALSE;
+  ldi->user_defined = parent->user_defined;
+  ldi->color = parent->color;
+  ldi->class_desc = getStringCopy(parent->class_desc);
+
+  if (ldi->type == TREE_TYPE_LEVEL_DIR)
+  {
+    ldi->imported_from = getStringCopy(parent->imported_from);
+
+    ldi->graphics_set = NULL;
+    ldi->sounds_set = NULL;
+    ldi->music_set = NULL;
+    ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
+    ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
+    ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+
+    ldi->levels = 0;
+    ldi->first_level = 0;
+    ldi->last_level = 0;
+    ldi->level_group = FALSE;
+    ldi->handicap_level = 0;
+    ldi->readonly = TRUE;
+  }
+
+
+#else
+
   /* first copy all values from the parent structure ... */
   *ldi = *parent;
 
@@ -1540,7 +1621,16 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->name = getStringCopy(ANONYMOUS_NAME);
   ldi->name_sorting = NULL;
   ldi->author = getStringCopy(parent->author);
+
   ldi->imported_from = getStringCopy(parent->imported_from);
+  ldi->class_desc = getStringCopy(parent->class_desc);
+
+  ldi->graphics_set = NULL;
+  ldi->sounds_set = NULL;
+  ldi->music_set = NULL;
+  ldi->graphics_path = NULL;
+  ldi->sounds_path = NULL;
+  ldi->music_path = NULL;
 
   ldi->level_group = FALSE;
   ldi->parent_link = FALSE;
@@ -1549,6 +1639,8 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->node_parent = parent;
   ldi->node_group = NULL;
   ldi->next = NULL;
+
+#endif
 }
 
 void setSetupInfo(struct TokenInfo *token_info,
@@ -1829,6 +1921,13 @@ void LoadLevelInfo()
 
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
+
+  {
+    TreeInfo *tst1 = getTreeInfoFromIdentifier(leveldir_first, "jue1");
+    TreeInfo *tst2 = getTreeInfoFromIdentifier(leveldir_first, "demojue");
+    printf("::: ??? 1 '%s' [%x, %x]\n", tst1->graphics_path,
+	   tst1->graphics_path, tst2->graphics_path);
+  }
 
   /* before sorting, the first entries will be from the user directory */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
@@ -2264,6 +2363,18 @@ static void SaveUserLevelInfo()
   /* always start with reliable default values */
   setTreeInfoToDefaults(&ldi, TREE_TYPE_LEVEL_DIR);
 
+#if 0
+  /* !!! FIX ME !!! */
+  setString(&ldi.name, getLoginName());
+  setString(&ldi.author, getRealName());
+  ldi.levels = 100;
+  ldi.first_level = 1;
+  ldi.sort_priority = LEVELCLASS_USER_START;
+  ldi.readonly = FALSE;
+  setString(&ldi.graphics_set, GRAPHICS_SUBDIR);
+  setString(&ldi.sounds_set, SOUNDS_SUBDIR);
+  setString(&ldi.music_set, MUSIC_SUBDIR);
+#else
   ldi.name = getStringCopy(getLoginName());
   ldi.author = getStringCopy(getRealName());
   ldi.levels = 100;
@@ -2273,6 +2384,7 @@ static void SaveUserLevelInfo()
   ldi.graphics_set = getStringCopy(GRAPHICS_SUBDIR);
   ldi.sounds_set = getStringCopy(SOUNDS_SUBDIR);
   ldi.music_set = getStringCopy(MUSIC_SUBDIR);
+#endif
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
 						 getCookie("LEVELINFO")));
