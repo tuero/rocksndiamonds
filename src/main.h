@@ -915,8 +915,6 @@ struct PlayerInfo
   unsigned long push_delay;
   unsigned long push_delay_value;
 
-  int frame_reset_delay;
-
   unsigned long actual_frame_counter;
 
   int score;

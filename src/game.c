@@ -101,10 +101,8 @@
 
 #define NUM_GAME_BUTTONS		6
 
+
 /* forward declaration for internal use */
-#if 0
-static void ResetGfxAnimation(int, int);
-#endif
 
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
@@ -651,8 +649,6 @@ void InitGame()
 
     player->actual_frame_counter = 0;
 
-    player->frame_reset_delay = 0;
-
     player->last_move_dir = MV_NO_MOVING;
     player->is_moving = FALSE;
 
@@ -1152,10 +1148,6 @@ void GameWon()
       StopSound(SND_GAME_LEVELTIME_BONUS);
   }
 
-#if 0
-  FadeSounds();
-#endif
-
   /* Hero disappears */
   DrawLevelField(ExitX, ExitY);
   BackToFront();
@@ -1266,6 +1258,15 @@ int NewHiScore()
   return position;
 }
 
+static void InitPlayerGfxAnimation(struct PlayerInfo *player, int action)
+{
+  if (player->GfxAction != action)
+  {
+    player->GfxAction = action;
+    player->Frame = 0;
+  }
+}
+
 static void ResetRandomAnimationValue(int x, int y)
 {
   GfxRandom[x][y] = INIT_GFX_RANDOM();
@@ -1273,26 +1274,8 @@ static void ResetRandomAnimationValue(int x, int y)
 
 static void ResetGfxAnimation(int x, int y)
 {
-#if 0
-#if 1
-  int element = Feld[x][y];
-  int graphic = el2img(element);
-
-  /* reset random value not until one full delay cycle was reached */
-  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-      GfxFrame[x][y] > ANIM_DELAY(graphic))
-#endif
-    ResetRandomAnimationValue(x, y);
-#endif
-
   GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
-
-#if 0
-  if (Feld[x][y] == EL_ROCK)
-    printf("ResetGfxAnimation: EL_ROCK [%d, %d]\n",
-	   JustStopped[x][y], MovDir[x][y]);
-#endif
 }
 
 void InitMovingField(int x, int y, int direction)
@@ -1816,35 +1799,6 @@ void SplashAcid(int x, int y)
 	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
       Feld[x+1][y] = EL_ACID_SPLASH_RIGHT;
   }
-
-#if 0
-  else								/* go on */
-  {
-    int graphic = (element == EL_ACID_SPLASH_LEFT ?
-		   IMG_ACID_SPLASH_LEFT :
-		   IMG_ACID_SPLASH_RIGHT);
-
-    if (!MovDelay[x][y])	/* initialize animation counter */
-      MovDelay[x][y] = 9;
-
-    if (MovDelay[x][y])		/* continue animation */
-    {
-      MovDelay[x][y]--;
-      if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      {
-	int frame = getGraphicAnimationFrame(graphic, 8 - MovDelay[x][y]);
-
-        DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-      }
-
-      if (!MovDelay[x][y])
-      {
-	Feld[x][y] = EL_EMPTY;
-	DrawLevelField(x, y);
-      }
-    }
-  }
-#endif
 }
 
 static void InitBeltMovement()
@@ -2171,16 +2125,11 @@ void Impact(int x, int y)
     return;
   }
 
-#if 1
   if (lastline || object_hit)
   {
-#if 0
-    MovDir[x][y] = 0;
-#endif
     ResetGfxAnimation(x, y);
     DrawLevelField(x, y);
   }
-#endif
 
   if ((element == EL_BOMB ||
        element == EL_SP_DISK_ORANGE ||
@@ -2338,13 +2287,6 @@ void Impact(int x, int y)
 
     return;
   }
-
-#if 0
-  printf("::: -> %d,%d [%d]\n", element, ACTION_IMPACT,
-	 element_info[element].sound[ACTION_IMPACT]);
-
-  PlaySound(177);
-#endif
 
   /* play sound of object that hits the ground */
   if (lastline || object_hit)
@@ -3048,15 +2990,8 @@ void StartMoving(int x, int y)
 	  element != EL_DARK_YAMYAM &&
 	  element != EL_PACMAN)
       {
-#if 0
-  if (element == EL_SPRING)
-    printf("1--> %d\n", MovDir[x][y]);
-#endif
 	TurnRound(x, y);
-#if 0
-  if (element == EL_SPRING)
-    printf("2--> %d\n", MovDir[x][y]);
-#endif
+
 	if (MovDelay[x][y] && (element == EL_BUG ||
 			       element == EL_SPACESHIP ||
 			       element == EL_SP_SNIKSNAK ||
@@ -3074,29 +3009,8 @@ void StartMoving(int x, int y)
 	  element == EL_YAMYAM ||
 	  element == EL_DARK_YAMYAM)
       {
-#if 1
 	DrawLevelElementAnimationIfNeeded(x, y, element);
-#else
-	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-	{
-	  int graphic = el2img(element);
-	  int frame = getGraphicAnimationFrame(graphic, MovDelay[x][y] % 8);
-
-	  DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-	}
-#endif
-
-#if 1
 	PlaySoundLevelAction(x, y, ACTION_WAITING);
-#else
-	if (MovDelay[x][y] % 4 == 3)
-	{
-	  if (element == EL_YAMYAM)
-	    PlaySoundLevel(x, y, SND_YAMYAM_WAITING);
-	  else if (element == EL_DARK_YAMYAM)
-	    PlaySoundLevel(x, y, SND_DARK_YAMYAM_WAITING);
-	}
-#endif
       }
       else if (element == EL_SP_ELECTRON)
 	DrawLevelElementAnimationIfNeeded(x, y, element);
@@ -3496,16 +3410,10 @@ void ContinueMoving(int x, int y)
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     MovDelay[newx][newy] = 0;
 
-#if 0
-    /* all done in "InitMovingField()" */
-    GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
-    GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
-#endif
-
     /* copy animation control values to new field */
     GfxFrame[newx][newy]  = GfxFrame[x][y];
-    GfxAction[newx][newy] = GfxAction[x][y];
-    GfxRandom[newx][newy] = GfxRandom[x][y];
+    GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
+    GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
 
     ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
@@ -3546,15 +3454,6 @@ void ContinueMoving(int x, int y)
   }
   else				/* still moving on */
   {
-#if 0
-    if (GfxAction[x][y] == ACTION_DEFAULT)
-    {
-      printf("reset GfxAction...\n");
-
-      GfxAction[x][y] = ACTION_MOVING;
-    }
-#endif
-
     DrawLevelField(x, y);
   }
 }
@@ -4104,47 +4003,37 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (Feld[x][y] == EL_BD_DIAMOND)
-#if 0
-    DrawLevelElementAnimation(x, y, el2img(Feld[x][y]));
-#else
     return;
-#endif
-  else
+
+  if (MovDelay[x][y] == 0)	/* next animation frame */
+    MovDelay[x][y] = 11 * !SimpleRND(500);
+
+  if (MovDelay[x][y] != 0)	/* wait some time before next frame */
   {
-    if (MovDelay[x][y] == 0)	/* next animation frame */
-      MovDelay[x][y] = 11 * !SimpleRND(500);
+    MovDelay[x][y]--;
 
-    if (MovDelay[x][y] != 0)	/* wait some time before next frame */
+    if (setup.direct_draw && MovDelay[x][y])
+      SetDrawtoField(DRAW_BUFFERED);
+
+    DrawLevelElementAnimation(x, y, Feld[x][y]);
+
+    if (MovDelay[x][y] != 0)
     {
-      MovDelay[x][y]--;
+      int frame = getGraphicAnimationFrame(IMG_TWINKLE_WHITE,
+					   10 - MovDelay[x][y]);
 
-      if (setup.direct_draw && MovDelay[x][y])
-	SetDrawtoField(DRAW_BUFFERED);
+      DrawGraphicThruMask(SCREENX(x), SCREENY(y), IMG_TWINKLE_WHITE, frame);
 
-#if 0
-      DrawGraphic(SCREENX(x), SCREENY(y), el2img(Feld[x][y]), 0);
-#else
-      DrawLevelElementAnimation(x, y, Feld[x][y]);
-#endif
-
-      if (MovDelay[x][y] != 0)
+      if (setup.direct_draw)
       {
-	int frame = getGraphicAnimationFrame(IMG_TWINKLE_WHITE,
-					     10 - MovDelay[x][y]);
+	int dest_x, dest_y;
 
-	DrawGraphicThruMask(SCREENX(x), SCREENY(y), IMG_TWINKLE_WHITE, frame);
+	dest_x = FX + SCREENX(x) * TILEX;
+	dest_y = FY + SCREENY(y) * TILEY;
 
-	if (setup.direct_draw)
-	{
-	  int dest_x, dest_y;
-
-	  dest_x = FX + SCREENX(x) * TILEX;
-	  dest_y = FY + SCREENY(y) * TILEY;
-
-	  BlitBitmap(drawto_field, window,
-		     dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);
-	  SetDrawtoField(DRAW_DIRECT);
-	}
+	BlitBitmap(drawto_field, window,
+		   dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);
+	SetDrawtoField(DRAW_DIRECT);
       }
     }
   }
@@ -4449,9 +4338,6 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
-#if 0
-  static boolean save_tape_entry = FALSE;
-#endif
   boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
@@ -4470,11 +4356,6 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 
   if (player_action)
   {
-#if 0
-    save_tape_entry = TRUE;
-#endif
-    player->frame_reset_delay = 0;
-
     if (button1)
       snapped = SnapField(player, dx, dy);
     else
@@ -4493,20 +4374,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       }
     }
 
-#if 0
-    if (tape.recording && (moved || snapped || bombed))
-    {
-      if (bombed && !moved)
-	player_action &= JOY_BUTTON;
-
-      stored_player_action[player->index_nr] = player_action;
-      save_tape_entry = TRUE;
-    }
-    else if (tape.playing && snapped)
-      SnapField(player, 0, 0);			/* stop snapping */
-#else
     stored_player_action[player->index_nr] = player_action;
-#endif
   }
   else
   {
@@ -4516,74 +4384,17 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
-#if 1
+    InitPlayerGfxAnimation(player, ACTION_DEFAULT);
+
     if (player->MovPos == 0)	/* needed for tape.playing */
       player->is_moving = FALSE;
-#endif
-#if 0
-    if (player->MovPos == 0)	/* needed for tape.playing */
-      player->last_move_dir = MV_NO_MOVING;
-
-    /* !!! CHECK THIS AGAIN !!!
-       (Seems to be needed for some EL_ROBOT stuff, but breaks
-       tapes when walking through pipes!)
-    */
-
-    /* it seems that "player->last_move_dir" is misused as some sort of
-       "player->is_just_moving_in_this_moment", which is needed for the
-       robot stuff (robots don't kill players when they are moving)
-    */
-#endif 
-
-    /* if the player does not move for some time, reset animation to start */
-    if (++player->frame_reset_delay > player->move_delay_value)
-      player->Frame = 0;
   }
 
-#if 0
-  if (tape.recording && num_stored_actions >= MAX_PLAYERS && save_tape_entry)
-  {
-    TapeRecordAction(stored_player_action);
-    num_stored_actions = 0;
-    save_tape_entry = FALSE;
-  }
-#else
   if (tape.recording && num_stored_actions >= MAX_PLAYERS)
   {
     TapeRecordAction(stored_player_action);
     num_stored_actions = 0;
   }
-#endif
-
-#if 0
-  if (tape.playing && !tape.pausing && !player_action &&
-      tape.counter < tape.length)
-  {
-    int jx = player->jx, jy = player->jy;
-    int next_joy =
-      tape.pos[tape.counter].action[player->index_nr] & (JOY_LEFT|JOY_RIGHT);
-
-    if ((next_joy == JOY_LEFT || next_joy == JOY_RIGHT) &&
-	(player->MovDir != JOY_UP && player->MovDir != JOY_DOWN))
-    {
-      int dx = (next_joy == JOY_LEFT ? -1 : +1);
-
-      if (IN_LEV_FIELD(jx+dx, jy) && IS_PUSHABLE(Feld[jx+dx][jy]))
-      {
-	int el = Feld[jx+dx][jy];
-	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SATELLITE ? 2 :
-			  (el == EL_BALLOON || el == EL_SPRING) ? 0 : 10);
-
-	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
-	{
-	  player->MovDir = next_joy;
-	  player->Frame = FrameCounter % 4;
-	  player->Pushing = TRUE;
-	}
-      }
-    }
-  }
-#endif
 }
 
 void GameActions()
@@ -4674,29 +4485,11 @@ void GameActions()
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
-
-
-#ifdef DEBUG
-#if 0
-  if (TimeFrames == 0 && local_player->active)
-  {
-    extern unsigned int last_RND();
-
-    printf("DEBUG: %03d last RND was %d \t [state checksum is %d]\n",
-	   TimePlayed, last_RND(), getStateCheckSum(TimePlayed));
-  }
-#endif
-#endif
-
-#ifdef DEBUG
-#if 0
-  if (GameFrameDelay >= 500)
-    printf("FrameCounter == %d\n", FrameCounter);
-#endif
-#endif
-
   FrameCounter++;
   TimeFrames++;
+
+  for (i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].Frame++;
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
@@ -5365,13 +5158,13 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     }
   }
 
+#if 0
+#if 1
+  InitPlayerGfxAnimation(player, ACTION_DEFAULT);
+#else
   if (!(moved & MF_MOVING) && !player->Pushing)
     player->Frame = 0;
-  else
-#if 0
-    player->Frame = (player->Frame + 1) % 4;
-#else
-    player->Frame += 1 * 0;
+#endif
 #endif
 
   if (moved & MF_MOVING)
@@ -5417,8 +5210,6 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   {
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
-    if (player->Frame)
-      player->Frame += 1;
 
     if (Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
@@ -5431,7 +5222,6 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
-  player->Frame += 1;
 
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_EMPTY;

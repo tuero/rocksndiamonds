@@ -560,7 +560,9 @@ void DrawPlayer(struct PlayerInfo *player)
   if (element == EL_EXPLOSION)
     return;
 
-  /* draw things in the field the player is leaving, if needed */
+  /* ----------------------------------------------------------------------- */
+  /* draw things in the field the player is leaving, if needed               */
+  /* ----------------------------------------------------------------------- */
 
   if (player_is_moving)
   {
@@ -598,7 +600,9 @@ void DrawPlayer(struct PlayerInfo *player)
   if (setup.direct_draw)
     SetDrawtoField(DRAW_BUFFERED);
 
-  /* draw things behind the player, if needed */
+  /* ----------------------------------------------------------------------- */
+  /* draw things behind the player, if needed                                */
+  /* ----------------------------------------------------------------------- */
 
   if (Store[jx][jy])
     DrawLevelElement(jx, jy, Store[jx][jy]);
@@ -607,96 +611,32 @@ void DrawPlayer(struct PlayerInfo *player)
   else
     DrawLevelElement(jx, jy, EL_EMPTY);
 
-  /* draw player himself */
+  /* ----------------------------------------------------------------------- */
+  /* draw player himself                                                     */
+  /* ----------------------------------------------------------------------- */
+
+  player->GfxAction = (player->Pushing ? ACTION_PUSHING :
+		       player->is_digging ? ACTION_DIGGING :
+		       player->is_moving ? ACTION_MOVING :
+		       player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
 
   if (player->use_murphy_graphic)
   {
-    static int last_dir = MV_LEFT;
-    int action = (player->programmed_action ? player->programmed_action :
-		  player->action);
-    boolean action_moving =
-      (player_is_moving ||
-       ((action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
-	!(action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN))));
-
-    graphic = IMG_SP_MURPHY;
-
-    if (player->Pushing)
-    {
-      if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_PUSHING_LEFT;
-      else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_PUSHING_RIGHT;
-      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_PUSHING_LEFT;
-      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_PUSHING_RIGHT;
-    }
-    else if (player->snapped)
-    {
-      if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_SNAPPING_LEFT;
-      else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_SNAPPING_RIGHT;
-      else if (player->MovDir == MV_UP)
-	graphic = IMG_SP_MURPHY_SNAPPING_UP;
-      else if (player->MovDir == MV_DOWN)
-	graphic = IMG_SP_MURPHY_SNAPPING_DOWN;
-    }
-    else if (action_moving)
-    {
-      if (player->MovDir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_MOVING_LEFT;
-      else if (player->MovDir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_MOVING_RIGHT;
-      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
-	graphic = IMG_SP_MURPHY_MOVING_LEFT;
-      else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
-	graphic = IMG_SP_MURPHY_MOVING_RIGHT;
-      else
-	graphic = IMG_SP_MURPHY_MOVING_LEFT;
-
-      frame = getGraphicAnimationFrame(graphic, -1);
-    }
+    static int last_horizontal_dir = MV_LEFT;
+    int direction;
 
     if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
-      last_dir = player->MovDir;
+      last_horizontal_dir = player->MovDir;
+
+    direction = (player->snapped ? player->MovDir : last_horizontal_dir);
+
+    graphic = el_act_dir2img(EL_SP_MURPHY, player->GfxAction, direction);
   }
   else
-  {
-    if (player->MovDir == MV_LEFT)
-      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_LEFT :
-		 player->is_digging ? IMG_PLAYER1_DIGGING_LEFT :
-		 player->is_moving ? IMG_PLAYER1_MOVING_LEFT :
-		 player->snapped ? IMG_PLAYER1_SNAPPING_LEFT :
-		 IMG_PLAYER1_LEFT);
-    else if (player->MovDir == MV_RIGHT)
-      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_RIGHT :
-		 player->is_digging ? IMG_PLAYER1_DIGGING_RIGHT :
-		 player->is_moving ? IMG_PLAYER1_MOVING_RIGHT :
-		 player->snapped ? IMG_PLAYER1_SNAPPING_RIGHT :
-		 IMG_PLAYER1_RIGHT);
-    else if (player->MovDir == MV_UP)
-      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_UP :
-		 player->is_digging ? IMG_PLAYER1_DIGGING_UP :
-		 player->is_moving ? IMG_PLAYER1_MOVING_UP :
-		 player->snapped ? IMG_PLAYER1_SNAPPING_UP :
-		 IMG_PLAYER1_UP);
-    else	/* MV_DOWN || MV_NO_MOVING */
-      graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_DOWN :
-		 player->is_digging ? IMG_PLAYER1_DIGGING_DOWN :
-		 player->is_moving ? IMG_PLAYER1_MOVING_DOWN :
-		 player->snapped ? IMG_PLAYER1_SNAPPING_DOWN :
-		 IMG_PLAYER1_DOWN);
+    graphic = el_act_dir2img(player->element_nr, player->GfxAction,
+			     player->MovDir);
 
-    graphic = PLAYER_NR_GFX(graphic, player->index_nr);
-
-#if 0
-    frame = player->Frame;
-#else
-    frame = getGraphicAnimationFrame(graphic, player->Frame);
-#endif
-  }
+  frame = getGraphicAnimationFrame(graphic, player->Frame);
 
   if (player->GfxPos)
   {
@@ -709,11 +649,6 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!setup.soft_scrolling && ScreenMovPos)
     sxx = syy = 0;
 
-#if 0
-  if (player->Frame)
-    printf("-> %d\n", player->Frame);
-#endif
-
   DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
 
   if (SHIELD_ON(player))
@@ -725,11 +660,11 @@ void DrawPlayer(struct PlayerInfo *player)
     DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
   }
 
-#if 0
-  if (player->Pushing && player->GfxPos)
-#else
+  /* ----------------------------------------------------------------------- */
+  /* draw things the player is pushing, if needed                            */
+  /* ----------------------------------------------------------------------- */
+
   if (player->Pushing && player_is_moving)
-#endif
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
@@ -742,35 +677,12 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       int element = Feld[next_jx][next_jy];
       int graphic = el2img(element);
-#if 1
       int frame = 0;
-#endif
 
       if ((sxx || syy) && IS_PUSHABLE(element))
       {
 	graphic = el_act_dir2img(element, ACTION_MOVING, player->MovDir);
-#if 1
-	frame = getGraphicAnimationFrame(graphic, player->GfxPos);
-
 	frame = getGraphicAnimationFrame(graphic, player->Frame);
-#endif
-
-#if 0
-	printf("-> %d [%d]\n", player->Frame, player->GfxPos);
-#endif
-
-#if 0
-	/* !!! FIX !!! */
-	if (player->MovDir == MV_LEFT)
-	  frame = 3 - frame;
-#endif
-
-#if 0
-	frame = (player->GfxPos / (TILEX / 4));
-
-	if (player->MovDir == MV_RIGHT)
-	  frame = (frame + 4) % 4;
-#endif
       }
 
       DrawGraphicShifted(px, py, sxx, syy, graphic, frame,
@@ -778,32 +690,14 @@ void DrawPlayer(struct PlayerInfo *player)
     }
   }
 
-  /* draw things in front of player (active dynamite or dynabombs) */
+  /* ----------------------------------------------------------------------- */
+  /* draw things in front of player (active dynamite or dynabombs)           */
+  /* ----------------------------------------------------------------------- */
 
   if (IS_ACTIVE_BOMB(element))
   {
     graphic = el2img(element);
-
-#if 0
-    if (element == EL_DYNAMITE_ACTIVE)
-    {
-      if ((frame = (96 - MovDelay[jx][jy]) / 12) > 6)
-	frame = 6;
-    }
-    else
-    {
-      if ((frame = ((96 - MovDelay[jx][jy]) / 6) % 8) > 3)
-	frame = 7 - frame;
-    }
-#else
-
-#if 0
-    frame = getGraphicAnimationFrame(graphic, 96 - MovDelay[jx][jy]);
-#else
     frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
-#endif
-
-#endif
 
     if (game.emulation == EMU_SUPAPLEX)
       DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
@@ -825,7 +719,10 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
   }
 
-  /* draw elements that stay over the player */
+  /* ----------------------------------------------------------------------- */
+  /* draw elements that stay over the player                                 */
+  /* ----------------------------------------------------------------------- */
+
   /* handle the field the player is leaving ... */
   if (player_is_moving && IS_OVER_PLAYER(last_element))
     DrawLevelField(last_jx, last_jy);

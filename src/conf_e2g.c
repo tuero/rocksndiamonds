@@ -201,22 +201,6 @@ element_to_graphic[] =
     IMG_SP_MURPHY
   },
   {
-    EL_SP_MURPHY,				-1, MV_BIT_LEFT,
-    IMG_SP_MURPHY_LEFT
-  },
-  {
-    EL_SP_MURPHY,				-1, MV_BIT_RIGHT,
-    IMG_SP_MURPHY_RIGHT
-  },
-  {
-    EL_SP_MURPHY,				-1, MV_BIT_UP,
-    IMG_SP_MURPHY_UP
-  },
-  {
-    EL_SP_MURPHY,				-1, MV_BIT_DOWN,
-    IMG_SP_MURPHY_DOWN
-  },
-  {
     EL_SP_MURPHY,				ACTION_MOVING, MV_BIT_LEFT,
     IMG_SP_MURPHY_MOVING_LEFT
   },
