@@ -2661,36 +2661,48 @@ element_to_graphic[] =
     IMG_CHAR_Z
   },
   {
-    EL_CHAR_AE,					-1, -1,
-    IMG_CHAR_AE
+    EL_CHAR_BRACKETLEFT,			-1, -1,
+    IMG_CHAR_BRACKETLEFT
   },
   {
-    EL_CHAR_OE,					-1, -1,
-    IMG_CHAR_OE
+    EL_CHAR_BACKSLASH,				-1, -1,
+    IMG_CHAR_BACKSLASH
   },
   {
-    EL_CHAR_UE,					-1, -1,
-    IMG_CHAR_UE
+    EL_CHAR_BRACKETRIGHT,			-1, -1,
+    IMG_CHAR_BRACKETRIGHT
   },
   {
-    EL_CHAR_COPYRIGHT,				-1, -1,
-    IMG_CHAR_COPYRIGHT
+    EL_CHAR_ASCIICIRCUM,			-1, -1,
+    IMG_CHAR_ASCIICIRCUM
   },
   {
     EL_CHAR_UNDERSCORE,				-1, -1,
     IMG_CHAR_UNDERSCORE
   },
   {
-    EL_CHAR_EMPTY,				-1, -1,
-    IMG_CHAR_EMPTY
+    EL_CHAR_COPYRIGHT,				-1, -1,
+    IMG_CHAR_COPYRIGHT
+  },
+  {
+    EL_CHAR_AUMLAUT,				-1, -1,
+    IMG_CHAR_AUMLAUT
+  },
+  {
+    EL_CHAR_OUMLAUT,				-1, -1,
+    IMG_CHAR_OUMLAUT
+  },
+  {
+    EL_CHAR_UUMLAUT,				-1, -1,
+    IMG_CHAR_UUMLAUT
   },
   {
     EL_CHAR_DEGREE,				-1, -1,
     IMG_CHAR_DEGREE
   },
   {
-    EL_CHAR_TM,					-1, -1,
-    IMG_CHAR_TM
+    EL_CHAR_TRADEMARK,				-1, -1,
+    IMG_CHAR_TRADEMARK
   },
   {
     EL_CHAR_CURSOR,				-1, -1,

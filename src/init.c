@@ -383,6 +383,13 @@ void InitFontGraphicInfo()
       int font_bitmap_id = font_info[i].special_bitmap_id[j];
       int graphic = font_info[i].special_graphic[j];
 
+      /* set 'graphic_info' for font entries, if uninitialized */
+      if (graphic_info[graphic].anim_frames < MIN_NUM_CHARS_PER_FONT)
+      {
+	graphic_info[graphic].anim_frames = DEFAULT_NUM_CHARS_PER_FONT;
+	graphic_info[graphic].anim_frames_per_line= DEFAULT_NUM_CHARS_PER_LINE;
+      }
+
       /* copy font relevant information from graphics information */
       font_bitmap_info[font_bitmap_id].bitmap = graphic_info[graphic].bitmap;
       font_bitmap_info[font_bitmap_id].src_x  = graphic_info[graphic].src_x;
@@ -391,6 +398,11 @@ void InitFontGraphicInfo()
       font_bitmap_info[font_bitmap_id].height = graphic_info[graphic].height;
       font_bitmap_info[font_bitmap_id].draw_x = graphic_info[graphic].draw_x;
       font_bitmap_info[font_bitmap_id].draw_y = graphic_info[graphic].draw_y;
+
+      font_bitmap_info[font_bitmap_id].num_chars =
+	graphic_info[graphic].anim_frames;
+      font_bitmap_info[font_bitmap_id].num_chars_per_line =
+	graphic_info[graphic].anim_frames_per_line;
     }
   }
 
@@ -563,9 +575,8 @@ void InitElementSpecialGraphicInfo()
 static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
-  int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
-  int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
   int parameter[NUM_GFX_ARGS];
+  int num_xtiles = 1, num_ytiles = 1;
   int i;
 
   /* get integer values from string parameters */
@@ -602,21 +613,21 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].height = parameter[GFX_ARG_HEIGHT];
 
+  if (src_bitmap)
+  {
+    num_xtiles = src_bitmap->width  / graphic_info[graphic].width;
+    num_ytiles = src_bitmap->height / graphic_info[graphic].height;
+  }
+
   /* correct x or y offset dependant of vertical or horizontal frame order */
   if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
-  {
-    if (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE)
-      graphic_info[graphic].offset_y = parameter[GFX_ARG_OFFSET];
-    else
-      graphic_info[graphic].offset_y = graphic_info[graphic].height;
-  }
+    graphic_info[graphic].offset_y =
+      (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
+       parameter[GFX_ARG_OFFSET] : graphic_info[graphic].height);
   else					/* frames are ordered horizontally */
-  {
-    if (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE)
-      graphic_info[graphic].offset_x = parameter[GFX_ARG_OFFSET];
-    else
-      graphic_info[graphic].offset_x = graphic_info[graphic].width;
-  }
+    graphic_info[graphic].offset_x =
+      (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
+       parameter[GFX_ARG_OFFSET] : graphic_info[graphic].width);
 
   /* optionally, the x and y offset of frames can be specified directly */
   if (parameter[GFX_ARG_XOFFSET] != ARG_UNDEFINED_VALUE)
@@ -634,14 +645,17 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   else
     graphic_info[graphic].anim_frames = 1;
 
+  graphic_info[graphic].anim_frames_per_line =
+    (parameter[GFX_ARG_FRAMES_PER_LINE] != ARG_UNDEFINED_VALUE ?
+     parameter[GFX_ARG_FRAMES_PER_LINE] : graphic_info[graphic].anim_frames);
+
   graphic_info[graphic].anim_delay = parameter[GFX_ARG_DELAY];
   if (graphic_info[graphic].anim_delay == 0)	/* delay must be at least 1 */
     graphic_info[graphic].anim_delay = 1;
 
-  if (parameter[GFX_ARG_ANIM_MODE] != ANIM_NONE)
-    graphic_info[graphic].anim_mode = parameter[GFX_ARG_ANIM_MODE];
-  else if (graphic_info[graphic].anim_frames > 1)
-    graphic_info[graphic].anim_mode = ANIM_LOOP;
+  graphic_info[graphic].anim_mode = parameter[GFX_ARG_ANIM_MODE];
+  if (graphic_info[graphic].anim_frames == 1)
+    graphic_info[graphic].anim_mode = ANIM_NONE;
 
   /* automatically determine correct start frame, if not defined */
   if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
@@ -2534,6 +2548,12 @@ void InitGfx()
 	  font_initial[j].height = atoi(image_config[i].value);
       }
     }
+  }
+
+  for (j=0; j < NUM_INITIAL_FONTS; j++)
+  {
+    font_initial[j].num_chars = DEFAULT_NUM_CHARS_PER_FONT;
+    font_initial[j].num_chars_per_line = DEFAULT_NUM_CHARS_PER_LINE;
   }
 
   if (filename_font_initial == NULL)	/* should not happen */

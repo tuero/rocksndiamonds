@@ -995,64 +995,64 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "letter 'Z'"
   },
   {
-    "char_ae",
+    "char_bracketleft",
     "char",
-    "letter 'Ä'"
+    "letter '['"
   },
   {
-    "char_oe",
+    "char_backslash",
     "char",
-    "letter 'Ö'"
+    "letter '\\'"
   },
   {
-    "char_ue",
+    "char_bracketright",
     "char",
-    "letter 'Ü'"
+    "letter ']'"
   },
   {
-    "char_copyright",
+    "char_asciicircum",
     "char",
     "letter '^'"
   },
   {
     "char_underscore",
     "char",
-    "letter ''"
+    "letter '_'"
   },
   {
-    "char_empty",
+    "char_copyright",
     "char",
-    "letter ''"
+    "letter '©'"
+  },
+  {
+    "char_aumlaut",
+    "char",
+    "letter 'Ä'"
+  },
+  {
+    "char_oumlaut",
+    "char",
+    "letter 'Ö'"
+  },
+  {
+    "char_uumlaut",
+    "char",
+    "letter 'Ü'"
   },
   {
     "char_degree",
     "char",
-    "letter ''"
+    "letter '°'"
   },
   {
-    "char_tm",
+    "char_trademark",
     "char",
-    "letter ''"
+    "letter '®'"
   },
   {
     "char_cursor",
     "char",
-    "letter ''"
-  },
-  {
-    "char_unused",
-    "char",
-    "letter ''"
-  },
-  {
-    "char_unused",
-    "char",
-    "letter ''"
-  },
-  {
-    "char_unused",
-    "char",
-    "letter ''"
+    "letter ' '"
   },
   {
     "char_unused",

@@ -22,8 +22,6 @@
 /* font functions                                                            */
 /* ========================================================================= */
 
-#define NUM_FONT_CHARS		(FONT_LINES_PER_FONT * FONT_CHARS_PER_LINE)
-
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 static GC	font_clip_gc = None;
 
@@ -41,7 +39,10 @@ static void InitFontClipmasks()
   if (!clipmasks_initialized)
   {
     for (i=0; i < gfx.num_fonts; i++)
+    {
       gfx.font_bitmap_info[i].clip_mask = NULL;
+      gfx.font_bitmap_info[i].last_num_chars = 0;
+    }
 
     clipmasks_initialized = TRUE;
   }
@@ -49,11 +50,12 @@ static void InitFontClipmasks()
   for (i=0; i < gfx.num_fonts; i++)
   {
     if (gfx.font_bitmap_info[i].clip_mask)
-      for (j=0; j < NUM_FONT_CHARS; j++)
+      for (j=0; j < gfx.font_bitmap_info[i].last_num_chars; j++)
 	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
     free(gfx.font_bitmap_info[i].clip_mask);
 
     gfx.font_bitmap_info[i].clip_mask = NULL;
+    gfx.font_bitmap_info[i].last_num_chars = 0;
   }
 
   if (font_clip_gc)
@@ -84,14 +86,15 @@ static void InitFontClipmasks()
       continue;
 
     gfx.font_bitmap_info[i].clip_mask =
-      checked_calloc(NUM_FONT_CHARS * sizeof(Pixmap));
+      checked_calloc(gfx.font_bitmap_info[i].num_chars * sizeof(Pixmap));
+    gfx.font_bitmap_info[i].last_num_chars = gfx.font_bitmap_info[i].num_chars;
 
-    for (j=0; j < NUM_FONT_CHARS; j++)
+    for (j=0; j < gfx.font_bitmap_info[i].num_chars; j++)
     {
       Bitmap *src_bitmap = gfx.font_bitmap_info[i].bitmap;
       Pixmap src_pixmap = src_bitmap->clip_mask;
-      int xpos = j % FONT_CHARS_PER_LINE;
-      int ypos = j / FONT_CHARS_PER_LINE;
+      int xpos = j % gfx.font_bitmap_info[i].num_chars_per_line;
+      int ypos = j / gfx.font_bitmap_info[i].num_chars_per_line;
       int width  = gfx.font_bitmap_info[i].width;
       int height = gfx.font_bitmap_info[i].height;
       int src_x = gfx.font_bitmap_info[i].src_x + xpos * width;
@@ -141,27 +144,33 @@ int getFontHeight(int font_nr)
   return gfx.font_bitmap_info[font_bitmap_id].height;
 }
 
-boolean getFontChar(int font_nr, char c, int *src_x, int *src_y)
+static char getFontCharPosition(int font_nr, char c)
 {
   int font_bitmap_id = gfx.select_font_function(font_nr);
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+  boolean default_font = (font->num_chars == DEFAULT_NUM_CHARS_PER_FONT);
+  int font_pos = c - 32;
 
-  if ((c >= 32 && c <= 95) || c == '°' || c == '´' || c == '|')
-  {
-    *src_x = font->src_x + ((c - 32) % FONT_CHARS_PER_LINE) * font->width;
-    *src_y = font->src_y + ((c - 32) / FONT_CHARS_PER_LINE) * font->height;
+  /* map some special characters to their ascii values in default font */
+  if (default_font)
+    font_pos = MAP_FONT_ASCII(c) - 32;
 
-    /* map '°' and 'TM' signs and cursor */
-    if (c == '°' || c == '´' || c == '|')
-    {
-      *src_x = font->src_x + FONT_CHARS_PER_LINE * font->width;
-      *src_y = font->src_y + (c == '°' ? 1 : c == '´' ? 2 : 3) * font->height;
-    }
+  /* this allows dynamic special characters together with special font */
+  if (font_pos < 0 || font_pos >= font->num_chars)
+    font_pos = 0;
 
-    return TRUE;
-  }
+  return font_pos;
+}
 
-  return FALSE;
+void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
+{
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+  struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+  int font_pos = getFontCharPosition(font_nr, c);
+
+  *bitmap = font->bitmap;
+  *x = font->src_x + (font_pos % font->num_chars_per_line) * font->width;
+  *y = font->src_y + (font_pos / font->num_chars_per_line) * font->height;
 }
 
 void DrawInitText(char *text, int ypos, int font_nr)
@@ -230,8 +239,11 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 {
   int font_bitmap_id = gfx.select_font_function(font_nr);
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
   boolean print_inverse = FALSE;
   boolean print_inverse_cursor = FALSE;
+  Bitmap *src_bitmap;
   int src_x, src_y;
 
   if (font->bitmap == NULL)
@@ -254,76 +266,67 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
       continue;
     }
 
-    if (c >= 'a' && c <= 'z')
-      c = 'A' + (c - 'a');
-    else if (c == 'ä' || c == 'Ä')
-      c = 91;
-    else if (c == 'ö' || c == 'Ö')
-      c = 92;
-    else if (c == 'ü' || c == 'Ü')
-      c = 93;
-    else if (c == '[' || c == ']')	/* map to normal braces */
-      c = (c == '[' ? '(' : ')');
-    else if (c == '\\')			/* bad luck ... */
-      c = '/';
+    getFontCharSource(font_nr, c, &src_bitmap, &src_x, &src_y);
 
-    if (getFontChar(font_nr, c, &src_x, &src_y))
+    if (print_inverse)		/* special mode for text gadgets */
     {
-      if (print_inverse)	/* special mode for text gadgets */
-      {
 #if defined(TARGET_SDL)
-	/* blit normally (non-masked) */
-	BlitBitmap(font->bitmap, dst_bitmap, src_x, src_y,
-		   font->width, font->height, dst_x, dst_y);
+      /* blit normally (non-masked) */
+      BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y,
+		 font_width, font_height, dst_x, dst_y);
 
-	/* invert character */
-	SDLInvertArea(dst_bitmap, dst_x, dst_y, font->width, font->height,
-		      gfx.inverse_text_color);
+      /* invert character */
+      SDLInvertArea(dst_bitmap, dst_x, dst_y, font_width, font_height,
+		    gfx.inverse_text_color);
 #else
-	/* first step: draw solid colored rectangle (use "cursor" character) */
-	if (print_inverse_cursor)
-	  BlitBitmap(font->bitmap, dst_bitmap,
-		     font->src_x + FONT_CHARS_PER_LINE * font->width,
-		     font->src_y + 3 * font->height,
-		     font->width, font->height, dst_x, dst_y);
-
-	/* second step: draw masked black rectangle (use "space" character) */
-	SetClipOrigin(font->bitmap, font->bitmap->stored_clip_gc,
-		      dst_x - src_x, dst_y - src_y);
-	BlitBitmapMasked(font->bitmap, dst_bitmap,
-			 0, 0, font->width, font->height, dst_x, dst_y);
-#endif
-      }
-      else if (mask_mode == BLIT_MASKED)
+      /* first step: draw solid colored rectangle (use "cursor" character) */
+      if (print_inverse_cursor)
       {
-	/* clear font character background */
-	ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,
-				   font->width, font->height);
+	Bitmap *cursor_bitmap;
+	int cursor_x, cursor_y;
+
+	getFontCharSource(font_nr, FONT_ASCII_CURSOR, &cursor_bitmap,
+			  &cursor_x, &cursor_y);
+
+	BlitBitmap(cursor_bitmap, dst_bitmap, cursor_x, cursor_y,
+		   font_width, font_height, dst_x, dst_y);
+      }
+
+      /* second step: draw masked black rectangle (use "space" character) */
+      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
+      BlitBitmapMasked(src_bitmap, dst_bitmap, 0, 0,
+		       font_width, font_height, dst_x, dst_y);
+#endif
+    }
+    else if (mask_mode == BLIT_MASKED)
+    {
+      /* clear font character background */
+      ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,
+				 font_width, font_height);
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-	/* use special font tile clipmasks */
-	{
-	  int font_char = (c >= 32 && c <= 95 ? c - 32 : 0);
+      /* use special font tile clipmasks */
+      {
+	int font_pos = getFontCharPosition(font_nr, c);
 
-	  SetClipMask(font->bitmap, font_clip_gc,
-		      font->clip_mask[font_char]);
-	  SetClipOrigin(font->bitmap, font_clip_gc, dst_x, dst_y);
-	}
+	SetClipMask(src_bitmap, font_clip_gc, font->clip_mask[font_pos]);
+	SetClipOrigin(src_bitmap, font_clip_gc, dst_x, dst_y);
+      }
 #else
-	SetClipOrigin(font->bitmap, font->bitmap->stored_clip_gc,
-		      dst_x - src_x, dst_y - src_y);
+      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
 #endif
 
-	BlitBitmapMasked(font->bitmap, dst_bitmap, src_x, src_y,
-			 font->width, font->height, dst_x, dst_y);
-      }
-      else	/* normal, non-masked font blitting */
-      {
-	BlitBitmap(font->bitmap, dst_bitmap, src_x, src_y,
-		   font->width, font->height, dst_x, dst_y);
-      }
+      BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y,
+		       font_width, font_height, dst_x, dst_y);
+    }
+    else	/* normal, non-masked font blitting */
+    {
+      BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y,
+		 font_width, font_height, dst_x, dst_y);
     }
 
-    dst_x += font->width;
+    dst_x += font_width;
   }
 }

@@ -1363,17 +1363,22 @@ static int editor_el_chars[] =
   EL_CHAR('X'),
   EL_CHAR('Y'),
   EL_CHAR('Z'),
-  EL_CHAR('Ä'),
+  EL_CHAR('['),
 
-  EL_CHAR('Ö'),
-  EL_CHAR('Ü'),
+  EL_CHAR('\\'),
+  EL_CHAR(']'),
   EL_CHAR('^'),
   EL_CHAR('_'),
 
-  EL_CHAR(' '),
+  EL_CHAR('©'),
+  EL_CHAR('Ä'),
+  EL_CHAR('Ö'),
+  EL_CHAR('Ü'),
+
   EL_CHAR('°'),
-  EL_CHAR('´'),
-  EL_CHAR('|')
+  EL_CHAR('®'),
+  EL_CHAR(FONT_ASCII_CURSOR),
+  EL_CHAR(' ')
 };
 static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
@@ -3715,11 +3720,11 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
   if (letter >= 'a' && letter <= 'z')
     letter_element = EL_CHAR_ASCII0 + letter + (int)('A' - 'a');
   else if (letter == 'ä' || letter == 'Ä')
-    letter_element = EL_CHAR_AE;
+    letter_element = EL_CHAR_AUMLAUT;
   else if (letter == 'ö' || letter == 'Ö')
-    letter_element = EL_CHAR_OE;
+    letter_element = EL_CHAR_OUMLAUT;
   else if (letter == 'ü' || letter == 'Ü')
-    letter_element = EL_CHAR_UE;
+    letter_element = EL_CHAR_UUMLAUT;
   else if (letter == '^')
     letter_element = EL_CHAR_COPYRIGHT;
   else

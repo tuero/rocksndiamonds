@@ -318,9 +318,12 @@ struct FontBitmapInfo
   int src_x, src_y;		/* start position of animation frames */
   int width, height;		/* width/height of each animation frame */
   int draw_x, draw_y;		/* offset for drawing font characters */
+  int num_chars;
+  int num_chars_per_line;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap *clip_mask;		/* single-char-only clip mask array for X11 */
+  int last_num_chars;		/* to free last font clip masks */
 #endif
 };
 

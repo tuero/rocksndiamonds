@@ -29,11 +29,26 @@
 #define FC_GREEN		FONT_INITIAL_3
 #define FC_YELLOW		FONT_INITIAL_4
 
-#define FONT_CHARS_PER_LINE	16
-#define FONT_LINES_PER_FONT	4
-
 /* text output definitions */
 #define MAX_OUTPUT_LINESIZE	1024
+
+/* special character mapping for default fonts */
+#define FONT_ASCII_CURSOR	((char)160)
+#define MAP_FONT_ASCII(c)	((c) >= 'a' && (c) <= 'z' ? 'A' + (c) - 'a' : \
+				 (c) == '©'		  ? 96  :	      \
+				 (c) == 'ä' || (c) == 'Ä' ? 97  :	      \
+				 (c) == 'ö' || (c) == 'Ö' ? 98  :	      \
+				 (c) == 'ü' || (c) == 'Ü' ? 99  :	      \
+				 (c) == '°'		  ? 100 :	      \
+				 (c) == '®'		  ? 101 :	      \
+				 (c) == FONT_ASCII_CURSOR ? 102 :	      \
+				 (c))
+
+/* 64 regular ordered ASCII characters, 6 special characters, 1 cursor char. */
+#define MIN_NUM_CHARS_PER_FONT			64
+#define DEFAULT_NUM_CHARS_PER_FONT		(MIN_NUM_CHARS_PER_FONT + 6 +1)
+#define DEFAULT_NUM_CHARS_PER_LINE		16
+
 
 /* font structure definitions */
 
@@ -42,7 +57,7 @@ void SetInverseTextColor(Pixel);
 
 int getFontWidth(int);
 int getFontHeight(int);
-boolean getFontChar(int, char, int *, int *);
+void getFontCharSource(int, char, Bitmap **, int *, int *);
 
 void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);

@@ -440,15 +440,22 @@
 #define EL_CHAR_ASCII0_END		(EL_CHAR_ASCII0 + 111)
 #define EL_CHAR_END			(EL_CHAR_START  + 79)
 
+#define EL_CHAR(c)			(EL_CHAR_ASCII0 + MAP_FONT_ASCII(c))
+
+#if 0
 #define EL_CHAR(x)			((x) == 'Ä' ? EL_CHAR_AE         : \
 					 (x) == 'Ö' ? EL_CHAR_OE         : \
 					 (x) == 'Ü' ? EL_CHAR_UE         : \
-					 (x) == '^' ? EL_CHAR_COPYRIGHT  : \
+					 (x) == 'ä' ? EL_CHAR_AE         : \
+					 (x) == 'ö' ? EL_CHAR_OE         : \
+					 (x) == 'ü' ? EL_CHAR_UE         : \
+					 (x) == '©' ? EL_CHAR_COPYRIGHT  : \
 					 (x) == '_' ? EL_CHAR_UNDERSCORE : \
 					 (x) == '°' ? EL_CHAR_DEGREE     : \
 					 (x) == '´' ? EL_CHAR_TM         : \
 					 (x) == '|' ? EL_CHAR_CURSOR     : \
 					 EL_CHAR_A + (x) - 'A')
+#endif
 
 #define EL_EXPANDABLE_WALL_HORIZONTAL	200
 #define EL_EXPANDABLE_WALL_VERTICAL	201
@@ -794,10 +801,9 @@
 #define GFX_ARG_POSITION			19
 #define GFX_ARG_DRAW_XOFFSET			20
 #define GFX_ARG_DRAW_YOFFSET			21
-#define GFX_ARG_FORMAT				22
-#define GFX_ARG_NAME				23
+#define GFX_ARG_NAME				22
 
-#define NUM_GFX_ARGS				24
+#define NUM_GFX_ARGS				23
 
 
 /* values for sound configuration suffixes */
@@ -833,7 +839,6 @@
 #define NUM_FONTS				21
 #define NUM_INITIAL_FONTS			4
 
-
 /* values for game_status */
 #define EXITGAME		0
 #define MAINMENU		1
@@ -854,7 +859,7 @@
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2003 by"
+#define PROGRAM_RIGHTS_STRING	"Copyright ©1995-2003 by"
 #define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
 #define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
@@ -1107,6 +1112,7 @@ struct GraphicInfo
   int width, height;		/* width/height of each animation frame */
   int offset_x, offset_y;	/* x/y offset to next animation frame */
   int anim_frames;
+  int anim_frames_per_line;
   int anim_start_frame;
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;

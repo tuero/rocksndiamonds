@@ -751,33 +751,29 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
   if (gi->type & GD_TYPE_TEXTINPUT)
   {
     int font_nr = gi->text.font_type;
-    int font_bitmap_id = gfx.select_font_function(font_nr);
-    struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
     int font_width = getFontWidth(font_nr);
     int font_height = getFontHeight(font_nr);
     int border_size = gi->border.size;
+    Bitmap *src_bitmap;
     int src_x, src_y;
 
     gi->width  = 2 * border_size + (gi->text.size + 1) * font_width;
     gi->height = 2 * border_size + font_height;
 
-    if (!getFontChar(font_nr, '|', &src_x, &src_y))
-      Error(ERR_EXIT, "text input gadget incomplete (cannot get cursor)");
-
+    getFontCharSource(font_nr, FONT_ASCII_CURSOR, &src_bitmap, &src_x, &src_y);
     src_x += font_width / 2;
     src_y += font_height / 2;
-    gi->text.inverse_color = GetPixel(font->bitmap, src_x, src_y);
+    gi->text.inverse_color = GetPixel(src_bitmap, src_x, src_y);
   }
 
   if (gi->type & GD_TYPE_SELECTBOX)
   {
     int font_nr = gi->selectbox.font_type;
-    int font_bitmap_id = gfx.select_font_function(font_nr);
-    struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
     int font_width = getFontWidth(font_nr);
     int font_height = getFontHeight(font_nr);
     int border_size = gi->border.size;
     int button_size = gi->border.size_selectbutton;
+    Bitmap *src_bitmap;
     int src_x, src_y;
 
     gi->width  = 2 * border_size + gi->text.size * font_width + button_size;
@@ -802,12 +798,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     if (gi->selectbox.y < 0)
       gi->selectbox.y = gfx.real_sy + gfx.full_sysize - gi->selectbox.height;
 
-    if (!getFontChar(font_nr, '|', &src_x, &src_y))
-      Error(ERR_EXIT, "selectbox gadget incomplete (cannot get cursor)");
-
+    getFontCharSource(font_nr, FONT_ASCII_CURSOR, &src_bitmap, &src_x, &src_y);
     src_x += font_width / 2;
     src_y += font_height / 2;
-    gi->selectbox.inverse_color = GetPixel(font->bitmap, src_x, src_y);
+    gi->selectbox.inverse_color = GetPixel(src_bitmap, src_x, src_y);
 
     /* always start with closed selectbox */
     gi->selectbox.open = FALSE;
