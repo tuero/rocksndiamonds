@@ -996,6 +996,9 @@ void HandleInfoScreen_Music(int button)
   {
     int y = 0;
 
+    if (button != MB_MENU_INITIALIZE)
+      list = list->next;
+
     if (list == NULL)
     {
       info_mode = INFO_MODE_MAIN;
@@ -1011,7 +1014,12 @@ void HandleInfoScreen_Music(int button)
 
     if (list->is_sound)
     {
-      PlaySound(list->music);
+      int sound = list->music;
+
+      if (sound_info[sound].loop)
+	PlaySoundLoop(sound);
+      else
+	PlaySound(sound);
 
       DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Sounds:");
     }
@@ -1062,9 +1070,10 @@ void HandleInfoScreen_Music(int button)
 
     DrawTextSCentered(ybottom, FONT_TEXT_4,
 		      "Press any key or button for next page");
-
-    list = list->next;
   }
+
+  if (list->is_sound && sound_info[list->music].loop)
+    PlaySoundLoop(list->music);
 }
 
 void DrawInfoScreen_Credits()
