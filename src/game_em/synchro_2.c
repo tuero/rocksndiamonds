@@ -27,10 +27,13 @@ void synchro_2(void)
   unsigned int temp = 0;	/* initialized to make compilers happy */
   unsigned int dx; /* only needed to find closest player */
   unsigned int dy;
+  int element;
 
  loop:
 
-  switch (cave_cache[++x])
+  element = cave_cache[++x];
+
+  switch (element)
   {
     default:
       goto loop;
@@ -746,7 +749,7 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_sound(x, y, SAMPLE_squash);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xstone);
   	    goto loop;
   	  }
 
@@ -2858,7 +2861,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2866,7 +2869,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2874,7 +2877,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2882,7 +2885,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2930,7 +2933,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2938,7 +2941,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2946,7 +2949,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -2954,7 +2957,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3002,7 +3005,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3010,7 +3013,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3018,7 +3021,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3026,7 +3029,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3074,7 +3077,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3082,7 +3085,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3090,7 +3093,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3098,7 +3101,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_sound(x, y, SAMPLE_eater);
+	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
 	goto loop;
       }
 
@@ -3548,14 +3551,14 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_sound(x, y, SAMPLE_squash);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xemerald);
   	    goto loop;
   	  }
 
   	default:
   	  Cave[y][x] = Xemerald;
   	  Next[y][x] = Xemerald;
-  	  play_sound(x, y, SAMPLE_diamond);
+  	  play_element_sound(x, y, SAMPLE_diamond, Xemerald);
   	  goto loop;
       }
 
@@ -3775,14 +3778,14 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_sound(x, y, SAMPLE_squash);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xdiamond);
   	    goto loop;
   	  }
 
   	default:
   	  Cave[y][x] = Xdiamond;
   	  Next[y][x] = Xdiamond;
-  	  play_sound(x, y, SAMPLE_diamond);
+  	  play_element_sound(x, y, SAMPLE_diamond, Xdiamond);
   	  goto loop;
       }
 
@@ -4282,7 +4285,7 @@ void synchro_2(void)
 
     ball_common:
 
-      play_sound(x, y, SAMPLE_ball);
+      play_element_sound(x, y, SAMPLE_ball, element);
       if (lev.ball_random)
       {
 	switch (RANDOM & 7)

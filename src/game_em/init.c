@@ -57,6 +57,7 @@ static const char *sound_names[SAMPLE_MAX] =
   "12.collect.au",
   "13.diamond.au",
   "14.squash.au",
+  "14.squash.au",
   "15.drip.au",
   "16.push.au",
   "17.dirt.au",
@@ -87,6 +88,7 @@ static const int sound_volume[SAMPLE_MAX] =
   100,
   100,
   50,
+  100,
   100,
   100,
   100,
@@ -291,6 +293,11 @@ void play_sound(int x, int y, int sample)
        (unsigned int)(x - left) <= SCR_FIELDX))
     play[sample] = 1;
 #endif
+}
+
+void play_element_sound(int x, int y, int sample, int element)
+{
+  play_sound(x, y, sample);
 }
 
 void sound_play(void)

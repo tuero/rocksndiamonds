@@ -1820,7 +1820,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   ply2->x_initial = 0;
   ply2->y_initial = 0;
 
-  /* at last, set the two players at their positions in the playfield */
+  /* at last, set the two players to their positions in the playfield */
   for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
   {
     if (level->field[x][y] == EL_PLAYER_1)

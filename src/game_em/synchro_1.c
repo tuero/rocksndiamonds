@@ -84,6 +84,9 @@ static int test(struct PLAYER *ply)
   register unsigned int x = ply->x;
   register unsigned int y = ply->y;
 
+  if (!ply->alive)
+    return 0;
+
   if (lev.time == 0)
     return(1);
 
@@ -410,6 +413,8 @@ static void player(struct PLAYER *ply)
 
   if (ply->joy_fire == 0)
   {
+    int element = Cave[y][x];
+
     switch(Cave[y][x])
     {
       /* fire is released */
@@ -459,7 +464,7 @@ static void player(struct PLAYER *ply)
 	Cave[y][x] = (dy ? (dy < 0 ? Ygrass_nB : Ygrass_sB) :
 		      (dx > 0 ? Ygrass_eB : Ygrass_wB));
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_dirt);
+	play_element_sound(x, y, SAMPLE_dirt, Xgrass);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -469,7 +474,7 @@ static void player(struct PLAYER *ply)
 	Cave[y][x] = (dy ? (dy < 0 ? Ydirt_nB : Ydirt_sB) :
 		      (dx > 0 ? Ydirt_eB : Ydirt_wB));
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_dirt);
+	play_element_sound(x, y, SAMPLE_dirt, Xdirt);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -479,7 +484,7 @@ static void player(struct PLAYER *ply)
       case Xdiamond_pause:
 	Cave[y][x] = Ydiamond_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
 	ply->anim = SPR_walk + anim;
@@ -491,7 +496,7 @@ static void player(struct PLAYER *ply)
       case Xemerald_pause:
 	Cave[y][x] = Yemerald_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
 	ply->anim = SPR_walk + anim;
@@ -502,7 +507,7 @@ static void player(struct PLAYER *ply)
       case Xdynamite:
 	Cave[y][x] = Ydynamite_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.dynamite_score;
 	ply->dynamite = ply->dynamite > 9998 ? 9999 : ply->dynamite + 1;
 	ply->anim = SPR_walk + anim;
@@ -546,7 +551,7 @@ static void player(struct PLAYER *ply)
 
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.key_score;
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
@@ -556,7 +561,7 @@ static void player(struct PLAYER *ply)
       case Xlenses:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.lenses_score;
 	lev.lenses_cnt = lev.lenses_time;
 	ply->anim = SPR_walk + anim;
@@ -567,7 +572,7 @@ static void player(struct PLAYER *ply)
       case Xmagnify:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.magnify_score;
 	lev.magnify_cnt = lev.magnify_time;
 	ply->anim = SPR_walk + anim;
@@ -606,7 +611,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ystone_eB : Ystone_wB;
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_roll);
+	    play_element_sound(x, y, SAMPLE_roll, Xstone);
 	    ply->x = x;
 	}
 
@@ -644,7 +649,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ybomb_eB : Ybomb_wB;
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_roll);
+	    play_element_sound(x, y, SAMPLE_roll, Xbomb);
 	    ply->x = x;
 	}
 
@@ -682,7 +687,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ynut_eB : Ynut_wB;
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_roll);
+	    play_element_sound(x, y, SAMPLE_roll, Xnut);
 	    ply->x = x;
 	}
 
@@ -730,7 +735,7 @@ static void player(struct PLAYER *ply)
 	  spring_walk:
 	    Cave[y][x] = dx > 0 ? Yspring_eB : Yspring_wB;
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_roll);
+	    play_element_sound(x, y, SAMPLE_roll, Xspring);
 	    ply->x = x;
 	}
 
@@ -780,7 +785,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x] = (dy ? (dy < 0 ? Yballoon_nB : Yballoon_sB) :
 			  (dx > 0 ? Yballoon_eB : Yballoon_wB));
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_push);
+	    play_element_sound(x, y, SAMPLE_push, Xballoon);
 	    ply->x = x;
 	    ply->y = y;
 	}
@@ -826,7 +831,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x] = (dy ? (dy < 0 ? Yandroid_nB : Yandroid_sB) :
 			  (dx > 0 ? Yandroid_eB : Yandroid_wB));
 	    Next[y][x] = Zplayer;
-	    play_sound(x, y, SAMPLE_push);
+	    play_element_sound(x, y, SAMPLE_push, Xandroid);
 	    ply->x = x;
 	    ply->y = y;
 	}
@@ -896,14 +901,14 @@ static void player(struct PLAYER *ply)
 
 	Cave[y+dy][x+dx] = Zplayer;
 	Next[y+dy][x+dx] = Zplayer;
-	play_sound(x, y, SAMPLE_door);
+	play_element_sound(x, y, SAMPLE_door, element);
 	ply->anim = SPR_walk + anim;
 	ply->x = x + dx;
 	ply->y = y + dy;
 	break;
 
       case Xwheel:
-	play_sound(x, y, SAMPLE_press);
+	play_element_sound(x, y, SAMPLE_press, element);
 	lev.wheel_cnt = lev.wheel_time;
 	lev.wheel_x = x;
 	lev.wheel_y = y;
@@ -930,17 +935,17 @@ static void player(struct PLAYER *ply)
 	goto wind_walk;
 
       wind_walk:
-	play_sound(x, y, SAMPLE_press);
+	play_element_sound(x, y, SAMPLE_press, element);
 	lev.wind_cnt = lev.wind_time;
 	break;
 
       case Xwind_stop:
-	play_sound(x, y, SAMPLE_press);
+	play_element_sound(x, y, SAMPLE_press, element);
 	lev.wind_cnt = 0;
 	break;
 
       case Xswitch:
-	play_sound(x, y, SAMPLE_press);
+	play_element_sound(x, y, SAMPLE_press, element);
 	lev.ball_cnt = lev.ball_time;
 	lev.ball_state = !lev.ball_state;
 	break;
@@ -948,7 +953,7 @@ static void player(struct PLAYER *ply)
       case Xplant:
 	Cave[y][x] = Yplant;
 	Next[y][x] = Xplant;
-	play_sound(x, y, SAMPLE_blank);
+	play_element_sound(x, y, SAMPLE_blank, Xplant);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -968,6 +973,8 @@ static void player(struct PLAYER *ply)
   }
   else
   {
+    int element = Cave[y][x];
+
     switch(Cave[y][x])
     {
       /* fire is pressed */
@@ -976,7 +983,7 @@ static void player(struct PLAYER *ply)
       case Xdirt:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_dirt);
+	play_element_sound(x, y, SAMPLE_dirt, element);
 	ply->anim = SPR_spray + anim;
 	break;
 
@@ -984,7 +991,7 @@ static void player(struct PLAYER *ply)
       case Xdiamond_pause:
 	Cave[y][x] = Ydiamond_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
 	ply->anim = SPR_walk + anim;
@@ -994,7 +1001,7 @@ static void player(struct PLAYER *ply)
       case Xemerald_pause:
 	Cave[y][x] = Yemerald_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
 	ply->anim = SPR_walk + anim;
@@ -1003,7 +1010,7 @@ static void player(struct PLAYER *ply)
       case Xdynamite:
 	Cave[y][x] = Ydynamite_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.dynamite_score;
 	ply->dynamite = ply->dynamite > 9998 ? 9999 : ply->dynamite + 1;
 	ply->anim = SPR_walk + anim;
@@ -1044,7 +1051,7 @@ static void player(struct PLAYER *ply)
       key_shoot:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.key_score;
 	ply->anim = SPR_walk + anim;
 	break;
@@ -1052,7 +1059,7 @@ static void player(struct PLAYER *ply)
       case Xlenses:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.lenses_score;
 	lev.lenses_cnt = lev.lenses_time;
 	ply->anim = SPR_walk + anim;
@@ -1061,7 +1068,7 @@ static void player(struct PLAYER *ply)
       case Xmagnify:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play_sound(x, y, SAMPLE_collect);
+	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.magnify_score;
 	lev.magnify_cnt = lev.magnify_time;
 	ply->anim = SPR_walk + anim;
