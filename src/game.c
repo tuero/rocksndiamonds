@@ -2067,7 +2067,7 @@ void TurnRound(int x, int y)
 
   if (element == EL_KAEFER || element == EL_BUTTERFLY)
   {
-    TestIfBadThingHitsOtherBadThing(x, y);
+    TestIfBadThingTouchesOtherBadThing(x, y);
 
     if (IN_LEV_FIELD(right_x, right_y) &&
 	IS_FREE(right_x, right_y))
@@ -2084,7 +2084,7 @@ void TurnRound(int x, int y)
   else if (element == EL_FLIEGER || element == EL_FIREFLY ||
 	   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
   {
-    TestIfBadThingHitsOtherBadThing(x, y);
+    TestIfBadThingTouchesOtherBadThing(x, y);
 
     if (IN_LEV_FIELD(left_x, left_y) &&
 	IS_FREE(left_x, left_y))
@@ -2748,7 +2748,7 @@ void StartMoving(int x, int y)
     {
 
 #if 1
-      TestIfBadThingHitsHero(x, y);
+      TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
       return;
 #else
       /* enemy got the player */
@@ -2938,7 +2938,7 @@ void StartMoving(int x, int y)
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 
       if (DONT_TOUCH(element))
-	TestIfBadThingHitsHero(x, y);
+	TestIfBadThingTouchesHero(x, y);
 
       return;
     }
@@ -3080,12 +3080,12 @@ void ContinueMoving(int x, int y)
 
     if (DONT_TOUCH(element))	/* object may be nasty to player or others */
     {
-      TestIfBadThingHitsHero(newx, newy);
-      TestIfBadThingHitsFriend(newx, newy);
-      TestIfBadThingHitsOtherBadThing(newx, newy);
+      TestIfBadThingTouchesHero(newx, newy);
+      TestIfBadThingTouchesFriend(newx, newy);
+      TestIfBadThingTouchesOtherBadThing(newx, newy);
     }
     else if (element == EL_PINGUIN)
-      TestIfFriendHitsBadThing(newx, newy);
+      TestIfFriendTouchesBadThing(newx, newy);
 
     if (CAN_SMASH(element) && direction == MV_DOWN &&
 	(newy == lev_fieldy-1 || !IS_FREE(x, newy+1)))
@@ -4250,7 +4250,8 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
-    player->last_move_dir = MV_NO_MOVING;
+    if (player->MovPos == 0)	/* needed for tape.playing */
+      player->last_move_dir = MV_NO_MOVING;
 
     if (++player->frame_reset_delay > player->move_delay_value)
       player->Frame = 0;
@@ -4858,7 +4859,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
       BuryHero(player);
     }
     else
-      TestIfBadThingHitsHero(new_jx, new_jy);
+      TestIfHeroRunsIntoBadThing(jx, jy, player->MovDir);
 
     return MF_MOVING;
   }
@@ -5030,7 +5031,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     player->last_move_dir = MV_NO_MOVING;
   }
 
-  TestIfHeroHitsBadThing(jx, jy);
+  TestIfHeroTouchesBadThing(jx, jy);
 
   if (!player->active)
     RemoveHero(player);
@@ -5125,7 +5126,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
     ScreenMovDir = MV_NO_MOVING;
 }
 
-void TestIfGoodThingHitsBadThing(int goodx, int goody)
+void TestIfGoodThingHitsBadThing(int goodx, int goody, int move_dir)
 {
   int i, killx = goodx, killy = goody;
   static int xy[4][2] =
@@ -5135,7 +5136,7 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     { +1, 0 },
     { 0, +1 }
   };
-  static int harmless[4] =
+  static int xy_dir[4] =
   {
     MV_UP,
     MV_LEFT,
@@ -5158,11 +5159,12 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     element = MovingOrBlocked2ElementIfNotLeaving(x, y);
 #endif
 
-    if (DONT_TOUCH(element))
+    /* 1st case: good thing is moving towards DONT_GO_TO style bad thing;
+       2nd case: DONT_TOUCH style bad thing does not move away from good thing
+    */
+    if ((DONT_GO_TO(element) && move_dir == xy_dir[i]) ||
+	(DONT_TOUCH(element) && MovDir[x][y] != xy_dir[i]))
     {
-      if (MovDir[x][y] == harmless[i])
-	continue;
-
       killx = x;
       killy = y;
       break;
@@ -5185,9 +5187,10 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
   }
 }
 
-void TestIfBadThingHitsGoodThing(int badx, int bady)
+void TestIfBadThingHitsGoodThing(int badx, int bady, int move_dir)
 {
   int i, killx = badx, killy = bady;
+  int bad_element = Feld[badx][bady];
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -5195,7 +5198,7 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     { +1, 0 },
     { 0, +1 }
   };
-  static int harmless[4] =
+  static int xy_dir[4] =
   {
     MV_UP,
     MV_LEFT,
@@ -5203,7 +5206,7 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     MV_DOWN
   };
 
-  if (Feld[badx][bady] == EL_EXPLODING)	/* skip just exploding bad things */
+  if (bad_element == EL_EXPLODING)	/* skip just exploding bad things */
     return;
 
   for (i=0; i<4; i++)
@@ -5217,20 +5220,31 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
 
     element = Feld[x][y];
 
-    if (IS_PLAYER(x, y))
+    /* 1st case: good thing is moving towards DONT_GO_TO style bad thing;
+       2nd case: DONT_TOUCH style bad thing does not move away from good thing
+    */
+    if ((DONT_GO_TO(bad_element) && move_dir == xy_dir[i]) ||
+	(DONT_TOUCH(bad_element) && MovDir[x][y] != xy_dir[i]))
     {
-      killx = x;
-      killy = y;
-      break;
-    }
-    else if (element == EL_PINGUIN)
-    {
-      if (MovDir[x][y] == harmless[i] && IS_MOVING(x, y))
-	continue;
+      /* good thing is player or penguin that does not move away */
+      if (IS_PLAYER(x, y))
+      {
+	struct PlayerInfo *player = PLAYERINFO(x, y);
 
-      killx = x;
-      killy = y;
-      break;
+	if (bad_element == EL_ROBOT && player->last_move_dir)
+	  continue;	/* robot does not kill player if he moves */
+
+	killx = x;
+	killy = y;
+	break;
+      }
+      else if (element == EL_PINGUIN &&
+	       (MovDir[x][y] != xy_dir[i] || !IS_MOVING(x, y)))
+      {
+	killx = x;
+	killy = y;
+	break;
+      }
     }
   }
 
@@ -5240,9 +5254,25 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     {
       struct PlayerInfo *player = PLAYERINFO(killx, killy);
 
-      if (Feld[badx][bady] == EL_ROBOT && player->last_move_dir)
+#if 0
+      int dir = player->MovDir;
+      int newx = player->jx + (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
+      int newy = player->jy + (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
+
+      if (Feld[badx][bady] == EL_ROBOT && player->last_move_dir &&
+	  newx != badx && newy != bady)
 	;	/* robot does not kill player if he moves */
-      else if (player->shield_active_time_left > 0)
+      else
+	printf("-> %d\n", player->MovDir);
+
+      if (Feld[badx][bady] == EL_ROBOT && player->last_move_dir &&
+	  newx != badx && newy != bady)
+	;	/* robot does not kill player if he moves */
+      else
+	;
+#endif
+
+      if (player->shield_active_time_left > 0)
 	Bang(badx, bady);
       else if (!PLAYER_PROTECTED(killx, killy))
 	KillHero(player);
@@ -5252,27 +5282,37 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
   }
 }
 
-void TestIfHeroHitsBadThing(int x, int y)
+void TestIfHeroTouchesBadThing(int x, int y)
 {
-  TestIfGoodThingHitsBadThing(x, y);
+  TestIfGoodThingHitsBadThing(x, y, MV_NO_MOVING);
 }
 
-void TestIfBadThingHitsHero(int x, int y)
+void TestIfHeroRunsIntoBadThing(int x, int y, int move_dir)
 {
-  TestIfBadThingHitsGoodThing(x, y);
+  TestIfGoodThingHitsBadThing(x, y, move_dir);
 }
 
-void TestIfFriendHitsBadThing(int x, int y)
+void TestIfBadThingTouchesHero(int x, int y)
 {
-  TestIfGoodThingHitsBadThing(x, y);
+  TestIfBadThingHitsGoodThing(x, y, MV_NO_MOVING);
 }
 
-void TestIfBadThingHitsFriend(int x, int y)
+void TestIfBadThingRunsIntoHero(int x, int y, int move_dir)
 {
-  TestIfBadThingHitsGoodThing(x, y);
+  TestIfBadThingHitsGoodThing(x, y, move_dir);
 }
 
-void TestIfBadThingHitsOtherBadThing(int badx, int bady)
+void TestIfFriendTouchesBadThing(int x, int y)
+{
+  TestIfGoodThingHitsBadThing(x, y, MV_NO_MOVING);
+}
+
+void TestIfBadThingTouchesFriend(int x, int y)
+{
+  TestIfBadThingHitsGoodThing(x, y, MV_NO_MOVING);
+}
+
+void TestIfBadThingTouchesOtherBadThing(int badx, int bady)
 {
   int i, killx = badx, killy = bady;
   static int xy[4][2] =
