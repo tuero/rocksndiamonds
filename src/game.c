@@ -184,6 +184,7 @@ static void KillHeroUnlessProtected(int, int);
 
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
+static void TestIfElementHitsCustomElement(int, int, int);
 
 static void ChangeElement(int, int, int);
 static boolean CheckTriggeredElementSideChange(int, int, int, int, int);
@@ -673,6 +674,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     case EL_DYNAMITE_ACTIVE:
+    case EL_SP_DISK_RED_ACTIVE:
+    case EL_DYNABOMB_PLAYER_1_ACTIVE:
+    case EL_DYNABOMB_PLAYER_2_ACTIVE:
+    case EL_DYNABOMB_PLAYER_3_ACTIVE:
+    case EL_DYNABOMB_PLAYER_4_ACTIVE:
       MovDelay[x][y] = 96;
       break;
 
@@ -2565,6 +2571,7 @@ void Explode(int ex, int ey, int phase, int mode)
 void DynaExplode(int ex, int ey)
 {
   int i, j;
+  int dynabomb_element = Feld[ex][ey];
   int dynabomb_size = 1;
   boolean dynabomb_xl = FALSE;
   struct PlayerInfo *player;
@@ -2576,9 +2583,9 @@ void DynaExplode(int ex, int ey)
     { 0, +1 }
   };
 
-  if (IS_ACTIVE_BOMB(Feld[ex][ey]))
+  if (IS_ACTIVE_BOMB(dynabomb_element))
   {
-    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_PLAYER_1_ACTIVE];
+    player = &stored_player[dynabomb_element - EL_DYNABOMB_PLAYER_1_ACTIVE];
     dynabomb_size = player->dynabomb_size;
     dynabomb_xl = player->dynabomb_xl;
     player->dynabombs_left++;
@@ -2683,7 +2690,9 @@ void Bang(int x, int y)
 	Explode(x, y, EX_PHASE_START, EX_CENTER);
       break;
     default:
-      if (CAN_EXPLODE_1X1(element))
+      if (CAN_EXPLODE_DYNA(element))
+	DynaExplode(x, y);
+      else if (CAN_EXPLODE_1X1(element))
 	Explode(x, y, EX_PHASE_START, EX_CENTER);
       else
 	Explode(x, y, EX_PHASE_START, EX_NORMAL);
@@ -4257,6 +4266,8 @@ void StartMoving(int x, int y)
     int move_pattern = element_info[element].move_pattern;
     int newx, newy;
 
+    Moving2Blocked(x, y, &newx, &newy);
+
 #if 1
     if (IS_PUSHABLE(element) && JustBeingPushed(x, y))
       return;
@@ -4266,6 +4277,28 @@ void StartMoving(int x, int y)
 	 element == EL_SPRING)
 	&& JustBeingPushed(x, y))
       return;
+#endif
+
+#if 1
+    if (game.engine_version >= VERSION_IDENT(3,0,9,0) &&
+	WasJustMoving[x][y] && IN_LEV_FIELD(newx, newy) &&
+	(Feld[newx][newy] == EL_BLOCKED || IS_PLAYER(newx, newy)))
+    {
+#if 0
+      printf("::: element %d '%s' WasJustMoving %d [%d, %d, %d, %d]\n",
+	     element, element_info[element].token_name,
+	     WasJustMoving[x][y],
+	     HAS_ANY_CHANGE_EVENT(element, CE_HITTING_SOMETHING),
+	     HAS_ANY_CHANGE_EVENT(element, CE_HIT_BY_SOMETHING),
+	     HAS_ANY_CHANGE_EVENT(element, CE_OTHER_IS_HITTING),
+	     HAS_ANY_CHANGE_EVENT(element, CE_OTHER_GETS_HIT));
+#endif
+
+      TestIfElementHitsCustomElement(x, y, MovDir[x][y]);
+
+      if (Feld[x][y] != element)	/* element has changed */
+	return;
+    }
 #endif
 
 #if 0
@@ -4739,7 +4772,9 @@ void ContinueMoving(int x, int y)
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx, newy = y + dy;
+#if 0
   int nextx = newx + dx, nexty = newy + dy;
+#endif
   boolean pushed = Pushed[x][y];
 
   MovPos[x][y] += getElementMoveStepsize(x, y);
@@ -4916,13 +4951,19 @@ void ContinueMoving(int x, int y)
     ChangeElement(newx, newy, ChangePage[newx][newy]);
 #endif
 
+#if 1
+
+  TestIfElementHitsCustomElement(newx, newy, direction);
+
+#else
+
   if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
   {
     int hitting_element = Feld[newx][newy];
 
     /* !!! fix side (direction) orientation here and elsewhere !!! */
     CheckElementSideChange(newx, newy, hitting_element,
-			   direction, CE_COLLISION_ACTIVE, -1);
+			   direction, CE_HITTING_SOMETHING, -1);
 
 #if 0
     if (IN_LEV_FIELD(nextx, nexty))
@@ -4948,10 +4989,10 @@ void ContinueMoving(int x, int y)
 	int i;
 
 	CheckElementSideChange(nextx, nexty, touched_element,
-			       opposite_direction, CE_COLLISION_PASSIVE, -1);
+			       opposite_direction, CE_HIT_BY_SOMETHING, -1);
 
 	if (IS_CUSTOM_ELEMENT(hitting_element) &&
-	    HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_COLL_ACTIVE))
+	    HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_HITTING))
 	{
 	  for (i = 0; i < element_info[hitting_element].num_change_pages; i++)
 	  {
@@ -4959,19 +5000,19 @@ void ContinueMoving(int x, int y)
 	      &element_info[hitting_element].change_page[i];
 
 	    if (change->can_change &&
-		change->events & CH_EVENT_BIT(CE_OTHER_IS_COLL_ACTIVE) &&
+		change->events & CH_EVENT_BIT(CE_OTHER_IS_HITTING) &&
 		change->sides & touched_side &&
 		change->trigger_element == touched_element)
 	    {
 	      CheckElementSideChange(newx, newy, hitting_element,
-				     CH_SIDE_ANY, CE_OTHER_IS_COLL_ACTIVE, i);
+				     CH_SIDE_ANY, CE_OTHER_IS_HITTING, i);
 	      break;
 	    }
 	  }
 	}
 
 	if (IS_CUSTOM_ELEMENT(touched_element) &&
-	    HAS_ANY_CHANGE_EVENT(touched_element, CE_OTHER_IS_COLL_PASSIVE))
+	    HAS_ANY_CHANGE_EVENT(touched_element, CE_OTHER_GETS_HIT))
 	{
 	  for (i = 0; i < element_info[touched_element].num_change_pages; i++)
 	  {
@@ -4979,12 +5020,12 @@ void ContinueMoving(int x, int y)
 	      &element_info[touched_element].change_page[i];
 
 	    if (change->can_change &&
-		change->events & CH_EVENT_BIT(CE_OTHER_IS_COLL_PASSIVE) &&
+		change->events & CH_EVENT_BIT(CE_OTHER_GETS_HIT) &&
 		change->sides & hitting_side &&
 		change->trigger_element == hitting_element)
 	    {
 	      CheckElementSideChange(nextx, nexty, touched_element,
-				     CH_SIDE_ANY, CE_OTHER_IS_COLL_PASSIVE, i);
+				     CH_SIDE_ANY, CE_OTHER_GETS_HIT, i);
 	      break;
 	    }
 	  }
@@ -4993,6 +5034,7 @@ void ContinueMoving(int x, int y)
     }
 #endif
   }
+#endif
 
   TestIfPlayerTouchesCustomElement(newx, newy);
   TestIfElementTouchesCustomElement(newx, newy);
@@ -7867,6 +7909,89 @@ void TestIfElementTouchesCustomElement(int x, int y)
 			   CE_OTHER_IS_TOUCHING, center_element_change_page);
 }
 
+void TestIfElementHitsCustomElement(int x, int y, int direction)
+{
+  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int hitx = x + dx, hity = y + dy;
+  int hitting_element = Feld[x][y];
+
+  if (IN_LEV_FIELD(hitx, hity) && IS_FREE(hitx, hity))
+    return;
+
+  CheckElementSideChange(x, y, hitting_element,
+			 direction, CE_HITTING_SOMETHING, -1);
+
+  if (IN_LEV_FIELD(hitx, hity))
+  {
+    static int opposite_directions[] =
+    {
+      MV_RIGHT,
+      MV_LEFT,
+      MV_DOWN,
+      MV_UP
+    };
+    int move_dir_bit = MV_DIR_BIT(direction);
+    int opposite_direction = opposite_directions[move_dir_bit];
+    int hitting_side = direction;
+    int touched_side = opposite_direction;
+    int touched_element = MovingOrBlocked2Element(hitx, hity);
+    boolean object_hit = (!IS_MOVING(hitx, hity) ||
+			  MovDir[hitx][hity] != direction ||
+			  ABS(MovPos[hitx][hity]) <= TILEY / 2);
+
+    object_hit = TRUE;
+
+    if (object_hit)
+    {
+      int i;
+
+      CheckElementSideChange(hitx, hity, touched_element,
+			     opposite_direction, CE_HIT_BY_SOMETHING, -1);
+
+      if (IS_CUSTOM_ELEMENT(hitting_element) &&
+	  HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_HITTING))
+      {
+	for (i = 0; i < element_info[hitting_element].num_change_pages; i++)
+	{
+	  struct ElementChangeInfo *change =
+	    &element_info[hitting_element].change_page[i];
+
+	  if (change->can_change &&
+	      change->events & CH_EVENT_BIT(CE_OTHER_IS_HITTING) &&
+	      change->sides & touched_side &&
+	      change->trigger_element == touched_element)
+	  {
+	    CheckElementSideChange(x, y, hitting_element,
+				   CH_SIDE_ANY, CE_OTHER_IS_HITTING, i);
+	    break;
+	  }
+	}
+      }
+
+      if (IS_CUSTOM_ELEMENT(touched_element) &&
+	  HAS_ANY_CHANGE_EVENT(touched_element, CE_OTHER_GETS_HIT))
+      {
+	for (i = 0; i < element_info[touched_element].num_change_pages; i++)
+	{
+	  struct ElementChangeInfo *change =
+	    &element_info[touched_element].change_page[i];
+
+	  if (change->can_change &&
+	      change->events & CH_EVENT_BIT(CE_OTHER_GETS_HIT) &&
+	      change->sides & hitting_side &&
+	      change->trigger_element == hitting_element)
+	  {
+	    CheckElementSideChange(hitx, hity, touched_element,
+				   CH_SIDE_ANY, CE_OTHER_GETS_HIT, i);
+	    break;
+	  }
+	}
+      }
+    }
+  }
+}
+
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 {
   int i, kill_x = -1, kill_y = -1;
@@ -8890,13 +9015,12 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 boolean DropElement(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
-  int old_element;
+  int old_element = Feld[jx][jy];
   int new_element;
 
+  /* check if player is active, not moving and ready to drop */
   if (!player->active || player->MovPos || player->drop_delay > 0)
     return FALSE;
-
-  old_element = Feld[jx][jy];
 
   /* check if player has anything that can be dropped */
   if (player->inventory_size == 0 && player->dynabombs_left == 0)
@@ -8915,28 +9039,20 @@ boolean DropElement(struct PlayerInfo *player)
   if (old_element != EL_EMPTY)
     Back[jx][jy] = old_element;		/* store old element on this field */
 
-
-
-  /* !!! CHANGE !!! CHANGE !!! */
-
-#if 0
-  MovDelay[jx][jy] = 96;
-#endif
-
-  /* !!! CHANGE !!! CHANGE !!! */
-
-
-
   ResetGfxAnimation(jx, jy);
   ResetRandomAnimationValue(jx, jy);
 
   if (player->inventory_size > 0)
   {
-    new_element = player->inventory_element[--player->inventory_size];
+    player->inventory_size--;
+    new_element = player->inventory_element[player->inventory_size];
 
-    Feld[jx][jy] = (new_element == EL_DYNAMITE ? EL_DYNAMITE_ACTIVE :
-		    new_element == EL_SP_DISK_RED ? EL_SP_DISK_RED_ACTIVE :
-		    new_element);
+    if (new_element == EL_DYNAMITE)
+      new_element = EL_DYNAMITE_ACTIVE;
+    else if (new_element == EL_SP_DISK_RED)
+      new_element = EL_SP_DISK_RED_ACTIVE;
+
+    Feld[jx][jy] = new_element;
 
     DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	     int2str(local_player->inventory_size, 3), FONT_TEXT_2);
@@ -8954,30 +9070,33 @@ boolean DropElement(struct PlayerInfo *player)
   else		/* player is dropping a dyna bomb */
   {
     player->dynabombs_left--;
+    new_element = EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr;
 
-    Feld[jx][jy] =
-      EL_DYNABOMB_PLAYER_1_ACTIVE + (player->element_nr - EL_PLAYER_1);
+    Feld[jx][jy] = new_element;
 
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
 
     PlayLevelSoundAction(jx, jy, ACTION_DROPPING);
-
-    MovDelay[jx][jy] = 96;
   }
 
 
 
 #if 1
-  InitField(jx, jy, FALSE);
-  if (CAN_MOVE(Feld[jx][jy]))
-    InitMovDir(jx, jy);
+
+  if (Feld[jx][jy] == new_element)	/* uninitialized unless CE change */
+  {
+    InitField(jx, jy, FALSE);
+    if (CAN_MOVE(Feld[jx][jy]))
+      InitMovDir(jx, jy);
+  }
 
   new_element = Feld[jx][jy];
 
   if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
       element_info[new_element].move_pattern == MV_PROJECTILE)
   {
+    int move_stepsize = element_info[new_element].move_stepsize;
     int direction, dx, dy, nextx, nexty;
 
     if (element_info[new_element].move_direction_initial == MV_NO_MOVING)
@@ -8991,20 +9110,33 @@ boolean DropElement(struct PlayerInfo *player)
 
     if (IN_LEV_FIELD(nextx, nexty) && IS_FREE(nextx, nexty))
     {
-      InitMovingField(jx, jy, MovDir[jx][jy]);
+#if 0
+      WasJustMoving[jx][jy] = 3;
+#else
+      InitMovingField(jx, jy, direction);
       ContinueMoving(jx, jy);
+#endif
     }
     else
     {
       Changed[jx][jy] = 0;            /* allow another change */
+
+#if 1
+      TestIfElementHitsCustomElement(jx, jy, direction);
+#else
       CheckElementSideChange(jx, jy, new_element,
-			     direction, CE_COLLISION_ACTIVE, -1);
+			     direction, CE_HITTING_SOMETHING, -1);
+#endif
     }
+
+    player->drop_delay = 2 * TILEX / move_stepsize + 1;
   }
 
+#if 0
+  player->drop_delay = 8 + 8 + 8;
 #endif
 
-  player->drop_delay = 8 + 8 + 8;
+#endif
 
 
 

@@ -1134,6 +1134,7 @@ static struct ValueTextInfo options_deadliness[] =
 static struct ValueTextInfo options_consistency[] =
 {
   { EP_CAN_EXPLODE_3X3,		"can explode 3x3"		},
+  { EP_CAN_EXPLODE_DYNA,	"can explode 3+3"		},
   { EP_CAN_EXPLODE_1X1,		"can explode 1x1"		},
   { EP_INDESTRUCTIBLE,		"indestructible"		},
   { -1,				NULL				}
@@ -1155,11 +1156,11 @@ static struct ValueTextInfo options_change_direct_action[] =
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
   { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
   { CE_SWITCHED,		"switched ..."			},
-#if 0
-  { CE_COLLISION_ACTIVE,	"hitting something ..."		},
-  { CE_COLLISION_PASSIVE,	"hit by something ..."		},
+#if 1
+  { CE_HITTING_SOMETHING,	"hitting something ..."		},
+  { CE_HIT_BY_SOMETHING,	"hit by something ..."		},
 #else
-  { CE_COLLISION_ACTIVE,	"collision ..."			},
+  { CE_HITTING_SOMETHING,	"collision ..."			},
 #endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
@@ -1177,9 +1178,9 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
   { CE_OTHER_IS_TOUCHING,	"touching ..."			},
-#if 0
-  { CE_OTHER_IS_COLL_ACTIVE,	"hitting ..."			},
-  { CE_OTHER_IS_COLL_PASSIVE,	"hit by ..."			},
+#if 1
+  { CE_OTHER_IS_HITTING,	"hitting ..."			},
+  { CE_OTHER_GETS_HIT,		"hit by ..."			},
 #endif
   { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
   { CE_OTHER_IS_CHANGING,	"change of"			},
@@ -4963,11 +4964,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
      CAN_EXPLODE_1X1(element) ? EP_CAN_EXPLODE_1X1 :
      CAN_EXPLODE_3X3(element) ? EP_CAN_EXPLODE_3X3 :
+     CAN_EXPLODE_DYNA(element) ? EP_CAN_EXPLODE_DYNA :
      custom_element.consistency);
   custom_element_properties[EP_EXPLODE_RESULT] =
     (IS_INDESTRUCTIBLE(element) ||
      CAN_EXPLODE_1X1(element) ||
-     CAN_EXPLODE_3X3(element));
+     CAN_EXPLODE_3X3(element) ||
+     CAN_EXPLODE_DYNA(element));
 
   /* special case: sub-settings dependent from main setting */
   if (CAN_EXPLODE_BY_FIRE(element))
@@ -4988,8 +4991,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_LEFT_BY_PLAYER) ? CE_LEFT_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_DROPPED_BY_PLAYER) ? CE_DROPPED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_SWITCHED) ? CE_SWITCHED :
-     HAS_CHANGE_EVENT(element, CE_COLLISION_ACTIVE) ? CE_COLLISION_ACTIVE :
-     HAS_CHANGE_EVENT(element, CE_COLLISION_PASSIVE) ? CE_COLLISION_PASSIVE :
+     HAS_CHANGE_EVENT(element, CE_HITTING_SOMETHING) ? CE_HITTING_SOMETHING :
+     HAS_CHANGE_EVENT(element, CE_HIT_BY_SOMETHING) ? CE_HIT_BY_SOMETHING :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      custom_element_change.direct_action);
@@ -5005,8 +5008,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_COLL_ACTIVE) ? CE_OTHER_IS_COLL_ACTIVE :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_COLL_PASSIVE) ? CE_OTHER_IS_COLL_PASSIVE :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_HITTING) ? CE_OTHER_IS_HITTING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_HIT) ? CE_OTHER_GETS_HIT :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_SWITCHING) ? CE_OTHER_IS_SWITCHING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
@@ -5081,6 +5084,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_1X1] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_3X3] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_DYNA] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
@@ -5088,8 +5092,9 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_EXPLODE_RESULT];
 
   /* special case: sub-settings dependent from main setting */
-  if (custom_element_properties[EP_CAN_EXPLODE_3X3] ||
-      custom_element_properties[EP_CAN_EXPLODE_1X1])
+  if (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
+      custom_element_properties[EP_CAN_EXPLODE_3X3] ||
+      custom_element_properties[EP_CAN_EXPLODE_DYNA])
   {
     custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
       custom_element.can_explode_by_fire;
@@ -5109,8 +5114,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_LEFT_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_DROPPED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_SWITCHED] = FALSE;
-  custom_element_change_events[CE_COLLISION_ACTIVE] = FALSE;
-  custom_element_change_events[CE_COLLISION_PASSIVE] = FALSE;
+  custom_element_change_events[CE_HITTING_SOMETHING] = FALSE;
+  custom_element_change_events[CE_HIT_BY_SOMETHING] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
@@ -5126,8 +5131,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
   custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_COLL_ACTIVE] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_COLL_PASSIVE] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_HITTING] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_HIT] = FALSE;
   custom_element_change_events[CE_OTHER_IS_SWITCHING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;

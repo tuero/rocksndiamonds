@@ -488,7 +488,7 @@ static void HandleKeysCheating(Key key)
 #endif
 
 #if 1
-  if (is_string_suffix(cheat_input, ":insert solution tape"))
+  if (is_string_suffix(cheat_input, ":insert-solution-tape"))
     InsertSolutionTape();
 #else
   if (is_string_suffix(cheat_input, ":ist"))
@@ -496,7 +496,7 @@ static void HandleKeysCheating(Key key)
 #endif
 
 #ifdef DEBUG
-  else if (is_string_suffix(cheat_input, ":dump tape"))
+  else if (is_string_suffix(cheat_input, ":dump-tape"))
     DumpTape(&tape);
   else if (is_string_suffix(cheat_input, ".q"))
     for (i = 0; i < MAX_INVENTORY_SIZE; i++)

@@ -644,6 +644,15 @@ void InitElementGraphicInfo()
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].crumbled[act] != -1)
 	default_action_crumbled = element_info[EL_SB_DEFAULT].crumbled[act];
 
+#if 1
+      /* !!! make this better !!! */
+      if (i == EL_EMPTY_SPACE)
+      {
+	default_action_graphic = element_info[EL_DEFAULT].graphic[act];
+	default_action_crumbled = element_info[EL_DEFAULT].crumbled[act];
+      }
+#endif
+
       if (default_action_graphic == -1)
 	default_action_graphic = default_graphic;
       if (default_action_crumbled == -1)
@@ -2071,6 +2080,11 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_can_explode_dyna[] =
+  {
+    -1
+  };
+
   static int ep_player[] =
   {
     EL_PLAYER_1,
@@ -2842,6 +2856,7 @@ void InitElementPropertiesStatic()
     { ep_droppable,		EP_DROPPABLE		},
     { ep_can_explode_1x1,	EP_CAN_EXPLODE_1X1	},
     { ep_pushable,		EP_PUSHABLE		},
+    { ep_can_explode_dyna,	EP_CAN_EXPLODE_DYNA	},
 
     { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
@@ -3103,7 +3118,16 @@ void InitElementPropertiesEngine(int engine_version)
 
     /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
-					 !CAN_EXPLODE_1X1(i)));
+					 !CAN_EXPLODE_1X1(i) &&
+					 !CAN_EXPLODE_DYNA(i)));
+#if 0
+    if (i == EL_CUSTOM_START + 253)
+      printf("::: %d, %d, %d -> %d\n",
+	     CAN_EXPLODE_1X1(i),
+	     CAN_EXPLODE_3X3(i),
+	     CAN_EXPLODE_DYNA(i),
+	     CAN_EXPLODE(i));
+#endif
 
     /* ---------- CAN_CHANGE ----------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */
