@@ -1085,13 +1085,13 @@ static void CreateScrollbarGadgets()
 
     if (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL)
     {
-      items_max = lev_fieldx + 2;
+      items_max = MAX(lev_fieldx + 2, ED_FIELDX);
       items_visible = ED_FIELDX;
       item_position = 0;
     }
     else
     {
-      items_max = lev_fieldy + 2;
+      items_max = MAX(lev_fieldy + 2, ED_FIELDY);
       items_visible = ED_FIELDY;
       item_position = 0;
     }
@@ -1516,13 +1516,13 @@ void AdjustEditorScrollbar(int id)
 
   if (id == ED_CTRL_ID_SCROLL_HORIZONTAL)
   {
-    items_max = lev_fieldx + 2;
+    items_max = MAX(lev_fieldx + 2, ED_FIELDX);
     items_visible = ED_FIELDX;
     item_position = level_xpos + 1;
   }
   else
   {
-    items_max = lev_fieldy + 2;
+    items_max = MAX(lev_fieldy + 2, ED_FIELDY);
     items_visible = ED_FIELDY;
     item_position = level_ypos + 1;
   }
@@ -3109,10 +3109,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 		 button == 3 ? new_element3 : 0);
 
 
-
+#if 0
   if (button_release_event)
     button = 0;
-
+#endif
 
 
   if (!draw_level && drawing_function != ED_CTRL_ID_SINGLE_ITEMS)
@@ -3136,7 +3136,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  break;
 
 	if (draw_with_brush)
-	  CopyBrushToLevel(sx, sy, button);
+	{
+	  if (!button_release_event)
+	    CopyBrushToLevel(sx, sy, button);
+	}
 	else if (new_element != Feld[lx][ly])
 	{
 	  if (new_element == EL_SPIELFIGUR)
