@@ -1072,9 +1072,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     boolean left_stopped = FALSE, right_stopped = FALSE;
 
-    if (!IN_LEV_FIELD(lx - 1, ly) || IS_MAUER(Feld[lx - 1][ly]))
+    if (!IN_LEV_FIELD(lx - 1, ly) || IS_WALL(Feld[lx - 1][ly]))
       left_stopped = TRUE;
-    if (!IN_LEV_FIELD(lx + 1, ly) || IS_MAUER(Feld[lx + 1][ly]))
+    if (!IN_LEV_FIELD(lx + 1, ly) || IS_WALL(Feld[lx + 1][ly]))
       right_stopped = TRUE;
 
     if (left_stopped && right_stopped)

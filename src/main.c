@@ -289,45 +289,42 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "blue key"
   },
   {
-    "gate_1_closed",
+    "gate_1",
     "gate",
     "red door"
   },
   {
-    "gate_2_closed",
+    "gate_2",
     "gate",
     "yellow door"
   },
   {
-    "gate_3_closed",
+    "gate_3",
     "gate",
     "green door"
   },
   {
-    "gate_4_closed",
+    "gate_4",
     "gate",
     "blue door"
   },
   {
-    "gate_1_gray_closed",
+    "gate_1_gray",
     "gate",
     "gray door (opened by red key)"
   },
   {
-    "gate_2_gray_closed",
+    "gate_2_gray",
     "gate",
-    "gray door (opened by yellow key)"
-  },
+    "gray door (opened by yellow key)"},
   {
-    "gate_3_gray_closed",
+    "gate_3_gray",
     "gate",
-    "gray door (opened by green key)"
-  },
+    "gray door (opened by green key)"},
   {
-    "gate_4_gray_closed",
+    "gate_4_gray",
     "gate",
-    "gray door (opened by blue key)"
-  },
+    "gray door (opened by blue key)"},
   {
     "dynamite",
     "dynamite",
@@ -1118,22 +1115,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "growing wall (any direction)"
   },
   {
-    "em_gate_1_closed",
+    "em_gate_1",
     "gate",
     "red door (EM style)"
   },
   {
-    "em_gate_2_closed",
+    "em_gate_2",
     "gate",
     "yellow door (EM style)"
   },
   {
-    "em_gate_3_closed",
+    "em_gate_3",
     "gate",
     "green door (EM style)"
   },
   {
-    "em_gate_4_closed",
+    "em_gate_4",
     "gate",
     "blue door (EM style)"
   },
@@ -1353,22 +1350,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "chip (lower half)"
   },
   {
-    "em_gate_1_gray_closed",
+    "em_gate_1_gray",
     "gate",
     "gray door (EM style, red key)"
   },
   {
-    "em_gate_2_gray_closed",
+    "em_gate_2_gray",
     "gate",
     "gray door (EM style, yellow key)"
   },
   {
-    "em_gate_3_gray_closed",
+    "em_gate_3_gray",
     "gate",
     "gray door (EM style, green key)"
   },
   {
-    "em_gate_4_gray_closed",
+    "em_gate_4_gray",
     "gate",
     "gray door (EM style, blue key)"
   },
@@ -2776,86 +2773,6 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "bd_magic_wall_dead",
     "magic_wall",
     "-"
-  },
-  {
-    "gate_1_open",
-    "gate",
-    "red door"
-  },
-  {
-    "gate_2_open",
-    "gate",
-    "yellow door"
-  },
-  {
-    "gate_3_open",
-    "gate",
-    "green door"
-  },
-  {
-    "gate_4_open",
-    "gate",
-    "blue door"
-  },
-  {
-    "gate_1_gray_open",
-    "gate",
-    "gray door (opened by red key)"
-  },
-  {
-    "gate_2_gray_open",
-    "gate",
-    "gray door (opened by yellow key)"
-  },
-  {
-    "gate_3_gray_open",
-    "gate",
-    "gray door (opened by green key)"
-  },
-  {
-    "gate_4_gray_open",
-    "gate",
-    "gray door (opened by blue key)"
-  },
-  {
-    "em_gate_1_open",
-    "gate",
-    "red door (EM style)"
-  },
-  {
-    "em_gate_2_open",
-    "gate",
-    "yellow door (EM style)"
-  },
-  {
-    "em_gate_3_open",
-    "gate",
-    "green door (EM style)"
-  },
-  {
-    "em_gate_4_open",
-    "gate",
-    "blue door (EM style)"
-  },
-  {
-    "em_gate_1_gray_open",
-    "gate",
-    "gray door (EM style, red key)"
-  },
-  {
-    "em_gate_2_gray_open",
-    "gate",
-    "gray door (EM style, yellow key)"
-  },
-  {
-    "em_gate_3_gray_open",
-    "gate",
-    "gray door (EM style, green key)"
-  },
-  {
-    "em_gate_4_gray_open",
-    "gate",
-    "gray door (EM style, blue key)"
   },
 
   /* ----------------------------------------------------------------------- */

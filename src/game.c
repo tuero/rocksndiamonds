@@ -941,7 +941,8 @@ void InitGame()
   if (setup.sound_music)
     PlayMusic(level_nr);
 
-  KeyboardAutoRepeatOff();
+  if (!tape.playing)
+    KeyboardAutoRepeatOff();
 
   if (options.debug)
   {
@@ -1847,26 +1848,6 @@ void SplashAcid(int x, int y)
   }
 }
 
-static int ChangeElementOnPlayfield(int element_old, int element_new)
-{
-  int x, y;
-  int num_changes = 0;
-
-  for(y=0; y<lev_fieldy; y++)
-  {
-    for(x=0; x<lev_fieldx; x++)
-    {
-      if (Feld[x][y] == element_old)
-      {
-	Feld[x][y] = element_new;
-	num_changes++;
-      }
-    }
-  }
-
-  return num_changes;
-}
-
 static void InitBeltMovement()
 {
   static int belt_base_element[4] =
@@ -2157,11 +2138,7 @@ static void ActivateTimegateSwitch(int x, int y)
 	  element == EL_TIMEGATE_CLOSING)
       {
 	Feld[xx][yy] = EL_TIMEGATE_OPENING;
-#if 1
-	PlaySoundLevelElementAction(xx, yy, Feld[xx][yy], ACTION_OPENING);
-#else
 	PlaySoundLevel(xx, yy, SND_TIMEGATE_OPENING);
-#endif
       }
 
       /*
@@ -3123,7 +3100,7 @@ void StartMoving(int x, int y)
 	  int flame_graphic = graphic + (i - 1);
 
 	  if (!IN_LEV_FIELD(xx, yy) ||
-	      IS_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
+	      IS_HISTORIC_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
 	    break;
 
 	  if (MovDelay[x][y])
@@ -4188,22 +4165,22 @@ void MauerWaechst(int x, int y)
     {
       if (MovDir[x][y] == MV_LEFT)
       {
-	if (IN_LEV_FIELD(x - 1, y) && IS_MAUER(Feld[x - 1][y]))
+	if (IN_LEV_FIELD(x - 1, y) && IS_WALL(Feld[x - 1][y]))
 	  DrawLevelField(x - 1, y);
       }
       else if (MovDir[x][y] == MV_RIGHT)
       {
-	if (IN_LEV_FIELD(x + 1, y) && IS_MAUER(Feld[x + 1][y]))
+	if (IN_LEV_FIELD(x + 1, y) && IS_WALL(Feld[x + 1][y]))
 	  DrawLevelField(x + 1, y);
       }
       else if (MovDir[x][y] == MV_UP)
       {
-	if (IN_LEV_FIELD(x, y - 1) && IS_MAUER(Feld[x][y - 1]))
+	if (IN_LEV_FIELD(x, y - 1) && IS_WALL(Feld[x][y - 1]))
 	  DrawLevelField(x, y - 1);
       }
       else
       {
-	if (IN_LEV_FIELD(x, y + 1) && IS_MAUER(Feld[x][y + 1]))
+	if (IN_LEV_FIELD(x, y + 1) && IS_WALL(Feld[x][y + 1]))
 	  DrawLevelField(x, y + 1);
       }
 
@@ -4302,13 +4279,13 @@ void MauerAbleger(int ax, int ay)
   if (element == EL_EXPANDABLE_WALL && (links_frei || rechts_frei))
     DrawLevelField(ax, ay);
 
-  if (!IN_LEV_FIELD(ax, ay-1) || IS_MAUER(Feld[ax][ay-1]))
+  if (!IN_LEV_FIELD(ax, ay-1) || IS_WALL(Feld[ax][ay-1]))
     oben_massiv = TRUE;
-  if (!IN_LEV_FIELD(ax, ay+1) || IS_MAUER(Feld[ax][ay+1]))
+  if (!IN_LEV_FIELD(ax, ay+1) || IS_WALL(Feld[ax][ay+1]))
     unten_massiv = TRUE;
-  if (!IN_LEV_FIELD(ax-1, ay) || IS_MAUER(Feld[ax-1][ay]))
+  if (!IN_LEV_FIELD(ax-1, ay) || IS_WALL(Feld[ax-1][ay]))
     links_massiv = TRUE;
-  if (!IN_LEV_FIELD(ax+1, ay) || IS_MAUER(Feld[ax+1][ay]))
+  if (!IN_LEV_FIELD(ax+1, ay) || IS_WALL(Feld[ax+1][ay]))
     rechts_massiv = TRUE;
 
   if (((oben_massiv && unten_massiv) ||
@@ -5708,17 +5685,51 @@ void RemoveHero(struct PlayerInfo *player)
   ExitY = ZY = jy;
 }
 
-#if 0
 /*
   checkDiagonalPushing()
   -----------------------------------------------------------------------------
   check if diagonal input device direction results in pushing of object
+  (by checking if the alternative direction is walkable, diggable, ...)
 */
 
-static boolean checkDiagonalPushing(int x, int y, int real_dx, int real_dy)
+static boolean checkDiagonalPushing(struct PlayerInfo *player,
+				    int x, int y, int real_dx, int real_dy)
 {
-}
+  int jx = player->jx, jy = player->jy;
+  int dx = x - jx, dy = y - jy;
+
+  if (real_dx && real_dy) 	/* diagonal direction input => do check */
+  {
+    /* diagonal direction: check alternative direction */
+    int xx = jx + (dx == 0 ? real_dx : 0);
+    int yy = jy + (dy == 0 ? real_dy : 0);
+
+    if (IN_LEV_FIELD(xx, yy))
+    {
+      int element = Feld[xx][yy];
+
+#if 0
+      if (IS_HISTORIC_SOLID(element) !=
+	  (!(IS_WALKABLE(element) ||
+	     IS_DIGGABLE(element) ||
+	     IS_COLLECTIBLE(element))))
+	printf("::: %d ['%s'] [%d, %d]\n",
+	       element,
+	       element_info[element].token_name,
+	       game.engine_version, tape.engine_version);
 #endif
+
+      if (game.engine_version < VERSION_IDENT(2,2,0))
+	return IS_HISTORIC_SOLID(element);
+      else
+	return !(IS_WALKABLE(element) ||
+		 IS_DIGGABLE(element) ||
+		 IS_COLLECTIBLE(element));
+    }
+  }
+
+  return TRUE;		/* no diagonal direction input => push object */
+}
 
 /*
   DigField()
@@ -5757,9 +5768,15 @@ int DigField(struct PlayerInfo *player,
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
 
-  if (IS_TUBE(Feld[jx][jy]))
+#if 0
+  if (IS_TUBE(Feld[jx][jy]) || IS_TUBE(Back[jx][jy]))
+#else
+  if (IS_TUBE(Feld[jx][jy]) ||
+      (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0)))
+#endif
   {
     int i = 0;
+    int tube_element = (IS_TUBE(Feld[jx][jy]) ? Feld[jx][jy] : Back[jx][jy]);
     int tube_leave_directions[][2] =
     {
       { EL_TUBE_ANY,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
@@ -5776,7 +5793,7 @@ int DigField(struct PlayerInfo *player,
       { -1,                     	MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN }
     };
 
-    while (tube_leave_directions[i][0] != Feld[jx][jy])
+    while (tube_leave_directions[i][0] != tube_element)
     {
       i++;
       if (tube_leave_directions[i][0] == -1)	/* should not happen */
@@ -5912,8 +5929,6 @@ int DigField(struct PlayerInfo *player,
     {
       int key_nr = element - EL_KEY_1;
       int graphic = el2edimg(element);
-      int element_old, element_new;
-      int num_changes;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5923,34 +5938,6 @@ int DigField(struct PlayerInfo *player,
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
-
-      element_old = EL_GATE_1_CLOSED + key_nr;
-      element_new = EL_GATE_1_OPEN + key_nr;
-      num_changes = ChangeElementOnPlayfield(element_old, element_new);
-      if (num_changes > 0)
-	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-      element_old = EL_GATE_1_GRAY_CLOSED + key_nr;
-      element_new = EL_GATE_1_GRAY_OPEN + key_nr;
-      num_changes = ChangeElementOnPlayfield(element_old, element_new);
-      if (num_changes > 0)
-	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-      if (game.engine_version < VERSION_IDENT(2,2,0))
-      {
-	element_old = EL_EM_GATE_1_CLOSED + key_nr;
-	element_new = EL_EM_GATE_1_OPEN + key_nr;
-	num_changes = ChangeElementOnPlayfield(element_old, element_new);
-	if (num_changes > 0)
-	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-	element_old = EL_EM_GATE_1_GRAY_CLOSED + key_nr;
-	element_new = EL_EM_GATE_1_GRAY_OPEN + key_nr;
-	num_changes = ChangeElementOnPlayfield(element_old, element_new);
-	if (num_changes > 0)
-	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-      }
-
       break;
     }
 
@@ -5961,8 +5948,6 @@ int DigField(struct PlayerInfo *player,
     {
       int key_nr = element - EL_EM_KEY_1;
       int graphic = el2edimg(EL_KEY_1 + key_nr);
-      int element_old, element_new;
-      int num_changes;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5972,34 +5957,6 @@ int DigField(struct PlayerInfo *player,
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
-
-      element_old = EL_EM_GATE_1_CLOSED + key_nr;
-      element_new = EL_EM_GATE_1_OPEN + key_nr;
-      num_changes = ChangeElementOnPlayfield(element_old, element_new);
-      if (num_changes > 0)
-	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-      element_old = EL_EM_GATE_1_GRAY_CLOSED + key_nr;
-      element_new = EL_EM_GATE_1_GRAY_OPEN + key_nr;
-      num_changes = ChangeElementOnPlayfield(element_old, element_new);
-      if (num_changes > 0)
-	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-      if (game.engine_version < VERSION_IDENT(2,2,0))
-      {
-	element_old = EL_GATE_1_CLOSED + key_nr;
-	element_new = EL_GATE_1_OPEN + key_nr;
-	num_changes = ChangeElementOnPlayfield(element_old, element_new);
-	if (num_changes > 0)
-	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-
-	element_old = EL_GATE_1_GRAY_CLOSED + key_nr;
-	element_new = EL_GATE_1_GRAY_OPEN + key_nr;
-	num_changes = ChangeElementOnPlayfield(element_old, element_new);
-	if (num_changes > 0)
-	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
-      }
-
       break;
     }
 
@@ -6127,11 +6084,17 @@ int DigField(struct PlayerInfo *player,
       if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
 	return MF_NO_ACTION;
 
+#if 1
+      if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
+	return MF_NO_ACTION;
+#else
       if (real_dy)
       {
-	if (IN_LEV_FIELD(jx, jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
+	if (IN_LEV_FIELD(jx, jy+real_dy) &&
+	    !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
 	  return MF_NO_ACTION;
       }
+#endif
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
@@ -6170,34 +6133,28 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       break;
 
-    case EL_GATE_1_OPEN:
-    case EL_GATE_2_OPEN:
-    case EL_GATE_3_OPEN:
-    case EL_GATE_4_OPEN:
-#if 0
+    case EL_GATE_1:
+    case EL_GATE_2:
+    case EL_GATE_3:
+    case EL_GATE_4:
       if (!player->key[element - EL_GATE_1])
 	return MF_NO_ACTION;
-#endif
       break;
 
-    case EL_GATE_1_GRAY_OPEN:
-    case EL_GATE_2_GRAY_OPEN:
-    case EL_GATE_3_GRAY_OPEN:
-    case EL_GATE_4_GRAY_OPEN:
-#if 0
+    case EL_GATE_1_GRAY:
+    case EL_GATE_2_GRAY:
+    case EL_GATE_3_GRAY:
+    case EL_GATE_4_GRAY:
       if (!player->key[element - EL_GATE_1_GRAY])
 	return MF_NO_ACTION;
-#endif
       break;
 
-    case EL_EM_GATE_1_OPEN:
-    case EL_EM_GATE_2_OPEN:
-    case EL_EM_GATE_3_OPEN:
-    case EL_EM_GATE_4_OPEN:
-#if 0
+    case EL_EM_GATE_1:
+    case EL_EM_GATE_2:
+    case EL_EM_GATE_3:
+    case EL_EM_GATE_4:
       if (!player->key[element - EL_EM_GATE_1])
 	return MF_NO_ACTION;
-#endif
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
@@ -6205,21 +6162,15 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-#if 1
-      PlaySoundLevelAction(x, y, ACTION_PASSING);
-#else
       PlaySoundLevel(x, y, SND_CLASS_GATE_PASSING);
-#endif
       break;
 
-    case EL_EM_GATE_1_GRAY_OPEN:
-    case EL_EM_GATE_2_GRAY_OPEN:
-    case EL_EM_GATE_3_GRAY_OPEN:
-    case EL_EM_GATE_4_GRAY_OPEN:
-#if 0
+    case EL_EM_GATE_1_GRAY:
+    case EL_EM_GATE_2_GRAY:
+    case EL_EM_GATE_3_GRAY:
+    case EL_EM_GATE_4_GRAY:
       if (!player->key[element - EL_EM_GATE_1_GRAY])
 	return MF_NO_ACTION;
-#endif
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
@@ -6385,16 +6336,23 @@ int DigField(struct PlayerInfo *player,
 		  || !IS_SB_ELEMENT(element))))
 	return MF_NO_ACTION;
 
+#if 1
+      if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
+	return MF_NO_ACTION;
+#else
       if (dx && real_dy)
       {
-	if (IN_LEV_FIELD(jx, jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
+	if (IN_LEV_FIELD(jx, jy+real_dy) &&
+	    !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
 	  return MF_NO_ACTION;
       }
       else if (dy && real_dx)
       {
-	if (IN_LEV_FIELD(jx+real_dx, jy) && !IS_SOLID(Feld[jx+real_dx][jy]))
+	if (IN_LEV_FIELD(jx+real_dx, jy) &&
+	    !IS_HISTORIC_SOLID(Feld[jx+real_dx][jy]))
 	  return MF_NO_ACTION;
       }
+#endif
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
@@ -6494,16 +6452,23 @@ int DigField(struct PlayerInfo *player,
 	if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
 	  return MF_NO_ACTION;
 
+#if 1
+	if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
+	  return MF_NO_ACTION;
+#else
 	if (dx && real_dy)
 	{
-	  if (IN_LEV_FIELD(jx, jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
+	  if (IN_LEV_FIELD(jx, jy+real_dy) &&
+	      !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
 	    return MF_NO_ACTION;
 	}
 	else if (dy && real_dx)
 	{
-	  if (IN_LEV_FIELD(jx+real_dx, jy) && !IS_SOLID(Feld[jx+real_dx][jy]))
+	  if (IN_LEV_FIELD(jx+real_dx, jy) &&
+	      !IS_HISTORIC_SOLID(Feld[jx+real_dx][jy]))
 	    return MF_NO_ACTION;
 	}
+#endif
 
 	if (player->push_delay == 0)
 	  player->push_delay = FrameCounter;
@@ -6595,6 +6560,11 @@ boolean PlaceBomb(struct PlayerInfo *player)
   if ((player->dynamite == 0 && player->dynabombs_left == 0) ||
       IS_ACTIVE_BOMB(element) || element == EL_EXPLOSION)
     return FALSE;
+
+#if 0
+  if (element != EL_EMPTY)
+    return FALSE;
+#endif
 
   if (element != EL_EMPTY)
   {

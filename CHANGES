@@ -1,8 +1,16 @@
-Pre-Release Version 2.2.0rc4 [?? ??? ????]
+Pre-Release Version 2.2.0rc6 [?? ??? ????]
+------------------------------------------
+
+Pre-Release Version 2.2.0rc5 [20 APR 2003]
 ------------------------------------------
 	- added generic selectbox gadget
 	- added special mouse cursor for playfield while playing
 	- font handling now more flexible (support for ISO-Latin-1 fonts)
+
+Pre-Release Version 2.2.0rc4 [30 MAR 2003]
+------------------------------------------
+	- changes for menu configuration
+	- not officially announced pre-release version
 
 Pre-Release Version 2.2.0rc3 [11 FEB 2003]
 ------------------------------------------

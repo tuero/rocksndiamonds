@@ -1064,15 +1064,15 @@ static int editor_el_emerald_mine[] =
   EL_EM_KEY_3_FILE,
   EL_EM_KEY_4_FILE,
 
-  EL_EM_GATE_1_CLOSED,
-  EL_EM_GATE_2_CLOSED,
-  EL_EM_GATE_3_CLOSED,
-  EL_EM_GATE_4_CLOSED,
+  EL_EM_GATE_1,
+  EL_EM_GATE_2,
+  EL_EM_GATE_3,
+  EL_EM_GATE_4,
 
-  EL_EM_GATE_1_GRAY_CLOSED,
-  EL_EM_GATE_2_GRAY_CLOSED,
-  EL_EM_GATE_3_GRAY_CLOSED,
-  EL_EM_GATE_4_GRAY_CLOSED,
+  EL_EM_GATE_1_GRAY,
+  EL_EM_GATE_2_GRAY,
+  EL_EM_GATE_3_GRAY,
+  EL_EM_GATE_4_GRAY,
 };
 static int num_editor_el_emerald_mine = SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
@@ -1088,15 +1088,15 @@ static int editor_el_more[] =
   EL_KEY_3,
   EL_KEY_4,
 
-  EL_GATE_1_CLOSED,
-  EL_GATE_2_CLOSED,
-  EL_GATE_3_CLOSED,
-  EL_GATE_4_CLOSED,
+  EL_GATE_1,
+  EL_GATE_2,
+  EL_GATE_3,
+  EL_GATE_4,
 
-  EL_GATE_1_GRAY_CLOSED,
-  EL_GATE_2_GRAY_CLOSED,
-  EL_GATE_3_GRAY_CLOSED,
-  EL_GATE_4_GRAY_CLOSED,
+  EL_GATE_1_GRAY,
+  EL_GATE_2_GRAY,
+  EL_GATE_3_GRAY,
+  EL_GATE_4_GRAY,
 
   EL_ARROW_LEFT,
   EL_ARROW_RIGHT,
@@ -3683,11 +3683,9 @@ static void DrawPropertiesInfo()
   {
     { EP_AMOEBALIVE,		"- living amoeba"		},
     { EP_AMOEBOID,		"- amoeboid"			},
-    { EP_SOLID,			"- solid"			},
     { EP_INDESTRUCTIBLE,	"- undestructible"		},
     { EP_SLIPPERY,		"- slippery"			},
     { EP_ENEMY,			"- enemy"			},
-    { EP_MAUER,			"- mauer"			},
     { EP_CAN_FALL,		"- can fall"			},
     { EP_CAN_SMASH,		"- can smash"			},
     { EP_CAN_CHANGE,		"- can change"			},

@@ -857,68 +857,36 @@ element_to_graphic[] =
     IMG_EM_KEY_4
   },
   {
-    EL_EM_GATE_1_CLOSED,			-1, -1,
-    IMG_EM_GATE_1_CLOSED
+    EL_EM_GATE_1,				-1, -1,
+    IMG_EM_GATE_1
   },
   {
-    EL_EM_GATE_1_OPEN,				-1, -1,
-    IMG_EM_GATE_1_OPEN
+    EL_EM_GATE_2,				-1, -1,
+    IMG_EM_GATE_2
   },
   {
-    EL_EM_GATE_2_CLOSED,			-1, -1,
-    IMG_EM_GATE_2_CLOSED
+    EL_EM_GATE_3,				-1, -1,
+    IMG_EM_GATE_3
   },
   {
-    EL_EM_GATE_2_OPEN,				-1, -1,
-    IMG_EM_GATE_2_OPEN
+    EL_EM_GATE_4,				-1, -1,
+    IMG_EM_GATE_4
   },
   {
-    EL_EM_GATE_3_CLOSED,			-1, -1,
-    IMG_EM_GATE_3_CLOSED
+    EL_EM_GATE_1_GRAY,				-1, -1,
+    IMG_EM_GATE_1_GRAY
   },
   {
-    EL_EM_GATE_3_OPEN,				-1, -1,
-    IMG_EM_GATE_3_OPEN
+    EL_EM_GATE_2_GRAY,				-1, -1,
+    IMG_EM_GATE_2_GRAY
   },
   {
-    EL_EM_GATE_4_CLOSED,			-1, -1,
-    IMG_EM_GATE_4_CLOSED
+    EL_EM_GATE_3_GRAY,				-1, -1,
+    IMG_EM_GATE_3_GRAY
   },
   {
-    EL_EM_GATE_4_OPEN,				-1, -1,
-    IMG_EM_GATE_4_OPEN
-  },
-  {
-    EL_EM_GATE_1_GRAY_CLOSED,			-1, -1,
-    IMG_EM_GATE_1_GRAY_CLOSED
-  },
-  {
-    EL_EM_GATE_1_GRAY_OPEN,			-1, -1,
-    IMG_EM_GATE_1_GRAY_OPEN
-  },
-  {
-    EL_EM_GATE_2_GRAY_CLOSED,			-1, -1,
-    IMG_EM_GATE_2_GRAY_CLOSED
-  },
-  {
-    EL_EM_GATE_2_GRAY_OPEN,			-1, -1,
-    IMG_EM_GATE_2_GRAY_OPEN
-  },
-  {
-    EL_EM_GATE_3_GRAY_CLOSED,			-1, -1,
-    IMG_EM_GATE_3_GRAY_CLOSED
-  },
-  {
-    EL_EM_GATE_3_GRAY_OPEN,			-1, -1,
-    IMG_EM_GATE_3_GRAY_OPEN
-  },
-  {
-    EL_EM_GATE_4_GRAY_CLOSED,			-1, -1,
-    IMG_EM_GATE_4_GRAY_CLOSED
-  },
-  {
-    EL_EM_GATE_4_GRAY_OPEN,			-1, -1,
-    IMG_EM_GATE_4_GRAY_OPEN
+    EL_EM_GATE_4_GRAY,				-1, -1,
+    IMG_EM_GATE_4_GRAY
   },
   {
     EL_EXIT_CLOSED,				-1, -1,
@@ -1457,68 +1425,36 @@ element_to_graphic[] =
     IMG_KEY_4
   },
   {
-    EL_GATE_1_CLOSED,				-1, -1,
-    IMG_GATE_1_CLOSED
+    EL_GATE_1,					-1, -1,
+    IMG_GATE_1
   },
   {
-    EL_GATE_1_OPEN,				-1, -1,
-    IMG_GATE_1_OPEN
+    EL_GATE_2,					-1, -1,
+    IMG_GATE_2
   },
   {
-    EL_GATE_2_CLOSED,				-1, -1,
-    IMG_GATE_2_CLOSED
+    EL_GATE_3,					-1, -1,
+    IMG_GATE_3
   },
   {
-    EL_GATE_2_OPEN,				-1, -1,
-    IMG_GATE_2_OPEN
+    EL_GATE_4,					-1, -1,
+    IMG_GATE_4
   },
   {
-    EL_GATE_3_CLOSED,				-1, -1,
-    IMG_GATE_3_CLOSED
+    EL_GATE_1_GRAY,				-1, -1,
+    IMG_GATE_1_GRAY
   },
   {
-    EL_GATE_3_OPEN,				-1, -1,
-    IMG_GATE_3_OPEN
+    EL_GATE_2_GRAY,				-1, -1,
+    IMG_GATE_2_GRAY
   },
   {
-    EL_GATE_4_CLOSED,				-1, -1,
-    IMG_GATE_4_CLOSED
+    EL_GATE_3_GRAY,				-1, -1,
+    IMG_GATE_3_GRAY
   },
   {
-    EL_GATE_4_OPEN,				-1, -1,
-    IMG_GATE_4_OPEN
-  },
-  {
-    EL_GATE_1_GRAY_CLOSED,			-1, -1,
-    IMG_GATE_1_GRAY_CLOSED
-  },
-  {
-    EL_GATE_1_GRAY_OPEN,			-1, -1,
-    IMG_GATE_1_GRAY_OPEN
-  },
-  {
-    EL_GATE_2_GRAY_CLOSED,			-1, -1,
-    IMG_GATE_2_GRAY_CLOSED
-  },
-  {
-    EL_GATE_2_GRAY_OPEN,			-1, -1,
-    IMG_GATE_2_GRAY_OPEN
-  },
-  {
-    EL_GATE_3_GRAY_CLOSED,			-1, -1,
-    IMG_GATE_3_GRAY_CLOSED
-  },
-  {
-    EL_GATE_3_GRAY_OPEN,			-1, -1,
-    IMG_GATE_3_GRAY_OPEN
-  },
-  {
-    EL_GATE_4_GRAY_CLOSED,			-1, -1,
-    IMG_GATE_4_GRAY_CLOSED
-  },
-  {
-    EL_GATE_4_GRAY_OPEN,			-1, -1,
-    IMG_GATE_4_GRAY_OPEN
+    EL_GATE_4_GRAY,				-1, -1,
+    IMG_GATE_4_GRAY
   },
   {
     EL_GAME_OF_LIFE,				-1, -1,

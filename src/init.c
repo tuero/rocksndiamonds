@@ -1101,6 +1101,27 @@ void InitElementProperties()
     -1
   };
 
+  static int ep_keygate[] =
+  {
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    -1
+  };
+
   static int ep_can_be_crumbled[] =
   {
     EL_SAND,
@@ -1110,7 +1131,7 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_solid[] =
+  static int ep_historic_solid[] =
   {
     EL_WALL,
     EL_EXPANDABLE_WALL,
@@ -1227,38 +1248,22 @@ void InitElementProperties()
     EL_EMC_STEELWALL_3,
     EL_EMC_STEELWALL_4,
     EL_CRYSTAL,
-    EL_GATE_1_CLOSED,
-    EL_GATE_2_CLOSED,
-    EL_GATE_3_CLOSED,
-    EL_GATE_4_CLOSED,
-    EL_GATE_1_OPEN,
-    EL_GATE_2_OPEN,
-    EL_GATE_3_OPEN,
-    EL_GATE_4_OPEN,
-    EL_GATE_1_GRAY_CLOSED,
-    EL_GATE_2_GRAY_CLOSED,
-    EL_GATE_3_GRAY_CLOSED,
-    EL_GATE_4_GRAY_CLOSED,
-    EL_GATE_1_GRAY_OPEN,
-    EL_GATE_2_GRAY_OPEN,
-    EL_GATE_3_GRAY_OPEN,
-    EL_GATE_4_GRAY_OPEN,
-    EL_EM_GATE_1_CLOSED,
-    EL_EM_GATE_2_CLOSED,
-    EL_EM_GATE_3_CLOSED,
-    EL_EM_GATE_4_CLOSED,
-    EL_EM_GATE_1_OPEN,
-    EL_EM_GATE_2_OPEN,
-    EL_EM_GATE_3_OPEN,
-    EL_EM_GATE_4_OPEN,
-    EL_EM_GATE_1_GRAY_CLOSED,
-    EL_EM_GATE_2_GRAY_CLOSED,
-    EL_EM_GATE_3_GRAY_CLOSED,
-    EL_EM_GATE_4_GRAY_CLOSED,
-    EL_EM_GATE_1_GRAY_OPEN,
-    EL_EM_GATE_2_GRAY_OPEN,
-    EL_EM_GATE_3_GRAY_OPEN,
-    EL_EM_GATE_4_GRAY_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
@@ -1335,38 +1340,22 @@ void InitElementProperties()
     EL_EMC_STEELWALL_3,
     EL_EMC_STEELWALL_4,
     EL_CRYSTAL,
-    EL_GATE_1_CLOSED,
-    EL_GATE_2_CLOSED,
-    EL_GATE_3_CLOSED,
-    EL_GATE_4_CLOSED,
-    EL_GATE_1_OPEN,
-    EL_GATE_2_OPEN,
-    EL_GATE_3_OPEN,
-    EL_GATE_4_OPEN,
-    EL_GATE_1_GRAY_CLOSED,
-    EL_GATE_2_GRAY_CLOSED,
-    EL_GATE_3_GRAY_CLOSED,
-    EL_GATE_4_GRAY_CLOSED,
-    EL_GATE_1_GRAY_OPEN,
-    EL_GATE_2_GRAY_OPEN,
-    EL_GATE_3_GRAY_OPEN,
-    EL_GATE_4_GRAY_OPEN,
-    EL_EM_GATE_1_CLOSED,
-    EL_EM_GATE_2_CLOSED,
-    EL_EM_GATE_3_CLOSED,
-    EL_EM_GATE_4_CLOSED,
-    EL_EM_GATE_1_OPEN,
-    EL_EM_GATE_2_OPEN,
-    EL_EM_GATE_3_OPEN,
-    EL_EM_GATE_4_OPEN,
-    EL_EM_GATE_1_GRAY_CLOSED,
-    EL_EM_GATE_2_GRAY_CLOSED,
-    EL_EM_GATE_3_GRAY_CLOSED,
-    EL_EM_GATE_4_GRAY_CLOSED,
-    EL_EM_GATE_1_GRAY_OPEN,
-    EL_EM_GATE_2_GRAY_OPEN,
-    EL_EM_GATE_3_GRAY_OPEN,
-    EL_EM_GATE_4_GRAY_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
@@ -1441,41 +1430,25 @@ void InitElementProperties()
     -1
   };
 
-  static int ep_mauer[] =
+  static int ep_historic_wall[] =
   {
     EL_STEELWALL,
-    EL_GATE_1_CLOSED,
-    EL_GATE_2_CLOSED,
-    EL_GATE_3_CLOSED,
-    EL_GATE_4_CLOSED,
-    EL_GATE_1_OPEN,
-    EL_GATE_2_OPEN,
-    EL_GATE_3_OPEN,
-    EL_GATE_4_OPEN,
-    EL_GATE_1_GRAY_CLOSED,
-    EL_GATE_2_GRAY_CLOSED,
-    EL_GATE_3_GRAY_CLOSED,
-    EL_GATE_4_GRAY_CLOSED,
-    EL_GATE_1_GRAY_OPEN,
-    EL_GATE_2_GRAY_OPEN,
-    EL_GATE_3_GRAY_OPEN,
-    EL_GATE_4_GRAY_OPEN,
-    EL_EM_GATE_1_CLOSED,
-    EL_EM_GATE_2_CLOSED,
-    EL_EM_GATE_3_CLOSED,
-    EL_EM_GATE_4_CLOSED,
-    EL_EM_GATE_1_OPEN,
-    EL_EM_GATE_2_OPEN,
-    EL_EM_GATE_3_OPEN,
-    EL_EM_GATE_4_OPEN,
-    EL_EM_GATE_1_GRAY_CLOSED,
-    EL_EM_GATE_2_GRAY_CLOSED,
-    EL_EM_GATE_3_GRAY_CLOSED,
-    EL_EM_GATE_4_GRAY_CLOSED,
-    EL_EM_GATE_1_GRAY_OPEN,
-    EL_EM_GATE_2_GRAY_OPEN,
-    EL_EM_GATE_3_GRAY_OPEN,
-    EL_EM_GATE_4_GRAY_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_EXIT_CLOSED,
     EL_EXIT_OPENING,
     EL_EXIT_OPEN,
@@ -1768,38 +1741,22 @@ void InitElementProperties()
     EL_EM_KEY_2,
     EL_EM_KEY_3,
     EL_EM_KEY_4,
-    EL_GATE_1_CLOSED,
-    EL_GATE_2_CLOSED,
-    EL_GATE_3_CLOSED,
-    EL_GATE_4_CLOSED,
-    EL_GATE_1_OPEN,
-    EL_GATE_2_OPEN,
-    EL_GATE_3_OPEN,
-    EL_GATE_4_OPEN,
-    EL_GATE_1_GRAY_CLOSED,
-    EL_GATE_2_GRAY_CLOSED,
-    EL_GATE_3_GRAY_CLOSED,
-    EL_GATE_4_GRAY_CLOSED,
-    EL_GATE_1_GRAY_OPEN,
-    EL_GATE_2_GRAY_OPEN,
-    EL_GATE_3_GRAY_OPEN,
-    EL_GATE_4_GRAY_OPEN,
-    EL_EM_GATE_1_CLOSED,
-    EL_EM_GATE_2_CLOSED,
-    EL_EM_GATE_3_CLOSED,
-    EL_EM_GATE_4_CLOSED,
-    EL_EM_GATE_1_OPEN,
-    EL_EM_GATE_2_OPEN,
-    EL_EM_GATE_3_OPEN,
-    EL_EM_GATE_4_OPEN,
-    EL_EM_GATE_1_GRAY_CLOSED,
-    EL_EM_GATE_2_GRAY_CLOSED,
-    EL_EM_GATE_3_GRAY_CLOSED,
-    EL_EM_GATE_4_GRAY_CLOSED,
-    EL_EM_GATE_1_GRAY_OPEN,
-    EL_EM_GATE_2_GRAY_OPEN,
-    EL_EM_GATE_3_GRAY_OPEN,
-    EL_EM_GATE_4_GRAY_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_DYNAMITE,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_WALL,
@@ -1976,14 +1933,14 @@ void InitElementProperties()
     EL_SOKOBAN_FIELD_EMPTY,
     EL_EXIT_OPEN,
     EL_SP_EXIT_OPEN,
-    EL_GATE_1_OPEN,
-    EL_GATE_2_OPEN,
-    EL_GATE_3_OPEN,
-    EL_GATE_4_OPEN,
-    EL_GATE_1_GRAY_OPEN,
-    EL_GATE_2_GRAY_OPEN,
-    EL_GATE_3_GRAY_OPEN,
-    EL_GATE_4_GRAY_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
     -1
   };
 
@@ -2010,14 +1967,14 @@ void InitElementProperties()
 
   static int ep_passable_over[] =
   {
-    EL_EM_GATE_1_OPEN,
-    EL_EM_GATE_2_OPEN,
-    EL_EM_GATE_3_OPEN,
-    EL_EM_GATE_4_OPEN,
-    EL_EM_GATE_1_GRAY_OPEN,
-    EL_EM_GATE_2_GRAY_OPEN,
-    EL_EM_GATE_3_GRAY_OPEN,
-    EL_EM_GATE_4_GRAY_OPEN,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
     -1
@@ -2053,8 +2010,9 @@ void InitElementProperties()
     EL_TRAP,
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE,
-#if 0
+#if 1
     EL_LANDMINE,
+    EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
 #endif
     -1
@@ -2239,12 +2197,13 @@ void InitElementProperties()
   {
     { ep_amoebalive,		EP_AMOEBALIVE		},
     { ep_amoeboid,		EP_AMOEBOID		},
+    { ep_keygate,		EP_KEYGATE		},
     { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
-    { ep_solid,			EP_SOLID		},
+    { ep_historic_solid,	EP_HISTORIC_SOLID	},
     { ep_indestructible,	EP_INDESTRUCTIBLE	},
     { ep_slippery,		EP_SLIPPERY		},
     { ep_enemy,			EP_ENEMY		},
-    { ep_mauer,			EP_MAUER		},
+    { ep_historic_wall,		EP_HISTORIC_WALL	},
     { ep_can_fall,		EP_CAN_FALL		},
     { ep_can_smash,		EP_CAN_SMASH		},
     { ep_can_change,		EP_CAN_CHANGE		},
@@ -2315,6 +2274,32 @@ void InitElementProperties()
   };
 #endif
 
+  static int no_wall_properties[] =
+  {
+    EP_AMOEBALIVE,
+    EP_AMOEBOID,
+    EP_CAN_BE_CRUMBLED,
+    EP_ENEMY,
+    EP_CAN_FALL,
+    EP_CAN_SMASH,
+    EP_CAN_MOVE,
+    EP_COULD_MOVE,
+    EP_DONT_GO_TO,
+    EP_FOOD_DARK_YAMYAM,
+    EP_GEM,
+    EP_FOOD_PENGUIN,
+    EP_PUSHABLE,
+    EP_PLAYER,
+    EP_ACCESSIBLE,
+    EP_DIGGABLE,
+    EP_COLLECTIBLE,
+    EP_ACTIVE_BOMB,
+    EP_BELT,
+    EP_BELT_ACTIVE,
+    EP_TUBE,
+    -1
+  };
+
   /* always start with reliable default values (no properties) */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     for (j=0; j<NUM_EP_BITFIELDS; j++)
@@ -2352,6 +2337,28 @@ void InitElementProperties()
       SET_PROPERTY(i, EP_ACCESSIBLE, TRUE);
   }
 
+  /* dynamically determine wall-like elements */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    /* default: element is wall-like */
+    SET_PROPERTY(i, EP_WALL, TRUE);
+
+    for (j=0; no_wall_properties[j] != -1; j++)
+      if (HAS_PROPERTY(i, no_wall_properties[j]) ||
+	  i >= EL_FIRST_RUNTIME_UNREAL)
+	SET_PROPERTY(i, EP_WALL, FALSE);
+
+    if (IS_HISTORIC_WALL(i))
+      SET_PROPERTY(i, EP_WALL, TRUE);
+
+#if 0
+    printf("::: %d: %s '%s'\n",
+	   i,
+	   (IS_WALL(i) ? "IS A WALL:    " : "IS NOT A WALL:"),
+	   element_info[i].token_name);
+#endif
+  }
+
 #if 0
   /* determine inactive elements (used for engine main loop optimization) */
   for (i=0; i < MAX_NUM_ELEMENTS; i++)
@@ -2368,27 +2375,6 @@ void InitElementProperties()
     if (!active)
       SET_PROPERTY(i, EP_INACTIVE, TRUE);
 #endif
-  }
-#endif
-
-#if 0
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-  {
-    boolean element_is_solid = TRUE;
-
-    if (IS_DIGGABLE(i) ||
-	IS_COLLECTIBLE(i) ||
-	CAN_FALL(i) ||
-	CAN_MOVE(i) ||
-	IS_PUSHABLE(i))
-      element_is_solid = FALSE;
-
-    if (IS_INDESTRUCTIBLE(i))
-      element_is_solid = TRUE;
-
-    if (element_is_solid != HAS_PROPERTY(i, EP_SOLID))
-      printf("::: '%s' should %s solid\n", element_info[i].token_name,
-	     (HAS_PROPERTY(i, EP_SOLID) ? "NOT be" : "be"));
   }
 #endif
 }
