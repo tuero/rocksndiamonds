@@ -210,19 +210,8 @@ void InitSound()
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
-#ifdef MSDOS
-    sprintf(sound_name[i], "%d", i + 1);
-#endif
-
-#ifdef USE_SDL_LIBRARY
-    {
-      char *str = getStringCopy(sound_name[i]);
-      sprintf(str, "%d", i + 1);
-      Sound[i].name = str;
-    }
-#else
     Sound[i].name = sound_name[i];
-#endif
+
     if (!LoadSound(&Sound[i]))
     {
       sound_status = SOUND_OFF;

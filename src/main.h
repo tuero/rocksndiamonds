@@ -1653,7 +1653,7 @@ extern char		*element_info[];
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING
-#define COPYRIGHT_STRING	"Copyright ^1995-99 by " PROGRAM_AUTHOR_STRING
+#define COPYRIGHT_STRING	"Copyright ^1995-2000 by " PROGRAM_AUTHOR_STRING
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"

@@ -686,7 +686,7 @@ void DrawHelpScreenCreditsText()
   DrawTextFCentered(100, FC_GREEN,
 		    "Credits:");
   DrawTextFCentered(ystart + 0 * ystep, FC_YELLOW,
-		    "DOS/Windows port of the game:");
+		    "DOS port of the game:");
   DrawTextFCentered(ystart + 1 * ystep, FC_RED,
 		    "Guido Schulz");
   DrawTextFCentered(ystart + 2 * ystep, FC_YELLOW,
@@ -716,13 +716,13 @@ void DrawHelpScreenContactText()
   DrawTextFCentered(ystart + 1 * ystep, FC_YELLOW,
 		    "If you like it, send e-mail to:");
   DrawTextFCentered(ystart + 2 * ystep, FC_RED,
-		    "aeglos@valinor.owl.de");
+		    "info@artsoft.org");
   DrawTextFCentered(ystart + 3 * ystep, FC_YELLOW,
 		    "or SnailMail to:");
   DrawTextFCentered(ystart + 4 * ystep + 0, FC_RED,
 		    "Holger Schemel");
   DrawTextFCentered(ystart + 4 * ystep + 20, FC_RED,
-		    "Oststrasse 11a");
+		    "Detmolder Strasse 189");
   DrawTextFCentered(ystart + 4 * ystep + 40, FC_RED,
 		    "33604 Bielefeld");
   DrawTextFCentered(ystart + 4 * ystep + 60, FC_RED,
@@ -2215,6 +2215,8 @@ void CalibrateJoystick(int player_nr)
 
       NextEvent(&event);
       HandleOtherEvents(&event);
+
+      Delay(10);
     }
   }
   return;

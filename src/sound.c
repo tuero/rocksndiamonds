@@ -830,17 +830,6 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-#ifdef USE_SDL_LIBRARY
-  Mix_PlayChannel(-1, Sound[nr].mix_chunk, 0);
-
-  /*
-  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
-  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
-  */
-
-  return;
-#endif
-
   if (sound_status==SOUND_OFF || !setup.sound)
     return;
 
@@ -862,6 +851,14 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   snd_ctrl.data_ptr	= Sound[nr].data_ptr;
   snd_ctrl.data_len	= Sound[nr].data_len;
 
+#ifdef USE_SDL_LIBRARY
+
+  Mix_Volume(-1, SDL_MIX_MAXVOLUME / 4);
+  Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
+
+  Mix_PlayChannel(-1, Sound[nr].mix_chunk, (loop ? -1 : 0));
+
+#else
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
@@ -871,6 +868,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   }
 #else
   sound_handler(snd_ctrl);
+#endif
 #endif
 }
 
@@ -898,11 +896,6 @@ void StopSoundExt(int nr, int method)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-#ifdef USE_SDL_LIBRARY
-  Mix_HaltMusic();
-  return;
-#endif
-
   if (sound_status==SOUND_OFF)
     return;
 
@@ -917,6 +910,20 @@ void StopSoundExt(int nr, int method)
     snd_ctrl.stop_sound = TRUE;
   }
 
+#ifdef USE_SDL_LIBRARY
+
+  if (SSND_FADING(method))
+  {
+    Mix_FadeOutChannel(-1, 1000);
+    Mix_FadeOutMusic(1000);
+  }
+  else
+  {
+    Mix_HaltChannel(-1);
+    Mix_HaltMusic();
+  }
+
+#else
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
@@ -926,6 +933,7 @@ void StopSoundExt(int nr, int method)
   }
 #else
   sound_handler(snd_ctrl);
+#endif
 #endif
 }
 
