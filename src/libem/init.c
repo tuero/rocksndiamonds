@@ -345,7 +345,7 @@ int open_all(void)
 	ttlmaskBitmap = pcxBitmaps[3]->clip_mask;
 #endif
 
-#if 0
+#if 1
 	for (i = 0; i < 4; i++)
 	  pcxBitmapsX2[i] = ZoomBitmap(pcxBitmaps[i],
 				       pcxBitmaps[i]->width * 2,

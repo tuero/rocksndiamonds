@@ -1,8 +1,13 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#if 1
+#define TILEX 32
+#define TILEY 32
+#else
 #define TILEX 16
 #define TILEY 16
+#endif
 #define SCOREX 8
 #define SCOREY 9
 
