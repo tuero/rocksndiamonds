@@ -552,7 +552,7 @@ void HandleKey(KeySym key, int key_status)
 	case XK_Q:
 #endif
 	case XK_q:
-	  Dynamite = 1000;
+	  local_player->dynamite = 1000;
 	  break;
 
 	case XK_x:

@@ -80,6 +80,8 @@ void OpenAll(int argc, char *argv[])
 
 void InitLevelAndPlayerInfo()
 {
+  local_player = &stored_player[0];
+
   if (!LoadLevelInfo())			/* global level info */
     CloseAll();
 

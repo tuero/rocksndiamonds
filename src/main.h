@@ -68,6 +68,8 @@ typedef int BOOL;
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
 
+#define MAX_PLAYERS	4
+
 #ifndef MIN
 #define MIN(a,b) 	((a)<(b) ? (a) : (b))
 #endif
@@ -205,12 +207,28 @@ struct HiScore
 
 struct PlayerInfo
 {
+  BOOL active, local;
+
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
   int handicap;
   unsigned int setup;
   int leveldir_nr;
   int level_nr;
+
+  int JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
+  int PlayerMovDir, PlayerMovPos, PlayerPushing;
+  int PlayerFrame, PlayerGfxPos;
+  int PlayerGone, LevelSolved, GameOver;
+
+  int score;
+  int gems_still_needed;
+  int sokobanfields_still_needed;
+  int lights_still_needed;
+  int friends_still_needed;
+  int key[4];
+  int dynamite;
+  int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
 };
 
 struct LevelInfo
@@ -332,15 +350,13 @@ extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
 extern int		PlayerMovDir, PlayerMovPos, PlayerPushing;
 extern int		PlayerFrame, PlayerGfxPos;
 extern int		PlayerGone,LevelSolved,GameOver;
-extern int		FrameCounter,TimeFrames,TimeLeft,Score;
-extern int		Gems,SokobanFields,Lights,Friends;
-extern int		Dynamite,Key[4],MampferNr;
-extern int		DynaBombCount, DynaBombSize, DynaBombsLeft, DynaBombXL;
-extern int		SiebAktiv;
+extern int		FrameCounter,TimeFrames,TimeLeft;
+extern int		MampferNr, SiebAktiv;
 
 extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;
-extern struct PlayerInfo	player;
+extern struct PlayerInfo	stored_player[];
+extern struct PlayerInfo       *local_player, *actual_player;
 extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape;
 extern struct SoundInfo		Sound[];

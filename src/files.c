@@ -394,7 +394,7 @@ void LoadPlayerInfo(int mode)
 
   if (!file)
   {
-    player = default_player;
+    *local_player = default_player;
     level_nr = default_player.level_nr;
     return;
   }
@@ -453,19 +453,19 @@ void LoadPlayerInfo(int mode)
 
   if (mode==PLAYER_SETUP)
   {
-    player = new_player;
-    if (player.leveldir_nr < num_leveldirs)
-      leveldir_nr = player.leveldir_nr;
+    *local_player = new_player;
+    if (local_player->leveldir_nr < num_leveldirs)
+      leveldir_nr = local_player->leveldir_nr;
     else
       leveldir_nr = 0;
   }
   else
   {
-    player.handicap = new_player.handicap;
-    player.level_nr = new_player.level_nr;
+    local_player->handicap = new_player.handicap;
+    local_player->level_nr = new_player.level_nr;
   }
 
-  level_nr = player.level_nr;
+  level_nr = local_player->level_nr;
   fclose(file);
 }
 
@@ -668,26 +668,27 @@ void SavePlayerInfo(int mode)
     if (feof(file))		/* Spieler noch nicht in Liste enthalten */
       break;
     else			/* prüfen, ob Spieler in Liste enthalten */
-      if (!strncmp(default_player.login_name,player.login_name,MAX_NAMELEN-1))
+      if (!strncmp(default_player.login_name,
+		   local_player->login_name, MAX_NAMELEN-1))
       {
 	fseek(file,-(2*MAX_NAMELEN+1+2+1+(version_10_file ? 0 : 11)),SEEK_CUR);
 	break;
       }
   }
 
-  player.level_nr = level_nr;
+  local_player->level_nr = level_nr;
 
   for(i=0;i<MAX_NAMELEN;i++)
-    fputc(player.login_name[i],file);
+    fputc(local_player->login_name[i],file);
   for(i=0;i<MAX_NAMELEN;i++)
-    fputc(player.alias_name[i],file);
-  fputc(player.handicap,file);
-  fputc(player.setup / 256,file);
-  fputc(player.setup % 256,file);
-  fputc(player.leveldir_nr,file);
+    fputc(local_player->alias_name[i],file);
+  fputc(local_player->handicap,file);
+  fputc(local_player->setup / 256,file);
+  fputc(local_player->setup % 256,file);
+  fputc(local_player->leveldir_nr,file);
   if (!version_10_file)
   {
-    fputc(player.level_nr,file);
+    fputc(local_player->level_nr,file);
     for(i=0;i<10;i++)		/* currently unused bytes */
       fputc(0,file);
   }

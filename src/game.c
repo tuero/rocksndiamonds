@@ -28,24 +28,24 @@ void GetPlayerConfig()
   int old_joystick_nr = joystick_nr;
 
   if (sound_status==SOUND_OFF)
-    player.setup &= ~SETUP_SOUND;
+    local_player->setup &= ~SETUP_SOUND;
   if (!sound_loops_allowed)
   {
-    player.setup &= ~SETUP_SOUND_LOOPS;
-    player.setup &= ~SETUP_SOUND_MUSIC;
+    local_player->setup &= ~SETUP_SOUND_LOOPS;
+    local_player->setup &= ~SETUP_SOUND_MUSIC;
   }
 
-  sound_on = sound_simple_on = SETUP_SOUND_ON(player.setup);
-  sound_loops_on = SETUP_SOUND_LOOPS_ON(player.setup);
-  sound_music_on = SETUP_SOUND_MUSIC_ON(player.setup);
-  toons_on = SETUP_TOONS_ON(player.setup);
-  direct_draw_on = SETUP_DIRECT_DRAW_ON(player.setup);
-  fading_on = SETUP_FADING_ON(player.setup);
-  autorecord_on = SETUP_AUTO_RECORD_ON(player.setup);
-  joystick_nr = SETUP_2ND_JOYSTICK_ON(player.setup);
-  quick_doors = SETUP_QUICK_DOORS_ON(player.setup);
-  scroll_delay_on = SETUP_SCROLL_DELAY_ON(player.setup);
-  soft_scrolling_on = SETUP_SOFT_SCROLL_ON(player.setup);
+  sound_on = sound_simple_on = SETUP_SOUND_ON(local_player->setup);
+  sound_loops_on = SETUP_SOUND_LOOPS_ON(local_player->setup);
+  sound_music_on = SETUP_SOUND_MUSIC_ON(local_player->setup);
+  toons_on = SETUP_TOONS_ON(local_player->setup);
+  direct_draw_on = SETUP_DIRECT_DRAW_ON(local_player->setup);
+  fading_on = SETUP_FADING_ON(local_player->setup);
+  autorecord_on = SETUP_AUTO_RECORD_ON(local_player->setup);
+  joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
+  quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
+  scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
+  soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
 
 #ifndef MSDOS
   if (joystick_nr != old_joystick_nr)
@@ -63,12 +63,27 @@ void InitGame()
   BOOL emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   BOOL emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
 
-  Dynamite = Score = 0;
-  Gems = level.edelsteine;
-  SokobanFields = Lights = Friends = 0;
-  DynaBombCount = DynaBombSize = DynaBombsLeft = 0;
-  DynaBombXL = FALSE;
-  Key[0] = Key[1] = Key[2] = Key[3] = FALSE;
+  local_player->active = TRUE;
+  local_player->local = TRUE;
+
+  actual_player = local_player;
+
+  actual_player->score = 0;
+
+  actual_player->gems_still_needed = level.edelsteine;
+  actual_player->sokobanfields_still_needed = 0;
+  actual_player->lights_still_needed = 0;
+  actual_player->friends_still_needed = 0;
+
+  for(i=0; i<4; i++)
+    actual_player->key[i] = FALSE;
+
+  actual_player->dynamite = 0;
+  actual_player->dynabomb_count = 0;
+  actual_player->dynabomb_size = 0;
+  actual_player->dynabombs_left = 0;
+  actual_player->dynabomb_xl = FALSE;
+
   MampferNr = 0;
   FrameCounter = 0;
   TimeFrames = 0;
@@ -110,6 +125,8 @@ void InitGame()
 	JY = lastJY = y;
 	break;
       case EL_SPIELER2:
+      case EL_SPIELER3:
+      case EL_SPIELER4:
 	Feld[x][y] = EL_LEERRAUM;
 	break;
       case EL_BADEWANNE:
@@ -169,14 +186,14 @@ void InitGame()
 	MovDelay[x][y] = 96;
 	break;
       case EL_BIRNE_AUS:
-	Lights++;
+	local_player->lights_still_needed++;
 	break;
       case EL_SOKOBAN_FELD_LEER:
-	SokobanFields++;
+	local_player->sokobanfields_still_needed++;
 	break;
       case EL_MAULWURF:
       case EL_PINGUIN:
-	Friends++;
+	local_player->friends_still_needed++;
 	break;
       case EL_SCHWEIN:
       case EL_DRACHE:
@@ -212,13 +229,13 @@ void InitGame()
 	      int2str(level_nr,2),FS_SMALL,FC_YELLOW);
   DrawTextExt(pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX1+XX_EMERALDS,DOOR_GFX_PAGEY1+YY_EMERALDS,
-	      int2str(Gems,3),FS_SMALL,FC_YELLOW);
+	      int2str(local_player->gems_still_needed,3),FS_SMALL,FC_YELLOW);
   DrawTextExt(pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX1+XX_DYNAMITE,DOOR_GFX_PAGEY1+YY_DYNAMITE,
-	      int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
+	      int2str(local_player->dynamite,3),FS_SMALL,FC_YELLOW);
   DrawTextExt(pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX1+XX_SCORE,DOOR_GFX_PAGEY1+YY_SCORE,
-	      int2str(Score,5),FS_SMALL,FC_YELLOW);
+	      int2str(local_player->score,5),FS_SMALL,FC_YELLOW);
   DrawTextExt(pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX1+XX_TIME,DOOR_GFX_PAGEY1+YY_TIME,
 	      int2str(TimeLeft,3),FS_SMALL,FC_YELLOW);
@@ -361,19 +378,19 @@ void GameWon()
   if (TimeLeft)
   {
     if (sound_loops_on)
-      PlaySoundExt(SND_SIRR,PSND_MAX_VOLUME,PSND_MAX_RIGHT,PSND_LOOP);
+      PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
 
-    while(TimeLeft>0)
+    while(TimeLeft > 0)
     {
       if (!sound_loops_on)
-	PlaySoundStereo(SND_SIRR,PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
       if (TimeLeft && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimeLeft > 100 && !(TimeLeft % 10))
 	TimeLeft -= 10;
       else
 	TimeLeft--;
-      DrawText(DX_TIME,DY_TIME,int2str(TimeLeft,3),FS_SMALL,FC_YELLOW);
+      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft,3), FS_SMALL, FC_YELLOW);
       BackToFront();
       Delay(10);
     }
@@ -385,7 +402,7 @@ void GameWon()
   FadeSounds();
 
   /* Hero disappears */
-  DrawLevelElement(ExitX,ExitY,Feld[ExitX][ExitY]);
+  DrawLevelField(ExitX, ExitY);
   BackToFront();
 
   if (tape.playing)
@@ -399,15 +416,15 @@ void GameWon()
     SaveLevelTape(tape.level_nr);	/* Ask to save tape */
   }
 
-  if (level_nr==player.handicap &&
-      level_nr<leveldir[leveldir_nr].levels-1)
+  if (level_nr == local_player->handicap &&
+      level_nr < leveldir[leveldir_nr].levels-1)
   { 
-    player.handicap++; 
+    local_player->handicap++; 
     bumplevel = TRUE;
     SavePlayerInfo(PLAYER_LEVEL);
   }
 
-  if ((hi_pos=NewHiScore())>=0) 
+  if ((hi_pos=NewHiScore()) >= 0) 
   {
     game_status = HALLOFFAME;
     DrawHallOfFame(hi_pos);
@@ -432,21 +449,23 @@ BOOL NewHiScore()
 
   LoadScore(level_nr);
 
-  if (!strcmp(player.alias_name,EMPTY_ALIAS) ||
-      Score<highscore[MAX_SCORE_ENTRIES-1].Score) 
+  if (!strcmp(local_player->alias_name,EMPTY_ALIAS) ||
+      local_player->score < highscore[MAX_SCORE_ENTRIES-1].Score) 
     return(-1);
 
   for(k=0;k<MAX_SCORE_ENTRIES;k++) 
   {
-    if (Score>highscore[k].Score)	/* Spieler kommt in Highscore-Liste */
+    if (local_player->score > highscore[k].Score)
     {
+      /* Spieler kommt in Highscore-Liste */
+
       if (k<MAX_SCORE_ENTRIES-1)
       {
 	int m = MAX_SCORE_ENTRIES-1;
 
 #ifdef ONE_PER_NAME
 	for(l=k;l<MAX_SCORE_ENTRIES;l++)
-	  if (!strcmp(player.alias_name,highscore[l].Name))
+	  if (!strcmp(local_player->alias_name,highscore[l].Name))
 	    m = l;
 	if (m==k)	/* Spieler überschreibt seine alte Position */
 	  goto put_into_list;
@@ -462,14 +481,14 @@ BOOL NewHiScore()
 #ifdef ONE_PER_NAME
       put_into_list:
 #endif
-      sprintf(highscore[k].Name,player.alias_name);
-      highscore[k].Score = Score; 
+      sprintf(highscore[k].Name,local_player->alias_name);
+      highscore[k].Score = local_player->score; 
       position = k;
       break;
     }
 
 #ifdef ONE_PER_NAME
-    else if (!strcmp(player.alias_name,highscore[k].Name))
+    else if (!strcmp(local_player->alias_name,highscore[k].Name))
       break;	/* Spieler schon mit besserer Punktzahl in der Liste */
 #endif
 
@@ -792,12 +811,12 @@ void DynaExplode(int ex, int ey, int size)
       if (element != EL_LEERRAUM &&
 	  element != EL_ERDREICH &&
 	  element != EL_EXPLODING &&
-	  !DynaBombXL)
+	  !actual_player->dynabomb_xl)
 	break;
     }
   }
 
-  DynaBombsLeft++;
+  actual_player->dynabombs_left++;
 }
 
 void Bang(int x, int y)
@@ -823,7 +842,7 @@ void Bang(int x, int y)
     case EL_DYNABOMB_NR:
     case EL_DYNABOMB_SZ:
     case EL_DYNABOMB_XL:
-      DynaExplode(x,y,DynaBombSize);
+      DynaExplode(x,y,actual_player->dynabomb_size);
       break;
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
@@ -1647,8 +1666,8 @@ void StartMoving(int x, int y)
 	if (IN_SCR_FIELD(SCROLLX(newx),SCROLLY(newy)))
 	  DrawGraphicThruMask(SCROLLX(newx),SCROLLY(newy),el2gfx(element));
 
-	Friends--;
-	if (!Friends && PlayerGone && !GameOver)
+	local_player->friends_still_needed--;
+	if (!local_player->friends_still_needed && PlayerGone && !GameOver)
 	  LevelSolved = GameOver = TRUE;
 
 	return;
@@ -2346,7 +2365,9 @@ void SiebAktivieren(int x, int y, int typ)
 
 void AusgangstuerPruefen(int x, int y)
 {
-  if (!Gems && !SokobanFields && !Lights)
+  if (!local_player->gems_still_needed &&
+      !local_player->sokobanfields_still_needed &&
+      !local_player->lights_still_needed)
   {
     Feld[x][y] = EL_AUSGANG_ACT;
 
@@ -3161,49 +3182,55 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
     case EL_EDELSTEIN_LILA:
       Feld[x][y] = EL_LEERRAUM;
       MovDelay[x][y] = 0;	/* wegen EDELSTEIN_BD-Funkeln! */
-      if (Gems>0)
-	Gems--;
+      if (local_player->gems_still_needed > 0)
+	local_player->gems_still_needed--;
       RaiseScoreElement(EL_EDELSTEIN);
-      DrawText(DX_EMERALDS,DY_EMERALDS,int2str(Gems,3),FS_SMALL,FC_YELLOW);
-      PlaySoundLevel(x,y,SND_PONG);
+      DrawText(DX_EMERALDS, DY_EMERALDS,
+	       int2str(local_player->gems_still_needed, 3),
+	       FS_SMALL, FC_YELLOW);
+      PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_DIAMANT:
       Feld[x][y] = EL_LEERRAUM;
-      Gems -= 3;
-      if (Gems<0)
-	Gems=0;
+      local_player->gems_still_needed -= 3;
+      if (local_player->gems_still_needed < 0)
+	local_player->gems_still_needed = 0;
       RaiseScoreElement(EL_DIAMANT);
-      DrawText(DX_EMERALDS,DY_EMERALDS,int2str(Gems,3),FS_SMALL,FC_YELLOW);
-      PlaySoundLevel(x,y,SND_PONG);
+      DrawText(DX_EMERALDS, DY_EMERALDS,
+	       int2str(local_player->gems_still_needed, 3),
+	       FS_SMALL, FC_YELLOW);
+      PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_DYNAMIT_AUS:
       Feld[x][y] = EL_LEERRAUM;
-      Dynamite++;
+      actual_player->dynamite++;
       RaiseScoreElement(EL_DYNAMIT);
-      DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
+      DrawText(DX_DYNAMITE, DY_DYNAMITE,
+	       int2str(local_player->dynamite, 3),
+	       FS_SMALL, FC_YELLOW);
       PlaySoundLevel(x,y,SND_PONG);
       break;
 
     case EL_DYNABOMB_NR:
       Feld[x][y] = EL_LEERRAUM;
-      DynaBombCount++;
-      DynaBombsLeft++;
+      actual_player->dynabomb_count++;
+      actual_player->dynabombs_left++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
     case EL_DYNABOMB_SZ:
 
       Feld[x][y] = EL_LEERRAUM;
-      DynaBombSize++;
+      actual_player->dynabomb_size++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
 
     case EL_DYNABOMB_XL:
       Feld[x][y] = EL_LEERRAUM;
-      DynaBombXL = TRUE;
+      actual_player->dynabomb_xl = TRUE;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
@@ -3216,7 +3243,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       int key_nr = element-EL_SCHLUESSEL1;
 
       Feld[x][y] = EL_LEERRAUM;
-      Key[key_nr] = TRUE;
+      actual_player->key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
       DrawMiniGraphicExt(drawto,gc,
 			 DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
@@ -3277,7 +3304,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
     case EL_PFORTE2:
     case EL_PFORTE3:
     case EL_PFORTE4:
-      if (!Key[element-EL_PFORTE1])
+      if (!actual_player->key[element-EL_PFORTE1])
 	return(MF_NO_ACTION);
       break;
 
@@ -3285,7 +3312,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
     case EL_PFORTE2X:
     case EL_PFORTE3X:
     case EL_PFORTE4X:
-      if (!Key[element-EL_PFORTE1X])
+      if (!actual_player->key[element-EL_PFORTE1X])
 	return(MF_NO_ACTION);
       break;
 
@@ -3302,14 +3329,14 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       PlayerGone = TRUE;
       PlaySoundLevel(x,y,SND_BUING);
 
-      if (!Friends)
+      if (!local_player->friends_still_needed)
 	LevelSolved = GameOver = TRUE;
 
       break;
 
     case EL_BIRNE_AUS:
       Feld[x][y] = EL_BIRNE_EIN;
-      Lights--;
+      local_player->lights_still_needed--;
       DrawLevelField(x,y);
       PlaySoundLevel(x,y,SND_DENG);
       return(MF_ACTION);
@@ -3362,7 +3389,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	if (element == EL_SOKOBAN_FELD_VOLL)
 	{
 	  Feld[x][y] = EL_SOKOBAN_FELD_LEER;
-	  SokobanFields++;
+	  local_player->sokobanfields_still_needed++;
 	}
 	else
 	  Feld[x][y] = EL_LEERRAUM;
@@ -3370,7 +3397,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	if (Feld[x+dx][y+dy] == EL_SOKOBAN_FELD_LEER)
 	{
 	  Feld[x+dx][y+dy] = EL_SOKOBAN_FELD_VOLL;
-	  SokobanFields--;
+	  local_player->sokobanfields_still_needed--;
 	  if (element == EL_SOKOBAN_OBJEKT)
 	    PlaySoundLevel(x,y,SND_DENG);
 	}
@@ -3390,7 +3417,8 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       PlaySoundLevel(x+dx,y+dy,SND_PUSCH);
 
       if (IS_SB_ELEMENT(element) &&
-	  SokobanFields == 0 && game_emulation == EMU_SOKOBAN)
+	  local_player->sokobanfields_still_needed == 0 &&
+	  game_emulation == EMU_SOKOBAN)
       {
 	LevelSolved = GameOver = TRUE;
 	PlaySoundLevel(x,y,SND_BUING);
@@ -3455,26 +3483,28 @@ BOOL PlaceBomb(void)
 
   element = Feld[JX][JY];
 
-  if ((Dynamite==0 && DynaBombsLeft==0) ||
+  if ((actual_player->dynamite==0 && actual_player->dynabombs_left==0) ||
       element==EL_DYNAMIT || element==EL_DYNABOMB || element==EL_EXPLODING)
     return(FALSE);
 
   if (element != EL_LEERRAUM)
     Store[JX][JY] = element;
 
-  if (Dynamite)
+  if (actual_player->dynamite)
   {
     Feld[JX][JY] = EL_DYNAMIT;
     MovDelay[JX][JY] = 96;
-    Dynamite--;
-    DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
+    actual_player->dynamite--;
+    DrawText(DX_DYNAMITE, DY_DYNAMITE,
+	     int2str(local_player->dynamite, 3),
+	     FS_SMALL, FC_YELLOW);
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
   }
   else
   {
     Feld[JX][JY] = EL_DYNABOMB;
     MovDelay[JX][JY] = 96;
-    DynaBombsLeft--;
+    actual_player->dynabombs_left--;
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNABOMB);
   }
 
@@ -3518,8 +3548,10 @@ void PlaySoundLevel(int x, int y, int sound_nr)
 
 void RaiseScore(int value)
 {
-  Score += value;
-  DrawText(DX_SCORE,DY_SCORE,int2str(Score,5),FS_SMALL,FC_YELLOW);
+  local_player->score += value;
+  DrawText(DX_SCORE, DY_SCORE,
+	   int2str(local_player->score, 5),
+	   FS_SMALL, FC_YELLOW);
 }
 
 void RaiseScoreElement(int element)
