@@ -857,7 +857,7 @@ void InitElementSpecialGraphicInfo()
 
 static void InitElementSoundInfo()
 {
-  /* soon to come */
+  /* !!! soon to come !!! */
 }
 
 static void set_graphic_parameters(int graphic, char **parameter_raw)

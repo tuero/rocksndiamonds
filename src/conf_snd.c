@@ -220,8 +220,12 @@ struct ConfigInfo sound_config[] =
   /* sounds for other non-game actions */
   { "menu.door_opening",		"oeffnen.wav"		},
   { "menu.door_closing",		"oeffnen.wav"		},
+
   { "menu.hall_of_fame",		"halloffame.wav"	},
+  { "menu.hall_of_fame.mode_loop",	"false"			},
+
   { "menu.info_screen",			"rhythmloop.wav"	},
+  { "menu.info_screen.mode_loop",	"true"			},
 
 #if 0
   { "[not used]",			"antigrav.wav"		},

@@ -114,6 +114,20 @@ static void drawCursorXY(int xpos, int ypos, int graphic)
   drawCursorExt(xpos, ypos, -1, graphic);
 }
 
+static void PlaySound_Menu_Start(int sound)
+{
+  if (sound_info[sound].loop)
+    PlaySoundLoop(sound);
+  else
+    PlaySound(sound);
+}
+
+static void PlaySound_Menu_Continue(int sound)
+{
+  if (sound_info[sound].loop)
+    PlaySoundLoop(sound);
+}
+
 void DrawTextStatic(int x, int y, char *text, int font_size, int font_type)
 {
   if (game_status == MAINMENU && gfx.menu_main_hide_static_text)
@@ -1147,7 +1161,12 @@ void DrawHelpScreen()
 
   FadeToFront();
   InitAnimation();
+
+#if 0
   PlaySoundLoop(SND_MENU_INFO_SCREEN);
+#else
+  PlaySound_Menu_Start(SND_MENU_INFO_SCREEN);
+#endif
 }
 
 void HandleHelpScreen(int button)
@@ -1206,7 +1225,11 @@ void HandleHelpScreen(int button)
     /* !!! workaround for playing "music" that is really a sound loop (and
        must therefore periodically be reactivated with the current sound
        engine !!! */
+#if 0
     PlaySoundLoop(SND_MENU_INFO_SCREEN);
+#else
+    PlaySound_Menu_Continue(SND_MENU_INFO_SCREEN);
+#endif
 
     DoAnimation();
   }
@@ -1609,8 +1632,14 @@ void DrawHallOfFame(int highlight_position)
 
   FadeToFront();
   InitAnimation();
+
   HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
+
+#if 0
   PlaySound(SND_MENU_HALL_OF_FAME);
+#else
+  PlaySound_Menu_Start(SND_MENU_HALL_OF_FAME);
+#endif
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -1698,7 +1727,12 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   BackToFront();
 
   if (game_status == HALLOFFAME)
+  {
     DoAnimation();
+#if 1
+    PlaySound_Menu_Continue(SND_MENU_HALL_OF_FAME);
+#endif
+  }
 }
 
 
