@@ -1,3 +1,9 @@
+2004-03-02
+	* added different colored editor graphics for Supaplex gravity tubes
+
+2004-03-01
+	* fixed bug that allowed solvable tapes for unsolvable levels
+
 2004-02-28
 	* use unlimited number of droppable elements when "count" set to zero
 	* added option to use step limit instead of time limit for level
