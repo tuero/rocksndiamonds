@@ -140,6 +140,9 @@
 #define IS_TUBE(e)		(Properties2[e] & EP_BIT_TUBE)
 #define IS_EM_SLIPPERY_WALL(e)	(Properties2[e] & EP_BIT_EM_SLIPPERY_WALL)
 
+#define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
+	 			 (e) <= EL_CUSTOM_END)
+
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
 #define IS_FREE(x,y)		(Feld[x][y] == EL_EMPTY && !IS_PLAYER(x,y))
@@ -657,6 +660,7 @@
 #define EL_CUSTOM_128			(EL_CUSTOM_START + 127)
 #define EL_CUSTOM_END			(EL_CUSTOM_START + 127)
 
+#define NUM_CUSTOM_ELEMENTS		128
 #define NUM_FILE_ELEMENTS		488
 
 

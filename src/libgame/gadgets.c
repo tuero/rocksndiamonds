@@ -618,7 +618,7 @@ void FreeGadget(struct GadgetInfo *gi)
 {
   struct GadgetInfo *gi_previous = gadget_list_first_entry;
 
-  while (gi_previous && gi_previous->next != gi)
+  while (gi_previous != NULL && gi_previous->next != gi)
     gi_previous = gi_previous->next;
 
   if (gi == gadget_list_first_entry)
@@ -627,7 +627,7 @@ void FreeGadget(struct GadgetInfo *gi)
   if (gi == gadget_list_last_entry)
     gadget_list_last_entry = gi_previous;
 
-  if (gi_previous)
+  if (gi_previous != NULL)
     gi_previous->next = gi->next;
 
   free(gi);

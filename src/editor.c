@@ -263,39 +263,40 @@
 #define GADGET_ID_ELEM_CONTENT_6	56
 #define GADGET_ID_ELEM_CONTENT_7	57
 #define GADGET_ID_AMOEBA_CONTENT	58
+#define GADGET_ID_RANDOM_BACKGROUND	59
 
 /* text input identifiers */
-#define GADGET_ID_LEVEL_NAME		59
-#define GADGET_ID_LEVEL_AUTHOR		60
+#define GADGET_ID_LEVEL_NAME		60
+#define GADGET_ID_LEVEL_AUTHOR		61
 
 /* gadgets for scrolling of drawing area */
-#define GADGET_ID_SCROLL_UP		61
-#define GADGET_ID_SCROLL_DOWN		62
-#define GADGET_ID_SCROLL_LEFT		63
-#define GADGET_ID_SCROLL_RIGHT		64
-#define GADGET_ID_SCROLL_HORIZONTAL	65
-#define GADGET_ID_SCROLL_VERTICAL	66
+#define GADGET_ID_SCROLL_UP		62
+#define GADGET_ID_SCROLL_DOWN		63
+#define GADGET_ID_SCROLL_LEFT		64
+#define GADGET_ID_SCROLL_RIGHT		65
+#define GADGET_ID_SCROLL_HORIZONTAL	66
+#define GADGET_ID_SCROLL_VERTICAL	67
 
 /* gadgets for scrolling element list */
-#define GADGET_ID_SCROLL_LIST_UP	67
-#define GADGET_ID_SCROLL_LIST_DOWN	68
-#define GADGET_ID_SCROLL_LIST_VERTICAL	69
+#define GADGET_ID_SCROLL_LIST_UP	68
+#define GADGET_ID_SCROLL_LIST_DOWN	69
+#define GADGET_ID_SCROLL_LIST_VERTICAL	70
 
-/* buttons for level settings */
-#define GADGET_ID_RANDOM_PERCENTAGE	70
-#define GADGET_ID_RANDOM_QUANTITY	71
-#define GADGET_ID_RANDOM_RESTRICTED	72
-#define GADGET_ID_DOUBLE_SPEED		73
-#define GADGET_ID_GRAVITY		74
-#define GADGET_ID_STICK_ELEMENT		75
-#define GADGET_ID_EM_SLIPPERY_GEMS	76
-
-/* another drawing area for random placement */
-#define GADGET_ID_RANDOM_BACKGROUND	77
+/* buttons for level/element properties */
+#define GADGET_ID_RANDOM_PERCENTAGE	71
+#define GADGET_ID_RANDOM_QUANTITY	72
+#define GADGET_ID_RANDOM_RESTRICTED	73
+#define GADGET_ID_DOUBLE_SPEED		74
+#define GADGET_ID_GRAVITY		75
+#define GADGET_ID_STICK_ELEMENT		76
+#define GADGET_ID_EM_SLIPPERY_GEMS	77
+#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	78
+#define GADGET_ID_CUSTOM_CAN_FALL	79
+#define GADGET_ID_CUSTOM_SLIPPERY	80
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	78
-#define GADGET_ID_ELEMENTLIST_LAST	(78 + ED_NUM_ELEMENTLIST_BUTTONS - 1)
+#define GADGET_ID_ELEMENTLIST_FIRST	81
+#define GADGET_ID_ELEMENTLIST_LAST	(81 + ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
 #define NUM_EDITOR_GADGETS		(GADGET_ID_ELEMENTLIST_LAST + 1)
 
@@ -358,8 +359,11 @@
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	6
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	7
 
-#define ED_NUM_CHECKBUTTONS			5
+#define ED_NUM_CHECKBUTTONS			8
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -423,6 +427,13 @@ static int random_placement_method = RANDOM_USE_QUANTITY;
 static int random_placement_background_element = EL_SAND;
 static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
+
+static struct
+{
+  boolean indestructible;
+  boolean can_fall;
+  boolean slippery;
+} custom_element_properties[NUM_CUSTOM_ELEMENTS];
 
 static struct
 {
@@ -678,6 +689,24 @@ static struct
     GADGET_ID_EM_SLIPPERY_GEMS,
     &level.em_slippery_gems,
     "slip down from certain flat walls","use EM style slipping behaviour"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    GADGET_ID_CUSTOM_INDESTRUCTIBLE,
+    &custom_element_properties[0].indestructible,
+    "indestructible",			"element cannot be destroyed"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(5),
+    GADGET_ID_CUSTOM_CAN_FALL,
+    &custom_element_properties[0].can_fall,
+    "can fall",				"element can fall down"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(6),
+    GADGET_ID_CUSTOM_SLIPPERY,
+    &custom_element_properties[0].slippery,
+    "slippery",				"other elements can fall down from it"
   }
 };
 
@@ -3030,6 +3059,47 @@ static void DrawPropertiesWindow()
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
   }
+
+  if (IS_CUSTOM_ELEMENT(properties_element))
+  {
+    int nr = properties_element - EL_CUSTOM_START;
+
+    /* draw checkbutton gadget */
+    i = ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    checkbutton_info[i].value = &custom_element_properties[nr].indestructible;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
+
+    /* draw checkbutton gadget */
+    i = ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    checkbutton_info[i].value = &custom_element_properties[nr].can_fall;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
+
+    /* draw checkbutton gadget */
+    i = ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    checkbutton_info[i].value = &custom_element_properties[nr].slippery;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
+  }
 }
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
@@ -4208,6 +4278,30 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	for(x=0; x<lev_fieldx; x++)
 	  for(y=0; y<lev_fieldy; y++)
 	    Ur[x][y] = Feld[x][y];
+
+	/* !!! ---------- ---------- ---------- ---------- ---------- */
+
+	for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+	{
+	  int element = EL_CUSTOM_START + i;
+
+	  if (custom_element_properties[i].indestructible)
+	    Properties1[element] |= EP_BIT_MASSIVE;
+	  else
+	    Properties1[element] &= ~EP_BIT_MASSIVE;
+
+	  if (custom_element_properties[i].can_fall)
+	    Properties1[element] |= EP_BIT_CAN_FALL;
+	  else
+	    Properties1[element] &= ~EP_BIT_CAN_FALL;
+
+	  if (custom_element_properties[i].slippery)
+	    Properties1[element] |= EP_BIT_SLIPPERY;
+	  else
+	    Properties1[element] &= ~EP_BIT_SLIPPERY;
+	}
+
+	/* !!! ---------- ---------- ---------- ---------- ---------- */
 
 	UnmapLevelEditorGadgets();
 	UndrawSpecialEditorDoor();
