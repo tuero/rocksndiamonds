@@ -1513,6 +1513,8 @@ struct ElementInfo
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */
   int move_stepsize;		/* step size element moves with */
+  int move_enter_element;	/* element that can be entered (and removed) */
+  int move_leave_element;	/* element that can be left behind */
 
   int slippery_type;		/* how/where other elements slip away */
 
@@ -1532,6 +1534,8 @@ struct ElementInfo
 
   int event_page_nr[NUM_CHANGE_EVENTS]; /* page number for each event */
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
+
+  boolean in_group[NUM_GROUP_ELEMENTS];
 
   /* ---------- internal values used in level editor ---------- */
 

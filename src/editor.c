@@ -144,8 +144,15 @@
 					 ED_GADGET_DISTANCE)
 /* custom element content */
 #define ED_AREA_ELEM_CONTENT4_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(12) + \
+#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(13) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
+/* movement enter/leave element */
+#define ED_AREA_ELEM_CONTENT4a_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT4a_YPOS	(ED_SETTINGS_YPOS(7) + \
+					 ED_GADGET_DISTANCE)
+#define ED_AREA_ELEM_CONTENT4b_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT4b_YPOS	(ED_SETTINGS_YPOS(7) + \
+					 ED_GADGET_DISTANCE)
 /* custom change trigger element */
 #define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(6) + \
 					 ED_GADGET_DISTANCE)
@@ -397,14 +404,16 @@
 #define GADGET_ID_AMOEBA_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 9)
 #define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 10)
 #define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 11)
-#define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 12)
-#define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 13)
-#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 14)
-#define GADGET_ID_GROUP_CONTENT		(GADGET_ID_DRAWING_AREA_FIRST + 15)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 16)
+#define GADGET_ID_CUSTOM_MOVE_ENTER	(GADGET_ID_DRAWING_AREA_FIRST + 12)
+#define GADGET_ID_CUSTOM_MOVE_LEAVE	(GADGET_ID_DRAWING_AREA_FIRST + 13)
+#define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 14)
+#define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 15)
+#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 16)
+#define GADGET_ID_GROUP_CONTENT		(GADGET_ID_DRAWING_AREA_FIRST + 17)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 18)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 17)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 19)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -699,13 +708,15 @@
 #define ED_DRAWING_ID_AMOEBA_CONTENT		9
 #define ED_DRAWING_ID_CUSTOM_GRAPHIC		10
 #define ED_DRAWING_ID_CUSTOM_CONTENT		11
-#define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	12
-#define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	13
-#define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	14
-#define ED_DRAWING_ID_GROUP_CONTENT		15
-#define ED_DRAWING_ID_RANDOM_BACKGROUND		16
+#define ED_DRAWING_ID_CUSTOM_MOVE_ENTER		12
+#define ED_DRAWING_ID_CUSTOM_MOVE_LEAVE		13
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	14
+#define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	15
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	16
+#define ED_DRAWING_ID_GROUP_CONTENT		17
+#define ED_DRAWING_ID_RANDOM_BACKGROUND		18
 
-#define ED_NUM_DRAWING_AREAS			17
+#define ED_NUM_DRAWING_AREAS			19
 
 
 /*
@@ -947,7 +958,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
     0,					999,
     GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
     GADGET_ID_MOVE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -955,7 +966,7 @@ static struct
     NULL,				"move delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(7),
+    -1,					ED_SETTINGS_YPOS(9),
     0,					999,
     GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
     GADGET_ID_MOVE_DELAY_RND_TEXT,	GADGET_ID_MOVE_DELAY_FIX_UP,
@@ -1296,7 +1307,7 @@ static struct
     "move/fall speed", NULL,		"speed of element movement"
   },
   {
-    -1,					ED_SETTINGS_YPOS(9),
+    -1,					ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_SMASH_TARGETS,	GADGET_ID_CUSTOM_CAN_SMASH,
     -1,
     options_smash_targets,
@@ -1304,7 +1315,7 @@ static struct
     "can smash", NULL,			"elements that can be smashed"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_SLIPPERY_TYPE,	GADGET_ID_NONE,
     -1,
     options_slippery_type,
@@ -1312,7 +1323,7 @@ static struct
     "slippery", NULL,			"where other elements fall down"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_DEADLINESS,	GADGET_ID_NONE,
     -1,
     options_deadliness,
@@ -1320,7 +1331,7 @@ static struct
     "deadly when", NULL,		"deadliness of element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_CONSISTENCY,	GADGET_ID_NONE,
     -1,
     options_consistency,
@@ -1632,49 +1643,49 @@ static struct
     NULL, NULL,				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_FALL],
     NULL, "can fall",			"element can fall down"
   },
   {
-    -1,					ED_SETTINGS_YPOS(9),
+    -1,					ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_SMASH],
     " ", NULL,				"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
     &custom_element_properties[EP_SLIPPERY],
     NULL, NULL,				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_DEADLY,		GADGET_ID_NONE,
     &custom_element_properties[EP_DEADLY],
     NULL, NULL,				"element can kill the player"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_RESULT,	GADGET_ID_NONE,
     &custom_element_properties[EP_EXPLODE_RESULT],
     NULL, NULL,				"set consistency/destructibility"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,	GADGET_ID_NONE,
     &custom_element.can_explode_by_fire,
     NULL, "by fire",			"element can explode by fire/explosion"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,	GADGET_ID_CUSTOM_EXPLODE_FIRE,
     &custom_element.can_explode_smashed,
     " ", "smashed",			"element can explode when smashed"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,	GADGET_ID_CUSTOM_EXPLODE_SMASH,
     &custom_element.can_explode_impact,
     " ", "impact",			"element can explode on impact"
@@ -1838,6 +1849,22 @@ static struct
     3, 3,
     GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	/* align three rows */
     "content:", NULL,			NULL
+  },
+
+  /* ---------- custom enter and leave element (when moving) --------------- */
+
+  {
+    ED_SETTINGS_XPOS(1),		ED_AREA_ELEM_CONTENT4a_YPOS,
+    1, 1,
+    GADGET_ID_CUSTOM_MOVE_ENTER,	GADGET_ID_NONE,
+    "can dig:", " ",			NULL
+  },
+
+  {
+    -1,					ED_AREA_ELEM_CONTENT4b_YPOS,
+    1, 1,
+    GADGET_ID_CUSTOM_MOVE_LEAVE,	GADGET_ID_CUSTOM_MOVE_ENTER,
+    "can leave behind:", NULL,		NULL
   },
 
   /* ---------- custom change target --------------------------------------- */
@@ -3381,6 +3408,12 @@ static void DrawDrawingArea(int id)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
 			   el2edimg(custom_element.content[x][y]));
+  else if (id == ED_DRAWING_ID_CUSTOM_MOVE_ENTER)
+    DrawMiniGraphicExt(drawto, gi->x, gi->y,
+		       el2edimg(custom_element.move_enter_element));
+  else if (id == ED_DRAWING_ID_CUSTOM_MOVE_LEAVE)
+    DrawMiniGraphicExt(drawto, gi->x, gi->y,
+		       el2edimg(custom_element.move_leave_element));
   else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TARGET)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.target_element));
@@ -6218,6 +6251,8 @@ static void DrawPropertiesConfig()
 
     /* draw drawing area gadgets */
     DrawCustomContentArea();
+    MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_ENTER);
+    MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_LEAVE);
 
     /* draw text input gadgets */
     MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
@@ -7161,6 +7196,18 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	  CopyCustomElementPropertiesToGame(properties_element);
 	}
+	else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
+	{
+	  custom_element.move_enter_element = new_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
+	}
+	else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
+	{
+	  custom_element.move_leave_element = new_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
+	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	{
 	  custom_element_change.target_element = new_element;
@@ -7295,6 +7342,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	PickDrawingElement(button, custom_element.gfx_element);
       else if (id == GADGET_ID_CUSTOM_CONTENT)
 	PickDrawingElement(button, custom_element.content[sx][sy]);
+      else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
+	PickDrawingElement(button, custom_element.move_enter_element);
+      else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
+	PickDrawingElement(button, custom_element.move_leave_element);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	PickDrawingElement(button, custom_element_change.target_element);
       else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
@@ -8218,6 +8269,10 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       text = getElementInfoText(custom_element.gfx_element);
     else if (id == GADGET_ID_CUSTOM_CONTENT)
       text = getElementInfoText(custom_element.content[sx][sy]);
+    else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
+      text = getElementInfoText(custom_element.move_enter_element);
+    else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
+      text = getElementInfoText(custom_element.move_leave_element);
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       text = getElementInfoText(custom_element_change.target_element);
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
@@ -8247,6 +8302,10 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       strcpy(infotext, "Custom graphic element");
     else if (id == GADGET_ID_CUSTOM_CONTENT)
       sprintf(infotext, "Custom element content position: %d, %d", sx, sy);
+    else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
+      strcpy(infotext, "Element that can be digged");
+    else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
+      strcpy(infotext, "Element that can be left behind");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       strcpy(infotext, "New element after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)

@@ -763,6 +763,15 @@ static void InitField(int x, int y, boolean init_game)
     default:
       if (IS_CUSTOM_ELEMENT(element) && CAN_MOVE(element))
 	InitMovDir(x, y);
+      else if (IS_GROUP_ELEMENT(element))
+      {
+	struct ElementGroupInfo *group = element_info[element].group;
+	int random_pos = RND(group->num_elements_resolved);
+
+	Feld[x][y] = group->element_resolved[random_pos];
+
+	InitField(x, y, init_game);
+      }
       break;
   }
 }
@@ -787,10 +796,9 @@ void DrawGameDoorValues()
 	   int2str(TimeLeft, 3), FONT_TEXT_2);
 }
 
-#if 1
-
 static void resolve_group_element(int group_element, int recursion_depth)
 {
+  static int group_nr;
   static struct ElementGroupInfo *group;
   struct ElementGroupInfo *actual_group = element_info[group_element].group;
   int i;
@@ -810,6 +818,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
   {
     group = element_info[group_element].group;
     group->num_elements_resolved = 0;
+    group_nr = group_element - EL_GROUP_START;
   }
 
   for (i = 0; i < actual_group->num_elements; i++)
@@ -822,10 +831,13 @@ static void resolve_group_element(int group_element, int recursion_depth)
     if (IS_GROUP_ELEMENT(element))
       resolve_group_element(element, recursion_depth + 1);
     else
+    {
       group->element_resolved[group->num_elements_resolved++] = element;
+      element_info[element].in_group[group_nr] = TRUE;
+    }
   }
 
-#if 1
+#if 0
   if (recursion_depth == 0 && group_element <= EL_GROUP_4)
   {
     printf("::: group %d: %d resolved elements\n",
@@ -836,58 +848,6 @@ static void resolve_group_element(int group_element, int recursion_depth)
   }
 #endif
 }
-
-#else
-
-static void resolve_group_element(int group_element, int recursion_depth)
-{
-  static short element_list_count[NUM_FILE_ELEMENTS];
-  struct ElementGroupInfo *group = element_info[group_element].group;
-  int i, j;
-
-  if (group == NULL)
-    return;
-
-  if (recursion_depth > NUM_GROUP_ELEMENTS)	/* recursion too deep */
-    return;
-
-  if (recursion_depth == 0)			/* initialization */
-    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
-      element_list_count[i] = 0;
-
-  for (i = 0; i < group->num_elements; i++)
-  {
-    int element = group->element[i];
-
-    if (IS_GROUP_ELEMENT(element))
-      resolve_group_element(element, recursion_depth + 1);
-    else if (element < NUM_FILE_ELEMENTS)
-      element_list_count[group->element[i]]++;
-  }
-
-  if (recursion_depth == 0)			/* finalization */
-  {
-    group->num_elements_resolved = 0;
-
-    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
-      for (j = 0; j < element_list_count[i]; j++)
-	if (group->num_elements_resolved < NUM_FILE_ELEMENTS)
-	  group->element_resolved[group->num_elements_resolved++] = i;
-
-#if 1
-    if (group_element <= EL_GROUP_8)
-    {
-      printf("::: group %d: %d resolved elements\n",
-	     group_element - EL_GROUP_START, group->num_elements_resolved);
-      for (i = 0; i < group->num_elements_resolved; i++)
-	printf("::: - %d ['%s']\n", group->element_resolved[i],
-	       element_info[group->element_resolved[i]].token_name);
-    }
-#endif
-  }
-}
-
-#endif
 
 
 /*
@@ -918,6 +878,10 @@ static void InitGameEngine()
 #endif
 
   /* ---------- recursively resolve group elements ------------------------- */
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_GROUP_ELEMENTS; j++)
+      element_info[i].in_group[j] = FALSE;
 
   for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     resolve_group_element(EL_GROUP_START + i, 0);
