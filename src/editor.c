@@ -690,10 +690,10 @@ static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
 static int new_element3 = EL_ERDREICH;
 
-#define BUTTON_ELEMENT(button) (button == 1 ? new_element1 : \
-				button == 2 ? new_element2 : \
-				button == 3 ? new_element3 : EL_LEERRAUM)
-#define BUTTON_STEPSIZE(button) (button == 1 ? 1 : button == 2 ? 5 : 10)
+#define BUTTON_ELEMENT(button) ((button) == 1 ? new_element1 : \
+				(button) == 2 ? new_element2 : \
+				(button) == 3 ? new_element3 : EL_LEERRAUM)
+#define BUTTON_STEPSIZE(button) ((button) == 1 ? 1 : (button) == 2 ? 5 : 10)
 
 /* forward declaration for internal use */
 static void ModifyEditorCounter(int, int);
