@@ -1078,10 +1078,8 @@ static void ReinitializeMusic()
   /* currently nothing to do */
 }
 
-void InitElementProperties()
+void InitElementPropertiesStatic()
 {
-  int i, j;
-
   static int ep_amoebalive[] =
   {
     EL_AMOEBA_WET,
@@ -2239,6 +2237,22 @@ void InitElementProperties()
     { NULL,			-1			}
   };
 
+  int i, j;
+
+  /* always start with reliable default values (element has no properties) */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    for (j=0; j < NUM_ELEMENT_PROPERTIES; j++)
+      SET_PROPERTY(i, j, FALSE);
+
+  /* set all base element properties from above array definitions */
+  for (i=0; element_properties[i].elements != NULL; i++)
+    for (j=0; (element_properties[i].elements)[j] != -1; j++)
+      SET_PROPERTY((element_properties[i].elements)[j],
+		   element_properties[i].property, TRUE);
+}
+
+void InitElementPropertiesEngine(int engine_version)
+{
 #if 0
   static int active_properties[] =
   {
@@ -2300,24 +2314,16 @@ void InitElementProperties()
     -1
   };
 
-  /* always start with reliable default values (no properties) */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    for (j=0; j<NUM_EP_BITFIELDS; j++)
-      Properties[i][j] = EP_BITMASK_DEFAULT;
+  int i, j;
 
-  /* set all predefined element properties from above arrays */
-  for (i=0; element_properties[i].elements != NULL; i++)
-    for (j=0; (element_properties[i].elements)[j] != -1; j++)
-      SET_PROPERTY((element_properties[i].elements)[j],
-		   element_properties[i].property, TRUE);
-
-  /* set properties of character elements */
-  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    SET_PROPERTY(i, EP_INACTIVE, TRUE);
-
-  /* set properties derived from other properties */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  /* set all special, combined or engine dependant element properties */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
   {
+    /* ---------- INACTIVE ------------------------------------------------- */
+    if (i >= EL_CHAR_START && i <= EL_CHAR_END)
+      SET_PROPERTY(i, EP_INACTIVE, TRUE);
+
+    /* ---------- WALKABLE, PASSABLE, ACCESSIBLE --------------------------- */
     if (IS_WALKABLE_OVER(i) || IS_WALKABLE_INSIDE(i) || IS_WALKABLE_UNDER(i))
       SET_PROPERTY(i, EP_WALKABLE, TRUE);
 
@@ -2335,13 +2341,9 @@ void InitElementProperties()
 
     if (IS_WALKABLE(i) || IS_PASSABLE(i))
       SET_PROPERTY(i, EP_ACCESSIBLE, TRUE);
-  }
 
-  /* dynamically determine wall-like elements */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-  {
-    /* default: element is wall-like */
-    SET_PROPERTY(i, EP_WALL, TRUE);
+    /* ---------- WALL ----------------------------------------------------- */
+    SET_PROPERTY(i, EP_WALL, TRUE);	/* default: element is wall */
 
     for (j=0; no_wall_properties[j] != -1; j++)
       if (HAS_PROPERTY(i, no_wall_properties[j]) ||
@@ -2351,12 +2353,27 @@ void InitElementProperties()
     if (IS_HISTORIC_WALL(i))
       SET_PROPERTY(i, EP_WALL, TRUE);
 
-#if 0
-    printf("::: %d: %s '%s'\n",
-	   i,
-	   (IS_WALL(i) ? "IS A WALL:    " : "IS NOT A WALL:"),
-	   element_info[i].token_name);
-#endif
+    /* ---------- SOLID ---------------------------------------------------- */
+    if (engine_version < VERSION_IDENT(2,2,0))
+      SET_PROPERTY(i, EP_SOLID, IS_HISTORIC_SOLID(i));
+    else
+      SET_PROPERTY(i, EP_SOLID, (!IS_WALKABLE(i) &&
+				 !IS_DIGGABLE(i) &&
+				 !IS_COLLECTIBLE(i)));
+
+    /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
+    if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
+      SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
+
+    /* ---------- EXPLOSION_PROOF ------------------------------------------ */
+    if (i == EL_FLAMES)
+      SET_PROPERTY(i, EP_EXPLOSION_PROOF, TRUE);
+    else if (engine_version < VERSION_IDENT(2,2,0))
+      SET_PROPERTY(i, EP_EXPLOSION_PROOF, IS_INDESTRUCTIBLE(i));
+    else
+      SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
+					   !IS_WALKABLE_OVER(i) &&
+					   !IS_WALKABLE_UNDER(i)));
   }
 
 #if 0
@@ -2377,6 +2394,30 @@ void InitElementProperties()
 #endif
   }
 #endif
+
+  /* dynamically adjust element properties according to game engine version */
+  {
+    static int ep_em_slippery_wall[] =
+    {
+      EL_STEELWALL,
+      EL_WALL,
+      EL_EXPANDABLE_WALL,
+      EL_EXPANDABLE_WALL_HORIZONTAL,
+      EL_EXPANDABLE_WALL_VERTICAL,
+      EL_EXPANDABLE_WALL_ANY,
+      -1
+    };
+
+    /* special EM style gems behaviour */
+    for (i=0; ep_em_slippery_wall[i] != -1; i++)
+      SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
+		   level.em_slippery_gems);
+
+    /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
+    SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
+		 (level.em_slippery_gems &&
+		  engine_version > VERSION_IDENT(2,0,1)));
+  }
 }
 
 static void InitGlobal()
@@ -2913,7 +2954,7 @@ void OpenAll()
 
   InitEventFilter(FilterMouseMotionEvents);
 
-  InitElementProperties();
+  InitElementPropertiesStatic();
 
   InitGfx();
 

@@ -16,7 +16,10 @@
 
 #include "main.h"
 
-void ReloadCustomArtwork();
+void InitElementPropertiesStatic(void);
+void InitElementPropertiesEngine(int);
+
+void ReloadCustomArtwork(void);
 
 void OpenAll(void);
 void CloseAllAndExit(int);

@@ -17,6 +17,7 @@
 #include "libgame/libgame.h"
 
 #include "files.h"
+#include "init.h"
 #include "tools.h"
 #include "tape.h"
 
@@ -581,6 +582,7 @@ void LoadLevel(int level_nr)
   char *filename = getLevelFilename(level_nr);
 
   LoadLevelFromFilename(filename);
+  InitElementPropertiesEngine(level.game_version);
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)

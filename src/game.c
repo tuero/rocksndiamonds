@@ -14,9 +14,9 @@
 #include "libgame/libgame.h"
 
 #include "game.h"
+#include "init.h"
 #include "tools.h"
 #include "screens.h"
-#include "init.h"
 #include "files.h"
 #include "tape.h"
 #include "network.h"
@@ -500,8 +500,12 @@ static void InitGameEngine()
 {
   int i;
 
+  /* set game engine from tape file when re-playing, else from level file */
   game.engine_version = (tape.playing ? tape.engine_version :
 			 level.game_version);
+
+  /* dynamically adjust element properties according to game engine version */
+  InitElementPropertiesEngine(game.engine_version);
 
 #if 0
     printf("level %d: level version == %06d\n", level_nr, level.game_version);
@@ -520,6 +524,7 @@ static void InitGameEngine()
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
 
+#if 0
   /* dynamically adjust element properties according to game engine version */
   {
     static int ep_em_slippery_wall[] =
@@ -543,6 +548,7 @@ static void InitGameEngine()
 		 (level.em_slippery_gems &&
 		  game.engine_version > VERSION_IDENT(2,0,1)));
   }
+#endif
 
   /* initialize changing elements information */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
@@ -1535,11 +1541,16 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
+#if 1
+      if (IS_EXPLOSION_PROOF(element))
+	continue;
+#else
       if ((IS_INDESTRUCTIBLE(element) &&
 	   (game.engine_version < VERSION_IDENT(2,2,0) ||
 	    (!IS_WALKABLE_OVER(element) && !IS_WALKABLE_UNDER(element)))) ||
 	  element == EL_FLAMES)
 	continue;
+#endif
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
       {
@@ -3099,9 +3110,14 @@ void StartMoving(int x, int y)
 	  int sx = SCREENX(xx), sy = SCREENY(yy);
 	  int flame_graphic = graphic + (i - 1);
 
+#if 1
+	  if (!IN_LEV_FIELD(xx, yy) || IS_DRAGONFIRE_PROOF(Feld[xx][yy]))
+	    break;
+#else
 	  if (!IN_LEV_FIELD(xx, yy) ||
 	      IS_HISTORIC_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
 	    break;
+#endif
 
 	  if (MovDelay[x][y])
 	  {
@@ -5695,29 +5711,34 @@ void RemoveHero(struct PlayerInfo *player)
 static boolean checkDiagonalPushing(struct PlayerInfo *player,
 				    int x, int y, int real_dx, int real_dy)
 {
-  int jx = player->jx, jy = player->jy;
-  int dx = x - jx, dy = y - jy;
+#if 1
+  int jx, jy, dx, dy, xx, yy;
+
+  if (real_dx == 0 || real_dy == 0)	/* no diagonal direction => push */
+    return TRUE;
+
+  /* diagonal direction: check alternative direction */
+  jx = player->jx;
+  jy = player->jy;
+  dx = x - jx;
+  dy = y - jy;
+  xx = jx + (dx == 0 ? real_dx : 0);
+  yy = jy + (dy == 0 ? real_dy : 0);
+
+  return (!IN_LEV_FIELD(xx, yy) || IS_SOLID(Feld[xx][yy]));
+#else
 
   if (real_dx && real_dy) 	/* diagonal direction input => do check */
   {
     /* diagonal direction: check alternative direction */
+    int jx = player->jx, jy = player->jy;
+    int dx = x - jx, dy = y - jy;
     int xx = jx + (dx == 0 ? real_dx : 0);
     int yy = jy + (dy == 0 ? real_dy : 0);
 
     if (IN_LEV_FIELD(xx, yy))
     {
       int element = Feld[xx][yy];
-
-#if 0
-      if (IS_HISTORIC_SOLID(element) !=
-	  (!(IS_WALKABLE(element) ||
-	     IS_DIGGABLE(element) ||
-	     IS_COLLECTIBLE(element))))
-	printf("::: %d ['%s'] [%d, %d]\n",
-	       element,
-	       element_info[element].token_name,
-	       game.engine_version, tape.engine_version);
-#endif
 
       if (game.engine_version < VERSION_IDENT(2,2,0))
 	return IS_HISTORIC_SOLID(element);
@@ -5729,6 +5750,7 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
   }
 
   return TRUE;		/* no diagonal direction input => push object */
+#endif
 }
 
 /*
