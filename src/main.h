@@ -71,7 +71,7 @@ typedef unsigned char byte;
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
-#define ED_FIELDX	(2 * SCR_FIELDX - 2)
+#define ED_FIELDX	(2 * SCR_FIELDX - 1)
 #define ED_FIELDY	(2 * SCR_FIELDY - 2)
 
 #define MAX_PLAYERS	4

@@ -2239,6 +2239,9 @@ void HandleGadgets(int mx, int my, int button)
       DrawGadget(gi, DG_PRESSED, DG_DIRECT);
     }
 
+    if (gi->type == GD_TYPE_DRAWING_AREA)
+      changed_position = TRUE;
+
     gi->state = (gadget_moving_inside || gi->type & GD_TYPE_SCROLLBAR ?
 		 GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
     gi->event.type = GD_EVENT_MOVING;

@@ -87,39 +87,29 @@
 #define ED_AREA_ELEMCONT_YPOS	(10 * TILEY)
 
 /* values for scrolling gadgets */
-#if 1
-#define ED_SCROLLBUTTON_XSIZE	16
-#define ED_SCROLLBUTTON_YSIZE	16
-
 #define ED_SCROLLBUTTON_XPOS	24
 #define ED_SCROLLBUTTON_YPOS	0
 #define ED_SCROLLBAR_XPOS	24
 #define ED_SCROLLBAR_YPOS	64
-#else
-#define ED_SCROLLBUTTON_XSIZE	30
-#define ED_SCROLLBUTTON_YSIZE	30
 
-#define ED_SCROLLBUTTON_XPOS	70
-#define ED_SCROLLBUTTON_YPOS	0
-#define ED_SCROLLBAR_XPOS	10
-#define ED_SCROLLBAR_YPOS	110
-#endif
+#define ED_SCROLLBUTTON_XSIZE	16
+#define ED_SCROLLBUTTON_YSIZE	16
 
 #define ED_SCROLL_UP_XPOS	(SXSIZE - ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_UP_YPOS	(0)
 #define ED_SCROLL_DOWN_XPOS	ED_SCROLL_UP_XPOS
-#define ED_SCROLL_DOWN_YPOS	(SYSIZE - TILEX - ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_DOWN_YPOS	(SYSIZE - 3 * ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_LEFT_XPOS	(0)
-#define ED_SCROLL_LEFT_YPOS	(SYSIZE - ED_SCROLLBUTTON_YSIZE)
-#define ED_SCROLL_RIGHT_XPOS	(SXSIZE - TILEX - ED_SCROLLBUTTON_XSIZE)
+#define ED_SCROLL_LEFT_YPOS	(SYSIZE - 2 * ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_RIGHT_XPOS	(SXSIZE - 2 * ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_RIGHT_YPOS	ED_SCROLL_LEFT_YPOS
 #define ED_SCROLL_VERTICAL_XPOS	ED_SCROLL_UP_XPOS
 #define ED_SCROLL_VERTICAL_YPOS	(ED_SCROLL_UP_YPOS + ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_VERTICAL_XSIZE ED_SCROLLBUTTON_XSIZE
-#define ED_SCROLL_VERTICAL_YSIZE (SYSIZE - TILEY - 2 * ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_VERTICAL_YSIZE (SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_HORIZONTAL_XPOS (ED_SCROLL_LEFT_XPOS + ED_SCROLLBUTTON_XSIZE)
-#define ED_SCROLL_HORIZONTAL_YPOS (SYSIZE - ED_SCROLLBUTTON_YSIZE)
-#define ED_SCROLL_HORIZONTAL_XSIZE (SXSIZE - TILEX - 2 * ED_SCROLLBUTTON_XSIZE)
+#define ED_SCROLL_HORIZONTAL_YPOS ED_SCROLL_LEFT_YPOS
+#define ED_SCROLL_HORIZONTAL_XSIZE (SXSIZE - 3 * ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_HORIZONTAL_YSIZE ED_SCROLLBUTTON_YSIZE
 
 /* control button identifiers */
@@ -989,17 +979,10 @@ static void CreateScrollbarGadgets()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
-#if 1
     gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
     gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
     gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
     gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
-#else
-    gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
-    gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
-    gd_x2 = gd_x1;
-    gd_y2 = gd_y1 - ED_SCROLLBUTTON_YSIZE;
-#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, SX + scrollbar_info[i].x,
@@ -2501,6 +2484,18 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
 
+static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
+			  int element, boolean change_level)
+{
+  int lx = sx + level_xpos;
+  int ly = sy + level_ypos;
+
+  if (element == -1)
+    DrawMiniElement(sx, sy, Feld[lx][ly]);
+  else
+    DrawAreaBorder(sx, sy, sx, sy);
+}
+
 /* values for CopyBrushExt() */
 #define CB_AREA_TO_BRUSH	0
 #define CB_BRUSH_TO_LEVEL	1
@@ -2925,6 +2920,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_BRUSH:
+    case ED_CTRL_ID_TEXT:
       {
 	static int last_sx = -1;
 	static int last_sy = -1;
@@ -2938,14 +2934,19 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  draw_func = DrawRectangle;
 	else if (drawing_function == ED_CTRL_ID_FILLED_BOX)
 	  draw_func = DrawFilledBox;
-	else
+	else if (drawing_function == ED_CTRL_ID_BRUSH)
 	  draw_func = SelectArea;
+	else /* (drawing_function == ED_CTRL_ID_TEXT) */
+	  draw_func = SetTextCursor;
 
 	if (button_press_event)
 	{
 	  draw_func(sx, sy, sx, sy, new_element, FALSE);
 	  start_sx = last_sx = sx;
 	  start_sy = last_sy = sy;
+
+	  if (drawing_function == ED_CTRL_ID_TEXT)
+	    DrawLevelText(0, 0, 0, TEXT_END);
 	}
 	else if (button_release_event)
 	{
@@ -2955,6 +2956,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	    CopyAreaToBrush(start_sx, start_sy, sx, sy);
 	    draw_with_brush = TRUE;
 	  }
+	  else if (drawing_function == ED_CTRL_ID_TEXT)
+	    DrawLevelText(sx, sy, 0, TEXT_INIT);
 	  else
 	    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 	}
@@ -2968,10 +2971,23 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
+
+
+#if 0
     case ED_CTRL_ID_TEXT:
+      /*
+      DrawMiniElement(last_sx, last_sy, Feld[lx][ly]);
+      DrawAreaBorder(sx, sy, sx, sy);
+      last_sx = sx;
+      last_sy = sy;
+      */
+
       if (button_press_event)
 	DrawLevelText(sx, sy, 0, TEXT_INIT);
       break;
+#endif
+
+
 
     case ED_CTRL_ID_FLOOD_FILL:
       if (button_press_event && Feld[lx][ly] != new_element)
