@@ -1354,14 +1354,14 @@ inline void SDLNextEvent(Event *event)
   }
   else if (event->type == EVENT_MOTIONNOTIFY)
   {
-    if (((ButtonEvent *)event)->x > video_xoffset)
-      ((ButtonEvent *)event)->x -= video_xoffset;
+    if (((MotionEvent *)event)->x > video_xoffset)
+      ((MotionEvent *)event)->x -= video_xoffset;
     else
-      ((ButtonEvent *)event)->x = 0;
-    if (((ButtonEvent *)event)->y > video_yoffset)
-      ((ButtonEvent *)event)->y -= video_yoffset;
+      ((MotionEvent *)event)->x = 0;
+    if (((MotionEvent *)event)->y > video_yoffset)
+      ((MotionEvent *)event)->y -= video_yoffset;
     else
-      ((ButtonEvent *)event)->y = 0;
+      ((MotionEvent *)event)->y = 0;
   }
 #endif
 }

@@ -6907,17 +6907,26 @@ void RaiseScoreElement(int element)
     case EL_EMERALD_YELLOW:
     case EL_EMERALD_RED:
     case EL_EMERALD_PURPLE:
+    case EL_SP_INFOTRON:
       RaiseScore(level.score[SC_EMERALD]);
       break;
     case EL_DIAMOND:
       RaiseScore(level.score[SC_DIAMOND]);
       break;
+    case EL_CRYSTAL:
+      RaiseScore(level.score[SC_CRYSTAL]);
+      break;
+    case EL_PEARL:
+      RaiseScore(level.score[SC_PEARL]);
+      break;
     case EL_BUG:
     case EL_BD_BUTTERFLY:
+    case EL_SP_ELECTRON:
       RaiseScore(level.score[SC_BUG]);
       break;
     case EL_SPACESHIP:
     case EL_BD_FIREFLY:
+    case EL_SP_SNIKSNAK:
       RaiseScore(level.score[SC_SPACESHIP]);
       break;
     case EL_YAMYAM:
@@ -6934,7 +6943,17 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_NUT]);
       break;
     case EL_DYNAMITE:
+    case EL_DYNABOMB_INCREASE_NUMBER:
+    case EL_DYNABOMB_INCREASE_SIZE:
+    case EL_DYNABOMB_INCREASE_POWER:
       RaiseScore(level.score[SC_DYNAMITE]);
+      break;
+    case EL_SHIELD_NORMAL:
+    case EL_SHIELD_DEADLY:
+      RaiseScore(level.score[SC_SHIELD]);
+      break;
+    case EL_EXTRA_TIME:
+      RaiseScore(level.score[SC_TIME_BONUS]);
       break;
     case EL_KEY_1:
     case EL_KEY_2:

@@ -3409,6 +3409,13 @@ static void PickDrawingElement(int button, int element)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
+static void RedrawDrawingElements()
+{
+  PickDrawingElement(1, new_element1);
+  PickDrawingElement(2, new_element2);
+  PickDrawingElement(3, new_element3);
+}
+
 static void DrawDrawingWindow()
 {
   stick_element_properties_window = FALSE;
@@ -4049,7 +4056,10 @@ static struct
   { EL_EMERALD_YELLOW,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
   { EL_EMERALD_RED,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
   { EL_EMERALD_PURPLE,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
+  { EL_SP_INFOTRON,	&level.score[SC_EMERALD],	TEXT_COLLECTING	},
   { EL_DIAMOND,		&level.score[SC_DIAMOND],	TEXT_COLLECTING	},
+  { EL_CRYSTAL,		&level.score[SC_CRYSTAL],	TEXT_COLLECTING	},
+  { EL_PEARL,		&level.score[SC_PEARL],		TEXT_COLLECTING	},
   { EL_BUG_RIGHT,	&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_UP,		&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_LEFT,	&level.score[SC_BUG],		TEXT_SMASHING	},
@@ -4058,6 +4068,7 @@ static struct
   { EL_BD_BUTTERFLY_UP,   &level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_LEFT, &level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_DOWN, &level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_SP_ELECTRON,	&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_SPACESHIP_RIGHT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_LEFT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
@@ -4066,6 +4077,7 @@ static struct
   { EL_BD_FIREFLY_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_BD_FIREFLY_LEFT, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_BD_FIREFLY_DOWN, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_SP_SNIKSNAK,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_YAMYAM,		&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_DARK_YAMYAM,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING	},
@@ -4075,6 +4087,12 @@ static struct
   { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_NUT,		&level.score[SC_NUT],		TEXT_CRACKING	},
   { EL_DYNAMITE,	&level.score[SC_DYNAMITE],	TEXT_COLLECTING	},
+  { EL_DYNABOMB_INCREASE_NUMBER,&level.score[SC_DYNAMITE],TEXT_COLLECTING },
+  { EL_DYNABOMB_INCREASE_SIZE,	&level.score[SC_DYNAMITE],TEXT_COLLECTING },
+  { EL_DYNABOMB_INCREASE_POWER,	&level.score[SC_DYNAMITE],TEXT_COLLECTING },
+  { EL_SHIELD_NORMAL,	&level.score[SC_SHIELD],	TEXT_COLLECTING	},
+  { EL_SHIELD_DEADLY,	&level.score[SC_SHIELD],	TEXT_COLLECTING	},
+  { EL_EXTRA_TIME,	&level.score[SC_TIME_BONUS],	TEXT_COLLECTING	},
   { EL_KEY_1,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_2,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_3,		&level.score[SC_KEY],		TEXT_COLLECTING	},
@@ -5095,6 +5113,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  level.custom_element[i] = custom_element;
 
 	  ModifyEditorElementList();
+	  RedrawDrawingElements();
 
 	  FrameCounter = 0;	/* restart animation frame counter */
 	}
@@ -5357,7 +5376,10 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
     CopyCustomElementPropertiesToGame(properties_element);
 
   if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC)
+  {
     ModifyEditorElementList();
+    RedrawDrawingElements();
+  }
 }
 
 static void HandleControlButtons(struct GadgetInfo *gi)

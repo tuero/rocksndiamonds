@@ -52,6 +52,10 @@ element_to_special_graphic[] =
     IMG_SP_TERMINAL_EDITOR
   },
   {
+    EL_SP_BUGGY_BASE,				GFX_SPECIAL_ARG_EDITOR,
+    IMG_SP_BUGGY_BASE_EDITOR
+  },
+  {
     EL_SOKOBAN_OBJECT,				GFX_SPECIAL_ARG_EDITOR,
     IMG_SOKOBAN_OBJECT_EDITOR
   },

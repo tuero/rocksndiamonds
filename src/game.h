@@ -28,6 +28,9 @@
 #define SC_DYNAMITE		8
 #define SC_KEY			9
 #define SC_TIME_BONUS		10
+#define SC_CRYSTAL		11
+#define SC_PEARL		12
+#define SC_SHIELD		13
 
 void GetPlayerConfig(void);
 void DrawGameDoorValues(void);
