@@ -342,6 +342,9 @@
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
 	 			 (e) <= EL_CUSTOM_END)
 
+#define IS_GROUP_ELEMENT(e)	((e) >= EL_GROUP_START &&		\
+	 			 (e) <= EL_GROUP_END)
+
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 
@@ -824,7 +827,16 @@
 #define EL_ENVELOPE_3			622
 #define EL_ENVELOPE_4			623
 
-#define NUM_FILE_ELEMENTS		624
+/* ---------- begin of group elements section ------------------------------ */
+#define EL_GROUP_START			624
+
+#include "conf_grp.h"	/* include auto-generated data structure definitions */
+
+#define NUM_GROUP_ELEMENTS		32
+#define EL_GROUP_END			655
+/* ---------- end of custom elements section ------------------------------- */
+
+#define NUM_FILE_ELEMENTS		656
 
 
 /* "real" (and therefore drawable) runtime elements */

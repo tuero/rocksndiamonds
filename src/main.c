@@ -3234,6 +3234,166 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "envelope",
     "mail envelope 4"
   },
+  {
+    "group_1",
+    "group",
+    "group element 1"
+  },
+  {
+    "group_2",
+    "group",
+    "group element 2"
+  },
+  {
+    "group_3",
+    "group",
+    "group element 3"
+  },
+  {
+    "group_4",
+    "group",
+    "group element 4"
+  },
+  {
+    "group_5",
+    "group",
+    "group element 5"
+  },
+  {
+    "group_6",
+    "group",
+    "group element 6"
+  },
+  {
+    "group_7",
+    "group",
+    "group element 7"
+  },
+  {
+    "group_8",
+    "group",
+    "group element 8"
+  },
+  {
+    "group_9",
+    "group",
+    "group element 9"
+  },
+  {
+    "group_10",
+    "group",
+    "group element 10"
+  },
+  {
+    "group_11",
+    "group",
+    "group element 11"
+  },
+  {
+    "group_12",
+    "group",
+    "group element 12"
+  },
+  {
+    "group_13",
+    "group",
+    "group element 13"
+  },
+  {
+    "group_14",
+    "group",
+    "group element 14"
+  },
+  {
+    "group_15",
+    "group",
+    "group element 15"
+  },
+  {
+    "group_16",
+    "group",
+    "group element 16"
+  },
+  {
+    "group_17",
+    "group",
+    "group element 17"
+  },
+  {
+    "group_18",
+    "group",
+    "group element 18"
+  },
+  {
+    "group_19",
+    "group",
+    "group element 19"
+  },
+  {
+    "group_20",
+    "group",
+    "group element 20"
+  },
+  {
+    "group_21",
+    "group",
+    "group element 21"
+  },
+  {
+    "group_22",
+    "group",
+    "group element 22"
+  },
+  {
+    "group_23",
+    "group",
+    "group element 23"
+  },
+  {
+    "group_24",
+    "group",
+    "group element 24"
+  },
+  {
+    "group_25",
+    "group",
+    "group element 25"
+  },
+  {
+    "group_26",
+    "group",
+    "group element 26"
+  },
+  {
+    "group_27",
+    "group",
+    "group element 27"
+  },
+  {
+    "group_28",
+    "group",
+    "group element 28"
+  },
+  {
+    "group_29",
+    "group",
+    "group element 29"
+  },
+  {
+    "group_30",
+    "group",
+    "group element 30"
+  },
+  {
+    "group_31",
+    "group",
+    "group element 31"
+  },
+  {
+    "group_32",
+    "group",
+    "group element 32"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

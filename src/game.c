@@ -6484,6 +6484,11 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   if (!player->active || tape.pausing)
     return 0;
 
+#if 0
+  printf("::: [%d %d %d %d] [%d %d]\n",
+	 left, right, up, down, button1, button2);
+#endif
+
   if (player_action)
   {
 #if 0
@@ -8526,7 +8531,7 @@ int DigField(struct PlayerInfo *player,
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
-#if 0
+#if 1
       if (player->move_delay_reset_counter == 0)
       {
 	player->move_delay_reset_counter = 2;	/* two double speed steps */
@@ -8534,9 +8539,9 @@ int DigField(struct PlayerInfo *player,
 	DOUBLE_PLAYER_SPEED(player);
       }
 #else
-      DOUBLE_PLAYER_SPEED(player);
-
       player->move_delay_reset_counter = 2;
+
+      DOUBLE_PLAYER_SPEED(player);
 #endif
 
       PlayLevelSound(x, y, SND_CLASS_SP_PORT_PASSING);
@@ -8651,9 +8656,9 @@ int DigField(struct PlayerInfo *player,
 	  DOUBLE_PLAYER_SPEED(player);
 	}
 #else
-	DOUBLE_PLAYER_SPEED(player);
-
 	player->move_delay_reset_counter = 2;
+
+	DOUBLE_PLAYER_SPEED(player);
 #endif
 
 	PlayLevelSoundAction(x, y, ACTION_PASSING);
@@ -9100,9 +9105,14 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->MovDir = snap_direction;
 
-  player->is_moving = FALSE;
-  player->is_digging = FALSE;
-  player->is_collecting = FALSE;
+#if 1
+  if (player->MovPos == 0)
+#endif
+  {
+    player->is_moving = FALSE;
+    player->is_digging = FALSE;
+    player->is_collecting = FALSE;
+  }
 
   player->is_dropping = FALSE;
 
@@ -9111,9 +9121,14 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->is_snapping = TRUE;
 
-  player->is_moving = FALSE;
-  player->is_digging = FALSE;
-  player->is_collecting = FALSE;
+#if 1
+  if (player->MovPos == 0)
+#endif
+  {
+    player->is_moving = FALSE;
+    player->is_digging = FALSE;
+    player->is_collecting = FALSE;
+  }
 
   DrawLevelField(x, y);
   BackToFront();
