@@ -1476,7 +1476,7 @@ struct ElementInfo
   char *class_name;		/* element class used in config files */
   char *editor_description;	/* pre-defined description for level editor */
   char *custom_description;	/* alternative description from config file */
-  char description[MAX_ELEMENT_NAME_LEN + 1];	/* for custom elements */
+  char description[MAX_ELEMENT_NAME_LEN + 1];	/* for custom/group elements */
 
   /* ---------- graphic and sound definitions ---------- */
 

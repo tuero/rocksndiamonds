@@ -4753,7 +4753,7 @@ static void UnmapLevelEditorToolboxDrawingGadgets()
 
 static void UnmapDrawingArea(int id)
 {
-  UnmapGadget(level_editor_gadget[id]);
+  UnmapGadget(level_editor_gadget[drawingarea_info[id].gadget_id]);
 }
 
 static void UnmapLevelEditorWindowGadgets()
@@ -5144,6 +5144,15 @@ static void CopyCustomElementPropertiesToEditor(int element)
 static void CopyGroupElementPropertiesToEditor(int element)
 {
   group_element_info = *element_info[element].group;
+  custom_element = element_info[element];	/* needed for description */
+}
+
+static void CopyElementPropertiesToEditor(int element)
+{
+  if (IS_CUSTOM_ELEMENT(element))
+    CopyCustomElementPropertiesToEditor(element);
+  else if (IS_GROUP_ELEMENT(element))
+    CopyGroupElementPropertiesToEditor(element);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -5282,10 +5291,19 @@ static void CopyCustomElementPropertiesToGame(int element)
 
 static void CopyGroupElementPropertiesToGame(int element)
 {
+  element_info[element] = custom_element;
+  *element_info[element].group = group_element_info;
+
   /* mark that this group element has been modified */
   element_info[element].modified_settings = TRUE;
+}
 
-  *element_info[element].group = group_element_info;
+static void CopyElementPropertiesToGame(int element)
+{
+  if (IS_CUSTOM_ELEMENT(element))
+    CopyCustomElementPropertiesToGame(element);
+  else if (IS_GROUP_ELEMENT(element))
+    CopyGroupElementPropertiesToGame(element);
 }
 
 void DrawLevelEd()
@@ -5867,7 +5885,8 @@ static void DrawPropertiesTabulatorGadgets()
   int i;
 
   /* draw additional "advanced" tabulator for custom elements */
-  if (IS_CUSTOM_ELEMENT(properties_element))
+  if (IS_CUSTOM_ELEMENT(properties_element) ||
+      IS_GROUP_ELEMENT(properties_element))
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED;
 
   for (i = id_first; i <= id_last; i++)
@@ -5967,6 +5986,12 @@ static void DrawPropertiesInfo()
   {
     DrawTextF(pad_x, pad_y + screen_line++ * font2_height, FONT_TEXT_3,
 	      "[Custom Element %d]", properties_element - EL_CUSTOM_START + 1);
+    screen_line++;
+  }
+  else if (IS_GROUP_ELEMENT(properties_element))
+  {
+    DrawTextF(pad_x, pad_y + screen_line++ * font2_height, FONT_TEXT_3,
+	      "[Group Element %d]", properties_element - EL_GROUP_START + 1);
     screen_line++;
   }
 #endif
@@ -6197,27 +6222,35 @@ static void DrawPropertiesConfig()
     /* draw text input gadgets */
     MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
   }
-
-  if (IS_GROUP_ELEMENT(properties_element))
+  else if (IS_GROUP_ELEMENT(properties_element))
   {
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
     checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
     MapCheckbuttonGadget(i);
 
+    /* draw counter gadgets */
     MapCounterButtons(ED_COUNTER_ID_GROUP_CONTENT);
 
+    /* draw drawing area gadgets */
     DrawGroupElementArea(properties_element);
+
+    /* draw text input gadgets */
+    MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
   }
 }
 
 static void DrawPropertiesAdvancedDrawingAreas()
 {
   MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
-  MapDrawingArea(ED_DRAWING_ID_CUSTOM_CHANGE_TARGET);
-  MapDrawingArea(ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER);
 
-  DrawCustomChangeContentArea();
+  if (IS_CUSTOM_ELEMENT(properties_element))
+  {
+    MapDrawingArea(ED_DRAWING_ID_CUSTOM_CHANGE_TARGET);
+    MapDrawingArea(ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER);
+
+    DrawCustomChangeContentArea();
+  }
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -6231,27 +6264,42 @@ static void DrawPropertiesAdvanced()
   checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
   MapCheckbuttonGadget(i);
 
-  /* draw checkbutton gadgets */
-  for (i =  ED_CHECKBUTTON_ID_CHANGE_FIRST;
-       i <= ED_CHECKBUTTON_ID_CHANGE_LAST; i++)
+  if (IS_CUSTOM_ELEMENT(properties_element))
+  {
+    /* draw checkbutton gadgets */
+    for (i =  ED_CHECKBUTTON_ID_CHANGE_FIRST;
+	 i <= ED_CHECKBUTTON_ID_CHANGE_LAST; i++)
     MapCheckbuttonGadget(i);
 
-  /* draw counter gadgets */
-  for (i = ED_COUNTER_ID_CHANGE_FIRST; i <= ED_COUNTER_ID_CHANGE_LAST; i++)
-    MapCounterButtons(i);
+    /* draw counter gadgets */
+    for (i =  ED_COUNTER_ID_CHANGE_FIRST;
+	 i <= ED_COUNTER_ID_CHANGE_LAST; i++)
+      MapCounterButtons(i);
 
-  /* draw selectbox gadgets */
-  for (i = ED_SELECTBOX_ID_CHANGE_FIRST; i <= ED_SELECTBOX_ID_CHANGE_LAST; i++)
-    MapSelectboxGadget(i);
+    /* draw selectbox gadgets */
+    for (i =  ED_SELECTBOX_ID_CHANGE_FIRST;
+	 i <= ED_SELECTBOX_ID_CHANGE_LAST; i++)
+      MapSelectboxGadget(i);
 
-  /* draw textbutton gadgets */
-  for (i=ED_TEXTBUTTON_ID_CHANGE_FIRST; i <= ED_TEXTBUTTON_ID_CHANGE_LAST; i++)
-    MapTextbuttonGadget(i);
+    /* draw textbutton gadgets */
+    for (i =  ED_TEXTBUTTON_ID_CHANGE_FIRST;
+	 i <= ED_TEXTBUTTON_ID_CHANGE_LAST; i++)
+      MapTextbuttonGadget(i);
 
-  /* draw graphicbutton gadgets */
-  for (i =  ED_GRAPHICBUTTON_ID_CHANGE_FIRST;
-       i <= ED_GRAPHICBUTTON_ID_CHANGE_LAST; i++)
-    MapGraphicbuttonGadget(i);
+    /* draw graphicbutton gadgets */
+    for (i =  ED_GRAPHICBUTTON_ID_CHANGE_FIRST;
+	 i <= ED_GRAPHICBUTTON_ID_CHANGE_LAST; i++)
+      MapGraphicbuttonGadget(i);
+  }
+  else if (IS_GROUP_ELEMENT(properties_element))
+  {
+    /* draw checkbutton gadgets */
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE);
+
+    /* draw textbutton gadgets */
+    MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
+  }
 
   /* draw drawing area gadgets */
   DrawPropertiesAdvancedDrawingAreas();
@@ -6311,14 +6359,11 @@ static void DrawPropertiesWindow()
 
   /* make sure that previous properties edit mode exists for this element */
   if (edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED &&
-      !IS_CUSTOM_ELEMENT(properties_element))
+      !IS_CUSTOM_ELEMENT(properties_element) &&
+      !IS_GROUP_ELEMENT(properties_element))
     edit_mode_properties = ED_MODE_PROPERTIES_CONFIG;
 
-  if (IS_CUSTOM_ELEMENT(properties_element))
-    CopyCustomElementPropertiesToEditor(properties_element);
-
-  if (IS_GROUP_ELEMENT(properties_element))
-    CopyGroupElementPropertiesToEditor(properties_element);
+  CopyElementPropertiesToEditor(properties_element);
 
   UnmapLevelEditorWindowGadgets();
   UnmapLevelEditorToolboxDrawingGadgets();
@@ -7104,7 +7149,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  new_element = GFX_ELEMENT(new_element);
 	  custom_element.gfx_element = new_element;
 
-	  CopyCustomElementPropertiesToGame(properties_element);
+	  CopyElementPropertiesToGame(properties_element);
 
 	  UpdateCustomElementGraphicGadgets();
 
@@ -7256,6 +7301,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	PickDrawingElement(button, custom_element_change.content[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	PickDrawingElement(button, custom_element_change.trigger_element);
+      else if (id == GADGET_ID_GROUP_CONTENT)
+	PickDrawingElement(button, group_element_info.element[sx]);
       else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	PickDrawingElement(button, random_placement_background_element);
       else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
@@ -7342,7 +7389,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
        counter_id <= ED_COUNTER_ID_CUSTOM_LAST) ||
       (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
        counter_id <= ED_COUNTER_ID_CHANGE_LAST))
-    CopyCustomElementPropertiesToGame(properties_element);
+    CopyElementPropertiesToGame(properties_element);
 }
 
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
@@ -7353,7 +7400,7 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
 
   if (type_id == ED_TEXTINPUT_ID_ELEMENT_NAME)
   {
-    CopyCustomElementPropertiesToGame(properties_element);
+    CopyElementPropertiesToGame(properties_element);
 
     ModifyEditorElementList();	/* update changed button info text */
   }
@@ -7383,7 +7430,7 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 	    type_id <= ED_SELECTBOX_ID_CUSTOM_LAST) ||
 	   (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
 	    type_id <= ED_SELECTBOX_ID_CHANGE_LAST))
-    CopyCustomElementPropertiesToGame(properties_element);
+    CopyElementPropertiesToGame(properties_element);
 }
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
@@ -7480,7 +7527,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
        type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST &&
        type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE))
   {
-    CopyCustomElementPropertiesToGame(properties_element);
+    CopyElementPropertiesToGame(properties_element);
   }
 
   if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC)
@@ -8162,6 +8209,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
 		getElementInfoText(custom_element_change.trigger_element));
+    else if (id == GADGET_ID_GROUP_CONTENT)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(group_element_info.element[sx]));
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
 		getElementInfoText(random_placement_background_element));
@@ -8194,6 +8244,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"Other element triggering change");
+    else if (id == GADGET_ID_GROUP_CONTENT)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+		"Group element position: %d", sx + 1);
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
       DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"Random placement background");

@@ -36,12 +36,13 @@
 #define LEVEL_CHUNK_CNT3_UNUSED	10	/* unused CNT3 chunk bytes    */
 #define LEVEL_CPART_CUS3_SIZE	134	/* size of CUS3 chunk part    */
 #define LEVEL_CPART_CUS3_UNUSED	15	/* unused CUS3 bytes / part   */
+#define LEVEL_CHUNK_GRP1_SIZE	74	/* size of level GRP1 chunk   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
 
+#define LEVEL_CHUNK_CNT3_SIZE(x) (LEVEL_CHUNK_CNT3_HEADER + (x))
 #define LEVEL_CHUNK_CUS3_SIZE(x) (2 + (x) * LEVEL_CPART_CUS3_SIZE)
 #define LEVEL_CHUNK_CUS4_SIZE(x) (48 + 48 + (x) * 48)
-#define LEVEL_CHUNK_GRP1_SIZE(x) (2 + 8 + (x) * 2)
 
 /* file identifier strings */
 #define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
@@ -177,76 +178,79 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    setElementChangePages(&element_info[i], 1);
-    setElementChangeInfoToDefaults(element_info[i].change);
-  }
+    int element = i;
 
-  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    int element = EL_CUSTOM_START + i;
+    setElementChangePages(&element_info[element], 1);
+    setElementChangeInfoToDefaults(element_info[element].change);
 
-    for (j = 0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
-      element_info[element].description[j] = '\0';
-    if (element_info[element].custom_description != NULL)
-      strncpy(element_info[element].description,
-	      element_info[element].custom_description, MAX_ELEMENT_NAME_LEN);
-    else
-      strcpy(element_info[element].description,
-	     element_info[element].editor_description);
+    if (IS_CUSTOM_ELEMENT(element) || IS_GROUP_ELEMENT(element))
+    {
+      for (j = 0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
+	element_info[element].description[j] = '\0';
 
-    element_info[element].use_gfx_element = FALSE;
-    element_info[element].gfx_element = EL_EMPTY_SPACE;
+      if (element_info[element].custom_description != NULL)
+	strncpy(element_info[element].description,
+		element_info[element].custom_description,MAX_ELEMENT_NAME_LEN);
+      else
+	strcpy(element_info[element].description,
+	       element_info[element].editor_description);
 
-    element_info[element].collect_score = 10;		/* special default */
-    element_info[element].collect_count = 1;		/* special default */
+      element_info[element].use_gfx_element = FALSE;
+      element_info[element].gfx_element = EL_EMPTY_SPACE;
+    }
 
-    element_info[element].push_delay_fixed = -1;	/* initialize later */
-    element_info[element].push_delay_random = -1;	/* initialize later */
-    element_info[element].move_delay_fixed = 0;
-    element_info[element].move_delay_random = 0;
+    if (IS_CUSTOM_ELEMENT(element))
+    {
+      element_info[element].collect_score = 10;		/* special default */
+      element_info[element].collect_count = 1;		/* special default */
 
-    element_info[element].move_pattern = MV_ALL_DIRECTIONS;
-    element_info[element].move_direction_initial = MV_NO_MOVING;
-    element_info[element].move_stepsize = TILEX / 8;
+      element_info[element].push_delay_fixed = -1;	/* initialize later */
+      element_info[element].push_delay_random = -1;	/* initialize later */
+      element_info[element].move_delay_fixed = 0;
+      element_info[element].move_delay_random = 0;
 
-    element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
+      element_info[element].move_pattern = MV_ALL_DIRECTIONS;
+      element_info[element].move_direction_initial = MV_NO_MOVING;
+      element_info[element].move_stepsize = TILEX / 8;
 
-    for (x = 0; x < 3; x++)
-      for (y = 0; y < 3; y++)
-	element_info[element].content[x][y] = EL_EMPTY_SPACE;
+      element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
-    element_info[element].access_type = 0;
-    element_info[element].access_layer = 0;
-    element_info[element].walk_to_action = 0;
-    element_info[element].smash_targets = 0;
-    element_info[element].deadliness = 0;
-    element_info[element].consistency = 0;
+      for (x = 0; x < 3; x++)
+	for (y = 0; y < 3; y++)
+	  element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
-    element_info[element].can_explode_by_fire = FALSE;
-    element_info[element].can_explode_smashed = FALSE;
-    element_info[element].can_explode_impact = FALSE;
+      element_info[element].access_type = 0;
+      element_info[element].access_layer = 0;
+      element_info[element].walk_to_action = 0;
+      element_info[element].smash_targets = 0;
+      element_info[element].deadliness = 0;
+      element_info[element].consistency = 0;
 
-    element_info[element].current_change_page = 0;
+      element_info[element].can_explode_by_fire = FALSE;
+      element_info[element].can_explode_smashed = FALSE;
+      element_info[element].can_explode_impact = FALSE;
 
-    /* start with no properties at all */
-    for (j = 0; j < NUM_EP_BITFIELDS; j++)
-      Properties[element][j] = EP_BITMASK_DEFAULT;
+      element_info[element].current_change_page = 0;
 
-    element_info[element].modified_settings = FALSE;
-  }
+      /* start with no properties at all */
+      for (j = 0; j < NUM_EP_BITFIELDS; j++)
+	Properties[element][j] = EP_BITMASK_DEFAULT;
 
-  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
-  {
-    int element = EL_GROUP_START + i;
+      element_info[element].modified_settings = FALSE;
+    }
+    else if (IS_GROUP_ELEMENT(element))
+    {
+      /* initialize memory for list of elements in group */
+      if (element_info[element].group == NULL)
+	element_info[element].group =
+	  checked_malloc(sizeof(struct ElementGroupInfo));
 
-    if (element_info[element].group == NULL)
-      element_info[element].group =
-	checked_malloc(sizeof(struct ElementGroupInfo));
+      for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
+	element_info[element].group->element[j] = EL_EMPTY_SPACE;
 
-    for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
-      element_info[element].group->element[j] = EL_EMPTY_SPACE;
-
-    element_info[element].group->num_elements = 1;
+      /* default: only one element in group */
+      element_info[element].group->num_elements = 1;
+    }
   }
 
   BorderElement = EL_STEELWALL;
@@ -650,8 +654,7 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
 
   ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT3_UNUSED);
 
-  chunk_size_expected = LEVEL_CHUNK_CNT3_HEADER + envelope_len;
-
+  chunk_size_expected = LEVEL_CHUNK_CNT3_SIZE(envelope_len);
   if (chunk_size_expected != chunk_size)
   {
     ReadUnusedBytesFromFile(file, chunk_size - LEVEL_CHUNK_CNT3_HEADER);
@@ -819,7 +822,8 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   {
     Error(ERR_WARN, "invalid custom element number %d", element);
 
-    element = EL_DUMMY;
+    ReadUnusedBytesFromFile(file, chunk_size - 2);
+    return chunk_size;
   }
 
   ei = &element_info[element];
@@ -921,8 +925,8 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
 static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
 {
+  struct ElementInfo *ei;
   struct ElementGroupInfo *group;
-  int chunk_size_expected;
   int element;
   int i;
 
@@ -936,21 +940,23 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
     return chunk_size;
   }
 
+  ei = &element_info[element];
+
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN; i++)
+    ei->description[i] = getFile8Bit(file);
+  ei->description[MAX_ELEMENT_NAME_LEN] = 0;
+
   group = element_info[element].group;
 
   group->num_elements = getFile8Bit(file);
 
+  ei->use_gfx_element = getFile8Bit(file);
+  ei->gfx_element = checkLevelElement(getFile16BitBE(file));
+
   /* some free bytes for future values and padding */
-  ReadUnusedBytesFromFile(file, 7);
+  ReadUnusedBytesFromFile(file, 4);
 
-  chunk_size_expected = LEVEL_CHUNK_GRP1_SIZE(group->num_elements);
-  if (chunk_size_expected != chunk_size)
-  {
-    ReadUnusedBytesFromFile(file, chunk_size - 10);
-    return chunk_size_expected;
-  }
-
-  for (i = 0; i < group->num_elements; i++)
+  for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
     group->element[i] = checkLevelElement(getFile16BitBE(file));
 
   /* mark this group element as modified */
@@ -2070,17 +2076,24 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
 static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
 {
-  struct ElementGroupInfo *group = element_info[element].group;
+  struct ElementInfo *ei = &element_info[element];
+  struct ElementGroupInfo *group = ei->group;
   int i;
 
   putFile16BitBE(file, element);
 
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN; i++)
+    putFile8Bit(file, ei->description[i]);
+
   putFile8Bit(file, group->num_elements);
 
-  /* some free bytes for future values and padding */
-  WriteUnusedBytesToFile(file, 7);
+  putFile8Bit(file, ei->use_gfx_element);
+  putFile16BitBE(file, ei->gfx_element);
 
-  for (i = 0; i < group->num_elements; i++)
+  /* some free bytes for future values and padding */
+  WriteUnusedBytesToFile(file, 4);
+
+  for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
     putFile16BitBE(file, group->element[i]);
 }
 
@@ -2158,7 +2171,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
     {
       int envelope_len = strlen(level->envelope_text[i]) + 1;
 
-      putFileChunkBE(file, "CNT3", LEVEL_CHUNK_CNT3_HEADER + envelope_len);
+      putFileChunkBE(file, "CNT3", LEVEL_CHUNK_CNT3_SIZE(envelope_len));
       SaveLevel_CNT3(file, level, EL_ENVELOPE_1 + i);
     }
   }
@@ -2189,9 +2202,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 
       if (element_info[element].modified_settings)
       {
-	int num_elements = element_info[element].group->num_elements;
-
-	putFileChunkBE(file, "GRP1", LEVEL_CHUNK_GRP1_SIZE(num_elements));
+	putFileChunkBE(file, "GRP1", LEVEL_CHUNK_GRP1_SIZE);
 	SaveLevel_GRP1(file, level, element);
       }
     }
