@@ -362,8 +362,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	char cursor_letter;
 	char cursor_string[3];
 	char text[MAX_GADGET_TEXTSIZE + 1];
-	int font_color = FC_YELLOW;
-	int border = gi->design_border;
+	int font_type = gi->text.font_type;
+	int font_width = getFontWidth(FS_SMALL, font_type);
+	int border = gi->border.size;
 	strcpy(text, gi->text.value);
 	strcat(text, " ");
 
@@ -374,16 +375,16 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	/* middle part of gadget */
 	for (i=0; i<=gi->text.size; i++)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + border, gd->y, FONT2_XSIZE, gi->height,
-		    gi->x + border + i * FONT2_XSIZE, gi->y);
+		    gd->x + border, gd->y, font_width, gi->height,
+		    gi->x + border + i * font_width, gi->y);
 
 	/* right part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x + ED_WIN_COUNT_XSIZE - border, gd->y,
+		  gd->x + gi->border.width - border, gd->y,
 		  border, gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
-	DrawText(gi->x + border, gi->y + border, text, FS_SMALL, font_color);
+	DrawText(gi->x + border, gi->y + border, text, FS_SMALL, font_type);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
 	cursor_string[0] = '~';
@@ -392,8 +393,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 
 	/* draw cursor, if active */
 	if (pressed)
-	  DrawText(gi->x + border + gi->text.cursor_position * FONT2_XSIZE,
-		   gi->y + border, cursor_string, FS_SMALL, font_color);
+	  DrawText(gi->x + border + gi->text.cursor_position * font_width,
+		   gi->y + border, cursor_string, FS_SMALL, font_type);
       }
       break;
 
@@ -403,9 +404,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int xpos = gi->x;
 	int ypos = gi->y + gi->scrollbar.position;
 	int design_full = gi->width;
-	int design_body = design_full - 2 * gi->design_border;
+	int design_body = design_full - 2 * gi->border.size;
 	int size_full = gi->scrollbar.size;
-	int size_body = size_full - 2 * gi->design_border;
+	int size_body = size_full - 2 * gi->border.size;
 	int num_steps = size_body / design_body;
 	int step_size_remain = size_body - num_steps * design_body;
 
@@ -416,28 +417,28 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	/* upper part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
 		  gd->x, gd->y,
-		  gi->width, gi->design_border,
+		  gi->width, gi->border.size,
 		  xpos, ypos);
 
 	/* middle part of gadget */
 	for (i=0; i<num_steps; i++)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x, gd->y + gi->design_border,
+		    gd->x, gd->y + gi->border.size,
 		    gi->width, design_body,
-		    xpos, ypos + gi->design_border + i * design_body);
+		    xpos, ypos + gi->border.size + i * design_body);
 
 	/* remaining middle part of gadget */
 	if (step_size_remain > 0)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x,  gd->y + gi->design_border,
+		    gd->x,  gd->y + gi->border.size,
 		    gi->width, step_size_remain,
-		    xpos, ypos + gi->design_border + num_steps * design_body);
+		    xpos, ypos + gi->border.size + num_steps * design_body);
 
 	/* lower part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y + design_full - gi->design_border,
-		  gi->width, gi->design_border,
-		  xpos, ypos + size_full - gi->design_border);
+		  gd->x, gd->y + design_full - gi->border.size,
+		  gi->width, gi->border.size,
+		  xpos, ypos + size_full - gi->border.size);
       }
       break;
 
@@ -447,9 +448,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int xpos = gi->x + gi->scrollbar.position;
 	int ypos = gi->y;
 	int design_full = gi->height;
-	int design_body = design_full - 2 * gi->design_border;
+	int design_body = design_full - 2 * gi->border.size;
 	int size_full = gi->scrollbar.size;
-	int size_body = size_full - 2 * gi->design_border;
+	int size_body = size_full - 2 * gi->border.size;
 	int num_steps = size_body / design_body;
 	int step_size_remain = size_body - num_steps * design_body;
 
@@ -460,28 +461,28 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	/* left part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
 		  gd->x, gd->y,
-		  gi->design_border, gi->height,
+		  gi->border.size, gi->height,
 		  xpos, ypos);
 
 	/* middle part of gadget */
 	for (i=0; i<num_steps; i++)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + gi->design_border, gd->y,
+		    gd->x + gi->border.size, gd->y,
 		    design_body, gi->height,
-		    xpos + gi->design_border + i * design_body, ypos);
+		    xpos + gi->border.size + i * design_body, ypos);
 
 	/* remaining middle part of gadget */
 	if (step_size_remain > 0)
 	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + gi->design_border, gd->y,
+		    gd->x + gi->border.size, gd->y,
 		    step_size_remain, gi->height,
-		    xpos + gi->design_border + num_steps * design_body, ypos);
+		    xpos + gi->border.size + num_steps * design_body, ypos);
 
 	/* right part of gadget */
 	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x + design_full - gi->design_border, gd->y,
-		  gi->design_border, gi->height,
-		  xpos + size_full - gi->design_border, ypos);
+		  gd->x + design_full - gi->border.size, gd->y,
+		  gi->border.size, gi->height,
+		  xpos + size_full - gi->border.size, ypos);
       }
       break;
 
@@ -599,13 +600,11 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
 	  gi->text.size = max_textsize;
 	  gi->text.value[max_textsize] = '\0';
-
-	  if (gi->width == 0 && gi->height == 0)
-	  {
-	    gi->width = (gi->text.size + 1) * FONT2_XSIZE + 6;
-	    gi->height = ED_WIN_COUNT_YSIZE;
-	  }
 	}
+	break;
+
+      case GDI_TEXT_FONT:
+	gi->text.font_type = va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_UNPRESSED:
@@ -632,8 +631,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
 
-      case GDI_DESIGN_BORDER:
-	gi->design_border = va_arg(ap, int);
+      case GDI_BORDER_SIZE:
+	gi->border.size = va_arg(ap, int);
+	break;
+
+      case GDI_TEXTINPUT_DESIGN_WIDTH:
+	gi->border.width = va_arg(ap, int);
 	break;
 
       case GDI_DECORATION_DESIGN:
@@ -734,6 +737,15 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
   /* adjust gadget values in relation to other gadget values */
 
+  if (gi->type & GD_TYPE_TEXTINPUT)
+  {
+    int font_width = getFontWidth(FS_SMALL, gi->text.font_type);
+    int font_height = getFontHeight(FS_SMALL, gi->text.font_type);
+
+    gi->width = 2 * gi->border.size + (gi->text.size + 1) * font_width;
+    gi->height = 2 * gi->border.size + font_height;
+  }
+
   if (gi->type & GD_TYPE_TEXTINPUT_NUMERIC)
   {
     struct GadgetTextInput *text = &gi->text;
@@ -760,6 +772,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     gs->size = gs->size_max * gs->items_visible / gs->items_max;
     gs->position = gs->size_max * gs->item_position / gs->items_max;
     gs->position_max = gs->size_max - gs->size;
+    gs->correction = gs->size_max / gs->items_max / 2;
 
     /* finetuning for maximal right/bottom position */
     if (gs->item_position == gs->items_max - gs->items_visible)
@@ -992,7 +1005,9 @@ void HandleGadgets(int mx, int my, int button)
     if (new_gi == last_gi)
     {
       /* if mouse button pressed inside activated text gadget, set cursor */
-      gi->text.cursor_position = (mx - gi->x) / FONT2_XSIZE;
+      gi->text.cursor_position =
+	(mx - gi->x - gi->border.size) /
+	getFontWidth(FS_SMALL, gi->text.font_type);
 
       if (gi->text.cursor_position < 0)
 	gi->text.cursor_position = 0;
@@ -1006,6 +1021,8 @@ void HandleGadgets(int mx, int my, int button)
       /* if mouse button pressed outside text input gadget, deactivate it */
       CheckRangeOfNumericInputGadget(gi);
       DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+
+      gi->event.type = GD_EVENT_TEXT_LEAVING;
 
       if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
 	gi->callback_action(gi);
@@ -1213,7 +1230,13 @@ void HandleGadgets(int mx, int my, int button)
       if (gs->position > gs->position_max)
 	gs->position = gs->position_max;
 
-      gs->item_position = gs->items_max * gs->position / gs->size_max;
+      gs->item_position =
+	gs->items_max * (gs->position + gs->correction) / gs->size_max;
+
+      if (gs->item_position < 0)
+	gs->item_position = 0;
+      if (gs->item_position > gs->items_max - 1)
+	gs->item_position = gs->items_max - 1;
 
       if (old_item_position != gs->item_position)
       {
@@ -1313,6 +1336,8 @@ void HandleGadgetsKeyInput(KeySym key)
   {
     CheckRangeOfNumericInputGadget(gi);
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+
+    gi->event.type = GD_EVENT_TEXT_RETURN;
 
     if (gi->event_mask & GD_EVENT_TEXT_RETURN)
       gi->callback_action(gi);

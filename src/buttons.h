@@ -83,15 +83,6 @@ void DrawCompleteVideoDisplay(void);
 
 /* NEW GADGET STUFF -------------------------------------------------------- */
 
-/* some values for gadget graphics (also used by editor.c) */
-#define ED_BUTTON_COUNT_YPOS	60
-#define ED_BUTTON_COUNT_XSIZE	20
-#define ED_BUTTON_COUNT_YSIZE	20
-#define ED_WIN_COUNT_XPOS	(2 + ED_BUTTON_COUNT_XSIZE + 2)
-#define ED_WIN_COUNT_YPOS	ED_BUTTON_COUNT_YPOS
-#define ED_WIN_COUNT_XSIZE	52
-#define ED_WIN_COUNT_YSIZE	ED_BUTTON_COUNT_YSIZE
-
 /* gadget types */
 #define GD_TYPE_NORMAL_BUTTON		(1 << 0)
 #define GD_TYPE_CHECK_BUTTON		(1 << 1)
@@ -144,27 +135,35 @@ void DrawCompleteVideoDisplay(void);
 #define GDI_NUMBER_MAX			13
 #define GDI_TEXT_VALUE			14
 #define GDI_TEXT_SIZE			15
-#define GDI_DESIGN_UNPRESSED		16
-#define GDI_DESIGN_PRESSED		17
-#define GDI_ALT_DESIGN_UNPRESSED	18
-#define GDI_ALT_DESIGN_PRESSED		19
-#define GDI_DESIGN_BORDER		20
-#define GDI_DECORATION_DESIGN		21
-#define GDI_DECORATION_POSITION		22
-#define GDI_DECORATION_SIZE		23
-#define GDI_DECORATION_SHIFTING		24
-#define GDI_EVENT_MASK			25
-#define GDI_EVENT			26
-#define GDI_CALLBACK_INFO		27
-#define GDI_CALLBACK_ACTION		28
-#define GDI_AREA_SIZE			29
-#define GDI_ITEM_SIZE			30
-#define GDI_SCROLLBAR_ITEMS_MAX		31
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	32
-#define GDI_SCROLLBAR_ITEM_POSITION	33
-#define GDI_INFO_TEXT			34
+#define GDI_TEXT_FONT			16
+#define GDI_DESIGN_UNPRESSED		17
+#define GDI_DESIGN_PRESSED		18
+#define GDI_ALT_DESIGN_UNPRESSED	19
+#define GDI_ALT_DESIGN_PRESSED		20
+#define GDI_BORDER_SIZE			21
+#define GDI_TEXTINPUT_DESIGN_WIDTH	22
+#define GDI_DECORATION_DESIGN		23
+#define GDI_DECORATION_POSITION		24
+#define GDI_DECORATION_SIZE		25
+#define GDI_DECORATION_SHIFTING		26
+#define GDI_EVENT_MASK			27
+#define GDI_EVENT			28
+#define GDI_CALLBACK_INFO		29
+#define GDI_CALLBACK_ACTION		30
+#define GDI_AREA_SIZE			31
+#define GDI_ITEM_SIZE			32
+#define GDI_SCROLLBAR_ITEMS_MAX		33
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	34
+#define GDI_SCROLLBAR_ITEM_POSITION	35
+#define GDI_INFO_TEXT			36
 
 typedef void (*gadget_function)(void *);
+
+struct GadgetBorder
+{
+  int size;				/* size of gadget border */
+  int width;				/* for text input gadgets */
+};
 
 struct GadgetDesign
 {
@@ -203,6 +202,7 @@ struct GadgetTextInput
   int number_max;			/* maximal allowed numeric value */
   int size;				/* maximal size of input text */
   int cursor_position;			/* actual cursor position */
+  int font_type;			/* font to use for text input */
 };
 
 struct GadgetScrollbar
@@ -215,6 +215,7 @@ struct GadgetScrollbar
   int position;				/* scrollbar position on screen */
   int position_max;			/* bottom/right scrollbar position */
   int drag_position;			/* drag position on scrollbar */
+  int correction;			/* scrollbar position correction */
 };
 
 struct GadgetInfo
@@ -230,10 +231,10 @@ struct GadgetInfo
   boolean checked;			/* check/radio button state */
   int radio_nr;				/* number of radio button series */
   boolean mapped;			/* gadget is active */
+  struct GadgetBorder border;		/* gadget border design */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
   struct GadgetDecoration deco;		/* decoration on top of gadget */
-  int design_border;			/* border size of gadget decoration */
   unsigned long event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
   gadget_function callback_info;	/* function for pop-up info text */

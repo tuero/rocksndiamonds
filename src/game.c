@@ -588,17 +588,11 @@ void InitGame()
   DrawAllPlayers();
   FadeToFront();
 
-
-#if 1
-
   if (setup.soft_scrolling)
     XCopyArea(display, fieldbuffer, backbuffer, gc,
 	      FX, FY, SXSIZE, SYSIZE, SX, SY);
 
   redraw_mask |= REDRAW_FROM_BACKBUFFER;
-
-#endif
-
 
   /* copy default game door content to main double buffer */
   XCopyArea(display, pix[PIX_DOOR], drawto, gc,
@@ -608,11 +602,17 @@ void InitGame()
     DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
 	     int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
   else
-    DrawText(DX + XX_LEVEL - 1, DY + YY_LEVEL + 1,
-	     int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
+  {
+    DrawTextExt(drawto, gc, DX + XX_EMERALDS, DY + YY_EMERALDS,
+		int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
+    XCopyArea(display, drawto, drawto, gc,
+	      DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
+	      FONT5_XSIZE * 3, FONT5_YSIZE - 1,
+	      DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
+  }
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
-	   int2str(local_player->gems_still_needed,3), FS_SMALL, FC_YELLOW);
+	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
 	   int2str(local_player->dynamite, 3), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_SCORE, DY + YY_SCORE,

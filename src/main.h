@@ -545,7 +545,7 @@ extern char		*element_info[];
 #define FONT4_XSIZE		16
 #define FONT4_YSIZE		16
 #define FONT5_XSIZE		10
-#define FONT5_YSIZE		12
+#define FONT5_YSIZE		14
 
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
