@@ -490,6 +490,7 @@ void InitElementProperties()
   {
     EL_BETON,
     EL_MAUERWERK,
+    EL_MAUER_LEBT,
     EL_FELSBODEN,
     EL_AUSGANG_ZU,
     EL_AUSGANG_ACT,
@@ -502,6 +503,10 @@ void InitElementProperties()
     EL_MORAST_LEER,
     EL_SIEB_VOLL,
     EL_SIEB_LEER,
+    EL_SIEB_TOT,
+    EL_SIEB2_VOLL,
+    EL_SIEB2_LEER,
+    EL_SIEB2_TOT,
     EL_LIFE,
     EL_LIFE_ASYNC,
     EL_BADEWANNE1,
@@ -537,6 +542,8 @@ void InitElementProperties()
     EL_FELSBODEN,
     EL_FELSBROCKEN,
     EL_EDELSTEIN,
+    EL_EDELSTEIN2,
+    EL_EDELSTEIN3,
     EL_DIAMANT,
     EL_BOMBE,
     EL_KOKOSNUSS,
@@ -556,21 +563,46 @@ void InitElementProperties()
     EL_KAEFER,
     EL_FLIEGER,
     EL_MAMPFER,
+    EL_MAMPFER2,
     EL_ZOMBIE,
     EL_PACMAN
   };
   static int ep_enemy_num = sizeof(ep_enemy)/sizeof(int);
 
+  static int ep_mauer[] =
+  {
+    EL_BETON,
+    EL_PFORTE1,
+    EL_PFORTE2,
+    EL_PFORTE3,
+    EL_PFORTE4,
+    EL_PFORTE1X,
+    EL_PFORTE2X,
+    EL_PFORTE3X,
+    EL_PFORTE4X,
+    EL_AUSGANG_ZU,
+    EL_AUSGANG_ACT,
+    EL_AUSGANG_AUF,
+    EL_MAUERWERK,
+    EL_FELSBODEN,
+    EL_MAUER_LEBT,
+    EL_MAUERND
+  };
+  static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
+
   static int ep_can_fall[] =
   {
     EL_FELSBROCKEN,
     EL_EDELSTEIN,
+    EL_EDELSTEIN2,
+    EL_EDELSTEIN3,
     EL_DIAMANT,
     EL_BOMBE,
     EL_KOKOSNUSS,
     EL_TROPFEN,
     EL_MORAST_VOLL,
     EL_SIEB_VOLL,
+    EL_SIEB2_VOLL,
     EL_ZEIT_VOLL,
     EL_ZEIT_LEER
   };
@@ -580,6 +612,8 @@ void InitElementProperties()
   {
     EL_FELSBROCKEN,
     EL_EDELSTEIN,
+    EL_EDELSTEIN2,
+    EL_EDELSTEIN3,
     EL_DIAMANT,
     EL_SCHLUESSEL1,
     EL_SCHLUESSEL2,
@@ -597,6 +631,8 @@ void InitElementProperties()
   {
     EL_FELSBROCKEN,
     EL_EDELSTEIN,
+    EL_EDELSTEIN2,
+    EL_EDELSTEIN3,
     EL_DIAMANT
   };
   static int ep_can_change_num = sizeof(ep_can_change)/sizeof(int);
@@ -606,6 +642,7 @@ void InitElementProperties()
     EL_KAEFER,
     EL_FLIEGER,
     EL_MAMPFER,
+    EL_MAMPFER2,
     EL_ZOMBIE,
     EL_PACMAN
   };
@@ -640,12 +677,33 @@ void InitElementProperties()
     EL_KAEFER,
     EL_FLIEGER,
     EL_MAMPFER,
+    EL_MAMPFER2,
     EL_ZOMBIE,
     EL_PACMAN,
     EL_TROPFEN,
     EL_SALZSAEURE
   };
   static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
+
+  static int ep_mampf2[] =
+  {
+    EL_ERDREICH,
+    EL_KAEFER,
+    EL_FLIEGER,
+    EL_MAMPFER,
+    EL_ZOMBIE,
+    EL_PACMAN,
+    EL_TROPFEN,
+    EL_AMOEBE_TOT,
+    EL_AMOEBE_NASS,
+    EL_AMOEBE_NORM,
+    EL_AMOEBE_VOLL,
+    EL_EDELSTEIN,
+    EL_EDELSTEIN2,
+    EL_EDELSTEIN3,
+    EL_DIAMANT
+  };
+  static int ep_mampf2_num = sizeof(ep_mampf2)/sizeof(int);
 
   static long ep_bit[] =
   {
@@ -658,13 +716,15 @@ void InitElementProperties()
     EP_BIT_MASSIV,
     EP_BIT_SLIPPERY,
     EP_BIT_ENEMY,
+    EP_BIT_MAUER,
     EP_BIT_CAN_FALL,
     EP_BIT_CAN_SMASH,
     EP_BIT_CAN_CHANGE,
     EP_BIT_CAN_MOVE,
     EP_BIT_COULD_MOVE,
     EP_BIT_DONT_TOUCH,
-    EP_BIT_DONT_GO_TO
+    EP_BIT_DONT_GO_TO,
+    EP_BIT_MAMPF2
   };
   static int *ep_array[] =
   {
@@ -677,13 +737,15 @@ void InitElementProperties()
     ep_massiv,
     ep_slippery,
     ep_enemy,
+    ep_mauer,
     ep_can_fall,
     ep_can_smash,
     ep_can_change,
     ep_can_move,
     ep_could_move,
     ep_dont_touch,
-    ep_dont_go_to
+    ep_dont_go_to,
+    ep_mampf2
   };
   static int *ep_num[] =
   {
@@ -696,13 +758,15 @@ void InitElementProperties()
     &ep_massiv_num,
     &ep_slippery_num,
     &ep_enemy_num,
+    &ep_mauer_num,
     &ep_can_fall_num,
     &ep_can_smash_num,
     &ep_can_change_num,
     &ep_can_move_num,
     &ep_could_move_num,
     &ep_dont_touch_num,
-    &ep_dont_go_to_num
+    &ep_dont_go_to_num,
+    &ep_mampf2_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 

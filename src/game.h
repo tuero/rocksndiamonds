@@ -25,6 +25,10 @@
 #define MF_MOVING	1
 #define MF_ACTION	2
 
+#define EX_NORMAL	0
+#define EX_CENTER	1
+#define EX_BORDER	2
+
 void GetPlayerConfig(void);
 void InitGame(void);
 void InitMovDir(int, int);
@@ -38,7 +42,8 @@ int MovingOrBlocked2Element(int, int);
 void RemoveMovingField(int, int);
 void DrawDynamite(int, int);
 void CheckDynamite(int, int);
-void Explode(int, int, int);
+void Explode(int, int, int, int);
+void DynaExplode(int, int, int);
 void Bang(int, int);
 void Blurb(int, int);
 void Impact(int, int);
@@ -53,9 +58,13 @@ void Life(int, int);
 void Ablenk(int, int);
 void Blubber(int, int);
 void NussKnacken(int, int);
-void SiebAktivieren(int x, int y);
-void AusgangstuerPruefen(int x, int y);
-void AusgangstuerOeffnen(int x, int y);
+void SiebAktivieren(int, int, int);
+void AusgangstuerPruefen(int, int);
+void AusgangstuerOeffnen(int, int);
+void AusgangstuerBlinken(int, int);
+void EdelsteinFunkeln(int, int);
+void MauerWaechst(int, int);
+void MauerAbleger(int, int);
 int GameActions(int, int, int);
 void ScrollLevel(int, int);
 BOOL MoveFigure(int, int);

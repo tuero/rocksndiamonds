@@ -64,6 +64,7 @@ int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		AmoebaCnt[MAX_NUM_AMOEBA];
 long		Elementeigenschaften[MAX_ELEMENTS];
@@ -73,6 +74,7 @@ int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		LevelSolved,GameOver, JX,JY, ZX,ZY;
 int		Gems,Dynamite,Key[4],TimeLeft,Score,MampferNr;
+int		DynaBombCount, DynaBombSize, DynaBombsLeft;
 int		CheckMoving,CheckExploding, SiebAktiv;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];

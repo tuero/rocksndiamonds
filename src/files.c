@@ -155,9 +155,9 @@ void LoadLevel(int level_nr)
     level.edelsteine	= (fgetc(file)<<8) | fgetc(file);
     for(i=0;i<MAX_LEVNAMLEN;i++)
       level.name[i]	= fgetc(file);
-    for(i=0;i<MAX_SC_ENTRIES;i++)
+    level.name[MAX_LEVNAMLEN-1] = 0;
+    for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
       level.score[i]	= fgetc(file);
-    level.amoebe_inhalt = fgetc(file);
     for(i=0;i<4;i++)
       for(y=0;y<3;y++)
 	for(x=0;x<3;x++)
@@ -165,8 +165,9 @@ void LoadLevel(int level_nr)
     level.tempo_amoebe	= fgetc(file);
     level.dauer_sieb	= fgetc(file);
     level.dauer_ablenk	= fgetc(file);
+    level.amoebe_inhalt = fgetc(file);
 
-    for(i=0;i<19;i++)	/* Rest reserviert / Headergröße 80 Bytes */
+    for(i=0;i<NUM_FREE_LVHD_BYTES;i++)	/* Rest frei / Headergröße 80 Bytes */
       fgetc(file);
 
     for(y=0;y<MAX_LEV_FIELDY;y++) 
@@ -190,9 +191,8 @@ void LoadLevel(int level_nr)
     level.time		= 100;
     level.edelsteine	= 0;
     strncpy(level.name,"Nameless Level",MAX_LEVNAMLEN-1);
-    for(i=0;i<MAX_SC_ENTRIES;i++)
+    for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
       level.score[i]	= 10;
-    level.amoebe_inhalt = EL_DIAMANT;
     for(i=0;i<4;i++)
       for(y=0;y<3;y++)
 	for(x=0;x<3;x++)
@@ -200,6 +200,7 @@ void LoadLevel(int level_nr)
     level.tempo_amoebe	= 10;
     level.dauer_sieb	= 10;
     level.dauer_ablenk	= 10;
+    level.amoebe_inhalt = EL_DIAMANT;
 
     for(y=0;y<STD_LEV_FIELDY;y++) 
       for(x=0;x<STD_LEV_FIELDX;x++) 
@@ -464,9 +465,8 @@ void SaveLevel(int level_nr)
 
   for(i=0;i<MAX_LEVNAMLEN;i++)
     fputc(level.name[i],file);
-  for(i=0;i<MAX_SC_ENTRIES;i++)
+  for(i=0;i<MAX_LEVSCORE_ENTRIES;i++)
     fputc(level.score[i],file);
-  fputc(level.amoebe_inhalt,file);
   for(i=0;i<4;i++)
     for(y=0;y<3;y++)
       for(x=0;x<3;x++)
@@ -474,8 +474,9 @@ void SaveLevel(int level_nr)
   fputc(level.tempo_amoebe,file);
   fputc(level.dauer_sieb,file);
   fputc(level.dauer_ablenk,file);
+  fputc(level.amoebe_inhalt,file);
 
-  for(i=0;i<19;i++)	/* Rest reserviert / Headergröße 80 Bytes */
+  for(i=0;i<NUM_FREE_LVHD_BYTES;i++)	/* Rest frei / Headergröße 80 Bytes */
     fputc(0,file);
 
   for(y=0;y<lev_fieldy;y++) 

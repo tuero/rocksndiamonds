@@ -118,15 +118,18 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   {
     static long level_delay = 0;
     int step = (button==1 ? 1 : button==2 ? 5 : 10);
+    int new_level_nr, old_level_nr = level_nr;
 
-    if (!DelayReached(&level_delay,20))
+    new_level_nr = level_nr + (x==11 ? -step : +step);
+    if (new_level_nr<0)
+      new_level_nr = 0;
+    if (new_level_nr>LEVELDIR_SIZE(leveldir[leveldir_nr])-1)
+      new_level_nr = LEVELDIR_SIZE(leveldir[leveldir_nr])-1;
+
+    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,20))
       goto out;
 
-    level_nr += (x==11 ? -step : +step);
-    if (level_nr<0)
-      level_nr = 0;
-    if (level_nr>LEVELDIR_SIZE(leveldir[leveldir_nr])-1)
-      level_nr = LEVELDIR_SIZE(leveldir[leveldir_nr])-1;
+    level_nr = new_level_nr;
 
     if (level_nr>player.handicap && level_nr<leveldir[leveldir_nr].num_ready)
     {
@@ -233,25 +236,37 @@ static int helpscreen_frame[MAX_HELPSCREEN_ELS];
 static int helpscreen_delay[MAX_HELPSCREEN_ELS];
 static int helpscreen_action[] =
 {
+  GFX_SPIELFIGUR,1,100,						HA_NEXT,
   GFX_ERDREICH,1,100,						HA_NEXT,
   GFX_LEERRAUM,1,100,						HA_NEXT,
   GFX_MORAST_LEER,1,100,					HA_NEXT,
   GFX_BETON,1,100,						HA_NEXT,
   GFX_MAUERWERK,1,100,						HA_NEXT,
+  GFX_MAUER_R1,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,
+  GFX_MAUER_L1,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,	HA_NEXT,
+  GFX_UNSICHTBAR,1,100,						HA_NEXT,
   GFX_FELSBODEN,1,100,						HA_NEXT,
+  GFX_CHAR_A,30,3, GFX_CHAR_AUSRUF,32,3,			HA_NEXT,
   GFX_EDELSTEIN,2,5,						HA_NEXT,
   GFX_DIAMANT,2,5,						HA_NEXT,
+  GFX_EDELSTEIN2,2,5,						HA_NEXT,
+  GFX_EDELSTEIN3,2,5,						HA_NEXT,
   GFX_FELSBROCKEN,4,5,						HA_NEXT,
   GFX_BOMBE,1,50, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,		HA_NEXT,
   GFX_KOKOSNUSS,1,50, GFX_CRACKINGNUT,3,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
   GFX_ERZ_EDEL,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
   GFX_ERZ_DIAM,1,50, GFX_EXPLOSION,8,1, GFX_DIAMANT,1,10,	HA_NEXT,
+  GFX_ERZ_EDEL2,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN2,1,10,	HA_NEXT,
+  GFX_ERZ_EDEL3,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN3,1,10,	HA_NEXT,
   GFX_GEBLUBBER,4,4,						HA_NEXT,
   GFX_SCHLUESSEL1,4,33,						HA_NEXT,
   GFX_PFORTE1,4,33,						HA_NEXT,
   GFX_PFORTE1X,4,33,						HA_NEXT,
   GFX_DYNAMIT_AUS,1,100,					HA_NEXT,
   GFX_DYNAMIT,7,6, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,	HA_NEXT,
+  GFX_DYNABOMB,1,33, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,	HA_NEXT,
+  GFX_DYNABOMB_NR,1,100,					HA_NEXT,
+  GFX_DYNABOMB_SZ,1,100,					HA_NEXT,
   GFX_FLIEGER+4,1,3, GFX_FLIEGER+0,1,3, GFX_FLIEGER+4,1,3,
   GFX_FLIEGER+5,1,3, GFX_FLIEGER+1,1,3, GFX_FLIEGER+5,1,3,
   GFX_FLIEGER+6,1,3, GFX_FLIEGER+2,1,3, GFX_FLIEGER+6,1,3,
@@ -266,44 +281,82 @@ static int helpscreen_action[] =
   GFX_PACMAN+3,1,3, GFX_PACMAN+7,1,2, GFX_PACMAN+3,1,3,		HA_NEXT,
   GFX_MAMPFER+0,4,0, GFX_MAMPFER+3,1,0, GFX_MAMPFER+2,1,0,
   GFX_MAMPFER+1,1,0,						HA_NEXT,
+  GFX_MAMPFER2+0,4,0, GFX_MAMPFER2+3,1,0, GFX_MAMPFER2+2,1,0,
+  GFX_MAMPFER2+1,1,0,						HA_NEXT,
   GFX_ZOMBIE+0,4,0, GFX_ZOMBIE+3,1,0, GFX_ZOMBIE+2,1,0,
   GFX_ZOMBIE+1,1,0,						HA_NEXT,
   GFX_ABLENK,4,1,						HA_NEXT,
-  GFX_AMOEBE_LEBT,4,40,						HA_NEXT,
+  GFX_BIRNE_AUS,1,33, GFX_BIRNE_EIN,1,33,			HA_NEXT,
+  GFX_ZEIT_VOLL,1,33, GFX_ZEIT_LEER,1,33,			HA_NEXT,
+  GFX_TROPFEN,1,33, GFX_AMOEBING,4,1, GFX_AMOEBE_LEBT,1,10,	HA_NEXT,
   GFX_AMOEBE_TOT+2,2,50, GFX_AMOEBE_TOT,2,50,			HA_NEXT,
+  GFX_AMOEBE_LEBT,4,40,						HA_NEXT,
+  GFX_AMOEBE_LEBT,1,10,	GFX_AMOEBING,4,2,			HA_NEXT,
+  GFX_AMOEBE_LEBT,1,33, GFX_AMOEBE_TOT,1,33, GFX_EXPLOSION,8,1,
+  GFX_DIAMANT,1,10,						HA_NEXT,
+  GFX_LIFE,1,100,						HA_NEXT,
+  GFX_LIFE_ASYNC,1,100,						HA_NEXT,
   GFX_SIEB_LEER,4,2,						HA_NEXT,
+  GFX_SIEB2_LEER,4,2,						HA_NEXT,
+  GFX_AUSGANG_ZU,1,100, GFX_AUSGANG_ACT,4,2,
+  GFX_AUSGANG_AUF+0,4,1, GFX_AUSGANG_AUF+3,1,1,
+  GFX_AUSGANG_AUF+2,1,1, GFX_AUSGANG_AUF+1,1,1,			HA_NEXT,
+  GFX_AUSGANG_AUF+0,4,1, GFX_AUSGANG_AUF+3,1,1,
+  GFX_AUSGANG_AUF+2,1,1, GFX_AUSGANG_AUF+1,1,1,			HA_NEXT,
   HA_END
 };
 static char *helpscreen_eltext[][2] =
 {
-  "Normal sand:", "You can dig through it",
-  "Empty field:", "You can walk through it",
-  "Quicksand: You cannot pass it,", "but rocks can fall though it",
-  "Massive Wall:", "Nothing can go through it",
-  "Normal Wall: You can't go through", "it, but you can bomb it away",
-  "Old Wall: Like normal wall, but", "some things can fall down from it",
-  "Emerald: You must collect enough of", "them to finish a level",
-  "Diamond: Counts as 3 emeralds;", "Can be destroyed by rocks",
-  "Rock: Smashes several things;", "Can be moved by the player",
-  "Bomb: You can move it, but be", "careful when dropping it",
-  "Nut: Throw a rock on it to open it;", "Each nut contains an emerald",
-  "Wall with an Emerald inside:", "Bomb the wall away to get it",
-  "Wall with a Diamond inside:", "Bomb the wall away to get it",
-  "Acid: Destroys everything that", "falls or walks into it",
-  "Key: Opens the door that has the", "same color (red/yellow/green/blue)",
-  "Door: Can be opened by the key", "with the same color",
-  "Door: You have to find out the", "right color of the key for it",
-  "Dynamite: Collect it and use it to", "destroy walls or kill enemies",
-  "Dynamite: This one explodes after", "a few seconds",
-  "Spaceship: Moves at the left side", "of walls; don't touch it!",
-  "Bug: Moves at the right side of", "walls; don't touch it!",
-  "Pacman: Eats the amoeba and you,", "if you're not careful",
-  "Cruncher: Eats diamonds and you,", "if you're not careful",
-  "Robot: Tries to kill the player", "",
-  "Magic Wheel: Touch it to get rid of", "the robots for some seconds",
-  "Living Amoeba: Grows through empty", "fields, sand and quicksand",
-  "Dead Amoeba: Does not grow, but", "can still kill bugs and spaceships",
-  "Magic Wall: Changes rocks, emeralds", "and diamonds when they pass it",
+  "THE HERO:",				"(Is _this_ guy good old Rockford?)",
+  "Normal sand:",			"You can dig through it",
+  "Empty field:",			"You can walk through it",
+  "Quicksand: You cannot pass it,",	"but rocks can fall though it",
+  "Massive Wall:",			"Nothing can go through it",
+  "Normal Wall: You can't go through",	"it, but you can bomb it away",
+  "Growing Wall: Grows to the left or",	"right if there is an empty field",
+  "Invisible Wall: Behaves like normal","wall, but is invisible",
+  "Old Wall: Like normal wall, but",	"some things can fall down from it",
+  "Letter Wall: Looks like a letter,",	"behaves like a normal wall",
+  "Emerald: You must collect enough of","them to finish a level",
+  "Diamond: Counts as 3 emeralds, but",	"can be destroyed by rocks",
+  "Diamond (BD style): Counts like one","emerald and behaves a bit different",
+  "Red emerald: Seems to behave like",	"the BD style diamond",
+  "Rock: Smashes several things;",	"Can be moved by the player",
+  "Bomb: You can move it, but be",	"careful when dropping it",
+  "Nut: Throw a rock on it to open it;","Each nut contains an emerald",
+  "Wall with an emerald inside:",	"Bomb the wall away to get it",
+  "Wall with a diamond inside:",	"Bomb the wall away to get it",
+  "Wall with BD style diamond inside:",	"Bomb the wall away to get it",
+  "Wall with red emerald inside:",	"Bomb the wall away to get it",
+  "Acid: Things that fall in are gone",	"forever (including our hero)",
+  "Key: Opens the door that has the",	"same color (red/yellow/green/blue)",
+  "Door: Can be opened by the key",	"with the same color",
+  "Door: You have to find out the",	"right color of the key for it",
+  "Dynamite: Collect it and use it to",	"destroy walls or kill enemies",
+  "Dynamite: This one explodes after",	"a few seconds",
+  "Dyna Bomb: Explodes in 4 directions","with variable explosion size",
+  "Dyna Bomb: Increases the number of",	"dyna bombs available at a time",
+  "Dyna Bomb: Increases the size of",	"explosion of dyna bombs",
+  "Spaceship: Moves at the left side",	"of walls; don't touch it!",
+  "Bug: Moves at the right side of",	"walls; don't touch it!",
+  "Pacman: Eats the amoeba and you,",	"if you're not careful",
+  "Cruncher: Eats diamonds and you,",	"if you're not careful",
+  "Cruncher (BD style):",		"Eats almost everything",
+  "Robot: Tries to kill the player",	"",
+  "Magic Wheel: Touch it to get rid of","the robots for some seconds",
+  "Light Bulb: It seems to have no",	"special function, but looks nice",
+  "Extra Time Orb: Adds some seconds",	"to the time available for the level",
+  "Amoeba Drop: Grows to an amoeba on",	"the ground - don't touch it",
+  "Dead Amoeba: Does not grow, but",	"can still kill bugs and spaceships",
+  "Normal Amoeba: Grows through empty",	"fields, sand and quicksand",
+  "Dropping Amoeba: This one makes",	"drops that grow to a new amoeba",
+  "Living Amoeba (BD style): Contains",	"other element, when surrounded",
+  "Game Of Life: Behaves like the well","known 'Game Of Life' (2333 style)",
+  "Biomaze: A bit like the 'Game Of",	"Life', but builds crazy mazes",
+  "Magic Wall: Changes rocks, emeralds","and diamonds when they pass it",
+  "Magic Wall (BD style):",		"Changes rocks and BD style diamonds",
+  "Exit door: Opens if you have enough","emeralds to finish the level",
+  "Open exit door: Enter here to leave","the level and exit the actual game",
 };
 static int num_helpscreen_els = sizeof(helpscreen_eltext)/(2*sizeof(char *));
 
@@ -491,6 +544,16 @@ void DrawHelpScreenCreditsText()
   sprintf(text,"Germany");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+60,
 	   text,FS_SMALL,FC_RED);
+
+  sprintf(text,"If you have created new levels,");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+7*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"send them to me to include them!");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+8*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,":-)");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+9*ystep,
+	   text,FS_SMALL,FC_YELLOW);
 
   sprintf(text,"Press any key or button for main menu");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,

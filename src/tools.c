@@ -452,16 +452,17 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
       graphic += 3;
   }
   else if ((element==EL_FELSBROCKEN ||
-	    element==EL_EDELSTEIN ||
-	    element==EL_DIAMANT) && horiz_move && phase)
+	    element==EL_EDELSTEIN || element==EL_EDELSTEIN2 ||
+	    element==EL_EDELSTEIN3 || element==EL_DIAMANT)
+	   && horiz_move && phase)
   {
     if (element==EL_FELSBROCKEN)
       graphic += 2;
     else
       graphic += 1;
   }
-  else if ((element==EL_SIEB_LEER ||
-	    element==EL_SIEB_VOLL) && SiebAktiv)
+  else if ((element==EL_SIEB_LEER || element==EL_SIEB2_LEER ||
+	    element==EL_SIEB_VOLL || element==EL_SIEB2_VOLL) && SiebAktiv)
   {
     graphic += 3-(SiebAktiv%8)/2;
   }
@@ -469,6 +470,22 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
   {
     graphic = (element==EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x+2*y) % 4;
+  }
+  else if (element==EL_MAUER_LEBT)
+  {
+    BOOL links_massiv = FALSE, rechts_massiv = FALSE;
+
+    if (!IN_LEV_FIELD(ux-1,uy) || IS_MAUER(Feld[ux-1][uy]))
+      links_massiv = TRUE;
+    if (!IN_LEV_FIELD(ux+1,uy) || IS_MAUER(Feld[ux+1][uy]))
+      rechts_massiv = TRUE;
+
+    if (links_massiv && rechts_massiv)
+      graphic = GFX_MAUERWERK;
+    else if (links_massiv)
+      graphic = GFX_MAUER_R;
+    else if (rechts_massiv)
+      graphic = GFX_MAUER_L;
   }
 
   if (dx || dy)
@@ -625,10 +642,12 @@ void DrawScreenField(int x, int y)
 
     if (Store[ux][uy]==EL_MORAST_LEER ||
 	Store[ux][uy]==EL_SIEB_LEER ||
+	Store[ux][uy]==EL_SIEB2_LEER ||
 	Store[ux][uy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (Store[ux][uy]==EL_MORAST_VOLL ||
 	Store[ux][uy]==EL_SIEB_VOLL ||
+	Store[ux][uy]==EL_SIEB2_VOLL ||
 	Store[ux][uy]==EL_SALZSAEURE)
       cut_mode = CUT_BELOW;
 
@@ -656,6 +675,7 @@ void DrawScreenField(int x, int y)
 
     if (Store[oldx][oldy]==EL_MORAST_LEER ||
 	Store[oldx][oldy]==EL_SIEB_LEER ||
+	Store[oldx][oldy]==EL_SIEB2_LEER ||
 	Store[oldx][oldy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
 
@@ -1354,6 +1374,18 @@ int el2gfx(int element)
     case EL_BIRNE_EIN:		return(GFX_BIRNE_EIN);
     case EL_ZEIT_VOLL:		return(GFX_ZEIT_VOLL);
     case EL_ZEIT_LEER:		return(GFX_ZEIT_LEER);
+    case EL_MAUER_LEBT:		return(GFX_MAUER_LEBT);
+    case EL_EDELSTEIN2:		return(GFX_EDELSTEIN2);
+    case EL_EDELSTEIN3:		return(GFX_EDELSTEIN3);
+    case EL_ERZ_EDEL2:		return(GFX_ERZ_EDEL2);
+    case EL_ERZ_EDEL3:		return(GFX_ERZ_EDEL3);
+    case EL_MAMPFER2:		return(GFX_MAMPFER2);
+    case EL_SIEB2_LEER:		return(GFX_SIEB2_LEER);
+    case EL_SIEB2_VOLL:		return(GFX_SIEB2_VOLL);
+    case EL_SIEB2_TOT:		return(GFX_SIEB2_TOT);
+    case EL_DYNABOMB:		return(GFX_DYNABOMB);
+    case EL_DYNABOMB_NR:	return(GFX_DYNABOMB_NR);
+    case EL_DYNABOMB_SZ:	return(GFX_DYNABOMB_SZ);
     default:
     {
       if (IS_CHAR(element))

@@ -24,7 +24,11 @@
 #include <X11/Intrinsic.h>
 #include <X11/keysymdef.h>
 
+#ifdef   XPM_INCLUDE_FILE
 #include XPM_INCLUDE_FILE
+#else
+#include "YOU HAVE TO SET 'XPM_INCLUDE_FILE' IN THE 'Makefile'!!!"
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -67,40 +71,6 @@ typedef int BOOL;
 #define IS_MOVING(x,y)	(MovPos[x][y]!=0)
 #define IS_BLOCKED(x,y)	(Feld[x][y]==EL_BLOCKED)
 
-/*
-
-#define IS_AMOEBALIVE(e) ((e)==EL_AMOEBE_NASS || (e)==EL_AMOEBE_NORM || (e)==EL_AMOEBE_VOLL)
-#define IS_AMOEBOID(e)	((e)==EL_AMOEBE_TOT || IS_AMOEBALIVE(e))
-#define IS_BADEWANNOID(e) ((e)>=EL_BADEWANNE1 && (e)<=EL_BADEWANNE5)
-#define IS_SCHLUESSEL(e) ((e)>=EL_SCHLUESSEL1 && (e)<=EL_SCHLUESSEL4)
-#define IS_PFORTE(e)	((e)>=EL_PFORTE1 && (e)<=EL_PFORTE4X)
-
-#define IS_SOLID(e)	((e)==EL_BETON || (e)==EL_MAUERWERK || (e)==EL_FELSBODEN || (e)==EL_AUSGANG_ZU || (e)==EL_AUSGANG_ACT || (e)==EL_AUSGANG_AUF || IS_AMOEBOID(e) || (e)==EL_MORAST_VOLL || (e)==EL_MORAST_LEER || (e)==EL_SIEB_VOLL || (e)==EL_SIEB_LEER || (e)==EL_LIFE || (e)==EL_LIFE_ASYNC || IS_BADEWANNOID(e))
-
-#define IS_MASSIV(e)	((e)==EL_BETON || (e)==EL_SALZSAEURE || IS_BADEWANNOID(e) || IS_PFORTE(e))
-
-#define IS_SLIPPERY(e)	((e)==EL_FELSBODEN || (e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_ABLENK_EIN || (e)==EL_ABLENK_AUS || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER || (e)==EL_BIRNE_EIN || (e)==EL_BIRNE_AUS || (e)==EL_BADEWANNE1 || (e)==EL_BADEWANNE2)
-
-#define IS_ENEMY(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN)
-
-#define CAN_FALL(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN || (e)==EL_MORAST_VOLL || (e)==EL_SIEB_VOLL || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER)
-
-#define CAN_SMASH(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || IS_SCHLUESSEL(e) || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER)
-
-#define CAN_CHANGE(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT)
-
-#define CAN_MOVE(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN)
-
-#define COULD_MOVE(e)	(((e)>=EL_KAEFER_R && (e)<=EL_KAEFER_U) || ((e)>=EL_FLIEGER_R && (e)<=EL_FLIEGER_U) || ((e)>=EL_PACMAN_R && (e)==EL_PACMAN_U))
-
-#define DONT_TOUCH(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER)
-#define DONT_GO_TO(e)	(IS_ENEMY(e) || (e)==EL_TROPFEN || (e)==EL_SALZSAEURE)
-
-#define IS_CHAR(e)	((e)>=EL_CHAR_START && (e)<=EL_CHAR_END)
-
-*/
-
-
 #define EP_BIT_AMOEBALIVE	(1<<0)
 #define EP_BIT_AMOEBOID		(1<<1)
 #define EP_BIT_BADEWANNOID	(1<<2)
@@ -110,14 +80,16 @@ typedef int BOOL;
 #define EP_BIT_MASSIV		(1<<6)
 #define EP_BIT_SLIPPERY		(1<<7)
 #define EP_BIT_ENEMY		(1<<8)
-#define EP_BIT_CAN_FALL		(1<<9)
-#define EP_BIT_CAN_SMASH	(1<<10)
-#define EP_BIT_CAN_CHANGE	(1<<11)
-#define EP_BIT_CAN_MOVE		(1<<12)
-#define EP_BIT_COULD_MOVE	(1<<13)
-#define EP_BIT_DONT_TOUCH	(1<<14)
-#define EP_BIT_DONT_GO_TO	(1<<15)
-#define EP_BIT_CHAR		(1<<16)
+#define EP_BIT_MAUER		(1<<9)
+#define EP_BIT_CAN_FALL		(1<<10)
+#define EP_BIT_CAN_SMASH	(1<<11)
+#define EP_BIT_CAN_CHANGE	(1<<12)
+#define EP_BIT_CAN_MOVE		(1<<13)
+#define EP_BIT_COULD_MOVE	(1<<14)
+#define EP_BIT_DONT_TOUCH	(1<<15)
+#define EP_BIT_DONT_GO_TO	(1<<16)
+#define EP_BIT_MAMPF2		(1<<17)
+#define EP_BIT_CHAR		(1<<18)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -128,6 +100,7 @@ typedef int BOOL;
 #define IS_MASSIV(e)		(Elementeigenschaften[e] & EP_BIT_MASSIV)
 #define IS_SLIPPERY(e)		(Elementeigenschaften[e] & EP_BIT_SLIPPERY)
 #define IS_ENEMY(e)		(Elementeigenschaften[e] & EP_BIT_ENEMY)
+#define IS_MAUER(e)		(Elementeigenschaften[e] & EP_BIT_MAUER)
 #define CAN_FALL(e)		(Elementeigenschaften[e] & EP_BIT_CAN_FALL)
 #define CAN_SMASH(e)		(Elementeigenschaften[e] & EP_BIT_CAN_SMASH)
 #define CAN_CHANGE(e)		(Elementeigenschaften[e] & EP_BIT_CAN_CHANGE)
@@ -135,10 +108,15 @@ typedef int BOOL;
 #define COULD_MOVE(e)		(Elementeigenschaften[e] & EP_BIT_COULD_MOVE)
 #define DONT_TOUCH(e)		(Elementeigenschaften[e] & EP_BIT_DONT_TOUCH)
 #define DONT_GO_TO(e)		(Elementeigenschaften[e] & EP_BIT_DONT_GO_TO)
+#define IS_MAMPF2(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF2)
 #define IS_CHAR(e)		(Elementeigenschaften[e] & EP_BIT_CHAR)
 
 #define EL_CHANGED(e)		((e)==EL_FELSBROCKEN ? EL_EDELSTEIN :	\
 				 (e)==EL_EDELSTEIN   ? EL_DIAMANT :	\
+				 (e)==EL_EDELSTEIN2   ? EL_DIAMANT :	\
+				 (e)==EL_EDELSTEIN3   ? EL_DIAMANT :	\
+				 EL_FELSBROCKEN)
+#define EL_CHANGED2(e)		((e)==EL_FELSBROCKEN ? EL_EDELSTEIN2 :	\
 				 EL_FELSBROCKEN)
 #define IS_DRAWABLE(e)		((e)<EL_BLOCKED)
 #define IS_NOT_DRAWABLE(e)	((e)>=EL_BLOCKED)
@@ -164,7 +142,8 @@ typedef int BOOL;
 #define MAX_NAMELEN		(10+1)
 
 #define MAX_LEVNAMLEN		32
-#define MAX_SC_ENTRIES		15
+#define MAX_LEVSCORE_ENTRIES	16
+#define NUM_FREE_LVHD_BYTES	18
 #define MAX_TAPELEN		10000
 
 #define MAX_LEVDIR_FILENAME	(64+1)
@@ -204,12 +183,12 @@ struct LevelInfo
   int time;
   int edelsteine;
   char name[MAX_LEVNAMLEN];
-  int score[MAX_SC_ENTRIES];
-  int amoebe_inhalt;
+  int score[MAX_LEVSCORE_ENTRIES];
   int mampfer_inhalt[4][3][3];
   int tempo_amoebe;
   int dauer_sieb;
   int dauer_ablenk;
+  int amoebe_inhalt;
 };
 
 struct LevelDirInfo
@@ -288,6 +267,7 @@ extern int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		AmoebaCnt[MAX_NUM_AMOEBA];
 extern long		Elementeigenschaften[MAX_ELEMENTS];
@@ -297,6 +277,7 @@ extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		LevelSolved,GameOver, JX,JY, ZX,ZY;
 extern int		Gems,Dynamite,Key[4],TimeLeft,Score,MampferNr;
+extern int		DynaBombCount, DynaBombSize, DynaBombsLeft;
 extern int		CheckMoving,CheckExploding, SiebAktiv;
 
 extern struct LevelDirInfo	leveldir[];
@@ -354,9 +335,9 @@ extern char	       *progname;
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
 #define MINI_GFX_STARTX		SX
-#define MINI_GFX_STARTY		432
+#define MINI_GFX_STARTY		424
 #define MICRO_GFX_STARTX	SX
-#define MICRO_GFX_STARTY	528
+#define MICRO_GFX_STARTY	536
 #define GFX_PER_LINE		16
 #define MINI_GFX_PER_LINE	32
 #define MICRO_GFX_PER_LINE	128
@@ -423,6 +404,17 @@ extern char	       *progname;
 #define EL_AMOEBA2DIAM	52
 #define EL_ZEIT_VOLL	53
 #define EL_ZEIT_LEER	54
+#define EL_MAUER_LEBT	55
+#define EL_EDELSTEIN2	56
+#define EL_EDELSTEIN3	57
+#define EL_ERZ_EDEL2	58
+#define EL_ERZ_EDEL3	59
+#define EL_MAMPFER2	60
+#define EL_SIEB2_LEER	61
+#define EL_SIEB2_VOLL	62
+#define EL_DYNABOMB	63
+#define EL_DYNABOMB_NR	64
+#define EL_DYNABOMB_SZ	65
 
 #define EL_SPIELER1	80
 #define EL_SPIELER2	81
@@ -449,6 +441,7 @@ extern char	       *progname;
 #define EL_SIEB_TOT	105
 #define EL_AUSGANG_ACT	106
 #define EL_AUSGANG_AUF	107
+#define EL_SIEB2_TOT	108
 
 #define EL_CHAR_START	120
 #define EL_CHAR_ASCII0	(EL_CHAR_START-32)
@@ -488,6 +481,7 @@ extern char	       *progname;
 #define EL_BLURB_LEFT	303
 #define EL_BLURB_RIGHT	304
 #define EL_AMOEBING	305
+#define EL_MAUERND	306
 
 /* names for the graphic objects */
 /* Zeile 0 (0) */
@@ -499,7 +493,8 @@ extern char	       *progname;
 #define GFX_BETON	4
 #define	GFX_MAUERWERK	5
 #define	GFX_FELSBODEN	6
-#define GFX_BOMBE_MM	7
+#define GFX_DYNABOMB	7
+#define GFX_DYNABOMB_NR	GFX_DYNABOMB
 #define	GFX_EDELSTEIN	8
 #define GFX_DIAMANT	10
 #define	GFX_FELSBROCKEN	12
@@ -531,9 +526,6 @@ extern char	       *progname;
 #define GFX_PFORTE2X	41
 #define GFX_PFORTE3X	42
 #define GFX_PFORTE4X	43
-#define	GFX_AUSGANG_ZU	44
-#define	GFX_AUSGANG_ACT	44
-#define	GFX_AUSGANG_AUF	47
 /* Zeile 3 (48) */
 #define GFX_DYNAMIT_AUS	48
 #define GFX_DYNAMIT	49
@@ -568,6 +560,8 @@ extern char	       *progname;
 #define GFX_AMOEBE_NORM	GFX_AMOEBE_LEBT
 #define GFX_AMOEBE_TOT	108
 #define GFX_AMOEBA2DIAM	GFX_AMOEBE_TOT
+#define GFX_BIRNE_AUS	112
+#define GFX_BIRNE_EIN	113
 #define GFX_ZEIT_VOLL	114
 #define GFX_ZEIT_LEER	115
 /* Zeile 7 (112) */
@@ -578,15 +572,33 @@ extern char	       *progname;
 #define GFX_SIEB_TOT	GFX_SIEB_LEER
 #define GFX_ERZ_EDEL	132
 #define GFX_ERZ_DIAM	133
-#define GFX_BIRNE_AUS	134
-#define GFX_BIRNE_EIN	135
+#define GFX_ERZ_EDEL2	134
+#define GFX_ERZ_EDEL3	135
 #define GFX_AMOEBE_VOLL	136
 #define GFX_KUGEL_ROT	140
 #define GFX_KUGEL_BLAU	141
 #define GFX_KUGEL_GELB	142
+#define GFX_KUGEL_GRAU	143
+#define GFX_DYNABOMB_SZ	GFX_KUGEL_GRAU
 /* Zeile 9 (144) */
 #define GFX_BLURB_LEFT	144
 #define GFX_BLURB_RIGHT	148
+#define GFX_EDELSTEIN3	152
+/* Zeile 10 (160) */
+#define GFX_EDELSTEIN2	163
+#define GFX_MAUER_R1	165
+#define GFX_MAUER_R	167
+#define GFX_MAUER_L1	168
+#define GFX_MAUER_L	170
+#define GFX_MAUER_LEBT	171
+#define GFX_SIEB2_LEER	172
+#define GFX_SIEB2_VOLL	GFX_SIEB2_LEER
+#define GFX_SIEB2_TOT	GFX_SIEB2_LEER
+/* Zeile 11 (176) */
+#define	GFX_AUSGANG_ZU	176
+#define	GFX_AUSGANG_ACT	177
+#define	GFX_AUSGANG_AUF	180
+#define GFX_MAMPFER2	184
 
 #define	GFX_SCHLUESSEL	GFX_SCHLUESSEL1
 

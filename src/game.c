@@ -57,6 +57,7 @@ void InitGame()
 
   Dynamite = Score = 0;
   Gems = level.edelsteine;
+  DynaBombCount = DynaBombSize = DynaBombsLeft = 0;
   Key[0] = Key[1] = Key[2] = Key[3] = FALSE;
   MampferNr = 0;
   TimeLeft = level.time;
@@ -82,6 +83,7 @@ void InitGame()
     Feld[x][y] = Ur[x][y];
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     Store[x][y] = Store2[x][y] = Frame[x][y] = AmoebaNr[x][y] = 0;
+    JustHit[x][y] = 0;
 
     switch(Feld[x][y])
     {
@@ -121,6 +123,7 @@ void InitGame()
       case EL_PACMAN_L:
       case EL_PACMAN_U:
       case EL_MAMPFER:
+      case EL_MAMPFER2:
       case EL_ZOMBIE:
       case EL_PACMAN:
 	InitMovDir(x,y);
@@ -313,7 +316,7 @@ void GameWon()
   CloseDoor(DOOR_CLOSE_1);
 
   if (level_nr==player.handicap &&
-      level_nr<leveldir[leveldir_nr].num_ready) 
+      level_nr<leveldir[leveldir_nr].num_ready-1)
   { 
     player.handicap++; 
     bumplevel = TRUE;
@@ -503,7 +506,7 @@ void DrawDynamite(int x, int y)
 
 void CheckDynamite(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (MovDelay[x][y])		/* neues Dynamit / in Wartezustand */
   {
@@ -524,7 +527,7 @@ void CheckDynamite(int x, int y)
   Bang(x,y);
 }
 
-void Explode(int ex, int ey, int phase)
+void Explode(int ex, int ey, int phase, int mode)
 {
   int x,y;
   int num_phase = 9, delay = 1;
@@ -545,7 +548,8 @@ void Explode(int ex, int ey, int phase)
       if (!IN_LEV_FIELD(x,y) || IS_MASSIV(element))
 	continue;
 
-      if (center_element==EL_AMOEBA2DIAM && (x!=ex || y!=ey))
+      if ((mode!=EX_NORMAL || center_element==EL_AMOEBA2DIAM) &&
+	  (x!=ex || y!=ey))
 	continue;
 
       if (element==EL_EXPLODING)
@@ -561,10 +565,14 @@ void Explode(int ex, int ey, int phase)
 	Store[x][y] = EL_EDELSTEIN;
       else if (element==EL_ERZ_DIAM)
 	Store[x][y] = EL_DIAMANT;
+      else if (element==EL_ERZ_EDEL2)
+	Store[x][y] = EL_EDELSTEIN2;
+      else if (element==EL_ERZ_EDEL3)
+	Store[x][y] = EL_EDELSTEIN3;
       else if (!IS_PFORTE(Store[x][y]))
 	Store[x][y] = EL_LEERRAUM;
 
-      if (x!=ex || y!=ey || center_element==EL_AMOEBA2DIAM)
+      if (x!=ex || y!=ey || center_element==EL_AMOEBA2DIAM || mode==EX_BORDER)
 	Store2[x][y] = element;
 
       if (AmoebaNr[x][y] && (element==EL_AMOEBE_VOLL || element==EL_AMOEBING))
@@ -601,6 +609,7 @@ void Explode(int ex, int ey, int phase)
     else if (element==EL_BOMBE ||
 	     element==EL_DYNAMIT ||
 	     element==EL_DYNAMIT_AUS ||
+	     element==EL_DYNABOMB ||
 	     element==EL_KAEFER)
     {
       Feld[x][y] = Store2[x][y];
@@ -630,14 +639,44 @@ void Explode(int ex, int ey, int phase)
     DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_EXPLOSION+(phase/delay-1));
   }
 
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
+}
+
+void DynaExplode(int ex, int ey, int size)
+{
+  int i,j;
+  static int xy[4][2] =
+  {
+    0,-1,
+    -1,0,
+    +1,0,
+    0,+1
+  };
+
+  Explode(ex,ey,0,EX_CENTER);
+
+  for(i=0;i<4;i++)
+  {
+    for(j=1;j<=size;j++)
+    {
+      int x = ex+j*xy[i%4][0];
+      int y = ey+j*xy[i%4][1];
+
+      if (!IN_LEV_FIELD(x,y) || IS_MASSIV(Feld[x][y]))
+	break;
+
+      Explode(x,y,0,EX_BORDER);
+    }
+  }
+
+  DynaBombsLeft++;
 }
 
 void Bang(int x, int y)
 {
   int element = Feld[x][y];
 
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
   PlaySoundLevel(x,y,SND_ROAAAR);
 
   switch(element)
@@ -649,6 +688,7 @@ void Bang(int x, int y)
       RaiseScore(level.score[SC_FLIEGER]);
       break;
     case EL_MAMPFER:
+    case EL_MAMPFER2:
       RaiseScore(level.score[SC_MAMPFER]);
       break;
     case EL_ZOMBIE:
@@ -661,7 +701,10 @@ void Bang(int x, int y)
       break;
   }
 
-  Explode(x,y,0);
+  if (element==EL_DYNABOMB)
+    DynaExplode(x,y,DynaBombSize);
+  else
+    Explode(x,y,0,EX_NORMAL);
 }
 
 void Blurb(int x, int y)
@@ -688,7 +731,7 @@ void Blurb(int x, int y)
   {
     int graphic = (element==EL_BLURB_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
 
-    CheckExploding=TRUE;
+    CheckExploding = TRUE;
 
     if (!MovDelay[x][y])	/* neue Phase / noch nicht gewartet */
       MovDelay[x][y] = 5;
@@ -757,7 +800,8 @@ void Impact(int x, int y)
       KillHero();
       return;
     }
-    else if (element==EL_FELSBROCKEN)
+    else if (element==EL_FELSBROCKEN ||
+	     element==EL_EDELSTEIN2 || element==EL_EDELSTEIN3)
     {
       if (IS_ENEMY(MovingOrBlocked2Element(x,y+1)))
       {
@@ -789,7 +833,7 @@ void Impact(int x, int y)
   }
 
   /* Kein Geräusch beim Durchqueren des Siebes */
-  if (!lastline && Feld[x][y+1]==EL_SIEB_LEER)
+  if (!lastline && (Feld[x][y+1]==EL_SIEB_LEER || Feld[x][y+1]==EL_SIEB2_LEER))
     return;
 
   /* Geräusch beim Auftreffen */
@@ -800,6 +844,8 @@ void Impact(int x, int y)
     switch(element)
     {
       case EL_EDELSTEIN:
+      case EL_EDELSTEIN2:
+      case EL_EDELSTEIN3:
       case EL_DIAMANT:
         sound = SND_PLING;
 	break;
@@ -936,6 +982,31 @@ void TurnRound(int x, int y)
 
     MovDelay[x][y]=8+8*RND(3);
   }
+  else if (element==EL_MAMPFER2)
+  {
+    if (MovDir[x][y]==MV_LEFT || MovDir[x][y]==MV_RIGHT)
+    {
+      MovDir[x][y]=(MovDir[x][y]==MV_LEFT ? MV_RIGHT : MV_LEFT);
+      if (IN_LEV_FIELD(x,y-1) &&
+	  (IS_FREE(x,y-1) || IS_MAMPF2(Feld[x][y-1])) && RND(2))
+	MovDir[x][y]=MV_UP;
+      if (IN_LEV_FIELD(x,y+1) &&
+	  (IS_FREE(x,y+1) || IS_MAMPF2(Feld[x][y+1])) && RND(2))
+	MovDir[x][y]=MV_DOWN;
+    }
+    else if (MovDir[x][y]==MV_UP || MovDir[x][y]==MV_DOWN)
+    {
+      MovDir[x][y]=(MovDir[x][y]==MV_UP ? MV_DOWN : MV_UP);
+      if (IN_LEV_FIELD(x-1,y) &&
+	  (IS_FREE(x-1,y) || IS_MAMPF2(Feld[x-1][y])) && RND(2))
+	MovDir[x][y]=MV_LEFT;
+      if (IN_LEV_FIELD(x+1,y) &&
+	  (IS_FREE(x+1,y) || IS_MAMPF2(Feld[x+1][y])) && RND(2))
+	MovDir[x][y]=MV_RIGHT;
+    }
+
+    MovDelay[x][y]=8+8*RND(3);
+  }
   else if (element==EL_PACMAN)
   {
     if (MovDir[x][y]==MV_LEFT || MovDir[x][y]==MV_RIGHT)
@@ -1010,7 +1081,7 @@ void StartMoving(int x, int y)
       }
       else if (Feld[x][y+1]==EL_MORAST_LEER)
       {
-	CheckMoving=TRUE;
+	CheckMoving = TRUE;
 
 	if (!MovDelay[x][y])
 	  MovDelay[x][y] = 16;
@@ -1040,10 +1111,21 @@ void StartMoving(int x, int y)
 	Store[x][y] = EL_SIEB_LEER;
       }
     }
-    else if (CAN_CHANGE(element) && Feld[x][y+1]==EL_SIEB_LEER)
+    else if (element==EL_SIEB2_VOLL)
+    {
+      if (IS_FREE(x,y+1))
+      {
+	InitMovingField(x,y,MV_DOWN);
+	Feld[x][y] = EL_CHANGED2(Store2[x][y]);
+	Store[x][y] = EL_SIEB2_LEER;
+      }
+    }
+    else if (CAN_CHANGE(element) &&
+	     (Feld[x][y+1]==EL_SIEB_LEER || Feld[x][y+1]==EL_SIEB2_LEER))
     {
       InitMovingField(x,y,MV_DOWN);
-      Store[x][y] = EL_SIEB_VOLL;
+      Store[x][y] =
+	(Feld[x][y+1]==EL_SIEB_LEER ? EL_SIEB_VOLL : EL_SIEB2_VOLL);
       Store2[x][y+1] = element;
       SiebAktiv = 330;
     }
@@ -1053,7 +1135,7 @@ void StartMoving(int x, int y)
       InitMovingField(x,y,MV_DOWN);
       Store[x][y] = EL_SALZSAEURE;
     }
-    else if (CAN_SMASH(element) && Feld[x][y+1]==EL_BLOCKED)
+    else if (CAN_SMASH(element) && Feld[x][y+1]==EL_BLOCKED && JustHit[x][y])
     {
       Impact(x,y);
     }
@@ -1101,7 +1183,7 @@ void StartMoving(int x, int y)
     {
       MovDelay[x][y]--;
 
-      if (element==EL_ZOMBIE || element==EL_MAMPFER)
+      if (element==EL_ZOMBIE || element==EL_MAMPFER || element==EL_MAMPFER2)
       {
 	int phase = MovDelay[x][y] % 8;
 
@@ -1112,7 +1194,8 @@ void StartMoving(int x, int y)
 	  DrawGraphic(SCROLLX(x),SCROLLY(y),
 		      el2gfx(element)+phase);
 
-	if (element==EL_MAMPFER && MovDelay[x][y]%4==3)
+	if ((element==EL_MAMPFER || element==EL_MAMPFER2)
+	    && MovDelay[x][y]%4==3)
 	  PlaySoundLevel(x,y,SND_NJAM);
       }
 
@@ -1142,6 +1225,20 @@ void StartMoving(int x, int y)
     else if (element==EL_MAMPFER && IN_LEV_FIELD(newx,newy) &&
 	     Feld[newx][newy]==EL_DIAMANT)
     {
+      if (IS_MOVING(newx,newy))
+	RemoveMovingField(newx,newy);
+      else
+      {
+	Feld[newx][newy] = EL_LEERRAUM;
+	DrawLevelField(newx,newy);
+      }
+    }
+    else if (element==EL_MAMPFER2 && IN_LEV_FIELD(newx,newy) &&
+	     IS_MAMPF2(Feld[newx][newy]))
+    {
+      if (AmoebaNr[newx][newy] && Feld[newx][newy]==EL_AMOEBE_VOLL)
+	AmoebaCnt[AmoebaNr[newx][newy]]--;
+
       if (IS_MOVING(newx,newy))
 	RemoveMovingField(newx,newy);
       else
@@ -1200,8 +1297,8 @@ void ContinueMoving(int x, int y)
 
   if (ABS(MovPos[x][y])>=TILEX)		/* Zielfeld erreicht */
   {
-    Feld[x][y]=EL_LEERRAUM;
-    Feld[newx][newy]=element;
+    Feld[x][y] = EL_LEERRAUM;
+    Feld[newx][newy] = element;
 
     if (Store[x][y]==EL_MORAST_VOLL)
     {
@@ -1225,6 +1322,17 @@ void ContinueMoving(int x, int y)
       Store[x][y] = Store2[x][y] = 0;
       Feld[x][y] = EL_SIEB_LEER;
     }
+    else if (Store[x][y]==EL_SIEB2_VOLL)
+    {
+      Store[x][y] = 0;
+      Feld[newx][newy] = EL_SIEB2_VOLL;
+      element = EL_SIEB2_VOLL;
+    }
+    else if (Store[x][y]==EL_SIEB2_LEER)
+    {
+      Store[x][y] = Store2[x][y] = 0;
+      Feld[x][y] = EL_SIEB2_LEER;
+    }
     else if (Store[x][y]==EL_SALZSAEURE)
     {
       Store[x][y] = 0;
@@ -1245,8 +1353,9 @@ void ContinueMoving(int x, int y)
     DrawLevelField(x,y);
     DrawLevelField(newx,newy);
 
-    Stop[newx][newy]=TRUE;
-    CheckMoving=TRUE;
+    Stop[newx][newy] = TRUE;
+    JustHit[x][newy] = 3;
+    CheckMoving = TRUE;
 
     if (DONT_TOUCH(element))	/* Käfer oder Flieger */
     {
@@ -1261,7 +1370,7 @@ void ContinueMoving(int x, int y)
   else				/* noch in Bewegung */
   {
     DrawLevelField(x,y);
-    CheckMoving=TRUE;
+    CheckMoving = TRUE;
   }
 }
 
@@ -1376,7 +1485,7 @@ void AmoebeWaechst(int x, int y)
   static long sound_delay = 0;
   static int sound_delay_value = 0;
 
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
   {
@@ -1417,7 +1526,7 @@ void AmoebeAbleger(int ax, int ay)
     0,+1
   };
 
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!level.tempo_amoebe)
   {
@@ -1529,7 +1638,7 @@ void Life(int ax, int ay)
   int life_time = 20;
   int element = Feld[ax][ay];
 
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (Stop[ax][ay])
     return;
@@ -1591,7 +1700,7 @@ void Life(int ax, int ay)
 
 void Ablenk(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
     MovDelay[x][y] = 33*(level.dauer_ablenk/10);
@@ -1616,7 +1725,7 @@ void Ablenk(int x, int y)
 
 void Birne(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
     MovDelay[x][y] = 400;
@@ -1647,7 +1756,7 @@ void Birne(int x, int y)
 
 void Blubber(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
     MovDelay[x][y] = 20;
@@ -1665,7 +1774,7 @@ void Blubber(int x, int y)
 
 void NussKnacken(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
     MovDelay[x][y] = 4;
@@ -1684,14 +1793,15 @@ void NussKnacken(int x, int y)
   }
 }
 
-void SiebAktivieren(int x, int y)
+void SiebAktivieren(int x, int y, int typ)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (SiebAktiv>1)
   {
     if (SiebAktiv%2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_SIEB_VOLL+3-(SiebAktiv%8)/2);
+      DrawGraphic(SCROLLX(x),SCROLLY(y),
+		  (typ==1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL)+3-(SiebAktiv%8)/2);
 
 /*
     if (!(SiebAktiv%4))
@@ -1701,34 +1811,39 @@ void SiebAktivieren(int x, int y)
   }
   else
   {
-    Feld[x][y] = EL_SIEB_TOT;
+    Feld[x][y] = (typ==1 ? EL_SIEB_TOT : EL_SIEB2_TOT);
     DrawLevelField(x,y);
   }
 }
 
 void AusgangstuerPruefen(int x, int y)
 {
-  CheckExploding=TRUE;
+  CheckExploding = TRUE;
 
   if (!Gems)
+  {
     Feld[x][y] = EL_AUSGANG_ACT;
+    PlaySoundLevel(x,y,SND_OEFFNEN);
+  }
 }
 
 void AusgangstuerOeffnen(int x, int y)
 {
-  CheckExploding=TRUE;
+  int speed = 3;
+
+  CheckExploding = TRUE;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
-    MovDelay[x][y] = 20;
+    MovDelay[x][y] = 5*speed;
 
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     int tuer;
 
     MovDelay[x][y]--;
-    tuer = MovDelay[x][y]/5;
-    if (!(MovDelay[x][y]%5) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AUSGANG_ZU+3-tuer);
+    tuer = MovDelay[x][y]/speed;
+    if (!(MovDelay[x][y]%speed) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AUSGANG_AUF-tuer);
 
     if (!MovDelay[x][y])
     {
@@ -1736,6 +1851,137 @@ void AusgangstuerOeffnen(int x, int y)
       DrawLevelField(x,y);
     }
   }
+}
+
+void AusgangstuerBlinken(int x, int y)
+{
+  CheckExploding = TRUE;
+
+  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+    MovDelay[x][y] = 16;
+
+  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = (MovDelay[x][y] % 16)/2;
+    if (phase>3)
+      phase = 7-phase;
+    if (!(MovDelay[x][y]%2) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AUSGANG_AUF+phase);
+  }
+}
+
+void EdelsteinFunkeln(int x, int y)
+{
+  int speed = 2;
+
+  CheckExploding = TRUE;
+
+  if (IS_MOVING(x,y))
+    return;
+
+  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+    MovDelay[x][y] = 4*speed;
+
+  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = MovDelay[x][y]/speed;
+    if (!(MovDelay[x][y]%speed) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_EDELSTEIN2-phase);
+  }
+}
+
+void MauerWaechst(int x, int y)
+{
+  int speed = 3;
+
+  CheckExploding = TRUE;
+
+  if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
+    MovDelay[x][y] = 3*speed;
+
+  if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = 2-MovDelay[x][y]/speed;
+    if (!(MovDelay[x][y]%speed) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+      DrawGraphic(SCROLLX(x),SCROLLY(y),
+		  (Store[x][y]==MV_LEFT ? GFX_MAUER_L1 : GFX_MAUER_R1)+phase);
+
+    if (!MovDelay[x][y])
+    {
+      if (Store[x][y]==MV_LEFT)
+      {
+	if (IN_LEV_FIELD(x-1,y) && IS_MAUER(Feld[x-1][y]))
+	  DrawLevelField(x-1,y);
+      }
+      else
+      {
+	if (IN_LEV_FIELD(x+1,y) && IS_MAUER(Feld[x+1][y]))
+	  DrawLevelField(x+1,y);
+      }
+
+      Feld[x][y] = EL_MAUER_LEBT;
+      Store[x][y] = 0;
+      DrawLevelField(x,y);
+    }
+  }
+}
+
+void MauerAbleger(int ax, int ay)
+{
+  BOOL links_frei = FALSE, rechts_frei = FALSE;
+  BOOL links_massiv = FALSE, rechts_massiv = FALSE;
+
+  CheckExploding = TRUE;
+
+  if (!MovDelay[ax][ay])	/* neue Mauer / noch nicht gewartet */
+    MovDelay[ax][ay] = 3;
+
+  if (MovDelay[ax][ay])		/* neue Mauer / in Wartezustand */
+  {
+    MovDelay[ax][ay]--;
+    if (MovDelay[ax][ay])
+      return;
+  }
+
+  if (IN_LEV_FIELD(ax-1,ay) && IS_FREE(ax-1,ay))
+    links_frei = TRUE;
+  if (IN_LEV_FIELD(ax+1,ay) && IS_FREE(ax+1,ay))
+    rechts_frei = TRUE;
+
+  if (links_frei)
+  {
+    Feld[ax-1][ay] = EL_MAUERND;
+    Store[ax-1][ay] = MV_LEFT;
+    if (IN_SCR_FIELD(SCROLLX(ax-1),SCROLLY(ay)))
+      DrawGraphic(SCROLLX(ax-1),SCROLLY(ay),GFX_MAUER_L1);
+  }
+  if (rechts_frei)
+  {
+    Feld[ax+1][ay] = EL_MAUERND;
+    Store[ax+1][ay] = MV_RIGHT;
+    if (IN_SCR_FIELD(SCROLLX(ax+1),SCROLLY(ay)))
+      DrawGraphic(SCROLLX(ax+1),SCROLLY(ay),GFX_MAUER_R1);
+  }
+
+  if (links_frei || rechts_frei)
+    DrawLevelField(ax,ay);
+
+  if (!IN_LEV_FIELD(ax-1,ay) || IS_MAUER(Feld[ax-1][ay]))
+    links_massiv = TRUE;
+  if (!IN_LEV_FIELD(ax+1,ay) || IS_MAUER(Feld[ax+1][ay]))
+    rechts_massiv = TRUE;
+
+  if (links_massiv && rechts_massiv)
+    Feld[ax][ay] = EL_MAUERWERK;
 }
 
 int GameActions(int mx, int my, int button)
@@ -1777,7 +2023,11 @@ int GameActions(int mx, int my, int button)
 
     CheckMoving = CheckExploding = FALSE;
     for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+    {
       Stop[x][y] = FALSE;
+      if (JustHit[x][y]>0)
+	JustHit[x][y]--;
+    }
 
     for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
     {
@@ -1787,13 +2037,17 @@ int GameActions(int mx, int my, int button)
 	continue;
 
       if (!IS_MOVING(x,y) && (CAN_FALL(element) || CAN_MOVE(element)))
+      {
 	StartMoving(x,y);
+	if (Feld[x][y]==EL_EDELSTEIN2)
+	  EdelsteinFunkeln(x,y);
+      }
       else if (IS_MOVING(x,y))
 	ContinueMoving(x,y);
-      else if (element==EL_DYNAMIT)
+      else if (element==EL_DYNAMIT || element==EL_DYNABOMB)
 	CheckDynamite(x,y);
       else if (element==EL_EXPLODING)
-	Explode(x,y,Frame[x][y]);
+	Explode(x,y,Frame[x][y],EX_NORMAL);
       else if (element==EL_AMOEBING)
 	AmoebeWaechst(x,y);
       else if (IS_AMOEBALIVE(element))
@@ -1812,11 +2066,22 @@ int GameActions(int mx, int my, int button)
 	AusgangstuerPruefen(x,y);
       else if (element==EL_AUSGANG_ACT)
 	AusgangstuerOeffnen(x,y);
+      else if (element==EL_AUSGANG_AUF)
+	AusgangstuerBlinken(x,y);
+      else if (element==EL_MAUERND)
+	MauerWaechst(x,y);
+      else if (element==EL_MAUER_LEBT)
+	MauerAbleger(x,y);
 
-      if (SiebAktiv && (element==EL_SIEB_LEER ||
-			element==EL_SIEB_VOLL ||
-			Store[x][y]==EL_SIEB_LEER))
-	SiebAktivieren(x,y);
+      if (SiebAktiv)
+      {
+	if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL ||
+	    Store[x][y]==EL_SIEB_LEER)
+	  SiebAktivieren(x,y,1);
+	else if (element==EL_SIEB2_LEER || element==EL_SIEB2_VOLL ||
+		 Store[x][y]==EL_SIEB2_LEER)
+	  SiebAktivieren(x,y,2);
+      }
     }
 
     if (SiebAktiv)
@@ -2058,7 +2323,7 @@ void KillHero()
 
 int DigField(int x, int y, int mode)
 {
-  int dx=x-JX, dy=y-JY;
+  int dx = x-JX, dy = y-JY;
   int element;
   static long push_delay = 0;
   static int push_delay_value = 20;
@@ -2077,15 +2342,17 @@ int DigField(int x, int y, int mode)
   switch(element)
   {
     case EL_LEERRAUM:
-      CheckMoving=TRUE;
+      CheckMoving = TRUE;
       break;
     case EL_ERDREICH:
-      Feld[x][y]=EL_LEERRAUM;
-      CheckMoving=TRUE;
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
       break;
     case EL_EDELSTEIN:
-      Feld[x][y]=EL_LEERRAUM;
-      CheckMoving=TRUE;
+    case EL_EDELSTEIN2:
+    case EL_EDELSTEIN3:
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
       if (Gems>0)
 	Gems--;
       RaiseScore(level.score[SC_EDELSTEIN]);
@@ -2093,8 +2360,8 @@ int DigField(int x, int y, int mode)
       PlaySoundLevel(x,y,SND_PONG);
       break;
     case EL_DIAMANT:
-      Feld[x][y]=EL_LEERRAUM;
-      CheckMoving=TRUE;
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
       Gems -= 3;
       if (Gems<0)
 	Gems=0;
@@ -2103,11 +2370,26 @@ int DigField(int x, int y, int mode)
       PlaySoundLevel(x,y,SND_PONG);
       break;
     case EL_DYNAMIT_AUS:
-      Feld[x][y]=EL_LEERRAUM;
-      CheckMoving=TRUE;
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
       Dynamite++;
       RaiseScore(level.score[SC_DYNAMIT]);
       DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
+      PlaySoundLevel(x,y,SND_PONG);
+      break;
+    case EL_DYNABOMB_NR:
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
+      DynaBombCount++;
+      DynaBombsLeft++;
+      RaiseScore(level.score[SC_DYNAMIT]);
+      PlaySoundLevel(x,y,SND_PONG);
+      break;
+    case EL_DYNABOMB_SZ:
+      Feld[x][y] = EL_LEERRAUM;
+      CheckMoving = TRUE;
+      DynaBombSize++;
+      RaiseScore(level.score[SC_DYNAMIT]);
       PlaySoundLevel(x,y,SND_PONG);
       break;
     case EL_SCHLUESSEL1:
@@ -2132,7 +2414,7 @@ int DigField(int x, int y, int mode)
     }
     case EL_ABLENK_AUS:
       Feld[x][y] = EL_ABLENK_EIN;
-      CheckExploding=TRUE;
+      CheckExploding = TRUE;
       ZX=x;
       ZY=y;
       DrawLevelField(x,y);
@@ -2184,7 +2466,11 @@ int DigField(int x, int y, int mode)
       return(MF_NO_ACTION);
       break;
     case EL_AUSGANG_AUF:
+/*
       if (mode==DF_SNAP || Gems>0)
+	return(MF_NO_ACTION);
+*/
+      if (mode==DF_SNAP)
 	return(MF_NO_ACTION);
       LevelSolved = GameOver = TRUE;
       PlaySoundLevel(x,y,SND_BUING);
@@ -2238,16 +2524,32 @@ BOOL SnapField(int dx, int dy)
 
 BOOL PlaceBomb(void)
 {
-  if (Dynamite==0 || Feld[JX][JY]==EL_DYNAMIT)
+  if ((Dynamite==0 && DynaBombsLeft==0) ||
+      Feld[JX][JY]==EL_DYNAMIT || Feld[JX][JY]==EL_DYNABOMB)
     return(FALSE);
 
   if (Feld[JX][JY]!=EL_LEERRAUM)
     Store[JX][JY] = Feld[JX][JY];
-  Feld[JX][JY] = EL_DYNAMIT;
-  MovDelay[JX][JY] = 48;
-  Dynamite--;
-  DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
-  DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
+
+  if (Dynamite)
+  {
+    Feld[JX][JY] = EL_DYNAMIT;
+    MovDelay[JX][JY] = 48;
+    Dynamite--;
+    DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
+    DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
+  }
+  else
+  {
+    Feld[JX][JY] = EL_DYNABOMB;
+    MovDelay[JX][JY] = 48;
+    DynaBombsLeft--;
+
+    /* ändern, wenn Maske für DYNABOMB vorliegt! */
+
+    DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
+  }
+
   CheckExploding = TRUE;
   return(TRUE);
 }
