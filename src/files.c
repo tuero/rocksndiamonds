@@ -759,9 +759,8 @@ static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
 {
   int i, x, y;
   int header_size = 4;
-  int content_size_type1 = MAX_ELEMENT_CONTENTS * 3 * 3;
-
-  int chunk_size_expected = header_size + content_size_type1;
+  int content_size = MAX_ELEMENT_CONTENTS * 3 * 3;
+  int chunk_size_expected = header_size + content_size;
 
   /* Note: "chunk_size" was wrong before version 2.0 when elements are
      stored with 16-bit encoding (and should be twice as big then).
@@ -769,7 +768,7 @@ static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
      contained 16-bit elements and vice versa. */
 
   if (level->encoding_16bit_field && level->file_version >= FILE_VERSION_2_0)
-    chunk_size_expected += content_size_type1;
+    chunk_size_expected += content_size;
 
   if (chunk_size_expected != chunk_size)
   {
@@ -957,8 +956,8 @@ void LoadLevel(int level_nr)
 	  (chunk_info[i].loader)(&level, file, chunk_size);
 
 	/* the size of some chunks cannot be checked before reading other
-	   chunks first (like "HEAD" and "BODY") or before reading some
-	   header information first (like "CONT"), so check them here */
+	   chunks first (like "HEAD" and "BODY") that contain some header
+	   information, so check them here */
 	if (chunk_size_expected != chunk_size)
 	{
 	  Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
@@ -1204,8 +1203,7 @@ static void SaveLevel_CNT2(struct LevelInfo *level, FILE *file, int element)
   else
   {
     /* chunk header already written -- write empty chunk data */
-    for(i=0; i<LEVEL_CHUNK_CNT2_SIZE; i++)
-      fputc(0, file);
+    WriteUnusedBytesToFile(file, LEVEL_CHUNK_CNT2_SIZE);
 
     Error(ERR_WARN, "cannot save content for element '%d'", element);
     return;
@@ -1215,8 +1213,8 @@ static void SaveLevel_CNT2(struct LevelInfo *level, FILE *file, int element)
   fputc(num_contents, file);
   fputc(content_xsize, file);
   fputc(content_ysize, file);
-  for(i=0; i<LEVEL_CHUNK_CNT2_UNUSED; i++)
-    fputc(0, file);
+
+  WriteUnusedBytesToFile(file, LEVEL_CHUNK_CNT2_UNUSED);
 
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
@@ -1229,7 +1227,7 @@ void SaveLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
-  int chunk_size;
+  int body_chunk_size;
   FILE *file;
 
   if (!(file = fopen(filename, MODE_WRITE)))
@@ -1255,6 +1253,9 @@ void SaveLevel(int level_nr)
   if (level.amoeba_content > 255)
     level.encoding_16bit_amoeba = TRUE;
 
+  body_chunk_size =
+    level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
+
   fputs(LEVEL_COOKIE, file);		/* file identifier */
   fputc('\n', file);
 
@@ -1274,9 +1275,7 @@ void SaveLevel(int level_nr)
   }
 #endif
 
-  chunk_size =
-    level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
-  putFileChunk(file, "BODY", chunk_size, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_BODY(&level, file);
 
   if (level.encoding_16bit_yamyam ||
@@ -1297,7 +1296,25 @@ void SaveLevel(int level_nr)
   chmod(filename, LEVEL_PERMS);
 }
 
-void LoadTape(int level_nr)
+static void setTapeInfoToDefaults()
+{
+  int i;
+
+  /* always start with reliable default values (empty tape) */
+  tape.file_version = FILE_VERSION_ACTUAL;
+  tape.game_version = GAME_VERSION_ACTUAL;
+  TapeErase();
+
+  /* default values (also for pre-1.2 tapes) with only the first player */
+  tape.player_participates[0] = TRUE;
+  for(i=1; i<MAX_PLAYERS; i++)
+    tape.player_participates[i] = FALSE;
+
+  /* at least one (default: the first) player participates in every tape */
+  tape.num_participating_players = 1;
+}
+
+void OLD_LoadTape(int level_nr)
 {
   int i, j;
   char *filename = getTapeFilename(level_nr);
@@ -1507,7 +1524,253 @@ void LoadTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
-void SaveTape(int level_nr)
+static int LoadTape_HEAD(struct TapeInfo *tape, FILE *file, int chunk_size)
+{
+  int i;
+
+  tape->random_seed = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  tape->date        = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  tape->length      = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+
+  /* read header fields that are new since version 1.2 */
+  if (tape->file_version >= FILE_VERSION_1_2)
+  {
+    byte store_participating_players = fgetc(file);
+
+    ReadUnusedBytesFromFile(file, TAPE_HEADER_UNUSED);
+
+    /* since version 1.2, tapes store which players participate in the tape */
+    tape->num_participating_players = 0;
+    for(i=0; i<MAX_PLAYERS; i++)
+    {
+      tape->player_participates[i] = FALSE;
+
+      if (store_participating_players & (1 << i))
+      {
+	tape->player_participates[i] = TRUE;
+	tape->num_participating_players++;
+      }
+    }
+  }
+
+  tape->level_nr = level_nr;
+  tape->counter = 0;
+  tape->changed = FALSE;
+
+  tape->recording = FALSE;
+  tape->playing = FALSE;
+  tape->pausing = FALSE;
+
+  return chunk_size;
+}
+
+static int LoadTape_BODY(struct TapeInfo *tape, FILE *file, int chunk_size)
+{
+  int i, j;
+  int chunk_size_expected =
+    (tape->num_participating_players + 1) * tape->length;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size);
+    return chunk_size_expected;
+  }
+
+#if DEBUG
+  printf("\nTAPE OF LEVEL %d\n", level_nr);
+#endif
+
+  for(i=0; i<tape->length; i++)
+  {
+    if (i >= MAX_TAPELEN)
+      break;
+
+    for(j=0; j<MAX_PLAYERS; j++)
+    {
+      tape->pos[i].action[j] = MV_NO_MOVING;
+
+      if (tape->player_participates[j])
+	tape->pos[i].action[j] = fgetc(file);
+
+#if DEBUG
+      {
+	int x = tape->pos[i].action[j];
+
+	printf("%d:%02x ", j, x);
+	printf("[%c%c%c%c|%c%c] - ",
+	       (x & JOY_LEFT ? '<' : ' '),
+	       (x & JOY_RIGHT ? '>' : ' '),
+	       (x & JOY_UP ? '^' : ' '),
+	       (x & JOY_DOWN ? 'v' : ' '),
+	       (x & JOY_BUTTON_1 ? '1' : ' '),
+	       (x & JOY_BUTTON_2 ? '2' : ' '));
+      }
+#endif
+
+    }
+
+    tape->pos[i].delay = fgetc(file);
+
+#if DEBUG
+    printf("[%03d]\n", tape->pos[i].delay);
+#endif
+
+    if (tape->file_version == FILE_VERSION_1_0)
+    {
+      /* eliminate possible diagonal moves in old tapes */
+      /* this is only for backward compatibility */
+
+      byte joy_dir[4] = { JOY_LEFT, JOY_RIGHT, JOY_UP, JOY_DOWN };
+      byte action = tape->pos[i].action[0];
+      int k, num_moves = 0;
+
+      for (k=0; k<4; k++)
+      {
+	if (action & joy_dir[k])
+	{
+	  tape->pos[i + num_moves].action[0] = joy_dir[k];
+	  if (num_moves > 0)
+	    tape->pos[i + num_moves].delay = 0;
+	  num_moves++;
+	}
+      }
+
+      if (num_moves > 1)
+      {
+	num_moves--;
+	i += num_moves;
+	tape->length += num_moves;
+      }
+    }
+    else if (tape->file_version < FILE_VERSION_2_0)
+    {
+      if (tape->pos[i].delay > 1)
+      {
+	/* action part */
+	tape->pos[i + 1] = tape->pos[i];
+	tape->pos[i + 1].delay = 1;
+
+	/* delay part */
+	for(j=0; j<MAX_PLAYERS; j++)
+	  tape->pos[i].action[j] = MV_NO_MOVING;
+	tape->pos[i].delay--;
+
+	i++;
+	tape->length++;
+      }
+    }
+
+    if (feof(file))
+      break;
+  }
+
+  if (i != tape->length)
+    chunk_size = (tape->num_participating_players + 1) * i;
+
+  return chunk_size;
+}
+
+void LoadTape(int level_nr)
+{
+  char *filename = getTapeFilename(level_nr);
+  char cookie[MAX_LINE_LEN];
+  char chunk_name[CHUNK_ID_LEN + 1];
+  FILE *file;
+  int chunk_size;
+
+  /* always start with reliable default values */
+  setTapeInfoToDefaults();
+
+  if (!(file = fopen(filename, MODE_READ)))
+    return;
+
+  /* check file identifier */
+  fgets(cookie, MAX_LINE_LEN, file);
+  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
+    cookie[strlen(cookie) - 1] = '\0';
+
+  if (!checkCookieString(cookie, TAPE_COOKIE))	/* unknown file format */
+  {
+    Error(ERR_WARN, "unknown format of tape file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  if ((tape.file_version = getFileVersionFromCookieString(cookie)) == -1)
+  {
+    Error(ERR_WARN, "unsupported version of tape file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  tape.game_version = tape.file_version;
+
+  if (tape.file_version < FILE_VERSION_1_2)
+  {
+    /* tape files from versions before 1.2.0 without chunk structure */
+    LoadTape_HEAD(&tape, file, TAPE_HEADER_SIZE);
+    LoadTape_BODY(&tape, file, 2 * tape.length);
+  }
+  else
+  {
+    static struct
+    {
+      char *name;
+      int size;
+      int (*loader)(struct TapeInfo *, FILE *, int);
+    }
+    chunk_info[] =
+    {
+      { "HEAD", TAPE_HEADER_SIZE,	LoadTape_HEAD },
+      { "BODY", -1,			LoadTape_BODY },
+      {  NULL,  0,			NULL }
+    };
+
+    while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN))
+    {
+      int i = 0;
+
+      while (chunk_info[i].name != NULL &&
+	     strcmp(chunk_name, chunk_info[i].name) != 0)
+	i++;
+
+      if (chunk_info[i].name == NULL)
+      {
+	Error(ERR_WARN, "unknown chunk '%s' in tape file '%s'",
+	      chunk_name, filename);
+	ReadUnusedBytesFromFile(file, chunk_size);
+      }
+      else if (chunk_info[i].size != -1 &&
+	       chunk_info[i].size != chunk_size)
+      {
+	Error(ERR_WARN, "wrong size (%d) of chunk '%s' in tape file '%s'",
+	      chunk_size, chunk_name, filename);
+	ReadUnusedBytesFromFile(file, chunk_size);
+      }
+      else
+      {
+	/* call function to load this tape chunk */
+	int chunk_size_expected =
+	  (chunk_info[i].loader)(&tape, file, chunk_size);
+
+	/* the size of some chunks cannot be checked before reading other
+	   chunks first (like "HEAD" and "BODY") that contain some header
+	   information, so check them here */
+	if (chunk_size_expected != chunk_size)
+	{
+	  Error(ERR_WARN, "wrong size (%d) of chunk '%s' in tape file '%s'",
+		chunk_size, chunk_name, filename);
+	}
+      }
+    }
+  }
+
+  fclose(file);
+
+  tape.length_seconds = GetTapeLength();
+}
+
+void OLD_SaveTape(int level_nr)
 {
   int i;
   char *filename = getTapeFilename(level_nr);
@@ -1571,6 +1834,90 @@ void SaveTape(int level_nr)
 
     fputc(tape.pos[i].delay, file);
   }
+
+  fclose(file);
+
+  chmod(filename, TAPE_PERMS);
+
+  tape.changed = FALSE;
+
+  if (new_tape)
+    Request("tape saved !", REQ_CONFIRM);
+}
+
+static void SaveTape_HEAD(struct TapeInfo *tape, FILE *file)
+{
+  int i;
+  byte store_participating_players = 0;
+
+  /* set bits for participating players for compact storage */
+  for(i=0; i<MAX_PLAYERS; i++)
+    if (tape->player_participates[i])
+      store_participating_players |= (1 << i);
+
+  putFile32BitInteger(file, tape->random_seed, BYTE_ORDER_BIG_ENDIAN);
+  putFile32BitInteger(file, tape->date, BYTE_ORDER_BIG_ENDIAN);
+  putFile32BitInteger(file, tape->length, BYTE_ORDER_BIG_ENDIAN);
+
+  fputc(store_participating_players, file);
+
+  WriteUnusedBytesToFile(file, TAPE_HEADER_UNUSED);
+}
+
+static void SaveTape_BODY(struct TapeInfo *tape, FILE *file)
+{
+  int i, j;
+
+  for(i=0; i<tape->length; i++)
+  {
+    for(j=0; j<MAX_PLAYERS; j++)
+      if (tape->player_participates[j])
+	fputc(tape->pos[i].action[j], file);
+
+    fputc(tape->pos[i].delay, file);
+  }
+}
+
+void SaveTape(int level_nr)
+{
+  int i;
+  char *filename = getTapeFilename(level_nr);
+  FILE *file;
+  boolean new_tape = TRUE;
+  int num_participating_players = 0;
+  int body_chunk_size;
+
+  InitTapeDirectory(leveldir_current->filename);
+
+  /* if a tape still exists, ask to overwrite it */
+  if (access(filename, F_OK) == 0)
+  {
+    new_tape = FALSE;
+    if (!Request("Replace old tape ?", REQ_ASK))
+      return;
+  }
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot save level recording file '%s'", filename);
+    return;
+  }
+
+  /* count number of participating players  */
+  for(i=0; i<MAX_PLAYERS; i++)
+    if (tape.player_participates[i])
+      num_participating_players++;
+
+  body_chunk_size = (num_participating_players + 1) * tape.length;
+
+  fputs(TAPE_COOKIE, file);		/* file identifier */
+  fputc('\n', file);
+
+  putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  SaveTape_HEAD(&tape, file);
+
+  putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
+  SaveTape_BODY(&tape, file);
 
   fclose(file);
 

@@ -364,6 +364,7 @@ struct TapeInfo
   boolean fast_forward;
   boolean changed;
   boolean player_participates[MAX_PLAYERS];
+  int num_participating_players;
   struct
   {
     byte action[MAX_PLAYERS];
