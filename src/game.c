@@ -2984,7 +2984,7 @@ void StartMoving(int x, int y)
 	}
       }
       else if (element == EL_SP_ELECTRON)
-	DrawGraphicAnimation(x, y, IMG_SP_ELECTRON);
+	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_ELECTRON);
       else if (element == EL_DRAGON)
       {
 	int i;
@@ -3242,11 +3242,11 @@ void StartMoving(int x, int y)
 	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
 	DrawLevelField(x, y);
       else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
-	DrawGraphicAnimation(x, y, el2img(element));
+	DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
       else if (element == EL_SATELLITE)
-	DrawGraphicAnimation(x, y, IMG_SATELLITE);
+	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SATELLITE);
       else if (element == EL_SP_ELECTRON)
-	DrawGraphicAnimation(x, y, IMG_SP_ELECTRON);
+	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_ELECTRON);
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
@@ -3388,7 +3388,13 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 #else
+    /*
     if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
+      MovDir[newx][newy] = 0;
+    */
+
+    if (!CAN_MOVE(element) ||
+	(element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
       MovDir[newx][newy] = 0;
 #endif
 
@@ -4015,7 +4021,7 @@ void SiebAktivieren(int x, int y, int type)
 {
   int graphic = (type == 1 ? IMG_MAGIC_WALL_FULL : IMG_BD_MAGIC_WALL_FULL);
 
-  DrawGraphicAnimation(x, y, graphic);
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 }
 
 void AusgangstuerPruefen(int x, int y)
@@ -4221,7 +4227,7 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (Feld[x][y] == EL_BD_DIAMOND)
-    DrawGraphicAnimation(x, y, IMG_BD_DIAMOND);
+    DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_BD_DIAMOND);
   else
   {
     if (!MovDelay[x][y])	/* next animation frame */
@@ -4237,7 +4243,7 @@ void EdelsteinFunkeln(int x, int y)
 #if 0
       DrawGraphic(SCREENX(x), SCREENY(y), el2img(Feld[x][y]), 0);
 #else
-      DrawGraphicAnimation(x, y, el2img(Feld[x][y]));
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(Feld[x][y]));
 #endif
 
       if (MovDelay[x][y])
@@ -4592,7 +4598,7 @@ static void DrawBeltAnimation(int x, int y, int element)
   {
     int graphic = el2img(element);
 
-    DrawGraphicAnimation(x, y, graphic);
+    DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 
     if (!(FrameCounter % 2))
       PlaySoundLevel(x, y, SND_CONVEYOR_BELT_ACTIVE);
@@ -4892,7 +4898,7 @@ void GameActions()
       if (Feld[x][y] == EL_EMERALD &&
 	  new_graphic_info[IMG_EMERALD].anim_frames > 1 &&
 	  !IS_MOVING(x, y))
-	DrawGraphicAnimation(x, y, IMG_EMERALD);
+	DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_EMERALD);
 #endif
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
@@ -4923,7 +4929,7 @@ void GameActions()
     else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
       TimegateWheel(x, y);
     else if (element == EL_ACID)
-      DrawGraphicAnimation(x, y, IMG_ACID);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_ACID);
     else if (element == EL_ACID_SPLASH_LEFT ||
 	     element == EL_ACID_SPLASH_RIGHT)
       Blurb(x, y);
@@ -4938,9 +4944,9 @@ void GameActions()
     else if (element == EL_EXIT_OPENING)
       AusgangstuerOeffnen(x, y);
     else if (element == EL_EXIT_OPEN)
-      DrawGraphicAnimation(x, y, IMG_EXIT_OPEN);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_EXIT_OPEN);
     else if (element == EL_SP_EXIT_OPEN)
-      DrawGraphicAnimation(x, y, IMG_SP_EXIT_OPEN);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_EXIT_OPEN);
     else if (element == EL_WALL_GROWING_ACTIVE)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
@@ -4955,9 +4961,9 @@ void GameActions()
     else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
     else if (element == EL_SP_TERMINAL)
-      DrawGraphicAnimation(x, y, IMG_SP_TERMINAL);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_TERMINAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
-      DrawGraphicAnimation(x, y, IMG_SP_TERMINAL_ACTIVE);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SP_TERMINAL_ACTIVE);
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
     else if (element == EL_SWITCHGATE_OPENING)
@@ -4969,11 +4975,11 @@ void GameActions()
     else if (element == EL_TIMEGATE_CLOSING)
       CloseTimegate(x, y);
     else if (element == EL_EXTRA_TIME)
-      DrawGraphicAnimation(x, y, IMG_EXTRA_TIME);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_EXTRA_TIME);
     else if (element == EL_SHIELD_NORMAL)
-      DrawGraphicAnimation(x, y, IMG_SHIELD_NORMAL);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SHIELD_NORMAL);
     else if (element == EL_SHIELD_DEADLY)
-      DrawGraphicAnimation(x, y, IMG_SHIELD_DEADLY);
+      DrawGraphicAnimation(SCREENX(x), SCREENY(y), IMG_SHIELD_DEADLY);
 
     if (game.magic_wall_active)
     {

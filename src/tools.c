@@ -803,30 +803,16 @@ int getGraphicAnimationFrame(int graphic, int sync_frame)
 
 void DrawGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
 {
-#if 0
-  int delay = new_graphic_info[graphic].anim_delay;
-
-  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-#else
-  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-#endif
+  if (IN_SCR_FIELD(x, y))
   {
     int frame = getGraphicAnimationFrame(graphic, -1);
 
     if (mask_mode == USE_MASKING)
-      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
+      DrawGraphicThruMask(x, y, graphic, frame);
     else
-      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+      DrawGraphic(x, y, graphic, frame);
   }
 }
-
-#if 0
-void DrawOldGraphicAnimation(int x, int y, int graphic,
-			     int frames, int delay, int mode)
-{
-  DrawGraphicAnimationExt(x, y, graphic, frames, delay, mode, NO_MASKING);
-}
-#endif
 
 void DrawGraphicAnimation(int x, int y, int graphic)
 {
