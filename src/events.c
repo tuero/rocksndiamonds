@@ -226,9 +226,21 @@ void HandleButtonEvent(XButtonEvent *event)
 
 void HandleMotionEvent(XMotionEvent *event)
 {
+  Window root, child;
+  int root_x, root_y;
+  int win_x, win_y;
+  unsigned int mask;
+
+  if (!XQueryPointer(display, window, &root, &child, &root_x, &root_y,
+		     &win_x, &win_y, &mask))
+    return;
+
+  if (!button_status && game_status != LEVELED)
+    return;
+
   motion_status = TRUE;
 
-  HandleButton(event->x, event->y, button_status);
+  HandleButton(win_x, win_y, button_status);
 }
 
 void HandleKeyEvent(XKeyEvent *event)

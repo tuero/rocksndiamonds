@@ -436,9 +436,11 @@ void InitWindow(int argc, char *argv[])
   XFree(iconName.value);
 
   /* Select event types wanted */
-  window_event_mask = ExposureMask | StructureNotifyMask | FocusChangeMask |
-                      ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
-                      KeyPressMask | KeyReleaseMask;
+  window_event_mask =
+    ExposureMask | StructureNotifyMask | FocusChangeMask |
+    ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
+    PointerMotionHintMask | KeyPressMask | KeyReleaseMask;
+
   XSelectInput(display, window, window_event_mask);
 #endif
 

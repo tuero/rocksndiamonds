@@ -329,14 +329,16 @@ int CheckCountButtons(int, int, int);
 #define GDI_DESIGN_BORDER		19
 #define GDI_EVENT_MASK			20
 #define GDI_EVENT			21
-#define GDI_CALLBACK			22
-#define GDI_AREA_SIZE			23
-#define GDI_ITEM_SIZE			24
-#define GDI_SCROLLBAR_ITEMS_MAX		25
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	26
-#define GDI_SCROLLBAR_ITEM_POSITION	27
+#define GDI_CALLBACK_INFO		22
+#define GDI_CALLBACK_ACTION		23
+#define GDI_AREA_SIZE			24
+#define GDI_ITEM_SIZE			25
+#define GDI_SCROLLBAR_ITEMS_MAX		26
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	27
+#define GDI_SCROLLBAR_ITEM_POSITION	28
+#define GDI_DESCRIPTION_TEXT		29
 
-typedef void (*gadget_callback_function)(void *);
+typedef void (*gadget_function)(void *);
 
 struct GadgetDesign
 {
@@ -375,6 +377,7 @@ struct GadgetInfo
 {
   int id;				/* internal gadget identifier */
   int custom_id;			/* custom gadget identifier */
+  char *description_text;		/* short text describing gadget */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
@@ -390,7 +393,8 @@ struct GadgetInfo
   int design_border;			/* border size of gadget decoration */
   unsigned long event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
-  gadget_callback_function callback;
+  gadget_function callback_info;	/* function for pop-up info text */
+  gadget_function callback_action;	/* function for gadget action */
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
   struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */
   struct GadgetInfo *next;		/* next list entry */

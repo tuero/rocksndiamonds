@@ -30,5 +30,6 @@ void DrawLevelEd(void);
 void LevelEd(int, int, int);
 void HandleLevelEditorKeyInput(KeySym);
 void LevelNameTyping(KeySym);
+void HandleEditorGadgetInfoText(void *ptr);
 
 #endif

@@ -74,6 +74,7 @@
 
 /* values for properties window */
 #define ED_PROPERTIES_XPOS	(TILEX - MINI_TILEX/2)
+
 /* values for counter gadgets */
 #define ED_COUNT_VALUE_XOFFSET	5
 #define ED_COUNT_VALUE_YOFFSET	3
@@ -173,6 +174,32 @@
 #define UNDO_IMMEDIATE			0
 #define UNDO_ACCUMULATE			1
 
+static char *control_infotext[ED_NUM_CTRL_BUTTONS] =
+{
+  "draw single items",
+  "draw connected items",
+  "draw lines",
+  "enter text elements",
+  "draw outline rectangles",
+  "draw filled boxes",
+  "wrap (rotate) level up",
+  "properties of drawing element",
+  "flood fill",
+  "wrap (rotate) level left",
+  "",
+  "wrap (rotate) level right",
+  "random element placement",
+  "grab brush",
+  "wrap (rotate) level down",
+  "pick drawing element from editing area",
+  "undo last operation",
+  "level properties",
+  "save level",
+  "clear level",
+  "test level",
+  "exit level editor",
+};
+
 static struct
 {
   int x, y;
@@ -188,16 +215,29 @@ static struct
   int xpos, ypos;
   int x, y;
   int gadget_id;
+  char *text;
 } scrollbutton_info[ED_NUM_SCROLLBUTTONS] =
 {
-  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 0 * ED_SCROLLBUTTON_YSIZE,
-    ED_SCROLL_UP_XPOS,      ED_SCROLL_UP_YPOS,      ED_CTRL_ID_SCROLL_UP },
-  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 1 * ED_SCROLLBUTTON_YSIZE,
-    ED_SCROLL_DOWN_XPOS,    ED_SCROLL_DOWN_YPOS,    ED_CTRL_ID_SCROLL_DOWN },
-  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 2 * ED_SCROLLBUTTON_YSIZE,
-    ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,    ED_CTRL_ID_SCROLL_LEFT },
-  { ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 3 * ED_SCROLLBUTTON_YSIZE,
-    ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,   ED_CTRL_ID_SCROLL_RIGHT }
+  {
+    ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 0 * ED_SCROLLBUTTON_YSIZE,
+    ED_SCROLL_UP_XPOS,      ED_SCROLL_UP_YPOS,      ED_CTRL_ID_SCROLL_UP,
+    "scroll level editing area up"
+  },
+  {
+    ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 1 * ED_SCROLLBUTTON_YSIZE,
+    ED_SCROLL_DOWN_XPOS,    ED_SCROLL_DOWN_YPOS,    ED_CTRL_ID_SCROLL_DOWN,
+    "scroll level editing area down"
+  },
+  {
+    ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 2 * ED_SCROLLBUTTON_YSIZE,
+    ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,    ED_CTRL_ID_SCROLL_LEFT,
+    "scroll level editing area left"
+  },
+  {
+    ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 3 * ED_SCROLLBUTTON_YSIZE,
+    ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,   ED_CTRL_ID_SCROLL_RIGHT,
+    "scroll level editing area right"
+  }
 };
 
 static struct
@@ -207,18 +247,25 @@ static struct
   int width, height;
   int type;
   int gadget_id;
+  char *text;
 } scrollbar_info[ED_NUM_SCROLLBARS] =
 {
-  { ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
+  {
+    ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
     ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
-    ED_CTRL_ID_SCROLL_VERTICAL },
-  { ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
+    ED_CTRL_ID_SCROLL_VERTICAL,
+    "scroll level editing area vertically"
+  },
+  {
+    ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
     ED_SCROLL_HORIZONTAL_XPOS,	ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,	ED_SCROLL_HORIZONTAL_YSIZE,
     GD_TYPE_SCROLLBAR_HORIZONTAL,
-    ED_CTRL_ID_SCROLL_HORIZONTAL },
+    ED_CTRL_ID_SCROLL_HORIZONTAL,
+    "scroll level editing area horizontally"
+  },
 };
 
 
@@ -229,6 +276,7 @@ static void CopyLevelToUndoBuffer(int);
 static void HandleControlButtons(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
 static void HandleDrawingAreas(struct GadgetInfo *);
+static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void HandleTextInputGadgets(struct GadgetInfo *);
 
 static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
@@ -744,6 +792,7 @@ static void CreateControlButtons()
     gd_y2  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_DESCRIPTION_TEXT, control_infotext[i],
 		      GDI_X, EX + gd_xoffset,
 		      GDI_Y, EY + gd_yoffset,
 		      GDI_WIDTH, width,
@@ -757,7 +806,7 @@ static void CreateControlButtons()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y2,
 		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleControlButtons,
+		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -779,6 +828,7 @@ static void CreateControlButtons()
     gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_DESCRIPTION_TEXT, scrollbutton_info[i].text,
 		      GDI_X, SX + scrollbutton_info[i].x,
 		      GDI_Y, SY + scrollbutton_info[i].y,
 		      GDI_WIDTH, ED_SCROLLBUTTON_XSIZE,
@@ -788,7 +838,7 @@ static void CreateControlButtons()
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleControlButtons,
+		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -830,7 +880,7 @@ static void CreateCounterButtons()
 			GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
 			GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
 			GDI_EVENT_MASK, event_mask,
-			GDI_CALLBACK, HandleCounterButtons,
+			GDI_CALLBACK_ACTION, HandleCounterButtons,
 			GDI_END);
 
       if (gi == NULL)
@@ -857,17 +907,12 @@ static void CreateDrawingAreas()
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX,
 		    GDI_Y, SY,
-
-		    /*
-		    GDI_WIDTH, SXSIZE,
-		    GDI_HEIGHT, SYSIZE,
-		    */
-
 		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		    GDI_AREA_SIZE, ED_FIELDX, ED_FIELDY,
 		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK, HandleDrawingAreas,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
 		    GDI_END);
 
   if (gi == NULL)
@@ -890,7 +935,8 @@ static void CreateDrawingAreas()
 		      GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		      GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleDrawingAreas,
+		      GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		      GDI_CALLBACK_ACTION, HandleDrawingAreas,
 		      GDI_END);
 
     if (gi == NULL)
@@ -909,7 +955,8 @@ static void CreateDrawingAreas()
 		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK, HandleDrawingAreas,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
 		    GDI_END);
 
   if (gi == NULL)
@@ -942,7 +989,7 @@ static void CreateTextInputGadgets()
 		    GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
 		    GDI_DESIGN_BORDER, 3,
 		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK, HandleTextInputGadgets,
+		    GDI_CALLBACK_ACTION, HandleTextInputGadgets,
 		    GDI_END);
 
   if (gi == NULL)
@@ -985,6 +1032,7 @@ static void CreateScrollbarGadgets()
     gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_DESCRIPTION_TEXT, scrollbar_info[i].text,
 		      GDI_X, SX + scrollbar_info[i].x,
 		      GDI_Y, SY + scrollbar_info[i].y,
 		      GDI_WIDTH, scrollbar_info[i].width,
@@ -998,7 +1046,7 @@ static void CreateScrollbarGadgets()
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
 		      GDI_DESIGN_BORDER, 3,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleControlButtons,
+		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -1386,6 +1434,29 @@ void AdjustLevelScrollPosition()
     level_ypos = lev_fieldy - ED_FIELDY + 1;
   if (lev_fieldy < ED_FIELDY - 2)
     level_ypos = -1;
+}
+
+void AdjustEditorScrollbar(int id)
+{
+  struct GadgetInfo *gi = level_editor_gadget[id];
+  struct GadgetScrollbar *gs = &gi->scrollbar;
+  int items_max, items_visible, item_position = gs->item_position;
+
+  if (id == ED_CTRL_ID_SCROLL_HORIZONTAL)
+  {
+    items_max = lev_fieldx + 2;
+    items_visible = ED_FIELDX;
+  }
+  else
+  {
+    items_max = lev_fieldy + 2;
+    items_visible = ED_FIELDY;
+  }
+
+  if (item_position > items_max - items_visible)
+    item_position = items_max - items_visible;
+
+  AdjustScrollbar(gi, items_max, item_position);
 }
 
 static void PickDrawingElement(int button, int element)
@@ -2098,9 +2169,11 @@ static void DrawDrawingWindow()
 {
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
-  MapMainDrawingArea();
   AdjustLevelScrollPosition();
+  AdjustEditorScrollbar(ED_CTRL_ID_SCROLL_HORIZONTAL);
+  AdjustEditorScrollbar(ED_CTRL_ID_SCROLL_VERTICAL);
   DrawMiniLevel(level_xpos, level_ypos);
+  MapMainDrawingArea();
 }
 
 static void DrawElementContentAreas()
@@ -3417,4 +3490,59 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
     default:
       break;
   }
+}
+
+/* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
+#define INFOTEXT_XPOS		SX
+#define INFOTEXT_YPOS		(SY + SYSIZE - MINI_TILEX + 2)
+#define INFOTEXT_XSIZE		SXSIZE
+#define INFOTEXT_YSIZE		MINI_TILEX
+#define MAX_INFOTEXT_LEN	(SXSIZE / FONT2_XSIZE)
+
+void ClearEditorGadgetInfoText()
+{
+  XFillRectangle(display, drawto, gc,
+		 INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
+  redraw_mask |= REDRAW_FIELD;
+}
+
+void HandleEditorGadgetInfoText(void *ptr)
+{
+  struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
+  char infotext[MAX_INFOTEXT_LEN + 1];
+
+  ClearEditorGadgetInfoText();
+
+  if (gi == NULL || gi->description_text == NULL)
+    return;
+
+  strncpy(infotext, gi->description_text, MAX_INFOTEXT_LEN);
+  infotext[MAX_INFOTEXT_LEN] = '\0';
+
+  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FS_SMALL, FC_YELLOW);
+}
+
+static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+  int sx = gi->event.x;
+  int sy = gi->event.y;
+  int lx = sx + level_xpos;
+  int ly = sy + level_ypos;
+
+  ClearEditorGadgetInfoText();
+
+  if (id == ED_CTRL_ID_DRAWING_LEVEL)
+  {
+    if (IN_LEV_FIELD(lx, ly))
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		"Level: %d, %d (Screen: %d, %d)", lx, ly, sx, sy);
+  }
+  else if (id == ED_CTRL_ID_AMOEBA_CONTENT)
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	      "Amoeba content");
+  else
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	      "Cruncher %d content: %d, %d", id - ED_CTRL_ID_ELEMCONT_0 + 1,
+	      sx, sy);
 }

@@ -1549,7 +1549,13 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
   return gi;
 }
 
-static void default_callback_function(void *ptr)
+static void default_callback_info(void *ptr)
+{
+  if (game_status == LEVELED)
+    HandleEditorGadgetInfoText(ptr);
+}
+
+static void default_callback_action(void *ptr)
 {
   return;
 }
@@ -1564,8 +1570,9 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 
   /* always start with reliable default values */
   memset(new_gadget, 0, sizeof(struct GadgetInfo));	/* zero all fields */
-  new_gadget->id = getNewGadgetID();			/* new gadget id */
-  new_gadget->callback = default_callback_function;	/* dummy function */
+  new_gadget->id = getNewGadgetID();
+  new_gadget->callback_info = default_callback_info;
+  new_gadget->callback_action = default_callback_action;
 
   while (tag != GDI_END)
   {
@@ -1573,6 +1580,10 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
     {
       case GDI_CUSTOM_ID:
 	new_gadget->custom_id = va_arg(ap, int);
+	break;
+
+      case GDI_DESCRIPTION_TEXT:
+	new_gadget->description_text = va_arg(ap, char *);
 	break;
 
       case GDI_X:
@@ -1737,8 +1748,12 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	new_gadget->scrollbar.item_position = va_arg(ap, int);
 	break;
 
-      case GDI_CALLBACK:
-	new_gadget->callback = va_arg(ap, gadget_callback_function);
+      case GDI_CALLBACK_INFO:
+	new_gadget->callback_info = va_arg(ap, gadget_function);
+	break;
+
+      case GDI_CALLBACK_ACTION:
+	new_gadget->callback_action = va_arg(ap, gadget_function);
 	break;
 
       default:
@@ -2011,6 +2026,7 @@ static struct GadgetInfo *last_gi = NULL;
 
 void HandleGadgets(int mx, int my, int button)
 {
+  static struct GadgetInfo *last_info_gi = NULL;
   static unsigned long pressed_delay = 0;
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;
@@ -2027,6 +2043,7 @@ void HandleGadgets(int mx, int my, int button)
   boolean gadget_released;
   boolean gadget_released_inside;
   boolean gadget_released_off_borders;
+  boolean changed_position = FALSE;
 
   /* check if there are any gadgets defined */
   if (gadget_list_first_entry == NULL)
@@ -2054,7 +2071,7 @@ void HandleGadgets(int mx, int my, int button)
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
-      gi->callback(gi);
+      gi->callback_action(gi);
 
     last_gi = NULL;
   }
@@ -2088,16 +2105,34 @@ void HandleGadgets(int mx, int my, int button)
   if (button == 0 && last_gi && last_gi->type != GD_TYPE_TEXTINPUT)
     last_gi = NULL;
 
-  if (gi)
+  if (new_gi)
   {
-    gi->event.x = mx - gi->x;
-    gi->event.y = my - gi->y;
+    int last_x = new_gi->event.x;
+    int last_y = new_gi->event.y;
 
-    if (gi->type == GD_TYPE_DRAWING_AREA)
+    new_gi->event.x = mx - new_gi->x;
+    new_gi->event.y = my - new_gi->y;
+
+    if (new_gi->type == GD_TYPE_DRAWING_AREA)
     {
-      gi->event.x /= gi->drawing.item_xsize;
-      gi->event.y /= gi->drawing.item_ysize;
+      new_gi->event.x /= new_gi->drawing.item_xsize;
+      new_gi->event.y /= new_gi->drawing.item_ysize;
+
+      if (last_x != new_gi->event.x || last_y != new_gi->event.y)
+	changed_position = TRUE;
     }
+  }
+
+  /* handle gadget popup info text */
+  if (last_info_gi != new_gi ||
+      (new_gi && new_gi->type == GD_TYPE_DRAWING_AREA))
+  {
+    last_info_gi = new_gi;
+
+    if (new_gi != NULL)
+      new_gi->callback_info(new_gi);
+    else
+      default_callback_info(NULL);
   }
 
   if (gadget_pressed)
@@ -2150,7 +2185,8 @@ void HandleGadgets(int mx, int my, int button)
 
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 	int old_item_position = gs->item_position;
-	boolean changed_position = FALSE;
+
+	changed_position = FALSE;
 
 	gs->item_position +=
 	  gs->items_visible * (mpos < gpos + gi->scrollbar.position ? -1 : +1);
@@ -2173,7 +2209,7 @@ void HandleGadgets(int mx, int my, int button)
 	gi->event.off_borders = FALSE;
 
 	if (gi->event_mask & GD_EVENT_MOVING && changed_position)
-	  gi->callback(gi);
+	  gi->callback_action(gi);
 
 	/* don't handle this scrollbar anymore while mouse button pressed */
 	last_gi = NULL;
@@ -2194,20 +2230,18 @@ void HandleGadgets(int mx, int my, int button)
     DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
 
     if (gi->event_mask & GD_EVENT_PRESSED)
-      gi->callback(gi);
+      gi->callback_action(gi);
   }
 
   if (gadget_pressed_repeated)
   {
     if (gi->event_mask & GD_EVENT_REPEATED &&
 	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
-      gi->callback(gi);
+      gi->callback_action(gi);
   }
 
   if (gadget_moving)
   {
-    boolean changed_position = FALSE;
-
     if (gi->type & GD_TYPE_BUTTON)
     {
       if (gadget_moving_inside && gi->state == GD_BUTTON_UNPRESSED)
@@ -2239,9 +2273,6 @@ void HandleGadgets(int mx, int my, int button)
       DrawGadget(gi, DG_PRESSED, DG_DIRECT);
     }
 
-    if (gi->type == GD_TYPE_DRAWING_AREA)
-      changed_position = TRUE;
-
     gi->state = (gadget_moving_inside || gi->type & GD_TYPE_SCROLLBAR ?
 		 GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
     gi->event.type = GD_EVENT_MOVING;
@@ -2249,7 +2280,7 @@ void HandleGadgets(int mx, int my, int button)
 
     if (gi->event_mask & GD_EVENT_MOVING && changed_position &&
 	(gadget_moving_inside || gi->event_mask & GD_EVENT_OFF_BORDERS))
-      gi->callback(gi);
+      gi->callback_action(gi);
   }
 
   if (gadget_released_inside)
@@ -2261,7 +2292,7 @@ void HandleGadgets(int mx, int my, int button)
     gi->event.type = GD_EVENT_RELEASED;
 
     if (gi->event_mask & GD_EVENT_RELEASED)
-      gi->callback(gi);
+      gi->callback_action(gi);
   }
 
   if (gadget_released_off_borders)
@@ -2273,7 +2304,7 @@ void HandleGadgets(int mx, int my, int button)
 
     if (gi->event_mask & GD_EVENT_RELEASED &&
 	gi->event_mask & GD_EVENT_OFF_BORDERS)
-      gi->callback(gi);
+      gi->callback_action(gi);
   }
 }
 
@@ -2305,7 +2336,7 @@ void HandleGadgetsKeyInput(KeySym key)
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     if (gi->event_mask & GD_EVENT_TEXT_RETURN)
-      gi->callback(gi);
+      gi->callback_action(gi);
 
     last_gi = NULL;
   }
