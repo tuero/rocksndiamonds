@@ -169,32 +169,39 @@
 #define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 66)
 
 /* some positions in the editor control window */
-#define ED_BUTTON_ELEM_XPOS	6
-#define ED_BUTTON_ELEM_YPOS	30
-#define ED_BUTTON_ELEM_XSIZE	22
-#define ED_BUTTON_ELEM_YSIZE	22
+#define ED_BUTTON_ELEM_XPOS		6
+#define ED_BUTTON_ELEM_YPOS		30
+#define ED_BUTTON_ELEM_XSIZE		22
+#define ED_BUTTON_ELEM_YSIZE		22
 
-/* some values for text input and counter gadgets */
-#define ED_BUTTON_COUNT_YPOS	60
-#define ED_BUTTON_COUNT_XSIZE	20
-#define ED_BUTTON_COUNT_YSIZE	20
-#define ED_WIN_COUNT_XPOS	(2 + ED_BUTTON_COUNT_XSIZE + 2)
-#define ED_WIN_COUNT_YPOS	ED_BUTTON_COUNT_YPOS
-#define ED_WIN_COUNT_XSIZE	52
-#define ED_WIN_COUNT_YSIZE	ED_BUTTON_COUNT_YSIZE
-#define ED_WIN_COUNT2_XPOS	27
-#define ED_WIN_COUNT2_YPOS	3
-#define ED_WIN_COUNT2_XSIZE	46
-#define ED_WIN_COUNT2_YSIZE	ED_BUTTON_COUNT_YSIZE
+/* some values for text input, selectbox and counter gadgets */
+#define ED_BUTTON_COUNT_YPOS		60
+#define ED_BUTTON_COUNT_XSIZE		20
+#define ED_BUTTON_COUNT_YSIZE		20
+#define ED_WIN_COUNT_XPOS		(2 + ED_BUTTON_COUNT_XSIZE + 2)
+#define ED_WIN_COUNT_YPOS		ED_BUTTON_COUNT_YPOS
+#define ED_WIN_COUNT_XSIZE		52
+#define ED_WIN_COUNT_YSIZE		ED_BUTTON_COUNT_YSIZE
+#define ED_WIN_COUNT2_XPOS		27
+#define ED_WIN_COUNT2_YPOS		3
+#define ED_WIN_COUNT2_XSIZE		46
+#define ED_WIN_COUNT2_YSIZE		ED_BUTTON_COUNT_YSIZE
 
-#define ED_BUTTON_MINUS_XPOS	2
-#define ED_BUTTON_MINUS_YPOS	ED_BUTTON_COUNT_YPOS
-#define ED_BUTTON_MINUS_XSIZE	ED_BUTTON_COUNT_XSIZE
-#define ED_BUTTON_MINUS_YSIZE	ED_BUTTON_COUNT_YSIZE
-#define ED_BUTTON_PLUS_XPOS	(ED_WIN_COUNT_XPOS + ED_WIN_COUNT_XSIZE + 2)
-#define ED_BUTTON_PLUS_YPOS	ED_BUTTON_COUNT_YPOS
-#define ED_BUTTON_PLUS_XSIZE	ED_BUTTON_COUNT_XSIZE
-#define ED_BUTTON_PLUS_YSIZE	ED_BUTTON_COUNT_YSIZE
+#define ED_BUTTON_MINUS_XPOS		2
+#define ED_BUTTON_MINUS_YPOS		ED_BUTTON_COUNT_YPOS
+#define ED_BUTTON_MINUS_XSIZE		ED_BUTTON_COUNT_XSIZE
+#define ED_BUTTON_MINUS_YSIZE		ED_BUTTON_COUNT_YSIZE
+#define ED_BUTTON_PLUS_XPOS		(ED_WIN_COUNT_XPOS + \
+	 				 ED_WIN_COUNT_XSIZE + 2)
+#define ED_BUTTON_PLUS_YPOS		ED_BUTTON_COUNT_YPOS
+#define ED_BUTTON_PLUS_XSIZE		ED_BUTTON_COUNT_XSIZE
+#define ED_BUTTON_PLUS_YSIZE		ED_BUTTON_COUNT_YSIZE
+
+#define ED_SELECTBOX_XPOS		ED_WIN_COUNT_XPOS
+#define ED_SELECTBOX_YPOS		(ED_WIN_COUNT_YPOS + 2 + \
+					 ED_WIN_COUNT_YSIZE)
+#define ED_SELECTBOX_XSIZE		ED_WIN_COUNT_XSIZE
+#define ED_SELECTBOX_YSIZE		ED_WIN_COUNT_YSIZE
 
 /* editor gadget identifiers */
 
@@ -269,35 +276,38 @@
 #define GADGET_ID_LEVEL_NAME		60
 #define GADGET_ID_LEVEL_AUTHOR		61
 
+/* selectbox identifiers */
+#define GADGET_ID_SELECTBOX_TEST	62
+
 /* gadgets for scrolling of drawing area */
-#define GADGET_ID_SCROLL_UP		62
-#define GADGET_ID_SCROLL_DOWN		63
-#define GADGET_ID_SCROLL_LEFT		64
-#define GADGET_ID_SCROLL_RIGHT		65
-#define GADGET_ID_SCROLL_HORIZONTAL	66
-#define GADGET_ID_SCROLL_VERTICAL	67
+#define GADGET_ID_SCROLL_UP		63
+#define GADGET_ID_SCROLL_DOWN		64
+#define GADGET_ID_SCROLL_LEFT		65
+#define GADGET_ID_SCROLL_RIGHT		66
+#define GADGET_ID_SCROLL_HORIZONTAL	67
+#define GADGET_ID_SCROLL_VERTICAL	68
 
 /* gadgets for scrolling element list */
-#define GADGET_ID_SCROLL_LIST_UP	68
-#define GADGET_ID_SCROLL_LIST_DOWN	69
-#define GADGET_ID_SCROLL_LIST_VERTICAL	70
+#define GADGET_ID_SCROLL_LIST_UP	69
+#define GADGET_ID_SCROLL_LIST_DOWN	70
+#define GADGET_ID_SCROLL_LIST_VERTICAL	71
 
 /* buttons for level/element properties */
-#define GADGET_ID_RANDOM_PERCENTAGE	71
-#define GADGET_ID_RANDOM_QUANTITY	72
-#define GADGET_ID_RANDOM_RESTRICTED	73
-#define GADGET_ID_DOUBLE_SPEED		74
-#define GADGET_ID_GRAVITY		75
-#define GADGET_ID_STICK_ELEMENT		76
-#define GADGET_ID_EM_SLIPPERY_GEMS	77
-#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	78
-#define GADGET_ID_CUSTOM_CAN_FALL	79
-#define GADGET_ID_CUSTOM_CAN_SMASH	80
-#define GADGET_ID_CUSTOM_PUSHABLE	81
-#define GADGET_ID_CUSTOM_SLIPPERY	82
+#define GADGET_ID_RANDOM_PERCENTAGE	72
+#define GADGET_ID_RANDOM_QUANTITY	73
+#define GADGET_ID_RANDOM_RESTRICTED	74
+#define GADGET_ID_DOUBLE_SPEED		75
+#define GADGET_ID_GRAVITY		76
+#define GADGET_ID_STICK_ELEMENT		77
+#define GADGET_ID_EM_SLIPPERY_GEMS	78
+#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	79
+#define GADGET_ID_CUSTOM_CAN_FALL	80
+#define GADGET_ID_CUSTOM_CAN_SMASH	81
+#define GADGET_ID_CUSTOM_PUSHABLE	82
+#define GADGET_ID_CUSTOM_SLIPPERY	83
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	83
+#define GADGET_ID_ELEMENTLIST_FIRST	84
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -355,6 +365,11 @@
 
 #define ED_TEXTINPUT_ID_LEVEL_FIRST	ED_TEXTINPUT_ID_LEVEL_NAME
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
+
+/* values for selectbox gadgets */
+#define ED_SELECTBOX_ID_TEST		0
+
+#define ED_NUM_SELECTBOX		1
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_ID_DOUBLE_SPEED		0
@@ -551,6 +566,34 @@ static struct
     level.author,
     "Author"
   }
+};
+
+static char *test_values[] =
+{
+  "test 1",
+  "test 2",
+  "dieser test-text ist viel zu lang fuer die selectbox",
+  "letzter text"
+};
+static int test_index = 0;
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+  int size;
+  char **values;
+  int *index;
+  char *text, *infotext;
+} selectbox_info[ED_NUM_SELECTBOX] =
+{
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(3),
+    GADGET_ID_SELECTBOX_TEST,
+    MAX_PLAYER_NAME_LEN,
+    test_values, &test_index,
+    "test:", "test-selectbox entry"
+  },
 };
 
 static struct
@@ -763,6 +806,7 @@ static void CopyLevelToUndoBuffer(int);
 static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
 static void HandleTextInputGadgets(struct GadgetInfo *);
+static void HandleSelectboxGadgets(struct GadgetInfo *);
 static void HandleRadiobuttons(struct GadgetInfo *);
 static void HandleCheckbuttons(struct GadgetInfo *);
 static void HandleControlButtons(struct GadgetInfo *);
@@ -2158,6 +2202,55 @@ static void CreateTextInputGadgets()
   }
 }
 
+static void CreateSelectboxGadgets()
+{
+  int max_infotext_len = getMaxInfoTextLength();
+  int i;
+
+  for (i=0; i<ED_NUM_SELECTBOX; i++)
+  {
+    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+    int gd_x, gd_y;
+    struct GadgetInfo *gi;
+    unsigned long event_mask;
+    char infotext[MAX_OUTPUT_LINESIZE + 1];
+    int id = selectbox_info[i].gadget_id;
+
+    event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+
+    gd_x = DOOR_GFX_PAGEX4 + ED_SELECTBOX_XPOS;
+    gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
+
+    sprintf(infotext, "Select %s", selectbox_info[i].infotext);
+    infotext[max_infotext_len] = '\0';
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_INFO_TEXT, infotext,
+		      GDI_X, SX + selectbox_info[i].x,
+		      GDI_Y, SY + selectbox_info[i].y,
+		      GDI_TYPE, GD_TYPE_SELECTBOX,
+		      GDI_SELECTBOX_VALUES, selectbox_info[i].values,
+		      GDI_SELECTBOX_INDEX, selectbox_info[i].index,
+		      GDI_TEXT_SIZE, selectbox_info[i].size,
+		      GDI_TEXT_FONT, FONT_INPUT,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
+		      GDI_BORDER_SIZE, ED_BORDER_SIZE,
+		      GDI_BORDER_SIZE_SELECTBUTTON, getFontHeight(FONT_INPUT),
+		      GDI_TEXTINPUT_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
+		      GDI_CALLBACK_ACTION, HandleSelectboxGadgets,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id] = gi;
+  }
+}
+
 static void CreateScrollbarGadgets()
 {
   int i;
@@ -2319,6 +2412,7 @@ void CreateLevelEditorGadgets()
   CreateCounterButtons();
   CreateDrawingAreas();
   CreateTextInputGadgets();
+  CreateSelectboxGadgets();
   CreateScrollbarGadgets();
   CreateCheckbuttonGadgets();
 }
@@ -2371,6 +2465,11 @@ static void MapDrawingArea(int id)
 static void MapTextInputGadget(int id)
 {
   MapGadget(level_editor_gadget[textinput_info[id].gadget_id]);
+}
+
+static void MapSelectboxGadget(int id)
+{
+  MapGadget(level_editor_gadget[selectbox_info[id].gadget_id]);
 }
 
 static void MapRadiobuttonGadget(int id)
@@ -3210,6 +3309,18 @@ static void DrawPropertiesWindow()
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
+
+    /* draw selectbox gadget */
+    i = ED_SELECTBOX_ID_TEST;
+    x = selectbox_info[i].x + xoffset_right2;
+    y = selectbox_info[i].y + yoffset_right2;
+
+    selectbox_info[i].index = &test_index;
+
+    DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
+    ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
+		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
+    MapSelectboxGadget(i);
   }
 }
 
@@ -4112,6 +4223,16 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
 {
   strcpy(textinput_info[gi->custom_type_id].value, gi->text.value);
+}
+
+static void HandleSelectboxGadgets(struct GadgetInfo *gi)
+{
+  *selectbox_info[gi->custom_type_id].index = gi->selectbox.index;
+
+#if 1
+  printf("Selected text value: '%s'\n",
+	 selectbox_info[gi->custom_type_id].values[gi->selectbox.index]);
+#endif
 }
 
 static void HandleRadiobuttons(struct GadgetInfo *gi)

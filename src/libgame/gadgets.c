@@ -147,14 +147,14 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			       gd->x, gd->y, border, gi->height, gi->x, gi->y);
 
 	/* middle part of gadget */
-	for (i=0; i<=gi->text.size; i++)
+	for (i=0; i <= gi->text.size; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + border, gd->y, font_width, gi->height,
 				 gi->x + border + i * font_width, gi->y);
 
 	/* right part of gadget */
 	BlitBitmapOnBackground(gd->bitmap, drawto,
-			       gd->x + gi->border.width -border, gd->y, border,
+			       gd->x + gi->border.width - border, gd->y,border,
 			       gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
@@ -173,6 +173,48 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		      gi->x + border + gi->text.cursor_position * font_width,
 		      gi->y + border, cursor_string,
 		      font_type, FONT_MASKED);
+      }
+      break;
+
+    case GD_TYPE_SELECTBOX:
+      {
+	int i;
+	char text[MAX_GADGET_TEXTSIZE + 1];
+	int font_type = gi->selectbox.font_type;
+	int font_width = getFontWidth(font_type);
+	int border = gi->border.size;
+	int button = gi->border.size_selectbutton;
+	int width_inner = gi->border.width - button - 2 * border;
+
+	strncpy(text, gi->selectbox.values[gi->selectbox.index],
+		MAX_GADGET_TEXTSIZE);
+	text[MAX_GADGET_TEXTSIZE] = '\0';
+
+	/* left part of gadget */
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x, gd->y, border, gi->height, gi->x, gi->y);
+
+	/* middle part of gadget */
+	for (i=0; i <= gi->selectbox.size; i++)
+	  BlitBitmapOnBackground(gd->bitmap, drawto,
+				 gd->x + border, gd->y, font_width, gi->height,
+				 gi->x + border + i * font_width, gi->y);
+
+	/* button part of gadget */
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x + border + width_inner, gd->y,
+			       button, gi->height,
+			       gi->x + gi->width - border - button, gi->y);
+
+	/* right part of gadget */
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x + gi->border.width - border, gd->y,border,
+			       gi->height, gi->x + gi->width - border, gi->y);
+
+	/* gadget text value */
+	DrawTextExt(drawto,
+		    gi->x + border, gi->y + border, text,
+		    font_type, FONT_MASKED);
       }
       break;
 
@@ -391,11 +433,25 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
 	  gi->text.size = max_textsize;
 	  gi->text.value[max_textsize] = '\0';
+
+	  /* same tag also used for selectbox definition */
+	  gi->selectbox.size = gi->text.size;
 	}
 	break;
 
       case GDI_TEXT_FONT:
 	gi->text.font_type = va_arg(ap, int);
+
+	/* same tag also used for selectbox definition */
+	gi->selectbox.font_type = gi->text.font_type;
+	break;
+
+      case GDI_SELECTBOX_VALUES:
+	gi->selectbox.values = va_arg(ap, const char **);
+	break;
+
+      case GDI_SELECTBOX_INDEX:
+	gi->selectbox.index = va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_UNPRESSED:
@@ -424,6 +480,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_BORDER_SIZE:
 	gi->border.size = va_arg(ap, int);
+	break;
+
+      case GDI_BORDER_SIZE_SELECTBUTTON:
+	gi->border.size_selectbutton = va_arg(ap, int);
 	break;
 
       case GDI_TEXTINPUT_DESIGN_WIDTH:
@@ -520,7 +580,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     tag = va_arg(ap, int);	/* read next tag */
   }
 
-  /* check if gadget complete */
+  /* check if gadget is complete */
   if (gi->type != GD_TYPE_DRAWING_AREA &&
       (!gi->design[GD_BUTTON_UNPRESSED].bitmap ||
        !gi->design[GD_BUTTON_PRESSED].bitmap))
@@ -532,9 +592,21 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
   {
     int font_width = getFontWidth(gi->text.font_type);
     int font_height = getFontHeight(gi->text.font_type);
+    int border_size = gi->border.size;
 
-    gi->width = 2 * gi->border.size + (gi->text.size + 1) * font_width;
-    gi->height = 2 * gi->border.size + font_height;
+    gi->width  = 2 * border_size + (gi->text.size + 1) * font_width;
+    gi->height = 2 * border_size + font_height;
+  }
+
+  if (gi->type & GD_TYPE_SELECTBOX)
+  {
+    int font_width = getFontWidth(gi->selectbox.font_type);
+    int font_height = getFontHeight(gi->selectbox.font_type);
+    int border_size = gi->border.size;
+    int button_size = gi->border.size_selectbutton;
+
+    gi->width  = 2 * border_size + gi->text.size * font_width + button_size;
+    gi->height = 2 * border_size + font_height;
   }
 
   if (gi->type & GD_TYPE_TEXTINPUT_NUMERIC)

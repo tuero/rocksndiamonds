@@ -26,8 +26,9 @@
 #define GD_TYPE_DRAWING_AREA		(1 << 3)
 #define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 4)
 #define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 5)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 6)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 7)
+#define GD_TYPE_SELECTBOX		(1 << 6)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 7)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 8)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
 					 GD_TYPE_CHECK_BUTTON | \
@@ -74,33 +75,37 @@
 #define GDI_TEXT_VALUE			14
 #define GDI_TEXT_SIZE			15
 #define GDI_TEXT_FONT			16
-#define GDI_DESIGN_UNPRESSED		17
-#define GDI_DESIGN_PRESSED		18
-#define GDI_ALT_DESIGN_UNPRESSED	19
-#define GDI_ALT_DESIGN_PRESSED		20
-#define GDI_BORDER_SIZE			21
-#define GDI_TEXTINPUT_DESIGN_WIDTH	22
-#define GDI_DECORATION_DESIGN		23
-#define GDI_DECORATION_POSITION		24
-#define GDI_DECORATION_SIZE		25
-#define GDI_DECORATION_SHIFTING		26
-#define GDI_EVENT_MASK			27
-#define GDI_EVENT			28
-#define GDI_CALLBACK_INFO		29
-#define GDI_CALLBACK_ACTION		30
-#define GDI_AREA_SIZE			31
-#define GDI_ITEM_SIZE			32
-#define GDI_SCROLLBAR_ITEMS_MAX		33
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	34
-#define GDI_SCROLLBAR_ITEM_POSITION	35
-#define GDI_INFO_TEXT			36
+#define GDI_SELECTBOX_VALUES		17
+#define GDI_SELECTBOX_INDEX		18
+#define GDI_DESIGN_UNPRESSED		19
+#define GDI_DESIGN_PRESSED		20
+#define GDI_ALT_DESIGN_UNPRESSED	21
+#define GDI_ALT_DESIGN_PRESSED		22
+#define GDI_BORDER_SIZE			23
+#define GDI_BORDER_SIZE_SELECTBUTTON	24
+#define GDI_TEXTINPUT_DESIGN_WIDTH	25
+#define GDI_DECORATION_DESIGN		26
+#define GDI_DECORATION_POSITION		27
+#define GDI_DECORATION_SIZE		28
+#define GDI_DECORATION_SHIFTING		29
+#define GDI_EVENT_MASK			30
+#define GDI_EVENT			31
+#define GDI_CALLBACK_INFO		32
+#define GDI_CALLBACK_ACTION		33
+#define GDI_AREA_SIZE			34
+#define GDI_ITEM_SIZE			35
+#define GDI_SCROLLBAR_ITEMS_MAX		36
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	37
+#define GDI_SCROLLBAR_ITEM_POSITION	38
+#define GDI_INFO_TEXT			39
 
 typedef void (*gadget_function)(void *);
 
 struct GadgetBorder
 {
   int size;				/* size of gadget border */
-  int width;				/* for text input gadgets */
+  int size_selectbutton;		/* for selectbox gadgets */
+  int width;				/* for selectbox/text input gadgets */
 };
 
 struct GadgetDesign
@@ -143,6 +148,14 @@ struct GadgetTextInput
   int font_type;			/* font to use for text input */
 };
 
+struct GadgetSelectbox
+{
+  const char **values;			/* pointer to array of text strings */
+  int index;				/* index of actual text string */
+  int size;				/* maximal size of text strings */
+  int font_type;			/* font to use for text input */
+};
+
 struct GadgetScrollbar
 {
   int items_max;			/* number of items to access */
@@ -179,6 +192,7 @@ struct GadgetInfo
   gadget_function callback_action;	/* function for gadget action */
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
   struct GadgetTextInput text;		/* fields for text input gadget */
+  struct GadgetSelectbox selectbox;	/* fields for selectbox gadget */
   struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */
   struct GadgetInfo *next;		/* next list entry */
 };
