@@ -409,14 +409,14 @@ void HandleKey(KeySym key, int key_status)
       if (key_status == KEY_PRESSED)
       {
 	if (network_playing)
-	  local_player->potential_action |= key_action;
+	  stored_player[pnr].potential_action |= key_action;
 	else
 	  stored_player[pnr].action |= key_action;
       }
       else
       {
 	if (network_playing)
-	  local_player->potential_action &= ~key_action;
+	  stored_player[pnr].potential_action &= ~key_action;
 	else
 	  stored_player[pnr].action &= ~key_action;
       }
@@ -894,9 +894,9 @@ static int HandleJoystickForAllPlayers()
     result |= joy_action;
 
     if (network_playing)
-      local_player->potential_action |= joy_action;
+      stored_player[i].potential_action = joy_action;
     else
-      stored_player[i].action |= joy_action;
+      stored_player[i].action = joy_action;
   }
 
   return result;

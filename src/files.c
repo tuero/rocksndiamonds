@@ -262,7 +262,7 @@ void LoadLevelTape(int level_nr)
 
     for(j=0; j<MAX_PLAYERS; j++)
     {
-      if (levelrec_10 && j>0)
+      if (levelrec_10 && j > 0)
       {
 	tape.pos[i].action[j] = MV_NO_MOVING;
 	continue;
@@ -271,6 +271,34 @@ void LoadLevelTape(int level_nr)
     }
 
     tape.pos[i].delay = fgetc(file);
+
+    if (levelrec_10)
+    {
+      /* eliminate possible diagonal moves in old tapes */
+      /* this is only for backward compatibility */
+
+      byte joy_dir[4] = { JOY_LEFT, JOY_RIGHT, JOY_UP, JOY_DOWN };
+      byte action = tape.pos[i].action[0];
+      int k, num_moves = 0;
+
+      for (k=0; k<4; k++)
+      {
+	if (action & joy_dir[k])
+	{
+	  tape.pos[i + num_moves].action[0] = joy_dir[k];
+	  if (num_moves > 0)
+	    tape.pos[i + num_moves].delay = 0;
+	  num_moves++;
+	}
+      }
+
+      if (num_moves > 1)
+      {
+	num_moves--;
+	i += num_moves;
+	tape.length += num_moves;
+      }
+    }
 
     if (feof(file))
       break;

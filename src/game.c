@@ -156,7 +156,12 @@ void InitGame()
 	int jx = player->jx, jy = player->jy;
 
 	player->present = TRUE;
+
+	/*
 	if (!network_playing || player->connected)
+	*/
+
+	if (!options.network || player->connected)
 	{
 	  player->active = TRUE;
 
@@ -260,9 +265,6 @@ void InitGame()
 
     if (player->connected && !player->present)
     {
-      printf("Oops!\n");
-
-
       for(j=0; j<MAX_PLAYERS; j++)
       {
 	struct PlayerInfo *some_player = &stored_player[j];
@@ -476,6 +478,9 @@ void GameWon()
 {
   int hi_pos;
   int bumplevel = FALSE;
+
+  if (local_player->MovPos)
+    return;
 
   local_player->LevelSolved = FALSE;
 
@@ -2809,6 +2814,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
+  static boolean save_tape_entry = FALSE;
   boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
   int jx = player->jx, jy = player->jy;
   int left	= player_action & JOY_LEFT;
@@ -2828,6 +2834,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
 
   if (player_action)
   {
+    save_tape_entry = TRUE;
     player->frame_reset_delay = 0;
 
     if (button1)
@@ -2846,12 +2853,15 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
 
       stored_player_action[player->index_nr] = player_action;
 
+#if 0
       /* this allows cycled sequences of PlayerActions() */
       if (num_stored_actions >= MAX_PLAYERS)
       {
 	TapeRecordAction(stored_player_action);
 	num_stored_actions = 0;
       }
+#endif
+
     }
     else if (tape.playing && snapped)
       SnapField(player, 0,0);			/* stop snapping */
@@ -2864,13 +2874,21 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
       player->Frame = 0;
   }
 
+  if (tape.recording && num_stored_actions >= MAX_PLAYERS && save_tape_entry)
+  {
+    TapeRecordAction(stored_player_action);
+    num_stored_actions = 0;
+    save_tape_entry = FALSE;
+  }
+
   if (tape.playing && !tape.pausing && !player_action &&
       tape.counter < tape.length)
   {
     int next_joy =
       tape.pos[tape.counter].action[player->index_nr] & (JOY_LEFT|JOY_RIGHT);
 
-    if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
+    if ((next_joy == JOY_LEFT || next_joy == JOY_RIGHT) &&
+	(player->MovDir != JOY_UP && player->MovDir != JOY_DOWN))
     {
       int dx = (next_joy == JOY_LEFT ? -1 : +1);
 
@@ -2933,15 +2951,32 @@ void GameActions()
   }
 
 
+  /*
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
+  else if (tape.recording)
+    TapeRecordDelay();
+  */
+
+  if (tape.pausing)
+    return;
+
+  if (tape.playing)
+    TapePlayDelay();
   else if (tape.recording)
     TapeRecordDelay();
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
   if (network_playing)
-    SendToServer_MovePlayer(local_player->potential_action);
+  {
+    byte local_potential_action = 0;
+
+    for(i=0; i<MAX_PLAYERS; i++)
+      local_potential_action |= stored_player[i].potential_action;
+
+    SendToServer_MovePlayer(local_potential_action);
+  }
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
@@ -2957,6 +2992,15 @@ void GameActions()
   network_player_action_received = FALSE;
 
   ScrollScreen(NULL, SCROLL_GO_ON);
+
+
+  /*
+  if (tape.pausing || (tape.playing && !TapePlayDelay()))
+    return;
+  else if (tape.recording)
+    TapeRecordDelay();
+  */
+
 
   FrameCounter++;
   TimeFrames++;
@@ -3245,6 +3289,25 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
   if (!FrameReached(&player->move_delay,MoveSpeed) && !tape.playing)
     return(FALSE);
+
+  if (player->MovPos)
+  {
+    /* should only happen if pre-1.0 tape recordings are played */
+    /* this is only for backward compatibility */
+
+#ifdef DEBUG
+    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.0 LEVEL TAPES.\n");
+#endif
+
+    while (player->MovPos)
+    {
+      ScrollFigure(player, SCROLL_GO_ON);
+      ScrollScreen(NULL, SCROLL_GO_ON);
+      FrameCounter++;
+      DrawAllPlayers();
+      BackToFront();
+    }
+  }
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
   {
