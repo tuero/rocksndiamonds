@@ -107,8 +107,8 @@ void InitGame()
       case EL_SPIELFIGUR:
       case EL_SPIELER1:
 	Feld[x][y] = EL_LEERRAUM;
-	JX = x;
-	JY = y;
+	JX = lastJX = x;
+	JY = lastJY = y;
 	break;
       case EL_SPIELER2:
 	Feld[x][y] = EL_LEERRAUM;
@@ -2724,14 +2724,6 @@ void GameActions()
 	}
       }
     }
-
-    /*
-    if (PlayerMovPos)
-      ScrollFigure(0);
-
-    DrawPlayerField();
-    */
-
   }
 
   if (TimeLeft>0 && TimeFrames>=25 && !tape.pausing)
@@ -2751,43 +2743,17 @@ void GameActions()
       KillHero();
   }
 
-  /*
-  if (PlayerMovPos)
-    ScrollFigure(0);
-    */
-
-
-  /*
   DrawPlayerField();
-  */
-
-
-  DrawPlayerField();
-
 
   BackToFront();
 }
 
 void ScrollLevel(int dx, int dy)
 {
+  int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
   int x,y;
-  int softscroll_offset = (FX == TILEX ? TILEX : 0);
-
-  /*
-  if (soft_scrolling_on)
-  {
-    ScreenMovPos = PlayerMovPos;
-    redraw_mask |= REDRAW_FIELD;
-  }
-  */
-
 
   ScreenMovPos = PlayerMovPos;
-  if (soft_scrolling_on)
-  {
-    redraw_mask |= REDRAW_FIELD;
-  }
-
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2819,10 +2785,6 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   int element;
   int can_move;
 
-/*
-  int old_move_dir = PlayerMovDir;
-*/
-
   if (PlayerGone || (!dx && !dy))
     return(MF_NO_ACTION);
 
@@ -2830,12 +2792,6 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
 		  dx > 0 ? MV_RIGHT :
 		  dy < 0 ? MV_UP :
 		  dy > 0 ? MV_DOWN :	MV_NO_MOVING);
-/*
-  if (old_move_dir != PlayerMovDir)
-    PlayerFrame = 0;
-  else
-    PlayerFrame = (PlayerFrame + 1) % 4;
-*/
 
   if (!IN_LEV_FIELD(newJX,newJY))
     return(MF_NO_ACTION);
@@ -2900,21 +2856,6 @@ BOOL MoveFigure(int dx, int dy)
   if (PlayerGone || (!dx && !dy))
     return(FALSE);
 
-/*
-  if (!DelayReached(&move_delay,8) && !tape.playing)
-    return(FALSE);
-*/
-
-/*
-  if (!DelayReached(&move_delay,10) && !tape.playing)
-    return(FALSE);
-*/
-
-/*
-  if (!FrameReached(&move_delay,2) && !tape.playing)
-    return(FALSE);
-*/
-
   if (Movemethod == 0)
   {
     if (!DelayReached(&move_delay,Movespeed[0]) && !tape.playing)
@@ -2925,7 +2866,6 @@ BOOL MoveFigure(int dx, int dy)
     if (!FrameReached(&move_delay,Movespeed[1]) && !tape.playing)
       return(FALSE);
   }
-
 
   if (last_move_dir & (MV_LEFT | MV_RIGHT))
   {
@@ -2939,17 +2879,6 @@ BOOL MoveFigure(int dx, int dy)
   }
 
   last_move_dir = MV_NO_MOVING;
-
-
-  /*
-  if (moved |= MoveFigureOneStep(dx,0, dx,dy))
-    moved |= MoveFigureOneStep(0,dy, dx,dy);
-  else
-  {
-    moved |= MoveFigureOneStep(0,dy, dx,dy);
-    moved |= MoveFigureOneStep(dx,0, dx,dy);
-  }
-  */
 
   if (moved & MF_MOVING)
   {
@@ -2986,10 +2915,6 @@ BOOL MoveFigure(int dx, int dy)
 
   TestIfHeroHitsBadThing();
 
-  /*
-  BackToFront();
-  */
-
   if (PlayerGone)
     RemoveHero();
 
@@ -3003,28 +2928,8 @@ void ScrollFigure(int init)
 
   if (init)
   {
-    /*
-    if (PlayerMovPos && oldJX != -1 && oldJY != -1)
-    {
-      if (Feld[lastJX][lastJY] == EL_LEERRAUM)
-	Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
-      DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
-      DrawPlayerField();
-    }
-    */
-
     if (oldJX != -1 && oldJY != -1)
-    {
-      /*
-      if (Feld[lastJX][lastJY] == EL_LEERRAUM)
-	Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
-	*/
       DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
-      /*
-      DrawLevelElement(lastJX,lastJY, Feld[lastJX][lastJY]);
-      DrawPlayerField();
-      */
-    }
 
     if (Feld[lastJX][lastJY] == EL_LEERRAUM)
       Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
@@ -3035,16 +2940,6 @@ void ScrollFigure(int init)
     oldJY = lastJY;
     actual_frame_counter = FrameCounter;
 
-    /*
-    redraw[redraw_x1 + oldJX][redraw_y1 + oldJY] = 1;
-    redraw_tiles++;
-    */
-
-    /*
-    DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
-    */
-
-
     if (PlayerPushing)
     {
       int nextJX = JX + (JX - lastJX);
@@ -3054,8 +2949,7 @@ void ScrollFigure(int init)
 	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
       else
 	DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
-  }
-
+    }
 
     DrawPlayerField();
 

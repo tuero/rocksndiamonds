@@ -65,67 +65,11 @@ void BackToFront()
   if (direct_draw_on && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
 
-
-
-  /*
-  if (ScreenMovPos && redraw_mask & REDRAW_FIELD)
-  {
-    redraw_mask |= REDRAW_FIELD;
-
-    printf("FULL SCREEN REDRAW FORCED by ScreenMovPos == %d\n", ScreenMovPos);
-  }
-  */
-
-
-
-  /*
-  if (ScreenMovPos && redraw_mask & REDRAW_TILES)
-  {
-    redraw_mask |= REDRAW_FIELD;
-
-    printf("FULL SCREEN REDRAW FORCED by ScreenMovPos == %d\n", ScreenMovPos);
-  }
-  */
-
-
-  /*
-  if (ScreenMovPos && !(redraw_mask & REDRAW_FIELD))
-  {
-    printf("OOPS!\n");
-
-    *((int *)NULL) = 0;
-  }
-  */
-
-  /*
-  if (IN_SCR_FIELD(lastJX,lastJY))
-    redraw[redraw_x1 + lastJX][redraw_y1 + lastJY] = 0;
-    */
-
-
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
 
   if (redraw_mask & REDRAW_FIELD)
     redraw_mask &= ~REDRAW_TILES;
-
-  /*
-  {
-    static int lastFrame = 0;
-
-    printf("FrameCounter: %d\n", FrameCounter);
-
-    if (FrameCounter != lastFrame + 1)
-    {
-      printf("SYNC LOST! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-
-      if (FrameCounter > 100)
-	*((int *)NULL) = 0;
-    }
-
-    lastFrame = FrameCounter;
-  }
-  */
 
   if (!redraw_mask)
     return;
@@ -140,29 +84,24 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_FIELD)
   {
-    int fx = FX, fy = FY;
-
-    if (soft_scrolling_on)
-    {
-      fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-      fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
-    }
-
-    if (game_status == PLAYING && !(redraw_mask & REDRAW_FROM_BACKBUFFER))
-    {
-      XCopyArea(display,buffer,window,gc,
-		fx,fy, SXSIZE,SYSIZE,
-		SX,SY);
-
-      /*
-      printf("FULL SCREEN REDRAW / ScreenMovPos == %d\n", ScreenMovPos);
-      */
-
-    }
-    else
+    if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
       XCopyArea(display,backbuffer,window,gc,
 		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
 		REAL_SX,REAL_SY);
+    else
+    {
+      int fx = FX, fy = FY;
+
+      if (soft_scrolling_on)
+      {
+	fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+	fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+      }
+
+      XCopyArea(display,buffer,window,gc,
+		fx,fy, SXSIZE,SYSIZE,
+		SX,SY);
+    }
     redraw_mask &= ~REDRAW_MAIN;
   }
 
@@ -232,7 +171,6 @@ void BackToFront()
 
 void FadeToFront()
 {
-
 /*
   long fading_delay = 300000;
 
@@ -391,11 +329,6 @@ void DrawPlayerField()
   if (PlayerGone)
     return;
 
-  /*
-  printf("INFO: DrawPlayerField(): x = %d, y = %d\n",x,y);
-  */
-
-
 #if DEBUG
   if (!IN_LEV_FIELD(x,y) || !IN_SCR_FIELD(sx,sy))
   {
@@ -468,31 +401,10 @@ void DrawPlayerField()
       syy = PlayerMovPos;
   }
 
-#if 0
-  if (!soft_scrolling_on)
-  {
-    int old_scroll_x=scroll_x, old_scroll_y=scroll_y;
-    int new_scroll_x=scroll_x, new_scroll_y=scroll_y;
-    int offset = (scroll_delay_on ? 3 : 0);
-
-    if ((scroll_x < lastJX-MIDPOSX-offset || scroll_x > lastJX-MIDPOSX+offset) &&
-	lastJX>=MIDPOSX-1-offset && lastJX<=lev_fieldx-(MIDPOSX-offset))
-      new_scroll_x = lastJX-MIDPOSX + (scroll_x < lastJX-MIDPOSX ? -offset : offset);
-    if ((scroll_y < lastJY-MIDPOSY-offset || scroll_y > lastJY-MIDPOSY+offset) &&
-	JY>=MIDPOSY-1-offset && JY<=lev_fieldy-(MIDPOSY-offset))
-      new_scroll_y = lastJY-MIDPOSY + (scroll_y < lastJY-MIDPOSY ? -offset : offset);
-
-    if (new_scroll_x!=old_scroll_x || new_scroll_y!=old_scroll_y)
-      /*
-      ScrollLevel(old_scroll_x-scroll_x,old_scroll_y-scroll_y);
-      */
-      sxx = syy = 0;
-  }
-#endif
-
 
   if (!soft_scrolling_on && ScreenMovPos)
     sxx = syy = 0;
+
 
 
   if (draw_thru_mask)
@@ -520,9 +432,22 @@ void DrawPlayerField()
 				 GFX_SOKOBAN_OBJEKT,
 				 CUT_NO_CUTTING);
     else
-      DrawGraphicShifted(px,py,sxx,syy,
-			 el2gfx(Feld[nextJX][nextJY]),
-			 CUT_NO_CUTTING);
+    {
+      int element = Feld[nextJX][nextJY];
+      int graphic = el2gfx(element);
+
+      if (element == EL_FELSBROCKEN && sxx)
+      {
+	int phase = PlayerMovPos / (TILEX/4);
+
+	if (PlayerMovDir == MV_LEFT)
+	  graphic += phase;
+	else
+	  graphic += phase+4;
+      }
+
+      DrawGraphicShifted(px,py, sxx,syy, graphic, CUT_NO_CUTTING);
+    }
   }
 
 
@@ -551,9 +476,19 @@ void DrawPlayerField()
   {
     int dest_x = SX+SCROLLX(x)*TILEX;
     int dest_y = SY+SCROLLY(y)*TILEY;
+    int x_size = TILEX;
+    int y_size = TILEY;
+
+    if (!ScreenMovPos)
+    {
+      dest_x = SX + SCROLLX(MIN(JX,lastJX))*TILEX;
+      dest_y = SY + SCROLLY(MIN(JY,lastJY))*TILEY;
+      x_size = TILEX * (1 + ABS(JX - lastJX));
+      y_size = TILEY * (1 + ABS(JY - lastJY));
+    }
 
     XCopyArea(display,drawto_field,window,gc,
-	      dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
+	      dest_x,dest_y, x_size,y_size, dest_x,dest_y);
     SetDrawtoField(DRAW_DIRECT);
   }
 }

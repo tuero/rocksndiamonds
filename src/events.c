@@ -668,18 +668,6 @@ void HandleJoystick()
 	return;
       }
 
-
-#if 0
-      if (PlayerMovPos)
-      {
-	ScrollFigure(0);
-	/*
-	BackToFront();
-	*/
-      }
-#endif
-
-
       if (tape.pausing || PlayerGone)
 	joy = 0;
 
@@ -733,13 +721,6 @@ void HandleJoystick()
 	  }
 	}
       }
-
-
-      /*
-      DrawPlayerField();
-      */
-
-
       break;
     }
     default:
