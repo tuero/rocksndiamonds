@@ -25,9 +25,9 @@
 #include "netserv.h"
 
 #ifdef DEBUG
-/*
+
 #define DEBUG_TIMING
-*/
+
 #endif
 
 struct PictureFileInfo
@@ -640,7 +640,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char *picture_ext = ".xpm";
   char *picturemask_ext = "Mask.xbm";
 #else
-  int gif_err;
+  int pcx_err;
   char *picture_ext = ".pcx";
 #endif
 
@@ -693,30 +693,30 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else 
 
-    gif_err = Read_PCX_to_Pixmaps(display, window, filename,
+    pcx_err = Read_PCX_to_Pixmaps(display, window, filename,
 				  &pix[pos], &clipmask[pos]);
 
-    switch(gif_err)
+    switch(pcx_err)
     {
-      case GIF_Success:
+      case PCX_Success:
         break;
-      case GIF_OpenFailed:
-        Error(ERR_EXIT, "cannot open GIF file '%s'", filename);
-      case GIF_ReadFailed:
-        Error(ERR_EXIT, "cannot read GIF file '%s'", filename);
-      case GIF_FileInvalid:
-	Error(ERR_EXIT, "invalid GIF file '%s'", filename);
-      case GIF_NoMemory:
-	Error(ERR_EXIT, "not enough memory for GIF file '%s'", filename);
-      case GIF_ColorFailed:
-	Error(ERR_EXIT, "cannot get colors for GIF file '%s'", filename);
+      case PCX_OpenFailed:
+        Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
+      case PCX_ReadFailed:
+        Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
+      case PCX_FileInvalid:
+	Error(ERR_EXIT, "invalid PCX file '%s'", filename);
+      case PCX_NoMemory:
+	Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
+      case PCX_ColorFailed:
+	Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
       default:
 	break;
     }
 
 #ifdef DEBUG_TIMING
     count2 = Counter();
-    printf("GIF LOADING %s IN %.2f SECONDS\n",
+    printf("PCX LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/1000.0);
 #endif
 

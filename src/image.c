@@ -17,370 +17,87 @@
 /* extra colors to try allocating in private color maps to minimise flashing */
 #define NOFLASH_COLORS 256
 
-Image *monochrome(Image *cimage)
+static void Image_to_Mask(Image *image)
 {
-  Image         *image;
-  unsigned char *sp, *dp, *dp2; /* data pointers */
-  unsigned int   spl;           /* source pixel length in bytes */
-  unsigned int   dll;           /* destination line length in bytes */
-  Pixel          color;         /* pixel color */
-  unsigned int   x, y;          /* random counters */
-  int bitmap_pixel;
+  unsigned char *src_ptr, *dst_ptr, *dst_ptr2;
+  unsigned int bytes_per_row;
+  unsigned int x, y;
+  unsigned char bitmask;
 
-  if (BITMAPP(cimage))
+  bytes_per_row = (image->width + 7) / 8;
+  src_ptr = image->data;
+  dst_ptr = image->data_mask;
+
+  for (y=0; y<image->height; y++)
   {
-    printf("-->ERROR(monochrome)\n");
+    bitmask = 0x80;		/* start with leftmost bit in the byte     */
+    dst_ptr2 = dst_ptr;		/* start with leftmost byte in the row     */
 
-    return(NULL);
-  }
-
-  image = newBitImage(cimage->width, cimage->height);
-
-  spl = cimage->pixlen;
-  dll = (image->width / 8) + (image->width % 8 ? 1 : 0);
-
-  sp = cimage->data;
-  dp = image->data;
-
-  for (y=0; y<cimage->height; y++)
-  {
-    for (x=0; x<cimage->width; x++)
+    for (x=0; x<image->width; x++)
     {
-      dp2 = dp + (x / 8);	/* dp + x/8 */
-      color = memToVal(sp, spl);
+      if (*src_ptr++)		/* source pixel solid? (pixel index != 0)  */
+	*dst_ptr2 |= bitmask;	/* then write a bit into the image mask    */
 
-      if (cimage->rgb.red[color] > 0x0000 ||
-	  cimage->rgb.green[color] > 0x0000 ||
-	  cimage->rgb.blue[color] > 0x0000)
-	bitmap_pixel = 0x00;
-      else
-	bitmap_pixel = 0x80;
-
-      *dp2 |= bitmap_pixel >> (x % 8);
-      sp += spl;
+      if ((bitmask >>= 1) == 0)	/* bit at rightmost byte position reached? */
+      {
+	bitmask = 0x80;		/* start again with leftmost bit position  */
+	dst_ptr2++;		/* continue with next byte in image mask   */
+      }
     }
 
-    dp += dll;	/* next row */
+    dst_ptr += bytes_per_row;	/* continue with leftmost byte of next row */
   }
-
-  return(image);
 }
 
-static unsigned int *buildIndex(unsigned int width,
-				unsigned int zoom,
-				unsigned int *rwidth)
+static boolean XImage_to_Pixmap(Display *display, Window parent,
+				XImageInfo *ximageinfo)
 {
-  float         fzoom;
-  unsigned int *index;
-  unsigned int  a;
+  XGCValues gcv;
 
-  if (!zoom)
+  ximageinfo->pixmap =
+    XCreatePixmap(display, parent,
+		  ximageinfo->ximage->width,
+		  ximageinfo->ximage->height,
+		  ximageinfo->depth);
+
+  ximageinfo->pixmap_mask =
+    XCreatePixmap(display, parent,
+		  ximageinfo->ximage->width,
+		  ximageinfo->ximage->height,
+		  1);
+
+  /* build and cache the GC */
+
+  if (!ximageinfo->gc)
   {
-    fzoom = 100.0;
-    *rwidth = width;
-  }
-  else
-  {
-    fzoom = (float)zoom / 100.0;
-    *rwidth = (unsigned int)(fzoom * width + 0.5);
-  }
-  index = (unsigned int *)checked_malloc(sizeof(unsigned int) * *rwidth);
-  for (a=0; a<*rwidth; a++)
-  {
-    if (zoom)
-      *(index + a) = (unsigned int)((float)a / fzoom + 0.5);
-    else
-      *(index + a) = a;
-  }
-  return(index);
-}
-
-Image *zoom(Image *oimage, unsigned int xzoom, unsigned int yzoom)
-{
-  Image        *image;
-  unsigned int *xindex, *yindex;
-  unsigned int  xwidth, ywidth;
-  unsigned int  x, y, xsrc, ysrc;
-  unsigned int  pixlen;
-  unsigned int  srclinelen;
-  unsigned int  destlinelen;
-  byte         *srcline, *srcptr;
-  byte         *destline, *destptr;
-  byte          srcmask, destmask, bit;
-  Pixel         value;
-
-  if ((!xzoom || xzoom == 100) && (!yzoom || yzoom == 100)) 
-    return(oimage);
-
-  if (!xzoom)
-    printf("  Zooming image Y axis by %d%%...", yzoom);
-  else if (!yzoom)
-    printf("  Zooming image X axis by %d%%...", xzoom);
-  else if (xzoom == yzoom)
-    printf("  Zooming image by %d%%...", xzoom);
-  else
-    printf("  Zooming image X axis by %d%% and Y axis by %d%%...",
-	     xzoom, yzoom);
-  fflush(stdout);
-
-  xindex = buildIndex(oimage->width, xzoom, &xwidth);
-  yindex = buildIndex(oimage->height, yzoom, &ywidth);
-
-  switch (oimage->type)
-  {
-    case IBITMAP:
-      image = newBitImage(xwidth, ywidth);
-      for (x=0; x<oimage->rgb.used; x++)
-      {
-	*(image->rgb.red + x) = *(oimage->rgb.red + x);
-	*(image->rgb.green + x) = *(oimage->rgb.green + x);
-	*(image->rgb.blue + x) = *(oimage->rgb.blue + x);
-      }
-      image->rgb.used = oimage->rgb.used;
-      destline = image->data;
-      destlinelen = (xwidth / 8) + (xwidth % 8 ? 1 : 0);
-      srcline = oimage->data;
-      srclinelen = (oimage->width / 8) + (oimage->width % 8 ? 1 : 0);
-      for (y=0, ysrc=*(yindex + y); y<ywidth; y++)
-      {
-	while (ysrc != *(yindex + y))
-	{
-	  ysrc++;
-	  srcline += srclinelen;
-	}
-	srcptr = srcline;
-	destptr = destline;
-	srcmask = 0x80;
-	destmask = 0x80;
-	bit = srcmask & *srcptr;
-	for (x=0, xsrc=*(xindex + x); x<xwidth; x++)
-	{
-	  if (xsrc != *(xindex + x))
-	  {
-	    do
-	    {
-	      xsrc++;
-	      if (!(srcmask >>= 1))
-	      {
-		srcmask = 0x80;
-		srcptr++;
-	      }
-	    }
-	    while (xsrc != *(xindex + x));
-
-	    bit = srcmask & *srcptr;
-	  }
-	  if (bit)
-	    *destptr |= destmask;
-	  if (!(destmask >>= 1))
-	  {
-	    destmask = 0x80;
-	    destptr++;
-	  }
-	}
-	destline += destlinelen;
-      }
-      break;
-
-    case IRGB:
-      image = newRGBImage(xwidth, ywidth, oimage->depth);
-      for (x=0; x<oimage->rgb.used; x++)
-      {
-	*(image->rgb.red + x) = *(oimage->rgb.red + x);
-	*(image->rgb.green + x) = *(oimage->rgb.green + x);
-	*(image->rgb.blue + x) = *(oimage->rgb.blue + x);
-      }
-      image->rgb.used = oimage->rgb.used;
-
-      pixlen = oimage->pixlen;
-      destptr = image->data;
-      srcline = oimage->data;
-      srclinelen = oimage->width * pixlen;
-      for (y=0, ysrc=*(yindex + y); y<ywidth; y++)
-      {
-	while (ysrc != *(yindex + y))
-	{
-	  ysrc++;
-	  srcline += srclinelen;
-	}
-
-	srcptr = srcline;
-	value = memToVal(srcptr, image->pixlen);
-
-	for (x=0, xsrc=*(xindex + x); x<xwidth; x++)
-	{
-	  if (xsrc != *(xindex + x))
-	  {
-	    do
-	    {
-	      xsrc++;
-	      srcptr++;
-	    }
-	    while (xsrc != *(xindex + x));
-	    value = memToVal(srcptr, 1);
-	  }
-	  valToMem(value, destptr, 1);
-	  destptr++;
-	}
-      }
-      break;
-
-    default:
-      /* no zooming */
-      return(oimage);
-      break;
+    gcv.function = GXcopy;
+    ximageinfo->gc =
+      XCreateGC(ximageinfo->display, ximageinfo->pixmap,
+		GCFunction, &gcv);
   }
 
-  free((byte *)xindex);
-  free((byte *)yindex);
-
-  printf("done\n");
-
-  return(image);
-}
-
-void compress(Image *image)
-{
-  unsigned char	  *used, fast[32][32][32];
-  unsigned int     dmask;       /* Depth mask protection */
-  Pixel           *map;
-  unsigned int     next_index;
-  Intensity *red = image->rgb.red,
-            *green = image->rgb.green,
-            *blue = image->rgb.blue;
-  Intensity r,g,b;
-  unsigned int x, y, badcount = 0, dupcount = 0, unusedcount = 0;
-  unsigned char *pixptr, *pixend;
-
-  if (!RGBP(image) || image->rgb.compressed)
-    return;
-
-  used = (unsigned char *)checked_calloc(sizeof(unsigned char) * depthToColors(image->depth));
-  dmask = (1 << image->depth) -1;	/* Mask any illegal bits for that depth */
-  map = (Pixel *)checked_calloc(sizeof(Pixel) * depthToColors(image->depth));
-
-  /* init fast duplicate check table */
-  for(r=0;r<32;r++)
-    for(g=0;g<32;g++)
-      for(b=0;b<32;b++)
-        fast[r][g][b] = 0;
-
-  /* do pass 1 through the image to check index usage */
-
-  pixptr = image->data;
-  pixend = pixptr + (image->height * image->width);
-  for(;pixptr < pixend; pixptr++)
-    used[(*pixptr) & dmask] = 1;
-
-  /* count the bad pixels */
-  for (x = image->rgb.used; x < depthToColors(image->depth); x++)
-    if (used[x])
-      badcount++;
-
-  /* figure out duplicates and unuseds, and create the new mapping */
-  next_index = 0;
-  for (x = 0; x < image->rgb.used; x++)
+  if (!ximageinfo->gc_mask)
   {
-    if (!used[x])
-    {
-      unusedcount++;
-      continue;		/* delete this index */
-    }
-
-    /* check for duplicate */
-    r = red[x];
-    g = green[x];
-    b = blue[x];
-    if (fast[r>>11][g>>11][b>>11])	/* if matches fast check */
-    {
-      /* then do a linear search */
-      for (y = x+1; y < image->rgb.used; y++)
-      {
-        if (r == red[y] && g == green[y] && b == blue[y])
-          break;
-      }
-      if (y < image->rgb.used)	/* found match */
-      {
-	map[x] = y;
-        dupcount++;
-	continue;		/* delete this index */
-      }
-      fast[r>>11][g>>11][b>>11] = 1;
-    }
-    /* will map to this index */
-    map[x] = next_index;
-    next_index++;
+    gcv.function = GXcopy;
+    gcv.foreground = ximageinfo->foreground;
+    gcv.background = ximageinfo->background;
+    ximageinfo->gc_mask =
+      XCreateGC(ximageinfo->display, ximageinfo->pixmap_mask,
+		GCFunction | GCForeground | GCBackground, &gcv);
   }
 
-  /* change the image pixels */
-  pixptr = image->data;
-  pixend = pixptr + (image->height * image->width);
-  for(;pixptr < pixend; pixptr++)
-    *pixptr = map[(*pixptr) & dmask];
+  XPutImage(ximageinfo->display, ximageinfo->pixmap, ximageinfo->gc,
+	    ximageinfo->ximage, 0, 0, 0, 0,
+	    ximageinfo->ximage->width, ximageinfo->ximage->height);
+  XPutImage(ximageinfo->display, ximageinfo->pixmap_mask, ximageinfo->gc_mask,
+	    ximageinfo->ximage_mask, 0, 0, 0, 0,
+	    ximageinfo->ximage->width, ximageinfo->ximage->height);
 
-  /* change the colormap */
-  for (x = 0; x < image->rgb.used; x++)
-  {
-    if (!used[x])
-      continue;
-    red[map[x]] = red[x];
-    green[map[x]] = green[x];
-    blue[map[x]] = blue[x];
-  }
-  image->rgb.used = next_index;
-
-  /* clean up */
-  free(map);
-  free(used);
-
-
-
-#if 0
-  if (badcount)
-    printf("%d out-of-range pixels, ", badcount);
-
-  if (!unusedcount && !dupcount)
-    printf("no improvment\n");
-  else
-  {
-    if (dupcount)
-      printf("%d duplicate%s and %d unused color%s removed...",
-	     dupcount, (dupcount == 1 ? "" : "s"),
-	     unusedcount, (unusedcount == 1 ? "" : "s"));
-    printf("%d unique color%s\n",
-	   next_index, (next_index == 1 ? "" : "s"));
-  }
-#endif
-
-
-
-  image->rgb.compressed = TRUE;	/* don't do it again */
-}
-
-
-
-
-Pixmap XImage_to_Pixmap(Display *display, Window parent,
-			XImageInfo *ximageinfo)
-{
-  Pixmap pixmap;
-
-  pixmap = XCreatePixmap(display, parent,
-			 ximageinfo->ximage->width, ximageinfo->ximage->height,
-			 ximageinfo->depth);
-
-  ximageinfo->drawable = pixmap;
-
-  XImage_to_Drawable(ximageinfo, 0, 0, 0, 0,
-		     ximageinfo->ximage->width, ximageinfo->ximage->height);
-  return(pixmap);
+  return (ximageinfo->pixmap != None && ximageinfo->pixmap_mask != None);
 }
 
 /* find the best pixmap depth supported by the server for a particular
  * visual and return that depth.
- *
- * this is complicated by R3's lack of XListPixmapFormats so we fake it
- * by looking at the structure ourselves.
  */
 
 static unsigned int bitsPerPixelAtDepth(Display *display, int screen,
@@ -402,8 +119,7 @@ static unsigned int bitsPerPixelAtDepth(Display *display, int screen,
   }
   XFree(xf);
 
-  /* this should never happen; if it does, we're in trouble
-   */
+  /* this should never happen; if it does, we're in trouble */
 
   fprintf(stderr, "bitsPerPixelAtDepth: Can't find pixmap depth info!\n");
   exit(1);
@@ -423,6 +139,12 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
   XColor xcolor;
   XGCValues gcv;
   XImageInfo *ximageinfo;
+
+  /* for building image */
+  byte *data, *destptr, *srcptr;
+
+  /* for building image mask */
+  byte *data_mask;
 
   if (!global_cmap)
   {
@@ -447,7 +169,9 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
   ximageinfo->rootimage = FALSE;
   ximageinfo->foreground = ximageinfo->background= 0;
   ximageinfo->gc = NULL;
+  ximageinfo->gc_mask = NULL;
   ximageinfo->ximage = NULL;
+  ximageinfo->ximage_mask = NULL;
 
   switch (visual->class)
   {
@@ -556,13 +280,20 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
       ximageinfo->index =
 	(Pixel *)checked_malloc(sizeof(Pixel) * image->rgb.used);
 
+#if 0
       for (a=0; a<image->rgb.used; a++)
+#endif
+
+      for (a=0; a<MAX_COLORS; a++)
       {
 	XColor xcolor2;
 	unsigned short mask;
 	int color_found;
   	int i;
-  
+
+	if (!image->rgb.color_used[a])
+	  continue;
+
   	xcolor.red = *(image->rgb.red + a);
   	xcolor.green = *(image->rgb.green + a);
   	xcolor.blue = *(image->rgb.blue + a);
@@ -572,9 +303,8 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
 	{
 	  if (!private_cmap)
 	  {
-	    /*
-	    printf("switching to private colormap...\n");
-	    */
+	    if (options.verbose)
+	      Error(ERR_RETURN, "switching to private colormap");
 
 	    /* we just filled up the default colormap -- get a private one
 	       which contains all already allocated colors */
@@ -680,144 +410,141 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
       break;
   }
 
-  /* create an XImage and related colormap based on the image type
-   * we have.
-   */
+  /* CREATE IMAGE ITSELF */
+  /* modify image data to match visual and colormap */
 
-  /*
-  printf("  Building XImage...");
-  fflush(stdout);
-  */
+  dbits = bitsPerPixelAtDepth(display, screen, ddepth);/* bits per pixel */
+  dpixlen = (dbits + 7) / 8;			/* bytes per pixel */
 
-  switch (image->type)
+  ximageinfo->ximage = XCreateImage(display, visual, ddepth, ZPixmap, 0,
+				    NULL, image->width, image->height,
+				    8, image->width * dpixlen);
+
+  data = (byte *)checked_malloc(image->width * image->height * dpixlen);
+  ximageinfo->depth = ddepth;
+  ximageinfo->ximage->data = (char *)data;
+  ximageinfo->ximage->byte_order = MSBFirst;
+  srcptr = image->data;
+  destptr = data;
+
+  switch (visual->class)
   {
-    case IBITMAP:
+    case DirectColor:
+    case TrueColor:
     {
-      byte *data;
+      Pixel pixval;
 
-      /* we copy the data to be more consistent
-       */
-
-      linelen = ((image->width + 7) / 8);
-      data= checked_malloc(linelen * image->height);
-
-      memcpy((char *)data, (char *)image->data, linelen * image->height);
-
-      gcv.function= GXcopy;
-      ximageinfo->ximage= XCreateImage(display, visual, 1, XYBitmap,
-				       0, (char *)data, image->width,
-				       image->height,
-				       8, linelen);
-
-      /* use this if you want to use the bitmap as a mask */
-      ximageinfo->depth = image->depth;
-
-      if(visual->class == DirectColor || visual->class == TrueColor)
+      for (y=0; y<image->height; y++)
       {
-        Pixel pixval;
-        dbits= bitsPerPixelAtDepth(display, screen, ddepth);
-        dpixlen= (dbits + 7) / 8;
-        pixval= redvalue[image->rgb.red[0] >> 8] |
-                greenvalue[image->rgb.green[0] >> 8] |
-                bluevalue[image->rgb.blue[0] >> 8];
-        ximageinfo->background = pixval;
-        pixval= redvalue[image->rgb.red[1] >> 8] |
-                greenvalue[image->rgb.green[1] >> 8] |
-                bluevalue[image->rgb.blue[1] >> 8];
-        ximageinfo->foreground = pixval;
+	for (x=0; x<image->width; x++)
+	{
+	  pixval = memToVal(srcptr, 1);
+	  pixval =
+	    redvalue[image->rgb.red[pixval] >> 8] |
+	    greenvalue[image->rgb.green[pixval] >> 8] |
+	    bluevalue[image->rgb.blue[pixval] >> 8];
+	  valToMem(pixval, destptr, dpixlen);
+	  srcptr += 1;
+	  destptr += dpixlen;
+	}
       }
-      else	/* Not Direct or True Color */
-      {
-        ximageinfo->foreground = BlackPixel(display, screen);
-        ximageinfo->background = WhitePixel(display, screen);
-      }
-      ximageinfo->ximage->bitmap_bit_order= MSBFirst;
-      ximageinfo->ximage->byte_order= MSBFirst;
-
       break;
     }
 
-    case IRGB:
+    default:
     {
-      /* modify image data to match visual and colormap
-       */
-
-      byte *data, *destptr, *srcptr;
-
-      dbits = bitsPerPixelAtDepth(display, screen, ddepth);/* bits per pixel */
-      dpixlen = (dbits + 7) / 8;			/* bytes per pixel */
-
-      ximageinfo->ximage = XCreateImage(display, visual, ddepth, ZPixmap, 0,
-					NULL, image->width, image->height,
-					8, image->width * dpixlen);
-
-      data = (byte *)checked_malloc(image->width * image->height * dpixlen);
-      ximageinfo->depth = ddepth;
-      ximageinfo->ximage->data = (char *)data;
-      ximageinfo->ximage->byte_order = MSBFirst;
-      srcptr = image->data;
-      destptr = data;
-
-      switch (visual->class)
+      if (dpixlen == 1)			/* most common */
       {
-  	case DirectColor:
-  	case TrueColor:
-  	{
-  	  Pixel pixval;
-
-	  for (y=0; y<image->height; y++)
+	for (y=0; y<image->height; y++)
+	{
+	  for (x=0; x<image->width; x++)
 	  {
-	    for (x=0; x<image->width; x++)
-	    {
-	      pixval = memToVal(srcptr, 1);
-	      pixval = redvalue[image->rgb.red[pixval] >> 8] |
-		greenvalue[image->rgb.green[pixval] >> 8] |
-		bluevalue[image->rgb.blue[pixval] >> 8];
-	      valToMem(pixval, destptr, dpixlen);
-	      srcptr += 1;
-	      destptr += dpixlen;
-	    }
-	  }
-  	  break;
-  	}
-  
-        default:
-	{  
-	  if (dpixlen == 1)			/* most common */
-	  {
-	    for (y=0; y<image->height; y++)
-	    {
-	      for (x=0; x<image->width; x++)
-	      {
-		*destptr = ximageinfo->index[c + *srcptr];
-		srcptr++;
-		destptr++;
-	      }
-	    }
-	  }
-	  else					/* less common */
-	  {
-	    for (y=0; y<image->height; y++)
-	    {
-	      for (x=0; x<image->width; x++)
-	      {
-		register unsigned long temp;
-		temp = memToVal(srcptr, 1);
-		valToMem(ximageinfo->index[c + temp], destptr, dpixlen);
-		srcptr += 1;
-		destptr += dpixlen;
-	      }
-	    }
+	    *destptr = ximageinfo->index[c + *srcptr];
+	    srcptr++;
+	    destptr++;
 	  }
 	}
-	break;
+      }
+      else					/* less common */
+      {
+	for (y=0; y<image->height; y++)
+	{
+	  for (x=0; x<image->width; x++)
+	  {
+	    register unsigned long temp;
+	    temp = memToVal(srcptr, 1);
+	    valToMem(ximageinfo->index[c + temp], destptr, dpixlen);
+	    srcptr += 1;
+	    destptr += dpixlen;
+	  }
+	}
       }
     }
   }
 
+  /* NOW CREATE IMAGE MASK */
+  /* we copy the data to be more consistent */
+
+  linelen = ((image->width + 7) / 8);
+  data_mask = checked_malloc(linelen * image->height);
+
+  memcpy((char *)data_mask, (char *)image->data_mask,
+	 linelen * image->height);
+
+  gcv.function = GXcopy;
+  ximageinfo->ximage_mask =
+    XCreateImage(display, visual, 1, XYBitmap, 0, (char *)data_mask,
+		 image->width, image->height, 8, linelen);
+
+
+  /* use this if you want to use the bitmap as a mask */
   /*
-  printf("done\n");
-  */
+    ximageinfo->depth = image->depth;
+    */
+
+  if (visual->class == DirectColor || visual->class == TrueColor)
+  {
+    Pixel pixval;
+    dbits = bitsPerPixelAtDepth(display, screen, ddepth);
+    dpixlen = (dbits + 7) / 8;
+    pixval =
+      redvalue[65535 >> 8] |
+      greenvalue[65535 >> 8] |
+      bluevalue[65535 >> 8];
+    /*
+      redvalue[image->rgb.red[0] >> 8] |
+      greenvalue[image->rgb.green[0] >> 8] |
+      bluevalue[image->rgb.blue[0] >> 8];
+      */
+    ximageinfo->background = pixval;
+    pixval =
+      redvalue[0 >> 8] |
+      greenvalue[0 >> 8] |
+      bluevalue[0 >> 8];
+    /*
+      redvalue[image->rgb.red[1] >> 8] |
+      greenvalue[image->rgb.green[1] >> 8] |
+      bluevalue[image->rgb.blue[1] >> 8];
+      */
+    ximageinfo->foreground = pixval;
+  }
+  else	/* Not Direct or True Color */
+  {
+    ximageinfo->foreground = BlackPixel(display, screen);
+    ximageinfo->background = WhitePixel(display, screen);
+  }
+
+  /*
+    ximageinfo->foreground = BlackPixel(display, screen);
+    ximageinfo->background = WhitePixel(display, screen);
+    */
+
+  ximageinfo->foreground = WhitePixel(display, screen);
+  ximageinfo->background = BlackPixel(display, screen);
+
+
+  ximageinfo->ximage_mask->bitmap_bit_order = MSBFirst;
+  ximageinfo->ximage_mask->byte_order = MSBFirst;
 
   if (redvalue)
   {
@@ -827,39 +554,6 @@ XImageInfo *Image_to_XImage(Display *display, int screen, Visual *visual,
   }
 
   return(ximageinfo);
-}
-
-/* Given an XImage and a drawable, move a rectangle from the Ximage
- * to the drawable.
- */
-
-void XImage_to_Drawable(XImageInfo *ximageinfo,
-			int src_x, int src_y, int dst_x, int dst_y,
-			unsigned int w, unsigned int h)
-{
-  XGCValues gcv;
-
-  /* build and cache the GC
-   */
-
-  if (!ximageinfo->gc)
-  {
-    gcv.function = GXcopy;
-    if (ximageinfo->ximage->depth == 1)
-    {
-      gcv.foreground = ximageinfo->foreground;
-      gcv.background = ximageinfo->background;
-      ximageinfo->gc = XCreateGC(ximageinfo->display, ximageinfo->drawable,
-				 GCFunction | GCForeground | GCBackground,
-				 &gcv);
-    }
-    else
-      ximageinfo->gc = XCreateGC(ximageinfo->display, ximageinfo->drawable,
-				 GCFunction, &gcv);
-  }
-
-  XPutImage(ximageinfo->display, ximageinfo->drawable, ximageinfo->gc,
-	    ximageinfo->ximage, src_x, src_y, dst_x, dst_y, w, h);
 }
 
 /* free up anything cached in the local Ximage structure.
@@ -883,123 +577,60 @@ void freeXImage(Image *image, XImageInfo *ximageinfo)
   /* should we free private color map to ??? */
 }
 
-
-
-/* this table is useful for quick conversions between depth and ncolors
- */
-
-unsigned long DepthToColorsTable[] =
+Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
 {
-  /*  0 */ 1,
-  /*  1 */ 2,
-  /*  2 */ 4,
-  /*  3 */ 8,
-  /*  4 */ 16,
-  /*  5 */ 32,
-  /*  6 */ 64,
-  /*  7 */ 128,
-  /*  8 */ 256,
-  /*  9 */ 512,
-  /* 10 */ 1024,
-  /* 11 */ 2048,
-  /* 12 */ 4096,
-  /* 13 */ 8192,
-  /* 14 */ 16384,
-  /* 15 */ 32768,
-  /* 16 */ 65536,
-  /* 17 */ 131072,
-  /* 18 */ 262144,
-  /* 19 */ 524288,
-  /* 20 */ 1048576,
-  /* 21 */ 2097152,
-  /* 22 */ 4194304,
-  /* 23 */ 8388608,
-  /* 24 */ 16777216
-};
+  Image *image;
+  unsigned int bytes_per_row;
+  const unsigned int bytes_per_pixel = 1;
+  int i;
 
-void newRGBMapData(RGBMap *rgb, unsigned int size)
-{
-  rgb->used = 0;
-  rgb->size = size;
-  rgb->compressed = FALSE;
-  rgb->red = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-  rgb->green = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-  rgb->blue = (Intensity *)checked_malloc(sizeof(Intensity) * size);
-}
+  if (depth > 8)
+    Error(ERR_EXIT, "images with more than 256 colors are not supported");
 
-void freeRGBMapData(RGBMap *rgb)
-{
-  free((byte *)rgb->red);
-  free((byte *)rgb->green);
-  free((byte *)rgb->blue);
-}
-
-Image *newBitImage(unsigned int width, unsigned int height)
-{
-  Image        *image;
-  unsigned int  linelen;
-
-  image = (Image *)checked_malloc(sizeof(Image));
-  image->type = IBITMAP;
-  newRGBMapData(&(image->rgb), (unsigned int)2);
-  *(image->rgb.red)= *(image->rgb.green) = *(image->rgb.blue)= 65535;
-  *(image->rgb.red + 1)= *(image->rgb.green + 1) = *(image->rgb.blue + 1)= 0;
-  image->rgb.used = 2;
-  image->width = width;
-  image->height = height;
-  image->depth = 1;
-  linelen = ((width + 7) / 8);
-  image->data = (unsigned char *)checked_calloc(linelen * height);
-  return(image);
-}
-
-Image *newRGBImage(unsigned int width, unsigned int height, unsigned int depth)
-{
-  Image        *image;
-  unsigned int  pixlen, numcolors;
-
-  if (depth == 0)	/* special case for `zero' depth image, which is */
-    depth = 1;		/* sometimes interpreted as `one color' */
-  pixlen = ((depth+7) / 8);
-  numcolors = depthToColors(depth);
-  image = (Image *)checked_malloc(sizeof(Image));
-  image->type = IRGB;
-  newRGBMapData(&(image->rgb), numcolors);
+  depth = 8;
+  image = checked_malloc(sizeof(Image));
+  image->data = checked_malloc(width * height * bytes_per_pixel);
   image->width = width;
   image->height = height;
   image->depth = depth;
-  image->pixlen = pixlen;
-  image->data = (unsigned char *)checked_malloc(width * height * pixlen);
-  return(image);
-}
+  image->rgb.used = 0;
+  for (i=0; i<MAX_COLORS; i++)
+    image->rgb.color_used[i] = FALSE;
 
-void freeImageData(Image *image)
-{
-  freeRGBMapData(&(image->rgb));
-  free(image->data);
+  bytes_per_row = (width + 7) / 8;
+  image->data_mask = checked_calloc(bytes_per_row * height);
+
+  return image;
 }
 
 void freeImage(Image *image)
 {
-  freeImageData(image);
-  free((byte *)image);
+  free(image->data);
+  free(image->data_mask);
+  free(image);
 }
 
 /* ------------------------------------------------------------------------- */
 
 
 #ifdef DEBUG
-/*
+
 #define DEBUG_TIMING
-*/
+
 #endif
 
 
 int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
 			Pixmap *pixmap, Pixmap *pixmap_mask)
 {
+  Image *image;
+  XImageInfo *ximageinfo;
+
+  /*
   Image *image, *image_mask;
   XImageInfo *ximageinfo, *ximageinfo_mask;
+  */
+
   int screen;
   Visual *visual;
   unsigned int depth;
@@ -1009,12 +640,8 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
   count1 = Counter();
 #endif
 
-  /* load GIF file */
-  if (!(image = Read_PCX_to_Image(filename)))
-  {
-    printf("Loading GIF image failed -- maybe no GIF...\n");
-    exit(1);
-  }
+  if ((image = Read_PCX_to_Image(filename)) == NULL)
+    return PCX_FileInvalid;
 
 #ifdef DEBUG_TIMING
   count2 = Counter();
@@ -1023,18 +650,12 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
   count1 = Counter();
 #endif
 
-  if (image->depth > 8)
-  {
-    printf("Sorry, GIFs with more than 256 colors are not supported.\n");
-    exit(1);
-  }
-
-  /* minimize colormap */
-  compress(image);
+  /* create image mask */
+  Image_to_Mask(image);
 
 #ifdef DEBUG_TIMING
   count2 = Counter();
-  printf("   COMPRESSING IMAGE COLORMAP IN %.2f SECONDS\n",
+  printf("   CONVERTING IMAGE TO MASK IN %.2f SECONDS\n",
 	 (float)(count2-count1)/1000.0);
   count1 = Counter();
 #endif
@@ -1061,7 +682,7 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
     XSetWindowColormap(display, window, ximageinfo->cmap);
 
   /* convert XImage to Pixmap */
-  if ((*pixmap = XImage_to_Pixmap(display, window, ximageinfo)) == None)
+  if (!(XImage_to_Pixmap(display, window, ximageinfo)))
   {
     fprintf(stderr, "Cannot convert XImage to Pixmap.\n");
     exit(1);
@@ -1074,44 +695,8 @@ int Read_PCX_to_Pixmaps(Display *display, Window window, char *filename,
   count1 = Counter();
 #endif
 
-  /* create mono image for masking */
-  image_mask = monochrome(image);
+  *pixmap = ximageinfo->pixmap;
+  *pixmap_mask = ximageinfo->pixmap_mask;
 
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING IMAGE TO MASK IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
-#endif
-
-  /* convert internal image structure to X11 XImage */
-  if (!(ximageinfo_mask = Image_to_XImage(display, screen, visual, depth,
-					image_mask)))
-  {
-    fprintf(stderr, "Cannot convert Image to XImage.\n");
-    exit(1);
-  }
-
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING MASK TO XIMAGE IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
-#endif
-
-  /* convert XImage to Pixmap */
-  if ((*pixmap_mask = XImage_to_Pixmap(display, window, ximageinfo_mask)) == None)
-  {
-    fprintf(stderr, "Cannot convert XImage to Pixmap.\n");
-    exit(1);
-  }
-
-#ifdef DEBUG_TIMING
-  count2 = Counter();
-  printf("   CONVERTING MASK TO PIXMAP IN %.2f SECONDS\n",
-	 (float)(count2-count1)/1000.0);
-  count1 = Counter();
-#endif
-
-  return(GIF_Success);
+  return(PCX_Success);
 }

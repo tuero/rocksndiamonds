@@ -16,67 +16,52 @@
 
 #include "main.h"
 
+#define MAX_COLORS	256	/* maximal number of colors for each image */
+
 typedef unsigned short Intensity; /* what X thinks an RGB intensity is */
 
-/* This struct holds the X-client side bits for a rendered image. */
 typedef struct
 {
-  Display  *display;	/* destination display */
-  int       screen;	/* destination screen */
-  int       depth;	/* depth of drawable we want/have */
-  Drawable  drawable;	/* drawable to send image to */
-  Pixel    *index;	/* array of pixel values allocated */
-  int       no;		/* number of pixels in the array */
-  int       rootimage;	/* True if is a root image - eg, retain colors */
+  Display  *display;	/* destination display                              */
+  int       screen;	/* destination screen                               */
+  int       depth;	/* depth of drawable we want/have                   */
+  Drawable  drawable;	/* drawable to send image to                        */
+  Pixel    *index;	/* array of pixel values allocated                  */
+  int       no;		/* number of pixels in the array                    */
+  int       rootimage;	/* True if is a root image - eg, retain colors      */
   Pixel     foreground; /* foreground and background pixels for mono images */
   Pixel     background;
-  Colormap  cmap;	/* colormap used for image */
-  GC        gc;		/* cached gc for sending image */
-  XImage   *ximage;	/* ximage structure */
+  Colormap  cmap;	/* colormap used for image                          */
+  GC        gc;		/* cached gc for sending image                      */
+  GC        gc_mask;	/* cached gc for sending image mask                 */
+  XImage   *ximage;	/* ximage structure                                 */
+  XImage   *ximage_mask;/* ximage structure of mask                         */
+  Pixmap   pixmap;	/* final pixmap                                     */
+  Pixmap   pixmap_mask;	/* final pixmap of mask                             */
 } XImageInfo;
 
-/* Function declarations */
-void        sendXImage(); /* send.c */
-XImageInfo *imageToXImage();
-Pixmap      ximageToPixmap();
-void        freeXImage();
-
-
-typedef struct rgbmap
+struct RGBMap
 {
-  unsigned int  size;       /* size of RGB map */
-  unsigned int  used;       /* number of colors used in RGB map */
-  int           compressed; /* image uses colormap fully */
-  Intensity    *red;        /* color values in X style */
-  Intensity    *green;
-  Intensity    *blue;
-} RGBMap;
+  unsigned int used;			/* number of colors used in RGB map */
+  Intensity    red[MAX_COLORS];		/* color values in X style          */
+  Intensity    green[MAX_COLORS];
+  Intensity    blue[MAX_COLORS];
+  boolean      color_used[MAX_COLORS];	/* flag if color cell is used       */
+};
 
-/* image structure
- */
-
-typedef struct {
-  unsigned int  type;   /* type of image */
-  RGBMap        rgb;    /* RGB map of image if IRGB type */
-  unsigned int  width;  /* width of image in pixels */
-  unsigned int  height; /* height of image in pixels */
-  unsigned int  depth;  /* depth of image in bits if IRGB type */
-  unsigned int  pixlen; /* length of pixel if IRGB type */
-  byte         *data;   /* data rounded to full byte for each row */
-  float		gamma;	/* gamma of display the image is adjusted for */
+typedef struct
+{
+  struct RGBMap rgb;		/* RGB map of image if IRGB type       */
+  unsigned int  width;		/* width of image in pixels            */
+  unsigned int  height;		/* height of image in pixels           */
+  unsigned int  depth;		/* depth of image in bits if IRGB type */
+  byte         *data;		/* image data                          */
+  byte         *data_mask;	/* clip mask data                      */
 } Image;
 
-#define IBITMAP 0 /* image is a bitmap */
-#define IRGB    1 /* image is RGB */
-
-#define BITMAPP(IMAGE) ((IMAGE)->type == IBITMAP)
-#define RGBP(IMAGE)    ((IMAGE)->type == IRGB)
-
-#define depthToColors(n) DepthToColorsTable[((n) < 24 ? (n) : 24)]
-
 /*
- * Architecture independent memory to value conversions.
- * Note the "Normal" internal format is big endian.
+ * architecture independent memory-to-value conversions
+ * note: the internal format is big endian
  */
 
 #define memToVal(PTR,LEN) (                                   \
@@ -103,16 +88,6 @@ typedef struct {
               *(((byte *)(PTR))+2) = (((unsigned long)(VAL))>> 8),        \
               *(((byte *)(PTR))+3) = ( VAL     ) ))
 
-
-/* return values */
-
-#define GIF_Success		 0
-#define GIF_OpenFailed		-1
-#define GIF_ReadFailed		-2
-#define	GIF_FileInvalid		-3
-#define GIF_NoMemory		-4
-#define GIF_ColorFailed		-5
-
 #define PCX_Success		 0
 #define PCX_OpenFailed		-1
 #define PCX_ReadFailed		-2
@@ -120,32 +95,11 @@ typedef struct {
 #define PCX_NoMemory		-4
 #define PCX_ColorFailed		-5
 
-/* functions */
-
-extern unsigned long DepthToColorsTable[];
-Image *newBitImage();
-Image *newRGBImage();
-void   freeImage();
-void   freeImageData();
-void   newRGBMapData();
-void   freeRGBMapData();
-byte  *lcalloc();
-byte  *lmalloc();
-
-Image *Read_GIF_to_Image();
-Image *Read_PCX_to_Image();
-
-int Read_GIF_to_Pixmaps(Display *, Window, char *, Pixmap *, Pixmap *);
 int Read_PCX_to_Pixmaps(Display *, Window, char *, Pixmap *, Pixmap *);
 
-Image *monochrome();
-Image *zoom();
-
-void compress();
-
-Pixmap XImage_to_Pixmap(Display *, Window, XImageInfo *);
-XImageInfo *Image_to_XImage(Display *, int, Visual *, unsigned int, Image *);
-void XImage_to_Drawable(XImageInfo *, int, int, int, int,
-			unsigned int, unsigned int);
+Image *Read_PCX_to_Image();
+Image *newImage();
+void freeImage();
+void freeXImage();
 
 #endif	/* IMAGE_H */
