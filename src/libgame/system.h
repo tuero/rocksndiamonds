@@ -138,14 +138,18 @@
 /* default name for unknown player names */
 #define ANONYMOUS_NAME		"anonymous"
 
+/* default name for new levels */
+#define NAMELESS_LEVEL_NAME	"nameless level"
+
 /* default text for non-existant artwork */
 #define NOT_AVAILABLE		"(not available)"
 
 /* default value for undefined filename */
 #define UNDEFINED_FILENAME	"[NONE]"
 
-/* default name for new levels */
-#define NAMELESS_LEVEL_NAME	"nameless level"
+/* default values for undefined configuration file parameters */
+#define ARG_UNDEFINED		"-1000000"
+#define ARG_UNDEFINED_VALUE	(atoi(ARG_UNDEFINED))
 
 /* definitions for game sub-directories */
 #ifndef RO_GAME_DIR

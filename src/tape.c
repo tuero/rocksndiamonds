@@ -727,14 +727,14 @@ void AutoPlayTape()
 
     autoplay_level_nr = autoplay_leveldir->first_level;
 
-    printf_line('=', 79);
+    printf_line("=", 79);
     printf("Automatically playing level tapes\n");
-    printf_line('-', 79);
+    printf_line("-", 79);
     printf("Level series identifier: '%s'\n", autoplay_leveldir->identifier);
     printf("Level series name:       '%s'\n", autoplay_leveldir->name);
     printf("Level series author:     '%s'\n", autoplay_leveldir->author);
     printf("Number of levels:        %d\n",   autoplay_leveldir->levels);
-    printf_line('=', 79);
+    printf_line("=", 79);
     printf("\n");
 
     for (i=0; i<MAX_NUM_AUTOPLAY_LEVELS; i++)
@@ -774,11 +774,11 @@ void AutoPlayTape()
   }
 
   printf("\n");
-  printf_line('=', 79);
+  printf_line("=", 79);
   printf("Number of levels played: %d\n", num_levels_played);
   printf("Number of levels solved: %d (%d%%)\n", num_levels_solved,
 	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
-  printf_line('-', 79);
+  printf_line("-", 79);
   printf("Summary (for automatic parsing by scripts):\n");
   printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
 	 autoplay_leveldir->identifier, num_levels_solved, num_levels_played,
@@ -791,7 +791,7 @@ void AutoPlayTape()
 	printf(" %03d", i);
   }
   printf("\n");
-  printf_line('=', 79);
+  printf_line("=", 79);
 
   CloseAllAndExit(0);
 }

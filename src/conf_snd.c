@@ -12,13 +12,18 @@
 ***********************************************************/
 
 #include "libgame/libgame.h"
+#include "main.h"
 
+
+/* List values that are not defined in the configuration file are set to
+   reliable default values. If that value is GFX_ARG_UNDEFINED, it will
+   be dynamically determined, using some of the other list values. */
 
 struct ConfigInfo sound_config_suffix[] =
 {
-  { ".mode_loop",			"0",			TYPE_BOOLEAN },
+  { ".mode_loop",			ARG_UNDEFINED,	TYPE_BOOLEAN },
 
-  { NULL,				NULL,			0	     }
+  { NULL,				NULL,		0	     }
 };
 
 struct ConfigInfo sound_config[] =
@@ -98,7 +103,8 @@ struct ConfigInfo sound_config[] =
   { "yamyam.moving",			SND_FILE_UNDEFINED	},
   { "yamyam.waiting",			"njam.wav"		},
   { "yamyam.eating",			SND_FILE_UNDEFINED	},
-  { "robot.stepping",			"schlurf.wav"		},
+  { "robot.moving",			"schlurf.wav"		},
+  { "robot.moving.mode_loop",		"false"			},
   { "robot.waiting",			SND_FILE_UNDEFINED	},
   { "robot_wheel.activating",		"deng.wav"		},
   { "robot_wheel.active",		"miep.wav"		},

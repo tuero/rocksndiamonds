@@ -702,10 +702,10 @@ void SaveLevel(int level_nr)
 
 void DumpLevel(struct LevelInfo *level)
 {
-  printf_line('-', 79);
+  printf_line("-", 79);
   printf("Level xxx (file version %06d, game version %06d)\n",
 	 level->file_version, level->game_version);
-  printf_line('-', 79);
+  printf_line("-", 79);
 
   printf("Level Author: '%s'\n", level->author);
   printf("Level Title:  '%s'\n", level->name);
@@ -726,7 +726,7 @@ void DumpLevel(struct LevelInfo *level)
   printf("Double Speed Movement:  %s\n", (level->double_speed ? "yes" : "no"));
   printf("EM style slippery gems: %s\n", (level->em_slippery_gems ? "yes" : "no"));
 
-  printf_line('-', 79);
+  printf_line("-", 79);
 }
 
 
@@ -1120,10 +1120,10 @@ void DumpTape(struct TapeInfo *tape)
     return;
   }
 
-  printf_line('-', 79);
+  printf_line("-", 79);
   printf("Tape of Level %03d (file version %06d, game version %06d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
-  printf_line('-', 79);
+  printf_line("-", 79);
 
   for(i=0; i<tape->length; i++)
   {
@@ -1152,7 +1152,7 @@ void DumpTape(struct TapeInfo *tape)
     printf("(%03d)\n", tape->pos[i].delay);
   }
 
-  printf_line('-', 79);
+  printf_line("-", 79);
 }
 
 

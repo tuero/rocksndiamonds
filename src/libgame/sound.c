@@ -2011,6 +2011,7 @@ static void ReloadCustomSounds()
   printf("DEBUG: reloading sounds '%s' ...\n", artwork.snd_current_identifier);
 #endif
 
+  LoadArtworkConfig(sound_info);
   ReloadCustomArtworkList(sound_info);
 }
 
@@ -2023,19 +2024,20 @@ static void ReloadCustomMusic()
   LoadCustomMusic();
 }
 
-void InitReloadSounds(char *set_identifier)
+void InitReloadCustomSounds(char *set_identifier)
 {
   if (!audio.sound_available)
     return;
 
 #if defined(AUDIO_UNIX_NATIVE)
+  LoadArtworkConfig(sound_info);	/* also load config on sound client */
   WriteReloadInfoToPipe(set_identifier, SND_CTRL_RELOAD_SOUNDS);
 #else
   ReloadCustomSounds();
 #endif
 }
 
-void InitReloadMusic(char *set_identifier)
+void InitReloadCustomMusic(char *set_identifier)
 {
   if (!audio.music_available)
     return;

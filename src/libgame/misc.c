@@ -32,6 +32,60 @@
 #include "text.h"
 
 
+/* ------------------------------------------------------------------------- */
+/* some generic helper functions                                             */
+/* ------------------------------------------------------------------------- */
+
+void fprintf_line(FILE *stream, char *line_string, int line_length)
+{
+  int i;
+
+  for (i=0; i<line_length; i++)
+    fprintf(stream, "%s", line_string);
+
+  fprintf(stream, "\n");
+}
+
+void printf_line(char *line_string, int line_length)
+{
+  fprintf_line(stdout, line_string, line_length);
+}
+
+/* int2str() returns a number converted to a string;
+   the used memory is static, but will be overwritten by later calls,
+   so if you want to save the result, copy it to a private string buffer;
+   there can be 10 local calls of int2str() without buffering the result --
+   the 11th call will then destroy the result from the first call and so on.
+*/
+
+char *int2str(int number, int size)
+{
+  static char shift_array[10][40];
+  static int shift_counter = 0;
+  char *s = shift_array[shift_counter];
+
+  shift_counter = (shift_counter + 1) % 10;
+
+  if (size > 20)
+    size = 20;
+
+  if (size)
+  {
+    sprintf(s, "                    %09d", number);
+    return &s[strlen(s) - size];
+  }
+  else
+  {
+    sprintf(s, "%d", number);
+    return s;
+  }
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* counter functions                                                         */
+/* ------------------------------------------------------------------------- */
+
 #if defined(PLATFORM_MSDOS)
 volatile unsigned long counter = 0;
 
@@ -202,35 +256,10 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
   *counter_var = actual_counter;
 }
 
-/* int2str() returns a number converted to a string;
-   the used memory is static, but will be overwritten by later calls,
-   so if you want to save the result, copy it to a private string buffer;
-   there can be 10 local calls of int2str() without buffering the result --
-   the 11th call will then destroy the result from the first call and so on.
-*/
 
-char *int2str(int number, int size)
-{
-  static char shift_array[10][40];
-  static int shift_counter = 0;
-  char *s = shift_array[shift_counter];
-
-  shift_counter = (shift_counter + 1) % 10;
-
-  if (size > 20)
-    size = 20;
-
-  if (size)
-  {
-    sprintf(s, "                    %09d", number);
-    return &s[strlen(s) - size];
-  }
-  else
-  {
-    sprintf(s, "%d", number);
-    return s;
-  }
-}
+/* ------------------------------------------------------------------------- */
+/* random generator functions                                                */
+/* ------------------------------------------------------------------------- */
 
 unsigned int SimpleRND(unsigned int max)
 {
@@ -301,6 +330,11 @@ unsigned int InitRND(long seed)
   }
 #endif
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* system info functions                                                     */
+/* ------------------------------------------------------------------------- */
 
 char *getLoginName()
 {
@@ -384,6 +418,11 @@ char *getHomeDir()
 #endif
 }
 
+
+/* ------------------------------------------------------------------------- */
+/* various string functions                                                  */
+/* ------------------------------------------------------------------------- */
+
 char *getPath2(char *path1, char *path2)
 {
   char *complete_path = checked_malloc(strlen(path1) + 1 +
@@ -435,6 +474,11 @@ char *getStringToLower(char *s)
 
   return s_copy;
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* command line option handling functions                                    */
+/* ------------------------------------------------------------------------- */
 
 static void printUsage()
 {
@@ -631,6 +675,11 @@ void GetOptions(char *argv[])
   }
 }
 
+
+/* ------------------------------------------------------------------------- */
+/* error handling functions                                                  */
+/* ------------------------------------------------------------------------- */
+
 /* used by SetError() and GetError() to store internal error messages */
 static char internal_error[1024];	/* this is bad */
 
@@ -650,6 +699,7 @@ char *GetError()
 
 void Error(int mode, char *format, ...)
 {
+  static boolean last_line_was_separator = FALSE;
   char *process_name = "";
   FILE *error = stderr;
   char *newline = "\n";
@@ -657,6 +707,18 @@ void Error(int mode, char *format, ...)
   /* display warnings only when running in verbose mode */
   if (mode & ERR_WARN && !options.verbose)
     return;
+
+  if (mode == ERR_RETURN_LINE)
+  {
+    if (!last_line_was_separator)
+      fprintf_line(error, format, 79);
+
+    last_line_was_separator = TRUE;
+
+    return;
+  }
+
+  last_line_was_separator = FALSE;
 
 #if defined(PLATFORM_MSDOS)
   newline = "\r\n";
@@ -711,6 +773,11 @@ void Error(int mode, char *format, ...)
   }
 }
 
+
+/* ------------------------------------------------------------------------- */
+/* memory allocation functions                                               */
+/* ------------------------------------------------------------------------- */
+
 void *checked_malloc(unsigned long size)
 {
   void *ptr;
@@ -744,6 +811,11 @@ void *checked_realloc(void *ptr, unsigned long size)
 
   return ptr;
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* various helper functions                                                  */
+/* ------------------------------------------------------------------------- */
 
 inline void swap_numbers(int *i1, int *i2)
 {
@@ -1292,9 +1364,9 @@ boolean get_boolean_from_string(char *s)
 }
 
 
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 /* functions for generic lists                                               */
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 
 ListNode *newListNode()
 {
@@ -1372,9 +1444,9 @@ void dumpList(ListNode *node_first)
 }
 
 
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 /* functions for checking filenames                                          */
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 
 boolean FileIsGraphic(char *filename)
 {
@@ -1423,13 +1495,14 @@ boolean FileIsArtworkType(char *basename, int type)
   return FALSE;
 }
 
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 /* functions for loading artwork configuration information                   */
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 
 static int get_parameter_value(int type, char *value)
 {
-  return (type == TYPE_INTEGER ? get_integer_from_string(value) :
+  return (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
+	  type == TYPE_INTEGER ? get_integer_from_string(value) :
 	  type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
 	  -1);
 }
@@ -1533,74 +1606,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   return file_list;
 }
 
-#if 0
-static void CheckArtworkConfig(struct ArtworkListInfo *artwork_info)
-{
-  struct FileInfo *file_list = artwork_info->file_list;
-  struct ConfigInfo *suffix_list = artwork_info->suffix_list;
-  int num_file_list_entries = artwork_info->num_file_list_entries;
-  int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
-  char *filename = getCustomArtworkConfigFilename(artwork_info->type);
-  struct SetupFileList *setup_file_list;
-  char *known_token_value = "[KNOWN_TOKEN]";
-  int i, j;
-
-  if (!options.verbose)
-    return;
-
-  if (filename == NULL)
-    return;
-
-  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
-    return;
-
-  for (i=0; i<num_file_list_entries; i++)
-  {
-    /* check for config token that is the base token without any suffixes */
-    if (getTokenValue(setup_file_list, file_list[i].token) != NULL)
-    {
-      /* mark token as well known from default config */
-      setTokenValue(setup_file_list, file_list[i].token, known_token_value);
-    }
-
-    /* check for config tokens that can be build by base token and suffixes */
-    for (j=0; j<num_suffix_list_entries; j++)
-    {
-      char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
-
-      if (getTokenValue(setup_file_list, token) != NULL)
-      {
-	/* mark token as well known from default config */
-	setTokenValue(setup_file_list, token, known_token_value);
-      }
-
-      free(token);
-    }
-  }
-
-  /* set some additional tokens to "known" */
-  setTokenValue(setup_file_list, "name", known_token_value);
-  setTokenValue(setup_file_list, "sort_priority", known_token_value);
-
-  /* check for each token in config file if it is defined in default config */
-  while (setup_file_list != NULL)
-  {
-    if (strcmp(setup_file_list->value, known_token_value) != 0)
-    {
-      Error(ERR_RETURN, "custom artwork configuration warning:");
-      Error(ERR_RETURN, "- config file: '%s'", filename);
-      Error(ERR_RETURN, "- config token: '%s'", setup_file_list->token);
-      Error(ERR_WARN, "token not recognized");
-    }
-
-    setup_file_list = setup_file_list->next;
-  }
-
-  freeSetupFileList(setup_file_list);
-}
-#endif
-
-static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
+void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
   struct ConfigInfo *suffix_list = artwork_info->suffix_list;
@@ -1674,21 +1680,32 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   setTokenValue(setup_file_list, "name", known_token_value);
   setTokenValue(setup_file_list, "sort_priority", known_token_value);
 
-  if (options.verbose)
+  if (options.verbose && !IS_CHILD_PROCESS(audio.mixer_pid))
   {
+    boolean unknown_tokens_found = FALSE;
+
     /* check each token in config file if it is defined in default config */
     while (setup_file_list != NULL)
     {
       if (strcmp(setup_file_list->value, known_token_value) != 0)
       {
-	Error(ERR_RETURN, "custom artwork configuration warning:");
-	Error(ERR_RETURN, "- config file: '%s'", filename);
-	Error(ERR_RETURN, "- config token: '%s'", setup_file_list->token);
-	Error(ERR_WARN, "token not recognized");
+	if (!unknown_tokens_found)
+	{
+	  Error(ERR_RETURN_LINE, "-");
+	  Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
+	  Error(ERR_RETURN, "- config file: '%s'", filename);
+
+	  unknown_tokens_found = TRUE;
+	}
+
+	Error(ERR_RETURN, "- unknown token: '%s'", setup_file_list->token);
       }
 
       setup_file_list = setup_file_list->next;
     }
+
+    if (unknown_tokens_found)
+      Error(ERR_RETURN_LINE, "-");
   }
 
   freeSetupFileList(setup_file_list);
@@ -1886,9 +1903,8 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   int i;
 
 #if 0
-  CheckArtworkConfig(artwork_info);
-#endif
   LoadArtworkConfig(artwork_info);
+#endif
 
 #if 0
   if (draw_init[artwork_info->type].do_it)
@@ -1953,10 +1969,10 @@ void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
 }
 
 
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 /* functions only needed for non-Unix (non-command-line) systems             */
 /* (MS-DOS only; SDL/Windows creates files "stdout.txt" and "stderr.txt")    */
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 
 #if defined(PLATFORM_MSDOS)
 
@@ -1987,24 +2003,9 @@ void dumpErrorFile()
 #endif
 
 
-/* ========================================================================= */
-/* some generic helper functions                                             */
-/* ========================================================================= */
-
-void printf_line(char line_char, int line_length)
-{
-  int i;
-
-  for (i=0; i<line_length; i++)
-    printf("%c", line_char);
-
-  printf("\n");
-}
-
-
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 /* the following is only for debugging purpose and normally not used         */
-/* ========================================================================= */
+/* ------------------------------------------------------------------------- */
 
 #define DEBUG_NUM_TIMESTAMPS	3
 

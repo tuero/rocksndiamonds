@@ -756,6 +756,7 @@ void ReloadCustomImages()
   printf("DEBUG: reloading images '%s' ...\n", artwork.gfx_current_identifier);
 #endif
 
+  LoadArtworkConfig(image_info);
   ReloadCustomArtworkList(image_info);
 }
 

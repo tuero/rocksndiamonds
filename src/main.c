@@ -2773,7 +2773,9 @@ struct SoundActionProperties sound_action_properties[] =
   { ".attacking",	ACTION_ATTACKING,	TRUE },
 
   /* other (non-loop) sound actions are optional */
+#if 0
   { ".stepping",	ACTION_MOVING,		FALSE }, /* discrete moving */
+#endif
   { ".digging",		ACTION_DIGGING,		FALSE },
   { ".collecting",	ACTION_COLLECTING,	FALSE },
   { ".passing",		ACTION_PASSING,		FALSE },

@@ -21,24 +21,24 @@
 
 struct ConfigInfo image_config_suffix[] =
 {
-  { ".xpos",				"0",			TYPE_INTEGER },
-  { ".ypos",				"0",			TYPE_INTEGER },
-  { ".offset",				"32",			TYPE_INTEGER },
-  { ".vertical",			"false",		TYPE_BOOLEAN },
-  { ".xoffset",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
-  { ".yoffset",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
-  { ".frames",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
-  { ".start_frame",			GFX_ARG_UNDEFINED,	TYPE_INTEGER },
-  { ".delay",				"1",			TYPE_INTEGER },
-  { ".mode_loop",			"false",		TYPE_BOOLEAN },
-  { ".mode_linear",			"false",		TYPE_BOOLEAN },
-  { ".mode_pingpong",			"false",		TYPE_BOOLEAN },
-  { ".mode_pingpong2",			"false",		TYPE_BOOLEAN },
-  { ".mode_random",			"false",		TYPE_BOOLEAN },
-  { ".mode_reverse",			"false",		TYPE_BOOLEAN },
-  { ".global_sync",			GFX_ARG_UNDEFINED,	TYPE_BOOLEAN },
+  { ".xpos",				"0",		TYPE_INTEGER },
+  { ".ypos",				"0",		TYPE_INTEGER },
+  { ".offset",				"32",		TYPE_INTEGER },
+  { ".vertical",			"false",	TYPE_BOOLEAN },
+  { ".xoffset",				ARG_UNDEFINED,	TYPE_INTEGER },
+  { ".yoffset",				ARG_UNDEFINED,	TYPE_INTEGER },
+  { ".frames",				ARG_UNDEFINED,	TYPE_INTEGER },
+  { ".start_frame",			ARG_UNDEFINED,	TYPE_INTEGER },
+  { ".delay",				"1",		TYPE_INTEGER },
+  { ".mode_loop",			"false",	TYPE_BOOLEAN },
+  { ".mode_linear",			"false",	TYPE_BOOLEAN },
+  { ".mode_pingpong",			"false",	TYPE_BOOLEAN },
+  { ".mode_pingpong2",			"false",	TYPE_BOOLEAN },
+  { ".mode_random",			"false",	TYPE_BOOLEAN },
+  { ".mode_reverse",			"false",	TYPE_BOOLEAN },
+  { ".global_sync",			ARG_UNDEFINED,	TYPE_BOOLEAN },
 
-  { NULL,				NULL,			0	     }
+  { NULL,				NULL,		0	     }
 };
 
 struct ConfigInfo image_config[] =

@@ -29,12 +29,13 @@
 
 /* values for Error() */
 #define ERR_RETURN			0
-#define ERR_WARN			(1 << 0)
-#define ERR_EXIT			(1 << 1)
-#define ERR_HELP			(1 << 2)
-#define ERR_SOUND_SERVER		(1 << 3)
-#define ERR_NETWORK_SERVER		(1 << 4)
-#define ERR_NETWORK_CLIENT		(1 << 5)
+#define ERR_RETURN_LINE			(1 << 0)
+#define ERR_WARN			(1 << 1)
+#define ERR_EXIT			(1 << 2)
+#define ERR_HELP			(1 << 3)
+#define ERR_SOUND_SERVER		(1 << 4)
+#define ERR_NETWORK_SERVER		(1 << 5)
+#define ERR_NETWORK_CLIENT		(1 << 6)
 #define ERR_FROM_SERVER			(ERR_SOUND_SERVER | ERR_NETWORK_SERVER)
 #define ERR_EXIT_HELP			(ERR_EXIT | ERR_HELP)
 #define ERR_EXIT_SOUND_SERVER		(ERR_EXIT | ERR_SOUND_SERVER)
@@ -53,19 +54,25 @@
 #define MAX_FILENAME_LEN		256
 #define MAX_LINE_LEN			1000
 
+void fprintf_line(FILE *, char *, int);
+void printf_line(char *, int);
+char *int2str(int, int);
+
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);
 boolean FrameReached(unsigned long *, unsigned long);
 boolean DelayReached(unsigned long *, unsigned long);
 void WaitUntilDelayReached(unsigned long *, unsigned long);
-char *int2str(int, int);
+
 unsigned int SimpleRND(unsigned int);
 unsigned int RND(unsigned int);
 unsigned int InitRND(long);
+
 char *getLoginName(void);
 char *getRealName(void);
 char *getHomeDir(void);
+
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
@@ -80,6 +87,7 @@ void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
+
 inline void swap_numbers(int *, int *);
 inline void swap_number_pairs(int *, int *, int *, int *);
 
@@ -116,13 +124,11 @@ char getCharFromKey(Key);
 int get_integer_from_string(char *);
 boolean get_boolean_from_string(char *);
 
-
 ListNode *newListNode(void);
 void addNodeToList(ListNode **, char *, void *);
 void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
 ListNode *getNodeFromKey(ListNode *, char *);
 int getNumNodes(ListNode *);
-
 
 boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);
@@ -131,17 +137,15 @@ boolean FileIsArtworkType(char *, int);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigInfo *, int);
+void LoadArtworkConfig(struct ArtworkListInfo *);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkList(struct ArtworkListInfo *);
-
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();
 FILE *openErrorFile();
 void dumpErrorFile();
 #endif
-
-void printf_line(char, int);
 
 void debug_print_timestamp(int, char *);
 

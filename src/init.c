@@ -64,9 +64,11 @@ static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
 static void InitLevelArtworkInfo(void);
 static void InitNetworkServer(void);
+static void InitArtworkConfig(void);
 static void InitImages(void);
 static void InitMixer(void);
 static void InitSound(void);
+static void InitMusic(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
@@ -102,9 +104,11 @@ void OpenAll(void)
   InitSetup();
   InitPlayerInfo();
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
+  InitArtworkConfig();		/* needed before forking sound child process */
+  InitMixer();
 
   InitCounter();
-  InitMixer();
+
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
@@ -124,6 +128,7 @@ void OpenAll(void)
 
   InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
+  InitMusic();			/* needs to know current level directory */
 
   InitGfxBackground();
 
@@ -138,7 +143,7 @@ void OpenAll(void)
   InitNetworkServer();
 }
 
-void InitGlobal()
+static void InitGlobal()
 {
   global.autoplay_leveldir = NULL;
 
@@ -147,12 +152,12 @@ void InitGlobal()
   global.fps_slowdown_factor = 1;
 }
 
-void InitSetup()
+static void InitSetup()
 {
   LoadSetup();					/* global setup info */
 }
 
-void InitPlayerInfo()
+static void InitPlayerInfo()
 {
   int i;
 
@@ -165,16 +170,22 @@ void InitPlayerInfo()
   local_player->connected = TRUE;
 }
 
-void InitLevelInfo()
+static void InitLevelInfo()
 {
   LoadLevelInfo();				/* global level info */
   LoadLevelSetup_LastSeries();			/* last played series info */
   LoadLevelSetup_SeriesInfo();			/* last played level info */
 }
 
-void InitArtworkInfo()
+static void InitArtworkInfo()
 {
   LoadArtworkInfo();
+}
+
+static void InitArtworkConfig()
+{
+  InitImageList(image_config, image_config_suffix, NUM_IMAGE_FILES);
+  InitSoundList(sound_config, sound_config_suffix, NUM_SOUND_FILES);
 }
 
 void InitLevelArtworkInfo()
@@ -205,11 +216,15 @@ void InitNetworkServer()
 #endif
 }
 
+static void InitMixer()
+{
+  OpenAudio();
+  StartMixer();
+}
+
 static void ReinitializeGraphics()
 {
-  ReloadCustomImages();		/* load custom image files */
-
-  InitGraphicInfo();		/* initialize graphic info from config file */
+  InitGraphicInfo();	/* initialize graphic info from config file */
 
   InitFontInfo(bitmap_font_initial,
 	       graphic_info[IMG_FONT_BIG].bitmap,
@@ -224,29 +239,32 @@ static void ReinitializeGraphics()
   InitToons();
 }
 
-static void InitImages()
+static void ReinitializeSounds()
 {
-  InitImageList(image_config, image_config_suffix, NUM_IMAGE_FILES);
-
-  ReinitializeGraphics();
+  InitSoundInfo();	/* initialize sounds info from config file */
 }
 
-static void InitMixer()
+static void ReinitializeMusic()
 {
-  OpenAudio();
+  /* currently nothing to do */
+}
 
-  InitSoundList(sound_config, sound_config_suffix, NUM_SOUND_FILES);
-
-  StartMixer();
+static void InitImages()
+{
+  ReloadCustomImages();
+  ReinitializeGraphics();
 }
 
 static void InitSound()
 {
-  /* load custom sounds and music */
-  InitReloadSounds(artwork.snd_current->identifier);
-  InitReloadMusic(artwork.mus_current->identifier);
+  InitReloadCustomSounds(artwork.snd_current->identifier);
+  ReinitializeSounds();
+}
 
-  InitSoundInfo();
+static void InitMusic()
+{
+  InitReloadCustomMusic(artwork.mus_current->identifier);
+  ReinitializeMusic();
 }
 
 static void InitTileClipmasks()
@@ -569,43 +587,22 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
-#if 0
-    printf("CHANGED GFX: '%s' -> '%s'\n",
-	   artwork.gfx_current_identifier, gfx_new_identifier);
-#endif
-
-#if 0
-    int i;
+#if 1
+    printf("RELOADING GRAPHICS '%s' -> '%s' (-> '%s')\n",
+	   artwork.gfx_current_identifier,
+	   artwork.gfx_current->identifier,
+	   gfx_new_identifier);
 #endif
 
     setLevelArtworkDir(artwork.gfx_first);
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-#if 0
-    for (i=0; i<NUM_PICTURES; i++)
-    {
-      DrawInitText(image_filename[i], 150, FC_YELLOW);
-      ReloadCustomImage(pix[i], image_filename[i]);
-    }
-#endif
-
-#if 0
-    SyncDisplay();
-#endif
-
+    ReloadCustomImages();
     ReinitializeGraphics();
 
     FreeTileClipmasks();
     InitTileClipmasks();
-
-#if 0
-    InitGfxBackground();
-
-    /* force redraw of (open or closed) door graphics */
-    SetDoorState(DOOR_OPEN_ALL);
-    CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
-#endif
 
 #if 0
     artwork.gfx_current_identifier = gfx_new_identifier;
@@ -620,12 +617,25 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
       last_override_level_sounds != setup.override_level_sounds)
   {
+#if 1
+    printf("RELOADING SOUNDS '%s' -> '%s' (-> '%s')\n",
+	   artwork.snd_current_identifier,
+	   snd_new_identifier,
+	   artwork.snd_current->identifier);
+#endif
+
     /* set artwork path to send it to the sound server process */
     setLevelArtworkDir(artwork.snd_first);
 
-    InitReloadSounds(snd_new_identifier);
+    InitReloadCustomSounds(snd_new_identifier);
+    ReinitializeSounds();
 
+#if 0
     artwork.snd_current_identifier = snd_new_identifier;
+#else
+    artwork.snd_current_identifier = artwork.snd_current->identifier;
+#endif
+
     last_override_level_sounds = setup.override_level_sounds;
 
     redraw_screen = TRUE;
@@ -637,9 +647,14 @@ void ReloadCustomArtwork()
     /* set artwork path to send it to the sound server process */
     setLevelArtworkDir(artwork.mus_first);
 
-    InitReloadMusic(mus_new_identifier);
+    InitReloadCustomMusic(mus_new_identifier);
+    ReinitializeMusic();
 
+#if 0
     artwork.mus_current_identifier = mus_new_identifier;
+#else
+    artwork.mus_current_identifier = artwork.mus_current->identifier;
+#endif
     last_override_level_music = setup.override_level_music;
 
     redraw_screen = TRUE;
@@ -772,12 +787,93 @@ void InitElementInfo()
   }
 }
 
+static void set_graphic_parameters(int graphic, int action, int *parameter)
+{
+  Bitmap *src_bitmap = getBitmapFromImageID(graphic);
+  int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
+  int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
+
+  graphic_info[graphic].bitmap = src_bitmap;
+
+  graphic_info[graphic].src_x = parameter[GFX_ARG_XPOS] * TILEX;
+  graphic_info[graphic].src_y = parameter[GFX_ARG_YPOS] * TILEY;
+  graphic_info[graphic].offset_x = parameter[GFX_ARG_OFFSET];
+  graphic_info[graphic].offset_y = 0;
+
+  /* animation frames are ordered vertically instead of horizontally */
+  if (parameter[GFX_ARG_VERTICAL])
+  {
+    graphic_info[graphic].offset_x = 0;
+    graphic_info[graphic].offset_y = parameter[GFX_ARG_OFFSET];
+  }
+
+  /* optionally, the x and y offset of frames can be specified directly */
+  if (parameter[GFX_ARG_XOFFSET] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].offset_x = parameter[GFX_ARG_XOFFSET];
+  if (parameter[GFX_ARG_YOFFSET] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].offset_y = parameter[GFX_ARG_YOFFSET];
+
+  /* automatically determine correct number of frames, if not defined */
+  if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_frames = parameter[GFX_ARG_FRAMES];
+  else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
+    graphic_info[graphic].anim_frames =	num_xtiles;
+  else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
+    graphic_info[graphic].anim_frames =	num_ytiles;
+  else
+    graphic_info[graphic].anim_frames = 1;
+
+  graphic_info[graphic].anim_delay = parameter[GFX_ARG_DELAY];
+  if (graphic_info[graphic].anim_delay == 0)	/* delay must be at least 1 */
+    graphic_info[graphic].anim_delay = 1;
+
+  /* set mode for animation frame order */
+  if (parameter[GFX_ARG_MODE_LOOP])
+    graphic_info[graphic].anim_mode = ANIM_LOOP;
+  else if (parameter[GFX_ARG_MODE_LINEAR])
+    graphic_info[graphic].anim_mode = ANIM_LINEAR;
+  else if (parameter[GFX_ARG_MODE_PINGPONG])
+    graphic_info[graphic].anim_mode = ANIM_PINGPONG;
+  else if (parameter[GFX_ARG_MODE_PINGPONG2])
+    graphic_info[graphic].anim_mode = ANIM_PINGPONG2;
+  else if (parameter[GFX_ARG_MODE_RANDOM])
+    graphic_info[graphic].anim_mode = ANIM_RANDOM;
+  else if (graphic_info[graphic].anim_frames > 1)
+    graphic_info[graphic].anim_mode = ANIM_LOOP;
+  else
+    graphic_info[graphic].anim_mode = ANIM_NONE;
+
+  /* set additional flag to play animation frames in reverse order */
+  if (parameter[GFX_ARG_MODE_REVERSE])
+    graphic_info[graphic].anim_mode |= ANIM_REVERSE;
+
+  /* set first frame of animation after determining animation mode */
+  graphic_info[graphic].anim_start_frame = parameter[GFX_ARG_START_FRAME];
+
+  /* automatically determine correct start frame, if not defined */
+  if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_start_frame = 0;
+  else if (graphic_info[graphic].anim_mode & ANIM_REVERSE)
+    graphic_info[graphic].anim_start_frame =
+      graphic_info[graphic].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
+
+  /* animation synchronized with global frame counter, not move position */
+  graphic_info[graphic].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+
+  /* set global_sync for all animations with undefined "animation action" */
+  if (parameter[GFX_ARG_GLOBAL_SYNC] == ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].anim_global_sync =
+      (action == ACTION_DEFAULT ? TRUE : FALSE);
+
+  /* "linear" animations are never globally synchronized */
+  if (parameter[GFX_ARG_MODE_LINEAR])
+    graphic_info[graphic].anim_global_sync = FALSE;
+}
+
 static void InitGraphicInfo()
 {
   static boolean clipmasks_initialized = FALSE;
   static int gfx_action[NUM_IMAGE_FILES];
-  int src_x, src_y;
-  int first_frame, last_frame;
   int i;
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap src_pixmap;
@@ -825,86 +921,11 @@ static void InitGraphicInfo()
 
   for (i=0; i<NUM_IMAGE_FILES; i++)
   {
-    Bitmap *src_bitmap = getBitmapFromImageID(i);
-    int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
-    int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
-    int *parameter = image_files[i].parameter;
+    Bitmap *src_bitmap;
+    int src_x, src_y;
+    int first_frame, last_frame;
 
-    graphic_info[i].bitmap = src_bitmap;
-
-    graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
-    graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
-    graphic_info[i].offset_x = parameter[GFX_ARG_OFFSET];
-    graphic_info[i].offset_y = 0;
-
-    /* animation frames are ordered vertically instead of horizontally */
-    if (parameter[GFX_ARG_VERTICAL])
-    {
-      graphic_info[i].offset_x = 0;
-      graphic_info[i].offset_y = parameter[GFX_ARG_OFFSET];
-    }
-
-    /* optionally, the x and y offset of frames can be specified directly */
-    if (parameter[GFX_ARG_XOFFSET] != GFX_ARG_UNDEFINED_VALUE)
-      graphic_info[i].offset_x = parameter[GFX_ARG_XOFFSET];
-    if (parameter[GFX_ARG_YOFFSET] != GFX_ARG_UNDEFINED_VALUE)
-      graphic_info[i].offset_y = parameter[GFX_ARG_YOFFSET];
-
-    /* automatically determine correct number of frames, if not defined */
-    if (parameter[GFX_ARG_FRAMES] != GFX_ARG_UNDEFINED_VALUE)
-      graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
-    else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
-      graphic_info[i].anim_frames =	num_xtiles;
-    else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
-      graphic_info[i].anim_frames =	num_ytiles;
-    else
-      graphic_info[i].anim_frames = 1;
-
-    graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
-    if (graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
-      graphic_info[i].anim_delay = 1;
-
-    /* set mode for animation frame order */
-    if (parameter[GFX_ARG_MODE_LOOP])
-      graphic_info[i].anim_mode = ANIM_LOOP;
-    else if (parameter[GFX_ARG_MODE_LINEAR])
-      graphic_info[i].anim_mode = ANIM_LINEAR;
-    else if (parameter[GFX_ARG_MODE_PINGPONG])
-      graphic_info[i].anim_mode = ANIM_PINGPONG;
-    else if (parameter[GFX_ARG_MODE_PINGPONG2])
-      graphic_info[i].anim_mode = ANIM_PINGPONG2;
-    else if (parameter[GFX_ARG_MODE_RANDOM])
-      graphic_info[i].anim_mode = ANIM_RANDOM;
-    else if (graphic_info[i].anim_frames > 1)
-      graphic_info[i].anim_mode = ANIM_LOOP;
-    else
-      graphic_info[i].anim_mode = ANIM_NONE;
-
-    /* set additional flag to play animation frames in reverse order */
-    if (parameter[GFX_ARG_MODE_REVERSE])
-      graphic_info[i].anim_mode |= ANIM_REVERSE;
-
-    /* set first frame of animation after determining animation mode */
-    graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
-
-    /* automatically determine correct start frame, if not defined */
-    if (parameter[GFX_ARG_START_FRAME] == GFX_ARG_UNDEFINED_VALUE)
-      graphic_info[i].anim_start_frame = 0;
-    else if (graphic_info[i].anim_mode & ANIM_REVERSE)
-      graphic_info[i].anim_start_frame =
-	graphic_info[i].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
-
-    /* animation synchronized with global frame counter, not move position */
-    graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
-
-    /* set global_sync for all animations with undefined "animation action" */
-    if (parameter[GFX_ARG_GLOBAL_SYNC] == GFX_ARG_UNDEFINED_VALUE)
-      graphic_info[i].anim_global_sync =
-	(gfx_action[i] == ACTION_DEFAULT ? TRUE : FALSE);
-
-    /* "linear" animations are never globally synchronized */
-    if (parameter[GFX_ARG_MODE_LINEAR])
-      graphic_info[i].anim_global_sync = FALSE;
+    set_graphic_parameters(i, gfx_action[i], image_files[i].parameter);
 
     /* now check if no animation frames are outside of the loaded image */
 
@@ -917,15 +938,22 @@ static void InitGraphicInfo()
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
     {
-      Error(ERR_RETURN, "custom artwork configuration error:");
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "warning: error found in config file:");
       Error(ERR_RETURN, "- config file: '%s'",
 	    getImageConfigFilename());
       Error(ERR_RETURN, "- config token: '%s'",
 	    getTokenFromImageID(i));
       Error(ERR_RETURN, "- image file: '%s'",
 	    src_bitmap->source_filename);
-      Error(ERR_EXIT, "error: first animation frame out of bounds (%d,%d)",
+      Error(ERR_RETURN,
+	    "error: first animation frame out of bounds (%d, %d)",
 	    src_x, src_y);
+      Error(ERR_RETURN, "custom graphic rejected for this element/action");
+      Error(ERR_RETURN_LINE, "-");
+
+      set_graphic_parameters(i, gfx_action[i],
+			     image_files[i].default_parameter);
     }
 
     last_frame = graphic_info[i].anim_frames - 1;
@@ -934,15 +962,22 @@ static void InitGraphicInfo()
 	src_x + TILEX > src_bitmap->width ||
 	src_y + TILEY > src_bitmap->height)
     {
-      Error(ERR_RETURN, "custom artwork configuration error:");
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "warning: error found in config file:");
       Error(ERR_RETURN, "- config file: '%s'",
 	    getImageConfigFilename());
       Error(ERR_RETURN, "- config token: '%s'",
 	    getTokenFromImageID(i));
       Error(ERR_RETURN, "- image file: '%s'",
 	    src_bitmap->source_filename);
-      Error(ERR_EXIT, "error: last animation frame (%d) out of bounds (%d,%d)",
+      Error(ERR_RETURN,
+	    "error: last animation frame (%d) out of bounds (%d, %d)",
 	    last_frame, src_x, src_y);
+      Error(ERR_RETURN, "custom graphic rejected for this element/action");
+      Error(ERR_RETURN_LINE, "-");
+
+      set_graphic_parameters(i, gfx_action[i],
+			     image_files[i].default_parameter);
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -978,6 +1013,13 @@ static void InitGraphicInfo()
 #endif
 
   clipmasks_initialized = TRUE;
+}
+
+static void set_sound_parameters(int sound, int *parameter)
+{
+  /* explicit loop mode setting in configuration overrides default value */
+  if (parameter[SND_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
+    sound_info[sound].loop = parameter[SND_ARG_MODE_LOOP];
 }
 
 static void InitSoundInfo()
@@ -1035,6 +1077,8 @@ static void InitSoundInfo()
 	}
       }
     }
+
+    set_sound_parameters(i, sound_files[i].parameter);
   }
 
 #if 0

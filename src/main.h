@@ -805,12 +805,11 @@
 
 #define NUM_GFX_ARGS				16
 
-#define GFX_ARG_UNDEFINED			"-1000000"
-#define GFX_ARG_UNDEFINED_VALUE			(atoi(GFX_ARG_UNDEFINED))
-
 
 /* values for sound configuration suffixes */
-/* (currently none) */
+#define SND_ARG_MODE_LOOP			0
+
+#define NUM_SND_ARGS				1
 
 
 /* values for game_status */
