@@ -2712,114 +2712,39 @@ void Explode(int ex, int ey, int phase, int mode)
   if (phase == element_info[border_element].ignition_delay ||
       phase == last_phase)
   {
+    boolean border_explosion = FALSE;
+
     if (IS_PLAYER(x, y))
     {
-      if (phase == 2)
-	printf("::: IS_PLAYER\n");
-
       KillHeroUnlessExplosionProtected(x, y);
-      return;
+      border_explosion = TRUE;
+
+      if (phase == last_phase)
+	printf("::: IS_PLAYER\n");
     }
     else if (CAN_EXPLODE_BY_FIRE(border_element))
     {
-      if (phase == 2)
-	printf("::: CAN_EXPLODE_BY_FIRE\n");
-
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
       Bang(x, y);
-      return;
+      border_explosion = TRUE;
+
+      if (phase == last_phase)
+	printf("::: CAN_EXPLODE_BY_FIRE\n");
     }
     else if (border_element == EL_AMOEBA_TO_DIAMOND)
     {
-      if (phase == 2)
-	printf("::: EL_AMOEBA_TO_DIAMOND\n");
-
       AmoebeUmwandeln(x, y);
-      return;
+      border_explosion = TRUE;
+
+      if (phase == last_phase)
+	printf("::: EL_AMOEBA_TO_DIAMOND\n");
     }
-  }
-
-  if (phase == last_phase)
-  {
-    int element;
-
-    element = Feld[x][y] = Store[x][y];
-    Store[x][y] = Store2[x][y] = 0;
-    GfxElement[x][y] = EL_UNDEFINED;
-
-    /* player can escape from explosions and might therefore be still alive */
-    if (element >= EL_PLAYER_IS_EXPLODING_1 &&
-	element <= EL_PLAYER_IS_EXPLODING_4)
-      Feld[x][y] = (stored_player[element - EL_PLAYER_IS_EXPLODING_1].active ?
-		    EL_EMPTY :
-		    element == EL_PLAYER_IS_EXPLODING_1 ? EL_EMERALD_YELLOW :
-		    element == EL_PLAYER_IS_EXPLODING_2 ? EL_EMERALD_RED :
-		    element == EL_PLAYER_IS_EXPLODING_3 ? EL_EMERALD :
-		    EL_EMERALD_PURPLE);
-
-    /* restore probably existing indestructible background element */
-    if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
-      element = Feld[x][y] = Back[x][y];
-    Back[x][y] = 0;
-
-    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
-    GfxDir[x][y] = MV_NO_MOVING;
-    ChangeDelay[x][y] = 0;
-    ChangePage[x][y] = -1;
-
-    InitField(x, y, FALSE);
-#if 1
-    /* !!! not needed !!! */
-    if (CAN_MOVE(element))
-      InitMovDir(x, y);
-#endif
-    DrawLevelField(x, y);
-
-    TestIfElementTouchesCustomElement(x, y);
-
-    if (GFX_CRUMBLED(element))
-      DrawLevelFieldCrumbledSandNeighbours(x, y);
-
-    if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
-      StorePlayer[x][y] = 0;
-
-    if (ELEM_IS_PLAYER(element))
-      RelocatePlayer(x, y, element);
-  }
-  else if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-  {
-#if 1
-    int graphic = el_act2img(GfxElement[x][y], ACTION_EXPLODING);
-#else
-    int stored = Store[x][y];
-    int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
-		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
-		   IMG_SP_EXPLOSION);
-#endif
-    int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
 #if 0
-    printf("::: %d ['%s'] -> %d\n", GfxElement[x][y],
-	   element_info[GfxElement[x][y]].token_name,
-	   graphic);
+    if (border_explosion && phase == last_phase)
+      return;
 #endif
-
-    if (phase == delay)
-      DrawLevelFieldCrumbledSand(x, y);
-
-    if (IS_WALKABLE_OVER(Back[x][y]) && Back[x][y] != EL_EMPTY)
-    {
-      DrawLevelElement(x, y, Back[x][y]);
-      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
-    }
-    else if (IS_WALKABLE_UNDER(Back[x][y]))
-    {
-      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-      DrawLevelElementThruMask(x, y, Back[x][y]);
-    }
-    else if (!IS_WALKABLE_INSIDE(Back[x][y]))
-      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
   }
 
 #else
@@ -2850,6 +2775,7 @@ void Explode(int ex, int ey, int phase, int mode)
     else if (element == EL_AMOEBA_TO_DIAMOND)
       AmoebeUmwandeln(x, y);
   }
+#endif
 
   if (phase == last_phase)
   {
@@ -2898,7 +2824,11 @@ void Explode(int ex, int ey, int phase, int mode)
     if (ELEM_IS_PLAYER(element))
       RelocatePlayer(x, y, element);
   }
+#if 1
+  else if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#else
   else if (phase >= delay && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#endif
   {
 #if 1
     int graphic = el_act2img(GfxElement[x][y], ACTION_EXPLODING);
@@ -2932,7 +2862,6 @@ void Explode(int ex, int ey, int phase, int mode)
     else if (!IS_WALKABLE_INSIDE(Back[x][y]))
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
   }
-#endif
 }
 
 void DynaExplode(int ex, int ey)
