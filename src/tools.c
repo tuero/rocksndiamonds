@@ -109,8 +109,8 @@ void BackToFront()
 
       if (soft_scrolling_on)
       {
-	fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-	fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+	fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+	fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
       }
 
       XCopyArea(display,buffer,window,gc,
@@ -330,15 +330,16 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   }
 }
 
-void DrawPlayerField()
+void DrawPlayerField(int x, int y)
 {
-  int x = JX, y = JY;
+  int lastJX = player->lastJX, lastJY = player->lastJY;
   int sx = SCROLLX(x), sy = SCROLLY(y);
-
   int sxx = 0, syy = 0;
-
   int element = Feld[x][y];
   int graphic, phase;
+
+  if (!IS_PLAYER(x,y))
+    return;
 
   if (PlayerGone)
     return;
@@ -373,12 +374,12 @@ void DrawPlayerField()
     else
       DrawLevelField(lastJX,lastJY);
 
-    if (PlayerPushing)
+    if (player->Pushing)
     {
       int nextJX = JX + (JX - lastJX);
       int nextJY = JY + (JY - lastJY);
 
-      if (PlayerGfxPos)
+      if (player->GfxPos)
       {
   	if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
   	  DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
@@ -399,23 +400,23 @@ void DrawPlayerField()
 
   /* draw player himself */
 
-  if (PlayerMovDir==MV_LEFT)
-    graphic = (PlayerPushing ? GFX_SPIELER_PUSH_LEFT : GFX_SPIELER_LEFT);
-  else if (PlayerMovDir==MV_RIGHT)
-    graphic = (PlayerPushing ? GFX_SPIELER_PUSH_RIGHT : GFX_SPIELER_RIGHT);
-  else if (PlayerMovDir==MV_UP)
+  if (player->MovDir==MV_LEFT)
+    graphic = (player->Pushing ? GFX_SPIELER_PUSH_LEFT : GFX_SPIELER_LEFT);
+  else if (player->MovDir==MV_RIGHT)
+    graphic = (player->Pushing ? GFX_SPIELER_PUSH_RIGHT : GFX_SPIELER_RIGHT);
+  else if (player->MovDir==MV_UP)
     graphic = GFX_SPIELER_UP;
   else	/* MV_DOWN || MV_NO_MOVING */
     graphic = GFX_SPIELER_DOWN;
 
-  graphic += PlayerFrame;
+  graphic += player->Frame;
 
-  if (PlayerGfxPos)
+  if (player->GfxPos)
   {
-    if (PlayerMovDir == MV_LEFT || PlayerMovDir == MV_RIGHT)
-      sxx = PlayerGfxPos;
+    if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
+      sxx = player->GfxPos;
     else
-      syy = PlayerGfxPos;
+      syy = player->GfxPos;
   }
 
   if (!soft_scrolling_on && ScreenMovPos)
@@ -423,7 +424,7 @@ void DrawPlayerField()
 
   DrawGraphicShiftedThruMask(sx,sy, sxx,syy, graphic, NO_CUTTING);
 
-  if (PlayerPushing && PlayerGfxPos)
+  if (player->Pushing && player->GfxPos)
   {
     int nextJX = JX + (JX - lastJX);
     int nextJY = JY + (JY - lastJY);
@@ -439,9 +440,9 @@ void DrawPlayerField()
 
       if (element == EL_FELSBROCKEN && sxx)
       {
-	int phase = (PlayerGfxPos / (TILEX/4));
+	int phase = (player->GfxPos / (TILEX/4));
 
-	if (PlayerMovDir == MV_LEFT)
+	if (player->MovDir == MV_LEFT)
 	  graphic += phase;
 	else
 	  graphic += (phase+4)%4;

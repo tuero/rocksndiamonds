@@ -72,7 +72,7 @@ void AusgangstuerBlinken(int, int);
 void EdelsteinFunkeln(int, int);
 void MauerWaechst(int, int);
 void MauerAbleger(int, int);
-void GameActions(void);
+void GameActions(int);
 void ScrollLevel(int, int);
 BOOL MoveFigureOneStep(int, int, int, int);
 BOOL MoveFigure(int, int);

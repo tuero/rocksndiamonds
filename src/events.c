@@ -171,7 +171,7 @@ void HandleExposeEvent(XExposeEvent *event)
       for(yy=0;yy<SCR_FIELDY;yy++)
 	if (xx>=x1 && xx<=x2 && yy>=y1 && yy<=y2)
 	  DrawScreenField(xx,yy);
-    DrawPlayerField();
+    DrawPlayerField(JX,JY);
 
     SetDrawtoField(DRAW_DIRECT);
   }
@@ -180,8 +180,8 @@ void HandleExposeEvent(XExposeEvent *event)
   {
     int fx = FX, fy = FY;
 
-    fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-    fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+    fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+    fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
 
     XCopyArea(display,fieldbuffer,backbuffer,gc,
 	      fx,fy, SXSIZE,SYSIZE,
@@ -291,7 +291,7 @@ void HandleButton(int mx, int my, int button)
       HandleSetupScreen(mx,my,0,0,button);
       break;
     case PLAYING:
-      HandleGameActions();
+      HandleGameActions(0);
       break;
     default:
       break;
@@ -655,7 +655,11 @@ void HandleNoXEvent()
       break;
     case PLAYING:
       HandleJoystick();
-      HandleGameActions();
+
+      /*
+      HandleGameActions(0);
+      */
+
       break;
     default:
       break;
@@ -672,14 +676,9 @@ void HandleJoystick()
   int up	= joy & JOY_UP;
   int down	= joy & JOY_DOWN;
   int button	= joy & JOY_BUTTON;
-  int button1	= joy & JOY_BUTTON_1;
-  int button2	= joy & JOY_BUTTON_2;
   int newbutton	= (JoystickButton() == JOY_BUTTON_NEW_PRESSED);
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
-
-  if (game_status==PLAYING && (tape.playing || keyboard))
-    newbutton = ((joy & JOY_BUTTON) != 0);
 
   switch(game_status)
   {
@@ -700,16 +699,18 @@ void HandleJoystick()
 	HandleSetupScreen(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       break;
     }
+
     case HALLOFFAME:
       HandleHallOfFame(!newbutton);
       break;
+
     case HELPSCREEN:
       HandleHelpScreen(!newbutton);
       break;
+
     case PLAYING:
-    {
-      static int player_frame_reset_delay = 0;
-      BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
+      if (tape.playing || keyboard)
+	newbutton = ((joy & JOY_BUTTON) != 0);
 
       if (GameOver && newbutton)
       {
@@ -722,61 +723,9 @@ void HandleJoystick()
       if (tape.pausing || PlayerGone)
 	joy = 0;
 
-      if (joy)
-      {
-	player_frame_reset_delay = 0;
-
-	if (button1)
-	  snapped = SnapField(dx,dy);
-	else
-	{
-	  if (button2)
-	    bombed = PlaceBomb();
-	  moved = MoveFigure(dx,dy);
-	}
-
-	if (tape.recording && (moved || snapped || bombed))
-	{
-	  if (bombed && !moved)
-	    joy &= JOY_BUTTON;
-	  TapeRecordAction(joy);
-	}
-	else if (tape.playing && snapped)
-	  SnapField(0,0);			/* stop snapping */
-      }
-      else
-      {
-	DigField(0,0,0,0,DF_NO_PUSH);
-	SnapField(0,0);
-	if (++player_frame_reset_delay > MoveSpeed)
-	  PlayerFrame = 0;
-      }
-
-      if (tape.playing && !tape.pausing && !joy && tape.counter<tape.length)
-      {
-	int next_joy =
-	  tape.pos[tape.counter].joystickdata & (JOY_LEFT|JOY_RIGHT);
-
-	if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
-	{
-	  int dx = (next_joy == JOY_LEFT ? -1 : +1);
-
-	  if (IN_LEV_FIELD(JX+dx,JY) && IS_PUSHABLE(Feld[JX+dx][JY]))
-	  {
-	    int el = Feld[JX+dx][JY];
-	    int push_delay = (IS_SB_ELEMENT(el) || el==EL_SONDE ? 2 : 10);
-
-	    if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
-	    {
-	      PlayerMovDir = next_joy;
-	      PlayerFrame = FrameCounter % 4;
-	      PlayerPushing = TRUE;
-	    }
-	  }
-	}
-      }
+      HandleGameActions(joy);
       break;
-    }
+
     default:
       break;
   }

@@ -1299,7 +1299,7 @@ void CalibrateJoystick()
   DrawSetupScreen();
 }
 
-void HandleGameActions()
+void HandleGameActions(int player_action)
 {
   if (game_status != PLAYING)
     return;
@@ -1310,7 +1310,7 @@ void HandleGameActions()
   if (PlayerGone && !TAPE_IS_STOPPED(tape))
     TapeStop();
 
-  GameActions();
+  GameActions(player_action);
 
   BackToFront();
 }

@@ -86,6 +86,11 @@ int editor_element[] =
   EL_CHAR_A + ('N' - 'A'),
   EL_CHAR_A + ('E' - 'A'),
 
+  EL_SPIELER1,
+  EL_SPIELER2,
+  EL_SPIELER3,
+  EL_SPIELER4,
+
   EL_SPIELFIGUR,
   EL_LEERRAUM,
   EL_ERDREICH,

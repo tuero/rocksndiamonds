@@ -134,7 +134,7 @@ void HandleAnimation(int mode)
 	for(xx=0;xx<SCR_FIELDX;xx++)
 	  for(yy=0;yy<SCR_FIELDY;yy++)
 	    DrawScreenField(xx,yy);
-	DrawPlayerField();
+	DrawPlayerField(JX,JY);
 
 	SetDrawtoField(DRAW_DIRECT);
       }
@@ -143,8 +143,8 @@ void HandleAnimation(int mode)
       {
 	int fx = FX, fy = FY;
 
-        fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-        fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+        fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+        fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
 
 	XCopyArea(display,fieldbuffer,backbuffer,gc,
 		  fx,fy, SXSIZE,SYSIZE,

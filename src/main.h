@@ -31,7 +31,7 @@
 #endif
 #else
 #include "msdos.h"
-#endif  // von #ifndef MSDOS
+#endif  /* #ifndef MSDOS */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -53,16 +53,16 @@ typedef int BOOL;
 #define WIN_XPOS	0
 #define WIN_YPOS	0
 #else
-#define WIN_XPOS	(XRES-WIN_XSIZE)/2
-#define WIN_YPOS	(YRES-WIN_YSIZE)/2
+#define WIN_XPOS	((XRES - WIN_XSIZE) / 2)
+#define WIN_YPOS	((YRES - WIN_YSIZE) / 2)
 #endif
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE	(SCR_FIELDY + 2)
 
-#define MIN_LEV_FIELDX	(SCR_FIELDX-2)
-#define MIN_LEV_FIELDY	(SCR_FIELDY-2)
+#define MIN_LEV_FIELDX	(SCR_FIELDX - 2)
+#define MIN_LEV_FIELDY	(SCR_FIELDY - 2)
 #define STD_LEV_FIELDX	64
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128
@@ -71,35 +71,23 @@ typedef int BOOL;
 #define MAX_PLAYERS	4
 
 #ifndef MIN
-#define MIN(a,b) 	((a)<(b) ? (a) : (b))
+#define MIN(a,b) 	((a) < (b) ? (a) : (b))
 #endif
 #ifndef MAX
-#define MAX(a,b) 	((a)>(b) ? (a) : (b))
+#define MAX(a,b) 	((a) > (b) ? (a) : (b))
 #endif
 #ifndef ABS
-#define ABS(a)		((a)<0 ? -(a) : (a))
+#define ABS(a)		((a) < 0 ? -(a) : (a))
 #endif
 #ifndef SIGN
-#define SIGN(a)		((a)<0 ? -1 : ((a)>0 ? 1 : 0))
+#define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
 #endif
-#define SCROLLX(a)	((a)-scroll_x)
-#define SCROLLY(a)	((a)-scroll_y)
-#define UNSCROLLX(a)	((a)+scroll_x)
-#define UNSCROLLY(a)	((a)+scroll_y)
+#define SCROLLX(a)	((a) - scroll_x)
+#define SCROLLY(a)	((a) - scroll_y)
+#define UNSCROLLX(a)	((a) + scroll_x)
+#define UNSCROLLY(a)	((a) + scroll_y)
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
-
-
-#define IS_PLAYER(x,y)		(JX==(x) && JY==(y))
-
-/*
-#define IS_PLAYER(x,y)		((JX==(x) && JY==(y)) || (lastJX==(x) && lastJY==(y)))
-*/
-
-#define IS_FREE(x,y)		(Feld[x][y]==EL_LEERRAUM && !IS_PLAYER(x,y))
-#define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y]==EL_LEERRAUM)
-#define IS_MOVING(x,y)		(MovPos[x][y]!=0)
-#define IS_BLOCKED(x,y)		(Feld[x][y]==EL_BLOCKED)
 
 #define EP_BIT_AMOEBALIVE	(1<<0)
 #define EP_BIT_AMOEBOID		(1<<1)
@@ -126,6 +114,7 @@ typedef int BOOL;
 #define EP_BIT_EXPLOSIVE	(1<<22)
 #define EP_BIT_MAMPF3		(1<<23)
 #define EP_BIT_PUSHABLE		(1<<24)
+#define EP_BIT_PLAYER		(1<<25)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -152,18 +141,32 @@ typedef int BOOL;
 #define IS_EXPLOSIVE(e)		(Elementeigenschaften[e] & EP_BIT_EXPLOSIVE)
 #define IS_MAMPF3(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF3)
 #define IS_PUSHABLE(e)		(Elementeigenschaften[e] & EP_BIT_PUSHABLE)
+#define ELEM_IS_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_PLAYER)
 
-#define EL_CHANGED(e)		((e)==EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
-				 (e)==EL_EDELSTEIN      ? EL_DIAMANT :	  \
-				 (e)==EL_EDELSTEIN_GELB ? EL_DIAMANT :	  \
-				 (e)==EL_EDELSTEIN_ROT  ? EL_DIAMANT :	  \
-				 (e)==EL_EDELSTEIN_LILA ? EL_DIAMANT :	  \
+/*
+#define IS_PLAYER(x,y)		(JX == (x) && JY == (y))
+*/
+
+#define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
+#define IS_LOCAL_PLAYER(x,y)	(StorePlayer[x][y] == EL_SPIELER1)
+
+#define IS_FREE(x,y)		(Feld[x][y] == EL_LEERRAUM && !IS_PLAYER(x,y))
+#define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_LEERRAUM)
+
+#define IS_MOVING(x,y)		(MovPos[x][y] != 0)
+#define IS_BLOCKED(x,y)		(Feld[x][y] == EL_BLOCKED)
+
+#define EL_CHANGED(e)		((e) == EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
+				 (e) == EL_EDELSTEIN      ? EL_DIAMANT :    \
+				 (e) == EL_EDELSTEIN_GELB ? EL_DIAMANT :    \
+				 (e) == EL_EDELSTEIN_ROT  ? EL_DIAMANT :    \
+				 (e) == EL_EDELSTEIN_LILA ? EL_DIAMANT :    \
 				 EL_FELSBROCKEN)
-#define EL_CHANGED2(e)		((e)==EL_FELSBROCKEN ? EL_EDELSTEIN_BD :  \
+#define EL_CHANGED2(e)		((e) == EL_FELSBROCKEN ? EL_EDELSTEIN_BD :  \
 				 EL_FELSBROCKEN)
-#define IS_DRAWABLE(e)		((e)<EL_BLOCKED)
-#define IS_NOT_DRAWABLE(e)	((e)>=EL_BLOCKED)
-#define TIMESIZE		(TimeLeft*100/level.time)
+#define IS_DRAWABLE(e)		((e) < EL_BLOCKED)
+#define IS_NOT_DRAWABLE(e)	((e) >= EL_BLOCKED)
+#define TIMESIZE		(TimeLeft * 100 / level.time)
 #define TAPE_IS_EMPTY(x)	((x).length == 0)
 #define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing &&!(x).pausing)
 
@@ -207,7 +210,7 @@ struct HiScore
 
 struct PlayerInfo
 {
-  BOOL active, local;
+  int nr, active, local;
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
@@ -217,9 +220,18 @@ struct PlayerInfo
   int level_nr;
 
   int JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
-  int PlayerMovDir, PlayerMovPos, PlayerPushing;
-  int PlayerFrame, PlayerGfxPos;
+  int MovDir, MovPos, Pushing;
+  int Frame, GfxPos;
+
   int PlayerGone, LevelSolved, GameOver;
+
+  int frame_reset_delay;
+
+  long move_delay;
+  int last_move_dir;
+
+  long push_delay;
+  int push_delay_value;
 
   int score;
   int gems_still_needed;
@@ -333,6 +345,7 @@ extern int		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -347,8 +360,6 @@ extern int		FX,FY, ScreenMovPos, ScrollStepSize;
 extern int		GameFrameDelay, MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
-extern int		PlayerMovDir, PlayerMovPos, PlayerPushing;
-extern int		PlayerFrame, PlayerGfxPos;
 extern int		PlayerGone,LevelSolved,GameOver;
 extern int		FrameCounter,TimeFrames,TimeLeft;
 extern int		MampferNr, SiebAktiv;
@@ -356,7 +367,7 @@ extern int		MampferNr, SiebAktiv;
 extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[];
-extern struct PlayerInfo       *local_player, *actual_player;
+extern struct PlayerInfo       *local_player, *player;
 extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape;
 extern struct SoundInfo		Sound[];

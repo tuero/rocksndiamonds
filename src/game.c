@@ -59,44 +59,74 @@ void GetPlayerConfig()
 
 void InitGame()
 {
-  int i,x,y;
+  int i, x,y;
   BOOL emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   BOOL emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
 
+  for(i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].active = FALSE;
+
+  local_player->nr = 1;
   local_player->active = TRUE;
   local_player->local = TRUE;
 
-  actual_player = local_player;
+  player = local_player;
 
-  actual_player->score = 0;
-
-  actual_player->gems_still_needed = level.edelsteine;
-  actual_player->sokobanfields_still_needed = 0;
-  actual_player->lights_still_needed = 0;
-  actual_player->friends_still_needed = 0;
+  player->score = 0;
+  player->gems_still_needed = level.edelsteine;
+  player->sokobanfields_still_needed = 0;
+  player->lights_still_needed = 0;
+  player->friends_still_needed = 0;
 
   for(i=0; i<4; i++)
-    actual_player->key[i] = FALSE;
+    player->key[i] = FALSE;
 
-  actual_player->dynamite = 0;
-  actual_player->dynabomb_count = 0;
-  actual_player->dynabomb_size = 0;
-  actual_player->dynabombs_left = 0;
-  actual_player->dynabomb_xl = FALSE;
+  player->dynamite = 0;
+  player->dynabomb_count = 0;
+  player->dynabomb_size = 0;
+  player->dynabombs_left = 0;
+  player->dynabomb_xl = FALSE;
 
   MampferNr = 0;
   FrameCounter = 0;
   TimeFrames = 0;
   TimeLeft = level.time;
   ScreenMovPos = 0;
-  PlayerMovDir = MV_NO_MOVING;
-  PlayerMovPos = 0;
-  PlayerGfxPos = 0;
-  PlayerFrame = 0;
-  PlayerPushing = FALSE;
-  PlayerGone = LevelSolved = GameOver = SiebAktiv = FALSE;
+
+  player->MovDir = MV_NO_MOVING;
+  player->MovPos = 0;
+  player->Pushing = FALSE;
+  player->GfxPos = 0;
+  player->Frame = 0;
+
+  player->frame_reset_delay = 0;
+
+  player->push_delay = 0;
+  player->push_delay_value = 5;
+
+  player->move_delay = 0;
+  player->last_move_dir = MV_NO_MOVING;
+
+  player->lastJX = player->lastJY = 0;
+  player->JX = player->JY = 0;
+
+  lastJX = lastJY = 0;
   JX = JY = 0;
   ZX = ZY = -1;
+
+
+  /* test */
+  for(i=1; i<MAX_PLAYERS; i++)
+  {
+    stored_player[i] = stored_player[0];
+    stored_player[i].nr = i+1;
+    stored_player[i].active = TRUE;
+    stored_player[i].local = FALSE;
+  }
+
+
+
+  PlayerGone = LevelSolved = GameOver = SiebAktiv = FALSE;
 
   DigField(0,0,0,0,DF_NO_PUSH);
   SnapField(0,0);
@@ -108,7 +138,9 @@ void InitGame()
   {
     Feld[x][y] = Ur[x][y];
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
-    Store[x][y] = Store2[x][y] = Frame[x][y] = AmoebaNr[x][y] = 0;
+    Store[x][y] = Store2[x][y] = StorePlayer[x][y] = 0;
+    Frame[x][y] = 0;
+    AmoebaNr[x][y] = 0;
     JustHit[x][y] = 0;
 
     if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
@@ -120,14 +152,28 @@ void InitGame()
     {
       case EL_SPIELFIGUR:
       case EL_SPIELER1:
+	StorePlayer[x][y] = EL_SPIELER1;
 	Feld[x][y] = EL_LEERRAUM;
 	JX = lastJX = x;
 	JY = lastJY = y;
+
+	player->JX = JX;
+	player->JY = JY;
+	player->lastJX = lastJX;
+	player->lastJY = lastJY;
+
 	break;
       case EL_SPIELER2:
       case EL_SPIELER3:
       case EL_SPIELER4:
+	StorePlayer[x][y] = Feld[x][y];
 	Feld[x][y] = EL_LEERRAUM;
+
+	stored_player[StorePlayer[x][y] - EL_SPIELER1].JX = x;
+	stored_player[StorePlayer[x][y] - EL_SPIELER1].JY = y;
+	stored_player[StorePlayer[x][y] - EL_SPIELER1].lastJX = x;
+	stored_player[StorePlayer[x][y] - EL_SPIELER1].lastJY = y;
+
 	break;
       case EL_BADEWANNE:
 	if (x<lev_fieldx-1 && Feld[x+1][y]==EL_SALZSAEURE)
@@ -811,12 +857,12 @@ void DynaExplode(int ex, int ey, int size)
       if (element != EL_LEERRAUM &&
 	  element != EL_ERDREICH &&
 	  element != EL_EXPLODING &&
-	  !actual_player->dynabomb_xl)
+	  !player->dynabomb_xl)
 	break;
     }
   }
 
-  actual_player->dynabombs_left++;
+  player->dynabombs_left++;
 }
 
 void Bang(int x, int y)
@@ -842,7 +888,7 @@ void Bang(int x, int y)
     case EL_DYNABOMB_NR:
     case EL_DYNABOMB_SZ:
     case EL_DYNABOMB_XL:
-      DynaExplode(x,y,actual_player->dynabomb_size);
+      DynaExplode(x,y,player->dynabomb_size);
       break;
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
@@ -1410,13 +1456,24 @@ void StartMoving(int x, int y)
 
   if (CAN_FALL(element) && y<lev_fieldy-1)
   {
-    if (PlayerPushing && PlayerMovPos)
+    /* check if this element is just being pushed */
+    if ((x>0 && IS_PLAYER(x-1,y)) || (x<lev_fieldx-1 && IS_PLAYER(x+1,y)))
     {
-      int nextJX = JX + (JX - lastJX);
-      int nextJY = JY + (JY - lastJY);
+      int i;
 
-      if (x == nextJX && y == nextJY)
-	return;
+      for(i=0; i<MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *pl = &stored_player[i];
+
+	if (pl->active && pl->Pushing && pl->MovPos)
+	{
+	  int nextJX = pl->JX + (pl->JX - pl->lastJX);
+	  int nextJY = pl->JY + (pl->JY - pl->lastJY);
+
+	  if (x == nextJX && y == nextJY)
+	    return;
+	}
+      }
     }
 
     if (element==EL_MORAST_VOLL)
@@ -1682,7 +1739,7 @@ void StartMoving(int x, int y)
       else if (!IS_FREE(newx,newy))
       {
 	if (IS_PLAYER(x,y))
-	  DrawPlayerField();
+	  DrawPlayerField(x,y);
 	else
 	  DrawLevelField(x,y);
 	return;
@@ -1703,7 +1760,7 @@ void StartMoving(int x, int y)
       else if (!IS_FREE(newx,newy))
       {
 	if (IS_PLAYER(x,y))
-	  DrawPlayerField();
+	  DrawPlayerField(x,y);
 	else
 	  DrawLevelField(x,y);
 	return;
@@ -1714,7 +1771,7 @@ void StartMoving(int x, int y)
       if (!IS_FREE(newx,newy))
       {
 	if (IS_PLAYER(x,y))
-	  DrawPlayerField();
+	  DrawPlayerField(x,y);
 	else
 	  DrawLevelField(x,y);
 	return;
@@ -1735,7 +1792,7 @@ void StartMoving(int x, int y)
 	    element1 != EL_BURNING && element2 != EL_BURNING)
 	{
 	  if (IS_PLAYER(x,y))
-	    DrawPlayerField();
+	    DrawPlayerField(x,y);
 	  else
 	    DrawLevelField(x,y);
 
@@ -1801,11 +1858,24 @@ void StartMoving(int x, int y)
 	DrawGraphicAnimation(x,y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element==EL_SONDE)
       {
-	int nextJX = JX + (JX - lastJX);
-	int nextJY = JY + (JY - lastJY);
+	int i;
 
-	if (!(PlayerPushing && PlayerGfxPos && x == nextJX && y == nextJY))
-	  DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+	/* check if this element is just being pushed */
+	for(i=0; i<MAX_PLAYERS; i++)
+	{
+	  struct PlayerInfo *pl = &stored_player[i];
+
+	  if (pl->active && pl->Pushing && pl->GfxPos)
+	  {
+	    int nextJX = pl->JX + (pl->JX - pl->lastJX);
+	    int nextJY = pl->JY + (pl->JY - pl->lastJY);
+
+	    if (x == nextJX && y == nextJY)
+	      return;
+	  }
+	}
+
+	DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
       }
 
       return;
@@ -2597,12 +2667,79 @@ void CheckForDragon(int x, int y)
   }
 }
 
-void GameActions()
+void PlayerActions(int player_action)
+{
+  BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
+  int left	= player_action & JOY_LEFT;
+  int right	= player_action & JOY_RIGHT;
+  int up	= player_action & JOY_UP;
+  int down	= player_action & JOY_DOWN;
+  int button1	= player_action & JOY_BUTTON_1;
+  int button2	= player_action & JOY_BUTTON_2;
+  int dx	= (left ? -1	: right ? 1	: 0);
+  int dy	= (up   ? -1	: down  ? 1	: 0);
+
+  if (player_action)
+  {
+    player->frame_reset_delay = 0;
+
+    if (button1)
+      snapped = SnapField(dx,dy);
+    else
+    {
+      if (button2)
+	bombed = PlaceBomb();
+      moved = MoveFigure(dx,dy);
+    }
+
+    if (tape.recording && (moved || snapped || bombed))
+    {
+      if (bombed && !moved)
+	player_action &= JOY_BUTTON;
+      TapeRecordAction(player_action);
+    }
+    else if (tape.playing && snapped)
+      SnapField(0,0);			/* stop snapping */
+  }
+  else
+  {
+    DigField(0,0,0,0,DF_NO_PUSH);
+    SnapField(0,0);
+    if (++player->frame_reset_delay > MoveSpeed)
+      player->Frame = 0;
+  }
+
+  if (tape.playing && !tape.pausing && !player_action &&
+      tape.counter < tape.length)
+  {
+    int next_joy = tape.pos[tape.counter].joystickdata & (JOY_LEFT|JOY_RIGHT);
+
+    if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
+    {
+      int dx = (next_joy == JOY_LEFT ? -1 : +1);
+
+      if (IN_LEV_FIELD(JX+dx,JY) && IS_PUSHABLE(Feld[JX+dx][JY]))
+      {
+	int el = Feld[JX+dx][JY];
+	int push_delay = (IS_SB_ELEMENT(el) || el==EL_SONDE ? 2 : 10);
+
+	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
+	{
+	  player->MovDir = next_joy;
+	  player->Frame = FrameCounter % 4;
+	  player->Pushing = TRUE;
+	}
+      }
+    }
+  }
+}
+
+void GameActions(int player_action)
 {
   static long action_delay = 0;
   long action_delay_value;
   int sieb_x = 0, sieb_y = 0;
-  int x, y, element;
+  int i, x,y, element;
 
   if (game_status != PLAYING)
     return;
@@ -2615,11 +2752,31 @@ void GameActions()
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
 #endif
 
-  if (PlayerMovPos)
-    ScrollFigure(0);
-
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    player = &stored_player[i];
+    JX = player->JX;
+    JY = player->JY;
+    lastJX = player->lastJX;
+    lastJY = player->lastJY;
+
+    if (!player->active)
+      continue;
+
+    PlayerActions(player_action);
+
+    if (player->MovPos)
+      ScrollFigure(0);
+  }
+
+  player = local_player;
+  JX = player->JX;
+  JY = player->JY;
+  lastJX = player->lastJX;
+  lastJY = player->lastJY;
 
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
@@ -2765,7 +2922,32 @@ void GameActions()
       KillHero();
   }
 
-  DrawPlayerField();
+
+
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    player = &stored_player[i];
+    JX = player->JX;
+    JY = player->JY;
+    lastJX = player->lastJX;
+    lastJY = player->lastJY;
+
+    if (!player->active)
+      continue;
+
+    DrawPlayerField(player->JX,player->JY);
+  }
+
+  player = local_player;
+  JX = player->JX;
+  JY = player->JY;
+  lastJX = player->lastJX;
+  lastJY = player->lastJY;
+
+  /*
+  DrawPlayerField(JX,JY);
+  */
 }
 
 void ScrollLevel(int dx, int dy)
@@ -2773,7 +2955,7 @@ void ScrollLevel(int dx, int dy)
   int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
   int x,y;
 
-  ScreenMovPos = PlayerGfxPos;
+  ScreenMovPos = player->GfxPos;
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2808,10 +2990,10 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   if (PlayerGone || (!dx && !dy))
     return(MF_NO_ACTION);
 
-  PlayerMovDir = (dx < 0 ? MV_LEFT :
-		  dx > 0 ? MV_RIGHT :
-		  dy < 0 ? MV_UP :
-		  dy > 0 ? MV_DOWN :	MV_NO_MOVING);
+  player->MovDir = (dx < 0 ? MV_LEFT :
+		    dx > 0 ? MV_RIGHT :
+		    dy < 0 ? MV_UP :
+		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
 
   if (!IN_LEV_FIELD(newJX,newJY))
     return(MF_NO_ACTION);
@@ -2839,12 +3021,15 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   if (can_move != MF_MOVING)
     return(can_move);
 
-  lastJX = JX;
-  lastJY = JY;
-  JX = newJX;
-  JY = newJY;
+  lastJX = player->lastJX = JX;
+  lastJY = player->lastJY = JY;
+  JX = player->JX = newJX;
+  JY = player->JY = newJY;
 
-  PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
+  StorePlayer[lastJX][lastJY] = EL_LEERRAUM;
+  StorePlayer[JX][JY] = EL_SPIELER1;
+
+  player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
 
   ScrollFigure(-1);
 
@@ -2853,18 +3038,16 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
 
 BOOL MoveFigure(int dx, int dy)
 {
-  static long move_delay = 0;
-  static int last_move_dir = MV_NO_MOVING;
   int moved = MF_NO_ACTION;
   int oldJX = JX, oldJY = JY;
 
   if (PlayerGone || (!dx && !dy))
     return(FALSE);
 
-  if (!FrameReached(&move_delay,MoveSpeed) && !tape.playing)
+  if (!FrameReached(&player->move_delay,MoveSpeed) && !tape.playing)
     return(FALSE);
 
-  if (last_move_dir & (MV_LEFT | MV_RIGHT))
+  if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
   {
     if (!(moved |= MoveFigureOneStep(0,dy, dx,dy)))
       moved |= MoveFigureOneStep(dx,0, dx,dy);
@@ -2875,9 +3058,13 @@ BOOL MoveFigure(int dx, int dy)
       moved |= MoveFigureOneStep(0,dy, dx,dy);
   }
 
-  last_move_dir = MV_NO_MOVING;
 
-  if (moved & MF_MOVING)
+  /*
+  player->last_move_dir = MV_NO_MOVING;
+  */
+
+
+  if (moved & MF_MOVING && player == local_player)
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
@@ -2893,21 +3080,21 @@ BOOL MoveFigure(int dx, int dy)
       ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
   }
 
-  if (!(moved & MF_MOVING) && !PlayerPushing)
-    PlayerFrame = 0;
+  if (!(moved & MF_MOVING) && !player->Pushing)
+    player->Frame = 0;
   else
-    PlayerFrame = (PlayerFrame + 1) % 4;
+    player->Frame = (player->Frame + 1) % 4;
 
   if (moved & MF_MOVING)
   {
     if (oldJX != JX && oldJY == JY)
-      PlayerMovDir = (oldJX < JX ? MV_RIGHT : MV_LEFT);
+      player->MovDir = (oldJX < JX ? MV_RIGHT : MV_LEFT);
     else if (oldJX == JX && oldJY != JY)
-      PlayerMovDir = (oldJY < JY ? MV_DOWN : MV_UP);
+      player->MovDir = (oldJY < JY ? MV_DOWN : MV_UP);
 
     DrawLevelField(JX,JY);	/* für "ErdreichAnbroeckeln()" */
 
-    last_move_dir = PlayerMovDir;
+    player->last_move_dir = player->MovDir;
   }
 
   TestIfHeroHitsBadThing();
@@ -2924,40 +3111,34 @@ void ScrollFigure(int init)
 
   if (init)
   {
-    PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
     actual_frame_counter = FrameCounter;
 
-    /*
-    if (Feld[lastJX][lastJY] == EL_LEERRAUM &&
-	IN_LEV_FIELD(lastJX,lastJY-1) &&
-	CAN_FALL(Feld[lastJX][lastJY-1]))
-      Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
-      */
+    player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
     if (Feld[lastJX][lastJY] == EL_LEERRAUM)
       Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
 
-    DrawPlayerField();
+    DrawPlayerField(JX,JY);
     return;
   }
   else if (!FrameReached(&actual_frame_counter,1))
     return;
 
-  PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/8;
-  PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
+  player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX/8;
+  player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
-  if (ScreenMovPos && ScreenMovPos != PlayerGfxPos)
+  if (ScreenMovPos && ScreenMovPos != local_player->GfxPos)
   {
-    ScreenMovPos = PlayerGfxPos;
+    ScreenMovPos = local_player->GfxPos;
     redraw_mask |= REDRAW_FIELD;
   }
 
   if (Feld[lastJX][lastJY] == EL_PLAYER_IS_LEAVING)
     Feld[lastJX][lastJY] = EL_LEERRAUM;
 
-  DrawPlayerField();
+  DrawPlayerField(JX,JY);
 
-  if (!PlayerMovPos)
+  if (!player->MovPos)
   {
     lastJX = JX;
     lastJY = JY;
@@ -3149,19 +3330,17 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 {
   int dx = x-JX, dy = y-JY;
   int element;
-  static long push_delay = 0;
-  static int push_delay_value = 5;
 
-  if (!PlayerMovPos)
-    PlayerPushing = FALSE;
+  if (!player->MovPos)
+    player->Pushing = FALSE;
 
   if (mode == DF_NO_PUSH)
   {
-    push_delay = 0;
+    player->push_delay = 0;
     return(MF_NO_ACTION);
   }
 
-  if (IS_MOVING(x,y))
+  if (IS_MOVING(x,y) || IS_PLAYER(x,y))
     return(MF_NO_ACTION);
 
   element = Feld[x][y];
@@ -3205,7 +3384,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 
     case EL_DYNAMIT_AUS:
       Feld[x][y] = EL_LEERRAUM;
-      actual_player->dynamite++;
+      player->dynamite++;
       RaiseScoreElement(EL_DYNAMIT);
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
@@ -3215,22 +3394,22 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 
     case EL_DYNABOMB_NR:
       Feld[x][y] = EL_LEERRAUM;
-      actual_player->dynabomb_count++;
-      actual_player->dynabombs_left++;
+      player->dynabomb_count++;
+      player->dynabombs_left++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
     case EL_DYNABOMB_SZ:
 
       Feld[x][y] = EL_LEERRAUM;
-      actual_player->dynabomb_size++;
+      player->dynabomb_size++;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
 
     case EL_DYNABOMB_XL:
       Feld[x][y] = EL_LEERRAUM;
-      actual_player->dynabomb_xl = TRUE;
+      player->dynabomb_xl = TRUE;
       RaiseScoreElement(EL_DYNAMIT);
       PlaySoundLevel(x,y,SND_PONG);
       break;
@@ -3243,7 +3422,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       int key_nr = element-EL_SCHLUESSEL1;
 
       Feld[x][y] = EL_LEERRAUM;
-      actual_player->key[key_nr] = TRUE;
+      player->key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
       DrawMiniGraphicExt(drawto,gc,
 			 DX_KEYS+key_nr*MINI_TILEX,DY_KEYS,
@@ -3270,7 +3449,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       if (dy || mode==DF_SNAP)
 	return(MF_NO_ACTION);
 
-      PlayerPushing = TRUE;
+      player->Pushing = TRUE;
 
       if (!IN_LEV_FIELD(x+dx,y+dy) || Feld[x+dx][y+dy] != EL_LEERRAUM)
 	return(MF_NO_ACTION);
@@ -3281,15 +3460,16 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	  return(MF_NO_ACTION);
       }
 
-      if (push_delay == 0)
-	push_delay = FrameCounter;
-      if (!FrameReached(&push_delay,push_delay_value) && !tape.playing)
+      if (player->push_delay == 0)
+	player->push_delay = FrameCounter;
+      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
+	  !tape.playing)
 	return(MF_NO_ACTION);
 
       Feld[x][y] = EL_LEERRAUM;
       Feld[x+dx][y+dy] = element;
 
-      push_delay_value = 2+RND(8);
+      player->push_delay_value = 2+RND(8);
 
       DrawLevelField(x+dx,y+dy);
       if (element==EL_FELSBROCKEN)
@@ -3304,7 +3484,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
     case EL_PFORTE2:
     case EL_PFORTE3:
     case EL_PFORTE4:
-      if (!actual_player->key[element-EL_PFORTE1])
+      if (!player->key[element-EL_PFORTE1])
 	return(MF_NO_ACTION);
       break;
 
@@ -3312,7 +3492,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
     case EL_PFORTE2X:
     case EL_PFORTE3X:
     case EL_PFORTE4X:
-      if (!actual_player->key[element-EL_PFORTE1X])
+      if (!player->key[element-EL_PFORTE1X])
 	return(MF_NO_ACTION);
       break;
 
@@ -3360,7 +3540,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       if (mode==DF_SNAP)
 	return(MF_NO_ACTION);
 
-      PlayerPushing = TRUE;
+      player->Pushing = TRUE;
 
       if (!IN_LEV_FIELD(x+dx,y+dy)
 	  || (Feld[x+dx][y+dy] != EL_LEERRAUM
@@ -3379,9 +3559,10 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	  return(MF_NO_ACTION);
       }
 
-      if (push_delay == 0)
-	push_delay = FrameCounter;
-      if (!FrameReached(&push_delay,push_delay_value) && !tape.playing)
+      if (player->push_delay == 0)
+	player->push_delay = FrameCounter;
+      if (!FrameReached(&player->push_delay, player->push_delay_value) &&
+	  !tape.playing)
 	return(MF_NO_ACTION);
 
       if (IS_SB_ELEMENT(element))
@@ -3410,7 +3591,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	Feld[x+dx][y+dy] = element;
       }
 
-      push_delay_value = 2;
+      player->push_delay_value = 2;
 
       DrawLevelField(x,y);
       DrawLevelField(x+dx,y+dy);
@@ -3437,7 +3618,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       break;
   }
 
-  push_delay = 0;
+  player->push_delay = 0;
 
   return(MF_MOVING);
 }
@@ -3459,10 +3640,10 @@ BOOL SnapField(int dx, int dy)
   if (snapped)
     return(FALSE);
 
-  PlayerMovDir = (dx < 0 ? MV_LEFT :
-		  dx > 0 ? MV_RIGHT :
-		  dy < 0 ? MV_UP :
-		  dy > 0 ? MV_DOWN :	MV_NO_MOVING);
+  player->MovDir = (dx < 0 ? MV_LEFT :
+		    dx > 0 ? MV_RIGHT :
+		    dy < 0 ? MV_UP :
+		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
 
   if (!DigField(x,y, 0,0, DF_SNAP))
     return(FALSE);
@@ -3478,25 +3659,24 @@ BOOL PlaceBomb(void)
 {
   int element;
 
-  if (PlayerGone || PlayerMovPos)
+  if (PlayerGone || player->MovPos)
     return(FALSE);
 
   element = Feld[JX][JY];
 
-  if ((actual_player->dynamite==0 && actual_player->dynabombs_left==0) ||
+  if ((player->dynamite==0 && player->dynabombs_left==0) ||
       element==EL_DYNAMIT || element==EL_DYNABOMB || element==EL_EXPLODING)
     return(FALSE);
 
   if (element != EL_LEERRAUM)
     Store[JX][JY] = element;
 
-  if (actual_player->dynamite)
+  if (player->dynamite)
   {
     Feld[JX][JY] = EL_DYNAMIT;
     MovDelay[JX][JY] = 96;
-    actual_player->dynamite--;
-    DrawText(DX_DYNAMITE, DY_DYNAMITE,
-	     int2str(local_player->dynamite, 3),
+    player->dynamite--;
+    DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FS_SMALL, FC_YELLOW);
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
   }
@@ -3504,7 +3684,7 @@ BOOL PlaceBomb(void)
   {
     Feld[JX][JY] = EL_DYNABOMB;
     MovDelay[JX][JY] = 96;
-    actual_player->dynabombs_left--;
+    player->dynabombs_left--;
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNABOMB);
   }
 
@@ -3549,8 +3729,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
 void RaiseScore(int value)
 {
   local_player->score += value;
-  DrawText(DX_SCORE, DY_SCORE,
-	   int2str(local_player->score, 5),
+  DrawText(DX_SCORE, DY_SCORE, int2str(local_player->score, 5),
 	   FS_SMALL, FC_YELLOW);
 }
 

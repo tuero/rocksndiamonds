@@ -80,7 +80,7 @@ void OpenAll(int argc, char *argv[])
 
 void InitLevelAndPlayerInfo()
 {
-  local_player = &stored_player[0];
+  player = local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
     CloseAll();
@@ -1203,6 +1203,16 @@ void InitElementProperties()
   };
   static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
 
+  static int ep_player[] =
+  {
+    EL_SPIELFIGUR,
+    EL_SPIELER1,
+    EL_SPIELER2,
+    EL_SPIELER3,
+    EL_SPIELER4
+  };
+  static int ep_player_num = sizeof(ep_player)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1228,7 +1238,8 @@ void InitElementProperties()
     EP_BIT_INACTIVE,
     EP_BIT_EXPLOSIVE,
     EP_BIT_MAMPF3,
-    EP_BIT_PUSHABLE
+    EP_BIT_PUSHABLE,
+    EP_BIT_PLAYER
   };
   static int *ep_array[] =
   {
@@ -1255,7 +1266,8 @@ void InitElementProperties()
     ep_inactive,
     ep_explosive,
     ep_mampf3,
-    ep_pushable
+    ep_pushable,
+    ep_player
   };
   static int *ep_num[] =
   {
@@ -1282,7 +1294,8 @@ void InitElementProperties()
     &ep_inactive_num,
     &ep_explosive_num,
     &ep_mampf3_num,
-    &ep_pushable_num
+    &ep_pushable_num,
+    &ep_player_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 

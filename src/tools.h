@@ -63,7 +63,7 @@ void FadeToFront();
 void ClearWindow();
 void DrawText(int, int, char *, int, int);
 void DrawTextExt(Drawable, GC, int, int, char *, int, int);
-void DrawPlayerField(void);
+void DrawPlayerField(int, int);
 void DrawGraphicAnimationExt(int, int, int, int, int, int, int);
 void DrawGraphicAnimation(int, int, int, int, int, int);
 void DrawGraphicAnimationThruMask(int, int, int, int, int, int);
