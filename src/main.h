@@ -664,7 +664,7 @@ extern char		*element_info[];
 
 #define EL_AUSGANG_AUF		107
 
-#define EL_UNUSED_108		108
+#define EL_BLACK_ORB		108
 
 #define EL_AMOEBA2DIAM		109
 #define EL_MAULWURF		110
@@ -683,11 +683,14 @@ extern char		*element_info[];
 #define EL_CHAR_ASCII0		(EL_CHAR_START-32)
 #define EL_CHAR_AUSRUF		(EL_CHAR_ASCII0+33)
 #define EL_CHAR_ZOLL		(EL_CHAR_ASCII0+34)
+#define EL_CHAR_RAUTE		(EL_CHAR_ASCII0+35)
 #define EL_CHAR_DOLLAR		(EL_CHAR_ASCII0+36)
 #define EL_CHAR_PROZ		(EL_CHAR_ASCII0+37)
+#define EL_CHAR_AMPERSAND	(EL_CHAR_ASCII0+38)
 #define EL_CHAR_APOSTR		(EL_CHAR_ASCII0+39)
 #define EL_CHAR_KLAMM1		(EL_CHAR_ASCII0+40)
 #define EL_CHAR_KLAMM2		(EL_CHAR_ASCII0+41)
+#define EL_CHAR_MULT		(EL_CHAR_ASCII0+42)
 #define EL_CHAR_PLUS		(EL_CHAR_ASCII0+43)
 #define EL_CHAR_KOMMA		(EL_CHAR_ASCII0+44)
 #define EL_CHAR_MINUS		(EL_CHAR_ASCII0+45)
@@ -710,7 +713,10 @@ extern char		*element_info[];
 #define EL_CHAR_COPY		(EL_CHAR_ASCII0+94)
 #define EL_CHAR_END		(EL_CHAR_START+79)
 
-#define EL_CHAR(x)		(EL_CHAR_A + x - 'A')
+#define EL_CHAR(x)		((x) == 'Ä' ? EL_CHAR_AE : \
+				 (x) == 'Ö' ? EL_CHAR_OE : \
+				 (x) == 'Ü' ? EL_CHAR_UE : \
+				 EL_CHAR_A + (x) - 'A')
 
 #define EL_MAUER_X		200
 #define EL_MAUER_Y		201
@@ -935,6 +941,7 @@ extern char		*element_info[];
 #define GFX_EDELSTEIN_ROT	152
 #define GFX_EDELSTEIN_LILA	154
 #define GFX_DYNABOMB_XL		156
+#define GFX_BLACK_ORB		157
 #define GFX_SPEED_PILL		158
 #define GFX_SONDE		159
 /* Zeile 10 (160) */

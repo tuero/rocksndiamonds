@@ -2723,6 +2723,7 @@ int el2gfx(int element)
     case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
     case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
     case EL_INVISIBLE_STEEL:	return GFX_INVISIBLE_STEEL;
+    case EL_BLACK_ORB:		return GFX_BLACK_ORB;
 
     default:
     {

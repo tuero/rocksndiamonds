@@ -844,7 +844,7 @@ int editor_element[] =
   EL_INVISIBLE_STEEL,
   EL_UNSICHTBAR,
   EL_SPEED_PILL,
-  EL_LEERRAUM,
+  EL_BLACK_ORB,
 
   EL_CHAR_A + ('S' - 'A'),
   EL_CHAR_A + ('O' - 'A'),
@@ -948,80 +948,85 @@ int editor_element[] =
   EL_LEERRAUM,
   EL_LEERRAUM,
 
-  EL_CHAR_AUSRUF,
-  EL_CHAR_ZOLL,
-  EL_CHAR_DOLLAR,
-  EL_CHAR_PROZ,
+  EL_CHAR(' '),
+  EL_CHAR('!'),
+  EL_CHAR('"'),
+  EL_CHAR('#'),
 
-  EL_CHAR_APOSTR,
-  EL_CHAR_KLAMM1,
-  EL_CHAR_KLAMM2,
-  EL_CHAR_PLUS,
+  EL_CHAR('$'),
+  EL_CHAR('%'),
+  EL_CHAR('&'),
+  EL_CHAR('\''),
 
-  EL_CHAR_KOMMA,
-  EL_CHAR_MINUS,
-  EL_CHAR_PUNKT,
-  EL_CHAR_SLASH,
+  EL_CHAR('('),
+  EL_CHAR(')'),
+  EL_CHAR('*'),
+  EL_CHAR('+'),
 
-  EL_CHAR_0 + 0,
-  EL_CHAR_0 + 1,
-  EL_CHAR_0 + 2,
-  EL_CHAR_0 + 3,
+  EL_CHAR(','),
+  EL_CHAR('-'),
+  EL_CHAR('.'),
+  EL_CHAR('/'),
 
-  EL_CHAR_0 + 4,
-  EL_CHAR_0 + 5,
-  EL_CHAR_0 + 6,
-  EL_CHAR_0 + 7,
+  EL_CHAR('0'),
+  EL_CHAR('1'),
+  EL_CHAR('2'),
+  EL_CHAR('3'),
 
-  EL_CHAR_0 + 8,
-  EL_CHAR_0 + 9,
-  EL_CHAR_DOPPEL,
-  EL_CHAR_SEMIKL,
+  EL_CHAR('4'),
+  EL_CHAR('5'),
+  EL_CHAR('6'),
+  EL_CHAR('7'),
 
-  EL_CHAR_LT,
-  EL_CHAR_GLEICH,
-  EL_CHAR_GT,
-  EL_CHAR_FRAGE,
+  EL_CHAR('8'),
+  EL_CHAR('9'),
+  EL_CHAR(':'),
+  EL_CHAR(';'),
 
-  EL_CHAR_AT,
-  EL_CHAR_A + 0,
-  EL_CHAR_A + 1,
-  EL_CHAR_A + 2,
+  EL_CHAR('<'),
+  EL_CHAR('='),
+  EL_CHAR('>'),
+  EL_CHAR('?'),
 
-  EL_CHAR_A + 3,
-  EL_CHAR_A + 4,
-  EL_CHAR_A + 5,
-  EL_CHAR_A + 6,
+  EL_CHAR('@'),
+  EL_CHAR('A'),
+  EL_CHAR('B'),
+  EL_CHAR('C'),
 
-  EL_CHAR_A + 7,
-  EL_CHAR_A + 8,
-  EL_CHAR_A + 9,
-  EL_CHAR_A + 10,
+  EL_CHAR('D'),
+  EL_CHAR('E'),
+  EL_CHAR('F'),
+  EL_CHAR('G'),
 
-  EL_CHAR_A + 11,
-  EL_CHAR_A + 12,
-  EL_CHAR_A + 13,
-  EL_CHAR_A + 14,
+  EL_CHAR('H'),
+  EL_CHAR('I'),
+  EL_CHAR('J'),
+  EL_CHAR('K'),
 
-  EL_CHAR_A + 15,
-  EL_CHAR_A + 16,
-  EL_CHAR_A + 17,
-  EL_CHAR_A + 18,
+  EL_CHAR('L'),
+  EL_CHAR('M'),
+  EL_CHAR('N'),
+  EL_CHAR('O'),
 
-  EL_CHAR_A + 19,
-  EL_CHAR_A + 20,
-  EL_CHAR_A + 21,
-  EL_CHAR_A + 22,
+  EL_CHAR('P'),
+  EL_CHAR('Q'),
+  EL_CHAR('R'),
+  EL_CHAR('S'),
 
-  EL_CHAR_A + 23,
-  EL_CHAR_A + 24,
-  EL_CHAR_A + 25,
-  EL_CHAR_AE,
+  EL_CHAR('T'),
+  EL_CHAR('U'),
+  EL_CHAR('V'),
+  EL_CHAR('W'),
 
-  EL_CHAR_OE,
-  EL_CHAR_UE,
-  EL_CHAR_COPY,
-  EL_LEERRAUM
+  EL_CHAR('X'),
+  EL_CHAR('Y'),
+  EL_CHAR('Z'),
+  EL_CHAR('Ä'),
+
+  EL_CHAR('Ö'),
+  EL_CHAR('Ü'),
+  EL_CHAR('^'),
+  EL_CHAR(' ')
 };
 int elements_in_list = sizeof(editor_element)/sizeof(int);
 
@@ -3284,10 +3289,17 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_PICK_ELEMENT:
+
+      /*
       if (button_press_event)
 	PickDrawingElement(button, Feld[lx][ly]);
+      */
+
       if (button_release_event)
 	ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
+      else
+	PickDrawingElement(button, Feld[lx][ly]);
+
       break;
 
     default:
@@ -3797,6 +3809,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  if (edit_mode == ED_MODE_PROPERTIES)
 	    DrawPropertiesWindow();
 	}
+
+	if (drawing_function == GADGET_ID_PICK_ELEMENT)
+	  ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
       }
 #ifdef DEBUG
       else if (gi->event.type == GD_EVENT_PRESSED)
@@ -4001,11 +4016,17 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	    break;
 	}
 
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
-		  "%s: %d, %d", infotext,
-		  ABS(lx - start_lx) + 1,
-		  ABS(ly - start_ly) + 1);
+	if (drawing_function == GADGET_ID_PICK_ELEMENT)
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		    "%s: %d, %d", infotext, lx, ly);
+	else
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		    "%s: %d, %d", infotext,
+		    ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
       }
+      else if (drawing_function == GADGET_ID_PICK_ELEMENT)
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+		  "%s", element_info[Feld[lx][ly]]);
       else
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 		  "Level position: %d, %d", lx, ly);

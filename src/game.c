@@ -1075,6 +1075,7 @@ void Explode(int ex, int ey, int phase, int mode)
   int num_phase = 9, delay = 2;
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
+  int first_phase_after_start = EX_PHASE_START + 1;
 
   if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
   {
@@ -1189,9 +1190,20 @@ void Explode(int ex, int ey, int phase, int mode)
   x = ex;
   y = ey;
 
-  Frame[x][y] = (phase<last_phase ? phase+1 : 0);
+  Frame[x][y] = (phase < last_phase ? phase + 1 : 0);
 
-  if (phase == half_phase)
+  if (phase == first_phase_after_start)
+  {
+    int element = Store2[x][y];
+
+    if (element == EL_BLACK_ORB)
+    {
+      Feld[x][y] = Store2[x][y];
+      Store2[x][y] = 0;
+      Bang(x, y);
+    }
+  }
+  else if (phase == half_phase)
   {
     int element = Store2[x][y];
 
