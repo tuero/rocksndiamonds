@@ -101,8 +101,9 @@
 #define NUM_GAME_BUTTONS		6
 
 /* forward declaration for internal use */
+static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
-static void KillHeroUnlessForceField(struct PlayerInfo *);
+static void KillHeroUnlessShield(struct PlayerInfo *);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -408,7 +409,7 @@ static void InitField(int x, int y, boolean init_game)
 
     case EL_LIGHT_SWITCH_ON:
       if (init_game)
-	game.light_time_left = 10 * FRAMES_PER_SECOND;
+	game.light_time_left = level.time_light * FRAMES_PER_SECOND;
       break;
 
     default:
@@ -480,8 +481,8 @@ void InitGame()
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
 
-    player->force_field_passive_time_left = 0;
-    player->force_field_active_time_left = 0;
+    player->shield_passive_time_left = 0;
+    player->shield_active_time_left = 0;
 
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
@@ -515,8 +516,10 @@ void InitGame()
   AllPlayersGone = FALSE;
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
-  game.switchgate_pos = 0;
   game.light_time_left = 0;
+  game.timegate_time_left = 0;
+  game.switchgate_pos = 0;
+
   for (i=0; i<4; i++)
   {
     game.belt_dir[i] = MV_NO_MOVING;
@@ -695,6 +698,11 @@ void InitGame()
   DrawLevel();
   DrawAllPlayers();
   FadeToFront();
+
+  /* after drawing the level, corect some elements */
+
+  if (game.timegate_time_left == 0)
+    CloseAllOpenTimegates();
 
   if (setup.soft_scrolling)
     XCopyArea(display, fieldbuffer, backbuffer, gc,
@@ -1257,7 +1265,7 @@ void Explode(int ex, int ey, int phase, int mode)
       if (IS_MASSIVE(element) || element == EL_BURNING)
 	continue;
 
-      if (IS_PLAYER(x, y) && FORCE_FIELD_ON(PLAYERINFO(x, y)))
+      if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
       {
 	if (IS_ACTIVE_BOMB(element))
 	{
@@ -1272,7 +1280,7 @@ void Explode(int ex, int ey, int phase, int mode)
       if (element == EL_EXPLODING)
 	element = Store2[x][y];
 
-      if (IS_PLAYER(ex, ey) && !FORCE_FIELD_ON(PLAYERINFO(ex, ey)))
+      if (IS_PLAYER(ex, ey) && !SHIELD_ON(PLAYERINFO(ex, ey)))
       {
 	switch(StorePlayer[ex][ey])
 	{
@@ -1373,7 +1381,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int element = Store2[x][y];
 
     if (IS_PLAYER(x, y))
-      KillHeroUnlessForceField(PLAYERINFO(x, y));
+      KillHeroUnlessShield(PLAYERINFO(x, y));
     else if (IS_EXPLOSIVE(element))
     {
       Feld[x][y] = Store2[x][y];
@@ -1650,13 +1658,53 @@ static void ToggleSwitchgateSwitch(int x, int y)
   }
 }
 
+static void RedrawAllLightSwitchesAndInvisibleElements()
+{
+  int x, y;
+
+  for (y=0; y<lev_fieldy; y++)
+  {
+    for (x=0; x<lev_fieldx; x++)
+    {
+      int element = Feld[x][y];
+
+      if (element == EL_LIGHT_SWITCH_OFF &&
+	  game.light_time_left > 0)
+      {
+	Feld[x][y] = EL_LIGHT_SWITCH_ON;
+	DrawLevelField(x, y);
+      }
+      else if (element == EL_LIGHT_SWITCH_ON &&
+	       game.light_time_left == 0)
+      {
+	Feld[x][y] = EL_LIGHT_SWITCH_OFF;
+	DrawLevelField(x, y);
+      }
+
+      if (element == EL_INVISIBLE_STEEL ||
+	  element == EL_UNSICHTBAR ||
+	  element == EL_SAND_INVISIBLE)
+	DrawLevelField(x, y);
+    }
+  }
+}
+
 static void ToggleLightSwitch(int x, int y)
 {
   int element = Feld[x][y];
-  int xx, yy;
 
   game.light_time_left =
-    (element == EL_LIGHT_SWITCH_OFF ? 10 * FRAMES_PER_SECOND : 0);
+    (element == EL_LIGHT_SWITCH_OFF ?
+     level.time_light * FRAMES_PER_SECOND : 0);
+
+  RedrawAllLightSwitchesAndInvisibleElements();
+}
+
+static void ActivateTimegateSwitch(int x, int y)
+{
+  int xx, yy;
+
+  game.timegate_time_left = level.time_timegate * FRAMES_PER_SECOND;
 
   for (yy=0; yy<lev_fieldy; yy++)
   {
@@ -1664,25 +1712,25 @@ static void ToggleLightSwitch(int x, int y)
     {
       int element = Feld[xx][yy];
 
-      if (element == EL_LIGHT_SWITCH_OFF &&
-	  game.light_time_left > 0)
+      if (element == EL_TIMEGATE_CLOSED ||
+	  element == EL_TIMEGATE_CLOSING)
       {
-	Feld[xx][yy] = EL_LIGHT_SWITCH_ON;
-	DrawLevelField(xx, yy);
-      }
-      else if (element == EL_LIGHT_SWITCH_ON &&
-	       game.light_time_left == 0)
-      {
-	Feld[xx][yy] = EL_LIGHT_SWITCH_OFF;
-	DrawLevelField(xx, yy);
+	Feld[xx][yy] = EL_TIMEGATE_OPENING;
+	PlaySoundLevel(xx, yy, SND_OEFFNEN);
       }
 
-      if (element == EL_INVISIBLE_STEEL ||
-	  element == EL_UNSICHTBAR ||
-	  element == EL_SAND_INVISIBLE)
+      /*
+      else if (element == EL_TIMEGATE_SWITCH_ON)
+      {
+	Feld[xx][yy] = EL_TIMEGATE_SWITCH_OFF;
 	DrawLevelField(xx, yy);
+      }
+      */
+
     }
   }
+
+  Feld[x][y] = EL_TIMEGATE_SWITCH_ON;
 }
 
 void Impact(int x, int y)
@@ -1720,7 +1768,7 @@ void Impact(int x, int y)
   if (element == EL_TROPFEN && (lastline || object_hit))	/* acid drop */
   {
     if (object_hit && IS_PLAYER(x, y+1))
-      KillHeroUnlessForceField(PLAYERINFO(x, y+1));
+      KillHeroUnlessShield(PLAYERINFO(x, y+1));
     else if (object_hit && smashed == EL_PINGUIN)
       Bang(x, y+1);
     else
@@ -1753,7 +1801,7 @@ void Impact(int x, int y)
 
     if (IS_PLAYER(x, y+1))
     {
-      KillHeroUnlessForceField(PLAYERINFO(x, y+1));
+      KillHeroUnlessShield(PLAYERINFO(x, y+1));
       return;
     }
     else if (smashed == EL_PINGUIN)
@@ -2562,7 +2610,7 @@ void StartMoving(int x, int y)
     Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
     if (IS_ENEMY(element) && IS_PLAYER(newx, newy) &&
-	!FORCE_FIELD_ON(PLAYERINFO(newx, newy)))
+	!SHIELD_ON(PLAYERINFO(newx, newy)))
     {
 
 #if 1
@@ -3365,6 +3413,31 @@ void Ablenk(int x, int y)
     ZX = ZY = -1;
 }
 
+void TimegateWheel(int x, int y)
+{
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    MovDelay[x][y]--;
+    if (MovDelay[x][y])
+    {
+      if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+	DrawGraphic(SCREENX(x), SCREENY(y),
+		    GFX_TIMEGATE_SWITCH + MovDelay[x][y]%4);
+      if (!(MovDelay[x][y]%4))
+	PlaySoundLevel(x, y, SND_MIEP);
+      return;
+    }
+  }
+
+  Feld[x][y] = EL_TIMEGATE_SWITCH_OFF;
+  DrawLevelField(x, y);
+  if (ZX == x && ZY == y)
+    ZX = ZY = -1;
+}
+
 void Birne(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
@@ -3517,6 +3590,73 @@ void CloseSwitchgate(int x, int y)
     {
       Feld[x][y] = EL_SWITCHGATE_CLOSED;
       DrawLevelField(x, y);
+    }
+  }
+}
+
+void OpenTimegate(int x, int y)
+{
+  int delay = 6;
+
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = 5 * delay;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = MovDelay[x][y] / delay;
+    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_TIMEGATE_OPEN - phase);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_TIMEGATE_OPEN;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
+void CloseTimegate(int x, int y)
+{
+  int delay = 6;
+
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = 5 * delay;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = MovDelay[x][y] / delay;
+    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_TIMEGATE_CLOSED + phase);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_TIMEGATE_CLOSED;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
+static void CloseAllOpenTimegates()
+{
+  int x, y;
+
+  for (y=0; y<lev_fieldy; y++)
+  {
+    for (x=0; x<lev_fieldx; x++)
+    {
+      int element = Feld[x][y];
+
+      if (element == EL_TIMEGATE_OPEN || element == EL_TIMEGATE_OPENING)
+      {
+	Feld[x][y] = EL_TIMEGATE_CLOSING;
+	PlaySoundLevel(x, y, SND_OEFFNEN);
+      }
     }
   }
 }
@@ -4092,6 +4232,8 @@ void GameActions()
       Life(x, y);
     else if (element == EL_ABLENK_EIN)
       Ablenk(x, y);
+    else if (element == EL_TIMEGATE_SWITCH_ON)
+      TimegateWheel(x, y);
     else if (element == EL_SALZSAEURE)
       Blubber(x, y);
     else if (element == EL_BLURB_LEFT || element == EL_BLURB_RIGHT)
@@ -4125,12 +4267,16 @@ void GameActions()
       OpenSwitchgate(x, y);
     else if (element == EL_SWITCHGATE_CLOSING)
       CloseSwitchgate(x, y);
+    else if (element == EL_TIMEGATE_OPENING)
+      OpenTimegate(x, y);
+    else if (element == EL_TIMEGATE_CLOSING)
+      CloseTimegate(x, y);
     else if (element == EL_EXTRA_TIME)
       DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_NORMAL);
-    else if (element == EL_FORCE_FIELD_PASSIVE)
-      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD_PASSIVE, 6, 4, ANIM_NORMAL);
-    else if (element == EL_FORCE_FIELD_ACTIVE)
-      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD_ACTIVE, 6, 4, ANIM_NORMAL);
+    else if (element == EL_SHIELD_PASSIVE)
+      DrawGraphicAnimation(x, y, GFX_SHIELD_PASSIVE, 6, 4, ANIM_NORMAL);
+    else if (element == EL_SHIELD_ACTIVE)
+      DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_NORMAL);
 
     if (game.magic_wall_active)
     {
@@ -4213,6 +4359,14 @@ void GameActions()
     }
   }
 
+  if (game.timegate_time_left > 0)
+  {
+    game.timegate_time_left--;
+
+    if (game.timegate_time_left == 0)
+      CloseAllOpenTimegates();
+  }
+
   if (TimeFrames >= (1000 / GameFrameDelay))
   {
     TimeFrames = 0;
@@ -4220,12 +4374,12 @@ void GameActions()
 
     for (i=0; i<MAX_PLAYERS; i++)
     {
-      if (FORCE_FIELD_ON(&stored_player[i]))
+      if (SHIELD_ON(&stored_player[i]))
       {
-	stored_player[i].force_field_passive_time_left--;
+	stored_player[i].shield_passive_time_left--;
 
-	if (stored_player[i].force_field_active_time_left > 0)
-	  stored_player[i].force_field_active_time_left--;
+	if (stored_player[i].shield_active_time_left > 0)
+	  stored_player[i].shield_active_time_left--;
       }
     }
 
@@ -4390,7 +4544,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
 #if 1
       TestIfBadThingHitsHero(new_jx, new_jy);
 #else
-      if (player->force_field_time_left == 0)
+      if (player->shield_time_left == 0)
 	KillHero(player);
 #endif
     }
@@ -4710,9 +4864,9 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     {
       struct PlayerInfo *player = PLAYERINFO(goodx, goody);
 
-      if (player->force_field_active_time_left > 0)
+      if (player->shield_active_time_left > 0)
 	Bang(killx, killy);
-      else if (player->force_field_passive_time_left == 0)
+      else if (player->shield_passive_time_left == 0)
 	KillHero(player);
     }
     else
@@ -4772,9 +4926,9 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     {
       struct PlayerInfo *player = PLAYERINFO(killx, killy);
 
-      if (player->force_field_active_time_left > 0)
+      if (player->shield_active_time_left > 0)
 	Bang(badx, bady);
-      else if (player->force_field_passive_time_left == 0)
+      else if (player->shield_passive_time_left == 0)
 	KillHero(player);
     }
     else
@@ -4846,17 +5000,17 @@ void KillHero(struct PlayerInfo *player)
   if (IS_PFORTE(Feld[jx][jy]))
     Feld[jx][jy] = EL_LEERRAUM;
 
-  /* deactivate force field (else Bang()/Explode() would not work right) */
-  player->force_field_passive_time_left = 0;
-  player->force_field_active_time_left = 0;
+  /* deactivate shield (else Bang()/Explode() would not work right) */
+  player->shield_passive_time_left = 0;
+  player->shield_active_time_left = 0;
 
   Bang(jx, jy);
   BuryHero(player);
 }
 
-static void KillHeroUnlessForceField(struct PlayerInfo *player)
+static void KillHeroUnlessShield(struct PlayerInfo *player)
 {
-  if (!FORCE_FIELD_ON(player))
+  if (!SHIELD_ON(player))
     KillHero(player);
 }
 
@@ -4981,16 +5135,16 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
       break;
 
-    case EL_FORCE_FIELD_PASSIVE:
+    case EL_SHIELD_PASSIVE:
       RemoveField(x, y);
-      player->force_field_passive_time_left += 10;
+      player->shield_passive_time_left += 10;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
-    case EL_FORCE_FIELD_ACTIVE:
+    case EL_SHIELD_ACTIVE:
       RemoveField(x, y);
-      player->force_field_passive_time_left += 10;
-      player->force_field_active_time_left += 10;
+      player->shield_passive_time_left += 10;
+      player->shield_active_time_left += 10;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -5137,6 +5291,12 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
+    case EL_TIMEGATE_SWITCH_OFF:
+      ActivateTimegateSwitch(x, y);
+
+      return MF_ACTION;
+      break;
+
     case EL_SP_EXIT:
       if (local_player->gems_still_needed > 0)
 	return MF_NO_ACTION;
@@ -5238,6 +5398,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_SWITCHGATE_OPEN:
+    case EL_TIMEGATE_OPEN:
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 

@@ -561,6 +561,8 @@ void InitGfx()
     { GFX_SOKOBAN_OBJEKT, 1 },
     { GFX_FUNKELN_BLAU, 3 },
     { GFX_FUNKELN_WEISS, 3 },
+    { GFX2_SHIELD_PASSIVE, 3 },
+    { GFX2_SHIELD_ACTIVE, 3 },
     { -1, 0 }
   };
 
@@ -872,7 +874,9 @@ void InitElementProperties()
     EL_EM_GATE_3X,
     EL_EM_GATE_4X,
     EL_SWITCHGATE_OPEN,
-    EL_SWITCHGATE_CLOSED
+    EL_SWITCHGATE_CLOSED,
+    EL_TIMEGATE_OPEN,
+    EL_TIMEGATE_CLOSED
   };
   static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
 
@@ -941,8 +945,12 @@ void InitElementProperties()
     EL_BELT4_SWITCH_LEFT,
     EL_BELT4_SWITCH_MIDDLE,
     EL_BELT4_SWITCH_RIGHT,
+    EL_SWITCHGATE_SWITCH_1,
+    EL_SWITCHGATE_SWITCH_2,
     EL_LIGHT_SWITCH_OFF,
     EL_LIGHT_SWITCH_ON,
+    EL_TIMEGATE_SWITCH_OFF,
+    EL_TIMEGATE_SWITCH_ON,
     EL_SIGN_EXCLAMATION,
     EL_SIGN_RADIOACTIVITY,
     EL_SIGN_STOP,
@@ -986,6 +994,8 @@ void InitElementProperties()
     EL_EM_GATE_4X,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_CLOSED,
+    EL_TIMEGATE_OPEN,
+    EL_TIMEGATE_CLOSED,
     EL_SP_HARD_GRAY,
     EL_SP_HARD_GREEN,
     EL_SP_HARD_BLUE,
@@ -1613,7 +1623,8 @@ void InitElementProperties()
     EL_SP_PORT_X,
     EL_SP_PORT_Y,
     EL_SP_PORT_XY,
-    EL_SWITCHGATE_OPEN
+    EL_SWITCHGATE_OPEN,
+    EL_TIMEGATE_OPEN
   };
   static int ep_quick_gate_num = sizeof(ep_quick_gate)/sizeof(int);
 

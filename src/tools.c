@@ -606,9 +606,14 @@ void DrawPlayer(struct PlayerInfo *player)
 
   DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, NO_CUTTING);
 
-  if (FORCE_FIELD_ON(player))
-    DrawGraphicAnimationShiftedThruMask(sx, sy, sxx, syy, GFX_FUNKELN_BLAU,
+  if (SHIELD_ON(player))
+  {
+    int graphic = (player->shield_active_time_left ? GFX2_SHIELD_ACTIVE :
+		   GFX2_SHIELD_PASSIVE);
+
+    DrawGraphicAnimationShiftedThruMask(sx, sy, sxx, syy, graphic,
 					3, 8, ANIM_OSCILLATE);
+  }
 
   if (player->Pushing && player->GfxPos)
   {
@@ -2504,15 +2509,13 @@ int el2gfx(int element)
     case EL_DOOR_WHITE:		return GFX_DOOR_WHITE;
     case EL_DOOR_WHITE_GRAY:	return GFX_DOOR_WHITE_GRAY;
     case EL_KEY_WHITE:		return GFX_KEY_WHITE;
-    case EL_FORCE_FIELD_PASSIVE:return GFX_FORCE_FIELD_PASSIVE;
-    case EL_FORCE_FIELD_ACTIVE:	return GFX_FORCE_FIELD_ACTIVE;
+    case EL_SHIELD_PASSIVE:	return GFX_SHIELD_PASSIVE;
+    case EL_SHIELD_ACTIVE:	return GFX_SHIELD_ACTIVE;
     case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
     case EL_SWITCHGATE_OPEN:	return GFX_SWITCHGATE_OPEN;
     case EL_SWITCHGATE_CLOSED:	return GFX_SWITCHGATE_CLOSED;
     case EL_SWITCHGATE_SWITCH_1:return GFX_SWITCHGATE_SWITCH_1;
     case EL_SWITCHGATE_SWITCH_2:return GFX_SWITCHGATE_SWITCH_2;
-    case EL_TIME_GATE:		return GFX_TIME_GATE;
-    case EL_TIME_GATE_WHEEL:	return GFX_TIME_GATE_WHEEL;
     case EL_BELT1_LEFT:		return GFX_BELT1_LEFT;
     case EL_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
     case EL_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
@@ -2561,6 +2564,10 @@ int el2gfx(int element)
     case EL_SAND_INVISIBLE:	return GFX_SAND_INVISIBLE;
     case EL_DX_UNKNOWN_15:	return GFX_DX_UNKNOWN_15;
     case EL_DX_UNKNOWN_42:	return GFX_DX_UNKNOWN_42;
+    case EL_TIMEGATE_OPEN:	return GFX_TIMEGATE_OPEN;
+    case EL_TIMEGATE_CLOSED:	return GFX_TIMEGATE_CLOSED;
+    case EL_TIMEGATE_SWITCH_ON:	return GFX_TIMEGATE_SWITCH;
+    case EL_TIMEGATE_SWITCH_OFF:return GFX_TIMEGATE_SWITCH;
 
     default:
     {

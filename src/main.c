@@ -463,14 +463,14 @@ char *element_info[] =
   "white door",					/* 260 */
   "gray door (opened by white key)",
   "white key",
-  "force field (passive)",
+  "shield (passive)",
   "extra time",
   "switch gate (open)",
   "switch gate (closed)",
   "switch for switch gate",
   "switch for switch gate",
-  "time gate",
-  "time gate with magic wheel",			/* 270 */
+  "-",
+  "-",						/* 270 */
   "red conveyor belt (left)",
   "red conveyor belt (middle)",
   "red conveyor belt (right)",
@@ -521,10 +521,11 @@ char *element_info[] =
   "dx unknown 42",
   "-",
   "-",						/* 320 */
-  "force field (active, kills enemies)",
-  "-",
-  "-",
-  "-",
+  "shield (active, kills enemies)",
+  "time gate (open)",
+  "time gate (closed)",
+  "switch for time gate",
+  "switch for time gate",
   "-",
   "-",
   "-"

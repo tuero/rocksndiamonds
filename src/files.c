@@ -355,6 +355,8 @@ static void setLevelInfoToDefaults()
   level.amoeba_speed = 10;
   level.time_magic_wall = 10;
   level.time_wheel = 10;
+  level.time_light = 10;
+  level.time_timegate = 10;
   level.amoeba_content = EL_DIAMANT;
   level.double_speed = FALSE;
   level.gravity = FALSE;

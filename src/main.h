@@ -191,7 +191,7 @@ typedef unsigned char byte;
 #define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing &&!(x).pausing)
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_SPIELER1])
-#define FORCE_FIELD_ON(p)	((p)->force_field_passive_time_left > 0)
+#define SHIELD_ON(p)		((p)->shield_passive_time_left > 0)
 
 /* Pixmaps with graphic file */
 #define PIX_BACK		0
@@ -354,8 +354,8 @@ struct PlayerInfo
   int key[4];
   int dynamite;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
-  int force_field_passive_time_left;
-  int force_field_active_time_left;
+  int shield_passive_time_left;
+  int shield_active_time_left;
 };
 
 struct LevelInfo
@@ -373,6 +373,8 @@ struct LevelInfo
   int amoeba_content;
   int time_magic_wall;
   int time_wheel;
+  int time_light;
+  int time_timegate;
   boolean double_speed;
   boolean gravity;
 };
@@ -421,10 +423,11 @@ struct GameInfo
   int yam_content_nr;
   boolean magic_wall_active;
   int magic_wall_time_left;
+  int light_time_left;
+  int timegate_time_left;
   int belt_dir[4];
   int belt_dir_nr[4];
   int switchgate_pos;
-  int light_time_left;
 };
 
 struct GlobalInfo
@@ -853,14 +856,16 @@ extern char		*element_info[];
 #define EL_DOOR_WHITE		260
 #define EL_DOOR_WHITE_GRAY	261
 #define EL_KEY_WHITE		262
-#define EL_FORCE_FIELD_PASSIVE	263
+#define EL_SHIELD_PASSIVE	263
 #define EL_EXTRA_TIME		264
 #define EL_SWITCHGATE_OPEN	265
 #define EL_SWITCHGATE_CLOSED	266
 #define EL_SWITCHGATE_SWITCH_1	267
 #define EL_SWITCHGATE_SWITCH_2	268
-#define EL_TIME_GATE		269
-#define EL_TIME_GATE_WHEEL	270
+
+#define EL_UNUSED_269		269
+#define EL_UNUSED_270		270
+
 #define EL_BELT1_LEFT		271
 #define EL_BELT1_MIDDLE		272
 #define EL_BELT1_RIGHT		273
@@ -913,7 +918,11 @@ extern char		*element_info[];
 #define EL_UNUSED_319		319
 #define EL_UNUSED_320		320
 
-#define EL_FORCE_FIELD_ACTIVE	321
+#define EL_SHIELD_ACTIVE	321
+#define EL_TIMEGATE_OPEN	322
+#define EL_TIMEGATE_CLOSED	323
+#define EL_TIMEGATE_SWITCH_ON	324
+#define EL_TIMEGATE_SWITCH_OFF	325
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_SIEB_LEER		500
@@ -935,6 +944,8 @@ extern char		*element_info[];
 #define EL_DYNABOMB_ACTIVE_4	516
 #define EL_SWITCHGATE_OPENING	517
 #define EL_SWITCHGATE_CLOSING	518
+#define EL_TIMEGATE_OPENING	519
+#define EL_TIMEGATE_CLOSING	520
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -1175,6 +1186,8 @@ extern char		*element_info[];
 #define GFX_SPIELER4_PUSH_LEFT	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 4)
 #define GFX_MAUER_DOWN		(GFX_START_ROCKSHEROES +12*HEROES_PER_LINE + 0)
 #define GFX_MAUER_UP		(GFX_START_ROCKSHEROES +12*HEROES_PER_LINE + 3)
+#define GFX2_SHIELD_PASSIVE	(GFX_START_ROCKSHEROES +14*HEROES_PER_LINE + 1)
+#define GFX2_SHIELD_ACTIVE	(GFX_START_ROCKSHEROES +14*HEROES_PER_LINE + 5)
 
 #define GFX_SONDE_START		(GFX_START_ROCKSHEROES + 9*HEROES_PER_LINE + 8)
 #define GFX_SCHWEIN_DOWN	(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE + 8)
@@ -1185,18 +1198,20 @@ extern char		*element_info[];
 #define GFX_DRACHE_UP		(GFX_START_ROCKSHEROES + 2*HEROES_PER_LINE +12)
 #define GFX_DRACHE_LEFT		(GFX_START_ROCKSHEROES + 3*HEROES_PER_LINE + 8)
 #define GFX_DRACHE_RIGHT	(GFX_START_ROCKSHEROES + 3*HEROES_PER_LINE +12)
+/*
 #define GFX_MOLE_DOWN		(GFX_START_ROCKSHEROES + 4*HEROES_PER_LINE + 8)
 #define GFX_MOLE_UP		(GFX_START_ROCKSHEROES + 4*HEROES_PER_LINE +12)
 #define GFX_MOLE_LEFT		(GFX_START_ROCKSHEROES + 5*HEROES_PER_LINE + 8)
 #define GFX_MOLE_RIGHT		(GFX_START_ROCKSHEROES + 5*HEROES_PER_LINE +12)
+*/
 #define GFX_PINGUIN_DOWN	(GFX_START_ROCKSHEROES + 6*HEROES_PER_LINE + 8)
 #define GFX_PINGUIN_UP		(GFX_START_ROCKSHEROES + 6*HEROES_PER_LINE +12)
 #define GFX_PINGUIN_LEFT	(GFX_START_ROCKSHEROES + 7*HEROES_PER_LINE + 8)
 #define GFX_PINGUIN_RIGHT	(GFX_START_ROCKSHEROES + 7*HEROES_PER_LINE +12)
 #define GFX_BLURB_LEFT		(GFX_START_ROCKSHEROES +10*HEROES_PER_LINE + 8)
 #define GFX_BLURB_RIGHT		(GFX_START_ROCKSHEROES +10*HEROES_PER_LINE +12)
-#define GFX_FUNKELN_BLAU	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 8)
-#define GFX_FUNKELN_WEISS	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE +12)
+#define GFX_FUNKELN_BLAU	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 9)
+#define GFX_FUNKELN_WEISS	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE +13)
 #define GFX_FLAMMEN_LEFT	(GFX_START_ROCKSHEROES +12*HEROES_PER_LINE + 8)
 #define GFX_FLAMMEN_RIGHT	(GFX_START_ROCKSHEROES +13*HEROES_PER_LINE + 8)
 #define GFX_FLAMMEN_UP		(GFX_START_ROCKSHEROES +14*HEROES_PER_LINE + 8)
@@ -1318,12 +1333,11 @@ extern char		*element_info[];
 #define GFX_BELT3_SWITCH_RIGHT	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  2)
 #define GFX_BELT4_SWITCH_RIGHT	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  3)
 
-#define GFX_SWITCHGATE_OPEN	(GFX_START_ROCKSDC + 15 * DC_PER_LINE +  4)
-#define GFX_SWITCHGATE_CLOSED	(GFX_START_ROCKSDC + 15 * DC_PER_LINE +  0)
 #define GFX_SWITCHGATE_SWITCH_1	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  4)
 #define GFX_SWITCHGATE_SWITCH_2	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  5)
 #define GFX_LIGHT_SWITCH_OFF	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  6)
 #define GFX_LIGHT_SWITCH_ON	(GFX_START_ROCKSDC + 12 * DC_PER_LINE +  7)
+#define GFX_TIMEGATE_SWITCH	(GFX_START_ROCKSDC + 15 * DC_PER_LINE +  0)
 
 #define GFX_ENVELOPE		(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  4)
 #define GFX_SIGN_EXCLAMATION	(GFX_START_ROCKSDC + 14 * DC_PER_LINE +  5)
@@ -1332,8 +1346,16 @@ extern char		*element_info[];
 #define GFX_STEEL_SLANTED	(GFX_START_ROCKSDC + 15 * DC_PER_LINE +  5)
 
 #define GFX_EXTRA_TIME		(GFX_START_ROCKSDC +  0 * DC_PER_LINE +  8)
-#define GFX_FORCE_FIELD_PASSIVE	(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
-#define GFX_FORCE_FIELD_ACTIVE	(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
+#define GFX_SHIELD_ACTIVE	(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
+#define GFX_SHIELD_PASSIVE	(GFX_START_ROCKSDC +  2 * DC_PER_LINE +  8)
+#define GFX_MOLE_DOWN		(GFX_START_ROCKSDC +  3 * DC_PER_LINE +  8)
+#define GFX_MOLE_UP		(GFX_START_ROCKSDC +  3 * DC_PER_LINE + 12)
+#define GFX_MOLE_LEFT		(GFX_START_ROCKSDC +  4 * DC_PER_LINE +  8)
+#define GFX_MOLE_RIGHT		(GFX_START_ROCKSDC +  4 * DC_PER_LINE + 12)
+#define GFX_SWITCHGATE_CLOSED	(GFX_START_ROCKSDC +  5 * DC_PER_LINE +  8)
+#define GFX_SWITCHGATE_OPEN	(GFX_START_ROCKSDC +  5 * DC_PER_LINE + 12)
+#define GFX_TIMEGATE_CLOSED	(GFX_START_ROCKSDC +  6 * DC_PER_LINE +  8)
+#define GFX_TIMEGATE_OPEN	(GFX_START_ROCKSDC +  6 * DC_PER_LINE + 12)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
@@ -1375,8 +1397,6 @@ extern char		*element_info[];
 #define GFX_DOOR_WHITE		GFX_CHAR_FRAGE
 #define GFX_DOOR_WHITE_GRAY	GFX_CHAR_FRAGE
 #define GFX_KEY_WHITE		GFX_CHAR_FRAGE
-#define GFX_TIME_GATE		GFX_CHAR_FRAGE
-#define GFX_TIME_GATE_WHEEL	GFX_CHAR_FRAGE
 #define GFX_SIGN_RADIOACTIVITY	GFX_CHAR_FRAGE
 #define GFX_SIGN_WHEELCHAIR	GFX_CHAR_FRAGE
 #define GFX_SIGN_PARKING	GFX_CHAR_FRAGE
