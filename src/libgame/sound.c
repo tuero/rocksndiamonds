@@ -135,7 +135,7 @@ static boolean ForkAudioProcess(void)
     return FALSE;
   }
 
-  if (audio.soundserver_pid == 0)	/* we are child */
+  if (audio.soundserver_pid == 0)	/* we are child process */
   {
     SoundServer();
 
@@ -168,7 +168,7 @@ void UnixCloseAudio(void)
   if (audio.device_fd)
     close(audio.device_fd);
 
-  if (audio.soundserver_pid)
+  if (audio.soundserver_pid > 0)	/* we are parent process */
     kill(audio.soundserver_pid, SIGTERM);
 }
 #endif	/* PLATFORM_UNIX */
@@ -1169,6 +1169,9 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   Mix_Volume(-1, SOUND_MAX_VOLUME);
   Mix_PlayChannel(-1, Sound[nr].mix_chunk, (loop ? -1 : 0));
 #elif defined(PLATFORM_UNIX)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
@@ -1274,6 +1277,9 @@ void StopSoundExt(int nr, int method)
 
 #else
 #if !defined(PLATFORM_MSDOS)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
