@@ -202,13 +202,14 @@ typedef unsigned char byte;
 #define PIX_DC			5
 #define	PIX_BIGFONT		6
 #define PIX_SMALLFONT		7
+#define PIX_MEDIUMFONT		8
 /* Pixmaps without graphic file */
-#define PIX_DB_BACK		8
-#define PIX_DB_DOOR		9
-#define PIX_DB_FIELD		10
+#define PIX_DB_BACK		9
+#define PIX_DB_DOOR		10
+#define PIX_DB_FIELD		11
 
-#define NUM_PICTURES		8
-#define NUM_PIXMAPS		10
+#define NUM_PICTURES		9
+#define NUM_PIXMAPS		11
 
 /* boundaries of arrays etc. */
 #define MAX_PLAYER_NAME_LEN	10
@@ -576,6 +577,8 @@ extern char		*element_info[];
 #define FONT4_YSIZE		16
 #define FONT5_XSIZE		10
 #define FONT5_YSIZE		14
+#define FONT6_XSIZE		16
+#define FONT6_YSIZE		32
 
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
@@ -1543,6 +1546,7 @@ extern char		*element_info[];
 /* font types */
 #define FS_SMALL		0
 #define FS_BIG			1
+#define FS_MEDIUM		2
 /* font colors */
 #define FC_RED			0
 #define FC_BLUE			1

@@ -823,17 +823,23 @@ void DrawChooseLevel()
 static void drawChooseLevelList(int first_entry, int num_page_entries)
 {
   int i;
-  char buffer[SCR_FIELDX];
+  char buffer[SCR_FIELDX * 2];
 
   ClearWindow();
   DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
 
   for(i=0; i<num_page_entries; i++)
   {
+#if 0
     strncpy(buffer, leveldir[first_entry + i].name_short , SCR_FIELDX - 1);
     buffer[SCR_FIELDX - 1] = '\0';
+#else
+    strncpy(buffer, leveldir[first_entry + i].name , (SCR_FIELDX - 1) * 2);
+    buffer[(SCR_FIELDX - 1) * 2] = '\0';
+#endif
+
     DrawText(SX + 32, SY + (i + 2) * 32, buffer,
-	     FS_BIG, leveldir[first_entry + i].color);
+	     FS_MEDIUM, leveldir[first_entry + i].color);
     DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
   }
 
@@ -994,47 +1000,101 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
 void DrawHallOfFame(int highlight_position)
 {
-  int i;
-
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
   if (highlight_position < 0) 
     LoadScore(level_nr);
 
-  ClearWindow();
+  FadeToFront();
+  InitAnimation();
+  HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
+  PlaySound(SND_HALLOFFAME);
+}
 
+static void drawHallOfFameList(int first_entry, int highlight_position)
+{
+  int i;
+
+  ClearWindow();
   DrawText(SX + 80, SY + 8, "Hall Of Fame", FS_BIG, FC_YELLOW);
   DrawTextFCentered(46, FC_RED, "HighScores of Level %d", level_nr);
 
   for(i=0; i<MAX_LEVEL_SERIES_ON_SCREEN; i++)
   {
-    DrawText(SX, SY + 64 + i * 32, ".................", FS_BIG,
-	     (i == highlight_position ? FC_RED : FC_GREEN));
-    DrawText(SX, SY + 64 + i * 32, highscore[i].Name, FS_BIG,
-	     (i == highlight_position ? FC_RED : FC_GREEN));
-    DrawText(SX + 12 * 32, SY + 64 + i * 32,
-	     int2str(highscore[i].Score, 5), FS_BIG,
-	     (i == highlight_position ? FC_RED : FC_GREEN));
-  }
+    int entry = first_entry + i;
+    int color = (entry == highlight_position ? FC_RED : FC_GREEN);
 
-  FadeToFront();
-  InitAnimation();
-  PlaySound(SND_HALLOFFAME);
+#if 0
+    DrawText(SX, SY + 64 + i * 32, ".................", FS_BIG, color);
+    DrawText(SX, SY + 64 + i * 32, highscore[i].Name, FS_BIG, color);
+    DrawText(SX + 12 * 32, SY + 64 + i * 32,
+	     int2str(highscore[i].Score, 5), FS_BIG, color);
+#else
+    DrawText(SX, SY + 64 + i * 32, "..................................",
+	     FS_MEDIUM, FC_YELLOW);
+    DrawText(SX, SY + 64 + i * 32, int2str(entry + 1, 3),
+	     FS_MEDIUM, FC_YELLOW);
+    DrawText(SX + 64, SY + 64 + i * 32, highscore[entry].Name, FS_BIG, color);
+    DrawText(SX + 14 * 32 + 16, SY + 64 + i * 32,
+	     int2str(highscore[entry].Score, 5), FS_MEDIUM, color);
+#endif
+  }
 }
 
-void HandleHallOfFame(int button)
+void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 {
+  static int first_entry = 0;
+  static int highlight_position = 0;
+  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int button_released = !button;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    first_entry = 0;
+    highlight_position = mx;
+    drawHallOfFameList(first_entry, highlight_position);
+    return;
+  }
+
+  if (ABS(dy) == SCR_FIELDY)	/* handle XK_Page_Up, XK_Page_Down */
+    step = MAX_LEVEL_SERIES_ON_SCREEN - 1;
+
+  if (dy < 0)
+  {
+    if (first_entry > 0)
+    {
+      first_entry -= step;
+      if (first_entry < 0)
+	first_entry = 0;
+
+      drawHallOfFameList(first_entry, highlight_position);
+      return;
+    }
+  }
+  else if (dy > 0)
+  {
+    if (first_entry + MAX_LEVEL_SERIES_ON_SCREEN < MAX_SCORE_ENTRIES)
+    {
+      first_entry += step;
+      if (first_entry + MAX_LEVEL_SERIES_ON_SCREEN > MAX_SCORE_ENTRIES)
+	first_entry = MAX(0, MAX_SCORE_ENTRIES - MAX_LEVEL_SERIES_ON_SCREEN);
+
+      drawHallOfFameList(first_entry, highlight_position);
+      return;
+    }
+  }
 
   if (button_released)
   {
     FadeSound(SND_HALLOFFAME);
     game_status = MAINMENU;
     DrawMainMenu();
-    BackToFront();
   }
-  else
+
+  BackToFront();
+
+  if (game_status == HALLOFFAME)
     DoAnimation();
 }
 

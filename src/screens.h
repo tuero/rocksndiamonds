@@ -29,7 +29,7 @@ void HandleTypeName(int, KeySym);
 void DrawChooseLevel(void);
 void HandleChooseLevel(int, int, int, int, int);
 void DrawHallOfFame(int);
-void HandleHallOfFame(int);
+void HandleHallOfFame(int, int, int, int, int);
 void DrawSetupScreen(void);
 void HandleSetupScreen(int, int, int, int, int);
 void DrawSetupInputScreen(void);

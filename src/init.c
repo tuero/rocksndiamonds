@@ -473,7 +473,8 @@ void InitGfx()
     { "SP",	TRUE },
     { "DC",	TRUE },
     { "Font",	FALSE },
-    { "Font2",	FALSE }
+    { "Font2",	FALSE },
+    { "Font3",	FALSE }
   }; 
 #else
   static struct PictureFileInfo pic[NUM_PICTURES] =
@@ -485,7 +486,8 @@ void InitGfx()
     { "RocksSP",	TRUE },
     { "RocksDC",	TRUE },
     { "RocksFont",	FALSE },
-    { "RocksFont2",	FALSE }
+    { "RocksFont2",	FALSE },
+    { "RocksFont3",	FALSE }
   }; 
 #endif
 

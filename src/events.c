@@ -356,7 +356,7 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case HALLOFFAME:
-      HandleHallOfFame(button);
+      HandleHallOfFame(0,0, 0,0, button);
       break;
 
     case LEVELED:
@@ -559,6 +559,14 @@ void HandleKey(KeySym key, int key_status)
 	  game_status = MAINMENU;
 	  DrawMainMenu();
 	  BackToFront();
+	  break;
+
+        case XK_Page_Up:
+	  HandleHallOfFame(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
+	  break;
+
+        case XK_Page_Down:
+	  HandleHallOfFame(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
 	default:
@@ -773,7 +781,7 @@ void HandleJoystick()
     }
 
     case HALLOFFAME:
-      HandleHallOfFame(!newbutton);
+      HandleHallOfFame(0,0, dx,dy, !newbutton);
       break;
 
     case HELPSCREEN:

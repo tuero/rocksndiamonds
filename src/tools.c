@@ -319,6 +319,7 @@ void ClearWindow()
 int getFontWidth(int font_size, int font_type)
 {
   return (font_size == FS_BIG ? FONT1_XSIZE :
+	  font_size == FS_MEDIUM ? FONT6_XSIZE :
 	  font_type == FC_SPECIAL1 ? FONT3_XSIZE :
 	  font_type == FC_SPECIAL2 ? FONT4_XSIZE :
 	  font_type == FC_SPECIAL3 ? FONT5_XSIZE :
@@ -328,6 +329,7 @@ int getFontWidth(int font_size, int font_type)
 int getFontHeight(int font_size, int font_type)
 {
   return (font_size == FS_BIG ? FONT1_YSIZE :
+	  font_size == FS_MEDIUM ? FONT6_YSIZE :
 	  font_type == FC_SPECIAL1 ? FONT3_YSIZE :
 	  font_type == FC_SPECIAL2 ? FONT4_YSIZE :
 	  font_type == FC_SPECIAL3 ? FONT5_YSIZE :
@@ -388,7 +390,7 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   int font_pixmap;
   boolean print_inverse = FALSE;
 
-  if (font_size != FS_SMALL && font_size != FS_BIG)
+  if (font_size != FS_SMALL && font_size != FS_BIG && font_size != FS_MEDIUM)
     font_size = FS_SMALL;
   if (font_type < FC_RED || font_type > FC_SPECIAL3)
     font_type = FC_RED;
@@ -396,8 +398,12 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   font_width = getFontWidth(font_size, font_type);
   font_height = getFontHeight(font_size, font_type);
 
-  font_pixmap = (font_size == FS_BIG ? PIX_BIGFONT : PIX_SMALLFONT);
-  font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE : FONT2_YSIZE) *
+  font_pixmap = (font_size == FS_BIG ? PIX_BIGFONT :
+		 font_size == FS_MEDIUM ? PIX_MEDIUMFONT :
+		 PIX_SMALLFONT);
+  font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
+			     font_size == FS_MEDIUM ? FONT6_YSIZE :
+			     FONT2_YSIZE) *
 		FONT_LINES_PER_FONT);
 
   if (font_type == FC_SPECIAL3)
