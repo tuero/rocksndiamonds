@@ -927,7 +927,8 @@ static void InitGameEngine()
   {
     if (!IS_CUSTOM_ELEMENT(i))
     {
-      element_info[i].push_delay_fixed = 8;
+      element_info[i].push_delay_fixed =
+	(game.engine_version < VERSION_IDENT(3,0,7) ? 2 : 8);
       element_info[i].push_delay_random = 8;
     }
   }
