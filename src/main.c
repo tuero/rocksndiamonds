@@ -50,7 +50,9 @@ char	       *joystick_device_name[MAX_PLAYERS] =
   DEV_JOYSTICK_3
 };
 
+/*
 int     	width, height;
+*/
 
 char	       *program_name = NULL;
 

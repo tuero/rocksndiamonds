@@ -159,9 +159,22 @@ unsigned int SimpleRND(unsigned int max)
   return (root % max);
 }
 
+#ifdef DEBUG
+static unsigned int last_RND_value = 0;
+
+unsigned int last_RND()
+{
+  return last_RND_value;
+}
+#endif
+
 unsigned int RND(unsigned int max)
 {
+#ifdef DEBUG
+  return (last_RND_value = random_linux_libc() % max);
+#else
   return (random_linux_libc() % max);
+#endif
 }
 
 unsigned int InitRND(long seed)

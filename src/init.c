@@ -318,6 +318,7 @@ void InitWindow(int argc, char *argv[])
   int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
   unsigned long pen_fg = WhitePixel(display,screen);
   unsigned long pen_bg = BlackPixel(display,screen);
+  const int width = WIN_XSIZE, height = WIN_YSIZE;
 
 #ifndef MSDOS
   static struct IconFileInfo icon_pic =
@@ -329,9 +330,6 @@ void InitWindow(int argc, char *argv[])
 
   screen_width = XDisplayWidth(display, screen);
   screen_height = XDisplayHeight(display, screen);
-
-  width = WIN_XSIZE;
-  height = WIN_YSIZE;
 
   win_xpos = (screen_width - width) / 2;
   win_ypos = (screen_height - height) / 2;

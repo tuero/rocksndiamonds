@@ -387,7 +387,10 @@ extern int		sound_device;
 extern char	       *sound_device_name;
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
+
+/*
 extern int     		width, height;
+*/
 
 extern char	       *program_name;
 

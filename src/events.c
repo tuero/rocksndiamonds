@@ -426,8 +426,16 @@ void HandleKey(KeySym key, int key_status)
     return;
   }
 
+
+
+#ifndef DEBUG
+
   if (game_status == PLAYING && (tape.playing || tape.pausing))
     return;
+
+#endif
+
+
 
   switch(game_status)
   {
@@ -496,7 +504,12 @@ void HandleKey(KeySym key, int key_status)
 	case XK_8:
 	case XK_9:
 	  if (key == XK_0)
-	    GameFrameDelay = 500;
+	  {
+	    if (GameFrameDelay == 500)
+	      GameFrameDelay = GAME_FRAME_DELAY;
+	    else
+	      GameFrameDelay = 500;
+	  }
 	  else
 	    GameFrameDelay = (key - XK_0) * 10;
 	  printf("Game speed == %d%% (%d ms delay between two frames)\n",

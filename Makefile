@@ -28,7 +28,7 @@ clean:
 	$(MAKE_CMD) clean
 
 backup:
-	./scripts/make_backup.sh
+	./Scripts/make_backup.sh
 
 depend:
 	$(MAKE_CMD) depend
