@@ -942,12 +942,12 @@ void GameWon()
 
   if (TimeLeft)
   {
-    if (setup.sound_loops)
+    if (!tape.playing && setup.sound_loops)
       PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
 
     while(TimeLeft > 0)
     {
-      if (!setup.sound_loops)
+      if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
       if (TimeLeft > 0 && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
@@ -957,20 +957,22 @@ void GameWon()
 	TimeLeft--;
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
       BackToFront();
-      Delay(10);
+
+      if (!tape.playing)
+	Delay(10);
     }
 
-    if (setup.sound_loops)
+    if (!tape.playing && setup.sound_loops)
       StopSound(SND_SIRR);
   }
   else if (level.time == 0)		/* level without time limit */
   {
-    if (setup.sound_loops)
+    if (!tape.playing && setup.sound_loops)
       PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
 
     while(TimePlayed < 999)
     {
-      if (!setup.sound_loops)
+      if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
       if (TimePlayed < 999 && !(TimePlayed % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
@@ -980,10 +982,12 @@ void GameWon()
 	TimePlayed++;
       DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FS_SMALL, FC_YELLOW);
       BackToFront();
-      Delay(10);
+
+      if (!tape.playing)
+	Delay(10);
     }
 
-    if (setup.sound_loops)
+    if (!tape.playing && setup.sound_loops)
       StopSound(SND_SIRR);
   }
 
@@ -4207,7 +4211,9 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
+#if 0
   static boolean save_tape_entry = FALSE;
+#endif
   boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
@@ -4247,9 +4253,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 	player_action &= JOY_BUTTON;
 
       stored_player_action[player->index_nr] = player_action;
-#if 1
       save_tape_entry = TRUE;
-#endif
     }
     else if (tape.playing && snapped)
       SnapField(player, 0, 0);			/* stop snapping */

@@ -19,6 +19,7 @@
 #include "tools.h"
 #include "game.h"
 #include "editor.h"
+#include "files.h"
 #include "tape.h"
 #include "joystick.h"
 #include "network.h"
@@ -564,6 +565,12 @@ void HandleKey(Key key, int key_status)
           if (game_status == CHOOSELEVEL)
             HandleChooseLevel(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
+
+#ifdef DEBUG
+        case KSYM_t:
+	  DumpTape(&tape);
+	  break;
+#endif
 
 	default:
 	  break;

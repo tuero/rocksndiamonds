@@ -1312,6 +1312,14 @@ static void setTapeInfoToDefaults()
 
   /* at least one (default: the first) player participates in every tape */
   tape.num_participating_players = 1;
+
+  tape.level_nr = level_nr;
+  tape.counter = 0;
+  tape.changed = FALSE;
+
+  tape.recording = FALSE;
+  tape.playing = FALSE;
+  tape.pausing = FALSE;
 }
 
 void OLD_LoadTape(int level_nr)
@@ -1553,14 +1561,6 @@ static int LoadTape_HEAD(struct TapeInfo *tape, FILE *file, int chunk_size)
     }
   }
 
-  tape->level_nr = level_nr;
-  tape->counter = 0;
-  tape->changed = FALSE;
-
-  tape->recording = FALSE;
-  tape->playing = FALSE;
-  tape->pausing = FALSE;
-
   return chunk_size;
 }
 
@@ -1576,10 +1576,6 @@ static int LoadTape_BODY(struct TapeInfo *tape, FILE *file, int chunk_size)
     return chunk_size_expected;
   }
 
-#if DEBUG
-  printf("\nTAPE OF LEVEL %d\n", level_nr);
-#endif
-
   for(i=0; i<tape->length; i++)
   {
     if (i >= MAX_TAPELEN)
@@ -1591,29 +1587,9 @@ static int LoadTape_BODY(struct TapeInfo *tape, FILE *file, int chunk_size)
 
       if (tape->player_participates[j])
 	tape->pos[i].action[j] = fgetc(file);
-
-#if DEBUG
-      {
-	int x = tape->pos[i].action[j];
-
-	printf("%d:%02x ", j, x);
-	printf("[%c%c%c%c|%c%c] - ",
-	       (x & JOY_LEFT ? '<' : ' '),
-	       (x & JOY_RIGHT ? '>' : ' '),
-	       (x & JOY_UP ? '^' : ' '),
-	       (x & JOY_DOWN ? 'v' : ' '),
-	       (x & JOY_BUTTON_1 ? '1' : ' '),
-	       (x & JOY_BUTTON_2 ? '2' : ' '));
-      }
-#endif
-
     }
 
     tape->pos[i].delay = fgetc(file);
-
-#if DEBUG
-    printf("[%03d]\n", tape->pos[i].delay);
-#endif
 
     if (tape->file_version == FILE_VERSION_1_0)
     {
@@ -1927,6 +1903,49 @@ void SaveTape(int level_nr)
 
   if (new_tape)
     Request("tape saved !", REQ_CONFIRM);
+}
+
+void DumpTape(struct TapeInfo *tape)
+{
+  int i, j;
+
+  if (TAPE_IS_EMPTY(*tape))
+  {
+    Error(ERR_WARN, "no tape available for level %d", tape->level_nr);
+    return;
+  }
+
+  printf("\n");
+  printf("-------------------------------------------------------------------------------\n");
+  printf("TAPE OF LEVEL %d\n", tape->level_nr);
+  printf("-------------------------------------------------------------------------------\n");
+
+  for(i=0; i<tape->length; i++)
+  {
+    if (i >= MAX_TAPELEN)
+      break;
+
+    for(j=0; j<MAX_PLAYERS; j++)
+    {
+      if (tape->player_participates[j])
+      {
+	int action = tape->pos[i].action[j];
+
+	printf("%d:%02x ", j, action);
+	printf("[%c%c%c%c|%c%c] - ",
+	       (action & JOY_LEFT ? '<' : ' '),
+	       (action & JOY_RIGHT ? '>' : ' '),
+	       (action & JOY_UP ? '^' : ' '),
+	       (action & JOY_DOWN ? 'v' : ' '),
+	       (action & JOY_BUTTON_1 ? '1' : ' '),
+	       (action & JOY_BUTTON_2 ? '2' : ' '));
+      }
+    }
+
+    printf("(%03d)\n", tape->pos[i].delay);
+  }
+
+  printf("-------------------------------------------------------------------------------\n");
 }
 
 void LoadScore(int level_nr)

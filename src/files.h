@@ -21,6 +21,7 @@ void SaveLevel(int);
 
 void LoadTape(int);
 void SaveTape(int);
+void DumpTape(struct TapeInfo *);
 
 void LoadScore(int);
 void SaveScore(int);
