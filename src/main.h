@@ -175,11 +175,12 @@
 #define CE_OTHER_GETS_DROPPED	15
 
 /* values for activating change events (also stored in level file!) */
-#define CE_BY_PLAYER		16
-#define CE_BY_COLLISION		17
-#define CE_BY_OTHER		18
+#define CE_BY_PLAYER		16 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
+#define CE_BY_COLLISION		17 /* obsolete; map'd to CE_BY_DIRECT_ACTION */
+#define CE_BY_OTHER_ACTION	18
+#define CE_BY_DIRECT_ACTION	19
 
-#define NUM_CHANGE_EVENTS	19
+#define NUM_CHANGE_EVENTS	20
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -1266,9 +1267,8 @@ struct ElementChangeInfo
 
   /* ---------- internal values used in level editor ---------- */
 
-  int player_action;		/* touched/pressed/pushed by player */
-  int collide_action;		/* collision/impact/smashed */
-  int other_action;		/* various change actions */
+  int direct_action;		/* change triggered by actions on element */
+  int other_action;		/* change triggered by other element actions */
 };
 
 struct ElementInfo

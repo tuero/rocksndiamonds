@@ -88,8 +88,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
     for(y=0; y<3; y++)
       change->content[x][y] = EL_EMPTY_SPACE;
 
-  change->player_action = 0;
-  change->collide_action = 0;
+  change->direct_action = 0;
   change->other_action = 0;
 
   change->pre_change_function = NULL;
@@ -796,8 +795,8 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     {
       int element = EL_CUSTOM_START + i;
 
-      /* order of checking events to be mapped is important */
-      for (j=CE_BY_OTHER; j >= CE_BY_PLAYER; j--)
+      /* order of checking and copying events to be mapped is important */
+      for (j=CE_BY_OTHER_ACTION; j >= CE_BY_PLAYER; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 2))
 	{
@@ -806,7 +805,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 	}
       }
 
-      /* order of checking events to be mapped is important */
+      /* order of checking and copying events to be mapped is important */
       for (j=CE_OTHER_GETS_COLLECTED; j >= CE_COLLISION; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 1))
@@ -815,6 +814,21 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 	  SET_CHANGE_EVENT(element, j, TRUE);
 	}
       }
+    }
+  }
+
+  /* some custom element change events get mapped since version 3.0.3 */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER) ||
+	HAS_CHANGE_EVENT(element, CE_BY_COLLISION))
+    {
+      SET_CHANGE_EVENT(element, CE_BY_PLAYER, FALSE);
+      SET_CHANGE_EVENT(element, CE_BY_COLLISION, FALSE);
+
+      SET_CHANGE_EVENT(element, CE_BY_DIRECT_ACTION, TRUE);
     }
   }
 
@@ -2065,9 +2079,10 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	6
 #define SETUP_TOKEN_EDITOR_EL_CHARS		7
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		8
-#define SETUP_TOKEN_EDITOR_EL_HEADLINES		9
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM_MORE	9
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
 
-#define NUM_EDITOR_SETUP_TOKENS			10
+#define NUM_EDITOR_SETUP_TOKENS			11
 
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0

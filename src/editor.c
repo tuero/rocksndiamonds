@@ -127,11 +127,11 @@
 #define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(12) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 /* custom change trigger element */
-#define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(7) + \
+#define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(6) + \
 					 ED_GADGET_DISTANCE)
 /* extended custom change target */
 #define ED_AREA_ELEM_CONTENT6_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(10) + \
+#define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(9) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* values for random placement background drawing area */
@@ -397,14 +397,13 @@
 #define GADGET_ID_CUSTOM_ACCESS_TYPE	(GADGET_ID_SELECTBOX_FIRST + 8)
 #define GADGET_ID_CUSTOM_ACCESS_LAYER	(GADGET_ID_SELECTBOX_FIRST + 9)
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 10)
-#define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
-#define GADGET_ID_CHANGE_COLLIDE_ACTION	(GADGET_ID_SELECTBOX_FIRST + 12)
-#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 13)
-#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 14)
-#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 15)
+#define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
+#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 12)
+#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 13)
+#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 14)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 16)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 15)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -465,12 +464,11 @@
 #define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 23)
 #define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 24)
 #define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 25)
-#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 26)
-#define GADGET_ID_CHANGE_BY_COLLISION	(GADGET_ID_CHECKBUTTON_FIRST + 27)
-#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 27)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 28)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -567,13 +565,12 @@
 #define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	8
 #define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	9
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	10
-#define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	11
-#define ED_SELECTBOX_ID_CHANGE_COLLIDE_ACTION	12
-#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	13
-#define ED_SELECTBOX_ID_CHANGE_POWER		14
-#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	15
+#define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	11
+#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	12
+#define ED_SELECTBOX_ID_CHANGE_POWER		13
+#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	14
 
-#define ED_NUM_SELECTBOX			16
+#define ED_NUM_SELECTBOX			15
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_CONSISTENCY
@@ -626,16 +623,15 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	17
 #define ED_CHECKBUTTON_ID_CHANGE_DELAY		18
-#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	19
-#define ED_CHECKBUTTON_ID_CHANGE_BY_COLLISION	20
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	21
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	22
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	23
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	24
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	25
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	26
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	19
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	20
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	21
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	22
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	23
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	24
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	25
 
-#define ED_NUM_CHECKBUTTONS			27
+#define ED_NUM_CHECKBUTTONS			26
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -944,7 +940,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(11),
     0,					100,
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
@@ -1108,41 +1104,36 @@ static struct ValueTextInfo options_time_units[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_player_action[] =
+static struct ValueTextInfo options_change_direct_action[] =
 {
-  { CE_TOUCHED_BY_PLAYER,	"touched"			},
-  { CE_PRESSED_BY_PLAYER,	"pressed"			},
-  { CE_PUSHED_BY_PLAYER,	"pushed"			},
-  { CE_DROPPED_BY_PLAYER,	"dropped"			},
-  { -1,				NULL				}
-};
-
-static struct ValueTextInfo options_change_collide_action[] =
-{
-  { CE_COLLISION,		"on collision"			},
-  { CE_IMPACT,			"on impact"			},
-  { CE_SMASHED,			"when smashed"			},
+  { CE_TOUCHED_BY_PLAYER,	"player touches it"		},
+  { CE_PRESSED_BY_PLAYER,	"player presses it"		},
+  { CE_PUSHED_BY_PLAYER,	"player pushes it"		},
+  { CE_DROPPED_BY_PLAYER,	"player drops it"		},
+  { CE_COLLISION,		"collision"			},
+  { CE_IMPACT,			"impact"			},
+  { CE_SMASHED,			"smashed"			},
   { -1,				NULL				}
 };
 
 static struct ValueTextInfo options_change_other_action[] =
 {
-  { CE_OTHER_IS_TOUCHING,	"touching"			},
-  { CE_OTHER_IS_CHANGING,	"change of"			},
-  { CE_OTHER_IS_EXPLODING,	"explosion of"			},
   { CE_OTHER_GETS_TOUCHED,	"player touches"		},
   { CE_OTHER_GETS_PRESSED,	"player presses"		},
   { CE_OTHER_GETS_PUSHED,	"player pushes"			},
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
+  { CE_OTHER_IS_TOUCHING,	"it touches"			},
+  { CE_OTHER_IS_CHANGING,	"change of"			},
+  { CE_OTHER_IS_EXPLODING,	"explosion of"			},
   { -1,				NULL				}
 };
 
 static struct ValueTextInfo options_change_power[] =
 {
-  { CP_NON_DESTRUCTIVE,		"non-destructive"		},
-  { CP_HALF_DESTRUCTIVE,	"half-destructive"		},
-  { CP_FULL_DESTRUCTIVE,	"full-destructive"		},
+  { CP_NON_DESTRUCTIVE,		"empty"				},
+  { CP_HALF_DESTRUCTIVE,	"diggable"			},
+  { CP_FULL_DESTRUCTIVE,	"destructible"			},
   { -1,				NULL				}
 };
 
@@ -1171,7 +1162,7 @@ static struct
     -1,
     options_access_type,
     &custom_element.access_type,
-    "player can", NULL, "type of access to this field"
+    "player can", NULL,			"type of access to this field"
   },
   {
     -1,					ED_SETTINGS_YPOS(1),
@@ -1179,7 +1170,7 @@ static struct
     -1,
     options_access_layer,
     &custom_element.access_layer,
-    NULL, NULL, "layer of access for this field"
+    NULL, NULL,				"layer of access for this field"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
@@ -1187,7 +1178,7 @@ static struct
     -1,
     options_walk_to_action,
     &custom_element.walk_to_action,
-    NULL, NULL, "diggable/collectible/pushable"
+    NULL, NULL,				"diggable/collectible/pushable"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
@@ -1195,7 +1186,7 @@ static struct
     -1,
     options_move_pattern,
     &custom_element.move_pattern,
-    "can move", NULL, "element move direction"
+    "can move", NULL,			"element move direction"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
@@ -1203,7 +1194,7 @@ static struct
     -1,
     options_move_direction,
     &custom_element.move_direction_initial,
-    "starts moving", NULL, "initial element move direction"
+    "starts moving", NULL,		"initial element move direction"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
@@ -1211,7 +1202,7 @@ static struct
     -1,
     options_move_stepsize,
     &custom_element.move_stepsize,
-    "move/fall speed", NULL, "speed of element movement"
+    "move/fall speed", NULL,		"speed of element movement"
   },
   {
     -1,					ED_SETTINGS_YPOS(9),
@@ -1219,7 +1210,7 @@ static struct
     -1,
     options_smash_targets,
     &custom_element.smash_targets,
-    "can smash", NULL, "elements that can be smashed"
+    "can smash", NULL,			"elements that can be smashed"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
@@ -1227,7 +1218,7 @@ static struct
     -1,
     options_slippery_type,
     &custom_element.slippery_type,
-    "slippery", NULL, "where other elements fall down"
+    "slippery", NULL,			"where other elements fall down"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
@@ -1235,7 +1226,7 @@ static struct
     -1,
     options_deadliness,
     &custom_element.deadliness,
-    "deadly when", NULL, "deadliness of element"
+    "deadly when", NULL,		"deadliness of element"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
@@ -1243,7 +1234,7 @@ static struct
     -1,
     options_consistency,
     &custom_element.consistency,
-    NULL, NULL, "consistency/destructibility"
+    NULL, NULL,				"consistency/destructibility"
   },
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -1254,47 +1245,39 @@ static struct
     -1,
     options_time_units,
     &custom_element_change.delay_frames,
-    "delay time given in", NULL, "delay time units for change"
+    "delay time given in", NULL,	"delay time units for change"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(5),
-    GADGET_ID_CHANGE_PLAYER_ACTION,	GADGET_ID_NONE,
+    GADGET_ID_CHANGE_DIRECT_ACTION,	GADGET_ID_NONE,
     -1,
-    options_change_player_action,
-    &custom_element_change.player_action,
-    NULL, "by player", "type of player contact"
+    options_change_direct_action,
+    &custom_element_change.direct_action,
+    NULL, NULL,				"type of direct action"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CHANGE_COLLIDE_ACTION,	GADGET_ID_NONE,
-    -1,
-    options_change_collide_action,
-    &custom_element_change.collide_action,
-    NULL, NULL, "change after impact or smash"
-  },
-  {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
     GADGET_ID_CHANGE_OTHER_ACTION,	GADGET_ID_NONE,
     -1,
     options_change_other_action,
     &custom_element_change.other_action,
-    NULL, "element:", "type of other element action"
+    NULL, "element:",			"type of other element action"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CHANGE_POWER,		GADGET_ID_NONE,
     -1,
     options_change_power,
     &custom_element_change.power,
-    "power:", NULL, "power of extended change"
+    "replace when", NULL,		"which elements can be replaced"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     GADGET_ID_SELECT_CHANGE_PAGE,	GADGET_ID_NONE,
     3,
     options_change_page,
     &custom_element.current_change_page,
-    NULL, NULL, "element config page"
+    NULL, NULL,				"element config page"
   },
 };
 
@@ -1327,19 +1310,19 @@ static struct
     NULL, NULL,				"Advanced element configuration"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(12),
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
     -1,					"Save as template",
     " ", NULL,				"Save current settings as new template"
   },
   {
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_SETTINGS_YPOS(13),
     GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
     -1,					"New",
     " ", NULL,				"Add new config page"
   },
   {
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_SETTINGS_YPOS(13),
     GADGET_ID_DEL_CHANGE_PAGE,		GADGET_ID_ADD_CHANGE_PAGE,
     -1,					"Delete",
     NULL, NULL,				"Delete current config page"
@@ -1358,14 +1341,14 @@ static struct
 {
   {
     ED_BUTTON_MINUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(14),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PREV_CHANGE_PAGE,		GADGET_ID_NONE,
     NULL, NULL,				"select previous config page"
   },
   {
     ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_SETTINGS_YPOS(13),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
     NULL, "config page",		"select next config page"
@@ -1620,48 +1603,42 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
-    GADGET_ID_CHANGE_BY_PLAYER,		GADGET_ID_NONE,
-    &custom_element_change_events[CE_BY_PLAYER],
-    NULL, NULL,				"element changes by player contact"
+    GADGET_ID_CHANGE_BY_DIRECT_ACT,	GADGET_ID_NONE,
+    &custom_element_change_events[CE_BY_DIRECT_ACTION],
+    NULL, NULL,				"element changes by direct action"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CHANGE_BY_COLLISION,	GADGET_ID_NONE,
-    &custom_element_change_events[CE_BY_COLLISION],
-    NULL, NULL,				"element changes by impact or smash"
-  },
-  {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
-    GADGET_ID_CHANGE_BY_OTHER,		GADGET_ID_NONE,
-    &custom_element_change_events[CE_BY_OTHER],
+    GADGET_ID_CHANGE_BY_OTHER_ACT,	GADGET_ID_NONE,
+    &custom_element_change_events[CE_BY_OTHER_ACTION],
     NULL, NULL,				"element changes by other element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
     GADGET_ID_CHANGE_USE_EXPLOSION,	GADGET_ID_NONE,
     &custom_element_change.explode,
     NULL, "explode instead of change",	"element explodes instead of change"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CHANGE_USE_CONTENT,	GADGET_ID_NONE,
     &custom_element_change.use_content,
     NULL, "use extended change target:","element changes to more elements"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
     &custom_element_change.only_complete,
     NULL, "only use complete change",	"only use complete extended content"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_change,
     NULL, NULL,				"use random value for new content"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_USE_TEMPLATE,	GADGET_ID_NONE,
     &level.use_custom_template,
     NULL, "use template",		"use template for custom properties"
@@ -4544,31 +4521,28 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* ---------- element settings: advanced (custom elements) --------------- */
 
-  /* set change by player selectbox help value */
-  custom_element_change.player_action =
-    (HAS_CHANGE_EVENT(element, CE_DROPPED_BY_PLAYER) ? CE_DROPPED_BY_PLAYER :
-     HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
+  /* set "change by direct action" selectbox help value */
+  custom_element_change.direct_action =
+    (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
-     HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
-     custom_element_change.player_action);
-
-  /* set change by collision selectbox help value */
-  custom_element_change.collide_action =
-    (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
-     HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
+     HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_DROPPED_BY_PLAYER) ? CE_DROPPED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
-     custom_element_change.collide_action);
+     HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
+     HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
+     custom_element_change.direct_action);
 
-  /* set change by other element action selectbox help value */
+  /* set "change by other element action" selectbox help value */
   custom_element_change.other_action =
-    (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
+    (
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
      custom_element_change.other_action);
 }
 
@@ -4665,15 +4639,11 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_DROPPED_BY_PLAYER] = FALSE;
-  custom_element_change_events[custom_element_change.player_action] =
-    custom_element_change_events[CE_BY_PLAYER];
-
-  /* set collision change event from checkbox and selectbox */
   custom_element_change_events[CE_COLLISION] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
-  custom_element_change_events[custom_element_change.collide_action] =
-    custom_element_change_events[CE_BY_COLLISION];
+  custom_element_change_events[custom_element_change.direct_action] =
+    custom_element_change_events[CE_BY_DIRECT_ACTION];
 
   /* set other element action change event from checkbox and selectbox */
   custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
@@ -4685,7 +4655,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
-    custom_element_change_events[CE_BY_OTHER];
+    custom_element_change_events[CE_BY_OTHER_ACTION];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);

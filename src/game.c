@@ -868,7 +868,7 @@ static void InitGameEngine()
       if (!ei->change_page->can_change)
 	continue;
 
-      if (ei->change_page[j].events & CH_EVENT_BIT(CE_BY_OTHER))
+      if (ei->change_page[j].events & CH_EVENT_BIT(CE_BY_OTHER_ACTION))
       {
 	int trigger_element = ei->change_page[j].trigger_element;
 
@@ -879,7 +879,7 @@ static void InitGameEngine()
 #else
   /* add trigger events from element change event properties */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    if (HAS_CHANGE_EVENT(i, CE_BY_OTHER))
+    if (HAS_CHANGE_EVENT(i, CE_BY_OTHER_ACTION))
       trigger_events[element_info[i].change->trigger_element] |=
 	element_info[i].change->events;
 #endif
