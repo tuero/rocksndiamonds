@@ -102,6 +102,7 @@ static void KillHeroUnlessProtected(int, int);
 
 void PlaySoundLevel(int, int, int);
 void PlaySoundLevelAction(int, int, int);
+void PlaySoundLevelActionElement(int, int, int, int);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -111,12 +112,15 @@ static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 #define SND_ACTION_UNKNOWN		0
 #define SND_ACTION_WAITING		1
 #define SND_ACTION_MOVING		2
-#define SND_ACTION_COLLECTING		3
-#define SND_ACTION_IMPACT		4
-#define SND_ACTION_PUSHING		5
-#define SND_ACTION_ACTIVATING		6
+#define SND_ACTION_DIGGING		3
+#define SND_ACTION_COLLECTING		4
+#define SND_ACTION_PASSING		5
+#define SND_ACTION_IMPACT		6
+#define SND_ACTION_PUSHING		7
+#define SND_ACTION_ACTIVATING		8
+#define SND_ACTION_BURNING		9
 
-#define NUM_SND_ACTIONS			7
+#define NUM_SND_ACTIONS			10
 
 static struct
 {
@@ -129,13 +133,15 @@ static struct
   { ".waiting",		SND_ACTION_WAITING,	TRUE },
   { ".moving",		SND_ACTION_MOVING,	TRUE }, /* continuos moving */
   { ".running",		SND_ACTION_UNKNOWN,	TRUE },
-  { ".burning",		SND_ACTION_UNKNOWN,	TRUE },
+  { ".burning",		SND_ACTION_BURNING,	TRUE },
   { ".growing",		SND_ACTION_UNKNOWN,	TRUE },
   { ".attacking",	SND_ACTION_UNKNOWN,	TRUE },
 
   /* other (non-loop) sound actions are optional */
   { ".stepping",	SND_ACTION_MOVING,	FALSE }, /* discrete moving */
+  { ".digging",		SND_ACTION_DIGGING,	FALSE },
   { ".collecting",	SND_ACTION_COLLECTING,	FALSE },
+  { ".passing",		SND_ACTION_PASSING,	FALSE },
   { ".impact",		SND_ACTION_IMPACT,	FALSE },
   { ".pushing",		SND_ACTION_PUSHING,	FALSE },
   { ".activating",	SND_ACTION_ACTIVATING,	FALSE },
@@ -533,9 +539,10 @@ void InitGameEngine()
       {
 	int len_class_text = strlen(element_info[j].sound_class_name);
 
-	if (len_class_text < len_effect_text &&
+	if (len_class_text + 1 < len_effect_text &&
 	    strncmp(sound_effects[i].text,
-		    element_info[j].sound_class_name, len_class_text) == 0)
+		    element_info[j].sound_class_name, len_class_text) == 0 &&
+	    sound_effects[i].text[len_class_text] == '.')
 	{
 	  int sound_action_value = sound_effect_properties[i];
 
@@ -552,8 +559,8 @@ void InitGameEngine()
 #if 0
   /* TEST ONLY */
   {
-    int element = EL_ROBOT;
-    int sound_action = SND_ACTION_COLLECTING;
+    int element = EL_ERDREICH;
+    int sound_action = SND_ACTION_DIGGING;
     int j = 0;
 
     while (sound_action_properties[j].text)
@@ -1428,17 +1435,8 @@ void CheckDynamite(int x, int y)
     MovDelay[x][y]--;
     if (MovDelay[x][y])
     {
-#if 0
-      if (!(MovDelay[x][y] % 12))
-#else
       if (!(MovDelay[x][y] % 6))
-#endif
-      {
-	if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
-	  PlaySoundLevel(x, y, SND_DYNAMITE_BURNING);
-	else
-	  PlaySoundLevel(x, y, SND_DYNABOMB_BURNING);
-      }
+	PlaySoundLevelAction(x, y, SND_ACTION_BURNING);
 
       if (IS_ACTIVE_BOMB(Feld[x][y]))
       {
@@ -2164,65 +2162,7 @@ void Impact(int x, int y)
 
   /* play sound of object that hits the ground */
   if (lastline || object_hit)
-  {
-    int sound;
-
-    switch (element)
-    {
-      case EL_EDELSTEIN_BD:
-        sound = SND_BD_DIAMOND_IMPACT;
-	break;
-      case EL_EDELSTEIN:
-      case EL_EDELSTEIN_GELB:
-      case EL_EDELSTEIN_ROT:
-      case EL_EDELSTEIN_LILA:
-        sound = SND_EMERALD_IMPACT;
-	break;
-      case EL_DIAMANT:
-        sound = SND_DIAMOND_IMPACT;
-	break;
-      case EL_PEARL:
-        sound = SND_PEARL_IMPACT;
-	break;
-      case EL_CRYSTAL:
-        sound = SND_CRYSTAL_IMPACT;
-	break;
-      case EL_SP_INFOTRON:
-        sound = SND_SP_INFOTRON_IMPACT;
-	break;
-      case EL_KOKOSNUSS:
-	sound = SND_NUT_IMPACT;
-	break;
-      case EL_BD_ROCK:
-	sound = SND_BD_ROCK_IMPACT;
-	break;
-      case EL_FELSBROCKEN:
-	sound = SND_ROCK_IMPACT;
-	break;
-      case EL_SP_ZONK:
-	sound = SND_SP_ZONK_IMPACT;
-	break;
-      case EL_ZEIT_VOLL:
-	sound = SND_TIME_ORB_FULL_IMPACT;
-	break;
-      case EL_ZEIT_LEER:
-	sound = SND_TIME_ORB_EMPTY_IMPACT;
-	break;
-      case EL_SPRING:
-	sound = SND_SPRING_IMPACT;
-	break;
-      default:
-	sound = -1;
-        break;
-    }
-
-#if 1
-    PlaySoundLevelAction(x, y, SND_ACTION_IMPACT);
-#else
-    if (sound >= 0)
-      PlaySoundLevel(x, y, sound);
-#endif
-  }
+    PlaySoundLevelActionElement(x, y, SND_ACTION_IMPACT, element);
 }
 
 void TurnRound(int x, int y)
@@ -5802,19 +5742,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BASE:
     case EL_SP_BUG:
       RemoveField(x, y);
-
-      if (element == EL_LEERRAUM)
-	PlaySoundLevel(x, y, SND_EMPTY_SPACE_DIGGING);
-      else if (element == EL_ERDREICH)
-	PlaySoundLevel(x, y, SND_SAND_DIGGING);
-      else if (element == EL_SAND_INVISIBLE)
-	PlaySoundLevel(x, y, SND_SAND_INVISIBLE_DIGGING);
-      else if (element == EL_TRAP_INACTIVE)
-	PlaySoundLevel(x, y, SND_TRAP_INACTIVE_DIGGING);
-      else if (element == EL_SP_BASE)
-	PlaySoundLevel(x, y, SND_SP_BASE_DIGGING);
-      else if (element == EL_SP_BUG)
-	PlaySoundLevel(x, y, SND_SP_BUGGY_BASE_DIGGING);
+      PlaySoundLevelActionElement(x, y, SND_ACTION_DIGGING, element);
       break;
 
     case EL_EDELSTEIN:
@@ -5836,19 +5764,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3),
 	       FS_SMALL, FC_YELLOW);
-
-      if (element == EL_EDELSTEIN_BD)
-	PlaySoundLevel(x, y, SND_BD_DIAMOND_COLLECTING);
-      else if (element == EL_DIAMANT)
-	PlaySoundLevel(x, y, SND_DIAMOND_COLLECTING);
-      else if (element == EL_SP_INFOTRON)
-	PlaySoundLevel(x, y, SND_SP_INFOTRON_COLLECTING);
-      else if (element == EL_PEARL)
-	PlaySoundLevel(x, y, SND_PEARL_COLLECTING);
-      else if (element == EL_CRYSTAL)
-	PlaySoundLevel(x, y, SND_CRYSTAL_COLLECTING);
-      else	/* EL_EDELSTEIN style element */
-	PlaySoundLevel(x, y, SND_EMERALD_COLLECTING);
+      PlaySoundLevelActionElement(x, y, SND_ACTION_COLLECTING, element);
       break;
 
     case EL_SPEED_PILL:
@@ -5893,10 +5809,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
 	       FS_SMALL, FC_YELLOW);
-      if (element == EL_SP_DISK_RED)
-	PlaySoundLevel(x, y, SND_SP_DISK_RED_COLLECTING);
-      else
-	PlaySoundLevel(x, y, SND_DYNAMITE_COLLECTING);
+      PlaySoundLevelActionElement(x, y, SND_ACTION_COLLECTING, element);
       break;
 
     case EL_DYNABOMB_NR:
@@ -6126,24 +6039,7 @@ int DigField(struct PlayerInfo *player,
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
       DrawLevelField(x+dx, y+dy);
-      if (element == EL_FELSBROCKEN)
-	PlaySoundLevel(x+dx, y+dy, SND_ROCK_PUSHING);
-      else if (element == EL_BD_ROCK)
-	PlaySoundLevel(x+dx, y+dy, SND_BD_ROCK_PUSHING);
-      else if (element == EL_BOMBE)
-	PlaySoundLevel(x+dx, y+dy, SND_BOMB_PUSHING);
-      else if (element == EL_DX_SUPABOMB)
-	PlaySoundLevel(x+dx, y+dy, SND_DX_BOMB_PUSHING);
-      else if (element == EL_KOKOSNUSS)
-	PlaySoundLevel(x+dx, y+dy, SND_NUT_PUSHING);
-      else if (element == EL_ZEIT_LEER)
-	PlaySoundLevel(x+dx, y+dy, SND_TIME_ORB_EMPTY_PUSHING);
-      else if (element == EL_SP_ZONK)
-	PlaySoundLevel(x+dx, y+dy, SND_SP_ZONK_PUSHING);
-      else if (element == EL_SP_DISK_ORANGE)
-	PlaySoundLevel(x+dx, y+dy, SND_SP_DISK_ORANGE_PUSHING);
-      else if (element == EL_SPRING)
-	PlaySoundLevel(x+dx, y+dy, SND_SPRING_PUSHING);
+      PlaySoundLevelActionElement(x, y, SND_ACTION_PUSHING, element);
       break;
 
     case EL_PFORTE1:
@@ -6176,7 +6072,6 @@ int DigField(struct PlayerInfo *player,
       DOUBLE_PLAYER_SPEED(player);
 
       PlaySoundLevel(x, y, SND_GATE_PASSING);
-
       break;
 
     case EL_EM_GATE_1X:
@@ -6193,7 +6088,6 @@ int DigField(struct PlayerInfo *player,
       DOUBLE_PLAYER_SPEED(player);
 
       PlaySoundLevel(x, y, SND_GATE_PASSING);
-
       break;
 
     case EL_SWITCHGATE_OPEN:
@@ -6205,11 +6099,7 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-      if (element == EL_SWITCHGATE_OPEN)
-	PlaySoundLevel(x, y, SND_SWITCHGATE_PASSING);
-      else
-	PlaySoundLevel(x, y, SND_TIMEGATE_PASSING);
-
+      PlaySoundLevelActionElement(x, y, SND_ACTION_PASSING, element);
       break;
 
     case EL_SP_PORT1_LEFT:
@@ -6403,18 +6293,13 @@ int DigField(struct PlayerInfo *player,
       {
 	RemoveField(x, y);
 	Feld[x+dx][y+dy] = element;
+	PlaySoundLevelActionElement(x, y, SND_ACTION_PUSHING, element);
       }
 
       player->push_delay_value = (element == EL_BALLOON ? 0 : 2);
 
       DrawLevelField(x, y);
       DrawLevelField(x+dx, y+dy);
-      if (element == EL_SONDE)
-	PlaySoundLevel(x+dx, y+dy, SND_SATELLITE_PUSHING);
-      else if (element == EL_SP_DISK_YELLOW)
-	PlaySoundLevel(x+dx, y+dy, SND_SP_DISK_YELLOW_PUSHING);
-      else if (element == EL_BALLOON)
-	PlaySoundLevel(x+dx, y+dy, SND_BALLOON_PUSHING);
 
       if (IS_SB_ELEMENT(element) &&
 	  local_player->sokobanfields_still_needed == 0 &&
@@ -6575,86 +6460,15 @@ void PlaySoundLevel(int x, int y, int nr)
 
 void PlaySoundLevelAction(int x, int y, int sound_action)
 {
-  int element = Feld[x][y];
+  PlaySoundLevelActionElement(x, y, sound_action, Feld[x][y]);
+}
+
+void PlaySoundLevelActionElement(int x, int y, int sound_action, int element)
+{
   int sound_effect = element_action_sound[element][sound_action];
 
-#if 1
   if (sound_effect != -1)
     PlaySoundLevel(x, y, sound_effect);
-#else
-  if (sound_action == SND_ACTION_MOVING)
-  {
-    if (element == EL_KAEFER)
-      PlaySoundLevel(x, y, SND_BUG_MOVING);
-    else if (element == EL_FLIEGER)
-      PlaySoundLevel(x, y, SND_SPACESHIP_MOVING);
-    else if (element == EL_BUTTERFLY)
-      PlaySoundLevel(x, y, SND_BD_BUTTERFLY_MOVING);
-    else if (element == EL_FIREFLY)
-      PlaySoundLevel(x, y, SND_BD_FIREFLY_MOVING);
-    else if (element == EL_SP_SNIKSNAK)
-      PlaySoundLevel(x, y, SND_SP_SNIKSNAK_MOVING);
-    else if (element == EL_SP_ELECTRON)
-      PlaySoundLevel(x, y, SND_SP_ELECTRON_MOVING);
-    else if (element == EL_MAMPFER)
-      PlaySoundLevel(x, y, SND_YAMYAM_MOVING);
-    else if (element == EL_MAMPFER2)
-      PlaySoundLevel(x, y, SND_DARK_YAMYAM_MOVING);
-    else if (element == EL_BALLOON)
-      PlaySoundLevel(x, y, SND_BALLOON_MOVING);
-    else if (element == EL_SPRING_MOVING)
-      PlaySoundLevel(x, y, SND_SPRING_MOVING);
-    else if (element == EL_MOLE)
-      PlaySoundLevel(x, y, SND_MOLE_MOVING);
-    else if (element == EL_SONDE)
-      PlaySoundLevel(x, y, SND_SATELLITE_MOVING);
-    else if (element == EL_PACMAN)
-      PlaySoundLevel(x, y, SND_PACMAN_MOVING);
-    else if (element == EL_PINGUIN)
-      PlaySoundLevel(x, y, SND_PENGUIN_MOVING);
-    else if (element == EL_SCHWEIN)
-      PlaySoundLevel(x, y, SND_PIG_MOVING);
-    else if (element == EL_DRACHE)
-      PlaySoundLevel(x, y, SND_DRAGON_MOVING);
-    else if (element == EL_ROBOT)
-      PlaySoundLevel(x, y, SND_ROBOT_STEPPING);
-  }
-  else if (sound_action == SND_ACTION_WAITING)
-  {
-    if (element == EL_KAEFER)
-      PlaySoundLevel(x, y, SND_BUG_WAITING);
-    else if (element == EL_FLIEGER)
-      PlaySoundLevel(x, y, SND_SPACESHIP_WAITING);
-    else if (element == EL_BUTTERFLY)
-      PlaySoundLevel(x, y, SND_BD_BUTTERFLY_WAITING);
-    else if (element == EL_FIREFLY)
-      PlaySoundLevel(x, y, SND_BD_FIREFLY_WAITING);
-    else if (element == EL_SP_SNIKSNAK)
-      PlaySoundLevel(x, y, SND_SP_SNIKSNAK_WAITING);
-    else if (element == EL_SP_ELECTRON)
-      PlaySoundLevel(x, y, SND_SP_ELECTRON_WAITING);
-    else if (element == EL_MAMPFER)
-      PlaySoundLevel(x, y, SND_YAMYAM_WAITING);
-    else if (element == EL_MAMPFER2)
-      PlaySoundLevel(x, y, SND_DARK_YAMYAM_WAITING);
-    else if (element == EL_BALLOON)
-      PlaySoundLevel(x, y, SND_BALLOON_WAITING);
-    else if (element == EL_MOLE)
-      PlaySoundLevel(x, y, SND_MOLE_WAITING);
-    else if (element == EL_SONDE)
-      PlaySoundLevel(x, y, SND_SATELLITE_WAITING);
-    else if (element == EL_PACMAN)
-      PlaySoundLevel(x, y, SND_PACMAN_WAITING);
-    else if (element == EL_PINGUIN)
-      PlaySoundLevel(x, y, SND_PENGUIN_WAITING);
-    else if (element == EL_SCHWEIN)
-      PlaySoundLevel(x, y, SND_PIG_WAITING);
-    else if (element == EL_DRACHE)
-      PlaySoundLevel(x, y, SND_DRAGON_WAITING);
-    else if (element == EL_ROBOT)
-      PlaySoundLevel(x, y, SND_ROBOT_WAITING);
-  }
-#endif
 }
 
 void RaiseScore(int value)
