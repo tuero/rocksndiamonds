@@ -77,6 +77,13 @@ struct SetupFileList
   struct SetupFileList *next;
 };
 
+struct TokenInfo
+{
+  int type;
+  void *value;
+  char *text;
+};
+
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);

@@ -1504,12 +1504,7 @@ void SaveScore(int level_nr)
 static struct SetupInfo si;
 static struct SetupInputInfo sii;
 static struct LevelDirInfo ldi;
-static struct
-{
-  int type;
-  void *value;
-  char *text;
-} token_info[] =
+static struct TokenInfo token_info[] =
 {
   /* global setup */
   { TYPE_STRING,  &si.player_name,	"player_name"			},
