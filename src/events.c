@@ -13,6 +13,7 @@
 ***********************************************************/
 
 #include "events.h"
+#include "init.h"
 #include "screens.h"
 #include "tools.h"
 #include "game.h"
@@ -53,6 +54,9 @@ void EventLoop(void)
 	case FocusIn:
 	case FocusOut:
 	  HandleFocusEvent((XFocusChangeEvent *) &event);
+	  break;
+        case ClientMessage:
+	  HandleClientMessageEvent((XClientMessageEvent *) &event);
 	  break;
 	default:
 	  break;
@@ -97,6 +101,9 @@ void ClearEventQueue()
       case FocusOut:
 	HandleFocusEvent((XFocusChangeEvent *) &event);
 	break;
+      case ClientMessage:
+	HandleClientMessageEvent((XClientMessageEvent *) &event);
+	break;
       default:
 	break;
     }
@@ -128,6 +135,9 @@ void SleepWhileUnmapped()
 	break;
       case MapNotify:
 	window_unmapped = FALSE;
+	break;
+      case ClientMessage:
+	HandleClientMessageEvent((XClientMessageEvent *) &event);
 	break;
       default:
 	break;
@@ -218,6 +228,13 @@ void HandleFocusEvent(XFocusChangeEvent *event)
   }
 }
 
+void HandleClientMessageEvent(XClientMessageEvent *event)
+{
+  if ((event->window == window) &&
+      (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
+    CloseAll();
+}
+
 void HandleButton(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
@@ -284,7 +301,9 @@ void HandleKey(KeySym key, int key_status)
     case XK_KP_Left:
 #endif
     case XK_KP_4:
+#ifndef MSDOS
     case XK_J:
+#endif
     case XK_j:
       joy |= JOY_LEFT;
       break;
@@ -293,7 +312,9 @@ void HandleKey(KeySym key, int key_status)
     case XK_KP_Right:
 #endif
     case XK_KP_6:
+#ifndef MSDOS
     case XK_K:
+#endif
     case XK_k:
       joy |= JOY_RIGHT;
       break;
@@ -302,7 +323,9 @@ void HandleKey(KeySym key, int key_status)
     case XK_KP_Up:
 #endif
     case XK_KP_8:
+#ifndef MSDOS
     case XK_I:
+#endif
     case XK_i:
       joy |= JOY_UP;
       break;
@@ -311,7 +334,9 @@ void HandleKey(KeySym key, int key_status)
     case XK_KP_Down:
 #endif
     case XK_KP_2:
+#ifndef MSDOS
     case XK_M:
+#endif
     case XK_m:
       joy |= JOY_DOWN;
       break;
@@ -339,35 +364,47 @@ void HandleKey(KeySym key, int key_status)
     case XK_KP_3:
       joy |= JOY_DOWN | JOY_RIGHT;
       break;
+#ifndef MSDOS
     case XK_S:			/* Feld entfernen */
+#endif
     case XK_s:
       joy |= JOY_BUTTON_1 | JOY_LEFT;
       break;
+#ifndef MSDOS
     case XK_D:
+#endif
     case XK_d:
       joy |= JOY_BUTTON_1 | JOY_RIGHT;
       break;
+#ifndef MSDOS
     case XK_E:
+#endif
     case XK_e:
       joy |= JOY_BUTTON_1 | JOY_UP;
       break;
+#ifndef MSDOS
     case XK_X:
+#endif
     case XK_x:
       joy |= JOY_BUTTON_1 | JOY_DOWN;
       break;
     case XK_Shift_L:		/* Linker Feuerknopf */
+#ifndef MSDOS
     case XK_Control_L:
     case XK_Alt_L:
     case XK_Meta_L:
+#endif
       joy |= JOY_BUTTON_1;
       break;
     case XK_Shift_R:		/* Rechter Feuerknopf */
+#ifndef MSDOS
     case XK_Control_R:
     case XK_Alt_R:
     case XK_Meta_R:
     case XK_Mode_switch:
     case XK_Multi_key:
     case XK_B:			/* (Bombe legen) */
+#endif
     case XK_b:
       joy |= JOY_BUTTON_2;
       break;
@@ -500,7 +537,9 @@ void HandleKey(KeySym key, int key_status)
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
+#ifndef MSDOS
 	case XK_Q:
+#endif
 	case XK_q:
 	  Dynamite = 1000;
 	  break;
@@ -571,6 +610,29 @@ void HandleKey(KeySym key, int key_status)
 	    XFlush(display);
 	    XSync(display,FALSE);
 	    Delay(1000000);
+	  }
+
+	  break;
+
+	case XK_z:
+	  {
+	    static int test_picture_pos = 0;
+
+	    printf("test picture %d\n", test_picture_pos);
+
+	    XCopyArea(display,test_pix[test_picture_pos],window,gc,
+		      0,0, 100,100,
+		      0,0);
+	    /*
+	    XCopyArea(display,test_clipmask[test_picture_pos],window,gc,
+		      0,0, 100,100,
+		      100,0);
+		      */
+	    XFlush(display);
+	    XSync(display,FALSE);
+	    Delay(1000000);
+
+	    test_picture_pos = (test_picture_pos + 1) % test_picture_count;
 	  }
 
 	  break;

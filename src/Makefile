@@ -59,7 +59,11 @@ SRCS =	main.c		\
 	sound.c		\
 	joystick.c	\
 	cartoons.c	\
-	gfxloader.c	\
+	gfxload.c	\
+	gifload.c	\
+	gif.c		\
+	send.c		\
+	new.c		\
 	random.c
 
 OBJS =	main.o		\
@@ -76,7 +80,11 @@ OBJS =	main.o		\
 	sound.o		\
 	joystick.o	\
 	cartoons.o	\
-	gfxloader.o	\
+	gfxload.o	\
+	gifload.o	\
+	gif.o		\
+	send.o		\
+	new.o		\
 	random.o
 
 all:	$(OBJS)

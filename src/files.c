@@ -221,8 +221,13 @@ void LoadLevelTape(int level_nr)
   char cookie[MAX_FILENAME];
   FILE *file;
 
+#ifndef MSDOS
   sprintf(filename,"%s/%s/%d.tape",
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+#else
+  sprintf(filename,"%s/%s/%d.tap",
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+#endif
 
   if ((file=fopen(filename,"r")))
   {
@@ -521,8 +526,13 @@ void SaveLevelTape(int level_nr)
   FILE *file;
   BOOL new_tape = TRUE;
 
+#ifndef MSDOS
   sprintf(filename,"%s/%s/%d.tape",
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+#else
+  sprintf(filename,"%s/%s/%d.tap",
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
+#endif
 
   /* Testen, ob bereits eine Aufnahme existiert */
   if ((file=fopen(filename,"r")))
@@ -694,6 +704,7 @@ void LoadJoystickData()
   if (joystick_status==JOYSTICK_OFF)
     return;
 
+#ifndef MSDOS
   if (!(file=fopen(JOYDAT_FILE,"r")))
     return;
 
@@ -716,6 +727,9 @@ void LoadJoystickData()
   fclose(file);
 
   CheckJoystickData();
+#else
+  load_joystick_data(JOYDAT_FILE);
+#endif
 }
 
 void SaveJoystickData()
@@ -726,6 +740,7 @@ void SaveJoystickData()
   if (joystick_status==JOYSTICK_OFF)
     return;
 
+#ifndef MSDOS
   CheckJoystickData();
 
   if (!(file=fopen(JOYDAT_FILE,"w")))
@@ -746,4 +761,8 @@ void SaveJoystickData()
   fclose(file);
 
   chmod(JOYDAT_FILE, JOYDAT_PERMS);
+#else
+  save_joystick_data(JOYDAT_FILE);
+#endif
+
 }

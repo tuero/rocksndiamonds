@@ -9,10 +9,11 @@
 *               aeglos@uni-paderborn.de                    *
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
-*  gfxloader.c                                             *
+*  gfxload.c                                               *
 ***********************************************************/
 
-#include "gfxloader.h"
+#ifndef MSDOS
+#include "gfxload.h"
 
 
 
@@ -73,25 +74,14 @@ static int Read_GIF_to_Pixmap_or_Bitmap(Display *, char *, Pixmap *, int);
 #define READ_GIF_TO_BITMAP	0
 #define READ_GIF_TO_PIXMAP	1
 
-
 int Read_GIF_to_Bitmap(Display *display, char *filename, Pixmap *pixmap)
 {
-  printf("Read_GIF_to_Bitmap\n");
-
-
-
-
   return(Read_GIF_to_Pixmap_or_Bitmap(display, filename,
 				      pixmap, READ_GIF_TO_BITMAP));
 }
 
 int Read_GIF_to_Pixmap(Display *display, char *filename, Pixmap *pixmap)
 {
-  printf("Read_GIF_to_Pixmap\n");
-
-
-
-
   return(Read_GIF_to_Pixmap_or_Bitmap(display, filename,
 				      pixmap, READ_GIF_TO_PIXMAP));
 }
@@ -164,21 +154,6 @@ int Read_GIF_to_Pixmap_or_Bitmap(Display *display, char *filename,
       gcv.background = WhitePixel(display,screen);
       gc = XCreateGC(display, root, GCForeground | GCBackground, &gcv);
       XPutImage(display,new_pixmap,gc,image,0,0,0,0,width,height);
-
-
-
-
-
-
-      Delay(1000000);
-
-      XPutImage(display,window,gc,image,0,0,0,0,width,height);
-
-      Delay(3000000);
-
-
-
-
 
       XFreeGC(display, gc);
     }
@@ -826,9 +801,9 @@ static int ConvertXImageDepth(Display *display, XImage **image)
   if ((*image)->depth != depth)
   {
     XImage *old_image, *new_image;
-    /*
+
     Visual *visual = DefaultVisual(display,screen);
-    */
+
     int width = (*image)->width;
     int height = (*image)->height;
     register int dwx, dwy;
@@ -848,14 +823,13 @@ static int ConvertXImageDepth(Display *display, XImage **image)
     data = (byte *)malloc(width * height * depth);
     old_image = *image;
 
-    /*
+#if 1
     new_image = XCreateImage(display,visual,depth,
 			     ZPixmap,0,data,width,height,8,0);
-			     */
-
+#else
     new_image = XGetImage(display,RootWindow(display,screen),
 			  0,0,width,height,0xffffffff,ZPixmap);
-
+#endif
 
     if (!new_image)
       return(GIF_NoMemory);
@@ -978,15 +952,6 @@ int Read_ILBM_to_Bitmap(Display *display, char *filename, Pixmap *pixmap)
   int width, height, depth;
   int bytes_per_line, bitmap_size;
   FILE *file;
-
-
-
-
-
-  printf("Read_ILBM_to_Bitmap\n");
-
-
-
 
   if (!(file = fopen(filename,"r")))
     return(ILBM_OpenFailed);
@@ -1153,3 +1118,4 @@ int Read_ILBM_to_Bitmap(Display *display, char *filename, Pixmap *pixmap)
   *pixmap = new_pixmap;
   return(ILBM_Success);
 }
+#endif

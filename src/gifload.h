@@ -9,12 +9,13 @@
 *               aeglos@uni-paderborn.de                    *
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
-*  gfxloader.h                                             *
+*  gifload.h                                               *
 ***********************************************************/
 
-#ifndef GFXLOADER_H
-#define GFXLOADER_H
+#ifndef GIFLOAD_H
+#define GIFLOAD_H
 
+#ifndef MSDOS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,16 +29,11 @@
 #define GIF_NoMemory		-4
 #define GIF_ColorFailed		-5
 
-#define ILBM_Success		 0
-#define ILBM_OpenFailed		-1
-#define ILBM_ReadFailed		-2
-#define	ILBM_FileInvalid	-3
-#define ILBM_NoMemory		-4
-#define ILBM_ColorFailed	-5
-
-int Read_ILBM_to_Bitmap(Display *, char *, Pixmap *);
+int Read_GIF_to_Image(Display *, Window, char *);
 int Read_GIF_to_Bitmap(Display *, char *, Pixmap *);
 int Read_GIF_to_Pixmap(Display *, char *, Pixmap *);
 int Read_GIF_to_XImage(Display *, char *, XImage **);
+
+#endif
 
 #endif

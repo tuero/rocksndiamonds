@@ -15,11 +15,13 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#ifndef MSDOS
 #define XK_MISCELLANY
 #define XK_LATIN1
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/Xos.h>
 #include <X11/Intrinsic.h>
 #include <X11/keysymdef.h>
@@ -27,6 +29,9 @@
 #ifdef   XPM_INCLUDE_FILE
 #include XPM_INCLUDE_FILE
 #endif
+#else
+#include "msdos.h"
+#endif  // von #ifndef MSDOS
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,13 +42,20 @@
 
 typedef int BOOL;
 
-#define TRUE		1
-#define FALSE		0
+#ifndef FALSE
+#define FALSE 0
+#define TRUE (!FALSE)
+#endif
 
-#define WIN_XPOS	0
-#define WIN_YPOS	0
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
+#ifndef MSDOS
+#define WIN_XPOS	0
+#define WIN_YPOS	0
+#else
+#define WIN_XPOS	(XRES-WIN_XSIZE)/2
+#define WIN_YPOS	(YRES-WIN_YSIZE)/2
+#endif
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
@@ -56,10 +68,18 @@ typedef int BOOL;
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
 
+#ifndef MIN
 #define MIN(a,b) 	((a)<(b) ? (a) : (b))
+#endif
+#ifndef MAX
 #define MAX(a,b) 	((a)>(b) ? (a) : (b))
+#endif
+#ifndef ABS
 #define ABS(a)		((a)<0 ? -(a) : (a))
+#endif
+#ifndef SIGN
 #define SIGN(a)		((a)<0 ? -1 : ((a)>0 ? 1 : 0))
+#endif
 #define SCROLLX(a)	((a)-scroll_x)
 #define SCROLLY(a)	((a)-scroll_y)
 #define UNSCROLLX(a)	((a)+scroll_x)
@@ -249,6 +269,13 @@ extern GC		gc, clip_gc[];
 extern XImage 	       *image[];
 extern Pixmap		clipmask[];
 extern Pixmap		pix[];
+
+
+extern Pixmap		test_pix[];
+extern Pixmap		test_clipmask[];
+extern int		test_picture_count;
+
+
 
 #ifdef XPM_INCLUDE_FILE
 extern XpmAttributes 	xpm_att[];
@@ -935,10 +962,17 @@ extern char		*progname;
 #define JOYDAT_PATH		GAME_DIR
 #endif
 
+#ifndef MSDOS
 #define SCORE_FILENAME		"ROCKS.score"
 #define NAMES_FILENAME		"ROCKS.names"
 #define LEVDIR_FILENAME		"ROCKS.levelinfo"
 #define JOYDAT_FILENAME		"ROCKS.joystick"
+#else
+#define SCORE_FILENAME		"ROCKS.sco"
+#define NAMES_FILENAME		"ROCKS.nam"
+#define LEVDIR_FILENAME		"ROCKS.lev"
+#define JOYDAT_FILENAME		"ROCKS.joy"
+#endif
 
 #define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
 
@@ -982,8 +1016,13 @@ extern char		*progname;
 #define MB_MENU_MARK		TRUE
 #define MB_MENU_INITIALIZE	(-1)
 #define MB_LEFT			1
+#ifdef MSDOS
+#define MB_MIDDLE		4
+#define MB_RIGHT		2
+#else
 #define MB_MIDDLE		2
 #define MB_RIGHT		3
+#endif
 
 /* values for key_status */
 #define KEY_NOT_PRESSED		FALSE

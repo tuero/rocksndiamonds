@@ -21,7 +21,9 @@
  * It was reworked for the GNU C Library by Roland McGrath.
  */
 
+#ifndef MSDOS
 #include <ansidecl.h>
+#endif
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>

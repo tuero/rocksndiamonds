@@ -19,14 +19,15 @@
 #include "tools.h"
 #include "files.h"
 #include "joystick.h"
-#include "gfxloader.h"
+#include "gfxload.h"
+#include "gifload.h"
 
 #include <signal.h>
 
 #ifdef DEBUG
-/*
+
 #define DEBUG_TIMING
-*/
+
 #endif
 
 struct PictureFileInfo
@@ -93,6 +94,7 @@ void InitSound()
   if (sound_status==SOUND_OFF)
     return;
 
+#ifndef MSDOS
   if (access(sound_device_name,W_OK)<0)
   {
     fprintf(stderr,"%s: cannot access sound device - no sounds\n",progname);
@@ -114,9 +116,16 @@ void InitSound()
   sound_loops_allowed = TRUE;
   sound_loops_on = TRUE;
 #endif
+#else
+  sound_loops_allowed = TRUE;
+  sound_loops_on = TRUE;
+#endif
 
   for(i=0;i<NUM_SOUNDS;i++)
   {
+#ifdef MSDOS
+  sprintf(sound_name[i], "%d", i+1);
+#endif
     Sound[i].name = sound_name[i];
     if (!LoadSound(&Sound[i]))
     {
@@ -131,6 +140,7 @@ void InitSoundProcess()
   if (sound_status==SOUND_OFF)
     return;
 
+#ifndef MSDOS
   if (pipe(sound_pipe)<0)
   {
     fprintf(stderr,"%s: cannot create pipe - no sounds\n",progname);
@@ -149,6 +159,9 @@ void InitSoundProcess()
     SoundServer();
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
+#else
+  SoundServer();
+#endif
 }
 
 void InitJoystick()
@@ -156,6 +169,7 @@ void InitJoystick()
   if (global_joystick_status==JOYSTICK_OFF)
     return;
 
+#ifndef MSDOS
   if (access(joystick_device_name[joystick_nr],R_OK)<0)
   {
     fprintf(stderr,"%s: cannot access joystick device '%s'\n",
@@ -174,6 +188,9 @@ void InitJoystick()
 
   joystick_status = JOYSTICK_AVAILABLE;
   LoadJoystickData();
+#else
+  joystick_status = JOYSTICK_AVAILABLE;
+#endif
 }
 
 void InitDisplay(int argc, char *argv[])
@@ -226,18 +243,37 @@ void InitWindow(int argc, char *argv[])
   char *window_name = WINDOWTITLE_STRING;
   char *icon_name = WINDOWTITLE_STRING;
   long window_event_mask;
+  Atom proto_atom = None, delete_atom = None;
+  int screen_width, screen_height;
+  int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
+
+#ifndef MSDOS
   static struct IconFileInfo icon_pic =
   {
     "rocks_icon.xbm",
     "rocks_iconmask.xbm"
   };
+#endif
+
+  screen_width = XDisplayWidth(display, screen);
+  screen_height = XDisplayHeight(display, screen);
 
   width = WIN_XSIZE;
   height = WIN_YSIZE;
 
+  win_xpos = (screen_width - width) / 2;
+  win_ypos = (screen_height - height) / 2;
+
   window = XCreateSimpleWindow(display, RootWindow(display, screen),
-			    WIN_XPOS, WIN_YPOS, width, height, border_width,
-			    pen_fg, pen_bg);
+			       win_xpos, win_ypos, width, height, border_width,
+			       pen_fg, pen_bg);
+
+#ifndef MSDOS
+  proto_atom = XInternAtom(display, "WM_PROTOCOLS", FALSE);
+  delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", FALSE);
+  if ((proto_atom != None) && (delete_atom != None))
+    XChangeProperty(display, window, proto_atom, XA_ATOM, 32,
+		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
   sprintf(icon_filename,"%s/%s",GFX_PATH,icon_pic.picture_filename);
   XReadBitmapFile(display,window,icon_filename,
@@ -261,9 +297,16 @@ void InitWindow(int argc, char *argv[])
     exit(-1);
   }
 
-  size_hints.flags = PSize | PMinSize | PMaxSize;
   size_hints.width  = size_hints.min_width  = size_hints.max_width  = width;
   size_hints.height = size_hints.min_height = size_hints.max_height = height;
+  size_hints.flags = PSize | PMinSize | PMaxSize;
+
+  if (win_xpos || win_ypos)
+  {
+    size_hints.x = win_xpos;
+    size_hints.y = win_ypos;
+    size_hints.flags |= PPosition;
+  }
 
   if (!XStringListToTextProperty(&window_name, 1, &windowName))
   {
@@ -301,6 +344,7 @@ void InitWindow(int argc, char *argv[])
                       KeyPressMask | KeyReleaseMask;
   XSelectInput(display, window, window_event_mask);
 
+#endif
   /* create GC for drawing with window depth */
   gc_values.graphics_exposures = False;
   gc_values.foreground = pen_bg;
@@ -325,6 +369,17 @@ void InitGfx()
   int i,j;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
+#ifdef MSDOS
+  static struct PictureFileInfo pic[NUM_PICTURES] =
+  {
+    { "Screen",	TRUE },
+    { "Door",	TRUE },
+    { "Heroes",	TRUE },
+    { "Toons",	TRUE },
+    { "Font",	FALSE },
+    { "Font2",	FALSE }
+  }; 
+#else
   static struct PictureFileInfo pic[NUM_PICTURES] =
   {
     { "RocksScreen",	TRUE },
@@ -334,6 +389,7 @@ void InitGfx()
     { "RocksFont",	FALSE },
     { "RocksFont2",	FALSE }
   }; 
+#endif
 
 #ifdef DEBUG_TIMING
   long count1, count2;
@@ -343,6 +399,10 @@ void InitGfx()
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
   DrawInitText(WINDOWTITLE_STRING,20,FC_YELLOW);
   DrawInitText(COPYRIGHT_STRING,50,FC_RED);
+#ifdef MSDOS
+  DrawInitText("MSDOS version done by Guido Schulz",210,FC_BLUE);
+  rest(200);
+#endif MSDOS
   DrawInitText("Loading graphics:",120,FC_GREEN);
 
   for(i=0;i<NUM_PICTURES;i++)
@@ -414,7 +474,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   unsigned int width,height;
   int hot_x,hot_y;
   Pixmap shapemask;
+#ifdef MSDOS
+  char *picture_ext = ".gif";
+#else
   char *picture_ext = ".xpm";
+#endif
   char *picturemask_ext = "Mask.xbm";
 #else
   int gif_err, ilbm_err;
@@ -429,8 +493,37 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   /* Grafik laden */
   if (pic->picture_filename)
   {
+
+
+
+
+
+    sprintf(basefilename,"%s%s",pic->picture_filename,".gif");
+    DrawInitText(basefilename,150,FC_YELLOW);
+    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+
+#ifdef DEBUG_TIMING
+    count1 = Counter();
+#endif
+
+    Read_GIF_to_Image(display, window, filename);
+
+#ifdef DEBUG_TIMING
+    count2 = Counter();
+    printf("GIF LOADING %s IN %.2f SECONDS\n",
+	   filename,(float)(count2-count1)/100.0);
+#endif
+
+
+
+
+
+
     sprintf(basefilename,"%s%s",pic->picture_filename,picture_ext);
     DrawInitText(basefilename,150,FC_YELLOW);
+#ifdef MSDOS
+    rest(100);
+#endif MSDOS
     sprintf(filename,"%s/%s",GFX_PATH,basefilename);
 
 #ifdef DEBUG_TIMING
@@ -440,9 +533,19 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef XPM_INCLUDE_FILE
 
     xpm_att[pos].valuemask = XpmCloseness;
+    xpm_att[pos].closeness = 65535;
+
+    /*
     xpm_att[pos].closeness = 20000;
+    */
+
+#if 0
     xpm_err = XpmReadFileToPixmap(display,window,filename,
 				  &pix[pos],&shapemask,&xpm_att[pos]);
+#else
+    xpm_err = XpmSuccess;
+#endif
+
     switch(xpm_err)
     {
       case XpmOpenFailed:
@@ -501,10 +604,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifdef DEBUG_TIMING
     count2 = Counter();
-    printf("LOADING %s IN %.2f SECONDS\n",
+    printf("XPM LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/100.0);
 #endif
 
+#if 0
     if (!pix[pos])
     {
       fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
@@ -512,14 +616,22 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       CloseAll();
       exit(-1);
     }
+#endif
+
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
   if (pic->picture_with_mask)
   {
+#ifdef MSDOS
+    xbm_err = BitmapSuccess;
+    clipmask[pos] = DUMMY_MASK;
+    goto msdos_jmp;
+#else
     sprintf(basefilename,"%s%s",pic->picture_filename,picturemask_ext);
     DrawInitText(basefilename,150,FC_YELLOW);
     sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+#endif
 
 #ifdef DEBUG_TIMING
     count1 = Counter();
@@ -527,8 +639,16 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifdef XPM_INCLUDE_FILE
 
+#if 0
     xbm_err = XReadBitmapFile(display,window,filename,
 			      &width,&height,&clipmask[pos],&hot_x,&hot_y);
+#else
+    xbm_err = BitmapSuccess;
+#endif
+
+#ifdef MSDOS
+msdos_jmp:
+#endif
     switch(xbm_err)
     {
       case BitmapSuccess:
@@ -588,6 +708,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	   filename,(float)(count2-count1)/100.0);
 #endif
 
+#if 0
     if (!clipmask[pos])
     {
       fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
@@ -595,7 +716,12 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       CloseAll();
       exit(-1);
     }
+#endif
+
   }
+
+  pix[pos] = test_pix[test_picture_count-1];
+  clipmask[pos] = test_clipmask[test_picture_count-1];
 }
 
 void InitElementProperties()

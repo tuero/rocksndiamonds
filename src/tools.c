@@ -27,6 +27,10 @@
 
 #include <math.h>
 
+#ifdef MSDOS
+extern BOOL wait_for_vsync;
+#endif
+
 void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && soft_scrolling_on)
@@ -84,6 +88,9 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_FIELD)
   {
+#ifdef MSDOS
+    wait_for_vsync = TRUE;
+#endif
     if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
       XCopyArea(display,backbuffer,window,gc,
 		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
@@ -116,6 +123,9 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_DOORS)
   {
+#ifdef MSDOS
+    wait_for_vsync = TRUE;
+#endif
     if (redraw_mask & REDRAW_DOOR_1)
       XCopyArea(display,backbuffer,window,gc,
 		DX,DY, DXSIZE,DYSIZE,
@@ -1469,6 +1479,9 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	case FocusOut:
 	  HandleFocusEvent((XFocusChangeEvent *) &event);
 	  break;
+        case ClientMessage:
+	  HandleClientMessageEvent((XClientMessageEvent *) &event);
+	  break;
 	default:
 	  break;
       }
@@ -1552,6 +1565,10 @@ unsigned int MoveDoor(unsigned int door_state)
   static unsigned int door1 = DOOR_OPEN_1;
   static unsigned int door2 = DOOR_CLOSE_2;
   int x, start, stepsize = 4, door_anim_delay = stepsize*5000;
+
+#ifdef MSDOS
+  stepsize = 2;
+#endif
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
@@ -1656,7 +1673,9 @@ unsigned int MoveDoor(unsigned int door_state)
       }
 
       BackToFront();
+#ifndef MSDOS
       Delay(door_anim_delay);
+#endif
 
       if (game_status==MAINMENU)
 	DoAnimation();

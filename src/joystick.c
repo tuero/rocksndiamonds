@@ -90,6 +90,7 @@ int Joystick()
   if (joystick_status==JOYSTICK_OFF)
     return(0);
 
+#ifndef MSDOS
   if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
   {
     fprintf(stderr,"%s: cannot read joystick settings - no joystick support\n",
@@ -131,6 +132,9 @@ int Joystick()
     result |= JOY_BUTTON_2;
 
   return(result);
+#else
+  return(0);
+#endif
 }
 
 int JoystickButton()

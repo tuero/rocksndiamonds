@@ -57,12 +57,14 @@ void GetPlayerConfig()
   scroll_delay_on = SETUP_SCROLL_DELAY_ON(player.setup);
   soft_scrolling_on = SETUP_SOFT_SCROLL_ON(player.setup);
 
+#ifndef MSDOS
   if (joystick_nr != old_joystick_nr)
   {
     if (joystick_device)
       close(joystick_device);
     InitJoystick();
   }
+#endif
 }
 
 void InitGame()
@@ -3674,7 +3676,13 @@ void PlaySoundLevel(int x, int y, int sound_nr)
     return;
 
   volume = PSND_MAX_VOLUME;
+#ifndef MSDOS
   stereo = (sx-SCR_FIELDX/2)*12;
+#else
+  stereo = PSND_MIDDLE+(2*sx-(SCR_FIELDX-1))*5;
+  if(stereo > PSND_MAX_RIGHT) stereo = PSND_MAX_RIGHT;
+  if(stereo < PSND_MAX_LEFT) stereo = PSND_MAX_LEFT;
+#endif
 
   if (!IN_SCR_FIELD(sx,sy))
   {

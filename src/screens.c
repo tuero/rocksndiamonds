@@ -25,6 +25,10 @@
 #include "joystick.h"
 #include "cartoons.h"
 
+#ifdef MSDOS
+extern unsigned char get_ascii(KeySym);
+#endif
+
 void DrawHeadline()
 {
   int x1 = SX+(SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
@@ -700,6 +704,7 @@ void HandleTypeName(int newxpos, KeySym key)
     return;
   }
 
+#ifndef MSDOS
   if ((key>=XK_A && key<=XK_Z) || (key>=XK_a && key<=XK_z && 
       xpos<MAX_NAMELEN-1))
   {
@@ -707,6 +712,10 @@ void HandleTypeName(int newxpos, KeySym key)
       ascii = 'A'+(char)(key-XK_A);
     if (key>=XK_a && key<=XK_z)
       ascii = 'a'+(char)(key-XK_a);
+#else
+  if((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
+  {
+#endif
     player.alias_name[xpos] = ascii;
     player.alias_name[xpos+1] = 0;
     xpos++;
@@ -1133,12 +1142,17 @@ void CalibrateJoystick()
   } joy_ctrl;
 #endif
 
+#ifdef MSDOS
+  char joy_nr[4];
+#endif
+
   int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
   int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
 
   if (joystick_status==JOYSTICK_OFF)
     goto error_out;
 
+#ifndef MSDOS
   ClearWindow();
   DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
   DrawText(SX+16, SY+8*32, " THE UPPER LEFT ",FS_BIG,FC_YELLOW);
@@ -1238,11 +1252,50 @@ void CalibrateJoystick()
   while(Joystick() & JOY_BUTTON);
   return;
 
+#endif
   error_out:
+
+#ifdef MSDOS
+  joy_nr[0] = '#';
+  joy_nr[1] = SETUP_2ND_JOYSTICK_ON(player.setup)+49;
+  joy_nr[2] = '\0';
+
+  remove_joystick();
+  ClearWindow();
+  DrawText(SX+32, SY+7*32, "CENTER JOYSTICK",FS_BIG,FC_YELLOW);
+  DrawText(SX+16+7*32, SY+8*32, joy_nr, FS_BIG,FC_YELLOW);
+  DrawText(SX+32, SY+9*32, "AND PRESS A KEY",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+  for(clear_keybuf();!keypressed(););
+  install_joystick(JOY_TYPE_2PADS);
+
+  ClearWindow();
+  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+8*32, " THE UPPER LEFT ",FS_BIG,FC_YELLOW);
+  DrawText(SX+32, SY+9*32, "AND PRESS A KEY",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+  for(clear_keybuf();!keypressed(););
+  calibrate_joystick(SETUP_2ND_JOYSTICK_ON(player.setup));
+
+  ClearWindow();
+  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
+  DrawText(SX+32, SY+8*32, "THE LOWER RIGHT",FS_BIG,FC_YELLOW);
+  DrawText(SX+32, SY+9*32, "AND PRESS A KEY",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+  for(clear_keybuf();!keypressed(););
+  calibrate_joystick(SETUP_2ND_JOYSTICK_ON(player.setup));
+
+  DrawSetupScreen();
+  return;
+#endif
 
   ClearWindow();
   DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
   DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
+  BackToFront();
   Delay(3000000);
   DrawSetupScreen();
 }

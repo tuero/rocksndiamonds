@@ -13,9 +13,13 @@
 ***********************************************************/
 
 #include "sound.h"
+#ifdef MSDOS
+extern void sound_handler(struct SoundControl);
+#endif
 
 /*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
+#ifndef MSDOS
 static struct SoundControl playlist[MAX_SOUNDS_PLAYING];
 static struct SoundControl emptySoundControl =
 {
@@ -28,18 +32,27 @@ static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
 static unsigned char playing_buffer[SND_BLOCKSIZE];
 static int playing_sounds = 0;
+#else
+struct SoundControl playlist[MAX_SOUNDS_PLAYING];
+struct SoundControl emptySoundControl;
+int playing_sounds;
+#endif
 
 void SoundServer()
 {
+  int i;
+#ifndef MSDOS
   struct SoundControl snd_ctrl;
   fd_set sound_fdset;
-  int i;
 
   close(sound_pipe[1]);		/* no writing into pipe needed */
+#endif
 
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     playlist[i] = emptySoundControl;
+  playing_sounds = 0;
 
+#ifndef MSDOS
   stereo_volume[PSND_MAX_LEFT2RIGHT] = 0;
   for(i=0;i<PSND_MAX_LEFT2RIGHT;i++)
     stereo_volume[i] =
@@ -295,6 +308,7 @@ void SoundServer()
 #endif	/* von '#ifdef VOXWARE' */
 
   }
+#endif
 }
 
 void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
@@ -308,8 +322,11 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 
     for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     {
-      int actual =
-	100 * playlist[i].playingpos / playlist[i].data_len;
+#ifndef MSDOS
+      int actual = 100 * playlist[i].playingpos / playlist[i].data_len;
+#else
+      int actual = playlist[i].playingpos;
+#endif
 
       if (!playlist[i].loop && actual>longest)
       {
@@ -317,6 +334,10 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 	longest_nr=i;
       }
     }
+#ifdef MSDOS
+    voice_set_volume(playlist[longest_nr].voice, 0);
+    deallocate_voice(playlist[longest_nr].voice);
+#endif
     playlist[longest_nr] = emptySoundControl;
     playing_sounds--;
   }
@@ -337,6 +358,11 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       {
 	playlist[i].fade_sound = FALSE;
 	playlist[i].volume = PSND_MAX_VOLUME;
+#ifdef MSDOS
+        playlist[i].loop = PSND_LOOP;
+        voice_stop_volumeramp(playlist[i].voice);
+        voice_ramp_volume(playlist[i].voice, playlist[i].volume, 1000);
+#endif
       }
     }
     return;
@@ -355,13 +381,21 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       if (!playlist[i].active || playlist[i].nr != snd_ctrl.nr)
 	continue;
 
+#ifndef MSDOS
       actual = 100 * playlist[i].playingpos / playlist[i].data_len;
+#else
+      actual = playlist[i].playingpos;
+#endif
       if (actual>=longest)
       {
 	longest=actual;
 	longest_nr=i;
       }
     }
+#ifdef MSDOS
+    voice_set_volume(playlist[longest_nr].voice, 0);
+    deallocate_voice(playlist[longest_nr].voice);
+#endif
     playlist[longest_nr] = emptySoundControl;
     playing_sounds--;
   }
@@ -373,6 +407,14 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     {
       playlist[i] = snd_ctrl;
       playing_sounds++;
+#ifdef MSDOS
+      playlist[i].voice = allocate_voice(Sound[snd_ctrl.nr].sample_ptr);
+      if(snd_ctrl.loop)
+        voice_set_playmode(playlist[i].voice, PLAYMODE_LOOP);
+      voice_set_volume(playlist[i].voice, snd_ctrl.volume);
+      voice_set_pan(playlist[i].voice, snd_ctrl.stereo);
+      voice_start(playlist[i].voice);       
+#endif
       break;
     }
   }
@@ -402,12 +444,18 @@ void SoundServer_StopSound(int nr)
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     if (playlist[i].nr == nr)
     {
+#ifdef MSDOS
+      voice_set_volume(playlist[i].voice, 0);
+      deallocate_voice(playlist[i].voice);
+#endif
       playlist[i] = emptySoundControl;
       playing_sounds--;
     }
 
+#ifndef MSDOS
   if (!playing_sounds)
     close(sound_device);
+#endif
 }
 
 void SoundServer_StopAllSounds()
@@ -415,10 +463,18 @@ void SoundServer_StopAllSounds()
   int i;
 
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
+  {
+#ifdef MSDOS
+    voice_set_volume(playlist[i].voice, 0);
+    deallocate_voice(playlist[i].voice);
+#endif
     playlist[i]=emptySoundControl;
-  playing_sounds=0;
+  }
+  playing_sounds = 0;
 
+#ifndef MSDOS
   close(sound_device);
+#endif
 }
 
 #ifdef HPUX_AUDIO
@@ -574,12 +630,17 @@ BOOL LoadSound(struct SoundInfo *snd_info)
 {
   FILE *file;
   char filename[256];
+#ifndef MSDOS
   char *sound_ext = "8svx";
+#else
+  char *sound_ext = "wav";
+#endif
   struct SoundHeader_8SVX *sound_header;
   unsigned char *ptr;
 
   sprintf(filename,"%s/%s.%s",SND_PATH,snd_info->name,sound_ext);
 
+#ifndef MSDOS
   if (!(file=fopen(filename,"r")))
   {
     fprintf(stderr,"%s: cannot open sound file '%s' - no sounds\n",
@@ -661,6 +722,17 @@ BOOL LoadSound(struct SoundInfo *snd_info)
   }
 
   return(FALSE);
+#else
+  snd_info->sample_ptr = load_sample(filename);
+  if(!snd_info->sample_ptr)
+  {
+    fprintf(stderr,"%s: cannot read sound file '%s' - no sounds\n",
+	    progname,filename);
+    fclose(file);
+    return(FALSE);
+  }
+  return(TRUE);
+#endif  // von  #ifndef MSDOS
 }
 
 void PlaySound(int nr)
@@ -703,12 +775,16 @@ void PlaySoundExt(int nr, int volume, int stereo, BOOL loop)
   snd_ctrl.data_ptr	= Sound[nr].data_ptr;
   snd_ctrl.data_len	= Sound[nr].data_len;
 
+#ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
     fprintf(stderr,"%s: cannot pipe to child process - no sounds\n",progname);
     sound_status=SOUND_OFF;
     return;
   }
+#else
+  sound_handler(snd_ctrl);
+#endif
 }
 
 void FadeSound(int nr)
@@ -749,12 +825,16 @@ void StopSoundExt(int nr, int method)
     snd_ctrl.stop_sound = TRUE;
   }
 
+#ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
     fprintf(stderr,"%s: cannot pipe to child process - no sounds\n",progname);
     sound_status=SOUND_OFF;
     return;
   }
+#else
+  sound_handler(snd_ctrl);
+#endif
 }
 
 void FreeSounds(int max)
@@ -765,7 +845,11 @@ void FreeSounds(int max)
     return;
 
   for(i=0;i<max;i++)
+#ifndef MSDOS
     free(Sound[i].file_ptr);
+#else
+    destroy_sample(Sound[i].sample_ptr);
+#endif
 }
 
 /*** THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS ***/

@@ -26,6 +26,8 @@ void HandleButtonEvent(XButtonEvent *);
 void HandleMotionEvent(XMotionEvent *);
 void HandleKeyEvent(XKeyEvent *);
 void HandleFocusEvent(XFocusChangeEvent *);
+void HandleClientMessageEvent(XClientMessageEvent *event);
+
 void HandleNoXEvent(void);
 
 void HandleButton(int, int, int);
