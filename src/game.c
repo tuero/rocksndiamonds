@@ -2900,7 +2900,11 @@ void StartMoving(int x, int y)
 	 EL_BD_MAGIC_WALL_FILLING);
       Store[x][y] = element;
     }
+#if 0
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_ACID)
+#else
+    else if (CAN_FALL(element) && Feld[x][y+1] == EL_ACID)
+#endif
     {
       SplashAcid(x, y);
 
