@@ -194,14 +194,14 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "bomb",			"bomb"				},
   { "magic_wall",		"magic wall"			},     /* 20 */
   { "speed_pill",		"speed pill"			},
-  { "acid",			"acid pool"			},
+  { "acid",			"acid"				},
   { "amoeba",			"dropping amoeba"		},
   { "amoeba",			"normal amoeba"			},
   { "nut",			"nut with emerald"		},
   { "gameoflife",		"Conway's wall of life"		},
   { "biomaze",			"biomaze"			},
   { "dynamite",			"burning dynamite"		},
-  { NULL,			"unknown"			},
+  { "wall",			"wall"				},
   { "robot_wheel",		"magic wheel"			},     /* 30 */
   { "robot_wheel",		"magic wheel (running)"		},
   { "key",			"red key"			},
@@ -235,7 +235,9 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "dark_yamyam",		"dark yam yam"			},     /* 60 */
   { "bd_magic_wall",		"magic wall (BD style)"		},
   { "wall",			"invisible steel wall"		},
-  { NULL,			"-"				},
+
+  { NULL,			"(not used)"			},
+
   { "dynabomb_nr",		"increases number of bombs"	},
   { "dynabomb_sz",		"increases explosion size"	},
   { "dynabomb_xl",		"increases power of explosion"	},
@@ -272,12 +274,12 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "emerald",			"purple emerald"		},
   { "wall",			"wall with red emerald"		},
   { "wall",			"wall with purple emerald"	},
-  { NULL,			"unknown"			},    /* 100 */
-  { NULL,			"unknown"			},
-  { NULL,			"unknown"			},
-  { NULL,			"unknown"			},
-  { NULL,			"unknown"			},
-  { NULL,			"normal wall (BD style)"	},
+  { "wall",			"acid pool (top left)"		},    /* 100 */
+  { "wall",			"acid pool (top right)"		},
+  { "wall",			"acid pool (bottom left)"	},
+  { "wall",			"acid pool (bottom)"		},
+  { "wall",			"acid pool (bottom right)"	},
+  { "wall",			"normal wall (BD style)"	},
   { "bd_rock",			"rock (BD style)"		},
   { "exit",			"open exit"			},
   { NULL,			"black orb bomb"		},
@@ -426,8 +428,9 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "gate",			"gray door (EM style, yellow key)"},
   { "gate",			"gray door (EM style, green key)"},
   { "gate",			"gray door (EM style, blue key)"},
-  { NULL,			"unknown"			},
-  { NULL,			"unknown"			},
+
+  { NULL,			"(not used)"			},
+  { NULL,			"(not used)"			},
 
   /* 256 */
 
@@ -492,10 +495,13 @@ struct ElementInfo element_info[MAX_ELEMENTS] =
   { "mole",			"mole (starts moving down)"	},
   { "wall",			"steel wall (slanted)"		},
   { "sand",			"invisible sand"		},
-  { NULL,			"dx unknown 15"			},
-  { NULL,			"dx unknown 42"			},
-  { NULL,			"-"				},
-  { NULL,			"-"				},    /* 320 */
+
+  { NULL,			"dx unknown element 15"		},
+  { NULL,			"dx unknown element 42"		},
+
+  { NULL,			"(not used)"			},
+  { NULL,			"(not used)"			},    /* 320 */
+
   { "shield_deadly",		"shield (deadly, kills enemies)"},
   { "timegate",			"time gate (open)"		},
   { "timegate",			"time gate (closed)"		},
