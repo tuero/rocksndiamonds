@@ -1049,7 +1049,8 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 				 leveldir_current->cl_first);
 
     drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
-    drawChooseLevelInfo(leveldir_pos);
+    drawChooseLevelInfo(leveldir_current->cl_first +
+			leveldir_current->cl_cursor - 3);
     redraw = TRUE;
   }
 
