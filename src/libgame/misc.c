@@ -1777,12 +1777,12 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
 
 #define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN]"
 
-static void read_token_parameters(struct SetupFileList *setup_file_list,
+static void read_token_parameters(SetupFileHash *setup_file_hash,
 				  struct ConfigInfo *suffix_list,
 				  struct FileInfo *file_list_entry)
 {
   /* check for config token that is the base token without any suffixes */
-  char *filename = getTokenValue(setup_file_list, file_list_entry->token);
+  char *filename = getHashEntry(setup_file_hash, file_list_entry->token);
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i;
 
@@ -1797,7 +1797,7 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
     file_list_entry->redefined = TRUE;
 
     /* mark config file token as well known from default config */
-    setTokenValue(setup_file_list, file_list_entry->token, known_token_value);
+    setHashEntry(setup_file_hash, file_list_entry->token, known_token_value);
   }
   else
     setString(&file_list_entry->filename, file_list_entry->default_filename);
@@ -1806,14 +1806,14 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
   for (i=0; suffix_list[i].token != NULL; i++)
   {
     char *token = getStringCat2(file_list_entry->token, suffix_list[i].token);
-    char *value = getTokenValue(setup_file_list, token);
+    char *value = getHashEntry(setup_file_hash, token);
 
     if (value != NULL)
     {
       setString(&file_list_entry->parameter[i], value);
 
       /* mark config file token as well known from default config */
-      setTokenValue(setup_file_list, token, known_token_value);
+      setHashEntry(setup_file_hash, token, known_token_value);
     }
 
     free(token);
@@ -1822,7 +1822,7 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
 
 static void add_dynamic_file_list_entry(struct FileInfo **list,
 					int *num_list_entries,
-					struct SetupFileList *extra_file_list,
+					SetupFileHash *extra_file_hash,
 					struct ConfigInfo *suffix_list,
 					int num_suffix_list_entries,
 					char *token)
@@ -1843,7 +1843,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   new_list_entry->filename = NULL;
   new_list_entry->parameter = checked_calloc(parameter_array_size);
 
-  read_token_parameters(extra_file_list, suffix_list, new_list_entry);
+  read_token_parameters(extra_file_hash, suffix_list, new_list_entry);
 }
 
 static void add_property_mapping(struct PropertyMapping **list,
@@ -1884,9 +1884,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
   int num_ignore_tokens = artwork_info->num_ignore_tokens;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
-  struct SetupFileList *setup_file_list;
-  struct SetupFileList *extra_file_list = NULL;
-  struct SetupFileList *list;
+  SetupFileHash *setup_file_hash;
+  SetupFileHash *extra_file_hash = NULL;
+#if 0
+  SetupFileHash *list;
+#endif
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i, j, k, l;
 
@@ -1934,35 +1936,60 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if (filename == NULL)
     return;
 
-  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+  printf("::: THIS 0\n");
+
+  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
+
+  printf("::: THIS 1 [%d]\n", num_file_list_entries);
 
   /* read parameters for all known config file tokens */
   for (i=0; i<num_file_list_entries; i++)
-    read_token_parameters(setup_file_list, suffix_list, &file_list[i]);
+    read_token_parameters(setup_file_hash, suffix_list, &file_list[i]);
+
+  printf("::: THIS 2\n");
 
   /* set all tokens that can be ignored here to "known" keyword */
   for (i=0; i < num_ignore_tokens; i++)
-    setTokenValue(setup_file_list, ignore_tokens[i], known_token_value);
+    setHashEntry(setup_file_hash, ignore_tokens[i], known_token_value);
 
   /* copy all unknown config file tokens to extra config list */
-  for (list = setup_file_list; list != NULL; list = list->next)
+#if 0
+  for (list = setup_file_hash; list != NULL; list = list->next)
   {
     if (strcmp(list->value, known_token_value) != 0)
     {
-      if (extra_file_list == NULL)
-	extra_file_list = newSetupFileList(list->token, list->value);
+      if (extra_file_hash == NULL)
+	extra_file_hash = newSetupFileHash(list->token, list->value);
       else
-	setTokenValue(extra_file_list, list->token, list->value);
+	setHashEntry(extra_file_hash, list->token, list->value);
     }
   }
+#else
+  BEGIN_HASH_ITERATION(setup_file_hash, itr)
+  {
+    if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
+    {
+      if (extra_file_hash == NULL)
+	extra_file_hash = newSetupFileHash();
+
+      setHashEntry(extra_file_hash,
+		   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));
+    }
+  }
+  END_HASH_ITERATION(setup_file_hash, itr)
+#endif
 
   /* at this point, we do not need the config file list anymore -- free it */
-  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(setup_file_hash);
 
   /* now try to determine valid, dynamically defined config tokens */
 
-  for (list = extra_file_list; list != NULL; list = list->next)
+#if 0
+  for (list = extra_file_hash; list != NULL; list = list->next)
+#endif
+
+  BEGIN_HASH_ITERATION(extra_file_hash, itr)
   {
     struct FileInfo **dynamic_file_list =
       &artwork_info->dynamic_file_list;
@@ -1975,7 +2002,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     int current_summarized_file_list_entry =
       artwork_info->num_file_list_entries +
       artwork_info->num_dynamic_file_list_entries;
-    char *token = list->token;
+    char *token = HASH_ITERATION_TOKEN(itr);
     int len_token = strlen(token);
     int start_pos;
     boolean base_prefix_found = FALSE;
@@ -2032,7 +2059,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
 	add_dynamic_file_list_entry(dynamic_file_list,
 				    num_dynamic_file_list_entries,
-				    extra_file_list,
+				    extra_file_hash,
 				    suffix_list,
 				    num_suffix_list_entries,
 				    token);
@@ -2069,7 +2096,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
-				      extra_file_list,
+				      extra_file_hash,
 				      suffix_list,
 				      num_suffix_list_entries,
 				      token);
@@ -2111,7 +2138,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
-				      extra_file_list,
+				      extra_file_hash,
 				      suffix_list,
 				      num_suffix_list_entries,
 				      token);
@@ -2153,7 +2180,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
-				      extra_file_list,
+				      extra_file_hash,
 				      suffix_list,
 				      num_suffix_list_entries,
 				      token);
@@ -2166,6 +2193,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       }
     }
   }
+  END_HASH_ITERATION(extra_file_hash, itr)
 
   if (artwork_info->num_dynamic_file_list_entries > 0)
   {
@@ -2174,18 +2202,23 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 		     artwork_info->sizeof_artwork_list_entry);
   }
 
-  if (extra_file_list != NULL && options.verbose && IS_PARENT_PROCESS())
+  if (extra_file_hash != NULL && options.verbose && IS_PARENT_PROCESS())
   {
     boolean dynamic_tokens_found = FALSE;
     boolean unknown_tokens_found = FALSE;
 
-    for (list = extra_file_list; list != NULL; list = list->next)
+#if 0
+    for (list = extra_file_hash; list != NULL; list = list->next)
+#endif
+
+    BEGIN_HASH_ITERATION(extra_file_hash, itr)
     {
-      if (strcmp(list->value, known_token_value) == 0)
+      if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) == 0)
 	dynamic_tokens_found = TRUE;
       else
 	unknown_tokens_found = TRUE;
     }
+    END_HASH_ITERATION(extra_file_hash, itr)
 
 #if DEBUG
     if (dynamic_tokens_found)
@@ -2193,9 +2226,16 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "dynamic token(s) found:");
 
-      for (list = extra_file_list; list != NULL; list = list->next)
-	if (strcmp(list->value, known_token_value) == 0)
-	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+#if 0
+      for (list = extra_file_hash; list != NULL; list = list->next)
+#endif
+
+      BEGIN_HASH_ITERATION(extra_file_hash, itr)
+      {
+	if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) == 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'",HASH_ITERATION_TOKEN(itr));
+      }
+      END_HASH_ITERATION(extra_file_hash, itr)
 
       Error(ERR_RETURN_LINE, "-");
     }
@@ -2207,15 +2247,22 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
       Error(ERR_RETURN, "- config file: '%s'", filename);
 
-      for (list = extra_file_list; list != NULL; list = list->next)
-	if (strcmp(list->value, known_token_value) != 0)
-	  Error(ERR_RETURN, "- unknown token: '%s'", list->token);
+#if 0
+      for (list = extra_file_hash; list != NULL; list = list->next)
+#endif
+
+      BEGIN_HASH_ITERATION(extra_file_hash, itr)
+      {
+	if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
+	  Error(ERR_RETURN, "- unknown token: '%s'",HASH_ITERATION_TOKEN(itr));
+      }
+      END_HASH_ITERATION(extra_file_hash, itr)
 
       Error(ERR_RETURN_LINE, "-");
     }
   }
 
-  freeSetupFileList(extra_file_list);
+  freeSetupFileHash(extra_file_hash);
 
 #if 0
   for (i=0; i<num_file_list_entries; i++)

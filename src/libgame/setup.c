@@ -21,6 +21,7 @@
 #include "joystick.h"
 #include "text.h"
 #include "misc.h"
+#include "hash.h"
 
 /* file names and filename extensions */
 #if !defined(PLATFORM_MSDOS)
@@ -1020,7 +1021,7 @@ boolean checkCookieString(const char *cookie, const char *template)
 }
 
 /* ------------------------------------------------------------------------- */
-/* setup file list handling functions                                        */
+/* setup file list and hash handling functions                               */
 /* ------------------------------------------------------------------------- */
 
 char *getFormattedSetupEntry(char *token, char *value)
@@ -1039,23 +1040,23 @@ char *getFormattedSetupEntry(char *token, char *value)
   return entry;
 }
 
-void freeSetupFileList(struct SetupFileList *setup_file_list)
+void freeSetupFileList(SetupFileList *list)
 {
-  if (setup_file_list == NULL)
+  if (list == NULL)
     return;
 
-  if (setup_file_list->token)
-    free(setup_file_list->token);
-  if (setup_file_list->value)
-    free(setup_file_list->value);
-  if (setup_file_list->next)
-    freeSetupFileList(setup_file_list->next);
-  free(setup_file_list);
+  if (list->token)
+    free(list->token);
+  if (list->value)
+    free(list->value);
+  if (list->next)
+    freeSetupFileList(list->next);
+  free(list);
 }
 
-struct SetupFileList *newSetupFileList(char *token, char *value)
+SetupFileList *newSetupFileList(char *token, char *value)
 {
-  struct SetupFileList *new = checked_malloc(sizeof(struct SetupFileList));
+  SetupFileList *new = checked_malloc(sizeof(SetupFileList));
 
   new->token = getStringCopy(token);
   new->value = getStringCopy(value);
@@ -1065,56 +1066,167 @@ struct SetupFileList *newSetupFileList(char *token, char *value)
   return new;
 }
 
-char *getTokenValue(struct SetupFileList *setup_file_list, char *token)
+char *getTokenValue(SetupFileList *list, char *token)
 {
-  if (setup_file_list == NULL)
+  if (list == NULL)
     return NULL;
 
-  if (strcmp(setup_file_list->token, token) == 0)
-    return setup_file_list->value;
+  if (strcmp(list->token, token) == 0)
+    return list->value;
   else
-    return getTokenValue(setup_file_list->next, token);
+    return getTokenValue(list->next, token);
 }
 
-void setTokenValue(struct SetupFileList *setup_file_list,
-		   char *token, char *value)
+void setTokenValue(SetupFileList *list, char *token, char *value)
 {
-  if (setup_file_list == NULL)
+  if (list == NULL)
     return;
 
-  if (strcmp(setup_file_list->token, token) == 0)
+  if (strcmp(list->token, token) == 0)
   {
-    if (setup_file_list->value)
-      free(setup_file_list->value);
+    if (list->value)
+      free(list->value);
 
-    setup_file_list->value = getStringCopy(value);
+    list->value = getStringCopy(value);
   }
-  else if (setup_file_list->next == NULL)
-    setup_file_list->next = newSetupFileList(token, value);
+  else if (list->next == NULL)
+    list->next = newSetupFileList(token, value);
   else
-    setTokenValue(setup_file_list->next, token, value);
+    setTokenValue(list->next, token, value);
 }
 
 #ifdef DEBUG
-static void printSetupFileList(struct SetupFileList *setup_file_list)
+static void printSetupFileList(SetupFileList *list)
 {
-  if (!setup_file_list)
+  if (!list)
     return;
 
-  printf("token: '%s'\n", setup_file_list->token);
-  printf("value: '%s'\n", setup_file_list->value);
+  printf("token: '%s'\n", list->token);
+  printf("value: '%s'\n", list->value);
 
-  printSetupFileList(setup_file_list->next);
+  printSetupFileList(list->next);
 }
 #endif
 
-struct SetupFileList *loadSetupFileList(char *filename)
+#ifdef DEBUG
+DEFINE_HASHTABLE_INSERT(insert_hash_entry, char, char);
+DEFINE_HASHTABLE_SEARCH(search_hash_entry, char, char);
+DEFINE_HASHTABLE_CHANGE(change_hash_entry, char, char);
+DEFINE_HASHTABLE_REMOVE(remove_hash_entry, char, char);
+#else
+#define insert_hash_entry hashtable_insert
+#define search_hash_entry hashtable_search
+#define change_hash_entry hashtable_change
+#define remove_hash_entry hashtable_remove
+#endif
+
+static unsigned int get_hash_from_key(void *key)
+{
+  /*
+    djb2
+
+    this algorithm (k=33) was first reported by dan bernstein many years ago in
+    comp.lang.c. another version of this algorithm (now favored by bernstein)
+    uses xor: hash(i) = hash(i - 1) * 33 ^ str[i]; the magic of number 33 (why
+    it works better than many other constants, prime or not) has never been
+    adequately explained.
+  */
+
+  char *str = (char *)key;
+  unsigned int hash = 5381;
+  int c;
+
+  while ((c = *str++))
+    hash = ((hash << 5) + hash) + c;	/* hash * 33 + c */
+
+  return hash;
+}
+
+static int keys_are_equal(void *key1, void *key2)
+{
+  return (strcmp((char *)key1, (char *)key2) == 0);
+}
+
+void freeSetupFileHash(SetupFileHash *hash)
+{
+  if (hash == NULL)
+    return;
+
+  hashtable_destroy(hash, 1);	/* 1 == also free values */
+  free(hash);
+}
+
+SetupFileHash *newSetupFileHash()
+{
+  SetupFileHash *new_hash =
+    create_hashtable(16, 0.75, get_hash_from_key, keys_are_equal);
+
+  return new_hash;
+}
+
+char *getHashEntry(SetupFileHash *hash, char *token)
+{
+  if (hash == NULL)
+    return NULL;
+
+  return search_hash_entry(hash, token);
+}
+
+void setHashEntry(SetupFileHash *hash, char *token, char *value)
+{
+  char *value_copy;
+
+  if (hash == NULL)
+    return;
+
+  value_copy = getStringCopy(value);
+
+  /* change value; if it does not exist, insert it as new */
+  if (!change_hash_entry(hash, token, value_copy))
+    if (!insert_hash_entry(hash, getStringCopy(token), value_copy))
+      Error(ERR_EXIT, "cannot insert into hash -- aborting");
+}
+
+#if 0
+#ifdef DEBUG
+static void printSetupFileHash(SetupFileHash *hash)
+{
+#if 0
+  if (hash == NULL)
+    return;
+
+  /* iterator constructor only returns valid iterator for non-empty hash */
+  if (hash != NULL && hashtable_count(hash) > 0)
+  {
+    struct hashtable_itr *itr = hashtable_iterator(hash);
+
+    do
+    {
+      printf("token: '%s'\n", (char *)hashtable_iterator_key(itr));
+      printf("value: '%s'\n", (char *)hashtable_iterator_value(itr));
+    }
+    while (hashtable_iterator_advance(itr));
+
+    free(itr);
+  }
+#endif
+
+  BEGIN_HASH_ITERATION(hash, itr)
+  {
+    printf("token: '%s'\n", HASH_ITERATION_TOKEN(itr));
+    printf("value: '%s'\n", HASH_ITERATION_VALUE(itr));
+  }
+  END_HASH_ITERATION(hash, itr)
+}
+#endif
+#endif
+
+SetupFileHash *loadSetupFileHash(char *filename)
 {
   int line_len;
   char line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
-  struct SetupFileList *setup_file_list = newSetupFileList("", "");
-  struct SetupFileList *first_valid_list_entry;
+  SetupFileHash *setup_file_hash = newSetupFileHash();
   FILE *file;
 
   if (!(file = fopen(filename, MODE_READ)))
@@ -1176,47 +1288,26 @@ struct SetupFileList *loadSetupFileList(char *filename)
 	break;
 
     if (*token && *value)
-      setTokenValue(setup_file_list, token, value);
+      setHashEntry(setup_file_hash, token, value);
   }
 
   fclose(file);
 
-  first_valid_list_entry = setup_file_list->next;
-
-  /* free empty list header */
-  setup_file_list->next = NULL;
-  freeSetupFileList(setup_file_list);
-
-  if (first_valid_list_entry == NULL)
+  if (hashtable_count(setup_file_hash) == 0)
     Error(ERR_WARN, "configuration file '%s' is empty", filename);
 
-  return first_valid_list_entry;
+  return setup_file_hash;
 }
 
-void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
+void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 				  char *identifier)
 {
-  if (!setup_file_list)
-    return;
+  char *value = getHashEntry(setup_file_hash, TOKEN_STR_FILE_IDENTIFIER);
 
-  if (strcmp(setup_file_list->token, TOKEN_STR_FILE_IDENTIFIER) == 0)
-  {
-    if (!checkCookieString(setup_file_list->value, identifier))
-    {
-      Error(ERR_WARN, "configuration file has wrong file identifier");
-      return;
-    }
-    else
-      return;
-  }
-
-  if (setup_file_list->next)
-    checkSetupFileListIdentifier(setup_file_list->next, identifier);
-  else
-  {
+  if (value == NULL)
     Error(ERR_WARN, "configuration file has no file identifier");
-    return;
-  }
+  else if (!checkCookieString(value, identifier))
+    Error(ERR_WARN, "configuration file has wrong file identifier");
 }
 
 
@@ -1466,11 +1557,11 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 {
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
-  struct SetupFileList *setup_file_list = loadSetupFileList(filename);
+  SetupFileHash *setup_file_hash = loadSetupFileHash(filename);
   LevelDirTree *leveldir_new = NULL;
   int i;
 
-  if (setup_file_list == NULL)
+  if (setup_file_hash == NULL)
   {
     Error(ERR_WARN, "ignoring level directory '%s'", directory_path);
 
@@ -1489,13 +1580,13 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   leveldir_new->filename = getStringCopy(directory_name);
 
-  checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
+  checkSetupFileHashIdentifier(setup_file_hash, getCookie("LEVELINFO"));
 
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
   for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
     setSetupInfo(levelinfo_tokens, i,
-		 getTokenValue(setup_file_list, levelinfo_tokens[i].text));
+		 getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
   *leveldir_new = ldi;
 
   if (strcmp(leveldir_new->name, ANONYMOUS_NAME) == 0)
@@ -1542,7 +1633,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   pushTreeInfo(node_first, leveldir_new);
 
-  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(setup_file_hash);
 
   if (leveldir_new->level_group)
   {
@@ -1651,14 +1742,14 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 {
   char *directory_path = getPath2(base_directory, directory_name);
   char *filename = getPath2(directory_path, ARTWORKINFO_FILENAME(type));
-  struct SetupFileList *setup_file_list = NULL;
+  SetupFileHash *setup_file_hash = NULL;
   TreeInfo *artwork_new = NULL;
   int i;
 
   if (access(filename, F_OK) == 0)		/* file exists */
-    setup_file_list = loadSetupFileList(filename);
+    setup_file_hash = loadSetupFileHash(filename);
 
-  if (setup_file_list == NULL)	/* no config file -- look for artwork files */
+  if (setup_file_hash == NULL)	/* no config file -- look for artwork files */
   {
     DIR *dir;
     struct dirent *dir_entry;
@@ -1701,17 +1792,17 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
   artwork_new->filename = getStringCopy(directory_name);
 
-  if (setup_file_list)	/* (before defining ".color" and ".class_desc") */
+  if (setup_file_hash)	/* (before defining ".color" and ".class_desc") */
   {
 #if 0
-    checkSetupFileListIdentifier(setup_file_list, getCookie("..."));
+    checkSetupFileHashIdentifier(setup_file_hash, getCookie("..."));
 #endif
 
     /* set all structure fields according to the token/value pairs */
     ldi = *artwork_new;
     for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
       setSetupInfo(levelinfo_tokens, i,
-		   getTokenValue(setup_file_list, levelinfo_tokens[i].text));
+		   getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
     *artwork_new = ldi;
 
     if (strcmp(artwork_new->name, ANONYMOUS_NAME) == 0)
@@ -1745,11 +1836,11 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   artwork_new->user_defined =
     (artwork_new->basepath == OPTIONS_ARTWORK_DIRECTORY(type) ? FALSE : TRUE);
 
-  /* (may use ".sort_priority" from "setup_file_list" above) */
+  /* (may use ".sort_priority" from "setup_file_hash" above) */
   artwork_new->color = ARTWORKCOLOR(artwork_new);
   artwork_new->class_desc = getLevelClassDescription(artwork_new);
 
-  if (setup_file_list == NULL)	/* (after determining ".user_defined") */
+  if (setup_file_hash == NULL)	/* (after determining ".user_defined") */
   {
     if (artwork_new->name != NULL)
       free(artwork_new->name);
@@ -1784,7 +1875,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
   pushTreeInfo(node_first, artwork_new);
 
-  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(setup_file_hash);
 
   free(directory_path);
   free(filename);
@@ -2158,7 +2249,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 void LoadLevelSetup_LastSeries()
 {
   char *filename;
-  struct SetupFileList *level_setup_list = NULL;
+  SetupFileHash *level_setup_hash = NULL;
 
   /* always start with reliable default values */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
@@ -2169,19 +2260,19 @@ void LoadLevelSetup_LastSeries()
 
   filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
 
-  if ((level_setup_list = loadSetupFileList(filename)))
+  if ((level_setup_hash = loadSetupFileHash(filename)))
   {
     char *last_level_series =
-      getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
+      getHashEntry(level_setup_hash, TOKEN_STR_LAST_LEVEL_SERIES);
 
     leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
 						 last_level_series);
     if (leveldir_current == NULL)
       leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
-    checkSetupFileListIdentifier(level_setup_list, getCookie("LEVELSETUP"));
+    checkSetupFileHashIdentifier(level_setup_hash, getCookie("LEVELSETUP"));
 
-    freeSetupFileList(level_setup_list);
+    freeSetupFileHash(level_setup_hash);
   }
   else
     Error(ERR_WARN, "using default setup values");
@@ -2273,7 +2364,7 @@ static void checkSeriesInfo()
 void LoadLevelSetup_SeriesInfo()
 {
   char *filename;
-  struct SetupFileList *level_setup_list = NULL;
+  SetupFileHash *level_setup_hash = NULL;
   char *level_subdir = leveldir_current->filename;
 
   /* always start with reliable default values */
@@ -2289,11 +2380,11 @@ void LoadLevelSetup_SeriesInfo()
 
   filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
 
-  if ((level_setup_list = loadSetupFileList(filename)))
+  if ((level_setup_hash = loadSetupFileHash(filename)))
   {
     char *token_value;
 
-    token_value = getTokenValue(level_setup_list, TOKEN_STR_LAST_PLAYED_LEVEL);
+    token_value = getHashEntry(level_setup_hash, TOKEN_STR_LAST_PLAYED_LEVEL);
 
     if (token_value)
     {
@@ -2305,7 +2396,7 @@ void LoadLevelSetup_SeriesInfo()
 	level_nr = leveldir_current->last_level;
     }
 
-    token_value = getTokenValue(level_setup_list, TOKEN_STR_HANDICAP_LEVEL);
+    token_value = getHashEntry(level_setup_hash, TOKEN_STR_HANDICAP_LEVEL);
 
     if (token_value)
     {
@@ -2322,9 +2413,9 @@ void LoadLevelSetup_SeriesInfo()
       leveldir_current->handicap_level = level_nr;
     }
 
-    checkSetupFileListIdentifier(level_setup_list, getCookie("LEVELSETUP"));
+    checkSetupFileHashIdentifier(level_setup_hash, getCookie("LEVELSETUP"));
 
-    freeSetupFileList(level_setup_list);
+    freeSetupFileHash(level_setup_hash);
   }
   else
     Error(ERR_WARN, "using default setup values");

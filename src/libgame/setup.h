@@ -15,6 +15,7 @@
 #define SETUP_H
 
 #include "system.h"
+#include "hash.h"
 
 
 /* values for setup file handling */
@@ -61,6 +62,25 @@ struct TokenInfo
   void *value;
   char *text;
 };
+
+/* some definitions for list and hash handling */
+typedef struct SetupFileList SetupFileList;
+typedef struct hashtable SetupFileHash;
+
+#define BEGIN_HASH_ITERATION(hash, itr)				\
+  if (hash != NULL && hashtable_count(hash) > 0)		\
+  {								\
+    struct hashtable_itr *itr = hashtable_iterator(hash);	\
+    do {							\
+
+#define HASH_ITERATION_TOKEN(itr)	((char *)hashtable_iterator_key(itr))
+#define HASH_ITERATION_VALUE(itr)	((char *)hashtable_iterator_value(itr))
+
+#define END_HASH_ITERATION(hash, itr)				\
+    } while (hashtable_iterator_advance(itr));			\
+    free(itr);							\
+  }								\
+
 
 /* sort priorities of level series (also used as level series classes) */
 #define LEVELCLASS_TUTORIAL_START	10
@@ -206,12 +226,18 @@ int getFileVersionFromCookieString(const char *);
 boolean checkCookieString(const char *, const char *);
 
 char *getFormattedSetupEntry(char *, char *);
+
 void freeSetupFileList(struct SetupFileList *);
 struct SetupFileList *newSetupFileList(char *, char *);
-char *getTokenValue(struct SetupFileList *, char *);
-void setTokenValue(struct SetupFileList *, char *, char *);
-struct SetupFileList *loadSetupFileList(char *);
-void checkSetupFileListIdentifier(struct SetupFileList *, char *);
+char *getListEntry(struct SetupFileList *, char *);
+void setListEntry(struct SetupFileList *, char *, char *);
+
+void freeSetupFileHash(SetupFileHash *);
+SetupFileHash *newSetupFileHash();
+char *getHashEntry(SetupFileHash *, char *);
+void setHashEntry(SetupFileHash *, char *, char *);
+SetupFileHash *loadSetupFileHash(char *);
+void checkSetupFileHashIdentifier(SetupFileHash *, char *);
 void setSetupInfo(struct TokenInfo *, int, char *);
 char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);

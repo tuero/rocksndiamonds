@@ -1700,32 +1700,32 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->options.verbose = FALSE;
 }
 
-static void decodeSetupFileList(struct SetupFileList *setup_file_list)
+static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 {
   int i, pnr;
 
-  if (!setup_file_list)
+  if (!setup_file_hash)
     return;
 
   /* global setup */
   si = setup;
   for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
     setSetupInfo(global_setup_tokens, i,
-		 getTokenValue(setup_file_list, global_setup_tokens[i].text));
+		 getHashEntry(setup_file_hash, global_setup_tokens[i].text));
   setup = si;
 
   /* editor setup */
   sei = setup.editor;
   for (i=0; i<NUM_EDITOR_SETUP_TOKENS; i++)
     setSetupInfo(editor_setup_tokens, i,
-		 getTokenValue(setup_file_list,editor_setup_tokens[i].text));
+		 getHashEntry(setup_file_hash,editor_setup_tokens[i].text));
   setup.editor = sei;
 
   /* shortcut setup */
   ssi = setup.shortcut;
   for (i=0; i<NUM_SHORTCUT_SETUP_TOKENS; i++)
     setSetupInfo(shortcut_setup_tokens, i,
-		 getTokenValue(setup_file_list,shortcut_setup_tokens[i].text));
+		 getHashEntry(setup_file_hash,shortcut_setup_tokens[i].text));
   setup.shortcut = ssi;
 
   /* player setup */
@@ -1742,7 +1742,7 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
 
       sprintf(full_token, "%s%s", prefix, player_setup_tokens[i].text);
       setSetupInfo(player_setup_tokens, i,
-		   getTokenValue(setup_file_list, full_token));
+		   getHashEntry(setup_file_hash, full_token));
     }
     setup.input[pnr] = sii;
   }
@@ -1751,37 +1751,37 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   syi = setup.system;
   for (i=0; i<NUM_SYSTEM_SETUP_TOKENS; i++)
     setSetupInfo(system_setup_tokens, i,
-		 getTokenValue(setup_file_list, system_setup_tokens[i].text));
+		 getHashEntry(setup_file_hash, system_setup_tokens[i].text));
   setup.system = syi;
 
   /* options setup */
   soi = setup.options;
   for (i=0; i<NUM_OPTIONS_SETUP_TOKENS; i++)
     setSetupInfo(options_setup_tokens, i,
-		 getTokenValue(setup_file_list, options_setup_tokens[i].text));
+		 getHashEntry(setup_file_hash, options_setup_tokens[i].text));
   setup.options = soi;
 }
 
 void LoadSetup()
 {
   char *filename = getSetupFilename();
-  struct SetupFileList *setup_file_list = NULL;
+  SetupFileHash *setup_file_hash = NULL;
 
   /* always start with reliable default values */
   setSetupInfoToDefaults(&setup);
 
-  setup_file_list = loadSetupFileList(filename);
+  setup_file_hash = loadSetupFileHash(filename);
 
-  if (setup_file_list)
+  if (setup_file_hash)
   {
     char *player_name_new;
 
-    checkSetupFileListIdentifier(setup_file_list, getCookie("SETUP"));
-    decodeSetupFileList(setup_file_list);
+    checkSetupFileHashIdentifier(setup_file_hash, getCookie("SETUP"));
+    decodeSetupFileHash(setup_file_hash);
 
     setup.direct_draw = !setup.double_buffering;
 
-    freeSetupFileList(setup_file_list);
+    freeSetupFileHash(setup_file_hash);
 
     /* needed to work around problems with fixed length strings */
     player_name_new = get_corrected_login_name(setup.player_name);
@@ -1867,7 +1867,7 @@ void SaveSetup()
 void LoadCustomElementDescriptions()
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
-  struct SetupFileList *setup_file_list;
+  SetupFileHash *setup_file_hash;
   int i;
 
   for (i=0; i<NUM_FILE_ELEMENTS; i++)
@@ -1879,13 +1879,13 @@ void LoadCustomElementDescriptions()
     }
   }
 
-  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
   for (i=0; i<NUM_FILE_ELEMENTS; i++)
   {
     char *token = getStringCat2(element_info[i].token_name, ".name");
-    char *value = getTokenValue(setup_file_list, token);
+    char *value = getHashEntry(setup_file_hash, token);
 
     if (value != NULL)
       element_info[i].custom_description = getStringCopy(value);
@@ -1893,13 +1893,13 @@ void LoadCustomElementDescriptions()
     free(token);
   }
 
-  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(setup_file_hash);
 }
 
 void LoadSpecialMenuDesignSettings()
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
-  struct SetupFileList *setup_file_list;
+  SetupFileHash *setup_file_hash;
   char *value;
 
   /* !!! CHANGE THIS !!! (redundant initialization) !!! */
@@ -1911,36 +1911,36 @@ void LoadSpecialMenuDesignSettings()
   global.door_step_offset = 2;
   global.door_step_delay = 10;
 
-  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
-  value = getTokenValue(setup_file_list, "global.num_toons");
+  value = getHashEntry(setup_file_hash, "global.num_toons");
   if (value != NULL)
     global.num_toons = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "menu.draw_xoffset");
+  value = getHashEntry(setup_file_hash, "menu.draw_xoffset");
   if (value != NULL)
     global.menu_draw_xoffset = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "menu.draw_yoffset");
+  value = getHashEntry(setup_file_hash, "menu.draw_yoffset");
   if (value != NULL)
     global.menu_draw_yoffset = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "menu.draw_xoffset.MAIN");
+  value = getHashEntry(setup_file_hash, "menu.draw_xoffset.MAIN");
   if (value != NULL)
     global.menu_draw_xoffset_MAIN = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "menu.draw_yoffset.MAIN");
+  value = getHashEntry(setup_file_hash, "menu.draw_yoffset.MAIN");
   if (value != NULL)
     global.menu_draw_yoffset_MAIN = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "door.step_offset");
+  value = getHashEntry(setup_file_hash, "door.step_offset");
   if (value != NULL)
     global.door_step_offset = get_integer_from_string(value);
 
-  value = getTokenValue(setup_file_list, "door.step_delay");
+  value = getHashEntry(setup_file_hash, "door.step_delay");
   if (value != NULL)
     global.door_step_delay = get_integer_from_string(value);
 
-  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(setup_file_hash);
 }

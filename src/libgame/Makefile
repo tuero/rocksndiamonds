@@ -12,6 +12,7 @@ SRCS =	system.c	\
 	pcx.c		\
 	image.c		\
 	random.c	\
+	hash.c		\
 	setup.c		\
 	misc.c		\
 	msdos.c		\
@@ -27,6 +28,7 @@ OBJS =	system.o	\
 	pcx.o		\
 	image.o		\
 	random.o	\
+	hash.o		\
 	setup.o		\
 	misc.o		\
 	msdos.o		\
