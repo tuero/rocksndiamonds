@@ -75,7 +75,7 @@
 
 /* values for counter gadgets */
 #define ED_COUNT_ELEM_SCORE_XPOS	ED_SETTINGS_XPOS
-#define ED_COUNT_ELEM_SCORE_YPOS	(14 * MINI_TILEY)
+#define ED_COUNT_ELEM_SCORE_YPOS	(11 * MINI_TILEY)
 #define ED_COUNT_ELEM_CONTENT_XPOS	ED_SETTINGS_XPOS
 #define ED_COUNT_ELEM_CONTENT_YPOS	(19 * MINI_TILEY)
 
@@ -339,13 +339,19 @@
 #define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 5)
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
 #define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CUSTOM_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_CUSTOM_COLLECTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
 #define GADGET_ID_CUSTOM_PUSHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_WALKABLE_OVER	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CUSTOM_WALKABLE_INSIDE (GADGET_ID_CHECKBUTTON_FIRST+ 16)
+#define GADGET_ID_CUSTOM_WALKABLE_UNDER	(GADGET_ID_CHECKBUTTON_FIRST + 17)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 18)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -423,18 +429,24 @@
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	6
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	7
+#define ED_CHECKBUTTON_ID_CUSTOM_DIGGABLE	6
+#define ED_CHECKBUTTON_ID_CUSTOM_COLLECTIBLE	7
 #define ED_CHECKBUTTON_ID_CUSTOM_PUSHABLE	8
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	9
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	9
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	10
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	11
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	12
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_OVER	13
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_INSIDE 14
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_UNDER	15
 
-#define ED_NUM_CHECKBUTTONS			10
+#define ED_NUM_CHECKBUTTONS			16
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
-#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY
+#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_UNDER
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -847,34 +859,70 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(5),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
     "indestructible",			"element cannot be destroyed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
-    GADGET_ID_CUSTOM_CAN_FALL,
-    &custom_element_properties[EP_CAN_FALL],
-    "can fall",				"element can fall down"
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(6),
+    GADGET_ID_CUSTOM_DIGGABLE,
+    &custom_element_properties[EP_DIGGABLE],
+    "diggable",				"element can be digged away"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
-    GADGET_ID_CUSTOM_CAN_SMASH,
-    &custom_element_properties[EP_CAN_SMASH],
-    "can smash",			"element can smash other elements"
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(7),
+    GADGET_ID_CUSTOM_COLLECTIBLE,
+    &custom_element_properties[EP_COLLECTIBLE],
+    "collectible",			"element can be collected"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(8),
     GADGET_ID_CUSTOM_PUSHABLE,
     &custom_element_properties[EP_PUSHABLE],
     "pushable",				"element can be pushed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(9),
+    GADGET_ID_CUSTOM_CAN_FALL,
+    &custom_element_properties[EP_CAN_FALL],
+    "can fall",				"element can fall down"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
+    GADGET_ID_CUSTOM_CAN_SMASH,
+    &custom_element_properties[EP_CAN_SMASH],
+    "can smash",			"element can smash other elements"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
+    GADGET_ID_CUSTOM_CAN_MOVE,
+    &custom_element_properties[EP_CAN_MOVE],
+    "can move",				"element can move in some direction"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
+    GADGET_ID_CUSTOM_WALKABLE_OVER,
+    &custom_element_properties[EP_WALKABLE_OVER],
+    "player can walk over",		"player can walk over this element"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
+    GADGET_ID_CUSTOM_WALKABLE_INSIDE,
+    &custom_element_properties[EP_WALKABLE_INSIDE],
+    "player can walk inside",		"player can walk inside this element"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(15),
+    GADGET_ID_CUSTOM_WALKABLE_UNDER,
+    &custom_element_properties[EP_WALKABLE_UNDER],
+    "player can walk under",		"player can walk under this element"
   }
 };
 
@@ -3362,6 +3410,9 @@ static boolean checkPropertiesConfig()
 
 static void DrawPropertiesConfig()
 {
+  boolean element_has_score = FALSE;
+  char *element_score_text = NULL;
+  int temporary_dummy_score = 0;
   int counter_id = ED_COUNTER_ID_ELEM_SCORE;
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
@@ -3374,6 +3425,11 @@ static void DrawPropertiesConfig()
   {
     if (elements_with_counter[i].element == properties_element)
     {
+#if 1
+      counterbutton_info[counter_id].value = elements_with_counter[i].value;
+      element_score_text = elements_with_counter[i].text;
+      element_has_score = TRUE;
+#else
       int x = counterbutton_info[counter_id].x + xoffset_right;
       int y = counterbutton_info[counter_id].y + yoffset_right;
 
@@ -3382,12 +3438,30 @@ static void DrawPropertiesConfig()
 
       ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
       MapCounterButtons(counter_id);
+#endif
       break;
     }
   }
 
-  if (HAS_CONTENT(properties_element) ||
-      IS_CUSTOM_ELEMENT(properties_element))
+  if (IS_CUSTOM_ELEMENT(properties_element))
+  {
+    counterbutton_info[counter_id].value = &temporary_dummy_score;
+    element_score_text = "Score for certain actions";
+    element_has_score = TRUE;
+  }
+
+  if (element_has_score)
+  {
+    int x = counterbutton_info[counter_id].x + xoffset_right;
+    int y = counterbutton_info[counter_id].y + yoffset_right;
+
+    DrawTextF(x, y, FONT_TEXT_1, element_score_text);
+
+    ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
+    MapCounterButtons(counter_id);
+  }
+
+  if (HAS_CONTENT(properties_element))
   {
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
@@ -3406,10 +3480,6 @@ static void DrawPropertiesConfig()
       else
 	DrawElementContentAreas();
     }
-#if 1
-    else if (IS_CUSTOM_ELEMENT(properties_element))
-      DrawCustomChangedArea();
-#endif
   }
 
   if (IS_GEM(properties_element))
@@ -3429,8 +3499,8 @@ static void DrawPropertiesConfig()
   {
     CopyCustomElementPropertiesToEditor(properties_element);
 
-    for (i =  ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
-	 i <= ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY; i++)
+    for (i =  ED_CHECKBUTTON_ID_CUSTOM_FIRST;
+	 i <= ED_CHECKBUTTON_ID_CUSTOM_LAST; i++)
     {
       /* draw checkbutton gadget */
       x = checkbutton_info[i].x + xoffset_right2;
@@ -3441,20 +3511,6 @@ static void DrawPropertiesConfig()
 		   GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
       MapCheckbuttonGadget(i);
     }
-
-#if 1
-    /* draw selectbox gadget */
-    i = ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE;
-    x = selectbox_info[i].x + xoffset_right2;
-    y = selectbox_info[i].y + yoffset_right2;
-
-    selectbox_info[i].index = &index_change_cause;
-
-    DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
-    ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
-		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
-    MapSelectboxGadget(i);
-#endif
   }
 }
 
@@ -3772,8 +3828,36 @@ static void DrawPropertiesInfo()
 
 static void DrawPropertiesAdvanced()
 {
+  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int yoffset_right2 = ED_BORDER_SIZE;
+  int i, x, y;
+
   DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY,
 	   "Under construction! :-)", FONT_TEXT_1);
+
+  /* draw stickybutton gadget */
+  i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+  x = checkbutton_info[i].x + xoffset_right2;
+  y = checkbutton_info[i].y + yoffset_right2;
+
+  DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
+  ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+	       GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+  MapCheckbuttonGadget(i);
+
+  DrawCustomChangedArea();
+
+  /* draw selectbox gadget */
+  i = ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE;
+  x = selectbox_info[i].x + xoffset_right2;
+  y = selectbox_info[i].y + yoffset_right2;
+
+  selectbox_info[i].index = &index_change_cause;
+
+  DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
+  ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
+	       GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
+  MapSelectboxGadget(i);
 }
 
 static void DrawPropertiesWindow()

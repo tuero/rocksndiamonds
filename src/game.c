@@ -6446,7 +6446,39 @@ int DigField(struct PlayerInfo *player,
       break;
 
     default:
-      if (IS_PUSHABLE(element))
+      if (IS_WALKABLE(element))
+      {
+	break;
+      }
+      else if (IS_DIGGABLE(element))
+      {
+	RemoveField(x, y);
+#if 1
+	if (mode != DF_SNAP)
+	{
+	  GfxElement[x][y] = element;
+	  player->is_digging = TRUE;
+	}
+#endif
+	PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
+
+	break;
+      }
+      else if (IS_COLLECTIBLE(element))
+      {
+	RemoveField(x, y);
+#if 1
+	if (mode != DF_SNAP)
+	{
+	  GfxElement[x][y] = element;
+	  player->is_collecting = TRUE;
+	}
+#endif
+	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+
+	break;
+      }
+      else if (IS_PUSHABLE(element))
       {
 	if (mode == DF_SNAP)
 	  return MF_NO_ACTION;
