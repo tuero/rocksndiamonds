@@ -898,6 +898,7 @@ void InitElementProperties()
     EL_MAUER_X,
     EL_MAUER_Y,
     EL_MAUER_XY,
+    EL_BD_WALL,
     EL_FELSBODEN,
     EL_AUSGANG_ZU,
     EL_AUSGANG_ACT,
@@ -1093,7 +1094,9 @@ void InitElementProperties()
   static int ep_slippery[] =
   {
     EL_FELSBODEN,
+    EL_BD_WALL,
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_EDELSTEIN,
     EL_EDELSTEIN_BD,
     EL_EDELSTEIN_GELB,
@@ -1169,6 +1172,7 @@ void InitElementProperties()
     EL_MAUER_Y,
     EL_MAUER_XY,
     EL_MAUERND,
+    EL_BD_WALL,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
@@ -1207,6 +1211,7 @@ void InitElementProperties()
   static int ep_can_fall[] =
   {
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_EDELSTEIN,
     EL_EDELSTEIN_BD,
     EL_EDELSTEIN_GELB,
@@ -1226,13 +1231,15 @@ void InitElementProperties()
     EL_SP_DISK_ORANGE,
     EL_PEARL,
     EL_CRYSTAL,
-    EL_SPRING
+    EL_SPRING,
+    EL_DX_SUPABOMB
   };
   static int ep_can_fall_num = sizeof(ep_can_fall)/sizeof(int);
 
   static int ep_can_smash[] =
   {
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_EDELSTEIN,
     EL_EDELSTEIN_BD,
     EL_EDELSTEIN_GELB,
@@ -1256,13 +1263,16 @@ void InitElementProperties()
     EL_SP_INFOTRON,
     EL_SP_DISK_ORANGE,
     EL_PEARL,
-    EL_CRYSTAL
+    EL_CRYSTAL,
+    EL_SPRING,
+    EL_DX_SUPABOMB
   };
   static int ep_can_smash_num = sizeof(ep_can_smash)/sizeof(int);
 
   static int ep_can_change[] =
   {
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_EDELSTEIN,
     EL_EDELSTEIN_BD,
     EL_EDELSTEIN_GELB,
@@ -1289,7 +1299,8 @@ void InitElementProperties()
     EL_SONDE,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
-    EL_BALLOON
+    EL_BALLOON,
+    EL_SPRING_MOVING
   };
   static int ep_can_move_num = sizeof(ep_can_move)/sizeof(int);
 
@@ -1379,7 +1390,9 @@ void InitElementProperties()
     EL_LEERRAUM,
     EL_ERDREICH,
     EL_FELSBODEN,
+    EL_BD_WALL,
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_EDELSTEIN_BD,
     EL_SIEB2_INAKTIV,
     EL_AUSGANG_ZU,
@@ -1430,6 +1443,7 @@ void InitElementProperties()
     EL_LEERRAUM,
     EL_ERDREICH,
     EL_MAUERWERK,
+    EL_BD_WALL,
     EL_FELSBODEN,
     EL_SCHLUESSEL,
     EL_BETON,
@@ -1583,7 +1597,8 @@ void InitElementProperties()
     EL_SP_DISK_ORANGE,
     EL_SP_DISK_YELLOW,
     EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON
+    EL_SP_ELECTRON,
+    EL_DX_SUPABOMB
   };
   static int ep_explosive_num = sizeof(ep_explosive)/sizeof(int);
 
@@ -1603,6 +1618,7 @@ void InitElementProperties()
   static int ep_pushable[] =
   {
     EL_FELSBROCKEN,
+    EL_BD_ROCK,
     EL_BOMBE,
     EL_KOKOSNUSS,
     EL_ZEIT_LEER,
@@ -1613,7 +1629,8 @@ void InitElementProperties()
     EL_SP_DISK_ORANGE,
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
-    EL_SPRING
+    EL_SPRING,
+    EL_DX_SUPABOMB
   };
   static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
 

@@ -1772,7 +1772,9 @@ void Impact(int x, int y)
     return;
   }
 
-  if ((element == EL_BOMBE || element == EL_SP_DISK_ORANGE) &&
+  if ((element == EL_BOMBE ||
+       element == EL_SP_DISK_ORANGE ||
+       element == EL_DX_SUPABOMB) &&
       (lastline || object_hit))	/* element is bomb */
   {
     Bang(x, y);
@@ -1837,10 +1839,13 @@ void Impact(int x, int y)
 	return;
       }
     }
-    else if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
+    else if (element == EL_FELSBROCKEN ||
+	     element == EL_SP_ZONK ||
+	     element == EL_BD_ROCK)
     {
       if (IS_ENEMY(smashed) ||
 	  smashed == EL_BOMBE || smashed == EL_SP_DISK_ORANGE ||
+	  smashed == EL_DX_SUPABOMB ||
 	  smashed == EL_SONDE || smashed == EL_SCHWEIN ||
 	  smashed == EL_DRACHE || smashed == EL_MOLE)
       {
@@ -1919,6 +1924,7 @@ void Impact(int x, int y)
 	sound = SND_KLUMPF;
 	break;
       case EL_FELSBROCKEN:
+      case EL_BD_ROCK:
 	sound = SND_KLOPF;
 	break;
       case EL_SP_ZONK:
@@ -2235,6 +2241,16 @@ void TurnRound(int x, int y)
     MovDir[x][y] = game.balloon_dir;
     MovDelay[x][y] = 0;
   }
+  else if (element == EL_SPRING_MOVING)
+  {
+    if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y) ||
+	(IN_LEV_FIELD(x, y+1) && IS_FREE(x, y+1)))
+    {
+      Feld[x][y] = EL_SPRING;
+      MovDir[x][y] = MV_NO_MOVING;
+    }
+    MovDelay[x][y] = 0;
+  }
   else if (element == EL_ROBOT || element == EL_SONDE || element == EL_PINGUIN)
   {
     int attr_x = -1, attr_y = -1;
@@ -2418,7 +2434,8 @@ void StartMoving(int x, int y)
 	Feld[x][y+1] = EL_MORAST_VOLL;
       }
     }
-    else if (element == EL_FELSBROCKEN && Feld[x][y+1] == EL_MORAST_LEER)
+    else if ((element == EL_FELSBROCKEN || element == EL_BD_ROCK) &&
+	     Feld[x][y+1] == EL_MORAST_LEER)
     {
       InitMovingField(x, y, MV_DOWN);
       Store[x][y] = EL_MORAST_VOLL;
@@ -2507,7 +2524,8 @@ void StartMoving(int x, int y)
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
 #else
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1] &&
-	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1])
+	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1] &&
+	     element != EL_DX_SUPABOMB)
 #endif
     {
       boolean left  = (x>0 && IS_FREE(x-1, y) &&
@@ -2517,7 +2535,9 @@ void StartMoving(int x, int y)
 
       if (left || right)
       {
-	if (left && right && game.emulation != EMU_BOULDERDASH)
+	if (left && right &&
+	    (game.emulation != EMU_BOULDERDASH &&
+	     element != EL_BD_ROCK && element != EL_EDELSTEIN_BD))
 	  left = !(right = RND(2));
 
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
@@ -2539,7 +2559,8 @@ void StartMoving(int x, int y)
   {
     int newx, newy;
 
-    if ((element == EL_SONDE || element == EL_BALLOON)
+    if ((element == EL_SONDE || element == EL_BALLOON ||
+	 element == EL_SPRING_MOVING)
 	&& JustBeingPushed(x, y))
       return;
 
@@ -2868,6 +2889,8 @@ void ContinueMoving(int x, int y)
   else if (CAN_FALL(element) && horiz_move &&
 	   y < lev_fieldy-1 && IS_BELT(Feld[x][y+1]))
     step /= 2;
+  else if (element == EL_SPRING_MOVING)
+    step*=2;
 
 #if OLD_GAME_BEHAVIOUR
   else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
@@ -3148,7 +3171,7 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 
   if (done)
     PlaySoundLevel(ax, ay,
-		   (new_element == EL_FELSBROCKEN ? SND_KLOPF : SND_PLING));
+		   (new_element == EL_BD_ROCK ? SND_KLOPF : SND_PLING));
 }
 
 void AmoebeWaechst(int x, int y)
@@ -3332,7 +3355,7 @@ void AmoebeAbleger(int ax, int ay)
 
       if (element == EL_AMOEBE_BD && AmoebaCnt2[new_group_nr] >= 200)
       {
-	AmoebeUmwandelnBD(newax, neway, EL_FELSBROCKEN);
+	AmoebeUmwandelnBD(newax, neway, EL_BD_ROCK);
 	return;
       }
     }
@@ -4162,7 +4185,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       {
 	int el = Feld[jx+dx][jy];
 	int push_delay = (IS_SB_ELEMENT(el) || el == EL_SONDE ? 2 :
-			  el == EL_BALLOON ? 0 : 10);
+			  (el == EL_BALLOON || el == EL_SPRING) ? 0 : 10);
 
 	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
 	{
@@ -5470,11 +5493,14 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_FELSBROCKEN:
+    case EL_BD_ROCK:
     case EL_BOMBE:
+    case EL_DX_SUPABOMB:
     case EL_KOKOSNUSS:
     case EL_ZEIT_LEER:
     case EL_SP_ZONK:
     case EL_SP_DISK_ORANGE:
+    case EL_SPRING:
       if (dy || mode == DF_SNAP)
 	return MF_NO_ACTION;
 
@@ -5492,16 +5518,22 @@ int DigField(struct PlayerInfo *player,
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !tape.playing)
+	  !tape.playing && element != EL_SPRING)
 	return MF_NO_ACTION;
 
       RemoveField(x, y);
       Feld[x+dx][y+dy] = element;
 
-      player->push_delay_value = 2+RND(8);
+      if (element == EL_SPRING)
+      {
+	Feld[x+dx][y+dy] = EL_SPRING_MOVING;
+	MovDir[x+dx][y+dy] = move_direction;
+      }
+
+      player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
       DrawLevelField(x+dx, y+dy);
-      if (element == EL_FELSBROCKEN)
+      if (element == EL_FELSBROCKEN || element == EL_BD_ROCK)
 	PlaySoundLevel(x+dx, y+dy, SND_PUSCH);
       else if (element == EL_KOKOSNUSS)
 	PlaySoundLevel(x+dx, y+dy, SND_KNURK);
@@ -5696,7 +5728,6 @@ int DigField(struct PlayerInfo *player,
     case EL_SONDE:
     case EL_SP_DISK_YELLOW:
     case EL_BALLOON:
-    case EL_SPRING:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
 

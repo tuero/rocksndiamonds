@@ -258,7 +258,7 @@ char *element_info[] =
   "dark yam yam",				/* 60 */
   "magic wall (BD style)",
   "invisible steel wall",
-  "dynabomb",
+  "-",
   "increases number of bombs",
   "increases explosion size",
   "increases power of explosion",
@@ -300,8 +300,8 @@ char *element_info[] =
   "unknown",
   "unknown",
   "unknown",
-  "unknown",
-  "unknown",
+  "normal wall (BD style)",
+  "rock (BD style)",
   "open exit",
   "unknown",
   "amoeba",
@@ -555,6 +555,7 @@ char *element_info[] =
   "tube (right & down)",
   "spring",
   "trap",
+  "stable bomb (DX style)",
   "-"
 
   /*

@@ -645,7 +645,9 @@ void DrawPlayer(struct PlayerInfo *player)
       int element = Feld[next_jx][next_jy];
       int graphic = el2gfx(element);
 
-      if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK) && sxx)
+      if ((element == EL_FELSBROCKEN ||
+	   element == EL_SP_ZONK ||
+	   element == EL_BD_ROCK) && sxx)
       {
 	int phase = (player->GfxPos / (TILEX / 4));
 
@@ -1170,12 +1172,16 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic += phase4;
   }
-  else if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK ||
+  else if ((element == EL_FELSBROCKEN ||
+	    element == EL_SP_ZONK ||
+	    element == EL_BD_ROCK ||
 	    IS_GEM(element)) && !cut_mode)
   {
     if (uy >= lev_fieldy-1 || !IS_BELT(Feld[ux][uy+1]))
     {
-      if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
+      if (element == EL_FELSBROCKEN ||
+	  element == EL_SP_ZONK ||
+	  element == EL_BD_ROCK)
       {
 	if (dir == MV_LEFT)
 	  graphic += (4 - phase4) % 4;
@@ -2650,8 +2656,12 @@ int el2gfx(int element)
     case EL_TUBE_RIGHT_UP:	return GFX_TUBE_RIGHT_UP;
     case EL_TUBE_RIGHT_DOWN:	return GFX_TUBE_RIGHT_DOWN;
     case EL_SPRING:		return GFX_SPRING;
+    case EL_SPRING_MOVING:	return GFX_SPRING;
     case EL_TRAP_INACTIVE:	return GFX_TRAP_INACTIVE;
     case EL_TRAP_ACTIVE:	return GFX_TRAP_ACTIVE;
+    case EL_BD_WALL:		return GFX_BD_WALL;
+    case EL_BD_ROCK:		return GFX_BD_ROCK;
+    case EL_DX_SUPABOMB:	return GFX_DX_SUPABOMB;
 
     default:
     {

@@ -180,13 +180,15 @@ typedef unsigned char byte;
 #define IS_BLOCKED(x,y)		(Feld[x][y] == EL_BLOCKED)
 
 #define EL_CHANGED(e)		((e) == EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
+				 (e) == EL_BD_ROCK        ? EL_EDELSTEIN_BD : \
 				 (e) == EL_EDELSTEIN      ? EL_DIAMANT :    \
 				 (e) == EL_EDELSTEIN_GELB ? EL_DIAMANT :    \
 				 (e) == EL_EDELSTEIN_ROT  ? EL_DIAMANT :    \
 				 (e) == EL_EDELSTEIN_LILA ? EL_DIAMANT :    \
 				 EL_FELSBROCKEN)
 #define EL_CHANGED2(e)		((e) == EL_FELSBROCKEN ? EL_EDELSTEIN_BD :  \
-				 EL_FELSBROCKEN)
+				 (e) == EL_BD_ROCK     ? EL_EDELSTEIN_BD : \
+				 EL_BD_ROCK)
 #define IS_DRAWABLE(e)		((e) < EL_BLOCKED)
 #define IS_NOT_DRAWABLE(e)	((e) >= EL_BLOCKED)
 #define TAPE_IS_EMPTY(x)	((x).length == 0)
@@ -754,14 +756,10 @@ extern char		*element_info[];
 #define EL_BADEWANNE3		102
 #define EL_BADEWANNE4		103
 #define EL_BADEWANNE5		104
-
-#define EL_UNUSED_105		105
-#define EL_UNUSED_106		106
-
+#define EL_BD_WALL		105
+#define EL_BD_ROCK		106
 #define EL_AUSGANG_AUF		107
-
 #define EL_BLACK_ORB		108
-
 #define EL_AMOEBA2DIAM		109
 #define EL_MOLE			110
 #define EL_PINGUIN		111
@@ -986,6 +984,7 @@ extern char		*element_info[];
 #define EL_TUBE_RIGHT_DOWN	354
 #define EL_SPRING		355
 #define EL_TRAP_INACTIVE	356
+#define EL_DX_SUPABOMB		357
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_FIRST_RUNTIME_EL	500
@@ -1013,6 +1012,7 @@ extern char		*element_info[];
 #define EL_TIMEGATE_CLOSING	520
 #define EL_PEARL_BREAKING	521
 #define EL_TRAP_ACTIVE		522
+#define EL_SPRING_MOVING	523
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -1477,6 +1477,9 @@ extern char		*element_info[];
 
 #define GFX_TRAP_INACTIVE	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  4)
 #define GFX_TRAP_ACTIVE		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  7)
+#define GFX_BD_WALL		(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  4)
+#define GFX_BD_ROCK		(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  4)
+#define GFX_DX_SUPABOMB		(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  7)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)

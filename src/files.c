@@ -441,6 +441,17 @@ static void setLevelInfoToDefaults()
   }
 }
 
+static int checkLevelElement(int element)
+{
+  if (element >= EL_FIRST_RUNTIME_EL)
+  {
+    Error(ERR_WARN, "invalid level element %d", element);
+    element = EL_CHAR_FRAGE;
+  }
+
+  return element;
+}
+
 void LoadLevel(int level_nr)
 {
   int i, x, y;
@@ -510,7 +521,7 @@ void LoadLevel(int level_nr)
       for(x=0; x<3; x++)
       {
 	if (i < STD_ELEMENT_CONTENTS)
-	  level.yam_content[i][x][y] = fgetc(file);
+	  level.yam_content[i][x][y] = checkLevelElement(fgetc(file));
 	else
 	  level.yam_content[i][x][y] = EL_LEERRAUM;
       }
@@ -520,7 +531,7 @@ void LoadLevel(int level_nr)
   level.amoeba_speed	= fgetc(file);
   level.time_magic_wall	= fgetc(file);
   level.time_wheel	= fgetc(file);
-  level.amoeba_content	= fgetc(file);
+  level.amoeba_content	= checkLevelElement(fgetc(file));
   level.double_speed	= (fgetc(file) == 1 ? TRUE : FALSE);
   level.gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
 
@@ -566,9 +577,10 @@ void LoadLevel(int level_nr)
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
 	    level.yam_content[i][x][y] =
-	      (encoding_16bit ?
-	       getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
-	       fgetc(file));
+	      checkLevelElement(encoding_16bit ?
+				getFile16BitInteger(file,
+						    BYTE_ORDER_BIG_ENDIAN) :
+				fgetc(file));
 
       getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     }
@@ -591,9 +603,9 @@ void LoadLevel(int level_nr)
   for(y=0; y<lev_fieldy; y++)
     for(x=0; x<lev_fieldx; x++)
       Feld[x][y] = Ur[x][y] =
-	(encoding_16bit ?
-	 getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
-	 fgetc(file));
+	checkLevelElement(encoding_16bit ?
+			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
+			  fgetc(file));
 
   fclose(file);
 
