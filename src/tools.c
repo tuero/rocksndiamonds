@@ -68,7 +68,7 @@ void BackToFront()
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
 
-  if (redraw_mask & REDRAW_FIELD)
+  if (redraw_mask & REDRAW_FIELD || ScreenMovPos)
     redraw_mask &= ~REDRAW_TILES;
 
   if (!redraw_mask)
@@ -101,6 +101,15 @@ void BackToFront()
       XCopyArea(display,buffer,window,gc,
 		fx,fy, SXSIZE,SYSIZE,
 		SX,SY);
+
+
+
+#if 0
+      printf("FULL SCREEN REDRAW [%d]\n", ScreenMovPos);
+#endif
+
+
+
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
@@ -407,6 +416,9 @@ void DrawPlayerField()
 
 
 
+
+
+
   if (draw_thru_mask)
     DrawGraphicShiftedThruMask(sx,sy,sxx,syy,graphic,CUT_NO_CUTTING);
     /*
@@ -442,12 +454,19 @@ void DrawPlayerField()
 
       if (element == EL_FELSBROCKEN && sxx)
       {
-	int phase = PlayerGfxPos / (TILEX/4);
+	int phase = (PlayerGfxPos / (TILEX/4));
 
 	if (PlayerMovDir == MV_LEFT)
 	  graphic += phase;
 	else
-	  graphic += phase+4;
+	  graphic += (phase+4)%4;
+
+
+	/*
+	printf("----> (%d, %d, %d)\n",
+	       PlayerGfxPos, phase, graphic);
+	       */
+
       }
 
       DrawGraphicShifted(px,py, sxx,syy, graphic, CUT_NO_CUTTING);
@@ -464,12 +483,12 @@ void DrawPlayerField()
 
     if (element == EL_DYNAMIT)
     {
-      if ((phase = (48-MovDelay[x][y])/6) > 6)
+      if ((phase = (96-MovDelay[x][y])/12) > 6)
 	phase = 6;
     }
     else
     {
-      if ((phase = ((48-MovDelay[x][y])/3) % 8) > 3)
+      if ((phase = ((96-MovDelay[x][y])/6) % 8) > 3)
 	phase = 7-phase;
     }
 
@@ -510,6 +529,9 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   else
     phase = (FrameCounter % (delay * frames)) / delay;
 
+  if (mode == ANIM_REVERSE)
+    phase = -phase;
+
   return(phase);
 }
 
@@ -517,19 +539,6 @@ void DrawGraphicAnimation(int x, int y, int graphic,
 			  int frames, int delay, int mode)
 {
   int phase = getGraphicAnimationPhase(frames, delay, mode);
-
-/*
-  int phase;
-
-  if (mode == ANIM_OSCILLATE)
-  {
-    int max_anim_frames = frames*2 - 2;
-    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
-    phase = (phase < frames ? phase : max_anim_frames - phase);
-  }
-  else
-    phase = (FrameCounter % (delay * frames)) / delay;
-*/
 
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
     DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);

@@ -468,12 +468,6 @@ void HandleKey(KeySym key, int key_status)
 	case XK_7:
 	case XK_8:
 	case XK_9:
-	  /*
-	  MoveSpeed = key - XK_0;
-	  printf("speed == %d\n", MoveSpeed);
-	  break;
-	  */
-
 	  if (key == XK_0)
 	    GameSpeed = 50;
 	  else
@@ -482,27 +476,28 @@ void HandleKey(KeySym key, int key_status)
 	  break;
 
 	case XK_a:
-	  if (ScrollSteps == TILEX/4)
-	    ScrollSteps = TILEX/8;
+	  if (ScrollStepSize == TILEX/8)
+	    ScrollStepSize = TILEX/4;
 	  else
-	    ScrollSteps = TILEX/4;
+	    ScrollStepSize = TILEX/8;
+	  printf("ScrollStepSize == %d\n", ScrollStepSize);
 	  break;
 
 	case XK_f:
-	  GameSpeed = 2;
-	  printf("GameSpeed == %d\n", GameSpeed);
+	  ScrollStepSize = TILEX/8;
+	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
 	  break;
 	case XK_g:
-	  GameSpeed = 3;
-	  printf("GameSpeed == %d\n", GameSpeed);
+	  ScrollStepSize = TILEX/4;
+	  printf("ScrollStepSize == %d (1/4)\n", ScrollStepSize);
 	  break;
 	case XK_h:
-	  GameSpeed = 4;
-	  printf("GameSpeed == %d\n", GameSpeed);
+	  ScrollStepSize = TILEX/2;
+	  printf("ScrollStepSize == %d (1/2)\n", ScrollStepSize);
 	  break;
 	case XK_l:
-	  GameSpeed = 50;
-	  printf("GameSpeed == %d\n", GameSpeed);
+	  ScrollStepSize = TILEX;
+	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
 	case XK_Q:

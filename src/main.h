@@ -306,7 +306,7 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-extern int		FX,FY, ScreenMovPos, ScrollSteps;
+extern int		FX,FY, ScreenMovPos, ScrollStepSize;
 extern int		BX1,BY1, BX2,BY2;
 extern int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
 extern int		PlayerMovDir, PlayerMovPos, PlayerPushing;
@@ -1052,5 +1052,6 @@ extern char		*progname;
 /* für DrawGraphicAnimation (tools.c) und AnimateToon (cartoons.c) */
 #define ANIM_NORMAL	0
 #define ANIM_OSCILLATE	1
+#define ANIM_REVERSE	2
 
 #endif

@@ -31,7 +31,7 @@
 #define EX_BORDER		2
 
 /* fundamental game speed */
-#define GAME_FRAME_DELAY	4
+#define GAME_FRAME_DELAY	2
 #define FFWD_FRAME_DELAY	1
 #define FRAMES_PER_SECOND	(100 / GAME_FRAME_DELAY)
 

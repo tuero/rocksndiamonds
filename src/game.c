@@ -174,7 +174,7 @@ void InitGame()
 	}
 	break;
       case EL_DYNAMIT:
-	MovDelay[x][y] = 48;
+	MovDelay[x][y] = 96;
 	break;
       case EL_BIRNE_AUS:
 	Lights++;
@@ -597,12 +597,12 @@ void DrawDynamite(int x, int y)
 
   if (Feld[x][y]==EL_DYNAMIT)
   {
-    if ((phase = (48-MovDelay[x][y])/6) > 6)
+    if ((phase = (96-MovDelay[x][y])/12) > 6)
       phase = 6;
   }
   else
   {
-    if ((phase = ((48-MovDelay[x][y])/3) % 8) > 3)
+    if ((phase = ((96-MovDelay[x][y])/6) % 8) > 3)
       phase = 7-phase;
   }
 
@@ -619,12 +619,12 @@ void CheckDynamite(int x, int y)
     MovDelay[x][y]--;
     if (MovDelay[x][y])
     {
-      if (!(MovDelay[x][y] % 6))
+      if (!(MovDelay[x][y] % 12))
 	PlaySoundLevel(x,y,SND_ZISCH);
 
-      if (Feld[x][y]==EL_DYNAMIT && !(MovDelay[x][y] % 6))
+      if (Feld[x][y]==EL_DYNAMIT && !(MovDelay[x][y] % 12))
 	DrawDynamite(x,y);
-      else if (Feld[x][y]==EL_DYNABOMB && !(MovDelay[x][y] % 3))
+      else if (Feld[x][y]==EL_DYNABOMB && !(MovDelay[x][y] % 6))
 	DrawDynamite(x,y);
 
       return;
@@ -638,7 +638,7 @@ void CheckDynamite(int x, int y)
 void Explode(int ex, int ey, int phase, int mode)
 {
   int x,y;
-  int num_phase = 9, delay = 1;
+  int num_phase = 9, delay = 2;
   int last_phase = num_phase*delay;
   int half_phase = (num_phase/2)*delay;
 
@@ -868,13 +868,13 @@ void Blurb(int x, int y)
     int graphic = (element==EL_BLURB_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
 
     if (!MovDelay[x][y])	/* neue Phase / noch nicht gewartet */
-      MovDelay[x][y] = 5;
+      MovDelay[x][y] = 9;
 
     if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-	DrawGraphic(SCROLLX(x),SCROLLY(y),graphic+4-MovDelay[x][y]);
+	DrawGraphic(SCROLLX(x),SCROLLY(y),graphic+4-MovDelay[x][y]/2);
 
       if (!MovDelay[x][y])
       {
@@ -1093,7 +1093,7 @@ void TurnRound(int x, int y)
       MovDir[x][y] = left_dir;
 
     if (element==EL_KAEFER && MovDir[x][y] != old_move_dir)
-      MovDelay[x][y] = 5;
+      MovDelay[x][y] = 9;
     else if (element==EL_BUTTERFLY)	/* && MovDir[x][y]==left_dir) */
       MovDelay[x][y] = 1;
   }
@@ -1109,7 +1109,7 @@ void TurnRound(int x, int y)
       MovDir[x][y] = right_dir;
 
     if (element==EL_FLIEGER && MovDir[x][y] != old_move_dir)
-      MovDelay[x][y] = 5;
+      MovDelay[x][y] = 9;
     else if (element==EL_FIREFLY)	/* && MovDir[x][y]==right_dir) */
       MovDelay[x][y] = 1;
   }
@@ -1135,7 +1135,7 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 8+8*RND(3);
+    MovDelay[x][y] = 16+16*RND(3);
   }
   else if (element==EL_MAMPFER2)
   {
@@ -1159,7 +1159,7 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 8+8*RND(3);
+    MovDelay[x][y] = 16+16*RND(3);
   }
   else if (element==EL_PACMAN)
   {
@@ -1183,7 +1183,7 @@ void TurnRound(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    MovDelay[x][y] = 3+RND(20);
+    MovDelay[x][y] = 6+RND(40);
   }
   else if (element==EL_SCHWEIN)
   {
@@ -1346,9 +1346,9 @@ void TurnRound(int x, int y)
       Moving2Blocked(x,y,&newx,&newy);
 
       if (IN_LEV_FIELD(newx,newy) && IS_FREE_OR_PLAYER(newx,newy))
-	MovDelay[x][y] = 4+4*!RND(3);
+	MovDelay[x][y] = 8+8*!RND(3);
       else
-	MovDelay[x][y] = 8;
+	MovDelay[x][y] = 16;
     }
     else
     {
@@ -1419,7 +1419,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y+1]==EL_MORAST_LEER)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = 16;
+	  MovDelay[x][y] = TILEY + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -1448,7 +1448,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y+1]==EL_SIEB_LEER)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = 2;
+	  MovDelay[x][y] = TILEY/4 + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -1474,7 +1474,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y+1]==EL_SIEB2_LEER)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = 2;
+	  MovDelay[x][y] = TILEY/4 + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -1728,7 +1728,7 @@ void StartMoving(int x, int y)
 	  else
 	    DrawLevelField(x,y);
 
-	  MovDelay[x][y] = 25;
+	  MovDelay[x][y] = 50;
 	  Feld[newx][newy] = EL_BURNING;
 	  if (IN_LEV_FIELD(newx1,newy1) && Feld[newx1][newy1] == EL_LEERRAUM)
 	    Feld[newx1][newy1] = EL_BURNING;
@@ -1787,9 +1787,9 @@ void StartMoving(int x, int y)
       if (element == EL_KAEFER || element == EL_FLIEGER)
 	DrawLevelField(x,y);
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
-	DrawGraphicAnimation(x,y, el2gfx(element), 2, 2, ANIM_NORMAL);
+	DrawGraphicAnimation(x,y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element==EL_SONDE)
-	DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 1, ANIM_NORMAL);
+	DrawGraphicAnimation(x,y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
 
       return;
     }
@@ -2041,7 +2041,7 @@ void AmoebeWaechst(int x, int y)
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
   {
-    MovDelay[x][y] = 4;
+    MovDelay[x][y] = 7;
 
     if (DelayReached(&sound_delay,sound_delay_value))
     {
@@ -2054,7 +2054,7 @@ void AmoebeWaechst(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AMOEBING+3-MovDelay[x][y]);
+      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AMOEBING+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
@@ -2198,7 +2198,7 @@ void Life(int ax, int ay)
 {
   int x1,y1,x2,y2;
   static int life[4] = { 2,3,3,3 };	/* "Life"-Parameter */
-  int life_time = 20;
+  int life_time = 40;
   int element = Feld[ax][ay];
 
   if (Stop[ax][ay])
@@ -2286,7 +2286,7 @@ void Ablenk(int x, int y)
 void Birne(int x, int y)
 {
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
-    MovDelay[x][y] = 400;
+    MovDelay[x][y] = 800;
 
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
@@ -2314,19 +2314,19 @@ void Birne(int x, int y)
 
 void Blubber(int x, int y)
 {
-  DrawGraphicAnimation(x,y, GFX_GEBLUBBER, 4, 5, ANIM_NORMAL);
+  DrawGraphicAnimation(x,y, GFX_GEBLUBBER, 4, 10, ANIM_NORMAL);
 }
 
 void NussKnacken(int x, int y)
 {
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
-    MovDelay[x][y] = 4;
+    MovDelay[x][y] = 7;
 
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y] && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_CRACKINGNUT+3-MovDelay[x][y]);
+      DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_CRACKINGNUT+3-MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
@@ -2358,18 +2358,18 @@ void AusgangstuerPruefen(int x, int y)
 
 void AusgangstuerOeffnen(int x, int y)
 {
-  int speed = 3;
+  int delay = 6;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
-    MovDelay[x][y] = 5*speed;
+    MovDelay[x][y] = 5*delay;
 
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     int tuer;
 
     MovDelay[x][y]--;
-    tuer = MovDelay[x][y]/speed;
-    if (!(MovDelay[x][y]%speed) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    tuer = MovDelay[x][y]/delay;
+    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
       DrawGraphic(SCROLLX(x),SCROLLY(y),GFX_AUSGANG_AUF-tuer);
 
     if (!MovDelay[x][y])
@@ -2382,7 +2382,7 @@ void AusgangstuerOeffnen(int x, int y)
 
 void AusgangstuerBlinken(int x, int y)
 {
-  DrawGraphicAnimation(x,y, GFX_AUSGANG_AUF, 4, 2, ANIM_OSCILLATE);
+  DrawGraphicAnimation(x,y, GFX_AUSGANG_AUF, 4, 4, ANIM_OSCILLATE);
 }
 
 void EdelsteinFunkeln(int x, int y)
@@ -2391,18 +2391,11 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (Feld[x][y] == EL_EDELSTEIN_BD)
-  {
-    const int delay = 4; /* war: 2 */
-    const int frames = 4;
-    int phase = (FrameCounter % (delay*frames)) / delay;
-
-    if (!(FrameCounter % delay))
-      DrawGraphic(SCROLLX(x),SCROLLY(y), GFX_EDELSTEIN_BD - phase);
-  }
+    DrawGraphicAnimation(x,y, GFX_EDELSTEIN_BD, 4, 4, ANIM_REVERSE);
   else
   {
     if (!MovDelay[x][y])	/* neue Phase / noch nicht gewartet */
-      MovDelay[x][y] = 6*!SimpleRND(500);
+      MovDelay[x][y] = 11 * !SimpleRND(500);
 
     if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
     {
@@ -2416,7 +2409,7 @@ void EdelsteinFunkeln(int x, int y)
       if (MovDelay[x][y])
       {
 	int src_x,src_y, dest_x,dest_y;
-	int phase = MovDelay[x][y]-1;
+	int phase = (MovDelay[x][y]-1)/2;
 
 	src_x  = SX+GFX_PER_LINE*TILEX;
 	src_y  = SY+(phase > 2 ? 4-phase : phase)*TILEY;
@@ -2440,18 +2433,18 @@ void EdelsteinFunkeln(int x, int y)
 
 void MauerWaechst(int x, int y)
 {
-  int speed = 3;
+  int delay = 6;
 
   if (!MovDelay[x][y])		/* neue Phase / noch nicht gewartet */
-    MovDelay[x][y] = 3*speed;
+    MovDelay[x][y] = 3*delay;
 
   if (MovDelay[x][y])		/* neue Phase / in Wartezustand */
   {
     int phase;
 
     MovDelay[x][y]--;
-    phase = 2-MovDelay[x][y]/speed;
-    if (!(MovDelay[x][y]%speed) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    phase = 2-MovDelay[x][y]/delay;
+    if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
       DrawGraphic(SCROLLX(x),SCROLLY(y),
 		  (Store[x][y]==MV_LEFT ? GFX_MAUER_L1 : GFX_MAUER_R1)+phase);
 
@@ -2481,7 +2474,7 @@ void MauerAbleger(int ax, int ay)
   BOOL links_massiv = FALSE, rechts_massiv = FALSE;
 
   if (!MovDelay[ax][ay])	/* neue Mauer / noch nicht gewartet */
-    MovDelay[ax][ay] = 3;
+    MovDelay[ax][ay] = 6;
 
   if (MovDelay[ax][ay])		/* neue Mauer / in Wartezustand */
   {
@@ -2995,8 +2988,16 @@ void ScrollFigure(int init)
   if (init)
   {
 
-    PlayerGfxPos =
-      (TILEX/ScrollSteps) * (PlayerMovPos / (TILEX/ScrollSteps));
+
+
+    PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
+
+
+
+    /*
+    ScreenMovPos = PlayerGfxPos;
+    redraw_mask |= REDRAW_FIELD;
+    */
 
 
 
@@ -3061,12 +3062,15 @@ void ScrollFigure(int init)
     return;
 
   PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/8;
+  PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
 
 
-  PlayerGfxPos =
-    (TILEX/ScrollSteps) * (PlayerMovPos / (TILEX/ScrollSteps));
+  /*
+  printf("PlayerGfxPos = %d\n", PlayerGfxPos);
+  */
 
-  if (ScreenMovPos)
+
+  if (ScreenMovPos && ScreenMovPos != PlayerGfxPos)
   {
     ScreenMovPos = PlayerGfxPos;
     redraw_mask |= REDRAW_FIELD;
@@ -3638,7 +3642,7 @@ BOOL PlaceBomb(void)
   if (Dynamite)
   {
     Feld[JX][JY] = EL_DYNAMIT;
-    MovDelay[JX][JY] = 48;
+    MovDelay[JX][JY] = 96;
     Dynamite--;
     DrawText(DX_DYNAMITE,DY_DYNAMITE,int2str(Dynamite,3),FS_SMALL,FC_YELLOW);
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
@@ -3646,7 +3650,7 @@ BOOL PlaceBomb(void)
   else
   {
     Feld[JX][JY] = EL_DYNABOMB;
-    MovDelay[JX][JY] = 48;
+    MovDelay[JX][JY] = 96;
     DynaBombsLeft--;
     DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNABOMB);
   }
