@@ -1459,7 +1459,7 @@ void DrawDynamite(int x, int y)
 #else
   int graphic = el2img(Feld[x][y]);
 #endif
-  int phase;
+  int frame;
 
   if (!IN_SCR_FIELD(sx, sy) || IS_PLAYER(x, y))
     return;
@@ -1473,37 +1473,37 @@ void DrawDynamite(int x, int y)
 
   if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
   {
-    if ((phase = (96 - MovDelay[x][y]) / 12) > 6)
-      phase = 6;
+    if ((frame = (96 - MovDelay[x][y]) / 12) > 6)
+      frame = 6;
   }
   else
   {
-    if ((phase = ((96 - MovDelay[x][y]) / 6) % 8) > 3)
-      phase = 7 - phase;
+    if ((frame = ((96 - MovDelay[x][y]) / 6) % 8) > 3)
+      frame = 7 - frame;
   }
 
 #if 1
-  phase = getNewGraphicAnimationFrame(graphic, 96 - MovDelay[x][y]);
+  frame = getNewGraphicAnimationFrame(graphic, 96 - MovDelay[x][y]);
 #endif
 
   /*
-  printf("-> %d: %d [%d]\n", graphic, phase, MovDelay[x][y]);
+  printf("-> %d: %d [%d]\n", graphic, frame, MovDelay[x][y]);
   */
 
 #if 0
   if (game.emulation == EMU_SUPAPLEX)
     DrawGraphic(sx, sy, GFX_SP_DISK_RED);
   else if (Store[x][y])
-    DrawGraphicThruMask(sx, sy, graphic + phase);
+    DrawGraphicThruMask(sx, sy, graphic + frame);
   else
-    DrawGraphic(sx, sy, graphic + phase);
+    DrawGraphic(sx, sy, graphic + frame);
 #else
   if (game.emulation == EMU_SUPAPLEX)
     DrawNewGraphic(sx, sy, IMG_SP_DISK_RED, 0);
   else if (Store[x][y])
-    DrawNewGraphicThruMask(sx, sy, graphic, phase);
+    DrawNewGraphicThruMask(sx, sy, graphic, frame);
   else
-    DrawNewGraphic(sx, sy, graphic, phase);
+    DrawNewGraphic(sx, sy, graphic, frame);
 #endif
 }
 
@@ -1540,7 +1540,8 @@ void CheckDynamite(int x, int y)
 void Explode(int ex, int ey, int phase, int mode)
 {
   int x, y;
-  int num_phase = 9, delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+  int num_phase = 9;
+  int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
   int first_phase_after_start = EX_PHASE_START + 1;
@@ -1724,7 +1725,7 @@ void Explode(int ex, int ey, int phase, int mode)
     InitField(x, y, FALSE);
     if (CAN_MOVE(element) || COULD_MOVE(element))
       InitMovDir(x, y);
-    DrawLevelField(x, y);
+    DrawNewLevelField(x, y);
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
       StorePlayer[x][y] = 0;
@@ -1745,7 +1746,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PFORTE(Store[x][y]))
     {
-      DrawLevelElement(x, y, Store[x][y]);
+      DrawNewLevelElement(x, y, Store[x][y]);
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic);
     }
     else

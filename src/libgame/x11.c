@@ -254,6 +254,8 @@ Bitmap *X11LoadImage(char *filename)
   Bitmap *new_bitmap = CreateBitmapStruct();
   char *error = "Read_PCX_to_Pixmap(): %s '%s'";
   int pcx_err;
+  XGCValues clip_gc_values;
+  unsigned long clip_gc_valuemask;
 
   pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc, filename,
 			       &new_bitmap->drawable, &new_bitmap->clip_mask);
@@ -295,6 +297,12 @@ Bitmap *X11LoadImage(char *filename)
     SetError("X11LoadImage(): cannot get clipmask for '%s'", filename);
     return NULL;
   }
+
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_values.clip_mask = new_bitmap->clip_mask;
+  clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
+  new_bitmap->stored_clip_gc = XCreateGC(display, window->drawable,
+					 clip_gc_valuemask, &clip_gc_values);
 
   /* set GraphicContext inheritated from Window */
   new_bitmap->gc = window->gc;
