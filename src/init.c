@@ -105,7 +105,7 @@ void InitNetworkServer()
 {
   int nr_wanted;
 
-  if (standalone)
+  if (!network)
     return;
 
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);

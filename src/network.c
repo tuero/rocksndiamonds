@@ -98,7 +98,7 @@ static void flushbuf()
 
 static void sendbuf(int len)
 {
-  if (!standalone)
+  if (network)
   {
     realbuf[0] = realbuf[1] = realbuf[2] = 0;
     realbuf[3] = (unsigned char)len;
@@ -156,7 +156,7 @@ static void StartNetworkServer(int port)
     case -1:
       Error(ERR_RETURN,
 	    "cannot create network server process - no network games");
-      standalone = TRUE;
+      network = FALSE;
       return;
 
     default:
@@ -639,9 +639,6 @@ void HandleNetworking()
   static struct timeval tv = { 0, 0 };
   fd_set rfds;
   int r = 0;
-
-  if (standalone)
-    return;
 
   flushbuf();
 

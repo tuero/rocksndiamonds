@@ -1309,7 +1309,7 @@ BOOL Request(char *text, unsigned int req_state)
   unsigned int old_door_state;
 
   /* pause network game while waiting for request to answer */
-  if (!standalone && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+  if (network && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
     SendToServer_PausePlaying();
 
   old_door_state = GetDoorState();
@@ -1535,7 +1535,7 @@ BOOL Request(char *text, unsigned int req_state)
   }
 
   /* continue network game after request */
-  if (!standalone && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+  if (network && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
     SendToServer_ContinuePlaying();
 
   return(result);

@@ -610,24 +610,25 @@ void FloodFill(int from_x, int from_y, int fill_element)
   static int check[4][2] = { {-1,0}, {0,-1}, {1,0}, {0,1} };
   static int safety = 0;
 
+  /* check if starting field still has the desired content */
+  if (Feld[from_x][from_y] == fill_element)
+    return;
+
   safety++;
 
-  if (safety>lev_fieldx*lev_fieldy)
-  {
-    fprintf(stderr,"Something went wrong in 'FloodFill()'. Please debug.\n");
-    exit(-1);
-  }
+  if (safety > lev_fieldx*lev_fieldy)
+    Error(ERR_EXIT, "Something went wrong in 'FloodFill()'. Please debug.");
 
   old_element = Feld[from_x][from_y];
   Feld[from_x][from_y] = fill_element;
 
   for(i=0;i<4;i++)
   {
-    x = from_x+check[i][0];
-    y = from_y+check[i][1];
+    x = from_x + check[i][0];
+    y = from_y + check[i][1];
 
-    if (IN_LEV_FIELD(x,y) && Feld[x][y]==old_element)
-      FloodFill(x,y,fill_element);
+    if (IN_LEV_FIELD(x,y) && Feld[x][y] == old_element)
+      FloodFill(x, y, fill_element);
   }
 
   safety--;

@@ -134,7 +134,8 @@ void InitGame()
 
 
   /* initial null action */
-  SendToServer_MovePlayer(MV_NO_MOVING);
+  if (network)
+    SendToServer_MovePlayer(MV_NO_MOVING);
 
 
 
@@ -2888,7 +2889,7 @@ void GameActions(byte player_action)
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
 
-  if (!standalone && !network_player_action_received)
+  if (network && !network_player_action_received)
   {
     /*
 #ifdef DEBUG
@@ -2925,13 +2926,13 @@ void GameActions(byte player_action)
   else
     recorded_player_action = NULL;
 
-  if (!standalone)
+  if (network)
     SendToServer_MovePlayer(player_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
     int actual_player_action =
-      (standalone ? player_action : network_player_action[i]);
+      (network ? network_player_action[i] : player_action);
 
     /*
     int actual_player_action = network_player_action[i];
@@ -2948,7 +2949,7 @@ void GameActions(byte player_action)
       actual_player_action = 0;
     */
 
-    if (standalone && i != TestPlayer)
+    if (!network && i != TestPlayer)
       actual_player_action = 0;
 
     /* TEST TEST TEST */
@@ -3219,7 +3220,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   if (!IN_LEV_FIELD(new_jx,new_jy))
     return(MF_NO_ACTION);
 
-  if (standalone && !AllPlayersInSight(player, new_jx,new_jy))
+  if (!network && !AllPlayersInSight(player, new_jx,new_jy))
     return(MF_NO_ACTION);
 
   element = MovingOrBlocked2Element(new_jx,new_jy);
@@ -3292,7 +3293,7 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
   */
 
   if (moved & MF_MOVING && !ScreenMovPos &&
-      (player == local_player || standalone))
+      (player == local_player || !network))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
@@ -3362,7 +3363,7 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
-      if (standalone && !AllPlayersInVisibleScreen())
+      if (!network && !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;

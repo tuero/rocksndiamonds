@@ -51,7 +51,7 @@ char	       *display_name = NULL;
 char	       *server_host = NULL;
 int		server_port = 0;
 int		serveronly = FALSE;
-int		standalone = TRUE;
+int		network = FALSE;
 int		verbose = FALSE;
 
 int		game_status = MAINMENU;

@@ -265,7 +265,7 @@ void GetOptions(char *argv[])
     {
       printf("--network\n");
 
-      standalone = FALSE;
+      network = TRUE;
     }
     else if (strncmp(option, "-serveronly", option_len) == 0)
     {

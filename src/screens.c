@@ -218,13 +218,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (autorecord_on)
 	  TapeStartRecording();
 
-	if (standalone)
+	if (network)
+	  SendToServer_StartPlaying();
+	else
 	{
 	  game_status = PLAYING;
 	  InitGame();
 	}
-	else
-	  SendToServer_StartPlaying();
       }
       else if (y==9)
       {
@@ -1345,24 +1345,27 @@ void HandleVideoButtons(int mx, int my, int button)
       }
       DrawCompleteVideoDisplay();
       break;
+
     case BUTTON_VIDEO_STOP:
       TapeStop();
       break;
+
     case BUTTON_VIDEO_PAUSE:
       TapeTogglePause();
       break;
+
     case BUTTON_VIDEO_REC:
       if (TAPE_IS_STOPPED(tape))
       {
 	TapeStartRecording();
 
-	if (standalone)
+	if (network)
+	  SendToServer_StartPlaying();
+	else
 	{
 	  game_status = PLAYING;
 	  InitGame();
 	}
-	else
-	  SendToServer_StartPlaying();
       }
       else if (tape.pausing)
       {
@@ -1379,6 +1382,7 @@ void HandleVideoButtons(int mx, int my, int button)
 	  TapeTogglePause();
       }
       break;
+
     case BUTTON_VIDEO_PLAY:
       if (TAPE_IS_EMPTY(tape))
 	break;
@@ -1387,13 +1391,8 @@ void HandleVideoButtons(int mx, int my, int button)
       {
 	TapeStartPlaying();
 
-	if (standalone)
-	{
-	  game_status = PLAYING;
-	  InitGame();
-	}
-	else
-	  SendToServer_StartPlaying();
+	game_status = PLAYING;
+	InitGame();
       }
       else if (tape.playing)
       {
@@ -1417,6 +1416,7 @@ void HandleVideoButtons(int mx, int my, int button)
 	}
       }
       break;
+
     default:
       break;
   }
@@ -1449,6 +1449,7 @@ void HandleSoundButtons(int mx, int my, int button)
       else
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_OFF);
       break;
+
     case BUTTON_SOUND_LOOPS:
       if (sound_loops_on)
       { 
@@ -1465,6 +1466,7 @@ void HandleSoundButtons(int mx, int my, int button)
       else
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_OFF);
       break;
+
     case BUTTON_SOUND_SIMPLE:
       if (sound_simple_on)
       { 
@@ -1481,6 +1483,7 @@ void HandleSoundButtons(int mx, int my, int button)
       else
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       break;
+
     default:
       break;
   }
@@ -1507,51 +1510,67 @@ void HandleGameButtons(int mx, int my, int button)
       if (Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
-	if (standalone)
+	if (network)
+	  SendToServer_StopPlaying();
+	else
 	{
 	  game_status = MAINMENU;
 	  DrawMainMenu();
 	}
-	else
-	  SendToServer_StopPlaying();
       }
       else
 	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
       break;
+
     case BUTTON_GAME_PAUSE:
+      if (network)
+      {
+	if (tape.pausing)
+	  SendToServer_ContinuePlaying();
+	else
+	  SendToServer_PausePlaying();
+      }
+      else
+	TapeTogglePause();
+
+      /*
       if (tape.pausing)
       {
-	if (standalone)
+	if (network)
+	  SendToServer_ContinuePlaying();
+	else
 	{
 	  tape.pausing = FALSE;
 	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
 	}
-	else
-	  SendToServer_ContinuePlaying();
       }
       else
       {
-	if (standalone)
+	if (network)
+	  SendToServer_PausePlaying();
+	else
 	{
 	  tape.pausing = TRUE;
 	  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
 	}
-	else
-	  SendToServer_PausePlaying();
       }
+      */
+
       break;
+
     case BUTTON_GAME_PLAY:
       if (tape.pausing)
       {
-	if (standalone)
+	if (network)
+	  SendToServer_ContinuePlaying();
+	else
 	{
 	  tape.pausing = FALSE;
 	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
 	}
-	else
-	  SendToServer_ContinuePlaying();
       }
       break;
+
     default:
       break;
   }

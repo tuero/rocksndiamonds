@@ -242,5 +242,5 @@ unsigned int GetTapeLength()
   for(i=0;i<tape.length;i++)
     tape_length += tape.pos[i].delay;
 
-  return(tape_length * GAME_FRAME_DELAY / 100);
+  return(tape_length * GAME_FRAME_DELAY / 1000);
 }

@@ -726,7 +726,8 @@ void HandleNoXEvent()
     return;
   }
 
-  HandleNetworking();
+  if (network)
+    HandleNetworking();
 
   switch(game_status)
   {
