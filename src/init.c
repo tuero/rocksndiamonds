@@ -915,9 +915,8 @@ static void InitGraphicInfo()
     int src_x, src_y;
     int first_frame, last_frame;
 
-#if 1
-    if (strcmp(image->token, "dynamite.EDITOR") == 0)
-      printf("::: image: '%s' [%d]\n", image->token, i);
+#if 0
+    printf("::: image: '%s' [%d]\n", image->token, i);
 #endif
 
 #if 0
@@ -929,11 +928,6 @@ static void InitGraphicInfo()
     set_graphic_parameters(i, image->parameter);
 
     /* now check if no animation frames are outside of the loaded image */
-
-#if 1
-    if (graphic_info[i].bitmap == NULL)
-      printf("::: graphic_info['%s'].bitmap == NULL\n", image->token);
-#endif
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
