@@ -154,38 +154,144 @@ struct ChangingElementInfo
 
 static struct ChangingElementInfo changing_element_list[] =
 {
-  { EL_NUT_BREAKING,		EL_EMERALD,		 6, NULL, NULL, NULL },
-  { EL_PEARL_BREAKING,		EL_EMPTY,		 8, NULL, NULL, NULL },
-  { EL_EXIT_OPENING,		EL_EXIT_OPEN,		29, NULL, NULL, NULL },
+  {
+    EL_NUT_BREAKING,
+    EL_EMERALD,
+    6,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_PEARL_BREAKING,
+    EL_EMPTY,
+    8,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_EXIT_OPENING,
+    EL_EXIT_OPEN,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_SWITCHGATE_OPENING,
+    EL_SWITCHGATE_OPEN,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_SWITCHGATE_CLOSING,
+    EL_SWITCHGATE_CLOSED,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_TIMEGATE_OPENING,
+    EL_TIMEGATE_OPEN,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_TIMEGATE_CLOSING,
+    EL_TIMEGATE_CLOSED,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
 
-  { EL_SWITCHGATE_OPENING,	EL_SWITCHGATE_OPEN,	29, NULL, NULL, NULL },
-  { EL_SWITCHGATE_CLOSING,	EL_SWITCHGATE_CLOSED,	29, NULL, NULL, NULL },
+  {
+    EL_ACID_SPLASH_LEFT,
+    EL_EMPTY,
+    8,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_ACID_SPLASH_RIGHT,
+    EL_EMPTY,
+    8,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_SP_BUGGY_BASE,
+    EL_SP_BUGGY_BASE_ACTIVATING,
+    0,
+    InitBuggyBase,
+    NULL,
+    NULL
+  },
+  {
+    EL_SP_BUGGY_BASE_ACTIVATING,
+    EL_SP_BUGGY_BASE_ACTIVE,
+    0,
+    InitBuggyBase,
+    NULL,
+    NULL
+  },
+  {
+    EL_SP_BUGGY_BASE_ACTIVE,
+    EL_SP_BUGGY_BASE,
+    0,
+    InitBuggyBase,
+    WarnBuggyBase,
+    NULL
+  },
+  {
+    EL_TRAP,
+    EL_TRAP_ACTIVE,
+    0,
+    InitTrap,
+    NULL,
+    ActivateTrap
+  },
+  {
+    EL_TRAP_ACTIVE,
+    EL_TRAP,
+    31,
+    NULL,
+    ChangeActiveTrap,
+    NULL
+  },
+  {
+    EL_ROBOT_WHEEL_ACTIVE,
+    EL_ROBOT_WHEEL,
+    0,
+    InitRobotWheel,
+    RunRobotWheel,
+    StopRobotWheel
+  },
+  {
+    EL_TIMEGATE_SWITCH_ACTIVE,
+    EL_TIMEGATE_SWITCH,
+    0,
+    InitTimegateWheel,
+    RunTimegateWheel,
+    NULL
+  },
 
-  { EL_TIMEGATE_OPENING,	EL_TIMEGATE_OPEN,	29, NULL, NULL, NULL },
-  { EL_TIMEGATE_CLOSING,	EL_TIMEGATE_CLOSED,	29, NULL, NULL, NULL },
-
-  { EL_ACID_SPLASH_LEFT,	EL_EMPTY,		 8, NULL, NULL, NULL },
-  { EL_ACID_SPLASH_RIGHT,	EL_EMPTY,		 8, NULL, NULL, NULL },
-
-  { EL_SP_BUGGY_BASE,		EL_SP_BUGGY_BASE_ACTIVATING, 0,
-    InitBuggyBase, NULL, NULL },
-  { EL_SP_BUGGY_BASE_ACTIVATING,EL_SP_BUGGY_BASE_ACTIVE, 0,
-    InitBuggyBase, NULL, NULL },
-  { EL_SP_BUGGY_BASE_ACTIVE,	EL_SP_BUGGY_BASE,	 0,
-    InitBuggyBase, WarnBuggyBase, NULL },
-
-  { EL_TRAP,			EL_TRAP_ACTIVE,		 0,
-    InitTrap, NULL, ActivateTrap },
-  { EL_TRAP_ACTIVE,		EL_TRAP,		31,
-    NULL, ChangeActiveTrap, NULL },
-
-  { EL_ROBOT_WHEEL_ACTIVE,	EL_ROBOT_WHEEL,		 0,
-    InitRobotWheel, RunRobotWheel, StopRobotWheel },
-
-  { EL_TIMEGATE_SWITCH_ACTIVE,	EL_TIMEGATE_SWITCH,	 0,
-    InitTimegateWheel, RunTimegateWheel, NULL },
-
-  { EL_UNDEFINED,		EL_UNDEFINED,	        -1, NULL	}
+  {
+    EL_UNDEFINED,
+    EL_UNDEFINED,
+    -1,
+    NULL,
+    NULL,
+    NULL
+  }
 };
 
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
@@ -561,6 +667,7 @@ static void InitGameEngine()
     changing_element[i].post_change_function = NULL;
   }
 
+  /* add changing elements from pre-defined list */
   i = 0;
   while (changing_element_list[i].base_element != EL_UNDEFINED)
   {
@@ -575,6 +682,30 @@ static void InitGameEngine()
     changing_element[element].post_change_function = ce->post_change_function;
 
     i++;
+  }
+
+  /* add changing elements from custom element configuration */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    struct CustomElementChangeInfo *change = &level.custom_element[i].change;
+    int element = EL_CUSTOM_START + i;
+
+    /* only add custom elements that change after fixed/random frame delay */
+    if (!IS_CHANGEABLE(element) ||
+	(!HAS_CHANGE_EVENT(element, CE_DELAY_FIXED) &&
+	 !HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM)))
+      continue;
+
+    changing_element[element].base_element = element;
+    changing_element[element].next_element = change->successor;
+    changing_element[i].change_delay = 0;
+
+    if (HAS_CHANGE_EVENT(element, CE_DELAY_FIXED))
+      changing_element[element].change_delay +=
+	change->delay_fixed * FRAMES_PER_SECOND;
+
+    if (HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM));
+    /* random frame delay added at runtime for each element individually */
   }
 }
 
@@ -4422,9 +4553,21 @@ static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
 
+  if (IS_MOVING(x, y))			/* never change moving elements */
+    return;
+
   if (MovDelay[x][y] == 0)		/* initialize element change */
   {
     MovDelay[x][y] = changing_element[element].change_delay + 1;
+
+    if (IS_CUSTOM_ELEMENT(element) &&
+	HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM))
+    {
+      int i = element - EL_CUSTOM_START;
+      int max_random_delay = level.custom_element[i].change.delay_random;
+
+      MovDelay[x][y] += RND(max_random_delay * FRAMES_PER_SECOND);
+    }
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
@@ -4729,12 +4872,19 @@ void GameActions()
       MauerAbleger(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);
+#if 0
     else if (IS_AUTO_CHANGING(element))
       ChangeElement(x, y);
+#endif
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
     else if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+#if 1
+    if (IS_AUTO_CHANGING(element))
+      ChangeElement(x, y);
+#endif
 
     if (IS_BELT_ACTIVE(element))
       PlaySoundLevelAction(x, y, ACTION_ACTIVE);

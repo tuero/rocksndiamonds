@@ -566,8 +566,8 @@ static int random_placement_background_element = EL_SAND;
 static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
 static boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
-static boolean custom_element_changes[42];
-static int custom_element_change_delay[2];
+static boolean custom_element_change_events[NUM_CHANGE_EVENTS];
+static struct CustomElementChangeInfo custom_element_change;
 
 static struct
 {
@@ -656,16 +656,16 @@ static struct
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
-    &custom_element_change_delay[0],
-    NULL,				"frames (fixed)"
+    &custom_element_change.delay_fixed,
+    NULL,				"seconds (fixed)"
   },
   {
     ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(6),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
-    &custom_element_change_delay[1],
-    NULL,				"frames (random)"
+    &custom_element_change.delay_random,
+    NULL,				"seconds (random)"
   }
 };
 
@@ -974,13 +974,13 @@ static struct
   {
     ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(5),
     GADGET_ID_CHANGE_DELAY_FIXED,
-    &custom_element_changes[0],
+    &custom_element_change_events[CE_DELAY_FIXED],
     "delay of",				"element changes after fixed delay"
   },
   {
     ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(6),
     GADGET_ID_CHANGE_DELAY_RANDOM,
-    &custom_element_changes[1],
+    &custom_element_change_events[CE_DELAY_RANDOM],
     "delay of",				"element changes after random delay"
   }
 };
@@ -2911,16 +2911,28 @@ static void CopyCustomElementPropertiesToEditor(int element)
 {
   int i;
 
+  i = properties_element - EL_CUSTOM_START;
+  custom_element_change = level.custom_element[i].change;
+
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     custom_element_properties[i] = HAS_PROPERTY(element, i);
+
+  for (i=0; i < NUM_CHANGE_EVENTS; i++)
+    custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
 
+  i = properties_element - EL_CUSTOM_START;
+  level.custom_element[i].change = custom_element_change;
+
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
+
+  for (i=0; i < NUM_CHANGE_EVENTS; i++)
+    SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
 }
 
 void DrawLevelEd()
@@ -3324,7 +3336,7 @@ static void DrawCustomChangedArea()
   int area_y = ypos / MINI_TILEY;
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
-  int element = properties_element - EL_CUSTOM_START;
+  int i = properties_element - EL_CUSTOM_START;
 
   if (!IS_CUSTOM_ELEMENT(properties_element))
   {
@@ -3334,7 +3346,7 @@ static void DrawCustomChangedArea()
     return;
   }
 
-  ElementContent[0][0][0] = level.custom_element_successor[element];
+  ElementContent[0][0][0] = level.custom_element[i].change.successor;
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
@@ -3903,13 +3915,13 @@ static void DrawPropertiesAdvanced()
 {
   char infotext[MAX_OUTPUT_LINESIZE + 1];
   int max_infotext_len = getMaxInfoTextLength();
-  int xoffset_above = 0;
-  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
+
+  CopyCustomElementPropertiesToEditor(properties_element);
 
   /* draw stickybutton gadget */
   i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
@@ -3924,16 +3936,6 @@ static void DrawPropertiesAdvanced()
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_CHANGE_FIRST; i<=ED_COUNTER_ID_CHANGE_LAST; i++)
   {
-    if (counterbutton_info[i].infotext_above)
-    {
-      x = counterbutton_info[i].x + xoffset_above;
-      y = counterbutton_info[i].y + yoffset_above;
-
-      sprintf(infotext, "%s:", counterbutton_info[i].infotext_above);
-      infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, FONT_TEXT_1, infotext);
-    }
-
     if (counterbutton_info[i].infotext_right)
     {
       x = counterbutton_info[i].x + xoffset_right;
@@ -4754,7 +4756,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	{
 	  int i = properties_element - EL_CUSTOM_START;
 
-	  level.custom_element_successor[i] = new_element;
+	  level.custom_element[i].change.successor = new_element;
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;
@@ -4922,6 +4924,10 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     default:
       break;
   }
+
+  if (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
+      counter_id <= ED_COUNTER_ID_CHANGE_LAST)
+    CopyCustomElementPropertiesToGame(properties_element);
 }
 
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
@@ -4965,8 +4971,10 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
   *checkbutton_info[type_id].value ^= TRUE;
 
-  if (type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
-      type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST)
+  if ((type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
+       type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST) ||
+      (type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
+       type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST))
     CopyCustomElementPropertiesToGame(properties_element);
 }
 

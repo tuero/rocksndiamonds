@@ -141,11 +141,33 @@
 #define EP_BITMASK_DEFAULT	0
 
 #define PROPERTY_BIT(p)		(1 << ((p) % 32))
-#define PROPERTY_VAR(e, p)	(Properties[e][(p) / 32])
-#define HAS_PROPERTY(e, p)	((PROPERTY_VAR(e, p) & PROPERTY_BIT(p)) != 0)
-#define SET_PROPERTY(e, p, v)	((v) ?					   \
+#define PROPERTY_VAR(e,p)	(Properties[e][(p) / 32])
+#define HAS_PROPERTY(e,p)	((PROPERTY_VAR(e, p) & PROPERTY_BIT(p)) != 0)
+#define SET_PROPERTY(e,p,v)	((v) ?					   \
 				 (PROPERTY_VAR(e,p) |=  PROPERTY_BIT(p)) : \
 				 (PROPERTY_VAR(e,p) &= ~PROPERTY_BIT(p)))
+
+
+/* values for change events for custom elements */
+#define CE_DELAY_FIXED		0
+#define CE_DELAY_RANDOM		1
+
+#define NUM_CHANGE_EVENTS	2
+
+#define CE_BITMASK_DEFAULT	0
+
+#define CUSTOM_ELEMENT_INFO(e)	(level.custom_element[(e) - EL_CUSTOM_START])
+
+#define CH_EVENT_BIT(c)		(1 << (c))
+#define CH_EVENT_VAR(e)		(CUSTOM_ELEMENT_INFO(e).change.events)
+
+#define HAS_CHANGE_EVENT(e,c)	(IS_CUSTOM_ELEMENT(e) &&		  \
+				 (CH_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
+#define SET_CHANGE_EVENT(e,c,v)	(IS_CUSTOM_ELEMENT(e) ?			  \
+				 ((v) ?					  \
+				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
+				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
+
 
 /* macros for configurable properties */
 #define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
@@ -1033,6 +1055,21 @@ struct PlayerInfo
   int shield_deadly_time_left;
 };
 
+struct CustomElementChangeInfo
+{
+  unsigned long events;	/* bitfield for change events */
+
+  short successor;	/* new custom element after change */
+
+  int delay_fixed;	/* added frame delay before changed (fixed) */
+  int delay_random;	/* added frame delay before changed (random) */
+};
+
+struct CustomElementInfo
+{
+  struct CustomElementChangeInfo change;
+};
+
 struct LevelInfo
 {
   int file_version;	/* file format version the level is stored with    */
@@ -1061,7 +1098,7 @@ struct LevelInfo
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
-  short custom_element_successor[NUM_CUSTOM_ELEMENTS];
+  struct CustomElementInfo custom_element[NUM_CUSTOM_ELEMENTS];
 
   boolean no_level_file;
 };
