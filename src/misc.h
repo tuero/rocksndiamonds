@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  misc.h                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef MISC_H
@@ -85,6 +83,14 @@ struct AnimInfo
 #define NEW_RANDOMIZE	-1
 
 void microsleep(unsigned long);
+long mainCounter(int);
+void InitCounter(void);
+long Counter(void);
+long Counter2(void);
+void WaitCounter(long);
+void WaitCounter2(long);
+void Delay(long);
+BOOL DelayReached(long *, int);
 unsigned long be2long(unsigned long *);
 char *int2str(int, int);
 unsigned int RND(unsigned int);

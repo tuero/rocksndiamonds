@@ -6,6 +6,7 @@ PROGNAME = rocksndiamonds
 
 RM = rm -f
 CC = gcc
+CPP = $(CC) -E
 # CC = cc				# for HP-UX and others
 
 GAME_DIR = -DGAME_DIR=\".\"		# path of the game and its data
@@ -35,15 +36,28 @@ LIBS = -lXpm -lXpm -lXpm -lX11 -lm	# triple -lXpm; else I got an error...
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
 
-OBJS =	main.o \
-	init.o \
-	images.o \
-	events.o \
-	tools.o \
-	screens.o \
-	misc.o \
-	game.o \
-	editor.o \
+SRCS =	main.c		\
+	init.c		\
+	events.c	\
+	tools.c		\
+	screens.c	\
+	misc.c		\
+	game.c		\
+	editor.c	\
+	buttons.c	\
+	files.c		\
+	sound.c
+
+OBJS =	main.o		\
+	init.o		\
+	events.o	\
+	tools.o		\
+	screens.o	\
+	misc.o		\
+	game.o		\
+	editor.o	\
+	buttons.o	\
+	files.o		\
 	sound.o
 
 all:	$(OBJS)
@@ -54,3 +68,10 @@ all:	$(OBJS)
 
 clean:
 	$(RM) $(OBJS)
+
+depend:
+	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif

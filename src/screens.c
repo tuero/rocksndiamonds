@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  screens.c                                               *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "screens.h"
@@ -21,6 +19,8 @@
 #include "tools.h"
 #include "editor.h"
 #include "misc.h"
+#include "files.h"
+#include "buttons.h"
 
 void DrawMainMenu()
 {
@@ -244,8 +244,8 @@ static int helpscreen_action[] =
   GFX_FELSBROCKEN,4,5,						HA_NEXT,
   GFX_BOMBE,1,50, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,		HA_NEXT,
   GFX_KOKOSNUSS,1,50, GFX_CRACKINGNUT,3,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
-  GFX_ERZ_1,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
-  GFX_ERZ_2,1,50, GFX_EXPLOSION,8,1, GFX_DIAMANT,1,10,		HA_NEXT,
+  GFX_ERZ_EDEL,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
+  GFX_ERZ_DIAM,1,50, GFX_EXPLOSION,8,1, GFX_DIAMANT,1,10,	HA_NEXT,
   GFX_GEBLUBBER,4,4,						HA_NEXT,
   GFX_SCHLUESSEL1,4,33,						HA_NEXT,
   GFX_PFORTE1,4,33,						HA_NEXT,
@@ -452,7 +452,7 @@ void DrawHelpScreenMusicText(int num)
   PlaySoundLoop(background_loop[num]);
 }
 
-void DrawHelpScreenRegistrationText()
+void DrawHelpScreenCreditsText()
 {
   int ystart = 150, ystep = 30;
   char text[FULL_SXSIZE/FONT2_XSIZE+10];
@@ -463,13 +463,34 @@ void DrawHelpScreenRegistrationText()
   DrawText(SX+25+16, SY+46, "Copyright ^1995 by Holger Schemel",
 	   FS_SMALL,FC_RED);
 
-  sprintf(text,"Registration information:");
+  sprintf(text,"Program information:");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
 	   text,FS_SMALL,FC_GREEN);
 
-  sprintf(text,"Unregistered version");
-  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep,
+  sprintf(text,"This game is Freeware!");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+0*ystep,
 	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"If you like it, send e-mail to:");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+1*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"aeglos@valinor.owl.de");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+2*ystep,
+	   text,FS_SMALL,FC_RED);
+  sprintf(text,"or SnailMail to:");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+3*ystep,
+	   text,FS_SMALL,FC_YELLOW);
+  sprintf(text,"Holger Schemel");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep,
+	   text,FS_SMALL,FC_RED);
+  sprintf(text,"Sennehof 28");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+20,
+	   text,FS_SMALL,FC_RED);
+  sprintf(text,"33659 Bielefeld");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+40,
+	   text,FS_SMALL,FC_RED);
+  sprintf(text,"Germany");
+  DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+ystart+4*ystep+60,
+	   text,FS_SMALL,FC_RED);
 
   sprintf(text,"Press any key or button for main menu");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+SYSIZE-20,
@@ -520,7 +541,7 @@ void HandleHelpScreen(int button)
     else if (helpscreen_state==num_helpscreen_els_pages+num_bg_loops-1)
     {
       helpscreen_state++;
-      DrawHelpScreenRegistrationText();
+      DrawHelpScreenCreditsText();
     }
     else
     {
@@ -608,6 +629,8 @@ void HandleTypeName(int newxpos, KeySym key)
 void DrawChooseLevel()
 {
   int i;
+
+  CloseDoor(DOOR_CLOSE_2);
 
   ClearWindow();
   DrawText(SX,SY,"Level Directories",FS_BIG,FC_GREEN);
@@ -743,11 +766,13 @@ void DrawSetupScreen()
   DrawText(SX+32, SY+5*32,"Toons:",FS_BIG,FC_GREEN);
   DrawText(SX+32, SY+6*32,"Buffered gfx:",FS_BIG,FC_GREEN);
   DrawText(SX+32, SY+7*32,"Fading:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+8*32,"Auto-Record:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+9*32,"Joystick:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+10*32,"Cal. Joystick",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+12*32,"Exit",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+13*32,"Save and exit",FS_BIG,FC_GREEN);
+  DrawText(SX+32, SY+8*32,"Quick Doors:",FS_BIG,FC_GREEN);
+  DrawText(SX+32, SY+9*32,"Auto-Record:",FS_BIG,FC_GREEN);
+  DrawText(SX+32, SY+10*32,"Joystick:",FS_BIG,FC_GREEN);
+  DrawText(SX+32, SY+11*32,"Cal. Joystick",FS_BIG,FC_GREEN);
+
+  DrawText(SX+32, SY+13*32,"Exit",FS_BIG,FC_GREEN);
+  DrawText(SX+32, SY+14*32,"Save and exit",FS_BIG,FC_GREEN);
 
   if (SETUP_SOUND_ON(player.setup))
     DrawText(SX+14*32, SY+2*32,"on",FS_BIG,FC_YELLOW);
@@ -779,18 +804,23 @@ void DrawSetupScreen()
   else
     DrawText(SX+14*32, SY+7*32,"off",FS_BIG,FC_BLUE);
 
-  if (SETUP_RECORD_EACH_GAME_ON(player.setup))
+  if (SETUP_QUICK_DOORS_ON(player.setup))
     DrawText(SX+14*32, SY+8*32,"on",FS_BIG,FC_YELLOW);
   else
     DrawText(SX+14*32, SY+8*32,"off",FS_BIG,FC_BLUE);
 
-  if (SETUP_2ND_JOYSTICK_ON(player.setup))
-    DrawText(SX+14*32, SY+9*32,"2nd",FS_BIG,FC_YELLOW);
+  if (SETUP_RECORD_EACH_GAME_ON(player.setup))
+    DrawText(SX+14*32, SY+9*32,"on",FS_BIG,FC_YELLOW);
   else
-    DrawText(SX+14*32, SY+9*32,"1st",FS_BIG,FC_YELLOW);
+    DrawText(SX+14*32, SY+9*32,"off",FS_BIG,FC_BLUE);
 
-  for(i=2;i<14;i++)
-    if (i!=11)
+  if (SETUP_2ND_JOYSTICK_ON(player.setup))
+    DrawText(SX+14*32, SY+10*32,"2nd",FS_BIG,FC_YELLOW);
+  else
+    DrawText(SX+14*32, SY+10*32,"1st",FS_BIG,FC_YELLOW);
+
+  for(i=2;i<15;i++)
+    if (i!=12)
       DrawGraphic(0,i,GFX_KUGEL_BLAU);
 
   FadeToFront();
@@ -820,13 +850,13 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     else
       x = y = 0;
 
-    if (y==12)
-      y = (dy>0 ? 13 : 11);
+    if (y==13)
+      y = (dy>0 ? 14 : 12);
 
     if (y<3)
       y = 3;
-    else if (y>14)
-      y = 14;
+    else if (y>15)
+      y = 15;
   }
 
   if (!mx && !my && !dx && !dy)
@@ -835,7 +865,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (x==1 && y>=3 && y<=14 && y!=12)
+  if (x==1 && y>=3 && y<=15 && y!=13)
   {
     if (button)
     {
@@ -900,13 +930,21 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==9)
       {
+	if (SETUP_QUICK_DOORS_ON(player.setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	player.setup ^= SETUP_QUICK_DOORS;
+      }
+      else if (y==10)
+      {
 	if (SETUP_RECORD_EACH_GAME_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_RECORD_EACH_GAME;
       }
-      else if (y==10)
+      else if (y==11)
       {
 	if (SETUP_2ND_JOYSTICK_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"1st",FS_BIG,FC_YELLOW);
@@ -914,14 +952,14 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"2nd",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_2ND_JOYSTICK;
       }
-      else if (y==11)
+      else if (y==12)
       {
 	CalibrateJoystick();
 	redraw = TRUE;
       }
-      else if (y==13 || y==14)
+      else if (y==14 || y==15)
       {
-        if (y==14)
+        if (y==15)
 	{
 	  SavePlayerInfo(PLAYER_SETUP);
 	  SaveJoystickData();
@@ -937,6 +975,133 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
   if (game_status==SETUP)
     DoAnimation();
+}
+
+void CalibrateJoystick()
+{
+#ifdef __FreeBSD__
+  struct joystick joy_ctrl;
+#else
+  struct joystick_control
+  {
+    int buttons;
+    int x;
+    int y;
+  } joy_ctrl;
+#endif
+
+  int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
+  int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
+
+  if (joystick_status==JOYSTICK_OFF)
+    goto error_out;
+
+  ClearWindow();
+  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+8*32, " THE UPPER LEFT ",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+9*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+#ifdef __FreeBSD__
+  joy_ctrl.b1 = joy_ctrl.b2 = 0;
+#else
+  joy_ctrl.buttons = 0;
+#endif
+  while(Joystick() & JOY_BUTTON);
+#ifdef __FreeBSD__
+  while(!(joy_ctrl.b1||joy_ctrl.b2))
+#else
+  while(!joy_ctrl.buttons)
+#endif
+  {
+    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    {
+      joystick_status=JOYSTICK_OFF;
+      goto error_out;
+    }
+    Delay(10000);
+  }
+
+  new_joystick_xleft = joy_ctrl.x;
+  new_joystick_yupper = joy_ctrl.y;
+
+  ClearWindow();
+  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
+  DrawText(SX+32, SY+8*32, "THE LOWER RIGHT",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+9*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+#ifdef __FreeBSD__
+  joy_ctrl.b1 = joy_ctrl.b2 = 0;
+#else
+  joy_ctrl.buttons = 0;
+#endif
+  while(Joystick() & JOY_BUTTON);
+#ifdef __FreeBSD__
+  while(!(joy_ctrl.b1||joy_ctrl.b2))
+#else
+  while(!joy_ctrl.buttons)
+#endif
+  {
+    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    {
+      joystick_status=JOYSTICK_OFF;
+      goto error_out;
+    }
+    Delay(10000);
+  }
+
+  new_joystick_xright = joy_ctrl.x;
+  new_joystick_ylower = joy_ctrl.y;
+
+  ClearWindow();
+  DrawText(SX+32, SY+16+7*32, "CENTER JOYSTICK",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+16+8*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
+  BackToFront();
+
+#ifdef __FreeBSD__
+  joy_ctrl.b1 = joy_ctrl.b2 = 0;
+#else
+  joy_ctrl.buttons = 0;
+#endif
+  while(Joystick() & JOY_BUTTON);
+#ifdef __FreeBSD__
+  while(!(joy_ctrl.b1||joy_ctrl.b2))
+#else
+  while(!joy_ctrl.buttons)
+#endif
+  {
+    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    {
+      joystick_status=JOYSTICK_OFF;
+      goto error_out;
+    }
+    Delay(10000);
+  }
+
+  new_joystick_xmiddle = joy_ctrl.x;
+  new_joystick_ymiddle = joy_ctrl.y;
+
+  joystick[joystick_nr].xleft = new_joystick_xleft;
+  joystick[joystick_nr].yupper = new_joystick_yupper;
+  joystick[joystick_nr].xright = new_joystick_xright;
+  joystick[joystick_nr].ylower = new_joystick_ylower;
+  joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
+  joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
+
+  CheckJoystickData();
+
+  DrawSetupScreen();
+  while(Joystick() & JOY_BUTTON);
+  return;
+
+  error_out:
+
+  ClearWindow();
+  DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
+  DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
+  Delay(3000000);
+  DrawSetupScreen();
 }
 
 void HandleVideoButtons(int mx, int my, int button)
@@ -1078,308 +1243,4 @@ void HandleGameButtons(int mx, int my, int button)
     default:
       break;
   }
-}
-
-int CheckVideoButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  static int video_button[5] =
-  {
-    VIDEO_PRESS_EJECT_ON,
-    VIDEO_PRESS_STOP_ON,
-    VIDEO_PRESS_PAUSE_ON,
-    VIDEO_PRESS_REC_ON,
-    VIDEO_PRESS_PLAY_ON
-  };
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_VIDEO_BUTTON(mx,my))
-      {
-	choice = VIDEO_BUTTON(mx);
-	pressed = TRUE;
-	DrawVideoDisplay(video_button[choice],0);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_VIDEO_BUTTON(mx,my) || VIDEO_BUTTON(mx)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawVideoDisplay(video_button[choice]<<1,0);
-      }
-      else if (ON_VIDEO_BUTTON(mx,my) && VIDEO_BUTTON(mx)==choice && !pressed)
-      {
-	pressed = TRUE;
-	DrawVideoDisplay(video_button[choice],0);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_VIDEO_BUTTON(mx,my) && VIDEO_BUTTON(mx)==choice && pressed)
-    {
-      DrawVideoDisplay(video_button[choice]<<1,0);
-      return_code = choice+1;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckSoundButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  int sound_state[3];
-
-  sound_state[0] = BUTTON_SOUND_MUSIC | (BUTTON_ON * sound_music_on);
-  sound_state[1] = BUTTON_SOUND_LOOPS | (BUTTON_ON * sound_loops_on);
-  sound_state[2] = BUTTON_SOUND_SOUND | (BUTTON_ON * sound_on);
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_SOUND_BUTTON(mx,my))
-      {
-	choice = SOUND_BUTTON(mx);
-	pressed = TRUE;
-	DrawSoundDisplay(sound_state[choice] | BUTTON_PRESSED);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_SOUND_BUTTON(mx,my) || SOUND_BUTTON(mx)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawSoundDisplay(sound_state[choice] | BUTTON_RELEASED);
-      }
-      else if (ON_SOUND_BUTTON(mx,my) && SOUND_BUTTON(mx)==choice && !pressed)
-      {
-	pressed = TRUE;
-	DrawSoundDisplay(sound_state[choice] | BUTTON_PRESSED);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_SOUND_BUTTON(mx,my) && SOUND_BUTTON(mx)==choice && pressed)
-    {
-      DrawSoundDisplay(sound_state[choice] | BUTTON_RELEASED);
-      return_code = 1<<choice;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckGameButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  int game_state[3] =
-  {
-    BUTTON_GAME_STOP,
-    BUTTON_GAME_PAUSE,
-    BUTTON_GAME_PLAY
-  };
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_GAME_BUTTON(mx,my))
-      {
-	choice = GAME_BUTTON(mx);
-	pressed = TRUE;
-	DrawGameButton(game_state[choice] | BUTTON_PRESSED);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_GAME_BUTTON(mx,my) || GAME_BUTTON(mx)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawGameButton(game_state[choice] | BUTTON_RELEASED);
-      }
-      else if (ON_GAME_BUTTON(mx,my) && GAME_BUTTON(mx)==choice && !pressed)
-      {
-	pressed = TRUE;
-	DrawGameButton(game_state[choice] | BUTTON_PRESSED);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_GAME_BUTTON(mx,my) && GAME_BUTTON(mx)==choice && pressed)
-    {
-      DrawGameButton(game_state[choice] | BUTTON_RELEASED);
-      return_code = 1<<choice;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckChooseButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  static int choose_button[5] =
-  {
-    BUTTON_OK,
-    BUTTON_NO
-  };
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_CHOOSE_BUTTON(mx,my))
-      {
-	choice = CHOOSE_BUTTON(mx);
-	pressed = TRUE;
-	DrawChooseButton(choose_button[choice] | BUTTON_PRESSED);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_CHOOSE_BUTTON(mx,my) || CHOOSE_BUTTON(mx)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawChooseButton(choose_button[choice] | BUTTON_RELEASED);
-      }
-      else if (ON_CHOOSE_BUTTON(mx,my) &&CHOOSE_BUTTON(mx)==choice && !pressed)
-      {
-	pressed = TRUE;
-	DrawChooseButton(choose_button[choice] | BUTTON_PRESSED);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_CHOOSE_BUTTON(mx,my) && CHOOSE_BUTTON(mx)==choice && pressed)
-    {
-      DrawChooseButton(choose_button[choice] | BUTTON_RELEASED);
-      return_code = choice+1;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckConfirmButton(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_CONFIRM_BUTTON(mx,my))
-      {
-	choice = 0;
-	pressed = TRUE;
-	DrawConfirmButton(BUTTON_PRESSED);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if (!ON_CONFIRM_BUTTON(mx,my) && choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawConfirmButton(BUTTON_RELEASED);
-      }
-      else if (ON_CONFIRM_BUTTON(mx,my) && !pressed)
-      {
-	pressed = TRUE;
-	DrawConfirmButton(BUTTON_PRESSED);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_CONFIRM_BUTTON(mx,my) && pressed)
-    {
-      DrawConfirmButton(BUTTON_RELEASED);
-      return_code = BUTTON_CONFIRM;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-void DrawCompleteVideoDisplay()
-{
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX3,DOOR_GFX_PAGEY2, VXSIZE,VYSIZE, VX,VY);
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX4+VIDEO_CONTROL_XPOS,
-	    DOOR_GFX_PAGEY2+VIDEO_CONTROL_YPOS,
-	    VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
-	    VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
-
-  DrawVideoDisplay(VIDEO_ALL_OFF,0);
-  if (tape.date && tape.length)
-  {
-    DrawVideoDisplay(VIDEO_STATE_DATE_ON,tape.date);
-    DrawVideoDisplay(VIDEO_STATE_TIME_ON,0);
-  }
-
-  XCopyArea(display,drawto,pix[PIX_DB_DOOR],gc,
-	    VX,VY, VXSIZE,VYSIZE, DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
 }

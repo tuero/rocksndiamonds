@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  init.h                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef INIT_H
@@ -20,12 +18,14 @@
 #include "main.h"
 
 void OpenAll(int, char **);
+void InitLevelAndPlayerInfo(void);
 void InitDisplay(int, char **);
 void InitSound(void);
 void InitSoundProcess(void);
 void InitJoystick(void);
 void InitWindow(int, char **);
 void InitGfx(void);
+void InitElementProperties(void);
 void CloseAll();
 
 #endif

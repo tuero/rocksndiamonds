@@ -1,4 +1,20 @@
 
+Prerelease Version 0.9b [4 NOV 95]
+------------------------------------
+	- the game is now completely Freeware
+	- the game is now better playable by keyboard
+	  (in the last version, the player was making more than
+          one step for one keystroke in some cases -- thanks to
+	  Warwick Allison for the hint with "XSync()"!)
+	- new amoeba type with configurable content (like in the
+	  original C64 version, when aboeba cannot grow anymore
+	  and explodes to diamonds or some other elements)
+	- compile error with ONE_PER_NAME in high score function
+	  removed (thanks to Dmitry Kohmanyuk)
+	- little code cleanup (to get some new bugs ;)
+	- FreeBSD sound and joystick support (thanks to Jean-Marc
+	  Zucconi)
+
 Prerelease Version 0.9 [23 OCT 95]
 ----------------------------------
 	- first (pre)release version

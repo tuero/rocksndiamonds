@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  tools.h                                                 *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef TOOLS_H
@@ -62,7 +60,6 @@ void DrawElementThruMask(int, int, int);
 void DrawMiniGraphic(int, int, int);
 void DrawMiniGraphicExt(Drawable, GC, int, int, int);
 void DrawMiniGraphicExtHiRes(Drawable, GC, int, int, int);
-int el2gfx(int);
 void DrawGraphicShifted(int, int, int, int, int, int);
 void DrawElementShifted(int, int, int, int, int, int);
 void ErdreichAnbroeckeln(int, int);
@@ -80,22 +77,11 @@ BOOL AreYouSure(char *, unsigned int);
 void OpenDoor(unsigned int);
 void CloseDoor(unsigned int);
 void MoveDoor(unsigned int);
-long mainCounter(int);
-void InitCounter(void);
-long Counter(void);
-long Counter2(void);
-void WaitCounter(long);
-void WaitCounter2(long);
-void Delay(long);
-BOOL DelayReached(long *, int);
 int ReadPixel(Drawable, int, int);
-int el2gfx(int);
-void LoadJoystickData(void);
-void SaveJoystickData(void);
 void CheckJoystickData(void);
 int JoystickPosition(int, int, int);
 int Joystick(void);
 int JoystickButton(void);
-void CalibrateJoystick(void);
+int el2gfx(int);
 
 #endif

@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  main.h                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef MAIN_H
@@ -47,13 +45,6 @@ typedef int BOOL;
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 
-/*
-
-#define LEV_FIELDX	64
-#define LEV_FIELDY	32
-
-*/
-
 #define MIN_LEV_FIELDX	(SCR_FIELDX-2)
 #define MIN_LEV_FIELDY	(SCR_FIELDY-2)
 #define STD_LEV_FIELDX	64
@@ -75,41 +66,83 @@ typedef int BOOL;
 #define IS_FREE(x,y)	(Feld[x][y]==EL_LEERRAUM && !PLAYER(x,y))
 #define IS_MOVING(x,y)	(MovPos[x][y]!=0)
 #define IS_BLOCKED(x,y)	(Feld[x][y]==EL_BLOCKED)
-#define IS_AMOEBOID(e)	((e)==EL_AMOEBE1 || (e)==EL_AMOEBE2 || (e)==EL_AMOEBE3)
+
+/*
+
+#define IS_AMOEBALIVE(e) ((e)==EL_AMOEBE_NASS || (e)==EL_AMOEBE_NORM || (e)==EL_AMOEBE_VOLL)
+#define IS_AMOEBOID(e)	((e)==EL_AMOEBE_TOT || IS_AMOEBALIVE(e))
 #define IS_BADEWANNOID(e) ((e)>=EL_BADEWANNE1 && (e)<=EL_BADEWANNE5)
 #define IS_SCHLUESSEL(e) ((e)>=EL_SCHLUESSEL1 && (e)<=EL_SCHLUESSEL4)
 #define IS_PFORTE(e)	((e)>=EL_PFORTE1 && (e)<=EL_PFORTE4X)
-#define IS_CHAR(e)	((e)>=EL_CHAR_START && (e)<=EL_CHAR_END)
 
 #define IS_SOLID(e)	((e)==EL_BETON || (e)==EL_MAUERWERK || (e)==EL_FELSBODEN || (e)==EL_AUSGANG_ZU || (e)==EL_AUSGANG_ACT || (e)==EL_AUSGANG_AUF || IS_AMOEBOID(e) || (e)==EL_MORAST_VOLL || (e)==EL_MORAST_LEER || (e)==EL_SIEB_VOLL || (e)==EL_SIEB_LEER || (e)==EL_LIFE || (e)==EL_LIFE_ASYNC || IS_BADEWANNOID(e))
 
 #define IS_MASSIV(e)	((e)==EL_BETON || (e)==EL_SALZSAEURE || IS_BADEWANNOID(e) || IS_PFORTE(e))
 
-#define CAN_FALL(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN || (e)==EL_MORAST_VOLL || (e)==EL_SIEB_VOLL)
+#define IS_SLIPPERY(e)	((e)==EL_FELSBODEN || (e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_ABLENK_EIN || (e)==EL_ABLENK_AUS || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER || (e)==EL_BIRNE_EIN || (e)==EL_BIRNE_AUS || (e)==EL_BADEWANNE1 || (e)==EL_BADEWANNE2)
 
-#define CAN_SMASH(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || IS_SCHLUESSEL(e) || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN)
+#define IS_ENEMY(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN)
+
+#define CAN_FALL(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN || (e)==EL_MORAST_VOLL || (e)==EL_SIEB_VOLL || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER)
+
+#define CAN_SMASH(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || IS_SCHLUESSEL(e) || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_TROPFEN || (e)==EL_ZEIT_VOLL || (e)==EL_ZEIT_LEER)
 
 #define CAN_CHANGE(e)	((e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT)
 
 #define CAN_MOVE(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN)
 
-#define COULD_MOVE(e)	(((e)>=EL_KAEFER_R && (e)<=EL_KAEFER_U) || ((e)>=EL_FLIEGER_R && (e)<=EL_FLIEGER_U) || ((e)>=EL_PACMAN && (e)==EL_PACMAN_U))
+#define COULD_MOVE(e)	(((e)>=EL_KAEFER_R && (e)<=EL_KAEFER_U) || ((e)>=EL_FLIEGER_R && (e)<=EL_FLIEGER_U) || ((e)>=EL_PACMAN_R && (e)==EL_PACMAN_U))
 
-/*
-#define CAN_KILL(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN || (e)==EL_TROPFEN)
-*/
-
-#define IS_ENEMY(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER || (e)==EL_MAMPFER || (e)==EL_ZOMBIE || (e)==EL_PACMAN)
 #define DONT_TOUCH(e)	((e)==EL_KAEFER || (e)==EL_FLIEGER)
 #define DONT_GO_TO(e)	(IS_ENEMY(e) || (e)==EL_TROPFEN || (e)==EL_SALZSAEURE)
 
-#define SLIPPERY(e)	((e)==EL_FELSBODEN || (e)==EL_FELSBROCKEN || (e)==EL_EDELSTEIN || (e)==EL_DIAMANT || (e)==EL_BOMBE || (e)==EL_KOKOSNUSS || (e)==EL_ABLENK_EIN || (e)==EL_ABLENK_AUS || (e)==EL_BADEWANNE1 || (e)==EL_BADEWANNE2)
+#define IS_CHAR(e)	((e)>=EL_CHAR_START && (e)<=EL_CHAR_END)
 
-#define EL_CHANGED(e)	((e)==EL_FELSBROCKEN ? EL_EDELSTEIN : (e)==EL_EDELSTEIN ? EL_DIAMANT : EL_FELSBROCKEN)
+*/
+
+
+#define EP_BIT_AMOEBALIVE	(1<<0)
+#define EP_BIT_AMOEBOID		(1<<1)
+#define EP_BIT_BADEWANNOID	(1<<2)
+#define EP_BIT_SCHLUESSEL	(1<<3)
+#define EP_BIT_PFORTE		(1<<4)
+#define EP_BIT_SOLID		(1<<5)
+#define EP_BIT_MASSIV		(1<<6)
+#define EP_BIT_SLIPPERY		(1<<7)
+#define EP_BIT_ENEMY		(1<<8)
+#define EP_BIT_CAN_FALL		(1<<9)
+#define EP_BIT_CAN_SMASH	(1<<10)
+#define EP_BIT_CAN_CHANGE	(1<<11)
+#define EP_BIT_CAN_MOVE		(1<<12)
+#define EP_BIT_COULD_MOVE	(1<<13)
+#define EP_BIT_DONT_TOUCH	(1<<14)
+#define EP_BIT_DONT_GO_TO	(1<<15)
+#define EP_BIT_CHAR		(1<<16)
+
+#define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
+#define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
+#define IS_BADEWANNOID(e)	(Elementeigenschaften[e] & EP_BIT_BADEWANNOID)
+#define IS_SCHLUESSEL(e)	(Elementeigenschaften[e] & EP_BIT_SCHLUESSEL)
+#define IS_PFORTE(e)		(Elementeigenschaften[e] & EP_BIT_PFORTE)
+#define IS_SOLID(e)		(Elementeigenschaften[e] & EP_BIT_SOLID)
+#define IS_MASSIV(e)		(Elementeigenschaften[e] & EP_BIT_MASSIV)
+#define IS_SLIPPERY(e)		(Elementeigenschaften[e] & EP_BIT_SLIPPERY)
+#define IS_ENEMY(e)		(Elementeigenschaften[e] & EP_BIT_ENEMY)
+#define CAN_FALL(e)		(Elementeigenschaften[e] & EP_BIT_CAN_FALL)
+#define CAN_SMASH(e)		(Elementeigenschaften[e] & EP_BIT_CAN_SMASH)
+#define CAN_CHANGE(e)		(Elementeigenschaften[e] & EP_BIT_CAN_CHANGE)
+#define CAN_MOVE(e)		(Elementeigenschaften[e] & EP_BIT_CAN_MOVE)
+#define COULD_MOVE(e)		(Elementeigenschaften[e] & EP_BIT_COULD_MOVE)
+#define DONT_TOUCH(e)		(Elementeigenschaften[e] & EP_BIT_DONT_TOUCH)
+#define DONT_GO_TO(e)		(Elementeigenschaften[e] & EP_BIT_DONT_GO_TO)
+#define IS_CHAR(e)		(Elementeigenschaften[e] & EP_BIT_CHAR)
+
+#define EL_CHANGED(e)		((e)==EL_FELSBROCKEN ? EL_EDELSTEIN :	\
+				 (e)==EL_EDELSTEIN   ? EL_DIAMANT :	\
+				 EL_FELSBROCKEN)
 #define IS_DRAWABLE(e)		((e)<EL_BLOCKED)
 #define IS_NOT_DRAWABLE(e)	((e)>=EL_BLOCKED)
-#define TIMESIZE	(TimeLeft*100/level.time)
-
+#define TIMESIZE		(TimeLeft*100/level.time)
 #define LEVELDIR_SIZE(x)	((x).num_ready + (x).num_free)
 #define TAPE_IS_EMPTY(x)	((x).length == 0)
 
@@ -127,10 +160,11 @@ typedef int BOOL;
 #define NUM_PICTURES		5
 #define NUM_PIXMAPS		8
 
+/* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
 
 #define MAX_LEVNAMLEN		32
-#define MAX_SC_ENTRIES		16
+#define MAX_SC_ENTRIES		15
 #define MAX_TAPELEN		10000
 
 #define MAX_LEVDIR_FILENAME	(64+1)
@@ -139,6 +173,8 @@ typedef int BOOL;
 #define MAX_SCORE_ENTRIES	15
 
 #define MAX_FILENAME		256
+#define MAX_NUM_AMOEBA		100
+#define MAX_ELEMENTS		512
 
 struct PictureFile
 {
@@ -169,6 +205,7 @@ struct LevelInfo
   int edelsteine;
   char name[MAX_LEVNAMLEN];
   int score[MAX_SC_ENTRIES];
+  int amoebe_inhalt;
   int mampfer_inhalt[4][3][3];
   int tempo_amoebe;
   int dauer_sieb;
@@ -236,6 +273,7 @@ extern int		direct_draw_on;
 extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
+extern int		quick_doors;
 
 extern BOOL		redraw[SCR_FIELDX][SCR_FIELDY];
 extern int		redraw_mask;
@@ -250,6 +288,10 @@ extern int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int		AmoebaCnt[MAX_NUM_AMOEBA];
+extern long		Elementeigenschaften[MAX_ELEMENTS];
+
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
@@ -262,6 +304,7 @@ extern struct LevelInfo		level;
 extern struct PlayerInfo	player;
 extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape, master_tape;
+extern struct JoystickInfo	joystick[];
 
 extern int		background_loop[];
 extern int		num_bg_loops;
@@ -321,8 +364,8 @@ extern char	       *progname;
 #define FONT_LINES_PER_FONT	4
 
 /* game elements:
-**	0 - 255: real elements, stored in level file
-**	256 - ?: flag elements, only used at runtime
+**	  0 - 255: real elements, stored in level file
+**	256 - 511: flag elements, only used at runtime
 */
 /* "real" level elements */
 #define EL_LEERRAUM	0
@@ -340,7 +383,7 @@ extern char	       *progname;
 #define EL_ZOMBIE	12
 #define EL_BETON	13
 #define EL_DIAMANT	14
-#define EL_AMOEBE1	15
+#define EL_AMOEBE_TOT	15
 #define EL_MORAST_LEER	16
 #define EL_MORAST_VOLL	17
 #define EL_TROPFEN	18
@@ -348,8 +391,8 @@ extern char	       *progname;
 #define EL_SIEB_LEER	20
 #define EL_SIEB_VOLL	21
 #define EL_SALZSAEURE	22
-#define EL_AMOEBE2	23
-#define EL_AMOEBE3	24
+#define EL_AMOEBE_NASS	23
+#define EL_AMOEBE_NORM	24
 #define EL_KOKOSNUSS	25
 #define EL_LIFE		26
 #define EL_LIFE_ASYNC	27
@@ -374,8 +417,12 @@ extern char	       *progname;
 #define EL_UNSICHTBAR	46
 #define EL_BIRNE_AUS	47
 #define EL_BIRNE_EIN	48
-#define EL_ERZ_1	49
-#define EL_ERZ_2	50
+#define EL_ERZ_EDEL	49
+#define EL_ERZ_DIAM	50
+#define EL_AMOEBE_VOLL	51
+#define EL_AMOEBA2DIAM	52
+#define EL_ZEIT_VOLL	53
+#define EL_ZEIT_LEER	54
 
 #define EL_SPIELER1	80
 #define EL_SPIELER2	81
@@ -440,8 +487,7 @@ extern char	       *progname;
 #define EL_CRACKINGNUT	302
 #define EL_BLURB_LEFT	303
 #define EL_BLURB_RIGHT	304
-#define EL_AMOEBING2	305
-#define EL_AMOEBING3	306
+#define EL_AMOEBING	305
 
 /* names for the graphic objects */
 /* Zeile 0 (0) */
@@ -515,23 +561,26 @@ extern char	       *progname;
 #define GFX_ABLENK	96
 #define GFX_ABLENK_EIN	GFX_ABLENK
 #define GFX_ABLENK_AUS	GFX_ABLENK
-#define GFX_AMOEBE2	100
+#define GFX_AMOEBE_NASS	100
 #define GFX_TROPFEN	101
 #define GFX_AMOEBING	GFX_TROPFEN
 #define GFX_AMOEBE_LEBT	104
-#define GFX_AMOEBE3	GFX_AMOEBE_LEBT
+#define GFX_AMOEBE_NORM	GFX_AMOEBE_LEBT
 #define GFX_AMOEBE_TOT	108
-#define GFX_AMOEBE1	GFX_AMOEBE_TOT
+#define GFX_AMOEBA2DIAM	GFX_AMOEBE_TOT
+#define GFX_ZEIT_VOLL	114
+#define GFX_ZEIT_LEER	115
 /* Zeile 7 (112) */
 #define GFX_GEBLUBBER	124
 /* Zeile 8 (128) */
 #define GFX_SIEB_LEER	128
 #define GFX_SIEB_VOLL	GFX_SIEB_LEER
 #define GFX_SIEB_TOT	GFX_SIEB_LEER
-#define GFX_ERZ_1	132
-#define GFX_ERZ_2	133
+#define GFX_ERZ_EDEL	132
+#define GFX_ERZ_DIAM	133
 #define GFX_BIRNE_AUS	134
 #define GFX_BIRNE_EIN	135
+#define GFX_AMOEBE_VOLL	136
 #define GFX_KUGEL_ROT	140
 #define GFX_KUGEL_BLAU	141
 #define GFX_KUGEL_GELB	142
@@ -695,8 +744,13 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 /* values for the joystick */
 #define JOYSTICK_OFF		0
 #define	JOYSTICK_AVAILABLE	1
+#ifdef __FreeBSD__
+#define DEV_JOYSTICK_0		"/dev/joy0"
+#define DEV_JOYSTICK_1		"/dev/joy1"
+#else
 #define DEV_JOYSTICK_0		"/dev/js0"
 #define DEV_JOYSTICK_1		"/dev/js1"
+#endif
 
 /* get these values from the program 'js' from the joystick package, */
 /* set JOYSTICK_PERCENT to a threshold appropriate for your joystick */
@@ -858,236 +912,5 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 #define DOOR_GFX_PAGEX6		(5*DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		0
 #define DOOR_GFX_PAGEY2		DYSIZE
-
-/* some positions in the video tape control window */
-#define VIDEO_DISPLAY1_XPOS	5
-#define VIDEO_DISPLAY1_YPOS	5
-#define VIDEO_DISPLAY2_XPOS	5
-#define VIDEO_DISPLAY2_YPOS	41
-#define VIDEO_DISPLAY_XSIZE	90
-#define VIDEO_DISPLAY_YSIZE	31
-#define VIDEO_BUTTON_XSIZE	18
-#define VIDEO_BUTTON_YSIZE	18
-#define VIDEO_CONTROL_XPOS	5
-#define VIDEO_CONTROL_YPOS	77
-#define VIDEO_CONTROL_XSIZE	(VIDEO_DISPLAY_XSIZE)
-#define VIDEO_CONTROL_YSIZE	(VIDEO_BUTTON_YSIZE)
-#define VIDEO_BUTTON_EJECT_XPOS	(VIDEO_CONTROL_XPOS + 0 * VIDEO_BUTTON_XSIZE)
-#define VIDEO_BUTTON_STOP_XPOS	(VIDEO_CONTROL_XPOS + 1 * VIDEO_BUTTON_XSIZE)
-#define VIDEO_BUTTON_PAUSE_XPOS	(VIDEO_CONTROL_XPOS + 2 * VIDEO_BUTTON_XSIZE)
-#define VIDEO_BUTTON_REC_XPOS	(VIDEO_CONTROL_XPOS + 3 * VIDEO_BUTTON_XSIZE)
-#define VIDEO_BUTTON_PLAY_XPOS	(VIDEO_CONTROL_XPOS + 4 * VIDEO_BUTTON_XSIZE)
-#define VIDEO_BUTTON_ANY_YPOS	(VIDEO_CONTROL_YPOS)
-#define VIDEO_DATE_LABEL_XPOS	(VIDEO_DISPLAY1_XPOS)
-#define VIDEO_DATE_LABEL_YPOS	(VIDEO_DISPLAY1_YPOS)
-#define VIDEO_DATE_LABEL_XSIZE	(VIDEO_DISPLAY_XSIZE)
-#define VIDEO_DATE_LABEL_YSIZE	(VIDEO_DISPLAY_YSIZE)
-#define VIDEO_DATE_XPOS		(VIDEO_DISPLAY1_XPOS+1)
-#define VIDEO_DATE_YPOS		(VIDEO_DISPLAY1_YPOS+14)
-#define VIDEO_DATE_XSIZE	(VIDEO_DISPLAY_XSIZE)
-#define VIDEO_DATE_YSIZE	16
-#define VIDEO_REC_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS)
-#define VIDEO_REC_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_REC_LABEL_XSIZE	20
-#define VIDEO_REC_LABEL_YSIZE	12
-#define VIDEO_REC_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS+20)
-#define VIDEO_REC_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_REC_SYMBOL_XSIZE	16
-#define VIDEO_REC_SYMBOL_YSIZE	16
-#define VIDEO_PLAY_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS+65)
-#define VIDEO_PLAY_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PLAY_LABEL_XSIZE	22
-#define VIDEO_PLAY_LABEL_YSIZE	12
-#define VIDEO_PLAY_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS+50)
-#define VIDEO_PLAY_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PLAY_SYMBOL_XSIZE	13
-#define VIDEO_PLAY_SYMBOL_YSIZE	13
-#define VIDEO_PAUSE_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS)
-#define VIDEO_PAUSE_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS+20)
-#define VIDEO_PAUSE_LABEL_XSIZE	35
-#define VIDEO_PAUSE_LABEL_YSIZE	8
-#define VIDEO_PAUSE_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS+35)
-#define VIDEO_PAUSE_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PAUSE_SYMBOL_XSIZE 13
-#define VIDEO_PAUSE_SYMBOL_YSIZE 13
-#define VIDEO_TIME_XPOS		(VIDEO_DISPLAY2_XPOS+38)
-#define VIDEO_TIME_YPOS		(VIDEO_DISPLAY2_YPOS+14)
-#define VIDEO_TIME_XSIZE	50
-#define VIDEO_TIME_YSIZE	16
-
-#define ON_VIDEO_BUTTON(x,y)	((x)>=(VX+VIDEO_CONTROL_XPOS) &&	\
-				 (x)< (VX+VIDEO_CONTROL_XPOS +		\
-				       VIDEO_CONTROL_XSIZE) &&		\
-				 (y)>=(VY+VIDEO_CONTROL_YPOS) &&	\
-				 (y)< (VY+VIDEO_CONTROL_YPOS +		\
-				       VIDEO_CONTROL_YSIZE))
-#define VIDEO_BUTTON(x)		(((x)-(VX+VIDEO_CONTROL_XPOS))/VIDEO_BUTTON_XSIZE)
-
-/* values for video tape control */
-#define VIDEO_STATE_PLAY_OFF	(1L<<0)
-#define VIDEO_STATE_PLAY_ON	(1L<<1)
-#define VIDEO_STATE_PLAY	(VIDEO_STATE_PLAY_OFF	| VIDEO_STATE_PLAY_ON)
-#define VIDEO_STATE_REC_OFF	(1L<<2)
-#define VIDEO_STATE_REC_ON	(1L<<3)
-#define VIDEO_STATE_REC		(VIDEO_STATE_REC_OFF	| VIDEO_STATE_REC_ON)
-#define VIDEO_STATE_PAUSE_OFF	(1L<<4)
-#define VIDEO_STATE_PAUSE_ON	(1L<<5)
-#define VIDEO_STATE_PAUSE	(VIDEO_STATE_PAUSE_OFF	| VIDEO_STATE_PAUSE_ON)
-#define VIDEO_STATE_DATE_OFF	(1L<<6)
-#define VIDEO_STATE_DATE_ON	(1L<<7)
-#define VIDEO_STATE_DATE	(VIDEO_STATE_DATE_OFF	| VIDEO_STATE_DATE_ON)
-#define VIDEO_STATE_TIME_OFF	(1L<<8)
-#define VIDEO_STATE_TIME_ON	(1L<<9)
-#define VIDEO_STATE_TIME	(VIDEO_STATE_TIME_OFF	| VIDEO_STATE_TIME_ON)
-#define VIDEO_PRESS_PLAY_ON	(1L<<10)
-#define VIDEO_PRESS_PLAY_OFF	(1L<<11)
-#define VIDEO_PRESS_PLAY	(VIDEO_PRESS_PLAY_OFF	| VIDEO_PRESS_PLAY_ON)
-#define VIDEO_PRESS_REC_ON	(1L<<12)
-#define VIDEO_PRESS_REC_OFF	(1L<<13)
-#define VIDEO_PRESS_REC		(VIDEO_PRESS_REC_OFF	| VIDEO_PRESS_REC_ON)
-#define VIDEO_PRESS_PAUSE_ON	(1L<<14)
-#define VIDEO_PRESS_PAUSE_OFF	(1L<<15)
-#define VIDEO_PRESS_PAUSE	(VIDEO_PRESS_PAUSE_OFF	| VIDEO_PRESS_PAUSE_ON)
-#define VIDEO_PRESS_STOP_ON	(1L<<16)
-#define VIDEO_PRESS_STOP_OFF	(1L<<17)
-#define VIDEO_PRESS_STOP	(VIDEO_PRESS_STOP_OFF	| VIDEO_PRESS_STOP_ON)
-#define VIDEO_PRESS_EJECT_ON	(1L<<18)
-#define VIDEO_PRESS_EJECT_OFF	(1L<<19)
-#define VIDEO_PRESS_EJECT	(VIDEO_PRESS_EJECT_OFF	| VIDEO_PRESS_EJECT_ON)
-
-#define BUTTON_VIDEO_EJECT	1
-#define BUTTON_VIDEO_STOP	2
-#define BUTTON_VIDEO_PAUSE	3
-#define BUTTON_VIDEO_REC	4
-#define BUTTON_VIDEO_PLAY	5
-
-#define VIDEO_STATE_OFF		(VIDEO_STATE_PLAY_OFF	|	\
-				 VIDEO_STATE_REC_OFF	|	\
-				 VIDEO_STATE_PAUSE_OFF	|	\
-				 VIDEO_STATE_DATE_OFF	|	\
-				 VIDEO_STATE_TIME_OFF)
-#define VIDEO_PRESS_OFF		(VIDEO_PRESS_PLAY_OFF	|	\
-				 VIDEO_PRESS_REC_OFF	|	\
-				 VIDEO_PRESS_PAUSE_OFF	|	\
-				 VIDEO_PRESS_STOP_OFF	|	\
-				 VIDEO_PRESS_EJECT_OFF)
-#define VIDEO_ALL_OFF		(VIDEO_STATE_OFF | VIDEO_PRESS_OFF)
-
-#define VIDEO_STATE_ON		(VIDEO_STATE_PLAY_ON	|	\
-				 VIDEO_STATE_REC_ON	|	\
-				 VIDEO_STATE_PAUSE_ON	|	\
-				 VIDEO_STATE_DATE_ON	|	\
-				 VIDEO_STATE_TIME_ON)
-#define VIDEO_PRESS_ON		(VIDEO_PRESS_PLAY_ON	|	\
-				 VIDEO_PRESS_REC_ON	|	\
-				 VIDEO_PRESS_PAUSE_ON	|	\
-				 VIDEO_PRESS_STOP_ON	|	\
-				 VIDEO_PRESS_EJECT_ON)
-#define VIDEO_ALL_ON		(VIDEO_STATE_ON | VIDEO_PRESS_ON)
-
-#define VIDEO_STATE		(VIDEO_STATE_ON | VIDEO_STATE_OFF)
-#define VIDEO_PRESS		(VIDEO_PRESS_ON | VIDEO_PRESS_OFF)
-#define VIDEO_ALL		(VIDEO_ALL_ON | VIDEO_ALL_OFF)
-
-/* some positions in the sound control window */
-#define SOUND_BUTTON_XSIZE	30
-#define SOUND_BUTTON_YSIZE	30
-#define SOUND_CONTROL_XPOS	5
-#define SOUND_CONTROL_YPOS	245
-#define SOUND_CONTROL_XSIZE	90
-#define SOUND_CONTROL_YSIZE	(SOUND_BUTTON_YSIZE)
-#define SOUND_BUTTON_MUSIC_XPOS	(SOUND_CONTROL_XPOS + 0 * SOUND_BUTTON_XSIZE)
-#define SOUND_BUTTON_LOOPS_XPOS	(SOUND_CONTROL_XPOS + 1 * SOUND_BUTTON_XSIZE)
-#define SOUND_BUTTON_SOUND_XPOS	(SOUND_CONTROL_XPOS + 2 * SOUND_BUTTON_XSIZE)
-#define SOUND_BUTTON_ANY_YPOS	(SOUND_CONTROL_YPOS)
-
-#define ON_SOUND_BUTTON(x,y)	((x)>=(DX+SOUND_CONTROL_XPOS) &&	\
-				 (x)< (DX+SOUND_CONTROL_XPOS +		\
-				       SOUND_CONTROL_XSIZE) &&		\
-				 (y)>=(DY+SOUND_CONTROL_YPOS) &&	\
-				 (y)< (DY+SOUND_CONTROL_YPOS +		\
-				       SOUND_CONTROL_YSIZE))
-#define SOUND_BUTTON(x)		(((x)-(DX+SOUND_CONTROL_XPOS))/SOUND_BUTTON_XSIZE)
-
-/* values for sound control */
-#define BUTTON_SOUND_MUSIC	(1L<<0)
-#define BUTTON_SOUND_LOOPS	(1L<<1)
-#define BUTTON_SOUND_SOUND	(1L<<2)
-#define BUTTON_RELEASED		0
-#define BUTTON_PRESSED		(1L<<3)
-#define BUTTON_OFF		0
-#define BUTTON_ON		(1L<<4)
-#define BUTTON_SOUND_MUSIC_OFF	(BUTTON_SOUND_MUSIC | BUTTON_OFF)
-#define BUTTON_SOUND_LOOPS_OFF	(BUTTON_SOUND_LOOPS | BUTTON_OFF)
-#define BUTTON_SOUND_SOUND_OFF	(BUTTON_SOUND_SOUND | BUTTON_OFF)
-#define BUTTON_SOUND_MUSIC_ON	(BUTTON_SOUND_MUSIC | BUTTON_ON)
-#define BUTTON_SOUND_LOOPS_ON	(BUTTON_SOUND_LOOPS | BUTTON_ON)
-#define BUTTON_SOUND_SOUND_ON	(BUTTON_SOUND_SOUND | BUTTON_ON)
-
-/* some positions in the game control window */
-#define GAME_BUTTON_XSIZE	30
-#define GAME_BUTTON_YSIZE	30
-#define GAME_CONTROL_XPOS	5
-#define GAME_CONTROL_YPOS	215
-#define GAME_CONTROL_XSIZE	90
-#define GAME_CONTROL_YSIZE	(GAME_BUTTON_YSIZE)
-#define GAME_BUTTON_STOP_XPOS	(GAME_CONTROL_XPOS + 0 * GAME_BUTTON_XSIZE)
-#define GAME_BUTTON_PAUSE_XPOS	(GAME_CONTROL_XPOS + 1 * GAME_BUTTON_XSIZE)
-#define GAME_BUTTON_PLAY_XPOS	(GAME_CONTROL_XPOS + 2 * GAME_BUTTON_XSIZE)
-#define GAME_BUTTON_ANY_YPOS	(GAME_CONTROL_YPOS)
-
-#define ON_GAME_BUTTON(x,y)	((x)>=(DX+GAME_CONTROL_XPOS) &&	\
-				 (x)< (DX+GAME_CONTROL_XPOS +		\
-				       GAME_CONTROL_XSIZE) &&		\
-				 (y)>=(DY+GAME_CONTROL_YPOS) &&	\
-				 (y)< (DY+GAME_CONTROL_YPOS +		\
-				       GAME_CONTROL_YSIZE))
-#define GAME_BUTTON(x)		(((x)-(DX+GAME_CONTROL_XPOS))/GAME_BUTTON_XSIZE)
-
-/* values for game control */
-#define BUTTON_GAME_STOP	(1L<<0)
-#define BUTTON_GAME_PAUSE	(1L<<1)
-#define BUTTON_GAME_PLAY	(1L<<2)
-
-/* some positions in the asking window */
-#define OK_BUTTON_XPOS		2
-#define OK_BUTTON_YPOS		250
-#define OK_BUTTON_GFX_YPOS	0
-#define OK_BUTTON_XSIZE		46
-#define OK_BUTTON_YSIZE		28
-#define NO_BUTTON_XPOS		52
-#define NO_BUTTON_YPOS		OK_BUTTON_YPOS
-#define NO_BUTTON_XSIZE		OK_BUTTON_XSIZE
-#define NO_BUTTON_YSIZE		OK_BUTTON_YSIZE
-#define CONFIRM_BUTTON_XPOS	2
-#define CONFIRM_BUTTON_GFX_YPOS	30
-#define CONFIRM_BUTTON_YPOS	OK_BUTTON_YPOS
-#define CONFIRM_BUTTON_XSIZE	96
-#define CONFIRM_BUTTON_YSIZE	OK_BUTTON_YSIZE
-
-#define ON_CHOOSE_BUTTON(x,y)	(((x)>=(DX+OK_BUTTON_XPOS) &&		\
-				  (x)< (DX+OK_BUTTON_XPOS +		\
-					OK_BUTTON_XSIZE) &&		\
-				  (y)>=(DY+OK_BUTTON_YPOS) &&		\
-				  (y)< (DY+OK_BUTTON_YPOS +		\
-					OK_BUTTON_YSIZE)) ||		\
-				 ((x)>=(DX+NO_BUTTON_XPOS) &&		\
-				  (x)< (DX+NO_BUTTON_XPOS +		\
-					NO_BUTTON_XSIZE) &&		\
-				  (y)>=(DY+NO_BUTTON_YPOS) &&		\
-				  (y)< (DY+NO_BUTTON_YPOS +		\
-					NO_BUTTON_YSIZE)))
-#define ON_CONFIRM_BUTTON(x,y)	(((x)>=(DX+CONFIRM_BUTTON_XPOS) &&	\
-				  (x)< (DX+CONFIRM_BUTTON_XPOS +	\
-					CONFIRM_BUTTON_XSIZE) &&	\
-				  (y)>=(DY+CONFIRM_BUTTON_YPOS) &&	\
-				  (y)< (DY+CONFIRM_BUTTON_YPOS +	\
-					CONFIRM_BUTTON_YSIZE)))
-#define CHOOSE_BUTTON(x)	(((x)-(DX+OK_BUTTON_XPOS))/OK_BUTTON_XSIZE)
-
-/* values for asking control */
-#define BUTTON_OK		(1L<<0)
-#define BUTTON_NO		(1L<<1)
-#define BUTTON_CONFIRM		(1L<<2)
 
 #endif

@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  events.c                                                *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "events.h"
@@ -19,6 +17,7 @@
 #include "tools.h"
 #include "game.h"
 #include "editor.h"
+#include "misc.h"
 
 void EventLoop(void)
 {
@@ -66,6 +65,8 @@ void EventLoop(void)
     else			/* got no event, but don't be lazy... */
     {
       HandleNoXEvent();
+
+      XSync(display,FALSE);
 
       if (game_status!=PLAYING)
 	Delay(10000);		/* don't use all CPU time when idle */
@@ -658,7 +659,7 @@ void HandleJoystick()
 	break;
       }
 
-      if ((GameOver || LevelSolved) && newbutton)
+      if (GameOver && newbutton)
       {
 	CloseDoor(DOOR_CLOSE_1);
 	game_status = MAINMENU;

@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  game.c                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "game.h"
@@ -20,620 +18,8 @@
 #include "screens.h"
 #include "sound.h"
 #include "init.h"
-
-BOOL CreateNewScoreFile()
-{
-  int i,j,k;
-  char filename[MAX_FILENAME];
-  char empty_alias[MAX_NAMELEN];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
-
-  if (!(file=fopen(filename,"w")))
-    return(FALSE);
-
-  for(i=0;i<MAX_NAMELEN;i++)
-    empty_alias[i] = 0;
-  strncpy(empty_alias,EMPTY_ALIAS,MAX_NAMELEN-1);
-
-  fputs(SCORE_COOKIE,file);		/* Formatkennung */
-  for(i=0;i<LEVELDIR_SIZE(leveldir[leveldir_nr]);i++)
-  {
-    for(j=0;j<MAX_SCORE_ENTRIES;j++)
-    {
-      for(k=0;k<MAX_NAMELEN;k++)
-	fputc(empty_alias[k],file);
-      fputc(0,file);
-      fputc(0,file);
-    }
-  }
-  fclose(file);
-
-  chmod(filename, SCORE_PERMS);
-  return(TRUE);
-}
-
-BOOL CreateNewNamesFile(int mode)
-{
-  char filename[MAX_FILENAME];
-  FILE *file;
-
-  if (mode==PLAYER_LEVEL)
-    sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
-  else
-    sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
-
-  if (!(file=fopen(filename,"w")))
-    return(FALSE);
-
-  fputs(NAMES_COOKIE,file);		/* Formatkennung */
-  fclose(file);
-
-  chmod(filename, NAMES_PERMS);
-  return(TRUE);
-}
-
-void LoadLevelInfo()
-{
-  int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s",LEVEL_PATH,LEVDIR_FILENAME);
-
-  if (!(file=fopen(filename,"r")))
-  {
-    fprintf(stderr,"%s: cannot load level info '%s'!\n",progname,filename);
-    CloseAll();
-  }
-
-  fscanf(file,"%s\n",cookie);
-  if (strcmp(cookie,LEVELDIR_COOKIE))	/* ungültiges Format? */
-  {
-    fprintf(stderr,"%s: wrong format of level info file!\n",progname);
-    fclose(file);
-    CloseAll();
-  }
-
-  num_leveldirs = 0;
-  leveldir_nr = 0;
-  for(i=0;i<MAX_LEVDIR_ENTRIES;i++)
-  {
-    fscanf(file,"%s",leveldir[i].filename);
-    fscanf(file,"%s",leveldir[i].name);
-    fscanf(file,"%d",&leveldir[i].num_ready);
-    fscanf(file,"%d",&leveldir[i].num_free);
-    if (feof(file))
-      break;
-
-    num_leveldirs++;
-  }
-
-  if (!num_leveldirs)
-  {
-    fprintf(stderr,"%s: empty level info '%s'!\n",progname,filename);
-    CloseAll();
-  }
-}
-
-void LoadLevel(int level_nr)
-{
-  int i,x,y;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%d",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
-
-  if (!(file=fopen(filename,"r")))
-  {
-/*
-    fprintf(stderr,"%s: cannot load level '%s'!\n",progname,filename);
-*/
-  }
-  else
-  {
-    fgets(cookie,LEVEL_COOKIE_LEN,file);
-    fgetc(file);
-    if (strcmp(cookie,LEVEL_COOKIE))	/* ungültiges Format? */
-    {
-      fprintf(stderr,"%s: wrong format of level file '%s'!\n",
-	      progname,filename);
-      fclose(file);
-      file = NULL;
-    }
-  }
-
-  if (file)
-  {
-    lev_fieldx = level.fieldx = fgetc(file);
-    lev_fieldy = level.fieldy = fgetc(file);
-
-    level.time		= (fgetc(file)<<8) | fgetc(file);
-    level.edelsteine	= (fgetc(file)<<8) | fgetc(file);
-    for(i=0;i<MAX_LEVNAMLEN;i++)
-      level.name[i]	= fgetc(file);
-    for(i=0;i<MAX_SC_ENTRIES;i++)
-      level.score[i]	= fgetc(file);
-    for(i=0;i<4;i++)
-      for(y=0;y<3;y++)
-	for(x=0;x<3;x++)
-	  level.mampfer_inhalt[i][x][y] = fgetc(file);
-    level.tempo_amoebe	= fgetc(file);
-    level.dauer_sieb	= fgetc(file);
-    level.dauer_ablenk	= fgetc(file);
-
-    for(i=0;i<19;i++)	/* Rest reserviert / Headergröße 80 Bytes */
-      fgetc(file);
-
-    for(y=0;y<lev_fieldy;y++) 
-      for(x=0;x<lev_fieldx;x++) 
-	Feld[x][y] = Ur[x][y] = fgetc(file);
-
-    fclose(file);
-
-    if (level.time<=10)	/* Mindestspieldauer */
-      level.time = 10;
-  }
-  else
-  {
-    lev_fieldx = level.fieldx = STD_LEV_FIELDX;
-    lev_fieldy = level.fieldy = STD_LEV_FIELDY;
-
-    level.time		= 100;
-    level.edelsteine	= 0;
-    strncpy(level.name,"Nameless Level",MAX_LEVNAMLEN-1);
-    for(i=0;i<MAX_SC_ENTRIES;i++)
-      level.score[i]	= 10;
-    for(i=0;i<4;i++)
-      for(y=0;y<3;y++)
-	for(x=0;x<3;x++)
-	  level.mampfer_inhalt[i][x][y] = EL_FELSBROCKEN;
-    level.tempo_amoebe	= 10;
-    level.dauer_sieb	= 10;
-    level.dauer_ablenk	= 10;
-
-    for(y=0;y<STD_LEV_FIELDY;y++) 
-      for(x=0;x<STD_LEV_FIELDX;x++) 
-	Feld[x][y] = Ur[x][y] = EL_ERDREICH;
-    Feld[0][0] = Ur[0][0] = EL_SPIELFIGUR;
-    Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
-      Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_AUSGANG_ZU;
-  }
-}
-
-void LoadLevelTape(int level_nr)
-{
-  int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%d.tape",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
-
-  if ((file=fopen(filename,"r")))
-  {
-    fgets(cookie,LEVELREC_COOKIE_LEN,file);
-    fgetc(file);
-    if (strcmp(cookie,LEVELREC_COOKIE))	/* ungültiges Format? */
-    {
-      fprintf(stderr,"%s: wrong format of level recording file '%s'!\n",
-	      progname,filename);
-      fclose(file);
-      file = NULL;
-    }
-  }
-
-  if (!file)
-    return;
-
-  tape.random_seed =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-  tape.date =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-  tape.length =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-
-  tape.level_nr = level_nr;
-  tape.counter = 0;
-  tape.recording = FALSE;
-  tape.playing = FALSE;
-  tape.pausing = FALSE;
-
-  for(i=0;i<tape.length;i++)
-  {
-    if (i>=MAX_TAPELEN)
-      break;
-    tape.pos[i].joystickdata = fgetc(file);
-    tape.pos[i].delay        = fgetc(file);
-    if (feof(file))
-      break;
-  }
-
-  if (i != tape.length)
-    fprintf(stderr,"%s: level recording file '%s' corrupted!\n",
-	    progname,filename);
-
-  fclose(file);
-
-  master_tape = tape;
-}
-
-void LoadScore(int level_nr)
-{
-  int i,j;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
-
-  if (!(file=fopen(filename,"r")))
-  {
-    if (!CreateNewScoreFile())
-    {
-      fprintf(stderr,"%s: cannot create score file '%s'!\n",
-	      progname,filename);
-    }
-    else if (!(file=fopen(filename,"r"))) 
-    {
-      fprintf(stderr,"%s: cannot load score for level %d!\n",
-	      progname,level_nr);
-    }
-  }
-
-  if (file)
-  {
-    fgets(cookie,SCORE_COOKIE_LEN,file);
-    if (strcmp(cookie,SCORE_COOKIE))	/* ungültiges Format? */
-    {
-      fprintf(stderr,"%s: wrong format of score file!\n",progname);
-      fclose(file);
-      file = NULL;
-    }
-  }
-
-  if (file)
-  {
-    fseek(file,
-	  SCORE_COOKIE_LEN-1+level_nr*(MAX_SCORE_ENTRIES*(MAX_NAMELEN+2)),
-	  SEEK_SET);
-    for(i=0;i<MAX_SCORE_ENTRIES;i++)
-    {
-      for(j=0;j<MAX_NAMELEN;j++)
-	highscore[i].Name[j] = fgetc(file);
-      highscore[i].Score = (fgetc(file)<<8) | fgetc(file);
-    }
-    fclose(file);
-  }
-  else
-  {
-    for(i=0;i<MAX_SCORE_ENTRIES;i++)
-    {
-      strcpy(highscore[i].Name,EMPTY_ALIAS);
-      highscore[i].Score = 0;
-    }
-  }
-}
-
-void LoadPlayerInfo(int mode)
-{
-  int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-  char *login_name = GetLoginName();
-  struct PlayerInfo default_player, new_player;
-
-  if (mode==PLAYER_LEVEL)
-    sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
-  else
-    sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
-
-  for(i=0;i<MAX_NAMELEN;i++)
-    default_player.login_name[i] = default_player.alias_name[i] = 0;
-  strncpy(default_player.login_name,login_name,MAX_NAMELEN-1);
-  strncpy(default_player.alias_name,login_name,MAX_NAMELEN-1);
-  default_player.handicap = 0;
-  default_player.setup = DEFAULT_SETUP;
-  default_player.leveldir_nr = 0;
-
-  new_player = default_player;
-
-  if (!(file=fopen(filename,"r")))
-  {
-    if (!CreateNewNamesFile(mode))
-    {
-      fprintf(stderr,"%s: cannot create names file '%s'!\n",
-	      progname,filename);
-    }
-    else if (!(file=fopen(filename,"r"))) 
-    {
-      fprintf(stderr,"%s: cannot load player information '%s'!\n",
-	      progname,filename);
-    }
-  }
-
-  if (file)
-  {
-    fgets(cookie,NAMES_COOKIE_LEN,file);
-    if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
-    {
-      fprintf(stderr,"%s: wrong format of names file '%s'!\n",
-	      progname,filename);
-      fclose(file);
-      file = NULL;
-    }
-  }
-
-  if (!file)
-  {
-    player = default_player;
-    level_nr = default_player.handicap;
-    return;
-  }
-
-  while(1)
-  {
-    for(i=0;i<MAX_NAMELEN;i++)
-      new_player.login_name[i] = fgetc(file);
-    for(i=0;i<MAX_NAMELEN;i++)
-      new_player.alias_name[i] = fgetc(file);
-    new_player.handicap = fgetc(file);
-    new_player.setup = (fgetc(file)<<8) | fgetc(file);
-    new_player.leveldir_nr = fgetc(file);
-
-    if (feof(file))		/* Spieler noch nicht in Liste enthalten */
-    {
-      new_player = default_player;
-
-      fclose(file);
-      if (!(file=fopen(filename,"a")))
-      {
-	fprintf(stderr,"%s: cannot append new player to names file '%s'!\n",
-		progname,filename);
-      }
-      else
-      {
-	for(i=0;i<MAX_NAMELEN;i++)
-	  fputc(new_player.login_name[i],file);
-	for(i=0;i<MAX_NAMELEN;i++)
-	  fputc(new_player.alias_name[i],file);
-	fputc(new_player.handicap,file);
-	fputc(new_player.setup / 256,file);
-	fputc(new_player.setup % 256,file);
-	fputc(new_player.leveldir_nr,file);
-      }
-      break;
-    }
-    else			/* prüfen, ob Spieler in Liste enthalten */
-      if (!strncmp(new_player.login_name,login_name,MAX_NAMELEN-1))
-	break;
-  }
-
-  if (mode==PLAYER_SETUP)
-  {
-    player = new_player;
-    if (player.leveldir_nr < num_leveldirs)
-      leveldir_nr = player.leveldir_nr;
-    else
-      leveldir_nr = 0;
-  }
-  else
-    player.handicap = new_player.handicap;
-
-  level_nr = player.handicap;
-  fclose(file);
-}
-
-void SaveLevel(int level_nr)
-{
-  int i,x,y;
-  char filename[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%d",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
-
-  if (!(file=fopen(filename,"w")))
-  {
-    fprintf(stderr,"%s: cannot save level file '%s'!\n",progname,filename);
-    return;
-  }
-
-  fputs(LEVEL_COOKIE,file);		/* Formatkennung */
-  fputc(0x0a,file);
-
-  fputc(level.fieldx,file);
-  fputc(level.fieldy,file);
-  fputc(level.time / 256,file);
-  fputc(level.time % 256,file);
-  fputc(level.edelsteine / 256,file);
-  fputc(level.edelsteine % 256,file);
-
-  for(i=0;i<MAX_LEVNAMLEN;i++)
-    fputc(level.name[i],file);
-  for(i=0;i<MAX_SC_ENTRIES;i++)
-    fputc(level.score[i],file);
-  for(i=0;i<4;i++)
-    for(y=0;y<3;y++)
-      for(x=0;x<3;x++)
-	fputc(level.mampfer_inhalt[i][x][y],file);
-  fputc(level.tempo_amoebe,file);
-  fputc(level.dauer_sieb,file);
-  fputc(level.dauer_ablenk,file);
-
-  for(i=0;i<19;i++)	/* Rest reserviert / Headergröße 80 Bytes */
-    fputc(0,file);
-
-  for(y=0;y<lev_fieldy;y++) 
-    for(x=0;x<lev_fieldx;x++) 
-      fputc(Ur[x][y],file);
-
-  fclose(file);
-
-  chmod(filename, LEVEL_PERMS);
-}
-
-void SaveLevelTape(int level_nr)
-{
-  int i;
-  char filename[MAX_FILENAME];
-  FILE *file;
-  BOOL new_tape = TRUE;
-
-  sprintf(filename,"%s/%s/%d.tape",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
-
-  /* Testen, ob bereits eine Aufnahme existiert */
-  if ((file=fopen(filename,"r")))
-  {
-    new_tape = FALSE;
-    fclose(file);
-
-    if (!AreYouSure("Replace old tape ?",AYS_ASK))
-      return;
-  }
-
-  if (!(file=fopen(filename,"w")))
-  {
-    fprintf(stderr,"%s: cannot save level recording file '%s'!\n",
-	    progname,filename);
-    return;
-  }
-
-  fputs(LEVELREC_COOKIE,file);		/* Formatkennung */
-  fputc(0x0a,file);
-
-  tape = master_tape;
-
-  fputc((tape.random_seed >> 24) & 0xff,file);
-  fputc((tape.random_seed >> 16) & 0xff,file);
-  fputc((tape.random_seed >>  8) & 0xff,file);
-  fputc((tape.random_seed >>  0) & 0xff,file);
-
-  fputc((tape.date >>  24) & 0xff,file);
-  fputc((tape.date >>  16) & 0xff,file);
-  fputc((tape.date >>   8) & 0xff,file);
-  fputc((tape.date >>   0) & 0xff,file);
-
-  fputc((tape.length >>  24) & 0xff,file);
-  fputc((tape.length >>  16) & 0xff,file);
-  fputc((tape.length >>   8) & 0xff,file);
-  fputc((tape.length >>   0) & 0xff,file);
-
-  for(i=0;i<tape.length;i++)
-  {
-    fputc(tape.pos[i].joystickdata,file);
-    fputc(tape.pos[i].delay,file);
-  }
-
-  fclose(file);
-
-  chmod(filename, LEVREC_PERMS);
-
-  if (new_tape)
-    AreYouSure("tape saved !",AYS_CONFIRM);
-}
-
-void SaveScore(int level_nr)
-{
-  int i,j;
-  char filename[MAX_FILENAME];
-  FILE *file;
-
-  sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
-
-  if (!(file=fopen(filename,"r+")))
-  {
-    fprintf(stderr,"%s: cannot save score for level %d!\n",
-	    progname,level_nr);
-    return;
-  }
-
-  fseek(file,
-	SCORE_COOKIE_LEN-1+level_nr*(MAX_SCORE_ENTRIES*(MAX_NAMELEN+2)),
-	SEEK_SET);
-  for(i=0;i<MAX_SCORE_ENTRIES;i++)
-  {
-    for(j=0;j<MAX_NAMELEN;j++)
-      fputc(highscore[i].Name[j],file);
-    fputc(highscore[i].Score / 256,file);
-    fputc(highscore[i].Score % 256,file);
-  }
-  fclose(file);
-}
-
-void SavePlayerInfo(int mode)
-{
-  int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
-  FILE *file;
-  struct PlayerInfo default_player;
-
-  if (mode==PLAYER_LEVEL)
-    sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
-  else
-    sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
-
-  if (!(file=fopen(filename,"r+")))
-  {
-    fprintf(stderr,"%s: cannot save player information '%s'!\n",
-	    progname,filename);
-    return;
-  }
-
-  fgets(cookie,NAMES_COOKIE_LEN,file);
-  if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
-  {
-    fprintf(stderr,"%s: wrong format of names file '%s'!\n",
-	    progname,filename);
-    fclose(file);
-    return;
-  }
-
-  while(1)
-  {
-    for(i=0;i<MAX_NAMELEN;i++)
-      default_player.login_name[i] = fgetc(file);
-    for(i=0;i<MAX_NAMELEN;i++)
-      default_player.alias_name[i] = fgetc(file);
-    default_player.handicap = fgetc(file);
-    default_player.setup = (fgetc(file)<<8) | fgetc(file);
-    default_player.leveldir_nr = fgetc(file);
-
-    if (feof(file))		/* Spieler noch nicht in Liste enthalten */
-      break;
-    else			/* prüfen, ob Spieler in Liste enthalten */
-      if (!strncmp(default_player.login_name,player.login_name,MAX_NAMELEN-1))
-      {
-	fseek(file,-(2*MAX_NAMELEN+1+2+1),SEEK_CUR);
-	break;
-      }
-  }
-
-  for(i=0;i<MAX_NAMELEN;i++)
-    fputc(player.login_name[i],file);
-  for(i=0;i<MAX_NAMELEN;i++)
-    fputc(player.alias_name[i],file);
-  fputc(player.handicap,file);
-  fputc(player.setup / 256,file);
-  fputc(player.setup % 256,file);
-  fputc(player.leveldir_nr,file);
-
-  fclose(file);
-}
+#include "buttons.h"
+#include "files.h"
 
 void GetPlayerConfig()
 {
@@ -655,6 +41,7 @@ void GetPlayerConfig()
   fading_on = SETUP_FADING_ON(player.setup);
   autorecord_on = SETUP_RECORD_EACH_GAME_ON(player.setup);
   joystick_nr = SETUP_2ND_JOYSTICK_ON(player.setup);
+  quick_doors = SETUP_QUICK_DOORS_ON(player.setup);
 
   if (joystick_nr != old_joystick_nr)
   {
@@ -666,7 +53,7 @@ void GetPlayerConfig()
 
 void InitGame()
 {
-  int x,y;
+  int i,x,y;
 
   Dynamite = Score = 0;
   Gems = level.edelsteine;
@@ -687,11 +74,14 @@ void InitGame()
   DigField(0,0,DF_NO_PUSH);
   SnapField(0,0);
 
+  for(i=0;i<MAX_NUM_AMOEBA;i++)
+    AmoebaCnt[i] = 0;
+
   for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
   {
-    Feld[x][y]=Ur[x][y];
-    MovPos[x][y]=MovDir[x][y]=MovDelay[x][y]=0;
-    Store[x][y]=Store2[x][y]=Frame[x][y]=0;
+    Feld[x][y] = Ur[x][y];
+    MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
+    Store[x][y] = Store2[x][y] = Frame[x][y] = AmoebaNr[x][y] = 0;
 
     switch(Feld[x][y])
     {
@@ -734,6 +124,16 @@ void InitGame()
       case EL_ZOMBIE:
       case EL_PACMAN:
 	InitMovDir(x,y);
+	break;
+      case EL_AMOEBE_VOLL:
+	InitAmoebaNr(x,y);
+	break;
+      case EL_TROPFEN:
+	if (y==lev_fieldy-1)
+	{
+	  Feld[x][y] = EL_AMOEBING;
+	  Store[x][y] = EL_AMOEBE_NASS;
+	}
 	break;
       default:
 	break;
@@ -860,6 +260,27 @@ void InitMovDir(int x, int y)
   }
 }
 
+void InitAmoebaNr(int x, int y)
+{
+  int i;
+  int group_nr = AmoebeNachbarNr(x,y);
+
+  if (group_nr==0)
+  {
+    for(i=1;i<MAX_NUM_AMOEBA;i++)
+    {
+      if (AmoebaCnt[i]==0)
+      {
+	group_nr = i;
+	break;
+      }
+    }
+  }
+
+  AmoebaNr[x][y] = group_nr;
+  AmoebaCnt[group_nr]++;
+}
+
 void GameWon()
 {
   int hi_pos;
@@ -958,12 +379,13 @@ BOOL NewHiScore()
       position = k;
       break;
     }
-  }
 
 #ifdef ONE_PER_NAME
-  else if (!strcmp(player.alias_name,highscore[k].Name))
-    break;	/* Spieler schon mit besserer Punktzahl in der Liste */
+    else if (!strcmp(player.alias_name,highscore[k].Name))
+      break;	/* Spieler schon mit besserer Punktzahl in der Liste */
 #endif
+
+  }
 
   if (position>=0) 
     SaveScore(level_nr);
@@ -1123,6 +545,9 @@ void Explode(int ex, int ey, int phase)
       if (!IN_LEV_FIELD(x,y) || IS_MASSIV(element))
 	continue;
 
+      if (center_element==EL_AMOEBA2DIAM && (x!=ex || y!=ey))
+	continue;
+
       if (element==EL_EXPLODING)
 	element = Store2[x][y];
 
@@ -1130,19 +555,25 @@ void Explode(int ex, int ey, int phase)
 	Store[x][y] = ((x==ex && y==ey) ? EL_DIAMANT : EL_EDELSTEIN);
       else if (center_element==EL_MAMPFER)
 	Store[x][y] = level.mampfer_inhalt[MampferNr][x-ex+1][y-ey+1];
-      else if (Feld[x][y]==EL_ERZ_1)
+      else if (center_element==EL_AMOEBA2DIAM)
+	Store[x][y] = level.amoebe_inhalt;
+      else if (element==EL_ERZ_EDEL)
 	Store[x][y] = EL_EDELSTEIN;
-      else if (Feld[x][y]==EL_ERZ_2)
+      else if (element==EL_ERZ_DIAM)
 	Store[x][y] = EL_DIAMANT;
       else if (!IS_PFORTE(Store[x][y]))
 	Store[x][y] = EL_LEERRAUM;
 
-      if (x!=ex || y!=ey)
+      if (x!=ex || y!=ey || center_element==EL_AMOEBA2DIAM)
 	Store2[x][y] = element;
+
+      if (AmoebaNr[x][y] && (element==EL_AMOEBE_VOLL || element==EL_AMOEBING))
+	AmoebaCnt[AmoebaNr[x][y]]--;
 
       RemoveMovingField(x,y);
       Feld[x][y] = EL_EXPLODING;
       MovDir[x][y] = MovPos[x][y] = 0;
+      AmoebaNr[x][y] = 0;
       Frame[x][y] = 1;
       Stop[x][y] = TRUE;
     }
@@ -1176,6 +607,8 @@ void Explode(int ex, int ey, int phase)
       Store2[x][y] = 0;
       Bang(x,y);
     }
+    else if (element==EL_AMOEBA2DIAM)
+      AmoebeUmwandeln(x,y);
   }
 
   if (phase==last_phase)
@@ -1307,7 +740,10 @@ void Impact(int x, int y)
     if (object_hit && PLAYER(x,y+1))
       KillHero();
     else
-      Feld[x][y] = EL_AMOEBING2;
+    {
+      Feld[x][y] = EL_AMOEBING;
+      Store[x][y] = EL_AMOEBE_NASS;
+    }
     return;
   }
 
@@ -1379,6 +815,10 @@ void Impact(int x, int y)
       case EL_SCHLUESSEL3:
       case EL_SCHLUESSEL4:
 	sound = SND_KINK;
+	break;
+      case EL_ZEIT_VOLL:
+      case EL_ZEIT_LEER:
+	sound = SND_DENG;
 	break;
       default:
 	sound = -1;
@@ -1623,9 +1063,10 @@ void StartMoving(int x, int y)
     }
     else if (element==EL_TROPFEN)
     {
-      Feld[x][y] = EL_AMOEBING2;
+      Feld[x][y] = EL_AMOEBING;
+      Store[x][y] = EL_AMOEBE_NASS;
     }
-    else if (SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
+    else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
     {
       int left  = (x>0 && IS_FREE(x-1,y) &&
 		   (IS_FREE(x-1,y+1) || Feld[x-1][y+1]==EL_SALZSAEURE));
@@ -1701,12 +1142,20 @@ void StartMoving(int x, int y)
     else if (element==EL_MAMPFER && IN_LEV_FIELD(newx,newy) &&
 	     Feld[newx][newy]==EL_DIAMANT)
     {
-      Feld[newx][newy] = EL_LEERRAUM;
-      DrawLevelField(newx,newy);
+      if (IS_MOVING(newx,newy))
+	RemoveMovingField(newx,newy);
+      else
+      {
+	Feld[newx][newy] = EL_LEERRAUM;
+	DrawLevelField(newx,newy);
+      }
     }
     else if (element==EL_PACMAN && IN_LEV_FIELD(newx,newy) &&
 	     IS_AMOEBOID(Feld[newx][newy]))
     {
+      if (AmoebaNr[newx][newy] && Feld[newx][newy]==EL_AMOEBE_VOLL)
+	AmoebaCnt[AmoebaNr[newx][newy]]--;
+
       Feld[newx][newy] = EL_LEERRAUM;
       DrawLevelField(newx,newy);
     }
@@ -1782,10 +1231,10 @@ void ContinueMoving(int x, int y)
       Feld[newx][newy] = EL_SALZSAEURE;
       element = EL_SALZSAEURE;
     }
-    else if (Store[x][y]==EL_AMOEBE2)
+    else if (Store[x][y]==EL_AMOEBE_NASS)
     {
       Store[x][y] = 0;
-      Feld[x][y] = EL_AMOEBE2;
+      Feld[x][y] = EL_AMOEBE_NASS;
     }
 
     MovPos[x][y] = MovDir[x][y] = 0;
@@ -1816,6 +1265,112 @@ void ContinueMoving(int x, int y)
   }
 }
 
+int AmoebeNachbarNr(int ax, int ay)
+{
+  int i;
+  int element = Feld[ax][ay];
+  int group_nr = 0;
+  static int xy[4][2] =
+  {
+    0,-1,
+    -1,0,
+    +1,0,
+    0,+1
+  };
+
+  for(i=0;i<4;i++)
+  {
+    int x = ax+xy[i%4][0];
+    int y = ay+xy[i%4][1];
+
+    if (!IN_LEV_FIELD(x,y))
+      continue;
+
+    if (Feld[x][y]==element && AmoebaNr[x][y]>0)
+      group_nr = AmoebaNr[x][y];
+  }
+
+  return(group_nr);
+}
+
+void AmoebenVereinigen(int ax, int ay)
+{
+  int i,x,y,xx,yy;
+  int new_group_nr = AmoebaNr[ax][ay];
+  static int xy[4][2] =
+  {
+    0,-1,
+    -1,0,
+    +1,0,
+    0,+1
+  };
+
+  if (!new_group_nr)
+    return;
+
+  for(i=0;i<4;i++)
+  {
+    x = ax+xy[i%4][0];
+    y = ay+xy[i%4][1];
+
+    if (!IN_LEV_FIELD(x,y))
+      continue;
+
+    if ((Feld[x][y]==EL_AMOEBE_VOLL || Feld[x][y]==EL_AMOEBE_TOT) &&
+	AmoebaNr[x][y] != new_group_nr)
+    {
+      int old_group_nr = AmoebaNr[x][y];
+
+      AmoebaCnt[new_group_nr] += AmoebaCnt[old_group_nr];
+      AmoebaCnt[old_group_nr] = 0;
+
+      for(yy=0;yy<lev_fieldy;yy++) for(xx=0;xx<lev_fieldx;xx++)
+	if (AmoebaNr[xx][yy]==old_group_nr)
+	  AmoebaNr[xx][yy] = new_group_nr;
+    }
+  }
+}
+
+void AmoebeUmwandeln(int ax, int ay)
+{
+  int i,x,y;
+  int group_nr = AmoebaNr[ax][ay];
+  static int xy[4][2] =
+  {
+    0,-1,
+    -1,0,
+    +1,0,
+    0,+1
+  };
+
+  if (Feld[ax][ay]==EL_AMOEBE_TOT)
+  {
+    for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+    {
+      if (Feld[x][y]==EL_AMOEBE_TOT && AmoebaNr[x][y]==group_nr)
+      {
+	AmoebaNr[x][y] = 0;
+	Feld[x][y] = EL_AMOEBA2DIAM;
+      }
+    }
+    Bang(ax,ay);
+  }
+  else
+  {
+    for(i=0;i<4;i++)
+    {
+      x = ax+xy[i%4][0];
+      y = ay+xy[i%4][1];
+
+      if (!IN_LEV_FIELD(x,y))
+	continue;
+
+      if (Feld[x][y]==EL_AMOEBA2DIAM)
+	Bang(x,y);
+    }
+  }
+}
+
 void AmoebeWaechst(int x, int y)
 {
   static long sound_delay = 0;
@@ -1842,7 +1397,8 @@ void AmoebeWaechst(int x, int y)
 
     if (!MovDelay[x][y])
     {
-      Feld[x][y] = (Feld[x][y]==EL_AMOEBING2 ? EL_AMOEBE2 : EL_AMOEBE3);
+      Feld[x][y] = Store[x][y];
+      Store[x][y] = 0;
       DrawLevelField(x,y);
     }
   }
@@ -1850,9 +1406,9 @@ void AmoebeWaechst(int x, int y)
 
 void AmoebeAbleger(int ax, int ay)
 {
-  int i,j,start;
+  int i;
+  int element = Feld[ax][ay];
   int newax = ax, neway = ay;
-  BOOL waiting_for_player = FALSE;
   static int xy[4][2] =
   {
     0,-1,
@@ -1865,7 +1421,7 @@ void AmoebeAbleger(int ax, int ay)
 
   if (!level.tempo_amoebe)
   {
-    Feld[ax][ay] = EL_AMOEBE1;
+    Feld[ax][ay] = EL_AMOEBE_TOT;
     DrawLevelField(ax,ay);
     return;
   }
@@ -1880,24 +1436,44 @@ void AmoebeAbleger(int ax, int ay)
       return;
   }
 
-  if (Feld[ax][ay]==EL_AMOEBE3)
+  if (element==EL_AMOEBE_NASS)	/* tropfende Amöbe */
   {
-    start = RND(4);
+    int start = RND(4);
+    int x = ax+xy[start][0];
+    int y = ay+xy[start][1];
+
+    if (!IN_LEV_FIELD(x,y))
+      return;
+
+    if (IS_FREE(x,y) ||
+	Feld[x][y]==EL_ERDREICH || Feld[x][y]==EL_MORAST_LEER)
+    {
+      newax = x;
+      neway = y;
+    }
+
+    if (newax==ax && neway==ay)
+      return;
+  }
+  else				/* normale oder "gefüllte" Amöbe */
+  {
+    int start = RND(4);
+    BOOL waiting_for_player = FALSE;
+
     for(i=0;i<4;i++)
     {
-      int x,y;
+      int j = (start+i)%4;
+      int x = ax+xy[j][0];
+      int y = ay+xy[j][1];
 
-      j = (start+i)%4;
-      x = ax+xy[j][0];
-      y = ay+xy[j][1];
       if (!IN_LEV_FIELD(x,y))
 	continue;
 
       if (IS_FREE(x,y) ||
 	  Feld[x][y]==EL_ERDREICH || Feld[x][y]==EL_MORAST_LEER)
       {
-	newax=x;
-	neway=y;
+	newax = x;
+	neway = y;
 	break;
       }
       else if (PLAYER(x,y))
@@ -1906,46 +1482,39 @@ void AmoebeAbleger(int ax, int ay)
 
     if (newax==ax && neway==ay)
     {
-      if (Feld[ax][ay]==EL_AMOEBE3 && i==4 && !waiting_for_player)
+      if (i==4 && !waiting_for_player)
       {
-	Feld[ax][ay] = EL_AMOEBE1;
+	Feld[ax][ay] = EL_AMOEBE_TOT;
 	DrawLevelField(ax,ay);
+
+	if (element==EL_AMOEBE_VOLL && --AmoebaCnt[AmoebaNr[ax][ay]]<=0)
+	  AmoebeUmwandeln(ax,ay);
       }
       return;
     }
-  }
-  else
-  {
-    int x,y;
-
-    start = RND(4);
-    x = ax+xy[start][0];
-    y = ay+xy[start][1];
-    if (!IN_LEV_FIELD(x,y))
-      return;
-
-    if (IS_FREE(x,y) ||
-	  Feld[x][y]==EL_ERDREICH || Feld[x][y]==EL_MORAST_LEER)
+    else if (element==EL_AMOEBE_VOLL)
     {
-      newax=x;
-      neway=y;
-    }
+      int new_group_nr = AmoebaNr[ax][ay];
 
-    if (newax==ax && neway==ay)
-      return;
+      AmoebaNr[newax][neway] = new_group_nr;
+      AmoebaCnt[new_group_nr]++;
+      AmoebenVereinigen(newax,neway);
+    }
   }
 
-  if (Feld[ax][ay]==EL_AMOEBE3)
-    Feld[newax][neway] = EL_AMOEBING3;
-  else if (neway==lev_fieldy-1)
-    Feld[newax][neway] = EL_AMOEBING2;
-  else if (neway<=ay || !IS_FREE(newax,neway))
+  if (element!=EL_AMOEBE_NASS || neway<ay || !IS_FREE(newax,neway) ||
+      (neway==lev_fieldy-1 && newax!=ax))
+  {
+    Feld[newax][neway] = EL_AMOEBING;
+    Store[newax][neway] = element;
+  }
+  else if (neway==ay)
     Feld[newax][neway] = EL_TROPFEN;
   else
   {
     InitMovingField(ax,ay,MV_DOWN);
-    Feld[ax][ay]=EL_TROPFEN;
-    Store[ax][ay]=EL_AMOEBE2;
+    Feld[ax][ay] = EL_TROPFEN;
+    Store[ax][ay] = EL_AMOEBE_NASS;
     ContinueMoving(ax,ay);
     return;
   }
@@ -1990,7 +1559,8 @@ void Life(int ax, int ay)
       if (!IN_LEV_FIELD(x,y) || (x==xx && y==yy))
 	continue;
 
-      if ((Feld[x][y]==element && !Stop[x][y]) ||
+      if (((Feld[x][y]==element || (element==EL_LIFE && PLAYER(x,y))) &&
+	   !Stop[x][y]) ||
 	  (IS_FREE(x,y) && Stop[x][y]))
 	nachbarn++;
     }
@@ -2224,9 +1794,9 @@ int GameActions(int mx, int my, int button)
 	CheckDynamite(x,y);
       else if (element==EL_EXPLODING)
 	Explode(x,y,Frame[x][y]);
-      else if (element==EL_AMOEBING2 || element==EL_AMOEBING3)
+      else if (element==EL_AMOEBING)
 	AmoebeWaechst(x,y);
-      else if (element==EL_AMOEBE2 || element==EL_AMOEBE3)
+      else if (IS_AMOEBALIVE(element))
 	AmoebeAbleger(x,y);
       else if (element==EL_LIFE || element==EL_LIFE_ASYNC)
 	Life(x,y);
@@ -2286,7 +1856,7 @@ void ScrollLevel(int dx, int dy)
 
 BOOL MoveFigureOneStep(int dx, int dy)
 {
-  int oldJX,oldJY, newJX=JX+dx,newJY=JY+dy;
+  int oldJX,oldJY, newJX = JX+dx,newJY = JY+dy;
   int element;
   int can_move;
 
@@ -2309,8 +1879,8 @@ BOOL MoveFigureOneStep(int dx, int dy)
 
       PlaySoundLevel(JX,JY,SND_AUTSCH);
       PlaySoundLevel(JX,JY,SND_LACHEN);
-      GameOver=TRUE;
-      JX=JY=-1;
+      GameOver = TRUE;
+      JX = JY = -1;
     }
     else
       KillHero();
@@ -2459,7 +2029,7 @@ void TestIfBadThingHitsOtherBadThing(int badx, int bady)
 
     element=Feld[x][y];
     if (IS_AMOEBOID(element) || element==EL_LIFE ||
-	element==EL_AMOEBING2 || element==EL_AMOEBING3 || element==EL_TROPFEN)
+	element==EL_AMOEBING ||	element==EL_TROPFEN)
     {
       killx=x;
       killy=y;
@@ -2561,19 +2131,17 @@ int DigField(int x, int y, int mode)
       break;
     }
     case EL_ABLENK_AUS:
-      Feld[x][y]=EL_ABLENK_EIN;
+      Feld[x][y] = EL_ABLENK_EIN;
       CheckExploding=TRUE;
       ZX=x;
       ZY=y;
       DrawLevelField(x,y);
-/*
-      PlaySoundLevel(x,y,SND_DENG);
-*/
       return(MF_ACTION);
       break;
     case EL_FELSBROCKEN:
     case EL_BOMBE:
     case EL_KOKOSNUSS:
+    case EL_ZEIT_LEER:
       if (mode==DF_SNAP)
 	return(MF_NO_ACTION);
       if (dy || !IN_LEV_FIELD(x+dx,y+dy) || Feld[x+dx][y+dy]!=EL_LEERRAUM)
@@ -2618,8 +2186,20 @@ int DigField(int x, int y, int mode)
     case EL_AUSGANG_AUF:
       if (mode==DF_SNAP || Gems>0)
 	return(MF_NO_ACTION);
-      LevelSolved = TRUE;
+      LevelSolved = GameOver = TRUE;
       PlaySoundLevel(x,y,SND_BUING);
+      break;
+    case EL_BIRNE_AUS:
+      Feld[x][y] = EL_BIRNE_EIN;
+      DrawLevelField(x,y);
+      PlaySoundLevel(x,y,SND_DENG);
+      return(MF_ACTION);
+      break;
+    case EL_ZEIT_VOLL:
+      Feld[x][y] = EL_ZEIT_LEER;
+      DrawLevelField(x,y);
+      PlaySoundStereo(SND_GONG,PSND_MAX_RIGHT);
+      return(MF_ACTION);
       break;
     default:
       return(MF_NO_ACTION);
@@ -2896,203 +2476,4 @@ void TapeStop()
 void TapeErase()
 {
   tape.length = 0;
-}
-
-void DrawVideoDisplay(unsigned long state, unsigned long value)
-{
-  int i;
-  int part1 = 0, part2 = 1;
-  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
-  static char *monatsname[12] =
-  {
-    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
-  };
-  static int video_pos[10][2][4] =
-  {
-    VIDEO_PLAY_LABEL_XPOS, VIDEO_PLAY_LABEL_YPOS,
-    VIDEO_PLAY_LABEL_XSIZE,VIDEO_PLAY_LABEL_YSIZE,
-    VIDEO_PLAY_SYMBOL_XPOS, VIDEO_PLAY_SYMBOL_YPOS,
-    VIDEO_PLAY_SYMBOL_XSIZE,VIDEO_PLAY_SYMBOL_YSIZE,
-
-    VIDEO_REC_LABEL_XPOS, VIDEO_REC_LABEL_YPOS,
-    VIDEO_REC_LABEL_XSIZE,VIDEO_REC_LABEL_YSIZE,
-    VIDEO_REC_SYMBOL_XPOS, VIDEO_REC_SYMBOL_YPOS,
-    VIDEO_REC_SYMBOL_XSIZE,VIDEO_REC_SYMBOL_YSIZE,
-
-    VIDEO_PAUSE_LABEL_XPOS, VIDEO_PAUSE_LABEL_YPOS,
-    VIDEO_PAUSE_LABEL_XSIZE,VIDEO_PAUSE_LABEL_YSIZE,
-    VIDEO_PAUSE_SYMBOL_XPOS, VIDEO_PAUSE_SYMBOL_YPOS,
-    VIDEO_PAUSE_SYMBOL_XSIZE,VIDEO_PAUSE_SYMBOL_YSIZE,
-
-    VIDEO_DATE_LABEL_XPOS, VIDEO_DATE_LABEL_YPOS,
-    VIDEO_DATE_LABEL_XSIZE,VIDEO_DATE_LABEL_YSIZE,
-    VIDEO_DATE_XPOS, VIDEO_DATE_YPOS,
-    VIDEO_DATE_XSIZE,VIDEO_DATE_YSIZE,
-
-    0,0,
-    0,0,
-    VIDEO_TIME_XPOS, VIDEO_TIME_YPOS,
-    VIDEO_TIME_XSIZE,VIDEO_TIME_YSIZE,
-
-    VIDEO_BUTTON_PLAY_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
-
-    VIDEO_BUTTON_REC_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
-
-    VIDEO_BUTTON_PAUSE_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
-
-    VIDEO_BUTTON_STOP_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
-
-    VIDEO_BUTTON_EJECT_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0
-  };
-
-  for(i=0;i<20;i++)
-  {
-    if (state & (1<<i))
-    {
-      int pos = i/2, cx, cy = DOOR_GFX_PAGEY2;
-
-      if (i%2)			/* i ungerade => STATE_ON / PRESS_OFF */
-	cx = DOOR_GFX_PAGEX4;
-      else
-	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
-
-      if (video_pos[pos][part1][0])
-	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part1][xpos],
-		  cy + video_pos[pos][part1][ypos],
-		  video_pos[pos][part1][xsize],
-		  video_pos[pos][part1][ysize],
-		  VX + video_pos[pos][part1][xpos],
-		  VY + video_pos[pos][part1][ypos]);
-      if (video_pos[pos][part2][0])
-	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part2][xpos],
-		  cy + video_pos[pos][part2][ypos],
-		  video_pos[pos][part2][xsize],
-		  video_pos[pos][part2][ysize],
-		  VX + video_pos[pos][part2][xpos],
-		  VY + video_pos[pos][part2][ypos]);
-    }
-  }
-
-  if (state & VIDEO_STATE_DATE_ON)
-  {
-    int tag = value % 100;
-    int monat = (value/100) % 100;
-    int jahr = (value/10000);
-
-    DrawText(VX+VIDEO_DATE_XPOS,VY+VIDEO_DATE_YPOS,
-	     int2str(tag,2),FS_SMALL,FC_SPECIAL1);
-    DrawText(VX+VIDEO_DATE_XPOS+27,VY+VIDEO_DATE_YPOS,
-	     monatsname[monat],FS_SMALL,FC_SPECIAL1);
-    DrawText(VX+VIDEO_DATE_XPOS+64,VY+VIDEO_DATE_YPOS,
-	     int2str(jahr,2),FS_SMALL,FC_SPECIAL1);
-  }
-
-  if (state & VIDEO_STATE_TIME_ON)
-  {
-    int min = value / 60;
-    int sec = value % 60;
-
-    DrawText(VX+VIDEO_TIME_XPOS,VY+VIDEO_TIME_YPOS,
-	     int2str(min,2),FS_SMALL,FC_SPECIAL1);
-    DrawText(VX+VIDEO_TIME_XPOS+27,VY+VIDEO_TIME_YPOS,
-	     int2str(sec,2),FS_SMALL,FC_SPECIAL1);
-  }
-
-  if (state & VIDEO_STATE_DATE)
-    redraw_mask |= REDRAW_VIDEO_1;
-  if ((state & ~VIDEO_STATE_DATE) & VIDEO_STATE)
-    redraw_mask |= REDRAW_VIDEO_2;
-  if (state & VIDEO_PRESS)
-    redraw_mask |= REDRAW_VIDEO_3;
-}
-
-void DrawSoundDisplay(unsigned long state)
-{
-  int pos, cx = DOOR_GFX_PAGEX4, cy = 0;
-
-  pos = (state & BUTTON_SOUND_MUSIC ? SOUND_BUTTON_MUSIC_XPOS :
-	 state & BUTTON_SOUND_LOOPS ? SOUND_BUTTON_LOOPS_XPOS :
-	 SOUND_BUTTON_SOUND_XPOS);
-
-  if (state & BUTTON_ON)
-    cy -= SOUND_BUTTON_YSIZE;
-
-  if (state & BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX3;
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + pos,cy + SOUND_BUTTON_ANY_YPOS,
-	    SOUND_BUTTON_XSIZE,SOUND_BUTTON_YSIZE,
-	    DX + pos,DY + SOUND_BUTTON_ANY_YPOS);
-
-  redraw_mask |= REDRAW_DOOR_1;
-}
-
-void DrawGameButton(unsigned long state)
-{
-  int pos, cx = DOOR_GFX_PAGEX4, cy = -GAME_BUTTON_YSIZE;
-
-  pos = (state & BUTTON_GAME_STOP ? GAME_BUTTON_STOP_XPOS :
-	 state & BUTTON_GAME_PAUSE ? GAME_BUTTON_PAUSE_XPOS :
-	 GAME_BUTTON_PLAY_XPOS);
-
-  if (state & BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX3;
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + pos,cy + GAME_BUTTON_ANY_YPOS,
-	    GAME_BUTTON_XSIZE,GAME_BUTTON_YSIZE,
-	    DX + pos,DY + GAME_BUTTON_ANY_YPOS);
-
-  redraw_mask |= REDRAW_DOOR_1;
-}
-
-void DrawChooseButton(unsigned long state)
-{
-  int pos, cx = DOOR_GFX_PAGEX4, cy = 0;
-
-  pos = (state & BUTTON_OK ? OK_BUTTON_XPOS : NO_BUTTON_XPOS);
-
-  if (state & BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX3;
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + pos,cy + OK_BUTTON_GFX_YPOS,
-	    OK_BUTTON_XSIZE,OK_BUTTON_YSIZE,
-	    DX + pos,DY + OK_BUTTON_YPOS);
-
-  redraw_mask |= REDRAW_DOOR_1;
-}
-
-void DrawConfirmButton(unsigned long state)
-{
-  int cx = DOOR_GFX_PAGEX4, cy = 0;
-
-  if (state & BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX3;
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    cx + CONFIRM_BUTTON_XPOS,cy + CONFIRM_BUTTON_GFX_YPOS,
-	    CONFIRM_BUTTON_XSIZE,CONFIRM_BUTTON_YSIZE,
-	    DX + CONFIRM_BUTTON_XPOS,DY + CONFIRM_BUTTON_YPOS);
-
-  redraw_mask |= REDRAW_DOOR_1;
 }

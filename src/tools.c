@@ -10,16 +10,19 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  tools.c                                                 *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
+
+#ifdef __FreeBSD__
+#include <machine/joystick.h>
+#endif
 
 #include "tools.h"
 #include "game.h"
 #include "events.h"
 #include "sound.h"
-#include "screens.h"
 #include "misc.h"
+#include "buttons.h"
+#include <math.h>
 
 void BackToFront()
 {
@@ -116,6 +119,35 @@ void FadeToFront()
 
   if (fading_on && (redraw_mask & REDRAW_FIELD))
   {
+
+/*
+    int x,y;
+
+    XFillRectangle(display,window,gc,
+		   REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
+    XFlush(display);
+
+    for(i=0;i<2*FULL_SYSIZE;i++)
+    {
+      for(y=0;y<FULL_SYSIZE;y++)
+      {
+	XCopyArea(display,backbuffer,window,gc,
+		  REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
+      }
+      XFlush(display);
+      Delay(10000);
+    }
+*/
+
+/*
+    for(i=1;i<FULL_SYSIZE;i+=2)
+      XCopyArea(display,backbuffer,window,gc,
+		REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
+    XFlush(display);
+    Delay(fading_delay);
+*/
+
+
     XSetClipOrigin(display,clip_gc[PIX_FADEMASK],0,0);
     XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
 	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
@@ -310,95 +342,6 @@ void DrawMiniGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
   }
 }
 
-int el2gfx(int element)
-{
-  switch(element)
-  {
-    case EL_LEERRAUM:		return(-1);
-    case EL_ERDREICH:		return(GFX_ERDREICH);
-    case EL_MAUERWERK:		return(GFX_MAUERWERK);
-    case EL_FELSBODEN:		return(GFX_FELSBODEN);
-    case EL_FELSBROCKEN:	return(GFX_FELSBROCKEN);
-    case EL_SCHLUESSEL:		return(GFX_SCHLUESSEL);
-    case EL_EDELSTEIN:		return(GFX_EDELSTEIN);
-    case EL_AUSGANG_ZU:		return(GFX_AUSGANG_ZU);
-    case EL_AUSGANG_ACT:	return(GFX_AUSGANG_ACT);
-    case EL_AUSGANG_AUF:	return(GFX_AUSGANG_AUF);
-    case EL_SPIELFIGUR:		return(GFX_SPIELFIGUR);
-    case EL_SPIELER1:		return(GFX_SPIELER1);
-    case EL_SPIELER2:		return(GFX_SPIELER2);
-    case EL_SPIELER3:		return(GFX_SPIELER3);
-    case EL_SPIELER4:		return(GFX_SPIELER4);
-    case EL_KAEFER:		return(GFX_KAEFER);
-    case EL_KAEFER_R:		return(GFX_KAEFER_R);
-    case EL_KAEFER_O:		return(GFX_KAEFER_O);
-    case EL_KAEFER_L:		return(GFX_KAEFER_L);
-    case EL_KAEFER_U:		return(GFX_KAEFER_U);
-    case EL_FLIEGER:		return(GFX_FLIEGER);
-    case EL_FLIEGER_R:		return(GFX_FLIEGER_R);
-    case EL_FLIEGER_O:		return(GFX_FLIEGER_O);
-    case EL_FLIEGER_L:		return(GFX_FLIEGER_L);
-    case EL_FLIEGER_U:		return(GFX_FLIEGER_U);
-    case EL_MAMPFER:		return(GFX_MAMPFER);
-    case EL_ZOMBIE:		return(GFX_ZOMBIE);
-    case EL_BETON:		return(GFX_BETON);
-    case EL_DIAMANT:		return(GFX_DIAMANT);
-    case EL_MORAST_LEER:	return(GFX_MORAST_LEER);
-    case EL_MORAST_VOLL:	return(GFX_MORAST_VOLL);
-    case EL_TROPFEN:		return(GFX_TROPFEN);
-    case EL_BOMBE:		return(GFX_BOMBE);
-    case EL_SIEB_LEER:		return(GFX_SIEB_LEER);
-    case EL_SIEB_VOLL:		return(GFX_SIEB_VOLL);
-    case EL_SIEB_TOT:		return(GFX_SIEB_TOT);
-    case EL_SALZSAEURE:		return(GFX_SALZSAEURE);
-    case EL_AMOEBE1:		return(GFX_AMOEBE1);
-    case EL_AMOEBE2:		return(GFX_AMOEBE2);
-    case EL_AMOEBE3:		return(GFX_AMOEBE3);
-    case EL_KOKOSNUSS:		return(GFX_KOKOSNUSS);
-    case EL_LIFE:		return(GFX_LIFE);
-    case EL_LIFE_ASYNC:		return(GFX_LIFE_ASYNC);
-    case EL_DYNAMIT:		return(GFX_DYNAMIT);
-    case EL_BADEWANNE:		return(GFX_BADEWANNE);
-    case EL_BADEWANNE1:		return(GFX_BADEWANNE1);
-    case EL_BADEWANNE2:		return(GFX_BADEWANNE2);
-    case EL_BADEWANNE3:		return(GFX_BADEWANNE3);
-    case EL_BADEWANNE4:		return(GFX_BADEWANNE4);
-    case EL_BADEWANNE5:		return(GFX_BADEWANNE5);
-    case EL_ABLENK_AUS:		return(GFX_ABLENK_AUS);
-    case EL_ABLENK_EIN:		return(GFX_ABLENK_EIN);
-    case EL_SCHLUESSEL1:	return(GFX_SCHLUESSEL1);
-    case EL_SCHLUESSEL2:	return(GFX_SCHLUESSEL2);
-    case EL_SCHLUESSEL3:	return(GFX_SCHLUESSEL3);
-    case EL_SCHLUESSEL4:	return(GFX_SCHLUESSEL4);
-    case EL_PFORTE1:		return(GFX_PFORTE1);
-    case EL_PFORTE2:		return(GFX_PFORTE2);
-    case EL_PFORTE3:		return(GFX_PFORTE3);
-    case EL_PFORTE4:		return(GFX_PFORTE4);
-    case EL_PFORTE1X:		return(GFX_PFORTE1X);
-    case EL_PFORTE2X:		return(GFX_PFORTE2X);
-    case EL_PFORTE3X:		return(GFX_PFORTE3X);
-    case EL_PFORTE4X:		return(GFX_PFORTE4X);
-    case EL_DYNAMIT_AUS:	return(GFX_DYNAMIT_AUS);
-    case EL_PACMAN:		return(GFX_PACMAN);
-    case EL_PACMAN_R:		return(GFX_PACMAN_R);
-    case EL_PACMAN_O:		return(GFX_PACMAN_O);
-    case EL_PACMAN_L:		return(GFX_PACMAN_L);
-    case EL_PACMAN_U:		return(GFX_PACMAN_U);
-    case EL_UNSICHTBAR:		return(GFX_UNSICHTBAR);
-    case EL_ERZ_1:		return(GFX_ERZ_1);
-    case EL_ERZ_2:		return(GFX_ERZ_2);
-    case EL_BIRNE_AUS:		return(GFX_BIRNE_AUS);
-    case EL_BIRNE_EIN:		return(GFX_BIRNE_EIN);
-    default:
-    {
-      if (IS_CHAR(element))
-	return(GFX_CHAR_START + (element-EL_CHAR_START));
-      else
-	return(-1);
-    }
-  }
-}
-
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
 {
   int width = TILEX, height = TILEY;
@@ -524,7 +467,7 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
   }
   else if (IS_AMOEBOID(element))
   {
-    graphic = (element==EL_AMOEBE1 ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
+    graphic = (element==EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x+2*y) % 4;
   }
 
@@ -682,7 +625,7 @@ void DrawScreenField(int x, int y)
 
     if (Store[ux][uy]==EL_MORAST_LEER ||
 	Store[ux][uy]==EL_SIEB_LEER ||
-	Store[ux][uy]==EL_AMOEBE2)
+	Store[ux][uy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (Store[ux][uy]==EL_MORAST_VOLL ||
 	Store[ux][uy]==EL_SIEB_VOLL ||
@@ -713,7 +656,7 @@ void DrawScreenField(int x, int y)
 
     if (Store[oldx][oldy]==EL_MORAST_LEER ||
 	Store[oldx][oldy]==EL_SIEB_LEER ||
-	Store[oldx][oldy]==EL_AMOEBE2)
+	Store[oldx][oldy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
 
     DrawScreenElement(x,y,EL_LEERRAUM);
@@ -1072,9 +1015,9 @@ void CloseDoor(unsigned int door_state)
 
 void MoveDoor(unsigned int door_state)
 {
-  static int door1 = DOOR_CLOSE_1;
-  static int door2 = DOOR_OPEN_2;
-  int x, start, stepsize = 4;
+  static int door1 = DOOR_OPEN_1;
+  static int door2 = DOOR_CLOSE_2;
+  int x, start, stepsize = 4, door_anim_delay = stepsize*5000;
 
   if (door1==DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
     door_state &= ~DOOR_OPEN_1;
@@ -1085,31 +1028,15 @@ void MoveDoor(unsigned int door_state)
   else if (door2==DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
     door_state &= ~DOOR_CLOSE_2;
 
+  if (quick_doors)
+  {
+    stepsize = 20;
+    door_anim_delay = 0;
+    StopSound(SND_OEFFNEN);
+  }
+
   if (door_state & DOOR_ACTION)
   {
-    if (door_state & DOOR_OPEN_1)
-    {
-      XCopyArea(display,pix[PIX_DOOR],pix[PIX_DOOR],gc,
-		104,136, 8,8, 146,136);
-      if (!(door_state & DOOR_NO_DELAY))
-      {
-	int i;
-
-	XCopyArea(display,pix[PIX_DOOR],window,gc,
-		  104,136, 8,8, DX+46,DY+136);
-	XFlush(display);
-	for(i=0;i<30;i++)
-	{
-	  if (game_status==MAINMENU)
-	    DoAnimation();
-	  Delay(10000);
-	}
-      }
-    }
-    else if (door_state & DOOR_CLOSE_1)
-      XCopyArea(display,pix[PIX_DOOR],pix[PIX_DOOR],gc,
-		88,136, 8,8, 146,136);
-
     if (!(door_state & DOOR_NO_DELAY))
       PlaySoundStereo(SND_OEFFNEN,PSND_MAX_RIGHT);
 
@@ -1120,6 +1047,7 @@ void MoveDoor(unsigned int door_state)
       if (door_state & DOOR_ACTION_1)
       {
 	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
+	int j = (DXSIZE - i)/3;
 
 	XCopyArea(display,pix[PIX_DB_DOOR],drawto,gc,
 		  DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1+i/2,
@@ -1127,31 +1055,41 @@ void MoveDoor(unsigned int door_state)
 
 	XFillRectangle(display,drawto,gc,DX,DY+DYSIZE-i/2,DXSIZE,i/2);
 
-	XSetClipOrigin(display,clip_gc[PIX_DOOR],DX-DXSIZE+i,DY);
+	XSetClipOrigin(display,clip_gc[PIX_DOOR],
+		       DX-i,(DY+j)-DOOR_GFX_PAGEY1);
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  DXSIZE-i,0, i,30, DX,DY);
+		  DXSIZE,DOOR_GFX_PAGEY1, i,77, DX+DXSIZE-i,DY+j);
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  DXSIZE-i,DYSIZE-30, i,30, DX,DY+DYSIZE-30);
-	XSetClipOrigin(display,clip_gc[PIX_DOOR],DX-i,DY);
+		  DXSIZE,DOOR_GFX_PAGEY1+140, i,63, DX+DXSIZE-i,DY+140+j);
+	XSetClipOrigin(display,clip_gc[PIX_DOOR],
+		       DX-DXSIZE+i,DY-(DOOR_GFX_PAGEY1+j));
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  DXSIZE,0, i,30, DX+DXSIZE-i,DY);
+		  DXSIZE-i,DOOR_GFX_PAGEY1+j, i,77-j, DX,DY);
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  DXSIZE,DYSIZE-30, i,30, DX+DXSIZE-i,DY+DYSIZE-30);
-	if (i>14)
-	{
-	  XSetClipOrigin(display,clip_gc[PIX_DOOR],DX-i,DY);
-	  XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		    DXSIZE+14,30,i-14,DYSIZE-60,DX+DXSIZE+14-i,DY+30);
-	  XSetClipOrigin(display,clip_gc[PIX_DOOR],DX-DXSIZE+i,DY);
-	  XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		    DXSIZE-i,30,i-14,DYSIZE-60,DX,DY+30);
-	}
+		  DXSIZE-i,DOOR_GFX_PAGEY1+140, i,63, DX,DY+140-j);
+
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  DXSIZE-i,DOOR_GFX_PAGEY1+77, i,63,
+		  DX,DY+77-j);
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  DXSIZE-i,DOOR_GFX_PAGEY1+203, i,77,
+		  DX,DY+203-j);
+	XSetClipOrigin(display,clip_gc[PIX_DOOR],
+		       DX-i,(DY+j)-DOOR_GFX_PAGEY1);
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  DXSIZE,DOOR_GFX_PAGEY1+77, i,63,
+		  DX+DXSIZE-i,DY+77+j);
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  DXSIZE,DOOR_GFX_PAGEY1+203, i,77-j,
+		  DX+DXSIZE-i,DY+203+j);
+
 	redraw_mask |= REDRAW_DOOR_1;
       }
 
       if (door_state & DOOR_ACTION_2)
       {
 	int i = (door_state & DOOR_OPEN_2 ? VXSIZE-x : x);
+	int j = (VXSIZE - i)/3;
 
 	XCopyArea(display,pix[PIX_DB_DOOR],drawto,gc,
 		  DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2+i/2,
@@ -1160,19 +1098,28 @@ void MoveDoor(unsigned int door_state)
 	XFillRectangle(display,drawto,gc,VX,VY+VYSIZE-i/2,VXSIZE,i/2);
 
 	XSetClipOrigin(display,clip_gc[PIX_DOOR],
-		       VX-VXSIZE+i,VY-DOOR_GFX_PAGEY2);
+		       VX-i,(VY+j)-DOOR_GFX_PAGEY2);
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  VXSIZE-i,DOOR_GFX_PAGEY2, i,VYSIZE, VX,VY);
+		  VXSIZE,DOOR_GFX_PAGEY2, i,VYSIZE/2, VX+VXSIZE-i,VY+j);
 	XSetClipOrigin(display,clip_gc[PIX_DOOR],
-		       VX-i,VY-DOOR_GFX_PAGEY2);
+		       VX-VXSIZE+i,VY-(DOOR_GFX_PAGEY2+j));
 	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
-		  VXSIZE,DOOR_GFX_PAGEY2, i,VYSIZE, VX+VXSIZE-i,VY);
+		  VXSIZE-i,DOOR_GFX_PAGEY2+j, i,VYSIZE/2-j, VX,VY);
+
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  VXSIZE-i,DOOR_GFX_PAGEY2+VYSIZE/2, i,VYSIZE/2,
+		  VX,VY+VYSIZE/2-j);
+	XSetClipOrigin(display,clip_gc[PIX_DOOR],
+		       VX-i,(VY+j)-DOOR_GFX_PAGEY2);
+	XCopyArea(display,pix[PIX_DOOR],drawto,clip_gc[PIX_DOOR],
+		  VXSIZE,DOOR_GFX_PAGEY2+VYSIZE/2, i,VYSIZE/2-j,
+		  VX+VXSIZE-i,VY+VYSIZE/2+j);
 
 	redraw_mask |= REDRAW_DOOR_2;
       }
 
       BackToFront();
-      Delay(stepsize*5000);
+      Delay(door_anim_delay);
 
       if (game_status==MAINMENU)
 	DoAnimation();
@@ -1185,152 +1132,12 @@ void MoveDoor(unsigned int door_state)
     door2 = door_state & DOOR_ACTION_2;
 }
 
-long mainCounter(int mode)
-{
-  static struct timeval base_time = { 0, 0 };
-  struct timeval current_time;
-  long counter_ms;
-
-  gettimeofday(&current_time,NULL);
-  if (mode==0 || current_time.tv_sec<base_time.tv_sec)
-    base_time = current_time;
-
-  counter_ms = (current_time.tv_sec - base_time.tv_sec)*1000
-             + (current_time.tv_usec - base_time.tv_usec)/1000;
-
-  if (mode==1)
-    return(counter_ms/10);	/* return 1/100 secs since last init */
-  else
-    return(counter_ms);		/* return 1/1000 secs since last init */
-}
-
-void InitCounter() /* set counter back to zero */
-{
-  mainCounter(0);
-}
-
-long Counter()	/* returns 1/100 secs since last call of InitCounter() */
-{
-  return(mainCounter(1));
-}
-
-long Counter2()	/* returns 1/1000 secs since last call of InitCounter() */
-{
-  return(mainCounter(2));
-}
-
-void WaitCounter(long value) 	/* wait for counter to reach value */
-{
-  long wait;
-
-  while((wait=value-Counter())>0)
-    microsleep(wait*10000);
-}
-
-void WaitCounter2(long value) 	/* wait for counter to reach value */
-{
-  long wait;
-
-  while((wait=value-Counter2())>0)
-    microsleep(wait*1000);
-}
-
-void Delay(long value)
-{
-  microsleep(value);
-}
-
-BOOL DelayReached(long *counter_var, int delay)
-{
-  long actual_counter = Counter();
-
-  if (actual_counter>*counter_var+delay || actual_counter<*counter_var)
-  {
-    *counter_var = actual_counter;
-    return(TRUE);
-  }
-  else
-    return(FALSE);
-}
-
 int ReadPixel(Drawable d, int x, int y)
 {
   static XImage *pixelimage;
 
   pixelimage = XGetImage(display, d, x,y, 1,1, AllPlanes, ZPixmap);
   return(XGetPixel(pixelimage,0,0));
-}
-
-static struct JoystickInfo joystick[2] =
-{
-  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE,
-
-  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE
-};
-
-void LoadJoystickData()
-{
-  int i;
-  char cookie[256];
-  FILE *file;
-
-  if (joystick_status==JOYSTICK_OFF)
-    return;
-
-  if (!(file=fopen(JOYDAT_FILE,"r")))
-    return;
-
-  fscanf(file,"%s",cookie);
-  if (strcmp(cookie,JOYSTICK_COOKIE))	/* ungültiges Format? */
-  {
-    fprintf(stderr,"%s: wrong format of joystick file!\n",progname);
-    fclose(file);
-    return;
-  }
-
-  for(i=0;i<2;i++)
-  {
-    fscanf(file,"%s",cookie);
-    fscanf(file, "%d %d %d \n",
-	   &joystick[i].xleft, &joystick[i].xmiddle, &joystick[i].xright);
-    fscanf(file, "%d %d %d \n",
-	   &joystick[i].yupper, &joystick[i].ymiddle, &joystick[i].ylower);
-  }
-  fclose(file);
-
-  CheckJoystickData();
-}
-
-void SaveJoystickData()
-{
-  int i;
-  FILE *file;
-
-  if (joystick_status==JOYSTICK_OFF)
-    return;
-
-  CheckJoystickData();
-
-  if (!(file=fopen(JOYDAT_FILE,"w")))
-  {
-    fprintf(stderr,"%s: cannot save joystick calibration data!\n",progname);
-    return;
-  }
-
-  fprintf(file,"%s\n",JOYSTICK_COOKIE);	/* Formatkennung */
-  for(i=0;i<2;i++)
-  {
-    fprintf(file,"JOYSTICK_%d_DATA\n",i);
-    fprintf(file, "%d %d %d \n",
-	    joystick[i].xleft, joystick[i].xmiddle, joystick[i].xright);
-    fprintf(file, "%d %d %d \n",
-	    joystick[i].yupper, joystick[i].ymiddle, joystick[i].ylower);
-  }
-  fclose(file);
-
-  chmod(JOYDAT_FILE, JOYDAT_PERMS);
 }
 
 void CheckJoystickData()
@@ -1367,23 +1174,27 @@ int JoystickPosition(int middle, int margin, int actual)
   if (margin>middle && actual<middle)
     return(0);
 
-  range=ABS(margin-middle);
-  pos=ABS(actual-middle);
-  percentage=(int)(pos*100/range);
+  range = ABS(margin-middle);
+  pos = ABS(actual-middle);
+  percentage = (int)(pos*100/range);
   if (percentage>100)
-    percentage=100;
+    percentage = 100;
 
   return(percentage);
 }
 
 int Joystick()
 {
+#ifdef __FreeBSD__
+  struct joystick joy_ctrl;
+#else
   struct joystick_control
   {
     int buttons;
     int x;
     int y;
   } joy_ctrl;
+#endif
 
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
@@ -1394,15 +1205,21 @@ int Joystick()
 
   if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
   {
-    fprintf(stderr,"%s: cannot read joystick settings - no joystick support\n",progname);
+    fprintf(stderr,"%s: cannot read joystick settings - no joystick support\n",
+	    progname);
     joystick_status = JOYSTICK_OFF;
     return(0);
   }
 
   js_x  = joy_ctrl.x;
   js_y  = joy_ctrl.y;
+#ifdef __FreeBSD__
+  js_b1 = joy_ctrl.b1;
+  js_b2 = joy_ctrl.b2;
+#else
   js_b1 = joy_ctrl.buttons & 1;
   js_b2 = joy_ctrl.buttons & 2;
+#endif
 
   left = JoystickPosition(joystick[joystick_nr].xmiddle,
 			  joystick[joystick_nr].xleft,  js_x);
@@ -1431,124 +1248,118 @@ int Joystick()
 
 int JoystickButton()
 {
-  static int last_joy_button=0;
-  int joy_button=(Joystick() & JOY_BUTTON);
+  static int last_joy_button = 0;
+  int joy_button = (Joystick() & JOY_BUTTON);
   int result;
 
   if (joy_button)
   {
     if (last_joy_button)
-      result=JOY_BUTTON_PRESSED;
+      result = JOY_BUTTON_PRESSED;
     else
-      result=JOY_BUTTON_NEW_PRESSED;
+      result = JOY_BUTTON_NEW_PRESSED;
   }
   else
   {
     if (last_joy_button)
-      result=JOY_BUTTON_NEW_RELEASED;
+      result = JOY_BUTTON_NEW_RELEASED;
     else
-      result=JOY_BUTTON_NOT_PRESSED;
+      result = JOY_BUTTON_NOT_PRESSED;
   }
 
   last_joy_button = joy_button;
   return(result);
 }
 
-void CalibrateJoystick()
+int el2gfx(int element)
 {
-  struct joystick_control
+  switch(element)
   {
-    int buttons;
-    int x;
-    int y;
-  } joy_ctrl;
-
-  int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
-  int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
-
-  if (joystick_status==JOYSTICK_OFF)
-    goto error_out;
-
-  ClearWindow();
-  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+8*32, " THE UPPER LEFT ",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+9*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
-  BackToFront();
-
-  joy_ctrl.buttons = 0;
-  while(Joystick() & JOY_BUTTON);
-  while(!joy_ctrl.buttons)
-  {
-    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
+    case EL_LEERRAUM:		return(-1);
+    case EL_ERDREICH:		return(GFX_ERDREICH);
+    case EL_MAUERWERK:		return(GFX_MAUERWERK);
+    case EL_FELSBODEN:		return(GFX_FELSBODEN);
+    case EL_FELSBROCKEN:	return(GFX_FELSBROCKEN);
+    case EL_SCHLUESSEL:		return(GFX_SCHLUESSEL);
+    case EL_EDELSTEIN:		return(GFX_EDELSTEIN);
+    case EL_AUSGANG_ZU:		return(GFX_AUSGANG_ZU);
+    case EL_AUSGANG_ACT:	return(GFX_AUSGANG_ACT);
+    case EL_AUSGANG_AUF:	return(GFX_AUSGANG_AUF);
+    case EL_SPIELFIGUR:		return(GFX_SPIELFIGUR);
+    case EL_SPIELER1:		return(GFX_SPIELER1);
+    case EL_SPIELER2:		return(GFX_SPIELER2);
+    case EL_SPIELER3:		return(GFX_SPIELER3);
+    case EL_SPIELER4:		return(GFX_SPIELER4);
+    case EL_KAEFER:		return(GFX_KAEFER);
+    case EL_KAEFER_R:		return(GFX_KAEFER_R);
+    case EL_KAEFER_O:		return(GFX_KAEFER_O);
+    case EL_KAEFER_L:		return(GFX_KAEFER_L);
+    case EL_KAEFER_U:		return(GFX_KAEFER_U);
+    case EL_FLIEGER:		return(GFX_FLIEGER);
+    case EL_FLIEGER_R:		return(GFX_FLIEGER_R);
+    case EL_FLIEGER_O:		return(GFX_FLIEGER_O);
+    case EL_FLIEGER_L:		return(GFX_FLIEGER_L);
+    case EL_FLIEGER_U:		return(GFX_FLIEGER_U);
+    case EL_MAMPFER:		return(GFX_MAMPFER);
+    case EL_ZOMBIE:		return(GFX_ZOMBIE);
+    case EL_BETON:		return(GFX_BETON);
+    case EL_DIAMANT:		return(GFX_DIAMANT);
+    case EL_MORAST_LEER:	return(GFX_MORAST_LEER);
+    case EL_MORAST_VOLL:	return(GFX_MORAST_VOLL);
+    case EL_TROPFEN:		return(GFX_TROPFEN);
+    case EL_BOMBE:		return(GFX_BOMBE);
+    case EL_SIEB_LEER:		return(GFX_SIEB_LEER);
+    case EL_SIEB_VOLL:		return(GFX_SIEB_VOLL);
+    case EL_SIEB_TOT:		return(GFX_SIEB_TOT);
+    case EL_SALZSAEURE:		return(GFX_SALZSAEURE);
+    case EL_AMOEBE_TOT:		return(GFX_AMOEBE_TOT);
+    case EL_AMOEBE_NASS:	return(GFX_AMOEBE_NASS);
+    case EL_AMOEBE_NORM:	return(GFX_AMOEBE_NORM);
+    case EL_AMOEBE_VOLL:	return(GFX_AMOEBE_VOLL);
+    case EL_AMOEBA2DIAM:	return(GFX_AMOEBA2DIAM);
+    case EL_KOKOSNUSS:		return(GFX_KOKOSNUSS);
+    case EL_LIFE:		return(GFX_LIFE);
+    case EL_LIFE_ASYNC:		return(GFX_LIFE_ASYNC);
+    case EL_DYNAMIT:		return(GFX_DYNAMIT);
+    case EL_BADEWANNE:		return(GFX_BADEWANNE);
+    case EL_BADEWANNE1:		return(GFX_BADEWANNE1);
+    case EL_BADEWANNE2:		return(GFX_BADEWANNE2);
+    case EL_BADEWANNE3:		return(GFX_BADEWANNE3);
+    case EL_BADEWANNE4:		return(GFX_BADEWANNE4);
+    case EL_BADEWANNE5:		return(GFX_BADEWANNE5);
+    case EL_ABLENK_AUS:		return(GFX_ABLENK_AUS);
+    case EL_ABLENK_EIN:		return(GFX_ABLENK_EIN);
+    case EL_SCHLUESSEL1:	return(GFX_SCHLUESSEL1);
+    case EL_SCHLUESSEL2:	return(GFX_SCHLUESSEL2);
+    case EL_SCHLUESSEL3:	return(GFX_SCHLUESSEL3);
+    case EL_SCHLUESSEL4:	return(GFX_SCHLUESSEL4);
+    case EL_PFORTE1:		return(GFX_PFORTE1);
+    case EL_PFORTE2:		return(GFX_PFORTE2);
+    case EL_PFORTE3:		return(GFX_PFORTE3);
+    case EL_PFORTE4:		return(GFX_PFORTE4);
+    case EL_PFORTE1X:		return(GFX_PFORTE1X);
+    case EL_PFORTE2X:		return(GFX_PFORTE2X);
+    case EL_PFORTE3X:		return(GFX_PFORTE3X);
+    case EL_PFORTE4X:		return(GFX_PFORTE4X);
+    case EL_DYNAMIT_AUS:	return(GFX_DYNAMIT_AUS);
+    case EL_PACMAN:		return(GFX_PACMAN);
+    case EL_PACMAN_R:		return(GFX_PACMAN_R);
+    case EL_PACMAN_O:		return(GFX_PACMAN_O);
+    case EL_PACMAN_L:		return(GFX_PACMAN_L);
+    case EL_PACMAN_U:		return(GFX_PACMAN_U);
+    case EL_UNSICHTBAR:		return(GFX_UNSICHTBAR);
+    case EL_ERZ_EDEL:		return(GFX_ERZ_EDEL);
+    case EL_ERZ_DIAM:		return(GFX_ERZ_DIAM);
+    case EL_BIRNE_AUS:		return(GFX_BIRNE_AUS);
+    case EL_BIRNE_EIN:		return(GFX_BIRNE_EIN);
+    case EL_ZEIT_VOLL:		return(GFX_ZEIT_VOLL);
+    case EL_ZEIT_LEER:		return(GFX_ZEIT_LEER);
+    default:
     {
-      joystick_status=JOYSTICK_OFF;
-      goto error_out;
+      if (IS_CHAR(element))
+	return(GFX_CHAR_START + (element-EL_CHAR_START));
+      else
+	return(-1);
     }
-    Delay(10000);
   }
-
-  new_joystick_xleft = joy_ctrl.x;
-  new_joystick_yupper = joy_ctrl.y;
-
-  ClearWindow();
-  DrawText(SX+16, SY+7*32, "MOVE JOYSTICK TO",FS_BIG,FC_YELLOW);
-  DrawText(SX+32, SY+8*32, "THE LOWER RIGHT",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+9*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
-  BackToFront();
-
-  joy_ctrl.buttons = 0;
-  while(Joystick() & JOY_BUTTON);
-  while(!joy_ctrl.buttons)
-  {
-    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
-    {
-      joystick_status=JOYSTICK_OFF;
-      goto error_out;
-    }
-    Delay(10000);
-  }
-
-  new_joystick_xright = joy_ctrl.x;
-  new_joystick_ylower = joy_ctrl.y;
-
-  ClearWindow();
-  DrawText(SX+32, SY+16+7*32, "CENTER JOYSTICK",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+16+8*32, "AND PRESS BUTTON",FS_BIG,FC_YELLOW);
-  BackToFront();
-
-  joy_ctrl.buttons = 0;
-  while(Joystick() & JOY_BUTTON);
-  while(!joy_ctrl.buttons)
-  {
-    if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
-    {
-      joystick_status=JOYSTICK_OFF;
-      goto error_out;
-    }
-    Delay(10000);
-  }
-
-  new_joystick_xmiddle = joy_ctrl.x;
-  new_joystick_ymiddle = joy_ctrl.y;
-
-  joystick[joystick_nr].xleft = new_joystick_xleft;
-  joystick[joystick_nr].yupper = new_joystick_yupper;
-  joystick[joystick_nr].xright = new_joystick_xright;
-  joystick[joystick_nr].ylower = new_joystick_ylower;
-  joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
-  joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
-
-  CheckJoystickData();
-
-  DrawSetupScreen();
-  while(Joystick() & JOY_BUTTON);
-  return;
-
-  error_out:
-
-  ClearWindow();
-  DrawText(SX+16, SY+16, "NO JOYSTICK",FS_BIG,FC_YELLOW);
-  DrawText(SX+16, SY+48, " AVAILABLE ",FS_BIG,FC_YELLOW);
-  Delay(3000000);
-  DrawSetupScreen();
 }

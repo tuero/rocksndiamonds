@@ -10,24 +10,24 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  editor.c                                                *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "editor.h"
 #include "screens.h"
-#include "game.h"
 #include "tools.h"
 #include "misc.h"
+#include "buttons.h"
+#include "files.h"
 
 static int level_xpos,level_ypos;
 static BOOL edit_mode;
 static BOOL name_typing;
-static int element_shift;
 static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
 static int new_element3 = EL_ERDREICH;
-static int editor_element[] =
+
+int element_shift;
+int editor_element[] =
 {
   EL_SPIELFIGUR,
   EL_LEERRAUM,
@@ -70,20 +70,24 @@ static int editor_element[] =
   EL_UNSICHTBAR,
 
   EL_TROPFEN,
-  EL_AMOEBE1,
-  EL_AMOEBE2,
-  EL_AMOEBE3,
+  EL_AMOEBE_TOT,
+  EL_AMOEBE_NASS,
+  EL_AMOEBE_NORM,
 
-  EL_LIFE,
-  EL_LIFE_ASYNC,
-
-  EL_ERZ_1,
-  EL_ERZ_2,
+  EL_AMOEBE_VOLL,
 
 /*
+  EL_LIFE,
+*/
+  EL_LIFE_ASYNC,
+
+  EL_ERZ_EDEL,
+  EL_ERZ_DIAM,
+
+  EL_ZEIT_VOLL,
+  EL_ZEIT_LEER,
   EL_BIRNE_AUS,
   EL_BIRNE_EIN,
-*/
 
   EL_SCHLUESSEL1,
   EL_SCHLUESSEL2,
@@ -189,7 +193,7 @@ static int editor_element[] =
   EL_CHAR_UE,
   EL_CHAR_COPY
 };
-static int elements_in_list = sizeof(editor_element)/sizeof(int);
+int elements_in_list = sizeof(editor_element)/sizeof(int);
 
 void DrawLevelEd()
 {
@@ -275,20 +279,21 @@ void DrawControlWindow()
 
   ClearWindow();
 
+  /* Inhalt der Mampfer */
   DrawText(ED_COUNT_GADGET_XPOS+1,SY+6,
 	   "Contents of a smashed cruncher:",FS_SMALL,FC_YELLOW);
   for(i=0;i<4;i++) for(y=0;y<4;y++) for(x=0;x<4;x++)
   {
     DrawMiniElement(1+5*i+x,2+y,EL_ERDREICH);
     XFillRectangle(display,drawto,gc,
-		   SX+(2+5*i)*MINI_TILEX-MINI_TILEX/2-1,
-		   SY+(3)*MINI_TILEY-MINI_TILEY/2-1,
+		   SX+(1+5*i)*MINI_TILEX+MINI_TILEX/2-1,
+		   SY+(2)*MINI_TILEY+MINI_TILEY/2-1,
 		   3*MINI_TILEX+2,3*MINI_TILEY+2);
   }
   XCopyArea(display,drawto,drawto,gc,
-	    SX+MINI_TILEX,SY+2*MINI_TILEY,
+	    SX+1*MINI_TILEX,SY+2*MINI_TILEY,
 	    4*5*MINI_TILEX,5*MINI_TILEY,
-	    SX+MINI_TILEX-MINI_TILEX/2,SY+2*MINI_TILEY-MINI_TILEY/2);
+	    SX+1*MINI_TILEX-MINI_TILEX/2,SY+2*MINI_TILEY-MINI_TILEY/2);
   for(i=0;i<4;i++)
   {
     for(y=0;y<3;y++) for(x=0;x<3;x++)
@@ -298,6 +303,21 @@ void DrawControlWindow()
 	     SY+2*MINI_TILEY+(4)*MINI_TILEY-4,
 	     int2str(i+1,1),FS_SMALL,FC_YELLOW);
   }
+
+  /* Inhalt der Amöbe */
+  for(y=0;y<2;y++) for(x=0;x<2;x++)
+  {
+    DrawMiniElement(29+x,26+y,EL_ERDREICH);
+    XFillRectangle(display,drawto,gc,
+		   SX+29*MINI_TILEX+MINI_TILEX/2-1,
+		   SY+26*MINI_TILEY+MINI_TILEY/2-1,
+		   MINI_TILEX+2,MINI_TILEY+2);
+  }
+  XCopyArea(display,drawto,drawto,gc,
+	    SX+29*MINI_TILEX,SY+26*MINI_TILEY,
+	    3*MINI_TILEX,3*MINI_TILEY,
+	    SX+29*MINI_TILEX-MINI_TILEX/2,SY+26*MINI_TILEY-MINI_TILEY/2);
+  DrawMiniElement(29,26,level.amoebe_inhalt);
 
   for(i=0;i<11+3+2;i++)
   {
@@ -357,7 +377,7 @@ void DrawControlWindow()
   DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+10*ED_COUNT_TEXT_YSIZE,
 	   "Score for each 10 seconds left",FS_SMALL,FC_YELLOW);
   DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+11*ED_COUNT_TEXT_YSIZE,
-	   "Speed of the amoeba",FS_SMALL,FC_YELLOW);
+	   "Speed of the amoeba / Content",FS_SMALL,FC_YELLOW);
   DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+12*ED_COUNT_TEXT_YSIZE,
 	   "Time for magic wall",FS_SMALL,FC_YELLOW);
   DrawText(ED_COUNT_TEXT_XPOS,ED_COUNT_TEXT_YPOS+13*ED_COUNT_TEXT_YSIZE,
@@ -952,6 +972,25 @@ void LevelEd(int mx, int my, int button)
 	}
       }
 
+      if (mx>=SX+29*MINI_TILEX && mx<SX+30*MINI_TILEX &&
+	  my>=SY+26*MINI_TILEY && my<SY+27*MINI_TILEY)
+      {
+	int new_element;
+
+	if (!button || button<1 || button>3)
+	  return;
+
+	new_element = (button==1 ? new_element1 :
+		       button==2 ? new_element2 :
+		       button==3 ? new_element3 : 0);
+
+	if (new_element != level.amoebe_inhalt)
+	{
+	  level.amoebe_inhalt = new_element;
+	  DrawMiniElement(29,26,new_element);
+	}
+      }
+
       if (mx>=SX+1*MINI_TILEX && mx<SX+(1+4*5)*MINI_TILEX &&
 	  my>=SY+2*MINI_TILEY && my<SY+(2+3)*MINI_TILEY)
       {
@@ -976,7 +1015,7 @@ void LevelEd(int mx, int my, int button)
 	  if (new_element != level.mampfer_inhalt[i][x][y])
 	  {
 	    level.mampfer_inhalt[i][x][y] = new_element;
-	    DrawMiniElement(1+5*i+x,2+y,level.mampfer_inhalt[i][x][y]);
+	    DrawMiniElement(1+5*i+x,2+y,new_element);
 	  }
 	}
 	else if (!motion_status)/* Mauszeiger nicht im Cruncher-Feld */
@@ -1083,434 +1122,4 @@ void LevelNameTyping(KeySym key)
 
     name_typing = FALSE;
   }
-}
-
-void DrawEditButton(unsigned long state)
-{
-  int i;
-  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
-  int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY2;
-  static int edit_pos[6][4] =
-  {
-    ED_BUTTON_CTRL_XPOS,ED_BUTTON_CTRL_YPOS,
-    ED_BUTTON_CTRL_XSIZE,ED_BUTTON_CTRL_YSIZE,
-
-    ED_BUTTON_FILL_XPOS,ED_BUTTON_FILL_YPOS,
-    ED_BUTTON_FILL_XSIZE,ED_BUTTON_FILL_YSIZE,
-
-    ED_BUTTON_LEFT_XPOS,ED_BUTTON_LEFT_YPOS,
-    ED_BUTTON_LEFT_XSIZE,ED_BUTTON_LEFT_YSIZE,
-
-    ED_BUTTON_UP_XPOS,ED_BUTTON_UP_YPOS,
-    ED_BUTTON_UP_XSIZE,ED_BUTTON_UP_YSIZE,
-
-    ED_BUTTON_DOWN_XPOS,ED_BUTTON_DOWN_YPOS,
-    ED_BUTTON_DOWN_XSIZE,ED_BUTTON_DOWN_YSIZE,
-
-    ED_BUTTON_RIGHT_XPOS,ED_BUTTON_RIGHT_YPOS,
-    ED_BUTTON_RIGHT_XSIZE,ED_BUTTON_RIGHT_YSIZE
-  };
-
-  if (state & ED_BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX5;
-
-  for(i=0;i<6;i++)
-  {
-    if (state & (1<<i))
-      XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		cx + edit_pos[i][xpos],
-		cy + edit_pos[i][ypos],
-		edit_pos[i][xsize],
-		edit_pos[i][ysize],
-		VX + edit_pos[i][xpos],
-		VY + edit_pos[i][ypos]);
-  }
-
-  redraw_mask |= REDRAW_DOOR_2;
-}
-
-void DrawCtrlButton(unsigned long state)
-{
-  int i;
-  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
-  int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY1+80;
-  static int edit_pos[4][4] =
-  {
-    ED_BUTTON_EDIT_XPOS,ED_BUTTON_EDIT_YPOS,
-    ED_BUTTON_EDIT_XSIZE,ED_BUTTON_EDIT_YSIZE,
-
-    ED_BUTTON_CLEAR_XPOS,ED_BUTTON_CLEAR_YPOS,
-    ED_BUTTON_CLEAR_XSIZE,ED_BUTTON_CLEAR_YSIZE,
-
-    ED_BUTTON_UNDO_XPOS,ED_BUTTON_UNDO_YPOS,
-    ED_BUTTON_UNDO_XSIZE,ED_BUTTON_UNDO_YSIZE,
-
-    ED_BUTTON_EXIT_XPOS,ED_BUTTON_EXIT_YPOS,
-    ED_BUTTON_EXIT_XSIZE,ED_BUTTON_EXIT_YSIZE
-  };
-
-  if (state & ED_BUTTON_PRESSED)
-    cx = DOOR_GFX_PAGEX3;
-
-  for(i=0;i<4;i++)
-  {
-    if (state & (1<<(i+6)))
-      XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		cx + edit_pos[i][xpos],
-		cy + edit_pos[i][ypos],
-		edit_pos[i][xsize],
-		edit_pos[i][ysize],
-		VX + edit_pos[i][xpos],
-		VY + edit_pos[i][ypos]);
-  }
-
-  redraw_mask |= REDRAW_DOOR_2;
-}
-
-void DrawElemButton(int button_nr, int button_state)
-{
-  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
-  int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
-  int from_x, from_y, to_x,to_y, size_x, size_y;
-  static int edit_pos[3][4] =
-  {
-    ED_BUTTON_EUP_XPOS,ED_BUTTON_EUP_YPOS,
-    ED_BUTTON_EUP_XSIZE,ED_BUTTON_EUP_YSIZE,
-
-    ED_BUTTON_EDOWN_XPOS,ED_BUTTON_EDOWN_YPOS,
-    ED_BUTTON_EDOWN_XSIZE,ED_BUTTON_EDOWN_YSIZE,
-
-    ED_BUTTON_ELEM_XPOS,ED_BUTTON_ELEM_YPOS,
-    ED_BUTTON_ELEM_XSIZE,ED_BUTTON_ELEM_YSIZE
-  };
-
-  if (button_nr<ED_BUTTON_ELEM)
-  {
-    int pos = button_nr;
-
-    from_x = cx + edit_pos[pos][xpos];
-    from_y = cy + edit_pos[pos][ypos];
-    size_x = edit_pos[pos][xsize];
-    size_y = edit_pos[pos][ysize];
-    to_x   = DX + edit_pos[pos][xpos];
-    to_y   = DY + edit_pos[pos][ypos];
-
-    if (button_state & ED_BUTTON_PRESSED)
-    {
-      if (button_nr==ED_BUTTON_EUP)
-	from_y = cy + ED_BUTTON_EUP_Y2POS;
-      else
-	from_y = cy + ED_BUTTON_EDOWN_Y2POS;
-    }
-
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      from_x,from_y, size_x,size_y, to_x,to_y);
-  }
-  else
-  {
-    int pos = ED_BUTTON_ELEM;
-    int elem_pos = button_nr-ED_BUTTON_ELEM;
-    int x = elem_pos % MAX_ELEM_X;
-    int y = elem_pos / MAX_ELEM_X;
-    int graphic;
-    int shift = 0;
-
-    if (elem_pos+element_shift < elements_in_list)
-      graphic = el2gfx(editor_element[elem_pos+element_shift]);
-    else
-      graphic = GFX_LEERRAUM;
-
-    from_x = cx + edit_pos[pos][xpos];
-    from_y = cy + edit_pos[pos][ypos];
-    size_x = edit_pos[pos][xsize];
-    size_y = edit_pos[pos][ysize];
-    to_x   = DX + edit_pos[pos][xpos] + x * ED_BUTTON_ELEM_XSIZE;
-    to_y   = DY + edit_pos[pos][ypos] + y * ED_BUTTON_ELEM_YSIZE;
-
-    if (button_state & ED_BUTTON_PRESSED)
-    {
-      from_y = ED_BUTTON_ELEM_Y2POS;
-      shift = 1;
-    }
-
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      from_x,from_y, size_x,size_y, to_x,to_y);
-
-    DrawMiniGraphicExtHiRes(drawto,gc,
-			    DX+ED_BUTTON_ELEM_XPOS+3+shift + 
-			    (elem_pos % MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
-			    DY+ED_BUTTON_ELEM_YPOS+3-shift +
-			    (elem_pos / MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
-			    graphic);
-  }
-
-  redraw_mask |= REDRAW_DOOR_1;
-}
-
-void DrawCountButton(int button_nr, int button_state)
-{
-  int from_x, from_y, to_x,to_y, size_x, size_y;
-
-  from_x =
-    DOOR_GFX_PAGEX4+(button_nr%2 ? ED_BUTTON_PLUS_XPOS : ED_BUTTON_MINUS_XPOS);
-  from_y = DOOR_GFX_PAGEY1 + ED_BUTTON_MINUS_YPOS;
-  size_x = ED_BUTTON_MINUS_XSIZE;
-  size_y = ED_BUTTON_MINUS_YSIZE;
-  to_x = (button_nr<32 ? ED_COUNT_GADGET_XPOS : ED_SIZE_GADGET_XPOS);
-  if (button_nr % 2)
-    to_x += (ED_BUTTON_PLUS_XPOS - ED_BUTTON_MINUS_XPOS);
-  to_y = (button_nr<32 ? ED_COUNT_GADGET_YPOS : ED_SIZE_GADGET_YPOS) +
-    ((button_nr<32 ? button_nr : button_nr-32)/2)*ED_COUNT_GADGET_YSIZE;
-
-  if (button_state & ED_BUTTON_PRESSED)
-    from_x -= DXSIZE;
-
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    from_x,from_y, size_x,size_y, to_x,to_y);
-  XCopyArea(display,pix[PIX_DOOR],window,gc,
-	    from_x,from_y, size_x,size_y, to_x,to_y);
-}
-
-int CheckEditButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  static int edit_button[6] =
-  {
-    ED_BUTTON_CTRL,
-    ED_BUTTON_FILL,
-    ED_BUTTON_LEFT,
-    ED_BUTTON_UP,
-    ED_BUTTON_DOWN,
-    ED_BUTTON_RIGHT
-  };
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_EDIT_BUTTON(mx,my))
-      {
-	choice = EDIT_BUTTON(mx,my);
-	pressed = TRUE;
-	DrawEditButton(edit_button[choice] | ED_BUTTON_PRESSED);
-	if (edit_button[choice]!=ED_BUTTON_CTRL &&
-	    edit_button[choice]!=ED_BUTTON_FILL)
-	  return_code = 1<<choice;
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_EDIT_BUTTON(mx,my) || EDIT_BUTTON(mx,my)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawEditButton(edit_button[choice] | ED_BUTTON_RELEASED);
-      }
-      else if (ON_EDIT_BUTTON(mx,my) && EDIT_BUTTON(mx,my)==choice)
-      {
-	if (!pressed)
-	  DrawEditButton(edit_button[choice] | ED_BUTTON_PRESSED);
-	pressed = TRUE;
-	if (edit_button[choice]!=ED_BUTTON_CTRL &&
-	    edit_button[choice]!=ED_BUTTON_FILL)
-	  return_code = 1<<choice;
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_EDIT_BUTTON(mx,my) && EDIT_BUTTON(mx,my)==choice && pressed)
-    {
-      DrawEditButton(edit_button[choice] | ED_BUTTON_RELEASED);
-      if (edit_button[choice]==ED_BUTTON_CTRL ||
-	  edit_button[choice]==ED_BUTTON_FILL)
-	return_code = 1<<choice;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckCtrlButtons(int mx, int my, int button)
-{
-  int return_code = 0;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-  static int ctrl_button[4] =
-  {
-    ED_BUTTON_EDIT,
-    ED_BUTTON_CLEAR,
-    ED_BUTTON_UNDO,
-    ED_BUTTON_EXIT
-  };
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_CTRL_BUTTON(mx,my))
-      {
-	choice = CTRL_BUTTON(mx,my);
-	pressed = TRUE;
-	DrawCtrlButton(ctrl_button[choice] | ED_BUTTON_PRESSED);
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_CTRL_BUTTON(mx,my) || CTRL_BUTTON(mx,my)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawCtrlButton(ctrl_button[choice] | ED_BUTTON_RELEASED);
-      }
-      else if (ON_CTRL_BUTTON(mx,my) && CTRL_BUTTON(mx,my)==choice && !pressed)
-      {
-	pressed = TRUE;
-	DrawCtrlButton(ctrl_button[choice] | ED_BUTTON_PRESSED);
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_CTRL_BUTTON(mx,my) && CTRL_BUTTON(mx,my)==choice && pressed)
-    {
-      DrawCtrlButton(ctrl_button[choice] | ED_BUTTON_RELEASED);
-      return_code = 1<<(choice+6);
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckElemButtons(int mx, int my, int button)
-{
-  int return_code = -1;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_ELEM_BUTTON(mx,my))
-      {
-	choice = ELEM_BUTTON(mx,my);
-	pressed = TRUE;
-	DrawElemButton(choice,ED_BUTTON_PRESSED);
-	if (choice==ED_BUTTON_EUP ||
-	    choice==ED_BUTTON_EDOWN)
-	  return_code = choice;
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_ELEM_BUTTON(mx,my) || ELEM_BUTTON(mx,my)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawElemButton(choice,ED_BUTTON_RELEASED);
-      }
-      else if (ON_ELEM_BUTTON(mx,my) && ELEM_BUTTON(mx,my)==choice)
-      {
-	if (!pressed)
-	  DrawElemButton(choice,ED_BUTTON_PRESSED);
-	pressed = TRUE;
-	if (choice==ED_BUTTON_EUP ||
-	    choice==ED_BUTTON_EDOWN)
-	  return_code = choice;
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_ELEM_BUTTON(mx,my) && ELEM_BUTTON(mx,my)==choice && pressed)
-    {
-      DrawElemButton(choice,ED_BUTTON_RELEASED);
-      if (choice!=ED_BUTTON_EUP &&
-	  choice!=ED_BUTTON_EDOWN)
-	return_code = choice;
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
-}
-
-int CheckCountButtons(int mx, int my, int button)
-{
-  int return_code = -1;
-  static int choice = -1;
-  static BOOL pressed = FALSE;
-
-  if (button)
-  {
-    if (!motion_status)		/* Maustaste neu gedrückt */
-    {
-      if (ON_COUNT_BUTTON(mx,my))
-      {
-	choice = COUNT_BUTTON(mx,my);
-	pressed = TRUE;
-	DrawCountButton(choice,ED_BUTTON_PRESSED);
-	return_code = choice;
-      }
-    }
-    else			/* Mausbewegung bei gedrückter Maustaste */
-    {
-      if ((!ON_COUNT_BUTTON(mx,my) || COUNT_BUTTON(mx,my)!=choice) &&
-	  choice>=0 && pressed)
-      {
-	pressed = FALSE;
-	DrawCountButton(choice,ED_BUTTON_RELEASED);
-      }
-      else if (ON_COUNT_BUTTON(mx,my) && COUNT_BUTTON(mx,my)==choice)
-      {
-	if (!pressed)
-	  DrawCountButton(choice,ED_BUTTON_PRESSED);
-	pressed = TRUE;
-	return_code = choice;
-      }
-    }
-  }
-  else				/* Maustaste wieder losgelassen */
-  {
-    if (ON_COUNT_BUTTON(mx,my) && COUNT_BUTTON(mx,my)==choice && pressed)
-    {
-      DrawCountButton(choice,ED_BUTTON_RELEASED);
-      choice = -1;
-      pressed = FALSE;
-    }
-    else
-    {
-      choice = -1;
-      pressed = FALSE;
-    }
-  }
-
-  BackToFront();
-  return(return_code);
 }

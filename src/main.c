@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  main.c                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "main.h"
@@ -51,6 +49,7 @@ int		direct_draw_on = FALSE;
 int		fading_on = FALSE;
 int		autorecord_on = FALSE;
 int		joystick_nr = 0;
+int		quick_doors = FALSE;
 
 BOOL		redraw[SCR_FIELDX][SCR_FIELDY];
 int		redraw_mask;
@@ -65,6 +64,10 @@ int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int		AmoebaCnt[MAX_NUM_AMOEBA];
+long		Elementeigenschaften[MAX_ELEMENTS];
+
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
@@ -78,6 +81,15 @@ struct PlayerInfo	player;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SoundInfo	Sound[NUM_SOUNDS];
 struct RecordingInfo	tape,master_tape;
+
+struct JoystickInfo joystick[2] =
+{
+  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
+  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE,
+
+  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
+  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE
+};
 
 /* data needed for playing sounds */
 char *sound_name[NUM_SOUNDS] =

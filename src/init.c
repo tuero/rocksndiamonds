@@ -10,27 +10,20 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  init.c                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "init.h"
-#include "images.h"
+#include "misc.h"
 #include "sound.h"
 #include "screens.h"
-#include "tools.h"
-#include "game.h"
-#include "misc.h"
-
+#include "files.h"
 #include <signal.h>
 
-int sound_process_id=0;
+static int sound_process_id = 0;
 
 void OpenAll(int argc, char *argv[])
 {
-  LoadLevelInfo();
-  LoadPlayerInfo(PLAYER_SETUP);
-  LoadPlayerInfo(PLAYER_LEVEL);
+  InitLevelAndPlayerInfo();
 
   InitCounter();
   InitSound();
@@ -44,11 +37,21 @@ void OpenAll(int argc, char *argv[])
   InitDisplay(argc, argv);
   InitWindow(argc, argv);
   InitGfx();
+  InitElementProperties();
 
   DrawMainMenu();
 
   XMapWindow(display, window);
   XFlush(display);
+}
+
+void InitLevelAndPlayerInfo()
+{
+  if (!LoadLevelInfo())			/* global level info */
+    CloseAll();
+
+  LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
+  LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
 }
 
 void InitSound()
@@ -124,7 +127,7 @@ void InitJoystick()
   if (access(joystick_device_name[joystick_nr],R_OK)<0)
   {
     fprintf(stderr,"%s: cannot access joystick device '%s'\n",
-	    joystick_device_name[joystick_nr],progname);
+	    progname,joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
@@ -132,7 +135,7 @@ void InitJoystick()
   if ((joystick_device=open(joystick_device_name[joystick_nr],O_RDONLY))<0)
   {
     fprintf(stderr,"%s: cannot open joystick device '%s'\n",
-	    joystick_device_name[joystick_nr],progname);
+	    progname,joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
@@ -191,6 +194,11 @@ void InitWindow(int argc, char *argv[])
   char *window_name = "Rocks'n'Diamonds";
   char *icon_name = "Rocks'n'Diamonds";
   long window_event_mask;
+  static struct PictureFile icon_pic =
+  {
+    "rocks_icon.xbm",
+    "rocks_iconmask.xbm"
+  };
 
   width = WIN_XSIZE;
   height = WIN_YSIZE;
@@ -281,6 +289,15 @@ void InitGfx()
   unsigned long clip_gc_valuemask;
   char filename[256];
   Pixmap shapemask;
+
+  static struct PictureFile pic[NUM_PICTURES] =
+  {
+    "RocksScreen.xpm",		"RocksScreenMaske.xbm",
+    "RocksDoor.xpm",		"RocksDoorMaske.xbm",
+    "RocksToons.xpm",		"RocksToonsMaske.xbm",
+    "RocksFont.xpm",		NULL,
+    "RocksFont2.xpm",		NULL
+  }; 
 
   for(i=0;i<NUM_PICTURES;i++)
   {
@@ -414,6 +431,289 @@ void InitGfx()
       redraw[i][j]=0;
   redraw_tiles=0;
   redraw_mask=REDRAW_ALL;
+}
+
+void InitElementProperties()
+{
+  int i,j;
+
+  static int ep_amoebalive[] =
+  {
+    EL_AMOEBE_NASS,
+    EL_AMOEBE_NORM,
+    EL_AMOEBE_VOLL
+  };
+  static int ep_amoebalive_num = sizeof(ep_amoebalive)/sizeof(int);
+
+  static int ep_amoeboid[] =
+  {
+    EL_AMOEBE_TOT,
+    EL_AMOEBE_NASS,
+    EL_AMOEBE_NORM,
+    EL_AMOEBE_VOLL
+  };
+  static int ep_amoeboid_num = sizeof(ep_amoeboid)/sizeof(int);
+
+  static int ep_badewannoid[] =
+  {
+    EL_BADEWANNE1,
+    EL_BADEWANNE2,
+    EL_BADEWANNE3,
+    EL_BADEWANNE4,
+    EL_BADEWANNE5
+  };
+  static int ep_badewannoid_num = sizeof(ep_badewannoid)/sizeof(int);
+
+  static int ep_schluessel[] =
+  {
+    EL_SCHLUESSEL1,
+    EL_SCHLUESSEL2,
+    EL_SCHLUESSEL3,
+    EL_SCHLUESSEL4
+  };
+  static int ep_schluessel_num = sizeof(ep_schluessel)/sizeof(int);
+
+  static int ep_pforte[] =
+  {
+    EL_PFORTE1,
+    EL_PFORTE2,
+    EL_PFORTE3,
+    EL_PFORTE4,
+    EL_PFORTE1X,
+    EL_PFORTE2X,
+    EL_PFORTE3X,
+    EL_PFORTE4X
+  };
+  static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
+
+  static int ep_solid[] =
+  {
+    EL_BETON,
+    EL_MAUERWERK,
+    EL_FELSBODEN,
+    EL_AUSGANG_ZU,
+    EL_AUSGANG_ACT,
+    EL_AUSGANG_AUF,
+    EL_AMOEBE_TOT,
+    EL_AMOEBE_NASS,
+    EL_AMOEBE_NORM,
+    EL_AMOEBE_VOLL,
+    EL_MORAST_VOLL,
+    EL_MORAST_LEER,
+    EL_SIEB_VOLL,
+    EL_SIEB_LEER,
+    EL_LIFE,
+    EL_LIFE_ASYNC,
+    EL_BADEWANNE1,
+    EL_BADEWANNE2,
+    EL_BADEWANNE3,
+    EL_BADEWANNE4,
+    EL_BADEWANNE5
+  };
+  static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
+
+  static int ep_massiv[] =
+  {
+    EL_BETON,
+    EL_SALZSAEURE,
+    EL_BADEWANNE1,
+    EL_BADEWANNE2,
+    EL_BADEWANNE3,
+    EL_BADEWANNE4,
+    EL_BADEWANNE5,
+    EL_PFORTE1,
+    EL_PFORTE2,
+    EL_PFORTE3,
+    EL_PFORTE4,
+    EL_PFORTE1X,
+    EL_PFORTE2X,
+    EL_PFORTE3X,
+    EL_PFORTE4X
+  };
+  static int ep_massiv_num = sizeof(ep_massiv)/sizeof(int);
+
+  static int ep_slippery[] =
+  {
+    EL_FELSBODEN,
+    EL_FELSBROCKEN,
+    EL_EDELSTEIN,
+    EL_DIAMANT,
+    EL_BOMBE,
+    EL_KOKOSNUSS,
+    EL_ABLENK_EIN,
+    EL_ABLENK_AUS,
+    EL_ZEIT_VOLL,
+    EL_ZEIT_LEER,
+    EL_BIRNE_EIN,
+    EL_BIRNE_AUS,
+    EL_BADEWANNE1,
+    EL_BADEWANNE2
+  };
+  static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
+
+  static int ep_enemy[] =
+  {
+    EL_KAEFER,
+    EL_FLIEGER,
+    EL_MAMPFER,
+    EL_ZOMBIE,
+    EL_PACMAN
+  };
+  static int ep_enemy_num = sizeof(ep_enemy)/sizeof(int);
+
+  static int ep_can_fall[] =
+  {
+    EL_FELSBROCKEN,
+    EL_EDELSTEIN,
+    EL_DIAMANT,
+    EL_BOMBE,
+    EL_KOKOSNUSS,
+    EL_TROPFEN,
+    EL_MORAST_VOLL,
+    EL_SIEB_VOLL,
+    EL_ZEIT_VOLL,
+    EL_ZEIT_LEER
+  };
+  static int ep_can_fall_num = sizeof(ep_can_fall)/sizeof(int);
+
+  static int ep_can_smash[] =
+  {
+    EL_FELSBROCKEN,
+    EL_EDELSTEIN,
+    EL_DIAMANT,
+    EL_SCHLUESSEL1,
+    EL_SCHLUESSEL2,
+    EL_SCHLUESSEL3,
+    EL_SCHLUESSEL4,
+    EL_BOMBE,
+    EL_KOKOSNUSS,
+    EL_TROPFEN,
+    EL_ZEIT_VOLL,
+    EL_ZEIT_LEER
+  };
+  static int ep_can_smash_num = sizeof(ep_can_smash)/sizeof(int);
+
+  static int ep_can_change[] =
+  {
+    EL_FELSBROCKEN,
+    EL_EDELSTEIN,
+    EL_DIAMANT
+  };
+  static int ep_can_change_num = sizeof(ep_can_change)/sizeof(int);
+
+  static int ep_can_move[] =
+  {
+    EL_KAEFER,
+    EL_FLIEGER,
+    EL_MAMPFER,
+    EL_ZOMBIE,
+    EL_PACMAN
+  };
+  static int ep_can_move_num = sizeof(ep_can_move)/sizeof(int);
+
+  static int ep_could_move[] =
+  {
+    EL_KAEFER_R,
+    EL_KAEFER_O,
+    EL_KAEFER_L,
+    EL_KAEFER_U,
+    EL_FLIEGER_R,
+    EL_FLIEGER_O,
+    EL_FLIEGER_L,
+    EL_FLIEGER_U,
+    EL_PACMAN_R,
+    EL_PACMAN_O,
+    EL_PACMAN_L,
+    EL_PACMAN_U
+  };
+  static int ep_could_move_num = sizeof(ep_could_move)/sizeof(int);
+
+  static int ep_dont_touch[] =
+  {
+    EL_KAEFER,
+    EL_FLIEGER
+  };
+  static int ep_dont_touch_num = sizeof(ep_dont_touch)/sizeof(int);
+
+  static int ep_dont_go_to[] =
+  {
+    EL_KAEFER,
+    EL_FLIEGER,
+    EL_MAMPFER,
+    EL_ZOMBIE,
+    EL_PACMAN,
+    EL_TROPFEN,
+    EL_SALZSAEURE
+  };
+  static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
+
+  static long ep_bit[] =
+  {
+    EP_BIT_AMOEBALIVE,
+    EP_BIT_AMOEBOID,
+    EP_BIT_BADEWANNOID,
+    EP_BIT_SCHLUESSEL,
+    EP_BIT_PFORTE,
+    EP_BIT_SOLID,
+    EP_BIT_MASSIV,
+    EP_BIT_SLIPPERY,
+    EP_BIT_ENEMY,
+    EP_BIT_CAN_FALL,
+    EP_BIT_CAN_SMASH,
+    EP_BIT_CAN_CHANGE,
+    EP_BIT_CAN_MOVE,
+    EP_BIT_COULD_MOVE,
+    EP_BIT_DONT_TOUCH,
+    EP_BIT_DONT_GO_TO
+  };
+  static int *ep_array[] =
+  {
+    ep_amoebalive,
+    ep_amoeboid,
+    ep_badewannoid,
+    ep_schluessel,
+    ep_pforte,
+    ep_solid,
+    ep_massiv,
+    ep_slippery,
+    ep_enemy,
+    ep_can_fall,
+    ep_can_smash,
+    ep_can_change,
+    ep_can_move,
+    ep_could_move,
+    ep_dont_touch,
+    ep_dont_go_to
+  };
+  static int *ep_num[] =
+  {
+    &ep_amoebalive_num,
+    &ep_amoeboid_num,
+    &ep_badewannoid_num,
+    &ep_schluessel_num,
+    &ep_pforte_num,
+    &ep_solid_num,
+    &ep_massiv_num,
+    &ep_slippery_num,
+    &ep_enemy_num,
+    &ep_can_fall_num,
+    &ep_can_smash_num,
+    &ep_can_change_num,
+    &ep_can_move_num,
+    &ep_could_move_num,
+    &ep_dont_touch_num,
+    &ep_dont_go_to_num
+  };
+  static int num_properties = sizeof(ep_num)/sizeof(int *);
+
+  for(i=0;i<MAX_ELEMENTS;i++)
+    Elementeigenschaften[i] = 0;
+
+  for(i=0;i<num_properties;i++)
+    for(j=0;j<*(ep_num[i]);j++)
+      Elementeigenschaften[(ep_array[i])[j]] |= ep_bit[i];
+  for(i=EL_CHAR_START;i<EL_CHAR_END;i++)
+    Elementeigenschaften[i] |= EP_BIT_CHAR;
 }
 
 void CloseAll()

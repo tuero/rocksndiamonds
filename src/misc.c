@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  misc.c                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #include "misc.h"
@@ -34,6 +32,74 @@ void microsleep(unsigned long usec)
   if (select(0,NULL,NULL,NULL,&delay)!=0)
     fprintf(stderr,"%s: in function microsleep: select failed!\n",
 	    progname);
+}
+
+long mainCounter(int mode)
+{
+  static struct timeval base_time = { 0, 0 };
+  struct timeval current_time;
+  long counter_ms;
+
+  gettimeofday(&current_time,NULL);
+  if (mode==0 || current_time.tv_sec<base_time.tv_sec)
+    base_time = current_time;
+
+  counter_ms = (current_time.tv_sec - base_time.tv_sec)*1000
+             + (current_time.tv_usec - base_time.tv_usec)/1000;
+
+  if (mode==1)
+    return(counter_ms/10);	/* return 1/100 secs since last init */
+  else
+    return(counter_ms);		/* return 1/1000 secs since last init */
+}
+
+void InitCounter() /* set counter back to zero */
+{
+  mainCounter(0);
+}
+
+long Counter()	/* returns 1/100 secs since last call of InitCounter() */
+{
+  return(mainCounter(1));
+}
+
+long Counter2()	/* returns 1/1000 secs since last call of InitCounter() */
+{
+  return(mainCounter(2));
+}
+
+void WaitCounter(long value) 	/* wait for counter to reach value */
+{
+  long wait;
+
+  while((wait=value-Counter())>0)
+    microsleep(wait*10000);
+}
+
+void WaitCounter2(long value) 	/* wait for counter to reach value */
+{
+  long wait;
+
+  while((wait=value-Counter2())>0)
+    microsleep(wait*1000);
+}
+
+void Delay(long value)
+{
+  microsleep(value);
+}
+
+BOOL DelayReached(long *counter_var, int delay)
+{
+  long actual_counter = Counter();
+
+  if (actual_counter>*counter_var+delay || actual_counter<*counter_var)
+  {
+    *counter_var = actual_counter;
+    return(TRUE);
+  }
+  else
+    return(FALSE);
 }
 
 unsigned long be2long(unsigned long *be)	/* big-endian -> longword */
@@ -82,63 +148,6 @@ char *GetLoginName()
   else
     return(pwd->pw_name);
 }
-
-static struct AnimInfo toon[NUM_TOONS] =
-{
-  DWARF_XSIZE, DWARF_YSIZE,
-  DWARF_X, DWARF_Y,
-  DWARF_FRAMES,
-  DWARF_FPS,
-  DWARF_STEPSIZE,
-  FALSE,
-  ANIMDIR_RIGHT,
-  ANIMPOS_DOWN,
-
-  DWARF_XSIZE, DWARF_YSIZE,
-  DWARF_X, DWARF2_Y,
-  DWARF_FRAMES,
-  DWARF_FPS,
-  DWARF_STEPSIZE,
-  FALSE,
-  ANIMDIR_LEFT,
-  ANIMPOS_DOWN,
-
-  JUMPER_XSIZE, JUMPER_YSIZE,
-  JUMPER_X, JUMPER_Y,
-  JUMPER_FRAMES,
-  JUMPER_FPS,
-  JUMPER_STEPSIZE,
-  FALSE,
-  ANIMDIR_LEFT,
-  ANIMPOS_DOWN,
-
-  CLOWN_XSIZE, CLOWN_YSIZE,
-  CLOWN_X, CLOWN_Y,
-  CLOWN_FRAMES,
-  CLOWN_FPS,
-  CLOWN_STEPSIZE,
-  FALSE,
-  ANIMDIR_UP,
-  ANIMPOS_ANY,
-
-  BIRD_XSIZE, BIRD_YSIZE,
-  BIRD1_X, BIRD1_Y,
-  BIRD_FRAMES,
-  BIRD_FPS,
-  BIRD_STEPSIZE,
-  TRUE,
-  ANIMDIR_RIGHT,
-  ANIMPOS_UPPER,
-
-  BIRD_XSIZE, BIRD_YSIZE,
-  BIRD2_X, BIRD2_Y,
-  BIRD_FRAMES,
-  BIRD_FPS,
-  BIRD_STEPSIZE,
-  TRUE,
-  ANIMDIR_LEFT,
-  ANIMPOS_UPPER
-};
 
 void InitAnimation()
 {
@@ -210,12 +219,68 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
   static BOOL horiz_move, vert_move;
   static long anim_delay = 0;
   static int anim_delay_value = 0;
-  struct AnimInfo *anim = &toon[toon_nr];
   static int width,height;
   static int pad_x,pad_y;
   static int cut_x,cut_y;
   static int src_x, src_y;
   static int dest_x, dest_y;
+  static struct AnimInfo toon[NUM_TOONS] =
+  {
+    DWARF_XSIZE, DWARF_YSIZE,
+    DWARF_X, DWARF_Y,
+    DWARF_FRAMES,
+    DWARF_FPS,
+    DWARF_STEPSIZE,
+    FALSE,
+    ANIMDIR_RIGHT,
+    ANIMPOS_DOWN,
+
+    DWARF_XSIZE, DWARF_YSIZE,
+    DWARF_X, DWARF2_Y,
+    DWARF_FRAMES,
+    DWARF_FPS,
+    DWARF_STEPSIZE,
+    FALSE,
+    ANIMDIR_LEFT,
+    ANIMPOS_DOWN,
+
+    JUMPER_XSIZE, JUMPER_YSIZE,
+    JUMPER_X, JUMPER_Y,
+    JUMPER_FRAMES,
+    JUMPER_FPS,
+    JUMPER_STEPSIZE,
+    FALSE,
+    ANIMDIR_LEFT,
+    ANIMPOS_DOWN,
+
+    CLOWN_XSIZE, CLOWN_YSIZE,
+    CLOWN_X, CLOWN_Y,
+    CLOWN_FRAMES,
+    CLOWN_FPS,
+    CLOWN_STEPSIZE,
+    FALSE,
+    ANIMDIR_UP,
+    ANIMPOS_ANY,
+
+    BIRD_XSIZE, BIRD_YSIZE,
+    BIRD1_X, BIRD1_Y,
+    BIRD_FRAMES,
+    BIRD_FPS,
+    BIRD_STEPSIZE,
+    TRUE,
+    ANIMDIR_RIGHT,
+    ANIMPOS_UPPER,
+
+    BIRD_XSIZE, BIRD_YSIZE,
+    BIRD2_X, BIRD2_Y,
+    BIRD_FRAMES,
+    BIRD_FPS,
+    BIRD_STEPSIZE,
+    TRUE,
+    ANIMDIR_LEFT,
+    ANIMPOS_UPPER
+  };
+  struct AnimInfo *anim = &toon[toon_nr];
 
   if (restart)
   {
@@ -348,6 +413,8 @@ void DrawAnim(int src_x, int src_y, int width, int height,
 {
   int buf_x = DOOR_GFX_PAGEX3, buf_y = DOOR_GFX_PAGEY1;
 
+#if 1
+  /* special method to avoid flickering interference with BackToFront() */
   XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,dest_x-pad_x,dest_y-pad_y,
 	    width+2*pad_x,height+2*pad_y, buf_x,buf_y);
   XSetClipOrigin(display,clip_gc[PIX_TOONS],dest_x-src_x,dest_y-src_y);
@@ -355,13 +422,11 @@ void DrawAnim(int src_x, int src_y, int width, int height,
 	    src_x,src_y, width,height, dest_x,dest_y);
   XCopyArea(display,backbuffer,window,gc, dest_x-pad_x,dest_y-pad_y,
 	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
-
   BackToFront();
-
   XCopyArea(display,pix[PIX_DB_DOOR],backbuffer,gc, buf_x,buf_y,
 	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
-
-/*
+#else
+  /* normal method, causing flickering interference with BackToFront() */
   XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,dest_x-pad_x,dest_y-pad_y,
 	    width+2*pad_x,height+2*pad_y, buf_x,buf_y);
   XSetClipOrigin(display,clip_gc[PIX_TOONS],
@@ -370,7 +435,7 @@ void DrawAnim(int src_x, int src_y, int width, int height,
 	    src_x,src_y, width,height, buf_x+pad_x,buf_y+pad_y);
   XCopyArea(display,pix[PIX_DB_DOOR],window,gc, buf_x,buf_y,
 	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
-*/
+#endif
 
   XFlush(display);
 }

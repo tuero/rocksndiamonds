@@ -10,17 +10,12 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  game.h                                                  *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef GAME_H
 #define GAME_H
 
 #include "main.h"
-
-#define PLAYER_LEVEL	0
-#define PLAYER_SETUP	1
 
 #define DF_DIG		0
 #define DF_SNAP		1
@@ -30,20 +25,10 @@
 #define MF_MOVING	1
 #define MF_ACTION	2
 
-BOOL CreateNewScoreFile(void);
-BOOL CreateNewNamesFile(int);
-void LoadLevelInfo(void);
-void LoadLevel(int);
-void LoadLevelTape(int);
-void LoadScore(int);
-void LoadPlayerInfo(int);
-void SaveLevel(int);
-void SaveLevelTape(int);
-void SaveScore(int);
-void SavePlayerInfo(int);
 void GetPlayerConfig(void);
 void InitGame(void);
 void InitMovDir(int, int);
+void InitAmoebaNr(int, int);
 void GameWon(void);
 BOOL NewHiScore(void);
 void InitMovingField(int, int, int);
@@ -60,6 +45,8 @@ void Impact(int, int);
 void TurnRound(int, int);
 void StartMoving(int, int);
 void ContinueMoving(int, int);
+int AmoebeNachbarNr(int, int);
+void AmoebeUmwandeln(int, int);
 void AmoebeWaechst(int, int);
 void AmoebeAbleger(int, int);
 void Life(int, int);
@@ -94,10 +81,5 @@ int TapePlayAction(void);
 BOOL TapePlayDelay(void);
 void TapeStop(void);
 void TapeErase(void);
-void DrawVideoDisplay(unsigned long, unsigned long);
-void DrawSoundDisplay(unsigned long);
-void DrawGameButton(unsigned long);
-void DrawChooseButton(unsigned long);
-void DrawConfirmButton(unsigned long);
 
 #endif

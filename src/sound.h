@@ -10,8 +10,6 @@
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
 *  sound.c                                                 *
-*                                                          *
-*  Letzte Aenderung: 15.06.1995                            *
 ***********************************************************/
 
 #ifndef SOUND_H
@@ -27,6 +25,10 @@
 #endif
 /* where is the right declaration for 'ioctl'? */
 extern void ioctl(long, long, void *);
+#endif
+
+#ifdef __FreeBSD__
+#include <machine/soundcard.h>
 #endif
 
 #define SND_BLOCKSIZE 4096
