@@ -600,6 +600,9 @@ void DrawPlayer(struct PlayerInfo *player)
 
     if (player->Pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
     {
+#if 1
+      DrawLevelElement(next_jx, next_jy, EL_EMPTY);
+#else
       if (player->GfxPos)
       {
   	if (Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL)
@@ -609,6 +612,7 @@ void DrawPlayer(struct PlayerInfo *player)
       }
       else
   	DrawLevelField(next_jx, next_jy);
+#endif
     }
   }
 
@@ -700,11 +704,20 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
+    if (Back[next_jx][next_jy])
+      DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+
+#if 1
+    if ((sxx || syy) && element == EL_SOKOBAN_OBJECT)
+      DrawGraphicShiftedThruMask(px, py, sxx, syy, IMG_SOKOBAN_OBJECT, 0,
+				 NO_CUTTING);
+#else
     if ((sxx || syy) &&
 	(element == EL_SOKOBAN_FIELD_EMPTY ||
 	 Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL))
       DrawGraphicShiftedThruMask(px, py, sxx, syy, IMG_SOKOBAN_OBJECT, 0,
 				 NO_CUTTING);
+#endif
     else
     {
 #if 1

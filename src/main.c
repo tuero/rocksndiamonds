@@ -50,6 +50,7 @@ short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaCnt[MAX_NUM_AMOEBA];

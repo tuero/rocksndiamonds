@@ -750,6 +750,33 @@ static void InitGameEngine()
     if (HAS_CHANGE_EVENT(i, CE_BY_OTHER))
       trigger_events[element_info[i].change.trigger] |=
 	element_info[i].change.events;
+
+  /* set push delay value for all non-custom elements */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    if (!IS_CUSTOM_ELEMENT(i))
+    {
+      if (i == EL_SPRING ||
+	  i == EL_BALLOON)
+      {
+	element_info[i].push_delay_fixed = 0;
+	element_info[i].push_delay_random = 0;
+      }
+      else if (i == EL_SOKOBAN_OBJECT ||
+	       i == EL_SOKOBAN_FIELD_FULL ||
+	       i == EL_SATELLITE ||
+	       i == EL_SP_DISK_YELLOW)
+      {
+	element_info[i].push_delay_fixed = 2;
+	element_info[i].push_delay_random = 0;
+      }
+      else
+      {
+	element_info[i].push_delay_fixed = 2;
+	element_info[i].push_delay_random = 8;
+      }
+    }
+  }
 }
 
 
@@ -907,6 +934,7 @@ void InitGame()
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
+      Pushed[x][y] = FALSE;
       ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
@@ -1601,6 +1629,7 @@ static void RemoveField(int x, int y)
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
   ChangeDelay[x][y] = 0;
+  Pushed[x][y] = FALSE;
 }
 
 void RemoveMovingField(int x, int y)
@@ -3315,8 +3344,14 @@ void StartMoving(int x, int y)
 #endif
     }
 #if 1
+#if 1
+    else if (game.engine_version < RELEASE_IDENT(2,2,0,7) &&
+	     CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
+	     JustStopped[x][y] && !Pushed[x][y + 1])
+#else
     else if (CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
 	     JustStopped[x][y])
+#endif
     {
       /*
       printf("::: %d\n", MovDir[x][y]);
@@ -3828,7 +3863,11 @@ void ContinueMoving(int x, int y)
   MovPos[x][y] += step;
 
 #if 1
+#if 1
+  if (Pushed[x][y])	/* special case: moving object pushed by player */
+#else
   if (pushing)		/* special case: moving object pushed by player */
+#endif
 #if 1
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
 #else
@@ -3922,6 +3961,16 @@ void ContinueMoving(int x, int y)
       Feld[x][y] = get_next_element(element);
       element = Feld[newx][newy] = Store[x][y];
     }
+    else if (element == EL_SOKOBAN_OBJECT)
+    {
+      if (Back[x][y])
+	Feld[x][y] = Back[x][y];
+
+      if (Back[newx][newy])
+	Feld[newx][newy] = EL_SOKOBAN_FIELD_FULL;
+
+      Back[x][y] = Back[newx][newy] = 0;
+    }
     else if (Store[x][y] == EL_ACID)
     {
       element = Feld[newx][newy] = EL_ACID;
@@ -3939,6 +3988,8 @@ void ContinueMoving(int x, int y)
     GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
     GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
 
+    Pushed[x][y] = Pushed[newx][newy] = FALSE;
+
     ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
 #if 1
@@ -3946,14 +3997,16 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 #else
-    /*
+
+#if 0
     if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
       MovDir[newx][newy] = 0;
-    */
-
+#else
     if (!CAN_MOVE(element) ||
 	(element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
       MovDir[newx][newy] = 0;
+#endif
+
 #endif
 #endif
 
@@ -6766,6 +6819,8 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
+#if 0
+
       /* the following elements cannot be pushed by "snapping" */
     case EL_ROCK:
     case EL_BOMB:
@@ -6862,6 +6917,8 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
 
       break;
+
+#endif
 
     case EL_GATE_1:
     case EL_GATE_2:
@@ -7048,6 +7105,8 @@ int DigField(struct PlayerInfo *player,
       break;
 
 #if 0
+
+#if 0
     case EL_SOKOBAN_FIELD_EMPTY:
       break;
 #endif
@@ -7086,6 +7145,44 @@ int DigField(struct PlayerInfo *player,
 
       if (IS_SB_ELEMENT(element))
       {
+#if 1
+	if (element == EL_SOKOBAN_FIELD_FULL)
+	{
+	  Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
+	  local_player->sokobanfields_still_needed++;
+	}
+
+	if (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY)
+	{
+	  Back[x + dx][y + dy] = EL_SOKOBAN_FIELD_EMPTY;
+	  local_player->sokobanfields_still_needed--;
+	}
+
+	Feld[x][y] = EL_SOKOBAN_OBJECT;
+
+	if (Back[x][y] == Back[x + dx][y + dy])
+	  PlaySoundLevelAction(x, y, ACTION_PUSHING);
+	else if (Back[x][y] != 0)
+	  PlaySoundLevelElementAction(x, y, EL_SOKOBAN_FIELD_FULL,
+				      ACTION_EMPTYING);
+	else
+	  PlaySoundLevelElementAction(x + dx, y + dy, EL_SOKOBAN_FIELD_EMPTY,
+				      ACTION_FILLING);
+
+	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
+			       dx > 0 ? MV_RIGHT :
+			       dy < 0 ? MV_UP : MV_DOWN));
+	MovPos[x][y] = (dx != 0 ? dx : dy);
+
+#if 0
+	printf("::: %s -> %s [%s -> %s]\n",
+	       element_info[Feld[x][y]].token_name,
+	       element_info[Feld[x + dx][y + dy]].token_name,
+	       element_info[Back[x][y]].token_name,
+	       element_info[Back[x + dx][y + dy]].token_name);
+#endif
+
+#else
 	if (element == EL_SOKOBAN_FIELD_FULL)
 	{
 	  Feld[x][y] = EL_SOKOBAN_FIELD_EMPTY;
@@ -7127,11 +7224,19 @@ int DigField(struct PlayerInfo *player,
 	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
 #endif
 	}
+#endif
       }
       else
       {
+#if 1
+	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
+			       dx > 0 ? MV_RIGHT :
+			       dy < 0 ? MV_UP : MV_DOWN));
+	MovPos[x][y] = (dx != 0 ? dx : dy);
+#else
 	RemoveField(x, y);
-	Feld[x+dx][y+dy] = element;
+	Feld[x + dx][y + dy] = element;
+#endif
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       }
 
@@ -7151,6 +7256,8 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
 
       break;
+
+#endif
 
     case EL_PENGUIN:
     case EL_PIG:
@@ -7199,13 +7306,17 @@ int DigField(struct PlayerInfo *player,
       }
       else if (IS_PUSHABLE(element))
       {
-	if (mode == DF_SNAP)
+	if (mode == DF_SNAP && element != EL_BD_ROCK)
 	  return MF_NO_ACTION;
 
 	if (CAN_FALL(element) && dy)
 	  return MF_NO_ACTION;
 
-	if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))
+	if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
+	    !(element == EL_SPRING && use_spring_bug))
+	  return MF_NO_ACTION;
+
+	if (element == EL_SPRING && MovDir[x][y] != MV_NO_MOVING)
 	  return MF_NO_ACTION;
 
 	if (!player->Pushing &&
@@ -7214,7 +7325,10 @@ int DigField(struct PlayerInfo *player,
 
 	player->Pushing = TRUE;
 
-	if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	if (!(IN_LEV_FIELD(x + dx, y + dy) &&
+	      (IS_FREE(x + dx, y + dy) ||
+	       (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY &&
+		IS_SB_ELEMENT(element)))))
 	  return MF_NO_ACTION;
 
 	if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
@@ -7224,35 +7338,60 @@ int DigField(struct PlayerInfo *player,
 	  player->push_delay = FrameCounter;
 
 	if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	    !(tape.playing && tape.file_version < FILE_VERSION_2_0))
+	    !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
+	    element != EL_SPRING && element != EL_BALLOON)
 	  return MF_NO_ACTION;
 
-#if 1
-	InitMovingField(x, y, (dx < 0 ? MV_LEFT :
-			       dx > 0 ? MV_RIGHT :
-			       dy < 0 ? MV_UP : MV_DOWN));
-	MovPos[x][y] = (dx != 0 ? dx : dy);
-#else
-	RemoveField(x, y);
-	Feld[x + dx][y + dy] = element;
-#endif
+	if (IS_SB_ELEMENT(element))
+	{
+	  if (element == EL_SOKOBAN_FIELD_FULL)
+	  {
+	    Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
+	    local_player->sokobanfields_still_needed++;
+	  }
 
-#if 1
+	  if (Feld[x + dx][y + dy] == EL_SOKOBAN_FIELD_EMPTY)
+	  {
+	    Back[x + dx][y + dy] = EL_SOKOBAN_FIELD_EMPTY;
+	    local_player->sokobanfields_still_needed--;
+	  }
+
+	  Feld[x][y] = EL_SOKOBAN_OBJECT;
+
+	  if (Back[x][y] == Back[x + dx][y + dy])
+	    PlaySoundLevelAction(x, y, ACTION_PUSHING);
+	  else if (Back[x][y] != 0)
+	    PlaySoundLevelElementAction(x, y, EL_SOKOBAN_FIELD_FULL,
+					ACTION_EMPTYING);
+	  else
+	    PlaySoundLevelElementAction(x + dx, y + dy, EL_SOKOBAN_FIELD_EMPTY,
+					ACTION_FILLING);
+
+	  if (local_player->sokobanfields_still_needed == 0 &&
+	      game.emulation == EMU_SOKOBAN)
+	  {
+	    player->LevelSolved = player->GameOver = TRUE;
+	    PlaySoundLevel(x, y, SND_GAME_SOKOBAN_SOLVING);
+	  }
+	}
+	else
+	  PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
+
+	InitMovingField(x, y, move_direction);
+
+	if (mode == DF_SNAP)
+	  ContinueMoving(x, y);
+	else
+	  MovPos[x][y] = (dx != 0 ? dx : dy);
+
+	Pushed[x][y] = TRUE;
+	Pushed[x + dx][y + dy] = TRUE;
+
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
-#else
-	player->push_delay_value = 2 + RND(8);
-#endif
-
-	DrawLevelField(x + dx, y + dy);
-	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
-#if 1
 	CheckPlayerElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
-#else
-	CheckPlayerElementChange(x + dx, y + dy, element, CE_PUSHED_BY_PLAYER);
-#endif
 
 	break;
       }
