@@ -1,5 +1,12 @@
+2003-11-08
+	* fixed tape recording when player is created from CE element change
+
 2003-11-04
 	* introduced "turning..." action graphic for elements with move delay
+	  (non-CE: bug, spaceship, sniksnak, mole, pacman, yamyam)
+
+2003-11-03
+	* prevent "extended" changed elements from delay change in same frame
 
 2003-11-02
 	* fixed bug when pushing element that can move away to the side

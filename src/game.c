@@ -5904,6 +5904,100 @@ static boolean CheckElementChange(int x, int y, int element, int trigger_event)
   return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
 }
 
+#if 1
+static byte PlayerActions(struct PlayerInfo *player, byte player_action)
+{
+#if 0
+  static byte stored_player_action[MAX_PLAYERS];
+  static int num_stored_actions = 0;
+#endif
+  boolean moved = FALSE, snapped = FALSE, dropped = FALSE;
+  int left	= player_action & JOY_LEFT;
+  int right	= player_action & JOY_RIGHT;
+  int up	= player_action & JOY_UP;
+  int down	= player_action & JOY_DOWN;
+  int button1	= player_action & JOY_BUTTON_1;
+  int button2	= player_action & JOY_BUTTON_2;
+  int dx	= (left ? -1	: right ? 1	: 0);
+  int dy	= (up   ? -1	: down  ? 1	: 0);
+
+#if 0
+  stored_player_action[player->index_nr] = 0;
+  num_stored_actions++;
+#endif
+
+#if 0
+  printf("::: player %d [%d]\n", player->index_nr, FrameCounter);
+#endif
+
+  if (!player->active || tape.pausing)
+    return 0;
+
+  if (player_action)
+  {
+#if 0
+    printf("::: player %d acts [%d]\n", player->index_nr, FrameCounter);
+#endif
+
+    if (button1)
+      snapped = SnapField(player, dx, dy);
+    else
+    {
+      if (button2)
+	dropped = DropElement(player);
+
+      moved = MovePlayer(player, dx, dy);
+    }
+
+    if (tape.single_step && tape.recording && !tape.pausing)
+    {
+      if (button1 || (dropped && !moved))
+      {
+	TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+	SnapField(player, 0, 0);		/* stop snapping */
+      }
+    }
+
+#if 1
+    return player_action;
+#else
+    stored_player_action[player->index_nr] = player_action;
+#endif
+  }
+  else
+  {
+#if 0
+    printf("::: player %d waits [%d]\n", player->index_nr, FrameCounter);
+#endif
+
+    /* no actions for this player (no input at player's configured device) */
+
+    DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
+    SnapField(player, 0, 0);
+    CheckGravityMovement(player);
+
+    if (player->MovPos == 0)
+      InitPlayerGfxAnimation(player, ACTION_DEFAULT, player->MovDir);
+
+    if (player->MovPos == 0)	/* needed for tape.playing */
+      player->is_moving = FALSE;
+
+    return 0;
+  }
+
+#if 0
+  if (tape.recording && num_stored_actions >= MAX_PLAYERS)
+  {
+    printf("::: player %d recorded [%d]\n", player->index_nr, FrameCounter);
+
+    TapeRecordAction(stored_player_action);
+    num_stored_actions = 0;
+  }
+#endif
+}
+
+#else
+
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
@@ -5921,11 +6015,15 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   stored_player_action[player->index_nr] = 0;
   num_stored_actions++;
 
+  printf("::: player %d [%d]\n", player->index_nr, FrameCounter);
+
   if (!player->active || tape.pausing)
     return;
 
   if (player_action)
   {
+    printf("::: player %d acts [%d]\n", player->index_nr, FrameCounter);
+
     if (button1)
       snapped = SnapField(player, dx, dy);
     else
@@ -5949,6 +6047,8 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   }
   else
   {
+    printf("::: player %d waits [%d]\n", player->index_nr, FrameCounter);
+
     /* no actions for this player (no input at player's configured device) */
 
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
@@ -5964,10 +6064,13 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 
   if (tape.recording && num_stored_actions >= MAX_PLAYERS)
   {
+    printf("::: player %d recorded [%d]\n", player->index_nr, FrameCounter);
+
     TapeRecordAction(stored_player_action);
     num_stored_actions = 0;
   }
 }
+#endif
 
 void GameActions()
 {
@@ -5977,6 +6080,9 @@ void GameActions()
   int i, x, y, element, graphic;
   byte *recorded_player_action;
   byte summarized_player_action = 0;
+#if 1
+  byte tape_action[MAX_PLAYERS];
+#endif
 
   if (game_status != GAME_MODE_PLAYING)
     return;
@@ -6039,7 +6145,7 @@ void GameActions()
   if (!options.network && !setup.team_mode)
     local_player->effective_action = summarized_player_action;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i=0; i < MAX_PLAYERS; i++)
   {
     int actual_player_action = stored_player[i].effective_action;
 
@@ -6049,9 +6155,15 @@ void GameActions()
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
 
-    PlayerActions(&stored_player[i], actual_player_action);
+    tape_action[i] = PlayerActions(&stored_player[i], actual_player_action);
+
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
+
+#if 1
+  if (tape.recording)
+    TapeRecordAction(tape_action);
+#endif
 
   network_player_action_received = FALSE;
 
@@ -6223,6 +6335,11 @@ void GameActions()
 	  !Stop[x][y])
       {
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+#if 0
+	if (element == EL_BUG)
+	  printf("::: %d, %d\n", graphic, GfxFrame[x][y]);
+#endif
 
 #if 0
 	if (element == EL_MOLE)
