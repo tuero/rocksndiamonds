@@ -217,14 +217,14 @@ struct ConfigInfo sound_config[] =
   { "game.sokoban_solving",		"buing.wav"		},
 
   /* sounds for other non-game actions */
-  { "menu.door_opening",		"oeffnen.wav"		},
-  { "menu.door_closing",		"oeffnen.wav"		},
+  { "door.opening",			"oeffnen.wav"		},
+  { "door.closing",			"oeffnen.wav"		},
 
-  { "menu.hall_of_fame",		"halloffame.wav"	},
-  { "menu.hall_of_fame.mode_loop",	"false"			},
+  { "background.SCORES",		"halloffame.wav"	},
+  { "background.SCORES.mode_loop",	"false"			},
 
-  { "menu.info_screen",			"rhythmloop.wav"	},
-  { "menu.info_screen.mode_loop",	"true"			},
+  { "background.INFO",			"rhythmloop.wav"	},
+  { "background.INFO.mode_loop",	"true"			},
 
 #if 0
   { "[not used]",			"antigrav.wav"		},

@@ -658,6 +658,8 @@ void InitGame()
 
     player->is_moving = FALSE;
     player->is_waiting = FALSE;
+    player->is_digging = FALSE;
+    player->is_collecting = FALSE;
 
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
@@ -5664,7 +5666,10 @@ int DigField(struct PlayerInfo *player,
   int element;
 
   if (player->MovPos == 0)
+  {
     player->is_digging = FALSE;
+    player->is_collecting = FALSE;
+  }
 
   if (player->MovPos == 0)
     player->Pushing = FALSE;
@@ -6368,8 +6373,13 @@ int DigField(struct PlayerInfo *player,
 
   player->push_delay = 0;
 
-  if (Feld[x][y] != element)		/* really digged something */
-    player->is_digging = TRUE;
+  if (Feld[x][y] != element)		/* really digged/collected something */
+  {
+    if (GfxElement[x][y] == EL_SAND)
+      player->is_digging = TRUE;
+    else
+      player->is_collecting = TRUE;
+  }
 
   return MF_MOVING;
 }
@@ -6393,7 +6403,10 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     player->snapped = FALSE;
 
     if (player->MovPos == 0)
+    {
       player->is_digging = FALSE;
+      player->is_collecting = FALSE;
+    }
 
     return FALSE;
   }
@@ -6411,6 +6424,8 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->snapped = TRUE;
   player->is_digging = FALSE;
+  player->is_collecting = FALSE;
+
   DrawLevelField(x, y);
   BackToFront();
 

@@ -129,7 +129,7 @@
    position of the rear pointer is just
 	(MAX_TYPES * (rptr - state)) + TYPE_3 == TYPE_3.  */
 
-static long int randtbl[DEG_3 + 1] =
+static long int randtbl_0[DEG_3 + 1] =
 {
   TYPE_3,
   -851904987, -43806228, -2029755270, 1390239686, -1912102820,
@@ -139,6 +139,17 @@ static long int randtbl[DEG_3 + 1] =
   -607508183, -205999574, -1696891592, 1492211999, -1528267240,
   -952028296, -189082757, 362343714, 1424981831, 2039449641,
 };
+static long int randtbl_1[DEG_3 + 1] =
+{
+  TYPE_3,
+  -851904987, -43806228, -2029755270, 1390239686, -1912102820,
+  -485608943, 1969813258, -1590463333, -1944053249, 455935928, 508023712,
+  -1714531963, 1800685987, -2015299881, 654595283, -1149023258,
+  -1470005550, -1143256056, -1325577603, -1568001885, 1275120390,
+  -607508183, -205999574, -1696891592, 1492211999, -1528267240,
+  -952028296, -189082757, 362343714, 1424981831, 2039449641,
+};
+
 
 /* FPTR and RPTR are two pointers into the state info, a front and a rear
    pointer.  These two pointers are always rand_sep places aparts, as they
@@ -150,8 +161,8 @@ static long int randtbl[DEG_3 + 1] =
    in the initialization of randtbl) because the state table pointer is set
    to point to randtbl[1] (as explained below).)  */
 
-static long int *fptr = &randtbl[SEP_3 + 1];
-static long int *rptr = &randtbl[1];
+static long int *fptr[2] = { &randtbl_0[SEP_3 + 1], &randtbl_1[SEP_3 + 1] };
+static long int *rptr[2] = { &randtbl_0[1],         &randtbl_1[1]         };
 
 
 
@@ -165,13 +176,17 @@ static long int *rptr = &randtbl[1];
    indexing every time to find the address of the last element to see if
    the front and rear pointers have wrapped.  */
 
-static long int *state = &randtbl[1];
+static long int *state[2] = { &randtbl_0[1], &randtbl_1[1] };
 
-static int rand_type = TYPE_3;
-static int rand_deg = DEG_3;
-static int rand_sep = SEP_3;
+static int rand_type[2] = { TYPE_3,	TYPE_3	};
+static int rand_deg[2]  = { DEG_3,	DEG_3	};
+static int rand_sep[2]  = { SEP_3,	SEP_3	};
 
-static long int *end_ptr = &randtbl[sizeof(randtbl) / sizeof(randtbl[0])];
+static long int *end_ptr[2] =
+{
+  &randtbl_0[sizeof(randtbl_0) / sizeof(randtbl_0[0])],
+  &randtbl_1[sizeof(randtbl_1) / sizeof(randtbl_1[0])]
+};
 
 /* Initialize the random number generator based on the given seed.  If the
    type is the trivial no-state-information type, just remember the seed.
@@ -182,18 +197,22 @@ static long int *end_ptr = &randtbl[sizeof(randtbl) / sizeof(randtbl[0])];
    introduced by the L.C.R.N.G.  Note that the initialization of randtbl[]
    for default usage relies on values produced by this routine.  */
 
-void srandom_linux_libc(unsigned int x)
+void srandom_linux_libc(int nr, unsigned int x)
 {
-  state[0] = x;
-  if (rand_type != TYPE_0)
+  state[nr][0] = x;
+
+  if (rand_type[nr] != TYPE_0)
   {
     register long int i;
-    for (i = 1; i < rand_deg; ++i)
-      state[i] = (1103515145 * state[i - 1]) + 12345;
-    fptr = &state[rand_sep];
-    rptr = &state[0];
-    for (i = 0; i < 10 * rand_deg; ++i)
-      (void) random_linux_libc();
+
+    for (i = 1; i < rand_deg[nr]; ++i)
+      state[nr][i] = (1103515145 * state[nr][i - 1]) + 12345;
+
+    fptr[nr] = &state[nr][rand_sep[nr]];
+    rptr[nr] = &state[nr][0];
+
+    for (i = 0; i < 10 * rand_deg[nr]; ++i)
+      random_linux_libc(nr);
   }
 }
 
@@ -208,31 +227,35 @@ void srandom_linux_libc(unsigned int x)
    rear pointers can't wrap on the same call by not testing the rear
    pointer if the front one has wrapped.  Returns a 31-bit random number.  */
 
-long int random_linux_libc()
+long int random_linux_libc(int nr)
 {
-  if (rand_type == TYPE_0)
+  if (rand_type[nr] == TYPE_0)
   {
-    state[0] = ((state[0] * 1103515245) + 12345) & LONG_MAX;
-    return state[0];
+    state[nr][0] = ((state[nr][0] * 1103515245) + 12345) & LONG_MAX;
+    return state[nr][0];
   }
   else
   {
     long int i;
-    *fptr += *rptr;
+
+    *fptr[nr] += *rptr[nr];
+
     /* Chucking least random bit.  */
-    i = (*fptr >> 1) & LONG_MAX;
-    ++fptr;
-    if (fptr >= end_ptr)
+    i = (*fptr[nr] >> 1) & LONG_MAX;
+    fptr[nr]++;
+
+    if (fptr[nr] >= end_ptr[nr])
     {
-      fptr = state;
-      ++rptr;
+      fptr[nr] = state[nr];
+      rptr[nr]++;
     }
     else
     {
-      ++rptr;
-      if (rptr >= end_ptr)
-	rptr = state;
+      rptr[nr]++;
+      if (rptr[nr] >= end_ptr[nr])
+	rptr[nr] = state[nr];
     }
+
     return i;
   }
 }

@@ -2462,7 +2462,7 @@ static void InitArtworkConfig()
 		special_id_suffix, ignore_image_tokens);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
 		sound_id_prefix, action_id_suffix, dummy,
-		dummy, ignore_sound_tokens);
+		special_id_suffix, ignore_sound_tokens);
 }
 
 static void InitMixer()
@@ -2785,8 +2785,10 @@ void OpenAll()
 
   InitCounter();
 
-  InitJoysticks();
   InitRND(NEW_RANDOMIZE);
+  InitSimpleRND(NEW_RANDOMIZE);
+
+  InitJoysticks();
 
   InitVideoDisplay();
   InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,

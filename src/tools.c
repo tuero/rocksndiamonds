@@ -562,6 +562,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   current_action = (player->Pushing ? ACTION_PUSHING :
 		    player->is_digging ? ACTION_DIGGING :
+		    player->is_collecting ? ACTION_COLLECTING :
 		    player->is_moving ? ACTION_MOVING :
 		    player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
 
@@ -2086,8 +2087,8 @@ unsigned int MoveDoor(unsigned int door_state)
     stepsize = 20;
     door_delay_value = 0;
 
-    StopSound(SND_MENU_DOOR_OPENING);
-    StopSound(SND_MENU_DOOR_CLOSING);
+    StopSound(SND_DOOR_OPENING);
+    StopSound(SND_DOOR_CLOSING);
   }
 
   if (global.autoplay_leveldir)
@@ -2102,9 +2103,9 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       /* opening door sound has priority over simultaneously closing door */
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
-	PlaySoundStereo(SND_MENU_DOOR_OPENING, SOUND_MAX_RIGHT);
+	PlaySoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
       else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
-	PlaySoundStereo(SND_MENU_DOOR_CLOSING, SOUND_MAX_RIGHT);
+	PlaySoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
     }
 
     start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
@@ -2202,8 +2203,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (setup.quick_doors)
   {
-    StopSound(SND_MENU_DOOR_OPENING);
-    StopSound(SND_MENU_DOOR_CLOSING);
+    StopSound(SND_DOOR_OPENING);
+    StopSound(SND_DOOR_CLOSING);
   }
 
   if (door_state & DOOR_ACTION_1)

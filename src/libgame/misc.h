@@ -27,6 +27,11 @@
 /* values for InitRND() */
 #define NEW_RANDOMIZE			-1
 
+#define InitRND(seed)			init_random_number(0, seed)
+#define InitSimpleRND(seed)		init_random_number(1, seed)
+#define RND(max)			get_random_number(0, max)
+#define SimpleRND(max)			get_random_number(1, max)
+
 /* values for Error() */
 #define ERR_RETURN			0
 #define ERR_RETURN_LINE			(1 << 0)
@@ -65,9 +70,15 @@ boolean FrameReached(unsigned long *, unsigned long);
 boolean DelayReached(unsigned long *, unsigned long);
 void WaitUntilDelayReached(unsigned long *, unsigned long);
 
+#if 0
 unsigned int SimpleRND(unsigned int);
+unsigned int InitSimpleRND(long);
 unsigned int RND(unsigned int);
 unsigned int InitRND(long);
+#endif
+
+unsigned int init_random_number(int, long);
+unsigned int get_random_number(int, unsigned int);
 
 char *getLoginName(void);
 char *getRealName(void);

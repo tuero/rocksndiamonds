@@ -1156,9 +1156,9 @@ void DrawHelpScreen()
   InitAnimation();
 
 #if 0
-  PlaySoundLoop(SND_MENU_INFO_SCREEN);
+  PlaySoundLoop(SND_BACKGROUND_INFO);
 #else
-  PlaySound_Menu_Start(SND_MENU_INFO_SCREEN);
+  PlaySound_Menu_Start(SND_BACKGROUND_INFO);
 #endif
 }
 
@@ -1220,9 +1220,9 @@ void HandleHelpScreen(int button)
        must therefore periodically be reactivated with the current sound
        engine !!! */
 #if 0
-    PlaySoundLoop(SND_MENU_INFO_SCREEN);
+    PlaySoundLoop(SND_BACKGROUND_INFO);
 #else
-    PlaySound_Menu_Continue(SND_MENU_INFO_SCREEN);
+    PlaySound_Menu_Continue(SND_BACKGROUND_INFO);
 #endif
 
     DoAnimation();
@@ -1638,9 +1638,9 @@ void DrawHallOfFame(int highlight_position)
   HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
 
 #if 0
-  PlaySound(SND_MENU_HALL_OF_FAME);
+  PlaySound(SND_BACKGROUND_SCORES);
 #else
-  PlaySound_Menu_Start(SND_MENU_HALL_OF_FAME);
+  PlaySound_Menu_Start(SND_BACKGROUND_SCORES);
 #endif
 }
 
@@ -1715,7 +1715,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
   if (button_released)
   {
-    FadeSound(SND_MENU_HALL_OF_FAME);
+    FadeSound(SND_BACKGROUND_SCORES);
     game_status = MAINMENU;
     DrawMainMenu();
   }
@@ -1726,7 +1726,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   {
     DoAnimation();
 #if 1
-    PlaySound_Menu_Continue(SND_MENU_HALL_OF_FAME);
+    PlaySound_Menu_Continue(SND_BACKGROUND_SCORES);
 #endif
   }
 }

@@ -935,9 +935,9 @@ struct PlayerInfo
 
   int last_move_dir;
   boolean is_moving;
-
-  boolean is_digging;
   boolean is_waiting;
+  boolean is_digging;
+  boolean is_collecting;
 
   unsigned long move_delay;
   int move_delay_value;

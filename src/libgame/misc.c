@@ -261,74 +261,66 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 /* random generator functions                                                */
 /* ------------------------------------------------------------------------- */
 
+#if 0
 unsigned int SimpleRND(unsigned int max)
 {
-#if defined(TARGET_SDL)
-  static unsigned long root = 654321;
-  unsigned long current_ms;
-
-  current_ms = SDL_GetTicks();
-  root = root * 4253261 + current_ms;
-  return (root % max);
-#else
-  static unsigned long root = 654321;
-  struct timeval current_time;
-
-  gettimeofday(&current_time, NULL);
-  root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
-  return (root % max);
-#endif
+  return (random_linux_libc(RND_FREE) % max);
 }
 
-#ifdef DEBUG
-static unsigned int last_RND_value = 0;
-
-unsigned int last_RND()
+unsigned int InitSimpleRND(long seed)
 {
-  return last_RND_value;
+  if (seed == NEW_RANDOMIZE)
+  {
+    struct timeval current_time;
+
+    gettimeofday(&current_time, NULL);
+    seed = (long)current_time.tv_usec;
+  }
+
+  srandom_linux_libc(RND_FREE, (unsigned int) seed);
+
+  return (unsigned int) seed;
 }
-#endif
 
 unsigned int RND(unsigned int max)
 {
-#ifdef DEBUG
-  return (last_RND_value = random_linux_libc() % max);
-#else
-  return (random_linux_libc() % max);
-#endif
+  return (random_linux_libc(RND_GAME) % max);
 }
 
 unsigned int InitRND(long seed)
 {
-#if defined(TARGET_SDL)
-  unsigned long current_ms;
-
   if (seed == NEW_RANDOMIZE)
   {
-    current_ms = SDL_GetTicks();
-    srandom_linux_libc((unsigned int) current_ms);
-    return (unsigned int) current_ms;
-  }
-  else
-  {
-    srandom_linux_libc((unsigned int) seed);
-    return (unsigned int) seed;
-  }
-#else
-  struct timeval current_time;
+    struct timeval current_time;
 
-  if (seed == NEW_RANDOMIZE)
-  {
     gettimeofday(&current_time, NULL);
-    srandom_linux_libc((unsigned int) current_time.tv_usec);
-    return (unsigned int) current_time.tv_usec;
+    seed = (long)current_time.tv_usec;
   }
-  else
-  {
-    srandom_linux_libc((unsigned int) seed);
-    return (unsigned int) seed;
-  }
+
+  srandom_linux_libc(RND_GAME, (unsigned int) seed);
+
+  return (unsigned int) seed;
+}
 #endif
+
+unsigned int init_random_number(int nr, long seed)
+{
+  if (seed == NEW_RANDOMIZE)
+  {
+    struct timeval current_time;
+
+    gettimeofday(&current_time, NULL);
+    seed = (long)current_time.tv_usec;
+  }
+
+  srandom_linux_libc(nr, (unsigned int) seed);
+
+  return (unsigned int) seed;
+}
+
+unsigned int get_random_number(int nr, unsigned int max)
+{
+  return (random_linux_libc(nr) % max);
 }
 
 
