@@ -386,6 +386,13 @@ struct TreeInfo
   char *author;		/* level or artwork author name */
   char *imported_from;	/* optional comment for imported levels or artwork */
 
+  char *graphics_set;	/* optional custom graphics set (level tree only) */
+  char *sounds_set;	/* optional custom sounds set (level tree only) */
+  char *music_set;	/* optional custom music set (level tree only) */
+  char *graphics_path;	/* path to optional custom graphics set (level only) */
+  char *sounds_path;	/* path to optional custom sounds set (level only) */
+  char *music_path;	/* path to optional custom music set (level only) */
+
   int levels;		/* number of levels in level series */
   int first_level;	/* first level number (to allow start with 0 or 1) */
   int last_level;	/* last level number (automatically calculated) */

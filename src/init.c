@@ -416,6 +416,11 @@ void ReloadCustomArtwork()
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
 
+  /* identifier for new artwork; default: artwork configured in setup */
+  char *gfx_new_identifier = artwork.gfx_current->identifier;
+  char *snd_new_identifier = artwork.snd_current->identifier;
+  char *mus_new_identifier = artwork.mus_current->identifier;
+
 #if 0
   printf("graphics --> '%s' ('%s')\n",
 	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
@@ -425,19 +430,27 @@ void ReloadCustomArtwork()
 	 artwork.mus_current_identifier, artwork.mus_current->filename);
 #endif
 
+  /* leveldir_current may be invalid (level group, parent link) */
+  if (!validLevelSeries(leveldir_current))
+    return;
+
+#if 0
+  printf("--> '%s'\n", artwork.gfx_current_identifier);
+#endif
+
+  /* when a new level series was selected, check if there was a change
+     in custom artwork stored in level series directory */
   if (leveldir_current_identifier != leveldir_current->identifier)
   {
     char *identifier_old = leveldir_current_identifier;
     char *identifier_new = leveldir_current->identifier;
 
-    /* force reload of custom artwork after new level series was selected,
-       but reload only that part of the artwork that really has changed */
     if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
 	getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
-      artwork.gfx_current_identifier = NULL;
+      gfx_new_identifier = identifier_new;
     if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
 	getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
-      artwork.snd_current_identifier = NULL;
+      snd_new_identifier = identifier_new;
     if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
 	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
       artwork.mus_current_identifier = NULL;
@@ -445,7 +458,39 @@ void ReloadCustomArtwork()
     leveldir_current_identifier = leveldir_current->identifier;
   }
 
-  if (artwork.gfx_current_identifier != artwork.gfx_current->identifier ||
+  /* custom level artwork configured in level series configuration file
+     always overrides custom level artwork stored in level series directory
+     and (level independant) custom artwork configured in setup menue
+     (the path entry is needed to send it to the sound child process) */
+  if (leveldir_current->graphics_set != NULL)
+  {
+    if (leveldir_current->graphics_path)
+      free(leveldir_current->graphics_path);
+    leveldir_current->graphics_path = NULL;
+    leveldir_current->graphics_path =
+      getStringCopy(getLevelArtworkDir(artwork.gfx_first));
+    gfx_new_identifier = leveldir_current->graphics_set;
+  }
+  if (leveldir_current->sounds_set != NULL)
+  {
+    if (leveldir_current->sounds_path)
+      free(leveldir_current->sounds_path);
+    leveldir_current->sounds_path = NULL;
+    leveldir_current->sounds_path =
+      getStringCopy(getLevelArtworkDir(artwork.snd_first));
+    snd_new_identifier = leveldir_current->sounds_set;
+  }
+  if (leveldir_current->music_set != NULL)
+  {
+    if (leveldir_current->music_path)
+      free(leveldir_current->music_path);
+    leveldir_current->music_path = NULL;
+    leveldir_current->music_path =
+      getStringCopy(getLevelArtworkDir(artwork.mus_first));
+    mus_new_identifier = leveldir_current->music_set;
+  }
+
+  if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
     int i;
@@ -466,27 +511,31 @@ void ReloadCustomArtwork()
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
 
-    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
+    artwork.gfx_current_identifier = gfx_new_identifier;
     last_override_level_graphics = setup.override_level_graphics;
   }
 
-  if (artwork.snd_current_identifier != artwork.snd_current->identifier ||
+  if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
       last_override_level_sounds != setup.override_level_sounds)
   {
-    InitReloadSounds(artwork.snd_current->identifier);
+    InitReloadSounds(snd_new_identifier);
 
-    artwork.snd_current_identifier = artwork.snd_current->identifier;
+    artwork.snd_current_identifier = snd_new_identifier;
     last_override_level_sounds = setup.override_level_sounds;
   }
 
-  if (artwork.mus_current_identifier != artwork.mus_current->identifier ||
+  if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
       last_override_level_music != setup.override_level_music)
   {
-    InitReloadMusic(artwork.mus_current->identifier);
+    InitReloadMusic(mus_new_identifier);
 
-    artwork.mus_current_identifier = artwork.mus_current->identifier;
+    artwork.mus_current_identifier = mus_new_identifier;
     last_override_level_music = setup.override_level_music;
   }
+
+#if 0
+  printf("<-- '%s'\n", artwork.gfx_current_identifier);
+#endif
 }
 
 void InitGadgets()

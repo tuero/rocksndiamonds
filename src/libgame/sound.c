@@ -273,6 +273,12 @@ static boolean ForkAudioProcess(void)
     return FALSE;
   }
 
+#if 0
+  printf("PID: %d [%s]\n", getpid(),
+	 (IS_CHILD_PROCESS(audio.mixer_pid) ? "child" : "parent"));
+  Delay(10000 * 0);
+#endif
+
   if (IS_CHILD_PROCESS(audio.mixer_pid))
     Mixer_Main();			/* this function never returns */
   else
@@ -498,8 +504,10 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
   TreeInfo *ti = (type == SND_CTRL_RELOAD_SOUNDS ? artwork.snd_current :
 		  artwork.mus_current);
   unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
-  unsigned long str_size2 = strlen(ti->basepath) + 1;
-  unsigned long str_size3 = strlen(ti->fullpath) + 1;
+  unsigned long str_size2 = strlen(leveldir_current->sounds_path) + 1;
+  unsigned long str_size3 = strlen(leveldir_current->music_path) + 1;
+  unsigned long str_size4 = strlen(ti->basepath) + 1;
+  unsigned long str_size5 = strlen(ti->fullpath) + 1;
   boolean override_level_artwork = (type == SND_CTRL_RELOAD_SOUNDS ?
 				    setup.override_level_sounds :
 				    setup.override_level_music);
@@ -530,12 +538,20 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
 	    sizeof(unsigned long)) < 0 ||
       write(audio.mixer_pipe[1], &str_size3,
 	    sizeof(unsigned long)) < 0 ||
+      write(audio.mixer_pipe[1], &str_size4,
+	    sizeof(unsigned long)) < 0 ||
+      write(audio.mixer_pipe[1], &str_size5,
+	    sizeof(unsigned long)) < 0 ||
       write(audio.mixer_pipe[1], leveldir_current->fullpath,
 	    str_size1) < 0 ||
-      write(audio.mixer_pipe[1], ti->basepath,
+      write(audio.mixer_pipe[1], leveldir_current->sounds_path,
 	    str_size2) < 0 ||
+      write(audio.mixer_pipe[1], leveldir_current->music_path,
+	    str_size3) < 0 ||
+      write(audio.mixer_pipe[1], ti->basepath,
+	    str_size4) < 0 ||
       write(audio.mixer_pipe[1], ti->fullpath,
-	    str_size3) < 0)
+	    str_size5) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
@@ -548,7 +564,7 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
   TreeInfo **ti_ptr = ((snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS) ?
 		       &artwork.snd_current : &artwork.mus_current);
   TreeInfo *ti = *ti_ptr;
-  unsigned long str_size1, str_size2, str_size3;
+  unsigned long str_size1, str_size2, str_size3, str_size4, str_size5;
   static char *set_identifier = NULL;
   boolean *override_level_artwork = (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS ?
 				     &setup.override_level_sounds :
@@ -561,10 +577,15 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
 
   if (leveldir_current == NULL)
     leveldir_current = checked_calloc(sizeof(TreeInfo));
+
   if (ti == NULL)
     ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
   if (leveldir_current->fullpath != NULL)
     free(leveldir_current->fullpath);
+  if (leveldir_current->sounds_path != NULL)
+    free(leveldir_current->sounds_path);
+  if (leveldir_current->music_path != NULL)
+    free(leveldir_current->music_path);
   if (ti->basepath != NULL)
     free(ti->basepath);
   if (ti->fullpath != NULL)
@@ -583,19 +604,29 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
       read(audio.mixer_pipe[0], &str_size2,
 	   sizeof(unsigned long)) != sizeof(unsigned long) ||
       read(audio.mixer_pipe[0], &str_size3,
+	   sizeof(unsigned long)) != sizeof(unsigned long) ||
+      read(audio.mixer_pipe[0], &str_size4,
+	   sizeof(unsigned long)) != sizeof(unsigned long) ||
+      read(audio.mixer_pipe[0], &str_size5,
 	   sizeof(unsigned long)) != sizeof(unsigned long))
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
   leveldir_current->fullpath = checked_calloc(str_size1);
-  ti->basepath = checked_calloc(str_size2);
-  ti->fullpath = checked_calloc(str_size3);
+  leveldir_current->sounds_path = checked_calloc(str_size2);
+  leveldir_current->music_path = checked_calloc(str_size3);
+  ti->basepath = checked_calloc(str_size4);
+  ti->fullpath = checked_calloc(str_size5);
 
   if (read(audio.mixer_pipe[0], leveldir_current->fullpath,
 	   str_size1) != str_size1 ||
-      read(audio.mixer_pipe[0], ti->basepath,
+      read(audio.mixer_pipe[0], leveldir_current->sounds_path,
 	   str_size2) != str_size2 ||
+      read(audio.mixer_pipe[0], leveldir_current->music_path,
+	   str_size3) != str_size3 ||
+      read(audio.mixer_pipe[0], ti->basepath,
+	   str_size4) != str_size4 ||
       read(audio.mixer_pipe[0], ti->fullpath,
-	   str_size3) != str_size3)
+	   str_size5) != str_size5)
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
   if (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS)
@@ -1861,7 +1892,9 @@ void LoadCustomMusic(void)
       strcmp(last_music_directory, music_directory) == 0)
     return;	/* old and new music directory are the same */
 
-  last_music_directory = music_directory;
+  if (last_music_directory != NULL)
+    free(last_music_directory);
+  last_music_directory = getStringCopy(music_directory);
 
   FreeAllMusic();
 
@@ -1880,6 +1913,10 @@ void LoadCustomMusic(void)
     char *basename = dir_entry->d_name;
     char *filename = getPath2(music_directory, basename);
     MusicInfo *mus_info = NULL;
+
+#if 0
+    printf("DEBUG: loading music '%s' ...\n", basename);
+#endif
 
     if (draw_init_text)
       DrawInitText(basename, 150, FC_YELLOW);
@@ -2135,7 +2172,7 @@ static void ReloadCustomSounds()
   int i;
 
 #if 0
-  printf("DEBUG: reloading sounds '%s' ...\n",artwork.sounds_set_current_name);
+  printf("DEBUG: reloading sounds '%s' ...\n",artwork.snd_current_identifier);
 #endif
 
   LoadSoundsInfo();
@@ -2172,7 +2209,7 @@ static void ReloadCustomSounds()
 static void ReloadCustomMusic()
 {
 #if 0
-  printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current_name);
+  printf("DEBUG: reloading music '%s' ...\n", artwork.mus_current_identifier);
 #endif
 
 #if 0
