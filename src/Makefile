@@ -20,7 +20,8 @@ SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
 # because the GIF loading routines are still a bit beta.
 # If you use the Xpm library, convert the GIF files to Xpm
 # files (and the mask files ('*Maske.gif') to xbm files).
-XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
+
+# XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
 
 CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)

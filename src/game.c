@@ -2781,7 +2781,7 @@ void ScrollLevel(int dx, int dy)
 
 BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
 {
-  int oldJX,oldJY, newJX = JX+dx,newJY = JY+dy;
+  int newJX = JX+dx, newJY = JY+dy;
   int element;
   int can_move;
 
@@ -2819,29 +2819,14 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
   if (can_move != MF_MOVING)
     return(can_move);
 
-  oldJX = JX;
-  oldJY = JY;
+  lastJX = JX;
+  lastJY = JY;
   JX = newJX;
   JY = newJY;
-
-
-  lastJX = oldJX;
-  lastJY = oldJY;
 
   PlayerMovPos = (dx > 0 || dy > 0 ? -1 : 1) * 3*TILEX/4;
 
   ScrollFigure(-1);
-
-  if (Store[oldJX][oldJY])
-  {
-    DrawGraphic(SCROLLX(oldJX),SCROLLY(oldJY),el2gfx(Store[oldJX][oldJY]));
-    DrawGraphicThruMask(SCROLLX(oldJX),SCROLLY(oldJY),
-			el2gfx(Feld[oldJX][oldJY]));
-  }
-  else if (Feld[oldJX][oldJY]==EL_DYNAMIT)
-    DrawDynamite(oldJX,oldJY);
-  else
-    DrawLevelField(oldJX,oldJY);
 
   return(MF_MOVING);
 }
@@ -2882,18 +2867,18 @@ BOOL MoveFigure(int dx, int dy)
 
   if (moved & MF_MOVING)
   {
-    int old_scroll_x=scroll_x, old_scroll_y=scroll_y;
+    int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
 
     if ((scroll_x < JX-MIDPOSX-offset || scroll_x > JX-MIDPOSX+offset) &&
-	JX>=MIDPOSX-1-offset && JX<=lev_fieldx-(MIDPOSX-offset))
+	JX >= MIDPOSX-1-offset && JX <= lev_fieldx-(MIDPOSX-offset))
       scroll_x = JX-MIDPOSX + (scroll_x < JX-MIDPOSX ? -offset : offset);
     if ((scroll_y < JY-MIDPOSY-offset || scroll_y > JY-MIDPOSY+offset) &&
-	JY>=MIDPOSY-1-offset && JY<=lev_fieldy-(MIDPOSY-offset))
+	JY >= MIDPOSY-1-offset && JY <= lev_fieldy-(MIDPOSY-offset))
       scroll_y = JY-MIDPOSY + (scroll_y < JY-MIDPOSY ? -offset : offset);
 
-    if (scroll_x!=old_scroll_x || scroll_y!=old_scroll_y)
-      ScrollLevel(old_scroll_x-scroll_x,old_scroll_y-scroll_y);
+    if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
+      ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
   }
 
   if (!(moved & MF_MOVING) && !PlayerPushing)
@@ -2952,6 +2937,18 @@ void ScrollFigure(int init)
     }
 
     DrawPlayerField();
+
+    if (Store[lastJX][lastJY])
+    {
+      DrawGraphic(SCROLLX(lastJX),SCROLLY(lastJY),
+		  el2gfx(Store[lastJX][lastJY]));
+      DrawGraphicThruMask(SCROLLX(lastJX),SCROLLY(lastJY),
+			  el2gfx(Feld[lastJX][lastJY]));
+    }
+    else if (Feld[lastJX][lastJY]==EL_DYNAMIT)
+      DrawDynamite(lastJX,lastJY);
+    else
+      DrawLevelField(lastJX,lastJY);
 
     return;
   }

@@ -14,6 +14,19 @@
 
 #include "gfxloader.h"
 
+
+
+
+
+
+extern Window  		window;
+extern void Delay(long);
+
+
+
+
+
+
 #ifdef DEBUG
 /*
 #define DEBUG_GIF
@@ -63,12 +76,22 @@ static int Read_GIF_to_Pixmap_or_Bitmap(Display *, char *, Pixmap *, int);
 
 int Read_GIF_to_Bitmap(Display *display, char *filename, Pixmap *pixmap)
 {
+  printf("Read_GIF_to_Bitmap\n");
+
+
+
+
   return(Read_GIF_to_Pixmap_or_Bitmap(display, filename,
 				      pixmap, READ_GIF_TO_BITMAP));
 }
 
 int Read_GIF_to_Pixmap(Display *display, char *filename, Pixmap *pixmap)
 {
+  printf("Read_GIF_to_Pixmap\n");
+
+
+
+
   return(Read_GIF_to_Pixmap_or_Bitmap(display, filename,
 				      pixmap, READ_GIF_TO_PIXMAP));
 }
@@ -141,6 +164,22 @@ int Read_GIF_to_Pixmap_or_Bitmap(Display *display, char *filename,
       gcv.background = WhitePixel(display,screen);
       gc = XCreateGC(display, root, GCForeground | GCBackground, &gcv);
       XPutImage(display,new_pixmap,gc,image,0,0,0,0,width,height);
+
+
+
+
+
+
+      Delay(1000000);
+
+      XPutImage(display,window,gc,image,0,0,0,0,width,height);
+
+      Delay(3000000);
+
+
+
+
+
       XFreeGC(display, gc);
     }
 
@@ -770,14 +809,41 @@ static int ConvertXImageDepth(Display *display, XImage **image)
   int screen = DefaultScreen(display);
   int depth = DefaultDepth(display, screen);
 
+
+
+
+
+
+  printf("ConvertXImageDepth:\n");
+  printf("(*image)->depth == %d\n",
+	 (*image)->depth);
+  printf("DefaultDepth(display, screen) == %d\n",
+	 DefaultDepth(display, screen));
+
+
+
+
   if ((*image)->depth != depth)
   {
     XImage *old_image, *new_image;
+    /*
     Visual *visual = DefaultVisual(display,screen);
+    */
     int width = (*image)->width;
     int height = (*image)->height;
     register int dwx, dwy;
     byte *data;
+
+
+
+
+
+    printf("ConvertXImageDepth: ---------> CONVERTING...\n");
+
+
+
+
+
 
     data = (byte *)malloc(width * height * depth);
     old_image = *image;
@@ -912,6 +978,15 @@ int Read_ILBM_to_Bitmap(Display *display, char *filename, Pixmap *pixmap)
   int width, height, depth;
   int bytes_per_line, bitmap_size;
   FILE *file;
+
+
+
+
+
+  printf("Read_ILBM_to_Bitmap\n");
+
+
+
 
   if (!(file = fopen(filename,"r")))
     return(ILBM_OpenFailed);
