@@ -58,6 +58,14 @@ void DrawMainMenu()
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
+  /* needed if last screen was the playing screen, invoked from level editor */
+  if (level_editor_test_game)
+  {
+    game_status = LEVELED;
+    DrawLevelEd();
+    return;
+  }
+
   /* needed if last screen was the level editor */
   UnmapLevelEditorControlButtons();
 

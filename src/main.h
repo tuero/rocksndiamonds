@@ -390,6 +390,7 @@ extern char	       *joystick_device_name[];
 extern char	       *program_name;
 
 extern int		game_status;
+extern boolean		level_editor_test_game;
 extern boolean		network_playing;
 extern int		button_status;
 extern boolean		motion_status;

@@ -17,6 +17,7 @@
 #include "misc.h"
 #include "buttons.h"
 #include "files.h"
+#include "game.h"
 
 /* positions in the level editor */
 #define ED_WIN_MB_LEFT_XPOS	7
@@ -82,13 +83,17 @@
 #define ED_CTRL_ID_EXIT			21
 
 /* forward declaration for internal use */
-void HandleDrawingFunction(int, int, int);
+void HandleDrawingFunctions(int, int, int);
+void HandlePressedControlButtons();
+void HandleControlButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *control_button_gadget[ED_NUM_CTRL_BUTTONS];
 static boolean control_button_gadgets_created = FALSE;
+static boolean control_button_gadgets_mapped = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 
+static short OrigBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
@@ -423,234 +428,6 @@ void ScrollMiniLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
-void HandlePressedControlButtons()
-{
-  static unsigned long button_delay = 0;
-  int i = 0;
-
-  /* buttons with action when held pressed */
-  int gadget_id[] =
-  {
-    ED_CTRL_ID_WRAP_UP,
-    ED_CTRL_ID_WRAP_LEFT,
-    ED_CTRL_ID_WRAP_RIGHT,
-    ED_CTRL_ID_WRAP_DOWN,
-    -1
-  };
-
-  if (!DelayReached(&button_delay, CHOICE_DELAY_VALUE))
-    return;
-
-  while (gadget_id[i] != -1)
-  {
-    int id = gadget_id[i++];
-    int state = control_button_gadget[id]->state;
-    int button = control_button_gadget[id]->event.button;
-    int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-
-    if (state != GD_BUTTON_PRESSED)
-      continue;
-  
-    switch (id)
-    {
-      case ED_CTRL_ID_WRAP_LEFT:
-  	if (level_xpos >= 0)
-  	{
-  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
-  	    break;
-  
-  	  level_xpos -= step;
-  	  if (level_xpos <- 1)
-  	    level_xpos = -1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_RIGHT:
-  	if (level_xpos <= lev_fieldx - 2*SCR_FIELDX)
-  	{
-  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
-  	    break;
-  
-  	  level_xpos += step;
-  	  if (level_xpos > lev_fieldx - 2*SCR_FIELDX + 1)
-  	    level_xpos = lev_fieldx - 2*SCR_FIELDX + 1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_UP:
-  	if (level_ypos >= 0)
-  	{
-  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
-  	    break;
-  
-  	  level_ypos -= step;
-  	  if (level_ypos < -1)
-  	    level_ypos = -1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      case ED_CTRL_ID_WRAP_DOWN:
-  	if (level_ypos <= lev_fieldy - 2*SCR_FIELDY)
-  	{
-  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
-  	    break;
-  
-  	  level_ypos += step;
-  	  if (level_ypos > lev_fieldy - 2*SCR_FIELDY + 1)
-  	    level_ypos = lev_fieldy - 2*SCR_FIELDY + 1;
-  	  if (button == 1)
-  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
-  	  else
-  	    DrawMiniLevel(level_xpos, level_ypos);
-  	}
-  	break;
-  
-      default:
-	break;
-    }
-  }
-}
-
-void HandleLevelEditorControlButtons(struct GadgetInfo *gi)
-{
-  int event_type = gi->event.type;
-
-  /*
-  int button = gi->event.button;
-  */
-
-  int id;
-  int i, x, y;
-
-  /* get the button id */
-  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-    if (gi->id == control_button_gadget[i]->id)
-      id = i;
-
-  switch (id)
-  {
-    case ED_CTRL_ID_SINGLE_ITEMS:
-    case ED_CTRL_ID_CONNECTED_ITEMS:
-    case ED_CTRL_ID_LINE:
-    case ED_CTRL_ID_TEXT:
-    case ED_CTRL_ID_RECTANGLE:
-    case ED_CTRL_ID_FILLED_BOX:
-    case ED_CTRL_ID_FLOOD_FILL:
-    case ED_CTRL_ID_RANDOM_PLACEMENT:
-    case ED_CTRL_ID_BRUSH:
-      drawing_function = id;
-      break;
-
-    case ED_CTRL_ID_UNDO:
-      if (undo_buffer_steps == 0)
-      {
-	Request("Undo buffer empty !", REQ_CONFIRM);
-	break;
-      }
-
-      undo_buffer_position =
-	(undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
-      undo_buffer_steps--;
-
-      for(x=0; x<lev_fieldx; x++)
-	for(y=0; y<lev_fieldy; y++)
-	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
-      DrawMiniLevel(level_xpos,level_ypos);
-      break;
-
-    case ED_CTRL_ID_CLEAR:
-      if (Request("Are you sure to clear this level ?", REQ_ASK))
-      {
-	for(x=0; x<MAX_LEV_FIELDX; x++) 
-	  for(y=0; y<MAX_LEV_FIELDY; y++) 
-	    Feld[x][y] = EL_ERDREICH;
-
-	DrawMiniLevel(level_xpos, level_ypos);
-      }
-      break;
-
-    case ED_CTRL_ID_SAVE:
-      {
-	int player_present = FALSE;
-
-	if (leveldir[leveldir_nr].readonly)
-	{
-	  Request("This level is read only !", REQ_CONFIRM);
-	  break;
-	}
-
-	for(y=0; y<lev_fieldy; y++) 
-	  for(x=0; x<lev_fieldx; x++)
-	    if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1) 
-	      player_present = TRUE;
-
-	if (!player_present)
-	  Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
-	else
-	{
-	  if (Request("Save this level and kill the old ?", REQ_ASK))
-	  {
-	    for(x=0; x<lev_fieldx; x++)
-	      for(y=0; y<lev_fieldy; y++) 
-		Ur[x][y] = Feld[x][y];
-	    SaveLevel(level_nr);
-	  }
-	}
-      }
-      break;
-
-    case ED_CTRL_ID_EXIT:
-      if (Request("Exit level editor ?", REQ_ASK | REQ_STAY_OPEN))
-      {
-	CloseDoor(DOOR_CLOSE_1);
-
-	/*
-	CloseDoor(DOOR_CLOSE_BOTH);
-	*/
-
-	/* draw smaller door */
-	XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-		  DOOR_GFX_PAGEX7, 64,
-		  108, 64,
-		  EX - 4, EY - 12);
-	redraw_mask |= REDRAW_ALL;
-
-	game_status = MAINMENU;
-	DrawMainMenu();
-      }
-      else
-      {
-	CloseDoor(DOOR_CLOSE_1);
-	XCopyArea(display, pix[PIX_DB_DOOR], pix[PIX_DB_DOOR], gc,
-		  DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
-		  DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-	OpenDoor(DOOR_OPEN_1);
-      }
-      break;
-
-    default:
-      if (event_type == GD_EVENT_PRESSED)
-	printf("test_func2: GD_EVENT_PRESSED\n");
-      else if (event_type == GD_EVENT_RELEASED)
-	printf("test_func2: GD_EVENT_RELEASED\n");
-      else
-	printf("test_func2: ?\n");
-      break;
-  }
-}
-
 void CreateLevelEditorControlButtons()
 {
   int i;
@@ -709,7 +486,7 @@ void CreateLevelEditorControlButtons()
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK, HandleLevelEditorControlButtons,
+		      GDI_CALLBACK, HandleControlButtons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -730,17 +507,21 @@ void MapLevelEditorControlButtons()
 
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
     MapGadget(control_button_gadget[i]);
+
+  control_button_gadgets_mapped = TRUE;
 }
 
 void UnmapLevelEditorControlButtons()
 {
   int i;
 
-  if (!control_button_gadgets_created)
+  if (!control_button_gadgets_created || !control_button_gadgets_mapped)
     return;
 
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
     UnmapGadget(control_button_gadget[i]);
+
+  control_button_gadgets_mapped = FALSE;
 }
 
 void DrawLevelEd()
@@ -753,13 +534,28 @@ void DrawLevelEd()
   name_typing = FALSE;
   element_shift = 0;
 
-  CloseDoor(DOOR_CLOSE_2);
+  CloseDoor(DOOR_CLOSE_ALL);
 
-  undo_buffer_position = 0;
-  undo_buffer_steps = 0;
-  for(x=0; x<lev_fieldx; x++)
-    for(y=0; y<lev_fieldy; y++)
-      UndoBuffer[0][x][y] = Ur[x][y];
+  if (level_editor_test_game)
+  {
+    for(x=0; x<lev_fieldx; x++)
+      for(y=0; y<lev_fieldy; y++)
+	Feld[x][y] = Ur[x][y];
+
+    for(x=0; x<lev_fieldx; x++)
+      for(y=0; y<lev_fieldy; y++)
+	Ur[x][y] = OrigBackup[x][y];
+
+    level_editor_test_game = FALSE;
+  }
+  else
+  {
+    undo_buffer_position = 0;
+    undo_buffer_steps = 0;
+    for(x=0; x<lev_fieldx; x++)
+      for(y=0; y<lev_fieldy; y++)
+	UndoBuffer[0][x][y] = Ur[x][y];
+  }
 
   DrawMiniLevel(level_xpos,level_ypos);
   FadeToFront();
@@ -1007,18 +803,18 @@ void DrawControlWindow()
 
 void AdjustLevelScrollPosition()
 {
-  if (level_xpos<-1)
+  if (level_xpos < -1)
     level_xpos = -1;
-  if (level_xpos>lev_fieldx-2*SCR_FIELDX+1)
-    level_xpos = lev_fieldx-2*SCR_FIELDX+1;
-  if (lev_fieldx<2*SCR_FIELDX-2)
+  if (level_xpos > lev_fieldx - 2*SCR_FIELDX + 1)
+    level_xpos = lev_fieldx - 2*SCR_FIELDX + 1;
+  if (lev_fieldx < 2*SCR_FIELDX - 2)
     level_xpos = -1;
 
-  if (level_ypos<-1)
+  if (level_ypos < -1)
     level_ypos = -1;
-  if (level_ypos>lev_fieldy-2*SCR_FIELDY+1)
-    level_ypos = lev_fieldy-2*SCR_FIELDY+1;
-  if (lev_fieldy<2*SCR_FIELDY-2)
+  if (level_ypos > lev_fieldy - 2*SCR_FIELDY + 1)
+    level_ypos = lev_fieldy - 2*SCR_FIELDY + 1;
+  if (lev_fieldy < 2*SCR_FIELDY - 2)
     level_ypos = -1;
 }
 
@@ -1036,7 +832,7 @@ void LevelEd(int mx, int my, int button)
 
 
   HandlePressedControlButtons();
-  HandleDrawingFunction(mx, my, button);
+  HandleDrawingFunctions(mx, my, button);
 
   if (use_floodfill)		/********** FLOOD FILL **********/
   {
@@ -1448,7 +1244,7 @@ void LevelEd(int mx, int my, int button)
 	  if (leveldir[leveldir_nr].readonly ||
 	      Request("Exit without saving ?",REQ_ASK | REQ_STAY_OPEN))
 	  {
-	    CloseDoor(DOOR_CLOSE_BOTH);
+	    CloseDoor(DOOR_CLOSE_ALL);
 	    game_status=MAINMENU;
 	    DrawMainMenu();
 	  }
@@ -1486,7 +1282,7 @@ void LevelEd(int mx, int my, int button)
 		    Ur[x][y]=Feld[x][y];
 		SaveLevel(level_nr);
 	      }
-	      CloseDoor(DOOR_CLOSE_BOTH);
+	      CloseDoor(DOOR_CLOSE_ALL);
 	      game_status=MAINMENU;
 	      DrawMainMenu();
 	    }
@@ -1827,7 +1623,27 @@ void FloodFill(int from_x, int from_y, int fill_element)
   safety--;
 }
 
-void HandleDrawingFunction(int mx, int my, int button)
+void CopyLevelToUndoBuffer()
+{
+  int x, y;
+
+  undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
+
+  if (undo_buffer_steps < NUM_UNDO_STEPS - 1)
+    undo_buffer_steps++;
+
+  for(x=0; x<lev_fieldx; x++)
+    for(y=0; y<lev_fieldy; y++)
+      UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
+
+
+
+  /*
+    printf("state saved to undo buffer %d\n", undo_buffer_position);
+  */
+}
+
+void HandleDrawingFunctions(int mx, int my, int button)
 {
   static int last_button = 0;
   static int last_element = 0;
@@ -1841,6 +1657,9 @@ void HandleDrawingFunction(int mx, int my, int button)
   int ly = sy + level_ypos;
   int x, y;
 
+  if (!edit_mode)
+    return;
+
   button_press_event = (last_button == 0 && button != 0);
   button_release_event = (last_button != 0 && button == 0);
   last_button = button;
@@ -1848,7 +1667,8 @@ void HandleDrawingFunction(int mx, int my, int button)
   if (mx < SX || mx >= SX + SXSIZE || my < SY || my >= SY + SYSIZE)
     return;
 
-  if (sx > lev_fieldx || sy > lev_fieldy ||
+  if ((!button && !button_release_event) ||
+      sx > lev_fieldx || sy > lev_fieldy ||
       (sx == 0 && level_xpos<0) ||
       (sx == 2*SCR_FIELDX - 1 && level_xpos > lev_fieldx - 2*SCR_FIELDX) ||
       (sy == 0 && level_ypos < 0) ||
@@ -1949,38 +1769,7 @@ void HandleDrawingFunction(int mx, int my, int button)
       }
       break;
 
-    case 999:
-      {
-	static int last_sx = -1;
-	static int last_sy = -1;
-
-	if (last_sx == -1)
-	{
-	  Feld[lx][ly] = new_element;
-	  DrawMiniElement(sx, sy, new_element);
-
-	  last_sx = sx;
-	  last_sy = sy;
-	}
-	else if (last_sx != sx || last_sy != sy)
-	{
-	  DrawLine(last_sx, last_sy, sx, sy, new_element, TRUE);
-
-	  last_sx = -1;
-	  last_sy = -1;
-	}
-
-	/*
-	last_sx = sx;
-	last_sy = sy;
-	*/
-      }
-      break;
-
     case ED_CTRL_ID_FLOOD_FILL:
-      if (!button)
-	break;
-
       if (button_press_event && Feld[lx][ly] != new_element)
       {
 	FloodFill(lx, ly, new_element);
@@ -1996,22 +1785,289 @@ void HandleDrawingFunction(int mx, int my, int button)
   last_element = new_element;
 
   if (copy_to_undo_buffer)
+    CopyLevelToUndoBuffer();
+  copy_to_undo_buffer = FALSE;
+}
+
+void HandlePressedControlButtons()
+{
+  static unsigned long button_delay = 0;
+  int i = 0;
+
+  /* buttons with action when held pressed */
+  int gadget_id[] =
   {
-    undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
+    ED_CTRL_ID_WRAP_UP,
+    ED_CTRL_ID_WRAP_LEFT,
+    ED_CTRL_ID_WRAP_RIGHT,
+    ED_CTRL_ID_WRAP_DOWN,
+    -1
+  };
 
-    if (undo_buffer_steps < NUM_UNDO_STEPS - 1)
-      undo_buffer_steps++;
+  if (!DelayReached(&button_delay, CHOICE_DELAY_VALUE))
+    return;
 
-    for(x=0; x<lev_fieldx; x++)
-      for(y=0; y<lev_fieldy; y++)
-	UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
+  while (gadget_id[i] != -1)
+  {
+    int id = gadget_id[i++];
+    int state = control_button_gadget[id]->state;
+    int button = control_button_gadget[id]->event.button;
+    int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
 
-    copy_to_undo_buffer = FALSE;
+    if (state != GD_BUTTON_PRESSED)
+      continue;
+  
+    switch (id)
+    {
+      case ED_CTRL_ID_WRAP_LEFT:
+  	if (level_xpos >= 0)
+  	{
+  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
+  	    break;
+  
+  	  level_xpos -= step;
+  	  if (level_xpos <- 1)
+  	    level_xpos = -1;
+  	  if (button == 1)
+  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
+  	  else
+  	    DrawMiniLevel(level_xpos, level_ypos);
+  	}
+  	break;
+  
+      case ED_CTRL_ID_WRAP_RIGHT:
+  	if (level_xpos <= lev_fieldx - 2*SCR_FIELDX)
+  	{
+  	  if (lev_fieldx < 2*SCR_FIELDX - 2)
+  	    break;
+  
+  	  level_xpos += step;
+  	  if (level_xpos > lev_fieldx - 2*SCR_FIELDX + 1)
+  	    level_xpos = lev_fieldx - 2*SCR_FIELDX + 1;
+  	  if (button == 1)
+  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
+  	  else
+  	    DrawMiniLevel(level_xpos, level_ypos);
+  	}
+  	break;
+  
+      case ED_CTRL_ID_WRAP_UP:
+  	if (level_ypos >= 0)
+  	{
+  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
+  	    break;
+  
+  	  level_ypos -= step;
+  	  if (level_ypos < -1)
+  	    level_ypos = -1;
+  	  if (button == 1)
+  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
+  	  else
+  	    DrawMiniLevel(level_xpos, level_ypos);
+  	}
+  	break;
+  
+      case ED_CTRL_ID_WRAP_DOWN:
+  	if (level_ypos <= lev_fieldy - 2*SCR_FIELDY)
+  	{
+  	  if (lev_fieldy < 2*SCR_FIELDY - 2)
+  	    break;
+  
+  	  level_ypos += step;
+  	  if (level_ypos > lev_fieldy - 2*SCR_FIELDY + 1)
+  	    level_ypos = lev_fieldy - 2*SCR_FIELDY + 1;
+  	  if (button == 1)
+  	    ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
+  	  else
+  	    DrawMiniLevel(level_xpos, level_ypos);
+  	}
+  	break;
+  
+      default:
+	break;
+    }
+  }
+}
 
+void HandleControlButtons(struct GadgetInfo *gi)
+{
+  int event_type = gi->event.type;
+  int player_present = FALSE;
+  int level_changed = FALSE;
+  int id;
+  int i, x, y;
 
+  /* get the button id */
+  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+    if (gi->id == control_button_gadget[i]->id)
+      id = i;
 
-    /*
-    printf("state saved to undo buffer %d\n", undo_buffer_position);
-    */
+  if (id < ED_NUM_CTRL1_BUTTONS && !edit_mode)
+  {
+    AdjustLevelScrollPosition();
+    DrawMiniLevel(level_xpos, level_ypos);
+    edit_mode = TRUE;
+  }
+
+  switch (id)
+  {
+    case ED_CTRL_ID_SINGLE_ITEMS:
+    case ED_CTRL_ID_CONNECTED_ITEMS:
+    case ED_CTRL_ID_LINE:
+    case ED_CTRL_ID_TEXT:
+    case ED_CTRL_ID_RECTANGLE:
+    case ED_CTRL_ID_FILLED_BOX:
+    case ED_CTRL_ID_FLOOD_FILL:
+    case ED_CTRL_ID_RANDOM_PLACEMENT:
+    case ED_CTRL_ID_BRUSH:
+      drawing_function = id;
+      break;
+
+    case ED_CTRL_ID_UNDO:
+      if (undo_buffer_steps == 0)
+      {
+	Request("Undo buffer empty !", REQ_CONFIRM);
+	break;
+      }
+
+      undo_buffer_position =
+	(undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
+      undo_buffer_steps--;
+
+      for(x=0; x<lev_fieldx; x++)
+	for(y=0; y<lev_fieldy; y++)
+	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
+      DrawMiniLevel(level_xpos,level_ypos);
+      break;
+
+    case ED_CTRL_ID_INFO:
+      if (edit_mode)
+      {
+	DrawControlWindow();
+	edit_mode = FALSE;
+      }
+      else
+      {
+	AdjustLevelScrollPosition();
+	DrawMiniLevel(level_xpos, level_ypos);
+	edit_mode = TRUE;
+      }
+      break;
+
+    case ED_CTRL_ID_CLEAR:
+      CopyLevelToUndoBuffer();
+
+      for(x=0; x<MAX_LEV_FIELDX; x++) 
+	for(y=0; y<MAX_LEV_FIELDY; y++) 
+	  Feld[x][y] = new_element3;
+
+      DrawMiniLevel(level_xpos, level_ypos);
+      break;
+
+    case ED_CTRL_ID_SAVE:
+      if (leveldir[leveldir_nr].readonly)
+      {
+	Request("This level is read only !", REQ_CONFIRM);
+	break;
+      }
+
+      for(y=0; y<lev_fieldy; y++) 
+	for(x=0; x<lev_fieldx; x++)
+	  if (Feld[x][y] != Ur[x][y])
+	    level_changed = TRUE;
+
+      if (!level_changed)
+      {
+	Request("Level has not changed !", REQ_CONFIRM);
+	break;
+      }
+
+      for(y=0; y<lev_fieldy; y++) 
+	for(x=0; x<lev_fieldx; x++)
+	  if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1) 
+	    player_present = TRUE;
+
+      if (!player_present)
+	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
+      else
+      {
+	if (Request("Save this level and kill the old ?", REQ_ASK))
+	{
+	  for(x=0; x<lev_fieldx; x++)
+	    for(y=0; y<lev_fieldy; y++) 
+	      Ur[x][y] = Feld[x][y];
+	  SaveLevel(level_nr);
+	}
+      }
+      break;
+
+    case ED_CTRL_ID_TEST:
+      for(y=0; y<lev_fieldy; y++) 
+	for(x=0; x<lev_fieldx; x++)
+	  if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1) 
+	    player_present = TRUE;
+
+      if (!player_present)
+	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
+      else
+      {
+	for(x=0; x<lev_fieldx; x++)
+	  for(y=0; y<lev_fieldy; y++)
+	    OrigBackup[x][y] = Ur[x][y];
+
+	for(x=0; x<lev_fieldx; x++)
+	  for(y=0; y<lev_fieldy; y++)
+	    Ur[x][y] = Feld[x][y];
+
+	level_editor_test_game = TRUE;
+	game_status = PLAYING;
+	InitGame();
+      }
+      break;
+
+    case ED_CTRL_ID_EXIT:
+      for(y=0; y<lev_fieldy; y++) 
+	for(x=0; x<lev_fieldx; x++)
+	  if (Feld[x][y] != Ur[x][y])
+	    level_changed = TRUE;
+
+      if (!level_changed ||
+	  Request("Level has changed! Exit without saving ?",
+		  REQ_ASK | REQ_STAY_OPEN))
+      {
+	CloseDoor(DOOR_CLOSE_1);
+
+	/*
+	CloseDoor(DOOR_CLOSE_ALL);
+	*/
+
+	/* draw smaller door */
+	XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+		  DOOR_GFX_PAGEX7, 64,
+		  108, 64,
+		  EX - 4, EY - 12);
+	redraw_mask |= REDRAW_ALL;
+
+	game_status = MAINMENU;
+	DrawMainMenu();
+      }
+      else
+      {
+	CloseDoor(DOOR_CLOSE_1);
+	XCopyArea(display, pix[PIX_DB_DOOR], pix[PIX_DB_DOOR], gc,
+		  DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
+		  DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+	OpenDoor(DOOR_OPEN_1);
+      }
+      break;
+
+    default:
+      if (event_type == GD_EVENT_PRESSED)
+	printf("test_func2: GD_EVENT_PRESSED\n");
+      else if (event_type == GD_EVENT_RELEASED)
+	printf("test_func2: GD_EVENT_RELEASED\n");
+      else
+	printf("test_func2: ?\n");
+      break;
   }
 }
