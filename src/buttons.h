@@ -285,6 +285,11 @@ int CheckCountButtons(int, int, int);
 #define GD_TYPE_SCROLLBAR_VERTICAL	(1<<7)
 #define GD_TYPE_SCROLLBAR_HORIZONTAL	(1<<8)
 
+#define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
+					 GD_TYPE_RADIO_BUTTON)
+#define GD_TYPE_SCROLLBAR		(GD_TYPE_SCROLLBAR_VERTICAL | \
+					 GD_TYPE_SCROLLBAR_HORIZONTAL)
+
 /* gadget events */
 #define GD_EVENT_PRESSED		(1<<0)
 #define GD_EVENT_RELEASED		(1<<1)
@@ -317,16 +322,19 @@ int CheckCountButtons(int, int, int);
 #define GDI_NUMBER_MAX			12
 #define GDI_TEXT_VALUE			13
 #define GDI_TEXT_SIZE			14
-#define GDI_TEXT_BORDER			15
-#define GDI_DESIGN_UNPRESSED		16
-#define GDI_DESIGN_PRESSED		17
-#define GDI_ALT_DESIGN_UNPRESSED	18
-#define GDI_ALT_DESIGN_PRESSED		19
+#define GDI_DESIGN_UNPRESSED		15
+#define GDI_DESIGN_PRESSED		16
+#define GDI_ALT_DESIGN_UNPRESSED	17
+#define GDI_ALT_DESIGN_PRESSED		18
+#define GDI_DESIGN_BORDER		19
 #define GDI_EVENT_MASK			20
 #define GDI_EVENT			21
 #define GDI_CALLBACK			22
 #define GDI_AREA_SIZE			23
 #define GDI_ITEM_SIZE			24
+#define GDI_SCROLLBAR_ITEMS_MAX		25
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	26
+#define GDI_SCROLLBAR_ITEM_POSITION	27
 
 typedef void (*gadget_callback_function)(void *);
 
@@ -342,12 +350,25 @@ struct GadgetEvent
   int button;				/* button number for button events */
   int x, y;				/* gadget position at event time */
   boolean off_borders;			/* mouse pointer outside gadget? */
+  int item_x, item_y, item_position;	/* new item position */
 };
 
 struct GadgetDrawingArea
 {
   int area_xsize, area_ysize;		/* size of drawing area (in items) */
   int item_xsize, item_ysize;		/* size of each item in drawing area */
+};
+
+struct GadgetScrollbar
+{
+  int items_max;			/* number of items to access */
+  int items_visible;			/* number of visible items */
+  int item_position;			/* actual item position */
+  int size_max;				/* this is either width or height */
+  int size;				/* scrollbar size on screen */
+  int position;				/* scrollbar position on screen */
+  int position_max;			/* bottom/right scrollbar position */
+  int drag_position;			/* drag position on scrollbar */
 };
 
 struct GadgetInfo
@@ -364,13 +385,14 @@ struct GadgetInfo
   long number_value;
   char text_value[MAX_GADGET_TEXTSIZE];
   int text_size;			/* maximal size of input text */
-  int text_border;			/* border size of text input gadget */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
+  int design_border;			/* border size of gadget decoration */
   unsigned long event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
   gadget_callback_function callback;
   struct GadgetDrawingArea drawing;	/* fields for drawing area gadget */
+  struct GadgetScrollbar scrollbar;	/* fields for scrollbar gadget */
   struct GadgetInfo *next;		/* next list entry */
 };
 
@@ -378,6 +400,7 @@ struct GadgetInfo *CreateGadget(int, ...);
 void FreeGadget(struct GadgetInfo *);
 
 void ClickOnGadget(struct GadgetInfo *);
+void AdjustScrollbar(struct GadgetInfo *, int, int);
 
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);

@@ -89,12 +89,20 @@
 /* values for scrolling gadgets */
 #define ED_SCROLL_UP_XPOS	(SXSIZE - ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_UP_YPOS	(0)
-#define ED_SCROLL_DOWN_XPOS	(SXSIZE - ED_SCROLLBUTTON_XSIZE)
+#define ED_SCROLL_DOWN_XPOS	ED_SCROLL_UP_XPOS
 #define ED_SCROLL_DOWN_YPOS	(SYSIZE - TILEX - ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_LEFT_XPOS	(0)
 #define ED_SCROLL_LEFT_YPOS	(SYSIZE - ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_RIGHT_XPOS	(SXSIZE - TILEX - ED_SCROLLBUTTON_XSIZE)
-#define ED_SCROLL_RIGHT_YPOS	(SYSIZE - ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_RIGHT_YPOS	ED_SCROLL_LEFT_YPOS
+#define ED_SCROLL_VERTICAL_XPOS		ED_SCROLL_UP_XPOS
+#define ED_SCROLL_VERTICAL_YPOS		(ED_SCROLL_UP_YPOS + 20)
+#define ED_SCROLL_VERTICAL_XSIZE	30
+#define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - TILEY - 2 * 20)
+#define ED_SCROLL_HORIZONTAL_XPOS	(ED_SCROLL_LEFT_XPOS + 30)
+#define ED_SCROLL_HORIZONTAL_YPOS	(SYSIZE - 30)
+#define ED_SCROLL_HORIZONTAL_XSIZE	(SXSIZE - TILEX - 2*30)
+#define ED_SCROLL_HORIZONTAL_YSIZE	30
 
 /* control button identifiers */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
@@ -140,8 +148,10 @@
 #define ED_CTRL_ID_SCROLL_DOWN		38
 #define ED_CTRL_ID_SCROLL_LEFT		39
 #define ED_CTRL_ID_SCROLL_RIGHT		40
+#define ED_CTRL_ID_SCROLL_VERTICAL	41
+#define ED_CTRL_ID_SCROLL_HORIZONTAL	42
 
-#define ED_NUM_GADGETS			41
+#define ED_NUM_GADGETS			43
 
 /* values for counter gadgets */
 #define ED_COUNTER_SCORE		0
@@ -149,6 +159,7 @@
 
 #define ED_NUM_COUNTERBUTTONS		2
 #define ED_NUM_SCROLLBUTTONS		4
+#define ED_NUM_SCROLLBARS		2
 
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
@@ -179,6 +190,27 @@ static struct
     ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,    ED_CTRL_ID_SCROLL_LEFT },
   { ED_BUTTON_RIGHT_XPOS,   ED_BUTTON_RIGHT_YPOS,
     ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,   ED_CTRL_ID_SCROLL_RIGHT }
+};
+
+static struct
+{
+  int xpos, ypos;
+  int x, y;
+  int width, height;
+  int type;
+  int gadget_id;
+} scrollbar_info[ED_NUM_SCROLLBARS] =
+{
+  { GAME_CONTROL_XPOS,		GAME_CONTROL_YPOS - GAME_BUTTON_YSIZE,
+    ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
+    ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
+    GD_TYPE_SCROLLBAR_VERTICAL,
+    ED_CTRL_ID_SCROLL_VERTICAL },
+  { GAME_CONTROL_XPOS,		GAME_CONTROL_YPOS - GAME_BUTTON_YSIZE,
+    ED_SCROLL_HORIZONTAL_XPOS,	ED_SCROLL_HORIZONTAL_YPOS,
+    ED_SCROLL_HORIZONTAL_XSIZE,	ED_SCROLL_HORIZONTAL_YSIZE,
+    GD_TYPE_SCROLLBAR_HORIZONTAL,
+    ED_CTRL_ID_SCROLL_HORIZONTAL },
 };
 
 
@@ -898,9 +930,9 @@ static void CreateTextInputGadgets()
 		    GDI_TYPE, GD_TYPE_TEXTINPUT,
 		    GDI_TEXT_VALUE, level.name,
 		    GDI_TEXT_SIZE, 30,
-		    GDI_TEXT_BORDER, 3,
 		    GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
 		    GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
+		    GDI_DESIGN_BORDER, 3,
 		    GDI_EVENT_MASK, event_mask,
 		    GDI_CALLBACK, HandleTextInputGadgets,
 		    GDI_END);
@@ -909,6 +941,62 @@ static void CreateTextInputGadgets()
     Error(ERR_EXIT, "cannot create gadget");
 
   level_editor_gadget[id] = gi;
+}
+
+static void CreateScrollbarGadgets()
+{
+  int i;
+
+  for (i=0; i<ED_NUM_SCROLLBARS; i++)
+  {
+    int id = scrollbar_info[i].gadget_id;
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    int gd_x1, gd_x2, gd_y;
+    struct GadgetInfo *gi;
+    int items_max, items_visible, item_position;
+    unsigned long event_mask;
+
+    if (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL)
+    {
+      items_max = lev_fieldx + 2;
+      items_visible = ED_FIELDX;
+      item_position = 0;
+    }
+    else
+    {
+      items_max = lev_fieldy + 2;
+      items_visible = ED_FIELDY;
+      item_position = 0;
+    }
+
+    event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
+
+    gd_x1 = DOOR_GFX_PAGEX4 + scrollbar_info[i].xpos;
+    gd_x2 = DOOR_GFX_PAGEX3 + scrollbar_info[i].xpos;
+    gd_y  = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_X, SX + scrollbar_info[i].x,
+		      GDI_Y, SY + scrollbar_info[i].y,
+		      GDI_WIDTH, scrollbar_info[i].width,
+		      GDI_HEIGHT, scrollbar_info[i].height,
+		      GDI_TYPE, scrollbar_info[i].type,
+		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
+		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
+		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_DESIGN_BORDER, 3,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK, HandleControlButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id] = gi;
+  }
 }
 
 static void CreateLevelEditorGadgets()
@@ -920,6 +1008,7 @@ static void CreateLevelEditorGadgets()
   CreateCounterButtons();
   CreateDrawingAreas();
   CreateTextInputGadgets();
+  CreateScrollbarGadgets();
 
   level_editor_gadgets_created = TRUE;
 }
@@ -956,6 +1045,9 @@ static void MapMainDrawingArea()
 
   for (i=0; i<ED_NUM_SCROLLBUTTONS; i++)
     MapGadget(level_editor_gadget[scrollbutton_info[i].gadget_id]);
+
+  for (i=0; i<ED_NUM_SCROLLBARS; i++)
+    MapGadget(level_editor_gadget[scrollbar_info[i].gadget_id]);
 
   MapDrawingArea(ED_CTRL_ID_DRAWING_LEVEL);
 }
@@ -2927,22 +3019,32 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_SCROLL_LEFT:
       if (level_xpos >= 0)
       {
+	int gadget_id = ED_CTRL_ID_SCROLL_HORIZONTAL;
+	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+	struct GadgetScrollbar *gs = &gi->scrollbar;
+
 	if (lev_fieldx < ED_FIELDX - 2)
 	  break;
 
 	level_xpos -= step;
-	if (level_xpos <- 1)
+	if (level_xpos < -1)
 	  level_xpos = -1;
 	if (button == 1)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
+
+	AdjustScrollbar(gi, gs->items_max, level_xpos + 1);
       }
       break;
 
     case ED_CTRL_ID_SCROLL_RIGHT:
       if (level_xpos <= lev_fieldx - ED_FIELDX)
       {
+	int gadget_id = ED_CTRL_ID_SCROLL_HORIZONTAL;
+	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+	struct GadgetScrollbar *gs = &gi->scrollbar;
+
 	if (lev_fieldx < ED_FIELDX - 2)
 	  break;
 
@@ -2953,12 +3055,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
+
+	AdjustScrollbar(gi, gs->items_max, level_xpos + 1);
       }
       break;
 
     case ED_CTRL_ID_SCROLL_UP:
       if (level_ypos >= 0)
       {
+	int gadget_id = ED_CTRL_ID_SCROLL_VERTICAL;
+	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+	struct GadgetScrollbar *gs = &gi->scrollbar;
+
 	if (lev_fieldy < ED_FIELDY - 2)
 	  break;
 
@@ -2969,12 +3077,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
+
+	AdjustScrollbar(gi, gs->items_max, level_ypos + 1);
       }
       break;
 
     case ED_CTRL_ID_SCROLL_DOWN:
       if (level_ypos <= lev_fieldy - ED_FIELDY)
       {
+	int gadget_id = ED_CTRL_ID_SCROLL_VERTICAL;
+	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+	struct GadgetScrollbar *gs = &gi->scrollbar;
+
 	if (lev_fieldy < ED_FIELDY - 2)
 	  break;
 
@@ -2985,7 +3099,19 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
 	else
 	  DrawMiniLevel(level_xpos, level_ypos);
+
+	AdjustScrollbar(gi, gs->items_max, level_ypos + 1);
       }
+      break;
+
+    case ED_CTRL_ID_SCROLL_HORIZONTAL:
+      level_xpos = gi->event.item_position - 1;
+      DrawMiniLevel(level_xpos, level_ypos);
+      break;
+
+    case ED_CTRL_ID_SCROLL_VERTICAL:
+      level_ypos = gi->event.item_position - 1;
+      DrawMiniLevel(level_xpos, level_ypos);
       break;
 
     case ED_CTRL_ID_WRAP_LEFT:
