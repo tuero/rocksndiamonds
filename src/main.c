@@ -2758,7 +2758,34 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   }
 };
 
-struct NewGraphicInfo graphic_info[NUM_IMAGE_FILES];
+
+/* ------------------------------------------------------------------------- */
+/* sound definitions                                                         */
+/* ------------------------------------------------------------------------- */
+
+struct SoundActionProperties sound_action_properties[] =
+{
+  /* insert _all_ loop sound actions here */
+  { ".waiting",		ACTION_WAITING,		TRUE },
+  { ".moving",		ACTION_MOVING,		TRUE }, /* continuos moving */
+  { ".active",		ACTION_ACTIVE,		TRUE },
+  { ".growing",		ACTION_GROWING,		TRUE },
+  { ".attacking",	ACTION_ATTACKING,	TRUE },
+
+  /* other (non-loop) sound actions are optional */
+  { ".stepping",	ACTION_MOVING,		FALSE }, /* discrete moving */
+  { ".digging",		ACTION_DIGGING,		FALSE },
+  { ".collecting",	ACTION_COLLECTING,	FALSE },
+  { ".passing",		ACTION_PASSING,		FALSE },
+  { ".impact",		ACTION_IMPACT,		FALSE },
+  { ".pushing",		ACTION_PUSHING,		FALSE },
+  { ".activating",	ACTION_ACTIVATING,	FALSE },
+  { NULL,		0,			0 },
+};
+
+
+struct GraphicInfo graphic_info[NUM_IMAGE_FILES];
+struct SoundInfo sound_info[NUM_SOUND_FILES];
 
 
 /* ========================================================================= */

@@ -36,6 +36,8 @@
 #define IMG_CHAR_START		IMG_CHAR_SPACE
 #define IMG_CUSTOM_START	IMG_CUSTOM_1
 
+#define SND_UNDEFINED		(-1)
+
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
 
@@ -1030,20 +1032,14 @@ struct ElementInfo
   char *sound_class_name;	/* classification for custom sound effects */
   char *editor_description;	/* short description for level editor */
 
-				/* default graphics for several actions */
-  int graphic[NUM_ACTIONS];
-
+  int graphic[NUM_ACTIONS];	/* default graphics for several actions */
 				/* special graphics for left/right/up/down */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
+
+  int sound[NUM_ACTIONS];	/* default sounds for several actions */
 };
 
 struct GraphicInfo
-{
-  Bitmap *bitmap;
-  int src_x, src_y;
-};
-
-struct NewGraphicInfo
 {
   Bitmap *bitmap;
   int src_x, src_y;		/* derived from (tile sized) .xpos/.ypos */
@@ -1059,6 +1055,19 @@ struct NewGraphicInfo
   GC clip_gc;			/* single-graphic-only clip gc for X11 */
 #endif
 };
+
+struct SoundInfo
+{
+  boolean loop;
+};
+
+struct SoundActionProperties
+{
+  char *text;
+  int value;
+  boolean is_loop;
+};
+
 
 #if 0
 extern GC		tile_clip_gc;
@@ -1127,7 +1136,9 @@ extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
-extern struct NewGraphicInfo	graphic_info[];
+extern struct GraphicInfo	graphic_info[];
+extern struct SoundInfo		sound_info[];
+extern struct SoundActionProperties sound_action_properties[];
 extern struct ConfigInfo	image_config[], sound_config[];
 extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
 extern struct FileInfo	       *image_files, *sound_files;

@@ -115,41 +115,8 @@ static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
-#define IS_ANIMATED(g)	(graphic_info[g].anim_frames > 1)
-
-
-/* ------------------------------------------------------------------------- */
-/* sound definitions                                                         */
-/* ------------------------------------------------------------------------- */
-
-static struct
-{
-  char *text;
-  int value;
-  boolean is_loop;
-} sound_action_properties[] =
-{
-  /* insert _all_ loop sound actions here */
-  { ".waiting",		ACTION_WAITING,		TRUE },
-  { ".moving",		ACTION_MOVING,		TRUE }, /* continuos moving */
-  { ".active",		ACTION_ACTIVE,		TRUE },
-  { ".growing",		ACTION_GROWING,		TRUE },
-  { ".attacking",	ACTION_ATTACKING,	TRUE },
-
-  /* other (non-loop) sound actions are optional */
-  { ".stepping",	ACTION_MOVING,		FALSE }, /* discrete moving */
-  { ".digging",		ACTION_DIGGING,		FALSE },
-  { ".collecting",	ACTION_COLLECTING,	FALSE },
-  { ".passing",		ACTION_PASSING,		FALSE },
-  { ".impact",		ACTION_IMPACT,		FALSE },
-  { ".pushing",		ACTION_PUSHING,		FALSE },
-  { ".activating",	ACTION_ACTIVATING,	FALSE },
-  { NULL,		0,			0 },
-};
-static int element_action_sound[MAX_NUM_ELEMENTS][NUM_ACTIONS];
-static boolean is_loop_sound[NUM_SOUND_FILES];
-
-#define IS_LOOP_SOUND(x)	(is_loop_sound[x])
+#define IS_ANIMATED(g)		(graphic_info[g].anim_frames > 1)
+#define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 
 /* -------------------------------------------------------------------------
@@ -562,97 +529,6 @@ void DrawGameDoorValues()
 	   int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_TIME, DY + YY_TIME,
 	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
-}
-
-
-/*
-  =============================================================================
-  InitGameSound()
-  -----------------------------------------------------------------------------
-  initialize sound effect lookup table for element actions
-  =============================================================================
-*/
-
-void InitGameSound()
-{
-  int sound_effect_properties[NUM_SOUND_FILES];
-  int i, j;
-
-#if 0
-  debug_print_timestamp(0, NULL);
-#endif
-
-  /* initialize sound effect for all elements to "no sound" */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    for (j=0; j<NUM_ACTIONS; j++)
-      element_action_sound[i][j] = -1;
-
-  for (i=0; i<NUM_SOUND_FILES; i++)
-  {
-    int len_effect_text = strlen(sound_files[i].token);
-
-    sound_effect_properties[i] = ACTION_OTHER;
-    is_loop_sound[i] = FALSE;
-
-    /* determine all loop sounds and identify certain sound classes */
-
-    for (j=0; sound_action_properties[j].text; j++)
-    {
-      int len_action_text = strlen(sound_action_properties[j].text);
-
-      if (len_action_text < len_effect_text &&
-	  strcmp(&sound_files[i].token[len_effect_text - len_action_text],
-		 sound_action_properties[j].text) == 0)
-      {
-	sound_effect_properties[i] = sound_action_properties[j].value;
-
-	if (sound_action_properties[j].is_loop)
-	  is_loop_sound[i] = TRUE;
-      }
-    }
-
-    /* associate elements and some selected sound actions */
-
-    for (j=0; j<MAX_NUM_ELEMENTS; j++)
-    {
-      if (element_info[j].sound_class_name)
-      {
-	int len_class_text = strlen(element_info[j].sound_class_name);
-
-	if (len_class_text + 1 < len_effect_text &&
-	    strncmp(sound_files[i].token,
-		    element_info[j].sound_class_name, len_class_text) == 0 &&
-	    sound_files[i].token[len_class_text] == '.')
-	{
-	  int sound_action_value = sound_effect_properties[i];
-
-	  element_action_sound[j][sound_action_value] = i;
-	}
-      }
-    }
-  }
-
-#if 0
-  debug_print_timestamp(0, "InitGameEngine");
-#endif
-
-#if 0
-  /* TEST ONLY */
-  {
-    int element = EL_SAND;
-    int sound_action = ACTION_DIGGING;
-    int j = 0;
-
-    while (sound_action_properties[j].text)
-    {
-      if (sound_action_properties[j].value == sound_action)
-	printf("element %d, sound action '%s'  == %d\n",
-	       element, sound_action_properties[j].text,
-	       element_action_sound[element][sound_action]);
-      j++;
-    }
-  }
-#endif
 }
 
 
@@ -7087,9 +6963,9 @@ static void PlaySoundLevelAction(int x, int y, int sound_action)
 static void PlaySoundLevelElementAction(int x, int y, int element,
 					int sound_action)
 {
-  int sound_effect = element_action_sound[element][sound_action];
+  int sound_effect = element_info[element].sound[sound_action];
 
-  if (sound_effect != -1)
+  if (sound_effect != SND_UNDEFINED)
     PlaySoundLevel(x, y, sound_effect);
 }
 

@@ -982,10 +982,78 @@ static void InitGraphicInfo()
 
 static void InitSoundInfo()
 {
+  int sound_effect_properties[NUM_SOUND_FILES];
+  int i, j;
+
   sound_files = getCurrentSoundList();
 
-  /* initialize sound effect lookup table for element actions */
-  InitGameSound();
+  /* initialize sound effect for all elements to "no sound" */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    for (j=0; j<NUM_ACTIONS; j++)
+      element_info[i].sound[j] = SND_UNDEFINED;
+
+  for (i=0; i<NUM_SOUND_FILES; i++)
+  {
+    int len_effect_text = strlen(sound_files[i].token);
+
+    sound_effect_properties[i] = ACTION_OTHER;
+    sound_info[i].loop = FALSE;
+
+    /* determine all loop sounds and identify certain sound classes */
+
+    for (j=0; sound_action_properties[j].text; j++)
+    {
+      int len_action_text = strlen(sound_action_properties[j].text);
+
+      if (len_action_text < len_effect_text &&
+	  strcmp(&sound_files[i].token[len_effect_text - len_action_text],
+		 sound_action_properties[j].text) == 0)
+      {
+	sound_effect_properties[i] = sound_action_properties[j].value;
+
+	if (sound_action_properties[j].is_loop)
+	  sound_info[i].loop = TRUE;
+      }
+    }
+
+    /* associate elements and some selected sound actions */
+
+    for (j=0; j<MAX_NUM_ELEMENTS; j++)
+    {
+      if (element_info[j].sound_class_name)
+      {
+	int len_class_text = strlen(element_info[j].sound_class_name);
+
+	if (len_class_text + 1 < len_effect_text &&
+	    strncmp(sound_files[i].token,
+		    element_info[j].sound_class_name, len_class_text) == 0 &&
+	    sound_files[i].token[len_class_text] == '.')
+	{
+	  int sound_action_value = sound_effect_properties[i];
+
+	  element_info[j].sound[sound_action_value] = i;
+	}
+      }
+    }
+  }
+
+#if 0
+  /* TEST ONLY */
+  {
+    int element = EL_SAND;
+    int sound_action = ACTION_DIGGING;
+    int j = 0;
+
+    while (sound_action_properties[j].text)
+    {
+      if (sound_action_properties[j].value == sound_action)
+	printf("element %d, sound action '%s'  == %d\n",
+	       element, sound_action_properties[j].text,
+	       element_info_[element].sound[sound_action]);
+      j++;
+    }
+  }
+#endif
 }
 
 void InitElementProperties()
