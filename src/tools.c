@@ -2027,6 +2027,7 @@ void DrawPlayer(struct PlayerInfo *player)
     graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
     frame = getGraphicAnimationFrame(graphic, player->StepFrame);
 
+    /* draw background element under pushed element (like the Sokoban field) */
     if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
@@ -3009,7 +3010,7 @@ static void HandleToolButtons(struct GadgetInfo *gi)
 
 #if 1
 
-static struct
+static struct Mapping_EM_to_RND_object
 {
   int element_em;
   boolean is_rnd_to_em_mapping;		/* unique mapping EM <-> RND */
@@ -3019,18 +3020,18 @@ static struct
   int action;
   int direction;
 }
-mapping_EM_to_RND_list[] =
+em_object_mapping_list[] =
 {
   {
     Xblank,				TRUE,	FALSE,
     EL_EMPTY,				-1, -1
   },
   {
-    Yacid_splash_eB,			FALSE,	TRUE,
+    Yacid_splash_eB,			FALSE,	FALSE,
     EL_ACID_SPLASH_RIGHT,		-1, -1
   },
   {
-    Yacid_splash_wB,			FALSE,	TRUE,
+    Yacid_splash_wB,			FALSE,	FALSE,
     EL_ACID_SPLASH_LEFT,		-1, -1
   },
 
@@ -3838,19 +3839,19 @@ mapping_EM_to_RND_list[] =
     EL_EMC_GRASS,			-1, -1
   },
   {
-    Ygrass_nB,				FALSE,	TRUE,
+    Ygrass_nB,				FALSE,	FALSE,
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_UP
   },
   {
-    Ygrass_eB,				FALSE,	TRUE,
+    Ygrass_eB,				FALSE,	FALSE,
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_RIGHT
   },
   {
-    Ygrass_sB,				FALSE,	TRUE,
+    Ygrass_sB,				FALSE,	FALSE,
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_DOWN
   },
   {
-    Ygrass_wB,				FALSE,	TRUE,
+    Ygrass_wB,				FALSE,	FALSE,
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_LEFT
   },
   {
@@ -3858,19 +3859,19 @@ mapping_EM_to_RND_list[] =
     EL_SAND,				-1, -1
   },
   {
-    Ydirt_nB,				FALSE,	TRUE,
+    Ydirt_nB,				FALSE,	FALSE,
     EL_SAND,				ACTION_DIGGING, MV_BIT_UP
   },
   {
-    Ydirt_eB,				FALSE,	TRUE,
+    Ydirt_eB,				FALSE,	FALSE,
     EL_SAND,				ACTION_DIGGING, MV_BIT_RIGHT
   },
   {
-    Ydirt_sB,				FALSE,	TRUE,
+    Ydirt_sB,				FALSE,	FALSE,
     EL_SAND,				ACTION_DIGGING, MV_BIT_DOWN
   },
   {
-    Ydirt_wB,				FALSE,	TRUE,
+    Ydirt_wB,				FALSE,	FALSE,
     EL_SAND,				ACTION_DIGGING, MV_BIT_LEFT
   },
   {
@@ -3930,7 +3931,7 @@ mapping_EM_to_RND_list[] =
     EL_EMC_MAGIC_BALL,			-1, -1
   },
   {
-    Xball_1B,				FALSE,	TRUE,
+    Xball_1B,				FALSE,	FALSE,
     EL_EMC_MAGIC_BALL,			ACTION_ACTIVE, -1
   },
   {
@@ -3938,12 +3939,60 @@ mapping_EM_to_RND_list[] =
     EL_EMC_MAGIC_BALL,			ACTION_ACTIVE, -1
   },
   {
-    Xball_2B,				FALSE,	TRUE,
+    Xball_2B,				FALSE,	FALSE,
     EL_EMC_MAGIC_BALL,			ACTION_ACTIVE, -1
   },
   {
     Yball_eat,				FALSE,	FALSE,
     EL_EMC_MAGIC_BALL,			ACTION_DROPPING, -1
+  },
+  {
+    Ykey_1_eat,				FALSE,	FALSE,
+    EL_EM_KEY_1,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_2_eat,				FALSE,	FALSE,
+    EL_EM_KEY_2,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_3_eat,				FALSE,	FALSE,
+    EL_EM_KEY_3,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_4_eat,				FALSE,	FALSE,
+    EL_EM_KEY_4,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_5_eat,				FALSE,	FALSE,
+    EL_EM_KEY_5,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_6_eat,				FALSE,	FALSE,
+    EL_EM_KEY_6,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_7_eat,				FALSE,	FALSE,
+    EL_EM_KEY_7,			ACTION_COLLECTING, -1
+  },
+  {
+    Ykey_8_eat,				FALSE,	FALSE,
+    EL_EM_KEY_8,			ACTION_COLLECTING, -1
+  },
+  {
+    Ylenses_eat,			FALSE,	FALSE,
+    EL_EMC_LENSES,			ACTION_COLLECTING, -1
+  },
+  {
+    Ymagnify_eat,			FALSE,	FALSE,
+    EL_EMC_MAGNIFIER,			ACTION_COLLECTING, -1
+  },
+  {
+    Ygrass_eat,				FALSE,	FALSE,
+    EL_EMC_GRASS,			ACTION_SNAPPING, -1
+  },
+  {
+    Ydirt_eat,				FALSE,	FALSE,
+    EL_SAND,				ACTION_SNAPPING, -1
   },
   {
     Xgrow_ns,				TRUE,	FALSE,
@@ -4617,6 +4666,128 @@ mapping_EM_to_RND_list[] =
   }
 };
 
+static struct Mapping_EM_to_RND_player
+{
+  int action_em;
+  int player_nr;
+
+  int element_rnd;
+  int action;
+  int direction;
+}
+em_player_mapping_list[] =
+{
+  {
+    SPR_walk + 0,			0,
+    EL_PLAYER_1,			ACTION_MOVING, MV_BIT_UP,
+  },
+  {
+    SPR_walk + 1,			0,
+    EL_PLAYER_1,			ACTION_MOVING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_walk + 2,			0,
+    EL_PLAYER_1,			ACTION_MOVING, MV_BIT_DOWN,
+  },
+  {
+    SPR_walk + 3,			0,
+    EL_PLAYER_1,			ACTION_MOVING, MV_BIT_LEFT,
+  },
+  {
+    SPR_push + 0,			0,
+    EL_PLAYER_1,			ACTION_PUSHING, MV_BIT_UP,
+  },
+  {
+    SPR_push + 1,			0,
+    EL_PLAYER_1,			ACTION_PUSHING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_push + 2,			0,
+    EL_PLAYER_1,			ACTION_PUSHING, MV_BIT_DOWN,
+  },
+  {
+    SPR_push + 3,			0,
+    EL_PLAYER_1,			ACTION_PUSHING, MV_BIT_LEFT,
+  },
+  {
+    SPR_spray + 0,			0,
+    EL_PLAYER_1,			ACTION_SNAPPING, MV_BIT_UP,
+  },
+  {
+    SPR_spray + 1,			0,
+    EL_PLAYER_1,			ACTION_SNAPPING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_spray + 2,			0,
+    EL_PLAYER_1,			ACTION_SNAPPING, MV_BIT_DOWN,
+  },
+  {
+    SPR_spray + 3,			0,
+    EL_PLAYER_1,			ACTION_SNAPPING, MV_BIT_LEFT,
+  },
+  {
+    SPR_walk + 0,			1,
+    EL_PLAYER_2,			ACTION_MOVING, MV_BIT_UP,
+  },
+  {
+    SPR_walk + 1,			1,
+    EL_PLAYER_2,			ACTION_MOVING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_walk + 2,			1,
+    EL_PLAYER_2,			ACTION_MOVING, MV_BIT_DOWN,
+  },
+  {
+    SPR_walk + 3,			1,
+    EL_PLAYER_2,			ACTION_MOVING, MV_BIT_LEFT,
+  },
+  {
+    SPR_push + 0,			1,
+    EL_PLAYER_2,			ACTION_PUSHING, MV_BIT_UP,
+  },
+  {
+    SPR_push + 1,			1,
+    EL_PLAYER_2,			ACTION_PUSHING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_push + 2,			1,
+    EL_PLAYER_2,			ACTION_PUSHING, MV_BIT_DOWN,
+  },
+  {
+    SPR_push + 3,			1,
+    EL_PLAYER_2,			ACTION_PUSHING, MV_BIT_LEFT,
+  },
+  {
+    SPR_spray + 0,			1,
+    EL_PLAYER_2,			ACTION_SNAPPING, MV_BIT_UP,
+  },
+  {
+    SPR_spray + 1,			1,
+    EL_PLAYER_2,			ACTION_SNAPPING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_spray + 2,			1,
+    EL_PLAYER_2,			ACTION_SNAPPING, MV_BIT_DOWN,
+  },
+  {
+    SPR_spray + 3,			1,
+    EL_PLAYER_2,			ACTION_SNAPPING, MV_BIT_LEFT,
+  },
+  {
+    SPR_still,				0,
+    EL_PLAYER_1,			ACTION_DEFAULT, -1,
+  },
+  {
+    SPR_still,				1,
+    EL_PLAYER_2,			ACTION_DEFAULT, -1,
+  },
+
+  {
+    -1,					-1,
+    -1,					-1, -1
+  }
+};
+
 int map_element_RND_to_EM(int element_rnd)
 {
   static unsigned short mapping_RND_to_EM[NUM_FILE_ELEMENTS];
@@ -4630,10 +4801,10 @@ int map_element_RND_to_EM(int element_rnd)
     for (i = 0; i < NUM_FILE_ELEMENTS; i++)
       mapping_RND_to_EM[i] = Xalpha_quest;
 
-    for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
-      if (mapping_EM_to_RND_list[i].is_rnd_to_em_mapping)
-	mapping_RND_to_EM[mapping_EM_to_RND_list[i].element_rnd] =
-	  mapping_EM_to_RND_list[i].element_em;
+    for (i = 0; em_object_mapping_list[i].element_em != -1; i++)
+      if (em_object_mapping_list[i].is_rnd_to_em_mapping)
+	mapping_RND_to_EM[em_object_mapping_list[i].element_rnd] =
+	  em_object_mapping_list[i].element_em;
 
     mapping_initialized = TRUE;
   }
@@ -4659,9 +4830,9 @@ int map_element_EM_to_RND(int element_em)
     for (i = 0; i < TILE_MAX; i++)
       mapping_EM_to_RND[i] = EL_UNKNOWN;
 
-    for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
-      mapping_EM_to_RND[mapping_EM_to_RND_list[i].element_em] =
-	mapping_EM_to_RND_list[i].element_rnd;
+    for (i = 0; em_object_mapping_list[i].element_em != -1; i++)
+      mapping_EM_to_RND[em_object_mapping_list[i].element_em] =
+	em_object_mapping_list[i].element_rnd;
 
     mapping_initialized = TRUE;
   }
@@ -4883,7 +5054,7 @@ int map_element_EM_to_RND(int element_em)
     int element_em;
     int element_rnd;
   }
-  mapping_EM_to_RND_list[] =
+  em_object_mapping_list[] =
   {
     { Xblank,			EL_EMPTY			},
     { Yacid_splash_eB,		EL_EMPTY			},
@@ -5291,9 +5462,9 @@ int map_element_EM_to_RND(int element_em)
     for (i = 0; i < TILE_MAX; i++)
       mapping_EM_to_RND[i] = EL_UNKNOWN;
 
-    for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
-      mapping_EM_to_RND[mapping_EM_to_RND_list[i].element_em] =
-	mapping_EM_to_RND_list[i].element_rnd;
+    for (i = 0; em_object_mapping_list[i].element_em != -1; i++)
+      mapping_EM_to_RND[em_object_mapping_list[i].element_em] =
+	em_object_mapping_list[i].element_rnd;
 
     mapping_initialized = TRUE;
   }
@@ -5401,43 +5572,78 @@ unsigned int InitRND(long seed)
     return InitEngineRND(seed);
 }
 
+#define DEBUG_EM_GFX	0
+
 void InitGraphicInfo_EM(void)
 {
-  int mapping_EM_to_RND_element[TILE_MAX];
-  int mapping_EM_to_RND_action[TILE_MAX];
-  int mapping_EM_to_RND_direction[TILE_MAX];
-  boolean mapping_EM_to_RND_backside[TILE_MAX];
-  int i, j;
+  struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
+  struct Mapping_EM_to_RND_player player_mapping[2][SPR_MAX];
+  int i, j, p;
 
-  /* return "EL_UNKNOWN" for all undefined elements in mapping array */
+#if DEBUG_EM_GFX
+  if (graphic_info_em_object[0][0].bitmap == NULL)
+  {
+    /* EM graphics not yet initialized in em_open_all() */
+
+    return;
+  }
+#endif
+
+  /* always start with reliable default values */
   for (i = 0; i < TILE_MAX; i++)
   {
-    mapping_EM_to_RND_element[i] = EL_UNKNOWN;
-    mapping_EM_to_RND_backside[i] = FALSE;
-    mapping_EM_to_RND_action[i] = ACTION_DEFAULT;
-    mapping_EM_to_RND_direction[i] = MV_NO_MOVING;
+    object_mapping[i].element_rnd = EL_UNKNOWN;
+    object_mapping[i].is_backside = FALSE;
+    object_mapping[i].action = ACTION_DEFAULT;
+    object_mapping[i].direction = MV_NO_MOVING;
   }
 
-  for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
+  /* always start with reliable default values */
+  for (p = 0; p < 2; p++)
   {
-    int e = mapping_EM_to_RND_list[i].element_em;
+    for (i = 0; i < SPR_MAX; i++)
+    {
+      player_mapping[p][i].element_rnd = EL_UNKNOWN;
+      player_mapping[p][i].action = ACTION_DEFAULT;
+      player_mapping[p][i].direction = MV_NO_MOVING;
+    }
+  }
 
-    mapping_EM_to_RND_element[e] = mapping_EM_to_RND_list[i].element_rnd;
-    mapping_EM_to_RND_backside[e] = mapping_EM_to_RND_list[i].is_backside;
+  for (i = 0; em_object_mapping_list[i].element_em != -1; i++)
+  {
+    int e = em_object_mapping_list[i].element_em;
 
-    if (mapping_EM_to_RND_list[i].action != -1)
-      mapping_EM_to_RND_action[e] = mapping_EM_to_RND_list[i].action;
+    object_mapping[e].element_rnd = em_object_mapping_list[i].element_rnd;
+    object_mapping[e].is_backside = em_object_mapping_list[i].is_backside;
 
-    if (mapping_EM_to_RND_list[i].direction != -1)
-      mapping_EM_to_RND_direction[e] = 1<< mapping_EM_to_RND_list[i].direction;
+    if (em_object_mapping_list[i].action != -1)
+      object_mapping[e].action = em_object_mapping_list[i].action;
+
+    if (em_object_mapping_list[i].direction != -1)
+      object_mapping[e].direction = (1 << em_object_mapping_list[i].direction);
+  }
+
+  for (i = 0; em_player_mapping_list[i].action_em != -1; i++)
+  {
+    int a = em_player_mapping_list[i].action_em;
+    int p = em_player_mapping_list[i].player_nr;
+
+    player_mapping[p][a].element_rnd = em_player_mapping_list[i].element_rnd;
+
+    if (em_player_mapping_list[i].action != -1)
+      player_mapping[p][a].action = em_player_mapping_list[i].action;
+
+    if (em_player_mapping_list[i].direction != -1)
+      player_mapping[p][a].direction =
+	(1 << em_player_mapping_list[i].direction);
   }
 
   for (i = 0; i < TILE_MAX; i++)
   {
-    int element = mapping_EM_to_RND_element[i];
-    int action = mapping_EM_to_RND_action[i];
-    int direction = mapping_EM_to_RND_direction[i];
-    int backside = mapping_EM_to_RND_backside[i];
+    int element = object_mapping[i].element_rnd;
+    int action = object_mapping[i].action;
+    int direction = object_mapping[i].direction;
+    boolean is_backside = object_mapping[i].is_backside;
     boolean action_removing = (action == ACTION_DIGGING ||
 			       action == ACTION_SNAPPING ||
 			       action == ACTION_COLLECTING);
@@ -5450,7 +5656,9 @@ void InitGraphicInfo_EM(void)
 
     for (j = 0; j < 8; j++)
     {
-      int effective_element = (j < 7 ? element :
+      int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
+			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
+			       j < 7 ? element :
 			       i == Ynut_sB ? element :
 			       i == Xdrip_stretch ? element :
 			       i == Xdrip_stretchB ? element :
@@ -5460,11 +5668,23 @@ void InitGraphicInfo_EM(void)
 			       i == Xball_2 ? element :
 			       i == Xball_2B ? element :
 			       i == Yball_eat ? element :
+			       i == Ykey_1_eat ? element :
+			       i == Ykey_2_eat ? element :
+			       i == Ykey_3_eat ? element :
+			       i == Ykey_4_eat ? element :
+			       i == Ykey_5_eat ? element :
+			       i == Ykey_6_eat ? element :
+			       i == Ykey_7_eat ? element :
+			       i == Ykey_8_eat ? element :
+			       i == Ylenses_eat ? element :
+			       i == Ymagnify_eat ? element :
+			       i == Ygrass_eat ? element :
+			       i == Ydirt_eat ? element :
 			       i == Yspring_kill_e ? EL_SPRING :
 			       i == Yspring_kill_w ? EL_SPRING :
 			       i == Yemerald_stone ? EL_EMERALD :
 			       i == Ydiamond_stone ? EL_ROCK :
-			       backside ? EL_EMPTY :
+			       is_backside ? EL_EMPTY :
 			       action_removing ? EL_EMPTY :
 			       element);
       int effective_action = (j < 7 ? action :
@@ -5477,6 +5697,18 @@ void InitGraphicInfo_EM(void)
 			      i == Xball_2 ? action :
 			      i == Xball_2B ? action :
 			      i == Yball_eat ? action :
+			      i == Ykey_1_eat ? action :
+			      i == Ykey_2_eat ? action :
+			      i == Ykey_3_eat ? action :
+			      i == Ykey_4_eat ? action :
+			      i == Ykey_5_eat ? action :
+			      i == Ykey_6_eat ? action :
+			      i == Ykey_7_eat ? action :
+			      i == Ykey_8_eat ? action :
+			      i == Ylenses_eat ? action :
+			      i == Ymagnify_eat ? action :
+			      i == Ygrass_eat ? action :
+			      i == Ydirt_eat ? action :
 			      i == Xsand_stonein_1 ? action :
 			      i == Xsand_stonein_2 ? action :
 			      i == Xsand_stonein_3 ? action :
@@ -5493,7 +5725,7 @@ void InitGraphicInfo_EM(void)
 		     el_act_dir2img(effective_element, effective_action,
 				    direction));
       struct GraphicInfo *g = &graphic_info[graphic];
-      struct GraphicInfo_EM *g_em = &graphic_info_em[i][7 - j];
+      struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
       int src_x, src_y;
       int sync_frame = (i == Xdrip_stretch ? 7 :
@@ -5501,16 +5733,28 @@ void InitGraphicInfo_EM(void)
 			i == Ydrip_s2 ? j + 8 :
 			i == Ydrip_s2B ? j + 8 :
 			i == Xacid_1 ? 0 :
-			i == Xacid_2 ? 1 :
-			i == Xacid_3 ? 2 :
-			i == Xacid_4 ? 3 :
-			i == Xacid_5 ? 4 :
-			i == Xacid_6 ? 5 :
-			i == Xacid_7 ? 6 :
-			i == Xacid_8 ? 7 :
+			i == Xacid_2 ? 10 :
+			i == Xacid_3 ? 20 :
+			i == Xacid_4 ? 30 :
+			i == Xacid_5 ? 40 :
+			i == Xacid_6 ? 50 :
+			i == Xacid_7 ? 60 :
+			i == Xacid_8 ? 70 :
 			i == Xball_2 ? 7 :
 			i == Xball_2B ? j + 8 :
 			i == Yball_eat ? j + 1 :
+			i == Ykey_1_eat ? j + 1 :
+			i == Ykey_2_eat ? j + 1 :
+			i == Ykey_3_eat ? j + 1 :
+			i == Ykey_4_eat ? j + 1 :
+			i == Ykey_5_eat ? j + 1 :
+			i == Ykey_6_eat ? j + 1 :
+			i == Ykey_7_eat ? j + 1 :
+			i == Ykey_8_eat ? j + 1 :
+			i == Ylenses_eat ? j + 1 :
+			i == Ymagnify_eat ? j + 1 :
+			i == Ygrass_eat ? j + 1 :
+			i == Ydirt_eat ? j + 1 :
 			i == Xamoeba_1 ? 0 :
 			i == Xamoeba_2 ? 1 :
 			i == Xamoeba_3 ? 2 :
@@ -5522,9 +5766,9 @@ void InitGraphicInfo_EM(void)
 			i == Xexit_2 ? j + 8 :
 			i == Xexit_3 ? j + 16 :
 			i == Xdynamite_1 ? 0 :
-			i == Xdynamite_2 ? 2 :
-			i == Xdynamite_3 ? 4 :
-			i == Xdynamite_4 ? 6 :
+			i == Xdynamite_2 ? 20 :
+			i == Xdynamite_3 ? 40 :
+			i == Xdynamite_4 ? 60 :
 			i == Xsand_stonein_1 ? j + 1 :
 			i == Xsand_stonein_2 ? j + 9 :
 			i == Xsand_stonein_3 ? j + 17 :
@@ -5545,34 +5789,40 @@ void InitGraphicInfo_EM(void)
 			i == Xsand_stoneout_2 && j == 5 ? 22 :
 			i == Xsand_stoneout_2 && j == 6 ? 26 :
 			i == Xsand_stoneout_2 && j == 7 ? 30 :
-			i == Xboom_bug && j == 2 ? 1 :
-			i == Xboom_bug && j == 3 ? 2 :
-			i == Xboom_bug && j == 4 ? 2 :
-			i == Xboom_bug && j == 5 ? 1 :
-			i == Xboom_bug && j == 6 ? 1 :
+			i == Xboom_bug && j == 1 ? 2 :
+			i == Xboom_bug && j == 2 ? 2 :
+			i == Xboom_bug && j == 3 ? 4 :
+			i == Xboom_bug && j == 4 ? 4 :
+			i == Xboom_bug && j == 5 ? 2 :
+			i == Xboom_bug && j == 6 ? 2 :
 			i == Xboom_bug && j == 7 ? 0 :
-			i == Xboom_bomb && j == 2 ? 1 :
-			i == Xboom_bomb && j == 3 ? 2 :
-			i == Xboom_bomb && j == 4 ? 2 :
-			i == Xboom_bomb && j == 5 ? 1 :
-			i == Xboom_bomb && j == 6 ? 1 :
+			i == Xboom_bomb && j == 1 ? 2 :
+			i == Xboom_bomb && j == 2 ? 2 :
+			i == Xboom_bomb && j == 3 ? 4 :
+			i == Xboom_bomb && j == 4 ? 4 :
+			i == Xboom_bomb && j == 5 ? 2 :
+			i == Xboom_bomb && j == 6 ? 2 :
 			i == Xboom_bomb && j == 7 ? 0 :
-			i == Xboom_android && j == 7 ? 3 :
-			i == Xboom_1 && j == 2 ? 1 :
-			i == Xboom_1 && j == 3 ? 2 :
-			i == Xboom_1 && j == 4 ? 2 :
-			i == Xboom_1 && j == 5 ? 3 :
-			i == Xboom_1 && j == 6 ? 3 :
-			i == Xboom_1 && j == 7 ? 4 :
-			i == Xboom_2 && j == 0 ? 4 :
-			i == Xboom_2 && j == 1 ? 4 :
-			i == Xboom_2 && j == 2 ? 5 :
-			i == Xboom_2 && j == 3 ? 5 :
-			i == Xboom_2 && j == 4 ? 5 :
-			i == Xboom_2 && j == 5 ? 6 :
+			i == Xboom_android && j == 7 ? 6 :
+			i == Xboom_1 && j == 1 ? 2 :
+			i == Xboom_1 && j == 2 ? 2 :
+			i == Xboom_1 && j == 3 ? 4 :
+			i == Xboom_1 && j == 4 ? 4 :
+			i == Xboom_1 && j == 5 ? 6 :
+			i == Xboom_1 && j == 6 ? 6 :
+			i == Xboom_1 && j == 7 ? 8 :
+			i == Xboom_2 && j == 0 ? 8 :
+			i == Xboom_2 && j == 1 ? 8 :
+			i == Xboom_2 && j == 2 ? 10 :
+			i == Xboom_2 && j == 3 ? 10 :
+			i == Xboom_2 && j == 4 ? 10 :
+			i == Xboom_2 && j == 5 ? 12 :
+			i == Xboom_2 && j == 6 ? 12 :
+			i == Xboom_2 && j == 7 ? 12 :
 			effective_action != action ? 0 :
 			j);
-#if 0
+
+#if DEBUG_EM_GFX
       Bitmap *debug_bitmap = g_em->bitmap;
       int debug_src_x = g_em->src_x;
       int debug_src_y = g_em->src_y;
@@ -5585,7 +5835,7 @@ void InitGraphicInfo_EM(void)
 				    sync_frame);
 
       getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y,
-			  g->double_movement && backside);
+			  g->double_movement && is_backside);
 
 #if 1
       g_em->bitmap = src_bitmap;
@@ -5611,7 +5861,7 @@ void InitGraphicInfo_EM(void)
 	int cx = ABS(dx) * TILEX / 8;
 	int cy = ABS(dy) * TILEY / 8;
 
-	if (backside)		/* tile where movement starts */
+	if (is_backside)		/* tile where movement starts */
 	{
 	  if (dx < 0 || dy < 0)
 	  {
@@ -5646,7 +5896,11 @@ void InitGraphicInfo_EM(void)
       }
 #endif
 
-#if 0
+      /* create unique graphic identifier to decide if tile must be redrawn */
+      g_em->unique_identifier =
+	(i << 16) | (frame << 8) | g_em->width | g_em->height;
+
+#if DEBUG_EM_GFX
       if (g_em->bitmap != debug_bitmap ||
 	  g_em->src_x != debug_src_x ||
 	  g_em->src_y != debug_src_y ||
@@ -5662,7 +5916,6 @@ void InitGraphicInfo_EM(void)
 	if (i != last_i)
 	{
 	  printf("\n");
-
 	  last_i = i;
 	}
 
@@ -5671,18 +5924,19 @@ void InitGraphicInfo_EM(void)
 
 	if (element != effective_element)
 	  printf(" [%d ('%s')]",
-		 effective_element,element_info[effective_element].token_name);
+		 effective_element,
+		 element_info[effective_element].token_name);
 
 	printf("\n");
 
 	if (g_em->bitmap != debug_bitmap)
-	  printf("    %d(%d): different bitmap!\n",
-		 j, backside);
+	  printf("    %d (%d): different bitmap! (0x%08x != 0x%08x)\n",
+		 j, is_backside, (int)(g_em->bitmap), (int)(debug_bitmap));
 
 	if (g_em->src_x != debug_src_x ||
 	    g_em->src_y != debug_src_y)
 	  printf("    frame %d (%c): %d,%d (%d,%d) should be %d,%d (%d,%d)\n",
-		 j, (backside ? 'B' : 'F'),
+		 j, (is_backside ? 'B' : 'F'),
 		 g_em->src_x, g_em->src_y,
 		 g_em->src_x / 32, g_em->src_y / 32,
 		 debug_src_x, debug_src_y,
@@ -5692,15 +5946,15 @@ void InitGraphicInfo_EM(void)
 	    g_em->src_offset_y != 0 ||
 	    g_em->dst_offset_x != 0 ||
 	    g_em->dst_offset_y != 0)
-	  printf("    %d(%d): offsets %d,%d and %d,%d should be all 0\n",
-		 j, backside,
+	  printf("    %d (%d): offsets %d,%d and %d,%d should be all 0\n",
+		 j, is_backside,
 		 g_em->src_offset_x, g_em->src_offset_y,
 		 g_em->dst_offset_x, g_em->dst_offset_y);
 
 	if (g_em->width != TILEX ||
 	    g_em->height != TILEY)
-	  printf("    %d(%d): size %d,%d should be %d,%d\n",
-		 j, backside,
+	  printf("    %d (%d): size %d,%d should be %d,%d\n",
+		 j, is_backside,
 		 g_em->width, g_em->height, TILEX, TILEY);
       }
 #endif
@@ -5708,7 +5962,98 @@ void InitGraphicInfo_EM(void)
     }
   }
 
-#if 0
+  for (p = 0; p < 2; p++)
+  {
+    for (i = 0; i < SPR_MAX; i++)
+    {
+      int element = player_mapping[p][i].element_rnd;
+      int action = player_mapping[p][i].action;
+      int direction = player_mapping[p][i].direction;
+
+      for (j = 0; j < 8; j++)
+      {
+	int effective_element = element;
+	int effective_action = action;
+	int graphic = (direction == MV_NO_MOVING ?
+		       el_act2img(effective_element, effective_action) :
+		       el_act_dir2img(effective_element, effective_action,
+				      direction));
+	struct GraphicInfo *g = &graphic_info[graphic];
+	struct GraphicInfo_EM *g_em = &graphic_info_em_player[p][i][7 - j];
+	Bitmap *src_bitmap;
+	int src_x, src_y;
+	int sync_frame = j;
+
+#if DEBUG_EM_GFX
+	Bitmap *debug_bitmap = g_em->bitmap;
+	int debug_src_x = g_em->src_x;
+	int debug_src_y = g_em->src_y;
+#endif
+
+	int frame = getAnimationFrame(g->anim_frames,
+				      g->anim_delay,
+				      g->anim_mode,
+				      g->anim_start_frame,
+				      sync_frame);
+
+	getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x,&src_y, FALSE);
+
+#if 1
+	g_em->bitmap = src_bitmap;
+	g_em->src_x = src_x;
+	g_em->src_y = src_y;
+	g_em->src_offset_x = 0;
+	g_em->src_offset_y = 0;
+	g_em->dst_offset_x = 0;
+	g_em->dst_offset_y = 0;
+	g_em->width  = TILEX;
+	g_em->height = TILEY;
+#endif
+
+#if DEBUG_EM_GFX
+	if (g_em->bitmap != debug_bitmap ||
+	    g_em->src_x != debug_src_x ||
+	    g_em->src_y != debug_src_y)
+	{
+	  static int last_i = -1;
+
+	  if (i != last_i)
+	  {
+	    printf("\n");
+	    last_i = i;
+	  }
+
+	  printf("::: EMC GFX ERROR for p/a %d/%d -> %d ('%s', '%s', %d)",
+		 p, i, element, element_info[element].token_name,
+		 element_action_info[effective_action].suffix, direction);
+
+	  if (element != effective_element)
+	    printf(" [%d ('%s')]",
+		   effective_element,
+		   element_info[effective_element].token_name);
+
+	  printf("\n");
+
+	  if (g_em->bitmap != debug_bitmap)
+	    printf("    %d: different bitmap! (0x%08x != 0x%08x)\n",
+		   j, (int)(g_em->bitmap), (int)(debug_bitmap));
+
+	  if (g_em->src_x != debug_src_x ||
+	      g_em->src_y != debug_src_y)
+	    printf("    frame %d: %d,%d (%d,%d) should be %d,%d (%d,%d)\n",
+		   j,
+		   g_em->src_x, g_em->src_y,
+		   g_em->src_x / 32, g_em->src_y / 32,
+		   debug_src_x, debug_src_y,
+		   debug_src_x / 32, debug_src_y / 32);
+	}
+#endif
+
+      }
+    }
+  }
+
+#if DEBUG_EM_GFX
   exit(0);
 #endif
 }

@@ -3,7 +3,7 @@
  * handle sounds in emerald mine
  */
 
-#include "game_em.h"
+#include "main_em.h"
 
 
 #if defined(AUDIO_UNIX_NATIVE)

@@ -13,7 +13,7 @@ unsigned int screen_x;		/* current scroll position */
 unsigned int screen_y;
 
 /* tiles currently on screen */
-static unsigned short screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
+static unsigned int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 
 /* copy the entire screen to the window at the scroll position
@@ -77,7 +77,7 @@ void blitscreen(void)
 static void animscreen(void)
 {
   unsigned int x, y, dx, dy;
-  unsigned short obj;
+  unsigned int obj;
   unsigned int left = screen_x / TILEX;
   unsigned int top = screen_y / TILEY;
 
@@ -88,14 +88,16 @@ static void animscreen(void)
     for (x = left; x < left + MAX_BUF_XSIZE; x++)
     {
       int tile = Draw[y][x];
+      struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
 
       dx = x % MAX_BUF_XSIZE;
-      obj = map_obj[frame][tile];
 
-      if (screentiles[dy][dx] != obj)
-      {
 #if 1
-	struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
+      /* create unique graphic identifier to decide if tile must be redrawn */
+      obj = g->unique_identifier;
+
+      if (1 || screentiles[dy][dx] != obj)
+      {
 	int dst_x = dx * TILEX;
 	int dst_y = dy * TILEY;
 
@@ -107,14 +109,21 @@ static void animscreen(void)
 		     g->src_x + g->src_offset_x, g->src_y + g->src_offset_y,
 		     g->width, g->height,
 		     dst_x + g->dst_offset_x, dst_y + g->dst_offset_y);
-#else
-	BlitBitmap(objBitmap, screenBitmap,
-		   (obj / 512) * TILEX, (obj % 512) * TILEY / 16,
-		   TILEX, TILEY, dx * TILEX, dy * TILEY);
-#endif
 
 	screentiles[dy][dx] = obj;
       }
+#else
+      obj = map_obj[frame][tile];
+
+      if (screentiles[dy][dx] != obj)
+      {
+	BlitBitmap(objBitmap, screenBitmap,
+		   (obj / 512) * TILEX, (obj % 512) * TILEY / 16,
+		   TILEX, TILEY, dx * TILEX, dy * TILEY);
+
+	screentiles[dy][dx] = obj;
+      }
+#endif
     }
   }
 }
@@ -130,8 +139,6 @@ static void blitplayer(struct PLAYER *ply)
   int dx, dy;
   int old_x, old_y, new_x, new_y;
   int src_x, src_y, dst_x, dst_y;
-  int tile;
-  struct GraphicInfo_EM *g;
   unsigned int x1, y1, x2, y2;
 #if 1
   unsigned short spr;
@@ -159,6 +166,9 @@ static void blitplayer(struct PLAYER *ply)
   if ((unsigned int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
       (unsigned int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
   {
+    struct GraphicInfo_EM *g;
+    int tile;
+
     spr = map_spr[ply->num][frame][ply->anim];
     x1 %= MAX_BUF_XSIZE * TILEX;
     y1 %= MAX_BUF_YSIZE * TILEY;
@@ -166,18 +176,40 @@ static void blitplayer(struct PLAYER *ply)
     y2 %= MAX_BUF_YSIZE * TILEY;
 
 #if 1
+
+#if 1
+    g = &graphic_info_em_player[ply->num][ply->anim][frame];
+
+    /* draw the player to current location */
+    BlitBitmap(g->bitmap, screenBitmap,
+	       g->src_x, g->src_y, TILEX, TILEY,
+	       x1, y1);
+
+    /* draw the player to opposite wrap-around column */
+    BlitBitmap(g->bitmap, screenBitmap,
+	       g->src_x, g->src_y, TILEX, TILEY,
+	       x1 - MAX_BUF_XSIZE * TILEX, y1);
+
+    /* draw the player to opposite wrap-around row */
+    BlitBitmap(g->bitmap, screenBitmap,
+	       g->src_x, g->src_y, TILEX, TILEY,
+	       x1, y1 - MAX_BUF_YSIZE * TILEY);
+#else
     /* draw the player to current location */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
 	       x1, y1);
+
     /* draw the player to opposite wrap-around column */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-	       x1 - MAX_BUF_XSIZE * TILEX, y1),
+	       x1 - MAX_BUF_XSIZE * TILEX, y1);
+
     /* draw the player to opposite wrap-around row */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
 	       x1, y1 - MAX_BUF_YSIZE * TILEY);
+#endif
 
     /* draw the field the player is moving from (masked over the player) */
 #if 0
@@ -190,7 +222,7 @@ static void blitplayer(struct PLAYER *ply)
 
 #if 1
     tile = Draw[old_y][old_x];
-    g = &graphic_info_em[tile][frame];
+    g = &graphic_info_em_object[tile][frame];
 
     if (g->width > 0 && g->height > 0)
     {
@@ -222,7 +254,7 @@ static void blitplayer(struct PLAYER *ply)
 
 #if 1
     tile = Draw[new_y][new_x];
-    g = &graphic_info_em[tile][frame];
+    g = &graphic_info_em_object[tile][frame];
 
     if (g->width > 0 && g->height > 0)
     {

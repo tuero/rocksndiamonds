@@ -3540,9 +3540,19 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "magic ball",
   },
   {
+    "emc_magic_ball.active",
+    "emc_magic_ball",
+    "magic ball (activated)",
+  },
+  {
     "emc_magic_ball_switch",
     "emc_magic_ball_switch",
-    "magic ball switch",
+    "magic ball switch (off)",
+  },
+  {
+    "emc_magic_ball_switch.active",
+    "emc_magic_ball_switch",
+    "magic ball switch (on)",
   },
   {
     "emc_spring_bumper",

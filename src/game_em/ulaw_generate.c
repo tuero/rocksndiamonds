@@ -4,7 +4,7 @@
  * directly in emerald mine source
  */
 
-#include "game_em.h"
+#include "main_em.h"
 
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)

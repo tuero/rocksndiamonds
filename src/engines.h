@@ -1,42 +1,31 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2002 Artsoft Entertainment                      *
+* (c) 1994-2004 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
 *               Germany                                    *
 *               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-* game_em.h                                                *
+* engines.h                                                *
 ***********************************************************/
 
-#ifndef GAME_EM_H
-#define GAME_EM_H
+#ifndef ENGINES_H
+#define ENGINES_H
 
-#define GAME_EM_VERSION_1_0_0
+#include "libgame/libgame.h"
 
 
 /* ========================================================================= */
-/* functions and definitions exported from game_em to main program           */
+/* functions and definitions exported from main program to game_em           */
 /* ========================================================================= */
 
-#include "main_em.h"
+extern void SetBitmaps_EM(Bitmap **);
+extern void UpdateEngineValues(int, int);
+extern void DrawGameDoorValues_EM(int, int, int, int);
+extern int getGameFrameDelay_EM(int);
+extern void PlayLevelSound_EM(int, int, int, int);
+extern void InitGraphicInfo_EM(void);
 
-extern struct LevelInfo_EM native_em_level;
-extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
-extern struct GraphicInfo_EM graphic_info_em_player[2][SPR_MAX][8];
-
-extern void em_open_all();
-extern void em_close_all();
-
-extern void InitGameEngine_EM();
-extern void GameActions_EM(byte);
-
-extern unsigned int InitEngineRND_EM(long);
-
-extern void setLevelInfoToDefaults_EM();
-extern boolean LoadNativeLevel_EM(char *);
-
-
-#endif	/* GAME_EM_H */
+#endif	/* ENGINES_H */

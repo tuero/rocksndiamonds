@@ -541,39 +541,46 @@ static void player(struct PLAYER *ply)
 
       case Xkey_1:
 	ply->keys |= 0x01;
+	Cave[y][x] = Ykey_1_eat;
 	goto key_walk;
 
       case Xkey_2:
 	ply->keys |= 0x02;
+	Cave[y][x] = Ykey_2_eat;
 	goto key_walk;
 
       case Xkey_3:
 	ply->keys |= 0x04;
+	Cave[y][x] = Ykey_3_eat;
 	goto key_walk;
 
       case Xkey_4:
 	ply->keys |= 0x08;
+	Cave[y][x] = Ykey_4_eat;
 	goto key_walk;
 
       case Xkey_5:
 	ply->keys |= 0x10;
+	Cave[y][x] = Ykey_5_eat;
 	goto key_walk;
 
       case Xkey_6:
 	ply->keys |= 0x20;
+	Cave[y][x] = Ykey_6_eat;
 	goto key_walk;
 
       case Xkey_7:
 	ply->keys |= 0x40;
+	Cave[y][x] = Ykey_7_eat;
 	goto key_walk;
 
       case Xkey_8:
 	ply->keys |= 0x80;
+	Cave[y][x] = Ykey_8_eat;
 	goto key_walk;
 
       key_walk:
 
-	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.key_score;
@@ -583,7 +590,7 @@ static void player(struct PLAYER *ply)
 	break;
 
       case Xlenses:
-	Cave[y][x] = Yball_eat;
+	Cave[y][x] = Ylenses_eat;
 	Next[y][x] = Zplayer;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.lenses_score;
@@ -594,7 +601,7 @@ static void player(struct PLAYER *ply)
 	break;
 
       case Xmagnify:
-	Cave[y][x] = Yball_eat;
+	Cave[y][x] = Ymagnify_eat;
 	Next[y][x] = Zplayer;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.magnify_score;
@@ -1004,8 +1011,14 @@ static void player(struct PLAYER *ply)
       /* fire is pressed */
 
       case Xgrass:
+	Cave[y][x] = Ygrass_eat;
+	Next[y][x] = Xblank;
+	play_element_sound(x, y, SAMPLE_dirt, element);
+	ply->anim = SPR_spray + anim;
+	break;
+
       case Xdirt:
-	Cave[y][x] = Yball_eat;
+	Cave[y][x] = Ydirt_eat;
 	Next[y][x] = Xblank;
 	play_element_sound(x, y, SAMPLE_dirt, element);
 	ply->anim = SPR_spray + anim;
@@ -1042,38 +1055,45 @@ static void player(struct PLAYER *ply)
 
       case Xkey_1:
 	ply->keys |= 0x01;
+	Cave[y][x] = Ykey_1_eat;
 	goto key_shoot;
 
       case Xkey_2:
 	ply->keys |= 0x02;
+	Cave[y][x] = Ykey_2_eat;
 	goto key_shoot;
 
       case Xkey_3:
 	ply->keys |= 0x04;
+	Cave[y][x] = Ykey_3_eat;
 	goto key_shoot;
 
       case Xkey_4:
 	ply->keys |= 0x08;
+	Cave[y][x] = Ykey_4_eat;
 	goto key_shoot;
 
       case Xkey_5:
 	ply->keys |= 0x10;
+	Cave[y][x] = Ykey_5_eat;
 	goto key_shoot;
 
       case Xkey_6:
 	ply->keys |= 0x20;
+	Cave[y][x] = Ykey_6_eat;
 	goto key_shoot;
 
       case Xkey_7:
 	ply->keys |= 0x40;
+	Cave[y][x] = Ykey_7_eat;
 	goto key_shoot;
 
       case Xkey_8:
 	ply->keys |= 0x80;
+	Cave[y][x] = Ykey_8_eat;
 	goto key_shoot;
 
       key_shoot:
-	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.key_score;
@@ -1081,7 +1101,7 @@ static void player(struct PLAYER *ply)
 	break;
 
       case Xlenses:
-	Cave[y][x] = Yball_eat;
+	Cave[y][x] = Ylenses_eat;
 	Next[y][x] = Xblank;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.lenses_score;
@@ -1090,7 +1110,7 @@ static void player(struct PLAYER *ply)
 	break;
 
       case Xmagnify:
-	Cave[y][x] = Yball_eat;
+	Cave[y][x] = Ymagnify_eat;
 	Next[y][x] = Xblank;
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.magnify_score;

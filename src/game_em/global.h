@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "game_em.h"
+#include "main_em.h"
 
 #define EM_GFX_DIR	"graphics.EM"
 #define EM_SND_DIR	"sounds.EM"

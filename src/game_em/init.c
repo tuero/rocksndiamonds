@@ -6,7 +6,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include "game_em.h"
+#include "main_em.h"
 
 #include "global.h"
 #include "display.h"

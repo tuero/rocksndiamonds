@@ -1,7 +1,7 @@
 #ifndef MAIN_EM_H
 #define MAIN_EM_H
 
-#include "game_em.h"
+#include "../engines.h"
 
 
 /* 2000-07-30T11:06:03Z ---------------------------------------------------- */
@@ -260,6 +260,22 @@ enum
   Xball_2,
   Xball_2B,
   Yball_eat,
+
+#if 1
+  Ykey_1_eat,
+  Ykey_2_eat,
+  Ykey_3_eat,
+  Ykey_4_eat,
+  Ykey_5_eat,
+  Ykey_6_eat,
+  Ykey_7_eat,
+  Ykey_8_eat,
+  Ylenses_eat,
+  Ymagnify_eat,
+  Ygrass_eat,
+  Ydirt_eat,
+#endif
+
   Xgrow_ns,
   Ygrow_ns_eat,
   Xgrow_ew,
@@ -441,6 +457,16 @@ enum
 
 enum
 {
+  SPR_still = 0,
+  SPR_walk  = 1,
+  SPR_push  = 5,
+  SPR_spray = 9,
+
+  SPR_MAX   = 13
+};
+
+enum
+{
   SAMPLE_blank = 0,	/* player walks on blank */
   SAMPLE_roll,		/* player pushes stone/bomb/nut/spring */
   SAMPLE_stone,		/* stone hits ground */
@@ -608,6 +634,8 @@ struct GraphicInfo_EM
   int src_offset_x, src_offset_y;
   int dst_offset_x, dst_offset_y;
   int width, height;
+
+  int unique_identifier;	/* used to identify needed screen updates */
 };
 
 #endif	/* MAIN_EM_H */

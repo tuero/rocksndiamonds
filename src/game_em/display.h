@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "game_em.h"
+#include "main_em.h"
 
 #define ORIG_TILEX		16
 #define ORIG_TILEY		16

@@ -3338,9 +3338,15 @@ struct ConfigInfo image_config[] =
   { "emc_magic_ball",				"emc_object.pcx"	},
   { "emc_magic_ball.xpos",			"22"			},
   { "emc_magic_ball.ypos",			"18"			},
-  { "emc_magic_ball.frames",			"16"			},
-  { "emc_magic_ball.vertical",			"true"			},
+  { "emc_magic_ball.frames",			"1"			},
   { "emc_magic_ball.scale_up_factor",		"2"			},
+
+  { "emc_magic_ball.active",			"emc_object.pcx"	},
+  { "emc_magic_ball.active.xpos",		"22"			},
+  { "emc_magic_ball.active.ypos",		"18"			},
+  { "emc_magic_ball.active.frames",		"16"			},
+  { "emc_magic_ball.active.vertical",		"true"			},
+  { "emc_magic_ball.active.scale_up_factor",	"2"			},
 
   { "emc_magic_ball_switch",			"emc_object.pcx"	},
   { "emc_magic_ball_switch.xpos",		"25"			},
@@ -3348,11 +3354,25 @@ struct ConfigInfo image_config[] =
   { "emc_magic_ball_switch.frames",		"1"			},
   { "emc_magic_ball_switch.scale_up_factor",	"2"			},
 
+  { "emc_magic_ball_switch.active",		"emc_object.pcx"	},
+  { "emc_magic_ball_switch.active.xpos",	"25"			},
+  { "emc_magic_ball_switch.active.ypos",	"9"			},
+  { "emc_magic_ball_switch.active.frames",	"1"			},
+  { "emc_magic_ball_switch.active.scale_up_factor", "2"			},
+
   { "emc_spring_bumper",			"emc_object.pcx"	},
   { "emc_spring_bumper.xpos",			"25"			},
   { "emc_spring_bumper.ypos",			"3"			},
   { "emc_spring_bumper.frames",			"1"			},
   { "emc_spring_bumper.scale_up_factor",	"2"			},
+
+  { "emc_spring_bumper.active",			"emc_object.pcx"	},
+  { "emc_spring_bumper.active.xpos",		"25"			},
+  { "emc_spring_bumper.active.ypos",		"3"			},
+  { "emc_spring_bumper.active.frames",		"4"			},
+  { "emc_spring_bumper.active.vertical",	"true"			},
+  { "emc_spring_bumper.active.anim_mode",	"pingpong2"		},
+  { "emc_spring_bumper.active.scale_up_factor",	"2"			},
 
   { "emc_plant",				"emc_object.pcx"	},
   { "emc_plant.xpos",				"25"			},

@@ -270,7 +270,7 @@ void InitElementSmallImages()
       InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
 #endif
 
-#if 0
+#if 1
   /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
   for (i = IMG_EMC_OBJECT; i <= IMG_EMC_SPRITE; i++)
     InitElementSmallImagesScaledUp(i);
@@ -726,6 +726,10 @@ void InitElementGraphicInfo()
       /* generic default action graphic (defined by "[default]" directive) */
       int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
       int default_action_crumbled = element_info[EL_DEFAULT].crumbled[act];
+      int default_remove_graphic = IMG_EMPTY;
+
+      if (act_remove && default_action_graphic != -1)
+	default_remove_graphic = default_action_graphic;
 
       /* look for special default action graphic (classic game specific) */
       if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].graphic[act] != -1)
@@ -766,13 +770,13 @@ void InitElementGraphicInfo()
 	/* !!! maybe it's better to use default _action_ graphic here !!! */
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
-	    (act_remove ? IMG_EMPTY :
+	    (act_remove ? default_remove_graphic :
 	     act_turning ?
 	     element_info[i].direction_graphic[ACTION_TURNING][dir] :
 	     default_direction_graphic[dir]);
 	if (default_action_direction_crumbled == -1)
 	  default_action_direction_crumbled =
-	    (act_remove ? IMG_EMPTY :
+	    (act_remove ? default_remove_graphic :
 	     act_turning ?
 	     element_info[i].direction_crumbled[ACTION_TURNING][dir] :
 	     default_direction_crumbled[dir]);
@@ -788,12 +792,12 @@ void InitElementGraphicInfo()
       /* no graphic for this specific action -- use default action graphic */
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] =
-	  (act_remove ? IMG_EMPTY :
+	  (act_remove ? default_remove_graphic :
 	   act_turning ? element_info[i].graphic[ACTION_TURNING] :
 	   default_action_graphic);
       if (element_info[i].crumbled[act] == -1)
 	element_info[i].crumbled[act] =
-	  (act_remove ? IMG_EMPTY :
+	  (act_remove ? default_remove_graphic :
 	   act_turning ? element_info[i].crumbled[ACTION_TURNING] :
 	   default_action_crumbled);
     }

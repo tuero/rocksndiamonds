@@ -428,16 +428,17 @@ enum
   TILE_MAX
 };
 
-#endif
-
 enum
 {
   SPR_still = 0,
-  SPR_walk = 1,
-  SPR_push = 5,
+  SPR_walk  = 1,
+  SPR_push  = 5,
   SPR_spray = 9,
-  SPR_MAX = 13
+
+  SPR_MAX   = 13
 };
+
+#endif
 
 extern unsigned char tab_blank[TILE_MAX];
 extern unsigned char tab_acid[TILE_MAX];
