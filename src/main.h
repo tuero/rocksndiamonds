@@ -89,57 +89,57 @@
 #define EP_PUSHABLE		24
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	25
+#define EP_EM_SLIPPERY_WALL	32
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_CAN_BE_CRUMBLED	26
+#define EP_CAN_BE_CRUMBLED	33
 
 /* values for pre-defined properties */
-#define EP_PLAYER		27
-#define EP_CAN_PASS_MAGIC_WALL	28
-#define EP_SWITCHABLE		29
-#define EP_BD_ELEMENT		30
-#define EP_SP_ELEMENT		31
-#define EP_SB_ELEMENT		32
-#define EP_GEM			33
-#define EP_FOOD_DARK_YAMYAM	34
-#define EP_FOOD_PENGUIN		35
-#define EP_FOOD_PIG		36
-#define EP_HISTORIC_WALL	37
-#define EP_HISTORIC_SOLID	38
-#define EP_CLASSIC_ENEMY	39
-#define EP_BELT			40
-#define EP_BELT_ACTIVE		41
-#define EP_BELT_SWITCH		42
-#define EP_TUBE			43
-#define EP_KEYGATE		44
-#define EP_AMOEBOID		45
-#define EP_AMOEBALIVE		46
-#define EP_HAS_CONTENT		47
-#define EP_ACTIVE_BOMB		48
-#define EP_INACTIVE		49
+#define EP_PLAYER		34
+#define EP_CAN_PASS_MAGIC_WALL	35
+#define EP_SWITCHABLE		36
+#define EP_BD_ELEMENT		37
+#define EP_SP_ELEMENT		38
+#define EP_SB_ELEMENT		39
+#define EP_GEM			40
+#define EP_FOOD_DARK_YAMYAM	41
+#define EP_FOOD_PENGUIN		42
+#define EP_FOOD_PIG		43
+#define EP_HISTORIC_WALL	44
+#define EP_HISTORIC_SOLID	45
+#define EP_CLASSIC_ENEMY	46
+#define EP_BELT			47
+#define EP_BELT_ACTIVE		48
+#define EP_BELT_SWITCH		49
+#define EP_TUBE			50
+#define EP_KEYGATE		51
+#define EP_AMOEBOID		52
+#define EP_AMOEBALIVE		53
+#define EP_HAS_CONTENT		54
+#define EP_ACTIVE_BOMB		55
+#define EP_INACTIVE		56
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	50
-#define EP_ACCESSIBLE_INSIDE	51
-#define EP_ACCESSIBLE_UNDER	52
-#define EP_WALKABLE		53
-#define EP_PASSABLE		54
-#define EP_ACCESSIBLE		55
-#define EP_SNAPPABLE		56
-#define EP_WALL			57
-#define EP_SOLID_FOR_PUSHING	58
-#define EP_DRAGONFIRE_PROOF	59
-#define EP_EXPLOSION_PROOF	60
-#define EP_CAN_SMASH		61
-#define EP_CAN_EXPLODE		62
+#define EP_ACCESSIBLE_OVER	57
+#define EP_ACCESSIBLE_INSIDE	58
+#define EP_ACCESSIBLE_UNDER	59
+#define EP_WALKABLE		60
+#define EP_PASSABLE		61
+#define EP_ACCESSIBLE		62
+#define EP_SNAPPABLE		63
+#define EP_WALL			64
+#define EP_SOLID_FOR_PUSHING	65
+#define EP_DRAGONFIRE_PROOF	66
+#define EP_EXPLOSION_PROOF	67
+#define EP_CAN_SMASH		68
+#define EP_CAN_EXPLODE		69
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	63
-#define EP_WALK_TO_OBJECT	64
-#define EP_DEADLY		65
+#define EP_EXPLODE_RESULT	70
+#define EP_WALK_TO_OBJECT	71
+#define EP_DEADLY		72
 
-#define NUM_ELEMENT_PROPERTIES	66
+#define NUM_ELEMENT_PROPERTIES	73
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -184,6 +184,11 @@
 				 ((v) ?					  \
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
 				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
+
+/* values for change power for custom elements */
+#define CP_NON_DESTRUCTIVE	0
+#define CP_HALF_DESTRUCTIVE	1
+#define CP_FULL_DESTRUCTIVE	2
 
 
 /* macros for configurable properties */
@@ -1172,7 +1177,20 @@ struct ElementChangeInfo
 
   short trigger;		/* custom element triggering change */
 
-  short successor;		/* new custom element after change */
+  short target_element;		/* target element after change */
+
+  int content[3][3];		/* new elements after extended change */
+  boolean use_content;		/* use extended change content */
+  boolean only_complete;	/* only use complete content */
+  int power;			/* power of extended change */
+
+  boolean explode;		/* explode instead of change */
+
+  /* functions that are called before, while and after the change of an
+     element -- currently only used for non-custom elements */
+  void (*pre_change_function)(int x, int y);
+  void (*change_function)(int x, int y);
+  void (*post_change_function)(int x, int y);
 };
 
 struct ElementInfo
@@ -1201,8 +1219,8 @@ struct ElementInfo
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */
 
-  int collect_score;		/* score value for collecting */
-  int collect_gem_count;	/* gem count value for collecting */
+  int score;			/* score value for collecting */
+  int gem_count;		/* gem count value for collecting */
 
   int push_delay_fixed;		/* constant frame delay for pushing */
   int push_delay_random;	/* additional random frame delay for pushing */

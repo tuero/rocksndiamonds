@@ -165,7 +165,7 @@ static void KillHeroUnlessProtected(int, int);
 
 static void CheckTriggeredElementChange(int, int);
 static void CheckPlayerElementChange(int, int, int, int);
-static void ChangeElementDoIt(int, int, int);
+static void ChangeElementNow(int, int, int);
 
 static void PlaySoundLevel(int, int, int);
 static void PlaySoundLevelNearest(int, int, int);
@@ -202,8 +202,8 @@ static void RunTimegateWheel(int x, int y);
 
 struct ChangingElementInfo
 {
-  int base_element;
-  int next_element;
+  int element;
+  int target_element;
   int change_delay;
   void (*pre_change_function)(int x, int y);
   void (*change_function)(int x, int y);
@@ -375,7 +375,7 @@ struct
   int element;
   int gem_count;
 }
-collect_gem_count_list[] =
+gem_count_list[] =
 {
   { EL_EMERALD,		1 },
   { EL_BD_DIAMOND,	1 },
@@ -390,10 +390,10 @@ collect_gem_count_list[] =
   { EL_UNDEFINED,	0 },
 };
 
-static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
+static boolean changing_element[MAX_NUM_ELEMENTS];
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
 
-#define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
+#define IS_AUTO_CHANGING(e)	(changing_element[e])
 #define IS_JUST_CHANGING(x, y)	(ChangeDelay[x][y] != 0)
 #define IS_CHANGING(x, y)	(IS_AUTO_CHANGING(Feld[x][y]) || \
 				 IS_JUST_CHANGING(x, y))
@@ -742,42 +742,75 @@ static void InitGameEngine()
   /* initialize changing elements information */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
+#if 1
+    element_info[i].change.pre_change_function = NULL;
+    element_info[i].change.change_function = NULL;
+    element_info[i].change.post_change_function = NULL;
+
+    if (!IS_CUSTOM_ELEMENT(i))
+    {
+      element_info[i].change.target_element = EL_EMPTY_SPACE;
+      element_info[i].change.delay_fixed = 0;
+      element_info[i].change.delay_random = 0;
+      element_info[i].change.delay_frames = 1;
+    }
+
+    changing_element[i] = FALSE;
+#else
     changing_element[i].base_element = EL_UNDEFINED;
     changing_element[i].next_element = EL_UNDEFINED;
     changing_element[i].change_delay = -1;
     changing_element[i].pre_change_function = NULL;
     changing_element[i].change_function = NULL;
     changing_element[i].post_change_function = NULL;
+#endif
   }
 
   /* add changing elements from pre-defined list */
-  for (i=0; changing_element_list[i].base_element != EL_UNDEFINED; i++)
+  for (i=0; changing_element_list[i].element != EL_UNDEFINED; i++)
   {
+    int element = changing_element_list[i].element;
     struct ChangingElementInfo *ce = &changing_element_list[i];
-    int element = ce->base_element;
+    struct ElementChangeInfo *change = &element_info[element].change;
 
+#if 1
+    change->target_element       = ce->target_element;
+    change->delay_fixed          = ce->change_delay;
+    change->pre_change_function  = ce->pre_change_function;
+    change->change_function      = ce->change_function;
+    change->post_change_function = ce->post_change_function;
+
+    changing_element[element] = TRUE;
+#else
     changing_element[element].base_element         = ce->base_element;
     changing_element[element].next_element         = ce->next_element;
     changing_element[element].change_delay         = ce->change_delay;
     changing_element[element].pre_change_function  = ce->pre_change_function;
     changing_element[element].change_function      = ce->change_function;
     changing_element[element].post_change_function = ce->post_change_function;
+#endif
   }
 
   /* add changing elements from custom element configuration */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
+#if 0
     struct ElementChangeInfo *change = &element_info[element].change;
+#endif
 
     /* only add custom elements that change after fixed/random frame delay */
     if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, CE_DELAY))
       continue;
 
+#if 1
+    changing_element[element] = TRUE;
+#else
     changing_element[element].base_element = element;
-    changing_element[element].next_element = change->successor;
+    changing_element[element].next_element = change->target_element;
     changing_element[element].change_delay = (change->delay_fixed *
 					      change->delay_frames);
+#endif
   }
 
   /* ---------- initialize trigger events ---------------------------------- */
@@ -818,12 +851,12 @@ static void InitGameEngine()
   /* initialize gem count values for each element */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     if (!IS_CUSTOM_ELEMENT(i))
-      element_info[i].collect_gem_count = 0;
+      element_info[i].gem_count = 0;
 
   /* add gem count values for all elements from pre-defined list */
-  for (i=0; collect_gem_count_list[i].element != EL_UNDEFINED; i++)
-    element_info[collect_gem_count_list[i].element].collect_gem_count =
-      collect_gem_count_list[i].gem_count;
+  for (i=0; gem_count_list[i].element != EL_UNDEFINED; i++)
+    element_info[gem_count_list[i].element].gem_count =
+      gem_count_list[i].gem_count;
 }
 
 
@@ -2535,7 +2568,7 @@ void Impact(int x, int y)
   {
     PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);
 
-    ChangeElementDoIt(x, y, element_info[element].change.successor);
+    ChangeElementNow(x, y, element);
 
     return;
   }
@@ -2666,7 +2699,7 @@ void Impact(int x, int y)
 	else if (CAN_CHANGE(smashed) &&
 		 HAS_CHANGE_EVENT(smashed, CE_SMASHED))
 	{
-	  ChangeElementDoIt(x, y + 1, element_info[smashed].change.successor);
+	  ChangeElementNow(x, y + 1, smashed);
 	}
       }
     }
@@ -5003,12 +5036,16 @@ static void ChangeActiveTrap(int x, int y)
     DrawLevelFieldCrumbledSand(x, y);
 }
 
-static void ChangeElementDoIt(int x, int y, int element_new)
+static void ChangeElementNowExt(int x, int y, int target_element)
 {
-  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_CHANGING);
+  if (IS_PLAYER(x, y) && !IS_ACCESSIBLE(target_element))
+  {
+    Bang(x, y);
+    return;
+  }
 
   RemoveField(x, y);
-  Feld[x][y] = element_new;
+  Feld[x][y] = target_element;
 
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
@@ -5049,12 +5086,99 @@ static void ChangeElementDoIt(int x, int y, int element_new)
   }
 }
 
+static void ChangeElementNow(int x, int y, int element)
+{
+  struct ElementChangeInfo *change = &element_info[element].change;
+
+  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_CHANGING);
+
+  if (change->explode)
+  {
+    Bang(x, y);
+    return;
+  }
+
+  if (change->use_content)
+  {
+    boolean complete_change = TRUE;
+    boolean can_change[3][3];
+    int xx, yy;
+
+    for (yy = 0; yy < 3; yy++) for(xx = 0; xx < 3 ; xx++)
+    {
+      boolean half_destructible;
+      int ex = x + xx - 1;
+      int ey = y + yy - 1;
+      int e;
+
+      can_change[xx][yy] = TRUE;
+
+      if (ex == x && ey == y)	/* do not check changing element itself */
+	continue;
+
+      if (change->content[xx][yy] == EL_EMPTY_SPACE)
+      {
+	can_change[xx][yy] = FALSE;	/* do not change empty borders */
+
+	continue;
+      }
+
+      if (!IN_LEV_FIELD(ex, ey))
+      {
+	can_change[xx][yy] = FALSE;
+	complete_change = FALSE;
+
+	continue;
+      }
+
+      e = Feld[ex][ey];
+
+      half_destructible = (IS_FREE(ex, ey) || IS_DIGGABLE(e));
+
+      if ((change->power <= CP_NON_DESTRUCTIVE  && !IS_FREE(ex, ey)) ||
+	  (change->power <= CP_HALF_DESTRUCTIVE && !half_destructible) ||
+	  (change->power <= CP_FULL_DESTRUCTIVE && IS_INDESTRUCTIBLE(e)))
+      {
+	can_change[xx][yy] = FALSE;
+	complete_change = FALSE;
+      }
+    }
+
+    if (!change->only_complete || complete_change)
+    {
+      for (yy = 0; yy < 3; yy++) for(xx = 0; xx < 3 ; xx++)
+      {
+	int ex = x + xx - 1;
+	int ey = y + yy - 1;
+
+	if (can_change[xx][yy])
+	{
+	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
+
+	  /* for symmetry reasons, stop newly created border elements */
+	  if (ex != x || ey != y)
+	    Stop[ex][ey] = TRUE;
+	}
+      }
+
+      return;
+    }
+  }
+
+  ChangeElementNowExt(x, y, change->target_element);
+}
+
 static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
+  struct ElementChangeInfo *change = &element_info[element].change;
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
+#if 1
+    ChangeDelay[x][y] = (    change->delay_fixed  * change->delay_frames +
+			 RND(change->delay_random * change->delay_frames)) + 1;
+#else
     ChangeDelay[x][y] = changing_element[element].change_delay + 1;
 
     if (IS_CUSTOM_ELEMENT(element) && HAS_CHANGE_EVENT(element, CE_DELAY))
@@ -5064,12 +5188,18 @@ static void ChangeElement(int x, int y)
 
       ChangeDelay[x][y] += RND(max_random_delay * delay_frames);
     }
+#endif
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
+#if 1
+    if (change->pre_change_function)
+      change->pre_change_function(x, y);
+#else
     if (changing_element[element].pre_change_function)
       changing_element[element].pre_change_function(x, y);
+#endif
   }
 
   ChangeDelay[x][y]--;
@@ -5081,12 +5211,19 @@ static void ChangeElement(int x, int y)
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
+#if 1
+    if (change->change_function)
+      change->change_function(x, y);
+#else
     if (changing_element[element].change_function)
       changing_element[element].change_function(x, y);
+#endif
   }
   else					/* finish element change */
   {
+#if 0
     int next_element = changing_element[element].next_element;
+#endif
 
     if (IS_MOVING(x, y))		/* never change a running system ;-) */
     {
@@ -5095,13 +5232,20 @@ static void ChangeElement(int x, int y)
       return;
     }
 
+#if 1
+    ChangeElementNow(x, y, element);
+
+    if (change->post_change_function)
+      change->post_change_function(x, y);
+#else
     if (next_element != EL_UNDEFINED)
-      ChangeElementDoIt(x, y, next_element);
+      ChangeElementNow(x, y, next_element);
     else
-      ChangeElementDoIt(x, y, element_info[element].change.successor);
+      ChangeElementNow(x, y, element_info[element].change.target_element);
 
     if (changing_element[element].post_change_function)
       changing_element[element].post_change_function(x, y);
+#endif
   }
 }
 
@@ -5135,12 +5279,8 @@ static void CheckPlayerElementChange(int x, int y, int element,
   if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, trigger_event))
     return;
 
-#if 1
   ChangeDelay[x][y] = 1;
   ChangeElement(x, y);
-#else
-  ChangeElementDoIt(x, y, element_info[element].change.successor);
-#endif
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -6904,10 +7044,10 @@ int DigField(struct PlayerInfo *player,
 			     el2edimg(EL_KEY_1 + key_nr));
 	  redraw_mask |= REDRAW_DOOR_1;
 	}
-	else if (element_info[element].collect_gem_count > 0)
+	else if (element_info[element].gem_count > 0)
 	{
 	  local_player->gems_still_needed -=
-	    element_info[element].collect_gem_count;
+	    element_info[element].gem_count;
 	  if (local_player->gems_still_needed < 0)
 	    local_player->gems_still_needed = 0;
 
@@ -7326,7 +7466,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_KEY]);
       break;
     default:
-      RaiseScore(element_info[element].collect_score);
+      RaiseScore(element_info[element].score);
       break;
   }
 }

@@ -125,6 +125,10 @@
 #define ED_AREA_ELEM_CONTENT5_XPOS	(30 * MINI_TILEX + MINI_TILEX / 2)
 #define ED_AREA_ELEM_CONTENT5_YPOS	(ED_SETTINGS_YPOS(7) + \
 					 ED_GADGET_DISTANCE)
+/* extended custom change target */
+#define ED_AREA_ELEM_CONTENT6_XPOS	(29 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(10) + \
+					 ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
@@ -293,9 +297,9 @@
 #define GADGET_ID_LEVEL_RANDOM_DOWN	(GADGET_ID_COUNTER_FIRST + 9)
 #define GADGET_ID_LEVEL_RANDOM_TEXT	(GADGET_ID_COUNTER_FIRST + 10)
 #define GADGET_ID_LEVEL_RANDOM_UP	(GADGET_ID_COUNTER_FIRST + 11)
-#define GADGET_ID_LEVEL_COLLECT_DOWN	(GADGET_ID_COUNTER_FIRST + 12)
-#define GADGET_ID_LEVEL_COLLECT_TEXT	(GADGET_ID_COUNTER_FIRST + 13)
-#define GADGET_ID_LEVEL_COLLECT_UP	(GADGET_ID_COUNTER_FIRST + 14)
+#define GADGET_ID_LEVEL_GEMSLIMIT_DOWN	(GADGET_ID_COUNTER_FIRST + 12)
+#define GADGET_ID_LEVEL_GEMSLIMIT_TEXT	(GADGET_ID_COUNTER_FIRST + 13)
+#define GADGET_ID_LEVEL_GEMSLIMIT_UP	(GADGET_ID_COUNTER_FIRST + 14)
 #define GADGET_ID_LEVEL_TIMELIMIT_DOWN	(GADGET_ID_COUNTER_FIRST + 15)
 #define GADGET_ID_LEVEL_TIMELIMIT_TEXT	(GADGET_ID_COUNTER_FIRST + 16)
 #define GADGET_ID_LEVEL_TIMELIMIT_UP	(GADGET_ID_COUNTER_FIRST + 17)
@@ -308,12 +312,12 @@
 #define GADGET_ID_ELEMENT_CONTENT_DOWN	(GADGET_ID_COUNTER_FIRST + 24)
 #define GADGET_ID_ELEMENT_CONTENT_TEXT	(GADGET_ID_COUNTER_FIRST + 25)
 #define GADGET_ID_ELEMENT_CONTENT_UP	(GADGET_ID_COUNTER_FIRST + 26)
-#define GADGET_ID_COLLECT_SCORE_DOWN	(GADGET_ID_COUNTER_FIRST + 27)
-#define GADGET_ID_COLLECT_SCORE_TEXT	(GADGET_ID_COUNTER_FIRST + 28)
-#define GADGET_ID_COLLECT_SCORE_UP	(GADGET_ID_COUNTER_FIRST + 29)
-#define GADGET_ID_COLLECT_GEMCOUNT_DOWN	(GADGET_ID_COUNTER_FIRST + 30)
-#define GADGET_ID_COLLECT_GEMCOUNT_TEXT	(GADGET_ID_COUNTER_FIRST + 31)
-#define GADGET_ID_COLLECT_GEMCOUNT_UP	(GADGET_ID_COUNTER_FIRST + 32)
+#define GADGET_ID_CUSTOM_SCORE_DOWN	(GADGET_ID_COUNTER_FIRST + 27)
+#define GADGET_ID_CUSTOM_SCORE_TEXT	(GADGET_ID_COUNTER_FIRST + 28)
+#define GADGET_ID_CUSTOM_SCORE_UP	(GADGET_ID_COUNTER_FIRST + 29)
+#define GADGET_ID_CUSTOM_GEMCOUNT_DOWN	(GADGET_ID_COUNTER_FIRST + 30)
+#define GADGET_ID_CUSTOM_GEMCOUNT_TEXT	(GADGET_ID_COUNTER_FIRST + 31)
+#define GADGET_ID_CUSTOM_GEMCOUNT_UP	(GADGET_ID_COUNTER_FIRST + 32)
 #define GADGET_ID_PUSH_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 33)
 #define GADGET_ID_PUSH_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 34)
 #define GADGET_ID_PUSH_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 35)
@@ -349,11 +353,12 @@
 #define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 10)
 #define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 11)
 #define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 12)
-#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 13)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 14)
+#define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 13)
+#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 14)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 15)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 15)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 16)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -374,9 +379,10 @@
 #define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 10)
 #define GADGET_ID_CHANGE_IMPACT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
 #define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 12)
+#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 13)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 13)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 14)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -424,13 +430,16 @@
 #define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 18)
 #define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
 #define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 20)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 21)
-#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 22)
-#define GADGET_ID_CHANGE_IMPACT_SMASHED	(GADGET_ID_CHECKBUTTON_FIRST + 23)
-#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_CHANGE_IMPACT_SMASHED	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 27)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 28)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -445,14 +454,14 @@
 #define ED_COUNTER_ID_SELECT_LEVEL	0
 #define ED_COUNTER_ID_LEVEL_XSIZE	1
 #define ED_COUNTER_ID_LEVEL_YSIZE	2
-#define ED_COUNTER_ID_LEVEL_COLLECT	3
+#define ED_COUNTER_ID_LEVEL_GEMSLIMIT	3
 #define ED_COUNTER_ID_LEVEL_TIMELIMIT	4
 #define ED_COUNTER_ID_LEVEL_TIMESCORE	5
 #define ED_COUNTER_ID_LEVEL_RANDOM	6
 #define ED_COUNTER_ID_ELEMENT_SCORE	7
 #define ED_COUNTER_ID_ELEMENT_CONTENT	8
-#define ED_COUNTER_ID_COLLECT_SCORE	9
-#define ED_COUNTER_ID_COLLECT_GEMCOUNT	10
+#define ED_COUNTER_ID_CUSTOM_SCORE	9
+#define ED_COUNTER_ID_CUSTOM_GEMCOUNT	10
 #define ED_COUNTER_ID_PUSH_DELAY_FIX	11
 #define ED_COUNTER_ID_PUSH_DELAY_RND	12
 #define ED_COUNTER_ID_MOVE_DELAY_FIX	13
@@ -465,7 +474,7 @@
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
 
-#define ED_COUNTER_ID_CUSTOM_FIRST	ED_COUNTER_ID_COLLECT_SCORE
+#define ED_COUNTER_ID_CUSTOM_FIRST	ED_COUNTER_ID_CUSTOM_SCORE
 #define ED_COUNTER_ID_CUSTOM_LAST	ED_COUNTER_ID_MOVE_DELAY_RND
 
 #define ED_COUNTER_ID_CHANGE_FIRST	ED_COUNTER_ID_CHANGE_DELAY_FIX
@@ -517,14 +526,15 @@
 #define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	10
 #define ED_SELECTBOX_ID_CHANGE_IMPACT_ACTION	11
 #define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	12
+#define ED_SELECTBOX_ID_CHANGE_POWER		13
 
-#define ED_NUM_SELECTBOX			13
+#define ED_NUM_SELECTBOX			14
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER
 
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
-#define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_OTHER_ACTION
+#define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_POWER
 
 /* values for textbutton gadgets */
 #define ED_TEXTBUTTON_ID_PROPERTIES_INFO	0
@@ -554,12 +564,15 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	17
 #define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	18
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		19
-#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	20
-#define ED_CHECKBUTTON_ID_CHANGE_IMPACT_SMASHED	21
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	22
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	19
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	20
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	21
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		22
+#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	23
+#define ED_CHECKBUTTON_ID_CHANGE_IMPACT_SMASHED	24
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	25
 
-#define ED_NUM_CHECKBUTTONS			23
+#define ED_NUM_CHECKBUTTONS			26
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -711,8 +724,8 @@ static struct
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(3),
     0,					999,
-    GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
-    GADGET_ID_LEVEL_COLLECT_TEXT,
+    GADGET_ID_LEVEL_GEMSLIMIT_DOWN,	GADGET_ID_LEVEL_GEMSLIMIT_UP,
+    GADGET_ID_LEVEL_GEMSLIMIT_TEXT,
     &level.gems_needed,
     "number of emeralds to collect",	NULL, NULL
   },
@@ -765,17 +778,17 @@ static struct
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     MIN_SCORE,				MAX_SCORE,
-    GADGET_ID_COLLECT_SCORE_DOWN,	GADGET_ID_COLLECT_SCORE_UP,
-    GADGET_ID_COLLECT_SCORE_TEXT,
-    &custom_element.collect_score,
+    GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
+    GADGET_ID_CUSTOM_SCORE_TEXT,
+    &custom_element.score,
     NULL,				"collect score", NULL
   },
   {
     ED_SETTINGS_XPOS(13) + 10,		ED_SETTINGS_YPOS(3),
     MIN_GEM_COUNT,			MAX_GEM_COUNT,
-    GADGET_ID_COLLECT_GEMCOUNT_DOWN,	GADGET_ID_COLLECT_GEMCOUNT_UP,
-    GADGET_ID_COLLECT_GEMCOUNT_TEXT,
-    &custom_element.collect_gem_count,
+    GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
+    GADGET_ID_CUSTOM_GEMCOUNT_TEXT,
+    &custom_element.gem_count,
     NULL,				"gems", NULL
   },
   {
@@ -856,6 +869,23 @@ static struct
   }
 };
 
+static struct ValueTextInfo options_access_type[] =
+{
+  { EP_WALKABLE,		"walk"				},
+  { EP_PASSABLE,		"pass"				},
+  { -1,				NULL				}
+};
+static int value_access_type = 0;
+
+static struct ValueTextInfo options_access_layer[] =
+{
+  { EP_ACCESSIBLE_OVER,		"over"				},
+  { EP_ACCESSIBLE_INSIDE,	"inside"			},
+  { EP_ACCESSIBLE_UNDER,	"under"				},
+  { -1,				NULL				}
+};
+static int value_access_layer = 0;
+
 static struct ValueTextInfo options_walk_to_action[] =
 {
   { EP_DIGGABLE,		"diggable"			},
@@ -903,13 +933,14 @@ static struct ValueTextInfo options_move_stepsize[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_consistency[] =
+static struct ValueTextInfo options_smash_targets[] =
 {
-  { EP_CAN_EXPLODE,		"can explode"			},
-  { EP_INDESTRUCTIBLE,		"indestructible"		},
+  { EP_CAN_SMASH_PLAYER,	"player"			},
+  { EP_CAN_SMASH_ENEMIES,	"enemies"			},
+  { EP_CAN_SMASH_EVERYTHING,	"everything"			},
   { -1,				NULL				}
 };
-static int value_consistency = 0;
+static int value_smash_targets = 0;
 
 static struct ValueTextInfo options_deadliness[] =
 {
@@ -920,31 +951,13 @@ static struct ValueTextInfo options_deadliness[] =
 };
 static int value_deadliness = 0;
 
-static struct ValueTextInfo options_smash_targets[] =
+static struct ValueTextInfo options_consistency[] =
 {
-  { EP_CAN_SMASH_PLAYER,	"player"			},
-  { EP_CAN_SMASH_ENEMIES,	"enemies"			},
-  { EP_CAN_SMASH_EVERYTHING,	"everything"			},
+  { EP_CAN_EXPLODE,		"can explode"			},
+  { EP_INDESTRUCTIBLE,		"indestructible"		},
   { -1,				NULL				}
 };
-static int value_smash_targets = 0;
-
-static struct ValueTextInfo options_access_type[] =
-{
-  { EP_WALKABLE,		"walk"				},
-  { EP_PASSABLE,		"pass"				},
-  { -1,				NULL				}
-};
-static int value_access_type = 0;
-
-static struct ValueTextInfo options_access_layer[] =
-{
-  { EP_ACCESSIBLE_OVER,		"over"				},
-  { EP_ACCESSIBLE_INSIDE,	"inside"			},
-  { EP_ACCESSIBLE_UNDER,	"under"				},
-  { -1,				NULL				}
-};
-static int value_access_layer = 0;
+static int value_consistency = 0;
 
 static struct ValueTextInfo options_time_units[] =
 {
@@ -979,6 +992,14 @@ static struct ValueTextInfo options_change_other_action[] =
   { -1,				NULL				}
 };
 static int value_change_other_action = 0;
+
+static struct ValueTextInfo options_change_power[] =
+{
+  { CP_NON_DESTRUCTIVE,		"non-destructive"		},
+  { CP_HALF_DESTRUCTIVE,	"half-destructive"		},
+  { CP_FULL_DESTRUCTIVE,	"full-destructive"		},
+  { -1,				NULL				}
+};
 
 static struct
 {
@@ -1098,6 +1119,14 @@ static struct
     options_change_other_action,
     &value_change_other_action,
     NULL, "other element:", "type of other element action"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
+    GADGET_ID_CHANGE_POWER,
+    -1,
+    options_change_power,
+    &custom_element.change.power,
+    "power:", NULL, "power of extended change"
   },
 };
 
@@ -1389,6 +1418,24 @@ static struct
     GADGET_ID_CHANGE_BY_OTHER,
     &custom_element_change_events[CE_BY_OTHER],
     NULL,				"element changes by other element"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    GADGET_ID_CHANGE_USE_EXPLOSION,
+    &custom_element.change.explode,
+    "explode instead of change",	"element explodes instead of change"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    GADGET_ID_CHANGE_USE_CONTENT,
+    &custom_element.change.use_content,
+    "use extended change target:",	"element changes to more elements"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
+    GADGET_ID_CHANGE_ONLY_COMPLETE,
+    &custom_element.change.only_complete,
+    "only use complete change",		"only use complete extended content"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
@@ -2806,7 +2853,7 @@ static void CreateDrawingAreas()
 
   level_editor_gadget[id] = gi;
 
-  /* ... one areas for custom element explosion content ... */
+  /* ... one area for custom element explosion content ... */
   id = GADGET_ID_CUSTOM_CONTENT;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_CUSTOM_TYPE_ID, i,
@@ -2833,6 +2880,26 @@ static void CreateDrawingAreas()
 		    GDI_Y, SY + ED_AREA_ELEM_CONTENT2_YPOS,
 		    GDI_WIDTH, MINI_TILEX,
 		    GDI_HEIGHT, MINI_TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+
+  /* ... one area for extended custom element change target content ... */
+  id = GADGET_ID_CUSTOM_CHANGE_CONTENT;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_CUSTOM_TYPE_ID, i,
+		    GDI_X, SX + ED_AREA_ELEM_CONTENT6_XPOS,
+		    GDI_Y, SX + ED_AREA_ELEM_CONTENT6_YPOS,
+		    GDI_WIDTH, 3 * MINI_TILEX,
+		    GDI_HEIGHT, 3 * MINI_TILEY,
 		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		    GDI_EVENT_MASK, event_mask,
@@ -4110,9 +4177,34 @@ static void DrawCustomChangeTargetArea()
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
   DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		     el2edimg(custom_element.change.successor));
+		     el2edimg(custom_element.change.target_element));
 
   MapDrawingArea(GADGET_ID_CUSTOM_CHANGE_TARGET);
+}
+
+static void DrawCustomChangeContentArea()
+{
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGE_CONTENT];
+  int area_sx = SX + ED_AREA_ELEM_CONTENT6_XPOS;
+  int area_sy = SY + ED_AREA_ELEM_CONTENT6_YPOS;
+  int x, y;
+
+  if (!IS_CUSTOM_ELEMENT(properties_element))
+  {
+    /* this should never happen */
+    Error(ERR_WARN, "element %d is no custom element", properties_element);
+
+    return;
+  }
+
+  DrawElementBorder(area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY, TRUE);
+
+  for (y=0; y<3; y++)
+    for (x=0; x<3; x++)
+      DrawMiniGraphicExt(drawto, gi->x + x * MINI_TILEX,gi->y + y * MINI_TILEY,
+			 el2edimg(custom_element.change.content[x][y]));
+
+  MapDrawingArea(GADGET_ID_CUSTOM_CHANGE_CONTENT);
 }
 
 static void DrawCustomChangeTriggerArea()
@@ -4700,6 +4792,7 @@ static void DrawPropertiesAdvanced()
   /* draw drawing area gadgets */
   DrawCustomGraphicElementArea();
   DrawCustomChangeTargetArea();
+  DrawCustomChangeContentArea();
   DrawCustomChangeTriggerArea();
 }
 
@@ -5548,7 +5641,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	{
-	  custom_element.change.successor = new_element;
+	  custom_element.change.target_element = new_element;
+	  element_info[properties_element] = custom_element;
+	}
+	else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
+	{
+	  custom_element.change.content[sx][sy] = new_element;
 	  element_info[properties_element] = custom_element;
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
@@ -5667,7 +5765,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       else if (id == GADGET_ID_CUSTOM_CONTENT)
 	PickDrawingElement(button, custom_element.content[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-	PickDrawingElement(button, custom_element.change.successor);
+	PickDrawingElement(button, custom_element.change.target_element);
+      else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
+	PickDrawingElement(button, custom_element.change.content[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	PickDrawingElement(button, custom_element.change.trigger);
       else if (id == GADGET_ID_RANDOM_BACKGROUND)
@@ -6399,30 +6499,33 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
   {
     if (id == GADGET_ID_AMOEBA_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(level.amoeba_content));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(level.amoeba_content));
     else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(custom_element.use_gfx_element));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(custom_element.gfx_element));
     else if (id == GADGET_ID_CUSTOM_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(custom_element.content[sx][sy]));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(custom_element.content[sx][sy]));
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(custom_element.change.successor));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(custom_element.change.target_element));
+    else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(custom_element.change.content[sx][sy]));
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(custom_element.change.trigger));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(custom_element.change.trigger));
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(random_placement_background_element));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(random_placement_background_element));
     else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
 	     id <= GADGET_ID_ELEMENT_CONTENT_7)
     {
       int i = id - GADGET_ID_ELEMENT_CONTENT_0;
 
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"%s", getElementInfoText(level.yamyam_content[i][sx][sy]));
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
+		getElementInfoText(level.yamyam_content[i][sx][sy]));
     }
   }
   else
@@ -6439,6 +6542,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"New element after change");
+    else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
+      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+		"New extended elements after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		"Other element triggering change");

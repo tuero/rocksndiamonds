@@ -99,8 +99,13 @@ static void setLevelInfoToDefaults()
   {
     int element = EL_CUSTOM_START + i;
 
+    element_info[element].use_template = FALSE;
+
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
+
+    element_info[element].score = 0;
+    element_info[element].gem_count = 0;
 
     element_info[element].push_delay_fixed = 2;		/* special default */
     element_info[element].push_delay_random = 8;	/* special default */
@@ -116,9 +121,24 @@ static void setLevelInfoToDefaults()
 	element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
     element_info[element].change.events = CE_BITMASK_DEFAULT;
+
     element_info[element].change.delay_fixed = 0;
     element_info[element].change.delay_random = 0;
-    element_info[element].change.successor = EL_EMPTY_SPACE;
+    element_info[element].change.delay_frames = -1;	/* use default */
+
+    element_info[element].change.trigger = EL_EMPTY_SPACE;
+
+    element_info[element].change.target_element = EL_EMPTY_SPACE;
+
+    element_info[element].change.use_content = FALSE;
+    element_info[element].change.only_complete = FALSE;
+    element_info[element].change.power = CP_NON_DESTRUCTIVE;
+
+    element_info[element].change.explode = FALSE;
+
+    for(x=0; x<3; x++)
+      for(y=0; y<3; y++)
+	element_info[element].change.content[x][y] = EL_EMPTY_SPACE;
 
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
@@ -385,10 +405,10 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i=0; i < num_changed_custom_elements; i++)
   {
     int element = getFile16BitBE(file);
-    int custom_element_successor = getFile16BitBE(file);
+    int custom_target_element = getFile16BitBE(file);
 
     if (IS_CUSTOM_ELEMENT(element))
-      element_info[element].change.successor = custom_element_successor;
+      element_info[element].change.target_element = custom_target_element;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
@@ -778,12 +798,12 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (element_info[element].change.successor != EL_EMPTY_SPACE)
+    if (element_info[element].change.target_element != EL_EMPTY_SPACE)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile16BitBE(file, element_info[element].change.successor);
+	putFile16BitBE(file, element_info[element].change.target_element);
       }
 
       check++;
@@ -791,7 +811,7 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   }
 
   if (check != num_changed_custom_elements)	/* should not happen */
-    Error(ERR_WARN, "inconsistent number of custom element successors");
+    Error(ERR_WARN, "inconsistent number of custom target elements");
 }
 
 void SaveLevel(int level_nr)
@@ -843,7 +863,7 @@ void SaveLevel(int level_nr)
 
   /* check for non-standard custom elements and calculate "CUS2" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    if (element_info[EL_CUSTOM_START + i].change.successor != EL_EMPTY_SPACE)
+    if (element_info[EL_CUSTOM_START + i].change.target_element != EL_EMPTY)
       num_changed_custom_elements2++;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
