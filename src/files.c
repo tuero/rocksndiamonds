@@ -682,16 +682,17 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 
 static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
 {
-  int x, y;
+  int i, j, x, y;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
+  /* determine correct game engine version of current level */
   if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
       IS_LEVELCLASS_USER(leveldir_current))
   {
 #if 0
-    printf("::: This level is private or contributed: '%s'\n", filename);
+    printf("\n::: This level is private or contributed: '%s'\n", filename);
 #endif
 
     /* For user contributed and private levels, use the version of
@@ -719,7 +720,7 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   else
   {
 #if 0
-    printf("::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",
+    printf("\n::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",
 	   leveldir_current->sort_priority, filename);
 #endif
 
@@ -743,7 +744,7 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
       level->em_slippery_gems = TRUE;
   }
 
-  /* map elements which have changed in newer versions */
+  /* map elements that have changed in newer versions */
   for(y=0; y<level->fieldy; y++)
   {
     for(x=0; x<level->fieldx; x++)
@@ -770,6 +771,36 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
       }
 
       level->field[x][y] = element;
+    }
+  }
+
+  /* map custom element change events that have changed in newer versions
+     (these following values have accidentally changed in version 3.0.1) */
+  if (level->game_version <= VERSION_IDENT(3,0,0))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      /* order of checking events to be mapped is important */
+      for (j=CE_BY_OTHER; j >= CE_BY_PLAYER; j--)
+      {
+	if (HAS_CHANGE_EVENT(element, j - 2))
+	{
+	  SET_CHANGE_EVENT(element, j - 2, FALSE);
+	  SET_CHANGE_EVENT(element, j, TRUE);
+	}
+      }
+
+      /* order of checking events to be mapped is important */
+      for (j=CE_OTHER_GETS_COLLECTED; j >= CE_COLLISION; j--)
+      {
+	if (HAS_CHANGE_EVENT(element, j - 1))
+	{
+	  SET_CHANGE_EVENT(element, j - 1, FALSE);
+	  SET_CHANGE_EVENT(element, j, TRUE);
+	}
+      }
     }
   }
 
@@ -1279,6 +1310,8 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
     engine_version = getFileVersion(file);
     if (engine_version > 0)
       tape->engine_version = engine_version;
+    else
+      tape->engine_version = tape->game_version;
   }
 
   return chunk_size;
@@ -1506,7 +1539,8 @@ void LoadTapeFromFilename(char *filename)
   tape.length_seconds = GetTapeLength();
 
 #if 0
-  printf("tape version: %d\n", tape.game_version);
+  printf("tape game version: %d\n", tape.game_version);
+  printf("tape engine version: %d\n", tape.engine_version);
 #endif
 }
 

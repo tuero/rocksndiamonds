@@ -156,7 +156,7 @@
 				 (PROPERTY_VAR(e,p) &= ~PROPERTY_BIT(p)))
 
 
-/* values for change events for custom elements */
+/* values for change events for custom elements (stored in level file) */
 #define CE_DELAY		0
 #define CE_TOUCHED_BY_PLAYER	1
 #define CE_PRESSED_BY_PLAYER	2
@@ -174,7 +174,7 @@
 #define CE_OTHER_GETS_COLLECTED	14
 #define CE_OTHER_GETS_DROPPED	15
 
-/* values for internal purpose only (level editor) */
+/* values for activating change events (also stored in level file!) */
 #define CE_BY_PLAYER		16
 #define CE_BY_COLLISION		17
 #define CE_BY_OTHER		18
@@ -980,9 +980,9 @@
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	1
+#define PROGRAM_VERSION_PATCH	2
 #define PROGRAM_VERSION_RELEASE	0
-#define PROGRAM_VERSION_STRING	"3.0.1"
+#define PROGRAM_VERSION_STRING	"3.0.2"
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"

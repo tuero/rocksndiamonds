@@ -3241,7 +3241,7 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
-#if 0
+#if 1
   setLevelArtworkDir(artwork.gfx_first);
 #endif
 
@@ -3267,7 +3267,7 @@ static void InitSound(char *identifier)
   if (identifier == NULL)
     identifier = artwork.snd_current->identifier;
 
-#if 0
+#if 1
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.snd_first);
 #endif
@@ -3281,7 +3281,7 @@ static void InitMusic(char *identifier)
   if (identifier == NULL)
     identifier = artwork.mus_current->identifier;
 
-#if 0
+#if 1
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.mus_first);
 #endif
