@@ -17,7 +17,7 @@
 
 #include "main.h"
 
-/* names file mode: level or setup */
+/* names file mode: local level setup or global game setup */
 #define PLAYER_LEVEL	0
 #define PLAYER_SETUP	1
 
@@ -28,9 +28,10 @@
 #define SETUP_SOUND_MUSIC		(1<<3)
 #define SETUP_DIRECT_DRAW		(1<<4)
 #define SETUP_FADING			(1<<5)
-#define SETUP_RECORD_EACH_GAME		(1<<6)
+#define SETUP_AUTO_RECORD		(1<<6)
 #define SETUP_2ND_JOYSTICK		(1<<7)
 #define SETUP_QUICK_DOORS		(1<<8)
+#define SETUP_SCROLL_DELAY		(1<<9)
 
 #define DEFAULT_SETUP			(SETUP_TOONS |		\
 					 SETUP_SOUND |		\
@@ -44,9 +45,10 @@
 #define SETUP_SOUND_MUSIC_ON(x)		(((x) & SETUP_SOUND_MUSIC) != 0)
 #define SETUP_DIRECT_DRAW_ON(x)		(((x) & SETUP_DIRECT_DRAW) != 0)
 #define SETUP_FADING_ON(x)		(((x) & SETUP_FADING) != 0)
-#define SETUP_RECORD_EACH_GAME_ON(x)	(((x) & SETUP_RECORD_EACH_GAME) != 0)
+#define SETUP_AUTO_RECORD_ON(x)		(((x) & SETUP_AUTO_RECORD) != 0)
 #define SETUP_2ND_JOYSTICK_ON(x)	(((x) & SETUP_2ND_JOYSTICK) != 0)
 #define SETUP_QUICK_DOORS_ON(x)		(((x) & SETUP_QUICK_DOORS) != 0)
+#define SETUP_SCROLL_DELAY_ON(x)	(((x) & SETUP_SCROLL_DELAY) != 0)
 
 BOOL CreateNewScoreFile(void);
 BOOL CreateNewNamesFile(int);

@@ -17,22 +17,28 @@
 
 #include "main.h"
 
-void DrawMainMenu();
+#define SETUP_SCREEN_POS_START		2
+#define SETUP_SCREEN_POS_END		15
+#define SETUP_SCREEN_POS_EMPTY		(SETUP_SCREEN_POS_END - 2)
+
+void DrawHeadline(void);
+void DrawMainMenu(void);
 void HandleMainMenu(int, int, int, int, int);
 void DrawHelpScreenElAction(int);
 void DrawHelpScreenElText(int);
 void DrawHelpScreenMusicText(int);
 void DrawHelpScreenCreditsText(void);
-void DrawHelpScreen();
+void DrawHelpScreen(void);
 void HandleHelpScreen(int);
 void HandleTypeName(int, KeySym);
 void DrawChooseLevel(void);
 void HandleChooseLevel(int, int, int, int, int);
 void DrawHallOfFame(int);
 void HandleHallOfFame(int);
-void DrawSetupScreen();
+void DrawSetupScreen(void);
 void HandleSetupScreen(int, int, int, int, int);
 void CalibrateJoystick(void);
+void HandleGameActions(void);
 void HandleVideoButtons(int, int, int);
 void HandleSoundButtons(int, int, int);
 void HandleGameButtons(int, int, int);

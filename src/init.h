@@ -25,6 +25,7 @@ void InitSoundProcess(void);
 void InitJoystick(void);
 void InitWindow(int, char **);
 void InitGfx(void);
+void LoadGfx(int, struct PictureFile *);
 void InitElementProperties(void);
 void CloseAll();
 

@@ -21,6 +21,18 @@
 #include "misc.h"
 #include "files.h"
 #include "buttons.h"
+#include "tape.h"
+
+void DrawHeadline()
+{
+  int x1 = SX+(SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
+  int y1 = SY+8;
+  int x2 = SX+(SXSIZE - strlen(COPYRIGHT_STRING) * FONT2_XSIZE) / 2;
+  int y2 = SY+46;
+
+  DrawText(x1,y1, GAMETITLE_STRING, FS_BIG,FC_YELLOW);
+  DrawText(x2,y2, COPYRIGHT_STRING, FS_SMALL,FC_RED);
+}
 
 void DrawMainMenu()
 {
@@ -31,14 +43,12 @@ void DrawMainMenu()
   LoadLevel(level_nr);
 
   ClearWindow();
-  DrawText(SX+16, SY+8,  "ROCKS'N'DIAMONDS",FS_BIG,FC_YELLOW);
-  DrawText(SX+25+16, SY+46, "Copyright ^1995 by Holger Schemel",
-	   FS_SMALL,FC_RED);
+  DrawHeadline();
   DrawText(SX+32, SY+64, "Name:",FS_BIG,FC_GREEN);
   DrawText(SX+192,SY+64, player.alias_name,FS_BIG,FC_RED);
   DrawText(SX+32, SY+96, "Level:",FS_BIG,FC_GREEN);
   DrawText(SX+352,SY+96, int2str(level_nr,3),FS_BIG,
-	   (level_nr<leveldir[leveldir_nr].num_ready ? FC_RED : FC_YELLOW));
+	   (level_nr<leveldir[leveldir_nr].levels ? FC_RED : FC_YELLOW));
   DrawText(SX+32, SY+128,"Hall Of Fame",FS_BIG,FC_GREEN);
   DrawText(SX+32, SY+160,"Level Creator",FS_BIG,FC_GREEN);
   DrawText(SY+32, SY+192,"Info Screen",FS_BIG,FC_GREEN);
@@ -50,8 +60,8 @@ void DrawMainMenu()
 
   for(i=2;i<10;i++)
     DrawGraphic(0,i,GFX_KUGEL_BLAU);
-  DrawGraphic(10,3,GFX_KUGEL_BLAU);
-  DrawGraphic(14,3,GFX_KUGEL_BLAU);
+  DrawGraphic(10,3,GFX_PFEIL_L);
+  DrawGraphic(14,3,GFX_PFEIL_R);
 
   DrawText(SX+54+16,SY+326,"A Game by Artsoft Development",FS_SMALL,FC_BLUE);
   DrawText(SX+40+16,SY+344,"Graphics: Deluxe Paint IV Amiga",
@@ -79,7 +89,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   static int redraw = TRUE;
   int x = (mx+32-SX)/32, y = (my+32-SY)/32;
 
-  if (redraw)
+  if (redraw || (!mx && !my && !dx && !dy))
   {
     DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
     redraw = FALSE;
@@ -113,7 +123,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   }
 
   if (y==4 && ((x==11 && level_nr>0) ||
-	       (x==15 && level_nr<LEVELDIR_SIZE(leveldir[leveldir_nr]))) &&
+	       (x==15 && level_nr<leveldir[leveldir_nr].levels)) &&
       button)
   {
     static long level_delay = 0;
@@ -123,26 +133,19 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     new_level_nr = level_nr + (x==11 ? -step : +step);
     if (new_level_nr<0)
       new_level_nr = 0;
-    if (new_level_nr>LEVELDIR_SIZE(leveldir[leveldir_nr])-1)
-      new_level_nr = LEVELDIR_SIZE(leveldir[leveldir_nr])-1;
+    if (new_level_nr>leveldir[leveldir_nr].levels-1)
+      new_level_nr = leveldir[leveldir_nr].levels-1;
 
-    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,20))
+    if (old_level_nr==new_level_nr || !DelayReached(&level_delay,15))
       goto out;
 
     level_nr = new_level_nr;
 
-    if (level_nr>player.handicap && level_nr<leveldir[leveldir_nr].num_ready)
-    {
-      if (x==11 || leveldir[leveldir_nr].num_free==0)
-	level_nr = player.handicap;
-      else
-	level_nr = leveldir[leveldir_nr].num_ready;
-    }
+    if (level_nr>player.handicap)
+      level_nr = player.handicap;
 
-    DrawTextExt(drawto,gc,SX+352,SY+96, int2str(level_nr,3),FS_BIG,
-		(level_nr<leveldir[leveldir_nr].num_ready ?FC_RED :FC_YELLOW));
-    DrawTextExt(window,gc,SX+352,SY+96,	int2str(level_nr,3),FS_BIG,
-		(level_nr<leveldir[leveldir_nr].num_ready ?FC_RED :FC_YELLOW));
+    DrawTextExt(drawto,gc,SX+352,SY+96, int2str(level_nr,3), FS_BIG,FC_RED);
+    DrawTextExt(window,gc,SX+352,SY+96,	int2str(level_nr,3), FS_BIG,FC_RED);
 
     LoadLevel(level_nr);
     DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
@@ -150,6 +153,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     TapeErase();
     LoadLevelTape(level_nr);
     DrawCompleteVideoDisplay();
+
+    /* needed because DrawMicroLevel() takes some time */
+    BackToFront();
+    XSync(display,FALSE);
+    DelayReached(&level_delay,0);	/* reset delay counter */
   }
   else if (x==1 && y>=3 && y<=10)
   {
@@ -174,48 +182,48 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (num_leveldirs)
 	{
 	  game_status = CHOOSELEVEL;
+	  SavePlayerInfo(PLAYER_LEVEL);
 	  DrawChooseLevel();
-	  redraw = TRUE;
 	}
       }
       else if (y==5)
       {
 	game_status = HALLOFFAME;
 	DrawHallOfFame(-1);
-	redraw = TRUE;
       }
       else if (y==6)
       {
 	game_status = LEVELED;
+	if (leveldir[leveldir_nr].readonly)
+	  AreYouSure("This level is read only !",AYS_CONFIRM);
 	DrawLevelEd();
-	redraw = TRUE;
       }
       else if (y==7)
       {
 	game_status = HELPSCREEN;
 	DrawHelpScreen();
-	redraw = TRUE;
       }
       else if (y==8)
       {
-	if (autorecord_on && !tape.playing)
-	  TapeInitRecording();
+	if (autorecord_on)
+	  TapeStartRecording();
 
 	game_status = PLAYING;
 	InitGame();
-	redraw = TRUE;
       }
       else if (y==9)
       {
 	game_status = SETUP;
 	DrawSetupScreen();
-	redraw = TRUE;
       }
       else if (y==10)
       {
+	SavePlayerInfo(PLAYER_LEVEL);
         if (AreYouSure("Do you really want to quit ?",AYS_ASK|AYS_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
+
+      redraw = TRUE;
     }
   }
   BackToFront();
@@ -249,22 +257,29 @@ static int helpscreen_action[] =
   GFX_CHAR_A,30,3, GFX_CHAR_AUSRUF,32,3,			HA_NEXT,
   GFX_EDELSTEIN,2,5,						HA_NEXT,
   GFX_DIAMANT,2,5,						HA_NEXT,
-  GFX_EDELSTEIN2,2,5,						HA_NEXT,
-  GFX_EDELSTEIN3,2,5,						HA_NEXT,
+  GFX_EDELSTEIN_BD,2,5,						HA_NEXT,
+  GFX_EDELSTEIN_GELB,2,5, GFX_EDELSTEIN_ROT,2,5,
+  GFX_EDELSTEIN_LILA,2,5,					HA_NEXT,
   GFX_FELSBROCKEN,4,5,						HA_NEXT,
   GFX_BOMBE,1,50, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,		HA_NEXT,
   GFX_KOKOSNUSS,1,50, GFX_CRACKINGNUT,3,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
   GFX_ERZ_EDEL,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN,1,10,	HA_NEXT,
   GFX_ERZ_DIAM,1,50, GFX_EXPLOSION,8,1, GFX_DIAMANT,1,10,	HA_NEXT,
-  GFX_ERZ_EDEL2,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN2,1,10,	HA_NEXT,
-  GFX_ERZ_EDEL3,1,50, GFX_EXPLOSION,8,1, GFX_EDELSTEIN3,1,10,	HA_NEXT,
+  GFX_ERZ_EDEL_BD,1,50, GFX_EXPLOSION,8,1,GFX_EDELSTEIN_BD,1,10,HA_NEXT,
+  GFX_ERZ_EDEL_GELB,1,50, GFX_EXPLOSION,8,1,
+  GFX_EDELSTEIN_GELB,1,10, GFX_ERZ_EDEL_ROT,1,50,
+  GFX_EXPLOSION,8,1, GFX_EDELSTEIN_ROT,1,10,
+  GFX_ERZ_EDEL_LILA,1,50, GFX_EXPLOSION,8,1,
+  GFX_EDELSTEIN_LILA,1,10,					HA_NEXT,
   GFX_GEBLUBBER,4,4,						HA_NEXT,
   GFX_SCHLUESSEL1,4,33,						HA_NEXT,
   GFX_PFORTE1,4,33,						HA_NEXT,
   GFX_PFORTE1X,4,33,						HA_NEXT,
   GFX_DYNAMIT_AUS,1,100,					HA_NEXT,
   GFX_DYNAMIT,7,6, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,	HA_NEXT,
-  GFX_DYNABOMB,1,33, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,	HA_NEXT,
+  GFX_DYNABOMB+0,4,3, GFX_DYNABOMB+3,1,3, GFX_DYNABOMB+2,1,3,
+  GFX_DYNABOMB+1,1,3, GFX_DYNABOMB+0,1,3, GFX_EXPLOSION,8,1,
+  GFX_LEERRAUM,1,10,						HA_NEXT,
   GFX_DYNABOMB_NR,1,100,					HA_NEXT,
   GFX_DYNABOMB_SZ,1,100,					HA_NEXT,
   GFX_FLIEGER+4,1,3, GFX_FLIEGER+0,1,3, GFX_FLIEGER+4,1,3,
@@ -275,16 +290,18 @@ static int helpscreen_action[] =
   GFX_KAEFER+5,1,1, GFX_KAEFER+1,1,1, GFX_KAEFER+5,1,1,
   GFX_KAEFER+6,1,1, GFX_KAEFER+2,1,1, GFX_KAEFER+6,1,1,
   GFX_KAEFER+7,1,1, GFX_KAEFER+3,1,1, GFX_KAEFER+7,1,1,		HA_NEXT,
+  GFX_BUTTERFLY,1,1, GFX_BUTTERFLY+1,1,1,			HA_NEXT,
+  GFX_FIREFLY,1,1, GFX_FIREFLY+1,1,1,				HA_NEXT,
   GFX_PACMAN+0,1,3, GFX_PACMAN+4,1,2, GFX_PACMAN+0,1,3,
   GFX_PACMAN+1,1,3, GFX_PACMAN+5,1,2, GFX_PACMAN+1,1,3,
   GFX_PACMAN+2,1,3, GFX_PACMAN+6,1,2, GFX_PACMAN+2,1,3,
   GFX_PACMAN+3,1,3, GFX_PACMAN+7,1,2, GFX_PACMAN+3,1,3,		HA_NEXT,
   GFX_MAMPFER+0,4,0, GFX_MAMPFER+3,1,0, GFX_MAMPFER+2,1,0,
-  GFX_MAMPFER+1,1,0,						HA_NEXT,
+  GFX_MAMPFER+1,1,0, GFX_MAMPFER+0,1,0,				HA_NEXT,
   GFX_MAMPFER2+0,4,0, GFX_MAMPFER2+3,1,0, GFX_MAMPFER2+2,1,0,
-  GFX_MAMPFER2+1,1,0,						HA_NEXT,
+  GFX_MAMPFER2+1,1,0, GFX_MAMPFER2+0,1,0,			HA_NEXT,
   GFX_ZOMBIE+0,4,0, GFX_ZOMBIE+3,1,0, GFX_ZOMBIE+2,1,0,
-  GFX_ZOMBIE+1,1,0,						HA_NEXT,
+  GFX_ZOMBIE+1,1,0, GFX_ZOMBIE+0,1,0,				HA_NEXT,
   GFX_ABLENK,4,1,						HA_NEXT,
   GFX_BIRNE_AUS,1,33, GFX_BIRNE_EIN,1,33,			HA_NEXT,
   GFX_ZEIT_VOLL,1,33, GFX_ZEIT_LEER,1,33,			HA_NEXT,
@@ -307,68 +324,70 @@ static int helpscreen_action[] =
 };
 static char *helpscreen_eltext[][2] =
 {
-  "THE HERO:",				"(Is _this_ guy good old Rockford?)",
-  "Normal sand:",			"You can dig through it",
-  "Empty field:",			"You can walk through it",
-  "Quicksand: You cannot pass it,",	"but rocks can fall though it",
-  "Massive Wall:",			"Nothing can go through it",
-  "Normal Wall: You can't go through",	"it, but you can bomb it away",
-  "Growing Wall: Grows to the left or",	"right if there is an empty field",
-  "Invisible Wall: Behaves like normal","wall, but is invisible",
-  "Old Wall: Like normal wall, but",	"some things can fall down from it",
-  "Letter Wall: Looks like a letter,",	"behaves like a normal wall",
-  "Emerald: You must collect enough of","them to finish a level",
-  "Diamond: Counts as 3 emeralds, but",	"can be destroyed by rocks",
-  "Diamond (BD style): Counts like one","emerald and behaves a bit different",
-  "Red emerald: Seems to behave like",	"the BD style diamond",
-  "Rock: Smashes several things;",	"Can be moved by the player",
-  "Bomb: You can move it, but be",	"careful when dropping it",
-  "Nut: Throw a rock on it to open it;","Each nut contains an emerald",
-  "Wall with an emerald inside:",	"Bomb the wall away to get it",
-  "Wall with a diamond inside:",	"Bomb the wall away to get it",
-  "Wall with BD style diamond inside:",	"Bomb the wall away to get it",
-  "Wall with red emerald inside:",	"Bomb the wall away to get it",
-  "Acid: Things that fall in are gone",	"forever (including our hero)",
-  "Key: Opens the door that has the",	"same color (red/yellow/green/blue)",
-  "Door: Can be opened by the key",	"with the same color",
-  "Door: You have to find out the",	"right color of the key for it",
-  "Dynamite: Collect it and use it to",	"destroy walls or kill enemies",
-  "Dynamite: This one explodes after",	"a few seconds",
-  "Dyna Bomb: Explodes in 4 directions","with variable explosion size",
-  "Dyna Bomb: Increases the number of",	"dyna bombs available at a time",
-  "Dyna Bomb: Increases the size of",	"explosion of dyna bombs",
-  "Spaceship: Moves at the left side",	"of walls; don't touch it!",
-  "Bug: Moves at the right side of",	"walls; don't touch it!",
-  "Pacman: Eats the amoeba and you,",	"if you're not careful",
-  "Cruncher: Eats diamonds and you,",	"if you're not careful",
-  "Cruncher (BD style):",		"Eats almost everything",
-  "Robot: Tries to kill the player",	"",
-  "Magic Wheel: Touch it to get rid of","the robots for some seconds",
-  "Light Bulb: It seems to have no",	"special function, but looks nice",
-  "Extra Time Orb: Adds some seconds",	"to the time available for the level",
-  "Amoeba Drop: Grows to an amoeba on",	"the ground - don't touch it",
-  "Dead Amoeba: Does not grow, but",	"can still kill bugs and spaceships",
-  "Normal Amoeba: Grows through empty",	"fields, sand and quicksand",
-  "Dropping Amoeba: This one makes",	"drops that grow to a new amoeba",
-  "Living Amoeba (BD style): Contains",	"other element, when surrounded",
-  "Game Of Life: Behaves like the well","known 'Game Of Life' (2333 style)",
-  "Biomaze: A bit like the 'Game Of",	"Life', but builds crazy mazes",
-  "Magic Wall: Changes rocks, emeralds","and diamonds when they pass it",
-  "Magic Wall (BD style):",		"Changes rocks and BD style diamonds",
-  "Exit door: Opens if you have enough","emeralds to finish the level",
-  "Open exit door: Enter here to leave","the level and exit the actual game",
+ {"THE HERO:",				"(Is _this_ guy good old Rockford?)"},
+ {"Normal sand:",			"You can dig through it"},
+ {"Empty field:",			"You can walk through it"},
+ {"Quicksand: You cannot pass it,",	"but rocks can fall though it"},
+ {"Massive Wall:",			"Nothing can go through it"},
+ {"Normal Wall: You can't go through",	"it, but you can bomb it away"},
+ {"Growing Wall: Grows to the left or",	"right if there is an empty field"},
+ {"Invisible Wall: Behaves like normal","wall, but is invisible"},
+ {"Old Wall: Like normal wall, but",	"some things can fall down from it"},
+ {"Letter Wall: Looks like a letter,",	"behaves like a normal wall"},
+ {"Emerald: You must collect enough of","them to finish a level"},
+ {"Diamond: Counts as 3 emeralds, but",	"can be destroyed by rocks"},
+ {"Diamond (BD style): Counts like one","emerald and behaves a bit different"},
+ {"Colorful Gems:",			"Seem to behave like Emeralds"},
+ {"Rock: Smashes several things;",	"Can be moved by the player"},
+ {"Bomb: You can move it, but be",	"careful when dropping it"},
+ {"Nut: Throw a rock on it to open it;","Each nut contains an emerald"},
+ {"Wall with an emerald inside:",	"Bomb the wall away to get it"},
+ {"Wall with a diamond inside:",	"Bomb the wall away to get it"},
+ {"Wall with BD style diamond inside:",	"Bomb the wall away to get it"},
+ {"Wall with colorful gem inside:",	"Bomb the wall away to get it"},
+ {"Acid: Things that fall in are gone",	"forever (including our hero)"},
+ {"Key: Opens the door that has the",	"same color (red/yellow/green/blue)"},
+ {"Door: Can be opened by the key",	"with the same color"},
+ {"Door: You have to find out the",	"right color of the key for it"},
+ {"Dynamite: Collect it and use it to",	"destroy walls or kill enemies"},
+ {"Dynamite: This one explodes after",	"a few seconds"},
+ {"Dyna Bomb: Explodes in 4 directions","with variable explosion size"},
+ {"Dyna Bomb: Increases the number of",	"dyna bombs available at a time"},
+ {"Dyna Bomb: Increases the size of",	"explosion of dyna bombs"},
+ {"Spaceship: Moves at the left side",	"of walls; don't touch it!"},
+ {"Bug: Moves at the right side",	"of walls; don't touch it!"},
+ {"Butterfly: Moves at the right side",	"of walls; don't touch it!"},
+ {"Firefly: Moves at the left side",	"of walls; don't touch it!"},
+ {"Pacman: Eats the amoeba and you,",	"if you're not careful"},
+ {"Cruncher: Eats diamonds and you,",	"if you're not careful"},
+ {"Cruncher (BD style):",		"Eats almost everything"},
+ {"Robot: Tries to kill the player",	""},
+ {"Magic Wheel: Touch it to get rid of","the robots for some seconds"},
+ {"Light Bulb: All of them must be",	"switched on to finish a level"},
+ {"Extra Time Orb: Adds some seconds",	"to the time available for the level"},
+ {"Amoeba Drop: Grows to an amoeba on",	"the ground - don't touch it"},
+ {"Dead Amoeba: Does not grow, but",	"can still kill bugs and spaceships"},
+ {"Normal Amoeba: Grows through empty",	"fields, sand and quicksand"},
+ {"Dropping Amoeba: This one makes",	"drops that grow to a new amoeba"},
+ {"Living Amoeba (BD style): Contains",	"other element, when surrounded"},
+ {"Game Of Life: Behaves like the well","known 'Game Of Life' (2333 style)"},
+ {"Biomaze: A bit like the 'Game Of",	"Life', but builds crazy mazes"},
+ {"Magic Wall: Changes rocks, emeralds","and diamonds when they pass it"},
+ {"Magic Wall (BD style):",		"Changes rocks and BD style diamonds"},
+ {"Exit door: Opens if you have enough","emeralds to finish the level"},
+ {"Open exit door: Enter here to leave","the level and exit the actual game"},
 };
 static int num_helpscreen_els = sizeof(helpscreen_eltext)/(2*sizeof(char *));
 
 static char *helpscreen_music[][3] =
 {
-  "Alchemy",			"Ian Boddy",		"Drive",
-  "The Chase",			"Propaganda",		"A Secret Wish",
-  "Network 23",			"Tangerine Dream",	"Exit",
-  "Czardasz",			"Robert Pieculewicz",	"Czardasz",
-  "21st Century Common Man",	"Tangerine Dream",	"Tyger",
-  "Voyager",			"The Alan Parsons Project","Pyramid",
-  "Twilight Painter",		"Tangerine Dream",	"Heartbreakers"
+  { "Alchemy",			"Ian Boddy",		"Drive" },
+  { "The Chase",		"Propaganda",		"A Secret Wish" },
+  { "Network 23",		"Tangerine Dream",	"Exit" },
+  { "Czardasz",			"Robert Pieculewicz",	"Czardasz" },
+  { "21st Century Common Man",	"Tangerine Dream",	"Tyger" },
+  { "Voyager",			"The Alan Parsons Project","Pyramid" },
+  { "Twilight Painter",		"Tangerine Dream",	"Heartbreakers" }
 };
 static int helpscreen_musicpos;
 
@@ -443,9 +462,7 @@ void DrawHelpScreenElText(int start)
   char text[FULL_SXSIZE/FONT2_XSIZE+10];
 
   ClearWindow();
-  DrawText(SX+16, SY+8,  "ROCKS'N'DIAMONDS",FS_BIG,FC_YELLOW);
-  DrawText(SX+25+16, SY+46, "Copyright ^1995 by Holger Schemel",
-	   FS_SMALL,FC_RED);
+  DrawHeadline();
 
   sprintf(text,"The game elements:");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
@@ -471,9 +488,7 @@ void DrawHelpScreenMusicText(int num)
 
   FadeSounds();
   ClearWindow();
-  DrawText(SX+16, SY+8,  "ROCKS'N'DIAMONDS",FS_BIG,FC_YELLOW);
-  DrawText(SX+25+16, SY+46, "Copyright ^1995 by Holger Schemel",
-	   FS_SMALL,FC_RED);
+  DrawHeadline();
 
   sprintf(text,"The game background music loops:");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
@@ -512,9 +527,7 @@ void DrawHelpScreenCreditsText()
 
   FadeSounds();
   ClearWindow();
-  DrawText(SX+16, SY+8,  "ROCKS'N'DIAMONDS",FS_BIG,FC_YELLOW);
-  DrawText(SX+25+16, SY+46, "Copyright ^1995 by Holger Schemel",
-	   FS_SMALL,FC_RED);
+  DrawHeadline();
 
   sprintf(text,"Program information:");
   DrawText(SX+(SXSIZE-strlen(text)*FONT2_XSIZE)/2,SY+100,
@@ -631,7 +644,7 @@ void CheckCheat()
   int old_handicap = player.handicap;
 
   if (!strcmp(player.alias_name,"Artsoft"))
-    player.handicap = MAX(0,leveldir[leveldir_nr].num_ready-1);
+    player.handicap = leveldir[leveldir_nr].levels-1;
 
   if (player.handicap != old_handicap)
   {
@@ -671,8 +684,8 @@ void HandleTypeName(int newxpos, KeySym key)
   }
   else if (key==XK_Delete && xpos>0)
   {
-    player.alias_name[xpos] = 0;
     xpos--;
+    player.alias_name[xpos] = 0;
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
     DrawGraphic(xpos+7,ypos,GFX_LEERRAUM);
   }
@@ -684,7 +697,10 @@ void HandleTypeName(int newxpos, KeySym key)
     CheckCheat();
 
     game_status = MAINMENU;
+/*
     DrawMainMenu();
+*/
+
   }
   BackToFront();
 }
@@ -760,6 +776,9 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       SavePlayerInfo(PLAYER_SETUP);
       CheckCheat();
 
+      TapeErase();
+      LoadLevelTape(level_nr);
+
       game_status = MAINMENU;
       DrawMainMenu();
       redraw = TRUE;
@@ -818,73 +837,51 @@ void HandleHallOfFame(int button)
 void DrawSetupScreen()
 {
   int i;
+  static struct setup
+  {
+    unsigned int bit;
+    char *text, *mode[2];
+    int color[2];
+  } setup[] =
+  {
+    {SETUP_SOUND,	"Sound:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOUND_LOOPS,	" Sound Loops:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOUND_MUSIC,	" Game Music:", {"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_TOONS,	"Toons:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_DIRECT_DRAW,	"Buffered gfx:",{"off","on" },	{FC_BLUE,FC_YELLOW}},
+    {SETUP_SCROLL_DELAY,"Scroll Delay:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_FADING,	"Fading:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_QUICK_DOORS,	"Quick Doors:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_AUTO_RECORD,	"Auto-Record:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_2ND_JOYSTICK,"Joystick:",	{"2nd","1st"},	{FC_YELLOW,FC_YELLOW}},
+    {0,			"Cal. Joystick",{"",   ""},	{0,0}},
+    {0,			"",		{"",   ""},	{0,0}},
+    {0,			"Exit",		{"",   ""},	{0,0}},
+    {0,			"Save and exit",{"",   ""},	{0,0}}
+  };
 
   CloseDoor(DOOR_CLOSE_2);
-
   ClearWindow();
   DrawText(SX+16, SY+16,  "SETUP",FS_BIG,FC_YELLOW);
-  DrawText(SX+32, SY+2*32,"Sound:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+3*32,"Sound loops:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+4*32,"Game music:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+5*32,"Toons:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+6*32,"Buffered gfx:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+7*32,"Fading:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+8*32,"Quick Doors:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+9*32,"Auto-Record:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+10*32,"Joystick:",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+11*32,"Cal. Joystick",FS_BIG,FC_GREEN);
 
-  DrawText(SX+32, SY+13*32,"Exit",FS_BIG,FC_GREEN);
-  DrawText(SX+32, SY+14*32,"Save and exit",FS_BIG,FC_GREEN);
+  for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
+  {
+    int base = i - SETUP_SCREEN_POS_START;
 
-  if (SETUP_SOUND_ON(player.setup))
-    DrawText(SX+14*32, SY+2*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+2*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_SOUND_LOOPS_ON(player.setup))
-    DrawText(SX+14*32, SY+3*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+3*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_SOUND_MUSIC_ON(player.setup))
-    DrawText(SX+14*32, SY+4*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+4*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_TOONS_ON(player.setup))
-    DrawText(SX+14*32, SY+5*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+5*32,"off",FS_BIG,FC_BLUE);
-
-  if (!SETUP_DIRECT_DRAW_ON(player.setup))
-    DrawText(SX+14*32, SY+6*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+6*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_FADING_ON(player.setup))
-    DrawText(SX+14*32, SY+7*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+7*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_QUICK_DOORS_ON(player.setup))
-    DrawText(SX+14*32, SY+8*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+8*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_RECORD_EACH_GAME_ON(player.setup))
-    DrawText(SX+14*32, SY+9*32,"on",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+9*32,"off",FS_BIG,FC_BLUE);
-
-  if (SETUP_2ND_JOYSTICK_ON(player.setup))
-    DrawText(SX+14*32, SY+10*32,"2nd",FS_BIG,FC_YELLOW);
-  else
-    DrawText(SX+14*32, SY+10*32,"1st",FS_BIG,FC_YELLOW);
-
-  for(i=2;i<15;i++)
-    if (i!=12)
+    if (i != SETUP_SCREEN_POS_EMPTY)
+    {
       DrawGraphic(0,i,GFX_KUGEL_BLAU);
+      DrawText(SX+32,SY+i*32, setup[base].text, FS_BIG,FC_GREEN);
+    }
+
+    if (i < SETUP_SCREEN_POS_EMPTY)
+    {
+      int setting_bit = setup[base].bit;
+      int setting_pos = ((player.setup & setting_bit) != 0 ? 0 : 1);
+      DrawText(SX+14*32, SY+i*32,setup[base].mode[setting_pos],
+	       FS_BIG,setup[base].color[setting_pos]);
+    }
+  }
 
   FadeToFront();
   InitAnimation();
@@ -896,6 +893,9 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
   static int choice = 3;
   static int redraw = TRUE;
   int x = (mx+32-SX)/32, y = (my+32-SY)/32;
+  int pos_start = SETUP_SCREEN_POS_START + 1;
+  int pos_empty = SETUP_SCREEN_POS_EMPTY + 1;
+  int pos_end   = SETUP_SCREEN_POS_END   + 1;
 
   if (redraw)
   {
@@ -913,13 +913,13 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     else
       x = y = 0;
 
-    if (y==13)
-      y = (dy>0 ? 14 : 12);
+    if (y == pos_empty)
+      y = (dy>0 ? pos_empty+1 : pos_empty-1);
 
-    if (y<3)
-      y = 3;
-    else if (y>15)
-      y = 15;
+    if (y < pos_start)
+      y = pos_start;
+    else if (y > pos_end)
+      y = pos_end;
   }
 
   if (!mx && !my && !dx && !dy)
@@ -928,7 +928,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (x==1 && y>=3 && y<=15 && y!=13)
+  if (x==1 && y>=pos_start && y<=pos_end && y!=pos_empty)
   {
     if (button)
     {
@@ -946,7 +946,13 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       if (y==3 && sound_status==SOUND_AVAILABLE)
       {
 	if (SETUP_SOUND_ON(player.setup))
+	{
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
+	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
+	  player.setup &= ~SETUP_SOUND_LOOPS;
+	  player.setup &= ~SETUP_SOUND_MUSIC;
+	}
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_SOUND;
@@ -956,7 +962,11 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	if (SETUP_SOUND_LOOPS_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
+	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
+	  player.setup |= SETUP_SOUND;
+	}
 	player.setup ^= SETUP_SOUND_LOOPS;
       }
       else if (y==5 && sound_loops_allowed)
@@ -964,7 +974,11 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	if (SETUP_SOUND_MUSIC_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
+	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
+	  player.setup |= SETUP_SOUND;
+	}
 	player.setup ^= SETUP_SOUND_MUSIC;
       }
       else if (y==6)
@@ -985,13 +999,21 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==8)
       {
+	if (SETUP_SCROLL_DELAY_ON(player.setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	player.setup ^= SETUP_SCROLL_DELAY;
+      }
+      else if (y==9)
+      {
 	if (SETUP_FADING_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_FADING;
       }
-      else if (y==9)
+      else if (y==10)
       {
 	if (SETUP_QUICK_DOORS_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -999,15 +1021,15 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_QUICK_DOORS;
       }
-      else if (y==10)
+      else if (y==11)
       {
-	if (SETUP_RECORD_EACH_GAME_ON(player.setup))
+	if (SETUP_AUTO_RECORD_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	player.setup ^= SETUP_RECORD_EACH_GAME;
+	player.setup ^= SETUP_AUTO_RECORD;
       }
-      else if (y==11)
+      else if (y==12)
       {
 	if (SETUP_2ND_JOYSTICK_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"1st",FS_BIG,FC_YELLOW);
@@ -1015,14 +1037,14 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"2nd",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_2ND_JOYSTICK;
       }
-      else if (y==12)
+      else if (y==13)
       {
 	CalibrateJoystick();
 	redraw = TRUE;
       }
-      else if (y==14 || y==15)
+      else if (y==pos_end-1 || y==pos_end)
       {
-        if (y==15)
+        if (y==pos_end)
 	{
 	  SavePlayerInfo(PLAYER_SETUP);
 	  SaveJoystickData();
@@ -1167,19 +1189,41 @@ void CalibrateJoystick()
   DrawSetupScreen();
 }
 
+void HandleGameActions()
+{
+  if (game_status != PLAYING)
+    return;
+
+  if (LevelSolved)
+    GameWon();
+
+  if (GameOver && !TAPE_IS_STOPPED(tape))
+    TapeStop();
+
+  GameActions();
+}
+
 void HandleVideoButtons(int mx, int my, int button)
 {
-  if (game_status!=MAINMENU && game_status!=PLAYING)
+  if (game_status != MAINMENU && game_status != PLAYING)
     return;
 
   switch(CheckVideoButtons(mx,my,button))
   {
     case BUTTON_VIDEO_EJECT:
       TapeStop();
-      if (!TAPE_IS_EMPTY(tape))
-	SaveLevelTape(tape.level_nr);
+      if (TAPE_IS_EMPTY(tape))
+      {
+	LoadLevelTape(level_nr);
+	if (TAPE_IS_EMPTY(tape))
+	  AreYouSure("No tape for this level !",AYS_CONFIRM);
+      }
       else
-	AreYouSure("Tape is empty !",AYS_CONFIRM);
+      {
+	if (tape.changed)
+	  SaveLevelTape(tape.level_nr);
+	TapeErase();
+      }
       DrawCompleteVideoDisplay();
       break;
     case BUTTON_VIDEO_STOP:
@@ -1189,25 +1233,68 @@ void HandleVideoButtons(int mx, int my, int button)
       TapeTogglePause();
       break;
     case BUTTON_VIDEO_REC:
-      if (tape.pausing)
-	TapeTogglePause();
-      else if (game_status==MAINMENU)
-	TapeInitRecording();
+      if (TAPE_IS_STOPPED(tape))
+      {
+	TapeStartRecording();
+	game_status = PLAYING;
+	InitGame();
+      }
+      else if (tape.pausing)
+      {
+	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
+	{
+	  tape.pos[tape.counter].delay = tape.delay_played;
+	  tape.playing = FALSE;
+	  tape.recording = TRUE;
+
+	  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
+	}
+	else
+	  TapeTogglePause();
+      }
       break;
     case BUTTON_VIDEO_PLAY:
-      if (tape.pausing)
-	TapeTogglePause();
-      else if (game_status==MAINMENU)
-	TapeInitPlaying();
+      if (TAPE_IS_EMPTY(tape))
+	break;
+
+      if (TAPE_IS_STOPPED(tape))
+      {
+	TapeStartPlaying();
+	game_status = PLAYING;
+	InitGame();
+      }
+      else if (tape.playing)
+      {
+	if (tape.pausing)			/* PAUSE -> PLAY */
+	  TapeTogglePause();
+	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
+	{
+	  tape.fast_forward = TRUE;
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
+	}
+	else if (!tape.pause_before_death)	/* FFWD PLAY -> + AUTO PAUSE */
+	{
+	  tape.pause_before_death = TRUE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, VIDEO_DISPLAY_LABEL_ONLY);
+	}
+	else					/* -> NORMAL PLAY */
+	{
+	  tape.fast_forward = FALSE;
+	  tape.pause_before_death = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PAUSE_OFF, 0);
+	}
+      }
       break;
     default:
       break;
   }
+
+  BackToFront();
 }
 
 void HandleSoundButtons(int mx, int my, int button)
 {
-  if (game_status!=PLAYING)
+  if (game_status != PLAYING)
     return;
 
   switch(CheckSoundButtons(mx,my,button))
@@ -1222,8 +1309,8 @@ void HandleSoundButtons(int mx, int my, int button)
       }
       else if (sound_loops_allowed)
       { 
-	sound_music_on = TRUE;
-	player.setup |= SETUP_SOUND_MUSIC;
+	sound_on = sound_music_on = TRUE;
+	player.setup |= (SETUP_SOUND | SETUP_SOUND_MUSIC);
 	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_ON);
       }
@@ -1239,42 +1326,52 @@ void HandleSoundButtons(int mx, int my, int button)
       }
       else if (sound_loops_allowed)
       { 
-	sound_loops_on = TRUE;
-	player.setup |= SETUP_SOUND_LOOPS;
+	sound_on = sound_loops_on = TRUE;
+	player.setup |= (SETUP_SOUND | SETUP_SOUND_LOOPS);
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_ON);
       }
       else
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_OFF);
       break;
-    case BUTTON_SOUND_SOUND:
-      if (sound_on)
+    case BUTTON_SOUND_SIMPLE:
+      if (sound_simple_on)
       { 
-	sound_on = FALSE;
+	sound_simple_on = FALSE;
 	player.setup &= ~SETUP_SOUND;
-	DrawSoundDisplay(BUTTON_SOUND_SOUND_OFF);
+	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       }
       else if (sound_status==SOUND_AVAILABLE)
       { 
-	sound_on = TRUE;
+	sound_on = sound_simple_on = TRUE;
 	player.setup |= SETUP_SOUND;
-	DrawSoundDisplay(BUTTON_SOUND_SOUND_ON);
+	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_ON);
       }
       else
-	DrawSoundDisplay(BUTTON_SOUND_SOUND_OFF);
+	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       break;
     default:
       break;
   }
+
+  BackToFront();
 }
 
 void HandleGameButtons(int mx, int my, int button)
 {
-  if (game_status!=PLAYING)
+  if (game_status != PLAYING)
     return;
 
   switch(CheckGameButtons(mx,my,button))
   {
     case BUTTON_GAME_STOP:
+      if (GameOver)
+      {
+	CloseDoor(DOOR_CLOSE_1);
+	game_status = MAINMENU;
+	DrawMainMenu();
+	break;
+      }
+
       if (AreYouSure("Do you really want to quit the game ?",
 		      AYS_ASK | AYS_STAY_CLOSED))
       { 
@@ -1306,4 +1403,6 @@ void HandleGameButtons(int mx, int my, int button)
     default:
       break;
   }
+
+  BackToFront();
 }

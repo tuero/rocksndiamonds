@@ -16,6 +16,7 @@
 #include "tools.h"
 #include "misc.h"
 #include "editor.h"
+#include "tape.h"
 
 /****************************************************************/
 /********** drawing buttons and corresponding displays **********/
@@ -24,7 +25,7 @@
 void DrawVideoDisplay(unsigned long state, unsigned long value)
 {
   int i;
-  int part1 = 0, part2 = 1;
+  int part_label = 0, part_symbol = 1;
   int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
   static char *monatsname[12] =
   {
@@ -33,55 +34,55 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   };
   static int video_pos[10][2][4] =
   {
-    VIDEO_PLAY_LABEL_XPOS, VIDEO_PLAY_LABEL_YPOS,
-    VIDEO_PLAY_LABEL_XSIZE,VIDEO_PLAY_LABEL_YSIZE,
-    VIDEO_PLAY_SYMBOL_XPOS, VIDEO_PLAY_SYMBOL_YPOS,
-    VIDEO_PLAY_SYMBOL_XSIZE,VIDEO_PLAY_SYMBOL_YSIZE,
+    {{ VIDEO_PLAY_LABEL_XPOS, VIDEO_PLAY_LABEL_YPOS,
+       VIDEO_PLAY_LABEL_XSIZE,VIDEO_PLAY_LABEL_YSIZE },
+     { VIDEO_PLAY_SYMBOL_XPOS, VIDEO_PLAY_SYMBOL_YPOS,
+       VIDEO_PLAY_SYMBOL_XSIZE,VIDEO_PLAY_SYMBOL_YSIZE }},
 
-    VIDEO_REC_LABEL_XPOS, VIDEO_REC_LABEL_YPOS,
-    VIDEO_REC_LABEL_XSIZE,VIDEO_REC_LABEL_YSIZE,
-    VIDEO_REC_SYMBOL_XPOS, VIDEO_REC_SYMBOL_YPOS,
-    VIDEO_REC_SYMBOL_XSIZE,VIDEO_REC_SYMBOL_YSIZE,
+    {{ VIDEO_REC_LABEL_XPOS, VIDEO_REC_LABEL_YPOS,
+       VIDEO_REC_LABEL_XSIZE,VIDEO_REC_LABEL_YSIZE },
+     { VIDEO_REC_SYMBOL_XPOS, VIDEO_REC_SYMBOL_YPOS,
+       VIDEO_REC_SYMBOL_XSIZE,VIDEO_REC_SYMBOL_YSIZE }},
 
-    VIDEO_PAUSE_LABEL_XPOS, VIDEO_PAUSE_LABEL_YPOS,
-    VIDEO_PAUSE_LABEL_XSIZE,VIDEO_PAUSE_LABEL_YSIZE,
-    VIDEO_PAUSE_SYMBOL_XPOS, VIDEO_PAUSE_SYMBOL_YPOS,
-    VIDEO_PAUSE_SYMBOL_XSIZE,VIDEO_PAUSE_SYMBOL_YSIZE,
+    {{ VIDEO_PAUSE_LABEL_XPOS, VIDEO_PAUSE_LABEL_YPOS,
+       VIDEO_PAUSE_LABEL_XSIZE,VIDEO_PAUSE_LABEL_YSIZE },
+     { VIDEO_PAUSE_SYMBOL_XPOS, VIDEO_PAUSE_SYMBOL_YPOS,
+       VIDEO_PAUSE_SYMBOL_XSIZE,VIDEO_PAUSE_SYMBOL_YSIZE }},
 
-    VIDEO_DATE_LABEL_XPOS, VIDEO_DATE_LABEL_YPOS,
-    VIDEO_DATE_LABEL_XSIZE,VIDEO_DATE_LABEL_YSIZE,
-    VIDEO_DATE_XPOS, VIDEO_DATE_YPOS,
-    VIDEO_DATE_XSIZE,VIDEO_DATE_YSIZE,
+    {{ VIDEO_DATE_LABEL_XPOS, VIDEO_DATE_LABEL_YPOS,
+       VIDEO_DATE_LABEL_XSIZE,VIDEO_DATE_LABEL_YSIZE },
+     { VIDEO_DATE_XPOS, VIDEO_DATE_YPOS,
+       VIDEO_DATE_XSIZE,VIDEO_DATE_YSIZE }},
 
-    0,0,
-    0,0,
-    VIDEO_TIME_XPOS, VIDEO_TIME_YPOS,
-    VIDEO_TIME_XSIZE,VIDEO_TIME_YSIZE,
+    {{ 0,0,
+       0,0 },
+     { VIDEO_TIME_XPOS, VIDEO_TIME_YPOS,
+       VIDEO_TIME_XSIZE,VIDEO_TIME_YSIZE }},
 
-    VIDEO_BUTTON_PLAY_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
+    {{ VIDEO_BUTTON_PLAY_XPOS, VIDEO_BUTTON_ANY_YPOS,
+       VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE },
+     { 0,0,
+       0,0 }},
 
-    VIDEO_BUTTON_REC_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
+    {{ VIDEO_BUTTON_REC_XPOS, VIDEO_BUTTON_ANY_YPOS,
+       VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE },
+     { 0,0,
+       0,0 }},
 
-    VIDEO_BUTTON_PAUSE_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
+    {{ VIDEO_BUTTON_PAUSE_XPOS, VIDEO_BUTTON_ANY_YPOS,
+       VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE },
+     { 0,0,
+       0,0 }},
 
-    VIDEO_BUTTON_STOP_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0,
+    {{ VIDEO_BUTTON_STOP_XPOS, VIDEO_BUTTON_ANY_YPOS,
+       VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE },
+     { 0,0,
+       0,0 }},
 
-    VIDEO_BUTTON_EJECT_XPOS, VIDEO_BUTTON_ANY_YPOS,
-    VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE,
-    0,0,
-    0,0
+    {{ VIDEO_BUTTON_EJECT_XPOS, VIDEO_BUTTON_ANY_YPOS,
+       VIDEO_BUTTON_XSIZE,VIDEO_BUTTON_YSIZE },
+     { 0,0,
+       0,0 }}
   };
 
   for(i=0;i<20;i++)
@@ -95,23 +96,36 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
       else
 	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
 
-      if (video_pos[pos][part1][0])
+      if (video_pos[pos][part_label][0] && value != VIDEO_DISPLAY_SYMBOL_ONLY)
 	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part1][xpos],
-		  cy + video_pos[pos][part1][ypos],
-		  video_pos[pos][part1][xsize],
-		  video_pos[pos][part1][ysize],
-		  VX + video_pos[pos][part1][xpos],
-		  VY + video_pos[pos][part1][ypos]);
-      if (video_pos[pos][part2][0])
+		  cx + video_pos[pos][part_label][xpos],
+		  cy + video_pos[pos][part_label][ypos],
+		  video_pos[pos][part_label][xsize],
+		  video_pos[pos][part_label][ysize],
+		  VX + video_pos[pos][part_label][xpos],
+		  VY + video_pos[pos][part_label][ypos]);
+      if (video_pos[pos][part_symbol][0] && value != VIDEO_DISPLAY_LABEL_ONLY)
 	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part2][xpos],
-		  cy + video_pos[pos][part2][ypos],
-		  video_pos[pos][part2][xsize],
-		  video_pos[pos][part2][ysize],
-		  VX + video_pos[pos][part2][xpos],
-		  VY + video_pos[pos][part2][ypos]);
+		  cx + video_pos[pos][part_symbol][xpos],
+		  cy + video_pos[pos][part_symbol][ypos],
+		  video_pos[pos][part_symbol][xsize],
+		  video_pos[pos][part_symbol][ysize],
+		  VX + video_pos[pos][part_symbol][xpos],
+		  VY + video_pos[pos][part_symbol][ypos]);
     }
+  }
+
+  if (state & VIDEO_STATE_FFWD_ON)
+  {
+    int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_PLAY_SYMBOL_XPOS,
+	      cy + VIDEO_PLAY_SYMBOL_YPOS,
+	      VIDEO_PLAY_SYMBOL_XSIZE - 2,
+	      VIDEO_PLAY_SYMBOL_YSIZE,
+	      VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
+	      VY + VIDEO_PLAY_SYMBOL_YPOS);
   }
 
   if (state & VIDEO_STATE_DATE_ON)
@@ -161,7 +175,7 @@ void DrawCompleteVideoDisplay()
   if (tape.date && tape.length)
   {
     DrawVideoDisplay(VIDEO_STATE_DATE_ON,tape.date);
-    DrawVideoDisplay(VIDEO_STATE_TIME_ON,0);
+    DrawVideoDisplay(VIDEO_STATE_TIME_ON,tape.length_seconds);
   }
 
   XCopyArea(display,drawto,pix[PIX_DB_DOOR],gc,
@@ -174,7 +188,7 @@ void DrawSoundDisplay(unsigned long state)
 
   pos = (state & BUTTON_SOUND_MUSIC ? SOUND_BUTTON_MUSIC_XPOS :
 	 state & BUTTON_SOUND_LOOPS ? SOUND_BUTTON_LOOPS_XPOS :
-	 SOUND_BUTTON_SOUND_XPOS);
+	 SOUND_BUTTON_SIMPLE_XPOS);
 
   if (state & BUTTON_ON)
     cy -= SOUND_BUTTON_YSIZE;
@@ -250,23 +264,23 @@ void DrawEditButton(unsigned long state)
   int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY2;
   static int edit_pos[6][4] =
   {
-    ED_BUTTON_CTRL_XPOS,ED_BUTTON_CTRL_YPOS,
-    ED_BUTTON_CTRL_XSIZE,ED_BUTTON_CTRL_YSIZE,
+   {ED_BUTTON_CTRL_XPOS,ED_BUTTON_CTRL_YPOS,
+    ED_BUTTON_CTRL_XSIZE,ED_BUTTON_CTRL_YSIZE},
 
-    ED_BUTTON_FILL_XPOS,ED_BUTTON_FILL_YPOS,
-    ED_BUTTON_FILL_XSIZE,ED_BUTTON_FILL_YSIZE,
+   {ED_BUTTON_FILL_XPOS,ED_BUTTON_FILL_YPOS,
+    ED_BUTTON_FILL_XSIZE,ED_BUTTON_FILL_YSIZE},
 
-    ED_BUTTON_LEFT_XPOS,ED_BUTTON_LEFT_YPOS,
-    ED_BUTTON_LEFT_XSIZE,ED_BUTTON_LEFT_YSIZE,
+   {ED_BUTTON_LEFT_XPOS,ED_BUTTON_LEFT_YPOS,
+    ED_BUTTON_LEFT_XSIZE,ED_BUTTON_LEFT_YSIZE},
 
-    ED_BUTTON_UP_XPOS,ED_BUTTON_UP_YPOS,
-    ED_BUTTON_UP_XSIZE,ED_BUTTON_UP_YSIZE,
+   {ED_BUTTON_UP_XPOS,ED_BUTTON_UP_YPOS,
+    ED_BUTTON_UP_XSIZE,ED_BUTTON_UP_YSIZE},
 
-    ED_BUTTON_DOWN_XPOS,ED_BUTTON_DOWN_YPOS,
-    ED_BUTTON_DOWN_XSIZE,ED_BUTTON_DOWN_YSIZE,
+   {ED_BUTTON_DOWN_XPOS,ED_BUTTON_DOWN_YPOS,
+    ED_BUTTON_DOWN_XSIZE,ED_BUTTON_DOWN_YSIZE},
 
-    ED_BUTTON_RIGHT_XPOS,ED_BUTTON_RIGHT_YPOS,
-    ED_BUTTON_RIGHT_XSIZE,ED_BUTTON_RIGHT_YSIZE
+   {ED_BUTTON_RIGHT_XPOS,ED_BUTTON_RIGHT_YPOS,
+    ED_BUTTON_RIGHT_XSIZE,ED_BUTTON_RIGHT_YSIZE}
   };
 
   if (state & ED_BUTTON_PRESSED)
@@ -294,17 +308,17 @@ void DrawCtrlButton(unsigned long state)
   int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY1+80;
   static int edit_pos[4][4] =
   {
-    ED_BUTTON_EDIT_XPOS,ED_BUTTON_EDIT_YPOS,
-    ED_BUTTON_EDIT_XSIZE,ED_BUTTON_EDIT_YSIZE,
+   {ED_BUTTON_EDIT_XPOS,ED_BUTTON_EDIT_YPOS,
+    ED_BUTTON_EDIT_XSIZE,ED_BUTTON_EDIT_YSIZE},
 
-    ED_BUTTON_CLEAR_XPOS,ED_BUTTON_CLEAR_YPOS,
-    ED_BUTTON_CLEAR_XSIZE,ED_BUTTON_CLEAR_YSIZE,
+   {ED_BUTTON_CLEAR_XPOS,ED_BUTTON_CLEAR_YPOS,
+    ED_BUTTON_CLEAR_XSIZE,ED_BUTTON_CLEAR_YSIZE},
 
-    ED_BUTTON_UNDO_XPOS,ED_BUTTON_UNDO_YPOS,
-    ED_BUTTON_UNDO_XSIZE,ED_BUTTON_UNDO_YSIZE,
+   {ED_BUTTON_UNDO_XPOS,ED_BUTTON_UNDO_YPOS,
+    ED_BUTTON_UNDO_XSIZE,ED_BUTTON_UNDO_YSIZE},
 
-    ED_BUTTON_EXIT_XPOS,ED_BUTTON_EXIT_YPOS,
-    ED_BUTTON_EXIT_XSIZE,ED_BUTTON_EXIT_YSIZE
+   {ED_BUTTON_EXIT_XPOS,ED_BUTTON_EXIT_YPOS,
+    ED_BUTTON_EXIT_XSIZE,ED_BUTTON_EXIT_YSIZE}
   };
 
   if (state & ED_BUTTON_PRESSED)
@@ -332,14 +346,14 @@ void DrawElemButton(int button_nr, int button_state)
   int from_x, from_y, to_x,to_y, size_x, size_y;
   static int edit_pos[3][4] =
   {
-    ED_BUTTON_EUP_XPOS,ED_BUTTON_EUP_YPOS,
-    ED_BUTTON_EUP_XSIZE,ED_BUTTON_EUP_YSIZE,
+   {ED_BUTTON_EUP_XPOS,ED_BUTTON_EUP_YPOS,
+    ED_BUTTON_EUP_XSIZE,ED_BUTTON_EUP_YSIZE},
 
-    ED_BUTTON_EDOWN_XPOS,ED_BUTTON_EDOWN_YPOS,
-    ED_BUTTON_EDOWN_XSIZE,ED_BUTTON_EDOWN_YSIZE,
+   {ED_BUTTON_EDOWN_XPOS,ED_BUTTON_EDOWN_YPOS,
+    ED_BUTTON_EDOWN_XSIZE,ED_BUTTON_EDOWN_YSIZE},
 
-    ED_BUTTON_ELEM_XPOS,ED_BUTTON_ELEM_YPOS,
-    ED_BUTTON_ELEM_XSIZE,ED_BUTTON_ELEM_YSIZE
+   {ED_BUTTON_ELEM_XPOS,ED_BUTTON_ELEM_YPOS,
+    ED_BUTTON_ELEM_XSIZE,ED_BUTTON_ELEM_YSIZE}
   };
 
   if (button_nr<ED_BUTTON_ELEM)
@@ -500,9 +514,9 @@ int CheckSoundButtons(int mx, int my, int button)
   static BOOL pressed = FALSE;
   int sound_state[3];
 
-  sound_state[0] = BUTTON_SOUND_MUSIC | (BUTTON_ON * sound_music_on);
-  sound_state[1] = BUTTON_SOUND_LOOPS | (BUTTON_ON * sound_loops_on);
-  sound_state[2] = BUTTON_SOUND_SOUND | (BUTTON_ON * sound_on);
+  sound_state[0] = BUTTON_SOUND_MUSIC  | (BUTTON_ON * sound_music_on);
+  sound_state[1] = BUTTON_SOUND_LOOPS  | (BUTTON_ON * sound_loops_on);
+  sound_state[2] = BUTTON_SOUND_SIMPLE | (BUTTON_ON * sound_simple_on);
 
   if (button)
   {

@@ -22,16 +22,15 @@ CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
 
 # DEBUG = -DDEBUG -g -ansi -pedantic -Wall
-# DEBUG = -DDEBUG -g -Wall
-DEBUG = -O6
+DEBUG = -DDEBUG -g -Wall
+# DEBUG = -O6
 
 # SYSTEM = -Aa -D_HPUX_SOURCE -Dhpux	# for HP-UX (obsolete)
 # SYSTEM = -DSYSV -Ae			# for HP-UX
 # SYSTEM = -DSYSV			# for systems without 'usleep()'
 # INCL = -I/usr/include/X11R5		# for HP-UX and others
-# LIBS = -lXpm -lX11 -lm
 # LIBS = -L/usr/lib/X11R5 -lXpm -lX11 -lm # for HP-UX and others
-LIBS = -lXpm -lXpm -lXpm -lX11 -lm	# triple -lXpm; else I got an error...
+LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -46,6 +45,7 @@ SRCS =	main.c		\
 	editor.c	\
 	buttons.c	\
 	files.c		\
+	tape.c		\
 	sound.c
 
 OBJS =	main.o		\
@@ -58,6 +58,7 @@ OBJS =	main.o		\
 	editor.o	\
 	buttons.o	\
 	files.o		\
+	tape.o		\
 	sound.o
 
 all:	$(OBJS)
@@ -68,10 +69,3 @@ all:	$(OBJS)
 
 clean:
 	$(RM) $(OBJS)
-
-depend:
-	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
-
-ifeq (.depend,$(wildcard .depend))
-include .depend
-endif

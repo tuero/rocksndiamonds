@@ -19,6 +19,10 @@
 
 #include <sys/time.h>
 
+/* für DrawGraphicAnimation */
+#define ANIM_NORMAL	0
+#define ANIM_OSCILLATE	1
+
 /* für DrawElementShifted */
 #define CUT_NO_CUTTING	0
 #define CUT_ABOVE	1
@@ -38,6 +42,7 @@
 #define DOOR_ACTION	(DOOR_ACTION_1 | DOOR_ACTION_2)
 #define DOOR_COPY_BACK	16
 #define DOOR_NO_DELAY	32
+#define DOOR_GET_STATE	64
 
 /* für AreYouSure */
 #define AYS_ASK		1
@@ -52,6 +57,7 @@ void FadeToFront();
 void ClearWindow();
 void DrawText(int, int, char *, int, int);
 void DrawTextExt(Drawable, GC, int, int, char *, int, int);
+void DrawGraphicAnimation(int, int, int, int, int, int);
 void DrawGraphic(int, int, int);
 void DrawGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicExtHiRes(Drawable, GC, int, int, int);
@@ -74,9 +80,10 @@ void DrawLevel(void);
 void DrawMiniLevel(int, int);
 void DrawMicroLevel(int, int);
 BOOL AreYouSure(char *, unsigned int);
-void OpenDoor(unsigned int);
-void CloseDoor(unsigned int);
-void MoveDoor(unsigned int);
+unsigned int OpenDoor(unsigned int);
+unsigned int CloseDoor(unsigned int);
+unsigned int GetDoorState(void);
+unsigned int MoveDoor(unsigned int);
 int ReadPixel(Drawable, int, int);
 void CheckJoystickData(void);
 int JoystickPosition(int, int, int);

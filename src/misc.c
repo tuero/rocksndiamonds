@@ -41,31 +41,31 @@ long mainCounter(int mode)
   long counter_ms;
 
   gettimeofday(&current_time,NULL);
-  if (mode==0 || current_time.tv_sec<base_time.tv_sec)
+  if (mode == INIT_COUNTER || current_time.tv_sec < base_time.tv_sec)
     base_time = current_time;
 
   counter_ms = (current_time.tv_sec - base_time.tv_sec)*1000
              + (current_time.tv_usec - base_time.tv_usec)/1000;
 
-  if (mode==1)
+  if (mode == READ_COUNTER_100)
     return(counter_ms/10);	/* return 1/100 secs since last init */
-  else
+  else	/*    READ_COUNTER_1000 */
     return(counter_ms);		/* return 1/1000 secs since last init */
 }
 
 void InitCounter() /* set counter back to zero */
 {
-  mainCounter(0);
+  mainCounter(INIT_COUNTER);
 }
 
 long Counter()	/* returns 1/100 secs since last call of InitCounter() */
 {
-  return(mainCounter(1));
+  return(mainCounter(READ_COUNTER_100));
 }
 
 long Counter2()	/* returns 1/1000 secs since last call of InitCounter() */
 {
-  return(mainCounter(2));
+  return(mainCounter(READ_COUNTER_1000));
 }
 
 void WaitCounter(long value) 	/* wait for counter to reach value */
@@ -93,9 +93,23 @@ BOOL DelayReached(long *counter_var, int delay)
 {
   long actual_counter = Counter();
 
-  if (actual_counter>*counter_var+delay || actual_counter<*counter_var)
+  if (actual_counter >= *counter_var+delay || actual_counter < *counter_var)
   {
     *counter_var = actual_counter;
+    return(TRUE);
+  }
+  else
+    return(FALSE);
+}
+
+BOOL FrameReached(long *frame_counter_var, int frame_delay)
+{
+  long actual_frame_counter = FrameCounter;
+
+  if (actual_frame_counter >= *frame_counter_var+frame_delay
+      || actual_frame_counter < *frame_counter_var)
+  {
+    *frame_counter_var = actual_frame_counter;
     return(TRUE);
   }
   else
@@ -115,6 +129,16 @@ char *int2str(int ct, int nr)
 
   sprintf(str,"%09d",ct);
   return(&str[strlen(str)-nr]);
+}
+
+unsigned int SimpleRND(unsigned int max)
+{
+  static unsigned long root = 654321;
+  struct timeval current_time;
+
+  gettimeofday(&current_time,NULL);
+  root = root * 4253261 + current_time.tv_sec + current_time.tv_usec;
+  return(root % max);
 }
 
 unsigned int RND(unsigned int max)
@@ -171,8 +195,19 @@ void HandleAnimation(int mode)
   static BOOL anim_restart = TRUE;
   static BOOL reset_delay = TRUE;
   static int toon_nr = 0;
+  int draw_mode;
 
+/*
   if (!toons_on || game_status==PLAYING)
+    return;
+*/
+
+/*
+  if (!toons_on || tape.playing || tape.recording)
+    return;
+*/
+
+  if (!toons_on)
     return;
 
   switch(mode)
@@ -180,13 +215,37 @@ void HandleAnimation(int mode)
     case ANIM_START:
       anim_restart = TRUE;
       reset_delay = TRUE;
+
+      /* Fill empty backbuffer for animation functions */
+      if (direct_draw_on && game_status==PLAYING)
+      {
+	int xx,yy;
+
+	drawto_field = backbuffer;
+
+	for(xx=0;xx<SCR_FIELDX;xx++)
+	  for(yy=0;yy<SCR_FIELDY;yy++)
+	    DrawScreenField(xx,yy);
+	DrawLevelElement(JX,JY,EL_SPIELFIGUR);
+
+	drawto_field = window;
+      }
+
       return;
       break;
     case ANIM_CONTINUE:
       break;
     case ANIM_STOP:
       redraw_mask |= REDRAW_FIELD;
+
+      /* Redraw background even when in direct drawing mode */
+      draw_mode = direct_draw_on;
+      direct_draw_on = FALSE;
+
       BackToFront();
+
+      direct_draw_on = draw_mode;
+
       return;
       break;
     default:
@@ -196,7 +255,7 @@ void HandleAnimation(int mode)
   if (reset_delay)
   {
     animstart_delay = Counter();
-    animstart_delay_value = RND(500);
+    animstart_delay_value = SimpleRND(500);
     reset_delay = FALSE;
   }
 
@@ -205,7 +264,7 @@ void HandleAnimation(int mode)
     if (!DelayReached(&animstart_delay,animstart_delay_value))
       return;
 
-    toon_nr = RND(NUM_TOONS);
+    toon_nr = SimpleRND(NUM_TOONS);
   }
 
   anim_restart = reset_delay = AnimateToon(toon_nr,anim_restart);
@@ -226,59 +285,59 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
   static int dest_x, dest_y;
   static struct AnimInfo toon[NUM_TOONS] =
   {
-    DWARF_XSIZE, DWARF_YSIZE,
+   {DWARF_XSIZE, DWARF_YSIZE,
     DWARF_X, DWARF_Y,
     DWARF_FRAMES,
     DWARF_FPS,
     DWARF_STEPSIZE,
     FALSE,
     ANIMDIR_RIGHT,
-    ANIMPOS_DOWN,
+    ANIMPOS_DOWN},
 
-    DWARF_XSIZE, DWARF_YSIZE,
+   {DWARF_XSIZE, DWARF_YSIZE,
     DWARF_X, DWARF2_Y,
     DWARF_FRAMES,
     DWARF_FPS,
     DWARF_STEPSIZE,
     FALSE,
     ANIMDIR_LEFT,
-    ANIMPOS_DOWN,
+    ANIMPOS_DOWN},
 
-    JUMPER_XSIZE, JUMPER_YSIZE,
+   {JUMPER_XSIZE, JUMPER_YSIZE,
     JUMPER_X, JUMPER_Y,
     JUMPER_FRAMES,
     JUMPER_FPS,
     JUMPER_STEPSIZE,
     FALSE,
     ANIMDIR_LEFT,
-    ANIMPOS_DOWN,
+    ANIMPOS_DOWN},
 
-    CLOWN_XSIZE, CLOWN_YSIZE,
+   {CLOWN_XSIZE, CLOWN_YSIZE,
     CLOWN_X, CLOWN_Y,
     CLOWN_FRAMES,
     CLOWN_FPS,
     CLOWN_STEPSIZE,
     FALSE,
     ANIMDIR_UP,
-    ANIMPOS_ANY,
+    ANIMPOS_ANY},
 
-    BIRD_XSIZE, BIRD_YSIZE,
+   {BIRD_XSIZE, BIRD_YSIZE,
     BIRD1_X, BIRD1_Y,
     BIRD_FRAMES,
     BIRD_FPS,
     BIRD_STEPSIZE,
     TRUE,
     ANIMDIR_RIGHT,
-    ANIMPOS_UPPER,
+    ANIMPOS_UPPER},
 
-    BIRD_XSIZE, BIRD_YSIZE,
+   {BIRD_XSIZE, BIRD_YSIZE,
     BIRD2_X, BIRD2_Y,
     BIRD_FRAMES,
     BIRD_FPS,
     BIRD_STEPSIZE,
     TRUE,
     ANIMDIR_LEFT,
-    ANIMPOS_UPPER
+    ANIMPOS_UPPER}
   };
   struct AnimInfo *anim = &toon[toon_nr];
 
@@ -296,9 +355,9 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
       else if (anim->position==ANIMPOS_DOWN)
 	pos_y = FULL_SYSIZE-anim->height;
       else if (anim->position==ANIMPOS_UPPER)
-	pos_y = RND((FULL_SYSIZE-anim->height)/2);
+	pos_y = SimpleRND((FULL_SYSIZE-anim->height)/2);
       else
-	pos_y = RND(FULL_SYSIZE-anim->height);
+	pos_y = SimpleRND(FULL_SYSIZE-anim->height);
 
       if (anim->direction==ANIMDIR_RIGHT)
       {
@@ -319,7 +378,7 @@ BOOL AnimateToon(int toon_nr, BOOL restart)
       else if (anim->position==ANIMPOS_RIGHT)
 	pos_x = FULL_SXSIZE-anim->width;
       else
-	pos_x = RND(FULL_SXSIZE-anim->width);
+	pos_x = SimpleRND(FULL_SXSIZE-anim->width);
 
       if (anim->direction==ANIMDIR_DOWN)
       {

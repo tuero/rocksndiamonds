@@ -115,10 +115,13 @@ void BackToFront()
 
 void FadeToFront()
 {
+
+/*
   long fading_delay = 300000;
 
   if (fading_on && (redraw_mask & REDRAW_FIELD))
   {
+*/
 
 /*
     int x,y;
@@ -147,7 +150,7 @@ void FadeToFront()
     Delay(fading_delay);
 */
 
-
+/*
     XSetClipOrigin(display,clip_gc[PIX_FADEMASK],0,0);
     XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
 	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
@@ -174,6 +177,7 @@ void FadeToFront()
 
     redraw_mask &= ~REDRAW_MAIN;
   }
+*/
 
   BackToFront();
 }
@@ -185,7 +189,7 @@ void ClearWindow()
 		 REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
   redraw_mask|=REDRAW_FIELD;
 
-  if (game_status==PLAYING && direct_draw_on)
+  if (direct_draw_on && game_status==PLAYING)
   {
     drawto_field = window;
     XFillRectangle(display,drawto_field,gc,
@@ -245,6 +249,24 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 
     x += font_width;
   }
+}
+
+void DrawGraphicAnimation(int x, int y, int graphic,
+			  int frames, int delay, int mode)
+{
+  int phase;
+
+  if (mode == ANIM_OSCILLATE)
+  {
+    int max_anim_frames = frames*2 - 2;
+    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
+    phase = (phase < frames ? phase : max_anim_frames - phase);
+  }
+  else
+    phase = (FrameCounter % (delay * frames)) / delay;
+
+  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);
 }
 
 void DrawGraphic(int x, int y, int graphic)
@@ -433,33 +455,34 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
   int graphic = el2gfx(element);
   int phase = ABS(MovPos[ux][uy])/(TILEX/2);
   int dir = MovDir[ux][uy];
+
+/*
   int horiz_move = (dir==MV_LEFT || dir==MV_RIGHT);
+*/
 
   if (element==EL_PACMAN ||
       element==EL_KAEFER ||
-      element==EL_FLIEGER)
+      element==EL_FLIEGER ||
+      element==EL_BUTTERFLY ||
+      element==EL_FIREFLY)
   {
-    if (element==EL_PACMAN)
-      graphic = GFX_PACMAN + 4*!phase;
+    if (element==EL_BUTTERFLY || element==EL_FIREFLY)
+      graphic += !phase;
     else
+    {
       graphic += 4*!phase;
 
-    if (dir==MV_UP)
-      graphic += 1;
-    else if (dir==MV_LEFT)
-      graphic += 2;
-    else if (dir==MV_DOWN)
-      graphic += 3;
+      if (dir==MV_UP)
+	graphic += 1;
+      else if (dir==MV_LEFT)
+	graphic += 2;
+      else if (dir==MV_DOWN)
+	graphic += 3;
+    }
   }
-  else if ((element==EL_FELSBROCKEN ||
-	    element==EL_EDELSTEIN || element==EL_EDELSTEIN2 ||
-	    element==EL_EDELSTEIN3 || element==EL_DIAMANT)
-	   && horiz_move && phase)
+  else if ((element==EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
   {
-    if (element==EL_FELSBROCKEN)
-      graphic += 2;
-    else
-      graphic += 1;
+    graphic += phase * (element==EL_FELSBROCKEN ? 2 : 1);
   }
   else if ((element==EL_SIEB_LEER || element==EL_SIEB2_LEER ||
 	    element==EL_SIEB_VOLL || element==EL_SIEB2_VOLL) && SiebAktiv)
@@ -502,10 +525,10 @@ void ErdreichAnbroeckeln(int x, int y)
   int snip = 4;
   static int xy[4][2] =
   {
-    0,-1,
-    -1,0,
-    +1,0,
-    0,+1
+    { 0,-1 },
+    { -1,0 },
+    { +1,0 },
+    { 0,+1 }
   };
 
   if (!IN_LEV_FIELD(ux,uy))
@@ -794,6 +817,10 @@ void DrawMicroLevel(int xpos, int ypos)
 		 xpos-MICRO_TILEX,ypos-MICRO_TILEY,
 		 MICRO_TILEX*(STD_LEV_FIELDX+2),
 		 MICRO_TILEY*(STD_LEV_FIELDY+2));
+  if (lev_fieldx < STD_LEV_FIELDX)
+    xpos += (STD_LEV_FIELDX - lev_fieldx)/2 * MICRO_TILEX;
+  if (lev_fieldy < STD_LEV_FIELDY)
+    ypos += (STD_LEV_FIELDY - lev_fieldy)/2 * MICRO_TILEY;
 
   for(x=-1;x<=STD_LEV_FIELDX;x++)
     for(y=-1;y<=STD_LEV_FIELDY;y++)
@@ -833,6 +860,9 @@ int AYS_in_range(int x, int y)
 BOOL AreYouSure(char *text, unsigned int ays_state)
 {
   int mx,my, ty, result = -1;
+  unsigned int old_door_state;
+
+  old_door_state = GetDoorState();
 
   CloseDoor(DOOR_CLOSE_1);
 
@@ -883,11 +913,12 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	      DOOR_GFX_PAGEX1,CONFIRM_BUTTON_YPOS);
 
   OpenDoor(DOOR_OPEN_1);
+  ClearEventQueue();
 
   if (!(ays_state & AYS_ASK) && !(ays_state & AYS_CONFIRM))
     return(FALSE);
 
-  if (game_status!=MAINMENU)
+  if (game_status != MAINMENU)
     InitAnimation();
 
   button_status = MB_RELEASED;
@@ -916,7 +947,7 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	{
 	  int choice;
 
-	  if (event.type==MotionNotify)
+	  if (event.type == MotionNotify)
 	  {
 	    motion_status = TRUE;
 	    mx = ((XMotionEvent *) &event)->x;
@@ -955,7 +986,6 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	  break;
 	}
 	case KeyPress:
-	  key_status = KEY_PRESSED;
 	  switch(XLookupKeysym((XKeyEvent *)&event,
 			       ((XKeyEvent *)&event)->state))
 	  {
@@ -977,7 +1007,7 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	  break;
       }
     }
-    else if (JoystickButton()==JOY_BUTTON_NEW_PRESSED)
+    else if (JoystickButton() == JOY_BUTTON_NEW_PRESSED)
     {
       int joy=Joystick();
 
@@ -988,15 +1018,14 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
     }
   }
 
-  if (game_status!=MAINMENU)
+  if (game_status != MAINMENU)
     StopAnimation();
 
   if (!(ays_state & AYS_STAY_OPEN))
   {
     CloseDoor(DOOR_CLOSE_1);
 
-    if (!(ays_state & AYS_STAY_CLOSED) &&
-	(game_status==PLAYING || game_status==LEVELED))
+    if (!(ays_state & AYS_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
     {
       XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
 		DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
@@ -1008,8 +1037,10 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
   return(result);
 }
 
-void OpenDoor(unsigned int door_state)
+unsigned int OpenDoor(unsigned int door_state)
 {
+  unsigned int new_door_state;
+
   if (door_state & DOOR_COPY_BACK)
   {
     XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
@@ -1018,26 +1049,46 @@ void OpenDoor(unsigned int door_state)
     door_state &= ~DOOR_COPY_BACK;
   }
 
-  MoveDoor(door_state);
+  new_door_state = MoveDoor(door_state);
+
+/*
   ClearEventQueue();
+*/
+
+  return(new_door_state);
 }
 
-void CloseDoor(unsigned int door_state)
+unsigned int CloseDoor(unsigned int door_state)
 {
+  unsigned int new_door_state;
+
   XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,
 	    DX,DY, DXSIZE,DYSIZE, DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
   XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,
 	    VX,VY, VXSIZE,VYSIZE, DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
 
-  MoveDoor(door_state);
+  new_door_state = MoveDoor(door_state);
+
+/*
   ClearEventQueue();
+*/
+
+  return(new_door_state);
 }
 
-void MoveDoor(unsigned int door_state)
+unsigned int GetDoorState()
 {
-  static int door1 = DOOR_OPEN_1;
-  static int door2 = DOOR_CLOSE_2;
+  return(MoveDoor(DOOR_GET_STATE));
+}
+
+unsigned int MoveDoor(unsigned int door_state)
+{
+  static unsigned int door1 = DOOR_OPEN_1;
+  static unsigned int door2 = DOOR_CLOSE_2;
   int x, start, stepsize = 4, door_anim_delay = stepsize*5000;
+
+  if (door_state == DOOR_GET_STATE)
+    return(door1 | door2);
 
   if (door1==DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
     door_state &= ~DOOR_OPEN_1;
@@ -1150,6 +1201,8 @@ void MoveDoor(unsigned int door_state)
     door1 = door_state & DOOR_ACTION_1;
   if (door_state & DOOR_ACTION_2)
     door2 = door_state & DOOR_ACTION_2;
+
+  return(door1 | door2);
 }
 
 int ReadPixel(Drawable d, int x, int y)
@@ -1320,6 +1373,16 @@ int el2gfx(int element)
     case EL_FLIEGER_O:		return(GFX_FLIEGER_O);
     case EL_FLIEGER_L:		return(GFX_FLIEGER_L);
     case EL_FLIEGER_U:		return(GFX_FLIEGER_U);
+    case EL_BUTTERFLY:		return(GFX_BUTTERFLY);
+    case EL_BUTTERFLY_R:	return(GFX_BUTTERFLY_R);
+    case EL_BUTTERFLY_O:	return(GFX_BUTTERFLY_O);
+    case EL_BUTTERFLY_L:	return(GFX_BUTTERFLY_L);
+    case EL_BUTTERFLY_U:	return(GFX_BUTTERFLY_U);
+    case EL_FIREFLY:		return(GFX_FIREFLY);
+    case EL_FIREFLY_R:		return(GFX_FIREFLY_R);
+    case EL_FIREFLY_O:		return(GFX_FIREFLY_O);
+    case EL_FIREFLY_L:		return(GFX_FIREFLY_L);
+    case EL_FIREFLY_U:		return(GFX_FIREFLY_U);
     case EL_MAMPFER:		return(GFX_MAMPFER);
     case EL_ZOMBIE:		return(GFX_ZOMBIE);
     case EL_BETON:		return(GFX_BETON);
@@ -1336,6 +1399,7 @@ int el2gfx(int element)
     case EL_AMOEBE_NASS:	return(GFX_AMOEBE_NASS);
     case EL_AMOEBE_NORM:	return(GFX_AMOEBE_NORM);
     case EL_AMOEBE_VOLL:	return(GFX_AMOEBE_VOLL);
+    case EL_AMOEBE_BD:		return(GFX_AMOEBE_BD);
     case EL_AMOEBA2DIAM:	return(GFX_AMOEBA2DIAM);
     case EL_KOKOSNUSS:		return(GFX_KOKOSNUSS);
     case EL_LIFE:		return(GFX_LIFE);
@@ -1375,10 +1439,14 @@ int el2gfx(int element)
     case EL_ZEIT_VOLL:		return(GFX_ZEIT_VOLL);
     case EL_ZEIT_LEER:		return(GFX_ZEIT_LEER);
     case EL_MAUER_LEBT:		return(GFX_MAUER_LEBT);
-    case EL_EDELSTEIN2:		return(GFX_EDELSTEIN2);
-    case EL_EDELSTEIN3:		return(GFX_EDELSTEIN3);
-    case EL_ERZ_EDEL2:		return(GFX_ERZ_EDEL2);
-    case EL_ERZ_EDEL3:		return(GFX_ERZ_EDEL3);
+    case EL_EDELSTEIN_BD:	return(GFX_EDELSTEIN_BD);
+    case EL_EDELSTEIN_GELB:	return(GFX_EDELSTEIN_GELB);
+    case EL_EDELSTEIN_ROT:	return(GFX_EDELSTEIN_ROT);
+    case EL_EDELSTEIN_LILA:	return(GFX_EDELSTEIN_LILA);
+    case EL_ERZ_EDEL_BD:	return(GFX_ERZ_EDEL_BD);
+    case EL_ERZ_EDEL_GELB:	return(GFX_ERZ_EDEL_GELB);
+    case EL_ERZ_EDEL_ROT:	return(GFX_ERZ_EDEL_ROT);
+    case EL_ERZ_EDEL_LILA:	return(GFX_ERZ_EDEL_LILA);
     case EL_MAMPFER2:		return(GFX_MAMPFER2);
     case EL_SIEB2_LEER:		return(GFX_SIEB2_LEER);
     case EL_SIEB2_VOLL:		return(GFX_SIEB2_VOLL);
@@ -1386,6 +1454,10 @@ int el2gfx(int element)
     case EL_DYNABOMB:		return(GFX_DYNABOMB);
     case EL_DYNABOMB_NR:	return(GFX_DYNABOMB_NR);
     case EL_DYNABOMB_SZ:	return(GFX_DYNABOMB_SZ);
+    case EL_DYNABOMB_XL:	return(GFX_DYNABOMB_XL);
+    case EL_SOKOBAN_OBJEKT:	return(GFX_SOKOBAN_OBJEKT);
+    case EL_SOKOBAN_FELD_LEER:	return(GFX_SOKOBAN_FELD_LEER);
+    case EL_SOKOBAN_FELD_VOLL:	return(GFX_SOKOBAN_FELD_VOLL);
     default:
     {
       if (IS_CHAR(element))

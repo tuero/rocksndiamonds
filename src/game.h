@@ -17,17 +17,23 @@
 
 #include "main.h"
 
-#define DF_DIG		0
-#define DF_SNAP		1
-#define DF_NO_PUSH	2
+#define DF_NO_PUSH		0
+#define DF_DIG			1
+#define DF_SNAP			2
 
-#define MF_NO_ACTION	0
-#define MF_MOVING	1
-#define MF_ACTION	2
+#define MF_NO_ACTION		0
+#define MF_MOVING		1
+#define MF_ACTION		2
 
-#define EX_NORMAL	0
-#define EX_CENTER	1
-#define EX_BORDER	2
+/* explosion position marks */
+#define EX_NORMAL		0
+#define EX_CENTER		1
+#define EX_BORDER		2
+
+/* fundamental game speed */
+#define GAME_FRAME_DELAY	4
+#define FFWD_FRAME_DELAY	1
+#define FRAMES_PER_SECOND	(100 / GAME_FRAME_DELAY)
 
 void GetPlayerConfig(void);
 void InitGame(void);
@@ -52,6 +58,7 @@ void StartMoving(int, int);
 void ContinueMoving(int, int);
 int AmoebeNachbarNr(int, int);
 void AmoebeUmwandeln(int, int);
+void AmoebeUmwandeln2(int, int, int);
 void AmoebeWaechst(int, int);
 void AmoebeAbleger(int, int);
 void Life(int, int);
@@ -65,30 +72,19 @@ void AusgangstuerBlinken(int, int);
 void EdelsteinFunkeln(int, int);
 void MauerWaechst(int, int);
 void MauerAbleger(int, int);
-int GameActions(int, int, int);
+void GameActions(void);
 void ScrollLevel(int, int);
+BOOL MoveFigureOneStep(int, int, int, int);
 BOOL MoveFigure(int, int);
 void TestIfHeroHitsBadThing(void);
 void TestIfBadThingHitsHero(void);
 void TestIfBadThingHitsOtherBadThing(int, int);
 void KillHero(void);
-int DigField(int, int, int);
+int DigField(int, int, int, int, int);
 BOOL SnapField(int, int);
 BOOL PlaceBomb(void);
 void PlaySoundLevel(int, int, int);
 void RaiseScore(int);
-void TapeInitRecording(void);
-void TapeStartRecording(void);
-void TapeStopRecording(void);
-void TapeRecordAction(int);
-void TapeRecordDelay(void);
-void TapeTogglePause(void);
-void TapeInitPlaying(void);
-void TapeStartPlaying(void);
-void TapeStopPlaying(void);
-int TapePlayAction(void);
-BOOL TapePlayDelay(void);
-void TapeStop(void);
-void TapeErase(void);
+void RaiseScoreElement(int);
 
 #endif

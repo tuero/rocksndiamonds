@@ -20,8 +20,7 @@
 Display        *display;
 int		screen;
 Window  	window;
-GC      	gc, plane_gc;
-GC		clip_gc[NUM_PIXMAPS];
+GC		gc, clip_gc[NUM_PIXMAPS];
 Pixmap		pix[NUM_PIXMAPS];
 Pixmap		clipmask[NUM_PIXMAPS];
 XpmAttributes 	xpm_att[NUM_PICTURES];
@@ -33,19 +32,23 @@ int		sound_device;
 char	       *sound_device_name = SOUND_DEVICE;
 int		joystick_device = 0;
 char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
+char	       *level_directory = LEVEL_PATH;
 int     	width, height;
 unsigned long	pen_fg, pen_bg;
 
 int		game_status = MAINMENU;
+int		game_emulation = EMU_NONE;
 int		button_status = MB_NOT_PRESSED, motion_status = FALSE;
-int		key_status = KEY_NOT_PRESSED;
+int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;
-int	    	sound_status = SOUND_STATUS, sound_on=TRUE;
+int	    	sound_status = SOUND_STATUS, sound_on = TRUE;
 int		sound_loops_allowed = FALSE, sound_loops_on = FALSE;
 int		sound_music_on = FALSE;
+int		sound_simple_on = FALSE;
 int		toons_on = TRUE;
 int		direct_draw_on = FALSE;
+int		scroll_delay_on = FALSE;
 int		fading_on = FALSE;
 int		autorecord_on = FALSE;
 int		joystick_nr = 0;
@@ -66,31 +69,31 @@ int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		AmoebaCnt[MAX_NUM_AMOEBA];
+int		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 long		Elementeigenschaften[MAX_ELEMENTS];
 
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		LevelSolved,GameOver, JX,JY, ZX,ZY;
-int		Gems,Dynamite,Key[4],TimeLeft,Score,MampferNr;
-int		DynaBombCount, DynaBombSize, DynaBombsLeft;
-int		CheckMoving,CheckExploding, SiebAktiv;
+int		FrameCounter,TimeFrames,TimeLeft,Score;
+int		Gems,SokobanFields,Lights,Dynamite,Key[4],MampferNr;
+int		DynaBombCount, DynaBombSize, DynaBombsLeft, DynaBombXL;
+int		SiebAktiv;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
 struct LevelInfo	level;
 struct PlayerInfo	player;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SoundInfo	Sound[NUM_SOUNDS];
-struct RecordingInfo	tape,master_tape;
+struct RecordingInfo	tape;
 
 struct JoystickInfo joystick[2] =
 {
-  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE,
-
-  JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
-  JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE
+  { JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
+    JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE },
+  { JOYSTICK_XLEFT, JOYSTICK_XRIGHT, JOYSTICK_XMIDDLE,
+    JOYSTICK_YUPPER, JOYSTICK_YLOWER, JOYSTICK_YMIDDLE }
 };
 
 /* data needed for playing sounds */
@@ -168,6 +171,9 @@ char 		*progname;
 int main(int argc, char *argv[])
 {
   progname = argv[0];
+
+  if (argc>1)
+    level_directory = argv[1];
 
   OpenAll(argc,argv);
   EventLoop();

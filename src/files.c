@@ -15,6 +15,7 @@
 #include "files.h"
 #include "tools.h"
 #include "misc.h"
+#include "tape.h"
 
 BOOL CreateNewScoreFile()
 {
@@ -24,7 +25,7 @@ BOOL CreateNewScoreFile()
   FILE *file;
 
   sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
+	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
 
   if (!(file=fopen(filename,"w")))
     return(FALSE);
@@ -34,7 +35,7 @@ BOOL CreateNewScoreFile()
   strncpy(empty_alias,EMPTY_ALIAS,MAX_NAMELEN-1);
 
   fputs(SCORE_COOKIE,file);		/* Formatkennung */
-  for(i=0;i<LEVELDIR_SIZE(leveldir[leveldir_nr]);i++)
+  for(i=0;i<leveldir[leveldir_nr].levels;i++)
   {
     for(j=0;j<MAX_SCORE_ENTRIES;j++)
     {
@@ -57,7 +58,7 @@ BOOL CreateNewNamesFile(int mode)
 
   if (mode==PLAYER_LEVEL)
     sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
+	    level_directory,leveldir[leveldir_nr].filename,NAMES_FILENAME);
   else
     sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
 
@@ -78,7 +79,7 @@ BOOL LoadLevelInfo()
   char cookie[MAX_FILENAME];
   FILE *file;
 
-  sprintf(filename,"%s/%s",LEVEL_PATH,LEVDIR_FILENAME);
+  sprintf(filename,"%s/%s",level_directory,LEVDIR_FILENAME);
 
   if (!(file=fopen(filename,"r")))
   {
@@ -100,8 +101,8 @@ BOOL LoadLevelInfo()
   {
     fscanf(file,"%s",leveldir[i].filename);
     fscanf(file,"%s",leveldir[i].name);
-    fscanf(file,"%d",&leveldir[i].num_ready);
-    fscanf(file,"%d",&leveldir[i].num_free);
+    fscanf(file,"%d",&leveldir[i].levels);
+    fscanf(file,"%d",&leveldir[i].readonly);
     if (feof(file))
       break;
 
@@ -125,7 +126,7 @@ void LoadLevel(int level_nr)
   FILE *file;
 
   sprintf(filename,"%s/%s/%d",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if (!(file=fopen(filename,"r")))
   {
@@ -137,6 +138,7 @@ void LoadLevel(int level_nr)
   {
     fgets(cookie,LEVEL_COOKIE_LEN,file);
     fgetc(file);
+
     if (strcmp(cookie,LEVEL_COOKIE))	/* ungültiges Format? */
     {
       fprintf(stderr,"%s: wrong format of level file '%s'!\n",
@@ -219,7 +221,7 @@ void LoadLevelTape(int level_nr)
   FILE *file;
 
   sprintf(filename,"%s/%s/%d.tape",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if ((file=fopen(filename,"r")))
   {
@@ -246,6 +248,8 @@ void LoadLevelTape(int level_nr)
 
   tape.level_nr = level_nr;
   tape.counter = 0;
+  tape.changed = FALSE;
+
   tape.recording = FALSE;
   tape.playing = FALSE;
   tape.pausing = FALSE;
@@ -260,13 +264,13 @@ void LoadLevelTape(int level_nr)
       break;
   }
 
+  fclose(file);
+
   if (i != tape.length)
     fprintf(stderr,"%s: level recording file '%s' corrupted!\n",
 	    progname,filename);
 
-  fclose(file);
-
-  master_tape = tape;
+  tape.length_seconds = GetTapeLength();
 }
 
 void LoadScore(int level_nr)
@@ -277,7 +281,7 @@ void LoadScore(int level_nr)
   FILE *file;
 
   sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
+	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
 
   if (!(file=fopen(filename,"r")))
   {
@@ -335,10 +339,11 @@ void LoadPlayerInfo(int mode)
   FILE *file;
   char *login_name = GetLoginName();
   struct PlayerInfo default_player, new_player;
+  int version_10_file = FALSE;
 
   if (mode==PLAYER_LEVEL)
     sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
+	    level_directory,leveldir[leveldir_nr].filename,NAMES_FILENAME);
   else
     sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
 
@@ -349,6 +354,7 @@ void LoadPlayerInfo(int mode)
   default_player.handicap = 0;
   default_player.setup = DEFAULT_SETUP;
   default_player.leveldir_nr = 0;
+  default_player.level_nr = 0;
 
   new_player = default_player;
 
@@ -369,7 +375,9 @@ void LoadPlayerInfo(int mode)
   if (file)
   {
     fgets(cookie,NAMES_COOKIE_LEN,file);
-    if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
+    if (!strcmp(cookie,NAMES_COOKIE_10))	/* altes Format? */
+      version_10_file = TRUE;
+    else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
     {
       fprintf(stderr,"%s: wrong format of names file '%s'!\n",
 	      progname,filename);
@@ -381,7 +389,7 @@ void LoadPlayerInfo(int mode)
   if (!file)
   {
     player = default_player;
-    level_nr = default_player.handicap;
+    level_nr = default_player.level_nr;
     return;
   }
 
@@ -394,6 +402,14 @@ void LoadPlayerInfo(int mode)
     new_player.handicap = fgetc(file);
     new_player.setup = (fgetc(file)<<8) | fgetc(file);
     new_player.leveldir_nr = fgetc(file);
+    if (!version_10_file)
+    {
+      new_player.level_nr = fgetc(file);
+      for(i=0;i<10;i++)		/* currently unused bytes */
+	fgetc(file);
+    }
+    else
+      new_player.level_nr = new_player.handicap;
 
     if (feof(file))		/* Spieler noch nicht in Liste enthalten */
     {
@@ -415,6 +431,12 @@ void LoadPlayerInfo(int mode)
 	fputc(new_player.setup / 256,file);
 	fputc(new_player.setup % 256,file);
 	fputc(new_player.leveldir_nr,file);
+	if (!version_10_file)
+	{
+	  fputc(new_player.level_nr,file);
+	  for(i=0;i<10;i++)	/* currently unused bytes */
+	    fputc(0,file);
+	}
       }
       break;
     }
@@ -432,9 +454,12 @@ void LoadPlayerInfo(int mode)
       leveldir_nr = 0;
   }
   else
+  {
     player.handicap = new_player.handicap;
+    player.level_nr = new_player.level_nr;
+  }
 
-  level_nr = player.handicap;
+  level_nr = player.level_nr;
   fclose(file);
 }
 
@@ -445,7 +470,7 @@ void SaveLevel(int level_nr)
   FILE *file;
 
   sprintf(filename,"%s/%s/%d",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if (!(file=fopen(filename,"w")))
   {
@@ -496,7 +521,7 @@ void SaveLevelTape(int level_nr)
   BOOL new_tape = TRUE;
 
   sprintf(filename,"%s/%s/%d.tape",
-	  LEVEL_PATH,leveldir[leveldir_nr].filename,level_nr);
+	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   /* Testen, ob bereits eine Aufnahme existiert */
   if ((file=fopen(filename,"r")))
@@ -517,8 +542,6 @@ void SaveLevelTape(int level_nr)
 
   fputs(LEVELREC_COOKIE,file);		/* Formatkennung */
   fputc(0x0a,file);
-
-  tape = master_tape;
 
   fputc((tape.random_seed >> 24) & 0xff,file);
   fputc((tape.random_seed >> 16) & 0xff,file);
@@ -545,6 +568,8 @@ void SaveLevelTape(int level_nr)
 
   chmod(filename, LEVREC_PERMS);
 
+  tape.changed = FALSE;
+
   if (new_tape)
     AreYouSure("tape saved !",AYS_CONFIRM);
 }
@@ -556,7 +581,7 @@ void SaveScore(int level_nr)
   FILE *file;
 
   sprintf(filename,"%s/%s/%s",
-	  SCORE_PATH,leveldir[leveldir_nr].filename,SCORE_FILENAME);
+	  level_directory,leveldir[leveldir_nr].filename,SCORE_FILENAME);
 
   if (!(file=fopen(filename,"r+")))
   {
@@ -585,10 +610,11 @@ void SavePlayerInfo(int mode)
   char cookie[MAX_FILENAME];
   FILE *file;
   struct PlayerInfo default_player;
+  int version_10_file = FALSE;
 
   if (mode==PLAYER_LEVEL)
     sprintf(filename,"%s/%s/%s",
-	    NAMES_PATH,leveldir[leveldir_nr].filename,NAMES_FILENAME);
+	    level_directory,leveldir[leveldir_nr].filename,NAMES_FILENAME);
   else
     sprintf(filename,"%s/%s",CONFIG_PATH,NAMES_FILENAME);
 
@@ -600,7 +626,9 @@ void SavePlayerInfo(int mode)
   }
 
   fgets(cookie,NAMES_COOKIE_LEN,file);
-  if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
+  if (!strcmp(cookie,NAMES_COOKIE_10))	/* altes Format? */
+    version_10_file = TRUE;
+  else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
   {
     fprintf(stderr,"%s: wrong format of names file '%s'!\n",
 	    progname,filename);
@@ -617,16 +645,26 @@ void SavePlayerInfo(int mode)
     default_player.handicap = fgetc(file);
     default_player.setup = (fgetc(file)<<8) | fgetc(file);
     default_player.leveldir_nr = fgetc(file);
+    if (!version_10_file)
+    {
+      default_player.level_nr = fgetc(file);
+      for(i=0;i<10;i++)		/* currently unused bytes */
+	fgetc(file);
+    }
+    else
+      default_player.level_nr = default_player.handicap;
 
     if (feof(file))		/* Spieler noch nicht in Liste enthalten */
       break;
     else			/* prüfen, ob Spieler in Liste enthalten */
       if (!strncmp(default_player.login_name,player.login_name,MAX_NAMELEN-1))
       {
-	fseek(file,-(2*MAX_NAMELEN+1+2+1),SEEK_CUR);
+	fseek(file,-(2*MAX_NAMELEN+1+2+1+(version_10_file ? 0 : 11)),SEEK_CUR);
 	break;
       }
   }
+
+  player.level_nr = level_nr;
 
   for(i=0;i<MAX_NAMELEN;i++)
     fputc(player.login_name[i],file);
@@ -636,6 +674,12 @@ void SavePlayerInfo(int mode)
   fputc(player.setup / 256,file);
   fputc(player.setup % 256,file);
   fputc(player.leveldir_nr,file);
+  if (!version_10_file)
+  {
+    fputc(player.level_nr,file);
+    for(i=0;i<10;i++)		/* currently unused bytes */
+      fputc(0,file);
+  }
 
   fclose(file);
 }

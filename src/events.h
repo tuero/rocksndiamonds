@@ -29,7 +29,7 @@ void HandleFocusEvent(int);
 void HandleNoXEvent(void);
 
 void HandleButton(int, int, int);
-void HandleKey(KeySym);
+void HandleKey(KeySym, int);
 void HandleJoystick();
 
 #endif

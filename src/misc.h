@@ -80,7 +80,11 @@ struct AnimInfo
   int position;
 };
 
-#define NEW_RANDOMIZE	-1
+#define INIT_COUNTER		0
+#define READ_COUNTER_100	1
+#define READ_COUNTER_1000	2
+
+#define NEW_RANDOMIZE		-1
 
 void microsleep(unsigned long);
 long mainCounter(int);
@@ -91,8 +95,10 @@ void WaitCounter(long);
 void WaitCounter2(long);
 void Delay(long);
 BOOL DelayReached(long *, int);
+BOOL FrameReached(long *, int);
 unsigned long be2long(unsigned long *);
 char *int2str(int, int);
+unsigned int SimpleRND(unsigned int);
 unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *GetLoginName(void);

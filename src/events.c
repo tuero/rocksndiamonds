@@ -18,6 +18,7 @@
 #include "game.h"
 #include "editor.h"
 #include "misc.h"
+#include "tape.h"
 
 void EventLoop(void)
 {
@@ -65,12 +66,10 @@ void EventLoop(void)
     else			/* got no event, but don't be lazy... */
     {
       HandleNoXEvent();
-
-      XSync(display,FALSE);
-
-      if (game_status!=PLAYING)
-	Delay(10000);		/* don't use all CPU time when idle */
+      Delay(10000);		/* don't use all CPU time when idle */
     }
+
+    XSync(display,FALSE);
 
     if (game_status==EXITGAME)
       return;
@@ -97,7 +96,7 @@ void ClearEventQueue()
 	button_status = MB_RELEASED;
 	break;
       case KeyRelease:
-	key_status = KEY_RELEASED;
+	key_joystick_mapping = 0;
 	break;
       case FocusIn:
 	HandleFocusEvent(FOCUS_IN);
@@ -132,7 +131,7 @@ void SleepWhileUnmapped()
 	button_status = MB_RELEASED;
 	break;
       case KeyRelease:
-	key_status = KEY_RELEASED;
+	key_joystick_mapping = 0;
 	break;
       case MapNotify:
 	window_unmapped = FALSE;
@@ -190,34 +189,30 @@ void HandleMotionEvent(XMotionEvent *event)
 
 void HandleKeyEvent(XKeyEvent *event)
 {
-  static KeySym old_keycode = 0;
-  int new_keycode = event->keycode;
-  KeySym new_key = XLookupKeysym(event,event->state);
-  int new_key_status = (event->type==KeyPress ? KEY_PRESSED : KEY_RELEASED);
+  int key_status = (event->type == KeyPress ? KEY_PRESSED : KEY_RELEASED);
+  unsigned int event_state = (game_status != PLAYING ? event->state : 0);
+  KeySym key = XLookupKeysym(event, event_state);
 
-  if (game_status==PLAYING &&
-      (old_keycode!=new_keycode || key_status!=new_key_status))
-  {
-    DigField(0,0,DF_NO_PUSH);
-    SnapField(0,0);
-  }
-
-  if (event->type==KeyPress)
-  {
-    key_status = KEY_PRESSED;
-    HandleKey(new_key);
-    old_keycode = new_keycode;
-  }
-  else if (key_status==KEY_PRESSED && old_keycode==new_keycode)
-    key_status = KEY_RELEASED;
+  HandleKey(key, key_status);
 }
 
 void HandleFocusEvent(int focus_status)
 {
+  static int old_joystick_status = -1;
+
   if (focus_status==FOCUS_OUT)
+  {
     XAutoRepeatOn(display);
-  else if (game_status==PLAYING)
-    XAutoRepeatOff(display);
+    old_joystick_status = joystick_status;
+    joystick_status = JOYSTICK_OFF;
+  }
+  else
+  {
+    if (game_status == PLAYING)
+      XAutoRepeatOff(display);
+    if (old_joystick_status != -1)
+      joystick_status = old_joystick_status;
+  }
 }
 
 void HandleButton(int mx, int my, int button)
@@ -263,41 +258,128 @@ void HandleButton(int mx, int my, int button)
       HandleSetupScreen(mx,my,0,0,button);
       break;
     case PLAYING:
-      if (!LevelSolved)
-      {
-	switch(GameActions(mx,my,button))
-	{
-	  case ACT_GAME_OVER:
-	    game_status = MAINMENU;
-	    DrawMainMenu();
-	    BackToFront();
-	    break;
-	  case ACT_NEW_GAME:
-	    game_status = PLAYING;
-	    InitGame();
-	    break;
-	  case ACT_GO_ON:
-	    break;
-	  default:
-	    break;
-	}
-      }
-      BackToFront();
-      Delay(10000);
+      HandleGameActions();
       break;
     default:
       break;
   }
 }
 
-void HandleKey(KeySym key)
-{
-  static KeySym old_key = 0;
+int Gamespeed = 4;
+int Movemethod = 0;
+int Movespeed[2] = { 10, 3 };
 
-  if (!key)
-    key = old_key;
-  else
-    old_key = key;
+void HandleKey(KeySym key, int key_status)
+{
+  int joy = 0;
+
+  /* Map cursor keys to joystick directions */
+
+  switch(key)
+  {
+    case XK_Left:		/* normale Richtungen */
+#ifdef XK_KP_Left
+    case XK_KP_Left:
+#endif
+    case XK_KP_4:
+    case XK_J:
+    case XK_j:
+      joy |= JOY_LEFT;
+      break;
+    case XK_Right:
+#ifdef XK_KP_Right
+    case XK_KP_Right:
+#endif
+    case XK_KP_6:
+    case XK_K:
+    case XK_k:
+      joy |= JOY_RIGHT;
+      break;
+    case XK_Up:
+#ifdef XK_KP_Up
+    case XK_KP_Up:
+#endif
+    case XK_KP_8:
+    case XK_I:
+    case XK_i:
+      joy |= JOY_UP;
+      break;
+    case XK_Down:
+#ifdef XK_KP_Down
+    case XK_KP_Down:
+#endif
+    case XK_KP_2:
+    case XK_M:
+    case XK_m:
+      joy |= JOY_DOWN;
+      break;
+#ifdef XK_KP_Home
+    case XK_KP_Home:		/* Diagonalrichtungen */
+#endif
+    case XK_KP_7:
+      joy |= JOY_UP | JOY_LEFT;
+      break;
+#ifdef XK_KP_Page_Up
+    case XK_KP_Page_Up:
+#endif
+    case XK_KP_9:
+      joy = JOY_UP | JOY_RIGHT;
+      break;
+#ifdef XK_KP_End
+    case XK_KP_End:
+#endif
+    case XK_KP_1:
+      joy |= JOY_DOWN | JOY_LEFT;
+      break;
+#ifdef XK_KP_Page_Down
+    case XK_KP_Page_Down:
+#endif
+    case XK_KP_3:
+      joy |= JOY_DOWN | JOY_RIGHT;
+      break;
+    case XK_S:			/* Feld entfernen */
+    case XK_s:
+      joy |= JOY_BUTTON_1 | JOY_LEFT;
+      break;
+    case XK_D:
+    case XK_d:
+      joy |= JOY_BUTTON_1 | JOY_RIGHT;
+      break;
+    case XK_E:
+    case XK_e:
+      joy |= JOY_BUTTON_1 | JOY_UP;
+      break;
+    case XK_X:
+    case XK_x:
+      joy |= JOY_BUTTON_1 | JOY_DOWN;
+      break;
+    case XK_Shift_L:		/* Linker Feuerknopf */
+      joy |= JOY_BUTTON_1;
+      break;
+    case XK_Shift_R:		/* Rechter Feuerknopf */
+    case XK_B:			/* (Bombe legen) */
+    case XK_b:
+      joy |= JOY_BUTTON_2;
+      break;
+    default:
+      break;
+  }
+
+  if (joy)
+  {
+    if (key_status == KEY_PRESSED)
+      key_joystick_mapping |= joy;
+    else
+      key_joystick_mapping &= ~joy;
+
+    HandleJoystick();
+
+    if (game_status != PLAYING)
+      key_joystick_mapping = 0;
+  }
+
+  if (key_status == KEY_RELEASED)
+    return;
 
   if (key==XK_Escape && game_status!=MAINMENU)	/* quick quit to MAINMENU */
   {
@@ -319,8 +401,6 @@ void HandleKey(KeySym key)
     case CHOOSELEVEL:
     case SETUP:
     {
-      int dx = 0, dy = 0;
-
       switch(key)
       {
 	case XK_Return:
@@ -331,54 +411,8 @@ void HandleKey(KeySym key)
 	  else if (game_status==SETUP)
 	    HandleSetupScreen(0,0,0,0,MB_MENU_CHOICE);
 	  break;
-	case XK_Left:
-#ifdef XK_KP_Left
-	case XK_KP_Left:
-#endif
-	case XK_KP_4:
-	case XK_J:
-	case XK_j:
-	  dx = -1;
-	  break;
-	case XK_Right:
-#ifdef XK_KP_Right
-	case XK_KP_Right:
-#endif
-	case XK_KP_6:
-	case XK_K:
-	case XK_k:
-	  dx = 1;
-	  break;
-	case XK_Up:
-#ifdef XK_KP_Up
-	case XK_KP_Up:
-#endif
-	case XK_KP_8:
-	case XK_I:
-	case XK_i:
-	  dy = -1;
-	  break;
-	case XK_Down:
-#ifdef XK_KP_Down
-	case XK_KP_Down:
-#endif
-	case XK_KP_2:
-	case XK_M:
-	case XK_m:
-	  dy = 1;
-	  break;
 	default:
 	  break;
-      }
-
-      if (dx || dy)
-      {
-	if (game_status==MAINMENU)
-	  HandleMainMenu(0,0,dx,dy,MB_MENU_MARK);
-        else if (game_status==CHOOSELEVEL)
-          HandleChooseLevel(0,0,dx,dy,MB_MENU_MARK);
-	else if (game_status==SETUP)
-	  HandleSetupScreen(0,0,dx,dy,MB_MENU_MARK);
       }
       break;
     }
@@ -402,128 +436,89 @@ void HandleKey(KeySym key)
       break;
     case PLAYING:
     {
-      int mvx = 0, mvy = 0;
-      int sbx = 0, sby = 0;
-      int joy = 0;
-      BOOL bomb = FALSE;
-      BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
-
       switch(key)
       {
-	case XK_Left:		/* normale Richtungen */
-#ifdef XK_KP_Left
-	case XK_KP_Left:
-#endif
-	case XK_KP_4:
-	case XK_J:
-	case XK_j:
-	  mvx = -1;
-	  joy = JOY_LEFT;
+
+#ifdef DEBUG
+	case XK_0:
+	case XK_1:
+	case XK_2:
+	case XK_3:
+	case XK_4:
+	case XK_5:
+	case XK_6:
+	case XK_7:
+	case XK_8:
+	case XK_9:
+	  Movespeed[Movemethod] = (Movemethod == 0 ? 4 : 0) + (key - XK_0);
+	  printf("method == %d, speed == %d\n",
+		 Movemethod, Movespeed[Movemethod]);
 	  break;
-	case XK_Right:
-#ifdef XK_KP_Right
-	case XK_KP_Right:
-#endif
-	case XK_KP_6:
-	case XK_K:
-	case XK_k:
-	  mvx = 1;
-	  joy = JOY_RIGHT;
+
+	case XK_a:
+	  Movemethod = !Movemethod;
+	  printf("method == %d, speed == %d\n",
+		 Movemethod, Movespeed[Movemethod]);
 	  break;
-	case XK_Up:
-#ifdef XK_KP_Up
-	case XK_KP_Up:
-#endif
-	case XK_KP_8:
-	case XK_I:
-	case XK_i:
-	  mvy = -1;
-	  joy = JOY_UP;
+
+	case XK_f:
+	  Gamespeed = 2;
+	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
-	case XK_Down:
-#ifdef XK_KP_Down
-	case XK_KP_Down:
-#endif
-	case XK_KP_2:
-	case XK_M:
-	case XK_m:
-	  mvy = 1;
-	  joy = JOY_DOWN;
+	case XK_g:
+	  Gamespeed = 3;
+	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
-#ifdef XK_KP_Home
-	case XK_KP_Home:	/* Diagonalrichtungen */
-#endif
-	case XK_KP_7:
-	  mvx = -1;
-	  mvy = -1;
-	  joy = JOY_UP | JOY_LEFT;
+	case XK_h:
+	  Gamespeed = 4;
+	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
-#ifdef XK_KP_Page_Up
-	case XK_KP_Page_Up:
-#endif
-	case XK_KP_9:
-	  mvx = 1;
-	  mvy = -1;
-	  joy = JOY_UP | JOY_RIGHT;
+	case XK_l:
+	  Gamespeed = 10;
+	  printf("gamespeed == %d\n", Gamespeed);
 	  break;
-#ifdef XK_KP_End
-	case XK_KP_End:
-#endif
-	case XK_KP_1:
-	  mvx = -1;
-	  mvy = 1;
-	  joy = JOY_DOWN | JOY_LEFT;
-	  break;
-#ifdef XK_KP_Page_Down
-	case XK_KP_Page_Down:
-#endif
-	case XK_KP_3:
-	  mvx = 1;
-	  mvy = 1;
-	  joy = JOY_DOWN | JOY_RIGHT;
-	  break;
-	case XK_S:		/* Feld entfernen */
-	case XK_s:
-	  sbx = -1;
-	  joy = JOY_BUTTON_1 | JOY_LEFT;
-	  break;
-	case XK_D:
-	case XK_d:
-	  sbx = 1;
-	  joy = JOY_BUTTON_1 | JOY_RIGHT;
-	  break;
-	case XK_E:
-	case XK_e:
-	  sby = -1;
-	  joy = JOY_BUTTON_1 | JOY_UP;
-	  break;
-	case XK_X:
-	case XK_x:
-	  sby = 1;
-	  joy = JOY_BUTTON_1 | JOY_DOWN;
-	  break;
-	case XK_B:		/* Bombe legen */
-	case XK_b:
-	  bomb = TRUE;
-	  joy = JOY_BUTTON_2;
-	  break;
+
 	case XK_Q:
+	case XK_q:
 	  Dynamite = 1000;
 	  break;
+#endif
+
+	case XK_x:
+	  /*
+	  {
+	    int i,j,k, num_steps = 4, step_size = TILEX / num_steps;
+
+	    for(i=0;i<10;i++)
+	    {
+	      for(j=0;j<SCR_FIELDX;j++)
+	      {
+		for(k=0;k<num_steps;k++)
+		{
+		  int xxx = j*TILEX+k*step_size;
+
+		  XCopyArea(display,backbuffer,window,gc,
+			    REAL_SX+xxx,REAL_SY,
+			    FULL_SXSIZE-xxx,FULL_SYSIZE,
+			    REAL_SX,REAL_SY);
+		  XCopyArea(display,backbuffer,window,gc,
+			    REAL_SX,REAL_SY,
+			    xxx,FULL_SYSIZE,
+			    REAL_SX+FULL_SXSIZE-xxx,REAL_SY);
+
+		  XFlush(display);
+		  XSync(display,FALSE);
+		  Delay(120000 / num_steps);
+		}
+	      }
+	    }
+	  }
+	  */
+	  break;
+
 	default:
 	  break;
       }
-
-      if (mvx || mvy)
-	moved = MoveFigure(mvx,mvy);
-      else if (sbx || sby)
-	snapped = SnapField(sbx,sby);
-      else if (bomb)
-	bombed = PlaceBomb();
-
-      if (tape.recording && (moved || snapped || bombed))
-	TapeRecordAction(joy);
-
       break;
     }
     default:
@@ -533,7 +528,7 @@ void HandleKey(KeySym key)
 
 void HandleNoXEvent()
 {
-  if (button_status)
+  if (button_status && game_status!=PLAYING)
   {
     HandleButton(-1,-1,button_status);
     return;
@@ -550,33 +545,7 @@ void HandleNoXEvent()
       break;
     case PLAYING:
       HandleJoystick();
-      if (key_status)
-	HandleKey(0);
-      if (game_status!=PLAYING)
-	break;
-
-      if (!LevelSolved)
-      {
-	switch(GameActions(0,0,MB_NOT_PRESSED))
-	{
-	  case ACT_GAME_OVER:
-	    game_status = MAINMENU;
-	    DrawMainMenu();
-	    BackToFront();
-	    break;
-	  case ACT_NEW_GAME:
-	    game_status = PLAYING;
-	    InitGame();
-	    break;
-	  case ACT_GO_ON:
-	    break;
-	  default:
-	    break;
-	}
-      }
-
-      Delay(10000);
-
+      HandleGameActions();
       break;
     default:
       break;
@@ -585,7 +554,9 @@ void HandleNoXEvent()
 
 void HandleJoystick()
 {
-  int joy	= Joystick();
+  int joystick	= Joystick();
+  int keyboard	= key_joystick_mapping;
+  int joy	= (tape.playing ? TapePlayAction() : (joystick | keyboard));
   int left	= joy & JOY_LEFT;
   int right	= joy & JOY_RIGHT;
   int up	= joy & JOY_UP;
@@ -593,10 +564,9 @@ void HandleJoystick()
   int button	= joy & JOY_BUTTON;
   int button1	= joy & JOY_BUTTON_1;
   int button2	= joy & JOY_BUTTON_2;
-  int newbutton	= (JoystickButton()==JOY_BUTTON_NEW_PRESSED);
-
-  if (button_status || key_status)
-    return;
+  int newbutton	= (JoystickButton() == JOY_BUTTON_NEW_PRESSED);
+  int dx	= (left ? -1	: right ? 1	: 0);
+  int dy	= (up   ? -1	: down  ? 1	: 0);
 
   switch(game_status)
   {
@@ -604,20 +574,10 @@ void HandleJoystick()
     case CHOOSELEVEL:
     case SETUP:
     {
-      int dx = 0, dy = 0;
       static long joystickmove_delay = 0;
 
-      if (DelayReached(&joystickmove_delay,15) || button)
-      {
-	if (left)
-	  dx = -1;
-	else if (right)
-	  dx = 1;
-	if (up)
-	  dy = -1;
-	else if (down)
-	  dy = 1;
-      }
+      if (joystick && !button && !DelayReached(&joystickmove_delay,15))
+	break;
 
       if (game_status==MAINMENU)
 	HandleMainMenu(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
@@ -635,27 +595,15 @@ void HandleJoystick()
       break;
     case PLAYING:
     {
-      int mvx = 0, mvy = 0;
       BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
 
-      if (tape.playing)
-      {
-	joy	= TapePlayAction();
-
-	left	= joy & JOY_LEFT;
-	right	= joy & JOY_RIGHT;
-	up	= joy & JOY_UP;
-	down	= joy & JOY_DOWN;
-	button	= joy & JOY_BUTTON;
-	button1	= joy & JOY_BUTTON_1;
-	button2	= joy & JOY_BUTTON_2;
-      }
-      else if (tape.pausing)
+      if (tape.pausing)
 	joy = 0;
 
       if (!joy)
       {
-	DigField(0,0,DF_NO_PUSH);
+	DigField(0,0,0,0,DF_NO_PUSH);
+	SnapField(0,0);
 	break;
       }
 
@@ -667,22 +615,13 @@ void HandleJoystick()
 	return;
       }
 
-      if (left)
-	mvx = -1;
-      else if (right)
-	mvx = 1;
-      if (up)
-	mvy = -1;
-      else if (down)
-	mvy = 1;
-
       if (button1)
-	snapped = SnapField(mvx,mvy);
+	snapped = SnapField(dx,dy);
       else
       {
 	if (button2)
 	  bombed = PlaceBomb();
-	moved = MoveFigure(mvx,mvy);
+	moved = MoveFigure(dx,dy);
       }
 
       if (tape.recording && (moved || snapped || bombed))
@@ -692,7 +631,7 @@ void HandleJoystick()
 	TapeRecordAction(joy);
       }
       else if (tape.playing && snapped)
-	SnapField(0,0);
+	SnapField(0,0);			/* stop snapping */
 
       break;
     }
