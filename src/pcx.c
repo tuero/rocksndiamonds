@@ -154,6 +154,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     /* PCX file is too short to contain a valid PCX header */
     fclose(file);
+
     errno_pcx = PCX_FileInvalid;
     return NULL;
   }
@@ -190,6 +191,7 @@ Image *Read_PCX_to_Image(char *filename)
       width < 0 || height < 0)
   {
     free(file_buffer);
+
     errno_pcx = PCX_FileInvalid;
     return NULL;
   }
@@ -198,7 +200,7 @@ Image *Read_PCX_to_Image(char *filename)
   if (options.verbose)
   {
     printf("%s is a %dx%d PC Paintbrush image with %d bitplanes\n",
-	   filename, pcx.xmax, pcx.ymax,
+	   filename, width, height,
 	   pcx.color_planes);
     printf("depth: %d\n", pcx.bits_per_pixel);
     printf("color_planes: %d\n", pcx.color_planes);
@@ -220,6 +222,7 @@ Image *Read_PCX_to_Image(char *filename)
   {
     free(file_buffer);
     freeImage(image);
+
     errno_pcx = PCX_FileInvalid;
     return NULL;
   }

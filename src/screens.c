@@ -125,8 +125,8 @@ void DrawMainMenu()
 
   for(i=2; i<10; i++)
     DrawGraphic(0, i, GFX_KUGEL_BLAU);
-  DrawGraphic(10, 3, GFX_PFEIL_LEFT);
-  DrawGraphic(14, 3, GFX_PFEIL_RIGHT);
+  DrawGraphic(10, 3, GFX_ARROW_BLUE_LEFT);
+  DrawGraphic(14, 3, GFX_ARROW_BLUE_RIGHT);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -880,10 +880,10 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   }
 
   if (first_entry > 0)
-    DrawGraphic(0, 1, GFX_PFEIL_UP);
+    DrawGraphic(0, 1, GFX_ARROW_BLUE_UP);
 
   if (first_entry + num_page_entries < num_leveldirs)
-    DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_PFEIL_DOWN);
+    DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_ARROW_BLUE_DOWN);
 }
 
 static void drawChooseLevelInfo(int leveldir_nr)
@@ -1436,8 +1436,8 @@ void DrawSetupInputScreen()
   DrawGraphic(0, 3, GFX_KUGEL_BLAU);
   DrawGraphic(0, 4, GFX_KUGEL_BLAU);
   DrawGraphic(0, 15, GFX_KUGEL_BLAU);
-  DrawGraphic(10, 2, GFX_PFEIL_LEFT);
-  DrawGraphic(12, 2, GFX_PFEIL_RIGHT);
+  DrawGraphic(10, 2, GFX_ARROW_BLUE_LEFT);
+  DrawGraphic(12, 2, GFX_ARROW_BLUE_RIGHT);
 
   DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
@@ -1517,10 +1517,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 
   DrawText(SX+32, SY+5*32, "Actual Settings:", FS_BIG, FC_GREEN);
-  DrawGraphic(1, 6, GFX_PFEIL_LEFT);
-  DrawGraphic(1, 7, GFX_PFEIL_RIGHT);
-  DrawGraphic(1, 8, GFX_PFEIL_UP);
-  DrawGraphic(1, 9, GFX_PFEIL_DOWN);
+  DrawGraphic(1, 6, GFX_ARROW_BLUE_LEFT);
+  DrawGraphic(1, 7, GFX_ARROW_BLUE_RIGHT);
+  DrawGraphic(1, 8, GFX_ARROW_BLUE_UP);
+  DrawGraphic(1, 9, GFX_ARROW_BLUE_DOWN);
   DrawText(SX+2*32, SY+6*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+7*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+8*32, ":", FS_BIG, FC_BLUE);
@@ -2096,24 +2096,24 @@ void HandleGameActions()
 /* ---------- new screen button stuff -------------------------------------- */
 
 /* graphic position and size values for buttons and scrollbars */
-#define SC_SCROLLBUTTON_XPOS		24
+#define SC_SCROLLBUTTON_XPOS		64
 #define SC_SCROLLBUTTON_YPOS		0
-#define SC_SCROLLBAR_XPOS		24
+#define SC_SCROLLBAR_XPOS		0
 #define SC_SCROLLBAR_YPOS		64
 
-#define SC_SCROLLBUTTON_XSIZE		16
-#define SC_SCROLLBUTTON_YSIZE		16
+#define SC_SCROLLBUTTON_XSIZE		32
+#define SC_SCROLLBUTTON_YSIZE		32
 
 #define SC_SCROLL_UP_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
-#define SC_SCROLL_UP_YPOS		(3 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_UP_YPOS		SC_SCROLLBUTTON_YSIZE
 #define SC_SCROLL_DOWN_XPOS		SC_SCROLL_UP_XPOS
-#define SC_SCROLL_DOWN_YPOS		(SYSIZE - 2 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_DOWN_YPOS		(SYSIZE - SC_SCROLLBUTTON_YSIZE)
 #define SC_SCROLL_VERTICAL_XPOS		SC_SCROLL_UP_XPOS
 #define SC_SCROLL_VERTICAL_YPOS	  (SC_SCROLL_UP_YPOS + SC_SCROLLBUTTON_YSIZE)
 #define SC_SCROLL_VERTICAL_XSIZE	SC_SCROLLBUTTON_XSIZE
-#define SC_SCROLL_VERTICAL_YSIZE	(SYSIZE - 6 * SC_SCROLLBUTTON_YSIZE)
+#define SC_SCROLL_VERTICAL_YSIZE	(SYSIZE - 3 * SC_SCROLLBUTTON_YSIZE)
 
-#define SC_BORDER_SIZE			3
+#define SC_BORDER_SIZE			14
 
 static struct
 {
@@ -2124,14 +2124,14 @@ static struct
 } scrollbutton_info[NUM_SCREEN_SCROLLBUTTONS] =
 {
   {
-    SC_SCROLLBUTTON_XPOS,   SC_SCROLLBUTTON_YPOS + 0 * SC_SCROLLBUTTON_YSIZE,
-    SC_SCROLL_UP_XPOS,      SC_SCROLL_UP_YPOS,
+    SC_SCROLLBUTTON_XPOS + 0 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
+    SC_SCROLL_UP_XPOS,					SC_SCROLL_UP_YPOS,
     SCREEN_CTRL_ID_SCROLL_UP,
     "scroll level series up"
   },
   {
-    SC_SCROLLBUTTON_XPOS,   SC_SCROLLBUTTON_YPOS + 1 * SC_SCROLLBUTTON_YSIZE,
-    SC_SCROLL_DOWN_XPOS,    SC_SCROLL_DOWN_YPOS,
+    SC_SCROLLBUTTON_XPOS + 1 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
+    SC_SCROLL_DOWN_XPOS,				SC_SCROLL_DOWN_YPOS,
     SCREEN_CTRL_ID_SCROLL_DOWN,
     "scroll level series down"
   }
@@ -2159,7 +2159,7 @@ static struct
 
 static void CreateScreenScrollbuttons()
 {
-  Pixmap gd_pixmap = pix[PIX_DOOR];
+  Pixmap gd_pixmap = pix[PIX_MORE];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
@@ -2179,10 +2179,10 @@ static void CreateScreenScrollbuttons()
     y += SY;
     width = SC_SCROLLBUTTON_XSIZE;
     height = SC_SCROLLBUTTON_YSIZE;
-    gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[i].xpos;
-    gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[i].ypos;
-    gd_x2 = gd_x1 - SC_SCROLLBUTTON_XSIZE;
-    gd_y2 = gd_y1;
+    gd_x1 = scrollbutton_info[i].xpos;
+    gd_y1 = scrollbutton_info[i].ypos;
+    gd_x2 = gd_x1;
+    gd_y2 = gd_y1 + SC_SCROLLBUTTON_YSIZE;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2213,7 +2213,7 @@ static void CreateScreenScrollbars()
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
-    Pixmap gd_pixmap = pix[PIX_DOOR];
+    Pixmap gd_pixmap = pix[PIX_MORE];
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -2231,11 +2231,10 @@ static void CreateScreenScrollbars()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
-    gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].xpos;
-    gd_x2 = (gd_x1 - (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL ?
-		      scrollbar_info[i].height : scrollbar_info[i].width));
-    gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
-    gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
+    gd_x1 = scrollbar_info[i].xpos;
+    gd_x2 = gd_x1 + scrollbar_info[i].width;
+    gd_y1 = scrollbar_info[i].ypos;
+    gd_y2 = scrollbar_info[i].ypos;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,

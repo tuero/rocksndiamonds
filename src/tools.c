@@ -801,6 +801,13 @@ void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
     *x = (graphic % DC_PER_LINE) * TILEX;
     *y = (graphic / DC_PER_LINE) * TILEY;
   }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    *pixmap_nr = PIX_MORE;
+    *x = (graphic % MORE_PER_LINE) * TILEX;
+    *y = (graphic / MORE_PER_LINE) * TILEY;
+  }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;

@@ -476,6 +476,7 @@ void InitGfx()
     { "Toons",	TRUE },
     { "SP",	TRUE },
     { "DC",	TRUE },
+    { "More",	TRUE },
     { "Font",	FALSE },
     { "Font2",	FALSE },
     { "Font3",	FALSE }
@@ -489,6 +490,7 @@ void InitGfx()
     { "RocksToons",	TRUE },
     { "RocksSP",	TRUE },
     { "RocksDC",	TRUE },
+    { "RocksMore",	TRUE },
     { "RocksFont",	FALSE },
     { "RocksFont2",	FALSE },
     { "RocksFont3",	FALSE }

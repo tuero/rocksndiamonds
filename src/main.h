@@ -200,16 +200,17 @@ typedef unsigned char byte;
 #define PIX_TOONS		3
 #define PIX_SP			4
 #define PIX_DC			5
-#define	PIX_BIGFONT		6
-#define PIX_SMALLFONT		7
-#define PIX_MEDIUMFONT		8
+#define PIX_MORE		6
+#define	PIX_BIGFONT		7
+#define PIX_SMALLFONT		8
+#define PIX_MEDIUMFONT		9
 /* Pixmaps without graphic file */
-#define PIX_DB_BACK		9
-#define PIX_DB_DOOR		10
-#define PIX_DB_FIELD		11
+#define PIX_DB_BACK		10
+#define PIX_DB_DOOR		11
+#define PIX_DB_FIELD		12
 
-#define NUM_PICTURES		9
-#define NUM_PIXMAPS		11
+#define NUM_PICTURES		10
+#define NUM_PIXMAPS		13
 
 /* boundaries of arrays etc. */
 #define MAX_PLAYER_NAME_LEN	10
@@ -608,6 +609,14 @@ extern char		*element_info[];
 #define MINI_DC_PER_LINE	16
 #define MICRO_DC_PER_LINE	16
 
+#define MINI_MORE_STARTX	256
+#define MINI_MORE_STARTY	256
+#define MICRO_MORE_STARTX	384
+#define MICRO_MORE_STARTY	384
+#define MORE_PER_LINE		16
+#define MINI_MORE_PER_LINE	16
+#define MICRO_MORE_PER_LINE	16
+
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
@@ -994,6 +1003,7 @@ extern char		*element_info[];
 **	512 -  767: graphics from "RocksHeroes"
 **	768 - 1023: graphics from "RocksSP"
 **     1024 - 1279: graphics from "RocksDC"
+**     1280 - 1535: graphics from "RocksMore"
 */
 
 #define GFX_START_ROCKSSCREEN	0
@@ -1006,8 +1016,10 @@ extern char		*element_info[];
 #define GFX_END_ROCKSSP		1023
 #define GFX_START_ROCKSDC	1024
 #define GFX_END_ROCKSDC		1279
+#define GFX_START_ROCKSMORE	1280
+#define GFX_END_ROCKSMORE	1535
 
-#define NUM_TILES		1280
+#define NUM_TILES		1536
 
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
@@ -1404,6 +1416,18 @@ extern char		*element_info[];
 #define GFX_EMC_WALL_6		(GFX_START_ROCKSDC +  2 * DC_PER_LINE + 14)
 #define GFX_EMC_WALL_7		(GFX_START_ROCKSDC +  2 * DC_PER_LINE + 15)
 #define GFX_EMC_WALL_8		(GFX_START_ROCKSDC +  1 * DC_PER_LINE + 14)
+
+/* graphics from "RocksMore" */
+#define GFX_ARROW_BLUE_LEFT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  0)
+#define GFX_ARROW_BLUE_RIGHT	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  1)
+#define GFX_ARROW_BLUE_UP	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  2)
+#define GFX_ARROW_BLUE_DOWN	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  3)
+#define GFX_ARROW_RED_LEFT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  0)
+#define GFX_ARROW_RED_RIGHT	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  1)
+#define GFX_ARROW_RED_UP	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  2)
+#define GFX_ARROW_RED_DOWN	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  3)
+#define GFX_SCROLLBAR_BLUE	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  0)
+#define GFX_SCROLLBAR_RED	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  1)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
