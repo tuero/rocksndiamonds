@@ -83,7 +83,8 @@ struct ConfigInfo sound_config[] =
   { "[sokoban].emptying",		UNDEFINED_FILENAME	},
 
   /* sounds for Emerald Mine style elements and actions */
-  { "empty_space.digging",		"empty.wav"		},
+  { "[player].moving",			"empty.wav"		},
+  { "[player].moving.mode_loop",	"false"			},
   { "sand.digging",			"schlurf.wav"		},
   { "emerald.collecting",		"pong.wav"		},
   { "emerald.impact",			"pling.wav"		},

@@ -6380,7 +6380,13 @@ int DigField(struct PlayerInfo *player,
 
   switch (element)
   {
+#if 0
     case EL_EMPTY:
+      PlaySoundLevelElementAction(x, y, player->element_nr, ACTION_MOVING);
+      break;
+#endif
+
+#if 0
     case EL_SAND:
     case EL_INVISIBLE_SAND:
     case EL_INVISIBLE_SAND_ACTIVE:
@@ -6389,15 +6395,16 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BUGGY_BASE:
     case EL_SP_BUGGY_BASE_ACTIVATING:
       RemoveField(x, y);
-#if 1
+
       if (mode != DF_SNAP && element != EL_EMPTY)
       {
 	GfxElement[x][y] = (CAN_BE_CRUMBLED(element) ? EL_SAND : element);
 	player->is_digging = TRUE;
       }
-#endif
+
       PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
       break;
+#endif
 
     case EL_EMERALD:
     case EL_BD_DIAMOND:
@@ -6409,13 +6416,13 @@ int DigField(struct PlayerInfo *player,
     case EL_PEARL:
     case EL_CRYSTAL:
       RemoveField(x, y);
-#if 1
+
       if (mode != DF_SNAP)
       {
 	GfxElement[x][y] = element;
 	player->is_collecting = TRUE;
       }
-#endif
+
       local_player->gems_still_needed -= (element == EL_DIAMOND ? 3 :
 					  element == EL_PEARL ? 5 :
 					  element == EL_CRYSTAL ? 8 : 1);
@@ -6439,6 +6446,7 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
+#if 0
     case EL_ENVELOPE:
       Feld[x][y] = EL_EMPTY;
 #if 1
@@ -6448,6 +6456,7 @@ int DigField(struct PlayerInfo *player,
 #endif
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
+#endif
 
     case EL_EXTRA_TIME:
       RemoveField(x, y);
@@ -6941,8 +6950,10 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
+#if 0
     case EL_SOKOBAN_FIELD_EMPTY:
       break;
+#endif
 
     case EL_SOKOBAN_OBJECT:
     case EL_SOKOBAN_FIELD_FULL:
@@ -7053,19 +7064,20 @@ int DigField(struct PlayerInfo *player,
 
       if (IS_WALKABLE(element))
       {
+	PlaySoundLevelElementAction(x, y, player->element_nr, ACTION_MOVING);
 	break;
       }
       else if (IS_DIGGABLE(element))
       {
 	RemoveField(x, y);
-#if 1
+
 	if (mode != DF_SNAP)
 	{
 	  GfxElement[x][y] =
 	    (CAN_BE_CRUMBLED(element) ? EL_SAND : GFX_ELEMENT(element));
 	  player->is_digging = TRUE;
 	}
-#endif
+
 	PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
 
 	break;
@@ -7073,13 +7085,13 @@ int DigField(struct PlayerInfo *player,
       else if (IS_COLLECTIBLE(element))
       {
 	RemoveField(x, y);
-#if 1
+
 	if (mode != DF_SNAP)
 	{
 	  GfxElement[x][y] = element;
 	  player->is_collecting = TRUE;
 	}
-#endif
+
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
