@@ -1,5 +1,7 @@
 2004-01-18
 	* custom elements can change (limited) or leave (unlimited) elements
+	* finally added multiple matches using group elements
+	* added shortcut to dump brush (type ":DB" in editor) for use in forum
 
 2004-01-17
 	* added new start movement type "previous" for continued CE movement
