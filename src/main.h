@@ -1510,7 +1510,7 @@ extern int		num_element_info;
 #define SETUPINPUT		9
 #define CALIBRATION		10
 
-#define PROGRAM_VERSION_STRING	"1.5.0"
+#define PROGRAM_VERSION_STRING	"2.0.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2000 by"

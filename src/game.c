@@ -985,11 +985,10 @@ void GameWon()
     SaveLevelSetup_SeriesInfo();
   }
 
-  if (!level_editor_test_game)
-  {
-    if (level_nr < leveldir_current->last_level)
-      raise_level = TRUE;
-  }
+  if (level_editor_test_game)
+    local_player->score = -1;	/* no highscore when playing from editor */
+  else if (level_nr < leveldir_current->last_level)
+    raise_level = TRUE;		/* advance to next level */
 
   if ((hi_pos = NewHiScore()) >= 0) 
   {
