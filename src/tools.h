@@ -63,6 +63,8 @@ void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();
 void FadeToFront();
 void ClearWindow();
+void SetMainBackgroundImage(int);
+void SetDoorBackgroundImage(int);
 void DrawBackground(int, int, int, int);
 
 void MarkTileDirty(int, int);

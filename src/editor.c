@@ -2650,7 +2650,7 @@ static void PickDrawingElement(int button, int element)
 
 static void DrawDrawingWindow()
 {
-  SetMainBackgroundBitmap(NULL);
+  SetMainBackgroundImage(IMG_NONE);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
@@ -2710,7 +2710,7 @@ static void DrawLevelInfoWindow()
   int font_color = FC_GREEN;
   int i, x, y;
 
-  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR_SETTINGS_LEVEL);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
@@ -2943,7 +2943,7 @@ static void DrawPropertiesWindow()
     { -1, NULL, NULL }
   };
 
-  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR_SETTINGS_ELEMENT);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 

@@ -362,13 +362,25 @@ void FadeToFront()
   BackToFront();
 }
 
+void SetMainBackgroundImage(int graphic)
+{
+  SetMainBackgroundBitmap(graphic == IMG_NONE ? NULL :
+			  new_graphic_info[graphic].bitmap ?
+			  new_graphic_info[graphic].bitmap :
+			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+}
+
+void SetDoorBackgroundImage(int graphic)
+{
+  SetDoorBackgroundBitmap(graphic == IMG_NONE ? NULL :
+			  new_graphic_info[graphic].bitmap ?
+			  new_graphic_info[graphic].bitmap :
+			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+}
+
 void DrawBackground(int dest_x, int dest_y, int width, int height)
 {
-  if (DrawingOnBackground(dest_x, dest_y) && game_status != PLAYING)
-    BlitBitmap(gfx.background_bitmap, backbuffer, dest_x, dest_y,
-	       width, height, dest_x, dest_y);
-  else
-    ClearRectangle(backbuffer, dest_x, dest_y, width, height);
+  ClearRectangleOnBackground(backbuffer, dest_x, dest_y, width, height);
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -1754,6 +1766,7 @@ void DrawLevel()
 {
   int x,y;
 
+  SetDrawBackgroundMask(REDRAW_NONE);
   ClearWindow();
 
   for(x=BX1; x<=BX2; x++)

@@ -220,10 +220,8 @@ static void ReinitializeGraphics()
 	       new_graphic_info[IMG_FONT_SMALL].bitmap,
 	       new_graphic_info[IMG_FONT_EM].bitmap);
 
-  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
-  SetDoorBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DOOR].bitmap ?
-			  new_graphic_info[IMG_BACKGROUND_DOOR].bitmap :
-			  new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+  SetMainBackgroundImage(IMG_BACKGROUND_DEFAULT);
+  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
 
   InitGadgets();
   InitToons();

@@ -201,7 +201,7 @@ void DrawMainMenu()
   GetPlayerConfig();
   LoadLevel(level_nr);
 
-  SetMainBackgroundBitmap(new_graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+  SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
   ClearWindow();
 
   DrawHeadline();
@@ -1008,6 +1008,7 @@ void DrawHelpScreenElText(int start)
   int xstart = SX + 56, ystart = SY + 65 + 2 * 32, ystep = TILEY + 4;
   int ybottom = SYSIZE - 20;
 
+  SetMainBackgroundImage(IMG_BACKGROUND_INFO);
   ClearWindow();
   DrawHeadline();
 
@@ -1131,6 +1132,7 @@ void DrawHelpScreen()
     helpscreen_step[i] = helpscreen_frame[i] = 0;
   helpscreen_musicpos = 0;
   helpscreen_state = 0;
+
   DrawHelpScreenElText(0);
   DrawHelpScreenElAction(0);
 
@@ -1262,6 +1264,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   CloseDoor(DOOR_CLOSE_2);
 
   ClearWindow();
+
   HandleChooseTree(0,0, 0,0, MB_MENU_INITIALIZE, ti_ptr);
   MapChooseTreeGadgets(*ti_ptr);
 
@@ -1576,6 +1579,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 void DrawChooseLevel()
 {
+  SetMainBackgroundImage(IMG_BACKGROUND_LEVEL_SERIES);
+
   DrawChooseTree(&leveldir_current);
 }
 
@@ -1603,7 +1608,9 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
 {
   int i;
 
+  SetMainBackgroundImage(IMG_BACKGROUND_HALL_OF_FAME);
   ClearWindow();
+
   DrawText(SX + 80, SY + 8, "Hall Of Fame", FS_BIG, FC_YELLOW);
   DrawTextFCentered(46, FC_RED, "HighScores of Level %d", level_nr);
 
@@ -2008,6 +2015,7 @@ static void DrawSetupScreen_Generic()
 
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
+
   ClearWindow();
 
   if (setup_mode == SETUP_MODE_MAIN)
@@ -2184,6 +2192,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 void DrawSetupScreen_Input()
 {
   ClearWindow();
+
   DrawText(SX+16, SY+16, "Setup Input", FS_BIG, FC_YELLOW);
 
   initCursor(0, IMG_BALL_BLUE);
@@ -2752,6 +2761,8 @@ void CalibrateJoystick(int player_nr)
 void DrawSetupScreen()
 {
   DeactivateJoystick();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_SETUP);
 
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();

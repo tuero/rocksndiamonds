@@ -292,9 +292,8 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
       else if (mask_mode == FONT_MASKED)
       {
 	/* clear font character background */
-	BlitBitmap(gfx.background_bitmap, bitmap,
-		   dest_x - gfx.real_sx, dest_y - gfx.real_sy,
-		   font_width, font_height, dest_x, dest_y);
+	ClearRectangleOnBackground(bitmap, dest_x, dest_y,
+				   font_width, font_height);
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 	/* use special font tile clipmasks, if available */

@@ -510,8 +510,7 @@ inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
 				       int width, int height)
 {
   if (DrawingOnBackground(x, y))
-    BlitBitmap(gfx.background_bitmap, bitmap,
-	       x - gfx.real_sx, y - gfx.real_sy, width, height, x, y);
+    BlitBitmap(gfx.background_bitmap, bitmap, x, y, width, height, x, y);
   else
     ClearRectangle(bitmap, x, y, width, height);
 }

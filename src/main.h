@@ -30,6 +30,7 @@
 #include "conf_gfx.h"
 #include "conf_snd.h"
 
+#define IMG_NONE		(-1)
 #define IMG_EMPTY		IMG_EMPTY_SPACE
 #define IMG_SP_EMPTY		IMG_SP_EMPTY_SPACE
 #define IMG_CHAR_START		IMG_CHAR_SPACE

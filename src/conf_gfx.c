@@ -2595,6 +2595,13 @@ struct ConfigInfo image_config[] =
 
   { "background.default",			UNDEFINED_FILENAME	},
   { "background.door",				UNDEFINED_FILENAME	},
+  { "background.main",				UNDEFINED_FILENAME	},
+  { "background.level_series",			UNDEFINED_FILENAME	},
+  { "background.hall_of_fame",			UNDEFINED_FILENAME	},
+  { "background.editor_settings_level",		UNDEFINED_FILENAME	},
+  { "background.editor_settings_element",	UNDEFINED_FILENAME	},
+  { "background.info",				UNDEFINED_FILENAME	},
+  { "background.setup",				UNDEFINED_FILENAME	},
 
   { "info.font_em_1",				"RocksFontEM.pcx"	},
   { "info.font_em_1.xpos",			"0"			},
