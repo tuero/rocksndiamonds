@@ -2859,11 +2859,12 @@ static struct MusicFileInfo *get_music_file_info(char *basename)
   }
   token_to_value_ptr[] =
   {
-    { "title",	&tmp_music_file_info.title	},
-    { "artist",	&tmp_music_file_info.artist	},
-    { "album",	&tmp_music_file_info.album	},
-    { "year",	&tmp_music_file_info.year	},
-    { NULL,	NULL				},
+    { "context",	&tmp_music_file_info.context	},
+    { "title",		&tmp_music_file_info.title	},
+    { "artist",		&tmp_music_file_info.artist	},
+    { "album",		&tmp_music_file_info.album	},
+    { "year",		&tmp_music_file_info.year	},
+    { NULL,		NULL				},
   };
   int i;
 
@@ -2914,8 +2915,7 @@ static struct MusicFileInfo *get_music_file_info(char *basename)
   {
     char *value = getHashEntry(setup_file_hash, token_to_value_ptr[i].token);
 
-    if (value != NULL)
-      *token_to_value_ptr[i].value_ptr = getStringCopy(value);
+    *token_to_value_ptr[i].value_ptr = getStringCopy(value);  /* may be NULL */
   }
 
   new_music_file_info = checked_calloc(sizeof(struct MusicFileInfo));
@@ -3016,5 +3016,205 @@ void LoadMusicInfo()
   /* TEST-ONLY */
   for (next = music_file_info; next != NULL; next = next->next)
     printf("::: title == '%s'\n", next->title);
+#endif
+}
+
+void add_info_animation(int element, int action, int direction, int delay,
+			int *num_list_entries)
+{
+  struct InfoAnimationInfo *new_list_entry;
+  (*num_list_entries)++;
+
+  info_animation_info =
+    checked_realloc(info_animation_info,
+		    *num_list_entries * sizeof(struct InfoAnimationInfo));
+  new_list_entry = &info_animation_info[*num_list_entries - 1];
+
+  new_list_entry->element = element;
+  new_list_entry->action = action;
+  new_list_entry->direction = direction;
+  new_list_entry->delay = delay;
+}
+
+void print_unknown_token(char *filename, char *token, int token_nr)
+{
+  if (token_nr == 0)
+  {
+    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
+    Error(ERR_RETURN, "- config file: '%s'", filename);
+  }
+
+  Error(ERR_RETURN, "- token: '%s'", token);
+}
+
+void print_unknown_token_end(int token_nr)
+{
+  if (token_nr > 0)
+    Error(ERR_RETURN_LINE, "-");
+}
+
+void LoadInfoAnimations()
+{
+  char *filename = getElementInfoFilename();
+  SetupFileList *setup_file_list, *list;
+  SetupFileHash *element_hash, *action_hash, *direction_hash;
+  int num_list_entries = 0;
+  int num_unknown_tokens = 0;
+  int i;
+
+  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+    return;
+
+  element_hash   = newSetupFileHash();
+  action_hash    = newSetupFileHash();
+  direction_hash = newSetupFileHash();
+
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    setHashEntry(element_hash, element_info[i].token_name, itoa(i));
+
+  for (i=0; i < NUM_ACTIONS; i++)
+    setHashEntry(action_hash, element_action_info[i].suffix,
+		 itoa(element_action_info[i].value));
+
+  for (i=0; i < NUM_DIRECTIONS; i++)
+    setHashEntry(direction_hash, element_direction_info[i].suffix,
+		 itoa(element_direction_info[i].value));
+
+  for (list = setup_file_list; list != NULL; list = list->next)
+  {
+    char *element_token, *action_token, *direction_token;
+    char *element_value, *action_value, *direction_value;
+    int delay = atoi(list->value);
+
+    if (strcmp(list->token, "end") == 0)
+    {
+      add_info_animation(-1, -1, -1, -1, &num_list_entries);
+
+      continue;
+    }
+
+    element_token = list->token;
+    element_value = getHashEntry(element_hash, element_token);
+
+    if (element_value != NULL)
+    {
+      /* element found */
+      add_info_animation(atoi(element_value), -1, -1,
+			 delay, &num_list_entries);
+
+      continue;
+    }
+
+    if (strchr(element_token, '.') == NULL)
+    {
+      /* no further suffixes found -- this is not an element */
+      print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+      continue;
+    }
+
+    action_token = strchr(element_token, '.');
+    element_token = getStringCopy(element_token);
+    *strchr(element_token, '.') = '\0';
+
+    element_value = getHashEntry(element_hash, element_token);
+
+    if (element_value == NULL)
+    {
+      /* this is not an element */
+      print_unknown_token(filename, list->token, num_unknown_tokens++);
+      free(element_token);
+
+      continue;
+    }
+
+    action_value = getHashEntry(action_hash, action_token);
+
+    if (action_value != NULL)
+    {
+      /* action found */
+      add_info_animation(atoi(element_value), atoi(action_value), -1,
+			 delay, &num_list_entries);
+      free(element_token);
+
+      continue;
+    }
+
+    direction_token = action_token;
+    direction_value = getHashEntry(direction_hash, direction_token);
+
+    if (direction_value != NULL)
+    {
+      /* direction found */
+      add_info_animation(atoi(element_value), -1, atoi(direction_value),
+			 delay, &num_list_entries);
+      free(element_token);
+
+      continue;
+    }
+
+    if (strchr(action_token + 1, '.') == NULL)
+    {
+      /* no further suffixes found -- this is not an action or direction */
+      print_unknown_token(filename, list->token, num_unknown_tokens++);
+      free(element_token);
+
+      continue;
+    }
+
+    direction_token = strchr(action_token + 1, '.');
+    action_token = getStringCopy(action_token);
+    *strchr(action_token + 1, '.') = '\0';
+
+    action_value = getHashEntry(action_hash, action_token);
+
+    if (action_value == NULL)
+    {
+      /* this is not an action */
+      print_unknown_token(filename, list->token, num_unknown_tokens++);
+      free(element_token);
+      free(action_token);
+
+      continue;
+    }
+
+    direction_value = getHashEntry(direction_hash, direction_token);
+
+    if (direction_value != NULL)
+    {
+      /* direction found */
+      add_info_animation(atoi(element_value), atoi(action_value),
+			 atoi(direction_value),
+			 delay, &num_list_entries);
+      free(element_token);
+      free(action_token);
+
+      continue;
+    }
+
+    print_unknown_token(filename, list->token, num_unknown_tokens++);
+
+    free(element_token);
+    free(action_token);
+  }
+
+  print_unknown_token_end(num_unknown_tokens);
+
+  add_info_animation(-999, -999, -999, -999, &num_list_entries);
+
+  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(element_hash);
+  freeSetupFileHash(action_hash);
+  freeSetupFileHash(direction_hash);
+
+#if 0
+  /* TEST ONLY */
+  for (i=0; i < num_list_entries; i++)
+    printf("::: %d, %d, %d => %d\n",
+	   info_animation_info[i].element,
+	   info_animation_info[i].action,
+	   info_animation_info[i].direction,
+	   info_animation_info[i].delay);
 #endif
 }

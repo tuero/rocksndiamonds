@@ -417,6 +417,18 @@ char *getEditorSetupFilename()
   return filename;
 }
 
+char *getElementInfoFilename()
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(getCurrentLevelDir(), ELEMENTINFO_FILENAME);
+
+  return filename;
+}
+
 static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;

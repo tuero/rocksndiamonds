@@ -105,6 +105,7 @@ struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
+struct InfoAnimationInfo *info_animation_info = NULL;
 
 
 /* ------------------------------------------------------------------------- */
@@ -3476,12 +3477,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "nut_breaking",
+    "nut.breaking",
     "-",
     "-"
   },
   {
-    "diamond_breaking",
+    "diamond.breaking",
     "-",
     "-"
   },
@@ -3496,12 +3497,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "amoeba_growing",
+    "amoeba.growing",
     "-",
     "-"
   },
   {
-    "amoeba_shrinking",
+    "amoeba.shrinking",
     "-",
     "-"
   },
@@ -3638,6 +3639,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "shield_deadly.active",
     "-",
+    "-"
+  },
+  {
+    "amoeba",
+    "amoeba",
     "-"
   },
   {

@@ -516,6 +516,7 @@ static long helpscreen_state;
 static int helpscreen_step[MAX_HELPSCREEN_ELS];
 static int helpscreen_frame[MAX_HELPSCREEN_ELS];
 
+#if 0
 static int helpscreen_action[] =
 {
   IMG_PLAYER_1_MOVING_DOWN,		16,
@@ -725,6 +726,8 @@ static int helpscreen_action[] =
 
   HA_END
 };
+#endif
+
 static char *helpscreen_eltext[][2] =
 {
  {"THE HERO:",				"(Is _this_ guy good old Rockford?)"},
@@ -792,6 +795,7 @@ static char *helpscreen_eltext[][2] =
 };
 static int num_helpscreen_els = sizeof(helpscreen_eltext) / (2*sizeof(char *));
 
+#if 0
 static char *helpscreen_music[][3] =
 {
   { "Alchemy",			"Ian Boddy",		"Drive" },
@@ -802,73 +806,98 @@ static char *helpscreen_music[][3] =
   { "Voyager",			"The Alan Parsons Project","Pyramid" },
   { "Twilight Painter",		"Tangerine Dream",	"Heartbreakers" }
 };
+#endif
+
 static int num_helpscreen_music = 7;
 static int helpscreen_musicpos;
 
-#if 0
-void OLD_DrawHelpScreenElAction(int start)
+#if 1
+void DrawHelpScreenElAction(int start)
 {
   int i = 0, j = 0;
-  int frame, graphic;
-  int xstart = SX+16, ystart = SY+64+2*32, ystep = TILEY+4;
+  int xstart = mSX + 16;
+  int ystart = mSY + 64 + 2 * 32;
+  int ystep = TILEY + 4;
+  int element, action, direction;
+  int graphic;
+  int delay;
+  int sync_frame;
 
-  while(helpscreen_action[j] != HA_END)
+  while (info_animation_info[j].element != -999)
   {
-    if (i>=start+MAX_HELPSCREEN_ELS || i>=num_helpscreen_els)
+    if (i >= start + MAX_HELPSCREEN_ELS || i >= num_helpscreen_els)
       break;
-    else if (i<start || helpscreen_delay[i-start])
+    else if (i < start)
     {
-      if (i>=start && helpscreen_delay[i-start])
-	helpscreen_delay[i-start]--;
-
-      while(helpscreen_action[j] != HA_NEXT)
+      while (info_animation_info[j].element != -1)
 	j++;
+
       j++;
       i++;
+
       continue;
     }
 
-    j += 3*helpscreen_step[i-start];
-    graphic = helpscreen_action[j++];
+    j += helpscreen_step[i - start];
 
-    if (helpscreen_frame[i-start])
+    element = info_animation_info[j].element;
+    action = info_animation_info[j].action;
+    direction = info_animation_info[j].direction;
+
+    if (action != -1 && direction != -1)
+      graphic = el_act_dir2img(element, action, direction);
+    else if (action != -1)
+      graphic = el_act2img(element, action);
+    else if (direction != -1)
+      graphic = el_act2img(element, direction);
+    else
+      graphic = el2img(element);
+
+    delay = info_animation_info[j++].delay;
+
+    if (delay == -1)
+      delay = 1000000;
+
+    if (helpscreen_frame[i - start] == 0)
     {
-      frame = helpscreen_action[j++] - helpscreen_frame[i-start];
-      helpscreen_frame[i-start]--;
+      sync_frame = 0;
+      helpscreen_frame[i - start] = delay - 1;
     }
     else
     {
-      frame = 0;
-      helpscreen_frame[i-start] = helpscreen_action[j++]-1;
+      sync_frame = delay - helpscreen_frame[i - start];
+      helpscreen_frame[i - start]--;
     }
 
-    helpscreen_delay[i-start] = helpscreen_action[j++] - 1;
-
-    if (helpscreen_action[j] == HA_NEXT)
+    if (info_animation_info[j].element == -1)
     {
-      if (!helpscreen_frame[i-start])
-	helpscreen_step[i-start] = 0;
+      if (!helpscreen_frame[i - start])
+	helpscreen_step[i - start] = 0;
     }
     else
     {
-      if (!helpscreen_frame[i-start])
-	helpscreen_step[i-start]++;
-      while(helpscreen_action[j] != HA_NEXT)
+      if (!helpscreen_frame[i - start])
+	helpscreen_step[i - start]++;
+      while(info_animation_info[j].element != -1)
 	j++;
     }
+
     j++;
 
-    DrawOldGraphicExt(drawto, xstart, ystart+(i-start)*ystep, graphic+frame);
+    ClearRectangleOnBackground(drawto, xstart, ystart + (i - start) * ystep,
+			       TILEX, TILEY);
+    DrawGraphicAnimationExt(drawto, xstart, ystart + (i - start) * ystep,
+			    graphic, sync_frame, USE_MASKING);
+
     i++;
   }
 
-  for(i=2;i<16;i++)
-  {
-    MarkTileDirty(0,i);
-    MarkTileDirty(1,i);
-  }
+  redraw_mask |= REDRAW_FIELD;
+
+  FrameCounter++;
 }
-#endif
+
+#else
 
 void DrawHelpScreenElAction(int start)
 {
@@ -953,6 +982,7 @@ void DrawHelpScreenElAction(int start)
 
   FrameCounter++;
 }
+#endif
 
 void DrawHelpScreenElText(int start)
 {
@@ -1095,7 +1125,13 @@ void DrawHelpScreen()
   helpscreen_musicpos = 0;
   helpscreen_state = 0;
 
+  LoadInfoAnimations();
   LoadMusicInfo();
+
+  num_helpscreen_els = 0;
+  for (i=0; info_animation_info[i].element != -999; i++)
+    if (info_animation_info[i].element == -1)
+      num_helpscreen_els++;
 
   num_helpscreen_music = 0;
   for (list = music_file_info; list != NULL; list = list->next)

@@ -882,12 +882,13 @@
 #define EL_DYNABOMB_PLAYER_4			(EL_FIRST_DUMMY + 17)
 #define EL_SHIELD_NORMAL_ACTIVE			(EL_FIRST_DUMMY + 18)
 #define EL_SHIELD_DEADLY_ACTIVE			(EL_FIRST_DUMMY + 19)
-#define EL_DEFAULT				(EL_FIRST_DUMMY + 20)
-#define EL_BD_DEFAULT				(EL_FIRST_DUMMY + 21)
-#define EL_SP_DEFAULT				(EL_FIRST_DUMMY + 22)
-#define EL_SB_DEFAULT				(EL_FIRST_DUMMY + 23)
+#define EL_AMOEBA				(EL_FIRST_DUMMY + 20)
+#define EL_DEFAULT				(EL_FIRST_DUMMY + 21)
+#define EL_BD_DEFAULT				(EL_FIRST_DUMMY + 22)
+#define EL_SP_DEFAULT				(EL_FIRST_DUMMY + 23)
+#define EL_SB_DEFAULT				(EL_FIRST_DUMMY + 24)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 24)
+#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 25)
 
 
 /* values for graphics/sounds action types */
@@ -1514,6 +1515,15 @@ struct SpecialSuffixInfo
   int value;
 };
 
+struct InfoAnimationInfo
+{
+  int element;
+  int action;
+  int direction;
+
+  int delay;
+};
+
 
 #if 0
 extern GC			tile_clip_gc;
@@ -1608,6 +1618,7 @@ extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct MusicInfo	       *music_info;
 extern struct MusicFileInfo    *music_file_info;
+extern struct InfoAnimationInfo *info_animation_info;
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];

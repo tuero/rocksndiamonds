@@ -1934,7 +1934,7 @@ void LoadCustomMusic_NoConf(void)
     if (music_already_used)
       continue;
 
-#if 1
+#if 0
     if (FileIsSound(basename) || FileIsMusic(basename))
       printf("DEBUG: loading music '%s' ...\n", basename);
 #endif

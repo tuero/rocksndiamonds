@@ -886,7 +886,15 @@ element_to_graphic[] =
     IMG_AMOEBA_GROWING
   },
   {
+    EL_AMOEBA,				ACTION_GROWING, -1, FALSE,
+    IMG_AMOEBA_GROWING
+  },
+  {
     EL_AMOEBA_SHRINKING,		-1, -1, FALSE,
+    IMG_AMOEBA_SHRINKING
+  },
+  {
+    EL_AMOEBA,				ACTION_SHRINKING, -1, FALSE,
     IMG_AMOEBA_SHRINKING
   },
   {
@@ -895,6 +903,10 @@ element_to_graphic[] =
   },
   {
     EL_AMOEBA_DROPPING,			-1, -1, FALSE,
+    IMG_AMOEBA_DROPPING
+  },
+  {
+    EL_AMOEBA,				ACTION_DROPPING, -1, FALSE,
     IMG_AMOEBA_DROPPING
   },
   {
