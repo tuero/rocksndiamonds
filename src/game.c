@@ -679,7 +679,7 @@ static void InitField(int x, int y, boolean init_game)
 
     case EL_PIG:
     case EL_DRAGON:
-      MovDir[x][y] = 1 << RND(4);
+      GfxDir[x][y] = MovDir[x][y] = 1 << RND(4);
       break;
 
 #if 0
@@ -1150,9 +1150,10 @@ void InitGame()
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
       GfxFrame[x][y] = 0;
-      GfxAction[x][y] = ACTION_DEFAULT;
       GfxRandom[x][y] = INIT_GFX_RANDOM();
       GfxElement[x][y] = EL_UNDEFINED;
+      GfxAction[x][y] = ACTION_DEFAULT;
+      GfxDir[x][y] = MV_NO_MOVING;
     }
   }
 
@@ -1604,6 +1605,8 @@ void InitMovDir(int x, int y)
       }
       break;
   }
+
+  GfxDir[x][y] = MovDir[x][y];
 }
 
 void InitAmoebaNr(int x, int y)
@@ -1848,6 +1851,7 @@ static void ResetGfxAnimation(int x, int y)
 {
   GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
+  GfxDir[x][y] = MovDir[x][y];
 }
 
 void InitMovingField(int x, int y, int direction)
@@ -1862,6 +1866,7 @@ void InitMovingField(int x, int y, int direction)
     ResetGfxAnimation(x, y);
 
   MovDir[newx][newy] = MovDir[x][y] = direction;
+  GfxDir[x][y] = direction;
 
   if (Feld[newx][newy] == EL_EMPTY)
     Feld[newx][newy] = EL_BLOCKED;
@@ -1872,8 +1877,9 @@ void InitMovingField(int x, int y, int direction)
     GfxAction[x][y] = ACTION_MOVING;
 
   GfxFrame[newx][newy] = GfxFrame[x][y];
-  GfxAction[newx][newy] = GfxAction[x][y];
   GfxRandom[newx][newy] = GfxRandom[x][y];
+  GfxAction[newx][newy] = GfxAction[x][y];
+  GfxDir[newx][newy] = GfxDir[x][y];
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -1957,6 +1963,7 @@ static void RemoveField(int x, int y)
 
   GfxElement[x][y] = EL_UNDEFINED;
   GfxAction[x][y] = ACTION_DEFAULT;
+  GfxDir[x][y] = MV_NO_MOVING;
 }
 
 void RemoveMovingField(int x, int y)
@@ -2334,6 +2341,7 @@ void Explode(int ex, int ey, int phase, int mode)
       RemoveField(x, y);
 #else
       MovDir[x][y] = MovPos[x][y] = 0;
+      GfxDir[x][y] = MovDir[x][y];
       AmoebaNr[x][y] = 0;
 #endif
 #endif
@@ -2422,6 +2430,7 @@ void Explode(int ex, int ey, int phase, int mode)
     Back[x][y] = 0;
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+    GfxDir[x][y] = MV_NO_MOVING;
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
 
@@ -3180,7 +3189,7 @@ void Impact(int x, int y)
     PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);
 }
 
-void TurnRound(int x, int y)
+inline static void TurnRoundExt(int x, int y)
 {
   static struct
   {
@@ -3720,6 +3729,32 @@ void TurnRound(int x, int y)
   }
 }
 
+static void TurnRound(int x, int y)
+{
+  int direction = MovDir[x][y];
+
+#if 1
+  GfxDir[x][y] = MovDir[x][y];
+#endif
+
+  TurnRoundExt(x, y);
+
+#if 0
+  GfxDir[x][y] = MovDir[x][y];
+#endif
+
+  if (direction != MovDir[x][y])
+    GfxFrame[x][y] = 0;
+
+#if 0
+  if (MovDelay[x][y])
+    GfxAction[x][y] = ACTION_XXX_LEFT + MV_DIR_BIT(direction);
+#else
+  if (MovDelay[x][y])
+    GfxAction[x][y] = ACTION_WAITING;
+#endif
+}
+
 static boolean JustBeingPushed(int x, int y)
 {
   int i;
@@ -3750,9 +3785,15 @@ void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
+#if 1
+  /* !!! this should be handled more generic (not only for mole) !!! */
+  if (MovDelay[x][y] == 0)
+    GfxAction[x][y] = ACTION_DEFAULT;
+#else
   /* !!! this should be handled more generic (not only for mole) !!! */
   if (element != EL_MOLE && GfxAction[x][y] != ACTION_DIGGING)
     GfxAction[x][y] = ACTION_DEFAULT;
+#endif
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
@@ -4096,7 +4137,13 @@ void StartMoving(int x, int y)
 	/* !!! PLACE THIS SOMEWHERE AFTER "TurnRound()" !!! */
 	ResetGfxAnimation(x, y);
 #endif
+
+#if 0
+	if (GfxAction[x][y] != ACTION_WAITING)
+	  printf("::: %d: %d != ACTION_WAITING\n", element, GfxAction[x][y]);
+
 	GfxAction[x][y] = ACTION_WAITING;
+#endif
       }
 
       if (element == EL_ROBOT ||
@@ -4183,10 +4230,12 @@ void StartMoving(int x, int y)
 	return;
       }
 
+#if 0
       /* special case of "moving" animation of waiting elements (FIX THIS !!!);
 	 for all other elements GfxAction will be set by InitMovingField() */
       if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
 	GfxAction[x][y] = ACTION_MOVING;
+#endif
     }
 
     /* now make next step */
@@ -4242,7 +4291,7 @@ void StartMoving(int x, int y)
 	if (DigField(local_player, newx, newy, 0, 0, DF_DIG) == MF_MOVING)
 	  DrawLevelField(newx, newy);
 	else
-	  MovDir[x][y] = MV_NO_MOVING;
+	  GfxDir[x][y] = MovDir[x][y] = MV_NO_MOVING;
       }
       else if (!IS_FREE(newx, newy))
       {
@@ -4554,8 +4603,9 @@ void ContinueMoving(int x, int y)
 
   /* copy animation control values to new field */
   GfxFrame[newx][newy]  = GfxFrame[x][y];
-  GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
   GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
+  GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame  */
+  GfxDir[newx][newy]    = GfxDir[x][y];		/* keep element direction */
 
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
@@ -4580,7 +4630,7 @@ void ContinueMoving(int x, int y)
 
   if (!CAN_MOVE(element) ||
       (CAN_FALL(element) && direction == MV_DOWN))
-    MovDir[newx][newy] = 0;
+    GfxDir[x][y] = MovDir[newx][newy] = 0;
 
 #endif
 #endif
@@ -5273,7 +5323,7 @@ void MauerWaechst(int x, int y)
 
     if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     {
-      int graphic = el_dir2img(Feld[x][y], MovDir[x][y]);
+      int graphic = el_dir2img(Feld[x][y], GfxDir[x][y]);
       int frame = getGraphicAnimationFrame(graphic, 17 - MovDelay[x][y]);
 
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
@@ -5304,7 +5354,7 @@ void MauerWaechst(int x, int y)
 
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
-      MovDir[x][y] = MV_NO_MOVING;
+      GfxDir[x][y] = MovDir[x][y] = MV_NO_MOVING;
       DrawLevelField(x, y);
     }
   }
@@ -5349,7 +5399,7 @@ void MauerAbleger(int ax, int ay)
     {
       Feld[ax][ay-1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay-1] = element;
-      MovDir[ax][ay-1] = MV_UP;
+      GfxDir[ax][ay-1] = MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay - 1),
 		    IMG_EXPANDABLE_WALL_GROWING_UP, 0);
@@ -5359,7 +5409,7 @@ void MauerAbleger(int ax, int ay)
     {
       Feld[ax][ay+1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay+1] = element;
-      MovDir[ax][ay+1] = MV_DOWN;
+      GfxDir[ax][ay+1] = MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay + 1),
 		    IMG_EXPANDABLE_WALL_GROWING_DOWN, 0);
@@ -5375,7 +5425,7 @@ void MauerAbleger(int ax, int ay)
     {
       Feld[ax-1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax-1][ay] = element;
-      MovDir[ax-1][ay] = MV_LEFT;
+      GfxDir[ax-1][ay] = MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax - 1), SCREENY(ay),
 		    IMG_EXPANDABLE_WALL_GROWING_LEFT, 0);
@@ -5386,7 +5436,7 @@ void MauerAbleger(int ax, int ay)
     {
       Feld[ax+1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax+1][ay] = element;
-      MovDir[ax+1][ay] = MV_RIGHT;
+      GfxDir[ax+1][ay] = MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax + 1), SCREENY(ay),
 		    IMG_EXPANDABLE_WALL_GROWING_RIGHT, 0);
@@ -5720,7 +5770,7 @@ static void ChangeElement(int x, int y, int page)
 
   if (ChangeDelay[x][y] != 0)		/* continue element change */
   {
-    int graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+    int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
@@ -6094,7 +6144,7 @@ void GameActions()
   {
     element = Feld[x][y];
 #if 1
-    graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+    graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 #else
     graphic = el2img(element);
 #endif
@@ -6131,7 +6181,12 @@ void GameActions()
 
 #if 1
     /* this may take place after moving, so 'element' may have changed */
+#if 0
     if (IS_CHANGING(x, y))
+#else
+    if (IS_CHANGING(x, y) &&
+	(game.engine_version < VERSION_IDENT(3,0,7,1) || !Stop[x][y]))
+#endif
     {
 #if 0
       ChangeElement(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] :
@@ -6141,7 +6196,7 @@ void GameActions()
 #endif
 
       element = Feld[x][y];
-      graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+      graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
     }
 #endif
 
@@ -6150,7 +6205,7 @@ void GameActions()
       StartMoving(x, y);
 
 #if 1
-      graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+      graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 #if 0
       if (element == EL_MOLE)
 	printf("::: %d, %d, %d [%d]\n",

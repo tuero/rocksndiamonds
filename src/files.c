@@ -1997,8 +1997,8 @@ void LoadTapeFromFilename(char *filename)
   tape.length_seconds = GetTapeLength();
 
 #if 0
-  printf("tape game version: %d\n", tape.game_version);
-  printf("tape engine version: %d\n", tape.engine_version);
+  printf("::: tape game version: %d\n", tape.game_version);
+  printf("::: tape engine version: %d\n", tape.engine_version);
 #endif
 }
 

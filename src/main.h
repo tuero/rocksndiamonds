@@ -915,9 +915,13 @@
 #define ACTION_CHANGING				23
 #define ACTION_EXPLODING			24
 #define ACTION_DYING				25
-#define ACTION_OTHER				26
+#define ACTION_XXX_LEFT				26
+#define ACTION_XXX_RIGHT			27
+#define ACTION_XXX_UP				28
+#define ACTION_XXX_DOWN				29
+#define ACTION_OTHER				30
 
-#define NUM_ACTIONS				27
+#define NUM_ACTIONS				31
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_MAIN			0
@@ -1509,9 +1513,10 @@ extern short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;

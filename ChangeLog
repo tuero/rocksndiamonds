@@ -1,3 +1,10 @@
+2003-11-02
+	* fixed bug when pushing element that can move away to the side
+	  (like pushing falling elements, but now with moving elements)
+
+2003-11-01
+	* finally fixed serious bug in code for delayed element pushing (again)
+
 2003-10-19
 	* unavailable setup options now marked as "n/a" instead of "off"
 	* new boolean directive "latest_engine" for "levelinfo.conf": when set

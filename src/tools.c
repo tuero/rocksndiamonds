@@ -486,7 +486,7 @@ void DrawLevelGraphicAnimation(int x, int y, int graphic)
 void DrawLevelElementAnimation(int x, int y, int element)
 {
 #if 1
-  int graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+  int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 #else
@@ -518,7 +518,7 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
   if (!IN_LEV_FIELD(x, y) || !IN_SCR_FIELD(sx, sy))
     return;
 
-  graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+  graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
   if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
     return;
@@ -1072,7 +1072,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     SetRandomAnimationValue(lx, ly);
 
-    graphic = el_act_dir2img(element, GfxAction[lx][ly], MovDir[lx][ly]);
+    graphic = el_act_dir2img(element, GfxAction[lx][ly], GfxDir[lx][ly]);
     frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
   }
   else	/* border element */

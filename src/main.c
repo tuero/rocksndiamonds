@@ -64,9 +64,10 @@ short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 
 int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
@@ -3699,6 +3700,10 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".changing",	ACTION_CHANGING,	FALSE	},
   { ".exploding",	ACTION_EXPLODING,	FALSE	},
   { ".dying",		ACTION_DYING,		FALSE	},
+  { ".xxx_left",	ACTION_XXX_LEFT,	FALSE	},
+  { ".xxx_right",	ACTION_XXX_RIGHT,	FALSE	},
+  { ".xxx_up",		ACTION_XXX_UP,		FALSE	},
+  { ".xxx_down",	ACTION_XXX_DOWN,	FALSE	},
   { ".other",		ACTION_OTHER,		FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */

@@ -54,7 +54,6 @@ void DynaExplode(int, int);
 void Bang(int, int);
 void Blurb(int, int);
 void Impact(int, int);
-void TurnRound(int, int);
 void StartMoving(int, int);
 void ContinueMoving(int, int);
 int AmoebeNachbarNr(int, int);
