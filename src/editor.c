@@ -116,6 +116,10 @@
 #define ED_AREA_ELEM_CONTENT3_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE)
 
+#define ED_AREA_ELEM_CONTENT4_XPOS	(17 * MINI_TILEX)
+#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(8) + \
+					 ED_GADGET_DISTANCE - MINI_TILEY)
+
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_XPOS	(29 * MINI_TILEX)
 #define ED_AREA_RANDOM_BACKGROUND_YPOS	(31 * MINI_TILEY)
@@ -313,11 +317,12 @@
 #define GADGET_ID_ELEMENT_CONTENT_7	(GADGET_ID_DRAWING_AREA_FIRST + 8)
 #define GADGET_ID_AMOEBA_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 9)
 #define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 10)
-#define GADGET_ID_CUSTOM_CHANGED	(GADGET_ID_DRAWING_AREA_FIRST + 11)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 12)
+#define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 11)
+#define GADGET_ID_CUSTOM_CHANGED	(GADGET_ID_DRAWING_AREA_FIRST + 12)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 13)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 13)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 14)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -366,18 +371,19 @@
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
 #define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 7)
 #define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CHANGE_DELAY_FIXED	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_CHANGE_DELAY_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CHANGE_DELAY_FIXED	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CHANGE_DELAY_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 18)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 19)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -470,17 +476,18 @@
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
 #define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	6
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	7
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	8
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	9
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	10
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	11
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	12
-#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	13
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_FIXED	14
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM	15
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	7
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	8
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	9
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	10
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	11
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	12
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	13
+#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	14
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY_FIXED	15
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM	16
 
-#define ED_NUM_CHECKBUTTONS			16
+#define ED_NUM_CHECKBUTTONS			17
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -770,7 +777,7 @@ static struct
     NULL, "diggable, collectible or pushable"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_WALKABLE_LAYER,
     0,
     options_walkable_layer, &index_walkable_layer,
@@ -783,7 +790,7 @@ static struct
     0,
     options_time_units, &index_time_units,
     &custom_element.change.delay_frames,
-    "delay units given in", "time units for change"
+    "delay time given in", "delay time units for change"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(8),
@@ -984,30 +991,36 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
-    GADGET_ID_CUSTOM_CAN_FALL,
-    &custom_element_properties[EP_CAN_FALL],
-    "can fall",				"element can fall down"
-  },
-  {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CUSTOM_CAN_SMASH,
-    &custom_element_properties[EP_CAN_SMASH],
-    "can smash",			"element can smash other elements"
-  },
-  {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
     "can move",				"element can move in some direction"
   },
   {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    GADGET_ID_CUSTOM_CAN_FALL,
+    &custom_element_properties[EP_CAN_FALL],
+    "can fall",				"element can fall down"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CUSTOM_CAN_SMASH,
+    &custom_element_properties[EP_CAN_SMASH],
+    "can smash",			"element can smash other elements"
+  },
+  {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
+    GADGET_ID_CUSTOM_CAN_EXPLODE,
+    &custom_element_properties[EP_CAN_EXPLODE],
+    "can explode to:",			"element can explode to other elements"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_WALKABLE,
     &custom_element_properties[EP_WALKABLE],
     NULL,				"player can walk on the same field"
@@ -2440,6 +2453,26 @@ static void CreateDrawingAreas()
 
   level_editor_gadget[id] = gi;
 
+  /* ... one areas for custom element explosion content ... */
+  id = GADGET_ID_CUSTOM_CONTENT;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_CUSTOM_TYPE_ID, i,
+		    GDI_X, SX + ED_AREA_ELEM_CONTENT4_XPOS,
+		    GDI_Y, SX + ED_AREA_ELEM_CONTENT4_YPOS,
+		    GDI_WIDTH, 3 * MINI_TILEX,
+		    GDI_HEIGHT, 3 * MINI_TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+
   /* ... one for each custom element change target element ... */
   id = GADGET_ID_CUSTOM_CHANGED;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -3524,6 +3557,41 @@ static void DrawCustomGraphicElementArea()
   MapDrawingArea(GADGET_ID_CUSTOM_GRAPHIC);
 }
 
+static void DrawCustomContentArea()
+{
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CONTENT];
+  int area_sx = SX + ED_AREA_ELEM_CONTENT4_XPOS;
+  int area_sy = SY + ED_AREA_ELEM_CONTENT4_YPOS;
+  int x, y;
+
+  if (!IS_CUSTOM_ELEMENT(properties_element))
+  {
+    /* this should never happen */
+    Error(ERR_WARN, "element %d is no custom element", properties_element);
+
+    return;
+  }
+
+  for (y=0; y<3; y++)
+    for (x=0; x<3; x++)
+      ElementContent[0][x][y] = custom_element.content[x][y];
+
+  DrawElementBorder(area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY, TRUE);
+
+  for (y=0; y<3; y++)
+    for (x=0; x<3; x++)
+#if 1
+      DrawMiniGraphicExt(drawto,
+			 gi->x + x * MINI_TILEX,
+			 gi->y + y * MINI_TILEY,
+			 el2edimg(ElementContent[0][0][0]));
+#else
+      DrawMiniElement(area_x + x, area_y + y, ElementContent[0][x][y]);
+#endif
+
+  MapDrawingArea(GADGET_ID_CUSTOM_CONTENT);
+}
+
 static void DrawCustomChangedArea()
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGED];
@@ -4092,7 +4160,10 @@ static void DrawPropertiesConfig()
     MapCheckbuttonGadget(i);
 
     if (IS_CUSTOM_ELEMENT(properties_element))
+    {
       DrawCustomGraphicElementArea();
+      DrawCustomContentArea();
+    }
     else if (IS_AMOEBOID(properties_element))
       DrawAmoebaContentArea();
     else

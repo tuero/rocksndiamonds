@@ -68,8 +68,8 @@
 #define EP_UNUSED_4		4
 #define EP_INDESTRUCTIBLE	5
 #define EP_SLIPPERY		6
-#define EP_UNUSED_7		7
-#define EP_UNUSED_8		8
+#define EP_CAN_EXPLODE		7
+#define EP_CAN_MOVE		8
 #define EP_CAN_FALL		9
 #define EP_CAN_SMASH		10
 #define EP_WALKABLE_OVER	11
@@ -95,50 +95,48 @@
 
 /* values for pre-defined properties */
 #define EP_PLAYER		27
-#define EP_CAN_MOVE		28
-#define EP_CAN_PASS_MAGIC_WALL	29
-#define EP_SWITCHABLE		30
-#define EP_DONT_TOUCH		31
-#define EP_ENEMY		32
-#define EP_DONT_GO_TO		33
-#define EP_CAN_EXPLODE		34
-#define EP_BD_ELEMENT		35
-#define EP_SP_ELEMENT		36
-#define EP_SB_ELEMENT		37
-#define EP_GEM			38
-#define EP_FOOD_DARK_YAMYAM	39
-#define EP_FOOD_PENGUIN		40
-#define EP_FOOD_PIG		41
-#define EP_HISTORIC_WALL	42
-#define EP_HISTORIC_SOLID	43
-#define EP_BELT			44
-#define EP_BELT_ACTIVE		45
-#define EP_BELT_SWITCH		46
-#define EP_TUBE			47
-#define EP_KEYGATE		48
-#define EP_AMOEBOID		49
-#define EP_AMOEBALIVE		50
-#define EP_HAS_CONTENT		51
-#define EP_ACTIVE_BOMB		52
-#define EP_INACTIVE		53
+#define EP_CAN_PASS_MAGIC_WALL	28
+#define EP_SWITCHABLE		29
+#define EP_DONT_TOUCH		30
+#define EP_ENEMY		31
+#define EP_DONT_GO_TO		32
+#define EP_BD_ELEMENT		33
+#define EP_SP_ELEMENT		34
+#define EP_SB_ELEMENT		35
+#define EP_GEM			36
+#define EP_FOOD_DARK_YAMYAM	37
+#define EP_FOOD_PENGUIN		38
+#define EP_FOOD_PIG		39
+#define EP_HISTORIC_WALL	40
+#define EP_HISTORIC_SOLID	41
+#define EP_BELT			42
+#define EP_BELT_ACTIVE		43
+#define EP_BELT_SWITCH		44
+#define EP_TUBE			45
+#define EP_KEYGATE		46
+#define EP_AMOEBOID		47
+#define EP_AMOEBALIVE		48
+#define EP_HAS_CONTENT		49
+#define EP_ACTIVE_BOMB		50
+#define EP_INACTIVE		51
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	54
-#define EP_ACCESSIBLE_INSIDE	55
-#define EP_ACCESSIBLE_UNDER	56
-#define EP_WALKABLE		57
-#define EP_PASSABLE		58
-#define EP_ACCESSIBLE		59
-#define EP_SNAPPABLE		60
-#define EP_WALL			61
-#define EP_SOLID_FOR_PUSHING	62
-#define EP_DRAGONFIRE_PROOF	63
-#define EP_EXPLOSION_PROOF	64
+#define EP_ACCESSIBLE_OVER	52
+#define EP_ACCESSIBLE_INSIDE	53
+#define EP_ACCESSIBLE_UNDER	54
+#define EP_WALKABLE		55
+#define EP_PASSABLE		56
+#define EP_ACCESSIBLE		57
+#define EP_SNAPPABLE		58
+#define EP_WALL			59
+#define EP_SOLID_FOR_PUSHING	60
+#define EP_DRAGONFIRE_PROOF	61
+#define EP_EXPLOSION_PROOF	62
 
 /* values for internal purpose only (level editor) */
-#define EP_WALK_TO_OBJECT	65
+#define EP_WALK_TO_OBJECT	63
 
-#define NUM_ELEMENT_PROPERTIES	66
+#define NUM_ELEMENT_PROPERTIES	64
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -179,6 +177,8 @@
 #define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
 #define IS_INDESTRUCTIBLE(e)	HAS_PROPERTY(e, EP_INDESTRUCTIBLE)
 #define IS_SLIPPERY(e)		HAS_PROPERTY(e, EP_SLIPPERY)
+#define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
+#define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_FALL(e)		HAS_PROPERTY(e, EP_CAN_FALL)
 #define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
 #define IS_WALKABLE_OVER(e)	HAS_PROPERTY(e, EP_WALKABLE_OVER)
@@ -198,13 +198,11 @@
 
 /* macros for pre-defined properties */
 #define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
-#define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_PASS_MAGIC_WALL(e)	HAS_PROPERTY(e, EP_CAN_PASS_MAGIC_WALL)
 #define IS_SWITCHABLE(e)	HAS_PROPERTY(e, EP_SWITCHABLE)
 #define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
 #define IS_ENEMY(e)		HAS_PROPERTY(e, EP_ENEMY)
 #define DONT_GO_TO(e)		HAS_PROPERTY(e, EP_DONT_GO_TO)
-#define IS_CAN_EXPLODE(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE)
 #define IS_BD_ELEMENT(e)	HAS_PROPERTY(e, EP_BD_ELEMENT)
 #define IS_SP_ELEMENT(e)	HAS_PROPERTY(e, EP_SP_ELEMENT)
 #define IS_SB_ELEMENT(e)	HAS_PROPERTY(e, EP_SB_ELEMENT)
@@ -1039,6 +1037,8 @@ struct CustomElementInfo
 
   int walk_to_action;		/* only for level editor; not stored */
   int walkable_layer;		/* only for level editor; not stored */
+
+  int content[3][3];		/* new elements after explosion */
 
   struct CustomElementChangeInfo change;
 };

@@ -1809,7 +1809,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PLAYER(x, y))
       KillHeroUnlessProtected(x, y);
-    else if (IS_CAN_EXPLODE(element))
+    else if (CAN_EXPLODE(element))
     {
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
@@ -3247,7 +3247,7 @@ void StartMoving(int x, int y)
 	  {
 	    int flamed = MovingOrBlocked2Element(xx, yy);
 
-	    if (IS_ENEMY(flamed) || IS_CAN_EXPLODE(flamed))
+	    if (IS_ENEMY(flamed) || CAN_EXPLODE(flamed))
 	      Bang(xx, yy);
 	    else
 	      RemoveMovingField(xx, yy);

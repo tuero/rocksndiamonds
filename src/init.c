@@ -1251,6 +1251,79 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_can_explode[] =
+  {
+    EL_BOMB,
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNAMITE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
+    EL_SP_DISK_RED_ACTIVE,
+    EL_BUG,
+    EL_MOLE,
+    EL_PENGUIN,
+    EL_PIG,
+    EL_DRAGON,
+    EL_SATELLITE,
+    EL_SP_DISK_RED,
+    EL_SP_DISK_ORANGE,
+    EL_SP_DISK_YELLOW,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_can_move[] =
+  {
+    /* only stored in level file */
+    EL_BUG_RIGHT,
+    EL_BUG_UP,
+    EL_BUG_LEFT,
+    EL_BUG_DOWN,
+    EL_SPACESHIP_RIGHT,
+    EL_SPACESHIP_UP,
+    EL_SPACESHIP_LEFT,
+    EL_SPACESHIP_DOWN,
+    EL_BD_BUTTERFLY_RIGHT,
+    EL_BD_BUTTERFLY_UP,
+    EL_BD_BUTTERFLY_LEFT,
+    EL_BD_BUTTERFLY_DOWN,
+    EL_BD_FIREFLY_RIGHT,
+    EL_BD_FIREFLY_UP,
+    EL_BD_FIREFLY_LEFT,
+    EL_BD_FIREFLY_DOWN,
+    EL_PACMAN_RIGHT,
+    EL_PACMAN_UP,
+    EL_PACMAN_LEFT,
+    EL_PACMAN_DOWN,
+
+    /* level file and runtime elements */
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_MOLE,
+    EL_PENGUIN,
+    EL_PIG,
+    EL_DRAGON,
+    EL_SATELLITE,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    EL_BALLOON,
+    EL_SPRING,
+    -1
+  };
+
   static int ep_can_fall[] =
   {
     EL_ROCK,
@@ -1416,51 +1489,6 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_move[] =
-  {
-    /* only stored in level file */
-    EL_BUG_RIGHT,
-    EL_BUG_UP,
-    EL_BUG_LEFT,
-    EL_BUG_DOWN,
-    EL_SPACESHIP_RIGHT,
-    EL_SPACESHIP_UP,
-    EL_SPACESHIP_LEFT,
-    EL_SPACESHIP_DOWN,
-    EL_BD_BUTTERFLY_RIGHT,
-    EL_BD_BUTTERFLY_UP,
-    EL_BD_BUTTERFLY_LEFT,
-    EL_BD_BUTTERFLY_DOWN,
-    EL_BD_FIREFLY_RIGHT,
-    EL_BD_FIREFLY_UP,
-    EL_BD_FIREFLY_LEFT,
-    EL_BD_FIREFLY_DOWN,
-    EL_PACMAN_RIGHT,
-    EL_PACMAN_UP,
-    EL_PACMAN_LEFT,
-    EL_PACMAN_DOWN,
-
-    /* level file and runtime elements */
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_MOLE,
-    EL_PENGUIN,
-    EL_PIG,
-    EL_DRAGON,
-    EL_SATELLITE,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_BALLOON,
-    EL_SPRING,
-    -1
-  };
-
   static int ep_can_pass_magic_wall[] =
   {
     EL_ROCK,
@@ -1550,34 +1578,6 @@ void InitElementPropertiesStatic()
     EL_TRAP_ACTIVE,
     EL_LANDMINE,
 #endif
-    -1
-  };
-
-  static int ep_can_explode[] =
-  {
-    EL_BOMB,
-    EL_DYNAMITE_ACTIVE,
-    EL_DYNAMITE,
-    EL_DYNABOMB_PLAYER_1_ACTIVE,
-    EL_DYNABOMB_PLAYER_2_ACTIVE,
-    EL_DYNABOMB_PLAYER_3_ACTIVE,
-    EL_DYNABOMB_PLAYER_4_ACTIVE,
-    EL_DYNABOMB_INCREASE_NUMBER,
-    EL_DYNABOMB_INCREASE_SIZE,
-    EL_DYNABOMB_INCREASE_POWER,
-    EL_SP_DISK_RED_ACTIVE,
-    EL_BUG,
-    EL_MOLE,
-    EL_PENGUIN,
-    EL_PIG,
-    EL_DRAGON,
-    EL_SATELLITE,
-    EL_SP_DISK_RED,
-    EL_SP_DISK_ORANGE,
-    EL_SP_DISK_YELLOW,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_DX_SUPABOMB,
     -1
   };
 
