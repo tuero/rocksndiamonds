@@ -908,7 +908,7 @@ extern int		num_element_info;
 #define EL_SPRING_MOVING	523
 #define EL_SP_MURPHY_CLONE	524
 #define EL_QUICKSAND_FILLING	525
-#define EL_QUICKSAND_DROPPING	526
+#define EL_QUICKSAND_EMPTYING	526
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600

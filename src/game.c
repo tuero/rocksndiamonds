@@ -1196,9 +1196,13 @@ void RemoveMovingField(int x, int y)
       return;
   }
 
-  if (Feld[x][y] == EL_BLOCKED &&
-      (Store[oldx][oldy] == EL_MORAST_LEER ||
-       Store[oldx][oldy] == EL_MAGIC_WALL_EMPTY ||
+  if (Feld[x][y] == EL_BLOCKED && Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING)
+  {
+    Feld[oldx][oldy] = EL_MORAST_LEER;
+    Store[oldx][oldy] = Store2[oldx][oldy] = 0;
+  }
+  else if (Feld[x][y] == EL_BLOCKED &&
+      (Store[oldx][oldy] == EL_MAGIC_WALL_EMPTY ||
        Store[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTY ||
        Store[oldx][oldy] == EL_AMOEBE_NASS))
   {
@@ -2455,8 +2459,8 @@ void StartMoving(int x, int y)
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
-	Feld[x][y] = EL_FELSBROCKEN;
-	Store[x][y] = EL_MORAST_LEER;
+	Feld[x][y] = EL_QUICKSAND_EMPTYING;
+	Store[x][y] = EL_FELSBROCKEN;
       }
       else if (Feld[x][y+1] == EL_MORAST_LEER)
       {
@@ -2472,13 +2476,16 @@ void StartMoving(int x, int y)
 
 	Feld[x][y] = EL_MORAST_LEER;
 	Feld[x][y+1] = EL_MORAST_VOLL;
+	Store[x][y+1] = Store[x][y];
+	Store[x][y] = 0;
       }
     }
     else if ((element == EL_FELSBROCKEN || element == EL_BD_ROCK) &&
 	     Feld[x][y+1] == EL_MORAST_LEER)
     {
       InitMovingField(x, y, MV_DOWN);
-      Store[x][y] = EL_MORAST_VOLL;
+      Feld[x][y] = EL_QUICKSAND_FILLING;
+      Store[x][y] = element;
     }
     else if (element == EL_MAGIC_WALL_FULL)
     {
@@ -2565,10 +2572,16 @@ void StartMoving(int x, int y)
     /* Store[x][y+1] must be zero, because:
        (EL_MORAST_VOLL -> EL_FELSBROCKEN): Store[x][y+1] == EL_MORAST_LEER
     */
+#if 0
 #if OLD_GAME_BEHAVIOUR
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
 #else
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1] &&
+	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1] &&
+	     element != EL_DX_SUPABOMB)
+#endif
+#else
+    else if (IS_SLIPPERY(Feld[x][y+1]) &&
 	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1] &&
 	     element != EL_DX_SUPABOMB)
 #endif
@@ -2929,7 +2942,7 @@ void ContinueMoving(int x, int y)
 
   if (element == EL_TROPFEN)
     step /= 2;
-  else if (Store[x][y] == EL_MORAST_VOLL || Store[x][y] == EL_MORAST_LEER)
+  else if (element == EL_QUICKSAND_FILLING || element == EL_QUICKSAND_EMPTYING)
     step /= 4;
   else if (CAN_FALL(element) && horiz_move &&
 	   y < lev_fieldy-1 && IS_BELT(Feld[x][y+1]))
@@ -2975,16 +2988,17 @@ void ContinueMoving(int x, int y)
       }
     }
 
-    if (Store[x][y] == EL_MORAST_VOLL)
+    if (element == EL_QUICKSAND_FILLING)
     {
+      element = Feld[newx][newy] = EL_MORAST_VOLL;
+      Store[newx][newy] = Store[x][y];
       Store[x][y] = 0;
-      Feld[newx][newy] = EL_MORAST_VOLL;
-      element = EL_MORAST_VOLL;
     }
-    else if (Store[x][y] == EL_MORAST_LEER)
+    else if (element == EL_QUICKSAND_EMPTYING)
     {
-      Store[x][y] = 0;
       Feld[x][y] = EL_MORAST_LEER;
+      element = Feld[newx][newy] = Store[x][y];
+      Store[x][y] = 0;
     }
     else if (Store[x][y] == EL_MAGIC_WALL_FULL)
     {
