@@ -1780,16 +1780,50 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   game_status = last_game_status;	/* restore current game status */
 }
 
-int REQ_in_range(int x, int y)
+void WaitForEventToContinue()
 {
-  if (y > DY+249 && y < DY+278)
+  boolean still_wait = TRUE;
+
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
+
+  button_status = MB_RELEASED;
+
+  while (still_wait)
   {
-    if (x > DX+1 && x < DX+48)
-      return 1;
-    else if (x > DX+51 && x < DX+98) 
-      return 2;
+    if (PendingEvent())
+    {
+      Event event;
+
+      NextEvent(&event);
+
+      switch (event.type)
+      {
+	case EVENT_BUTTONPRESS:
+	case EVENT_KEYPRESS:
+	  still_wait = FALSE;
+	  break;
+
+	case EVENT_KEYRELEASE:
+	  ClearPlayerAction();
+	  break;
+
+	default:
+	  HandleOtherEvents(&event);
+	  break;
+      }
+    }
+    else if (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED)
+    {
+      still_wait = FALSE;
+    }
+
+    DoAnimation();
+
+    /* don't eat all CPU time */
+    Delay(10);
   }
-  return 0;
 }
 
 #define MAX_REQUEST_LINES		13

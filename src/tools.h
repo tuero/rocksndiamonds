@@ -120,6 +120,7 @@ void DrawLevel(void);
 void DrawMiniLevel(int, int, int, int);
 void DrawMicroLevel(int, int, boolean);
 
+void WaitForEventToContinue();
 boolean Request(char *, unsigned int);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);

@@ -1994,7 +1994,7 @@ void ShowEnvelope()
   int i, x, y;
 
   /* open envelope window horizontally */
-  for (i=2; i <= level.envelope_xsize + 2; i += 2)
+  for (i = 2; i <= level.envelope_xsize + 2; i += 2)
   {
     int startx = (SXSIZE / MINI_TILEX - i) / 2;
     int starty = (SYSIZE / MINI_TILEY) / 2 - 1;
@@ -2020,7 +2020,7 @@ void ShowEnvelope()
   }
 
   /* open envelope window vertically */
-  for (i=2; i <= level.envelope_ysize + 2; i += 2)
+  for (i = 2; i <= level.envelope_ysize + 2; i += 2)
   {
     int xsize = level.envelope_xsize + 2;
     int startx = (SXSIZE / MINI_TILEX - (xsize - 1)) / 2;
@@ -2050,7 +2050,67 @@ void ShowEnvelope()
     Delay(GAME_FRAME_DELAY);
   }
 
-  Delay(3000);
+  if (tape.playing)
+    Delay(1000);
+  else
+    WaitForEventToContinue();
+
+  /* close envelope window vertically */
+  for (i = level.envelope_ysize + 2; i >= 2; i -= 2)
+  {
+    int xsize = level.envelope_xsize + 2;
+    int startx = (SXSIZE / MINI_TILEX - (xsize - 1)) / 2;
+    int starty = (SYSIZE / MINI_TILEY - i) / 2;
+
+    SetDrawtoField(DRAW_BUFFERED);
+
+    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+
+    SetDrawtoField(DRAW_BACKBUFFER);
+
+    for (y=0; y < i; y++) for (x=0; x < xsize; x++)
+    {
+      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
+      int ey = (y == 0 ? -1 : y == i - 1     ? +1 : 0);
+
+      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+    }
+
+    DrawTextToTextArea(SX + (startx + 1) * MINI_TILEX,
+		       SY + (starty + 1) * MINI_TILEY, level.envelope,
+		       FONT_TEXT_1, level.envelope_xsize, i - 2);
+
+    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    BackToFront();
+
+    Delay(GAME_FRAME_DELAY);
+  }
+
+  /* close envelope window horizontally */
+  for (i = level.envelope_xsize + 2; i >= 2; i -= 2)
+  {
+    int startx = (SXSIZE / MINI_TILEX - i) / 2;
+    int starty = (SYSIZE / MINI_TILEY) / 2 - 1;
+
+    SetDrawtoField(DRAW_BUFFERED);
+
+    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+
+    SetDrawtoField(DRAW_BACKBUFFER);
+
+    for (y=0; y < 2; y++) for (x=0; x < i; x++)
+    {
+      int ex = (x == 0 ? -1 : x == i - 1 ? +1 : 0);
+      int ey = (y == 0 ? -1 : y == 1     ? +1 : 0);
+
+      DrawEnvelopeBorder(startx + x, starty + y, ex, ey);
+    }
+
+    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    BackToFront();
+
+    Delay(GAME_FRAME_DELAY);
+  }
 
   SetDrawtoField(DRAW_BUFFERED);
 
