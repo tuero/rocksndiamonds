@@ -479,8 +479,8 @@ extern int		num_bg_loops;
 /* often used screen positions */
 #define SX			8
 #define SY			8
-#define REAL_SX			(SX-2)
-#define REAL_SY			(SY-2)
+#define REAL_SX			(SX - 2)
+#define REAL_SY			(SY - 2)
 #define DX			566
 #define DY			60
 #define VX			DX
@@ -489,29 +489,29 @@ extern int		num_bg_loops;
 #define EY			(VY - 44)
 #define TILEX			32
 #define TILEY			32
-#define MINI_TILEX		(TILEX/2)
-#define MINI_TILEY		(TILEY/2)
-#define MICRO_TILEX		(TILEX/8)
-#define MICRO_TILEY		(TILEY/8)
-#define MIDPOSX			(SCR_FIELDX/2)
-#define MIDPOSY			(SCR_FIELDY/2)
-#define SXSIZE			(SCR_FIELDX*TILEX)
-#define SYSIZE			(SCR_FIELDY*TILEY)
-#define FXSIZE			((SCR_FIELDX+2)*TILEX)
-#define FYSIZE			((SCR_FIELDY+2)*TILEY)
+#define MINI_TILEX		(TILEX / 2)
+#define MINI_TILEY		(TILEY / 2)
+#define MICRO_TILEX		(TILEX / 8)
+#define MICRO_TILEY		(TILEY / 8)
+#define MIDPOSX			(SCR_FIELDX / 2)
+#define MIDPOSY			(SCR_FIELDY / 2)
+#define SXSIZE			(SCR_FIELDX * TILEX)
+#define SYSIZE			(SCR_FIELDY * TILEY)
+#define FXSIZE			((SCR_FIELDX + 2) * TILEX)
+#define FYSIZE			((SCR_FIELDY + 2) * TILEY)
 #define DXSIZE			100
 #define DYSIZE			280
 #define VXSIZE			DXSIZE
 #define VYSIZE			100
 #define EXSIZE			DXSIZE
 #define EYSIZE			(VXSIZE + 44)
-#define FULL_SXSIZE		(2+SXSIZE+2)
-#define FULL_SYSIZE		(2+SYSIZE+2)
+#define FULL_SXSIZE		(2 + SXSIZE + 2)
+#define FULL_SYSIZE		(2 + SYSIZE + 2)
 #define MICROLEV_XSIZE		((STD_LEV_FIELDX + 2) * MICRO_TILEX)
 #define MICROLEV_YSIZE		((STD_LEV_FIELDY + 2) * MICRO_TILEY)
 #define MICROLEV_XPOS		(SX + (SXSIZE - MICROLEV_XSIZE) / 2)
 #define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
-#define MICROLABEL_YPOS		(MICROLEV_YPOS+MICROLEV_YSIZE+12)
+#define MICROLABEL_YPOS		(MICROLEV_YPOS + MICROLEV_YSIZE + 7)
 #define FONT1_XSIZE		32
 #define FONT1_YSIZE		32
 #define FONT2_XSIZE		14
@@ -1087,35 +1087,35 @@ extern int		num_bg_loops;
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
-#define GFX_CHAR_ASCII0		(GFX_CHAR_START-32)
-#define GFX_CHAR_AUSRUF		(GFX_CHAR_ASCII0+33)
-#define GFX_CHAR_ZOLL		(GFX_CHAR_ASCII0+34)
-#define GFX_CHAR_DOLLAR		(GFX_CHAR_ASCII0+36)
-#define GFX_CHAR_PROZ		(GFX_CHAR_ASCII0+37)
-#define GFX_CHAR_APOSTR		(GFX_CHAR_ASCII0+39)
-#define GFX_CHAR_KLAMM1		(GFX_CHAR_ASCII0+40)
-#define GFX_CHAR_KLAMM2		(GFX_CHAR_ASCII0+41)
-#define GFX_CHAR_PLUS		(GFX_CHAR_ASCII0+43)
-#define GFX_CHAR_KOMMA		(GFX_CHAR_ASCII0+44)
-#define GFX_CHAR_MINUS		(GFX_CHAR_ASCII0+45)
-#define GFX_CHAR_PUNKT		(GFX_CHAR_ASCII0+46)
-#define GFX_CHAR_SLASH		(GFX_CHAR_ASCII0+47)
-#define GFX_CHAR_0		(GFX_CHAR_ASCII0+48)
-#define GFX_CHAR_9		(GFX_CHAR_ASCII0+57)
-#define GFX_CHAR_DOPPEL		(GFX_CHAR_ASCII0+58)
-#define GFX_CHAR_SEMIKL		(GFX_CHAR_ASCII0+59)
-#define GFX_CHAR_LT		(GFX_CHAR_ASCII0+60)
-#define GFX_CHAR_GLEICH		(GFX_CHAR_ASCII0+61)
-#define GFX_CHAR_GT		(GFX_CHAR_ASCII0+62)
-#define GFX_CHAR_FRAGE		(GFX_CHAR_ASCII0+63)
-#define GFX_CHAR_AT		(GFX_CHAR_ASCII0+64)
-#define GFX_CHAR_A		(GFX_CHAR_ASCII0+65)
-#define GFX_CHAR_Z		(GFX_CHAR_ASCII0+90)
-#define GFX_CHAR_AE		(GFX_CHAR_ASCII0+91)
-#define GFX_CHAR_OE		(GFX_CHAR_ASCII0+92)
-#define GFX_CHAR_UE		(GFX_CHAR_ASCII0+93)
-#define GFX_CHAR_COPY		(GFX_CHAR_ASCII0+94)
-#define GFX_CHAR_END		(GFX_CHAR_START+79)
+#define GFX_CHAR_ASCII0		(GFX_CHAR_START - 32)
+#define GFX_CHAR_AUSRUF		(GFX_CHAR_ASCII0 + 33)
+#define GFX_CHAR_ZOLL		(GFX_CHAR_ASCII0 + 34)
+#define GFX_CHAR_DOLLAR		(GFX_CHAR_ASCII0 + 36)
+#define GFX_CHAR_PROZ		(GFX_CHAR_ASCII0 + 37)
+#define GFX_CHAR_APOSTR		(GFX_CHAR_ASCII0 + 39)
+#define GFX_CHAR_KLAMM1		(GFX_CHAR_ASCII0 + 40)
+#define GFX_CHAR_KLAMM2		(GFX_CHAR_ASCII0 + 41)
+#define GFX_CHAR_PLUS		(GFX_CHAR_ASCII0 + 43)
+#define GFX_CHAR_KOMMA		(GFX_CHAR_ASCII0 + 44)
+#define GFX_CHAR_MINUS		(GFX_CHAR_ASCII0 + 45)
+#define GFX_CHAR_PUNKT		(GFX_CHAR_ASCII0 + 46)
+#define GFX_CHAR_SLASH		(GFX_CHAR_ASCII0 + 47)
+#define GFX_CHAR_0		(GFX_CHAR_ASCII0 + 48)
+#define GFX_CHAR_9		(GFX_CHAR_ASCII0 + 57)
+#define GFX_CHAR_DOPPEL		(GFX_CHAR_ASCII0 + 58)
+#define GFX_CHAR_SEMIKL		(GFX_CHAR_ASCII0 + 59)
+#define GFX_CHAR_LT		(GFX_CHAR_ASCII0 + 60)
+#define GFX_CHAR_GLEICH		(GFX_CHAR_ASCII0 + 61)
+#define GFX_CHAR_GT		(GFX_CHAR_ASCII0 + 62)
+#define GFX_CHAR_FRAGE		(GFX_CHAR_ASCII0 + 63)
+#define GFX_CHAR_AT		(GFX_CHAR_ASCII0 + 64)
+#define GFX_CHAR_A		(GFX_CHAR_ASCII0 + 65)
+#define GFX_CHAR_Z		(GFX_CHAR_ASCII0 + 90)
+#define GFX_CHAR_AE		(GFX_CHAR_ASCII0 + 91)
+#define GFX_CHAR_OE		(GFX_CHAR_ASCII0 + 92)
+#define GFX_CHAR_UE		(GFX_CHAR_ASCII0 + 93)
+#define GFX_CHAR_COPY		(GFX_CHAR_ASCII0 + 94)
+#define GFX_CHAR_END		(GFX_CHAR_START + 79)
 
 /* the names of the sounds */
 #define SND_ALCHEMY		0
@@ -1245,6 +1245,12 @@ extern int		num_bg_loops;
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
 
+/* default name for unknown player names */
+#define ANONYMOUS_NAME		"anonymous"
+
+/* default name for new levels */
+#define NAMELESS_LEVEL_NAME	"nameless level"
+
 /* values for button_status */
 #define MB_NOT_PRESSED		FALSE
 #define MB_RELEASED		FALSE
@@ -1303,9 +1309,9 @@ extern int		num_bg_loops;
 #define DOOR_GFX_PAGEY2		DYSIZE
 
 /* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
-#define ANIM_NORMAL	0
-#define ANIM_OSCILLATE	1
-#define ANIM_REVERSE	2
+#define ANIM_NORMAL		0
+#define ANIM_OSCILLATE		1
+#define ANIM_REVERSE		2
 
 /* values for game_emulation */
 #define EMU_NONE		0

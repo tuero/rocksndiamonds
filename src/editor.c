@@ -11,6 +11,8 @@
 *  editor.c                                                *
 ***********************************************************/
 
+#include <math.h>
+
 #include "editor.h"
 #include "screens.h"
 #include "tools.h"
@@ -135,14 +137,14 @@
 #define ED_CTRL_ID_SINGLE_ITEMS		0
 #define ED_CTRL_ID_CONNECTED_ITEMS	1
 #define ED_CTRL_ID_LINE			2
-#define ED_CTRL_ID_TEXT			3
+#define ED_CTRL_ID_ARC			3
 #define ED_CTRL_ID_RECTANGLE		4
 #define ED_CTRL_ID_FILLED_BOX		5
 #define ED_CTRL_ID_WRAP_UP		6
-#define ED_CTRL_ID_PROPERTIES		7
+#define ED_CTRL_ID_TEXT			7
 #define ED_CTRL_ID_FLOOD_FILL		8
 #define ED_CTRL_ID_WRAP_LEFT		9
-#define ED_CTRL_ID_UNUSED1		10
+#define ED_CTRL_ID_PROPERTIES		10
 #define ED_CTRL_ID_WRAP_RIGHT		11
 #define ED_CTRL_ID_RANDOM_PLACEMENT	12
 #define ED_CTRL_ID_GRAB_BRUSH		13
@@ -246,14 +248,14 @@ static struct
   { 's', "draw single items" },
   { 'd', "draw connected items" },
   { 'l', "draw lines" },
-  { 't', "enter text elements" },
+  { 'a', "draw arcs" },
   { 'r', "draw outline rectangles" },
   { 'R', "draw filled rectangles" },
   { '\0', "wrap (rotate) level up" },
-  { '?', "properties of drawing element" },
+  { 't', "enter text elements" },
   { 'f', "flood fill" },
   { '\0', "wrap (rotate) level left" },
-  { '\0', "" },
+  { '?', "properties of drawing element" },
   { '\0', "wrap (rotate) level right" },
   { '\0', "random element placement" },
   { 'b', "grab brush" },
@@ -902,6 +904,7 @@ static void CreateControlButtons()
     if (id == ED_CTRL_ID_SINGLE_ITEMS ||
 	id == ED_CTRL_ID_CONNECTED_ITEMS ||
 	id == ED_CTRL_ID_LINE ||
+	id == ED_CTRL_ID_ARC ||
 	id == ED_CTRL_ID_TEXT ||
 	id == ED_CTRL_ID_RECTANGLE ||
 	id == ED_CTRL_ID_FILLED_BOX ||
@@ -2768,8 +2771,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 
       for (x=0; x<=len_x; x++)
       {
-	int y = (int)(a * x + 0.5) * (to_y < from_y ? -1 : +1);
-
+	y = (int)(a * x + 0.5) * (to_y < from_y ? -1 : +1);
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
@@ -2782,8 +2784,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 
       for (y=0; y<=len_y; y++)
       {
-	int x = (int)(a * y + 0.5) * (to_x < from_x ? -1 : +1);
-
+	x = (int)(a * y + 0.5) * (to_x < from_x ? -1 : +1);
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
@@ -2810,6 +2811,76 @@ static void DrawFilledBox(int from_x, int from_y, int to_x, int to_y,
   for (y=from_y; y<=to_y; y++)
     DrawLine(from_x, y, to_x, y, element, change_level);
 }
+
+static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
+		       int element, boolean change_level)
+{
+  int to_x = to_x2 - (to_x2 > from_x ? +1 : -1);
+  int to_y = to_y2 - (to_y2 > from_y ? +1 : -1);
+  int len_x = ABS(to_x - from_x);
+  int len_y = ABS(to_y - from_y);
+  int radius, x, y;
+
+  radius = (int)(sqrt((float)(len_x * len_x + len_y * len_y)) + 0.5);
+
+  /* not optimal (some points get drawn twice) but simple,
+     and fast enough for the few points we are drawing */
+
+  for (x=0; x<=radius; x++)
+  {
+    int sx, sy, lx, ly;
+
+    y = (int)(sqrt((float)(radius * radius - x * x)) + 0.5);
+
+    sx = from_x + x * (from_x < to_x2 ? +1 : -1);
+    sy = from_y + y * (from_y < to_y2 ? +1 : -1);
+    lx = sx + level_xpos;
+    ly = sy + level_ypos;
+
+    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
+      DrawLineElement(sx, sy, element, change_level);
+  }
+
+  for (y=0; y<=radius; y++)
+  {
+    int sx, sy, lx, ly;
+
+    x = (int)(sqrt((float)(radius * radius - y * y)) + 0.5);
+
+    sx = from_x + x * (from_x < to_x2 ? +1 : -1);
+    sy = from_y + y * (from_y < to_y2 ? +1 : -1);
+    lx = sx + level_xpos;
+    ly = sy + level_ypos;
+
+    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
+      DrawLineElement(sx, sy, element, change_level);
+  }
+}
+
+static void DrawArc(int from_x, int from_y, int to_x, int to_y,
+		    int element, boolean change_level)
+{
+  int to_x2 = to_x + (to_x < from_x ? -1 : +1);
+  int to_y2 = to_y + (to_y > from_y ? +1 : -1);
+
+  DrawArcExt(from_x, from_y, to_x2, to_y2, element, change_level);
+}
+
+#if 0
+static void DrawCircle(int from_x, int from_y, int to_x, int to_y,
+		       int element, boolean change_level)
+{
+  int to_x2 = to_x + (to_x < from_x ? -1 : +1);
+  int to_y2 = to_y + (to_y > from_y ? +1 : -1);
+  int mirror_to_x2 = from_x - (to_x2 - from_x);
+  int mirror_to_y2 = from_y - (to_y2 - from_y);
+
+  DrawArcExt(from_x, from_y, to_x2, to_y2, element, change_level);
+  DrawArcExt(from_x, from_y, mirror_to_x2, to_y2, element, change_level);
+  DrawArcExt(from_x, from_y, to_x2, mirror_to_y2, element, change_level);
+  DrawArcExt(from_x, from_y, mirror_to_x2, mirror_to_y2, element,change_level);
+}
+#endif
 
 static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
 {
@@ -3400,6 +3471,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       break;
 
     case ED_CTRL_ID_LINE:
+    case ED_CTRL_ID_ARC:
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_GRAB_BRUSH:
@@ -3413,6 +3485,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	if (drawing_function == ED_CTRL_ID_LINE)
 	  draw_func = DrawLine;
+	else if (drawing_function == ED_CTRL_ID_ARC)
+	  draw_func = DrawArc;
 	else if (drawing_function == ED_CTRL_ID_RECTANGLE)
 	  draw_func = DrawRectangle;
 	else if (drawing_function == ED_CTRL_ID_FILLED_BOX)
@@ -3756,6 +3830,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_SINGLE_ITEMS:
     case ED_CTRL_ID_CONNECTED_ITEMS:
     case ED_CTRL_ID_LINE:
+    case ED_CTRL_ID_ARC:
     case ED_CTRL_ID_TEXT:
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
@@ -4112,6 +4187,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       	  case ED_CTRL_ID_LINE:
 	    infotext = "Drawing line";
 	    break;
+      	  case ED_CTRL_ID_ARC:
+	    infotext = "Drawing arc";
+	    break;
       	  case ED_CTRL_ID_TEXT:
 	    infotext = "Setting text cursor";
 	    break;
@@ -4149,7 +4227,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     /* misuse this function to draw brush cursor, if needed */
     if (edit_mode == ED_MODE_DRAWING && draw_with_brush && !button_status)
     {
-      if (IN_ED_FIELD(sx,sy) && IN_LEV_FIELD(lx, ly))
+      if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
 	CopyBrushToCursor(sx, sy);
       else
 	DeleteBrushFromCursor();

@@ -319,8 +319,10 @@ static int helpscreen_action[] =
   GFX_MORAST_LEER,1,100,					HA_NEXT,
   GFX_BETON,1,100,						HA_NEXT,
   GFX_MAUERWERK,1,100,						HA_NEXT,
-  GFX_MAUER_R1,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,
-  GFX_MAUER_L1,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,	HA_NEXT,
+  GFX_MAUER_L1,  3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,
+  GFX_MAUER_R1,  3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,
+  GFX_MAUER_UP,  3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,
+  GFX_MAUER_DOWN,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,	HA_NEXT,
   GFX_UNSICHTBAR,1,100,						HA_NEXT,
   GFX_FELSBODEN,1,100,						HA_NEXT,
   GFX_CHAR_A,30,4, GFX_CHAR_AUSRUF,32,4,			HA_NEXT,
@@ -406,6 +408,10 @@ static int helpscreen_action[] =
   GFX_AUSGANG_AUF+2,1,2, GFX_AUSGANG_AUF+1,1,2,			HA_NEXT,
   GFX_AUSGANG_AUF+0,4,2, GFX_AUSGANG_AUF+3,1,2,
   GFX_AUSGANG_AUF+2,1,2, GFX_AUSGANG_AUF+1,1,2,			HA_NEXT,
+  GFX_SOKOBAN_OBJEKT,1,100,					HA_NEXT,
+  GFX_SOKOBAN_FELD_LEER,1,100,					HA_NEXT,
+  GFX_SOKOBAN_FELD_VOLL,1,100,					HA_NEXT,
+  GFX_SPEED_PILL,1,100,						HA_NEXT,
   HA_END
 };
 static char *helpscreen_eltext[][2] =
@@ -416,7 +422,7 @@ static char *helpscreen_eltext[][2] =
  {"Quicksand: You cannot pass it,",	"but rocks can fall though it"},
  {"Massive Wall:",			"Nothing can go through it"},
  {"Normal Wall: You can't go through",	"it, but you can bomb it away"},
- {"Growing Wall: Grows to the left or",	"right if there is an empty field"},
+ {"Growing Wall: Grows in several di-",	"rections if there is an empty field"},
  {"Invisible Wall: Behaves like normal","wall, but is invisible"},
  {"Old Wall: Like normal wall, but",	"some things can fall down from it"},
  {"Letter Wall: Looks like a letter,",	"behaves like a normal wall"},
@@ -467,6 +473,10 @@ static char *helpscreen_eltext[][2] =
  {"Magic Wall (BD style):",		"Changes rocks and BD style diamonds"},
  {"Exit door: Opens if you have enough","emeralds to finish the level"},
  {"Open exit door: Enter here to leave","the level and exit the actual game"},
+ {"Sokoban element: Object which must", "be pushed to an empty field"},
+ {"Sokoban element: Empty field where", "a Sokoban object can be placed on"},
+ {"Sokoban element: Field with object", "which can be pushed away"},
+ {"Speed pill: Lets the player run",    "twice as fast as normally"},
 };
 static int num_helpscreen_els = sizeof(helpscreen_eltext)/(2*sizeof(char *));
 

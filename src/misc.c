@@ -235,8 +235,8 @@ char *getLoginName()
 {
   struct passwd *pwd;
 
-  if (!(pwd = getpwuid(getuid())))
-    return "ANONYMOUS";
+  if ((pwd = getpwuid(getuid())) == NULL)
+    return ANONYMOUS_NAME;
   else
     return pwd->pw_name;
 }
@@ -245,10 +245,33 @@ char *getRealName()
 {
   struct passwd *pwd;
 
-  if (!(pwd = getpwuid(getuid())))
-    return "ANONYMOUS";
+  if ((pwd = getpwuid(getuid())) == NULL || strlen(pwd->pw_gecos) == 0)
+    return ANONYMOUS_NAME;
   else
-    return pwd->pw_gecos;
+  {
+    static char real_name[1024];
+    char *from_ptr = pwd->pw_gecos, *to_ptr = real_name;
+
+    if (strchr(pwd->pw_gecos, 'ß') == NULL)
+      return pwd->pw_gecos;
+
+    /* the user's real name contains a 'ß' character (german sharp s),
+       which has no equivalent in upper case letters (which our fonts use) */
+    while (*from_ptr != '\0' && (long)(to_ptr - real_name) < 1024 - 2)
+    {
+      if (*from_ptr != 'ß')
+	*to_ptr++ = *from_ptr++;
+      else
+      {
+	from_ptr++;
+	*to_ptr++ = 's';
+	*to_ptr++ = 's';
+      }
+    }
+    *to_ptr = '\0';
+
+    return real_name;
+  }
 }
 
 char *getHomeDir()

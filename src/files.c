@@ -290,8 +290,8 @@ static void setLevelInfoToDefaults()
 
   level.high_speed = FALSE;
 
-  strcpy(level.name, "Nameless Level");
-  strcpy(level.author, "Anonymous");
+  strcpy(level.name, NAMELESS_LEVEL_NAME);
+  strcpy(level.author, ANONYMOUS_NAME);
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
@@ -307,6 +307,38 @@ static void setLevelInfoToDefaults()
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_AUSGANG_ZU;
 
   BorderElement = EL_BETON;
+
+  /* try to determine better author name than 'anonymous' */
+  if (strcmp(leveldir[leveldir_nr].author, ANONYMOUS_NAME) != 0)
+  {
+    strncpy(level.author, leveldir[leveldir_nr].author,
+	    MAX_LEVEL_AUTHOR_LEN - 1);
+    level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  }
+  else
+  {
+    switch (LEVELCLASS(leveldir_nr))
+    {
+      case LEVELCLASS_TUTORIAL:
+  	strcpy(level.author, PROGRAM_AUTHOR_STRING);
+  	break;
+
+      case LEVELCLASS_CONTRIBUTION:
+  	strncpy(level.author, leveldir[leveldir_nr].name,
+		MAX_LEVEL_AUTHOR_LEN - 1);
+  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  	break;
+
+      case LEVELCLASS_USER:
+  	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN - 1);
+  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
+  	break;
+
+      default:
+  	/* keep default value */
+  	break;
+    }
+  }
 }
 
 void LoadLevel(int level_nr)
@@ -437,39 +469,6 @@ void LoadLevel(int level_nr)
   if (level.time <= 10)		/* minimum playing time of each level */
     level.time = 10;
 #endif
-
-  /* determine level author */
-  if (leveldir[leveldir_nr].author)
-  {
-    strncpy(level.author, leveldir[leveldir_nr].author,
-	    MAX_LEVEL_AUTHOR_LEN - 1);
-    level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
-  }
-  else
-  {
-    switch (LEVELCLASS(leveldir_nr))
-    {
-      case LEVELCLASS_TUTORIAL:
-  	strcpy(level.author, PROGRAM_AUTHOR_STRING);
-  	break;
-  
-      case LEVELCLASS_CLASSICS:
-      case LEVELCLASS_CONTRIBUTION:
-  	strncpy(level.author, leveldir[leveldir_nr].name,
-		MAX_LEVEL_AUTHOR_LEN - 1);
-  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
-  	break;
-  
-      case LEVELCLASS_USER:
-  	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN - 1);
-  	level.author[MAX_LEVEL_AUTHOR_LEN - 1] = '\0';
-  	break;
-  
-      default:
-  	/* keep default value */
-  	break;
-    }
-  }
 
   /* player was faster than monsters in pre-1.0 levels */
   if (file_version == FILE_VERSION_1_0 &&
@@ -1275,8 +1274,8 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
-  ldi->name = getStringCopy("non-existing");
-  ldi->author = NULL;
+  ldi->name = getStringCopy(ANONYMOUS_NAME);
+  ldi->author = getStringCopy(ANONYMOUS_NAME);
   ldi->levels = 0;
   ldi->first_level = 0;
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
@@ -1408,7 +1407,7 @@ int getLastPlayedLevelOfLevelSeries(char *level_series_name)
 {
   char *token_value;
   int level_series_nr = getLevelSeriesNrFromLevelSeriesName(level_series_name);
-  int last_level_nr = 0;
+  int last_level_nr = leveldir[level_series_nr].first_level;
 
   if (!level_series_name)
     return 0;
@@ -1563,9 +1562,13 @@ static void SaveUserLevelInfo()
     return;
   }
 
+  /* always start with reliable default values */
+  setLevelDirInfoToDefaults(&ldi);
+
   ldi.name = getLoginName();
+  ldi.author = getRealName();
   ldi.levels = 100;
-  ldi.first_level = 0;
+  ldi.first_level = 1;
   ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
 

@@ -1530,7 +1530,10 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   }
 
   /* redraw micro level label, if needed */
-  if (DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
+  if (strcmp(level.name, NAMELESS_LEVEL_NAME) != 0 &&
+      strcmp(level.author, ANONYMOUS_NAME) != 0 &&
+      strcmp(level.author, leveldir[leveldir_nr].name) != 0 &&
+      DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
   {
     label_counter = (label_counter + 1) % 23;
     label_state = (label_counter >= 0 && label_counter <= 7 ? 1 :
