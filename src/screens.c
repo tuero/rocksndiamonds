@@ -201,13 +201,8 @@ static void PlayMenuMusic()
 
 void DrawHeadline()
 {
-  int text1_width = getTextWidth(PROGRAM_TITLE_STRING,     FONT_TITLE_1);
-  int text2_width = getTextWidth(PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2);
-  int x1 = SX + (SXSIZE - text1_width) / 2;
-  int x2 = SX + (SXSIZE - text2_width) / 2;
-
-  DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,     FONT_TITLE_1);
-  DrawText(x2, SY + 46, PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2);
+  DrawTextSCentered(8,  FONT_TITLE_1, PROGRAM_TITLE_STRING);
+  DrawTextSCentered(46, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -238,8 +233,7 @@ void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
-  int name_width  = getTextWidth("Name:",  FONT_MENU_1);
-  int level_width = getTextWidth("Level:", FONT_MENU_1);
+  int name_width, level_width;
   int i;
 
   UnmapAllGadgets();
@@ -306,6 +300,10 @@ void DrawMainMenu()
   DrawText(mSX + 32, mSY + 8*32, "Setup", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 9*32, "Quit", FONT_MENU_1);
 
+  /* calculated after (possible) reload of custom artwork */
+  name_width = getTextWidth(name_text, FONT_MENU_1);
+  level_width = getTextWidth("Level:", FONT_MENU_1);
+
   DrawText(mSX + 32 + name_width, mSY + 2*32, setup.player_name, FONT_INPUT_1);
   DrawText(mSX + level_width + 5 * 32, mSY + 3*32, int2str(level_nr,3),
 	   FONT_VALUE_1);
@@ -330,7 +328,7 @@ void DrawMainMenu()
   drawCursorXY(level_width/32 + 4, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width/32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
 
-  DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment", FONT_TITLE_2);
+  DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
   FadeToFront();
   InitAnimation();
@@ -997,7 +995,8 @@ void HandleInfoScreen_Music(int button)
     int y = 0;
 
     if (button != MB_MENU_INITIALIZE)
-      list = list->next;
+      if (list != NULL)
+	list = list->next;
 
     if (list == NULL)
     {
@@ -1072,7 +1071,7 @@ void HandleInfoScreen_Music(int button)
 		      "Press any key or button for next page");
   }
 
-  if (list->is_sound && sound_info[list->music].loop)
+  if (list != NULL && list->is_sound && sound_info[list->music].loop)
     PlaySoundLoop(list->music);
 }
 

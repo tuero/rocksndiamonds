@@ -1076,6 +1076,7 @@ void InitGame()
     player->post_delay_counter = 0;
 
     player->action_waiting = ACTION_DEFAULT;
+    player->last_action_waiting = ACTION_DEFAULT;
     player->special_action_bored = ACTION_DEFAULT;
     player->special_action_sleeping = ACTION_DEFAULT;
 
@@ -6175,125 +6176,49 @@ static boolean CheckElementChange(int x, int y, int element, int trigger_event)
   return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
 }
 
-int GetPlayerAction(struct PlayerInfo *player, int move_dir)
+static void PlayPlayerSound(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
   int element = player->element_nr;
-  int action = (player->is_pushing    ? ACTION_PUSHING    :
-		player->is_digging    ? ACTION_DIGGING    :
-		player->is_collecting ? ACTION_COLLECTING :
-		player->is_moving     ? ACTION_MOVING     :
-		player->is_snapping   ? ACTION_SNAPPING   :
-		player->is_sleeping   ? ACTION_SLEEPING   :
-		player->is_bored      ? ACTION_BORING     :
-		player->is_waiting    ? ACTION_WAITING    : ACTION_DEFAULT);
+  int last_action = player->last_action_waiting;
+  int action = player->action_waiting;
 
-  if (player->is_sleeping)
+  if (player->is_waiting)
   {
-    if (player->num_special_action_sleeping > 0)
-    {
-      int last_action = player->action_waiting;
-
-      if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
-      {
-	int last_special_action = player->special_action_sleeping;
-	int num_special_action = player->num_special_action_sleeping;
-	int special_action =
-	  (last_special_action == ACTION_DEFAULT ? ACTION_SLEEPING_1 :
-	   last_special_action == ACTION_SLEEPING ? ACTION_SLEEPING :
-	   last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
-	   last_special_action + 1 : ACTION_SLEEPING);
-	int special_graphic =
-	  el_act_dir2img(player->element_nr, special_action, move_dir);
-
-	player->anim_delay_counter =
-	  graphic_info[special_graphic].anim_delay_fixed +
-	  SimpleRND(graphic_info[special_graphic].anim_delay_random);
-	player->post_delay_counter =
-	  graphic_info[special_graphic].post_delay_fixed +
-	  SimpleRND(graphic_info[special_graphic].post_delay_random);
-
-	player->special_action_sleeping = special_action;
-      }
-
-      if (player->anim_delay_counter > 0)
-      {
-	action = player->special_action_sleeping;
-	player->anim_delay_counter--;
-      }
-      else if (player->post_delay_counter > 0)
-      {
-	player->post_delay_counter--;
-      }
-
-      player->action_waiting = action;
-
-      if (last_action != action)
-	PlayLevelSoundElementAction(jx, jy, element, action);
-      else
-	PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
-    }
+    if (action != last_action)
+      PlayLevelSoundElementAction(jx, jy, element, action);
+    else
+      PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
   }
-  else if (player->is_bored)
+  else
   {
-    if (player->num_special_action_bored > 0)
-    {
-      int last_action = player->action_waiting;
+    if (action != last_action)
+      StopSound(element_info[element].sound[last_action]);
 
-      if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
-      {
-	int special_action =
-	  ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
-	int special_graphic =
-	  el_act_dir2img(player->element_nr, special_action, move_dir);
-
-	player->anim_delay_counter =
-	  graphic_info[special_graphic].anim_delay_fixed +
-	  SimpleRND(graphic_info[special_graphic].anim_delay_random);
-	player->post_delay_counter =
-	  graphic_info[special_graphic].post_delay_fixed +
-	  SimpleRND(graphic_info[special_graphic].post_delay_random);
-
-	player->special_action_bored = special_action;
-      }
-
-      if (player->anim_delay_counter > 0)
-      {
-	action = player->special_action_bored;
-	player->anim_delay_counter--;
-      }
-      else if (player->post_delay_counter > 0)
-      {
-	player->post_delay_counter--;
-      }
-
-      player->action_waiting = action;
-
-      if (last_action != action)
-	PlayLevelSoundElementAction(jx, jy, element, action);
-      else
-	PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
-    }
+    if (last_action == ACTION_SLEEPING)
+      PlayLevelSoundElementAction(jx, jy, element, ACTION_AWAKENING);
   }
+}
 
-  return action;
+static void PlayAllPlayersSound()
+{
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (stored_player[i].active)
+      PlayPlayerSound(&stored_player[i]);
 }
 
 static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 {
-  int jx = player->jx, jy = player->jy;
-  int element = player->element_nr;
-  boolean was_waiting = player->is_waiting;
+  boolean last_waiting = player->is_waiting;
+  int move_dir = player->MovDir;
+
+  player->last_action_waiting = player->action_waiting;
 
   if (is_waiting)
   {
-    int last_action, action;
-    boolean play_sound;
-
-    last_action = (player->is_sleeping ? ACTION_SLEEPING :
-		   player->is_bored ? ACTION_BORING : ACTION_WAITING);
-
-    if (!was_waiting)		/* not waiting -> waiting */
+    if (!last_waiting)		/* not waiting -> waiting */
     {
       player->is_waiting = TRUE;
 
@@ -6320,24 +6245,82 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	     FrameCounter >= player->frame_counter_bored)
       player->is_bored = TRUE;
 
-    action = (player->is_sleeping ? ACTION_SLEEPING :
-	      player->is_bored ? ACTION_BORING : ACTION_WAITING);
+    player->action_waiting = (player->is_sleeping ? ACTION_SLEEPING :
+			      player->is_bored ? ACTION_BORING :
+			      ACTION_WAITING);
 
-    play_sound =
-      ((player->is_sleeping && player->num_special_action_sleeping == 0) ||
-       (player->is_bored    && player->num_special_action_bored == 0) ||
-       (player->is_waiting && !player->is_sleeping && !player->is_bored));
-
-    if (play_sound && action != last_action)
-      PlayLevelSoundElementAction(jx, jy, element, action);
-    else
-      PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
-  }
-  else if (was_waiting)		/* waiting -> not waiting */
-  {
     if (player->is_sleeping)
-      PlayLevelSoundElementAction(jx, jy, element, ACTION_AWAKENING);
+    {
+      if (player->num_special_action_sleeping > 0)
+      {
+	if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
+	{
+	  int last_special_action = player->special_action_sleeping;
+	  int num_special_action = player->num_special_action_sleeping;
+	  int special_action =
+	    (last_special_action == ACTION_DEFAULT ? ACTION_SLEEPING_1 :
+	     last_special_action == ACTION_SLEEPING ? ACTION_SLEEPING :
+	     last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
+	     last_special_action + 1 : ACTION_SLEEPING);
+	  int special_graphic =
+	    el_act_dir2img(player->element_nr, special_action, move_dir);
 
+	  player->anim_delay_counter =
+	    graphic_info[special_graphic].anim_delay_fixed +
+	    SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	  player->post_delay_counter =
+	    graphic_info[special_graphic].post_delay_fixed +
+	    SimpleRND(graphic_info[special_graphic].post_delay_random);
+
+	  player->special_action_sleeping = special_action;
+	}
+
+	if (player->anim_delay_counter > 0)
+	{
+	  player->action_waiting = player->special_action_sleeping;
+	  player->anim_delay_counter--;
+	}
+	else if (player->post_delay_counter > 0)
+	{
+	  player->post_delay_counter--;
+	}
+      }
+    }
+    else if (player->is_bored)
+    {
+      if (player->num_special_action_bored > 0)
+      {
+	if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
+	{
+	  int special_action =
+	    ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
+	  int special_graphic =
+	    el_act_dir2img(player->element_nr, special_action, move_dir);
+
+	  player->anim_delay_counter =
+	    graphic_info[special_graphic].anim_delay_fixed +
+	    SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	  player->post_delay_counter =
+	    graphic_info[special_graphic].post_delay_fixed +
+	    SimpleRND(graphic_info[special_graphic].post_delay_random);
+
+	  player->special_action_bored = special_action;
+	}
+
+	if (player->anim_delay_counter > 0)
+	{
+	  player->action_waiting = player->special_action_bored;
+	  player->anim_delay_counter--;
+	}
+	else if (player->post_delay_counter > 0)
+	{
+	  player->post_delay_counter--;
+	}
+      }
+    }
+  }
+  else if (last_waiting)	/* waiting -> not waiting */
+  {
     player->is_waiting = FALSE;
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
@@ -6347,6 +6330,8 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
+
+    player->action_waiting = ACTION_DEFAULT;
 
     player->special_action_bored = ACTION_DEFAULT;
     player->special_action_sleeping = ACTION_DEFAULT;
@@ -7058,6 +7043,7 @@ void GameActions()
   }
 
   DrawAllPlayers();
+  PlayAllPlayersSound();
 
   if (options.debug)			/* calculate frames per second */
   {
@@ -9031,7 +9017,7 @@ static void StopLevelSoundActionIfLoop(int x, int y, int action)
   int sound_effect = element_info[Feld[x][y]].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
-    StopSoundExt(sound_effect, SND_CTRL_STOP_SOUND);
+    StopSound(sound_effect);
 }
 
 static void PlayLevelMusic()

@@ -628,55 +628,12 @@ void DrawPlayer(struct PlayerInfo *player)
   if (element == EL_EXPLOSION)
     return;
 
-#if 1
-
-  action = GetPlayerAction(player, move_dir);
-
-#else
-
-  action = (player->is_pushing	  ? ACTION_PUSHING    :
-	    player->is_digging    ? ACTION_DIGGING    :
-	    player->is_collecting ? ACTION_COLLECTING :
-	    player->is_moving     ? ACTION_MOVING     :
-	    player->is_snapping   ? ACTION_SNAPPING   :
-	    player->is_sleeping   ? ACTION_SLEEPING   :
-	    player->is_bored      ? ACTION_BORING     :
-	    player->is_waiting    ? ACTION_WAITING    : ACTION_DEFAULT);
-
-  if (player->is_bored && player->num_special_action_bored > 0)
-  {
-    if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
-    {
-      int graphic_waiting;
-
-      action = ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
-      special_graphic = el_act_dir2img(EL_SP_MURPHY, action, move_dir);
-
-      player->anim_delay_counter =
-	graphic_info[special_graphic].anim_delay_fixed +
-	SimpleRND(graphic_info[special_graphic].anim_delay_random);
-      player->post_delay_counter =
-	graphic_info[special_graphic].post_delay_fixed +
-	SimpleRND(graphic_info[special_graphic].post_delay_random);
-      player->special_action_bored = action;
-    }
-
-    if (player->anim_delay_counter > 0)
-    {
-      action = player->special_action_bored;
-      player->anim_delay_counter--;
-    }
-
-    if (player->post_delay_counter > 0)
-    {
-      player->post_delay_counter--;
-    }
-  }
-#endif
-
-#if 0
-  printf("::: '%s'\n", element_action_info[action].suffix);
-#endif
+  action = (player->is_pushing    ? ACTION_PUSHING         :
+	    player->is_digging    ? ACTION_DIGGING         :
+	    player->is_collecting ? ACTION_COLLECTING      :
+	    player->is_moving     ? ACTION_MOVING          :
+	    player->is_snapping   ? ACTION_SNAPPING        :
+	    player->is_waiting    ? player->action_waiting : ACTION_DEFAULT);
 
   InitPlayerGfxAnimation(player, action, move_dir);
 

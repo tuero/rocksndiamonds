@@ -1089,7 +1089,7 @@
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
 #define PROGRAM_VERSION_PATCH	8
-#define PROGRAM_VERSION_BUILD	1
+#define PROGRAM_VERSION_BUILD	2
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
@@ -1217,7 +1217,7 @@ struct PlayerInfo
   int anim_delay_counter;
   int post_delay_counter;
 
-  int action_waiting;
+  int action_waiting, last_action_waiting;
   int special_action_bored;
   int special_action_sleeping;
 
