@@ -254,7 +254,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "biomaze"
   },
   {
-    "dynamite_active",
+    "dynamite.active",
     "dynamite",
     "burning dynamite"
   },
@@ -269,7 +269,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "magic wheel"
   },
   {
-    "robot_wheel_active",
+    "robot_wheel.active",
     "robot_wheel",
     "magic wheel (running)"
   },
@@ -351,7 +351,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "lamp (off)"
   },
   {
-    "lamp_active",
+    "lamp.active",
     "lamp",
     "lamp (on)"
   },
@@ -461,39 +461,39 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "sokoban field with object"
   },
   {
-    "bd_butterfly_right",
+    "bd_butterfly.right",
     "bd_butterfly",
     "butterfly (starts moving right)"},
   {
-    "bd_butterfly_up",
+    "bd_butterfly.up",
     "bd_butterfly",
     "butterfly (starts moving up)"
   },
   {
-    "bd_butterfly_left",
+    "bd_butterfly.left",
     "bd_butterfly",
     "butterfly (starts moving left)"},
   {
-    "bd_butterfly_down",
+    "bd_butterfly.down",
     "bd_butterfly",
     "butterfly (starts moving down)"},
   {
-    "bd_firefly_right",
+    "bd_firefly.right",
     "bd_firefly",
     "firefly (starts moving right)"
   },
   {
-    "bd_firefly_up",
+    "bd_firefly.up",
     "bd_firefly",
     "firefly (starts moving up)"
   },
   {
-    "bd_firefly_left",
+    "bd_firefly.left",
     "bd_firefly",
     "firefly (starts moving left)"
   },
   {
-    "bd_firefly_down",
+    "bd_firefly.down",
     "bd_firefly",
     "firefly (starts moving down)"
   },
@@ -528,59 +528,59 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "blue player"
   },
   {
-    "bug_right",
+    "bug.right",
     "bug",
     "bug (starts moving right)"
   },
   {
-    "bug_up",
+    "bug.up",
     "bug",
     "bug (starts moving up)"
   },
   {
-    "bug_left",
+    "bug.left",
     "bug",
     "bug (starts moving left)"
   },
   {
-    "bug_down",
+    "bug.down",
     "bug",
     "bug (starts moving down)"
   },
   {
-    "spaceship_right",
+    "spaceship.right",
     "spaceship",
     "spaceship (starts moving right)"},
   {
-    "spaceship_up",
+    "spaceship.up",
     "spaceship",
     "spaceship (starts moving up)"
   },
   {
-    "spaceship_left",
+    "spaceship.left",
     "spaceship",
     "spaceship (starts moving left)"},
   {
-    "spaceship_down",
+    "spaceship.down",
     "spaceship",
     "spaceship (starts moving down)"},
   {
-    "pacman_right",
+    "pacman.right",
     "pacman",
     "pac man (starts moving right)"
   },
   {
-    "pacman_up",
+    "pacman.up",
     "pacman",
     "pac man (starts moving up)"
   },
   {
-    "pacman_left",
+    "pacman.left",
     "pacman",
     "pac man (starts moving left)"
   },
   {
-    "pacman_down",
+    "pacman.down",
     "pacman",
     "pac man (starts moving down)"
   },
@@ -1595,7 +1595,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "light switch (off)"
   },
   {
-    "light_switch_active",
+    "light_switch.active",
     "light_switch",
     "light switch (on)"
   },
@@ -1660,22 +1660,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "sign (other)"
   },
   {
-    "mole_left",
+    "mole.left",
     "mole",
     "mole (starts moving left)"
   },
   {
-    "mole_right",
+    "mole.right",
     "mole",
     "mole (starts moving right)"
   },
   {
-    "mole_up",
+    "mole.up",
     "mole",
     "mole (starts moving up)"
   },
   {
-    "mole_down",
+    "mole.down",
     "mole",
     "mole (starts moving down)"
   },
@@ -1725,7 +1725,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "time gate (closed)"
   },
   {
-    "timegate_switch_active",
+    "timegate_switch.active",
     "timegate_switch",
     "switch for time gate"
   },
@@ -3230,142 +3230,142 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   /* ----------------------------------------------------------------------- */
 
   {
-    "dynabomb_player_1_active",
+    "dynabomb_player_1.active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player_2_active",
+    "dynabomb_player_2.active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player_3_active",
+    "dynabomb_player_3.active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player_4_active",
+    "dynabomb_player_4.active",
     "dynabomb",
     "-"
   },
   {
-    "sp_disk_red_active",
+    "sp_disk_red.active",
     "dynamite",
     "-"
   },
   {
-    "switchgate_opening",
+    "switchgate.opening",
     "switchgate",
     "-"
   },
   {
-    "switchgate_closing",
+    "switchgate.closing",
     "switchgate",
     "-"
   },
   {
-    "timegate_opening",
+    "timegate.opening",
     "timegate",
     "-"
   },
   {
-    "timegate_closing",
+    "timegate.closing",
     "timegate",
     "-"
   },
   {
-    "pearl_breaking",
+    "pearl.breaking",
     "pearl",
     "-"
   },
   {
-    "trap_active",
+    "trap.active",
     "trap",
     "-"
   },
   {
-    "invisible_steelwall_active",
+    "invisible_steelwall.active",
     "wall",
     "-"
   },
   {
-    "invisible_wall_active",
+    "invisible_wall.active",
     "wall",
     "-"
   },
   {
-    "invisible_sand_active",
+    "invisible_sand.active",
     "sand",
     "-"
   },
   {
-    "conveyor_belt_1_left_active",
+    "conveyor_belt_1_left.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_1_middle_active",
+    "conveyor_belt_1_middle.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_1_right_active",
+    "conveyor_belt_1_right.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_2_left_active",
+    "conveyor_belt_2_left.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_2_middle_active",
+    "conveyor_belt_2_middle.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_2_right_active",
+    "conveyor_belt_2_right.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_3_left_active",
+    "conveyor_belt_3_left.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_3_middle_active",
+    "conveyor_belt_3_middle.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_3_right_active",
+    "conveyor_belt_3_right.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_4_left_active",
+    "conveyor_belt_4_left.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_4_middle_active",
+    "conveyor_belt_4_middle.active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt_4_right_active",
+    "conveyor_belt_4_right.active",
     "conveyor_belt",
     "-"
   },
   {
-    "exit_opening",
+    "exit.opening",
     "exit",
     "-"
   },
   {
-    "exit_closing",
+    "exit.closing",
     "exit",
     "-"
   },
@@ -3375,17 +3375,17 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "sp_terminal_active",
+    "sp_terminal.active",
     "sp_terminal",
     "-"
   },
   {
-    "sp_buggy_base_activating",
+    "sp_buggy_base.activating",
     "sp_buggy_base",
     "-"
   },
   {
-    "sp_buggy_base_active",
+    "sp_buggy_base.active",
     "sp_buggy_base",
     "-"
   },
@@ -3395,22 +3395,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "amoeba_dropping",
+    "amoeba.dropping",
     "amoeba",
     "-"
   },
   {
-    "quicksand_emptying",
+    "quicksand.emptying",
     "quicksand",
     "-"
   },
   {
-    "magic_wall_active",
+    "magic_wall.active",
     "magic_wall",
     "-"
   },
   {
-    "bd_magic_wall_active",
+    "bd_magic_wall.active",
     "magic_wall",
     "-"
   },
@@ -3425,12 +3425,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "magic_wall_emptying",
+    "magic_wall.emptying",
     "magic_wall",
     "-"
   },
   {
-    "bd_magic_wall_emptying",
+    "bd_magic_wall.emptying",
     "magic_wall",
     "-"
   },
@@ -3490,7 +3490,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "expandable_wall_growing",
+    "expandable_wall.growing",
     "-",
     "-"
   },
@@ -3505,17 +3505,17 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "quicksand_filling",
+    "quicksand.filling",
     "quicksand",
     "-"
   },
   {
-    "magic_wall_filling",
+    "magic_wall.filling",
     "-",
     "-"
   },
   {
-    "bd_magic_wall_filling",
+    "bd_magic_wall.filling",
     "-",
     "-"
   },
@@ -3590,7 +3590,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "dynabomb_active",
+    "dynabomb.active",
     "-",
     "-"
   },
@@ -3615,12 +3615,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "shield_normal_active",
+    "shield_normal.active",
     "-",
     "-"
   },
   {
-    "shield_deadly_active",
+    "shield_deadly.active",
     "-",
     "-"
   },
