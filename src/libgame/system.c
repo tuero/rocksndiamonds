@@ -215,6 +215,7 @@ inline void CloseVideoDisplay(void)
 #if defined(TARGET_SDL)
   SDL_QuitSubSystem(SDL_INIT_VIDEO);
 #else
+
   if (display)
     XCloseDisplay(display);
 #endif
@@ -639,13 +640,16 @@ Bitmap *LoadImage(char *filename)
 
 Bitmap *LoadCustomImage(char *basename)
 {
-  char *filename = getStringCopy(getCustomImageFilename(basename));
+  char *filename = getCustomImageFilename(basename);
   Bitmap *new_bitmap;
+
+  if (filename == NULL)
+    Error(ERR_EXIT, "LoadCustomImage(): cannot find file '%s'", basename);
 
   if ((new_bitmap = LoadImage(filename)) == NULL)
     Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
 
-  new_bitmap->source_filename = filename;
+  new_bitmap->source_filename = getStringCopy(filename);
 
   return new_bitmap;
 }

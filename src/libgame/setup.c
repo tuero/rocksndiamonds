@@ -166,53 +166,94 @@ static char *getLevelSetupDir(char *level_subdir)
   return levelsetup_dir;
 }
 
-static char *getUserGraphicsDir(char *graphics_subdir)
+static char *getCurrentLevelDir()
+{
+  static char *level_dir = NULL;
+
+  if (level_dir)
+    free(level_dir);
+
+  if (leveldir_current == NULL)
+    return options.level_directory;
+
+  level_dir = getPath2((leveldir_current->user_defined ?
+			getUserLevelDir(NULL) : options.level_directory),
+		       leveldir_current->fullpath);
+
+  return level_dir;
+}
+
+static char *getDefaultGraphicsDir(char *graphics_subdir)
+{
+  static char *graphics_dir = NULL;
+
+  if (graphics_subdir == NULL)
+    return options.graphics_directory;
+
+  if (graphics_dir)
+    free(graphics_dir);
+
+  graphics_dir = getPath2(options.graphics_directory, graphics_subdir);
+
+  return graphics_dir;
+}
+
+static char *getDefaultSoundsDir(char *sounds_subdir)
+{
+  static char *sounds_dir = NULL;
+
+  if (sounds_subdir == NULL)
+    return options.sounds_directory;
+
+  if (sounds_dir)
+    free(sounds_dir);
+
+  sounds_dir = getPath2(options.sounds_directory, sounds_subdir);
+
+  return sounds_dir;
+}
+
+static char *getDefaultMusicDir(char *music_subdir)
+{
+  static char *music_dir = NULL;
+
+  if (music_subdir == NULL)
+    return options.music_directory;
+
+  if (music_dir)
+    free(music_dir);
+
+  music_dir = getPath2(options.music_directory, music_subdir);
+
+  return music_dir;
+}
+
+static char *getUserGraphicsDir()
 {
   static char *usergraphics_dir = NULL;
-  char *data_dir = getUserDataDir();
-  char *usergraphics_subdir = GRAPHICS_DIRECTORY;
 
-  if (usergraphics_dir)
-    free(usergraphics_dir);
-
-  if (graphics_subdir != NULL)
-    usergraphics_dir = getPath3(data_dir, usergraphics_subdir,graphics_subdir);
-  else
-    usergraphics_dir = getPath2(data_dir, usergraphics_subdir);
+  if (usergraphics_dir == NULL)
+    usergraphics_dir = getPath2(getUserDataDir(), GRAPHICS_DIRECTORY);
 
   return usergraphics_dir;
 }
 
-static char *getUserSoundsDir(char *sounds_subdir)
+static char *getUserSoundsDir()
 {
   static char *usersounds_dir = NULL;
-  char *data_dir = getUserDataDir();
-  char *usersounds_subdir = SOUNDS_DIRECTORY;
 
-  if (usersounds_dir)
-    free(usersounds_dir);
-
-  if (sounds_subdir != NULL)
-    usersounds_dir = getPath3(data_dir, usersounds_subdir,sounds_subdir);
-  else
-    usersounds_dir = getPath2(data_dir, usersounds_subdir);
+  if (usersounds_dir == NULL)
+    usersounds_dir = getPath2(getUserDataDir(), SOUNDS_DIRECTORY);
 
   return usersounds_dir;
 }
 
-static char *getUserMusicDir(char *music_subdir)
+static char *getUserMusicDir()
 {
   static char *usermusic_dir = NULL;
-  char *data_dir = getUserDataDir();
-  char *usermusic_subdir = MUSIC_DIRECTORY;
 
-  if (usermusic_dir)
-    free(usermusic_dir);
-
-  if (music_subdir != NULL)
-    usermusic_dir = getPath3(data_dir, usermusic_subdir,music_subdir);
-  else
-    usermusic_dir = getPath2(data_dir, usermusic_subdir);
+  if (usermusic_dir == NULL)
+    usermusic_dir = getPath2(getUserDataDir(), MUSIC_DIRECTORY);
 
   return usermusic_dir;
 }
@@ -226,11 +267,7 @@ char *getLevelFilename(int nr)
     free(filename);
 
   sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
-  filename = getPath3((leveldir_current->user_defined ?
-		       getUserLevelDir(NULL) :
-		       options.level_directory),
-		      leveldir_current->fullpath,
-		      basename);
+  filename = getPath2(getCurrentLevelDir(), basename);
 
   return filename;
 }
@@ -275,7 +312,19 @@ char *getSetupFilename()
   return filename;
 }
 
-static char *getImageBasename(char *basename)
+static char *getSetupArtworkDir(TreeInfo *ti)
+{
+  static char *artwork_dir = NULL;
+
+  if (artwork_dir != NULL)
+    free(artwork_dir);
+
+  artwork_dir = getPath2(ti->basepath, ti->fullpath);
+
+  return artwork_dir;
+}
+
+static char *getCorrectedImageBasename(char *basename)
 {
   char *result = basename;
 
@@ -292,34 +341,50 @@ static char *getImageBasename(char *basename)
   return result;
 }
 
-char *getImageFilename(char *basename)
+static boolean fileExists(char *filename)
+{
+#if 0
+  printf("checking file '%s'\n", filename);
+#endif
+
+  return (access(filename, F_OK) == 0);
+}
+
+char *getCustomImageFilename(char *basename)
 {
   static char *filename = NULL;
 
   if (filename != NULL)
     free(filename);
 
-  filename = getPath2(options.graphics_directory, getImageBasename(basename));
+  basename = getCorrectedImageBasename(basename);
 
-  return filename;
-}
+  /* 1st try: look for special artwork in current level series directory */
+  filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
+  if (fileExists(filename))
+    return filename;
 
-char *getCustomImageFilename(char *basename)
-{
-#if 0
-  if (strcmp(basename, "RocksFont.pcx") == 0)
-  {
-    char *dir = options.graphics_directory;
+  /* 2nd try: look for special artwork in private artwork directory */
+  filename = getPath2(getUserGraphicsDir(), basename);
+  if (fileExists(filename))
+    return filename;
 
-    printf("checking directory '%s' ...\n", dir);
+  /* 3rd try: look for special artwork in configured artwork directory */
+  filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
+  if (fileExists(filename))
+    return filename;
 
-    /*
-    dir = getPath2(options.graphics_directory);
-    */
-  }
-#endif
+  /* 4th try: look for default artwork in new default artwork directory */
+  filename = getPath2(getDefaultGraphicsDir("gfx_classic"), basename);
+  if (fileExists(filename))
+    return filename;
 
-  return getImageFilename(basename);
+  /* 5th try: look for default artwork in old default artwork directory */
+  filename = getPath2(options.graphics_directory, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;					/* cannot find image file */
 }
 
 void InitTapeDirectory(char *level_subdir)
@@ -1629,21 +1694,21 @@ void LoadArtworkInfo()
 				options.graphics_directory,
 				TREE_TYPE_GRAPHICS_DIR);
   LoadArtworkInfoFromArtworkDir(&artwork.gfx_first, NULL,
-				getUserGraphicsDir(NULL),
+				getUserGraphicsDir(),
 				TREE_TYPE_GRAPHICS_DIR);
 
   LoadArtworkInfoFromArtworkDir(&artwork.snd_first, NULL,
 				options.sounds_directory,
 				TREE_TYPE_SOUNDS_DIR);
   LoadArtworkInfoFromArtworkDir(&artwork.snd_first, NULL,
-				getUserSoundsDir(NULL),
+				getUserSoundsDir(),
 				TREE_TYPE_SOUNDS_DIR);
 
   LoadArtworkInfoFromArtworkDir(&artwork.mus_first, NULL,
 				options.music_directory,
 				TREE_TYPE_MUSIC_DIR);
   LoadArtworkInfoFromArtworkDir(&artwork.mus_first, NULL,
-				getUserMusicDir(NULL),
+				getUserMusicDir(),
 				TREE_TYPE_MUSIC_DIR);
 
   /* before sorting, the first entries will be from the user directory */
@@ -1655,7 +1720,7 @@ void LoadArtworkInfo()
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
 
-#if 1
+#if 0
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
