@@ -63,6 +63,9 @@ void InitGame()
   BOOL emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   BOOL emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
 
+  /* don't play tapes over network */
+  network_playing = (network && !tape.playing);
+
   for(i=0; i<MAX_PLAYERS; i++)
   {
     struct PlayerInfo *player = &stored_player[i];
@@ -134,7 +137,7 @@ void InitGame()
 
 
   /* initial null action */
-  if (network)
+  if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
 
 
@@ -2889,7 +2892,7 @@ void GameActions(byte player_action)
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
 
-  if (network && !network_player_action_received)
+  if (network_playing && !network_player_action_received)
   {
     /*
 #ifdef DEBUG
@@ -2926,13 +2929,18 @@ void GameActions(byte player_action)
   else
     recorded_player_action = NULL;
 
-  if (network)
+  if (network_playing)
     SendToServer_MovePlayer(player_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
+    /*
     int actual_player_action =
       (network ? network_player_action[i] : player_action);
+      */
+
+    int actual_player_action =
+      (network_playing ? network_player_action[i] : player_action);
 
     /*
     int actual_player_action = network_player_action[i];

@@ -516,6 +516,9 @@ static void Handle_OP_MOVE_FIGURE()
   int frame_nr;
   int i;
 
+  if (!network_playing)
+    return;
+
   frame_nr =
     (buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | (buf[5]);
 

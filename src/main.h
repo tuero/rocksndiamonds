@@ -329,6 +329,7 @@ extern int		verbose;
 
 extern int		game_status;
 extern int		game_emulation;
+extern int		network_playing;
 extern int		button_status, motion_status;
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;

@@ -56,6 +56,7 @@ int		verbose = FALSE;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;
+int		network_playing = FALSE;
 int		button_status = MB_NOT_PRESSED, motion_status = FALSE;
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;

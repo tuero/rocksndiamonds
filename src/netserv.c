@@ -41,7 +41,7 @@ static int clients = 0;
 static int bots = 0;
 static int onceonly = 0;
 static int timetoplay = 0;
-static int daemon = 0;
+static int is_daemon = 0;
 static int level = 5;
 static int mode = -1;
 static int paused = 0;
@@ -83,7 +83,7 @@ static fd_set fds;
 
 static void syserr(char *s)
 {
-  if (!daemon)
+  if (!is_daemon)
     fprintf(stderr, "fatal: %s failed.\n", s);
   exit(1);
 }
@@ -518,7 +518,7 @@ void NetworkServer(int port, int serveronly)
   unsigned int len;
   struct protoent *tcpproto;
   struct timeval tv;
-  int daemon = 0;
+  int is_daemon = 0;
 
 #ifndef NeXT
   struct sigaction sact;
@@ -558,7 +558,7 @@ void NetworkServer(int port, int serveronly)
 
   listen(lfd, 5);
 
-  if (daemon)
+  if (is_daemon)
   {
     /* become a daemon, breaking all ties with the controlling terminal */
     verbose = 0;
