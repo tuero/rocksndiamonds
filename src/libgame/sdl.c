@@ -829,14 +829,6 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 /* http://www.ferzkopp.net/Software/SDL_gfx-2.0/index.html                   */
 /* ========================================================================= */
 
-typedef struct
-{
-  Uint8 r;
-  Uint8 g;
-  Uint8 b;
-  Uint8 a;
-} tColorRGBA;
-
 /*
   -----------------------------------------------------------------------------
   32 bit zoomer
@@ -844,6 +836,14 @@ typedef struct
   zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
   -----------------------------------------------------------------------------
 */
+
+typedef struct
+{
+  Uint8 r;
+  Uint8 g;
+  Uint8 b;
+  Uint8 a;
+} tColorRGBA;
 
 int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 {
@@ -1028,32 +1028,10 @@ int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
   -----------------------------------------------------------------------------
 */
 
-void zoomSurfaceSize(int width, int height, float zoom_x, float zoom_y,
-		     int *dst_width, int *dst_height)
-{
-  const float value_limit = 0.001;
-
-  /* sanity check zoom factors */
-  if (zoom_x < value_limit)
-    zoom_x = value_limit;
-  if (zoom_y < value_limit)
-    zoom_y = value_limit;
-
-  /* calculate target size */
-  *dst_width  = (int) ((float) width  * zoom_x);
-  *dst_height = (int) ((float) height * zoom_y);
-
-  if (*dst_width < 1)
-    *dst_width = 1;
-  if (*dst_height < 1)
-    *dst_height = 1;
-}
-
-SDL_Surface *zoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
+SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
 {
   SDL_Surface *zoom_src = NULL;
   SDL_Surface *zoom_dst = NULL;
-  int dst_width, dst_height;
   boolean is_converted = FALSE;
   boolean is_32bit;
   int i;
@@ -1078,10 +1056,6 @@ SDL_Surface *zoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
     is_32bit = TRUE;
     is_converted = TRUE;
   }
-
-  /* get size of destination surface */
-  zoomSurfaceSize(zoom_src->w, zoom_src->h, zoom_x, zoom_y,
-		  &dst_width, &dst_height);
 
   /* allocate surface to completely contain the zoomed surface */
   if (is_32bit)
@@ -1131,9 +1105,14 @@ SDL_Surface *zoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
   return zoom_dst;
 }
 
-SDL_Surface *SDLZoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
+void SDLZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)
 {
-  return zoomSurface(src, zoom_x, zoom_y);
+  int dst_width = dst_bitmap->width;
+  int dst_height = dst_bitmap->height;
+
+  SDL_FreeSurface(dst_bitmap->surface);
+
+  dst_bitmap->surface = zoomSurface(src_bitmap->surface, dst_width,dst_height);
 }
 
 

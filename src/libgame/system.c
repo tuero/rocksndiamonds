@@ -865,6 +865,19 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
   free(new_bitmap);
 }
 
+Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
+{
+  Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
+
+#if defined(TARGET_SDL)
+  SDLZoomBitmap(src_bitmap, dst_bitmap);
+#else
+  X11ZoomBitmap(src_bitmap, dst_bitmap);
+#endif
+
+  return dst_bitmap;
+}
+
 
 /* ========================================================================= */
 /* audio functions                                                           */

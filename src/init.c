@@ -264,6 +264,20 @@ static void ReinitializeGraphics()
 
   /* !!! TEST ONLY !!! */
 
+#if 1
+
+  {
+    Bitmap *tst_bitmap = graphic_info[IMG_SAND].bitmap;
+    Bitmap *tmp_bitmap = ZoomBitmap(tst_bitmap,
+				    tst_bitmap->width / 2,
+				    tst_bitmap->height / 2);
+
+    BlitBitmap(tmp_bitmap, tst_bitmap, 0, 0, 256, 224, 0, 448);
+
+    FreeBitmap(tmp_bitmap);
+  }
+
+#else
 #ifdef TARGET_SDL
 
   {
@@ -285,6 +299,7 @@ static void ReinitializeGraphics()
 	       0, 0, 512, 448,
 	       0, 448, 256, 224);
 
+#endif
 #endif
 }
 

@@ -330,7 +330,7 @@ inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, unsigned int);
 inline void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
 inline Pixel SDLGetPixel(Bitmap *, int, int);
 
-SDL_Surface *SDLZoomSurface(SDL_Surface *, float, float);
+void SDLZoomBitmap(Bitmap *, Bitmap *);
 
 Bitmap *SDLLoadImage(char *);
 

@@ -917,6 +917,14 @@ Pixel AllegroGetPixel(Drawable d, int x, int y)
   return getpixel((BITMAP *)d, x, y);
 }
 
+void AllegroZoomBitmap(Drawable src, Drawable dst,
+		       int src_width, int src_height,
+		       int dst_width, int dst_height)
+{
+  stretch_blit((BITMAP *)src, (BITMAP *)dst,
+	       0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
+}
+
 void MSDOSOpenAudio(void)
 {
   if (allegro_init_audio())

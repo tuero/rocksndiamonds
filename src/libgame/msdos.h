@@ -747,6 +747,8 @@ void XAutoRepeatOff(Display *);
 void AllegroDrawLine(Drawable, int, int, int, int, Pixel);
 Pixel AllegroGetPixel(Drawable, int, int);
 
+void AllegroZoomBitmap(Drawable, Drawable, int, int, int, int);
+
 void MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);
 

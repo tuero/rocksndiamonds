@@ -232,6 +232,21 @@ static DrawWindow *X11InitWindow()
   return new_window;
 }
 
+inline void X11NativeZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)
+{
+}
+
+void X11ZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)
+{
+#if defined(TARGET_ALLEGRO)
+  AllegroZoomBitmap(src_bitmap->drawable, dst_bitmap->drawable,
+		    src_bitmap->width, src_bitmap->height,
+		    dst_bitmap->width, dst_bitmap->height);
+#else
+  X11NativeZoomBitmap(src_bitmap, dst_bitmap);
+#endif
+}
+
 static void SetImageDimensions(Bitmap *bitmap)
 {
 #if defined(TARGET_ALLEGRO)
