@@ -71,6 +71,8 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 
+static Bitmap *scrollbar_bitmap[4];
+
 static void drawCursorExt(int xpos, int ypos, int color, int graphic)
 {
   static int cursor_array[SCR_FIELDY];
@@ -2827,7 +2829,11 @@ static struct
 
 static struct
 {
+#if 0
   int gfx_unpressed, gfx_pressed;
+#else
+  Bitmap **gfx_unpressed, **gfx_pressed;
+#endif
   int x, y;
   int width, height;
   int type;
@@ -2836,7 +2842,11 @@ static struct
 } scrollbar_info[NUM_SCREEN_SCROLLBARS] =
 {
   {
+#if 0
     IMG_SCROLLBAR_BLUE, IMG_SCROLLBAR_RED,
+#else
+    &scrollbar_bitmap[0], &scrollbar_bitmap[1],
+#endif
     SX + SC_SCROLL_VERTICAL_XPOS, SY + SC_SCROLL_VERTICAL_YPOS,
     SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
@@ -2907,7 +2917,9 @@ static void CreateScreenScrollbars()
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
+#if 0
     int gfx_unpressed, gfx_pressed;
+#endif
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -2921,6 +2933,7 @@ static void CreateScreenScrollbars()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
+#if 0
     gfx_unpressed = scrollbar_info[i].gfx_unpressed;
     gfx_pressed   = scrollbar_info[i].gfx_pressed;
     gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
@@ -2929,6 +2942,14 @@ static void CreateScreenScrollbars()
     gd_y1 = new_graphic_info[gfx_unpressed].src_y;
     gd_x2 = new_graphic_info[gfx_pressed].src_x;
     gd_y2 = new_graphic_info[gfx_pressed].src_y;
+#else
+    gd_bitmap_unpressed = *scrollbar_info[i].gfx_unpressed;
+    gd_bitmap_pressed   = *scrollbar_info[i].gfx_pressed;
+    gd_x1 = 0;
+    gd_y1 = 0;
+    gd_x2 = 0;
+    gd_y2 = 0;
+#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2958,6 +2979,40 @@ static void CreateScreenScrollbars()
 
 void CreateScreenGadgets()
 {
+  int i;
+
+  for (i=0; i<4; i++)
+  {
+    scrollbar_bitmap[i] = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
+
+#if defined(TARGET_X11_NATIVE)
+    /* copy pointers to clip mask and GC */
+    scrollbar_bitmap[i]->clip_mask =
+      new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_mask;
+    scrollbar_bitmap[i]->stored_clip_gc =
+      new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_gc;
+#endif
+
+    BlitBitmap(new_graphic_info[IMG_SCROLLBAR_BLUE + i].bitmap,
+	       scrollbar_bitmap[i],
+	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_x,
+	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_y,
+	       TILEX, TILEY, 0, 0);
+
+#ifdef TARGET_SDL
+    SDL_SetColorKey(scrollbar_bitmap[i]->surface, SDL_SRCCOLORKEY,
+		    SDL_MapRGB(scrollbar_bitmap[i]->surface->format,
+			       0x00, 0x00, 0x00));
+    if ((scrollbar_bitmap[i]->surface_masked =
+	 SDL_DisplayFormat(scrollbar_bitmap[i]->surface)) == NULL)
+    {
+      SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+      Error(ERR_EXIT, "CreateScreenGadgets() failed: %s", GetError());
+    }
+    SDL_SetColorKey(scrollbar_bitmap[i]->surface, 0, 0);
+#endif
+  }
+
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
 }
@@ -2965,6 +3020,17 @@ void CreateScreenGadgets()
 void FreeScreenGadgets()
 {
   int i;
+
+  for (i=0; i<4; i++)
+  {
+#if defined(TARGET_X11_NATIVE)
+    /* prevent freeing clip mask and GC twice */
+    scrollbar_bitmap[i]->clip_mask = None;
+    scrollbar_bitmap[i]->stored_clip_gc = None;
+#endif
+
+    FreeBitmap(scrollbar_bitmap[i]);
+  }
 
   for (i=0; i<NUM_SCREEN_GADGETS; i++)
     FreeGadget(screen_gadget[i]);
