@@ -1706,19 +1706,31 @@ static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
 static void RemoveField(int x, int y)
 {
   Feld[x][y] = EL_EMPTY;
-  GfxElement[x][y] = EL_UNDEFINED;
+
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
+
+#if 0
+  Store[x][y] = 0;
+  Store2[x][y] = 0;
+#endif
+
+  AmoebaNr[x][y] = 0;
   ChangeDelay[x][y] = 0;
   Pushed[x][y] = FALSE;
+
+  GfxElement[x][y] = EL_UNDEFINED;
+  GfxAction[x][y] = ACTION_DEFAULT;
 }
 
 void RemoveMovingField(int x, int y)
 {
   int oldx = x, oldy = y, newx = x, newy = y;
+  int element = Feld[x][y];
+  int next_element = EL_UNDEFINED;
 
-  if (Feld[x][y] != EL_BLOCKED && !IS_MOVING(x, y))
+  if (element != EL_BLOCKED && !IS_MOVING(x, y))
     return;
 
   if (IS_MOVING(x, y))
@@ -1727,14 +1739,32 @@ void RemoveMovingField(int x, int y)
     if (Feld[newx][newy] != EL_BLOCKED)
       return;
   }
-  else if (Feld[x][y] == EL_BLOCKED)
+  else if (element == EL_BLOCKED)
   {
     Blocked2Moving(x, y, &oldx, &oldy);
     if (!IS_MOVING(oldx, oldy))
       return;
   }
 
-  if (Feld[x][y] == EL_BLOCKED &&
+#if 1
+  if (element == EL_BLOCKED &&
+      (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
+       Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
+       Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
+       Feld[oldx][oldy] == EL_AMOEBA_DROPPING))
+    next_element = get_next_element(Feld[oldx][oldy]);
+
+  RemoveField(oldx, oldy);
+  RemoveField(newx, newy);
+
+#if 1
+  Store[oldx][oldy] = Store2[oldx][oldy] = 0;
+#endif
+
+  if (next_element != EL_UNDEFINED)
+    Feld[oldx][oldy] = next_element;
+#else
+  if (element == EL_BLOCKED &&
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
@@ -1749,7 +1779,9 @@ void RemoveMovingField(int x, int y)
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
   MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
   ChangeDelay[oldx][oldy] = ChangeDelay[newx][newy] = 0;
+  Pushed[oldx][oldy] = Pushed[newx][newy] = FALSE;
   GfxAction[oldx][oldy] = GfxAction[newx][newy] = ACTION_DEFAULT;
+#endif
 
   DrawLevelField(oldx, oldy);
   DrawLevelField(newx, newy);
@@ -1896,6 +1928,19 @@ void Explode(int ex, int ey, int phase, int mode)
       if (element == EL_EXPLOSION)
 	element = Store2[x][y];
 
+#if 1
+      if (AmoebaNr[x][y] &&
+	  (element == EL_AMOEBA_FULL ||
+	   element == EL_BD_AMOEBA ||
+	   element == EL_AMOEBA_GROWING))
+      {
+	AmoebaCnt[AmoebaNr[x][y]]--;
+	AmoebaCnt2[AmoebaNr[x][y]]--;
+      }
+
+      RemoveField(x, y);
+#endif
+
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
       {
 	switch(StorePlayer[ex][ey])
@@ -1959,6 +2004,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_BORDER)
 	Store2[x][y] = element;
 
+#if 0
       if (AmoebaNr[x][y] &&
 	  (element == EL_AMOEBA_FULL ||
 	   element == EL_BD_AMOEBA ||
@@ -1968,14 +2014,21 @@ void Explode(int ex, int ey, int phase, int mode)
 	AmoebaCnt2[AmoebaNr[x][y]]--;
       }
 
+#if 1
+      RemoveField(x, y);
+#else
+      MovDir[x][y] = MovPos[x][y] = 0;
+      AmoebaNr[x][y] = 0;
+#endif
+#endif
+
       Feld[x][y] = EL_EXPLOSION;
 #if 1
       GfxElement[x][y] = center_element;
 #else
       GfxElement[x][y] = EL_UNDEFINED;
 #endif
-      MovDir[x][y] = MovPos[x][y] = 0;
-      AmoebaNr[x][y] = 0;
+
       ExplodePhase[x][y] = 1;
       Stop[x][y] = TRUE;
     }
@@ -2127,7 +2180,11 @@ void DynaExplode(int ex, int ey)
 
 void Bang(int x, int y)
 {
+#if 1
+  int element = MovingOrBlocked2Element(x, y);
+#else
   int element = Feld[x][y];
+#endif
 
   if (IS_PLAYER(x, y))
   {
