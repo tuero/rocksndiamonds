@@ -1,3 +1,6 @@
+2004-06-15
+	* re-recorded tape for BD2K3, level 010 (broken due to bugfix)
+
 2004-06-13
 	* fixed bug (missing array boundary check) which caused broken tapes
 	* fixed bug (when loading level template) which caused broken levels
