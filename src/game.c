@@ -32,12 +32,12 @@
 #define DF_DIG			1
 #define DF_SNAP			2
 
-/* for MoveFigure() */
+/* for MovePlayer() */
 #define MF_NO_ACTION		0
 #define MF_MOVING		1
 #define MF_ACTION		2
 
-/* for ScrollFigure() */
+/* for ScrollPlayer() */
 #define SCROLL_INIT		0
 #define SCROLL_GO_ON		1
 
@@ -160,6 +160,11 @@
 
 
 /* forward declaration for internal use */
+
+static boolean MovePlayerOneStep(struct PlayerInfo *, int, int, int, int);
+static boolean MovePlayer(struct PlayerInfo *, int, int);
+static void ScrollPlayer(struct PlayerInfo *, int);
+static void ScrollScreen(struct PlayerInfo *, int);
 
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
@@ -2055,7 +2060,7 @@ void RelocatePlayer(int x, int y, int element)
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
 
 #if 1
-  RemoveField(x, y);
+  RemoveField(x, y);		/* temporarily remove newly placed player */
   DrawLevelField(x, y);
 #endif
 
@@ -2063,23 +2068,20 @@ void RelocatePlayer(int x, int y, int element)
   {
     while (player->MovPos)
     {
-      ScrollFigure(player, SCROLL_GO_ON);
+      ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
       FrameCounter++;
 
-      DrawAllPlayers();
+      DrawPlayer(player);
 
       BackToFront();
       Delay(GAME_FRAME_DELAY);
     }
 
+    DrawPlayer(player);		/* needed here only to cleanup last field */
+    DrawLevelField(player->jx, player->jy);	/* remove player graphic */
+
     player->is_moving = FALSE;
-
-#if 0
-    RemoveField(player->jx, player->jy);
-#endif
-
-    DrawLevelField(player->jx, player->jy);
   }
 
   Feld[x][y] = element;
@@ -4430,170 +4432,172 @@ void ContinueMoving(int x, int y)
   if (pushed)		/* special case: moving object pushed by player */
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
 
-  if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
+  if (ABS(MovPos[x][y]) < TILEX)
   {
-    Feld[x][y] = EL_EMPTY;
-    Feld[newx][newy] = element;
-    MovPos[x][y] = 0;	/* force "not moving" for "crumbled sand" */
-
-    if (element == EL_MOLE)
-    {
-      Feld[x][y] = EL_SAND;
-
-      DrawLevelFieldCrumbledSandNeighbours(x, y);
-    }
-    else if (element == EL_QUICKSAND_FILLING)
-    {
-      element = Feld[newx][newy] = get_next_element(element);
-      Store[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_QUICKSAND_EMPTYING)
-    {
-      Feld[x][y] = get_next_element(element);
-      element = Feld[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_MAGIC_WALL_FILLING)
-    {
-      element = Feld[newx][newy] = get_next_element(element);
-      if (!game.magic_wall_active)
-	element = Feld[newx][newy] = EL_MAGIC_WALL_DEAD;
-      Store[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_MAGIC_WALL_EMPTYING)
-    {
-      Feld[x][y] = get_next_element(element);
-      if (!game.magic_wall_active)
-	Feld[x][y] = EL_MAGIC_WALL_DEAD;
-      element = Feld[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_BD_MAGIC_WALL_FILLING)
-    {
-      element = Feld[newx][newy] = get_next_element(element);
-      if (!game.magic_wall_active)
-	element = Feld[newx][newy] = EL_BD_MAGIC_WALL_DEAD;
-      Store[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_BD_MAGIC_WALL_EMPTYING)
-    {
-      Feld[x][y] = get_next_element(element);
-      if (!game.magic_wall_active)
-	Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
-      element = Feld[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_AMOEBA_DROPPING)
-    {
-      Feld[x][y] = get_next_element(element);
-      element = Feld[newx][newy] = Store[x][y];
-    }
-    else if (element == EL_SOKOBAN_OBJECT)
-    {
-      if (Back[x][y])
-	Feld[x][y] = Back[x][y];
-
-      if (Back[newx][newy])
-	Feld[newx][newy] = EL_SOKOBAN_FIELD_FULL;
-
-      Back[x][y] = Back[newx][newy] = 0;
-    }
-    else if (Store[x][y] == EL_ACID)
-    {
-      element = Feld[newx][newy] = EL_ACID;
-    }
-
-    Store[x][y] = 0;
-    MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
-    MovDelay[newx][newy] = 0;
-
-    /* copy element change control values to new field */
-    ChangeDelay[newx][newy] = ChangeDelay[x][y];
-    ChangePage[newx][newy] = ChangePage[x][y];
-    Changed[newx][newy] = Changed[x][y];
-    ChangeEvent[newx][newy] = ChangeEvent[x][y];
-
-    ChangeDelay[x][y] = 0;
-    ChangePage[x][y] = -1;
-    Changed[x][y] = CE_BITMASK_DEFAULT;
-    ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
-
-    /* copy animation control values to new field */
-    GfxFrame[newx][newy]  = GfxFrame[x][y];
-    GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
-    GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
-
-    Pushed[x][y] = Pushed[newx][newy] = FALSE;
-
-    ResetGfxAnimation(x, y);	/* reset animation values for old field */
-
-#if 0
-    /* 2.1.1 (does not work correctly for spring) */
-    if (!CAN_MOVE(element))
-      MovDir[newx][newy] = 0;
-#else
-
-#if 0
-    /* (does not work for falling objects that slide horizontally) */
-    if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
-      MovDir[newx][newy] = 0;
-#else
-    /*
-    if (!CAN_MOVE(element) ||
-	(element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
-      MovDir[newx][newy] = 0;
-    */
-
-    if (!CAN_MOVE(element) ||
-	(CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN))
-      MovDir[newx][newy] = 0;
-#endif
-#endif
-
     DrawLevelField(x, y);
-    DrawLevelField(newx, newy);
 
-    Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
+    return;	/* element is still moving */
+  }
 
-    /* prevent pushed element from moving on in pushed direction */
-    if (pushed && CAN_MOVE(element) &&
-	element_info[element].move_pattern & MV_ANY_DIRECTION &&
-	!(element_info[element].move_pattern & MovDir[newx][newy]))
-      TurnRound(newx, newy);
+  /* element reached destination field */
 
-    if (!pushed)	/* special case: moving object pushed by player */
-      JustStopped[newx][newy] = 3;
+  Feld[x][y] = EL_EMPTY;
+  Feld[newx][newy] = element;
+  MovPos[x][y] = 0;	/* force "not moving" for "crumbled sand" */
 
-    if (DONT_TOUCH(element))	/* object may be nasty to player or others */
-    {
-      TestIfBadThingTouchesHero(newx, newy);
-      TestIfBadThingTouchesFriend(newx, newy);
-      TestIfBadThingTouchesOtherBadThing(newx, newy);
-    }
-    else if (element == EL_PENGUIN)
-      TestIfFriendTouchesBadThing(newx, newy);
+  if (element == EL_MOLE)
+  {
+    Feld[x][y] = EL_SAND;
 
-    if (CAN_FALL(element) && direction == MV_DOWN &&
-	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
-      Impact(x, newy);
+    DrawLevelFieldCrumbledSandNeighbours(x, y);
+  }
+  else if (element == EL_QUICKSAND_FILLING)
+  {
+    element = Feld[newx][newy] = get_next_element(element);
+    Store[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_QUICKSAND_EMPTYING)
+  {
+    Feld[x][y] = get_next_element(element);
+    element = Feld[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_MAGIC_WALL_FILLING)
+  {
+    element = Feld[newx][newy] = get_next_element(element);
+    if (!game.magic_wall_active)
+      element = Feld[newx][newy] = EL_MAGIC_WALL_DEAD;
+    Store[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_MAGIC_WALL_EMPTYING)
+  {
+    Feld[x][y] = get_next_element(element);
+    if (!game.magic_wall_active)
+      Feld[x][y] = EL_MAGIC_WALL_DEAD;
+    element = Feld[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_BD_MAGIC_WALL_FILLING)
+  {
+    element = Feld[newx][newy] = get_next_element(element);
+    if (!game.magic_wall_active)
+      element = Feld[newx][newy] = EL_BD_MAGIC_WALL_DEAD;
+    Store[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_BD_MAGIC_WALL_EMPTYING)
+  {
+    Feld[x][y] = get_next_element(element);
+    if (!game.magic_wall_active)
+      Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
+    element = Feld[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_AMOEBA_DROPPING)
+  {
+    Feld[x][y] = get_next_element(element);
+    element = Feld[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_SOKOBAN_OBJECT)
+  {
+    if (Back[x][y])
+      Feld[x][y] = Back[x][y];
+
+    if (Back[newx][newy])
+      Feld[newx][newy] = EL_SOKOBAN_FIELD_FULL;
+
+    Back[x][y] = Back[newx][newy] = 0;
+  }
+  else if (Store[x][y] == EL_ACID)
+  {
+    element = Feld[newx][newy] = EL_ACID;
+  }
+
+  Store[x][y] = 0;
+  MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
+  MovDelay[newx][newy] = 0;
+
+  /* copy element change control values to new field */
+  ChangeDelay[newx][newy] = ChangeDelay[x][y];
+  ChangePage[newx][newy] = ChangePage[x][y];
+  Changed[newx][newy] = Changed[x][y];
+  ChangeEvent[newx][newy] = ChangeEvent[x][y];
+
+  ChangeDelay[x][y] = 0;
+  ChangePage[x][y] = -1;
+  Changed[x][y] = CE_BITMASK_DEFAULT;
+  ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
+
+  /* copy animation control values to new field */
+  GfxFrame[newx][newy]  = GfxFrame[x][y];
+  GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
+  GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
+
+  Pushed[x][y] = Pushed[newx][newy] = FALSE;
+
+  ResetGfxAnimation(x, y);	/* reset animation values for old field */
+
+#if 0
+  /* 2.1.1 (does not work correctly for spring) */
+  if (!CAN_MOVE(element))
+    MovDir[newx][newy] = 0;
+#else
+
+#if 0
+  /* (does not work for falling objects that slide horizontally) */
+  if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
+    MovDir[newx][newy] = 0;
+#else
+  /*
+  if (!CAN_MOVE(element) ||
+      (element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
+    MovDir[newx][newy] = 0;
+  */
+
+  if (!CAN_MOVE(element) ||
+      (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN))
+    MovDir[newx][newy] = 0;
+#endif
+#endif
+
+  DrawLevelField(x, y);
+  DrawLevelField(newx, newy);
+
+  Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
+
+  /* prevent pushed element from moving on in pushed direction */
+  if (pushed && CAN_MOVE(element) &&
+      element_info[element].move_pattern & MV_ANY_DIRECTION &&
+      !(element_info[element].move_pattern & MovDir[newx][newy]))
+    TurnRound(newx, newy);
+
+  if (!pushed)	/* special case: moving object pushed by player */
+    JustStopped[newx][newy] = 3;
+
+  if (DONT_TOUCH(element))	/* object may be nasty to player or others */
+  {
+    TestIfBadThingTouchesHero(newx, newy);
+    TestIfBadThingTouchesFriend(newx, newy);
+    TestIfBadThingTouchesOtherBadThing(newx, newy);
+  }
+  else if (element == EL_PENGUIN)
+    TestIfFriendTouchesBadThing(newx, newy);
+
+  if (CAN_FALL(element) && direction == MV_DOWN &&
+      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
+    Impact(x, newy);
 
 #if 1
-    TestIfElementTouchesCustomElement(x, y);		/* for empty space */
+  TestIfElementTouchesCustomElement(x, y);		/* for empty space */
 #endif
 
 #if 0
-    if (ChangePage[newx][newy] != -1)			/* delayed change */
-      ChangeElement(newx, newy, ChangePage[newx][newy]);
+  if (ChangePage[newx][newy] != -1)			/* delayed change */
+    ChangeElement(newx, newy, ChangePage[newx][newy]);
 #endif
 
-    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
-      CheckElementSideChange(newx, newy, Feld[newx][newy], direction,
-			     CE_COLLISION, -1);
+  if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
+    CheckElementSideChange(newx, newy, Feld[newx][newy], direction,
+			   CE_COLLISION, -1);
 
-    TestIfPlayerTouchesCustomElement(newx, newy);
-    TestIfElementTouchesCustomElement(newx, newy);
-  }
-  else				/* still moving on */
-  {
-    DrawLevelField(x, y);
-  }
+  TestIfPlayerTouchesCustomElement(newx, newy);
+  TestIfElementTouchesCustomElement(newx, newy);
 }
 
 int AmoebeNachbarNr(int ax, int ay)
@@ -5837,7 +5841,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
       if (button2)
 	dropped = DropElement(player);
 
-      moved = MoveFigure(player, dx, dy);
+      moved = MovePlayer(player, dx, dy);
     }
 
     if (tape.single_step && tape.recording && !tape.pausing)
@@ -5954,7 +5958,7 @@ void GameActions()
       actual_player_action = recorded_player_action[i];
 
     PlayerActions(&stored_player[i], actual_player_action);
-    ScrollFigure(&stored_player[i], SCROLL_GO_ON);
+    ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
 
   network_player_action_received = FALSE;
@@ -6536,15 +6540,16 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 }
 
 /*
-  MoveFigureOneStep()
+  MovePlayerOneStep()
   -----------------------------------------------------------------------------
   dx, dy:		direction (non-diagonal) to try to move the player to
   real_dx, real_dy:	direction as read from input device (can be diagonal)
 */
 
-boolean MoveFigureOneStep(struct PlayerInfo *player,
+boolean MovePlayerOneStep(struct PlayerInfo *player,
 			  int dx, int dy, int real_dx, int real_dy)
 {
+#if 0
   static int change_sides[4][2] =
   {
     /* enter side        leave side */
@@ -6559,6 +6564,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int enter_side = change_sides[MV_DIR_BIT(move_direction)][0];
   int leave_side = change_sides[MV_DIR_BIT(move_direction)][1];
+#endif
   int jx = player->jx, jy = player->jy;
   int new_jx = jx + dx, new_jy = jy + dy;
   int element;
@@ -6619,7 +6625,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   player->MovPos =
     (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
-  ScrollFigure(player, SCROLL_INIT);
+  ScrollPlayer(player, SCROLL_INIT);
 
 #if 0
   if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
@@ -6642,7 +6648,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   return MF_MOVING;
 }
 
-boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
+boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int old_jx = jx, old_jy = jy;
@@ -6681,7 +6687,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     while (player->MovPos)
     {
-      ScrollFigure(player, SCROLL_GO_ON);
+      ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
       FrameCounter++;
       DrawAllPlayers();
@@ -6693,13 +6699,13 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
   {
-    if (!(moved |= MoveFigureOneStep(player, 0, dy, dx, dy)))
-      moved |= MoveFigureOneStep(player, dx, 0, dx, dy);
+    if (!(moved |= MovePlayerOneStep(player, 0, dy, dx, dy)))
+      moved |= MovePlayerOneStep(player, dx, 0, dx, dy);
   }
   else
   {
-    if (!(moved |= MoveFigureOneStep(player, dx, 0, dx, dy)))
-      moved |= MoveFigureOneStep(player, 0, dy, dx, dy);
+    if (!(moved |= MovePlayerOneStep(player, dx, 0, dx, dy)))
+      moved |= MovePlayerOneStep(player, 0, dy, dx, dy);
   }
 
   jx = player->jx;
@@ -6852,8 +6858,11 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     player->is_moving = FALSE;
   }
 
-  TestIfHeroTouchesBadThing(jx, jy);
-  TestIfPlayerTouchesCustomElement(jx, jy);
+  if (game.engine_version < VERSION_IDENT(3,0,7))
+  {
+    TestIfHeroTouchesBadThing(jx, jy);
+    TestIfPlayerTouchesCustomElement(jx, jy);
+  }
 
   if (!player->active)
     RemoveHero(player);
@@ -6861,7 +6870,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   return moved;
 }
 
-void ScrollFigure(struct PlayerInfo *player, int mode)
+void ScrollPlayer(struct PlayerInfo *player, int mode)
 {
   int jx = player->jx, jy = player->jy;
   int last_jx = player->last_jx, last_jy = player->last_jy;
@@ -6926,6 +6935,15 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 	player->LevelSolved = player->GameOver = TRUE;
     }
 
+    if (game.engine_version >= VERSION_IDENT(3,0,7))
+    {
+      TestIfHeroTouchesBadThing(jx, jy);
+      TestIfPlayerTouchesCustomElement(jx, jy);
+
+      if (!player->active)
+	RemoveHero(player);
+    }
+
     if (tape.single_step && tape.recording && !tape.pausing &&
 	!player->programmed_action)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
@@ -6962,9 +6980,6 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
 void TestIfPlayerTouchesCustomElement(int x, int y)
 {
-#if 0
-  static boolean check_changing = FALSE;
-#endif
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6980,14 +6995,15 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
     { CH_SIDE_BOTTOM,	CH_SIDE_TOP	}	/* check bottom */
   };
+  static int touch_dir[4] =
+  {
+    MV_LEFT | MV_RIGHT,
+    MV_UP   | MV_DOWN,
+    MV_UP   | MV_DOWN,
+    MV_LEFT | MV_RIGHT
+  };
+  int center_element = Feld[x][y];	/* should always be non-moving! */
   int i;
-
-#if 0
-  if (check_changing)	/* prevent this function from running into a loop */
-    return;
-
-  check_changing = TRUE;
-#endif
 
   for (i=0; i<4; i++)
   {
@@ -6995,53 +7011,49 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     int yy = y + xy[i][1];
     int center_side = change_sides[i][0];
     int border_side = change_sides[i][1];
+    int border_element;
 
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-#if 1
     if (IS_PLAYER(x, y))
     {
-      CheckTriggeredElementSideChange(xx, yy, Feld[xx][yy], border_side,
+      if (game.engine_version < VERSION_IDENT(3,0,7))
+	border_element = Feld[xx][yy];		/* may be moving! */
+      else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
+	border_element = Feld[xx][yy];
+      else if (MovDir[xx][yy] & touch_dir[i])	/* elements are touching */
+	border_element = MovingOrBlocked2Element(xx, yy);
+      else
+	continue;		/* center and border element do not touch */
+
+      CheckTriggeredElementSideChange(xx, yy, border_element, border_side,
 				      CE_OTHER_GETS_TOUCHED);
-      CheckElementSideChange(xx, yy, Feld[xx][yy], border_side,
+      CheckElementSideChange(xx, yy, border_element, border_side,
 			     CE_TOUCHED_BY_PLAYER, -1);
     }
     else if (IS_PLAYER(xx, yy))
     {
-      CheckTriggeredElementSideChange(x, y, Feld[x][y], center_side,
+      if (game.engine_version >= VERSION_IDENT(3,0,7))
+      {
+	struct PlayerInfo *player = PLAYERINFO(xx, yy);
+
+	if (player->MovPos != 0 && !(player->MovDir & touch_dir[i]))
+	  continue;		/* center and border element do not touch */
+      }
+
+      CheckTriggeredElementSideChange(x, y, center_element, center_side,
 				      CE_OTHER_GETS_TOUCHED);
-      CheckElementSideChange(x, y, Feld[x][y], center_side,
+      CheckElementSideChange(x, y, center_element, center_side,
 			     CE_TOUCHED_BY_PLAYER, -1);
 
       break;
     }
-#else
-    if (IS_PLAYER(x, y))
-    {
-      CheckTriggeredElementChange(xx, yy, Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
-      CheckElementChange(xx, yy, Feld[xx][yy], CE_TOUCHED_BY_PLAYER);
-    }
-    else if (IS_PLAYER(xx, yy))
-    {
-      CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_GETS_TOUCHED);
-      CheckElementChange(x, y, Feld[x][y], CE_TOUCHED_BY_PLAYER);
-
-      break;
-    }
-#endif
   }
-
-#if 0
-  check_changing = FALSE;
-#endif
 }
 
 void TestIfElementTouchesCustomElement(int x, int y)
 {
-#if 0
-  static boolean check_changing = FALSE;
-#endif
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -7066,25 +7078,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
   };
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
-#if 0
-  int center_element = MovingOrBlocked2Element(x, y);
-#else
   int center_element = Feld[x][y];	/* should always be non-moving! */
-#endif
   int i, j;
-
-#if 0
-  if (center_element == EL_CUSTOM_START + 244)
-    printf("::: checking element %d at %d,%d... [%d]\n",
-	   center_element, x, y, Feld[x][y + 1]);
-#endif
-
-#if 0
-  if (check_changing)	/* prevent this function from running into a loop */
-    return;
-
-  check_changing = TRUE;
-#endif
 
   for (i=0; i<4; i++)
   {
@@ -7097,34 +7092,14 @@ void TestIfElementTouchesCustomElement(int x, int y)
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-#if 0
-    if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
+    if (game.engine_version < VERSION_IDENT(3,0,7))
+      border_element = Feld[xx][yy];	/* may be moving! */
+    else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
       border_element = Feld[xx][yy];
     else if (MovDir[xx][yy] & touch_dir[i])	/* elements are touching */
-    {
-#if 0
-      printf("::: moving && touching...\n");
-#endif
-
       border_element = MovingOrBlocked2Element(xx, yy);
-    }
     else
-    {
-#if 0
-      printf("::: moving && NOT touching...\n");
-#endif
-
       continue;			/* center and border element do not touch */
-    }
-#else
-
-#if 0
-    border_element = MovingOrBlocked2Element(xx, yy);
-#else
-    border_element = Feld[xx][yy];	/* may be moving! */
-#endif
-
-#endif
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
@@ -7163,11 +7138,6 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	    change->sides & center_side &&
 	    change->trigger_element == center_element)
 	{
-#if 0
-	  printf("::: changing border element %d at %d,%d\n",
-		 border_element, xx, yy);
-#endif
-
 	  CheckElementSideChange(xx, yy, border_element, CH_SIDE_ANY,
 				 CE_OTHER_IS_TOUCHING, j);
 	  break;
@@ -7177,19 +7147,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
   }
 
   if (change_center_element)
-  {
-#if 0
-    printf("::: changing center element %d at %d,%d\n",
-	   center_element, x, y);
-#endif
-
     CheckElementSideChange(x, y, center_element, CH_SIDE_ANY,
 			   CE_OTHER_IS_TOUCHING, center_element_change_page);
-  }
-
-#if 0
-  check_changing = FALSE;
-#endif
 }
 
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
@@ -7267,6 +7226,13 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
     { +1, 0 },
     { 0, +1 }
   };
+  static int touch_dir[4] =
+  {
+    MV_LEFT | MV_RIGHT,
+    MV_UP   | MV_DOWN,
+    MV_UP   | MV_DOWN,
+    MV_LEFT | MV_RIGHT
+  };
   static int test_dir[4] =
   {
     MV_UP,
@@ -7306,6 +7272,12 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 	if (bad_element == EL_ROBOT && player->is_moving)
 	  continue;	/* robot does not kill player if he is moving */
 
+	if (game.engine_version >= VERSION_IDENT(3,0,7))
+	{
+	  if (player->MovPos != 0 && !(player->MovDir & touch_dir[i]))
+	    continue;		/* center and border element do not touch */
+	}
+
 	kill_x = test_x;
 	kill_y = test_y;
 	break;
@@ -7324,24 +7296,6 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
     if (IS_PLAYER(kill_x, kill_y))
     {
       struct PlayerInfo *player = PLAYERINFO(kill_x, kill_y);
-
-#if 0
-      int dir = player->MovDir;
-      int newx = player->jx + (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
-      int newy = player->jy + (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
-
-      if (Feld[bad_x][bad_y] == EL_ROBOT && player->is_moving &&
-	  newx != bad_x && newy != bad_y)
-	;	/* robot does not kill player if he is moving */
-      else
-	printf("-> %d\n", player->MovDir);
-
-      if (Feld[bad_x][bad_y] == EL_ROBOT && player->is_moving &&
-	  newx != bad_x && newy != bad_y)
-	;	/* robot does not kill player if he is moving */
-      else
-	;
-#endif
 
       if (player->shield_deadly_time_left > 0)
 	Bang(bad_x, bad_y);

@@ -377,7 +377,7 @@ static void Handle_OP_STOP_PLAYING(struct NetworkServerPlayerInfo *player)
   broadcast(NULL, 2, 0);
 }
 
-static void Handle_OP_MOVE_FIGURE(struct NetworkServerPlayerInfo *player)
+static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
 {
   struct NetworkServerPlayerInfo *v;
   int last_client_nr = 0;
@@ -635,8 +635,8 @@ void NetworkServer(int port, int serveronly)
 	      Handle_OP_STOP_PLAYING(player);
 	      break;
 
-	    case OP_MOVE_FIGURE:
-	      Handle_OP_MOVE_FIGURE(player);
+	    case OP_MOVE_PLAYER:
+	      Handle_OP_MOVE_PLAYER(player);
 	      break;
 
 	    case OP_BROADCAST_MESSAGE:

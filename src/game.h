@@ -76,11 +76,6 @@ void MauerAbleger(int, int);
 void GameActions(void);
 void ScrollLevel(int, int);
 
-boolean MoveFigureOneStep(struct PlayerInfo *, int, int, int, int);
-boolean MoveFigure(struct PlayerInfo *, int, int);
-void ScrollFigure(struct PlayerInfo *, int);
-void ScrollScreen(struct PlayerInfo *, int);
-
 void TestIfGoodThingHitsBadThing(int, int, int);
 void TestIfBadThingHitsGoodThing(int, int, int);
 void TestIfHeroTouchesBadThing(int, int);

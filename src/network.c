@@ -266,7 +266,7 @@ void SendToServer_StopPlaying()
 
 void SendToServer_MovePlayer(byte player_action)
 {
-  buffer[1] = OP_MOVE_FIGURE;
+  buffer[1] = OP_MOVE_PLAYER;
   buffer[2] = player_action;
 
   SendBufferToServer(3);
@@ -486,7 +486,7 @@ static void Handle_OP_STOP_PLAYING()
   DrawMainMenu();
 }
 
-static void Handle_OP_MOVE_FIGURE(unsigned int len)
+static void Handle_OP_MOVE_PLAYER(unsigned int len)
 {
   int server_frame_counter;
   int i;
@@ -569,8 +569,8 @@ static void HandleNetworkingMessages()
 	Handle_OP_STOP_PLAYING();
 	break;
 
-      case OP_MOVE_FIGURE:
-	Handle_OP_MOVE_FIGURE(message_length);
+      case OP_MOVE_PLAYER:
+	Handle_OP_MOVE_PLAYER(message_length);
 	break;
 
       case OP_BROADCAST_MESSAGE:
