@@ -1101,16 +1101,23 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
   if (gi->type & GD_TYPE_SCROLLBAR)
   {
     struct GadgetScrollbar *gs = &gi->scrollbar;
+    int scrollbar_size_cmp;
 
     if (gi->width == 0 || gi->height == 0 ||
 	gs->items_max == 0 || gs->items_visible == 0)
       Error(ERR_EXIT, "scrollbar gadget incomplete (missing tags)");
 
     /* calculate internal scrollbar values */
+    gs->size_min = (gi->type == GD_TYPE_SCROLLBAR_VERTICAL ?
+		    gi->width : gi->height);
     gs->size_max = (gi->type == GD_TYPE_SCROLLBAR_VERTICAL ?
 		    gi->height : gi->width);
-    gs->size = gs->size_max * gs->items_visible / gs->items_max;
-    gs->position = gs->size_max * gs->item_position / gs->items_max;
+
+    scrollbar_size_cmp = gs->size_max * gs->items_visible / gs->items_max;
+    gs->size = MAX(scrollbar_size_cmp, gs->size_min);
+    gs->size_max_cmp = (gs->size_max - (gs->size - scrollbar_size_cmp));
+
+    gs->position = gs->size_max_cmp * gs->item_position / gs->items_max;
     gs->position_max = gs->size_max - gs->size;
     gs->correction = gs->size_max / gs->items_max / 2;
 
@@ -1789,7 +1796,7 @@ boolean HandleGadgets(int mx, int my, int button)
 	gs->position = gs->position_max;
 
       gs->item_position =
-	gs->items_max * (gs->position + gs->correction) / gs->size_max;
+	gs->items_max * (gs->position + gs->correction) / gs->size_max_cmp;
 
       if (gs->item_position < 0)
 	gs->item_position = 0;

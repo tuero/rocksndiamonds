@@ -560,8 +560,23 @@ struct PLAYER
   unsigned joy_spin:1;
 };
 
+
+/* ------------------------------------------------------------------------- */
+/* definitions and structures for use by the main game functions             */
+/* ------------------------------------------------------------------------- */
+
+/* values for native Emerald Mine game version */
+#define FILE_VERSION_EM_V3	3
+#define FILE_VERSION_EM_V4	4
+#define FILE_VERSION_EM_V5	5
+#define FILE_VERSION_EM_V6	6
+
+#define FILE_VERSION_EM_ACTUAL	FILE_VERSION_EM_V6
+
 struct LevelInfo_EM
 {
+  int file_version;
+
   struct LEVEL *lev;
   struct PLAYER *ply1, *ply2;
 

@@ -195,7 +195,9 @@ struct GadgetScrollbar
   int items_max;			/* number of items to access */
   int items_visible;			/* number of visible items */
   int item_position;			/* actual item position */
+  int size_min;				/* minimal scrollbar size */
   int size_max;				/* this is either width or height */
+  int size_max_cmp;			/* needed for minimal scrollbar size */
   int size;				/* scrollbar size on screen */
   int position;				/* scrollbar position on screen */
   int position_max;			/* bottom/right scrollbar position */

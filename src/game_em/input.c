@@ -14,8 +14,6 @@ struct PLAYER ply1;
 struct PLAYER ply2;
 struct LEVEL lev;
 
-struct LevelInfo_EM native_em_level;
-
 unsigned short **Boom;
 unsigned short **Cave;
 unsigned short **Next;

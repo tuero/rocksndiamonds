@@ -45,12 +45,12 @@ void synchro_1(void);
 void synchro_2(void);
 void synchro_3(void);
 
-boolean cleanup_em_level(unsigned char *src, int *length);
-void    convert_em_level(unsigned char *src);
-void    prepare_em_level(void);
+int  cleanup_em_level(unsigned char *, int);
+void convert_em_level(unsigned char *, int);
+void prepare_em_level(void);
 
 int sound_thread(void);
-int read_sample(char *name, short **data, long *length);
+int read_sample(char *, short **, long *);
 
 void read_cave_list(void);
 void free_cave_list(void);

@@ -44,6 +44,7 @@ extern void em_close_all();
 extern void InitGameEngine_EM();
 extern void GameActions_EM(byte);
 
+void setLevelInfoToDefaults_EM();
 boolean LoadNativeLevel_EM(char *);
 
 

@@ -87,8 +87,8 @@ static int test(struct PLAYER *ply)
   if (!ply->alive)
     return 0;
 
-  if (lev.time == 0)
-    return(1);
+  if (lev.time_initial > 0 && lev.time == 0)
+    return 1;
 
   switch(Cave[y-1][x])
   {
@@ -108,7 +108,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return(1);
+      return 1;
   }
 
   switch(Cave[y][x+1])
@@ -129,7 +129,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return(1);
+      return 1;
   }
 
   switch(Cave[y+1][x])
@@ -150,7 +150,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return(1);
+      return 1;
   }
 
   switch(Cave[y][x-1])
@@ -171,7 +171,7 @@ static int test(struct PLAYER *ply)
     case Xtank_goe:
     case Xtank_gos:
     case Xtank_gow:
-      return(1);
+      return 1;
   }
 
   switch(Cave[y][x])
@@ -184,10 +184,10 @@ static int test(struct PLAYER *ply)
     case Xdynamite_2:
     case Xdynamite_3:
     case Xdynamite_4:
-      return(0);
+      return 0;
   }
 
-  return(1);
+  return 1;
 }
 
 static void die(struct PLAYER *ply)
@@ -987,8 +987,8 @@ static void player(struct PLAYER *ply)
       case Xexit_2:
       case Xexit_3:
 	play_element_sound(x, y, SAMPLE_exit, Xexit_1);
-	if (--lev.home == 0)
-	  lev.score += lev.time * lev.exit_score / 100;
+	if (--lev.home == 0 && lev.time_initial > 0)
+	    lev.score += lev.time * lev.exit_score / 100;
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;

@@ -3134,8 +3134,15 @@ void Explode(int ex, int ey, int phase, int mode)
       return;
 #endif
 
+#if 1
+    if (mode == EX_TYPE_NORMAL ||
+	mode == EX_TYPE_CENTER ||
+	mode == EX_TYPE_CROSS)
+      PlayLevelSoundAction(ex, ey, ACTION_EXPLODING);
+#else
     if (mode == EX_TYPE_NORMAL || mode == EX_TYPE_CENTER)
       PlayLevelSoundAction(ex, ey, ACTION_EXPLODING);
+#endif
 
     /* remove things displayed in background while burning dynamite */
     if (Back[ex][ey] != EL_EMPTY && !IS_INDESTRUCTIBLE(Back[ex][ey]))

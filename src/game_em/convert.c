@@ -88,59 +88,63 @@ static unsigned char remap_v4eater[28] =
   146,147,175,65,66,64,2,18
 };
 
-boolean cleanup_em_level(unsigned char *src, int *length)
+int cleanup_em_level(unsigned char *src, int length)
 {
-  unsigned int i;
+  int file_version = 0;
+  int i;
 
-  if (*length >= 2172 &&
+  if (length >= 2172 &&
       src[2106] == 255 &&
       src[2107] == 54 &&
       src[2108] == 48 &&
       src[2109] == 48)
   {
+    /* ---------- this cave has V6 file format ---------- */
+    file_version = FILE_VERSION_EM_V6;
+
     for (i = 0; i < 2048; i++)
       src[i] = remap_v6[src[i]];
     for (i = 2048; i < 2084; i++)
       src[i] = remap_v6[src[i]];
     for (i = 2112; i < 2148; i++)
       src[i] = remap_v6[src[i]];
-
-    goto v6;
   }
-
-  if (*length >= 2110 &&
-      src[2106] == 255 &&
-      src[2107] == 53 &&
-      src[2108] == 48 &&
-      src[2109] == 48)
+  else if (length >= 2110 &&
+	   src[2106] == 255 &&
+	   src[2107] == 53 &&
+	   src[2108] == 48 &&
+	   src[2109] == 48)
   {
+    /* ---------- this cave has V5 file format ---------- */
+    file_version = FILE_VERSION_EM_V5;
+
     for (i = 0; i < 2048; i++)
       src[i] = remap_v5[src[i]];
     for (i = 2048; i < 2084; i++)
       src[i] = remap_v5[src[i]];
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
-
-    goto v5;
   }
-
-  if (*length >= 2106 &&
-      src[1983] == 116)
+  else if (length >= 2106 &&
+	   src[1983] == 116)
   {
+    /* ---------- this cave has V4 file format ---------- */
+    file_version = FILE_VERSION_EM_V4;
+
     for (i = 0; i < 2048; i++)
       src[i] = remap_v4[src[i]];
     for (i = 2048; i < 2084; i++)
       src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
     for (i = 2112; i < 2148; i++) src[i] = src[i - 64];
-
-    goto v4;
   }
-
-  if (*length >= 2106 &&
-      src[0] == 241 &&
-      src[1983] == 27)
+  else if (length >= 2106 &&
+	   src[0] == 241 &&
+	   src[1983] == 27)
   {
     unsigned char j = 94;
+
+    /* ---------- this cave has V3 file format ---------- */
+    file_version = FILE_VERSION_EM_V3;
 
     for (i = 0; i < 2106; i++)
       src[i] = (src[i] ^ (j += 7)) - 0x11;
@@ -151,34 +155,35 @@ boolean cleanup_em_level(unsigned char *src, int *length)
       src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
+  }
+  else
+  {
+    /* ---------- this cave has unknown file format ---------- */
 
-    goto v3;
+    return 0;
   }
 
-  return FALSE;		/* unrecognized cave */
+  if (file_version < FILE_VERSION_EM_V6)
+  {
+    /* id */
+    src[2106] = 255;
+    src[2107] = 54;
+    src[2108] = 48;
+    src[2109] = 48;
 
- v3:
- v4:
- v5:
+    /* time */
+    i = src[2094] * 10;
+    src[2110] = i >> 8;
+    src[2111] = i;
 
-  /* id */
-  src[2106] = 255;
-  src[2107] = 54;
-  src[2108] = 48;
-  src[2109] = 48;
+    for (i = 2148; i < 2172; i++)
+      src[i] = 0;
 
-  /* time */
-  i = src[2094] * 10;
-  src[2110] = i >> 8;
-  src[2111] = i;
+    /* ball data */
+    src[2159] = 128;
+  }
 
-  for (i = 2148; i < 2172; i++)
-    src[i] = 0;
-
-  /* ball data */
-  src[2159] = 128;
-
- v6:
+  /* ---------- at this stage, the cave data always has V6 format ---------- */
 
   /* fix wheel */
   for (i = 0; i < 2048; i++)
@@ -319,9 +324,9 @@ boolean cleanup_em_level(unsigned char *src, int *length)
   src[2168] &= 31;
 
   /* size of v6 cave */
-  *length = 2172;
+  length = 2172;
 
-  return TRUE;
+  return file_version;
 }
 
 /* 2000-07-30T00:26:00Z
@@ -421,7 +426,7 @@ static unsigned short remap_emerald[256] =
   Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank, Xblank,
 };
 
-void convert_em_level(unsigned char *src)
+void convert_em_level(unsigned char *src, int file_version)
 {
   static int eater_offset[8] =
   {
@@ -469,17 +474,9 @@ void convert_em_level(unsigned char *src)
   lev.slurp_score = src[0x869];
 
   lev.lenses_time = src[0x86A] << 8 | src[0x86B];
-  lev.lenses_cnt_initial = 0;
-
   lev.magnify_time = src[0x86C] << 8 | src[0x86D];
-  lev.magnify_cnt_initial = 0;
-
   lev.wheel_time = src[0x838] << 8 | src[0x839];
-  lev.wheel_cnt_initial = 0;
-  lev.wheel_x_initial = 1;
-  lev.wheel_y_initial = 1;
 
-  lev.wind_time = 9999;
   lev.wind_cnt_initial = src[0x865] & 15 ? lev.wind_time : 0;
   temp = src[0x865];
   lev.wind_direction_initial = (temp & 8 ? 0 :
@@ -487,7 +484,6 @@ void convert_em_level(unsigned char *src)
 				temp & 2 ? 2 :
 				temp & 4 ? 3 : 0);
 
-  lev.wonderwall_state_initial = 0;
   lev.wonderwall_time_initial = src[0x836] << 8 | src[0x837];
 
   for (i = 0; i < 8; i++)
@@ -514,9 +510,6 @@ void convert_em_level(unsigned char *src)
       lev.ball_array[y][0] = (src[0x873] & 128)? temp : Xblank; /* northwest */
     }
   }
-
-  for (temp = 0; temp < TILE_MAX; temp++)
-    lev.android_array[temp] = Xblank;
 
   temp = src[0x878] << 8 | src[0x879];
 
@@ -748,11 +741,6 @@ void convert_em_level(unsigned char *src)
     }
   }
 
-  lev.home_initial = 1;		/* initial number of players in this level */
-
-  ply1.alive_initial = (lev.home_initial >= 1);
-  ply2.alive_initial = (lev.home_initial >= 2);
-
   /* first fill the complete playfield with the default border element */
   for (y = 0; y < HEIGHT; y++)
     for (x = 0; x < WIDTH; x++)
@@ -769,6 +757,8 @@ void convert_em_level(unsigned char *src)
     native_em_level.cave[ply1.x_initial][ply1.y_initial] = Zplayer;
   if (ply2.alive_initial)
     native_em_level.cave[ply2.x_initial][ply2.y_initial] = Zplayer;
+
+  native_em_level.file_version = file_version;
 }
 
 void prepare_em_level(void)

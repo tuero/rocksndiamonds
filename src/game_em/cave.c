@@ -6,11 +6,16 @@
 #include "global.h"
 #include "tile.h"
 #include "level.h"
-#include "file.h"
 
 
-static void setLevelInfoToDefaults_EM(void)
+struct LevelInfo_EM native_em_level;
+
+void setLevelInfoToDefaults_EM(void)
 {
+  int i;
+
+  native_em_level.file_version = FILE_VERSION_EM_ACTUAL;
+
   native_em_level.lev = &lev;
   native_em_level.ply1 = &ply1;
   native_em_level.ply2 = &ply2;
@@ -23,6 +28,27 @@ static void setLevelInfoToDefaults_EM(void)
 
   ply2.x_initial = 0;
   ply2.y_initial = 0;
+
+  lev.lenses_cnt_initial = 0;
+  lev.magnify_cnt_initial = 0;
+
+  lev.wheel_cnt_initial = 0;
+  lev.wheel_x_initial = 1;
+  lev.wheel_y_initial = 1;
+
+  lev.wind_time = 9999;
+  lev.wind_cnt_initial = 0;
+
+  lev.wonderwall_state_initial = 0;
+  lev.wonderwall_time_initial = 0;
+
+  for (i = 0; i < TILE_MAX; i++)
+    lev.android_array[i] = Xblank;
+
+  lev.home_initial = 1;		/* initial number of players in this level */
+
+  ply1.alive_initial = (lev.home_initial >= 1);
+  ply2.alive_initial = (lev.home_initial >= 2);
 }
 
 
@@ -37,6 +63,7 @@ boolean LoadNativeLevel_EM(char *filename)
 {
   unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
   int raw_leveldata_length;
+  int file_version;
   FILE *file;
 
   /* always start with reliable default values */
@@ -60,14 +87,14 @@ boolean LoadNativeLevel_EM(char *filename)
     return FALSE;
   }
 
-  if (!cleanup_em_level(raw_leveldata, &raw_leveldata_length))
+  if (!(file_version = cleanup_em_level(raw_leveldata, raw_leveldata_length)))
   {
     Error(ERR_WARN, "unknown EM level '%s' -- using empty level", filename);
 
     return FALSE;
   }
 
-  convert_em_level(raw_leveldata);
+  convert_em_level(raw_leveldata, file_version);
   prepare_em_level();
 
   return TRUE;

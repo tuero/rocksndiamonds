@@ -111,8 +111,9 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   static boolean clipboard_elements_initialized = FALSE;
-
   int i, j, x, y;
+
+  setLevelInfoToDefaults_EM();
 
   level->native_em_level = &native_em_level;
 
@@ -1808,7 +1809,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->width  = MIN(level->fieldx, EM_MAX_CAVE_WIDTH);
   lev->height = MIN(level->fieldy, EM_MAX_CAVE_HEIGHT);
 
-  lev->time_initial     = level->time;
+  lev->time_initial     = level->time * 5;
   lev->required_initial = level->gems_needed;
 
   lev->emerald_score	= level->score[SC_EMERALD];
@@ -1819,7 +1820,8 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->eater_score	= level->score[SC_YAMYAM];
   lev->nut_score	= level->score[SC_NUT];
   lev->dynamite_score	= level->score[SC_DYNAMITE];
-  lev->key_score	= level->score[SC_TIME_BONUS];	/* ??? CHECK THIS */
+  lev->key_score	= level->score[SC_KEY];
+  lev->exit_score	= level->score[SC_TIME_BONUS];
 
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (y = 0; y < 3; y++)
@@ -1836,9 +1838,11 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->ball_random		= level->ball_random;
   lev->ball_state_initial	= level->ball_state_initial;
   lev->ball_time		= level->ball_time;
+
   lev->lenses_score		= level->lenses_score;
   lev->magnify_score		= level->magnify_score;
   lev->slurp_score		= level->slurp_score;
+
   lev->lenses_time		= level->lenses_time;
   lev->magnify_time		= level->magnify_time;
   lev->wind_direction_initial	= level->wind_direction_initial;
@@ -1914,7 +1918,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->fieldx = MIN(lev->width,  MAX_LEV_FIELDX);
   level->fieldy = MIN(lev->height, MAX_LEV_FIELDY);
 
-  level->time        = lev->time_initial;
+  level->time        = lev->time_initial / 5;
   level->gems_needed = lev->required_initial;
 
   sprintf(level->name, "Level %d", level->file_info.nr);
@@ -1927,7 +1931,8 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->score[SC_YAMYAM]	= lev->eater_score;
   level->score[SC_NUT]		= lev->nut_score;
   level->score[SC_DYNAMITE]	= lev->dynamite_score;
-  level->score[SC_TIME_BONUS]	= lev->key_score;	/* ??? CHECK THIS */
+  level->score[SC_KEY]		= lev->key_score;
+  level->score[SC_TIME_BONUS]	= lev->exit_score;
 
   level->num_yamyam_contents = MAX_ELEMENT_CONTENTS;
 
@@ -1946,9 +1951,11 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->ball_random		= lev->ball_random;
   level->ball_state_initial	= lev->ball_state_initial;
   level->ball_time		= lev->ball_time;
+
   level->lenses_score		= lev->lenses_score;
   level->magnify_score		= lev->magnify_score;
   level->slurp_score		= lev->slurp_score;
+
   level->lenses_time		= lev->lenses_time;
   level->magnify_time		= lev->magnify_time;
   level->wind_direction_initial	= lev->wind_direction_initial;
@@ -1975,6 +1982,10 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   /* in case of both players set to the same field, use the first player */
   level->field[ply2->x_initial - 1][ply2->y_initial - 1] = EL_PLAYER_2;
   level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
+
+#if 1
+  printf("::: native Emerald Mine file version: %d\n", level_em->file_version);
+#endif
 }
 
 static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,

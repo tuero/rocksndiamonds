@@ -110,8 +110,11 @@
 					 MINI_TILEX / 2)
 
 /* values for the settings windows */
-#define ED_SETTINGS_XSTART		(3 * MINI_TILEX / 2)
-#define ED_SETTINGS_YSTART		(MINI_TILEY * 10)
+#define ED_LEVEL_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
+#define ED_LEVEL_SETTINGS_YSTART	(5 * MINI_TILEY)
+
+#define ED_ELEMENT_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
+#define ED_ELEMENT_SETTINGS_YSTART	(10 * MINI_TILEY)
 
 #define ED_XOFFSET_CHECKBOX		(ED_CHECKBUTTON_XSIZE +		\
 					 2 * ED_GADGET_DISTANCE)
@@ -119,9 +122,14 @@
 #define ED_SETTINGS_XOFFSET		ED_XOFFSET_CHECKBOX
 #define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
 
-#define ED_SETTINGS_XPOS(n)		(ED_SETTINGS_XSTART +		\
+#define ED_LEVEL_SETTINGS_XPOS(n)	(ED_LEVEL_SETTINGS_XSTART +	\
 	 				 (n) * ED_SETTINGS_XOFFSET)
-#define ED_SETTINGS_YPOS(n)		(ED_SETTINGS_YSTART +		\
+#define ED_LEVEL_SETTINGS_YPOS(n)	(ED_LEVEL_SETTINGS_YSTART +	\
+					 (n) * ED_SETTINGS_YOFFSET)
+
+#define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XSTART +	\
+	 				 (n) * ED_SETTINGS_XOFFSET)
+#define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
 					 (n) * ED_SETTINGS_YOFFSET)
 
 #define ED_SETTINGS1_YPOS		MINI_TILEY
@@ -137,12 +145,12 @@
 					 (n) * ED_COUNTER_YDISTANCE - 2)
 
 /* values for element content drawing areas */
-#define ED_AREA_1X1_SETTINGS_XPOS(n)	(ED_SETTINGS_XPOS(n))
-#define ED_AREA_1X1_SETTINGS_YPOS(n)	(ED_SETTINGS_YPOS(n) +		\
+#define ED_AREA_1X1_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
+#define ED_AREA_1X1_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YPOS(n) +	\
 					 ED_GADGET_DISTANCE)
 
-#define ED_AREA_3X3_SETTINGS_XPOS(n)	(ED_SETTINGS_XPOS(n))
-#define ED_AREA_3X3_SETTINGS_YPOS(n)	(ED_SETTINGS_YPOS(n) +		\
+#define ED_AREA_3X3_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
+#define ED_AREA_3X3_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YPOS(n) +	\
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* yamyam content */
@@ -512,12 +520,12 @@
 #define GADGET_ID_RANDOM_PERCENTAGE	(GADGET_ID_CHECKBUTTON_FIRST + 0)
 #define GADGET_ID_RANDOM_QUANTITY	(GADGET_ID_CHECKBUTTON_FIRST + 1)
 #define GADGET_ID_RANDOM_RESTRICTED	(GADGET_ID_CHECKBUTTON_FIRST + 2)
-#define GADGET_ID_DOUBLE_SPEED		(GADGET_ID_CHECKBUTTON_FIRST + 3)
-#define GADGET_ID_GRAVITY		(GADGET_ID_CHECKBUTTON_FIRST + 4)
-#define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 5)
-#define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
-#define GADGET_ID_USE_SPRING_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_GROW_INTO_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_INITIAL_GRAVITY	(GADGET_ID_CHECKBUTTON_FIRST + 3)
+#define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 4)
+#define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 5)
+#define GADGET_ID_USE_SPRING_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 6)
+#define GADGET_ID_GROW_INTO_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 7)
+#define GADGET_ID_DOUBLE_SPEED		(GADGET_ID_CHECKBUTTON_FIRST + 8)
 #define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 9)
 #define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 10)
 #define GADGET_ID_INSTANT_RELOCATION	(GADGET_ID_CHECKBUTTON_FIRST + 11)
@@ -716,13 +724,13 @@
 #define ED_GRAPHICBUTTON_ID_CHANGE_LAST   ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE
 
 /* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_ID_DOUBLE_SPEED		0
-#define ED_CHECKBUTTON_ID_GRAVITY		1
-#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
-#define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
-#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
-#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	5
-#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	6
+#define ED_CHECKBUTTON_ID_INITIAL_GRAVITY	0
+#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	1
+#define ED_CHECKBUTTON_ID_STICK_ELEMENT		2
+#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	3
+#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	4
+#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	5
+#define ED_CHECKBUTTON_ID_DOUBLE_SPEED		6
 #define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	7
 #define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	8
 #define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	9
@@ -756,7 +764,7 @@
 
 #define ED_NUM_CHECKBUTTONS			37
 
-#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
+#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_INITIAL_GRAVITY
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
@@ -925,7 +933,7 @@ static struct
   char *text_above, *text_left, *text_right;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
-  /* ---------- level and editor settings ---------------------------------- */
+  /* ---------- current level number --------------------------------------- */
 
   {
     DX + 5 - SX,			DY + 3 - SY,
@@ -935,8 +943,11 @@ static struct
     &level_nr,
     NULL,				NULL, NULL
   },
+
+  /* ---------- level and editor settings ---------------------------------- */
+
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(2),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(4),
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
     GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
     GADGET_ID_LEVEL_XSIZE_TEXT,		GADGET_ID_NONE,
@@ -944,7 +955,7 @@ static struct
     "playfield size:",			NULL, "width",
   },
   {
-    -1,					ED_COUNTER_YPOS(2),
+    -1,					ED_LEVEL_SETTINGS_YPOS(4),
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
     GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
     GADGET_ID_LEVEL_YSIZE_TEXT,		GADGET_ID_LEVEL_XSIZE_UP,
@@ -952,15 +963,15 @@ static struct
     NULL,				" ", "height",
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(3),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
     0,					999,
     GADGET_ID_LEVEL_GEMSLIMIT_DOWN,	GADGET_ID_LEVEL_GEMSLIMIT_UP,
     GADGET_ID_LEVEL_GEMSLIMIT_TEXT,	GADGET_ID_NONE,
     &level.gems_needed,
-    "number of gems to collect:",	NULL, NULL
+    NULL, "number of gems to collect:",	NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(8),
     0,					9999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,	GADGET_ID_NONE,
@@ -968,7 +979,7 @@ static struct
     "time or step limit to solve level:", NULL, NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(5),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(10),
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,	GADGET_ID_NONE,
@@ -976,7 +987,7 @@ static struct
     "score for each 10 sec/steps left:", NULL, NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
     1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,	GADGET_ID_NONE,
@@ -987,7 +998,7 @@ static struct
   /* ---------- element settings: configure (various elements) ------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE1_DOWN,	GADGET_ID_ELEMENT_VALUE1_UP,
     GADGET_ID_ELEMENT_VALUE1_TEXT,	GADGET_ID_NONE,
@@ -995,7 +1006,7 @@ static struct
     NULL,				NULL, NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE2_DOWN,	GADGET_ID_ELEMENT_VALUE2_UP,
     GADGET_ID_ELEMENT_VALUE2_TEXT,	GADGET_ID_NONE,
@@ -1003,7 +1014,7 @@ static struct
     NULL,				NULL, NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     MIN_ELEMENT_CONTENTS,		MAX_ELEMENT_CONTENTS,
     GADGET_ID_YAMYAM_CONTENT_DOWN,	GADGET_ID_YAMYAM_CONTENT_UP,
     GADGET_ID_YAMYAM_CONTENT_TEXT,	GADGET_ID_NONE,
@@ -1011,7 +1022,7 @@ static struct
     NULL,				NULL, "number of content areas"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     MIN_ENVELOPE_XSIZE,			MAX_ENVELOPE_XSIZE,
     GADGET_ID_ENVELOPE_XSIZE_DOWN,	GADGET_ID_ENVELOPE_XSIZE_UP,
     GADGET_ID_ENVELOPE_XSIZE_TEXT,	GADGET_ID_NONE,
@@ -1019,7 +1030,7 @@ static struct
     NULL,				NULL, "width",
   },
   {
-    -1,					ED_SETTINGS_YPOS(0),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(0),
     MIN_ENVELOPE_YSIZE,			MAX_ENVELOPE_YSIZE,
     GADGET_ID_ENVELOPE_YSIZE_DOWN,	GADGET_ID_ENVELOPE_YSIZE_UP,
     GADGET_ID_ENVELOPE_YSIZE_TEXT,	GADGET_ID_ENVELOPE_XSIZE_UP,
@@ -1030,7 +1041,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ------------ */
 
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(6),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
     GADGET_ID_CUSTOM_SCORE_TEXT,	GADGET_ID_NONE,
@@ -1038,7 +1049,7 @@ static struct
     NULL,				"score", " "
   },
   {
-    -1,					ED_SETTINGS_YPOS(6),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(6),
     MIN_COLLECT_COUNT,			MAX_COLLECT_COUNT,
     GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
     GADGET_ID_CUSTOM_GEMCOUNT_TEXT,	GADGET_ID_CUSTOM_SCORE_UP,
@@ -1046,7 +1057,7 @@ static struct
     NULL,				"count", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(7),
     0,					255,
     GADGET_ID_PUSH_DELAY_FIX_DOWN,	GADGET_ID_PUSH_DELAY_FIX_UP,
     GADGET_ID_PUSH_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1054,7 +1065,7 @@ static struct
     NULL,				"push delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(7),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(7),
     0,					255,
     GADGET_ID_PUSH_DELAY_RND_DOWN,	GADGET_ID_PUSH_DELAY_RND_UP,
     GADGET_ID_PUSH_DELAY_RND_TEXT,	GADGET_ID_PUSH_DELAY_FIX_UP,
@@ -1062,7 +1073,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
     0,					255,
     GADGET_ID_DROP_DELAY_FIX_DOWN,	GADGET_ID_DROP_DELAY_FIX_UP,
     GADGET_ID_DROP_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1070,7 +1081,7 @@ static struct
     NULL,				"drop delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(8),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(8),
     0,					255,
     GADGET_ID_DROP_DELAY_RND_DOWN,	GADGET_ID_DROP_DELAY_RND_UP,
     GADGET_ID_DROP_DELAY_RND_TEXT,	GADGET_ID_DROP_DELAY_FIX_UP,
@@ -1081,7 +1092,7 @@ static struct
   /* ---------- element settings: configure 2 (custom elements) ------------ */
 
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
     0,					999,
     GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
     GADGET_ID_MOVE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1089,7 +1100,7 @@ static struct
     NULL,				"move delay", NULL
   },
   {
-    -1,					ED_SETTINGS_YPOS(5),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(5),
     0,					999,
     GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
     GADGET_ID_MOVE_DELAY_RND_TEXT,	GADGET_ID_MOVE_DELAY_FIX_UP,
@@ -1097,7 +1108,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(12),
     0,					255,
     GADGET_ID_EXPLOSION_DELAY_DOWN,	GADGET_ID_EXPLOSION_DELAY_UP,
     GADGET_ID_EXPLOSION_DELAY_TEXT,	GADGET_ID_NONE,
@@ -1105,7 +1116,7 @@ static struct
     NULL,				"explosion delay", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(13),
     0,					255,
     GADGET_ID_IGNITION_DELAY_DOWN,	GADGET_ID_IGNITION_DELAY_UP,
     GADGET_ID_IGNITION_DELAY_TEXT,	GADGET_ID_NONE,
@@ -1116,7 +1127,7 @@ static struct
   /* ---------- element settings: configure (group elements) --------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
     MIN_ELEMENTS_IN_GROUP,		MAX_ELEMENTS_IN_GROUP,
     GADGET_ID_GROUP_CONTENT_DOWN,	GADGET_ID_GROUP_CONTENT_UP,
     GADGET_ID_GROUP_CONTENT_TEXT,	GADGET_ID_NONE,
@@ -1127,7 +1138,7 @@ static struct
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(2),
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1135,7 +1146,7 @@ static struct
     NULL,				"delay", NULL,
   },
   {
-    -1,					ED_SETTINGS_YPOS(2),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(2),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,	GADGET_ID_CHANGE_DELAY_FIX_UP,
@@ -1143,7 +1154,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(12),
+    ED_ELEMENT_SETTINGS_XPOS(3),	ED_ELEMENT_SETTINGS_YPOS(12),
     0,					100,
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
@@ -1162,14 +1173,14 @@ static struct
 } textinput_info[ED_NUM_TEXTINPUT] =
 {
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(0),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(0),
     GADGET_ID_LEVEL_NAME,
     MAX_LEVEL_NAME_LEN,
     level.name,
     "Title:", "Title"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(1),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(2),
     GADGET_ID_LEVEL_AUTHOR,
     MAX_LEVEL_AUTHOR_LEN,
     level.author,
@@ -1194,7 +1205,7 @@ static struct
 } textarea_info[ED_NUM_TEXTAREAS] =
 {
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_ENVELOPE_INFO,
     MAX_ENVELOPE_XSIZE, MAX_ENVELOPE_YSIZE,
     NULL,
@@ -1212,8 +1223,8 @@ static struct ValueTextInfo options_time_or_steps[] =
 
 static struct ValueTextInfo options_game_engine_type[] =
 {
-  { GAME_ENGINE_TYPE_RND,	"RND"				},
-  { GAME_ENGINE_TYPE_EM,	"EM"				},
+  { GAME_ENGINE_TYPE_RND,	"Rocks'n'Diamonds"		},
+  { GAME_ENGINE_TYPE_EM,	"Emerald Mine"			},
 
   { -1,				NULL				}
 };
@@ -1541,7 +1552,7 @@ static struct
   /* ---------- level and editor settings ---------------------------------- */
 
   {
-    -1,					ED_COUNTER_YPOS(4),
+    -1,					ED_LEVEL_SETTINGS_YPOS(8),
     GADGET_ID_TIME_OR_STEPS,		GADGET_ID_LEVEL_TIMELIMIT_UP,
     -1,
     options_time_or_steps,
@@ -1549,7 +1560,7 @@ static struct
     NULL, "(0 => no limit)",		"time or step limit"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(6) + 8,
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(5),
     GADGET_ID_GAME_ENGINE_TYPE,		GADGET_ID_NONE,
     -1,
     options_game_engine_type,
@@ -1560,7 +1571,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ----------- */
 
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_ACCESS_TYPE,	GADGET_ID_NONE,
     -1,
     options_access_type,
@@ -1568,7 +1579,7 @@ static struct
     NULL, NULL,				"type of access to this field"
   },
   {
-    -1,					ED_SETTINGS_YPOS(3),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_ACCESS_LAYER,	GADGET_ID_CUSTOM_ACCESS_TYPE,
     -1,
     options_access_layer,
@@ -1576,7 +1587,7 @@ static struct
     NULL, NULL,				"layer of access for this field"
   },
   {
-    -1,					ED_SETTINGS_YPOS(3),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_ACCESS_PROTECTED,	GADGET_ID_CUSTOM_ACCESS_LAYER,
     -1,
     options_access_protected,
@@ -1584,7 +1595,7 @@ static struct
     NULL, NULL,				"protected access for this field"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_ACCESS_DIRECTION,	GADGET_ID_NONE,
     -1,
     options_access_direction,
@@ -1592,7 +1603,7 @@ static struct
     "from", NULL,			"access direction for this field"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_WALK_TO_ACTION,	GADGET_ID_NONE,
     -1,
     options_walk_to_action,
@@ -1603,7 +1614,7 @@ static struct
   /* ---------- element settings: configure 2 (custom elements) ----------- */
 
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_MOVE_PATTERN,	GADGET_ID_NONE,
     -1,
     options_move_pattern,
@@ -1611,7 +1622,7 @@ static struct
     "can move", NULL,			"element move pattern"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_MOVE_DIRECTION,	GADGET_ID_NONE,
     -1,
     options_move_direction,
@@ -1619,7 +1630,7 @@ static struct
     "starts moving", NULL,		"initial element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_MOVE_STEPSIZE,	GADGET_ID_NONE,
     -1,
     options_move_stepsize,
@@ -1627,7 +1638,7 @@ static struct
     "move/fall speed", NULL,		"speed of element movement"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,	GADGET_ID_NONE,
     -1,
     options_move_leave_type,
@@ -1635,7 +1646,7 @@ static struct
     "can dig:    can", ":",		"leave behind or change element"
   },
   {
-    -1,					ED_SETTINGS_YPOS(7),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_SMASH_TARGETS,	GADGET_ID_CUSTOM_CAN_SMASH,
     -1,
     options_smash_targets,
@@ -1643,7 +1654,7 @@ static struct
     "can smash", NULL,			"elements that can be smashed"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY_TYPE,	GADGET_ID_NONE,
     -1,
     options_slippery_type,
@@ -1651,7 +1662,7 @@ static struct
     "slippery", NULL,			"where other elements fall down"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_DEADLINESS,	GADGET_ID_NONE,
     -1,
     options_deadliness,
@@ -1659,7 +1670,7 @@ static struct
     "deadly when", NULL,		"deadliness of element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_EXPLOSION_TYPE,	GADGET_ID_NONE,
     -1,
     options_explosion_type,
@@ -1670,7 +1681,7 @@ static struct
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CHANGE_TIME_UNITS,	GADGET_ID_NONE,
     -1,
     options_time_units,
@@ -1678,7 +1689,7 @@ static struct
     "delay time given in", NULL,	"delay time units for change"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(4),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_DIRECT_ACTION,	GADGET_ID_NONE,
     -1,
     options_change_direct_action,
@@ -1686,7 +1697,7 @@ static struct
     NULL, NULL,				"type of direct action"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_CHANGE_OTHER_ACTION,	GADGET_ID_NONE,
     -1,
     options_change_other_action,
@@ -1694,7 +1705,7 @@ static struct
     NULL, "element:",			"type of other element action"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(6),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(6),
     GADGET_ID_CHANGE_SIDE,		GADGET_ID_NONE,
     -1,
     options_change_trigger_side,
@@ -1702,7 +1713,7 @@ static struct
     "at", "side",			"element side that causes change"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CHANGE_PLAYER,		GADGET_ID_NONE,
     -1,
     options_change_trigger_player,
@@ -1710,7 +1721,7 @@ static struct
     "player:", " ",			"player that causes change"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CHANGE_PAGE,		GADGET_ID_CHANGE_PLAYER,
     -1,
     options_change_trigger_page,
@@ -1718,7 +1729,7 @@ static struct
     "page:", NULL,			"change page that causes change"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_CHANGE_REPLACE_WHEN,	GADGET_ID_NONE,
     -1,
     options_change_replace_when,
@@ -1726,7 +1737,7 @@ static struct
     "replace when", NULL,		"which elements can be replaced"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_SELECT_CHANGE_PAGE,	GADGET_ID_NONE,
     3,
     options_change_page,
@@ -1737,7 +1748,7 @@ static struct
   /* ---------- element settings: configure (group elements) --------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(6),
     GADGET_ID_GROUP_CHOICE_MODE,	GADGET_ID_NONE,
     -1,
     options_group_choice_mode,
@@ -1758,69 +1769,69 @@ static struct
 {
 #if 1
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
     NULL, NULL,				"Show information about element"
   },
   {
-    ED_SETTINGS_XPOS(0) + 124,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 124,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_NONE,
     8,					"Config",
     NULL, NULL,				"Configure element properties"
   },
   {
-    ED_SETTINGS_XPOS(0) + 124,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 124,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CONFIG_1,	GADGET_ID_NONE,
     8,					"Config 1",
     NULL, NULL,				"Configure custom element properties"
   },
   {
-    ED_SETTINGS_XPOS(0) + 248,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 248,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CONFIG_2,	GADGET_ID_NONE,
     8,					"Config 2",
     NULL, NULL,				"Configure custom element properties"
   },
   {
-    ED_SETTINGS_XPOS(0) + 372,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 372,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_NONE,
     8,					"Change",
     NULL, NULL,				"Custom element change configuration"
   },
 #else
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     11,					"Information",			
     NULL, NULL,				"Show information about element"
   },
   {
-    ED_SETTINGS_XPOS(0) + 166,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 166,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_NONE,
     11,					"Configure",
     NULL, NULL,				"Configure element properties"
   },
   {
-    ED_SETTINGS_XPOS(0) + 332,		ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0) + 332,	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_NONE,
     11,					"Advanced",
     NULL, NULL,				"Advanced element configuration"
   },
 #endif
   {
-    -1,					ED_SETTINGS_YPOS(2),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
     -1,					"Save",
     " ", "As Template",			"Save current settings as new template"
   },
   {
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_PASTE_CHANGE_PAGE,
     -1,					"New",
     NULL, NULL,				"Add new change page"
   },
   {
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_DEL_CHANGE_PAGE,		GADGET_ID_ADD_CHANGE_PAGE,
     -1,					"Delete",
     NULL, NULL,				"Delete current change page"
@@ -1839,28 +1850,28 @@ static struct
 {
   {
     ED_BUTTON_MINUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(14),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PREV_CHANGE_PAGE,		GADGET_ID_NONE,
     NULL, NULL,				"select previous change page"
   },
   {
     ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
     NULL, "change page",		"select next change page"
   },
   {
     ED_COPY_CHANGE_PAGE_XPOS,		ED_COPY_CHANGE_PAGE_YPOS,
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_COPY_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
     " ", NULL,				"copy settings from this change page"
   },
   {
     ED_PASTE_CHANGE_PAGE_XPOS,		ED_PASTE_CHANGE_PAGE_YPOS,
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PASTE_CHANGE_PAGE,	GADGET_ID_COPY_CHANGE_PAGE,
     NULL, NULL,				"paste settings to this change page"
@@ -1988,19 +1999,14 @@ static struct
   /* ---------- level and editor settings ---------------------------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(6) - MINI_TILEY,
-    GADGET_ID_DOUBLE_SPEED,		GADGET_ID_NONE,
-    &level.double_speed,
-    NULL, "double speed movement",	"set movement speed of player"
-  },
-  {
-    -1,					ED_COUNTER_YPOS(6) - MINI_TILEY,
-    GADGET_ID_GRAVITY,			GADGET_ID_DOUBLE_SPEED,
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
+    GADGET_ID_INITIAL_GRAVITY,		GADGET_ID_NONE,
     &level.initial_gravity,
-    " ", "gravity",			"set level gravity"
+    NULL,
+    "initial gravity",			"set initial level gravity"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(9) - MINI_TILEY,
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(9) - MINI_TILEY,
     GADGET_ID_RANDOM_RESTRICTED,	GADGET_ID_NONE,
     &random_placement_background_restricted,
     NULL,
@@ -2010,77 +2016,84 @@ static struct
   /* ---------- element settings: configure (various elements) ------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_STICK_ELEMENT,		GADGET_ID_NONE,
     &stick_element_properties_window,
     NULL,
     "stick this screen to edit content","stick this screen to edit content"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_EM_SLIPPERY_GEMS,		GADGET_ID_NONE,
     &level.em_slippery_gems,
     NULL,
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_USE_SPRING_BUG,		GADGET_ID_NONE,
     &level.use_spring_bug,
     NULL,
     "use spring pushing bug",		"use odd spring pushing behaviour"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_GROW_INTO_DIGGABLE,	GADGET_ID_NONE,
     &level.grow_into_diggable,
     NULL,
     "can grow into anything diggable",	"grow into more than just sand"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
+    GADGET_ID_DOUBLE_SPEED,		GADGET_ID_NONE,
+    &level.double_speed,
+    NULL,
+    "double speed movement",		"set initial movement speed of player"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_BLOCK_LAST_FIELD,		GADGET_ID_NONE,
     &level.block_last_field,
     NULL,
     "block last field when moving",	"player blocks last field when moving"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_SP_BLOCK_LAST_FIELD,	GADGET_ID_NONE,
     &level.sp_block_last_field,
     NULL,
     "block last field when moving",	"player blocks last field when moving"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_INSTANT_RELOCATION,	GADGET_ID_NONE,
     &level.instant_relocation,
     NULL,
     "no scrolling when relocating",	"player gets relocated without delay"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CAN_PASS_TO_WALKABLE,	GADGET_ID_NONE,
     &level.can_pass_to_walkable,
     NULL,
     "can pass to walkable element",	"player can pass to empty or walkable"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_CAN_FALL_INTO_ACID,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE_INTO_ACID],
     NULL,
     "can fall into acid (with gravity)","player can fall into acid pool"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_CAN_MOVE_INTO_ACID,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE_INTO_ACID],
     NULL,
     "can move into acid",		"element can move into acid pool"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_DONT_COLLIDE_WITH,	GADGET_ID_NONE,
     &custom_element_properties[EP_DONT_COLLIDE_WITH],
     NULL,
@@ -2090,7 +2103,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ----------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_USE_GRAPHIC,	GADGET_ID_NONE,
     &custom_element.use_gfx_element,
 
@@ -2102,31 +2115,31 @@ static struct
 #endif
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_USE_TEMPLATE,	GADGET_ID_NONE,
     &level.use_custom_template,
     NULL, "use template",		"use template for custom properties"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_ACCESSIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_ACCESSIBLE],
     NULL, NULL,				"player can walk to or pass this field"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_GRAV_REACHABLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_GRAVITY_REACHABLE],
     NULL, "reachable despite gravity",	"player can walk/dig despite gravity"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_WALK_TO_OBJECT,	GADGET_ID_NONE,
     &custom_element_properties[EP_WALK_TO_OBJECT],
     NULL, NULL,				"player can dig/collect/push element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
     NULL, "indestructible",		"element is indestructible"
@@ -2135,55 +2148,55 @@ static struct
   /* ---------- element settings: configure 2 (custom elements) ----------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CAN_MOVE,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE],
     NULL, NULL,				"element can move with some pattern"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_FALL],
     NULL, "can fall",			"element can fall down"
   },
   {
-    -1,					ED_SETTINGS_YPOS(7),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_SMASH],
     " ", NULL,				"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
     &custom_element_properties[EP_SLIPPERY],
     NULL, NULL,				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_DEADLY,		GADGET_ID_NONE,
     &custom_element_properties[EP_DEADLY],
     NULL, NULL,				"element can kill the player"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_EXPLODE,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_EXPLODE],
     NULL, NULL,				"element can explode"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(11),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,	GADGET_ID_NONE,
     &custom_element_properties[EP_EXPLODES_BY_FIRE],
     NULL, "by fire",			"element can explode by fire/explosion"
   },
   {
-    -1,					ED_SETTINGS_YPOS(11),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,	GADGET_ID_CUSTOM_EXPLODE_FIRE,
     &custom_element_properties[EP_EXPLODES_SMASHED],
     " ", "smashed",			"element can explode when smashed"
   },
   {
-    -1,					ED_SETTINGS_YPOS(11),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,	GADGET_ID_CUSTOM_EXPLODE_SMASH,
     &custom_element_properties[EP_EXPLODES_IMPACT],
     " ", "impact",			"element can explode on impact"
@@ -2192,49 +2205,49 @@ static struct
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CAN_CHANGE,	GADGET_ID_NONE,
     &custom_element_change.can_change,
     NULL, "element changes to:",	"element can change to other element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CHANGE_DELAY,		GADGET_ID_NONE,
     &custom_element_change_events[CE_DELAY],
     NULL, NULL,				"element changes after delay"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_BY_DIRECT_ACT,	GADGET_ID_NONE,
     &custom_element_change_events[CE_BY_DIRECT_ACTION],
     NULL, NULL,				"element changes by direct action"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_CHANGE_BY_OTHER_ACT,	GADGET_ID_NONE,
     &custom_element_change_events[CE_BY_OTHER_ACTION],
     NULL, NULL,				"element changes by other element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CHANGE_USE_EXPLOSION,	GADGET_ID_NONE,
     &custom_element_change.explode,
     NULL, "explode instead of change",	"element explodes instead of change"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CHANGE_USE_CONTENT,	GADGET_ID_NONE,
     &custom_element_change.use_target_content,
     NULL, "use extended change target:","element changes to more elements"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
     &custom_element_change.only_if_complete,
     NULL, "replace all or nothing",	"only replace when all can be changed"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
+    ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(12),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_replace,
     NULL, NULL,				"use percentage for random replace"
@@ -2448,7 +2461,7 @@ static struct
   /* ---------- random background (for random painting) -------------------- */
 
   {
-    -1,					ED_SETTINGS_YPOS(14),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     1, 1,
     GADGET_ID_RANDOM_BACKGROUND,	GADGET_ID_RANDOM_RESTRICTED,
     NULL, NULL,				NULL
@@ -6884,8 +6897,8 @@ char *getElementDescriptionFilename(int element)
 static boolean PrintInfoText(char *text, int font_nr, int start_line)
 {
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
+  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
@@ -6905,8 +6918,8 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
+  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y + start_line * font_height;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
@@ -6923,8 +6936,8 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
+  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
@@ -7118,8 +7131,8 @@ static void DrawPropertiesInfo()
   int font2_nr = FONT_TEXT_2;
   int font1_width = getFontWidth(font1_nr);
   int font2_height = getFontHeight(font2_nr);
-  int pad_x = ED_SETTINGS_XPOS(0);
-  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
+  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
   int screen_line = 0;
   int i, x, y;
 
@@ -7330,7 +7343,7 @@ static void DrawPropertiesConfig()
       int counter_id = ED_COUNTER_ID_ELEMENT_VALUE1 + num_element_counters;
 
       counterbutton_info[counter_id].y =
-	ED_SETTINGS_YPOS((HAS_CONTENT(properties_element) ? 1 : 0) +
+	ED_ELEMENT_SETTINGS_YPOS((HAS_CONTENT(properties_element) ? 1 : 0) +
 			 (CAN_GROW(properties_element) ? 1 : 0) +
 			 (COULD_MOVE_INTO_ACID(properties_element) ? 1 : 0) +
 			 (MAYBE_DONT_COLLIDE_WITH(properties_element) ? 1 : 0)+
@@ -7373,6 +7386,7 @@ static void DrawPropertiesConfig()
 			 ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_INSTANT_RELOCATION);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_DOUBLE_SPEED);
   }
 
   if (IS_GEM(properties_element))
@@ -7385,9 +7399,9 @@ static void DrawPropertiesConfig()
   {
     /* set position for checkbutton for "can move into acid" */
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].x =
-      ED_SETTINGS_XPOS(IS_CUSTOM_ELEMENT(properties_element) ? 1 : 0);
+      ED_ELEMENT_SETTINGS_XPOS(IS_CUSTOM_ELEMENT(properties_element) ? 1 : 0);
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
-      ED_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
+      ED_ELEMENT_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
 		       HAS_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
@@ -7402,7 +7416,7 @@ static void DrawPropertiesConfig()
   if (CAN_GROW(properties_element))
   {
     checkbutton_info[ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE].y =
-      ED_SETTINGS_YPOS(HAS_CONTENT(properties_element) ? 1 : 0);
+      ED_ELEMENT_SETTINGS_YPOS(HAS_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE);
   }
@@ -7561,7 +7575,7 @@ static void DrawElementName(int x, int y, int element)
   int font_nr = FONT_TEXT_1;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int max_text_width = SXSIZE - x - ED_SETTINGS_XPOS(0);
+  int max_text_width = SXSIZE - x - ED_ELEMENT_SETTINGS_XPOS(0);
   int max_chars_per_line = max_text_width / font_width;
   char buffer[max_chars_per_line + 1];
 
