@@ -1168,17 +1168,18 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_SOUND_LOOPS		2
 #define SETUP_TOKEN_SOUND_MUSIC		3
 #define SETUP_TOKEN_SOUND_SIMPLE	4
-#define SETUP_TOKEN_SCROLL_DELAY	5
-#define SETUP_TOKEN_SOFT_SCROLLING	6
-#define SETUP_TOKEN_FADING		7
-#define SETUP_TOKEN_AUTORECORD		8
-#define SETUP_TOKEN_QUICK_DOORS		9
-#define SETUP_TOKEN_TEAM_MODE		10
-#define SETUP_TOKEN_HANDICAP		11
-#define SETUP_TOKEN_TIME_LIMIT		12
-#define SETUP_TOKEN_FULLSCREEN		13
+#define SETUP_TOKEN_TOONS		5
+#define SETUP_TOKEN_SCROLL_DELAY	6
+#define SETUP_TOKEN_SOFT_SCROLLING	7
+#define SETUP_TOKEN_FADING		8
+#define SETUP_TOKEN_AUTORECORD		9
+#define SETUP_TOKEN_QUICK_DOORS		10
+#define SETUP_TOKEN_TEAM_MODE		11
+#define SETUP_TOKEN_HANDICAP		12
+#define SETUP_TOKEN_TIME_LIMIT		13
+#define SETUP_TOKEN_FULLSCREEN		14
 
-#define NUM_GLOBAL_SETUP_TOKENS		14
+#define NUM_GLOBAL_SETUP_TOKENS		15
 
 /* player setup */
 #define SETUP_TOKEN_USE_JOYSTICK	0
@@ -1211,6 +1212,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
   { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
   { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
+  { TYPE_SWITCH,  &si.toons,		"toons"				},
   { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
   { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
   { TYPE_SWITCH,  &si.fading,		"screen_fading"			},

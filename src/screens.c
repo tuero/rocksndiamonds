@@ -27,12 +27,10 @@
 /* screens in the setup menu */
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_INPUT		1
+#define SETUP_MODE_GRAPHICS		2
+#define SETUP_MODE_SOUND		3
 
-/* for DrawSetupScreen(), HandleSetupScreen() */
-#define SETUP_SCREEN_POS_START		0
-#define SETUP_SCREEN_POS_END		(SCR_FIELDY - 3)
-#define SETUP_SCREEN_POS_EMPTY1		(SETUP_SCREEN_POS_END - 2)
-#define SETUP_SCREEN_POS_EMPTY2		(SETUP_SCREEN_POS_END - 2)
+#define MAX_SETUP_MODES			4
 
 /* for HandleSetupInputScreen() */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -1306,10 +1304,22 @@ static struct TokenInfo *setup_info;
 static int num_setup_info;
 static int setup_mode = SETUP_MODE_MAIN;
 
+static void execSetupMain()
+{
+  setup_mode = SETUP_MODE_MAIN;
+  DrawSetupScreen();
+}
+
+static void execSetupSound()
+{
+  setup_mode = SETUP_MODE_SOUND;
+  DrawSetupScreen();
+}
+
 static void execSetupInput()
 {
   setup_mode = SETUP_MODE_INPUT;
-  DrawSetupInputScreen();
+  DrawSetupScreen();
 }
 
 static void execExitSetup()
@@ -1324,13 +1334,18 @@ static void execSaveAndExitSetup()
   execExitSetup();
 }
 
-static struct TokenInfo setup_main_info[] =
+static struct TokenInfo setup_info_main[] =
 {
+  { TYPE_ENTER_MENU,	execSetupSound,		"Sound Setup"	},
+  { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"	},
+  { TYPE_EMPTY,		NULL,			""		},
+#if 0
   { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
   { TYPE_SWITCH,	&setup.sound_loops,	" Sound Loops:"	},
   { TYPE_SWITCH,	&setup.sound_music,	" Game Music:"	},
-#if 0
+#endif
   { TYPE_SWITCH,	&setup.toons,		"Toons:"	},
+#if 0
   { TYPE_SWITCH,	&setup.double_buffering,"Buffered gfx:"	},
 #endif
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"	},
@@ -1344,10 +1359,21 @@ static struct TokenInfo setup_main_info[] =
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode:"	},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"	},
   { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"	},
-  { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"	},
   { TYPE_EMPTY,		NULL,			""		},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"		},
   { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and exit"	},
+  { 0,			NULL,			NULL		}
+};
+
+static struct TokenInfo setup_info_sound[] =
+{
+  { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
+  { TYPE_EMPTY,		NULL,			""		},
+  { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"	},
+  { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"	},
+  { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"	},
+  { TYPE_EMPTY,		NULL,			""		},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"		},
   { 0,			NULL,			NULL		}
 };
 
@@ -1375,16 +1401,27 @@ static void drawSetupValue(int pos)
   DrawText(SX + xpos * 32, SY + ypos * 32, value_string, FS_BIG, value_color);
 }
 
-static void DrawSetupMainScreen()
+static void DrawGenericSetupScreen()
 {
+  char *title_string = NULL;
   int i;
 
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
 
-  DrawText(SX + 16, SY + 16, "SETUP",FS_BIG,FC_YELLOW);
-  setup_info = setup_main_info;
+  if (setup_mode == SETUP_MODE_MAIN)
+  {
+    setup_info = setup_info_main;
+    title_string = "Setup";
+  }
+  else if (setup_mode == SETUP_MODE_SOUND)
+  {
+    setup_info = setup_info_sound;
+    title_string = "Sound Setup";
+  }
+
+  DrawText(SX + 16, SY + 16, title_string, FS_BIG, FC_YELLOW);
 
   num_setup_info = 0;
   for(i=0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
@@ -1420,9 +1457,10 @@ static void DrawSetupMainScreen()
   HandleSetupScreen(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
-void HandleSetupMainScreen(int mx, int my, int dx, int dy, int button)
+void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
 {
-  static int choice = 0;
+  static int choice_store[MAX_SETUP_MODES];
+  int choice = choice_store[setup_mode];
   int x = 0;
   int y = choice;
 
@@ -1478,7 +1516,7 @@ void HandleSetupMainScreen(int mx, int my, int dx, int dy, int button)
       {
 	drawCursor(y, FC_RED);
 	drawCursor(choice, FC_BLUE);
-	choice = y;
+	choice = choice_store[setup_mode] = y;
       }
     }
     else if (!(setup_info[y].type & TYPE_GHOSTED))
@@ -1746,18 +1784,18 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 
 void DrawSetupScreen()
 {
-  if (setup_mode == SETUP_MODE_MAIN)
-    DrawSetupMainScreen();
-  else if (setup_mode == SETUP_MODE_INPUT)
+  if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupInputScreen();
+  else
+    DrawGenericSetupScreen();
 }
 
 void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 {
-  if (setup_mode == SETUP_MODE_MAIN)
-    HandleSetupMainScreen(mx, my, dx, dy, button);
-  else if (setup_mode == SETUP_MODE_INPUT)
+  if (setup_mode == SETUP_MODE_INPUT)
     HandleSetupInputScreen(mx, my, dx, dy, button);
+  else
+    HandleGenericSetupScreen(mx, my, dx, dy, button);
 }
 
 void CustomizeKeyboard(int player_nr)
