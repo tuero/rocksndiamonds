@@ -158,9 +158,25 @@
 #define ED_CHECKBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 22)
 #define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 88)
 
-#define GADGET_ID_NONE			-1
+/* some positions in the editor control window */
+#define ED_BUTTON_ELEM_XPOS	6
+#define ED_BUTTON_ELEM_YPOS	30
+#define ED_BUTTON_ELEM_XSIZE	22
+#define ED_BUTTON_ELEM_YSIZE	22
+
+#define ED_BUTTON_MINUS_XPOS	2
+#define ED_BUTTON_MINUS_YPOS	ED_BUTTON_COUNT_YPOS
+#define ED_BUTTON_MINUS_XSIZE	ED_BUTTON_COUNT_XSIZE
+#define ED_BUTTON_MINUS_YSIZE	ED_BUTTON_COUNT_YSIZE
+#define ED_BUTTON_PLUS_XPOS	(ED_WIN_COUNT_XPOS + ED_WIN_COUNT_XSIZE + 2)
+#define ED_BUTTON_PLUS_YPOS	ED_BUTTON_COUNT_YPOS
+#define ED_BUTTON_PLUS_XSIZE	ED_BUTTON_COUNT_XSIZE
+#define ED_BUTTON_PLUS_YSIZE	ED_BUTTON_COUNT_YSIZE
+
+/* editor gadget identifiers */
 
 /* drawing toolbox buttons */
+#define GADGET_ID_NONE			-1
 #define GADGET_ID_SINGLE_ITEMS		0
 #define GADGET_ID_CONNECTED_ITEMS	1
 #define GADGET_ID_LINE			2
@@ -285,6 +301,9 @@
 
 #define ED_NUM_SCROLLBUTTONS		6
 
+#define ED_SCROLLBUTTON_ID_AREA_FIRST	ED_SCROLLBUTTON_ID_AREA_UP
+#define ED_SCROLLBUTTON_ID_AREA_LAST	ED_SCROLLBUTTON_ID_AREA_RIGHT
+
 /* values for scrollbar gadgets */
 #define ED_SCROLLBAR_ID_HORIZONTAL	0
 #define ED_SCROLLBAR_ID_VERTICAL	1
@@ -313,7 +332,7 @@
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
-#define ED_RADIOBUTTON_ID_QUANTITY		1
+#define ED_RADIOBUTTON_ID_QUANTITY	1
 
 #define ED_NUM_RADIOBUTTONS		2
 
@@ -1665,6 +1684,8 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
   for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
     MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
+  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_UP]);
+  MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_DOWN]);
 }
 
 static void MapCounterButtons(int id)
@@ -1700,7 +1721,7 @@ static void MapMainDrawingArea()
   boolean no_vertical_scrollbar = (lev_fieldy + 2 <= ed_fieldy);
   int i;
 
-  for (i=0; i<ED_NUM_SCROLLBUTTONS; i++)
+  for (i=ED_SCROLLBUTTON_ID_AREA_FIRST; i<=ED_SCROLLBUTTON_ID_AREA_LAST; i++)
   {
     if (((i == ED_SCROLLBUTTON_ID_AREA_LEFT ||
 	  i == ED_SCROLLBUTTON_ID_AREA_RIGHT) &&
@@ -1749,16 +1770,15 @@ void UnmapLevelEditorGadgets()
 
 void DrawLevelEd()
 {
-  int i, x, y, graphic;
-
   edit_mode = ED_MODE_DRAWING;
 
   CloseDoor(DOOR_CLOSE_ALL);
-
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
 
   if (level_editor_test_game)
   {
+    int x, y;
+
     for(x=0; x<lev_fieldx; x++)
       for(y=0; y<lev_fieldy; y++)
 	Feld[x][y] = Ur[x][y];
@@ -1778,70 +1798,39 @@ void DrawLevelEd()
     CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
   }
 
-  /*
-  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
-  FadeToFront();
-  */
+  /* copy default editor door content to main double buffer */
+  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
-  XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
-	    DOOR_GFX_PAGEX6,DOOR_GFX_PAGEY1,
-	    DXSIZE,DYSIZE,
-	    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
-  XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
-	    DOOR_GFX_PAGEX6+ED_BUTTON_ELEM_XPOS,
-	    DOOR_GFX_PAGEY1+ED_BUTTON_ELEM_YPOS,
-	    4*ED_BUTTON_ELEM_XSIZE,5*ED_BUTTON_ELEM_YSIZE,
-	    DOOR_GFX_PAGEX1+ED_BUTTON_ELEM_XPOS,
-	    DOOR_GFX_PAGEY1+ED_BUTTON_EUP_Y2POS);
-
-  for(i=0;i<MAX_ELEM_X*MAX_ELEM_Y;i++)
-  {
-    if (i < elements_in_list)
-      graphic = el2gfx(editor_element[i + element_shift]);
-    else
-      graphic = GFX_LEERRAUM;
-
-    DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
-		       DOOR_GFX_PAGEX1+ED_BUTTON_ELEM_XPOS+3 + 
-		       (i%MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
-		       DOOR_GFX_PAGEY1+ED_BUTTON_ELEM_YPOS+3 +
-		       (i/MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
-		       graphic);
-  }
-
-  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
-		     DOOR_GFX_PAGEX1+ED_WIN_MB_LEFT_XPOS,
-		     DOOR_GFX_PAGEY1+ED_WIN_MB_LEFT_YPOS,
+  /* draw mouse button brush elements */
+  DrawMiniGraphicExt(drawto, gc,
+		     DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
 		     el2gfx(new_element1));
-  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
-		     DOOR_GFX_PAGEX1+ED_WIN_MB_MIDDLE_XPOS,
-		     DOOR_GFX_PAGEY1+ED_WIN_MB_MIDDLE_YPOS,
+  DrawMiniGraphicExt(drawto, gc,
+		     DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
 		     el2gfx(new_element2));
-  DrawMiniGraphicExt(pix[PIX_DB_DOOR],gc,
-		     DOOR_GFX_PAGEX1+ED_WIN_MB_RIGHT_XPOS,
-		     DOOR_GFX_PAGEY1+ED_WIN_MB_RIGHT_YPOS,
+  DrawMiniGraphicExt(drawto, gc,
+		     DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
 		     el2gfx(new_element3));
-  DrawTextExt(pix[PIX_DB_DOOR],gc,
-	      DOOR_GFX_PAGEX2+ED_WIN_LEVELNR_XPOS,
-	      DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS,
-	      int2str(level_nr,2),FS_SMALL,FC_SPECIAL1);
-  XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
-	    DOOR_GFX_PAGEX2+ED_WIN_LEVELNR_XPOS+3,
-	    DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS,
-	    7,FONT3_YSIZE,
-	    DOOR_GFX_PAGEX1+ED_WIN_LEVELNR_XPOS,
-	    DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS);
-  XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
-	    DOOR_GFX_PAGEX2+ED_WIN_LEVELNR_XPOS+14,
-	    DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS,
-	    7,FONT3_YSIZE,
-	    DOOR_GFX_PAGEX1+ED_WIN_LEVELNR_XPOS+9,
-	    DOOR_GFX_PAGEY1+ED_WIN_LEVELNR_YPOS);
 
-  XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
-	    DOOR_GFX_PAGEX6,DOOR_GFX_PAGEY2,
-	    VXSIZE,VYSIZE,
-	    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
+  /* draw level number */
+  DrawTextExt(pix[PIX_DB_DOOR], gc,
+	      DOOR_GFX_PAGEX2 + ED_WIN_LEVELNR_XPOS,
+	      DOOR_GFX_PAGEY1 + ED_WIN_LEVELNR_YPOS,
+	      int2str(level_nr, 2), FS_SMALL, FC_SPECIAL1);
+  /* copy level number to fit into level number field */
+  XCopyArea(display, pix[PIX_DB_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX2 + ED_WIN_LEVELNR_XPOS + 3,
+	    DOOR_GFX_PAGEY1 + ED_WIN_LEVELNR_YPOS,
+	    7, FONT3_YSIZE,
+	    DX + ED_WIN_LEVELNR_XPOS,
+	    DY + ED_WIN_LEVELNR_YPOS);
+  XCopyArea(display, pix[PIX_DB_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX2 + ED_WIN_LEVELNR_XPOS + 14,
+	    DOOR_GFX_PAGEY1 + ED_WIN_LEVELNR_YPOS,
+	    7, FONT3_YSIZE,
+	    DX + ED_WIN_LEVELNR_XPOS + 9,
+	    DY + ED_WIN_LEVELNR_YPOS);
 
   /* draw bigger door */
   XCopyArea(display, pix[PIX_DOOR], drawto, gc,
@@ -1857,18 +1846,16 @@ void DrawLevelEd()
 
   redraw_mask |= REDRAW_ALL;
 
-  OpenDoor(DOOR_OPEN_1);
-
-  strcpy(level_editor_gadget[GADGET_ID_LEVEL_NAME]->text.value, level.name);
-
   MapControlButtons();
 
-  /*
-  MapMainDrawingArea();
-  */
+  /* copy actual editor door content to door double buffer for OpenDoor() */
+  XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
+	    DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   DrawDrawingWindow();
   FadeToFront();
+
+  OpenDoor(DOOR_OPEN_1);
 
   /*
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
@@ -2421,8 +2408,6 @@ static void DrawPropertiesWindow()
 
   if (HAS_CONTENT(properties_element))
   {
-
-#if 1
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
     x = checkbutton_info[i].x + xoffset_right2;
@@ -2432,8 +2417,6 @@ static void DrawPropertiesWindow()
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
-#endif
-
 
     if (IS_AMOEBOID(properties_element))
       DrawAmoebaContentArea();
@@ -2678,15 +2661,11 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
   static int brush_width, brush_height;
   static int last_cursor_x = -1, last_cursor_y = -1;
   static boolean delete_old_brush;
-  int new_element;
+  int new_element = BUTTON_ELEMENT(button);
   int x, y;
 
   if (mode == CB_DELETE_OLD_CURSOR && !delete_old_brush)
     return;
-
-  new_element = (button == 1 ? new_element1 :
-		 button == 2 ? new_element2 :
-		 button == 3 ? new_element3 : 0);
 
   if (mode == CB_AREA_TO_BRUSH)
   {
@@ -2769,18 +2748,8 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
       }
     }
 
-    /*
-    printf("%d, %d - %d, %d in level and screen\n",
-	   border_from_x, border_from_y, border_to_x, border_to_y);
-    */
-
     if (mode != CB_DELETE_OLD_CURSOR)
       DrawAreaBorder(border_from_x, border_from_y, border_to_x, border_to_y);
-
-    /*
-    if (mode == CB_BRUSH_TO_LEVEL)
-      CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
-    */
 
     last_cursor_x = cursor_x;
     last_cursor_y = cursor_y;
@@ -3110,11 +3079,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   /* handle info callback for each invocation of action callback */
   gi->callback_info(gi);
 
-  /*
-  if (edit_mode != ED_MODE_DRAWING)
-    return;
-  */
-
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
@@ -3148,17 +3112,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
   if (!button && !button_release_event)
     return;
-
-
-#if 0
-  if (button_release_event)
-    button = 0;
-#endif
-
-#if 0
-  if (!draw_level && drawing_function != GADGET_ID_SINGLE_ITEMS)
-    return;
-#endif
 
   /* automatically switch to 'single item' drawing mode, if needed */
   actual_drawing_function =
@@ -3322,12 +3275,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_PICK_ELEMENT:
-
-      /*
-      if (button_press_event)
-	PickDrawingElement(button, Feld[lx][ly]);
-      */
-
       if (button_release_event)
 	ClickOnGadget(level_editor_gadget[last_drawing_function], MB_LEFT);
       else
@@ -3697,12 +3644,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	for(x=0; x<lev_fieldx; x++)
 	  if (Feld[x][y] != Ur[x][y])
 	    level_changed = TRUE;
-
-      if (0 && !level_changed)
-      {
-	Request("Level has not changed !", REQ_CONFIRM);
-	break;
-      }
 
       for(y=0; y<lev_fieldy; y++) 
 	for(x=0; x<lev_fieldx; x++)

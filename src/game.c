@@ -606,24 +606,20 @@ void InitGame()
   DrawAllPlayers();
   FadeToFront();
 
-  XCopyArea(display, pix[PIX_DOOR], pix[PIX_DB_DOOR], gc,
-	    DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-  DrawTextExt(pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX1 + XX_LEVEL, DOOR_GFX_PAGEY1 + YY_LEVEL,
-	      int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
-  DrawTextExt(pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX1 + XX_EMERALDS, DOOR_GFX_PAGEY1 + YY_EMERALDS,
-	      int2str(local_player->gems_still_needed,3), FS_SMALL, FC_YELLOW);
-  DrawTextExt(pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX1 + XX_DYNAMITE, DOOR_GFX_PAGEY1 + YY_DYNAMITE,
-	      int2str(local_player->dynamite, 3), FS_SMALL, FC_YELLOW);
-  DrawTextExt(pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX1 + XX_SCORE, DOOR_GFX_PAGEY1 + YY_SCORE,
-	      int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
-  DrawTextExt(pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX1 + XX_TIME, DOOR_GFX_PAGEY1 + YY_TIME,
-	      int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+  /* copy default game door content to main double buffer */
+  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+
+  DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
+	   int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
+	   int2str(local_player->gems_still_needed,3), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
+	   int2str(local_player->dynamite, 3), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_SCORE, DY + YY_SCORE,
+	   int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_TIME, DY + YY_TIME,
+	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
   UnmapGameButtons();
   game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
@@ -632,12 +628,9 @@ void InitGame()
   MapGameButtons();
   MapTapeButtons();
 
-  /* copy actual game buttons to door double buffer for OpenDoor() */
+  /* copy actual game door content to door double buffer for OpenDoor() */
   XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
-	    DX + GAME_CONTROL_XPOS, DY + GAME_CONTROL_YPOS,
-	    GAME_CONTROL_XSIZE, 2 * GAME_CONTROL_YSIZE,
-	    DOOR_GFX_PAGEX1 + GAME_CONTROL_XPOS,
-	    DOOR_GFX_PAGEY1 + GAME_CONTROL_YPOS);
+	    DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   OpenDoor(DOOR_OPEN_ALL);
 
