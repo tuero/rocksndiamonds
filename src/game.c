@@ -5333,11 +5333,30 @@ void StartMoving(int x, int y)
 	  {
 	    int flamed = MovingOrBlocked2Element(xx, yy);
 
+	    /* !!! */
+#if 0
+	    if (IS_CLASSIC_ENEMY(flamed) || CAN_EXPLODE_BY_DRAGONFIRE(flamed))
+	      Bang(xx, yy);
+	    else if (IS_MOVING(xx, yy) || IS_BLOCKED(xx, yy))
+	      RemoveMovingField(xx, yy);
+	    else
+	      RemoveField(xx, yy);
+#else
 	    if (IS_CLASSIC_ENEMY(flamed) || CAN_EXPLODE_BY_DRAGONFIRE(flamed))
 	      Bang(xx, yy);
 	    else
 	      RemoveMovingField(xx, yy);
+#endif
 
+#if 0
+	    if (ChangeDelay[xx][yy])
+	      printf("::: !!! [%d]\n", (IS_MOVING(xx, yy) ||
+					Feld[xx][yy] == EL_BLOCKED));
+#endif
+
+#if 1
+	    ChangeDelay[xx][yy] = 0;
+#endif
 	    Feld[xx][yy] = EL_FLAMES;
 	    if (IN_SCR_FIELD(sx, sy))
 	    {
@@ -5591,11 +5610,25 @@ void StartMoving(int x, int y)
 
 	  MovDelay[x][y] = 50;
 
+	  /* !!! */
+#if 0
+	  RemoveField(newx, newy);
+#endif
 	  Feld[newx][newy] = EL_FLAMES;
 	  if (IN_LEV_FIELD(newx1, newy1) && Feld[newx1][newy1] == EL_EMPTY)
+	  {
+#if 0
+	    RemoveField(newx1, newy1);
+#endif
 	    Feld[newx1][newy1] = EL_FLAMES;
+	  }
 	  if (IN_LEV_FIELD(newx2, newy2) && Feld[newx2][newy2] == EL_EMPTY)
+	  {
+#if 0
+	    RemoveField(newx2, newy2);
+#endif
 	    Feld[newx2][newy2] = EL_FLAMES;
+	  }
 
 	  return;
 	}

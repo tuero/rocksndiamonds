@@ -1,5 +1,12 @@
+2004-03-19
+	* added move speed faster than "very fast" for custom elements
+	* fixed bug with 3+3 style explosions and missing border content
+	* fixed little bug when copying custom elements in the editor
+	* enhanced custom element changes by more side trigger actions
+
 2004-03-16
 	* added option "no scrolling when relocating" for instant teleporting
+	* uploaded pre-release (test) version 3.1.0-0 binary and source code
 
 2004-03-15
 	* added trigger element and trigger player to use as target elements
