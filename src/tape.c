@@ -366,7 +366,7 @@ static void TapeStartGameRecording()
   else
 #endif
   {
-    game_status = PLAYING;
+    game_status = GAME_MODE_PLAYING;
     StopAnimation();
     InitGame();
   }
@@ -511,7 +511,7 @@ static void TapeStartGamePlaying()
 {
   TapeStartPlaying();
 
-  game_status = PLAYING;
+  game_status = GAME_MODE_PLAYING;
   StopAnimation();
   InitGame();
 }
@@ -646,7 +646,7 @@ static void TapeSingleStep()
 
 void TapeQuickSave()
 {
-  if (game_status == PLAYING)
+  if (game_status == GAME_MODE_PLAYING)
   {
     if (tape.recording)
       TapeHaltRecording();	/* prepare tape for saving on-the-fly */
@@ -656,13 +656,13 @@ void TapeQuickSave()
     else
       SaveTape(tape.level_nr);
   }
-  else if (game_status == MAINMENU)
+  else if (game_status == GAME_MODE_MAIN)
     Request("No game that can be saved !", REQ_CONFIRM);
 }
 
 void TapeQuickLoad()
 {
-  if (game_status == PLAYING || game_status == MAINMENU)
+  if (game_status == GAME_MODE_PLAYING || game_status == GAME_MODE_MAIN)
   {
     TapeStop();
     TapeErase();
@@ -943,7 +943,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
 
-  if (game_status != MAINMENU && game_status != PLAYING)
+  if (game_status != GAME_MODE_MAIN && game_status != GAME_MODE_PLAYING)
     return;
 
   switch (id)

@@ -3342,8 +3342,8 @@ struct ConfigInfo image_config[] =
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
 
-  /* the following directives are not associated with an image,
-     but make sense to be defined in "graphicsinfo.conf", too */
+  /* the following directives are not associated with an image, but
+     probably make sense to be defined in "graphicsinfo.conf", too */
 
   { "global.num_toons",				"20"			},
 
@@ -3351,6 +3351,16 @@ struct ConfigInfo image_config[] =
   { "menu.draw_yoffset",			"0"			},
   { "menu.draw_xoffset.MAIN",			"0"			},
   { "menu.draw_yoffset.MAIN",			"0"			},
+  { "menu.draw_xoffset.LEVELS",			"0"			},
+  { "menu.draw_yoffset.LEVELS",			"0"			},
+  { "menu.draw_xoffset.SCORES",			"0"			},
+  { "menu.draw_yoffset.SCORES",			"0"			},
+  { "menu.draw_xoffset.EDITOR",			"0"			},
+  { "menu.draw_yoffset.EDITOR",			"0"			},
+  { "menu.draw_xoffset.INFO",			"0"			},
+  { "menu.draw_yoffset.INFO",			"0"			},
+  { "menu.draw_xoffset.SETUP",			"0"			},
+  { "menu.draw_yoffset.SETUP",			"0"			},
 
   { "door.step_offset",				"2"			},
   { "door.step_delay",				"10"			},

@@ -1183,7 +1183,7 @@ void GameWon()
 
   if ((hi_pos = NewHiScore()) >= 0) 
   {
-    game_status = HALLOFFAME;
+    game_status = GAME_MODE_SCORES;
     DrawHallOfFame(hi_pos);
     if (raise_level)
     {
@@ -1193,7 +1193,7 @@ void GameWon()
   }
   else
   {
-    game_status = MAINMENU;
+    game_status = GAME_MODE_MAIN;
     if (raise_level)
     {
       level_nr++;
@@ -4543,7 +4543,7 @@ void GameActions()
   byte *recorded_player_action;
   byte summarized_player_action = 0;
 
-  if (game_status != PLAYING)
+  if (game_status != GAME_MODE_PLAYING)
     return;
 
   action_delay_value =
@@ -4569,7 +4569,7 @@ void GameActions()
     HandleNetworking();
 #endif
 
-    if (game_status != PLAYING)
+    if (game_status != GAME_MODE_PLAYING)
       return;
 
     if (!network_player_action_received)
@@ -6812,7 +6812,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
     else
 #endif
     {
-      game_status = MAINMENU;
+      game_status = GAME_MODE_MAIN;
       DrawMainMenu();
     }
   }
@@ -6973,7 +6973,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
 
-  if (game_status != PLAYING)
+  if (game_status != GAME_MODE_PLAYING)
     return;
 
   switch (id)

@@ -70,7 +70,7 @@ void SetDrawtoField(int mode)
 
 void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 {
-  if (game_status == PLAYING)
+  if (game_status == GAME_MODE_PLAYING)
   {
     if (force_redraw)
     {
@@ -118,7 +118,7 @@ void BackToFront()
   int x,y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
 
-  if (setup.direct_draw && game_status == PLAYING)
+  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
@@ -130,7 +130,7 @@ void BackToFront()
   if (redraw_mask == REDRAW_NONE)
     return;
 
-  if (global.fps_slowdown && game_status == PLAYING)
+  if (global.fps_slowdown && game_status == GAME_MODE_PLAYING)
   {
     static boolean last_frame_skipped = FALSE;
     boolean skip_even_when_not_scrolling = TRUE;
@@ -175,7 +175,8 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_FIELD)
   {
-    if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
+    if (game_status != GAME_MODE_PLAYING ||
+	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
       BlitBitmap(backbuffer, window,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
@@ -388,7 +389,7 @@ void ClearWindow()
 {
   DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
-  if (setup.soft_scrolling && game_status == PLAYING)
+  if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
     SetDrawtoField(DRAW_BUFFERED);
@@ -396,7 +397,7 @@ void ClearWindow()
   else
     SetDrawtoField(DRAW_BACKBUFFER);
 
-  if (setup.direct_draw && game_status == PLAYING)
+  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(window, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
     SetDrawtoField(DRAW_DIRECT);
@@ -1588,7 +1589,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   static int label_state, label_counter;
   int last_game_status = game_status;	/* save current game status */
 
-  game_status = PSEUDO_PREVIEW;	/* force PREVIEW font on preview level */
+  /* force PREVIEW font on preview level */
+  game_status = GAME_MODE_PSEUDO_PREVIEW;
 
   if (restart)
   {
@@ -1711,7 +1713,7 @@ boolean Request(char *text, unsigned int req_state)
 #if defined(PLATFORM_UNIX)
   /* pause network game while waiting for request to answer */
   if (options.network &&
-      game_status == PLAYING &&
+      game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR)
     SendToServer_PausePlaying();
 #endif
@@ -1732,7 +1734,8 @@ boolean Request(char *text, unsigned int req_state)
   /* clear door drawing field */
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
-  game_status = PSEUDO_DOOR;	/* force DOOR font on preview level */
+  /* force DOOR font on preview level */
+  game_status = GAME_MODE_PSEUDO_DOOR;
 
   /* write text for request */
   for(ty=0; ty < MAX_REQUEST_LINES; ty++)
@@ -1804,7 +1807,7 @@ boolean Request(char *text, unsigned int req_state)
     return FALSE;
   }
 
-  if (game_status != MAINMENU)
+  if (game_status != GAME_MODE_MAIN)
     InitAnimation();
 
   button_status = MB_RELEASED;
@@ -1928,7 +1931,7 @@ boolean Request(char *text, unsigned int req_state)
     Delay(10);
   }
 
-  if (game_status != MAINMENU)
+  if (game_status != GAME_MODE_MAIN)
     StopAnimation();
 
   UnmapToolButtons();
@@ -1953,7 +1956,7 @@ boolean Request(char *text, unsigned int req_state)
 #if defined(PLATFORM_UNIX)
   /* continue network game after request */
   if (options.network &&
-      game_status == PLAYING &&
+      game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR)
     SendToServer_ContinuePlaying();
 #endif
@@ -2146,7 +2149,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
       BackToFront();
 
-      if (game_status == MAINMENU)
+      if (game_status == GAME_MODE_MAIN)
 	DoAnimation();
     }
   }

@@ -75,9 +75,9 @@ static int setup_mode = SETUP_MODE_MAIN;
 static int mSX = SX;
 static int mSY = SY;
 #else
-#define mSX (SX + (game_status == MAINMENU ? global.menu_draw_xoffset_MAIN : \
+#define mSX (SX + (game_status == GAME_MODE_MAIN ? global.menu_draw_xoffset_MAIN : \
 		   global.menu_draw_xoffset))
-#define mSY (SY + (game_status == MAINMENU ? global.menu_draw_yoffset_MAIN : \
+#define mSY (SY + (game_status == GAME_MODE_MAIN ? global.menu_draw_yoffset_MAIN : \
 		   global.menu_draw_yoffset))
 #endif
 
@@ -208,7 +208,7 @@ void DrawMainMenu()
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
   {
-    game_status = LEVELED;
+    game_status = GAME_MODE_EDITOR;
     DrawLevelEd();
     return;
   }
@@ -406,14 +406,14 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     {
       if (y == 0)
       {
-	game_status = TYPENAME;
+	game_status = GAME_MODE_PSEUDO_TYPENAME;
 	HandleTypeName(strlen(setup.player_name), 0);
       }
       else if (y == 1)
       {
 	if (leveldir_first)
 	{
-	  game_status = CHOOSELEVEL;
+	  game_status = GAME_MODE_LEVELS;
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
@@ -424,7 +424,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 2)
       {
-	game_status = HALLOFFAME;
+	game_status = GAME_MODE_SCORES;
 	DrawHallOfFame(-1);
       }
       else if (y == 3)
@@ -432,12 +432,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (leveldir_current->readonly &&
 	    strcmp(setup.player_name, "Artsoft") != 0)
 	  Request("This level is read only !", REQ_CONFIRM);
-	game_status = LEVELED;
+	game_status = GAME_MODE_EDITOR;
 	DrawLevelEd();
       }
       else if (y == 4)
       {
-	game_status = HELPSCREEN;
+	game_status = GAME_MODE_INFO;
 	DrawHelpScreen();
       }
       else if (y == 5)
@@ -451,14 +451,14 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	else
 #endif
 	{
-	  game_status = PLAYING;
+	  game_status = GAME_MODE_PLAYING;
 	  StopAnimation();
 	  InitGame();
 	}
       }
       else if (y == 6)
       {
-	game_status = SETUP;
+	game_status = GAME_MODE_SETUP;
 	setup_mode = SETUP_MODE_MAIN;
 	DrawSetupScreen();
       }
@@ -467,7 +467,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	SaveLevelSetup_LastSeries();
 	SaveLevelSetup_SeriesInfo();
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
-	  game_status = EXITGAME;
+	  game_status = GAME_MODE_QUIT;
       }
     }
   }
@@ -476,7 +476,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   out:
 
-  if (game_status == MAINMENU)
+  if (game_status == GAME_MODE_MAIN)
   {
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
     DoAnimation();
@@ -1101,7 +1101,7 @@ void HandleHelpScreen(int button)
     {
       FadeSounds();
 
-      game_status = MAINMENU;
+      game_status = GAME_MODE_MAIN;
       DrawMainMenu();
     }
   }
@@ -1177,7 +1177,7 @@ void HandleTypeName(int newxpos, Key key)
     DrawText(startx + xpos * font_width, starty, " ", FONT_INPUT_1_ACTIVE);
 
     SaveSetup();
-    game_status = MAINMENU;
+    game_status = GAME_MODE_MAIN;
   }
 
   BackToFront();
@@ -1235,7 +1235,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   DrawText(SX + offset, SY + offset, title_string, FONT_TITLE_1);
 
-  game_status = CHOOSELEVEL;	/* force LEVELS font on artwork setup screen */
+  /* force LEVELS font on artwork setup screen */
+  game_status = GAME_MODE_LEVELS;
 
   for(i=0; i<num_page_entries; i++)
   {
@@ -1352,13 +1353,13 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       *ti_ptr = ti->node_parent;
       DrawChooseTree(ti_ptr);
     }
-    else if (game_status == SETUP)
+    else if (game_status == GAME_MODE_SETUP)
     {
       execSetupArtwork();
     }
     else
     {
-      game_status = MAINMENU;
+      game_status = GAME_MODE_MAIN;
       DrawMainMenu();
     }
 
@@ -1489,13 +1490,13 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  TapeErase();
 	}
 
-	if (game_status == SETUP)
+	if (game_status == GAME_MODE_SETUP)
 	{
 	  execSetupArtwork();
 	}
 	else
 	{
-	  game_status = MAINMENU;
+	  game_status = GAME_MODE_MAIN;
 	  DrawMainMenu();
 	}
       }
@@ -1504,7 +1505,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   BackToFront();
 
-  if (game_status == CHOOSELEVEL || game_status == SETUP)
+  if (game_status == GAME_MODE_LEVELS || game_status == GAME_MODE_SETUP)
     DoAnimation();
 }
 
@@ -1619,13 +1620,13 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   if (button_released)
   {
     FadeSound(SND_BACKGROUND_SCORES);
-    game_status = MAINMENU;
+    game_status = GAME_MODE_MAIN;
     DrawMainMenu();
   }
 
   BackToFront();
 
-  if (game_status == HALLOFFAME)
+  if (game_status == GAME_MODE_SCORES)
   {
     DoAnimation();
 #if 1
@@ -1726,7 +1727,7 @@ static void execSetupShortcut()
 
 static void execExitSetup()
 {
-  game_status = MAINMENU;
+  game_status = GAME_MODE_MAIN;
   DrawMainMenu();
 }
 
@@ -2126,7 +2127,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 
   BackToFront();
 
-  if (game_status == SETUP)
+  if (game_status == GAME_MODE_SETUP)
     DoAnimation();
 }
 
@@ -2372,7 +2373,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
   out:
 
-  if (game_status == SETUP)
+  if (game_status == GAME_MODE_SETUP)
     DoAnimation();
 }
 
@@ -2736,7 +2737,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
 void HandleGameActions()
 {
-  if (game_status != PLAYING)
+  if (game_status != GAME_MODE_PLAYING)
     return;
 
   if (local_player->LevelSolved)
@@ -3009,29 +3010,29 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
 
-  if (game_status != CHOOSELEVEL && game_status != SETUP)
+  if (game_status != GAME_MODE_LEVELS && game_status != GAME_MODE_SETUP)
     return;
 
   switch (id)
   {
     case SCREEN_CTRL_ID_SCROLL_UP:
-      if (game_status == CHOOSELEVEL)
+      if (game_status == GAME_MODE_LEVELS)
 	HandleChooseLevel(SX,SY + 32, 0,0, MB_MENU_MARK);
-      else if (game_status == SETUP)
+      else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(SX,SY + 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_DOWN:
-      if (game_status == CHOOSELEVEL)
+      if (game_status == GAME_MODE_LEVELS)
 	HandleChooseLevel(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
-      else if (game_status == SETUP)
+      else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:
-      if (game_status == CHOOSELEVEL)
+      if (game_status == GAME_MODE_LEVELS)
 	HandleChooseLevel(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
-      else if (game_status == SETUP)
+      else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
       break;
 

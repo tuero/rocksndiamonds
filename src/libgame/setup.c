@@ -1125,11 +1125,19 @@ static unsigned int get_hash_from_key(void *key)
   /*
     djb2
 
-    this algorithm (k=33) was first reported by dan bernstein many years ago in
-    comp.lang.c. another version of this algorithm (now favored by bernstein)
-    uses xor: hash(i) = hash(i - 1) * 33 ^ str[i]; the magic of number 33 (why
+    This algorithm (k=33) was first reported by Dan Bernstein many years ago in
+    'comp.lang.c'. Another version of this algorithm (now favored by Bernstein)
+    uses XOR: hash(i) = hash(i - 1) * 33 ^ str[i]; the magic of number 33 (why
     it works better than many other constants, prime or not) has never been
     adequately explained.
+
+    If you just want to have a good hash function, and cannot wait, djb2
+    is one of the best string hash functions i know. It has excellent
+    distribution and speed on many different sets of keys and table sizes.
+    You are not likely to do better with one of the "well known" functions
+    such as PJW, K&R, etc.
+
+    Ozan (oz) Yigit [http://www.cs.yorku.ca/~oz/hash.html]
   */
 
   char *str = (char *)key;
@@ -1190,26 +1198,6 @@ void setHashEntry(SetupFileHash *hash, char *token, char *value)
 #ifdef DEBUG
 static void printSetupFileHash(SetupFileHash *hash)
 {
-#if 0
-  if (hash == NULL)
-    return;
-
-  /* iterator constructor only returns valid iterator for non-empty hash */
-  if (hash != NULL && hashtable_count(hash) > 0)
-  {
-    struct hashtable_itr *itr = hashtable_iterator(hash);
-
-    do
-    {
-      printf("token: '%s'\n", (char *)hashtable_iterator_key(itr));
-      printf("value: '%s'\n", (char *)hashtable_iterator_value(itr));
-    }
-    while (hashtable_iterator_advance(itr));
-
-    free(itr);
-  }
-#endif
-
   BEGIN_HASH_ITERATION(hash, itr)
   {
     printf("token: '%s'\n", HASH_ITERATION_TOKEN(itr));

@@ -455,7 +455,7 @@ static void Handle_OP_START_PLAYING()
 
   InitRND(new_random_seed);
 
-  game_status = PLAYING;
+  game_status = GAME_MODE_PLAYING;
   InitGame();
 }
 
@@ -482,7 +482,7 @@ static void Handle_OP_STOP_PLAYING()
   printf("OP_STOP_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT, "client %d stops game", buffer[0]);
 
-  game_status = MAINMENU;
+  game_status = GAME_MODE_MAIN;
   DrawMainMenu();
 }
 

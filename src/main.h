@@ -791,7 +791,7 @@
 
 #define NUM_ACTIONS				26
 
-/* values for special image configuration suffixes */
+/* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_MAIN			0
 #define GFX_SPECIAL_ARG_LEVELS			1
 #define GFX_SPECIAL_ARG_SCORES			2
@@ -872,18 +872,20 @@
 #define NUM_FONTS				28
 #define NUM_INITIAL_FONTS			4
 
-/* values for game_status */
-#define EXITGAME		0
-#define MAINMENU		1
-#define PLAYING			2
-#define LEVELED			3
-#define HELPSCREEN		4
-#define CHOOSELEVEL		5
-#define TYPENAME		6
-#define HALLOFFAME		7
-#define SETUP			8
-#define PSEUDO_PREVIEW		9
-#define PSEUDO_DOOR		10
+/* values for game_status (must match special image configuration suffixes) */
+#define GAME_MODE_MAIN				0
+#define GAME_MODE_LEVELS			1
+#define GAME_MODE_SCORES			2
+#define GAME_MODE_EDITOR			3
+#define GAME_MODE_INFO				4
+#define GAME_MODE_SETUP				5
+#define GAME_MODE_PSEUDO_DOOR			6
+#define GAME_MODE_PSEUDO_PREVIEW		7
+
+/* there are no special config file suffixes for these modes */
+#define GAME_MODE_PLAYING			8
+#define GAME_MODE_PSEUDO_TYPENAME		9
+#define GAME_MODE_QUIT				10
 
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	2

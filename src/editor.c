@@ -2607,7 +2607,7 @@ void CreateLevelEditorGadgets()
   int old_game_status = game_status;
 
   /* setting 'game_status' is needed to get the right fonts for the editor */
-  game_status = LEVELED;
+  game_status = GAME_MODE_EDITOR;
 
   ReinitializeElementList();
 
@@ -5047,7 +5047,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  TapeStartRecording();
 
 	level_editor_test_game = TRUE;
-	game_status = PLAYING;
+	game_status = GAME_MODE_PLAYING;
 
 	InitGame();
       }
@@ -5205,7 +5205,7 @@ void HandleEditorGadgetInfoText(void *ptr)
   char shortcut[MAX_OUTPUT_LINESIZE + 1];
   int max_infotext_len = getMaxInfoTextLength();
 
-  if (game_status != LEVELED)
+  if (game_status != GAME_MODE_EDITOR)
     return;
 
   ClearEditorGadgetInfoText();
@@ -5386,7 +5386,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
     /*
     CloseDoor(DOOR_CLOSE_ALL);
     */
-    game_status = MAINMENU;
+    game_status = GAME_MODE_MAIN;
     DrawMainMenu();
   }
   else

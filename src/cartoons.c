@@ -24,7 +24,7 @@ static struct ToonInfo toons[MAX_NUM_TOONS];
 static void PrepareBackbuffer()
 {
   /* Fill empty backbuffer for animation functions */
-  if (setup.direct_draw && game_status == PLAYING)
+  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
   {
     int xx,yy;
 
@@ -38,7 +38,7 @@ static void PrepareBackbuffer()
     SetDrawtoField(DRAW_DIRECT);
   }
 
-  if (setup.soft_scrolling && game_status == PLAYING)
+  if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
   {
     int fx = FX, fy = FY;
 
@@ -51,8 +51,8 @@ static void PrepareBackbuffer()
 
 boolean ToonNeedsRedraw()
 {
-  return (game_status == HELPSCREEN ||
-	  (game_status == MAINMENU &&
+  return (game_status == GAME_MODE_INFO ||
+	  (game_status == GAME_MODE_MAIN &&
 	   ((redraw_mask & REDRAW_MICROLEVEL) ||
 	    (redraw_mask & REDRAW_MICROLABEL))));
 }

@@ -2988,14 +2988,14 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS + 1] =
 
 struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 {
-  { ".MAIN",		0,				},
-  { ".LEVELS",		0,				},
-  { ".SCORES",		0,				},
-  { ".EDITOR",		0,				},
-  { ".INFO",		0,				},
-  { ".SETUP",		0,				},
-  { ".DOOR",		0,				},
-  { ".PREVIEW",		0,				},
+  { ".MAIN",		GAME_MODE_MAIN,			},
+  { ".LEVELS",		GAME_MODE_LEVELS		},
+  { ".SCORES",		GAME_MODE_SCORES,		},
+  { ".EDITOR",		GAME_MODE_EDITOR,		},
+  { ".INFO",		GAME_MODE_INFO,			},
+  { ".SETUP",		GAME_MODE_SETUP,		},
+  { ".DOOR",		GAME_MODE_PSEUDO_DOOR,		},
+  { ".PREVIEW",		GAME_MODE_PSEUDO_PREVIEW,	},
 
   { NULL,		0,				}
 };

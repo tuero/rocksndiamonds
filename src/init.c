@@ -260,21 +260,11 @@ static int getFontBitmapID(int font_nr)
 {
   int special = -1;
 
-  if (game_status == MAINMENU || game_status == TYPENAME)
+  if (game_status >= GAME_MODE_MAIN && game_status <= GAME_MODE_PSEUDO_PREVIEW)
+    special = game_status;
+  else if (game_status == GAME_MODE_PSEUDO_TYPENAME)
     special = GFX_SPECIAL_ARG_MAIN;
-  else if (game_status == CHOOSELEVEL)
-    special = GFX_SPECIAL_ARG_LEVELS;
-  else if (game_status == HALLOFFAME)
-    special = GFX_SPECIAL_ARG_SCORES;
-  else if (game_status == LEVELED)
-    special = GFX_SPECIAL_ARG_EDITOR;
-  else if (game_status == HELPSCREEN)
-    special = GFX_SPECIAL_ARG_INFO;
-  else if (game_status == SETUP)
-    special = GFX_SPECIAL_ARG_SETUP;
-  else if (game_status == PSEUDO_PREVIEW)
-    special = GFX_SPECIAL_ARG_PREVIEW;
-  else if (game_status == PLAYING || game_status == PSEUDO_DOOR)
+  else if (game_status == GAME_MODE_PLAYING)
     special = GFX_SPECIAL_ARG_DOOR;
 
   if (special != -1)
@@ -2578,6 +2568,16 @@ static void InitArtworkConfig()
     "menu.draw_yoffset",
     "menu.draw_xoffset.MAIN",
     "menu.draw_yoffset.MAIN",
+    "menu.draw_xoffset.LEVELS",
+    "menu.draw_yoffset.LEVELS",
+    "menu.draw_xoffset.SCORES",
+    "menu.draw_yoffset.SCORES",
+    "menu.draw_xoffset.EDITOR",
+    "menu.draw_yoffset.EDITOR",
+    "menu.draw_xoffset.INFO",
+    "menu.draw_yoffset.INFO",
+    "menu.draw_xoffset.SETUP",
+    "menu.draw_yoffset.SETUP",
     "door.step_offset",
     "door.step_delay",
     NULL
@@ -2973,7 +2973,7 @@ void OpenAll()
     return;
   }
 
-  game_status = MAINMENU;
+  game_status = GAME_MODE_MAIN;
 
   DrawMainMenu();
 
