@@ -308,7 +308,7 @@ void DrawMainMenu()
   DrawText(mSX + level_width + 5 * 32, mSY + 3*32, int2str(level_nr,3),
 	   FONT_VALUE_1);
 
-  DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
+  DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
 
   DrawTextF(mSX + 32 + level_width - 2, mSY + 3*32 + 1, FONT_TEXT_3, "%d-%d",
 	    leveldir_current->first_level, leveldir_current->last_level);
@@ -427,7 +427,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	       FONT_VALUE_1);
 
       LoadLevel(level_nr);
-      DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
+      DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
 
       TapeErase();
       LoadTape(level_nr);
@@ -524,7 +524,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (game_status == GAME_MODE_MAIN)
   {
-    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
+    DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, FALSE);
     DoAnimation();
   }
 }
@@ -1481,6 +1481,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int num_entries = numTreeInfoInGroup(ti);
   int num_page_entries;
   int last_game_status = game_status;	/* save current game status */
+  boolean position_set_by_scrollbar = (dx == 999);
 
   /* force LEVELS draw offset on choose level and artwork setup screen */
   game_status = GAME_MODE_LEVELS;
@@ -1512,7 +1513,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       ti->cl_cursor = entry_pos - ti->cl_first;
     }
 
-    if (dx == 999)	/* first entry is set by scrollbar position */
+    if (position_set_by_scrollbar)
       ti->cl_first = dy;
     else
       AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
@@ -1634,7 +1635,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     return;
   }
 
-  if (IN_VIS_FIELD(x, y) &&
+  if (!anyScrollbarGadgetActive() &&
+      IN_VIS_FIELD(x, y) &&
       mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
       y >= 0 && y < num_page_entries)
   {

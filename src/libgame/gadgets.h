@@ -250,6 +250,10 @@ void UnmapGadget(struct GadgetInfo *);
 void UnmapAllGadgets();
 void RemapAllGadgets();
 
+boolean anyTextInputGadgetActive();
+boolean anyTextAreaGadgetActive();
+boolean anySelectboxGadgetActive();
+boolean anyScrollbarGadgetActive();
 boolean anyTextGadgetActive();
 
 void ClickOnGadget(struct GadgetInfo *, int);

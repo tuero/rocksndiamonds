@@ -41,10 +41,11 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 
 #define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		FC_BLUE :    \
 			 IS_LEVELCLASS_CLASSICS(n) ?		FC_RED :     \
-			 IS_LEVELCLASS_BD(n) ?			FC_GREEN :   \
+			 IS_LEVELCLASS_BD(n) ?			FC_YELLOW :  \
 			 IS_LEVELCLASS_EM(n) ?			FC_YELLOW :  \
-			 IS_LEVELCLASS_SP(n) ?			FC_GREEN :   \
+			 IS_LEVELCLASS_SP(n) ?			FC_YELLOW :  \
 			 IS_LEVELCLASS_DX(n) ?			FC_YELLOW :  \
+			 IS_LEVELCLASS_SB(n) ?			FC_YELLOW :  \
 			 IS_LEVELCLASS_CONTRIB(n) ?		FC_GREEN :   \
 			 IS_LEVELCLASS_PRIVATE(n) ?		FC_RED :     \
 			 FC_BLUE)
@@ -55,14 +56,15 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_EM(n) ?			3 :	\
 			 IS_LEVELCLASS_SP(n) ?			4 :	\
 			 IS_LEVELCLASS_DX(n) ?			5 :	\
-			 IS_LEVELCLASS_CONTRIB(n) ?		6 :	\
-			 IS_LEVELCLASS_PRIVATE(n) ?		7 :	\
+			 IS_LEVELCLASS_SB(n) ?			6 :	\
+			 IS_LEVELCLASS_CONTRIB(n) ?		7 :	\
+			 IS_LEVELCLASS_PRIVATE(n) ?		8 :	\
 			 9)
 
 #define ARTWORKCOLOR(n)	(IS_ARTWORKCLASS_CLASSICS(n) ?		FC_RED :     \
-			 IS_ARTWORKCLASS_CONTRIB(n) ?		FC_YELLOW :  \
+			 IS_ARTWORKCLASS_CONTRIB(n) ?		FC_GREEN :   \
 			 IS_ARTWORKCLASS_PRIVATE(n) ?		FC_RED :     \
-			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_GREEN :   \
+			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_YELLOW :  \
 			 FC_BLUE)
 
 #define ARTWORKSORTING(n) (IS_ARTWORKCLASS_CLASSICS(n) ?	0 :	\
@@ -1578,20 +1580,21 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_NAME_SORTING	2
 #define LEVELINFO_TOKEN_AUTHOR		3
 #define LEVELINFO_TOKEN_IMPORTED_FROM	4
-#define LEVELINFO_TOKEN_LEVELS		5
-#define LEVELINFO_TOKEN_FIRST_LEVEL	6
-#define LEVELINFO_TOKEN_SORT_PRIORITY	7
-#define LEVELINFO_TOKEN_LATEST_ENGINE	8
-#define LEVELINFO_TOKEN_LEVEL_GROUP	9
-#define LEVELINFO_TOKEN_READONLY	10
-#define LEVELINFO_TOKEN_GRAPHICS_SET	11
-#define LEVELINFO_TOKEN_SOUNDS_SET	12
-#define LEVELINFO_TOKEN_MUSIC_SET	13
-#define LEVELINFO_TOKEN_FILENAME	14
-#define LEVELINFO_TOKEN_FILETYPE	15
-#define LEVELINFO_TOKEN_HANDICAP	16
+#define LEVELINFO_TOKEN_IMPORTED_BY	5
+#define LEVELINFO_TOKEN_LEVELS		6
+#define LEVELINFO_TOKEN_FIRST_LEVEL	7
+#define LEVELINFO_TOKEN_SORT_PRIORITY	8
+#define LEVELINFO_TOKEN_LATEST_ENGINE	9
+#define LEVELINFO_TOKEN_LEVEL_GROUP	10
+#define LEVELINFO_TOKEN_READONLY	11
+#define LEVELINFO_TOKEN_GRAPHICS_SET	12
+#define LEVELINFO_TOKEN_SOUNDS_SET	13
+#define LEVELINFO_TOKEN_MUSIC_SET	14
+#define LEVELINFO_TOKEN_FILENAME	15
+#define LEVELINFO_TOKEN_FILETYPE	16
+#define LEVELINFO_TOKEN_HANDICAP	17
 
-#define NUM_LEVELINFO_TOKENS		17
+#define NUM_LEVELINFO_TOKENS		18
 
 static LevelDirTree ldi;
 
@@ -1603,6 +1606,7 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"	},
   { TYPE_STRING,	&ldi.author,		"author"	},
   { TYPE_STRING,	&ldi.imported_from,	"imported_from"	},
+  { TYPE_STRING,	&ldi.imported_by,	"imported_by"	},
   { TYPE_INTEGER,	&ldi.levels,		"levels"	},
   { TYPE_INTEGER,	&ldi.first_level,	"first_level"	},
   { TYPE_INTEGER,	&ldi.sort_priority,	"sort_priority"	},
@@ -1652,6 +1656,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
     ldi->imported_from = NULL;
+    ldi->imported_by = NULL;
 
     ldi->graphics_set = NULL;
     ldi->sounds_set = NULL;
@@ -1715,6 +1720,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
     ldi->imported_from = getStringCopy(parent->imported_from);
+    ldi->imported_by = getStringCopy(parent->imported_by);
 
     ldi->graphics_set = NULL;
     ldi->sounds_set = NULL;
@@ -1756,6 +1762,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->author = getStringCopy(parent->author);
 
   ldi->imported_from = getStringCopy(parent->imported_from);
+  ldi->imported_by = getStringCopy(parent->imported_by);
   ldi->class_desc = getStringCopy(parent->class_desc);
 
   ldi->graphics_set = NULL;
@@ -1792,6 +1799,7 @@ static void freeTreeInfo(TreeInfo *ldi)
   if (ldi->type == TREE_TYPE_LEVEL_DIR)
   {
     checked_free(ldi->imported_from);
+    checked_free(ldi->imported_by);
 
     checked_free(ldi->graphics_set);
     checked_free(ldi->sounds_set);
@@ -2639,6 +2647,7 @@ static void SaveUserLevelInfo()
     if (i != LEVELINFO_TOKEN_IDENTIFIER &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
 	i != LEVELINFO_TOKEN_IMPORTED_FROM &&
+	i != LEVELINFO_TOKEN_IMPORTED_BY &&
 	i != LEVELINFO_TOKEN_FILENAME &&
 	i != LEVELINFO_TOKEN_FILETYPE)
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));

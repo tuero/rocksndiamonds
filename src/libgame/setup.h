@@ -103,9 +103,11 @@ typedef struct hashtable     SetupFileHash;
 #define LEVELCLASS_SP_END		699
 #define LEVELCLASS_DX_START		700
 #define LEVELCLASS_DX_END		799
+#define LEVELCLASS_SB_START		800
+#define LEVELCLASS_SB_END		899
 
 #define LEVELCLASS_PREDEFINED_START	LEVELCLASS_TUTORIAL_START
-#define LEVELCLASS_PREDEFINED_END	LEVELCLASS_DX_END
+#define LEVELCLASS_PREDEFINED_END	LEVELCLASS_SB_END
 
 #define LEVELCLASS_TUTORIAL		LEVELCLASS_TUTORIAL_START
 #define LEVELCLASS_CLASSICS		LEVELCLASS_CLASSICS_START
@@ -115,6 +117,7 @@ typedef struct hashtable     SetupFileHash;
 #define LEVELCLASS_EM			LEVELCLASS_EM_START
 #define LEVELCLASS_SP			LEVELCLASS_SP_START
 #define LEVELCLASS_DX			LEVELCLASS_DX_START
+#define LEVELCLASS_SB			LEVELCLASS_SB_START
 
 #define LEVELCLASS_UNDEFINED		999
 
@@ -142,6 +145,9 @@ typedef struct hashtable     SetupFileHash;
 #define IS_LEVELCLASS_DX(p)						\
 	((p)->sort_priority >= LEVELCLASS_DX_START &&			\
 	 (p)->sort_priority <= LEVELCLASS_DX_END)
+#define IS_LEVELCLASS_SB(p)						\
+	((p)->sort_priority >= LEVELCLASS_SB_START &&			\
+	 (p)->sort_priority <= LEVELCLASS_SB_END)
 #define IS_LEVELCLASS_UNDEFINED(p)					\
 	((p)->sort_priority < LEVELCLASS_PREDEFINED_START ||		\
 	 (p)->sort_priority > LEVELCLASS_PREDEFINED_END)
@@ -154,6 +160,7 @@ typedef struct hashtable     SetupFileHash;
 			 IS_LEVELCLASS_EM(n) ? LEVELCLASS_EM :		   \
 			 IS_LEVELCLASS_SP(n) ? LEVELCLASS_SP :		   \
 			 IS_LEVELCLASS_DX(n) ? LEVELCLASS_DX :		   \
+			 IS_LEVELCLASS_SB(n) ? LEVELCLASS_SB :		   \
 			 LEVELCLASS_UNDEFINED)
 
 /* sort priorities of artwork */

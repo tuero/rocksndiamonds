@@ -1,3 +1,6 @@
+2005-02-01
+	* fixed bug on level selection screen when dragging scrollbar
+
 2005-01-19
 	* fixed bug which caused broken tapes when appending to EM engine tapes
 

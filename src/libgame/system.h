@@ -640,6 +640,7 @@ struct TreeInfo
   char *name_sorting;	/* optional sorting name for correct name sorting */
   char *author;		/* level or artwork author name */
   char *imported_from;	/* optional comment for imported levels or artwork */
+  char *imported_by;	/* optional comment for imported levels or artwork */
 
   char *graphics_set;	/* optional custom graphics set (level tree only) */
   char *sounds_set;	/* optional custom sounds set (level tree only) */

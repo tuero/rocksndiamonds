@@ -1509,7 +1509,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 {
   int x, y;
 
-  DrawBackground(xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
+  DrawBackground(xpos, ypos, MICROLEVEL_XSIZE, MICROLEVEL_YSIZE);
 
   if (lev_fieldx < STD_LEV_FIELDX)
     xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
@@ -1540,10 +1540,12 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 
 #define MICROLABEL_EMPTY		0
 #define MICROLABEL_LEVEL_NAME		1
-#define MICROLABEL_CREATED_BY		2
+#define MICROLABEL_LEVEL_AUTHOR_HEAD	2
 #define MICROLABEL_LEVEL_AUTHOR		3
-#define MICROLABEL_IMPORTED_FROM	4
-#define MICROLABEL_LEVEL_IMPORT_INFO	5
+#define MICROLABEL_IMPORTED_FROM_HEAD	4
+#define MICROLABEL_IMPORTED_FROM	5
+#define MICROLABEL_IMPORTED_BY_HEAD	6
+#define MICROLABEL_IMPORTED_BY		7
 
 static void DrawMicroLevelLabelExt(int mode)
 {
@@ -1551,26 +1553,30 @@ static void DrawMicroLevelLabelExt(int mode)
   int max_len_label_text;
   int font_nr = FONT_TEXT_2;
 
-  if (mode == MICROLABEL_CREATED_BY || mode == MICROLABEL_IMPORTED_FROM)
+  if (mode == MICROLABEL_LEVEL_AUTHOR_HEAD ||
+      mode == MICROLABEL_IMPORTED_FROM_HEAD ||
+      mode == MICROLABEL_IMPORTED_BY_HEAD)
     font_nr = FONT_TEXT_3;
 
   max_len_label_text = SXSIZE / getFontWidth(font_nr);
 
-  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE, getFontHeight(font_nr));
+  DrawBackground(SX, MICROLABEL2_YPOS, SXSIZE, getFontHeight(font_nr));
 
-  strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
-		       mode == MICROLABEL_CREATED_BY ? "created by" :
-		       mode == MICROLABEL_LEVEL_AUTHOR ? level.author :
-		       mode == MICROLABEL_IMPORTED_FROM ? "imported from" :
-		       mode == MICROLABEL_LEVEL_IMPORT_INFO ?
-		       leveldir_current->imported_from : ""),
+  strncpy(label_text,
+	  (mode == MICROLABEL_LEVEL_NAME ? level.name :
+	   mode == MICROLABEL_LEVEL_AUTHOR_HEAD ? "created by" :
+	   mode == MICROLABEL_LEVEL_AUTHOR ? level.author :
+	   mode == MICROLABEL_IMPORTED_FROM_HEAD ? "imported from" :
+	   mode == MICROLABEL_IMPORTED_FROM ? leveldir_current->imported_from :
+	   mode == MICROLABEL_IMPORTED_BY_HEAD ? "imported by" :
+	   mode == MICROLABEL_IMPORTED_BY ? leveldir_current->imported_by :""),
 	  max_len_label_text);
   label_text[max_len_label_text] = '\0';
 
   if (strlen(label_text) > 0)
   {
     int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
-    int lypos = MICROLABEL_YPOS;
+    int lypos = MICROLABEL2_YPOS;
 
     DrawText(lxpos, lypos, label_text, font_nr);
   }
@@ -1605,11 +1611,18 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 
     if (leveldir_current->name)
     {
-      int text_width = getTextWidth(leveldir_current->name, FONT_TEXT_1);
-      int lxpos = SX + (SXSIZE - text_width) / 2;
-      int lypos = SY + 352;
+      char label_text[MAX_OUTPUT_LINESIZE + 1];
+      int font_nr = FONT_TEXT_1;
+      int max_len_label_text = SXSIZE / getFontWidth(font_nr);
+      int lxpos, lypos;
 
-      DrawText(lxpos, lypos, leveldir_current->name, FONT_TEXT_1);
+      strncpy(label_text, leveldir_current->name, max_len_label_text);
+      label_text[max_len_label_text] = '\0';
+
+      lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
+      lypos = SY + MICROLABEL1_YPOS;
+
+      DrawText(lxpos, lypos, label_text, font_nr);
     }
 
     game_status = last_game_status;	/* restore current game status */
@@ -1658,6 +1671,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     DrawMicroLevelExt(xpos, ypos, from_x, from_y);
   }
 
+  /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
   /* redraw micro level label, if needed */
   if (strcmp(level.name, NAMELESS_LEVEL_NAME) != 0 &&
       strcmp(level.author, ANONYMOUS_NAME) != 0 &&
@@ -1668,18 +1682,31 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 
     if (leveldir_current->imported_from != NULL)
       max_label_counter += 14;
+    if (leveldir_current->imported_by != NULL)
+      max_label_counter += 14;
 
     label_counter = (label_counter + 1) % max_label_counter;
     label_state = (label_counter >= 0 && label_counter <= 7 ?
 		   MICROLABEL_LEVEL_NAME :
 		   label_counter >= 9 && label_counter <= 12 ?
-		   MICROLABEL_CREATED_BY :
+		   MICROLABEL_LEVEL_AUTHOR_HEAD :
 		   label_counter >= 14 && label_counter <= 21 ?
 		   MICROLABEL_LEVEL_AUTHOR :
 		   label_counter >= 23 && label_counter <= 26 ?
-		   MICROLABEL_IMPORTED_FROM :
+		   MICROLABEL_IMPORTED_FROM_HEAD :
 		   label_counter >= 28 && label_counter <= 35 ?
-		   MICROLABEL_LEVEL_IMPORT_INFO : MICROLABEL_EMPTY);
+		   MICROLABEL_IMPORTED_FROM :
+		   label_counter >= 37 && label_counter <= 40 ?
+		   MICROLABEL_IMPORTED_BY_HEAD :
+		   label_counter >= 42 && label_counter <= 49 ?
+		   MICROLABEL_IMPORTED_BY : MICROLABEL_EMPTY);
+
+    if (leveldir_current->imported_from == NULL &&
+	(label_state == MICROLABEL_IMPORTED_FROM_HEAD ||
+	 label_state == MICROLABEL_IMPORTED_FROM))
+      label_state = (label_state == MICROLABEL_IMPORTED_FROM_HEAD ?
+		     MICROLABEL_IMPORTED_BY_HEAD : MICROLABEL_IMPORTED_BY);
+
     DrawMicroLevelLabelExt(label_state);
   }
 

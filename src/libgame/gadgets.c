@@ -1316,19 +1316,31 @@ void RemapAllGadgets()
   MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_REMAP);
 }
 
-static boolean anyTextInputGadgetActive()
+boolean anyTextInputGadgetActive()
 {
   return (last_gi && (last_gi->type & GD_TYPE_TEXT_INPUT) && last_gi->mapped);
 }
 
-static boolean anyTextAreaGadgetActive()
+boolean anyTextAreaGadgetActive()
 {
   return (last_gi && (last_gi->type & GD_TYPE_TEXT_AREA) && last_gi->mapped);
 }
 
-static boolean anySelectboxGadgetActive()
+boolean anySelectboxGadgetActive()
 {
   return (last_gi && (last_gi->type & GD_TYPE_SELECTBOX) && last_gi->mapped);
+}
+
+boolean anyScrollbarGadgetActive()
+{
+  return (last_gi && (last_gi->type & GD_TYPE_SCROLLBAR) && last_gi->mapped);
+}
+
+boolean anyTextGadgetActive()
+{
+  return (anyTextInputGadgetActive() ||
+	  anyTextAreaGadgetActive() ||
+	  anySelectboxGadgetActive());
 }
 
 static boolean insideSelectboxLine(struct GadgetInfo *gi, int mx, int my)
@@ -1345,13 +1357,6 @@ static boolean insideSelectboxArea(struct GadgetInfo *gi, int mx, int my)
 	 gi->type & GD_TYPE_SELECTBOX &&
 	 mx >= gi->selectbox.x && mx < gi->selectbox.x + gi->selectbox.width &&
 	 my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height);
-}
-
-boolean anyTextGadgetActive()
-{
-  return (anyTextInputGadgetActive() ||
-	  anyTextAreaGadgetActive() ||
-	  anySelectboxGadgetActive());
 }
 
 void ClickOnGadget(struct GadgetInfo *gi, int button)
