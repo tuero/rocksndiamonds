@@ -700,18 +700,25 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player_is_moving && last_element == EL_EXPLOSION)
   {
-    int frame = Frame[last_jx][last_jy];
-    int delay = 2;
+    int graphic = IMG_EXPLOSION;
+    int phase = Frame[last_jx][last_jy] - 1;
+    int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+    int frame = (phase / delay - 1);
 
-    if (frame > 2)
-      DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), GFX_EXPLOSION,
-			  ((frame - 1) / delay - 1));
+    if (game.emulation == EMU_SUPAPLEX)
+      graphic = (Store[last_jx][last_jy] == EL_SP_INFOTRON ?
+		 IMG_SP_EXPLOSION_INFOTRON :
+		 IMG_SP_EXPLOSION);
+
+    if (frame >= 0)
+      DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
   }
 
   /* draw elements that stay over the player */
   /* handle the field the player is leaving ... */
   if (player_is_moving && IS_OVER_PLAYER(last_element))
     DrawLevelField(last_jx, last_jy);
+
   /* ... and the field the player is entering */
   if (IS_OVER_PLAYER(element))
     DrawLevelField(jx, jy);
@@ -2839,7 +2846,6 @@ int el2gfx_OLD(int element)
     case EL_TUBE_RIGHT_UP:		return GFX_TUBE_RIGHT_UP;
     case EL_TUBE_RIGHT_DOWN:		return GFX_TUBE_RIGHT_DOWN;
     case EL_SPRING:			return GFX_SPRING;
-    case EL_SPRING_MOVING:		return GFX_SPRING;
     case EL_TRAP:			return GFX_TRAP_INACTIVE;
     case EL_TRAP_ACTIVE:		return GFX_TRAP_ACTIVE;
     case EL_BD_WALL:			return GFX_BD_WALL;

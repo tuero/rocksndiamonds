@@ -1750,7 +1750,7 @@ void InitElementProperties()
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
     EL_BALLOON,
-    EL_SPRING_MOVING
+    EL_SPRING
   };
   static int ep_can_move_num = SIZEOF_ARRAY_INT(ep_can_move);
 

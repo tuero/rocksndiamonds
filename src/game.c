@@ -292,6 +292,8 @@ static void InitField(int x, int y, boolean init_game)
 	  Feld[x][y] = EL_SP_MURPHY_CLONE;
 	  break;
 	}
+
+	Feld[x][y] = EL_PLAYER1;
       }
       /* no break! */
     case EL_PLAYER1:
@@ -2326,18 +2328,18 @@ void TurnRound(int x, int y)
 
   int element = Feld[x][y];
   int old_move_dir = MovDir[x][y];
-  int left_dir = turn[old_move_dir].left;
+  int left_dir  = turn[old_move_dir].left;
   int right_dir = turn[old_move_dir].right;
-  int back_dir = turn[old_move_dir].back;
+  int back_dir  = turn[old_move_dir].back;
 
-  int left_dx = move_xy[left_dir].x, left_dy = move_xy[left_dir].y;
-  int right_dx = move_xy[right_dir].x, right_dy = move_xy[right_dir].y;
-  int move_dx = move_xy[old_move_dir].x, move_dy = move_xy[old_move_dir].y;
-  int back_dx = move_xy[back_dir].x, back_dy = move_xy[back_dir].y;
+  int left_dx  = move_xy[left_dir].x,     left_dy  = move_xy[left_dir].y;
+  int right_dx = move_xy[right_dir].x,    right_dy = move_xy[right_dir].y;
+  int move_dx  = move_xy[old_move_dir].x, move_dy  = move_xy[old_move_dir].y;
+  int back_dx  = move_xy[back_dir].x,     back_dy  = move_xy[back_dir].y;
 
-  int left_x = x+left_dx, left_y = y+left_dy;
-  int right_x = x+right_dx, right_y = y+right_dy;
-  int move_x = x+move_dx, move_y = y+move_dy;
+  int left_x  = x + left_dx,  left_y  = y + left_dy;
+  int right_x = x + right_dx, right_y = y + right_dy;
+  int move_x  = x + move_dx,  move_y  = y + move_dy;
 
   if (element == EL_BUG || element == EL_BD_BUTTERFLY)
   {
@@ -2581,17 +2583,18 @@ void TurnRound(int x, int y)
     MovDir[x][y] = game.balloon_dir;
     MovDelay[x][y] = 0;
   }
-  else if (element == EL_SPRING_MOVING)
+  else if (element == EL_SPRING)
   {
-    if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y) ||
-	(IN_LEV_FIELD(x, y+1) && IS_FREE(x, y+1)))
-    {
-      Feld[x][y] = EL_SPRING;
+    if ((MovDir[x][y] == MV_LEFT || MovDir[x][y] == MV_RIGHT) &&
+	(!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y) ||
+	 (IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))))
       MovDir[x][y] = MV_NO_MOVING;
-    }
+
     MovDelay[x][y] = 0;
   }
-  else if (element == EL_ROBOT || element == EL_SATELLITE || element == EL_PENGUIN)
+  else if (element == EL_ROBOT ||
+	   element == EL_SATELLITE ||
+	   element == EL_PENGUIN)
   {
     int attr_x = -1, attr_y = -1;
 
@@ -2918,24 +2921,38 @@ void StartMoving(int x, int y)
       }
     }
   }
-  else if (CAN_MOVE(element))
+
+  if (CAN_MOVE(element))	/* not "else if" because of EL_SPRING */
   {
     int newx, newy;
 
-    if ((element == EL_SATELLITE || element == EL_BALLOON ||
-	 element == EL_SPRING_MOVING)
+    if ((element == EL_SATELLITE ||
+	 element == EL_BALLOON ||
+	 element == EL_SPRING)
 	&& JustBeingPushed(x, y))
       return;
+
+    if (element == EL_SPRING && MovDir[x][y] == MV_DOWN)
+      Feld[x][y + 1] = EL_EMPTY;	/* was set to EL_BLOCKED above */
 
     if (!MovDelay[x][y])	/* start new movement phase */
     {
       /* all objects that can change their move direction after each step */
       /* (MAMPFER, MAMPFER2 and PACMAN go straight until they hit a wall  */
 
-      if (element!=EL_YAMYAM && element!=EL_DARK_YAMYAM && element!=EL_PACMAN)
+      if (element != EL_YAMYAM &&
+	  element != EL_DARK_YAMYAM &&
+	  element != EL_PACMAN)
       {
+#if 0
+  if (element == EL_SPRING)
+    printf("1--> %d\n", MovDir[x][y]);
+#endif
 	TurnRound(x, y);
-
+#if 0
+  if (element == EL_SPRING)
+    printf("2--> %d\n", MovDir[x][y]);
+#endif
 	if (MovDelay[x][y] && (element == EL_BUG ||
 			       element == EL_SPACESHIP ||
 			       element == EL_SP_SNIKSNAK ||
@@ -3256,7 +3273,7 @@ void ContinueMoving(int x, int y)
   int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
-  int horiz_move = (dx!=0);
+  int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / 8;
 
@@ -3273,8 +3290,8 @@ void ContinueMoving(int x, int y)
   else if (CAN_FALL(element) && horiz_move &&
 	   y < lev_fieldy-1 && IS_BELT_ACTIVE(Feld[x][y+1]))
     step /= 2;
-  else if (element == EL_SPRING_MOVING)
-    step*=2;
+  else if (element == EL_SPRING && horiz_move)
+    step *= 2;
 
 #if OLD_GAME_BEHAVIOUR
   else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
@@ -3369,8 +3386,13 @@ void ContinueMoving(int x, int y)
     GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
     GfxAction[x][y] = GFX_ACTION_DEFAULT;
 
+#if 0
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
+#else
+    if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
+      MovDir[newx][newy] = 0;
+#endif
 
     DrawLevelField(x, y);
     DrawLevelField(newx, newy);
@@ -6231,13 +6253,13 @@ int DigField(struct PlayerInfo *player,
       else
       {
 	RemoveField(x, y);
-	Feld[x+dx][y+dy] = element;
+	Feld[x + dx][y + dy] = element;
       }
 
       if (element == EL_SPRING)
       {
-	Feld[x+dx][y+dy] = EL_SPRING_MOVING;
-	MovDir[x+dx][y+dy] = move_direction;
+	Feld[x + dx][y + dy] = EL_SPRING;
+	MovDir[x + dx][y + dy] = move_direction;
       }
 
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));

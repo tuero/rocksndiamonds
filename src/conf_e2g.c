@@ -913,7 +913,7 @@ element_to_graphic[] =
     IMG_SPRING
   },
   {
-    EL_SPRING_MOVING,				-1, GFX_ACTION_MOVING,
+    EL_SPRING,					-1, GFX_ACTION_MOVING,
     IMG_SPRING_MOVING
   },
   {
