@@ -36,8 +36,10 @@
 #define ED_SCROLL_UP		4
 #define ED_SCROLL_DOWN		8
 
-/* delay value to avoid too fast scrolling etc. */
-#define CHOICE_DELAY_VALUE	100
+/* screens in the level editor */
+#define ED_MODE_EDIT		0
+#define ED_MODE_INFO		1
+#define ED_MODE_PROPERTIES	2
 
 /* how many steps can be cancelled */
 #define NUM_UNDO_STEPS		(10 + 1)
@@ -64,7 +66,16 @@
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_BUTTONS + ED_NUM_CTRL2_BUTTONS)
 
-/* control button names */
+/* values for other gadgets */
+#define ED_SCORE_XPOS		TILEX
+#define ED_SCORE_YPOS		(7 * TILEY)
+#define ED_COUNT_VALUE_XOFFSET	5
+#define ED_COUNT_VALUE_YOFFSET	3
+
+/* identifiers for DrawValueField() */
+#define ED_SCORE_FIELD			0
+
+/* control button identifiers */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
 #define ED_CTRL_ID_CONNECTED_ITEMS	1
 #define ED_CTRL_ID_LINE			2
@@ -72,7 +83,7 @@
 #define ED_CTRL_ID_RECTANGLE		4
 #define ED_CTRL_ID_FILLED_BOX		5
 #define ED_CTRL_ID_WRAP_UP		6
-#define ED_CTRL_ID_ITEM_PROPERTIES	7
+#define ED_CTRL_ID_PROPERTIES		7
 #define ED_CTRL_ID_FLOOD_FILL		8
 #define ED_CTRL_ID_WRAP_LEFT		9
 #define ED_CTRL_ID_WRAP_RIGHT		11
@@ -86,14 +97,20 @@
 #define ED_CTRL_ID_TEST			20
 #define ED_CTRL_ID_EXIT			21
 
-/* forward declaration for internal use */
-void HandleDrawingFunctions(int, int, int);
-void HandlePressedControlButtons();
-void HandleControlButtons(struct GadgetInfo *);
+/* other gadget identifiers */
+#define ED_CTRL_ID_SCORE_DOWN		22
+#define ED_CTRL_ID_SCORE_UP		23
 
-static struct GadgetInfo *control_button_gadget[ED_NUM_CTRL_BUTTONS];
-static boolean control_button_gadgets_created = FALSE;
-static boolean control_button_gadgets_mapped = FALSE;
+#define ED_NUM_GADGETS			24
+
+/* forward declaration for internal use */
+static void CopyLevelToUndoBuffer();
+static void HandleDrawingFunctions(int, int, int);
+static void HandlePressedControlButtons();
+static void HandleControlButtons(struct GadgetInfo *);
+
+static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
+static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 
@@ -110,8 +127,11 @@ static int random_placement_method = RANDOM_USE_PERCENTAGE;
 static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
 #endif
 
+/* pointer to score value */
+static int *gadget_score_value;
+
 static int level_xpos,level_ypos;
-static boolean edit_mode;
+static int edit_mode;
 static boolean name_typing;
 static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
@@ -413,7 +433,7 @@ int editor_element[] =
 };
 int elements_in_list = sizeof(editor_element)/sizeof(int);
 
-void ScrollMiniLevel(int from_x, int from_y, int scroll)
+static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 {
   int x,y;
   int dx = (scroll==ED_SCROLL_LEFT ? -1 : scroll==ED_SCROLL_RIGHT ? 1 : 0);
@@ -440,12 +460,17 @@ void ScrollMiniLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
-void CreateLevelEditorControlButtons()
+void InitLevelEditorGadgets()
 {
   int i;
 
-  if (control_button_gadgets_created)
-    return;
+  for (i=0; i<ED_NUM_GADGETS; i++)
+    level_editor_gadget[i] = NULL;
+}
+
+static void CreateControlButtons()
+{
+  int i;
 
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
   {
@@ -504,36 +529,89 @@ void CreateLevelEditorControlButtons()
     if (gi == NULL)
       Error(ERR_EXIT, "cannot create gadget");
 
-    control_button_gadget[i] = gi;
+    level_editor_gadget[i] = gi;
   }
-
-  control_button_gadgets_created = TRUE;
 }
 
-void MapLevelEditorControlButtons()
+static void CreateCounterButtons(int id)
 {
   int i;
 
-  if (!control_button_gadgets_created)
-    CreateLevelEditorControlButtons();
+  for (i=0; i<2; i++)
+  {
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    struct GadgetInfo *gi;
+    int gd_xoffset;
+    int gd_x1, gd_x2, gd_y;
 
-  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-    MapGadget(control_button_gadget[i]);
+    gd_xoffset = (i == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
+    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+    gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
 
-  control_button_gadgets_mapped = TRUE;
+    gi = CreateGadget(GDI_X, SX + ED_SCORE_XPOS + gd_xoffset,
+		      GDI_Y, SY + ED_SCORE_YPOS,
+		      GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
+		      GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_EVENT_MASK, GD_EVENT_PRESSED,
+		      GDI_CALLBACK, HandleControlButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    level_editor_gadget[id + i] = gi;
+  }
 }
 
-void UnmapLevelEditorControlButtons()
+static void CreateLevelEditorGadgets()
 {
-  int i;
-
-  if (!control_button_gadgets_created || !control_button_gadgets_mapped)
+  if (level_editor_gadgets_created)
     return;
 
-  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-    UnmapGadget(control_button_gadget[i]);
+  /* create main control buttons */
+  CreateControlButtons();
 
-  control_button_gadgets_mapped = FALSE;
+  /* create element score buttons */
+  CreateCounterButtons(ED_CTRL_ID_SCORE_DOWN);
+
+  level_editor_gadgets_created = TRUE;
+}
+
+static void MapControlButtons()
+{
+  int i;
+
+  for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+    MapGadget(level_editor_gadget[i]);
+}
+
+static void MapCounterButtons(int id)
+{
+  int i;
+
+  for (i=0; i<2; i++)
+    MapGadget(level_editor_gadget[id + i]);
+}
+
+void UnmapLevelEditorWindowGadgets()
+{
+  int i;
+
+  for (i=ED_NUM_CTRL_BUTTONS; i<ED_NUM_GADGETS; i++)
+    UnmapGadget(level_editor_gadget[i]);
+}
+
+void UnmapLevelEditorGadgets()
+{
+  int i;
+
+  for (i=0; i<ED_NUM_GADGETS; i++)
+    UnmapGadget(level_editor_gadget[i]);
 }
 
 void DrawLevelEd()
@@ -542,7 +620,7 @@ void DrawLevelEd()
 
   level_xpos=-1;
   level_ypos=-1;
-  edit_mode = TRUE;
+  edit_mode = ED_MODE_EDIT;
   name_typing = FALSE;
   element_shift = 0;
 
@@ -562,11 +640,9 @@ void DrawLevelEd()
   }
   else
   {
-    undo_buffer_position = 0;
-    undo_buffer_steps = 0;
-    for(x=0; x<lev_fieldx; x++)
-      for(y=0; y<lev_fieldy; y++)
-	UndoBuffer[0][x][y] = Ur[x][y];
+    undo_buffer_position = -1;
+    undo_buffer_steps = -1;
+    CopyLevelToUndoBuffer();
   }
 
   DrawMiniLevel(level_xpos,level_ypos);
@@ -648,7 +724,10 @@ void DrawLevelEd()
 
   OpenDoor(DOOR_OPEN_1);
 
-  MapLevelEditorControlButtons();
+  if (!level_editor_gadgets_created)
+    CreateLevelEditorGadgets();
+
+  MapControlButtons();
 
   /*
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
@@ -660,6 +739,7 @@ void DrawControlWindow()
   int i,x,y;
 
   ClearWindow();
+  UnmapLevelEditorWindowGadgets();
 
   /* Inhalt der Mampfer */
   DrawText(ED_COUNT_GADGET_XPOS+1,SY+6,
@@ -896,7 +976,7 @@ void LevelEd(int mx, int my, int button)
     if (((choice == ED_BUTTON_EUP && element_shift>0) ||
 	 (choice == ED_BUTTON_EDOWN &&
 	  element_shift<elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)) &&
-	DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	DelayReached(&choice_delay, GADGET_FRAME_DELAY))
     {
       int i, step;
 
@@ -944,7 +1024,7 @@ void LevelEd(int mx, int my, int button)
       redraw_mask |= REDRAW_DOOR_1;
     }
   
-    if (edit_mode)		/********** EDIT-FENSTER **********/
+    if (edit_mode == ED_MODE_EDIT)	/********** EDIT-FENSTER **********/
     {
 
 
@@ -961,7 +1041,7 @@ void LevelEd(int mx, int my, int button)
 		    VXSIZE,VYSIZE,
 		    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
 	  OpenDoor(DOOR_OPEN_2);
-	  edit_mode = FALSE;
+	  edit_mode = ED_MODE_INFO;
 	  break;
 	case ED_BUTTON_FILL:
 	  Request("Caution ! Flood fill mode ! Choose area !",REQ_OPEN);
@@ -971,7 +1051,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_LEFT:
 	  if (level_xpos>=0)
 	  {
-	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
 	      break;
 	    if (lev_fieldx<2*SCR_FIELDX-2)
 	      break;
@@ -988,7 +1068,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_RIGHT:
 	  if (level_xpos<=lev_fieldx-2*SCR_FIELDX)
 	  {
-	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
 	      break;
 	    if (lev_fieldx<2*SCR_FIELDX-2)
 	      break;
@@ -1005,7 +1085,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_UP:
 	  if (level_ypos>=0)
 	  {
-	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
 	      break;
 	    if (lev_fieldy<2*SCR_FIELDY-2)
 	      break;
@@ -1022,7 +1102,7 @@ void LevelEd(int mx, int my, int button)
 	case ED_BUTTON_DOWN:
 	  if (level_ypos<=lev_fieldy-2*SCR_FIELDY)
 	  {
-	    if (!DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
 	      break;
 	    if (lev_fieldy<2*SCR_FIELDY-2)
 	      break;
@@ -1101,7 +1181,7 @@ void LevelEd(int mx, int my, int button)
       int step = (button==1 ? 1 : button==2 ? 5 : button==3 ? 10 : 0);
 
       if (choice >= 0 && choice < 36 &&
-	  DelayReached(&choice_delay, CHOICE_DELAY_VALUE))
+	  DelayReached(&choice_delay, GADGET_FRAME_DELAY))
       {
 	if (!(choice % 2))
 	  step = -step;
@@ -1241,7 +1321,7 @@ void LevelEd(int mx, int my, int button)
 		    VXSIZE,VYSIZE,
 		    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
 	  OpenDoor(DOOR_OPEN_2);
-	  edit_mode = TRUE;
+	  edit_mode = ED_MODE_EDIT;
 	  break;
 	case ED_BUTTON_CLEAR:
 	  if (Request("Are you sure to clear this level ?",REQ_ASK))
@@ -1490,6 +1570,65 @@ void LevelNameTyping(KeySym key)
   }
 }
 
+static void DrawValueField(int field, int value)
+{
+  int i = 0;
+  int screen_pos[][3] =
+  {
+    { ED_SCORE_FIELD,
+      ED_SCORE_XPOS + ED_WIN_COUNT_XPOS,	ED_SCORE_YPOS },
+    { -1, 0, 0 }
+  };
+
+  while (screen_pos[i][0] != -1)
+  {
+    int x = SX + screen_pos[i][1];
+    int y = SY + screen_pos[i][2];
+
+    if (screen_pos[i++][0] != field)
+      continue;
+
+    XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	      DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS,
+	      DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS,
+	      ED_WIN_COUNT_XSIZE, ED_WIN_COUNT_YSIZE,
+	      x, y);
+
+    DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
+	     int2str(value, 3), FS_SMALL, FC_YELLOW);
+  }
+}
+
+static void DrawPropertiesWindow(int button)
+{
+  int x, y;
+  int new_element;
+  int num_elements_in_level;
+
+  ClearWindow();
+
+  new_element = (button == 1 ? new_element1 :
+		 button == 2 ? new_element2 :
+		 button == 3 ? new_element3 : 0);
+
+  DrawGraphic(1, 1, el2gfx(new_element));
+  DrawText(SX + 3*TILEX, SY + 5*TILEY/4, "Element Properties",
+	   FS_SMALL, FC_YELLOW);
+
+  num_elements_in_level = 0;
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++)
+      if (Feld[x][y] == new_element)
+	num_elements_in_level++;
+
+  DrawTextF(TILEX, 5*TILEY, FC_YELLOW, "%d x contained in level",
+	    num_elements_in_level);
+	
+  gadget_score_value = &level.score[0];
+  DrawValueField(ED_SCORE_FIELD, *gadget_score_value);
+  MapCounterButtons(ED_CTRL_ID_SCORE_DOWN);
+}
+
 static void swap_numbers(int *i1, int *i2)
 {
   int help = *i1;
@@ -1521,8 +1660,8 @@ static void DrawLineElement(int sx, int sy, int element, boolean change_level)
     Feld[lx][ly] = element;
 }
 
-void DrawLine(int from_x, int from_y, int to_x, int to_y, int element,
-	      boolean change_level)
+static void DrawLine(int from_x, int from_y, int to_x, int to_y,
+		     int element, boolean change_level)
 {
   if (from_y == to_y)			/* horizontal line */
   {
@@ -1583,8 +1722,8 @@ void DrawLine(int from_x, int from_y, int to_x, int to_y, int element,
   }
 }
 
-void DrawRectangle(int from_x, int from_y, int to_x, int to_y, int element,
-		   boolean change_level)
+static void DrawRectangle(int from_x, int from_y, int to_x, int to_y,
+			  int element, boolean change_level)
 {
   DrawLine(from_x, from_y, from_x, to_y, element, change_level);
   DrawLine(from_x, to_y, to_x, to_y, element, change_level);
@@ -1592,8 +1731,8 @@ void DrawRectangle(int from_x, int from_y, int to_x, int to_y, int element,
   DrawLine(to_x, from_y, from_x, from_y, element, change_level);
 }
 
-void DrawFilledBox(int from_x, int from_y, int to_x, int to_y, int element,
-		   boolean change_level)
+static void DrawFilledBox(int from_x, int from_y, int to_x, int to_y,
+			  int element, boolean change_level)
 {
   int y;
 
@@ -1604,7 +1743,7 @@ void DrawFilledBox(int from_x, int from_y, int to_x, int to_y, int element,
     DrawLine(from_x, y, to_x, y, element, change_level);
 }
 
-void FloodFill(int from_x, int from_y, int fill_element)
+static void FloodFill(int from_x, int from_y, int fill_element)
 {
   int i,x,y;
   int old_element;
@@ -1635,7 +1774,7 @@ void FloodFill(int from_x, int from_y, int fill_element)
   safety--;
 }
 
-void CopyLevelToUndoBuffer()
+static void CopyLevelToUndoBuffer()
 {
   int x, y;
 
@@ -1655,7 +1794,7 @@ void CopyLevelToUndoBuffer()
   */
 }
 
-void RandomPlacement(int button)
+static void RandomPlacement(int button)
 {
   int new_element;
   int x, y;
@@ -1663,8 +1802,6 @@ void RandomPlacement(int button)
   new_element = (button == 1 ? new_element1 :
 		 button == 2 ? new_element2 :
 		 button == 3 ? new_element3 : 0);
-
-  CopyLevelToUndoBuffer();
 
   if (random_placement_method == RANDOM_USE_PERCENTAGE)
   {
@@ -1693,13 +1830,12 @@ void RandomPlacement(int button)
   DrawMiniLevel(level_xpos, level_ypos);
 }
 
-void HandleDrawingFunctions(int mx, int my, int button)
+static void HandleDrawingFunctions(int mx, int my, int button)
 {
   static int last_button = 0;
   static int last_element = 0;
   boolean button_press_event;
   boolean button_release_event;
-  boolean copy_to_undo_buffer = FALSE;
   int new_element;
   int sx = (mx - SX) / MINI_TILEX; 
   int sy = (my - SY) / MINI_TILEY; 
@@ -1707,7 +1843,7 @@ void HandleDrawingFunctions(int mx, int my, int button)
   int ly = sy + level_ypos;
   int x, y;
 
-  if (!edit_mode)
+  if (edit_mode != ED_MODE_EDIT)
     return;
 
   button_press_event = (last_button == 0 && button != 0);
@@ -1733,7 +1869,7 @@ void HandleDrawingFunctions(int mx, int my, int button)
   {
     case ED_CTRL_ID_SINGLE_ITEMS:
       if (button_release_event)
-	copy_to_undo_buffer = TRUE;
+	CopyLevelToUndoBuffer();
 
       if (!button)
 	break;
@@ -1769,7 +1905,7 @@ void HandleDrawingFunctions(int mx, int my, int button)
 	static int last_sy = -1;
 
 	if (button_release_event)
-	  copy_to_undo_buffer = TRUE;
+	  CopyLevelToUndoBuffer();
 
 	if (button)
 	{
@@ -1807,7 +1943,7 @@ void HandleDrawingFunctions(int mx, int my, int button)
 	else if (button_release_event)
 	{
 	  draw_func(start_sx, start_sy, sx, sy, last_element, TRUE);
-	  copy_to_undo_buffer = TRUE;
+	  CopyLevelToUndoBuffer();
 	}
 	else if (last_sx != sx || last_sy != sy)
 	{
@@ -1824,7 +1960,7 @@ void HandleDrawingFunctions(int mx, int my, int button)
       {
 	FloodFill(lx, ly, new_element);
 	DrawMiniLevel(level_xpos, level_ypos);
-	copy_to_undo_buffer = TRUE;
+	CopyLevelToUndoBuffer();
       }
       break;
 
@@ -1833,13 +1969,9 @@ void HandleDrawingFunctions(int mx, int my, int button)
   }
 
   last_element = new_element;
-
-  if (copy_to_undo_buffer)
-    CopyLevelToUndoBuffer();
-  copy_to_undo_buffer = FALSE;
 }
 
-void HandlePressedControlButtons()
+static void HandlePressedControlButtons()
 {
   static unsigned long button_delay = 0;
   int i = 0;
@@ -1851,17 +1983,19 @@ void HandlePressedControlButtons()
     ED_CTRL_ID_WRAP_LEFT,
     ED_CTRL_ID_WRAP_RIGHT,
     ED_CTRL_ID_WRAP_DOWN,
+    ED_CTRL_ID_SCORE_DOWN,
+    ED_CTRL_ID_SCORE_UP,
     -1
   };
 
-  if (!DelayReached(&button_delay, CHOICE_DELAY_VALUE))
+  if (!DelayReached(&button_delay, GADGET_FRAME_DELAY))
     return;
 
   while (gadget_id[i] != -1)
   {
     int id = gadget_id[i++];
-    int state = control_button_gadget[id]->state;
-    int button = control_button_gadget[id]->event.button;
+    int state = level_editor_gadget[id]->state;
+    int button = level_editor_gadget[id]->event.button;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
 
     if (state != GD_BUTTON_PRESSED)
@@ -1932,6 +2066,17 @@ void HandlePressedControlButtons()
   	    DrawMiniLevel(level_xpos, level_ypos);
   	}
   	break;
+
+      case ED_CTRL_ID_SCORE_DOWN:
+      case ED_CTRL_ID_SCORE_UP:
+	*gadget_score_value += (id == ED_CTRL_ID_SCORE_DOWN ? -step : step);
+	if (*gadget_score_value < 0)
+	  *gadget_score_value = 0;
+	else if (*gadget_score_value > 255)
+	  *gadget_score_value = 255;
+
+	DrawValueField(ED_SCORE_FIELD, *gadget_score_value);
+  	break;
   
       default:
 	break;
@@ -1939,25 +2084,28 @@ void HandlePressedControlButtons()
   }
 }
 
-void HandleControlButtons(struct GadgetInfo *gi)
+static void HandleControlButtons(struct GadgetInfo *gi)
 {
+  /*
   int event_type = gi->event.type;
+  */
   int button = gi->event.button;
   int player_present = FALSE;
   int level_changed = FALSE;
-  int id;
+  int id = -1;
   int i, x, y;
 
   /* get the button id */
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
-    if (gi->id == control_button_gadget[i]->id)
+    if (gi->id == level_editor_gadget[i]->id)
       id = i;
 
-  if (id < ED_NUM_CTRL1_BUTTONS && !edit_mode)
+  if (id >= 0 && id < ED_NUM_CTRL1_BUTTONS && edit_mode != ED_MODE_EDIT)
   {
+    UnmapLevelEditorWindowGadgets();
     AdjustLevelScrollPosition();
     DrawMiniLevel(level_xpos, level_ypos);
-    edit_mode = TRUE;
+    edit_mode = ED_MODE_EDIT;
   }
 
   switch (id)
@@ -1973,8 +2121,14 @@ void HandleControlButtons(struct GadgetInfo *gi)
       drawing_function = id;
       break;
 
+    case ED_CTRL_ID_PROPERTIES:
+      DrawPropertiesWindow(button);
+      edit_mode = ED_MODE_PROPERTIES;
+      break;
+
     case ED_CTRL_ID_RANDOM_PLACEMENT:
       RandomPlacement(button);
+      CopyLevelToUndoBuffer();
       break;
 
     case ED_CTRL_ID_UNDO:
@@ -1995,25 +2149,24 @@ void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case ED_CTRL_ID_INFO:
-      if (edit_mode)
+      if (edit_mode != ED_MODE_INFO)
       {
 	DrawControlWindow();
-	edit_mode = FALSE;
+	edit_mode = ED_MODE_INFO;
       }
       else
       {
 	AdjustLevelScrollPosition();
 	DrawMiniLevel(level_xpos, level_ypos);
-	edit_mode = TRUE;
+	edit_mode = ED_MODE_EDIT;
       }
       break;
 
     case ED_CTRL_ID_CLEAR:
-      CopyLevelToUndoBuffer();
-
       for(x=0; x<MAX_LEV_FIELDX; x++) 
 	for(y=0; y<MAX_LEV_FIELDY; y++) 
 	  Feld[x][y] = new_element3;
+      CopyLevelToUndoBuffer();
 
       DrawMiniLevel(level_xpos, level_ypos);
       break;
@@ -2116,12 +2269,14 @@ void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     default:
+      /*
       if (event_type == GD_EVENT_PRESSED)
 	printf("HandleControlButtons: GD_EVENT_PRESSED\n");
       else if (event_type == GD_EVENT_RELEASED)
 	printf("HandleControlButtons: GD_EVENT_RELEASED\n");
       else
 	printf("HandleControlButtons: ?\n");
+      */
       break;
   }
 }

@@ -67,7 +67,7 @@ void DrawMainMenu()
   }
 
   /* needed if last screen was the level editor */
-  UnmapLevelEditorControlButtons();
+  UnmapLevelEditorGadgets();
 
   FadeSounds();
   GetPlayerConfig();
@@ -180,7 +180,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (new_level_nr > leveldir[leveldir_nr].levels - 1)
       new_level_nr = leveldir[leveldir_nr].levels - 1;
 
-    if (old_level_nr == new_level_nr || !DelayReached(&level_delay, 150))
+    if (old_level_nr == new_level_nr ||
+	!DelayReached(&level_delay, GADGET_FRAME_DELAY))
       goto out;
 
     level_nr = new_level_nr;
@@ -861,7 +862,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   if (x == 1 && y == 2)
   {
     if (first_entry > 0 &&
-	(dy || DelayReached(&choose_delay, 150)))
+	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
 #if 0
       first_entry--;
@@ -879,7 +880,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   else if (x == 1 && y > num_page_entries + 2)
   {
     if (first_entry + num_page_entries < num_leveldirs &&
-	(dy || DelayReached(&choose_delay, 150)))
+	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
 #if 0
       first_entry++;
@@ -1421,7 +1422,7 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
   {
     static unsigned long delay = 0;
 
-    if (!DelayReached(&delay, 150))
+    if (!DelayReached(&delay, GADGET_FRAME_DELAY))
       goto out;
 
     player_nr = (player_nr + (x == 11 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;

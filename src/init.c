@@ -17,6 +17,7 @@
 #include "misc.h"
 #include "sound.h"
 #include "screens.h"
+#include "editor.h"
 #include "tools.h"
 #include "files.h"
 #include "joystick.h"
@@ -66,6 +67,7 @@ void OpenAll(int argc, char *argv[])
   InitSoundServer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
+  InitLevelEditorGadgets();
 
   signal(SIGINT, CloseAllAndExit);
   signal(SIGTERM, CloseAllAndExit);

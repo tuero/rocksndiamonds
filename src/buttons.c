@@ -1659,21 +1659,31 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
-  XCopyArea(display, gd->pixmap, (direct ? window : drawto), gc,
+  XCopyArea(display, gd->pixmap, drawto, gc,
 	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+
+  if (direct)
+    XCopyArea(display, gd->pixmap, window, gc,
+	      gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+  else
+    redraw_mask |= REDRAW_ALL;
 }
 
 void MapGadget(struct GadgetInfo *gi)
 {
+  if (gi == NULL)
+    return;
+
   gi->mapped = TRUE;
 
   DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), FALSE);
-
-  redraw_mask |= REDRAW_ALL;
 }
 
 void UnmapGadget(struct GadgetInfo *gi)
 {
+  if (gi == NULL)
+    return;
+
   gi->mapped = FALSE;
 }
 

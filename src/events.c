@@ -676,7 +676,8 @@ void HandleJoystick()
     {
       static unsigned long joystickmove_delay = 0;
 
-      if (joystick && !button && !DelayReached(&joystickmove_delay, 150))
+      if (joystick && !button &&
+	  !DelayReached(&joystickmove_delay, GADGET_FRAME_DELAY))
 	newbutton = dx = dy = 0;
 
       if (game_status==MAINMENU)
