@@ -73,13 +73,11 @@ void SetBorderElement();
 void SetRandomAnimationValue(int, int);
 int getGraphicAnimationFrame(int, int);
 void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
-boolean checkDrawGraphicAnimation(int, int, int);
-boolean checkDrawLevelGraphicAnimation(int, int, int);
-boolean DrawGraphicAnimation(int, int, int);
-boolean DrawLevelGraphicAnimation(int, int, int);
-boolean DrawLevelElementAnimation(int, int, int);
-void ContinueLevelGraphicAnimation(int, int, int);
-void ContinueLevelElementAnimation(int, int, int);
+void DrawGraphicAnimation(int, int, int);
+void DrawLevelGraphicAnimation(int, int, int);
+void DrawLevelElementAnimation(int, int, int);
+void DrawLevelGraphicAnimationIfNeeded(int, int, int);
+void DrawLevelElementAnimationIfNeeded(int, int, int);
 
 void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
@@ -135,8 +133,9 @@ void CreateToolButtons();
 void FreeToolButtons();
 
 int get_next_element(int);
-int el2img(int);
+int el_act_dir2img(int, int, int);
+int el_act2img(int, int);
 int el_dir2img(int, int);
-int el_dir_act2img(int, int, int);
+int el2img(int);
 
 #endif	/* TOOLS_H */

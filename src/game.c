@@ -1269,6 +1269,12 @@ static void ResetGfxAnimation(int x, int y)
 
   GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
+
+#if 0
+  if (Feld[x][y] == EL_ROCK)
+    printf("ResetGfxAnimation: EL_ROCK [%d, %d]\n",
+	   JustStopped[x][y], MovDir[x][y]);
+#endif
 }
 
 void InitMovingField(int x, int y, int direction)
@@ -1280,8 +1286,7 @@ void InitMovingField(int x, int y, int direction)
   if (!JustStopped[x][y] || direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
 
-  MovDir[x][y] = direction;
-  MovDir[newx][newy] = direction;
+  MovDir[newx][newy] = MovDir[x][y] = direction;
 
   if (Feld[newx][newy] == EL_EMPTY)
     Feld[newx][newy] = EL_BLOCKED;
@@ -1290,6 +1295,10 @@ void InitMovingField(int x, int y, int direction)
     GfxAction[x][y] = ACTION_FALLING;
   else
     GfxAction[x][y] = ACTION_MOVING;
+
+  GfxFrame[newx][newy] = GfxFrame[x][y];
+  GfxAction[newx][newy] = GfxAction[x][y];
+  GfxRandom[newx][newy] = GfxRandom[x][y];
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -1430,21 +1439,15 @@ void DrawDynamite(int x, int y)
 
 void CheckDynamite(int x, int y)
 {
-#if 0
-  int element = Feld[x][y];
-#endif
-
   if (MovDelay[x][y] != 0)	/* dynamite is still waiting to explode */
   {
     MovDelay[x][y]--;
 
     if (MovDelay[x][y] != 0)
     {
-#if 0
-      if (checkDrawLevelGraphicAnimation(x, y, el2img(element)))
-#endif
-	DrawDynamite(x, y);
+      DrawDynamite(x, y);
 
+      /* !!! correct: "PlaySoundLevelActionIfLoop" etc. !!! */
       PlaySoundLevelAction(x, y, ACTION_ACTIVE);
 
       return;
@@ -2138,8 +2141,8 @@ void Impact(int x, int y)
       return;
 
     object_hit = (!IS_FREE(x, y+1) && (!IS_MOVING(x, y+1) ||
-				      MovDir[x][y+1]!=MV_DOWN ||
-				      MovPos[x][y+1]<=TILEY/2));
+				      MovDir[x][y+1] != MV_DOWN ||
+				      MovPos[x][y+1] <= TILEY / 2));
     if (object_hit)
       smashed = MovingOrBlocked2Element(x, y+1);
   }
@@ -2149,6 +2152,17 @@ void Impact(int x, int y)
     SplashAcid(x, y);
     return;
   }
+
+#if 1
+  if (lastline || object_hit)
+  {
+#if 0
+    MovDir[x][y] = 0;
+#endif
+    ResetGfxAnimation(x, y);
+    DrawLevelField(x, y);
+  }
+#endif
 
   if ((element == EL_BOMB ||
        element == EL_SP_DISK_ORANGE ||
@@ -2902,6 +2916,9 @@ void StartMoving(int x, int y)
     }
     else if (IS_FREE(x, y+1))
     {
+      if (JustStopped[x][y])	/* prevent animation from being restarted */
+	MovDir[x][y] = MV_DOWN;
+
       InitMovingField(x, y, MV_DOWN);
       started_moving = TRUE;
     }
@@ -3023,7 +3040,7 @@ void StartMoving(int x, int y)
 	  element == EL_DARK_YAMYAM)
       {
 #if 1
-	ContinueLevelElementAnimation(x, y, element);
+	DrawLevelElementAnimationIfNeeded(x, y, element);
 #else
 	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
 	{
@@ -3047,7 +3064,7 @@ void StartMoving(int x, int y)
 #endif
       }
       else if (element == EL_SP_ELECTRON)
-	ContinueLevelElementAnimation(x, y, element);
+	DrawLevelElementAnimationIfNeeded(x, y, element);
       else if (element == EL_DRAGON)
       {
 	int i;
@@ -3305,11 +3322,11 @@ void StartMoving(int x, int y)
 	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
 	DrawLevelField(x, y);
       else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
-	ContinueLevelElementAnimation(x, y, element);
+	DrawLevelElementAnimationIfNeeded(x, y, element);
       else if (element == EL_SATELLITE)
-	ContinueLevelElementAnimation(x, y, element);
+	DrawLevelElementAnimationIfNeeded(x, y, element);
       else if (element == EL_SP_ELECTRON)
-	ContinueLevelElementAnimation(x, y, element);
+	DrawLevelElementAnimationIfNeeded(x, y, element);
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
@@ -3444,10 +3461,20 @@ void ContinueMoving(int x, int y)
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     MovDelay[newx][newy] = 0;
 
+#if 0
+    /* all done in "InitMovingField()" */
     GfxAction[newx][newy] = GfxAction[x][y];	/* keep action one frame */
     GfxRandom[newx][newy] = GfxRandom[x][y];	/* keep same random value */
-    GfxAction[x][y] = ACTION_DEFAULT;
+#endif
 
+    /* copy animation control values to new field */
+    GfxFrame[newx][newy]  = GfxFrame[x][y];
+    GfxAction[newx][newy] = GfxAction[x][y];
+    GfxRandom[newx][newy] = GfxRandom[x][y];
+
+    ResetGfxAnimation(x, y);	/* reset animation values for old field */
+
+#if 1
 #if 0
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
@@ -3460,6 +3487,7 @@ void ContinueMoving(int x, int y)
     if (!CAN_MOVE(element) ||
 	(element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
       MovDir[newx][newy] = 0;
+#endif
 #endif
 
     DrawLevelField(x, y);
@@ -3994,13 +4022,6 @@ static void RunTimegateWheel(int x, int y)
   PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
 }
 
-void SiebAktivieren(int x, int y, int type)
-{
-  int graphic = (type == 1 ? IMG_MAGIC_WALL_FULL : IMG_BD_MAGIC_WALL_FULL);
-
-  ContinueLevelGraphicAnimation(x, y, graphic);
-}
-
 void CheckExit(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
@@ -4345,10 +4366,9 @@ static void ChangeActiveTrap(int x, int y)
 {
   int graphic = IMG_TRAP_ACTIVE;
 
-  /* if animation frame already drawn, correct crumbled sand border */
-  if (IS_ANIMATED(graphic))
-    if (checkDrawLevelGraphicAnimation(x, y, graphic))
-      DrawCrumbledSand(SCREENX(x), SCREENY(y));
+  /* if new animation frame was drawn, correct crumbled sand border */
+  if (IS_NEW_FRAME(GfxFrame[x][y], graphic))
+    DrawCrumbledSand(SCREENX(x), SCREENY(y));
 }
 
 static void ChangeElement(int x, int y)
@@ -4370,7 +4390,7 @@ static void ChangeElement(int x, int y)
   if (MovDelay[x][y] != 0)		/* continue element change */
   {
     if (IS_ANIMATED(el2img(element)))
-      ContinueLevelElementAnimation(x, y, element);
+      DrawLevelElementAnimationIfNeeded(x, y, element);
 
     if (changing_element[element].change_function)
       changing_element[element].change_function(x, y);
@@ -4533,7 +4553,7 @@ void GameActions()
 {
   static unsigned long action_delay = 0;
   unsigned long action_delay_value;
-  int sieb_x = 0, sieb_y = 0;
+  int magic_wall_x = 0, magic_wall_y = 0;
   int i, x, y, element, graphic;
   byte *recorded_player_action;
   byte summarized_player_action = 0;
@@ -4671,6 +4691,11 @@ void GameActions()
     element = Feld[x][y];
     graphic = el2img(element);
 
+#if 1
+    if (graphic_info[graphic].anim_global_sync)
+      GfxFrame[x][y] = FrameCounter;
+#endif
+
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
 	IS_NEW_FRAME(GfxFrame[x][y], graphic))
       ResetRandomAnimationValue(x, y);
@@ -4682,7 +4707,7 @@ void GameActions()
 
 #if 1
       if (IS_ANIMATED(graphic))
-	ContinueLevelGraphicAnimation(x, y, graphic);
+	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 #endif
 
       continue;
@@ -4692,18 +4717,10 @@ void GameActions()
     {
       StartMoving(x, y);
 
-#if 1
-#if 0
-      if (Feld[x][y] == EL_EMERALD &&
-	  IS_ANIMATED(graphic) &&
-	  !IS_MOVING(x, y))
-	ContinueLevelGraphicAnimation(x, y, graphic);
-#else
       if (IS_ANIMATED(graphic) &&
-	  !IS_MOVING(x, y))
-	ContinueLevelGraphicAnimation(x, y, graphic);
-#endif
-#endif
+	  !IS_MOVING(x, y) &&
+	  !Stop[x][y])
+	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	EdelsteinFunkeln(x, y);
@@ -4719,7 +4736,7 @@ void GameActions()
 	      element == EL_SHIELD_NORMAL ||
 	      element == EL_SHIELD_DEADLY) &&
 	     IS_ANIMATED(graphic))
-      ContinueLevelGraphicAnimation(x, y, graphic);
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 #endif
 
     else if (IS_MOVING(x, y))
@@ -4803,7 +4820,7 @@ void GameActions()
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
     else if (IS_ANIMATED(graphic))
-      ContinueLevelGraphicAnimation(x, y, graphic);
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 #endif
 
     if (IS_BELT_ACTIVE(element))
@@ -4814,26 +4831,17 @@ void GameActions()
       boolean sieb = FALSE;
       int jx = local_player->jx, jy = local_player->jy;
 
-      if (element == EL_MAGIC_WALL_FULL ||
-	  element == EL_MAGIC_WALL_ACTIVE ||
-	  element == EL_MAGIC_WALL_EMPTYING)
-      {
-	SiebAktivieren(x, y, 1);
-	sieb = TRUE;
-      }
-      else if (element == EL_BD_MAGIC_WALL_FULL ||
-	       element == EL_BD_MAGIC_WALL_ACTIVE ||
-	       element == EL_BD_MAGIC_WALL_EMPTYING)
-      {
-	SiebAktivieren(x, y, 2);
-	sieb = TRUE;
-      }
-
       /* play the element sound at the position nearest to the player */
-      if (sieb && ABS(x-jx)+ABS(y-jy) < ABS(sieb_x-jx)+ABS(sieb_y-jy))
+      if ((element == EL_MAGIC_WALL_FULL ||
+	   element == EL_MAGIC_WALL_ACTIVE ||
+	   element == EL_MAGIC_WALL_EMPTYING ||
+	   element == EL_BD_MAGIC_WALL_FULL ||
+	   element == EL_BD_MAGIC_WALL_ACTIVE ||
+	   element == EL_BD_MAGIC_WALL_EMPTYING) &&
+	  ABS(x-jx) + ABS(y-jy) < ABS(magic_wall_x-jx) + ABS(magic_wall_y-jy))
       {
-	sieb_x = x;
-	sieb_y = y;
+	magic_wall_x = x;
+	magic_wall_y = y;
       }
     }
   }
@@ -4901,14 +4909,14 @@ void GameActions()
   {
     if (!(game.magic_wall_time_left % 4))
     {
-      int element = Feld[sieb_x][sieb_y];
+      int element = Feld[magic_wall_x][magic_wall_y];
 
       if (element == EL_BD_MAGIC_WALL_FULL ||
 	  element == EL_BD_MAGIC_WALL_ACTIVE ||
 	  element == EL_BD_MAGIC_WALL_EMPTYING)
-	PlaySoundLevel(sieb_x, sieb_y, SND_BD_MAGIC_WALL_ACTIVE);
+	PlaySoundLevel(magic_wall_x, magic_wall_y, SND_BD_MAGIC_WALL_ACTIVE);
       else
-	PlaySoundLevel(sieb_x, sieb_y, SND_MAGIC_WALL_ACTIVE);
+	PlaySoundLevel(magic_wall_x, magic_wall_y, SND_MAGIC_WALL_ACTIVE);
     }
 
     if (game.magic_wall_time_left > 0)

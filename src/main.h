@@ -177,7 +177,8 @@
 #define ANIM_MODE(g)		(graphic_info[g].anim_mode)
 
 #define IS_ANIMATED(g)		(ANIM_FRAMES(g) > 1)
-#define IS_NEW_FRAME(f, g)	((f) % ANIM_DELAY(g) == 0)
+#define IS_NEW_DELAY(f, g)	((f) % ANIM_DELAY(g) == 0)
+#define IS_NEW_FRAME(f, g)	(IS_ANIMATED(g) && IS_NEW_DELAY(f, g))
 
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 

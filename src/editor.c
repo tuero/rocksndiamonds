@@ -4343,7 +4343,6 @@ void HandleLevelEditorIdle()
 {
   static unsigned long action_delay = 0;
   unsigned long action_delay_value = GameFrameDelay;
-  int graphic = el2img(properties_element);
   int xpos = 1, ypos = 2;
 
   if (edit_mode != ED_MODE_PROPERTIES)
@@ -4352,20 +4351,10 @@ void HandleLevelEditorIdle()
   if (!DelayReached(&action_delay, action_delay_value))
     return;
 
-#if 1
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  graphic, -1, NO_MASKING);
-
-#else
-  DrawGraphicAnimationExt(drawto,
-			  SX + xpos * TILEX,
-			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  el_dir_act2img(properties_element,
-					 MV_NO_MOVING,
-					 ...), -1, NO_MASKING);
-#endif
+			  el2img(properties_element), -1, NO_MASKING);
 
   MarkTileDirty(xpos, ypos);
   MarkTileDirty(xpos, ypos + 1);

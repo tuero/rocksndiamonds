@@ -435,26 +435,6 @@ void SetBorderElement()
   }
 }
 
-static int getGraphicAnimationPhase(int frames, int delay, int mode)
-{
-  int phase;
-
-  if (mode & ANIM_PINGPONG)
-  {
-    int max_anim_frames = 2 * frames - 2;
-
-    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
-    phase = (phase < frames ? phase : max_anim_frames - phase);
-  }
-  else
-    phase = (FrameCounter % (delay * frames)) / delay;
-
-  if (mode & ANIM_REVERSE)
-    phase = -phase;
-
-  return phase;
-}
-
 void SetRandomAnimationValue(int x, int y)
 {
   anim.random_frame = GfxRandom[x][y];
@@ -484,60 +464,55 @@ inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-inline boolean checkDrawGraphicAnimation(int sx, int sy, int graphic)
-{
-  int lx = LEVELX(sx), ly = LEVELY(sy);
-
-  return (IN_SCR_FIELD(sx, sy) && IS_NEW_FRAME(GfxFrame[lx][ly], graphic));
-}
-
-inline boolean checkDrawLevelGraphicAnimation(int lx, int ly, int graphic)
-{
-  int sx = SCREENX(lx), sy = SCREENY(ly);
-
-  return (IN_SCR_FIELD(sx, sy) && IS_NEW_FRAME(GfxFrame[lx][ly], graphic));
-}
-
-inline boolean DrawGraphicAnimation(int x, int y, int graphic)
+inline void DrawGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
-#if 0
-  if (!checkDrawGraphicAnimation(x, y, graphic))
-    return FALSE;
-#else
   if (!IN_SCR_FIELD(x, y))
-    return FALSE;
-#endif
+    return;
 
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
 			  graphic, GfxFrame[lx][ly], NO_MASKING);
   MarkTileDirty(x, y);
-
-  return TRUE;
 }
 
-boolean DrawLevelGraphicAnimation(int x, int y, int graphic)
+void DrawLevelGraphicAnimation(int x, int y, int graphic)
 {
-  return DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
-}
-
-boolean DrawLevelElementAnimation(int x, int y, int element)
-{
-  return DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
-}
-
-inline void ContinueLevelGraphicAnimation(int x, int y, int graphic)
-{
-  if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
-    return;
-
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 }
 
-void ContinueLevelElementAnimation(int x, int y, int element)
+void DrawLevelElementAnimation(int x, int y, int element)
 {
-  ContinueLevelGraphicAnimation(x, y, el2img(element));
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
+}
+
+inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
+{
+  int sx = SCREENX(x), sy = SCREENY(y);
+
+  if (!IN_LEV_FIELD(x, y) || !IN_SCR_FIELD(sx, sy))
+    return;
+
+  if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
+    return;
+
+  DrawGraphicAnimation(sx, sy, graphic);
+}
+
+void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
+{
+  int sx = SCREENX(x), sy = SCREENY(y);
+  int graphic;
+
+  if (!IN_LEV_FIELD(x, y) || !IN_SCR_FIELD(sx, sy))
+    return;
+
+  graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+
+  if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
+    return;
+
+  DrawGraphicAnimation(sx, sy, graphic);
 }
 
 void DrawAllPlayers()
@@ -765,7 +740,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
       if ((sxx || syy) && IS_PUSHABLE(element))
       {
-	graphic = el_dir_act2img(element, player->MovDir, ACTION_MOVING);
+	graphic = el_act_dir2img(element, ACTION_MOVING, player->MovDir);
 #if 1
 	frame = getGraphicAnimationFrame(graphic, player->GfxPos);
 
@@ -1132,88 +1107,39 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
+void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy, int graphic,
 				int frame, int cut_mode)
 {
   DrawGraphicShifted(x,y, dx,dy, graphic, frame, cut_mode, USE_MASKING);
 }
 
-inline static int getFramePosition(int x, int y)
-{
-  int frame_pos = -1;		/* default: global synchronization */
-#if 0
-  int element = Feld[x][y];
-
-  if (element == EL_QUICKSAND_FULL ||
-      element == EL_MAGIC_WALL_FULL ||
-      element == EL_BD_MAGIC_WALL_FULL)
-    frame_pos = -1;
-  else if (IS_MOVING(x, y) || CAN_MOVE(element) || CAN_FALL(element))
-    frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
-#else
-
-  frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
-
-  frame_pos = GfxFrame[x][y];
-
-#endif
-
-  return frame_pos;
-}
-
-inline static int getGfxAction(int x, int y)
-{
-  int gfx_action = ACTION_DEFAULT;
-
-#if 0
-  if (GfxAction[x][y] != ACTION_DEFAULT)
-    gfx_action = GfxAction[x][y];
-  else if (IS_MOVING(x, y))
-    gfx_action = ACTION_MOVING;
-#else
-  gfx_action = GfxAction[x][y];
-#endif
-
-#if DEBUG
-  if (gfx_action < 0)
-    printf("getGfxAction: THIS SHOULD NEVER HAPPEN: GfxAction[%d][%d] == %d\n",
-	   x, y, gfx_action);
-#endif
-
-  return gfx_action;
-}
-
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
-  int ux = LEVELX(x), uy = LEVELY(y);
+  int lx = LEVELX(x), ly = LEVELY(y);
   int graphic;
   int frame;
 
-  if (IN_LEV_FIELD(ux, uy))
+  if (IN_LEV_FIELD(lx, ly))
   {
-    int move_dir = MovDir[ux][uy];
-    int move_pos = getFramePosition(ux, uy);
-    int gfx_action = getGfxAction(ux, uy);
+    SetRandomAnimationValue(lx, ly);
 
-    SetRandomAnimationValue(ux, uy);
-
-    graphic = el_dir_act2img(element, move_dir, gfx_action);
-    frame = getGraphicAnimationFrame(graphic, move_pos);
+    graphic = el_act_dir2img(element, GfxAction[lx][ly], MovDir[lx][ly]);
+    frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
   }
-  else
+  else	/* border element */
   {
     graphic = el2img(element);
-    frame = getGraphicAnimationFrame(graphic, 0);
+    frame = getGraphicAnimationFrame(graphic, -1);
   }
 
   if (element == EL_WALL_GROWING)
   {
     boolean left_stopped = FALSE, right_stopped = FALSE;
 
-    if (!IN_LEV_FIELD(ux - 1, uy) || IS_MAUER(Feld[ux - 1][uy]))
+    if (!IN_LEV_FIELD(lx - 1, ly) || IS_MAUER(Feld[lx - 1][ly]))
       left_stopped = TRUE;
-    if (!IN_LEV_FIELD(ux + 1, uy) || IS_MAUER(Feld[ux + 1][uy]))
+    if (!IN_LEV_FIELD(lx + 1, ly) || IS_MAUER(Feld[lx + 1][ly]))
       right_stopped = TRUE;
 
     if (left_stopped && right_stopped)
@@ -1295,7 +1221,7 @@ void DrawCrumbledSand(int x, int y)
   Bitmap *src_bitmap;
   int src_x, src_y;
   int i, width, height, cx,cy;
-  int ux = LEVELX(x), uy = LEVELY(y);
+  int lx = LEVELX(x), ly = LEVELY(y);
   int element, graphic;
   int snip = 4;
   static int xy[4][2] =
@@ -1306,10 +1232,10 @@ void DrawCrumbledSand(int x, int y)
     { 0, +1 }
   };
 
-  if (!IN_LEV_FIELD(ux, uy))
+  if (!IN_LEV_FIELD(lx, ly))
     return;
 
-  element = Feld[ux][uy];
+  element = Feld[lx][ly];
 
   if (element == EL_SAND ||
       element == EL_LANDMINE ||
@@ -1327,14 +1253,14 @@ void DrawCrumbledSand(int x, int y)
 
     for(i=0; i<4; i++)
     {
-      int uxx, uyy;
+      int lxx, lyy;
 
-      uxx = ux + xy[i][0];
-      uyy = uy + xy[i][1];
-      if (!IN_LEV_FIELD(uxx, uyy))
+      lxx = lx + xy[i][0];
+      lyy = ly + xy[i][1];
+      if (!IN_LEV_FIELD(lxx, lyy))
 	element = EL_STEELWALL;
       else
-	element = Feld[uxx][uyy];
+	element = Feld[lxx][lyy];
 
       if (element == EL_SAND ||
 	  element == EL_LANDMINE ||
@@ -1373,18 +1299,18 @@ void DrawCrumbledSand(int x, int y)
 
     for(i=0; i<4; i++)
     {
-      int xx, yy, uxx, uyy;
+      int xx, yy, lxx, lyy;
 
       xx = x + xy[i][0];
       yy = y + xy[i][1];
-      uxx = ux + xy[i][0];
-      uyy = uy + xy[i][1];
+      lxx = lx + xy[i][0];
+      lyy = ly + xy[i][1];
 
-      if (!IN_LEV_FIELD(uxx, uyy) ||
-	  (Feld[uxx][uyy] != EL_SAND &&
-	   Feld[uxx][uyy] != EL_LANDMINE &&
-	   Feld[uxx][uyy] != EL_TRAP &&
-	   Feld[uxx][uyy] != EL_TRAP_ACTIVE) ||
+      if (!IN_LEV_FIELD(lxx, lyy) ||
+	  (Feld[lxx][lyy] != EL_SAND &&
+	   Feld[lxx][lyy] != EL_LANDMINE &&
+	   Feld[lxx][lyy] != EL_TRAP &&
+	   Feld[lxx][lyy] != EL_TRAP_ACTIVE) ||
 	  !IN_SCR_FIELD(xx, yy))
 	continue;
 
@@ -1425,12 +1351,12 @@ void DrawLevelElement(int x, int y, int element)
 
 void DrawScreenField(int x, int y)
 {
-  int ux = LEVELX(x), uy = LEVELY(y);
+  int lx = LEVELX(x), ly = LEVELY(y);
   int element, content;
 
-  if (!IN_LEV_FIELD(ux, uy))
+  if (!IN_LEV_FIELD(lx, ly))
   {
-    if (ux < -1 || ux > lev_fieldx || uy < -1 || uy > lev_fieldy)
+    if (lx < -1 || lx > lev_fieldx || ly < -1 || ly > lev_fieldy)
       element = EL_EMPTY;
     else
       element = BorderElement;
@@ -1439,12 +1365,12 @@ void DrawScreenField(int x, int y)
     return;
   }
 
-  element = Feld[ux][uy];
-  content = Store[ux][uy];
+  element = Feld[lx][ly];
+  content = Store[lx][ly];
 
-  if (IS_MOVING(ux, uy))
+  if (IS_MOVING(lx, ly))
   {
-    int horiz_move = (MovDir[ux][uy] == MV_LEFT || MovDir[ux][uy] == MV_RIGHT);
+    int horiz_move = (MovDir[lx][ly] == MV_LEFT || MovDir[lx][ly] == MV_RIGHT);
     boolean cut_mode = NO_CUTTING;
 
     if (element == EL_QUICKSAND_EMPTYING ||
@@ -1463,16 +1389,16 @@ void DrawScreenField(int x, int y)
       DrawScreenElement(x, y, EL_EMPTY);
 
     if (horiz_move)
-      DrawScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
+      DrawScreenElementShifted(x, y, MovPos[lx][ly], 0, element, NO_CUTTING);
     else if (cut_mode == NO_CUTTING)
-      DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], element, cut_mode);
+      DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], element, cut_mode);
     else
-      DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], content, cut_mode);
+      DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], content, cut_mode);
 
     if (content == EL_ACID)
-      DrawLevelElementThruMask(ux, uy + 1, EL_ACID);
+      DrawLevelElementThruMask(lx, ly + 1, EL_ACID);
   }
-  else if (IS_BLOCKED(ux, uy))
+  else if (IS_BLOCKED(lx, ly))
   {
     int oldx, oldy;
     int sx, sy;
@@ -1480,7 +1406,7 @@ void DrawScreenField(int x, int y)
     boolean cut_mode = NO_CUTTING;
     int element_old, content_old;
 
-    Blocked2Moving(ux, uy, &oldx, &oldy);
+    Blocked2Moving(lx, ly, &oldx, &oldy);
     sx = SCREENX(oldx);
     sy = SCREENY(oldy);
     horiz_move = (MovDir[oldx][oldy] == MV_LEFT ||
@@ -2503,45 +2429,24 @@ int get_next_element(int element)
   }
 }
 
-int el2img(int element)
+int el_act_dir2img(int element, int action, int direction)
 {
-  int graphic = element_info[element].graphic[ACTION_DEFAULT];
+  direction = MV_DIR_BIT(direction);
 
-#if DEBUG
-  if (graphic < 0)
-    Error(ERR_WARN, "element %d -> graphic %d -- probably crashing now...",
-	  element, graphic);
-#endif
+  return element_info[element].direction_graphic[action][direction];
+}
 
-  return graphic;
+int el_act2img(int element, int action)
+{
+  return element_info[element].graphic[action];
 }
 
 int el_dir2img(int element, int direction)
 {
-  return el_dir_act2img(element, direction, ACTION_DEFAULT);
+  return el_act_dir2img(element, ACTION_DEFAULT, direction);
 }
 
-int el_dir_act2img(int element, int direction, int action)
+int el2img(int element)
 {
-#if DEBUG
-  if (element < 0)
-  {    
-    printf("el_dir_act2img: THIS SHOULD NEVER HAPPEN: element == %d\n",
-	   element);
-
-    return IMG_EMPTY;
-  }
-
-  if (action < 0)
-  {    
-    printf("el_dir_act2img: THIS SHOULD NEVER HAPPEN: action == %d\n",
-	   action);
-
-    return IMG_EMPTY;
-  }
-#endif
-
-  direction = MV_DIR_BIT(direction);
-
-  return element_info[element].direction_graphic[action][direction];
+  return element_info[element].graphic[ACTION_DEFAULT];
 }
