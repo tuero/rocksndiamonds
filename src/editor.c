@@ -4143,8 +4143,23 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     default:
+      if (id >= GADGET_ID_ELEMENTLIST_FIRST &&
+	  id <= GADGET_ID_ELEMENTLIST_LAST)
+      {
+	int element_position = id - GADGET_ID_ELEMENTLIST_FIRST;
+	int new_element = editor_element[element_position + element_shift];
+
+	PickDrawingElement(button, new_element);
+
+	if (!HAS_CONTENT(properties_element))
+	{
+	  properties_element = new_element;
+	  if (edit_mode == ED_MODE_PROPERTIES)
+	    DrawPropertiesWindow();
+	}
+      }
 #ifdef DEBUG
-      if (gi->event.type == GD_EVENT_PRESSED)
+      else if (gi->event.type == GD_EVENT_PRESSED)
 	printf("default: HandleControlButtons: GD_EVENT_PRESSED\n");
       else if (gi->event.type == GD_EVENT_RELEASED)
 	printf("default: HandleControlButtons: GD_EVENT_RELEASED\n");
