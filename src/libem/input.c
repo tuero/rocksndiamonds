@@ -118,7 +118,7 @@ int game_start(void)
 	strcpy(player_name, "dave");
 	player_level = 0;
 
-	input_pause = 1;
+	input_pause = 1    * 0;
 
 	for(;;) {
 
@@ -259,6 +259,11 @@ void readjoy(void)
 		ply1.joy_s = south;
 		ply1.joy_w = west;
 	}
+
+#if 0
+	printf("::: JOY == %d/%d/%d/%d/%d\n",
+	       north, east, south, west, fire);
+#endif
 }
 
 /* handle events from x windows and block until the next frame

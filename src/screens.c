@@ -501,9 +501,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	else
 #endif
 	{
+#if 1
+	  em_main();
+#else
 	  game_status = GAME_MODE_PLAYING;
 	  StopAnimation();
 	  InitGame();
+#endif
 	}
       }
       else if (y == 6)

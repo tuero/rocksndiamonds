@@ -25,7 +25,7 @@ int arg_silence;
 extern void tab_generate();
 extern void ulaw_generate();
 
-int em_main(int argc, char **argv)
+int em_main_OLD(int argc, char **argv)
 {
 	int result;
 	int option;
@@ -59,6 +59,30 @@ int em_main(int argc, char **argv)
 
 	result = open_all(); if(result) goto fail;
 	result = game_start(); if(result) goto fail;
+	result = 0;
+fail:
+	close_all();
+	return(result);
+}
+
+int em_main()
+{
+	int result;
+
+	/* pre-calculate some data */
+	tab_generate();
+	ulaw_generate();
+
+	progname = "emerald mine";
+
+	result = open_all();
+	if(result)
+	  goto fail;
+
+	result = game_start();
+	if(result)
+	  goto fail;
+
 	result = 0;
 fail:
 	close_all();

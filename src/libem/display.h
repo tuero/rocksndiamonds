@@ -11,12 +11,30 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
+#if 0
+
 extern Display *display;
 extern Window window;
-#if 0
-extern Window xwindow;
-#else
 #define xwindow window
+
+#else
+
+#include "../libgame/system.h"
+
+#define xwindow (window->drawable)
+
+#endif
+
+#if 1
+
+extern Bitmap *screenBitmap;
+extern Bitmap *scoreBitmap;
+
+extern Bitmap *objBitmap;
+extern Bitmap *sprBitmap;
+extern Bitmap *ttlBitmap;
+extern Bitmap *botBitmap;
+
 #endif
 
 extern Pixmap screenPixmap;

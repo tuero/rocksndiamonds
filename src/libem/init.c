@@ -3,6 +3,15 @@
  * open X11 display and sound
  */
 
+#if 1
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <X11/Xos.h>
+#include <X11/Intrinsic.h>
+#include <X11/keysymdef.h>
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -24,8 +33,22 @@
 #include "display.h"
 #include "sample.h"
 
+#if 0
 Display *display;
 Window xwindow;
+#endif
+
+#if 1
+Bitmap *objBitmap;
+Bitmap *botBitmap;
+Bitmap *sprBitmap;
+Bitmap *ttlBitmap;
+#endif
+
+#if 1
+Bitmap *screenBitmap;
+Bitmap *scoreBitmap;
+#endif
 
 Pixmap screenPixmap;
 Pixmap scorePixmap;
@@ -73,10 +96,12 @@ static unsigned int screenHeight;
 static unsigned long screenBlackPixel;
 static unsigned long screenWhitePixel;
 
+#if 0
 static XSizeHints sizeHints;
 static XSetWindowAttributes setWindowAttributes;
 static XWMHints wmHints;
 static XVisualInfo visualInfo;
+#endif
 static XGCValues gcValues;
 
 static Colormap privateColourmap;
@@ -90,17 +115,30 @@ static XColor whiteColour;
 static int gotRed;
 static int gotWhite;
 
+#if 1
+static Bitmap *pcxBitmaps[4];
+#endif
+
+#if 0
 static Pixmap xpmPixmaps[4];
 static Pixmap xpmBitmaps[4];
 static XpmAttributes xpmAttributes[4];
 static int xpmGot[4];
+#endif
 
 static int xpmAllocColourFunc(Display *, Colormap, char *, XColor *, void *);
 static int xpmFreeColoursFunc(Display *, Colormap, unsigned long *, int, void *);
 
 static KeyCode keycodes[16];
 
+#if 0
 static const char *xpmNames[4] = { "object.xpm", "score.xpm", "sprite.xpm", "title.xpm" };
+#endif
+
+#if 1
+static const char *pcxNames[4] = { "object.pcx", "score.pcx", "sprite.pcx", "title.pcx" };
+#endif
+
 static const int xpmCloseness[4] = { 10000, 10000, 40000, 50000 };
 static const KeySym keysyms[16] = {
 	XK_Up, XK_KP_Up, XK_r, /* north */
@@ -129,15 +167,19 @@ static const int sound_volume[SAMPLE_MAX] = {
 int open_all(void)
 {
 	char name[MAXNAME+2];
+#if 0
 	void *dummyptr;
 	int dummyint;
+#endif
 	int i;
 
+#if 0
 	display = XOpenDisplay(arg_display);
 	if(display == 0) {
 		fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, XDisplayName(arg_display), "failed to open display", strerror(errno));
 		return(1);
 	}
+#endif
 
 	defaultScreen = DefaultScreenOfDisplay(display);
 	defaultVisual = DefaultVisualOfScreen(defaultScreen);
@@ -149,6 +191,7 @@ int open_all(void)
 	screenBlackPixel = BlackPixelOfScreen(defaultScreen);
 	screenWhitePixel = WhitePixelOfScreen(defaultScreen);
 
+#if 0
 	if(arg_install) {
 		visualInfo.visualid = XVisualIDFromVisual(defaultVisual);
 		dummyptr = XGetVisualInfo(display, VisualIDMask, &visualInfo, &dummyint);
@@ -231,7 +274,9 @@ int open_all(void)
 	if(cursor) XDefineCursor(display, xwindow, cursor);
 
 	XMapWindow(display, xwindow);
+#endif
 
+#if 0
 	for(i = 0; i < 4; i++) {
 		name[MAXNAME] = 0;
 		if(arg_basedir) {
@@ -254,7 +299,29 @@ int open_all(void)
 		}
 		xpmGot[i] = 1;
 	}
+#endif
 
+	for(i = 0; i < 4; i++)
+	{
+	  name[MAXNAME] = 0;
+	  snprintf(name, MAXNAME+2, "%s/%s", EM_GFX_DIR, pcxNames[i]);
+
+	  if (name[MAXNAME])
+	    snprintf_overflow("read graphics/ files");
+
+	  if ((pcxBitmaps[i] = LoadImage(name)) == NULL)
+	  {
+	    printf("::: LoadImage() failed for file '%s'\n", name);
+	    return 1;
+	  }
+	}
+
+	objBitmap = pcxBitmaps[0];
+	botBitmap = pcxBitmaps[1];
+	sprBitmap = pcxBitmaps[2];
+	ttlBitmap = pcxBitmaps[3];
+
+#if 0
 	objPixmap = xpmPixmaps[0];
 	botPixmap = xpmPixmaps[1];
 	sprPixmap = xpmPixmaps[2];
@@ -263,6 +330,21 @@ int open_all(void)
 	botmaskBitmap = xpmBitmaps[1];
 	sprmaskBitmap = xpmBitmaps[2];
 	ttlmaskBitmap = xpmBitmaps[3];
+#else
+	objPixmap = pcxBitmaps[0]->drawable;
+	botPixmap = pcxBitmaps[1]->drawable;
+	sprPixmap = pcxBitmaps[2]->drawable;
+	ttlPixmap = pcxBitmaps[3]->drawable;
+	objmaskBitmap = pcxBitmaps[0]->clip_mask;
+	botmaskBitmap = pcxBitmaps[1]->clip_mask;
+	sprmaskBitmap = pcxBitmaps[2]->clip_mask;
+	ttlmaskBitmap = pcxBitmaps[3]->clip_mask;
+#endif
+
+#if 1
+	screenBitmap = CreateBitmap(22 * TILEX, 14 * TILEY, DEFAULT_DEPTH);
+	scoreBitmap = CreateBitmap(20 * TILEX, SCOREY, DEFAULT_DEPTH);
+#endif
 
 	screenPixmap = XCreatePixmap(display, xwindow, 22 * TILEX, 14 * TILEY, screenDepth);
 	if(screenPixmap == 0) {
@@ -380,14 +462,18 @@ void close_all(void)
 	if(sound_pipe[1] != -1) close(sound_pipe[1]);
 	for(i = 0; i < SAMPLE_MAX; i++) if(sound_data[i]) free(sound_data[i]);
 
+#if 0
 	for(i = 0; i < 4; i++) if(xpmPixmaps[i]) XFreePixmap(display, xpmPixmaps[i]);
 	for(i = 0; i < 4; i++) if(xpmBitmaps[i]) XFreePixmap(display, xpmBitmaps[i]);
 	for(i = 0; i < 4; i++) if(xpmGot[i]) {
 		xpmFreeColoursFunc(display, xpmAttributes[i].colormap, xpmAttributes[i].alloc_pixels, xpmAttributes[i].nalloc_pixels, 0);
 		XpmFreeAttributes(&xpmAttributes[i]);
 	}
+#endif
+
 	if(gotRed) xpmFreeColoursFunc(display, privateColourmap ? privateColourmap : defaultColourmap, &redColour.pixel, 1, 0);
 	if(gotWhite) xpmFreeColoursFunc(display, privateColourmap ? privateColourmap : defaultColourmap, &whiteColour.pixel, 1, 0);
+
 	if(screenGC) XFreeGC(display, screenGC);
 	if(scoreGC) XFreeGC(display, scoreGC);
 	if(spriteGC) XFreeGC(display, spriteGC);

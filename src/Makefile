@@ -22,9 +22,7 @@ ifdef X11_PATH			# path to X11 specified by top level Makefile
 XINC_PATH = $(X11_PATH)/include
 XLIB_PATH = $(X11_PATH)/lib
 X11_INCL = -I$(XINC_PATH)
-# X11_LIBS = -L$(XLIB_PATH) -lX11
-# !!! remove Xpm dependency !!!
-X11_LIBS = -L$(XLIB_PATH) -lX11 -lXpm
+X11_LIBS = -L$(XLIB_PATH) -lX11
 endif
 
 AR = ar

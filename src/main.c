@@ -4173,9 +4173,6 @@ static void print_usage()
 
 int main(int argc, char *argv[])
 {
-  em_main(argc, argv);
-  return 0;
-
   InitProgramInfo(argv[0], USERDATA_DIRECTORY,
 		  PROGRAM_TITLE_STRING, getWindowTitleString(),
 		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
