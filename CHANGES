@@ -1,7 +1,11 @@
-Pre-Release Version 2.2.0rc7 [?? ??? ????]
+Pre-Release Version 2.2.0rc8 [?? ??? ????]
+------------------------------------------
+
+Pre-Release Version 2.2.0rc7 [17 JUL 2003]
 ------------------------------------------
 	- fixed bug when picking element in the editor
 	- added more custom elements properties
+	- fixed bugs when smashing penguin
 
 Pre-Release Version 2.2.0rc6 [22 APR 2003]
 ------------------------------------------

@@ -3096,19 +3096,23 @@ void ReloadCustomArtwork()
   char *mus_new_identifier = artwork.mus_current->identifier;
   boolean redraw_screen = FALSE;
 
+#if 0
   if (leveldir_current_identifier == NULL)
     leveldir_current_identifier = leveldir_current->identifier;
+#endif
 
-#if 0
+#if 1
   printf("CURRENT GFX: '%s' ['%s']\n", artwork.gfx_current->identifier,
 	 leveldir_current->graphics_set);
   printf("CURRENT LEV: '%s' / '%s'\n", leveldir_current_identifier,
 	 leveldir_current->identifier);
 #endif
 
-#if 0
+#if 1
   printf("graphics --> '%s' ('%s')\n",
 	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
+#endif
+#if 0
   printf("sounds   --> '%s' ('%s')\n",
 	 artwork.snd_current_identifier, artwork.snd_current->filename);
   printf("music    --> '%s' ('%s')\n",
@@ -3126,15 +3130,47 @@ void ReloadCustomArtwork()
     char *identifier_old = leveldir_current_identifier;
     char *identifier_new = leveldir_current->identifier;
 
-    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
-	getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
+#if 1
+    printf("::: 1: ['%s'] '%s', '%s' [%lx, %lx]\n",
+	   gfx_new_identifier, identifier_old, identifier_new,
+	   getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old),
+	   getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new));
+#endif
+
+#if 0
+    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new) == NULL)
+      gfx_new_identifier = GRAPHICS_SUBDIR;
+    else if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
+	     getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
       gfx_new_identifier = identifier_new;
-    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
-	getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
+#else
+    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new) == NULL)
+      gfx_new_identifier = setup.graphics_set;
+    else
+      gfx_new_identifier = identifier_new;
+#endif
+
+#if 1
+    if (leveldir_current_identifier == NULL)
+      leveldir_current_identifier = leveldir_current->identifier;
+#endif
+
+    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_new) == NULL)
+      snd_new_identifier = SOUNDS_SUBDIR;
+    else if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
+	     getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
       snd_new_identifier = identifier_new;
-    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
-	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
+
+    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) == NULL)
+      mus_new_identifier = MUSIC_SUBDIR;
+    else if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
+	     getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
       mus_new_identifier = identifier_new;
+
+#if 1
+    printf("::: 2: ['%s'] '%s', '%s'\n",
+	   gfx_new_identifier, identifier_old, identifier_new);
+#endif
 
     leveldir_current_identifier = leveldir_current->identifier;
   }
@@ -3149,10 +3185,24 @@ void ReloadCustomArtwork()
   if (leveldir_current->music_set != NULL)
     mus_new_identifier = leveldir_current->music_set;
 
+#if 1
+  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' ['%s', '%s']\n",
+	 artwork.gfx_current_identifier, gfx_new_identifier,
+	 artwork.gfx_current->identifier, leveldir_current->graphics_set);
+#endif
+
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
 #if 0
+    artwork.gfx_current =
+      getTreeInfoFromIdentifier(artwork.gfx_first, gfx_new_identifier);
+#endif
+#if 1
+    artwork.gfx_current_identifier = gfx_new_identifier;
+#endif
+
+#if 1
     printf("RELOADING GRAPHICS '%s' -> '%s' ('%s')\n",
 	   artwork.gfx_current_identifier,
 	   artwork.gfx_current->identifier,
@@ -3167,9 +3217,21 @@ void ReloadCustomArtwork()
 
     FreeTileClipmasks();
     InitTileClipmasks();
+#if 0
+    artwork.gfx_current =
+      getTreeInfoFromIdentifier(artwork.gfx_first, gfx_new_identifier);
+#endif
+    printf("::: '%s', %lx\n", gfx_new_identifier, artwork.gfx_current);
 
+#if 0
     artwork.gfx_current_identifier = artwork.gfx_current->identifier;
+#endif
     last_override_level_graphics = setup.override_level_graphics;
+
+#if 0
+    printf("DONE RELOADING GFX: '%s' ['%s']\n",
+	   artwork.gfx_current_identifier, artwork.gfx_current->identifier);
+#endif
 
     redraw_screen = TRUE;
   }
@@ -3190,6 +3252,8 @@ void ReloadCustomArtwork()
     InitReloadCustomSounds(snd_new_identifier);
     ReinitializeSounds();
 
+    artwork.snd_current =
+      getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
     artwork.snd_current_identifier = artwork.snd_current->identifier;
     last_override_level_sounds = setup.override_level_sounds;
 
@@ -3205,6 +3269,8 @@ void ReloadCustomArtwork()
     InitReloadCustomMusic(mus_new_identifier);
     ReinitializeMusic();
 
+    artwork.mus_current =
+      getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
     artwork.mus_current_identifier = artwork.mus_current->identifier;
     last_override_level_music = setup.override_level_music;
 

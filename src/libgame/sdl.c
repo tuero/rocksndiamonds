@@ -26,9 +26,9 @@
 /* functions from SGE library */
 inline void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
-#ifdef PLATFORM_WIN32
+/* #ifdef PLATFORM_WIN32 */
 #define FULLSCREEN_BUG
-#endif
+/* #endif */
 
 /* stuff needed to work around SDL/Windows fullscreen drawing bug */
 static int fullscreen_width;
@@ -866,6 +866,14 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 
 inline void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 {
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    x += video_xoffset;
+    y += video_yoffset;
+  }
+#endif
+
   sge_PutPixel(dst_bitmap->surface, x, y, pixel);
 }
 
