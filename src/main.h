@@ -963,7 +963,103 @@
 #define EL_SP_GRAVITY_OFF_PORT_LEFT	665
 #define EL_SP_GRAVITY_OFF_PORT_UP	666
 
+#if 1
+
 #define NUM_FILE_ELEMENTS		667
+
+/* the following EMC style elements are currently not implemented in R'n'D */
+#define EL_BALLOON_SWITCH_NONE		EL_UNKNOWN
+#define EL_EMC_LEVEL_BORDER		EL_UNKNOWN
+#define EL_EMC_ANDROID			EL_UNKNOWN
+#define EL_EMC_ANDROID_RIGHT		EL_UNKNOWN
+#define EL_EMC_ANDROID_UP		EL_UNKNOWN
+#define EL_EMC_ANDROID_LEFT		EL_UNKNOWN
+#define EL_EMC_ANDROID_DOWN		EL_UNKNOWN
+#define EL_EMC_ANDROID_LEFT_UP		EL_UNKNOWN
+#define EL_EMC_ANDROID_LEFT_DOWN	EL_UNKNOWN
+#define EL_EMC_ANDROID_RIGHT_UP		EL_UNKNOWN
+#define EL_EMC_ANDROID_RIGHT_DOWN	EL_UNKNOWN
+#define EL_EMC_GRASS			EL_UNKNOWN
+#define EL_EMC_GENERATOR_BALL		EL_UNKNOWN
+#define EL_EMC_GROW			EL_UNKNOWN
+#define EL_EMC_GATE_1			EL_UNKNOWN
+#define EL_EMC_GATE_2			EL_UNKNOWN
+#define EL_EMC_GATE_3			EL_UNKNOWN
+#define EL_EMC_GATE_4			EL_UNKNOWN
+#define EL_EMC_GATE_5			EL_UNKNOWN
+#define EL_EMC_GATE_6			EL_UNKNOWN
+#define EL_EMC_GATE_7			EL_UNKNOWN
+#define EL_EMC_GATE_8			EL_UNKNOWN
+#define EL_EMC_GATE_1_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_2_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_3_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_4_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_5_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_6_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_7_GRAY		EL_UNKNOWN
+#define EL_EMC_GATE_8_GRAY		EL_UNKNOWN
+#define EL_EMC_KEY_1			EL_UNKNOWN
+#define EL_EMC_KEY_2			EL_UNKNOWN
+#define EL_EMC_KEY_3			EL_UNKNOWN
+#define EL_EMC_KEY_4			EL_UNKNOWN
+#define EL_EMC_KEY_5			EL_UNKNOWN
+#define EL_EMC_KEY_6			EL_UNKNOWN
+#define EL_EMC_KEY_7			EL_UNKNOWN
+#define EL_EMC_KEY_8			EL_UNKNOWN
+#define EL_EMC_BUMPER			EL_UNKNOWN
+#define EL_EMC_PLANT			EL_UNKNOWN
+#define EL_EMC_LENSES			EL_UNKNOWN
+#define EL_EMC_MAGNIFY			EL_UNKNOWN
+
+#else
+
+/* the following EMC style elements are currently not implemented in R'n'D */
+#define EL_BALLOON_SWITCH_NONE		667
+#define EL_EMC_LEVEL_BORDER		668
+#define EL_EMC_ANDROID			669
+#define EL_EMC_ANDROID_RIGHT		670
+#define EL_EMC_ANDROID_UP		671
+#define EL_EMC_ANDROID_LEFT		672
+#define EL_EMC_ANDROID_DOWN		673
+#define EL_EMC_ANDROID_LEFT_UP		674
+#define EL_EMC_ANDROID_LEFT_DOWN	675
+#define EL_EMC_ANDROID_RIGHT_UP		676
+#define EL_EMC_ANDROID_RIGHT_DOWN	677
+#define EL_EMC_GRASS			678
+#define EL_EMC_GENERATOR_BALL		679
+#define EL_EMC_GROW			680
+#define EL_EMC_GATE_1			681
+#define EL_EMC_GATE_2			682
+#define EL_EMC_GATE_3			683
+#define EL_EMC_GATE_4			684
+#define EL_EMC_GATE_5			685
+#define EL_EMC_GATE_6			686
+#define EL_EMC_GATE_7			687
+#define EL_EMC_GATE_8			688
+#define EL_EMC_GATE_1_GRAY		689
+#define EL_EMC_GATE_2_GRAY		690
+#define EL_EMC_GATE_3_GRAY		691
+#define EL_EMC_GATE_4_GRAY		692
+#define EL_EMC_GATE_5_GRAY		693
+#define EL_EMC_GATE_6_GRAY		694
+#define EL_EMC_GATE_7_GRAY		695
+#define EL_EMC_GATE_8_GRAY		696
+#define EL_EMC_KEY_1			697
+#define EL_EMC_KEY_2			698
+#define EL_EMC_KEY_3			699
+#define EL_EMC_KEY_4			700
+#define EL_EMC_KEY_5			701
+#define EL_EMC_KEY_6			702
+#define EL_EMC_KEY_7			703
+#define EL_EMC_KEY_8			704
+#define EL_EMC_BUMPER			705
+#define EL_EMC_PLANT			706
+#define EL_EMC_LENSES			707
+#define EL_EMC_MAGNIFY			708
+
+#define NUM_FILE_ELEMENTS		709
+
+#endif
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1479,7 +1575,7 @@ struct LevelInfo
   struct LevelFileInfo file_info;
 
   /* level stored in native format for the native game engines */
-  struct LevelInfo_EM native_em_level;
+  struct LevelInfo_EM *native_em_level;
 
   int game_engine_type;
 

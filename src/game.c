@@ -2063,13 +2063,7 @@ void InitGame()
   /* !!! FIX THIS (START) !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
-    if (em_main_init_game(level_nr, level.file_info.filename) != 0)
-    {
-      game_status = GAME_MODE_MAIN;
-      DrawMainMenu();
-
-      return;
-    }
+    InitGameEngine_EM();
   }
   else
   {

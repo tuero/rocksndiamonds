@@ -2985,11 +2985,7 @@ void HandleGameActions()
     if (tape.recording)
       TapeRecordAction(tape_action);
 
-    if (em_main_handle_game(local_player->effective_action) != 0)
-    {
-      game_status = GAME_MODE_MAIN;
-      DrawMainMenu();
-    }
+    GameActions_EM(local_player->effective_action);
 
     if (TimeFrames >= FRAMES_PER_SECOND)
     {

@@ -3,6 +3,15 @@
 
 #include "main_em.h"
 
+#ifdef EM_ENGINE_BAD_ROLL
+#define BAD_ROLL
+#endif
+
+#ifdef EM_ENGINE_BAD_SPRING
+#define BAD_SPRING
+#endif
+
+
 #if 0
 
 /* 2000-07-30T11:06:03Z

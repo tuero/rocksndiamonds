@@ -22,6 +22,10 @@ struct cave_node *cave_list;
 
 static void setLevelInfoToDefaults_EM(void)
 {
+  native_em_level.lev = &lev;
+  native_em_level.ply1 = &ply1;
+  native_em_level.ply2 = &ply2;
+
   lev.width = 64;
   lev.height = 32;
 

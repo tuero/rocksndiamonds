@@ -22,12 +22,6 @@ extern int arg_silence;
 
 extern unsigned int frame;
 
-#define EM_GAME_STATUS_MENU	1
-#define EM_GAME_STATUS_PLAY	2
-
-extern int em_game_status;
-extern boolean skip_menu;
-
 extern short ulaw_to_linear[256];
 extern unsigned char linear_to_ulaw[65536];
 
@@ -41,13 +35,7 @@ void input_eventloop(void);
 
 void blitscreen(void);
 void game_initscreen(void);
-void game_blitscore(void);
 void game_animscreen(void);
-void title_initscreen(void);
-void title_blitscore(void);
-void title_animscreen(void);
-void title_string(unsigned int y, unsigned int left, unsigned int right,
-		  char *string);
 
 void sound_play(void);
 
@@ -55,8 +43,8 @@ int cave_convert(char *);
 boolean LoadNativeLevel_EM(char *);
 
 void game_init_vars(void);
-int game_play_init(int, char *);
-int game_loop(byte);
+void game_play_init(int, char *);
+void game_loop(byte);
 
 void synchro_1(void);
 void synchro_2(void);

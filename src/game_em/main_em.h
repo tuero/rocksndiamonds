@@ -7,8 +7,8 @@
 #define EM_MAX_CAVE_HEIGHT		102
 
 /* define these for backwards compatibility */
-#define BAD_ROLL
-#define BAD_SPRING
+#define EM_ENGINE_BAD_ROLL
+#define EM_ENGINE_BAD_SPRING
 
 enum
 {
@@ -16,7 +16,7 @@ enum
   Yacid_splash_eB,	/* hmm */
   Yacid_splash_wB,	/* hmm */
 
-#ifdef BAD_ROLL
+#ifdef EM_ENGINE_BAD_ROLL
   Xstone_force_e,	/* only use these in eater */
   Xstone_force_w,
   Xnut_force_e,
@@ -524,15 +524,10 @@ struct PLAYER
 
 struct LevelInfo_EM
 {
-  struct LEVEL lev;
-  struct PLAYER ply1, ply2;
+  struct LEVEL *lev;
+  struct PLAYER *ply1, *ply2;
 
   unsigned short cave[EM_MAX_CAVE_WIDTH][EM_MAX_CAVE_HEIGHT];
-
-  unsigned short **Boom;
-  unsigned short **Cave;
-  unsigned short **Next;
-  unsigned short **Draw;
 };
 
 #endif	/* MAIN_EM_H */

@@ -33,11 +33,13 @@ extern void DrawGameDoorValues_EM(int, int, int, int);
 
 #include "main_em.h"
 
+extern struct LevelInfo_EM native_em_level;
+
 extern void em_open_all();
 extern void em_close_all();
 
-extern int em_main_init_game(int, char *);
-extern int em_main_handle_game(byte);
+extern void InitGameEngine_EM();
+extern void GameActions_EM(byte);
 
 boolean LoadNativeLevel_EM(char *);
 
