@@ -1445,8 +1445,9 @@ extern int		num_element_info;
 #define SND_TEST1		0
 #define SND_TEST2		1
 #define SND_TEST3		2
+#define SND_TEST4		3
 
-#define NUM_SOUND_EFFECTS	3
+#define NUM_SOUND_EFFECTS	4
 
 
 #define SND_AMOEBA_GROWING		0

@@ -89,7 +89,7 @@ static void SoundServer_StopAllSounds();
 
 static void ReloadCustomSounds();
 static void ReloadCustomMusic();
-static void FreeSound(SoundInfo *);
+static void FreeSound(void *);
 
 #if defined(PLATFORM_UNIX)
 static int OpenAudioDevice(char *audio_device_name)
@@ -1666,7 +1666,13 @@ static void LoadSoundsInfo()
 
 #if 1
     for (i=0; i<num_sounds; i++)
-      printf("'%s' -> '%s'\n", sound_effect[i].text, sound_effect[i].filename);
+    {
+      printf("'%s' ", sound_effect[i].text);
+      if (sound_effect[i].filename)
+	printf("-> '%s'\n", sound_effect[i].filename);
+      else
+	printf("-> UNDEFINED [-> '%s']\n", sound_effect[i].default_filename);
+    }
 #endif
   }
 }
@@ -1774,8 +1780,10 @@ void InitReloadMusic(char *set_name)
   InitReloadSoundsOrMusic(set_name, SND_RELOAD_MUSIC);
 }
 
-void FreeSound(SoundInfo *sound)
+void FreeSound(void *ptr)
 {
+  SoundInfo *sound = (SoundInfo *)ptr;
+
   if (sound == NULL)
     return;
 

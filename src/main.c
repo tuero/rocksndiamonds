@@ -139,9 +139,10 @@ char *sound_name[NUM_SOUNDS] =
 /* sound effects: setup file identifiers and corresponding default filenames */
 struct SoundEffectInfo sound_effects[NUM_SOUND_EFFECTS] =
 {
-  { "infotron_collecting",	"infotron.wav" },
-  { "zonk_falling",		"zonkdown.wav" },
-  { "zonk_pushing",		"zonkpush.wav" }
+  { "infotron_collecting",	"infotron.wav"	},
+  { "zonk_falling",		"zonkdown.wav"	},
+  { "zonk_pushing",		"zonkpush.wav"	},
+  { "player_screaming",		"autsch.wav"	}
 };
 
 struct SoundEffectInfo sound_effects_NEW[] =
