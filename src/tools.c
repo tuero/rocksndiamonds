@@ -356,11 +356,17 @@ void DrawPlayer(struct PlayerInfo *player)
   int element = Feld[jx][jy];
   int graphic, phase;
 
+  /*
   if (!player->active || player->gone || !IN_SCR_FIELD(sx,sy))
+    return;
+  */
+
+  if (!player->active || player->gone ||
+      !IN_SCR_FIELD(SCREENX(last_jx),SCREENY(last_jy)))
     return;
 
 #if DEBUG
-  if (!IN_LEV_FIELD(jx,jy) || !IN_SCR_FIELD(sx,sy))
+  if (!IN_LEV_FIELD(jx,jy))
   {
     printf("DrawPlayerField(): x = %d, y = %d\n",jx,jy);
     printf("DrawPlayerField(): sx = %d, sy = %d\n",sx,sy);
@@ -371,9 +377,6 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (element == EL_EXPLODING)
     return;
-
-  if (direct_draw_on)
-    SetDrawtoField(DRAW_BUFFERED);
 
   /* draw things in the field the player is leaving, if needed */
 
@@ -389,7 +392,7 @@ void DrawPlayer(struct PlayerInfo *player)
     else
       DrawLevelField(last_jx,last_jy);
 
-    if (player->Pushing)
+    if (player->Pushing && IN_SCR_FIELD(SCREENX(next_jx),SCREENY(next_jy)))
     {
       if (player->GfxPos)
       {
@@ -402,6 +405,12 @@ void DrawPlayer(struct PlayerInfo *player)
   	DrawLevelField(next_jx,next_jy);
     }
   }
+
+  if (!IN_SCR_FIELD(sx,sy))
+    return;
+
+  if (direct_draw_on)
+    SetDrawtoField(DRAW_BUFFERED);
 
   /* draw things behind the player, if needed */
 
@@ -421,7 +430,7 @@ void DrawPlayer(struct PlayerInfo *player)
   else	/* MV_DOWN || MV_NO_MOVING */
     graphic = GFX_SPIELER1_DOWN;
 
-  graphic += player->nr * 3*HEROES_PER_LINE;
+  graphic += player->index_nr * 3*HEROES_PER_LINE;
   graphic += player->Frame;
 
   if (player->GfxPos)
@@ -555,7 +564,6 @@ void DrawGraphicAnimationThruMask(int x, int y, int graphic,
 
 void DrawGraphic(int x, int y, int graphic)
 {
-
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
   {
@@ -602,11 +610,6 @@ void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 
 void DrawGraphicThruMask(int x, int y, int graphic)
 {
-  int src_x,src_y, dest_x,dest_y;
-  int tile = graphic;
-  Pixmap src_pixmap;
-  GC drawing_gc;
-
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
   {
@@ -615,6 +618,17 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     return;
   }
 #endif
+
+  DrawGraphicThruMaskExt(drawto_field, FX+x*TILEX, FY+y*TILEY, graphic);
+  MarkTileDirty(x,y);
+}
+
+void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
+{
+  int src_x, src_y;
+  int tile = graphic;
+  Pixmap src_pixmap;
+  GC drawing_gc;
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
@@ -634,12 +648,9 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   }
   else
   {
-    DrawGraphic(x,y,graphic);
+    DrawGraphicExt(d, gc, dest_x,dest_y, graphic);
     return;
   }
-
-  dest_x = FX + x*TILEX;
-  dest_y = FY + y*TILEY;
 
   if (tile_clipmask[tile] != None)
   {
@@ -658,8 +669,6 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     XCopyArea(display, src_pixmap, drawto_field, drawing_gc,
 	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
   }
-
-  MarkTileDirty(x,y);
 }
 
 void DrawMiniGraphic(int x, int y, int graphic)
@@ -1281,7 +1290,7 @@ void DrawMicroLevel(int xpos, int ypos)
   redraw_mask |= REDRAW_MICROLEV;
 }
 
-int AYS_in_range(int x, int y)
+int REQ_in_range(int x, int y)
 {
   if (y>DY+249 && y<DY+278)
   {
@@ -1293,7 +1302,7 @@ int AYS_in_range(int x, int y)
   return(0);
 }
 
-BOOL AreYouSure(char *text, unsigned int ays_state)
+BOOL Request(char *text, unsigned int req_state)
 {
   int mx,my, ty, result = -1;
   unsigned int old_door_state;
@@ -1337,21 +1346,53 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
     text+=(tl+(tc==32));
   }
 
-  if (ays_state & AYS_ASK)
+  if (req_state & REQ_ASK)
     XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX4,OK_BUTTON_GFX_YPOS,
 	      DXSIZE,OK_BUTTON_YSIZE,
 	      DOOR_GFX_PAGEX1,OK_BUTTON_YPOS);
-  else if (ays_state & AYS_CONFIRM)
+  else if (req_state & REQ_CONFIRM)
     XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
 	      DOOR_GFX_PAGEX4,CONFIRM_BUTTON_GFX_YPOS,
 	      DXSIZE,CONFIRM_BUTTON_YSIZE,
 	      DOOR_GFX_PAGEX1,CONFIRM_BUTTON_YPOS);
+  else if (req_state & REQ_PLAYER)
+  {
+    DrawPlayerButton(BUTTON_PLAYER_1, DB_INIT);
+    DrawPlayerButton(BUTTON_PLAYER_2, DB_INIT);
+    DrawPlayerButton(BUTTON_PLAYER_3, DB_INIT);
+    DrawPlayerButton(BUTTON_PLAYER_4, DB_INIT);
+
+    /*
+    XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
+	      DOOR_GFX_PAGEX4 + PLAYER_BUTTON_GFX_XPOS, PLAYER_BUTTON_GFX_YPOS,
+	      PLAYER_BUTTON_XSIZE,PLAYER_BUTTON_YSIZE,
+	      DOOR_GFX_PAGEX1 + PLAYER_BUTTON_1_XPOS, PLAYER_BUTTON_1_YPOS);
+    XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
+	      DOOR_GFX_PAGEX4 + PLAYER_BUTTON_GFX_XPOS, PLAYER_BUTTON_GFX_YPOS,
+	      PLAYER_BUTTON_XSIZE,PLAYER_BUTTON_YSIZE,
+	      DOOR_GFX_PAGEX1 + PLAYER_BUTTON_1_XPOS, PLAYER_BUTTON_1_YPOS);
+    XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
+	      DOOR_GFX_PAGEX4 + PLAYER_BUTTON_GFX_XPOS, PLAYER_BUTTON_GFX_YPOS,
+	      PLAYER_BUTTON_XSIZE,PLAYER_BUTTON_YSIZE,
+	      DOOR_GFX_PAGEX1 + PLAYER_BUTTON_2_XPOS, PLAYER_BUTTON_2_YPOS);
+    XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
+	      DOOR_GFX_PAGEX4 + PLAYER_BUTTON_GFX_XPOS, PLAYER_BUTTON_GFX_YPOS,
+	      PLAYER_BUTTON_XSIZE,PLAYER_BUTTON_YSIZE,
+	      DOOR_GFX_PAGEX1 + PLAYER_BUTTON_3_XPOS, PLAYER_BUTTON_3_YPOS);
+    XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
+	      DOOR_GFX_PAGEX4 + PLAYER_BUTTON_GFX_XPOS, PLAYER_BUTTON_GFX_YPOS,
+	      PLAYER_BUTTON_XSIZE,PLAYER_BUTTON_YSIZE,
+	      DOOR_GFX_PAGEX1 + PLAYER_BUTTON_4_XPOS, PLAYER_BUTTON_4_YPOS);
+    */
+  }
 
   OpenDoor(DOOR_OPEN_1);
   ClearEventQueue();
 
-  if (!(ays_state & AYS_ASK) && !(ays_state & AYS_CONFIRM))
+  if (!(req_state & REQ_ASK) &&
+      !(req_state & REQ_CONFIRM) &&
+      !(req_state & REQ_PLAYER))
     return(FALSE);
 
   if (game_status != MAINMENU)
@@ -1400,10 +1441,12 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	      button_status = MB_RELEASED;
 	  }
 
-	  if (ays_state & AYS_ASK)
-	    choice = CheckChooseButtons(mx,my,button_status);
-	  else
+	  if (req_state & REQ_ASK)
+	    choice = CheckYesNoButtons(mx,my,button_status);
+	  else if (req_state & REQ_CONFIRM)
 	    choice = CheckConfirmButton(mx,my,button_status);
+	  else
+	    choice = CheckPlayerButtons(mx,my,button_status);
 
 	  switch(choice)
 	  {
@@ -1414,7 +1457,19 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	      result = FALSE;
 	      break;
 	    case BUTTON_CONFIRM:
-	      result = TRUE|FALSE;
+	      result = TRUE | FALSE;
+	      break;
+	    case BUTTON_PLAYER_1:
+	      result = 1;
+	      break;
+	    case BUTTON_PLAYER_2:
+	      result = 2;
+	      break;
+	    case BUTTON_PLAYER_3:
+	      result = 3;
+	      break;
+	    case BUTTON_PLAYER_4:
+	      result = 4;
 	      break;
 	    default:
 	      break;
@@ -1432,6 +1487,8 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	      result = 0;
 	      break;
 	  }
+	  if (req_state & REQ_PLAYER)
+	    result = 0;
 	  break;
 	case KeyRelease:
 	  key_joystick_mapping = 0;
@@ -1461,11 +1518,11 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
   if (game_status != MAINMENU)
     StopAnimation();
 
-  if (!(ays_state & AYS_STAY_OPEN))
+  if (!(req_state & REQ_STAY_OPEN))
   {
     CloseDoor(DOOR_CLOSE_1);
 
-    if (!(ays_state & AYS_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
+    if (!(req_state & REQ_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
     {
       XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
 		DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,

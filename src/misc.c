@@ -233,6 +233,7 @@ void GetOptions(char *argv[])
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
 	     "  -l, --levels directory        alternative level directory\n"
+	     "  -n, --network                 network multiplayer game\n"
 	     "  -v, --verbose                 verbose mode\n",
 	     program_name);
       exit(0);

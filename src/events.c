@@ -788,6 +788,11 @@ void HandleJoystick()
       if (tape.pausing || AllPlayersGone)
 	joy = 0;
 
+      /*
+      if (!network_player_action_stored)
+	SendToServer_MovePlayer(joy, 0);
+      */
+
       HandleGameActions((byte)joy);
       break;
 

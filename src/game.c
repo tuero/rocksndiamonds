@@ -67,7 +67,8 @@ void InitGame()
   {
     struct PlayerInfo *player = &stored_player[i];
 
-    player->nr = i;
+    player->index_nr = i;
+    player->element_nr = EL_SPIELER1 + i;
     player->active = FALSE;
     player->local = FALSE;
 
@@ -127,6 +128,21 @@ void InitGame()
 
   local_player->active = TRUE;
   local_player->local = TRUE;
+
+  network_player_action_stored = FALSE;
+
+
+
+  /* initial null action */
+  SendToServer_MovePlayer(0,0);
+
+
+
+  /*
+  printf("BLURB\n");
+  */
+
+
 
   ZX = ZY = -1;
 
@@ -2780,7 +2796,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
 
-  stored_player_action[player->nr] = 0;
+  stored_player_action[player->index_nr] = 0;
   num_stored_actions++;
 
   if (!player->active || player->gone)
@@ -2804,7 +2820,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
       if (bombed && !moved)
 	player_action &= JOY_BUTTON;
 
-      stored_player_action[player->nr] = player_action;
+      stored_player_action[player->index_nr] = player_action;
 
       /* this allows cycled sequences of PlayerActions() */
       if (num_stored_actions >= MAX_PLAYERS)
@@ -2828,7 +2844,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
       tape.counter < tape.length)
   {
     int next_joy =
-      tape.pos[tape.counter].joystickdata[player->nr] & (JOY_LEFT|JOY_RIGHT);
+      tape.pos[tape.counter].action[player->index_nr] & (JOY_LEFT|JOY_RIGHT);
 
     if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
     {
@@ -2858,8 +2874,10 @@ void GameActions(byte player_action)
   int i, x,y, element;
   int *recorded_player_action;
 
+
   if (game_status != PLAYING)
     return;
+
 
 #ifdef DEBUG
   action_delay_value =
@@ -2869,23 +2887,60 @@ void GameActions(byte player_action)
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
 #endif
 
+  /*
+  HandleNetworking();
+
+  if (game_status != PLAYING)
+    return;
+  */
+
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
+
+  if (!network_player_action_stored)
+  {
+#ifdef DEBUG
+    printf("DEBUG: try to get network player actions in time\n");
+#endif
+
+    /* last chance to get network player actions without main loop delay */
+    HandleNetworking();
+
+    if (game_status != PLAYING)
+      return;
+
+    if (!network_player_action_stored)
+    {
+#ifdef DEBUG
+      printf("DEBUG: failed to get network player actions in time\n");
+#endif
+      return;
+    }
+  }
 
   if (tape.playing)
     recorded_player_action = TapePlayAction();
   else
     recorded_player_action = NULL;
 
-  SendToServer_MovePlayer(player_action);
+
+  SendToServer_MovePlayer(player_action, FrameCounter);
+
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
+    int actual_player_action = network_player_action[i];
+
+    /*
     int actual_player_action = player_action;
+    */
+
     /* TEST TEST TEST */
 
+    /*
     if (i != TestPlayer && !stored_player[i].MovPos)
       actual_player_action = 0;
+    */
 
     /* TEST TEST TEST */
 
@@ -2894,7 +2949,11 @@ void GameActions(byte player_action)
 
     PlayerActions(&stored_player[i], actual_player_action);
     ScrollFigure(&stored_player[i], SCROLL_GO_ON);
+
+    network_player_action[i] = 0;
   }
+
+  network_player_action_stored = FALSE;
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
@@ -2905,6 +2964,11 @@ void GameActions(byte player_action)
 
   FrameCounter++;
   TimeFrames++;
+
+  /*
+  printf("advancing FrameCounter to %d\n",
+	 FrameCounter);
+  */
 
   for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
   {
@@ -3143,7 +3207,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   if (!IN_LEV_FIELD(new_jx,new_jy))
     return(MF_NO_ACTION);
 
-  if (!networking && !AllPlayersInSight(player, new_jx,new_jy))
+  if (standalone && !AllPlayersInSight(player, new_jx,new_jy))
     return(MF_NO_ACTION);
 
   element = MovingOrBlocked2Element(new_jx,new_jy);
@@ -3174,7 +3238,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   player->last_jy = jy;
   jx = player->jx = new_jx;
   jy = player->jy = new_jy;
-  StorePlayer[jx][jy] = EL_SPIELER1 + player->nr;
+  StorePlayer[jx][jy] = player->element_nr;
 
   player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
 
@@ -3215,10 +3279,18 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
   if (moved & MF_MOVING && player == local_player)
   */
 
-  if (moved & MF_MOVING && !ScreenMovPos)
+  if (moved & MF_MOVING && !ScreenMovPos &&
+      (player == local_player || standalone))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
+
+    /*
+    if (player == local_player)
+    {
+      printf("MOVING LOCAL PLAYER && SCROLLING\n");
+    }
+    */
 
     if (!IN_VIS_FIELD(SCREENX(jx),SCREENY(jy)))
     {
@@ -3278,22 +3350,15 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
-      if (networking || AllPlayersInVisibleScreen())
-      {
-	ScrollScreen(player, SCROLL_INIT);
-
-	/*
-	ScreenMovDir = player->MovDir;
-	ScreenMovPos = player->MovPos;
-	ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
-	*/
-
-	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
-      }
-      else
+      if (standalone && !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;
+      }
+      else
+      {
+	ScrollScreen(player, SCROLL_INIT);
+	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
       }
     }
   }
@@ -3338,10 +3403,6 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
-    /*
-    ScreenGfxPos = local_player->GfxPos;
-    */
-
     if (Feld[last_jx][last_jy] == EL_LEERRAUM)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 
@@ -3353,22 +3414,6 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX/8;
   player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
-
-  /*
-  if (ScreenMovPos)
-  {
-    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX/8;
-    ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
-  }
-  */
-
-  /*
-  if (ScreenGfxPos && ScreenGfxPos != local_player->GfxPos)
-  {
-    ScreenGfxPos = local_player->GfxPos;
-    redraw_mask |= REDRAW_FIELD;
-  }
-  */
 
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
@@ -3407,12 +3452,6 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
   if (ScreenMovPos)
   {
-    /*
-    printf("ScreenMovDir = %d, ", ScreenMovDir);
-    printf("ScreenMovPos = %d, ", ScreenMovPos);
-    printf("ScreenGfxPos = %d\n", ScreenGfxPos);
-    */
-
     ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX/8;
     ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
     redraw_mask |= REDRAW_FIELD;
@@ -3986,7 +4025,7 @@ BOOL PlaceBomb(struct PlayerInfo *player)
   else
   {
     Feld[jx][jy] = EL_DYNABOMB;
-    Store2[jx][jy] = EL_SPIELER1 + player->nr;	/* for DynaExplode() */
+    Store2[jx][jy] = player->element_nr;	/* for DynaExplode() */
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
     DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNABOMB);

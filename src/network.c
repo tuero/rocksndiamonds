@@ -29,6 +29,7 @@
 #include "game.h"
 #include "tape.h"
 #include "files.h"
+#include "tools.h"
 #include "misc.h"
 
 int norestart = 0;
@@ -43,7 +44,7 @@ int nospeedup = 0;
 #define OP_NICK 1
 #define OP_PLAY 2
 #define OP_MOVE 3
-#define OP_DRAW 4
+#define OP_NRWANTED 4
 #define OP_LOST 5
 #define OP_GONE 6
 #define OP_CLEAR 7
@@ -98,8 +99,11 @@ void copydown(char *s, char *t, int n)
 
 void sysmsg(char *s)
 {
-  printf("** %s\n", s);
-  fflush(stdout);
+  if (verbose)
+  {
+    printf("** %s\n", s);
+    fflush(stdout);
+  }
 }
 
 void fatal(char *s)
@@ -183,8 +187,8 @@ void startserver()
   int n = 0;
 
   options[0] = options[1] = NULL;
-  if (norestart)
-    options[n++] = "-norestart";
+  if (verbose)
+    options[n++] = "-v";
   if (nospeedup)
     options[n++] = "-nospeedup";
 
@@ -197,7 +201,7 @@ void startserver()
 #else
       "rnd_server",
 #endif
-      "rnd_server", "-once", "-v", options[0], options[1], NULL);
+      "rnd_server", "-once", options[0], options[1], NULL);
 
       fprintf(stderr, "Can't start server '%s'.\n",
 #ifdef XTRISPATH
@@ -295,22 +299,50 @@ void SendToServer_ProtocolVersion()
   sendbuf(5);
 }
 
+void SendToServer_NrWanted(int nr_wanted)
+{
+  buf[1] = OP_NRWANTED;
+  buf[2] = nr_wanted;
+  sendbuf(3);
+}
+
 void SendToServer_StartPlaying()
 {
   buf[1] = OP_PLAY;
-  buf[2] = (unsigned char)(level_nr / 256);
-  buf[3] = (unsigned char)(level_nr % 256);
-  buf[4] = (unsigned char)(leveldir_nr / 256);
-  buf[5] = (unsigned char)(leveldir_nr % 256);
+  buf[2] = (byte)(level_nr >> 8);
+  buf[3] = (byte)(level_nr & 0xff);
+  buf[4] = (byte)(leveldir_nr >> 8);
+  buf[5] = (byte)(leveldir_nr & 0xff);
   strcpy(&buf[6], leveldir[leveldir_nr].name);
   sendbuf(strlen(leveldir[leveldir_nr].name)+1 + 6);
 }
 
-void SendToServer_MovePlayer(byte player_action)
+void SendToServer_MovePlayer(byte player_action, unsigned long frame_nr)
 {
   buf[1] = OP_MOVE;
   buf[2] = player_action;
+
   sendbuf(3);
+
+  /*
+  buf[3] = (byte)((frame_nr >> 24) & 0xff);
+  buf[4] = (byte)((frame_nr >> 16) & 0xff);
+  buf[5] = (byte)((frame_nr >>  8) & 0xff);
+  buf[6] = (byte)((frame_nr >>  0) & 0xff);
+
+  sendbuf(7);
+  */
+
+  /*
+  printf("%d: %x, %x, %x, %x\n", frame_nr, buf[3], buf[4], buf[5], buf[6]);
+  */
+
+
+
+  flushbuf();
+
+
+
 }
 
 void handlemessages()
@@ -332,12 +364,65 @@ void handlemessages()
     switch(buf[1])
     {
       case OP_YOUARE:
-	printf("OP_YOUARE: %d\n", buf[0]);
-	me.nr = buf[0];
+      {
+	int new_client_nr = buf[2];
+	int new_index_nr = new_client_nr - 1;
 
-	TestPlayer = buf[0] - 1;
+	printf("OP_YOUARE: %d\n", buf[0]);
+	me.nr = new_client_nr;
+
+	stored_player[new_index_nr] = *local_player;
+	local_player = &stored_player[new_index_nr];
+
+	TestPlayer = new_index_nr;
+
+	if (me.nr > MAX_PLAYERS)
+	  Error(ERR_EXIT, "sorry - no more than %d players", MAX_PLAYERS);
+
+	sprintf(msgbuf, "you get client # %d", new_client_nr);
+	sysmsg(msgbuf);
 
 	break;
+      }
+
+      case OP_NRWANTED:
+      {
+	int client_nr_wanted = buf[2];
+	int new_client_nr = buf[3];
+	int new_index_nr = new_client_nr - 1;
+
+	printf("OP_NRWANTED: %d\n", buf[0]);
+
+	if (new_client_nr != client_nr_wanted)
+	{
+	  char *color[] = { "yellow", "red", "green", "blue" };
+
+	  sprintf(msgbuf, "Sorry ! You are %s player !",
+		  color[new_index_nr]);
+	  Request(msgbuf, REQ_CONFIRM);
+
+	  sprintf(msgbuf, "cannot switch -- you keep client # %d",
+		  new_client_nr);
+	  sysmsg(msgbuf);
+	}
+	else
+	{
+	  if (me.nr != client_nr_wanted)
+	    sprintf(msgbuf, "switching to client # %d", new_client_nr);
+	  else
+	    sprintf(msgbuf, "keeping client # %d", new_client_nr);
+	  sysmsg(msgbuf);
+
+	  me.nr = new_client_nr;
+
+	  stored_player[new_index_nr] = *local_player;
+	  local_player = &stored_player[new_index_nr];
+
+	  TestPlayer = new_index_nr;
+	}
+
+	break;
+      }
 
       case OP_NEW:
 	printf("OP_NEW: %d\n", buf[0]);
@@ -428,13 +513,41 @@ void handlemessages()
 	break;
 
       case OP_MOVE:
-	if (buf[2])
+      {
+	int frame_nr;
+	int i;
+
+	frame_nr =
+	  (buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | (buf[5]);
+
+	for (i=0; i<MAX_PLAYERS; i++)
 	{
-	  printf("OP_MOVE: %d\n", buf[0]);
-	  sprintf(msgbuf, "client %d moves player [0x%02x]", buf[0], buf[2]);
-	  sysmsg(msgbuf);
+	  if (stored_player[i].active)
+	    network_player_action[i] = buf[6 + i];
 	}
+
+	network_player_action_stored = TRUE;
+
+	/*
+	printf("FrameCounter == %d, frame_nr = %d\n",
+	       FrameCounter, frame_nr);
+	*/
+
+	/*
+	if (buf[2])
+	*/
+
+
+	/*
+	printf("OP_MOVE: %d\n", buf[0]);
+	*/
+
+	sprintf(msgbuf, "frame %d: client %d moves player [0x%02x]",
+		FrameCounter, buf[0], buf[2]);
+	sysmsg(msgbuf);
+
 	break;
+      }
 
       case OP_PAUSE:
 	printf("OP_PAUSE: %d\n", buf[0]);

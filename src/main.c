@@ -50,7 +50,6 @@ char	       *program_name = NULL;
 char	       *display_name = NULL;
 char	       *server_host = NULL;
 int		server_port = 0;
-int		networking = FALSE;
 int		standalone = TRUE;
 int		verbose = FALSE;
 
@@ -106,6 +105,8 @@ int		AllPlayersGone;
 int		FrameCounter, TimeFrames, TimeLeft;
 int		MampferNr, SiebAktiv;
 
+byte		network_player_action[MAX_PLAYERS];
+BOOL		network_player_action_stored = FALSE;
 int		TestPlayer = 0;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];

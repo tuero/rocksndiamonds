@@ -745,7 +745,7 @@ void LevelEd(int mx, int my, int button)
 	  edit_mode = FALSE;
 	  break;
 	case ED_BUTTON_FILL:
-	  AreYouSure("Caution ! Flood fill mode ! Choose area !",AYS_OPEN);
+	  Request("Caution ! Flood fill mode ! Choose area !",REQ_OPEN);
 	  use_floodfill = TRUE;
 	  return;
 	  break;
@@ -1010,7 +1010,7 @@ void LevelEd(int mx, int my, int button)
 	  edit_mode = TRUE;
 	  break;
 	case ED_BUTTON_CLEAR:
-	  if (AreYouSure("Are you sure to clear this level ?",AYS_ASK))
+	  if (Request("Are you sure to clear this level ?",REQ_ASK))
 	  {
 	    for(x=0;x<MAX_LEV_FIELDX;x++) 
 	      for(y=0;y<MAX_LEV_FIELDY;y++) 
@@ -1020,7 +1020,7 @@ void LevelEd(int mx, int my, int button)
 	  break;
 	case ED_BUTTON_UNDO:
 	  if (leveldir[leveldir_nr].readonly ||
-	      AreYouSure("Exit without saving ?",AYS_ASK | AYS_STAY_OPEN))
+	      Request("Exit without saving ?",REQ_ASK | REQ_STAY_OPEN))
 	  {
 	    CloseDoor(DOOR_CLOSE_BOTH);
 	    game_status=MAINMENU;
@@ -1038,7 +1038,7 @@ void LevelEd(int mx, int my, int button)
 
 	    if (leveldir[leveldir_nr].readonly)
 	    {
-	      AreYouSure("This level is read only !",AYS_CONFIRM);
+	      Request("This level is read only !",REQ_CONFIRM);
 	      break;
 	    }
 
@@ -1048,12 +1048,12 @@ void LevelEd(int mx, int my, int button)
 		  figur_vorhanden = TRUE;
 
 	    if (!figur_vorhanden)
-	      AreYouSure("No Level without Gregor Mc Duffin please !",
-			 AYS_CONFIRM);
+	      Request("No Level without Gregor Mc Duffin please !",
+			 REQ_CONFIRM);
 	    else
 	    {
-	      if (AreYouSure("Save this level and kill the old ?",
-			     AYS_ASK | AYS_STAY_OPEN))
+	      if (Request("Save this level and kill the old ?",
+			     REQ_ASK | REQ_STAY_OPEN))
 	      {
 		for(x=0;x<lev_fieldx;x++)
 		  for(y=0;y<lev_fieldy;y++) 

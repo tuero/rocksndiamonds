@@ -44,11 +44,11 @@ struct IconFileInfo
 
 static int sound_process_id = 0;
 
-static void InitServer(void);
 static void InitLevelAndPlayerInfo(void);
+static void InitNetworkServer(void);
 static void InitDisplay(void);
 static void InitSound(void);
-static void InitSoundProcess(void);
+static void InitSoundServer(void);
 static void InitWindow(int, char **);
 static void InitGfx(void);
 static void LoadGfx(int, struct PictureFileInfo *);
@@ -57,11 +57,10 @@ static void InitElementProperties(void);
 void OpenAll(int argc, char *argv[])
 {
   InitLevelAndPlayerInfo();
-  InitServer();
 
   InitCounter();
   InitSound();
-  InitSoundProcess();
+  InitSoundServer();
   InitJoystick();
   InitRND(NEW_RANDOMIZE);
 
@@ -78,6 +77,8 @@ void OpenAll(int argc, char *argv[])
   InitElementProperties();
 
   DrawMainMenu();
+
+  InitNetworkServer();
 }
 
 void InitLevelAndPlayerInfo()
@@ -91,19 +92,25 @@ void InitLevelAndPlayerInfo()
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
 }
 
-void InitServer()
+void InitNetworkServer()
 {
+  int nr_wanted;
+
   standalone = FALSE;
-  networking = !standalone;
 
   if (standalone)
     return;
+
+  nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(server_host, server_port))
     Error(ERR_EXIT, "cannot connect to multiplayer server");
 
   SendToServer_Nickname(local_player->alias_name);
   SendToServer_ProtocolVersion();
+
+  if (nr_wanted)
+    SendToServer_NrWanted(nr_wanted);
 }
 
 void InitSound()
@@ -154,7 +161,7 @@ void InitSound()
   }
 }
 
-void InitSoundProcess()
+void InitSoundServer()
 {
   if (sound_status==SOUND_OFF)
     return;

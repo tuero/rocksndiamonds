@@ -164,8 +164,8 @@
 #define SOUND_BUTTON_YSIZE	30
 #define SOUND_CONTROL_XPOS	5
 #define SOUND_CONTROL_YPOS	245
-#define SOUND_CONTROL_XSIZE	90
-#define SOUND_CONTROL_YSIZE	 (SOUND_BUTTON_YSIZE)
+#define SOUND_CONTROL_XSIZE	 (3*SOUND_BUTTON_XSIZE)
+#define SOUND_CONTROL_YSIZE	 (1*SOUND_BUTTON_YSIZE)
 #define SOUND_BUTTON_MUSIC_XPOS	 (SOUND_CONTROL_XPOS + 0 * SOUND_BUTTON_XSIZE)
 #define SOUND_BUTTON_LOOPS_XPOS	 (SOUND_CONTROL_XPOS + 1 * SOUND_BUTTON_XSIZE)
 #define SOUND_BUTTON_SIMPLE_XPOS (SOUND_CONTROL_XPOS + 2 * SOUND_BUTTON_XSIZE)
@@ -200,8 +200,8 @@
 #define GAME_BUTTON_YSIZE	30
 #define GAME_CONTROL_XPOS	5
 #define GAME_CONTROL_YPOS	215
-#define GAME_CONTROL_XSIZE	90
-#define GAME_CONTROL_YSIZE	(GAME_BUTTON_YSIZE)
+#define GAME_CONTROL_XSIZE	(3*GAME_BUTTON_XSIZE)
+#define GAME_CONTROL_YSIZE	(1*GAME_BUTTON_YSIZE)
 #define GAME_BUTTON_STOP_XPOS	(GAME_CONTROL_XPOS + 0 * GAME_BUTTON_XSIZE)
 #define GAME_BUTTON_PAUSE_XPOS	(GAME_CONTROL_XPOS + 1 * GAME_BUTTON_XSIZE)
 #define GAME_BUTTON_PLAY_XPOS	(GAME_CONTROL_XPOS + 2 * GAME_BUTTON_XSIZE)
@@ -220,7 +220,6 @@
 #define BUTTON_GAME_PAUSE	(1L<<1)
 #define BUTTON_GAME_PLAY	(1L<<2)
 
-
 /* some positions in the asking window */
 #define OK_BUTTON_XPOS		2
 #define OK_BUTTON_YPOS		250
@@ -237,7 +236,7 @@
 #define CONFIRM_BUTTON_XSIZE	96
 #define CONFIRM_BUTTON_YSIZE	OK_BUTTON_YSIZE
 
-#define ON_CHOOSE_BUTTON(x,y)	(((x)>=(DX+OK_BUTTON_XPOS) &&		\
+#define ON_YESNO_BUTTON(x,y)	(((x)>=(DX+OK_BUTTON_XPOS) &&		\
 				  (x)< (DX+OK_BUTTON_XPOS +		\
 					OK_BUTTON_XSIZE) &&		\
 				  (y)>=(DY+OK_BUTTON_YPOS) &&		\
@@ -255,12 +254,48 @@
 				  (y)>=(DY+CONFIRM_BUTTON_YPOS) &&	\
 				  (y)< (DY+CONFIRM_BUTTON_YPOS +	\
 					CONFIRM_BUTTON_YSIZE)))
-#define CHOOSE_BUTTON(x)	(((x)-(DX+OK_BUTTON_XPOS))/OK_BUTTON_XSIZE)
+#define YESNO_BUTTON(x)		(((x)-(DX+OK_BUTTON_XPOS))/OK_BUTTON_XSIZE)
 
 /* values for asking control */
 #define BUTTON_OK		(1L<<0)
 #define BUTTON_NO		(1L<<1)
 #define BUTTON_CONFIRM		(1L<<2)
+
+/* some positions in the choose player window */
+
+#define PLAYER_BUTTON_XSIZE	30
+#define PLAYER_BUTTON_YSIZE	30
+#define PLAYER_BUTTON_GFX_XPOS	5
+#define PLAYER_BUTTON_GFX_YPOS	(215-30)
+#define PLAYER_CONTROL_XPOS	(5 + PLAYER_BUTTON_XSIZE/2)
+#define PLAYER_CONTROL_YPOS	(215 - PLAYER_BUTTON_YSIZE/2)
+#define PLAYER_CONTROL_XSIZE	(2*PLAYER_BUTTON_XSIZE)
+#define PLAYER_CONTROL_YSIZE	(2*PLAYER_BUTTON_YSIZE)
+#define PLAYER_BUTTON_1_XPOS	(PLAYER_CONTROL_XPOS + 0 * PLAYER_BUTTON_XSIZE)
+#define PLAYER_BUTTON_2_XPOS	(PLAYER_CONTROL_XPOS + 1 * PLAYER_BUTTON_XSIZE)
+#define PLAYER_BUTTON_3_XPOS	(PLAYER_CONTROL_XPOS + 0 * PLAYER_BUTTON_XSIZE)
+#define PLAYER_BUTTON_4_XPOS	(PLAYER_CONTROL_XPOS + 1 * PLAYER_BUTTON_XSIZE)
+#define PLAYER_BUTTON_1_YPOS	(PLAYER_CONTROL_YPOS + 0 * PLAYER_BUTTON_YSIZE)
+#define PLAYER_BUTTON_2_YPOS	(PLAYER_CONTROL_YPOS + 0 * PLAYER_BUTTON_YSIZE)
+#define PLAYER_BUTTON_3_YPOS	(PLAYER_CONTROL_YPOS + 1 * PLAYER_BUTTON_YSIZE)
+#define PLAYER_BUTTON_4_YPOS	(PLAYER_CONTROL_YPOS + 1 * PLAYER_BUTTON_YSIZE)
+
+#define ON_PLAYER_BUTTON(x,y)	((x)>=(DX+PLAYER_CONTROL_XPOS) &&	\
+				 (x)< (DX+PLAYER_CONTROL_XPOS +		\
+				       PLAYER_CONTROL_XSIZE) &&		\
+				 (y)>=(DY+PLAYER_CONTROL_YPOS) &&	\
+				 (y)< (DY+PLAYER_CONTROL_YPOS +		\
+				       PLAYER_CONTROL_YSIZE))
+#define PLAYER_BUTTON(x,y)	((((x)-(DX+PLAYER_CONTROL_XPOS)) /	\
+				  PLAYER_BUTTON_XSIZE) + 2 *		\
+				 (((y)-(DY+PLAYER_CONTROL_YPOS)) /	\
+				  PLAYER_BUTTON_YSIZE))
+
+/* values for choose player control */
+#define BUTTON_PLAYER_1		(1L<<10)
+#define BUTTON_PLAYER_2		(1L<<11)
+#define BUTTON_PLAYER_3		(1L<<12)
+#define BUTTON_PLAYER_4		(1L<<13)
 
 
 /* some positions in the editor control window */
@@ -497,12 +532,18 @@
 #define ED_BUTTON_ELEM		2
 
 
+/* for DrawPlayerButton() */
+
+#define DB_INIT			0
+#define DB_NORMAL		1
+
 void DrawVideoDisplay(unsigned long, unsigned long);
 void DrawCompleteVideoDisplay(void);
 void DrawSoundDisplay(unsigned long);
 void DrawGameButton(unsigned long);
-void DrawChooseButton(unsigned long);
+void DrawYesNoButton(unsigned long);
 void DrawConfirmButton(unsigned long);
+void DrawPlayerButton(unsigned long, int);
 void DrawEditButton(unsigned long state);
 void DrawCtrlButton(unsigned long state);
 void DrawElemButton(int, int);
@@ -510,8 +551,9 @@ void DrawCountButton(int, int);
 int CheckVideoButtons(int, int, int);
 int CheckSoundButtons(int, int, int);
 int CheckGameButtons(int, int, int);
-int CheckChooseButtons(int, int, int);
+int CheckYesNoButtons(int, int, int);
 int CheckConfirmButton(int, int, int);
+int CheckPlayerButtons(int, int, int);
 int CheckEditButtons(int, int, int);
 int CheckCtrlButtons(int, int, int);
 int CheckElemButtons(int, int, int);

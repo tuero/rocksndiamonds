@@ -222,7 +222,7 @@ void DrawGameButton(unsigned long state)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawChooseButton(unsigned long state)
+void DrawYesNoButton(unsigned long state)
 {
   int pos, cx = DOOR_GFX_PAGEX4, cy = 0;
 
@@ -250,6 +250,60 @@ void DrawConfirmButton(unsigned long state)
 	    cx + CONFIRM_BUTTON_XPOS,cy + CONFIRM_BUTTON_GFX_YPOS,
 	    CONFIRM_BUTTON_XSIZE,CONFIRM_BUTTON_YSIZE,
 	    DX + CONFIRM_BUTTON_XPOS,DY + CONFIRM_BUTTON_YPOS);
+
+  redraw_mask |= REDRAW_DOOR_1;
+}
+
+void DrawPlayerButton(unsigned long state, int mode)
+{
+  Drawable dest_drawto;
+  int dest_xoffset, dest_yoffset;
+  int graphic;
+  int graphic_offset = (PLAYER_BUTTON_XSIZE - TILEX/2)/2;
+  int xpos, ypos;
+  int cx = DOOR_GFX_PAGEX4, cy = 0;
+
+  if (mode == DB_INIT)
+  {
+    dest_drawto = pix[PIX_DB_DOOR];
+    dest_xoffset = DOOR_GFX_PAGEX1;
+    dest_yoffset = 0;
+  }
+  else
+  {
+    dest_drawto = drawto;
+    dest_xoffset = DX;
+    dest_yoffset = DY;
+  }
+
+  if (state & BUTTON_PLAYER_1)
+    graphic = GFX_SPIELER1;
+  else if (state & BUTTON_PLAYER_2)
+    graphic = GFX_SPIELER2;
+  else if (state & BUTTON_PLAYER_3)
+    graphic = GFX_SPIELER3;
+  else if (state & BUTTON_PLAYER_4)
+    graphic = GFX_SPIELER4;
+
+  xpos = (state & BUTTON_PLAYER_1 || state & BUTTON_PLAYER_3 ?
+	  PLAYER_BUTTON_1_XPOS : PLAYER_BUTTON_2_XPOS);
+  ypos = (state & BUTTON_PLAYER_1 || state & BUTTON_PLAYER_2 ?
+	  PLAYER_BUTTON_1_YPOS : PLAYER_BUTTON_3_YPOS);
+
+  if (state & BUTTON_PRESSED)
+  {
+    cx = DOOR_GFX_PAGEX3;
+    graphic_offset += 1;
+  }
+
+  XCopyArea(display,pix[PIX_DOOR],dest_drawto,gc,
+	    cx + PLAYER_BUTTON_GFX_XPOS, cy + PLAYER_BUTTON_GFX_YPOS,
+	    PLAYER_BUTTON_XSIZE, PLAYER_BUTTON_YSIZE,
+	    dest_xoffset + xpos, dest_yoffset + ypos);
+  DrawMiniGraphicExt(dest_drawto,gc,
+		     dest_xoffset + xpos + graphic_offset,
+		     dest_yoffset + ypos + graphic_offset,
+		     graphic);
 
   redraw_mask |= REDRAW_DOOR_1;
 }
@@ -621,12 +675,12 @@ int CheckGameButtons(int mx, int my, int button)
   return(return_code);
 }
 
-int CheckChooseButtons(int mx, int my, int button)
+int CheckYesNoButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
   static BOOL pressed = FALSE;
-  static int choose_button[5] =
+  static int yesno_button[5] =
   {
     BUTTON_OK,
     BUTTON_NO
@@ -636,33 +690,33 @@ int CheckChooseButtons(int mx, int my, int button)
   {
     if (!motion_status)		/* Maustaste neu gedrückt */
     {
-      if (ON_CHOOSE_BUTTON(mx,my))
+      if (ON_YESNO_BUTTON(mx,my))
       {
-	choice = CHOOSE_BUTTON(mx);
+	choice = YESNO_BUTTON(mx);
 	pressed = TRUE;
-	DrawChooseButton(choose_button[choice] | BUTTON_PRESSED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED);
       }
     }
     else			/* Mausbewegung bei gedrückter Maustaste */
     {
-      if ((!ON_CHOOSE_BUTTON(mx,my) || CHOOSE_BUTTON(mx)!=choice) &&
+      if ((!ON_YESNO_BUTTON(mx,my) || YESNO_BUTTON(mx)!=choice) &&
 	  choice>=0 && pressed)
       {
 	pressed = FALSE;
-	DrawChooseButton(choose_button[choice] | BUTTON_RELEASED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED);
       }
-      else if (ON_CHOOSE_BUTTON(mx,my) &&CHOOSE_BUTTON(mx)==choice && !pressed)
+      else if (ON_YESNO_BUTTON(mx,my) && YESNO_BUTTON(mx)==choice && !pressed)
       {
 	pressed = TRUE;
-	DrawChooseButton(choose_button[choice] | BUTTON_PRESSED);
+	DrawYesNoButton(yesno_button[choice] | BUTTON_PRESSED);
       }
     }
   }
   else				/* Maustaste wieder losgelassen */
   {
-    if (ON_CHOOSE_BUTTON(mx,my) && CHOOSE_BUTTON(mx)==choice && pressed)
+    if (ON_YESNO_BUTTON(mx,my) && YESNO_BUTTON(mx)==choice && pressed)
     {
-      DrawChooseButton(choose_button[choice] | BUTTON_RELEASED);
+      DrawYesNoButton(yesno_button[choice] | BUTTON_RELEASED);
       return_code = choice+1;
       choice = -1;
       pressed = FALSE;
@@ -715,6 +769,65 @@ int CheckConfirmButton(int mx, int my, int button)
     {
       DrawConfirmButton(BUTTON_RELEASED);
       return_code = BUTTON_CONFIRM;
+      choice = -1;
+      pressed = FALSE;
+    }
+    else
+    {
+      choice = -1;
+      pressed = FALSE;
+    }
+  }
+
+  BackToFront();
+  return(return_code);
+}
+
+int CheckPlayerButtons(int mx, int my, int button)
+{
+  int return_code = 0;
+  static int choice = -1;
+  static BOOL pressed = FALSE;
+  int player_state[4] =
+  {
+    BUTTON_PLAYER_1,
+    BUTTON_PLAYER_2,
+    BUTTON_PLAYER_3,
+    BUTTON_PLAYER_4
+  };
+
+  if (button)
+  {
+    if (!motion_status)		/* Maustaste neu gedrückt */
+    {
+      if (ON_PLAYER_BUTTON(mx,my))
+      {
+	choice = PLAYER_BUTTON(mx,my);
+	pressed = TRUE;
+	DrawPlayerButton(player_state[choice] | BUTTON_PRESSED, DB_NORMAL);
+      }
+    }
+    else			/* Mausbewegung bei gedrückter Maustaste */
+    {
+      if ((!ON_PLAYER_BUTTON(mx,my) || PLAYER_BUTTON(mx,my)!=choice) &&
+	  choice>=0 && pressed)
+      {
+	pressed = FALSE;
+	DrawPlayerButton(player_state[choice] | BUTTON_RELEASED, DB_NORMAL);
+      }
+      else if (ON_PLAYER_BUTTON(mx,my) && PLAYER_BUTTON(mx,my)==choice && !pressed)
+      {
+	pressed = TRUE;
+	DrawPlayerButton(player_state[choice] | BUTTON_PRESSED, DB_NORMAL);
+      }
+    }
+  }
+  else				/* Maustaste wieder losgelassen */
+  {
+    if (ON_PLAYER_BUTTON(mx,my) && PLAYER_BUTTON(mx,my)==choice && pressed)
+    {
+      DrawPlayerButton(player_state[choice] | BUTTON_RELEASED, DB_NORMAL);
+      return_code = player_state[choice];
       choice = -1;
       pressed = FALSE;
     }

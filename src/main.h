@@ -144,12 +144,7 @@ typedef unsigned char byte;
 #define IS_PUSHABLE(e)		(Elementeigenschaften[e] & EP_BIT_PUSHABLE)
 #define ELEM_IS_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_PLAYER)
 
-/*
-#define IS_PLAYER(x,y)		(JX == (x) && JY == (y))
-*/
-
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
-#define IS_LOCAL_PLAYER(x,y)	(StorePlayer[x][y] == EL_SPIELER1)
 
 #define IS_FREE(x,y)		(Feld[x][y] == EL_LEERRAUM && !IS_PLAYER(x,y))
 #define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_LEERRAUM)
@@ -214,7 +209,8 @@ struct HiScore
 
 struct PlayerInfo
 {
-  int nr, active, local;
+  int active, local;
+  int index_nr, client_nr, element_nr;
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
@@ -289,7 +285,7 @@ struct RecordingInfo
   BOOL changed;
   struct
   {
-    byte joystickdata[MAX_PLAYERS];
+    byte action[MAX_PLAYERS];
     byte delay;
   } pos[MAX_TAPELEN];
 };
@@ -327,7 +323,6 @@ extern char	       *program_name;
 extern char	       *display_name;
 extern char	       *server_host;
 extern int		server_port;
-extern int		networking;
 extern int		standalone;
 extern int		verbose;
 
@@ -381,6 +376,8 @@ extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
 
+extern byte		network_player_action[];
+extern BOOL		network_player_action_stored;
 extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];

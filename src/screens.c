@@ -205,7 +205,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	game_status = LEVELED;
 	if (leveldir[leveldir_nr].readonly)
-	  AreYouSure("This level is read only !",AYS_CONFIRM);
+	  Request("This level is read only !",REQ_CONFIRM);
 	DrawLevelEd();
       }
       else if (y==7)
@@ -234,7 +234,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y==10)
       {
 	SavePlayerInfo(PLAYER_LEVEL);
-        if (AreYouSure("Do you really want to quit ?",AYS_ASK|AYS_STAY_CLOSED))
+        if (Request("Do you really want to quit ?",REQ_ASK|REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
 
@@ -1333,7 +1333,7 @@ void HandleVideoButtons(int mx, int my, int button)
       {
 	LoadLevelTape(level_nr);
 	if (TAPE_IS_EMPTY(tape))
-	  AreYouSure("No tape for this level !",AYS_CONFIRM);
+	  Request("No tape for this level !",REQ_CONFIRM);
       }
       else
       {
@@ -1490,8 +1490,8 @@ void HandleGameButtons(int mx, int my, int button)
 	break;
       }
 
-      if (AreYouSure("Do you really want to quit the game ?",
-		      AYS_ASK | AYS_STAY_CLOSED))
+      if (Request("Do you really want to quit the game ?",
+		  REQ_ASK | REQ_STAY_CLOSED))
       { 
 	game_status = MAINMENU;
 	DrawMainMenu();

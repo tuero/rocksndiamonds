@@ -267,10 +267,10 @@ void LoadLevelTape(int level_nr)
     {
       if (levelrec_10 && j>0)
       {
-	tape.pos[i].joystickdata[j] = MV_NO_MOVING;
+	tape.pos[i].action[j] = MV_NO_MOVING;
 	continue;
       }
-      tape.pos[i].joystickdata[j] = fgetc(file);
+      tape.pos[i].action[j] = fgetc(file);
     }
 
     tape.pos[i].delay = fgetc(file);
@@ -533,7 +533,7 @@ void SaveLevelTape(int level_nr)
     new_tape = FALSE;
     fclose(file);
 
-    if (!AreYouSure("Replace old tape ?",AYS_ASK))
+    if (!Request("Replace old tape ?",REQ_ASK))
       return;
   }
 
@@ -566,7 +566,7 @@ void SaveLevelTape(int level_nr)
     int j;
 
     for(j=0; j<MAX_PLAYERS; j++)
-      fputc(tape.pos[i].joystickdata[j],file);
+      fputc(tape.pos[i].action[j],file);
 
     fputc(tape.pos[i].delay,file);
   }
@@ -578,7 +578,7 @@ void SaveLevelTape(int level_nr)
   tape.changed = FALSE;
 
   if (new_tape)
-    AreYouSure("tape saved !",AYS_CONFIRM);
+    Request("tape saved !",REQ_CONFIRM);
 }
 
 void SaveScore(int level_nr)

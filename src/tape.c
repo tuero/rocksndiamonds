@@ -48,7 +48,7 @@ void TapeStopRecording()
     return;
 
   for(i=0; i<MAX_PLAYERS; i++)
-    tape.pos[tape.counter].joystickdata[i] = 0;
+    tape.pos[tape.counter].action[i] = 0;
 
   tape.counter++;
   tape.length = tape.counter;
@@ -72,7 +72,7 @@ void TapeRecordAction(byte joy[MAX_PLAYERS])
   }
 
   for(i=0; i<MAX_PLAYERS; i++)
-    tape.pos[tape.counter].joystickdata[i] = joy[i];
+    tape.pos[tape.counter].action[i] = joy[i];
 
   tape.counter++;
   tape.pos[tape.counter].delay = 0;
@@ -96,7 +96,7 @@ void TapeRecordDelay()
   if (tape.pos[tape.counter].delay >= 255)
   {
     for(i=0; i<MAX_PLAYERS; i++)
-      tape.pos[tape.counter].joystickdata[i] = 0;
+      tape.pos[tape.counter].action[i] = 0;
 
     tape.counter++;
     tape.pos[tape.counter].delay = 0;
@@ -168,7 +168,7 @@ int *TapePlayAction()
     tape.counter++;
 
     for(i=0; i<MAX_PLAYERS; i++)
-      joy[i] = tape.pos[tape.counter-1].joystickdata[i];
+      joy[i] = tape.pos[tape.counter-1].action[i];
 
     return(joy);
   }

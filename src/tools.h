@@ -34,26 +34,27 @@
 #define USE_MASKING	1
  
 /* for MoveDoor */
-#define DOOR_OPEN_1	1
-#define DOOR_OPEN_2	2
-#define DOOR_CLOSE_1	4
-#define DOOR_CLOSE_2	8
+#define DOOR_OPEN_1	(1 << 0)
+#define DOOR_OPEN_2	(1 << 1)
+#define DOOR_CLOSE_1	(1 << 2)
+#define DOOR_CLOSE_2	(1 << 3)
 #define DOOR_OPEN_BOTH	(DOOR_OPEN_1 | DOOR_OPEN_2)
 #define DOOR_CLOSE_BOTH	(DOOR_CLOSE_1 | DOOR_CLOSE_2)
 #define DOOR_ACTION_1	(DOOR_OPEN_1 | DOOR_CLOSE_1)
 #define DOOR_ACTION_2	(DOOR_OPEN_2 | DOOR_CLOSE_2)
 #define DOOR_ACTION	(DOOR_ACTION_1 | DOOR_ACTION_2)
-#define DOOR_COPY_BACK	16
-#define DOOR_NO_DELAY	32
-#define DOOR_GET_STATE	64
+#define DOOR_COPY_BACK	(1 << 4)
+#define DOOR_NO_DELAY	(1 << 5)
+#define DOOR_GET_STATE	(1 << 6)
 
-/* for AreYouSure */
-#define AYS_ASK		1
-#define AYS_OPEN	2
-#define AYS_CLOSE	4
-#define AYS_CONFIRM	8
-#define AYS_STAY_CLOSED	16
-#define AYS_STAY_OPEN	32
+/* for Request */
+#define REQ_ASK		(1 << 0)
+#define REQ_OPEN	(1 << 1)
+#define REQ_CLOSE	(1 << 2)
+#define REQ_CONFIRM	(1 << 3)
+#define REQ_STAY_CLOSED	(1 << 4)
+#define REQ_STAY_OPEN	(1 << 5)
+#define REQ_PLAYER	(1 << 6)
 
 void SetDrawtoField(int);
 void BackToFront();
@@ -70,6 +71,7 @@ void DrawGraphicAnimationThruMask(int, int, int, int, int, int);
 void DrawGraphic(int, int, int);
 void DrawGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicThruMask(int, int, int);
+void DrawGraphicThruMaskExt(Drawable, int, int, int);
 void DrawMiniGraphic(int, int, int);
 void DrawMiniGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicShifted(int, int, int, int, int, int, int);
@@ -92,7 +94,7 @@ void DrawMicroElement(int, int, int);
 void DrawLevel(void);
 void DrawMiniLevel(int, int);
 void DrawMicroLevel(int, int);
-BOOL AreYouSure(char *, unsigned int);
+BOOL Request(char *, unsigned int);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
