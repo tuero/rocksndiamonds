@@ -77,25 +77,25 @@
 
 #define NUM_DIRECTIONS		4
 
+/* values for special "button" bitmasks (effective at runtime) */
+#define BUTTON_1		4
+#define BUTTON_2		5
+
 /* values for special move patterns (stored in level files) */
-#define MV_BIT_HORIZONTAL	4
-#define MV_BIT_VERTICAL		5
-#define MV_BIT_ALL_DIRECTIONS	6
-#define MV_BIT_TOWARDS_PLAYER	7
-#define MV_BIT_AWAY_FROM_PLAYER	8
-#define MV_BIT_ALONG_LEFT_SIDE	9
-#define MV_BIT_ALONG_RIGHT_SIDE	10
+#define MV_BIT_TOWARDS_PLAYER	6
+#define MV_BIT_AWAY_FROM_PLAYER	7
+#define MV_BIT_ALONG_LEFT_SIDE	8
+#define MV_BIT_ALONG_RIGHT_SIDE	9
 
-#define NUM_MOVE_PATTERNS	11
-
-/* values for move direction and special "button" key bitmasks */
+/* values for move direction/pattern and special "button" key bitmasks */
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
 #define MV_UP			(1 << MV_BIT_UP)
 #define MV_DOWN	       		(1 << MV_BIT_DOWN)
-#define KEY_BUTTON_1		(1 << 4)
-#define KEY_BUTTON_2		(1 << 5)
+
+#define KEY_BUTTON_1		(1 << BUTTON_1)
+#define KEY_BUTTON_2		(1 << BUTTON_2)
 #define KEY_MOTION		(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
@@ -104,6 +104,14 @@
 				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
 				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
 
+#define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
+#define MV_VERTICAL		(MV_UP | MV_DOWN)
+#define MV_ALL_DIRECTIONS	(MV_HORIZONTAL | MV_VERTICAL)
+#define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
+#define MV_TOWARDS_PLAYER	(1 << MV_BIT_TOWARDS_PLAYER)
+#define MV_AWAY_FROM_PLAYER	(1 << MV_BIT_AWAY_FROM_PLAYER)
+#define MV_ALONG_LEFT_SIDE	(1 << MV_BIT_ALONG_LEFT_SIDE)
+#define MV_ALONG_RIGHT_SIDE	(1 << MV_BIT_ALONG_RIGHT_SIDE)
 
 /* values for button status */
 #define MB_NOT_PRESSED		FALSE

@@ -2474,6 +2474,18 @@ void InitElementPropertiesEngine(int engine_version)
 		 (level.em_slippery_gems &&
 		  engine_version > VERSION_IDENT(2,0,1)));
   }
+
+  /* dynamically adjust element properties according to game engine version */
+  if (engine_version < RELEASE_IDENT(2,2,0,7))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      element_info[element].push_delay_fixed = 2;
+      element_info[element].push_delay_random = 8;
+    }
+  }
 }
 
 static void InitGlobal()

@@ -101,7 +101,7 @@ static void setLevelInfoToDefaults()
 
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
-    element_info[element].move_direction = 0;
+    element_info[element].move_pattern = MV_NO_MOVING;
 
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)

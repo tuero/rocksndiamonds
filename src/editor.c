@@ -351,7 +351,7 @@
 #define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
 #define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 0)
-#define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 1)
 #define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 2)
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 3)
 #define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 4)
@@ -479,7 +479,7 @@
 
 /* values for selectbox gadgets */
 #define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	0
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	1
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	1
 #define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	2
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	3
 #define ED_SELECTBOX_ID_CHANGE_CAUSE		4
@@ -802,22 +802,22 @@ static struct ValueTextInfo options_walk_to_action[] =
 };
 static int index_walk_to_action = 0;
 
-static struct ValueTextInfo options_move_direction[] =
+static struct ValueTextInfo options_move_pattern[] =
 {
-  { MV_BIT_LEFT,		"left"			},
-  { MV_BIT_RIGHT,		"right"			},
-  { MV_BIT_UP,			"up"			},
-  { MV_BIT_DOWN,		"down"			},
-  { MV_BIT_HORIZONTAL,		"horizontal"		},
-  { MV_BIT_VERTICAL,		"vertical"		},
-  { MV_BIT_ALL_DIRECTIONS,	"all directions"	},
-  { MV_BIT_TOWARDS_PLAYER,	"towards player"	},
-  { MV_BIT_AWAY_FROM_PLAYER,	"away from player"	},
-  { MV_BIT_ALONG_LEFT_SIDE,	"along left side"	},
-  { MV_BIT_ALONG_RIGHT_SIDE,	"along right side"	},
+  { MV_LEFT,			"left"			},
+  { MV_RIGHT,			"right"			},
+  { MV_UP,			"up"			},
+  { MV_DOWN,			"down"			},
+  { MV_HORIZONTAL,		"horizontal"		},
+  { MV_VERTICAL,		"vertical"		},
+  { MV_ALL_DIRECTIONS,		"all directions"	},
+  { MV_TOWARDS_PLAYER,		"towards player"	},
+  { MV_AWAY_FROM_PLAYER,	"away from player"	},
+  { MV_ALONG_LEFT_SIDE,		"along left side"	},
+  { MV_ALONG_RIGHT_SIDE,	"along right side"	},
   { -1,				NULL			}
 };
-static int index_move_direction = 0;
+static int index_move_pattern = 0;
 
 static struct ValueTextInfo options_walkable_layer[] =
 {
@@ -867,10 +867,10 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CUSTOM_MOVE_DIRECTION,
+    GADGET_ID_CUSTOM_MOVE_PATTERN,
     -1,
-    options_move_direction, &index_move_direction,
-    &custom_element.move_direction,
+    options_move_pattern, &index_move_pattern,
+    &custom_element.move_pattern,
     "can move", "element move direction"
   },
   {

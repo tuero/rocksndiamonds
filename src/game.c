@@ -377,7 +377,9 @@ static int getBeltDirFromBeltSwitchElement(int element)
 
 static void InitField(int x, int y, boolean init_game)
 {
-  switch (Feld[x][y])
+  int element = Feld[x][y];
+
+  switch (element)
   {
     case EL_SP_MURPHY:
       if (init_game)
@@ -574,6 +576,8 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     default:
+      if (IS_CUSTOM_ELEMENT(element) && CAN_MOVE(element))
+	InitMovDir(x, y);
       break;
   }
 }
@@ -634,32 +638,6 @@ static void InitGameEngine()
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
-
-#if 0
-  /* dynamically adjust element properties according to game engine version */
-  {
-    static int ep_em_slippery_wall[] =
-    {
-      EL_STEELWALL,
-      EL_WALL,
-      EL_EXPANDABLE_WALL,
-      EL_EXPANDABLE_WALL_HORIZONTAL,
-      EL_EXPANDABLE_WALL_VERTICAL,
-      EL_EXPANDABLE_WALL_ANY
-    };
-    static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
-
-    /* special EM style gems behaviour */
-    for (i=0; i<ep_em_slippery_wall_num; i++)
-      SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
-		   level.em_slippery_gems);
-
-    /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
-    SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
-		 (level.em_slippery_gems &&
-		  game.engine_version > VERSION_IDENT(2,0,1)));
-  }
-#endif
 
   /* initialize changing elements information */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
@@ -1161,30 +1139,64 @@ void InitMovDir(int x, int y)
       break;
 
     default:
-      MovDir[x][y] = 1 << RND(4);
-      if (element != EL_BUG &&
-	  element != EL_SPACESHIP &&
-	  element != EL_BD_BUTTERFLY &&
-	  element != EL_BD_FIREFLY)
-	break;
-
-      for (i=0; i<4; i++)
+      if (IS_CUSTOM_ELEMENT(element))
       {
-	int x1 = x + xy[i][0];
-	int y1 = y + xy[i][1];
-
-	if (!IN_LEV_FIELD(x1, y1) || !IS_FREE(x1, y1))
+	if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
+	  MovDir[x][y] = 1 << RND(4);
+	else if (element_info[element].move_pattern == MV_HORIZONTAL)
+	  MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
+	else if (element_info[element].move_pattern == MV_VERTICAL)
+	  MovDir[x][y] = (RND(2) ? MV_UP : MV_DOWN);
+	else if (element_info[element].move_pattern & MV_ANY_DIRECTION)
+	  MovDir[x][y] = element_info[element].move_pattern;
+	else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE ||
+		 element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
 	{
-	  if (element == EL_BUG || element == EL_BD_BUTTERFLY)
+	  for (i=0; i<4; i++)
 	  {
-	    MovDir[x][y] = direction[0][i];
-	    break;
+	    int x1 = x + xy[i][0];
+	    int y1 = y + xy[i][1];
+
+	    if (!IN_LEV_FIELD(x1, y1) || !IS_FREE(x1, y1))
+	    {
+	      if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
+		MovDir[x][y] = direction[0][i];
+	      else
+		MovDir[x][y] = direction[1][i];
+
+	      break;
+	    }
 	  }
-	  else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY ||
-		   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+	}		 
+      }
+      else
+      {
+	MovDir[x][y] = 1 << RND(4);
+
+	if (element != EL_BUG &&
+	    element != EL_SPACESHIP &&
+	    element != EL_BD_BUTTERFLY &&
+	    element != EL_BD_FIREFLY)
+	  break;
+
+	for (i=0; i<4; i++)
+	{
+	  int x1 = x + xy[i][0];
+	  int y1 = y + xy[i][1];
+
+	  if (!IN_LEV_FIELD(x1, y1) || !IS_FREE(x1, y1))
 	  {
-	    MovDir[x][y] = direction[1][i];
-	    break;
+	    if (element == EL_BUG || element == EL_BD_BUTTERFLY)
+	    {
+	      MovDir[x][y] = direction[0][i];
+	      break;
+	    }
+	    else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY ||
+		     element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+	    {
+	      MovDir[x][y] = direction[1][i];
+	      break;
+	    }
 	  }
 	}
       }
@@ -2836,8 +2848,8 @@ void TurnRound(int x, int y)
 
       for (i=0; i<4; i++)
       {
-    	int ex = x + xy[i%4][0];
-    	int ey = y + xy[i%4][1];
+    	int ex = x + xy[i % 4][0];
+    	int ey = y + xy[i % 4][1];
 
     	if (IN_LEV_FIELD(ex, ey) && Feld[ex][ey] == EL_EXIT_OPEN)
 	{
@@ -2849,21 +2861,21 @@ void TurnRound(int x, int y)
     }
 
     MovDir[x][y] = MV_NO_MOVING;
-    if (attr_x<x)
+    if (attr_x < x)
       MovDir[x][y] |= (AllPlayersGone ? MV_RIGHT : MV_LEFT);
-    else if (attr_x>x)
+    else if (attr_x > x)
       MovDir[x][y] |= (AllPlayersGone ? MV_LEFT : MV_RIGHT);
-    if (attr_y<y)
+    if (attr_y < y)
       MovDir[x][y] |= (AllPlayersGone ? MV_DOWN : MV_UP);
-    else if (attr_y>y)
+    else if (attr_y > y)
       MovDir[x][y] |= (AllPlayersGone ? MV_UP : MV_DOWN);
 
     if (element == EL_ROBOT)
     {
       int newx, newy;
 
-      if ((MovDir[x][y]&(MV_LEFT|MV_RIGHT)) && (MovDir[x][y]&(MV_UP|MV_DOWN)))
-	MovDir[x][y] &= (RND(2) ? (MV_LEFT|MV_RIGHT) : (MV_UP|MV_DOWN));
+      if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL)
+	MovDir[x][y] &= (RND(2) ? MV_HORIZONTAL : MV_VERTICAL);
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && IS_FREE_OR_PLAYER(newx, newy))
@@ -2877,13 +2889,13 @@ void TurnRound(int x, int y)
 
       MovDelay[x][y] = 1;
 
-      if ((MovDir[x][y]&(MV_LEFT|MV_RIGHT)) && (MovDir[x][y]&(MV_UP|MV_DOWN)))
+      if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL)
       {
 	boolean first_horiz = RND(2);
 	int new_move_dir = MovDir[x][y];
 
 	MovDir[x][y] =
-	  new_move_dir & (first_horiz ? (MV_LEFT|MV_RIGHT) : (MV_UP|MV_DOWN));
+	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
 	if (IN_LEV_FIELD(newx, newy) &&
@@ -2895,7 +2907,7 @@ void TurnRound(int x, int y)
 	  return;
 
 	MovDir[x][y] =
-	  new_move_dir & (!first_horiz ? (MV_LEFT|MV_RIGHT) : (MV_UP|MV_DOWN));
+	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
 	if (IN_LEV_FIELD(newx, newy) &&
@@ -2909,6 +2921,124 @@ void TurnRound(int x, int y)
 	MovDir[x][y] = old_move_dir;
 	return;
       }
+    }
+  }
+  else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
+  {
+    boolean can_turn_left = FALSE, can_turn_right = FALSE;
+
+    if (IN_LEV_FIELD(left_x, left_y) && IS_FREE(left_x, left_y))
+      can_turn_left = TRUE;
+    if (IN_LEV_FIELD(right_x, right_y) && IS_FREE(right_x, right_y))
+      can_turn_right = TRUE;
+
+    if (can_turn_left && can_turn_right)
+      MovDir[x][y] = (RND(3) ? (RND(2) ? left_dir : right_dir) : back_dir);
+    else if (can_turn_left)
+      MovDir[x][y] = (RND(2) ? left_dir : back_dir);
+    else if (can_turn_right)
+      MovDir[x][y] = (RND(2) ? right_dir : back_dir);
+    else
+      MovDir[x][y] = back_dir;
+
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
+  else if (element_info[element].move_pattern == MV_HORIZONTAL ||
+	   element_info[element].move_pattern == MV_VERTICAL)
+  {
+    MovDir[x][y] = back_dir;
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
+  else if (element_info[element].move_pattern & MV_ANY_DIRECTION)
+  {
+    MovDir[x][y] = element_info[element].move_pattern;
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
+  else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE)
+  {
+    if (IN_LEV_FIELD(left_x, left_y) && IS_FREE(left_x, left_y))
+      MovDir[x][y] = left_dir;
+    else if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y))
+      MovDir[x][y] = right_dir;
+
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
+  else if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
+  {
+    if (IN_LEV_FIELD(right_x, right_y) && IS_FREE(right_x, right_y))
+      MovDir[x][y] = right_dir;
+    else if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y))
+      MovDir[x][y] = left_dir;
+
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
+  else if (element_info[element].move_pattern == MV_TOWARDS_PLAYER ||
+	   element_info[element].move_pattern == MV_AWAY_FROM_PLAYER)
+  {
+    int attr_x = -1, attr_y = -1;
+    int newx, newy;
+    boolean move_away =
+      (element_info[element].move_pattern == MV_AWAY_FROM_PLAYER);
+
+    if (AllPlayersGone)
+    {
+      attr_x = ExitX;
+      attr_y = ExitY;
+    }
+    else
+    {
+      int i;
+
+      for (i=0; i<MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+	int jx = player->jx, jy = player->jy;
+
+	if (!player->active)
+	  continue;
+
+	if (attr_x == -1 || ABS(jx-x)+ABS(jy-y) < ABS(attr_x-x)+ABS(attr_y-y))
+	{
+	  attr_x = jx;
+	  attr_y = jy;
+	}
+      }
+    }
+
+    MovDir[x][y] = MV_NO_MOVING;
+    if (attr_x < x)
+      MovDir[x][y] |= (move_away ? MV_RIGHT : MV_LEFT);
+    else if (attr_x > x)
+      MovDir[x][y] |= (move_away ? MV_LEFT : MV_RIGHT);
+    if (attr_y < y)
+      MovDir[x][y] |= (move_away ? MV_DOWN : MV_UP);
+    else if (attr_y > y)
+      MovDir[x][y] |= (move_away ? MV_UP : MV_DOWN);
+
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+
+    if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL)
+    {
+      boolean first_horiz = RND(2);
+      int new_move_dir = MovDir[x][y];
+
+      MovDir[x][y] =
+	new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
+      Moving2Blocked(x, y, &newx, &newy);
+
+      if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
+				       Feld[newx][newy] == EL_ACID))
+	return;
+
+      MovDir[x][y] =
+	new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
+      Moving2Blocked(x, y, &newx, &newy);
+
+      if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
+				       Feld[newx][newy] == EL_ACID))
+	return;
+
+      MovDir[x][y] = old_move_dir;
     }
   }
 }
@@ -3198,7 +3328,8 @@ void StartMoving(int x, int y)
 
       if (element != EL_YAMYAM &&
 	  element != EL_DARK_YAMYAM &&
-	  element != EL_PACMAN)
+	  element != EL_PACMAN &&
+	  !(element_info[element].move_pattern & MV_ANY_DIRECTION))
       {
 	TurnRound(x, y);
 

@@ -1172,7 +1172,7 @@ struct ElementInfo
   int move_delay_fixed;		/* constant frame delay for moving */
   int move_delay_random;	/* additional random frame delay for moving */
 
-  int move_direction;		/* direction movable element moves to */
+  int move_pattern;		/* direction movable element moves to */
 
   int walk_to_action;		/* only for level editor; not stored */
   int walkable_layer;		/* only for level editor; not stored */
