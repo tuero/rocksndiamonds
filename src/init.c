@@ -777,7 +777,6 @@ static void InitGraphicInfo()
 {
   static boolean clipmasks_initialized = FALSE;
   static int gfx_action[NUM_IMAGE_FILES];
-  Bitmap *src_bitmap;
   int src_x, src_y;
   int first_frame, last_frame;
   int i;
@@ -827,9 +826,12 @@ static void InitGraphicInfo()
 
   for (i=0; i<NUM_IMAGE_FILES; i++)
   {
+    Bitmap *src_bitmap = getBitmapFromImageID(i);
+    int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
+    int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
     int *parameter = image_files[i].parameter;
 
-    new_graphic_info[i].bitmap = getBitmapFromImageID(i);
+    new_graphic_info[i].bitmap = src_bitmap;
 
     new_graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
     new_graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
@@ -849,7 +851,15 @@ static void InitGraphicInfo()
     if (parameter[GFX_ARG_YOFFSET] != GFX_ARG_UNDEFINED_VALUE)
       new_graphic_info[i].offset_y = parameter[GFX_ARG_YOFFSET];
 
-    new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
+    /* automatically determine correct number of frames, if not defined */
+    if (parameter[GFX_ARG_FRAMES] != GFX_ARG_UNDEFINED_VALUE)
+      new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
+    else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
+      new_graphic_info[i].anim_frames =	num_xtiles;
+    else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
+      new_graphic_info[i].anim_frames =	num_ytiles;
+    else
+      new_graphic_info[i].anim_frames = 1;
 
     new_graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
     if (new_graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
@@ -864,7 +874,7 @@ static void InitGraphicInfo()
       new_graphic_info[i].anim_mode = ANIM_PINGPONG;
     else if (parameter[GFX_ARG_MODE_PINGPONG2])
       new_graphic_info[i].anim_mode = ANIM_PINGPONG2;
-    else if (parameter[GFX_ARG_FRAMES] > 1)
+    else if (new_graphic_info[i].anim_frames > 1)
       new_graphic_info[i].anim_mode = ANIM_LOOP;
     else
       new_graphic_info[i].anim_mode = ANIM_NONE;
@@ -930,8 +940,8 @@ static void InitGraphicInfo()
 	    getTokenFromImageID(i));
       Error(ERR_RETURN, "- image file: '%s'",
 	    src_bitmap->source_filename);
-      Error(ERR_EXIT, "error: last animation frame out of bounds (%d,%d)",
-	    src_x, src_y);
+      Error(ERR_EXIT, "error: last animation frame (%d) out of bounds (%d,%d)",
+	    last_frame, src_x, src_y);
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)

@@ -1566,8 +1566,13 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     {
       char *filename = getTokenValue(setup_file_list, file_list[i].token);
 
-      if (filename == NULL)
+      if (filename)
+	for (j=0; j<num_suffix_list_entries; j++)
+	  file_list[i].parameter[j] =
+	    get_parameter_value(suffix_list[j].type, suffix_list[j].value);
+      else
 	filename = file_list[i].default_filename;
+
       file_list[i].filename = getStringCopy(filename);
 
       for (j=0; j<num_suffix_list_entries; j++)

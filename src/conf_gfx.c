@@ -15,6 +15,10 @@
 #include "main.h"
 
 
+/* List values that are not defined in the configuration file are set to
+   reliable default values. If that value is GFX_ARG_UNDEFINED, it will
+   be dynamically determined, using some of the other list values. */
+
 struct ConfigInfo image_config_suffix[] =
 {
   { ".xpos",				"0",			TYPE_INTEGER },
@@ -23,7 +27,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".vertical",			"false",		TYPE_BOOLEAN },
   { ".xoffset",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
   { ".yoffset",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
-  { ".frames",				"1",			TYPE_INTEGER },
+  { ".frames",				GFX_ARG_UNDEFINED,	TYPE_INTEGER },
   { ".start_frame",			GFX_ARG_UNDEFINED,	TYPE_INTEGER },
   { ".delay",				"1",			TYPE_INTEGER },
   { ".mode_loop",			"false",		TYPE_BOOLEAN },
