@@ -114,7 +114,11 @@ void InitGame()
 
 
     /* TEST TEST TEST */
+
+    /*
     stored_player[i].active = TRUE;
+    */
+
     /* TEST TEST TEST */
 
     player->LevelSolved = FALSE;
@@ -170,6 +174,8 @@ void InitGame()
 	/* remove duplicate players */
 	if (StorePlayer[jx][jy] == Feld[x][y])
 	  StorePlayer[jx][jy] = 0;
+
+	player->active = TRUE;
 
 	StorePlayer[x][y] = Feld[x][y];
 	Feld[x][y] = EL_LEERRAUM;
@@ -2798,7 +2804,7 @@ void GameActions(int player_action)
   {
     /* TEST TEST TEST */
 
-    if (i != TestPlayer)
+    if (i != TestPlayer && !stored_player[i].MovPos)
       continue;
 
     /* TEST TEST TEST */

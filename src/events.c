@@ -673,7 +673,9 @@ void HandleKey(KeySym key, int key_status)
 	  {
 	    char *color[] = { "yellow", "red", "green", "blue" };
 
-	    TestPlayer = (TestPlayer + 1) % MAX_PLAYERS;
+	    do
+	      TestPlayer = (TestPlayer + 1) % MAX_PLAYERS;
+	    while(!stored_player[TestPlayer].active);
 
 	    printf("TestPlayer = %d (%s player)\n",
 		   TestPlayer, color[TestPlayer]);
