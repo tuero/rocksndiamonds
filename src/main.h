@@ -848,24 +848,28 @@
 #define FONT_TITLE_2				5
 #define FONT_MENU_1				6
 #define FONT_MENU_2				7
-#define FONT_TEXT_1				8
-#define FONT_TEXT_2				9
-#define FONT_TEXT_3				10
-#define FONT_TEXT_4				11
-#define FONT_INPUT_1_ACTIVE			12
-#define FONT_INPUT_1				13
-#define FONT_INPUT_2_ACTIVE			14
-#define FONT_INPUT_2				15
-#define FONT_OPTION_OFF				16
-#define FONT_OPTION_ON				17
-#define FONT_VALUE_1				18
-#define FONT_VALUE_2				19
-#define FONT_VALUE_OLD				20
-#define FONT_LEVEL_NUMBER			21
-#define FONT_TAPE_RECORDER			22
-#define FONT_GAME_INFO				23
+#define FONT_TEXT_1_ACTIVE			8
+#define FONT_TEXT_2_ACTIVE			9
+#define FONT_TEXT_3_ACTIVE			10
+#define FONT_TEXT_4_ACTIVE			11
+#define FONT_TEXT_1				12
+#define FONT_TEXT_2				13
+#define FONT_TEXT_3				14
+#define FONT_TEXT_4				15
+#define FONT_INPUT_1_ACTIVE			16
+#define FONT_INPUT_2_ACTIVE			17
+#define FONT_INPUT_1				18
+#define FONT_INPUT_2				19
+#define FONT_OPTION_OFF				20
+#define FONT_OPTION_ON				21
+#define FONT_VALUE_1				22
+#define FONT_VALUE_2				23
+#define FONT_VALUE_OLD				24
+#define FONT_LEVEL_NUMBER			25
+#define FONT_TAPE_RECORDER			26
+#define FONT_GAME_INFO				27
 
-#define NUM_FONTS				24
+#define NUM_FONTS				28
 #define NUM_INITIAL_FONTS			4
 
 /* values for game_status */

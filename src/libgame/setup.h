@@ -227,14 +227,14 @@ boolean checkCookieString(const char *, const char *);
 
 char *getFormattedSetupEntry(char *, char *);
 
-void freeSetupFileList(struct SetupFileList *);
 struct SetupFileList *newSetupFileList(char *, char *);
+void freeSetupFileList(struct SetupFileList *);
 char *getListEntry(struct SetupFileList *, char *);
 void setListEntry(struct SetupFileList *, char *, char *);
 SetupFileList *loadSetupFileList(char *);
 
-void freeSetupFileHash(SetupFileHash *);
 SetupFileHash *newSetupFileHash();
+void freeSetupFileHash(SetupFileHash *);
 char *getHashEntry(SetupFileHash *, char *);
 void setHashEntry(SetupFileHash *, char *, char *);
 SetupFileHash *loadSetupFileHash(char *);

@@ -3004,6 +3004,9 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 /* font definitions                                                          */
 /* ------------------------------------------------------------------------- */
 
+/* Important: When one entry is a prefix of another entry, the longer entry
+   must come first, because the dynamic configuration does prefix matching! */
+
 struct FontInfo font_info[NUM_FONTS + 1] =
 {
   { "font.initial_1"		},
@@ -3014,13 +3017,17 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.title_2"		},
   { "font.menu_1"		},
   { "font.menu_2"		},
+  { "font.text_1.active"	},
+  { "font.text_2.active"	},
+  { "font.text_3.active"	},
+  { "font.text_4.active"	},
   { "font.text_1"		},
   { "font.text_2"		},
   { "font.text_3"		},
   { "font.text_4"		},
   { "font.input_1.active"	},
-  { "font.input_1"		},
   { "font.input_2.active"	},
+  { "font.input_1"		},
   { "font.input_2"		},
   { "font.option_off"		},
   { "font.option_on"		},

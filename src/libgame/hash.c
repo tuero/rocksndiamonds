@@ -57,6 +57,7 @@ create_hashtable(unsigned int minsize, float maxloadfactor,
     if (NULL == h) return NULL; /*oom*/
     h->table = (struct entry **)malloc(sizeof(struct entry*) * size);
     if (NULL == h->table) { free(h); return NULL; } /*oom*/
+
     for (i=0;i<size;i++) { h->table[i] = NULL; }
     h->tablelength  = size;
     h->entrycount   = 0;
@@ -194,9 +195,9 @@ hashtable_change(struct hashtable *h, void *k, void *v)
         /* Check hash value to short circuit heavier comparison */
         if ((hashvalue == e->h) && (h->eqfn(k, e->k)))
 	{
-	  free(e->v);
-	  e->v = v;
-	  return -1;
+	    free(e->v);
+	    e->v = v;
+	    return -1;
 	}
         e = e->next;
     }
@@ -260,24 +261,23 @@ hashtable_destroy(struct hashtable *h, int free_values)
     unsigned int i;
     struct entry *e, *f;
     struct entry **table = h->table;
-    if (free_values)
+
+    for (i = 0; i < h->tablelength; i++)
     {
-        for (i = 0; i < h->tablelength; i++)
-        {
-            e = table[i];
-            while (NULL != e)
-            { f = e; e = e->next; free(f->k); free(f->v); free(f); }
-        }
+        e = table[i];
+        while (NULL != e)
+	{
+	    f = e;
+	    e = e->next;
+	    free(f->k);
+	    if (free_values)
+	        free(f->v);
+	    free(f);
+	}
     }
-    else
-    {
-        for (i = 0; i < h->tablelength; i++)
-        {
-            e = table[i];
-            while (NULL != e)
-            { f = e; e = e->next; free(f->k); free(f); }
-        }
-    }
+
+    free(h->table);
+    free(h);
 }
 
 

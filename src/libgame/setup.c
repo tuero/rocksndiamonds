@@ -1040,6 +1040,18 @@ char *getFormattedSetupEntry(char *token, char *value)
   return entry;
 }
 
+SetupFileList *newSetupFileList(char *token, char *value)
+{
+  SetupFileList *new = checked_malloc(sizeof(SetupFileList));
+
+  new->token = getStringCopy(token);
+  new->value = getStringCopy(value);
+
+  new->next = NULL;
+
+  return new;
+}
+
 void freeSetupFileList(SetupFileList *list)
 {
   if (list == NULL)
@@ -1052,18 +1064,6 @@ void freeSetupFileList(SetupFileList *list)
   if (list->next)
     freeSetupFileList(list->next);
   free(list);
-}
-
-SetupFileList *newSetupFileList(char *token, char *value)
-{
-  SetupFileList *new = checked_malloc(sizeof(SetupFileList));
-
-  new->token = getStringCopy(token);
-  new->value = getStringCopy(value);
-
-  new->next = NULL;
-
-  return new;
 }
 
 char *getListEntry(SetupFileList *list, char *token)
@@ -1147,21 +1147,20 @@ static int keys_are_equal(void *key1, void *key2)
   return (strcmp((char *)key1, (char *)key2) == 0);
 }
 
-void freeSetupFileHash(SetupFileHash *hash)
-{
-  if (hash == NULL)
-    return;
-
-  hashtable_destroy(hash, 1);	/* 1 == also free values */
-  free(hash);
-}
-
 SetupFileHash *newSetupFileHash()
 {
   SetupFileHash *new_hash =
     create_hashtable(16, 0.75, get_hash_from_key, keys_are_equal);
 
   return new_hash;
+}
+
+void freeSetupFileHash(SetupFileHash *hash)
+{
+  if (hash == NULL)
+    return;
+
+  hashtable_destroy(hash, 1);	/* 1 == also free values stored in hash */
 }
 
 char *getHashEntry(SetupFileHash *hash, char *token)

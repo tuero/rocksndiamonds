@@ -1554,16 +1554,22 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
   for(i=0; i<MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
     int entry = first_entry + i;
+    boolean active = (entry == highlight_position);
+    int font_nr1 = (active ? FONT_TEXT_1_ACTIVE : FONT_TEXT_1);
+    int font_nr2 = (active ? FONT_TEXT_2_ACTIVE : FONT_TEXT_2);
+    int font_nr3 = (active ? FONT_TEXT_3_ACTIVE : FONT_TEXT_3);
+    int font_nr4 = (active ? FONT_TEXT_4_ACTIVE : FONT_TEXT_4);
+    int dx1 = 3 * getFontWidth(font_nr1);
+    int dx2 = dx1 + getFontWidth(font_nr1);
+    int dx3 = dx2 + 25 * getFontWidth(font_nr3);
+    int sy = mSY + 64 + i * 32;
 
-    DrawText(mSX, mSY + 64 + i * 32, "..................................",
-	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
-    DrawText(mSX, mSY + 64 + i * 32, int2str(entry + 1, 3),
-	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
-    DrawText(mSX + 64, mSY + 64 + i * 32, highscore[entry].Name,
-	     (entry == highlight_position ? FONT_TEXT_3 : FONT_TEXT_1));
-    DrawText(mSX + 14 * 32 + 16, mSY + 64 + i * 32,
-	     int2str(highscore[entry].Score, 5),
-	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
+    DrawText(mSX, sy, int2str(entry + 1, 3), font_nr1);
+    DrawText(mSX + dx1, sy, ".", font_nr1);
+    DrawText(mSX + dx2, sy, ".........................", font_nr3);
+    if (strcmp(highscore[entry].Name, EMPTY_PLAYER_NAME) != 0)
+      DrawText(mSX + dx2, sy, highscore[entry].Name, font_nr2);
+    DrawText(mSX + dx3, sy, int2str(highscore[entry].Score, 5), font_nr4);
   }
 }
 

@@ -3641,7 +3641,7 @@ static void DrawPropertiesTabulatorGadgets()
   struct GadgetDesign *gd = &gd_gi->alt_design[GD_BUTTON_UNPRESSED];
   int gd_x = gd->x + gd_gi->border.width / 2;
   int gd_y = gd->y + gd_gi->height - 1;
-  Pixel line_color = GetPixel(gd->bitmap, gd_x, gd_y);
+  Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
   int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
   int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
   int i;
@@ -3659,19 +3659,23 @@ static void DrawPropertiesTabulatorGadgets()
     int gadget_id = textbutton_info[i].gadget_id;
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
     boolean active = (i != edit_mode_properties);
-    Pixel color = (active ? BLACK_PIXEL : line_color);
 
-    /* draw solid or black line below tabulator button */
-    FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, color);
+    /* draw background line below tabulator button */
+    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width,1);
+
+    /* draw solid line below inactive tabulator buttons */
+    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
+      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width,1, tab_color);
 
     ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
     MapTextbuttonGadget(i);
   }
 
   /* draw little border line below tabulator buttons */
-  FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
-		3 * gd_gi->width + 2 * ED_GADGET_DISTANCE, ED_GADGET_DISTANCE,
-		line_color);
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
+		  3 * gd_gi->width + 2 * ED_GADGET_DISTANCE,
+		  ED_GADGET_DISTANCE, tab_color);
 }
 
 static void DrawPropertiesInfo()
