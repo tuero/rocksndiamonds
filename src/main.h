@@ -920,8 +920,8 @@ struct PlayerInfo
 				   through doors); overrides other actions */
 
   int jx,jy, last_jx,last_jy;
-  int MovDir, MovPos, GfxPos;
-  int Frame;
+  int MovDir, MovPos, GfxDir, GfxPos;
+  int Frame, StepFrame;
 
   int GfxAction;
 

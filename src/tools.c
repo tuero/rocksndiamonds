@@ -542,6 +542,7 @@ void DrawPlayer(struct PlayerInfo *player)
   int graphic;
   int frame = 0;
   boolean player_is_moving = (last_jx != jx || last_jy != jy ? TRUE : FALSE);
+  int current_action = ACTION_DEFAULT;
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
@@ -558,6 +559,13 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (element == EL_EXPLOSION)
     return;
+
+  current_action = (player->Pushing ? ACTION_PUSHING :
+		    player->is_digging ? ACTION_DIGGING :
+		    player->is_moving ? ACTION_MOVING :
+		    player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
+
+  InitPlayerGfxAnimation(player, current_action, player->MovDir);
 
   /* ----------------------------------------------------------------------- */
   /* draw things in the field the player is leaving, if needed               */
@@ -616,7 +624,8 @@ void DrawPlayer(struct PlayerInfo *player)
       int old_element = GfxElement[jx][jy];
       int old_graphic =
 	el_act_dir2img(old_element, ACTION_DIGGING, player->MovDir);
-      int frame = getGraphicAnimationFrame(old_graphic, player->Frame);
+      int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
+
 #if 0
       Bitmap *src_bitmap;
       int src_x, src_y;
@@ -650,10 +659,10 @@ void DrawPlayer(struct PlayerInfo *player)
 		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
 #else
 #if 0
-      printf("::: %d, %d, %d, %d => %d, %d [%d]\n",
+      printf("::: %d, %d, %d, %d => %d, %d [%d, %d, %d]\n",
 	     old_element, ACTION_DIGGING, player->MovDir, player->Frame,
 	     old_graphic, frame,
-	     player->GfxPos);
+	     player->MovPos, player->GfxPos, player->StepFrame);
 #endif
 
       DrawGraphic(sx, sy, old_graphic, frame);
@@ -670,11 +679,6 @@ void DrawPlayer(struct PlayerInfo *player)
   /* ----------------------------------------------------------------------- */
   /* draw player himself                                                     */
   /* ----------------------------------------------------------------------- */
-
-  player->GfxAction = (player->Pushing ? ACTION_PUSHING :
-		       player->is_digging ? ACTION_DIGGING :
-		       player->is_moving ? ACTION_MOVING :
-		       player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
 
   if (player->use_murphy_graphic)
   {

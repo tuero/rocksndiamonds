@@ -643,9 +643,10 @@ void InitGame()
     player->Pushing = FALSE;
     player->Switching = FALSE;
     player->GfxPos = 0;
-    player->Frame = 0;
-
+    player->GfxDir = MV_NO_MOVING;
     player->GfxAction = ACTION_DEFAULT;
+    player->Frame = 0;
+    player->StepFrame = 0;
 
     player->use_murphy_graphic = FALSE;
     player->use_disk_red_graphic = FALSE;
@@ -1261,12 +1262,19 @@ int NewHiScore()
   return position;
 }
 
-static void InitPlayerGfxAnimation(struct PlayerInfo *player, int action)
+void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
 {
-  if (player->GfxAction != action)
+  if (player->GfxAction != action || player->GfxDir != dir)
   {
+#if 0
+    printf("Player frame reset! (%d => %d, %d => %d)\n",
+	   player->GfxAction, action, player->GfxDir, dir);
+#endif
+
     player->GfxAction = action;
+    player->GfxDir = dir;
     player->Frame = 0;
+    player->StepFrame = 0;
   }
 }
 
@@ -4465,7 +4473,13 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     CheckGravityMovement(player);
 
     if (player->MovPos == 0)
-      InitPlayerGfxAnimation(player, ACTION_DEFAULT);
+    {
+#if 0
+      printf("Trying... Player frame reset\n");
+#endif
+
+      InitPlayerGfxAnimation(player, ACTION_DEFAULT, player->MovDir);
+    }
 
     if (player->MovPos == 0)	/* needed for tape.playing */
       player->is_moving = FALSE;
@@ -4898,12 +4912,31 @@ void GameActions()
     redraw_mask |= REDRAW_FPS;
   }
 
+#if 0
+  if (stored_player[0].jx != stored_player[0].last_jx ||
+      stored_player[0].jy != stored_player[0].last_jy)
+    printf("::: %d, %d, %d, %d, %d\n",
+	   stored_player[0].MovDir,
+	   stored_player[0].MovPos,
+	   stored_player[0].GfxPos,
+	   stored_player[0].Frame,
+	   stored_player[0].StepFrame);
+#endif
+
 #if 1
   FrameCounter++;
   TimeFrames++;
 
   for (i=0; i<MAX_PLAYERS; i++)
-    stored_player[i].Frame++;
+  {
+    int move_frames =
+      MOVE_DELAY_NORMAL_SPEED /  stored_player[i].move_delay_value;
+
+    stored_player[i].Frame += move_frames;
+
+    if (stored_player[i].MovPos != 0)
+      stored_player[i].StepFrame += move_frames;
+  }
 #endif
 }
 
@@ -5200,7 +5233,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     }
   }
 
-#if 1
+#if 0
 #if 1
   InitPlayerGfxAnimation(player, ACTION_DEFAULT);
 #else
@@ -5208,6 +5241,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     player->Frame = 0;
 #endif
 #endif
+
+  player->StepFrame = 0;
 
   if (moved & MF_MOVING)
   {
@@ -5628,7 +5663,8 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
-  player->is_digging = FALSE;
+  if (player->MovPos == 0)
+    player->is_digging = FALSE;
 
   if (player->MovPos == 0)
     player->Pushing = FALSE;
@@ -6355,7 +6391,10 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
       player->Pushing = FALSE;
 
     player->snapped = FALSE;
-    player->is_digging = FALSE;
+
+    if (player->MovPos == 0)
+      player->is_digging = FALSE;
+
     return FALSE;
   }
 
