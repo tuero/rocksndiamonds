@@ -152,10 +152,7 @@ struct SoundControl
 };
 typedef struct SoundControl SoundControl;
 
-static struct ArtworkListInfo sound_info;
-
-static struct ArtworkConfigInfo *sound_config = NULL;
-static ListNode *SoundFileList = NULL;
+static struct ArtworkListInfo *sound_info = NULL;
 static SoundInfo **Sound = NULL;
 static MusicInfo **Music = NULL;
 static int num_sounds = 0, num_music = 0;
@@ -1724,126 +1721,24 @@ static void *Load_WAV(char *filename)
   return snd_info;
 }
 
-static void deleteSoundEntry(SoundInfo **snd_info)
-{
-  if (*snd_info)
-  {
-    char *filename = (*snd_info)->source_filename;
-
-#if 0
-    printf("[decrementing reference counter of sound '%s']\n", filename);
-#endif
-
-    if (--(*snd_info)->num_references <= 0)
-    {
-#if 0
-      printf("[deleting sound '%s']\n", filename);
-#endif
-
-      /*
-      FreeSound(*snd_info);
-      */
-      deleteNodeFromList(&SoundFileList, filename, FreeSound);
-    }
-
-    *snd_info = NULL;
-  }
-}
-
-static void replaceSoundEntry(SoundInfo **snd_info, char *filename)
-{
-  ListNode *node;
-
-  /* check if the old and the new sound file are the same */
-  if (*snd_info && strcmp((*snd_info)->source_filename, filename) == 0)
-  {
-    /* The old and new sound are the same (have the same filename and path).
-       This usually means that this sound does not exist in this sound set
-       and a fallback to the existing sound is done. */
-
-#if 0
-    printf("[sound '%s' already exists (same list entry)]\n", filename);
-#endif
-
-    return;
-  }
-
-  /* delete existing sound file entry */
-  deleteSoundEntry(snd_info);
-
-  /* check if the new sound file already exists in the list of sounds */
-  if ((node = getNodeFromKey(SoundFileList, filename)) != NULL)
-  {
-#if 0
-      printf("[sound '%s' already exists (other list entry)]\n", filename);
-#endif
-
-      *snd_info = (SoundInfo *)node->content;
-      (*snd_info)->num_references++;
-  }
-  else if ((*snd_info = Load_WAV(filename)) != NULL)	/* load new sound */
-  {
-    (*snd_info)->num_references = 1;
-    addNodeToList(&SoundFileList, (*snd_info)->source_filename, *snd_info);
-  }
-}
-
-static void LoadCustomSound(SoundInfo **snd_info, char *basename)
-{
-  char *filename = getCustomSoundFilename(basename);
-
-#if 0
-  printf("GOT CUSTOM SOUND FILE '%s'\n", filename);
-#endif
-
-  if (strcmp(basename, SND_FILE_UNDEFINED) == 0)
-  {
-    deleteSoundEntry(snd_info);
-    return;
-  }
-
-  if (filename == NULL)
-  {
-    Error(ERR_WARN, "cannot find sound file '%s'", basename);
-    return;
-  }
-
-  replaceSoundEntry(snd_info, filename);
-}
-
 void InitSoundList(struct ArtworkConfigInfo *config_list, int num_list_entries)
 {
-  if (Sound == NULL)
-    Sound = checked_calloc(num_list_entries * sizeof(SoundInfo *));
+  if (sound_info == NULL)
+    sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
 
-  sound_config = config_list;
-  num_sounds = num_list_entries;
+  if (sound_info->artwork_list == NULL)
+    sound_info->artwork_list =
+      checked_calloc(num_list_entries * sizeof(SoundInfo *));
 
-  sound_info.type = ARTWORK_TYPE_SOUNDS;
-  sound_info.num_list_entries = num_list_entries;
-  sound_info.config_list = config_list;
-  sound_info.artwork_list = (struct ArtworkListNodeInfo **)Sound;
-  sound_info.file_list = NULL;
-  sound_info.load_artwork = Load_WAV;
-  sound_info.free_artwork = FreeSound;
-}
+  sound_info->type = ARTWORK_TYPE_SOUNDS;
+  sound_info->num_list_entries = num_list_entries;
+  sound_info->config_list = config_list;
+  sound_info->file_list = NULL;
+  sound_info->load_artwork = Load_WAV;
+  sound_info->free_artwork = FreeSound;
 
-void LoadSoundToList(char *basename, int list_pos)
-{
-  if (Sound == NULL || list_pos >= num_sounds)
-    return;
-
-#if 0
-  printf("loading sound '%s' ...  [%d]\n",
-	 basename, getNumNodes(SoundFileList));
-#endif
-
-  LoadCustomSound(&Sound[list_pos], basename);
-
-#if 0
-  printf("loading sound '%s' done [%d]\n",
-	 basename, getNumNodes(SoundFileList));
-#endif
+  num_sounds = sound_info->num_list_entries;
+  Sound = (SoundInfo **)sound_info->artwork_list;
 }
 
 static MusicInfo *Load_MOD(char *filename)
@@ -2048,62 +1943,19 @@ void StopSoundExt(int nr, int state)
   HandleSoundRequest(snd_ctrl);
 }
 
-#if 1
 static void ReloadCustomSounds()
 {
-  ReloadCustomArtworkFiles(&sound_info);
+#if 0
+  printf("DEBUG: reloading sounds '%s' ...\n", artwork.snd_current_identifier);
+#endif
+
+  ReloadCustomArtworkList(sound_info);
 }
-#else
-static void ReloadCustomSounds()
-{
-  static boolean draw_init_text = TRUE;		/* only draw at startup */
-  int i;
-
-#if 0
-  printf("DEBUG: reloading sounds '%s' ...\n",artwork.snd_current_identifier);
-#endif
-
-  LoadArtworkConfig(&sound_info);
-
-  if (draw_init_text)
-    DrawInitText("Loading sounds:", 120, FC_GREEN);
-
-#if 0
-  printf("DEBUG: reloading %d sounds ...\n", num_sounds);
-#endif
-
-  for(i=0; i<num_sounds; i++)
-  {
-    if (draw_init_text)
-      DrawInitText(sound_config[i].token, 150, FC_YELLOW);
-
-    if (sound_config[i].filename)
-      LoadSoundToList(sound_config[i].filename, i);
-    else
-      LoadSoundToList(sound_config[i].default_filename, i);
-  }
-
-  draw_init_text = FALSE;
-
-  /*
-  printf("list size == %d\n", getNumNodes(SoundFileList));
-  */
-
-#if 0
-  dumpList(SoundFileList);
-#endif
-}
-#endif
 
 static void ReloadCustomMusic()
 {
 #if 0
   printf("DEBUG: reloading music '%s' ...\n", artwork.mus_current_identifier);
-#endif
-
-#if 0
-  /* this is done directly in LoadCustomMusic() now */
-  FreeAllMusic();
 #endif
 
   LoadCustomMusic();
@@ -2181,31 +2033,7 @@ void FreeMusic(MusicInfo *music)
 
 void FreeAllSounds()
 {
-  int i;
-
-  if (Sound == NULL)
-    return;
-
-#if 0
-  printf("%s: FREEING SOUNDS ...\n",
-	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
-#endif
-
-  for(i=0; i<num_sounds; i++)
-    deleteSoundEntry(&Sound[i]);
-  /*
-    FreeSound(Sound[i]);
-  */
-
-#if 0
-  printf("%s: FREEING SOUNDS -- DONE\n",
-	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
-#endif
-
-  free(Sound);
-
-  Sound = NULL;
-  num_sounds = 0;
+  FreeCustomArtworkList(sound_info);
 }
 
 void FreeAllMusic()

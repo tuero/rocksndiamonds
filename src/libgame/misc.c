@@ -1500,7 +1500,7 @@ void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 #endif
 }
 
-void ReloadCustomArtworkFiles(struct ArtworkListInfo *artwork_info)
+void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
   static struct
   {
@@ -1518,14 +1518,6 @@ void ReloadCustomArtworkFiles(struct ArtworkListInfo *artwork_info)
   int num_list_entries = artwork_info->num_list_entries;
   struct ArtworkConfigInfo *config_list = artwork_info->config_list;
   int i;
-
-#if 0
-  Delay(5000);
-#endif
-
-#if 0
-  printf("DEBUG: reloading sounds '%s' ...\n",artwork.snd_current_identifier);
-#endif
 
   LoadArtworkConfig(artwork_info);
 
@@ -1556,6 +1548,32 @@ void ReloadCustomArtworkFiles(struct ArtworkListInfo *artwork_info)
 #if 0
   dumpList(artwork_info->file_list);
 #endif
+}
+
+void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
+{
+  int i;
+
+  if (artwork_info->artwork_list == NULL)
+    return;
+
+#if 0
+  printf("%s: FREEING ARTWORK ...\n",
+	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+#endif
+
+  for(i=0; i<artwork_info->num_list_entries; i++)
+    deleteArtworkListEntry(artwork_info, &artwork_info->artwork_list[i]);
+
+#if 0
+  printf("%s: FREEING ARTWORK -- DONE\n",
+	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+#endif
+
+  free(artwork_info->artwork_list);
+
+  artwork_info->artwork_list = NULL;
+  artwork_info->num_list_entries = 0;
 }
 
 

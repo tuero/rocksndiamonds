@@ -126,10 +126,8 @@ boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
 
-/*
-void LoadArtworkConfig(struct ArtworkListInfo *);
-*/
-void ReloadCustomArtworkFiles(struct ArtworkListInfo *);
+void ReloadCustomArtworkList(struct ArtworkListInfo *);
+void FreeCustomArtworkList(struct ArtworkListInfo *);
 
 
 #if !defined(PLATFORM_UNIX)
