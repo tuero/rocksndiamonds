@@ -1118,9 +1118,16 @@ void Explode(int ex, int ey, int phase, int mode)
       RemoveMovingField(ex, ey);
     }
 
-    for (y=ey-1; y<ey+2; y++) for(x=ex-1; x<ex+2; x++)
+    for (y=ey-1; y<=ey+1; y++) for(x=ex-1; x<=ex+1; x++)
     {
-      int element = Feld[x][y];
+      int element;
+
+      if (!IN_LEV_FIELD(x, y) ||
+	  ((mode != EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
+	   (x != ex || y != ey)))
+	continue;
+
+      element = Feld[x][y];
 
       if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
       {
@@ -1128,11 +1135,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(element) || element == EL_BURNING)
-	continue;
-
-      if ((mode != EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
-	  (x != ex || y != ey))
+      if (IS_MASSIVE(element) || element == EL_BURNING)
 	continue;
 
       if (element == EL_EXPLODING)
