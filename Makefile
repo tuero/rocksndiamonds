@@ -24,7 +24,13 @@ clean:
 	$(MAKE_CMD) clean
 
 backup:
-	./Scripts/make_backup.sh
+	./Scripts/make_backup.sh src
+
+backup_lev:
+	./Scripts/make_backup.sh lev
+
+backup_gfx:
+	./Scripts/make_backup.sh gfx
 
 dist-unix:
 	./Scripts/make_dist_unix.sh .
