@@ -283,7 +283,7 @@ static void PrepareBackbuffer()
 
     for(xx=0; xx<SCR_FIELDX; xx++)
       for(yy=0; yy<SCR_FIELDY; yy++)
-	DrawNewScreenField(xx,yy);
+	DrawScreenField(xx,yy);
     DrawAllPlayers();
 
     SetDrawtoField(DRAW_DIRECT);

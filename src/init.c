@@ -1137,6 +1137,28 @@ static void InitGraphicInfo()
     if (parameter[GFX_ARG_MODE_REVERSE])
       new_graphic_info[i].anim_mode |= ANIM_REVERSE;
 
+#if 1
+    /* set first frame of animation after determining animation mode */
+    new_graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
+    if (new_graphic_info[i].anim_start_frame == -1)
+      new_graphic_info[i].anim_start_frame = 0;
+    else if (new_graphic_info[i].anim_mode & ANIM_REVERSE)
+      new_graphic_info[i].anim_start_frame =
+	new_graphic_info[i].anim_frames
+	- new_graphic_info[i].anim_start_frame - 1;
+#else
+    /* set first frame of animation after determining animation mode */
+    new_graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
+    if (parameter[GFX_ARG_START_FRAME] == -1)	/* default: start with ... */
+    {
+      if (parameter[GFX_ARG_MODE_REVERSE])
+	new_graphic_info[i].anim_start_frame =
+	  new_graphic_info[i].anim_frames - 1;		/* ... last frame */
+      else
+	new_graphic_info[i].anim_start_frame = 0;	/* ... first frame */
+    }
+#endif
+
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
   }

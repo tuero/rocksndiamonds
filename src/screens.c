@@ -84,7 +84,7 @@ static void drawCursorExt(int pos, int color, int graphic)
 	       graphic == IMG_ARROW_BLUE_RIGHT ? IMG_ARROW_RED_RIGHT :
 	       IMG_BALL_RED);
 
-  DrawNewGraphic(0, MENU_SCREEN_START_YPOS + pos, graphic, 0);
+  DrawGraphic(0, MENU_SCREEN_START_YPOS + pos, graphic, 0);
 }
 
 static void initCursor(int pos, int graphic)
@@ -208,8 +208,8 @@ void DrawMainMenu()
   for(i=0; i<8; i++)
     initCursor(i, (i == 1 || i == 6 ? IMG_ARROW_BLUE_RIGHT : IMG_BALL_BLUE));
 
-  DrawNewGraphic(10, 3, IMG_ARROW_BLUE_LEFT, 0);
-  DrawNewGraphic(14, 3, IMG_ARROW_BLUE_RIGHT, 0);
+  DrawGraphic(10, 3, IMG_ARROW_BLUE_LEFT, 0);
+  DrawGraphic(14, 3, IMG_ARROW_BLUE_RIGHT, 0);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -892,7 +892,7 @@ void HandleTypeName(int newxpos, Key key)
   {
     xpos = newxpos;
     DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_YELLOW);
-    DrawNewGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
+    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
     return;
   }
 
@@ -914,19 +914,19 @@ void HandleTypeName(int newxpos, Key key)
 		setup.player_name, FS_BIG, FC_YELLOW);
     DrawTextExt(window, SX + 6*32, SY + ypos*32,
 		setup.player_name, FS_BIG, FC_YELLOW);
-    DrawNewGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
+    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
-    DrawNewGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
-    DrawNewGraphic(xpos + 7, ypos, IMG_EMPTY, 0);
+    DrawGraphic(xpos + 6, ypos, IMG_BALL_RED, 0);
+    DrawGraphic(xpos + 7, ypos, IMG_EMPTY, 0);
   }
   else if (key == KSYM_Return && xpos > 0)
   {
     DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_RED);
-    DrawNewGraphic(xpos + 6, ypos, IMG_EMPTY, 0);
+    DrawGraphic(xpos + 6, ypos, IMG_EMPTY, 0);
 
     SaveSetup();
     game_status = MAINMENU;
@@ -1009,10 +1009,10 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   }
 
   if (first_entry > 0)
-    DrawNewGraphic(0, 1, IMG_ARROW_BLUE_UP, 0);
+    DrawGraphic(0, 1, IMG_ARROW_BLUE_UP, 0);
 
   if (first_entry + num_page_entries < num_entries)
-    DrawNewGraphic(0, MAX_MENU_ENTRIES_ON_SCREEN + 1, IMG_ARROW_BLUE_DOWN, 0);
+    DrawGraphic(0, MAX_MENU_ENTRIES_ON_SCREEN + 1, IMG_ARROW_BLUE_DOWN, 0);
 }
 
 static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
@@ -1825,8 +1825,8 @@ void DrawSetupScreen_Input()
   initCursor(2, IMG_ARROW_BLUE_RIGHT);
   initCursor(13, IMG_ARROW_BLUE_LEFT);
 
-  DrawNewGraphic(10, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_LEFT, 0);
-  DrawNewGraphic(12, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_RIGHT, 0);
+  DrawGraphic(10, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_LEFT, 0);
+  DrawGraphic(12, MENU_SCREEN_START_YPOS, IMG_ARROW_BLUE_RIGHT, 0);
 
   DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
@@ -1892,7 +1892,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FS_BIG, FC_RED);
-  DrawNewGraphic(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
+  DrawGraphic(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
 
   if (setup.input[player_nr].use_joystick)
   {
@@ -1910,10 +1910,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 
   DrawText(SX+32, SY+5*32, "Actual Settings:", FS_BIG, FC_GREEN);
-  DrawNewGraphic(1, 6, IMG_ARROW_BLUE_LEFT, 0);
-  DrawNewGraphic(1, 7, IMG_ARROW_BLUE_RIGHT, 0);
-  DrawNewGraphic(1, 8, IMG_ARROW_BLUE_UP, 0);
-  DrawNewGraphic(1, 9, IMG_ARROW_BLUE_DOWN, 0);
+  DrawGraphic(1, 6, IMG_ARROW_BLUE_LEFT, 0);
+  DrawGraphic(1, 7, IMG_ARROW_BLUE_RIGHT, 0);
+  DrawGraphic(1, 8, IMG_ARROW_BLUE_UP, 0);
+  DrawGraphic(1, 9, IMG_ARROW_BLUE_DOWN, 0);
   DrawText(SX+2*32, SY+6*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+7*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+8*32, ":", FS_BIG, FC_BLUE);
@@ -2215,7 +2215,7 @@ static boolean CalibrateJoystickMain(int player_nr)
     for(x=0; x<3; x++)
     {
       check[x][y] = FALSE;
-      DrawNewGraphic(xpos + x - 1, ypos + y - 1, IMG_BALL_BLUE, 0);
+      DrawGraphic(xpos + x - 1, ypos + y - 1, IMG_BALL_BLUE, 0);
     }
   }
 
@@ -2238,7 +2238,7 @@ static boolean CalibrateJoystickMain(int player_nr)
   new_joystick_xmiddle = joy_x;
   new_joystick_ymiddle = joy_y;
 
-  DrawNewGraphic(xpos + last_x, ypos + last_y, IMG_BALL_RED, 0);
+  DrawGraphic(xpos + last_x, ypos + last_y, IMG_BALL_RED, 0);
   BackToFront();
 
   while(Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
@@ -2308,8 +2308,8 @@ static boolean CalibrateJoystickMain(int player_nr)
 
     if (x != last_x || y != last_y)
     {
-      DrawNewGraphic(xpos + last_x, ypos + last_y, IMG_BALL_YELLOW, 0);
-      DrawNewGraphic(xpos + x,      ypos + y,      IMG_BALL_RED, 0);
+      DrawGraphic(xpos + last_x, ypos + last_y, IMG_BALL_YELLOW, 0);
+      DrawGraphic(xpos + x,      ypos + y,      IMG_BALL_RED, 0);
 
       last_x = x;
       last_y = y;

@@ -1368,13 +1368,14 @@
 #define GFX_ARG_OFFSET				2
 #define GFX_ARG_VERTICAL			3
 #define GFX_ARG_FRAMES				4
-#define GFX_ARG_DELAY				5
-#define GFX_ARG_MODE_LOOP			6
-#define GFX_ARG_MODE_LINEAR			7
-#define GFX_ARG_MODE_PINGPONG			8
-#define GFX_ARG_MODE_PINGPONG2			9
-#define GFX_ARG_MODE_REVERSE			10
-#define GFX_ARG_GLOBAL_SYNC			11
+#define GFX_ARG_START_FRAME			5
+#define GFX_ARG_DELAY				6
+#define GFX_ARG_MODE_LOOP			7
+#define GFX_ARG_MODE_LINEAR			8
+#define GFX_ARG_MODE_PINGPONG			9
+#define GFX_ARG_MODE_PINGPONG2			10
+#define GFX_ARG_MODE_REVERSE			11
+#define GFX_ARG_GLOBAL_SYNC			12
 
 /* values for sound configuration suffixes */
 /* (currently none) */
@@ -1610,6 +1611,7 @@ struct NewGraphicInfo
   int src_x, src_y;		/* derived from (tile sized) .xpos/.ypos */
   int offset_x, offset_y;	/* x/y offset to next animation frame */
   int anim_frames;
+  int anim_start_frame;
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
