@@ -1033,6 +1033,10 @@ struct ConfigInfo image_config[] =
   { "spring.xpos",				"0"			},
   { "spring.ypos",				"5"			},
   { "spring.frames",				"1"			},
+  { "spring.moving",				"RocksMore.pcx"		},
+  { "spring.moving.xpos",			"0"			},
+  { "spring.moving.ypos",			"5"			},
+  { "spring.moving.frames",			"1"			},
 
   { "emc_steelwall1",				"RocksDC.pcx"		},
   { "emc_steelwall1.xpos",			"14"			},
@@ -1319,15 +1323,15 @@ struct ConfigInfo image_config[] =
   { "extra_time.ypos",				"0"			},
   { "extra_time.frames",			"6"			},
 
-  { "shield_deadly",				"RocksDC.pcx"		},
-  { "shield_deadly.xpos",			"8"			},
-  { "shield_deadly.ypos",			"1"			},
-  { "shield_deadly.frames",			"6"			},
-
   { "shield_normal",				"RocksDC.pcx"		},
   { "shield_normal.xpos",			"8"			},
   { "shield_normal.ypos",			"2"			},
   { "shield_normal.frames",			"6"			},
+
+  { "shield_deadly",				"RocksDC.pcx"		},
+  { "shield_deadly.xpos",			"8"			},
+  { "shield_deadly.ypos",			"1"			},
+  { "shield_deadly.frames",			"6"			},
 
   { "shield_normal.active",			"RocksHeroes.pcx"	},
   { "shield_normal.active.xpos",		"1"			},
@@ -2409,6 +2413,11 @@ struct ConfigInfo image_config[] =
   { "scrollbar_yellow.xpos",			"3"			},
   { "scrollbar_yellow.ypos",			"2"			},
   { "scrollbar_yellow.frames",			"1"			},
+
+  { "char_question",				"RocksFontEM.pcx"	},
+  { "char_question.xpos",			"15"			},
+  { "char_question.ypos",			"1"			},
+  { "char_question.frames",			"1"			},
 
   { NULL,					NULL			}
 };

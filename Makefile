@@ -87,6 +87,11 @@ clean:
 # development only stuff                                                      #
 #-----------------------------------------------------------------------------#
 
+auto-conf:
+	./Scripts/create_element_defs.pl --graphics > src/conf_gfx.h
+	./Scripts/create_element_defs.pl --sounds   > src/conf_snd.h
+	./Scripts/create_element_defs.pl --el2gfx   > src/conf_e2g.c
+
 run:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && ./rocksndiamonds --verbose
 

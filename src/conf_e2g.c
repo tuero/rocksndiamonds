@@ -1,0 +1,2182 @@
+/***********************************************************
+* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
+*----------------------------------------------------------*
+* (c) 1995-2002 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
+*----------------------------------------------------------*
+* conf_e2g.c                                               *
+***********************************************************/
+
+/* ----- this file was automatically generated -- do not edit by hand ----- */
+
+#ifndef CONF_E2G_C
+#define CONF_E2G_C
+
+/* values for element/graphics configuration */
+
+static struct
+{
+    int element;
+    int graphic;
+}
+element_to_graphic[] =
+{
+  {
+    EL_BD_WALL,					-1, -1,
+    IMG_BD_WALL
+  },
+  {
+    EL_BD_ROCK,					-1, -1,
+    IMG_BD_ROCK
+  },
+  {
+    EL_BD_ROCK,					-1, GFX_ACTION_FALLING,
+    IMG_BD_ROCK_FALLING
+  },
+  {
+    EL_BD_ROCK,					-1, GFX_ACTION_PUSHING,
+    IMG_BD_ROCK_PUSHING
+  },
+  {
+    EL_BD_DIAMOND,				-1, -1,
+    IMG_BD_DIAMOND
+  },
+  {
+    EL_BD_DIAMOND,				-1, GFX_ACTION_FALLING,
+    IMG_BD_DIAMOND_FALLING
+  },
+  {
+    EL_BD_MAGIC_WALL,				-1, -1,
+    IMG_BD_MAGIC_WALL
+  },
+  {
+    EL_BD_MAGIC_WALL_ACTIVE,			-1, -1,
+    IMG_BD_MAGIC_WALL_ACTIVE
+  },
+  {
+    EL_BD_MAGIC_WALL_FILLING,			-1, -1,
+    IMG_BD_MAGIC_WALL_FILLING
+  },
+  {
+    EL_BD_MAGIC_WALL_FULL,			-1, -1,
+    IMG_BD_MAGIC_WALL_FULL
+  },
+  {
+    EL_BD_MAGIC_WALL_EMPTYING,			-1, -1,
+    IMG_BD_MAGIC_WALL_EMPTYING
+  },
+  {
+    EL_BD_MAGIC_WALL_DEAD,			-1, -1,
+    IMG_BD_MAGIC_WALL_DEAD
+  },
+  {
+    EL_BD_AMOEBA,				-1, -1,
+    IMG_BD_AMOEBA
+  },
+  {
+    EL_BD_AMOEBA_PART1,				-1, -1,
+    IMG_BD_AMOEBA_PART1
+  },
+  {
+    EL_BD_AMOEBA_PART2,				-1, -1,
+    IMG_BD_AMOEBA_PART2
+  },
+  {
+    EL_BD_AMOEBA_PART3,				-1, -1,
+    IMG_BD_AMOEBA_PART3
+  },
+  {
+    EL_BD_AMOEBA_PART4,				-1, -1,
+    IMG_BD_AMOEBA_PART4
+  },
+  {
+    EL_BD_BUTTERFLY,				-1, -1,
+    IMG_BD_BUTTERFLY
+  },
+  {
+    EL_BD_BUTTERFLY,				-1, GFX_ACTION_MOVING,
+    IMG_BD_BUTTERFLY_MOVING
+  },
+  {
+    EL_BD_BUTTERFLY_RIGHT,			-1, -1,
+    IMG_BD_BUTTERFLY_RIGHT
+  },
+  {
+    EL_BD_BUTTERFLY,				MV_RIGHT, -1,
+    IMG_BD_BUTTERFLY_RIGHT
+  },
+  {
+    EL_BD_BUTTERFLY_UP,				-1, -1,
+    IMG_BD_BUTTERFLY_UP
+  },
+  {
+    EL_BD_BUTTERFLY,				MV_UP, -1,
+    IMG_BD_BUTTERFLY_UP
+  },
+  {
+    EL_BD_BUTTERFLY_LEFT,			-1, -1,
+    IMG_BD_BUTTERFLY_LEFT
+  },
+  {
+    EL_BD_BUTTERFLY,				MV_LEFT, -1,
+    IMG_BD_BUTTERFLY_LEFT
+  },
+  {
+    EL_BD_BUTTERFLY_DOWN,			-1, -1,
+    IMG_BD_BUTTERFLY_DOWN
+  },
+  {
+    EL_BD_BUTTERFLY,				MV_DOWN, -1,
+    IMG_BD_BUTTERFLY_DOWN
+  },
+  {
+    EL_BD_FIREFLY,				-1, -1,
+    IMG_BD_FIREFLY
+  },
+  {
+    EL_BD_FIREFLY,				-1, GFX_ACTION_MOVING,
+    IMG_BD_FIREFLY_MOVING
+  },
+  {
+    EL_BD_FIREFLY_RIGHT,			-1, -1,
+    IMG_BD_FIREFLY_RIGHT
+  },
+  {
+    EL_BD_FIREFLY,				MV_RIGHT, -1,
+    IMG_BD_FIREFLY_RIGHT
+  },
+  {
+    EL_BD_FIREFLY_UP,				-1, -1,
+    IMG_BD_FIREFLY_UP
+  },
+  {
+    EL_BD_FIREFLY,				MV_UP, -1,
+    IMG_BD_FIREFLY_UP
+  },
+  {
+    EL_BD_FIREFLY_LEFT,				-1, -1,
+    IMG_BD_FIREFLY_LEFT
+  },
+  {
+    EL_BD_FIREFLY,				MV_LEFT, -1,
+    IMG_BD_FIREFLY_LEFT
+  },
+  {
+    EL_BD_FIREFLY_DOWN,				-1, -1,
+    IMG_BD_FIREFLY_DOWN
+  },
+  {
+    EL_BD_FIREFLY,				MV_DOWN, -1,
+    IMG_BD_FIREFLY_DOWN
+  },
+  {
+    EL_SP_EMPTY_SPACE,				-1, -1,
+    IMG_SP_EMPTY_SPACE
+  },
+  {
+    EL_SP_ZONK,					-1, -1,
+    IMG_SP_ZONK
+  },
+  {
+    EL_SP_ZONK,					-1, GFX_ACTION_FALLING,
+    IMG_SP_ZONK_FALLING
+  },
+  {
+    EL_SP_ZONK,					-1, GFX_ACTION_PUSHING,
+    IMG_SP_ZONK_PUSHING
+  },
+  {
+    EL_SP_BASE,					-1, -1,
+    IMG_SP_BASE
+  },
+  {
+    EL_SP_MURPHY,				-1, -1,
+    IMG_SP_MURPHY
+  },
+  {
+    EL_SP_MURPHY,				MV_LEFT, -1,
+    IMG_SP_MURPHY_LEFT
+  },
+  {
+    EL_SP_MURPHY,				MV_LEFT, GFX_ACTION_MOVING,
+    IMG_SP_MURPHY_LEFT_MOVING
+  },
+  {
+    EL_SP_MURPHY,				MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_SP_MURPHY_LEFT_DIGGING
+  },
+  {
+    EL_SP_MURPHY,				MV_LEFT, GFX_ACTION_PUSHING,
+    IMG_SP_MURPHY_LEFT_PUSHING
+  },
+  {
+    EL_SP_MURPHY,				MV_LEFT, GFX_ACTION_SNAPPING,
+    IMG_SP_MURPHY_LEFT_SNAPPING
+  },
+  {
+    EL_SP_MURPHY,				MV_RIGHT, -1,
+    IMG_SP_MURPHY_RIGHT
+  },
+  {
+    EL_SP_MURPHY,				MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_SP_MURPHY_RIGHT_MOVING
+  },
+  {
+    EL_SP_MURPHY,				MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_SP_MURPHY_RIGHT_DIGGING
+  },
+  {
+    EL_SP_MURPHY,				MV_RIGHT, GFX_ACTION_PUSHING,
+    IMG_SP_MURPHY_RIGHT_PUSHING
+  },
+  {
+    EL_SP_MURPHY,				MV_RIGHT, GFX_ACTION_SNAPPING,
+    IMG_SP_MURPHY_RIGHT_SNAPPING
+  },
+  {
+    EL_SP_MURPHY,				MV_UP, -1,
+    IMG_SP_MURPHY_UP
+  },
+  {
+    EL_SP_MURPHY,				MV_UP, GFX_ACTION_SNAPPING,
+    IMG_SP_MURPHY_UP_SNAPPING
+  },
+  {
+    EL_SP_MURPHY,				MV_DOWN, -1,
+    IMG_SP_MURPHY_DOWN
+  },
+  {
+    EL_SP_MURPHY,				MV_DOWN, GFX_ACTION_SNAPPING,
+    IMG_SP_MURPHY_DOWN_SNAPPING
+  },
+  {
+    EL_SP_MURPHY_CLONE,				-1, -1,
+    IMG_SP_MURPHY_CLONE
+  },
+  {
+    EL_SP_INFOTRON,				-1, -1,
+    IMG_SP_INFOTRON
+  },
+  {
+    EL_SP_INFOTRON,				-1, GFX_ACTION_FALLING,
+    IMG_SP_INFOTRON_FALLING
+  },
+  {
+    EL_SP_CHIP_SINGLE,				-1, -1,
+    IMG_SP_CHIP_SINGLE
+  },
+  {
+    EL_SP_CHIP_LEFT,				-1, -1,
+    IMG_SP_CHIP_LEFT
+  },
+  {
+    EL_SP_CHIP_RIGHT,				-1, -1,
+    IMG_SP_CHIP_RIGHT
+  },
+  {
+    EL_SP_CHIP_UPPER,				-1, -1,
+    IMG_SP_CHIP_UPPER
+  },
+  {
+    EL_SP_CHIP_LOWER,				-1, -1,
+    IMG_SP_CHIP_LOWER
+  },
+  {
+    EL_SP_HARD_GRAY,				-1, -1,
+    IMG_SP_HARD_GRAY
+  },
+  {
+    EL_SP_HARD_GREEN,				-1, -1,
+    IMG_SP_HARD_GREEN
+  },
+  {
+    EL_SP_HARD_BLUE,				-1, -1,
+    IMG_SP_HARD_BLUE
+  },
+  {
+    EL_SP_HARD_RED,				-1, -1,
+    IMG_SP_HARD_RED
+  },
+  {
+    EL_SP_HARD_YELLOW,				-1, -1,
+    IMG_SP_HARD_YELLOW
+  },
+  {
+    EL_SP_EXIT_CLOSED,				-1, -1,
+    IMG_SP_EXIT_CLOSED
+  },
+  {
+    EL_SP_EXIT_OPEN,				-1, -1,
+    IMG_SP_EXIT_OPEN
+  },
+  {
+    EL_SP_DISK_ORANGE,				-1, -1,
+    IMG_SP_DISK_ORANGE
+  },
+  {
+    EL_SP_DISK_ORANGE,				-1, GFX_ACTION_FALLING,
+    IMG_SP_DISK_ORANGE_FALLING
+  },
+  {
+    EL_SP_DISK_ORANGE,				-1, GFX_ACTION_PUSHING,
+    IMG_SP_DISK_ORANGE_PUSHING
+  },
+  {
+    EL_SP_DISK_YELLOW,				-1, -1,
+    IMG_SP_DISK_YELLOW
+  },
+  {
+    EL_SP_DISK_YELLOW,				-1, GFX_ACTION_PUSHING,
+    IMG_SP_DISK_YELLOW_PUSHING
+  },
+  {
+    EL_SP_DISK_RED,				-1, -1,
+    IMG_SP_DISK_RED
+  },
+  {
+    EL_SP_DISK_RED,				-1, GFX_ACTION_COLLECTING,
+    IMG_SP_DISK_RED_COLLECTING
+  },
+  {
+    EL_SP_PORT1_RIGHT,				-1, -1,
+    IMG_SP_PORT1_RIGHT
+  },
+  {
+    EL_SP_PORT1_DOWN,				-1, -1,
+    IMG_SP_PORT1_DOWN
+  },
+  {
+    EL_SP_PORT1_LEFT,				-1, -1,
+    IMG_SP_PORT1_LEFT
+  },
+  {
+    EL_SP_PORT1_UP,				-1, -1,
+    IMG_SP_PORT1_UP
+  },
+  {
+    EL_SP_PORT2_RIGHT,				-1, -1,
+    IMG_SP_PORT2_RIGHT
+  },
+  {
+    EL_SP_PORT2_DOWN,				-1, -1,
+    IMG_SP_PORT2_DOWN
+  },
+  {
+    EL_SP_PORT2_LEFT,				-1, -1,
+    IMG_SP_PORT2_LEFT
+  },
+  {
+    EL_SP_PORT2_UP,				-1, -1,
+    IMG_SP_PORT2_UP
+  },
+  {
+    EL_SP_PORT_X,				-1, -1,
+    IMG_SP_PORT_X
+  },
+  {
+    EL_SP_PORT_Y,				-1, -1,
+    IMG_SP_PORT_Y
+  },
+  {
+    EL_SP_PORT_XY,				-1, -1,
+    IMG_SP_PORT_XY
+  },
+  {
+    EL_SP_SNIKSNAK,				-1, -1,
+    IMG_SP_SNIKSNAK
+  },
+  {
+    EL_SP_SNIKSNAK,				MV_LEFT, -1,
+    IMG_SP_SNIKSNAK_LEFT
+  },
+  {
+    EL_SP_SNIKSNAK,				MV_RIGHT, -1,
+    IMG_SP_SNIKSNAK_RIGHT
+  },
+  {
+    EL_SP_SNIKSNAK,				MV_UP, -1,
+    IMG_SP_SNIKSNAK_UP
+  },
+  {
+    EL_SP_SNIKSNAK,				MV_DOWN, -1,
+    IMG_SP_SNIKSNAK_DOWN
+  },
+  {
+    EL_SP_ELECTRON,				-1, -1,
+    IMG_SP_ELECTRON
+  },
+  {
+    EL_SP_TERMINAL,				-1, -1,
+    IMG_SP_TERMINAL
+  },
+  {
+    EL_SP_TERMINAL_ACTIVE,			-1, -1,
+    IMG_SP_TERMINAL_ACTIVE
+  },
+  {
+    EL_SP_BUGGY_BASE,				-1, -1,
+    IMG_SP_BUGGY_BASE
+  },
+  {
+    EL_SP_BUGGY_BASE_ACTIVE,			-1, -1,
+    IMG_SP_BUGGY_BASE_ACTIVE
+  },
+  {
+    EL_SP_HARD_BASE1,				-1, -1,
+    IMG_SP_HARD_BASE1
+  },
+  {
+    EL_SP_HARD_BASE2,				-1, -1,
+    IMG_SP_HARD_BASE2
+  },
+  {
+    EL_SP_HARD_BASE3,				-1, -1,
+    IMG_SP_HARD_BASE3
+  },
+  {
+    EL_SP_HARD_BASE4,				-1, -1,
+    IMG_SP_HARD_BASE4
+  },
+  {
+    EL_SP_HARD_BASE5,				-1, -1,
+    IMG_SP_HARD_BASE5
+  },
+  {
+    EL_SP_HARD_BASE6,				-1, -1,
+    IMG_SP_HARD_BASE6
+  },
+  {
+    EL_SOKOBAN_OBJECT,				-1, -1,
+    IMG_SOKOBAN_OBJECT
+  },
+  {
+    EL_SOKOBAN_FIELD_EMPTY,			-1, -1,
+    IMG_SOKOBAN_FIELD_EMPTY
+  },
+  {
+    EL_SOKOBAN_FIELD_FULL,			-1, -1,
+    IMG_SOKOBAN_FIELD_FULL
+  },
+  {
+    EL_EMPTY_SPACE,				-1, -1,
+    IMG_EMPTY_SPACE
+  },
+  {
+    EL_SAND,					-1, -1,
+    IMG_SAND
+  },
+  {
+    EL_SAND_CRUMBLED,				-1, -1,
+    IMG_SAND_CRUMBLED
+  },
+  {
+    EL_WALL,					-1, -1,
+    IMG_WALL
+  },
+  {
+    EL_WALL_CRUMBLED,				-1, -1,
+    IMG_WALL_CRUMBLED
+  },
+  {
+    EL_STEELWALL,				-1, -1,
+    IMG_STEELWALL
+  },
+  {
+    EL_ROCK,					-1, -1,
+    IMG_ROCK
+  },
+  {
+    EL_ROCK,					-1, GFX_ACTION_FALLING,
+    IMG_ROCK_FALLING
+  },
+  {
+    EL_ROCK,					-1, GFX_ACTION_PUSHING,
+    IMG_ROCK_PUSHING
+  },
+  {
+    EL_EMERALD,					-1, -1,
+    IMG_EMERALD
+  },
+  {
+    EL_EMERALD,					-1, GFX_ACTION_FALLING,
+    IMG_EMERALD_FALLING
+  },
+  {
+    EL_DIAMOND,					-1, -1,
+    IMG_DIAMOND
+  },
+  {
+    EL_DIAMOND,					-1, GFX_ACTION_FALLING,
+    IMG_DIAMOND_FALLING
+  },
+  {
+    EL_BOMB,					-1, -1,
+    IMG_BOMB
+  },
+  {
+    EL_NUT,					-1, -1,
+    IMG_NUT
+  },
+  {
+    EL_NUT,					-1, GFX_ACTION_CRACKING,
+    IMG_NUT_CRACKING
+  },
+  {
+    EL_DYNAMITE,				-1, -1,
+    IMG_DYNAMITE
+  },
+  {
+    EL_DYNAMITE_ACTIVE,				-1, -1,
+    IMG_DYNAMITE_ACTIVE
+  },
+  {
+    EL_WALL_EMERALD,				-1, -1,
+    IMG_WALL_EMERALD
+  },
+  {
+    EL_WALL_DIAMOND,				-1, -1,
+    IMG_WALL_DIAMOND
+  },
+  {
+    EL_BUG_RIGHT,				-1, -1,
+    IMG_BUG_RIGHT
+  },
+  {
+    EL_BUG,					MV_RIGHT, -1,
+    IMG_BUG_RIGHT
+  },
+  {
+    EL_BUG_UP,					-1, -1,
+    IMG_BUG_UP
+  },
+  {
+    EL_BUG,					MV_UP, -1,
+    IMG_BUG_UP
+  },
+  {
+    EL_BUG_LEFT,				-1, -1,
+    IMG_BUG_LEFT
+  },
+  {
+    EL_BUG,					MV_LEFT, -1,
+    IMG_BUG_LEFT
+  },
+  {
+    EL_BUG_DOWN,				-1, -1,
+    IMG_BUG_DOWN
+  },
+  {
+    EL_BUG,					MV_DOWN, -1,
+    IMG_BUG_DOWN
+  },
+  {
+    EL_SPACESHIP_RIGHT,				-1, -1,
+    IMG_SPACESHIP_RIGHT
+  },
+  {
+    EL_SPACESHIP,				MV_RIGHT, -1,
+    IMG_SPACESHIP_RIGHT
+  },
+  {
+    EL_SPACESHIP_UP,				-1, -1,
+    IMG_SPACESHIP_UP
+  },
+  {
+    EL_SPACESHIP,				MV_UP, -1,
+    IMG_SPACESHIP_UP
+  },
+  {
+    EL_SPACESHIP_LEFT,				-1, -1,
+    IMG_SPACESHIP_LEFT
+  },
+  {
+    EL_SPACESHIP,				MV_LEFT, -1,
+    IMG_SPACESHIP_LEFT
+  },
+  {
+    EL_SPACESHIP_DOWN,				-1, -1,
+    IMG_SPACESHIP_DOWN
+  },
+  {
+    EL_SPACESHIP,				MV_DOWN, -1,
+    IMG_SPACESHIP_DOWN
+  },
+  {
+    EL_YAMYAM,					-1, -1,
+    IMG_YAMYAM
+  },
+  {
+    EL_YAMYAM,					-1, GFX_ACTION_MOVING,
+    IMG_YAMYAM_MOVING
+  },
+  {
+    EL_ROBOT,					-1, -1,
+    IMG_ROBOT
+  },
+  {
+    EL_ROBOT_WHEEL,				-1, -1,
+    IMG_ROBOT_WHEEL
+  },
+  {
+    EL_ROBOT_WHEEL_ACTIVE,			-1, -1,
+    IMG_ROBOT_WHEEL_ACTIVE
+  },
+  {
+    EL_MAGIC_WALL,				-1, -1,
+    IMG_MAGIC_WALL
+  },
+  {
+    EL_MAGIC_WALL_ACTIVE,			-1, -1,
+    IMG_MAGIC_WALL_ACTIVE
+  },
+  {
+    EL_MAGIC_WALL_FILLING,			-1, -1,
+    IMG_MAGIC_WALL_FILLING
+  },
+  {
+    EL_MAGIC_WALL_FULL,				-1, -1,
+    IMG_MAGIC_WALL_FULL
+  },
+  {
+    EL_MAGIC_WALL_EMPTYING,			-1, -1,
+    IMG_MAGIC_WALL_EMPTYING
+  },
+  {
+    EL_MAGIC_WALL_DEAD,				-1, -1,
+    IMG_MAGIC_WALL_DEAD
+  },
+  {
+    EL_QUICKSAND_EMPTY,				-1, -1,
+    IMG_QUICKSAND_EMPTY
+  },
+  {
+    EL_QUICKSAND_FILLING,			-1, -1,
+    IMG_QUICKSAND_FILLING
+  },
+  {
+    EL_QUICKSAND_FULL,				-1, -1,
+    IMG_QUICKSAND_FULL
+  },
+  {
+    EL_QUICKSAND_EMPTYING,			-1, -1,
+    IMG_QUICKSAND_EMPTYING
+  },
+  {
+    EL_ACIDPOOL_TOPLEFT,			-1, -1,
+    IMG_ACIDPOOL_TOPLEFT
+  },
+  {
+    EL_ACIDPOOL_TOPRIGHT,			-1, -1,
+    IMG_ACIDPOOL_TOPRIGHT
+  },
+  {
+    EL_ACIDPOOL_BOTTOMLEFT,			-1, -1,
+    IMG_ACIDPOOL_BOTTOMLEFT
+  },
+  {
+    EL_ACIDPOOL_BOTTOM,				-1, -1,
+    IMG_ACIDPOOL_BOTTOM
+  },
+  {
+    EL_ACIDPOOL_BOTTOMRIGHT,			-1, -1,
+    IMG_ACIDPOOL_BOTTOMRIGHT
+  },
+  {
+    EL_ACID,					-1, -1,
+    IMG_ACID
+  },
+  {
+    EL_ACID_SPLASHING_LEFT,			-1, -1,
+    IMG_ACID_SPLASHING_LEFT
+  },
+  {
+    EL_ACID_SPLASHING_RIGHT,			-1, -1,
+    IMG_ACID_SPLASHING_RIGHT
+  },
+  {
+    EL_AMOEBA_DROP,				-1, -1,
+    IMG_AMOEBA_DROP
+  },
+  {
+    EL_AMOEBA_CREATING,				-1, -1,
+    IMG_AMOEBA_CREATING
+  },
+  {
+    EL_AMOEBA_PART1,				-1, -1,
+    IMG_AMOEBA_PART1
+  },
+  {
+    EL_AMOEBA_PART2,				-1, -1,
+    IMG_AMOEBA_PART2
+  },
+  {
+    EL_AMOEBA_PART3,				-1, -1,
+    IMG_AMOEBA_PART3
+  },
+  {
+    EL_AMOEBA_PART4,				-1, -1,
+    IMG_AMOEBA_PART4
+  },
+  {
+    EL_AMOEBA_DEAD_PART1,			-1, -1,
+    IMG_AMOEBA_DEAD_PART1
+  },
+  {
+    EL_AMOEBA_DEAD_PART2,			-1, -1,
+    IMG_AMOEBA_DEAD_PART2
+  },
+  {
+    EL_AMOEBA_DEAD_PART3,			-1, -1,
+    IMG_AMOEBA_DEAD_PART3
+  },
+  {
+    EL_AMOEBA_DEAD_PART4,			-1, -1,
+    IMG_AMOEBA_DEAD_PART4
+  },
+  {
+    EL_EM_KEY1,					-1, -1,
+    IMG_EM_KEY1
+  },
+  {
+    EL_EM_KEY2,					-1, -1,
+    IMG_EM_KEY2
+  },
+  {
+    EL_EM_KEY3,					-1, -1,
+    IMG_EM_KEY3
+  },
+  {
+    EL_EM_KEY4,					-1, -1,
+    IMG_EM_KEY4
+  },
+  {
+    EL_EM_GATE1,				-1, -1,
+    IMG_EM_GATE1
+  },
+  {
+    EL_EM_GATE2,				-1, -1,
+    IMG_EM_GATE2
+  },
+  {
+    EL_EM_GATE3,				-1, -1,
+    IMG_EM_GATE3
+  },
+  {
+    EL_EM_GATE4,				-1, -1,
+    IMG_EM_GATE4
+  },
+  {
+    EL_EM_GATE1_GRAY,				-1, -1,
+    IMG_EM_GATE1_GRAY
+  },
+  {
+    EL_EM_GATE2_GRAY,				-1, -1,
+    IMG_EM_GATE2_GRAY
+  },
+  {
+    EL_EM_GATE3_GRAY,				-1, -1,
+    IMG_EM_GATE3_GRAY
+  },
+  {
+    EL_EM_GATE4_GRAY,				-1, -1,
+    IMG_EM_GATE4_GRAY
+  },
+  {
+    EL_EXIT_CLOSED,				-1, -1,
+    IMG_EXIT_CLOSED
+  },
+  {
+    EL_EXIT_OPENING,				-1, -1,
+    IMG_EXIT_OPENING
+  },
+  {
+    EL_EXIT_OPEN,				-1, -1,
+    IMG_EXIT_OPEN
+  },
+  {
+    EL_BALLOON,					-1, -1,
+    IMG_BALLOON
+  },
+  {
+    EL_BALLOON,					-1, GFX_ACTION_MOVING,
+    IMG_BALLOON_MOVING
+  },
+  {
+    EL_BALLOON_SEND_LEFT,			-1, -1,
+    IMG_BALLOON_SEND_LEFT
+  },
+  {
+    EL_BALLOON_SEND_RIGHT,			-1, -1,
+    IMG_BALLOON_SEND_RIGHT
+  },
+  {
+    EL_BALLOON_SEND_UP,				-1, -1,
+    IMG_BALLOON_SEND_UP
+  },
+  {
+    EL_BALLOON_SEND_DOWN,			-1, -1,
+    IMG_BALLOON_SEND_DOWN
+  },
+  {
+    EL_BALLOON_SEND_ANY_DIRECTION,		-1, -1,
+    IMG_BALLOON_SEND_ANY_DIRECTION
+  },
+  {
+    EL_SPRING,					-1, -1,
+    IMG_SPRING
+  },
+  {
+    EL_SPRING_MOVING,				-1, -1,
+    IMG_SPRING_MOVING
+  },
+  {
+    EL_EMC_STEELWALL1,				-1, -1,
+    IMG_EMC_STEELWALL1
+  },
+  {
+    EL_EMC_STEELWALL2,				-1, -1,
+    IMG_EMC_STEELWALL2
+  },
+  {
+    EL_EMC_STEELWALL3,				-1, -1,
+    IMG_EMC_STEELWALL3
+  },
+  {
+    EL_EMC_STEELWALL4,				-1, -1,
+    IMG_EMC_STEELWALL4
+  },
+  {
+    EL_EMC_WALL_PILLAR_UPPER,			-1, -1,
+    IMG_EMC_WALL_PILLAR_UPPER
+  },
+  {
+    EL_EMC_WALL_PILLAR_MIDDLE,			-1, -1,
+    IMG_EMC_WALL_PILLAR_MIDDLE
+  },
+  {
+    EL_EMC_WALL_PILLAR_LOWER,			-1, -1,
+    IMG_EMC_WALL_PILLAR_LOWER
+  },
+  {
+    EL_EMC_WALL4,				-1, -1,
+    IMG_EMC_WALL4
+  },
+  {
+    EL_EMC_WALL5,				-1, -1,
+    IMG_EMC_WALL5
+  },
+  {
+    EL_EMC_WALL6,				-1, -1,
+    IMG_EMC_WALL6
+  },
+  {
+    EL_EMC_WALL7,				-1, -1,
+    IMG_EMC_WALL7
+  },
+  {
+    EL_EMC_WALL8,				-1, -1,
+    IMG_EMC_WALL8
+  },
+  {
+    EL_INVISIBLE_STEELWALL,			-1, -1,
+    IMG_INVISIBLE_STEELWALL
+  },
+  {
+    EL_INVISIBLE_STEELWALL_ACTIVE,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_ACTIVE
+  },
+  {
+    EL_INVISIBLE_WALL,				-1, -1,
+    IMG_INVISIBLE_WALL
+  },
+  {
+    EL_INVISIBLE_WALL_ACTIVE,			-1, -1,
+    IMG_INVISIBLE_WALL_ACTIVE
+  },
+  {
+    EL_INVISIBLE_SAND,				-1, -1,
+    IMG_INVISIBLE_SAND
+  },
+  {
+    EL_INVISIBLE_SAND_ACTIVE,			-1, -1,
+    IMG_INVISIBLE_SAND_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT1_MIDDLE,			-1, -1,
+    IMG_CONVEYOR_BELT1_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT1_MIDDLE_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT1_MIDDLE_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT1_LEFT,			-1, -1,
+    IMG_CONVEYOR_BELT1_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT1_LEFT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT1_LEFT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT1_RIGHT,			-1, -1,
+    IMG_CONVEYOR_BELT1_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT1_RIGHT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT1_RIGHT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT1_SWITCH_LEFT,		-1, -1,
+    IMG_CONVEYOR_BELT1_SWITCH_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT1_SWITCH_MIDDLE,		-1, -1,
+    IMG_CONVEYOR_BELT1_SWITCH_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT1_SWITCH_RIGHT,		-1, -1,
+    IMG_CONVEYOR_BELT1_SWITCH_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT2_MIDDLE,			-1, -1,
+    IMG_CONVEYOR_BELT2_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT2_MIDDLE_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT2_MIDDLE_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT2_LEFT,			-1, -1,
+    IMG_CONVEYOR_BELT2_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT2_LEFT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT2_LEFT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT2_RIGHT,			-1, -1,
+    IMG_CONVEYOR_BELT2_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT2_RIGHT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT2_RIGHT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT2_SWITCH_LEFT,		-1, -1,
+    IMG_CONVEYOR_BELT2_SWITCH_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT2_SWITCH_MIDDLE,		-1, -1,
+    IMG_CONVEYOR_BELT2_SWITCH_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT2_SWITCH_RIGHT,		-1, -1,
+    IMG_CONVEYOR_BELT2_SWITCH_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT3_MIDDLE,			-1, -1,
+    IMG_CONVEYOR_BELT3_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT3_MIDDLE_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT3_MIDDLE_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT3_LEFT,			-1, -1,
+    IMG_CONVEYOR_BELT3_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT3_LEFT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT3_LEFT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT3_RIGHT,			-1, -1,
+    IMG_CONVEYOR_BELT3_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT3_RIGHT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT3_RIGHT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT3_SWITCH_LEFT,		-1, -1,
+    IMG_CONVEYOR_BELT3_SWITCH_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT3_SWITCH_MIDDLE,		-1, -1,
+    IMG_CONVEYOR_BELT3_SWITCH_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT3_SWITCH_RIGHT,		-1, -1,
+    IMG_CONVEYOR_BELT3_SWITCH_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT4_MIDDLE,			-1, -1,
+    IMG_CONVEYOR_BELT4_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT4_MIDDLE_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT4_MIDDLE_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT4_LEFT,			-1, -1,
+    IMG_CONVEYOR_BELT4_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT4_LEFT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT4_LEFT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT4_RIGHT,			-1, -1,
+    IMG_CONVEYOR_BELT4_RIGHT
+  },
+  {
+    EL_CONVEYOR_BELT4_RIGHT_ACTIVE,		-1, -1,
+    IMG_CONVEYOR_BELT4_RIGHT_ACTIVE
+  },
+  {
+    EL_CONVEYOR_BELT4_SWITCH_LEFT,		-1, -1,
+    IMG_CONVEYOR_BELT4_SWITCH_LEFT
+  },
+  {
+    EL_CONVEYOR_BELT4_SWITCH_MIDDLE,		-1, -1,
+    IMG_CONVEYOR_BELT4_SWITCH_MIDDLE
+  },
+  {
+    EL_CONVEYOR_BELT4_SWITCH_RIGHT,		-1, -1,
+    IMG_CONVEYOR_BELT4_SWITCH_RIGHT
+  },
+  {
+    EL_SWITCHGATE_SWITCH_UP,			-1, -1,
+    IMG_SWITCHGATE_SWITCH_UP
+  },
+  {
+    EL_SWITCHGATE_SWITCH_DOWN,			-1, -1,
+    IMG_SWITCHGATE_SWITCH_DOWN
+  },
+  {
+    EL_LIGHT_SWITCH,				-1, -1,
+    IMG_LIGHT_SWITCH
+  },
+  {
+    EL_LIGHT_SWITCH_ACTIVE,			-1, -1,
+    IMG_LIGHT_SWITCH_ACTIVE
+  },
+  {
+    EL_TIMEGATE_SWITCH,				-1, -1,
+    IMG_TIMEGATE_SWITCH
+  },
+  {
+    EL_TIMEGATE_SWITCH_ACTIVE,			-1, -1,
+    IMG_TIMEGATE_SWITCH_ACTIVE
+  },
+  {
+    EL_ENVELOPE,				-1, -1,
+    IMG_ENVELOPE
+  },
+  {
+    EL_SIGN_EXCLAMATION,			-1, -1,
+    IMG_SIGN_EXCLAMATION
+  },
+  {
+    EL_SIGN_STOP,				-1, -1,
+    IMG_SIGN_STOP
+  },
+  {
+    EL_LANDMINE,				-1, -1,
+    IMG_LANDMINE
+  },
+  {
+    EL_STEELWALL_SLANTED,			-1, -1,
+    IMG_STEELWALL_SLANTED
+  },
+  {
+    EL_EXTRA_TIME,				-1, -1,
+    IMG_EXTRA_TIME
+  },
+  {
+    EL_SHIELD_NORMAL,				-1, -1,
+    IMG_SHIELD_NORMAL
+  },
+  {
+    EL_SHIELD_DEADLY,				-1, -1,
+    IMG_SHIELD_DEADLY
+  },
+  {
+    EL_SHIELD_NORMAL_ACTIVE,			-1, -1,
+    IMG_SHIELD_NORMAL_ACTIVE
+  },
+  {
+    EL_SHIELD_DEADLY_ACTIVE,			-1, -1,
+    IMG_SHIELD_DEADLY_ACTIVE
+  },
+  {
+    EL_SWITCHGATE_CLOSED,			-1, -1,
+    IMG_SWITCHGATE_CLOSED
+  },
+  {
+    EL_SWITCHGATE_OPENING,			-1, -1,
+    IMG_SWITCHGATE_OPENING
+  },
+  {
+    EL_SWITCHGATE_OPEN,				-1, -1,
+    IMG_SWITCHGATE_OPEN
+  },
+  {
+    EL_SWITCHGATE_CLOSING,			-1, -1,
+    IMG_SWITCHGATE_CLOSING
+  },
+  {
+    EL_TIMEGATE_CLOSED,				-1, -1,
+    IMG_TIMEGATE_CLOSED
+  },
+  {
+    EL_TIMEGATE_OPENING,			-1, -1,
+    IMG_TIMEGATE_OPENING
+  },
+  {
+    EL_TIMEGATE_OPEN,				-1, -1,
+    IMG_TIMEGATE_OPEN
+  },
+  {
+    EL_TIMEGATE_CLOSING,			-1, -1,
+    IMG_TIMEGATE_CLOSING
+  },
+  {
+    EL_PEARL,					-1, -1,
+    IMG_PEARL
+  },
+  {
+    EL_PEARL_BREAKING,				-1, -1,
+    IMG_PEARL_BREAKING
+  },
+  {
+    EL_CRYSTAL,					-1, -1,
+    IMG_CRYSTAL
+  },
+  {
+    EL_WALL_PEARL,				-1, -1,
+    IMG_WALL_PEARL
+  },
+  {
+    EL_WALL_CRYSTAL,				-1, -1,
+    IMG_WALL_CRYSTAL
+  },
+  {
+    EL_TUBE_RIGHT_DOWN,				-1, -1,
+    IMG_TUBE_RIGHT_DOWN
+  },
+  {
+    EL_TUBE_HORIZONTAL_DOWN,			-1, -1,
+    IMG_TUBE_HORIZONTAL_DOWN
+  },
+  {
+    EL_TUBE_LEFT_DOWN,				-1, -1,
+    IMG_TUBE_LEFT_DOWN
+  },
+  {
+    EL_TUBE_HORIZONTAL,				-1, -1,
+    IMG_TUBE_HORIZONTAL
+  },
+  {
+    EL_TUBE_VERTICAL_RIGHT,			-1, -1,
+    IMG_TUBE_VERTICAL_RIGHT
+  },
+  {
+    EL_TUBE_ALL,				-1, -1,
+    IMG_TUBE_ALL
+  },
+  {
+    EL_TUBE_VERTICAL_LEFT,			-1, -1,
+    IMG_TUBE_VERTICAL_LEFT
+  },
+  {
+    EL_TUBE_VERTICAL,				-1, -1,
+    IMG_TUBE_VERTICAL
+  },
+  {
+    EL_TUBE_RIGHT_UP,				-1, -1,
+    IMG_TUBE_RIGHT_UP
+  },
+  {
+    EL_TUBE_HORIZONTAL_UP,			-1, -1,
+    IMG_TUBE_HORIZONTAL_UP
+  },
+  {
+    EL_TUBE_LEFT_UP,				-1, -1,
+    IMG_TUBE_LEFT_UP
+  },
+  {
+    EL_TRAP,					-1, -1,
+    IMG_TRAP
+  },
+  {
+    EL_TRAP_ACTIVE,				-1, -1,
+    IMG_TRAP_ACTIVE
+  },
+  {
+    EL_DX_SUPABOMB,				-1, -1,
+    IMG_DX_SUPABOMB
+  },
+  {
+    EL_KEY1,					-1, -1,
+    IMG_KEY1
+  },
+  {
+    EL_KEY2,					-1, -1,
+    IMG_KEY2
+  },
+  {
+    EL_KEY3,					-1, -1,
+    IMG_KEY3
+  },
+  {
+    EL_KEY4,					-1, -1,
+    IMG_KEY4
+  },
+  {
+    EL_GATE1,					-1, -1,
+    IMG_GATE1
+  },
+  {
+    EL_GATE2,					-1, -1,
+    IMG_GATE2
+  },
+  {
+    EL_GATE3,					-1, -1,
+    IMG_GATE3
+  },
+  {
+    EL_GATE4,					-1, -1,
+    IMG_GATE4
+  },
+  {
+    EL_GATE1_GRAY,				-1, -1,
+    IMG_GATE1_GRAY
+  },
+  {
+    EL_GATE2_GRAY,				-1, -1,
+    IMG_GATE2_GRAY
+  },
+  {
+    EL_GATE3_GRAY,				-1, -1,
+    IMG_GATE3_GRAY
+  },
+  {
+    EL_GATE4_GRAY,				-1, -1,
+    IMG_GATE4_GRAY
+  },
+  {
+    EL_GAMEOFLIFE,				-1, -1,
+    IMG_GAMEOFLIFE
+  },
+  {
+    EL_BIOMAZE,					-1, -1,
+    IMG_BIOMAZE
+  },
+  {
+    EL_PACMAN_RIGHT,				-1, -1,
+    IMG_PACMAN_RIGHT
+  },
+  {
+    EL_PACMAN,					MV_RIGHT, -1,
+    IMG_PACMAN_RIGHT
+  },
+  {
+    EL_PACMAN_UP,				-1, -1,
+    IMG_PACMAN_UP
+  },
+  {
+    EL_PACMAN,					MV_UP, -1,
+    IMG_PACMAN_UP
+  },
+  {
+    EL_PACMAN_LEFT,				-1, -1,
+    IMG_PACMAN_LEFT
+  },
+  {
+    EL_PACMAN,					MV_LEFT, -1,
+    IMG_PACMAN_LEFT
+  },
+  {
+    EL_PACMAN_DOWN,				-1, -1,
+    IMG_PACMAN_DOWN
+  },
+  {
+    EL_PACMAN,					MV_DOWN, -1,
+    IMG_PACMAN_DOWN
+  },
+  {
+    EL_LAMP,					-1, -1,
+    IMG_LAMP
+  },
+  {
+    EL_LAMP_ACTIVE,				-1, -1,
+    IMG_LAMP_ACTIVE
+  },
+  {
+    EL_TIME_ORB_FULL,				-1, -1,
+    IMG_TIME_ORB_FULL
+  },
+  {
+    EL_TIME_ORB_EMPTY,				-1, -1,
+    IMG_TIME_ORB_EMPTY
+  },
+  {
+    EL_EMERALD_YELLOW,				-1, -1,
+    IMG_EMERALD_YELLOW
+  },
+  {
+    EL_EMERALD_YELLOW,				-1, GFX_ACTION_FALLING,
+    IMG_EMERALD_YELLOW_FALLING
+  },
+  {
+    EL_EMERALD_RED,				-1, -1,
+    IMG_EMERALD_RED
+  },
+  {
+    EL_EMERALD_RED,				-1, GFX_ACTION_FALLING,
+    IMG_EMERALD_RED_FALLING
+  },
+  {
+    EL_EMERALD_PURPLE,				-1, -1,
+    IMG_EMERALD_PURPLE
+  },
+  {
+    EL_EMERALD_PURPLE,				-1, GFX_ACTION_FALLING,
+    IMG_EMERALD_PURPLE_FALLING
+  },
+  {
+    EL_WALL_EMERALD_YELLOW,			-1, -1,
+    IMG_WALL_EMERALD_YELLOW
+  },
+  {
+    EL_WALL_EMERALD_RED,			-1, -1,
+    IMG_WALL_EMERALD_RED
+  },
+  {
+    EL_WALL_EMERALD_PURPLE,			-1, -1,
+    IMG_WALL_EMERALD_PURPLE
+  },
+  {
+    EL_WALL_BD_DIAMOND,				-1, -1,
+    IMG_WALL_BD_DIAMOND
+  },
+  {
+    EL_WALL_GROWING_XY,				-1, -1,
+    IMG_WALL_GROWING_XY
+  },
+  {
+    EL_WALL_GROWING_X,				-1, -1,
+    IMG_WALL_GROWING_X
+  },
+  {
+    EL_WALL_GROWING_Y,				-1, -1,
+    IMG_WALL_GROWING_Y
+  },
+  {
+    EL_WALL_GROWING_ACTIVE,			MV_LEFT, -1,
+    IMG_WALL_GROWING_ACTIVE_LEFT
+  },
+  {
+    EL_WALL_GROWING_ACTIVE,			MV_RIGHT, -1,
+    IMG_WALL_GROWING_ACTIVE_RIGHT
+  },
+  {
+    EL_WALL_GROWING_ACTIVE,			MV_UP, -1,
+    IMG_WALL_GROWING_ACTIVE_UP
+  },
+  {
+    EL_WALL_GROWING_ACTIVE,			MV_DOWN, -1,
+    IMG_WALL_GROWING_ACTIVE_DOWN
+  },
+  {
+    EL_BLACK_ORB,				-1, -1,
+    IMG_BLACK_ORB
+  },
+  {
+    EL_SPEED_PILL,				-1, -1,
+    IMG_SPEED_PILL
+  },
+  {
+    EL_DARK_YAMYAM,				-1, -1,
+    IMG_DARK_YAMYAM
+  },
+  {
+    EL_DYNABOMB_ACTIVE,				-1, -1,
+    IMG_DYNABOMB_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER1_ACTIVE,			-1, -1,
+    IMG_DYNABOMB_PLAYER1_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER2_ACTIVE,			-1, -1,
+    IMG_DYNABOMB_PLAYER2_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER3_ACTIVE,			-1, -1,
+    IMG_DYNABOMB_PLAYER3_ACTIVE
+  },
+  {
+    EL_DYNABOMB_PLAYER4_ACTIVE,			-1, -1,
+    IMG_DYNABOMB_PLAYER4_ACTIVE
+  },
+  {
+    EL_DYNABOMB_NR,				-1, -1,
+    IMG_DYNABOMB_NR
+  },
+  {
+    EL_DYNABOMB_SZ,				-1, -1,
+    IMG_DYNABOMB_SZ
+  },
+  {
+    EL_DYNABOMB_XL,				-1, -1,
+    IMG_DYNABOMB_XL
+  },
+  {
+    EL_PIG,					MV_DOWN, -1,
+    IMG_PIG_DOWN
+  },
+  {
+    EL_PIG,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PIG_DOWN_MOVING
+  },
+  {
+    EL_PIG,					MV_DOWN, GFX_ACTION_EATING,
+    IMG_PIG_DOWN_EATING
+  },
+  {
+    EL_PIG,					MV_UP, -1,
+    IMG_PIG_UP
+  },
+  {
+    EL_PIG,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PIG_UP_MOVING
+  },
+  {
+    EL_PIG,					MV_UP, GFX_ACTION_EATING,
+    IMG_PIG_UP_EATING
+  },
+  {
+    EL_PIG,					MV_LEFT, -1,
+    IMG_PIG_LEFT
+  },
+  {
+    EL_PIG,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PIG_LEFT_MOVING
+  },
+  {
+    EL_PIG,					MV_LEFT, GFX_ACTION_EATING,
+    IMG_PIG_LEFT_EATING
+  },
+  {
+    EL_PIG,					MV_RIGHT, -1,
+    IMG_PIG_RIGHT
+  },
+  {
+    EL_PIG,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PIG_RIGHT_MOVING
+  },
+  {
+    EL_PIG,					MV_RIGHT, GFX_ACTION_EATING,
+    IMG_PIG_RIGHT_EATING
+  },
+  {
+    EL_DRAGON,					MV_DOWN, -1,
+    IMG_DRAGON_DOWN
+  },
+  {
+    EL_DRAGON,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_DRAGON_DOWN_MOVING
+  },
+  {
+    EL_DRAGON,					MV_DOWN, GFX_ACTION_ATTACKING,
+    IMG_DRAGON_DOWN_ATTACKING
+  },
+  {
+    EL_DRAGON,					MV_UP, -1,
+    IMG_DRAGON_UP
+  },
+  {
+    EL_DRAGON,					MV_UP, GFX_ACTION_MOVING,
+    IMG_DRAGON_UP_MOVING
+  },
+  {
+    EL_DRAGON,					MV_UP, GFX_ACTION_ATTACKING,
+    IMG_DRAGON_UP_ATTACKING
+  },
+  {
+    EL_DRAGON,					MV_LEFT, -1,
+    IMG_DRAGON_LEFT
+  },
+  {
+    EL_DRAGON,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_DRAGON_LEFT_MOVING
+  },
+  {
+    EL_DRAGON,					MV_LEFT, GFX_ACTION_ATTACKING,
+    IMG_DRAGON_LEFT_ATTACKING
+  },
+  {
+    EL_DRAGON,					MV_RIGHT, -1,
+    IMG_DRAGON_RIGHT
+  },
+  {
+    EL_DRAGON,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_DRAGON_RIGHT_MOVING
+  },
+  {
+    EL_DRAGON,					MV_RIGHT, GFX_ACTION_ATTACKING,
+    IMG_DRAGON_RIGHT_ATTACKING
+  },
+  {
+    EL_MOLE_DOWN,				-1, -1,
+    IMG_MOLE_DOWN
+  },
+  {
+    EL_MOLE,					MV_DOWN, -1,
+    IMG_MOLE_DOWN
+  },
+  {
+    EL_MOLE_DOWN,				-1, GFX_ACTION_MOVING,
+    IMG_MOLE_DOWN_MOVING
+  },
+  {
+    EL_MOLE,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_MOLE_DOWN_MOVING
+  },
+  {
+    EL_MOLE_DOWN,				-1, GFX_ACTION_DIGGING,
+    IMG_MOLE_DOWN_DIGGING
+  },
+  {
+    EL_MOLE,					MV_DOWN, GFX_ACTION_DIGGING,
+    IMG_MOLE_DOWN_DIGGING
+  },
+  {
+    EL_MOLE_UP,					-1, -1,
+    IMG_MOLE_UP
+  },
+  {
+    EL_MOLE,					MV_UP, -1,
+    IMG_MOLE_UP
+  },
+  {
+    EL_MOLE_UP,					-1, GFX_ACTION_MOVING,
+    IMG_MOLE_UP_MOVING
+  },
+  {
+    EL_MOLE,					MV_UP, GFX_ACTION_MOVING,
+    IMG_MOLE_UP_MOVING
+  },
+  {
+    EL_MOLE_UP,					-1, GFX_ACTION_DIGGING,
+    IMG_MOLE_UP_DIGGING
+  },
+  {
+    EL_MOLE,					MV_UP, GFX_ACTION_DIGGING,
+    IMG_MOLE_UP_DIGGING
+  },
+  {
+    EL_MOLE_LEFT,				-1, -1,
+    IMG_MOLE_LEFT
+  },
+  {
+    EL_MOLE,					MV_LEFT, -1,
+    IMG_MOLE_LEFT
+  },
+  {
+    EL_MOLE_LEFT,				-1, GFX_ACTION_MOVING,
+    IMG_MOLE_LEFT_MOVING
+  },
+  {
+    EL_MOLE,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_MOLE_LEFT_MOVING
+  },
+  {
+    EL_MOLE_LEFT,				-1, GFX_ACTION_DIGGING,
+    IMG_MOLE_LEFT_DIGGING
+  },
+  {
+    EL_MOLE,					MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_MOLE_LEFT_DIGGING
+  },
+  {
+    EL_MOLE_RIGHT,				-1, -1,
+    IMG_MOLE_RIGHT
+  },
+  {
+    EL_MOLE,					MV_RIGHT, -1,
+    IMG_MOLE_RIGHT
+  },
+  {
+    EL_MOLE_RIGHT,				-1, GFX_ACTION_MOVING,
+    IMG_MOLE_RIGHT_MOVING
+  },
+  {
+    EL_MOLE,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_MOLE_RIGHT_MOVING
+  },
+  {
+    EL_MOLE_RIGHT,				-1, GFX_ACTION_DIGGING,
+    IMG_MOLE_RIGHT_DIGGING
+  },
+  {
+    EL_MOLE,					MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_MOLE_RIGHT_DIGGING
+  },
+  {
+    EL_PENGUIN,					MV_DOWN, -1,
+    IMG_PENGUIN_DOWN
+  },
+  {
+    EL_PENGUIN,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PENGUIN_DOWN_MOVING
+  },
+  {
+    EL_PENGUIN,					MV_UP, -1,
+    IMG_PENGUIN_UP
+  },
+  {
+    EL_PENGUIN,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PENGUIN_UP_MOVING
+  },
+  {
+    EL_PENGUIN,					MV_LEFT, -1,
+    IMG_PENGUIN_LEFT
+  },
+  {
+    EL_PENGUIN,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PENGUIN_LEFT_MOVING
+  },
+  {
+    EL_PENGUIN,					MV_RIGHT, -1,
+    IMG_PENGUIN_RIGHT
+  },
+  {
+    EL_PENGUIN,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PENGUIN_RIGHT_MOVING
+  },
+  {
+    EL_SATELLITE,				-1, -1,
+    IMG_SATELLITE
+  },
+  {
+    EL_SATELLITE,				-1, GFX_ACTION_MOVING,
+    IMG_SATELLITE_MOVING
+  },
+  {
+    EL_STONEBLOCK,				-1, -1,
+    IMG_STONEBLOCK
+  },
+  {
+    EL_PLAYER1,					-1, -1,
+    IMG_PLAYER1
+  },
+  {
+    EL_PLAYER1,					MV_DOWN, -1,
+    IMG_PLAYER1_DOWN
+  },
+  {
+    EL_PLAYER1,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PLAYER1_DOWN_MOVING
+  },
+  {
+    EL_PLAYER1,					MV_DOWN, GFX_ACTION_DIGGING,
+    IMG_PLAYER1_DOWN_DIGGING
+  },
+  {
+    EL_PLAYER1,					MV_DOWN, GFX_ACTION_PUSHING,
+    IMG_PLAYER1_DOWN_PUSHING
+  },
+  {
+    EL_PLAYER1,					MV_DOWN, GFX_ACTION_SNAPPING,
+    IMG_PLAYER1_DOWN_SNAPPING
+  },
+  {
+    EL_PLAYER1,					MV_UP, -1,
+    IMG_PLAYER1_UP
+  },
+  {
+    EL_PLAYER1,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PLAYER1_UP_MOVING
+  },
+  {
+    EL_PLAYER1,					MV_UP, GFX_ACTION_DIGGING,
+    IMG_PLAYER1_UP_DIGGING
+  },
+  {
+    EL_PLAYER1,					MV_UP, GFX_ACTION_PUSHING,
+    IMG_PLAYER1_UP_PUSHING
+  },
+  {
+    EL_PLAYER1,					MV_UP, GFX_ACTION_SNAPPING,
+    IMG_PLAYER1_UP_SNAPPING
+  },
+  {
+    EL_PLAYER1,					MV_LEFT, -1,
+    IMG_PLAYER1_LEFT
+  },
+  {
+    EL_PLAYER1,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PLAYER1_LEFT_MOVING
+  },
+  {
+    EL_PLAYER1,					MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_PLAYER1_LEFT_DIGGING
+  },
+  {
+    EL_PLAYER1,					MV_LEFT, GFX_ACTION_PUSHING,
+    IMG_PLAYER1_LEFT_PUSHING
+  },
+  {
+    EL_PLAYER1,					MV_LEFT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER1_LEFT_SNAPPING
+  },
+  {
+    EL_PLAYER1,					MV_RIGHT, -1,
+    IMG_PLAYER1_RIGHT
+  },
+  {
+    EL_PLAYER1,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PLAYER1_RIGHT_MOVING
+  },
+  {
+    EL_PLAYER1,					MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_PLAYER1_RIGHT_DIGGING
+  },
+  {
+    EL_PLAYER1,					MV_RIGHT, GFX_ACTION_PUSHING,
+    IMG_PLAYER1_RIGHT_PUSHING
+  },
+  {
+    EL_PLAYER1,					MV_RIGHT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER1_RIGHT_SNAPPING
+  },
+  {
+    EL_PLAYER2,					-1, -1,
+    IMG_PLAYER2
+  },
+  {
+    EL_PLAYER2,					MV_DOWN, -1,
+    IMG_PLAYER2_DOWN
+  },
+  {
+    EL_PLAYER2,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PLAYER2_DOWN_MOVING
+  },
+  {
+    EL_PLAYER2,					MV_DOWN, GFX_ACTION_DIGGING,
+    IMG_PLAYER2_DOWN_DIGGING
+  },
+  {
+    EL_PLAYER2,					MV_DOWN, GFX_ACTION_PUSHING,
+    IMG_PLAYER2_DOWN_PUSHING
+  },
+  {
+    EL_PLAYER2,					MV_DOWN, GFX_ACTION_SNAPPING,
+    IMG_PLAYER2_DOWN_SNAPPING
+  },
+  {
+    EL_PLAYER2,					MV_UP, -1,
+    IMG_PLAYER2_UP
+  },
+  {
+    EL_PLAYER2,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PLAYER2_UP_MOVING
+  },
+  {
+    EL_PLAYER2,					MV_UP, GFX_ACTION_DIGGING,
+    IMG_PLAYER2_UP_DIGGING
+  },
+  {
+    EL_PLAYER2,					MV_UP, GFX_ACTION_PUSHING,
+    IMG_PLAYER2_UP_PUSHING
+  },
+  {
+    EL_PLAYER2,					MV_UP, GFX_ACTION_SNAPPING,
+    IMG_PLAYER2_UP_SNAPPING
+  },
+  {
+    EL_PLAYER2,					MV_LEFT, -1,
+    IMG_PLAYER2_LEFT
+  },
+  {
+    EL_PLAYER2,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PLAYER2_LEFT_MOVING
+  },
+  {
+    EL_PLAYER2,					MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_PLAYER2_LEFT_DIGGING
+  },
+  {
+    EL_PLAYER2,					MV_LEFT, GFX_ACTION_PUSHING,
+    IMG_PLAYER2_LEFT_PUSHING
+  },
+  {
+    EL_PLAYER2,					MV_LEFT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER2_LEFT_SNAPPING
+  },
+  {
+    EL_PLAYER2,					MV_RIGHT, -1,
+    IMG_PLAYER2_RIGHT
+  },
+  {
+    EL_PLAYER2,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PLAYER2_RIGHT_MOVING
+  },
+  {
+    EL_PLAYER2,					MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_PLAYER2_RIGHT_DIGGING
+  },
+  {
+    EL_PLAYER2,					MV_RIGHT, GFX_ACTION_PUSHING,
+    IMG_PLAYER2_RIGHT_PUSHING
+  },
+  {
+    EL_PLAYER2,					MV_RIGHT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER2_RIGHT_SNAPPING
+  },
+  {
+    EL_PLAYER3,					-1, -1,
+    IMG_PLAYER3
+  },
+  {
+    EL_PLAYER3,					MV_DOWN, -1,
+    IMG_PLAYER3_DOWN
+  },
+  {
+    EL_PLAYER3,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PLAYER3_DOWN_MOVING
+  },
+  {
+    EL_PLAYER3,					MV_DOWN, GFX_ACTION_DIGGING,
+    IMG_PLAYER3_DOWN_DIGGING
+  },
+  {
+    EL_PLAYER3,					MV_DOWN, GFX_ACTION_PUSHING,
+    IMG_PLAYER3_DOWN_PUSHING
+  },
+  {
+    EL_PLAYER3,					MV_DOWN, GFX_ACTION_SNAPPING,
+    IMG_PLAYER3_DOWN_SNAPPING
+  },
+  {
+    EL_PLAYER3,					MV_UP, -1,
+    IMG_PLAYER3_UP
+  },
+  {
+    EL_PLAYER3,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PLAYER3_UP_MOVING
+  },
+  {
+    EL_PLAYER3,					MV_UP, GFX_ACTION_DIGGING,
+    IMG_PLAYER3_UP_DIGGING
+  },
+  {
+    EL_PLAYER3,					MV_UP, GFX_ACTION_PUSHING,
+    IMG_PLAYER3_UP_PUSHING
+  },
+  {
+    EL_PLAYER3,					MV_UP, GFX_ACTION_SNAPPING,
+    IMG_PLAYER3_UP_SNAPPING
+  },
+  {
+    EL_PLAYER3,					MV_LEFT, -1,
+    IMG_PLAYER3_LEFT
+  },
+  {
+    EL_PLAYER3,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PLAYER3_LEFT_MOVING
+  },
+  {
+    EL_PLAYER3,					MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_PLAYER3_LEFT_DIGGING
+  },
+  {
+    EL_PLAYER3,					MV_LEFT, GFX_ACTION_PUSHING,
+    IMG_PLAYER3_LEFT_PUSHING
+  },
+  {
+    EL_PLAYER3,					MV_LEFT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER3_LEFT_SNAPPING
+  },
+  {
+    EL_PLAYER3,					MV_RIGHT, -1,
+    IMG_PLAYER3_RIGHT
+  },
+  {
+    EL_PLAYER3,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PLAYER3_RIGHT_MOVING
+  },
+  {
+    EL_PLAYER3,					MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_PLAYER3_RIGHT_DIGGING
+  },
+  {
+    EL_PLAYER3,					MV_RIGHT, GFX_ACTION_PUSHING,
+    IMG_PLAYER3_RIGHT_PUSHING
+  },
+  {
+    EL_PLAYER3,					MV_RIGHT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER3_RIGHT_SNAPPING
+  },
+  {
+    EL_PLAYER4,					-1, -1,
+    IMG_PLAYER4
+  },
+  {
+    EL_PLAYER4,					MV_DOWN, -1,
+    IMG_PLAYER4_DOWN
+  },
+  {
+    EL_PLAYER4,					MV_DOWN, GFX_ACTION_MOVING,
+    IMG_PLAYER4_DOWN_MOVING
+  },
+  {
+    EL_PLAYER4,					MV_DOWN, GFX_ACTION_DIGGING,
+    IMG_PLAYER4_DOWN_DIGGING
+  },
+  {
+    EL_PLAYER4,					MV_DOWN, GFX_ACTION_PUSHING,
+    IMG_PLAYER4_DOWN_PUSHING
+  },
+  {
+    EL_PLAYER4,					MV_DOWN, GFX_ACTION_SNAPPING,
+    IMG_PLAYER4_DOWN_SNAPPING
+  },
+  {
+    EL_PLAYER4,					MV_UP, -1,
+    IMG_PLAYER4_UP
+  },
+  {
+    EL_PLAYER4,					MV_UP, GFX_ACTION_MOVING,
+    IMG_PLAYER4_UP_MOVING
+  },
+  {
+    EL_PLAYER4,					MV_UP, GFX_ACTION_DIGGING,
+    IMG_PLAYER4_UP_DIGGING
+  },
+  {
+    EL_PLAYER4,					MV_UP, GFX_ACTION_PUSHING,
+    IMG_PLAYER4_UP_PUSHING
+  },
+  {
+    EL_PLAYER4,					MV_UP, GFX_ACTION_SNAPPING,
+    IMG_PLAYER4_UP_SNAPPING
+  },
+  {
+    EL_PLAYER4,					MV_LEFT, -1,
+    IMG_PLAYER4_LEFT
+  },
+  {
+    EL_PLAYER4,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_PLAYER4_LEFT_MOVING
+  },
+  {
+    EL_PLAYER4,					MV_LEFT, GFX_ACTION_DIGGING,
+    IMG_PLAYER4_LEFT_DIGGING
+  },
+  {
+    EL_PLAYER4,					MV_LEFT, GFX_ACTION_PUSHING,
+    IMG_PLAYER4_LEFT_PUSHING
+  },
+  {
+    EL_PLAYER4,					MV_LEFT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER4_LEFT_SNAPPING
+  },
+  {
+    EL_PLAYER4,					MV_RIGHT, -1,
+    IMG_PLAYER4_RIGHT
+  },
+  {
+    EL_PLAYER4,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_PLAYER4_RIGHT_MOVING
+  },
+  {
+    EL_PLAYER4,					MV_RIGHT, GFX_ACTION_DIGGING,
+    IMG_PLAYER4_RIGHT_DIGGING
+  },
+  {
+    EL_PLAYER4,					MV_RIGHT, GFX_ACTION_PUSHING,
+    IMG_PLAYER4_RIGHT_PUSHING
+  },
+  {
+    EL_PLAYER4,					MV_RIGHT, GFX_ACTION_SNAPPING,
+    IMG_PLAYER4_RIGHT_SNAPPING
+  },
+  {
+    EL_EXPLOSION,				-1, -1,
+    IMG_EXPLOSION
+  },
+  {
+    EL_STEELWALL_TOPLEFT,			-1, -1,
+    IMG_STEELWALL_TOPLEFT
+  },
+  {
+    EL_STEELWALL_TOPRIGHT,			-1, -1,
+    IMG_STEELWALL_TOPRIGHT
+  },
+  {
+    EL_STEELWALL_BOTTOMLEFT,			-1, -1,
+    IMG_STEELWALL_BOTTOMLEFT
+  },
+  {
+    EL_STEELWALL_BOTTOMRIGHT,			-1, -1,
+    IMG_STEELWALL_BOTTOMRIGHT
+  },
+  {
+    EL_STEELWALL_HORIZONTAL,			-1, -1,
+    IMG_STEELWALL_HORIZONTAL
+  },
+  {
+    EL_STEELWALL_VERTICAL,			-1, -1,
+    IMG_STEELWALL_VERTICAL
+  },
+  {
+    EL_INVISIBLE_STEELWALL_TOPLEFT,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_TOPLEFT
+  },
+  {
+    EL_INVISIBLE_STEELWALL_TOPRIGHT,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_TOPRIGHT
+  },
+  {
+    EL_INVISIBLE_STEELWALL_BOTTOMLEFT,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_BOTTOMLEFT
+  },
+  {
+    EL_INVISIBLE_STEELWALL_BOTTOMRIGHT,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_BOTTOMRIGHT
+  },
+  {
+    EL_INVISIBLE_STEELWALL_HORIZONTAL,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_HORIZONTAL
+  },
+  {
+    EL_INVISIBLE_STEELWALL_VERTICAL,		-1, -1,
+    IMG_INVISIBLE_STEELWALL_VERTICAL
+  },
+  {
+    EL_ARROW_BLUE_LEFT,				-1, -1,
+    IMG_ARROW_BLUE_LEFT
+  },
+  {
+    EL_ARROW_BLUE_RIGHT,			-1, -1,
+    IMG_ARROW_BLUE_RIGHT
+  },
+  {
+    EL_ARROW_BLUE_UP,				-1, -1,
+    IMG_ARROW_BLUE_UP
+  },
+  {
+    EL_ARROW_BLUE_DOWN,				-1, -1,
+    IMG_ARROW_BLUE_DOWN
+  },
+  {
+    EL_ARROW_RED_LEFT,				-1, -1,
+    IMG_ARROW_RED_LEFT
+  },
+  {
+    EL_ARROW_RED_RIGHT,				-1, -1,
+    IMG_ARROW_RED_RIGHT
+  },
+  {
+    EL_ARROW_RED_UP,				-1, -1,
+    IMG_ARROW_RED_UP
+  },
+  {
+    EL_ARROW_RED_DOWN,				-1, -1,
+    IMG_ARROW_RED_DOWN
+  },
+  {
+    EL_CHAR_QUESTION,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_DOOR_WHITE,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_DOOR_WHITE_GRAY,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_DX_UNKNOWN_15,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_DX_UNKNOWN_42,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_EM_KEY1_FILE,				-1, -1,
+    IMG_EM_KEY1
+  },
+  {
+    EL_EM_KEY2_FILE,				-1, -1,
+    IMG_EM_KEY2
+  },
+  {
+    EL_EM_KEY3_FILE,				-1, -1,
+    IMG_EM_KEY3
+  },
+  {
+    EL_EM_KEY4_FILE,				-1, -1,
+    IMG_EM_KEY4
+  },
+  {
+    EL_KEY_WHITE,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_EXIT,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_HEART,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_ONEWAY,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_OTHER,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_PARKING,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_RADIOACTIVITY,			-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_ROUND,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_TRIANGLE,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_WHEELCHAIR,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_SIGN_YINYANG,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    -1,						-1, -1,
+    -1
+  },
+};
+
+#endif	/* GFX_LIST_H */
