@@ -357,7 +357,7 @@ void SoundServer(void)
 	       select(audio.soundserver_pipe[0] + 1,
 		      &sound_fdset, NULL, NULL, &delay) < 1)
 	{	
-	  short *sample_ptr;
+	  void *sample_ptr;
 	  int sample_size;
 	  int max_sample_size;
 	  int fragment_size = afmt.fragment_size;
@@ -380,23 +380,60 @@ void SoundServer(void)
 	      continue;
 
 	    /* get pointer and size of the actual sound sample */
-	    sample_ptr = (short *)playlist[i].data_ptr +playlist[i].playingpos;
+	    if (playlist[i].format == AUDIO_FORMAT_U8)
+	      sample_ptr =
+		(byte *)playlist[i].data_ptr + playlist[i].playingpos;
+	    else
+	      sample_ptr =
+		(short *)playlist[i].data_ptr + playlist[i].playingpos;
+
 	    sample_size = MIN(max_sample_size,
 			      playlist[i].data_len - playlist[i].playingpos);
 	    playlist[i].playingpos += sample_size;
 
 	    /* fill the first mixing buffer with original sample */
+#if 1
+	    if (playlist[i].format == AUDIO_FORMAT_U8)
+	      for (j=0; j<sample_size; j++)
+		premix_first_buffer[j] =
+		  ((short)(((byte *)sample_ptr)[j] ^ 0x80)) << 8;
+	    else
+	      for (j=0; j<sample_size; j++)
+		premix_first_buffer[j] = ((short *)sample_ptr)[j];
+#else
 	    memcpy(premix_first_buffer, sample_ptr,
-		   sample_size * sizeof(short));
+		   sample_size * (playlist[i].format == AUDIO_FORMAT_U8 ?
+				  sizeof(byte) : sizeof(short)));
+#endif
 
 	    /* are we about to restart a looping sound? */
 	    if (playlist[i].loop && sample_size < max_sample_size)
 	    {
+#if 1
+	      while (sample_size < max_sample_size)
+	      {
+		int restarted_sample_size =
+		  MIN(max_sample_size - sample_size, playlist[i].data_len);
+
+		if (playlist[i].format == AUDIO_FORMAT_U8)
+		  for (j=0; j<restarted_sample_size; j++)
+		    premix_first_buffer[sample_size + j] =
+		      ((short)(((byte *)playlist[i].data_ptr)[j] ^ 0x80)) << 8;
+		else
+		  for (j=0; j<restarted_sample_size; j++)
+		    premix_first_buffer[sample_size + j] =
+		      ((short *)playlist[i].data_ptr)[j];
+
+		playlist[i].playingpos = restarted_sample_size;
+		sample_size += restarted_sample_size;
+	      }
+#else
 	      playlist[i].playingpos = max_sample_size - sample_size;
 	      memcpy(premix_first_buffer + sample_size * sizeof(short),
 		     playlist[i].data_ptr,
 		     (max_sample_size - sample_size) * sizeof(short));
 	      sample_size = max_sample_size;
+#endif
 	    }
 
 	    /* decrease volume if sound is fading out */
@@ -713,6 +750,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 
       snd_ctrl.data_ptr = snd_info->data_ptr;
       snd_ctrl.data_len = snd_info->data_len;
+      snd_ctrl.format   = snd_info->format;
 
       playlist[i] = snd_ctrl;
       playing_sounds++;
@@ -1172,15 +1210,24 @@ static SoundInfo *Load_WAV(char *filename)
     return NULL;
   }
 
-  /* convert unsigned 8 bit sample data to signed 16 bit sample data */
+  if (0)
+  {
+    /* convert unsigned 8 bit sample data to signed 16 bit sample data */
 
-  data_ptr = checked_malloc(snd_info->data_len * sizeof(short));
+    data_ptr = checked_malloc(snd_info->data_len * sizeof(short));
 
-  for (i=0; i<snd_info->data_len; i++)
-    data_ptr[i] = ((short)(((byte *)snd_info->data_ptr)[i] ^ 0x80)) << 8;
+    for (i=0; i<snd_info->data_len; i++)
+      data_ptr[i] = ((short)(((byte *)snd_info->data_ptr)[i] ^ 0x80)) << 8;
 
-  free(snd_info->data_ptr);
-  snd_info->data_ptr = data_ptr;
+    free(snd_info->data_ptr);
+    snd_info->data_ptr = data_ptr;
+
+    snd_info->format = AUDIO_FORMAT_S16;
+  }
+  else
+  {
+    snd_info->format = AUDIO_FORMAT_U8;
+  }
 
 #endif	/* PLATFORM_UNIX */
 

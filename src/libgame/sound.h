@@ -199,6 +199,7 @@ struct SampleInfo
 
   long data_len;
   void *data_ptr;
+  int format;
 };
 
 typedef struct SampleInfo	SoundInfo;
@@ -224,6 +225,7 @@ struct SoundControl
 
   long data_len;
   void *data_ptr;
+  int format;
 
 #if defined(PLATFORM_MSDOS)
   int voice;
