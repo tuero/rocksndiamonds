@@ -236,9 +236,9 @@ void SendToServer_StartPlaying()
   buffer[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
   buffer[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
 
-  strcpy((char *)&buffer[10], leveldir_current->name);
+  strcpy((char *)&buffer[10], leveldir_current->filename);
 
-  SendBufferToServer(10 + strlen(leveldir_current->name) + 1);
+  SendBufferToServer(10 + strlen(leveldir_current->filename) + 1);
 }
 
 void SendToServer_PausePlaying()
@@ -415,18 +415,18 @@ static void Handle_OP_START_PLAYING()
   int new_level_nr;
   int dummy;				/* !!! HAS NO MEANING ANYMORE !!! */
   unsigned long new_random_seed;
-  char *new_leveldir_name;
+  char *new_leveldir_filename;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
   dummy = (buffer[4] << 8) + buffer[5];
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
-  new_leveldir_name = (char *)&buffer[10];
+  new_leveldir_filename = (char *)&buffer[10];
 
-  new_leveldir = getLevelDirInfoFromFilename(new_leveldir_name);
+  new_leveldir = getLevelDirInfoFromFilename(new_leveldir_filename);
   if (new_leveldir == NULL)
   {
-    Error(ERR_WARN, "no such level directory: '%s'", new_leveldir_name);
+    Error(ERR_WARN, "no such level directory: '%s'", new_leveldir_filename);
 
     new_leveldir = leveldir_first;
     Error(ERR_WARN, "using default level directory: '%s'", new_leveldir->name);

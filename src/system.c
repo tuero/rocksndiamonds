@@ -193,7 +193,7 @@ inline boolean SetVideoMode(void)
   if (setup.fullscreen && !fullscreen_enabled && fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
-    DrawWindow window_old = window;
+    DrawWindow window_old = backbuffer;
     DrawWindow window_new;
 
     if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
@@ -211,17 +211,17 @@ inline boolean SetVideoMode(void)
     {
       if (window_old)
 	SDL_FreeSurface(window_old);
-      window = window_new;
+      backbuffer = window_new;
 
       fullscreen_enabled = TRUE;
       success = TRUE;
     }
   }
 
-  if ((!setup.fullscreen && fullscreen_enabled) || !window)
+  if ((!setup.fullscreen && fullscreen_enabled) || !backbuffer)
   {
     /* switch display to window mode */
-    DrawWindow window_old = window;
+    DrawWindow window_old = backbuffer;
     DrawWindow window_new;
 
     if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
@@ -237,7 +237,7 @@ inline boolean SetVideoMode(void)
     {
       if (window_old)
 	SDL_FreeSurface(window_old);
-      window = window_new;
+      backbuffer = window_new;
 
       fullscreen_enabled = FALSE;
       success = TRUE;

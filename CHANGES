@@ -2,6 +2,7 @@ Version 1.5.0
 -------------
 	- SDL!!!
 	- trying to open already busy audio device does not block the game
+	- fixed network playing bug (patch from web site)
 
 Release Version 1.4.0 [27 OCT 1999]
 -----------------------------------

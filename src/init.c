@@ -53,6 +53,7 @@ static void InitSound(void);
 static void InitSoundServer(void);
 static void InitWindow(int, char **);
 static void InitGfx(void);
+static void InitGfxBackground(void);
 static void LoadGfx(int, struct PictureFileInfo *);
 static void InitGadgets(void);
 static void InitElementProperties(void);
@@ -100,6 +101,7 @@ void OpenAll(int argc, char *argv[])
   InitLevelInfo();
   InitGadgets();		/* needs to know number of level series */
 
+  InitGfxBackground();
   DrawMainMenu();
 
   InitNetworkServer();
@@ -455,7 +457,7 @@ void InitWindow(int argc, char *argv[])
 #ifdef USE_SDL_LIBRARY
   /* open SDL video output device (window or fullscreen mode) */
 #if 0
-  if ((window = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
+  if ((backbuffer = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
 				 SDL_HWSURFACE))
       == NULL)
     Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -591,7 +593,7 @@ void InitWindow(int argc, char *argv[])
 
 void InitGfx()
 {
-  int i,j;
+  int i, j;
 
 #ifdef USE_SDL_LIBRARY
   SDL_Surface *sdl_image_tmp;
@@ -698,39 +700,10 @@ void InitGfx()
     { -1, 0 }
   };
 
-#if DEBUG_TIMING
-  debug_print_timestamp(0, NULL);	/* initialize timestamp function */
-#endif
-
-#ifdef DEBUG
-#if 0
-  printf("Test: Loading RocksFont2.pcx ...\n");
-  LoadGfx(PIX_SMALLFONT,&test_pic1);
-  printf("Test: Done.\n");
-  printf("Test: Loading mouse.pcx ...\n");
-  LoadGfx(PIX_SMALLFONT,&test_pic2);
-  printf("Test: Done.\n");
-#endif
-#endif
-
-  LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
-  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
-  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
-#ifdef MSDOS
-  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
-  rest(200);
-#endif /* MSDOS */
-  DrawInitText("Loading graphics:",120,FC_GREEN);
-
-  for(i=0; i<NUM_PICTURES; i++)
-    if (i != PIX_SMALLFONT)
-      LoadGfx(i,&pic[i]);
-
-#if DEBUG_TIMING
-  debug_print_timestamp(0, "SUMMARY LOADING ALL GRAPHICS:");
-#endif
+  /* create additional image buffers for double-buffering */
 
 #ifdef USE_SDL_LIBRARY
+
   /* create some native image surfaces for double-buffer purposes */
 
   /* create double-buffer surface for background image */
@@ -768,6 +741,75 @@ void InitGfx()
     Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
+
+  /* SDL cannot directly draw to the visible video framebuffer like X11,
+     but always uses a backbuffer, which is then blitted to the visible
+     video framebuffer with 'SDL_UpdateRect' (or replaced with the current
+     visible video framebuffer with 'SDL_Flip', if the hardware supports
+     this). Therefore do not use an additional backbuffer for drawing, but
+     use a symbolic buffer (distinguishable from the SDL backbuffer) called
+     'window', which indicates that the SDL backbuffer should be updated to
+     the visible video framebuffer when attempting to blit to it.
+
+     For convenience, it seems to be a good idea to create this symbolic
+     buffer 'window' at the same size as the SDL backbuffer. Although it
+     should never be drawn to directly, it would do no harm nevertheless. */
+
+  window = pix[PIX_DB_BACK];		/* 'window' is only symbolic buffer */
+  pix[PIX_DB_BACK] = backbuffer;	/* 'backbuffer' is SDL screen buffer */
+
+#else /* !USE_SDL_LIBRARY */
+
+  pix[PIX_DB_BACK] = XCreatePixmap(display, window,
+				   WIN_XSIZE,WIN_YSIZE,
+				   XDefaultDepth(display,screen));
+  pix[PIX_DB_DOOR] = XCreatePixmap(display, window,
+				   3*DXSIZE,DYSIZE+VYSIZE,
+				   XDefaultDepth(display,screen));
+  pix[PIX_DB_FIELD] = XCreatePixmap(display, window,
+				    FXSIZE,FYSIZE,
+				    XDefaultDepth(display,screen));
+
+  if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR] || !pix[PIX_DB_FIELD])
+    Error(ERR_EXIT, "cannot create additional pixmaps");
+
+#endif /* !USE_SDL_LIBRARY */
+
+#if DEBUG_TIMING
+  debug_print_timestamp(0, NULL);	/* initialize timestamp function */
+#endif
+
+#ifdef DEBUG
+#if 0
+  printf("Test: Loading RocksFont2.pcx ...\n");
+  LoadGfx(PIX_SMALLFONT,&test_pic1);
+  printf("Test: Done.\n");
+  printf("Test: Loading mouse.pcx ...\n");
+  LoadGfx(PIX_SMALLFONT,&test_pic2);
+  printf("Test: Done.\n");
+#endif
+#endif
+
+  LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
+  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
+  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
+#ifdef MSDOS
+  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
+  rest(200);
+#endif /* MSDOS */
+  DrawInitText("Loading graphics:",120,FC_GREEN);
+
+  for(i=0; i<NUM_PICTURES; i++)
+    if (i != PIX_SMALLFONT)
+      LoadGfx(i,&pic[i]);
+
+#if DEBUG_TIMING
+  debug_print_timestamp(0, "SUMMARY LOADING ALL GRAPHICS:");
+#endif
+
+  /* create additional image buffers for masking of graphics */
+
+#ifdef USE_SDL_LIBRARY
 
   /* initialize surface array to 'NULL' */
   for(i=0; i<NUM_TILES; i++)
@@ -807,25 +849,27 @@ void InitGfx()
 
 #else /* !USE_SDL_LIBRARY */
 
-  pix[PIX_DB_BACK] = XCreatePixmap(display, window,
-				   WIN_XSIZE,WIN_YSIZE,
-				   XDefaultDepth(display,screen));
-  pix[PIX_DB_DOOR] = XCreatePixmap(display, window,
-				   3*DXSIZE,DYSIZE+VYSIZE,
-				   XDefaultDepth(display,screen));
-  pix[PIX_DB_FIELD] = XCreatePixmap(display, window,
-				    FXSIZE,FYSIZE,
-				    XDefaultDepth(display,screen));
-
+  /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
   copy_clipmask_gc =
-    XCreateGC(display,clipmask[PIX_BACK],clip_gc_valuemask,&clip_gc_values);
+    XCreateGC(display, clipmask[PIX_BACK], clip_gc_valuemask, &clip_gc_values);
 
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
   tile_clip_gc =
-    XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
+    XCreateGC(display, window, clip_gc_valuemask, &clip_gc_values);
+
+  for(i=0; i<NUM_BITMAPS; i++)
+  {
+    if (clipmask[i])
+    {
+      clip_gc_values.graphics_exposures = False;
+      clip_gc_values.clip_mask = clipmask[i];
+      clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
+      clip_gc[i] = XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
+    }
+  }
 
   /* initialize pixmap array to Pixmap 'None' */
   for(i=0; i<NUM_TILES; i++)
@@ -852,33 +896,24 @@ void InitGfx()
     }
   }
 
-  if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
-    Error(ERR_EXIT, "cannot create additional pixmaps");
-
-  for(i=0; i<NUM_BITMAPS; i++)
-  {
-    if (clipmask[i])
-    {
-      clip_gc_values.graphics_exposures = False;
-      clip_gc_values.clip_mask = clipmask[i];
-      clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
-      clip_gc[i] = XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
-    }
-  }
-
 #endif /* !USE_SDL_LIBRARY */
+}
+
+void InitGfxBackground()
+{
+  int x, y;
 
   drawto = backbuffer = pix[PIX_DB_BACK];
   fieldbuffer = pix[PIX_DB_FIELD];
   SetDrawtoField(DRAW_BACKBUFFER);
 
   BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-  ClearRectangle(pix[PIX_DB_BACK], REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
+  ClearRectangle(backbuffer, REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
   ClearRectangle(pix[PIX_DB_DOOR], 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
 
-  for(i=0; i<MAX_BUF_XSIZE; i++)
-    for(j=0; j<MAX_BUF_YSIZE; j++)
-      redraw[i][j] = 0;
+  for(x=0; x<MAX_BUF_XSIZE; x++)
+    for(y=0; y<MAX_BUF_YSIZE; y++)
+      redraw[x][y] = 0;
   redraw_tiles = 0;
   redraw_mask = REDRAW_ALL;
 }

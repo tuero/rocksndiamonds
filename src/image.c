@@ -553,5 +553,5 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   return PCX_Success;
 }
 
-#endif /* !USE_SDL_LIBRARY */
 #endif /* !MSDOS */
+#endif /* !USE_SDL_LIBRARY */

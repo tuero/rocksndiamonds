@@ -22,6 +22,7 @@ inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
 			int width, int height,
 			int dst_x, int dst_y)
 {
+  SDL_Surface *surface = (dst_surface == window ? backbuffer : dst_surface);
   SDL_Rect src_rect, dst_rect;
 
   src_rect.x = src_x;
@@ -34,15 +35,17 @@ inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
   dst_rect.w = width;
   dst_rect.h = height;
 
-  SDL_BlitSurface(src_surface, &src_rect, dst_surface, &dst_rect);
+  if (src_surface != backbuffer || dst_surface != window)
+    SDL_BlitSurface(src_surface, &src_rect, surface, &dst_rect);
 
   if (dst_surface == window)
-    SDL_UpdateRect(dst_surface, dst_x, dst_y, width, height);
+    SDL_UpdateRect(backbuffer, dst_x, dst_y, width, height);
 }
 
-inline void SDLFillRectangle(SDL_Surface *surface, int x, int y,
+inline void SDLFillRectangle(SDL_Surface *dst_surface, int x, int y,
 			     int width, int height, unsigned int color)
 {
+  SDL_Surface *surface = (dst_surface == window ? backbuffer : dst_surface);
   SDL_Rect rect;
   unsigned int color_r = (color >> 16) && 0xff;
   unsigned int color_g = (color >>  8) && 0xff;
@@ -54,8 +57,10 @@ inline void SDLFillRectangle(SDL_Surface *surface, int x, int y,
   rect.h = height;
 
   SDL_FillRect(surface, &rect,
-               SDL_MapRGB(surface->format, color_r, color_g, color_b));
-  SDL_UpdateRect(surface, x, y, width, height);
+	       SDL_MapRGB(surface->format, color_r, color_g, color_b));
+
+  if (dst_surface == window)
+    SDL_UpdateRect(backbuffer, x, y, width, height);
 }
 
 inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
