@@ -261,6 +261,8 @@ static void InitField(int x, int y, boolean init_game)
     case EL_MAMPFER2:
     case EL_ROBOT:
     case EL_PACMAN:
+    case EL_SP_SNIKSNAK:
+    case EL_SP_ELECTRON:
       InitMovDir(x, y);
       break;
 
@@ -653,7 +655,9 @@ void InitMovDir(int x, int y)
       if (element != EL_KAEFER &&
 	  element != EL_FLIEGER &&
 	  element != EL_BUTTERFLY &&
-	  element != EL_FIREFLY)
+	  element != EL_FIREFLY &&
+	  element != EL_SP_SNIKSNAK &&
+	  element != EL_SP_ELECTRON)
 	break;
 
       for (i=0; i<4; i++)
@@ -668,7 +672,8 @@ void InitMovDir(int x, int y)
 	    MovDir[x][y] = direction[0][i];
 	    break;
 	  }
-	  else if (element == EL_FLIEGER || element == EL_FIREFLY)
+	  else if (element == EL_FLIEGER || element == EL_FIREFLY ||
+		   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
 	  {
 	    MovDir[x][y] = direction[1][i];
 	    break;
@@ -1285,7 +1290,8 @@ void Impact(int x, int y)
     return;
   }
 
-  if (element == EL_BOMBE && (lastline || object_hit))	/* element is bomb */
+  if ((element == EL_BOMBE || element == EL_SP_DISK_ORANGE) &&
+      (lastline || object_hit))	/* element is bomb */
   {
     Bang(x, y);
     return;
@@ -1345,8 +1351,9 @@ void Impact(int x, int y)
     }
     else if (element == EL_FELSBROCKEN)
     {
-      if (IS_ENEMY(smashed) || smashed == EL_BOMBE || smashed == EL_SONDE ||
-	  smashed == EL_SCHWEIN || smashed == EL_DRACHE)
+      if (IS_ENEMY(smashed) ||
+	  smashed == EL_BOMBE || smashed == EL_SP_DISK_ORANGE ||
+	  smashed == EL_SONDE || smashed == EL_SCHWEIN || smashed == EL_DRACHE)
       {
 	Bang(x, y+1);
 	return;
@@ -1485,7 +1492,8 @@ void TurnRound(int x, int y)
     else if (element == EL_BUTTERFLY)	/* && MovDir[x][y] == left_dir) */
       MovDelay[x][y] = 1;
   }
-  else if (element == EL_FLIEGER || element == EL_FIREFLY)
+  else if (element == EL_FLIEGER || element == EL_FIREFLY ||
+	   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
   {
     TestIfBadThingHitsOtherBadThing(x, y);
 
@@ -1496,7 +1504,9 @@ void TurnRound(int x, int y)
 	     !IS_FREE_OR_PLAYER(move_x, move_y))
       MovDir[x][y] = right_dir;
 
-    if (element == EL_FLIEGER && MovDir[x][y] != old_move_dir)
+    if ((element == EL_FLIEGER ||
+	 element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+	&& MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = 9;
     else if (element == EL_FIREFLY)	/* && MovDir[x][y] == right_dir) */
       MovDelay[x][y] = 1;
@@ -1974,7 +1984,9 @@ void StartMoving(int x, int y)
       if (element!=EL_MAMPFER && element!=EL_MAMPFER2 && element!=EL_PACMAN)
       {
 	TurnRound(x, y);
-	if (MovDelay[x][y] && (element == EL_KAEFER || element == EL_FLIEGER))
+	if (MovDelay[x][y] && (element == EL_KAEFER || element == EL_FLIEGER ||
+			       element == EL_SP_SNIKSNAK ||
+			       element == EL_SP_ELECTRON))
 	  DrawLevelField(x, y);
       }
     }
@@ -2219,7 +2231,8 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
-      if (element == EL_KAEFER || element == EL_FLIEGER)
+      if (element == EL_KAEFER || element == EL_FLIEGER ||
+	  element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
 	DrawLevelField(x, y);
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
@@ -2249,7 +2262,7 @@ void ContinueMoving(int x, int y)
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX/8;
 
-  if (CAN_FALL(element) && horiz_move)
+  if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
     step*=2;
   else if (element == EL_TROPFEN)
     step/=2;
@@ -2612,7 +2625,7 @@ void AmoebeAbleger(int ax, int ay)
 
     if (newax == ax && neway == ay)		/* amoeba cannot grow */
     {
-      if (i == 4 && !waiting_for_player)
+      if (i == 4 && (!waiting_for_player || game_emulation == EMU_BOULDERDASH))
       {
 	Feld[ax][ay] = EL_AMOEBE_TOT;
 	DrawLevelField(ax, ay);
@@ -4133,6 +4146,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_DYNAMIT_AUS:
+    case EL_SP_DISK_RED:
       RemoveField(x, y);
       player->dynamite++;
       RaiseScoreElement(EL_DYNAMIT);

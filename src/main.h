@@ -124,6 +124,7 @@ typedef unsigned char byte;
 #define EP_BIT_PLAYER		(1 << 25)
 #define EP_BIT_HAS_CONTENT	(1 << 26)
 #define EP_BIT_EATABLE		(1 << 27)
+#define EP_BIT_SP_ELEMENT	(1 << 28)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -153,6 +154,7 @@ typedef unsigned char byte;
 #define ELEM_IS_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_PLAYER)
 #define HAS_CONTENT(e)		(Elementeigenschaften[e] & EP_BIT_HAS_CONTENT)
 #define IS_EATABLE(e)		(Elementeigenschaften[e] & EP_BIT_EATABLE)
+#define IS_SP_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SP_ELEMENT)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -697,6 +699,8 @@ extern int		num_bg_loops;
 #define EL_CHAR_UE		(EL_CHAR_ASCII0+93)
 #define EL_CHAR_COPY		(EL_CHAR_ASCII0+94)
 #define EL_CHAR_END		(EL_CHAR_START+79)
+
+#define EL_CHAR(x)		(EL_CHAR_A + x - 'A')
 
 #define EL_MAUER_X		200
 #define EL_MAUER_Y		201

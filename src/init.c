@@ -1379,6 +1379,51 @@ void InitElementProperties()
   };
   static int ep_eatable_num = sizeof(ep_eatable)/sizeof(int);
 
+  static int ep_sp_element[] =
+  {
+    EL_SP_EMPTY,
+    EL_SP_ZONK,
+    EL_SP_BASE,
+    EL_SP_MURPHY,
+    EL_SP_INFOTRON,
+    EL_SP_CHIP_SINGLE,
+    EL_SP_HARD_GRAY,
+    EL_SP_EXIT,
+    EL_SP_DISK_ORANGE,
+    EL_SP_PORT1_RIGHT,
+    EL_SP_PORT1_DOWN,
+    EL_SP_PORT1_LEFT,
+    EL_SP_PORT1_UP,
+    EL_SP_PORT2_RIGHT,
+    EL_SP_PORT2_DOWN,
+    EL_SP_PORT2_LEFT,
+    EL_SP_PORT2_UP,
+    EL_SP_SNIKSNAK,
+    EL_SP_DISK_YELLOW,
+    EL_SP_TERMINAL,
+    EL_SP_DISK_RED,
+    EL_SP_PORT_Y,
+    EL_SP_PORT_X,
+    EL_SP_PORT_XY,
+    EL_SP_ELECTRON,
+    EL_SP_BUG,
+    EL_SP_CHIP_LEFT,
+    EL_SP_CHIP_RIGHT,
+    EL_SP_HARD_BASE1,
+    EL_SP_HARD_GREEN,
+    EL_SP_HARD_BLUE,
+    EL_SP_HARD_RED,
+    EL_SP_HARD_YELLOW,
+    EL_SP_HARD_BASE2,
+    EL_SP_HARD_BASE3,
+    EL_SP_HARD_BASE4,
+    EL_SP_HARD_BASE5,
+    EL_SP_HARD_BASE6,
+    EL_SP_CHIP_UPPER,
+    EL_SP_CHIP_LOWER
+  };
+  static int ep_sp_element_num = sizeof(ep_sp_element)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1407,7 +1452,8 @@ void InitElementProperties()
     EP_BIT_PUSHABLE,
     EP_BIT_PLAYER,
     EP_BIT_HAS_CONTENT,
-    EP_BIT_EATABLE
+    EP_BIT_EATABLE,
+    EP_BIT_SP_ELEMENT
   };
   static int *ep_array[] =
   {
@@ -1437,7 +1483,8 @@ void InitElementProperties()
     ep_pushable,
     ep_player,
     ep_has_content,
-    ep_eatable
+    ep_eatable,
+    ep_sp_element
   };
   static int *ep_num[] =
   {
@@ -1467,7 +1514,8 @@ void InitElementProperties()
     &ep_pushable_num,
     &ep_player_num,
     &ep_has_content_num,
-    &ep_eatable_num
+    &ep_eatable_num,
+    &ep_sp_element_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 
