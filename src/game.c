@@ -787,6 +787,108 @@ void DrawGameDoorValues()
 	   int2str(TimeLeft, 3), FONT_TEXT_2);
 }
 
+#if 1
+
+static void resolve_group_element(int group_element, int recursion_depth)
+{
+  static struct ElementGroupInfo *group;
+  struct ElementGroupInfo *actual_group = element_info[group_element].group;
+  int i;
+
+  if (recursion_depth > NUM_GROUP_ELEMENTS)	/* recursion too deep */
+  {
+    Error(ERR_WARN, "recursion too deep when resolving group element %d",
+	  group_element - EL_GROUP_START + 1);
+
+    /* replace element which caused too deep recursion by question mark */
+    group->element_resolved[group->num_elements_resolved++] = EL_CHAR_QUESTION;
+
+    return;
+  }
+
+  if (recursion_depth == 0)			/* initialization */
+  {
+    group = element_info[group_element].group;
+    group->num_elements_resolved = 0;
+  }
+
+  for (i = 0; i < actual_group->num_elements; i++)
+  {
+    int element = actual_group->element[i];
+
+    if (group->num_elements_resolved == NUM_FILE_ELEMENTS)
+      break;
+
+    if (IS_GROUP_ELEMENT(element))
+      resolve_group_element(element, recursion_depth + 1);
+    else
+      group->element_resolved[group->num_elements_resolved++] = element;
+  }
+
+#if 1
+  if (recursion_depth == 0 && group_element <= EL_GROUP_4)
+  {
+    printf("::: group %d: %d resolved elements\n",
+	   group_element - EL_GROUP_START, group->num_elements_resolved);
+    for (i = 0; i < group->num_elements_resolved; i++)
+      printf("::: - %d ['%s']\n", group->element_resolved[i],
+	     element_info[group->element_resolved[i]].token_name);
+  }
+#endif
+}
+
+#else
+
+static void resolve_group_element(int group_element, int recursion_depth)
+{
+  static short element_list_count[NUM_FILE_ELEMENTS];
+  struct ElementGroupInfo *group = element_info[group_element].group;
+  int i, j;
+
+  if (group == NULL)
+    return;
+
+  if (recursion_depth > NUM_GROUP_ELEMENTS)	/* recursion too deep */
+    return;
+
+  if (recursion_depth == 0)			/* initialization */
+    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+      element_list_count[i] = 0;
+
+  for (i = 0; i < group->num_elements; i++)
+  {
+    int element = group->element[i];
+
+    if (IS_GROUP_ELEMENT(element))
+      resolve_group_element(element, recursion_depth + 1);
+    else if (element < NUM_FILE_ELEMENTS)
+      element_list_count[group->element[i]]++;
+  }
+
+  if (recursion_depth == 0)			/* finalization */
+  {
+    group->num_elements_resolved = 0;
+
+    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+      for (j = 0; j < element_list_count[i]; j++)
+	if (group->num_elements_resolved < NUM_FILE_ELEMENTS)
+	  group->element_resolved[group->num_elements_resolved++] = i;
+
+#if 1
+    if (group_element <= EL_GROUP_8)
+    {
+      printf("::: group %d: %d resolved elements\n",
+	     group_element - EL_GROUP_START, group->num_elements_resolved);
+      for (i = 0; i < group->num_elements_resolved; i++)
+	printf("::: - %d ['%s']\n", group->element_resolved[i],
+	       element_info[group->element_resolved[i]].token_name);
+    }
+#endif
+  }
+}
+
+#endif
+
 
 /*
   =============================================================================
@@ -814,6 +916,11 @@ static void InitGameEngine()
 	 tape.file_version);
   printf("       => game.engine_version == %06d\n", game.engine_version);
 #endif
+
+  /* ---------- recursively resolve group elements ------------------------- */
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+    resolve_group_element(EL_GROUP_START + i, 0);
 
   /* ---------- initialize player's initial move delay --------------------- */
 
