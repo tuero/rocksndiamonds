@@ -5348,12 +5348,21 @@ static void ChangeElementNow(int x, int y, int element)
 {
   struct ElementChangeInfo *change = &element_info[element].change;
 
+#if 0
+  if (element >= EL_CUSTOM_START + 17 && element <= EL_CUSTOM_START + 39)
+    printf("::: changing... [%d]\n", FrameCounter);
+#endif
+
+#if 0
   /* prevent CheckTriggeredElementChange() from looping */
   Changing[x][y] = TRUE;
+#endif
 
   CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
 
+#if 0
   Changing[x][y] = FALSE;
+#endif
 
   if (change->explode)
   {
@@ -5544,6 +5553,10 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
   if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
     return FALSE;
 
+  /* prevent this function from running into a loop */
+  if (trigger_event == CE_OTHER_IS_CHANGING)
+    Changing[lx][ly] = TRUE;
+
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     if (!CAN_CHANGE(i) || !HAS_CHANGE_EVENT(i, trigger_event) ||
@@ -5562,9 +5575,15 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
       {
 	ChangeDelay[x][y] = 1;
 	ChangeElement(x, y);
+
+	Changing[x][y] = TRUE;	/* do not change just changed elements */
       }
     }
   }
+
+  /* reset change prevention array */
+  for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+    Changing[x][y] = FALSE;
 
   return TRUE;
 }
@@ -6517,6 +6536,9 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     player->last_move_dir = player->MovDir;
     player->is_moving = TRUE;
+#if 1
+    player->snapped = FALSE;
+#endif
   }
   else
   {
@@ -7636,7 +7658,14 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     {
       player->is_digging = FALSE;
       player->is_collecting = FALSE;
+#if 1
+      player->is_moving = FALSE;
+#endif
     }
+
+#if 0
+    printf("::: trying to snap...\n");
+#endif
 
     return FALSE;
   }
@@ -7646,12 +7675,25 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->MovDir = snap_direction;
 
+#if 1
+  player->is_digging = FALSE;
+  player->is_collecting = FALSE;
+#if 1
+  player->is_moving = FALSE;
+#endif
+#endif
+
   if (DigField(player, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
     return FALSE;
 
   player->snapped = TRUE;
+#if 1
   player->is_digging = FALSE;
   player->is_collecting = FALSE;
+#if 1
+  player->is_moving = FALSE;
+#endif
+#endif
 
   DrawLevelField(x, y);
   BackToFront();

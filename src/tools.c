@@ -599,6 +599,10 @@ void DrawPlayer(struct PlayerInfo *player)
 	    player->is_moving ? ACTION_MOVING :
 	    player->snapped ? ACTION_SNAPPING : ACTION_DEFAULT);
 
+#if 0
+  printf("::: '%s'\n", element_action_info[action].suffix);
+#endif
+
   InitPlayerGfxAnimation(player, action, move_dir);
 
   /* ----------------------------------------------------------------------- */
