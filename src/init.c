@@ -109,9 +109,9 @@ void OpenAll(void)
 
   InitLevelInfo();
   InitLevelArtworkInfo();
-  InitGadgets();		/* needs to know number of level series */
   InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
+  InitGadgets();		/* needs images + number of level series */
 
   InitGfxBackground();
   InitToons();

@@ -484,7 +484,7 @@ void DrawGameDoorValues()
   for (i=0; i<MAX_PLAYERS; i++)
     for (j=0; j<4; j++)
       if (stored_player[i].key[j])
-	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
+	DrawNewMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
 			   GFX_SCHLUESSEL1 + j);
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
@@ -6306,9 +6306,9 @@ int DigField(struct PlayerInfo *player,
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
-      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+      DrawNewMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
-      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+      DrawNewMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;
@@ -6324,9 +6324,9 @@ int DigField(struct PlayerInfo *player,
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
-      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+      DrawNewMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
-      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+      DrawNewMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;

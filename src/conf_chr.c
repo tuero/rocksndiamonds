@@ -339,23 +339,23 @@
   { "char_underscore.frames",			"1"			},
 
   { "char_empty",				"RocksFontEM.pcx"	},
-  { "char_empty.xpos",				"16"			},
-  { "char_empty.ypos",				"0"			},
+  { "char_empty.xpos",				"0"			},
+  { "char_empty.ypos",				"4"			},
   { "char_empty.frames",			"1"			},
 
   { "char_degree",				"RocksFontEM.pcx"	},
-  { "char_degree.xpos",				"16"			},
-  { "char_degree.ypos",				"1"			},
+  { "char_degree.xpos",				"1"			},
+  { "char_degree.ypos",				"4"			},
   { "char_degree.frames",			"1"			},
 
   { "char_tm",					"RocksFontEM.pcx"	},
-  { "char_tm.xpos",				"16"			},
-  { "char_tm.ypos",				"2"			},
+  { "char_tm.xpos",				"2"			},
+  { "char_tm.ypos",				"4"			},
   { "char_tm.frames",				"1"			},
 
   { "char_cursor",				"RocksFontEM.pcx"	},
-  { "char_cursor.xpos",				"16"			},
-  { "char_cursor.ypos",				"3"			},
+  { "char_cursor.xpos",				"3"			},
+  { "char_cursor.ypos",				"4"			},
   { "char_cursor.frames",			"1"			},
 
 

@@ -1008,8 +1008,16 @@ void DrawNewGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y,
 
 void DrawMiniGraphic(int x, int y, int graphic)
 {
-  DrawMiniGraphicExt(drawto, SX + x*MINI_TILEX, SY + y*MINI_TILEY, graphic);
-  MarkTileDirty(x/2, y/2);
+  DrawMiniGraphicExt(drawto,
+		     SX + x * MINI_TILEX, SY + y * MINI_TILEY, graphic);
+  MarkTileDirty(x / 2, y / 2);
+}
+
+void DrawNewMiniGraphic(int x, int y, int graphic)
+{
+  DrawNewMiniGraphicExt(drawto,
+			SX + x * MINI_TILEX, SY + y * MINI_TILEY, graphic);
+  MarkTileDirty(x / 2, y / 2);
 }
 
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
@@ -1057,6 +1065,19 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   }
 }
 
+void getNewMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
+{
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  int mini_startx = 0;
+  int mini_starty = src_bitmap->height * 2 / 3;
+  int src_x = mini_startx + new_graphic_info[graphic].src_x / 2;
+  int src_y = mini_starty + new_graphic_info[graphic].src_y / 2;
+
+  *bitmap = src_bitmap;
+  *x = src_x;
+  *y = src_y;
+}
+
 void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
 {
   Bitmap *bitmap;
@@ -1064,6 +1085,24 @@ void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
 
   getMiniGraphicSource(graphic, &bitmap, &src_x, &src_y);
   BlitBitmap(bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
+}
+
+void DrawNewMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
+{
+#if 1
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getNewMiniGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+#else
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  int mini_startx = src_bitmap->width  * 2 / 3;
+  int mini_starty = src_bitmap->height * 2 / 3;
+  int src_x = mini_startx + new_graphic_info[graphic].src_x / 2;
+  int src_y = mini_starty + new_graphic_info[graphic].src_y / 2;
+#endif
+
+  BlitBitmap(src_bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
 
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
@@ -2025,6 +2064,22 @@ void DrawMiniElement(int x, int y, int element)
   DrawMiniGraphic(x, y, graphic);
 }
 
+void DrawNewMiniElement(int x, int y, int element)
+{
+  int graphic;
+
+#if 0
+  if (!element)
+  {
+    DrawNewMiniGraphic(x, y, -1);
+    return;
+  }
+#endif
+
+  graphic = el2img(element);
+  DrawNewMiniGraphic(x, y, graphic);
+}
+
 void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 {
   int x = sx + scroll_x, y = sy + scroll_y;
@@ -2056,6 +2111,40 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 
     if (steel_position != -1)
       DrawMiniGraphic(sx, sy, border[steel_position][steel_type]);
+  }
+}
+
+void DrawNewMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
+{
+  int x = sx + scroll_x, y = sy + scroll_y;
+
+  if (x < -1 || x > lev_fieldx || y < -1 || y > lev_fieldy)
+    DrawNewMiniElement(sx, sy, EL_EMPTY);
+  else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
+    DrawNewMiniElement(sx, sy, Feld[x][y]);
+  else
+  {
+    int steel_type, steel_position;
+    int border[6][2] =
+    {
+      { IMG_STEELWALL_TOPLEFT,		IMG_INVISIBLE_STEELWALL_TOPLEFT     },
+      { IMG_STEELWALL_TOPRIGHT,		IMG_INVISIBLE_STEELWALL_TOPRIGHT    },
+      { IMG_STEELWALL_BOTTOMLEFT,	IMG_INVISIBLE_STEELWALL_BOTTOMLEFT  },
+      { IMG_STEELWALL_BOTTOMRIGHT,	IMG_INVISIBLE_STEELWALL_BOTTOMRIGHT },
+      { IMG_STEELWALL_VERTICAL,		IMG_INVISIBLE_STEELWALL_VERTICAL    },
+      { IMG_STEELWALL_HORIZONTAL,	IMG_INVISIBLE_STEELWALL_HORIZONTAL  }
+    };
+
+    steel_type = (BorderElement == EL_STEELWALL ? 0 : 1);
+    steel_position = (x == -1 && y == -1			? 0 :
+		      x == lev_fieldx && y == -1		? 1 :
+		      x == -1 && y == lev_fieldy		? 2 :
+		      x == lev_fieldx && y == lev_fieldy	? 3 :
+		      x == -1 || x == lev_fieldx		? 4 :
+		      y == -1 || y == lev_fieldy		? 5 : -1);
+
+    if (steel_position != -1)
+      DrawNewMiniGraphic(sx, sy, border[steel_position][steel_type]);
   }
 }
 
@@ -2127,6 +2216,17 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
   for(x=0; x<size_x; x++)
     for(y=0; y<size_y; y++)
       DrawMiniElementOrWall(x, y, scroll_x, scroll_y);
+
+  redraw_mask |= REDRAW_FIELD;
+}
+
+void DrawNewMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
+{
+  int x,y;
+
+  for(x=0; x<size_x; x++)
+    for(y=0; y<size_y; y++)
+      DrawNewMiniElementOrWall(x, y, scroll_x, scroll_y);
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -3292,6 +3392,12 @@ int el2img(int element)
 {
 #if 1
   int graphic_NEW = element_info[element].graphic[GFX_ACTION_DEFAULT];
+
+#if DEBUG
+  if (graphic_NEW < 0)
+    Error(ERR_WARN, "element %d -> graphic %d -- probably crashing now...",
+	  element, graphic_NEW);
+#endif
 
   return graphic_NEW;
 #else

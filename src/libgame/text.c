@@ -108,7 +108,7 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
 		 char *text, int font_size, int font_type)
 {
   Bitmap *font_bitmap;
-  int font_width, font_height, font_start;
+  int font_width, font_height, font_starty;
   boolean print_inverse = FALSE;
 
   if (font_size != FS_SMALL && font_size != FS_BIG && font_size != FS_MEDIUM)
@@ -126,15 +126,15 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
 		 font.bitmap_small);
 
   if (font_type == FC_SPECIAL2)
-    font_start = (font_size == FS_BIG ? 0 : FONT1_YSIZE) * FONT_LINES_PER_FONT;
+    font_starty = (font_size == FS_BIG ? 0 : FONT1_YSIZE) * 5;
   else
-    font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
-			       font_size == FS_MEDIUM ? FONT6_YSIZE :
-			       FONT2_YSIZE) *
-		  FONT_LINES_PER_FONT);
+    font_starty = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
+				font_size == FS_MEDIUM ? FONT6_YSIZE :
+				FONT2_YSIZE) *
+		   FONT_LINES_PER_FONT);
 
   if (font_type == FC_SPECIAL3)
-    font_start -= FONT2_YSIZE * FONT_LINES_PER_FONT;
+    font_starty -= FONT2_YSIZE * FONT_LINES_PER_FONT;
 
   while (*text)
   {
@@ -162,20 +162,28 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
     if ((c >= 32 && c <= 95) || c == '°' || c == '´')
     {
       int src_x = ((c - 32) % FONT_CHARS_PER_LINE) * font_width;
-      int src_y = ((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_start;
+      int src_y = ((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_starty;
       int dest_x = x, dest_y = y;
 
       if (c == '°' || c == '´')		/* map '°' and 'TM' signs */
       {
-	src_x = FONT_CHARS_PER_LINE * font_width;
-	src_y = (c == '°' ? 1 : 2) * font_height + font_start;
+	if (font_type == FC_SPECIAL2)
+	{
+	  src_x = (c == '°' ? 1 : 2) * font_width;
+	  src_y = 4 * font_height;
+	}
+	else
+	{
+	  src_x = FONT_CHARS_PER_LINE * font_width;
+	  src_y = (c == '°' ? 1 : 2) * font_height + font_starty;
+	}
       }
 
       if (print_inverse)
       {
 	BlitBitmap(font_bitmap, bitmap,
 		   FONT_CHARS_PER_LINE * font_width,
-		   3 * font_height + font_start,
+		   3 * font_height + font_starty,
 		   font_width, font_height, x, y);
 
 	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
