@@ -949,6 +949,8 @@ extern char		*element_info[];
 
 
 /* "real" (and therefore drawable) runtime elements */
+#define EL_FIRST_RUNTIME_EL	500
+
 #define EL_SIEB_LEER		500
 #define EL_SIEB2_LEER		501
 #define EL_SIEB_VOLL		502
