@@ -1,5 +1,6 @@
 Release Version 2.1.0 [XX XXX XXXX]
 -----------------------------------
+	- added Boulderdash style "snap-pushing" (thanks to Achim Härtel)
 	- bug fixed that prevented walking through tubes when gravity on
 	- enhanced sound system (especially regarding stereo and loop sounds)
 	- new structured setup menu (with sob-menues for graphics and sounds)
@@ -7,6 +8,7 @@ Release Version 2.1.0 [XX XXX XXXX]
 	- added support for TrueColor PCX graphics files
 	- added support for 16 bit WAV sound files
 	- added "quick save" and "quick load" functions with shortcut key
+	- added single-step playing mode (automatic pause after each step)
 	- changed default slipping behaviour of gems back to 2.0.0 style;
 	  this is now an element property for gems in the level editor,
 	  although existing converted levels use the new EM gems behaviour

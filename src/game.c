@@ -1349,7 +1349,11 @@ void CheckDynamite(int x, int y)
     MovDelay[x][y]--;
     if (MovDelay[x][y])
     {
+#if 0
       if (!(MovDelay[x][y] % 12))
+#else
+      if (!(MovDelay[x][y] % 6))
+#endif
       {
 	if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
 	  PlaySoundLevel(x, y, SND_DYNAMITE_BURNING);
@@ -3144,7 +3148,7 @@ void ContinueMoving(int x, int y)
 
   MovPos[x][y] += step;
 
-  if (ABS(MovPos[x][y])>=TILEX)		/* object reached its destination */
+  if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
   {
     Feld[x][y] = EL_LEERRAUM;
     Feld[newx][newy] = element;
@@ -5688,7 +5692,7 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
-  if (!player->MovPos)
+  if (player->MovPos == 0)
     player->Pushing = FALSE;
 
   if (mode == DF_NO_PUSH)
@@ -6004,8 +6008,8 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_SP_EXIT_ENTERING, SOUND_MAX_RIGHT);
       break;
 
+      /* the following elements cannot be pushed by "snapping" */
     case EL_FELSBROCKEN:
-    case EL_BD_ROCK:
     case EL_BOMBE:
     case EL_DX_SUPABOMB:
     case EL_KOKOSNUSS:
@@ -6013,7 +6017,12 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_ZONK:
     case EL_SP_DISK_ORANGE:
     case EL_SPRING:
-      if (dy || mode == DF_SNAP)
+      if (mode == DF_SNAP)
+	return MF_NO_ACTION;
+      /* no "break" -- fall through to next case */
+      /* the following elements can be pushed by "snapping" */
+    case EL_BD_ROCK:
+      if (dy)
 	return MF_NO_ACTION;
 
       player->Pushing = TRUE;
@@ -6040,8 +6049,16 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #endif
 
-      RemoveField(x, y);
-      Feld[x+dx][y+dy] = element;
+      if (mode == DF_SNAP)
+      {
+	InitMovingField(x, y, move_direction);
+	ContinueMoving(x, y);
+      }
+      else
+      {
+	RemoveField(x, y);
+	Feld[x+dx][y+dy] = element;
+      }
 
       if (element == EL_SPRING)
       {
@@ -6377,6 +6394,9 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   if (!dx && !dy)
   {
+    if (player->MovPos == 0)
+      player->Pushing = FALSE;
+
     player->snapped = FALSE;
     return FALSE;
   }
@@ -6449,6 +6469,8 @@ boolean PlaceBomb(struct PlayerInfo *player)
 
 void PlaySoundLevel(int x, int y, int nr)
 {
+  static int loop_sound_frame[NUM_SOUND_EFFECTS];
+  static int loop_sound_volume[NUM_SOUND_EFFECTS];
   int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo_position;
   int max_distance = 8;
@@ -6476,6 +6498,18 @@ void PlaySoundLevel(int x, int y, int nr)
   stereo_position = (SOUND_MAX_LEFT +
 		     (sx + max_distance) * SOUND_MAX_LEFT2RIGHT /
 		     (SCR_FIELDX + 2 * max_distance));
+
+  if (IS_LOOP_SOUND(nr))
+  {
+    /* This assures that quieter loop sounds do not overwrite louder ones,
+       while restarting sound volume comparison with each new game frame. */
+
+    if (loop_sound_volume[nr] > volume && loop_sound_frame[nr] == FrameCounter)
+      return;
+
+    loop_sound_volume[nr] = volume;
+    loop_sound_frame[nr] = FrameCounter;
+  }
 
   PlaySoundExt(nr, volume, stereo_position, type);
 }
