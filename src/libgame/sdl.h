@@ -314,6 +314,10 @@ struct XY
 #define KSYM_F23		KSYM_UNDEFINED
 #define KSYM_F24		KSYM_UNDEFINED
 
+#define KSYM_FKEY_FIRST		KSYM_F1
+#define KSYM_FKEY_LAST		KSYM_F15
+#define KSYM_NUM_FKEYS		(KSYM_FKEY_LAST - KSYM_FKEY_FIRST + 1)
+
 
 /* SDL function definitions */
 

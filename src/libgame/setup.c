@@ -516,50 +516,6 @@ void InitLevelSetupDirectory(char *level_subdir)
   createDirectory(getLevelSetupDir(level_subdir), "level setup",PERMS_PRIVATE);
 }
 
-void ReadChunk_VERS(FILE *file, int *file_version, int *game_version)
-{
-  int file_version_major, file_version_minor, file_version_patch;
-  int game_version_major, game_version_minor, game_version_patch;
-
-  file_version_major = fgetc(file);
-  file_version_minor = fgetc(file);
-  file_version_patch = fgetc(file);
-  fgetc(file);		/* not used */
-
-  game_version_major = fgetc(file);
-  game_version_minor = fgetc(file);
-  game_version_patch = fgetc(file);
-  fgetc(file);		/* not used */
-
-  *file_version = VERSION_IDENT(file_version_major,
-				file_version_minor,
-				file_version_patch);
-
-  *game_version = VERSION_IDENT(game_version_major,
-				game_version_minor,
-				game_version_patch);
-}
-
-void WriteChunk_VERS(FILE *file, int file_version, int game_version)
-{
-  int file_version_major = VERSION_MAJOR(file_version);
-  int file_version_minor = VERSION_MINOR(file_version);
-  int file_version_patch = VERSION_PATCH(file_version);
-  int game_version_major = VERSION_MAJOR(game_version);
-  int game_version_minor = VERSION_MINOR(game_version);
-  int game_version_patch = VERSION_PATCH(game_version);
-
-  fputc(file_version_major, file);
-  fputc(file_version_minor, file);
-  fputc(file_version_patch, file);
-  fputc(0, file);	/* not used */
-
-  fputc(game_version_major, file);
-  fputc(game_version_minor, file);
-  fputc(game_version_patch, file);
-  fputc(0, file);	/* not used */
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* some functions to handle lists of level directories                       */
@@ -1917,7 +1873,7 @@ void LoadLevelArtworkInfo()
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
 
-#if 1
+#if 0
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);

@@ -303,9 +303,13 @@ void TapeErase()
   tape.level_nr = level_nr;
   tape.pos[tape.counter].delay = 0;
   tape.changed = TRUE;
+
   tape.date = 10000*(time->tm_year % 100) + 100*time->tm_mon + time->tm_mday;
-  tape.game_version = GAME_VERSION_ACTUAL;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
+
+  tape.file_version = FILE_VERSION_ACTUAL;
+  tape.game_version = GAME_VERSION_ACTUAL;
+  tape.engine_version = level.game_version;
 
   for(i=0; i<MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
@@ -366,16 +370,10 @@ static void TapeAppendRecording()
   if (!tape.playing || !tape.pausing)
     return;
 
-  if (tape.game_version != GAME_VERSION_ACTUAL &&
-      !Request("This may break old version tape ! Append anyway ?",
-	       REQ_ASK))
-    return;
-
   tape.pos[tape.counter].delay = tape.delay_played;
   tape.playing = FALSE;
   tape.recording = TRUE;
   tape.changed = TRUE;
-  tape.game_version = GAME_VERSION_ACTUAL;
 
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
 }

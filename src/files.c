@@ -30,7 +30,7 @@
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
-#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes   */
+#define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
 
 /* file identifier strings */
 #define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
@@ -140,7 +140,8 @@ static int checkLevelElement(int element)
 
 static int LoadLevel_VERS(FILE *file, int chunk_size, struct LevelInfo *level)
 {
-  ReadChunk_VERS(file, &(level->file_version), &(level->game_version));
+  level->file_version = getFileVersion(file);
+  level->game_version = getFileVersion(file);
 
   return chunk_size;
 }
@@ -475,6 +476,12 @@ void LoadLevel(int level_nr)
   SetBorderElement();
 }
 
+static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
+{
+  putFileVersion(file, level->file_version);
+  putFileVersion(file, level->game_version);
+}
+
 static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
@@ -614,6 +621,8 @@ void SaveLevel(int level_nr)
     return;
   }
 
+  level.file_version = FILE_VERSION_ACTUAL;
+  level.game_version = GAME_VERSION_ACTUAL;
 
   /* check level field for 16-bit elements */
   level.encoding_16bit_field = FALSE;
@@ -642,7 +651,7 @@ void SaveLevel(int level_nr)
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
 
   putFileChunkBE(file, "VERS", FILE_VERS_CHUNK_SIZE);
-  WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
+  SaveLevel_VERS(file, &level);
 
   putFileChunkBE(file, "HEAD", LEVEL_HEADER_SIZE);
   SaveLevel_HEAD(file, &level);
@@ -704,7 +713,8 @@ static void setTapeInfoToDefaults()
 
 static int LoadTape_VERS(FILE *file, int chunk_size, struct TapeInfo *tape)
 {
-  ReadChunk_VERS(file, &(tape->file_version), &(tape->game_version));
+  tape->file_version = getFileVersion(file);
+  tape->game_version = getFileVersion(file);
 
   return chunk_size;
 }
@@ -736,6 +746,8 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
 	tape->num_participating_players++;
       }
     }
+
+    ReadUnusedBytesFromFile(file, 4);
   }
 
   return chunk_size;
@@ -943,6 +955,12 @@ void LoadTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
+static void SaveTape_VERS(FILE *file, struct TapeInfo *tape)
+{
+  putFileVersion(file, tape->file_version);
+  putFileVersion(file, tape->game_version);
+}
+
 static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
 {
   int i;
@@ -960,6 +978,8 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
   fputc(store_participating_players, file);
 
   WriteUnusedBytesToFile(file, TAPE_HEADER_UNUSED);
+
+  WriteUnusedBytesToFile(file, 4);
 }
 
 static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
@@ -1001,6 +1021,9 @@ void SaveTape(int level_nr)
     return;
   }
 
+  tape.file_version = FILE_VERSION_ACTUAL;
+  tape.game_version = GAME_VERSION_ACTUAL;
+
   /* count number of participating players  */
   for(i=0; i<MAX_PLAYERS; i++)
     if (tape.player_participates[i])
@@ -1012,7 +1035,7 @@ void SaveTape(int level_nr)
   putFileChunkBE(file, "TAPE", CHUNK_SIZE_NONE);
 
   putFileChunkBE(file, "VERS", FILE_VERS_CHUNK_SIZE);
-  WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
+  SaveTape_VERS(file, &tape);
 
   putFileChunkBE(file, "HEAD", TAPE_HEADER_SIZE);
   SaveTape_HEAD(file, &tape);

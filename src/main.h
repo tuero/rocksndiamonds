@@ -254,7 +254,8 @@ struct PlayerInfo
 struct LevelInfo
 {
   int file_version;	/* file format version the level is stored with    */
-  int game_version;	/* game engine version the level was created with  */
+  int game_version;	/* game release version the level was created with */
+
   boolean encoding_16bit_field;		/* level contains 16-bit elements  */
   boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
   boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
@@ -281,9 +282,10 @@ struct LevelInfo
 
 struct TapeInfo
 {
-  int file_version;	/* file format version the tape is stored with   */
-  int game_version;	/* game engine version the tape was created with */
-  int version;
+  int file_version;	/* file format version the tape is stored with    */
+  int game_version;	/* game release version the tape was created with */
+  int engine_version;	/* game engine version the tape was recorded with */
+
   int level_nr;
   unsigned long random_seed;
   unsigned long date;
@@ -310,8 +312,13 @@ struct TapeInfo
 
 struct GameInfo
 {
-  int version;
+  /* constant within running game */
+  int engine_version;
   int emulation;
+  int initial_move_delay;
+  int initial_move_delay_value;
+
+  /* variable within running game */
   int yam_content_nr;
   boolean magic_wall_active;
   int magic_wall_time_left;

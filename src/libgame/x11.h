@@ -286,6 +286,10 @@ struct XY
 #define KSYM_F23		XK_F23
 #define KSYM_F24		XK_F24
 
+#define KSYM_FKEY_FIRST		KSYM_F1
+#define KSYM_FKEY_LAST		KSYM_F24
+#define KSYM_NUM_FKEYS		(KSYM_FKEY_LAST - KSYM_FKEY_FIRST + 1)
+
 
 /* X11 function definitions */
 

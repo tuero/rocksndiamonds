@@ -76,6 +76,10 @@
 #define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
+/* values for initial player move delay (initial delay counter value) */
+#define INITIAL_MOVE_DELAY_OFF	-1
+#define INITIAL_MOVE_DELAY_ON	0
+
 /* values for player movement speed (which is in fact a delay value) */
 #define MOVE_DELAY_NORMAL_SPEED	8
 #define MOVE_DELAY_HIGH_SPEED	4
@@ -491,9 +495,18 @@ void DrawGameDoorValues()
 	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 }
 
-void InitGameEngine()
+
+/*
+  =============================================================================
+  InitGameSound()
+  -----------------------------------------------------------------------------
+  initialize sound effect lookup table for element actions
+  =============================================================================
+*/
+
+void InitGameSound()
 {
-  static int sound_effect_properties[NUM_SOUND_EFFECTS];
+  int sound_effect_properties[NUM_SOUND_EFFECTS];
   int i, j;
 
 #if 0
@@ -575,12 +588,102 @@ void InitGameEngine()
 #endif
 }
 
-void InitGame()
+
+/*
+  =============================================================================
+  InitGameEngine()
+  -----------------------------------------------------------------------------
+  initialize game engine due to level / tape version number
+  =============================================================================
+*/
+
+static void InitGameEngine()
 {
-  int i, j, x, y;
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
+  int i, x, y;
+
+  for(y=0; y<lev_fieldy; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
+	emulate_bd = FALSE;
+      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
+	emulate_sb = FALSE;
+      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
+	emulate_sp = FALSE;
+    }
+  }
+
+  game.engine_version = (tape.playing ? tape.engine_version :
+			 level.game_version);
+  game.emulation = (emulate_bd ? EMU_BOULDERDASH :
+		    emulate_sb ? EMU_SOKOBAN :
+		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
+
+#if 0
+    printf("level %d: level version == %06d\n", level_nr, level.game_version);
+    printf("          tape version == %06d [%s]\n",
+	   tape.engine_version, (tape.playing ? "PLAYING" : "RECORDING"));
+    printf("       => game.engine_version == %06d\n", game.engine_version);
+#endif
+
+  /* dynamically adjust player properties according to game engine version */
+  game.initial_move_delay =
+    (game.engine_version <= VERSION_IDENT(2,0,1) ? INITIAL_MOVE_DELAY_ON :
+     INITIAL_MOVE_DELAY_OFF);
+
+  /* dynamically adjust player properties according to level information */
+  game.initial_move_delay_value =
+    (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
+  /* dynamically adjust element properties according to game engine version */
+  {
+    static int ep_em_slippery_wall[] =
+    {
+      EL_BETON,
+      EL_MAUERWERK,
+      EL_MAUER_LEBT,
+      EL_MAUER_X,
+      EL_MAUER_Y,
+      EL_MAUER_XY
+    };
+    static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
+
+    for (i=0; i<ep_em_slippery_wall_num; i++)
+    {
+      if (level.em_slippery_gems)	/* special EM style gems behaviour */
+	Elementeigenschaften2[ep_em_slippery_wall[i]] |=
+	  EP_BIT_EM_SLIPPERY_WALL;
+      else
+	Elementeigenschaften2[ep_em_slippery_wall[i]] &=
+	  ~EP_BIT_EM_SLIPPERY_WALL;
+    }
+
+    /* "EL_MAUERND" was not slippery for EM gems in version 2.0.1 */
+    if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
+      Elementeigenschaften2[EL_MAUERND] |=  EP_BIT_EM_SLIPPERY_WALL;
+    else
+      Elementeigenschaften2[EL_MAUERND] &= ~EP_BIT_EM_SLIPPERY_WALL;
+  }
+}
+
+
+/*
+  =============================================================================
+  InitGame()
+  -----------------------------------------------------------------------------
+  initialize and start new game
+  =============================================================================
+*/
+
+void InitGame()
+{
+  int i, j, x, y;
+
+  InitGameEngine();
 
 #if DEBUG
 #if USE_NEW_AMOEBA_CODE
@@ -636,9 +739,8 @@ void InitGame()
     player->last_move_dir = MV_NO_MOVING;
     player->is_moving = FALSE;
 
-    player->move_delay = -1;	/* no initial move delay */
-    player->move_delay_value =
-      (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+    player->move_delay       = game.initial_move_delay;
+    player->move_delay_value = game.initial_move_delay_value;
 
     player->push_delay = 0;
     player->push_delay_value = 5;
@@ -715,19 +817,8 @@ void InitGame()
   }
 
   for(y=0; y<lev_fieldy; y++)
-  {
     for(x=0; x<lev_fieldx; x++)
-    {
-      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
-	emulate_bd = FALSE;
-      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
-	emulate_sb = FALSE;
-      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
-	emulate_sp = FALSE;
-
       InitField(x, y, TRUE);
-    }
-  }
 
   /* correct non-moving belts to start moving left */
   for (i=0; i<4; i++)
@@ -826,68 +917,6 @@ void InitGame()
       if (local_player == player)
 	printf("Player 	%d is local player.\n", i+1);
     }
-  }
-
-  game.version = (tape.playing ? tape.game_version : level.game_version);
-  game.emulation = (emulate_bd ? EMU_BOULDERDASH :
-		    emulate_sb ? EMU_SOKOBAN :
-		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
-
-  /* dynamically adjust element properties according to game engine version */
-  {
-    static int ep_em_slippery_wall[] =
-    {
-      EL_BETON,		/* dummy entry; may be overwritten with EL_MAUERND */
-      EL_BETON,
-      EL_MAUERWERK,
-      EL_MAUER_LEBT,
-      EL_MAUER_X,
-      EL_MAUER_Y,
-      EL_MAUER_XY
-    };
-#if 1
-    static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
-#else
-    static int ep_em_slippery_wall_num =
-      sizeof(ep_em_slippery_wall) / sizeof(int);
-#endif
-
-#if 1
-    printf("level %d: level version == %06d\n", level_nr, level.game_version);
-    printf("         tape version == %06d\n", tape.game_version);
-    printf("      => game.version == %06d\n", game.version);
-
-    /*
-    printf("level %d: game.version == %06d\n", level_nr, level.game_version);
-    printf("         file_version == %06d\n", level.file_version);
-    */
-#endif
-
-    if (game.version > VERSION_IDENT(2,0,1))
-      ep_em_slippery_wall[0] = EL_MAUERND;
-    else
-      ep_em_slippery_wall[0] = EL_BETON;	/* dummy entry */
-
-    Elementeigenschaften2[EL_MAUERND] &= ~EP_BIT_EM_SLIPPERY_WALL;
-
-    for (i=0; i<ep_em_slippery_wall_num; i++)
-    {
-#if 1
-      if (level.em_slippery_gems)	/* special EM style gems behaviour */
-#else
-      if (game.version >= GAME_VERSION_2_0)
-#endif
-	Elementeigenschaften2[ep_em_slippery_wall[i]] |=
-	  EP_BIT_EM_SLIPPERY_WALL;
-      else
-	Elementeigenschaften2[ep_em_slippery_wall[i]] &=
-	  ~EP_BIT_EM_SLIPPERY_WALL;
-    }
-
-    if (IS_EM_SLIPPERY_WALL(EL_MAUERND))
-      printf("IS_EM_SLIPPERY_WALL(EL_MAUERND)\n");
-    else
-      printf("! IS_EM_SLIPPERY_WALL(EL_MAUERND)\n");
   }
 
   if (BorderElement == EL_LEERRAUM)
@@ -4186,6 +4215,7 @@ void MauerAbleger(int ax, int ay)
   	DrawGraphic(SCREENX(ax-1), SCREENY(ay), GFX_MAUER_LEFT);
       new_wall = TRUE;
     }
+
     if (rechts_frei)
     {
       Feld[ax+1][ay] = EL_MAUERND;

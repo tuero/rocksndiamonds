@@ -3920,6 +3920,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
+	if (LevelChanged())
+	  level.game_version = GAME_VERSION_ACTUAL;
+
 	for(x=0; x<lev_fieldx; x++)
 	  for(y=0; y<lev_fieldy; y++)
 	    FieldBackup[x][y] = Ur[x][y];

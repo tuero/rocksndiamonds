@@ -105,8 +105,6 @@ void OpenAll(void)
   InitGfxBackground();
   InitToons();
 
-  InitGameEngine();
-
   DrawMainMenu();
 
   InitNetworkServer();
@@ -180,8 +178,12 @@ static void InitMixer()
 
 static void InitSound()
 {
+  /* load custom sounds and music */
   InitReloadSounds(artwork.snd_current->name);
   InitReloadMusic(artwork.mus_current->name);
+
+  /* initialize sound effect lookup table for element actions */
+  InitGameSound();
 }
 
 static void InitTileClipmasks()

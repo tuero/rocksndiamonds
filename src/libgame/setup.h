@@ -150,9 +150,6 @@ void InitScoreDirectory(char *);
 void InitUserLevelDirectory(char *);
 void InitLevelSetupDirectory(char *);
 
-void ReadChunk_VERS(FILE *, int *, int *);
-void WriteChunk_VERS(FILE *, int, int);
-
 TreeInfo *newTreeInfo();
 void pushTreeInfo(TreeInfo **, TreeInfo *);
 int numTreeInfo(TreeInfo *);

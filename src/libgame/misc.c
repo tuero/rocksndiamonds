@@ -821,6 +821,30 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
   }
 }
 
+int getFileVersion(FILE *file)
+{
+  int version_major, version_minor, version_patch;
+
+  version_major = fgetc(file);
+  version_minor = fgetc(file);
+  version_patch = fgetc(file);
+  fgetc(file);		/* not used */
+
+  return VERSION_IDENT(version_major, version_minor, version_patch);
+}
+
+void putFileVersion(FILE *file, int version)
+{
+  int version_major = VERSION_MAJOR(version);
+  int version_minor = VERSION_MINOR(version);
+  int version_patch = VERSION_PATCH(version);
+
+  fputc(version_major, file);
+  fputc(version_minor, file);
+  fputc(version_patch, file);
+  fputc(0, file);	/* not used */
+}
+
 void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
 {
   while (bytes-- && !feof(file))
@@ -832,6 +856,11 @@ void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
   while (bytes--)
     fputc(0, file);
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* functions to translate key identifiers between different format           */
+/* ------------------------------------------------------------------------- */
 
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
@@ -962,8 +991,8 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
-    else if (key >= KSYM_F1 && key <= KSYM_F24)
-      sprintf(name_buffer, "function F%d", (int)(key - KSYM_F1 + 1));
+    else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
+      sprintf(name_buffer, "function F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "(undefined)");
     else
@@ -999,8 +1028,8 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "XK_%c", '0' + (char)(key - KSYM_0));
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KSYM_KP_0));
-    else if (key >= KSYM_F1 && key <= KSYM_F24)
-      sprintf(name_buffer, "XK_F%d", (int)(key - KSYM_F1 + 1));
+    else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
+      sprintf(name_buffer, "XK_F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "[undefined]");
     else
@@ -1076,7 +1105,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 	  ((c2 >= '0' && c1 <= '9') || c2 == '\0'))
 	d = atoi(&name_ptr[4]);
 
-      if (d >=1 && d <= 24)
+      if (d >= 1 && d <= KSYM_NUM_FKEYS)
 	key = KSYM_F1 + (Key)(d - 1);
     }
     else if (strncmp(name_ptr, "XK_", 3) == 0)

@@ -89,6 +89,8 @@ int getFile32BitInteger(FILE *, int);
 void putFile32BitInteger(FILE *, int, int);
 boolean getFileChunk(FILE *, char *, int *, int);
 void putFileChunk(FILE *, char *, int, int);
+int getFileVersion(FILE *);
+void putFileVersion(FILE *, int);
 void ReadUnusedBytesFromFile(FILE *, unsigned long);
 void WriteUnusedBytesToFile(FILE *, unsigned long);
 
