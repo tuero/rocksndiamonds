@@ -4250,6 +4250,8 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
+    player->last_move_dir = MV_NO_MOVING;
+
     if (++player->frame_reset_delay > player->move_delay_value)
       player->Frame = 0;
   }
@@ -5238,7 +5240,9 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     {
       struct PlayerInfo *player = PLAYERINFO(killx, killy);
 
-      if (player->shield_active_time_left > 0)
+      if (Feld[badx][bady] == EL_ROBOT && player->last_move_dir)
+	;	/* robot does not kill player if he moves */
+      else if (player->shield_active_time_left > 0)
 	Bang(badx, bady);
       else if (!PLAYER_PROTECTED(killx, killy))
 	KillHero(player);
