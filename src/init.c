@@ -556,7 +556,7 @@ void InitGadgets()
 
 void InitElementInfo()
 {
-  int i;
+  int i, j;
 
   static struct
   {
@@ -909,12 +909,16 @@ void InitElementInfo()
   /* always start with reliable default values */
   for(i=0; i<MAX_ELEMENTS; i++)
   {
-    element_info[i].graphic = GFX_LEERRAUM;
-    element_info[i].has_direction_graphic = FALSE;
+    for(j=0; j<NUM_GFX_ACTIONS_MAPPED; j++)
+    {
+      element_info[i].graphic[j] = GFX_LEERRAUM;
+      element_info[i].has_direction_graphic[j] = FALSE;
+    }
   }
 
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    element_info[i].graphic = GFX_CHAR_START + (i - EL_CHAR_START);
+    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+      GFX_CHAR_START + (i - EL_CHAR_START);
 
   for (i=EL_SP_START; i<=EL_SP_END; i++)
   {
@@ -924,7 +928,8 @@ void InitElementInfo()
       (nr_element / gfx_per_line) * SP_PER_LINE +
       (nr_element % gfx_per_line);
 
-    element_info[i].graphic = GFX_START_ROCKSSP + nr_graphic;
+    element_info[i].graphic[GFX_ACTION_DEFAULT] =
+      GFX_START_ROCKSSP + nr_graphic;
   }
 
   /* this overrides some of the above default settings (GFX_SP_ZONK etc.) */
@@ -934,7 +939,7 @@ void InitElementInfo()
     int element = element_to_graphic[i].element;
     int graphic = element_to_graphic[i].graphic;
 
-    element_info[element].graphic = graphic;
+    element_info[element].graphic[GFX_ACTION_DEFAULT] = graphic;
     i++;
   }
 
@@ -943,17 +948,17 @@ void InitElementInfo()
   while (element_to_direction_graphic[i].element > -1)
   {
     int element = element_to_direction_graphic[i].element;
-    int graphic_left  = element_to_direction_graphic[i].graphic_left;
-    int graphic_right = element_to_direction_graphic[i].graphic_right;
-    int graphic_up    = element_to_direction_graphic[i].graphic_up;
-    int graphic_down  = element_to_direction_graphic[i].graphic_down;
 
-    element_info[element].direction_graphic[MV_BIT_LEFT]  = graphic_left;
-    element_info[element].direction_graphic[MV_BIT_RIGHT] = graphic_right;
-    element_info[element].direction_graphic[MV_BIT_UP]    = graphic_up;
-    element_info[element].direction_graphic[MV_BIT_DOWN]  = graphic_down;
+    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_LEFT] =
+      element_to_direction_graphic[i].graphic_left;
+    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_RIGHT] =
+      element_to_direction_graphic[i].graphic_right;
+    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_UP] =
+      element_to_direction_graphic[i].graphic_up;
+    element_info[element].direction_graphic[GFX_ACTION_DEFAULT][MV_BIT_DOWN] =
+      element_to_direction_graphic[i].graphic_down;
 
-    element_info[element].has_direction_graphic = TRUE;
+    element_info[element].has_direction_graphic[GFX_ACTION_DEFAULT] = TRUE;
     i++;
   }
 }

@@ -3296,7 +3296,7 @@ int el2gfx_OLD(int element)
 
 int el2gfx(int element)
 {
-  int graphic_NEW = element_info[element].graphic;
+  int graphic_NEW = element_info[element].graphic[GFX_ACTION_DEFAULT];
 
 #if DEBUG
   int graphic_OLD = el2gfx_OLD(element);
@@ -3333,8 +3333,12 @@ int el2img(int element)
 
 int el_dir2img(int element, int direction)
 {
-  if (element_info[element].has_direction_graphic)
-    return element_info[element].direction_graphic[LOG_MV_DIR(direction)];
+  if (element_info[element].has_direction_graphic[GFX_ACTION_DEFAULT])
+  {
+    int i = LOG_MV_DIR(direction);
+
+    return element_info[element].direction_graphic[GFX_ACTION_DEFAULT][i];
+  }
   else
     return el2img(element);
 }

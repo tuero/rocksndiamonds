@@ -199,241 +199,6 @@
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
-struct HiScore
-{
-  char Name[MAX_PLAYER_NAME_LEN + 1];
-  int Score;
-};
-
-struct PlayerInfo
-{
-  boolean present;		/* player present in level playfield */
-  boolean connected;		/* player connected (locally or via network) */
-  boolean active;		/* player (present && connected) */
-
-  int index_nr, client_nr, element_nr;
-
-  byte action;			/* action from local input device */
-  byte effective_action;	/* action acknowledged from network server
-				   or summarized over all configured input
-				   devices when in single player mode */
-  byte programmed_action;	/* action forced by game itself (like moving
-				   through doors); overrides other actions */
-
-  int jx,jy, last_jx,last_jy;
-  int MovDir, MovPos, GfxPos;
-  int Frame;
-
-  boolean Pushing;
-  boolean Switching;
-  boolean LevelSolved, GameOver;
-  boolean snapped;
-
-  int last_move_dir;
-  int is_moving;
-
-  unsigned long move_delay;
-  int move_delay_value;
-
-  unsigned long push_delay;
-  unsigned long push_delay_value;
-
-  int frame_reset_delay;
-
-  unsigned long actual_frame_counter;
-
-  int score;
-  int gems_still_needed;
-  int sokobanfields_still_needed;
-  int lights_still_needed;
-  int friends_still_needed;
-  int key[4];
-  int dynamite;
-  int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
-  int shield_passive_time_left;
-  int shield_active_time_left;
-};
-
-struct LevelInfo
-{
-  int file_version;	/* file format version the level is stored with    */
-  int game_version;	/* game release version the level was created with */
-
-  boolean encoding_16bit_field;		/* level contains 16-bit elements  */
-  boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
-  boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
-
-  int fieldx;
-  int fieldy;
-  int time;
-  int gems_needed;
-  char name[MAX_LEVEL_NAME_LEN + 1];
-  char author[MAX_LEVEL_AUTHOR_LEN + 1];
-  int score[LEVEL_SCORE_ELEMENTS];
-  int yam_content[MAX_ELEMENT_CONTENTS][3][3];
-  int num_yam_contents;
-  int amoeba_speed;
-  int amoeba_content;
-  int time_magic_wall;
-  int time_wheel;
-  int time_light;
-  int time_timegate;
-  boolean double_speed;
-  boolean gravity;
-  boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
-};
-
-struct TapeInfo
-{
-  int file_version;	/* file format version the tape is stored with    */
-  int game_version;	/* game release version the tape was created with */
-  int engine_version;	/* game engine version the tape was recorded with */
-
-  int level_nr;
-  unsigned long random_seed;
-  unsigned long date;
-  unsigned long counter;
-  unsigned long length;
-  unsigned long length_seconds;
-  unsigned int delay_played;
-  boolean pause_before_death;
-  boolean recording, playing, pausing;
-  boolean fast_forward;
-  boolean index_search;
-  boolean quick_resume;
-  boolean single_step;
-  boolean changed;
-  boolean player_participates[MAX_PLAYERS];
-  int num_participating_players;
-
-  struct
-  {
-    byte action[MAX_PLAYERS];
-    byte delay;
-  } pos[MAX_TAPELEN];
-};
-
-struct GameInfo
-{
-  /* constant within running game */
-  int engine_version;
-  int emulation;
-  int initial_move_delay;
-  int initial_move_delay_value;
-
-  /* variable within running game */
-  int yam_content_nr;
-  boolean magic_wall_active;
-  int magic_wall_time_left;
-  int light_time_left;
-  int timegate_time_left;
-  int belt_dir[4];
-  int belt_dir_nr[4];
-  int switchgate_pos;
-  int balloon_dir;
-  boolean explosions_delayed;
-};
-
-struct GlobalInfo
-{
-  float frames_per_second;
-  boolean fps_slowdown;
-  int fps_slowdown_factor;
-};
-
-struct ElementInfo
-{
-  char *sound_class_name;	/* classification for custom sound effects */
-  char *editor_description;	/* short description for level editor */
-
-  int graphic[NUM_GFX_ACTIONS_MAPPED];
-
-				/* special graphics for left/right/up/down */
-  int direction_graphic[NUM_GFX_ACTIONS_MAPPED][4];
-  boolean has_direction_graphic[NUM_GFX_ACTIONS_MAPPED];
-};
-
-struct GraphicInfo
-{
-  Bitmap *bitmap;
-  int src_x, src_y;
-};
-
-struct NewGraphicInfo
-{
-  Bitmap *bitmap;
-  int src_x, src_y;
-  int anim_frames;
-  int anim_delay;
-  int anim_mode;
-  boolean anim_global_sync;
-  boolean anim_vertical;
-};
-
-extern GC		tile_clip_gc;
-extern Bitmap	       *pix[];
-extern Pixmap		tile_clipmask[];
-extern DrawBuffer      *fieldbuffer;
-extern DrawBuffer      *drawto_field;
-
-extern int		game_status;
-extern boolean		level_editor_test_game;
-extern boolean		network_playing;
-
-extern int		key_joystick_mapping;
-
-extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-extern int		redraw_x1, redraw_y1;
-
-extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
-extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
-
-extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
-
-extern int		FX,FY, ScrollStepSize;
-extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
-extern int		BorderElement;
-extern int		GameFrameDelay;
-extern int		FfwdFrameDelay;
-extern int		BX1,BY1, BX2,BY2;
-extern int		SBX_Left, SBX_Right;
-extern int		SBY_Upper, SBY_Lower;
-extern int		ZX,ZY, ExitX,ExitY;
-extern int		AllPlayersGone;
-
-extern int		TimeFrames, TimePlayed, TimeLeft;
-extern boolean		SiebAktiv;
-extern int		SiebCount;
-
-extern boolean		network_player_action_received;
-
-extern struct LevelInfo		level;
-extern struct PlayerInfo	stored_player[], *local_player;
-extern struct HiScore		highscore[];
-extern struct TapeInfo		tape;
-extern struct GameInfo		game;
-extern struct GlobalInfo	global;
-extern struct ElementInfo	element_info[];
-extern struct GraphicInfo	graphic_info[];
-extern struct NewGraphicInfo	new_graphic_info[];
-extern struct ConfigInfo	image_config[], sound_config[];
-extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
-extern struct FileInfo	       *image_files, *sound_files;
-
 /* often used screen positions */
 #define SX			8
 #define SY			8
@@ -860,56 +625,63 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define EL_TRAP_INACTIVE	356
 #define EL_DX_SUPABOMB		357
 
-#define NUM_LEVEL_ELEMENTS	358
+#define NUM_FILE_ELEMENTS	358
 
 
 /* "real" (and therefore drawable) runtime elements */
-#define EL_FIRST_RUNTIME_EL	500
+#define EL_FIRST_RUNTIME		NUM_FILE_ELEMENTS
 
-#define EL_MAGIC_WALL_EMPTY	500
-#define EL_MAGIC_WALL_BD_EMPTY	501
-#define EL_MAGIC_WALL_FULL	502
-#define EL_MAGIC_WALL_BD_FULL	503
-#define EL_MAGIC_WALL_DEAD	504
-#define EL_MAGIC_WALL_BD_DEAD	505
-#define EL_AUSGANG_ACT		506
-#define EL_SP_TERMINAL_ACTIVE	507
-#define EL_SP_BUG_ACTIVE	508
-#define EL_EM_KEY_1		509
-#define EL_EM_KEY_2		510
-#define EL_EM_KEY_3		511
-#define EL_EM_KEY_4		512
-#define EL_DYNABOMB_ACTIVE_1	513
-#define EL_DYNABOMB_ACTIVE_2	514
-#define EL_DYNABOMB_ACTIVE_3	515
-#define EL_DYNABOMB_ACTIVE_4	516
-#define EL_SWITCHGATE_OPENING	517
-#define EL_SWITCHGATE_CLOSING	518
-#define EL_TIMEGATE_OPENING	519
-#define EL_TIMEGATE_CLOSING	520
-#define EL_PEARL_BREAKING	521
-#define EL_TRAP_ACTIVE		522
-#define EL_SPRING_MOVING	523
-#define EL_SP_MURPHY_CLONE	524
-#define EL_QUICKSAND_EMPTYING	525
-#define EL_MAGIC_WALL_EMPTYING	526
-#define EL_MAGIC_WALL_BD_EMPTYING 527
-#define EL_AMOEBA_DRIPPING	528
+#define EL_MAGIC_WALL_EMPTY		(EL_FIRST_RUNTIME + 0)
+#define EL_MAGIC_WALL_BD_EMPTY		(EL_FIRST_RUNTIME + 1)
+#define EL_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME + 2)
+#define EL_MAGIC_WALL_BD_FULL		(EL_FIRST_RUNTIME + 3)
+#define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME + 4)
+#define EL_MAGIC_WALL_BD_DEAD		(EL_FIRST_RUNTIME + 5)
+#define EL_AUSGANG_ACT			(EL_FIRST_RUNTIME + 6)
+#define EL_SP_TERMINAL_ACTIVE		(EL_FIRST_RUNTIME + 7)
+#define EL_SP_BUG_ACTIVE		(EL_FIRST_RUNTIME + 8)
+#define EL_EM_KEY_1			(EL_FIRST_RUNTIME + 9)
+#define EL_EM_KEY_2			(EL_FIRST_RUNTIME + 10)
+#define EL_EM_KEY_3			(EL_FIRST_RUNTIME + 11)
+#define EL_EM_KEY_4			(EL_FIRST_RUNTIME + 12)
+#define EL_DYNABOMB_ACTIVE_1		(EL_FIRST_RUNTIME + 13)
+#define EL_DYNABOMB_ACTIVE_2		(EL_FIRST_RUNTIME + 14)
+#define EL_DYNABOMB_ACTIVE_3		(EL_FIRST_RUNTIME + 15)
+#define EL_DYNABOMB_ACTIVE_4		(EL_FIRST_RUNTIME + 16)
+#define EL_SWITCHGATE_OPENING		(EL_FIRST_RUNTIME + 17)
+#define EL_SWITCHGATE_CLOSING		(EL_FIRST_RUNTIME + 18)
+#define EL_TIMEGATE_OPENING		(EL_FIRST_RUNTIME + 19)
+#define EL_TIMEGATE_CLOSING		(EL_FIRST_RUNTIME + 20)
+#define EL_PEARL_BREAKING		(EL_FIRST_RUNTIME + 21)
+#define EL_TRAP_ACTIVE			(EL_FIRST_RUNTIME + 22)
+#define EL_SPRING_MOVING		(EL_FIRST_RUNTIME + 23)
+#define EL_SP_MURPHY_CLONE		(EL_FIRST_RUNTIME + 24)
+#define EL_QUICKSAND_EMPTYING		(EL_FIRST_RUNTIME + 25)
+#define EL_MAGIC_WALL_EMPTYING		(EL_FIRST_RUNTIME + 26)
+#define EL_MAGIC_WALL_BD_EMPTYING	(EL_FIRST_RUNTIME + 27)
+#define EL_AMOEBA_DRIPPING		(EL_FIRST_RUNTIME + 28)
+
+#define NUM_RUNTIME_ELEMENTS		(EL_FIRST_RUNTIME + 29)
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_BLOCKED		600
-#define EL_EXPLODING		601
-#define EL_CRACKINGNUT		602
-#define EL_BLURB_LEFT		603
-#define EL_BLURB_RIGHT		604
-#define EL_AMOEBING		605
-#define EL_DEAMOEBING		606
-#define EL_MAUERND		607
-#define EL_BURNING		608
-#define EL_PLAYER_IS_LEAVING	609
-#define EL_QUICKSAND_FILLING	610
-#define EL_MAGIC_WALL_FILLING	611
-#define EL_MAGIC_WALL_BD_FILLING 612
+#define EL_FIRST_RUNTIME_UNREAL		NUM_RUNTIME_ELEMENTS
+
+#define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
+#define EL_EXPLODING			(EL_FIRST_RUNTIME_UNREAL + 1)
+#define EL_CRACKINGNUT			(EL_FIRST_RUNTIME_UNREAL + 2)
+#define EL_BLURB_LEFT			(EL_FIRST_RUNTIME_UNREAL + 3)
+#define EL_BLURB_RIGHT			(EL_FIRST_RUNTIME_UNREAL + 4)
+#define EL_AMOEBING			(EL_FIRST_RUNTIME_UNREAL + 5)
+#define EL_DEAMOEBING			(EL_FIRST_RUNTIME_UNREAL + 6)
+#define EL_MAUERND			(EL_FIRST_RUNTIME_UNREAL + 7)
+#define EL_BURNING			(EL_FIRST_RUNTIME_UNREAL + 8)
+#define EL_PLAYER_IS_LEAVING		(EL_FIRST_RUNTIME_UNREAL + 9)
+#define EL_QUICKSAND_FILLING		(EL_FIRST_RUNTIME_UNREAL + 10)
+#define EL_MAGIC_WALL_FILLING		(EL_FIRST_RUNTIME_UNREAL + 11)
+#define EL_MAGIC_WALL_BD_FILLING	(EL_FIRST_RUNTIME_UNREAL + 12)
+
+#define MAX_NUM_ELEMENTS		(EL_FIRST_RUNTIME_UNREAL + 13)
+
 
 /* game graphics:
 **	  0 -  255: graphics from "RocksElements"
@@ -1482,18 +1254,20 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define GFX_ACTION_UNKNOWN		0
 #define GFX_ACTION_DEFAULT		1
 #define GFX_ACTION_WAITING		2
-#define GFX_ACTION_MOVING		3
-#define GFX_ACTION_DIGGING		4
-#define GFX_ACTION_COLLECTING		5
-#define GFX_ACTION_PUSHING		6
-#define GFX_ACTION_PASSING		7
-#define GFX_ACTION_IMPACT		8
-#define GFX_ACTION_ACTIVATING		9
-#define GFX_ACTION_BURNING		10
-#define GFX_ACTION_OTHER		11
+#define GFX_ACTION_FALLING		3
+#define GFX_ACTION_MOVING		4
+#define GFX_ACTION_DIGGING		5
+#define GFX_ACTION_COLLECTING		6
+#define GFX_ACTION_PUSHING		7
+#define GFX_ACTION_PASSING		8
+#define GFX_ACTION_IMPACT		9
+#define GFX_ACTION_CRACKING		10
+#define GFX_ACTION_ACTIVATING		11
+#define GFX_ACTION_BURNING		12
+#define GFX_ACTION_OTHER		13
 
-#define NUM_GFX_ACTIONS			12
-#define NUM_GFX_ACTIONS_MAPPED		6
+#define NUM_GFX_ACTIONS			14
+#define NUM_GFX_ACTIONS_MAPPED		7
 
 
 /* values for image configuration suffixes */
@@ -1513,7 +1287,7 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define IMG_SAND_CRUMBLED			2
 #define IMG_QUICKSAND_EMPTY			3
 #define IMG_QUICKSAND_FULL			4
-#define IMG_QUICKSAND_SLIPPING_THROUGH		5
+#define IMG_QUICKSAND_SLIPPING			5
 #define IMG_STEELWALL				6
 #define IMG_WALL				7
 #define IMG_WALL_CRUMBLED			8
@@ -1567,403 +1341,409 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define IMG_ROBOT				56
 #define IMG_ROBOT_WHEEL				57
 #define IMG_AMOEBA_DROP				58
-#define IMG_AMOEBA_GROWING			59
-#define IMG_AMOEBA				60
-#define IMG_AMOEBA_DEAD				61
-#define IMG_LAMP_OFF				62
-#define IMG_LAMP_ON				63
-#define IMG_TIME_ORB_FULL			64
-#define IMG_TIME_ORB_EMPTY			65
-#define IMG_BD_AMOEBA				66
-#define IMG_SOKOBAN_OBJECT			67
-#define IMG_SOKOBAN_FIELD_EMPTY			68
-#define IMG_SOKOBAN_FIELD_FULL			69
-#define IMG_MAGIC_WALL				70
-#define IMG_MAGIC_WALL_RUNNING			71
-#define IMG_BD_MAGIC_WALL			72
-#define IMG_BD_MAGIC_WALL_RUNNING		73
-#define IMG_WALL_EMERALD			74
-#define IMG_WALL_DIAMOND			75
-#define IMG_WALL_EMERALD_RED			76
-#define IMG_WALL_EMERALD_PURPLE			77
-#define IMG_WALL_EMERALD_YELLOW			78
-#define IMG_WALL_BD_DIAMOND			79
-#define IMG_EMERALD_RED				80
-#define IMG_EMERALD_RED_FALLING			81
-#define IMG_EMERALD_PURPLE			82
-#define IMG_EMERALD_PURPLE_FALLING		83
-#define IMG_EMERALD_YELLOW			84
-#define IMG_EMERALD_YELLOW_FALLING		85
-#define IMG_WALL_GROWING_XY			86
-#define IMG_WALL_GROWING_X			87
-#define IMG_WALL_GROWING_Y			88
-#define IMG_DYNABOMB_XL				89
-#define IMG_BLACK_ORB				90
-#define IMG_SPEED_PILL				91
-#define IMG_BD_DIAMOND				92
-#define IMG_BD_DIAMOND_FALLING			93
-#define IMG_WALL_GROWING_RIGHT			94
-#define IMG_WALL_GROWING_LEFT			95
-#define IMG_EXIT_CLOSED				96
-#define IMG_EXIT_OPENING			97
-#define IMG_EXIT_OPEN				98
-#define IMG_DARK_YAMYAM				99
-#define IMG_DYNABOMB_BURNING			100
-#define IMG_DYNABOMB_NR				101
-#define IMG_DYNABOMB_SZ				102
-#define IMG_ARROW_LEFT				103
-#define IMG_ARROW_RIGHT				104
-#define IMG_ARROW_UP				105
-#define IMG_ARROW_DOWN				106
-#define IMG_BD_BUTTERFLY			107
-#define IMG_BD_BUTTERFLY_MOVING			108
-#define IMG_BD_BUTTERFLY_RIGHT			109
-#define IMG_BD_BUTTERFLY_UP			110
-#define IMG_BD_BUTTERFLY_LEFT			111
-#define IMG_BD_BUTTERFLY_DOWN			112
-#define IMG_BD_FIREFLY				113
-#define IMG_BD_FIREFLY_MOVING			114
-#define IMG_BD_FIREFLY_RIGHT			115
-#define IMG_BD_FIREFLY_UP			116
-#define IMG_BD_FIREFLY_LEFT			117
-#define IMG_BD_FIREFLY_DOWN			118
-#define IMG_STEELWALL_TOPLEFT			119
-#define IMG_STEELWALL_TOPRIGHT			120
-#define IMG_STEELWALL_BOTTOMLEFT		121
-#define IMG_STEELWALL_BOTTOMRIGHT		122
-#define IMG_STEELWALL_HORIZONTAL		123
-#define IMG_INVISIBLE_STEELWALL_TOPLEFT		124
-#define IMG_INVISIBLE_STEELWALL_TOPRIGHT	125
-#define IMG_INVISIBLE_STEELWALL_BOTTOMLEFT	126
-#define IMG_INVISIBLE_STEELWALL_BOTTOMRIGHT	127
-#define IMG_INVISIBLE_STEELWALL_HORIZONTAL	128
-#define IMG_PLAYER1_DOWN			129
-#define IMG_PLAYER1_DOWN_MOVING			130
-#define IMG_PLAYER1_DOWN_DIGGING		131
-#define IMG_PLAYER1_UP				132
-#define IMG_PLAYER1_UP_MOVING			133
-#define IMG_PLAYER1_UP_DIGGING			134
-#define IMG_PLAYER1_LEFT			135
-#define IMG_PLAYER1_LEFT_MOVING			136
-#define IMG_PLAYER1_LEFT_DIGGING		137
-#define IMG_PLAYER1_LEFT_PUSHING		138
-#define IMG_PLAYER1_RIGHT			139
-#define IMG_PLAYER1_RIGHT_MOVING		140
-#define IMG_PLAYER1_RIGHT_DIGGING		141
-#define IMG_PLAYER1_RIGHT_PUSHING		142
-#define IMG_PLAYER2_DOWN			143
-#define IMG_PLAYER2_DOWN_MOVING			144
-#define IMG_PLAYER2_DOWN_DIGGING		145
-#define IMG_PLAYER2_UP				146
-#define IMG_PLAYER2_UP_MOVING			147
-#define IMG_PLAYER2_UP_DIGGING			148
-#define IMG_PLAYER2_LEFT			149
-#define IMG_PLAYER2_LEFT_MOVING			150
-#define IMG_PLAYER2_LEFT_DIGGING		151
-#define IMG_PLAYER2_LEFT_PUSHING		152
-#define IMG_PLAYER2_RIGHT			153
-#define IMG_PLAYER2_RIGHT_MOVING		154
-#define IMG_PLAYER2_RIGHT_DIGGING		155
-#define IMG_PLAYER2_RIGHT_PUSHING		156
-#define IMG_PLAYER3_DOWN			157
-#define IMG_PLAYER3_DOWN_MOVING			158
-#define IMG_PLAYER3_DOWN_DIGGING		159
-#define IMG_PLAYER3_UP				160
-#define IMG_PLAYER3_UP_MOVING			161
-#define IMG_PLAYER3_UP_DIGGING			162
-#define IMG_PLAYER3_LEFT			163
-#define IMG_PLAYER3_LEFT_MOVING			164
-#define IMG_PLAYER3_LEFT_DIGGING		165
-#define IMG_PLAYER3_LEFT_PUSHING		166
-#define IMG_PLAYER3_RIGHT			167
-#define IMG_PLAYER3_RIGHT_MOVING		168
-#define IMG_PLAYER3_RIGHT_DIGGING		169
-#define IMG_PLAYER3_RIGHT_PUSHING		170
-#define IMG_PLAYER4_DOWN			171
-#define IMG_PLAYER4_DOWN_MOVING			172
-#define IMG_PLAYER4_DOWN_DIGGING		173
-#define IMG_PLAYER4_UP				174
-#define IMG_PLAYER4_UP_MOVING			175
-#define IMG_PLAYER4_UP_DIGGING			176
-#define IMG_PLAYER4_LEFT			177
-#define IMG_PLAYER4_LEFT_MOVING			178
-#define IMG_PLAYER4_LEFT_DIGGING		179
-#define IMG_PLAYER4_LEFT_PUSHING		180
-#define IMG_PLAYER4_RIGHT			181
-#define IMG_PLAYER4_RIGHT_MOVING		182
-#define IMG_PLAYER4_RIGHT_DIGGING		183
-#define IMG_PLAYER4_RIGHT_PUSHING		184
-#define IMG_WALL_GROWING_DOWN			185
-#define IMG_WALL_GROWING_UP			186
-#define IMG_SHIELD_PASSIVE_ACTIVATED		187
-#define IMG_SHIELD_ACTIVE_ACTIVATED		188
-#define IMG_PIG_DOWN				189
-#define IMG_PIG_DOWN_MOVING			190
-#define IMG_PIG_DOWN_EATING			191
-#define IMG_PIG_UP				192
-#define IMG_PIG_UP_MOVING			193
-#define IMG_PIG_UP_EATING			194
-#define IMG_PIG_LEFT				195
-#define IMG_PIG_LEFT_MOVING			196
-#define IMG_PIG_LEFT_EATING			197
-#define IMG_PIG_RIGHT				198
-#define IMG_PIG_RIGHT_MOVING			199
-#define IMG_PIG_RIGHT_EATING			200
-#define IMG_DRAGON_DOWN				201
-#define IMG_DRAGON_DOWN_MOVING			202
-#define IMG_DRAGON_DOWN_ATTACKING		203
-#define IMG_DRAGON_UP				204
-#define IMG_DRAGON_UP_MOVING			205
-#define IMG_DRAGON_UP_ATTACKING			206
-#define IMG_DRAGON_LEFT				207
-#define IMG_DRAGON_LEFT_MOVING			208
-#define IMG_DRAGON_LEFT_ATTACKING		209
-#define IMG_DRAGON_RIGHT			210
-#define IMG_DRAGON_RIGHT_MOVING			211
-#define IMG_DRAGON_RIGHT_ATTACKING		212
-#define IMG_MOLE_DOWN				213
-#define IMG_MOLE_DOWN_MOVING			214
-#define IMG_MOLE_DOWN_DIGGING			215
-#define IMG_MOLE_UP				216
-#define IMG_MOLE_UP_MOVING			217
-#define IMG_MOLE_UP_DIGGING			218
-#define IMG_MOLE_LEFT				219
-#define IMG_MOLE_LEFT_MOVING			220
-#define IMG_MOLE_LEFT_DIGGING			221
-#define IMG_MOLE_RIGHT				222
-#define IMG_MOLE_RIGHT_MOVING			223
-#define IMG_MOLE_RIGHT_DIGGING			224
-#define IMG_PENGUIN_DOWN			225
-#define IMG_PENGUIN_DOWN_MOVING			226
-#define IMG_PENGUIN_UP				227
-#define IMG_PENGUIN_UP_MOVING			228
-#define IMG_PENGUIN_LEFT			229
-#define IMG_PENGUIN_LEFT_MOVING			230
-#define IMG_PENGUIN_RIGHT			231
-#define IMG_PENGUIN_RIGHT_MOVING		232
-#define IMG_SATELLITE				233
-#define IMG_SATELLITE_MOVING			234
-#define IMG_ACID_SPLASHING_LEFT			235
-#define IMG_ACID_SPLASHING_RIGHT		236
-#define IMG_SPARKLING_BLUE			237
-#define IMG_SPARKLING_WHITE			238
-#define IMG_FLAMES_LEFT1			239
-#define IMG_FLAMES_LEFT2			240
-#define IMG_FLAMES_LEFT3			241
-#define IMG_FLAMES_RIGHT1			242
-#define IMG_FLAMES_RIGHT2			243
-#define IMG_FLAMES_RIGHT3			244
-#define IMG_FLAMES_UP1				245
-#define IMG_FLAMES_UP2				246
-#define IMG_FLAMES_UP3				247
-#define IMG_FLAMES_DOWN1			248
-#define IMG_FLAMES_DOWN2			249
-#define IMG_FLAMES_DOWN3			250
-#define IMG_SP_EMPTY_SPACE			251
-#define IMG_SP_ZONK				252
-#define IMG_SP_ZONK_FALLING			253
-#define IMG_SP_ZONK_PUSHING			254
-#define IMG_SP_BASE				255
-#define IMG_SP_MURPHY				256
-#define IMG_SP_MURPHY_LEFT			257
-#define IMG_SP_MURPHY_LEFT_MOVING		258
-#define IMG_SP_MURPHY_LEFT_DIGGING		259
-#define IMG_SP_MURPHY_LEFT_PUSHING		260
-#define IMG_SP_MURPHY_LEFT_SNAPPING		261
-#define IMG_SP_MURPHY_RIGHT			262
-#define IMG_SP_MURPHY_RIGHT_MOVING		263
-#define IMG_SP_MURPHY_RIGHT_DIGGING		264
-#define IMG_SP_MURPHY_RIGHT_PUSHING		265
-#define IMG_SP_MURPHY_RIGHT_SNAPPING		266
-#define IMG_SP_MURPHY_UP			267
-#define IMG_SP_MURPHY_UP_SNAPPING		268
-#define IMG_SP_MURPHY_DOWN			269
-#define IMG_SP_MURPHY_DOWN_SNAPPING		270
-#define IMG_SP_MURPHY_CLONE			271
-#define IMG_SP_INFOTRON				272
-#define IMG_SP_INFOTRON_FALLING			273
-#define IMG_SP_CHIP_SINGLE			274
-#define IMG_SP_CHIP_LEFT			275
-#define IMG_SP_CHIP_RIGHT			276
-#define IMG_SP_CHIP_UPPER			277
-#define IMG_SP_CHIP_LOWER			278
-#define IMG_SP_HARD_GRAY			279
-#define IMG_SP_HARD_GREEN			280
-#define IMG_SP_HARD_BLUE			281
-#define IMG_SP_HARD_RED				282
-#define IMG_SP_HARD_YELLOW			283
-#define IMG_SP_EXIT_CLOSED			284
-#define IMG_SP_EXIT_OPEN			285
-#define IMG_SP_DISK_ORANGE			286
-#define IMG_SP_DISK_ORANGE_FALLING		287
-#define IMG_SP_DISK_ORANGE_PUSHING		288
-#define IMG_SP_DISK_YELLOW			289
-#define IMG_SP_DISK_YELLOW_PUSHING		290
-#define IMG_SP_DISK_RED				291
-#define IMG_SP_DISK_RED_COLLECTING		292
-#define IMG_SP_PORT1_RIGHT			293
-#define IMG_SP_PORT1_DOWN			294
-#define IMG_SP_PORT1_LEFT			295
-#define IMG_SP_PORT1_UP				296
-#define IMG_SP_PORT2_RIGHT			297
-#define IMG_SP_PORT2_DOWN			298
-#define IMG_SP_PORT2_LEFT			299
-#define IMG_SP_PORT2_UP				300
-#define IMG_SP_PORT_X				301
-#define IMG_SP_PORT_Y				302
-#define IMG_SP_PORT_XY				303
-#define IMG_SP_SNIKSNAK				304
-#define IMG_SP_SNIKSNAK_LEFT			305
-#define IMG_SP_SNIKSNAK_RIGHT			306
-#define IMG_SP_SNIKSNAK_UP			307
-#define IMG_SP_SNIKSNAK_DOWN			308
-#define IMG_SP_ELECTRON				309
-#define IMG_SP_TERMINAL				310
-#define IMG_SP_TERMINAL_ACTIVE			311
-#define IMG_SP_BUGGY_BASE			312
-#define IMG_SP_BUGGY_BASE_ACTIVATING		313
-#define IMG_SP_HARD_BASE1			314
-#define IMG_SP_HARD_BASE2			315
-#define IMG_SP_HARD_BASE3			316
-#define IMG_SP_HARD_BASE4			317
-#define IMG_SP_HARD_BASE5			318
-#define IMG_SP_HARD_BASE6			319
-#define IMG_INVISIBLE_STEELWALL			320
-#define IMG_INVISIBLE_STEELWALL_ON		321
-#define IMG_INVISIBLE_SAND			322
-#define IMG_INVISIBLE_SAND_ON			323
-#define IMG_INVISIBLE_WALL			324
-#define IMG_INVISIBLE_WALL_ON			325
-#define IMG_EM_KEY1				326
-#define IMG_EM_KEY2				327
-#define IMG_EM_KEY3				328
-#define IMG_EM_KEY4				329
-#define IMG_EM_GATE1				330
-#define IMG_EM_GATE2				331
-#define IMG_EM_GATE3				332
-#define IMG_EM_GATE4				333
-#define IMG_EM_GATE1_GRAY			334
-#define IMG_EM_GATE2_GRAY			335
-#define IMG_EM_GATE3_GRAY			336
-#define IMG_EM_GATE4_GRAY			337
-#define IMG_SP_EXPLOSION			338
-#define IMG_SP_EXPLOSION_INFOTRON		339
-#define IMG_CONVEYOR_BELT1_MIDDLE		340
-#define IMG_CONVEYOR_BELT1_MIDDLE_RUNNING	341
-#define IMG_CONVEYOR_BELT1_LEFT			342
-#define IMG_CONVEYOR_BELT1_LEFT_RUNNING		343
-#define IMG_CONVEYOR_BELT1_RIGHT		344
-#define IMG_CONVEYOR_BELT1_RIGHT_RUNNING	345
-#define IMG_CONVEYOR_BELT1_SWITCH_LEFT		346
-#define IMG_CONVEYOR_BELT1_SWITCH_MIDDLE	347
-#define IMG_CONVEYOR_BELT1_SWITCH_RIGHT		348
-#define IMG_CONVEYOR_BELT2_MIDDLE		349
-#define IMG_CONVEYOR_BELT2_MIDDLE_RUNNING	350
-#define IMG_CONVEYOR_BELT2_LEFT			351
-#define IMG_CONVEYOR_BELT2_LEFT_RUNNING		352
-#define IMG_CONVEYOR_BELT2_RIGHT		353
-#define IMG_CONVEYOR_BELT2_RIGHT_RUNNING	354
-#define IMG_CONVEYOR_BELT2_SWITCH_LEFT		355
-#define IMG_CONVEYOR_BELT2_SWITCH_MIDDLE	356
-#define IMG_CONVEYOR_BELT2_SWITCH_RIGHT		357
-#define IMG_CONVEYOR_BELT3_MIDDLE		358
-#define IMG_CONVEYOR_BELT3_MIDDLE_RUNNING	359
-#define IMG_CONVEYOR_BELT3_LEFT			360
-#define IMG_CONVEYOR_BELT3_LEFT_RUNNING		361
-#define IMG_CONVEYOR_BELT3_RIGHT		362
-#define IMG_CONVEYOR_BELT3_RIGHT_RUNNING	363
-#define IMG_CONVEYOR_BELT3_SWITCH_LEFT		364
-#define IMG_CONVEYOR_BELT3_SWITCH_MIDDLE	365
-#define IMG_CONVEYOR_BELT3_SWITCH_RIGHT		366
-#define IMG_CONVEYOR_BELT4_MIDDLE		367
-#define IMG_CONVEYOR_BELT4_MIDDLE_RUNNING	368
-#define IMG_CONVEYOR_BELT4_LEFT			369
-#define IMG_CONVEYOR_BELT4_LEFT_RUNNING		370
-#define IMG_CONVEYOR_BELT4_RIGHT		371
-#define IMG_CONVEYOR_BELT4_RIGHT_RUNNING	372
-#define IMG_CONVEYOR_BELT4_SWITCH_LEFT		373
-#define IMG_CONVEYOR_BELT4_SWITCH_MIDDLE	374
-#define IMG_CONVEYOR_BELT4_SWITCH_RIGHT		375
-#define IMG_SWITCHGATE_SWITCH_UP		376
-#define IMG_SWITCHGATE_SWITCH_DOWN		377
-#define IMG_LIGHT_SWITCH_OFF			378
-#define IMG_LIGHT_SWITCH_ON			379
-#define IMG_TIMEGATE_WHEEL			380
-#define IMG_TIMEGATE_WHEEL_RUNNING		381
-#define IMG_ENVELOPE				382
-#define IMG_SIGN_EXCLAMATION			383
-#define IMG_SIGN_STOP				384
-#define IMG_LANDMINE				385
-#define IMG_STEELWALL_SLANTED			386
-#define IMG_EXTRA_TIME				387
-#define IMG_SHIELD_ACTIVE			388
-#define IMG_SHIELD_PASSIVE			389
-#define IMG_SWITCHGATE_CLOSED			390
-#define IMG_SWITCHGATE_OPENING			391
-#define IMG_SWITCHGATE_OPEN			392
-#define IMG_SWITCHGATE_CLOSING			393
-#define IMG_TIMEGATE_CLOSED			394
-#define IMG_TIMEGATE_OPENING			395
-#define IMG_TIMEGATE_OPEN			396
-#define IMG_TIMEGATE_CLOSING			397
-#define IMG_BALLOON				398
-#define IMG_BALLOON_MOVING			399
-#define IMG_BALLOON_WINDROSE_LEFT		400
-#define IMG_BALLOON_WINDROSE_RIGHT		401
-#define IMG_BALLOON_WINDROSE_UP			402
-#define IMG_BALLOON_WINDROSE_DOWN		403
-#define IMG_BALLOON_WINDROSE_ALL		404
-#define IMG_EMC_STEELWALL1			405
-#define IMG_EMC_STEELWALL2			406
-#define IMG_EMC_STEELWALL3			407
-#define IMG_EMC_STEELWALL4			408
-#define IMG_EMC_WALL_PILLAR_UPPER		409
-#define IMG_EMC_WALL_PILLAR_MIDDLE		410
-#define IMG_EMC_WALL_PILLAR_LOWER		411
-#define IMG_EMC_WALL4				412
-#define IMG_EMC_WALL5				413
-#define IMG_EMC_WALL6				414
-#define IMG_EMC_WALL7				415
-#define IMG_EMC_WALL8				416
-#define IMG_ARROW_BLUE_LEFT			417
-#define IMG_ARROW_BLUE_RIGHT			418
-#define IMG_ARROW_BLUE_UP			419
-#define IMG_ARROW_BLUE_DOWN			420
-#define IMG_ARROW_RED_LEFT			421
-#define IMG_ARROW_RED_RIGHT			422
-#define IMG_ARROW_RED_UP			423
-#define IMG_ARROW_RED_DOWN			424
-#define IMG_SCROLLBAR_BLUE			425
-#define IMG_SCROLLBAR_RED			426
-#define IMG_SCROLLBAR_GREEN			427
-#define IMG_SCROLLBAR_YELLOW			428
-#define IMG_PEARL				429
-#define IMG_PEARL_BREAKING			430
-#define IMG_CRYSTAL				431
-#define IMG_WALL_PEARL				432
-#define IMG_WALL_CRYSTAL			433
-#define IMG_SPRING				434
-#define IMG_TUBE_RIGHT_DOWN			435
-#define IMG_TUBE_HORIZONTAL_DOWN		436
-#define IMG_TUBE_LEFT_DOWN			437
-#define IMG_TUBE_HORIZONTAL			438
-#define IMG_TUBE_VERTICAL_RIGHT			439
-#define IMG_TUBE_ALL				440
-#define IMG_TUBE_VERTICAL_LEFT			441
-#define IMG_TUBE_VERTICAL			442
-#define IMG_TUBE_RIGHT_UP			443
-#define IMG_TUBE_HORIZONTAL_UP			444
-#define IMG_TUBE_LEFT_UP			445
-#define IMG_TRAP_INACTIVE			446
-#define IMG_TRAP_ACTIVE				447
-#define IMG_TRAP_ACTIVATING			448
-#define IMG_BD_WALL				449
-#define IMG_BD_ROCK				450
-#define IMG_BD_ROCK_FALLING			451
-#define IMG_BD_ROCK_PUSHING			452
-#define IMG_DX_BOMB				453
+#define IMG_AMOEBA_CREATING			59
+#define IMG_AMOEBA1				60
+#define IMG_AMOEBA2				61
+#define IMG_AMOEBA3				62
+#define IMG_AMOEBA4				63
+#define IMG_AMOEBA_DEAD1			64
+#define IMG_AMOEBA_DEAD2			65
+#define IMG_AMOEBA_DEAD3			66
+#define IMG_AMOEBA_DEAD4			67
+#define IMG_LAMP_OFF				68
+#define IMG_LAMP_ON				69
+#define IMG_TIME_ORB_FULL			70
+#define IMG_TIME_ORB_EMPTY			71
+#define IMG_BD_AMOEBA				72
+#define IMG_SOKOBAN_OBJECT			73
+#define IMG_SOKOBAN_FIELD_EMPTY			74
+#define IMG_SOKOBAN_FIELD_FULL			75
+#define IMG_MAGIC_WALL				76
+#define IMG_MAGIC_WALL_ACTIVE			77
+#define IMG_BD_MAGIC_WALL			78
+#define IMG_BD_MAGIC_WALL_ACTIVE		79
+#define IMG_WALL_EMERALD			80
+#define IMG_WALL_DIAMOND			81
+#define IMG_WALL_EMERALD_RED			82
+#define IMG_WALL_EMERALD_PURPLE			83
+#define IMG_WALL_EMERALD_YELLOW			84
+#define IMG_WALL_BD_DIAMOND			85
+#define IMG_EMERALD_RED				86
+#define IMG_EMERALD_RED_FALLING			87
+#define IMG_EMERALD_PURPLE			88
+#define IMG_EMERALD_PURPLE_FALLING		89
+#define IMG_EMERALD_YELLOW			90
+#define IMG_EMERALD_YELLOW_FALLING		91
+#define IMG_WALL_GROWING_XY			92
+#define IMG_WALL_GROWING_X			93
+#define IMG_WALL_GROWING_Y			94
+#define IMG_DYNABOMB_XL				95
+#define IMG_BLACK_ORB				96
+#define IMG_SPEED_PILL				97
+#define IMG_BD_DIAMOND				98
+#define IMG_BD_DIAMOND_FALLING			99
+#define IMG_WALL_GROWING_RIGHT			100
+#define IMG_WALL_GROWING_LEFT			101
+#define IMG_EXIT_CLOSED				102
+#define IMG_EXIT_OPENING			103
+#define IMG_EXIT_OPEN				104
+#define IMG_DARK_YAMYAM				105
+#define IMG_DYNABOMB_BURNING			106
+#define IMG_DYNABOMB_NR				107
+#define IMG_DYNABOMB_SZ				108
+#define IMG_ARROW_LEFT				109
+#define IMG_ARROW_RIGHT				110
+#define IMG_ARROW_UP				111
+#define IMG_ARROW_DOWN				112
+#define IMG_BD_BUTTERFLY			113
+#define IMG_BD_BUTTERFLY_MOVING			114
+#define IMG_BD_BUTTERFLY_RIGHT			115
+#define IMG_BD_BUTTERFLY_UP			116
+#define IMG_BD_BUTTERFLY_LEFT			117
+#define IMG_BD_BUTTERFLY_DOWN			118
+#define IMG_BD_FIREFLY				119
+#define IMG_BD_FIREFLY_MOVING			120
+#define IMG_BD_FIREFLY_RIGHT			121
+#define IMG_BD_FIREFLY_UP			122
+#define IMG_BD_FIREFLY_LEFT			123
+#define IMG_BD_FIREFLY_DOWN			124
+#define IMG_STEELWALL_TOPLEFT			125
+#define IMG_STEELWALL_TOPRIGHT			126
+#define IMG_STEELWALL_BOTTOMLEFT		127
+#define IMG_STEELWALL_BOTTOMRIGHT		128
+#define IMG_STEELWALL_HORIZONTAL		129
+#define IMG_INVISIBLE_STEELWALL_TOPLEFT		130
+#define IMG_INVISIBLE_STEELWALL_TOPRIGHT	131
+#define IMG_INVISIBLE_STEELWALL_BOTTOMLEFT	132
+#define IMG_INVISIBLE_STEELWALL_BOTTOMRIGHT	133
+#define IMG_INVISIBLE_STEELWALL_HORIZONTAL	134
+#define IMG_PLAYER1_DOWN			135
+#define IMG_PLAYER1_DOWN_MOVING			136
+#define IMG_PLAYER1_DOWN_DIGGING		137
+#define IMG_PLAYER1_UP				138
+#define IMG_PLAYER1_UP_MOVING			139
+#define IMG_PLAYER1_UP_DIGGING			140
+#define IMG_PLAYER1_LEFT			141
+#define IMG_PLAYER1_LEFT_MOVING			142
+#define IMG_PLAYER1_LEFT_DIGGING		143
+#define IMG_PLAYER1_LEFT_PUSHING		144
+#define IMG_PLAYER1_RIGHT			145
+#define IMG_PLAYER1_RIGHT_MOVING		146
+#define IMG_PLAYER1_RIGHT_DIGGING		147
+#define IMG_PLAYER1_RIGHT_PUSHING		148
+#define IMG_PLAYER2_DOWN			149
+#define IMG_PLAYER2_DOWN_MOVING			150
+#define IMG_PLAYER2_DOWN_DIGGING		151
+#define IMG_PLAYER2_UP				152
+#define IMG_PLAYER2_UP_MOVING			153
+#define IMG_PLAYER2_UP_DIGGING			154
+#define IMG_PLAYER2_LEFT			155
+#define IMG_PLAYER2_LEFT_MOVING			156
+#define IMG_PLAYER2_LEFT_DIGGING		157
+#define IMG_PLAYER2_LEFT_PUSHING		158
+#define IMG_PLAYER2_RIGHT			159
+#define IMG_PLAYER2_RIGHT_MOVING		160
+#define IMG_PLAYER2_RIGHT_DIGGING		161
+#define IMG_PLAYER2_RIGHT_PUSHING		162
+#define IMG_PLAYER3_DOWN			163
+#define IMG_PLAYER3_DOWN_MOVING			164
+#define IMG_PLAYER3_DOWN_DIGGING		165
+#define IMG_PLAYER3_UP				166
+#define IMG_PLAYER3_UP_MOVING			167
+#define IMG_PLAYER3_UP_DIGGING			168
+#define IMG_PLAYER3_LEFT			169
+#define IMG_PLAYER3_LEFT_MOVING			170
+#define IMG_PLAYER3_LEFT_DIGGING		171
+#define IMG_PLAYER3_LEFT_PUSHING		172
+#define IMG_PLAYER3_RIGHT			173
+#define IMG_PLAYER3_RIGHT_MOVING		174
+#define IMG_PLAYER3_RIGHT_DIGGING		175
+#define IMG_PLAYER3_RIGHT_PUSHING		176
+#define IMG_PLAYER4_DOWN			177
+#define IMG_PLAYER4_DOWN_MOVING			178
+#define IMG_PLAYER4_DOWN_DIGGING		179
+#define IMG_PLAYER4_UP				180
+#define IMG_PLAYER4_UP_MOVING			181
+#define IMG_PLAYER4_UP_DIGGING			182
+#define IMG_PLAYER4_LEFT			183
+#define IMG_PLAYER4_LEFT_MOVING			184
+#define IMG_PLAYER4_LEFT_DIGGING		185
+#define IMG_PLAYER4_LEFT_PUSHING		186
+#define IMG_PLAYER4_RIGHT			187
+#define IMG_PLAYER4_RIGHT_MOVING		188
+#define IMG_PLAYER4_RIGHT_DIGGING		189
+#define IMG_PLAYER4_RIGHT_PUSHING		190
+#define IMG_WALL_GROWING_DOWN			191
+#define IMG_WALL_GROWING_UP			192
+#define IMG_SHIELD_NORMAL_ACTIVE		193
+#define IMG_SHIELD_DEADLY_ACTIVE		194
+#define IMG_PIG_DOWN				195
+#define IMG_PIG_DOWN_MOVING			196
+#define IMG_PIG_DOWN_EATING			197
+#define IMG_PIG_UP				198
+#define IMG_PIG_UP_MOVING			199
+#define IMG_PIG_UP_EATING			200
+#define IMG_PIG_LEFT				201
+#define IMG_PIG_LEFT_MOVING			202
+#define IMG_PIG_LEFT_EATING			203
+#define IMG_PIG_RIGHT				204
+#define IMG_PIG_RIGHT_MOVING			205
+#define IMG_PIG_RIGHT_EATING			206
+#define IMG_DRAGON_DOWN				207
+#define IMG_DRAGON_DOWN_MOVING			208
+#define IMG_DRAGON_DOWN_ATTACKING		209
+#define IMG_DRAGON_UP				210
+#define IMG_DRAGON_UP_MOVING			211
+#define IMG_DRAGON_UP_ATTACKING			212
+#define IMG_DRAGON_LEFT				213
+#define IMG_DRAGON_LEFT_MOVING			214
+#define IMG_DRAGON_LEFT_ATTACKING		215
+#define IMG_DRAGON_RIGHT			216
+#define IMG_DRAGON_RIGHT_MOVING			217
+#define IMG_DRAGON_RIGHT_ATTACKING		218
+#define IMG_MOLE_DOWN				219
+#define IMG_MOLE_DOWN_MOVING			220
+#define IMG_MOLE_DOWN_DIGGING			221
+#define IMG_MOLE_UP				222
+#define IMG_MOLE_UP_MOVING			223
+#define IMG_MOLE_UP_DIGGING			224
+#define IMG_MOLE_LEFT				225
+#define IMG_MOLE_LEFT_MOVING			226
+#define IMG_MOLE_LEFT_DIGGING			227
+#define IMG_MOLE_RIGHT				228
+#define IMG_MOLE_RIGHT_MOVING			229
+#define IMG_MOLE_RIGHT_DIGGING			230
+#define IMG_PENGUIN_DOWN			231
+#define IMG_PENGUIN_DOWN_MOVING			232
+#define IMG_PENGUIN_UP				233
+#define IMG_PENGUIN_UP_MOVING			234
+#define IMG_PENGUIN_LEFT			235
+#define IMG_PENGUIN_LEFT_MOVING			236
+#define IMG_PENGUIN_RIGHT			237
+#define IMG_PENGUIN_RIGHT_MOVING		238
+#define IMG_SATELLITE				239
+#define IMG_SATELLITE_MOVING			240
+#define IMG_ACID_SPLASHING_LEFT			241
+#define IMG_ACID_SPLASHING_RIGHT		242
+#define IMG_SPARK_BLUE				243
+#define IMG_SPARK_WHITE				244
+#define IMG_FLAMES_LEFT1			245
+#define IMG_FLAMES_LEFT2			246
+#define IMG_FLAMES_LEFT3			247
+#define IMG_FLAMES_RIGHT1			248
+#define IMG_FLAMES_RIGHT2			249
+#define IMG_FLAMES_RIGHT3			250
+#define IMG_FLAMES_UP1				251
+#define IMG_FLAMES_UP2				252
+#define IMG_FLAMES_UP3				253
+#define IMG_FLAMES_DOWN1			254
+#define IMG_FLAMES_DOWN2			255
+#define IMG_FLAMES_DOWN3			256
+#define IMG_SP_EMPTY_SPACE			257
+#define IMG_SP_ZONK				258
+#define IMG_SP_ZONK_FALLING			259
+#define IMG_SP_ZONK_PUSHING			260
+#define IMG_SP_BASE				261
+#define IMG_SP_MURPHY				262
+#define IMG_SP_MURPHY_LEFT			263
+#define IMG_SP_MURPHY_LEFT_MOVING		264
+#define IMG_SP_MURPHY_LEFT_DIGGING		265
+#define IMG_SP_MURPHY_LEFT_PUSHING		266
+#define IMG_SP_MURPHY_LEFT_SNAPPING		267
+#define IMG_SP_MURPHY_RIGHT			268
+#define IMG_SP_MURPHY_RIGHT_MOVING		269
+#define IMG_SP_MURPHY_RIGHT_DIGGING		270
+#define IMG_SP_MURPHY_RIGHT_PUSHING		271
+#define IMG_SP_MURPHY_RIGHT_SNAPPING		272
+#define IMG_SP_MURPHY_UP			273
+#define IMG_SP_MURPHY_UP_SNAPPING		274
+#define IMG_SP_MURPHY_DOWN			275
+#define IMG_SP_MURPHY_DOWN_SNAPPING		276
+#define IMG_SP_MURPHY_CLONE			277
+#define IMG_SP_INFOTRON				278
+#define IMG_SP_INFOTRON_FALLING			279
+#define IMG_SP_CHIP_SINGLE			280
+#define IMG_SP_CHIP_LEFT			281
+#define IMG_SP_CHIP_RIGHT			282
+#define IMG_SP_CHIP_UPPER			283
+#define IMG_SP_CHIP_LOWER			284
+#define IMG_SP_HARD_GRAY			285
+#define IMG_SP_HARD_GREEN			286
+#define IMG_SP_HARD_BLUE			287
+#define IMG_SP_HARD_RED				288
+#define IMG_SP_HARD_YELLOW			289
+#define IMG_SP_EXIT_CLOSED			290
+#define IMG_SP_EXIT_OPEN			291
+#define IMG_SP_DISK_ORANGE			292
+#define IMG_SP_DISK_ORANGE_FALLING		293
+#define IMG_SP_DISK_ORANGE_PUSHING		294
+#define IMG_SP_DISK_YELLOW			295
+#define IMG_SP_DISK_YELLOW_PUSHING		296
+#define IMG_SP_DISK_RED				297
+#define IMG_SP_DISK_RED_COLLECTING		298
+#define IMG_SP_PORT1_RIGHT			299
+#define IMG_SP_PORT1_DOWN			300
+#define IMG_SP_PORT1_LEFT			301
+#define IMG_SP_PORT1_UP				302
+#define IMG_SP_PORT2_RIGHT			303
+#define IMG_SP_PORT2_DOWN			304
+#define IMG_SP_PORT2_LEFT			305
+#define IMG_SP_PORT2_UP				306
+#define IMG_SP_PORT_X				307
+#define IMG_SP_PORT_Y				308
+#define IMG_SP_PORT_XY				309
+#define IMG_SP_SNIKSNAK				310
+#define IMG_SP_SNIKSNAK_LEFT			311
+#define IMG_SP_SNIKSNAK_RIGHT			312
+#define IMG_SP_SNIKSNAK_UP			313
+#define IMG_SP_SNIKSNAK_DOWN			314
+#define IMG_SP_ELECTRON				315
+#define IMG_SP_TERMINAL				316
+#define IMG_SP_TERMINAL_ACTIVE			317
+#define IMG_SP_BUGGY_BASE			318
+#define IMG_SP_BUGGY_BASE_ACTIVATING		319
+#define IMG_SP_HARD_BASE1			320
+#define IMG_SP_HARD_BASE2			321
+#define IMG_SP_HARD_BASE3			322
+#define IMG_SP_HARD_BASE4			323
+#define IMG_SP_HARD_BASE5			324
+#define IMG_SP_HARD_BASE6			325
+#define IMG_INVISIBLE_STEELWALL			326
+#define IMG_INVISIBLE_STEELWALL_ON		327
+#define IMG_INVISIBLE_SAND			328
+#define IMG_INVISIBLE_SAND_ON			329
+#define IMG_INVISIBLE_WALL			330
+#define IMG_INVISIBLE_WALL_ON			331
+#define IMG_EM_KEY1				332
+#define IMG_EM_KEY2				333
+#define IMG_EM_KEY3				334
+#define IMG_EM_KEY4				335
+#define IMG_EM_GATE1				336
+#define IMG_EM_GATE2				337
+#define IMG_EM_GATE3				338
+#define IMG_EM_GATE4				339
+#define IMG_EM_GATE1_GRAY			340
+#define IMG_EM_GATE2_GRAY			341
+#define IMG_EM_GATE3_GRAY			342
+#define IMG_EM_GATE4_GRAY			343
+#define IMG_SP_EXPLOSION			344
+#define IMG_SP_EXPLOSION_INFOTRON		345
+#define IMG_CONVEYOR_BELT1_MIDDLE		346
+#define IMG_CONVEYOR_BELT1_MIDDLE_ACTIVE	347
+#define IMG_CONVEYOR_BELT1_LEFT			348
+#define IMG_CONVEYOR_BELT1_LEFT_ACTIVE		349
+#define IMG_CONVEYOR_BELT1_RIGHT		350
+#define IMG_CONVEYOR_BELT1_RIGHT_ACTIVE		351
+#define IMG_CONVEYOR_BELT1_SWITCH_LEFT		352
+#define IMG_CONVEYOR_BELT1_SWITCH_MIDDLE	353
+#define IMG_CONVEYOR_BELT1_SWITCH_RIGHT		354
+#define IMG_CONVEYOR_BELT2_MIDDLE		355
+#define IMG_CONVEYOR_BELT2_MIDDLE_ACTIVE	356
+#define IMG_CONVEYOR_BELT2_LEFT			357
+#define IMG_CONVEYOR_BELT2_LEFT_ACTIVE		358
+#define IMG_CONVEYOR_BELT2_RIGHT		359
+#define IMG_CONVEYOR_BELT2_RIGHT_ACTIVE		360
+#define IMG_CONVEYOR_BELT2_SWITCH_LEFT		361
+#define IMG_CONVEYOR_BELT2_SWITCH_MIDDLE	362
+#define IMG_CONVEYOR_BELT2_SWITCH_RIGHT		363
+#define IMG_CONVEYOR_BELT3_MIDDLE		364
+#define IMG_CONVEYOR_BELT3_MIDDLE_ACTIVE	365
+#define IMG_CONVEYOR_BELT3_LEFT			366
+#define IMG_CONVEYOR_BELT3_LEFT_ACTIVE		367
+#define IMG_CONVEYOR_BELT3_RIGHT		368
+#define IMG_CONVEYOR_BELT3_RIGHT_ACTIVE		369
+#define IMG_CONVEYOR_BELT3_SWITCH_LEFT		370
+#define IMG_CONVEYOR_BELT3_SWITCH_MIDDLE	371
+#define IMG_CONVEYOR_BELT3_SWITCH_RIGHT		372
+#define IMG_CONVEYOR_BELT4_MIDDLE		373
+#define IMG_CONVEYOR_BELT4_MIDDLE_ACTIVE	374
+#define IMG_CONVEYOR_BELT4_LEFT			375
+#define IMG_CONVEYOR_BELT4_LEFT_ACTIVE		376
+#define IMG_CONVEYOR_BELT4_RIGHT		377
+#define IMG_CONVEYOR_BELT4_RIGHT_ACTIVE		378
+#define IMG_CONVEYOR_BELT4_SWITCH_LEFT		379
+#define IMG_CONVEYOR_BELT4_SWITCH_MIDDLE	380
+#define IMG_CONVEYOR_BELT4_SWITCH_RIGHT		381
+#define IMG_SWITCHGATE_SWITCH_UP		382
+#define IMG_SWITCHGATE_SWITCH_DOWN		383
+#define IMG_LIGHT_SWITCH_OFF			384
+#define IMG_LIGHT_SWITCH_ON			385
+#define IMG_TIMEGATE_WHEEL			386
+#define IMG_TIMEGATE_WHEEL_ACTIVE		387
+#define IMG_ENVELOPE				388
+#define IMG_SIGN_EXCLAMATION			389
+#define IMG_SIGN_STOP				390
+#define IMG_LANDMINE				391
+#define IMG_STEELWALL_SLANTED			392
+#define IMG_EXTRA_TIME				393
+#define IMG_SHIELD_DEADLY			394
+#define IMG_SHIELD_NORMAL			395
+#define IMG_SWITCHGATE_CLOSED			396
+#define IMG_SWITCHGATE_OPENING			397
+#define IMG_SWITCHGATE_OPEN			398
+#define IMG_SWITCHGATE_CLOSING			399
+#define IMG_TIMEGATE_CLOSED			400
+#define IMG_TIMEGATE_OPENING			401
+#define IMG_TIMEGATE_OPEN			402
+#define IMG_TIMEGATE_CLOSING			403
+#define IMG_BALLOON				404
+#define IMG_BALLOON_MOVING			405
+#define IMG_BALLOON_WINDROSE_LEFT		406
+#define IMG_BALLOON_WINDROSE_RIGHT		407
+#define IMG_BALLOON_WINDROSE_UP			408
+#define IMG_BALLOON_WINDROSE_DOWN		409
+#define IMG_BALLOON_WINDROSE_ALL		410
+#define IMG_EMC_STEELWALL1			411
+#define IMG_EMC_STEELWALL2			412
+#define IMG_EMC_STEELWALL3			413
+#define IMG_EMC_STEELWALL4			414
+#define IMG_EMC_WALL_PILLAR_UPPER		415
+#define IMG_EMC_WALL_PILLAR_MIDDLE		416
+#define IMG_EMC_WALL_PILLAR_LOWER		417
+#define IMG_EMC_WALL4				418
+#define IMG_EMC_WALL5				419
+#define IMG_EMC_WALL6				420
+#define IMG_EMC_WALL7				421
+#define IMG_EMC_WALL8				422
+#define IMG_ARROW_BLUE_LEFT			423
+#define IMG_ARROW_BLUE_RIGHT			424
+#define IMG_ARROW_BLUE_UP			425
+#define IMG_ARROW_BLUE_DOWN			426
+#define IMG_ARROW_RED_LEFT			427
+#define IMG_ARROW_RED_RIGHT			428
+#define IMG_ARROW_RED_UP			429
+#define IMG_ARROW_RED_DOWN			430
+#define IMG_SCROLLBAR_BLUE			431
+#define IMG_SCROLLBAR_RED			432
+#define IMG_SCROLLBAR_GREEN			433
+#define IMG_SCROLLBAR_YELLOW			434
+#define IMG_PEARL				435
+#define IMG_PEARL_BREAKING			436
+#define IMG_CRYSTAL				437
+#define IMG_WALL_PEARL				438
+#define IMG_WALL_CRYSTAL			439
+#define IMG_SPRING				440
+#define IMG_TUBE_RIGHT_DOWN			441
+#define IMG_TUBE_HORIZONTAL_DOWN		442
+#define IMG_TUBE_LEFT_DOWN			443
+#define IMG_TUBE_HORIZONTAL			444
+#define IMG_TUBE_VERTICAL_RIGHT			445
+#define IMG_TUBE_ALL				446
+#define IMG_TUBE_VERTICAL_LEFT			447
+#define IMG_TUBE_VERTICAL			448
+#define IMG_TUBE_RIGHT_UP			449
+#define IMG_TUBE_HORIZONTAL_UP			450
+#define IMG_TUBE_LEFT_UP			451
+#define IMG_TRAP_INACTIVE			452
+#define IMG_TRAP_ACTIVE				453
+#define IMG_TRAP_ACTIVATING			454
+#define IMG_BD_WALL				455
+#define IMG_BD_ROCK				456
+#define IMG_BD_ROCK_FALLING			457
+#define IMG_BD_ROCK_PUSHING			458
+#define IMG_DX_BOMB				459
 
-#define NUM_IMAGE_FILES				454
+#define NUM_IMAGE_FILES				460
 
 
 /* values for sound configuration suffixes */
@@ -1977,8 +1757,8 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define SND_BD_ROCK_PUSHING			4
 #define SND_BD_ROCK_IMPACT			5
 #define SND_BD_MAGIC_WALL_ACTIVATING		6
-#define SND_BD_MAGIC_WALL_CHANGING		7
-#define SND_BD_MAGIC_WALL_RUNNING		8
+#define SND_BD_MAGIC_WALL_ACTIVE		7
+#define SND_BD_MAGIC_WALL_CHANGING		8
 #define SND_BD_AMOEBA_WAITING			9
 #define SND_BD_AMOEBA_CREATING			10
 #define SND_BD_AMOEBA_TURNING_TO_GEM		11
@@ -1987,7 +1767,7 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define SND_BD_BUTTERFLY_WAITING		14
 #define SND_BD_FIREFLY_MOVING			15
 #define SND_BD_FIREFLY_WAITING			16
-#define SND_BD_EXIT_ENTERING			17
+#define SND_BD_EXIT_PASSING			17
 #define SND_SP_EMPTY_SPACE_DIGGING		18
 #define SND_SP_BASE_DIGGING			19
 #define SND_SP_BUGGY_BASE_DIGGING		20
@@ -2000,147 +1780,149 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define SND_SP_DISK_ORANGE_PUSHING		27
 #define SND_SP_DISK_YELLOW_PUSHING		28
 #define SND_SP_PORT_PASSING			29
-#define SND_SP_EXIT_ENTERING			30
+#define SND_SP_EXIT_PASSING			30
 #define SND_SP_ELEMENT_EXPLODING		31
 #define SND_SP_SNIKSNAK_MOVING			32
 #define SND_SP_SNIKSNAK_WAITING			33
 #define SND_SP_ELECTRON_MOVING			34
 #define SND_SP_ELECTRON_WAITING			35
 #define SND_SP_TERMINAL_ACTIVATING		36
-#define SND_SOKOBAN_OBJECT_PUSHING		37
-#define SND_SOKOBAN_FIELD_FILLING		38
-#define SND_SOKOBAN_FIELD_CLEARING		39
-#define SND_SOKOBAN_GAME_SOLVING		40
-#define SND_EMPTY_SPACE_DIGGING			41
-#define SND_SAND_DIGGING			42
-#define SND_EMERALD_COLLECTING			43
-#define SND_EMERALD_IMPACT			44
-#define SND_DIAMOND_COLLECTING			45
-#define SND_DIAMOND_IMPACT			46
-#define SND_DIAMOND_BREAKING			47
-#define SND_ROCK_PUSHING			48
-#define SND_ROCK_IMPACT				49
-#define SND_BOMB_PUSHING			50
-#define SND_NUT_PUSHING				51
-#define SND_NUT_CRACKING			52
-#define SND_NUT_IMPACT				53
-#define SND_DYNAMITE_COLLECTING			54
-#define SND_DYNAMITE_PLACING			55
-#define SND_DYNAMITE_BURNING			56
-#define SND_KEY_COLLECTING			57
-#define SND_GATE_PASSING			58
-#define SND_BUG_MOVING				59
-#define SND_BUG_WAITING				60
-#define SND_SPACESHIP_MOVING			61
-#define SND_SPACESHIP_WAITING			62
-#define SND_YAMYAM_MOVING			63
-#define SND_YAMYAM_WAITING			64
-#define SND_YAMYAM_EATING_DIAMOND		65
-#define SND_ROBOT_STEPPING			66
-#define SND_ROBOT_WAITING			67
-#define SND_ROBOT_WHEEL_ACTIVATING		68
-#define SND_ROBOT_WHEEL_RUNNING			69
-#define SND_MAGIC_WALL_ACTIVATING		70
-#define SND_MAGIC_WALL_CHANGING			71
-#define SND_MAGIC_WALL_RUNNING			72
-#define SND_AMOEBA_WAITING			73
-#define SND_AMOEBA_CREATING			74
-#define SND_AMOEBA_DROPPING			75
-#define SND_ACID_SPLASHING			76
-#define SND_QUICKSAND_FILLING			77
-#define SND_QUICKSAND_SLIPPING_THROUGH		78
-#define SND_QUICKSAND_EMPTYING			79
-#define SND_EXIT_OPENING			80
-#define SND_EXIT_ENTERING			81
-#define SND_BALLOON_MOVING			82
-#define SND_BALLOON_WAITING			83
-#define SND_BALLOON_PUSHING			84
-#define SND_BALLOON_SWITCH_ACTIVATING		85
-#define SND_SPRING_MOVING			86
-#define SND_SPRING_PUSHING			87
-#define SND_SPRING_IMPACT			88
-#define SND_WALL_GROWING			89
-#define SND_PEARL_COLLECTING			90
-#define SND_PEARL_BREAKING			91
-#define SND_PEARL_IMPACT			92
-#define SND_CRYSTAL_COLLECTING			93
-#define SND_CRYSTAL_IMPACT			94
-#define SND_ENVELOPE_COLLECTING			95
-#define SND_SAND_INVISIBLE_DIGGING		96
-#define SND_SHIELD_PASSIVE_COLLECTING		97
-#define SND_SHIELD_PASSIVE_ACTIVATED		98
-#define SND_SHIELD_ACTIVE_COLLECTING		99
-#define SND_SHIELD_ACTIVE_ACTIVATED		100
-#define SND_EXTRA_TIME_COLLECTING		101
-#define SND_MOLE_MOVING				102
-#define SND_MOLE_WAITING			103
-#define SND_MOLE_EATING_AMOEBA			104
-#define SND_SWITCHGATE_SWITCH_ACTIVATING	105
-#define SND_SWITCHGATE_OPENING			106
-#define SND_SWITCHGATE_CLOSING			107
-#define SND_SWITCHGATE_PASSING			108
-#define SND_TIMEGATE_WHEEL_ACTIVATING		109
-#define SND_TIMEGATE_WHEEL_RUNNING		110
-#define SND_TIMEGATE_OPENING			111
-#define SND_TIMEGATE_CLOSING			112
-#define SND_TIMEGATE_PASSING			113
-#define SND_CONVEYOR_BELT_SWITCH_ACTIVATING	114
-#define SND_CONVEYOR_BELT_RUNNING		115
-#define SND_LIGHT_SWITCH_ACTIVATING		116
-#define SND_LIGHT_SWITCH_DEACTIVATING		117
-#define SND_DX_BOMB_PUSHING			118
-#define SND_TRAP_INACTIVE_DIGGING		119
-#define SND_TRAP_ACTIVATING			120
-#define SND_TUBE_PASSING			121
-#define SND_AMOEBA_TURNING_TO_GEM		122
-#define SND_AMOEBA_TURNING_TO_ROCK		123
-#define SND_SPEED_PILL_COLLECTING		124
-#define SND_DYNABOMB_NR_COLLECTING		125
-#define SND_DYNABOMB_SZ_COLLECTING		126
-#define SND_DYNABOMB_XL_COLLECTING		127
-#define SND_DYNABOMB_PLACING			128
-#define SND_DYNABOMB_BURNING			129
-#define SND_SATELLITE_MOVING			130
-#define SND_SATELLITE_WAITING			131
-#define SND_SATELLITE_PUSHING			132
-#define SND_LAMP_ACTIVATING			133
-#define SND_LAMP_DEACTIVATING			134
-#define SND_TIME_ORB_FULL_COLLECTING		135
-#define SND_TIME_ORB_FULL_IMPACT		136
-#define SND_TIME_ORB_EMPTY_PUSHING		137
-#define SND_TIME_ORB_EMPTY_IMPACT		138
-#define SND_GAMEOFLIFE_WAITING			139
-#define SND_GAMEOFLIFE_CREATING			140
-#define SND_BIOMAZE_WAITING			141
-#define SND_BIOMAZE_CREATING			142
-#define SND_PACMAN_MOVING			143
-#define SND_PACMAN_WAITING			144
-#define SND_PACMAN_EATING_AMOEBA		145
-#define SND_DARK_YAMYAM_MOVING			146
-#define SND_DARK_YAMYAM_WAITING			147
-#define SND_DARK_YAMYAM_EATING_ANY		148
-#define SND_PENGUIN_MOVING			149
-#define SND_PENGUIN_WAITING			150
-#define SND_PENGUIN_ENTERING_EXIT		151
-#define SND_PIG_MOVING				152
-#define SND_PIG_WAITING				153
-#define SND_PIG_EATING_GEM			154
-#define SND_DRAGON_MOVING			155
-#define SND_DRAGON_WAITING			156
-#define SND_DRAGON_ATTACKING			157
-#define SND_PLAYER_DYING			158
-#define SND_ELEMENT_EXPLODING			159
-#define SND_GAME_STARTING			160
-#define SND_GAME_RUNNING_OUT_OF_TIME		161
-#define SND_GAME_LEVELTIME_BONUS		162
-#define SND_GAME_LOSING				163
-#define SND_GAME_WINNING			164
-#define SND_MENU_DOOR_OPENING			165
-#define SND_MENU_DOOR_CLOSING			166
-#define SND_MENU_HALL_OF_FAME			167
-#define SND_MENU_INFO_SCREEN			168
+#define SND_SP_TERMINAL_ACTIVE			37
+#define SND_SOKOBAN_OBJECT_PUSHING		38
+#define SND_SOKOBAN_FIELD_FILLING		39
+#define SND_SOKOBAN_FIELD_EMPTYING		40
+#define SND_SOKOBAN_GAME_SOLVING		41
+#define SND_EMPTY_SPACE_DIGGING			42
+#define SND_SAND_DIGGING			43
+#define SND_EMERALD_COLLECTING			44
+#define SND_EMERALD_IMPACT			45
+#define SND_DIAMOND_COLLECTING			46
+#define SND_DIAMOND_IMPACT			47
+#define SND_DIAMOND_BREAKING			48
+#define SND_ROCK_PUSHING			49
+#define SND_ROCK_IMPACT				50
+#define SND_BOMB_PUSHING			51
+#define SND_NUT_PUSHING				52
+#define SND_NUT_CRACKING			53
+#define SND_NUT_IMPACT				54
+#define SND_DYNAMITE_COLLECTING			55
+#define SND_DYNAMITE_DROPPING			56
+#define SND_DYNAMITE_BURNING			57
+#define SND_KEY_COLLECTING			58
+#define SND_GATE_PASSING			59
+#define SND_BUG_MOVING				60
+#define SND_BUG_WAITING				61
+#define SND_SPACESHIP_MOVING			62
+#define SND_SPACESHIP_WAITING			63
+#define SND_YAMYAM_MOVING			64
+#define SND_YAMYAM_WAITING			65
+#define SND_YAMYAM_EATING			66
+#define SND_ROBOT_STEPPING			67
+#define SND_ROBOT_WAITING			68
+#define SND_ROBOT_WHEEL_ACTIVATING		69
+#define SND_ROBOT_WHEEL_ACTIVE			70
+#define SND_MAGIC_WALL_ACTIVATING		71
+#define SND_MAGIC_WALL_ACTIVE			72
+#define SND_MAGIC_WALL_CHANGING			73
+#define SND_AMOEBA_WAITING			74
+#define SND_AMOEBA_CREATING			75
+#define SND_AMOEBA_DROP_CREATING		76
+#define SND_ACID_SPLASHING			77
+#define SND_QUICKSAND_FILLING			78
+#define SND_QUICKSAND_SLIPPING			79
+#define SND_QUICKSAND_EMPTYING			80
+#define SND_EXIT_OPENING			81
+#define SND_EXIT_PASSING			82
+#define SND_BALLOON_MOVING			83
+#define SND_BALLOON_WAITING			84
+#define SND_BALLOON_PUSHING			85
+#define SND_BALLOON_SWITCH_ACTIVATING		86
+#define SND_SPRING_MOVING			87
+#define SND_SPRING_PUSHING			88
+#define SND_SPRING_IMPACT			89
+#define SND_WALL_GROWING			90
+#define SND_PEARL_COLLECTING			91
+#define SND_PEARL_BREAKING			92
+#define SND_PEARL_IMPACT			93
+#define SND_CRYSTAL_COLLECTING			94
+#define SND_CRYSTAL_IMPACT			95
+#define SND_ENVELOPE_COLLECTING			96
+#define SND_SAND_INVISIBLE_DIGGING		97
+#define SND_SHIELD_NORMAL_COLLECTING		98
+#define SND_SHIELD_NORMAL_ACTIVE		99
+#define SND_SHIELD_DEADLY_COLLECTING		100
+#define SND_SHIELD_DEADLY_ACTIVE		101
+#define SND_EXTRA_TIME_COLLECTING		102
+#define SND_MOLE_MOVING				103
+#define SND_MOLE_WAITING			104
+#define SND_MOLE_EATING				105
+#define SND_SWITCHGATE_SWITCH_ACTIVATING	106
+#define SND_SWITCHGATE_OPENING			107
+#define SND_SWITCHGATE_CLOSING			108
+#define SND_SWITCHGATE_PASSING			109
+#define SND_TIMEGATE_WHEEL_ACTIVATING		110
+#define SND_TIMEGATE_WHEEL_ACTIVE		111
+#define SND_TIMEGATE_OPENING			112
+#define SND_TIMEGATE_CLOSING			113
+#define SND_TIMEGATE_PASSING			114
+#define SND_CONVEYOR_BELT_SWITCH_ACTIVATING	115
+#define SND_CONVEYOR_BELT_SWITCH_DEACTIVATING	116
+#define SND_CONVEYOR_BELT_ACTIVE		117
+#define SND_LIGHT_SWITCH_ACTIVATING		118
+#define SND_LIGHT_SWITCH_DEACTIVATING		119
+#define SND_DX_BOMB_PUSHING			120
+#define SND_TRAP_INACTIVE_DIGGING		121
+#define SND_TRAP_ACTIVATING			122
+#define SND_TUBE_PASSING			123
+#define SND_AMOEBA_TURNING_TO_GEM		124
+#define SND_AMOEBA_TURNING_TO_ROCK		125
+#define SND_SPEED_PILL_COLLECTING		126
+#define SND_DYNABOMB_NR_COLLECTING		127
+#define SND_DYNABOMB_SZ_COLLECTING		128
+#define SND_DYNABOMB_XL_COLLECTING		129
+#define SND_DYNABOMB_DROPPING			130
+#define SND_DYNABOMB_BURNING			131
+#define SND_SATELLITE_MOVING			132
+#define SND_SATELLITE_WAITING			133
+#define SND_SATELLITE_PUSHING			134
+#define SND_LAMP_ACTIVATING			135
+#define SND_LAMP_DEACTIVATING			136
+#define SND_TIME_ORB_FULL_COLLECTING		137
+#define SND_TIME_ORB_FULL_IMPACT		138
+#define SND_TIME_ORB_EMPTY_PUSHING		139
+#define SND_TIME_ORB_EMPTY_IMPACT		140
+#define SND_GAMEOFLIFE_WAITING			141
+#define SND_GAMEOFLIFE_CREATING			142
+#define SND_BIOMAZE_WAITING			143
+#define SND_BIOMAZE_CREATING			144
+#define SND_PACMAN_MOVING			145
+#define SND_PACMAN_WAITING			146
+#define SND_PACMAN_EATING			147
+#define SND_DARK_YAMYAM_MOVING			148
+#define SND_DARK_YAMYAM_WAITING			149
+#define SND_DARK_YAMYAM_EATING			150
+#define SND_PENGUIN_MOVING			151
+#define SND_PENGUIN_WAITING			152
+#define SND_PENGUIN_PASSING_EXIT		153
+#define SND_PIG_MOVING				154
+#define SND_PIG_WAITING				155
+#define SND_PIG_EATING				156
+#define SND_DRAGON_MOVING			157
+#define SND_DRAGON_WAITING			158
+#define SND_DRAGON_ATTACKING			159
+#define SND_PLAYER_DYING			160
+#define SND_ELEMENT_EXPLODING			161
+#define SND_GAME_STARTING			162
+#define SND_GAME_RUNNING_OUT_OF_TIME		163
+#define SND_GAME_LEVELTIME_BONUS		164
+#define SND_GAME_LOSING				165
+#define SND_GAME_WINNING			166
+#define SND_MENU_DOOR_OPENING			167
+#define SND_MENU_DOOR_CLOSING			168
+#define SND_MENU_HALL_OF_FAME			169
+#define SND_MENU_INFO_SCREEN			170
 
-#define NUM_SOUND_FILES				169
+#define NUM_SOUND_FILES				171
 
 
 /* values for game_status */
@@ -2212,5 +1994,240 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define EMU_BOULDERDASH		1
 #define EMU_SOKOBAN		2
 #define EMU_SUPAPLEX		3
+
+struct HiScore
+{
+  char Name[MAX_PLAYER_NAME_LEN + 1];
+  int Score;
+};
+
+struct PlayerInfo
+{
+  boolean present;		/* player present in level playfield */
+  boolean connected;		/* player connected (locally or via network) */
+  boolean active;		/* player (present && connected) */
+
+  int index_nr, client_nr, element_nr;
+
+  byte action;			/* action from local input device */
+  byte effective_action;	/* action acknowledged from network server
+				   or summarized over all configured input
+				   devices when in single player mode */
+  byte programmed_action;	/* action forced by game itself (like moving
+				   through doors); overrides other actions */
+
+  int jx,jy, last_jx,last_jy;
+  int MovDir, MovPos, GfxPos;
+  int Frame;
+
+  boolean Pushing;
+  boolean Switching;
+  boolean LevelSolved, GameOver;
+  boolean snapped;
+
+  int last_move_dir;
+  int is_moving;
+
+  unsigned long move_delay;
+  int move_delay_value;
+
+  unsigned long push_delay;
+  unsigned long push_delay_value;
+
+  int frame_reset_delay;
+
+  unsigned long actual_frame_counter;
+
+  int score;
+  int gems_still_needed;
+  int sokobanfields_still_needed;
+  int lights_still_needed;
+  int friends_still_needed;
+  int key[4];
+  int dynamite;
+  int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
+  int shield_passive_time_left;
+  int shield_active_time_left;
+};
+
+struct LevelInfo
+{
+  int file_version;	/* file format version the level is stored with    */
+  int game_version;	/* game release version the level was created with */
+
+  boolean encoding_16bit_field;		/* level contains 16-bit elements  */
+  boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
+  boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
+
+  int fieldx;
+  int fieldy;
+  int time;
+  int gems_needed;
+  char name[MAX_LEVEL_NAME_LEN + 1];
+  char author[MAX_LEVEL_AUTHOR_LEN + 1];
+  int score[LEVEL_SCORE_ELEMENTS];
+  int yam_content[MAX_ELEMENT_CONTENTS][3][3];
+  int num_yam_contents;
+  int amoeba_speed;
+  int amoeba_content;
+  int time_magic_wall;
+  int time_wheel;
+  int time_light;
+  int time_timegate;
+  boolean double_speed;
+  boolean gravity;
+  boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
+};
+
+struct TapeInfo
+{
+  int file_version;	/* file format version the tape is stored with    */
+  int game_version;	/* game release version the tape was created with */
+  int engine_version;	/* game engine version the tape was recorded with */
+
+  int level_nr;
+  unsigned long random_seed;
+  unsigned long date;
+  unsigned long counter;
+  unsigned long length;
+  unsigned long length_seconds;
+  unsigned int delay_played;
+  boolean pause_before_death;
+  boolean recording, playing, pausing;
+  boolean fast_forward;
+  boolean index_search;
+  boolean quick_resume;
+  boolean single_step;
+  boolean changed;
+  boolean player_participates[MAX_PLAYERS];
+  int num_participating_players;
+
+  struct
+  {
+    byte action[MAX_PLAYERS];
+    byte delay;
+  } pos[MAX_TAPELEN];
+};
+
+struct GameInfo
+{
+  /* constant within running game */
+  int engine_version;
+  int emulation;
+  int initial_move_delay;
+  int initial_move_delay_value;
+
+  /* variable within running game */
+  int yam_content_nr;
+  boolean magic_wall_active;
+  int magic_wall_time_left;
+  int light_time_left;
+  int timegate_time_left;
+  int belt_dir[4];
+  int belt_dir_nr[4];
+  int switchgate_pos;
+  int balloon_dir;
+  boolean explosions_delayed;
+};
+
+struct GlobalInfo
+{
+  float frames_per_second;
+  boolean fps_slowdown;
+  int fps_slowdown_factor;
+};
+
+struct ElementInfo
+{
+  char *sound_class_name;	/* classification for custom sound effects */
+  char *editor_description;	/* short description for level editor */
+
+  int graphic[NUM_GFX_ACTIONS_MAPPED];
+
+				/* special graphics for left/right/up/down */
+  int direction_graphic[NUM_GFX_ACTIONS_MAPPED][4];
+  boolean has_direction_graphic[NUM_GFX_ACTIONS_MAPPED];
+};
+
+struct GraphicInfo
+{
+  Bitmap *bitmap;
+  int src_x, src_y;
+};
+
+struct NewGraphicInfo
+{
+  Bitmap *bitmap;
+  int src_x, src_y;
+  int anim_frames;
+  int anim_delay;
+  int anim_mode;
+  boolean anim_global_sync;
+  boolean anim_vertical;
+};
+
+extern GC		tile_clip_gc;
+extern Bitmap	       *pix[];
+extern Pixmap		tile_clipmask[];
+extern DrawBuffer      *fieldbuffer;
+extern DrawBuffer      *drawto_field;
+
+extern int		game_status;
+extern boolean		level_editor_test_game;
+extern boolean		network_playing;
+
+extern int		key_joystick_mapping;
+
+extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+extern int		redraw_x1, redraw_y1;
+
+extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
+extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
+
+extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
+
+extern int		FX,FY, ScrollStepSize;
+extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
+extern int		BorderElement;
+extern int		GameFrameDelay;
+extern int		FfwdFrameDelay;
+extern int		BX1,BY1, BX2,BY2;
+extern int		SBX_Left, SBX_Right;
+extern int		SBY_Upper, SBY_Lower;
+extern int		ZX,ZY, ExitX,ExitY;
+extern int		AllPlayersGone;
+
+extern int		TimeFrames, TimePlayed, TimeLeft;
+extern boolean		SiebAktiv;
+extern int		SiebCount;
+
+extern boolean		network_player_action_received;
+
+extern struct LevelInfo		level;
+extern struct PlayerInfo	stored_player[], *local_player;
+extern struct HiScore		highscore[];
+extern struct TapeInfo		tape;
+extern struct GameInfo		game;
+extern struct GlobalInfo	global;
+extern struct ElementInfo	element_info[];
+extern struct GraphicInfo	graphic_info[];
+extern struct NewGraphicInfo	new_graphic_info[];
+extern struct ConfigInfo	image_config[], sound_config[];
+extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
+extern struct FileInfo	       *image_files, *sound_files;
 
 #endif	/* MAIN_H */
