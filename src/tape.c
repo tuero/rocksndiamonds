@@ -973,6 +973,8 @@ byte *TapePlayAction()
 	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
     }
   }
+#if 0
+  /* !!! this makes things much slower !!! */
   else if (tape.warp_forward)
   {
     if ((FrameCounter / 20) % 2)
@@ -982,6 +984,7 @@ byte *TapePlayAction()
 
     DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
   }
+#endif
 
   if (tape.counter >= tape.length)	/* end of tape reached */
   {

@@ -256,6 +256,7 @@ void BackToFront()
   {
     if (redraw_mask & REDRAW_DOOR_1)
       BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
+
     if (redraw_mask & REDRAW_DOOR_2)
     {
 #if 0
