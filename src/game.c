@@ -1384,6 +1384,7 @@ static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
 static void RemoveField(int x, int y)
 {
   Feld[x][y] = EL_EMPTY;
+  GfxElement[x][y] = EL_EMPTY;
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
@@ -1617,6 +1618,7 @@ void Explode(int ex, int ey, int phase, int mode)
       }
 
       Feld[x][y] = EL_EXPLOSION;
+      GfxElement[x][y] = EL_EMPTY;
       MovDir[x][y] = MovPos[x][y] = 0;
       AmoebaNr[x][y] = 0;
       ExplodePhase[x][y] = 1;
@@ -5726,11 +5728,11 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_BASE:
     case EL_SP_BUGGY_BASE:
     case EL_SP_BUGGY_BASE_ACTIVATING:
+      RemoveField(x, y);
 #if 1
       if (mode != DF_SNAP && element == EL_SAND)
-	GfxElement[x][y] = Feld[x][y];
+	GfxElement[x][y] = EL_SAND;
 #endif
-      RemoveField(x, y);
       PlaySoundLevelElementAction(x, y, element, ACTION_DIGGING);
       break;
 

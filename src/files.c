@@ -872,6 +872,26 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
   return chunk_size;
 }
 
+static int LoadTape_INFO(FILE *file, int chunk_size, struct TapeInfo *tape)
+{
+  int level_identifier_size;
+  int i;
+
+  level_identifier_size = getFile16BitBE(file);
+
+  tape->level_identifier =
+    checked_realloc(tape->level_identifier, level_identifier_size);
+
+  for(i=0; i < level_identifier_size; i++)
+    tape->level_identifier[i] = fgetc(file);
+
+  tape->level_nr = getFile16BitBE(file);
+
+  chunk_size = 2 + level_identifier_size + 2;
+
+  return chunk_size;
+}
+
 static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
 {
   int i, j;
@@ -1025,6 +1045,7 @@ void LoadTapeFromFilename(char *filename)
     {
       { "VERS", FILE_VERS_CHUNK_SIZE,	LoadTape_VERS },
       { "HEAD", TAPE_HEADER_SIZE,	LoadTape_HEAD },
+      { "INFO", -1,			LoadTape_INFO },
       { "BODY", -1,			LoadTape_BODY },
       {  NULL,  0,			NULL }
     };
@@ -1108,6 +1129,19 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
   putFileVersion(file, tape->engine_version);
 }
 
+static void SaveTape_INFO(FILE *file, struct TapeInfo *tape)
+{
+  int level_identifier_size = strlen(tape->level_identifier) + 1;
+  int i;
+
+  putFile16BitBE(file, level_identifier_size);
+
+  for(i=0; i < level_identifier_size; i++)
+    fputc(tape->level_identifier[i], file);
+
+  putFile16BitBE(file, tape->level_nr);
+}
+
 static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
 {
   int i, j;
@@ -1124,12 +1158,13 @@ static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
 
 void SaveTape(int level_nr)
 {
-  int i;
   char *filename = getTapeFilename(level_nr);
   FILE *file;
   boolean new_tape = TRUE;
   int num_participating_players = 0;
+  int info_chunk_size;
   int body_chunk_size;
+  int i;
 
   InitTapeDirectory(leveldir_current->filename);
 
@@ -1155,6 +1190,7 @@ void SaveTape(int level_nr)
     if (tape.player_participates[i])
       num_participating_players++;
 
+  info_chunk_size = 2 + (strlen(tape.level_identifier) + 1) + 2;
   body_chunk_size = (num_participating_players + 1) * tape.length;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
@@ -1165,6 +1201,9 @@ void SaveTape(int level_nr)
 
   putFileChunkBE(file, "HEAD", TAPE_HEADER_SIZE);
   SaveTape_HEAD(file, &tape);
+
+  putFileChunkBE(file, "INFO", info_chunk_size);
+  SaveTape_INFO(file, &tape);
 
   putFileChunkBE(file, "BODY", body_chunk_size);
   SaveTape_BODY(file, &tape);
@@ -1192,6 +1231,7 @@ void DumpTape(struct TapeInfo *tape)
   printf_line("-", 79);
   printf("Tape of Level %03d (file version %06d, game version %06d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
+  printf("Level series identifier: '%s'\n", tape->level_identifier);
   printf_line("-", 79);
 
   for(i=0; i<tape->length; i++)

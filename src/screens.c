@@ -106,8 +106,14 @@ static void drawCursorExt(int xpos, int ypos, int color, int graphic)
 
   ypos += MENU_SCREEN_START_YPOS;
 
+#if 1
+  DrawBackground(mSX + xpos * TILEX, mSY + ypos * TILEY, TILEX, TILEY);
+  DrawGraphicThruMaskExt(drawto, mSX + xpos * TILEX, mSY + ypos * TILEY,
+			 graphic, 0);
+#else
   DrawBackground(SX + xpos * 32, SY + ypos * 32, TILEX, TILEY);
   DrawGraphicThruMask(xpos, ypos, graphic, 0);
+#endif
 }
 
 static void initCursor(int ypos, int graphic)
@@ -141,10 +147,10 @@ static void PlaySound_Menu_Continue(int sound)
 
 void DrawHeadline()
 {
-  int font1_xsize = getFontWidth(FONT_TITLE_1);
-  int font2_xsize = getFontWidth(FONT_TITLE_2);
-  int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * font1_xsize) / 2;
-  int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * font2_xsize) / 2;
+  int font1_width = getFontWidth(FONT_TITLE_1);
+  int font2_width = getFontWidth(FONT_TITLE_2);
+  int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * font1_width) / 2;
+  int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * font2_width) / 2;
 
   DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
   DrawText(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
@@ -178,7 +184,9 @@ void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
-  int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
+  int font_width = getFontWidth(FONT_MENU_1);
+  int name_width = font_width * strlen("Name:");
+  int level_width = font_width * strlen("Level:");
   int i;
 
 #if 0
@@ -240,39 +248,39 @@ void DrawMainMenu()
 
   DrawHeadline();
 
-  DrawText(mSX + 32,    mSY + 2*32, name_text, FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 2*32, name_text, FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 3*32, "Level:", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 4*32, "Hall Of Fame", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 5*32, "Level Creator", FONT_MENU_1);
+  DrawText(mSY + 32, mSY + 6*32, "Info Screen", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 7*32, "Start Game", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 8*32, "Setup", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 9*32, "Quit", FONT_MENU_1);
+
   DrawText(mSX + 32 + name_width, mSY + 2*32, setup.player_name, FONT_INPUT);
-  DrawText(mSX + 32,    mSY + 3*32, "Level:", FONT_MENU_1);
-  DrawText(mSX + 11 * 32, mSY + 3*32, int2str(level_nr,3), FONT_VALUE_1);
-  DrawText(mSX + 32,    mSY + 4*32, "Hall Of Fame", FONT_MENU_1);
-  DrawText(mSX + 32,    mSY + 5*32, "Level Creator", FONT_MENU_1);
-  DrawText(mSY + 32,    mSY + 6*32, "Info Screen", FONT_MENU_1);
-  DrawText(mSX + 32,    mSY + 7*32, "Start Game", FONT_MENU_1);
-  DrawText(mSX + 32,    mSY + 8*32, "Setup", FONT_MENU_1);
-  DrawText(mSX + 32,    mSY + 9*32, "Quit", FONT_MENU_1);
+  DrawText(mSX + level_width + 5 * 32, mSY + 3*32, int2str(level_nr,3),
+	   FONT_VALUE_1);
 
   DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
-  DrawTextF(7*32 + 6, 3*32 + 9, FONT_TEXT_3, "%d-%d",
-	    leveldir_current->first_level,
-	    leveldir_current->last_level);
+  DrawTextF(mSX + 32 + level_width - 2, mSY + 3*32 + 1, FONT_TEXT_3, "%d-%d",
+	    leveldir_current->first_level, leveldir_current->last_level);
 
+  /*
   if (leveldir_current->readonly)
+  */
   {
-    DrawTextF(15*32 + 6, 3*32 + 9 - 7, FONT_TEXT_3, "READ");
-    DrawTextF(15*32 + 6, 3*32 + 9 + 7, FONT_TEXT_3, "ONLY");
+    DrawTextF(mSX + level_width + 9*32 - 2,
+	      mSY + 3*32 + 1 - 7, FONT_TEXT_3, "READ");
+    DrawTextF(mSX + level_width + 9*32 - 2,
+	      mSY + 3*32 + 1 + 7, FONT_TEXT_3, "ONLY");
   }
 
   for(i=0; i<8; i++)
     initCursor(i, (i == 1 || i == 6 ? IMG_MENU_BUTTON_RIGHT :IMG_MENU_BUTTON));
 
-#if 0
-  DrawGraphic(10, 3, IMG_MENU_BUTTON_LEFT, 0);
-  DrawGraphic(14, 3, IMG_MENU_BUTTON_RIGHT, 0);
-#else
-  drawCursorXY(10, 1, IMG_MENU_BUTTON_LEFT);
-  drawCursorXY(14, 1, IMG_MENU_BUTTON_RIGHT);
-#endif
+  drawCursorXY(level_width/32 + 4, 1, IMG_MENU_BUTTON_LEFT);
+  drawCursorXY(level_width/32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment", FONT_TITLE_2);
 
@@ -2305,7 +2313,12 @@ static void drawPlayerSetupInputInfo(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   DrawText(mSX+11*32, mSY+2*32, int2str(player_nr + 1, 1), FONT_INPUT_ACTIVE);
+#if 1
+  DrawGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
+			 PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
+#else
   DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
+#endif
 
   if (setup.input[player_nr].use_joystick)
   {

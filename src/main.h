@@ -996,6 +996,7 @@ struct TapeInfo
   int game_version;	/* game release version the tape was created with */
   int engine_version;	/* game engine version the tape was recorded with */
 
+  char *level_identifier;
   int level_nr;
   unsigned long random_seed;
   unsigned long date;

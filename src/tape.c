@@ -302,6 +302,9 @@ void TapeErase()
   tape.length = 0;
   tape.counter = 0;
 
+  if (leveldir_current)
+    setString(&tape.level_identifier, leveldir_current->identifier);
+
   tape.level_nr = level_nr;
   tape.pos[tape.counter].delay = 0;
   tape.changed = TRUE;

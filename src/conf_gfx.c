@@ -209,6 +209,11 @@ struct ConfigInfo image_config[] =
 
   /* images for Supaplex style elements and actions */
 
+  { "sp_empty_space",				"RocksSP.pcx"		},
+  { "sp_empty_space.xpos",			"0"			},
+  { "sp_empty_space.ypos",			"0"			},
+  { "sp_empty_space.frames",			"1"			},
+
   { "sp_zonk",					"RocksSP.pcx"		},
   { "sp_zonk.xpos",				"1"			},
   { "sp_zonk.ypos",				"0"			},

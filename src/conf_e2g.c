@@ -181,6 +181,10 @@ element_to_graphic[] =
     IMG_BD_FIREFLY_MOVING
   },
   {
+    EL_SP_EMPTY_SPACE,				-1, -1,
+    IMG_SP_EMPTY_SPACE
+  },
+  {
     EL_SP_ZONK,					-1, -1,
     IMG_SP_ZONK
   },

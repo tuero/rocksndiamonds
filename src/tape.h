@@ -76,9 +76,11 @@
 #define VIDEO_STATE_PBEND	(VIDEO_STATE_PBEND_OFF	| VIDEO_STATE_PBEND_ON)
 
 /* tags to draw video display labels or symbols only */
+/* (negative values to prevent misinterpretation in DrawVideoDisplay(), where
+   the variable "value" is also used for tape length -- better fix this) */
 #define VIDEO_DISPLAY_DEFAULT		0
-#define VIDEO_DISPLAY_LABEL_ONLY	1
-#define VIDEO_DISPLAY_SYMBOL_ONLY	2
+#define VIDEO_DISPLAY_LABEL_ONLY	-1
+#define VIDEO_DISPLAY_SYMBOL_ONLY	-2
 
 
 void DrawVideoDisplay(unsigned long, unsigned long);
