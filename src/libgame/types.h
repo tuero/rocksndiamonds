@@ -20,7 +20,10 @@
 #include <sys/types.h>
 
 typedef unsigned char boolean;
+
+#if !defined(PLATFORM_WIN32)
 typedef unsigned char byte;
+#endif
 
 #ifndef FALSE
 #define FALSE		0

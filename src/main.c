@@ -17,6 +17,7 @@
 #include "init.h"
 #include "game.h"
 #include "events.h"
+#include "config.h"
 
 #if 0
 GC			tile_clip_gc;
@@ -3035,7 +3036,12 @@ struct FontInfo font_info[NUM_FONTS + 1] =
 
 int main(int argc, char *argv[])
 {
-  InitCommandName(argv[0]);
+  InitProgramInfo(argv[0], USERDATA_DIRECTORY,
+		  PROGRAM_TITLE_STRING, getWindowTitleString(),
+		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
+		  MSDOS_POINTER_FILENAME,
+		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
+
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependantStuff();
 

@@ -195,6 +195,7 @@ void sortTreeInfo(TreeInfo **,
 		  int (*compare_function)(const void *, const void *));
 
 char *getUserDataDir(void);
+char *getCommonDataDir(void);
 char *getSetupDir(void);
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);

@@ -17,7 +17,12 @@
 #include "platform.h"
 #include "types.h"
 
-#if defined(PLATFORM_MSDOS)
+
+#if defined(PLATFORM_MACOSX)
+#include "macosx.h"
+#elif defined(PLATFORM_WIN32)
+#include "windows.h"
+#elif defined(PLATFORM_MSDOS)
 #include "msdos.h"
 #endif
 
@@ -25,14 +30,6 @@
 #include "sdl.h"
 #elif defined(TARGET_X11)
 #include "x11.h"
-#endif
-
-#if defined(PLATFORM_MACOSX)
-/* some symbols are already defined on Mac OS X */
-#define Delay Delay_internal
-#define DrawLine DrawLine_internal
-#define DrawText DrawText_internal
-#define GetPixel GetPixel_internal
 #endif
 
 
@@ -632,13 +629,12 @@ extern int			FrameCounter;
 
 /* function definitions */
 
-void InitCommandName(char *);
+void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
+		     char *, char *, char *, int);
+
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependantStuff(void);
 void ClosePlatformDependantStuff(void);
-
-void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, int);
 
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
 void InitGfxDoor1Info(int, int, int, int);

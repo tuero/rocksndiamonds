@@ -332,13 +332,53 @@ unsigned int get_random_number(int nr, unsigned int max)
 /* system info functions                                                     */
 /* ------------------------------------------------------------------------- */
 
+static char *get_corrected_real_name(char *real_name)
+{
+  char *real_name_new = checked_malloc(MAX_USERNAME_LEN + 1);
+  char *from_ptr = real_name;
+  char *to_ptr   = real_name_new;
+
+  if (strchr(real_name, 'ß') == NULL)	/* name does not contain 'ß' */
+  {
+    strncpy(real_name_new, real_name, MAX_USERNAME_LEN);
+    real_name_new[MAX_USERNAME_LEN] = '\0';
+
+    return real_name_new;
+  }
+
+  /* the user's real name may contain a 'ß' character (german sharp s),
+     which has no equivalent in upper case letters (which our fonts use) */
+  while (*from_ptr && (long)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
+  {
+    if (*from_ptr != 'ß')
+      *to_ptr++ = *from_ptr++;
+    else
+    {
+      from_ptr++;
+      *to_ptr++ = 's';
+      *to_ptr++ = 's';
+    }
+  }
+
+  *to_ptr = '\0';
+
+  return real_name_new;
+}
+
 char *getLoginName()
 {
-#if defined(PLATFORM_WIN32)
-  return ANONYMOUS_NAME;
-#else
   static char *login_name = NULL;
 
+#if defined(PLATFORM_WIN32)
+  if (login_name == NULL)
+  {
+    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
+    login_name = checked_malloc(buffer_size);
+
+    if (GetUserName(login_name, &buffer_size) == 0)
+      strcpy(login_name, ANONYMOUS_NAME);
+  }
+#else
   if (login_name == NULL)
   {
     struct passwd *pwd;
@@ -348,70 +388,73 @@ char *getLoginName()
     else
       login_name = getStringCopy(pwd->pw_name);
   }
+#endif
 
   return login_name;
-#endif
 }
 
 char *getRealName()
 {
-#if defined(PLATFORM_UNIX)
-  struct passwd *pwd;
+  static char *real_name = NULL;
 
-  if ((pwd = getpwuid(getuid())) == NULL || strlen(pwd->pw_gecos) == 0)
-    return ANONYMOUS_NAME;
-  else
+#if defined(PLATFORM_WIN32)
+  if (real_name == NULL)
   {
-    static char real_name[1024];
-    char *from_ptr = pwd->pw_gecos, *to_ptr = real_name;
+    static char buffer[MAX_USERNAME_LEN + 1];
+    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
 
-    if (strchr(pwd->pw_gecos, 'ß') == NULL)
-      return pwd->pw_gecos;
-
-    /* the user's real name contains a 'ß' character (german sharp s),
-       which has no equivalent in upper case letters (which our fonts use) */
-    while (*from_ptr != '\0' && (long)(to_ptr - real_name) < 1024 - 2)
-    {
-      if (*from_ptr != 'ß')
-	*to_ptr++ = *from_ptr++;
-      else
-      {
-	from_ptr++;
-	*to_ptr++ = 's';
-	*to_ptr++ = 's';
-      }
-    }
-    *to_ptr = '\0';
-
-    return real_name;
+    if (GetUserName(buffer, &buffer_size) != 0)
+      real_name = get_corrected_real_name(buffer);
+    else
+      real_name = ANONYMOUS_NAME;
   }
-#else /* !PLATFORM_UNIX */
-  return ANONYMOUS_NAME;
+#elif defined(PLATFORM_UNIX)
+  if (real_name == NULL)
+  {
+    struct passwd *pwd;
+
+    if ((pwd = getpwuid(getuid())) != NULL && strlen(pwd->pw_gecos) != 0)
+      real_name = get_corrected_real_name(pwd->pw_gecos);
+    else
+      real_name = ANONYMOUS_NAME;
+  }
+#else
+  real_name = ANONYMOUS_NAME;
 #endif
+
+  return real_name;
 }
 
 char *getHomeDir()
 {
-#if defined(PLATFORM_UNIX)
-  static char *home_dir = NULL;
+  static char *dir = NULL;
 
-  if (home_dir == NULL)
+#if defined(PLATFORM_WIN32)
+  if (dir == NULL)
   {
-    if ((home_dir = getenv("HOME")) == NULL)
+    dir = checked_malloc(MAX_PATH + 1);
+
+    if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, dir)))
+      strcpy(dir, ".");
+  }
+#elif defined(PLATFORM_UNIX)
+  if (dir == NULL)
+  {
+    if ((dir = getenv("HOME")) == NULL)
     {
       struct passwd *pwd;
 
-      if ((pwd = getpwuid(getuid())) == NULL)
-	home_dir = ".";
+      if ((pwd = getpwuid(getuid())) != NULL)
+	dir = getStringCopy(pwd->pw_dir);
       else
-	home_dir = getStringCopy(pwd->pw_dir);
+	dir = ".";
     }
   }
-
-  return home_dir;
 #else
-  return ".";
+  dir = ".";
 #endif
+
+  return dir;
 }
 
 

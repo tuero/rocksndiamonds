@@ -170,7 +170,7 @@ static char *getTapeDir(char *level_subdir)
 static char *getScoreDir(char *level_subdir)
 {
   static char *score_dir = NULL;
-  char *data_dir = options.rw_base_directory;
+  char *data_dir = getCommonDataDir();
   char *score_subdir = SCORES_DIRECTORY;
 
   if (score_dir)
@@ -610,6 +610,7 @@ void InitTapeDirectory(char *level_subdir)
 
 void InitScoreDirectory(char *level_subdir)
 {
+  createDirectory(getCommonDataDir(), "common data", PERMS_PUBLIC);
   createDirectory(getScoreDir(NULL), "main score", PERMS_PUBLIC);
   createDirectory(getScoreDir(level_subdir), "level score", PERMS_PUBLIC);
 }
@@ -885,15 +886,33 @@ char *getUserDataDir(void)
 {
   static char *userdata_dir = NULL;
 
-  if (!userdata_dir)
-  {
-    char *home_dir = getHomeDir();
-    char *data_dir = program.userdata_directory;
-
-    userdata_dir = getPath2(home_dir, data_dir);
-  }
+  if (userdata_dir == NULL)
+    userdata_dir = getPath2(getHomeDir(), program.userdata_directory);
 
   return userdata_dir;
+}
+
+char *getCommonDataDir(void)
+{
+  static char *common_data_dir = NULL;
+
+#if defined(PLATFORM_WIN32)
+  if (common_data_dir == NULL)
+  {
+    char *dir = checked_malloc(MAX_PATH + 1);
+
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_DOCUMENTS, NULL, 0, dir))
+	&& strcmp(dir, "") != 0)	/* empty for Windows 95/98 */
+      common_data_dir = getPath2(dir, program.userdata_directory);
+    else
+      common_data_dir = options.rw_base_directory;
+  }
+#else
+  if (common_data_dir == NULL)
+    common_data_dir = options.rw_base_directory;
+#endif
+
+  return common_data_dir;
 }
 
 char *getSetupDir()

@@ -66,10 +66,31 @@ int			FrameCounter = 0;
 /* init/close functions                                                      */
 /* ========================================================================= */
 
-void InitCommandName(char *argv0)
+void InitProgramInfo(char *argv0,
+		     char *userdata_directory, char *program_title,
+		     char *window_title, char *icon_title,
+		     char *x11_icon_filename, char *x11_iconmask_filename,
+		     char *msdos_pointer_filename,
+		     char *cookie_prefix, char *filename_prefix,
+		     int program_version)
 {
   program.command_basename =
     (strrchr(argv0, '/') ? strrchr(argv0, '/') + 1 : argv0);
+
+  program.userdata_directory = userdata_directory;
+  program.program_title = program_title;
+  program.window_title = window_title;
+  program.icon_title = icon_title;
+  program.x11_icon_filename = x11_icon_filename;
+  program.x11_iconmask_filename = x11_iconmask_filename;
+  program.msdos_pointer_filename = msdos_pointer_filename;
+
+  program.cookie_prefix = cookie_prefix;
+  program.filename_prefix = filename_prefix;
+
+  program.version_major = VERSION_MAJOR(program_version);
+  program.version_minor = VERSION_MINOR(program_version);
+  program.version_patch = VERSION_PATCH(program_version);
 }
 
 void InitExitFunction(void (*exit_function)(int))
@@ -90,13 +111,6 @@ void InitPlatformDependantStuff(void)
 {
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
-#endif
-
-#if !defined(PLATFORM_UNIX)
-  program.userdata_directory = "userdata";
-#endif
-
-#if defined(PLATFORM_MSDOS)
   initErrorFile();
 #endif
 
@@ -111,34 +125,6 @@ void ClosePlatformDependantStuff(void)
 #if defined(PLATFORM_MSDOS)
   dumpErrorFile();
 #endif
-}
-
-void InitProgramInfo(char *unix_userdata_directory, char *program_title,
-		     char *window_title, char *icon_title,
-		     char *x11_icon_filename, char *x11_iconmask_filename,
-		     char *msdos_pointer_filename,
-		     char *cookie_prefix, char *filename_prefix,
-		     int program_version)
-{
-#if defined(PLATFORM_UNIX)
-  program.userdata_directory = unix_userdata_directory;
-#else
-  program.userdata_directory = "userdata";
-#endif
-
-  program.program_title = program_title;
-  program.window_title = window_title;
-  program.icon_title = icon_title;
-  program.x11_icon_filename = x11_icon_filename;
-  program.x11_iconmask_filename = x11_iconmask_filename;
-  program.msdos_pointer_filename = msdos_pointer_filename;
-
-  program.cookie_prefix = cookie_prefix;
-  program.filename_prefix = filename_prefix;
-
-  program.version_major = VERSION_MAJOR(program_version);
-  program.version_minor = VERSION_MINOR(program_version);
-  program.version_patch = VERSION_PATCH(program_version);
 }
 
 void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,

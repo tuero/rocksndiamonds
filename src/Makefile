@@ -64,6 +64,7 @@ TARGET = allegro
 endif
 
 ifeq ($(PLATFORM),cross-win32)
+EXTRA_LDFLAGS = -lshfolder
 PROGNAME = ../$(PROGBASE).exe
 TARGET = sdl
 endif

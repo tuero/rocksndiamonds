@@ -1515,11 +1515,26 @@ static struct TokenInfo options_setup_tokens[] =
   { TYPE_BOOLEAN, &soi.verbose,		"options.verbose"		}
 };
 
+static char *get_corrected_login_name(char *login_name)
+{
+  /* needed because player name must be a fixed length string */
+  char *login_name_new = checked_malloc(MAX_PLAYER_NAME_LEN + 1);
+
+  strncpy(login_name_new, login_name, MAX_PLAYER_NAME_LEN);
+  login_name_new[MAX_PLAYER_NAME_LEN] = '\0';
+
+  if (strlen(login_name) > MAX_PLAYER_NAME_LEN)		/* name has been cut */
+    if (strchr(login_name_new, ' '))
+      *strchr(login_name_new, ' ') = '\0';
+
+  return login_name_new;
+}
+
 static void setSetupInfoToDefaults(struct SetupInfo *si)
 {
   int i;
 
-  si->player_name = getStringCopy(getLoginName());
+  si->player_name = get_corrected_login_name(getLoginName());
 
   si->sound = TRUE;
   si->sound_loops = TRUE;
@@ -1660,6 +1675,8 @@ void LoadSetup()
 
   if (setup_file_list)
   {
+    char *player_name_new;
+
     checkSetupFileListIdentifier(setup_file_list, getCookie("SETUP"));
     decodeSetupFileList(setup_file_list);
 
@@ -1668,16 +1685,9 @@ void LoadSetup()
     freeSetupFileList(setup_file_list);
 
     /* needed to work around problems with fixed length strings */
-    if (strlen(setup.player_name) > MAX_PLAYER_NAME_LEN)
-      setup.player_name[MAX_PLAYER_NAME_LEN] = '\0';
-    else if (strlen(setup.player_name) < MAX_PLAYER_NAME_LEN)
-    {
-      char *new_name = checked_malloc(MAX_PLAYER_NAME_LEN + 1);
-
-      strcpy(new_name, setup.player_name);
-      free(setup.player_name);
-      setup.player_name = new_name;
-    }
+    player_name_new = get_corrected_login_name(setup.player_name);
+    free(setup.player_name);
+    setup.player_name = player_name_new;
   }
   else
     Error(ERR_WARN, "using default setup values");

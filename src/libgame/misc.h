@@ -57,7 +57,11 @@
 
 /* values for general file handling stuff */
 #define MAX_FILENAME_LEN		256
-#define MAX_LINE_LEN			1000
+#define MAX_LINE_LEN			1024
+
+/* values for general username handling stuff */
+#define MAX_USERNAME_LEN		1024
+
 
 void fprintf_line(FILE *, char *, int);
 void printf_line(char *, int);

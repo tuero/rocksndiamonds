@@ -24,7 +24,6 @@
 #include "network.h"
 #include "netserv.h"
 #include "cartoons.h"
-#include "config.h"
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
@@ -2769,12 +2768,6 @@ void OpenAll()
 #endif
     exit(0);	/* never reached */
   }
-
-  InitProgramInfo(UNIX_USERDATA_DIRECTORY,
-		  PROGRAM_TITLE_STRING, getWindowTitleString(),
-		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
-		  MSDOS_POINTER_FILENAME,
-		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
 
   InitSetup();
 
