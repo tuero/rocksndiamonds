@@ -626,6 +626,14 @@ void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 	      SY + (graphic / GFX_PER_LINE) * TILEY,
 	      TILEX, TILEY, x, y);
   }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    XCopyArea(display, pix[PIX_MORE], d, gc,
+	      (graphic % MORE_PER_LINE) * TILEX,
+	      (graphic / MORE_PER_LINE) * TILEY,
+	      TILEX, TILEY, x, y);
+  }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
@@ -677,6 +685,14 @@ void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
     src_x  = SX + (graphic % GFX_PER_LINE) * TILEX;
     src_y  = SY + (graphic / GFX_PER_LINE) * TILEY;
   }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    src_pixmap = pix[PIX_MORE];
+    drawing_gc = clip_gc[PIX_MORE];
+    graphic -= GFX_START_ROCKSMORE;
+    src_x  = (graphic % MORE_PER_LINE) * TILEX;
+    src_y  = (graphic / MORE_PER_LINE) * TILEY;
+  }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     src_pixmap = pix[PIX_HEROES];
@@ -724,6 +740,14 @@ void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
     XCopyArea(display, pix[PIX_BACK], d, gc,
 	      MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX,
 	      MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY,
+	      MINI_TILEX, MINI_TILEY, x, y);
+  }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    XCopyArea(display, pix[PIX_MORE], d, gc,
+	      MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX,
+	      MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY,
 	      MINI_TILEX, MINI_TILEY, x, y);
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
@@ -826,6 +850,14 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
     graphic -= GFX_START_ROCKSSCREEN;
     src_x  = SX + (graphic % GFX_PER_LINE) * TILEX + cx;
     src_y  = SY + (graphic / GFX_PER_LINE) * TILEY + cy;
+  }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    src_pixmap = pix[PIX_MORE];
+    drawing_gc = clip_gc[PIX_MORE];
+    graphic -= GFX_START_ROCKSMORE;
+    src_x  = (graphic % MORE_PER_LINE) * TILEX + cx;
+    src_y  = (graphic / MORE_PER_LINE) * TILEY + cy;
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
@@ -1259,10 +1291,16 @@ void DrawMicroElement(int xpos, int ypos, int element)
 
   graphic = el2gfx(element);
 
-  XCopyArea(display, pix[PIX_BACK], drawto, gc,
-	    MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,
-	    MICRO_GFX_STARTY + (graphic / MICRO_GFX_PER_LINE) * MICRO_TILEY,
-	    MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+    XCopyArea(display, pix[PIX_MORE], drawto, gc,
+	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
+	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
+	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  else
+    XCopyArea(display, pix[PIX_BACK], drawto, gc,
+	      MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,
+	      MICRO_GFX_STARTY + (graphic / MICRO_GFX_PER_LINE) * MICRO_TILEY,
+	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
 }
 
 void DrawLevel()
@@ -1877,6 +1915,8 @@ int el2gfx(int element)
     {
       if (IS_CHAR(element))
 	return GFX_CHAR_START + (element - EL_CHAR_START);
+      else if (element >= EL_SP_START && element <= EL_SP_END)
+	return GFX_START_ROCKSMORE + (element - EL_SP_START);
       else
 	return -1;
     }

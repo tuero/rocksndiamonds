@@ -180,7 +180,8 @@ static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
 static int new_element3 = EL_ERDREICH;
 
-int element_shift;
+int element_shift = 0;
+
 int editor_element[] =
 {
   EL_CHAR_A + ('B' - 'A'),
@@ -472,7 +473,63 @@ int editor_element[] =
 
   EL_CHAR_OE,
   EL_CHAR_UE,
-  EL_CHAR_COPY
+  EL_CHAR_COPY,
+  EL_LEERRAUM,
+
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+
+  EL_LEERRAUM,
+  EL_SP_ZONK,
+  EL_SP_BASE,
+  EL_SP_MURPHY,
+
+  EL_SP_INFOTRON,
+  EL_SP_CHIP_SINGLE,
+  EL_SP_HARD_GRAY,
+  EL_SP_EXIT,
+
+  EL_SP_DISK_ORANGE,
+  EL_SP_PORT1_RIGHT,
+  EL_SP_PORT1_DOWN,
+  EL_SP_PORT1_LEFT,
+
+  EL_SP_PORT1_UP,
+  EL_SP_PORT2_RIGHT,
+  EL_SP_PORT2_DOWN,
+  EL_SP_PORT2_LEFT,
+
+  EL_SP_PORT2_UP,
+  EL_SP_SNIKSNAK,
+  EL_SP_DISK_YELLOW,
+  EL_SP_TERMINAL,
+
+  EL_SP_DISK_RED,
+  EL_SP_PORT_Y,
+  EL_SP_PORT_X,
+  EL_SP_PORT_XY,
+
+  EL_SP_ELECTRON,
+  EL_SP_BUG,
+  EL_SP_CHIP_LEFT,
+  EL_SP_CHIP_RIGHT,
+
+  EL_SP_HARD_BASE1,
+  EL_SP_HARD_GREEN,
+  EL_SP_HARD_BLUE,
+  EL_SP_HARD_RED,
+
+  EL_SP_HARD_YELLOW,
+  EL_SP_HARD_BASE2,
+  EL_SP_HARD_BASE3,
+  EL_SP_HARD_BASE4,
+
+  EL_SP_HARD_BASE5,
+  EL_SP_HARD_BASE6,
+  EL_SP_CHIP_UPPER,
+  EL_SP_CHIP_LOWER
 };
 int elements_in_list = sizeof(editor_element)/sizeof(int);
 
@@ -789,7 +846,6 @@ void DrawLevelEd()
   level_ypos=-1;
   edit_mode = ED_MODE_DRAWING;
   name_typing = FALSE;
-  element_shift = 0;
 
   CloseDoor(DOOR_CLOSE_ALL);
 
@@ -829,7 +885,7 @@ void DrawLevelEd()
   for(i=0;i<MAX_ELEM_X*MAX_ELEM_Y;i++)
   {
     if (i < elements_in_list)
-      graphic = el2gfx(editor_element[i]);
+      graphic = el2gfx(editor_element[i + element_shift]);
     else
       graphic = GFX_LEERRAUM;
 
