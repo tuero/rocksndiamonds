@@ -421,77 +421,45 @@ static unsigned int bitsPerPixelAtDepth(Display *disp, int scrn,
   exit(1);
 }
 
-XImageInfo *imageToXImage(Display *disp,
-			  int scrn,
-			  Visual *visual,
-			  unsigned int ddepth,
-			  Image *image)
+XImageInfo *imageToXImage(Display *disp, int scrn, Visual *visual,
+			  unsigned int ddepth, Image *image)
 {
-  Pixel        *redvalue, *greenvalue, *bluevalue;
-  unsigned int  a, c=0, x, y, linelen, dpixlen, dbits;
-  XColor        xcolor;
+  static XColor xcolor_private[NOFLASH_COLORS];
+  static int colorcell_used[NOFLASH_COLORS];
+  static Colormap global_cmap = 0;
+  static Pixel *global_cmap_index;
+  static int num_cmap_entries, free_cmap_entries;
+  static private_cmap = FALSE;
+  Pixel *redvalue, *greenvalue, *bluevalue;
+  unsigned int a, c=0, x, y, linelen, dpixlen, dbits;
+  XColor xcolor;
+  XGCValues gcv;
+  XImageInfo *ximageinfo;
 
-  static XColor xcolor_used[NOFLASH_COLORS];
-
-  XGCValues     gcv;
-  XImageInfo   *ximageinfo;
-  Image        *orig_image;
-
-  static Colormap our_default_cmap = 0;
-  static Pixel *our_default_index;
-  static int free_cmap_entries, max_cmap_entries;
-  int use_cmap_entry;
-
-
-  static unsigned long pixel_used[NOFLASH_COLORS];
-
-
-  if (!our_default_cmap)
+  if (!global_cmap)
   {
-#if 0
-    our_default_cmap = DefaultColormap(disp, scrn);
-#endif
-
-    our_default_cmap = XCreateColormap(disp, RootWindow(disp, scrn),
-				       visual, AllocNone);
-    our_default_index = (Pixel *)lmalloc(sizeof(Pixel) * NOFLASH_COLORS);
-
-    for (a=0; a<NOFLASH_COLORS; a++)	/* count entries we got */
-      if (!XAllocColorCells(disp, our_default_cmap, FALSE, NULL, 0,
-			    our_default_index + a, 1))
-	break;
-
-    free_cmap_entries = max_cmap_entries = a;
-
-    printf("We've got %d colormap entries.\n", free_cmap_entries);
-
-    for(a=0; a<max_cmap_entries; a++)	/* copy default colors */
+    if (visual == DefaultVisual(disp, scrn))
+      global_cmap = DefaultColormap(disp, scrn);
+    else
     {
-      xcolor.pixel = *(our_default_index + a);
-      XQueryColor(disp, DefaultColormap(disp, scrn), &xcolor);
-      XStoreColor(disp, our_default_cmap, &xcolor);
-
-      pixel_used[xcolor.pixel] = 0;
-      xcolor_used[xcolor.pixel] = xcolor;
+      global_cmap = XCreateColormap(disp, RootWindow(disp, scrn),
+					 visual, AllocNone);
+      private_cmap = TRUE;
     }
   }
 
-  xcolor.flags= DoRed | DoGreen | DoBlue;
-  redvalue= greenvalue= bluevalue= NULL;
-  orig_image= image;
-  ximageinfo= (XImageInfo *)lmalloc(sizeof(XImageInfo));
-  ximageinfo->disp= disp;
-  ximageinfo->scrn= scrn;
-  ximageinfo->depth= 0;
-  ximageinfo->drawable= None;
-  ximageinfo->index= NULL;
-  ximageinfo->rootimage= FALSE;	/* assume not */
-  ximageinfo->foreground= ximageinfo->background= 0;
-  ximageinfo->gc= NULL;
-  ximageinfo->ximage= NULL;
-
-  /* do color allocation
-   */
+  xcolor.flags = DoRed | DoGreen | DoBlue;
+  redvalue = greenvalue = bluevalue = NULL;
+  ximageinfo = (XImageInfo *)lmalloc(sizeof(XImageInfo));
+  ximageinfo->disp = disp;
+  ximageinfo->scrn = scrn;
+  ximageinfo->depth = 0;
+  ximageinfo->drawable = None;
+  ximageinfo->index = NULL;
+  ximageinfo->rootimage = FALSE;
+  ximageinfo->foreground = ximageinfo->background= 0;
+  ximageinfo->gc = NULL;
+  ximageinfo->ximage = NULL;
 
   switch (visual->class)
   {
@@ -504,19 +472,11 @@ XImageInfo *imageToXImage(Display *disp,
       unsigned int redbottom, greenbottom, bluebottom;
       unsigned int redtop, greentop, bluetop;
 
-      redvalue= (Pixel *)lmalloc(sizeof(Pixel) * 256);
-      greenvalue= (Pixel *)lmalloc(sizeof(Pixel) * 256);
-      bluevalue= (Pixel *)lmalloc(sizeof(Pixel) * 256);
+      redvalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
+      greenvalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
+      bluevalue = (Pixel *)lmalloc(sizeof(Pixel) * 256);
 
-#if 1
-      if (visual == DefaultVisual(disp, scrn))
-	ximageinfo->cmap= DefaultColormap(disp, scrn);
-      else
-	ximageinfo->cmap= XCreateColormap(disp, RootWindow(disp, scrn),
-					  visual, AllocNone);
-#else
-      ximageinfo->cmap = our_default_cmap;
-#endif
+      ximageinfo->cmap = global_cmap;
 
       retry_direct: /* tag we hit if a DirectColor allocation fails on
 		     * default colormap */
@@ -524,8 +484,8 @@ XImageInfo *imageToXImage(Display *disp,
       /* calculate number of distinct colors in each band
        */
 
-      redcolors= greencolors= bluecolors= 1;
-      for (pixval= 1; pixval; pixval <<= 1)
+      redcolors = greencolors = bluecolors = 1;
+      for (pixval=1; pixval; pixval <<= 1)
       {
 	if (pixval & visual->red_mask)
 	  redcolors <<= 1;
@@ -550,19 +510,19 @@ XImageInfo *imageToXImage(Display *disp,
       bluestep = 256 / bluecolors;
       redbottom = greenbottom = bluebottom = 0;
       redtop = greentop = bluetop = 0;
-      for (a= 0; a < visual->map_entries; a++)
+      for (a=0; a<visual->map_entries; a++)
       {
 	if (redbottom < 256)
-	  redtop= redbottom + redstep;
+	  redtop = redbottom + redstep;
 	if (greenbottom < 256)
-	  greentop= greenbottom + greenstep;
+	  greentop = greenbottom + greenstep;
 	if (bluebottom < 256)
-	  bluetop= bluebottom + bluestep;
+	  bluetop = bluebottom + bluestep;
 
-	xcolor.red= (redtop - 1) << 8;
-	xcolor.green= (greentop - 1) << 8;
-	xcolor.blue= (bluetop - 1) << 8;
-	if (! XAllocColor(disp, ximageinfo->cmap, &xcolor))
+	xcolor.red = (redtop - 1) << 8;
+	xcolor.green = (greentop - 1) << 8;
+	xcolor.blue = (bluetop - 1) << 8;
+	if (!XAllocColor(disp, ximageinfo->cmap, &xcolor))
 	{
 	  /* if an allocation fails for a DirectColor default visual then
 	   * we should create a private colormap and try again.
@@ -571,13 +531,10 @@ XImageInfo *imageToXImage(Display *disp,
 	  if ((visual->class == DirectColor) &&
 	      (visual == DefaultVisual(disp, scrn)))
 	  {
-#if 1
-	    ximageinfo->cmap = XCreateColormap(disp, RootWindow(disp, scrn),
-					       visual, AllocNone);
-#else
-	    our_default_cmap = XCopyColormapAndFree(disp, our_default_cmap);
-	    ximageinfo->cmap = our_default_cmap;
-#endif
+	    global_cmap = XCopyColormapAndFree(disp, global_cmap);
+	    ximageinfo->cmap = global_cmap;
+	    private_cmap = TRUE;
+
 	    goto retry_direct;
 	  }
 
@@ -596,144 +553,136 @@ XImageInfo *imageToXImage(Display *disp,
 	 */
 
 	while ((redbottom < 256) && (redbottom < redtop))
-	  redvalue[redbottom++]= xcolor.pixel & visual->red_mask;
+	  redvalue[redbottom++] = xcolor.pixel & visual->red_mask;
 	while ((greenbottom < 256) && (greenbottom < greentop))
-	  greenvalue[greenbottom++]= xcolor.pixel & visual->green_mask;
+	  greenvalue[greenbottom++] = xcolor.pixel & visual->green_mask;
 	while ((bluebottom < 256) && (bluebottom < bluetop))
-	  bluevalue[bluebottom++]= xcolor.pixel & visual->blue_mask;
+	  bluevalue[bluebottom++] = xcolor.pixel & visual->blue_mask;
       }
       break;
     }
 
     case PseudoColor:
 
-      ximageinfo->index= (Pixel *)lmalloc(sizeof(Pixel) * (image->rgb.used+NOFLASH_COLORS));
+      ximageinfo->cmap = global_cmap;
+      ximageinfo->index = (Pixel *)lmalloc(sizeof(Pixel) * image->rgb.used);
 
-
-      /* get the colormap to use.
-       */
-
-      ximageinfo->cmap = our_default_cmap;
-
-      /* allocate colors shareable (if we can)
-       */
-
-      for (a = 0; a < image->rgb.used; a++)
+      for (a=0; a<image->rgb.used; a++)
       {
+	XColor xcolor2;
+	unsigned short mask;
+	int color_found;
   	int i;
-  	XColor xcolor2;
   
-  	xcolor2.flags = DoRed | DoGreen | DoBlue;
-  
-  	xcolor.red= *(image->rgb.red + a);
-  	xcolor.green= *(image->rgb.green + a);
-  	xcolor.blue= *(image->rgb.blue + a);
+  	xcolor.red = *(image->rgb.red + a);
+  	xcolor.green = *(image->rgb.green + a);
+  	xcolor.blue = *(image->rgb.blue + a);
   
   	/* look if this color already exists in our colormap */
-  
-  #if 0
-  	for (i=max_cmap_entries-1; i>=free_cmap_entries; i--)
-  
-  #else
-  	for (i=max_cmap_entries-1; i>=0; i--)
-  	{
-  	  /*
-  	  if (!pixel_used[i])
-  	    continue;
-  	    */
-  #endif
-  
-  	  xcolor2.pixel = *(our_default_index + i);
-  
-  #if 0
-  	  XQueryColor(disp, ximageinfo->cmap, &xcolor2);
-  #else
-  	  xcolor2 = xcolor_used[xcolor2.pixel];
-  #endif
-  
-  	  if ((xcolor.red >> 8) == (xcolor2.red >> 8) &&
-  	      (xcolor.green >> 8) == (xcolor2.green >> 8) &&
-  	      (xcolor.blue >> 8) == (xcolor2.blue >> 8))
-  	    break;
-  	}
-  
-  	use_cmap_entry = i;
-  
-  	if (0 && use_cmap_entry < free_cmap_entries)	/* not found in colormap */
-  	{
-  	  free_cmap_entries--;
-  	}
-  	else if (0 && use_cmap_entry < free_cmap_entries)	/* not found in colormap */
-  	{
-  	}
-  	else if (use_cmap_entry < 0)	/* not found in colormap */
-  	{
-  	  /* look for an existing 'unused' color near the one we want */
-  
-  	  for (i=free_cmap_entries-1; i>=0; i--)
-  	  {
-  	    int closeness = 14;
-  
-  	    if (pixel_used[i])
-  	      continue;
-  
-  	    xcolor2.pixel = *(our_default_index + i);
-  
-  #if 0
-  	    XQueryColor(disp, ximageinfo->cmap, &xcolor2);
-  #else
-  	    xcolor2 = xcolor_used[xcolor2.pixel];
-  #endif
-  
-  
-  	    if ((xcolor.red >> closeness) == (xcolor2.red >> closeness) &&
-  		(xcolor.green >> closeness) == (xcolor2.green >> closeness) &&
-  		(xcolor.blue >> closeness) == (xcolor2.blue >> closeness))
-  	      break;
-  	  }
-  
-  	  use_cmap_entry = i;
-  
-  	  if (use_cmap_entry < 0)		/* no 'near' color found */
-  	  {
-  	    /* look for the next free color */
-  
-  	    while (pixel_used[--free_cmap_entries])
-  	      ;
-  	    use_cmap_entry = free_cmap_entries;
-  	  }
-  	}
-  
-  	if (free_cmap_entries < 0)
-  	{
-  	  printf("imageToXImage: too many global colors!\n");
-  	  exit(0);
-  	}
-  
-  
-  	/*
-  	  printf("--> eating color %d\n", use_cmap_entry);
-  	  */
-  
-  
-  
-  	xcolor.pixel = use_cmap_entry;
-  
-  	xcolor_used[xcolor.pixel] = xcolor;
-  
-  	*(ximageinfo->index + a) = xcolor.pixel;
-  
-  	XStoreColor(disp, ximageinfo->cmap, &xcolor);
-  
-  	pixel_used[use_cmap_entry] = 1;
-      }
-      
-      ximageinfo->no = a;    /* number of pixels allocated in default visual */
+	if (!XAllocColor(disp, ximageinfo->cmap, &xcolor))
+	{
+	  if (!private_cmap)
+	  {
+	    /*
+	    printf("switching to private colormap...\n");
+	    */
 
-      /*  
+	    /* we just filled up the default colormap -- get a private one
+	       which contains all already allocated colors */
+
+	    global_cmap = XCopyColormapAndFree(disp, global_cmap);
+	    ximageinfo->cmap = global_cmap;
+	    private_cmap = TRUE;
+
+	    /* allocate the rest of the color cells read/write */
+	    global_cmap_index =
+	      (Pixel *)lmalloc(sizeof(Pixel) * NOFLASH_COLORS);
+	    for (i=0; i<NOFLASH_COLORS; i++)
+	      if (!XAllocColorCells(disp, global_cmap, FALSE, NULL, 0,
+				    global_cmap_index + i, 1))
+		break;
+	    num_cmap_entries = free_cmap_entries = i;
+
+	    /*
+	    printf("We've got %d free colormap entries.\n", free_cmap_entries);
+	    */
+
+	    /* to minimize colormap flashing, copy default colors and try
+	       to keep them as near as possible to the old values */
+
+	    for(i=0; i<num_cmap_entries; i++)
+	    {
+	      xcolor2.pixel = *(global_cmap_index + i);
+	      XQueryColor(disp, DefaultColormap(disp, scrn), &xcolor2);
+	      XStoreColor(disp, global_cmap, &xcolor2);
+	      xcolor_private[xcolor2.pixel] = xcolor2;
+	      colorcell_used[xcolor2.pixel] = FALSE;
+	    }
+
+	    /* now we have the default colormap private: all colors we
+	       successfully allocated so far are read-only, which is okay,
+	       because we don't want to change them anymore -- if we need
+	       an existing color again, we get it by XAllocColor; all other
+	       colors are read/write and we can set them by XStoreColor,
+	       but we will try to overwrite those color cells with our new
+	       color which are as close as possible to our new color */
+	  }
+
+  	  /* look for an existing default color close the one we want */
+
+	  mask = 0xf000;
+	  color_found = FALSE;
+
+	  while (!color_found)
+	  {
+	    for (i=num_cmap_entries-1; i>=0; i--)
+	    {
+	      xcolor2.pixel = *(global_cmap_index + i);
+	      xcolor2 = xcolor_private[xcolor2.pixel];
+
+	      if (colorcell_used[xcolor2.pixel])
+		continue;
+
+	      if ((xcolor.red & mask) == (xcolor2.red & mask) &&
+		  (xcolor.green & mask) == (xcolor2.green & mask) &&
+		  (xcolor.blue & mask) == (xcolor2.blue & mask))
+	      {
+		/*
+		printf("replacing color cell %ld with a close color\n",
+		       xcolor2.pixel);
+		       */
+		color_found = TRUE;
+		break;
+	      }
+	    }
+
+	    if (mask == 0x0000)
+	      break;
+
+	    mask = (mask << 1) & 0xffff;
+	  }
+
+	  if (!color_found)		/* no more free color cells */
+	  {
+	    printf("Sorry, cannot allocate enough colors!\n");
+	    exit(0);
+	  }
+
+	  xcolor.pixel = xcolor2.pixel;
+	  xcolor_private[xcolor.pixel] = xcolor;
+	  colorcell_used[xcolor.pixel] = TRUE;
+	  XStoreColor(disp, ximageinfo->cmap, &xcolor);
+	  free_cmap_entries--;
+	}
+
+	*(ximageinfo->index + a) = xcolor.pixel;
+      }
+
+      /*
       printf("still %d free colormap entries\n", free_cmap_entries);
       */
 
+      ximageinfo->no = a;	/* number of pixels allocated for this image */
       break;
   
     default:
@@ -741,8 +690,6 @@ XImageInfo *imageToXImage(Display *disp,
       exit(0);
       break;
   }
-
-
 
   /* create an XImage and related colormap based on the image type
    * we have.
@@ -889,8 +836,6 @@ XImageInfo *imageToXImage(Display *disp,
     lfree((byte *)bluevalue);
   }
 
-  if (image != orig_image)
-    freeImage(image);
   return(ximageinfo);
 }
 

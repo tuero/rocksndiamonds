@@ -613,29 +613,6 @@ void HandleKey(KeySym key, int key_status)
 	  }
 
 	  break;
-
-	case XK_z:
-	  {
-	    static int test_picture_pos = 0;
-
-	    printf("test picture %d\n", test_picture_pos);
-
-	    XCopyArea(display,test_pix[test_picture_pos],window,gc,
-		      0,0, 100,100,
-		      0,0);
-	    /*
-	    XCopyArea(display,test_clipmask[test_picture_pos],window,gc,
-		      0,0, 100,100,
-		      100,0);
-		      */
-	    XFlush(display);
-	    XSync(display,FALSE);
-	    Delay(1000000);
-
-	    test_picture_pos = (test_picture_pos + 1) % test_picture_count;
-	  }
-
-	  break;
 #endif
 
 	default:

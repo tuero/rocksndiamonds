@@ -74,7 +74,7 @@ typedef struct rgbmap {
  */
 
 typedef struct {
-  char         *title;  /* name of image */
+  char	       *title;  /* name of image */
   unsigned int  type;   /* type of image */
   RGBMap        rgb;    /* RGB map of image if IRGB type */
   unsigned int  width;  /* width of image in pixels */

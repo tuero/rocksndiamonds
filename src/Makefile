@@ -21,7 +21,7 @@ SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
 # If you use the Xpm library, convert the GIF files to Xpm
 # files (and the mask files ('*Maske.gif') to xbm files).
 
-XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
+# XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
 
 CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
@@ -39,8 +39,8 @@ DEBUG = -DDEBUG -g -Wall
 # LIBS = -L/usr/local/X11/lib -lXpm -lX11 -lm -lsocket -R/usr/local/X11/lib
 #					# for SunOS and others
 
-LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
-# LIBS = -L/usr/X11R6/lib -lX11 -lm
+# LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
+LIBS = -L/usr/X11R6/lib -lX11 -lm
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)

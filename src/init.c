@@ -25,9 +25,7 @@
 #include <signal.h>
 
 #ifdef DEBUG
-
 #define DEBUG_TIMING
-
 #endif
 
 struct PictureFileInfo
@@ -504,16 +502,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   unsigned int width,height;
   int hot_x,hot_y;
   Pixmap shapemask;
-#ifdef MSDOS
-  char *picture_ext = ".gif";
-#else
   char *picture_ext = ".xpm";
-#endif
   char *picturemask_ext = "Mask.xbm";
 #else
-  int gif_err, ilbm_err;
+  int gif_err;
   char *picture_ext = ".gif";
-  char *picturemask_ext = "Mask.ilbm";
 #endif
 
 #ifdef DEBUG_TIMING
@@ -523,38 +516,13 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   /* Grafik laden */
   if (pic->picture_filename)
   {
-
-
-
-
-
-    sprintf(basefilename,"%s%s",pic->picture_filename,".gif");
+    sprintf(basefilename,"%s%s",pic->picture_filename,picture_ext);
     DrawInitText(basefilename,150,FC_YELLOW);
     sprintf(filename,"%s/%s",GFX_PATH,basefilename);
 
-#ifdef DEBUG_TIMING
-    count1 = Counter();
-#endif
-
-    Read_GIF_to_Pixmaps(display, window, filename);
-
-#ifdef DEBUG_TIMING
-    count2 = Counter();
-    printf("GIF LOADING %s IN %.2f SECONDS\n",
-	   filename,(float)(count2-count1)/100.0);
-#endif
-
-
-
-
-
-
-    sprintf(basefilename,"%s%s",pic->picture_filename,picture_ext);
-    DrawInitText(basefilename,150,FC_YELLOW);
 #ifdef MSDOS
     rest(100);
 #endif MSDOS
-    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
 
 #ifdef DEBUG_TIMING
     count1 = Counter();
@@ -563,18 +531,9 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef XPM_INCLUDE_FILE
 
     xpm_att[pos].valuemask = XpmCloseness;
-    xpm_att[pos].closeness = 65535;
-
-    /*
     xpm_att[pos].closeness = 20000;
-    */
-
-#if 0
     xpm_err = XpmReadFileToPixmap(display,window,filename,
 				  &pix[pos],&shapemask,&xpm_att[pos]);
-#else
-    xpm_err = XpmSuccess;
-#endif
 
     switch(xpm_err)
     {
@@ -598,9 +557,16 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
+#ifdef DEBUG_TIMING
+    count2 = Counter();
+    printf("XPM LOADING %s IN %.2f SECONDS\n",
+	   filename,(float)(count2-count1)/100.0);
+#endif
+
 #else 
 
-    gif_err = Read_GIF_to_Pixmap(display,filename,&pix[pos]);
+    gif_err = Read_GIF_to_Pixmaps(display, window, filename,
+				  &pix[pos], &clipmask[pos]);
 
     switch(gif_err)
     {
@@ -630,57 +596,40 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-#endif
-
 #ifdef DEBUG_TIMING
     count2 = Counter();
-    /*
-    printf("XPM LOADING %s IN %.2f SECONDS\n",
+    printf("GIF LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/100.0);
-	   */
 #endif
 
-#if 0
+#endif
+
     if (!pix[pos])
     {
-      fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
-	      progname,filename);
+      fprintf(stderr, "%s: cannot get graphics for '%s'.\n",
+	      progname, pic->picture_filename);
       CloseAll();
       exit(-1);
     }
-#endif
-
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
   if (pic->picture_with_mask)
   {
-#ifdef MSDOS
-    xbm_err = BitmapSuccess;
-    clipmask[pos] = DUMMY_MASK;
-    goto msdos_jmp;
-#else
+
+#ifdef XPM_INCLUDE_FILE
+
     sprintf(basefilename,"%s%s",pic->picture_filename,picturemask_ext);
     DrawInitText(basefilename,150,FC_YELLOW);
     sprintf(filename,"%s/%s",GFX_PATH,basefilename);
-#endif
 
 #ifdef DEBUG_TIMING
     count1 = Counter();
 #endif
 
-#ifdef XPM_INCLUDE_FILE
-
-#if 0
     xbm_err = XReadBitmapFile(display,window,filename,
 			      &width,&height,&clipmask[pos],&hot_x,&hot_y);
-#else
-    xbm_err = BitmapSuccess;
-#endif
 
-#ifdef MSDOS
-msdos_jmp:
-#endif
     switch(xbm_err)
     {
       case BitmapSuccess:
@@ -704,58 +653,22 @@ msdos_jmp:
 	break;
     }
 
-#else
-
-    ilbm_err = Read_ILBM_to_Bitmap(display,filename,&clipmask[pos]);
-
-    switch(ilbm_err)
-    {
-      case ILBM_Success:
-        break;
-      case ILBM_OpenFailed:
-        fprintf(stderr,"Cannot open ILBM file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
-      case ILBM_ReadFailed:
-        fprintf(stderr,"Cannot read ILBM file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
-      case ILBM_FileInvalid:
-	fprintf(stderr,"Invalid ILBM file '%s'!\n",filename);
-	CloseAll();
-	exit(-1);
-      case ILBM_NoMemory:
-	fprintf(stderr,"Not enough memory for ILBM file '%s'!\n",filename);
-	CloseAll();
-	exit(1);
-      default:
-	break;
-    }
-
-#endif
-
 #ifdef DEBUG_TIMING
     count2 = Counter();
-    /*
-    printf("LOADING %s IN %.2f SECONDS\n",
+    printf("XBM LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/100.0);
-	   */
 #endif
 
-#if 0
+#endif
+
     if (!clipmask[pos])
     {
-      fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
-	      progname,filename);
+      fprintf(stderr, "%s: cannot get clipmask for '%s'.\n",
+	      progname, pic->picture_filename);
       CloseAll();
       exit(-1);
     }
-#endif
-
   }
-
-  pix[pos] = test_pix[test_picture_count-1];
-  clipmask[pos] = test_clipmask[test_picture_count-1];
 }
 
 void InitElementProperties()
@@ -1326,8 +1239,12 @@ void CloseAll()
 
   if (gc)
     XFreeGC(display, gc);
+
   if (display)
+  {
+    XAutoRepeatOn(display);
     XCloseDisplay(display);
+  }
 
   exit(0);
 }

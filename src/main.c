@@ -30,12 +30,6 @@ GC		gc, clip_gc[NUM_PIXMAPS];
 Pixmap		pix[NUM_PIXMAPS];
 Pixmap		clipmask[NUM_PIXMAPS];
 
-
-Pixmap		test_pix[NUM_PICTURES];
-Pixmap		test_clipmask[NUM_PICTURES];
-int		test_picture_count = 0;
-
-
 #ifdef XPM_INCLUDE_FILE
 XpmAttributes 	xpm_att[NUM_PICTURES];
 #endif

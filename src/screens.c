@@ -666,7 +666,7 @@ void HandleHelpScreen(int button)
   }
   else
   {
-    if (DelayReached(&hs_delay,GAME_FRAME_DELAY))
+    if (DelayReached(&hs_delay,GAME_FRAME_DELAY * 2))
     {
       if (helpscreen_state<num_helpscreen_els_pages)
 	DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);

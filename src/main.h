@@ -271,13 +271,6 @@ extern XImage 	       *image[];
 extern Pixmap		clipmask[];
 extern Pixmap		pix[];
 
-
-extern Pixmap		test_pix[];
-extern Pixmap		test_clipmask[];
-extern int		test_picture_count;
-
-
-
 #ifdef XPM_INCLUDE_FILE
 extern XpmAttributes 	xpm_att[];
 #endif
