@@ -339,7 +339,6 @@ void DrawPlayerField()
 
   int element = Feld[x][y];
   int graphic, phase;
-  BOOL draw_thru_mask = FALSE;
 
   if (PlayerGone)
     return;
@@ -360,39 +359,43 @@ void DrawPlayerField()
   if (direct_draw_on)
     SetDrawtoField(DRAW_BUFFERED);
 
-  /* draw things behind the player (EL_PFORTE* || mole/penguin/pig/dragon) */
+  /* draw things in the field the player is leaving, if needed */
 
+  if (lastJX != JX || lastJY != JY)
+  {
+    if (Store[lastJX][lastJY])
+    {
+      DrawLevelElement(lastJX,lastJY, Store[lastJX][lastJY]);
+      DrawLevelElementThruMask(lastJX,lastJY, Feld[lastJX][lastJY]);
+    }
+    else if (Feld[lastJX][lastJY] == EL_DYNAMIT)
+      DrawDynamite(lastJX,lastJY);
+    else
+      DrawLevelField(lastJX,lastJY);
 
+    if (PlayerPushing)
+    {
+      int nextJX = JX + (JX - lastJX);
+      int nextJY = JY + (JY - lastJY);
 
+      if (PlayerGfxPos)
+      {
+  	if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
+  	  DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
+  	else
+  	  DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
+      }
+      else
+  	DrawLevelField(nextJX,nextJY);
+    }
+  }
 
-  DrawLevelField(x,y);
-
-
+  /* draw things behind the player, if needed */
 
   if (Store[x][y])
-  {
-    DrawGraphic(sx,sy, el2gfx(Store[x][y]));
-    draw_thru_mask = TRUE;
-  }
-  else if (element!=EL_DYNAMIT && element!=EL_DYNABOMB)
-  {
+    DrawLevelElement(x,y, Store[x][y]);
+  else if (element != EL_DYNAMIT && element != EL_DYNABOMB)
     DrawLevelField(x,y);
-    draw_thru_mask = TRUE;
-  }
-
-  /*
-  else if (element!=EL_LEERRAUM && element!=EL_DYNAMIT && element!=EL_DYNABOMB)
-  {
-    DrawLevelField(x,y);
-    draw_thru_mask = TRUE;
-  }
-  */
-
-
-  draw_thru_mask = TRUE;
-
-
-
 
   /* draw player himself */
 
@@ -407,7 +410,6 @@ void DrawPlayerField()
 
   graphic += PlayerFrame;
 
-
   if (PlayerGfxPos)
   {
     if (PlayerMovDir == MV_LEFT || PlayerMovDir == MV_RIGHT)
@@ -416,31 +418,10 @@ void DrawPlayerField()
       syy = PlayerGfxPos;
   }
 
-
   if (!soft_scrolling_on && ScreenMovPos)
     sxx = syy = 0;
 
-
-
-
-
-
-  if (draw_thru_mask)
-    DrawGraphicShiftedThruMask(sx,sy,sxx,syy,graphic,CUT_NO_CUTTING);
-    /*
-    DrawGraphicThruMask(sx, sy, graphic);
-    */
-  else
-    DrawGraphicShifted(sx,sy,sxx,syy,graphic,CUT_NO_CUTTING);
-  /*
-    DrawGraphic(sx, sy, graphic);
-    */
-
-
-
-  MarkTileDirty(sx,sy);
-
-
+  DrawGraphicShiftedThruMask(sx,sy, sxx,syy, graphic, NO_CUTTING);
 
   if (PlayerPushing && PlayerGfxPos)
   {
@@ -450,9 +431,7 @@ void DrawPlayerField()
 
     if (Feld[JX][JY] == EL_SOKOBAN_FELD_LEER ||
 	Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
-      DrawGraphicShiftedThruMask(px,py,sxx,syy,
-				 GFX_SOKOBAN_OBJEKT,
-				 CUT_NO_CUTTING);
+      DrawGraphicShiftedThruMask(px,py,sxx,syy, GFX_SOKOBAN_OBJEKT,NO_CUTTING);
     else
     {
       int element = Feld[nextJX][nextJY];
@@ -466,20 +445,11 @@ void DrawPlayerField()
 	  graphic += phase;
 	else
 	  graphic += (phase+4)%4;
-
-
-	/*
-	printf("----> (%d, %d, %d)\n",
-	       PlayerGfxPos, phase, graphic);
-	       */
-
       }
 
-      DrawGraphicShifted(px,py, sxx,syy, graphic, CUT_NO_CUTTING);
+      DrawGraphicShifted(px,py, sxx,syy, graphic, NO_CUTTING, NO_MASKING);
     }
   }
-
-
 
   /* draw things in front of player (EL_DYNAMIT || EL_DYNABOMB) */
 
@@ -520,6 +490,8 @@ void DrawPlayerField()
 	      dest_x,dest_y, x_size,y_size, dest_x,dest_y);
     SetDrawtoField(DRAW_DIRECT);
   }
+
+  MarkTileDirty(sx,sy);
 }
 
 static int getGraphicAnimationPhase(int frames, int delay, int mode)
@@ -648,9 +620,15 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawElementThruMask(int x, int y, int element)
+void DrawScreenElementThruMask(int x, int y, int element)
 {
   DrawGraphicThruMask(x,y,el2gfx(element));
+}
+
+void DrawLevelElementThruMask(int x, int y, int element)
+{
+  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    DrawScreenElementThruMask(SCROLLX(x),SCROLLY(y),element);
 }
 
 void DrawMiniGraphic(int x, int y, int graphic)
@@ -687,198 +665,8 @@ void DrawMiniGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
     XFillRectangle(display,d,gc, x,y, MINI_TILEX,MINI_TILEY);
 }
 
-void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
-{
-  int width = TILEX, height = TILEY;
-  int cx = 0, cy = 0;
-
-  if (graphic < 0)
-  {
-    DrawGraphic(x,y,graphic);
-    return;
-  }
-
-  if (dx || dy)			/* Verschiebung der Grafik? */
-  {
-    if (x < BX1)		/* Element kommt von links ins Bild */
-    {
-      x = BX1;
-      width = dx;
-      cx = TILEX - dx;
-      dx = 0;
-    }
-    else if (x > BX2)		/* Element kommt von rechts ins Bild */
-    {
-      x = BX2;
-      width = -dx;
-      dx = TILEX + dx;
-    }
-    else if (x==BX1 && dx<0)	/* Element verl‰ﬂt links das Bild */
-    {
-      width += dx;
-      cx = -dx;
-      dx = 0;
-    }
-    else if (x==BX2 && dx>0)	/* Element verl‰ﬂt rechts das Bild */
-      width -= dx;
-    else if (dx)		/* allg. Bewegung in x-Richtung */
-      MarkTileDirty(x + SIGN(dx), y);
-
-    if (y < BY1)		/* Element kommt von oben ins Bild */
-    {
-      if (cut_mode==CUT_BELOW)	/* Element oberhalb des Bildes */
-	return;
-
-      y = BY1;
-      height = dy;
-      cy = TILEY - dy;
-      dy = 0;
-    }
-    else if (y > BY2)		/* Element kommt von unten ins Bild */
-    {
-      y = BY2;
-      height = -dy;
-      dy = TILEY + dy;
-    }
-    else if (y==BY1 && dy<0)	/* Element verl‰ﬂt oben das Bild */
-    {
-      height += dy;
-      cy = -dy;
-      dy = 0;
-    }
-    else if (dy > 0 && cut_mode==CUT_ABOVE)
-    {
-      if (y == BY2)		/* Element unterhalb des Bildes */
-	return;
-
-      height = dy;
-      cy = TILEY-dy;
-      dy = TILEY;
-      MarkTileDirty(x, y + 1);
-    }				/* Element verl‰ﬂt unten das Bild */
-    else if (dy > 0 && (y == BY2 || cut_mode==CUT_BELOW))
-      height -= dy;
-    else if (dy)		/* allg. Bewegung in y-Richtung */
-      MarkTileDirty(x, y + SIGN(dy));
-  }
-
-  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
-  {
-    graphic -= GFX_START_ROCKSSCREEN;
-    XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
-	      SX+(graphic % GFX_PER_LINE)*TILEX+cx,
-	      SY+(graphic / GFX_PER_LINE)*TILEY+cy,
-	      width,height, FX+x*TILEX+dx,FY+y*TILEY+dy);
-  }
-  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
-  {
-    graphic -= GFX_START_ROCKSHEROES;
-    XCopyArea(display,pix[PIX_HEROES],drawto_field,gc,
-	      (graphic % HEROES_PER_LINE)*TILEX+cx,
-	      (graphic / HEROES_PER_LINE)*TILEY+cy,
-	      width,height, FX+x*TILEX+dx,FY+y*TILEY+dy);
-  }
-
-#if DEBUG
-  if (!IN_SCR_FIELD(x,y))
-  {
-    printf("DrawGraphicShifted(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
-    printf("DrawGraphicShifted(): This should never happen!\n");
-    return;
-  }
-#endif
-
-  MarkTileDirty(x,y);
-}
-
-void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
-{
-  int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
-  int graphic = el2gfx(element);
-  int phase4 = ABS(MovPos[ux][uy])/(TILEX/4);
-  int phase  = phase4 / 2;
-  int dir = MovDir[ux][uy];
-
-  if (element==EL_PACMAN || element==EL_KAEFER || element==EL_FLIEGER)
-  {
-    graphic += 4*!phase;
-
-    if (dir == MV_UP)
-      graphic += 1;
-    else if (dir == MV_LEFT)
-      graphic += 2;
-    else if (dir == MV_DOWN)
-      graphic += 3;
-  }
-  else if (element==EL_MAULWURF || element==EL_PINGUIN ||
-	   element==EL_SCHWEIN || element==EL_DRACHE)
-  {
-    if (dir==MV_LEFT)
-      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_LEFT :
-		 element==EL_PINGUIN ? GFX_PINGUIN_LEFT :
-		 element==EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
-    else if (dir==MV_RIGHT)
-      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_RIGHT :
-		 element==EL_PINGUIN ? GFX_PINGUIN_RIGHT :
-		 element==EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
-    else if (dir==MV_UP)
-      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_UP :
-		 element==EL_PINGUIN ? GFX_PINGUIN_UP :
-		 element==EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
-    else
-      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_DOWN :
-		 element==EL_PINGUIN ? GFX_PINGUIN_DOWN :
-		 element==EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
-
-    graphic += phase4;
-  }
-  else if (element==EL_SONDE)
-  {
-    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
-  }
-  else if (element==EL_BUTTERFLY || element==EL_FIREFLY)
-  {
-    graphic += !phase;
-  }
-  else if ((element==EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
-  {
-    graphic += phase * (element==EL_FELSBROCKEN ? 2 : 1);
-  }
-  else if ((element==EL_SIEB_LEER || element==EL_SIEB2_LEER ||
-	    element==EL_SIEB_VOLL || element==EL_SIEB2_VOLL) && SiebAktiv)
-  {
-    graphic += 3-(SiebAktiv%8)/2;
-  }
-  else if (IS_AMOEBOID(element))
-  {
-    graphic = (element==EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
-    graphic += (x+2*y) % 4;
-  }
-  else if (element==EL_MAUER_LEBT)
-  {
-    BOOL links_massiv = FALSE, rechts_massiv = FALSE;
-
-    if (!IN_LEV_FIELD(ux-1,uy) || IS_MAUER(Feld[ux-1][uy]))
-      links_massiv = TRUE;
-    if (!IN_LEV_FIELD(ux+1,uy) || IS_MAUER(Feld[ux+1][uy]))
-      rechts_massiv = TRUE;
-
-    if (links_massiv && rechts_massiv)
-      graphic = GFX_MAUERWERK;
-    else if (links_massiv)
-      graphic = GFX_MAUER_R;
-    else if (rechts_massiv)
-      graphic = GFX_MAUER_L;
-  }
-
-  if (dx || dy)
-    DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode);
-  else
-    DrawGraphic(x,y, graphic);
-}
-
-void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
-				int cut_mode)
+void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
+			int cut_mode, int mask_mode)
 {
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
@@ -962,9 +750,15 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
     dest_x = FX+x*TILEX+dx;
     dest_y = FY+y*TILEY+dy;
 
-    XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
-    XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
-              src_x,src_y, width,height, dest_x,dest_y);
+    if (mask_mode == USE_MASKING)
+    {
+      XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
+      XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
+		src_x,src_y, width,height, dest_x,dest_y);
+    }
+    else
+      XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
+		src_x,src_y, width,height, dest_x,dest_y);
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
@@ -974,22 +768,127 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
     dest_x = FX+x*TILEX+dx;
     dest_y = FY+y*TILEY+dy;
 
-    XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
-    XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
-              src_x,src_y, width,height, dest_x,dest_y);
+    if (mask_mode == USE_MASKING)
+    {
+      XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
+      XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
+		src_x,src_y, width,height, dest_x,dest_y);
+    }
+    else
+      XCopyArea(display,pix[PIX_HEROES],drawto_field,gc,
+		src_x,src_y, width,height, dest_x,dest_y);
   }
 
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
   {
-    printf("DrawGraphicShiftedThruMask(): x = %d, y = %d, graphic = %d\n",
-	   x,y,graphic);
+    printf("DrawGraphicShifted(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
     printf("DrawGraphicShifted(): This should never happen!\n");
     return;
   }
 #endif
 
   MarkTileDirty(x,y);
+}
+
+void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
+				int cut_mode)
+{
+  DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, USE_MASKING);
+}
+
+void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
+			      int cut_mode)
+{
+  int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
+  int graphic = el2gfx(element);
+  int phase4 = ABS(MovPos[ux][uy])/(TILEX/4);
+  int phase  = phase4 / 2;
+  int dir = MovDir[ux][uy];
+
+  if (element==EL_PACMAN || element==EL_KAEFER || element==EL_FLIEGER)
+  {
+    graphic += 4*!phase;
+
+    if (dir == MV_UP)
+      graphic += 1;
+    else if (dir == MV_LEFT)
+      graphic += 2;
+    else if (dir == MV_DOWN)
+      graphic += 3;
+  }
+  else if (element==EL_MAULWURF || element==EL_PINGUIN ||
+	   element==EL_SCHWEIN || element==EL_DRACHE)
+  {
+    if (dir==MV_LEFT)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_LEFT :
+		 element==EL_PINGUIN ? GFX_PINGUIN_LEFT :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
+    else if (dir==MV_RIGHT)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_RIGHT :
+		 element==EL_PINGUIN ? GFX_PINGUIN_RIGHT :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
+    else if (dir==MV_UP)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_UP :
+		 element==EL_PINGUIN ? GFX_PINGUIN_UP :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
+    else
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_DOWN :
+		 element==EL_PINGUIN ? GFX_PINGUIN_DOWN :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
+
+    graphic += phase4;
+  }
+  else if (element==EL_SONDE)
+  {
+    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+  }
+  else if (element==EL_BUTTERFLY || element==EL_FIREFLY)
+  {
+    graphic += !phase;
+  }
+  else if ((element==EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
+  {
+    graphic += phase * (element==EL_FELSBROCKEN ? 2 : 1);
+  }
+  else if ((element==EL_SIEB_LEER || element==EL_SIEB2_LEER ||
+	    element==EL_SIEB_VOLL || element==EL_SIEB2_VOLL) && SiebAktiv)
+  {
+    graphic += 3-(SiebAktiv%8)/2;
+  }
+  else if (IS_AMOEBOID(element))
+  {
+    graphic = (element==EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
+    graphic += (x+2*y) % 4;
+  }
+  else if (element==EL_MAUER_LEBT)
+  {
+    BOOL links_massiv = FALSE, rechts_massiv = FALSE;
+
+    if (!IN_LEV_FIELD(ux-1,uy) || IS_MAUER(Feld[ux-1][uy]))
+      links_massiv = TRUE;
+    if (!IN_LEV_FIELD(ux+1,uy) || IS_MAUER(Feld[ux+1][uy]))
+      rechts_massiv = TRUE;
+
+    if (links_massiv && rechts_massiv)
+      graphic = GFX_MAUERWERK;
+    else if (links_massiv)
+      graphic = GFX_MAUER_R;
+    else if (rechts_massiv)
+      graphic = GFX_MAUER_L;
+  }
+
+  if (dx || dy)
+    DrawGraphicShifted(x,y, dx,dy, graphic, cut_mode, NO_MASKING);
+  else
+    DrawGraphic(x,y, graphic);
+}
+
+void DrawLevelElementShifted(int x, int y, int dx, int dy, int element,
+			     int cut_mode)
+{
+  if (IN_LEV_FIELD(x,y) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+    DrawScreenElementShifted(SCROLLX(x),SCROLLY(y), dx,dy, element, cut_mode);
 }
 
 void ErdreichAnbroeckeln(int x, int y)
@@ -1029,10 +928,6 @@ void ErdreichAnbroeckeln(int x, int y)
       else
 	element = Feld[uxx][uyy];
 
-/*
-      if (element==EL_ERDREICH || IS_SOLID(element))
-	continue;
-*/
       if (element==EL_ERDREICH)
 	continue;
 
@@ -1071,11 +966,6 @@ void ErdreichAnbroeckeln(int x, int y)
       yy = y+xy[i][1];
       uxx = ux+xy[i][0];
       uyy = uy+xy[i][1];
-/*
-      if (!IN_LEV_FIELD(uxx,uyy) || Feld[uxx][uyy]!=EL_ERDREICH ||
-	  !IN_SCR_FIELD(xx,yy) || IS_SOLID(element))
-	continue;
-*/
 
       if (!IN_LEV_FIELD(uxx,uyy) || Feld[uxx][uyy]!=EL_ERDREICH ||
 	  !IN_SCR_FIELD(xx,yy))
@@ -1108,7 +998,7 @@ void ErdreichAnbroeckeln(int x, int y)
 
 void DrawScreenElement(int x, int y, int element)
 {
-  DrawElementShifted(x,y,0,0,element,CUT_NO_CUTTING);
+  DrawScreenElementShifted(x,y, 0,0, element, NO_CUTTING);
   ErdreichAnbroeckeln(x,y);
 }
 
@@ -1134,7 +1024,7 @@ void DrawScreenField(int x, int y)
   if (IS_MOVING(ux,uy))
   {
     int horiz_move = (MovDir[ux][uy]==MV_LEFT || MovDir[ux][uy]==MV_RIGHT);
-    BOOL cut_mode = CUT_NO_CUTTING;
+    BOOL cut_mode = NO_CUTTING;
 
     if (Store[ux][uy]==EL_MORAST_LEER ||
 	Store[ux][uy]==EL_SIEB_LEER ||
@@ -1148,21 +1038,21 @@ void DrawScreenField(int x, int y)
       cut_mode = CUT_BELOW;
 
     if (cut_mode==CUT_ABOVE)
-      DrawElementShifted(x,y,0,0,Store[ux][uy],CUT_NO_CUTTING);
+      DrawScreenElementShifted(x,y, 0,0, Store[ux][uy], NO_CUTTING);
     else
       DrawScreenElement(x,y,EL_LEERRAUM);
 
     if (horiz_move)
-      DrawElementShifted(x,y,MovPos[ux][uy],0,element,CUT_NO_CUTTING);
+      DrawScreenElementShifted(x,y, MovPos[ux][uy],0, element, NO_CUTTING);
     else
-      DrawElementShifted(x,y,0,MovPos[ux][uy],element,cut_mode);
+      DrawScreenElementShifted(x,y, 0,MovPos[ux][uy], element, cut_mode);
   }
   else if (IS_BLOCKED(ux,uy))
   {
     int oldx,oldy;
     int sx, sy;
     int horiz_move;
-    BOOL cut_mode = CUT_NO_CUTTING;
+    BOOL cut_mode = NO_CUTTING;
 
     Blocked2Moving(ux,uy,&oldx,&oldy);
     sx = SCROLLX(oldx);
@@ -1179,9 +1069,9 @@ void DrawScreenField(int x, int y)
     element = Feld[oldx][oldy];
 
     if (horiz_move)
-      DrawElementShifted(sx,sy,MovPos[oldx][oldy],0,element,CUT_NO_CUTTING);
+      DrawScreenElementShifted(sx,sy, MovPos[oldx][oldy],0,element,NO_CUTTING);
     else
-      DrawElementShifted(sx,sy,0,MovPos[oldx][oldy],element,cut_mode);
+      DrawScreenElementShifted(sx,sy, 0,MovPos[oldx][oldy],element,cut_mode);
   }
   else if (IS_DRAWABLE(element))
     DrawScreenElement(x,y,element);
@@ -1666,7 +1556,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
       BackToFront();
 
-      if (game_status==MAINMENU)
+      if (game_status == MAINMENU)
 	DoAnimation();
     }
   }

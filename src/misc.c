@@ -26,14 +26,31 @@
 
 void microsleep(unsigned long usec)
 {
-  struct timeval delay;
+  if (usec < 5000)
+  {
+    /* we want to wait less than 5 ms -- if we assume that we have a
+       kernel timer resolution of 10 ms, we would wait far to long;
+       therefore it's better to do a short interval of busy waiting
+       to get our sleeping time more accurate */
 
-  delay.tv_sec  = usec / 1000000;
-  delay.tv_usec = usec % 1000000;
+    long base_counter = Counter2(), actual_counter = Counter2();
+    long delay = usec/1000;
 
-  if (select(0,NULL,NULL,NULL,&delay)!=0)
-    fprintf(stderr,"%s: in function microsleep: select failed!\n",
-	    progname);
+    while (actual_counter < base_counter+delay &&
+	   actual_counter >= base_counter)
+      actual_counter = Counter2();
+  }
+  else
+  {
+    struct timeval delay;
+
+    delay.tv_sec  = usec / 1000000;
+    delay.tv_usec = usec % 1000000;
+
+    if (select(0,NULL,NULL,NULL,&delay) != 0)
+      fprintf(stderr,"%s: in function microsleep: select failed!\n",
+	      progname);
+  }
 }
 
 long mainCounter(int mode)

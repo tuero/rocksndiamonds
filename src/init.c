@@ -25,7 +25,9 @@
 #include <signal.h>
 
 #ifdef DEBUG
+/*
 #define DEBUG_TIMING
+*/
 #endif
 
 struct PictureFileInfo

@@ -18,7 +18,9 @@
 #include "xli.h"
 
 #ifdef DEBUG
+/*
 #define DEBUG_TIMING
+*/
 #endif
 
 

@@ -492,12 +492,18 @@ Image *gifLoad(char *fullname)
     return(NULL);
   }
 
+
+
+  /*
   printf("%s:\n   %dx%d %s%s image with %d colors at depth %d\n",
 	 fullname, gifin_img_width, gifin_img_height,
 	 (gifin_interlace_flag ? "interlaced " : ""),
 	 gif_version_name[gifin_version],
 	 (gifin_l_cmap_flag ? gifin_l_ncolors : gifin_g_ncolors),
 	 (gifin_l_cmap_flag ? gifin_l_pixel_bits : gifin_g_pixel_bits));
+	 */
+
+
 
   image = newRGBImage(gifin_img_width, gifin_img_height, (gifin_l_cmap_flag ?
 							  gifin_l_pixel_bits :

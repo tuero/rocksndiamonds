@@ -1312,6 +1312,8 @@ void HandleGameActions()
     TapeStop();
 
   GameActions();
+
+  BackToFront();
 }
 
 void HandleVideoButtons(int mx, int my, int button)

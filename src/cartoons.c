@@ -125,7 +125,7 @@ void HandleAnimation(int mode)
       reset_delay = TRUE;
 
       /* Fill empty backbuffer for animation functions */
-      if (direct_draw_on && game_status==PLAYING)
+      if (direct_draw_on && game_status == PLAYING)
       {
 	int xx,yy;
 
@@ -139,7 +139,7 @@ void HandleAnimation(int mode)
 	SetDrawtoField(DRAW_DIRECT);
       }
 
-      if (soft_scrolling_on && game_status==PLAYING)
+      if (soft_scrolling_on && game_status == PLAYING)
       {
 	int fx = FX, fy = FY;
 

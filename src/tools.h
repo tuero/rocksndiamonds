@@ -19,19 +19,23 @@
 
 #include <sys/time.h>
 
-/* für SetDrawtoField */
+/* for SetDrawtoField */
 #define DRAW_DIRECT	0
 #define DRAW_BUFFERED	1
 #define DRAW_BACKBUFFER	2
 
-/* für DrawElementShifted */
-#define CUT_NO_CUTTING	0
+/* for DrawElementShifted */
+#define NO_CUTTING	0
 #define CUT_ABOVE	1
 #define CUT_BELOW	2
 #define CUT_LEFT	4
 #define CUT_RIGHT	8
 
-/* für MoveDoor */
+/* for masking functions */
+#define NO_MASKING	0
+#define USE_MASKING	1
+ 
+/* for MoveDoor */
 #define DOOR_OPEN_1	1
 #define DOOR_OPEN_2	2
 #define DOOR_CLOSE_1	4
@@ -45,7 +49,7 @@
 #define DOOR_NO_DELAY	32
 #define DOOR_GET_STATE	64
 
-/* für AreYouSure */
+/* for AreYouSure */
 #define AYS_ASK		1
 #define AYS_OPEN	2
 #define AYS_CLOSE	4
@@ -65,13 +69,15 @@ void DrawGraphic(int, int, int);
 void DrawGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicExtHiRes(Drawable, GC, int, int, int);
 void DrawGraphicThruMask(int, int, int);
-void DrawElementThruMask(int, int, int);
+void DrawScreenElementThruMask(int, int, int);
+void DrawLevelElementThruMask(int, int, int);
 void DrawMiniGraphic(int, int, int);
 void DrawMiniGraphicExt(Drawable, GC, int, int, int);
 void DrawMiniGraphicExtHiRes(Drawable, GC, int, int, int);
-void DrawGraphicShifted(int, int, int, int, int, int);
-void DrawElementShifted(int, int, int, int, int, int);
+void DrawGraphicShifted(int, int, int, int, int, int, int);
 void DrawGraphicShiftedThruMask(int, int, int, int, int, int);
+void DrawScreenElementShifted(int, int, int, int, int, int);
+void DrawLevelElementShifted(int, int, int, int, int, int);
 void ErdreichAnbroeckeln(int, int);
 void DrawScreenElement(int, int, int);
 void DrawLevelElement(int, int, int);

@@ -23,16 +23,6 @@
 #include "tape.h"
 #include "joystick.h"
 
-
-
-int tst = 0;
-int tst2 = 0;
-
-
-
-extern int GameSpeed;
-extern int MoveSpeed;
-
 void GetPlayerConfig()
 {
   int old_joystick_nr = joystick_nr;
@@ -2346,9 +2336,9 @@ void NussKnacken(int x, int y)
 
 void SiebAktivieren(int x, int y, int typ)
 {
-  if (SiebAktiv%2 && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
+  if (!(SiebAktiv % 4) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
     DrawGraphic(SCROLLX(x),SCROLLY(y),
-		(typ==1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL)+3-(SiebAktiv%8)/2);
+		(typ==1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL)+3-(SiebAktiv%16)/4);
 }
 
 void AusgangstuerPruefen(int x, int y)
@@ -2576,245 +2566,152 @@ void GameActions()
 {
   static long action_delay = 0;
   long action_delay_value;
+  int sieb_x = 0, sieb_y = 0;
+  int x, y, element;
 
   if (game_status != PLAYING)
     return;
 
-/*
-  action_delay_value =
-    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
-*/
-
+#ifdef DEBUG
   action_delay_value =
     (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GameSpeed);
-
-  /*
-  if (DelayReached(&action_delay, action_delay_value))
-  */
-
-
-
-  if (PlayerMovPos)
-    ScrollFigure(0);
-
-  DrawPlayerField();
-
-
-
-
-  tst++;
-
-  if (0)
-  {
-    static long last_Counter = 0;
-    long new_Counter = Counter();
-
-    printf("--> %ld / %ld [%d]\n",
-	   new_Counter - last_Counter,
-	   new_Counter,
-	   FrameCounter);
-    last_Counter = new_Counter;
-  }
-
-
-
-
-  /*
-  if (!DelayReached(&action_delay, action_delay_value))
-    return;
-    */
-
-
-  while(!DelayReached(&action_delay, action_delay_value))
-    Delay(1000);
-
-
-
-
-  /*
-  printf("-----------\n");
-  */
-
-
-
-  FrameCounter++;
-
-
-
-  /*
-  if (PlayerMovPos)
-    ScrollFigure(0);
-
-  DrawPlayerField();
-  */
-
-
-  tst2 = tst;
-  tst = 0;
-
-
-
-  if (0)
-  {
-    static long last_Counter = 0;
-    long new_Counter = Counter();
-
-    printf("--> %ld / %ld [%d]\n",
-	   new_Counter - last_Counter,
-	   new_Counter,
-	   FrameCounter);
-    last_Counter = new_Counter;
-  }
-
-
-  /*
-  printf("--> %ld / ", Counter());
-  */
-
-
-  {
-    int x,y,element;
-    int sieb_x = 0, sieb_y = 0;
-
-    if (tape.pausing || (tape.playing && !TapePlayDelay()))
-      return;
-    else if (tape.recording)
-      TapeRecordDelay();
-
-
-    /*
-    FrameCounter++;
-    */
-
-
-    TimeFrames++;
-
-    for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
-    {
-      Stop[x][y] = FALSE;
-      if (JustHit[x][y]>0)
-	JustHit[x][y]--;
-
-#if DEBUG
-      if (IS_BLOCKED(x,y))
-      {
-	int oldx,oldy;
-
-	Blocked2Moving(x,y,&oldx,&oldy);
-	if (!IS_MOVING(oldx,oldy))
-	{
-	  printf("GameActions(): (BLOCKED=>MOVING) context corrupted!\n");
-	  printf("GameActions(): BLOCKED: x = %d, y = %d\n",x,y);
-	  printf("GameActions(): !MOVING: oldx = %d, oldy = %d\n",oldx,oldy);
-	  printf("GameActions(): This should never happen!\n");
-	}
-      }
+#else
+  action_delay_value =
+    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
 #endif
 
-    }
+  if (PlayerMovPos)
+    ScrollFigure(0);
 
-    for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+  while(!DelayReached(&action_delay, action_delay_value))
+    Delay(5000);
+
+  if (tape.pausing || (tape.playing && !TapePlayDelay()))
+    return;
+  else if (tape.recording)
+    TapeRecordDelay();
+
+  FrameCounter++;
+  TimeFrames++;
+
+  for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+  {
+    Stop[x][y] = FALSE;
+    if (JustHit[x][y]>0)
+      JustHit[x][y]--;
+
+#if DEBUG
+    if (IS_BLOCKED(x,y))
     {
-      element = Feld[x][y];
+      int oldx,oldy;
 
-      if (IS_INACTIVE(element))
-	continue;
-
-      if (!IS_MOVING(x,y) && (CAN_FALL(element) || CAN_MOVE(element)))
+      Blocked2Moving(x,y,&oldx,&oldy);
+      if (!IS_MOVING(oldx,oldy))
       {
-	StartMoving(x,y);
-
-	if (IS_GEM(element))
-	  EdelsteinFunkeln(x,y);
-      }
-      else if (IS_MOVING(x,y))
-	ContinueMoving(x,y);
-      else if (element==EL_DYNAMIT || element==EL_DYNABOMB)
-	CheckDynamite(x,y);
-      else if (element==EL_EXPLODING)
-	Explode(x,y,Frame[x][y],EX_NORMAL);
-      else if (element==EL_AMOEBING)
-	AmoebeWaechst(x,y);
-      else if (IS_AMOEBALIVE(element))
-	AmoebeAbleger(x,y);
-      else if (element==EL_LIFE || element==EL_LIFE_ASYNC)
-	Life(x,y);
-      else if (element==EL_ABLENK_EIN)
-	Ablenk(x,y);
-      else if (element==EL_SALZSAEURE)
-	Blubber(x,y);
-      else if (element==EL_BLURB_LEFT || element==EL_BLURB_RIGHT)
-	Blurb(x,y);
-      else if (element==EL_CRACKINGNUT)
-	NussKnacken(x,y);
-      else if (element==EL_AUSGANG_ZU)
-	AusgangstuerPruefen(x,y);
-      else if (element==EL_AUSGANG_ACT)
-	AusgangstuerOeffnen(x,y);
-      else if (element==EL_AUSGANG_AUF)
-	AusgangstuerBlinken(x,y);
-      else if (element==EL_MAUERND)
-	MauerWaechst(x,y);
-      else if (element==EL_MAUER_LEBT)
-	MauerAbleger(x,y);
-      else if (element==EL_BURNING)
-	CheckForDragon(x,y);
-
-      if (SiebAktiv)
-      {
-	BOOL sieb = FALSE;
-
-	if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL ||
-	    Store[x][y]==EL_SIEB_LEER)
-	{
-	  SiebAktivieren(x, y, 1);
-	  sieb = TRUE;
-	}
-	else if (element==EL_SIEB2_LEER || element==EL_SIEB2_VOLL ||
-		 Store[x][y]==EL_SIEB2_LEER)
-	{
-	  SiebAktivieren(x, y, 2);
-	  sieb = TRUE;
-	}
-
-	if (sieb && ABS(x-JX)+ABS(y-JY) < ABS(sieb_x-JX)+ABS(sieb_y-JY))
-	{
-	  sieb_x = x;
-	  sieb_y = y;
-	}
+	printf("GameActions(): (BLOCKED=>MOVING) context corrupted!\n");
+	printf("GameActions(): BLOCKED: x = %d, y = %d\n",x,y);
+	printf("GameActions(): !MOVING: oldx = %d, oldy = %d\n",oldx,oldy);
+	printf("GameActions(): This should never happen!\n");
       }
     }
+#endif
+  }
+
+  for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+  {
+    element = Feld[x][y];
+
+    if (IS_INACTIVE(element))
+      continue;
+
+    if (!IS_MOVING(x,y) && (CAN_FALL(element) || CAN_MOVE(element)))
+    {
+      StartMoving(x,y);
+
+      if (IS_GEM(element))
+	EdelsteinFunkeln(x,y);
+    }
+    else if (IS_MOVING(x,y))
+      ContinueMoving(x,y);
+    else if (element==EL_DYNAMIT || element==EL_DYNABOMB)
+      CheckDynamite(x,y);
+    else if (element==EL_EXPLODING)
+      Explode(x,y,Frame[x][y],EX_NORMAL);
+    else if (element==EL_AMOEBING)
+      AmoebeWaechst(x,y);
+    else if (IS_AMOEBALIVE(element))
+      AmoebeAbleger(x,y);
+    else if (element==EL_LIFE || element==EL_LIFE_ASYNC)
+      Life(x,y);
+    else if (element==EL_ABLENK_EIN)
+      Ablenk(x,y);
+    else if (element==EL_SALZSAEURE)
+      Blubber(x,y);
+    else if (element==EL_BLURB_LEFT || element==EL_BLURB_RIGHT)
+      Blurb(x,y);
+    else if (element==EL_CRACKINGNUT)
+      NussKnacken(x,y);
+    else if (element==EL_AUSGANG_ZU)
+      AusgangstuerPruefen(x,y);
+    else if (element==EL_AUSGANG_ACT)
+      AusgangstuerOeffnen(x,y);
+    else if (element==EL_AUSGANG_AUF)
+      AusgangstuerBlinken(x,y);
+    else if (element==EL_MAUERND)
+      MauerWaechst(x,y);
+    else if (element==EL_MAUER_LEBT)
+      MauerAbleger(x,y);
+    else if (element==EL_BURNING)
+      CheckForDragon(x,y);
 
     if (SiebAktiv)
     {
-      if (!(SiebAktiv%4))
-	PlaySoundLevel(sieb_x,sieb_y,SND_MIEP);
-      SiebAktiv--;
-      if (!SiebAktiv)
+      BOOL sieb = FALSE;
+
+      if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL ||
+	  Store[x][y]==EL_SIEB_LEER)
       {
-	for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
-	{
-	  element = Feld[x][y];
-	  if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL)
-	  {
-	    Feld[x][y] = EL_SIEB_TOT;
-	    DrawLevelField(x,y);
-	  }
-	  else if (element==EL_SIEB2_LEER || element==EL_SIEB2_VOLL)
-	  {
-	    Feld[x][y] = EL_SIEB2_TOT;
-	    DrawLevelField(x,y);
-	  }
-	}
+	SiebAktivieren(x, y, 1);
+	sieb = TRUE;
+      }
+      else if (element==EL_SIEB2_LEER || element==EL_SIEB2_VOLL ||
+	       Store[x][y]==EL_SIEB2_LEER)
+      {
+	SiebAktivieren(x, y, 2);
+	sieb = TRUE;
+      }
+
+      if (sieb && ABS(x-JX)+ABS(y-JY) < ABS(sieb_x-JX)+ABS(sieb_y-JY))
+      {
+	sieb_x = x;
+	sieb_y = y;
       }
     }
   }
 
-
-  /*
-  printf("%ld\n", Counter());
-  */
-
+  if (SiebAktiv)
+  {
+    if (!(SiebAktiv%4))
+      PlaySoundLevel(sieb_x,sieb_y,SND_MIEP);
+    SiebAktiv--;
+    if (!SiebAktiv)
+    {
+      for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
+      {
+	element = Feld[x][y];
+	if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL)
+	{
+	  Feld[x][y] = EL_SIEB_TOT;
+	  DrawLevelField(x,y);
+	}
+	else if (element==EL_SIEB2_LEER || element==EL_SIEB2_VOLL)
+	{
+	  Feld[x][y] = EL_SIEB2_TOT;
+	  DrawLevelField(x,y);
+	}
+      }
+    }
+  }
 
   if (TimeLeft>0 && TimeFrames>=(100/GameSpeed) && !tape.pausing)
   {
@@ -2834,8 +2731,6 @@ void GameActions()
   }
 
   DrawPlayerField();
-
-  BackToFront();
 }
 
 void ScrollLevel(int dx, int dy)
@@ -2991,79 +2886,18 @@ BOOL MoveFigure(int dx, int dy)
 void ScrollFigure(int init)
 {
   static long actual_frame_counter = 0;
-  static int oldJX = -1, oldJY = -1;
 
   if (init)
   {
-
-
-
     PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
-
-
-
-    /*
-    ScreenMovPos = PlayerGfxPos;
-    redraw_mask |= REDRAW_FIELD;
-    */
-
-
-
-    if (0)
-    {
-      static long last_Counter = 0;
-      long new_Counter = Counter();
-
-      printf("--> %ld / %ld [%d, %d]\n",
-	     new_Counter - last_Counter,
-	     new_Counter,
-	     FrameCounter,
-	     tst2);
-      last_Counter = new_Counter;
-    }
-
-
-
-
-    if (oldJX != -1 && oldJY != -1)
-      DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
+    actual_frame_counter = FrameCounter;
 
     if (Feld[lastJX][lastJY] == EL_LEERRAUM &&
 	IN_LEV_FIELD(lastJX,lastJY-1) &&
 	CAN_FALL(Feld[lastJX][lastJY-1]))
       Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
-    DrawLevelElement(lastJX,lastJY, Feld[lastJX][lastJY]);
-    DrawPlayerField();
-
-    oldJX = lastJX;
-    oldJY = lastJY;
-    actual_frame_counter = FrameCounter;
-
-    if (PlayerPushing)
-    {
-      int nextJX = JX + (JX - lastJX);
-      int nextJY = JY + (JY - lastJY);
-
-      if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
-	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
-      else
-	DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
-    }
 
     DrawPlayerField();
-
-    if (Store[lastJX][lastJY])
-    {
-      DrawGraphic(SCROLLX(lastJX),SCROLLY(lastJY),
-		  el2gfx(Store[lastJX][lastJY]));
-      DrawGraphicThruMask(SCROLLX(lastJX),SCROLLY(lastJY),
-			  el2gfx(Feld[lastJX][lastJY]));
-    }
-    else if (Feld[lastJX][lastJY]==EL_DYNAMIT)
-      DrawDynamite(lastJX,lastJY);
-    else
-      DrawLevelField(lastJX,lastJY);
-
     return;
   }
   else if (!FrameReached(&actual_frame_counter,1))
@@ -3072,59 +2906,21 @@ void ScrollFigure(int init)
   PlayerMovPos += (PlayerMovPos > 0 ? -1 : 1) * TILEX/8;
   PlayerGfxPos = ScrollStepSize * (PlayerMovPos / ScrollStepSize);
 
-
-  /*
-  printf("PlayerGfxPos = %d\n", PlayerGfxPos);
-  */
-
-
   if (ScreenMovPos && ScreenMovPos != PlayerGfxPos)
   {
     ScreenMovPos = PlayerGfxPos;
     redraw_mask |= REDRAW_FIELD;
   }
 
-  if (Feld[oldJX][oldJY] == EL_PLAYER_IS_LEAVING)
-    Feld[oldJX][oldJY] = EL_LEERRAUM;
+  if (Feld[lastJX][lastJY] == EL_PLAYER_IS_LEAVING)
+    Feld[lastJX][lastJY] = EL_LEERRAUM;
 
-  DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
   DrawPlayerField();
-
-
-
-  if (Store[oldJX][oldJY])
-  {
-    DrawGraphic(SCROLLX(oldJX),SCROLLY(oldJY),el2gfx(Store[oldJX][oldJY]));
-    DrawGraphicThruMask(SCROLLX(oldJX),SCROLLY(oldJY),
-			el2gfx(Feld[oldJX][oldJY]));
-  }
-  else if (Feld[oldJX][oldJY]==EL_DYNAMIT)
-    DrawDynamite(oldJX,oldJY);
-  else
-    DrawLevelField(oldJX,oldJY);
-
-  if (PlayerPushing)
-  {
-    int nextJX = JX + (JX - lastJX);
-    int nextJY = JY + (JY - lastJY);
-
-    if (PlayerGfxPos)
-    {
-      if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
-	DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
-      else
-	DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
-    }
-    else
-      DrawLevelElement(nextJX,nextJY, Feld[nextJX][nextJY]);
-  }
 
   if (!PlayerMovPos)
   {
     lastJX = JX;
     lastJY = JY;
-
-    oldJX = oldJY = -1;
   }
 }
 

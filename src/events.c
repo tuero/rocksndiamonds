@@ -70,10 +70,13 @@ void EventLoop(void)
 	 has its own synchronization and is CPU friendly, too */
 
       if (game_status != PLAYING)
-	Delay(1000);
+      {
+	XSync(display, FALSE);
+	Delay(10000);
+      }
     }
 
-    if (game_status==EXITGAME)
+    if (game_status == EXITGAME)
       return;
   }
 }
@@ -173,10 +176,17 @@ void HandleExposeEvent(XExposeEvent *event)
     SetDrawtoField(DRAW_DIRECT);
   }
 
-  if (soft_scrolling_on && game_status==PLAYING)
+  if (soft_scrolling_on && game_status == PLAYING)
+  {
+    int fx = FX, fy = FY;
+
+    fx += (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
+    fy += (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+
     XCopyArea(display,fieldbuffer,backbuffer,gc,
-	      FX,FY, SXSIZE,SYSIZE,
+	      fx,fy, SXSIZE,SYSIZE,
 	      SX,SY);
+  }
 
   XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
 
@@ -287,9 +297,6 @@ void HandleButton(int mx, int my, int button)
       break;
   }
 }
-
-int GameSpeed = 2;
-int MoveSpeed = 8;
 
 void HandleKey(KeySym key, int key_status)
 {
@@ -700,6 +707,7 @@ void HandleJoystick()
       break;
     case PLAYING:
     {
+      static int player_frame_reset_delay = 0;
       BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
 
       if (GameOver && newbutton)
@@ -715,6 +723,8 @@ void HandleJoystick()
 
       if (joy)
       {
+	player_frame_reset_delay = 0;
+
 	if (button1)
 	  snapped = SnapField(dx,dy);
 	else
@@ -737,7 +747,8 @@ void HandleJoystick()
       {
 	DigField(0,0,0,0,DF_NO_PUSH);
 	SnapField(0,0);
-	PlayerFrame = 0;
+	if (++player_frame_reset_delay > MoveSpeed)
+	  PlayerFrame = 0;
       }
 
       if (tape.playing && !tape.pausing && !joy && tape.counter<tape.length)
