@@ -1199,7 +1199,7 @@ void HandleGadgets(int mx, int my, int button)
       /* if mouse button pressed inside activated selectbox, select value */
       if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
 	gi->selectbox.current_index =
-	  (my - gi->selectbox.y - gi->border.xsize) / getFontWidth(gi->font);
+	  (my - gi->selectbox.y - gi->border.ysize) / getFontHeight(gi->font);
 
       if (gi->selectbox.current_index < 0)
 	gi->selectbox.current_index = 0;
@@ -1245,8 +1245,8 @@ void HandleGadgets(int mx, int my, int button)
       (mx >= gi->x && mx < gi->x + gi->width &&
        my >= gi->y && my < gi->y + gi->height);
     gadget_released_inside_select_area =
-      (mx >= gi->selectbox.x && mx < gi->selectbox.x+gi->selectbox.width &&
-       my >= gi->selectbox.y && my < gi->selectbox.y+gi->selectbox.height);
+      (mx >= gi->selectbox.x && mx < gi->selectbox.x + gi->selectbox.width &&
+       my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height);
   }
   else
   {
@@ -1304,7 +1304,7 @@ void HandleGadgets(int mx, int my, int button)
       /* if mouse moving inside activated selectbox, select value */
       if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
 	gi->selectbox.current_index =
-	  (my - gi->selectbox.y - gi->border.xsize) / getFontWidth(gi->font);
+	  (my - gi->selectbox.y - gi->border.ysize) / getFontHeight(gi->font);
 
       if (gi->selectbox.current_index < 0)
 	gi->selectbox.current_index = 0;

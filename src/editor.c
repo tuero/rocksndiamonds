@@ -110,6 +110,12 @@
 #define ED_AREA_ELEM_CONTENT_XPOS	( 2 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
+/* yamyam content */
+#define ED_AREA_YAMYAM_CONTENT_XPOS(n)	(ED_AREA_ELEM_CONTENT_XPOS + \
+					 5 * (n % 4) * MINI_TILEX)
+#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(ED_AREA_ELEM_CONTENT_YPOS + \
+					 6 * (n / 4) * MINI_TILEY)
+
 /* custom change target */
 #define ED_AREA_ELEM_CONTENT2_XPOS	(20 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(2) + \
@@ -602,6 +608,26 @@
 
 #define ED_RADIOBUTTON_ID_LEVEL_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
 #define ED_RADIOBUTTON_ID_LEVEL_LAST	ED_RADIOBUTTON_ID_QUANTITY
+
+/* values for drawing area gadgets */
+#define ED_DRAWING_ID_DRAWING_LEVEL		0
+#define ED_DRAWING_ID_ELEMENT_CONTENT_0		1
+#define ED_DRAWING_ID_ELEMENT_CONTENT_1		2
+#define ED_DRAWING_ID_ELEMENT_CONTENT_2		3
+#define ED_DRAWING_ID_ELEMENT_CONTENT_3		4
+#define ED_DRAWING_ID_ELEMENT_CONTENT_4		5
+#define ED_DRAWING_ID_ELEMENT_CONTENT_5		6
+#define ED_DRAWING_ID_ELEMENT_CONTENT_6		7
+#define ED_DRAWING_ID_ELEMENT_CONTENT_7		8
+#define ED_DRAWING_ID_AMOEBA_CONTENT		9
+#define ED_DRAWING_ID_CUSTOM_GRAPHIC		10
+#define ED_DRAWING_ID_CUSTOM_CONTENT		11
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	12
+#define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	13
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	14
+#define ED_DRAWING_ID_RANDOM_BACKGROUND		15
+
+#define ED_NUM_DRAWING_AREAS			16
 
 
 /*
@@ -1489,6 +1515,138 @@ static struct
     GADGET_ID_CUSTOM_USE_TEMPLATE,
     &level.use_custom_template,
     "use template",			"use template for custom properties"
+  },
+};
+
+static struct
+{
+  int x, y;
+  int area_xsize, area_ysize;
+  int gadget_id;
+  char *text_left;
+} drawingarea_info[ED_NUM_DRAWING_AREAS] =
+{
+  /* ---------- level playfield content ------------------------------------ */
+
+  {
+    0, 0,
+    MAX_ED_FIELDX, MAX_ED_FIELDY,
+    GADGET_ID_DRAWING_LEVEL,
+    NULL
+  },
+
+  /* ---------- yam yam content -------------------------------------------- */
+
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(0),	ED_AREA_YAMYAM_CONTENT_YPOS(0),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_0,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(1),	ED_AREA_YAMYAM_CONTENT_YPOS(1),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_1,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(2),	ED_AREA_YAMYAM_CONTENT_YPOS(2),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_2,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(3),	ED_AREA_YAMYAM_CONTENT_YPOS(3),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_3,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(4),	ED_AREA_YAMYAM_CONTENT_YPOS(4),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_4,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(5),	ED_AREA_YAMYAM_CONTENT_YPOS(5),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_5,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(6),	ED_AREA_YAMYAM_CONTENT_YPOS(6),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_6,
+    NULL
+  },
+  {
+    ED_AREA_YAMYAM_CONTENT_XPOS(7),	ED_AREA_YAMYAM_CONTENT_YPOS(7),
+    3, 3,
+    GADGET_ID_ELEMENT_CONTENT_7,
+    NULL
+  },
+
+  /* ---------- amoeba content --------------------------------------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT_XPOS,		ED_AREA_ELEM_CONTENT_YPOS,
+    1, 1,
+    GADGET_ID_AMOEBA_CONTENT,
+    NULL
+  },
+
+  /* ---------- custom graphic --------------------------------------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT3_XPOS,		ED_AREA_ELEM_CONTENT3_YPOS,
+    1, 1,
+    GADGET_ID_CUSTOM_GRAPHIC,
+    NULL
+  },
+
+  /* ---------- custom content (when exploding) ---------------------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT4_XPOS,		ED_AREA_ELEM_CONTENT4_YPOS,
+    3, 3,
+    GADGET_ID_CUSTOM_CONTENT,
+    NULL
+  },
+
+  /* ---------- custom change target --------------------------------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT2_XPOS,		ED_AREA_ELEM_CONTENT2_YPOS,
+    1, 1,
+    GADGET_ID_CUSTOM_CHANGE_TARGET,
+    NULL
+  },
+
+  /* ---------- custom change content (extended change target) ------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT6_XPOS,		ED_AREA_ELEM_CONTENT6_YPOS,
+    3, 3,
+    GADGET_ID_CUSTOM_CHANGE_CONTENT,
+    NULL
+  },
+
+  /* ---------- custom change trigger (element causing change) ------------- */
+
+  {
+    ED_AREA_ELEM_CONTENT5_XPOS,		ED_AREA_ELEM_CONTENT5_YPOS,
+    1, 1,
+    GADGET_ID_CUSTOM_CHANGE_TRIGGER,
+    NULL
+  },
+
+  /* ---------- random background (for random painting) -------------------- */
+
+  {
+    ED_AREA_RANDOM_BACKGROUND_XPOS,	ED_AREA_RANDOM_BACKGROUND_YPOS,
+    1, 1,
+    GADGET_ID_RANDOM_BACKGROUND,
+    NULL
   },
 };
 
@@ -2812,47 +2970,26 @@ static void CreateCounterButtons()
 
 static void CreateDrawingAreas()
 {
-  struct GadgetInfo *gi;
-  unsigned long event_mask;
-  int id;
   int i;
 
-  event_mask =
-    GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
-    GD_EVENT_OFF_BORDERS;
-
-  /* one for the level drawing area ... */
-  id = GADGET_ID_DRAWING_LEVEL;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX,
-		    GDI_Y, SY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... up to eight areas for element content ... */
-  for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
+  for (i=0; i<ED_NUM_DRAWING_AREAS; i++)
   {
-    int gx = SX + ED_AREA_ELEM_CONTENT_XPOS + 5 * (i % 4) * MINI_TILEX;
-    int gy = SX + ED_AREA_ELEM_CONTENT_YPOS + 6 * (i / 4) * MINI_TILEY;
+    struct GadgetInfo *gi;
+    unsigned long event_mask;
+    int id = drawingarea_info[i].gadget_id;
+    int area_xsize = drawingarea_info[i].area_xsize;
+    int area_ysize = drawingarea_info[i].area_ysize;
 
-    id = GADGET_ID_ELEMENT_CONTENT_0 + i;
+    event_mask =
+      GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
+      GD_EVENT_OFF_BORDERS;
+
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
-		      GDI_X, gx,
-		      GDI_Y, gy,
-		      GDI_WIDTH, 3 * MINI_TILEX,
-		      GDI_HEIGHT, 3 * MINI_TILEY,
+		      GDI_X, SX + drawingarea_info[i].x,
+		      GDI_Y, SY + drawingarea_info[i].y,
 		      GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		      GDI_AREA_SIZE, area_xsize, area_ysize,
 		      GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
@@ -2864,141 +3001,6 @@ static void CreateDrawingAreas()
 
     level_editor_gadget[id] = gi;
   }
-
-  /* ... one for the amoeba content ... */
-  id = GADGET_ID_AMOEBA_CONTENT;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT_XPOS,
-		    GDI_Y, SY + ED_AREA_ELEM_CONTENT_YPOS,
-		    GDI_WIDTH, MINI_TILEX,
-		    GDI_HEIGHT, MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... one for each custom element optional graphic element ... */
-  id = GADGET_ID_CUSTOM_GRAPHIC;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT3_XPOS,
-		    GDI_Y, SY + ED_AREA_ELEM_CONTENT3_YPOS,
-		    GDI_WIDTH, MINI_TILEX,
-		    GDI_HEIGHT, MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... one area for custom element explosion content ... */
-  id = GADGET_ID_CUSTOM_CONTENT;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_CUSTOM_TYPE_ID, i,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT4_XPOS,
-		    GDI_Y, SX + ED_AREA_ELEM_CONTENT4_YPOS,
-		    GDI_WIDTH, 3 * MINI_TILEX,
-		    GDI_HEIGHT, 3 * MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... one for each custom element change target element ... */
-  id = GADGET_ID_CUSTOM_CHANGE_TARGET;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT2_XPOS,
-		    GDI_Y, SY + ED_AREA_ELEM_CONTENT2_YPOS,
-		    GDI_WIDTH, MINI_TILEX,
-		    GDI_HEIGHT, MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... one area for extended custom element change target content ... */
-  id = GADGET_ID_CUSTOM_CHANGE_CONTENT;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_CUSTOM_TYPE_ID, i,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT6_XPOS,
-		    GDI_Y, SX + ED_AREA_ELEM_CONTENT6_YPOS,
-		    GDI_WIDTH, 3 * MINI_TILEX,
-		    GDI_HEIGHT, 3 * MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... one for each custom element change trigger element ... */
-  id = GADGET_ID_CUSTOM_CHANGE_TRIGGER;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX + ED_AREA_ELEM_CONTENT5_XPOS,
-		    GDI_Y, SY + ED_AREA_ELEM_CONTENT5_YPOS,
-		    GDI_WIDTH, MINI_TILEX,
-		    GDI_HEIGHT, MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
-
-  /* ... and one for random placement background restrictions */
-  id = GADGET_ID_RANDOM_BACKGROUND;
-  gi = CreateGadget(GDI_CUSTOM_ID, id,
-		    GDI_X, SX + ED_AREA_RANDOM_BACKGROUND_XPOS,
-		    GDI_Y, SY + ED_AREA_RANDOM_BACKGROUND_YPOS,
-		    GDI_WIDTH, MINI_TILEX,
-		    GDI_HEIGHT, MINI_TILEY,
-		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
-		    GDI_EVENT_MASK, event_mask,
-		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
-		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
-		    GDI_END);
-
-  if (gi == NULL)
-    Error(ERR_EXIT, "cannot create gadget");
-
-  level_editor_gadget[id] = gi;
 }
 
 static void CreateTextInputGadgets()
