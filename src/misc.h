@@ -40,5 +40,7 @@ char *GetLoginName(void);
 void MarkTileDirty(int, int);
 void GetOptions(char **);
 void Error(int, char *, ...);
+void copydown(char *, char *, int);
+void fatal(char *);
 
 #endif

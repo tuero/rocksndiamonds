@@ -3,7 +3,7 @@
 #
 
 PROGNAME = rocksndiamonds
-SERVNAME = rnd_server
+# SERVNAME = rnd_server
 
 RM = rm -f
 CC = gcc
@@ -68,7 +68,8 @@ SRCS =	main.c		\
 	gif.c		\
 	send.c		\
 	new.c		\
-	network.c
+	network.c	\
+	netserv.c
 
 OBJS =	main.o		\
 	init.o		\
@@ -89,15 +90,17 @@ OBJS =	main.o		\
 	gif.o		\
 	send.o		\
 	new.o		\
-	network.o
+	network.o	\
+	netserv.o
 
-all:	$(PROGNAME) $(SERVNAME)
+# all:	$(PROGNAME) $(SERVNAME)
+all:	$(PROGNAME)
 
 $(PROGNAME):	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
 
-$(SERVNAME):	$(SERVNAME).c
-	$(CC) $(CFLAGS) $(SERVNAME).c $(LIBS) -o $(SERVNAME)
+# $(SERVNAME):	$(SERVNAME).c
+# 	$(CC) $(CFLAGS) $(SERVNAME).c $(LIBS) -o $(SERVNAME)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c

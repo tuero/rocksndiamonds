@@ -233,6 +233,7 @@ void GetOptions(char *argv[])
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
 	     "  -l, --levels directory        alternative level directory\n"
+	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "  -v, --verbose                 verbose mode\n",
 	     program_name);
@@ -265,6 +266,12 @@ void GetOptions(char *argv[])
       printf("--network\n");
 
       standalone = FALSE;
+    }
+    else if (strncmp(option, "-serveronly", option_len) == 0)
+    {
+      printf("--serveronly\n");
+
+      serveronly = TRUE;
     }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
@@ -361,4 +368,17 @@ void Error(int mode, char *format_str, ...)
     fprintf(output_stream, "%s%s: aborting\n", program_name, process_name);
     CloseAllAndExit(1);
   }
+}
+
+/* like memcpy, but guaranteed to handle overlap when s <= t */
+void copydown(char *s, char *t, int n)
+{
+  for (; n; n--)
+    *(s++) = *(t++);
+}
+
+void fatal(char *s)
+{
+  fprintf(stderr, "%s.\n", s);
+  exit(1);
 }

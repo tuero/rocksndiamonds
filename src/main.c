@@ -50,6 +50,7 @@ char	       *program_name = NULL;
 char	       *display_name = NULL;
 char	       *server_host = NULL;
 int		server_port = 0;
+int		serveronly = FALSE;
 int		standalone = TRUE;
 int		verbose = FALSE;
 

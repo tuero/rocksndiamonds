@@ -323,6 +323,7 @@ extern char	       *program_name;
 extern char	       *display_name;
 extern char	       *server_host;
 extern int		server_port;
+extern int		serveronly;
 extern int		standalone;
 extern int		verbose;
 

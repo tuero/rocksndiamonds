@@ -115,7 +115,7 @@ void InitSound()
 {
   int i;
 
-  if (sound_status==SOUND_OFF)
+  if (sound_status == SOUND_OFF)
     return;
 
 #ifndef MSDOS
@@ -126,7 +126,7 @@ void InitSound()
     return;
   }
 
-  if ((sound_device=open(sound_device_name,O_WRONLY))<0)
+  if ((sound_device = open(sound_device_name,O_WRONLY))<0)
   {
     Error(ERR_RETURN, "cannot open sound device - no sounds");
     sound_status = SOUND_OFF;
@@ -134,7 +134,7 @@ void InitSound()
   }
 
   close(sound_device);
-  sound_status=SOUND_AVAILABLE;
+  sound_status = SOUND_AVAILABLE;
 
 #ifdef VOXWARE
   sound_loops_allowed = TRUE;
@@ -145,7 +145,7 @@ void InitSound()
   sound_loops_on = TRUE;
 #endif
 
-  for(i=0;i<NUM_SOUNDS;i++)
+  for(i=0; i<NUM_SOUNDS; i++)
   {
 #ifdef MSDOS
   sprintf(sound_name[i], "%d", i+1);
@@ -153,7 +153,7 @@ void InitSound()
     Sound[i].name = sound_name[i];
     if (!LoadSound(&Sound[i]))
     {
-      sound_status=SOUND_OFF;
+      sound_status = SOUND_OFF;
       return;
     }
   }
@@ -161,26 +161,31 @@ void InitSound()
 
 void InitSoundServer()
 {
-  if (sound_status==SOUND_OFF)
+  if (sound_status == SOUND_OFF)
     return;
 
 #ifndef MSDOS
   if (pipe(sound_pipe)<0)
   {
     Error(ERR_RETURN, "cannot create pipe - no sounds");
-    sound_status=SOUND_OFF;
+    sound_status = SOUND_OFF;
     return;
   }
 
-  if ((sound_process_id=fork())<0)
+  if ((sound_process_id = fork()) < 0)
   {       
-    Error(ERR_RETURN, "cannot create child process - no sounds");
-    sound_status=SOUND_OFF;
+    Error(ERR_RETURN, "cannot create sound server process - no sounds");
+    sound_status = SOUND_OFF;
     return;
   }
 
   if (!sound_process_id)	/* we are child */
+  {
     SoundServer();
+
+    /* never reached */
+    exit(0);
+  }
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
 #else
@@ -190,7 +195,7 @@ void InitSoundServer()
 
 void InitJoystick()
 {
-  if (global_joystick_status==JOYSTICK_OFF)
+  if (global_joystick_status == JOYSTICK_OFF)
     return;
 
 #ifndef MSDOS
@@ -202,7 +207,7 @@ void InitJoystick()
     return;
   }
 
-  if ((joystick_device=open(joystick_device_name[joystick_nr],O_RDONLY))<0)
+  if ((joystick_device = open(joystick_device_name[joystick_nr],O_RDONLY))<0)
   {
     Error(ERR_RETURN, "cannot open joystick device '%s'",
 	  joystick_device_name[joystick_nr]);
@@ -547,7 +552,7 @@ void InitGfx()
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
     Error(ERR_EXIT, "cannot create additional pixmaps");
 
-  for(i=0;i<NUM_PIXMAPS;i++)
+  for(i=0; i<NUM_PIXMAPS; i++)
   {
     if (clipmask[i])
     {
@@ -1263,13 +1268,13 @@ void InitElementProperties()
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 
-  for(i=0;i<MAX_ELEMENTS;i++)
+  for(i=0; i<MAX_ELEMENTS; i++)
     Elementeigenschaften[i] = 0;
 
-  for(i=0;i<num_properties;i++)
-    for(j=0;j<*(ep_num[i]);j++)
+  for(i=0; i<num_properties; i++)
+    for(j=0; j<*(ep_num[i]); j++)
       Elementeigenschaften[(ep_array[i])[j]] |= ep_bit[i];
-  for(i=EL_CHAR_START;i<EL_CHAR_END;i++)
+  for(i=EL_CHAR_START; i<EL_CHAR_END; i++)
     Elementeigenschaften[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
@@ -1284,7 +1289,7 @@ void CloseAllAndExit(int exit_value)
     FreeSounds(NUM_SOUNDS);
   }
 
-  for(i=0;i<NUM_PIXMAPS;i++)
+  for(i=0; i<NUM_PIXMAPS; i++)
   {
     if (pix[i])
     {
