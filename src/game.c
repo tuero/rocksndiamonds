@@ -248,6 +248,9 @@ static void KillHeroUnlessExplosionProtected(int, int);
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
 static void TestIfElementHitsCustomElement(int, int, int);
+#if 0
+static void TestIfElementSmashesCustomElement(int, int, int);
+#endif
 
 static void ChangeElement(int, int, int);
 
@@ -1631,6 +1634,10 @@ void InitGame()
 	  some_player->present = FALSE;
 	  some_player->active = FALSE;
 
+#if 0
+	  player->element_nr = some_player->element_nr;
+#endif
+
 	  StorePlayer[jx][jy] = player->element_nr;
 	  player->jx = player->last_jx = jx;
 	  player->jy = player->last_jy = jy;
@@ -2641,6 +2648,10 @@ void Explode(int ex, int ey, int phase, int mode)
     int center_element = Feld[ex][ey];
 
 #if 0
+    printf("::: start explosion %d,%d [%d]\n", ex, ey, FrameCounter);
+#endif
+
+#if 0
     /* --- This is only really needed (and now handled) in "Impact()". --- */
     /* do not explode moving elements that left the explode field in time */
     if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
@@ -2979,6 +2990,10 @@ void Explode(int ex, int ey, int phase, int mode)
   if (phase == last_phase)
   {
     int element;
+
+#if 0
+    printf("::: explosion %d,%d done [%d]\n", x, y, FrameCounter);
+#endif
 
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
@@ -3788,6 +3803,10 @@ void Impact(int x, int y)
 	}
 	else
 	{
+#if 0
+	  TestIfElementSmashesCustomElement(x, y, MV_DOWN);
+#endif
+
 	  CheckElementChange(x, y + 1, smashed, CE_SMASHED);
 
 	  CheckTriggeredElementChangeSide(x, y + 1, smashed,
@@ -8084,8 +8103,16 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
     int new_jx = jx + dx, new_jy = jy + dy;
     boolean player_is_snapping = player->action & JOY_BUTTON_1;
-    boolean field_under_player_is_free =
-      (IN_LEV_FIELD(jx, jy + 1) && IS_FREE(jx, jy + 1));
+#if 0
+    /* !!! MAKE THIS CUSTOMIZABLE !!! */
+    boolean field_under_player_is_free_or_acid =
+      (IN_LEV_FIELD(jx, jy + 1) &&
+       (IS_FREE(jx, jy + 1) || Feld[jx][jy + 1] == EL_ACID));
+#else
+    boolean field_under_player_is_free_or_acid =
+      (IN_LEV_FIELD(jx, jy + 1) &&
+       (IS_FREE(jx, jy + 1)));
+#endif
     boolean player_is_moving_to_valid_field =
       (
 #if 1
@@ -8105,18 +8132,19 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 
 #if 0
     printf("::: checking gravity NOW [%d, %d, %d] [%d] ...\n",
-	   field_under_player_is_free,
+	   field_under_player_is_free_or_acid,
 	   player_is_standing_on_valid_field,
 	   player_is_moving_to_valid_field,
 	   (player_is_moving_to_valid_field ? Feld[new_jx][new_jy] : -1));
 #endif
 
-    if (field_under_player_is_free &&
+    if (field_under_player_is_free_or_acid &&
 	!player_is_standing_on_valid_field &&
 	!player_is_moving_to_valid_field)
     {
 #if 0
-      printf("::: setting programmed_action to MV_DOWN ...\n");
+      printf("::: setting programmed_action to MV_DOWN [%d,%d - %d] ...\n",
+	     jx, jy, FrameCounter);
 #endif
 
       player->programmed_action = MV_DOWN;
@@ -8968,6 +8996,108 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
   }
 }
 
+#if 0
+void TestIfElementSmashesCustomElement(int x, int y, int direction)
+{
+  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int hitx = x + dx, hity = y + dy;
+  int hitting_element = Feld[x][y];
+#if 0
+  boolean object_hit = (IN_LEV_FIELD(hitx, hity) &&
+			!IS_FREE(hitx, hity) &&
+			(!IS_MOVING(hitx, hity) ||
+			 MovDir[hitx][hity] != direction ||
+			 ABS(MovPos[hitx][hity]) <= TILEY / 2));
+#endif
+
+  if (IN_LEV_FIELD(hitx, hity) && IS_FREE(hitx, hity))
+    return;
+
+#if 0
+  if (IN_LEV_FIELD(hitx, hity) && !object_hit)
+    return;
+#endif
+
+  CheckElementChangeSide(x, y, hitting_element, EP_CAN_SMASH_EVERYTHING,
+			 direction);
+
+  if (IN_LEV_FIELD(hitx, hity))
+  {
+    int opposite_direction = MV_DIR_OPPOSITE(direction);
+    int hitting_side = direction;
+    int touched_side = opposite_direction;
+    int touched_element = MovingOrBlocked2Element(hitx, hity);
+#if 1
+    boolean object_hit = (!IS_MOVING(hitx, hity) ||
+			  MovDir[hitx][hity] != direction ||
+			  ABS(MovPos[hitx][hity]) <= TILEY / 2);
+
+    object_hit = TRUE;
+#endif
+
+    if (object_hit)
+    {
+      int i;
+
+      CheckElementChangeSide(hitx, hity, touched_element,
+			     CE_SMASHED_BY_SOMETHING, opposite_direction);
+
+      if (IS_CUSTOM_ELEMENT(hitting_element) &&
+	  HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_SMASHING))
+      {
+	for (i = 0; i < element_info[hitting_element].num_change_pages; i++)
+	{
+	  struct ElementChangeInfo *change =
+	    &element_info[hitting_element].change_page[i];
+
+	  if (change->can_change &&
+	      change->events & CH_EVENT_BIT(CE_OTHER_IS_SMASHING) &&
+	      change->trigger_side & touched_side &&
+	  
+#if 1
+	      IS_EQUAL_OR_IN_GROUP(touched_element, change->trigger_element)
+#else
+	      change->trigger_element == touched_element
+#endif
+	      )
+	  {
+	    CheckElementChangePage(x, y, hitting_element, CE_OTHER_IS_SMASHING,
+				   i);
+	    break;
+	  }
+	}
+      }
+
+      if (IS_CUSTOM_ELEMENT(touched_element) &&
+	  HAS_ANY_CHANGE_EVENT(touched_element, CE_OTHER_GETS_SMASHED))
+      {
+	for (i = 0; i < element_info[touched_element].num_change_pages; i++)
+	{
+	  struct ElementChangeInfo *change =
+	    &element_info[touched_element].change_page[i];
+
+	  if (change->can_change &&
+	      change->events & CH_EVENT_BIT(CE_OTHER_GETS_SMASHED) &&
+	      change->trigger_side & hitting_side &&
+#if 1
+	      IS_EQUAL_OR_IN_GROUP(hitting_element, change->trigger_element)
+#else
+	      change->trigger_element == hitting_element
+#endif
+	      )
+	  {
+	    CheckElementChangePage(hitx, hity, touched_element,
+				   CE_OTHER_GETS_SMASHED, i);
+	    break;
+	  }
+	}
+      }
+    }
+  }
+}
+#endif
+
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 {
   int i, kill_x = -1, kill_y = -1;
@@ -9457,6 +9587,10 @@ int DigField(struct PlayerInfo *player,
       player->move_delay_reset_counter = 2;
 
       DOUBLE_PLAYER_SPEED(player);
+#endif
+
+#if 0
+      printf("::: passing port %d,%d [%d]\n", x, y, FrameCounter);
 #endif
 
       PlayLevelSound(x, y, SND_CLASS_SP_PORT_PASSING);
