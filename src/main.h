@@ -357,6 +357,7 @@ struct LevelInfo
   int dauer_ablenk;
   int amoebe_inhalt;
   boolean double_speed;
+  boolean gravity;
 };
 
 struct LevelDirInfo

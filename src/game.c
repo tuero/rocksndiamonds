@@ -4132,6 +4132,16 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
 
+
+  /*
+  if (!player->MovPos && level.gravity)
+  {
+    if (player->action == MV_NO_MOVING)
+      player->programmed_action = MV_DOWN;
+  }
+  */
+
+
   DrawPlayer(player);
 
   if (!player->MovPos)
