@@ -2499,17 +2499,17 @@ void Explode(int ex, int ey, int phase, int mode)
 	switch(StorePlayer[ex][ey])
 	{
 	  case EL_PLAYER_2:
-	    Store[x][y] = EL_EMERALD_RED;
+	    Store[x][y] = EL_PLAYER_IS_EXPLODING_2;
 	    break;
 	  case EL_PLAYER_3:
-	    Store[x][y] = EL_EMERALD;
+	    Store[x][y] = EL_PLAYER_IS_EXPLODING_3;
 	    break;
 	  case EL_PLAYER_4:
-	    Store[x][y] = EL_EMERALD_PURPLE;
+	    Store[x][y] = EL_PLAYER_IS_EXPLODING_4;
 	    break;
 	  case EL_PLAYER_1:
 	  default:
-	    Store[x][y] = EL_EMERALD_YELLOW;
+	    Store[x][y] = EL_PLAYER_IS_EXPLODING_1;
 	    break;
 	}
 
@@ -2656,6 +2656,17 @@ void Explode(int ex, int ey, int phase, int mode)
     Store[x][y] = Store2[x][y] = 0;
     GfxElement[x][y] = EL_UNDEFINED;
 
+    /* player can escape from explosions and might therefore be still alive */
+    if (element >= EL_PLAYER_IS_EXPLODING_1 &&
+	element <= EL_PLAYER_IS_EXPLODING_4)
+      Feld[x][y] = (stored_player[element - EL_PLAYER_IS_EXPLODING_1].active ?
+		    EL_EMPTY :
+		    element == EL_PLAYER_IS_EXPLODING_1 ? EL_EMERALD_YELLOW :
+		    element == EL_PLAYER_IS_EXPLODING_2 ? EL_EMERALD_RED :
+		    element == EL_PLAYER_IS_EXPLODING_3 ? EL_EMERALD :
+		    EL_EMERALD_PURPLE);
+
+    /* restore probably existing indestructible background element */
     if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
       element = Feld[x][y] = Back[x][y];
     Back[x][y] = 0;
@@ -2666,8 +2677,11 @@ void Explode(int ex, int ey, int phase, int mode)
     ChangePage[x][y] = -1;
 
     InitField(x, y, FALSE);
+#if 1
+    /* !!! not needed !!! */
     if (CAN_MOVE(element))
       InitMovDir(x, y);
+#endif
     DrawLevelField(x, y);
 
     TestIfElementTouchesCustomElement(x, y);

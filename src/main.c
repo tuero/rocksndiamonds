@@ -3685,6 +3685,26 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "player_is_exploding_1",
+    "-",
+    "-"
+  },
+  {
+    "player_is_exploding_2",
+    "-",
+    "-"
+  },
+  {
+    "player_is_exploding_3",
+    "-",
+    "-"
+  },
+  {
+    "player_is_exploding_4",
+    "-",
+    "-"
+  },
+  {
     "quicksand.filling",
     "quicksand",
     "-"

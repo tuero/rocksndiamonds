@@ -1,3 +1,7 @@
+
+2004-01-19
+	* fixed bug which allowed creating emeralds by escaping explosions
+
 2004-01-18
 	* custom elements can change (limited) or leave (unlimited) elements
 	* finally added multiple matches using group elements
