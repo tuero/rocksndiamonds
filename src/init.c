@@ -1945,6 +1945,9 @@ void InitElementPropertiesStatic()
     EL_SP_DISK_YELLOW,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
+#if 1
+    EL_BLACK_ORB,
+#endif
     -1
   };
 
@@ -3097,8 +3100,20 @@ void InitElementPropertiesEngine(int engine_version)
     else if (engine_version < VERSION_IDENT(2,2,0,0))
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, IS_INDESTRUCTIBLE(i));
     else
+#if 1
+      SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
+					   (!IS_WALKABLE(i) ||
+					    IS_PROTECTED(i))));
+#else
+#if 1
+      SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
+					   !IS_WALKABLE_OVER(i) &&
+					   !IS_WALKABLE_UNDER(i)));
+#else
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
 					   IS_PROTECTED(i)));
+#endif
+#endif
 
     if (IS_CUSTOM_ELEMENT(i))
     {

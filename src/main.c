@@ -58,8 +58,9 @@ short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			AmoebaCnt[MAX_NUM_AMOEBA];
 short			AmoebaCnt2[MAX_NUM_AMOEBA];
-short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 

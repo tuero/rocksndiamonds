@@ -1385,6 +1385,7 @@ void InitGame()
       ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
       ExplodePhase[x][y] = 0;
+      ExplodeDelay[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
       RunnerVisit[x][y] = 0;
@@ -1418,6 +1419,30 @@ void InitGame()
   game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
+
+  /* initialize explosion and ignition delay */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    if (!IS_CUSTOM_ELEMENT(i))
+    {
+      int num_phase = 9;
+      int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+      int last_phase = num_phase * delay;
+      int half_phase = (num_phase / 2) * delay;
+
+      element_info[i].explosion_delay = last_phase;
+      element_info[i].ignition_delay = half_phase;
+
+      if (i == EL_BLACK_ORB)
+	element_info[i].ignition_delay = 1;
+    }
+
+    if (element_info[i].explosion_delay < 2)	/* !!! check again !!! */
+      element_info[i].explosion_delay = 2;
+
+    if (element_info[i].ignition_delay < 1)	/* !!! check again !!! */
+      element_info[i].ignition_delay = 1;
+  }
 
   /* correct non-moving belts to start moving left */
   for (i = 0; i < 4; i++)
@@ -2424,6 +2449,9 @@ void Explode(int ex, int ey, int phase, int mode)
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
   int first_phase_after_start = EX_PHASE_START + 1;
+  int border_element;
+
+  int last_phase_TEST = last_phase;
 
   if (game.explosions_delayed)
   {
@@ -2457,6 +2485,10 @@ void Explode(int ex, int ey, int phase, int mode)
       RemoveMovingField(ex, ey);
       Feld[ex][ey] = center_element;
     }
+
+#if 1
+    last_phase = element_info[center_element].explosion_delay;
+#endif
 
     for (y = ey - 1; y <= ey + 1; y++) for (x = ex - 1; x <= ex + 1; x++)
     {
@@ -2628,6 +2660,9 @@ void Explode(int ex, int ey, int phase, int mode)
 #endif
 
       ExplodePhase[x][y] = 1;
+#if 1
+      ExplodeDelay[x][y] = last_phase;
+#endif
       Stop[x][y] = TRUE;
     }
 
@@ -2643,6 +2678,10 @@ void Explode(int ex, int ey, int phase, int mode)
 
   x = ex;
   y = ey;
+
+#if 1
+  last_phase = ExplodeDelay[x][y];
+#endif
 
   ExplodePhase[x][y] = (phase < last_phase ? phase + 1 : 0);
 
@@ -2663,6 +2702,127 @@ void Explode(int ex, int ey, int phase, int mode)
     GfxElement[x][y] = EL_EMPTY;
   }
 #endif
+
+#if 1
+
+  border_element = Store2[x][y];
+  if (IS_PLAYER(x, y))
+    border_element = StorePlayer[x][y];
+
+  if (phase == element_info[border_element].ignition_delay ||
+      phase == last_phase)
+  {
+    if (IS_PLAYER(x, y))
+    {
+      if (phase == 2)
+	printf("::: IS_PLAYER\n");
+
+      KillHeroUnlessExplosionProtected(x, y);
+      return;
+    }
+    else if (CAN_EXPLODE_BY_FIRE(border_element))
+    {
+      if (phase == 2)
+	printf("::: CAN_EXPLODE_BY_FIRE\n");
+
+      Feld[x][y] = Store2[x][y];
+      Store2[x][y] = 0;
+      Bang(x, y);
+      return;
+    }
+    else if (border_element == EL_AMOEBA_TO_DIAMOND)
+    {
+      if (phase == 2)
+	printf("::: EL_AMOEBA_TO_DIAMOND\n");
+
+      AmoebeUmwandeln(x, y);
+      return;
+    }
+  }
+
+  if (phase == last_phase)
+  {
+    int element;
+
+    element = Feld[x][y] = Store[x][y];
+    Store[x][y] = Store2[x][y] = 0;
+    GfxElement[x][y] = EL_UNDEFINED;
+
+    /* player can escape from explosions and might therefore be still alive */
+    if (element >= EL_PLAYER_IS_EXPLODING_1 &&
+	element <= EL_PLAYER_IS_EXPLODING_4)
+      Feld[x][y] = (stored_player[element - EL_PLAYER_IS_EXPLODING_1].active ?
+		    EL_EMPTY :
+		    element == EL_PLAYER_IS_EXPLODING_1 ? EL_EMERALD_YELLOW :
+		    element == EL_PLAYER_IS_EXPLODING_2 ? EL_EMERALD_RED :
+		    element == EL_PLAYER_IS_EXPLODING_3 ? EL_EMERALD :
+		    EL_EMERALD_PURPLE);
+
+    /* restore probably existing indestructible background element */
+    if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
+      element = Feld[x][y] = Back[x][y];
+    Back[x][y] = 0;
+
+    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+    GfxDir[x][y] = MV_NO_MOVING;
+    ChangeDelay[x][y] = 0;
+    ChangePage[x][y] = -1;
+
+    InitField(x, y, FALSE);
+#if 1
+    /* !!! not needed !!! */
+    if (CAN_MOVE(element))
+      InitMovDir(x, y);
+#endif
+    DrawLevelField(x, y);
+
+    TestIfElementTouchesCustomElement(x, y);
+
+    if (GFX_CRUMBLED(element))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
+
+    if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
+      StorePlayer[x][y] = 0;
+
+    if (ELEM_IS_PLAYER(element))
+      RelocatePlayer(x, y, element);
+  }
+  else if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+  {
+#if 1
+    int graphic = el_act2img(GfxElement[x][y], ACTION_EXPLODING);
+#else
+    int stored = Store[x][y];
+    int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
+		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
+		   IMG_SP_EXPLOSION);
+#endif
+    int frame = getGraphicAnimationFrame(graphic, phase - delay);
+
+#if 0
+    printf("::: %d ['%s'] -> %d\n", GfxElement[x][y],
+	   element_info[GfxElement[x][y]].token_name,
+	   graphic);
+#endif
+
+    if (phase == delay)
+      DrawLevelFieldCrumbledSand(x, y);
+
+    if (IS_WALKABLE_OVER(Back[x][y]) && Back[x][y] != EL_EMPTY)
+    {
+      DrawLevelElement(x, y, Back[x][y]);
+      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
+    }
+    else if (IS_WALKABLE_UNDER(Back[x][y]))
+    {
+      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+      DrawLevelElementThruMask(x, y, Back[x][y]);
+    }
+    else if (!IS_WALKABLE_INSIDE(Back[x][y]))
+      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+  }
+
+#else
 
   if (phase == first_phase_after_start)
   {
@@ -2772,6 +2932,7 @@ void Explode(int ex, int ey, int phase, int mode)
     else if (!IS_WALKABLE_INSIDE(Back[x][y]))
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
   }
+#endif
 }
 
 void DynaExplode(int ex, int ey)

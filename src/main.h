@@ -399,6 +399,7 @@
 #define SHIELD_ON(p)		((p)->shield_normal_time_left > 0)
 
 #if 1
+
 #define ENEMY_PROTECTED_FIELD(x,y)	(IS_PROTECTED(Feld[x][y]) ||       \
 					 IS_PROTECTED(Back[x][y]))
 #define EXPLOSION_PROTECTED_FIELD(x,y)  (IS_EXPLOSION_PROOF(Feld[x][y]))
@@ -406,10 +407,14 @@
 					 ENEMY_PROTECTED_FIELD(x, y))
 #define PLAYER_EXPLOSION_PROTECTED(x,y) (SHIELD_ON(PLAYERINFO(x, y)) ||	   \
 					 EXPLOSION_PROTECTED_FIELD(x, y))
+
 #else
+
 #define PROTECTED_FIELD(x,y)	(IS_ACCESSIBLE_INSIDE(Feld[x][y]) &&	\
 				 IS_INDESTRUCTIBLE(Feld[x][y]))
-#define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
+#define PLAYER_ENEMY_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||	\
+				 PROTECTED_FIELD(x, y))
+#define PLAYER_EXPLOSION_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||	\
 				 PROTECTED_FIELD(x, y))
 #endif
 
@@ -1762,8 +1767,9 @@ extern short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];
 extern short			AmoebaCnt2[MAX_NUM_AMOEBA];
-extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 

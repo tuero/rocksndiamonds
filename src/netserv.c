@@ -24,7 +24,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <sys/select.h>		/* apparently needed by OS/2 */
+#include <sys/select.h>			/* apparently needed for OS/2 port */
 
 #include "libgame/libgame.h"
 
