@@ -72,6 +72,8 @@ void SetBorderElement();
 
 int getGraphicAnimationFrame(int, int);
 void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
+boolean checkDrawGraphicAnimation(int, int, int);
+boolean checkDrawLevelGraphicAnimation(int, int, int);
 boolean DrawGraphicAnimation(int, int, int);
 boolean DrawLevelGraphicAnimation(int, int, int);
 boolean DrawLevelElementAnimation(int, int, int);

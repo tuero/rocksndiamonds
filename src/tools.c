@@ -479,12 +479,25 @@ inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
+inline boolean checkDrawGraphicAnimation(int x, int y, int graphic)
+{
+  int lx = LEVELX(x), ly = LEVELY(y);
+
+  return (IN_SCR_FIELD(x, y) &&
+	  GfxFrame[lx][ly] % new_graphic_info[graphic].anim_delay == 0);
+}
+
+inline boolean checkDrawLevelGraphicAnimation(int x, int y, int graphic)
+{
+  return (IN_SCR_FIELD(SCREENX(x), SCREENY(y)) &&
+	  GfxFrame[x][y] % new_graphic_info[graphic].anim_delay == 0);
+}
+
 inline boolean DrawGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
-  if (!IN_SCR_FIELD(x, y) ||
-      (GfxFrame[lx][ly] % new_graphic_info[graphic].anim_delay) != 0)
+  if (!checkDrawGraphicAnimation(x, y, graphic))
     return FALSE;
 
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
@@ -777,11 +790,17 @@ void DrawPlayer(struct PlayerInfo *player)
 	frame = 7 - frame;
     }
 #else
+
+#if 0
     frame = getGraphicAnimationFrame(graphic, 96 - MovDelay[jx][jy]);
+#else
+    frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
+#endif
+
 #endif
 
     if (game.emulation == EMU_SUPAPLEX)
-      DrawGraphic(sx, sy, IMG_SP_DISK_RED, 0);
+      DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
     else
       DrawGraphicThruMask(sx, sy, graphic, frame);
   }
