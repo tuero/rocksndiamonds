@@ -660,25 +660,9 @@ static void HandleNetworkingMessages()
 	sysmsg(msgbuf);
 	break;
 
-      case OP_ZERO:
-	printf("OP_ZERO: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d resets game counters", buf[0]);
-	sysmsg(msgbuf);
-	break;
-
       case OP_MSG:
 	printf("OP_MSG: %d\n", buf[0]);
 	sprintf(msgbuf, "client %d sends message", buf[0]);
-	break;
-      
-      case OP_LOST:
-	printf("OP_MSG: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d has lost", buf[0]);
-	break;
-      
-      case OP_LEVEL:
-	printf("OP_MSG: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d sets level to %d", buf[0], buf[2]);
 	break;
     }
   }

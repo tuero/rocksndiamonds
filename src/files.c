@@ -212,6 +212,7 @@ static void InitUserDataDirectory()
 
 static void InitTapeDirectory(char *level_subdir)
 {
+  createDirectory(getUserDataDir(), "user data");
   createDirectory(getTapeDir(""), "main tape");
   createDirectory(getTapeDir(level_subdir), "level tape");
 }
@@ -226,6 +227,7 @@ static void InitUserLevelDirectory(char *level_subdir)
 {
   if (access(getUserLevelDir(level_subdir), F_OK) != 0)
   {
+    createDirectory(getUserDataDir(), "user data");
     createDirectory(getUserLevelDir(""), "main user level");
     createDirectory(getUserLevelDir(level_subdir), "user level");
 
@@ -599,11 +601,9 @@ void SaveTape(int level_nr)
   InitTapeDirectory(leveldir[leveldir_nr].filename);
 
   /* if a tape still exists, ask to overwrite it */
-  if ((file = fopen(filename, "r")))
+  if (access(filename, F_OK) == 0)
   {
     new_tape = FALSE;
-    fclose(file);
-
     if (!Request("Replace old tape ?", REQ_ASK))
       return;
   }
@@ -1029,7 +1029,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
 
   if (!(file = fopen(filename, "r")))
   {
-    Error(ERR_WARN, "cannot open setup/info file '%s'", filename);
+    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
     return NULL;
   }
 
@@ -1098,7 +1098,7 @@ static struct SetupFileList *loadSetupFileList(char *filename)
   freeSetupFileList(setup_file_list);
 
   if (first_valid_list_entry == NULL)
-    Error(ERR_WARN, "setup/info file '%s' is empty", filename);
+    Error(ERR_WARN, "configuration file '%s' is empty", filename);
 
   return first_valid_list_entry;
 }
@@ -1113,7 +1113,7 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
   {
     if (strcmp(setup_file_list->value, identifier) != 0)
     {
-      Error(ERR_WARN, "setup/info file has wrong version");
+      Error(ERR_WARN, "configuration file has wrong version");
       return;
     }
     else
@@ -1124,7 +1124,7 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
     checkSetupFileListIdentifier(setup_file_list->next, identifier);
   else
   {
-    Error(ERR_WARN, "setup/info file has no version information");
+    Error(ERR_WARN, "configuration file has no version information");
     return;
   }
 }
@@ -1317,7 +1317,10 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
   int i, current_entry = start_entry;
 
   if ((dir = opendir(level_directory)) == NULL)
-    Error(ERR_EXIT, "cannot read level directory '%s'", level_directory);
+  {
+    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+    return current_entry;
+  }
 
   while (current_entry < MAX_LEVDIR_ENTRIES)
   {
@@ -1371,8 +1374,8 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 
   closedir(dir);
 
-  if (current_entry == start_entry && start_entry != -1)
-    Error(ERR_EXIT, "cannot find any valid level series in directory '%s'",
+  if (current_entry == start_entry)
+    Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
 	  level_directory);
 
   return current_entry;
@@ -1389,6 +1392,10 @@ void LoadLevelInfo()
 					    num_leveldirs);
   num_leveldirs = LoadLevelInfoFromLevelDir(getUserLevelDir(""),
 					    num_leveldirs);
+
+  if (num_leveldirs == 0)
+    Error(ERR_EXIT, "cannot find any valid level series in any directory");
+
   if (num_leveldirs > 1)
     qsort(leveldir, num_leveldirs, sizeof(struct LevelDirInfo),
 	  compareLevelDirInfoEntries);

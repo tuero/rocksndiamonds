@@ -30,13 +30,8 @@
 #include "misc.h"
 
 static int clients = 0;
-static int bots = 0;
 static int onceonly = 0;
-static int timetoplay = 0;
 static int is_daemon = 0;
-static int levelnr = 5;
-static int mode = -1;
-static int paused = 0;
 
 struct user
 {
@@ -51,7 +46,6 @@ struct user
   unsigned char writbuf[MAX_BUFFER_SIZE];
   int nwrite;
   char playing;
-  char isbot;
   int lines;
   unsigned int games;
   unsigned char action;
@@ -162,13 +156,10 @@ static void dropuser(struct user *u)
     }
   }
 
-  if (u->isbot)
-    bots--;
-
   free(u);
   clients--;
 
-  if (onceonly && clients == bots)
+  if (onceonly && clients == 0)
   {
     if (options.verbose)
     {
@@ -176,13 +167,6 @@ static void dropuser(struct user *u)
       printf("RND_SERVER: aborting\n");
     }
     exit(0);
-  }
-
-  if (clients == 0)
-  {
-    mode = -1;
-    levelnr = 5;
-    timetoplay = 0;
   }
 }
 
@@ -201,7 +185,6 @@ static void new_connect(int fd)
   u->nread = 0;
   u->nwrite = 0;
   u->playing = 0;
-  u->isbot = 0;
   u->introduced = 0;
   u->games = 0;
   u->action = 0;
@@ -354,19 +337,6 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
 	sendtoone(u, 2+strlen(v->nick));
       }
     }
-    if (levelnr != 5)
-    {
-      buf[0] = 0;
-      buf[1] = OP_LEVEL;
-      buf[2] = levelnr;
-      sendtoone(u, 3);
-    }
-    if (mode >= 0)
-    {
-      buf[1] = OP_MODE;
-      buf[2] = mode;
-      sendtoone(u, 3);
-    }
   }
 
   u->introduced = 1;
@@ -382,7 +352,6 @@ static void Handle_OP_START_PLAYING(struct user *u)
 	   (buf[2] << 8) + buf[3],
 	   (buf[4] << 8) + buf[5],
 	   &buf[6]);
-  timetoplay = 0;
 
   for (w=user0; w; w=w->next)
   {
@@ -403,17 +372,6 @@ static void Handle_OP_START_PLAYING(struct user *u)
     }
   }
 
-  /*
-  if (paused)
-  {
-    paused = 0;
-    buf[1] = OP_CONT;
-    broadcast(NULL, 2, 0);
-  }
-  buf[1] = OP_START_PLAYING;
-  broadcast(NULL, 2, 0);
-  */
-
   /* reset frame counter */
   frame_counter = 0;
 
@@ -432,7 +390,6 @@ static void Handle_OP_PAUSE_PLAYING(struct user *u)
   if (options.verbose)
     printf("RND_SERVER: client %d (%s) pauses game\n", u->number, u->nick);
   broadcast(NULL, 2, 0);
-  paused = 1;
 }
 
 static void Handle_OP_CONTINUE_PLAYING(struct user *u)
@@ -440,7 +397,6 @@ static void Handle_OP_CONTINUE_PLAYING(struct user *u)
   if (options.verbose)
     printf("RND_SERVER: client %d (%s) continues game\n", u->number, u->nick);
   broadcast(NULL, 2, 0);
-  paused = 0;
 }
 
 static void Handle_OP_STOP_PLAYING(struct user *u)
@@ -508,7 +464,7 @@ static void Handle_OP_MOVE_FIGURE(struct user *u)
 void NetworkServer(int port, int serveronly)
 {
   int i, sl, on;
-  struct user *u, *v, *w;
+  struct user *u;
   int mfd;
   int r; 
   unsigned int len;
@@ -589,17 +545,6 @@ void NetworkServer(int port, int serveronly)
   {
     interrupt = 0;
 
-    /*
-    if (timetoplay && time(NULL) >= timetoplay)
-    {
-      buf[0] = 0;
-      do_play();
-      if (options.verbose)
-	printf("RND_SERVER: everyone lost... restarting game\n");
-      timetoplay = 0;
-    }
-    */
-
     for (u=user0; u; u=u->next)
       flushuser(u);
 
@@ -626,15 +571,6 @@ void NetworkServer(int port, int serveronly)
 
     if (sl < 0)
       continue;
-
-    if (clients > 0 && clients == bots)
-    {
-      if (options.verbose)
-	printf("RND_SERVER: only bots left... dropping all bots\n");
-      while (user0)
-	dropuser(user0);
-      continue;
-    }
     
     if (sl == 0)
       continue;
@@ -739,154 +675,11 @@ void NetworkServer(int port, int serveronly)
 	      Handle_OP_MOVE_FIGURE(u);
 	      break;
 
-	    case OP_KILL:
-	      for (v=user0; v; v=v->next)
-	      {
-		if (v->number == buf[2])
-		  break;
-	      }
-	      if (v)
-	      {
-		if (v->isbot)
-		{
-		  if (options.verbose)
-		    printf("RND_SERVER: client %d (%s) kills bot %d (%s)\n", u->number, u->nick, v->number, v->nick);
-
-		  dropuser(v);
-		  interrupt = 1;
-		  break;
-		}
-		else
-		{
-		  if (options.verbose)
-		    printf("RND_SERVER: client %d (%s) attempting to kill non-bot %d (%s)\n", u->number, u->nick, v->number, v->nick);
-		}
-	      }
-	      break;
-
-	    case OP_MODE:
-	      mode = buf[2];
-	      if (options.verbose)
-		printf("RND_SERVER: client %d (%s) sets mode %d (%s)\n", u->number, u->nick, buf[2], buf[2] == 0 ? "normal" : (buf[2] == 1 ? "fun" : "unknown"));
-	      broadcast(NULL, 3, 0);
-	      break;
-
-	    case OP_BOT:
-	      if (!u->isbot)
-		bots++;
-	      u->isbot = 1;
-	      if (options.verbose)
-		printf("RND_SERVER: client %d (%s) declares itself to be a bot\n", u->number, u->nick);
-	      break;
-	    
-	    case OP_LEVEL:
-	      levelnr = buf[2];
-	      if (options.verbose)
-		printf("RND_SERVER: client %d (%s) sets level %d\n", u->number, u->nick, buf[2]);
-	      broadcast(NULL, 3, 0);
-	      break;
-
-	    case OP_LOST:
-	      {
-		struct user *won = NULL;
-
-		if (options.verbose)
-		  printf("RND_SERVER: client %d (%s) has lost\n", u->number, u->nick);
-		u->playing = 0;
-		broadcast(u, 2, 1);
-		i = 0;
-		for (v=user0; v; v=v->next)
-		{
-		  if (v->nextvictim == u)
-		  {
-		    for (w=NEXT(v); w!=v; w=NEXT(w))
-		    {
-		      if (w->active && w->playing)
-		      {
-			v->nextvictim = w;
-			break;
-		      }
-		    }
-		    if (v->nextvictim == u)
-		      v->nextvictim = NULL;
-		  }
-		}
-		for (v=user0; v; v=v->next)
-		{
-		  if (v->playing)
-		  {
-		    i++;
-		    won = v;
-		  }
-		}
-		if (i == 1)
-		{
-		  buf[0] = won->number;
-		  buf[1] = OP_WON;
-		  won->games++;
-		  broadcast(NULL, 2, 0);
-		}
-		else if (i == 0)
-		{
-		  buf[0] = u->number;
-		  buf[1] = OP_WON;
-		  u->games++;
-		  broadcast(NULL, 2, 0);
-		}
-		if (i < 2 && clients > 1)
-		  timetoplay = time(NULL) + 4;
-	      }
-	      break;
-	    
-	    case OP_ZERO:
-	      broadcast(NULL, 2, 0);
-	      if (options.verbose)
-		printf("RND_SERVER: client %d (%s) resets the game counters\n", u->number, u->nick);
-	      for (v=user0; v; v=v->next)
-		v->games = 0;
-	      break;
-
-	    case OP_CLEAR:
-	    case OP_GROW:
-	      broadcast(u, 2, 1);
-	      break;
-
 	    case OP_MSG:
 	      buf[len] = '\0';
 	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) sends message: %s\n", u->number, u->nick, &buf[2]);
 	      broadcast(u, len, 0);
-	      break;
-
-	    case OP_LINES:
-	      if (len != 3)
-	      {
-		if (options.verbose)
-		  printf("RND_SERVER: client %d (%s) sends crap for an OP_LINES\n", u->number, u->nick);
-
-		dropuser(u);
-		interrupt = 1;
-		break;
-	      }
-	      if (u->nextvictim)
-	      {
-		if (options.verbose)
-		  printf("RND_SERVER: client %d (%s) sends %d %s to client %d (%s)\n", u->number, u->nick, (int)buf[2], buf[2] == 1 ? "line" : "lines", u->nextvictim->number, u->nextvictim->nick);
-		sendtoone(u->nextvictim, 3);
-		buf[3] = u->nextvictim->number;
-		buf[1] = OP_LINESTO;
-		broadcast(u->nextvictim, 4, 1);
-		for (v=NEXT(u->nextvictim); v!=u->nextvictim; v=NEXT(v))
-		{
-		  if (v->active && v != u && v->playing)
-		  {
-		    u->nextvictim = v;
-		    break;
-		  }
-		}
-	      }
-	      else if (options.verbose)
-		printf("RND_SERVER: client %d (%s) makes %d %s but has no victim\n", u->number, u->nick, (int)buf[2], buf[2] == 1 ? "line" : "lines");
 	      break;
 	    
 	    default:
