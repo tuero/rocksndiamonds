@@ -299,13 +299,15 @@ void HandleFocusEvent(XFocusChangeEvent *event)
        would be far better) set for each X11 window individually.
        The effect would be keyboard auto repeat while playing the game
        (game_status == PLAYING), which is not desired.
-       To avoid this special case, we just wait 1/50 second before
+       To avoid this special case, we just wait 1/10 second before
        processing the 'FocusIn' event.
     */
 
-    Delay(20);
     if (game_status == PLAYING)
+    {
+      Delay(100);
       XAutoRepeatOff(display);
+    }
     if (old_joystick_status != -1)
       joystick_status = old_joystick_status;
   }

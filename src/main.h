@@ -208,6 +208,11 @@ typedef unsigned char byte;
 #define MAX_ELEMENTS		512
 #define MAX_NUM_AMOEBA		100
 
+/* values for elements with content */
+#define MIN_ELEMENT_CONTENTS	1
+#define STD_ELEMENT_CONTENTS	4
+#define MAX_ELEMENT_CONTENTS	8
+
 #define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
 
 /* fundamental game speed values */
@@ -305,12 +310,6 @@ struct PlayerInfo
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
 
-
-#if 0
-  byte programmed_speed;	/* speed (for only one move) forced by game */
-#endif
-
-
   int joystick_fd;		/* file descriptor of player's joystick */
 
   int jx,jy, last_jx,last_jy;
@@ -318,7 +317,7 @@ struct PlayerInfo
   int Frame;
 
   boolean Pushing;
-  boolean gone, LevelSolved, GameOver;
+  boolean LevelSolved, GameOver;
   boolean snapped;
 
   unsigned long move_delay;
@@ -348,15 +347,16 @@ struct LevelInfo
   int fieldx;
   int fieldy;
   int time;
-  int edelsteine;
+  int gems_needed;
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
   int score[LEVEL_SCORE_ELEMENTS];
-  int mampfer_inhalt[8][3][3];
-  int tempo_amoebe;
-  int dauer_sieb;
-  int dauer_ablenk;
-  int amoebe_inhalt;
+  int yam_content[MAX_ELEMENT_CONTENTS][3][3];
+  int num_yam_contents;
+  int amoeba_speed;
+  int amoeba_content;
+  int time_magic_wall;
+  int time_wheel;
   boolean double_speed;
   boolean gravity;
 };
@@ -394,6 +394,18 @@ struct TapeInfo
     byte action[MAX_PLAYERS];
     byte delay;
   } pos[MAX_TAPELEN];
+};
+
+struct GameInfo
+{
+  int emulation;
+  int yam_content_nr;
+  boolean magic_wall_active;
+  int magic_wall_time_left;
+};
+
+struct GlobalInfo
+{
 };
 
 extern Display	       *display;
@@ -463,11 +475,8 @@ extern int		SBY_Upper, SBY_Lower;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
-extern int		MampferMax, MampferNr;
 extern boolean		SiebAktiv;
 extern int		SiebCount;
-
-extern int		game_emulation;
 
 extern boolean		network_player_action_received;
 
@@ -482,6 +491,8 @@ extern struct OptionInfo	options;
 extern struct SetupInfo		setup;
 extern struct SetupFileList	*setup_list;
 extern struct SetupFileList	*level_setup_list;
+extern struct GameInfo		game;
+extern struct GlobalInfo	global;
 
 extern char		*sound_name[];
 extern int		background_loop[];

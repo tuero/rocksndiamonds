@@ -460,8 +460,7 @@ void DrawPlayer(struct PlayerInfo *player)
   int graphic, phase;
   boolean player_is_moving = (last_jx != jx || last_jy != jy ? TRUE : FALSE);
 
-  if (!player->active || player->gone ||
-      !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
+  if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
 
 #if DEBUG
@@ -524,7 +523,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   /* draw player himself */
 
-  if (game_emulation == EMU_SUPAPLEX)
+  if (game.emulation == EMU_SUPAPLEX)
   {
     static int last_dir = MV_LEFT;
     int action = (player->programmed_action ? player->programmed_action :
@@ -649,7 +648,7 @@ void DrawPlayer(struct PlayerInfo *player)
 	phase = 7 - phase;
     }
 
-    if (game_emulation == EMU_SUPAPLEX)
+    if (game.emulation == EMU_SUPAPLEX)
       DrawGraphic(sx, sy, GFX_SP_DISK_RED);
     else
       DrawGraphicThruMask(sx, sy, graphic + phase);

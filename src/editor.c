@@ -51,10 +51,6 @@
 #define MIN_SCORE			0
 #define MAX_SCORE			255
 
-/* values for elements with content */
-#define MIN_ELEM_CONTENT		1
-#define MAX_ELEM_CONTENT		8
-
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 	236
 #define ED_CTRL_BUTTONS_ALT_GFX_YPOS 	142
@@ -410,10 +406,10 @@ static struct
   },
   {
     ED_COUNT_ELEM_CONTENT_XPOS,		ED_COUNT_ELEM_CONTENT_YPOS,
-    MIN_ELEM_CONTENT,			MAX_ELEM_CONTENT,
+    MIN_ELEMENT_CONTENTS,		MAX_ELEMENT_CONTENTS,
     GADGET_ID_ELEM_CONTENT_DOWN,	GADGET_ID_ELEM_CONTENT_UP,
     GADGET_ID_ELEM_CONTENT_TEXT,
-    &MampferMax,
+    &level.num_yam_contents,
     "element content",			NULL
   },
   {
@@ -437,7 +433,7 @@ static struct
     0,					999,
     GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
     GADGET_ID_LEVEL_COLLECT_TEXT,
-    &level.edelsteine,
+    &level.gems_needed,
     "number of emeralds to collect",	NULL
   },
   {
@@ -667,7 +663,7 @@ static int last_drawing_function = GADGET_ID_SINGLE_ITEMS;
 static boolean draw_with_brush = FALSE;
 static int properties_element = 0;
 
-static short ElementContent[MAX_ELEM_CONTENT][3][3];
+static short ElementContent[MAX_ELEMENT_CONTENTS][3][3];
 static short FieldBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
@@ -1421,7 +1417,7 @@ static void CreateDrawingAreas()
   level_editor_gadget[id] = gi;
 
   /* ... up to eight areas for element content ... */
-  for (i=0; i<MAX_ELEM_CONTENT; i++)
+  for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
   {
     int gx = SX + ED_AREA_ELEM_CONTENT_XPOS + 5 * (i % 4) * MINI_TILEX;
     int gy = SX + ED_AREA_ELEM_CONTENT_YPOS + 6 * (i / 4) * MINI_TILEY;
@@ -2083,17 +2079,6 @@ static void DrawLevelInfoWindow()
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
 	   "Editor Settings", FS_BIG, FC_YELLOW);
 
-
-  /*
-  gadget_level_xsize_value = &lev_fieldx;
-  gadget_level_ysize_value = &lev_fieldy;
-  gadget_level_random_value = &random_placement_value;
-  gadget_level_collect_value = &level.edelsteine;
-  gadget_level_timelimit_value = &level.time;
-  gadget_level_timescore_value = &level.score[SC_ZEITBONUS];
-  */
-
-
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
   {
@@ -2117,13 +2102,7 @@ static void DrawLevelInfoWindow()
       DrawTextF(x, y, font_color, infotext);
     }
 
-
-    /*
-    ModifyEditorCounter(i, **counterbutton_info[i].counter_value);
-    */
-
     ModifyEditorCounter(i, *counterbutton_info[i].value);
-
     MapCounterButtons(i);
   }
 
@@ -2181,7 +2160,7 @@ static void DrawAmoebaContentArea()
   int font_color = FC_GREEN;
   int x, y;
 
-  ElementContent[0][0][0] = level.amoebe_inhalt;
+  ElementContent[0][0][0] = level.amoeba_content;
 
   /* draw decorative border for the object */
   for (y=0; y<2; y++)
@@ -2207,7 +2186,7 @@ static void DrawAmoebaContentArea()
 
 static void DrawElementContentAreas()
 {
-  int *num_areas = &MampferMax;
+  int counter_id = ED_COUNTER_ID_ELEM_CONTENT;
   int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
@@ -2217,34 +2196,21 @@ static void DrawElementContentAreas()
   int font_color = FC_GREEN;
   int i, x, y;
 
-  for (i=0; i<MAX_ELEM_CONTENT; i++)
+  for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
-	ElementContent[i][x][y] = level.mampfer_inhalt[i][x][y];
+	ElementContent[i][x][y] = level.yam_content[i][x][y];
 
-  for (i=0; i<MAX_ELEM_CONTENT; i++)
+  for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
     UnmapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 
   /* display counter to choose number of element content areas */
-
-  /*
-  gadget_elem_content_value = num_areas;
-  */
-
-
-  x = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].x + xoffset_right;
-  y = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].y + yoffset_right;
+  x = counterbutton_info[counter_id].x + xoffset_right;
+  y = counterbutton_info[counter_id].y + yoffset_right;
   DrawTextF(x, y, font_color, "number of content areas");
 
-  /*
-  ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT, *gadget_elem_content_value);
-  */
-
-
-  ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT,
-		      *counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].value);
-
-  MapCounterButtons(ED_COUNTER_ID_ELEM_CONTENT);
+  ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
+  MapCounterButtons(counter_id);
 
   /* delete content areas in case of reducing number of them */
   XFillRectangle(display, backbuffer, gc,
@@ -2252,7 +2218,7 @@ static void DrawElementContentAreas()
 		 SXSIZE, 12 * MINI_TILEY);
 
   /* draw some decorative border for the objects */
-  for (i=0; i<*num_areas; i++)
+  for (i=0; i<level.num_yam_contents; i++)
   {
     for (y=0; y<4; y++)
       for (x=0; x<4; x++)
@@ -2277,7 +2243,7 @@ static void DrawElementContentAreas()
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
 	   "smashed", FS_SMALL, font_color);
 
-  for (i=0; i<*num_areas; i++)
+  for (i=0; i<level.num_yam_contents; i++)
   {
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
@@ -2289,7 +2255,7 @@ static void DrawElementContentAreas()
 	      font_color, "%d", i + 1);
   }
 
-  for (i=0; i<*num_areas; i++)
+  for (i=0; i<level.num_yam_contents; i++)
     MapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 }
 
@@ -2301,6 +2267,7 @@ static void DrawElementContentAreas()
 
 static void DrawPropertiesWindow()
 {
+  int counter_id = ED_COUNTER_ID_ELEM_SCORE;
   int num_elements_in_level;
   float percentage;
   int xoffset_right = counter_xsize;
@@ -2357,12 +2324,12 @@ static void DrawPropertiesWindow()
     { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_AMOEBE_NASS,	&level.tempo_amoebe,		TEXT_SPEED },
-    { EL_AMOEBE_NORM,	&level.tempo_amoebe,		TEXT_SPEED },
-    { EL_AMOEBE_VOLL,	&level.tempo_amoebe,		TEXT_SPEED },
-    { EL_AMOEBE_BD,	&level.tempo_amoebe,		TEXT_SPEED },
-    { EL_SIEB_INAKTIV,	&level.dauer_sieb,		TEXT_DURATION },
-    { EL_ABLENK_AUS,	&level.dauer_ablenk,		TEXT_DURATION },
+    { EL_AMOEBE_NASS,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_AMOEBE_NORM,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_AMOEBE_VOLL,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_AMOEBE_BD,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_SIEB_INAKTIV,	&level.time_magic_wall,		TEXT_DURATION },
+    { EL_ABLENK_AUS,	&level.time_wheel,		TEXT_DURATION },
     { -1, NULL, NULL }
   };
 
@@ -2419,30 +2386,14 @@ static void DrawPropertiesWindow()
   {
     if (elements_with_counter[i].element == properties_element)
     {
-      int x = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].x + xoffset_right;
-      int y = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].y + yoffset_right;
+      int x = counterbutton_info[counter_id].x + xoffset_right;
+      int y = counterbutton_info[counter_id].y + yoffset_right;
 
-
-      /*
-      gadget_elem_score_value = elements_with_counter[i].counter_value;
-      */
-
-
-      counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].value =
-	elements_with_counter[i].value;
-
+      counterbutton_info[counter_id].value = elements_with_counter[i].value;
       DrawTextF(x, y, font_color, elements_with_counter[i].text);
 
-
-      /*
-      ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE, *gadget_elem_score_value);
-      */
-
-
-      ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE,
-			  *counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].value);
-
-      MapCounterButtons(ED_COUNTER_ID_ELEM_SCORE);
+      ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
+      MapCounterButtons(counter_id);
       break;
     }
   }
@@ -3217,12 +3168,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 			   el2gfx(new_element));
 
 	if (id == GADGET_ID_AMOEBA_CONTENT)
-	  level.amoebe_inhalt = new_element;
+	  level.amoeba_content = new_element;
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;
 	else if (id >= GADGET_ID_ELEM_CONTENT_0 &&
 		 id <= GADGET_ID_ELEM_CONTENT_7)
-	  level.mampfer_inhalt[id - GADGET_ID_ELEM_CONTENT_0][sx][sy] =
+	  level.yam_content[id - GADGET_ID_ELEM_CONTENT_0][sx][sy] =
 	    new_element;
       }
       break;

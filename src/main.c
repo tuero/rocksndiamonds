@@ -98,11 +98,6 @@ int		SBY_Upper, SBY_Lower;
 int		ZX,ZY, ExitX,ExitY;
 int		AllPlayersGone;
 int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
-int		MampferMax, MampferNr;
-boolean		SiebAktiv;
-int		SiebCount;
-
-int		game_emulation = EMU_NONE;
 
 boolean		network_player_action_received = FALSE;
 
@@ -116,6 +111,8 @@ struct OptionInfo	options;
 struct SetupInfo	setup;
 struct SetupFileList	*setup_list = NULL;
 struct SetupFileList	*level_setup_list = NULL;
+struct GameInfo		game;
+struct GlobalInfo	global;
 
 /* data needed for playing sounds */
 char *sound_name[NUM_SOUNDS] =

@@ -37,7 +37,7 @@
 #define ERR_EXIT_NETWORK_SERVER		(ERR_EXIT | ERR_NETWORK_SERVER)
 #define ERR_EXIT_NETWORK_CLIENT		(ERR_EXIT | ERR_NETWORK_CLIENT)
 
-/* values for getFileChunk() and putFileChunk() */
+/* values for getFile...() and putFile...() */
 #define BYTE_ORDER_BIG_ENDIAN		0
 #define BYTE_ORDER_LITTLE_ENDIAN	1
 
@@ -64,6 +64,10 @@ void GetOptions(char **);
 void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
+short getFile16BitInteger(FILE *, int);
+void putFile16BitInteger(FILE *, short, int);
+int getFile32BitInteger(FILE *, int);
+void putFile32BitInteger(FILE *, int, int);
 void getFileChunk(FILE *, char *, int *, int);
 void putFileChunk(FILE *, char *, int, int);
 char *getKeyNameFromKeySym(KeySym);

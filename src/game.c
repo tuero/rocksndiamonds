@@ -199,7 +199,6 @@ static void InitField(int x, int y, boolean init_game)
 	if (!options.network || player->connected)
 	{
 	  player->active = TRUE;
-	  player->gone = FALSE;
 
 	  /* remove potentially duplicate players */
 	  if (StorePlayer[jx][jy] == Feld[x][y])
@@ -350,7 +349,7 @@ void InitGame()
     player->programmed_action = 0;
 
     player->score = 0;
-    player->gems_still_needed = level.edelsteine;
+    player->gems_still_needed = level.gems_needed;
     player->sokobanfields_still_needed = 0;
     player->lights_still_needed = 0;
     player->friends_still_needed = 0;
@@ -385,8 +384,6 @@ void InitGame()
 
     player->snapped = FALSE;
 
-    player->gone = TRUE;
-
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
 
@@ -407,7 +404,7 @@ void InitGame()
 
   ZX = ZY = -1;
 
-  MampferNr = 0;
+  game.yam_content_nr = 0;
   FrameCounter = 0;
   TimeFrames = 0;
   TimePlayed = 0;
@@ -420,8 +417,8 @@ void InitGame()
   ScrollStepSize = 0;	/* will be correctly initialized by ScrollScreen() */
 
   AllPlayersGone = FALSE;
-  SiebAktiv = FALSE;
-  SiebCount = 0;
+  game.magic_wall_active = FALSE;
+  game.magic_wall_time_left = 0;
 
   for (i=0; i<MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
@@ -472,7 +469,6 @@ void InitGame()
 	{
 	  player->present = TRUE;
 	  player->active = TRUE;
-	  player->gone = FALSE;
 	  some_player->present = FALSE;
 
 	  StorePlayer[jx][jy] = player->element_nr;
@@ -497,7 +493,6 @@ void InitGame()
 	int jx = player->jx, jy = player->jy;
 
 	player->active = FALSE;
-	player->gone = TRUE;
 	StorePlayer[jx][jy] = 0;
 	Feld[jx][jy] = EL_LEERRAUM;
       }
@@ -519,7 +514,6 @@ void InitGame()
 	    int jx = player->jx, jy = player->jy;
 
 	    player->active = FALSE;
-	    player->gone = TRUE;
 	    StorePlayer[jx][jy] = 0;
 	    Feld[jx][jy] = EL_LEERRAUM;
 	  }
@@ -552,7 +546,7 @@ void InitGame()
     }
   }
 
-  game_emulation = (emulate_bd ? EMU_BOULDERDASH :
+  game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
@@ -1057,7 +1051,7 @@ void DrawDynamite(int x, int y)
       phase = 7 - phase;
   }
 
-  if (game_emulation == EMU_SUPAPLEX)
+  if (game.emulation == EMU_SUPAPLEX)
     DrawGraphic(sx, sy, GFX_SP_DISK_RED);
   else if (Store[x][y])
     DrawGraphicThruMask(sx, sy, graphic + phase);
@@ -1145,7 +1139,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	    break;
 	}
 
-	if (game_emulation == EMU_SUPAPLEX)
+	if (game.emulation == EMU_SUPAPLEX)
 	  Store[x][y] = EL_LEERRAUM;
       }
       else if (center_element == EL_MAULWURF)
@@ -1159,9 +1153,9 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (center_element == EL_SP_ELECTRON)
 	Store[x][y] = EL_SP_INFOTRON;
       else if (center_element == EL_MAMPFER)
-	Store[x][y] = level.mampfer_inhalt[MampferNr][x-ex+1][y-ey+1];
+	Store[x][y] = level.yam_content[game.yam_content_nr][x-ex+1][y-ey+1];
       else if (center_element == EL_AMOEBA2DIAM)
-	Store[x][y] = level.amoebe_inhalt;
+	Store[x][y] = level.amoeba_content;
       else if (element == EL_ERZ_EDEL)
 	Store[x][y] = EL_EDELSTEIN;
       else if (element == EL_ERZ_DIAM)
@@ -1198,7 +1192,7 @@ void Explode(int ex, int ey, int phase, int mode)
     }
 
     if (center_element == EL_MAMPFER)
-      MampferNr = (MampferNr + 1) % MampferMax;
+      game.yam_content_nr = (game.yam_content_nr + 1) % level.num_yam_contents;
 
     return;
   }
@@ -1254,7 +1248,7 @@ void Explode(int ex, int ey, int phase, int mode)
   {
     int graphic = GFX_EXPLOSION;
 
-    if (game_emulation == EMU_SUPAPLEX)
+    if (game.emulation == EMU_SUPAPLEX)
       graphic = (Store[x][y] == EL_SP_INFOTRON ?
 		 GFX_SP_EXPLODE_INFOTRON :
 		 GFX_SP_EXPLODE_EMPTY);
@@ -1311,7 +1305,7 @@ void Bang(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (game_emulation == EMU_SUPAPLEX)
+  if (game.emulation == EMU_SUPAPLEX)
     PlaySoundLevel(x, y, SND_SP_BOOOM);
   else
     PlaySoundLevel(x, y, SND_ROAAAR);
@@ -1454,8 +1448,8 @@ void Impact(int x, int y)
 	  if (Feld[x][y] == smashed)
 	    Feld[x][y] = activated_magic_wall;
 
-      SiebCount = level.dauer_sieb * FRAMES_PER_SECOND;
-      SiebAktiv = TRUE;
+      game.magic_wall_time_left = level.time_magic_wall * FRAMES_PER_SECOND;
+      game.magic_wall_active = TRUE;
     }
 
     if (IS_PLAYER(x, y+1))
@@ -1838,7 +1832,7 @@ void TurnRound(int x, int y)
 	struct PlayerInfo *player = &stored_player[i];
 	int jx = player->jx, jy = player->jy;
 
-	if (!player->active || player->gone)
+	if (!player->active)
 	  continue;
 
 	if (attr_x == -1 || ABS(jx-x)+ABS(jy-y) < ABS(attr_x-x)+ABS(attr_y-y))
@@ -1953,8 +1947,7 @@ static boolean JustBeingPushed(int x, int y)
   {
     struct PlayerInfo *player = &stored_player[i];
 
-    if (player->active && !player->gone &&
-	player->Pushing && player->MovPos)
+    if (player->active && player->Pushing && player->MovPos)
     {
       int next_jx = player->jx + (player->jx - player->last_jx);
       int next_jy = player->jy + (player->jy - player->last_jy);
@@ -2097,7 +2090,7 @@ void StartMoving(int x, int y)
 
       if (left || right)
       {
-	if (left && right && game_emulation != EMU_BOULDERDASH)
+	if (left && right && game.emulation != EMU_BOULDERDASH)
 	  left = !(right = RND(2));
 
 	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
@@ -2429,22 +2422,24 @@ void ContinueMoving(int x, int y)
     else if (Store[x][y] == EL_SIEB_VOLL)
     {
       Store[x][y] = 0;
-      element = Feld[newx][newy] = (SiebAktiv ? EL_SIEB_VOLL : EL_SIEB_TOT);
+      element = Feld[newx][newy] =
+	(game.magic_wall_active ? EL_SIEB_VOLL : EL_SIEB_TOT);
     }
     else if (Store[x][y] == EL_SIEB_LEER)
     {
       Store[x][y] = Store2[x][y] = 0;
-      Feld[x][y] = (SiebAktiv ? EL_SIEB_LEER : EL_SIEB_TOT);
+      Feld[x][y] = (game.magic_wall_active ? EL_SIEB_LEER : EL_SIEB_TOT);
     }
     else if (Store[x][y] == EL_SIEB2_VOLL)
     {
       Store[x][y] = 0;
-      element = Feld[newx][newy] = (SiebAktiv ? EL_SIEB2_VOLL : EL_SIEB2_TOT);
+      element = Feld[newx][newy] =
+	(game.magic_wall_active ? EL_SIEB2_VOLL : EL_SIEB2_TOT);
     }
     else if (Store[x][y] == EL_SIEB2_LEER)
     {
       Store[x][y] = Store2[x][y] = 0;
-      Feld[x][y] = (SiebAktiv ? EL_SIEB2_LEER : EL_SIEB2_TOT);
+      Feld[x][y] = (game.magic_wall_active ? EL_SIEB2_LEER : EL_SIEB2_TOT);
     }
     else if (Store[x][y] == EL_SALZSAEURE)
     {
@@ -2701,7 +2696,7 @@ void AmoebeAbleger(int ax, int ay)
     { 0, +1 }
   };
 
-  if (!level.tempo_amoebe)
+  if (!level.amoeba_speed)
   {
     Feld[ax][ay] = EL_AMOEBE_TOT;
     DrawLevelField(ax, ay);
@@ -2709,7 +2704,7 @@ void AmoebeAbleger(int ax, int ay)
   }
 
   if (!MovDelay[ax][ay])	/* start making new amoeba field */
-    MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25 / (1 + level.tempo_amoebe));
+    MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25 / (1 + level.amoeba_speed));
 
   if (MovDelay[ax][ay])		/* wait some time before making new amoeba */
   {
@@ -2764,7 +2759,7 @@ void AmoebeAbleger(int ax, int ay)
 
     if (newax == ax && neway == ay)		/* amoeba cannot grow */
     {
-      if (i == 4 && (!waiting_for_player || game_emulation == EMU_BOULDERDASH))
+      if (i == 4 && (!waiting_for_player || game.emulation == EMU_BOULDERDASH))
       {
 	Feld[ax][ay] = EL_AMOEBE_TOT;
 	DrawLevelField(ax, ay);
@@ -2775,7 +2770,7 @@ void AmoebeAbleger(int ax, int ay)
 	  if (element == EL_AMOEBE_VOLL)
 	    AmoebeUmwandeln(ax, ay);
 	  else if (element == EL_AMOEBE_BD)
-	    AmoebeUmwandelnBD(ax, ay, level.amoebe_inhalt);
+	    AmoebeUmwandelnBD(ax, ay, level.amoeba_content);
 	}
       }
       return;
@@ -2899,7 +2894,7 @@ void Life(int ax, int ay)
 void Ablenk(int x, int y)
 {
   if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = level.dauer_ablenk * FRAMES_PER_SECOND;
+    MovDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
 
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
@@ -3342,7 +3337,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   stored_player_action[player->index_nr] = 0;
   num_stored_actions++;
 
-  if (!player->active || player->gone || tape.pausing)
+  if (!player->active || tape.pausing)
     return;
 
   if (player_action)
@@ -3509,7 +3504,7 @@ void GameActions()
 
 #ifdef DEBUG
 #if 0
-  if (TimeFrames == 0 && !local_player->gone)
+  if (TimeFrames == 0 && local_player->active)
   {
     extern unsigned int last_RND();
 
@@ -3610,7 +3605,7 @@ void GameActions()
     else if (element == EL_SP_TERMINAL_ACTIVE)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
 
-    if (SiebAktiv)
+    if (game.magic_wall_active)
     {
       boolean sieb = FALSE;
       int jx = local_player->jx, jy = local_player->jy;
@@ -3637,15 +3632,15 @@ void GameActions()
     }
   }
 
-  if (SiebAktiv)
+  if (game.magic_wall_active)
   {
-    if (!(SiebCount % 4))
+    if (!(game.magic_wall_time_left % 4))
       PlaySoundLevel(sieb_x, sieb_y, SND_MIEP);
 
-    if (SiebCount > 0)
+    if (game.magic_wall_time_left > 0)
     {
-      SiebCount--;
-      if (!SiebCount)
+      game.magic_wall_time_left--;
+      if (!game.magic_wall_time_left)
       {
 	for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
 	{
@@ -3662,7 +3657,7 @@ void GameActions()
 	  }
 	}
 
-	SiebAktiv = FALSE;
+	game.magic_wall_active = FALSE;
       }
     }
   }
@@ -3704,8 +3699,7 @@ static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
   {
     int jx = stored_player[i].jx, jy = stored_player[i].jy;
 
-    if (!stored_player[i].active || stored_player[i].gone ||
-	&stored_player[i] == player)
+    if (!stored_player[i].active || &stored_player[i] == player)
       continue;
 
     min_x = MIN(min_x, jx);
@@ -3725,7 +3719,7 @@ static boolean AllPlayersInVisibleScreen()
   {
     int jx = stored_player[i].jx, jy = stored_player[i].jy;
 
-    if (!stored_player[i].active || stored_player[i].gone)
+    if (!stored_player[i].active)
       continue;
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
@@ -3798,7 +3792,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   int element;
   int can_move;
 
-  if (player->gone || (!dx && !dy))
+  if (!player->active || (!dx && !dy))
     return MF_NO_ACTION;
 
   player->MovDir = (dx < 0 ? MV_LEFT :
@@ -3860,7 +3854,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   int old_jx = jx, old_jy = jy;
   int moved = MF_NO_ACTION;
 
-  if (player->gone || (!dx && !dy))
+  if (!player->active || (!dx && !dy))
     return FALSE;
 
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
@@ -4004,7 +3998,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
   TestIfHeroHitsBadThing(jx, jy);
 
-  if (player->gone)
+  if (!player->active)
     RemoveHero(player);
 
   return moved;
@@ -4016,7 +4010,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   int last_jx = player->last_jx, last_jy = player->last_jy;
   int move_stepsize = TILEX / player->move_delay_value;
 
-  if (!player->active || player->gone || !player->MovPos)
+  if (!player->active || !player->MovPos)
     return;
 
   if (mode == SCROLL_INIT)
@@ -4263,7 +4257,7 @@ void KillHero(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
 
-  if (player->gone)
+  if (!player->active)
     return;
 
   if (IS_PFORTE(Feld[jx][jy]))
@@ -4277,7 +4271,7 @@ void BuryHero(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
 
-  if (player->gone)
+  if (!player->active)
     return;
 
   PlaySoundLevel(jx, jy, SND_AUTSCH);
@@ -4292,11 +4286,13 @@ void RemoveHero(struct PlayerInfo *player)
   int jx = player->jx, jy = player->jy;
   int i, found = FALSE;
 
-  player->gone = TRUE;
+  player->present = FALSE;
+  player->active = FALSE;
+
   StorePlayer[jx][jy] = 0;
 
   for (i=0; i<MAX_PLAYERS; i++)
-    if (stored_player[i].active && !stored_player[i].gone)
+    if (stored_player[i].active)
       found = TRUE;
 
   if (!found)
@@ -4715,7 +4711,7 @@ int DigField(struct PlayerInfo *player,
 
       if (IS_SB_ELEMENT(element) &&
 	  local_player->sokobanfields_still_needed == 0 &&
-	  game_emulation == EMU_SOKOBAN)
+	  game.emulation == EMU_SOKOBAN)
       {
 	player->LevelSolved = player->GameOver = TRUE;
 	PlaySoundLevel(x, y, SND_BUING);
@@ -4743,7 +4739,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
 
-  if (player->gone || !IN_LEV_FIELD(x, y))
+  if (!player->active || !IN_LEV_FIELD(x, y))
     return FALSE;
 
   if (dx && dy)
@@ -4778,7 +4774,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   int jx = player->jx, jy = player->jy;
   int element;
 
-  if (player->gone || player->MovPos)
+  if (!player->active || player->MovPos)
     return FALSE;
 
   element = Feld[jx][jy];
@@ -4800,7 +4796,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
 	     FS_SMALL, FC_YELLOW);
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
     {
-      if (game_emulation == EMU_SUPAPLEX)
+      if (game.emulation == EMU_SUPAPLEX)
 	DrawGraphic(SCREENX(jx), SCREENY(jy), GFX_SP_DISK_RED);
       else
 	DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), GFX_DYNAMIT);

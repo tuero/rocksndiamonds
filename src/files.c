@@ -287,11 +287,11 @@ static void setLevelInfoToDefaults()
       Feld[x][y] = Ur[x][y] = EL_ERDREICH;
 
   level.time = 100;
-  level.edelsteine = 0;
-  level.tempo_amoebe = 10;
-  level.dauer_sieb = 10;
-  level.dauer_ablenk = 10;
-  level.amoebe_inhalt = EL_DIAMANT;
+  level.gems_needed = 0;
+  level.amoeba_speed = 10;
+  level.time_magic_wall = 10;
+  level.time_wheel = 10;
+  level.amoeba_content = EL_DIAMANT;
   level.double_speed = FALSE;
   level.gravity = FALSE;
 
@@ -306,11 +306,11 @@ static void setLevelInfoToDefaults()
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
 
-  MampferMax = 4;
-  for(i=0; i<8; i++)
+  level.num_yam_contents = STD_ELEMENT_CONTENTS;
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
-	level.mampfer_inhalt[i][x][y] = EL_FELSBROCKEN;
+	level.yam_content[i][x][y] = EL_FELSBROCKEN;
 
   Feld[0][0] = Ur[0][0] = EL_SPIELFIGUR;
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
@@ -397,35 +397,35 @@ void LoadLevel(int level_nr)
   lev_fieldx = level.fieldx = fgetc(file);
   lev_fieldy = level.fieldy = fgetc(file);
 
-  level.time		= (fgetc(file)<<8) | fgetc(file);
-  level.edelsteine	= (fgetc(file)<<8) | fgetc(file);
+  level.time        = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  level.gems_needed = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    level.name[i]	= fgetc(file);
+    level.name[i] = fgetc(file);
   level.name[MAX_LEVEL_NAME_LEN] = 0;
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    level.score[i]	= fgetc(file);
+    level.score[i] = fgetc(file);
 
-  MampferMax = 4;
-  for(i=0; i<8; i++)
+  level.num_yam_contents = STD_ELEMENT_CONTENTS;
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
   {
     for(y=0; y<3; y++)
     {
       for(x=0; x<3; x++)
       {
-	if (i < 4)
-	  level.mampfer_inhalt[i][x][y] = fgetc(file);
+	if (i < STD_ELEMENT_CONTENTS)
+	  level.yam_content[i][x][y] = fgetc(file);
 	else
-	  level.mampfer_inhalt[i][x][y] = EL_LEERRAUM;
+	  level.yam_content[i][x][y] = EL_LEERRAUM;
       }
     }
   }
 
-  level.tempo_amoebe	= fgetc(file);
-  level.dauer_sieb	= fgetc(file);
-  level.dauer_ablenk	= fgetc(file);
-  level.amoebe_inhalt	= fgetc(file);
+  level.amoeba_speed	= fgetc(file);
+  level.time_magic_wall	= fgetc(file);
+  level.time_wheel	= fgetc(file);
+  level.amoeba_content	= fgetc(file);
   level.double_speed	= (fgetc(file) == 1 ? TRUE : FALSE);
   level.gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
 
@@ -448,17 +448,18 @@ void LoadLevel(int level_nr)
     }
 
     /* look for optional content chunk */
-    if (strcmp(chunk, "CONT") == 0 && chunk_length == 4 + 8 * 3 * 3)
+    if (strcmp(chunk, "CONT") == 0 &&
+	chunk_length == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
     {
       fgetc(file);
-      MampferMax = fgetc(file);
+      level.num_yam_contents = fgetc(file);
       fgetc(file);
       fgetc(file);
 
-      for(i=0; i<8; i++)
+      for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
-	    level.mampfer_inhalt[i][x][y] = fgetc(file);
+	    level.yam_content[i][x][y] = fgetc(file);
 
       getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     }
@@ -513,23 +514,22 @@ void SaveLevel(int level_nr)
 
   fputc(level.fieldx, file);
   fputc(level.fieldy, file);
-  fputc(level.time / 256, file);
-  fputc(level.time % 256, file);
-  fputc(level.edelsteine / 256, file);
-  fputc(level.edelsteine % 256, file);
+
+  putFile16BitInteger(file, level.time, BYTE_ORDER_BIG_ENDIAN);
+  putFile16BitInteger(file, level.gems_needed, BYTE_ORDER_BIG_ENDIAN);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     fputc(level.name[i], file);
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     fputc(level.score[i], file);
-  for(i=0; i<4; i++)
+  for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc(level.mampfer_inhalt[i][x][y], file);
-  fputc(level.tempo_amoebe, file);
-  fputc(level.dauer_sieb, file);
-  fputc(level.dauer_ablenk, file);
-  fputc(level.amoebe_inhalt, file);
+	fputc(level.yam_content[i][x][y], file);
+  fputc(level.amoeba_speed, file);
+  fputc(level.time_magic_wall, file);
+  fputc(level.time_wheel, file);
+  fputc(level.amoeba_content, file);
   fputc((level.double_speed ? 1 : 0), file);
   fputc((level.gravity ? 1 : 0), file);
 
@@ -541,17 +541,18 @@ void SaveLevel(int level_nr)
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
     fputc(level.author[i], file);
 
-  putFileChunk(file, "CONT", 4 + 8 * 3 * 3, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunk(file, "CONT", 4 + MAX_ELEMENT_CONTENTS * 3 * 3,
+	       BYTE_ORDER_BIG_ENDIAN);
 
   fputc(EL_MAMPFER, file);
-  fputc(MampferMax, file);
+  fputc(level.num_yam_contents, file);
   fputc(0, file);
   fputc(0, file);
 
-  for(i=0; i<8; i++)
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc(level.mampfer_inhalt[i][x][y], file);
+	fputc(level.yam_content[i][x][y], file);
 
   putFileChunk(file, "BODY", lev_fieldx * lev_fieldy, BYTE_ORDER_BIG_ENDIAN);
 
@@ -606,11 +607,7 @@ void LoadTape(int level_nr)
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    /* first check header chunk identifier and chunk length */
-    fgets(chunk, CHUNK_ID_LEN + 1, file);
-    chunk_length =
-      (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     if (strcmp(chunk, "HEAD") || chunk_length != TAPE_HEADER_SIZE)
     {
       Error(ERR_WARN, "wrong 'HEAD' chunk of tape file '%s'", filename);
@@ -619,12 +616,9 @@ void LoadTape(int level_nr)
     }
   }
 
-  tape.random_seed =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-  tape.date =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
-  tape.length =
-    (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
+  tape.random_seed = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  tape.date        = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  tape.length      = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
 
   /* read header fields that are new since version 1.2 */
   if (file_version >= FILE_VERSION_1_2)
@@ -659,10 +653,7 @@ void LoadTape(int level_nr)
   /* read chunk "BODY" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    /* next check body chunk identifier and chunk length */
-    fgets(chunk, CHUNK_ID_LEN + 1, file);
-    chunk_length =
-      (fgetc(file)<<24) | (fgetc(file)<<16) | (fgetc(file)<<8) | fgetc(file);
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     if (strcmp(chunk, "BODY") ||
 	chunk_length != (num_participating_players + 1) * tape.length)
     {
@@ -735,7 +726,6 @@ void SaveTape(int level_nr)
   boolean new_tape = TRUE;
   byte store_participating_players;
   int num_participating_players;
-  int chunk_length;
 
   InitTapeDirectory(leveldir[leveldir_nr].filename);
 
@@ -768,42 +758,19 @@ void SaveTape(int level_nr)
   fputs(TAPE_COOKIE, file);		/* file identifier */
   fputc('\n', file);
 
-  fputs("HEAD", file);			/* chunk identifier for file header */
+  putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
 
-  chunk_length = TAPE_HEADER_SIZE;
-
-  fputc((chunk_length >>  24) & 0xff, file);
-  fputc((chunk_length >>  16) & 0xff, file);
-  fputc((chunk_length >>   8) & 0xff, file);
-  fputc((chunk_length >>   0) & 0xff, file);
-
-  fputc((tape.random_seed >> 24) & 0xff, file);
-  fputc((tape.random_seed >> 16) & 0xff, file);
-  fputc((tape.random_seed >>  8) & 0xff, file);
-  fputc((tape.random_seed >>  0) & 0xff, file);
-
-  fputc((tape.date >>  24) & 0xff, file);
-  fputc((tape.date >>  16) & 0xff, file);
-  fputc((tape.date >>   8) & 0xff, file);
-  fputc((tape.date >>   0) & 0xff, file);
-
-  fputc((tape.length >>  24) & 0xff, file);
-  fputc((tape.length >>  16) & 0xff, file);
-  fputc((tape.length >>   8) & 0xff, file);
-  fputc((tape.length >>   0) & 0xff, file);
+  putFile32BitInteger(file, tape.random_seed, BYTE_ORDER_BIG_ENDIAN);
+  putFile32BitInteger(file, tape.date, BYTE_ORDER_BIG_ENDIAN);
+  putFile32BitInteger(file, tape.length, BYTE_ORDER_BIG_ENDIAN);
 
   fputc(store_participating_players, file);
 
   for(i=0; i<TAPE_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
     fputc(0, file);
 
-  fputs("BODY", file);			/* chunk identifier for file body */
-  chunk_length = (num_participating_players + 1) * tape.length;
-
-  fputc((chunk_length >>  24) & 0xff, file);
-  fputc((chunk_length >>  16) & 0xff, file);
-  fputc((chunk_length >>   8) & 0xff, file);
-  fputc((chunk_length >>   0) & 0xff, file);
+  putFileChunk(file, "BODY", (num_participating_players + 1) * tape.length,
+	       BYTE_ORDER_BIG_ENDIAN);
 
   for(i=0; i<tape.length; i++)
   {
