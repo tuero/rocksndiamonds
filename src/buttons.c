@@ -1810,6 +1810,7 @@ void HandleGadgets(int mx, int my, int button)
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_PRESSED;
     gi->event.button = button;
+    gi->event.off_borders = FALSE;
 
     /* initialize delay counter */
     pressed_delay = 0;
@@ -1833,7 +1834,7 @@ void HandleGadgets(int mx, int my, int button)
 
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_MOVING;
-
+    gi->event.off_borders = FALSE;
     if (gi->event_mask & GD_EVENT_MOVING)
       gi->callback(gi);
   }
@@ -1845,6 +1846,7 @@ void HandleGadgets(int mx, int my, int button)
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_MOVING;
+    gi->event.off_borders = TRUE;
 
     if (gi->event_mask & GD_EVENT_MOVING)
       gi->callback(gi);

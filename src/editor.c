@@ -1973,16 +1973,12 @@ static void RandomPlacement(int button)
 static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
-  boolean inside_drawing_area;
+  boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
   boolean button_release_event;
   int new_element;
   int button = gi->event.button;
-  int mx = SX + gi->event.x * MINI_TILEX;
-  int my = SX + gi->event.y * MINI_TILEY;
-  int min_mx = SX, max_mx = SX + SXSIZE -1;
-  int min_my = SY, max_my = SY + SYSIZE -1;
-  int sx, sy;
+  int sx = gi->event.x, sy = gi->event.y;
   int lx, ly;
   int x, y;
 
@@ -1992,13 +1988,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
-  inside_drawing_area =
-    (mx >= min_mx && mx <= max_mx && my >= min_my && my <= max_my);
-
-  mx = (mx < min_mx ? min_mx : mx > max_mx ? max_mx : mx);
-  my = (my < min_my ? min_my : my > max_my ? max_my : my);
-  sx = (mx - SX) / MINI_TILEX; 
-  sy = (my - SY) / MINI_TILEY; 
+  sx = (sx < 0 ? 0 : sx > 2*SCR_FIELDX - 1 ? 2*SCR_FIELDX - 1 : sx);
+  sy = (sy < 0 ? 0 : sy > 2*SCR_FIELDY - 1 ? 2*SCR_FIELDY - 1 : sy);
   lx = sx + level_xpos;
   ly = sy + level_ypos;
 
@@ -2008,8 +1999,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   if (!started_inside_drawing_area)
     return;
 
-  printf("%d,%d, %d,%d, %d,%d, %d,%d.\n",
-	 gi->event.x, gi->event.y, mx, my, sx, sy, lx, ly);
+  printf("%d,%d, %d,%d, %d,%d.\n",
+	 gi->event.x, gi->event.y, sx, sy, lx, ly);
 
   if ((!button && !button_release_event) ||
       sx > lev_fieldx || sy > lev_fieldy ||
