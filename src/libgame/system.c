@@ -515,6 +515,23 @@ inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
   return fullscreen;
 }
 
+Bitmap *LoadImage(char *basename)
+{
+  Bitmap *new_bitmap;
+  char filename[256];
+
+  sprintf(filename, "%s/%s/%s",
+	  options.ro_base_directory, GRAPHICS_DIRECTORY, basename);
+
+#if defined(TARGET_SDL)
+  new_bitmap = SDLLoadImage(filename);
+#else
+  new_bitmap = X11LoadImage(filename);
+#endif
+
+  return new_bitmap;
+}
+
 
 /* ========================================================================= */
 /* audio functions                                                           */

@@ -12,6 +12,7 @@
 ***********************************************************/
 
 #include "system.h"
+#include "pcx.h"
 #include "misc.h"
 
 
@@ -232,6 +233,47 @@ static DrawWindow *X11InitWindow()
   }
 
   return new_window;
+}
+
+Bitmap *X11LoadImage(char *filename)
+{
+  Bitmap *new_bitmap = CreateBitmapStruct();
+  int pcx_err;
+
+#if defined(PLATFORM_MSDOS)
+  rest(100);
+#endif
+
+  pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc, filename,
+			       &new_bitmap->drawable, &new_bitmap->clip_mask);
+  switch(pcx_err)
+  {
+    case PCX_Success:
+      break;
+    case PCX_OpenFailed:
+      Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
+    case PCX_ReadFailed:
+      Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
+    case PCX_FileInvalid:
+      Error(ERR_EXIT, "invalid PCX file '%s'", filename);
+    case PCX_NoMemory:
+      Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
+    case PCX_ColorFailed:
+      Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
+    default:
+      break;
+  }
+
+  if (!new_bitmap->drawable)
+    Error(ERR_EXIT, "cannot get graphics for '%s'", filename);
+
+  if (!new_bitmap->clip_mask)
+    Error(ERR_EXIT, "cannot get clipmask for '%s'", filename);
+
+  /* set GraphicContext inheritated from Window */
+  new_bitmap->gc = window->gc;
+
+  return new_bitmap;
 }
 
 #endif /* TARGET_X11 */

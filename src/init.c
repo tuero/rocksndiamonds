@@ -27,12 +27,6 @@
 #include "network.h"
 #include "netserv.h"
 
-struct PictureFileInfo
-{
-  char *picture_filename;
-  boolean picture_with_mask;
-};
-
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
@@ -41,7 +35,6 @@ static void InitSoundServer(void);
 static void InitDisplay(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
-static void LoadGfx(int, struct PictureFileInfo *);
 static void InitGadgets(void);
 static void InitElementProperties(void);
 
@@ -333,32 +326,32 @@ void InitGfx()
 #endif
 
 #if !defined(PLATFORM_MSDOS)
-  static struct PictureFileInfo pic[NUM_PICTURES] =
+  static char *image_filename[NUM_PICTURES] =
   {
-    { "RocksScreen",	TRUE },
-    { "RocksDoor",	TRUE },
-    { "RocksHeroes",	TRUE },
-    { "RocksToons",	TRUE },
-    { "RocksSP",	TRUE },
-    { "RocksDC",	TRUE },
-    { "RocksMore",	TRUE },
-    { "RocksFont",	FALSE },
-    { "RocksFont2",	FALSE },
-    { "RocksFont3",	FALSE }
+    "RocksScreen.pcx",
+    "RocksDoor.pcx",
+    "RocksHeroes.pcx",
+    "RocksToons.pcx",
+    "RocksSP.pcx",
+    "RocksDC.pcx",
+    "RocksMore.pcx",
+    "RocksFont.pcx",
+    "RocksFont2.pcx",
+    "RocksFont3.pcx"
   }; 
 #else
-  static struct PictureFileInfo pic[NUM_PICTURES] =
+  static char *image_filename[NUM_PICTURES] =
   {
-    { "Screen",	TRUE },
-    { "Door",	TRUE },
-    { "Heroes",	TRUE },
-    { "Toons",	TRUE },
-    { "SP",	TRUE },
-    { "DC",	TRUE },
-    { "More",	TRUE },
-    { "Font",	FALSE },
-    { "Font2",	FALSE },
-    { "Font3",	FALSE }
+    "Screen.pcx",
+    "Door.pcx",
+    "Heroes.pcx",
+    "Toons.pcx",
+    "SP.pcx",
+    "DC.pcx",
+    "More.pcx",
+    "Font.pcx",
+    "Font2.pcx",
+    "Font3.pcx"
   }; 
 #endif
 
@@ -432,7 +425,7 @@ void InitGfx()
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 
-  LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
+  pix[PIX_SMALLFONT] = LoadImage(image_filename[PIX_SMALLFONT]);
   InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
@@ -444,8 +437,13 @@ void InitGfx()
   DrawInitText("Loading graphics:",120,FC_GREEN);
 
   for(i=0; i<NUM_PICTURES; i++)
+  {
     if (i != PIX_SMALLFONT)
-      LoadGfx(i,&pic[i]);
+    {
+      DrawInitText(image_filename[i], 150, FC_YELLOW);
+      pix[i] = LoadImage(image_filename[i]);
+    }
+  }
 
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
 
@@ -566,94 +564,6 @@ void InitGfxBackground()
       redraw[x][y] = 0;
   redraw_tiles = 0;
   redraw_mask = REDRAW_ALL;
-}
-
-void LoadGfx(int pos, struct PictureFileInfo *pic)
-{
-  char basefilename[256];
-  char filename[256];
-
-#if defined(TARGET_SDL)
-  SDL_Surface *sdl_image_tmp;
-#else
-  int pcx_err;
-#endif
-  char *picture_ext = ".pcx";
-
-  /* Grafik laden */
-  if (pic->picture_filename)
-  {
-    sprintf(basefilename, "%s%s", pic->picture_filename, picture_ext);
-    DrawInitText(basefilename, 150, FC_YELLOW);
-    sprintf(filename, "%s/%s/%s",
-	    options.ro_base_directory, GRAPHICS_DIRECTORY, basefilename);
-
-#if defined(PLATFORM_MSDOS)
-    rest(100);
-#endif
-
-    pix[pos] = CreateBitmapStruct();
-
-#if defined(TARGET_SDL)
-    /* load image to temporary surface */
-    if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-      Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
-
-    /* create native non-transparent surface for current image */
-    if ((pix[pos]->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-    /* create native transparent surface for current image */
-    SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
-		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
-    if ((pix[pos]->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-      Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-    /* free temporary surface */
-    SDL_FreeSurface(sdl_image_tmp);
-
-#else /* !TARGET_SDL */
-
-    pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc,
-				 filename,
-				 &pix[pos]->drawable, &pix[pos]->clip_mask);
-    switch(pcx_err)
-    {
-      case PCX_Success:
-        break;
-      case PCX_OpenFailed:
-        Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
-      case PCX_ReadFailed:
-        Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
-      case PCX_FileInvalid:
-	Error(ERR_EXIT, "invalid PCX file '%s'", filename);
-      case PCX_NoMemory:
-	Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
-      case PCX_ColorFailed:
-	Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
-      default:
-	break;
-    }
-
-    if (!pix[pos]->drawable)
-      Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
-
-    pix[pos]->gc = window->gc;
-
-#if 0
-    /* setting pix_masked[] to pix[] allows BlitBitmapMasked() to always
-       use pix_masked[], although they are the same when not using SDL */
-    pix_masked[pos] = pix[pos];
-#endif
-
-#endif /* !TARGET_SDL */
-  }
-
-#if defined(TARGET_X11)
-  /* check if clip mask was correctly created */
-  if (pic->picture_with_mask && !pix[pos]->clip_mask)
-    Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
-#endif
 }
 
 void InitGadgets()

@@ -678,6 +678,31 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
 
+Bitmap *SDLLoadImage(char *filename)
+{
+  Bitmap *new_bitmap = CreateBitmapStruct();
+  SDL_Surface *sdl_image_tmp;
+
+  /* load image to temporary surface */
+  if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
+    Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
+
+  /* create native non-transparent surface for current image */
+  if ((new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  /* create native transparent surface for current image */
+  SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
+		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+  if ((new_bitmap->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  /* free temporary surface */
+  SDL_FreeSurface(sdl_image_tmp);
+
+  return new_bitmap;
+}
+
 
 /* ========================================================================= */
 /* audio functions                                                           */

@@ -286,6 +286,8 @@ inline boolean PointerInWindow(DrawWindow *);
 inline boolean SetVideoMode(boolean);
 inline boolean ChangeVideoModeIfNeeded(boolean);
 
+Bitmap *LoadImage(char *);
+
 inline boolean OpenAudio(struct AudioSystemInfo *);
 inline void CloseAudio(struct AudioSystemInfo *);
 inline void SetAudioMode(boolean);

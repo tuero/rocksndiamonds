@@ -288,5 +288,6 @@ struct XY
 
 inline void X11InitVideoDisplay(void);
 inline void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
+Bitmap *X11LoadImage(char *);
 
 #endif /* X11_H */

@@ -324,6 +324,8 @@ inline void SDLDrawLine(SDL_Surface *, int, int, int, int, Uint32);
 /* functions from SGE library */
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
+Bitmap *SDLLoadImage(char *);
+
 inline boolean SDLOpenAudio(void);
 inline void SDLCloseAudio(void);
 
