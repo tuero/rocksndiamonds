@@ -1459,12 +1459,19 @@ extern struct FileInfo	       *image_files, *sound_files;
 #define NUM_SOUNDS		55
 
 
+/* values for image configuration suffixes */
+#define GFXARG_FRAME_XPOS			0
+#define GFXARG_FRAME_YPOS			1
+#define GFXARG_NUM_FRAMES			2
+
 /* values for image configuration */
 #define GFX_BD_DIAMOND				0
 #define GFX_ROBOT_WHEEL				1
 
 #define NUM_IMAGE_FILES				2
 
+/* values for sound configuration suffixes */
+/* (currently none) */
 
 /* values for sound configuration */
 #define SND_BD_EMPTY_SPACE_DIGGING		0

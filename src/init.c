@@ -858,7 +858,8 @@ static void InitGraphicInfo()
 
   image_files = getCurrentImageList();
 
-  printf("--> %d\n", image_files[0].parameter[2]);
+  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFXARG_NUM_FRAMES]);
+  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFXARG_NUM_FRAMES]);
 
   for(i=0; i<MAX_GRAPHICS; i++)
   {
@@ -873,6 +874,22 @@ static void InitGraphicInfo()
     getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
   }
+
+#if 1
+  graphic_info[GFX_ABLENK].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
+  graphic_info[GFX_ABLENK].src_x = 0;
+  graphic_info[GFX_ABLENK].src_y = 0;
+
+  graphic_info[GFX_ABLENK + 1].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
+  graphic_info[GFX_ABLENK + 2].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
+  graphic_info[GFX_ABLENK + 3].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
+  graphic_info[GFX_ABLENK + 1].src_x = 1 * TILEX;
+  graphic_info[GFX_ABLENK + 2].src_x = 2 * TILEX;
+  graphic_info[GFX_ABLENK + 3].src_x = 3 * TILEX;
+  graphic_info[GFX_ABLENK + 1].src_y = 0;
+  graphic_info[GFX_ABLENK + 2].src_y = 0;
+  graphic_info[GFX_ABLENK + 3].src_y = 0;
+#endif
 }
 
 static void InitSoundInfo()

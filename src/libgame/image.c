@@ -700,6 +700,13 @@ struct FileInfo *getCurrentImageList()
   return image_info->file_list;
 }
 
+Bitmap *getBitmapFromImageID(int graphic)
+{
+  ImageInfo **img_info = (ImageInfo **)image_info->artwork_list;
+
+  return img_info[graphic]->bitmap;
+}
+
 void InitImageList(struct ConfigInfo *config_list,
 		   struct ConfigInfo *config_suffix_list,
 		   int num_file_list_entries)
