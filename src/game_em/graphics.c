@@ -127,150 +127,136 @@ static void animscreen(void)
 
 static void blitplayer(struct PLAYER *ply)
 {
-  unsigned int x, y, dx, dy;
-  unsigned short obj, spr;
+  int dx, dy;
+  int old_x, old_y, new_x, new_y;
   int src_x, src_y, dst_x, dst_y;
+  int tile;
+  struct GraphicInfo_EM *g;
+  unsigned int x1, y1, x2, y2;
+#if 1
+  unsigned short spr;
+#else
+  unsigned short obj, spr;
+#endif
 
   if (!ply->alive)
     return;
 
-  x = (frame * ply->oldx + (8 - frame) * ply->x) * TILEX / 8;
-  y = (frame * ply->oldy + (8 - frame) * ply->y) * TILEY / 8;
-  dx = x + TILEX - 1;
-  dy = y + TILEY - 1;
+  /* some casts to "int" are needed because of negative calculation values */
+  dx = (int)ply->x - (int)ply->oldx;
+  dy = (int)ply->y - (int)ply->oldy;
+  old_x = (int)ply->oldx + (7 - (int)frame) * dx / 8;
+  old_y = (int)ply->oldy + (7 - (int)frame) * dy / 8;
+  new_x = old_x + SIGN(dx);
+  new_y = old_y + SIGN(dy);
 
-  if ((unsigned int)(dx - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
-      (unsigned int)(dy - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
+  /* x1/y1 are left/top and x2/y2 are right/down part of the player movement */
+  x1 = (frame * ply->oldx + (8 - frame) * ply->x) * TILEX / 8;
+  y1 = (frame * ply->oldy + (8 - frame) * ply->y) * TILEY / 8;
+  x2 = x1 + TILEX - 1;
+  y2 = y1 + TILEY - 1;
+
+  if ((unsigned int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
+      (unsigned int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
   {
     spr = map_spr[ply->num][frame][ply->anim];
-    x  %= MAX_BUF_XSIZE * TILEX;
-    y  %= MAX_BUF_YSIZE * TILEY;
-    dx %= MAX_BUF_XSIZE * TILEX;
-    dy %= MAX_BUF_YSIZE * TILEY;
+    x1 %= MAX_BUF_XSIZE * TILEX;
+    y1 %= MAX_BUF_YSIZE * TILEY;
+    x2 %= MAX_BUF_XSIZE * TILEX;
+    y2 %= MAX_BUF_YSIZE * TILEY;
 
 #if 1
     /* draw the player to current location */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-	       x, y);
+	       x1, y1);
     /* draw the player to opposite wrap-around column */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-	       x - MAX_BUF_XSIZE * TILEX, y),
+	       x1 - MAX_BUF_XSIZE * TILEX, y1),
     /* draw the player to opposite wrap-around row */
     BlitBitmap(sprBitmap, screenBitmap,
 	       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-	       x, y - MAX_BUF_YSIZE * TILEY);
+	       x1, y1 - MAX_BUF_YSIZE * TILEY);
 
     /* draw the field the player is moving from (masked over the player) */
-    obj = screentiles[y / TILEY][x / TILEX];
+#if 0
+    obj = screentiles[y1 / TILEY][x1 / TILEX];
     src_x = (obj / 512) * TILEX;
     src_y = (obj % 512) * TILEY / 16;
-    dst_x = (x / TILEX) * TILEX;
-    dst_y = (y / TILEY) * TILEY;
+    dst_x = (x1 / TILEX) * TILEX;
+    dst_y = (y1 / TILEY) * TILEY;
+#endif
 
 #if 1
-#if 0
+    tile = Draw[old_y][old_x];
+    g = &graphic_info_em[tile][frame];
+
+    if (g->width > 0 && g->height > 0)
     {
-      int tile = Draw[ply->oldy][ply->oldx];
-      struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
+      src_x = g->src_x + g->src_offset_x;
+      src_y = g->src_y + g->src_offset_y;
+      dst_x = old_x % MAX_BUF_XSIZE * TILEX + g->dst_offset_x;
+      dst_y = old_y % MAX_BUF_YSIZE * TILEY + g->dst_offset_y;
 
-      if (g->width > 0 && g->height > 0)
-      {
-	src_x = g->src_x + g->src_offset_x;
-	src_y = g->src_y + g->src_offset_y;
-	dst_x = ply->oldx % MAX_BUF_XSIZE * TILEX + g->dst_offset_x;
-	dst_y = ply->oldy % MAX_BUF_YSIZE * TILEY + g->dst_offset_y;
-
-	SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		      dst_x - src_x, dst_y - src_y);
-	BlitBitmapMasked(g->bitmap, screenBitmap,
-			 src_x, src_y, g->width, g->height, dst_x, dst_y);
-      }
+      SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
+      BlitBitmapMasked(g->bitmap, screenBitmap,
+		       src_x, src_y, g->width, g->height, dst_x, dst_y);
     }
 #else
     SetClipOrigin(objBitmap, objBitmap->stored_clip_gc,
 		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(objBitmap, screenBitmap,
 		     src_x, src_y, TILEX, TILEY, dst_x, dst_y);
-#endif
 #endif
 
     /* draw the field the player is moving to (masked over the player) */
-    obj = screentiles[dy / TILEY][dx / TILEX];
+#if 0
+    obj = screentiles[y2 / TILEY][x2 / TILEX];
     src_x = (obj / 512) * TILEX;
     src_y = (obj % 512) * TILEY / 16;
-    dst_x = (dx / TILEX) * TILEX;
-    dst_y = (dy / TILEY) * TILEY;
+    dst_x = (x2 / TILEX) * TILEX;
+    dst_y = (y2 / TILEY) * TILEY;
+#endif
 
 #if 1
-#if 1
+    tile = Draw[new_y][new_x];
+    g = &graphic_info_em[tile][frame];
+
+    if (g->width > 0 && g->height > 0)
     {
-      /*
-	d? == 1:
-	  0-3: 0, 1
-	  4-7: 0, 1
+      src_x = g->src_x + g->src_offset_x;
+      src_y = g->src_y + g->src_offset_y;
+      dst_x = new_x % MAX_BUF_XSIZE * TILEX + g->dst_offset_x;
+      dst_y = new_y % MAX_BUF_YSIZE * TILEY + g->dst_offset_y;
 
-	d? == 2:
-	  0-3: 0, 1
-	  4-7: 1, 2
-       */
-
-      int dx = (ply->x - ply->oldx);
-      int dy = (ply->y - ply->oldy);
-      int old_x = ply->oldx  ;
-      int old_y = ply->oldy  ;
-      int new_x = ply->oldx  ;
-      int new_y = ply->oldy  ;
-      int xxx = (frame * ply->oldx + (8 - frame) * ply->x) / 8;
-      int yyy = (frame * ply->oldy + (8 - frame) * ply->y) / 8;
-      int tileXXX = Draw[ply->y][ply->x];
-      int tile = Draw[ply->y][ply->x];
-      struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
-      int xx = ply->x - 1, yy = ply->y;
-
-      printf("::: %d: %d,%d -> %d,%d: %d, %d, %d, %d [%d,%d] <-> ",
-	     frame, ply->oldx, ply->oldy, ply->x, ply->y,
-	     src_x, src_y, dst_x, dst_y, xxx, yyy);
-
-      if (g->width > 0 && g->height > 0)
-      {
-	src_x = g->src_x + g->src_offset_x;
-	src_y = g->src_y + g->src_offset_y;
-	dst_x = ply->x % MAX_BUF_XSIZE * TILEX + g->dst_offset_x;
-	dst_y = ply->y % MAX_BUF_YSIZE * TILEY + g->dst_offset_y;
-
-	SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		      dst_x - src_x, dst_y - src_y);
-	BlitBitmapMasked(g->bitmap, screenBitmap,
-			 src_x, src_y, g->width, g->height, dst_x, dst_y);
-
-	printf("::: %d, %d, %d, %d\n",
-	       src_x, src_y, dst_x, dst_y);
-      }
+      SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
+      BlitBitmapMasked(g->bitmap, screenBitmap,
+		       src_x, src_y, g->width, g->height, dst_x, dst_y);
     }
 #else
     SetClipOrigin(objBitmap, objBitmap->stored_clip_gc,
 		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(objBitmap, screenBitmap,
 		     src_x, src_y, TILEX, TILEY, dst_x, dst_y);
-#endif
 #endif
 
 #else
 
     if (objmaskBitmap)
     {
-      obj = screentiles[y / TILEY][x / TILEX];
+      obj = screentiles[y1 / TILEY][x1 / TILEX];
       XCopyArea(display, objmaskBitmap, spriteBitmap, spriteGC,
 		(obj / 512) * TILEX, (obj % 512) * TILEY / 16, TILEX, TILEY,
-		-(x % TILEX), -(y % TILEY));
+		-(x1 % TILEX), -(y1 % TILEY));
 
-      obj = screentiles[dy / TILEY][dx / TILEX];
+      obj = screentiles[y2 / TILEY][x2 / TILEX];
       XCopyArea(display, objmaskBitmap, spriteBitmap, spriteGC,
 		(obj / 512) * TILEX, (obj % 512) * TILEY / 16, TILEX, TILEY,
-		(MAX_BUF_XSIZE * TILEX - x) % TILEX,
-		(MAX_BUF_YSIZE * TILEY - y) % TILEY);
+		(MAX_BUF_XSIZE * TILEX - x1) % TILEX,
+		(MAX_BUF_YSIZE * TILEY - y1) % TILEY);
     }
     else if (sprmaskBitmap)
     {
@@ -287,25 +273,26 @@ static void blitplayer(struct PLAYER *ply)
     SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc, x, y);
     BlitBitmapMasked(sprBitmap, screenBitmap,
 		     (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-		     x, y);
+		     x1, y1);
 
     SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc,
 		  x - MAX_BUF_XSIZE * TILEX, y);
     BlitBitmapMasked(sprBitmap, screenBitmap,
 		     (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-		     x - MAX_BUF_XSIZE * TILEX, y);
+		     x1 - MAX_BUF_XSIZE * TILEX, y1);
 
     SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc,
-		  x, y - MAX_BUF_YSIZE * TILEY);
+		  x1, y1 - MAX_BUF_YSIZE * TILEY);
     BlitBitmapMasked(sprBitmap, screenBitmap,
 		     (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
-		     x, y - MAX_BUF_YSIZE * TILEY);
+		     x1, y1 - MAX_BUF_YSIZE * TILEY);
 
     SetClipMask(sprBitmap, sprBitmap->stored_clip_gc, None);
 #endif
 
-    screentiles[y / TILEY][x / TILEX] = -1;	/* mark screen as dirty */
-    screentiles[dy / TILEY][dx / TILEX] = -1;
+    /* mark screen tiles as dirty */
+    screentiles[y1 / TILEY][x1 / TILEX] = -1;
+    screentiles[y2 / TILEY][x2 / TILEX] = -1;
   }
 }
 

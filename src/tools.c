@@ -721,26 +721,29 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
   }
 #endif
 
-  getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
-
-  src_x += cx;
-  src_y += cy;
-
-  dst_x = FX + x * TILEX + dx;
-  dst_y = FY + y * TILEY + dy;
-
-  if (mask_mode == USE_MASKING)
+  if (width > 0 && height > 0)
   {
-    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
-    BlitBitmapMasked(src_bitmap, drawto_field, src_x, src_y, width, height,
-		     dst_x, dst_y);
-  }
-  else
-    BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
-	       dst_x, dst_y);
+    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  MarkTileDirty(x, y);
+    src_x += cx;
+    src_y += cy;
+
+    dst_x = FX + x * TILEX + dx;
+    dst_y = FY + y * TILEY + dy;
+
+    if (mask_mode == USE_MASKING)
+    {
+      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
+      BlitBitmapMasked(src_bitmap, drawto_field, src_x, src_y, width, height,
+		       dst_x, dst_y);
+    }
+    else
+      BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
+		 dst_x, dst_y);
+
+    MarkTileDirty(x, y);
+  }
 }
 
 inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
@@ -802,6 +805,12 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
 
     MarkTileDirty(x2, y2);
   }
+
+#if 0
+  printf("::: DONE DrawGraphicShiftedDouble");
+  BackToFront();
+  Delay(1000);
+#endif
 }
 
 static void DrawGraphicShifted(int x, int y, int dx, int dy,
@@ -1998,13 +2007,38 @@ void DrawPlayer(struct PlayerInfo *player)
   if (player->is_pushing && player_is_moving)
 #endif
   {
+#if 1
+    int px = SCREENX(jx), py = SCREENY(jy);
+    int pxx = (TILEX - ABS(sxx)) * dx;
+    int pyy = (TILEY - ABS(syy)) * dy;
+#else
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
+    int pxx = sxx;
+    int pyy = syy;
+#endif
+
+#if 1
+    int graphic;
+    int frame;
+
+    if (!IS_MOVING(jx, jy))		/* push movement already finished */
+      element = Feld[next_jx][next_jy];
+
+    graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+    frame = getGraphicAnimationFrame(graphic, player->StepFrame);
 
     if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
-    if ((sxx || syy) && element == EL_SOKOBAN_OBJECT)
-      DrawGraphicShiftedThruMask(px, py, sxx, syy, IMG_SOKOBAN_OBJECT, 0,
+    /* masked drawing is needed for EMC style (double) movement graphics */
+    DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
+
+#else
+    if (Back[next_jx][next_jy])
+      DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+
+    if ((pxx || pyy) && element == EL_SOKOBAN_OBJECT)
+      DrawGraphicShiftedThruMask(px, py, pxx, pyy, IMG_SOKOBAN_OBJECT, 0,
 				 NO_CUTTING);
     else
     {
@@ -2016,9 +2050,16 @@ void DrawPlayer(struct PlayerInfo *player)
       int frame = getGraphicAnimationFrame(graphic, player->Frame);
 #endif
 
-      DrawGraphicShifted(px, py, sxx, syy, graphic, frame,
+#if 1
+      /* masked drawing is needed for EMC style (double) movement graphics */
+      DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame,
+				 NO_CUTTING);
+#else
+      DrawGraphicShifted(px, py, pxx, pyy, graphic, frame,
 			 NO_CUTTING, NO_MASKING);
+#endif
     }
+#endif
   }
 
   /* ----------------------------------------------------------------------- */
