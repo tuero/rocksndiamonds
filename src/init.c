@@ -196,6 +196,9 @@ void InitJoystick()
 void InitDisplay(int argc, char *argv[])
 {
   char *display_name = NULL;
+  XVisualInfo vinfo_template, *vinfo;
+  int num_visuals;
+  unsigned int depth;
   int i;
 
   /* get X server to connect to, if given as an argument */
@@ -222,9 +225,36 @@ void InitDisplay(int argc, char *argv[])
   }
   
   screen = DefaultScreen(display);
+  visual = DefaultVisual(display, screen);
+  depth  = DefaultDepth(display, screen);
   cmap   = DefaultColormap(display, screen);
   pen_fg = WhitePixel(display,screen);
   pen_bg = BlackPixel(display,screen);
+
+  /* look for good enough visual */
+  vinfo_template.screen = screen;
+  vinfo_template.class = (depth == 8 ? PseudoColor : TrueColor);
+  vinfo_template.depth = depth;
+  if ((vinfo = XGetVisualInfo(display, VisualScreenMask | VisualClassMask |
+			      VisualDepthMask, &vinfo_template, &num_visuals)))
+  {
+    visual = vinfo->visual;
+    XFree((void *)vinfo);
+  }
+
+  /* got appropriate visual? */
+  if (depth < 8)
+  {
+    printf("Sorry, displays with less than 8 bits per pixel not supported.\n");
+    exit(-1);
+  }
+  else if ((depth ==8 && visual->class != PseudoColor) ||
+	   (depth > 8 && visual->class != TrueColor &&
+	    visual->class != DirectColor))
+  {
+    printf("Sorry, cannot get appropriate visual.\n");
+    exit(-1);
+  }
 }
 
 void InitWindow(int argc, char *argv[])
@@ -506,7 +536,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     count1 = Counter();
 #endif
 
-    Read_GIF_to_Image(display, window, filename);
+    Read_GIF_to_Pixmaps(display, window, filename);
 
 #ifdef DEBUG_TIMING
     count2 = Counter();
@@ -604,8 +634,10 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifdef DEBUG_TIMING
     count2 = Counter();
+    /*
     printf("XPM LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/100.0);
+	   */
 #endif
 
 #if 0
@@ -704,8 +736,10 @@ msdos_jmp:
 
 #ifdef DEBUG_TIMING
     count2 = Counter();
+    /*
     printf("LOADING %s IN %.2f SECONDS\n",
 	   filename,(float)(count2-count1)/100.0);
+	   */
 #endif
 
 #if 0

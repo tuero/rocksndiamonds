@@ -521,7 +521,9 @@ Image *gifLoad(char *fullname)
     return(NULL);
   }
 
+  /*
   tellAboutImage(fullname);
+  */
 
   image= newRGBImage(gifin_img_width, gifin_img_height, (gifin_l_cmap_flag ?
 							 gifin_l_pixel_bits :

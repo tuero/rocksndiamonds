@@ -22,8 +22,10 @@ Image *monochrome(Image *cimage)
   if (BITMAPP(cimage))
     return(NULL);
 
+  /*
   printf("  Converting to monochrome...");
   fflush(stdout);
+  */
 
   image= newBitImage(cimage->width, cimage->height);
   if (cimage->title)
@@ -59,7 +61,9 @@ Image *monochrome(Image *cimage)
     dp += dll;	/* next row */
   }
 
+  /*
   printf("done\n");
+  */
 
   return(image);
 }
@@ -254,8 +258,10 @@ void compress(Image *image)
   if (!RGBP(image) || image->rgb.compressed)
     return;
 
+  /*
   printf("  Compressing colormap...");
   fflush(stdout);
+  */
 
   used = (unsigned char *)lcalloc(sizeof(unsigned char) * depthToColors(image->depth));
   dmask = (1 << image->depth) -1;	/* Mask any illegal bits for that depth */
@@ -335,6 +341,7 @@ void compress(Image *image)
   lfree(map);
   lfree(used);
 
+  /*
   if (badcount)
     printf("%d out-of-range pixels, ", badcount);
 
@@ -349,6 +356,7 @@ void compress(Image *image)
     printf("%d unique color%s\n",
 	   next_index, (next_index == 1 ? "" : "s"));
   }
+  */
 
   image->rgb.compressed= TRUE;	/* don't do it again */
 }
@@ -413,10 +421,6 @@ static unsigned int bitsPerPixelAtDepth(Display *disp, int scrn,
   exit(1);
 }
 
-/*
-  visual: visual to use
-  ddepth: depth of the visual to use
-*/
 XImageInfo *imageToXImage(Display *disp,
 			  int scrn,
 			  Visual *visual,
@@ -426,6 +430,9 @@ XImageInfo *imageToXImage(Display *disp,
   Pixel        *redvalue, *greenvalue, *bluevalue;
   unsigned int  a, c=0, x, y, linelen, dpixlen, dbits;
   XColor        xcolor;
+
+  static XColor xcolor_used[NOFLASH_COLORS];
+
   XGCValues     gcv;
   XImageInfo   *ximageinfo;
   Image        *orig_image;
@@ -434,6 +441,10 @@ XImageInfo *imageToXImage(Display *disp,
   static Pixel *our_default_index;
   static int free_cmap_entries, max_cmap_entries;
   int use_cmap_entry;
+
+
+  static unsigned long pixel_used[NOFLASH_COLORS];
+
 
   if (!our_default_cmap)
   {
@@ -459,6 +470,9 @@ XImageInfo *imageToXImage(Display *disp,
       xcolor.pixel = *(our_default_index + a);
       XQueryColor(disp, DefaultColormap(disp, scrn), &xcolor);
       XStoreColor(disp, our_default_cmap, &xcolor);
+
+      pixel_used[xcolor.pixel] = 0;
+      xcolor_used[xcolor.pixel] = xcolor;
     }
   }
 
@@ -588,61 +602,144 @@ XImageInfo *imageToXImage(Display *disp,
 	while ((bluebottom < 256) && (bluebottom < bluetop))
 	  bluevalue[bluebottom++]= xcolor.pixel & visual->blue_mask;
       }
-    }
-    break;
-
-  default:	/* Not TrueColor or DirectColor */
-
-    ximageinfo->index= (Pixel *)lmalloc(sizeof(Pixel) * (image->rgb.used+NOFLASH_COLORS));
-
-
-    /* get the colormap to use.
-     */
-
-    ximageinfo->cmap = our_default_cmap;
-
-    /* allocate colors shareable (if we can)
-     */
-
-    for (a= 0; a < image->rgb.used; a++)
-    {
-      int i;
-      XColor xcolor2;
-
-      xcolor.red= *(image->rgb.red + a);
-      xcolor.green= *(image->rgb.green + a);
-      xcolor.blue= *(image->rgb.blue + a);
-
-      for (i=max_cmap_entries-1; i>=free_cmap_entries; i--)
-      {
-	xcolor2.pixel = *(our_default_index + i);
-	XQueryColor(disp, ximageinfo->cmap, &xcolor2);
-
-	if ((xcolor.red >> 8) == (xcolor2.red >> 8) &&
-	    (xcolor.green >> 8) == (xcolor2.green >> 8) &&
-	    (xcolor.blue >> 8) == (xcolor2.blue >> 8))
-	  break;
-      }
-
-      use_cmap_entry = i;
-
-      if (use_cmap_entry < free_cmap_entries)
-	free_cmap_entries--;
-
-      if (free_cmap_entries < 0)
-      {
-	printf("imageToXImage: too many global colors!\n");
-	exit(0);
-      }
-
-      xcolor.pixel = use_cmap_entry;
-      *(ximageinfo->index + a) = xcolor.pixel;
-      XStoreColor(disp, ximageinfo->cmap, &xcolor);
+      break;
     }
 
-    ximageinfo->no = a;    /* number of pixels allocated in default visual */
+    case PseudoColor:
 
-    printf("still %d free colormap entries\n", free_cmap_entries);
+      ximageinfo->index= (Pixel *)lmalloc(sizeof(Pixel) * (image->rgb.used+NOFLASH_COLORS));
+
+
+      /* get the colormap to use.
+       */
+
+      ximageinfo->cmap = our_default_cmap;
+
+      /* allocate colors shareable (if we can)
+       */
+
+      for (a = 0; a < image->rgb.used; a++)
+      {
+  	int i;
+  	XColor xcolor2;
+  
+  	xcolor2.flags = DoRed | DoGreen | DoBlue;
+  
+  	xcolor.red= *(image->rgb.red + a);
+  	xcolor.green= *(image->rgb.green + a);
+  	xcolor.blue= *(image->rgb.blue + a);
+  
+  	/* look if this color already exists in our colormap */
+  
+  #if 0
+  	for (i=max_cmap_entries-1; i>=free_cmap_entries; i--)
+  
+  #else
+  	for (i=max_cmap_entries-1; i>=0; i--)
+  	{
+  	  /*
+  	  if (!pixel_used[i])
+  	    continue;
+  	    */
+  #endif
+  
+  	  xcolor2.pixel = *(our_default_index + i);
+  
+  #if 0
+  	  XQueryColor(disp, ximageinfo->cmap, &xcolor2);
+  #else
+  	  xcolor2 = xcolor_used[xcolor2.pixel];
+  #endif
+  
+  	  if ((xcolor.red >> 8) == (xcolor2.red >> 8) &&
+  	      (xcolor.green >> 8) == (xcolor2.green >> 8) &&
+  	      (xcolor.blue >> 8) == (xcolor2.blue >> 8))
+  	    break;
+  	}
+  
+  	use_cmap_entry = i;
+  
+  	if (0 && use_cmap_entry < free_cmap_entries)	/* not found in colormap */
+  	{
+  	  free_cmap_entries--;
+  	}
+  	else if (0 && use_cmap_entry < free_cmap_entries)	/* not found in colormap */
+  	{
+  	}
+  	else if (use_cmap_entry < 0)	/* not found in colormap */
+  	{
+  	  /* look for an existing 'unused' color near the one we want */
+  
+  	  for (i=free_cmap_entries-1; i>=0; i--)
+  	  {
+  	    int closeness = 14;
+  
+  	    if (pixel_used[i])
+  	      continue;
+  
+  	    xcolor2.pixel = *(our_default_index + i);
+  
+  #if 0
+  	    XQueryColor(disp, ximageinfo->cmap, &xcolor2);
+  #else
+  	    xcolor2 = xcolor_used[xcolor2.pixel];
+  #endif
+  
+  
+  	    if ((xcolor.red >> closeness) == (xcolor2.red >> closeness) &&
+  		(xcolor.green >> closeness) == (xcolor2.green >> closeness) &&
+  		(xcolor.blue >> closeness) == (xcolor2.blue >> closeness))
+  	      break;
+  	  }
+  
+  	  use_cmap_entry = i;
+  
+  	  if (use_cmap_entry < 0)		/* no 'near' color found */
+  	  {
+  	    /* look for the next free color */
+  
+  	    while (pixel_used[--free_cmap_entries])
+  	      ;
+  	    use_cmap_entry = free_cmap_entries;
+  	  }
+  	}
+  
+  	if (free_cmap_entries < 0)
+  	{
+  	  printf("imageToXImage: too many global colors!\n");
+  	  exit(0);
+  	}
+  
+  
+  	/*
+  	  printf("--> eating color %d\n", use_cmap_entry);
+  	  */
+  
+  
+  
+  	xcolor.pixel = use_cmap_entry;
+  
+  	xcolor_used[xcolor.pixel] = xcolor;
+  
+  	*(ximageinfo->index + a) = xcolor.pixel;
+  
+  	XStoreColor(disp, ximageinfo->cmap, &xcolor);
+  
+  	pixel_used[use_cmap_entry] = 1;
+      }
+      
+      ximageinfo->no = a;    /* number of pixels allocated in default visual */
+
+      /*  
+      printf("still %d free colormap entries\n", free_cmap_entries);
+      */
+
+      break;
+  
+    default:
+      printf("Sorry, only DirectColor, TrueColor and PseudoColor supported\n");
+      exit(0);
+      break;
   }
 
 
@@ -651,8 +748,10 @@ XImageInfo *imageToXImage(Display *disp,
    * we have.
    */
 
+  /*
   printf("  Building XImage...");
   fflush(stdout);
+  */
 
   switch (image->type)
   {
@@ -779,7 +878,9 @@ XImageInfo *imageToXImage(Display *disp,
     }
   }
 
+  /*
   printf("done\n");
+  */
 
   if (redvalue)
   {

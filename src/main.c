@@ -23,6 +23,7 @@
 #endif
 
 Display        *display;
+Visual	       *visual;
 int		screen;
 Window  	window;
 GC		gc, clip_gc[NUM_PIXMAPS];

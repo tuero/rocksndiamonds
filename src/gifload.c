@@ -26,7 +26,7 @@ extern int		test_picture_count;
 
 
 
-int Read_GIF_to_Image(Display *display, Window window, char *filename)
+int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename)
 {
   Image *image, *image_mask;
   XImageInfo *ximageinfo, *ximageinfo_mask;
@@ -64,7 +64,9 @@ int Read_GIF_to_Image(Display *display, Window window, char *filename)
 
   if (ximageinfo->cmap != DefaultColormap(display, screen))
   {
+    /*
     printf("--> '%s' gets own colormap\n", filename);
+    */
 
     XSetWindowColormap(display, window, ximageinfo->cmap);
   }
@@ -76,9 +78,9 @@ int Read_GIF_to_Image(Display *display, Window window, char *filename)
     exit(1);
   }
 
-
+  /*
   printf("test_picture_count == %d\n", test_picture_count);
-
+  */
 
   test_pix[test_picture_count] = pixmap;
 

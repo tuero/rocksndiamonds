@@ -29,11 +29,7 @@
 #define GIF_NoMemory		-4
 #define GIF_ColorFailed		-5
 
-int Read_GIF_to_Image(Display *, Window, char *);
-int Read_GIF_to_Bitmap(Display *, char *, Pixmap *);
-int Read_GIF_to_Pixmap(Display *, char *, Pixmap *);
-int Read_GIF_to_XImage(Display *, char *, XImage **);
-
+int Read_GIF_to_Pixmaps(Display *, Window, char *);
 #endif
 
 #endif

@@ -263,6 +263,7 @@ struct JoystickInfo
 };
 
 extern Display	       *display;
+extern Visual	       *visual;
 extern int		screen;
 extern Window  		window;
 extern GC		gc, clip_gc[];
