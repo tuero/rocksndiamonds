@@ -16,24 +16,28 @@
 
 #ifdef TARGET_SDL
 
-inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
+inline void SDLInitVideoDisplay(void)
 {
   /* initialize SDL video */
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
 
-  /* automatically cleanup SDL stuff after exit() */
-  atexit(SDL_Quit);
+  /* set default SDL depth */
+  video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
 
+  /* set exit function to automatically cleanup SDL stuff after exit() */
+  atexit(SDL_Quit);
+}
+
+inline void SDLInitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
+			       boolean fullscreen)
+{
   /* open SDL video output device (window or fullscreen mode) */
-  if (!SDLSetVideoMode(backbuffer))
+  if (!SDLSetVideoMode(backbuffer, fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
 
   /* set window and icon title */
-  SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
-
-  /* create additional buffer for double-buffering */
-  pix[PIX_DB_BACK] = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  SDL_WM_SetCaption(program.window_title, program.window_title);
 
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
@@ -48,13 +52,14 @@ inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
      buffer 'window' at the same size as the SDL backbuffer. Although it
      should never be drawn to directly, it would do no harm nevertheless. */
 
-  *window = pix[PIX_DB_BACK];		/* 'window' is only symbolic buffer */
-  pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is SDL screen buffer */
+  /* create additional (symbolic) buffer for double-buffering */
+  *window = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 }
 
 inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
+  int surface_flags = SDL_HWSURFACE | (fullscreen ? SDL_FULLSCREEN : 0);
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
@@ -62,9 +67,8 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
     DrawWindow window_old = *backbuffer;
     DrawWindow window_new;
 
-    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				       SDL_HWSURFACE|SDL_FULLSCREEN))
-	== NULL)
+    if ((window_new = SDL_SetVideoMode(video.width, video.height, video.depth,
+				       surface_flags)) == NULL)
     {
       /* switching display to fullscreen mode failed */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -90,9 +94,8 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
     DrawWindow window_old = *backbuffer;
     DrawWindow window_new;
 
-    if ((window_new = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				       SDL_HWSURFACE))
-	== NULL)
+    if ((window_new = SDL_SetVideoMode(video.width, video.height, video.depth,
+				       surface_flags)) == NULL)
     {
       /* switching display to window mode failed -- should not happen */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());

@@ -200,12 +200,11 @@
 #define PIX_SMALLFONT		8
 #define PIX_MEDIUMFONT		9
 /* Bitmaps without graphic file */
-#define PIX_DB_BACK		10
-#define PIX_DB_DOOR		11
-#define PIX_DB_FIELD		12
+#define PIX_DB_DOOR		10
+#define PIX_DB_FIELD		11
 
 #define NUM_PICTURES		10
-#define NUM_BITMAPS		13
+#define NUM_BITMAPS		12
 
 /* boundaries of arrays etc. */
 #define MAX_PLAYER_NAME_LEN	10
@@ -1666,6 +1665,7 @@ extern int		num_element_info;
 #define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
 #define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
+#define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"

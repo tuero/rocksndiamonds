@@ -43,8 +43,20 @@ typedef int (*EventFilter)(const Event *);
 
 /* structure definitions */
 
+struct ProgramInfo
+{
+  char *command_name;
+  char *program_title;
+  char *window_title;
+  char *icon_title;
+  char *x11_icon_filename;
+  char *x11_iconmask_filename;
+};
+
 struct VideoSystemInfo
 {
+  int default_depth;
+  int width, height, depth;
   boolean fullscreen_available;
   boolean fullscreen_enabled;
 };
@@ -78,6 +90,7 @@ struct OptionInfo
 /* exported variables                                                        */
 /* ========================================================================= */
 
+extern struct ProgramInfo	program;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct OptionInfo	options;
@@ -98,8 +111,9 @@ extern int		FrameCounter;
 
 /* function definitions */
 
-inline void InitBufferedDisplay(DrawBuffer *, DrawWindow *);
-inline int GetDisplayDepth(void);
+inline void InitProgramInfo(char *, char *, char *, char *, char *, char *);
+inline void InitVideoDisplay(void);
+inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);
 inline Bitmap CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap);
 inline void ClearRectangle(Bitmap, int, int, int, int);

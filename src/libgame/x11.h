@@ -268,6 +268,7 @@ typedef XClientMessageEvent	ClientMessageEvent;
 
 /* X11 function definitions */
 
-inline void X11InitBufferedDisplay(DrawBuffer *, DrawWindow *);
+inline void X11InitVideoDisplay(void);
+inline void X11InitVideoBuffer(DrawBuffer *, DrawWindow *);
 
 #endif /* X11_H */

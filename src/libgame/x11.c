@@ -16,13 +16,40 @@
 
 #if defined(TARGET_X11)
 
+#if 0
 #include "main_TMP.h"
+#endif
 
+#if 0
 struct IconFileInfo
 {
   char *picture_filename;
   char *picturemask_filename;
 };
+#endif
+
+static void X11InitDisplay();
+static DrawWindow X11InitWindow();
+
+inline void X11InitVideoDisplay(void)
+{
+  /* initialize X11 video */
+  X11InitDisplay();
+
+  /* set default X11 depth */
+  video.default_depth = XDefaultDepth(display, screen);
+}
+
+inline void X11InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window)
+{
+  *window = X11InitWindow();
+
+  XMapWindow(display, *window);
+  FlushDisplay();
+
+  /* create additional (off-screen) buffer for double-buffering */
+  *backbuffer = CreateBitmap(video.width, video.height, video.depth);
+}
 
 static void X11InitDisplay()
 {
@@ -85,23 +112,25 @@ static DrawWindow X11InitWindow()
   XSizeHints size_hints;
   XWMHints wm_hints;
   XClassHint class_hints;
-  char *window_name = WINDOW_TITLE_STRING;
-  char *icon_name = WINDOW_TITLE_STRING;
+  char *window_name = program.window_title;
+  char *icon_name = program.window_title;
   long window_event_mask;
   Atom proto_atom = None, delete_atom = None;
 #endif
   int screen_width, screen_height;
-  int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
+  int win_xpos, win_ypos;
   unsigned long pen_fg = WhitePixel(display,screen);
   unsigned long pen_bg = BlackPixel(display,screen);
-  const int width = WIN_XSIZE, height = WIN_YSIZE;
+  const int width = video.width, height = video.height;
 
+#if 0
 #if !defined(PLATFORM_MSDOS)
   static struct IconFileInfo icon_pic =
   {
     "rocks_icon.xbm",
     "rocks_iconmask.xbm"
   };
+#endif
 #endif
 
   screen_width = XDisplayWidth(display, screen);
@@ -121,21 +150,25 @@ static DrawWindow X11InitWindow()
     XChangeProperty(display, window, proto_atom, XA_ATOM, 32,
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
+#if 0
   sprintf(icon_filename, "%s/%s/%s",
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picture_filename);
-  XReadBitmapFile(display,window,icon_filename,
-		  &icon_width,&icon_height,
-		  &icon_pixmap,&icon_hot_x,&icon_hot_y);
+#endif
+  XReadBitmapFile(display, window, program.x11_icon_filename,
+		  &icon_width, &icon_height,
+		  &icon_pixmap, &icon_hot_x, &icon_hot_y);
   if (!icon_pixmap)
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
+#if 0
   sprintf(icon_filename, "%s/%s/%s",
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picturemask_filename);
-  XReadBitmapFile(display,window,icon_filename,
-		  &icon_width,&icon_height,
-		  &iconmask_pixmap,&icon_hot_x,&icon_hot_y);
+#endif
+  XReadBitmapFile(display, window, program.x11_iconmask_filename,
+		  &icon_width, &icon_height,
+		  &iconmask_pixmap, &icon_hot_x, &icon_hot_y);
   if (!iconmask_pixmap)
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
@@ -162,8 +195,8 @@ static DrawWindow X11InitWindow()
   wm_hints.icon_mask = iconmask_pixmap;
   wm_hints.flags = StateHint | IconPixmapHint | IconMaskHint | InputHint;
 
-  class_hints.res_name = program_name;
-  class_hints.res_class = "Rocks'n'Diamonds";
+  class_hints.res_name = program.command_name;
+  class_hints.res_class = program.program_title;
 
   XSetWMProperties(display, window, &windowName, &iconName, 
 		   NULL, 0, &size_hints, &wm_hints, 
@@ -189,19 +222,6 @@ static DrawWindow X11InitWindow()
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
 
   return window;
-}
-
-inline void X11InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
-{
-  X11InitDisplay();
-  *window = X11InitWindow();
-
-  XMapWindow(display, *window);
-  FlushDisplay();
-
-  /* create additional buffer for double-buffering */
-  *backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-  pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is off-screen buffer */
 }
 
 #endif /* TARGET_X11 */

@@ -34,6 +34,7 @@ int		FrameCounter;
 /* exported variables                                                        */
 /* ========================================================================= */
 
+struct ProgramInfo	program;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct OptionInfo	options;
@@ -43,30 +44,53 @@ struct OptionInfo	options;
 /* video functions                                                           */
 /* ========================================================================= */
 
-inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
+inline static int GetRealDepth(int depth)
 {
+  return (depth == DEFAULT_DEPTH ? video.default_depth : depth);
+}
+
+inline void InitProgramInfo(char *command_name, char *program_title,
+			    char *window_title, char *icon_title,
+			    char *x11_icon_filename,
+			    char *x11_iconmask_filename)
+{
+  program.command_name = command_name;
+  program.program_title = program_title;
+  program.window_title = window_title;
+  program.icon_title = icon_title;
+  program.x11_icon_filename = x11_icon_filename;
+  program.x11_iconmask_filename = x11_iconmask_filename;
+}
+
+inline void InitVideoDisplay(void)
+{
+#ifdef TARGET_SDL
+  SDLInitVideoDisplay();
+#else
+  X11InitVideoDisplay();
+#endif
+}
+
+inline void InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
+			    int width, int height, int depth,
+			    boolean fullscreen)
+{
+  video.width = width;
+  video.height = height;
+  video.depth = GetRealDepth(depth);
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
 
 #ifdef TARGET_SDL
-  SDLInitBufferedDisplay(backbuffer, window);
+  SDLInitVideoBuffer(backbuffer, window, fullscreen);
 #else
-  X11InitBufferedDisplay(backbuffer, window);
-#endif
-}
-
-inline int GetDisplayDepth(void)
-{
-#ifdef TARGET_SDL
-  return SDL_GetVideoSurface()->format->BitsPerPixel;
-#else
-  return XDefaultDepth(display, screen);
+  X11InitVideoBuffer(backbuffer, window);
 #endif
 }
 
 inline Bitmap CreateBitmap(int width, int height, int depth)
 {
-  int real_depth = (depth == DEFAULT_DEPTH ? GetDisplayDepth() : depth);
+  int real_depth = GetRealDepth(depth);
 
 #ifdef TARGET_SDL
   SDL_Surface *surface_tmp, *surface_native;

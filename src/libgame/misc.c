@@ -28,7 +28,9 @@
 
 #include "misc.h"
 
+#if 0
 #include "joystick_TMP.h"
+#endif
 
 #if defined(PLATFORM_MSDOS)
 volatile unsigned long counter = 0;
@@ -1054,90 +1056,6 @@ char getCharFromKey(Key key)
     letter = '^';
 
   return letter;
-}
-
-#define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
-#define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
-
-void translate_joyname(int *joysymbol, char **name, int mode)
-{
-  static struct
-  {
-    int joysymbol;
-    char *name;
-  } translate_joy[] =
-  {
-    { JOY_LEFT,		"joystick_left" },
-    { JOY_RIGHT,	"joystick_right" },
-    { JOY_UP,		"joystick_up" },
-    { JOY_DOWN,		"joystick_down" },
-    { JOY_BUTTON_1,	"joystick_button_1" },
-    { JOY_BUTTON_2,	"joystick_button_2" },
-  };
-
-  int i;
-
-  if (mode == TRANSLATE_JOYSYMBOL_TO_JOYNAME)
-  {
-    *name = "[undefined]";
-
-    for (i=0; i<6; i++)
-    {
-      if (*joysymbol == translate_joy[i].joysymbol)
-      {
-	*name = translate_joy[i].name;
-	break;
-      }
-    }
-  }
-  else if (mode == TRANSLATE_JOYNAME_TO_JOYSYMBOL)
-  {
-    *joysymbol = 0;
-
-    for (i=0; i<6; i++)
-    {
-      if (strcmp(*name, translate_joy[i].name) == 0)
-      {
-	*joysymbol = translate_joy[i].joysymbol;
-	break;
-      }
-    }
-  }
-}
-
-char *getJoyNameFromJoySymbol(int joysymbol)
-{
-  char *name;
-
-  translate_joyname(&joysymbol, &name, TRANSLATE_JOYSYMBOL_TO_JOYNAME);
-  return name;
-}
-
-int getJoySymbolFromJoyName(char *name)
-{
-  int joysymbol;
-
-  translate_joyname(&joysymbol, &name, TRANSLATE_JOYNAME_TO_JOYSYMBOL);
-  return joysymbol;
-}
-
-int getJoystickNrFromDeviceName(char *device_name)
-{
-  char c;
-  int joystick_nr = 0;
-
-  if (device_name == NULL || device_name[0] == '\0')
-    return 0;
-
-  c = device_name[strlen(device_name) - 1];
-
-  if (c >= '0' && c <= '9')
-    joystick_nr = (int)(c - '0');
-
-  if (joystick_nr < 0 || joystick_nr >= MAX_PLAYERS)
-    joystick_nr = 0;
-
-  return joystick_nr;
 }
 
 /* ------------------------------------------------------------------------- */

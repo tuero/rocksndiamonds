@@ -38,6 +38,7 @@ static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
 static void InitSoundServer(void);
+static void InitDisplay(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void LoadGfx(int, struct PictureFileInfo *);
@@ -73,7 +74,7 @@ void OpenAll(int argc, char *argv[])
   signal(SIGINT, CloseAllAndExit);
   signal(SIGTERM, CloseAllAndExit);
 
-  InitBufferedDisplay(&backbuffer, &window);
+  InitDisplay();
   InitEventFilter(FilterMouseMotionEvents);
 
   InitGfx();
@@ -307,6 +308,22 @@ void InitJoysticks()
 #endif /* !TARGET_SDL */
 }
 
+void InitDisplay()
+{
+  char *x11_icon_filename = getPath3(options.ro_base_directory,
+				     GRAPHICS_DIRECTORY,
+				     "rocks_icon.xbm");
+  char *x11_iconmask_filename = getPath3(options.ro_base_directory,
+					 GRAPHICS_DIRECTORY,
+					 "rocks_iconmask.xbm");
+
+  InitProgramInfo(program_name, PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
+		  ICON_TITLE_STRING, x11_icon_filename, x11_iconmask_filename);
+  InitVideoDisplay();
+  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
+		  setup.fullscreen);
+}
+
 void InitGfx()
 {
   int i, j;
@@ -515,7 +532,7 @@ void InitGfxBackground()
 {
   int x, y;
 
-  drawto = backbuffer = pix[PIX_DB_BACK];
+  drawto = backbuffer;
   fieldbuffer = pix[PIX_DB_FIELD];
   SetDrawtoField(DRAW_BACKBUFFER);
 
