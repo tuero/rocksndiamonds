@@ -1032,11 +1032,18 @@ void LevelEd(int mx, int my, int button)
 	  element_shift<elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)) &&
 	DelayReached(&choice_delay, GADGET_FRAME_DELAY))
     {
-      int i, step;
+      int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+      int i;
 
+#if 0
       step = (button==1 ? MAX_ELEM_X : button==2 ? 5*MAX_ELEM_X :
 	      elements_in_list);
       element_shift += (choice==ED_BUTTON_EUP ? -step : step);
+#else
+      step = step * MAX_ELEM_X * (choice == ED_BUTTON_EUP ? -1 : +1);
+      element_shift += step;
+#endif
+
       if (element_shift<0)
 	element_shift = 0;
       if (element_shift>elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)
@@ -1890,6 +1897,122 @@ static void FloodFill(int from_x, int from_y, int fill_element)
   safety--;
 }
 
+static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
+{
+  unsigned long border_color = ReadPixel(pix[PIX_SMALLFONT], 2, 16);
+  int from_sx = SX + from_x * MINI_TILEX;
+  int from_sy = SY + from_y * MINI_TILEX;
+  int to_sx = SX + to_x * MINI_TILEX + MINI_TILEX - 1;
+  int to_sy = SY + to_y * MINI_TILEX + MINI_TILEY - 1;
+
+  XSetForeground(display, gc, border_color);
+
+  XDrawLine(display, drawto, gc, from_sx, from_sy, to_sx, from_sy);
+  XDrawLine(display, drawto, gc, to_sx, from_sy, to_sx, to_sy);
+  XDrawLine(display, drawto, gc, to_sx, to_sy, from_sx, to_sy);
+  XDrawLine(display, drawto, gc, from_sx, to_sy, from_sx, from_sy);
+
+  XSetForeground(display, gc, BlackPixel(display,screen));
+
+  if (from_x == to_x && from_y == to_y)
+    MarkTileDirty(from_x/2, from_y/2);
+  else
+    redraw_mask |= REDRAW_FIELD;
+}
+
+/* values for DrawLeveltext() modes */
+#define TEXT_INIT	0
+#define TEXT_SETCURSOR	1
+#define TEXT_WRITECHAR	2
+#define TEXT_BACKSPACE	3
+#define TEXT_NEWLINE	4
+#define TEXT_END	5
+
+static void DrawLevelText(int sx, int sy, char letter, int mode)
+{
+  static short delete_buffer[MAX_LEV_FIELDX];
+  static int start_sx, start_sy;
+  static int last_sx, last_sy;
+  static boolean typing = FALSE;
+  int letter_element = EL_CHAR_ASCII0 + letter;
+  int lx, ly;
+
+  if (mode != TEXT_INIT)
+  {
+    if (!typing)
+      return;
+
+    if (mode != TEXT_SETCURSOR)
+    {
+      sx = last_sx;
+      sy = last_sy;
+    }
+
+    lx = last_sx + level_xpos;
+    ly = last_sy + level_ypos;
+  }
+
+  switch (mode)
+  {
+    case TEXT_INIT:
+      if (typing)
+	DrawLevelText(0, 0, 0, TEXT_END);
+
+      typing = TRUE;
+      start_sx = last_sx = sx;
+      start_sy = last_sy = sy;
+      DrawLevelText(sx, sy, 0, TEXT_SETCURSOR);
+      break;
+
+    case TEXT_SETCURSOR:
+      DrawMiniElement(last_sx, last_sy, Feld[lx][ly]);
+      DrawAreaBorder(sx, sy, sx, sy);
+      last_sx = sx;
+      last_sy = sy;
+      break;
+
+    case TEXT_WRITECHAR:
+      if (letter_element >= EL_CHAR_START && letter_element <= EL_CHAR_END)
+      {
+	delete_buffer[sx - start_sx] = Feld[lx][ly];
+	Feld[lx][ly] = letter_element;
+
+	if (sx + 1 < 2*SCR_FIELDX && lx + 1 < lev_fieldx)
+	  DrawLevelText(sx + 1, sy, 0, TEXT_SETCURSOR);
+	else if (sy + 1 < 2*SCR_FIELDY && ly + 1 < lev_fieldy)
+	  DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
+	else
+	  DrawLevelText(0, 0, 0, TEXT_END);
+      }
+      break;
+
+    case TEXT_BACKSPACE:
+      if (sx > start_sx)
+      {
+	Feld[lx - 1][ly] = delete_buffer[sx - start_sx - 1];
+	DrawMiniElement(sx - 1, sy, new_element3);
+	DrawLevelText(sx - 1, sy, 0, TEXT_SETCURSOR);
+      }
+      break;
+
+    case TEXT_NEWLINE:
+      if (sy + 1 < 2*SCR_FIELDY - 1 && ly + 1 < lev_fieldy - 1)
+	DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
+      else
+	DrawLevelText(0, 0, 0, TEXT_END);
+      break;
+
+    case TEXT_END:
+      CopyLevelToUndoBuffer();
+      DrawMiniElement(sx, sy, Feld[lx][ly]);
+      typing = FALSE;
+      break;
+
+    default:
+      break;
+  }
+}
+
 static void CopyLevelToUndoBuffer()
 {
   int x, y;
@@ -2058,9 +2181,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	if (button_press_event)
 	{
-	  last_sx = start_sx = sx;
-	  last_sy = start_sy = sy;
 	  draw_func(sx, sy, sx, sy, new_element, FALSE);
+	  start_sx = last_sx = sx;
+	  start_sy = last_sy = sy;
 	}
 	else if (button_release_event)
 	{
@@ -2084,6 +2207,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	DrawMiniLevel(level_xpos, level_ypos);
 	CopyLevelToUndoBuffer();
       }
+      break;
+
+    case ED_CTRL_ID_TEXT:
+      if (button_press_event)
+	DrawLevelText(sx, sy, 0, TEXT_INIT);
       break;
 
     default:
@@ -2128,6 +2256,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   new_element = (button == 1 ? new_element1 :
 		 button == 2 ? new_element2 :
 		 button == 3 ? new_element3 : 0);
+
+  if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
+    DrawLevelText(0, 0, 0, TEXT_END);
 
   if (id < ED_NUM_CTRL1_BUTTONS && edit_mode != ED_MODE_DRAWING)
   {
@@ -2369,5 +2500,42 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       else
 	printf("default: HandleControlButtons: ?\n");
       break;
+  }
+}
+
+void HandleLevelEditorKeyInput(KeySym key)
+{
+  if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
+  {
+    char *keyname = getKeyNameFromKeySym(key);
+    char letter = 0;
+
+    if (strlen(keyname) == 1)
+      letter = keyname[0];
+    else if (strcmp(keyname, "space") == 0)
+      letter = ' ';
+    else if (strcmp(keyname, "less") == 0)
+      letter = '<';
+    else if (strcmp(keyname, "equal") == 0)
+      letter = '=';
+    else if (strcmp(keyname, "greater") == 0)
+      letter = '>';
+
+    /* map lower case letters to upper case */
+    if (letter >= 'a' && letter <= 'z')
+      letter += (int)('A' - 'a');
+    else if (letter == 'ä')
+      letter = 'Ä';
+    else if (letter == 'ä')
+      letter = 'Ö';
+    else if (letter == 'ä')
+      letter = 'Ü';
+
+    if (letter)
+      DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
+    else if (key == XK_Delete || key == XK_BackSpace)
+      DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
+    else if (key == XK_Return)
+      DrawLevelText(0, 0, 0, TEXT_NEWLINE);
   }
 }

@@ -1736,10 +1736,15 @@ unsigned int MoveDoor(unsigned int door_state)
 
 int ReadPixel(Drawable d, int x, int y)
 {
-  static XImage *pixelimage;
+  XImage *pixel_image;
+  unsigned long pixel_value;
 
-  pixelimage = XGetImage(display, d, x, y, 1, 1, AllPlanes, ZPixmap);
-  return(XGetPixel(pixelimage, 0, 0));
+  pixel_image = XGetImage(display, d, x, y, 1, 1, AllPlanes, ZPixmap);
+  pixel_value = XGetPixel(pixel_image, 0, 0);
+
+  XDestroyImage(pixel_image);
+
+  return pixel_value;
 }
 
 int el2gfx(int element)

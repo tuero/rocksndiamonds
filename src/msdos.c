@@ -525,7 +525,7 @@ static BITMAP *Read_PCX_to_AllegroBitmap(char *filename)
   if ((bitmap = Image_to_AllegroBitmap(image)) == NULL)
     return NULL;
 
-  set_pallete(global_colormap);
+  set_palette(global_colormap);
 
   return bitmap;
 }

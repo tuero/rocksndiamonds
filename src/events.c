@@ -71,6 +71,9 @@ void EventLoop(void)
       Delay(10);
     }
 
+    /* refresh window contents from drawing buffer, if needed */
+    BackToFront();
+
     if (game_status == EXITGAME)
       return;
   }
@@ -505,6 +508,7 @@ void HandleKey(KeySym key, int key_status)
       break;
 
     case LEVELED:
+      HandleLevelEditorKeyInput(key);
       LevelNameTyping(key);
       break;
 
