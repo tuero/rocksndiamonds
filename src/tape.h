@@ -16,8 +16,6 @@
 
 #include "main.h"
 
-#define TAPE_PAUSE_SECONDS_BEFORE_DEATH		3
-
 /* some positions in the video tape control window */
 #define VIDEO_DISPLAY1_XPOS	5
 #define VIDEO_DISPLAY1_YPOS	5

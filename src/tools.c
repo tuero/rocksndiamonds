@@ -1775,6 +1775,9 @@ int REQ_in_range(int x, int y)
   return 0;
 }
 
+#define MAX_REQUEST_LINES		13
+#define MAX_REQUEST_LINE_LEN		7
+
 boolean Request(char *text, unsigned int req_state)
 {
   int mx, my, ty, result = -1;
@@ -1803,31 +1806,35 @@ boolean Request(char *text, unsigned int req_state)
   ClearRectangle(drawto, DX, DY, DXSIZE, DYSIZE);
 
   /* write text for request */
-  for(ty=0; ty<13; ty++)
+  for(ty=0; ty < MAX_REQUEST_LINES; ty++)
   {
+    char text_line[MAX_REQUEST_LINE_LEN + 1];
     int tx, tl, tc;
-    char txt[256];
 
     if (!*text)
       break;
 
-    for(tl=0,tx=0; tx<7; tl++,tx++)
+    for(tl=0,tx=0; tx < MAX_REQUEST_LINE_LEN; tl++,tx++)
     {
       tc = *(text + tx);
-      if (!tc || tc == 32)
+      if (!tc || tc == ' ')
 	break;
     }
+
     if (!tl)
     { 
       text++; 
       ty--; 
       continue; 
     }
-    sprintf(txt, text); 
-    txt[tl] = 0;
-    DrawTextExt(drawto, DX + 51 - (tl * 14)/2, DY + 8 + ty * 16,
-		txt, FS_SMALL, FC_YELLOW);
-    text += tl + (tc == 32 ? 1 : 0);
+
+    strncpy(text_line, text, tl);
+    text_line[tl] = 0;
+
+    DrawTextExt(drawto, DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
+		text_line, FS_SMALL, FC_YELLOW);
+
+    text += tl + (tc == ' ' ? 1 : 0);
   }
 
   if (req_state & REQ_ASK)

@@ -798,6 +798,8 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
     }
     else if (tape->file_version < FILE_VERSION_2_0)
     {
+      /* convert pre-2.0 tapes to new tape format */
+
       if (tape->pos[i].delay > 1)
       {
 	/* action part */

@@ -30,6 +30,9 @@
 
 #define NUM_TAPE_BUTTONS		6
 
+/* values for tape handling */
+#define TAPE_PAUSE_SECONDS_BEFORE_DEATH		5
+
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
 
@@ -315,6 +318,8 @@ void TapeStartRecording()
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
   MapTapeIndexButton();
+
+  SetDrawDeactivationMask(REDRAW_NONE);
 }
 
 void TapeStopRecording()
@@ -393,6 +398,14 @@ void TapeTogglePause()
     SetDrawDeactivationMask(REDRAW_NONE);
     RedrawPlayfield(TRUE, 0,0,0,0);
   }
+
+  if (tape.index_search)
+  {
+    tape.index_search = FALSE;
+
+    SetDrawDeactivationMask(REDRAW_NONE);
+    RedrawPlayfield(TRUE, 0,0,0,0);
+  }
 }
 
 void TapeStartPlaying()
@@ -418,6 +431,8 @@ void TapeStartPlaying()
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
   MapTapeIndexButton();
+
+  SetDrawDeactivationMask(REDRAW_NONE);
 }
 
 void TapeStopPlaying()
@@ -457,23 +472,13 @@ byte *TapePlayAction()
     }
   }
 
-  if (tape.index_search)
+  if (tape.counter >= tape.length)	/* end of tape reached */
   {
-    if (tape.counter >= tape.length)
-    {
-      tape.index_search = FALSE;
-
-      SetDrawDeactivationMask(REDRAW_NONE);
-      RedrawPlayfield(TRUE, 0,0,0,0);
-
+    if (tape.index_search)
       TapeTogglePause();
-      return NULL;
-    }
-  }
+    else
+      TapeStop();
 
-  if (tape.counter >= tape.length)
-  {
-    TapeStop();
     return NULL;
   }
 
@@ -687,7 +692,9 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	printf("Going to index mark ...\n");
 
 	tape.index_search = TRUE;
-	SetDrawDeactivationMask(REDRAW_FIELD);
+
+	if (!tape.fast_forward || tape.pause_before_death)
+	  SetDrawDeactivationMask(REDRAW_FIELD);
       }
       break;
 
@@ -719,6 +726,11 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       {
 	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
 	{
+	  if (tape.game_version != GAME_VERSION_ACTUAL &&
+	      !Request("This may break old version tape ! Append anyway ?",
+		       REQ_ASK))
+	    break;
+
 	  tape.pos[tape.counter].delay = tape.delay_played;
 	  tape.playing = FALSE;
 	  tape.recording = TRUE;

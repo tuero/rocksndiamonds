@@ -4971,7 +4971,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 #else
   if (!FrameReached(&player->move_delay, player->move_delay_value) &&
-      !(tape.playing && tape.game_version < FILE_VERSION_2_0))
+      !(tape.playing && tape.game_version < GAME_VERSION_2_0))
     return FALSE;
 #endif
 
@@ -5829,7 +5829,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.game_version < FILE_VERSION_2_0) &&
+	  !(tape.playing && tape.game_version < GAME_VERSION_2_0) &&
 	  element != EL_SPRING)
 	return MF_NO_ACTION;
 #endif
@@ -6071,7 +6071,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 #else
       if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	  !(tape.playing && tape.game_version < FILE_VERSION_2_0) &&
+	  !(tape.playing && tape.game_version < GAME_VERSION_2_0) &&
 	  element != EL_BALLOON)
 	return MF_NO_ACTION;
 #endif
