@@ -979,6 +979,9 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   src_pixmap = pix[pixmap_nr];
   drawing_gc = clip_gc[pixmap_nr];
 
+  src_x += cx;
+  src_y += cy;
+
   dest_x = FX + x * TILEX + dx;
   dest_y = FY + y * TILEY + dy;
 
@@ -1110,21 +1113,6 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     }
     else if (element != EL_SP_INFOTRON)
       graphic += phase2;
-
-    /*
-    if (element == EL_SP_ZONK)
-    {
-      if (dir == MV_LEFT)
-	graphic += (4 - phase4) % 4;
-      else if (dir == MV_RIGHT)
-	graphic += phase4;
-      else
-	graphic += phase2 * 2;
-    }
-    else if (element != EL_SP_INFOTRON)
-      graphic += phase2 * (element == EL_FELSBROCKEN ? 2 : 1);
-    */
-
   }
   else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
 	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)

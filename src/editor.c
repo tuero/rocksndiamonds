@@ -683,7 +683,7 @@ static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
 /* actual position of level editor drawing area in level playfield */
 static int level_xpos = -1, level_ypos = -1;
 
-#define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldx)
+#define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldy)
 
 /* drawing elements on the three mouse buttons */
 static int new_element1 = EL_MAUERWERK;
