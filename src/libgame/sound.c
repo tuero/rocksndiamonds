@@ -401,11 +401,9 @@ void SoundServer(void)
 	      sample_size = max_sample_size;
 	    }
 
-#if 0
 	    /* expand sample from 8 to 16 bit */
 	    for(j=0; j<sample_size; j++)
 	      premix_second_buffer[j] = premix_first_buffer[j] << 8;
-#endif
 
 	    /* decrease volume if sound is fading out */
 	    if (playlist[i].fade_sound &&
@@ -415,24 +413,24 @@ void SoundServer(void)
 	    /* adjust volume of actual sound sample */
 	    if (playlist[i].volume != PSND_MAX_VOLUME)
 	      for(j=0; j<sample_size; j++)
-		premix_first_buffer[j] =
-		  (playlist[i].volume * (int)premix_first_buffer[j])
+		premix_second_buffer[j] =
+		  (playlist[i].volume * (int)premix_second_buffer[j])
 		    >> PSND_MAX_VOLUME_BITS;
 
 	    /* fill the last mixing buffer with stereo or mono sound */
 	    if (stereo)
 	    {
-	      int middle_pos = PSND_MAX_LEFT2RIGHT/2;
+	      int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
 	      int left_volume = stereo_volume[middle_pos + playlist[i].stereo];
 	      int right_volume= stereo_volume[middle_pos - playlist[i].stereo];
 
 	      for(j=0; j<sample_size; j++)
 	      {
 		premix_left_buffer[j] =
-		  (left_volume * (int)premix_first_buffer[j])
+		  (left_volume * premix_second_buffer[j])
 		    >> PSND_MAX_LEFT2RIGHT_BITS;
 		premix_right_buffer[j] =
-		  (right_volume * (int)premix_first_buffer[j])
+		  (right_volume * premix_second_buffer[j])
 		    >> PSND_MAX_LEFT2RIGHT_BITS;
 
 		premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
@@ -442,7 +440,7 @@ void SoundServer(void)
 	    else
 	    {
 	      for(j=0; j<sample_size; j++)
-		premix_last_buffer[j] += (int)premix_first_buffer[j];
+		premix_last_buffer[j] += premix_second_buffer[j];
 	    }
 
 	    /* delete completed sound entries from the playlist */
@@ -464,29 +462,15 @@ void SoundServer(void)
 	  }
 
 	  /* put last mixing buffer to final playing buffer */
-#if 0
 	  for(i=0; i<fragment_size; i++)
 	  {
-	    if (premix_last_buffer[i] < -255)
-	      playing_buffer[i] = 0;
-	    else if (premix_last_buffer[i] > 255)
-	      playing_buffer[i] = 255;
+	    if (premix_last_buffer[i] < -65535)
+	      playing_buffer[i] = -32767;
+	    else if (premix_last_buffer[i] > 65535)
+	      playing_buffer[i] = 32767;
 	    else
-	      playing_buffer[i] = (premix_last_buffer[i] >> 1) ^ 0x80;
+	      playing_buffer[i] = (short)(premix_last_buffer[i] >> 1);
 	  }
-#else
-	  for(i=0; i<fragment_size; i++)
-	  {
-	    if (premix_last_buffer[i] < -255)
-	      playing_buffer[i] = -127;
-	    else if (premix_last_buffer[i] > 255)
-	      playing_buffer[i] = 127;
-	    else
-	      playing_buffer[i] = (premix_last_buffer[i] >> 1);
-
-	    playing_buffer[i] <<= 8;
-	  }
-#endif
 
 	  /* finally play the sound fragment */
 	  write(audio.device_fd, playing_buffer, fragment_size);
