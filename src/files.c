@@ -495,9 +495,6 @@ void LoadScore(int level_nr)
 
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
-    int position_nr;
-
-    fscanf(file, "%d", &position_nr);
     fscanf(file, "%d", &highscore[i].Score);
     fgets(line, MAX_LINE_LEN, file);
 
@@ -539,7 +536,7 @@ void SaveScore(int level_nr)
   fprintf(file, "%s\n\n", SCORE_COOKIE);
 
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
-    fprintf(file, "%d %d %s\n", i+1, highscore[i].Score, highscore[i].Name);
+    fprintf(file, "%d %s\n", highscore[i].Score, highscore[i].Name);
 
   fclose(file);
 

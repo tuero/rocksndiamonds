@@ -11,11 +11,10 @@
 CC = gcc
 
 # on Solaris and similar systems, you'll need to uncomment this
-EXTRA_LIBS = -lnsl -lsocket 
+# EXTRA_LIBS = -lnsl -lsocket 
 
-# specify path to X11 on your system
-# X11_PATH = /usr/X11
-X11_PATH = /local/X11
+# specify X11 library path on your system
+XLIB_PATH = /usr/X11/lib
 
 # change this to the directory where you want to install game data like levels
 GAME_DIR = .
@@ -73,12 +72,7 @@ DEBUG = -DDEBUG -g -Wall
 # LIBS = -L/usr/X11R6/lib -lX11 -lm
 
 # LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
-
-XINC_PATH = $(X11_PATH)/include
-XLIB_PATH = $(X11_PATH)/lib
-
-INCL = -I$(XINC_PATH)
-LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS) -R$(XLIB_PATH)
+LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -136,3 +130,10 @@ clean:
 
 backup:
 	./make_backup.sh
+
+depend:
+	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif

@@ -29,13 +29,9 @@ typedef struct
   Pixel    *index;	/* array of pixel values allocated                  */
   int       no;		/* number of pixels in the array                    */
   int       rootimage;	/* True if is a root image - eg, retain colors      */
-  Pixel     foreground; /* foreground and background pixels for mono images */
-  Pixel     background;
   Colormap  cmap;	/* colormap used for image                          */
   GC        gc;		/* cached gc for sending image                      */
-  GC        gc_mask;	/* cached gc for sending image mask                 */
   XImage   *ximage;	/* ximage structure                                 */
-  XImage   *ximage_mask;/* ximage structure of mask                         */
   Pixmap   pixmap;	/* final pixmap                                     */
   Pixmap   pixmap_mask;	/* final pixmap of mask                             */
 } XImageInfo;
