@@ -94,6 +94,9 @@ static void setLevelInfoToDefaults()
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    Properties1[EL_CUSTOM_START + i] = EP_BITMASK_DEFAULT;
+
   BorderElement = EL_STEELWALL;
 
   level.no_level_file = FALSE;
@@ -203,6 +206,33 @@ static int LoadLevel_AUTH(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int x, y;
+  int chunk_size_expected = level->fieldx * level->fieldy;
+
+  /* Note: "chunk_size" was wrong before version 2.0 when elements are
+     stored with 16-bit encoding (and should be twice as big then).
+     Even worse, playfield data was stored 16-bit when only yamyam content
+     contained 16-bit elements and vice versa. */
+
+  if (level->encoding_16bit_field && level->file_version >= FILE_VERSION_2_0)
+    chunk_size_expected *= 2;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size);
+    return chunk_size_expected;
+  }
+
+  for(y=0; y<level->fieldy; y++)
+    for(x=0; x<level->fieldx; x++)
+      Feld[x][y] = Ur[x][y] =
+	checkLevelElement(level->encoding_16bit_field ?
+			  getFile16BitBE(file) : fgetc(file));
+  return chunk_size;
+}
+
 static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
@@ -240,33 +270,6 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
 	level->yam_content[i][x][y] =
 	  checkLevelElement(level->encoding_16bit_field ?
 			    getFile16BitBE(file) : fgetc(file));
-  return chunk_size;
-}
-
-static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
-{
-  int x, y;
-  int chunk_size_expected = level->fieldx * level->fieldy;
-
-  /* Note: "chunk_size" was wrong before version 2.0 when elements are
-     stored with 16-bit encoding (and should be twice as big then).
-     Even worse, playfield data was stored 16-bit when only yamyam content
-     contained 16-bit elements and vice versa. */
-
-  if (level->encoding_16bit_field && level->file_version >= FILE_VERSION_2_0)
-    chunk_size_expected *= 2;
-
-  if (chunk_size_expected != chunk_size)
-  {
-    ReadUnusedBytesFromFile(file, chunk_size);
-    return chunk_size_expected;
-  }
-
-  for(y=0; y<level->fieldy; y++)
-    for(x=0; x<level->fieldx; x++)
-      Feld[x][y] = Ur[x][y] =
-	checkLevelElement(level->encoding_16bit_field ?
-			  getFile16BitBE(file) : fgetc(file));
   return chunk_size;
 }
 
@@ -308,6 +311,32 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   else
   {
     Error(ERR_WARN, "cannot load content for element '%d'", element);
+  }
+
+  return chunk_size;
+}
+
+static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int num_changed_custom_elements = getFile16BitBE(file);
+  int chunk_size_expected = 2 + num_changed_custom_elements * 6;
+  int i;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size - 2);
+    return chunk_size_expected;
+  }
+
+  for (i=0; i < num_changed_custom_elements; i++)
+  {
+    int element = getFile16BitBE(file);
+    int properties = getFile32BitBE(file);
+
+    if (IS_CUSTOM_ELEMENT(element))
+      Properties1[element] = properties;
+    else
+      Error(ERR_WARN, "invalid custom element number %d", element);
   }
 
   return chunk_size;
@@ -388,9 +417,10 @@ void LoadLevelFromFilename(char *filename)
       { "VERS", FILE_VERS_CHUNK_SIZE,	LoadLevel_VERS },
       { "HEAD", LEVEL_HEADER_SIZE,	LoadLevel_HEAD },
       { "AUTH", MAX_LEVEL_AUTHOR_LEN,	LoadLevel_AUTH },
-      { "CONT", -1,			LoadLevel_CONT },
       { "BODY", -1,			LoadLevel_BODY },
+      { "CONT", -1,			LoadLevel_CONT },
       { "CNT2", LEVEL_CHUNK_CNT2_SIZE,	LoadLevel_CNT2 },
+      { "CUS1", -1,			LoadLevel_CUS1 },
       {  NULL,  0,			NULL }
     };
 
@@ -545,6 +575,18 @@ static void SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
     fputc(level->author[i], file);
 }
 
+static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
+{
+  int x, y;
+
+  for(y=0; y<level->fieldy; y++) 
+    for(x=0; x<level->fieldx; x++) 
+      if (level->encoding_16bit_field)
+	putFile16BitBE(file, Ur[x][y]);
+      else
+	fputc(Ur[x][y], file);
+}
+
 #if 0
 static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 {
@@ -564,18 +606,6 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 	  fputc(level->yam_content[i][x][y], file);
 }
 #endif
-
-static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
-{
-  int x, y;
-
-  for(y=0; y<level->fieldy; y++) 
-    for(x=0; x<level->fieldx; x++) 
-      if (level->encoding_16bit_field)
-	putFile16BitBE(file, Ur[x][y]);
-      else
-	fputc(Ur[x][y], file);
-}
 
 static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 {
@@ -628,11 +658,38 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 	putFile16BitBE(file, content_array[i][x][y]);
 }
 
+static void SaveLevel_CUS1(FILE *file, int num_changed_custom_elements)
+{
+  int i, check = 0;
+
+  putFile16BitBE(file, num_changed_custom_elements);
+
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (Properties1[element] != EP_BITMASK_DEFAULT)
+    {
+      if (check < num_changed_custom_elements)
+      {
+	putFile16BitBE(file, element);
+	putFile32BitBE(file, Properties1[element]);
+      }
+
+      check++;
+    }
+  }
+
+  if (check != num_changed_custom_elements)	/* should not happen */
+    Error(ERR_WARN, "inconsistent number of custom element properties");
+}
+
 void SaveLevel(int level_nr)
 {
-  int i, x, y;
   char *filename = getLevelFilename(level_nr);
   int body_chunk_size;
+  int num_changed_custom_elements = 0;
+  int i, x, y;
   FILE *file;
 
   if (!(file = fopen(filename, MODE_WRITE)))
@@ -664,8 +721,14 @@ void SaveLevel(int level_nr)
   if (level.amoeba_content > 255)
     level.encoding_16bit_amoeba = TRUE;
 
+  /* calculate size of "BODY" chunk */
   body_chunk_size =
     level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
+
+  /* check for non-standard custom elements and calculate "CUS1" chunk size */
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    if (Properties1[EL_CUSTOM_START + i] != EP_BITMASK_DEFAULT)
+      num_changed_custom_elements++;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
@@ -693,6 +756,12 @@ void SaveLevel(int level_nr)
   {
     putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
     SaveLevel_CNT2(file, &level, EL_BD_AMOEBA);
+  }
+
+  if (num_changed_custom_elements > 0)
+  {
+    putFileChunkBE(file, "CUS1", 2 + num_changed_custom_elements * 6);
+    SaveLevel_CUS1(file, num_changed_custom_elements);
   }
 
   fclose(file);

@@ -368,6 +368,9 @@
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
+#define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
+#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY
+
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
 #define ED_RADIOBUTTON_ID_QUANTITY	1
@@ -2449,6 +2452,63 @@ static boolean LevelContainsPlayer()
   return player_found;
 }
 
+static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
+			  short dst[MAX_LEV_FIELDX][MAX_LEV_FIELDY])
+{
+  int x, y;
+
+  for(x=0; x<lev_fieldx; x++)
+    for(y=0; y<lev_fieldy; y++) 
+      dst[x][y] = src[x][y];
+}
+
+static void CopyCustomElementPropertiesToEditor()
+{
+  int i;
+
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+    int properties = Properties1[element];
+
+    custom_element_properties[i].indestructible =
+      ((properties & EP_BIT_MASSIVE) != 0 ? TRUE : FALSE);
+
+    custom_element_properties[i].can_fall =
+      ((properties & EP_BIT_CAN_FALL) != 0 ? TRUE : FALSE);
+
+    custom_element_properties[i].slippery =
+      ((properties & EP_BIT_SLIPPERY) != 0 ? TRUE : FALSE);
+  }
+}
+
+static void CopyCustomElementPropertiesToGame()
+{
+  int i;
+
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    Properties1[element] = EP_BITMASK_DEFAULT;
+
+    if (custom_element_properties[i].indestructible)
+      Properties1[element] |= EP_BIT_MASSIVE;
+    else
+      Properties1[element] &= ~EP_BIT_MASSIVE;
+
+    if (custom_element_properties[i].can_fall)
+      Properties1[element] |= EP_BIT_CAN_FALL;
+    else
+      Properties1[element] &= ~EP_BIT_CAN_FALL;
+
+    if (custom_element_properties[i].slippery)
+      Properties1[element] |= EP_BIT_SLIPPERY;
+    else
+      Properties1[element] &= ~EP_BIT_SLIPPERY;
+  }
+}
+
 void DrawLevelEd()
 {
   CloseDoor(DOOR_CLOSE_ALL);
@@ -2456,15 +2516,8 @@ void DrawLevelEd()
 
   if (level_editor_test_game)
   {
-    int x, y;
-
-    for(x=0; x<lev_fieldx; x++)
-      for(y=0; y<lev_fieldy; y++)
-	Feld[x][y] = Ur[x][y];
-
-    for(x=0; x<lev_fieldx; x++)
-      for(y=0; y<lev_fieldy; y++)
-	Ur[x][y] = FieldBackup[x][y];
+    CopyPlayfield(Ur, Feld);
+    CopyPlayfield(FieldBackup, Ur);
 
     level_editor_test_game = FALSE;
   }
@@ -2963,7 +3016,7 @@ static void DrawPropertiesWindow()
     { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING },
     { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING },
     { EL_NUT,		&level.score[SC_KOKOSNUSS],	TEXT_CRACKING },
-    { EL_DYNAMITE	,&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
+    { EL_DYNAMITE,	&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
     { EL_KEY1,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_KEY2,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_KEY3,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
@@ -3063,6 +3116,8 @@ static void DrawPropertiesWindow()
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
     int nr = properties_element - EL_CUSTOM_START;
+
+    CopyCustomElementPropertiesToEditor();
 
     /* draw checkbutton gadget */
     i = ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
@@ -4011,7 +4066,13 @@ static void HandleRadiobuttons(struct GadgetInfo *gi)
 
 static void HandleCheckbuttons(struct GadgetInfo *gi)
 {
-  *checkbutton_info[gi->custom_type_id].value ^= TRUE;
+  int type_id = gi->custom_type_id;
+
+  *checkbutton_info[type_id].value ^= TRUE;
+
+  if (type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
+      type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST)
+    CopyCustomElementPropertiesToGame();
 }
 
 static void HandleControlButtons(struct GadgetInfo *gi)
@@ -4255,9 +4316,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	if (Request("Save this level and kill the old ?", REQ_ASK))
 	{
-	  for(x=0; x<lev_fieldx; x++)
-	    for(y=0; y<lev_fieldy; y++) 
-	      Ur[x][y] = Feld[x][y];
+	  CopyPlayfield(Feld, Ur);
+
 	  SaveLevel(level_nr);
 	}
       }
@@ -4271,37 +4331,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (LevelChanged())
 	  level.game_version = GAME_VERSION_ACTUAL;
 
-	for(x=0; x<lev_fieldx; x++)
-	  for(y=0; y<lev_fieldy; y++)
-	    FieldBackup[x][y] = Ur[x][y];
-
-	for(x=0; x<lev_fieldx; x++)
-	  for(y=0; y<lev_fieldy; y++)
-	    Ur[x][y] = Feld[x][y];
-
-	/* !!! ---------- ---------- ---------- ---------- ---------- */
-
-	for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-	{
-	  int element = EL_CUSTOM_START + i;
-
-	  if (custom_element_properties[i].indestructible)
-	    Properties1[element] |= EP_BIT_MASSIVE;
-	  else
-	    Properties1[element] &= ~EP_BIT_MASSIVE;
-
-	  if (custom_element_properties[i].can_fall)
-	    Properties1[element] |= EP_BIT_CAN_FALL;
-	  else
-	    Properties1[element] &= ~EP_BIT_CAN_FALL;
-
-	  if (custom_element_properties[i].slippery)
-	    Properties1[element] |= EP_BIT_SLIPPERY;
-	  else
-	    Properties1[element] &= ~EP_BIT_SLIPPERY;
-	}
-
-	/* !!! ---------- ---------- ---------- ---------- ---------- */
+	CopyPlayfield(Ur, FieldBackup);
+	CopyPlayfield(Feld, Ur);
 
 	UnmapLevelEditorGadgets();
 	UndrawSpecialEditorDoor();

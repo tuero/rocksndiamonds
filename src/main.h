@@ -101,6 +101,8 @@
 #define EP_BIT_TUBE		(1 << 3)
 #define EP_BIT_EM_SLIPPERY_WALL	(1 << 4)
 
+#define EP_BITMASK_DEFAULT	0
+
 #define IS_AMOEBALIVE(e)	(Properties1[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Properties1[e] & EP_BIT_AMOEBOID)
 #define IS_SCHLUESSEL(e)	(Properties1[e] & EP_BIT_SCHLUESSEL)
