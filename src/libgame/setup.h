@@ -171,7 +171,7 @@ struct TokenInfo
 			 ARTWORKCLASS_UNDEFINED)
 
 
-char *getLevelArtworkDir(TreeInfo *);
+void setLevelArtworkDir(TreeInfo *);
 char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getScoreFilename(int);

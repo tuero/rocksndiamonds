@@ -453,47 +453,27 @@ void ReloadCustomArtwork()
       snd_new_identifier = identifier_new;
     if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
 	getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
-      artwork.mus_current_identifier = NULL;
+      mus_new_identifier = identifier_new;
 
     leveldir_current_identifier = leveldir_current->identifier;
   }
 
   /* custom level artwork configured in level series configuration file
      always overrides custom level artwork stored in level series directory
-     and (level independant) custom artwork configured in setup menue
-     (the path entry is needed to send it to the sound child process) */
+     and (level independant) custom artwork configured in setup menue */
   if (leveldir_current->graphics_set != NULL)
-  {
-    if (leveldir_current->graphics_path)
-      free(leveldir_current->graphics_path);
-    leveldir_current->graphics_path = NULL;
-    leveldir_current->graphics_path =
-      getStringCopy(getLevelArtworkDir(artwork.gfx_first));
     gfx_new_identifier = leveldir_current->graphics_set;
-  }
   if (leveldir_current->sounds_set != NULL)
-  {
-    if (leveldir_current->sounds_path)
-      free(leveldir_current->sounds_path);
-    leveldir_current->sounds_path = NULL;
-    leveldir_current->sounds_path =
-      getStringCopy(getLevelArtworkDir(artwork.snd_first));
     snd_new_identifier = leveldir_current->sounds_set;
-  }
   if (leveldir_current->music_set != NULL)
-  {
-    if (leveldir_current->music_path)
-      free(leveldir_current->music_path);
-    leveldir_current->music_path = NULL;
-    leveldir_current->music_path =
-      getStringCopy(getLevelArtworkDir(artwork.mus_first));
     mus_new_identifier = leveldir_current->music_set;
-  }
 
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
     int i;
+
+    setLevelArtworkDir(artwork.gfx_first);
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -518,6 +498,9 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
       last_override_level_sounds != setup.override_level_sounds)
   {
+    /* set artwork path to send it to the sound server process */
+    setLevelArtworkDir(artwork.snd_first);
+
     InitReloadSounds(snd_new_identifier);
 
     artwork.snd_current_identifier = snd_new_identifier;
@@ -527,6 +510,9 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
       last_override_level_music != setup.override_level_music)
   {
+    /* set artwork path to send it to the sound server process */
+    setLevelArtworkDir(artwork.mus_first);
+
     InitReloadMusic(mus_new_identifier);
 
     artwork.mus_current_identifier = mus_new_identifier;
