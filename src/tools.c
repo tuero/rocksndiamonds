@@ -489,7 +489,7 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
       DrawLevelFieldThruMask(last_jx, last_jy);
     }
-    else if (last_element == EL_DYNAMIT)
+    else if (last_element == EL_DYNAMITE_ACTIVE)
       DrawDynamite(last_jx, last_jy);
     else
       DrawLevelField(last_jx, last_jy);
@@ -518,7 +518,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (Store[jx][jy])
     DrawLevelElement(jx, jy, Store[jx][jy]);
-  else if (element != EL_DYNAMIT && element != EL_DYNABOMB)
+  else if (!IS_ACTIVE_BOMB(element))
     DrawLevelField(jx, jy);
 
   /* draw player himself */
@@ -631,13 +631,13 @@ void DrawPlayer(struct PlayerInfo *player)
     }
   }
 
-  /* draw things in front of player (EL_DYNAMIT or EL_DYNABOMB) */
+  /* draw things in front of player (active dynamite or dynabombs) */
 
-  if (element == EL_DYNAMIT || element == EL_DYNABOMB)
+  if (IS_ACTIVE_BOMB(element))
   {
     graphic = el2gfx(element);
 
-    if (element == EL_DYNAMIT)
+    if (element == EL_DYNAMITE_ACTIVE)
     {
       if ((phase = (96 - MovDelay[jx][jy]) / 12) > 6)
 	phase = 6;
@@ -2332,7 +2332,7 @@ int el2gfx(int element)
     case EL_KOKOSNUSS:		return GFX_KOKOSNUSS;
     case EL_LIFE:		return GFX_LIFE;
     case EL_LIFE_ASYNC:		return GFX_LIFE_ASYNC;
-    case EL_DYNAMIT:		return GFX_DYNAMIT;
+    case EL_DYNAMITE_ACTIVE:	return GFX_DYNAMIT;
     case EL_BADEWANNE:		return GFX_BADEWANNE;
     case EL_BADEWANNE1:		return GFX_BADEWANNE1;
     case EL_BADEWANNE2:		return GFX_BADEWANNE2;
@@ -2353,7 +2353,7 @@ int el2gfx(int element)
     case EL_PFORTE2X:		return GFX_PFORTE2X;
     case EL_PFORTE3X:		return GFX_PFORTE3X;
     case EL_PFORTE4X:		return GFX_PFORTE4X;
-    case EL_DYNAMIT_AUS:	return GFX_DYNAMIT_AUS;
+    case EL_DYNAMITE_INACTIVE:	return GFX_DYNAMIT_AUS;
     case EL_PACMAN:		return GFX_PACMAN;
     case EL_PACMAN_R:		return GFX_PACMAN_R;
     case EL_PACMAN_O:		return GFX_PACMAN_O;
@@ -2383,7 +2383,10 @@ int el2gfx(int element)
     case EL_SIEB2_LEER:		return GFX_SIEB2_LEER;
     case EL_SIEB2_VOLL:		return GFX_SIEB2_VOLL;
     case EL_SIEB2_TOT:		return GFX_SIEB2_TOT;
-    case EL_DYNABOMB:		return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_1:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_2:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_3:	return GFX_DYNABOMB;
+    case EL_DYNABOMB_ACTIVE_4:	return GFX_DYNABOMB;
     case EL_DYNABOMB_NR:	return GFX_DYNABOMB_NR;
     case EL_DYNABOMB_SZ:	return GFX_DYNABOMB_SZ;
     case EL_DYNABOMB_XL:	return GFX_DYNABOMB_XL;

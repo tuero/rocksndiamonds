@@ -280,7 +280,7 @@ static void InitField(int x, int y, boolean init_game)
       }
       break;
 
-    case EL_DYNAMIT:
+    case EL_DYNAMITE_ACTIVE:
       MovDelay[x][y] = 96;
       break;
 
@@ -359,7 +359,7 @@ void InitGame()
 
     player->dynamite = 0;
     player->dynabomb_count = 0;
-    player->dynabomb_size = 0;
+    player->dynabomb_size = 1;
     player->dynabombs_left = 0;
     player->dynabomb_xl = FALSE;
 
@@ -1054,7 +1054,7 @@ void DrawDynamite(int x, int y)
   if (Store[x][y])
     DrawGraphic(sx, sy, el2gfx(Store[x][y]));
 
-  if (Feld[x][y] == EL_DYNAMIT)
+  if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
   {
     if ((phase = (96 - MovDelay[x][y]) / 12) > 6)
       phase = 6;
@@ -1083,10 +1083,13 @@ void CheckDynamite(int x, int y)
       if (!(MovDelay[x][y] % 12))
 	PlaySoundLevel(x, y, SND_ZISCH);
 
-      if (Feld[x][y] == EL_DYNAMIT && !(MovDelay[x][y] % 12))
-	DrawDynamite(x, y);
-      else if (Feld[x][y] == EL_DYNABOMB && !(MovDelay[x][y] % 6))
-	DrawDynamite(x, y);
+      if (IS_ACTIVE_BOMB(Feld[x][y]))
+      {
+	int delay = (Feld[x][y] == EL_DYNAMITE_ACTIVE ? 12 : 6);
+
+	if (!(MovDelay[x][y] % delay))
+	  DrawDynamite(x, y);
+      }
 
       return;
     }
@@ -1127,8 +1130,8 @@ void Explode(int ex, int ey, int phase, int mode)
       if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(element) || element == EL_BURNING)
 	continue;
 
-      if ((mode!=EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
-	  (x!=ex || y!=ey))
+      if ((mode != EX_NORMAL || center_element == EL_AMOEBA2DIAM) &&
+	  (x != ex || y != ey))
 	continue;
 
       if (element == EL_EXPLODING)
@@ -1277,7 +1280,9 @@ void Explode(int ex, int ey, int phase, int mode)
 void DynaExplode(int ex, int ey)
 {
   int i, j;
-  struct PlayerInfo *player = &stored_player[Store2[ex][ey] - EL_SPIELER1];
+  int dynabomb_size = 1;
+  boolean dynabomb_xl = FALSE;
+  struct PlayerInfo *player;
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -1286,16 +1291,22 @@ void DynaExplode(int ex, int ey)
     { 0, +1 }
   };
 
-  Store2[ex][ey] = 0;	/* delete player information */
+  if (IS_ACTIVE_BOMB(Feld[ex][ey]))
+  {
+    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_ACTIVE_1];
+    dynabomb_size = player->dynabomb_size;
+    dynabomb_xl = player->dynabomb_xl;
+    player->dynabombs_left++;
+  }
 
   Explode(ex, ey, EX_PHASE_START, EX_CENTER);
 
   for (i=0; i<4; i++)
   {
-    for (j=1; j<=player->dynabomb_size; j++)
+    for (j=1; j<=dynabomb_size; j++)
     {
-      int x = ex+j*xy[i%4][0];
-      int y = ey+j*xy[i%4][1];
+      int x = ex + j * xy[i % 4][0];
+      int y = ey + j * xy[i % 4][1];
       int element;
 
       if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(Feld[x][y]))
@@ -1307,12 +1318,10 @@ void DynaExplode(int ex, int ey)
       if (element != EL_LEERRAUM &&
 	  element != EL_ERDREICH &&
 	  element != EL_EXPLODING &&
-	  !player->dynabomb_xl)
+	  !dynabomb_xl)
 	break;
     }
   }
-
-  player->dynabombs_left++;
 }
 
 void Bang(int x, int y)
@@ -1340,7 +1349,10 @@ void Bang(int x, int y)
       RaiseScoreElement(element);
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
-    case EL_DYNABOMB:
+    case EL_DYNABOMB_ACTIVE_1:
+    case EL_DYNABOMB_ACTIVE_2:
+    case EL_DYNABOMB_ACTIVE_3:
+    case EL_DYNABOMB_ACTIVE_4:
     case EL_DYNABOMB_NR:
     case EL_DYNABOMB_SZ:
     case EL_DYNABOMB_XL:
@@ -3579,7 +3591,7 @@ void GameActions()
     }
     else if (IS_MOVING(x, y))
       ContinueMoving(x, y);
-    else if (element == EL_DYNAMIT || element == EL_DYNABOMB)
+    else if (IS_ACTIVE_BOMB(element))
       CheckDynamite(x, y);
     else if (element == EL_EXPLODING)
       Explode(x, y, Frame[x][y], EX_NORMAL);
@@ -4385,11 +4397,11 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
-    case EL_DYNAMIT_AUS:
+    case EL_DYNAMITE_INACTIVE:
     case EL_SP_DISK_RED:
       RemoveField(x, y);
       player->dynamite++;
-      RaiseScoreElement(EL_DYNAMIT);
+      RaiseScoreElement(EL_DYNAMITE_INACTIVE);
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3),
 	       FS_SMALL, FC_YELLOW);
@@ -4403,21 +4415,21 @@ int DigField(struct PlayerInfo *player,
       RemoveField(x, y);
       player->dynabomb_count++;
       player->dynabombs_left++;
-      RaiseScoreElement(EL_DYNAMIT);
+      RaiseScoreElement(EL_DYNAMITE_INACTIVE);
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_DYNABOMB_SZ:
       RemoveField(x, y);
       player->dynabomb_size++;
-      RaiseScoreElement(EL_DYNAMIT);
+      RaiseScoreElement(EL_DYNAMITE_INACTIVE);
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
     case EL_DYNABOMB_XL:
       RemoveField(x, y);
       player->dynabomb_xl = TRUE;
-      RaiseScoreElement(EL_DYNAMIT);
+      RaiseScoreElement(EL_DYNAMITE_INACTIVE);
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -4794,8 +4806,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   element = Feld[jx][jy];
 
   if ((player->dynamite == 0 && player->dynabombs_left == 0) ||
-      element == EL_DYNAMIT || element == EL_DYNABOMB ||
-      element == EL_EXPLODING)
+      IS_ACTIVE_BOMB(element) || element == EL_EXPLODING)
     return FALSE;
 
   if (element != EL_LEERRAUM)
@@ -4803,7 +4814,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
 
   if (player->dynamite)
   {
-    Feld[jx][jy] = EL_DYNAMIT;
+    Feld[jx][jy] = EL_DYNAMITE_ACTIVE;
     MovDelay[jx][jy] = 96;
     player->dynamite--;
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
@@ -4818,8 +4829,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   }
   else
   {
-    Feld[jx][jy] = EL_DYNABOMB;
-    Store2[jx][jy] = player->element_nr;	/* for DynaExplode() */
+    Feld[jx][jy] = EL_DYNABOMB_ACTIVE_1 + (player->element_nr - EL_SPIELER1);
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
@@ -4909,7 +4919,7 @@ void RaiseScoreElement(int element)
     case EL_KOKOSNUSS:
       RaiseScore(level.score[SC_KOKOSNUSS]);
       break;
-    case EL_DYNAMIT:
+    case EL_DYNAMITE_INACTIVE:
       RaiseScore(level.score[SC_DYNAMIT]);
       break;
     case EL_SCHLUESSEL:

@@ -1313,7 +1313,7 @@ void InitElementProperties()
     EL_EM_GATE_2X,
     EL_EM_GATE_3X,
     EL_EM_GATE_4X,
-    EL_DYNAMIT_AUS,
+    EL_DYNAMITE_INACTIVE,
     EL_UNSICHTBAR,
     EL_BIRNE_AUS,
     EL_BIRNE_EIN,
@@ -1379,9 +1379,12 @@ void InitElementProperties()
   static int ep_explosive[] =
   {
     EL_BOMBE,
-    EL_DYNAMIT,
-    EL_DYNAMIT_AUS,
-    EL_DYNABOMB,
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNAMITE_INACTIVE,
+    EL_DYNABOMB_ACTIVE_1,
+    EL_DYNABOMB_ACTIVE_2,
+    EL_DYNABOMB_ACTIVE_3,
+    EL_DYNABOMB_ACTIVE_4,
     EL_DYNABOMB_NR,
     EL_DYNABOMB_SZ,
     EL_DYNABOMB_XL,
@@ -1538,6 +1541,16 @@ void InitElementProperties()
   };
   static int ep_over_player_num = sizeof(ep_over_player)/sizeof(int);
 
+  static int ep_active_bomb[] =
+  {
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNABOMB_ACTIVE_1,
+    EL_DYNABOMB_ACTIVE_2,
+    EL_DYNABOMB_ACTIVE_3,
+    EL_DYNABOMB_ACTIVE_4
+  };
+  static int ep_active_bomb_num = sizeof(ep_active_bomb)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1569,7 +1582,8 @@ void InitElementProperties()
     EP_BIT_EATABLE,
     EP_BIT_SP_ELEMENT,
     EP_BIT_QUICK_GATE,
-    EP_BIT_OVER_PLAYER
+    EP_BIT_OVER_PLAYER,
+    EP_BIT_ACTIVE_BOMB
   };
   static int *ep_array[] =
   {
@@ -1602,7 +1616,8 @@ void InitElementProperties()
     ep_eatable,
     ep_sp_element,
     ep_quick_gate,
-    ep_over_player
+    ep_over_player,
+    ep_active_bomb
   };
   static int *ep_num[] =
   {
@@ -1635,7 +1650,8 @@ void InitElementProperties()
     &ep_eatable_num,
     &ep_sp_element_num,
     &ep_quick_gate_num,
-    &ep_over_player_num
+    &ep_over_player_num,
+    &ep_active_bomb_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 

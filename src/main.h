@@ -126,6 +126,7 @@ typedef unsigned char byte;
 #define EP_BIT_SP_ELEMENT	(1 << 28)
 #define EP_BIT_QUICK_GATE	(1 << 29)
 #define EP_BIT_OVER_PLAYER	(1 << 30)
+#define EP_BIT_ACTIVE_BOMB	(1 << 31)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
@@ -158,6 +159,7 @@ typedef unsigned char byte;
 #define IS_SP_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SP_ELEMENT)
 #define IS_QUICK_GATE(e)	(Elementeigenschaften[e] & EP_BIT_QUICK_GATE)
 #define IS_OVER_PLAYER(e)	(Elementeigenschaften[e] & EP_BIT_OVER_PLAYER)
+#define IS_ACTIVE_BOMB(e)	(Elementeigenschaften[e] & EP_BIT_ACTIVE_BOMB)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -600,7 +602,7 @@ extern char		*element_info[];
 #define EL_KOKOSNUSS		25
 #define EL_LIFE			26
 #define EL_LIFE_ASYNC		27
-#define EL_DYNAMIT		28
+#define EL_DYNAMITE_ACTIVE	28
 #define EL_BADEWANNE		29
 #define EL_ABLENK_AUS		30
 #define EL_ABLENK_EIN		31
@@ -616,7 +618,7 @@ extern char		*element_info[];
 #define EL_PFORTE2X		41
 #define EL_PFORTE3X		42
 #define EL_PFORTE4X		43
-#define EL_DYNAMIT_AUS		44
+#define EL_DYNAMITE_INACTIVE	44
 #define EL_PACMAN		45
 #define EL_UNSICHTBAR		46
 #define EL_BIRNE_AUS		47
@@ -635,7 +637,9 @@ extern char		*element_info[];
 #define EL_MAMPFER2		60
 #define EL_SIEB2_INAKTIV	61
 #define EL_INVISIBLE_STEEL	62
-#define EL_DYNABOMB		63
+
+#define EL_UNUSED_63		63
+
 #define EL_DYNABOMB_NR		64
 #define EL_DYNABOMB_SZ		65
 #define EL_DYNABOMB_XL		66
@@ -823,6 +827,10 @@ extern char		*element_info[];
 #define EL_EM_KEY_2		310
 #define EL_EM_KEY_3		311
 #define EL_EM_KEY_4		312
+#define EL_DYNABOMB_ACTIVE_1	313
+#define EL_DYNABOMB_ACTIVE_2	314
+#define EL_DYNABOMB_ACTIVE_3	315
+#define EL_DYNABOMB_ACTIVE_4	316
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		400
