@@ -2652,6 +2652,40 @@ void RelocatePlayer(int x, int y, int element_raw)
 
   if (level.instant_relocation)
   {
+#if 1
+    int offset = (setup.scroll_delay ? 3 : 0);
+    int jx = local_player->jx;
+    int jy = local_player->jy;
+
+    if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
+    {
+      scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		  local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		  local_player->jx - MIDPOSX);
+
+      scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  local_player->jy - MIDPOSY);
+    }
+    else
+    {
+      if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
+	  (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
+	scroll_x = jx - MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
+
+      if ((player->MovDir == MV_UP  && scroll_y > jy - MIDPOSY + offset) ||
+	  (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
+	scroll_y = jy - MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_x < SBX_Left || scroll_x > SBX_Right)
+	scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
+	scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+    }
+#else
     scroll_x += (local_player->jx - old_jx);
     scroll_y += (local_player->jy - old_jy);
 
@@ -2662,11 +2696,16 @@ void RelocatePlayer(int x, int y, int element_raw)
     /* don't scroll over playfield boundaries */
     if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
       scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+#endif
 
     RedrawPlayfield(TRUE, 0,0,0,0);
   }
   else
   {
+#if 1
+    int offset = (setup.scroll_delay ? 3 : 0);
+    int jx = local_player->jx;
+    int jy = local_player->jy;
     int scroll_xx = -999, scroll_yy = -999;
 
     ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
@@ -2713,6 +2752,54 @@ void RelocatePlayer(int x, int y, int element_raw)
       BackToFront();
       Delay(wait_delay_value);
     }
+#else
+    int scroll_xx = -999, scroll_yy = -999;
+
+    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
+
+    while (scroll_xx != scroll_x || scroll_yy != scroll_y)
+    {
+      int dx = 0, dy = 0;
+      int fx = FX, fy = FY;
+
+      scroll_xx = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		   local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		   local_player->jx - MIDPOSX);
+
+      scroll_yy = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   local_player->jy - MIDPOSY);
+
+      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
+      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+
+#if 1
+      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+	break;
+#else
+      if (scroll_xx == scroll_x && scroll_yy == scroll_y)
+	break;
+#endif
+
+      scroll_x -= dx;
+      scroll_y -= dy;
+
+      fx += dx * TILEX / 2;
+      fy += dy * TILEY / 2;
+
+      ScrollLevel(dx, dy);
+      DrawAllPlayers();
+
+      /* scroll in two steps of half tile size to make things smoother */
+      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      FlushDisplay();
+      Delay(wait_delay_value);
+
+      /* scroll second step to align at full tile size */
+      BackToFront();
+      Delay(wait_delay_value);
+    }
+#endif
   }
 }
 
@@ -8694,7 +8781,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     {
       if (jx != old_jx)		/* player has moved horizontally */
       {
- 	if ((player->MovDir == MV_LEFT && scroll_x > jx - MIDPOSX + offset) ||
+ 	if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
 	    (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
 	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
 
@@ -8706,13 +8793,13 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
 
 	/* don't scroll against the player's moving direction */
-	if ((player->MovDir == MV_LEFT && scroll_x > old_scroll_x) ||
+	if ((player->MovDir == MV_LEFT  && scroll_x > old_scroll_x) ||
 	    (player->MovDir == MV_RIGHT && scroll_x < old_scroll_x))
 	  scroll_x = old_scroll_x;
       }
       else			/* player has moved vertically */
       {
-	if ((player->MovDir == MV_UP && scroll_y > jy - MIDPOSY + offset) ||
+	if ((player->MovDir == MV_UP   && scroll_y > jy - MIDPOSY + offset) ||
 	    (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
 	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
 
@@ -8724,7 +8811,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
 
 	/* don't scroll against the player's moving direction */
-	if ((player->MovDir == MV_UP && scroll_y > old_scroll_y) ||
+	if ((player->MovDir == MV_UP   && scroll_y > old_scroll_y) ||
 	    (player->MovDir == MV_DOWN && scroll_y < old_scroll_y))
 	  scroll_y = old_scroll_y;
       }
