@@ -2010,8 +2010,8 @@ unsigned int MoveDoor(unsigned int door_state)
   static int door1 = DOOR_OPEN_1;
   static int door2 = DOOR_CLOSE_2;
   static unsigned long door_delay = 0;
-  int x, start, stepsize = global.door_step_offset;
-  unsigned long door_delay_value = global.door_step_delay;
+  int x, start, stepsize = door.step_offset;
+  unsigned long door_delay_value = door.step_delay;
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);

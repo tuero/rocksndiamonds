@@ -92,6 +92,8 @@ struct TapeInfo		tape;
 struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
+struct MenuInfo		menu;
+struct DoorInfo		door;
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 
@@ -2999,6 +3001,30 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 
   { NULL,		0,				}
 };
+
+struct TokenIntPtrInfo image_config_vars[] =
+{
+  { "global.num_toons",		&global.num_toons			   },
+  { "menu.draw_xoffset",	&menu.draw_xoffset_default		   },
+  { "menu.draw_yoffset",	&menu.draw_yoffset_default		   },
+  { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]   },
+  { "menu.draw_yoffset.MAIN",	&menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]   },
+  { "menu.draw_xoffset.LEVELS",	&menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS] },
+  { "menu.draw_yoffset.LEVELS",	&menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS] },
+  { "menu.draw_xoffset.SCORES",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES] },
+  { "menu.draw_yoffset.SCORES",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SCORES] },
+  { "menu.draw_xoffset.EDITOR",	&menu.draw_xoffset[GFX_SPECIAL_ARG_EDITOR] },
+  { "menu.draw_yoffset.EDITOR",	&menu.draw_yoffset[GFX_SPECIAL_ARG_EDITOR] },
+  { "menu.draw_xoffset.INFO",	&menu.draw_xoffset[GFX_SPECIAL_ARG_INFO]   },
+  { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]   },
+  { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]  },
+  { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]  },
+  { "door.step_offset",		&door.step_offset			   },
+  { "door.step_delay",		&door.step_delay			   },
+
+  { NULL,			NULL,					   }
+};
+
 
 /* ------------------------------------------------------------------------- */
 /* font definitions                                                          */

@@ -1900,47 +1900,38 @@ void LoadSpecialMenuDesignSettings()
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
   SetupFileHash *setup_file_hash;
-  char *value;
+  int i, j;
 
-  /* !!! CHANGE THIS !!! (redundant initialization) !!! */
-  global.num_toons = 20;
-  global.menu_draw_xoffset = 0;
-  global.menu_draw_yoffset = 0;
-  global.menu_draw_xoffset_MAIN = 0;
-  global.menu_draw_yoffset_MAIN = 0;
-  global.door_step_offset = 2;
-  global.door_step_delay = 10;
+  /* always start with reliable default values from default config */
+  for (i=0; image_config_vars[i].token != NULL; i++)
+    for (j=0; image_config[j].token != NULL; j++)
+      if (strcmp(image_config_vars[i].token, image_config[j].token) == 0)
+	*image_config_vars[i].value =
+	  get_integer_from_string(image_config[j].value);
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
-  value = getHashEntry(setup_file_hash, "global.num_toons");
-  if (value != NULL)
-    global.num_toons = get_integer_from_string(value);
+  /* special case: initialize with default values that may be overwrittem */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset");
+    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset");
 
-  value = getHashEntry(setup_file_hash, "menu.draw_xoffset");
-  if (value != NULL)
-    global.menu_draw_xoffset = get_integer_from_string(value);
+    if (value_x != NULL)
+      menu.draw_xoffset[i] = get_integer_from_string(value_x);
+    if (value_y != NULL)
+      menu.draw_yoffset[i] = get_integer_from_string(value_y);
+  }
 
-  value = getHashEntry(setup_file_hash, "menu.draw_yoffset");
-  if (value != NULL)
-    global.menu_draw_yoffset = get_integer_from_string(value);
+  /* read (and overwrite with) values that may be specified in config file */
+  for (i=0; image_config_vars[i].token != NULL; i++)
+  {
+    char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
 
-  value = getHashEntry(setup_file_hash, "menu.draw_xoffset.MAIN");
-  if (value != NULL)
-    global.menu_draw_xoffset_MAIN = get_integer_from_string(value);
-
-  value = getHashEntry(setup_file_hash, "menu.draw_yoffset.MAIN");
-  if (value != NULL)
-    global.menu_draw_yoffset_MAIN = get_integer_from_string(value);
-
-  value = getHashEntry(setup_file_hash, "door.step_offset");
-  if (value != NULL)
-    global.door_step_offset = get_integer_from_string(value);
-
-  value = getHashEntry(setup_file_hash, "door.step_delay");
-  if (value != NULL)
-    global.door_step_delay = get_integer_from_string(value);
+    if (value != NULL)
+      *image_config_vars[i].value = get_integer_from_string(value);
+  }
 
   freeSetupFileHash(setup_file_hash);
 }

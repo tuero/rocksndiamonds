@@ -1070,27 +1070,110 @@ static void ReinitializeMusic()
 
 void InitElementPropertiesStatic()
 {
-  static int ep_amoebalive[] =
+  static int ep_diggable[] =
   {
-    EL_AMOEBA_WET,
-    EL_AMOEBA_DRY,
-    EL_AMOEBA_FULL,
-    EL_BD_AMOEBA,
+    EL_SAND,
+    EL_SP_BASE,
+    EL_SP_BUGGY_BASE,
+    EL_SP_BUGGY_BASE_ACTIVATING,
+    EL_TRAP,
+    EL_INVISIBLE_SAND,
+    EL_INVISIBLE_SAND_ACTIVE,
+#if 1
+    EL_LANDMINE,
+    EL_TRAP_ACTIVE,
+    EL_SP_BUGGY_BASE_ACTIVE,
+#endif
     -1
   };
 
-  static int ep_amoeboid[] =
+  static int ep_collectible[] =
   {
-    EL_AMOEBA_DEAD,
-    EL_AMOEBA_WET,
-    EL_AMOEBA_DRY,
-    EL_AMOEBA_FULL,
-    EL_BD_AMOEBA,
+    EL_BD_DIAMOND,
+    EL_EMERALD,
+    EL_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_KEY_1,
+    EL_KEY_2,
+    EL_KEY_3,
+    EL_KEY_4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4,
+    EL_DYNAMITE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
+    EL_SP_INFOTRON,
+    EL_SP_DISK_RED,
+    EL_PEARL,
+    EL_CRYSTAL,
+    EL_KEY_WHITE,
+    EL_SHIELD_NORMAL,
+    EL_SHIELD_DEADLY,
+    EL_EXTRA_TIME,
+    EL_ENVELOPE,
+    EL_SPEED_PILL,
     -1
   };
 
-  static int ep_keygate[] =
+  static int ep_indestructible[] =
   {
+    EL_STEELWALL,
+    EL_ACID,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_ACID_POOL_BOTTOMLEFT,
+    EL_ACID_POOL_BOTTOM,
+    EL_ACID_POOL_BOTTOMRIGHT,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_INVISIBLE_STEELWALL,
+    EL_INVISIBLE_STEELWALL_ACTIVE,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
+    EL_LIGHT_SWITCH,
+    EL_LIGHT_SWITCH_ACTIVE,
+    EL_SIGN_EXCLAMATION,
+    EL_SIGN_RADIOACTIVITY,
+    EL_SIGN_STOP,
+    EL_SIGN_WHEELCHAIR,
+    EL_SIGN_PARKING,
+    EL_SIGN_ONEWAY,
+    EL_SIGN_HEART,
+    EL_SIGN_TRIANGLE,
+    EL_SIGN_ROUND,
+    EL_SIGN_EXIT,
+    EL_SIGN_YINYANG,
+    EL_SIGN_OTHER,
+    EL_STEELWALL_SLANTED,
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
+    EL_CRYSTAL,
     EL_GATE_1,
     EL_GATE_2,
     EL_GATE_3,
@@ -1107,6 +1190,218 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
+    EL_SWITCHGATE_OPEN,
+    EL_SWITCHGATE_OPENING,
+    EL_SWITCHGATE_CLOSED,
+    EL_SWITCHGATE_CLOSING,
+    EL_TIMEGATE_OPEN,
+    EL_TIMEGATE_OPENING,
+    EL_TIMEGATE_CLOSED,
+    EL_TIMEGATE_CLOSING,
+    EL_TUBE_ANY,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN,
+    -1
+  };
+
+  static int ep_slippery[] =
+  {
+    EL_WALL_CRUMBLED,
+    EL_BD_WALL,
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_BOMB,
+    EL_NUT,
+    EL_ROBOT_WHEEL_ACTIVE,
+    EL_ROBOT_WHEEL,
+    EL_TIME_ORB_FULL,
+    EL_TIME_ORB_EMPTY,
+    EL_LAMP_ACTIVE,
+    EL_LAMP,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_SATELLITE,
+    EL_SP_ZONK,
+    EL_SP_INFOTRON,
+    EL_SP_CHIP_SINGLE,
+    EL_SP_CHIP_LEFT,
+    EL_SP_CHIP_RIGHT,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    EL_SPEED_PILL,
+    EL_STEELWALL_SLANTED,
+    EL_PEARL,
+    EL_CRYSTAL,
+    -1
+  };
+
+  static int ep_can_fall[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_BOMB,
+    EL_NUT,
+    EL_AMOEBA_DROP,
+    EL_QUICKSAND_FULL,
+    EL_MAGIC_WALL_FULL,
+    EL_BD_MAGIC_WALL_FULL,
+    EL_TIME_ORB_FULL,
+    EL_TIME_ORB_EMPTY,
+    EL_SP_ZONK,
+    EL_SP_INFOTRON,
+    EL_SP_DISK_ORANGE,
+    EL_PEARL,
+    EL_CRYSTAL,
+    EL_SPRING,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_can_smash[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_BOMB,
+    EL_NUT,
+    EL_AMOEBA_DROP,
+    EL_TIME_ORB_FULL,
+    EL_TIME_ORB_EMPTY,
+    EL_SP_ZONK,
+    EL_SP_INFOTRON,
+    EL_SP_DISK_ORANGE,
+    EL_PEARL,
+    EL_CRYSTAL,
+    EL_SPRING,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_walkable_over[] =
+  {
+    EL_EMPTY_SPACE,
+    EL_SP_EMPTY_SPACE,
+    EL_SOKOBAN_FIELD_EMPTY,
+    EL_EXIT_OPEN,
+    EL_SP_EXIT_OPEN,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    -1
+  };
+
+  static int ep_walkable_inside[] =
+  {
+    EL_TUBE_ANY,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN,
+    -1
+  };
+
+  static int ep_walkable_under[] =
+  {
+    -1
+  };
+
+  static int ep_passable_over[] =
+  {
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    EL_SWITCHGATE_OPEN,
+    EL_TIMEGATE_OPEN,
+    -1
+  };
+
+  static int ep_passable_inside[] =
+  {
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_UP,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_GRAVITY_PORT_DOWN,
+    -1
+  };
+
+  static int ep_passable_under[] =
+  {
+    -1
+  };
+
+  static int ep_pushable[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_BOMB,
+    EL_NUT,
+    EL_TIME_ORB_EMPTY,
+    EL_SOKOBAN_FIELD_FULL,
+    EL_SOKOBAN_OBJECT,
+    EL_SATELLITE,
+    EL_SP_ZONK,
+    EL_SP_DISK_ORANGE,
+    EL_SP_DISK_YELLOW,
+    EL_BALLOON,
+    EL_SPRING,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_player[] =
+  {
+    EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4,
     -1
   };
 
@@ -1116,6 +1411,348 @@ void InitElementPropertiesStatic()
     EL_LANDMINE,
     EL_TRAP,
     EL_TRAP_ACTIVE,
+    -1
+  };
+
+  static int ep_can_move[] =
+  {
+    /* only stored in level file */
+    EL_BUG_RIGHT,
+    EL_BUG_UP,
+    EL_BUG_LEFT,
+    EL_BUG_DOWN,
+    EL_SPACESHIP_RIGHT,
+    EL_SPACESHIP_UP,
+    EL_SPACESHIP_LEFT,
+    EL_SPACESHIP_DOWN,
+    EL_BD_BUTTERFLY_RIGHT,
+    EL_BD_BUTTERFLY_UP,
+    EL_BD_BUTTERFLY_LEFT,
+    EL_BD_BUTTERFLY_DOWN,
+    EL_BD_FIREFLY_RIGHT,
+    EL_BD_FIREFLY_UP,
+    EL_BD_FIREFLY_LEFT,
+    EL_BD_FIREFLY_DOWN,
+    EL_PACMAN_RIGHT,
+    EL_PACMAN_UP,
+    EL_PACMAN_LEFT,
+    EL_PACMAN_DOWN,
+
+    /* level file and runtime elements */
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_MOLE,
+    EL_PENGUIN,
+    EL_PIG,
+    EL_DRAGON,
+    EL_SATELLITE,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    EL_BALLOON,
+    EL_SPRING,
+    -1
+  };
+
+  static int ep_can_change[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    -1
+  };
+
+  static int ep_dont_touch[] =
+  {
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    -1
+  };
+
+  static int ep_enemy[] =
+  {
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    -1
+  };
+
+  static int ep_dont_go_to[] =
+  {
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_AMOEBA_DROP,
+    EL_ACID,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    EL_SP_BUGGY_BASE_ACTIVE,
+    EL_TRAP_ACTIVE,
+    EL_LANDMINE,
+    -1
+  };
+
+  static int ep_explosive[] =
+  {
+    EL_BOMB,
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNAMITE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
+    EL_SP_DISK_RED_ACTIVE,
+    EL_BUG,
+    EL_MOLE,
+    EL_PENGUIN,
+    EL_PIG,
+    EL_DRAGON,
+    EL_SATELLITE,
+    EL_SP_DISK_RED,
+    EL_SP_DISK_ORANGE,
+    EL_SP_DISK_YELLOW,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    EL_DX_SUPABOMB,
+    -1
+  };
+
+  static int ep_bd_element[] =
+  {
+    EL_EMPTY,
+    EL_SAND,
+    EL_WALL_CRUMBLED,
+    EL_BD_WALL,
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_BD_DIAMOND,
+    EL_BD_MAGIC_WALL,
+    EL_EXIT_CLOSED,
+    EL_EXIT_OPEN,
+    EL_STEELWALL,
+    EL_PLAYER_1,
+    EL_BD_FIREFLY,
+    EL_BD_FIREFLY_1,
+    EL_BD_FIREFLY_2,
+    EL_BD_FIREFLY_3,
+    EL_BD_FIREFLY_4,
+    EL_BD_BUTTERFLY,
+    EL_BD_BUTTERFLY_1,
+    EL_BD_BUTTERFLY_2,
+    EL_BD_BUTTERFLY_3,
+    EL_BD_BUTTERFLY_4,
+    EL_BD_AMOEBA,
+    EL_CHAR_QUESTION,
+    -1
+  };
+
+  static int ep_sp_element[] =
+  {
+    EL_SP_EMPTY,
+    EL_SP_ZONK,
+    EL_SP_BASE,
+    EL_SP_MURPHY,
+    EL_SP_INFOTRON,
+    EL_SP_CHIP_SINGLE,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_EXIT_CLOSED,
+    EL_SP_EXIT_OPEN,
+    EL_SP_DISK_ORANGE,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_UP,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_SNIKSNAK,
+    EL_SP_DISK_YELLOW,
+    EL_SP_TERMINAL,
+    EL_SP_DISK_RED,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_ANY,
+    EL_SP_ELECTRON,
+    EL_SP_BUGGY_BASE,
+    EL_SP_CHIP_LEFT,
+    EL_SP_CHIP_RIGHT,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    /* additional elements that appeared in newer Supaplex levels */
+    EL_INVISIBLE_WALL,
+    /* more than one murphy in a level results in an inactive clone */
+    EL_SP_MURPHY_CLONE,
+    -1
+  };
+
+  static int ep_sb_element[] =
+  {
+    EL_EMPTY,
+    EL_STEELWALL,
+    EL_SOKOBAN_OBJECT,
+    EL_SOKOBAN_FIELD_EMPTY,
+    EL_SOKOBAN_FIELD_FULL,
+    EL_PLAYER_1,
+    EL_INVISIBLE_STEELWALL,
+    -1
+  };
+
+  static int ep_gem[] =
+  {
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    -1
+  };
+
+  static int ep_food_dark_yamyam[] =
+  {
+    EL_SAND,
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+    EL_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_AMOEBA_DROP,
+    EL_AMOEBA_DEAD,
+    EL_AMOEBA_WET,
+    EL_AMOEBA_DRY,
+    EL_AMOEBA_FULL,
+    EL_BD_AMOEBA,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_PEARL,
+    EL_CRYSTAL,
+    -1
+  };
+
+  static int ep_food_penguin[] =
+  {
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_PEARL,
+    EL_CRYSTAL,
+    -1
+  };
+
+  static int ep_historic_wall[] =
+  {
+    EL_STEELWALL,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    EL_EXIT_CLOSED,
+    EL_EXIT_OPENING,
+    EL_EXIT_OPEN,
+    EL_WALL,
+    EL_WALL_CRUMBLED,
+    EL_EXPANDABLE_WALL,
+    EL_EXPANDABLE_WALL_HORIZONTAL,
+    EL_EXPANDABLE_WALL_VERTICAL,
+    EL_EXPANDABLE_WALL_ANY,
+    EL_EXPANDABLE_WALL_GROWING,
+    EL_BD_WALL,
+    EL_SP_CHIP_SINGLE,
+    EL_SP_CHIP_LEFT,
+    EL_SP_CHIP_RIGHT,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_SP_TERMINAL,
+    EL_SP_TERMINAL_ACTIVE,
+    EL_SP_EXIT_CLOSED,
+    EL_SP_EXIT_OPEN,
+    EL_INVISIBLE_STEELWALL,
+    EL_INVISIBLE_STEELWALL_ACTIVE,
+    EL_INVISIBLE_WALL,
+    EL_INVISIBLE_WALL_ACTIVE,
+    EL_STEELWALL_SLANTED,
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8,
     -1
   };
 
@@ -1274,28 +1911,42 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_indestructible[] =
+  static int ep_belt[] =
   {
-    EL_STEELWALL,
-    EL_ACID,
-    EL_ACID_POOL_TOPLEFT,
-    EL_ACID_POOL_TOPRIGHT,
-    EL_ACID_POOL_BOTTOMLEFT,
-    EL_ACID_POOL_BOTTOM,
-    EL_ACID_POOL_BOTTOMRIGHT,
-    EL_SP_HARDWARE_GRAY,
-    EL_SP_HARDWARE_GREEN,
-    EL_SP_HARDWARE_BLUE,
-    EL_SP_HARDWARE_RED,
-    EL_SP_HARDWARE_YELLOW,
-    EL_SP_HARDWARE_BASE_1,
-    EL_SP_HARDWARE_BASE_2,
-    EL_SP_HARDWARE_BASE_3,
-    EL_SP_HARDWARE_BASE_4,
-    EL_SP_HARDWARE_BASE_5,
-    EL_SP_HARDWARE_BASE_6,
-    EL_INVISIBLE_STEELWALL,
-    EL_INVISIBLE_STEELWALL_ACTIVE,
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_1_MIDDLE,
+    EL_CONVEYOR_BELT_1_RIGHT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_2_MIDDLE,
+    EL_CONVEYOR_BELT_2_RIGHT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_3_MIDDLE,
+    EL_CONVEYOR_BELT_3_RIGHT,
+    EL_CONVEYOR_BELT_4_LEFT,
+    EL_CONVEYOR_BELT_4_MIDDLE,
+    EL_CONVEYOR_BELT_4_RIGHT,
+    -1
+  };
+
+  static int ep_belt_active[] =
+  {
+    EL_CONVEYOR_BELT_1_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_1_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_2_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_2_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_3_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_3_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_4_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_4_RIGHT_ACTIVE,
+    -1
+  };
+
+  static int ep_belt_switch[] =
+  {
     EL_CONVEYOR_BELT_1_SWITCH_LEFT,
     EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
@@ -1308,119 +1959,27 @@ void InitElementPropertiesStatic()
     EL_CONVEYOR_BELT_4_SWITCH_LEFT,
     EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
-    EL_LIGHT_SWITCH,
-    EL_LIGHT_SWITCH_ACTIVE,
-    EL_SIGN_EXCLAMATION,
-    EL_SIGN_RADIOACTIVITY,
-    EL_SIGN_STOP,
-    EL_SIGN_WHEELCHAIR,
-    EL_SIGN_PARKING,
-    EL_SIGN_ONEWAY,
-    EL_SIGN_HEART,
-    EL_SIGN_TRIANGLE,
-    EL_SIGN_ROUND,
-    EL_SIGN_EXIT,
-    EL_SIGN_YINYANG,
-    EL_SIGN_OTHER,
-    EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL_1,
-    EL_EMC_STEELWALL_2,
-    EL_EMC_STEELWALL_3,
-    EL_EMC_STEELWALL_4,
-    EL_CRYSTAL,
-    EL_GATE_1,
-    EL_GATE_2,
-    EL_GATE_3,
-    EL_GATE_4,
-    EL_GATE_1_GRAY,
-    EL_GATE_2_GRAY,
-    EL_GATE_3_GRAY,
-    EL_GATE_4_GRAY,
-    EL_EM_GATE_1,
-    EL_EM_GATE_2,
-    EL_EM_GATE_3,
-    EL_EM_GATE_4,
-    EL_EM_GATE_1_GRAY,
-    EL_EM_GATE_2_GRAY,
-    EL_EM_GATE_3_GRAY,
-    EL_EM_GATE_4_GRAY,
-    EL_SWITCHGATE_OPEN,
-    EL_SWITCHGATE_OPENING,
-    EL_SWITCHGATE_CLOSED,
-    EL_SWITCHGATE_CLOSING,
-    EL_TIMEGATE_OPEN,
-    EL_TIMEGATE_OPENING,
-    EL_TIMEGATE_CLOSED,
-    EL_TIMEGATE_CLOSING,
-    EL_TUBE_ANY,
-    EL_TUBE_VERTICAL,
-    EL_TUBE_HORIZONTAL,
-    EL_TUBE_VERTICAL_LEFT,
-    EL_TUBE_VERTICAL_RIGHT,
-    EL_TUBE_HORIZONTAL_UP,
-    EL_TUBE_HORIZONTAL_DOWN,
+    -1
+  };
+
+  static int ep_tube[] =
+  {
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_ANY,
     -1
   };
 
-  static int ep_slippery[] =
+  static int ep_keygate[] =
   {
-    EL_WALL_CRUMBLED,
-    EL_BD_WALL,
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    EL_BOMB,
-    EL_NUT,
-    EL_ROBOT_WHEEL_ACTIVE,
-    EL_ROBOT_WHEEL,
-    EL_TIME_ORB_FULL,
-    EL_TIME_ORB_EMPTY,
-    EL_LAMP_ACTIVE,
-    EL_LAMP,
-    EL_ACID_POOL_TOPLEFT,
-    EL_ACID_POOL_TOPRIGHT,
-    EL_SATELLITE,
-    EL_SP_ZONK,
-    EL_SP_INFOTRON,
-    EL_SP_CHIP_SINGLE,
-    EL_SP_CHIP_LEFT,
-    EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_TOP,
-    EL_SP_CHIP_BOTTOM,
-    EL_SPEED_PILL,
-    EL_STEELWALL_SLANTED,
-    EL_PEARL,
-    EL_CRYSTAL,
-    -1
-  };
-
-  static int ep_enemy[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    -1
-  };
-
-  static int ep_historic_wall[] =
-  {
-    EL_STEELWALL,
     EL_GATE_1,
     EL_GATE_2,
     EL_GATE_3,
@@ -1437,275 +1996,46 @@ void InitElementPropertiesStatic()
     EL_EM_GATE_2_GRAY,
     EL_EM_GATE_3_GRAY,
     EL_EM_GATE_4_GRAY,
-    EL_EXIT_CLOSED,
-    EL_EXIT_OPENING,
-    EL_EXIT_OPEN,
-    EL_WALL,
-    EL_WALL_CRUMBLED,
-    EL_EXPANDABLE_WALL,
-    EL_EXPANDABLE_WALL_HORIZONTAL,
-    EL_EXPANDABLE_WALL_VERTICAL,
-    EL_EXPANDABLE_WALL_ANY,
-    EL_EXPANDABLE_WALL_GROWING,
-    EL_BD_WALL,
-    EL_SP_CHIP_SINGLE,
-    EL_SP_CHIP_LEFT,
-    EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_TOP,
-    EL_SP_CHIP_BOTTOM,
-    EL_SP_HARDWARE_GRAY,
-    EL_SP_HARDWARE_GREEN,
-    EL_SP_HARDWARE_BLUE,
-    EL_SP_HARDWARE_RED,
-    EL_SP_HARDWARE_YELLOW,
-    EL_SP_HARDWARE_BASE_1,
-    EL_SP_HARDWARE_BASE_2,
-    EL_SP_HARDWARE_BASE_3,
-    EL_SP_HARDWARE_BASE_4,
-    EL_SP_HARDWARE_BASE_5,
-    EL_SP_HARDWARE_BASE_6,
-    EL_SP_TERMINAL,
-    EL_SP_TERMINAL_ACTIVE,
-    EL_SP_EXIT_CLOSED,
-    EL_SP_EXIT_OPEN,
-    EL_INVISIBLE_STEELWALL,
-    EL_INVISIBLE_STEELWALL_ACTIVE,
-    EL_INVISIBLE_WALL,
-    EL_INVISIBLE_WALL_ACTIVE,
-    EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL_1,
-    EL_EMC_STEELWALL_2,
-    EL_EMC_STEELWALL_3,
-    EL_EMC_STEELWALL_4,
-    EL_EMC_WALL_1,
-    EL_EMC_WALL_2,
-    EL_EMC_WALL_3,
-    EL_EMC_WALL_4,
-    EL_EMC_WALL_5,
-    EL_EMC_WALL_6,
-    EL_EMC_WALL_7,
-    EL_EMC_WALL_8,
     -1
   };
 
-  static int ep_can_fall[] =
+  static int ep_amoeboid[] =
   {
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    EL_BOMB,
-    EL_NUT,
-    EL_AMOEBA_DROP,
-    EL_QUICKSAND_FULL,
-    EL_MAGIC_WALL_FULL,
-    EL_BD_MAGIC_WALL_FULL,
-    EL_TIME_ORB_FULL,
-    EL_TIME_ORB_EMPTY,
-    EL_SP_ZONK,
-    EL_SP_INFOTRON,
-    EL_SP_DISK_ORANGE,
-    EL_PEARL,
-    EL_CRYSTAL,
-    EL_SPRING,
-    EL_DX_SUPABOMB,
-    -1
-  };
-
-  static int ep_can_smash[] =
-  {
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    EL_BOMB,
-    EL_NUT,
-    EL_AMOEBA_DROP,
-    EL_TIME_ORB_FULL,
-    EL_TIME_ORB_EMPTY,
-    EL_SP_ZONK,
-    EL_SP_INFOTRON,
-    EL_SP_DISK_ORANGE,
-    EL_PEARL,
-    EL_CRYSTAL,
-    EL_SPRING,
-    EL_DX_SUPABOMB,
-    -1
-  };
-
-  static int ep_can_change[] =
-  {
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    -1
-  };
-
-  static int ep_can_move[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_MOLE,
-    EL_PENGUIN,
-    EL_PIG,
-    EL_DRAGON,
-    EL_SATELLITE,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_BALLOON,
-    EL_SPRING,
-    -1
-  };
-
-  static int ep_could_move[] =
-  {
-    EL_BUG_RIGHT,
-    EL_BUG_UP,
-    EL_BUG_LEFT,
-    EL_BUG_DOWN,
-    EL_SPACESHIP_RIGHT,
-    EL_SPACESHIP_UP,
-    EL_SPACESHIP_LEFT,
-    EL_SPACESHIP_DOWN,
-    EL_BD_BUTTERFLY_RIGHT,
-    EL_BD_BUTTERFLY_UP,
-    EL_BD_BUTTERFLY_LEFT,
-    EL_BD_BUTTERFLY_DOWN,
-    EL_BD_FIREFLY_RIGHT,
-    EL_BD_FIREFLY_UP,
-    EL_BD_FIREFLY_LEFT,
-    EL_BD_FIREFLY_DOWN,
-    EL_PACMAN_RIGHT,
-    EL_PACMAN_UP,
-    EL_PACMAN_LEFT,
-    EL_PACMAN_DOWN,
-    -1
-  };
-
-  static int ep_dont_touch[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    -1
-  };
-
-  static int ep_dont_go_to[] =
-  {
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    EL_YAMYAM,
-    EL_DARK_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_AMOEBA_DROP,
-    EL_ACID,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_SP_BUGGY_BASE_ACTIVE,
-    EL_TRAP_ACTIVE,
-    EL_LANDMINE,
-    -1
-  };
-
-  static int ep_food_dark_yamyam[] =
-  {
-    EL_SAND,
-    EL_BUG,
-    EL_SPACESHIP,
-    EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY,
-    EL_YAMYAM,
-    EL_ROBOT,
-    EL_PACMAN,
-    EL_AMOEBA_DROP,
     EL_AMOEBA_DEAD,
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    EL_PEARL,
-    EL_CRYSTAL,
     -1
   };
 
-  static int ep_bd_element[] =
+  static int ep_amoebalive[] =
   {
-    EL_EMPTY,
-    EL_SAND,
-    EL_WALL_CRUMBLED,
-    EL_BD_WALL,
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_BD_DIAMOND,
-    EL_BD_MAGIC_WALL,
-    EL_EXIT_CLOSED,
-    EL_EXIT_OPEN,
-    EL_STEELWALL,
-    EL_PLAYER_1,
-    EL_BD_FIREFLY,
-    EL_BD_FIREFLY_1,
-    EL_BD_FIREFLY_2,
-    EL_BD_FIREFLY_3,
-    EL_BD_FIREFLY_4,
-    EL_BD_BUTTERFLY,
-    EL_BD_BUTTERFLY_1,
-    EL_BD_BUTTERFLY_2,
-    EL_BD_BUTTERFLY_3,
-    EL_BD_BUTTERFLY_4,
+    EL_AMOEBA_WET,
+    EL_AMOEBA_DRY,
+    EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
-    EL_CHAR_QUESTION,
     -1
   };
 
-  static int ep_sb_element[] =
+  static int ep_has_content[] =
   {
-    EL_EMPTY,
-    EL_STEELWALL,
-    EL_SOKOBAN_OBJECT,
-    EL_SOKOBAN_FIELD_EMPTY,
-    EL_SOKOBAN_FIELD_FULL,
-    EL_PLAYER_1,
-    EL_INVISIBLE_STEELWALL,
+    EL_YAMYAM,
+    EL_AMOEBA_WET,
+    EL_AMOEBA_DRY,
+    EL_AMOEBA_FULL,
+    EL_BD_AMOEBA,
     -1
   };
 
-  static int ep_gem[] =
+  static int ep_active_bomb[] =
   {
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
+    EL_DYNAMITE_ACTIVE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_SP_DISK_RED_ACTIVE,
     -1
   };
 
@@ -1845,385 +2175,53 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_explosive[] =
-  {
-    EL_BOMB,
-    EL_DYNAMITE_ACTIVE,
-    EL_DYNAMITE,
-    EL_DYNABOMB_PLAYER_1_ACTIVE,
-    EL_DYNABOMB_PLAYER_2_ACTIVE,
-    EL_DYNABOMB_PLAYER_3_ACTIVE,
-    EL_DYNABOMB_PLAYER_4_ACTIVE,
-    EL_DYNABOMB_INCREASE_NUMBER,
-    EL_DYNABOMB_INCREASE_SIZE,
-    EL_DYNABOMB_INCREASE_POWER,
-    EL_SP_DISK_RED_ACTIVE,
-    EL_BUG,
-    EL_MOLE,
-    EL_PENGUIN,
-    EL_PIG,
-    EL_DRAGON,
-    EL_SATELLITE,
-    EL_SP_DISK_RED,
-    EL_SP_DISK_ORANGE,
-    EL_SP_DISK_YELLOW,
-    EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON,
-    EL_DX_SUPABOMB,
-    -1
-  };
-
-  static int ep_food_penguin[] =
-  {
-    EL_EMERALD,
-    EL_BD_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_DIAMOND,
-    EL_PEARL,
-    EL_CRYSTAL,
-    -1
-  };
-
-  static int ep_pushable[] =
-  {
-    EL_ROCK,
-    EL_BD_ROCK,
-    EL_BOMB,
-    EL_NUT,
-    EL_TIME_ORB_EMPTY,
-    EL_SOKOBAN_FIELD_FULL,
-    EL_SOKOBAN_OBJECT,
-    EL_SATELLITE,
-    EL_SP_ZONK,
-    EL_SP_DISK_ORANGE,
-    EL_SP_DISK_YELLOW,
-    EL_BALLOON,
-    EL_SPRING,
-    EL_DX_SUPABOMB,
-    -1
-  };
-
-  static int ep_player[] =
-  {
-    EL_PLAYER_1,
-    EL_PLAYER_2,
-    EL_PLAYER_3,
-    EL_PLAYER_4,
-    -1
-  };
-
-  static int ep_walkable_over[] =
-  {
-    EL_EMPTY_SPACE,
-    EL_SP_EMPTY_SPACE,
-    EL_SOKOBAN_FIELD_EMPTY,
-    EL_EXIT_OPEN,
-    EL_SP_EXIT_OPEN,
-    EL_GATE_1,
-    EL_GATE_2,
-    EL_GATE_3,
-    EL_GATE_4,
-    EL_GATE_1_GRAY,
-    EL_GATE_2_GRAY,
-    EL_GATE_3_GRAY,
-    EL_GATE_4_GRAY,
-    -1
-  };
-
-  static int ep_walkable_inside[] =
-  {
-    EL_TUBE_ANY,
-    EL_TUBE_VERTICAL,
-    EL_TUBE_HORIZONTAL,
-    EL_TUBE_VERTICAL_LEFT,
-    EL_TUBE_VERTICAL_RIGHT,
-    EL_TUBE_HORIZONTAL_UP,
-    EL_TUBE_HORIZONTAL_DOWN,
-    EL_TUBE_LEFT_UP,
-    EL_TUBE_LEFT_DOWN,
-    EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN,
-    -1
-  };
-
-  static int ep_walkable_under[] =
-  {
-    -1
-  };
-
-  static int ep_passable_over[] =
-  {
-    EL_EM_GATE_1,
-    EL_EM_GATE_2,
-    EL_EM_GATE_3,
-    EL_EM_GATE_4,
-    EL_EM_GATE_1_GRAY,
-    EL_EM_GATE_2_GRAY,
-    EL_EM_GATE_3_GRAY,
-    EL_EM_GATE_4_GRAY,
-    EL_SWITCHGATE_OPEN,
-    EL_TIMEGATE_OPEN,
-    -1
-  };
-
-  static int ep_passable_inside[] =
-  {
-    EL_SP_PORT_LEFT,
-    EL_SP_PORT_RIGHT,
-    EL_SP_PORT_UP,
-    EL_SP_PORT_DOWN,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_ANY,
-    EL_SP_GRAVITY_PORT_LEFT,
-    EL_SP_GRAVITY_PORT_RIGHT,
-    EL_SP_GRAVITY_PORT_UP,
-    EL_SP_GRAVITY_PORT_DOWN,
-    -1
-  };
-
-  static int ep_passable_under[] =
-  {
-    -1
-  };
-
-  static int ep_diggable[] =
-  {
-    EL_SAND,
-    EL_SP_BASE,
-    EL_SP_BUGGY_BASE,
-    EL_SP_BUGGY_BASE_ACTIVATING,
-    EL_TRAP,
-    EL_INVISIBLE_SAND,
-    EL_INVISIBLE_SAND_ACTIVE,
-#if 1
-    EL_LANDMINE,
-    EL_TRAP_ACTIVE,
-    EL_SP_BUGGY_BASE_ACTIVE,
-#endif
-    -1
-  };
-
-  static int ep_collectible[] =
-  {
-    EL_BD_DIAMOND,
-    EL_EMERALD,
-    EL_DIAMOND,
-    EL_EMERALD_YELLOW,
-    EL_EMERALD_RED,
-    EL_EMERALD_PURPLE,
-    EL_KEY_1,
-    EL_KEY_2,
-    EL_KEY_3,
-    EL_KEY_4,
-    EL_EM_KEY_1,
-    EL_EM_KEY_2,
-    EL_EM_KEY_3,
-    EL_EM_KEY_4,
-    EL_DYNAMITE,
-    EL_DYNABOMB_INCREASE_NUMBER,
-    EL_DYNABOMB_INCREASE_SIZE,
-    EL_DYNABOMB_INCREASE_POWER,
-    EL_SP_INFOTRON,
-    EL_SP_DISK_RED,
-    EL_PEARL,
-    EL_CRYSTAL,
-    EL_KEY_WHITE,
-    EL_SHIELD_NORMAL,
-    EL_SHIELD_DEADLY,
-    EL_EXTRA_TIME,
-    EL_ENVELOPE,
-    EL_SPEED_PILL,
-    -1
-  };
-
-  static int ep_active_bomb[] =
-  {
-    EL_DYNAMITE_ACTIVE,
-    EL_DYNABOMB_PLAYER_1_ACTIVE,
-    EL_DYNABOMB_PLAYER_2_ACTIVE,
-    EL_DYNABOMB_PLAYER_3_ACTIVE,
-    EL_DYNABOMB_PLAYER_4_ACTIVE,
-    EL_SP_DISK_RED_ACTIVE,
-    -1
-  };
-
-  static int ep_belt[] =
-  {
-    EL_CONVEYOR_BELT_1_LEFT,
-    EL_CONVEYOR_BELT_1_MIDDLE,
-    EL_CONVEYOR_BELT_1_RIGHT,
-    EL_CONVEYOR_BELT_2_LEFT,
-    EL_CONVEYOR_BELT_2_MIDDLE,
-    EL_CONVEYOR_BELT_2_RIGHT,
-    EL_CONVEYOR_BELT_3_LEFT,
-    EL_CONVEYOR_BELT_3_MIDDLE,
-    EL_CONVEYOR_BELT_3_RIGHT,
-    EL_CONVEYOR_BELT_4_LEFT,
-    EL_CONVEYOR_BELT_4_MIDDLE,
-    EL_CONVEYOR_BELT_4_RIGHT,
-    -1
-  };
-
-  static int ep_belt_active[] =
-  {
-    EL_CONVEYOR_BELT_1_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT_1_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT_2_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT_2_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT_3_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT_3_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT_4_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT_4_RIGHT_ACTIVE,
-    -1
-  };
-
-  static int ep_belt_switch[] =
-  {
-    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
-    -1
-  };
-
-  static int ep_sp_element[] =
-  {
-    EL_SP_EMPTY,
-    EL_SP_ZONK,
-    EL_SP_BASE,
-    EL_SP_MURPHY,
-    EL_SP_INFOTRON,
-    EL_SP_CHIP_SINGLE,
-    EL_SP_HARDWARE_GRAY,
-    EL_SP_EXIT_CLOSED,
-    EL_SP_EXIT_OPEN,
-    EL_SP_DISK_ORANGE,
-    EL_SP_PORT_RIGHT,
-    EL_SP_PORT_DOWN,
-    EL_SP_PORT_LEFT,
-    EL_SP_PORT_UP,
-    EL_SP_GRAVITY_PORT_RIGHT,
-    EL_SP_GRAVITY_PORT_DOWN,
-    EL_SP_GRAVITY_PORT_LEFT,
-    EL_SP_GRAVITY_PORT_UP,
-    EL_SP_SNIKSNAK,
-    EL_SP_DISK_YELLOW,
-    EL_SP_TERMINAL,
-    EL_SP_DISK_RED,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_ANY,
-    EL_SP_ELECTRON,
-    EL_SP_BUGGY_BASE,
-    EL_SP_CHIP_LEFT,
-    EL_SP_CHIP_RIGHT,
-    EL_SP_HARDWARE_BASE_1,
-    EL_SP_HARDWARE_GREEN,
-    EL_SP_HARDWARE_BLUE,
-    EL_SP_HARDWARE_RED,
-    EL_SP_HARDWARE_YELLOW,
-    EL_SP_HARDWARE_BASE_2,
-    EL_SP_HARDWARE_BASE_3,
-    EL_SP_HARDWARE_BASE_4,
-    EL_SP_HARDWARE_BASE_5,
-    EL_SP_HARDWARE_BASE_6,
-    EL_SP_CHIP_TOP,
-    EL_SP_CHIP_BOTTOM,
-    /* additional elements that appeared in newer Supaplex levels */
-    EL_INVISIBLE_WALL,
-    /* more than one murphy in a level results in an inactive clone */
-    EL_SP_MURPHY_CLONE,
-    -1
-  };
-
-  static int ep_has_content[] =
-  {
-    EL_YAMYAM,
-    EL_AMOEBA_WET,
-    EL_AMOEBA_DRY,
-    EL_AMOEBA_FULL,
-    EL_BD_AMOEBA,
-    -1
-  };
-
-  static int ep_tube[] =
-  {
-    EL_TUBE_LEFT_UP,
-    EL_TUBE_LEFT_DOWN,
-    EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN,
-    EL_TUBE_HORIZONTAL,
-    EL_TUBE_HORIZONTAL_UP,
-    EL_TUBE_HORIZONTAL_DOWN,
-    EL_TUBE_VERTICAL,
-    EL_TUBE_VERTICAL_LEFT,
-    EL_TUBE_VERTICAL_RIGHT,
-    EL_TUBE_ANY,
-    -1
-  };
-
   static struct
   {
     int *elements;
     int property;
   } element_properties[] =
   {
-    { ep_amoebalive,		EP_AMOEBALIVE		},
-    { ep_amoeboid,		EP_AMOEBOID		},
-    { ep_keygate,		EP_KEYGATE		},
-    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
-    { ep_historic_solid,	EP_HISTORIC_SOLID	},
+    { ep_diggable,		EP_DIGGABLE		},
+    { ep_collectible,		EP_COLLECTIBLE		},
     { ep_indestructible,	EP_INDESTRUCTIBLE	},
     { ep_slippery,		EP_SLIPPERY		},
-    { ep_enemy,			EP_ENEMY		},
-    { ep_historic_wall,		EP_HISTORIC_WALL	},
     { ep_can_fall,		EP_CAN_FALL		},
     { ep_can_smash,		EP_CAN_SMASH		},
-    { ep_can_change,		EP_CAN_CHANGE		},
-    { ep_can_move,		EP_CAN_MOVE		},
-    { ep_could_move,		EP_COULD_MOVE		},
-    { ep_dont_touch,		EP_DONT_TOUCH		},
-    { ep_dont_go_to,		EP_DONT_GO_TO		},
-    { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
-    { ep_bd_element,		EP_BD_ELEMENT		},
-    { ep_sb_element,		EP_SB_ELEMENT		},
-    { ep_gem,			EP_GEM			},
-    { ep_inactive,		EP_INACTIVE		},
-    { ep_explosive,		EP_EXPLOSIVE		},
-    { ep_food_penguin,		EP_FOOD_PENGUIN		},
-    { ep_pushable,		EP_PUSHABLE		},
-    { ep_player,		EP_PLAYER		},
     { ep_walkable_over,		EP_WALKABLE_OVER	},
     { ep_walkable_inside,	EP_WALKABLE_INSIDE	},
     { ep_walkable_under,	EP_WALKABLE_UNDER	},
     { ep_passable_over,		EP_PASSABLE_OVER	},
     { ep_passable_inside,	EP_PASSABLE_INSIDE	},
     { ep_passable_under,	EP_PASSABLE_UNDER	},
+    { ep_pushable,		EP_PUSHABLE		},
 
-    { ep_diggable,		EP_DIGGABLE		},
-    { ep_collectible,		EP_COLLECTIBLE		},
-    { ep_active_bomb,		EP_ACTIVE_BOMB		},
+    { ep_player,		EP_PLAYER		},
+    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
+    { ep_can_move,		EP_CAN_MOVE		},
+    { ep_can_change,		EP_CAN_CHANGE		},
+    { ep_dont_touch,		EP_DONT_TOUCH		},
+    { ep_enemy,			EP_ENEMY		},
+    { ep_dont_go_to,		EP_DONT_GO_TO		},
+    { ep_explosive,		EP_EXPLOSIVE		},
+    { ep_bd_element,		EP_BD_ELEMENT		},
+    { ep_sp_element,		EP_SP_ELEMENT		},
+    { ep_sb_element,		EP_SB_ELEMENT		},
+    { ep_gem,			EP_GEM			},
+    { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
+    { ep_food_penguin,		EP_FOOD_PENGUIN		},
+    { ep_historic_wall,		EP_HISTORIC_WALL	},
+    { ep_historic_solid,	EP_HISTORIC_SOLID	},
     { ep_belt,			EP_BELT			},
     { ep_belt_active,		EP_BELT_ACTIVE		},
     { ep_belt_switch,		EP_BELT_SWITCH		},
-    { ep_sp_element,		EP_SP_ELEMENT		},
-    { ep_has_content,		EP_HAS_CONTENT		},
     { ep_tube,			EP_TUBE			},
+    { ep_keygate,		EP_KEYGATE		},
+    { ep_amoeboid,		EP_AMOEBOID		},
+    { ep_amoebalive,		EP_AMOEBALIVE		},
+    { ep_has_content,		EP_HAS_CONTENT		},
+    { ep_active_bomb,		EP_ACTIVE_BOMB		},
+    { ep_inactive,		EP_INACTIVE		},
+
     { NULL,			-1			}
   };
 
@@ -2249,14 +2247,12 @@ void InitElementPropertiesEngine(int engine_version)
     EP_AMOEBALIVE,
     EP_AMOEBOID,
     EP_PFORTE,
-    EP_SOLID,
     EP_ENEMY,
     EP_MAUER,
     EP_CAN_FALL,
     EP_CAN_SMASH,
     EP_CAN_CHANGE,
     EP_CAN_MOVE,
-    EP_COULD_MOVE,
     EP_DONT_TOUCH,
     EP_DONT_GO_TO,
     EP_GEM,
@@ -2287,7 +2283,6 @@ void InitElementPropertiesEngine(int engine_version)
     EP_CAN_FALL,
     EP_CAN_SMASH,
     EP_CAN_MOVE,
-    EP_COULD_MOVE,
     EP_DONT_GO_TO,
     EP_FOOD_DARK_YAMYAM,
     EP_GEM,
@@ -2343,16 +2338,17 @@ void InitElementPropertiesEngine(int engine_version)
     if (IS_HISTORIC_WALL(i))
       SET_PROPERTY(i, EP_WALL, TRUE);
 
-    /* ---------- SOLID ---------------------------------------------------- */
+    /* ---------- SOLID_FOR_PUSHING ---------------------------------------- */
     if (engine_version < VERSION_IDENT(2,2,0))
-      SET_PROPERTY(i, EP_SOLID, IS_HISTORIC_SOLID(i));
+      SET_PROPERTY(i, EP_SOLID_FOR_PUSHING, IS_HISTORIC_SOLID(i));
     else
-      SET_PROPERTY(i, EP_SOLID, (!IS_WALKABLE(i) &&
-				 !IS_DIGGABLE(i) &&
-				 !IS_COLLECTIBLE(i)));
+      SET_PROPERTY(i, EP_SOLID_FOR_PUSHING, (!IS_WALKABLE(i) &&
+					     !IS_DIGGABLE(i) &&
+					     !IS_COLLECTIBLE(i)));
 
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
-    if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
+    if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION ||
+	(IS_CUSTOM_ELEMENT(i) && IS_INDESTRUCTIBLE(i)))
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
 
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
@@ -2559,36 +2555,42 @@ static void InitArtworkConfig()
   static char *direction_id_suffix[NUM_DIRECTIONS + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
   static char *dummy[1] = { NULL };
-  static char *ignore_image_tokens[] =
-  {
-    "name",
-    "sort_priority",
-    "global.num_toons",
-    "menu.draw_xoffset",
-    "menu.draw_yoffset",
-    "menu.draw_xoffset.MAIN",
-    "menu.draw_yoffset.MAIN",
-    "menu.draw_xoffset.LEVELS",
-    "menu.draw_yoffset.LEVELS",
-    "menu.draw_xoffset.SCORES",
-    "menu.draw_yoffset.SCORES",
-    "menu.draw_xoffset.EDITOR",
-    "menu.draw_yoffset.EDITOR",
-    "menu.draw_xoffset.INFO",
-    "menu.draw_yoffset.INFO",
-    "menu.draw_xoffset.SETUP",
-    "menu.draw_yoffset.SETUP",
-    "door.step_offset",
-    "door.step_delay",
-    NULL
-  };
-  static char *ignore_sound_tokens[] =
+  static char *ignore_generic_tokens[] =
   {
     "name",
     "sort_priority",
     NULL
   };
+  static char **ignore_image_tokens, **ignore_sound_tokens;
+  int num_ignore_generic_tokens;
+  int num_ignore_image_tokens, num_ignore_sound_tokens;
   int i;
+
+  /* dynamically determine list of generic tokens to be ignored */
+  num_ignore_generic_tokens = 0;
+  for (i=0; ignore_generic_tokens[i] != NULL; i++)
+    num_ignore_generic_tokens++;
+
+  /* dynamically determine list of image tokens to be ignored */
+  num_ignore_image_tokens = num_ignore_generic_tokens;
+  for (i=0; image_config_vars[i].token != NULL; i++)
+    num_ignore_image_tokens++;
+  ignore_image_tokens =
+    checked_malloc((num_ignore_image_tokens + 1) * sizeof(char *));
+  for (i=0; i < num_ignore_generic_tokens; i++)
+    ignore_image_tokens[i] = ignore_generic_tokens[i];
+  for (i=0; i < num_ignore_image_tokens - num_ignore_generic_tokens; i++)
+    ignore_image_tokens[num_ignore_generic_tokens + i] =
+      image_config_vars[i].token;
+  ignore_image_tokens[num_ignore_image_tokens] = NULL;
+
+  /* dynamically determine list of sound tokens to be ignored */
+  num_ignore_sound_tokens = num_ignore_generic_tokens;
+  ignore_sound_tokens =
+    checked_malloc((num_ignore_sound_tokens + 1) * sizeof(char *));
+  for (i=0; i < num_ignore_generic_tokens; i++)
+    ignore_sound_tokens[i] = ignore_generic_tokens[i];
+  ignore_sound_tokens[num_ignore_sound_tokens] = NULL;
 
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     image_id_prefix[i] = element_info[i].token_name;

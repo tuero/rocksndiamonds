@@ -1702,7 +1702,11 @@ void Explode(int ex, int ey, int phase, int mode)
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
+#if 1
+    if (CAN_MOVE(element))
+#else
     if (CAN_MOVE(element) || COULD_MOVE(element))
+#endif
       InitMovDir(x, y);
     DrawLevelField(x, y);
 
@@ -2804,7 +2808,7 @@ static boolean JustBeingPushed(int x, int y)
 
 void StartMoving(int x, int y)
 {
-  static boolean use_spring_bug = TRUE;
+  boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
   boolean started_moving = FALSE;	/* some elements can fall _and_ move */
   int element = Feld[x][y];
 
@@ -3110,14 +3114,8 @@ void StartMoving(int x, int y)
 	  int sx = SCREENX(xx), sy = SCREENY(yy);
 	  int flame_graphic = graphic + (i - 1);
 
-#if 1
 	  if (!IN_LEV_FIELD(xx, yy) || IS_DRAGONFIRE_PROOF(Feld[xx][yy]))
 	    break;
-#else
-	  if (!IN_LEV_FIELD(xx, yy) ||
-	      IS_HISTORIC_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
-	    break;
-#endif
 
 	  if (MovDelay[x][y])
 	  {
@@ -5711,7 +5709,6 @@ void RemoveHero(struct PlayerInfo *player)
 static boolean checkDiagonalPushing(struct PlayerInfo *player,
 				    int x, int y, int real_dx, int real_dy)
 {
-#if 1
   int jx, jy, dx, dy, xx, yy;
 
   if (real_dx == 0 || real_dy == 0)	/* no diagonal direction => push */
@@ -5725,32 +5722,7 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
   xx = jx + (dx == 0 ? real_dx : 0);
   yy = jy + (dy == 0 ? real_dy : 0);
 
-  return (!IN_LEV_FIELD(xx, yy) || IS_SOLID(Feld[xx][yy]));
-#else
-
-  if (real_dx && real_dy) 	/* diagonal direction input => do check */
-  {
-    /* diagonal direction: check alternative direction */
-    int jx = player->jx, jy = player->jy;
-    int dx = x - jx, dy = y - jy;
-    int xx = jx + (dx == 0 ? real_dx : 0);
-    int yy = jy + (dy == 0 ? real_dy : 0);
-
-    if (IN_LEV_FIELD(xx, yy))
-    {
-      int element = Feld[xx][yy];
-
-      if (game.engine_version < VERSION_IDENT(2,2,0))
-	return IS_HISTORIC_SOLID(element);
-      else
-	return !(IS_WALKABLE(element) ||
-		 IS_DIGGABLE(element) ||
-		 IS_COLLECTIBLE(element));
-    }
-  }
-
-  return TRUE;		/* no diagonal direction input => push object */
-#endif
+  return (!IN_LEV_FIELD(xx, yy) || IS_SOLID_FOR_PUSHING(Feld[xx][yy]));
 }
 
 /*
@@ -6106,17 +6078,8 @@ int DigField(struct PlayerInfo *player,
       if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
 	return MF_NO_ACTION;
 
-#if 1
       if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	return MF_NO_ACTION;
-#else
-      if (real_dy)
-      {
-	if (IN_LEV_FIELD(jx, jy+real_dy) &&
-	    !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
-	  return MF_NO_ACTION;
-      }
-#endif
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
@@ -6358,23 +6321,8 @@ int DigField(struct PlayerInfo *player,
 		  || !IS_SB_ELEMENT(element))))
 	return MF_NO_ACTION;
 
-#if 1
       if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	return MF_NO_ACTION;
-#else
-      if (dx && real_dy)
-      {
-	if (IN_LEV_FIELD(jx, jy+real_dy) &&
-	    !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
-	  return MF_NO_ACTION;
-      }
-      else if (dy && real_dx)
-      {
-	if (IN_LEV_FIELD(jx+real_dx, jy) &&
-	    !IS_HISTORIC_SOLID(Feld[jx+real_dx][jy]))
-	  return MF_NO_ACTION;
-      }
-#endif
 
       if (player->push_delay == 0)
 	player->push_delay = FrameCounter;
@@ -6474,23 +6422,8 @@ int DigField(struct PlayerInfo *player,
 	if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
 	  return MF_NO_ACTION;
 
-#if 1
 	if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	  return MF_NO_ACTION;
-#else
-	if (dx && real_dy)
-	{
-	  if (IN_LEV_FIELD(jx, jy+real_dy) &&
-	      !IS_HISTORIC_SOLID(Feld[jx][jy+real_dy]))
-	    return MF_NO_ACTION;
-	}
-	else if (dy && real_dx)
-	{
-	  if (IN_LEV_FIELD(jx+real_dx, jy) &&
-	      !IS_HISTORIC_SOLID(Feld[jx+real_dx][jy]))
-	    return MF_NO_ACTION;
-	}
-#endif
 
 	if (player->push_delay == 0)
 	  player->push_delay = FrameCounter;

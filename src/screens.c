@@ -71,15 +71,12 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 
-#if 0
-static int mSX = SX;
-static int mSY = SY;
-#else
-#define mSX (SX + (game_status == GAME_MODE_MAIN ? global.menu_draw_xoffset_MAIN : \
-		   global.menu_draw_xoffset))
-#define mSY (SY + (game_status == GAME_MODE_MAIN ? global.menu_draw_yoffset_MAIN : \
-		   global.menu_draw_yoffset))
-#endif
+#define mSX (SX + (game_status >= GAME_MODE_MAIN &&	\
+		   game_status <= GAME_MODE_SETUP ?	\
+		   menu.draw_xoffset[game_status] : menu.draw_xoffset_default))
+#define mSY (SY + (game_status >= GAME_MODE_MAIN &&	\
+		   game_status <= GAME_MODE_SETUP ?	\
+		   menu.draw_yoffset[game_status] : menu.draw_yoffset_default))
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
 #define NUM_SCROLLBAR_BITMAPS		2
@@ -106,14 +103,9 @@ static void drawCursorExt(int xpos, int ypos, int color, int graphic)
 
   ypos += MENU_SCREEN_START_YPOS;
 
-#if 1
   DrawBackground(mSX + xpos * TILEX, mSY + ypos * TILEY, TILEX, TILEY);
   DrawGraphicThruMaskExt(drawto, mSX + xpos * TILEX, mSY + ypos * TILEY,
 			 graphic, 0);
-#else
-  DrawBackground(SX + xpos * 32, SY + ypos * 32, TILEX, TILEY);
-  DrawGraphicThruMask(xpos, ypos, graphic, 0);
-#endif
 }
 
 static void initCursor(int ypos, int graphic)
@@ -189,11 +181,6 @@ void DrawMainMenu()
   int level_width = font_width * strlen("Level:");
   int i;
 
-#if 0
-  mSX = SX + global.menu_draw_xoffset;
-  mSY = SY + global.menu_draw_yoffset;
-#endif
-
   UnmapAllGadgets();
   FadeSounds();
 
@@ -252,7 +239,7 @@ void DrawMainMenu()
   DrawText(mSX + 32, mSY + 3*32, "Level:", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 4*32, "Hall Of Fame", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 5*32, "Level Creator", FONT_MENU_1);
-  DrawText(mSY + 32, mSY + 6*32, "Info Screen", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 6*32, "Info Screen", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 7*32, "Start Game", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 8*32, "Setup", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 9*32, "Quit", FONT_MENU_1);
@@ -343,8 +330,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (mx || my)		/* mouse input */
   {
-    x = (mx - SX) / 32;
-    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+    x = (mx - mSX) / 32;
+    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
   else if (dx || dy)	/* keyboard input */
   {
@@ -1221,7 +1208,10 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
   int num_entries = numTreeInfoInGroup(ti);
   char *title_string = NULL;
-  int offset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : 16);
+  int xoffset_setup = 16;
+  int yoffset_setup = 0;
+  int xoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : xoffset_setup);
+  int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : yoffset_setup);
   int last_game_status = game_status;	/* save current game status */
 
   DrawBackground(SX, SY, SXSIZE - 32, SYSIZE);
@@ -1233,7 +1223,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
      ti->type == TREE_TYPE_SOUNDS_DIR ? "Custom Sounds" :
      ti->type == TREE_TYPE_MUSIC_DIR ? "Custom Music" : "");
 
-  DrawText(SX + offset, SY + offset, title_string, FONT_TITLE_1);
+  DrawText(SX + xoffset, SY + yoffset, title_string, FONT_TITLE_1);
 
   /* force LEVELS font on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
@@ -1264,16 +1254,18 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   {
     int ypos = 1;
 
-    DrawBackground(SX, SY + ypos * 32, TILEX, TILEY);
-    DrawGraphicThruMask(0, ypos, IMG_MENU_BUTTON_UP, 0);
+    DrawBackground(mSX, mSY + ypos * TILEY, TILEX, TILEY);
+    DrawGraphicThruMaskExt(drawto, mSX, mSY + ypos * TILEY,
+			   IMG_MENU_BUTTON_UP, 0);
   }
 
   if (first_entry + num_page_entries < num_entries)
   {
     int ypos = MAX_MENU_ENTRIES_ON_SCREEN + 1;
 
-    DrawBackground(SX, SY + ypos * 32, TILEX, TILEY);
-    DrawGraphicThruMask(0, ypos, IMG_MENU_BUTTON_DOWN, 0);
+    DrawBackground(mSX, mSY + ypos * TILEY, TILEX, TILEY);
+    DrawGraphicThruMaskExt(drawto, mSX, mSY + ypos * TILEY,
+			   IMG_MENU_BUTTON_DOWN, 0);
   }
 
   game_status = last_game_status;	/* restore current game status */
@@ -1368,8 +1360,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (mx || my)		/* mouse input */
   {
-    x = (mx - SX) / 32;
-    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+    x = (mx - mSX) / 32;
+    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
   else if (dx || dy)	/* keyboard input */
   {
@@ -2071,8 +2063,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 
   if (mx || my)		/* mouse input */
   {
-    x = (mx - SX) / 32;
-    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+    x = (mx - mSX) / 32;
+    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
   else if (dx || dy)	/* keyboard input */
   {
@@ -2282,8 +2274,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
   if (mx || my)		/* mouse input */
   {
-    x = (mx - SX) / 32;
-    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+    x = (mx - mSX) / 32;
+    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
   else if (dx || dy)	/* keyboard input */
   {
@@ -3017,16 +3009,16 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
   {
     case SCREEN_CTRL_ID_SCROLL_UP:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(SX,SY + 32, 0,0, MB_MENU_MARK);
+	HandleChooseLevel(mSX,mSY + 32, 0,0, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
-	HandleSetupScreen(SX,SY + 32, 0,0, MB_MENU_MARK);
+	HandleSetupScreen(mSX,mSY + 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_DOWN:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+	HandleChooseLevel(mSX,mSY + SYSIZE - 32, 0,0, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
-	HandleSetupScreen(SX,SY + SYSIZE - 32, 0,0, MB_MENU_MARK);
+	HandleSetupScreen(mSX,mSY + SYSIZE - 32, 0,0, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:

@@ -545,6 +545,12 @@ struct ConfigInfo
   int type;
 };
 
+struct TokenIntPtrInfo
+{
+  char *token;
+  int *value;
+};
+
 struct FileInfo
 {
   char *token;

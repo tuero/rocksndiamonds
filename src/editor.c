@@ -3696,7 +3696,6 @@ static void DrawPropertiesInfo()
     { EP_CAN_SMASH,		"- can smash"			},
     { EP_CAN_CHANGE,		"- can change"			},
     { EP_CAN_MOVE,		"- can move"			},
-    { EP_COULD_MOVE,		"- could move"			},
     { EP_DONT_TOUCH,		"- don't touch"			},
     { EP_DONT_GO_TO,		"- don't go to"			},
     { EP_FOOD_DARK_YAMYAM,	"- food for dark yamyam"	},

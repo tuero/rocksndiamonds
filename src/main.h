@@ -60,62 +60,76 @@
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
-/* values for base properties (storable) */
-#define EP_AMOEBALIVE		0
-#define EP_AMOEBOID		1
-#define EP_CAN_BE_CRUMBLED	2
-#define EP_KEYGATE		3
-#define EP_HISTORIC_SOLID	4
+/* values for configurable properties (custom elem's only, else pre-defined) */
+#define EP_DIGGABLE		0
+#define EP_COLLECTIBLE		1
+#define EP_UNUSED_2		2
+#define EP_UNUSED_3		3
+#define EP_UNUSED_4		4
 #define EP_INDESTRUCTIBLE	5
 #define EP_SLIPPERY		6
-#define EP_ENEMY		7
-#define EP_HISTORIC_WALL	8
+#define EP_UNUSED_7		7
+#define EP_UNUSED_8		8
 #define EP_CAN_FALL		9
 #define EP_CAN_SMASH		10
-#define EP_CAN_CHANGE		11
-#define EP_CAN_MOVE		12
-#define EP_COULD_MOVE		13
-#define EP_DONT_TOUCH		14
-#define EP_DONT_GO_TO		15
-#define EP_FOOD_DARK_YAMYAM	16
-#define EP_EM_SLIPPERY_WALL	17
-#define EP_BD_ELEMENT		18
-#define EP_SB_ELEMENT		19
-#define EP_GEM			20
-#define EP_INACTIVE		21
-#define EP_EXPLOSIVE		22
-#define EP_FOOD_PENGUIN		23
+#define EP_WALKABLE_OVER	11
+#define EP_WALKABLE_INSIDE	12
+#define EP_WALKABLE_UNDER	13
+#define EP_PASSABLE_OVER	14
+#define EP_PASSABLE_INSIDE	15
+#define EP_PASSABLE_UNDER	16
+#define EP_UNUSED_17		17
+#define EP_UNUSED_18		18
+#define EP_UNUSED_19		19
+#define EP_UNUSED_20		20
+#define EP_UNUSED_21		21
+#define EP_UNUSED_22		22
+#define EP_UNUSED_23		23
 #define EP_PUSHABLE		24
-#define EP_PLAYER		25
-#define EP_WALKABLE_OVER	26
-#define EP_WALKABLE_INSIDE	27
-#define EP_WALKABLE_UNDER	28
-#define EP_PASSABLE_OVER	29
-#define EP_PASSABLE_INSIDE	30
-#define EP_PASSABLE_UNDER	31
 
-/* values for runtime properties (non-storable) */
-#define EP_ACCESSIBLE_OVER	32
-#define EP_ACCESSIBLE_INSIDE	33
-#define EP_ACCESSIBLE_UNDER	34
-#define EP_WALKABLE		35
-#define EP_PASSABLE		36
-#define EP_ACCESSIBLE		37
-#define EP_DIGGABLE		38
-#define EP_COLLECTIBLE		39
-#define EP_ACTIVE_BOMB		40
-#define EP_BELT			41
-#define EP_BELT_ACTIVE		42
-#define EP_BELT_SWITCH		43
-#define EP_SP_ELEMENT		44
-#define EP_HAS_CONTENT		45
-#define EP_TUBE			46
-#define EP_WALL			47
-#define EP_SOLID		48
-#define EP_DRAGONFIRE_PROOF	49
-#define EP_EXPLOSION_PROOF	50
+/* values for special configurable properties (depending on level settings) */
+#define EP_EM_SLIPPERY_WALL	25
 
-#define NUM_ELEMENT_PROPERTIES	51
+/* values for pre-defined properties */
+#define EP_PLAYER		26
+#define EP_CAN_BE_CRUMBLED	27
+#define EP_CAN_MOVE		28
+#define EP_CAN_CHANGE		29
+#define EP_DONT_TOUCH		30
+#define EP_ENEMY		31
+#define EP_DONT_GO_TO		32
+#define EP_EXPLOSIVE		33
+#define EP_BD_ELEMENT		34
+#define EP_SP_ELEMENT		35
+#define EP_SB_ELEMENT		36
+#define EP_GEM			37
+#define EP_FOOD_DARK_YAMYAM	38
+#define EP_FOOD_PENGUIN		39
+#define EP_HISTORIC_WALL	40
+#define EP_HISTORIC_SOLID	41
+#define EP_BELT			42
+#define EP_BELT_ACTIVE		43
+#define EP_BELT_SWITCH		44
+#define EP_TUBE			45
+#define EP_KEYGATE		46
+#define EP_AMOEBOID		47
+#define EP_AMOEBALIVE		48
+#define EP_HAS_CONTENT		49
+#define EP_ACTIVE_BOMB		50
+#define EP_INACTIVE		51
+
+/* values for derived properties (determined from properties above) */
+#define EP_ACCESSIBLE_OVER	52
+#define EP_ACCESSIBLE_INSIDE	53
+#define EP_ACCESSIBLE_UNDER	54
+#define EP_WALKABLE		55
+#define EP_PASSABLE		56
+#define EP_ACCESSIBLE		57
+#define EP_WALL			58
+#define EP_SOLID_FOR_PUSHING	59
+#define EP_DRAGONFIRE_PROOF	60
+#define EP_EXPLOSION_PROOF	61
+#define NUM_ELEMENT_PROPERTIES	63
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -129,58 +143,61 @@
 				 (PROPERTY_VAR(e,p) |=  PROPERTY_BIT(p)) : \
 				 (PROPERTY_VAR(e,p) &= ~PROPERTY_BIT(p)))
 
-/* macros for base properties */
-#define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)
-#define IS_AMOEBOID(e)		HAS_PROPERTY(e, EP_AMOEBOID)
-#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(e, EP_CAN_BE_CRUMBLED)
-#define IS_KEYGATE(e)		HAS_PROPERTY(e, EP_KEYGATE)
-#define IS_HISTORIC_SOLID(e)	HAS_PROPERTY(e, EP_HISTORIC_SOLID)
+/* macros for configurable properties */
+#define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
+#define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
 #define IS_INDESTRUCTIBLE(e)	HAS_PROPERTY(e, EP_INDESTRUCTIBLE)
 #define IS_SLIPPERY(e)		HAS_PROPERTY(e, EP_SLIPPERY)
-#define IS_ENEMY(e)		HAS_PROPERTY(e, EP_ENEMY)
-#define IS_HISTORIC_WALL(e)	HAS_PROPERTY(e, EP_HISTORIC_WALL)
 #define CAN_FALL(e)		HAS_PROPERTY(e, EP_CAN_FALL)
 #define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
-#define CAN_CHANGE(e)		HAS_PROPERTY(e, EP_CAN_CHANGE)
-#define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
-#define COULD_MOVE(e)		HAS_PROPERTY(e, EP_COULD_MOVE)
-#define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
-#define DONT_GO_TO(e)		HAS_PROPERTY(e, EP_DONT_GO_TO)
-#define IS_FOOD_DARK_YAMYAM(e)	HAS_PROPERTY(e, EP_FOOD_DARK_YAMYAM)
-#define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
-#define IS_BD_ELEMENT(e)	HAS_PROPERTY(e, EP_BD_ELEMENT)
-#define IS_SB_ELEMENT(e)	HAS_PROPERTY(e, EP_SB_ELEMENT)
-#define IS_GEM(e)		HAS_PROPERTY(e, EP_GEM)
-#define IS_INACTIVE(e)		HAS_PROPERTY(e, EP_INACTIVE)
-#define IS_EXPLOSIVE(e)		HAS_PROPERTY(e, EP_EXPLOSIVE)
-#define IS_FOOD_PENGUIN(e)	HAS_PROPERTY(e, EP_FOOD_PENGUIN)
-#define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
-#define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
 #define IS_WALKABLE_OVER(e)	HAS_PROPERTY(e, EP_WALKABLE_OVER)
 #define IS_WALKABLE_INSIDE(e)	HAS_PROPERTY(e, EP_WALKABLE_INSIDE)
 #define IS_WALKABLE_UNDER(e)	HAS_PROPERTY(e, EP_WALKABLE_UNDER)
 #define IS_PASSABLE_OVER(e)	HAS_PROPERTY(e, EP_PASSABLE_OVER)
 #define IS_PASSABLE_INSIDE(e)	HAS_PROPERTY(e, EP_PASSABLE_INSIDE)
 #define IS_PASSABLE_UNDER(e)	HAS_PROPERTY(e, EP_PASSABLE_UNDER)
+#define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 
-/* macros for runtime properties */
+/* macros for special configurable properties */
+#define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
+
+/* macros for pre-defined properties */
+#define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
+#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(e, EP_CAN_BE_CRUMBLED)
+#define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
+#define CAN_CHANGE(e)		HAS_PROPERTY(e, EP_CAN_CHANGE)
+#define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
+#define IS_ENEMY(e)		HAS_PROPERTY(e, EP_ENEMY)
+#define DONT_GO_TO(e)		HAS_PROPERTY(e, EP_DONT_GO_TO)
+#define IS_EXPLOSIVE(e)		HAS_PROPERTY(e, EP_EXPLOSIVE)
+#define IS_BD_ELEMENT(e)	HAS_PROPERTY(e, EP_BD_ELEMENT)
+#define IS_SP_ELEMENT(e)	HAS_PROPERTY(e, EP_SP_ELEMENT)
+#define IS_SB_ELEMENT(e)	HAS_PROPERTY(e, EP_SB_ELEMENT)
+#define IS_GEM(e)		HAS_PROPERTY(e, EP_GEM)
+#define IS_FOOD_DARK_YAMYAM(e)	HAS_PROPERTY(e, EP_FOOD_DARK_YAMYAM)
+#define IS_FOOD_PENGUIN(e)	HAS_PROPERTY(e, EP_FOOD_PENGUIN)
+#define IS_HISTORIC_WALL(e)	HAS_PROPERTY(e, EP_HISTORIC_WALL)
+#define IS_HISTORIC_SOLID(e)	HAS_PROPERTY(e, EP_HISTORIC_SOLID)
+#define IS_BELT(e)		HAS_PROPERTY(e, EP_BELT)
+#define IS_BELT_ACTIVE(e)	HAS_PROPERTY(e, EP_BELT_ACTIVE)
+#define IS_BELT_SWITCH(e)	HAS_PROPERTY(e, EP_BELT_SWITCH)
+#define IS_TUBE(e)		HAS_PROPERTY(e, EP_TUBE)
+#define IS_KEYGATE(e)		HAS_PROPERTY(e, EP_KEYGATE)
+#define IS_AMOEBOID(e)		HAS_PROPERTY(e, EP_AMOEBOID)
+#define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)
+#define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
+#define IS_ACTIVE_BOMB(e)	HAS_PROPERTY(e, EP_ACTIVE_BOMB)
+#define IS_INACTIVE(e)		HAS_PROPERTY(e, EP_INACTIVE)
+
+/* macros for derived properties */
 #define IS_ACCESSIBLE_OVER(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_OVER)
 #define IS_ACCESSIBLE_INSIDE(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_INSIDE)
 #define IS_ACCESSIBLE_UNDER(e)	HAS_PROPERTY(e, EP_ACCESSIBLE_UNDER)
 #define IS_WALKABLE(e)		HAS_PROPERTY(e, EP_WALKABLE)
 #define IS_PASSABLE(e)		HAS_PROPERTY(e, EP_PASSABLE)
 #define IS_ACCESSIBLE(e)	HAS_PROPERTY(e, EP_ACCESSIBLE)
-#define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
-#define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
-#define IS_ACTIVE_BOMB(e)	HAS_PROPERTY(e, EP_ACTIVE_BOMB)
-#define IS_BELT(e)		HAS_PROPERTY(e, EP_BELT)
-#define IS_BELT_ACTIVE(e)	HAS_PROPERTY(e, EP_BELT_ACTIVE)
-#define IS_BELT_SWITCH(e)	HAS_PROPERTY(e, EP_BELT_SWITCH)
-#define IS_SP_ELEMENT(e)	HAS_PROPERTY(e, EP_SP_ELEMENT)
-#define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
-#define IS_TUBE(e)		HAS_PROPERTY(e, EP_TUBE)
 #define IS_WALL(e)		HAS_PROPERTY(e, EP_WALL)
-#define IS_SOLID(e)		HAS_PROPERTY(e, EP_SOLID)
+#define IS_SOLID_FOR_PUSHING(e)	HAS_PROPERTY(e, EP_SOLID_FOR_PUSHING)
 #define IS_DRAGONFIRE_PROOF(e)	HAS_PROPERTY(e, EP_DRAGONFIRE_PROOF)
 #define IS_EXPLOSION_PROOF(e)	HAS_PROPERTY(e, EP_EXPLOSION_PROOF)
 
@@ -1102,17 +1119,23 @@ struct GlobalInfo
 
   int num_toons;
 
-  int menu_draw_xoffset;
-  int menu_draw_yoffset;
-  int menu_draw_xoffset_MAIN;
-  int menu_draw_yoffset_MAIN;
-
-  int door_step_offset;
-  int door_step_delay;
-
   float frames_per_second;
   boolean fps_slowdown;
   int fps_slowdown_factor;
+};
+
+struct MenuInfo
+{
+  int draw_xoffset_default;
+  int draw_yoffset_default;
+  int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
+  int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
+};
+
+struct DoorInfo
+{
+  int step_offset;
+  int step_delay;
 };
 
 struct ElementInfo
@@ -1264,10 +1287,13 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
+extern struct MenuInfo		menu;
+extern struct DoorInfo		door;
 extern struct ElementInfo	element_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
+extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
