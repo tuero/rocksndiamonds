@@ -4192,6 +4192,7 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".smashed_by_spring",	ACTION_SMASHED_BY_SPRING,	FALSE	},
   { ".slurped_by_spring",	ACTION_SLURPED_BY_SPRING,	FALSE	},
   { ".twinkling",		ACTION_TWINKLING,		FALSE	},
+  { ".splashing",		ACTION_SPLASHING,		FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */

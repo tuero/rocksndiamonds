@@ -348,7 +348,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -489,7 +489,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -536,7 +536,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -794,7 +794,7 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_element_sound(x, y, SAMPLE_wonderfall, Xstone);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xwonderwall);
   	    goto loop;
   	  }
 
@@ -824,7 +824,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -945,7 +945,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -982,7 +982,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1029,7 +1029,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ybug_n_e;
   	  Next[y][x] = Xbug_goe;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
@@ -1061,7 +1061,7 @@ void synchro_2(void)
   	  if (Cave[y-2][x-1] == Xblank)
 	    Cave[y-2][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1074,13 +1074,13 @@ void synchro_2(void)
   	  Cave[y-1][x] = Ybug_n;
   	  Next[y][x] = Xblank;
   	  Next[y-1][x] = Xbug_n;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ybug_n_w;
   	  Next[y][x] = Xbug_gow;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
       }
 
@@ -1111,7 +1111,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ybug_e_s;
   	  Next[y][x] = Xbug_gos;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
@@ -1143,7 +1143,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1156,13 +1156,13 @@ void synchro_2(void)
   	  Cave[y][x+1] = Ybug_e;
   	  Next[y][x] = Xblank;
   	  Next[y][x+1] = Xbug_e;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ybug_e_n;
   	  Next[y][x] = Xbug_gon;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
       }
 
@@ -1193,7 +1193,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ybug_s_w;
   	  Next[y][x] = Xbug_gow;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
@@ -1225,7 +1225,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1238,13 +1238,13 @@ void synchro_2(void)
   	  Cave[y+1][x] = Ybug_s;
   	  Next[y][x] = Xblank;
   	  Next[y+1][x] = Xbug_s;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ybug_s_e;
   	  Next[y][x] = Xbug_goe;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
       }
 
@@ -1275,7 +1275,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ybug_w_n;
   	  Next[y][x] = Xbug_gon;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
@@ -1307,7 +1307,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1320,13 +1320,13 @@ void synchro_2(void)
   	  Cave[y][x-1] = Ybug_w;
   	  Next[y][x] = Xblank;
   	  Next[y][x-1] = Xbug_w;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ybug_w_s;
   	  Next[y][x] = Xbug_gos;
-  	  play_sound(x, y, SAMPLE_bug);
+  	  play_element_sound(x, y, SAMPLE_bug, element);
   	  goto loop;
       }
 
@@ -1357,7 +1357,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ytank_n_w;
   	  Next[y][x] = Xtank_gow;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
@@ -1389,7 +1389,7 @@ void synchro_2(void)
   	  if (Cave[y-2][x-1] == Xblank)
 	    Cave[y-2][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1402,13 +1402,13 @@ void synchro_2(void)
   	  Cave[y-1][x] = Ytank_n;
   	  Next[y][x] = Xblank;
   	  Next[y-1][x] = Xtank_n;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ytank_n_e;
   	  Next[y][x] = Xtank_goe;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
       }
 
@@ -1439,7 +1439,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ytank_e_n;
   	  Next[y][x] = Xtank_gon;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
@@ -1471,7 +1471,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1484,13 +1484,13 @@ void synchro_2(void)
   	  Cave[y][x+1] = Ytank_e;
   	  Next[y][x] = Xblank;
   	  Next[y][x+1] = Xtank_e;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ytank_e_s;
   	  Next[y][x] = Xtank_gos;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
       }
 
@@ -1521,7 +1521,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ytank_s_e;
   	  Next[y][x] = Xtank_goe;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
@@ -1553,7 +1553,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1566,13 +1566,13 @@ void synchro_2(void)
   	  Cave[y+1][x] = Ytank_s;
   	  Next[y][x] = Xblank;
   	  Next[y+1][x] = Xtank_s;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ytank_s_w;
   	  Next[y][x] = Xtank_gow;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
       }
 
@@ -1603,7 +1603,7 @@ void synchro_2(void)
   	case Zplayer:
   	  Cave[y][x] = Ytank_w_s;
   	  Next[y][x] = Xtank_gos;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
@@ -1635,7 +1635,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -1648,13 +1648,13 @@ void synchro_2(void)
   	  Cave[y][x-1] = Ytank_w;
   	  Next[y][x] = Xblank;
   	  Next[y][x-1] = Xtank_w;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Ytank_w_n;
   	  Next[y][x] = Xtank_gon;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_tank, element);
   	  goto loop;
       }
 
@@ -1769,8 +1769,8 @@ void synchro_2(void)
   	    goto android_move;
   	}
 
-  	Next[y][x] = temp; /* the item we chose to clone */
-  	play_element_sound(x, y, SAMPLE_android, temp);
+  	Next[y][x] = temp;	/* the item we chose to clone */
+  	play_element_sound(x, y, SAMPLE_android_clone, temp);
 
   	switch (RANDOM & 7)
 	{
@@ -1911,7 +1911,7 @@ void synchro_2(void)
   	  dy = 0;
   	}
 
-  	Next[y][x] = Xblank; /* assume we will move */
+  	Next[y][x] = Xblank;	/* assume we will move */
   	temp = ((x < dx) + 1 - (x > dx)) + ((y < dy) + 1 - (y > dy)) * 3;
 
   	if (RANDOM & 1)
@@ -2042,7 +2042,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_nB;
       Cave[y-1][x] = Yandroid_n;
       Next[y-1][x] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_ne:
@@ -2050,7 +2050,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_neB;
       Cave[y-1][x+1] = Yandroid_ne;
       Next[y-1][x+1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_e:
@@ -2058,7 +2058,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_eB;
       Cave[y][x+1] = Yandroid_e;
       Next[y][x+1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_se:
@@ -2066,7 +2066,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_seB;
       Cave[y+1][x+1] = Yandroid_se;
       Next[y+1][x+1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_s:
@@ -2074,7 +2074,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_sB;
       Cave[y+1][x] = Yandroid_s;
       Next[y+1][x] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_sw:
@@ -2082,7 +2082,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_swB;
       Cave[y+1][x-1] = Yandroid_sw;
       Next[y+1][x-1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_w:
@@ -2090,7 +2090,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_wB;
       Cave[y][x-1] = Yandroid_w;
       Next[y][x-1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     android_nw:
@@ -2098,7 +2098,7 @@ void synchro_2(void)
       Cave[y][x] = Yandroid_nwB;
       Cave[y-1][x-1] = Yandroid_nw;
       Next[y-1][x-1] = Xandroid;
-      play_sound(x, y, SAMPLE_tank);
+      play_element_sound(x, y, SAMPLE_android_move, element);
       goto loop;
 
     /* --------------------------------------------------------------------- */
@@ -2120,7 +2120,7 @@ void synchro_2(void)
   	  if (Cave[y-2][x-1] == Xblank)
 	    Cave[y-2][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2130,7 +2130,7 @@ void synchro_2(void)
   	  Cave[y-1][x] = Yandroid_n;
   	  Next[y][x] = Xblank;
   	  Next[y-1][x] = Xandroid;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2154,7 +2154,7 @@ void synchro_2(void)
   	  if (Cave[y-2][x-1] == Xblank)
 	    Cave[y-2][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2164,7 +2164,7 @@ void synchro_2(void)
   	  Cave[y-1][x] = Yandroid_n;
   	  Next[y][x] = Xblank;
   	  Next[y-1][x] = Xandroid_1_n;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2190,7 +2190,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2200,7 +2200,7 @@ void synchro_2(void)
   	  Cave[y][x+1] = Yandroid_e;
   	  Next[y][x] = Xblank;
   	  Next[y][x+1] = Xandroid;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2224,7 +2224,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2234,7 +2234,7 @@ void synchro_2(void)
   	  Cave[y][x+1] = Yandroid_e;
   	  Next[y][x] = Xblank;
   	  Next[y][x+1] = Xandroid_1_e;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2260,7 +2260,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2270,7 +2270,7 @@ void synchro_2(void)
   	  Cave[y+1][x] = Yandroid_s;
   	  Next[y][x] = Xblank;
   	  Next[y+1][x] = Xandroid;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2294,7 +2294,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2304,7 +2304,7 @@ void synchro_2(void)
   	  Cave[y+1][x] = Yandroid_s;
   	  Next[y][x] = Xblank;
   	  Next[y+1][x] = Xandroid_1_s;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2330,7 +2330,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2340,7 +2340,7 @@ void synchro_2(void)
   	  Cave[y][x-1] = Yandroid_w;
   	  Next[y][x] = Xblank;
   	  Next[y][x-1] = Xandroid;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2364,7 +2364,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2374,7 +2374,7 @@ void synchro_2(void)
   	  Cave[y][x-1] = Yandroid_w;
   	  Next[y][x] = Xblank;
   	  Next[y][x-1] = Xandroid_1_w;
-  	  play_sound(x, y, SAMPLE_tank);
+  	  play_element_sound(x, y, SAMPLE_android_move, element);
   	  goto loop;
 
   	default:
@@ -2400,7 +2400,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2554,7 +2554,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2591,7 +2591,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2623,7 +2623,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2686,7 +2686,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2718,7 +2718,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2781,7 +2781,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2921,7 +2921,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -2929,7 +2929,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -2937,7 +2937,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -2945,7 +2945,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -2965,7 +2965,7 @@ void synchro_2(void)
   	  if (Cave[y-2][x-1] == Xblank)
 	    Cave[y-2][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -2982,7 +2982,7 @@ void synchro_2(void)
 
   	default:
   	  Next[y][x] = RANDOM & 1 ? Xeater_e : Xeater_w;
-  	  play_sound(x, y, SAMPLE_eater);
+  	  play_element_sound(x, y, SAMPLE_eater, element);
   	  goto loop;
       }
 
@@ -2993,7 +2993,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3001,7 +3001,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3009,7 +3009,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3017,7 +3017,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3037,7 +3037,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x] == Xblank)
 	    Cave[y-1][x] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3054,7 +3054,7 @@ void synchro_2(void)
 
   	default:
   	  Next[y][x] = RANDOM & 1 ? Xeater_n : Xeater_s;
-  	  play_sound(x, y, SAMPLE_eater);
+  	  play_element_sound(x, y, SAMPLE_eater, element);
   	  goto loop;
       }
 
@@ -3065,7 +3065,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3073,7 +3073,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3081,7 +3081,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3089,7 +3089,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3109,7 +3109,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3126,7 +3126,7 @@ void synchro_2(void)
 
   	default:
   	  Next[y][x] = RANDOM & 1 ? Xeater_e : Xeater_w;
-  	  play_sound(x, y, SAMPLE_eater);
+  	  play_element_sound(x, y, SAMPLE_eater, element);
   	  goto loop;
       }
 
@@ -3137,7 +3137,7 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ydiamond_eat;
 	Next[y-1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3145,7 +3145,7 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ydiamond_eat;
 	Next[y][x+1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3153,7 +3153,7 @@ void synchro_2(void)
       {
 	Cave[y+1][x] = Ydiamond_eat;
 	Next[y+1][x] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3161,7 +3161,7 @@ void synchro_2(void)
       {
 	Cave[y][x-1] = Ydiamond_eat;
 	Next[y][x-1] = Xblank;
-	play_element_sound(x, y, SAMPLE_eater, Xdiamond);
+	play_element_sound(x, y, SAMPLE_eater_eat, element);
 	goto loop;
       }
 
@@ -3181,7 +3181,7 @@ void synchro_2(void)
   	  if (Cave[y-1][x-2] == Xblank)
 	    Cave[y-1][x-2] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3198,7 +3198,7 @@ void synchro_2(void)
 
   	default:
   	  Next[y][x] = RANDOM & 1 ? Xeater_n : Xeater_s;
-  	  play_sound(x, y, SAMPLE_eater);
+  	  play_element_sound(x, y, SAMPLE_eater, element);
   	  goto loop;
       }
 
@@ -3262,7 +3262,7 @@ void synchro_2(void)
   	      if (Cave[y-2][x-1] == Xblank)
 		Cave[y-2][x-1] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -3297,7 +3297,7 @@ void synchro_2(void)
 		Cave[y][x+1] = Yacid_splash_eB;
   	      if (Cave[y][x-1] == Xblank)
 		Cave[y][x-1] = Yacid_splash_wB;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -3335,7 +3335,7 @@ void synchro_2(void)
   	      if (Cave[y-1][x] == Xblank)
 		Cave[y-1][x] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -3370,7 +3370,7 @@ void synchro_2(void)
   	      if (Cave[y-1][x-2] == Xblank)
 		Cave[y-1][x-2] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -3414,7 +3414,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3549,7 +3549,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3586,7 +3586,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3611,7 +3611,7 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_element_sound(x, y, SAMPLE_wonderfall, Xemerald);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xwonderwall);
   	    goto loop;
   	  }
 
@@ -3641,7 +3641,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3776,7 +3776,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3813,7 +3813,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3838,7 +3838,7 @@ void synchro_2(void)
   	    }
 
   	    Next[y][x] = Xblank;
-  	    play_element_sound(x, y, SAMPLE_wonderfall, Xdiamond);
+  	    play_element_sound(x, y, SAMPLE_wonderfall, Xwonderwall);
   	    goto loop;
   	  }
 
@@ -3868,7 +3868,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xdrip_stretchB;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -3960,7 +3960,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -4080,7 +4080,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -4117,7 +4117,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xblank;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:
@@ -4172,7 +4172,7 @@ void synchro_2(void)
   	      if (Cave[y-2][x-1] == Xblank)
 		Cave[y-2][x-1] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -4205,7 +4205,7 @@ void synchro_2(void)
   	      if (Cave[y-1][x] == Xblank)
 		Cave[y-1][x] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -4238,7 +4238,7 @@ void synchro_2(void)
   	      if (Cave[y][x-1] == Xblank)
 		Cave[y][x-1] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -4271,7 +4271,7 @@ void synchro_2(void)
   	      if (Cave[y-1][x-2] == Xblank)
 		Cave[y-1][x-2] = Yacid_splash_wB;
   	      Next[y][x] = Xblank;
-  	      play_sound(x, y, SAMPLE_acid);
+  	      play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	      goto loop;
 
   	    case Xblank:
@@ -4590,6 +4590,8 @@ void synchro_2(void)
 	Next[y][x] = Xexit_1;
       }
 
+      play_element_sound(x, y, SAMPLE_exit_open, Xexit);
+
       goto loop;
 
     case Xexit_1:
@@ -4668,7 +4670,7 @@ void synchro_2(void)
   	  if (Cave[y][x-1] == Xblank)
 	    Cave[y][x-1] = Yacid_splash_wB;
   	  Next[y][x] = Xsand_stonesand_4;
-  	  play_sound(x, y, SAMPLE_acid);
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
 
   	case Xblank:

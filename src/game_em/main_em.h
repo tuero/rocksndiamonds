@@ -486,10 +486,12 @@ enum
   SAMPLE_crack,		/* stone hits nut */
   SAMPLE_bug,		/* bug moves */
   SAMPLE_tank,		/* tank moves */
-  SAMPLE_android,	/* android places something */
+  SAMPLE_android_clone,	/* android places something */
+  SAMPLE_android_move,	/* android moves */
   SAMPLE_spring,	/* spring hits ground/wall/bumper, stone hits spring */
   SAMPLE_slurp,		/* spring kills alien */
-  SAMPLE_eater,		/* eater sits/eats diamond */
+  SAMPLE_eater,		/* eater sits */
+  SAMPLE_eater_eat,	/* eater eats diamond */
   SAMPLE_alien,		/* alien moves */
   SAMPLE_collect,	/* player collects object */
   SAMPLE_diamond,	/* diamond/emerald hits ground */
@@ -503,7 +505,8 @@ enum
   SAMPLE_grow,		/* growing wall grows */
   SAMPLE_wonder,	/* wonderwall is active */
   SAMPLE_door,		/* player goes thru door (gate) */
-  SAMPLE_exit,		/* player goes into exit */
+  SAMPLE_exit_open,	/* exit opens */
+  SAMPLE_exit_leave,	/* player goes into exit */
   SAMPLE_dynamite,	/* player places dynamite */
   SAMPLE_tick,		/* dynamite ticks */
   SAMPLE_press,		/* player presses wheel/wind/switch */

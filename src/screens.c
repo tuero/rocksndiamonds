@@ -346,6 +346,7 @@ void DrawMainMenu()
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 }
 
+#if 0
 static void gotoTopLevelDir()
 {
   /* move upwards to top level directory */
@@ -374,6 +375,7 @@ static void gotoTopLevelDir()
     leveldir_current = leveldir_current->node_parent;
   }
 }
+#endif
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {

@@ -1,3 +1,8 @@
+2005-03-06
+	* fixed mapping of obsolete element token names in "editorsetup.conf"
+	* fixed bug with sound "acid.splashing" treated as a loop sound
+	* fixed some little sound bugs in native EM engine
+
 2005-02-20
 	* fixed small bug when dragging scrollbars to end positions
 

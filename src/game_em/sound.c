@@ -27,7 +27,8 @@ static char audioname[] = "/dev/audio";
 
 static const int sound_priority[SAMPLE_MAX] =
 {
-  SAMPLE_exit,
+  SAMPLE_exit_open,
+  SAMPLE_exit_leave,
   SAMPLE_die,
   SAMPLE_time,
   SAMPLE_boom,
@@ -40,7 +41,8 @@ static const int sound_priority[SAMPLE_MAX] =
   SAMPLE_door,
   SAMPLE_dirt,
   SAMPLE_blank,
-  SAMPLE_android,
+  SAMPLE_android_clone,
+  SAMPLE_android_move,
   SAMPLE_ball,
   SAMPLE_grow,
   SAMPLE_squash,
@@ -57,6 +59,7 @@ static const int sound_priority[SAMPLE_MAX] =
   SAMPLE_bug,
   SAMPLE_tank,
   SAMPLE_eater,
+  SAMPLE_eater_eat,
   SAMPLE_alien,
   SAMPLE_acid
 };

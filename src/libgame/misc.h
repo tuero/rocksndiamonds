@@ -162,6 +162,8 @@ boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
 
+char *get_mapped_token(char *);
+
 int get_parameter_value(char *, char *, int);
 int get_auto_parameter_value(char *, char *);
 

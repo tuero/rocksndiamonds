@@ -165,9 +165,34 @@ int cleanup_em_level(unsigned char *src, int length)
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
   }
+#if 1
+  else if (length >= 2106 &&
+	   src[0] == 245 &&
+	   src[1983] == 27)
+  {
+    unsigned char j = 94;
+
+    /* ---------- this cave has V3 file format ---------- */
+    file_version = FILE_VERSION_EM_V3;
+
+    for (i = 0; i < 2106; i++)
+      src[i] = (src[i] ^ (j += 7)) - 0x11;
+    src[1] = 131;
+    for (i = 0; i < 2048; i++)
+      src[i] = remap_v4[src[i]];
+    for (i = 2048; i < 2084; i++)
+      src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
+    for (i = 2112; i < 2148; i++)
+      src[i] = src[i - 64];
+  }
+#endif
   else
   {
     /* ---------- this cave has unknown file format ---------- */
+
+#if 1
+    printf("::: %d, %d\n", src[0], src[1983]);
+#endif
 
     return 0;
   }

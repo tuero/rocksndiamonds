@@ -37,8 +37,45 @@
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
 
 
-struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
+static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
 
+static int copy_properties[][5] =
+{
+  {
+    EL_BUG,
+    EL_BUG_LEFT,		EL_BUG_RIGHT,
+    EL_BUG_UP,			EL_BUG_DOWN
+  },
+  {
+    EL_SPACESHIP,
+    EL_SPACESHIP_LEFT,		EL_SPACESHIP_RIGHT,
+    EL_SPACESHIP_UP,		EL_SPACESHIP_DOWN
+  },
+  {
+    EL_BD_BUTTERFLY,
+    EL_BD_BUTTERFLY_LEFT,	EL_BD_BUTTERFLY_RIGHT,
+    EL_BD_BUTTERFLY_UP,		EL_BD_BUTTERFLY_DOWN
+  },
+  {
+    EL_BD_FIREFLY,
+    EL_BD_FIREFLY_LEFT,		EL_BD_FIREFLY_RIGHT,
+    EL_BD_FIREFLY_UP,		EL_BD_FIREFLY_DOWN
+  },
+  {
+    EL_PACMAN,
+    EL_PACMAN_LEFT,		EL_PACMAN_RIGHT,
+    EL_PACMAN_UP,		EL_PACMAN_DOWN
+  },
+  {
+    EL_MOLE,
+    EL_MOLE_LEFT,		EL_MOLE_RIGHT,
+    EL_MOLE_UP,			EL_MOLE_DOWN
+  },
+  {
+    -1,
+    -1, -1, -1, -1
+  }
+};
 
 static void InitTileClipmasks()
 {
@@ -1504,6 +1541,16 @@ static void InitElementSoundInfo()
 	element_info[i].sound[act] = default_action_sound;
     }
   }
+
+#if 1
+  /* copy sound settings to some elements that are only stored in level file
+     in native R'n'D levels, but are used by game engine in native EM levels */
+  for (i = 0; copy_properties[i][0] != -1; i++)
+    for (j = 1; j <= 4; j++)
+      for (act = 0; act < NUM_ACTIONS; act++)
+	element_info[copy_properties[i][j]].sound[act] =
+	  element_info[copy_properties[i][0]].sound[act];
+#endif
 }
 
 static void InitGameModeSoundInfo()
@@ -1639,6 +1686,22 @@ static void InitSoundInfo()
   }
 
   free(sound_effect_properties);
+
+#if 0
+  /* !!! MOVED TO "InitElementSoundInfo()" !!! */
+  /* !!! everything defined here gets overwritten there !!! */
+
+  /* copy sound settings to some elements that are only stored in level file
+     in native R'n'D levels, but are used by game engine in native EM levels */
+  for (i = 0; i < NUM_ACTIONS; i++)
+    for (j = 0; copy_properties[j][0] != -1; j++)
+      for (k = 1; k <= 4; k++)
+	element_info[copy_properties[j][k]].sound[i] =
+	  element_info[copy_properties[j][0]].sound[i];
+
+  printf("::: bug   -> %d\n", element_info[EL_BUG].sound[ACTION_MOVING]);
+  printf("::: bug_r -> %d\n", element_info[EL_BUG_RIGHT].sound[ACTION_MOVING]);
+#endif
 
 #if 0
   /* !!! now handled in InitElementSoundInfo() !!! */
@@ -3597,44 +3660,6 @@ void InitElementPropertiesStatic()
     { ep_gfx_crumbled,		EP_GFX_CRUMBLED		},
 
     { NULL,			-1			}
-  };
-
-  static int copy_properties[][5] =
-  {
-    {
-      EL_BUG,
-      EL_BUG_LEFT,		EL_BUG_RIGHT,
-      EL_BUG_UP,		EL_BUG_DOWN
-    },
-    {
-      EL_SPACESHIP,
-      EL_SPACESHIP_LEFT,	EL_SPACESHIP_RIGHT,
-      EL_SPACESHIP_UP,		EL_SPACESHIP_DOWN
-    },
-    {
-      EL_BD_BUTTERFLY,
-      EL_BD_BUTTERFLY_LEFT,	EL_BD_BUTTERFLY_RIGHT,
-      EL_BD_BUTTERFLY_UP,	EL_BD_BUTTERFLY_DOWN
-    },
-    {
-      EL_BD_FIREFLY,
-      EL_BD_FIREFLY_LEFT,	EL_BD_FIREFLY_RIGHT,
-      EL_BD_FIREFLY_UP,		EL_BD_FIREFLY_DOWN
-    },
-    {
-      EL_PACMAN,
-      EL_PACMAN_LEFT,		EL_PACMAN_RIGHT,
-      EL_PACMAN_UP,		EL_PACMAN_DOWN
-    },
-    {
-      EL_MOLE,
-      EL_MOLE_LEFT,		EL_MOLE_RIGHT,
-      EL_MOLE_UP,		EL_MOLE_DOWN
-    },
-    {
-      -1,
-      -1, -1, -1, -1
-    }
   };
 
   int i, j, k;

@@ -55,7 +55,7 @@ void synchro_3(void)
     play_sound(-1, -1, SAMPLE_time);
 
   if (lev.wheel_cnt)
-    play_sound(-1, -1, SAMPLE_wheel);
+    play_element_sound(lev.wheel_x, lev.wheel_y, SAMPLE_wheel, Xwheel);
 
   /* grow amoeba */
 

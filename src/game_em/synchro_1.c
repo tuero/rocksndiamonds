@@ -337,7 +337,7 @@ static void kill_player(struct PLAYER *ply)
     case Xexit_1:
     case Xexit_2:
     case Xexit_3:
-      play_element_sound(x, y, SAMPLE_exit, Xexit_1);
+      play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
       break;
 
     default:
@@ -580,7 +580,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	  Cave[y-1][x+1] = Yacid_splash_eB;
 	if (Cave[y-1][x-1] == Xblank)
 	  Cave[y-1][x-1] = Yacid_splash_wB;
-	play_sound(x, y, SAMPLE_acid);
+	play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 
       case Xboom_android:
       case Xboom_1:
@@ -760,7 +760,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto stone_walk;
 
           case Xblank:
@@ -798,7 +798,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto bomb_walk;
 
 	  case Xblank:
@@ -836,7 +836,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto nut_walk;
 
           case Xblank:
@@ -885,7 +885,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto spring_walk;
 
           case Xblank:
@@ -933,7 +933,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y+dy-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y+dy-1][x+dx-1] == Xblank)
 	      Cave[y+dy-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto balloon_walk;
 
           case Xblank:
@@ -978,7 +978,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	      Cave[y+dy-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y+dy-1][x+dx-1] == Xblank)
 	      Cave[y+dy-1][x+dx-1] = Yacid_splash_wB;
-	    play_sound(x, y, SAMPLE_acid);
+	    play_element_sound(x, y, SAMPLE_acid, Xacid_1);
 	    goto android_walk;
 
           case Xblank:
@@ -1124,7 +1124,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xexit_1:
       case Xexit_2:
       case Xexit_3:
-	play_element_sound(x, y, SAMPLE_exit, Xexit_1);
+	play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
 
 	if (--lev.home == 0 && lev.time_initial > 0)	/* game won */
 	  lev.score += lev.time * lev.exit_score / 100;

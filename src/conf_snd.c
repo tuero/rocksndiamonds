@@ -112,7 +112,7 @@ struct ConfigInfo sound_config[] =
   { "spaceship.waiting",		"roehr.wav"			},
   { "yamyam.moving",			UNDEFINED_FILENAME		},
   { "yamyam.waiting",			"njam.wav"			},
-  { "yamyam.digging",			UNDEFINED_FILENAME		},
+  { "yamyam.digging",			"njam.wav"			},
   { "robot.moving",			"schlurf.wav"			},
   { "robot.moving.mode_loop",		"false"				},
   { "robot.waiting",			UNDEFINED_FILENAME		},
@@ -141,6 +141,11 @@ struct ConfigInfo sound_config[] =
   { "spring.pushing",			"pusch.wav"			},
   { "spring.impact",			"klopf.wav"			},
   { "[wall].growing",			UNDEFINED_FILENAME		},
+  { "emc_android.pushing",		"pusch.wav"			},
+  { "emc_android.moving",		"roehr.wav"			},
+  { "emc_android.moving.mode_loop",	"false"				},
+  { "emc_android.dropping",		"deng.wav"			},
+  { "emc_magic_ball.dropping",		"deng.wav"			},
 
   /* sounds for Diamond Caves style elements and actions */
   { "pearl.collecting",			"pong.wav"			},

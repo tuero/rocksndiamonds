@@ -1615,6 +1615,27 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ------------------------------------------------------------------------- */
 
+char *get_mapped_token(char *token)
+{
+  /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+  static char *map_token_prefix[][2] =
+  {
+    { "char_procent",		"char_percent"	},
+    { NULL,					}
+  };
+  int i;
+
+  for (i = 0; map_token_prefix[i][0] != NULL; i++)
+  {
+    int len_token_prefix = strlen(map_token_prefix[i][0]);
+
+    if (strncmp(token, map_token_prefix[i][0], len_token_prefix) == 0)
+      return getStringCat2(map_token_prefix[i][1], &token[len_token_prefix]);
+  }
+
+  return NULL;
+}
+
 /* This function checks if a string <s> of the format "string1, string2, ..."
    exactly contains a string <s_contained>. */
 
@@ -2000,34 +2021,20 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   /* map deprecated to current tokens (using prefix match and replace) */
   BEGIN_HASH_ITERATION(valid_file_hash, itr)
   {
-    /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
-    static char *map_token_prefix[][2] =
-    {	/* old prefix	->	new prefix	*/
-      { "char_procent",		"char_percent"	},
-      { NULL,			NULL		}
-    };
     char *token = HASH_ITERATION_TOKEN(itr);
+    char *mapped_token = get_mapped_token(token);
 
-    for (i = 0; map_token_prefix[i][0] != NULL; i++)
+    if (mapped_token != NULL)
     {
-      int token_prefix_length = strlen(map_token_prefix[i][0]);
+      char *value = HASH_ITERATION_VALUE(itr);
 
-      if (strncmp(token, map_token_prefix[i][0], token_prefix_length) == 0)
-      {
-	char *value = HASH_ITERATION_VALUE(itr);
-	char *mapped_token = getStringCat2(map_token_prefix[i][1],
-					   &token[token_prefix_length]);
+      /* add mapped token */
+      setHashEntry(valid_file_hash, mapped_token, value);
 
-	/* add mapped token */
-	setHashEntry(valid_file_hash, mapped_token, value);
+      /* ignore old token (by setting it to "known" keyword) */
+      setHashEntry(valid_file_hash, token, known_token_value);
 
-	/* ignore old token (by setting it to "known" keyword) */
-	setHashEntry(valid_file_hash, token, known_token_value);
-
-	free(mapped_token);
-
-	break;
-      }
+      free(mapped_token);
     }
   }
   END_HASH_ITERATION(valid_file_hash, itr)

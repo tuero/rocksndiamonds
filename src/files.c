@@ -4688,7 +4688,19 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
   {
     char *value = getHashEntry(element_hash, list->token);
 
-    if (value)
+    if (value == NULL)		/* try to find obsolete token mapping */
+    {
+      char *mapped_token = get_mapped_token(list->token);
+
+      if (mapped_token != NULL)
+      {
+	value = getHashEntry(element_hash, mapped_token);
+
+	free(mapped_token);
+      }
+    }
+
+    if (value != NULL)
     {
       (*elements)[(*num_elements)++] = atoi(value);
     }
