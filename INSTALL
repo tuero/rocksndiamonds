@@ -1,0 +1,85 @@
+
+Installation instructions for Rocks'n'Diamonds 1.2.0
+====================================================
+
+Compilation
+-----------
+
+If your system supports Linux/i386/ELF/libc5 executables (Linux package)
+or if you run DOS/Windows (DOS package), you can directly use the included
+precompiled binary.
+
+If you use a different system, just recompile the game:
+
+If you use Linux with gcc or DOS/Windows with djgpp, just try 'make'
+which should work without problems.
+
+If you use SUN/Solaris with gcc and GNU make, try 'make solaris'.
+
+If the above doesn't work, edit the Makefile in the top level directory.
+If it doesn't work either, edit the Makefile in the 'src' subdirectory.
+
+If you had to modify any Makefile to compile it, please drop me a note
+about it to 'aeglos@valinor.owl.de'. Thanks!
+
+
+Customization
+-------------
+
+The following configuration options in the top level Makefile help
+you to customize the game to your system and your environment:
+
+CC		Choose your favorite ANSI C compiler.
+		Default is 'gcc'.
+
+PLATFORM	Choose your platform, if auto detection fails.
+		Auto detection should work for Linux and DOS
+		(just type 'make'), on SUN/Solaris systems 'make solaris'
+		should work. Other systems may need additional editing
+		of 'src/Makefile' to set some additional compiler options.
+
+X11_PATH	Specify the path to your X11 installation. Include files
+		and libraries are searched for at $(X11_PATH)/include and
+		$(X11_PATH)/lib, if you set this variables. If you don't
+		set this variable, your compiler must be able to find X11
+		by itself, which works fine for Linux, for example.
+
+GAME_DIR	Specify the directory where the program looks for all the
+		graphics, sounds, levels and high scores. If you leave this
+		commented out, the current directory ('.') is used, which
+		lets you use the game without installing it somewhere in
+		your system (although you have to 'cd' to the game directory
+		each time you want to play it).
+
+JOYSTICK	Uncomment this line if your system does not support game
+		port hardware like joysticks (and has therefore no joystick
+		include file). Currently the game should work with joysticks
+		on Linux and FreeBSD.
+
+SOUNDS		Uncomment this line if your system does not support audio
+		hardware. Currently the game should work with sound support
+		on Linux, FreeBSD, SUN/Solaris, HP-UX and most Unix system
+		that support '/dev/dsp' or '/dev/audio' devices.
+
+SCORE_ENTRIES	Choose if you want to allow many entries in the high score
+		table for one player or exactly one entry. Systems with a
+		lot of users maybe want to limit high score entries to only
+		one entry for each player (and therefore set 'SCORE_ENTRIES'
+		to 'ONE_PER_NAME') where systems used by only one person
+		maybe want to use the default of 'MANY_PER_NAME' which is
+		automatically choosen if you leave everything commented out.
+
+Modifications of the Makefile in the directory 'src' are normally not needed.
+If the game fails to compile out of the box, you may have to modify some
+of the system variables there to get it to compile.
+
+SYSTEM		May need to be set to some system dependend values.
+
+INCL, LIBS	Maybe some more directories for include files and libraries
+		have to be added to this variables depending on your system.
+
+
+If you have any comments, additions or modifications to the Makefile(s),
+please send me mail: 'aeglos@valinor.owl.de'. Thanks!
+
+05-DEC-1998, Holger Schemel

@@ -66,7 +66,7 @@ sdl:
 	@$(MAKE_CMD) TARGET=sdl
 
 sdl_old:
-	@$(MAKE_CMD) TARGET=sdl_old_10
+	@$(MAKE_CMD) TARGET=sdl USE_SDL_OLD_LIBS=true
 
 solaris:
 	@$(MAKE_CMD) PLATFORM=solaris
@@ -76,3 +76,28 @@ windows:
 
 clean:
 	@$(MAKE_CMD) clean
+
+
+#-----------------------------------------------------------------------------#
+# development only stuff                                                      #
+#-----------------------------------------------------------------------------#
+
+backup:
+	./Scripts/make_backup.sh src
+
+backup_lev:
+	./Scripts/make_backup.sh lev
+
+backup_gfx:
+	./Scripts/make_backup.sh gfx
+
+dist-unix:
+	./Scripts/make_dist.sh unix .
+
+dist-dos:
+	./Scripts/make_dist.sh dos .
+
+dist: dist-unix dist-dos
+
+depend dep:
+	$(MAKE_CMD) depend

@@ -41,13 +41,6 @@ else
 PROFILING = -pg
 endif
 
-ifeq ($(TARGET),sdl_old_10)
-TARGET = sdl
-USE_SDL_OLD_LIBS = true
-else
-USE_SDL_OLD_LIBS = false
-endif
-
 ifeq ($(TARGET),sdl)
 USE_SDL = true
 else
@@ -169,3 +162,15 @@ clean:
 	$(RM) *.o
 	$(RM) ../*.exe
 	$(RM) $(PROGNAME)
+
+
+#-----------------------------------------------------------------------------#
+# development only stuff                                                      #
+#-----------------------------------------------------------------------------#
+
+depend:
+	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif

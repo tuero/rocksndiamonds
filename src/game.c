@@ -712,8 +712,7 @@ void InitGame()
   DrawAllPlayers();
   FadeToFront();
 
-  /* after drawing the level, corect some elements */
-
+  /* after drawing the level, correct some elements */
   if (game.timegate_time_left == 0)
     CloseAllOpenTimegates();
 

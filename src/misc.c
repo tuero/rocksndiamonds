@@ -1182,8 +1182,13 @@ boolean validLevelSeries(struct LevelDirInfo *node)
 
 struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *node)
 {
-  if (node == NULL)		/* start with first level directory entry */
-    return getFirstValidLevelSeries(leveldir_first);
+  if (node == NULL)
+  {
+    if (leveldir_first)		/* start with first level directory entry */
+      return getFirstValidLevelSeries(leveldir_first);
+    else
+      return NULL;
+  }
   else if (node->node_group)	/* enter level group (step down into tree) */
     return getFirstValidLevelSeries(node->node_group);
   else if (node->parent_link)	/* skip start entry of level group */

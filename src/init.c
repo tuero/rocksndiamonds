@@ -228,6 +228,7 @@ void InitSound()
     if (!LoadSound(&Sound[i]))
     {
       sound_status = SOUND_OFF;
+      sound_loops_allowed = FALSE;
       return;
     }
   }
