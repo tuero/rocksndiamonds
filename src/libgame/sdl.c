@@ -320,6 +320,60 @@ inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
 }
 #endif
 
+inline Pixel SDLGetPixel(Bitmap *dst_bitmap, int x, int y)
+{
+  SDL_Surface *surface = dst_bitmap->surface;
+
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    x += video_xoffset;
+    y += video_yoffset;
+  }
+#endif
+
+  switch (surface->format->BytesPerPixel)
+  {
+    case 1:		/* assuming 8-bpp */
+    {
+      return *((Uint8 *)surface->pixels + y * surface->pitch + x);
+    }
+    break;
+
+    case 2:		/* probably 15-bpp or 16-bpp */
+    {
+      return *((Uint16 *)surface->pixels + y * surface->pitch / 2 + x);
+    }
+    break;
+
+  case 3:		/* slow 24-bpp mode; usually not used */
+    {
+      /* does this work? */
+      Uint8 *pix = (Uint8 *)surface->pixels + y * surface->pitch + x * 3;
+      Uint32 color = 0;
+      int shift;
+
+      shift = surface->format->Rshift;
+      color |= *(pix + shift / 8) >> shift;
+      shift = surface->format->Gshift;
+      color |= *(pix + shift / 8) >> shift;
+      shift = surface->format->Bshift;
+      color |= *(pix + shift / 8) >> shift;
+
+      return color;
+    }
+    break;
+
+  case 4:		/* probably 32-bpp */
+    {
+      return *((Uint32 *)surface->pixels + y * surface->pitch / 4 + x);
+    }
+    break;
+  }
+
+  return 0;
+}
+
 
 /* ========================================================================= */
 /* The following functions have been taken from the SGE library              */

@@ -1306,6 +1306,12 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
 #ifndef S_IXOTH
 #define S_IXOTH S_IXUSR
 #endif
+#ifndef S_IRWXG
+#define S_IRWXG (S_IRGRP | S_IWGRP | S_IXGRP)
+#endif
+#ifndef S_ISGID
+#define S_ISGID 0
+#endif
 #endif	/* PLATFORM_WIN32 */
 
 /* file permissions for newly written files */
@@ -1343,29 +1349,39 @@ char *getSetupDir()
   return getUserDataDir();
 }
 
-void createDirectory(char *dir, char *text, int permission_class)
+static mode_t posix_umask(mode_t mask)
 {
 #if defined(PLATFORM_UNIX)
+  return umask(mask);
+#else
+  return 0;
+#endif
+}
+
+static int posix_mkdir(const char *pathname, mode_t mode)
+{
+#if defined(PLATFORM_WIN32)
+  return mkdir(pathname);
+#else
+  return mkdir(pathname, mode);
+#endif
+}
+
+void createDirectory(char *dir, char *text, int permission_class)
+{
   /* leave "other" permissions in umask untouched, but ensure group parts
      of USERDATA_DIR_MODE are not masked */
   mode_t dir_mode = (permission_class == PERMS_PRIVATE ?
 		     DIR_PERMS_PRIVATE : DIR_PERMS_PUBLIC);
-  mode_t normal_umask = umask(0);
+  mode_t normal_umask = posix_umask(0);
   mode_t group_umask = ~(dir_mode & S_IRWXG);
-  umask(normal_umask & group_umask);
-#endif
+  posix_umask(normal_umask & group_umask);
 
   if (access(dir, F_OK) != 0)
-#if defined(PLATFORM_WIN32)
-    if (mkdir(dir) != 0)
-#else
-    if (mkdir(dir, dir_mode) != 0)
-#endif
+    if (posix_mkdir(dir, dir_mode) != 0)
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 
-#if defined(PLATFORM_UNIX)
-  umask(normal_umask);		/* reset normal umask */
-#endif
+  posix_umask(normal_umask);		/* reset normal umask */
 }
 
 void InitUserDataDirectory()

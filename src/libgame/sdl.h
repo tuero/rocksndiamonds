@@ -321,6 +321,7 @@ inline void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
 inline void SDLFillRectangle(Bitmap *, int, int, int, int, unsigned int);
 inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, unsigned int);
 inline void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
+inline Pixel SDLGetPixel(Bitmap *, int, int);
 
 Bitmap *SDLLoadImage(char *);
 

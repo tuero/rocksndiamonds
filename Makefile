@@ -100,7 +100,13 @@ dist-win32:
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
-dist: dist-unix dist-msdos dist-win32
+dist-build-all:
+	$(MAKE) clean
+	@BUILD_DIST=TRUE $(MAKE) x11		; $(MAKE) dist-clean
+	@BUILD_DIST=TRUE $(MAKE) cross-win32	; $(MAKE) dist-clean
+	@BUILD_DIST=TRUE $(MAKE) cross-msdos	; $(MAKE) dist-clean
+
+dist-all: dist-build-all dist-unix dist-msdos dist-win32
 
 depend dep:
 	$(MAKE_CMD) depend

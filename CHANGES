@@ -1,4 +1,4 @@
-Release Version 2.0.1 [?? ??? 2002]
+Release Version 2.0.1 [19 MAR 2002]
 -----------------------------------
 	- bug in explosion code fixed that broke level 24 of "Baby Ghost Mine"
 	- several Supaplex emulation bugs fixed (thanks to Mihail Milushev):
@@ -16,6 +16,15 @@ Release Version 2.0.1 [?? ??? 2002]
 	- /dev/dsp support for NetBSD added (thanks to Krister Walfridsson)
 	- file permissions when saving files and creating directories changed
 	- some small sound bugs fixed
+	- added new contributed levels from the following players:
+	  + Arno Luppold
+	  + Barak Shacked
+	  + Ben Braithwaite
+	  + Dominik Seichter
+	  + Emilio Hemken
+	  + Glenn Alexander
+	  + Helge Hafting
+	  + Paul Sutton
 
 Release Version 2.0.0 [01 JAN 2001]
 -----------------------------------

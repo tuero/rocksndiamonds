@@ -108,6 +108,10 @@ OPTIONS = $(DEBUG) -O3 -Wall			# only for debugging purposes
 # OPTIONS = -O3
 # OPTIONS = -DSYSV -Ae				# may be needed for HP-UX
 
+ifdef BUILD_DIST				# distribution build
+OPTIONS = -O3 -Wall
+endif
+
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
 LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 

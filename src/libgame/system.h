@@ -291,6 +291,7 @@ inline void SetClipOrigin(Bitmap *, GC, int, int);
 inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
+inline Pixel GetPixel(Bitmap *, int, int);
 inline Pixel GetPixelFromRGB(Bitmap *, unsigned int,unsigned int,unsigned int);
 inline Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 

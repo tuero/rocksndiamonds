@@ -438,6 +438,26 @@ inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
 #endif
 }
 
+inline Pixel GetPixel(Bitmap *bitmap, int x, int y)
+{
+#if defined(TARGET_SDL)
+  return SDLGetPixel(bitmap, x, y);
+#elif defined(TARGET_ALLEGRO)
+  return AllegroGetPixel(bitmap->drawable, x, y);
+#else
+  unsigned long pixel_value;
+  XImage *pixel_image;
+
+  pixel_image = XGetImage(display, bitmap->drawable, x, y, 1, 1,
+			  AllPlanes, ZPixmap);
+  pixel_value = XGetPixel(pixel_image, 0, 0);
+
+  XDestroyImage(pixel_image);
+
+  return pixel_value;
+#endif
+}
+
 inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 			     unsigned int color_g, unsigned int color_b)
 {
