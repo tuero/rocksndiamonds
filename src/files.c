@@ -2104,7 +2104,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->field[ply2->x_initial - 1][ply2->y_initial - 1] = EL_PLAYER_2;
   level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
 
-#if 1
+#if 0
   printf("::: native Emerald Mine file version: %d\n", level_em->file_version);
 #endif
 }

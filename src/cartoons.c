@@ -74,7 +74,7 @@ void InitToons()
   for (i=0; i < num_toons; i++)
   {
     int graphic = IMG_TOON_1 + i;
-    struct FileInfo *image = getImageListEntry(graphic);
+    struct FileInfo *image = getImageListEntryFromImageID(graphic);
 
     toons[i].bitmap = graphic_info[graphic].bitmap;
 

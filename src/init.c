@@ -258,12 +258,19 @@ void InitElementSmallImages()
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
 
-  /* initialize images from dynamic configuration */
+  /* initialize images from dynamic configuration (may be elements or other) */
+#if 1
+  for (i = 0; i < num_property_mappings; i++)
+    InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+#else
+  /* !!! THIS DOES NOT WORK -- "artwork_index" is graphic, not element !!! */
+  /* !!! ALSO, non-element graphics might need scaling-up !!! */
   for (i = 0; i < num_property_mappings; i++)
     if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
       InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+#endif
 
-#if 1
+#if 0
   /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
   for (i = IMG_EMC_OBJECT; i <= IMG_EMC_SPRITE; i++)
     InitElementSmallImagesScaledUp(i);
@@ -468,8 +475,10 @@ void InitElementGraphicInfo()
     if ((action > -1 || direction > -1 || crumbled == TRUE) &&
 	base_graphic != -1)
     {
-      boolean base_redefined = getImageListEntry(base_graphic)->redefined;
-      boolean act_dir_redefined = getImageListEntry(graphic)->redefined;
+      boolean base_redefined =
+	getImageListEntryFromImageID(base_graphic)->redefined;
+      boolean act_dir_redefined =
+	getImageListEntryFromImageID(graphic)->redefined;
 
       /* if the base graphic ("emerald", for example) has been redefined,
       	 but not the action graphic ("emerald.falling", for example), do not
@@ -851,8 +860,10 @@ void InitElementSpecialGraphicInfo()
     int special = element_to_special_graphic[i].special;
     int graphic = element_to_special_graphic[i].graphic;
     int base_graphic = el2baseimg(element);
-    boolean base_redefined = getImageListEntry(base_graphic)->redefined;
-    boolean special_redefined = getImageListEntry(graphic)->redefined;
+    boolean base_redefined =
+      getImageListEntryFromImageID(base_graphic)->redefined;
+    boolean special_redefined =
+      getImageListEntryFromImageID(graphic)->redefined;
 
     /* if the base graphic ("emerald", for example) has been redefined,
        but not the special graphic ("emerald.EDITOR", for example), do not
@@ -899,9 +910,27 @@ static int get_element_from_token(char *token)
   return -1;
 }
 
-static void set_graphic_parameters(int graphic, char **parameter_raw)
+static int get_scaled_graphic_width(int graphic)
 {
-  Bitmap *src_bitmap = getBitmapFromImageID(graphic);
+  int original_width = getOriginalImageWidthFromImageID(graphic);
+  int scale_up_factor = graphic_info[graphic].scale_up_factor;
+
+  return original_width * scale_up_factor;
+}
+
+static int get_scaled_graphic_height(int graphic)
+{
+  int original_height = getOriginalImageHeightFromImageID(graphic);
+  int scale_up_factor = graphic_info[graphic].scale_up_factor;
+
+  return original_height * scale_up_factor;
+}
+
+static void set_graphic_parameters(int graphic, int graphic_copy_from)
+{
+  struct FileInfo *image = getImageListEntryFromImageID(graphic_copy_from);
+  char **parameter_raw = image->parameter;
+  Bitmap *src_bitmap = getBitmapFromImageID(graphic_copy_from);
   int parameter[NUM_GFX_ARGS];
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
@@ -964,10 +993,9 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
   if (src_bitmap)
   {
-    /* bitmap is not scaled at this stage, so calculate final size */
-    int scale_up_factor = graphic_info[graphic].scale_up_factor;
-    int src_bitmap_width  = src_bitmap->width  * scale_up_factor;
-    int src_bitmap_height = src_bitmap->height * scale_up_factor;
+    /* get final bitmap size (with scaling, but without small images) */
+    int src_bitmap_width  = get_scaled_graphic_width(graphic);
+    int src_bitmap_height = get_scaled_graphic_height(graphic);
 
     anim_frames_per_row = src_bitmap_width  / graphic_info[graphic].width;
     anim_frames_per_col = src_bitmap_height / graphic_info[graphic].height;
@@ -1094,8 +1122,6 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 static void InitGraphicInfo()
 {
   int fallback_graphic = IMG_CHAR_EXCLAM;
-  struct FileInfo *fallback_image = getImageListEntry(fallback_graphic);
-  Bitmap *fallback_bitmap = getBitmapFromImageID(fallback_graphic);
   int num_images = getImageListSize();
   int i;
 
@@ -1133,11 +1159,10 @@ static void InitGraphicInfo()
 
   for (i = 0; i < num_images; i++)
   {
-    struct FileInfo *image = getImageListEntry(i);
     Bitmap *src_bitmap;
     int src_x, src_y;
     int first_frame, last_frame;
-    int scale_up_factor, src_bitmap_width, src_bitmap_height;
+    int src_bitmap_width, src_bitmap_height;
 
 #if 0
     printf("::: image: '%s' [%d]\n", image->token, i);
@@ -1149,17 +1174,16 @@ static void InitGraphicInfo()
 	   getTokenFromImageID(i));
 #endif
 
-    set_graphic_parameters(i, image->parameter);
+    set_graphic_parameters(i, i);
 
     /* now check if no animation frames are outside of the loaded image */
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
 
-    /* bitmap is not scaled at this stage, so calculate final size */
-    scale_up_factor = graphic_info[i].scale_up_factor;
-    src_bitmap_width  = graphic_info[i].bitmap->width  * scale_up_factor;
-    src_bitmap_height = graphic_info[i].bitmap->height * scale_up_factor;
+    /* get final bitmap size (with scaling, but without small images) */
+    src_bitmap_width  = get_scaled_graphic_width(i);
+    src_bitmap_height = get_scaled_graphic_height(i);
 
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
@@ -1190,8 +1214,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, fallback_image->default_parameter);
-      graphic_info[i].bitmap = fallback_bitmap;
+      set_graphic_parameters(i, fallback_graphic);
     }
 
     last_frame = graphic_info[i].anim_frames - 1;
@@ -1219,8 +1242,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, fallback_image->default_parameter);
-      graphic_info[i].bitmap = fallback_bitmap;
+      set_graphic_parameters(i, fallback_graphic);
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -1697,6 +1719,8 @@ static void ReinitializeGraphics()
 
   InitElementSmallImages();		/* scale images to all needed sizes */
   InitFontGraphicInfo();		/* initialize text drawing functions */
+
+  InitGraphicInfo_EM();			/* graphic mapping for EM engine */
 
   SetMainBackgroundImage(IMG_BACKGROUND);
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);

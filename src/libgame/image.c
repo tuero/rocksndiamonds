@@ -820,7 +820,12 @@ struct ImageInfo
   int num_references;
 
   Bitmap *bitmap;
-  boolean contains_small_images;
+
+  int original_width;			/* original image file width */
+  int original_height;			/* original image file height */
+
+  boolean contains_small_images;	/* set after adding small images */
+  boolean scaled_up;			/* set after scaling up */
 };
 typedef struct ImageInfo ImageInfo;
 
@@ -846,7 +851,11 @@ static void *Load_PCX(char *filename)
 
   img_info->source_filename = getStringCopy(filename);
 
+  img_info->original_width  = img_info->bitmap->width;
+  img_info->original_height = img_info->bitmap->height;
+
   img_info->contains_small_images = FALSE;
+  img_info->scaled_up = FALSE;
 
   return img_info;
 }
@@ -873,7 +882,7 @@ int getImageListSize()
 	  image_info->num_dynamic_file_list_entries);
 }
 
-struct FileInfo *getImageListEntry(int pos)
+struct FileInfo *getImageListEntryFromImageID(int pos)
 {
   int num_list_entries = image_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
@@ -895,33 +904,30 @@ static ImageInfo *getImageInfoEntryFromImageID(int pos)
 
 Bitmap *getBitmapFromImageID(int pos)
 {
-#if 0
-  int num_list_entries = image_info->num_file_list_entries;
-  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
-  ImageInfo **img_info =
-    (ImageInfo **)(pos < num_list_entries ? image_info->artwork_list :
-		   image_info->dynamic_artwork_list);
-
-  return (img_info[list_pos] != NULL ? img_info[list_pos]->bitmap : NULL);
-#else
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
   return (img_info != NULL ? img_info->bitmap : NULL);
-#endif
+}
+
+int getOriginalImageWidthFromImageID(int pos)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  return (img_info != NULL ? img_info->original_width : 0);
+}
+
+int getOriginalImageHeightFromImageID(int pos)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  return (img_info != NULL ? img_info->original_height : 0);
 }
 
 char *getTokenFromImageID(int graphic)
 {
-#if 0
-  /* !!! this does not work for dynamic artwork (crash!) !!! */
-  struct FileInfo *file_list = (struct FileInfo *)image_info->file_list;
-
-  return file_list[graphic].token;
-#else
-  struct FileInfo *file_list = getImageListEntry(graphic);
+  struct FileInfo *file_list = getImageListEntryFromImageID(graphic);
 
   return (file_list != NULL ? file_list->token : NULL);
-#endif
 }
 
 int getImageIDFromToken(char *token)
@@ -1047,6 +1053,7 @@ void CreateImageWithSmallImages(int pos, int zoom_factor)
   CreateBitmapWithSmallBitmaps(img_info->bitmap, zoom_factor);
 
   img_info->contains_small_images = TRUE;
+  img_info->scaled_up = TRUE;
 
 #if 0
   if (zoom_factor)

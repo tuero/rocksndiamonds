@@ -5305,7 +5305,7 @@ unsigned int InitRND(long seed)
     return InitEngineRND(seed);
 }
 
-void InitGraphicsInfoEM(void)
+void InitGraphicInfo_EM(void)
 {
   int mapping_EM_to_RND_element[TILE_MAX];
   int mapping_EM_to_RND_action[TILE_MAX];
@@ -5514,11 +5514,6 @@ void InitGraphicsInfoEM(void)
 	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
 	int cx = ABS(dx) * TILEX / 8;
 	int cy = ABS(dy) * TILEY / 8;
-
-#if 0
-	if (i == Yemerald_sB)
-	  printf("::: %d: ...\n", j);
-#endif
 
 	if (backside)		/* tile where movement starts */
 	{

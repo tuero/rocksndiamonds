@@ -4493,7 +4493,7 @@ void create_obj_graphics_info_em()
     }
   }
 
-  InitGraphicsInfoEM();
+  InitGraphicInfo_EM();
 }
 
 void create_spr()

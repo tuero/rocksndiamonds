@@ -151,5 +151,6 @@ int el2edimg(int);
 int el2preimg(int);
 
 unsigned int InitRND(long);
+void InitGraphicInfo_EM(void);
 
 #endif	/* TOOLS_H */

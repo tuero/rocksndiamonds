@@ -77,8 +77,10 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 #endif /* TARGET_X11 */
 
 int getImageListSize();
-struct FileInfo *getImageListEntry(int);
+struct FileInfo *getImageListEntryFromImageID(int);
 Bitmap *getBitmapFromImageID(int);
+int getOriginalImageWidthFromImageID(int);
+int getOriginalImageHeightFromImageID(int);
 char *getTokenFromImageID(int);
 int getImageIDFromToken(char *);
 char *getImageConfigFilename();
