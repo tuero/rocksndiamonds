@@ -462,10 +462,12 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
   if (!DelayReached(&anim_delay, anim_delay_value))
   {
-    if (game_status==HELPSCREEN && !restart)
-      DrawAnim(anim_pixmap,anim_clip_gc,
-	       src_x+cut_x,src_y+cut_y, width,height,
-	       REAL_SX+dest_x,REAL_SY+dest_y, pad_x,pad_y);
+    if ((game_status == HELPSCREEN ||
+	 (game_status == MAINMENU && redraw_mask & REDRAW_MICROLEVEL))
+	&& !restart)
+      DrawAnim(anim_pixmap, anim_clip_gc,
+	       src_x + cut_x, src_y + cut_y, width, height,
+	       REAL_SX + dest_x, REAL_SY + dest_y, pad_x, pad_y);
 
     return(FALSE);
   }

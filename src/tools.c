@@ -184,15 +184,20 @@ void BackToFront()
     redraw_mask &= ~REDRAW_DOORS;
   }
 
-  if (redraw_mask & REDRAW_MICROLEV)
+  if (redraw_mask & REDRAW_MICROLEVEL)
   {
     XCopyArea(display,backbuffer,window,gc,
-	      MICROLEV_XPOS,MICROLEV_YPOS, MICROLEV_XSIZE,MICROLEV_YSIZE,
-	      MICROLEV_XPOS,MICROLEV_YPOS);
+	      MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
+	      MICROLEV_XPOS, MICROLEV_YPOS);
+    redraw_mask &= ~REDRAW_MICROLEVEL;
+  }
+
+  if (redraw_mask & REDRAW_MICROLEVEL_LABEL)
+  {
     XCopyArea(display,backbuffer,window,gc,
-	      SX,MICROLABEL_YPOS, SXSIZE,FONT4_YSIZE,
-	      SX,MICROLABEL_YPOS);
-    redraw_mask &= ~REDRAW_MICROLEV;
+	      SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE,
+	      SX, MICROLABEL_YPOS);
+    redraw_mask &= ~REDRAW_MICROLEVEL_LABEL;
   }
 
   if (redraw_mask & REDRAW_TILES)
@@ -1401,43 +1406,113 @@ void DrawMiniLevel(int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-void DrawMicroLevel(int xpos, int ypos)
+static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 {
-  int x,y;
+  int x, y;
 
   /* determine border element for this level */
   SetBorderElement();
 
   XFillRectangle(display, drawto, gc,
-		 xpos - MICRO_TILEX, ypos - MICRO_TILEY,
-		 MICRO_TILEX * (STD_LEV_FIELDX + 2),
-		 MICRO_TILEY * (STD_LEV_FIELDY + 2));
+		 xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
+
   if (lev_fieldx < STD_LEV_FIELDX)
-    xpos += (STD_LEV_FIELDX - lev_fieldx)/2 * MICRO_TILEX;
+    xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
   if (lev_fieldy < STD_LEV_FIELDY)
-    ypos += (STD_LEV_FIELDY - lev_fieldy)/2 * MICRO_TILEY;
+    ypos += (STD_LEV_FIELDY - lev_fieldy) / 2 * MICRO_TILEY;
+
+  xpos += MICRO_TILEX;
+  ypos += MICRO_TILEY;
 
   for(x=-1; x<=STD_LEV_FIELDX; x++)
+  {
     for(y=-1; y<=STD_LEV_FIELDY; y++)
-      if (x >= 0 && x < lev_fieldx && y >= 0 && y < lev_fieldy)
+    {
+      int lx = from_x + x, ly = from_y + y;
+
+      if (lx >= 0 && lx < lev_fieldx && ly >= 0 && ly < lev_fieldy)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 Ur[x][y]);
-      else if (x >= -1 && x < lev_fieldx+1 && y >= -1 && y < lev_fieldy+1)
+			 Ur[lx][ly]);
+      else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
 			 BorderElement);
-
-  XFillRectangle(display, drawto,gc, SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
-
-  if (level.name)
-  {
-    int len = strlen(level.name);
-    int lxpos = SX + (SXSIZE - len * FONT4_XSIZE) / 2;
-    int lypos = MICROLABEL_YPOS;
-
-    DrawText(lxpos, lypos, level.name, FS_SMALL, FC_SPECIAL2);
+    }
   }
 
-  redraw_mask |= REDRAW_MICROLEV;
+  redraw_mask |= REDRAW_MICROLEVEL;
+}
+
+void DrawMicroLevel(int xpos, int ypos, boolean restart)
+{
+  static unsigned long scroll_delay = 0;
+  static int from_x, from_y, scroll_direction;
+
+  if (restart)
+  {
+    from_x = from_y = 0;
+    scroll_direction = MV_RIGHT;
+
+    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+
+    XFillRectangle(display, drawto,gc,
+		   SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
+
+    if (level.name && restart)
+    {
+      int len = strlen(level.name);
+      int lxpos = SX + (SXSIZE - len * FONT4_XSIZE) / 2;
+      int lypos = MICROLABEL_YPOS;
+
+      DrawText(lxpos, lypos, level.name, FS_SMALL, FC_SPECIAL2);
+    }
+
+    /* initialize delay counter */
+    DelayReached(&scroll_delay, 0);
+
+    redraw_mask |= REDRAW_MICROLEVEL_LABEL;
+  }
+  else
+  {
+    if ((lev_fieldx <= STD_LEV_FIELDX && lev_fieldy <= STD_LEV_FIELDY) ||
+	!DelayReached(&scroll_delay, MICROLEVEL_SCROLL_DELAY))
+      return;
+
+    switch (scroll_direction)
+    {
+      case MV_LEFT:
+	if (from_x > 0)
+	  from_x--;
+	else
+	  scroll_direction = MV_UP;
+	break;
+
+      case MV_RIGHT:
+	if (from_x < lev_fieldx - STD_LEV_FIELDX)
+	  from_x++;
+	else
+	  scroll_direction = MV_DOWN;
+	break;
+
+      case MV_UP:
+	if (from_y > 0)
+	  from_y--;
+	else
+	  scroll_direction = MV_RIGHT;
+	break;
+
+      case MV_DOWN:
+	if (from_y < lev_fieldy - STD_LEV_FIELDY)
+	  from_y++;
+	else
+	  scroll_direction = MV_LEFT;
+	break;
+
+      default:
+	break;
+    }
+
+    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+  }
 }
 
 int REQ_in_range(int x, int y)
@@ -1987,6 +2062,7 @@ int el2gfx(int element)
     case EL_SPEED_PILL:		return GFX_SPEED_PILL;
     case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
     case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
+    case EL_INVISIBLE_STEEL:	return GFX_INVISIBLE_STEEL;
 
     default:
     {

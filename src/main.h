@@ -213,6 +213,7 @@ typedef unsigned char byte;
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
 #define GADGET_FRAME_DELAY	150	/* delay between gadget actions */
+#define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 
 struct HiScore
 {
@@ -502,10 +503,10 @@ extern int		num_bg_loops;
 #define EYSIZE			(VXSIZE + 44)
 #define FULL_SXSIZE		(2+SXSIZE+2)
 #define FULL_SYSIZE		(2+SYSIZE+2)
-#define MICROLEV_XPOS		(SX+4*32+16)
-#define MICROLEV_YPOS		(SX+12*32)
-#define MICROLEV_XSIZE		(STD_LEV_FIELDX*MICRO_TILEX)
-#define MICROLEV_YSIZE		(STD_LEV_FIELDY*MICRO_TILEY)
+#define MICROLEV_XSIZE		((STD_LEV_FIELDX + 2) * MICRO_TILEX)
+#define MICROLEV_YSIZE		((STD_LEV_FIELDY + 2) * MICRO_TILEY)
+#define MICROLEV_XPOS		(SX + (SXSIZE - MICROLEV_XSIZE) / 2)
+#define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL_YPOS		(MICROLEV_YPOS+MICROLEV_YSIZE+12)
 #define FONT1_XSIZE		32
 #define FONT1_YSIZE		32
@@ -603,9 +604,7 @@ extern int		num_bg_loops;
 #define EL_ERZ_EDEL_GELB	59
 #define EL_MAMPFER2		60
 #define EL_SIEB2_INAKTIV	61
-
-#define EL_UNUSED_62		62
-
+#define EL_INVISIBLE_STEEL	62
 #define EL_DYNABOMB		63
 #define EL_DYNABOMB_NR		64
 #define EL_DYNABOMB_SZ		65
@@ -968,6 +967,8 @@ extern int		num_bg_loops;
 #define GFX_FIREFLY_L		206
 #define GFX_FIREFLY_U		207
 
+#define GFX_INVISIBLE_STEEL	GFX_UNSICHTBAR
+
 #define GFX_SCHLUESSEL		GFX_SCHLUESSEL1
 #define GFX_SPIELFIGUR		GFX_SPIELER1
 
@@ -1263,13 +1264,21 @@ extern int		num_bg_loops;
 #define REDRAW_VIDEO_1		(1L << 4)
 #define REDRAW_VIDEO_2		(1L << 5)
 #define REDRAW_VIDEO_3		(1L << 6)
-#define REDRAW_MICROLEV		(1L << 7)
-#define REDRAW_FROM_BACKBUFFER	(1L << 8)
-#define REDRAW_DOOR_2	(REDRAW_VIDEO_1 | REDRAW_VIDEO_2 | REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1L << 9)
-#define REDRAW_DOORS	(REDRAW_DOOR_1 | REDRAW_DOOR_2 | REDRAW_DOOR_3)
-#define REDRAW_MAIN	(REDRAW_FIELD | REDRAW_TILES | REDRAW_MICROLEV)
-#define REDRAWTILES_THRESHOLD	SCR_FIELDX*SCR_FIELDY/2
+#define REDRAW_MICROLEVEL	(1L << 7)
+#define REDRAW_MICROLEVEL_LABEL	(1L << 8)
+#define REDRAW_FROM_BACKBUFFER	(1L << 9)
+#define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
+				 REDRAW_VIDEO_2 | \
+				 REDRAW_VIDEO_3)
+#define REDRAW_DOOR_3		(1L << 10)
+#define REDRAW_DOORS		(REDRAW_DOOR_1 | \
+				 REDRAW_DOOR_2 | \
+				 REDRAW_DOOR_3)
+#define REDRAW_MAIN		(REDRAW_FIELD | \
+				 REDRAW_TILES | \
+				 REDRAW_MICROLEVEL | \
+				 REDRAW_MICROLEVEL_LABEL)
+#define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
 /* areas in pixmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)

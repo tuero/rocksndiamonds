@@ -89,7 +89,7 @@ void DrawMainMenu()
   DrawText(SX + 32,    SY + 8*32, "Setup", FS_BIG, FC_GREEN);
   DrawText(SX + 32,    SY + 9*32, "Quit", FS_BIG, FC_GREEN);
 
-  DrawMicroLevel(MICROLEV_XPOS,MICROLEV_YPOS);
+  DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
   DrawTextF(7*32 + 6, 3*32 + 9, FC_RED, "%d-%d",
 	    leveldir[leveldir_nr].first_level,
@@ -201,7 +201,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 		int2str(level_nr, 3), FS_BIG, font_color);
 
     LoadLevel(level_nr);
-    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS);
+    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
     TapeErase();
     LoadTape(level_nr);
@@ -246,7 +246,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 6)
       {
-	if (leveldir[leveldir_nr].readonly)
+	if (leveldir[leveldir_nr].readonly &&
+	    strcmp(setup.player_name, "Artsoft") != 0)
 	  Request("This level is read only !", REQ_CONFIRM);
 	game_status = LEVELED;
 	DrawLevelEd();
@@ -291,7 +292,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   out:
 
   if (game_status == MAINMENU)
+  {
+    DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, FALSE);
     DoAnimation();
+  }
 }
 
 #define MAX_HELPSCREEN_ELS	10

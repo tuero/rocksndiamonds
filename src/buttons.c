@@ -2336,8 +2336,7 @@ void HandleGadgets(int mx, int my, int button)
     gi->event.off_borders = FALSE;
 
     /* initialize delay counter */
-    pressed_delay = 0;
-    DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
+    DelayReached(&pressed_delay, 0);
 
     if (gi->event_mask & GD_EVENT_PRESSED)
       gi->callback_action(gi);

@@ -887,7 +887,8 @@ void InitElementProperties()
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
     EL_SP_TERMINAL,
-    EL_SP_EXIT
+    EL_SP_EXIT,
+    EL_INVISIBLE_STEEL
   };
   static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
 
@@ -919,6 +920,7 @@ void InitElementProperties()
     EL_SP_HARD_BASE4,
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
+    EL_INVISIBLE_STEEL
   };
   static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
 
@@ -1007,7 +1009,8 @@ void InitElementProperties()
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
     EL_SP_TERMINAL,
-    EL_SP_EXIT
+    EL_SP_EXIT,
+    EL_INVISIBLE_STEEL
   };
   static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
 
@@ -1201,7 +1204,8 @@ void InitElementProperties()
     EL_SOKOBAN_OBJEKT,
     EL_SOKOBAN_FELD_LEER,
     EL_SOKOBAN_FELD_VOLL,
-    EL_SPIELFIGUR
+    EL_SPIELFIGUR,
+    EL_INVISIBLE_STEEL
   };
   static int ep_sb_element_num = sizeof(ep_sb_element)/sizeof(int);
 
@@ -1299,7 +1303,8 @@ void InitElementProperties()
     EL_SP_HARD_BASE4,
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
-    EL_SP_EXIT
+    EL_SP_EXIT,
+    EL_INVISIBLE_STEEL
   };
   static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
 
