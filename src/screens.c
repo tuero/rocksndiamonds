@@ -55,10 +55,6 @@ static void HandleScreenGadgets(struct GadgetInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
-#ifdef MSDOS
-extern unsigned char get_ascii(KeySym);
-#endif
-
 void DrawHeadline()
 {
   int x = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING) * FONT1_XSIZE) / 2;
@@ -814,7 +810,7 @@ void HandleHelpScreen(int button)
   BackToFront();
 }
 
-void HandleTypeName(int newxpos, KeySym key)
+void HandleTypeName(int newxpos, Key key)
 {
   static int xpos = 0, ypos = 2;
 
@@ -826,15 +822,15 @@ void HandleTypeName(int newxpos, KeySym key)
     return;
   }
 
-  if (((key >= XK_A && key <= XK_Z) || (key >= XK_a && key <= XK_z)) && 
+  if (((key >= KEY_A && key <= KEY_Z) || (key >= KEY_a && key <= KEY_z)) && 
       xpos < MAX_PLAYER_NAME_LEN)
   {
     char ascii;
 
-    if (key >= XK_A && key <= XK_Z)
-      ascii = 'A' + (char)(key - XK_A);
+    if (key >= KEY_A && key <= KEY_Z)
+      ascii = 'A' + (char)(key - KEY_A);
     else
-      ascii = 'a' + (char)(key - XK_a);
+      ascii = 'a' + (char)(key - KEY_a);
 
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos + 1] = 0;
@@ -845,14 +841,14 @@ void HandleTypeName(int newxpos, KeySym key)
 		setup.player_name, FS_BIG, FC_YELLOW);
     DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
   }
-  else if ((key == XK_Delete || key == XK_BackSpace) && xpos > 0)
+  else if ((key == KEY_Delete || key == KEY_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
     DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
     DrawGraphic(xpos + 7, ypos, GFX_LEERRAUM);
   }
-  else if (key == XK_Return && xpos > 0)
+  else if (key == KEY_Return && xpos > 0)
   {
     DrawText(SX + 6*32, SY + ypos*32, setup.player_name, FS_BIG, FC_RED);
     DrawGraphic(xpos + 6, ypos, GFX_LEERRAUM);
@@ -1040,7 +1036,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     else
       x = y = 0;	/* no action */
 
-    if (ABS(dy) == SCR_FIELDY)	/* handle XK_Page_Up, XK_Page_Down */
+    if (ABS(dy) == SCR_FIELDY)	/* handle KEY_Page_Up, KEY_Page_Down */
     {
       dy = SIGN(dy);
       step = num_page_entries - 1;
@@ -1228,7 +1224,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (ABS(dy) == SCR_FIELDY)	/* handle XK_Page_Up, XK_Page_Down */
+  if (ABS(dy) == SCR_FIELDY)	/* handle KEY_Page_Up, KEY_Page_Down */
     step = MAX_LEVEL_SERIES_ON_SCREEN - 1;
 
   if (dy < 0)
@@ -1618,7 +1614,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   static struct SetupKeyboardInfo custom_key;
   static struct
   {
-    KeySym *keysym;
+    Key *key;
     char *text;
   } custom[] =
   {
@@ -1678,7 +1674,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
     DrawText(SX + 3*32, SY + ypos*32,
 	     (setup.input[player_nr].use_joystick ?
 	      custom[i].text :
-	      getKeyNameFromKeySym(*custom[i].keysym)),
+	      getKeyNameFromKey(*custom[i].key)),
 	     FS_BIG, FC_YELLOW);
   }
 }
@@ -1858,7 +1854,7 @@ void CustomizeKeyboard(int player_nr)
   static struct SetupKeyboardInfo custom_key;
   static struct
   {
-    KeySym *keysym;
+    Key *key;
     char *text;
   } customize_step[] =
   {
@@ -1885,7 +1881,7 @@ void CustomizeKeyboard(int player_nr)
   DrawText(SX, SY + (2+2*step_nr+1)*32,
 	   "Key:", FS_BIG, FC_RED);
   DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-	   getKeyNameFromKeySym(*customize_step[step_nr].keysym),
+	   getKeyNameFromKey(*customize_step[step_nr].key),
 	   FS_BIG, FC_BLUE);
 
   while(!finished)
@@ -1900,32 +1896,31 @@ void CustomizeKeyboard(int player_nr)
       {
         case EVENT_KEYPRESS:
 	  {
-	    KeySym key = XLookupKeysym((KeyEvent *)&event,
-				       ((KeyEvent *)&event)->state);
+	    Key key = GetEventKey((KeyEvent *)&event, TRUE);
 
-	    if (key == XK_Escape || (key == XK_Return && step_nr == 6))
+	    if (key == KEY_Escape || (key == KEY_Return && step_nr == 6))
 	    {
 	      finished = TRUE;
 	      break;
 	    }
 
 	    /* press 'Enter' to keep the existing key binding */
-	    if (key == XK_Return || step_nr == 6)
-	      key = *customize_step[step_nr].keysym;
+	    if (key == KEY_Return || step_nr == 6)
+	      key = *customize_step[step_nr].key;
 
 	    /* check if key already used */
 	    for (i=0; i<step_nr; i++)
-	      if (*customize_step[i].keysym == key)
+	      if (*customize_step[i].key == key)
 		break;
 	    if (i < step_nr)
 	      break;
 
 	    /* got new key binding */
-	    *customize_step[step_nr].keysym = key;
+	    *customize_step[step_nr].key = key;
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
 		     "             ", FS_BIG, FC_YELLOW);
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-		     getKeyNameFromKeySym(key), FS_BIG, FC_YELLOW);
+		     getKeyNameFromKey(key), FS_BIG, FC_YELLOW);
 	    step_nr++;
 
 	    /* un-highlight last query */
@@ -1948,7 +1943,7 @@ void CustomizeKeyboard(int player_nr)
 	    DrawText(SX, SY+(2+2*step_nr+1)*32,
 		     "Key:", FS_BIG, FC_RED);
 	    DrawText(SX + 4*32, SY+(2+2*step_nr+1)*32,
-		     getKeyNameFromKeySym(*customize_step[step_nr].keysym),
+		     getKeyNameFromKey(*customize_step[step_nr].key),
 		     FS_BIG, FC_BLUE);
 	  }
 	  break;
@@ -2065,15 +2060,14 @@ void CalibrateJoystick(int player_nr)
       switch(event.type)
       {
 	case EVENT_KEYPRESS:
-	  switch(XLookupKeysym((KeyEvent *)&event,
-			       ((KeyEvent *)&event)->state))
+	  switch(GetEventKey((KeyEvent *)&event, TRUE))
 	  {
-	    case XK_Return:
+	    case KEY_Return:
 	      if (check_remaining == 0)
 		result = 1;
 	      break;
 
-	    case XK_Escape:
+	    case KEY_Escape:
 	      result = 0;
 	      break;
 

@@ -1093,7 +1093,7 @@ void SaveScore(int level_nr)
 
 #define TYPE_BOOLEAN			1
 #define TYPE_SWITCH			2
-#define TYPE_KEYSYM			3
+#define TYPE_KEY			3
 #define TYPE_INTEGER			4
 #define TYPE_STRING			5
 
@@ -1139,12 +1139,12 @@ static struct
   { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
   { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
   { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
-  { TYPE_KEYSYM,  &sii.key.left,	".key.move_left"		},
-  { TYPE_KEYSYM,  &sii.key.right,	".key.move_right"		},
-  { TYPE_KEYSYM,  &sii.key.up,		".key.move_up"			},
-  { TYPE_KEYSYM,  &sii.key.down,	".key.move_down"		},
-  { TYPE_KEYSYM,  &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEYSYM,  &sii.key.bomb,	".key.place_bomb"		},
+  { TYPE_KEY,     &sii.key.left,	".key.move_left"		},
+  { TYPE_KEY,     &sii.key.right,	".key.move_right"		},
+  { TYPE_KEY,     &sii.key.up,		".key.move_up"			},
+  { TYPE_KEY,     &sii.key.down,	".key.move_down"		},
+  { TYPE_KEY,     &sii.key.snap,	".key.snap_field"		},
+  { TYPE_KEY,     &sii.key.bomb,	".key.place_bomb"		},
 
   /* level directory info */
   { TYPE_STRING,  &ldi.name,		"name"				},
@@ -1513,12 +1513,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].joy.ylower  = JOYSTICK_YLOWER;
     si->input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
     si->input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
-    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
-    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
-    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
-    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
-    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
+    si->input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINED);
+    si->input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINED);
+    si->input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINED);
+    si->input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINED);
+    si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINED);
+    si->input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINED);
   }
 }
 
@@ -1538,8 +1538,8 @@ static void setSetupInfo(int token_nr, char *token_value)
       *(boolean *)setup_value = get_string_boolean_value(token_value);
       break;
 
-    case TYPE_KEYSYM:
-      *(KeySym *)setup_value = getKeySymFromX11KeyName(token_value);
+    case TYPE_KEY:
+      *(Key *)setup_value = getKeyFromX11KeyName(token_value);
       break;
 
     case TYPE_INTEGER:
@@ -1884,12 +1884,12 @@ static char *getSetupLine(char *prefix, int token_nr)
       strcat(entry, (*(boolean *)setup_value ? "on" : "off"));
       break;
 
-    case TYPE_KEYSYM:
+    case TYPE_KEY:
       {
-	KeySym keysym = *(KeySym *)setup_value;
-	char *keyname = getKeyNameFromKeySym(keysym);
+	Key key = *(Key *)setup_value;
+	char *keyname = getKeyNameFromKey(key);
 
-	strcat(entry, getX11KeyNameFromKeySym(keysym));
+	strcat(entry, getX11KeyNameFromKey(key));
 	for (i=strlen(entry); i<50; i++)
 	  strcat(entry, " ");
 

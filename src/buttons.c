@@ -1280,7 +1280,7 @@ void HandleGadgets(int mx, int my, int button)
   }
 }
 
-void HandleGadgetsKeyInput(KeySym key)
+void HandleGadgetsKeyInput(Key key)
 {
   struct GadgetInfo *gi = last_gi;
   char text[MAX_GADGET_TEXTSIZE];
@@ -1294,7 +1294,7 @@ void HandleGadgetsKeyInput(KeySym key)
 
   text_length = strlen(gi->text.value);
   cursor_pos = gi->text.cursor_position;
-  letter = getCharFromKeySym(key);
+  letter = getCharFromKey(key);
   legal_letter = (gi->type == GD_TYPE_TEXTINPUT_NUMERIC ?
 		  letter >= '0' && letter <= '9' :
 		  letter != 0);
@@ -1307,30 +1307,30 @@ void HandleGadgetsKeyInput(KeySym key)
     gi->text.cursor_position++;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == XK_Left && cursor_pos > 0)
+  else if (key == KEY_Left && cursor_pos > 0)
   {
     gi->text.cursor_position--;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == XK_Right && cursor_pos < text_length)
+  else if (key == KEY_Right && cursor_pos < text_length)
   {
     gi->text.cursor_position++;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == XK_BackSpace && cursor_pos > 0)
+  else if (key == KEY_BackSpace && cursor_pos > 0)
   {
     strcpy(text, gi->text.value);
     strcpy(&gi->text.value[cursor_pos - 1], &text[cursor_pos]);
     gi->text.cursor_position--;
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == XK_Delete && cursor_pos < text_length)
+  else if (key == KEY_Delete && cursor_pos < text_length)
   {
     strcpy(text, gi->text.value);
     strcpy(&gi->text.value[cursor_pos], &text[cursor_pos + 1]);
     DrawGadget(gi, DG_PRESSED, DG_DIRECT);
   }
-  else if (key == XK_Return)
+  else if (key == KEY_Return)
   {
     CheckRangeOfNumericInputGadget(gi);
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);

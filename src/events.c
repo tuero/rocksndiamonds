@@ -241,24 +241,8 @@ void HandleMotionEvent(MotionEvent *event)
 void HandleKeyEvent(KeyEvent *event)
 {
   int key_status = (event->type==EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
-  KeySym key;
-
-  if (game_status == PLAYING)
-  {
-    /* use '0' instead of 'event->state' to get the key without modifiers */
-    key = XLookupKeysym(event, 0);
-  }
-  else
-  {
-    /* get the key with all modifiers */
-    char buffer[10];
-    int buffer_size = 10;
-    XComposeStatus compose;
-    int char_count;
-
-    char_count = XLookupString(event, buffer, buffer_size, &key, &compose);
-    buffer[char_count] = '\0';
-  }
+  boolean with_modifiers = (game_status == PLAYING ? FALSE : TRUE);
+  Key key = GetEventKey(event, with_modifiers);
 
   HandleKey(key, key_status);
 }
@@ -346,7 +330,7 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case TYPENAME:
-      HandleTypeName(0, XK_Return);
+      HandleTypeName(0, KEY_Return);
       break;
 
     case CHOOSELEVEL:
@@ -407,14 +391,14 @@ void HandleButton(int mx, int my, int button)
   }
 }
 
-void HandleKey(KeySym key, int key_status)
+void HandleKey(Key key, int key_status)
 {
   int joy = 0;
   static struct SetupKeyboardInfo custom_key;
   static struct
   {
-    KeySym *keysym_custom;
-    KeySym keysym_default;
+    Key *key_custom;
+    Key key_default;
     byte action;
   } key_info[] =
   {
@@ -441,7 +425,7 @@ void HandleKey(KeySym key, int key_status)
       custom_key = setup.input[pnr].key;
 
       for (i=0; i<6; i++)
-	if (key == *key_info[i].keysym_custom)
+	if (key == *key_info[i].key_custom)
 	  key_action |= key_info[i].action;
 
       if (key_status == KEY_PRESSED)
@@ -455,7 +439,7 @@ void HandleKey(KeySym key, int key_status)
     int i;
 
     for (i=0; i<6; i++)
-      if (key == key_info[i].keysym_default)
+      if (key == key_info[i].key_default)
 	joy |= key_info[i].action;
   }
 
@@ -475,7 +459,7 @@ void HandleKey(KeySym key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if ((key == XK_Return || key == XK_space) &&
+  if ((key == KEY_Return || key == KEY_space) &&
       game_status == PLAYING && AllPlayersGone)
   {
     CloseDoor(DOOR_CLOSE_1);
@@ -485,7 +469,7 @@ void HandleKey(KeySym key, int key_status)
   }
 
   /* allow quick escape to the main menu with the Escape key */
-  if (key == XK_Escape && game_status != MAINMENU)
+  if (key == KEY_Escape && game_status != MAINMENU)
   {
     CloseDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
     game_status = MAINMENU;
@@ -518,8 +502,8 @@ void HandleKey(KeySym key, int key_status)
     case SETUPINPUT:
       switch(key)
       {
-	case XK_Return:
-	case XK_space:
+	case KEY_Return:
+	case KEY_space:
 	  if (game_status == MAINMENU)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
           else if (game_status == CHOOSELEVEL)
@@ -530,12 +514,12 @@ void HandleKey(KeySym key, int key_status)
 	    HandleSetupInputScreen(0,0, 0,0, MB_MENU_CHOICE);
 	  break;
 
-        case XK_Page_Up:
+        case KEY_Page_Up:
           if (game_status == CHOOSELEVEL)
             HandleChooseLevel(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
-        case XK_Page_Down:
+        case KEY_Page_Down:
           if (game_status == CHOOSELEVEL)
             HandleChooseLevel(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
@@ -552,18 +536,18 @@ void HandleKey(KeySym key, int key_status)
     case HALLOFFAME:
       switch(key)
       {
-	case XK_Return:
-	case XK_space:
+	case KEY_Return:
+	case KEY_space:
 	  game_status = MAINMENU;
 	  DrawMainMenu();
 	  BackToFront();
 	  break;
 
-        case XK_Page_Up:
+        case KEY_Page_Up:
 	  HandleHallOfFame(0,0, 0,-SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
-        case XK_Page_Down:
+        case KEY_Page_Down:
 	  HandleHallOfFame(0,0, 0,SCR_FIELDY, MB_MENU_MARK);
 	  break;
 
@@ -582,17 +566,17 @@ void HandleKey(KeySym key, int key_status)
       {
 
 #ifdef DEBUG
-	case XK_0:
-	case XK_1:
-	case XK_2:
-	case XK_3:
-	case XK_4:
-	case XK_5:
-	case XK_6:
-	case XK_7:
-	case XK_8:
-	case XK_9:
-	  if (key == XK_0)
+	case KEY_0:
+	case KEY_1:
+	case KEY_2:
+	case KEY_3:
+	case KEY_4:
+	case KEY_5:
+	case KEY_6:
+	case KEY_7:
+	case KEY_8:
+	case KEY_9:
+	  if (key == KEY_0)
 	  {
 	    if (GameFrameDelay == 500)
 	      GameFrameDelay = GAME_FRAME_DELAY;
@@ -600,14 +584,14 @@ void HandleKey(KeySym key, int key_status)
 	      GameFrameDelay = 500;
 	  }
 	  else
-	    GameFrameDelay = (key - XK_0) * 10;
+	    GameFrameDelay = (key - KEY_0) * 10;
 	  printf("Game speed == %d%% (%d ms delay between two frames)\n",
 		 GAME_FRAME_DELAY * 100 / GameFrameDelay, GameFrameDelay);
 	  break;
 
 
 #if 0
-	case XK_a:
+	case KEY_a:
 	  if (ScrollStepSize == TILEX/8)
 	    ScrollStepSize = TILEX/4;
 	  else
@@ -617,7 +601,7 @@ void HandleKey(KeySym key, int key_status)
 #endif
 
 #if 0
-	case XK_m:
+	case KEY_m:
 	  if (MoveSpeed == 8)
 	  {
 	    MoveSpeed = 4;
@@ -632,30 +616,30 @@ void HandleKey(KeySym key, int key_status)
 	  break;
 #endif
 
-	case XK_f:
+	case KEY_f:
 	  ScrollStepSize = TILEX/8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
 	  break;
 
-	case XK_g:
+	case KEY_g:
 	  ScrollStepSize = TILEX/4;
 	  printf("ScrollStepSize == %d (1/4)\n", ScrollStepSize);
 	  break;
 
-	case XK_h:
+	case KEY_h:
 	  ScrollStepSize = TILEX/2;
 	  printf("ScrollStepSize == %d (1/2)\n", ScrollStepSize);
 	  break;
 
-	case XK_l:
+	case KEY_l:
 	  ScrollStepSize = TILEX;
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
 
 #ifndef MSDOS
-	case XK_Q:
+	case KEY_Q:
 #endif
-	case XK_q:
+	case KEY_q:
 	  local_player->dynamite = 1000;
 	  break;
 
@@ -663,7 +647,7 @@ void HandleKey(KeySym key, int key_status)
 
 #if 0
 
-	case XK_z:
+	case KEY_z:
 	  {
 	    int i;
 

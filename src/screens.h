@@ -25,7 +25,7 @@ void DrawHelpScreenMusicText(int);
 void DrawHelpScreenCreditsText(void);
 void DrawHelpScreen(void);
 void HandleHelpScreen(int);
-void HandleTypeName(int, KeySym);
+void HandleTypeName(int, Key);
 void DrawChooseLevel(void);
 void HandleChooseLevel(int, int, int, int, int);
 void DrawHallOfFame(int);

@@ -260,6 +260,6 @@ boolean anyTextGadgetActive();
 void ClickOnGadget(struct GadgetInfo *, int);
 
 void HandleGadgets(int, int, int);
-void HandleGadgetsKeyInput(KeySym);
+void HandleGadgetsKeyInput(Key);
 
 #endif

@@ -677,112 +677,112 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_length,
   putFile32BitInteger(file, chunk_length, byte_order);
 }
 
-#define TRANSLATE_KEYSYM_TO_KEYNAME	0
-#define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
-#define TRANSLATE_X11KEYNAME_TO_KEYSYM	2
+#define TRANSLATE_KEY_TO_KEYNAME	0
+#define TRANSLATE_KEY_TO_X11KEYNAME	1
+#define TRANSLATE_X11KEYNAME_TO_KEY	2
 
-void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
+void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 {
   static struct
   {
-    KeySym keysym;
+    Key key;
     char *x11name;
     char *name;
   } translate_key[] =
   {
     /* normal cursor keys */
-    { XK_Left,		"XK_Left",		"cursor left" },
-    { XK_Right,		"XK_Right",		"cursor right" },
-    { XK_Up,		"XK_Up",		"cursor up" },
-    { XK_Down,		"XK_Down",		"cursor down" },
+    { KEY_Left,		"XK_Left",		"cursor left" },
+    { KEY_Right,	"XK_Right",		"cursor right" },
+    { KEY_Up,		"XK_Up",		"cursor up" },
+    { KEY_Down,		"XK_Down",		"cursor down" },
 
     /* keypad cursor keys */
-#ifdef XK_KP_Left
-    { XK_KP_Left,	"XK_KP_Left",		"keypad left" },
-    { XK_KP_Right,	"XK_KP_Right",		"keypad right" },
-    { XK_KP_Up,		"XK_KP_Up",		"keypad up" },
-    { XK_KP_Down,	"XK_KP_Down",		"keypad down" },
+#ifdef KEY_KP_Left
+    { KEY_KP_Left,	"XK_KP_Left",		"keypad left" },
+    { KEY_KP_Right,	"XK_KP_Right",		"keypad right" },
+    { KEY_KP_Up,	"XK_KP_Up",		"keypad up" },
+    { KEY_KP_Down,	"XK_KP_Down",		"keypad down" },
 #endif
 
     /* other keypad keys */
-#ifdef XK_KP_Enter
-    { XK_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
-    { XK_KP_Add,	"XK_KP_Add",		"keypad +" },
-    { XK_KP_Subtract,	"XK_KP_Subtract",	"keypad -" },
-    { XK_KP_Multiply,	"XK_KP_Multiply",	"keypad mltply" },
-    { XK_KP_Divide,	"XK_KP_Divide",		"keypad /" },
-    { XK_KP_Separator,	"XK_KP_Separator",	"keypad ," },
+#ifdef KEY_KP_Enter
+    { KEY_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
+    { KEY_KP_Add,	"XK_KP_Add",		"keypad +" },
+    { KEY_KP_Subtract,	"XK_KP_Subtract",	"keypad -" },
+    { KEY_KP_Multiply,	"XK_KP_Multiply",	"keypad mltply" },
+    { KEY_KP_Divide,	"XK_KP_Divide",		"keypad /" },
+    { KEY_KP_Separator,	"XK_KP_Separator",	"keypad ," },
 #endif
 
     /* modifier keys */
-    { XK_Shift_L,	"XK_Shift_L",		"left shift" },
-    { XK_Shift_R,	"XK_Shift_R",		"right shift" },
-    { XK_Control_L,	"XK_Control_L",		"left control" },
-    { XK_Control_R,	"XK_Control_R",		"right control" },
-    { XK_Meta_L,	"XK_Meta_L",		"left meta" },
-    { XK_Meta_R,	"XK_Meta_R",		"right meta" },
-    { XK_Alt_L,		"XK_Alt_L",		"left alt" },
-    { XK_Alt_R,		"XK_Alt_R",		"right alt" },
-    { XK_Mode_switch,	"XK_Mode_switch",	"mode switch" },
-    { XK_Multi_key,	"XK_Multi_key",		"multi key" },
+    { KEY_Shift_L,	"XK_Shift_L",		"left shift" },
+    { KEY_Shift_R,	"XK_Shift_R",		"right shift" },
+    { KEY_Control_L,	"XK_Control_L",		"left control" },
+    { KEY_Control_R,	"XK_Control_R",		"right control" },
+    { KEY_Meta_L,	"XK_Meta_L",		"left meta" },
+    { KEY_Meta_R,	"XK_Meta_R",		"right meta" },
+    { KEY_Alt_L,	"XK_Alt_L",		"left alt" },
+    { KEY_Alt_R,	"XK_Alt_R",		"right alt" },
+    { KEY_Mode_switch,	"XK_Mode_switch",	"mode switch" },
+    { KEY_Multi_key,	"XK_Multi_key",		"multi key" },
 
     /* some special keys */
-    { XK_BackSpace,	"XK_BackSpace",		"backspace" },
-    { XK_Delete,	"XK_Delete",		"delete" },
-    { XK_Insert,	"XK_Insert",		"insert" },
-    { XK_Tab,		"XK_Tab",		"tab" },
-    { XK_Home,		"XK_Home",		"home" },
-    { XK_End,		"XK_End",		"end" },
-    { XK_Page_Up,	"XK_Page_Up",		"page up" },
-    { XK_Page_Down,	"XK_Page_Down",		"page down" },
+    { KEY_BackSpace,	"XK_BackSpace",		"backspace" },
+    { KEY_Delete,	"XK_Delete",		"delete" },
+    { KEY_Insert,	"XK_Insert",		"insert" },
+    { KEY_Tab,		"XK_Tab",		"tab" },
+    { KEY_Home,		"XK_Home",		"home" },
+    { KEY_End,		"XK_End",		"end" },
+    { KEY_Page_Up,	"XK_Page_Up",		"page up" },
+    { KEY_Page_Down,	"XK_Page_Down",		"page down" },
 
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
-    { XK_space,		"XK_space",		"space" },
-    { XK_exclam,	"XK_exclam",		"!" },
-    { XK_quotedbl,	"XK_quotedbl",		"\"" },
-    { XK_numbersign,	"XK_numbersign",	"#" },
-    { XK_dollar,	"XK_dollar",		"$" },
-    { XK_percent,	"XK_percent",		"%" },
-    { XK_ampersand,	"XK_ampersand",		"&" },
-    { XK_apostrophe,	"XK_apostrophe",	"'" },
-    { XK_parenleft,	"XK_parenleft",		"(" },
-    { XK_parenright,	"XK_parenright",	")" },
-    { XK_asterisk,	"XK_asterisk",		"*" },
-    { XK_plus,		"XK_plus",		"+" },
-    { XK_comma,		"XK_comma",		"," },
-    { XK_minus,		"XK_minus",		"-" },
-    { XK_period,	"XK_period",		"." },
-    { XK_slash,		"XK_slash",		"/" },
-    { XK_colon,		"XK_colon",		":" },
-    { XK_semicolon,	"XK_semicolon",		";" },
-    { XK_less,		"XK_less",		"<" },
-    { XK_equal,		"XK_equal",		"=" },
-    { XK_greater,	"XK_greater",		">" },
-    { XK_question,	"XK_question",		"?" },
-    { XK_at,		"XK_at",		"@" },
+    { KEY_space,	"XK_space",		"space" },
+    { KEY_exclam,	"XK_exclam",		"!" },
+    { KEY_quotedbl,	"XK_quotedbl",		"\"" },
+    { KEY_numbersign,	"XK_numbersign",	"#" },
+    { KEY_dollar,	"XK_dollar",		"$" },
+    { KEY_percent,	"XK_percent",		"%" },
+    { KEY_ampersand,	"XK_ampersand",		"&" },
+    { KEY_apostrophe,	"XK_apostrophe",	"'" },
+    { KEY_parenleft,	"XK_parenleft",		"(" },
+    { KEY_parenright,	"XK_parenright",	")" },
+    { KEY_asterisk,	"XK_asterisk",		"*" },
+    { KEY_plus,		"XK_plus",		"+" },
+    { KEY_comma,	"XK_comma",		"," },
+    { KEY_minus,	"XK_minus",		"-" },
+    { KEY_period,	"XK_period",		"." },
+    { KEY_slash,	"XK_slash",		"/" },
+    { KEY_colon,	"XK_colon",		":" },
+    { KEY_semicolon,	"XK_semicolon",		";" },
+    { KEY_less,		"XK_less",		"<" },
+    { KEY_equal,	"XK_equal",		"=" },
+    { KEY_greater,	"XK_greater",		">" },
+    { KEY_question,	"XK_question",		"?" },
+    { KEY_at,		"XK_at",		"@" },
 
     /* more ASCII keys */
-    { XK_bracketleft,	"XK_bracketleft",	"[" },
-    { XK_backslash,	"XK_backslash",		"backslash" },
-    { XK_bracketright,	"XK_bracketright",	"]" },
-    { XK_asciicircum,	"XK_asciicircum",	"circumflex" },
-    { XK_underscore,	"XK_underscore",	"_" },
-    { XK_grave,		"XK_grave",		"grave" },
-    { XK_quoteleft,	"XK_quoteleft",		"quote left" },
-    { XK_braceleft,	"XK_braceleft",		"brace left" },
-    { XK_bar,		"XK_bar",		"bar" },
-    { XK_braceright,	"XK_braceright",	"brace right" },
-    { XK_asciitilde,	"XK_asciitilde",	"ascii tilde" },
+    { KEY_bracketleft,	"XK_bracketleft",	"[" },
+    { KEY_backslash,	"XK_backslash",		"backslash" },
+    { KEY_bracketright,	"XK_bracketright",	"]" },
+    { KEY_asciicircum,	"XK_asciicircum",	"circumflex" },
+    { KEY_underscore,	"XK_underscore",	"_" },
+    { KEY_grave,	"XK_grave",		"grave" },
+    { KEY_quoteleft,	"XK_quoteleft",		"quote left" },
+    { KEY_braceleft,	"XK_braceleft",		"brace left" },
+    { KEY_bar,		"XK_bar",		"bar" },
+    { KEY_braceright,	"XK_braceright",	"brace right" },
+    { KEY_asciitilde,	"XK_asciitilde",	"ascii tilde" },
 
     /* special (non-ASCII) keys */
-    { XK_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
-    { XK_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
-    { XK_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
-    { XK_adiaeresis,	"XK_adiaeresis",	"ä" },
-    { XK_odiaeresis,	"XK_odiaeresis",	"ö" },
-    { XK_udiaeresis,	"XK_udiaeresis",	"ü" },
-    { XK_ssharp,	"XK_ssharp",		"sharp s" },
+    { KEY_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
+    { KEY_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
+    { KEY_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
+    { KEY_adiaeresis,	"XK_adiaeresis",	"ä" },
+    { KEY_odiaeresis,	"XK_odiaeresis",	"ö" },
+    { KEY_udiaeresis,	"XK_udiaeresis",	"ü" },
+    { KEY_ssharp,	"XK_ssharp",		"sharp s" },
 
     /* end-of-array identifier */
     { 0,                NULL,			NULL }
@@ -790,22 +790,22 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 
   int i;
 
-  if (mode == TRANSLATE_KEYSYM_TO_KEYNAME)
+  if (mode == TRANSLATE_KEY_TO_KEYNAME)
   {
     static char name_buffer[30];
-    KeySym key = *keysym;
+    Key key = *keysym;
 
-    if (key >= XK_A && key <= XK_Z)
-      sprintf(name_buffer, "%c", 'A' + (char)(key - XK_A));
-    else if (key >= XK_a && key <= XK_z)
-      sprintf(name_buffer, "%c", 'a' + (char)(key - XK_a));
-    else if (key >= XK_0 && key <= XK_9)
-      sprintf(name_buffer, "%c", '0' + (char)(key - XK_0));
-    else if (key >= XK_KP_0 && key <= XK_KP_9)
-      sprintf(name_buffer, "keypad %c", '0' + (char)(key - XK_KP_0));
-    else if (key >= XK_F1 && key <= XK_F24)
-      sprintf(name_buffer, "function F%d", (int)(key - XK_F1 + 1));
-    else if (key == KEY_UNDEFINDED)
+    if (key >= KEY_A && key <= KEY_Z)
+      sprintf(name_buffer, "%c", 'A' + (char)(key - KEY_A));
+    else if (key >= KEY_a && key <= KEY_z)
+      sprintf(name_buffer, "%c", 'a' + (char)(key - KEY_a));
+    else if (key >= KEY_0 && key <= KEY_9)
+      sprintf(name_buffer, "%c", '0' + (char)(key - KEY_0));
+    else if (key >= KEY_KP_0 && key <= KEY_KP_9)
+      sprintf(name_buffer, "keypad %c", '0' + (char)(key - KEY_KP_0));
+    else if (key >= KEY_F1 && key <= KEY_F24)
+      sprintf(name_buffer, "function F%d", (int)(key - KEY_F1 + 1));
+    else if (key == KEY_UNDEFINED)
       strcpy(name_buffer, "(undefined)");
     else
     {
@@ -813,7 +813,7 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 
       do
       {
-	if (key == translate_key[i].keysym)
+	if (key == translate_key[i].key)
 	{
 	  strcpy(name_buffer, translate_key[i].name);
 	  break;
@@ -827,22 +827,22 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 
     *name = name_buffer;
   }
-  else if (mode == TRANSLATE_KEYSYM_TO_X11KEYNAME)
+  else if (mode == TRANSLATE_KEY_TO_X11KEYNAME)
   {
     static char name_buffer[30];
-    KeySym key = *keysym;
+    Key key = *keysym;
 
-    if (key >= XK_A && key <= XK_Z)
-      sprintf(name_buffer, "XK_%c", 'A' + (char)(key - XK_A));
-    else if (key >= XK_a && key <= XK_z)
-      sprintf(name_buffer, "XK_%c", 'a' + (char)(key - XK_a));
-    else if (key >= XK_0 && key <= XK_9)
-      sprintf(name_buffer, "XK_%c", '0' + (char)(key - XK_0));
-    else if (key >= XK_KP_0 && key <= XK_KP_9)
-      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - XK_KP_0));
-    else if (key >= XK_F1 && key <= XK_F24)
-      sprintf(name_buffer, "XK_F%d", (int)(key - XK_F1 + 1));
-    else if (key == KEY_UNDEFINDED)
+    if (key >= KEY_A && key <= KEY_Z)
+      sprintf(name_buffer, "XK_%c", 'A' + (char)(key - KEY_A));
+    else if (key >= KEY_a && key <= KEY_z)
+      sprintf(name_buffer, "XK_%c", 'a' + (char)(key - KEY_a));
+    else if (key >= KEY_0 && key <= KEY_9)
+      sprintf(name_buffer, "XK_%c", '0' + (char)(key - KEY_0));
+    else if (key >= KEY_KP_0 && key <= KEY_KP_9)
+      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KEY_KP_0));
+    else if (key >= KEY_F1 && key <= KEY_F24)
+      sprintf(name_buffer, "XK_F%d", (int)(key - KEY_F1 + 1));
+    else if (key == KEY_UNDEFINED)
       strcpy(name_buffer, "[undefined]");
     else
     {
@@ -850,7 +850,7 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 
       do
       {
-	if (key == translate_key[i].keysym)
+	if (key == translate_key[i].key)
 	{
 	  strcpy(name_buffer, translate_key[i].x11name);
 	  break;
@@ -864,9 +864,9 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 
     *x11name = name_buffer;
   }
-  else if (mode == TRANSLATE_X11KEYNAME_TO_KEYSYM)
+  else if (mode == TRANSLATE_X11KEYNAME_TO_KEY)
   {
-    KeySym key = XK_VoidSymbol;
+    Key key = KEY_UNDEFINED;
     char *name_ptr = *x11name;
 
     if (strncmp(name_ptr, "XK_", 3) == 0 && strlen(name_ptr) == 4)
@@ -874,18 +874,18 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
       char c = name_ptr[3];
 
       if (c >= 'A' && c <= 'Z')
-	key = XK_A + (KeySym)(c - 'A');
+	key = KEY_A + (Key)(c - 'A');
       else if (c >= 'a' && c <= 'z')
-	key = XK_a + (KeySym)(c - 'a');
+	key = KEY_a + (Key)(c - 'a');
       else if (c >= '0' && c <= '9')
-	key = XK_0 + (KeySym)(c - '0');
+	key = KEY_0 + (Key)(c - '0');
     }
     else if (strncmp(name_ptr, "XK_KP_", 6) == 0 && strlen(name_ptr) == 7)
     {
       char c = name_ptr[6];
 
       if (c >= '0' && c <= '9')
-	key = XK_0 + (KeySym)(c - '0');
+	key = KEY_0 + (Key)(c - '0');
     }
     else if (strncmp(name_ptr, "XK_F", 4) == 0 && strlen(name_ptr) <= 6)
     {
@@ -898,7 +898,7 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
 	d = atoi(&name_ptr[4]);
 
       if (d >=1 && d <= 24)
-	key = XK_F1 + (KeySym)(d - 1);
+	key = KEY_F1 + (Key)(d - 1);
     }
     else if (strncmp(name_ptr, "XK_", 3) == 0)
     {
@@ -908,7 +908,7 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
       {
 	if (strcmp(name_ptr, translate_key[i].x11name) == 0)
 	{
-	  key = translate_key[i].keysym;
+	  key = translate_key[i].key;
 	  break;
 	}
       }
@@ -942,40 +942,40 @@ void translate_keyname(KeySym *keysym, char **x11name, char **name, int mode)
       }
 
       if (value != -1)
-	key = (KeySym)value;
+	key = (Key)value;
     }
 
     *keysym = key;
   }
 }
 
-char *getKeyNameFromKeySym(KeySym keysym)
+char *getKeyNameFromKey(Key key)
 {
   char *name;
 
-  translate_keyname(&keysym, NULL, &name, TRANSLATE_KEYSYM_TO_KEYNAME);
+  translate_keyname(&key, NULL, &name, TRANSLATE_KEY_TO_KEYNAME);
   return name;
 }
 
-char *getX11KeyNameFromKeySym(KeySym keysym)
+char *getX11KeyNameFromKey(Key key)
 {
   char *x11name;
 
-  translate_keyname(&keysym, &x11name, NULL, TRANSLATE_KEYSYM_TO_X11KEYNAME);
+  translate_keyname(&key, &x11name, NULL, TRANSLATE_KEY_TO_X11KEYNAME);
   return x11name;
 }
 
-KeySym getKeySymFromX11KeyName(char *x11name)
+Key getKeyFromX11KeyName(char *x11name)
 {
-  KeySym keysym;
+  Key key;
 
-  translate_keyname(&keysym, &x11name, NULL, TRANSLATE_X11KEYNAME_TO_KEYSYM);
-  return keysym;
+  translate_keyname(&key, &x11name, NULL, TRANSLATE_X11KEYNAME_TO_KEY);
+  return key;
 }
 
-char getCharFromKeySym(KeySym keysym)
+char getCharFromKey(Key key)
 {
-  char *keyname = getKeyNameFromKeySym(keysym);
+  char *keyname = getKeyNameFromKey(key);
   char letter = 0;
 
   if (strlen(keyname) == 1)

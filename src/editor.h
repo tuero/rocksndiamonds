@@ -27,7 +27,7 @@ extern int elements_in_list;
 void CreateLevelEditorGadgets();
 void UnmapLevelEditorGadgets();
 void DrawLevelEd(void);
-void HandleLevelEditorKeyInput(KeySym);
+void HandleLevelEditorKeyInput(Key);
 void HandleEditorGadgetInfoText(void *ptr);
 
 #endif

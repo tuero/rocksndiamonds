@@ -676,7 +676,6 @@ typedef union _XEvent
   XKeyEvent xkey;
 } XEvent;
 
-unsigned char get_ascii(KeySym);
 void XMapWindow(Display *, Window);
 Display *XOpenDisplay(char *);
 Window XCreateSimpleWindow(Display *, Window, int, int,

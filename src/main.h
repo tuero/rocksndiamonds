@@ -278,12 +278,12 @@ struct SetupJoystickInfo
 
 struct SetupKeyboardInfo
 {
-  KeySym left;
-  KeySym right;
-  KeySym up;
-  KeySym down;
-  KeySym snap;
-  KeySym bomb;
+  Key left;
+  Key right;
+  Key up;
+  Key down;
+  Key snap;
+  Key bomb;
 };
 
 struct SetupInputInfo
@@ -1608,15 +1608,14 @@ extern char		*element_info[];
 #define NUM_SOUNDS		62
 
 /* default input keys */
-#define KEY_UNDEFINDED		XK_VoidSymbol
-#define DEFAULT_KEY_LEFT	XK_Left
-#define DEFAULT_KEY_RIGHT	XK_Right
-#define DEFAULT_KEY_UP		XK_Up
-#define DEFAULT_KEY_DOWN	XK_Down
-#define DEFAULT_KEY_SNAP	XK_Shift_L
-#define DEFAULT_KEY_BOMB	XK_Shift_R
-#define DEFAULT_KEY_OKAY	XK_Return
-#define DEFAULT_KEY_CANCEL	XK_Escape
+#define DEFAULT_KEY_LEFT	KEY_Left
+#define DEFAULT_KEY_RIGHT	KEY_Right
+#define DEFAULT_KEY_UP		KEY_Up
+#define DEFAULT_KEY_DOWN	KEY_Down
+#define DEFAULT_KEY_SNAP	KEY_Shift_L
+#define DEFAULT_KEY_BOMB	KEY_Shift_R
+#define DEFAULT_KEY_OKAY	KEY_Return
+#define DEFAULT_KEY_CANCEL	KEY_Escape
 
 /* directions for moving */
 #define MV_NO_MOVING		0

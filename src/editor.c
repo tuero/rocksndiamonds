@@ -3959,9 +3959,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   }
 }
 
-void HandleLevelEditorKeyInput(KeySym key)
+void HandleLevelEditorKeyInput(Key key)
 {
-  char letter = getCharFromKeySym(key);
+  char letter = getCharFromKey(key);
   int button = MB_LEFT;
 
   if (drawing_function == GADGET_ID_TEXT &&
@@ -3969,9 +3969,9 @@ void HandleLevelEditorKeyInput(KeySym key)
   {
     if (letter)
       DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
-    else if (key == XK_Delete || key == XK_BackSpace)
+    else if (key == KEY_Delete || key == KEY_BackSpace)
       DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
-    else if (key == XK_Return)
+    else if (key == KEY_Return)
       DrawLevelText(0, 0, 0, TEXT_NEWLINE);
   }
   else if (button_status == MB_RELEASED)
@@ -3980,23 +3980,23 @@ void HandleLevelEditorKeyInput(KeySym key)
 
     switch (key)
     {
-      case XK_Left:
+      case KEY_Left:
 	id = GADGET_ID_SCROLL_LEFT;
 	break;
-      case XK_Right:
+      case KEY_Right:
 	id = GADGET_ID_SCROLL_RIGHT;
 	break;
-      case XK_Up:
+      case KEY_Up:
 	id = GADGET_ID_SCROLL_UP;
 	break;
-      case XK_Down:
+      case KEY_Down:
 	id = GADGET_ID_SCROLL_DOWN;
 	break;
-      case XK_Page_Up:
+      case KEY_Page_Up:
 	id = GADGET_ID_SCROLL_LIST_UP;
 	button = 3;
 	break;
-      case XK_Page_Down:
+      case KEY_Page_Down:
 	id = GADGET_ID_SCROLL_LIST_DOWN;
 	button = 3;
 	break;
@@ -4010,7 +4010,7 @@ void HandleLevelEditorKeyInput(KeySym key)
       ClickOnGadget(level_editor_gadget[id], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
-    else if (key == XK_space || key == XK_Return)
+    else if (key == KEY_space || key == KEY_Return)
       ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
     else
       for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)

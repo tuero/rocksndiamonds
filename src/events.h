@@ -31,7 +31,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event);
 void HandleNoXEvent(void);
 
 void HandleButton(int, int, int);
-void HandleKey(KeySym, int);
+void HandleKey(Key, int);
 void HandleJoystick();
 
 #endif

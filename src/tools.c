@@ -330,23 +330,13 @@ int getFontHeight(int font_size, int font_type)
 
 void DrawInitText(char *text, int ypos, int color)
 {
-#ifdef USE_SDL_LIBRARY
   if (window && pix[PIX_SMALLFONT])
-  {
-    ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
-    DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
-		ypos, text, FS_SMALL, color);
-    SDL_Flip(window);
-  }
-#else
-  if (display && window && pix[PIX_SMALLFONT])
   {
     ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
     DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
 		ypos, text, FS_SMALL, color);
     FlushDisplay();
   }
-#endif
 }
 
 void DrawTextFCentered(int y, int font_type, char *format, ...)
@@ -1957,14 +1947,13 @@ boolean Request(char *text, unsigned int req_state)
 	}
 
 	case EVENT_KEYPRESS:
-	  switch(XLookupKeysym((KeyEvent *)&event,
-			       ((KeyEvent *)&event)->state))
+	  switch(GetEventKey((KeyEvent *)&event, TRUE))
 	  {
-	    case XK_Return:
+	    case KEY_Return:
 	      result = 1;
 	      break;
 
-	    case XK_Escape:
+	    case KEY_Escape:
 	      result = 0;
 	      break;
 

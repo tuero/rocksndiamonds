@@ -105,14 +105,21 @@ inline void SyncDisplay()
 
 inline void KeyboardAutoRepeatOn()
 {
-#ifndef USE_SDL_LIBRARY
+#ifdef USE_SDL_LIBRARY
+  SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
+		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
+  SDL_EnableUNICODE(1);
+#else
   XAutoRepeatOn(display);
 #endif
 }
 
 inline void KeyboardAutoRepeatOff()
 {
-#ifndef USE_SDL_LIBRARY
+#ifdef USE_SDL_LIBRARY
+  SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
+  SDL_EnableUNICODE(0);
+#else
   XAutoRepeatOff(display);
 #endif
 }
@@ -149,6 +156,30 @@ inline void NextEvent(Event *event)
   SDL_WaitEvent(event);
 #else
   XNextEvent(display, event);
+#endif
+}
+
+inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
+{
+#ifdef USE_SDL_LIBRARY
+#if 0
+  printf("0x%x, 0x%x\n",
+	 event->keysym.sym, event->keysym.unicode);
+#endif
+  if (with_modifiers && event->keysym.unicode != 0)
+    return event->keysym.unicode;
+  else
+    return event->keysym.sym;
+#else
+#if 0
+  printf("0x%x, 0x%x\n",
+	 (unsigned int)XLookupKeysym(event, 0),
+	 (unsigned int)XLookupKeysym(event, event->state));
+#endif
+  if (with_modifiers)
+    return XLookupKeysym(event, event->state);
+  else
+    return XLookupKeysym(event, 0);
 #endif
 }
 
