@@ -840,7 +840,7 @@ void DrawElemButton(int button_nr, int button_state)
     DrawMiniGraphicExt(drawto,gc,
 		       DX+ED_BUTTON_ELEM_XPOS+3+shift + 
 		       (elem_pos % MAX_ELEM_X)*ED_BUTTON_ELEM_XSIZE,
-		       DY+ED_BUTTON_ELEM_YPOS+3-shift +
+		       DY+ED_BUTTON_ELEM_YPOS+3+shift +
 		       (elem_pos / MAX_ELEM_X)*ED_BUTTON_ELEM_YSIZE,
 		       graphic);
   }
@@ -1470,6 +1470,41 @@ int CheckCountButtons(int mx, int my, int button)
 
 static struct GadgetInfo *gadget_list_first_entry = NULL;
 static struct GadgetInfo *gadget_list_last_entry = NULL;
+static int next_free_gadget_id = 1;
+static boolean gadget_id_wrapped = FALSE;
+
+static struct GadgetInfo *getGadgetInfoFromGadgetID(int id)
+{
+  struct GadgetInfo *gi = gadget_list_first_entry;
+
+  while (gi && gi->id != id)
+    gi = gi->next;
+
+  return gi;
+}
+
+static int getNewGadgetID()
+{
+  int id = next_free_gadget_id++;
+
+  if (next_free_gadget_id <= 0)		/* counter overrun */
+  {
+    gadget_id_wrapped = TRUE;		/* now we must check each ID */
+    next_free_gadget_id = 0;
+  }
+
+  if (gadget_id_wrapped)
+  {
+    next_free_gadget_id++;
+    while (getGadgetInfoFromGadgetID(next_free_gadget_id) != NULL)
+      next_free_gadget_id++;
+  }
+
+  if (next_free_gadget_id <= 0)		/* cannot get new gadget id */
+    Error(ERR_EXIT, "too much gadgets -- this should not happen");
+
+  return id;
+}
 
 static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 {
@@ -1477,7 +1512,8 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 
   while (gi)
   {
-    if (mx >= gi->x && mx < gi->x + gi->width &&
+    if (gi->mapped &&
+	mx >= gi->x && mx < gi->x + gi->width &&
 	my >= gi->y && my < gi->y + gi->height)
       break;
 
@@ -1498,13 +1534,24 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   /* always start with reliable default values */
   memset(new_gadget, 0, sizeof(struct GadgetInfo));
 
+  new_gadget->id = getNewGadgetID();
+
   while (tag != GDI_END)
   {
+
+
+
+#if 0
     printf("tag: %d\n", tag);
+#endif
+
 
 
     switch(tag)
     {
+      case GDI_ID:
+	new_gadget->id = va_arg(ap, int);
+	break;
       case GDI_X:
 	new_gadget->x = va_arg(ap, int);
 	break;
@@ -1551,6 +1598,9 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	new_gadget->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
 	new_gadget->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	new_gadget->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
+	break;
+      case GDI_EVENT_MASK:
+	new_gadget->event_mask = va_arg(ap, unsigned long);
 	break;
       case GDI_CALLBACK:
 	new_gadget->callback = va_arg(ap, gadget_callback_function);
@@ -1609,19 +1659,17 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
-  XCopyArea(display, gd->pixmap, drawto, gc,
+  XCopyArea(display, gd->pixmap, (direct ? window : drawto), gc,
 	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
-
-  if (direct)
-    XCopyArea(display, gd->pixmap, window, gc,
-	      gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
 }
 
 void MapGadget(struct GadgetInfo *gi)
 {
   gi->mapped = TRUE;
 
-  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), TRUE);
+  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), FALSE);
+
+  redraw_mask |= REDRAW_ALL;
 }
 
 void UnmapGadget(struct GadgetInfo *gi)
@@ -1631,47 +1679,52 @@ void UnmapGadget(struct GadgetInfo *gi)
 
 void HandleGadgets(int mx, int my, int button)
 {
-  static struct GadgetInfo *choice = NULL;
+  static struct GadgetInfo *gi = NULL;
   static boolean pressed = FALSE;
-  struct GadgetInfo *new_choice;
+  struct GadgetInfo *new_gi;
 
   if (gadget_list_first_entry == NULL)
     return;
 
-  new_choice = getGadgetInfoFromMousePosition(mx,my);
+  new_gi = getGadgetInfoFromMousePosition(mx,my);
 
   if (button)
   {
     if (!motion_status)		/* mouse button just pressed */
     {
-      if (new_choice != NULL)
+      if (new_gi != NULL)
       {
-	choice = new_choice;
-	choice->state = GD_BUTTON_PRESSED;
-	choice->event = GD_EVENT_PRESSED;
-	DrawGadget(choice, TRUE, TRUE);
-	choice->callback(choice);
+	gi = new_gi;
+	gi->state = GD_BUTTON_PRESSED;
+	gi->event.type = GD_EVENT_PRESSED;
+	gi->event.button = button;
+	DrawGadget(gi, TRUE, TRUE);
+
+	if (gi->event_mask & GD_EVENT_PRESSED)
+	  gi->callback(gi);
+
 	pressed = TRUE;
       }
     }
     else			/* mouse movement with pressed mouse button */
     {
-      if ((new_choice == NULL || new_choice != choice) &&
-	  choice != NULL && pressed)
+      if ((new_gi == NULL || new_gi != gi) &&
+	  gi != NULL && pressed)
       {
-	choice->state = GD_BUTTON_UNPRESSED;
-	DrawGadget(choice, FALSE, TRUE);
+	gi->state = GD_BUTTON_UNPRESSED;
+	DrawGadget(gi, FALSE, TRUE);
 	pressed = FALSE;
       }
-      else if (new_choice != NULL && new_choice == choice)
+      else if (new_gi != NULL && new_gi == gi)
       {
 	if (!pressed)
-	  DrawGadget(choice, TRUE, TRUE);
-	choice->state = GD_BUTTON_PRESSED;
+	  DrawGadget(gi, TRUE, TRUE);
+	gi->state = GD_BUTTON_PRESSED;
+	gi->event.type = GD_EVENT_MOVING;
+	gi->event.button = button;
 
-	/*
-	choice->callback(choice);
-	*/
+	if (gi->event_mask & GD_EVENT_MOVING)
+	  gi->callback(gi);
 
 	pressed = TRUE;
       }
@@ -1679,18 +1732,22 @@ void HandleGadgets(int mx, int my, int button)
   }
   else				/* mouse button just released */
   {
-    if (new_choice != NULL && new_choice == choice && pressed)
+    if (new_gi != NULL && new_gi == gi && pressed)
     {
-      choice->state = GD_BUTTON_UNPRESSED;
-      choice->event = GD_EVENT_RELEASED;
-      DrawGadget(choice, FALSE, TRUE);
-      choice->callback(choice);
-      choice = NULL;
+      gi->state = GD_BUTTON_UNPRESSED;
+      gi->event.type = GD_EVENT_RELEASED;
+      gi->event.button = button;
+      DrawGadget(gi, FALSE, TRUE);
+
+      if (gi->event_mask & GD_EVENT_RELEASED)
+	gi->callback(gi);
+
+      gi = NULL;
       pressed = FALSE;
     }
     else
     {
-      choice = NULL;
+      gi = NULL;
       pressed = FALSE;
     }
   }

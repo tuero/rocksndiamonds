@@ -161,6 +161,10 @@ void BackToFront()
 		    VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
       }
     }
+    if (redraw_mask & REDRAW_DOOR_3)
+      XCopyArea(display, backbuffer, window, gc,
+		EX, EY, EXSIZE, EYSIZE,
+		EX, EY);
     redraw_mask &= ~REDRAW_DOORS;
   }
 

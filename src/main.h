@@ -460,6 +460,8 @@ extern int		num_bg_loops;
 #define DY			60
 #define VX			DX
 #define VY			400
+#define EX			DX
+#define EY			(VY - 44)
 #define TILEX			32
 #define TILEY			32
 #define MINI_TILEX		(TILEX/2)
@@ -476,6 +478,8 @@ extern int		num_bg_loops;
 #define DYSIZE			280
 #define VXSIZE			DXSIZE
 #define VYSIZE			100
+#define EXSIZE			DXSIZE
+#define EYSIZE			(VXSIZE + 44)
 #define FULL_SXSIZE		(2+SXSIZE+2)
 #define FULL_SYSIZE		(2+SYSIZE+2)
 #define MICROLEV_XPOS		(SX+4*32+16)
@@ -1084,17 +1088,18 @@ extern int		num_bg_loops;
 #endif
 
 /* values for redraw_mask */
-#define REDRAW_ALL		(1L<<0)
-#define REDRAW_FIELD		(1L<<1)
-#define REDRAW_TILES		(1L<<2)
-#define REDRAW_DOOR_1		(1L<<3)
-#define REDRAW_VIDEO_1		(1L<<4)
-#define REDRAW_VIDEO_2		(1L<<5)
-#define REDRAW_VIDEO_3		(1L<<6)
-#define REDRAW_MICROLEV		(1L<<7)
-#define REDRAW_FROM_BACKBUFFER	(1L<<8)
+#define REDRAW_ALL		(1L << 0)
+#define REDRAW_FIELD		(1L << 1)
+#define REDRAW_TILES		(1L << 2)
+#define REDRAW_DOOR_1		(1L << 3)
+#define REDRAW_VIDEO_1		(1L << 4)
+#define REDRAW_VIDEO_2		(1L << 5)
+#define REDRAW_VIDEO_3		(1L << 6)
+#define REDRAW_MICROLEV		(1L << 7)
+#define REDRAW_FROM_BACKBUFFER	(1L << 8)
 #define REDRAW_DOOR_2	(REDRAW_VIDEO_1 | REDRAW_VIDEO_2 | REDRAW_VIDEO_3)
-#define REDRAW_DOORS	(REDRAW_DOOR_1 | REDRAW_DOOR_2)
+#define REDRAW_DOOR_3		(1L << 9)
+#define REDRAW_DOORS	(REDRAW_DOOR_1 | REDRAW_DOOR_2 | REDRAW_DOOR_3)
 #define REDRAW_MAIN	(REDRAW_FIELD | REDRAW_TILES | REDRAW_MICROLEV)
 #define REDRAWTILES_THRESHOLD	SCR_FIELDX*SCR_FIELDY/2
 
@@ -1112,6 +1117,8 @@ extern int		num_bg_loops;
 #define DOOR_GFX_PAGEX4		(3 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEX5		(4 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEX6		(5 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX7		(6 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX8		(7 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		0
 #define DOOR_GFX_PAGEY2		DYSIZE
 

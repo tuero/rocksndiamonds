@@ -293,21 +293,23 @@ int CheckCountButtons(int, int, int);
 
 /* gadget creation tags */
 #define GDI_END				0
-#define GDI_X				1
-#define GDI_Y				2
-#define GDI_WIDTH			3
-#define GDI_HEIGHT			4
-#define GDI_TYPE			5
-#define GDI_STATE			6
-#define GDI_ALT_STATE			7
-#define GDI_NUMBER_VALUE		8
-#define GDI_TEXT_VALUE			9
-#define GDI_DESIGN_UNPRESSED		10
-#define GDI_DESIGN_PRESSED		11
-#define GDI_ALT_DESIGN_UNPRESSED	12
-#define GDI_ALT_DESIGN_PRESSED		13
-#define GDI_EVENT			14
-#define GDI_CALLBACK			15
+#define GDI_ID				1
+#define GDI_X				2
+#define GDI_Y				3
+#define GDI_WIDTH			4
+#define GDI_HEIGHT			5
+#define GDI_TYPE			6
+#define GDI_STATE			7
+#define GDI_ALT_STATE			8
+#define GDI_NUMBER_VALUE		9
+#define GDI_TEXT_VALUE			10
+#define GDI_DESIGN_UNPRESSED		11
+#define GDI_DESIGN_PRESSED		12
+#define GDI_ALT_DESIGN_UNPRESSED	13
+#define GDI_ALT_DESIGN_PRESSED		14
+#define GDI_EVENT_MASK			15
+#define GDI_EVENT			16
+#define GDI_CALLBACK			17
 
 typedef void (*gadget_callback_function)(void *);
 
@@ -317,8 +319,15 @@ struct GadgetDesign
   int x, y;				/* position of rectangle in Pixmap */
 };
 
+struct GadgetEvent
+{
+  unsigned long type;			/* event type */
+  int button;				/* button number for button events */
+};
+
 struct GadgetInfo
 {
+  int id;				/* gadget identifier */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
@@ -329,28 +338,10 @@ struct GadgetInfo
   char text_value[MAX_GADGET_TEXTSIZE];
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
-  unsigned long event;			/* actual gadget event */
+  unsigned long event_mask;		/* possible events for this gadget */
+  struct GadgetEvent event;		/* actual gadget event */
   gadget_callback_function callback;
   struct GadgetInfo *next;		/* next list entry */
-};
-
-
-#if 0
-struct NewGadget
-{
-  int x, y;				/* screen position */
-  int width, height;			/* screen size */
-  unsigned long type;			/* type (button, text input, ...) */
-  struct GadgetDesign *design[2];	/* 0: normal; 1: pressed */
-  struct GadgetDesign *alt_design[2];	/* alternative design */
-  unsigned long value_mask;		/* actual gadget event */
-};
-#endif
-
-struct GadgetEvent
-{
-  unsigned long state;			/* state (pressed, released, ...) */
-  int x,y;				/* position inside drawing area */
 };
 
 struct GadgetInfo *CreateGadget(int, ...);

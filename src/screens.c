@@ -58,6 +58,9 @@ void DrawMainMenu()
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
+  /* needed if last screen was the level editor */
+  UnmapLevelEditorControlButtons();
+
   FadeSounds();
   GetPlayerConfig();
   LoadLevel(level_nr);
