@@ -443,6 +443,7 @@ inline void CloseVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
 inline Bitmap *CreateBitmapStruct(void);
 inline Bitmap *CreateBitmap(int, int, int);
+inline void TransferBitmapPointers(Bitmap *, Bitmap *);
 inline void FreeBitmap(Bitmap *);
 inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
 inline void ClearRectangle(Bitmap *, int, int, int, int);
@@ -465,7 +466,7 @@ inline boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
 Bitmap *LoadCustomImage(char *);
-void ReloadCustomImage(Bitmap **, char *);
+Bitmap *ReloadCustomImage(Bitmap **, char *);
 
 inline void OpenAudio(void);
 inline void CloseAudio(void);

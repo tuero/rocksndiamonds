@@ -594,7 +594,7 @@ void HandleKey(Key key, int key_status)
       switch(key)
       {
         case KSYM_Escape:
-	  RequestQuitGame();
+	  RequestQuitGame(setup.ask_on_escape);
 	  break;
 
 #ifdef DEBUG

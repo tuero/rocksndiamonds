@@ -234,7 +234,6 @@ void DrawMainMenu()
 #if 0
   ClearEventQueue();
 #endif
-
 }
 
 static void gotoTopLevelDir()

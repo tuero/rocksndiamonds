@@ -6305,10 +6305,10 @@ void RaiseScoreElement(int element)
   }
 }
 
-void RequestQuitGame()
+void RequestQuitGame(boolean ask_if_really_quit)
 {
   if (AllPlayersGone ||
-      !setup.ask_on_escape ||
+      !ask_if_really_quit ||
       level_editor_test_game ||
       Request("Do you really want to quit the game ?",
 	      REQ_ASK | REQ_STAY_CLOSED))
@@ -6478,7 +6478,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
   switch (id)
   {
     case GAME_CTRL_ID_STOP:
-      RequestQuitGame();
+      RequestQuitGame(TRUE);
       break;
 
     case GAME_CTRL_ID_PAUSE:

@@ -92,7 +92,7 @@ boolean PlaceBomb(struct PlayerInfo *);
 void PlaySoundLevel(int, int, int);
 void RaiseScore(int);
 void RaiseScoreElement(int);
-void RequestQuitGame(void);
+void RequestQuitGame(boolean);
 
 void CreateGameButtons();
 void UnmapGameButtons();

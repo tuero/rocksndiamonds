@@ -297,6 +297,9 @@ void InitTileClipmasks()
     }
   }
 #endif /* TARGET_X11_NATIVE */
+
+  XFreeGC(display, copy_clipmask_gc);
+
 #endif /* TARGET_X11 */
 }
 
@@ -343,7 +346,6 @@ void InitGfx()
   }
 
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
-
   InitTileClipmasks();
 }
 
@@ -355,9 +357,9 @@ void InitGfxBackground()
   fieldbuffer = pix[PIX_DB_FIELD];
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-  ClearRectangle(backbuffer, REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
-  ClearRectangle(pix[PIX_DB_DOOR], 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
+  BlitBitmap(pix[PIX_BACK], backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  ClearRectangle(pix[PIX_DB_DOOR], 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
   for(x=0; x<MAX_BUF_XSIZE; x++)
     for(y=0; y<MAX_BUF_YSIZE; y++)
@@ -370,12 +372,47 @@ void ReloadCustomArtwork()
 {
   if (artwork.graphics_set_current != artwork.gfx_current->name)
   {
+    Bitmap *pix_new[NUM_PICTURES];
     int i;
 
+    ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
     for(i=0; i<NUM_PICTURES; i++)
-      ReloadCustomImage(&pix[i], image_filename[i]);
+    {
+      DrawInitText(image_filename[i], 150, FC_YELLOW);
+      pix_new[i] = ReloadCustomImage(&pix[i], image_filename[i]);
 
+#if 0
+      if (pix_new[i] != NULL)
+	pix[i] = pix_new[i];
+#endif
+    }
+
+#if 0
+    InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+    InitTileClipmasks();
     InitGfxBackground();
+#endif
+
+#if 1
+    for(i=0; i<NUM_PICTURES; i++)
+    {
+      if (pix_new[i] != NULL)
+	TransferBitmapPointers(pix_new[i], pix[i]);
+    }
+#else
+    for(i=0; i<NUM_PICTURES; i++)
+    {
+      if (pix_new[i] != NULL)
+	FreeBitmap(pix_old[i]);
+    }
+#endif
+
+#if 1
+    InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+    InitTileClipmasks();
+    InitGfxBackground();
+#endif
+
     SetDoorState(DOOR_OPEN_1 | DOOR_CLOSE_2);
 
     artwork.graphics_set_current = artwork.gfx_current->name;

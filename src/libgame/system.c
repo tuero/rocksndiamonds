@@ -281,7 +281,7 @@ inline Bitmap *CreateBitmap(int width, int height, int depth)
   return new_bitmap;
 }
 
-inline void FreeBitmap(Bitmap *bitmap)
+inline static void FreeBitmapPointers(Bitmap *bitmap)
 {
   if (bitmap == NULL)
     return;
@@ -298,10 +298,29 @@ inline void FreeBitmap(Bitmap *bitmap)
     XFreePixmap(display, bitmap->clip_mask);
   if (bitmap->stored_clip_gc)
     XFreeGC(display, bitmap->stored_clip_gc);
+  /* the other GCs are only pointers to GCs used elsewhere */
 #endif
 
   if (bitmap->source_filename)
     free(bitmap->source_filename);
+}
+
+inline void TransferBitmapPointers(Bitmap *src_bitmap, Bitmap *dst_bitmap)
+{
+  if (src_bitmap == NULL || dst_bitmap == NULL)
+    return;
+
+  FreeBitmapPointers(dst_bitmap);
+
+  *dst_bitmap = *src_bitmap;
+}
+
+inline void FreeBitmap(Bitmap *bitmap)
+{
+  if (bitmap == NULL)
+    return;
+
+  FreeBitmapPointers(bitmap);
 
   free(bitmap);
 }
@@ -647,7 +666,7 @@ Bitmap *LoadCustomImage(char *basename)
   return new_bitmap;
 }
 
-void ReloadCustomImage(Bitmap **bitmap, char *basename)
+Bitmap *ReloadCustomImage(Bitmap **bitmap, char *basename)
 {
   char *filename = getCustomImageFilename(basename);
   Bitmap *old_bitmap = *bitmap;
@@ -656,7 +675,7 @@ void ReloadCustomImage(Bitmap **bitmap, char *basename)
   if (filename == NULL)		/* (should never happen) */
   {
     Error(ERR_WARN, "ReloadCustomImage(): cannot find file '%s'", basename);
-    return;
+    return NULL;
   }
 
   if (strcmp(filename, old_bitmap->source_filename) == 0)
@@ -665,13 +684,13 @@ void ReloadCustomImage(Bitmap **bitmap, char *basename)
        This usually means that this image does not exist in this graphic set
        and a fallback to the existing image is done. */
 
-    return;
+    return NULL;
   }
 
   if ((new_bitmap = LoadImage(filename)) == NULL)
   {
     Error(ERR_WARN, "LoadImage() failed: %s", GetError());
-    return;
+    return NULL;
   }
 
   if (old_bitmap->width != new_bitmap->width ||
@@ -679,9 +698,10 @@ void ReloadCustomImage(Bitmap **bitmap, char *basename)
   {
     Error(ERR_WARN, "ReloadCustomImage: new image has wrong dimensions");
     FreeBitmap(new_bitmap);
-    return;
+    return NULL;
   }
 
+#if 0
   /* copy filename for new image */
   free(old_bitmap->source_filename);
   old_bitmap->source_filename = getStringCopy(filename);
@@ -691,6 +711,12 @@ void ReloadCustomImage(Bitmap **bitmap, char *basename)
 	     old_bitmap->width, old_bitmap->height, 0,0);
 
   FreeBitmap(new_bitmap);
+#else
+  /*
+  *bitmap = new_bitmap;
+  */
+  return new_bitmap;
+#endif
 }
 
 
