@@ -55,6 +55,7 @@ static void InitGadgets(void);
 static void InitElementProperties(void);
 static void InitElementInfo(void);
 static void InitGraphicInfo(void);
+static void InitSoundInfo();
 static void Execute_Debug_Command(char *);
 
 void OpenAll(void)
@@ -175,37 +176,19 @@ void InitNetworkServer()
 
 static void InitImages()
 {
-  static char *suffix_list[] =
-  {
-    ".frame_xpos",
-    ".frame_ypos",
-    ".num_frames",
-    NULL
-  };
-
-  image_files =
-    getFileListFromConfigList(image_config, suffix_list, NUM_IMAGE_FILES);
-
-  InitImageList(image_files, NUM_IMAGE_FILES);
+  InitImageList(image_config, image_config_suffix, NUM_IMAGE_FILES);
 
   /* load custom images */
   ReloadCustomImages();
+
   InitGraphicInfo();
 }
 
 static void InitMixer()
 {
-  static char *suffix_list[] =
-  {
-    NULL
-  };
-
   OpenAudio();
 
-  sound_files =
-    getFileListFromConfigList(sound_config, suffix_list, NUM_SOUND_FILES);
-
-  InitSoundList(sound_files, NUM_SOUND_FILES);
+  InitSoundList(sound_config, sound_config_suffix, NUM_SOUND_FILES);
 
   StartMixer();
 }
@@ -216,8 +199,7 @@ static void InitSound()
   InitReloadSounds(artwork.snd_current->identifier);
   InitReloadMusic(artwork.mus_current->identifier);
 
-  /* initialize sound effect lookup table for element actions */
-  InitGameSound();
+  InitSoundInfo();
 }
 
 static void InitTileClipmasks()
@@ -869,13 +851,15 @@ void InitElementInfo()
   }
 }
 
-void InitGraphicInfo()
+static void InitGraphicInfo()
 {
   int i;
 
-  /* always start with reliable default values */
+  image_files = getCurrentImageList();
+
   for(i=0; i<MAX_GRAPHICS; i++)
   {
+    /* always start with reliable default values */
     graphic_info[i].bitmap = NULL;
     graphic_info[i].src_x = 0;
     graphic_info[i].src_y = 0;
@@ -886,6 +870,14 @@ void InitGraphicInfo()
     getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
   }
+}
+
+static void InitSoundInfo()
+{
+  sound_files = getCurrentSoundList();
+
+  /* initialize sound effect lookup table for element actions */
+  InitGameSound();
 }
 
 void InitElementProperties()

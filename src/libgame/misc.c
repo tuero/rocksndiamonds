@@ -1350,12 +1350,34 @@ boolean FileIsArtworkType(char *basename, int type)
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   char *suffix_list[],
-					   int num_list_entries)
+					   int num_file_list_entries)
 {
-  struct FileInfo *file_list =
-    checked_calloc(num_list_entries * sizeof(struct FileInfo));
-  int list_pos = 0;
+  struct FileInfo *file_list;
+  int num_suffix_list_entries = 0;
+  int list_pos = -1;
   int i, j;
+
+  file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
+
+  for (i=0; suffix_list[i] != NULL; i++)
+    num_suffix_list_entries++;
+
+  if (num_suffix_list_entries > 0)
+  {
+    for (i=0; i<num_file_list_entries; i++)
+    {
+      file_list[i].default_parameter =
+	checked_calloc(num_suffix_list_entries * sizeof(int));
+      file_list[i].parameter =
+	checked_calloc(num_suffix_list_entries * sizeof(int));
+
+      for (j=0; j<num_suffix_list_entries; j++)
+      {
+	file_list[i].default_parameter[j] = -1;
+	file_list[i].parameter[j] = -1;
+      }
+    }
+  }
 
   for (i=0; config_list[i].token != NULL; i++)
   {
@@ -1370,6 +1392,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  strcmp(&config_list[i].token[len_config_token - len_suffix],
 		 suffix_list[j]) == 0)
       {
+	file_list[list_pos].default_parameter[j] = atoi(config_list[i].value);
+
 	is_file_entry = FALSE;
 	break;
       }
@@ -1377,17 +1401,17 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
     if (is_file_entry)
     {
-      if (list_pos >= num_list_entries)
+      list_pos++;
+
+      if (list_pos >= num_file_list_entries)
 	Error(ERR_EXIT, "inconsistant config list information -- please fix");
 
       file_list[list_pos].token = config_list[i].token;
       file_list[list_pos].default_filename = config_list[i].value;
-
-      list_pos++;
     }
   }
 
-  if (list_pos != num_list_entries)
+  if (list_pos != num_file_list_entries - 1)
     Error(ERR_EXIT, "inconsistant config list information -- please fix");
 
   return file_list;
@@ -1395,33 +1419,41 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
 static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
-  int num_list_entries = artwork_info->num_list_entries;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
+  int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   struct FileInfo *file_list = artwork_info->file_list;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
-  int i;
+  int i, j;
 
 #if 0
   printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
 #endif
 
   /* always start with reliable default values */
-  for (i=0; i<num_list_entries; i++)
+  for (i=0; i<num_file_list_entries; i++)
+  {
     file_list[i].filename = NULL;
+
+    for (j=0; j<num_suffix_list_entries; j++)
+    {
+      file_list[i].parameter[j] = file_list[i].default_parameter[j];
+    }
+  }
 
   if (filename == NULL)
     return;
 
   if ((setup_file_list = loadSetupFileList(filename)))
   {
-    for (i=0; i<num_list_entries; i++)
+    for (i=0; i<num_file_list_entries; i++)
       file_list[i].filename =
 	getStringCopy(getTokenValue(setup_file_list, file_list[i].token));
 
     freeSetupFileList(setup_file_list);
 
 #if 0
-    for (i=0; i<num_list_entries; i++)
+    for (i=0; i<num_file_list_entries; i++)
     {
       printf("'%s' ", file_list[i].token);
       if (file_list[i].filename)
@@ -1528,7 +1560,7 @@ static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 			      char *basename, int list_pos)
 {
   if (artwork_info->artwork_list == NULL ||
-      list_pos >= artwork_info->num_list_entries)
+      list_pos >= artwork_info->num_file_list_entries)
     return;
 
 #if 0
@@ -1560,7 +1592,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     { "Loading music:",		TRUE }
   };
 
-  int num_list_entries = artwork_info->num_list_entries;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
   struct FileInfo *file_list = artwork_info->file_list;
   int i;
 
@@ -1570,10 +1602,10 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     DrawInitText(draw_init[artwork_info->type].text, 120, FC_GREEN);
 
 #if 0
-  printf("DEBUG: reloading %d sounds ...\n", num_list_entries);
+  printf("DEBUG: reloading %d sounds ...\n", num_file_list_entries);
 #endif
 
-  for(i=0; i<num_list_entries; i++)
+  for(i=0; i<num_file_list_entries; i++)
   {
     if (draw_init[artwork_info->type].do_it)
       DrawInitText(file_list[i].token, 150, FC_YELLOW);
@@ -1607,7 +1639,7 @@ void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
 	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
 #endif
 
-  for(i=0; i<artwork_info->num_list_entries; i++)
+  for(i=0; i<artwork_info->num_file_list_entries; i++)
     deleteArtworkListEntry(artwork_info, &artwork_info->artwork_list[i]);
 
 #if 0
@@ -1618,7 +1650,7 @@ void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
   free(artwork_info->artwork_list);
 
   artwork_info->artwork_list = NULL;
-  artwork_info->num_list_entries = 0;
+  artwork_info->num_file_list_entries = 0;
 }
 
 

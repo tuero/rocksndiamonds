@@ -445,9 +445,12 @@ struct ConfigInfo
 struct FileInfo
 {
   char *token;
-  char *default_filename;
 
+  char *default_filename;
   char *filename;
+
+  int *default_parameter;			/* array of file parameters */
+  int *parameter;				/* array of file parameters */
 };
 
 struct ListNodeInfo
@@ -459,10 +462,17 @@ struct ListNodeInfo
 struct ArtworkListInfo
 {
   int type;					/* type of artwork */
-  int num_list_entries;
-  struct FileInfo *file_list;			/* static artwork file list */
-  struct ListNodeInfo **artwork_list;		/* static artwork list */
-  struct ListNode *content_list;		/* dynamic artwork list */
+
+  int num_file_list_entries;
+  int num_suffix_list_entries;
+
+  struct FileInfo *file_list;			/* static artwork file array */
+  char **suffix_list;				/* parameter suffixes array */
+
+  struct ListNodeInfo **artwork_list;		/* static artwork node array */
+
+  struct ListNode *content_list;		/* dynamic artwork node list */
+
   void *(*load_artwork)(char *);		/* constructor function */
   void (*free_artwork)(void *);			/* destructor function */
 };

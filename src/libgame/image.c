@@ -695,19 +695,35 @@ static void FreeImage(void *ptr)
   free(image);
 }
 
-void InitImageList(struct FileInfo *file_list, int num_list_entries)
+struct FileInfo *getCurrentImageList()
 {
-  if (image_info == NULL)
-    image_info = checked_calloc(sizeof(struct ArtworkListInfo));
+  return image_info->file_list;
+}
 
-  if (image_info->artwork_list == NULL)
-    image_info->artwork_list =
-      checked_calloc(num_list_entries * sizeof(ImageInfo *));
+void InitImageList(struct ConfigInfo *config_list, char *config_suffix_list[],
+		   int num_file_list_entries)
+{
+  int i;
+
+  image_info = checked_calloc(sizeof(struct ArtworkListInfo));
 
   image_info->type = ARTWORK_TYPE_GRAPHICS;
-  image_info->num_list_entries = num_list_entries;
-  image_info->file_list = file_list;
+
+  image_info->num_file_list_entries = num_file_list_entries;
+  image_info->num_suffix_list_entries = 0;
+  for (i=0; config_suffix_list[i] != NULL; i++)
+    image_info->num_suffix_list_entries++;
+
+  image_info->file_list =
+    getFileListFromConfigList(config_list, config_suffix_list,
+			      num_file_list_entries);
+  image_info->suffix_list = config_suffix_list;
+
+  image_info->artwork_list =
+    checked_calloc(num_file_list_entries * sizeof(ImageInfo *));
+
   image_info->content_list = NULL;
+
   image_info->load_artwork = Load_PCX;
   image_info->free_artwork = FreeImage;
 }

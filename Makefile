@@ -89,6 +89,9 @@ clean:
 run:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && ./rocksndiamonds --verbose
 
+gdb:
+	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && gdb ./rocksndiamonds
+
 backup:
 	./Scripts/make_backup.sh src
 

@@ -1721,23 +1721,39 @@ static void *Load_WAV(char *filename)
   return snd_info;
 }
 
-void InitSoundList(struct FileInfo *file_list, int num_list_entries)
+struct FileInfo *getCurrentSoundList()
 {
-  if (sound_info == NULL)
-    sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
+  return sound_info->file_list;
+}
 
-  if (sound_info->artwork_list == NULL)
-    sound_info->artwork_list =
-      checked_calloc(num_list_entries * sizeof(SoundInfo *));
+void InitSoundList(struct ConfigInfo *config_list, char *config_suffix_list[],
+		   int num_file_list_entries)
+{
+  int i;
+
+  sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
 
   sound_info->type = ARTWORK_TYPE_SOUNDS;
-  sound_info->num_list_entries = num_list_entries;
-  sound_info->file_list = file_list;
+
+  sound_info->num_file_list_entries = num_file_list_entries;
+  sound_info->num_suffix_list_entries = 0;
+  for (i=0; config_suffix_list[i] != NULL; i++)
+    sound_info->num_suffix_list_entries++;
+
+  sound_info->file_list =
+    getFileListFromConfigList(config_list, config_suffix_list,
+			      num_file_list_entries);
+  sound_info->suffix_list = config_suffix_list;
+
+  sound_info->artwork_list =
+    checked_calloc(num_file_list_entries * sizeof(SoundInfo *));
+
   sound_info->content_list = NULL;
+
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;
 
-  num_sounds = sound_info->num_list_entries;
+  num_sounds = sound_info->num_file_list_entries;
   Sound = (SoundInfo **)sound_info->artwork_list;
 }
 

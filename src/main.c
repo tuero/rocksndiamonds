@@ -136,6 +136,19 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
+char *image_config_suffix[] =
+{
+  ".frame_xpos",
+  ".frame_ypos",
+  ".num_frames",
+  NULL
+};
+
+char *sound_config_suffix[] =
+{
+  NULL
+};
+
 struct ConfigInfo image_config[] =
 {
   /* graphics for Boulder Dash style elements and actions */
