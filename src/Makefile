@@ -1,111 +1,71 @@
 #=============================================================================#
-# Makefile for Rocks'n'Diamonds 1.2                                           #
-# (c) 1995-98 Holger Schemel, aeglos@valinor.owl.de                           #
+# Makefile for Rocks'n'Diamonds 1.4.0                                         #
+# (c) 1995-1999 Holger Schemel, aeglos@valinor.owl.de                         #
 #=============================================================================#
 
-#-----------------------------------------------------------------------------#
-# configuration section                                                       #
-#-----------------------------------------------------------------------------#
-
-# change this to your favorite ANSI C compiler
-CC = gcc
-
-# on Solaris and similar systems, you'll need to uncomment this
-# EXTRA_LIBS = -lnsl -lsocket 
-
-# specify X11 library path on your system
-XLIB_PATH = /usr/X11/lib
-
-# choose directory for read-only game data (like graphics, sounds, levels)
-# RO_GAME_DIR = /usr/games
-
-# choose directory for writable game data (like highscore files)
-# RW_GAME_DIR = /var/games
-
-# uncomment this if your system has no joystick include file
-# JOYSTICK = -DNO_JOYSTICK
-
-# uncomment this if your system has no sound
-# SOUNDS = -DNO_SOUNDS
-
-# choose if you want to allow many global score file entries for one player
-# when installing the game in a multi user environment, choose this
-# SCORE_ENTRIES = ONE_PER_NAME
-# when installing the game in a single user environment, choose this (default)
-# SCORE_ENTRIES = MANY_PER_NAME
-
-# The XPM-Library is no longer needed to build this program,
-# but is used to load graphics if XPM_INCLUDE_FILE is defined,
-# because the GIF loading routines are still a bit beta.
-# If you want to use the Xpm library, convert the GIF files to Xpm
-# files (and you need corresponding mask files in xbm format).
-
-# XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
-# EXTRA_X11_LIBS = -lXpm
-
-#-----------------------------------------------------------------------------#
-# you shouldn't need to change anything below                                 #
-#-----------------------------------------------------------------------------#
-
+ifndef PLATFORM			# platform not specified -- try auto detection
 ifdef COMSPEC
 PLATFORM = dos
 else
 PLATFORM = unix
 endif
+endif
 
-ifeq ($(PLATFORM),unix)
-RM = rm -f
-PROGNAME = ../rocksndiamonds
-LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
-else
+ifdef X11_PATH			# path to X11 specified by top level Makefile
+XINC_PATH = $(X11_PATH)/include
+XLIB_PATH = $(X11_PATH)/lib
+X11_INCL = -I$(XINC_PATH)
+X11_LIBS = -L$(XLIB_PATH)
+endif
+
+
+ifeq ($(PLATFORM),dos)		# DOS / Windows
+
 RM = del
 PROGNAME = ../rocks.exe
 LIBS = -s -lm -lalleg
+
+else				# Unix
+
+RM = rm -f
+PROGNAME = ../rocksndiamonds
+
+ifeq ($(PLATFORM),solaris)
+EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
-CPP = $(CC) -E
+INCL = $(X11_INCL)
+LIBS = $(X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
 
-ifdef RO_GAME_DIR
+endif
+
+
+ifdef RO_GAME_DIR		# path to read-only game data specified
 CONFIG_RO_GAME_DIR = -DRO_GAME_DIR="\"$(RO_GAME_DIR)\""
 endif
 
-ifdef RW_GAME_DIR
+ifdef RW_GAME_DIR		# path to writable game data specified
 CONFIG_RW_GAME_DIR = -DRW_GAME_DIR="\"$(RW_GAME_DIR)\""
 endif
 
-ifdef SCORE_ENTRIES
+ifdef SCORE_ENTRIES		# number of score entries per player specified
 CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
 endif
 
 CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
-CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
-	 $(CONFIG_SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
 
-# DEBUG = -DDEBUG -g -Wall -ansi -pedantic
-DEBUG = -DDEBUG -g -Wall
-# DEBUG = -O3 -Wall -ansi -pedantic
-# DEBUG = -O3 -Wall
-# DEBUG = -O3
+CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(SOUNDS) $(JOYSTICK)
 
-# SYSTEM = -Aa -D_HPUX_SOURCE -Dhpux	# for HP-UX (obsolete)
-# SYSTEM = -DSYSV -Ae			# for HP-UX
-# INCL = -I/usr/include/X11R5		# for HP-UX and others
-# INCL = -I/usr/local/X11/include	# for SunOS and others
-# LIBS = -L/usr/lib/X11R5 -lXpm -lX11 -lm
-#					# for HP-UX and others
-# LIBS = -L/usr/local/X11/lib -lXpm -lX11 -lm -lsocket -R/usr/local/X11/lib
-#					# for SunOS and others
+# OPTIONS = -DDEBUG -g -Wall -ansi -pedantic	# only for debugging purposes
+OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
+# OPTIONS = -O3 -Wall -ansi -pedantic
+# OPTIONS = -O3 -Wall
+# OPTIONS = -O3
 
-# LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
-# LIBS = -L/usr/X11R6/lib -lX11 -lm
+# SYSTEM = -DSYSV -Ae		# may be needed for HP-UX
 
-# LIBS = -L/usr/X11R6/lib $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
-
-# LIBS = -L$(XLIB_PATH) $(EXTRA_X11_LIBS) -lX11 -lm $(EXTRA_LIBS)
-
-# CFLAGS = -O2 $(CONFIG) $(SYSTEM)
-CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
+CFLAGS = $(OPTIONS) $(SYSTEM) $(INCL) $(CONFIG)
 
 SRCS =	main.c		\
 	init.c		\
@@ -160,6 +120,11 @@ $(PROGNAME):	$(OBJS)
 clean:
 	$(RM) *.o
 	$(RM) $(PROGNAME)
+
+
+#-----------------------------------------------------------------------------#
+# development only stuff                                                      #
+#-----------------------------------------------------------------------------#
 
 depend:
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend

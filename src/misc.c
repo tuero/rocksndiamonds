@@ -443,7 +443,7 @@ void GetOptions(char *argv[])
 	     "Options:\n"
 	     "  -d, --display machine:0       X server display\n"
 	     "  -b, --basepath directory      alternative base directory\n"
-	     "  -l, --levels directory        alternative level directory\n"
+	     "  -l, --level directory        alternative level directory\n"
 	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "  -v, --verbose                 verbose mode\n",
