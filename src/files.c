@@ -97,7 +97,7 @@ static void setLevelInfoToDefaults()
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     level.custom_element_successor[i] = EL_EMPTY_SPACE;
-    Properties1[EL_CUSTOM_START + i] = EP_BITMASK_DEFAULT;
+    Properties[EL_CUSTOM_START + i][EP_BITFIELD_BASE] = EP_BITMASK_DEFAULT;
   }
 
   BorderElement = EL_STEELWALL;
@@ -337,7 +337,7 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
     int properties = getFile32BitBE(file);
 
     if (IS_CUSTOM_ELEMENT(element))
-      Properties1[element] = properties;
+      Properties[element][EP_BITFIELD_BASE] = properties;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
@@ -726,12 +726,12 @@ static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (Properties1[element] != EP_BITMASK_DEFAULT)
+    if (Properties[element][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile32BitBE(file, Properties1[element]);
+	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
       }
 
       check++;
@@ -813,7 +813,7 @@ void SaveLevel(int level_nr)
 
   /* check for non-standard custom elements and calculate "CUS1" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    if (Properties1[EL_CUSTOM_START + i] != EP_BITMASK_DEFAULT)
+    if (Properties[EL_CUSTOM_START +i][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
       num_changed_custom_elements1++;
 
   /* check for non-standard custom elements and calculate "CUS2" chunk size */

@@ -1087,9 +1087,9 @@ void InitElementProperties()
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
-    EL_BD_AMOEBA
+    EL_BD_AMOEBA,
+    -1
   };
-  static int ep_amoebalive_num = SIZEOF_ARRAY_INT(ep_amoebalive);
 
   static int ep_amoeboid[] =
   {
@@ -1097,9 +1097,9 @@ void InitElementProperties()
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
-    EL_BD_AMOEBA
+    EL_BD_AMOEBA,
+    -1
   };
-  static int ep_amoeboid_num = SIZEOF_ARRAY_INT(ep_amoeboid);
 
   static int ep_schluessel[] =
   {
@@ -1110,9 +1110,9 @@ void InitElementProperties()
     EL_EM_KEY_1,
     EL_EM_KEY_2,
     EL_EM_KEY_3,
-    EL_EM_KEY_4
+    EL_EM_KEY_4,
+    -1
   };
-  static int ep_schluessel_num = SIZEOF_ARRAY_INT(ep_schluessel);
 
   static int ep_pforte[] =
   {
@@ -1150,9 +1150,9 @@ void InitElementProperties()
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN
+    EL_TUBE_RIGHT_DOWN,
+    -1
   };
-  static int ep_pforte_num = SIZEOF_ARRAY_INT(ep_pforte);
 
   static int ep_solid[] =
   {
@@ -1305,9 +1305,9 @@ void InitElementProperties()
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN
+    EL_TUBE_RIGHT_DOWN,
+    -1
   };
-  static int ep_solid_num = SIZEOF_ARRAY_INT(ep_solid);
 
   static int ep_indestructible[] =
   {
@@ -1397,9 +1397,9 @@ void InitElementProperties()
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN
+    EL_TUBE_RIGHT_DOWN,
+    -1
   };
-  static int ep_indestructible_num = SIZEOF_ARRAY_INT(ep_indestructible);
 
   static int ep_slippery[] =
   {
@@ -1434,9 +1434,9 @@ void InitElementProperties()
     EL_SPEED_PILL,
     EL_STEELWALL_SLANTED,
     EL_PEARL,
-    EL_CRYSTAL
+    EL_CRYSTAL,
+    -1
   };
-  static int ep_slippery_num = SIZEOF_ARRAY_INT(ep_slippery);
 
   static int ep_enemy[] =
   {
@@ -1449,9 +1449,9 @@ void InitElementProperties()
     EL_ROBOT,
     EL_PACMAN,
     EL_SP_SNIKSNAK,
-    EL_SP_ELECTRON
+    EL_SP_ELECTRON,
+    -1
   };
-  static int ep_enemy_num = SIZEOF_ARRAY_INT(ep_enemy);
 
   static int ep_mauer[] =
   {
@@ -1519,9 +1519,9 @@ void InitElementProperties()
     EL_EMC_WALL_5,
     EL_EMC_WALL_6,
     EL_EMC_WALL_7,
-    EL_EMC_WALL_8
+    EL_EMC_WALL_8,
+    -1
   };
-  static int ep_mauer_num = SIZEOF_ARRAY_INT(ep_mauer);
 
   static int ep_can_fall[] =
   {
@@ -1547,9 +1547,9 @@ void InitElementProperties()
     EL_PEARL,
     EL_CRYSTAL,
     EL_SPRING,
-    EL_DX_SUPABOMB
+    EL_DX_SUPABOMB,
+    -1
   };
-  static int ep_can_fall_num = SIZEOF_ARRAY_INT(ep_can_fall);
 
   static int ep_can_smash[] =
   {
@@ -1572,9 +1572,9 @@ void InitElementProperties()
     EL_PEARL,
     EL_CRYSTAL,
     EL_SPRING,
-    EL_DX_SUPABOMB
+    EL_DX_SUPABOMB,
+    -1
   };
-  static int ep_can_smash_num = SIZEOF_ARRAY_INT(ep_can_smash);
 
   static int ep_can_change[] =
   {
@@ -1585,9 +1585,9 @@ void InitElementProperties()
     EL_EMERALD_YELLOW,
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
-    EL_DIAMOND
+    EL_DIAMOND,
+    -1
   };
-  static int ep_can_change_num = SIZEOF_ARRAY_INT(ep_can_change);
 
   static int ep_can_move[] =
   {
@@ -1607,9 +1607,9 @@ void InitElementProperties()
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
     EL_BALLOON,
-    EL_SPRING
+    EL_SPRING,
+    -1
   };
-  static int ep_can_move_num = SIZEOF_ARRAY_INT(ep_can_move);
 
   static int ep_could_move[] =
   {
@@ -1632,18 +1632,18 @@ void InitElementProperties()
     EL_PACMAN_RIGHT,
     EL_PACMAN_UP,
     EL_PACMAN_LEFT,
-    EL_PACMAN_DOWN
+    EL_PACMAN_DOWN,
+    -1
   };
-  static int ep_could_move_num = SIZEOF_ARRAY_INT(ep_could_move);
 
   static int ep_dont_touch[] =
   {
     EL_BUG,
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
-    EL_BD_FIREFLY
+    EL_BD_FIREFLY,
+    -1
   };
-  static int ep_dont_touch_num = SIZEOF_ARRAY_INT(ep_dont_touch);
 
   static int ep_dont_go_to[] =
   {
@@ -1661,9 +1661,9 @@ void InitElementProperties()
     EL_SP_ELECTRON,
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_TRAP_ACTIVE,
-    EL_LANDMINE
+    EL_LANDMINE,
+    -1
   };
-  static int ep_dont_go_to_num = SIZEOF_ARRAY_INT(ep_dont_go_to);
 
   static int ep_mampf2[] =
   {
@@ -1688,9 +1688,9 @@ void InitElementProperties()
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
     EL_PEARL,
-    EL_CRYSTAL
+    EL_CRYSTAL,
+    -1
   };
-  static int ep_mampf2_num = SIZEOF_ARRAY_INT(ep_mampf2);
 
   static int ep_bd_element[] =
   {
@@ -1717,9 +1717,9 @@ void InitElementProperties()
     EL_BD_BUTTERFLY_3,
     EL_BD_BUTTERFLY_4,
     EL_BD_AMOEBA,
-    EL_CHAR_QUESTION
+    EL_CHAR_QUESTION,
+    -1
   };
-  static int ep_bd_element_num = SIZEOF_ARRAY_INT(ep_bd_element);
 
   static int ep_sb_element[] =
   {
@@ -1729,9 +1729,9 @@ void InitElementProperties()
     EL_SOKOBAN_FIELD_EMPTY,
     EL_SOKOBAN_FIELD_FULL,
     EL_PLAYER_1,
-    EL_INVISIBLE_STEELWALL
+    EL_INVISIBLE_STEELWALL,
+    -1
   };
-  static int ep_sb_element_num = SIZEOF_ARRAY_INT(ep_sb_element);
 
   static int ep_gem[] =
   {
@@ -1740,9 +1740,9 @@ void InitElementProperties()
     EL_EMERALD_YELLOW,
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
-    EL_DIAMOND
+    EL_DIAMOND,
+    -1
   };
-  static int ep_gem_num = SIZEOF_ARRAY_INT(ep_gem);
 
   static int ep_inactive[] =
   {
@@ -1876,9 +1876,9 @@ void InitElementProperties()
     EL_EMC_WALL_5,
     EL_EMC_WALL_6,
     EL_EMC_WALL_7,
-    EL_EMC_WALL_8
+    EL_EMC_WALL_8,
+    -1
   };
-  static int ep_inactive_num = SIZEOF_ARRAY_INT(ep_inactive);
 
   static int ep_explosive[] =
   {
@@ -1904,9 +1904,9 @@ void InitElementProperties()
     EL_SP_DISK_YELLOW,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
-    EL_DX_SUPABOMB
+    EL_DX_SUPABOMB,
+    -1
   };
-  static int ep_explosive_num = SIZEOF_ARRAY_INT(ep_explosive);
 
   static int ep_mampf3[] =
   {
@@ -1917,9 +1917,9 @@ void InitElementProperties()
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
     EL_PEARL,
-    EL_CRYSTAL
+    EL_CRYSTAL,
+    -1
   };
-  static int ep_mampf3_num = SIZEOF_ARRAY_INT(ep_mampf3);
 
   static int ep_pushable[] =
   {
@@ -1936,18 +1936,18 @@ void InitElementProperties()
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
     EL_SPRING,
-    EL_DX_SUPABOMB
+    EL_DX_SUPABOMB,
+    -1
   };
-  static int ep_pushable_num = SIZEOF_ARRAY_INT(ep_pushable);
 
   static int ep_player[] =
   {
     EL_PLAYER_1,
     EL_PLAYER_2,
     EL_PLAYER_3,
-    EL_PLAYER_4
+    EL_PLAYER_4,
+    -1
   };
-  static int ep_player_num = SIZEOF_ARRAY_INT(ep_player);
 
   static int ep_has_content[] =
   {
@@ -1955,9 +1955,9 @@ void InitElementProperties()
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
-    EL_BD_AMOEBA
+    EL_BD_AMOEBA,
+    -1
   };
-  static int ep_has_content_num = SIZEOF_ARRAY_INT(ep_has_content);
 
   static int ep_eatable[] =
   {
@@ -1967,9 +1967,9 @@ void InitElementProperties()
     EL_SP_BUGGY_BASE_ACTIVATING,
     EL_TRAP,
     EL_INVISIBLE_SAND,
-    EL_INVISIBLE_SAND_ACTIVE
+    EL_INVISIBLE_SAND_ACTIVE,
+    -1
   };
-  static int ep_eatable_num = SIZEOF_ARRAY_INT(ep_eatable);
 
   static int ep_sp_element[] =
   {
@@ -2017,9 +2017,9 @@ void InitElementProperties()
     /* additional elements that appeared in newer Supaplex levels */
     EL_INVISIBLE_WALL,
     /* more than one murphy in a level results in an inactive clone */
-    EL_SP_MURPHY_CLONE
+    EL_SP_MURPHY_CLONE,
+    -1
   };
-  static int ep_sp_element_num = SIZEOF_ARRAY_INT(ep_sp_element);
 
   static int ep_quick_gate[] =
   {
@@ -2043,9 +2043,9 @@ void InitElementProperties()
     EL_SP_PORT_VERTICAL,
     EL_SP_PORT_ANY,
     EL_SWITCHGATE_OPEN,
-    EL_TIMEGATE_OPEN
+    EL_TIMEGATE_OPEN,
+    -1
   };
-  static int ep_quick_gate_num = SIZEOF_ARRAY_INT(ep_quick_gate);
 
   static int ep_over_player[] =
   {
@@ -2070,9 +2070,9 @@ void InitElementProperties()
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN
+    EL_TUBE_RIGHT_DOWN,
+    -1
   };
-  static int ep_over_player_num = SIZEOF_ARRAY_INT(ep_over_player);
 
   static int ep_active_bomb[] =
   {
@@ -2081,9 +2081,9 @@ void InitElementProperties()
     EL_DYNABOMB_PLAYER_2_ACTIVE,
     EL_DYNABOMB_PLAYER_3_ACTIVE,
     EL_DYNABOMB_PLAYER_4_ACTIVE,
-    EL_SP_DISK_RED_ACTIVE
+    EL_SP_DISK_RED_ACTIVE,
+    -1
   };
-  static int ep_active_bomb_num = SIZEOF_ARRAY_INT(ep_active_bomb);
 
   static int ep_belt[] =
   {
@@ -2099,8 +2099,8 @@ void InitElementProperties()
     EL_CONVEYOR_BELT_4_LEFT,
     EL_CONVEYOR_BELT_4_MIDDLE,
     EL_CONVEYOR_BELT_4_RIGHT,
+    -1
   };
-  static int ep_belt_num = SIZEOF_ARRAY_INT(ep_belt);
 
   static int ep_belt_active[] =
   {
@@ -2116,8 +2116,8 @@ void InitElementProperties()
     EL_CONVEYOR_BELT_4_LEFT_ACTIVE,
     EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE,
     EL_CONVEYOR_BELT_4_RIGHT_ACTIVE,
+    -1
   };
-  static int ep_belt_active_num = SIZEOF_ARRAY_INT(ep_belt_active);
 
   static int ep_belt_switch[] =
   {
@@ -2133,8 +2133,8 @@ void InitElementProperties()
     EL_CONVEYOR_BELT_4_SWITCH_LEFT,
     EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
+    -1
   };
-  static int ep_belt_switch_num = SIZEOF_ARRAY_INT(ep_belt_switch);
 
   static int ep_tube[] =
   {
@@ -2148,171 +2148,81 @@ void InitElementProperties()
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
-    EL_TUBE_RIGHT_DOWN
+    EL_TUBE_RIGHT_DOWN,
+    -1
   };
-  static int ep_tube_num = SIZEOF_ARRAY_INT(ep_tube);
-
-  static int ep_em_slippery_wall[] =
-  {
-  };
-  static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
 
   static int ep_can_be_crumbled[] =
   {
     EL_SAND,
     EL_LANDMINE,
     EL_TRAP,
-    EL_TRAP_ACTIVE
+    EL_TRAP_ACTIVE,
+    -1
   };
-  static int ep_can_be_crumbled_num = SIZEOF_ARRAY_INT(ep_can_be_crumbled);
 
-  static long ep1_bit[] =
+  static struct
   {
-    EP_BIT_AMOEBALIVE,
-    EP_BIT_AMOEBOID,
-    EP_BIT_SCHLUESSEL,
-    EP_BIT_PFORTE,
-    EP_BIT_SOLID,
-    EP_BIT_INDESTRUCTIBLE,
-    EP_BIT_SLIPPERY,
-    EP_BIT_ENEMY,
-    EP_BIT_MAUER,
-    EP_BIT_CAN_FALL,
-    EP_BIT_CAN_SMASH,
-    EP_BIT_CAN_CHANGE,
-    EP_BIT_CAN_MOVE,
-    EP_BIT_COULD_MOVE,
-    EP_BIT_DONT_TOUCH,
-    EP_BIT_DONT_GO_TO,
-    EP_BIT_MAMPF2,
-    EP_BIT_BD_ELEMENT,
-    EP_BIT_SB_ELEMENT,
-    EP_BIT_GEM,
-    EP_BIT_INACTIVE,
-    EP_BIT_EXPLOSIVE,
-    EP_BIT_MAMPF3,
-    EP_BIT_PUSHABLE,
-    EP_BIT_PLAYER,
-    EP_BIT_HAS_CONTENT,
-    EP_BIT_EATABLE,
-    EP_BIT_SP_ELEMENT,
-    EP_BIT_QUICK_GATE,
-    EP_BIT_OVER_PLAYER,
-    EP_BIT_ACTIVE_BOMB
-  };
-  static long ep2_bit[] =
+    int *elements;
+    int property;
+  } element_properties[] =
   {
-    EP_BIT_BELT,
-    EP_BIT_BELT_ACTIVE,
-    EP_BIT_BELT_SWITCH,
-    EP_BIT_TUBE,
-    EP_BIT_EM_SLIPPERY_WALL,
-    EP_BIT_CAN_BE_CRUMBLED
+    { ep_amoebalive,		EP_AMOEBALIVE		},
+    { ep_amoeboid,		EP_AMOEBOID		},
+    { ep_schluessel,		EP_SCHLUESSEL		},
+    { ep_pforte,		EP_PFORTE		},
+    { ep_solid,			EP_SOLID		},
+    { ep_indestructible,	EP_INDESTRUCTIBLE	},
+    { ep_slippery,		EP_SLIPPERY		},
+    { ep_enemy,			EP_ENEMY		},
+    { ep_mauer,			EP_MAUER		},
+    { ep_can_fall,		EP_CAN_FALL		},
+    { ep_can_smash,		EP_CAN_SMASH		},
+    { ep_can_change,		EP_CAN_CHANGE		},
+    { ep_can_move,		EP_CAN_MOVE		},
+    { ep_could_move,		EP_COULD_MOVE		},
+    { ep_dont_touch,		EP_DONT_TOUCH		},
+    { ep_dont_go_to,		EP_DONT_GO_TO		},
+    { ep_mampf2,		EP_MAMPF2		},
+    { ep_bd_element,		EP_BD_ELEMENT		},
+    { ep_sb_element,		EP_SB_ELEMENT		},
+    { ep_gem,			EP_GEM			},
+    { ep_inactive,		EP_INACTIVE		},
+    { ep_explosive,		EP_EXPLOSIVE		},
+    { ep_mampf3,		EP_MAMPF3		},
+    { ep_pushable,		EP_PUSHABLE		},
+    { ep_player,		EP_PLAYER		},
+    { ep_has_content,		EP_HAS_CONTENT		},
+    { ep_eatable,		EP_EATABLE		},
+    { ep_sp_element,		EP_SP_ELEMENT		},
+    { ep_quick_gate,		EP_QUICK_GATE		},
+    { ep_over_player,		EP_OVER_PLAYER		},
+    { ep_active_bomb,		EP_ACTIVE_BOMB		},
+    { ep_belt,			EP_BELT			},
+    { ep_belt_active,		EP_BELT_ACTIVE		},
+    { ep_belt_switch,		EP_BELT_SWITCH		},
+    { ep_tube,			EP_TUBE			},
+    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
+    { NULL,			-1			}
   };
-  static int *ep1_array[] =
-  {
-    ep_amoebalive,
-    ep_amoeboid,
-    ep_schluessel,
-    ep_pforte,
-    ep_solid,
-    ep_indestructible,
-    ep_slippery,
-    ep_enemy,
-    ep_mauer,
-    ep_can_fall,
-    ep_can_smash,
-    ep_can_change,
-    ep_can_move,
-    ep_could_move,
-    ep_dont_touch,
-    ep_dont_go_to,
-    ep_mampf2,
-    ep_bd_element,
-    ep_sb_element,
-    ep_gem,
-    ep_inactive,
-    ep_explosive,
-    ep_mampf3,
-    ep_pushable,
-    ep_player,
-    ep_has_content,
-    ep_eatable,
-    ep_sp_element,
-    ep_quick_gate,
-    ep_over_player,
-    ep_active_bomb
-  };
-  static int *ep2_array[] =
-  {
-    ep_belt,
-    ep_belt_active,
-    ep_belt_switch,
-    ep_tube,
-    ep_em_slippery_wall,
-    ep_can_be_crumbled
-  };
-  static int *ep1_num[] =
-  {
-    &ep_amoebalive_num,
-    &ep_amoeboid_num,
-    &ep_schluessel_num,
-    &ep_pforte_num,
-    &ep_solid_num,
-    &ep_indestructible_num,
-    &ep_slippery_num,
-    &ep_enemy_num,
-    &ep_mauer_num,
-    &ep_can_fall_num,
-    &ep_can_smash_num,
-    &ep_can_change_num,
-    &ep_can_move_num,
-    &ep_could_move_num,
-    &ep_dont_touch_num,
-    &ep_dont_go_to_num,
-    &ep_mampf2_num,
-    &ep_bd_element_num,
-    &ep_sb_element_num,
-    &ep_gem_num,
-    &ep_inactive_num,
-    &ep_explosive_num,
-    &ep_mampf3_num,
-    &ep_pushable_num,
-    &ep_player_num,
-    &ep_has_content_num,
-    &ep_eatable_num,
-    &ep_sp_element_num,
-    &ep_quick_gate_num,
-    &ep_over_player_num,
-    &ep_active_bomb_num
-  };
-  static int *ep2_num[] =
-  {
-    &ep_belt_num,
-    &ep_belt_active_num,
-    &ep_belt_switch_num,
-    &ep_tube_num,
-    &ep_em_slippery_wall_num,
-    &ep_can_be_crumbled_num
-  };
-  static int num_properties1 = SIZEOF_ARRAY(ep1_num, int *);
-  static int num_properties2 = SIZEOF_ARRAY(ep2_num, int *);
 
+  /* always start with reliable default values (no properties) */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
-  {
-    Properties1[i] = 0;
-    Properties2[i] = 0;
-  }
+    for (j=0; j<NUM_EP_BITFIELDS; j++)
+      Properties[i][j] = EP_BITMASK_DEFAULT;
 
-  for (i=0; i<num_properties1; i++)
-    for (j=0; j<*(ep1_num[i]); j++)
-      Properties1[(ep1_array[i])[j]] |= ep1_bit[i];
-  for (i=0; i<num_properties2; i++)
-    for (j=0; j<*(ep2_num[i]); j++)
-      Properties2[(ep2_array[i])[j]] |= ep2_bit[i];
+  /* set all predefined element properties from above arrays */
+  for (i=0; element_properties[i].elements != NULL; i++)
+    for (j=0; (element_properties[i].elements)[j] >= 0; j++)
+      SET_PROPERTY((element_properties[i].elements)[j],
+		   element_properties[i].property, TRUE);
 
+  /* set properties of character elements */
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    Properties1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
+  {
+    SET_PROPERTY(i, EP_CHAR, TRUE);
+    SET_PROPERTY(i, EP_INACTIVE, TRUE);
+  }
 }
 
 static void InitGlobal()

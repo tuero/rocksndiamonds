@@ -535,19 +535,30 @@ static void InitGameEngine()
 
     for (i=0; i<ep_em_slippery_wall_num; i++)
     {
+#if 1
+      SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
+		   level.em_slippery_gems);
+#else
       if (level.em_slippery_gems)	/* special EM style gems behaviour */
-	Properties2[ep_em_slippery_wall[i]] |=
+	PROPERTY_VAR(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL) |=
 	  EP_BIT_EM_SLIPPERY_WALL;
       else
-	Properties2[ep_em_slippery_wall[i]] &=
+	PROPERTY_VAR(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL) &=
 	  ~EP_BIT_EM_SLIPPERY_WALL;
+#endif
     }
 
     /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
+#if 1
+    SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
+		 (level.em_slippery_gems &&
+		  game.engine_version > VERSION_IDENT(2,0,1)));
+#else
     if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
       Properties2[EL_EXPANDABLE_WALL_GROWING] |= EP_BIT_EM_SLIPPERY_WALL;
     else
       Properties2[EL_EXPANDABLE_WALL_GROWING] &=~EP_BIT_EM_SLIPPERY_WALL;
+#endif
   }
 
   /* initialize changing elements information */

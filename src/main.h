@@ -60,89 +60,144 @@
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
-/* values for 'Properties1' */
-#define EP_BIT_AMOEBALIVE	(1 << 0)
-#define EP_BIT_AMOEBOID		(1 << 1)
-#define EP_BIT_SCHLUESSEL	(1 << 2)
-#define EP_BIT_PFORTE		(1 << 3)
-#define EP_BIT_SOLID		(1 << 4)
-#define EP_BIT_INDESTRUCTIBLE	(1 << 5)
-#define EP_BIT_SLIPPERY		(1 << 6)
-#define EP_BIT_ENEMY		(1 << 7)
-#define EP_BIT_MAUER		(1 << 8)
-#define EP_BIT_CAN_FALL		(1 << 9)
-#define EP_BIT_CAN_SMASH	(1 << 10)
-#define EP_BIT_CAN_CHANGE	(1 << 11)
-#define EP_BIT_CAN_MOVE		(1 << 12)
-#define EP_BIT_COULD_MOVE	(1 << 13)
-#define EP_BIT_DONT_TOUCH	(1 << 14)
-#define EP_BIT_DONT_GO_TO	(1 << 15)
-#define EP_BIT_MAMPF2		(1 << 16)
-#define EP_BIT_CHAR		(1 << 17)
-#define EP_BIT_BD_ELEMENT	(1 << 18)
-#define EP_BIT_SB_ELEMENT	(1 << 19)
-#define EP_BIT_GEM		(1 << 20)
-#define EP_BIT_INACTIVE		(1 << 21)
-#define EP_BIT_EXPLOSIVE	(1 << 22)
-#define EP_BIT_MAMPF3		(1 << 23)
-#define EP_BIT_PUSHABLE		(1 << 24)
-#define EP_BIT_PLAYER		(1 << 25)
-#define EP_BIT_HAS_CONTENT	(1 << 26)
-#define EP_BIT_EATABLE		(1 << 27)
-#define EP_BIT_SP_ELEMENT	(1 << 28)
-#define EP_BIT_QUICK_GATE	(1 << 29)
-#define EP_BIT_OVER_PLAYER	(1 << 30)
-#define EP_BIT_ACTIVE_BOMB	(1 << 31)
+/* property values */
+#define EP_AMOEBALIVE		0
+#define EP_AMOEBOID		1
+#define EP_SCHLUESSEL		2
+#define EP_PFORTE		3
+#define EP_SOLID		4
+#define EP_INDESTRUCTIBLE	5
+#define EP_SLIPPERY		6
+#define EP_ENEMY		7
+#define EP_MAUER		8
+#define EP_CAN_FALL		9
+#define EP_CAN_SMASH		10
+#define EP_CAN_CHANGE		11
+#define EP_CAN_MOVE		12
+#define EP_COULD_MOVE		13
+#define EP_DONT_TOUCH		14
+#define EP_DONT_GO_TO		15
+#define EP_MAMPF2		16
+#define EP_CHAR			17
+#define EP_BD_ELEMENT		18
+#define EP_SB_ELEMENT		19
+#define EP_GEM			20
+#define EP_INACTIVE		21
+#define EP_EXPLOSIVE		22
+#define EP_MAMPF3		23
+#define EP_PUSHABLE		24
+#define EP_PLAYER		25
+#define EP_HAS_CONTENT		26
+#define EP_EATABLE		27
+#define EP_SP_ELEMENT		28
+#define EP_QUICK_GATE		29
+#define EP_OVER_PLAYER		30
+#define EP_ACTIVE_BOMB		31
+
+#define EP_BELT			32
+#define EP_BELT_ACTIVE		33
+#define EP_BELT_SWITCH		34
+#define EP_TUBE			35
+#define EP_EM_SLIPPERY_WALL	36
+#define EP_CAN_BE_CRUMBLED	37
+
+#define NUM_ELEMENT_PROPERTIES	38
+
+#define NUM_EP_BITFIELDS	(NUM_ELEMENT_PROPERTIES / 32)
+#define EP_BITFIELD_BASE	0
+
+#define PROPERTY_BIT(p)		(1 << ((p) % 32))
+#define PROPERTY_VAR(e, p)	(Properties[e][(p) / 32])
+#define PROPERTY_VALUE(e, p)	(PROPERTY_VAR(e, p) & PROPERTY_BIT(p))
+#define SET_PROPERTY(e, p, v)	((v) ?					   \
+				 (PROPERTY_VAR(e,p) |=  PROPERTY_BIT(p)) : \
+				 (PROPERTY_VAR(e,p) &= ~PROPERTY_BIT(p)))
+
+/* property bit masks */
+#define EP_BIT_AMOEBALIVE	PROPERTY_BIT(EP_AMOEBALIVE)
+#define EP_BIT_AMOEBOID		PROPERTY_BIT(EP_AMOEBOID)
+#define EP_BIT_SCHLUESSEL	PROPERTY_BIT(EP_SCHLUESSEL)
+#define EP_BIT_PFORTE		PROPERTY_BIT(EP_PFORTE)
+#define EP_BIT_SOLID		PROPERTY_BIT(EP_SOLID)
+#define EP_BIT_INDESTRUCTIBLE	PROPERTY_BIT(EP_INDESTRUCTIBLE)
+#define EP_BIT_SLIPPERY		PROPERTY_BIT(EP_SLIPPERY)
+#define EP_BIT_ENEMY		PROPERTY_BIT(EP_ENEMY)
+#define EP_BIT_MAUER		PROPERTY_BIT(EP_MAUER)
+#define EP_BIT_CAN_FALL		PROPERTY_BIT(EP_CAN_FALL)
+#define EP_BIT_CAN_SMASH	PROPERTY_BIT(EP_CAN_SMASH)
+#define EP_BIT_CAN_CHANGE	PROPERTY_BIT(EP_CAN_CHANGE)
+#define EP_BIT_CAN_MOVE		PROPERTY_BIT(EP_CAN_MOVE)
+#define EP_BIT_COULD_MOVE	PROPERTY_BIT(EP_COULD_MOVE)
+#define EP_BIT_DONT_TOUCH	PROPERTY_BIT(EP_DONT_TOUCH)
+#define EP_BIT_DONT_GO_TO	PROPERTY_BIT(EP_DONT_GO_TO)
+#define EP_BIT_MAMPF2		PROPERTY_BIT(EP_MAMPF2)
+#define EP_BIT_CHAR		PROPERTY_BIT(EP_CHAR)
+#define EP_BIT_BD_ELEMENT	PROPERTY_BIT(EP_BD_ELEMENT)
+#define EP_BIT_SB_ELEMENT	PROPERTY_BIT(EP_SB_ELEMENT)
+#define EP_BIT_GEM		PROPERTY_BIT(EP_GEM)
+#define EP_BIT_INACTIVE		PROPERTY_BIT(EP_INACTIVE)
+#define EP_BIT_EXPLOSIVE	PROPERTY_BIT(EP_EXPLOSIVE)
+#define EP_BIT_MAMPF3		PROPERTY_BIT(EP_MAMPF3)
+#define EP_BIT_PUSHABLE		PROPERTY_BIT(EP_PUSHABLE)
+#define EP_BIT_PLAYER		PROPERTY_BIT(EP_PLAYER)
+#define EP_BIT_HAS_CONTENT	PROPERTY_BIT(EP_HAS_CONTENT)
+#define EP_BIT_EATABLE		PROPERTY_BIT(EP_EATABLE)
+#define EP_BIT_SP_ELEMENT	PROPERTY_BIT(EP_SP_ELEMENT)
+#define EP_BIT_QUICK_GATE	PROPERTY_BIT(EP_QUICK_GATE)
+#define EP_BIT_OVER_PLAYER	PROPERTY_BIT(EP_OVER_PLAYER)
+#define EP_BIT_ACTIVE_BOMB	PROPERTY_BIT(EP_ACTIVE_BOMB)
 
 /* values for 'Properties2' */
-#define EP_BIT_BELT		(1 << 0)
-#define EP_BIT_BELT_ACTIVE	(1 << 1)
-#define EP_BIT_BELT_SWITCH	(1 << 2)
-#define EP_BIT_TUBE		(1 << 3)
-#define EP_BIT_EM_SLIPPERY_WALL	(1 << 4)
-#define EP_BIT_CAN_BE_CRUMBLED	(1 << 5)
+#define EP_BIT_BELT		PROPERTY_BIT(EP_BELT)
+#define EP_BIT_BELT_ACTIVE	PROPERTY_BIT(EP_BELT_ACTIVE)
+#define EP_BIT_BELT_SWITCH	PROPERTY_BIT(EP_BELT_SWITCH)
+#define EP_BIT_TUBE		PROPERTY_BIT(EP_TUBE)
+#define EP_BIT_EM_SLIPPERY_WALL	PROPERTY_BIT(EP_EM_SLIPPERY_WALL)
+#define EP_BIT_CAN_BE_CRUMBLED	PROPERTY_BIT(EP_CAN_BE_CRUMBLED)
+
 
 #define EP_BITMASK_DEFAULT	0
 
-#define IS_AMOEBALIVE(e)	(Properties1[e] & EP_BIT_AMOEBALIVE)
-#define IS_AMOEBOID(e)		(Properties1[e] & EP_BIT_AMOEBOID)
-#define IS_SCHLUESSEL(e)	(Properties1[e] & EP_BIT_SCHLUESSEL)
-#define IS_PFORTE(e)		(Properties1[e] & EP_BIT_PFORTE)
-#define IS_SOLID(e)		(Properties1[e] & EP_BIT_SOLID)
-#define IS_INDESTRUCTIBLE(e)	(Properties1[e] & EP_BIT_INDESTRUCTIBLE)
-#define IS_SLIPPERY(e)		(Properties1[e] & EP_BIT_SLIPPERY)
-#define IS_ENEMY(e)		(Properties1[e] & EP_BIT_ENEMY)
-#define IS_MAUER(e)		(Properties1[e] & EP_BIT_MAUER)
-#define CAN_FALL(e)		(Properties1[e] & EP_BIT_CAN_FALL)
-#define CAN_SMASH(e)		(Properties1[e] & EP_BIT_CAN_SMASH)
-#define CAN_CHANGE(e)		(Properties1[e] & EP_BIT_CAN_CHANGE)
-#define CAN_MOVE(e)		(Properties1[e] & EP_BIT_CAN_MOVE)
-#define COULD_MOVE(e)		(Properties1[e] & EP_BIT_COULD_MOVE)
-#define DONT_TOUCH(e)		(Properties1[e] & EP_BIT_DONT_TOUCH)
-#define DONT_GO_TO(e)		(Properties1[e] & EP_BIT_DONT_GO_TO)
-#define IS_MAMPF2(e)		(Properties1[e] & EP_BIT_MAMPF2)
-#define IS_CHAR(e)		(Properties1[e] & EP_BIT_CHAR)
-#define IS_BD_ELEMENT(e)	(Properties1[e] & EP_BIT_BD_ELEMENT)
-#define IS_SB_ELEMENT(e)	(Properties1[e] & EP_BIT_SB_ELEMENT)
-#define IS_GEM(e)		(Properties1[e] & EP_BIT_GEM)
-#define IS_INACTIVE(e)		(Properties1[e] & EP_BIT_INACTIVE)
-#define IS_EXPLOSIVE(e)		(Properties1[e] & EP_BIT_EXPLOSIVE)
-#define IS_MAMPF3(e)		(Properties1[e] & EP_BIT_MAMPF3)
-#define IS_PUSHABLE(e)		(Properties1[e] & EP_BIT_PUSHABLE)
-#define ELEM_IS_PLAYER(e)	(Properties1[e] & EP_BIT_PLAYER)
-#define HAS_CONTENT(e)		(Properties1[e] & EP_BIT_HAS_CONTENT)
-#define IS_EATABLE(e)		(Properties1[e] & EP_BIT_EATABLE)
-#define IS_SP_ELEMENT(e)	(Properties1[e] & EP_BIT_SP_ELEMENT)
-#define IS_QUICK_GATE(e)	(Properties1[e] & EP_BIT_QUICK_GATE)
-#define IS_OVER_PLAYER(e)	(Properties1[e] & EP_BIT_OVER_PLAYER)
-#define IS_ACTIVE_BOMB(e)	(Properties1[e] & EP_BIT_ACTIVE_BOMB)
+/* property macros */
+#define IS_AMOEBALIVE(e)	PROPERTY_VALUE(e, EP_AMOEBALIVE)
+#define IS_AMOEBOID(e)		PROPERTY_VALUE(e, EP_AMOEBOID)
+#define IS_SCHLUESSEL(e)	PROPERTY_VALUE(e, EP_SCHLUESSEL)
+#define IS_PFORTE(e)		PROPERTY_VALUE(e, EP_PFORTE)
+#define IS_SOLID(e)		PROPERTY_VALUE(e, EP_SOLID)
+#define IS_INDESTRUCTIBLE(e)	PROPERTY_VALUE(e, EP_INDESTRUCTIBLE)
+#define IS_SLIPPERY(e)		PROPERTY_VALUE(e, EP_SLIPPERY)
+#define IS_ENEMY(e)		PROPERTY_VALUE(e, EP_ENEMY)
+#define IS_MAUER(e)		PROPERTY_VALUE(e, EP_MAUER)
+#define CAN_FALL(e)		PROPERTY_VALUE(e, EP_CAN_FALL)
+#define CAN_SMASH(e)		PROPERTY_VALUE(e, EP_CAN_SMASH)
+#define CAN_CHANGE(e)		PROPERTY_VALUE(e, EP_CAN_CHANGE)
+#define CAN_MOVE(e)		PROPERTY_VALUE(e, EP_CAN_MOVE)
+#define COULD_MOVE(e)		PROPERTY_VALUE(e, EP_COULD_MOVE)
+#define DONT_TOUCH(e)		PROPERTY_VALUE(e, EP_DONT_TOUCH)
+#define DONT_GO_TO(e)		PROPERTY_VALUE(e, EP_DONT_GO_TO)
+#define IS_MAMPF2(e)		PROPERTY_VALUE(e, EP_MAMPF2)
+#define IS_CHAR(e)		PROPERTY_VALUE(e, EP_CHAR)
+#define IS_BD_ELEMENT(e)	PROPERTY_VALUE(e, EP_BD_ELEMENT)
+#define IS_SB_ELEMENT(e)	PROPERTY_VALUE(e, EP_SB_ELEMENT)
+#define IS_GEM(e)		PROPERTY_VALUE(e, EP_GEM)
+#define IS_INACTIVE(e)		PROPERTY_VALUE(e, EP_INACTIVE)
+#define IS_EXPLOSIVE(e)		PROPERTY_VALUE(e, EP_EXPLOSIVE)
+#define IS_MAMPF3(e)		PROPERTY_VALUE(e, EP_MAMPF3)
+#define IS_PUSHABLE(e)		PROPERTY_VALUE(e, EP_PUSHABLE)
+#define ELEM_IS_PLAYER(e)	PROPERTY_VALUE(e, EP_PLAYER)
+#define HAS_CONTENT(e)		PROPERTY_VALUE(e, EP_HAS_CONTENT)
+#define IS_EATABLE(e)		PROPERTY_VALUE(e, EP_EATABLE)
+#define IS_SP_ELEMENT(e)	PROPERTY_VALUE(e, EP_SP_ELEMENT)
+#define IS_QUICK_GATE(e)	PROPERTY_VALUE(e, EP_QUICK_GATE)
+#define IS_OVER_PLAYER(e)	PROPERTY_VALUE(e, EP_OVER_PLAYER)
+#define IS_ACTIVE_BOMB(e)	PROPERTY_VALUE(e, EP_ACTIVE_BOMB)
 
-#define IS_BELT(e)		(Properties2[e] & EP_BIT_BELT)
-#define IS_BELT_ACTIVE(e)	(Properties2[e] & EP_BIT_BELT_ACTIVE)
-#define IS_BELT_SWITCH(e)	(Properties2[e] & EP_BIT_BELT_SWITCH)
-#define IS_TUBE(e)		(Properties2[e] & EP_BIT_TUBE)
-#define IS_EM_SLIPPERY_WALL(e)	(Properties2[e] & EP_BIT_EM_SLIPPERY_WALL)
-#define CAN_BE_CRUMBLED(e)	(Properties2[e] & EP_BIT_CAN_BE_CRUMBLED)
+#define IS_BELT(e)		PROPERTY_VALUE(e, EP_BELT)
+#define IS_BELT_ACTIVE(e)	PROPERTY_VALUE(e, EP_BELT_ACTIVE)
+#define IS_BELT_SWITCH(e)	PROPERTY_VALUE(e, EP_BELT_SWITCH)
+#define IS_TUBE(e)		PROPERTY_VALUE(e, EP_TUBE)
+#define IS_EM_SLIPPERY_WALL(e)	PROPERTY_VALUE(e, EP_EM_SLIPPERY_WALL)
+#define CAN_BE_CRUMBLED(e)	PROPERTY_VALUE(e, EP_CAN_BE_CRUMBLED)
 
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
 	 			 (e) <= EL_CUSTOM_END)
@@ -1178,8 +1233,7 @@ extern short			AmoebaCnt2[MAX_NUM_AMOEBA];
 extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-extern unsigned long		Properties1[MAX_NUM_ELEMENTS];
-extern unsigned long		Properties2[MAX_NUM_ELEMENTS];
+extern unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

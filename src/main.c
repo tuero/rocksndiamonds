@@ -55,8 +55,7 @@ short			AmoebaCnt2[MAX_NUM_AMOEBA];
 short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-unsigned long		Properties1[MAX_NUM_ELEMENTS];
-unsigned long		Properties2[MAX_NUM_ELEMENTS];
+unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
 
 int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

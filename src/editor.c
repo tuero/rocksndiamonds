@@ -531,6 +531,9 @@ static int random_placement_background_element = EL_SAND;
 static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
 
+#if 1
+boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
+#else
 static struct
 {
   boolean indestructible;
@@ -539,6 +542,7 @@ static struct
   boolean pushable;
   boolean slippery;
 } custom_element_properties[NUM_CUSTOM_ELEMENTS];
+#endif
 
 static struct
 {
@@ -857,31 +861,31 @@ static struct
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,
-    &custom_element_properties[0].indestructible,
+    &custom_element_properties[EP_INDESTRUCTIBLE],
     "indestructible",			"element cannot be destroyed"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
     GADGET_ID_CUSTOM_CAN_FALL,
-    &custom_element_properties[0].can_fall,
+    &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
     GADGET_ID_CUSTOM_CAN_SMASH,
-    &custom_element_properties[0].can_smash,
+    &custom_element_properties[EP_CAN_SMASH],
     "can smash",			"element can smash other elements"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
     GADGET_ID_CUSTOM_PUSHABLE,
-    &custom_element_properties[0].pushable,
+    &custom_element_properties[EP_PUSHABLE],
     "pushable",				"element can be pushed"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
     GADGET_ID_CUSTOM_SLIPPERY,
-    &custom_element_properties[0].slippery,
+    &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   }
 };
@@ -2808,6 +2812,25 @@ static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
       dst[x][y] = src[x][y];
 }
 
+#if 1
+static void CopyCustomElementPropertiesToEditor(int element)
+{
+  int i;
+
+  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
+    custom_element_properties[i] = PROPERTY_VALUE(element, i);
+}
+
+static void CopyCustomElementPropertiesToGame(int element)
+{
+  int i;
+
+  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
+    SET_PROPERTY(element, i, custom_element_properties[i]);
+}
+
+#else
+
 static void CopyCustomElementPropertiesToEditor()
 {
   int i;
@@ -2870,6 +2893,7 @@ static void CopyCustomElementPropertiesToGame()
       Properties1[element] &= ~EP_BIT_SLIPPERY;
   }
 }
+#endif
 
 void DrawLevelEd()
 {
@@ -3480,16 +3504,20 @@ static void DrawPropertiesConfig()
 
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
+#if 0
     int nr = properties_element - EL_CUSTOM_START;
+#endif
 
-    CopyCustomElementPropertiesToEditor();
+    CopyCustomElementPropertiesToEditor(properties_element);
 
     /* draw checkbutton gadget */
     i = ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE;
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
+#if 0
     checkbutton_info[i].value = &custom_element_properties[nr].indestructible;
+#endif
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
@@ -3501,7 +3529,9 @@ static void DrawPropertiesConfig()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
+#if 0
     checkbutton_info[i].value = &custom_element_properties[nr].can_fall;
+#endif
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
@@ -3513,7 +3543,9 @@ static void DrawPropertiesConfig()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
+#if 0
     checkbutton_info[i].value = &custom_element_properties[nr].can_smash;
+#endif
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
@@ -3525,7 +3557,9 @@ static void DrawPropertiesConfig()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
+#if 0
     checkbutton_info[i].value = &custom_element_properties[nr].pushable;
+#endif
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
@@ -3537,7 +3571,9 @@ static void DrawPropertiesConfig()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
+#if 0
     checkbutton_info[i].value = &custom_element_properties[nr].slippery;
+#endif
 
     DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
@@ -4794,7 +4830,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
   if (type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
       type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST)
-    CopyCustomElementPropertiesToGame();
+    CopyCustomElementPropertiesToGame(properties_element);
 }
 
 static void HandleControlButtons(struct GadgetInfo *gi)
