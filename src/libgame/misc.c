@@ -283,48 +283,6 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 /* random generator functions                                                */
 /* ------------------------------------------------------------------------- */
 
-#if 0
-unsigned int SimpleRND(unsigned int max)
-{
-  return (random_linux_libc(RND_FREE) % max);
-}
-
-unsigned int InitSimpleRND(long seed)
-{
-  if (seed == NEW_RANDOMIZE)
-  {
-    struct timeval current_time;
-
-    gettimeofday(&current_time, NULL);
-    seed = (long)current_time.tv_usec;
-  }
-
-  srandom_linux_libc(RND_FREE, (unsigned int) seed);
-
-  return (unsigned int) seed;
-}
-
-unsigned int RND(unsigned int max)
-{
-  return (random_linux_libc(RND_GAME) % max);
-}
-
-unsigned int InitRND(long seed)
-{
-  if (seed == NEW_RANDOMIZE)
-  {
-    struct timeval current_time;
-
-    gettimeofday(&current_time, NULL);
-    seed = (long)current_time.tv_usec;
-  }
-
-  srandom_linux_libc(RND_GAME, (unsigned int) seed);
-
-  return (unsigned int) seed;
-}
-#endif
-
 unsigned int init_random_number(int nr, long seed)
 {
   if (seed == NEW_RANDOMIZE)
@@ -344,27 +302,10 @@ unsigned int init_random_number(int nr, long seed)
   return (unsigned int) seed;
 }
 
-#if 1
-unsigned int get_random_number(int nr, unsigned int max)
+unsigned int get_random_number(int nr, int max)
 {
   return (max > 0 ? random_linux_libc(nr) % max : 0);
 }
-#else
-unsigned int get_random_number(int nr, unsigned int max)
-{
-  unsigned int rnd = (max > 0 ? random_linux_libc(nr) % max : 0);
-
-  if (nr == 0 && FrameCounter < 2)
-    printf("::: %d [%d]\n", rnd, FrameCounter);
-
-#if 0
-  if (nr == 0 && FrameCounter < 2 && rnd == 8)
-    rnd /= 0;
-#endif
-
-  return rnd;
-}
-#endif
 
 
 /* ------------------------------------------------------------------------- */

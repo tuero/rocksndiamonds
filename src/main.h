@@ -1089,7 +1089,7 @@
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
 #define PROGRAM_VERSION_PATCH	8
-#define PROGRAM_VERSION_BUILD	0
+#define PROGRAM_VERSION_BUILD	1
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
@@ -1217,6 +1217,7 @@ struct PlayerInfo
   int anim_delay_counter;
   int post_delay_counter;
 
+  int action_waiting;
   int special_action_bored;
   int special_action_sleeping;
 
@@ -1545,7 +1546,12 @@ struct MusicPrefixInfo
 
 struct MusicFileInfo
 {
-  char *context;
+  char *basename;
+
+  char *title_header;
+  char *artist_header;
+  char *album_header;
+  char *year_header;
 
   char *title;
   char *artist;
@@ -1553,6 +1559,8 @@ struct MusicFileInfo
   char *year;
 
   int music;
+
+  boolean is_sound;
 
   struct MusicFileInfo *next;
 };

@@ -1071,8 +1071,10 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_TURNING_LEFT,		"turning left"			},
   { MV_TURNING_RIGHT,		"turning right"			},
   { MV_WHEN_PUSHED,		"when pushed"			},
+#if 0
   { MV_MAZE_RUNNER,		"maze runner style"		},
   { MV_MAZE_HUNTER,		"maze hunter style"		},
+#endif
   { -1,				NULL				}
 };
 
@@ -1148,8 +1150,12 @@ static struct ValueTextInfo options_change_direct_action[] =
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
   { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
   { CE_SWITCHED,		"switched ..."			},
+#if 0
   { CE_COLLISION_ACTIVE,	"hitting something ..."		},
   { CE_COLLISION_PASSIVE,	"hit by something ..."		},
+#else
+  { CE_COLLISION_ACTIVE,	"collision ..."			},
+#endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
   { -1,				NULL				}
@@ -1166,8 +1172,10 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
   { CE_OTHER_IS_TOUCHING,	"touching ..."			},
+#if 0
   { CE_OTHER_IS_COLL_ACTIVE,	"hitting ..."			},
   { CE_OTHER_IS_COLL_PASSIVE,	"hit by ..."			},
+#endif
   { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
   { CE_OTHER_IS_CHANGING,	"change of"			},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},

@@ -2829,12 +2829,12 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
 #endif
 }
 
-static struct MusicFileInfo *get_music_file_info(char *basename, int music)
+static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
+						     boolean is_sound)
 {
   SetupFileHash *setup_file_hash = NULL;
   struct MusicFileInfo tmp_music_file_info, *new_music_file_info;
-  char *filename_music = getCustomMusicFilename(basename);
-  char *filename_prefix, *filename_info;
+  char *filename_music, *filename_prefix, *filename_info;
   struct
   {
     char *token;
@@ -2842,14 +2842,22 @@ static struct MusicFileInfo *get_music_file_info(char *basename, int music)
   }
   token_to_value_ptr[] =
   {
-    { "context",	&tmp_music_file_info.context	},
-    { "title",		&tmp_music_file_info.title	},
-    { "artist",		&tmp_music_file_info.artist	},
-    { "album",		&tmp_music_file_info.album	},
-    { "year",		&tmp_music_file_info.year	},
-    { NULL,		NULL				},
+    { "title_header",	&tmp_music_file_info.title_header	},
+    { "artist_header",	&tmp_music_file_info.artist_header	},
+    { "album_header",	&tmp_music_file_info.album_header	},
+    { "year_header",	&tmp_music_file_info.year_header	},
+
+    { "title",		&tmp_music_file_info.title		},
+    { "artist",		&tmp_music_file_info.artist		},
+    { "album",		&tmp_music_file_info.album		},
+    { "year",		&tmp_music_file_info.year		},
+
+    { NULL,		NULL					},
   };
   int i;
+
+  filename_music = (is_sound ? getCustomSoundFilename(basename) :
+		    getCustomMusicFilename(basename));
 
   if (filename_music == NULL)
     return NULL;
@@ -2904,7 +2912,9 @@ static struct MusicFileInfo *get_music_file_info(char *basename, int music)
       getStringCopy(value != NULL ? value : UNKNOWN_NAME);
   }
 
+  tmp_music_file_info.basename = basename;
   tmp_music_file_info.music = music;
+  tmp_music_file_info.is_sound = is_sound;
 
   new_music_file_info = checked_malloc(sizeof(struct MusicFileInfo));
   *new_music_file_info = tmp_music_file_info;
@@ -2912,14 +2922,45 @@ static struct MusicFileInfo *get_music_file_info(char *basename, int music)
   return new_music_file_info;
 }
 
+static struct MusicFileInfo *get_music_file_info(char *basename, int music)
+{
+  return get_music_file_info_ext(basename, music, FALSE);
+}
+
+static struct MusicFileInfo *get_sound_file_info(char *basename, int sound)
+{
+  return get_music_file_info_ext(basename, sound, TRUE);
+}
+
+static boolean music_info_listed_ext(struct MusicFileInfo *list,
+				     char *basename, boolean is_sound)
+{
+  for (; list != NULL; list = list->next)
+    if (list->is_sound == is_sound && strcmp(list->basename, basename) == 0)
+      return TRUE;
+
+  return FALSE;
+}
+
+static boolean music_info_listed(struct MusicFileInfo *list, char *basename)
+{
+  return music_info_listed_ext(list, basename, FALSE);
+}
+
+static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
+{
+  return music_info_listed_ext(list, basename, TRUE);
+}
+
 void LoadMusicInfo()
 {
   char *music_directory = getCustomMusicDirectory();
   int num_music = getMusicListSize();
   int num_music_noconf = 0;
+  int num_sounds = getSoundListSize();
   DIR *dir;
   struct dirent *dir_entry;
-  struct FileInfo *music;
+  struct FileInfo *music, *sound;
   struct MusicFileInfo *next, **new;
   int i;
 
@@ -2927,8 +2968,15 @@ void LoadMusicInfo()
   {
     next = music_file_info->next;
 
-    if (music_file_info->context)
-      free(music_file_info->context);
+    if (music_file_info->title_header)
+      free(music_file_info->title_header);
+    if (music_file_info->artist_header)
+      free(music_file_info->artist_header);
+    if (music_file_info->album_header)
+      free(music_file_info->album_header);
+    if (music_file_info->year_header)
+      free(music_file_info->year_header);
+
     if (music_file_info->title)
       free(music_file_info->title);
     if (music_file_info->artist)
@@ -2945,7 +2993,9 @@ void LoadMusicInfo()
 
   new = &music_file_info;
 
+#if 0
   printf("::: num_music == %d\n", num_music);
+#endif
 
   for (i = 0; i < num_music; i++)
   {
@@ -2969,9 +3019,12 @@ void LoadMusicInfo()
     printf("::: -> '%s' (configured)\n", music->filename);
 #endif
 
-    *new = get_music_file_info(music->filename, i);
-    if (*new != NULL)
-      new = &(*new)->next;
+    if (!music_info_listed(music_file_info, music->filename))
+    {
+      *new = get_music_file_info(music->filename, i);
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
   }
 
   if ((dir = opendir(music_directory)) == NULL)
@@ -3010,14 +3063,43 @@ void LoadMusicInfo()
     printf("::: -> '%s' (found in directory)\n", basename);
 #endif
 
-    *new = get_music_file_info(basename, MAP_NOCONF_MUSIC(num_music_noconf));
-    if (*new != NULL)
-      new = &(*new)->next;
+    if (!music_info_listed(music_file_info, basename))
+    {
+      *new = get_music_file_info(basename, MAP_NOCONF_MUSIC(num_music_noconf));
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
 
     num_music_noconf++;
   }
 
   closedir(dir);
+
+  for (i = 0; i < num_sounds; i++)
+  {
+    sound = getSoundListEntry(i);
+
+    if (sound->filename == NULL)
+      continue;
+
+    if (strcmp(sound->filename, UNDEFINED_FILENAME) == 0)
+      continue;
+
+    /* a configured file may be not recognized as sound */
+    if (!FileIsSound(sound->filename))
+      continue;
+
+#if 0
+    printf("::: -> '%s' (configured)\n", sound->filename);
+#endif
+
+    if (!sound_info_listed(music_file_info, sound->filename))
+    {
+      *new = get_sound_file_info(sound->filename, i);
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
+  }
 
 #if 0
   /* TEST-ONLY */

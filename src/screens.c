@@ -961,7 +961,7 @@ void DrawInfoScreen_Music()
 void HandleInfoScreen_Music(int button)
 {
   static struct MusicFileInfo *list = NULL;
-  int ystart = 150, ystep = 30;
+  int ystart = 150, dy = 30;
   int ybottom = SYSIZE - 20;
   int button_released = !button;
 
@@ -994,6 +994,8 @@ void HandleInfoScreen_Music(int button)
 
   if (button_released || button == MB_MENU_INITIALIZE)
   {
+    int y = 0;
+
     if (list == NULL)
     {
       info_mode = INFO_MODE_MAIN;
@@ -1007,19 +1009,59 @@ void HandleInfoScreen_Music(int button)
     ClearWindow();
     DrawHeadline();
 
-    DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Music:");
+    if (list->is_sound)
+    {
+      PlaySound(list->music);
 
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
-    DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
-    DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "%s", list->artist);
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
-    DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3, "\"%s\"", list->album);
+      DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Sounds:");
+    }
+    else
+    {
+      PlayMusic(list->music);
+
+      DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Music:");
+    }
+
+    if (strcmp(list->title, UNKNOWN_NAME) != 0)
+    {
+      if (strcmp(list->title_header, UNKNOWN_NAME) != 0)
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->title_header);
+
+      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->title);
+    }
+
+    if (strcmp(list->artist, UNKNOWN_NAME) != 0)
+    {
+      if (strcmp(list->artist_header, UNKNOWN_NAME) != 0)
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->artist_header);
+      else
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "by");
+
+      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "%s", list->artist);
+    }
+
+    if (strcmp(list->album, UNKNOWN_NAME) != 0)
+    {
+      if (strcmp(list->album_header, UNKNOWN_NAME) != 0)
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->album_header);
+      else
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the album");
+
+      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->album);
+    }
+
+    if (strcmp(list->year, UNKNOWN_NAME) != 0)
+    {
+      if (strcmp(list->year_header, UNKNOWN_NAME) != 0)
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->year_header);
+      else
+	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the year");
+
+      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "%s", list->year);
+    }
 
     DrawTextSCentered(ybottom, FONT_TEXT_4,
 		      "Press any key or button for next page");
-
-    PlayMusic(list->music);
 
     list = list->next;
   }

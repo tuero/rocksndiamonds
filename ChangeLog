@@ -1,3 +1,13 @@
+2003-12-07
+	* fixed boring and sleeping sounds
+
+2003-12-05
+	* added "maze runner" and "maze hunter" movement types
+	* added extended collision conditions for custom elements
+
+2003-12-03
+	* added warnings for undefined token values in artwork config files
+
 2003-12-02
 	* added menu entry for level set information to the info screen
 
@@ -10,6 +20,7 @@
 
 2003-11-25
 	* added configurable "bored" and "sleeping" animations for the player
+	* added "awakening" sound for player waking up after sleeping
 
 2003-11-22
 	* added "copy" and "exchange" functions for custom elements to editor

@@ -1885,15 +1885,6 @@ void LoadCustomMusic_NoConf(void)
   struct dirent *dir_entry;
   int num_music = getMusicListSize();
 
-#if 0
-  int ii;
-  for (ii = 0; ii < num_music; ii++)
-  {
-    struct FileInfo *music = getMusicListEntry(ii);
-    printf("sound process: music %d: '%s'\n", ii, music->filename);
-  }
-#endif
-
   if (!audio.sound_available)
     return;
 
@@ -1928,10 +1919,6 @@ void LoadCustomMusic_NoConf(void)
     for (i = 0; i < num_music; i++)
     {
       struct FileInfo *music = getMusicListEntry(i);
-
-#if 0
-      printf("sound process: '%s'\n", music->filename);
-#endif
 
       if (strcmp(basename, music->filename) == 0)
       {

@@ -87,7 +87,7 @@ unsigned int InitRND(long);
 #endif
 
 unsigned int init_random_number(int, long);
-unsigned int get_random_number(int, unsigned int);
+unsigned int get_random_number(int, int);
 
 char *getLoginName(void);
 char *getRealName(void);

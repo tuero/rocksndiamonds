@@ -72,6 +72,9 @@ void AusgangstuerBlinken(int, int);
 void EdelsteinFunkeln(int, int);
 void MauerWaechst(int, int);
 void MauerAbleger(int, int);
+
+int GetPlayerAction(struct PlayerInfo *, int);
+
 void GameActions(void);
 void ScrollLevel(int, int);
 

@@ -1075,6 +1075,7 @@ void InitGame()
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
 
+    player->action_waiting = ACTION_DEFAULT;
     player->special_action_bored = ACTION_DEFAULT;
     player->special_action_sleeping = ACTION_DEFAULT;
 
@@ -4878,6 +4879,7 @@ void ContinueMoving(int x, int y)
     CheckElementSideChange(newx, newy, Feld[newx][newy],
 			   direction, CE_COLLISION_ACTIVE, -1);
 
+#if 0
     if (IN_LEV_FIELD(nextx, nexty))
     {
       static int opposite_directions[] =
@@ -4945,6 +4947,7 @@ void ContinueMoving(int x, int y)
 	}
       }
     }
+#endif
   }
 
   TestIfPlayerTouchesCustomElement(newx, newy);
@@ -6172,6 +6175,110 @@ static boolean CheckElementChange(int x, int y, int element, int trigger_event)
   return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
 }
 
+int GetPlayerAction(struct PlayerInfo *player, int move_dir)
+{
+  int jx = player->jx, jy = player->jy;
+  int element = player->element_nr;
+  int action = (player->is_pushing    ? ACTION_PUSHING    :
+		player->is_digging    ? ACTION_DIGGING    :
+		player->is_collecting ? ACTION_COLLECTING :
+		player->is_moving     ? ACTION_MOVING     :
+		player->is_snapping   ? ACTION_SNAPPING   :
+		player->is_sleeping   ? ACTION_SLEEPING   :
+		player->is_bored      ? ACTION_BORING     :
+		player->is_waiting    ? ACTION_WAITING    : ACTION_DEFAULT);
+
+  if (player->is_sleeping)
+  {
+    if (player->num_special_action_sleeping > 0)
+    {
+      int last_action = player->action_waiting;
+
+      if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
+      {
+	int last_special_action = player->special_action_sleeping;
+	int num_special_action = player->num_special_action_sleeping;
+	int special_action =
+	  (last_special_action == ACTION_DEFAULT ? ACTION_SLEEPING_1 :
+	   last_special_action == ACTION_SLEEPING ? ACTION_SLEEPING :
+	   last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
+	   last_special_action + 1 : ACTION_SLEEPING);
+	int special_graphic =
+	  el_act_dir2img(player->element_nr, special_action, move_dir);
+
+	player->anim_delay_counter =
+	  graphic_info[special_graphic].anim_delay_fixed +
+	  SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	player->post_delay_counter =
+	  graphic_info[special_graphic].post_delay_fixed +
+	  SimpleRND(graphic_info[special_graphic].post_delay_random);
+
+	player->special_action_sleeping = special_action;
+      }
+
+      if (player->anim_delay_counter > 0)
+      {
+	action = player->special_action_sleeping;
+	player->anim_delay_counter--;
+      }
+      else if (player->post_delay_counter > 0)
+      {
+	player->post_delay_counter--;
+      }
+
+      player->action_waiting = action;
+
+      if (last_action != action)
+	PlayLevelSoundElementAction(jx, jy, element, action);
+      else
+	PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
+    }
+  }
+  else if (player->is_bored)
+  {
+    if (player->num_special_action_bored > 0)
+    {
+      int last_action = player->action_waiting;
+
+      if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
+      {
+	int special_action =
+	  ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
+	int special_graphic =
+	  el_act_dir2img(player->element_nr, special_action, move_dir);
+
+	player->anim_delay_counter =
+	  graphic_info[special_graphic].anim_delay_fixed +
+	  SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	player->post_delay_counter =
+	  graphic_info[special_graphic].post_delay_fixed +
+	  SimpleRND(graphic_info[special_graphic].post_delay_random);
+
+	player->special_action_bored = special_action;
+      }
+
+      if (player->anim_delay_counter > 0)
+      {
+	action = player->special_action_bored;
+	player->anim_delay_counter--;
+      }
+      else if (player->post_delay_counter > 0)
+      {
+	player->post_delay_counter--;
+      }
+
+      player->action_waiting = action;
+
+      if (last_action != action)
+	PlayLevelSoundElementAction(jx, jy, element, action);
+      else
+	PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
+    }
+  }
+
+  return action;
+}
+
 static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 {
   int jx = player->jx, jy = player->jy;
@@ -6180,7 +6287,11 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
   if (is_waiting)
   {
-    int action;
+    int last_action, action;
+    boolean play_sound;
+
+    last_action = (player->is_sleeping ? ACTION_SLEEPING :
+		   player->is_bored ? ACTION_BORING : ACTION_WAITING);
 
     if (!was_waiting)		/* not waiting -> waiting */
     {
@@ -6198,21 +6309,26 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
       InitPlayerGfxAnimation(player, ACTION_WAITING, player->MovDir);
     }
 
-    if (game.player_sleeping_delay_fixed != -1 &&
-	game.player_sleeping_delay_random != -1 &&
+    if (game.player_sleeping_delay_fixed +
+	game.player_sleeping_delay_random > 0 &&
 	player->anim_delay_counter == 0 &&
 	player->post_delay_counter == 0 &&
 	FrameCounter >= player->frame_counter_sleeping)
       player->is_sleeping = TRUE;
-    else if (game.player_boring_delay_fixed != -1 &&
-	     game.player_boring_delay_random != -1 &&
+    else if (game.player_boring_delay_fixed +
+	     game.player_boring_delay_random > 0 &&
 	     FrameCounter >= player->frame_counter_bored)
       player->is_bored = TRUE;
 
     action = (player->is_sleeping ? ACTION_SLEEPING :
 	      player->is_bored ? ACTION_BORING : ACTION_WAITING);
 
-    if (!was_waiting)
+    play_sound =
+      ((player->is_sleeping && player->num_special_action_sleeping == 0) ||
+       (player->is_bored    && player->num_special_action_bored == 0) ||
+       (player->is_waiting && !player->is_sleeping && !player->is_bored));
+
+    if (play_sound && action != last_action)
       PlayLevelSoundElementAction(jx, jy, element, action);
     else
       PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
