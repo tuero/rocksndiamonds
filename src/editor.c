@@ -3531,6 +3531,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      CE_IMPACT);
+
+  /* set change by other element action selectbox help value */
+  value_change_other_action =
+    (HAS_CHANGE_EVENT(element, CE_OTHER_CHANGING) ? CE_OTHER_CHANGING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_PUSHING) ? CE_OTHER_PUSHING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_COLLECTING) ? CE_OTHER_COLLECTING :
+     CE_OTHER_COLLECTING);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3574,15 +3581,24 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_WALKABLE];
 
   /* set player change event from checkbox and selectbox */
-  custom_element.change.events &= ~CE_TOUCHED_BY_PLAYER;
-  custom_element.change.events &= ~CE_PRESSED_BY_PLAYER;
-  custom_element.change.events &= ~CE_PUSHED_BY_PLAYER;
-  custom_element.change.events |= value_change_player_action;
+  custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
+  custom_element_change_events[value_change_player_action] =
+    custom_element_change_events[CE_BY_PLAYER];
 
   /* set player change event from checkbox and selectbox */
-  custom_element.change.events &= ~CE_IMPACT;
-  custom_element.change.events &= ~CE_SMASHED;
-  custom_element.change.events |= value_change_impact_action;
+  custom_element_change_events[CE_IMPACT] = FALSE;
+  custom_element_change_events[CE_SMASHED] = FALSE;
+  custom_element_change_events[value_change_impact_action] =
+    custom_element_change_events[CE_IMPACT_SMASHED];
+
+  /* set other element action change event from checkbox and selectbox */
+  custom_element_change_events[CE_OTHER_COLLECTING] = FALSE;
+  custom_element_change_events[CE_OTHER_PUSHING] = FALSE;
+  custom_element_change_events[CE_OTHER_CHANGING] = FALSE;
+  custom_element_change_events[value_change_other_action] =
+    custom_element_change_events[CE_BY_OTHER];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
