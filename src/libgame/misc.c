@@ -537,6 +537,11 @@ void GetOptions(char *argv[])
   options.verbose = FALSE;
   options.debug = FALSE;
 
+#if !defined(PLATFORM_UNIX)
+  if (*options_left == NULL)	/* no options given -- enable verbose mode */
+    options.verbose = TRUE;
+#endif
+
   while (*options_left)
   {
     char option_str[MAX_OPTION_LEN];

@@ -224,6 +224,30 @@ element_to_special_graphic[] =
     IMG_INVISIBLE_STEELWALL_VERTICAL_EDITOR
   },
   {
+    EL_BUG,					GFX_SPECIAL_ARG_EDITOR,
+    IMG_BUG_RIGHT
+  },
+  {
+    EL_BUG,					GFX_SPECIAL_ARG_PREVIEW,
+    IMG_BUG_RIGHT
+  },
+  {
+    EL_PACMAN,					GFX_SPECIAL_ARG_EDITOR,
+    IMG_PACMAN_RIGHT
+  },
+  {
+    EL_PACMAN,					GFX_SPECIAL_ARG_PREVIEW,
+    IMG_PACMAN_RIGHT
+  },
+  {
+    EL_SPACESHIP,				GFX_SPECIAL_ARG_EDITOR,
+    IMG_SPACESHIP_RIGHT
+  },
+  {
+    EL_SPACESHIP,				GFX_SPECIAL_ARG_PREVIEW,
+    IMG_SPACESHIP_RIGHT
+  },
+  {
     -1,						-1,
     -1
   },

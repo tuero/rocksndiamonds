@@ -2253,10 +2253,6 @@ element_to_graphic[] =
     IMG_ARROW_RED_DOWN
   },
   {
-    EL_BUG,					-1, -1,
-    IMG_BUG_RIGHT
-  },
-  {
     EL_DOOR_WHITE,				-1, -1,
     IMG_CHAR_QUESTION
   },
@@ -2291,10 +2287,6 @@ element_to_graphic[] =
   {
     EL_KEY_WHITE,				-1, -1,
     IMG_CHAR_QUESTION
-  },
-  {
-    EL_PACMAN,					-1, -1,
-    IMG_PACMAN_RIGHT
   },
   {
     EL_SIGN_EXIT,				-1, -1,
@@ -2335,10 +2327,6 @@ element_to_graphic[] =
   {
     EL_SIGN_YINYANG,				-1, -1,
     IMG_CHAR_QUESTION
-  },
-  {
-    EL_SPACESHIP,				-1, -1,
-    IMG_SPACESHIP_RIGHT
   },
   {
     EL_CHAR_SPACE,				-1, -1,

@@ -1493,7 +1493,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_diamond_caves = TRUE;
   si->editor.el_dx_boulderdash = TRUE;
   si->editor.el_chars = TRUE;
-  si->editor.el_custom = FALSE;
+  si->editor.el_custom = TRUE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;

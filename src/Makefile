@@ -106,7 +106,8 @@ DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
-OPTIONS = $(DEBUG) -O3 -Wall			# only for debugging purposes
+# OPTIONS = $(DEBUG) -O3 -Wall			# only for debugging purposes
+OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = $(DEBUG) -Wall -ansi -pedantic	# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall

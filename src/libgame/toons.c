@@ -317,6 +317,10 @@ void HandleAnimation(int mode)
   if (!setup.toons)
     return;
 
+  /* this may happen after reloading graphics and redefining "num_toons" */
+  if (toon_nr >= screen_info.num_toons)
+    anim_restart = TRUE;
+
   switch(mode)
   {
     case ANIM_START:
@@ -359,7 +363,7 @@ void HandleAnimation(int mode)
     toon_nr = SimpleRND(screen_info.num_toons);
   }
 
-  anim_restart = reset_delay = AnimateToon(toon_nr,anim_restart);
+  anim_restart = reset_delay = AnimateToon(toon_nr, anim_restart);
 }
 
 void InitAnimation()

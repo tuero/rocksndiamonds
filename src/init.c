@@ -977,13 +977,14 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
 static void InitGraphicInfo()
 {
-  static boolean clipmasks_initialized = FALSE;
   int fallback_graphic = IMG_CHAR_EXCLAM;
   struct FileInfo *fallback_image = getImageListEntry(fallback_graphic);
   Bitmap *fallback_bitmap = getBitmapFromImageID(fallback_graphic);
   int num_images = getImageListSize();
   int i;
+
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
+  static boolean clipmasks_initialized = FALSE;
   Pixmap src_pixmap;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
@@ -1105,6 +1106,7 @@ static void InitGraphicInfo()
     clip_gc_values.graphics_exposures = False;
     clip_gc_values.clip_mask = graphic_info[i].clip_mask;
     clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
+
     graphic_info[i].clip_gc =
       XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
 #endif
@@ -1113,9 +1115,9 @@ static void InitGraphicInfo()
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (copy_clipmask_gc)
     XFreeGC(display, copy_clipmask_gc);
-#endif
 
   clipmasks_initialized = TRUE;
+#endif
 }
 
 static void InitElementSoundInfo()

@@ -478,7 +478,7 @@ void NetworkServer(int port, int serveronly)
   if (is_daemon)
   {
     /* become a daemon, breaking all ties with the controlling terminal */
-    options.verbose = 0;
+    options.verbose = FALSE;
     for (i=0; i<255; i++)
     {
       if (i != lfd)

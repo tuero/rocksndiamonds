@@ -122,14 +122,23 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
       if (count == 0)
       {
 	if ((value_int = fgetc(file)) == EOF)
+	{
+	  free(row_buffer);
 	  return FALSE;
+	}
+
 	value = (byte)value_int;
 
 	if ((value & 0xc0) == 0xc0)	/* this is a repeat count byte */
 	{
 	  count = value & 0x3f;		/* extract repeat count from byte */
+
 	  if ((value_int = fgetc(file)) == EOF)
+	  {
+	    free(row_buffer);
 	    return FALSE;
+	  }
+
 	  value = (byte)value_int;
 	}
 	else
@@ -185,6 +194,8 @@ static boolean PCX_ReadBitmap(FILE *file, struct PCX_Header *pcx, Image *image)
 
     bitmap_ptr += image->bytes_per_row;
   }
+
+  free(row_buffer);
 
   return TRUE;
 }
