@@ -208,7 +208,7 @@ void GetOptions(char *argv[])
       break;
 
     if (option_len >= MAX_OPTION_LEN)
-      Error(ERR_EXITHELP, "unrecognized option '%s'", option);
+      Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
 
     if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
       option++;
@@ -220,13 +220,13 @@ void GetOptions(char *argv[])
     {
       *option_arg++ = '\0';			/* cut argument from option */
       if (*option_arg == '\0')			/* no argument after '=' */
-	Error(ERR_EXITHELP, "option '%s' has invalid argument", option_str);
+	Error(ERR_EXIT_HELP, "option '%s' has invalid argument", option_str);
     }
 
     option_len = strlen(option);
 
     if (strcmp(option, "-") == 0)
-      Error(ERR_EXITHELP, "unrecognized option '%s'", option);
+      Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
     else if (strncmp(option, "-help", option_len) == 0)
     {
       printf("Usage: %s [options] [server.name [port]]\n"
@@ -240,7 +240,7 @@ void GetOptions(char *argv[])
     else if (strncmp(option, "-display", option_len) == 0)
     {
       if (option_arg == NULL)
-	Error(ERR_EXITHELP, "option '%s' requires an argument", option_str);
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       display_name = option_arg;
       if (option_arg == next_option)
@@ -251,7 +251,7 @@ void GetOptions(char *argv[])
     else if (strncmp(option, "-levels", option_len) == 0)
     {
       if (option_arg == NULL)
-	Error(ERR_EXITHELP, "option '%s' requires an argument", option_str);
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       level_directory = option_arg;
       if (option_arg == next_option)
@@ -266,7 +266,7 @@ void GetOptions(char *argv[])
       verbose = TRUE;
     }
     else if (*option == '-')
-      Error(ERR_EXITHELP, "unrecognized option '%s'", option_str);
+      Error(ERR_EXIT_HELP, "unrecognized option '%s'", option_str);
     else if (server_host == NULL)
     {
       server_host = *options_left;
@@ -277,12 +277,12 @@ void GetOptions(char *argv[])
     {
       server_port = atoi(*options_left);
       if (server_port < 1024)
-	Error(ERR_EXITHELP, "bad port number '%d'", server_port);
+	Error(ERR_EXIT_HELP, "bad port number '%d'", server_port);
 
       printf("port == %d\n", server_port);
     }
     else
-      Error(ERR_EXITHELP, "too many arguments");
+      Error(ERR_EXIT_HELP, "too many arguments");
 
     options_left++;
   }
@@ -291,6 +291,10 @@ void GetOptions(char *argv[])
 void Error(int mode, char *format_str, ...)
 {
   FILE *output_stream = stderr;
+  char *process_name = "";
+
+  if (mode == ERR_EXIT_SOUNDSERVER)
+    process_name = " sound server";
 
   if (format_str)
   {
@@ -300,7 +304,7 @@ void Error(int mode, char *format_str, ...)
     int i_value;
     double d_value;
 
-    fprintf(output_stream, "%s: ", program_name);
+    fprintf(output_stream, "%s%s: ", program_name, process_name);
 
     va_start(ap, format_str);	/* ap points to first unnamed argument */
   
@@ -330,7 +334,8 @@ void Error(int mode, char *format_str, ...)
   	  break;
   
   	default:
-  	  fprintf(stderr, "\nError(): invalid format string: %s\n",format_str);
+  	  fprintf(stderr, "\n%s: Error(): invalid format string: %s\n",
+		  program_name, format_str);
 	  CloseAllAndExit(10);
       }
     }
@@ -340,13 +345,13 @@ void Error(int mode, char *format_str, ...)
     fprintf(output_stream, "\n");
   }
   
-  if (mode == ERR_EXITHELP)
+  if (mode == ERR_EXIT_HELP)
     fprintf(output_stream, "%s: Try option '--help' for more information.\n",
 	    program_name);
 
-  if (mode == ERR_EXIT || mode == ERR_EXITHELP)
+  if (mode != ERR_RETURN)
   {
-    fprintf(output_stream, "%s: aborting\n", program_name);
+    fprintf(output_stream, "%s%s: aborting\n", program_name, process_name);
     CloseAllAndExit(1);
   }
 }

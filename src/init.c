@@ -93,7 +93,8 @@ void InitLevelAndPlayerInfo()
 
 void InitServer()
 {
-  standalone = FALSE + TRUE;
+  standalone = FALSE;
+  networking = !standalone;
 
   if (standalone)
     return;
@@ -101,8 +102,8 @@ void InitServer()
   if (!ConnectToServer(server_host, server_port))
     Error(ERR_EXIT, "cannot connect to multiplayer server");
 
-  SendNicknameToServer(local_player->alias_name);
-  SendProtocolVersionToServer();
+  SendToServer_Nickname(local_player->alias_name);
+  SendToServer_ProtocolVersion();
 }
 
 void InitSound()

@@ -26,6 +26,10 @@
 #include <errno.h>
 
 #include "network.h"
+#include "game.h"
+#include "tape.h"
+#include "files.h"
+#include "misc.h"
 
 int norestart = 0;
 int nospeedup = 0;
@@ -38,7 +42,7 @@ int nospeedup = 0;
 
 #define OP_NICK 1
 #define OP_PLAY 2
-#define OP_FALL 3
+#define OP_MOVE 3
 #define OP_DRAW 4
 #define OP_LOST 5
 #define OP_GONE 6
@@ -59,6 +63,22 @@ int nospeedup = 0;
 #define OP_LINESTO 21
 #define OP_WON 22
 #define OP_ZERO 23
+
+#define MAXNICKLEN 14
+
+struct user
+{
+  byte nr;
+  char name[MAXNICKLEN+2];
+  struct user *next;
+};
+
+struct user me =
+{
+  0,
+  "no name",
+  NULL
+};
 
 /* server stuff */
 
@@ -86,6 +106,16 @@ void fatal(char *s)
 {
   fprintf(stderr, "%s.\n", s);
   exit(1);
+}
+
+void *mmalloc(int n)
+{
+  void *r;
+
+  r = malloc(n);
+  if (r == NULL)
+    fatal("Out of memory");
+  return r;
 }
 
 void u_sleep(int i)
@@ -117,6 +147,34 @@ void sendbuf(int len)
     memcpy(writbuf + nwrite, realbuf, 4 + len);
     nwrite += 4 + len;
   }
+}
+
+struct user *finduser(unsigned char c)
+{
+  struct user *u;
+
+  for (u = &me; u; u = u->next)
+    if (u->nr == c)
+      return u;
+  
+  fatal("Protocol error: reference to non-existing user");
+  return NULL; /* so that gcc -Wall doesn't complain */
+}
+
+char *get_user_name(unsigned char c)
+{
+  struct user *u;
+
+  if (c == 0)
+    return("the server");
+  else if (c == me.nr)
+    return("you");
+  else
+    for (u = &me; u; u = u->next)
+      if (u->nr == c && u->name && strlen(u->name))
+	return(u->name);
+
+  return("no name");
 }
 
 void startserver()
@@ -217,7 +275,7 @@ BOOL ConnectToServer(char *host, int port)
   return(TRUE);
 }
 
-void SendNicknameToServer(char *nickname)
+void SendToServer_Nickname(char *nickname)
 {
   static char msgbuf[300];
 
@@ -228,7 +286,7 @@ void SendNicknameToServer(char *nickname)
   sysmsg(msgbuf);
 }
 
-void SendProtocolVersionToServer()
+void SendToServer_ProtocolVersion()
 {
   buf[1] = OP_VERSION;
   buf[2] = PROT_VERS_1;
@@ -237,9 +295,28 @@ void SendProtocolVersionToServer()
   sendbuf(5);
 }
 
+void SendToServer_StartPlaying()
+{
+  buf[1] = OP_PLAY;
+  buf[2] = (unsigned char)(level_nr / 256);
+  buf[3] = (unsigned char)(level_nr % 256);
+  buf[4] = (unsigned char)(leveldir_nr / 256);
+  buf[5] = (unsigned char)(leveldir_nr % 256);
+  strcpy(&buf[6], leveldir[leveldir_nr].name);
+  sendbuf(strlen(leveldir[leveldir_nr].name)+1 + 6);
+}
+
+void SendToServer_MovePlayer(byte player_action)
+{
+  buf[1] = OP_MOVE;
+  buf[2] = player_action;
+  sendbuf(3);
+}
+
 void handlemessages()
 {
   unsigned int len;
+  struct user *u, *v = NULL;
   static char msgbuf[300];
 
   while (nread >= 4 && nread >= 4 + readbuf[3])
@@ -256,33 +333,107 @@ void handlemessages()
     {
       case OP_YOUARE:
 	printf("OP_YOUARE: %d\n", buf[0]);
+	me.nr = buf[0];
+
+	TestPlayer = buf[0] - 1;
+
 	break;
 
       case OP_NEW:
 	printf("OP_NEW: %d\n", buf[0]);
 	sprintf(msgbuf, "new client %d connected", buf[0]);
 	sysmsg(msgbuf);
+
+	for (u = &me; u; u = u->next)
+	{
+	  if (u->nr == buf[0])
+	    Error(ERR_EXIT, "multiplayer server sent duplicate player id");
+	  else
+	    v = u;
+	}
+
+	v->next = u = mmalloc(sizeof(struct user));
+	u->nr = buf[0];
+	u->name[0] = '\0';
+	u->next = NULL;
+
+	break;
+
+      case OP_NICK:
+	printf("OP_NICK: %d\n", buf[0]);
+	u = finduser(buf[0]);
+	buf[len] = 0;
+	sprintf(msgbuf, "client %d calls itself \"%s\"", buf[0], &buf[2]);
+	sysmsg(msgbuf);
+	strncpy(u->name, &buf[2], MAXNICKLEN);
 	break;
       
       case OP_GONE:
 	printf("OP_GONE: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d disconnected", buf[0]);
+	u = finduser(buf[0]);
+	sprintf(msgbuf, "client %d (%s) disconnected",
+		buf[0], get_user_name(buf[0]));
 	sysmsg(msgbuf);
+
+	for (v = &me; v; v = v->next)
+	  if (v->next == u)
+	    v->next = u->next;
+	free(u);
+
 	break;
 
       case OP_BADVERS:
-	{
-	  static char tmpbuf[128];
-
-	  sprintf(tmpbuf, "Protocol version mismatch: server expects %d.%d.x instead of %d.%d.%d\n", buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
-	  fatal(tmpbuf);
-	}
+	Error(ERR_RETURN, "protocol version mismatch");
+	Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
+	      buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
 	break;
-      
+
       case OP_PLAY:
 	printf("OP_PLAY: %d\n", buf[0]);
-	sprintf(msgbuf, "client %d starts game", buf[0]);
+	sprintf(msgbuf, "client %d starts game [level %d from levedir %d (%s)]\n",
+		buf[0],
+		(buf[2] << 8) + buf[3],
+		(buf[4] << 8) + buf[5],
+		&buf[6]);
 	sysmsg(msgbuf);
+
+	if (strcmp(leveldir[(buf[4] << 8) + buf[5]].name, &buf[6]) == 0)
+	{
+	  leveldir_nr = (buf[4] << 8) + buf[5];
+
+	  local_player->leveldir_nr = leveldir_nr;
+	  LoadPlayerInfo(PLAYER_LEVEL);
+	  SavePlayerInfo(PLAYER_SETUP);
+
+	  level_nr = (buf[2] << 8) + buf[3];
+
+	  TapeErase();
+	  LoadLevelTape(level_nr);
+
+	  GetPlayerConfig();
+	  LoadLevel(level_nr);
+
+	  {
+	    if (autorecord_on)
+	      TapeStartRecording();
+
+	    game_status = PLAYING;
+	    InitGame();
+	  }
+	}
+	else
+	{
+	  Error(ERR_RETURN, "no such level directory: '%s'", &buf[6]);
+	}
+	break;
+
+      case OP_MOVE:
+	if (buf[2])
+	{
+	  printf("OP_MOVE: %d\n", buf[0]);
+	  sprintf(msgbuf, "client %d moves player [0x%02x]", buf[0], buf[2]);
+	  sysmsg(msgbuf);
+	}
 	break;
 
       case OP_PAUSE:
@@ -307,12 +458,6 @@ void handlemessages()
 	printf("OP_ZERO: %d\n", buf[0]);
 	sprintf(msgbuf, "client %d resets game counters", buf[0]);
 	sysmsg(msgbuf);
-	break;
-
-      case OP_NICK:
-	printf("OP_NICK: %d\n", buf[0]);
-        sprintf(msgbuf, "client %d calls itself \"%s\"", buf[0], &buf[2]);
-        sysmsg(msgbuf);
 	break;
 
       case OP_MSG:

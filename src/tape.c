@@ -58,7 +58,7 @@ void TapeStopRecording()
   DrawVideoDisplay(VIDEO_STATE_REC_OFF,0);
 }
 
-void TapeRecordAction(int joy[MAX_PLAYERS])
+void TapeRecordAction(byte joy[MAX_PLAYERS])
 {
   int i;
 

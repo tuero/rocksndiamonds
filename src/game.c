@@ -21,6 +21,7 @@
 #include "files.h"
 #include "tape.h"
 #include "joystick.h"
+#include "network.h"
 
 void GetPlayerConfig()
 {
@@ -2764,9 +2765,9 @@ void CheckForDragon(int x, int y)
   }
 }
 
-void PlayerActions(struct PlayerInfo *player, int player_action)
+void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
-  static int stored_player_action[MAX_PLAYERS];
+  static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
   BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
   int jx = player->jx, jy = player->jy;
@@ -2849,7 +2850,7 @@ void PlayerActions(struct PlayerInfo *player, int player_action)
   }
 }
 
-void GameActions(int player_action)
+void GameActions(byte player_action)
 {
   static long action_delay = 0;
   long action_delay_value;
@@ -2875,6 +2876,8 @@ void GameActions(int player_action)
     recorded_player_action = TapePlayAction();
   else
     recorded_player_action = NULL;
+
+  SendToServer_MovePlayer(player_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {

@@ -20,7 +20,7 @@
 
 void TapeStartRecording(void);
 void TapeStopRecording(void);
-void TapeRecordAction(int *);
+void TapeRecordAction(byte *);
 void TapeRecordDelay(void);
 void TapeTogglePause(void);
 void TapeStartPlaying(void);

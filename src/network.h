@@ -17,8 +17,10 @@
 #include "main.h"
 
 BOOL ConnectToServer(char *, int);
-void SendNicknameToServer(char *);
-void SendProtocolVersionToServer(void);
+void SendToServer_Nickname(char *);
+void SendToServer_ProtocolVersion(void);
+void SendToServer_StartPlaying(void);
+void SendToServer_MovePlayer(byte);
 void HandleNetworking(void);
 
 #endif

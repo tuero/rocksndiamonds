@@ -788,7 +788,7 @@ void HandleJoystick()
       if (tape.pausing || AllPlayersGone)
 	joy = 0;
 
-      HandleGameActions(joy);
+      HandleGameActions((byte)joy);
       break;
 
     default:

@@ -40,6 +40,7 @@
 #endif  /* #ifndef MSDOS */
 
 typedef int BOOL;
+typedef unsigned char byte;
 
 #ifndef FALSE
 #define FALSE 0
@@ -288,8 +289,8 @@ struct RecordingInfo
   BOOL changed;
   struct
   {
-    unsigned char joystickdata[MAX_PLAYERS];
-    unsigned char delay;
+    byte joystickdata[MAX_PLAYERS];
+    byte delay;
   } pos[MAX_TAPELEN];
 };
 

@@ -23,7 +23,8 @@
 
 #define ERR_RETURN		0
 #define ERR_EXIT		1
-#define ERR_EXITHELP		2
+#define ERR_EXIT_HELP		2
+#define ERR_EXIT_SOUNDSERVER	3
 
 void InitCounter(void);
 unsigned long Counter(void);

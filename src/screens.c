@@ -23,6 +23,7 @@
 #include "tape.h"
 #include "joystick.h"
 #include "cartoons.h"
+#include "network.h"
 
 #ifdef MSDOS
 extern unsigned char get_ascii(KeySym);
@@ -214,11 +215,16 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==8)
       {
-	if (autorecord_on)
-	  TapeStartRecording();
+	if (standalone)
+	{
+	  if (autorecord_on)
+	    TapeStartRecording();
 
-	game_status = PLAYING;
-	InitGame();
+	  game_status = PLAYING;
+	  InitGame();
+	}
+	else
+	  SendToServer_StartPlaying();
       }
       else if (y==9)
       {
@@ -1298,7 +1304,7 @@ void CalibrateJoystick()
   DrawSetupScreen();
 }
 
-void HandleGameActions(int player_action)
+void HandleGameActions(byte player_action)
 {
   if (game_status != PLAYING)
     return;
