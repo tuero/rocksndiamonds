@@ -2649,6 +2649,43 @@ static void DrawElementContentAreas()
     MapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 }
 
+#if 0
+static void DrawPropertiesElement(int xstart, int ystart, int element)
+{
+  int x, y;
+
+  /* draw some decorative border for the object */
+  for (y=0; y<3; y++)
+    for (x=0; x<3; x++)
+      DrawMiniElement(xstart + x , ystart + y, EL_SAND);
+
+  ClearRectangle(drawto,
+		 SX + xstart * MINI_TILEX + MINI_TILEX/2 - 1,
+		 SY + ystart * MINI_TILEY + MINI_TILEY/2 - 1,
+		 TILEX + 2, TILEY + 2);
+
+  /* copy border to the right location */
+  BlitBitmap(drawto, drawto,
+	     SX + xstart * MINI_TILEX,
+	     SY + ystart * MINI_TILEY,
+	     2 * TILEX, 2 * TILEY,
+	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
+	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
+
+  DrawGraphicAnimation(xstart / 2, ystart / 2, el2img(element));
+
+  /* copy the whole stuff to the definitive location */
+  BlitBitmap(drawto, drawto,
+	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
+	     SY + ystart * MINI_TILEY - MINI_TILEY,
+	     2 * TILEX, 2 * TILEY,
+	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
+	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
+
+  FrameCounter++;	/* increase animation frame counter */
+}
+#endif
+
 #define TEXT_COLLECTING		"Score for collecting"
 #define TEXT_SMASHING		"Score for smashing"
 #define TEXT_CRACKING		"Score for cracking"
@@ -2729,6 +2766,7 @@ static void DrawPropertiesWindow()
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
 	   "Element Settings", FS_BIG, FC_YELLOW);
 
+#if 1
   /* draw some decorative border for the object */
   for (y=0; y<3; y++)
     for (x=0; x<3; x++)
@@ -2747,7 +2785,11 @@ static void DrawPropertiesWindow()
 	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
 	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
 
+#if 0
   DrawGraphic(xstart / 2, ystart / 2, el2img(properties_element), 0);
+#else
+  DrawGraphicAnimation(xstart / 2, ystart / 2, el2img(properties_element));
+#endif
 
   /* copy the whole stuff to the definitive location */
   BlitBitmap(drawto, drawto,
@@ -2756,6 +2798,15 @@ static void DrawPropertiesWindow()
 	     2 * TILEX, 2 * TILEY,
 	     SX + xstart * MINI_TILEX - MINI_TILEX/2,
 	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
+
+  FrameCounter = 0;	/* restart animation frame counter */
+
+#else
+
+  FrameCounter = 0;	/* restart animation frame counter */
+  DrawPropertiesElement(xstart, ystart, properties_element);
+
+#endif
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
 	    font_color, getElementInfoText(properties_element));
@@ -4125,6 +4176,32 @@ void HandleLevelEditorKeyInput(Key key)
 	  if (!anyTextGadgetActive())
 	    ClickOnGadget(level_editor_gadget[i], button);
   }
+}
+
+void HandleLevelEditorIdle()
+{
+  static unsigned long action_delay = 0;
+  unsigned long action_delay_value = GameFrameDelay;
+  int xpos = 1, ypos = 2;
+
+  if (edit_mode != ED_MODE_PROPERTIES)
+    return;
+
+  if (!DelayReached(&action_delay, action_delay_value))
+    return;
+
+  FY += MINI_TILEY / 2;
+#if 1
+  DrawGraphicAnimation(xpos, ypos, el2img(properties_element));
+#else
+  DrawGraphicAnimation(xpos, ypos, el_dir_act2img(properties_element,
+						  MV_NO_MOVING,
+						  ...));
+#endif
+  FY -= MINI_TILEY / 2;
+  MarkTileDirty(xpos, ypos + 1);
+
+  FrameCounter++;	/* increase animation frame counter */
 }
 
 void ClearEditorGadgetInfoText()

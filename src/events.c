@@ -871,6 +871,10 @@ void HandleJoystick()
       HandleHelpScreen(!newbutton);
       break;
 
+    case LEVELED:
+      HandleLevelEditorIdle();
+      break;
+
     case PLAYING:
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);

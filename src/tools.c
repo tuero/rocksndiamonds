@@ -768,23 +768,26 @@ void DrawPlayer(struct PlayerInfo *player)
   MarkTileDirty(sx,sy);
 }
 
-void DrawGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
+void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+			     int graphic, int mask_mode)
 {
-  if (IN_SCR_FIELD(x, y) &&
-      (FrameCounter % new_graphic_info[graphic].anim_delay) == 0)
-  {
-    int frame = getGraphicAnimationFrame(graphic, -1);
+  int frame = getGraphicAnimationFrame(graphic, -1);
 
-    if (mask_mode == USE_MASKING)
-      DrawGraphicThruMask(x, y, graphic, frame);
-    else
-      DrawGraphic(x, y, graphic, frame);
-  }
+  if (mask_mode == USE_MASKING)
+    DrawGraphicThruMaskExt(dst_bitmap, x, y, graphic, frame);
+  else
+    DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
 void DrawGraphicAnimation(int x, int y, int graphic)
 {
-  DrawGraphicAnimationExt(x, y, graphic, NO_MASKING);
+  if (!IN_SCR_FIELD(x, y) ||
+      (FrameCounter % new_graphic_info[graphic].anim_delay) != 0)
+    return;
+
+  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
+			  graphic, NO_MASKING);
+  MarkTileDirty(x, y);
 }
 
 #if 1
@@ -876,7 +879,7 @@ void DrawGraphic(int x, int y, int graphic, int frame)
   MarkTileDirty(x, y);
 }
 
-#if 1
+#if 0
 void DrawOldGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
 {
   Bitmap *src_bitmap;

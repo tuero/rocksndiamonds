@@ -72,9 +72,12 @@ void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
 int getGraphicAnimationFrame(int, int);
 void DrawGraphicAnimation(int, int, int);
+void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int);
 void getGraphicSource(int, int, Bitmap **, int *, int *);
 void DrawGraphic(int, int, int, int);
+#if 0
 void DrawOldGraphicExt(DrawBuffer *, int, int, int);
+#endif
 void DrawGraphicExt(DrawBuffer *, int, int, int, int);
 void DrawGraphicThruMask(int, int, int, int);
 void DrawGraphicThruMaskExt(DrawBuffer *, int, int, int, int);

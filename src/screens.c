@@ -435,8 +435,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 static long helpscreen_state;
 static int helpscreen_step[MAX_HELPSCREEN_ELS];
 static int helpscreen_frame[MAX_HELPSCREEN_ELS];
-static int helpscreen_delay[MAX_HELPSCREEN_ELS];
-static int helpscreen_action[] =
+#if 0
+static int OLD_helpscreen_action[] =
 {
   GFX_SPIELER1_DOWN,4,2,
   GFX_SPIELER1_UP,4,2,
@@ -544,6 +544,219 @@ static int helpscreen_action[] =
   GFX_SPEED_PILL,1,100,						HA_NEXT,
   HA_END
 };
+#endif
+
+static int helpscreen_action[] =
+{
+  IMG_PLAYER1_DOWN_MOVING,		16,
+  IMG_PLAYER1_UP_MOVING,		16,
+  IMG_PLAYER1_LEFT_MOVING,		16,
+  IMG_PLAYER1_RIGHT_MOVING,		16,
+  IMG_PLAYER1_LEFT_PUSHING,		16,
+  IMG_PLAYER1_RIGHT_PUSHING,		16,			HA_NEXT,
+
+  IMG_SAND,				-1,			HA_NEXT,
+
+  IMG_EMPTY_SPACE,			-1,			HA_NEXT,
+
+  IMG_QUICKSAND_EMPTY,			-1,			HA_NEXT,
+
+  IMG_STEELWALL,			-1,			HA_NEXT,
+
+  IMG_WALL,				-1,			HA_NEXT,
+
+  IMG_WALL_GROWING_ACTIVE_LEFT,		20,
+  IMG_WALL,				50,
+  IMG_EMPTY_SPACE,			20,
+  IMG_WALL_GROWING_ACTIVE_RIGHT,	20,
+  IMG_WALL,				50,
+  IMG_EMPTY_SPACE,			20,
+  IMG_WALL_GROWING_ACTIVE_UP,		20,
+  IMG_WALL,				50,
+  IMG_EMPTY_SPACE,			20,
+  IMG_WALL_GROWING_ACTIVE_DOWN,		20,
+  IMG_WALL,				50,
+  IMG_EMPTY_SPACE,			20,			HA_NEXT,
+
+  IMG_INVISIBLE_WALL,			-1,			HA_NEXT,
+
+  IMG_WALL_CRUMBLED,			-1,			HA_NEXT,
+
+  IMG_INFO_FONT_EM_1,			160,
+  IMG_INFO_FONT_EM_2,			160,
+  IMG_INFO_FONT_EM_3,			160,
+  IMG_INFO_FONT_EM_4,			160,
+  IMG_INFO_FONT_EM_5,			40,			HA_NEXT,
+
+  IMG_EMERALD,				-1,			HA_NEXT,
+
+  IMG_DIAMOND,				-1,			HA_NEXT,
+
+  IMG_BD_DIAMOND,			-1,			HA_NEXT,
+
+  IMG_EMERALD_YELLOW,			50,
+  IMG_EMERALD_RED,			50,
+  IMG_EMERALD_PURPLE,			50,			HA_NEXT,
+
+  IMG_BD_ROCK,				-1,			HA_NEXT,
+
+  IMG_BOMB,				100,
+  IMG_EXPLOSION,			16,
+  IMG_EMPTY_SPACE,			10,			HA_NEXT,
+
+  IMG_NUT,				100,
+  IMG_NUT_CRACKING,			6,
+  IMG_EMERALD,				20,			HA_NEXT,
+
+  IMG_WALL_EMERALD, 			100,
+  IMG_EXPLOSION,			16,
+  IMG_EMERALD,				20,			HA_NEXT,
+
+  IMG_WALL_DIAMOND, 			100,
+  IMG_EXPLOSION,			16,
+  IMG_DIAMOND,				20,			HA_NEXT,
+
+  IMG_WALL_BD_DIAMOND, 			100,
+  IMG_EXPLOSION,			16,
+  IMG_BD_DIAMOND,			20,			HA_NEXT,
+
+  IMG_WALL_EMERALD_YELLOW,		100,
+  IMG_EXPLOSION,			16,
+  IMG_EMERALD_YELLOW,			20,
+  IMG_WALL_EMERALD_RED,			100,
+  IMG_EXPLOSION,			16,
+  IMG_EMERALD_RED,			20,
+  IMG_WALL_EMERALD_PURPLE,		100,
+  IMG_EXPLOSION,			16,
+  IMG_EMERALD_PURPLE,			20,			HA_NEXT,
+
+  IMG_ACID,				-1,			HA_NEXT,
+
+  IMG_KEY1,				50,
+  IMG_KEY2,				50,
+  IMG_KEY3,				50,
+  IMG_KEY4,				50,			HA_NEXT,
+
+  IMG_GATE1,				50,
+  IMG_GATE2,				50,
+  IMG_GATE3,				50,
+  IMG_GATE4,				50,			HA_NEXT,
+
+  IMG_GATE1_GRAY,			50,
+  IMG_GATE2_GRAY,			50,
+  IMG_GATE3_GRAY,			50,
+  IMG_GATE4_GRAY,			50,			HA_NEXT,
+
+  IMG_DYNAMITE,				-1,			HA_NEXT,
+
+  IMG_DYNAMITE_ACTIVE,			96,
+  IMG_EXPLOSION,			16,
+  IMG_EMPTY_SPACE,			20,			HA_NEXT,
+
+  IMG_DYNABOMB_ACTIVE,			100,
+  IMG_EXPLOSION,			16,
+  IMG_EMPTY_SPACE,			20,			HA_NEXT,
+
+  IMG_DYNABOMB_NR,			-1,			HA_NEXT,
+
+  IMG_DYNABOMB_SZ,			-1,			HA_NEXT,
+
+  IMG_SPACESHIP_RIGHT,			16,
+  IMG_SPACESHIP_UP,			16,
+  IMG_SPACESHIP_LEFT,			16,
+  IMG_SPACESHIP_DOWN,			16,			HA_NEXT,
+
+  IMG_BUG_RIGHT,			16,
+  IMG_BUG_UP,				16,
+  IMG_BUG_LEFT,				16,
+  IMG_BUG_DOWN,				16,			HA_NEXT,
+
+  IMG_BD_BUTTERFLY,			-1,			HA_NEXT,
+
+  IMG_BD_FIREFLY,			-1,			HA_NEXT,
+
+  IMG_PACMAN_RIGHT,			16,
+  IMG_PACMAN_UP,			16,
+  IMG_PACMAN_LEFT,			16,
+  IMG_PACMAN_DOWN,			16,			HA_NEXT,
+
+  IMG_YAMYAM,				-1,			HA_NEXT,
+
+  IMG_DARK_YAMYAM,			-1,			HA_NEXT,
+
+  IMG_ROBOT,				-1,			HA_NEXT,
+
+  IMG_MOLE_RIGHT_MOVING,		16,
+  IMG_MOLE_UP_MOVING,			16,
+  IMG_MOLE_LEFT_MOVING,			16,
+  IMG_MOLE_DOWN_MOVING,			16,			HA_NEXT,
+
+  IMG_PENGUIN_RIGHT_MOVING,		16,
+  IMG_PENGUIN_UP_MOVING,		16,
+  IMG_PENGUIN_LEFT_MOVING,		16,
+  IMG_PENGUIN_DOWN_MOVING,		16,			HA_NEXT,
+
+  IMG_PIG_RIGHT_MOVING,			16,
+  IMG_PIG_UP_MOVING,			16,
+  IMG_PIG_LEFT_MOVING,			16,
+  IMG_PIG_DOWN_MOVING,			16,			HA_NEXT,
+
+  IMG_DRAGON_RIGHT_MOVING,		16,
+  IMG_DRAGON_UP_MOVING,			16,
+  IMG_DRAGON_LEFT_MOVING,		16,
+  IMG_DRAGON_DOWN_MOVING,		16,			HA_NEXT,
+
+  IMG_SATELLITE,			-1,			HA_NEXT,
+
+  IMG_ROBOT_WHEEL,			50,
+  IMG_ROBOT_WHEEL_ACTIVE,		100,			HA_NEXT,
+
+  IMG_LAMP,				50,
+  IMG_LAMP_ACTIVE,			50,			HA_NEXT,
+
+  IMG_TIME_ORB_FULL,			50,
+  IMG_TIME_ORB_EMPTY,			50,			HA_NEXT,
+
+  IMG_AMOEBA_DROP,			50,
+  IMG_AMOEBA_CREATING,			6,
+  IMG_AMOEBA_WET,			20,			HA_NEXT,
+
+  IMG_AMOEBA_DEAD,			-1,			HA_NEXT,
+
+  IMG_AMOEBA_WET,			-1,			HA_NEXT,
+
+  IMG_AMOEBA_WET,			100,
+  IMG_AMOEBA_CREATING,			6,			HA_NEXT,
+
+  IMG_AMOEBA_FULL,			50,
+  IMG_AMOEBA_DEAD,			50,
+  IMG_EXPLOSION,			16,
+  IMG_DIAMOND,				20,			HA_NEXT,
+
+  IMG_GAMEOFLIFE,			-1,			HA_NEXT,
+
+  IMG_BIOMAZE,				-1,			HA_NEXT,
+
+  IMG_MAGIC_WALL_ACTIVE,		-1,			HA_NEXT,
+
+  IMG_BD_MAGIC_WALL_ACTIVE,		-1,			HA_NEXT,
+
+  IMG_EXIT_CLOSED,			200,
+  IMG_EXIT_OPENING,			16,
+  IMG_EXIT_OPEN,			100,			HA_NEXT,
+
+  IMG_EXIT_OPEN,			-1,			HA_NEXT,
+
+  IMG_SOKOBAN_OBJECT,			-1,			HA_NEXT,
+
+  IMG_SOKOBAN_FIELD_EMPTY,		-1,			HA_NEXT,
+
+  IMG_SOKOBAN_FIELD_FULL,		-1,			HA_NEXT,
+
+  IMG_SPEED_PILL,			-1,			HA_NEXT,
+
+  HA_END
+};
 static char *helpscreen_eltext[][2] =
 {
  {"THE HERO:",				"(Is _this_ guy good old Rockford?)"},
@@ -608,7 +821,7 @@ static char *helpscreen_eltext[][2] =
  {"Sokoban element: Field with object", "which can be pushed away"},
  {"Speed pill: Lets the player run",    "twice as fast as normally"},
 };
-static int num_helpscreen_els = sizeof(helpscreen_eltext)/(2*sizeof(char *));
+static int num_helpscreen_els = sizeof(helpscreen_eltext) / (2*sizeof(char *));
 
 static char *helpscreen_music[][3] =
 {
@@ -623,7 +836,8 @@ static char *helpscreen_music[][3] =
 static int num_helpscreen_music = 7;
 static int helpscreen_musicpos;
 
-void DrawHelpScreenElAction(int start)
+#if 0
+void OLD_DrawHelpScreenElAction(int start)
 {
   int i = 0, j = 0;
   int frame, graphic;
@@ -684,6 +898,81 @@ void DrawHelpScreenElAction(int start)
     MarkTileDirty(0,i);
     MarkTileDirty(1,i);
   }
+}
+#endif
+
+void DrawHelpScreenElAction(int start)
+{
+  int i = 0, j = 0;
+  int xstart = SX + 16;
+  int ystart = SY + 64 + 2 * 32;
+  int ystep = TILEY + 4;
+  int graphic;
+  int frame_count;
+  int sync_frame;
+  int frame;
+
+  while (helpscreen_action[j] != HA_END)
+  {
+    if (i >= start + MAX_HELPSCREEN_ELS || i >= num_helpscreen_els)
+      break;
+    else if (i < start)
+    {
+      while (helpscreen_action[j] != HA_NEXT)
+	j++;
+
+      j++;
+      i++;
+
+      continue;
+    }
+
+    j += 2 * helpscreen_step[i-start];
+    graphic = helpscreen_action[j++];
+    frame_count = helpscreen_action[j++];
+    if (frame_count == -1)
+      frame_count = 1000000;
+
+    if (helpscreen_frame[i-start] == 0)
+    {
+      sync_frame = 0;
+      helpscreen_frame[i-start] = frame_count - 1;
+    }
+    else
+    {
+      sync_frame = frame_count - helpscreen_frame[i-start];
+      helpscreen_frame[i-start]--;
+    }
+
+    if (helpscreen_action[j] == HA_NEXT)
+    {
+      if (!helpscreen_frame[i-start])
+	helpscreen_step[i-start] = 0;
+    }
+    else
+    {
+      if (!helpscreen_frame[i-start])
+	helpscreen_step[i-start]++;
+      while(helpscreen_action[j] != HA_NEXT)
+	j++;
+    }
+    j++;
+
+    frame = getGraphicAnimationFrame(graphic, sync_frame);
+
+    DrawGraphicExt(drawto, xstart, ystart + (i-start) * ystep,
+		   graphic, frame);
+
+    i++;
+  }
+
+  for(i=2; i<16; i++)
+  {
+    MarkTileDirty(0, i);
+    MarkTileDirty(1, i);
+  }
+
+  FrameCounter++;
 }
 
 void DrawHelpScreenElText(int start)
@@ -812,7 +1101,7 @@ void DrawHelpScreen()
   CloseDoor(DOOR_CLOSE_2);
 
   for(i=0;i<MAX_HELPSCREEN_ELS;i++)
-    helpscreen_step[i] = helpscreen_frame[i] = helpscreen_delay[i] = 0;
+    helpscreen_step[i] = helpscreen_frame[i] = 0;
   helpscreen_musicpos = 0;
   helpscreen_state = 0;
   DrawHelpScreenElText(0);
@@ -836,8 +1125,10 @@ void HandleHelpScreen(int button)
     if (helpscreen_state < num_helpscreen_els_pages - 1)
     {
       for(i=0;i<MAX_HELPSCREEN_ELS;i++)
-	helpscreen_step[i] = helpscreen_frame[i] = helpscreen_delay[i] = 0;
+	helpscreen_step[i] = helpscreen_frame[i] = 0;
       helpscreen_state++;
+
+      FrameCounter = 0;
       DrawHelpScreenElText(helpscreen_state * MAX_HELPSCREEN_ELS);
       DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
     }
@@ -868,7 +1159,7 @@ void HandleHelpScreen(int button)
   }
   else
   {
-    if (DelayReached(&hs_delay, GAME_FRAME_DELAY * 2))
+    if (DelayReached(&hs_delay, GAME_FRAME_DELAY))
     {
       if (helpscreen_state < num_helpscreen_els_pages)
 	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);

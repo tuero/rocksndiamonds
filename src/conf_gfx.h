@@ -659,13 +659,18 @@
 #define IMG_MENU_FONT_SMALL			638
 #define IMG_MENU_FONT_MEDIUM			639
 #define IMG_MENU_FONT_EM			640
-#define IMG_OLD_PIX_ELEMENTS			641
-#define IMG_OLD_PIX_HEROES			642
-#define IMG_OLD_PIX_SP				643
-#define IMG_OLD_PIX_DC				644
-#define IMG_OLD_PIX_MORE			645
-#define IMG_OLD_PIX_FONT_EM			646
+#define IMG_INFO_FONT_EM_1			641
+#define IMG_INFO_FONT_EM_2			642
+#define IMG_INFO_FONT_EM_3			643
+#define IMG_INFO_FONT_EM_4			644
+#define IMG_INFO_FONT_EM_5			645
+#define IMG_OLD_PIX_ELEMENTS			646
+#define IMG_OLD_PIX_HEROES			647
+#define IMG_OLD_PIX_SP				648
+#define IMG_OLD_PIX_DC				649
+#define IMG_OLD_PIX_MORE			650
+#define IMG_OLD_PIX_FONT_EM			651
 
-#define NUM_IMAGE_FILES				647
+#define NUM_IMAGE_FILES				652
 
 #endif	/* CONF_GFX_H */
