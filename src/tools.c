@@ -553,15 +553,15 @@ void DrawPlayer(struct PlayerInfo *player)
     else if (action_moving)
     {
       if (player->MovDir == MV_LEFT)
-	graphic = GFX_MURPHY_ANY_LEFT;
+	graphic = GFX_MURPHY_GO_LEFT;
       else if (player->MovDir == MV_RIGHT)
-	graphic = GFX_MURPHY_ANY_RIGHT;
+	graphic = GFX_MURPHY_GO_RIGHT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_LEFT)
-	graphic = GFX_MURPHY_ANY_LEFT;
+	graphic = GFX_MURPHY_GO_LEFT;
       else if (player->MovDir & (MV_UP | MV_DOWN) && last_dir == MV_RIGHT)
-	graphic = GFX_MURPHY_ANY_RIGHT;
+	graphic = GFX_MURPHY_GO_RIGHT;
 
-      graphic -= getGraphicAnimationPhase(2, 4, ANIM_NORMAL);
+      graphic += getGraphicAnimationPhase(3, 2, ANIM_OSCILLATE);
     }
 
     if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
@@ -610,20 +610,9 @@ void DrawPlayer(struct PlayerInfo *player)
       int element = Feld[next_jx][next_jy];
       int graphic = el2gfx(element);
 
-      if (element == EL_FELSBROCKEN && sxx)
+      if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK) && sxx)
       {
 	int phase = (player->GfxPos / (TILEX / 4));
-
-	if (player->MovDir == MV_LEFT)
-	  graphic += phase;
-	else
-	  graphic += (phase + 4) % 4;
-      }
-      else if (element == EL_SP_ZONK && sxx)
-      {
-	int phase = (player->GfxPos / (TILEX / 4));
-
-	graphic = GFX2_SP_ZONK;
 
 	if (player->MovDir == MV_LEFT)
 	  graphic += phase;
@@ -1240,18 +1229,21 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   else if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK ||
 	    IS_GEM(element)) && !cut_mode)
   {
+    if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
+    {
+      if (dir == MV_LEFT)
+	graphic += (4 - phase4) % 4;
+      else if (dir == MV_RIGHT)
+	graphic += phase4;
+      else
+	graphic += phase2 * 2;
+    }
+    else if (element != EL_SP_INFOTRON)
+      graphic += phase2;
+
+    /*
     if (element == EL_SP_ZONK)
     {
-      /*
-      graphic = GFX2_SP_ZONK + phase2 * 2;
-      */
-
-      /*
-      printf("-> %d\n", phase4);
-      */
-
-      graphic = GFX2_SP_ZONK;
-
       if (dir == MV_LEFT)
 	graphic += (4 - phase4) % 4;
       else if (dir == MV_RIGHT)
@@ -1261,6 +1253,8 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     }
     else if (element != EL_SP_INFOTRON)
       graphic += phase2 * (element == EL_FELSBROCKEN ? 2 : 1);
+    */
+
   }
   else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
 	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)
@@ -2732,6 +2726,8 @@ int el2gfx(int element)
     case EL_SPEED_PILL:		return GFX_SPEED_PILL;
     case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
     case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
+    case EL_SP_ZONK:		return GFX_SP_ZONK;
+      /* ^^^^^^^^^^ non-standard position in supaplex graphic set! */
     case EL_INVISIBLE_STEEL:	return GFX_INVISIBLE_STEEL;
     case EL_BLACK_ORB:		return GFX_BLACK_ORB;
 
