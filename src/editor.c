@@ -1793,7 +1793,7 @@ static void CreateControlButtons()
     gd_x2 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS;
     gd_y  = DOOR_GFX_PAGEY1 + ED_ELEMENTLIST_YPOS;
 
-    getMiniGraphicSource(el2img(element), &deco_bitmap, &deco_x, &deco_y);
+    getMiniGraphicSource(el2edimg(element), &deco_bitmap, &deco_x, &deco_y);
     deco_xpos = (ED_ELEMENTLIST_XSIZE - MINI_TILEX) / 2;
     deco_ypos = (ED_ELEMENTLIST_YSIZE - MINI_TILEY) / 2;
 
@@ -2455,13 +2455,13 @@ void DrawLevelEd()
   /* draw mouse button brush elements */
   DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
-		     el2img(new_element1));
+		     el2edimg(new_element1));
   DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
-		     el2img(new_element2));
+		     el2edimg(new_element2));
   DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
-		     el2img(new_element3));
+		     el2edimg(new_element3));
 
   /* draw bigger door */
   DrawSpecialEditorDoor();
@@ -2637,21 +2637,21 @@ static void PickDrawingElement(int button, int element)
     new_element1 = element;
     DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
-		       el2img(new_element1));
+		       el2edimg(new_element1));
   }
   else if (button == 2)
   {
     new_element2 = element;
     DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
-		       el2img(new_element2));
+		       el2edimg(new_element2));
   }
   else
   {
     new_element3 = element;
     DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
-		       el2img(new_element3));
+		       el2edimg(new_element3));
   }
 
   redraw_mask |= REDRAW_DOOR_1;
@@ -2965,7 +2965,7 @@ static void DrawPropertiesWindow()
   DrawGraphicAnimationExt(drawto,
 			  SX + xstart * MINI_TILEX,
 			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-			  el2img(properties_element), -1, NO_MASKING);
+			  el2edimg(properties_element), -1, NO_MASKING);
 
   FrameCounter = 0;	/* restart animation frame counter */
 
@@ -3752,11 +3752,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + sx * MINI_TILEX,
 			   gi->y + sy * MINI_TILEY,
-			   el2img(new_element));
+			   el2edimg(new_element));
 	DrawMiniGraphicExt(window,
 			   gi->x + sx * MINI_TILEX,
 			   gi->y + sy * MINI_TILEY,
-			   el2img(new_element));
+			   el2edimg(new_element));
 
 	if (id == GADGET_ID_AMOEBA_CONTENT)
 	  level.amoeba_content = new_element;
@@ -4078,7 +4078,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	int element = editor_elements[element_shift + i];
 
 	UnmapGadget(gi);
-	getMiniGraphicSource(el2img(element), &gd->bitmap, &gd->x, &gd->y);
+	getMiniGraphicSource(el2edimg(element), &gd->bitmap, &gd->x, &gd->y);
 	ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
 	MapGadget(gi);
       }
@@ -4354,7 +4354,7 @@ void HandleLevelEditorIdle()
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
-			  el2img(properties_element), -1, NO_MASKING);
+			  el2edimg(properties_element), -1, NO_MASKING);
 
   MarkTileDirty(xpos, ypos);
   MarkTileDirty(xpos, ypos + 1);

@@ -206,8 +206,8 @@
 #define VERSION_PATCH(x)	((x) % 100)
 
 /* functions for parent/child process identification */
-#define IS_PARENT_PROCESS(pid)	((pid) > 0 || (pid) == -1)
-#define IS_CHILD_PROCESS(pid)	((pid) == 0)
+#define IS_PARENT_PROCESS()	(audio.mixer_pid != getpid())
+#define IS_CHILD_PROCESS()	(audio.mixer_pid == getpid())
 
 
 /* type definitions */
@@ -521,6 +521,7 @@ struct PropertyMapping
   int base_index;
   int ext1_index;
   int ext2_index;
+  int ext3_index;
 
   int artwork_index;
 };
@@ -542,10 +543,12 @@ struct ArtworkListInfo
   int num_base_prefixes;
   int num_ext1_suffixes;
   int num_ext2_suffixes;
+  int num_ext3_suffixes;
 
   char **base_prefixes;				/* base token prefixes array */
   char **ext1_suffixes;				/* property suffixes array 1 */
   char **ext2_suffixes;				/* property suffixes array 2 */
+  char **ext3_suffixes;				/* property suffixes array 3 */
 
   int num_property_mapping_entries;
 

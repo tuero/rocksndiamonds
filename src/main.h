@@ -798,6 +798,11 @@
 
 #define NUM_ACTIONS				21
 
+/* values for special image configuration suffixes */
+#define GFX_SPECIAL_ARG_EDITOR			0
+
+#define NUM_SPECIAL_GFX_ARGS			1
+
 
 /* values for image configuration suffixes */
 #define GFX_ARG_XPOS				0
@@ -1050,6 +1055,8 @@ struct ElementInfo
 				/* special graphics for left/right/up/down */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
 
+  int editor_graphic;		/* graphic displayed in level editor */
+
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
 };
 
@@ -1083,6 +1090,12 @@ struct ElementActionInfo
 };
 
 struct ElementDirectionInfo
+{
+  char *suffix;
+  int value;
+};
+
+struct SpecialSuffixInfo
 {
   char *suffix;
   int value;
@@ -1164,6 +1177,7 @@ extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
+extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct ConfigInfo	image_config[], sound_config[];

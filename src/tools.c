@@ -1465,7 +1465,7 @@ void DrawMiniElement(int x, int y, int element)
 {
   int graphic;
 
-  graphic = el2img(element);
+  graphic = el2edimg(element);
   DrawMiniGraphic(x, y, graphic);
 }
 
@@ -2449,4 +2449,9 @@ int el_dir2img(int element, int direction)
 int el2img(int element)
 {
   return element_info[element].graphic[ACTION_DEFAULT];
+}
+
+int el2edimg(int element)
+{
+  return element_info[element].editor_graphic;
 }

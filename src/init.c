@@ -74,6 +74,7 @@ static void InitGfxBackground();
 static void InitGadgets();
 static void InitElementImages();
 static void InitElementGraphicInfo();
+static void InitElementEditorGraphicInfo();
 static void InitElementSoundInfo();
 static void InitElementProperties();
 static void InitGraphicInfo();
@@ -189,11 +190,9 @@ static void InitArtworkConfig()
   static char *sound_class_prefix[MAX_NUM_ELEMENTS + 1];
   static char *action_suffix[NUM_ACTIONS + 1];
   static char *direction_suffix[NUM_DIRECTIONS + 1];
+  static char *special_suffix[NUM_SPECIAL_GFX_ARGS + 1];
   static char *dummy[1] = { NULL };
   int i;
-
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
-    element_info[i].custom_description = NULL;
 
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
     element_prefix[i] = element_info[i].token_name;
@@ -203,11 +202,13 @@ static void InitArtworkConfig()
     action_suffix[i] = element_action_info[i].suffix;
   for (i=0; i<NUM_DIRECTIONS + 1; i++)
     direction_suffix[i] = element_direction_info[i].suffix;
+  for (i=0; i<NUM_SPECIAL_GFX_ARGS + 1; i++)
+    special_suffix[i] = special_suffix_info[i].suffix;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		element_prefix, action_suffix, direction_suffix);
+		element_prefix, action_suffix,direction_suffix,special_suffix);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		sound_class_prefix, action_suffix, dummy);
+		sound_class_prefix, action_suffix, dummy, dummy);
 }
 
 void InitLevelArtworkInfo()
@@ -246,8 +247,9 @@ static void InitMixer()
 
 static void ReinitializeGraphics()
 {
-  InitElementGraphicInfo();	/* initialize element/graphic config info */
-  InitGraphicInfo();		/* initialize graphic info from config file */
+  InitElementGraphicInfo();		/* element => game graphic mapping */
+  InitElementEditorGraphicInfo();	/* element => editor graphic mapping */
+  InitGraphicInfo();			/* graphic => properties mapping */
 
   InitFontInfo(bitmap_font_initial,
 	       graphic_info[IMG_FONT_BIG].bitmap,
@@ -293,10 +295,10 @@ static void ReinitializeGraphics()
 
 static void ReinitializeSounds()
 {
-  InitElementSoundInfo();	/* initialize element/sound config info */
-  InitSoundInfo();		/* initialize sounds info from config file */
+  InitElementSoundInfo();	/* element => game sound mapping */
+  InitSoundInfo();		/* sound   => properties mapping */
 
-  InitPlaySoundLevel();		/* initialize internal game sound values */
+  InitPlaySoundLevel();		/* internal game sound settings */
 }
 
 static void ReinitializeMusic()
@@ -801,7 +803,11 @@ void InitElementGraphicInfo()
     int element   = property_mapping[i].base_index;
     int action    = property_mapping[i].ext1_index;
     int direction = property_mapping[i].ext2_index;
+    int special   = property_mapping[i].ext3_index;
     int graphic   = property_mapping[i].artwork_index;
+
+    if (special != -1)
+      continue;
 
     if (action < 0)
       action = ACTION_DEFAULT;
@@ -849,6 +855,45 @@ void InitElementGraphicInfo()
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] = default_action_graphic;
     }
+  }
+}
+
+void InitElementEditorGraphicInfo()
+{
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
+  int i;
+
+  /* always start with reliable default values */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    element_info[i].editor_graphic = element_info[i].graphic[ACTION_DEFAULT];
+
+#if 0
+  /* initialize element/graphic mapping from static configuration */
+  for (i=0; ... ; i++)
+  {
+    int element   = ... element;
+    int special   = ... special;
+    int graphic   = ... graphic;
+
+    if (special != GFX_SPECIAL_ARG_EDITOR)
+      continue;
+
+    element_info[element].editor_graphic = graphic;
+  }
+#endif
+
+  /* initialize element/graphic mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element   = property_mapping[i].base_index;
+    int special   = property_mapping[i].ext3_index;
+    int graphic   = property_mapping[i].artwork_index;
+
+    if (special != GFX_SPECIAL_ARG_EDITOR)
+      continue;
+
+    element_info[element].editor_graphic = graphic;
   }
 }
 

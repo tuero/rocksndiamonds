@@ -148,7 +148,7 @@ struct FileInfo *getSoundListEntry(int);
 int getSoundListPropertyMappingSize();
 struct PropertyMapping *getSoundListPropertyMapping();
 void InitSoundList(struct ConfigInfo *, int, struct ConfigInfo *,
-		   char **, char **, char **);
+		   char **, char **, char **, char **);
 void InitReloadCustomSounds(char *);
 void InitReloadCustomMusic(char *);
 void FreeAllSounds(void);

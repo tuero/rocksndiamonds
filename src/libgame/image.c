@@ -824,7 +824,8 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
 		   char **base_prefixes,
 		   char **ext1_suffixes,
-		   char **ext2_suffixes)
+		   char **ext2_suffixes,
+		   char **ext3_suffixes)
 {
   int i;
 
@@ -861,9 +862,14 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   for (i=0; ext2_suffixes[i] != NULL; i++)
     image_info->num_ext2_suffixes++;
 
+  image_info->num_ext3_suffixes = 0;
+  for (i=0; ext3_suffixes[i] != NULL; i++)
+    image_info->num_ext3_suffixes++;
+
   image_info->base_prefixes = base_prefixes;
   image_info->ext1_suffixes = ext1_suffixes;
   image_info->ext2_suffixes = ext2_suffixes;
+  image_info->ext3_suffixes = ext3_suffixes;
 
   image_info->num_property_mapping_entries = 0;
 

@@ -2798,7 +2798,7 @@ struct ElementActionInfo element_action_info[] =
   { ".active",		ACTION_ACTIVE,		TRUE	},
   { ".other",		ACTION_OTHER,		FALSE	},
 
-  { NULL,		0,			0	},
+  { NULL,		0,			0	}
 };
 
 struct ElementDirectionInfo element_direction_info[] =
@@ -2808,7 +2808,14 @@ struct ElementDirectionInfo element_direction_info[] =
   { ".up",		MV_BIT_UP			},
   { ".down",		MV_BIT_DOWN			},
 
-  { NULL,		0				},
+  { NULL,		0				}
+};
+
+struct SpecialSuffixInfo special_suffix_info[] =
+{
+  { ".EDITOR",		0,				},
+
+  { NULL,		0,				}
 };
 
 

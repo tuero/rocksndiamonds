@@ -253,13 +253,15 @@ static boolean ForkAudioProcess(void)
     return FALSE;
   }
 
+  if (audio.mixer_pid == 0)		/* we are the child process */
+    audio.mixer_pid = getpid();
+
 #if 0
-  printf("PID: %d [%s]\n", getpid(),
-	 (IS_CHILD_PROCESS(audio.mixer_pid) ? "child" : "parent"));
+  printf("PID: %d [%s]\n", getpid(),(IS_CHILD_PROCESS() ? "child" : "parent"));
   Delay(10000 * 0);
 #endif
 
-  if (IS_CHILD_PROCESS(audio.mixer_pid))
+  if (IS_CHILD_PROCESS())
     Mixer_Main();			/* this function never returns */
   else
     close(audio.mixer_pipe[0]);		/* no reading from pipe needed */
@@ -290,7 +292,7 @@ void UnixCloseAudio(void)
   if (audio.device_fd)
     close(audio.device_fd);
 
-  if (IS_PARENT_PROCESS(audio.mixer_pid))
+  if (IS_PARENT_PROCESS())
     kill(audio.mixer_pid, SIGTERM);
 }
 
@@ -457,7 +459,7 @@ static void InitAudioDevice(struct AudioFormatInfo *afmt)
 
 static void SendSoundControlToMixerProcess(SoundControl *snd_ctrl)
 {
-  if (IS_CHILD_PROCESS(audio.mixer_pid))
+  if (IS_CHILD_PROCESS())
     return;
 
   if (write(audio.mixer_pipe[1], snd_ctrl, sizeof(SoundControl)) < 0)
@@ -470,7 +472,7 @@ static void SendSoundControlToMixerProcess(SoundControl *snd_ctrl)
 
 static void ReadSoundControlFromMainProcess(SoundControl *snd_ctrl)
 {
-  if (IS_PARENT_PROCESS(audio.mixer_pid))
+  if (IS_PARENT_PROCESS())
     return;
 
   if (read(audio.mixer_pipe[0], snd_ctrl, sizeof(SoundControl))
@@ -492,7 +494,7 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
 				    setup.override_level_sounds :
 				    setup.override_level_music);
 
-  if (IS_CHILD_PROCESS(audio.mixer_pid))
+  if (IS_CHILD_PROCESS())
     return;
 
   if (leveldir_current == NULL)		/* should never happen */
@@ -1012,7 +1014,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
   int i;
 
 #if defined(AUDIO_UNIX_NATIVE)
-  if (IS_PARENT_PROCESS(audio.mixer_pid))
+  if (IS_PARENT_PROCESS())
   {
     SendSoundControlToMixerProcess(&snd_ctrl);
     return;
@@ -1794,7 +1796,8 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
 		   char **base_prefixes,
 		   char **ext1_suffixes,
-		   char **ext2_suffixes)
+		   char **ext2_suffixes,
+		   char **ext3_suffixes)
 {
   int i;
 
@@ -1831,9 +1834,14 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   for (i=0; ext2_suffixes[i] != NULL; i++)
     sound_info->num_ext2_suffixes++;
 
+  sound_info->num_ext3_suffixes = 0;
+  for (i=0; ext3_suffixes[i] != NULL; i++)
+    sound_info->num_ext3_suffixes++;
+
   sound_info->base_prefixes = base_prefixes;
   sound_info->ext1_suffixes = ext1_suffixes;
   sound_info->ext2_suffixes = ext2_suffixes;
+  sound_info->ext3_suffixes = ext3_suffixes;
 
   sound_info->num_property_mapping_entries = 0;
 

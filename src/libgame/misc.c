@@ -1552,9 +1552,23 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
   for (i=0; config_list[i].token != NULL; i++)
   {
+#if 0
+    int len_config_token;
+    int len_config_value;
+    boolean is_file_entry;
+
+    printf("%d: '%s' => '%s'\n",
+	   i, config_list[i].token, config_list[i].value);
+
+    len_config_token = strlen(config_list[i].token);
+    len_config_value = strlen(config_list[i].value);
+    is_file_entry = TRUE;
+
+#else
     int len_config_token = strlen(config_list[i].token);
     int len_config_value = strlen(config_list[i].value);
     boolean is_file_entry = TRUE;
+#endif
 
     for (j=0; suffix_list[j].token != NULL; j++)
     {
@@ -1616,7 +1630,7 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
   int len_suffix = strlen(suffix);
 
 #if 0
-  if (IS_PARENT_PROCESS(audio.mixer_pid))
+  if (IS_PARENT_PROCESS())
     printf(":::::::::: check '%s' for '%s' ::::::::::\n", token, suffix);
 #endif
 
@@ -1648,6 +1662,9 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
   char *filename = getTokenValue(setup_file_list, file_list_entry->token);
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i;
+
+  if (file_list_entry->filename != NULL)
+    free(file_list_entry->filename);
 
   if (filename != NULL)
   {
@@ -1695,7 +1712,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   int parameter_array_size = num_suffix_list_entries * sizeof(int);
 
 #if 0
-  if (IS_PARENT_PROCESS(audio.mixer_pid))
+  if (IS_PARENT_PROCESS())
     printf("===> found dynamic definition '%s'\n", token);
 #endif
 
@@ -1704,6 +1721,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
   new_list_entry = &(*list)[*num_list_entries - 1];
 
   new_list_entry->token = getStringCopy(token);
+  new_list_entry->filename = NULL;
   new_list_entry->parameter = checked_calloc(parameter_array_size);
 
   read_token_parameters(extra_file_list, suffix_list, new_list_entry);
@@ -1711,7 +1729,8 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
 
 static void add_property_mapping(struct PropertyMapping **list,
 				 int *num_list_entries,
-				 int base_index, int ext1_index,int ext2_index,
+				 int base_index, int ext1_index,
+				 int ext2_index, int ext3_index,
 				 int artwork_index)
 {
   struct PropertyMapping *new_list_entry;
@@ -1724,6 +1743,7 @@ static void add_property_mapping(struct PropertyMapping **list,
   new_list_entry->base_index = base_index;
   new_list_entry->ext1_index = ext1_index;
   new_list_entry->ext2_index = ext2_index;
+  new_list_entry->ext3_index = ext3_index;
 
   new_list_entry->artwork_index = artwork_index;
 }
@@ -1735,17 +1755,19 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   char **base_prefixes = artwork_info->base_prefixes;
   char **ext1_suffixes = artwork_info->ext1_suffixes;
   char **ext2_suffixes = artwork_info->ext2_suffixes;
+  char **ext3_suffixes = artwork_info->ext3_suffixes;
   int num_file_list_entries = artwork_info->num_file_list_entries;
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   int num_base_prefixes = artwork_info->num_base_prefixes;
   int num_ext1_suffixes = artwork_info->num_ext1_suffixes;
   int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
+  int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
   struct SetupFileList *extra_file_list = NULL;
   struct SetupFileList *list;
   char *known_token_value = KNOWN_TOKEN_VALUE;
-  int i, j, k;
+  int i, j, k, l;
 
 #if 0
   printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
@@ -1756,7 +1778,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   {
     if (file_list[i].filename != NULL)
       free(file_list[i].filename);
-    file_list[i].filename = NULL;
+    file_list[i].filename = getStringCopy(file_list[i].default_filename);
 
     for (j=0; j<num_suffix_list_entries; j++)
       file_list[i].parameter[j] = file_list[i].default_parameter[j];
@@ -1848,7 +1870,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     }
 
 #if 0
-    if (IS_PARENT_PROCESS(audio.mixer_pid))
+    if (IS_PARENT_PROCESS())
     {
       if (parameter_suffix_found)
 	printf("---> skipping token '%s' (parameter token)\n", token);
@@ -1860,7 +1882,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     if (parameter_suffix_found)
       continue;
 
-    /* ---------- step 1: search for matching base prefix ---------- */
+    /* ---------- step 0: search for matching base prefix ---------- */
 
     start_pos = 0;
     for (i=0; i<num_base_prefixes && !base_prefix_found; i++)
@@ -1868,14 +1890,25 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       char *base_prefix = base_prefixes[i];
       int len_base_prefix = strlen(base_prefix);
       boolean ext1_suffix_found = FALSE;
+      boolean ext2_suffix_found = FALSE;
+      boolean ext3_suffix_found = FALSE;
+      boolean exact_match = FALSE;
+      int base_index = -1;
+      int ext1_index = -1;
+      int ext2_index = -1;
+      int ext3_index = -1;
 
       base_prefix_found = token_suffix_match(token, base_prefix, start_pos);
 
       if (!base_prefix_found)
 	continue;
 
+      base_index = i;
+
       if (start_pos + len_base_prefix == len_token)	/* exact match */
       {
+	exact_match = TRUE;
+
 	add_dynamic_file_list_entry(dynamic_file_list,
 				    num_dynamic_file_list_entries,
 				    extra_file_list,
@@ -1884,32 +1917,35 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 				    token);
 	add_property_mapping(property_mapping,
 			     num_property_mapping_entries,
-			     i, -1, -1,
+			     base_index, -1, -1, -1,
 			     current_summarized_file_list_entry);
 	continue;
       }
 
 #if 0
-      if (IS_PARENT_PROCESS(audio.mixer_pid))
+      if (IS_PARENT_PROCESS())
 	printf("---> examining token '%s': search 1st suffix ...\n", token);
 #endif
 
-      /* ---------- step 2: search for matching first suffix ---------- */
+      /* ---------- step 1: search for matching first suffix ---------- */
 
       start_pos += len_base_prefix;
       for (j=0; j<num_ext1_suffixes && !ext1_suffix_found; j++)
       {
 	char *ext1_suffix = ext1_suffixes[j];
 	int len_ext1_suffix = strlen(ext1_suffix);
-	boolean ext2_suffix_found = FALSE;
 
 	ext1_suffix_found = token_suffix_match(token, ext1_suffix, start_pos);
 
 	if (!ext1_suffix_found)
 	  continue;
 
+	ext1_index = j;
+
 	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
 	{
+	  exact_match = TRUE;
+
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
 				      extra_file_list,
@@ -1918,43 +1954,93 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 				      token);
 	  add_property_mapping(property_mapping,
 			       num_property_mapping_entries,
-			       i, j, -1,
+			       base_index, ext1_index, -1, -1,
 			       current_summarized_file_list_entry);
 	  continue;
 	}
 
+	start_pos += len_ext1_suffix;
+      }
+
+      if (exact_match)
+	break;
+
 #if 0
-	if (IS_PARENT_PROCESS(audio.mixer_pid))
-	  printf("---> examining token '%s': search 2nd suffix ...\n", token);
+      if (IS_PARENT_PROCESS())
+	printf("---> examining token '%s': search 2nd suffix ...\n", token);
 #endif
 
-	/* ---------- step 3: search for matching second suffix ---------- */
+      /* ---------- step 2: search for matching second suffix ---------- */
 
-	start_pos += len_ext1_suffix;
-	for (k=0; k<num_ext2_suffixes && !ext2_suffix_found; k++)
+      for (k=0; k<num_ext2_suffixes && !ext2_suffix_found; k++)
+      {
+	char *ext2_suffix = ext2_suffixes[k];
+	int len_ext2_suffix = strlen(ext2_suffix);
+
+	ext2_suffix_found = token_suffix_match(token, ext2_suffix,start_pos);
+
+	if (!ext2_suffix_found)
+	  continue;
+
+	ext2_index = k;
+
+	if (start_pos + len_ext2_suffix == len_token)	/* exact match */
 	{
-	  char *ext2_suffix = ext2_suffixes[k];
-	  int len_ext2_suffix = strlen(ext2_suffix);
+	  exact_match = TRUE;
 
-	  ext2_suffix_found = token_suffix_match(token, ext2_suffix,start_pos);
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_list,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       base_index, ext1_index, ext2_index, -1,
+			       current_summarized_file_list_entry);
+	  continue;
+	}
 
-	  if (!ext2_suffix_found)
-	    continue;
+	start_pos += len_ext2_suffix;
+      }
 
-	  if (start_pos + len_ext2_suffix == len_token)	/* exact match */
-	  {
-	    add_dynamic_file_list_entry(dynamic_file_list,
-					num_dynamic_file_list_entries,
-					extra_file_list,
-					suffix_list,
-					num_suffix_list_entries,
-					token);
-	    add_property_mapping(property_mapping,
-				 num_property_mapping_entries,
-				 i, j, k,
-				 current_summarized_file_list_entry);
-	    continue;
-	  }
+      if (exact_match)
+	break;
+
+#if 0
+      if (IS_PARENT_PROCESS())
+	printf("---> examining token '%s': search 3rd suffix ...\n",token);
+#endif
+
+      /* ---------- step 3: search for matching third suffix ---------- */
+
+      for (l=0; l<num_ext3_suffixes && !ext3_suffix_found; l++)
+      {
+	char *ext3_suffix = ext3_suffixes[l];
+	int len_ext3_suffix = strlen(ext3_suffix);
+
+	ext3_suffix_found =token_suffix_match(token,ext3_suffix,start_pos);
+
+	if (!ext3_suffix_found)
+	  continue;
+
+	ext3_index = l;
+
+	if (start_pos + len_ext3_suffix == len_token) /* exact match */
+	{
+	  exact_match = TRUE;
+
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_list,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  add_property_mapping(property_mapping,
+			       num_property_mapping_entries,
+			       base_index, ext1_index, ext2_index, ext3_index,
+			       current_summarized_file_list_entry);
+	  continue;
 	}
       }
     }
@@ -1967,8 +2053,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 		     artwork_info->sizeof_artwork_list_entry);
   }
 
-  if (extra_file_list != NULL &&
-      options.verbose && IS_PARENT_PROCESS(audio.mixer_pid))
+  if (extra_file_list != NULL && options.verbose && IS_PARENT_PROCESS())
   {
     boolean dynamic_tokens_found = FALSE;
     boolean unknown_tokens_found = FALSE;
@@ -2187,13 +2272,16 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 #if 0
   printf("DEBUG: reloading %d static artwork files ...\n",
 	 num_file_list_entries);
-  printf("DEBUG: reloading %d dynamic artwork files ...\n",
-	 num_dynamic_file_list_entries);
 #endif
 
   for(i=0; i<num_file_list_entries; i++)
     LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      file_list[i].filename, i);
+
+#if 0
+  printf("DEBUG: reloading %d dynamic artwork files ...\n",
+	 num_dynamic_file_list_entries);
+#endif
 
   for(i=0; i<num_dynamic_file_list_entries; i++)
     LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
@@ -2228,7 +2316,7 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 
 #if 0
   printf("%s: FREEING ARTWORK ...\n",
-	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+	 IS_CHILD_PROCESS() ? "CHILD" : "PARENT");
 #endif
 
   FreeCustomArtworkList(artwork_info, &artwork_info->artwork_list,
@@ -2239,7 +2327,7 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 
 #if 0
   printf("%s: FREEING ARTWORK -- DONE\n",
-	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
+	 IS_CHILD_PROCESS() ? "CHILD" : "PARENT");
 #endif
 }
 
