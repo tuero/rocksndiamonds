@@ -65,26 +65,15 @@ static struct SoundControl emptySoundControl =
 #endif
 };
 
-#if defined(PLATFORM_UNIX)
-static int stereo_volume[PSND_MAX_LEFT2RIGHT + 1];
-static short premix_first_buffer[SND_BLOCKSIZE];
-#if defined(AUDIO_STREAMING_DSP)
-static short premix_left_buffer[SND_BLOCKSIZE];
-static short premix_right_buffer[SND_BLOCKSIZE];
-static long premix_last_buffer[SND_BLOCKSIZE];
-#endif
-static byte playing_buffer[SND_BLOCKSIZE];
-#endif
-
 /* forward declaration of internal functions */
-#if defined(AUDIO_STREAMING_DSP)
 static void SoundServer_InsertNewSound(struct SoundControl);
-static void InitAudioDevice_DSP(struct AudioFormatInfo *);
-#elif defined(PLATFORM_HPUX)
-static void InitAudioDevice_HPUX(struct AudioFormatInfo *);
-#elif defined(PLATFORM_UNIX)
+static void InitAudioDevice(struct AudioFormatInfo *);
+
+#if defined(PLATFORM_UNIX)
+#if !defined(AUDIO_STREAMING_DSP)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
+#endif
 #elif defined(PLATFORM_MSDOS)
 static void SoundServer_InsertNewSound(struct SoundControl);
 static void SoundServer_StopSound(struct SoundControl);
@@ -222,9 +211,6 @@ static void PlaylistRemoveSound(int pos)
 
   playlist[pos] = emptySoundControl;
   playing_sounds--;
-
-  if (!playing_sounds)
-    CloseAudioDevice(&audio.device_fd);
 }
 
 static void WriteReloadInfoToPipe(char *set_name, int type)
@@ -326,7 +312,7 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
 {
   int i;
 
-  if (IS_RELOADING(snd_ctrl))
+  if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
     ReadReloadInfoFromPipe(snd_ctrl);
     InitPlaylist();
@@ -337,7 +323,7 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
     else
       ReloadCustomMusic();
   }
-  else if (IS_FADING(snd_ctrl))
+  else if (IS_FADING(snd_ctrl))		/* fade out existing sound or music */
   {
     if (!playing_sounds)
       return;
@@ -352,7 +338,7 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
       if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
 	playlist[i].state |= SND_CTRL_FADE;
   }
-  else if (IS_STOPPING(snd_ctrl))
+  else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
   {
     if (!playing_sounds)
       return;
@@ -366,6 +352,13 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
     for(i=FIRST_SOUND_CHANNEL; i<NUM_MIXER_CHANNELS; i++)
       if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
 	PlaylistRemoveSound(i);
+
+    if (!playing_sounds)
+      CloseAudioDevice(&audio.device_fd);
+  }
+  else if (snd_ctrl.active)		/* add new sound to playlist */
+  {
+    SoundServer_InsertNewSound(snd_ctrl);
   }
 }
 #endif
@@ -381,11 +374,251 @@ void StartSoundserver(void)
 #endif
 }
 
-#if defined(PLATFORM_UNIX)
-void SoundServer(void)
+#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
+
+static void CopySampleToMixingBuffer(struct SoundControl *snd_ctrl,
+				     int sample_pos, int sample_size,
+				     short *buffer_ptr)
 {
+  void *sample_ptr = snd_ctrl->data_ptr;
   int i;
 
+  if (snd_ctrl->format == AUDIO_FORMAT_U8)
+    for (i=0; i<sample_size; i++)
+      *buffer_ptr++ =
+	((short)(((byte *)sample_ptr)[sample_pos + i] ^ 0x80)) << 8;
+  else	/* AUDIO_FORMAT_S16 */
+    for (i=0; i<sample_size; i++)
+      *buffer_ptr++ =
+	((short *)sample_ptr)[sample_pos + i];
+}
+
+#if defined(AUDIO_STREAMING_DSP)
+static void SoundServer_Mixer()
+{
+  static int stereo_volume[PSND_MAX_LEFT2RIGHT + 1];
+  static boolean stereo_volume_calculated = FALSE;
+  static short premix_first_buffer[SND_BLOCKSIZE];
+  static short premix_left_buffer[SND_BLOCKSIZE];
+  static short premix_right_buffer[SND_BLOCKSIZE];
+  static long premix_last_buffer[SND_BLOCKSIZE];
+  static byte playing_buffer[SND_BLOCKSIZE];
+  int max_sample_size;
+  int fragment_size = afmt.fragment_size;
+  int sample_bytes = (afmt.format & AUDIO_FORMAT_U8 ? 1 : 2);
+  boolean stereo = afmt.stereo;
+  int i, j;
+
+  if (!stereo_volume_calculated)
+  {
+    for(i=0; i<=PSND_MAX_LEFT2RIGHT; i++)
+      stereo_volume[i] =
+	(int)sqrt((float)(PSND_MAX_LEFT2RIGHT * PSND_MAX_LEFT2RIGHT - i * i));
+
+    stereo_volume_calculated = TRUE;
+  }
+
+  if (!playing_sounds)
+    return;
+
+  if (audio.device_fd < 0)
+  {
+    if ((audio.device_fd = OpenAudioDevice(audio.device_name)) < 0)
+      return;
+
+    InitAudioDevice(&afmt);
+  }
+
+  max_sample_size = fragment_size / ((stereo ? 2 : 1) * sample_bytes);
+
+  /* first clear the last premixing buffer */
+  memset(premix_last_buffer, 0,
+	 max_sample_size * (stereo ? 2 : 1) * sizeof(long));
+
+  for(i=0; i<NUM_MIXER_CHANNELS; i++)
+  {
+    void *sample_ptr;
+    int sample_len;
+    int sample_pos;
+    int sample_size;
+
+    if (!playlist[i].active)
+      continue;
+
+    /* pointer, lenght and actual playing position of sound sample */
+    sample_ptr = playlist[i].data_ptr;
+    sample_len = playlist[i].data_len;
+    sample_pos = playlist[i].playingpos;
+    sample_size = MIN(max_sample_size, sample_len - sample_pos);
+    playlist[i].playingpos += sample_size;
+
+    /* copy original sample to first mixing buffer */
+    CopySampleToMixingBuffer(&playlist[i], sample_pos, sample_size,
+			     premix_first_buffer);
+
+    /* are we about to restart a looping sound? */
+    if (IS_LOOP(playlist[i]) && sample_size < max_sample_size)
+    {
+      while (sample_size < max_sample_size)
+      {
+	int restarted_sample_size =
+	  MIN(max_sample_size - sample_size, sample_len);
+
+	if (playlist[i].format == AUDIO_FORMAT_U8)
+	  for (j=0; j<restarted_sample_size; j++)
+	    premix_first_buffer[sample_size + j] =
+	      ((short)(((byte *)sample_ptr)[j] ^ 0x80)) << 8;
+	else
+	  for (j=0; j<restarted_sample_size; j++)
+	    premix_first_buffer[sample_size + j] =
+	      ((short *)sample_ptr)[j];
+
+	playlist[i].playingpos = restarted_sample_size;
+	sample_size += restarted_sample_size;
+      }
+    }
+
+    /* decrease volume if sound is fading out */
+    if (IS_FADING(playlist[i]) &&
+	playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
+      playlist[i].volume -= SOUND_FADING_VOLUME_STEP;
+
+    /* adjust volume of actual sound sample */
+    if (playlist[i].volume != PSND_MAX_VOLUME)
+      for(j=0; j<sample_size; j++)
+	premix_first_buffer[j] =
+	  (playlist[i].volume * (long)premix_first_buffer[j])
+	    >> PSND_MAX_VOLUME_BITS;
+
+    /* fill the last mixing buffer with stereo or mono sound */
+    if (stereo)
+    {
+      int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
+      int left_volume = stereo_volume[middle_pos + playlist[i].stereo];
+      int right_volume= stereo_volume[middle_pos - playlist[i].stereo];
+
+      for(j=0; j<sample_size; j++)
+      {
+	premix_left_buffer[j] =
+	  (left_volume * premix_first_buffer[j])
+	    >> PSND_MAX_LEFT2RIGHT_BITS;
+	premix_right_buffer[j] =
+	  (right_volume * premix_first_buffer[j])
+	    >> PSND_MAX_LEFT2RIGHT_BITS;
+
+	premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
+	premix_last_buffer[2 * j + 1] += premix_right_buffer[j];
+      }
+    }
+    else
+    {
+      for(j=0; j<sample_size; j++)
+	premix_last_buffer[j] += premix_first_buffer[j];
+    }
+
+    /* delete completed sound entries from the playlist */
+    if (playlist[i].playingpos >= playlist[i].data_len)
+    {
+      if (IS_LOOP(playlist[i]))
+	playlist[i].playingpos = 0;
+      else
+	PlaylistRemoveSound(i);
+    }
+    else if (playlist[i].volume <= SOUND_FADING_VOLUME_THRESHOLD)
+      PlaylistRemoveSound(i);
+  }
+
+  /* prepare final playing buffer according to system audio format */
+  for(i=0; i<max_sample_size * (stereo ? 2 : 1); i++)
+  {
+    /* cut off at 17 bit value */
+    if (premix_last_buffer[i] < -65535)
+      premix_last_buffer[i] = -65535;
+    else if (premix_last_buffer[i] > 65535)
+      premix_last_buffer[i] = 65535;
+
+    /* shift to 16 bit value */
+    premix_last_buffer[i] >>= 1;
+
+    if (afmt.format & AUDIO_FORMAT_U8)
+    {
+      playing_buffer[i] = (premix_last_buffer[i] >> 8) ^ 0x80;
+    }
+    else if (afmt.format & AUDIO_FORMAT_LE)	/* 16 bit */
+    {
+      playing_buffer[2 * i + 0] = premix_last_buffer[i] & 0xff;
+      playing_buffer[2 * i + 1] = premix_last_buffer[i] >> 8;
+    }
+    else					/* big endian */
+    {
+      playing_buffer[2 * i + 0] = premix_last_buffer[i] >> 8;
+      playing_buffer[2 * i + 1] = premix_last_buffer[i] & 0xff;
+    }
+  }
+
+  /* finally play the sound fragment */
+  write(audio.device_fd, playing_buffer, fragment_size);
+
+  if (!playing_sounds)
+    CloseAudioDevice(&audio.device_fd);
+}
+
+#else /* !AUDIO_STREAMING_DSP */
+
+static int SoundServer_SimpleAudio(struct SoundControl snd_ctrl)
+{
+  static short premix_first_buffer[SND_BLOCKSIZE];
+  static byte playing_buffer[SND_BLOCKSIZE];
+  int max_sample_size = SND_BLOCKSIZE;
+  void *sample_ptr;
+  int sample_len;
+  int sample_pos;
+  int sample_size;
+  int i, j;
+
+  i = 1;
+
+  /* pointer, lenght and actual playing position of sound sample */
+  sample_ptr = playlist[i].data_ptr;
+  sample_len = playlist[i].data_len;
+  sample_pos = playlist[i].playingpos;
+  sample_size = MIN(max_sample_size, sample_len - sample_pos);
+  playlist[i].playingpos += sample_size;
+
+  /* copy original sample to first mixing buffer */
+  CopySampleToMixingBuffer(&playlist[i], sample_pos, sample_size,
+			   premix_first_buffer);
+
+  /* adjust volume of actual sound sample */
+  if (playlist[i].volume != PSND_MAX_VOLUME)
+    for(j=0; j<sample_size; j++)
+      premix_first_buffer[j] =
+	(playlist[i].volume * (long)premix_first_buffer[j])
+	  >> PSND_MAX_VOLUME_BITS;
+
+  /* might be needed for u-law /dev/audio */
+#if 0
+  for(j=0; j<sample_size; j++)
+    playing_buffer[j] =
+      linear_to_ulaw(premix_first_buffer[j]);
+#endif
+
+  /* delete completed sound entries from the playlist */
+  if (playlist[i].playingpos >= playlist[i].data_len)
+    PlaylistRemoveSound(i);
+
+  for(i=0; i<sample_size; i++)
+    playing_buffer[i] = (premix_first_buffer[i] >> 8) ^ 0x80;
+
+  /* finally play the sound fragment */
+  write(audio.device_fd, playing_buffer, sample_size);
+
+  return sample_size;
+}
+#endif /* !AUDIO_STREAMING_DSP */
+
+void SoundServer()
+{
   struct SoundControl snd_ctrl;
   fd_set sound_fdset;
 
@@ -393,13 +626,8 @@ void SoundServer(void)
 
   InitPlaylist();
 
-  stereo_volume[PSND_MAX_LEFT2RIGHT] = 0;
-  for(i=0; i<PSND_MAX_LEFT2RIGHT; i++)
-    stereo_volume[i] =
-      (int)sqrt((float)(PSND_MAX_LEFT2RIGHT * PSND_MAX_LEFT2RIGHT - i * i));
-
 #if defined(PLATFORM_HPUX)
-  InitAudioDevice_HPUX(&afmt);
+  InitAudioDevice(&afmt);
 #endif
 
   FD_ZERO(&sound_fdset); 
@@ -407,6 +635,8 @@ void SoundServer(void)
 
   while(1)	/* wait for sound playing commands from client */
   {
+    struct timeval delay = { 0, 0 };
+
     FD_SET(audio.soundserver_pipe[0], &sound_fdset);
     select(audio.soundserver_pipe[0] + 1, &sound_fdset, NULL, NULL, NULL);
     if (!FD_ISSET(audio.soundserver_pipe[0], &sound_fdset))
@@ -417,238 +647,47 @@ void SoundServer(void)
 
     HandleSoundRequest(snd_ctrl);
 
-    if (IS_RELOADING(snd_ctrl))
-      continue;
-
 #if defined(AUDIO_STREAMING_DSP)
 
-    if (playing_sounds || snd_ctrl.active)
+    while (playing_sounds && select(audio.soundserver_pipe[0] + 1,
+				    &sound_fdset, NULL, NULL, &delay) < 1)
     {
-      if (playing_sounds ||
-	  (audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
-      {
-	struct timeval delay = { 0, 0 };
+      FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
-	if (!playing_sounds)	/* we just opened the audio device */
-	  InitAudioDevice_DSP(&afmt);
-
-	if (snd_ctrl.active)	/* new sound has arrived */
-	  SoundServer_InsertNewSound(snd_ctrl);
-
-	while (playing_sounds &&
-	       select(audio.soundserver_pipe[0] + 1,
-		      &sound_fdset, NULL, NULL, &delay) < 1)
-	{	
-	  int max_sample_size;
-	  int fragment_size = afmt.fragment_size;
-	  int sample_bytes = (afmt.format & AUDIO_FORMAT_U8 ? 1 : 2);
-	  boolean stereo = afmt.stereo;
-
-	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
-
-	  max_sample_size = fragment_size / ((stereo ? 2 : 1) * sample_bytes);
-
-	  /* first clear the last premixing buffer */
-	  memset(premix_last_buffer, 0,
-		 max_sample_size * (stereo ? 2 : 1) * sizeof(long));
-
-	  for(i=0; i<NUM_MIXER_CHANNELS; i++)
-	  {
-	    void *sample_ptr;
-	    int sample_len;
-	    int sample_pos;
-	    int sample_size;
-	    int j;
-
-	    if (!playlist[i].active)
-	      continue;
-
-	    /* pointer, lenght and actual playing position of sound sample */
-	    sample_ptr = playlist[i].data_ptr;
-	    sample_len = playlist[i].data_len;
-	    sample_pos = playlist[i].playingpos;
-	    sample_size = MIN(max_sample_size, sample_len - sample_pos);
-	    playlist[i].playingpos += sample_size;
-
-	    /* copy original sample to first mixing buffer */
-	    if (playlist[i].format == AUDIO_FORMAT_U8)
-	      for (j=0; j<sample_size; j++)
-		premix_first_buffer[j] =
-		  ((short)(((byte *)sample_ptr)[sample_pos + j] ^ 0x80)) << 8;
-	    else	/* AUDIO_FORMAT_S16 */
-	      for (j=0; j<sample_size; j++)
-		premix_first_buffer[j] =
-		  ((short *)sample_ptr)[sample_pos + j];
-
-	    /* are we about to restart a looping sound? */
-	    if (IS_LOOP(playlist[i]) && sample_size < max_sample_size)
-	    {
-	      while (sample_size < max_sample_size)
-	      {
-		int restarted_sample_size =
-		  MIN(max_sample_size - sample_size, sample_len);
-
-		if (playlist[i].format == AUDIO_FORMAT_U8)
-		  for (j=0; j<restarted_sample_size; j++)
-		    premix_first_buffer[sample_size + j] =
-		      ((short)(((byte *)sample_ptr)[j] ^ 0x80)) << 8;
-		else
-		  for (j=0; j<restarted_sample_size; j++)
-		    premix_first_buffer[sample_size + j] =
-		      ((short *)sample_ptr)[j];
-
-		playlist[i].playingpos = restarted_sample_size;
-		sample_size += restarted_sample_size;
-	      }
-	    }
-
-	    /* decrease volume if sound is fading out */
-	    if (IS_FADING(playlist[i]) &&
-		playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
-	      playlist[i].volume -= SOUND_FADING_VOLUME_STEP;
-
-	    /* adjust volume of actual sound sample */
-	    if (playlist[i].volume != PSND_MAX_VOLUME)
-	      for(j=0; j<sample_size; j++)
-		premix_first_buffer[j] =
-		  (playlist[i].volume * (long)premix_first_buffer[j])
-		    >> PSND_MAX_VOLUME_BITS;
-
-	    /* fill the last mixing buffer with stereo or mono sound */
-	    if (stereo)
-	    {
-	      int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
-	      int left_volume = stereo_volume[middle_pos + playlist[i].stereo];
-	      int right_volume= stereo_volume[middle_pos - playlist[i].stereo];
-
-	      for(j=0; j<sample_size; j++)
-	      {
-		premix_left_buffer[j] =
-		  (left_volume * premix_first_buffer[j])
-		    >> PSND_MAX_LEFT2RIGHT_BITS;
-		premix_right_buffer[j] =
-		  (right_volume * premix_first_buffer[j])
-		    >> PSND_MAX_LEFT2RIGHT_BITS;
-
-		premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
-		premix_last_buffer[2 * j + 1] += premix_right_buffer[j];
-	      }
-	    }
-	    else
-	    {
-	      for(j=0; j<sample_size; j++)
-		premix_last_buffer[j] += premix_first_buffer[j];
-	    }
-
-	    /* delete completed sound entries from the playlist */
-	    if (playlist[i].playingpos >= playlist[i].data_len)
-	    {
-	      if (IS_LOOP(playlist[i]))
-		playlist[i].playingpos = 0;
-	      else
-	      {
-		playlist[i] = emptySoundControl;
-		playing_sounds--;
-	      }
-	    }
-	    else if (playlist[i].volume <= SOUND_FADING_VOLUME_THRESHOLD)
-	    {
-	      playlist[i] = emptySoundControl;
-	      playing_sounds--;
-	    }
-	  }
-
-	  /* prepare final playing buffer according to system audio format */
-	  for(i=0; i<max_sample_size * (stereo ? 2 : 1); i++)
-	  {
-	    /* cut off at 17 bit value */
-	    if (premix_last_buffer[i] < -65535)
-	      premix_last_buffer[i] = -65535;
-	    else if (premix_last_buffer[i] > 65535)
-	      premix_last_buffer[i] = 65535;
-
-	    /* shift to 16 bit value */
-	    premix_last_buffer[i] >>= 1;
-
-	    if (afmt.format & AUDIO_FORMAT_U8)
-	    {
-	      playing_buffer[i] = (premix_last_buffer[i] >> 8) ^ 0x80;
-	    }
-	    else if (afmt.format & AUDIO_FORMAT_LE)	/* 16 bit */
-	    {
-	      playing_buffer[2 * i + 0] = premix_last_buffer[i] & 0xff;
-	      playing_buffer[2 * i + 1] = premix_last_buffer[i] >> 8;
-	    }
-	    else					/* big endian */
-	    {
-	      playing_buffer[2 * i + 0] = premix_last_buffer[i] >> 8;
-	      playing_buffer[2 * i + 1] = premix_last_buffer[i] & 0xff;
-	    }
-	  }
-
-	  /* finally play the sound fragment */
-	  write(audio.device_fd, playing_buffer, fragment_size);
-	}
-
-	/* if no sounds playing, free device for other sound programs */
-	if (!playing_sounds)
-	  close(audio.device_fd);
-      }
+      SoundServer_Mixer();
     }
 
 #else /* !AUDIO_STREAMING_DSP */
 
-    if (snd_ctrl.active && !IS_LOOP(snd_ctrl))
+    if (!snd_ctrl.active || IS_LOOP(snd_ctrl) ||
+	(audio.device_fd = OpenAudioDevice(audio.device_name)) < 0)
+      continue;
+
+    InitAudioDevice(&afmt);
+
+    delay.tv_sec = 0;
+    delay.tv_usec = 0;
+
+    while (playing_sounds && select(audio.soundserver_pipe[0] + 1,
+				    &sound_fdset, NULL, NULL, &delay) < 1)
     {
-      struct timeval delay = { 0, 0 };
-      byte *sample_ptr;
-      long sample_size, max_sample_size = SND_BLOCKSIZE;
-      long sample_rate = 8000;	/* standard "/dev/audio" sampling rate */
       int wait_percent = 90;	/* wait 90% of the real playing time */
-      int i;
+      int sample_size;
 
-      if ((audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
-      {
-	playing_sounds = 1;
+      FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
-	while (playing_sounds &&
-	       select(audio.soundserver_pipe[0] + 1,
-		      &sound_fdset, NULL, NULL, &delay) < 1)
-	{	
-	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
+      sample_size = SoundServer_SimpleAudio(snd_ctrl);
 
-	  /* get pointer and size of the actual sound sample */
-	  sample_ptr = snd_ctrl.data_ptr + snd_ctrl.playingpos;
-	  sample_size =
-	    MIN(max_sample_size, snd_ctrl.data_len - snd_ctrl.playingpos);
-	  snd_ctrl.playingpos += sample_size;
-
-	  /* fill the first mixing buffer with original sample */
-	  memcpy(premix_first_buffer,sample_ptr,sample_size);
-
-	  /* adjust volume of actual sound sample */
-	  if (snd_ctrl.volume != PSND_MAX_VOLUME)
-	    for(i=0;i<sample_size;i++)
-	      premix_first_buffer[i] =
-		(snd_ctrl.volume * (int)premix_first_buffer[i])
-		  >> PSND_MAX_VOLUME_BITS;
-
-	  for(i=0;i<sample_size;i++)
-	    playing_buffer[i] =
-	      linear_to_ulaw(((int)premix_first_buffer[i]) << 8);
-
-	  if (snd_ctrl.playingpos >= snd_ctrl.data_len)
-	    playing_sounds = 0;
-
-	  /* finally play the sound fragment */
-	  write(audio.device_fd,playing_buffer,sample_size);
-
-	  delay.tv_sec = 0;
-	  delay.tv_usec = ((sample_size*10*wait_percent)/(sample_rate))*1000;
-	}
-	close(audio.device_fd);
-      }
+      delay.tv_sec = 0;
+      delay.tv_usec =
+	((sample_size * 10 * wait_percent) / afmt.sample_rate) * 1000;
     }
+
+    CloseAudioDevice(&audio.device_fd);
+
+    /* delete all sounds from playlist */
+    InitPlaylist();
+
 #endif /* !AUDIO_STREAMING_DSP */
   }
 }
@@ -1111,7 +1150,7 @@ static void InitAudioDevice_HPUX(struct AudioFormatInfo *afmt)
 #endif /* PLATFORM_HPUX */
 
 #if defined(PLATFORM_UNIX)
-static void InitAudioDevice_DSP(struct AudioFormatInfo *afmt)
+static void InitAudioDevice(struct AudioFormatInfo *afmt)
 {
 #if defined(AUDIO_LINUX_IOCTL)
   InitAudioDevice_Linux(afmt);
@@ -1119,6 +1158,8 @@ static void InitAudioDevice_DSP(struct AudioFormatInfo *afmt)
   InitAudioDevice_NetBSD(afmt);
 #elif defined(PLATFORM_HPUX)
   InitAudioDevice_HPUX(afmt);
+#else
+  /* generic /dev/audio stuff might be placed here */
 #endif
 }
 #endif /* PLATFORM_UNIX */
