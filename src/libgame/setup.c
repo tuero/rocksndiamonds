@@ -23,32 +23,9 @@
 #include "misc.h"
 #include "hash.h"
 
-/* file names and filename extensions */
-#if !defined(PLATFORM_MSDOS)
-#define LEVELSETUP_DIRECTORY	"levelsetup"
-#define SETUP_FILENAME		"setup.conf"
-#define LEVELSETUP_FILENAME	"levelsetup.conf"
-#define LEVELINFO_FILENAME	"levelinfo.conf"
-#define GRAPHICSINFO_FILENAME	"graphicsinfo.conf"
-#define SOUNDSINFO_FILENAME	"soundsinfo.conf"
-#define MUSICINFO_FILENAME	"musicinfo.conf"
-#define LEVELFILE_EXTENSION	"level"
-#define TAPEFILE_EXTENSION	"tape"
-#define SCOREFILE_EXTENSION	"score"
-#else
-#define LEVELSETUP_DIRECTORY	"lvlsetup"
-#define SETUP_FILENAME		"setup.cnf"
-#define LEVELSETUP_FILENAME	"lvlsetup.cnf"
-#define LEVELINFO_FILENAME	"lvlinfo.cnf"
-#define GRAPHICSINFO_FILENAME	"gfxinfo.cnf"
-#define SOUNDSINFO_FILENAME	"sndinfo.cnf"
-#define MUSICINFO_FILENAME	"musinfo.cnf"
-#define LEVELFILE_EXTENSION	"lvl"
-#define TAPEFILE_EXTENSION	"tap"
-#define SCOREFILE_EXTENSION	"sco"
-#endif
 
 #define NUM_LEVELCLASS_DESC	8
+
 static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 {
   "Tutorial Levels",
@@ -61,14 +38,15 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
   "DX Boulderdash"
 };
 
-#define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		FC_BLUE : \
-			 IS_LEVELCLASS_CLASSICS(n) ?		FC_RED : \
-			 IS_LEVELCLASS_BD(n) ?			FC_GREEN : \
-			 IS_LEVELCLASS_EM(n) ?			FC_YELLOW : \
-			 IS_LEVELCLASS_SP(n) ?			FC_GREEN : \
-			 IS_LEVELCLASS_DX(n) ?			FC_YELLOW : \
-			 IS_LEVELCLASS_CONTRIBUTION(n) ?	FC_GREEN : \
-			 IS_LEVELCLASS_USER(n) ?		FC_RED : \
+
+#define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		FC_BLUE :    \
+			 IS_LEVELCLASS_CLASSICS(n) ?		FC_RED :     \
+			 IS_LEVELCLASS_BD(n) ?			FC_GREEN :   \
+			 IS_LEVELCLASS_EM(n) ?			FC_YELLOW :  \
+			 IS_LEVELCLASS_SP(n) ?			FC_GREEN :   \
+			 IS_LEVELCLASS_DX(n) ?			FC_YELLOW :  \
+			 IS_LEVELCLASS_CONTRIBUTION(n) ?	FC_GREEN :   \
+			 IS_LEVELCLASS_USER(n) ?		FC_RED :     \
 			 FC_BLUE)
 
 #define LEVELSORTING(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		0 : \
@@ -81,43 +59,22 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
 
-#define ARTWORKCOLOR(n)	(IS_ARTWORKCLASS_CLASSICS(n) ?		FC_RED : \
-			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	FC_YELLOW : \
-			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_GREEN : \
-			 IS_ARTWORKCLASS_USER(n) ?		FC_RED : \
+#define ARTWORKCOLOR(n)	(IS_ARTWORKCLASS_CLASSICS(n) ?		FC_RED :     \
+			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	FC_YELLOW :  \
+			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_GREEN :   \
+			 IS_ARTWORKCLASS_USER(n) ?		FC_RED :     \
 			 FC_BLUE)
 
 #define ARTWORKSORTING(n) (IS_ARTWORKCLASS_CLASSICS(n) ?	0 : \
-			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	1 : \
-			 IS_ARTWORKCLASS_LEVEL(n) ?		2 : \
-			 IS_ARTWORKCLASS_USER(n) ?		3 : \
-			 9)
+			   IS_ARTWORKCLASS_CONTRIBUTION(n) ?	1 : \
+			   IS_ARTWORKCLASS_LEVEL(n) ?		2 : \
+			   IS_ARTWORKCLASS_USER(n) ?		3 : \
+			   9)
 
 #define TOKEN_VALUE_POSITION		40
 #define TOKEN_COMMENT_POSITION		60
 
 #define MAX_COOKIE_LEN			256
-
-#define ARTWORKINFO_FILENAME(type)	((type) == ARTWORK_TYPE_GRAPHICS ? \
-					 GRAPHICSINFO_FILENAME :	   \
-					 (type) == ARTWORK_TYPE_SOUNDS ?   \
-					 SOUNDSINFO_FILENAME :		   \
-					 (type) == ARTWORK_TYPE_MUSIC ?    \
-					 MUSICINFO_FILENAME : "")
-
-#define ARTWORK_DIRECTORY(type)		((type) == ARTWORK_TYPE_GRAPHICS ? \
-					 GRAPHICS_DIRECTORY :		   \
-					 (type) == ARTWORK_TYPE_SOUNDS ?   \
-					 SOUNDS_DIRECTORY :		   \
-					 (type) == ARTWORK_TYPE_MUSIC ?    \
-					 MUSIC_DIRECTORY : "")
-
-#define OPTIONS_ARTWORK_DIRECTORY(type)	((type) == ARTWORK_TYPE_GRAPHICS ? \
-					 options.graphics_directory :	   \
-					 (type) == ARTWORK_TYPE_SOUNDS ?   \
-					 options.sounds_directory :	   \
-					 (type) == ARTWORK_TYPE_MUSIC ?    \
-					 options.music_directory : "")
 
 
 /* ------------------------------------------------------------------------- */
@@ -1172,10 +1129,10 @@ char *getListEntry(SetupFileList *list, char *token)
     return getListEntry(list->next, token);
 }
 
-void setListEntry(SetupFileList *list, char *token, char *value)
+SetupFileList *setListEntry(SetupFileList *list, char *token, char *value)
 {
   if (list == NULL)
-    return;
+    return NULL;
 
   if (strcmp(list->token, token) == 0)
   {
@@ -1183,11 +1140,13 @@ void setListEntry(SetupFileList *list, char *token, char *value)
       free(list->value);
 
     list->value = getStringCopy(value);
+
+    return list;
   }
   else if (list->next == NULL)
-    list->next = newSetupFileList(token, value);
+    return (list->next = newSetupFileList(token, value));
   else
-    setListEntry(list->next, token, value);
+    return setListEntry(list->next, token, value);
 }
 
 #ifdef DEBUG
@@ -1308,13 +1267,13 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   int line_len;
   char line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
-  void *setup_file_data;
+  void *setup_file_data, *insert_ptr;
   FILE *file;
 
   if (use_hash)
     setup_file_data = newSetupFileHash();
   else
-    setup_file_data = newSetupFileList("", "");
+    insert_ptr = setup_file_data = newSetupFileList("", "");
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -1379,7 +1338,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
       if (use_hash)
 	setHashEntry((SetupFileHash *)setup_file_data, token, value);
       else
-	setListEntry((SetupFileList *)setup_file_data, token, value);
+	insert_ptr = setListEntry((SetupFileList *)insert_ptr, token, value);
     }
   }
 

@@ -1,7 +1,14 @@
+2003-10-18
+	* fixed serious bug in code for delayed element pushing
+	* fixed little bug in animation frame selection for pushed elements
+
 2003-10-08
-	* added config directive for opening and closing Supaplex exit
+	* added configuration option for opening and closing Supaplex exit
+	* added configuration option for moving up/down animation for Murphy
 	* fixed incorrectly displayed animation for attacking dragon
 	* fixed bug with not setting initial gravity for each new game
+	* fixed bug with teleportation of player by custom element change
+	* fixed bug with player not getting smashed by rock sometimes
 
 2003-10-06
 	* Version number set to 3.0.7.

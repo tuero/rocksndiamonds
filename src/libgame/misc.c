@@ -2293,6 +2293,9 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
 #endif
 
+  DrawInitText("Loading artwork config:", 120, FC_GREEN);
+  DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);
+
   /* always start with reliable default values */
   for (i=0; i<num_file_list_entries; i++)
   {

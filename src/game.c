@@ -927,7 +927,7 @@ static void InitGameEngine()
   {
     if (!IS_CUSTOM_ELEMENT(i))
     {
-      element_info[i].push_delay_fixed = 2;
+      element_info[i].push_delay_fixed = 8;
       element_info[i].push_delay_random = 8;
     }
   }
@@ -7909,7 +7909,13 @@ int DigField(struct PlayerInfo *player,
 	if (!FrameReached(&player->push_delay, player->push_delay_value) &&
 	    !(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	    element != EL_SPRING && element != EL_BALLOON)
+	{
+	  /* make sure that there is no move delay before next try to push */
+	  if (game.engine_version >= VERSION_IDENT(3,0,7))
+	    player->move_delay = INITIAL_MOVE_DELAY_OFF;
+
 	  return MF_NO_ACTION;
+	}
 
 	if (IS_SB_ELEMENT(element))
 	{

@@ -186,7 +186,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     element_info[element].collect_score = 10;		/* special default */
     element_info[element].collect_count = 1;		/* special default */
 
-    element_info[element].push_delay_fixed = 2;		/* special default */
+    element_info[element].push_delay_fixed = 8;		/* special default */
     element_info[element].push_delay_random = 8;	/* special default */
     element_info[element].move_delay_fixed = 0;
     element_info[element].move_delay_random = 0;

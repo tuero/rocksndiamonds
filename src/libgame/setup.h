@@ -230,10 +230,10 @@ boolean checkCookieString(const char *, const char *);
 
 char *getFormattedSetupEntry(char *, char *);
 
-struct SetupFileList *newSetupFileList(char *, char *);
-void freeSetupFileList(struct SetupFileList *);
-char *getListEntry(struct SetupFileList *, char *);
-void setListEntry(struct SetupFileList *, char *, char *);
+SetupFileList *newSetupFileList(char *, char *);
+void freeSetupFileList(SetupFileList *);
+char *getListEntry(SetupFileList *, char *);
+SetupFileList *setListEntry(SetupFileList *, char *, char *);
 SetupFileList *loadSetupFileList(char *);
 
 SetupFileHash *newSetupFileHash();

@@ -743,7 +743,11 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       int element = MovingOrBlocked2Element(next_jx, next_jy);
       int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+#if 1
+      int frame = getGraphicAnimationFrame(graphic, player->StepFrame);
+#else
       int frame = getGraphicAnimationFrame(graphic, player->Frame);
+#endif
 
       DrawGraphicShifted(px, py, sxx, syy, graphic, frame,
 			 NO_CUTTING, NO_MASKING);
