@@ -9817,7 +9817,11 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       TestIfHeroTouchesBadThing(jx, jy);
       TestIfPlayerTouchesCustomElement(jx, jy);
 #if 1
-      TestIfElementTouchesCustomElement(jx, jy);	/* for empty space */
+#if 1
+      /* needed because pushed element has not yet reached its destination */
+      if (!player->is_pushing)
+#endif
+	TestIfElementTouchesCustomElement(jx, jy);	/* for empty space */
 #endif
 
       if (!player->active)
