@@ -306,11 +306,12 @@
 #define GADGET_ID_ELEMENT_CONTENT_6	(GADGET_ID_DRAWING_AREA_FIRST + 7)
 #define GADGET_ID_ELEMENT_CONTENT_7	(GADGET_ID_DRAWING_AREA_FIRST + 8)
 #define GADGET_ID_AMOEBA_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 9)
-#define GADGET_ID_CUSTOM_CHANGED	(GADGET_ID_DRAWING_AREA_FIRST + 10)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 11)
+#define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 10)
+#define GADGET_ID_CUSTOM_CHANGED	(GADGET_ID_DRAWING_AREA_FIRST + 11)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 12)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 12)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 13)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -1043,6 +1044,7 @@ static int new_element3 = EL_SAND;
 static void ModifyEditorCounter(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectbox(int, int);
+static void ModifyEditorElementList();
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
@@ -2395,6 +2397,25 @@ static void CreateDrawingAreas()
 
   level_editor_gadget[id] = gi;
 
+  /* ... one for each custom element optional graphic element ... */
+  id = GADGET_ID_CUSTOM_GRAPHIC;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_X, SX + 2 * MINI_TILEX,
+		    GDI_Y, SY + 4 * MINI_TILEY + MINI_TILEY / 2,
+		    GDI_WIDTH, TILEX,
+		    GDI_HEIGHT, TILEY,
+		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
+		    GDI_ITEM_SIZE, TILEX, TILEY,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
+		    GDI_CALLBACK_ACTION, HandleDrawingAreas,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+
   /* ... one for each custom element change target element ... */
   id = GADGET_ID_CUSTOM_CHANGED;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -3192,6 +3213,24 @@ static void ModifyEditorSelectbox(int selectbox_id, int new_value)
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
 }
 
+static void ModifyEditorElementList()
+{
+  int i;
+
+  for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
+  {
+    int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
+    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+    struct GadgetDesign *gd = &gi->deco.design;
+    int element = editor_elements[element_shift + i];
+
+    UnmapGadget(gi);
+    getMiniGraphicSource(el2edimg(element), &gd->bitmap, &gd->x, &gd->y);
+    ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
+    MapGadget(gi);
+  }
+}
+
 static void PickDrawingElement(int button, int element)
 {
   if (button < 1 || button > 3)
@@ -3655,8 +3694,6 @@ static void DrawPropertiesConfig()
 
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
-    CopyCustomElementPropertiesToEditor(properties_element);
-
     /* draw checkbutton gadgets */
     for (i =  ED_CHECKBUTTON_ID_CUSTOM_FIRST;
 	 i <= ED_CHECKBUTTON_ID_CUSTOM_LAST; i++)
@@ -3994,8 +4031,6 @@ static void DrawPropertiesAdvanced()
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
 
-  CopyCustomElementPropertiesToEditor(properties_element);
-
   /* draw stickybutton gadget */
   i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
   checkbutton_info[i].y = ED_COUNTER_YPOS2(4);
@@ -4038,6 +4073,9 @@ static void DrawPropertiesAdvanced()
     MapCheckbuttonGadget(i);
   }
 
+  /* map gadget for optional graphic element */
+  MapDrawingArea(GADGET_ID_CUSTOM_GRAPHIC);
+
   DrawCustomChangedArea();
 
   /* draw selectbox gadgets */
@@ -4072,6 +4110,9 @@ static void DrawPropertiesWindow()
   if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG &&
       !checkPropertiesConfig())
     edit_mode_properties = ED_MODE_PROPERTIES_INFO;
+
+  if (IS_CUSTOM_ELEMENT(properties_element))
+    CopyCustomElementPropertiesToEditor(properties_element);
 
   UnmapLevelEditorWindowGadgets();
 
@@ -4726,6 +4767,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   int sx = gi->event.x, sy = gi->event.y;
   int min_sx = 0, min_sy = 0;
   int max_sx = gi->drawing.area_xsize - 1, max_sy = gi->drawing.area_ysize - 1;
+  int item_xsize = gi->drawing.item_xsize, item_ysize = gi->drawing.item_ysize;
   int lx = 0, ly = 0;
   int min_lx = 0, min_ly = 0;
   int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
@@ -4821,17 +4863,34 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       else
       {
-	DrawMiniGraphicExt(drawto,
-			   gi->x + sx * MINI_TILEX,
-			   gi->y + sy * MINI_TILEY,
-			   el2edimg(new_element));
-	DrawMiniGraphicExt(window,
-			   gi->x + sx * MINI_TILEX,
-			   gi->y + sy * MINI_TILEY,
-			   el2edimg(new_element));
+	if (item_xsize == MINI_TILEX && item_ysize == MINI_TILEY)
+	  DrawMiniGraphicExt(drawto,
+			     gi->x + sx * MINI_TILEX,
+			     gi->y + sy * MINI_TILEY,
+			     el2edimg(new_element));
+	else
+	  DrawGraphicExt(drawto,
+			 gi->x + sx * TILEX,
+			 gi->y + sy * TILEY,
+			 el2img(new_element), 0);
 
 	if (id == GADGET_ID_AMOEBA_CONTENT)
 	  level.amoeba_content = new_element;
+	else if (id == GADGET_ID_CUSTOM_GRAPHIC &&
+		 IS_CUSTOM_ELEMENT(properties_element))
+	{
+	  int i = properties_element - EL_CUSTOM_START;
+
+	  if (IS_CUSTOM_ELEMENT(new_element))
+	    new_element = CUSTOM_ELEMENT_INFO(new_element).change.gfx_element;
+
+	  custom_element_change.gfx_element = new_element;
+	  level.custom_element[i].change = custom_element_change;
+
+	  ModifyEditorElementList();
+
+	  FrameCounter = 0;	/* restart animation frame counter */
+	}
 	else if (id == GADGET_ID_CUSTOM_CHANGED &&
 		 IS_CUSTOM_ELEMENT(properties_element))
 	{
@@ -5072,7 +5131,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int button = gi->event.button;
   int step = BUTTON_STEPSIZE(button);
   int new_element = BUTTON_ELEMENT(button);
-  int i, x, y;
+  int x, y;
 
   if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
     DrawLevelText(0, 0, 0, TEXT_END);
@@ -5192,18 +5251,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
       }
 
-      for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
-      {
-	int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
-	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-	struct GadgetDesign *gd = &gi->deco.design;
-	int element = editor_elements[element_shift + i];
+      ModifyEditorElementList();
 
-	UnmapGadget(gi);
-	getMiniGraphicSource(el2edimg(element), &gd->bitmap, &gd->x, &gd->y);
-	ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
-	MapGadget(gi);
-      }
       break;
 
     case GADGET_ID_WRAP_LEFT:
@@ -5653,6 +5702,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   else if (id == GADGET_ID_AMOEBA_CONTENT)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "Amoeba content");
+  else if (id == GADGET_ID_CUSTOM_GRAPHIC)
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+	      "Optional custom graphic element");
   else if (id == GADGET_ID_CUSTOM_CHANGED)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "New element after change");

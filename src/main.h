@@ -1014,6 +1014,8 @@ struct CustomElementChangeInfo
 {
   unsigned long events;	/* bitfield for change events */
 
+  short gfx_element;	/* optional custom graphic element */
+
   short successor;	/* new custom element after change */
 
   int delay_fixed;	/* added frame delay before changed (fixed) */

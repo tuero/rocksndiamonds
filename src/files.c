@@ -97,18 +97,17 @@ static void setLevelInfoToDefaults()
 
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
+    int element = EL_CUSTOM_START + i;
+
     level.custom_element[i].change.events = CE_BITMASK_DEFAULT;
+    level.custom_element[i].change.gfx_element = element;
     level.custom_element[i].change.successor = EL_EMPTY_SPACE;
     level.custom_element[i].change.delay_fixed = 0;
     level.custom_element[i].change.delay_random = 0;
 
     /* start with no properties at all */
-#if 1
     for (j=0; j < NUM_EP_BITFIELDS; j++)
-      Properties[EL_CUSTOM_START + i][j] = EP_BITMASK_DEFAULT;
-#else
-    Properties[EL_CUSTOM_START + i][EP_BITFIELD_BASE] = EP_BITMASK_DEFAULT;
-#endif
+      Properties[element][j] = EP_BITMASK_DEFAULT;
   }
 
   BorderElement = EL_STEELWALL;
