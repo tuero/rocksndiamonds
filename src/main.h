@@ -27,8 +27,8 @@
 
 #include "libgame/libgame.h"
 
-#include "conf_gfx.h"
-#include "conf_snd.h"
+#include "conf_gfx.h"	/* include auto-generated data structure definitions */
+#include "conf_snd.h"	/* include auto-generated data structure definitions */
 
 #define IMG_UNDEFINED		(-1)
 #define IMG_EMPTY		IMG_EMPTY_SPACE
@@ -432,41 +432,9 @@
 #define EL_CHAR_START			120
 #define EL_CHAR_ASCII0			(EL_CHAR_START  - 32)
 #define EL_CHAR_ASCII0_START		(EL_CHAR_ASCII0 + 32)
-#define EL_CHAR_EXCLAM			(EL_CHAR_ASCII0 + 33)
-#define EL_CHAR_QUOTEDBL		(EL_CHAR_ASCII0 + 34)
-#define EL_CHAR_NUMBERSIGN		(EL_CHAR_ASCII0 + 35)
-#define EL_CHAR_DOLLAR			(EL_CHAR_ASCII0 + 36)
-#define EL_CHAR_PROCENT			(EL_CHAR_ASCII0 + 37)
-#define EL_CHAR_AMPERSAND		(EL_CHAR_ASCII0 + 38)
-#define EL_CHAR_APOSTROPHE		(EL_CHAR_ASCII0 + 39)
-#define EL_CHAR_PARENLEFT		(EL_CHAR_ASCII0 + 40)
-#define EL_CHAR_PARENRIGHT		(EL_CHAR_ASCII0 + 41)
-#define EL_CHAR_ASTERISK		(EL_CHAR_ASCII0 + 42)
-#define EL_CHAR_PLUS			(EL_CHAR_ASCII0 + 43)
-#define EL_CHAR_COMMA			(EL_CHAR_ASCII0 + 44)
-#define EL_CHAR_MINUS			(EL_CHAR_ASCII0 + 45)
-#define EL_CHAR_PERIOD			(EL_CHAR_ASCII0 + 46)
-#define EL_CHAR_SLASH			(EL_CHAR_ASCII0 + 47)
-#define EL_CHAR_0			(EL_CHAR_ASCII0 + 48)
-#define EL_CHAR_9			(EL_CHAR_ASCII0 + 57)
-#define EL_CHAR_COLON			(EL_CHAR_ASCII0 + 58)
-#define EL_CHAR_SEMICOLON		(EL_CHAR_ASCII0 + 59)
-#define EL_CHAR_LESS			(EL_CHAR_ASCII0 + 60)
-#define EL_CHAR_EQUAL			(EL_CHAR_ASCII0 + 61)
-#define EL_CHAR_GREATER			(EL_CHAR_ASCII0 + 62)
-#define EL_CHAR_QUESTION		(EL_CHAR_ASCII0 + 63)
-#define EL_CHAR_AT			(EL_CHAR_ASCII0 + 64)
-#define EL_CHAR_A			(EL_CHAR_ASCII0 + 65)
-#define EL_CHAR_Z			(EL_CHAR_ASCII0 + 90)
-#define EL_CHAR_AE			(EL_CHAR_ASCII0 + 91)
-#define EL_CHAR_OE			(EL_CHAR_ASCII0 + 92)
-#define EL_CHAR_UE			(EL_CHAR_ASCII0 + 93)
-#define EL_CHAR_COPYRIGHT		(EL_CHAR_ASCII0 + 94)
-#define EL_CHAR_UNDERSCORE		(EL_CHAR_ASCII0 + 95)
-#define EL_CHAR_EMPTY			(EL_CHAR_ASCII0 + 96)
-#define EL_CHAR_DEGREE			(EL_CHAR_ASCII0 + 97)
-#define EL_CHAR_TM			(EL_CHAR_ASCII0 + 98)
-#define EL_CHAR_CURSOR			(EL_CHAR_ASCII0 + 99)
+
+#include "conf_chr.h"	/* include auto-generated data structure definitions */
+
 #define EL_CHAR_ASCII0_END		(EL_CHAR_ASCII0 + 111)
 #define EL_CHAR_END			(EL_CHAR_START  + 79)
 
@@ -659,8 +627,9 @@
 #define EL_UNUSED_359			359
 
 #define EL_CUSTOM_START			360
-#define EL_CUSTOM_1			(EL_CUSTOM_START + 0)
-#define EL_CUSTOM_128			(EL_CUSTOM_START + 127)
+
+#include "conf_cus.h"	/* include auto-generated data structure definitions */
+
 #define EL_CUSTOM_END			(EL_CUSTOM_START + 127)
 
 #define NUM_CUSTOM_ELEMENTS		128

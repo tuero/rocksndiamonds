@@ -500,8 +500,8 @@ struct FileInfo
   char *default_filename;
   char *filename;
 
-  int *default_parameter;			/* array of file parameters */
-  int *parameter;				/* array of file parameters */
+  char **default_parameter;			/* array of file parameters */
+  char **parameter;				/* array of file parameters */
 
   boolean redefined;
 };

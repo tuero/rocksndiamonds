@@ -30,32 +30,6 @@
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
 
 
-static char *image_filename[NUM_PICTURES] =
-{
-#if 0
-  "RocksScreen.pcx",
-  "RocksDoor.pcx",
-  "RocksToons.pcx",
-  "RocksFontBig.pcx",
-  "RocksFontSmall.pcx",
-  "RocksFontMedium.pcx",
-  "RocksFontEM.pcx"
-#else
-  "RocksScreen.pcx",
-  "RocksElements.pcx",
-  "RocksDoor.pcx",
-  "RocksHeroes.pcx",
-  "RocksToons.pcx",
-  "RocksSP.pcx",
-  "RocksDC.pcx",
-  "RocksMore.pcx",
-  "RocksFontBig.pcx",
-  "RocksFontSmall.pcx",
-  "RocksFontMedium.pcx",
-  "RocksFontEM.pcx"
-#endif
-}; 
-
 static Bitmap *bitmap_font_initial = NULL;
 
 static void InitGlobal();
@@ -477,9 +451,17 @@ void FreeTileClipmasks()
 
 void InitGfx()
 {
-#if 0
+  char *config_token_font_initial = "font.small";
+  char *filename_font_initial = NULL;
   int i;
-#endif
+
+  /* determine filename for initial font (for displaying startup messages) */
+  for (i=0; image_config[i].token != NULL; i++)
+    if (strcmp(image_config[i].token, config_token_font_initial) == 0)
+      filename_font_initial = image_config[i].value;
+
+  if (filename_font_initial == NULL)	/* should not happen */
+    Error(ERR_EXIT, "cannot get filename for '%s'", config_token_font_initial);
 
   /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
@@ -492,39 +474,14 @@ void InitGfx()
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
 
-#if 0
-  pix[PIX_FONT_SMALL] = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
-
-  InitFontInfo(NULL, NULL, pix[PIX_FONT_SMALL], NULL);
-#else
-  bitmap_font_initial = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
+  bitmap_font_initial = LoadCustomImage(filename_font_initial);
 
   InitFontInfo(bitmap_font_initial, NULL, NULL, NULL, NULL);
-#endif
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
-
-#if 0
-  for (i=0; i<NUM_PICTURES; i++)
-  {
-#if 0
-    if (i != PIX_FONT_SMALL)
-#endif
-    {
-      DrawInitText(image_filename[i], 150, FC_YELLOW);
-
-      pix[i] = LoadCustomImage(image_filename[i]);
-    }
-  }
-#endif
-
-#if 0
-  InitFontInfo(pix[PIX_FONT_BIG], pix[PIX_FONT_MEDIUM], pix[PIX_FONT_SMALL],
-	       pix[PIX_FONT_EM]);
-#endif
 
   InitTileClipmasks();
 }
@@ -752,6 +709,7 @@ void InitElementGraphicInfo()
     }
   }
 
+#if 0
   for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CHAR_START + (i - EL_CHAR_START);
@@ -759,6 +717,7 @@ void InitElementGraphicInfo()
   for (i=EL_CUSTOM_START; i<=EL_CUSTOM_END; i++)
     element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CUSTOM_START + (i - EL_CUSTOM_START);
+#endif
 
   /* initialize normal element/graphic mapping from static configuration */
   for (i=0; element_to_graphic[i].element > -1; i++)
@@ -901,11 +860,18 @@ static void InitElementSoundInfo()
   /* soon to come */
 }
 
-static void set_graphic_parameters(int graphic, int *parameter)
+static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
   int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
   int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
+  int parameter[NUM_GFX_ARGS];
+  int i;
+
+  /* get integer values from string parameters */
+  for (i=0; i < NUM_GFX_ARGS; i++)
+    parameter[i] =
+      get_parameter_value(image_config_suffix[i].type, parameter_raw[i]);
 
   graphic_info[graphic].bitmap = src_bitmap;
 
@@ -1151,8 +1117,16 @@ static void InitGraphicInfo()
   clipmasks_initialized = TRUE;
 }
 
-static void set_sound_parameters(int sound, int *parameter)
+static void set_sound_parameters(int sound, char **parameter_raw)
 {
+  int parameter[NUM_SND_ARGS];
+  int i;
+
+  /* get integer values from string parameters */
+  for (i=0; i < NUM_SND_ARGS; i++)
+    parameter[i] =
+      get_parameter_value(sound_config_suffix[i].type, parameter_raw[i]);
+
   /* explicit loop mode setting in configuration overrides default value */
   if (parameter[SND_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
     sound_info[sound].loop = parameter[SND_ARG_MODE_LOOP];

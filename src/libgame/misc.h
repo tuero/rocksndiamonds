@@ -78,6 +78,7 @@ char *getPath3(char *, char *, char*);
 char *getStringCat2(char *, char *);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
+void setString(char **, char *);
 
 void GetOptions(char **);
 
@@ -135,6 +136,8 @@ boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
+
+int get_parameter_value(int, char *);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigInfo *, int);

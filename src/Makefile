@@ -153,6 +153,17 @@ OBJS =	main.o		\
 	network.o	\
 	netserv.o
 
+CNFS =	conf_gfx.h	\
+	conf_snd.h	\
+	conf_chr.c	\
+	conf_chr.h	\
+	conf_cus.c	\
+	conf_cus.h	\
+	conf_e2g.c	\
+	conf_esg.c
+
+CNFS_CMD = ../Scripts/create_element_defs.pl
+
 TIMESTAMP_FILE = conftime.h
 
 LIBDIR = libgame
@@ -175,15 +186,17 @@ libgame_dir:
 $(LIBGAME):
 	@$(MAKE) -C $(LIBDIR)
 
+auto-conf:
+	@for i in $(CNFS); do			\
+		echo "$(CNFS_CMD) $$i > $$i";	\
+		$(CNFS_CMD) $$i > $$i;		\
+	done
+
 conf_gfx.h: conf_gfx.c
-	../Scripts/create_element_defs.pl --gfx > conf_gfx.h
-	../Scripts/create_element_defs.pl --chr > conf_chr.c
-	../Scripts/create_element_defs.pl --cus > conf_cus.c
-	../Scripts/create_element_defs.pl --e2g > conf_e2g.c
-	../Scripts/create_element_defs.pl --esg > conf_esg.c
+	@$(MAKE) auto-conf
 
 conf_snd.h: conf_snd.c
-	../Scripts/create_element_defs.pl --snd > conf_snd.h
+	@$(MAKE) auto-conf
 
 $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME)
 	@date '+"[%Y-%m-%d %H:%M]"' \

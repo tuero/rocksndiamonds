@@ -2329,6 +2329,790 @@ element_to_graphic[] =
     IMG_CHAR_QUESTION
   },
   {
+    EL_CHAR_SPACE,				-1, -1,
+    IMG_CHAR_SPACE
+  },
+  {
+    EL_CHAR_EXCLAM,				-1, -1,
+    IMG_CHAR_EXCLAM
+  },
+  {
+    EL_CHAR_QUOTEDBL,				-1, -1,
+    IMG_CHAR_QUOTEDBL
+  },
+  {
+    EL_CHAR_NUMBERSIGN,				-1, -1,
+    IMG_CHAR_NUMBERSIGN
+  },
+  {
+    EL_CHAR_DOLLAR,				-1, -1,
+    IMG_CHAR_DOLLAR
+  },
+  {
+    EL_CHAR_PROCENT,				-1, -1,
+    IMG_CHAR_PROCENT
+  },
+  {
+    EL_CHAR_AMPERSAND,				-1, -1,
+    IMG_CHAR_AMPERSAND
+  },
+  {
+    EL_CHAR_APOSTROPHE,				-1, -1,
+    IMG_CHAR_APOSTROPHE
+  },
+  {
+    EL_CHAR_PARENLEFT,				-1, -1,
+    IMG_CHAR_PARENLEFT
+  },
+  {
+    EL_CHAR_PARENRIGHT,				-1, -1,
+    IMG_CHAR_PARENRIGHT
+  },
+  {
+    EL_CHAR_ASTERISK,				-1, -1,
+    IMG_CHAR_ASTERISK
+  },
+  {
+    EL_CHAR_PLUS,				-1, -1,
+    IMG_CHAR_PLUS
+  },
+  {
+    EL_CHAR_COMMA,				-1, -1,
+    IMG_CHAR_COMMA
+  },
+  {
+    EL_CHAR_MINUS,				-1, -1,
+    IMG_CHAR_MINUS
+  },
+  {
+    EL_CHAR_PERIOD,				-1, -1,
+    IMG_CHAR_PERIOD
+  },
+  {
+    EL_CHAR_SLASH,				-1, -1,
+    IMG_CHAR_SLASH
+  },
+  {
+    EL_CHAR_0,					-1, -1,
+    IMG_CHAR_0
+  },
+  {
+    EL_CHAR_1,					-1, -1,
+    IMG_CHAR_1
+  },
+  {
+    EL_CHAR_2,					-1, -1,
+    IMG_CHAR_2
+  },
+  {
+    EL_CHAR_3,					-1, -1,
+    IMG_CHAR_3
+  },
+  {
+    EL_CHAR_4,					-1, -1,
+    IMG_CHAR_4
+  },
+  {
+    EL_CHAR_5,					-1, -1,
+    IMG_CHAR_5
+  },
+  {
+    EL_CHAR_6,					-1, -1,
+    IMG_CHAR_6
+  },
+  {
+    EL_CHAR_7,					-1, -1,
+    IMG_CHAR_7
+  },
+  {
+    EL_CHAR_8,					-1, -1,
+    IMG_CHAR_8
+  },
+  {
+    EL_CHAR_9,					-1, -1,
+    IMG_CHAR_9
+  },
+  {
+    EL_CHAR_COLON,				-1, -1,
+    IMG_CHAR_COLON
+  },
+  {
+    EL_CHAR_SEMICOLON,				-1, -1,
+    IMG_CHAR_SEMICOLON
+  },
+  {
+    EL_CHAR_LESS,				-1, -1,
+    IMG_CHAR_LESS
+  },
+  {
+    EL_CHAR_EQUAL,				-1, -1,
+    IMG_CHAR_EQUAL
+  },
+  {
+    EL_CHAR_GREATER,				-1, -1,
+    IMG_CHAR_GREATER
+  },
+  {
+    EL_CHAR_QUESTION,				-1, -1,
+    IMG_CHAR_QUESTION
+  },
+  {
+    EL_CHAR_AT,					-1, -1,
+    IMG_CHAR_AT
+  },
+  {
+    EL_CHAR_A,					-1, -1,
+    IMG_CHAR_A
+  },
+  {
+    EL_CHAR_B,					-1, -1,
+    IMG_CHAR_B
+  },
+  {
+    EL_CHAR_C,					-1, -1,
+    IMG_CHAR_C
+  },
+  {
+    EL_CHAR_D,					-1, -1,
+    IMG_CHAR_D
+  },
+  {
+    EL_CHAR_E,					-1, -1,
+    IMG_CHAR_E
+  },
+  {
+    EL_CHAR_F,					-1, -1,
+    IMG_CHAR_F
+  },
+  {
+    EL_CHAR_G,					-1, -1,
+    IMG_CHAR_G
+  },
+  {
+    EL_CHAR_H,					-1, -1,
+    IMG_CHAR_H
+  },
+  {
+    EL_CHAR_I,					-1, -1,
+    IMG_CHAR_I
+  },
+  {
+    EL_CHAR_J,					-1, -1,
+    IMG_CHAR_J
+  },
+  {
+    EL_CHAR_K,					-1, -1,
+    IMG_CHAR_K
+  },
+  {
+    EL_CHAR_L,					-1, -1,
+    IMG_CHAR_L
+  },
+  {
+    EL_CHAR_M,					-1, -1,
+    IMG_CHAR_M
+  },
+  {
+    EL_CHAR_N,					-1, -1,
+    IMG_CHAR_N
+  },
+  {
+    EL_CHAR_O,					-1, -1,
+    IMG_CHAR_O
+  },
+  {
+    EL_CHAR_P,					-1, -1,
+    IMG_CHAR_P
+  },
+  {
+    EL_CHAR_Q,					-1, -1,
+    IMG_CHAR_Q
+  },
+  {
+    EL_CHAR_R,					-1, -1,
+    IMG_CHAR_R
+  },
+  {
+    EL_CHAR_S,					-1, -1,
+    IMG_CHAR_S
+  },
+  {
+    EL_CHAR_T,					-1, -1,
+    IMG_CHAR_T
+  },
+  {
+    EL_CHAR_U,					-1, -1,
+    IMG_CHAR_U
+  },
+  {
+    EL_CHAR_V,					-1, -1,
+    IMG_CHAR_V
+  },
+  {
+    EL_CHAR_W,					-1, -1,
+    IMG_CHAR_W
+  },
+  {
+    EL_CHAR_X,					-1, -1,
+    IMG_CHAR_X
+  },
+  {
+    EL_CHAR_Y,					-1, -1,
+    IMG_CHAR_Y
+  },
+  {
+    EL_CHAR_Z,					-1, -1,
+    IMG_CHAR_Z
+  },
+  {
+    EL_CHAR_AE,					-1, -1,
+    IMG_CHAR_AE
+  },
+  {
+    EL_CHAR_OE,					-1, -1,
+    IMG_CHAR_OE
+  },
+  {
+    EL_CHAR_UE,					-1, -1,
+    IMG_CHAR_UE
+  },
+  {
+    EL_CHAR_COPYRIGHT,				-1, -1,
+    IMG_CHAR_COPYRIGHT
+  },
+  {
+    EL_CHAR_UNDERSCORE,				-1, -1,
+    IMG_CHAR_UNDERSCORE
+  },
+  {
+    EL_CHAR_EMPTY,				-1, -1,
+    IMG_CHAR_EMPTY
+  },
+  {
+    EL_CHAR_DEGREE,				-1, -1,
+    IMG_CHAR_DEGREE
+  },
+  {
+    EL_CHAR_TM,					-1, -1,
+    IMG_CHAR_TM
+  },
+  {
+    EL_CHAR_CURSOR,				-1, -1,
+    IMG_CHAR_CURSOR
+  },
+  {
+    EL_CUSTOM_1,				-1, -1,
+    IMG_CUSTOM_1
+  },
+  {
+    EL_CUSTOM_2,				-1, -1,
+    IMG_CUSTOM_2
+  },
+  {
+    EL_CUSTOM_3,				-1, -1,
+    IMG_CUSTOM_3
+  },
+  {
+    EL_CUSTOM_4,				-1, -1,
+    IMG_CUSTOM_4
+  },
+  {
+    EL_CUSTOM_5,				-1, -1,
+    IMG_CUSTOM_5
+  },
+  {
+    EL_CUSTOM_6,				-1, -1,
+    IMG_CUSTOM_6
+  },
+  {
+    EL_CUSTOM_7,				-1, -1,
+    IMG_CUSTOM_7
+  },
+  {
+    EL_CUSTOM_8,				-1, -1,
+    IMG_CUSTOM_8
+  },
+  {
+    EL_CUSTOM_9,				-1, -1,
+    IMG_CUSTOM_9
+  },
+  {
+    EL_CUSTOM_10,				-1, -1,
+    IMG_CUSTOM_10
+  },
+  {
+    EL_CUSTOM_11,				-1, -1,
+    IMG_CUSTOM_11
+  },
+  {
+    EL_CUSTOM_12,				-1, -1,
+    IMG_CUSTOM_12
+  },
+  {
+    EL_CUSTOM_13,				-1, -1,
+    IMG_CUSTOM_13
+  },
+  {
+    EL_CUSTOM_14,				-1, -1,
+    IMG_CUSTOM_14
+  },
+  {
+    EL_CUSTOM_15,				-1, -1,
+    IMG_CUSTOM_15
+  },
+  {
+    EL_CUSTOM_16,				-1, -1,
+    IMG_CUSTOM_16
+  },
+  {
+    EL_CUSTOM_17,				-1, -1,
+    IMG_CUSTOM_17
+  },
+  {
+    EL_CUSTOM_18,				-1, -1,
+    IMG_CUSTOM_18
+  },
+  {
+    EL_CUSTOM_19,				-1, -1,
+    IMG_CUSTOM_19
+  },
+  {
+    EL_CUSTOM_20,				-1, -1,
+    IMG_CUSTOM_20
+  },
+  {
+    EL_CUSTOM_21,				-1, -1,
+    IMG_CUSTOM_21
+  },
+  {
+    EL_CUSTOM_22,				-1, -1,
+    IMG_CUSTOM_22
+  },
+  {
+    EL_CUSTOM_23,				-1, -1,
+    IMG_CUSTOM_23
+  },
+  {
+    EL_CUSTOM_24,				-1, -1,
+    IMG_CUSTOM_24
+  },
+  {
+    EL_CUSTOM_25,				-1, -1,
+    IMG_CUSTOM_25
+  },
+  {
+    EL_CUSTOM_26,				-1, -1,
+    IMG_CUSTOM_26
+  },
+  {
+    EL_CUSTOM_27,				-1, -1,
+    IMG_CUSTOM_27
+  },
+  {
+    EL_CUSTOM_28,				-1, -1,
+    IMG_CUSTOM_28
+  },
+  {
+    EL_CUSTOM_29,				-1, -1,
+    IMG_CUSTOM_29
+  },
+  {
+    EL_CUSTOM_30,				-1, -1,
+    IMG_CUSTOM_30
+  },
+  {
+    EL_CUSTOM_31,				-1, -1,
+    IMG_CUSTOM_31
+  },
+  {
+    EL_CUSTOM_32,				-1, -1,
+    IMG_CUSTOM_32
+  },
+  {
+    EL_CUSTOM_33,				-1, -1,
+    IMG_CUSTOM_33
+  },
+  {
+    EL_CUSTOM_34,				-1, -1,
+    IMG_CUSTOM_34
+  },
+  {
+    EL_CUSTOM_35,				-1, -1,
+    IMG_CUSTOM_35
+  },
+  {
+    EL_CUSTOM_36,				-1, -1,
+    IMG_CUSTOM_36
+  },
+  {
+    EL_CUSTOM_37,				-1, -1,
+    IMG_CUSTOM_37
+  },
+  {
+    EL_CUSTOM_38,				-1, -1,
+    IMG_CUSTOM_38
+  },
+  {
+    EL_CUSTOM_39,				-1, -1,
+    IMG_CUSTOM_39
+  },
+  {
+    EL_CUSTOM_40,				-1, -1,
+    IMG_CUSTOM_40
+  },
+  {
+    EL_CUSTOM_41,				-1, -1,
+    IMG_CUSTOM_41
+  },
+  {
+    EL_CUSTOM_42,				-1, -1,
+    IMG_CUSTOM_42
+  },
+  {
+    EL_CUSTOM_43,				-1, -1,
+    IMG_CUSTOM_43
+  },
+  {
+    EL_CUSTOM_44,				-1, -1,
+    IMG_CUSTOM_44
+  },
+  {
+    EL_CUSTOM_45,				-1, -1,
+    IMG_CUSTOM_45
+  },
+  {
+    EL_CUSTOM_46,				-1, -1,
+    IMG_CUSTOM_46
+  },
+  {
+    EL_CUSTOM_47,				-1, -1,
+    IMG_CUSTOM_47
+  },
+  {
+    EL_CUSTOM_48,				-1, -1,
+    IMG_CUSTOM_48
+  },
+  {
+    EL_CUSTOM_49,				-1, -1,
+    IMG_CUSTOM_49
+  },
+  {
+    EL_CUSTOM_50,				-1, -1,
+    IMG_CUSTOM_50
+  },
+  {
+    EL_CUSTOM_51,				-1, -1,
+    IMG_CUSTOM_51
+  },
+  {
+    EL_CUSTOM_52,				-1, -1,
+    IMG_CUSTOM_52
+  },
+  {
+    EL_CUSTOM_53,				-1, -1,
+    IMG_CUSTOM_53
+  },
+  {
+    EL_CUSTOM_54,				-1, -1,
+    IMG_CUSTOM_54
+  },
+  {
+    EL_CUSTOM_55,				-1, -1,
+    IMG_CUSTOM_55
+  },
+  {
+    EL_CUSTOM_56,				-1, -1,
+    IMG_CUSTOM_56
+  },
+  {
+    EL_CUSTOM_57,				-1, -1,
+    IMG_CUSTOM_57
+  },
+  {
+    EL_CUSTOM_58,				-1, -1,
+    IMG_CUSTOM_58
+  },
+  {
+    EL_CUSTOM_59,				-1, -1,
+    IMG_CUSTOM_59
+  },
+  {
+    EL_CUSTOM_60,				-1, -1,
+    IMG_CUSTOM_60
+  },
+  {
+    EL_CUSTOM_61,				-1, -1,
+    IMG_CUSTOM_61
+  },
+  {
+    EL_CUSTOM_62,				-1, -1,
+    IMG_CUSTOM_62
+  },
+  {
+    EL_CUSTOM_63,				-1, -1,
+    IMG_CUSTOM_63
+  },
+  {
+    EL_CUSTOM_64,				-1, -1,
+    IMG_CUSTOM_64
+  },
+  {
+    EL_CUSTOM_65,				-1, -1,
+    IMG_CUSTOM_65
+  },
+  {
+    EL_CUSTOM_66,				-1, -1,
+    IMG_CUSTOM_66
+  },
+  {
+    EL_CUSTOM_67,				-1, -1,
+    IMG_CUSTOM_67
+  },
+  {
+    EL_CUSTOM_68,				-1, -1,
+    IMG_CUSTOM_68
+  },
+  {
+    EL_CUSTOM_69,				-1, -1,
+    IMG_CUSTOM_69
+  },
+  {
+    EL_CUSTOM_70,				-1, -1,
+    IMG_CUSTOM_70
+  },
+  {
+    EL_CUSTOM_71,				-1, -1,
+    IMG_CUSTOM_71
+  },
+  {
+    EL_CUSTOM_72,				-1, -1,
+    IMG_CUSTOM_72
+  },
+  {
+    EL_CUSTOM_73,				-1, -1,
+    IMG_CUSTOM_73
+  },
+  {
+    EL_CUSTOM_74,				-1, -1,
+    IMG_CUSTOM_74
+  },
+  {
+    EL_CUSTOM_75,				-1, -1,
+    IMG_CUSTOM_75
+  },
+  {
+    EL_CUSTOM_76,				-1, -1,
+    IMG_CUSTOM_76
+  },
+  {
+    EL_CUSTOM_77,				-1, -1,
+    IMG_CUSTOM_77
+  },
+  {
+    EL_CUSTOM_78,				-1, -1,
+    IMG_CUSTOM_78
+  },
+  {
+    EL_CUSTOM_79,				-1, -1,
+    IMG_CUSTOM_79
+  },
+  {
+    EL_CUSTOM_80,				-1, -1,
+    IMG_CUSTOM_80
+  },
+  {
+    EL_CUSTOM_81,				-1, -1,
+    IMG_CUSTOM_81
+  },
+  {
+    EL_CUSTOM_82,				-1, -1,
+    IMG_CUSTOM_82
+  },
+  {
+    EL_CUSTOM_83,				-1, -1,
+    IMG_CUSTOM_83
+  },
+  {
+    EL_CUSTOM_84,				-1, -1,
+    IMG_CUSTOM_84
+  },
+  {
+    EL_CUSTOM_85,				-1, -1,
+    IMG_CUSTOM_85
+  },
+  {
+    EL_CUSTOM_86,				-1, -1,
+    IMG_CUSTOM_86
+  },
+  {
+    EL_CUSTOM_87,				-1, -1,
+    IMG_CUSTOM_87
+  },
+  {
+    EL_CUSTOM_88,				-1, -1,
+    IMG_CUSTOM_88
+  },
+  {
+    EL_CUSTOM_89,				-1, -1,
+    IMG_CUSTOM_89
+  },
+  {
+    EL_CUSTOM_90,				-1, -1,
+    IMG_CUSTOM_90
+  },
+  {
+    EL_CUSTOM_91,				-1, -1,
+    IMG_CUSTOM_91
+  },
+  {
+    EL_CUSTOM_92,				-1, -1,
+    IMG_CUSTOM_92
+  },
+  {
+    EL_CUSTOM_93,				-1, -1,
+    IMG_CUSTOM_93
+  },
+  {
+    EL_CUSTOM_94,				-1, -1,
+    IMG_CUSTOM_94
+  },
+  {
+    EL_CUSTOM_95,				-1, -1,
+    IMG_CUSTOM_95
+  },
+  {
+    EL_CUSTOM_96,				-1, -1,
+    IMG_CUSTOM_96
+  },
+  {
+    EL_CUSTOM_97,				-1, -1,
+    IMG_CUSTOM_97
+  },
+  {
+    EL_CUSTOM_98,				-1, -1,
+    IMG_CUSTOM_98
+  },
+  {
+    EL_CUSTOM_99,				-1, -1,
+    IMG_CUSTOM_99
+  },
+  {
+    EL_CUSTOM_100,				-1, -1,
+    IMG_CUSTOM_100
+  },
+  {
+    EL_CUSTOM_101,				-1, -1,
+    IMG_CUSTOM_101
+  },
+  {
+    EL_CUSTOM_102,				-1, -1,
+    IMG_CUSTOM_102
+  },
+  {
+    EL_CUSTOM_103,				-1, -1,
+    IMG_CUSTOM_103
+  },
+  {
+    EL_CUSTOM_104,				-1, -1,
+    IMG_CUSTOM_104
+  },
+  {
+    EL_CUSTOM_105,				-1, -1,
+    IMG_CUSTOM_105
+  },
+  {
+    EL_CUSTOM_106,				-1, -1,
+    IMG_CUSTOM_106
+  },
+  {
+    EL_CUSTOM_107,				-1, -1,
+    IMG_CUSTOM_107
+  },
+  {
+    EL_CUSTOM_108,				-1, -1,
+    IMG_CUSTOM_108
+  },
+  {
+    EL_CUSTOM_109,				-1, -1,
+    IMG_CUSTOM_109
+  },
+  {
+    EL_CUSTOM_110,				-1, -1,
+    IMG_CUSTOM_110
+  },
+  {
+    EL_CUSTOM_111,				-1, -1,
+    IMG_CUSTOM_111
+  },
+  {
+    EL_CUSTOM_112,				-1, -1,
+    IMG_CUSTOM_112
+  },
+  {
+    EL_CUSTOM_113,				-1, -1,
+    IMG_CUSTOM_113
+  },
+  {
+    EL_CUSTOM_114,				-1, -1,
+    IMG_CUSTOM_114
+  },
+  {
+    EL_CUSTOM_115,				-1, -1,
+    IMG_CUSTOM_115
+  },
+  {
+    EL_CUSTOM_116,				-1, -1,
+    IMG_CUSTOM_116
+  },
+  {
+    EL_CUSTOM_117,				-1, -1,
+    IMG_CUSTOM_117
+  },
+  {
+    EL_CUSTOM_118,				-1, -1,
+    IMG_CUSTOM_118
+  },
+  {
+    EL_CUSTOM_119,				-1, -1,
+    IMG_CUSTOM_119
+  },
+  {
+    EL_CUSTOM_120,				-1, -1,
+    IMG_CUSTOM_120
+  },
+  {
+    EL_CUSTOM_121,				-1, -1,
+    IMG_CUSTOM_121
+  },
+  {
+    EL_CUSTOM_122,				-1, -1,
+    IMG_CUSTOM_122
+  },
+  {
+    EL_CUSTOM_123,				-1, -1,
+    IMG_CUSTOM_123
+  },
+  {
+    EL_CUSTOM_124,				-1, -1,
+    IMG_CUSTOM_124
+  },
+  {
+    EL_CUSTOM_125,				-1, -1,
+    IMG_CUSTOM_125
+  },
+  {
+    EL_CUSTOM_126,				-1, -1,
+    IMG_CUSTOM_126
+  },
+  {
+    EL_CUSTOM_127,				-1, -1,
+    IMG_CUSTOM_127
+  },
+  {
+    EL_CUSTOM_128,				-1, -1,
+    IMG_CUSTOM_128
+  },
+  {
     -1,						-1, -1,
     -1
   },

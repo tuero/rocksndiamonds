@@ -88,12 +88,7 @@ clean:
 #-----------------------------------------------------------------------------#
 
 auto-conf:
-	./Scripts/create_element_defs.pl --gfx > src/conf_gfx.h
-	./Scripts/create_element_defs.pl --snd > src/conf_snd.h
-	./Scripts/create_element_defs.pl --chr > src/conf_chr.c
-	./Scripts/create_element_defs.pl --cus > src/conf_cus.c
-	./Scripts/create_element_defs.pl --e2g > src/conf_e2g.c
-	./Scripts/create_element_defs.pl --esg > src/conf_esg.c
+	@$(MAKE_CMD) auto-conf
 
 run:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && ./rocksndiamonds --verbose

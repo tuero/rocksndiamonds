@@ -880,7 +880,7 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 
 void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
 {
-  Bitmap *tmp_bitmap, *tmp_bitmap_2, *tmp_bitmap_4, *tmp_bitmap_8;
+  Bitmap *tmp_bitmap, *tmp_bitmap_2, *tmp_bitmap_8;
   int src_width, src_height;
   int tmp_width, tmp_height;
 
@@ -893,19 +893,15 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   tmp_bitmap = CreateBitmap(tmp_width, tmp_height, DEFAULT_DEPTH);
 
   tmp_bitmap_2 = ZoomBitmap(src_bitmap, src_width / 2, src_height / 2);
-  tmp_bitmap_4 = ZoomBitmap(src_bitmap, src_width / 4, src_height / 4);
   tmp_bitmap_8 = ZoomBitmap(src_bitmap, src_width / 8, src_height / 8);
 
   BlitBitmap(src_bitmap, tmp_bitmap, 0, 0, src_width, src_height, 0, 0);
   BlitBitmap(tmp_bitmap_2, tmp_bitmap, 0, 0, src_width / 2, src_height / 2,
 	     0, src_height);
-  BlitBitmap(tmp_bitmap_4, tmp_bitmap, 0, 0, src_width / 4, src_height / 4,
-	     src_width / 2, src_height);
   BlitBitmap(tmp_bitmap_8, tmp_bitmap, 0, 0, src_width / 8, src_height / 8,
 	     3 * src_width / 4, src_height);
 
   FreeBitmap(tmp_bitmap_2);
-  FreeBitmap(tmp_bitmap_4);
   FreeBitmap(tmp_bitmap_8);
 
 #ifdef TARGET_SDL

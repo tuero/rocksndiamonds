@@ -908,10 +908,6 @@ void CreateImageWithSmallImages(int pos)
   if (img_info == NULL || img_info->contains_small_images)
     return;
 
-#if 0
-  printf("    creating small image for '%s'\n", img_info->source_filename);
-#endif
-
   CreateBitmapWithSmallBitmaps(img_info->bitmap);
 
   img_info->contains_small_images = TRUE;

@@ -959,16 +959,22 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   int src_x = mini_startx + graphic_info[graphic].src_x / 2;
   int src_y = mini_starty + graphic_info[graphic].src_y / 2;
 
+#if 0
+  /* !!! not needed anymore, because of automatically created mini graphics */
   if (src_x + MINI_TILEX > src_bitmap->width ||
       src_y + MINI_TILEY > src_bitmap->height)
   {
     /* graphic of desired size seems not to be contained in this image;
        dirty workaround: get it from the middle of the normal sized image */
 
+    printf("::: using dirty workaround for %d (%d, %d)\n",
+	   graphic, src_bitmap->width, src_bitmap->height);
+
     getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
     src_x += (TILEX / 2 - MINI_TILEX / 2);
     src_y += (TILEY / 2 - MINI_TILEY / 2);
   }
+#endif
 
   *bitmap = src_bitmap;
   *x = src_x;

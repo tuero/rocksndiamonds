@@ -475,6 +475,14 @@ char *getStringToLower(char *s)
   return s_copy;
 }
 
+void setString(char **old_value, char *new_value)
+{
+  if (*old_value != NULL)
+    free(*old_value);
+
+  *old_value = getStringCopy(new_value);
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* command line option handling functions                                    */
@@ -1499,16 +1507,16 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ------------------------------------------------------------------------- */
 
-static void FreeCustomArtworkList(struct ArtworkListInfo *,
-				  struct ListNodeInfo ***, int *);
-
-static int get_parameter_value(int type, char *value)
+int get_parameter_value(int type, char *value)
 {
   return (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
 	  type == TYPE_INTEGER ? get_integer_from_string(value) :
 	  type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
-	  -1);
+	  ARG_UNDEFINED_VALUE);
 }
+
+static void FreeCustomArtworkList(struct ArtworkListInfo *,
+				  struct ListNodeInfo ***, int *);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   struct ConfigInfo *suffix_list,
@@ -1517,7 +1525,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   struct FileInfo *file_list;
   int num_file_list_entries_found = 0;
   int num_suffix_list_entries = 0;
-  int list_pos = 0;
+  int list_pos;
   int i, j;
 
   file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
@@ -1529,46 +1537,31 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   for (i=0; i<num_file_list_entries; i++)
   {
     file_list[i].token = NULL;
+
     file_list[i].default_filename = NULL;
     file_list[i].filename = NULL;
 
     if (num_suffix_list_entries > 0)
     {
-      int parameter_array_size = num_suffix_list_entries * sizeof(int);
+      int parameter_array_size = num_suffix_list_entries * sizeof(char *);
 
       file_list[i].default_parameter = checked_calloc(parameter_array_size);
       file_list[i].parameter = checked_calloc(parameter_array_size);
 
       for (j=0; j<num_suffix_list_entries; j++)
       {
-	int default_parameter =
-	  get_parameter_value(suffix_list[j].type, suffix_list[j].value);
-
-	file_list[i].default_parameter[j] = default_parameter;
-	file_list[i].parameter[j] = default_parameter;
+	setString(&file_list[i].default_parameter[j], suffix_list[j].value);
+	setString(&file_list[i].parameter[j], suffix_list[j].value);
       }
     }
   }
 
+  list_pos = 0;
   for (i=0; config_list[i].token != NULL; i++)
   {
-#if 0
-    int len_config_token;
-    int len_config_value;
-    boolean is_file_entry;
-
-    printf("%d: '%s' => '%s'\n",
-	   i, config_list[i].token, config_list[i].value);
-
-    len_config_token = strlen(config_list[i].token);
-    len_config_value = strlen(config_list[i].value);
-    is_file_entry = TRUE;
-
-#else
     int len_config_token = strlen(config_list[i].token);
     int len_config_value = strlen(config_list[i].value);
     boolean is_file_entry = TRUE;
-#endif
 
     for (j=0; suffix_list[j].token != NULL; j++)
     {
@@ -1578,8 +1571,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  strcmp(&config_list[i].token[len_config_token - len_suffix],
 		 suffix_list[j].token) == 0)
       {
-	file_list[list_pos].default_parameter[j] =
-	  get_parameter_value(suffix_list[j].type, config_list[i].value);
+	setString(&file_list[list_pos].default_parameter[j],
+		  config_list[i].value);
 
 	is_file_entry = FALSE;
 	break;
@@ -1663,17 +1656,13 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i;
 
-  if (file_list_entry->filename != NULL)
-    free(file_list_entry->filename);
-
   if (filename != NULL)
   {
+    setString(&file_list_entry->filename, filename);
+
     /* when file definition found, set all parameters to default values */
     for (i=0; suffix_list[i].token != NULL; i++)
-      file_list_entry->parameter[i] =
-	get_parameter_value(suffix_list[i].type, suffix_list[i].value);
-
-    file_list_entry->filename = getStringCopy(filename);
+      setString(&file_list_entry->parameter[i], suffix_list[i].value);
 
     file_list_entry->redefined = TRUE;
 
@@ -1681,8 +1670,7 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
     setTokenValue(setup_file_list, file_list_entry->token, known_token_value);
   }
   else
-    file_list_entry->filename =
-      getStringCopy(file_list_entry->default_filename);
+    setString(&file_list_entry->filename, file_list_entry->default_filename);
 
   /* check for config tokens that can be build by base token and suffixes */
   for (i=0; suffix_list[i].token != NULL; i++)
@@ -1692,8 +1680,7 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
 
     if (value != NULL)
     {
-      file_list_entry->parameter[i] =
-	get_parameter_value(suffix_list[i].type, value);
+      setString(&file_list_entry->parameter[i], value);
 
       /* mark config file token as well known from default config */
       setTokenValue(setup_file_list, token, known_token_value);
@@ -1711,7 +1698,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
 					char *token)
 {
   struct FileInfo *new_list_entry;
-  int parameter_array_size = num_suffix_list_entries * sizeof(int);
+  int parameter_array_size = num_suffix_list_entries * sizeof(char *);
 
 #if 0
   if (IS_PARENT_PROCESS())
@@ -1778,12 +1765,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   /* always start with reliable default values */
   for (i=0; i<num_file_list_entries; i++)
   {
-    if (file_list[i].filename != NULL)
-      free(file_list[i].filename);
-    file_list[i].filename = getStringCopy(file_list[i].default_filename);
+    setString(&file_list[i].filename, file_list[i].default_filename);
 
     for (j=0; j<num_suffix_list_entries; j++)
-      file_list[i].parameter[j] = file_list[i].default_parameter[j];
+      setString(&file_list[i].parameter[j], file_list[i].default_parameter[j]);
 
     file_list[i].redefined = FALSE;
   }
@@ -2390,4 +2375,21 @@ void debug_print_timestamp(int counter_nr, char *message)
 	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
 
   counter[counter_nr][1] = Counter();
+}
+
+void debug_print_parent_only(char *format, ...)
+{
+  if (!IS_PARENT_PROCESS())
+    return;
+
+  if (format)
+  {
+    va_list ap;
+
+    va_start(ap, format);
+    vprintf(format, ap);
+    va_end(ap);
+
+    printf("\n");
+  }
 }
