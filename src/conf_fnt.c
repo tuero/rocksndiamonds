@@ -20,10 +20,10 @@
 
 static struct
 {
-    int font_nr;
-    int special;
+  int font_nr;
+  int special;
 
-    int graphic;
+  int graphic;
 }
 font_to_graphic[] =
 {

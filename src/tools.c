@@ -1045,7 +1045,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     frame = getGraphicAnimationFrame(graphic, -1);
   }
 
-  if (element == EL_WALL_GROWING)
+  if (element == EL_EXPANDABLE_WALL)
   {
     boolean left_stopped = FALSE, right_stopped = FALSE;
 
@@ -1058,17 +1058,17 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
       graphic = IMG_WALL;
     else if (left_stopped)
     {
-      graphic = IMG_WALL_GROWING_ACTIVE_RIGHT;
+      graphic = IMG_EXPANDABLE_WALL_GROWING_RIGHT;
       frame = graphic_info[graphic].anim_frames - 1;
     }
     else if (right_stopped)
     {
-      graphic = IMG_WALL_GROWING_ACTIVE_LEFT;
+      graphic = IMG_EXPANDABLE_WALL_GROWING_LEFT;
       frame = graphic_info[graphic].anim_frames - 1;
     }
   }
 #if 0
-  else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
+  else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DROPPING)
   {
     graphic = (element == EL_BD_AMOEBA ? IMG_BD_AMOEBA_PART1 :
 	       element == EL_AMOEBA_WET ? IMG_AMOEBA_WET_PART1 :
@@ -1081,9 +1081,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 #endif
 
 #if 0
-  if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
+  if (IS_AMOEBOID(element) || element == EL_AMOEBA_DROPPING)
   {
-    if (Feld[lx][ly] == EL_AMOEBA_DRIPPING)
+    if (Feld[lx][ly] == EL_AMOEBA_DROPPING)
       printf("---> %d -> %d / %d [%d]\n",
 	     element, graphic, frame, GfxRandom[lx][ly]);
   }
@@ -1322,7 +1322,7 @@ void DrawScreenField(int x, int y)
     if (element == EL_QUICKSAND_EMPTYING ||
 	element == EL_MAGIC_WALL_EMPTYING ||
 	element == EL_BD_MAGIC_WALL_EMPTYING ||
-	element == EL_AMOEBA_DRIPPING)
+	element == EL_AMOEBA_DROPPING)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
 	     element == EL_MAGIC_WALL_FILLING ||
@@ -1364,7 +1364,7 @@ void DrawScreenField(int x, int y)
     if (element_old == EL_QUICKSAND_EMPTYING ||
 	element_old == EL_MAGIC_WALL_EMPTYING ||
 	element_old == EL_BD_MAGIC_WALL_EMPTYING ||
-	element_old == EL_AMOEBA_DRIPPING)
+	element_old == EL_AMOEBA_DROPPING)
       cut_mode = CUT_ABOVE;
 
     DrawScreenElement(x, y, EL_EMPTY);
@@ -2313,7 +2313,7 @@ void CreateToolButtons()
     {
       int player_nr = id - TOOL_CTRL_ID_PLAYER_1;
 
-      getMiniGraphicSource(PLAYER_NR_GFX(IMG_PLAYER1, player_nr),
+      getMiniGraphicSource(PLAYER_NR_GFX(IMG_PLAYER_1, player_nr),
 			   &deco_bitmap, &deco_x, &deco_y);
       deco_xpos = (toolbutton_info[i].width - MINI_TILEX) / 2;
       deco_ypos = (toolbutton_info[i].height - MINI_TILEY) / 2;
@@ -2375,7 +2375,7 @@ int get_next_element(int element)
     case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_ACTIVE;
     case EL_BD_MAGIC_WALL_FILLING:	return EL_BD_MAGIC_WALL_FULL;
     case EL_BD_MAGIC_WALL_EMPTYING:	return EL_BD_MAGIC_WALL_ACTIVE;
-    case EL_AMOEBA_DRIPPING:		return EL_AMOEBA_WET;
+    case EL_AMOEBA_DROPPING:		return EL_AMOEBA_WET;
 
     default:				return element;
   }

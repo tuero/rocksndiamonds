@@ -113,6 +113,8 @@ static void PlaySoundLevel(int, int, int);
 static void PlaySoundLevelNearest(int, int, int);
 static void PlaySoundLevelAction(int, int, int);
 static void PlaySoundLevelElementAction(int, int, int, int);
+static void PlaySoundLevelActionIfLoop(int, int, int);
+static void StopSoundLevelActionIfLoop(int, int, int);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -152,7 +154,7 @@ struct ChangingElementInfo
 
 static struct ChangingElementInfo changing_element_list[] =
 {
-  { EL_NUT_CRACKING,		EL_EMERALD,		 6, NULL, NULL, NULL },
+  { EL_NUT_BREAKING,		EL_EMERALD,		 6, NULL, NULL, NULL },
   { EL_PEARL_BREAKING,		EL_EMPTY,		 8, NULL, NULL, NULL },
   { EL_EXIT_OPENING,		EL_EXIT_OPEN,		29, NULL, NULL, NULL },
 
@@ -213,33 +215,33 @@ void GetPlayerConfig()
 
 static int getBeltNrFromBeltElement(int element)
 {
-  return (element < EL_CONVEYOR_BELT2_LEFT ? 0 :
-	  element < EL_CONVEYOR_BELT3_LEFT ? 1 :
-	  element < EL_CONVEYOR_BELT4_LEFT ? 2 : 3);
+  return (element < EL_CONVEYOR_BELT_2_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT_3_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT_4_LEFT ? 2 : 3);
 }
 
 static int getBeltNrFromBeltActiveElement(int element)
 {
-  return (element < EL_CONVEYOR_BELT2_LEFT_ACTIVE ? 0 :
-	  element < EL_CONVEYOR_BELT3_LEFT_ACTIVE ? 1 :
-	  element < EL_CONVEYOR_BELT4_LEFT_ACTIVE ? 2 : 3);
+  return (element < EL_CONVEYOR_BELT_2_LEFT_ACTIVE ? 0 :
+	  element < EL_CONVEYOR_BELT_3_LEFT_ACTIVE ? 1 :
+	  element < EL_CONVEYOR_BELT_4_LEFT_ACTIVE ? 2 : 3);
 }
 
 static int getBeltNrFromBeltSwitchElement(int element)
 {
-  return (element < EL_CONVEYOR_BELT2_SWITCH_LEFT ? 0 :
-	  element < EL_CONVEYOR_BELT3_SWITCH_LEFT ? 1 :
-	  element < EL_CONVEYOR_BELT4_SWITCH_LEFT ? 2 : 3);
+  return (element < EL_CONVEYOR_BELT_2_SWITCH_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT_3_SWITCH_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT_4_SWITCH_LEFT ? 2 : 3);
 }
 
 static int getBeltDirNrFromBeltSwitchElement(int element)
 {
   static int belt_base_element[4] =
   {
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT
   };
 
   int belt_nr = getBeltNrFromBeltSwitchElement(element);
@@ -279,16 +281,16 @@ static void InitField(int x, int y, boolean init_game)
 	  stored_player[0].use_murphy_graphic = TRUE;
 	}
 
-	Feld[x][y] = EL_PLAYER1;
+	Feld[x][y] = EL_PLAYER_1;
       }
       /* no break! */
-    case EL_PLAYER1:
-    case EL_PLAYER2:
-    case EL_PLAYER3:
-    case EL_PLAYER4:
+    case EL_PLAYER_1:
+    case EL_PLAYER_2:
+    case EL_PLAYER_3:
+    case EL_PLAYER_4:
       if (init_game)
       {
-	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER1];
+	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER_1];
 	int jx = player->jx, jy = player->jy;
 
 	player->present = TRUE;
@@ -320,15 +322,15 @@ static void InitField(int x, int y, boolean init_game)
 
     case EL_STONEBLOCK:
       if (x < lev_fieldx-1 && Feld[x+1][y] == EL_ACID)
-	Feld[x][y] = EL_ACIDPOOL_TOPLEFT;
+	Feld[x][y] = EL_ACID_POOL_TOPLEFT;
       else if (x > 0 && Feld[x-1][y] == EL_ACID)
-	Feld[x][y] = EL_ACIDPOOL_TOPRIGHT;
-      else if (y > 0 && Feld[x][y-1] == EL_ACIDPOOL_TOPLEFT)
-	Feld[x][y] = EL_ACIDPOOL_BOTTOMLEFT;
+	Feld[x][y] = EL_ACID_POOL_TOPRIGHT;
+      else if (y > 0 && Feld[x][y-1] == EL_ACID_POOL_TOPLEFT)
+	Feld[x][y] = EL_ACID_POOL_BOTTOMLEFT;
       else if (y > 0 && Feld[x][y-1] == EL_ACID)
-	Feld[x][y] = EL_ACIDPOOL_BOTTOM;
-      else if (y > 0 && Feld[x][y-1] == EL_ACIDPOOL_TOPRIGHT)
-	Feld[x][y] = EL_ACIDPOOL_BOTTOMRIGHT;
+	Feld[x][y] = EL_ACID_POOL_BOTTOM;
+      else if (y > 0 && Feld[x][y-1] == EL_ACID_POOL_TOPRIGHT)
+	Feld[x][y] = EL_ACID_POOL_BOTTOMRIGHT;
       break;
 
     case EL_BUG_RIGHT:
@@ -377,7 +379,7 @@ static void InitField(int x, int y, boolean init_game)
     case EL_AMOEBA_DROP:
       if (y == lev_fieldy - 1)
       {
-	Feld[x][y] = EL_AMOEBA_CREATING;
+	Feld[x][y] = EL_AMOEBA_GROWING;
 	Store[x][y] = EL_AMOEBA_WET;
       }
       break;
@@ -407,31 +409,31 @@ static void InitField(int x, int y, boolean init_game)
       Feld[x][y] = EL_EMPTY;
       break;
 
-    case EL_EM_KEY1_FILE:
-      Feld[x][y] = EL_EM_KEY1;
+    case EL_EM_KEY_1_FILE:
+      Feld[x][y] = EL_EM_KEY_1;
       break;
-    case EL_EM_KEY2_FILE:
-      Feld[x][y] = EL_EM_KEY2;
+    case EL_EM_KEY_2_FILE:
+      Feld[x][y] = EL_EM_KEY_2;
       break;
-    case EL_EM_KEY3_FILE:
-      Feld[x][y] = EL_EM_KEY3;
+    case EL_EM_KEY_3_FILE:
+      Feld[x][y] = EL_EM_KEY_3;
       break;
-    case EL_EM_KEY4_FILE:
-      Feld[x][y] = EL_EM_KEY4;
+    case EL_EM_KEY_4_FILE:
+      Feld[x][y] = EL_EM_KEY_4;
       break;
 
-    case EL_CONVEYOR_BELT1_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT1_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT2_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT2_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT3_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT3_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT4_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT4_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_1_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_1_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_1_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_2_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_2_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_2_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_3_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_3_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_3_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_4_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_4_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_4_SWITCH_RIGHT:
       if (init_game)
       {
 	int belt_nr = getBeltNrFromBeltSwitchElement(Feld[x][y]);
@@ -473,7 +475,7 @@ void DrawGameDoorValues()
     for (j=0; j<4; j++)
       if (stored_player[i].key[j])
 	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
-			   el2edimg(EL_KEY1 + j));
+			   el2edimg(EL_KEY_1 + j));
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
@@ -524,10 +526,10 @@ static void InitGameEngine()
     {
       EL_STEELWALL,
       EL_WALL,
-      EL_WALL_GROWING,
-      EL_WALL_GROWING_X,
-      EL_WALL_GROWING_Y,
-      EL_WALL_GROWING_XY
+      EL_EXPANDABLE_WALL,
+      EL_EXPANDABLE_WALL_HORIZONTAL,
+      EL_EXPANDABLE_WALL_VERTICAL,
+      EL_EXPANDABLE_WALL_ANY
     };
     static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
 
@@ -541,11 +543,11 @@ static void InitGameEngine()
 	  ~EP_BIT_EM_SLIPPERY_WALL;
     }
 
-    /* "EL_WALL_GROWING_ACTIVE" wasn't slippery for EM gems in version 2.0.1 */
+    /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
     if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
-      Properties2[EL_WALL_GROWING_ACTIVE] |= EP_BIT_EM_SLIPPERY_WALL;
+      Properties2[EL_EXPANDABLE_WALL_GROWING] |= EP_BIT_EM_SLIPPERY_WALL;
     else
-      Properties2[EL_WALL_GROWING_ACTIVE] &=~EP_BIT_EM_SLIPPERY_WALL;
+      Properties2[EL_EXPANDABLE_WALL_GROWING] &=~EP_BIT_EM_SLIPPERY_WALL;
   }
 
   /* initialize changing elements information */
@@ -612,7 +614,7 @@ void InitGame()
     struct PlayerInfo *player = &stored_player[i];
 
     player->index_nr = i;
-    player->element_nr = EL_PLAYER1 + i;
+    player->element_nr = EL_PLAYER_1 + i;
 
     player->present = FALSE;
     player->active = FALSE;
@@ -1400,7 +1402,7 @@ void RemoveMovingField(int x, int y)
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
-       Feld[oldx][oldy] == EL_AMOEBA_DRIPPING))
+       Feld[oldx][oldy] == EL_AMOEBA_DROPPING))
     Feld[oldx][oldy] = get_next_element(Feld[oldx][oldy]);
   else
     Feld[oldx][oldy] = EL_EMPTY;
@@ -1454,19 +1456,21 @@ void CheckDynamite(int x, int y)
     if (MovDelay[x][y] != 0)
     {
       DrawDynamite(x, y);
-
-      /* !!! correct: "PlaySoundLevelActionIfLoop" etc. !!! */
-      PlaySoundLevelAction(x, y, ACTION_ACTIVE);
+      PlaySoundLevelActionIfLoop(x, y, ACTION_ACTIVE);
 
       return;
     }
   }
 
+#if 1
+  StopSoundLevelActionIfLoop(x, y, ACTION_ACTIVE);
+#else
   if (Feld[x][y] == EL_DYNAMITE_ACTIVE ||
       Feld[x][y] == EL_SP_DISK_RED_ACTIVE)
     StopSound(SND_DYNAMITE_ACTIVE);
   else
     StopSound(SND_DYNABOMB_ACTIVE);
+#endif
 
   Bang(x, y);
 }
@@ -1537,16 +1541,16 @@ void Explode(int ex, int ey, int phase, int mode)
       {
 	switch(StorePlayer[ex][ey])
 	{
-	  case EL_PLAYER2:
+	  case EL_PLAYER_2:
 	    Store[x][y] = EL_EMERALD_RED;
 	    break;
-	  case EL_PLAYER3:
+	  case EL_PLAYER_3:
 	    Store[x][y] = EL_EMERALD;
 	    break;
-	  case EL_PLAYER4:
+	  case EL_PLAYER_4:
 	    Store[x][y] = EL_EMERALD_PURPLE;
 	    break;
-	  case EL_PLAYER1:
+	  case EL_PLAYER_1:
 	  default:
 	    Store[x][y] = EL_EMERALD_YELLOW;
 	    break;
@@ -1595,7 +1599,7 @@ void Explode(int ex, int ey, int phase, int mode)
       if (AmoebaNr[x][y] &&
 	  (element == EL_AMOEBA_FULL ||
 	   element == EL_BD_AMOEBA ||
-	   element == EL_AMOEBA_CREATING))
+	   element == EL_AMOEBA_GROWING))
       {
 	AmoebaCnt[AmoebaNr[x][y]]--;
 	AmoebaCnt2[AmoebaNr[x][y]]--;
@@ -1701,7 +1705,7 @@ void DynaExplode(int ex, int ey)
 
   if (IS_ACTIVE_BOMB(Feld[ex][ey]))
   {
-    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_PLAYER1_ACTIVE];
+    player = &stored_player[Feld[ex][ey] - EL_DYNABOMB_PLAYER_1_ACTIVE];
     dynabomb_size = player->dynabomb_size;
     dynabomb_xl = player->dynabomb_xl;
     player->dynabombs_left++;
@@ -1765,13 +1769,13 @@ void Bang(int x, int y)
       RaiseScoreElement(element);
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
-    case EL_DYNABOMB_PLAYER1_ACTIVE:
-    case EL_DYNABOMB_PLAYER2_ACTIVE:
-    case EL_DYNABOMB_PLAYER3_ACTIVE:
-    case EL_DYNABOMB_PLAYER4_ACTIVE:
-    case EL_DYNABOMB_NR:
-    case EL_DYNABOMB_SZ:
-    case EL_DYNABOMB_XL:
+    case EL_DYNABOMB_PLAYER_1_ACTIVE:
+    case EL_DYNABOMB_PLAYER_2_ACTIVE:
+    case EL_DYNABOMB_PLAYER_3_ACTIVE:
+    case EL_DYNABOMB_PLAYER_4_ACTIVE:
+    case EL_DYNABOMB_INCREASE_NUMBER:
+    case EL_DYNABOMB_INCREASE_SIZE:
+    case EL_DYNABOMB_INCREASE_POWER:
       DynaExplode(x, y);
       break;
     case EL_PENGUIN:
@@ -1813,17 +1817,17 @@ static void InitBeltMovement()
 {
   static int belt_base_element[4] =
   {
-    EL_CONVEYOR_BELT1_LEFT,
-    EL_CONVEYOR_BELT2_LEFT,
-    EL_CONVEYOR_BELT3_LEFT,
-    EL_CONVEYOR_BELT4_LEFT
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_4_LEFT
   };
   static int belt_base_active_element[4] =
   {
-    EL_CONVEYOR_BELT1_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT2_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT3_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT4_LEFT_ACTIVE
+    EL_CONVEYOR_BELT_1_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_2_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_3_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_4_LEFT_ACTIVE
   };
 
   int x, y, i, j;
@@ -1874,24 +1878,24 @@ static void ToggleBeltSwitch(int x, int y)
 {
   static int belt_base_element[4] =
   {
-    EL_CONVEYOR_BELT1_LEFT,
-    EL_CONVEYOR_BELT2_LEFT,
-    EL_CONVEYOR_BELT3_LEFT,
-    EL_CONVEYOR_BELT4_LEFT
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_4_LEFT
   };
   static int belt_base_active_element[4] =
   {
-    EL_CONVEYOR_BELT1_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT2_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT3_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT4_LEFT_ACTIVE
+    EL_CONVEYOR_BELT_1_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_2_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_3_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_4_LEFT_ACTIVE
   };
   static int belt_base_switch_element[4] =
   {
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT
   };
   static int belt_move_dir[4] =
   {
@@ -1994,13 +1998,21 @@ static void ToggleSwitchgateSwitch(int x, int y)
 	       element == EL_SWITCHGATE_OPENING)
       {
 	Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
+#if 1
+	PlaySoundLevelAction(xx, yy, ACTION_CLOSING);
+#else
 	PlaySoundLevel(xx, yy, SND_SWITCHGATE_CLOSING);
+#endif
       }
       else if (element == EL_SWITCHGATE_CLOSED ||
 	       element == EL_SWITCHGATE_CLOSING)
       {
 	Feld[xx][yy] = EL_SWITCHGATE_OPENING;
+#if 1
+	PlaySoundLevelAction(xx, yy, ACTION_OPENING);
+#else
 	PlaySoundLevel(xx, yy, SND_SWITCHGATE_OPENING);
+#endif
       }
     }
   }
@@ -2162,7 +2174,7 @@ void Impact(int x, int y)
       Bang(x, y+1);
     else
     {
-      Feld[x][y] = EL_AMOEBA_CREATING;
+      Feld[x][y] = EL_AMOEBA_GROWING;
       Store[x][y] = EL_AMOEBA_WET;
 
       ResetRandomAnimationValue(x, y);
@@ -2248,8 +2260,8 @@ void Impact(int x, int y)
 	}
 	else if (smashed == EL_NUT)
 	{
-	  Feld[x][y+1] = EL_NUT_CRACKING;
-	  PlaySoundLevel(x, y, SND_NUT_CRACKING);
+	  Feld[x][y+1] = EL_NUT_BREAKING;
+	  PlaySoundLevel(x, y, SND_NUT_BREAKING);
 	  RaiseScoreElement(EL_NUT);
 	  return;
 	}
@@ -2289,9 +2301,9 @@ void Impact(int x, int y)
        Feld[x][y+1] == EL_BD_MAGIC_WALL_ACTIVE))
   {
     if (Feld[x][y+1] == EL_MAGIC_WALL_ACTIVE)
-      PlaySoundLevel(x, y, SND_MAGIC_WALL_CHANGING);
+      PlaySoundLevel(x, y, SND_MAGIC_WALL_FILLING);
     else if (Feld[x][y+1] == EL_BD_MAGIC_WALL_ACTIVE)
-      PlaySoundLevel(x, y, SND_BD_MAGIC_WALL_CHANGING);
+      PlaySoundLevel(x, y, SND_BD_MAGIC_WALL_FILLING);
 
     return;
   }
@@ -2770,7 +2782,11 @@ void StartMoving(int x, int y)
 
 	Feld[x][y] = EL_QUICKSAND_EMPTYING;
 	Store[x][y] = EL_ROCK;
+#if 1
+	PlaySoundLevelAction(x, y, ACTION_EMPTYING);
+#else
 	PlaySoundLevel(x, y, SND_QUICKSAND_EMPTYING);
+#endif
       }
       else if (Feld[x][y+1] == EL_QUICKSAND_EMPTY)
       {
@@ -2788,7 +2804,11 @@ void StartMoving(int x, int y)
 	Feld[x][y+1] = EL_QUICKSAND_FULL;
 	Store[x][y+1] = Store[x][y];
 	Store[x][y] = 0;
-	PlaySoundLevel(x, y, SND_QUICKSAND_SLIPPING);
+#if 1
+	PlaySoundLevelAction(x, y, ACTION_FILLING);
+#else
+	PlaySoundLevel(x, y, SND_QUICKSAND_FILLING);
+#endif
       }
     }
     else if ((element == EL_ROCK || element == EL_BD_ROCK) &&
@@ -2799,7 +2819,11 @@ void StartMoving(int x, int y)
 
       Feld[x][y] = EL_QUICKSAND_FILLING;
       Store[x][y] = element;
+#if 1
+      PlaySoundLevelAction(x, y, ACTION_FILLING);
+#else
       PlaySoundLevel(x, y, SND_QUICKSAND_FILLING);
+#endif
     }
     else if (element == EL_MAGIC_WALL_FULL)
     {
@@ -2909,7 +2933,7 @@ void StartMoving(int x, int y)
     }
     else if (element == EL_AMOEBA_DROP)
     {
-      Feld[x][y] = EL_AMOEBA_CREATING;
+      Feld[x][y] = EL_AMOEBA_GROWING;
       Store[x][y] = EL_AMOEBA_WET;
     }
     /* Store[x][y+1] must be zero, because:
@@ -3028,10 +3052,10 @@ void StartMoving(int x, int y)
 	int dir = MovDir[x][y];
 	int dx = (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
 	int dy = (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
-	int graphic = (dir == MV_LEFT	? IMG_FLAMES1_LEFT :
-		       dir == MV_RIGHT	? IMG_FLAMES1_RIGHT :
-		       dir == MV_UP	? IMG_FLAMES1_UP :
-		       dir == MV_DOWN	? IMG_FLAMES1_DOWN : IMG_EMPTY);
+	int graphic = (dir == MV_LEFT	? IMG_FLAMES_1_LEFT :
+		       dir == MV_RIGHT	? IMG_FLAMES_1_RIGHT :
+		       dir == MV_UP	? IMG_FLAMES_1_UP :
+		       dir == MV_DOWN	? IMG_FLAMES_1_DOWN : IMG_EMPTY);
 	int frame = getGraphicAnimationFrame(graphic, -1);
 
 	for (i=1; i<=3; i++)
@@ -3108,7 +3132,7 @@ void StartMoving(int x, int y)
 	Feld[x][y] = EL_EMPTY;
 	DrawLevelField(x, y);
 
-	PlaySoundLevel(newx, newy, SND_PENGUIN_PASSING_EXIT);
+	PlaySoundLevel(newx, newy, SND_CLASS_EXIT_PASSING);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
 	  DrawGraphicThruMask(SCREENX(newx),SCREENY(newy), el2img(element), 0);
 
@@ -3147,7 +3171,7 @@ void StartMoving(int x, int y)
 	  DrawLevelField(newx, newy);
 	}
 
-	PlaySoundLevel(x, y, SND_PIG_EATING);
+	PlaySoundLevel(x, y, SND_PIG_DIGGING);
       }
       else if (!IS_FREE(newx, newy))
       {
@@ -3211,7 +3235,7 @@ void StartMoving(int x, int y)
 	DrawLevelField(newx, newy);
       }
 
-      PlaySoundLevel(x, y, SND_YAMYAM_EATING);
+      PlaySoundLevel(x, y, SND_YAMYAM_DIGGING);
     }
     else if (element == EL_DARK_YAMYAM && IN_LEV_FIELD(newx, newy) &&
 	     IS_MAMPF2(Feld[newx][newy]))
@@ -3232,7 +3256,7 @@ void StartMoving(int x, int y)
 	DrawLevelField(newx, newy);
       }
 
-      PlaySoundLevel(x, y, SND_DARK_YAMYAM_EATING);
+      PlaySoundLevel(x, y, SND_DARK_YAMYAM_DIGGING);
     }
     else if ((element == EL_PACMAN || element == EL_MOLE)
 	     && IN_LEV_FIELD(newx, newy) && IS_AMOEBOID(Feld[newx][newy]))
@@ -3248,7 +3272,7 @@ void StartMoving(int x, int y)
       if (element == EL_MOLE)
       {
 	Feld[newx][newy] = EL_AMOEBA_SHRINKING;
-	PlaySoundLevel(x, y, SND_MOLE_EATING);
+	PlaySoundLevel(x, y, SND_MOLE_DIGGING);
 	MovDelay[newx][newy] = 0;	/* start amoeba shrinking delay */
 	return;				/* wait for shrinking amoeba */
       }
@@ -3256,7 +3280,7 @@ void StartMoving(int x, int y)
       {
 	Feld[newx][newy] = EL_EMPTY;
 	DrawLevelField(newx, newy);
-	PlaySoundLevel(x, y, SND_PACMAN_EATING);
+	PlaySoundLevel(x, y, SND_PACMAN_DIGGING);
       }
     }
     else if (element == EL_MOLE && IN_LEV_FIELD(newx, newy) &&
@@ -3312,7 +3336,7 @@ void ContinueMoving(int x, int y)
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / 8;
 
-  if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DRIPPING)
+  if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
     step /= 2;
   else if (element == EL_QUICKSAND_FILLING ||
 	   element == EL_QUICKSAND_EMPTYING)
@@ -3404,7 +3428,7 @@ void ContinueMoving(int x, int y)
 	Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
       element = Feld[newx][newy] = Store[x][y];
     }
-    else if (element == EL_AMOEBA_DRIPPING)
+    else if (element == EL_AMOEBA_DROPPING)
     {
       Feld[x][y] = get_next_element(element);
       element = Feld[newx][newy] = Store[x][y];
@@ -3628,7 +3652,7 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
       if (AmoebaNr[x][y] == group_nr &&
 	  (Feld[x][y] == EL_AMOEBA_DEAD ||
 	   Feld[x][y] == EL_BD_AMOEBA ||
-	   Feld[x][y] == EL_AMOEBA_CREATING))
+	   Feld[x][y] == EL_AMOEBA_GROWING))
       {
 	AmoebaNr[x][y] = 0;
 	Feld[x][y] = new_element;
@@ -3656,10 +3680,14 @@ void AmoebeWaechst(int x, int y)
 
     if (DelayReached(&sound_delay, sound_delay_value))
     {
+#if 1
+      PlaySoundLevelElementAction(x, y, Store[x][y], ACTION_GROWING);
+#else
       if (Store[x][y] == EL_BD_AMOEBA)
-	PlaySoundLevel(x, y, SND_BD_AMOEBA_CREATING);
+	PlaySoundLevel(x, y, SND_BD_AMOEBA_GROWING);
       else
-	PlaySoundLevel(x, y, SND_AMOEBA_CREATING);
+	PlaySoundLevel(x, y, SND_AMOEBA_GROWING);
+#endif
       sound_delay_value = 30;
     }
   }
@@ -3669,10 +3697,10 @@ void AmoebeWaechst(int x, int y)
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     {
-      int frame = getGraphicAnimationFrame(IMG_AMOEBA_CREATING,
+      int frame = getGraphicAnimationFrame(IMG_AMOEBA_GROWING,
 					   6 - MovDelay[x][y]);
 
-      DrawGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_CREATING, frame);
+      DrawGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_GROWING, frame);
     }
 
     if (!MovDelay[x][y])
@@ -3849,18 +3877,22 @@ void AmoebeAbleger(int ax, int ay)
   if (element != EL_AMOEBA_WET || neway < ay || !IS_FREE(newax, neway) ||
       (neway == lev_fieldy - 1 && newax != ax))
   {
-    Feld[newax][neway] = EL_AMOEBA_CREATING;	/* creation of new amoeba */
+    Feld[newax][neway] = EL_AMOEBA_GROWING;	/* creation of new amoeba */
     Store[newax][neway] = element;
   }
   else if (neway == ay)
   {
     Feld[newax][neway] = EL_AMOEBA_DROP;	/* drop left/right of amoeba */
-    PlaySoundLevel(newax, neway, SND_AMOEBA_DROP_CREATING);
+#if 1
+    PlaySoundLevelAction(newax, neway, ACTION_GROWING);
+#else
+    PlaySoundLevel(newax, neway, SND_AMOEBA_GROWING);
+#endif
   }
   else
   {
     InitMovingField(ax, ay, MV_DOWN);		/* drop dripping from amoeba */
-    Feld[ax][ay] = EL_AMOEBA_DRIPPING;
+    Feld[ax][ay] = EL_AMOEBA_DROPPING;
     Store[ax][ay] = EL_AMOEBA_DROP;
     ContinueMoving(ax, ay);
     return;
@@ -3910,7 +3942,7 @@ void Life(int ax, int ay)
 	continue;
 
       if (((Feld[x][y] == element ||
-	    (element == EL_GAMEOFLIFE && IS_PLAYER(x, y))) &&
+	    (element == EL_GAME_OF_LIFE && IS_PLAYER(x, y))) &&
 	   !Stop[x][y]) ||
 	  (IS_FREE(x, y) && Stop[x][y]))
 	nachbarn++;
@@ -3932,7 +3964,7 @@ void Life(int ax, int ay)
       if (nachbarn >= life[2] && nachbarn <= life[3])
       {
 	Feld[xx][yy] = element;
-	MovDelay[xx][yy] = (element == EL_GAMEOFLIFE ? 0 : life_time-1);
+	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);
 	if (!Stop[xx][yy])
 	  DrawLevelField(xx, yy);
 	Stop[xx][yy] = TRUE;
@@ -3942,8 +3974,8 @@ void Life(int ax, int ay)
   }
 
   if (changed)
-    PlaySoundLevel(ax, ay, element == EL_GAMEOFLIFE ? SND_GAMEOFLIFE_CREATING :
-		   SND_BIOMAZE_CREATING);
+    PlaySoundLevel(ax, ay, element == EL_BIOMAZE ? SND_BIOMAZE_GROWING :
+		   SND_GAME_OF_LIFE_GROWING);
 }
 
 static void InitRobotWheel(int x, int y)
@@ -3989,7 +4021,7 @@ void CheckExit(int x, int y)
 
   Feld[x][y] = EL_EXIT_OPENING;
 
-  PlaySoundLevelNearest(x, y, SND_EXIT_OPENING);
+  PlaySoundLevelNearest(x, y, SND_CLASS_EXIT_OPENING);
 }
 
 void CheckExitSP(int x, int y)
@@ -4007,7 +4039,7 @@ void CheckExitSP(int x, int y)
 
   Feld[x][y] = EL_SP_EXIT_OPEN;
 
-  PlaySoundLevelNearest(x, y, SND_SP_EXIT_OPENING);
+  PlaySoundLevelNearest(x, y, SND_CLASS_SP_EXIT_OPENING);
 }
 
 static void CloseAllOpenTimegates()
@@ -4023,7 +4055,11 @@ static void CloseAllOpenTimegates()
       if (element == EL_TIMEGATE_OPEN || element == EL_TIMEGATE_OPENING)
       {
 	Feld[x][y] = EL_TIMEGATE_CLOSING;
+#if 1
+	PlaySoundLevelAction(x, y, ACTION_CLOSING);
+#else
 	PlaySoundLevel(x, y, SND_TIMEGATE_CLOSING);
+#endif
       }
     }
   }
@@ -4153,57 +4189,59 @@ void MauerAbleger(int ax, int ay)
   if (IN_LEV_FIELD(ax+1, ay) && IS_FREE(ax+1, ay))
     rechts_frei = TRUE;
 
-  if (element == EL_WALL_GROWING_Y || element == EL_WALL_GROWING_XY)
+  if (element == EL_EXPANDABLE_WALL_VERTICAL ||
+      element == EL_EXPANDABLE_WALL_ANY)
   {
     if (oben_frei)
     {
-      Feld[ax][ay-1] = EL_WALL_GROWING_ACTIVE;
+      Feld[ax][ay-1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay-1] = element;
       MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay - 1),
-		    IMG_WALL_GROWING_ACTIVE_UP, 0);
+		    IMG_EXPANDABLE_WALL_GROWING_UP, 0);
       new_wall = TRUE;
     }
     if (unten_frei)
     {
-      Feld[ax][ay+1] = EL_WALL_GROWING_ACTIVE;
+      Feld[ax][ay+1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay+1] = element;
       MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay + 1),
-		    IMG_WALL_GROWING_ACTIVE_DOWN, 0);
+		    IMG_EXPANDABLE_WALL_GROWING_DOWN, 0);
       new_wall = TRUE;
     }
   }
 
-  if (element == EL_WALL_GROWING_X || element == EL_WALL_GROWING_XY ||
-      element == EL_WALL_GROWING)
+  if (element == EL_EXPANDABLE_WALL_HORIZONTAL ||
+      element == EL_EXPANDABLE_WALL_ANY ||
+      element == EL_EXPANDABLE_WALL)
   {
     if (links_frei)
     {
-      Feld[ax-1][ay] = EL_WALL_GROWING_ACTIVE;
+      Feld[ax-1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax-1][ay] = element;
       MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax - 1), SCREENY(ay),
-		    IMG_WALL_GROWING_ACTIVE_LEFT, 0);
+		    IMG_EXPANDABLE_WALL_GROWING_LEFT, 0);
       new_wall = TRUE;
     }
 
     if (rechts_frei)
     {
-      Feld[ax+1][ay] = EL_WALL_GROWING_ACTIVE;
+      Feld[ax+1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax+1][ay] = element;
       MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax + 1), SCREENY(ay),
-		    IMG_WALL_GROWING_ACTIVE_RIGHT, 0);
+		    IMG_EXPANDABLE_WALL_GROWING_RIGHT, 0);
       new_wall = TRUE;
     }
   }
 
-  if (element == EL_WALL_GROWING && (links_frei || rechts_frei))
+  if (element == EL_EXPANDABLE_WALL && (links_frei || rechts_frei))
     DrawLevelField(ax, ay);
 
   if (!IN_LEV_FIELD(ax, ay-1) || IS_MAUER(Feld[ax][ay-1]))
@@ -4216,13 +4254,18 @@ void MauerAbleger(int ax, int ay)
     rechts_massiv = TRUE;
 
   if (((oben_massiv && unten_massiv) ||
-       element == EL_WALL_GROWING_X || element == EL_WALL_GROWING) &&
+       element == EL_EXPANDABLE_WALL_HORIZONTAL ||
+       element == EL_EXPANDABLE_WALL) &&
       ((links_massiv && rechts_massiv) ||
-       element == EL_WALL_GROWING_Y))
+       element == EL_EXPANDABLE_WALL_VERTICAL))
     Feld[ax][ay] = EL_WALL;
 
   if (new_wall)
-    PlaySoundLevel(ax, ay, SND_WALL_GROWING);
+#if 1
+    PlaySoundLevelAction(ax, ay, ACTION_GROWING);
+#else
+    PlaySoundLevel(ax, ay, SND_EXPANDABLE_WALL_GROWING);
+#endif
 }
 
 void CheckForDragon(int x, int y)
@@ -4604,26 +4647,28 @@ void GameActions()
     else if (element == EL_EXPLOSION && !game.explosions_delayed)
       Explode(x, y, ExplodePhase[x][y], EX_NORMAL);
 #endif
-    else if (element == EL_AMOEBA_CREATING)
+    else if (element == EL_AMOEBA_GROWING)
       AmoebeWaechst(x, y);
     else if (element == EL_AMOEBA_SHRINKING)
       AmoebaDisappearing(x, y);
+
 #if !USE_NEW_AMOEBA_CODE
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
 #endif
-    else if (element == EL_GAMEOFLIFE || element == EL_BIOMAZE)
+
+    else if (element == EL_GAME_OF_LIFE || element == EL_BIOMAZE)
       Life(x, y);
     else if (element == EL_EXIT_CLOSED)
       CheckExit(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       CheckExitSP(x, y);
-    else if (element == EL_WALL_GROWING_ACTIVE)
+    else if (element == EL_EXPANDABLE_WALL_GROWING)
       MauerWaechst(x, y);
-    else if (element == EL_WALL_GROWING ||
-	     element == EL_WALL_GROWING_X ||
-	     element == EL_WALL_GROWING_Y ||
-	     element == EL_WALL_GROWING_XY)
+    else if (element == EL_EXPANDABLE_WALL ||
+	     element == EL_EXPANDABLE_WALL_HORIZONTAL ||
+	     element == EL_EXPANDABLE_WALL_VERTICAL ||
+	     element == EL_EXPANDABLE_WALL_ANY)
       MauerAbleger(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);
@@ -4976,7 +5021,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
     if (element == EL_ACID && dx == 0 && dy == 1)
     {
       SplashAcid(jx, jy);
-      Feld[jx][jy] = EL_PLAYER1;
+      Feld[jx][jy] = EL_PLAYER_1;
       InitMovingField(jx, jy, MV_DOWN);
       Store[jx][jy] = EL_ACID;
       ContinueMoving(jx, jy);
@@ -5483,8 +5528,8 @@ void TestIfBadThingTouchesOtherBadThing(int bad_x, int bad_y)
       continue;
 
     element = Feld[x][y];
-    if (IS_AMOEBOID(element) || element == EL_GAMEOFLIFE ||
-	element == EL_AMOEBA_CREATING || element == EL_AMOEBA_DROP)
+    if (IS_AMOEBOID(element) || element == EL_GAME_OF_LIFE ||
+	element == EL_AMOEBA_GROWING || element == EL_AMOEBA_DROP)
     {
       kill_x = x;
       kill_y = y;
@@ -5527,7 +5572,7 @@ void BuryHero(struct PlayerInfo *player)
   if (!player->active)
     return;
 
-  PlaySoundLevel(jx, jy, SND_PLAYER_DYING);
+  PlaySoundLevel(jx, jy, SND_CLASS_PLAYER_DYING);
   PlaySoundLevel(jx, jy, SND_GAME_LOSING);
 
   player->GameOver = TRUE;
@@ -5587,7 +5632,7 @@ int DigField(struct PlayerInfo *player,
     int i = 0;
     int tube_leave_directions[][2] =
     {
-      { EL_TUBE_ALL,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+      { EL_TUBE_ANY,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
       { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
       { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
       { EL_TUBE_VERTICAL_LEFT,		MV_LEFT |            MV_UP | MV_DOWN },
@@ -5694,34 +5739,34 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       break;
 
-    case EL_DYNABOMB_NR:
+    case EL_DYNABOMB_INCREASE_NUMBER:
       RemoveField(x, y);
       player->dynabomb_count++;
       player->dynabombs_left++;
       RaiseScoreElement(EL_DYNAMITE);
-      PlaySoundLevel(x, y, SND_DYNABOMB_NR_COLLECTING);
+      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_NUMBER_COLLECTING);
       break;
 
-    case EL_DYNABOMB_SZ:
+    case EL_DYNABOMB_INCREASE_SIZE:
       RemoveField(x, y);
       player->dynabomb_size++;
       RaiseScoreElement(EL_DYNAMITE);
-      PlaySoundLevel(x, y, SND_DYNABOMB_SZ_COLLECTING);
+      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_SIZE_COLLECTING);
       break;
 
-    case EL_DYNABOMB_XL:
+    case EL_DYNABOMB_INCREASE_POWER:
       RemoveField(x, y);
       player->dynabomb_xl = TRUE;
       RaiseScoreElement(EL_DYNAMITE);
-      PlaySoundLevel(x, y, SND_DYNABOMB_XL_COLLECTING);
+      PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_POWER_COLLECTING);
       break;
 
-    case EL_KEY1:
-    case EL_KEY2:
-    case EL_KEY3:
-    case EL_KEY4:
+    case EL_KEY_1:
+    case EL_KEY_2:
+    case EL_KEY_3:
+    case EL_KEY_4:
     {
-      int key_nr = element - EL_KEY1;
+      int key_nr = element - EL_KEY_1;
       int graphic = el2edimg(element);
 
       RemoveField(x, y);
@@ -5731,17 +5776,17 @@ int DigField(struct PlayerInfo *player,
 			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
-      PlaySoundLevel(x, y, SND_KEY_COLLECTING);
+      PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
       break;
     }
 
-    case EL_EM_KEY1:
-    case EL_EM_KEY2:
-    case EL_EM_KEY3:
-    case EL_EM_KEY4:
+    case EL_EM_KEY_1:
+    case EL_EM_KEY_2:
+    case EL_EM_KEY_3:
+    case EL_EM_KEY_4:
     {
-      int key_nr = element - EL_EM_KEY1;
-      int graphic = el2edimg(EL_KEY1 + key_nr);
+      int key_nr = element - EL_EM_KEY_1;
+      int graphic = el2edimg(EL_KEY_1 + key_nr);
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5750,7 +5795,7 @@ int DigField(struct PlayerInfo *player,
 			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
-      PlaySoundLevel(x, y, SND_KEY_COLLECTING);
+      PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
       break;
     }
 
@@ -5784,23 +5829,23 @@ int DigField(struct PlayerInfo *player,
       }
       break;
 
-    case EL_CONVEYOR_BELT1_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT1_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT2_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT2_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT3_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT3_SWITCH_RIGHT:
-    case EL_CONVEYOR_BELT4_SWITCH_LEFT:
-    case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:
-    case EL_CONVEYOR_BELT4_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_1_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_1_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_1_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_2_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_2_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_2_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_3_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_3_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_3_SWITCH_RIGHT:
+    case EL_CONVEYOR_BELT_4_SWITCH_LEFT:
+    case EL_CONVEYOR_BELT_4_SWITCH_MIDDLE:
+    case EL_CONVEYOR_BELT_4_SWITCH_RIGHT:
       if (!player->Switching)
       {
 	player->Switching = TRUE;
 	ToggleBeltSwitch(x, y);
-	PlaySoundLevel(x, y, SND_CONVEYOR_BELT_SWITCH_ACTIVATING);
+	PlaySoundLevel(x, y, SND_CLASS_CONVEYOR_BELT_SWITCH_ACTIVATING);
       }
       return MF_ACTION;
       break;
@@ -5811,7 +5856,7 @@ int DigField(struct PlayerInfo *player,
       {
 	player->Switching = TRUE;
 	ToggleSwitchgateSwitch(x, y);
-	PlaySoundLevel(x, y, SND_SWITCHGATE_SWITCH_ACTIVATING);
+	PlaySoundLevel(x, y, SND_CLASS_SWITCHGATE_SWITCH_ACTIVATING);
       }
       return MF_ACTION;
       break;
@@ -5836,20 +5881,20 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_BALLOON_SEND_LEFT:
-    case EL_BALLOON_SEND_RIGHT:
-    case EL_BALLOON_SEND_UP:
-    case EL_BALLOON_SEND_DOWN:
-    case EL_BALLOON_SEND_ANY_DIRECTION:
-      if (element == EL_BALLOON_SEND_ANY_DIRECTION)
+    case EL_BALLOON_SWITCH_LEFT:
+    case EL_BALLOON_SWITCH_RIGHT:
+    case EL_BALLOON_SWITCH_UP:
+    case EL_BALLOON_SWITCH_DOWN:
+    case EL_BALLOON_SWITCH_ANY:
+      if (element == EL_BALLOON_SWITCH_ANY)
 	game.balloon_dir = move_direction;
       else
-	game.balloon_dir = (element == EL_BALLOON_SEND_LEFT  ? MV_LEFT :
-			    element == EL_BALLOON_SEND_RIGHT ? MV_RIGHT :
-			    element == EL_BALLOON_SEND_UP    ? MV_UP :
-			    element == EL_BALLOON_SEND_DOWN  ? MV_DOWN :
+	game.balloon_dir = (element == EL_BALLOON_SWITCH_LEFT  ? MV_LEFT :
+			    element == EL_BALLOON_SWITCH_RIGHT ? MV_RIGHT :
+			    element == EL_BALLOON_SWITCH_UP    ? MV_UP :
+			    element == EL_BALLOON_SWITCH_DOWN  ? MV_DOWN :
 			    MV_NO_MOVING);
-      PlaySoundLevel(x, y, SND_BALLOON_SWITCH_ACTIVATING);
+      PlaySoundLevel(x, y, SND_CLASS_BALLOON_SWITCH_ACTIVATING);
 
       return MF_ACTION;
       break;
@@ -5921,27 +5966,27 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       break;
 
-    case EL_GATE1:
-    case EL_GATE2:
-    case EL_GATE3:
-    case EL_GATE4:
-      if (!player->key[element - EL_GATE1])
+    case EL_GATE_1:
+    case EL_GATE_2:
+    case EL_GATE_3:
+    case EL_GATE_4:
+      if (!player->key[element - EL_GATE_1])
 	return MF_NO_ACTION;
       break;
 
-    case EL_GATE1_GRAY:
-    case EL_GATE2_GRAY:
-    case EL_GATE3_GRAY:
-    case EL_GATE4_GRAY:
-      if (!player->key[element - EL_GATE1_GRAY])
+    case EL_GATE_1_GRAY:
+    case EL_GATE_2_GRAY:
+    case EL_GATE_3_GRAY:
+    case EL_GATE_4_GRAY:
+      if (!player->key[element - EL_GATE_1_GRAY])
 	return MF_NO_ACTION;
       break;
 
-    case EL_EM_GATE1:
-    case EL_EM_GATE2:
-    case EL_EM_GATE3:
-    case EL_EM_GATE4:
-      if (!player->key[element - EL_EM_GATE1])
+    case EL_EM_GATE_1:
+    case EL_EM_GATE_2:
+    case EL_EM_GATE_3:
+    case EL_EM_GATE_4:
+      if (!player->key[element - EL_EM_GATE_1])
 	return MF_NO_ACTION;
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
@@ -5950,14 +5995,14 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-      PlaySoundLevel(x, y, SND_GATE_PASSING);
+      PlaySoundLevel(x, y, SND_CLASS_GATE_PASSING);
       break;
 
-    case EL_EM_GATE1_GRAY:
-    case EL_EM_GATE2_GRAY:
-    case EL_EM_GATE3_GRAY:
-    case EL_EM_GATE4_GRAY:
-      if (!player->key[element - EL_EM_GATE1_GRAY])
+    case EL_EM_GATE_1_GRAY:
+    case EL_EM_GATE_2_GRAY:
+    case EL_EM_GATE_3_GRAY:
+    case EL_EM_GATE_4_GRAY:
+      if (!player->key[element - EL_EM_GATE_1_GRAY])
 	return MF_NO_ACTION;
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
@@ -5966,7 +6011,11 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
+#if 1
+      PlaySoundLevelAction(x, y, ACTION_PASSING);
+#else
       PlaySoundLevel(x, y, SND_GATE_PASSING);
+#endif
       break;
 
     case EL_SWITCHGATE_OPEN:
@@ -5981,37 +6030,37 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_PASSING);
       break;
 
-    case EL_SP_PORT1_LEFT:
-    case EL_SP_PORT2_LEFT:
-    case EL_SP_PORT1_RIGHT:
-    case EL_SP_PORT2_RIGHT:
-    case EL_SP_PORT1_UP:
-    case EL_SP_PORT2_UP:
-    case EL_SP_PORT1_DOWN:
-    case EL_SP_PORT2_DOWN:
-    case EL_SP_PORT_X:
-    case EL_SP_PORT_Y:
-    case EL_SP_PORT_XY:
+    case EL_SP_PORT_LEFT:
+    case EL_SP_GRAVITY_PORT_LEFT:
+    case EL_SP_PORT_RIGHT:
+    case EL_SP_GRAVITY_PORT_RIGHT:
+    case EL_SP_PORT_UP:
+    case EL_SP_GRAVITY_PORT_UP:
+    case EL_SP_PORT_DOWN:
+    case EL_SP_GRAVITY_PORT_DOWN:
+    case EL_SP_PORT_HORIZONTAL:
+    case EL_SP_PORT_VERTICAL:
+    case EL_SP_PORT_ANY:
       if ((dx == -1 &&
-	   element != EL_SP_PORT1_LEFT &&
-	   element != EL_SP_PORT2_LEFT &&
-	   element != EL_SP_PORT_X &&
-	   element != EL_SP_PORT_XY) ||
+	   element != EL_SP_PORT_LEFT &&
+	   element != EL_SP_GRAVITY_PORT_LEFT &&
+	   element != EL_SP_PORT_HORIZONTAL &&
+	   element != EL_SP_PORT_ANY) ||
 	  (dx == +1 &&
-	   element != EL_SP_PORT1_RIGHT &&
-	   element != EL_SP_PORT2_RIGHT &&
-	   element != EL_SP_PORT_X &&
-	   element != EL_SP_PORT_XY) ||
+	   element != EL_SP_PORT_RIGHT &&
+	   element != EL_SP_GRAVITY_PORT_RIGHT &&
+	   element != EL_SP_PORT_HORIZONTAL &&
+	   element != EL_SP_PORT_ANY) ||
 	  (dy == -1 &&
-	   element != EL_SP_PORT1_UP &&
-	   element != EL_SP_PORT2_UP &&
-	   element != EL_SP_PORT_Y &&
-	   element != EL_SP_PORT_XY) ||
+	   element != EL_SP_PORT_UP &&
+	   element != EL_SP_GRAVITY_PORT_UP &&
+	   element != EL_SP_PORT_VERTICAL &&
+	   element != EL_SP_PORT_ANY) ||
 	  (dy == +1 &&
-	   element != EL_SP_PORT1_DOWN &&
-	   element != EL_SP_PORT2_DOWN &&
-	   element != EL_SP_PORT_Y &&
-	   element != EL_SP_PORT_XY) ||
+	   element != EL_SP_PORT_DOWN &&
+	   element != EL_SP_GRAVITY_PORT_DOWN &&
+	   element != EL_SP_PORT_VERTICAL &&
+	   element != EL_SP_PORT_ANY) ||
 	  !IN_LEV_FIELD(x + dx, y + dy) ||
 	  !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
@@ -6020,10 +6069,10 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
-      PlaySoundLevel(x, y, SND_SP_PORT_PASSING);
+      PlaySoundLevel(x, y, SND_CLASS_SP_PORT_PASSING);
       break;
 
-    case EL_TUBE_ALL:
+    case EL_TUBE_ANY:
     case EL_TUBE_VERTICAL:
     case EL_TUBE_HORIZONTAL:
     case EL_TUBE_VERTICAL_LEFT:
@@ -6038,7 +6087,7 @@ int DigField(struct PlayerInfo *player,
 	int i = 0;
 	int tube_enter_directions[][2] =
 	{
-	  { EL_TUBE_ALL,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+	  { EL_TUBE_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
 	  { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
 	  { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
 	  { EL_TUBE_VERTICAL_LEFT,	          MV_RIGHT | MV_UP | MV_DOWN },
@@ -6062,7 +6111,7 @@ int DigField(struct PlayerInfo *player,
 	if (!(tube_enter_directions[i][1] & move_direction))
 	  return MF_NO_ACTION;	/* tube has no opening in this direction */
 
-	PlaySoundLevel(x, y, SND_TUBE_PASSING);
+	PlaySoundLevel(x, y, SND_CLASS_TUBE_PASSING);
       }
       break;
 
@@ -6078,9 +6127,9 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 
       if (element == EL_EXIT_OPEN)
-	PlaySoundLevel(x, y, SND_EXIT_PASSING);
+	PlaySoundLevel(x, y, SND_CLASS_EXIT_PASSING);
       else
-	PlaySoundLevel(x, y, SND_SP_EXIT_PASSING);
+	PlaySoundLevel(x, y, SND_CLASS_SP_EXIT_PASSING);
 
       break;
 
@@ -6159,17 +6208,33 @@ int DigField(struct PlayerInfo *player,
 	  Feld[x+dx][y+dy] = EL_SOKOBAN_FIELD_FULL;
 	  local_player->sokobanfields_still_needed--;
 	  if (element == EL_SOKOBAN_OBJECT)
-	    PlaySoundLevel(x, y, SND_SOKOBAN_FIELD_FILLING);
+#if 1
+	    PlaySoundLevelAction(x+dx, y+dy, ACTION_FILLING);
+#else
+	    PlaySoundLevel(x, y, SND_CLASS_SOKOBAN_FIELD_FILLING);
+#endif
 	  else
+#if 1
+	    PlaySoundLevelAction(x+dx, y+dy, ACTION_PUSHING);
+#else
 	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
+#endif
 	}
 	else
 	{
 	  Feld[x+dx][y+dy] = EL_SOKOBAN_OBJECT;
 	  if (element == EL_SOKOBAN_FIELD_FULL)
+#if 1
+	    PlaySoundLevelAction(x+dx, y+dy, ACTION_EMPTYING);
+#else
 	    PlaySoundLevel(x, y, SND_SOKOBAN_FIELD_EMPTYING);
+#endif
 	  else
+#if 1
+	    PlaySoundLevelAction(x+dx, y+dy, ACTION_PUSHING);
+#else
 	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
+#endif
 	}
       }
       else
@@ -6189,7 +6254,7 @@ int DigField(struct PlayerInfo *player,
 	  game.emulation == EMU_SOKOBAN)
       {
 	player->LevelSolved = player->GameOver = TRUE;
-	PlaySoundLevel(x, y, SND_SOKOBAN_GAME_SOLVING);
+	PlaySoundLevel(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
 
       break;
@@ -6335,18 +6400,18 @@ boolean PlaceBomb(struct PlayerInfo *player)
 #endif
     }
 
-    PlaySoundLevel(jx, jy, SND_DYNAMITE_DROPPING);
+    PlaySoundLevelAction(jx, jy, ACTION_DROPPING);
   }
   else
   {
     Feld[jx][jy] =
-      EL_DYNABOMB_PLAYER1_ACTIVE + (player->element_nr - EL_PLAYER1);
+      EL_DYNABOMB_PLAYER_1_ACTIVE + (player->element_nr - EL_PLAYER_1);
     player->dynabombs_left--;
 
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
       DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
 
-    PlaySoundLevel(jx, jy, SND_DYNABOMB_DROPPING);
+    PlaySoundLevelAction(jx, jy, ACTION_DROPPING);
   }
 
   return TRUE;
@@ -6427,18 +6492,33 @@ static void PlaySoundLevelNearest(int x, int y, int sound_action)
 		 sound_action);
 }
 
-static void PlaySoundLevelAction(int x, int y, int sound_action)
+static void PlaySoundLevelAction(int x, int y, int action)
 {
-  PlaySoundLevelElementAction(x, y, Feld[x][y], sound_action);
+  PlaySoundLevelElementAction(x, y, Feld[x][y], action);
 }
 
-static void PlaySoundLevelElementAction(int x, int y, int element,
-					int sound_action)
+static void PlaySoundLevelElementAction(int x, int y, int element, int action)
 {
-  int sound_effect = element_info[element].sound[sound_action];
+  int sound_effect = element_info[element].sound[action];
 
   if (sound_effect != SND_UNDEFINED)
     PlaySoundLevel(x, y, sound_effect);
+}
+
+static void PlaySoundLevelActionIfLoop(int x, int y, int action)
+{
+  int sound_effect = element_info[Feld[x][y]].sound[action];
+
+  if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
+    PlaySoundLevel(x, y, sound_effect);
+}
+
+static void StopSoundLevelActionIfLoop(int x, int y, int action)
+{
+  int sound_effect = element_info[Feld[x][y]].sound[action];
+
+  if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
+    StopSoundExt(sound_effect, SND_CTRL_STOP_SOUND);
 }
 
 void RaiseScore(int value)
@@ -6485,10 +6565,10 @@ void RaiseScoreElement(int element)
     case EL_DYNAMITE:
       RaiseScore(level.score[SC_DYNAMIT]);
       break;
-    case EL_KEY1:
-    case EL_KEY2:
-    case EL_KEY3:
-    case EL_KEY4:
+    case EL_KEY_1:
+    case EL_KEY_2:
+    case EL_KEY_3:
+    case EL_KEY_4:
       RaiseScore(level.score[SC_SCHLUESSEL]);
       break;
     default:

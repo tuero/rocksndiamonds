@@ -116,9 +116,6 @@
 #define SOUND_MAX_LEFT2RIGHT		255
 #define SOUND_MIDDLE			(SOUND_MAX_LEFT2RIGHT / 2)
 
-/* value for undefined sound effect filename */
-#define SND_FILE_UNDEFINED		UNDEFINED_FILENAME
-
 
 /* general sound functions */
 void UnixOpenAudio(void);

@@ -162,6 +162,7 @@ CNFS =	conf_gfx.h	\
 	conf_cus.h	\
 	conf_e2g.c	\
 	conf_esg.c	\
+	conf_e2s.c	\
 	conf_fnt.c
 
 CNFS_CMD = ../Scripts/create_element_defs.pl

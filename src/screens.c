@@ -581,12 +581,12 @@ static int OLD_helpscreen_action[] =
 
 static int helpscreen_action[] =
 {
-  IMG_PLAYER1_MOVING_DOWN,		16,
-  IMG_PLAYER1_MOVING_UP,		16,
-  IMG_PLAYER1_MOVING_LEFT,		16,
-  IMG_PLAYER1_MOVING_RIGHT,		16,
-  IMG_PLAYER1_PUSHING_LEFT,		16,
-  IMG_PLAYER1_PUSHING_RIGHT,		16,			HA_NEXT,
+  IMG_PLAYER_1_MOVING_DOWN,		16,
+  IMG_PLAYER_1_MOVING_UP,		16,
+  IMG_PLAYER_1_MOVING_LEFT,		16,
+  IMG_PLAYER_1_MOVING_RIGHT,		16,
+  IMG_PLAYER_1_PUSHING_LEFT,		16,
+  IMG_PLAYER_1_PUSHING_RIGHT,		16,			HA_NEXT,
 
   IMG_SAND,				-1,			HA_NEXT,
 
@@ -598,16 +598,16 @@ static int helpscreen_action[] =
 
   IMG_WALL,				-1,			HA_NEXT,
 
-  IMG_WALL_GROWING_ACTIVE_LEFT,		20,
+  IMG_EXPANDABLE_WALL_GROWING_LEFT,	20,
   IMG_WALL,				50,
   IMG_EMPTY_SPACE,			20,
-  IMG_WALL_GROWING_ACTIVE_RIGHT,	20,
+  IMG_EXPANDABLE_WALL_GROWING_RIGHT,	20,
   IMG_WALL,				50,
   IMG_EMPTY_SPACE,			20,
-  IMG_WALL_GROWING_ACTIVE_UP,		20,
+  IMG_EXPANDABLE_WALL_GROWING_UP,	20,
   IMG_WALL,				50,
   IMG_EMPTY_SPACE,			20,
-  IMG_WALL_GROWING_ACTIVE_DOWN,		20,
+  IMG_EXPANDABLE_WALL_GROWING_DOWN,	20,
   IMG_WALL,				50,
   IMG_EMPTY_SPACE,			20,			HA_NEXT,
 
@@ -638,7 +638,7 @@ static int helpscreen_action[] =
   IMG_EMPTY_SPACE,			10,			HA_NEXT,
 
   IMG_NUT,				100,
-  IMG_NUT_CRACKING,			6,
+  IMG_NUT_BREAKING,			6,
   IMG_EMERALD,				20,			HA_NEXT,
 
   IMG_WALL_EMERALD, 			100,
@@ -665,20 +665,20 @@ static int helpscreen_action[] =
 
   IMG_ACID,				-1,			HA_NEXT,
 
-  IMG_KEY1,				50,
-  IMG_KEY2,				50,
-  IMG_KEY3,				50,
-  IMG_KEY4,				50,			HA_NEXT,
+  IMG_KEY_1,				50,
+  IMG_KEY_2,				50,
+  IMG_KEY_3,				50,
+  IMG_KEY_4,				50,			HA_NEXT,
 
-  IMG_GATE1,				50,
-  IMG_GATE2,				50,
-  IMG_GATE3,				50,
-  IMG_GATE4,				50,			HA_NEXT,
+  IMG_GATE_1,				50,
+  IMG_GATE_2,				50,
+  IMG_GATE_3,				50,
+  IMG_GATE_4,				50,			HA_NEXT,
 
-  IMG_GATE1_GRAY,			50,
-  IMG_GATE2_GRAY,			50,
-  IMG_GATE3_GRAY,			50,
-  IMG_GATE4_GRAY,			50,			HA_NEXT,
+  IMG_GATE_1_GRAY,			50,
+  IMG_GATE_2_GRAY,			50,
+  IMG_GATE_3_GRAY,			50,
+  IMG_GATE_4_GRAY,			50,			HA_NEXT,
 
   IMG_DYNAMITE,				-1,			HA_NEXT,
 
@@ -690,9 +690,9 @@ static int helpscreen_action[] =
   IMG_EXPLOSION,			16,
   IMG_EMPTY_SPACE,			20,			HA_NEXT,
 
-  IMG_DYNABOMB_NR,			-1,			HA_NEXT,
+  EL_DYNABOMB_INCREASE_NUMBER,		-1,			HA_NEXT,
 
-  IMG_DYNABOMB_SZ,			-1,			HA_NEXT,
+  EL_DYNABOMB_INCREASE_SIZE,		-1,			HA_NEXT,
 
   IMG_SPACESHIP_RIGHT,			16,
   IMG_SPACESHIP_UP,			16,
@@ -751,7 +751,7 @@ static int helpscreen_action[] =
   IMG_TIME_ORB_EMPTY,			50,			HA_NEXT,
 
   IMG_AMOEBA_DROP,			50,
-  IMG_AMOEBA_CREATING,			6,
+  IMG_AMOEBA_GROWING,			6,
   IMG_AMOEBA_WET,			20,			HA_NEXT,
 
   IMG_AMOEBA_DEAD,			-1,			HA_NEXT,
@@ -759,14 +759,14 @@ static int helpscreen_action[] =
   IMG_AMOEBA_WET,			-1,			HA_NEXT,
 
   IMG_AMOEBA_WET,			100,
-  IMG_AMOEBA_CREATING,			6,			HA_NEXT,
+  IMG_AMOEBA_GROWING,			6,			HA_NEXT,
 
   IMG_AMOEBA_FULL,			50,
   IMG_AMOEBA_DEAD,			50,
   IMG_EXPLOSION,			16,
   IMG_DIAMOND,				20,			HA_NEXT,
 
-  IMG_GAMEOFLIFE,			-1,			HA_NEXT,
+  IMG_GAME_OF_LIFE,			-1,			HA_NEXT,
 
   IMG_BIOMAZE,				-1,			HA_NEXT,
 
@@ -2290,7 +2290,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FONT_INPUT_ACTIVE);
-  DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
+  DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
 
   if (setup.input[player_nr].use_joystick)
   {

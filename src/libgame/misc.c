@@ -429,6 +429,7 @@ char *getPath2(char *path1, char *path2)
 				       strlen(path2) + 1);
 
   sprintf(complete_path, "%s/%s", path1, path2);
+
   return complete_path;
 }
 
@@ -439,6 +440,7 @@ char *getPath3(char *path1, char *path2, char *path3)
 				       strlen(path3) + 1);
 
   sprintf(complete_path, "%s/%s/%s", path1, path2, path3);
+
   return complete_path;
 }
 
@@ -447,6 +449,7 @@ char *getStringCat2(char *s1, char *s2)
   char *complete_string = checked_malloc(strlen(s1) + strlen(s2) + 1);
 
   sprintf(complete_string, "%s%s", s1, s2);
+
   return complete_string;
 }
 
@@ -458,8 +461,8 @@ char *getStringCopy(char *s)
     return NULL;
 
   s_copy = checked_malloc(strlen(s) + 1);
-
   strcpy(s_copy, s);
+
   return s_copy;
 }
 

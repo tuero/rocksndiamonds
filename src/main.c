@@ -100,6 +100,8 @@ struct SoundInfo       *sound_info = NULL;
 
 struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
 {
+  /* keyword to start parser: "ELEMENT_INFO_START" <-- do not change! */
+
   /* ----------------------------------------------------------------------- */
   /* "real" level file elements                                              */
   /* ----------------------------------------------------------------------- */
@@ -235,8 +237,8 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "nut with emerald"
   },
   {
-    "gameoflife",
-    "gameoflife",
+    "game_of_life",
+    "game_of_life",
     "Conway's wall of life"
   },
   {
@@ -265,60 +267,60 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "magic wheel (running)"
   },
   {
-    "key1",
+    "key_1",
     "key",
     "red key"
   },
   {
-    "key2",
+    "key_2",
     "key",
     "yellow key"
   },
   {
-    "key3",
+    "key_3",
     "key",
     "green key"
   },
   {
-    "key4",
+    "key_4",
     "key",
     "blue key"
   },
   {
-    "gate1",
+    "gate_1",
     "gate",
     "red door"
   },
   {
-    "gate2",
+    "gate_2",
     "gate",
     "yellow door"
   },
   {
-    "gate3",
+    "gate_3",
     "gate",
     "green door"
   },
   {
-    "gate4",
+    "gate_4",
     "gate",
     "blue door"
   },
   {
-    "gate1_gray",
+    "gate_1_gray",
     "gate",
     "gray door (opened by red key)"
   },
   {
-    "gate2_gray",
+    "gate_2_gray",
     "gate",
     "gray door (opened by yellow key)"},
   {
-    "gate3_gray",
+    "gate_3_gray",
     "gate",
     "gray door (opened by green key)"},
   {
-    "gate4_gray",
+    "gate_4_gray",
     "gate",
     "gray door (opened by blue key)"},
   {
@@ -377,7 +379,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "time orb (empty)"
   },
   {
-    "wall_growing",
+    "expandable_wall",
     "wall",
     "growing wall"
   },
@@ -422,33 +424,33 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "(not used)"
   },
   {
-    "dynabomb_nr",
-    "dynabomb_nr",
+    "dynabomb_increase_number",
+    "dynabomb",
     "increases number of bombs"
   },
   {
-    "dynabomb_sz",
-    "dynabomb_sz",
+    "dynabomb_increase_size",
+    "dynabomb",
     "increases explosion size"
   },
   {
-    "dynabomb_xl",
-    "dynabomb_xl",
+    "dynabomb_increase_power",
+    "dynabomb",
     "increases power of explosion"
   },
   {
     "sokoban_object",
-    "sokoban_object",
+    "sokoban",
     "sokoban object"
   },
   {
     "sokoban_field_empty",
-    "sokoban_field",
+    "sokoban",
     "sokoban empty field"
   },
   {
     "sokoban_field_full",
-    "sokoban_field",
+    "sokoban",
     "sokoban field with object"
   },
   {
@@ -499,22 +501,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "firefly"
   },
   {
-    "player1",
+    "player_1",
     "player",
     "yellow player"
   },
   {
-    "player2",
+    "player_2",
     "player",
     "red player"
   },
   {
-    "player3",
+    "player_3",
     "player",
     "green player"
   },
   {
-    "player4",
+    "player_4",
     "player",
     "blue player"
   },
@@ -596,27 +598,27 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "wall with purple emerald"
   },
   {
-    "acidpool_topleft",
+    "acid_pool_topleft",
     "wall",
     "acid pool (top left)"
   },
   {
-    "acidpool_topright",
+    "acid_pool_topright",
     "wall",
     "acid pool (top right)"
   },
   {
-    "acidpool_bottomleft",
+    "acid_pool_bottomleft",
     "wall",
     "acid pool (bottom left)"
   },
   {
-    "acidpool_bottom",
+    "acid_pool_bottom",
     "wall",
     "acid pool (bottom)"
   },
   {
-    "acidpool_bottomright",
+    "acid_pool_bottomright",
     "wall",
     "acid pool (bottom right)"
   },
@@ -638,7 +640,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "black_orb",
     "black_orb",
-    "black orb bomb"
+    "bomb"
   },
   {
     "amoeba_to_diamond",
@@ -661,22 +663,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "satellite"
   },
   {
-    "arrow_blue_left",
+    "arrow_left",
     "arrow",
     "arrow left"
   },
   {
-    "arrow_blue_right",
+    "arrow_right",
     "arrow",
     "arrow right"
   },
   {
-    "arrow_blue_up",
+    "arrow_up",
     "arrow",
     "arrow up"
   },
   {
-    "arrow_blue_down",
+    "arrow_down",
     "arrow",
     "arrow down"
   },
@@ -691,7 +693,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "fire breathing dragon"
   },
   {
-    "em_key1_file",
+    "em_key_1_file",
     "key",
     "red key (EM style)"
   },
@@ -1096,52 +1098,52 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "letter ''"
   },
   {
-    "wall_growing_x",
+    "expandable_wall_horizontal",
     "wall",
     "growing wall (horizontal)"
   },
   {
-    "wall_growing_y",
+    "expandable_wall_vertical",
     "wall",
     "growing wall (vertical)"
   },
   {
-    "wall_growing_xy",
+    "expandable_wall_any",
     "wall",
-    "growing wall (all directions)"
+    "growing wall (any direction)"
   },
   {
-    "em_gate1",
+    "em_gate_1",
     "gate",
     "red door (EM style)"
   },
   {
-    "em_gate2",
+    "em_gate_2",
     "gate",
     "yellow door (EM style)"
   },
   {
-    "em_gate3",
+    "em_gate_3",
     "gate",
     "green door (EM style)"
   },
   {
-    "em_gate4",
+    "em_gate_4",
     "gate",
     "blue door (EM style)"
   },
   {
-    "em_key2_file",
+    "em_key_2_file",
     "key",
     "yellow key (EM style)"
   },
   {
-    "em_key3_file",
+    "em_key_3_file",
     "key",
     "green key (EM style)"
   },
   {
-    "em_key4_file",
+    "em_key_4_file",
     "key",
     "blue key (EM style)"
   },
@@ -1176,7 +1178,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "chip (single)"
   },
   {
-    "sp_hard_gray",
+    "sp_hardware_gray",
     "wall",
     "hardware"
   },
@@ -1191,42 +1193,42 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "orange disk"
   },
   {
-    "sp_port1_right",
+    "sp_port_right",
     "sp_port",
     "port (leading right)"
   },
   {
-    "sp_port1_down",
+    "sp_port_down",
     "sp_port",
     "port (leading down)"
   },
   {
-    "sp_port1_left",
+    "sp_port_left",
     "sp_port",
     "port (leading left)"
   },
   {
-    "sp_port1_up",
+    "sp_port_up",
     "sp_port",
     "port (leading up)"
   },
   {
-    "sp_port2_right",
+    "sp_gravity_port_right",
     "sp_port",
     "port (leading right)"
   },
   {
-    "sp_port2_down",
+    "sp_gravity_port_down",
     "sp_port",
     "port (leading down)"
   },
   {
-    "sp_port2_left",
+    "sp_gravity_port_left",
     "sp_port",
     "port (leading left)"
   },
   {
-    "sp_port2_up",
+    "sp_gravity_port_up",
     "sp_port",
     "port (leading up)"
   },
@@ -1247,23 +1249,23 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "sp_disk_red",
-    "sp_disk_red",
+    "dynamite",
     "red disk"
   },
   {
-    "sp_port_y",
+    "sp_port_vertical",
     "sp_port",
     "port (vertical)"
   },
   {
-    "sp_port_x",
+    "sp_port_horizontal",
     "sp_port",
     "port (horizontal)"
   },
   {
-    "sp_port_xy",
+    "sp_port_any",
     "sp_port",
-    "port (all directions)"
+    "port (any direction)"
   },
   {
     "sp_electron",
@@ -1286,82 +1288,82 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "chip (right half)"
   },
   {
-    "sp_hard_base1",
+    "sp_hardware_base_1",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_green",
+    "sp_hardware_green",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_blue",
+    "sp_hardware_blue",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_red",
+    "sp_hardware_red",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_yellow",
+    "sp_hardware_yellow",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_base2",
+    "sp_hardware_base_2",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_base3",
+    "sp_hardware_base_3",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_base4",
+    "sp_hardware_base_4",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_base5",
+    "sp_hardware_base_5",
     "wall",
     "hardware"
   },
   {
-    "sp_hard_base6",
+    "sp_hardware_base_6",
     "wall",
     "hardware"
   },
   {
-    "sp_chip_upper",
+    "sp_chip_top",
     "wall",
     "chip (upper half)"
   },
   {
-    "sp_chip_lower",
+    "sp_chip_bottom",
     "wall",
     "chip (lower half)"
   },
   {
-    "em_gate1_gray",
+    "em_gate_1_gray",
     "gate",
     "gray door (EM style, red key)"
   },
   {
-    "em_gate2_gray",
+    "em_gate_2_gray",
     "gate",
     "gray door (EM style, yellow key)"
   },
   {
-    "em_gate3_gray",
+    "em_gate_3_gray",
     "gate",
     "gray door (EM style, green key)"
   },
   {
-    "em_gate4_gray",
+    "em_gate_4_gray",
     "gate",
     "gray door (EM style, blue key)"
   },
@@ -1451,122 +1453,122 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "conveyor_belt1_left",
+    "conveyor_belt_1_left",
     "conveyor_belt",
     "red conveyor belt (left)"
   },
   {
-    "conveyor_belt1_middle",
+    "conveyor_belt_1_middle",
     "conveyor_belt",
     "red conveyor belt (middle)"
   },
   {
-    "conveyor_belt1_right",
+    "conveyor_belt_1_right",
     "conveyor_belt",
     "red conveyor belt (right)"
   },
   {
-    "conveyor_belt1_switch_left",
+    "conveyor_belt_1_switch_left",
     "conveyor_belt_switch",
     "switch for red conveyor belt (left)"
   },
   {
-    "conveyor_belt1_switch_middle",
+    "conveyor_belt_1_switch_middle",
     "conveyor_belt_switch",
     "switch for red conveyor belt (middle)"
   },
   {
-    "conveyor_belt1_switch_right",
+    "conveyor_belt_1_switch_right",
     "conveyor_belt_switch",
     "switch for red conveyor belt (right)"
   },
   {
-    "conveyor_belt2_left",
+    "conveyor_belt_2_left",
     "conveyor_belt",
     "yellow conveyor belt (left)"
   },
   {
-    "conveyor_belt2_middle",
+    "conveyor_belt_2_middle",
     "conveyor_belt",
     "yellow conveyor belt (middle)"
   },
   {
-    "conveyor_belt2_right",
+    "conveyor_belt_2_right",
     "conveyor_belt",
     "yellow conveyor belt (right)"
   },
   {
-    "conveyor_belt2_switch_left",
+    "conveyor_belt_2_switch_left",
     "conveyor_belt_switch",
     "switch for yellow conveyor belt (left)"
   },
   {
-    "conveyor_belt2_switch_middle",
+    "conveyor_belt_2_switch_middle",
     "conveyor_belt_switch",
     "switch for yellow conveyor belt (middle)"
   },
   {
-    "conveyor_belt2_switch_right",
+    "conveyor_belt_2_switch_right",
     "conveyor_belt_switch",
     "switch for yellow conveyor belt (right)"
   },
   {
-    "conveyor_belt3_left",
+    "conveyor_belt_3_left",
     "conveyor_belt",
     "green conveyor belt (left)"
   },
   {
-    "conveyor_belt3_middle",
+    "conveyor_belt_3_middle",
     "conveyor_belt",
     "green conveyor belt (middle)"
   },
   {
-    "conveyor_belt3_right",
+    "conveyor_belt_3_right",
     "conveyor_belt",
     "green conveyor belt (right)"
   },
   {
-    "conveyor_belt3_switch_left",
+    "conveyor_belt_3_switch_left",
     "conveyor_belt_switch",
     "switch for green conveyor belt (left)"
   },
   {
-    "conveyor_belt3_switch_middle",
+    "conveyor_belt_3_switch_middle",
     "conveyor_belt_switch",
     "switch for green conveyor belt (middle)"
   },
   {
-    "conveyor_belt3_switch_right",
+    "conveyor_belt_3_switch_right",
     "conveyor_belt_switch",
     "switch for green conveyor belt (right)"
   },
   {
-    "conveyor_belt4_left",
+    "conveyor_belt_4_left",
     "conveyor_belt",
     "blue conveyor belt (left)"
   },
   {
-    "conveyor_belt4_middle",
+    "conveyor_belt_4_middle",
     "conveyor_belt",
     "blue conveyor belt (middle)"
   },
   {
-    "conveyor_belt4_right",
+    "conveyor_belt_4_right",
     "conveyor_belt",
     "blue conveyor belt (right)"
   },
   {
-    "conveyor_belt4_switch_left",
+    "conveyor_belt_4_switch_left",
     "conveyor_belt_switch",
     "switch for blue conveyor belt (left)"
   },
   {
-    "conveyor_belt4_switch_middle",
+    "conveyor_belt_4_switch_middle",
     "conveyor_belt_switch",
     "switch for blue conveyor belt (middle)"
   },
   {
-    "conveyor_belt4_switch_right",
+    "conveyor_belt_4_switch_right",
     "conveyor_belt_switch",
     "switch for blue conveyor belt (right)"
   },
@@ -1731,94 +1733,94 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "balloon"
   },
   {
-    "balloon_send_left",
+    "balloon_switch_left",
     "balloon_switch",
     "send balloon to the left"
   },
   {
-    "balloon_send_right",
+    "balloon_switch_right",
     "balloon_switch",
     "send balloon to the right"
   },
   {
-    "balloon_send_up",
+    "balloon_switch_up",
     "balloon_switch",
     "send balloon up"
   },
   {
-    "balloon_send_down",
+    "balloon_switch_down",
     "balloon_switch",
     "send balloon down"
   },
   {
-    "balloon_send_any_direction",
+    "balloon_switch_any",
     "balloon_switch",
     "send balloon in any direction"
   },
   {
-    "emc_steelwall1",
+    "emc_steelwall_1",
     "wall",
     "steel wall"
   },
   {
-    "emc_steelwall2",
+    "emc_steelwall_2",
     "wall",
     "steel wall"
   },
   {
-    "emc_steelwall3",
+    "emc_steelwall_3",
     "wall",
     "steel wall"
   },
   {
-    "emc_steelwall4",
+    "emc_steelwall_4",
     "wall",
     "steel wall"
   },
   {
-    "emc_wall_pillar_upper",
+    "emc_wall_1",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall_pillar_middle",
+    "emc_wall_2",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall_pillar_lower",
+    "emc_wall_3",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall4",
+    "emc_wall_4",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall5",
+    "emc_wall_5",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall6",
+    "emc_wall_6",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall7",
+    "emc_wall_7",
     "wall",
     "normal wall"
   },
   {
-    "emc_wall8",
+    "emc_wall_8",
     "wall",
     "normal wall"
   },
   {
-    "tube_all",
+    "tube_any",
     "tube",
-    "tube (all directions)"
+    "tube (any direction)"
   },
   {
     "tube_vertical",
@@ -1882,7 +1884,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "dx_supabomb",
-    "dx_bomb",
+    "bomb",
     "stable bomb (DX style)"
   },
   {
@@ -1897,642 +1899,642 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "custom_1",
-    "custom_1",
+    "custom",
     "custom element 1"
   },
   {
     "custom_2",
-    "custom_2",
+    "custom",
     "custom element 2"
   },
   {
     "custom_3",
-    "custom_3",
+    "custom",
     "custom element 3"
   },
   {
     "custom_4",
-    "custom_4",
+    "custom",
     "custom element 4"
   },
   {
     "custom_5",
-    "custom_5",
+    "custom",
     "custom element 5"
   },
   {
     "custom_6",
-    "custom_6",
+    "custom",
     "custom element 6"
   },
   {
     "custom_7",
-    "custom_7",
+    "custom",
     "custom element 7"
   },
   {
     "custom_8",
-    "custom_8",
+    "custom",
     "custom element 8"
   },
   {
     "custom_9",
-    "custom_9",
+    "custom",
     "custom element 9"
   },
   {
     "custom_10",
-    "custom_10",
+    "custom",
     "custom element 10"
   },
   {
     "custom_11",
-    "custom_11",
+    "custom",
     "custom element 11"
   },
   {
     "custom_12",
-    "custom_12",
+    "custom",
     "custom element 12"
   },
   {
     "custom_13",
-    "custom_13",
+    "custom",
     "custom element 13"
   },
   {
     "custom_14",
-    "custom_14",
+    "custom",
     "custom element 14"
   },
   {
     "custom_15",
-    "custom_15",
+    "custom",
     "custom element 15"
   },
   {
     "custom_16",
-    "custom_16",
+    "custom",
     "custom element 16"
   },
   {
     "custom_17",
-    "custom_17",
+    "custom",
     "custom element 17"
   },
   {
     "custom_18",
-    "custom_18",
+    "custom",
     "custom element 18"
   },
   {
     "custom_19",
-    "custom_19",
+    "custom",
     "custom element 19"
   },
   {
     "custom_20",
-    "custom_20",
+    "custom",
     "custom element 20"
   },
   {
     "custom_21",
-    "custom_21",
+    "custom",
     "custom element 21"
   },
   {
     "custom_22",
-    "custom_22",
+    "custom",
     "custom element 22"
   },
   {
     "custom_23",
-    "custom_23",
+    "custom",
     "custom element 23"
   },
   {
     "custom_24",
-    "custom_24",
+    "custom",
     "custom element 24"
   },
   {
     "custom_25",
-    "custom_25",
+    "custom",
     "custom element 25"
   },
   {
     "custom_26",
-    "custom_26",
+    "custom",
     "custom element 26"
   },
   {
     "custom_27",
-    "custom_27",
+    "custom",
     "custom element 27"
   },
   {
     "custom_28",
-    "custom_28",
+    "custom",
     "custom element 28"
   },
   {
     "custom_29",
-    "custom_29",
+    "custom",
     "custom element 29"
   },
   {
     "custom_30",
-    "custom_30",
+    "custom",
     "custom element 30"
   },
   {
     "custom_31",
-    "custom_31",
+    "custom",
     "custom element 31"
   },
   {
     "custom_32",
-    "custom_32",
+    "custom",
     "custom element 32"
   },
   {
     "custom_33",
-    "custom_33",
+    "custom",
     "custom element 33"
   },
   {
     "custom_34",
-    "custom_34",
+    "custom",
     "custom element 34"
   },
   {
     "custom_35",
-    "custom_35",
+    "custom",
     "custom element 35"
   },
   {
     "custom_36",
-    "custom_36",
+    "custom",
     "custom element 36"
   },
   {
     "custom_37",
-    "custom_37",
+    "custom",
     "custom element 37"
   },
   {
     "custom_38",
-    "custom_38",
+    "custom",
     "custom element 38"
   },
   {
     "custom_39",
-    "custom_39",
+    "custom",
     "custom element 39"
   },
   {
     "custom_40",
-    "custom_40",
+    "custom",
     "custom element 40"
   },
   {
     "custom_41",
-    "custom_41",
+    "custom",
     "custom element 41"
   },
   {
     "custom_42",
-    "custom_42",
+    "custom",
     "custom element 42"
   },
   {
     "custom_43",
-    "custom_43",
+    "custom",
     "custom element 43"
   },
   {
     "custom_44",
-    "custom_44",
+    "custom",
     "custom element 44"
   },
   {
     "custom_45",
-    "custom_45",
+    "custom",
     "custom element 45"
   },
   {
     "custom_46",
-    "custom_46",
+    "custom",
     "custom element 46"
   },
   {
     "custom_47",
-    "custom_47",
+    "custom",
     "custom element 47"
   },
   {
     "custom_48",
-    "custom_48",
+    "custom",
     "custom element 48"
   },
   {
     "custom_49",
-    "custom_49",
+    "custom",
     "custom element 49"
   },
   {
     "custom_50",
-    "custom_50",
+    "custom",
     "custom element 50"
   },
   {
     "custom_51",
-    "custom_51",
+    "custom",
     "custom element 51"
   },
   {
     "custom_52",
-    "custom_52",
+    "custom",
     "custom element 52"
   },
   {
     "custom_53",
-    "custom_53",
+    "custom",
     "custom element 53"
   },
   {
     "custom_54",
-    "custom_54",
+    "custom",
     "custom element 54"
   },
   {
     "custom_55",
-    "custom_55",
+    "custom",
     "custom element 55"
   },
   {
     "custom_56",
-    "custom_56",
+    "custom",
     "custom element 56"
   },
   {
     "custom_57",
-    "custom_57",
+    "custom",
     "custom element 57"
   },
   {
     "custom_58",
-    "custom_58",
+    "custom",
     "custom element 58"
   },
   {
     "custom_59",
-    "custom_59",
+    "custom",
     "custom element 59"
   },
   {
     "custom_60",
-    "custom_60",
+    "custom",
     "custom element 60"
   },
   {
     "custom_61",
-    "custom_61",
+    "custom",
     "custom element 61"
   },
   {
     "custom_62",
-    "custom_62",
+    "custom",
     "custom element 62"
   },
   {
     "custom_63",
-    "custom_63",
+    "custom",
     "custom element 63"
   },
   {
     "custom_64",
-    "custom_64",
+    "custom",
     "custom element 64"
   },
   {
     "custom_65",
-    "custom_65",
+    "custom",
     "custom element 65"
   },
   {
     "custom_66",
-    "custom_66",
+    "custom",
     "custom element 66"
   },
   {
     "custom_67",
-    "custom_67",
+    "custom",
     "custom element 67"
   },
   {
     "custom_68",
-    "custom_68",
+    "custom",
     "custom element 68"
   },
   {
     "custom_69",
-    "custom_69",
+    "custom",
     "custom element 69"
   },
   {
     "custom_70",
-    "custom_70",
+    "custom",
     "custom element 70"
   },
   {
     "custom_71",
-    "custom_71",
+    "custom",
     "custom element 71"
   },
   {
     "custom_72",
-    "custom_72",
+    "custom",
     "custom element 72"
   },
   {
     "custom_73",
-    "custom_73",
+    "custom",
     "custom element 73"
   },
   {
     "custom_74",
-    "custom_74",
+    "custom",
     "custom element 74"
   },
   {
     "custom_75",
-    "custom_75",
+    "custom",
     "custom element 75"
   },
   {
     "custom_76",
-    "custom_76",
+    "custom",
     "custom element 76"
   },
   {
     "custom_77",
-    "custom_77",
+    "custom",
     "custom element 77"
   },
   {
     "custom_78",
-    "custom_78",
+    "custom",
     "custom element 78"
   },
   {
     "custom_79",
-    "custom_79",
+    "custom",
     "custom element 79"
   },
   {
     "custom_80",
-    "custom_80",
+    "custom",
     "custom element 80"
   },
   {
     "custom_81",
-    "custom_81",
+    "custom",
     "custom element 81"
   },
   {
     "custom_82",
-    "custom_82",
+    "custom",
     "custom element 82"
   },
   {
     "custom_83",
-    "custom_83",
+    "custom",
     "custom element 83"
   },
   {
     "custom_84",
-    "custom_84",
+    "custom",
     "custom element 84"
   },
   {
     "custom_85",
-    "custom_85",
+    "custom",
     "custom element 85"
   },
   {
     "custom_86",
-    "custom_86",
+    "custom",
     "custom element 86"
   },
   {
     "custom_87",
-    "custom_87",
+    "custom",
     "custom element 87"
   },
   {
     "custom_88",
-    "custom_88",
+    "custom",
     "custom element 88"
   },
   {
     "custom_89",
-    "custom_89",
+    "custom",
     "custom element 89"
   },
   {
     "custom_90",
-    "custom_90",
+    "custom",
     "custom element 90"
   },
   {
     "custom_91",
-    "custom_91",
+    "custom",
     "custom element 91"
   },
   {
     "custom_92",
-    "custom_92",
+    "custom",
     "custom element 92"
   },
   {
     "custom_93",
-    "custom_93",
+    "custom",
     "custom element 93"
   },
   {
     "custom_94",
-    "custom_94",
+    "custom",
     "custom element 94"
   },
   {
     "custom_95",
-    "custom_95",
+    "custom",
     "custom element 95"
   },
   {
     "custom_96",
-    "custom_96",
+    "custom",
     "custom element 96"
   },
   {
     "custom_97",
-    "custom_97",
+    "custom",
     "custom element 97"
   },
   {
     "custom_98",
-    "custom_98",
+    "custom",
     "custom element 98"
   },
   {
     "custom_99",
-    "custom_99",
+    "custom",
     "custom element 99"
   },
   {
     "custom_100",
-    "custom_100",
+    "custom",
     "custom element 100"
   },
   {
     "custom_101",
-    "custom_101",
+    "custom",
     "custom element 101"
   },
   {
     "custom_102",
-    "custom_102",
+    "custom",
     "custom element 102"
   },
   {
     "custom_103",
-    "custom_103",
+    "custom",
     "custom element 103"
   },
   {
     "custom_104",
-    "custom_104",
+    "custom",
     "custom element 104"
   },
   {
     "custom_105",
-    "custom_105",
+    "custom",
     "custom element 105"
   },
   {
     "custom_106",
-    "custom_106",
+    "custom",
     "custom element 106"
   },
   {
     "custom_107",
-    "custom_107",
+    "custom",
     "custom element 107"
   },
   {
     "custom_108",
-    "custom_108",
+    "custom",
     "custom element 108"
   },
   {
     "custom_109",
-    "custom_109",
+    "custom",
     "custom element 109"
   },
   {
     "custom_110",
-    "custom_110",
+    "custom",
     "custom element 110"
   },
   {
     "custom_111",
-    "custom_111",
+    "custom",
     "custom element 111"
   },
   {
     "custom_112",
-    "custom_112",
+    "custom",
     "custom element 112"
   },
   {
     "custom_113",
-    "custom_113",
+    "custom",
     "custom element 113"
   },
   {
     "custom_114",
-    "custom_114",
+    "custom",
     "custom element 114"
   },
   {
     "custom_115",
-    "custom_115",
+    "custom",
     "custom element 115"
   },
   {
     "custom_116",
-    "custom_116",
+    "custom",
     "custom element 116"
   },
   {
     "custom_117",
-    "custom_117",
+    "custom",
     "custom element 117"
   },
   {
     "custom_118",
-    "custom_118",
+    "custom",
     "custom element 118"
   },
   {
     "custom_119",
-    "custom_119",
+    "custom",
     "custom element 119"
   },
   {
     "custom_120",
-    "custom_120",
+    "custom",
     "custom element 120"
   },
   {
     "custom_121",
-    "custom_121",
+    "custom",
     "custom element 121"
   },
   {
     "custom_122",
-    "custom_122",
+    "custom",
     "custom element 122"
   },
   {
     "custom_123",
-    "custom_123",
+    "custom",
     "custom element 123"
   },
   {
     "custom_124",
-    "custom_124",
+    "custom",
     "custom element 124"
   },
   {
     "custom_125",
-    "custom_125",
+    "custom",
     "custom element 125"
   },
   {
     "custom_126",
-    "custom_126",
+    "custom",
     "custom element 126"
   },
   {
     "custom_127",
-    "custom_127",
+    "custom",
     "custom element 127"
   },
   {
     "custom_128",
-    "custom_128",
+    "custom",
     "custom element 128"
   },
 
@@ -2541,42 +2543,42 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   /* ----------------------------------------------------------------------- */
 
   {
-    "em_key1",
+    "em_key_1",
     "key",
     "-"
     },
   {
-    "em_key2",
+    "em_key_2",
     "key",
     "-"
     },
   {
-    "em_key3",
+    "em_key_3",
     "key",
     "-"
   },
   {
-    "em_key4",
+    "em_key_4",
     "key",
     "-"
   },
   {
-    "dynabomb_player1_active",
+    "dynabomb_player_1_active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player2_active",
+    "dynabomb_player_2_active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player3_active",
+    "dynabomb_player_3_active",
     "dynabomb",
     "-"
   },
   {
-    "dynabomb_player4_active",
+    "dynabomb_player_4_active",
     "dynabomb",
     "-"
   },
@@ -2631,62 +2633,62 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "conveyor_belt1_left_active",
+    "conveyor_belt_1_left_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt1_middle_active",
+    "conveyor_belt_1_middle_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt1_right_active",
+    "conveyor_belt_1_right_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt2_left_active",
+    "conveyor_belt_2_left_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt2_middle_active",
+    "conveyor_belt_2_middle_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt2_right_active",
+    "conveyor_belt_2_right_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt3_left_active",
+    "conveyor_belt_3_left_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt3_middle_active",
+    "conveyor_belt_3_middle_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt3_right_active",
+    "conveyor_belt_3_right_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt4_left_active",
+    "conveyor_belt_4_left_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt4_middle_active",
+    "conveyor_belt_4_middle_active",
     "conveyor_belt",
     "-"
   },
   {
-    "conveyor_belt4_right_active",
+    "conveyor_belt_4_right_active",
     "conveyor_belt",
     "-"
   },
@@ -2721,7 +2723,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "amoeba_dripping",
+    "amoeba_dropping",
     "amoeba",
     "-"
   },
@@ -2786,7 +2788,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "nut_cracking",
+    "nut_breaking",
     "-",
     "-"
   },
@@ -2801,7 +2803,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "amoeba_creating",
+    "amoeba_growing",
     "-",
     "-"
   },
@@ -2811,7 +2813,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
-    "wall_growing_active",
+    "expandable_wall_growing",
     "-",
     "-"
   },
@@ -2827,7 +2829,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "quicksand_filling",
-    "-",
+    "quicksand",
     "-"
   },
   {
@@ -2926,10 +2928,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
 
+  /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
+
   {
     NULL,
     NULL,
-    "-"
+    NULL
   }
 };
 
@@ -2947,19 +2951,24 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1] =
   { ".digging",		ACTION_DIGGING,		FALSE	},
   { ".snapping",	ACTION_SNAPPING,	FALSE	},
   { ".collecting",	ACTION_COLLECTING,	FALSE	},
+  { ".dropping",	ACTION_DROPPING,	FALSE	},
   { ".pushing",		ACTION_PUSHING,		FALSE	},
   { ".passing",		ACTION_PASSING,		FALSE	},
   { ".impact",		ACTION_IMPACT,		FALSE	},
-  { ".cracking",	ACTION_CRACKING,	FALSE	},
   { ".breaking",	ACTION_BREAKING,	FALSE	},
   { ".activating",	ACTION_ACTIVATING,	FALSE	},
+  { ".deactivating",	ACTION_DEACTIVATING,	FALSE	},
   { ".opening",		ACTION_OPENING,		FALSE	},
   { ".closing",		ACTION_CLOSING,		FALSE	},
-  { ".eating",		ACTION_EATING,		FALSE	},
   { ".attacking",	ACTION_ATTACKING,	TRUE	},
   { ".growing",		ACTION_GROWING,		TRUE	},
   { ".shrinking",	ACTION_SHRINKING,	FALSE	},
   { ".active",		ACTION_ACTIVE,		TRUE	},
+  { ".filling",		ACTION_FILLING,		FALSE	},
+  { ".emptying",	ACTION_EMPTYING,	FALSE	},
+  { ".changing",	ACTION_CHANGING,	FALSE	},
+  { ".exploding",	ACTION_EXPLODING,	FALSE	},
+  { ".dying",		ACTION_DYING,		FALSE	},
   { ".other",		ACTION_OTHER,		FALSE	},
 
   { NULL,		0,			0	}

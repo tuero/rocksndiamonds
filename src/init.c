@@ -28,6 +28,7 @@
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
+#include "conf_e2s.c"	/* include auto-generated data structure definitions */
 #include "conf_fnt.c"	/* include auto-generated data structure definitions */
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
@@ -164,10 +165,20 @@ static void InitArtworkInfo()
   LoadArtworkInfo();
 }
 
+static char *get_element_class_token(int element)
+{
+  char *element_class_name = element_info[element].class_name;
+  char *element_class_token = checked_malloc(strlen(element_class_name) + 3);
+
+  sprintf(element_class_token, "[%s]", element_class_name);
+
+  return element_class_token;
+}
+
 static void InitArtworkConfig()
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
-  static char *sound_id_prefix[MAX_NUM_ELEMENTS + 1];
+  static char *sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
@@ -189,20 +200,27 @@ static void InitArtworkConfig()
 
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     image_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i<NUM_FONTS + 1; i++)
+  for (i=0; i<NUM_FONTS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
+  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
 
-  for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
-    sound_id_prefix[i] = element_info[i].sound_class_name;
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    sound_id_prefix[i] = element_info[i].token_name;
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    sound_id_prefix[MAX_NUM_ELEMENTS + i] = get_element_class_token(i);
+  sound_id_prefix[MAX_NUM_ELEMENTS + MAX_NUM_ELEMENTS] = NULL;
 
-  for (i=0; i<NUM_ACTIONS + 1; i++)
+  for (i=0; i<NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;
+  action_id_suffix[NUM_ACTIONS] = NULL;
 
-  for (i=0; i<NUM_DIRECTIONS + 1; i++)
+  for (i=0; i<NUM_DIRECTIONS; i++)
     direction_id_suffix[i] = element_direction_info[i].suffix;
+  direction_id_suffix[NUM_DIRECTIONS] = NULL;
 
-  for (i=0; i<NUM_SPECIAL_GFX_ARGS + 1; i++)
+  for (i=0; i<NUM_SPECIAL_GFX_ARGS; i++)
     special_id_suffix[i] = special_suffix_info[i].suffix;
+  special_id_suffix[NUM_SPECIAL_GFX_ARGS] = NULL;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
 		image_id_prefix, action_id_suffix, direction_id_suffix,
@@ -266,6 +284,10 @@ static void ReinitializeSounds()
 {
   InitElementSoundInfo();	/* element game sound mapping */
   InitSoundInfo();		/* sound properties mapping */
+
+#if 1
+  InitElementSoundInfo();	/* element game sound mapping */
+#endif
 
   InitPlaySoundLevel();		/* internal game sound settings */
 }
@@ -1279,7 +1301,82 @@ static void InitGraphicInfo()
 
 static void InitElementSoundInfo()
 {
-  /* !!! soon to come !!! */
+  struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
+  int num_property_mappings = getSoundListPropertyMappingSize();
+  int i, j, act;
+
+  /* set values to -1 to identify later as "uninitialized" values */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    for (act=0; act < NUM_ACTIONS; act++)
+      element_info[i].sound[act] = -1;
+
+  /* initialize element/sound mapping from static configuration */
+  for (i=0; element_to_sound[i].element > -1; i++)
+  {
+    int element      = element_to_sound[i].element;
+    int action       = element_to_sound[i].action;
+    int sound        = element_to_sound[i].sound;
+    boolean is_class = element_to_sound[i].is_class;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    if (!is_class)
+      element_info[element].sound[action] = sound;
+    else
+      for (j=0; j < MAX_NUM_ELEMENTS; j++)
+	if (strcmp(element_info[j].class_name,
+		   element_info[element].class_name) == 0)
+	  element_info[j].sound[action] = sound;
+  }
+
+  /* initialize element/sound mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element = property_mapping[i].base_index;
+    int action  = property_mapping[i].ext1_index;
+    int sound   = property_mapping[i].artwork_index;
+
+    if (element >= MAX_NUM_ELEMENTS)
+      continue;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    element_info[element].sound[action] = sound;
+  }
+
+  /* initialize element class/sound mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int element_class = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
+    int action        = property_mapping[i].ext1_index;
+    int sound         = property_mapping[i].artwork_index;
+
+    if (element_class < 0 || element_class >= MAX_NUM_ELEMENTS)
+      continue;
+
+    if (action < 0)
+      action = ACTION_DEFAULT;
+
+    for (j=0; j < MAX_NUM_ELEMENTS; j++)
+      if (strcmp(element_info[j].class_name,
+		 element_info[element_class].class_name) == 0)
+	element_info[j].sound[action] = sound;
+  }
+
+  /* now set all '-1' values to element specific default values */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    int default_action_sound = element_info[i].sound[ACTION_DEFAULT];
+
+    for (act=0; act < NUM_ACTIONS; act++)
+    {
+      /* no sound for this specific action -- use default action sound */
+      if (element_info[i].sound[act] == -1)
+	element_info[i].sound[act] = default_action_sound;
+    }
+  }
 }
 
 static void set_sound_parameters(int sound, char **parameter_raw)
@@ -1346,13 +1443,13 @@ static void InitSoundInfo()
 
     for (j=0; j<MAX_NUM_ELEMENTS; j++)
     {
-      if (element_info[j].sound_class_name)
+      if (element_info[j].class_name)
       {
-	int len_class_text = strlen(element_info[j].sound_class_name);
+	int len_class_text = strlen(element_info[j].class_name);
 
 	if (len_class_text + 1 < len_effect_text &&
 	    strncmp(sound->token,
-		    element_info[j].sound_class_name, len_class_text) == 0 &&
+		    element_info[j].class_name, len_class_text) == 0 &&
 	    sound->token[len_class_text] == '.')
 	{
 	  int sound_action_value = sound_effect_properties[i];
@@ -1442,35 +1539,35 @@ void InitElementProperties()
 
   static int ep_schluessel[] =
   {
-    EL_KEY1,
-    EL_KEY2,
-    EL_KEY3,
-    EL_KEY4,
-    EL_EM_KEY1,
-    EL_EM_KEY2,
-    EL_EM_KEY3,
-    EL_EM_KEY4
+    EL_KEY_1,
+    EL_KEY_2,
+    EL_KEY_3,
+    EL_KEY_4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4
   };
   static int ep_schluessel_num = SIZEOF_ARRAY_INT(ep_schluessel);
 
   static int ep_pforte[] =
   {
-    EL_GATE1,
-    EL_GATE2,
-    EL_GATE3,
-    EL_GATE4,
-    EL_GATE1_GRAY,
-    EL_GATE2_GRAY,
-    EL_GATE3_GRAY,
-    EL_GATE4_GRAY,
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
@@ -1479,7 +1576,7 @@ void InitElementProperties()
     EL_TIMEGATE_OPENING,
     EL_TIMEGATE_CLOSED,
     EL_TIMEGATE_CLOSING,
-    EL_TUBE_ALL,
+    EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
     EL_TUBE_VERTICAL_LEFT,
@@ -1496,10 +1593,10 @@ void InitElementProperties()
   static int ep_solid[] =
   {
     EL_WALL,
-    EL_WALL_GROWING,
-    EL_WALL_GROWING_X,
-    EL_WALL_GROWING_Y,
-    EL_WALL_GROWING_XY,
+    EL_EXPANDABLE_WALL,
+    EL_EXPANDABLE_WALL_HORIZONTAL,
+    EL_EXPANDABLE_WALL_VERTICAL,
+    EL_EXPANDABLE_WALL_ANY,
     EL_BD_WALL,
     EL_WALL_CRUMBLED,
     EL_EXIT_CLOSED,
@@ -1510,8 +1607,8 @@ void InitElementProperties()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
-    EL_QUICKSAND_FULL,
     EL_QUICKSAND_EMPTY,
+    EL_QUICKSAND_FULL,
     EL_QUICKSAND_FILLING,
     EL_QUICKSAND_EMPTYING,
     EL_MAGIC_WALL,
@@ -1526,13 +1623,13 @@ void InitElementProperties()
     EL_BD_MAGIC_WALL_FULL,
     EL_BD_MAGIC_WALL_FILLING,
     EL_BD_MAGIC_WALL_DEAD,
-    EL_GAMEOFLIFE,
+    EL_GAME_OF_LIFE,
     EL_BIOMAZE,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
     EL_SP_TERMINAL,
     EL_SP_TERMINAL_ACTIVE,
     EL_SP_EXIT_CLOSED,
@@ -1543,14 +1640,14 @@ void InitElementProperties()
     EL_SWITCHGATE_SWITCH_DOWN,
     EL_TIMEGATE_SWITCH,
     EL_TIMEGATE_SWITCH_ACTIVE,
-    EL_EMC_WALL_PILLAR_UPPER,
-    EL_EMC_WALL_PILLAR_MIDDLE,
-    EL_EMC_WALL_PILLAR_LOWER,
-    EL_EMC_WALL4,
-    EL_EMC_WALL5,
-    EL_EMC_WALL6,
-    EL_EMC_WALL7,
-    EL_EMC_WALL8,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8,
     EL_WALL_PEARL,
     EL_WALL_CRYSTAL,
 
@@ -1560,36 +1657,36 @@ void InitElementProperties()
     EL_ACID,
 #endif
     EL_STEELWALL,
-    EL_ACIDPOOL_TOPLEFT,
-    EL_ACIDPOOL_TOPRIGHT,
-    EL_ACIDPOOL_BOTTOMLEFT,
-    EL_ACIDPOOL_BOTTOM,
-    EL_ACIDPOOL_BOTTOMRIGHT,
-    EL_SP_HARD_GRAY,
-    EL_SP_HARD_GREEN,
-    EL_SP_HARD_BLUE,
-    EL_SP_HARD_RED,
-    EL_SP_HARD_YELLOW,
-    EL_SP_HARD_BASE1,
-    EL_SP_HARD_BASE2,
-    EL_SP_HARD_BASE3,
-    EL_SP_HARD_BASE4,
-    EL_SP_HARD_BASE5,
-    EL_SP_HARD_BASE6,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_ACID_POOL_BOTTOMLEFT,
+    EL_ACID_POOL_BOTTOM,
+    EL_ACID_POOL_BOTTOMRIGHT,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_STEELWALL_ACTIVE,
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT1_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT1_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT2_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT3_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT4_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
     EL_LIGHT_SWITCH,
     EL_LIGHT_SWITCH_ACTIVE,
     EL_SIGN_EXCLAMATION,
@@ -1605,27 +1702,27 @@ void InitElementProperties()
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
     EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL1,
-    EL_EMC_STEELWALL2,
-    EL_EMC_STEELWALL3,
-    EL_EMC_STEELWALL4,
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
     EL_CRYSTAL,
-    EL_GATE1,
-    EL_GATE2,
-    EL_GATE3,
-    EL_GATE4,
-    EL_GATE1_GRAY,
-    EL_GATE2_GRAY,
-    EL_GATE3_GRAY,
-    EL_GATE4_GRAY,
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
@@ -1634,7 +1731,7 @@ void InitElementProperties()
     EL_TIMEGATE_OPENING,
     EL_TIMEGATE_CLOSED,
     EL_TIMEGATE_CLOSING,
-    EL_TUBE_ALL,
+    EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
     EL_TUBE_VERTICAL_LEFT,
@@ -1652,36 +1749,36 @@ void InitElementProperties()
   {
     EL_STEELWALL,
     EL_ACID,
-    EL_ACIDPOOL_TOPLEFT,
-    EL_ACIDPOOL_TOPRIGHT,
-    EL_ACIDPOOL_BOTTOMLEFT,
-    EL_ACIDPOOL_BOTTOM,
-    EL_ACIDPOOL_BOTTOMRIGHT,
-    EL_SP_HARD_GRAY,
-    EL_SP_HARD_GREEN,
-    EL_SP_HARD_BLUE,
-    EL_SP_HARD_RED,
-    EL_SP_HARD_YELLOW,
-    EL_SP_HARD_BASE1,
-    EL_SP_HARD_BASE2,
-    EL_SP_HARD_BASE3,
-    EL_SP_HARD_BASE4,
-    EL_SP_HARD_BASE5,
-    EL_SP_HARD_BASE6,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_ACID_POOL_BOTTOMLEFT,
+    EL_ACID_POOL_BOTTOM,
+    EL_ACID_POOL_BOTTOMRIGHT,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_STEELWALL_ACTIVE,
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT1_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT1_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT2_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT3_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT4_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
     EL_LIGHT_SWITCH,
     EL_LIGHT_SWITCH_ACTIVE,
     EL_SIGN_EXCLAMATION,
@@ -1697,27 +1794,27 @@ void InitElementProperties()
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
     EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL1,
-    EL_EMC_STEELWALL2,
-    EL_EMC_STEELWALL3,
-    EL_EMC_STEELWALL4,
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
     EL_CRYSTAL,
-    EL_GATE1,
-    EL_GATE2,
-    EL_GATE3,
-    EL_GATE4,
-    EL_GATE1_GRAY,
-    EL_GATE2_GRAY,
-    EL_GATE3_GRAY,
-    EL_GATE4_GRAY,
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
@@ -1726,7 +1823,7 @@ void InitElementProperties()
     EL_TIMEGATE_OPENING,
     EL_TIMEGATE_CLOSED,
     EL_TIMEGATE_CLOSING,
-    EL_TUBE_ALL,
+    EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
     EL_TUBE_VERTICAL_LEFT,
@@ -1760,16 +1857,16 @@ void InitElementProperties()
     EL_TIME_ORB_EMPTY,
     EL_LAMP_ACTIVE,
     EL_LAMP,
-    EL_ACIDPOOL_TOPLEFT,
-    EL_ACIDPOOL_TOPRIGHT,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
     EL_SATELLITE,
     EL_SP_ZONK,
     EL_SP_INFOTRON,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
     EL_SPEED_PILL,
     EL_STEELWALL_SLANTED,
     EL_PEARL,
@@ -1795,49 +1892,49 @@ void InitElementProperties()
   static int ep_mauer[] =
   {
     EL_STEELWALL,
-    EL_GATE1,
-    EL_GATE2,
-    EL_GATE3,
-    EL_GATE4,
-    EL_GATE1_GRAY,
-    EL_GATE2_GRAY,
-    EL_GATE3_GRAY,
-    EL_GATE4_GRAY,
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_EXIT_CLOSED,
     EL_EXIT_OPENING,
     EL_EXIT_OPEN,
     EL_WALL,
     EL_WALL_CRUMBLED,
-    EL_WALL_GROWING,
-    EL_WALL_GROWING_X,
-    EL_WALL_GROWING_Y,
-    EL_WALL_GROWING_XY,
-    EL_WALL_GROWING_ACTIVE,
+    EL_EXPANDABLE_WALL,
+    EL_EXPANDABLE_WALL_HORIZONTAL,
+    EL_EXPANDABLE_WALL_VERTICAL,
+    EL_EXPANDABLE_WALL_ANY,
+    EL_EXPANDABLE_WALL_GROWING,
     EL_BD_WALL,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER,
-    EL_SP_HARD_GRAY,
-    EL_SP_HARD_GREEN,
-    EL_SP_HARD_BLUE,
-    EL_SP_HARD_RED,
-    EL_SP_HARD_YELLOW,
-    EL_SP_HARD_BASE1,
-    EL_SP_HARD_BASE2,
-    EL_SP_HARD_BASE3,
-    EL_SP_HARD_BASE4,
-    EL_SP_HARD_BASE5,
-    EL_SP_HARD_BASE6,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
     EL_SP_TERMINAL,
     EL_SP_TERMINAL_ACTIVE,
     EL_SP_EXIT_CLOSED,
@@ -1847,18 +1944,18 @@ void InitElementProperties()
     EL_INVISIBLE_WALL,
     EL_INVISIBLE_WALL_ACTIVE,
     EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL1,
-    EL_EMC_STEELWALL2,
-    EL_EMC_STEELWALL3,
-    EL_EMC_STEELWALL4,
-    EL_EMC_WALL_PILLAR_UPPER,
-    EL_EMC_WALL_PILLAR_MIDDLE,
-    EL_EMC_WALL_PILLAR_LOWER,
-    EL_EMC_WALL4,
-    EL_EMC_WALL5,
-    EL_EMC_WALL6,
-    EL_EMC_WALL7,
-    EL_EMC_WALL8
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8
   };
   static int ep_mauer_num = SIZEOF_ARRAY_INT(ep_mauer);
 
@@ -2044,7 +2141,7 @@ void InitElementProperties()
     EL_EXIT_CLOSED,
     EL_EXIT_OPEN,
     EL_STEELWALL,
-    EL_PLAYER1,
+    EL_PLAYER_1,
     EL_BD_FIREFLY,
     EL_BD_FIREFLY_1,
     EL_BD_FIREFLY_2,
@@ -2067,7 +2164,7 @@ void InitElementProperties()
     EL_SOKOBAN_OBJECT,
     EL_SOKOBAN_FIELD_EMPTY,
     EL_SOKOBAN_FIELD_FULL,
-    EL_PLAYER1,
+    EL_PLAYER_1,
     EL_INVISIBLE_STEELWALL
   };
   static int ep_sb_element_num = SIZEOF_ARRAY_INT(ep_sb_element);
@@ -2095,30 +2192,30 @@ void InitElementProperties()
     EL_QUICKSAND_EMPTY,
     EL_STONEBLOCK,
     EL_ROBOT_WHEEL,
-    EL_KEY1,
-    EL_KEY2,
-    EL_KEY3,
-    EL_KEY4,
-    EL_EM_KEY1,
-    EL_EM_KEY2,
-    EL_EM_KEY3,
-    EL_EM_KEY4,
-    EL_GATE1,
-    EL_GATE2,
-    EL_GATE3,
-    EL_GATE4,
-    EL_GATE1_GRAY,
-    EL_GATE2_GRAY,
-    EL_GATE3_GRAY,
-    EL_GATE4_GRAY,
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
+    EL_KEY_1,
+    EL_KEY_2,
+    EL_KEY_3,
+    EL_KEY_4,
+    EL_EM_KEY_1,
+    EL_EM_KEY_2,
+    EL_EM_KEY_3,
+    EL_EM_KEY_4,
+    EL_GATE_1,
+    EL_GATE_2,
+    EL_GATE_3,
+    EL_GATE_4,
+    EL_GATE_1_GRAY,
+    EL_GATE_2_GRAY,
+    EL_GATE_3_GRAY,
+    EL_GATE_4_GRAY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
     EL_DYNAMITE,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_WALL,
@@ -2129,19 +2226,19 @@ void InitElementProperties()
     EL_WALL_DIAMOND,
     EL_WALL_BD_DIAMOND,
     EL_WALL_EMERALD_YELLOW,
-    EL_DYNABOMB_NR,
-    EL_DYNABOMB_SZ,
-    EL_DYNABOMB_XL,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
     EL_SOKOBAN_OBJECT,
     EL_SOKOBAN_FIELD_EMPTY,
     EL_SOKOBAN_FIELD_FULL,
     EL_WALL_EMERALD_RED,
     EL_WALL_EMERALD_PURPLE,
-    EL_ACIDPOOL_TOPLEFT,
-    EL_ACIDPOOL_TOPRIGHT,
-    EL_ACIDPOOL_BOTTOMLEFT,
-    EL_ACIDPOOL_BOTTOM,
-    EL_ACIDPOOL_BOTTOMRIGHT,
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_ACID_POOL_BOTTOMLEFT,
+    EL_ACID_POOL_BOTTOM,
+    EL_ACID_POOL_BOTTOMRIGHT,
     EL_MAGIC_WALL,
     EL_MAGIC_WALL_DEAD,
     EL_BD_MAGIC_WALL,
@@ -2150,47 +2247,47 @@ void InitElementProperties()
     EL_BLOCKED,
     EL_SP_EMPTY,
     EL_SP_BASE,
-    EL_SP_PORT1_RIGHT,
-    EL_SP_PORT1_DOWN,
-    EL_SP_PORT1_LEFT,
-    EL_SP_PORT1_UP,
-    EL_SP_PORT2_RIGHT,
-    EL_SP_PORT2_DOWN,
-    EL_SP_PORT2_LEFT,
-    EL_SP_PORT2_UP,
-    EL_SP_PORT_X,
-    EL_SP_PORT_Y,
-    EL_SP_PORT_XY,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_UP,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
     EL_SP_DISK_RED,
     EL_SP_DISK_YELLOW,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
-    EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER,
-    EL_SP_HARD_GRAY,
-    EL_SP_HARD_GREEN,
-    EL_SP_HARD_BLUE,
-    EL_SP_HARD_RED,
-    EL_SP_HARD_YELLOW,
-    EL_SP_HARD_BASE1,
-    EL_SP_HARD_BASE2,
-    EL_SP_HARD_BASE3,
-    EL_SP_HARD_BASE4,
-    EL_SP_HARD_BASE5,
-    EL_SP_HARD_BASE6,
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT1_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT1_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT2_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT3_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT4_SWITCH_RIGHT,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
+    EL_SP_HARDWARE_GRAY,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
     EL_SIGN_EXCLAMATION,
     EL_SIGN_RADIOACTIVITY,
     EL_SIGN_STOP,
@@ -2204,18 +2301,18 @@ void InitElementProperties()
     EL_SIGN_YINYANG,
     EL_SIGN_OTHER,
     EL_STEELWALL_SLANTED,
-    EL_EMC_STEELWALL1,
-    EL_EMC_STEELWALL2,
-    EL_EMC_STEELWALL3,
-    EL_EMC_STEELWALL4,
-    EL_EMC_WALL_PILLAR_UPPER,
-    EL_EMC_WALL_PILLAR_MIDDLE,
-    EL_EMC_WALL_PILLAR_LOWER,
-    EL_EMC_WALL4,
-    EL_EMC_WALL5,
-    EL_EMC_WALL6,
-    EL_EMC_WALL7,
-    EL_EMC_WALL8
+    EL_EMC_STEELWALL_1,
+    EL_EMC_STEELWALL_2,
+    EL_EMC_STEELWALL_3,
+    EL_EMC_STEELWALL_4,
+    EL_EMC_WALL_1,
+    EL_EMC_WALL_2,
+    EL_EMC_WALL_3,
+    EL_EMC_WALL_4,
+    EL_EMC_WALL_5,
+    EL_EMC_WALL_6,
+    EL_EMC_WALL_7,
+    EL_EMC_WALL_8
   };
   static int ep_inactive_num = SIZEOF_ARRAY_INT(ep_inactive);
 
@@ -2224,13 +2321,13 @@ void InitElementProperties()
     EL_BOMB,
     EL_DYNAMITE_ACTIVE,
     EL_DYNAMITE,
-    EL_DYNABOMB_PLAYER1_ACTIVE,
-    EL_DYNABOMB_PLAYER2_ACTIVE,
-    EL_DYNABOMB_PLAYER3_ACTIVE,
-    EL_DYNABOMB_PLAYER4_ACTIVE,
-    EL_DYNABOMB_NR,
-    EL_DYNABOMB_SZ,
-    EL_DYNABOMB_XL,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
+    EL_DYNABOMB_INCREASE_NUMBER,
+    EL_DYNABOMB_INCREASE_SIZE,
+    EL_DYNABOMB_INCREASE_POWER,
     EL_SP_DISK_RED_ACTIVE,
     EL_BUG,
     EL_MOLE,
@@ -2281,10 +2378,10 @@ void InitElementProperties()
 
   static int ep_player[] =
   {
-    EL_PLAYER1,
-    EL_PLAYER2,
-    EL_PLAYER3,
-    EL_PLAYER4
+    EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4
   };
   static int ep_player_num = SIZEOF_ARRAY_INT(ep_player);
 
@@ -2318,41 +2415,41 @@ void InitElementProperties()
     EL_SP_MURPHY,
     EL_SP_INFOTRON,
     EL_SP_CHIP_SINGLE,
-    EL_SP_HARD_GRAY,
+    EL_SP_HARDWARE_GRAY,
     EL_SP_EXIT_CLOSED,
     EL_SP_EXIT_OPEN,
     EL_SP_DISK_ORANGE,
-    EL_SP_PORT1_RIGHT,
-    EL_SP_PORT1_DOWN,
-    EL_SP_PORT1_LEFT,
-    EL_SP_PORT1_UP,
-    EL_SP_PORT2_RIGHT,
-    EL_SP_PORT2_DOWN,
-    EL_SP_PORT2_LEFT,
-    EL_SP_PORT2_UP,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_DOWN,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_UP,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_UP,
     EL_SP_SNIKSNAK,
     EL_SP_DISK_YELLOW,
     EL_SP_TERMINAL,
     EL_SP_DISK_RED,
-    EL_SP_PORT_Y,
-    EL_SP_PORT_X,
-    EL_SP_PORT_XY,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_ANY,
     EL_SP_ELECTRON,
     EL_SP_BUGGY_BASE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
-    EL_SP_HARD_BASE1,
-    EL_SP_HARD_GREEN,
-    EL_SP_HARD_BLUE,
-    EL_SP_HARD_RED,
-    EL_SP_HARD_YELLOW,
-    EL_SP_HARD_BASE2,
-    EL_SP_HARD_BASE3,
-    EL_SP_HARD_BASE4,
-    EL_SP_HARD_BASE5,
-    EL_SP_HARD_BASE6,
-    EL_SP_CHIP_UPPER,
-    EL_SP_CHIP_LOWER,
+    EL_SP_HARDWARE_BASE_1,
+    EL_SP_HARDWARE_GREEN,
+    EL_SP_HARDWARE_BLUE,
+    EL_SP_HARDWARE_RED,
+    EL_SP_HARDWARE_YELLOW,
+    EL_SP_HARDWARE_BASE_2,
+    EL_SP_HARDWARE_BASE_3,
+    EL_SP_HARDWARE_BASE_4,
+    EL_SP_HARDWARE_BASE_5,
+    EL_SP_HARDWARE_BASE_6,
+    EL_SP_CHIP_TOP,
+    EL_SP_CHIP_BOTTOM,
     /* additional elements that appeared in newer Supaplex levels */
     EL_INVISIBLE_WALL,
     /* more than one murphy in a level results in an inactive clone */
@@ -2362,25 +2459,25 @@ void InitElementProperties()
 
   static int ep_quick_gate[] =
   {
-    EL_EM_GATE1,
-    EL_EM_GATE2,
-    EL_EM_GATE3,
-    EL_EM_GATE4,
-    EL_EM_GATE1_GRAY,
-    EL_EM_GATE2_GRAY,
-    EL_EM_GATE3_GRAY,
-    EL_EM_GATE4_GRAY,
-    EL_SP_PORT1_LEFT,
-    EL_SP_PORT2_LEFT,
-    EL_SP_PORT1_RIGHT,
-    EL_SP_PORT2_RIGHT,
-    EL_SP_PORT1_UP,
-    EL_SP_PORT2_UP,
-    EL_SP_PORT1_DOWN,
-    EL_SP_PORT2_DOWN,
-    EL_SP_PORT_X,
-    EL_SP_PORT_Y,
-    EL_SP_PORT_XY,
+    EL_EM_GATE_1,
+    EL_EM_GATE_2,
+    EL_EM_GATE_3,
+    EL_EM_GATE_4,
+    EL_EM_GATE_1_GRAY,
+    EL_EM_GATE_2_GRAY,
+    EL_EM_GATE_3_GRAY,
+    EL_EM_GATE_4_GRAY,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_UP,
+    EL_SP_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN
   };
@@ -2388,18 +2485,18 @@ void InitElementProperties()
 
   static int ep_over_player[] =
   {
-    EL_SP_PORT1_LEFT,
-    EL_SP_PORT2_LEFT,
-    EL_SP_PORT1_RIGHT,
-    EL_SP_PORT2_RIGHT,
-    EL_SP_PORT1_UP,
-    EL_SP_PORT2_UP,
-    EL_SP_PORT1_DOWN,
-    EL_SP_PORT2_DOWN,
-    EL_SP_PORT_X,
-    EL_SP_PORT_Y,
-    EL_SP_PORT_XY,
-    EL_TUBE_ALL,
+    EL_SP_PORT_LEFT,
+    EL_SP_PORT_RIGHT,
+    EL_SP_PORT_UP,
+    EL_SP_PORT_DOWN,
+    EL_SP_GRAVITY_PORT_LEFT,
+    EL_SP_GRAVITY_PORT_RIGHT,
+    EL_SP_GRAVITY_PORT_UP,
+    EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
+    EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
     EL_TUBE_VERTICAL_LEFT,
@@ -2416,68 +2513,68 @@ void InitElementProperties()
   static int ep_active_bomb[] =
   {
     EL_DYNAMITE_ACTIVE,
-    EL_DYNABOMB_PLAYER1_ACTIVE,
-    EL_DYNABOMB_PLAYER2_ACTIVE,
-    EL_DYNABOMB_PLAYER3_ACTIVE,
-    EL_DYNABOMB_PLAYER4_ACTIVE,
+    EL_DYNABOMB_PLAYER_1_ACTIVE,
+    EL_DYNABOMB_PLAYER_2_ACTIVE,
+    EL_DYNABOMB_PLAYER_3_ACTIVE,
+    EL_DYNABOMB_PLAYER_4_ACTIVE,
     EL_SP_DISK_RED_ACTIVE
   };
   static int ep_active_bomb_num = SIZEOF_ARRAY_INT(ep_active_bomb);
 
   static int ep_belt[] =
   {
-    EL_CONVEYOR_BELT1_LEFT,
-    EL_CONVEYOR_BELT1_MIDDLE,
-    EL_CONVEYOR_BELT1_RIGHT,
-    EL_CONVEYOR_BELT2_LEFT,
-    EL_CONVEYOR_BELT2_MIDDLE,
-    EL_CONVEYOR_BELT2_RIGHT,
-    EL_CONVEYOR_BELT3_LEFT,
-    EL_CONVEYOR_BELT3_MIDDLE,
-    EL_CONVEYOR_BELT3_RIGHT,
-    EL_CONVEYOR_BELT4_LEFT,
-    EL_CONVEYOR_BELT4_MIDDLE,
-    EL_CONVEYOR_BELT4_RIGHT,
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_1_MIDDLE,
+    EL_CONVEYOR_BELT_1_RIGHT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_2_MIDDLE,
+    EL_CONVEYOR_BELT_2_RIGHT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_3_MIDDLE,
+    EL_CONVEYOR_BELT_3_RIGHT,
+    EL_CONVEYOR_BELT_4_LEFT,
+    EL_CONVEYOR_BELT_4_MIDDLE,
+    EL_CONVEYOR_BELT_4_RIGHT,
   };
   static int ep_belt_num = SIZEOF_ARRAY_INT(ep_belt);
 
   static int ep_belt_active[] =
   {
-    EL_CONVEYOR_BELT1_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT1_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT1_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT2_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT2_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT2_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT3_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT3_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT3_RIGHT_ACTIVE,
-    EL_CONVEYOR_BELT4_LEFT_ACTIVE,
-    EL_CONVEYOR_BELT4_MIDDLE_ACTIVE,
-    EL_CONVEYOR_BELT4_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_1_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_1_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_2_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_2_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_3_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_3_RIGHT_ACTIVE,
+    EL_CONVEYOR_BELT_4_LEFT_ACTIVE,
+    EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE,
+    EL_CONVEYOR_BELT_4_RIGHT_ACTIVE,
   };
   static int ep_belt_active_num = SIZEOF_ARRAY_INT(ep_belt_active);
 
   static int ep_belt_switch[] =
   {
-    EL_CONVEYOR_BELT1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT1_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT1_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT2_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT2_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT3_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT3_SWITCH_RIGHT,
-    EL_CONVEYOR_BELT4_SWITCH_LEFT,
-    EL_CONVEYOR_BELT4_SWITCH_MIDDLE,
-    EL_CONVEYOR_BELT4_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+    EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
   };
   static int ep_belt_switch_num = SIZEOF_ARRAY_INT(ep_belt_switch);
 
   static int ep_tube[] =
   {
-    EL_TUBE_ALL,
+    EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
     EL_TUBE_VERTICAL_LEFT,
