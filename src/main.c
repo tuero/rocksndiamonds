@@ -151,13 +151,17 @@ int graphics_action_mapping[] =
   6,		/* GFX_ACTION_PUSHING		(7)  */
 
   7,		/* GFX_ACTION_PASSING		(8)  */
-  7,		/* GFX_ACTION_IMPACT		(9) */
+  7,		/* GFX_ACTION_IMPACT		(9)  */
   7,		/* GFX_ACTION_CRACKING		(10) */
-  7,		/* GFX_ACTION_ACTIVATING	(11) */
-  7,		/* GFX_ACTION_EATING		(12) */
-  7,		/* GFX_ACTION_ATTACKING		(13) */
-  7,		/* GFX_ACTION_GROWING		(14) */
-  7		/* GFX_ACTION_OTHER		(15) */
+  7,		/* GFX_ACTION_BREAKING		(11) */
+  7,		/* GFX_ACTION_ACTIVATING	(12) */
+  7,		/* GFX_ACTION_OPENING		(13) */
+  7,		/* GFX_ACTION_CLOSING		(14) */
+  7,		/* GFX_ACTION_EATING		(15) */
+  7,		/* GFX_ACTION_ATTACKING		(16) */
+  7,		/* GFX_ACTION_GROWING		(17) */
+  7,		/* GFX_ACTION_SHRINKING		(18) */
+  7		/* GFX_ACTION_OTHER		(19) */
 };
 
 struct ConfigInfo image_config_suffix[] =
@@ -174,7 +178,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".mode_pingpong",			"0"			},
   { ".mode_pingpong2",			"0"			},
   { ".mode_reverse",			"0"			},
-  { ".global_sync",			"0"			},
+  { ".global_sync",			"-1"			},
 
   { NULL,				NULL			}
 };
@@ -220,10 +224,16 @@ struct ConfigInfo image_config[] =
   { "bd_diamond.frames",			"4"			},
   { "bd_diamond.delay",				"4"			},
   { "bd_diamond.mode_reverse",			"1"			},
+  { "bd_diamond.moving",			"RocksElements.pcx"	},
+  { "bd_diamond.moving.xpos",			"3"			},
+  { "bd_diamond.moving.ypos",			"10"			},
+  { "bd_diamond.moving.frames",			"2"			},
+  { "bd_diamond.moving.delay",			"4"			},
   { "bd_diamond.falling",			"RocksElements.pcx"	},
   { "bd_diamond.falling.xpos",			"3"			},
   { "bd_diamond.falling.ypos",			"10"			},
   { "bd_diamond.falling.frames",		"2"			},
+  { "bd_diamond.falling.delay",			"4"			},
 
   { "bd_magic_wall",				"RocksElements.pcx"	},
   { "bd_magic_wall.xpos",			"12"			},
@@ -613,7 +623,6 @@ struct ConfigInfo image_config[] =
   { "sp_electron.ypos",				"10"			},
   { "sp_electron.frames",			"8"			},
   { "sp_electron.delay",			"2"			},
-  { "sp_electron.global_sync",			"1"			},
 
   { "sp_terminal",				"RocksSP.pcx"		},
   { "sp_terminal.xpos",				"8"			},
@@ -741,19 +750,31 @@ struct ConfigInfo image_config[] =
   { "emerald.xpos",				"8"			},
   { "emerald.ypos",				"0"			},
   { "emerald.frames",				"1"			},
+  { "emerald.moving",				"RocksElements.pcx"	},
+  { "emerald.moving.xpos",			"8"			},
+  { "emerald.moving.ypos",			"0"			},
+  { "emerald.moving.frames",			"2"			},
+  { "emerald.moving.delay",			"4"			},
   { "emerald.falling",				"RocksElements.pcx"	},
   { "emerald.falling.xpos",			"8"			},
   { "emerald.falling.ypos",			"0"			},
   { "emerald.falling.frames",			"2"			},
+  { "emerald.falling.delay",			"4"			},
 
   { "diamond",					"RocksElements.pcx"	},
   { "diamond.xpos",				"10"			},
   { "diamond.ypos",				"0"			},
   { "diamond.frames",				"1"			},
+  { "diamond.moving",				"RocksElements.pcx"	},
+  { "diamond.moving.xpos",			"10"			},
+  { "diamond.moving.ypos",			"0"			},
+  { "diamond.moving.frames",			"2"			},
+  { "diamond.moving.delay",			"4"			},
   { "diamond.falling",				"RocksElements.pcx"	},
   { "diamond.falling.xpos",			"10"			},
   { "diamond.falling.ypos",			"0"			},
   { "diamond.falling.frames",			"2"			},
+  { "diamond.falling.delay",			"4"			},
 
   { "bomb",					"RocksElements.pcx"	},
   { "bomb.xpos",				"11"			},
@@ -941,11 +962,13 @@ struct ConfigInfo image_config[] =
   { "acid_splash_left.ypos",			"10"			},
   { "acid_splash_left.frames",			"4"			},
   { "acid_splash_left.delay",			"2"			},
+  { "acid_splash_left.global_sync",		"0"			},
   { "acid_splash_right",			"RocksHeroes.pcx"	},
   { "acid_splash_right.xpos",			"12"			},
   { "acid_splash_right.ypos",			"10"			},
   { "acid_splash_right.frames",			"4"			},
   { "acid_splash_right.delay",			"2"			},
+  { "acid_splash_right.global_sync",		"0"			},
 
   { "amoeba_drop",				"RocksElements.pcx"	},
   { "amoeba_drop.xpos",				"5"			},

@@ -1325,6 +1325,7 @@ int NewHiScore()
 
 void InitMovingField(int x, int y, int direction)
 {
+  int element = Feld[x][y];
   int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
 
@@ -1334,7 +1335,10 @@ void InitMovingField(int x, int y, int direction)
   if (Feld[newx][newy] == EL_EMPTY)
     Feld[newx][newy] = EL_BLOCKED;
 
-  GfxAction[x][y] = GFX_ACTION_MOVING;
+  if (direction == MV_DOWN && CAN_FALL(element))
+    GfxAction[x][y] = GFX_ACTION_FALLING;
+  else
+    GfxAction[x][y] = GFX_ACTION_MOVING;
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -2908,7 +2912,10 @@ void StartMoving(int x, int y)
 
       if ((belt_dir == MV_LEFT  && left_is_free) ||
 	  (belt_dir == MV_RIGHT && right_is_free))
+      {
 	InitMovingField(x, y, belt_dir);
+	GfxAction[x][y] = GFX_ACTION_DEFAULT;
+      }
     }
   }
   else if (CAN_MOVE(element))
@@ -3386,8 +3393,14 @@ void ContinueMoving(int x, int y)
   }
   else				/* still moving on */
   {
+#if 0
     if (GfxAction[x][y] == GFX_ACTION_DEFAULT)
+    {
+      printf("reset GfxAction...\n");
+
       GfxAction[x][y] = GFX_ACTION_MOVING;
+    }
+#endif
 
     DrawLevelField(x, y);
   }

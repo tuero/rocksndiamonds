@@ -53,6 +53,10 @@ element_to_graphic[] =
     IMG_BD_DIAMOND
   },
   {
+    EL_BD_DIAMOND,				-1, GFX_ACTION_MOVING,
+    IMG_BD_DIAMOND_MOVING
+  },
+  {
     EL_BD_DIAMOND,				-1, GFX_ACTION_FALLING,
     IMG_BD_DIAMOND_FALLING
   },
@@ -517,12 +521,20 @@ element_to_graphic[] =
     IMG_EMERALD
   },
   {
+    EL_EMERALD,					-1, GFX_ACTION_MOVING,
+    IMG_EMERALD_MOVING
+  },
+  {
     EL_EMERALD,					-1, GFX_ACTION_FALLING,
     IMG_EMERALD_FALLING
   },
   {
     EL_DIAMOND,					-1, -1,
     IMG_DIAMOND
+  },
+  {
+    EL_DIAMOND,					-1, GFX_ACTION_MOVING,
+    IMG_DIAMOND_MOVING
   },
   {
     EL_DIAMOND,					-1, GFX_ACTION_FALLING,
@@ -537,7 +549,7 @@ element_to_graphic[] =
     IMG_NUT
   },
   {
-    EL_NUT_CRACKING,				-1, -1,
+    EL_NUT_CRACKING,				-1, GFX_ACTION_CRACKING,
     IMG_NUT_CRACKING
   },
   {
@@ -721,7 +733,7 @@ element_to_graphic[] =
     IMG_AMOEBA_CREATING
   },
   {
-    EL_AMOEBA_SHRINKING,			-1, -1,
+    EL_AMOEBA_SHRINKING,			-1, GFX_ACTION_SHRINKING,
     IMG_AMOEBA_SHRINKING
   },
   {
@@ -857,7 +869,7 @@ element_to_graphic[] =
     IMG_EXIT_CLOSED
   },
   {
-    EL_EXIT_OPENING,				-1, -1,
+    EL_EXIT_OPENING,				-1, GFX_ACTION_OPENING,
     IMG_EXIT_OPENING
   },
   {
@@ -897,7 +909,7 @@ element_to_graphic[] =
     IMG_SPRING
   },
   {
-    EL_SPRING_MOVING,				-1, -1,
+    EL_SPRING_MOVING,				-1, GFX_ACTION_MOVING,
     IMG_SPRING_MOVING
   },
   {
@@ -1185,7 +1197,7 @@ element_to_graphic[] =
     IMG_SWITCHGATE_CLOSED
   },
   {
-    EL_SWITCHGATE_OPENING,			-1, -1,
+    EL_SWITCHGATE_OPENING,			-1, GFX_ACTION_OPENING,
     IMG_SWITCHGATE_OPENING
   },
   {
@@ -1193,7 +1205,7 @@ element_to_graphic[] =
     IMG_SWITCHGATE_OPEN
   },
   {
-    EL_SWITCHGATE_CLOSING,			-1, -1,
+    EL_SWITCHGATE_CLOSING,			-1, GFX_ACTION_CLOSING,
     IMG_SWITCHGATE_CLOSING
   },
   {
@@ -1201,7 +1213,7 @@ element_to_graphic[] =
     IMG_TIMEGATE_CLOSED
   },
   {
-    EL_TIMEGATE_OPENING,			-1, -1,
+    EL_TIMEGATE_OPENING,			-1, GFX_ACTION_OPENING,
     IMG_TIMEGATE_OPENING
   },
   {
@@ -1209,7 +1221,7 @@ element_to_graphic[] =
     IMG_TIMEGATE_OPEN
   },
   {
-    EL_TIMEGATE_CLOSING,			-1, -1,
+    EL_TIMEGATE_CLOSING,			-1, GFX_ACTION_CLOSING,
     IMG_TIMEGATE_CLOSING
   },
   {
@@ -1217,7 +1229,7 @@ element_to_graphic[] =
     IMG_PEARL
   },
   {
-    EL_PEARL_BREAKING,				-1, -1,
+    EL_PEARL_BREAKING,				-1, GFX_ACTION_BREAKING,
     IMG_PEARL_BREAKING
   },
   {

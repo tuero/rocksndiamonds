@@ -287,7 +287,7 @@ static void InitTileClipmasks()
   int i;
 
   /* initialize pixmap array for special X11 tile clipping to Pixmap 'None' */
-  for(i=0; i<NUM_TILES; i++)
+  for (i=0; i<NUM_TILES; i++)
     tile_clipmask[i] = None;
 
 #if defined(TARGET_X11)
@@ -301,7 +301,7 @@ static void InitTileClipmasks()
   tile_clip_gc = XCreateGC(display, window->drawable,
 			   clip_gc_valuemask, &clip_gc_values);
 
-  for(i=0; i<NUM_BITMAPS; i++)
+  for (i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i]->clip_mask)
     {
@@ -323,11 +323,11 @@ static void InitTileClipmasks()
 			       clip_gc_valuemask, &clip_gc_values);
 
   /* create only those clipping Pixmaps we really need */
-  for(i=0; tile_needs_clipping[i].start>=0; i++)
+  for (i=0; tile_needs_clipping[i].start>=0; i++)
   {
     int j;
 
-    for(j=0; j<tile_needs_clipping[i].count; j++)
+    for (j=0; j<tile_needs_clipping[i].count; j++)
     {
       int tile = tile_needs_clipping[i].start + j;
       int graphic = tile;
@@ -358,7 +358,7 @@ void FreeTileClipmasks()
 #if defined(TARGET_X11)
   int i;
 
-  for(i=0; i<NUM_TILES; i++)
+  for (i=0; i<NUM_TILES; i++)
   {
     if (tile_clipmask[i] != None)
     {
@@ -371,7 +371,7 @@ void FreeTileClipmasks()
     XFreeGC(display, tile_clip_gc);
   tile_clip_gc = None;
 
-  for(i=0; i<NUM_BITMAPS; i++)
+  for (i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i] != NULL && pix[i]->stored_clip_gc)
     {
@@ -411,7 +411,7 @@ void InitGfx()
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 
-  for(i=0; i<NUM_PICTURES; i++)
+  for (i=0; i<NUM_PICTURES; i++)
   {
     if (i != PIX_FONT_SMALL)
     {
@@ -439,8 +439,8 @@ void InitGfxBackground()
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(pix[PIX_DB_DOOR], 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
-  for(x=0; x<MAX_BUF_XSIZE; x++)
-    for(y=0; y<MAX_BUF_YSIZE; y++)
+  for (x=0; x<MAX_BUF_XSIZE; x++)
+    for (y=0; y<MAX_BUF_YSIZE; y++)
       redraw[x][y] = 0;
   redraw_tiles = 0;
   redraw_mask = REDRAW_ALL;
@@ -514,7 +514,7 @@ void ReloadCustomArtwork()
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-    for(i=0; i<NUM_PICTURES; i++)
+    for (i=0; i<NUM_PICTURES; i++)
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
       ReloadCustomImage(pix[i], image_filename[i]);
@@ -942,13 +942,13 @@ void InitElementInfo()
   int i, act, dir;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for(i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_ELEMENTS; i++)
   {
-    for(act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
+    for (act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
     {
       element_info[i].graphic[act] = -1;
 
-      for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+      for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
 	element_info[i].direction_graphic[act][dir] = -1;
     }
   }
@@ -1035,7 +1035,7 @@ void InitElementInfo()
   }
 
   /* now set all '-1' values to element specific default values */
-  for(i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_ELEMENTS; i++)
   {
     int default_action_graphic = element_info[i].graphic[GFX_ACTION_DEFAULT];
     int default_action_direction_graphic[NUM_MV_DIRECTIONS];
@@ -1043,7 +1043,7 @@ void InitElementInfo()
     if (default_action_graphic == -1)
       default_action_graphic = IMG_CHAR_QUESTION;
 
-    for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+    for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
     {
       default_action_direction_graphic[dir] =
 	element_info[i].direction_graphic[GFX_ACTION_DEFAULT][dir];
@@ -1052,9 +1052,9 @@ void InitElementInfo()
 	default_action_direction_graphic[dir] = default_action_graphic;
     }
 
-    for(act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
+    for (act=0; act<NUM_GFX_ACTIONS_MAPPED; act++)
     {
-      for(dir=0; dir<NUM_MV_DIRECTIONS; dir++)
+      for (dir=0; dir<NUM_MV_DIRECTIONS; dir++)
       {
 	int default_direction_graphic = element_info[i].graphic[act];
 
@@ -1078,12 +1078,13 @@ void InitElementInfo()
 
 static void InitGraphicInfo()
 {
+  static int gfx_action[NUM_IMAGE_FILES];
   int i;
 
   image_files = getCurrentImageList();
 
 #if 0
-  for(i=0; i<MAX_GRAPHICS; i++)
+  for (i=0; i<MAX_GRAPHICS; i++)
   {
     /* always start with reliable default values */
     graphic_info[i].bitmap = NULL;
@@ -1095,7 +1096,26 @@ static void InitGraphicInfo()
   }
 #endif
 
-  for(i=0; i<NUM_IMAGE_FILES; i++)
+  /* set temporary graphics action field to default value */
+  for (i=0; i<NUM_IMAGE_FILES; i++)
+    gfx_action[i] = GFX_ACTION_DEFAULT;
+
+  /* set temporary graphics action field from element_to_graphic list */
+  i = 0;
+  while (element_to_graphic[i].element > -1)
+  {
+    int action    = element_to_graphic[i].action;
+    int graphic   = element_to_graphic[i].graphic;
+
+    if (action == -1)
+      action = GFX_ACTION_DEFAULT;
+
+    gfx_action[graphic] = action;
+
+    i++;
+  }
+
+  for (i=0; i<NUM_IMAGE_FILES; i++)
   {
     int *parameter = image_files[i].parameter;
 
@@ -1159,8 +1179,16 @@ static void InitGraphicInfo()
     }
 #endif
 
+#if 1
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+    if (parameter[GFX_ARG_GLOBAL_SYNC] == -1)
+      new_graphic_info[i].anim_global_sync =
+	(gfx_action[i] == GFX_ACTION_DEFAULT ? TRUE : FALSE);
+#else
+    /* animation synchronized with global frame counter, not move position */
+    new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+#endif
   }
 
 #if 0
@@ -2390,20 +2418,20 @@ void InitElementProperties()
   static int num_properties1 = SIZEOF_ARRAY(ep1_num, int *);
   static int num_properties2 = SIZEOF_ARRAY(ep2_num, int *);
 
-  for(i=0; i<MAX_ELEMENTS; i++)
+  for (i=0; i<MAX_ELEMENTS; i++)
   {
     Elementeigenschaften1[i] = 0;
     Elementeigenschaften2[i] = 0;
   }
 
-  for(i=0; i<num_properties1; i++)
-    for(j=0; j<*(ep1_num[i]); j++)
+  for (i=0; i<num_properties1; i++)
+    for (j=0; j<*(ep1_num[i]); j++)
       Elementeigenschaften1[(ep1_array[i])[j]] |= ep1_bit[i];
-  for(i=0; i<num_properties2; i++)
-    for(j=0; j<*(ep2_num[i]); j++)
+  for (i=0; i<num_properties2; i++)
+    for (j=0; j<*(ep2_num[i]); j++)
       Elementeigenschaften2[(ep2_array[i])[j]] |= ep2_bit[i];
 
-  for(i=EL_CHAR_START; i<=EL_CHAR_END; i++)
+  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
@@ -2472,7 +2500,7 @@ void CloseAllAndExit(int exit_value)
   FreeAllImages();
 
   FreeTileClipmasks();
-  for(i=0; i<NUM_BITMAPS; i++)
+  for (i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
 
   CloseVideoDisplay();

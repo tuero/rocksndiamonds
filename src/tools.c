@@ -1271,8 +1271,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 
 inline static int getFramePosition(int x, int y)
 {
+  int frame_pos = -1;		/* default: global synchronization */
+#if 0
   int element = Feld[x][y];
-  int frame_pos = -1;
 
   if (element == EL_QUICKSAND_FULL ||
       element == EL_MAGIC_WALL_FULL ||
@@ -1280,6 +1281,9 @@ inline static int getFramePosition(int x, int y)
     frame_pos = -1;
   else if (IS_MOVING(x, y) || CAN_MOVE(element) || CAN_FALL(element))
     frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
+#else
+  frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
+#endif
 
   return frame_pos;
 }
@@ -1288,10 +1292,14 @@ inline static int getGfxAction(int x, int y)
 {
   int gfx_action = GFX_ACTION_DEFAULT;
 
+#if 0
   if (GfxAction[x][y] != GFX_ACTION_DEFAULT)
     gfx_action = GfxAction[x][y];
   else if (IS_MOVING(x, y))
     gfx_action = GFX_ACTION_MOVING;
+#else
+  gfx_action = GfxAction[x][y];
+#endif
 
   return gfx_action;
 }
@@ -1328,32 +1336,6 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
       frame = new_graphic_info[graphic].anim_frames - 1;
     }
   }
-#if 0
-  else if ((element == EL_ROCK ||
-	    element == EL_SP_ZONK ||
-	    element == EL_BD_ROCK ||
-	    element == EL_SP_INFOTRON ||
-	    IS_GEM(element))
-	   && !cut_mode)
-  {
-    if (uy >= lev_fieldy-1 || !IS_BELT(Feld[ux][uy+1]))
-    {
-      if (element == EL_ROCK ||
-	  element == EL_SP_ZONK ||
-	  element == EL_BD_ROCK)
-      {
-	if (move_dir == MV_LEFT)
-	  graphic += (4 - phase4) % 4;
-	else if (move_dir == MV_RIGHT)
-	  graphic += phase4;
-	else
-	  graphic += phase2 * 2;
-      }
-      else if (element != EL_SP_INFOTRON)
-	graphic += phase2;
-    }
-  }
-#endif
   else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
   {
     graphic = (element == EL_BD_AMOEBA ? IMG_BD_AMOEBA_PART1 :
