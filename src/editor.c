@@ -1116,11 +1116,13 @@ static struct ValueTextInfo options_move_pattern[] =
 
 static struct ValueTextInfo options_move_direction[] =
 {
-  { MV_NO_MOVING,		"automatic"			},
+  { MV_AUTOMATIC,		"automatic"			},
   { MV_LEFT,			"left"				},
   { MV_RIGHT,			"right"				},
   { MV_UP,			"up"				},
   { MV_DOWN,			"down"				},
+  { MV_RANDOM,			"random"			},
+  { MV_PREVIOUS,		"previous"			},
   { -1,				NULL				}
 };
 

@@ -1723,23 +1723,36 @@ void InitMovDir(int x, int y)
     default:
       if (IS_CUSTOM_ELEMENT(element))
       {
-	if (element_info[element].move_direction_initial != MV_NO_MOVING)
-	  MovDir[x][y] = element_info[element].move_direction_initial;
-	else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS ||
-		 element_info[element].move_pattern == MV_TURNING_LEFT ||
-		 element_info[element].move_pattern == MV_TURNING_RIGHT ||
-		 element_info[element].move_pattern == MV_TURNING_LEFT_RIGHT ||
-		 element_info[element].move_pattern == MV_TURNING_RIGHT_LEFT ||
-		 element_info[element].move_pattern == MV_TURNING_RANDOM)
+	struct ElementInfo *ei = &element_info[element];
+	int move_direction_initial = ei->move_direction_initial;
+	int move_pattern = ei->move_pattern;
+
+	if (move_direction_initial == MV_PREVIOUS)
+	{
+	  if (MovDir[x][y] != MV_NO_MOVING)
+	    return;
+
+	  move_direction_initial = MV_AUTOMATIC;
+	}
+
+	if (move_direction_initial & MV_ANY_DIRECTION)
+	  MovDir[x][y] = move_direction_initial;
+	else if (move_direction_initial == MV_RANDOM ||
+		 move_pattern == MV_ALL_DIRECTIONS ||
+		 move_pattern == MV_TURNING_LEFT ||
+		 move_pattern == MV_TURNING_RIGHT ||
+		 move_pattern == MV_TURNING_LEFT_RIGHT ||
+		 move_pattern == MV_TURNING_RIGHT_LEFT ||
+		 move_pattern == MV_TURNING_RANDOM)
 	  MovDir[x][y] = 1 << RND(4);
-	else if (element_info[element].move_pattern == MV_HORIZONTAL)
+	else if (move_pattern == MV_HORIZONTAL)
 	  MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
-	else if (element_info[element].move_pattern == MV_VERTICAL)
+	else if (move_pattern == MV_VERTICAL)
 	  MovDir[x][y] = (RND(2) ? MV_UP : MV_DOWN);
-	else if (element_info[element].move_pattern & MV_ANY_DIRECTION)
+	else if (move_pattern & MV_ANY_DIRECTION)
 	  MovDir[x][y] = element_info[element].move_pattern;
-	else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE ||
-		 element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
+	else if (move_pattern == MV_ALONG_LEFT_SIDE ||
+		 move_pattern == MV_ALONG_RIGHT_SIDE)
 	{
 	  for (i = 0; i < 4; i++)
 	  {
@@ -1748,7 +1761,7 @@ void InitMovDir(int x, int y)
 
 	    if (!IN_LEV_FIELD(x1, y1) || !IS_FREE(x1, y1))
 	    {
-	      if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
+	      if (move_pattern == MV_ALONG_RIGHT_SIDE)
 		MovDir[x][y] = direction[0][i];
 	      else
 		MovDir[x][y] = direction[1][i];
@@ -6126,6 +6139,8 @@ static void ChangeActiveTrap(int x, int y)
 
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
+  int previous_move_direction = MovDir[x][y];
+
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
   if (IS_PLAYER(x, y) && !PLAYER_PROTECTED(x, y) &&
@@ -6142,6 +6157,9 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 
   ResetGfxAnimation(x, y);
   ResetRandomAnimationValue(x, y);
+
+  if (element_info[Feld[x][y]].move_direction_initial == MV_PREVIOUS)
+    MovDir[x][y] = previous_move_direction;
 
   InitField(x, y, FALSE);
   if (CAN_MOVE(Feld[x][y]))
@@ -9386,7 +9404,7 @@ boolean DropElement(struct PlayerInfo *player)
     int move_stepsize = element_info[new_element].move_stepsize;
     int direction, dx, dy, nextx, nexty;
 
-    if (element_info[new_element].move_direction_initial == MV_NO_MOVING)
+    if (element_info[new_element].move_direction_initial == MV_AUTOMATIC)
       MovDir[jx][jy] = player->MovDir;
 
     direction = MovDir[jx][jy];
