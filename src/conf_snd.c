@@ -16,7 +16,9 @@
 
 struct ConfigInfo sound_config_suffix[] =
 {
-  { NULL,				NULL			}
+  { ".mode_loop",			"0",			TYPE_BOOLEAN },
+
+  { NULL,				NULL,			0	     }
 };
 
 struct ConfigInfo sound_config[] =

@@ -479,6 +479,7 @@ struct ConfigInfo
 {
   char *token;
   char *value;
+  int type;
 };
 
 struct FileInfo

@@ -113,6 +113,9 @@ Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
 
+int get_integer_from_string(char *);
+boolean get_boolean_from_string(char *);
+
 
 ListNode *newListNode(void);
 void addNodeToList(ListNode **, char *, void *);

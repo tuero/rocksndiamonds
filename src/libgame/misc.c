@@ -1234,6 +1234,63 @@ char getCharFromKey(Key key)
 }
 
 
+/* ------------------------------------------------------------------------- */
+/* functions to translate string identifiers to integer or boolean value     */
+/* ------------------------------------------------------------------------- */
+
+int get_integer_from_string(char *s)
+{
+  static char *number_text[][3] =
+  {
+    { "0", "zero", "null", },
+    { "1", "one", "first" },
+    { "2", "two", "second" },
+    { "3", "three", "third" },
+    { "4", "four", "fourth" },
+    { "5", "five", "fifth" },
+    { "6", "six", "sixth" },
+    { "7", "seven", "seventh" },
+    { "8", "eight", "eighth" },
+    { "9", "nine", "ninth" },
+    { "10", "ten", "tenth" },
+    { "11", "eleven", "eleventh" },
+    { "12", "twelve", "twelfth" },
+  };
+
+  int i, j;
+  char *s_lower = getStringToLower(s);
+  int result = -1;
+
+  for (i=0; i<13; i++)
+    for (j=0; j<3; j++)
+      if (strcmp(s_lower, number_text[i][j]) == 0)
+	result = i;
+
+  if (result == -1)
+    result = atoi(s);
+
+  free(s_lower);
+
+  return result;
+}
+
+boolean get_boolean_from_string(char *s)
+{
+  char *s_lower = getStringToLower(s);
+  boolean result = FALSE;
+
+  if (strcmp(s_lower, "true") == 0 ||
+      strcmp(s_lower, "yes") == 0 ||
+      strcmp(s_lower, "on") == 0 ||
+      get_integer_from_string(s) == 1)
+    result = TRUE;
+
+  free(s_lower);
+
+  return result;
+}
+
+
 /* ========================================================================= */
 /* functions for generic lists                                               */
 /* ========================================================================= */
@@ -1369,6 +1426,13 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ========================================================================= */
 
+static int get_parameter_value(int type, char *value)
+{
+  return (type == TYPE_INTEGER ? get_integer_from_string(value) :
+	  type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
+	  -1);
+}
+
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   struct ConfigInfo *suffix_list,
 					   int num_file_list_entries)
@@ -1400,7 +1464,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
       for (j=0; j<num_suffix_list_entries; j++)
       {
-	int default_parameter = atoi(suffix_list[j].value);
+	int default_parameter =
+	  get_parameter_value(suffix_list[j].type, suffix_list[j].value);
 
 	file_list[i].default_parameter[j] = default_parameter;
 	file_list[i].parameter[j] = default_parameter;
@@ -1422,7 +1487,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  strcmp(&config_list[i].token[len_config_token - len_suffix],
 		 suffix_list[j].token) == 0)
       {
-	file_list[list_pos].default_parameter[j] = atoi(config_list[i].value);
+	file_list[list_pos].default_parameter[j] =
+	  get_parameter_value(suffix_list[j].type, config_list[i].value);
 
 	is_file_entry = FALSE;
 	break;
@@ -1510,7 +1576,8 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 	char *value = getTokenValue(setup_file_list, token);
 
 	if (value != NULL)
-	  file_list[i].parameter[j] = atoi(value);
+	  file_list[i].parameter[j] =
+	    get_parameter_value(suffix_list[j].type, value);
 
 	free(token);
       }

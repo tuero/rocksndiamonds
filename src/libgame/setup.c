@@ -1013,58 +1013,6 @@ boolean checkCookieString(const char *cookie, const char *template)
 /* setup file list handling functions                                        */
 /* ------------------------------------------------------------------------- */
 
-int get_string_integer_value(char *s)
-{
-  static char *number_text[][3] =
-  {
-    { "0", "zero", "null", },
-    { "1", "one", "first" },
-    { "2", "two", "second" },
-    { "3", "three", "third" },
-    { "4", "four", "fourth" },
-    { "5", "five", "fifth" },
-    { "6", "six", "sixth" },
-    { "7", "seven", "seventh" },
-    { "8", "eight", "eighth" },
-    { "9", "nine", "ninth" },
-    { "10", "ten", "tenth" },
-    { "11", "eleven", "eleventh" },
-    { "12", "twelve", "twelfth" },
-  };
-
-  int i, j;
-  char *s_lower = getStringToLower(s);
-  int result = -1;
-
-  for (i=0; i<13; i++)
-    for (j=0; j<3; j++)
-      if (strcmp(s_lower, number_text[i][j]) == 0)
-	result = i;
-
-  if (result == -1)
-    result = atoi(s);
-
-  free(s_lower);
-
-  return result;
-}
-
-boolean get_string_boolean_value(char *s)
-{
-  char *s_lower = getStringToLower(s);
-  boolean result = FALSE;
-
-  if (strcmp(s_lower, "true") == 0 ||
-      strcmp(s_lower, "yes") == 0 ||
-      strcmp(s_lower, "on") == 0 ||
-      get_string_integer_value(s) == 1)
-    result = TRUE;
-
-  free(s_lower);
-
-  return result;
-}
-
 char *getFormattedSetupEntry(char *token, char *value)
 {
   int i;
@@ -1411,7 +1359,7 @@ void setSetupInfo(struct TokenInfo *token_info,
   {
     case TYPE_BOOLEAN:
     case TYPE_SWITCH:
-      *(boolean *)setup_value = get_string_boolean_value(token_value);
+      *(boolean *)setup_value = get_boolean_from_string(token_value);
       break;
 
     case TYPE_KEY:
@@ -1423,7 +1371,7 @@ void setSetupInfo(struct TokenInfo *token_info,
       break;
 
     case TYPE_INTEGER:
-      *(int *)setup_value = get_string_integer_value(token_value);
+      *(int *)setup_value = get_integer_from_string(token_value);
       break;
 
     case TYPE_STRING:
