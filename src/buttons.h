@@ -276,14 +276,16 @@ int CheckCountButtons(int, int, int);
 
 /* gadget types */
 #define GD_TYPE_NORMAL_BUTTON		(1 << 0)
-#define GD_TYPE_RADIO_BUTTON		(1 << 1)
-#define GD_TYPE_DRAWING_AREA		(1 << 2)
-#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 3)
-#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 4)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 5)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 6)
+#define GD_TYPE_CHECK_BUTTON		(1 << 1)
+#define GD_TYPE_RADIO_BUTTON		(1 << 2)
+#define GD_TYPE_DRAWING_AREA		(1 << 3)
+#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 4)
+#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 5)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 6)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 7)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
+					 GD_TYPE_CHECK_BUTTON | \
 					 GD_TYPE_RADIO_BUTTON)
 #define GD_TYPE_SCROLLBAR		(GD_TYPE_SCROLLBAR_VERTICAL | \
 					 GD_TYPE_SCROLLBAR_HORIZONTAL)
@@ -316,8 +318,8 @@ int CheckCountButtons(int, int, int);
 #define GDI_HEIGHT			5
 #define GDI_TYPE			6
 #define GDI_STATE			7
-#define GDI_RADIO_NR			8
-#define GDI_RADIO_PRESSED		9
+#define GDI_CHECKED			8
+#define GDI_RADIO_NR			9
 #define GDI_NUMBER_VALUE		10
 #define GDI_NUMBER_MIN			11
 #define GDI_NUMBER_MAX			12
@@ -393,8 +395,8 @@ struct GadgetInfo
   int width, height;			/* gadget size */
   unsigned long type;			/* type (button, text input, ...) */
   unsigned long state;			/* state (pressed, released, ...) */
+  boolean checked;			/* check/radio button state */
   int radio_nr;				/* number of radio button series */
-  boolean radio_pressed;		/* radio button state */
   boolean mapped;			/* gadget is active */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */

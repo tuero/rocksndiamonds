@@ -78,4 +78,7 @@ void PlaySoundLevel(int, int, int);
 void RaiseScore(int);
 void RaiseScoreElement(int);
 
+void CreateGameButtons();
+void UnmapGameButtons();
+
 #endif

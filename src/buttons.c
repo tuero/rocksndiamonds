@@ -132,8 +132,11 @@
 
 /* some positions in the game control window */
 #define GAME_BUTTON_STOP_XPOS	(GAME_CONTROL_XPOS + 0 * GAME_BUTTON_XSIZE)
+#define GAME_BUTTON_STOP_YPOS	(GAME_CONTROL_YPOS)
 #define GAME_BUTTON_PAUSE_XPOS	(GAME_CONTROL_XPOS + 1 * GAME_BUTTON_XSIZE)
+#define GAME_BUTTON_PAUSE_YPOS	(GAME_CONTROL_YPOS)
 #define GAME_BUTTON_PLAY_XPOS	(GAME_CONTROL_XPOS + 2 * GAME_BUTTON_XSIZE)
+#define GAME_BUTTON_PLAY_YPOS	(GAME_CONTROL_YPOS)
 #define GAME_BUTTON_ANY_YPOS	(GAME_CONTROL_YPOS)
 
 #define ON_GAME_BUTTON(x,y)	((x)>=(DX+GAME_CONTROL_XPOS) &&	\
@@ -339,6 +342,146 @@
 /****************************************************************/
 /********** drawing buttons and corresponding displays **********/
 /****************************************************************/
+
+void OLD_DrawVideoDisplay(unsigned long state, unsigned long value)
+{
+  int i;
+  int part_label = 0, part_symbol = 1;
+  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
+  static char *monatsname[12] =
+  {
+    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+  };
+  static int video_pos[5][2][4] =
+  {
+    {{ VIDEO_PLAY_LABEL_XPOS, VIDEO_PLAY_LABEL_YPOS,
+       VIDEO_PLAY_LABEL_XSIZE,VIDEO_PLAY_LABEL_YSIZE },
+     { VIDEO_PLAY_SYMBOL_XPOS, VIDEO_PLAY_SYMBOL_YPOS,
+       VIDEO_PLAY_SYMBOL_XSIZE,VIDEO_PLAY_SYMBOL_YSIZE }},
+
+    {{ VIDEO_REC_LABEL_XPOS, VIDEO_REC_LABEL_YPOS,
+       VIDEO_REC_LABEL_XSIZE,VIDEO_REC_LABEL_YSIZE },
+     { VIDEO_REC_SYMBOL_XPOS, VIDEO_REC_SYMBOL_YPOS,
+       VIDEO_REC_SYMBOL_XSIZE,VIDEO_REC_SYMBOL_YSIZE }},
+
+    {{ VIDEO_PAUSE_LABEL_XPOS, VIDEO_PAUSE_LABEL_YPOS,
+       VIDEO_PAUSE_LABEL_XSIZE,VIDEO_PAUSE_LABEL_YSIZE },
+     { VIDEO_PAUSE_SYMBOL_XPOS, VIDEO_PAUSE_SYMBOL_YPOS,
+       VIDEO_PAUSE_SYMBOL_XSIZE,VIDEO_PAUSE_SYMBOL_YSIZE }},
+
+    {{ VIDEO_DATE_LABEL_XPOS, VIDEO_DATE_LABEL_YPOS,
+       VIDEO_DATE_LABEL_XSIZE,VIDEO_DATE_LABEL_YSIZE },
+     { VIDEO_DATE_XPOS, VIDEO_DATE_YPOS,
+       VIDEO_DATE_XSIZE,VIDEO_DATE_YSIZE }},
+
+    {{ 0,0,
+       0,0 },
+     { VIDEO_TIME_XPOS, VIDEO_TIME_YPOS,
+       VIDEO_TIME_XSIZE,VIDEO_TIME_YSIZE }}
+  };
+
+  if (state & VIDEO_STATE_PBEND_OFF)
+  {
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_REC_LABEL_XPOS,
+	      cy + VIDEO_REC_LABEL_YPOS,
+	      VIDEO_PBEND_LABEL_XSIZE,
+	      VIDEO_PBEND_LABEL_YSIZE,
+	      VX + VIDEO_REC_LABEL_XPOS,
+	      VY + VIDEO_REC_LABEL_YPOS);
+  }
+
+  for(i=0;i<10;i++)
+  {
+    if (state & (1<<i))
+    {
+      int pos = i/2, cx, cy = DOOR_GFX_PAGEY2;
+
+      if (i%2)			/* i ungerade => STATE_ON / PRESS_OFF */
+	cx = DOOR_GFX_PAGEX4;
+      else
+	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
+
+      if (video_pos[pos][part_label][0] && value != VIDEO_DISPLAY_SYMBOL_ONLY)
+	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+		  cx + video_pos[pos][part_label][xpos],
+		  cy + video_pos[pos][part_label][ypos],
+		  video_pos[pos][part_label][xsize],
+		  video_pos[pos][part_label][ysize],
+		  VX + video_pos[pos][part_label][xpos],
+		  VY + video_pos[pos][part_label][ypos]);
+      if (video_pos[pos][part_symbol][0] && value != VIDEO_DISPLAY_LABEL_ONLY)
+	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+		  cx + video_pos[pos][part_symbol][xpos],
+		  cy + video_pos[pos][part_symbol][ypos],
+		  video_pos[pos][part_symbol][xsize],
+		  video_pos[pos][part_symbol][ysize],
+		  VX + video_pos[pos][part_symbol][xpos],
+		  VY + video_pos[pos][part_symbol][ypos]);
+    }
+  }
+
+  if (state & VIDEO_STATE_FFWD_ON)
+  {
+    int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_PLAY_SYMBOL_XPOS,
+	      cy + VIDEO_PLAY_SYMBOL_YPOS,
+	      VIDEO_PLAY_SYMBOL_XSIZE - 2,
+	      VIDEO_PLAY_SYMBOL_YSIZE,
+	      VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
+	      VY + VIDEO_PLAY_SYMBOL_YPOS);
+  }
+
+  if (state & VIDEO_STATE_PBEND_ON)
+  {
+    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
+
+    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
+	      cx + VIDEO_PBEND_LABEL_XPOS,
+	      cy + VIDEO_PBEND_LABEL_YPOS,
+	      VIDEO_PBEND_LABEL_XSIZE,
+	      VIDEO_PBEND_LABEL_YSIZE,
+	      VX + VIDEO_REC_LABEL_XPOS,
+	      VY + VIDEO_REC_LABEL_YPOS);
+  }
+
+  if (state & VIDEO_STATE_DATE_ON)
+  {
+    int tag = value % 100;
+    int monat = (value/100) % 100;
+    int jahr = (value/10000);
+
+    DrawText(VX+VIDEO_DATE_XPOS,VY+VIDEO_DATE_YPOS,
+	     int2str(tag,2),FS_SMALL,FC_SPECIAL1);
+    DrawText(VX+VIDEO_DATE_XPOS+27,VY+VIDEO_DATE_YPOS,
+	     monatsname[monat],FS_SMALL,FC_SPECIAL1);
+    DrawText(VX+VIDEO_DATE_XPOS+64,VY+VIDEO_DATE_YPOS,
+	     int2str(jahr,2),FS_SMALL,FC_SPECIAL1);
+  }
+
+  if (state & VIDEO_STATE_TIME_ON)
+  {
+    int min = value / 60;
+    int sec = value % 60;
+
+    DrawText(VX+VIDEO_TIME_XPOS,VY+VIDEO_TIME_YPOS,
+	     int2str(min,2),FS_SMALL,FC_SPECIAL1);
+    DrawText(VX+VIDEO_TIME_XPOS+27,VY+VIDEO_TIME_YPOS,
+	     int2str(sec,2),FS_SMALL,FC_SPECIAL1);
+  }
+
+  if (state & VIDEO_STATE_DATE)
+    redraw_mask |= REDRAW_VIDEO_1;
+  if ((state & ~VIDEO_STATE_DATE) & VIDEO_STATE)
+    redraw_mask |= REDRAW_VIDEO_2;
+  if (state & VIDEO_PRESS)
+    redraw_mask |= REDRAW_VIDEO_3;
+}
 
 void DrawVideoDisplay(unsigned long state, unsigned long value)
 {
@@ -1615,12 +1758,12 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	new_gadget->state = va_arg(ap, unsigned long);
 	break;
 
-      case GDI_RADIO_NR:
-	new_gadget->radio_nr = va_arg(ap, unsigned long);
+      case GDI_CHECKED:
+	new_gadget->checked = va_arg(ap, boolean);
 	break;
 
-      case GDI_RADIO_PRESSED:
-	new_gadget->radio_pressed = va_arg(ap, boolean);
+      case GDI_RADIO_NR:
+	new_gadget->radio_nr = va_arg(ap, unsigned long);
 	break;
 
       case GDI_NUMBER_VALUE:
@@ -1871,13 +2014,14 @@ static void CheckRangeOfNumericInputGadget(struct GadgetInfo *gi)
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
   int state = (pressed ? 1 : 0);
-  struct GadgetDesign *gd = (gi->radio_pressed ?
+  struct GadgetDesign *gd = (gi->checked ?
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
   switch (gi->type)
   {
     case GD_TYPE_NORMAL_BUTTON:
+    case GD_TYPE_CHECK_BUTTON:
     case GD_TYPE_RADIO_BUTTON:
       XCopyArea(display, gd->pixmap, drawto, gc,
 		gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
@@ -2247,7 +2391,11 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_pressed)
   {
-    if (gi->type == GD_TYPE_RADIO_BUTTON)
+    if (gi->type == GD_TYPE_CHECK_BUTTON)
+    {
+      gi->checked = !gi->checked;
+    }
+    else if (gi->type == GD_TYPE_RADIO_BUTTON)
     {
       struct GadgetInfo *rgi = gadget_list_first_entry;
 
@@ -2258,14 +2406,14 @@ void HandleGadgets(int mx, int my, int button)
 	    rgi->radio_nr == gi->radio_nr &&
 	    rgi != gi)
 	{
-	  rgi->radio_pressed = FALSE;
+	  rgi->checked = FALSE;
 	  DrawGadget(rgi, DG_UNPRESSED, DG_DIRECT);
 	}
 
 	rgi = rgi->next;
       }
 
-      gi->radio_pressed = TRUE;
+      gi->checked = TRUE;
     }
     else if (gi->type & GD_TYPE_SCROLLBAR)
     {

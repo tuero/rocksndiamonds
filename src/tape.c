@@ -15,6 +15,23 @@
 #include "misc.h"
 #include "game.h"
 #include "buttons.h"
+#include "tools.h"
+#include "files.h"
+#include "network.h"
+
+/* tape button identifiers */
+#define TAPE_CTRL_ID_EJECT		0
+#define TAPE_CTRL_ID_STOP		1
+#define TAPE_CTRL_ID_PAUSE		2
+#define TAPE_CTRL_ID_RECORD		3
+#define TAPE_CTRL_ID_PLAY		4
+
+#define NUM_TAPE_BUTTONS		5
+
+/* forward declaration for internal use */
+static void HandleTapeButtons(struct GadgetInfo *);
+
+static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
 void TapeStartRecording()
 {
@@ -255,4 +272,211 @@ unsigned int GetTapeLength()
     tape_length += tape.pos[i].delay;
 
   return(tape_length * GAME_FRAME_DELAY / 1000);
+}
+
+/* ---------- new tape button stuff ---------------------------------------- */
+
+/* graphic position values for tape buttons */
+#define TAPE_BUTTON_XSIZE	18
+#define TAPE_BUTTON_YSIZE	18
+#define TAPE_BUTTON_XPOS	5
+#define TAPE_BUTTON_YPOS	77
+
+#define TAPE_BUTTON_EJECT_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_STOP_XPOS	(TAPE_BUTTON_XPOS + 1 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_PAUSE_XPOS	(TAPE_BUTTON_XPOS + 2 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_RECORD_XPOS	(TAPE_BUTTON_XPOS + 3 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_PLAY_XPOS	(TAPE_BUTTON_XPOS + 4 * TAPE_BUTTON_XSIZE)
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+  char *infotext;
+} tapebutton_info[NUM_TAPE_BUTTONS] =
+{
+  {
+    TAPE_BUTTON_EJECT_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_EJECT,
+    "eject tape"
+  },
+  {
+    TAPE_BUTTON_STOP_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_STOP,
+    "stop tape"
+  },
+  {
+    TAPE_BUTTON_PAUSE_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_PAUSE,
+    "pause tape"
+  },
+  {
+    TAPE_BUTTON_RECORD_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_RECORD,
+    "record tape"
+  },
+  {
+    TAPE_BUTTON_PLAY_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_PLAY,
+    "play tape"
+  }
+};
+
+void CreateTapeButtons()
+{
+  Pixmap gd_pixmap = pix[PIX_DOOR];
+  struct GadgetInfo *gi;
+  int i;
+
+  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+  {
+    int id = i;
+    int gd_xoffset, gd_yoffset;
+    int gd_x1, gd_x2, gd_y;
+
+    gd_xoffset = tapebutton_info[i].x;
+    gd_yoffset = tapebutton_info[i].y;
+    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+    gd_y  = DOOR_GFX_PAGEY2 + gd_yoffset;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, tapebutton_info[i].infotext,
+		      GDI_X, VX + gd_xoffset,
+		      GDI_Y, VY + gd_yoffset,
+		      GDI_WIDTH, TAPE_BUTTON_XSIZE,
+		      GDI_HEIGHT, TAPE_BUTTON_YSIZE,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_EVENT_MASK, GD_EVENT_RELEASED,
+		      GDI_CALLBACK_ACTION, HandleTapeButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    tape_gadget[id] = gi;
+  }
+}
+
+void MapTapeButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+    MapGadget(tape_gadget[i]);
+}
+
+void UnmapTapeButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+    UnmapGadget(tape_gadget[i]);
+}
+
+static void HandleTapeButtons(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+
+  if (game_status != MAINMENU && game_status != PLAYING)
+    return;
+
+  switch (id)
+  {
+    case TAPE_CTRL_ID_EJECT:
+      TapeStop();
+      if (TAPE_IS_EMPTY(tape))
+      {
+	LoadTape(level_nr);
+	if (TAPE_IS_EMPTY(tape))
+	  Request("No tape for this level !", REQ_CONFIRM);
+      }
+      else
+      {
+	if (tape.changed)
+	  SaveTape(tape.level_nr);
+	TapeErase();
+      }
+      DrawCompleteVideoDisplay();
+      break;
+
+    case TAPE_CTRL_ID_STOP:
+      TapeStop();
+      break;
+
+    case TAPE_CTRL_ID_PAUSE:
+      TapeTogglePause();
+      break;
+
+    case TAPE_CTRL_ID_RECORD:
+      if (TAPE_IS_STOPPED(tape))
+      {
+	TapeStartRecording();
+
+#ifndef MSDOS
+	if (options.network)
+	  SendToServer_StartPlaying();
+	else
+#endif
+	{
+	  game_status = PLAYING;
+	  InitGame();
+	}
+      }
+      else if (tape.pausing)
+      {
+	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
+	{
+	  tape.pos[tape.counter].delay = tape.delay_played;
+	  tape.playing = FALSE;
+	  tape.recording = TRUE;
+	  tape.changed = TRUE;
+
+	  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
+	}
+	else
+	  TapeTogglePause();
+      }
+      break;
+
+    case TAPE_CTRL_ID_PLAY:
+      if (TAPE_IS_EMPTY(tape))
+	break;
+
+      if (TAPE_IS_STOPPED(tape))
+      {
+	TapeStartPlaying();
+
+	game_status = PLAYING;
+	InitGame();
+      }
+      else if (tape.playing)
+      {
+	if (tape.pausing)			/* PAUSE -> PLAY */
+	  TapeTogglePause();
+	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
+	{
+	  tape.fast_forward = TRUE;
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
+	}
+	else if (!tape.pause_before_death)	/* FFWD PLAY -> + AUTO PAUSE */
+	{
+	  tape.pause_before_death = TRUE;
+	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
+	}
+	else					/* -> NORMAL PLAY */
+	{
+	  tape.fast_forward = FALSE;
+	  tape.pause_before_death = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_OFF, 0);
+	}
+      }
+      break;
+
+    default:
+      break;
+  }
 }

@@ -37,8 +37,5 @@ void HandleSetupInputScreen(int, int, int, int, int);
 void CustomizeKeyboard(int);
 void CalibrateJoystick(int);
 void HandleGameActions(void);
-void HandleVideoButtons(int, int, int);
-void HandleSoundButtons(int, int, int);
-void HandleGameButtons(int, int, int);
 
 #endif	/* SCREENS_H */

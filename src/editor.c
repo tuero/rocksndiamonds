@@ -414,7 +414,7 @@ static struct
   int width, height;
   int type;
   int gadget_id;
-  char *text;
+  char *infotext;
 } scrollbar_info[ED_NUM_SCROLLBARS] =
 {
   {
@@ -447,7 +447,6 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void HandleTextInputGadgets(struct GadgetInfo *);
 
 static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
-static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 static int last_drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
@@ -875,14 +874,6 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
-void InitLevelEditorGadgets()
-{
-  int i;
-
-  for (i=0; i<ED_NUM_GADGETS; i++)
-    level_editor_gadget[i] = NULL;
-}
-
 static void CreateControlButtons()
 {
   Pixmap gd_pixmap = pix[PIX_DOOR];
@@ -899,7 +890,7 @@ static void CreateControlButtons()
     int gd_x1, gd_x2, gd_y1, gd_y2;
     int button_type;
     int radio_button_nr;
-    boolean radio_button_pressed;
+    boolean checked;
 
     if (id == ED_CTRL_ID_SINGLE_ITEMS ||
 	id == ED_CTRL_ID_CONNECTED_ITEMS ||
@@ -914,14 +905,14 @@ static void CreateControlButtons()
     {
       button_type = GD_TYPE_RADIO_BUTTON;
       radio_button_nr = 1;
-      radio_button_pressed = (id == drawing_function ? TRUE : FALSE);
+      checked = (id == drawing_function ? TRUE : FALSE);
       event_mask = GD_EVENT_PRESSED;
     }
     else
     {
       button_type = GD_TYPE_NORMAL_BUTTON;
       radio_button_nr = 0;
-      radio_button_pressed = FALSE;
+      checked = FALSE;
 
       if (id == ED_CTRL_ID_WRAP_LEFT ||
 	  id == ED_CTRL_ID_WRAP_RIGHT ||
@@ -967,7 +958,7 @@ static void CreateControlButtons()
 		      GDI_TYPE, button_type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_RADIO_NR, radio_button_nr,
-		      GDI_RADIO_PRESSED, radio_button_pressed,
+		      GDI_CHECKED, checked,
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
 		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y2,
@@ -1251,7 +1242,7 @@ static void CreateScrollbarGadgets()
     gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
-		      GDI_INFO_TEXT, scrollbar_info[i].text,
+		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
 		      GDI_X, SX + scrollbar_info[i].x,
 		      GDI_Y, SY + scrollbar_info[i].y,
 		      GDI_WIDTH, scrollbar_info[i].width,
@@ -1275,18 +1266,13 @@ static void CreateScrollbarGadgets()
   }
 }
 
-static void CreateLevelEditorGadgets()
+void CreateLevelEditorGadgets()
 {
-  if (level_editor_gadgets_created)
-    return;
-
   CreateControlButtons();
   CreateCounterButtons();
   CreateDrawingAreas();
   CreateTextInputGadgets();
   CreateScrollbarGadgets();
-
-  level_editor_gadgets_created = TRUE;
 }
 
 static void MapControlButtons()
@@ -1461,10 +1447,7 @@ void DrawLevelEd()
 
   OpenDoor(DOOR_OPEN_1);
 
-  if (!level_editor_gadgets_created)
-    CreateLevelEditorGadgets();
-  else
-    strcpy(level_editor_gadget[ED_CTRL_ID_LEVEL_NAME]->text.value, level.name);
+  strcpy(level_editor_gadget[ED_CTRL_ID_LEVEL_NAME]->text.value, level.name);
 
   MapControlButtons();
 

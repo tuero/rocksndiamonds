@@ -91,6 +91,21 @@
 #define SC_SCHLUESSEL		9
 #define SC_ZEITBONUS		10
 
+/* game button identifiers */
+#define GAME_CTRL_ID_STOP		0
+#define GAME_CTRL_ID_PAUSE		1
+#define GAME_CTRL_ID_PLAY		2
+#define SOUND_CTRL_ID_MUSIC		3
+#define SOUND_CTRL_ID_LOOPS		4
+#define SOUND_CTRL_ID_SIMPLE		5
+
+#define NUM_GAME_BUTTONS		6
+
+/* forward declaration for internal use */
+static void MapGameButtons();
+static void HandleGameButtons(struct GadgetInfo *);
+
+static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
 
 
@@ -595,17 +610,30 @@ void InitGame()
 	      DOOR_GFX_PAGEX1 + XX_TIME, DOOR_GFX_PAGEY1 + YY_TIME,
 	      int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
+
+
+#if 0
   DrawGameButton(BUTTON_GAME_STOP);
   DrawGameButton(BUTTON_GAME_PAUSE);
   DrawGameButton(BUTTON_GAME_PLAY);
   DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (setup.sound_music  ? BUTTON_ON : 0));
   DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (setup.sound_loops  ? BUTTON_ON : 0));
   DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (setup.sound_simple ? BUTTON_ON : 0));
+#else
+  UnmapGameButtons();
+  game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
+  game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
+  game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
+  MapGameButtons();
+#endif
+
   XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
 	    DX + GAME_CONTROL_XPOS, DY + GAME_CONTROL_YPOS,
 	    GAME_CONTROL_XSIZE, 2 * GAME_CONTROL_YSIZE,
 	    DOOR_GFX_PAGEX1 + GAME_CONTROL_XPOS,
 	    DOOR_GFX_PAGEY1 + GAME_CONTROL_YPOS);
+
+
 
   OpenDoor(DOOR_OPEN_ALL);
 
@@ -4796,6 +4824,240 @@ void RaiseScoreElement(int element)
     case EL_SCHLUESSEL:
       RaiseScore(level.score[SC_SCHLUESSEL]);
       break;
+    default:
+      break;
+  }
+}
+
+/* ---------- new game button stuff ---------------------------------------- */
+
+/* graphic position values for game buttons */
+#define GAME_BUTTON_XSIZE	30
+#define GAME_BUTTON_YSIZE	30
+#define GAME_BUTTON_XPOS	5
+#define GAME_BUTTON_YPOS	215
+#define SOUND_BUTTON_XPOS	5
+#define SOUND_BUTTON_YPOS	(GAME_BUTTON_YPOS + GAME_BUTTON_YSIZE)
+
+#define GAME_BUTTON_STOP_XPOS	(GAME_BUTTON_XPOS + 0 * GAME_BUTTON_XSIZE)
+#define GAME_BUTTON_PAUSE_XPOS	(GAME_BUTTON_XPOS + 1 * GAME_BUTTON_XSIZE)
+#define GAME_BUTTON_PLAY_XPOS	(GAME_BUTTON_XPOS + 2 * GAME_BUTTON_XSIZE)
+#define SOUND_BUTTON_MUSIC_XPOS	(SOUND_BUTTON_XPOS + 0 * GAME_BUTTON_XSIZE)
+#define SOUND_BUTTON_LOOPS_XPOS	(SOUND_BUTTON_XPOS + 1 * GAME_BUTTON_XSIZE)
+#define SOUND_BUTTON_SIMPLE_XPOS (SOUND_BUTTON_XPOS + 2 * GAME_BUTTON_XSIZE)
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+  char *infotext;
+} gamebutton_info[NUM_GAME_BUTTONS] =
+{
+  {
+    GAME_BUTTON_STOP_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_STOP,
+    "stop game"
+  },
+  {
+    GAME_BUTTON_PAUSE_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_PAUSE,
+    "pause game"
+  },
+  {
+    GAME_BUTTON_PLAY_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_PLAY,
+    "play game"
+  },
+  {
+    SOUND_BUTTON_MUSIC_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_MUSIC,
+    "background music on/off"
+  },
+  {
+    SOUND_BUTTON_LOOPS_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_LOOPS,
+    "sound loops on/off"
+  },
+  {
+    SOUND_BUTTON_SIMPLE_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_SIMPLE,
+    "normal sounds on/off"
+  }
+};
+
+void CreateGameButtons()
+{
+  Pixmap gd_pixmap = pix[PIX_DOOR];
+  struct GadgetInfo *gi;
+  unsigned long event_mask;
+  int i;
+
+  for (i=0; i<NUM_GAME_BUTTONS; i++)
+  {
+    int id = i;
+    int gd_xoffset, gd_yoffset;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+    int button_type;
+    boolean checked;
+
+    gd_xoffset = gamebutton_info[i].x;
+    gd_yoffset = gamebutton_info[i].y;
+    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+
+    if (id == GAME_CTRL_ID_STOP ||
+	id == GAME_CTRL_ID_PAUSE ||
+	id == GAME_CTRL_ID_PLAY)
+    {
+      button_type = GD_TYPE_NORMAL_BUTTON;
+      checked = FALSE;
+      event_mask = GD_EVENT_RELEASED;
+      gd_y1  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
+      gd_y2  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
+    }
+    else
+    {
+      button_type = GD_TYPE_CHECK_BUTTON;
+      checked =
+	((id == SOUND_CTRL_ID_MUSIC && setup.sound_music) ||
+	 (id == SOUND_CTRL_ID_LOOPS && setup.sound_loops) ||
+	 (id == SOUND_CTRL_ID_SIMPLE && setup.sound_simple) ? TRUE : FALSE);
+      event_mask = GD_EVENT_PRESSED;
+      gd_y1  = DOOR_GFX_PAGEY1 + gd_yoffset;
+      gd_y2  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
+    }
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
+		      GDI_X, DX + gd_xoffset,
+		      GDI_Y, DY + gd_yoffset,
+		      GDI_WIDTH, GAME_BUTTON_XSIZE,
+		      GDI_HEIGHT, GAME_BUTTON_YSIZE,
+		      GDI_TYPE, button_type,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_CHECKED, checked,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y2,
+		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleGameButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    game_gadget[id] = gi;
+  }
+}
+
+static void MapGameButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_GAME_BUTTONS; i++)
+    MapGadget(game_gadget[i]);
+}
+
+void UnmapGameButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_GAME_BUTTONS; i++)
+    UnmapGadget(game_gadget[i]);
+}
+
+static void HandleGameButtons(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+
+  if (game_status != PLAYING)
+    return;
+
+  switch (id)
+  {
+    case GAME_CTRL_ID_STOP:
+      if (AllPlayersGone)
+      {
+	CloseDoor(DOOR_CLOSE_1);
+	game_status = MAINMENU;
+	DrawMainMenu();
+	break;
+      }
+
+      if (Request("Do you really want to quit the game ?",
+		  REQ_ASK | REQ_STAY_CLOSED))
+      { 
+#ifndef MSDOS
+	if (options.network)
+	  SendToServer_StopPlaying();
+	else
+#endif
+	{
+	  game_status = MAINMENU;
+	  DrawMainMenu();
+	}
+      }
+      else
+	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+      break;
+
+    case GAME_CTRL_ID_PAUSE:
+      if (options.network)
+      {
+#ifndef MSDOS
+	if (tape.pausing)
+	  SendToServer_ContinuePlaying();
+	else
+	  SendToServer_PausePlaying();
+#endif
+      }
+      else
+	TapeTogglePause();
+      break;
+
+    case GAME_CTRL_ID_PLAY:
+      if (tape.pausing)
+      {
+#ifndef MSDOS
+	if (options.network)
+	  SendToServer_ContinuePlaying();
+	else
+#endif
+	{
+	  tape.pausing = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	}
+      }
+      break;
+
+    case SOUND_CTRL_ID_MUSIC:
+      if (setup.sound_music)
+      { 
+	setup.sound_music = FALSE;
+	FadeSound(background_loop[level_nr % num_bg_loops]);
+      }
+      else if (sound_loops_allowed)
+      { 
+	setup.sound = setup.sound_music = TRUE;
+	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
+      }
+      break;
+
+    case SOUND_CTRL_ID_LOOPS:
+      if (setup.sound_loops)
+	setup.sound_loops = FALSE;
+      else if (sound_loops_allowed)
+	setup.sound = setup.sound_loops = TRUE;
+      break;
+
+    case SOUND_CTRL_ID_SIMPLE:
+      if (setup.sound_simple)
+	setup.sound_simple = FALSE;
+      else if (sound_status==SOUND_AVAILABLE)
+	setup.sound = setup.sound_simple = TRUE;
+      break;
+
     default:
       break;
   }

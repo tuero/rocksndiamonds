@@ -68,8 +68,10 @@ void DrawMainMenu()
     return;
   }
 
-  /* needed if last screen was the level editor */
+  /* unmap gadgets from last screen, map gadgets for main menu screen */
   UnmapLevelEditorGadgets();
+  UnmapGameButtons();
+  MapTapeButtons();
 
   FadeSounds();
   GetPlayerConfig();
@@ -2112,6 +2114,11 @@ void HandleGameActions()
 
 void HandleVideoButtons(int mx, int my, int button)
 {
+  return;
+
+
+
+
   if (game_status != MAINMENU && game_status != PLAYING)
     return;
 
@@ -2216,6 +2223,13 @@ void HandleVideoButtons(int mx, int my, int button)
 
 void HandleSoundButtons(int mx, int my, int button)
 {
+
+
+
+  return;
+
+
+
   if (game_status != PLAYING)
     return;
 
@@ -2277,6 +2291,13 @@ void HandleSoundButtons(int mx, int my, int button)
 
 void HandleGameButtons(int mx, int my, int button)
 {
+
+
+
+  return;
+
+
+
   if (game_status != PLAYING)
     return;
 

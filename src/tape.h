@@ -31,4 +31,8 @@ void TapeStop(void);
 void TapeErase(void);
 unsigned int GetTapeLength(void);
 
+void CreateTapeButtons();
+void MapTapeButtons();
+void UnmapTapeButtons();
+
 #endif

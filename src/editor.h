@@ -24,7 +24,7 @@ extern int element_shift;
 extern int editor_element[];
 extern int elements_in_list;
 
-void InitLevelEditorGadgets();
+void CreateLevelEditorGadgets();
 void UnmapLevelEditorGadgets();
 void DrawLevelEd(void);
 void LevelEd(int, int, int);

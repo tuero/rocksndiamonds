@@ -18,6 +18,8 @@
 #include "sound.h"
 #include "screens.h"
 #include "editor.h"
+#include "game.h"
+#include "tape.h"
 #include "tools.h"
 #include "files.h"
 #include "joystick.h"
@@ -48,6 +50,7 @@ static void InitSoundServer(void);
 static void InitWindow(int, char **);
 static void InitGfx(void);
 static void LoadGfx(int, struct PictureFileInfo *);
+static void InitGadgets(void);
 static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
@@ -67,7 +70,6 @@ void OpenAll(int argc, char *argv[])
   InitSoundServer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
-  InitLevelEditorGadgets();
 
   signal(SIGINT, CloseAllAndExit);
   signal(SIGTERM, CloseAllAndExit);
@@ -79,6 +81,7 @@ void OpenAll(int argc, char *argv[])
   XFlush(display);
 
   InitGfx();
+  InitGadgets();
   InitElementProperties();
 
   DrawMainMenu();
@@ -789,6 +792,13 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     if (!clipmask[pos])
       Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
   }
+}
+
+void InitGadgets()
+{
+  CreateLevelEditorGadgets();
+  CreateGameButtons();
+  CreateTapeButtons();
 }
 
 void InitElementProperties()
