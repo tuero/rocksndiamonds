@@ -1133,6 +1133,8 @@ void InitGame()
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
 
+    player->move_delay_reset_counter = 0;
+
     player->push_delay = 0;
     player->push_delay_value = game.initial_push_delay_value;
 
@@ -7719,6 +7721,21 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
   if (player->MovPos == 0)	/* player reached destination field */
   {
+#if 1
+    if (player->move_delay_reset_counter > 0)
+    {
+      player->move_delay_reset_counter--;
+
+      if (player->move_delay_reset_counter == 0)
+      {
+	/* continue with normal speed after quickly moving through gate */
+	HALVE_PLAYER_SPEED(player);
+
+	/* be able to make the next move without delay */
+	player->move_delay = 0;
+      }
+    }
+#else
     if (IS_PASSABLE(Feld[last_jx][last_jy]))
     {
       /* continue with normal speed after quickly moving through gate */
@@ -7727,6 +7744,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       /* be able to make the next move without delay */
       player->move_delay = 0;
     }
+#endif
 
     player->last_jx = jx;
     player->last_jy = jy;
@@ -8508,7 +8526,18 @@ int DigField(struct PlayerInfo *player,
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
+#if 0
+      if (player->move_delay_reset_counter == 0)
+      {
+	player->move_delay_reset_counter = 2;	/* two double speed steps */
+
+	DOUBLE_PLAYER_SPEED(player);
+      }
+#else
       DOUBLE_PLAYER_SPEED(player);
+
+      player->move_delay_reset_counter = 2;
+#endif
 
       PlayLevelSound(x, y, SND_CLASS_SP_PORT_PASSING);
       break;
@@ -8614,7 +8643,18 @@ int DigField(struct PlayerInfo *player,
 
 	/* automatically move to the next field with double speed */
 	player->programmed_action = move_direction;
+#if 1
+	if (player->move_delay_reset_counter == 0)
+	{
+	  player->move_delay_reset_counter = 2;	/* two double speed steps */
+
+	  DOUBLE_PLAYER_SPEED(player);
+	}
+#else
 	DOUBLE_PLAYER_SPEED(player);
+
+	player->move_delay_reset_counter = 2;
+#endif
 
 	PlayLevelSoundAction(x, y, ACTION_PASSING);
 

@@ -1259,6 +1259,8 @@ struct PlayerInfo
   unsigned long move_delay;
   int move_delay_value;
 
+  int move_delay_reset_counter;
+
   unsigned long push_delay;
   unsigned long push_delay_value;
 
