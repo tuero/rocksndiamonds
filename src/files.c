@@ -627,10 +627,11 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
-  level->block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
-  level->sp_block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   level->use_custom_template	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  level->block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->sp_block_last_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -2141,10 +2142,11 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->initial_gravity ? 1 : 0));
   putFile8Bit(file, (level->encoding_16bit_field ? 1 : 0));
   putFile8Bit(file, (level->em_slippery_gems ? 1 : 0));
-  putFile8Bit(file, (level->block_last_field ? 1 : 0));
-  putFile8Bit(file, (level->sp_block_last_field ? 1 : 0));
 
   putFile8Bit(file, (level->use_custom_template ? 1 : 0));
+
+  putFile8Bit(file, (level->block_last_field ? 1 : 0));
+  putFile8Bit(file, (level->sp_block_last_field ? 1 : 0));
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
