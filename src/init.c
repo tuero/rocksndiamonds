@@ -449,7 +449,7 @@ void InitGfx()
 		src_x, src_y, TILEX, TILEY, 0, 0);
     }
   }
-#endif /* TARGET_X11_ANTIVE */
+#endif /* TARGET_X11_NATIVE */
 #endif /* TARGET_X11 */
 }
 

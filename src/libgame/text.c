@@ -148,11 +148,17 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
     else if (c == 'ü' || c == 'Ü')
       c = 93;
 
-    if (c >= 32 && c <= 95)
+    if ((c >= 32 && c <= 95) || c == '°')
     {
       int src_x = ((c - 32) % FONT_CHARS_PER_LINE) * font_width;
       int src_y = ((c - 32) / FONT_CHARS_PER_LINE) * font_height + font_start;
       int dest_x = x, dest_y = y;
+
+      if (c == '°')
+      {
+	src_x = (FONT_CHARS_PER_LINE + 1) * font_width;
+	src_y = 3 * font_height + font_start;
+      }
 
       if (print_inverse)
       {

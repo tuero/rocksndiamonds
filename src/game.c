@@ -960,7 +960,9 @@ void GameWon()
       StopSound(SND_SIRR);
   }
 
+#if 0
   FadeSounds();
+#endif
 
   /* Hero disappears */
   DrawLevelField(ExitX, ExitY);
@@ -981,7 +983,10 @@ void GameWon()
   {
     leveldir_current->handicap_level++;
     SaveLevelSetup_SeriesInfo();
+  }
 
+  if (!level_editor_test_game)
+  {
     if (level_nr < leveldir_current->last_level)
       raise_level = TRUE;
   }

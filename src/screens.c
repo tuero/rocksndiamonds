@@ -71,7 +71,8 @@ static void ToggleFullscreenIfNeeded()
 	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
     /* toggle fullscreen */
-    setup.fullscreen = ChangeVideoModeIfNeeded(setup.fullscreen);
+    ChangeVideoModeIfNeeded(setup.fullscreen);
+    setup.fullscreen = video.fullscreen_enabled;
 
     /* redraw background to newly created backbuffer */
     BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);

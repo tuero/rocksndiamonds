@@ -42,6 +42,7 @@
 
 /* values for button_status */
 #define MB_NOT_PRESSED		FALSE
+#define MB_NOT_RELEASED		TRUE
 #define MB_RELEASED		FALSE
 #define MB_PRESSED		TRUE
 #define MB_MENU_CHOICE		FALSE

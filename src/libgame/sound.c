@@ -117,6 +117,7 @@ static boolean TestAudioDevices(void)
   return TRUE;
 }
 
+#if !defined(TARGET_SDL)
 static boolean ForkAudioProcess(void)
 {
   if (pipe(audio.soundserver_pipe) < 0)
@@ -143,6 +144,7 @@ static boolean ForkAudioProcess(void)
 
   return TRUE;
 }
+#endif
 
 void UnixOpenAudio(void)
 {
