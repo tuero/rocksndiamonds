@@ -6081,6 +6081,26 @@ void ContinueMoving(int x, int y)
     Impact(x, newy);
 
 #if 1
+  if (pushed_by_player)
+  {
+    static int trigger_sides[4] =
+    {
+      CH_SIDE_RIGHT,	/* moving left  */
+      CH_SIDE_LEFT,	/* moving right */
+      CH_SIDE_BOTTOM,	/* moving up    */
+      CH_SIDE_TOP,	/* moving down  */
+    };
+    int dig_side = trigger_sides[MV_DIR_BIT(direction)];
+    struct PlayerInfo *player = PLAYERINFO(x, y);
+
+    CheckElementChangeByPlayer(newx, newy, element, CE_PUSHED_BY_PLAYER,
+			       player->index_bit, dig_side);
+    CheckTriggeredElementChangeByPlayer(newx,newy,element,CE_OTHER_GETS_PUSHED,
+					player->index_bit, dig_side);
+  }
+#endif
+
+#if 1
   TestIfElementTouchesCustomElement(x, y);	/* empty or new element */
 #endif
 
@@ -10893,6 +10913,10 @@ int DigField(struct PlayerInfo *player,
 	  player->push_delay_value = -1;	/* get new value later */
 
 #if 1
+	/* check for element change _after_ element has been pushed! */
+#else
+
+#if 1
       /* !!! TEST ONLY !!! */
 	CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				   player->index_bit, dig_side);
@@ -10903,6 +10927,7 @@ int DigField(struct PlayerInfo *player,
 					    player->index_bit, dig_side);
 	CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				   player->index_bit, dig_side);
+#endif
 #endif
 
 	break;
