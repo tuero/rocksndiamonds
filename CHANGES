@@ -12,7 +12,7 @@ Release Version 2.1.0 [XX XXX XXXX]
 	  this is now an element property for gems in the level editor,
 	  although existing converted levels use the new EM gems behaviour
 	- bug fixed that prevented walking through tubes when gravity on
-	- added Boulderdash style "snap-pushing" (thanks to Achim Härtel)
+	- added Boulder Dash style "snap-pushing" (thanks to Achim Härtel)
 	- fixed memory leak in image loading code
 	- fixed some "solid" elements that were accidentally destructible
 	- fixed some tape stuff
@@ -64,7 +64,7 @@ Release Version 2.0.0 [01 JAN 2001]
 
 Release Version 1.4.0 [27 OCT 1999]
 -----------------------------------
-	- new Boulderdash elements for better game emulation
+	- new Boulder Dash elements for better game emulation
 	- new cool medium-sized crystal font
 	- new elements and graphics for Diamond Caves II levels
 	- new elements and graphics for Emerald Mine Club levels
@@ -151,7 +151,7 @@ Version 1.0 [9 APR 1997] [NOT RELEASED]
 	  there are diagonal directions with keyboard playing
 	  and the fire buttons are mapped to the shift keys)
 	- a lot of new elements for better emulation of levels
-	  from the games "Boulderdash", "Emerald Mine" and
+	  from the games "Boulder Dash", "Emerald Mine" and
 	  "Sokoban". New elements to build "Dynablaster" style
 	  levels.
 	- enhanced functionality of the level tape recorder

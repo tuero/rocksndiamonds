@@ -867,10 +867,10 @@ void HandleHelpScreen(int button)
   }
   else
   {
-    if (DelayReached(&hs_delay,GAME_FRAME_DELAY * 2))
+    if (DelayReached(&hs_delay, GAME_FRAME_DELAY * 2))
     {
       if (helpscreen_state < num_helpscreen_els_pages)
-	DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
+	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
     }
 
     /* !!! workaround for playing "music" that is really a sound loop (and
