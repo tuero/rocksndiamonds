@@ -2555,6 +2555,8 @@ struct ConfigInfo image_config[] =
   { "explosion.xpos",				"0"			},
   { "explosion.ypos",				"4"			},
   { "explosion.frames",				"8"			},
+  { "explosion.delay",				"2"			},
+  { "explosion.global_sync",			"0"			},
 
   { "twinkle_blue",				"RocksHeroes.pcx"	},
   { "twinkle_blue.xpos",			"9"			},

@@ -1706,15 +1706,13 @@ void Explode(int ex, int ey, int phase, int mode)
     if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
       StorePlayer[x][y] = 0;
   }
-  else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+  else if (phase >= delay && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
-    int graphic = IMG_EXPLOSION;
-    int frame = (phase / delay - 1);
-
-    if (game.emulation == EMU_SUPAPLEX)
-      graphic = (Store[x][y] == EL_SP_INFOTRON ?
-		 IMG_SP_EXPLOSION_INFOTRON :
-		 IMG_SP_EXPLOSION);
+    int stored = Store[x][y];
+    int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
+		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
+		   IMG_SP_EXPLOSION);
+    int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
     if (phase == delay)
       DrawCrumbledSand(SCREENX(x), SCREENY(y));

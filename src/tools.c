@@ -700,17 +700,15 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player_is_moving && last_element == EL_EXPLOSION)
   {
-    int graphic = IMG_EXPLOSION;
-    int phase = Frame[last_jx][last_jy] - 1;
+    int stored = Store[last_jx][last_jy];
+    int graphic = (game.emulation != EMU_SUPAPLEX ? IMG_EXPLOSION :
+		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
+		   IMG_SP_EXPLOSION);
     int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
-    int frame = (phase / delay - 1);
+    int phase = Frame[last_jx][last_jy] - 1;
+    int frame = getGraphicAnimationFrame(graphic, phase - delay);
 
-    if (game.emulation == EMU_SUPAPLEX)
-      graphic = (Store[last_jx][last_jy] == EL_SP_INFOTRON ?
-		 IMG_SP_EXPLOSION_INFOTRON :
-		 IMG_SP_EXPLOSION);
-
-    if (frame >= 0)
+    if (phase >= delay)
       DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
   }
 
