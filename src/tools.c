@@ -3369,7 +3369,7 @@ int el_dir2img(int element, int direction)
 
   if (element_info[element].has_direction_graphic[action])
   {
-    int direction = MV_DIR_BIT(direction);
+    direction = MV_DIR_BIT(direction);
 
     return element_info[element].direction_graphic[action][direction];
   }
@@ -3381,7 +3381,7 @@ int el_dir_act2img(int element, int direction, int action)
 {
   if (element_info[element].has_direction_graphic[action])
   {
-    int direction = MV_DIR_BIT(direction);
+    direction = MV_DIR_BIT(direction);
 
     return element_info[element].direction_graphic[action][direction];
   }

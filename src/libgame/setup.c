@@ -462,10 +462,14 @@ char *getCustomImageFilename(char *basename)
     if (fileExists(filename))
       return filename;
 
+    free(filename);
+
     /* 2nd try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
     if (fileExists(filename))
       return filename;
+
+    free(filename);
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */
@@ -473,10 +477,14 @@ char *getCustomImageFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
+  free(filename);
+
   /* 4th try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
+
+  free(filename);
 
   /* 5th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.graphics_directory, basename);
@@ -500,10 +508,14 @@ char *getCustomSoundFilename(char *basename)
     if (fileExists(filename))
       return filename;
 
+    free(filename);
+
     /* 2nd try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
     if (fileExists(filename))
       return filename;
+
+    free(filename);
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */
@@ -511,10 +523,14 @@ char *getCustomSoundFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
+  free(filename);
+
   /* 4th try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultSoundsDir(SOUNDS_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
+
+  free(filename);
 
   /* 5th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.sounds_directory, basename);
@@ -553,10 +569,14 @@ char *getCustomMusicDirectory(void)
     if (fileExists(directory))
       return directory;
 
+    free(directory);
+
     /* 2nd try: look for special artwork in current level series directory */
     directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
     if (fileExists(directory))
       return directory;
+
+    free(directory);
   }
 
   /* 3rd try: look for special artwork in configured artwork directory */
@@ -564,10 +584,14 @@ char *getCustomMusicDirectory(void)
   if (fileExists(directory))
     return directory;
 
+  free(directory);
+
   /* 4th try: look for default artwork in new default artwork directory */
   directory = getStringCopy(getDefaultMusicDir(MUSIC_SUBDIR));
   if (fileExists(directory))
     return directory;
+
+  free(directory);
 
   /* 5th try: look for default artwork in old default artwork directory */
   directory = getStringCopy(options.music_directory);

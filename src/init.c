@@ -985,6 +985,7 @@ void InitElementInfo()
     i++;
   }
 #else
+
   i = 0;
   while (element_to_graphic[i].element > -1)
   {
@@ -1010,6 +1011,7 @@ void InitElementInfo()
 
     i++;
   }
+
 #endif
 }
 

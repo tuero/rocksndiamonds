@@ -1478,6 +1478,8 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
 	if (value != NULL)
 	  file_list[i].parameter[j] = atoi(value);
+
+	free(token);
       }
     }
 
