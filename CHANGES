@@ -5,6 +5,7 @@ Release Version 3.0.1 [?? ??? ????]
 	- fixed bug with missing graphic for active red disk bomb
 	- added custom element property for dropping collected elements
 	- added another 128 custom elements for those who can't get enough
+	- fixed PCX files in the DOS version ("classic" graphics only)
 
 Release Version 3.0.0 [05 AUG 2003]
 -----------------------------------
