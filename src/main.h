@@ -442,21 +442,6 @@
 
 #define EL_CHAR(c)			(EL_CHAR_ASCII0 + MAP_FONT_ASCII(c))
 
-#if 0
-#define EL_CHAR(x)			((x) == 'Ä' ? EL_CHAR_AE         : \
-					 (x) == 'Ö' ? EL_CHAR_OE         : \
-					 (x) == 'Ü' ? EL_CHAR_UE         : \
-					 (x) == 'ä' ? EL_CHAR_AE         : \
-					 (x) == 'ö' ? EL_CHAR_OE         : \
-					 (x) == 'ü' ? EL_CHAR_UE         : \
-					 (x) == '©' ? EL_CHAR_COPYRIGHT  : \
-					 (x) == '_' ? EL_CHAR_UNDERSCORE : \
-					 (x) == '°' ? EL_CHAR_DEGREE     : \
-					 (x) == '´' ? EL_CHAR_TM         : \
-					 (x) == '|' ? EL_CHAR_CURSOR     : \
-					 EL_CHAR_A + (x) - 'A')
-#endif
-
 #define EL_EXPANDABLE_WALL_HORIZONTAL	200
 #define EL_EXPANDABLE_WALL_VERTICAL	201
 #define EL_EXPANDABLE_WALL_ANY		202
@@ -833,10 +818,11 @@
 #define FONT_VALUE_1				16
 #define FONT_VALUE_2				17
 #define FONT_VALUE_OLD				18
-#define FONT_TAPE_RECORDER			19
-#define FONT_LEVEL_NUMBER			20
+#define FONT_LEVEL_NUMBER			19
+#define FONT_TAPE_RECORDER			20
+#define FONT_GAME_INFO				21
 
-#define NUM_FONTS				21
+#define NUM_FONTS				22
 #define NUM_INITIAL_FONTS			4
 
 /* values for game_status */

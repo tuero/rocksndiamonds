@@ -773,15 +773,25 @@ void DrawPlayer(struct PlayerInfo *player)
 
 void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
 {
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
-  int offset_x = graphic_info[graphic].offset_x;
-  int offset_y = graphic_info[graphic].offset_y;
-  int src_x = graphic_info[graphic].src_x + frame * offset_x;
-  int src_y = graphic_info[graphic].src_y + frame * offset_y;
+  struct GraphicInfo *g = &graphic_info[graphic];
 
-  *bitmap = src_bitmap;
-  *x = src_x;
-  *y = src_y;
+  *bitmap = g->bitmap;
+
+  if (g->offset_y == 0)		/* frames are ordered horizontally */
+  {
+    *x = g->src_x + (frame % g->anim_frames_per_line) * g->offset_x;
+    *y = g->src_y + (frame / g->anim_frames_per_line) * g->height;
+  }
+  else if (g->offset_x == 0)	/* frames are ordered vertically */
+  {
+    *x = g->src_x + (frame / g->anim_frames_per_line) * g->width;
+    *y = g->src_y + (frame % g->anim_frames_per_line) * g->offset_y;
+  }
+  else				/* frames are ordered diagonally */
+  {
+    *x = g->src_x + frame * g->offset_x;
+    *y = g->src_y + frame * g->offset_y;
+  }
 }
 
 void DrawGraphic(int x, int y, int graphic, int frame)
@@ -883,32 +893,13 @@ void DrawMiniGraphic(int x, int y, int graphic)
 
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
+  struct GraphicInfo *g = &graphic_info[graphic];
   int mini_startx = 0;
-  int mini_starty = src_bitmap->height * 2 / 3;
-  int src_x = mini_startx + graphic_info[graphic].src_x / 2;
-  int src_y = mini_starty + graphic_info[graphic].src_y / 2;
+  int mini_starty = g->bitmap->height * 2 / 3;
 
-#if 0
-  /* !!! not needed anymore, because of automatically created mini graphics */
-  if (src_x + MINI_TILEX > src_bitmap->width ||
-      src_y + MINI_TILEY > src_bitmap->height)
-  {
-    /* graphic of desired size seems not to be contained in this image;
-       dirty workaround: get it from the middle of the normal sized image */
-
-    printf("::: using dirty workaround for %d (%d, %d)\n",
-	   graphic, src_bitmap->width, src_bitmap->height);
-
-    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
-    src_x += (TILEX / 2 - MINI_TILEX / 2);
-    src_y += (TILEY / 2 - MINI_TILEY / 2);
-  }
-#endif
-
-  *bitmap = src_bitmap;
-  *x = src_x;
-  *y = src_y;
+  *bitmap = g->bitmap;
+  *x = mini_startx + g->src_x / 2;
+  *y = mini_starty + g->src_y / 2;
 }
 
 void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)

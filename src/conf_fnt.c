@@ -172,6 +172,10 @@ font_to_graphic[] =
     IMG_FONT_TAPE_RECORDER
   },
   {
+    FONT_GAME_INFO,				-1,
+    IMG_FONT_GAME_INFO
+  },
+  {
     -1,						-1,
     -1
   },

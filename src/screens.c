@@ -639,11 +639,7 @@ static int helpscreen_action[] =
 
   IMG_WALL_CRUMBLED,			-1,			HA_NEXT,
 
-  IMG_INFO_FONT_EM_1,			160,
-  IMG_INFO_FONT_EM_2,			160,
-  IMG_INFO_FONT_EM_3,			160,
-  IMG_INFO_FONT_EM_4,			160,
-  IMG_INFO_FONT_EM_5,			40,			HA_NEXT,
+  IMG_FONT_GAME_INFO,			-1,			HA_NEXT,
 
   IMG_EMERALD,				-1,			HA_NEXT,
 

@@ -383,7 +383,7 @@ void InitFontGraphicInfo()
       int font_bitmap_id = font_info[i].special_bitmap_id[j];
       int graphic = font_info[i].special_graphic[j];
 
-      /* set 'graphic_info' for font entries, if uninitialized */
+      /* set 'graphic_info' for font entries, if uninitialized (guessed) */
       if (graphic_info[graphic].anim_frames < MIN_NUM_CHARS_PER_FONT)
       {
 	graphic_info[graphic].anim_frames = DEFAULT_NUM_CHARS_PER_FONT;
