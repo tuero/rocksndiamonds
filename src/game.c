@@ -350,16 +350,16 @@ static void InitField(int x, int y, boolean init_game)
     case EL_SPACESHIP_LEFT:
     case EL_SPACESHIP_DOWN:
     case EL_SPACESHIP:
-    case EL_BUTTERFLY_RIGHT:
-    case EL_BUTTERFLY_UP:
-    case EL_BUTTERFLY_LEFT:
-    case EL_BUTTERFLY_DOWN:
-    case EL_BUTTERFLY:
-    case EL_FIREFLY_RIGHT:
-    case EL_FIREFLY_UP:
-    case EL_FIREFLY_LEFT:
-    case EL_FIREFLY_DOWN:
-    case EL_FIREFLY:
+    case EL_BD_BUTTERFLY_RIGHT:
+    case EL_BD_BUTTERFLY_UP:
+    case EL_BD_BUTTERFLY_LEFT:
+    case EL_BD_BUTTERFLY_DOWN:
+    case EL_BD_BUTTERFLY:
+    case EL_BD_FIREFLY_RIGHT:
+    case EL_BD_FIREFLY_UP:
+    case EL_BD_FIREFLY_LEFT:
+    case EL_BD_FIREFLY_DOWN:
+    case EL_BD_FIREFLY:
     case EL_PACMAN_RIGHT:
     case EL_PACMAN_UP:
     case EL_PACMAN_LEFT:
@@ -386,7 +386,7 @@ static void InitField(int x, int y, boolean init_game)
     case EL_AMOEBA_DROP:
       if (y == lev_fieldy - 1)
       {
-	Feld[x][y] = EL_AMOEBING;
+	Feld[x][y] = EL_AMOEBA_CREATING;
 	Store[x][y] = EL_AMOEBA_WET;
       }
       break;
@@ -399,7 +399,7 @@ static void InitField(int x, int y, boolean init_game)
       local_player->lights_still_needed++;
       break;
 
-    case EL_SOKOBAN_FELD_LEER:
+    case EL_SOKOBAN_FIELD_EMPTY:
       local_player->sokobanfields_still_needed++;
       break;
 
@@ -640,11 +640,11 @@ static void InitGameEngine()
 	  ~EP_BIT_EM_SLIPPERY_WALL;
     }
 
-    /* "EL_MAUERND" was not slippery for EM gems in version 2.0.1 */
+    /* "EL_WALL_GROWING_ACTIVE" wasn't slippery for EM gems in version 2.0.1 */
     if (level.em_slippery_gems && game.engine_version > VERSION_IDENT(2,0,1))
-      Elementeigenschaften2[EL_MAUERND] |=  EP_BIT_EM_SLIPPERY_WALL;
+      Elementeigenschaften2[EL_WALL_GROWING_ACTIVE] |= EP_BIT_EM_SLIPPERY_WALL;
     else
-      Elementeigenschaften2[EL_MAUERND] &= ~EP_BIT_EM_SLIPPERY_WALL;
+      Elementeigenschaften2[EL_WALL_GROWING_ACTIVE] &=~EP_BIT_EM_SLIPPERY_WALL;
   }
 }
 
@@ -1044,20 +1044,20 @@ void InitMovDir(int x, int y)
       MovDir[x][y] = direction[0][element - EL_SPACESHIP_RIGHT];
       break;
 
-    case EL_BUTTERFLY_RIGHT:
-    case EL_BUTTERFLY_UP:
-    case EL_BUTTERFLY_LEFT:
-    case EL_BUTTERFLY_DOWN:
-      Feld[x][y] = EL_BUTTERFLY;
-      MovDir[x][y] = direction[0][element - EL_BUTTERFLY_RIGHT];
+    case EL_BD_BUTTERFLY_RIGHT:
+    case EL_BD_BUTTERFLY_UP:
+    case EL_BD_BUTTERFLY_LEFT:
+    case EL_BD_BUTTERFLY_DOWN:
+      Feld[x][y] = EL_BD_BUTTERFLY;
+      MovDir[x][y] = direction[0][element - EL_BD_BUTTERFLY_RIGHT];
       break;
 
-    case EL_FIREFLY_RIGHT:
-    case EL_FIREFLY_UP:
-    case EL_FIREFLY_LEFT:
-    case EL_FIREFLY_DOWN:
-      Feld[x][y] = EL_FIREFLY;
-      MovDir[x][y] = direction[0][element - EL_FIREFLY_RIGHT];
+    case EL_BD_FIREFLY_RIGHT:
+    case EL_BD_FIREFLY_UP:
+    case EL_BD_FIREFLY_LEFT:
+    case EL_BD_FIREFLY_DOWN:
+      Feld[x][y] = EL_BD_FIREFLY;
+      MovDir[x][y] = direction[0][element - EL_BD_FIREFLY_RIGHT];
       break;
 
     case EL_PACMAN_RIGHT:
@@ -1088,8 +1088,8 @@ void InitMovDir(int x, int y)
       MovDir[x][y] = 1 << RND(4);
       if (element != EL_BUG &&
 	  element != EL_SPACESHIP &&
-	  element != EL_BUTTERFLY &&
-	  element != EL_FIREFLY)
+	  element != EL_BD_BUTTERFLY &&
+	  element != EL_BD_FIREFLY)
 	break;
 
       for (i=0; i<4; i++)
@@ -1099,12 +1099,12 @@ void InitMovDir(int x, int y)
 
 	if (!IN_LEV_FIELD(x1, y1) || !IS_FREE(x1, y1))
 	{
-	  if (element == EL_BUG || element == EL_BUTTERFLY)
+	  if (element == EL_BUG || element == EL_BD_BUTTERFLY)
 	  {
 	    MovDir[x][y] = direction[0][i];
 	    break;
 	  }
-	  else if (element == EL_SPACESHIP || element == EL_FIREFLY ||
+	  else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY ||
 		   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
 	  {
 	    MovDir[x][y] = direction[1][i];
@@ -1425,7 +1425,7 @@ void RemoveMovingField(int x, int y)
   if (Feld[x][y] == EL_BLOCKED &&
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
-       Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING ||
+       Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_AMOEBA_DRIPPING))
     Feld[oldx][oldy] = get_next_element(Feld[oldx][oldy]);
   else
@@ -1545,7 +1545,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (IS_MASSIVE(element) || element == EL_BURNING)
+      if (IS_MASSIVE(element) || element == EL_DRAGON_FIRE)
 	continue;
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
@@ -1560,7 +1560,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
       }
 
-      if (element == EL_EXPLODING)
+      if (element == EL_EXPLOSION)
 	element = Store2[x][y];
 
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
@@ -1591,7 +1591,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_EMERALD_PURPLE;
       else if (center_element == EL_BUG)
 	Store[x][y] = ((x == ex && y == ey) ? EL_DIAMOND : EL_EMERALD);
-      else if (center_element == EL_BUTTERFLY)
+      else if (center_element == EL_BD_BUTTERFLY)
 	Store[x][y] = EL_BD_DIAMOND;
       else if (center_element == EL_SP_ELECTRON)
 	Store[x][y] = EL_SP_INFOTRON;
@@ -1625,13 +1625,13 @@ void Explode(int ex, int ey, int phase, int mode)
       if (AmoebaNr[x][y] &&
 	  (element == EL_AMOEBA_FULL ||
 	   element == EL_BD_AMOEBA ||
-	   element == EL_AMOEBING))
+	   element == EL_AMOEBA_CREATING))
       {
 	AmoebaCnt[AmoebaNr[x][y]]--;
 	AmoebaCnt2[AmoebaNr[x][y]]--;
       }
 
-      Feld[x][y] = EL_EXPLODING;
+      Feld[x][y] = EL_EXPLOSION;
       MovDir[x][y] = MovPos[x][y] = 0;
       AmoebaNr[x][y] = 0;
       Frame[x][y] = 1;
@@ -1756,14 +1756,14 @@ void DynaExplode(int ex, int ey)
       element = Feld[x][y];
 
       /* do not restart explosions of fields with active bombs */
-      if (element == EL_EXPLODING && IS_ACTIVE_BOMB(Store2[x][y]))
+      if (element == EL_EXPLOSION && IS_ACTIVE_BOMB(Store2[x][y]))
 	continue;
 
       Explode(x, y, EX_PHASE_START, EX_BORDER);
 
       if (element != EL_EMPTY &&
 	  element != EL_SAND &&
-	  element != EL_EXPLODING &&
+	  element != EL_EXPLOSION &&
 	  !dynabomb_xl)
 	break;
     }
@@ -1788,8 +1788,8 @@ void Bang(int x, int y)
   {
     case EL_BUG:
     case EL_SPACESHIP:
-    case EL_BUTTERFLY:
-    case EL_FIREFLY:
+    case EL_BD_BUTTERFLY:
+    case EL_BD_FIREFLY:
     case EL_YAMYAM:
     case EL_DARK_YAMYAM:
     case EL_ROBOT:
@@ -1825,25 +1825,27 @@ void Blurb(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (element != EL_BLURB_LEFT && element != EL_BLURB_RIGHT)	/* start */
+  if (element != EL_ACID_SPLASHING_LEFT &&
+      element != EL_ACID_SPLASHING_RIGHT)	/* start */
   {
     PlaySoundLevel(x, y, SND_ACID_SPLASHING);
     if (IN_LEV_FIELD(x-1, y) && IS_FREE(x-1, y) &&
 	(!IN_LEV_FIELD(x-1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x-1, y-1))))
     {
-      Feld[x-1][y] = EL_BLURB_LEFT;
+      Feld[x-1][y] = EL_ACID_SPLASHING_LEFT;
     }
     if (IN_LEV_FIELD(x+1, y) && IS_FREE(x+1, y) &&
 	(!IN_LEV_FIELD(x+1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
     {
-      Feld[x+1][y] = EL_BLURB_RIGHT;
+      Feld[x+1][y] = EL_ACID_SPLASHING_RIGHT;
     }
   }
   else								/* go on */
   {
-    int graphic = (element==EL_BLURB_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
+    int graphic =
+      (element == EL_ACID_SPLASHING_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
 
     if (!MovDelay[x][y])	/* initialize animation counter */
       MovDelay[x][y] = 9;
@@ -1981,7 +1983,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 
       if (element == EL_INVISIBLE_STEELWALL ||
 	  element == EL_INVISIBLE_WALL ||
-	  element == EL_SAND_INVISIBLE)
+	  element == EL_INVISIBLE_SAND)
 	DrawLevelField(x, y);
     }
   }
@@ -2018,9 +2020,9 @@ static void ActivateTimegateSwitch(int x, int y)
       }
 
       /*
-      else if (element == EL_TIMEGATE_SWITCH_ON)
+      else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
       {
-	Feld[xx][yy] = EL_TIMEGATE_SWITCH_OFF;
+	Feld[xx][yy] = EL_TIMEGATE_SWITCH;
 	DrawLevelField(xx, yy);
       }
       */
@@ -2028,7 +2030,7 @@ static void ActivateTimegateSwitch(int x, int y)
     }
   }
 
-  Feld[x][y] = EL_TIMEGATE_SWITCH_ON;
+  Feld[x][y] = EL_TIMEGATE_SWITCH_ACTIVE;
 }
 
 void Impact(int x, int y)
@@ -2079,7 +2081,7 @@ void Impact(int x, int y)
       Bang(x, y+1);
     else
     {
-      Feld[x][y] = EL_AMOEBING;
+      Feld[x][y] = EL_AMOEBA_CREATING;
       Store[x][y] = EL_AMOEBA_WET;
     }
     return;
@@ -2088,12 +2090,12 @@ void Impact(int x, int y)
   if (!lastline && object_hit)		/* check which object was hit */
   {
     if (CAN_CHANGE(element) && 
-	(smashed == EL_MAGIC_WALL || smashed == EL_MAGIC_WALL_BD_OFF))
+	(smashed == EL_MAGIC_WALL || smashed == EL_BD_MAGIC_WALL))
     {
       int xx, yy;
       int activated_magic_wall =
 	(smashed == EL_MAGIC_WALL ? EL_MAGIC_WALL_EMPTY :
-	 EL_MAGIC_WALL_BD_EMPTY);
+	 EL_BD_MAGIC_WALL_EMPTY);
 
       /* activate magic wall / mill */
       for (yy=0; yy<lev_fieldy; yy++)
@@ -2194,11 +2196,11 @@ void Impact(int x, int y)
   /* play sound of magic wall / mill */
   if (!lastline &&
       (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ||
-       Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY))
+       Feld[x][y+1] == EL_BD_MAGIC_WALL_EMPTY))
   {
     if (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY)
       PlaySoundLevel(x, y, SND_MAGIC_WALL_CHANGING);
-    else if (Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY)
+    else if (Feld[x][y+1] == EL_BD_MAGIC_WALL_EMPTY)
       PlaySoundLevel(x, y, SND_BD_MAGIC_WALL_CHANGING);
 
     return;
@@ -2253,7 +2255,7 @@ void TurnRound(int x, int y)
   int right_x = x+right_dx, right_y = y+right_dy;
   int move_x = x+move_dx, move_y = y+move_dy;
 
-  if (element == EL_BUG || element == EL_BUTTERFLY)
+  if (element == EL_BUG || element == EL_BD_BUTTERFLY)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
@@ -2266,10 +2268,10 @@ void TurnRound(int x, int y)
 
     if (element == EL_BUG && MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = 9;
-    else if (element == EL_BUTTERFLY)	/* && MovDir[x][y] == left_dir) */
+    else if (element == EL_BD_BUTTERFLY)     /* && MovDir[x][y] == left_dir) */
       MovDelay[x][y] = 1;
   }
-  else if (element == EL_SPACESHIP || element == EL_FIREFLY ||
+  else if (element == EL_SPACESHIP || element == EL_BD_FIREFLY ||
 	   element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
@@ -2285,7 +2287,7 @@ void TurnRound(int x, int y)
 	 element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
 	&& MovDir[x][y] != old_move_dir)
       MovDelay[x][y] = 9;
-    else if (element == EL_FIREFLY)	/* && MovDir[x][y] == right_dir) */
+    else if (element == EL_BD_FIREFLY)	    /* && MovDir[x][y] == right_dir) */
       MovDelay[x][y] = 1;
   }
   else if (element == EL_YAMYAM)
@@ -2467,7 +2469,7 @@ void TurnRound(int x, int y)
 
     if (IN_LEV_FIELD(move_x, move_y) &&
 	(IS_FREE(move_x, move_y) || IS_AMOEBOID(Feld[move_x][move_y]) ||
-	 Feld[move_x][move_y] == EL_DEAMOEBING))
+	 Feld[move_x][move_y] == EL_AMOEBA_SHRINKING))
       can_move_on = TRUE;
 
     if (!can_move_on)
@@ -2726,15 +2728,15 @@ void StartMoving(int x, int y)
 	Store[x][y] = 0;
       }
     }
-    else if (element == EL_MAGIC_WALL_BD_FULL)
+    else if (element == EL_BD_MAGIC_WALL_FULL)
     {
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
-	Feld[x][y] = EL_MAGIC_WALL_BD_EMPTYING;
+	Feld[x][y] = EL_BD_MAGIC_WALL_EMPTYING;
 	Store[x][y] = EL_CHANGED2(Store[x][y]);
       }
-      else if (Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY)
+      else if (Feld[x][y+1] == EL_BD_MAGIC_WALL_EMPTY)
       {
 	if (!MovDelay[x][y])
 	  MovDelay[x][y] = TILEY/4 + 1;
@@ -2746,20 +2748,20 @@ void StartMoving(int x, int y)
 	    return;
 	}
 
-	Feld[x][y] = EL_MAGIC_WALL_BD_EMPTY;
-	Feld[x][y+1] = EL_MAGIC_WALL_BD_FULL;
+	Feld[x][y] = EL_BD_MAGIC_WALL_EMPTY;
+	Feld[x][y+1] = EL_BD_MAGIC_WALL_FULL;
 	Store[x][y+1] = EL_CHANGED2(Store[x][y]);
 	Store[x][y] = 0;
       }
     }
     else if (CAN_CHANGE(element) &&
 	     (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ||
-	      Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY))
+	      Feld[x][y+1] == EL_BD_MAGIC_WALL_EMPTY))
     {
       InitMovingField(x, y, MV_DOWN);
       Feld[x][y] =
 	(Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ? EL_MAGIC_WALL_FILLING :
-	 EL_MAGIC_WALL_BD_FILLING);
+	 EL_BD_MAGIC_WALL_FILLING);
       Store[x][y] = element;
     }
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_ACID)
@@ -2779,7 +2781,7 @@ void StartMoving(int x, int y)
     }
     else if (element == EL_AMOEBA_DROP)
     {
-      Feld[x][y] = EL_AMOEBING;
+      Feld[x][y] = EL_AMOEBA_CREATING;
       Store[x][y] = EL_AMOEBA_WET;
     }
     /* Store[x][y+1] must be zero, because:
@@ -2902,7 +2904,7 @@ void StartMoving(int x, int y)
 	  int sx = SCREENX(xx), sy = SCREENY(yy);
 
 	  if (!IN_LEV_FIELD(xx, yy) ||
-	      IS_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLODING)
+	      IS_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
 	    break;
 
 	  if (MovDelay[x][y])
@@ -2914,13 +2916,13 @@ void StartMoving(int x, int y)
 	    else
 	      RemoveMovingField(xx, yy);
 
-	    Feld[xx][yy] = EL_BURNING;
+	    Feld[xx][yy] = EL_DRAGON_FIRE;
 	    if (IN_SCR_FIELD(sx, sy))
 	      DrawGraphic(sx, sy, graphic + phase*3 + i-1);
 	  }
 	  else
 	  {
-	    if (Feld[xx][yy] == EL_BURNING)
+	    if (Feld[xx][yy] == EL_DRAGON_FIRE)
 	      Feld[xx][yy] = EL_EMPTY;
 	    DrawLevelField(xx, yy);
 	  }
@@ -3042,7 +3044,7 @@ void StartMoving(int x, int y)
 
 	if ((wanna_flame || IS_ENEMY(element1) || IS_ENEMY(element2)) &&
 	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
-	    element1 != EL_BURNING && element2 != EL_BURNING)
+	    element1 != EL_DRAGON_FIRE && element2 != EL_DRAGON_FIRE)
 	{
 	  if (IS_PLAYER(x, y))
 	    DrawPlayerField(x, y);
@@ -3052,11 +3054,11 @@ void StartMoving(int x, int y)
 	  PlaySoundLevel(x, y, SND_DRAGON_ATTACKING);
 
 	  MovDelay[x][y] = 50;
-	  Feld[newx][newy] = EL_BURNING;
+	  Feld[newx][newy] = EL_DRAGON_FIRE;
 	  if (IN_LEV_FIELD(newx1, newy1) && Feld[newx1][newy1] == EL_EMPTY)
-	    Feld[newx1][newy1] = EL_BURNING;
+	    Feld[newx1][newy1] = EL_DRAGON_FIRE;
 	  if (IN_LEV_FIELD(newx2, newy2) && Feld[newx2][newy2] == EL_EMPTY)
-	    Feld[newx2][newy2] = EL_BURNING;
+	    Feld[newx2][newy2] = EL_DRAGON_FIRE;
 	  return;
 	}
       }
@@ -3108,7 +3110,7 @@ void StartMoving(int x, int y)
 
       if (element == EL_MOLE)
       {
-	Feld[newx][newy] = EL_DEAMOEBING;
+	Feld[newx][newy] = EL_AMOEBA_SHRINKING;
 	PlaySoundLevel(x, y, SND_MOLE_EATING);
 	MovDelay[newx][newy] = 0;	/* start amoeba shrinking delay */
 	return;				/* wait for shrinking amoeba */
@@ -3121,7 +3123,7 @@ void StartMoving(int x, int y)
       }
     }
     else if (element == EL_MOLE && IN_LEV_FIELD(newx, newy) &&
-	     (Feld[newx][newy] == EL_DEAMOEBING ||
+	     (Feld[newx][newy] == EL_AMOEBA_SHRINKING ||
 	      (Feld[newx][newy] == EL_EMPTY && Stop[newx][newy])))
     {
       /* wait for shrinking amoeba to completely disappear */
@@ -3147,7 +3149,7 @@ void StartMoving(int x, int y)
 #else
 	DrawNewLevelField(x, y);
 #endif
-      else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
+      else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
 #if 0
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
 #else
@@ -3199,9 +3201,9 @@ void ContinueMoving(int x, int y)
 	   element == EL_QUICKSAND_EMPTYING)
     step /= 4;
   else if (element == EL_MAGIC_WALL_FILLING ||
-	   element == EL_MAGIC_WALL_BD_FILLING ||
+	   element == EL_BD_MAGIC_WALL_FILLING ||
 	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_MAGIC_WALL_BD_EMPTYING)
+	   element == EL_BD_MAGIC_WALL_EMPTYING)
     step /= 2;
   else if (CAN_FALL(element) && horiz_move &&
 	   y < lev_fieldy-1 && IS_BELT(Feld[x][y+1]))
@@ -3271,18 +3273,18 @@ void ContinueMoving(int x, int y)
 	Feld[x][y] = EL_MAGIC_WALL_DEAD;
       element = Feld[newx][newy] = Store[x][y];
     }
-    else if (element == EL_MAGIC_WALL_BD_FILLING)
+    else if (element == EL_BD_MAGIC_WALL_FILLING)
     {
       element = Feld[newx][newy] = get_next_element(element);
       if (!game.magic_wall_active)
-	element = Feld[newx][newy] = EL_MAGIC_WALL_BD_DEAD;
+	element = Feld[newx][newy] = EL_BD_MAGIC_WALL_DEAD;
       Store[newx][newy] = Store[x][y];
     }
-    else if (element == EL_MAGIC_WALL_BD_EMPTYING)
+    else if (element == EL_BD_MAGIC_WALL_EMPTYING)
     {
       Feld[x][y] = get_next_element(element);
       if (!game.magic_wall_active)
-	Feld[x][y] = EL_MAGIC_WALL_BD_DEAD;
+	Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
       element = Feld[newx][newy] = Store[x][y];
     }
     else if (element == EL_AMOEBA_DRIPPING)
@@ -3504,7 +3506,7 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
       if (AmoebaNr[x][y] == group_nr &&
 	  (Feld[x][y] == EL_AMOEBA_DEAD ||
 	   Feld[x][y] == EL_BD_AMOEBA ||
-	   Feld[x][y] == EL_AMOEBING))
+	   Feld[x][y] == EL_AMOEBA_CREATING))
       {
 	AmoebaNr[x][y] = 0;
 	Feld[x][y] = new_element;
@@ -3711,17 +3713,17 @@ void AmoebeAbleger(int ax, int ay)
   if (element != EL_AMOEBA_WET || neway < ay || !IS_FREE(newax, neway) ||
       (neway == lev_fieldy - 1 && newax != ax))
   {
-    Feld[newax][neway] = EL_AMOEBING;	/* simple growth of new amoeba tile */
+    Feld[newax][neway] = EL_AMOEBA_CREATING;	/* creation of new amoeba */
     Store[newax][neway] = element;
   }
   else if (neway == ay)
   {
-    Feld[newax][neway] = EL_AMOEBA_DROP; /* drop left or right from amoeba */
+    Feld[newax][neway] = EL_AMOEBA_DROP;	/* drop left/right of amoeba */
     PlaySoundLevel(newax, neway, SND_AMOEBA_DROP_CREATING);
   }
   else
   {
-    InitMovingField(ax, ay, MV_DOWN);	/* drop dripping out of amoeba */
+    InitMovingField(ax, ay, MV_DOWN);		/* drop dripping from amoeba */
     Feld[ax][ay] = EL_AMOEBA_DRIPPING;
     Store[ax][ay] = EL_AMOEBA_DROP;
     ContinueMoving(ax, ay);
@@ -3842,12 +3844,12 @@ void TimegateWheel(int x, int y)
 	DrawGraphic(SCREENX(x), SCREENY(y),
 		    GFX_TIMEGATE_SWITCH + MovDelay[x][y]%4);
       if (!(MovDelay[x][y]%4))
-	PlaySoundLevel(x, y, SND_TIMEGATE_WHEEL_ACTIVE);
+	PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
       return;
     }
   }
 
-  Feld[x][y] = EL_TIMEGATE_SWITCH_OFF;
+  Feld[x][y] = EL_TIMEGATE_SWITCH;
   DrawLevelField(x, y);
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
@@ -3915,7 +3917,7 @@ void AusgangstuerPruefen(int x, int y)
       local_player->lights_still_needed > 0)
     return;
 
-  Feld[x][y] = EL_AUSGANG_ACT;
+  Feld[x][y] = EL_EXIT_OPENING;
 
   PlaySoundLevel(x < LEVELX(BX1) ? LEVELX(BX1) :
 		 (x > LEVELX(BX2) ? LEVELX(BX2) : x),
@@ -4211,7 +4213,7 @@ void MauerAbleger(int ax, int ay)
   {
     if (oben_frei)
     {
-      Feld[ax][ay-1] = EL_MAUERND;
+      Feld[ax][ay-1] = EL_WALL_GROWING_ACTIVE;
       Store[ax][ay-1] = element;
       MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
@@ -4220,7 +4222,7 @@ void MauerAbleger(int ax, int ay)
     }
     if (unten_frei)
     {
-      Feld[ax][ay+1] = EL_MAUERND;
+      Feld[ax][ay+1] = EL_WALL_GROWING_ACTIVE;
       Store[ax][ay+1] = element;
       MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
@@ -4234,7 +4236,7 @@ void MauerAbleger(int ax, int ay)
   {
     if (links_frei)
     {
-      Feld[ax-1][ay] = EL_MAUERND;
+      Feld[ax-1][ay] = EL_WALL_GROWING_ACTIVE;
       Store[ax-1][ay] = element;
       MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
@@ -4244,7 +4246,7 @@ void MauerAbleger(int ax, int ay)
 
     if (rechts_frei)
     {
-      Feld[ax+1][ay] = EL_MAUERND;
+      Feld[ax+1][ay] = EL_WALL_GROWING_ACTIVE;
       Store[ax+1][ay] = element;
       MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
@@ -4294,7 +4296,7 @@ void CheckForDragon(int x, int y)
       int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
 
       if (IN_LEV_FIELD(xx, yy) &&
-	  (Feld[xx][yy] == EL_BURNING || Feld[xx][yy] == EL_DRAGON))
+	  (Feld[xx][yy] == EL_DRAGON_FIRE || Feld[xx][yy] == EL_DRAGON))
       {
 	if (Feld[xx][yy] == EL_DRAGON)
 	  dragon_found = TRUE;
@@ -4312,7 +4314,7 @@ void CheckForDragon(int x, int y)
       {
   	int xx = x + j*xy[i][0], yy = y + j*xy[i][1];
   
-  	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_BURNING)
+  	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_DRAGON_FIRE)
   	{
 	  Feld[xx][yy] = EL_EMPTY;
 	  DrawLevelField(xx, yy);
@@ -4328,7 +4330,7 @@ static void CheckBuggyBase(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (element == EL_SP_BUG)
+  if (element == EL_SP_BUGGY_BASE)
   {
     if (!MovDelay[x][y])	/* wait some time before activating base */
       MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
@@ -4341,10 +4343,10 @@ static void CheckBuggyBase(int x, int y)
       if (MovDelay[x][y])
 	return;
 
-      Feld[x][y] = EL_SP_BUG_ACTIVE;
+      Feld[x][y] = EL_SP_BUGGY_BASE_ACTIVE;
     }
   }
-  else if (element == EL_SP_BUG_ACTIVE)
+  else if (element == EL_SP_BUGGY_BASE_ACTIVE)
   {
     if (!MovDelay[x][y])	/* start activating buggy base */
       MovDelay[x][y] = 1 * FRAMES_PER_SECOND + RND(1 * FRAMES_PER_SECOND);
@@ -4380,7 +4382,7 @@ static void CheckBuggyBase(int x, int y)
 	return;
       }
 
-      Feld[x][y] = EL_SP_BUG;
+      Feld[x][y] = EL_SP_BUGGY_BASE;
       DrawLevelField(x, y);
     }
   }
@@ -4390,7 +4392,7 @@ static void CheckTrap(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (element == EL_TRAP_INACTIVE)
+  if (element == EL_TRAP)
   {
     if (!MovDelay[x][y])	/* wait some time before activating trap */
       MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
@@ -4436,7 +4438,7 @@ static void CheckTrap(int x, int y)
 	return;
       }
 
-      Feld[x][y] = EL_TRAP_INACTIVE;
+      Feld[x][y] = EL_TRAP;
       DrawLevelField(x, y);
     }
   }
@@ -4756,12 +4758,12 @@ void GameActions()
     else if (IS_ACTIVE_BOMB(element))
       CheckDynamite(x, y);
 #if 0
-    else if (element == EL_EXPLODING && !game.explosions_delayed)
+    else if (element == EL_EXPLOSION && !game.explosions_delayed)
       Explode(x, y, Frame[x][y], EX_NORMAL);
 #endif
-    else if (element == EL_AMOEBING)
+    else if (element == EL_AMOEBA_CREATING)
       AmoebeWaechst(x, y);
-    else if (element == EL_DEAMOEBING)
+    else if (element == EL_AMOEBA_SHRINKING)
       AmoebaDisappearing(x, y);
 
 #if !USE_NEW_AMOEBA_CODE
@@ -4773,11 +4775,12 @@ void GameActions()
       Life(x, y);
     else if (element == EL_ROBOT_WHEEL_ACTIVE)
       RobotWheel(x, y);
-    else if (element == EL_TIMEGATE_SWITCH_ON)
+    else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
       TimegateWheel(x, y);
     else if (element == EL_ACID)
       Blubber(x, y);
-    else if (element == EL_BLURB_LEFT || element == EL_BLURB_RIGHT)
+    else if (element == EL_ACID_SPLASHING_LEFT ||
+	     element == EL_ACID_SPLASHING_RIGHT)
       Blurb(x, y);
     else if (element == EL_CRACKINGNUT)
       NussKnacken(x, y);
@@ -4787,24 +4790,24 @@ void GameActions()
       AusgangstuerPruefen(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       AusgangstuerPruefen_SP(x, y);
-    else if (element == EL_AUSGANG_ACT)
+    else if (element == EL_EXIT_OPENING)
       AusgangstuerOeffnen(x, y);
     else if (element == EL_EXIT_OPEN)
       AusgangstuerBlinken(x, y);
     else if (element == EL_SP_EXIT_OPEN)
       ;		/* !!! ADD SOME (OPTIONAL) ANIMATIONS HERE !!! */
-    else if (element == EL_MAUERND)
+    else if (element == EL_WALL_GROWING_ACTIVE)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
 	     element == EL_WALL_GROWING_X ||
 	     element == EL_WALL_GROWING_Y ||
 	     element == EL_WALL_GROWING_XY)
       MauerAbleger(x, y);
-    else if (element == EL_BURNING)
+    else if (element == EL_DRAGON_FIRE)
       CheckForDragon(x, y);
-    else if (element == EL_SP_BUG || element == EL_SP_BUG_ACTIVE)
+    else if (element == EL_SP_BUGGY_BASE || element == EL_SP_BUGGY_BASE_ACTIVE)
       CheckBuggyBase(x, y);
-    else if (element == EL_TRAP_INACTIVE || element == EL_TRAP_ACTIVE)
+    else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
     else if (element == EL_SP_TERMINAL)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
@@ -4836,7 +4839,7 @@ void GameActions()
 	PlaySoundLevel(x, y, SND_SHIELD_PASSIVE_ACTIVATED);
 #endif
     }
-    else if (element == EL_SHIELD_ACTIVE)
+    else if (element == EL_SHIELD_DEADLY)
     {
       DrawGraphicAnimation(x, y, GFX_SHIELD_ACTIVE, 6, 4, ANIM_NORMAL);
 #if 0
@@ -4857,9 +4860,9 @@ void GameActions()
 	SiebAktivieren(x, y, 1);
 	sieb = TRUE;
       }
-      else if (element == EL_MAGIC_WALL_BD_FULL ||
-	       element == EL_MAGIC_WALL_BD_EMPTY ||
-	       element == EL_MAGIC_WALL_BD_EMPTYING)
+      else if (element == EL_BD_MAGIC_WALL_FULL ||
+	       element == EL_BD_MAGIC_WALL_EMPTY ||
+	       element == EL_BD_MAGIC_WALL_EMPTYING)
       {
 	SiebAktivieren(x, y, 2);
 	sieb = TRUE;
@@ -4897,8 +4900,8 @@ void GameActions()
 	  (element == EL_EMPTY ||
 	   element == EL_SAND ||
 	   element == EL_QUICKSAND_EMPTY ||
-	   element == EL_BLURB_LEFT ||
-	   element == EL_BLURB_RIGHT))
+	   element == EL_ACID_SPLASHING_LEFT ||
+	   element == EL_ACID_SPLASHING_RIGHT))
       {
 	if ((IN_LEV_FIELD(x, y-1) && Feld[x][y-1] == EL_AMOEBA_WET) ||
 	    (IN_LEV_FIELD(x-1, y) && Feld[x-1][y] == EL_AMOEBA_WET) ||
@@ -4924,7 +4927,7 @@ void GameActions()
 
       if (ExplodeField[x][y])
 	Explode(x, y, EX_PHASE_START, ExplodeField[x][y]);
-      else if (element == EL_EXPLODING)
+      else if (element == EL_EXPLOSION)
 	Explode(x, y, Frame[x][y], EX_NORMAL);
 
       ExplodeField[x][y] = EX_NO_EXPLOSION;
@@ -4939,9 +4942,9 @@ void GameActions()
     {
       int element = Feld[sieb_x][sieb_y];
 
-      if (element == EL_MAGIC_WALL_BD_FULL ||
-	  element == EL_MAGIC_WALL_BD_EMPTY ||
-	  element == EL_MAGIC_WALL_BD_EMPTYING)
+      if (element == EL_BD_MAGIC_WALL_FULL ||
+	  element == EL_BD_MAGIC_WALL_EMPTY ||
+	  element == EL_BD_MAGIC_WALL_EMPTYING)
 	PlaySoundLevel(sieb_x, sieb_y, SND_BD_MAGIC_WALL_ACTIVE);
       else
 	PlaySoundLevel(sieb_x, sieb_y, SND_MAGIC_WALL_ACTIVE);
@@ -4962,10 +4965,10 @@ void GameActions()
 	    Feld[x][y] = EL_MAGIC_WALL_DEAD;
 	    DrawLevelField(x, y);
 	  }
-	  else if (element == EL_MAGIC_WALL_BD_EMPTY ||
-		   element == EL_MAGIC_WALL_BD_FULL)
+	  else if (element == EL_BD_MAGIC_WALL_EMPTY ||
+		   element == EL_BD_MAGIC_WALL_FULL)
 	  {
-	    Feld[x][y] = EL_MAGIC_WALL_BD_DEAD;
+	    Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
 	    DrawLevelField(x, y);
 	  }
 	}
@@ -4992,7 +4995,7 @@ void GameActions()
 	}
 	else if (element == EL_INVISIBLE_STEELWALL ||
 		 element == EL_INVISIBLE_WALL ||
-		 element == EL_SAND_INVISIBLE)
+		 element == EL_INVISIBLE_SAND)
 	  DrawLevelField(x, y);
       }
     }
@@ -5581,7 +5584,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
     MV_DOWN
   };
 
-  if (bad_element == EL_EXPLODING)	/* skip just exploding bad things */
+  if (bad_element == EL_EXPLOSION)	/* skip just exploding bad things */
     return;
 
   for (i=0; i<4; i++)
@@ -5711,7 +5714,7 @@ void TestIfBadThingTouchesOtherBadThing(int bad_x, int bad_y)
 
     element = Feld[x][y];
     if (IS_AMOEBOID(element) || element == EL_GAMEOFLIFE ||
-	element == EL_AMOEBING || element == EL_AMOEBA_DROP)
+	element == EL_AMOEBA_CREATING || element == EL_AMOEBA_DROP)
     {
       kill_x = x;
       kill_y = y;
@@ -5812,18 +5815,18 @@ int DigField(struct PlayerInfo *player,
     int i = 0;
     int tube_leave_directions[][2] =
     {
-      { EL_TUBE_CROSS,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
-      { EL_TUBE_VERTICAL,	                     MV_UP | MV_DOWN },
-      { EL_TUBE_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
-      { EL_TUBE_VERT_LEFT,	MV_LEFT |            MV_UP | MV_DOWN },
-      { EL_TUBE_VERT_RIGHT,	          MV_RIGHT | MV_UP | MV_DOWN },
-      { EL_TUBE_HORIZ_UP,	MV_LEFT | MV_RIGHT | MV_UP           },
-      { EL_TUBE_HORIZ_DOWN,	MV_LEFT | MV_RIGHT |         MV_DOWN },
-      { EL_TUBE_LEFT_UP,	MV_LEFT |            MV_UP           },
-      { EL_TUBE_LEFT_DOWN,	MV_LEFT |                    MV_DOWN },
-      { EL_TUBE_RIGHT_UP,	          MV_RIGHT | MV_UP           },
-      { EL_TUBE_RIGHT_DOWN,	          MV_RIGHT |         MV_DOWN },
-      { -1,                     MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN }
+      { EL_TUBE_ALL,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+      { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
+      { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
+      { EL_TUBE_VERTICAL_LEFT,		MV_LEFT |            MV_UP | MV_DOWN },
+      { EL_TUBE_VERTICAL_RIGHT,		          MV_RIGHT | MV_UP | MV_DOWN },
+      { EL_TUBE_HORIZONTAL_UP,		MV_LEFT | MV_RIGHT | MV_UP           },
+      { EL_TUBE_HORIZONTAL_DOWN,	MV_LEFT | MV_RIGHT |         MV_DOWN },
+      { EL_TUBE_LEFT_UP,		MV_LEFT |            MV_UP           },
+      { EL_TUBE_LEFT_DOWN,		MV_LEFT |                    MV_DOWN },
+      { EL_TUBE_RIGHT_UP,		          MV_RIGHT | MV_UP           },
+      { EL_TUBE_RIGHT_DOWN,		          MV_RIGHT |         MV_DOWN },
+      { -1,                     	MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN }
     };
 
     while (tube_leave_directions[i][0] != Feld[jx][jy])
@@ -5843,10 +5846,10 @@ int DigField(struct PlayerInfo *player,
   {
     case EL_EMPTY:
     case EL_SAND:
-    case EL_SAND_INVISIBLE:
-    case EL_TRAP_INACTIVE:
+    case EL_INVISIBLE_SAND:
+    case EL_TRAP:
     case EL_SP_BASE:
-    case EL_SP_BUG:
+    case EL_SP_BUGGY_BASE:
       RemoveField(x, y);
       PlaySoundLevelElementAction(x, y, element, SND_ACTION_DIGGING);
       break;
@@ -5900,7 +5903,7 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_SHIELD_NORMAL_COLLECTING);
       break;
 
-    case EL_SHIELD_ACTIVE:
+    case EL_SHIELD_DEADLY:
       RemoveField(x, y);
       player->shield_passive_time_left += 10;
       player->shield_active_time_left += 10;
@@ -5949,7 +5952,7 @@ int DigField(struct PlayerInfo *player,
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
-      RaiseScoreElement(EL_KEY);
+      RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
@@ -5967,7 +5970,7 @@ int DigField(struct PlayerInfo *player,
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
-      RaiseScoreElement(EL_KEY);
+      RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 GFX_SCHLUESSEL1 + key_nr);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
@@ -6051,9 +6054,9 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_TIMEGATE_SWITCH_OFF:
+    case EL_TIMEGATE_SWITCH:
       ActivateTimegateSwitch(x, y);
-      PlaySoundLevel(x, y, SND_TIMEGATE_WHEEL_ACTIVATING);
+      PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVATING);
 
       return MF_ACTION;
       break;
@@ -6062,8 +6065,8 @@ int DigField(struct PlayerInfo *player,
     case EL_BALLOON_SEND_RIGHT:
     case EL_BALLOON_SEND_UP:
     case EL_BALLOON_SEND_DOWN:
-    case EL_BALLOON_SEND_ANY:
-      if (element == EL_BALLOON_SEND_ANY)
+    case EL_BALLOON_SEND_ANY_DIRECTION:
+      if (element == EL_BALLOON_SEND_ANY_DIRECTION)
 	game.balloon_dir = move_direction;
       else
 	game.balloon_dir = (element == EL_BALLOON_SEND_LEFT  ? MV_LEFT :
@@ -6242,13 +6245,13 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_SP_PORT_PASSING);
       break;
 
-    case EL_TUBE_CROSS:
+    case EL_TUBE_ALL:
     case EL_TUBE_VERTICAL:
     case EL_TUBE_HORIZONTAL:
-    case EL_TUBE_VERT_LEFT:
-    case EL_TUBE_VERT_RIGHT:
-    case EL_TUBE_HORIZ_UP:
-    case EL_TUBE_HORIZ_DOWN:
+    case EL_TUBE_VERTICAL_LEFT:
+    case EL_TUBE_VERTICAL_RIGHT:
+    case EL_TUBE_HORIZONTAL_UP:
+    case EL_TUBE_HORIZONTAL_DOWN:
     case EL_TUBE_LEFT_UP:
     case EL_TUBE_LEFT_DOWN:
     case EL_TUBE_RIGHT_UP:
@@ -6257,18 +6260,18 @@ int DigField(struct PlayerInfo *player,
 	int i = 0;
 	int tube_enter_directions[][2] =
 	{
-	  { EL_TUBE_CROSS,	MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
-	  { EL_TUBE_VERTICAL,	                     MV_UP | MV_DOWN },
-	  { EL_TUBE_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
-	  { EL_TUBE_VERT_LEFT,	          MV_RIGHT | MV_UP | MV_DOWN },
-	  { EL_TUBE_VERT_RIGHT,	MV_LEFT            | MV_UP | MV_DOWN },
-	  { EL_TUBE_HORIZ_UP,	MV_LEFT | MV_RIGHT |         MV_DOWN },
-	  { EL_TUBE_HORIZ_DOWN,	MV_LEFT | MV_RIGHT | MV_UP           },
-	  { EL_TUBE_LEFT_UP,	          MV_RIGHT |         MV_DOWN },
-	  { EL_TUBE_LEFT_DOWN,	          MV_RIGHT | MV_UP           },
-	  { EL_TUBE_RIGHT_UP,	MV_LEFT |                    MV_DOWN },
-	  { EL_TUBE_RIGHT_DOWN,	MV_LEFT |            MV_UP           },
-	  { -1,			MV_NO_MOVING                         }
+	  { EL_TUBE_ALL,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+	  { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
+	  { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
+	  { EL_TUBE_VERTICAL_LEFT,	          MV_RIGHT | MV_UP | MV_DOWN },
+	  { EL_TUBE_VERTICAL_RIGHT,	MV_LEFT            | MV_UP | MV_DOWN },
+	  { EL_TUBE_HORIZONTAL_UP,	MV_LEFT | MV_RIGHT |         MV_DOWN },
+	  { EL_TUBE_HORIZONTAL_DOWN,	MV_LEFT | MV_RIGHT | MV_UP           },
+	  { EL_TUBE_LEFT_UP,			  MV_RIGHT |         MV_DOWN },
+	  { EL_TUBE_LEFT_DOWN,			  MV_RIGHT | MV_UP           },
+	  { EL_TUBE_RIGHT_UP,		MV_LEFT |                    MV_DOWN },
+	  { EL_TUBE_RIGHT_DOWN,		MV_LEFT |            MV_UP           },
+	  { -1,				MV_NO_MOVING                         }
 	};
 
 	while (tube_enter_directions[i][0] != element)
@@ -6287,7 +6290,7 @@ int DigField(struct PlayerInfo *player,
 
     case EL_EXIT_CLOSED:
     case EL_SP_EXIT_CLOSED:
-    case EL_AUSGANG_ACT:
+    case EL_EXIT_OPENING:
       return MF_NO_ACTION;
       break;
 
@@ -6320,11 +6323,11 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
-    case EL_SOKOBAN_FELD_LEER:
+    case EL_SOKOBAN_FIELD_EMPTY:
       break;
 
-    case EL_SOKOBAN_OBJEKT:
-    case EL_SOKOBAN_FELD_VOLL:
+    case EL_SOKOBAN_OBJECT:
+    case EL_SOKOBAN_FIELD_FULL:
     case EL_SATELLITE:
     case EL_SP_DISK_YELLOW:
     case EL_BALLOON:
@@ -6335,7 +6338,7 @@ int DigField(struct PlayerInfo *player,
 
       if (!IN_LEV_FIELD(x+dx, y+dy)
 	  || (!IS_FREE(x+dx, y+dy)
-	      && (Feld[x+dx][y+dy] != EL_SOKOBAN_FELD_LEER
+	      && (Feld[x+dx][y+dy] != EL_SOKOBAN_FIELD_EMPTY
 		  || !IS_SB_ELEMENT(element))))
 	return MF_NO_ACTION;
 
@@ -6365,27 +6368,27 @@ int DigField(struct PlayerInfo *player,
 
       if (IS_SB_ELEMENT(element))
       {
-	if (element == EL_SOKOBAN_FELD_VOLL)
+	if (element == EL_SOKOBAN_FIELD_FULL)
 	{
-	  Feld[x][y] = EL_SOKOBAN_FELD_LEER;
+	  Feld[x][y] = EL_SOKOBAN_FIELD_EMPTY;
 	  local_player->sokobanfields_still_needed++;
 	}
 	else
 	  RemoveField(x, y);
 
-	if (Feld[x+dx][y+dy] == EL_SOKOBAN_FELD_LEER)
+	if (Feld[x+dx][y+dy] == EL_SOKOBAN_FIELD_EMPTY)
 	{
-	  Feld[x+dx][y+dy] = EL_SOKOBAN_FELD_VOLL;
+	  Feld[x+dx][y+dy] = EL_SOKOBAN_FIELD_FULL;
 	  local_player->sokobanfields_still_needed--;
-	  if (element == EL_SOKOBAN_OBJEKT)
+	  if (element == EL_SOKOBAN_OBJECT)
 	    PlaySoundLevel(x, y, SND_SOKOBAN_FIELD_FILLING);
 	  else
 	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
 	}
 	else
 	{
-	  Feld[x+dx][y+dy] = EL_SOKOBAN_OBJEKT;
-	  if (element == EL_SOKOBAN_FELD_VOLL)
+	  Feld[x+dx][y+dy] = EL_SOKOBAN_OBJECT;
+	  if (element == EL_SOKOBAN_FIELD_FULL)
 	    PlaySoundLevel(x, y, SND_SOKOBAN_FIELD_EMPTYING);
 	  else
 	    PlaySoundLevel(x, y, SND_SOKOBAN_OBJECT_PUSHING);
@@ -6476,7 +6479,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
   element = Feld[jx][jy];
 
   if ((player->dynamite == 0 && player->dynabombs_left == 0) ||
-      IS_ACTIVE_BOMB(element) || element == EL_EXPLODING)
+      IS_ACTIVE_BOMB(element) || element == EL_EXPLOSION)
     return FALSE;
 
   if (element != EL_EMPTY)
@@ -6595,11 +6598,11 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_DIAMANT]);
       break;
     case EL_BUG:
-    case EL_BUTTERFLY:
+    case EL_BD_BUTTERFLY:
       RaiseScore(level.score[SC_KAEFER]);
       break;
     case EL_SPACESHIP:
-    case EL_FIREFLY:
+    case EL_BD_FIREFLY:
       RaiseScore(level.score[SC_FLIEGER]);
       break;
     case EL_YAMYAM:
@@ -6618,7 +6621,10 @@ void RaiseScoreElement(int element)
     case EL_DYNAMITE:
       RaiseScore(level.score[SC_DYNAMIT]);
       break;
-    case EL_KEY:
+    case EL_KEY1:
+    case EL_KEY2:
+    case EL_KEY3:
+    case EL_KEY4:
       RaiseScore(level.score[SC_SCHLUESSEL]);
       break;
     default:

@@ -482,8 +482,8 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       if (player->GfxPos)
       {
-  	if (Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
-  	  DrawLevelElement(next_jx, next_jy, EL_SOKOBAN_FELD_LEER);
+  	if (Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL)
+  	  DrawLevelElement(next_jx, next_jy, EL_SOKOBAN_FIELD_EMPTY);
   	else
   	  DrawLevelElement(next_jx, next_jy, EL_EMPTY);
       }
@@ -605,8 +605,8 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
 
-    if (element == EL_SOKOBAN_FELD_LEER ||
-	Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
+    if (element == EL_SOKOBAN_FIELD_EMPTY ||
+	Feld[next_jx][next_jy] == EL_SOKOBAN_FIELD_FULL)
       DrawGraphicShiftedThruMask(px, py, sxx, syy, GFX_SOKOBAN_OBJEKT,
 				 NO_CUTTING);
     else
@@ -1376,7 +1376,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic = GFX_GEBLUBBER + getGraphicAnimationPhase(4, 10, ANIM_NORMAL);
   }
-  else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
+  else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
   {
     graphic += !phase2;
   }
@@ -1410,10 +1410,10 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_MAGIC_WALL_EMPTY ||
 	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_MAGIC_WALL_BD_EMPTY ||
-	   element == EL_MAGIC_WALL_BD_EMPTYING ||
+	   element == EL_BD_MAGIC_WALL_EMPTY ||
+	   element == EL_BD_MAGIC_WALL_EMPTYING ||
 	   element == EL_MAGIC_WALL_FULL ||
-	   element == EL_MAGIC_WALL_BD_FULL)
+	   element == EL_BD_MAGIC_WALL_FULL)
   {
     graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
   }
@@ -1440,7 +1440,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
-	    element == EL_SAND_INVISIBLE) && game.light_time_left)
+	    element == EL_INVISIBLE_SAND) && game.light_time_left)
   {
     graphic = (element == EL_INVISIBLE_STEELWALL ? GFX_INVISIBLE_STEEL_ON :
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
@@ -1542,7 +1542,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     graphic = GFX_GEBLUBBER + getNewGraphicAnimationFrame(graphic, move_pos);
 #endif
   }
-  else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
+  else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
   {
     graphic += !phase2;
   }
@@ -1576,10 +1576,10 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_MAGIC_WALL_EMPTY ||
 	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_MAGIC_WALL_BD_EMPTY ||
-	   element == EL_MAGIC_WALL_BD_EMPTYING ||
+	   element == EL_BD_MAGIC_WALL_EMPTY ||
+	   element == EL_BD_MAGIC_WALL_EMPTYING ||
 	   element == EL_MAGIC_WALL_FULL ||
-	   element == EL_MAGIC_WALL_BD_FULL)
+	   element == EL_BD_MAGIC_WALL_FULL)
   {
 #if 1
     graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
@@ -1610,7 +1610,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
-	    element == EL_SAND_INVISIBLE) && game.light_time_left)
+	    element == EL_INVISIBLE_SAND) && game.light_time_left)
   {
     graphic = (element == EL_INVISIBLE_STEELWALL ? GFX_INVISIBLE_STEEL_ON :
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
@@ -1718,7 +1718,7 @@ void ErdreichAnbroeckeln(int x, int y)
 
   if (element == EL_SAND ||
       element == EL_LANDMINE ||
-      element == EL_TRAP_INACTIVE ||
+      element == EL_TRAP ||
       element == EL_TRAP_ACTIVE)
   {
     if (!IN_SCR_FIELD(x, y))
@@ -1741,7 +1741,7 @@ void ErdreichAnbroeckeln(int x, int y)
 
       if (element == EL_SAND ||
 	  element == EL_LANDMINE ||
-	  element == EL_TRAP_INACTIVE ||
+	  element == EL_TRAP ||
 	  element == EL_TRAP_ACTIVE)
 	continue;
 
@@ -1784,7 +1784,7 @@ void ErdreichAnbroeckeln(int x, int y)
       if (!IN_LEV_FIELD(uxx, uyy) ||
 	  (Feld[uxx][uyy] != EL_SAND &&
 	   Feld[uxx][uyy] != EL_LANDMINE &&
-	   Feld[uxx][uyy] != EL_TRAP_INACTIVE &&
+	   Feld[uxx][uyy] != EL_TRAP &&
 	   Feld[uxx][uyy] != EL_TRAP_ACTIVE) ||
 	  !IN_SCR_FIELD(xx, yy))
 	continue;
@@ -1862,12 +1862,12 @@ void DrawScreenField(int x, int y)
 
     if (element == EL_QUICKSAND_EMPTYING ||
 	element == EL_MAGIC_WALL_EMPTYING ||
-	element == EL_MAGIC_WALL_BD_EMPTYING ||
+	element == EL_BD_MAGIC_WALL_EMPTYING ||
 	element == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
 	     element == EL_MAGIC_WALL_FILLING ||
-	     element == EL_MAGIC_WALL_BD_FILLING)
+	     element == EL_BD_MAGIC_WALL_FILLING)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
@@ -1904,7 +1904,7 @@ void DrawScreenField(int x, int y)
 
     if (element_old == EL_QUICKSAND_EMPTYING ||
 	element_old == EL_MAGIC_WALL_EMPTYING ||
-	element_old == EL_MAGIC_WALL_BD_EMPTYING ||
+	element_old == EL_BD_MAGIC_WALL_EMPTYING ||
 	element_old == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
 
@@ -1952,12 +1952,12 @@ void DrawNewScreenField(int x, int y)
 
     if (element == EL_QUICKSAND_EMPTYING ||
 	element == EL_MAGIC_WALL_EMPTYING ||
-	element == EL_MAGIC_WALL_BD_EMPTYING ||
+	element == EL_BD_MAGIC_WALL_EMPTYING ||
 	element == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
 	     element == EL_MAGIC_WALL_FILLING ||
-	     element == EL_MAGIC_WALL_BD_FILLING)
+	     element == EL_BD_MAGIC_WALL_FILLING)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
@@ -1994,7 +1994,7 @@ void DrawNewScreenField(int x, int y)
 
     if (element_old == EL_QUICKSAND_EMPTYING ||
 	element_old == EL_MAGIC_WALL_EMPTYING ||
-	element_old == EL_MAGIC_WALL_BD_EMPTYING ||
+	element_old == EL_BD_MAGIC_WALL_EMPTYING ||
 	element_old == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
 
@@ -3004,8 +3004,8 @@ int get_next_element(int element)
     case EL_QUICKSAND_EMPTYING:		return EL_QUICKSAND_EMPTY;
     case EL_MAGIC_WALL_FILLING:		return EL_MAGIC_WALL_FULL;
     case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_EMPTY;
-    case EL_MAGIC_WALL_BD_FILLING:	return EL_MAGIC_WALL_BD_FULL;
-    case EL_MAGIC_WALL_BD_EMPTYING:	return EL_MAGIC_WALL_BD_EMPTY;
+    case EL_BD_MAGIC_WALL_FILLING:	return EL_BD_MAGIC_WALL_FULL;
+    case EL_BD_MAGIC_WALL_EMPTYING:	return EL_BD_MAGIC_WALL_EMPTY;
     case EL_AMOEBA_DRIPPING:		return EL_AMOEBA_WET;
 
     default:				return element;
@@ -3021,10 +3021,9 @@ int el2gfx_OLD(int element)
     case EL_WALL:			return GFX_MAUERWERK;
     case EL_WALL_CRUMBLED:		return GFX_FELSBODEN;
     case EL_ROCK:			return GFX_FELSBROCKEN;
-    case EL_KEY:			return GFX_SCHLUESSEL;
     case EL_EMERALD:			return GFX_EDELSTEIN;
     case EL_EXIT_CLOSED:		return GFX_AUSGANG_ZU;
-    case EL_AUSGANG_ACT:		return GFX_AUSGANG_ACT;
+    case EL_EXIT_OPENING:		return GFX_AUSGANG_ACT;
     case EL_EXIT_OPEN:			return GFX_AUSGANG_AUF;
     case EL_SP_EXIT_OPEN:		return GFX_SP_EXIT;
     case EL_PLAYER:			return GFX_SPIELFIGUR;
@@ -3042,16 +3041,16 @@ int el2gfx_OLD(int element)
     case EL_SPACESHIP_UP:		return GFX_FLIEGER_UP;
     case EL_SPACESHIP_LEFT:		return GFX_FLIEGER_LEFT;
     case EL_SPACESHIP_DOWN:		return GFX_FLIEGER_DOWN;
-    case EL_BUTTERFLY:			return GFX_BUTTERFLY;
-    case EL_BUTTERFLY_RIGHT:		return GFX_BUTTERFLY_RIGHT;
-    case EL_BUTTERFLY_UP:		return GFX_BUTTERFLY_UP;
-    case EL_BUTTERFLY_LEFT:		return GFX_BUTTERFLY_LEFT;
-    case EL_BUTTERFLY_DOWN:		return GFX_BUTTERFLY_DOWN;
-    case EL_FIREFLY:			return GFX_FIREFLY;
-    case EL_FIREFLY_RIGHT:		return GFX_FIREFLY_RIGHT;
-    case EL_FIREFLY_UP:			return GFX_FIREFLY_UP;
-    case EL_FIREFLY_LEFT:		return GFX_FIREFLY_LEFT;
-    case EL_FIREFLY_DOWN:		return GFX_FIREFLY_DOWN;
+    case EL_BD_BUTTERFLY:		return GFX_BUTTERFLY;
+    case EL_BD_BUTTERFLY_RIGHT:		return GFX_BUTTERFLY_RIGHT;
+    case EL_BD_BUTTERFLY_UP:		return GFX_BUTTERFLY_UP;
+    case EL_BD_BUTTERFLY_LEFT:		return GFX_BUTTERFLY_LEFT;
+    case EL_BD_BUTTERFLY_DOWN:		return GFX_BUTTERFLY_DOWN;
+    case EL_BD_FIREFLY:			return GFX_FIREFLY;
+    case EL_BD_FIREFLY_RIGHT:		return GFX_FIREFLY_RIGHT;
+    case EL_BD_FIREFLY_UP:		return GFX_FIREFLY_UP;
+    case EL_BD_FIREFLY_LEFT:		return GFX_FIREFLY_LEFT;
+    case EL_BD_FIREFLY_DOWN:		return GFX_FIREFLY_DOWN;
     case EL_YAMYAM:			return GFX_MAMPFER;
     case EL_ROBOT:			return GFX_ROBOT;
     case EL_STEELWALL:			return GFX_BETON;
@@ -3124,11 +3123,11 @@ int el2gfx_OLD(int element)
     case EL_WALL_EMERALD_RED:		return GFX_ERZ_EDEL_ROT;
     case EL_WALL_EMERALD_PURPLE:	return GFX_ERZ_EDEL_LILA;
     case EL_DARK_YAMYAM:		return GFX_MAMPFER2;
-    case EL_MAGIC_WALL_BD_OFF:		return GFX_MAGIC_WALL_BD_OFF;
-    case EL_MAGIC_WALL_BD_EMPTY:	return GFX_MAGIC_WALL_BD_EMPTY;
-    case EL_MAGIC_WALL_BD_EMPTYING:	return GFX_MAGIC_WALL_BD_EMPTY;
-    case EL_MAGIC_WALL_BD_FULL:		return GFX_MAGIC_WALL_BD_FULL;
-    case EL_MAGIC_WALL_BD_DEAD:		return GFX_MAGIC_WALL_BD_DEAD;
+    case EL_BD_MAGIC_WALL:		return GFX_MAGIC_WALL_BD_OFF;
+    case EL_BD_MAGIC_WALL_EMPTY:	return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_BD_MAGIC_WALL_EMPTYING:	return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_BD_MAGIC_WALL_FULL:		return GFX_MAGIC_WALL_BD_FULL;
+    case EL_BD_MAGIC_WALL_DEAD:		return GFX_MAGIC_WALL_BD_DEAD;
     case EL_DYNABOMB_ACTIVE_1:		return GFX_DYNABOMB;
     case EL_DYNABOMB_ACTIVE_2:		return GFX_DYNABOMB;
     case EL_DYNABOMB_ACTIVE_3:		return GFX_DYNABOMB;
@@ -3136,21 +3135,21 @@ int el2gfx_OLD(int element)
     case EL_DYNABOMB_NR:		return GFX_DYNABOMB_NR;
     case EL_DYNABOMB_SZ:		return GFX_DYNABOMB_SZ;
     case EL_DYNABOMB_XL:		return GFX_DYNABOMB_XL;
-    case EL_SOKOBAN_OBJEKT:		return GFX_SOKOBAN_OBJEKT;
-    case EL_SOKOBAN_FELD_LEER:		return GFX_SOKOBAN_FELD_LEER;
-    case EL_SOKOBAN_FELD_VOLL:		return GFX_SOKOBAN_FELD_VOLL;
+    case EL_SOKOBAN_OBJECT:		return GFX_SOKOBAN_OBJEKT;
+    case EL_SOKOBAN_FIELD_EMPTY:	return GFX_SOKOBAN_FELD_LEER;
+    case EL_SOKOBAN_FIELD_FULL:		return GFX_SOKOBAN_FELD_VOLL;
     case EL_MOLE:			return GFX_MOLE;
     case EL_PENGUIN:			return GFX_PINGUIN;
     case EL_PIG:			return GFX_SCHWEIN;
     case EL_DRAGON:			return GFX_DRACHE;
     case EL_SATELLITE:			return GFX_SONDE;
-    case EL_ARROW_LEFT:			return GFX_PFEIL_LEFT;
-    case EL_ARROW_RIGHT:		return GFX_PFEIL_RIGHT;
-    case EL_ARROW_UP:			return GFX_PFEIL_UP;
-    case EL_ARROW_DOWN:			return GFX_PFEIL_DOWN;
+    case EL_ARROW_BLUE_LEFT:		return GFX_PFEIL_LEFT;
+    case EL_ARROW_BLUE_RIGHT:		return GFX_PFEIL_RIGHT;
+    case EL_ARROW_BLUE_UP:		return GFX_PFEIL_UP;
+    case EL_ARROW_BLUE_DOWN:		return GFX_PFEIL_DOWN;
     case EL_SPEED_PILL:			return GFX_SPEED_PILL;
     case EL_SP_TERMINAL_ACTIVE:		return GFX_SP_TERMINAL;
-    case EL_SP_BUG_ACTIVE:		return GFX_SP_BUG_ACTIVE;
+    case EL_SP_BUGGY_BASE_ACTIVE:	return GFX_SP_BUG_ACTIVE;
     case EL_SP_ZONK:			return GFX_SP_ZONK;
       /* ^^^^^^^^^^ non-standard position in supaplex graphic set! */
     case EL_INVISIBLE_STEELWALL:	return GFX_INVISIBLE_STEEL;
@@ -3179,7 +3178,7 @@ int el2gfx_OLD(int element)
     case EL_DOOR_WHITE_GRAY:		return GFX_DOOR_WHITE_GRAY;
     case EL_KEY_WHITE:			return GFX_KEY_WHITE;
     case EL_SHIELD_NORMAL:		return GFX_SHIELD_PASSIVE;
-    case EL_SHIELD_ACTIVE:		return GFX_SHIELD_ACTIVE;
+    case EL_SHIELD_DEADLY:		return GFX_SHIELD_ACTIVE;
     case EL_EXTRA_TIME:			return GFX_EXTRA_TIME;
     case EL_SWITCHGATE_OPEN:		return GFX_SWITCHGATE_OPEN;
     case EL_SWITCHGATE_CLOSED:		return GFX_SWITCHGATE_CLOSED;
@@ -3230,19 +3229,19 @@ int el2gfx_OLD(int element)
     case EL_MOLE_UP:			return GFX_MOLE_UP;
     case EL_MOLE_DOWN:			return GFX_MOLE_DOWN;
     case EL_STEELWALL_SLANTED:		return GFX_STEEL_SLANTED;
-    case EL_SAND_INVISIBLE:		return GFX_SAND_INVISIBLE;
+    case EL_INVISIBLE_SAND:		return GFX_SAND_INVISIBLE;
     case EL_DX_UNKNOWN_15:		return GFX_DX_UNKNOWN_15;
     case EL_DX_UNKNOWN_42:		return GFX_DX_UNKNOWN_42;
     case EL_TIMEGATE_OPEN:		return GFX_TIMEGATE_OPEN;
     case EL_TIMEGATE_CLOSED:		return GFX_TIMEGATE_CLOSED;
-    case EL_TIMEGATE_SWITCH_ON:		return GFX_TIMEGATE_SWITCH;
-    case EL_TIMEGATE_SWITCH_OFF:	return GFX_TIMEGATE_SWITCH;
+    case EL_TIMEGATE_SWITCH_ACTIVE:	return GFX_TIMEGATE_SWITCH;
+    case EL_TIMEGATE_SWITCH:		return GFX_TIMEGATE_SWITCH;
     case EL_BALLOON:			return GFX_BALLOON;
     case EL_BALLOON_SEND_LEFT:		return GFX_BALLOON_SEND_LEFT;
     case EL_BALLOON_SEND_RIGHT:		return GFX_BALLOON_SEND_RIGHT;
     case EL_BALLOON_SEND_UP:		return GFX_BALLOON_SEND_UP;
     case EL_BALLOON_SEND_DOWN:		return GFX_BALLOON_SEND_DOWN;
-    case EL_BALLOON_SEND_ANY:		return GFX_BALLOON_SEND_ANY;
+    case EL_BALLOON_SEND_ANY_DIRECTION:	return GFX_BALLOON_SEND_ANY;
     case EL_EMC_STEELWALL1:		return GFX_EMC_STEEL_WALL_1;
     case EL_EMC_STEELWALL2:		return GFX_EMC_STEEL_WALL_2;
     case EL_EMC_STEELWALL3:		return GFX_EMC_STEEL_WALL_3;
@@ -3255,20 +3254,20 @@ int el2gfx_OLD(int element)
     case EL_EMC_WALL6:			return GFX_EMC_WALL_6;
     case EL_EMC_WALL7:			return GFX_EMC_WALL_7;
     case EL_EMC_WALL8:			return GFX_EMC_WALL_8;
-    case EL_TUBE_CROSS:			return GFX_TUBE_CROSS;
+    case EL_TUBE_ALL:			return GFX_TUBE_CROSS;
     case EL_TUBE_VERTICAL:		return GFX_TUBE_VERTICAL;
     case EL_TUBE_HORIZONTAL:		return GFX_TUBE_HORIZONTAL;
-    case EL_TUBE_VERT_LEFT:		return GFX_TUBE_VERT_LEFT;
-    case EL_TUBE_VERT_RIGHT:		return GFX_TUBE_VERT_RIGHT;
-    case EL_TUBE_HORIZ_UP:		return GFX_TUBE_HORIZ_UP;
-    case EL_TUBE_HORIZ_DOWN:		return GFX_TUBE_HORIZ_DOWN;
+    case EL_TUBE_VERTICAL_LEFT:		return GFX_TUBE_VERT_LEFT;
+    case EL_TUBE_VERTICAL_RIGHT:	return GFX_TUBE_VERT_RIGHT;
+    case EL_TUBE_HORIZONTAL_UP:		return GFX_TUBE_HORIZ_UP;
+    case EL_TUBE_HORIZONTAL_DOWN:	return GFX_TUBE_HORIZ_DOWN;
     case EL_TUBE_LEFT_UP:		return GFX_TUBE_LEFT_UP;
     case EL_TUBE_LEFT_DOWN:		return GFX_TUBE_LEFT_DOWN;
     case EL_TUBE_RIGHT_UP:		return GFX_TUBE_RIGHT_UP;
     case EL_TUBE_RIGHT_DOWN:		return GFX_TUBE_RIGHT_DOWN;
     case EL_SPRING:			return GFX_SPRING;
     case EL_SPRING_MOVING:		return GFX_SPRING;
-    case EL_TRAP_INACTIVE:		return GFX_TRAP_INACTIVE;
+    case EL_TRAP:			return GFX_TRAP_INACTIVE;
     case EL_TRAP_ACTIVE:		return GFX_TRAP_ACTIVE;
     case EL_BD_WALL:			return GFX_BD_WALL;
     case EL_BD_ROCK:			return GFX_BD_ROCK;
@@ -3321,8 +3320,8 @@ int el2img(int element)
 {
   switch(element)
   {
-    case EL_BUTTERFLY:		return IMG_BD_BUTTERFLY;
-    case EL_FIREFLY:		return IMG_BD_FIREFLY;
+    case EL_BD_BUTTERFLY:	return IMG_BD_BUTTERFLY;
+    case EL_BD_FIREFLY:		return IMG_BD_FIREFLY;
     case EL_SP_ELECTRON:	return IMG_SP_ELECTRON;
 
     default:
