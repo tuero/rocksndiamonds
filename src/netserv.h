@@ -38,6 +38,10 @@
 
 #define MAX_BUFFER_SIZE		4096
 
+#if defined(TARGET_SDL)
+int NetworkServerThread(void *);
+#endif
+
 void NetworkServer(int, int);
 
 #endif

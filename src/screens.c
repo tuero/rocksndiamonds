@@ -495,7 +495,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (setup.autorecord)
 	  TapeStartRecording();
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
 	if (options.network)
 	  SendToServer_StartPlaying();
 	else

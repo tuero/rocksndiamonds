@@ -26,6 +26,7 @@
 #define PLATFORM_UNIX
 #endif
 
+
 /* ========================================================================= */
 /* define additional keywords for MS-DOS platform                            */
 /* ========================================================================= */
@@ -41,6 +42,7 @@
 #endif
 
 #endif
+
 
 /* ========================================================================= */
 /* define additional keywords for several Unix platforms                     */
@@ -74,6 +76,10 @@
 #define PLATFORM_MACOSX
 #endif
 
+#if defined(NeXT)
+#define PLATFORM_NEXT
+#endif
+
 /* detecting HP-UX by the following compiler keyword definitions:
    - in K&R mode (the default), the HP C compiler defines "hpux"
    - in ANSI mode (-Aa or -Ae), the HP C compiler defines "__hpux"
@@ -83,5 +89,15 @@
 #if defined(__hpux__) || defined(__hpux) || defined(hpux)
 #define PLATFORM_HPUX
 #endif
+
+
+/* ========================================================================= */
+/* this should better go into "system.h" or "features.h" (yet to be created) */
+/* ========================================================================= */
+
+#if defined(PLATFORM_UNIX) || defined(TARGET_SDL)
+#define NETWORK_AVALIABLE
+#endif
+
 
 #endif /* PLATFORM_H */

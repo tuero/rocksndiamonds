@@ -8,23 +8,28 @@
 *               Germany                                    *
 *               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-* network.c                                                *
+* netserv.c                                                *
 ***********************************************************/
 
 #include "libgame/platform.h"
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
 
 #include <fcntl.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/socket.h>
 #include <errno.h>
+
+#if defined(TARGET_SDL)
+#include "main.h"
+#else
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/select.h>			/* apparently needed for OS/2 port */
+#endif
 
 #include "libgame/libgame.h"
 
@@ -35,7 +40,12 @@ static int onceonly = 0;
 
 struct NetworkServerPlayerInfo
 {
+#if defined(TARGET_SDL)
+  TCPsocket fd;
+#else
   int fd;
+#endif
+
   char player_name[16];
   unsigned char number;
   struct NetworkServerPlayerInfo *next;
@@ -52,16 +62,22 @@ static struct NetworkServerPlayerInfo *first_player = NULL;
 
 #define NEXT(player) ((player)->next ? (player)->next : first_player)
 
+#if defined(TARGET_SDL)
+/* TODO: peer address */
+static TCPsocket lfd;		/* listening socket */
+static SDLNet_SocketSet fds;	/* socket set */
+#else
 static struct sockaddr_in saddr;
-static int lfd;
+static int lfd;			/* listening socket */
+static fd_set fds;		/* socket set */
+static int tcp = -1;
+#endif
+
 static unsigned char realbuffer[512], *buffer = realbuffer + 4;
 
 static int interrupt;
-static int tcp = -1;
 
 static unsigned long ServerFrameCounter = 0;
-
-static fd_set fds;
 
 static void addtobuffer(struct NetworkServerPlayerInfo *player,
 			unsigned char *b, int len)
@@ -78,7 +94,11 @@ static void flushuser(struct NetworkServerPlayerInfo *player)
 {
   if (player->nwrite)
   {
+#if defined(TARGET_SDL)
+    SDLNet_TCP_Send(player->fd, player->writbuffer, player->nwrite);
+#else
     write(player->fd, player->writbuffer, player->nwrite);
+#endif
     player->nwrite = 0;
   }
 }
@@ -124,7 +144,13 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
       }
     }
   }
+
+#if defined(TARGET_SDL)
+  SDLNet_TCP_DelSocket(fds, player->fd);
+  SDLNet_TCP_Close(player->fd);
+#else
   close(player->fd);
+#endif
 
   if (player->introduced)
   {
@@ -147,7 +173,11 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
   }
 }
 
+#if defined(TARGET_SDL)
+static void AddPlayer(TCPsocket fd)
+#else
 static void AddPlayer(int fd)
+#endif
 {
   struct NetworkServerPlayerInfo *player, *v;
   unsigned char nxn;
@@ -164,6 +194,10 @@ static void AddPlayer(int fd)
   player->introduced = 0;
   player->action = 0;
   player->action_received = FALSE;
+
+#if defined(TARGET_SDL)
+  SDLNet_TCP_AddSocket(fds, fd);
+#endif
 
   first_player = player;
 
@@ -202,9 +236,11 @@ static void AddPlayer(int fd)
 #endif
 
   player->number = nxn;
+#if !defined(TARGET_SDL)
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "client %d connecting from %s",
 	  nxn, inet_ntoa(saddr.sin_addr));
+#endif
   clients++;
 
   buffer[0] = 0;
@@ -448,18 +484,35 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   ServerFrameCounter++;
 }
 
+#if defined(TARGET_SDL)
+/* the following is not used for a standalone server;
+   the pointer points to an integer containing the port-number */
+int NetworkServerThread(void *ptr)
+{
+  NetworkServer(*((int *) ptr), 0);
+
+  /* should never be reached */
+  return 0;
+}
+#endif
+
 void NetworkServer(int port, int serveronly)
 {
-  int i, sl, on;
+  int sl;
   struct NetworkServerPlayerInfo *player;
-  int mfd;
   int r; 
   unsigned int len;
+#if defined(TARGET_SDL)
+  IPaddress ip;
+#else
+  int i, on;
+  int is_daemon = 0;
   struct protoent *tcpproto;
   struct timeval tv;
-  int is_daemon = 0;
+  int mfd;
+#endif
 
-#ifndef NeXT
+#if defined(PLATFORM_UNIX) && !defined(PLATFORM_NEXT)
   struct sigaction sact;
 #endif
 
@@ -469,10 +522,13 @@ void NetworkServer(int port, int serveronly)
   if (!serveronly)
     onceonly = 1;
 
+#if !defined(TARGET_SDL)
   if ((tcpproto = getprotobyname("tcp")) != NULL)
     tcp = tcpproto->p_proto;
+#endif
 
-#ifdef NeXT
+#if defined(PLATFORM_UNIX)
+#if defined(PLATFORM_NEXT)
   signal(SIGPIPE, SIG_IGN);
 #else
   sact.sa_handler = SIG_IGN;
@@ -480,7 +536,28 @@ void NetworkServer(int port, int serveronly)
   sact.sa_flags = 0;
   sigaction(SIGPIPE, &sact, NULL);
 #endif
+#endif
 
+#if defined(TARGET_SDL)
+
+  /* assume that SDL is already initialized */
+#if 0
+  if (SDLNet_Init() == -1)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_Init() failed");
+  atexit(SDLNet_Quit);
+#endif
+
+  if (SDLNet_ResolveHost(&ip, NULL, port) == -1)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_ResolveHost() failed");
+
+  lfd = SDLNet_TCP_Open(&ip);
+  if (!lfd)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_Open() failed");
+
+  fds = SDLNet_AllocSocketSet(MAX_PLAYERS+1);
+  SDLNet_TCP_AddSocket(fds, lfd);
+
+#else
 
   if ((lfd = socket(PF_INET, SOCK_STREAM, 0)) < 0)
     Error(ERR_EXIT_NETWORK_SERVER, "socket() failed");
@@ -496,7 +573,9 @@ void NetworkServer(int port, int serveronly)
     Error(ERR_EXIT_NETWORK_SERVER, "bind() failed");
 
   listen(lfd, 5);
+#endif
 
+#if !defined(TARGET_SDL)
   if (is_daemon)
   {
     /* become a daemon, breaking all ties with the controlling terminal */
@@ -519,6 +598,7 @@ void NetworkServer(int port, int serveronly)
     open("/dev/null", O_WRONLY);
     open("/dev/null", O_WRONLY);
   }
+#endif
 
   if (options.verbose)
   {
@@ -533,6 +613,15 @@ void NetworkServer(int port, int serveronly)
 
     for (player = first_player; player; player = player->next)
       flushuser(player);
+
+#if defined(TARGET_SDL)
+    if ((sl = SDLNet_CheckSockets(fds, 500000)) < 1)
+    {
+      Error(ERR_NETWORK_SERVER, SDLNet_GetError());
+      perror("SDLNet_CheckSockets");
+    }
+
+#else
 
     FD_ZERO(&fds);
     mfd = lfd;
@@ -554,12 +643,27 @@ void NetworkServer(int port, int serveronly)
       else
 	continue;
     }
+#endif
 
     if (sl < 0)
       continue;
     
     if (sl == 0)
       continue;
+
+    /* accept incoming connections */
+#if defined(TARGET_SDL)
+    if (SDLNet_SocketReady(lfd))
+    {
+      TCPsocket newsock;
+
+      newsock = SDLNet_TCP_Accept(lfd);
+
+      if (newsock)
+	AddPlayer(newsock);
+    }
+
+#else
 
     if (FD_ISSET(lfd, &fds))
     {
@@ -583,14 +687,27 @@ void NetworkServer(int port, int serveronly)
       }
       continue;
     }
+#endif
 
     player = first_player;
 
     do
     {
+#if defined(TARGET_SDL)
+      if (SDLNet_SocketReady(player->fd))
+#else
       if (FD_ISSET(player->fd, &fds))
+#endif
       {
-	r = read(player->fd, player->readbuffer + player->nread, MAX_BUFFER_SIZE - player->nread);
+#if defined(TARGET_SDL)
+	/* read only 1 byte, because SDLNet blocks when we want more than is
+	   in the buffer */
+	r = SDLNet_TCP_Recv(player->fd, player->readbuffer + player->nread, 1);
+#else
+	r = read(player->fd, player->readbuffer + player->nread,
+		 MAX_BUFFER_SIZE - player->nread);
+#endif
+
 	if (r <= 0)
 	{
 	  if (options.verbose)
@@ -686,4 +803,4 @@ void NetworkServer(int port, int serveronly)
   }
 }
 
-#endif /* PLATFORM_UNIX */
+#endif /* NETWORK_AVALIABLE */

@@ -656,6 +656,7 @@ struct TreeInfo
   boolean parent_link;	/* entry links back to parent directory */
   boolean user_defined;	/* user defined levels are stored in home directory */
   boolean readonly;	/* readonly levels can not be changed with editor */
+  boolean handicap;	/* level set has no handicap when set to "false" */
 
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */

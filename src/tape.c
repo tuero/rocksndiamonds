@@ -734,7 +734,7 @@ static void TapeStartGameRecording()
 {
   TapeStartRecording();
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   if (options.network)
     SendToServer_StartPlaying();
   else

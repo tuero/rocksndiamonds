@@ -2072,7 +2072,7 @@ boolean Request(char *text, unsigned int req_state)
   SetMouseCursor(CURSOR_DEFAULT);
 #endif
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   /* pause network game while waiting for request to answer */
   if (options.network &&
       game_status == GAME_MODE_PLAYING &&
@@ -2323,7 +2323,7 @@ boolean Request(char *text, unsigned int req_state)
 
   SetDrawBackgroundMask(REDRAW_FIELD);
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   /* continue network game after request */
   if (options.network &&
       game_status == GAME_MODE_PLAYING &&

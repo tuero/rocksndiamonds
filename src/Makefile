@@ -78,7 +78,7 @@ TARGET = allegro
 endif
 
 ifeq ($(PLATFORM),cross-win32)
-EXTRA_LDFLAGS = -lshfolder
+EXTRA_LDFLAGS = -lshfolder -lwsock32
 PROGNAME = ../$(PROGBASE).exe
 TARGET = sdl
 endif
@@ -93,7 +93,7 @@ SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
 ifeq ($(PLATFORM),macosx)
 SYS_LDFLAGS = -lSDL_image -lSDL_mixer -lsmpeg $(shell sdl-config --libs)
 else
-SYS_LDFLAGS = -lSDL_image -lSDL_mixer $(shell sdl-config --libs)
+SYS_LDFLAGS = -lSDL_image -lSDL_mixer -lSDL_net $(shell sdl-config --libs)
 endif
 endif
 

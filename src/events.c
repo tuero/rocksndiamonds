@@ -646,7 +646,7 @@ void HandleKey(Key key, int key_status)
     if (setup.autorecord)
       TapeStartRecording();
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
     if (options.network)
       SendToServer_StartPlaying();
     else
@@ -919,7 +919,7 @@ void HandleNoEvent()
     return;
   }
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   if (options.network)
     HandleNetworking();
 #endif

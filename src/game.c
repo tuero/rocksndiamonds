@@ -1582,7 +1582,7 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NO_MOVING);
@@ -8198,7 +8198,7 @@ void GameActions()
 #endif
     */
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
 #endif
@@ -8249,7 +8249,7 @@ void GameActions()
       stored_player[i].effective_action = stored_player[i].action;
   }
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   if (network_playing)
     SendToServer_MovePlayer(summarized_player_action);
 #endif
@@ -10559,6 +10559,8 @@ int DigField(struct PlayerInfo *player,
 #if 0
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
 #endif
+  boolean is_player = (IS_PLAYER(oldx, oldy) || mode != DF_DIG);
+  boolean player_was_pushing = player->is_pushing;
   int jx = oldx, jy = oldy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
@@ -10571,21 +10573,24 @@ int DigField(struct PlayerInfo *player,
   int old_element = Feld[jx][jy];
   int element;
 
-  if (player->MovPos == 0)
+  if (is_player)		/* function can also be called by EL_PENGUIN */
   {
-    player->is_digging = FALSE;
-    player->is_collecting = FALSE;
-  }
+    if (player->MovPos == 0)
+    {
+      player->is_digging = FALSE;
+      player->is_collecting = FALSE;
+    }
 
-  if (player->MovPos == 0)	/* last pushing move finished */
-    player->is_pushing = FALSE;
+    if (player->MovPos == 0)	/* last pushing move finished */
+      player->is_pushing = FALSE;
 
-  if (mode == DF_NO_PUSH)	/* player just stopped pushing */
-  {
-    player->is_switching = FALSE;
-    player->push_delay = 0;
+    if (mode == DF_NO_PUSH)	/* player just stopped pushing */
+    {
+      player->is_switching = FALSE;
+      player->push_delay = 0;
 
-    return MF_NO_ACTION;
+      return MF_NO_ACTION;
+    }
   }
 
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
@@ -10644,12 +10649,15 @@ int DigField(struct PlayerInfo *player,
 
   element = Feld[x][y];
 
+  if (!is_player && !IS_COLLECTIBLE(element))	/* penguin cannot collect it */
+    return MF_NO_ACTION;
+
   if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
       game.engine_version >= VERSION_IDENT(2,2,0,0))
     return MF_NO_ACTION;
 
 #if 1
-  if (game.gravity && !player->is_auto_moving &&
+  if (game.gravity && is_player && !player->is_auto_moving &&
       canFallDown(player) && move_direction != MV_DOWN &&
       !canMoveToValidFieldWithGravity(jx, jy, move_direction))
     return MF_NO_ACTION;	/* player cannot walk here due to gravity */
@@ -10939,7 +10947,7 @@ int DigField(struct PlayerInfo *player,
       {
 	RemoveField(x, y);
 
-	if (mode != DF_SNAP)
+	if (is_player && mode != DF_SNAP)
 	{
 	  GfxElement[x][y] = element;
 	  player->is_collecting = TRUE;
@@ -11025,9 +11033,10 @@ int DigField(struct PlayerInfo *player,
 	RaiseScoreElement(element);
 	PlayLevelSoundElementAction(x, y, element, ACTION_COLLECTING);
 
-	CheckTriggeredElementChangeByPlayer(x, y, element,
-					    CE_OTHER_GETS_COLLECTED,
-					    player->index_bit, dig_side);
+	if (is_player)
+	  CheckTriggeredElementChangeByPlayer(x, y, element,
+					      CE_OTHER_GETS_COLLECTED,
+					      player->index_bit, dig_side);
 
 #if 1
 	if (mode == DF_SNAP)
@@ -11074,11 +11083,25 @@ int DigField(struct PlayerInfo *player,
 #endif
 
 #if 1
-	if (game.engine_version >= VERSION_IDENT(3,0,7,1))
+
+#if 1
+	if (game.engine_version >= VERSION_IDENT(3,1,0,0))
+	{
+	  if (player->push_delay_value == -1 || !player_was_pushing)
+	    player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	}
+	else if (game.engine_version >= VERSION_IDENT(3,0,7,1))
 	{
 	  if (player->push_delay_value == -1)
 	    player->push_delay_value = GET_NEW_PUSH_DELAY(element);
 	}
+#else
+	if (game.engine_version >= VERSION_IDENT(3,0,7,1))
+	{
+	  if (player->push_delay_value == -1 || !player_was_pushing)
+	    player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+	}
+#endif
 	else if (game.engine_version >= VERSION_IDENT(2,2,0,7))
 	{
 	  if (!player->is_pushing)
@@ -11098,9 +11121,12 @@ int DigField(struct PlayerInfo *player,
 #endif
 
 #if 0
-	printf("::: push delay: %ld [%d, %d] [%d]\n",
-	       player->push_delay_value, FrameCounter, game.engine_version,
-	       player->is_pushing);
+	printf("::: push delay: %ld -> %ld [%d, %d] [%d / %d] [%d '%s': %d]\n",
+	       player->push_delay, player->push_delay_value,
+	       FrameCounter, game.engine_version,
+	       player_was_pushing, player->is_pushing,
+	       element, element_info[element].token_name,
+	       GET_NEW_PUSH_DELAY(element));
 #endif
 
 	player->is_pushing = TRUE;
@@ -11851,7 +11877,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
       Request("Do you really want to quit the game ?",
 	      REQ_ASK | REQ_STAY_CLOSED))
   {
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
     if (options.network)
       SendToServer_StopPlaying();
     else
@@ -12042,7 +12068,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PAUSE:
       if (options.network)
       {
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
 	else
@@ -12056,7 +12082,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     case GAME_CTRL_ID_PLAY:
       if (tape.pausing)
       {
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
 	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else

@@ -1584,8 +1584,9 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_MUSIC_SET	13
 #define LEVELINFO_TOKEN_FILENAME	14
 #define LEVELINFO_TOKEN_FILETYPE	15
+#define LEVELINFO_TOKEN_HANDICAP	16
 
-#define NUM_LEVELINFO_TOKENS		16
+#define NUM_LEVELINFO_TOKENS		17
 
 static LevelDirTree ldi;
 
@@ -1607,7 +1608,8 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,  &ldi.sounds_set,	"sounds_set"	},
   { TYPE_STRING,  &ldi.music_set,	"music_set"	},
   { TYPE_STRING,  &ldi.level_filename,	"filename"	},
-  { TYPE_STRING,  &ldi.level_filetype,	"filetype"	}
+  { TYPE_STRING,  &ldi.level_filetype,	"filetype"	},
+  { TYPE_STRING,  &ldi.handicap,	"handicap"	}
 };
 
 static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
@@ -1662,6 +1664,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
     ldi->level_group = FALSE;
     ldi->handicap_level = 0;
     ldi->readonly = TRUE;
+    ldi->handicap = TRUE;
   }
 }
 
@@ -1724,8 +1727,8 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
     ldi->level_group = FALSE;
     ldi->handicap_level = 0;
     ldi->readonly = TRUE;
+    ldi->handicap = TRUE;
   }
-
 
 #else
 
@@ -2006,9 +2009,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 #endif
 
   leveldir_new->handicap_level =	/* set handicap to default value */
-    (leveldir_new->user_defined ?
-     leveldir_new->last_level :
-     leveldir_new->first_level);
+    (leveldir_new->user_defined || !leveldir_new->handicap ?
+     leveldir_new->last_level : leveldir_new->first_level);
 
   pushTreeInfo(node_first, leveldir_new);
 
@@ -2880,7 +2882,7 @@ void LoadLevelSetup_SeriesInfo()
       if (level_nr > leveldir_current->last_level + 1)
 	level_nr = leveldir_current->last_level;
 
-      if (leveldir_current->user_defined)
+      if (leveldir_current->user_defined || !leveldir_current->handicap)
 	level_nr = leveldir_current->last_level;
 
       leveldir_current->handicap_level = level_nr;

@@ -13,16 +13,21 @@
 
 #include "libgame/platform.h"
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
 
 #include <signal.h>
 #include <sys/time.h>
+
+#if defined(TARGET_SDL)
+#include "main.h"
+#else
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
 
 #include "libgame/libgame.h"
 
@@ -50,7 +55,13 @@ static struct NetworkClientPlayerInfo first_player =
 
 /* server stuff */
 
-static int sfd;
+#if defined(TARGET_SDL)
+static TCPsocket sfd;		/* server socket */
+static SDLNet_SocketSet rfds;	/* socket set */
+#else
+static int sfd;			/* server socket */
+#endif
+
 static byte realbuffer[512];
 static byte readbuffer[MAX_BUFFER_SIZE], writbuffer[MAX_BUFFER_SIZE];
 static byte *buffer = realbuffer + 4;
@@ -72,7 +83,11 @@ static void SendBufferToServer(int size)
   nwrite += 4 + size;
 
   /* directly send the buffer to the network server */
+#if defined(TARGET_SDL)
+  SDLNet_TCP_Send(sfd, writbuffer, nwrite);
+#else
   write(sfd, writbuffer, nwrite);
+#endif
   nwrite = 0;
 }
 
@@ -109,6 +124,15 @@ char *getNetworkPlayerName(int player_nr)
 
 static void StartNetworkServer(int port)
 {
+#if defined(TARGET_SDL)
+  static int p;
+
+  p = port;
+  server_thread = SDL_CreateThread(NetworkServerThread, &p);
+  network_server = TRUE;
+
+#else
+
   switch (fork())
   {
     case 0:
@@ -127,7 +151,67 @@ static void StartNetworkServer(int port)
       /* we are parent process -- resume normal operation */
       return;
   }
+#endif
 }
+
+#if defined(TARGET_SDL)
+boolean ConnectToServer(char *hostname, int port)
+{
+  IPaddress ip;
+  int i;
+
+  if (port == 0)
+    port = DEFAULT_SERVER_PORT;
+
+  rfds = SDLNet_AllocSocketSet(1);
+
+  if (hostname)
+  {
+    SDLNet_ResolveHost(&ip, hostname, port);
+    if (ip.host == INADDR_NONE)
+      Error(ERR_EXIT, "cannot locate host '%s'", hostname);
+  }
+  else
+  {
+    SDLNet_Write32(0x7f000001, &ip.host);	/* 127.0.0.1 */
+    SDLNet_Write16(port, &ip.port);
+  }
+
+  sfd = SDLNet_TCP_Open(&ip);
+
+  if (sfd)
+  {
+    SDLNet_TCP_AddSocket(rfds, sfd);
+    return TRUE;
+  }
+  else
+  {
+    printf("SDLNet_TCP_Open(): %s\n", SDLNet_GetError());
+  }
+
+  if (hostname)			/* connect to specified server failed */
+    return FALSE;
+
+  printf("No rocksndiamonds server on localhost -- starting up one ...\n");
+  StartNetworkServer(port);
+
+  /* wait for server to start up and try connecting several times */
+  for (i = 0; i < 6; i++)
+  {
+    Delay(500);			/* wait 500 ms == 0.5 seconds */
+
+    if ((sfd = SDLNet_TCP_Open(&ip)))		/* connected */
+    {
+      SDLNet_TCP_AddSocket(rfds, sfd);
+      return TRUE;
+    }
+  }
+
+  /* when reaching this point, connect to newly started server has failed */
+  return FALSE;
+}
+
+#else
 
 boolean ConnectToServer(char *hostname, int port)
 {
@@ -169,7 +253,7 @@ boolean ConnectToServer(char *hostname, int port)
   if (hostname)	/* connect to specified server failed */
     return FALSE;
 
-  printf("No rocksndiamonds server on localhost - starting up one ...\n");
+  printf("No rocksndiamonds server on localhost -- starting up one ...\n");
   StartNetworkServer(port);
 
   /* wait for server to start up and try connecting several times */
@@ -191,6 +275,7 @@ boolean ConnectToServer(char *hostname, int port)
   /* when reaching this point, connect to newly started server has failed */
   return FALSE;
 }
+#endif	/* defined(TARGET_SDL) */
 
 void SendToServer_PlayerName(char *player_name)
 {
@@ -583,39 +668,60 @@ static void HandleNetworkingMessages()
   fflush(stdout);
 }
 
+/* TODO */
+
 void HandleNetworking()
 {
+#if !defined(TARGET_SDL)
   static struct timeval tv = { 0, 0 };
   fd_set rfds;
+#endif
   int r = 0;
 
-  FD_ZERO(&rfds);
-  FD_SET(sfd, &rfds);
-
-  r = select(sfd + 1, &rfds, NULL, NULL, &tv);
-
-  if (r < 0 && errno != EINTR)
-    Error(ERR_EXIT, "HandleNetworking(): select() failed");
-
-  if (r < 0)
-    FD_ZERO(&rfds);
-
-  if (FD_ISSET(sfd, &rfds))
+  do
   {
-    int r;
+#if defined(TARGET_SDL)
+    if ((r = SDLNet_CheckSockets(rfds, 1)) < 0)
+      Error(ERR_EXIT, "HandleNetworking(): SDLNet_CheckSockets() failed");
 
-    r = read(sfd, readbuffer + nread, MAX_BUFFER_SIZE - nread);
+#else
+
+    FD_ZERO(&rfds);
+    FD_SET(sfd, &rfds);
+
+    r = select(sfd + 1, &rfds, NULL, NULL, &tv);
+
+    if (r < 0 && errno != EINTR)
+      Error(ERR_EXIT, "HandleNetworking(): select() failed");
 
     if (r < 0)
-      Error(ERR_EXIT, "error reading from network server");
+      FD_ZERO(&rfds);
+#endif
 
-    if (r == 0)
-      Error(ERR_EXIT, "connection to network server lost");
+#if defined(TARGET_SDL)
+    if (r > 0)
+#else
+    if (FD_ISSET(sfd, &rfds))
+#endif
+    {
+#if defined(TARGET_SDL)
+      r = SDLNet_TCP_Recv(sfd, readbuffer + nread, 1);
+#else
+      r = read(sfd, readbuffer + nread, MAX_BUFFER_SIZE - nread);
+#endif
 
-    nread += r;
+      if (r < 0)
+	Error(ERR_EXIT, "error reading from network server");
 
-    HandleNetworkingMessages();
+      if (r == 0)
+	Error(ERR_EXIT, "connection to network server lost");
+
+      nread += r;
+
+      HandleNetworkingMessages();
+    }
   }
+  while (r > 0);
 }
 
 #endif /* PLATFORM_UNIX */

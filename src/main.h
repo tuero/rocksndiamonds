@@ -1863,6 +1863,11 @@ extern int			game_status;
 extern boolean			level_editor_test_game;
 extern boolean			network_playing;
 
+#if defined(TARGET_SDL)
+extern boolean			network_server;
+extern SDL_Thread	       *server_thread;
+#endif
+
 extern int			key_joystick_mapping;
 
 extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];

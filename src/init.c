@@ -4086,14 +4086,14 @@ static void InitMusic(char *identifier)
 
 void InitNetworkServer()
 {
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   int nr_wanted;
 #endif
 
   if (!options.network)
     return;
 
-#if defined(PLATFORM_UNIX)
+#if defined(NETWORK_AVALIABLE)
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(options.server_host, options.server_port))
@@ -4367,6 +4367,11 @@ void CloseAllAndExit(int exit_value)
 
   FreeAllImages();
   FreeTileClipmasks();
+
+#if defined(TARGET_SDL)
+  if (network_server)	/* terminate network server */
+    SDL_KillThread(server_thread);
+#endif
 
   CloseVideoDisplay();
   ClosePlatformDependentStuff();
