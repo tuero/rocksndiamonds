@@ -669,7 +669,8 @@ Bitmap *LoadImage(char *filename)
   new_bitmap = X11LoadImage(filename);
 #endif
 
-  new_bitmap->source_filename = getStringCopy(filename);
+  if (new_bitmap)
+    new_bitmap->source_filename = getStringCopy(filename);
 
   return new_bitmap;
 }
@@ -737,9 +738,8 @@ inline void OpenAudio(void)
   audio.sound_available = FALSE;
   audio.music_available = FALSE;
   audio.loops_available = FALSE;
-  audio.mods_available = FALSE;
-  audio.sound_enabled = FALSE;
 
+  audio.sound_enabled = FALSE;
   audio.sound_deactivated = FALSE;
 
   audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
@@ -749,7 +749,6 @@ inline void OpenAudio(void)
 
   audio.channels = 0;
   audio.music_channel = 0;
-  audio.music_nr = 0;
 
 #if defined(TARGET_SDL)
   SDLOpenAudio();

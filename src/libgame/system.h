@@ -230,11 +230,10 @@ struct VideoSystemInfo
 struct AudioSystemInfo
 {
   boolean sound_available;
-  boolean music_available;
   boolean loops_available;
-  boolean mods_available;
-  boolean sound_enabled;
+  boolean music_available;
 
+  boolean sound_enabled;
   boolean sound_deactivated;	/* for temporarily disabling sound */
 
   int soundserver_pipe[2];
@@ -244,7 +243,6 @@ struct AudioSystemInfo
 
   int channels;
   int music_channel;
-  int music_nr;
 };
 
 struct GfxInfo

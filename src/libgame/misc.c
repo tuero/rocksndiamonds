@@ -1174,22 +1174,22 @@ boolean FileIsGraphic(char *filename)
   return FALSE;
 }
 
-boolean FileIsSound(char *filename)
+boolean FileIsSound(char *basename)
 {
-  if (strlen(filename) > 4 &&
-      strcmp(&filename[strlen(filename) - 4], ".wav") == 0)
+  if (strlen(basename) > 4 &&
+      strcmp(&basename[strlen(basename) - 4], ".wav") == 0)
     return TRUE;
 
   return FALSE;
 }
 
-boolean FileIsMusic(char *filename)
+boolean FileIsMusic(char *basename)
 {
-  if (strlen(filename) > 4 &&
-      (strcmp(&filename[strlen(filename) - 4], ".mod") == 0 ||
-       strcmp(&filename[strlen(filename) - 4], ".MOD") == 0 ||
-       strncmp(filename, "mod.", 4) == 0 ||
-       strncmp(filename, "MOD.", 4) == 0))
+  if (strlen(basename) > 4 &&
+      (strcmp(&basename[strlen(basename) - 4], ".mod") == 0 ||
+       strcmp(&basename[strlen(basename) - 4], ".MOD") == 0 ||
+       strncmp(basename, "mod.", 4) == 0 ||
+       strncmp(basename, "MOD.", 4) == 0))
     return TRUE;
 
   return FALSE;

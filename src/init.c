@@ -157,21 +157,12 @@ void InitSound()
 
   OpenAudio();
 
+  InitSoundList(NUM_SOUNDS);
+
   for(i=0; i<NUM_SOUNDS; i++)
-  {
-    if (!LoadCustomSound(sound_name[i]))
-    {
-      Error(ERR_WARN, "sounds deactivated");
+    LoadSoundToList(sound_name[i], i);
 
-      audio.sound_available = FALSE;
-      audio.loops_available = FALSE;
-      audio.sound_enabled = FALSE;
-
-      return;
-    }
-  }
-
-  num_bg_loops = LoadCustomMusic();
+  LoadCustomMusic();
 
   StartSoundserver();
 }
@@ -1602,8 +1593,9 @@ void CloseAllAndExit(int exit_value)
   int i;
 
   StopSounds();
-  FreeSounds(NUM_SOUNDS);
   CloseAudio();
+  FreeAllSounds();
+  FreeAllMusic();
 
   FreeTileClipmasks();
   for(i=0; i<NUM_BITMAPS; i++)

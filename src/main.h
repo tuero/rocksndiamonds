@@ -398,8 +398,6 @@ extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 
 extern char		*sound_name[];
-extern int		background_loop[];
-extern int		num_bg_loops;
 extern char		*element_info[];
 extern int		num_element_info;
 

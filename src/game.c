@@ -831,8 +831,8 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_ALL);
 
-  if (setup.sound_music && num_bg_loops)
-    PlayMusic(level_nr % num_bg_loops);
+  if (setup.sound_music)
+    PlayMusic(level_nr);
 
   KeyboardAutoRepeatOff();
 
@@ -6548,8 +6548,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       else if (audio.music_available)
       { 
 	setup.sound = setup.sound_music = TRUE;
-	if (num_bg_loops)
-	  PlayMusic(level_nr % num_bg_loops);
+	PlayMusic(level_nr);
       }
       break;
 

@@ -888,13 +888,11 @@ inline void SDLOpenAudio(void)
   /* determine number of available channels */
   audio.channels = Mix_AllocateChannels(MIX_CHANNELS);
 
-  if (!audio.mods_available)	/* reserve first channel for music loops */
-  {
-    if (Mix_ReserveChannels(1) == 1)
-      audio.music_channel = 0;
-    else
-      audio.music_available = FALSE;
-  }
+  /* reserve first channel for music loops */
+  if (Mix_ReserveChannels(1) == 1)
+    audio.music_channel = 0;
+  else
+    audio.music_available = FALSE;
 
   Mix_Volume(-1, SOUND_MAX_VOLUME);
   Mix_VolumeMusic(SOUND_MAX_VOLUME);

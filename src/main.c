@@ -136,21 +136,6 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
-/* background music */
-int background_loop[] =
-{
-#if 0
-  SND_ALCHEMY,
-  SND_CHASE,
-  SND_NETWORK,
-  SND_CZARDASZ,
-  SND_TYGER,
-  SND_VOYAGER,
-  SND_TWILIGHT
-#endif
-};
-int num_bg_loops = sizeof(background_loop)/sizeof(int);
-
 char *element_info[] =
 {
   "empty space",				/* 0 */
