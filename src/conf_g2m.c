@@ -8,24 +8,56 @@
 *               Germany                                    *
 *               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-* conf_mus.h                                               *
+* conf_g2m.c                                               *
 ***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
-#ifndef CONF_MUS_H
-#define CONF_MUS_H
+#ifndef CONF_G2M_C
+#define CONF_G2M_C
 
-/* values for music configuration */
+/* values for gamemode/music mapping configuration */
 
-#define MUS_BACKGROUND					0
-#define MUS_BACKGROUND_MAIN				1
-#define MUS_BACKGROUND_LEVELS				2
-#define MUS_BACKGROUND_SCORES				3
-#define MUS_BACKGROUND_EDITOR				4
-#define MUS_BACKGROUND_INFO				5
-#define MUS_BACKGROUND_SETUP				6
+static struct
+{
+  int gamemode;
 
-#define NUM_MUSIC_FILES					7
+  int music;
+}
+gamemode_to_music[] =
+{
+  {
+    -1,
+    MUS_BACKGROUND
+  },
+  {
+    GFX_SPECIAL_ARG_MAIN,
+    MUS_BACKGROUND_MAIN
+  },
+  {
+    GFX_SPECIAL_ARG_LEVELS,
+    MUS_BACKGROUND_LEVELS
+  },
+  {
+    GFX_SPECIAL_ARG_SCORES,
+    MUS_BACKGROUND_SCORES
+  },
+  {
+    GFX_SPECIAL_ARG_EDITOR,
+    MUS_BACKGROUND_EDITOR
+  },
+  {
+    GFX_SPECIAL_ARG_INFO,
+    MUS_BACKGROUND_INFO
+  },
+  {
+    GFX_SPECIAL_ARG_SETUP,
+    MUS_BACKGROUND_SETUP
+  },
+  {
+    -1,
+    -1
+  },
+};
 
-#endif	/* CONF_MUS_H */
+#endif	/* CONF_G2M_C */

@@ -3727,8 +3727,9 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS + 1] =
   { NULL,		0				}
 };
 
-struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
+struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 {
+  { ".[DEFAULT]",	GAME_MODE_DEFAULT,		},
   { ".MAIN",		GAME_MODE_MAIN,			},
   { ".LEVELS",		GAME_MODE_LEVELS		},
   { ".SCORES",		GAME_MODE_SCORES,		},
@@ -3739,6 +3740,9 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
   { ".DOOR",		GAME_MODE_PSEUDO_DOOR,		},
   { ".PREVIEW",		GAME_MODE_PSEUDO_PREVIEW,	},
   { ".CRUMBLED",	GAME_MODE_PSEUDO_CRUMBLED,	},
+
+  /* empty suffix always matches -- check as last entry in InitMusicInfo() */
+  { "",			GAME_MODE_DEFAULT,		},
 
   { NULL,		0,				}
 };

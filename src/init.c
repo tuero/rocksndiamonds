@@ -30,6 +30,8 @@
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
 #include "conf_e2s.c"	/* include auto-generated data structure definitions */
 #include "conf_fnt.c"	/* include auto-generated data structure definitions */
+#include "conf_g2s.c"	/* include auto-generated data structure definitions */
+#include "conf_g2m.c"	/* include auto-generated data structure definitions */
 
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
@@ -1183,6 +1185,39 @@ static void InitElementSoundInfo()
   }
 }
 
+static void InitGameModeSoundInfo()
+{
+  int i;
+
+  /* set values to -1 to identify later as "uninitialized" values */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    menu.sound[i] = -1;
+
+  /* initialize gamemode/sound mapping from static configuration */
+  for (i=0; gamemode_to_sound[i].sound > -1; i++)
+  {
+    int gamemode = gamemode_to_sound[i].gamemode;
+    int sound    = gamemode_to_sound[i].sound;
+
+    if (gamemode < 0)
+      gamemode = GAME_MODE_DEFAULT;
+
+    menu.sound[gamemode] = sound;
+  }
+
+  /* now set all '-1' values to levelset specific default values */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    if (menu.sound[i] == -1)
+      menu.sound[i] = menu.sound[GAME_MODE_DEFAULT];
+
+#if 0
+  /* TEST ONLY */
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    if (menu.sound[i] != -1)
+      printf("::: menu.sound[%d] == %d\n", i, menu.sound[i]);
+#endif
+}
+
 static void set_sound_parameters(int sound, char **parameter_raw)
 {
   int parameter[NUM_SND_ARGS];
@@ -1335,34 +1370,34 @@ static void InitSoundInfo()
 #endif
 }
 
-static void InitLevelsetMusicInfo()
+static void InitGameModeMusicInfo()
 {
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
-  int i, j;
+  int default_levelset_music = -1;
+  int i;
 
   /* set values to -1 to identify later as "uninitialized" values */
+  for (i=0; i < MAX_LEVELS; i++)
+    levelset.music[i] = -1;
   for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
-    for (j=0; j < MAX_LEVELS; j++)
-      levelset.music[i][j] = -1;
+    menu.music[i] = -1;
 
-#if 0
   /* initialize gamemode/music mapping from static configuration */
-  for (i=0; gamemode_to_music[i].element > -1; i++)
+  for (i=0; gamemode_to_music[i].music > -1; i++)
   {
     int gamemode = gamemode_to_music[i].gamemode;
-    int level    = gamemode_to_music[i].level;
     int music    = gamemode_to_music[i].music;
 
-    if (gamemode < 0)
-      gamemode = 0;
-
-    if (level < 0)
-      level = 0;
-
-    levelset.music[gamemode][level] = music;
-  }
+#if 0
+    printf("::: gamemode == %d, music == %d\n", gamemode, music);
 #endif
+
+    if (gamemode < 0)
+      gamemode = GAME_MODE_DEFAULT;
+
+    menu.music[gamemode] = music;
+  }
 
   /* initialize gamemode/music mapping from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
@@ -1372,39 +1407,51 @@ static void InitLevelsetMusicInfo()
     int level    = property_mapping[i].ext2_index;
     int music    = property_mapping[i].artwork_index;
 
+#if 0
+    printf("::: prefix == %d, gamemode == %d, level == %d, music == %d\n",
+	   prefix, gamemode, level, music);
+#endif
+
     if (prefix < 0 || prefix >= NUM_MUSIC_PREFIXES)
       continue;
 
     if (gamemode < 0)
-      gamemode = 0;
+      gamemode = GAME_MODE_DEFAULT;
 
-    if (level < 0)
-      level = 0;
+    /* level specific music only allowed for in-game music */
+    if (level != -1 && gamemode == GAME_MODE_DEFAULT)
+      gamemode = GAME_MODE_PLAYING;
 
-    levelset.music[gamemode][level] = music;
-  }
-
-  /* now set all '-1' values to levelset specific default values */
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
-  {
-    for (j=0; j < MAX_LEVELS; j++)
+    if (level == -1)
     {
-      /* generic default music */
-      int default_music = levelset.music[i][0];		/* may still be -1 */
-
-      /* no music for this specific game mode and level -- use default music */
-      if (levelset.music[i][j] == -1)
-	levelset.music[i][j] = default_music;
+      level = 0;
+      default_levelset_music = music;
     }
+
+    if (gamemode == GAME_MODE_PLAYING || gamemode == GAME_MODE_DEFAULT)
+      levelset.music[level] = music;
+    if (gamemode != GAME_MODE_PLAYING)
+      menu.music[gamemode] = music;
   }
+
+  /* now set all '-1' values to menu specific default values */
+  /* (undefined values of "levelset.music[]" might stay at "-1" to
+     allow dynamic selection of music files from music directory!) */
+  for (i=0; i < MAX_LEVELS; i++)
+    if (levelset.music[i] == -1)
+      levelset.music[i] = default_levelset_music;
+  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+    if (menu.music[i] == -1)
+      menu.music[i] = menu.music[GAME_MODE_DEFAULT];
 
 #if 0
   /* TEST ONLY */
+  for (i=0; i < MAX_LEVELS; i++)
+    if (levelset.music[i] != -1)
+      printf("::: levelset.music[%d] == %d\n", i, levelset.music[i]);
   for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
-    for (j=0; j < MAX_LEVELS; j++)
-      if (levelset.music[i][j] != -1)
-	printf("::: levelset.music[%d][%d] == %d\n",
-	       i, j, levelset.music[i][j]);
+    if (menu.music[i] != -1)
+      printf("::: menu.music[%d] == %d\n", i, menu.music[i]);
 #endif
 }
 
@@ -1481,6 +1528,7 @@ static void ReinitializeSounds()
 {
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
+  InitGameModeSoundInfo();	/* game mode sound mapping */
 
   InitPlayLevelSound();		/* internal game sound settings */
 }
@@ -1488,7 +1536,7 @@ static void ReinitializeSounds()
 static void ReinitializeMusic()
 {
   InitMusicInfo();		/* music properties mapping */
-  InitLevelsetMusicInfo();	/* levelset music mapping */
+  InitGameModeMusicInfo();	/* game mode music mapping */
 }
 
 void InitElementPropertiesStatic()

@@ -929,18 +929,19 @@
 #define NUM_ACTIONS				34
 
 /* values for special image configuration suffixes (must match game mode) */
-#define GFX_SPECIAL_ARG_MAIN			0
-#define GFX_SPECIAL_ARG_LEVELS			1
-#define GFX_SPECIAL_ARG_SCORES			2
-#define GFX_SPECIAL_ARG_EDITOR			3
-#define GFX_SPECIAL_ARG_INFO			4
-#define GFX_SPECIAL_ARG_SETUP			5
-#define GFX_SPECIAL_ARG_PLAYING			6
-#define GFX_SPECIAL_ARG_DOOR			7
-#define GFX_SPECIAL_ARG_PREVIEW			8
-#define GFX_SPECIAL_ARG_CRUMBLED		9
+#define GFX_SPECIAL_ARG_DEFAULT			0
+#define GFX_SPECIAL_ARG_MAIN			1
+#define GFX_SPECIAL_ARG_LEVELS			2
+#define GFX_SPECIAL_ARG_SCORES			3
+#define GFX_SPECIAL_ARG_EDITOR			4
+#define GFX_SPECIAL_ARG_INFO			5
+#define GFX_SPECIAL_ARG_SETUP			6
+#define GFX_SPECIAL_ARG_PLAYING			7
+#define GFX_SPECIAL_ARG_DOOR			8
+#define GFX_SPECIAL_ARG_PREVIEW			9
+#define GFX_SPECIAL_ARG_CRUMBLED		10
 
-#define NUM_SPECIAL_GFX_ARGS			10
+#define NUM_SPECIAL_GFX_ARGS			11
 
 
 /* values for image configuration suffixes */
@@ -1025,22 +1026,24 @@
 #define NUM_INITIAL_FONTS			4
 
 /* values for game_status (must match special image configuration suffixes) */
-#define GAME_MODE_MAIN				0
-#define GAME_MODE_LEVELS			1
-#define GAME_MODE_SCORES			2
-#define GAME_MODE_EDITOR			3
-#define GAME_MODE_INFO				4
-#define GAME_MODE_SETUP				5
-#define GAME_MODE_PLAYING			6
-#define GAME_MODE_PSEUDO_DOOR			7
-#define GAME_MODE_PSEUDO_PREVIEW		8
-#define GAME_MODE_PSEUDO_CRUMBLED		9
+#define GAME_MODE_DEFAULT			0
+#define GAME_MODE_MAIN				1
+#define GAME_MODE_LEVELS			2
+#define GAME_MODE_SCORES			3
+#define GAME_MODE_EDITOR			4
+#define GAME_MODE_INFO				5
+#define GAME_MODE_SETUP				6
+#define GAME_MODE_PLAYING			7
+#define GAME_MODE_PSEUDO_DOOR			8
+#define GAME_MODE_PSEUDO_PREVIEW		9
+#define GAME_MODE_PSEUDO_CRUMBLED		10
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME		10
-#define GAME_MODE_QUIT				11
+#define GAME_MODE_PSEUDO_TYPENAME		11
+#define GAME_MODE_QUIT				12
 
 /* special definitions currently only used for custom artwork configuration */
+#define MUSIC_PREFIX_BACKGROUND			0
 #define NUM_MUSIC_PREFIXES			1
 #define MAX_LEVELS				1000
 
@@ -1120,6 +1123,9 @@ struct MenuInfo
 
   int list_size_default;
   int list_size[NUM_SPECIAL_GFX_ARGS];
+
+  int sound[NUM_SPECIAL_GFX_ARGS];
+  int music[NUM_SPECIAL_GFX_ARGS];
 };
 
 struct DoorInfo
@@ -1198,7 +1204,7 @@ struct PlayerInfo
 
 struct LevelSetInfo
 {
-  int music[NUM_SPECIAL_GFX_ARGS][MAX_LEVELS];
+  int music[MAX_LEVELS];
 };
 
 struct LevelInfo

@@ -232,11 +232,13 @@ struct ConfigInfo sound_config[] =
   { "door.opening",			"oeffnen.wav"		},
   { "door.closing",			"oeffnen.wav"		},
 
+  { "background.MAIN",			UNDEFINED_FILENAME	},
+  { "background.LEVELS",		UNDEFINED_FILENAME	},
   { "background.SCORES",		"halloffame.wav"	},
   { "background.SCORES.mode_loop",	"false"			},
-
-  { "background.INFO",			"rhythmloop.wav"	},
-  { "background.INFO.mode_loop",	"true"			},
+  { "background.EDITOR",		UNDEFINED_FILENAME	},
+  { "background.INFO",			UNDEFINED_FILENAME	},
+  { "background.SETUP",			UNDEFINED_FILENAME	},
 
 #if 0
   { "[not used]",			"antigrav.wav"		},

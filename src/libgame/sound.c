@@ -870,7 +870,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   }
   else
   {
-    if (snd_ctrl.nr >= num_sounds)
+    if (snd_ctrl.nr < 0 || snd_ctrl.nr >= num_sounds)
       return;
 
     snd_info = getSoundInfoEntryFromSoundID(snd_ctrl.nr);
@@ -1866,6 +1866,20 @@ static void *Load_MOD(char *filename)
 #endif
 }
 
+static void *Load_WAV_or_MOD(char *filename)
+{
+  char *basename = strrchr(filename, '/');
+
+  basename = (basename != NULL ? basename + 1 : filename);
+
+  if (FileIsSound(basename))
+    return Load_WAV(filename);
+  else if (FileIsMusic(basename))
+    return Load_MOD(filename);
+  else
+    return NULL;
+}
+
 void LoadCustomMusic_NoConf(void)
 {
   static boolean draw_init_text = TRUE;		/* only draw at startup */
@@ -2183,7 +2197,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   /* ---------- initialize artwork loading/freeing functions ---------- */
 
-  music_info->load_artwork = Load_MOD;
+  music_info->load_artwork = Load_WAV_or_MOD;
   music_info->free_artwork = FreeMusic;
 }
 

@@ -8610,10 +8610,10 @@ static void StopLevelSoundActionIfLoop(int x, int y, int action)
 static void PlayLevelMusic()
 {
 #if 1
-  if (levelset.music[game_status][level_nr] != MUS_UNDEFINED)
-    PlayMusic(levelset.music[game_status][level_nr]);
+  if (levelset.music[level_nr] != MUS_UNDEFINED)
+    PlayMusic(levelset.music[level_nr]);	/* from config file */
   else
-    PlayMusic(-(level_nr + 1));
+    PlayMusic(-(level_nr + 1));			/* from music dir */
 #else
   PlayMusic(level_nr);
 #endif

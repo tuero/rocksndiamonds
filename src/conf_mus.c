@@ -35,7 +35,10 @@ struct ConfigInfo music_config[] =
   { "background.EDITOR",		UNDEFINED_FILENAME	},
   { "background.INFO",			"rhythmloop.wav"	},
   { "background.SETUP",			UNDEFINED_FILENAME	},
-  { "background.PLAYING",		UNDEFINED_FILENAME	},
+
+  /* there is no definition for "background.PLAYING", because this would
+     prevent selecting music from music directory that is not defined in
+     "musicinfo.conf", when no default music is defined here */
 
   { NULL,				NULL			}
 };

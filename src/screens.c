@@ -139,18 +139,38 @@ static void drawChooseTreeCursor(int ypos, int color)
   game_status = last_game_status;	/* restore current game status */
 }
 
-static void PlaySound_Menu_Start(int sound)
+static void PlayMenuSound()
 {
+  int sound = menu.sound[game_status];
+
+  if (sound == SND_UNDEFINED)
+    return;
+
   if (sound_info[sound].loop)
     PlaySoundLoop(sound);
   else
     PlaySound(sound);
 }
 
-static void PlaySound_Menu_Continue(int sound)
+static void PlayMenuSoundIfLoop()
 {
+  int sound = menu.sound[game_status];
+
+  if (sound == SND_UNDEFINED)
+    return;
+
   if (sound_info[sound].loop)
     PlaySoundLoop(sound);
+}
+
+static void PlayMenuMusic()
+{
+  int music = menu.music[game_status];
+
+  if (music == MUS_UNDEFINED)
+    return;
+
+  PlayMusic(music);
 }
 
 void DrawHeadline()
@@ -293,6 +313,9 @@ void DrawMainMenu()
   if (TAPE_IS_EMPTY(tape))
     LoadTape(level_nr);
   DrawCompleteVideoDisplay();
+
+  PlayMenuSound();
+  PlayMenuMusic();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 
@@ -1063,16 +1086,8 @@ void DrawHelpScreen()
   FadeToFront();
   InitAnimation();
 
-#if 1
-  PlaySound(SND_BACKGROUND_INFO);
-  PlayMusic(MUS_BACKGROUND_INFO);
-#else
-#if 0
-  PlaySoundLoop(SND_BACKGROUND_INFO);
-#else
-  PlaySound_Menu_Start(SND_BACKGROUND_INFO);
-#endif
-#endif
+  PlayMenuSound();
+  PlayMenuMusic();
 }
 
 void HandleHelpScreen(int button)
@@ -1129,16 +1144,7 @@ void HandleHelpScreen(int button)
 	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
     }
 
-    /* !!! workaround for playing "music" that is really a sound loop (and
-       must therefore periodically be reactivated with the current sound
-       engine !!! */
-#if 0
-#if 0
-    PlaySoundLoop(SND_BACKGROUND_INFO);
-#else
-    PlaySound_Menu_Continue(SND_BACKGROUND_INFO);
-#endif
-#endif
+    PlayMenuSoundIfLoop();
   }
 
   DoAnimation();
@@ -1556,6 +1562,9 @@ void DrawChooseLevel()
   SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
 
   DrawChooseTree(&leveldir_current);
+
+  PlayMenuSound();
+  PlayMenuMusic();
 }
 
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
@@ -1580,16 +1589,8 @@ void DrawHallOfFame(int highlight_position)
 
   HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
 
-#if 1
-  PlaySound(SND_BACKGROUND_SCORES);
-  PlayMusic(MUS_BACKGROUND_SCORES);
-#else
-#if 0
-  PlaySound(SND_BACKGROUND_SCORES);
-#else
-  PlaySound_Menu_Start(SND_BACKGROUND_SCORES);
-#endif
-#endif
+  PlayMenuSound();
+  PlayMenuMusic();
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -1674,12 +1675,8 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     DrawMainMenu();
   }
 
-#if 0
-#if 1
   if (game_status == GAME_MODE_SCORES)
-    PlaySound_Menu_Continue(SND_BACKGROUND_SCORES);
-#endif
-#endif
+    PlayMenuSoundIfLoop();
 
   DoAnimation();
   BackToFront();
@@ -2780,6 +2777,9 @@ void DrawSetupScreen()
     DrawChooseTree(&artwork.mus_current);
   else
     DrawSetupScreen_Generic();
+
+  PlayMenuSound();
+  PlayMenuMusic();
 }
 
 void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
