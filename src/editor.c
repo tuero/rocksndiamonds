@@ -1313,7 +1313,7 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 
 static void CreateControlButtons()
 {
-  Bitmap *gd_bitmap = pix[PIX_DOOR];
+  Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
@@ -1534,7 +1534,7 @@ static void CreateCounterButtons()
 
     for (j=0; j<2; j++)
     {
-      Bitmap *gd_bitmap = pix[PIX_DOOR];
+      Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
       struct GadgetInfo *gi;
       int id = (j == 0 ?
 		counterbutton_info[i].gadget_id_down :
@@ -1756,7 +1756,7 @@ static void CreateTextInputGadgets()
 
   for (i=0; i<ED_NUM_TEXTINPUT; i++)
   {
-    Bitmap *gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
     int gd_x, gd_y;
     struct GadgetInfo *gi;
     unsigned long event_mask;
@@ -1803,7 +1803,7 @@ static void CreateScrollbarGadgets()
   for (i=0; i<ED_NUM_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
-    Bitmap *gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -1868,7 +1868,7 @@ static void CreateScrollbarGadgets()
 
 static void CreateCheckbuttonGadgets()
 {
-  Bitmap *gd_bitmap = pix[PIX_DOOR];
+  Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
@@ -2137,7 +2137,7 @@ void DrawLevelEd()
   }
 
   /* copy default editor door content to main double buffer */
-  BlitBitmap(pix[PIX_DOOR], drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   /* draw mouse button brush elements */
@@ -2155,7 +2155,7 @@ void DrawLevelEd()
   DrawSpecialEditorDoor();
 
   /* draw new control window */
-  BlitBitmap(pix[PIX_DOOR], drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX8, 236, EXSIZE, EYSIZE, EX, EY);
 
   redraw_mask |= REDRAW_ALL;
@@ -2163,7 +2163,7 @@ void DrawLevelEd()
   MapControlButtons();
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
-  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+  BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   DrawEditModeWindow();
@@ -4258,7 +4258,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
   else
   {
     CloseDoor(DOOR_CLOSE_1);
-    BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+    BlitBitmap(bitmap_db_door, bitmap_db_door,
 	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
 	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
     OpenDoor(DOOR_OPEN_1);

@@ -1625,6 +1625,7 @@ struct NewGraphicInfo
 
 extern GC		tile_clip_gc;
 extern Bitmap	       *pix[];
+extern Bitmap	       *bitmap_db_field, *bitmap_db_door;
 extern Pixmap		tile_clipmask[];
 extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;

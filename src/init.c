@@ -399,8 +399,12 @@ void InitGfx()
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
 
   /* create additional image buffers for double-buffering */
-  pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
-  pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+  bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+  bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+#if 1
+  pix[PIX_DB_FIELD] = bitmap_db_field;
+  pix[PIX_DB_DOOR]  = bitmap_db_door;
+#endif
 
   pix[PIX_FONT_SMALL] = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
 
@@ -432,12 +436,12 @@ void InitGfxBackground()
   int x, y;
 
   drawto = backbuffer;
-  fieldbuffer = pix[PIX_DB_FIELD];
+  fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
   BlitBitmap(pix[PIX_BACK], backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  ClearRectangle(pix[PIX_DB_DOOR], 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
+  ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
   for (x=0; x<MAX_BUF_XSIZE; x++)
     for (y=0; y<MAX_BUF_YSIZE; y++)

@@ -110,7 +110,7 @@ static void ToggleFullscreenIfNeeded()
   if (setup.fullscreen != video.fullscreen_enabled)
   {
     /* save old door content */
-    BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+    BlitBitmap(backbuffer, bitmap_db_door,
 	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
     /* toggle fullscreen */
@@ -118,10 +118,11 @@ static void ToggleFullscreenIfNeeded()
     setup.fullscreen = video.fullscreen_enabled;
 
     /* redraw background to newly created backbuffer */
-    BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
+    BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
+	       0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
 
     /* restore old door content */
-    BlitBitmap(pix[PIX_DB_DOOR], backbuffer,
+    BlitBitmap(bitmap_db_door, backbuffer,
 	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
     redraw_mask = REDRAW_ALL;
@@ -2432,11 +2433,6 @@ void HandleGameActions()
 /* ---------- new screen button stuff -------------------------------------- */
 
 /* graphic position and size values for buttons and scrollbars */
-#define SC_SCROLLBUTTON_XPOS		64
-#define SC_SCROLLBUTTON_YPOS		0
-#define SC_SCROLLBAR_XPOS		0
-#define SC_SCROLLBAR_YPOS		64
-
 #define SC_SCROLLBUTTON_XSIZE		32
 #define SC_SCROLLBUTTON_YSIZE		32
 
@@ -2453,21 +2449,21 @@ void HandleGameActions()
 
 static struct
 {
-  int xpos, ypos;
+  int gfx_unpressed, gfx_pressed;
   int x, y;
   int gadget_id;
   char *infotext;
 } scrollbutton_info[NUM_SCREEN_SCROLLBUTTONS] =
 {
   {
-    SC_SCROLLBUTTON_XPOS + 0 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
-    SC_SCROLL_UP_XPOS,					SC_SCROLL_UP_YPOS,
+    IMG_ARROW_BLUE_UP, IMG_ARROW_RED_UP,
+    SC_SCROLL_UP_XPOS, SC_SCROLL_UP_YPOS,
     SCREEN_CTRL_ID_SCROLL_UP,
     "scroll up"
   },
   {
-    SC_SCROLLBUTTON_XPOS + 1 * SC_SCROLLBUTTON_XSIZE,   SC_SCROLLBUTTON_YPOS,
-    SC_SCROLL_DOWN_XPOS,				SC_SCROLL_DOWN_YPOS,
+    IMG_ARROW_BLUE_DOWN, IMG_ARROW_RED_DOWN,
+    SC_SCROLL_DOWN_XPOS, SC_SCROLL_DOWN_YPOS,
     SCREEN_CTRL_ID_SCROLL_DOWN,
     "scroll down"
   }
@@ -2475,7 +2471,7 @@ static struct
 
 static struct
 {
-  int xpos, ypos;
+  int gfx_unpressed, gfx_pressed;
   int x, y;
   int width, height;
   int type;
@@ -2484,9 +2480,9 @@ static struct
 } scrollbar_info[NUM_SCREEN_SCROLLBARS] =
 {
   {
-    SC_SCROLLBAR_XPOS,			SC_SCROLLBAR_YPOS,
-    SX + SC_SCROLL_VERTICAL_XPOS,	SY + SC_SCROLL_VERTICAL_YPOS,
-    SC_SCROLL_VERTICAL_XSIZE,		SC_SCROLL_VERTICAL_YSIZE,
+    IMG_SCROLLBAR_BLUE, IMG_SCROLLBAR_RED,
+    SX + SC_SCROLL_VERTICAL_XPOS, SY + SC_SCROLL_VERTICAL_YPOS,
+    SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     SCREEN_CTRL_ID_SCROLL_VERTICAL,
     "scroll level series vertically"
@@ -2495,16 +2491,17 @@ static struct
 
 static void CreateScreenScrollbuttons()
 {
-  Bitmap *gd_bitmap = pix[PIX_MORE];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
 
   for (i=0; i<NUM_SCREEN_SCROLLBUTTONS; i++)
   {
-    int id = scrollbutton_info[i].gadget_id;
+    Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
+    int gfx_unpressed, gfx_pressed;
     int x, y, width, height;
     int gd_x1, gd_x2, gd_y1, gd_y2;
+    int id = scrollbutton_info[i].gadget_id;
 
     x = scrollbutton_info[i].x;
     y = scrollbutton_info[i].y;
@@ -2515,10 +2512,15 @@ static void CreateScreenScrollbuttons()
     y += SY;
     width = SC_SCROLLBUTTON_XSIZE;
     height = SC_SCROLLBUTTON_YSIZE;
-    gd_x1 = scrollbutton_info[i].xpos;
-    gd_y1 = scrollbutton_info[i].ypos;
-    gd_x2 = gd_x1;
-    gd_y2 = gd_y1 + SC_SCROLLBUTTON_YSIZE;
+
+    gfx_unpressed = scrollbutton_info[i].gfx_unpressed;
+    gfx_pressed   = scrollbutton_info[i].gfx_pressed;
+    gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
+    gd_bitmap_pressed   = new_graphic_info[gfx_pressed].bitmap;
+    gd_x1 = new_graphic_info[gfx_unpressed].src_x;
+    gd_y1 = new_graphic_info[gfx_unpressed].src_y;
+    gd_x2 = new_graphic_info[gfx_pressed].src_x;
+    gd_y2 = new_graphic_info[gfx_pressed].src_y;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2529,8 +2531,8 @@ static void CreateScreenScrollbuttons()
 		      GDI_HEIGHT, height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);
@@ -2548,35 +2550,29 @@ static void CreateScreenScrollbars()
 
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
-    int id = scrollbar_info[i].gadget_id;
-    Bitmap *gd_bitmap = pix[PIX_MORE];
+    Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
+    int gfx_unpressed, gfx_pressed;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
     unsigned long event_mask;
     int num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+    int id = scrollbar_info[i].gadget_id;
 
-#if 0
-    if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
-      num_page_entries = num_leveldirs;
-    else
-      num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
-
-    items_max = MAX(num_leveldirs, num_page_entries);
-    items_visible = num_page_entries;
-    item_position = 0;
-#else
     items_max = num_page_entries;
     items_visible = num_page_entries;
     item_position = 0;
-#endif
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
-    gd_x1 = scrollbar_info[i].xpos;
-    gd_x2 = gd_x1 + scrollbar_info[i].width;
-    gd_y1 = scrollbar_info[i].ypos;
-    gd_y2 = scrollbar_info[i].ypos;
+    gfx_unpressed = scrollbar_info[i].gfx_unpressed;
+    gfx_pressed   = scrollbar_info[i].gfx_pressed;
+    gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
+    gd_bitmap_pressed   = new_graphic_info[gfx_pressed].bitmap;
+    gd_x1 = new_graphic_info[gfx_unpressed].src_x;
+    gd_y1 = new_graphic_info[gfx_unpressed].src_y;
+    gd_x2 = new_graphic_info[gfx_pressed].src_x;
+    gd_y2 = new_graphic_info[gfx_pressed].src_y;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2590,8 +2586,8 @@ static void CreateScreenScrollbars()
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
 		      GDI_BORDER_SIZE, SC_BORDER_SIZE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,

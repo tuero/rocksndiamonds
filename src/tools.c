@@ -1953,7 +1953,7 @@ boolean Request(char *text, unsigned int req_state)
   CloseDoor(DOOR_CLOSE_1);
 
   /* save old door content */
-  BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+  BlitBitmap(bitmap_db_door, bitmap_db_door,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
 	     DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
 
@@ -2010,7 +2010,7 @@ boolean Request(char *text, unsigned int req_state)
   }
 
   /* copy request gadgets to door backbuffer */
-  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+  BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
@@ -2156,7 +2156,7 @@ boolean Request(char *text, unsigned int req_state)
 
     if (!(req_state & REQ_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
     {
-      BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+      BlitBitmap(bitmap_db_door, bitmap_db_door,
 		 DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
 		 DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
       OpenDoor(DOOR_OPEN_1);
@@ -2182,7 +2182,7 @@ unsigned int OpenDoor(unsigned int door_state)
 
   if (door_state & DOOR_COPY_BACK)
   {
-    BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+    BlitBitmap(bitmap_db_door, bitmap_db_door,
 	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE + VYSIZE,
 	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
     door_state &= ~DOOR_COPY_BACK;
@@ -2197,9 +2197,9 @@ unsigned int CloseDoor(unsigned int door_state)
 {
   unsigned int new_door_state;
 
-  BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+  BlitBitmap(backbuffer, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-  BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+  BlitBitmap(backbuffer, bitmap_db_door,
 	     VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
 
   new_door_state = MoveDoor(door_state);
@@ -2270,7 +2270,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
-      Bitmap *bitmap = pix[PIX_DOOR];
+      Bitmap *bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 
       WaitUntilDelayReached(&door_delay, door_delay_value);
@@ -2280,7 +2280,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
 	int j = (DXSIZE - i) / 3;
 
-	BlitBitmap(pix[PIX_DB_DOOR], drawto,
+	BlitBitmap(bitmap_db_door, drawto,
 		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i/2,
 		   DXSIZE,DYSIZE - i/2, DX, DY);
 
@@ -2323,7 +2323,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	int i = (door_state & DOOR_OPEN_2 ? VXSIZE - x : x);
 	int j = (VXSIZE - i) / 3;
 
-	BlitBitmap(pix[PIX_DB_DOOR], drawto,
+	BlitBitmap(bitmap_db_door, drawto,
 		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i/2,
 		   VXSIZE, VYSIZE - i/2, VX, VY);
 
@@ -2375,7 +2375,7 @@ unsigned int MoveDoor(unsigned int door_state)
 void DrawSpecialEditorDoor()
 {
   /* draw bigger toolbox window */
-  BlitBitmap(pix[PIX_DOOR], drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX7, 0, 108, 56, EX - 4, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
@@ -2384,7 +2384,7 @@ void DrawSpecialEditorDoor()
 void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
-  BlitBitmap(pix[PIX_BACK], drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, drawto,
 	     562, 344, 108, 56, EX - 4, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
@@ -2513,7 +2513,7 @@ void CreateToolButtons()
 
   for (i=0; i<NUM_TOOL_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
     Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;

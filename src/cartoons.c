@@ -310,7 +310,7 @@ boolean ToonNeedsRedraw()
 
 void InitToons()
 {
-  InitToonScreen(pix, pix[PIX_DB_DOOR],
+  InitToonScreen(pix, bitmap_db_door,
 		 BackToFront, PrepareBackbuffer, ToonNeedsRedraw,
 		 toons, NUM_TOONS,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);

@@ -971,7 +971,7 @@ void InitGame()
   redraw_mask |= REDRAW_FROM_BACKBUFFER;
 
   /* copy default game door content to main double buffer */
-  BlitBitmap(pix[PIX_DOOR], drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   if (level_nr < 100)
@@ -998,7 +998,7 @@ void InitGame()
   MapTapeButtons();
 
   /* copy actual game door content to door double buffer for OpenDoor() */
-  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+  BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   OpenDoor(DOOR_OPEN_ALL);
@@ -6847,7 +6847,7 @@ void CreateGameButtons()
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = new_graphic_info[IMG_MENU_DOOR].bitmap;
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;
