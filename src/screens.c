@@ -840,7 +840,6 @@ void DrawHelpScreenElAction(int start)
   int graphic;
   int frame_count;
   int sync_frame;
-  int frame;
 
   while (helpscreen_action[j] != HA_END)
   {

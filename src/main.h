@@ -153,8 +153,13 @@
 
 /* values for change events for custom elements */
 #define CE_DELAY		0
+#define CE_PRESSED_BY_PLAYER	1
+#define CE_TOUCHED_BY_PLAYER	2
 
-#define NUM_CHANGE_EVENTS	1
+/* values for internal purpose only (level editor) */
+#define CE_BY_PLAYER		3
+
+#define NUM_CHANGE_EVENTS	4
 
 #define CE_BITMASK_DEFAULT	0
 

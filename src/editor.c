@@ -363,10 +363,11 @@
 #define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 4)
 #define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 5)
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 6)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 7)
+#define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 7)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 8)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 8)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 9)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -412,9 +413,10 @@
 #define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
 #define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
 #define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 19)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 20)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -494,9 +496,10 @@
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	4
 #define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	5
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	6
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		7
+#define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	7
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		8
 
-#define ED_NUM_SELECTBOX			8
+#define ED_NUM_SELECTBOX			9
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
@@ -530,8 +533,9 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	14
 #define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	15
 #define ED_CHECKBUTTON_ID_CHANGE_DELAY		16
+#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	17
 
-#define ED_NUM_CHECKBUTTONS			17
+#define ED_NUM_CHECKBUTTONS			18
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -540,7 +544,7 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_WALKABLE
 
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
-#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_DELAY
+#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -878,6 +882,14 @@ static struct ValueTextInfo options_time_units[] =
 };
 static int index_time_units = 0;
 
+static struct ValueTextInfo options_change_player_action[] =
+{
+  { CE_PRESSED_BY_PLAYER,	"pressed"			},
+  { CE_TOUCHED_BY_PLAYER,	"touched"			},
+  { -1,				NULL				}
+};
+static int index_change_player_action = 0, value_change_player_action = 0;
+
 static struct ValueTextInfo options_change_cause[] =
 {
   { 1,				"specified delay"		},
@@ -956,7 +968,15 @@ static struct
     "delay time given in", NULL, "delay time units for change"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(5),
+    GADGET_ID_CHANGE_PLAYER_ACTION,
+    -1,
+    options_change_player_action, &index_change_player_action,
+    &value_change_player_action,
+    NULL, "by player", "type of player contact"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CHANGE_CAUSE,
     -1,
     options_change_cause, &index_change_cause,
@@ -989,7 +1009,7 @@ static struct
     11, "Advanced",			"Advanced element configuration"
   },
   {
-    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(12),
     GADGET_ID_SAVE_AS_TEMPLATE,
     -1, "Save as template",		"Save current settings as new template"
   },
@@ -1196,7 +1216,7 @@ static struct
     "use graphic of element:",		"use graphic for custom element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_USE_TEMPLATE,
     &custom_element.use_template,
     "use template",			"use template for custom properties"
@@ -1205,13 +1225,19 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_CHANGEABLE,
     &custom_element_properties[EP_CHANGEABLE],
-    "element changes to    after:",	"element can change to other element"
+    "element changes to    after/when:","element can change to other element"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CHANGE_DELAY,
     &custom_element_change_events[CE_DELAY],
     NULL,				"element changes after delay"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    GADGET_ID_CHANGE_BY_PLAYER,
+    &custom_element_change_events[CE_BY_PLAYER],
+    NULL,				"element changes by player contact"
   },
 };
 
@@ -3371,6 +3397,12 @@ static void CopyCustomElementPropertiesToEditor(int element)
     (IS_WALKABLE_OVER(element) ||
      IS_WALKABLE_INSIDE(element) ||
      IS_WALKABLE_UNDER(element));
+
+  /* set change by player selectbox help value */
+  value_change_player_action =
+    (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
+     CE_PRESSED_BY_PLAYER);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3405,6 +3437,11 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_WALKABLE_UNDER] = FALSE;
   custom_element_properties[custom_element.walkable_layer] =
     custom_element_properties[EP_WALKABLE];
+
+  /* set player change event from checkbox and selectbox */
+  custom_element.change.events &= ~CE_PRESSED_BY_PLAYER;
+  custom_element.change.events &= ~CE_TOUCHED_BY_PLAYER;
+  custom_element.change.events |= value_change_player_action;
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
