@@ -12,6 +12,7 @@
 ***********************************************************/
 
 #include <string.h>
+#include <signal.h>
 
 #include "platform.h"
 
@@ -56,7 +57,7 @@ int		FrameCounter = 0;
 
 
 /* ========================================================================= */
-/* init functions                                                            */
+/* init/close functions                                                      */
 /* ========================================================================= */
 
 void InitCommandName(char *argv0)
@@ -68,12 +69,32 @@ void InitCommandName(char *argv0)
 void InitExitFunction(void (*exit_function)(int))
 {
   program.exit_function = exit_function;
+
+  /* set signal handlers to custom exit function */
+  signal(SIGINT, exit_function);
+  signal(SIGTERM, exit_function);
+
+#if defined(TARGET_SDL)
+  /* set exit function to automatically cleanup SDL stuff after exit() */
+  atexit(SDL_Quit);
+#endif
 }
 
 void InitPlatformDependantStuff(void)
 {
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
+#endif
+
+#if !defined(PLATFORM_UNIX)
+  initErrorFile();
+#endif
+}
+
+void ClosePlatformDependantStuff(void)
+{
+#if !defined(PLATFORM_UNIX)
+  dumpErrorFile();
 #endif
 }
 
@@ -156,6 +177,14 @@ inline void InitVideoDisplay(void)
   SDLInitVideoDisplay();
 #else
   X11InitVideoDisplay();
+#endif
+}
+
+inline void CloseVideoDisplay(void)
+{
+#if defined(TARGET_X11)
+  if (display)
+    XCloseDisplay(display);
 #endif
 }
 
@@ -452,7 +481,8 @@ inline void KeyboardAutoRepeatOn(void)
 		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
   SDL_EnableUNICODE(1);
 #else
-  XAutoRepeatOn(display);
+  if (display)
+    XAutoRepeatOn(display);
 #endif
 }
 
@@ -462,7 +492,8 @@ inline void KeyboardAutoRepeatOff(void)
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
   SDL_EnableUNICODE(0);
 #else
-  XAutoRepeatOff(display);
+  if (display)
+    XAutoRepeatOff(display);
 #endif
 }
 

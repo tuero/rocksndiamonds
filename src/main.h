@@ -1,14 +1,14 @@
 /***********************************************************
-*  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
+* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-*  (c) 1995-98 Artsoft Entertainment                       *
-*              Holger Schemel                              *
-*              Oststrasse 11a                              *
-*              33604 Bielefeld                             *
-*              phone: ++49 +521 290471                     *
-*              email: aeglos@valinor.owl.de                *
+* (c) 1995-2000 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-*  main.h                                                  *
+* main.h                                                   *
 ***********************************************************/
 
 #ifndef MAIN_H
@@ -24,15 +24,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef DEBUG
-#define DEBUG_TIMING	0
-#endif
-
 #include "libgame/libgame.h"
 
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
-#define WIN_SDL_DEPTH	16	/* !!! change this !!! */
 
 #if !defined(PLATFORM_MSDOS)
 #define WIN_XPOS	0

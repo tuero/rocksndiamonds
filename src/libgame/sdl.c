@@ -29,9 +29,6 @@ inline void SDLInitVideoDisplay(void)
 
   /* set default SDL depth */
   video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
-
-  /* set exit function to automatically cleanup SDL stuff after exit() */
-  atexit(SDL_Quit);
 }
 
 inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,

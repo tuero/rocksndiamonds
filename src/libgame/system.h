@@ -255,6 +255,7 @@ extern int		FrameCounter;
 void InitCommandName(char *);
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependantStuff(void);
+void ClosePlatformDependantStuff(void);
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *);
 
@@ -264,6 +265,7 @@ void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
 
 inline void InitVideoDisplay(void);
+inline void CloseVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
 inline Bitmap *CreateBitmapStruct(void);
 inline Bitmap *CreateBitmap(int, int, int);

@@ -1,14 +1,14 @@
 /***********************************************************
-*  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
+* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-*  (c) 1995-98 Artsoft Entertainment                       *
-*              Holger Schemel                              *
-*              Oststrasse 11a                              *
-*              33604 Bielefeld                             *
-*              phone: ++49 +521 290471                     *
-*              email: aeglos@valinor.owl.de                *
+* (c) 1995-2000 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-*  init.c                                                  *
+* init.c                                                   *
 ***********************************************************/
 
 #include <signal.h>
@@ -32,7 +32,6 @@ static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
 static void InitSoundServer(void);
-static void InitDisplay(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
@@ -40,20 +39,14 @@ static void InitElementProperties(void);
 
 void OpenAll(void)
 {
-#if !defined(PLATFORM_UNIX)
-  initErrorFile();
-#endif
-
   if (options.serveronly)
   {
 #if defined(PLATFORM_UNIX)
     NetworkServer(options.server_port, options.serveronly);
 #else
-    Error(ERR_WARN, "networking not supported in Windows version");
+    Error(ERR_WARN, "networking only supported in Unix version");
 #endif
-
-    /* never reached */
-    exit(0);
+    exit(0);	/* never reached */
   }
 
   InitProgramInfo(UNIX_USERDATA_DIRECTORY,
@@ -69,11 +62,11 @@ void OpenAll(void)
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
-  signal(SIGINT, CloseAllAndExit);
-  signal(SIGTERM, CloseAllAndExit);
-
-  InitDisplay();
   InitEventFilter(FilterMouseMotionEvents);
+
+  InitVideoDisplay();
+  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
+		  setup.fullscreen);
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
@@ -308,13 +301,6 @@ void InitJoysticks()
 #endif /* !TARGET_SDL */
 }
 
-void InitDisplay()
-{
-  InitVideoDisplay();
-  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
-		  setup.fullscreen);
-}
-
 void InitGfx()
 {
   int i;
@@ -447,51 +433,7 @@ void InitGfx()
 
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
 
-  /* create additional image buffers for masking of graphics */
-
-#if defined(TARGET_SDL)
-
-#if 0
-  /* initialize surface array to 'NULL' */
-  for(i=0; i<NUM_TILES; i++)
-    tile_masked[i] = NULL;
-
-  /* create only those masked surfaces we really need */
-  for(i=0; tile_needs_clipping[i].start>=0; i++)
-  {
-    for(j=0; j<tile_needs_clipping[i].count; j++)
-    {
-      SDL_Surface *sdl_image_tmp;
-      int tile = tile_needs_clipping[i].start + j;
-      int graphic = tile;
-      int src_x, src_y;
-      int bitmap_nr;
-      Bitmap src_bitmap;
-
-      getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-      src_bitmap = pix[bitmap_nr];
-
-      /* create surface for masked tile graphic */
-      if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, TILEX, TILEY,
-						WIN_SDL_DEPTH, 0, 0, 0, 0))
-	  == NULL)
-	Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-      /* create native transparent surface for current image */
-      SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
-		      SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
-      if ((tile_masked[tile] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-	Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-      SDL_FreeSurface(sdl_image_tmp);
-
-      BlitBitmap(src_bitmap, tile_masked[tile], src_x,src_y, TILEX,TILEY, 0,0);
-    }
-  }
-#endif
-
-#else /* !TARGET_SDL */
-
+#if defined(TARGET_X11)
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
@@ -543,8 +485,7 @@ void InitGfx()
 		src_x, src_y, TILEX, TILEY, 0, 0);
     }
   }
-
-#endif /* !TARGET_SDL */
+#endif /* TARGET_X11 */
 }
 
 void InitGfxBackground()
@@ -1727,40 +1668,22 @@ void CloseAllAndExit(int exit_value)
 {
   int i;
 
-#if defined(TARGET_SDL)
   StopSounds();
   FreeSounds(NUM_SOUNDS);
-#else
+
+#if !defined(TARGET_SDL)
   if (audio.soundserver_pid)
-  {
-    StopSounds();
     kill(audio.soundserver_pid, SIGTERM);
-    FreeSounds(NUM_SOUNDS);
-  }
 #endif
 
   for(i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
 
-#if defined(TARGET_SDL)
   KeyboardAutoRepeatOn();
-#else
 
-#if 0
-  if (gc)
-    XFreeGC(display, gc);
-#endif
+  CloseVideoDisplay();
 
-  if (display)
-  {
-    KeyboardAutoRepeatOn();
-    XCloseDisplay(display);
-  }
-#endif
-
-#if !defined(PLATFORM_UNIX)
-  dumpErrorFile();
-#endif
+  ClosePlatformDependantStuff();
 
   exit(exit_value);
 }
