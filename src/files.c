@@ -132,6 +132,8 @@ static void setLevelInfoToDefaults()
 
     element_info[element].change.use_content = FALSE;
     element_info[element].change.only_complete = FALSE;
+    element_info[element].change.use_random_change = FALSE;
+    element_info[element].change.random = 0;
     element_info[element].change.power = CP_NON_DESTRUCTIVE;
 
     element_info[element].change.explode = FALSE;

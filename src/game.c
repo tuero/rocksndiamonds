@@ -163,8 +163,10 @@ static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
 static void KillHeroUnlessProtected(int, int);
 
-static void CheckTriggeredElementChange(int, int);
-static void CheckPlayerElementChange(int, int, int, int);
+static void TestIfPlayerTouchesCustomElement(int, int);
+
+static boolean CheckTriggeredElementChange(int, int);
+static boolean CheckElementChange(int, int, int, int);
 static void ChangeElementNow(int, int, int);
 
 static void PlaySoundLevel(int, int, int);
@@ -1711,11 +1713,6 @@ static void RemoveField(int x, int y)
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
 
-#if 0
-  Store[x][y] = 0;
-  Store2[x][y] = 0;
-#endif
-
   AmoebaNr[x][y] = 0;
   ChangeDelay[x][y] = 0;
   Pushed[x][y] = FALSE;
@@ -1746,7 +1743,6 @@ void RemoveMovingField(int x, int y)
       return;
   }
 
-#if 1
   if (element == EL_BLOCKED &&
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
@@ -1757,31 +1753,10 @@ void RemoveMovingField(int x, int y)
   RemoveField(oldx, oldy);
   RemoveField(newx, newy);
 
-#if 1
   Store[oldx][oldy] = Store2[oldx][oldy] = 0;
-#endif
 
   if (next_element != EL_UNDEFINED)
     Feld[oldx][oldy] = next_element;
-#else
-  if (element == EL_BLOCKED &&
-      (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
-       Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
-       Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
-       Feld[oldx][oldy] == EL_AMOEBA_DROPPING))
-    Feld[oldx][oldy] = get_next_element(Feld[oldx][oldy]);
-  else
-    Feld[oldx][oldy] = EL_EMPTY;
-
-  Store[oldx][oldy] = Store2[oldx][oldy] = 0;
-
-  Feld[newx][newy] = EL_EMPTY;
-  MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
-  MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
-  ChangeDelay[oldx][oldy] = ChangeDelay[newx][newy] = 0;
-  Pushed[oldx][oldy] = Pushed[newx][newy] = FALSE;
-  GfxAction[oldx][oldy] = GfxAction[newx][newy] = ACTION_DEFAULT;
-#endif
 
   DrawLevelField(oldx, oldy);
   DrawLevelField(newx, newy);
@@ -2620,6 +2595,14 @@ void Impact(int x, int y)
     PlaySoundLevel(x, y, SND_PEARL_BREAKING);
     return;
   }
+#if 1
+  else if (impact && CheckElementChange(x, y, element, ACTION_IMPACT))
+  {
+    PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);
+
+    return;
+  }
+#else
   else if (impact && CAN_CHANGE(element) &&
 	   HAS_CHANGE_EVENT(element, CE_IMPACT))
   {
@@ -2629,6 +2612,7 @@ void Impact(int x, int y)
 
     return;
   }
+#endif
 
   if (impact && element == EL_AMOEBA_DROP)
   {
@@ -2753,11 +2737,21 @@ void Impact(int x, int y)
 	{
 	  ToggleLightSwitch(x, y + 1);
 	}
-	else if (CAN_CHANGE(smashed) &&
-		 HAS_CHANGE_EVENT(smashed, CE_SMASHED))
+#if 1
+	else
+	{
+	  CheckElementChange(x, y + 1, smashed, CE_SMASHED);
+	}
+#else
+	else if (CAN_CHANGE(smashed) && HAS_CHANGE_EVENT(smashed, CE_SMASHED))
 	{
 	  ChangeElementNow(x, y + 1, smashed);
 	}
+#endif
+      }
+      else
+      {
+	CheckElementChange(x, y + 1, smashed, CE_SMASHED);
       }
     }
   }
@@ -3974,6 +3968,7 @@ void ContinueMoving(int x, int y)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
+  int nextx = newx + dx, nexty = newy + dy;
   int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
 #if 1
   boolean pushed = Pushed[x][y];
@@ -4201,6 +4196,20 @@ void ContinueMoving(int x, int y)
     if (CAN_SMASH(element) && direction == MV_DOWN &&
 	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
       Impact(x, newy);
+#endif
+
+#if 0
+    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
+      CheckTriggeredElementChange(element, CE_COLLISION);
+#else
+#if 1
+    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
+      CheckElementChange(newx, newy, element, CE_COLLISION);
+#else
+    if ((!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty)) &&
+	CAN_CHANGE(element) && HAS_CHANGE_EVENT(element, CE_COLLISION))
+      ChangeElementNow(newx, newy, element);
+#endif
 #endif
   }
   else				/* still moving on */
@@ -5203,12 +5212,17 @@ static void ChangeElementNow(int x, int y, int element)
 
     if (!change->only_complete || complete_change)
     {
+      if (change->only_complete && change->use_random_change &&
+	  RND(change->random) != 0)
+	return;
+
       for (yy = 0; yy < 3; yy++) for(xx = 0; xx < 3 ; xx++)
       {
 	int ex = x + xx - 1;
 	int ey = y + yy - 1;
 
-	if (can_change[xx][yy])
+	if (can_change[xx][yy] && (!change->use_random_change ||
+				   RND(change->random) == 0))
 	{
 	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
 
@@ -5227,7 +5241,11 @@ static void ChangeElementNow(int x, int y, int element)
 
 static void ChangeElement(int x, int y)
 {
+#if 1
+  int element = MovingOrBlocked2Element(x, y);
+#else
   int element = Feld[x][y];
+#endif
   struct ElementChangeInfo *change = &element_info[element].change;
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
@@ -5306,12 +5324,13 @@ static void ChangeElement(int x, int y)
   }
 }
 
-static void CheckTriggeredElementChange(int trigger_element, int trigger_event)
+static boolean CheckTriggeredElementChange(int trigger_element,
+					   int trigger_event)
 {
   int i, x, y;
 
   if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
-    return;
+    return FALSE;
 
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
@@ -5328,16 +5347,22 @@ static void CheckTriggeredElementChange(int trigger_element, int trigger_event)
       }
     }
   }
+
+  return TRUE;
 }
 
-static void CheckPlayerElementChange(int x, int y, int element,
-				     int trigger_event)
+static boolean CheckElementChange(int x, int y, int element, int trigger_event)
 {
   if (!CAN_CHANGE(element) || !HAS_CHANGE_EVENT(element, trigger_event))
-    return;
+    return FALSE;
+
+  if (Feld[x][y] == EL_BLOCKED)
+    Blocked2Moving(x, y, &x, &y);
 
   ChangeDelay[x][y] = 1;
   ChangeElement(x, y);
+
+  return TRUE;
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -6268,6 +6293,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   }
 
   TestIfHeroTouchesBadThing(jx, jy);
+  TestIfPlayerTouchesCustomElement(jx, jy);
 
   if (!player->active)
     RemoveHero(player);
@@ -6366,6 +6392,31 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
   }
   else
     ScreenMovDir = MV_NO_MOVING;
+}
+
+void TestIfPlayerTouchesCustomElement(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
+  boolean center_is_player = (IS_PLAYER(x, y));
+  int i;
+
+  for (i=0; i<4; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+
+    if (center_is_player && IN_LEV_FIELD(xx, yy))
+    {
+      CheckTriggeredElementChange(Feld[xx][yy], CE_OTHER_TOUCHING);
+      CheckElementChange(xx, yy, Feld[xx][yy], CE_TOUCHED_BY_PLAYER);
+    }
+  }
 }
 
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
@@ -7206,13 +7257,14 @@ int DigField(struct PlayerInfo *player,
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
 
 	CheckTriggeredElementChange(element, CE_OTHER_PUSHING);
-	CheckPlayerElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
+	CheckElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
 
 	break;
       }
       else
       {
-	CheckPlayerElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
+	CheckTriggeredElementChange(element, CE_OTHER_PRESSING);
+	CheckElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
       }
 
       return MF_NO_ACTION;

@@ -336,9 +336,12 @@
 #define GADGET_ID_CHANGE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 48)
 #define GADGET_ID_CHANGE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 49)
 #define GADGET_ID_CHANGE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 50)
+#define GADGET_ID_CHANGE_CONT_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 51)
+#define GADGET_ID_CHANGE_CONT_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 52)
+#define GADGET_ID_CHANGE_CONT_RND_UP	(GADGET_ID_COUNTER_FIRST + 53)
 
 /* drawing area identifiers */
-#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 51)
+#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 54)
 
 #define GADGET_ID_DRAWING_LEVEL		(GADGET_ID_DRAWING_AREA_FIRST + 0)
 #define GADGET_ID_ELEMENT_CONTENT_0	(GADGET_ID_DRAWING_AREA_FIRST + 1)
@@ -377,7 +380,7 @@
 #define GADGET_ID_CUSTOM_ACCESS_LAYER	(GADGET_ID_SELECTBOX_FIRST + 8)
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 9)
 #define GADGET_ID_CHANGE_PLAYER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 10)
-#define GADGET_ID_CHANGE_IMPACT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
+#define GADGET_ID_CHANGE_COLLIDE_ACTION	(GADGET_ID_SELECTBOX_FIRST + 11)
 #define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 12)
 #define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 13)
 
@@ -433,13 +436,14 @@
 #define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 21)
 #define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 22)
 #define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 23)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 24)
-#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 25)
-#define GADGET_ID_CHANGE_IMPACT_SMASHED	(GADGET_ID_CHECKBUTTON_FIRST + 26)
-#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 27)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_CHANGE_BY_PLAYER	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CHANGE_BY_COLLISION	(GADGET_ID_CHECKBUTTON_FIRST + 27)
+#define GADGET_ID_CHANGE_BY_OTHER	(GADGET_ID_CHECKBUTTON_FIRST + 28)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 29)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -468,8 +472,9 @@
 #define ED_COUNTER_ID_MOVE_DELAY_RND	14
 #define ED_COUNTER_ID_CHANGE_DELAY_FIX	15
 #define ED_COUNTER_ID_CHANGE_DELAY_RND	16
+#define ED_COUNTER_ID_CHANGE_CONT_RND	17
 
-#define ED_NUM_COUNTERBUTTONS		17
+#define ED_NUM_COUNTERBUTTONS		18
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
@@ -478,7 +483,7 @@
 #define ED_COUNTER_ID_CUSTOM_LAST	ED_COUNTER_ID_MOVE_DELAY_RND
 
 #define ED_COUNTER_ID_CHANGE_FIRST	ED_COUNTER_ID_CHANGE_DELAY_FIX
-#define ED_COUNTER_ID_CHANGE_LAST	ED_COUNTER_ID_CHANGE_DELAY_RND
+#define ED_COUNTER_ID_CHANGE_LAST	ED_COUNTER_ID_CHANGE_CONT_RND
 
 /* values for scrollbutton gadgets */
 #define ED_SCROLLBUTTON_ID_AREA_UP	0
@@ -524,7 +529,7 @@
 #define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	8
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	9
 #define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	10
-#define ED_SELECTBOX_ID_CHANGE_IMPACT_ACTION	11
+#define ED_SELECTBOX_ID_CHANGE_COLLIDE_ACTION	11
 #define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	12
 #define ED_SELECTBOX_ID_CHANGE_POWER		13
 
@@ -567,12 +572,13 @@
 #define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	19
 #define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	20
 #define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	21
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		22
-#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	23
-#define ED_CHECKBUTTON_ID_CHANGE_IMPACT_SMASHED	24
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	25
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	22
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		23
+#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	24
+#define ED_CHECKBUTTON_ID_CHANGE_BY_COLLISION	25
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	26
 
-#define ED_NUM_CHECKBUTTONS			26
+#define ED_NUM_CHECKBUTTONS			27
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -841,7 +847,15 @@ static struct
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
     &custom_element.change.delay_random,
     NULL,				"+random", NULL
-  }
+  },
+  {
+    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(12),
+    0,					100,
+    GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
+    GADGET_ID_CHANGE_CONT_RND_TEXT,
+    &custom_element.change.random,
+    NULL,				"use random change:", NULL
+  },
 };
 
 static struct
@@ -975,17 +989,20 @@ static struct ValueTextInfo options_change_player_action[] =
 };
 static int value_change_player_action = 0;
 
-static struct ValueTextInfo options_change_impact_action[] =
+static struct ValueTextInfo options_change_collide_action[] =
 {
+  { CE_COLLISION,		"on collision"			},
   { CE_IMPACT,			"on impact"			},
   { CE_SMASHED,			"when smashed"			},
   { -1,				NULL				}
 };
-static int value_change_impact_action = 0;
+static int value_change_collide_action = 0;
 
 static struct ValueTextInfo options_change_other_action[] =
 {
   { CE_OTHER_COLLECTING,	"collecting"			},
+  { CE_OTHER_TOUCHING,		"touching"			},
+  { CE_OTHER_PRESSING,		"pressing"			},
   { CE_OTHER_PUSHING,		"pushing"			},
   { CE_OTHER_CHANGING,		"change of"			},
   { CE_OTHER_EXPLODING,		"explosion of"			},
@@ -1106,10 +1123,10 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CHANGE_IMPACT_ACTION,
+    GADGET_ID_CHANGE_COLLIDE_ACTION,
     -1,
-    options_change_impact_action,
-    &value_change_impact_action,
+    options_change_collide_action,
+    &value_change_collide_action,
     NULL, NULL, "change after impact or smash"
   },
   {
@@ -1154,7 +1171,7 @@ static struct
     11, "Advanced",			"Advanced element configuration"
   },
   {
-    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(13),
     GADGET_ID_SAVE_AS_TEMPLATE,
     -1, "Save as template",		"Save current settings as new template"
   },
@@ -1409,8 +1426,8 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CHANGE_IMPACT_SMASHED,
-    &custom_element_change_events[CE_IMPACT_SMASHED],
+    GADGET_ID_CHANGE_BY_COLLISION,
+    &custom_element_change_events[CE_BY_COLLISION],
     NULL,				"element changes by impact or smash"
   },
   {
@@ -1438,7 +1455,13 @@ static struct
     "only use complete change",		"only use complete extended content"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
+    GADGET_ID_CHANGE_USE_RANDOM,
+    &custom_element.change.use_random_change,
+    NULL,				"use random value for new content"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_USE_TEMPLATE,
     &custom_element.use_template,
     "use template",			"use template for custom properties"
@@ -3662,16 +3685,19 @@ static void CopyCustomElementPropertiesToEditor(int element)
      CE_PRESSED_BY_PLAYER);
 
   /* set change by impact/smash selectbox help value */
-  value_change_impact_action =
+  value_change_collide_action =
     (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
-     CE_IMPACT);
+     HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
+     CE_COLLISION);
 
   /* set change by other element action selectbox help value */
   value_change_other_action =
     (HAS_CHANGE_EVENT(element, CE_OTHER_EXPLODING) ? CE_OTHER_EXPLODING :
      HAS_CHANGE_EVENT(element, CE_OTHER_CHANGING) ? CE_OTHER_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_PUSHING) ? CE_OTHER_PUSHING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_PRESSING) ? CE_OTHER_PRESSING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_TOUCHING) ? CE_OTHER_TOUCHING :
      HAS_CHANGE_EVENT(element, CE_OTHER_COLLECTING) ? CE_OTHER_COLLECTING :
      CE_OTHER_COLLECTING);
 }
@@ -3729,13 +3755,16 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_change_events[CE_BY_PLAYER];
 
   /* set player change event from checkbox and selectbox */
+  custom_element_change_events[CE_COLLISION] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
-  custom_element_change_events[value_change_impact_action] =
-    custom_element_change_events[CE_IMPACT_SMASHED];
+  custom_element_change_events[value_change_collide_action] =
+    custom_element_change_events[CE_BY_COLLISION];
 
   /* set other element action change event from checkbox and selectbox */
   custom_element_change_events[CE_OTHER_COLLECTING] = FALSE;
+  custom_element_change_events[CE_OTHER_TOUCHING] = FALSE;
+  custom_element_change_events[CE_OTHER_PRESSING] = FALSE;
   custom_element_change_events[CE_OTHER_PUSHING] = FALSE;
   custom_element_change_events[CE_OTHER_CHANGING] = FALSE;
   custom_element_change_events[CE_OTHER_EXPLODING] = FALSE;

@@ -159,19 +159,22 @@
 #define CE_TOUCHED_BY_PLAYER	1
 #define CE_PRESSED_BY_PLAYER	2
 #define CE_PUSHED_BY_PLAYER	3
-#define CE_IMPACT		4
-#define CE_SMASHED		5
-#define CE_OTHER_COLLECTING	6
-#define CE_OTHER_PUSHING	7
-#define CE_OTHER_CHANGING	8
-#define CE_OTHER_EXPLODING	9
+#define CE_COLLISION		4
+#define CE_IMPACT		5
+#define CE_SMASHED		6
+#define CE_OTHER_COLLECTING	7
+#define CE_OTHER_TOUCHING	8
+#define CE_OTHER_PRESSING	9
+#define CE_OTHER_PUSHING	10
+#define CE_OTHER_CHANGING	11
+#define CE_OTHER_EXPLODING	12
 
 /* values for internal purpose only (level editor) */
-#define CE_BY_PLAYER		10
-#define CE_IMPACT_SMASHED	11
-#define CE_BY_OTHER		12
+#define CE_BY_PLAYER		13
+#define CE_BY_COLLISION		14
+#define CE_BY_OTHER		15
 
-#define NUM_CHANGE_EVENTS	13
+#define NUM_CHANGE_EVENTS	16
 
 #define CE_BITMASK_DEFAULT	0
 
@@ -1182,6 +1185,8 @@ struct ElementChangeInfo
   int content[3][3];		/* new elements after extended change */
   boolean use_content;		/* use extended change content */
   boolean only_complete;	/* only use complete content */
+  boolean use_random_change;	/* use random value for setting content */
+  int random;			/* random value for setting content */
   int power;			/* power of extended change */
 
   boolean explode;		/* explode instead of change */
