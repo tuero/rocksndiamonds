@@ -5495,7 +5495,7 @@ int get_next_element(int element)
   }
 }
 
-#if 1
+#if 0
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -5513,11 +5513,12 @@ int el_act_dir2img(int element, int action, int direction)
   element = GFX_ELEMENT(element);
   direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
 
+  /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_graphic[action][direction];
 }
 #endif
 
-#if 1
+#if 0
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -5535,6 +5536,7 @@ static int el_act_dir2crm(int element, int action, int direction)
   element = GFX_ELEMENT(element);
   direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
 
+  /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_crumbled[action][direction];
 }
 #endif
@@ -5754,6 +5756,7 @@ void InitGraphicInfo_EM(void)
 				     direction));
       int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
       int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
+      boolean has_crumbled_graphics = (base_crumbled != base_graphic);
       struct GraphicInfo *g = &graphic_info[graphic];
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
@@ -5891,15 +5894,31 @@ void InitGraphicInfo_EM(void)
       g_em->crumbled_border_size = 0;
 #endif
 
-      if (base_crumbled != base_graphic && crumbled != IMG_EMPTY_SPACE)
+#if 0
+      if (effective_element == EL_EMC_GRASS &&
+	  effective_action == ACTION_DIGGING)
+	printf("::: %d\n", crumbled);
+#endif
+
+#if 0
+      if (has_crumbled_graphics && crumbled == IMG_EMPTY_SPACE)
+	printf("::: empty crumbled: %d [%s], %d, %d\n",
+	       effective_element, element_info[effective_element].token_name,
+	       effective_action, direction);
+#endif
+
+      /* if element can be crumbled, but certain action graphics are just empty
+	 space (like snapping sand with the original R'n'D graphics), do not
+	 treat these empty space graphics as crumbled graphics in EMC engine */
+      if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
       {
-	struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
+	getGraphicSource(crumbled, frame, &src_bitmap, &src_x, &src_y);
 
 	g_em->has_crumbled_graphics = TRUE;
-	g_em->crumbled_bitmap = g_crumbled->bitmap;
-	g_em->crumbled_src_x = g_crumbled->src_x;
-	g_em->crumbled_src_y = g_crumbled->src_y;
-	g_em->crumbled_border_size = g_crumbled->border_size;
+	g_em->crumbled_bitmap = src_bitmap;
+	g_em->crumbled_src_x = src_x;
+	g_em->crumbled_src_y = src_y;
+	g_em->crumbled_border_size = graphic_info[crumbled].border_size;
       }
 
 #if 1

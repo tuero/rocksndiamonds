@@ -806,40 +806,51 @@ void InitElementGraphicInfo()
 
       for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
+	/* use action graphic as the default direction graphic, if undefined */
 	int default_action_direction_graphic = element_info[i].graphic[act];
 	int default_action_direction_crumbled = element_info[i].crumbled[act];
 
 	/* no graphic for current action -- use default direction graphic */
-	/* !!! maybe it's better to use default _action_ graphic here !!! */
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
 	    (act_remove ? default_remove_graphic :
 	     act_turning ?
 	     element_info[i].direction_graphic[ACTION_TURNING][dir] :
+	     default_action_graphic != default_graphic ?
+	     default_action_graphic :
 	     default_direction_graphic[dir]);
+
+	if (element_info[i].direction_graphic[act][dir] == -1)
+	  element_info[i].direction_graphic[act][dir] =
+	    default_action_direction_graphic;
+
 #if 1
 	if (default_action_direction_crumbled == -1)
-	  default_action_direction_crumbled = default_action_direction_graphic;
+	  default_action_direction_crumbled =
+	    element_info[i].direction_graphic[act][dir];
 #else
 	if (default_action_direction_crumbled == -1)
 	  default_action_direction_crumbled =
 	    (act_remove ? default_remove_graphic :
 	     act_turning ?
 	     element_info[i].direction_crumbled[ACTION_TURNING][dir] :
+	     default_action_crumbled != default_crumbled ?
+	     default_action_crumbled :
 	     default_direction_crumbled[dir]);
 #endif
 
-	if (element_info[i].direction_graphic[act][dir] == -1)
-	  element_info[i].direction_graphic[act][dir] =
-	    default_action_direction_graphic;
-#if 1
-	if (element_info[i].direction_crumbled[act][dir] == -1)
-	  element_info[i].direction_crumbled[act][dir] =
-	    element_info[i].direction_graphic[act][dir];
-#else
 	if (element_info[i].direction_crumbled[act][dir] == -1)
 	  element_info[i].direction_crumbled[act][dir] =
 	    default_action_direction_crumbled;
+
+#if 0
+	if (i == EL_EMC_GRASS &&
+	    act == ACTION_DIGGING &&
+	    dir == MV_BIT_DOWN)
+	  printf("::: direction_crumbled == %d, %d, %d\n",
+		 element_info[i].direction_crumbled[act][dir],
+		 default_action_direction_crumbled,
+		 element_info[i].crumbled[act]);
 #endif
       }
 
