@@ -159,7 +159,7 @@
 					 ED_GADGET_DISTANCE)
 /* extended custom change target */
 #define ED_AREA_ELEM_CONTENT6_XPOS	(29 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(9) + \
+#define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(10) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 /* group element content */
 #define ED_AREA_GROUP_CONTENT_XPOS	ED_SETTINGS_XPOS(0)
@@ -456,12 +456,14 @@
 #define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 14)
 #define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 15)
 #define GADGET_ID_CHANGE_SIDES		(GADGET_ID_SELECTBOX_FIRST + 16)
-#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 17)
-#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 18)
-#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 19)
+#define GADGET_ID_CHANGE_PLAYERS	(GADGET_ID_SELECTBOX_FIRST + 17)
+#define GADGET_ID_CHANGE_PAGES		(GADGET_ID_SELECTBOX_FIRST + 18)
+#define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 19)
+#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 20)
+#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 21)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 20)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 22)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -642,11 +644,13 @@
 #define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	14
 #define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	15
 #define ED_SELECTBOX_ID_CHANGE_SIDES		16
-#define ED_SELECTBOX_ID_CHANGE_POWER		17
-#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	18
-#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	19
+#define ED_SELECTBOX_ID_CHANGE_PLAYERS		17
+#define ED_SELECTBOX_ID_CHANGE_PAGES		18
+#define ED_SELECTBOX_ID_CHANGE_POWER		19
+#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	20
+#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	21
 
-#define ED_NUM_SELECTBOX			20
+#define ED_NUM_SELECTBOX			22
 
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE
@@ -1071,7 +1075,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(3),		ED_SETTINGS_YPOS(12),
     0,					100,
     GADGET_ID_CHANGE_CONT_RND_DOWN,	GADGET_ID_CHANGE_CONT_RND_UP,
     GADGET_ID_CHANGE_CONT_RND_TEXT,	GADGET_ID_NONE,
@@ -1322,13 +1326,61 @@ static struct ValueTextInfo options_change_other_action[] =
 
 static struct ValueTextInfo options_change_sides[] =
 {
-  { CH_SIDE_LEFT,		"left side"			},
-  { CH_SIDE_RIGHT,		"right side"			},
-  { CH_SIDE_TOP,		"top side"			},
-  { CH_SIDE_BOTTOM,		"bottom side"			},
-  { CH_SIDE_LEFT_RIGHT,		"left/right side"		},
-  { CH_SIDE_TOP_BOTTOM,		"top/bottom side"		},
-  { CH_SIDE_ANY,		"any side"			},
+  { CH_SIDE_LEFT,		"left"				},
+  { CH_SIDE_RIGHT,		"right"				},
+  { CH_SIDE_TOP,		"top"				},
+  { CH_SIDE_BOTTOM,		"bottom"			},
+  { CH_SIDE_LEFT_RIGHT,		"left/right"			},
+  { CH_SIDE_TOP_BOTTOM,		"top/bottom"			},
+  { CH_SIDE_ANY,		"any"				},
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_change_trigger_player[] =
+{
+  { 0,				"any"				},
+  { 1,				"1"				},
+  { 2,				"2"				},
+  { 3,				"3"				},
+  { 4,				"4"				},
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_change_trigger_page[] =
+{
+  { 0,				"any"				},
+  { 1,				"1"				},
+  { 2,				"2"				},
+  { 3,				"3"				},
+  { 4,				"4"				},
+  { 5,				"5"				},
+  { 6,				"6"				},
+  { 7,				"7"				},
+  { 8,				"8"				},
+  { 9,				"9"				},
+  { 10,				"10"				},
+  { 11,				"11"				},
+  { 12,				"12"				},
+  { 13,				"13"				},
+  { 14,				"14"				},
+  { 15,				"15"				},
+  { 16,				"16"				},
+  { 17,				"17"				},
+  { 18,				"18"				},
+  { 19,				"19"				},
+  { 20,				"20"				},
+  { 21,				"21"				},
+  { 22,				"22"				},
+  { 23,				"23"				},
+  { 24,				"24"				},
+  { 25,				"25"				},
+  { 26,				"26"				},
+  { 27,				"27"				},
+  { 28,				"28"				},
+  { 29,				"29"				},
+  { 30,				"30"				},
+  { 31,				"31"				},
+  { 32,				"32"				},
   { -1,				NULL				}
 };
 
@@ -1509,10 +1561,26 @@ static struct
     -1,
     options_change_sides,
     &custom_element_change.sides,
-    "... at", NULL,			"element side that causes change"
+    "... at", "side",			"element side that causes change"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CHANGE_PLAYERS,		GADGET_ID_NONE,
+    -1,
+    options_change_trigger_player,
+    &custom_element_change.trigger_player,
+    "player:", " ",			"player that causes change"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CHANGE_PAGES,		GADGET_ID_CHANGE_PLAYERS,
+    -1,
+    options_change_trigger_page,
+    &custom_element_change.trigger_page,
+    "page:", NULL,			"change page that causes change"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CHANGE_POWER,		GADGET_ID_NONE,
     -1,
     options_change_power,
@@ -1520,7 +1588,7 @@ static struct
     "replace when", NULL,		"which elements can be replaced"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(14),
     GADGET_ID_SELECT_CHANGE_PAGE,	GADGET_ID_NONE,
     3,
     options_change_page,
@@ -1608,13 +1676,13 @@ static struct
     " ", "As Template",			"Save current settings as new template"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(14),
     GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
     -1,					"New",
     " ", NULL,				"Add new change page"
   },
   {
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(14),
     GADGET_ID_DEL_CHANGE_PAGE,		GADGET_ID_ADD_CHANGE_PAGE,
     -1,					"Delete",
     NULL, NULL,				"Delete current change page"
@@ -1633,14 +1701,14 @@ static struct
 {
   {
     ED_BUTTON_MINUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PREV_CHANGE_PAGE,		GADGET_ID_NONE,
     NULL, NULL,				"select previous change page"
   },
   {
     ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
-    -1,					ED_SETTINGS_YPOS(13),
+    -1,					ED_SETTINGS_YPOS(14),
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
     NULL, "change page",		"select next change page"
@@ -1943,25 +2011,25 @@ static struct
     NULL, NULL,				"element changes by other element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CHANGE_USE_EXPLOSION,	GADGET_ID_NONE,
     &custom_element_change.explode,
     NULL, "explode instead of change",	"element explodes instead of change"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CHANGE_USE_CONTENT,	GADGET_ID_NONE,
     &custom_element_change.use_content,
     NULL, "use extended change target:","element changes to more elements"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
     &custom_element_change.only_complete,
     NULL, "replace all or nothing",	"only replace when all can be changed"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_change,
     NULL, NULL,				"use percentage for random replace"

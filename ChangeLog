@@ -1,6 +1,10 @@
+2004-02-24
+	* fixed bug with exploding amoeba (explosion 3x3 instead of 1x1)
+
 2004-02-22
 	* fixed bug with dark yamyam changing to acid when moving over acid
 	* fixed handling of levels with more than 999 seconds level time
+	  (example: level 76 of "Denmine")
 
 2004-02-21
 	* "spring push bug" reintroduced as configurable element property

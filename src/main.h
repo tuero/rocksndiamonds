@@ -1507,6 +1507,8 @@ struct ElementChangeInfo
 
   unsigned long events;		/* change events */
   int sides;			/* change sides */
+  int trigger_player;		/* player triggering change */
+  int trigger_page;		/* page triggering change */
 
   short target_element;		/* target element after change */
 

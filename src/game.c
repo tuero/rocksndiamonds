@@ -249,9 +249,14 @@ static void TestIfElementTouchesCustomElement(int, int);
 static void TestIfElementHitsCustomElement(int, int, int);
 
 static void ChangeElement(int, int, int);
+static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
 static boolean CheckTriggeredElementSideChange(int, int, int, int, int);
+static boolean CheckTriggeredElementPlayerChange(int, int, int, int, int, int);
+static boolean CheckTriggeredElementPageChange(int, int, int, int, int);
 static boolean CheckTriggeredElementChange(int, int, int, int);
+static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
 static boolean CheckElementSideChange(int, int, int, int, int, int);
+static boolean CheckElementPlayerChange(int, int, int, int, int, int, int);
 static boolean CheckElementChange(int, int, int, int);
 
 static void PlayLevelSound(int, int, int);
@@ -3169,11 +3174,9 @@ void Bang(int x, int y)
     case EL_PENGUIN:
     case EL_LAMP:
     case EL_LAMP_ACTIVE:
-
 #if 1
     case EL_AMOEBA_TO_DIAMOND:
 #endif
-
       if (IS_PLAYER(x, y))
 	Explode(x, y, EX_PHASE_START, EX_NORMAL);
       else
@@ -6659,7 +6662,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
-  CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
+  CheckTriggeredElementPageChange(x,y, Feld[x][y], CE_OTHER_IS_CHANGING, page);
 
   if (change->explode)
   {
@@ -6833,10 +6836,12 @@ static void ChangeElement(int x, int y, int page)
   }
 }
 
-static boolean CheckTriggeredElementSideChange(int lx, int ly,
-					       int trigger_element,
-					       int trigger_side,
-					       int trigger_event)
+static boolean CheckTriggeredElementChangeExt(int lx, int ly,
+					      int trigger_element,
+					      int trigger_side,
+					      int trigger_event,
+					      int trigger_player,
+					      int trigger_page)
 {
   int i, j, x, y;
 
@@ -6907,12 +6912,40 @@ static boolean CheckTriggeredElementSideChange(int lx, int ly,
 static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
 					   int trigger_event)
 {
-  return CheckTriggeredElementSideChange(lx, ly, trigger_element, CH_SIDE_ANY,
-					 trigger_event);
+  return CheckTriggeredElementChangeExt(lx, ly, trigger_element, CH_SIDE_ANY,
+					trigger_event, -1, -1);
 }
 
-static boolean CheckElementSideChange(int x, int y, int element, int side,
-				      int trigger_event, int page)
+static boolean CheckTriggeredElementSideChange(int lx, int ly,
+					       int trigger_element,
+					       int trigger_side,
+					       int trigger_event)
+{
+  return CheckTriggeredElementChangeExt(lx, ly, trigger_element, trigger_side,
+					trigger_event, -1, -1);
+}
+
+static boolean CheckTriggeredElementPlayerChange(int lx, int ly,
+						 int trigger_element,
+						 int trigger_player,
+						 int trigger_side,
+						 int trigger_event)
+{
+  return CheckTriggeredElementChangeExt(lx, ly, trigger_element, trigger_side,
+					trigger_event, trigger_player, -1);
+}
+
+static boolean CheckTriggeredElementPageChange(int lx, int ly,
+					       int trigger_element,
+					       int trigger_event,
+					       int trigger_page)
+{
+  return CheckTriggeredElementChangeExt(lx, ly, trigger_element, CH_SIDE_ANY,
+					trigger_event, -1, trigger_page);
+}
+
+static boolean CheckElementChangeExt(int x, int y, int element, int player,
+				     int side, int trigger_event, int page)
 {
   if (!CAN_CHANGE(element) || !HAS_ANY_CHANGE_EVENT(element, trigger_event))
     return FALSE;
@@ -6968,7 +7001,27 @@ static boolean CheckElementSideChange(int x, int y, int element, int side,
 
 static boolean CheckElementChange(int x, int y, int element, int trigger_event)
 {
-  return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
+  return CheckElementChangeExt(x, y, element, -1, CH_SIDE_ANY, trigger_event,
+			       -1);
+}
+
+static boolean CheckElementSideChange(int x, int y, int element,
+				      int trigger_side,
+				      int trigger_event,
+				      int page)
+{
+  return CheckElementChangeExt(x, y, element, -1, trigger_side, trigger_event,
+			       page);
+}
+
+static boolean CheckElementPlayerChange(int x, int y, int element,
+					int trigger_player,
+					int trigger_side,
+					int trigger_event,
+					int page)
+{
+  return CheckElementChangeExt(x, y, element, trigger_player, trigger_side,
+			       trigger_event, page);
 }
 
 static void PlayPlayerSound(struct PlayerInfo *player)
@@ -8379,18 +8432,21 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #if 1
       if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
       {
-	CheckTriggeredElementSideChange(old_jx, old_jy, Feld[old_jx][old_jy],
-					leave_side, CE_OTHER_GETS_LEFT);
-	CheckElementSideChange(old_jx, old_jy, Feld[old_jx][old_jy],
-			       leave_side, CE_LEFT_BY_PLAYER, -1);
+	CheckTriggeredElementPlayerChange(old_jx, old_jy, Feld[old_jx][old_jy],
+					  player->index_nr, leave_side,
+					  CE_OTHER_GETS_LEFT);
+	CheckElementPlayerChange(old_jx, old_jy, Feld[old_jx][old_jy],
+				 player->index_nr, leave_side,
+				 CE_LEFT_BY_PLAYER, -1);
       }
 
       if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
       {
-	CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy],
-					enter_side, CE_OTHER_GETS_ENTERED);
-	CheckElementSideChange(jx, jy, Feld[jx][jy],
-			       enter_side, CE_ENTERED_BY_PLAYER, -1);
+	CheckTriggeredElementPlayerChange(jx, jy, Feld[jx][jy],
+					  player->index_nr, enter_side,
+					  CE_OTHER_GETS_ENTERED);
+	CheckElementPlayerChange(jx, jy, Feld[jx][jy], player->index_nr,
+				 enter_side, CE_ENTERED_BY_PLAYER, -1);
       }
 #endif
 
@@ -8594,6 +8650,8 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
     if (IS_PLAYER(x, y))
     {
+      struct PlayerInfo *player = PLAYERINFO(x, y);
+
       if (game.engine_version < VERSION_IDENT(3,0,7,0))
 	border_element = Feld[xx][yy];		/* may be moving! */
       else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
@@ -8603,25 +8661,27 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
       else
 	continue;		/* center and border element do not touch */
 
-      CheckTriggeredElementSideChange(xx, yy, border_element, border_side,
-				      CE_OTHER_GETS_TOUCHED);
-      CheckElementSideChange(xx, yy, border_element, border_side,
-			     CE_TOUCHED_BY_PLAYER, -1);
+      CheckTriggeredElementPlayerChange(xx, yy, border_element,
+					player->index_nr, border_side,
+					CE_OTHER_GETS_TOUCHED);
+      CheckElementPlayerChange(xx, yy, border_element, player->index_nr,
+			       border_side, CE_TOUCHED_BY_PLAYER, -1);
     }
     else if (IS_PLAYER(xx, yy))
     {
+      struct PlayerInfo *player = PLAYERINFO(xx, yy);
+
       if (game.engine_version >= VERSION_IDENT(3,0,7,0))
       {
-	struct PlayerInfo *player = PLAYERINFO(xx, yy);
-
 	if (player->MovPos != 0 && !(player->MovDir & touch_dir[i]))
 	  continue;		/* center and border element do not touch */
       }
 
-      CheckTriggeredElementSideChange(x, y, center_element, center_side,
-				      CE_OTHER_GETS_TOUCHED);
-      CheckElementSideChange(x, y, center_element, center_side,
-			     CE_TOUCHED_BY_PLAYER, -1);
+      CheckTriggeredElementPlayerChange(x, y, center_element,
+					player->index_nr, center_side,
+					CE_OTHER_GETS_TOUCHED);
+      CheckElementPlayerChange(x, y, center_element, player->index_nr,
+			       center_side, CE_TOUCHED_BY_PLAYER, -1);
 
       break;
     }
@@ -9475,7 +9535,9 @@ int DigField(struct PlayerInfo *player,
 
 	PlayLevelSoundElementAction(x, y, element, ACTION_DIGGING);
 
-	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_DIGGED);
+	CheckTriggeredElementPlayerChange(x, y, element,
+					  player->index_nr, CH_SIDE_ANY,
+					  CE_OTHER_GETS_DIGGED);
 
 #if 1
 	if (mode == DF_SNAP)
@@ -9570,7 +9632,9 @@ int DigField(struct PlayerInfo *player,
 	RaiseScoreElement(element);
 	PlayLevelSoundElementAction(x, y, element, ACTION_COLLECTING);
 
-	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_COLLECTED);
+	CheckTriggeredElementPlayerChange(x, y, element, player->index_nr,
+					  CH_SIDE_ANY,
+					  CE_OTHER_GETS_COLLECTED);
 
 #if 1
 	if (mode == DF_SNAP)
@@ -9726,10 +9790,10 @@ int DigField(struct PlayerInfo *player,
 	else
 	  player->push_delay_value = -1;	/* get new value later */
 
-	CheckTriggeredElementSideChange(x, y, element, dig_side,
-					CE_OTHER_GETS_PUSHED);
-	CheckElementSideChange(x, y, element, dig_side,
-			       CE_PUSHED_BY_PLAYER, -1);
+	CheckTriggeredElementPlayerChange(x, y, element, player->index_nr,
+					  dig_side, CE_OTHER_GETS_PUSHED);
+	CheckElementPlayerChange(x, y, element, player->index_nr, dig_side,
+				 CE_PUSHED_BY_PLAYER, -1);
 
 	break;
       }
@@ -9833,15 +9897,16 @@ int DigField(struct PlayerInfo *player,
 	  player->switch_x = x;
 	  player->switch_y = y;
 
-	  CheckTriggeredElementSideChange(x, y, element, dig_side,
-					  CE_OTHER_IS_SWITCHING);
-	  CheckElementSideChange(x, y, element, dig_side, CE_SWITCHED, -1);
+	  CheckTriggeredElementPlayerChange(x, y, element, player->index_nr,
+					    dig_side, CE_OTHER_IS_SWITCHING);
+	  CheckElementPlayerChange(x, y, element, player->index_nr, dig_side,
+				   CE_SWITCHED, -1);
 	}
 
-	CheckTriggeredElementSideChange(x, y, element, dig_side,
-					CE_OTHER_GETS_PRESSED);
-	CheckElementSideChange(x, y, element, dig_side,
-			       CE_PRESSED_BY_PLAYER, -1);
+	CheckTriggeredElementPlayerChange(x, y, element, player->index_nr,
+					  dig_side, CE_OTHER_GETS_PRESSED);
+	CheckElementPlayerChange(x, y, element, player->index_nr, dig_side,
+				 CE_PRESSED_BY_PLAYER, -1);
       }
 
       return MF_NO_ACTION;
@@ -9980,8 +10045,10 @@ boolean DropElement(struct PlayerInfo *player)
     Changed[jx][jy] = 0;		/* allow another change */
 #endif
 
-    CheckTriggeredElementChange(jx, jy, new_element, CE_OTHER_GETS_DROPPED);
-    CheckElementChange(jx, jy, new_element, CE_DROPPED_BY_PLAYER);
+    CheckTriggeredElementPlayerChange(jx, jy, new_element, player->index_nr,
+				      CH_SIDE_ANY, CE_OTHER_GETS_DROPPED);
+    CheckElementPlayerChange(jx, jy, new_element, player->index_nr,
+			     CH_SIDE_ANY, CE_DROPPED_BY_PLAYER, -1);
 
     TestIfElementTouchesCustomElement(jx, jy);
   }
