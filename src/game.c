@@ -1996,6 +1996,20 @@ static void ToggleSwitchgateSwitch(int x, int y)
   }
 }
 
+static int getInvisibleActiveFromInvisibleElement(int element)
+{
+  return (element == EL_INVISIBLE_STEELWALL ? EL_INVISIBLE_STEELWALL_ACTIVE :
+	  element == EL_INVISIBLE_WALL      ? EL_INVISIBLE_WALL_ACTIVE :
+	  EL_INVISIBLE_SAND_ACTIVE);
+}
+
+static int getInvisibleFromInvisibleActiveElement(int element)
+{
+  return (element == EL_INVISIBLE_STEELWALL_ACTIVE ? EL_INVISIBLE_STEELWALL :
+	  element == EL_INVISIBLE_WALL_ACTIVE      ? EL_INVISIBLE_WALL :
+	  EL_INVISIBLE_SAND);
+}
+
 static void RedrawAllLightSwitchesAndInvisibleElements()
 {
   int x, y;
@@ -2018,11 +2032,24 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	Feld[x][y] = EL_LIGHT_SWITCH;
 	DrawLevelField(x, y);
       }
+      else if (element == EL_INVISIBLE_STEELWALL ||
+	       element == EL_INVISIBLE_WALL ||
+	       element == EL_INVISIBLE_SAND)
+      {
+	if (game.light_time_left > 0)
+	  Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
-      if (element == EL_INVISIBLE_STEELWALL ||
-	  element == EL_INVISIBLE_WALL ||
-	  element == EL_INVISIBLE_SAND)
 	DrawLevelField(x, y);
+      }
+      else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
+	       element == EL_INVISIBLE_WALL_ACTIVE ||
+	       element == EL_INVISIBLE_SAND_ACTIVE)
+      {
+	if (game.light_time_left == 0)
+	  Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
+
+	DrawLevelField(x, y);
+      }
     }
   }
 }
@@ -5021,22 +5048,7 @@ void GameActions()
     game.light_time_left--;
 
     if (game.light_time_left == 0)
-    {
-      for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
-      {
-	element = Feld[x][y];
-
-	if (element == EL_LIGHT_SWITCH_ACTIVE)
-	{
-	  Feld[x][y] = EL_LIGHT_SWITCH;
-	  DrawLevelField(x, y);
-	}
-	else if (element == EL_INVISIBLE_STEELWALL ||
-		 element == EL_INVISIBLE_WALL ||
-		 element == EL_INVISIBLE_SAND)
-	  DrawLevelField(x, y);
-      }
-    }
+      RedrawAllLightSwitchesAndInvisibleElements();
   }
 
   if (game.timegate_time_left > 0)
@@ -5885,6 +5897,7 @@ int DigField(struct PlayerInfo *player,
     case EL_EMPTY:
     case EL_SAND:
     case EL_INVISIBLE_SAND:
+    case EL_INVISIBLE_SAND_ACTIVE:
     case EL_TRAP:
     case EL_SP_BASE:
     case EL_SP_BUGGY_BASE:

@@ -1438,6 +1438,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     else if (rechts_massiv)
       graphic = GFX_MAUER_L;
   }
+#if 0
   else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
 	    element == EL_INVISIBLE_SAND) && game.light_time_left)
@@ -1446,6 +1447,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
 	       GFX_SAND_INVISIBLE_ON);
   }
+#endif
 
   if (dx || dy)
     DrawGraphicShifted(x, y, dx, dy, graphic, cut_mode, mask_mode);
@@ -1608,6 +1610,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
     else if (rechts_massiv)
       graphic = GFX_MAUER_L;
   }
+#if 0
   else if ((element == EL_INVISIBLE_STEELWALL ||
 	    element == EL_INVISIBLE_WALL ||
 	    element == EL_INVISIBLE_SAND) && game.light_time_left)
@@ -1616,6 +1619,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 	       element == EL_INVISIBLE_WALL ? GFX_UNSICHTBAR_ON :
 	       GFX_SAND_INVISIBLE_ON);
   }
+#endif
 
   if (dx || dy)
     DrawNewGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
@@ -3104,6 +3108,7 @@ int el2gfx_OLD(int element)
     case EL_PACMAN_LEFT:		return GFX_PACMAN_LEFT;
     case EL_PACMAN_DOWN:		return GFX_PACMAN_DOWN;
     case EL_INVISIBLE_WALL:		return GFX_UNSICHTBAR;
+    case EL_INVISIBLE_WALL_ACTIVE:	return GFX_UNSICHTBAR_ON;
     case EL_WALL_EMERALD:		return GFX_ERZ_EDEL;
     case EL_WALL_DIAMOND:		return GFX_ERZ_DIAM;
     case EL_LAMP:			return GFX_BIRNE_AUS;
@@ -3153,6 +3158,7 @@ int el2gfx_OLD(int element)
     case EL_SP_ZONK:			return GFX_SP_ZONK;
       /* ^^^^^^^^^^ non-standard position in supaplex graphic set! */
     case EL_INVISIBLE_STEELWALL:	return GFX_INVISIBLE_STEEL;
+    case EL_INVISIBLE_STEELWALL_ACTIVE:	return GFX_INVISIBLE_STEEL_ON;
     case EL_BLACK_ORB:			return GFX_BLACK_ORB;
     case EL_EM_GATE1:			return GFX_EM_GATE_1;
     case EL_EM_GATE2:			return GFX_EM_GATE_2;
@@ -3242,6 +3248,7 @@ int el2gfx_OLD(int element)
     case EL_MOLE_DOWN:			return GFX_MOLE_DOWN;
     case EL_STEELWALL_SLANTED:		return GFX_STEEL_SLANTED;
     case EL_INVISIBLE_SAND:		return GFX_SAND_INVISIBLE;
+    case EL_INVISIBLE_SAND_ACTIVE:	return GFX_SAND_INVISIBLE_ON;
     case EL_DX_UNKNOWN_15:		return GFX_DX_UNKNOWN_15;
     case EL_DX_UNKNOWN_42:		return GFX_DX_UNKNOWN_42;
     case EL_TIMEGATE_OPEN:		return GFX_TIMEGATE_OPEN;
