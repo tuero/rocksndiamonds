@@ -463,7 +463,7 @@ inline void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
 
 inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
-  FillRectangle(bitmap, x, y, width, height, BlackPixel(display, screen));
+  FillRectangle(bitmap, x, y, width, height, BLACK_PIXEL);
 }
 
 inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
@@ -547,10 +547,9 @@ inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
 #ifdef TARGET_SDL
-  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, 0xffffff);
+  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
 #else
-  XSetForeground(display, bitmap->gc, WhitePixel(display, screen));
-  XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
+  X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
 #endif
 }
 

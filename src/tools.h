@@ -128,8 +128,6 @@ unsigned int MoveDoor(unsigned int);
 void DrawSpecialEditorDoor();
 void UndrawSpecialEditorDoor();
 
-int ReadPixel(DrawBuffer *, int, int);
-
 void CreateToolButtons();
 void FreeToolButtons();
 

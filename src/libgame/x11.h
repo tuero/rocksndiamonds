@@ -87,6 +87,9 @@ struct XY
 
 /* X11 symbol definitions */
 
+#define BLACK_PIXEL		BlackPixel(display, screen)
+#define WHITE_PIXEL		WhitePixel(display, screen)
+
 #define EVENT_BUTTONPRESS	ButtonPress
 #define EVENT_BUTTONRELEASE	ButtonRelease
 #define EVENT_MOTIONNOTIFY	MotionNotify
@@ -312,6 +315,7 @@ inline void X11CreateBitmapContent(Bitmap *, int, int, int);
 inline void X11FreeBitmapPointers(Bitmap *);
 inline void X11CopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
 inline void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
+inline void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
 inline Pixel X11GetPixel(Bitmap *, int, int);
 inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
 

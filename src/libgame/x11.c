@@ -382,10 +382,17 @@ inline void X11FillRectangle(Bitmap *bitmap, int x, int y,
   XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
 }
 
+inline void X11DrawSimpleLine(Bitmap *bitmap, int from_x, int from_y,
+			      int to_x, int to_y, Pixel color)
+{
+  XSetForeground(display, bitmap->gc, color);
+  XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
+}
+
 inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
 {
-  unsigned long pixel_value;
   XImage *pixel_image;
+  Pixel pixel_value;
 
   pixel_image = XGetImage(display, bitmap->drawable, x, y, 1, 1,
 			  AllPlanes, ZPixmap);

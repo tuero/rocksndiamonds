@@ -76,8 +76,8 @@ struct XY
 
 #define None			0L
 
-#define BlackPixel(d, s)	0x000000
-#define WhitePixel(d, s)	0xffffff
+#define BLACK_PIXEL		0x000000
+#define WHITE_PIXEL		0xffffff
 
 #define EVENT_BUTTONPRESS	SDL_MOUSEBUTTONDOWN
 #define EVENT_BUTTONRELEASE	SDL_MOUSEBUTTONUP

@@ -2189,21 +2189,6 @@ void UndrawSpecialEditorDoor()
   redraw_mask |= REDRAW_ALL;
 }
 
-#ifndef	TARGET_SDL
-int ReadPixel(DrawBuffer *bitmap, int x, int y)
-{
-  XImage *pixel_image;
-  unsigned long pixel_value;
-
-  pixel_image = XGetImage(display, bitmap->drawable,
-			  x, y, 1, 1, AllPlanes, ZPixmap);
-  pixel_value = XGetPixel(pixel_image, 0, 0);
-
-  XDestroyImage(pixel_image);
-
-  return pixel_value;
-}
-#endif
 
 /* ---------- new tool button stuff ---------------------------------------- */
 

@@ -2408,6 +2408,11 @@ static void CreateCheckbuttonGadgets()
 
 void CreateLevelEditorGadgets()
 {
+  int old_game_status = game_status;
+
+  /* setting 'game_status' is needed to get the right fonts for the editor */
+  game_status = LEVELED;
+
   ReinitializeElementList();
 
   CreateControlButtons();
@@ -2417,6 +2422,8 @@ void CreateLevelEditorGadgets()
   CreateSelectboxGadgets();
   CreateScrollbarGadgets();
   CreateCheckbuttonGadgets();
+
+  game_status = old_game_status;
 }
 
 void FreeLevelEditorGadgets()
