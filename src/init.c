@@ -199,16 +199,11 @@ static void ReinitializeGraphics()
 
   InitGraphicInfo();		/* initialize graphic info from config file */
 
-  InitFontInfo(new_graphic_info[IMG_MENU_FONT_BIG].bitmap,
+  InitFontInfo(bitmap_font_initial,
+	       new_graphic_info[IMG_MENU_FONT_BIG].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_MEDIUM].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_SMALL].bitmap,
 	       new_graphic_info[IMG_MENU_FONT_EM].bitmap);
-
-  if (bitmap_font_initial)
-  {
-    FreeBitmap(bitmap_font_initial);
-    bitmap_font_initial = NULL;
-  }
 }
 
 static void InitImages()
@@ -435,7 +430,7 @@ void InitGfx()
 #else
   bitmap_font_initial = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
 
-  InitFontInfo(NULL, NULL, bitmap_font_initial, NULL);
+  InitFontInfo(bitmap_font_initial, NULL, NULL, NULL, NULL);
 #endif
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
@@ -491,11 +486,21 @@ void ReloadCustomArtwork()
   static boolean last_override_level_graphics = FALSE;
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
-
   /* identifier for new artwork; default: artwork configured in setup */
   char *gfx_new_identifier = artwork.gfx_current->identifier;
   char *snd_new_identifier = artwork.snd_current->identifier;
   char *mus_new_identifier = artwork.mus_current->identifier;
+  boolean redraw_screen = FALSE;
+
+  if (leveldir_current_identifier == NULL)
+    leveldir_current_identifier = leveldir_current->identifier;
+
+#if 0
+  printf("CURRENT GFX: '%s' ['%s']\n", artwork.gfx_current->identifier,
+	 leveldir_current->graphics_set);
+  printf("CURRENT LEV: '%s' / '%s'\n", leveldir_current_identifier,
+	 leveldir_current->identifier);
+#endif
 
 #if 0
   printf("graphics --> '%s' ('%s')\n",
@@ -548,6 +553,11 @@ void ReloadCustomArtwork()
       last_override_level_graphics != setup.override_level_graphics)
   {
 #if 0
+    printf("CHANGED GFX: '%s' -> '%s'\n",
+	   artwork.gfx_current_identifier, gfx_new_identifier);
+#endif
+
+#if 0
     int i;
 #endif
 
@@ -567,14 +577,23 @@ void ReloadCustomArtwork()
 
     FreeTileClipmasks();
     InitTileClipmasks();
+
+#if 0
     InitGfxBackground();
 
     /* force redraw of (open or closed) door graphics */
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
+#endif
 
+#if 0
     artwork.gfx_current_identifier = gfx_new_identifier;
+#else
+    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
+#endif
     last_override_level_graphics = setup.override_level_graphics;
+
+    redraw_screen = TRUE;
   }
 
   if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
@@ -587,6 +606,8 @@ void ReloadCustomArtwork()
 
     artwork.snd_current_identifier = snd_new_identifier;
     last_override_level_sounds = setup.override_level_sounds;
+
+    redraw_screen = TRUE;
   }
 
   if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
@@ -599,6 +620,17 @@ void ReloadCustomArtwork()
 
     artwork.mus_current_identifier = mus_new_identifier;
     last_override_level_music = setup.override_level_music;
+
+    redraw_screen = TRUE;
+  }
+
+  if (redraw_screen)
+  {
+    InitGfxBackground();
+
+    /* force redraw of (open or closed) door graphics */
+    SetDoorState(DOOR_OPEN_ALL);
+    CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
   }
 
 #if 0
@@ -2586,6 +2618,9 @@ void CloseAllAndExit(int exit_value)
   for (i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
 #endif
+
+  if (bitmap_font_initial)
+    FreeBitmap(bitmap_font_initial);
 
   CloseVideoDisplay();
   ClosePlatformDependantStuff();

@@ -1536,9 +1536,23 @@ static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
 static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 				    struct ListNodeInfo **listnode,
-				    char *filename)
+				    char *basename)
 {
+  char *init_text[] =
+  { "",
+    "Loading graphics:",
+    "Loading sounds:",
+    "Loading music:"
+  };
+
   ListNode *node;
+  char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "cannot find artwork file '%s'", basename);
+    return;
+  }
 
   /* check if the old and the new artwork file are the same */
   if (*listnode && strcmp((*listnode)->source_filename, filename) == 0)
@@ -1566,8 +1580,14 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
       *listnode = (struct ListNodeInfo *)node->content;
       (*listnode)->num_references++;
+
+      return;
   }
-  else if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
+
+  DrawInitText(init_text[artwork_info->type], 120, FC_GREEN);
+  DrawInitText(basename, 150, FC_YELLOW);
+
+  if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {
 #if 0
       printf("[adding new artwork '%s']\n", filename);
@@ -1583,7 +1603,9 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      struct ListNodeInfo **listnode,
 			      char *basename)
 {
+#if 0
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+#endif
 
 #if 0
   printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
@@ -1595,6 +1617,7 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
     return;
   }
 
+#if 0
   if (filename == NULL)
   {
     Error(ERR_WARN, "cannot find artwork file '%s'", basename);
@@ -1602,6 +1625,9 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   }
 
   replaceArtworkListEntry(artwork_info, listnode, filename);
+#else
+  replaceArtworkListEntry(artwork_info, listnode, basename);
+#endif
 }
 
 static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
@@ -1627,6 +1653,7 @@ static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 
 void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
+#if 0
   static struct
   {
     char *text;
@@ -1639,6 +1666,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     { "Loading sounds:",	TRUE },
     { "Loading music:",		TRUE }
   };
+#endif
 
   int num_file_list_entries = artwork_info->num_file_list_entries;
   struct FileInfo *file_list = artwork_info->file_list;
@@ -1646,8 +1674,10 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 
   LoadArtworkConfig(artwork_info);
 
+#if 0
   if (draw_init[artwork_info->type].do_it)
     DrawInitText(draw_init[artwork_info->type].text, 120, FC_GREEN);
+#endif
 
 #if 0
   printf("DEBUG: reloading %d artwork files ...\n", num_file_list_entries);
@@ -1655,8 +1685,10 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 
   for(i=0; i<num_file_list_entries; i++)
   {
+#if 0
     if (draw_init[artwork_info->type].do_it)
       DrawInitText(file_list[i].token, 150, FC_YELLOW);
+#endif
 
     LoadArtworkToList(artwork_info, file_list[i].filename, i);
 
@@ -1665,7 +1697,9 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 #endif
   }
 
+#if 0
   draw_init[artwork_info->type].do_it = FALSE;
+#endif
 
   /*
   printf("list size == %d\n", getNumNodes(artwork_info->content_list));

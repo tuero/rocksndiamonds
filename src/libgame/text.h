@@ -18,10 +18,11 @@
 
 
 /* font types */
-#define FS_SMALL		0
+#define FS_INITIAL		0
 #define FS_BIG			1
 #define FS_MEDIUM		2
-#define FS_TILE			3
+#define FS_SMALL		3
+#define FS_TILE			4
 
 /* font colors */
 #define FC_RED			0
@@ -56,6 +57,7 @@
 
 struct FontInfo
 {
+  Bitmap *bitmap_initial;
   Bitmap *bitmap_big;
   Bitmap *bitmap_medium;
   Bitmap *bitmap_small;
@@ -63,7 +65,7 @@ struct FontInfo
 };
 
 
-void InitFontInfo(Bitmap *, Bitmap *, Bitmap *, Bitmap *);
+void InitFontInfo(Bitmap *, Bitmap *, Bitmap *, Bitmap *, Bitmap *);
 int getFontWidth(int, int);
 int getFontHeight(int, int);
 void DrawInitText(char *, int, int);

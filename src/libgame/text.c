@@ -28,9 +28,11 @@ struct FontInfo		font;
 /* font functions                                                            */
 /* ========================================================================= */
 
-void InitFontInfo(Bitmap *bitmap_big, Bitmap *bitmap_medium,
+void InitFontInfo(Bitmap *bitmap_initial,
+		  Bitmap *bitmap_big, Bitmap *bitmap_medium,
 		  Bitmap *bitmap_small, Bitmap *bitmap_tile)
 {
+  font.bitmap_initial = bitmap_initial;
   font.bitmap_big = bitmap_big;
   font.bitmap_medium = bitmap_medium;
   font.bitmap_small = bitmap_small;
@@ -39,31 +41,33 @@ void InitFontInfo(Bitmap *bitmap_big, Bitmap *bitmap_medium,
 
 int getFontWidth(int font_size, int font_type)
 {
-  return (font_size == FS_BIG ? FONT1_XSIZE :
-	  font_size == FS_MEDIUM ? FONT6_XSIZE :
-	  font_type == FC_SPECIAL1 ? FONT3_XSIZE :
+  return (font_type == FC_SPECIAL1 ? FONT3_XSIZE :
 	  font_type == FC_SPECIAL2 ? FONT4_XSIZE :
 	  font_type == FC_SPECIAL3 ? FONT5_XSIZE :
+	  font_size == FS_BIG ? FONT1_XSIZE :
+	  font_size == FS_MEDIUM ? FONT6_XSIZE :
+	  font_size == FS_SMALL ? FONT2_XSIZE :
 	  FONT2_XSIZE);
 }
 
 int getFontHeight(int font_size, int font_type)
 {
-  return (font_size == FS_BIG ? FONT1_YSIZE :
-	  font_size == FS_MEDIUM ? FONT6_YSIZE :
-	  font_type == FC_SPECIAL1 ? FONT3_YSIZE :
+  return (font_type == FC_SPECIAL1 ? FONT3_YSIZE :
 	  font_type == FC_SPECIAL2 ? FONT4_YSIZE :
 	  font_type == FC_SPECIAL3 ? FONT5_YSIZE :
+	  font_size == FS_BIG ? FONT1_YSIZE :
+	  font_size == FS_MEDIUM ? FONT6_YSIZE :
+	  font_size == FS_SMALL ? FONT2_YSIZE :
 	  FONT2_YSIZE);
 }
 
 void DrawInitText(char *text, int ypos, int color)
 {
-  if (window && font.bitmap_small)
+  if (window && font.bitmap_initial)
   {
     ClearRectangle(window, 0, ypos, video.width, FONT2_YSIZE);
     DrawTextExt(window, (video.width - strlen(text) * FONT2_XSIZE)/2,
-		ypos, text, FS_SMALL, color);
+		ypos, text, FS_INITIAL, color);
     FlushDisplay();
   }
 }
@@ -104,15 +108,15 @@ void DrawText(int x, int y, char *text, int font_size, int font_type)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawTextExt(DrawBuffer *bitmap, int x, int y,
-		 char *text, int font_size, int font_type)
+void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
+		 int font_size, int font_type)
 {
   Bitmap *font_bitmap;
   int font_width, font_height, font_starty;
   boolean print_inverse = FALSE;
 
-  if (font_size != FS_SMALL && font_size != FS_BIG && font_size != FS_MEDIUM)
-    font_size = FS_SMALL;
+  if (font_size != FS_BIG && font_size != FS_MEDIUM && font_size != FS_SMALL)
+    font_size = FS_INITIAL;
   if (font_type < FC_RED || font_type > FC_SPECIAL3)
     font_type = FC_RED;
 
@@ -123,7 +127,7 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
 		 font_size == FS_BIG		? font.bitmap_big	:
 		 font_size == FS_MEDIUM		? font.bitmap_medium	:
 		 font_size == FS_SMALL		? font.bitmap_small	:
-		 font.bitmap_small);
+		 font.bitmap_initial);
 
   if (font_bitmap == NULL)
     return;
@@ -133,6 +137,7 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
   else
     font_starty = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
 				font_size == FS_MEDIUM ? FONT6_YSIZE :
+				font_size == FS_SMALL ? FONT2_YSIZE :
 				FONT2_YSIZE) *
 		   FONT_LINES_PER_FONT);
 
