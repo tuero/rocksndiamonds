@@ -420,10 +420,10 @@
 #define EL_MOLE				110
 #define EL_PENGUIN			111
 #define EL_SATELLITE			112
-#define EL_ARROW_BLUE_LEFT		113
-#define EL_ARROW_BLUE_RIGHT		114
-#define EL_ARROW_BLUE_UP		115
-#define EL_ARROW_BLUE_DOWN		116
+#define EL_ARROW_LEFT			113
+#define EL_ARROW_RIGHT			114
+#define EL_ARROW_UP			115
+#define EL_ARROW_DOWN			116
 #define EL_PIG				117
 #define EL_DRAGON			118
 
@@ -721,12 +721,8 @@
 #define EL_DYNABOMB_ACTIVE			(EL_FIRST_DUMMY + 13)
 #define EL_SHIELD_NORMAL_ACTIVE			(EL_FIRST_DUMMY + 14)
 #define EL_SHIELD_DEADLY_ACTIVE			(EL_FIRST_DUMMY + 15)
-#define EL_ARROW_RED_LEFT			(EL_FIRST_DUMMY + 16)
-#define EL_ARROW_RED_RIGHT			(EL_FIRST_DUMMY + 17)
-#define EL_ARROW_RED_UP				(EL_FIRST_DUMMY + 18)
-#define EL_ARROW_RED_DOWN			(EL_FIRST_DUMMY + 19)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 20)
+#define MAX_NUM_ELEMENTS			(EL_FIRST_DUMMY + 16)
 
 
 /* values for graphics/sounds action types */
@@ -786,15 +782,27 @@
 #define GFX_ARG_STEP_DELAY			21
 #define GFX_ARG_DIRECTION			22
 #define GFX_ARG_POSITION			23
-#define GFX_ARG_NAME				24
+#define GFX_ARG_DRAW_XOFFSET			24
+#define GFX_ARG_DRAW_YOFFSET			25
+#define GFX_ARG_NAME				26
 
-#define NUM_GFX_ARGS				25
+#define NUM_GFX_ARGS				27
 
 
 /* values for sound configuration suffixes */
 #define SND_ARG_MODE_LOOP			0
 
 #define NUM_SND_ARGS				1
+
+
+/* values for font configuration */
+
+#define FIRST_IMG_FONT				IMG_FONT_INITIAL_1
+#define LAST_IMG_FONT				IMG_FONT_NARROW
+
+#define NUM_IMG_FONTS				(LAST_IMG_FONT - \
+						 FIRST_IMG_FONT + 1)
+#define NUM_INITIAL_FONTS			4
 
 
 /* values for game_status */
@@ -1040,8 +1048,11 @@ struct GraphicInfo
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
+
   int step_offset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */
+
+  int draw_x, draw_y;		/* optional offset for drawing fonts chars */
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */

@@ -1,15 +1,3 @@
-/***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
-*----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
-*               Holger Schemel                             *
-*               Detmolder Strasse 189                      *
-*               33604 Bielefeld                            *
-*               Germany                                    *
-*               e-mail: info@artsoft.org                   *
-*----------------------------------------------------------*
-* conf_e2g.c                                               *
-***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -2221,36 +2209,20 @@ element_to_graphic[] =
     IMG_INVISIBLE_STEELWALL_VERTICAL
   },
   {
-    EL_ARROW_BLUE_LEFT,				-1, -1,
-    IMG_ARROW_BLUE_LEFT
+    EL_ARROW_LEFT,				-1, -1,
+    IMG_ARROW_LEFT
   },
   {
-    EL_ARROW_BLUE_RIGHT,			-1, -1,
-    IMG_ARROW_BLUE_RIGHT
+    EL_ARROW_RIGHT,				-1, -1,
+    IMG_ARROW_RIGHT
   },
   {
-    EL_ARROW_BLUE_UP,				-1, -1,
-    IMG_ARROW_BLUE_UP
+    EL_ARROW_UP,				-1, -1,
+    IMG_ARROW_UP
   },
   {
-    EL_ARROW_BLUE_DOWN,				-1, -1,
-    IMG_ARROW_BLUE_DOWN
-  },
-  {
-    EL_ARROW_RED_LEFT,				-1, -1,
-    IMG_ARROW_RED_LEFT
-  },
-  {
-    EL_ARROW_RED_RIGHT,				-1, -1,
-    IMG_ARROW_RED_RIGHT
-  },
-  {
-    EL_ARROW_RED_UP,				-1, -1,
-    IMG_ARROW_RED_UP
-  },
-  {
-    EL_ARROW_RED_DOWN,				-1, -1,
-    IMG_ARROW_RED_DOWN
+    EL_ARROW_DOWN,				-1, -1,
+    IMG_ARROW_DOWN
   },
   {
     EL_DOOR_WHITE,				-1, -1,

@@ -136,7 +136,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	char cursor_string[3];
 	char text[MAX_GADGET_TEXTSIZE + 1];
 	int font_type = gi->text.font_type;
-	int font_width = getFontWidth(FS_SMALL, font_type);
+	int font_width = getFontWidth(font_type);
 	int border = gi->border.size;
 	strcpy(text, gi->text.value);
 	strcat(text, " ");
@@ -159,7 +159,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	/* gadget text value */
 	DrawTextExt(drawto,
 		    gi->x + border, gi->y + border, text,
-		    FS_SMALL, font_type, FONT_OPAQUE);
+		    font_type, FONT_OPAQUE);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
 	cursor_string[0] = '~';
@@ -171,7 +171,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  DrawTextExt(drawto,
 		      gi->x + border + gi->text.cursor_position * font_width,
 		      gi->y + border, cursor_string,
-		      FS_SMALL, font_type, FONT_OPAQUE);
+		      font_type, FONT_OPAQUE);
       }
       break;
 
@@ -529,8 +529,8 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
   if (gi->type & GD_TYPE_TEXTINPUT)
   {
-    int font_width = getFontWidth(FS_SMALL, gi->text.font_type);
-    int font_height = getFontHeight(FS_SMALL, gi->text.font_type);
+    int font_width = getFontWidth(gi->text.font_type);
+    int font_height = getFontHeight(gi->text.font_type);
 
     gi->width = 2 * gi->border.size + (gi->text.size + 1) * font_width;
     gi->height = 2 * gi->border.size + font_height;
@@ -802,7 +802,7 @@ void HandleGadgets(int mx, int my, int button)
       /* if mouse button pressed inside activated text gadget, set cursor */
       gi->text.cursor_position =
 	(mx - gi->x - gi->border.size) /
-	getFontWidth(FS_SMALL, gi->text.font_type);
+	getFontWidth(gi->text.font_type);
 
       if (gi->text.cursor_position < 0)
 	gi->text.cursor_position = 0;

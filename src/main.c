@@ -2920,26 +2920,6 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-",
     "-"
   },
-  {
-    "arrow_red_left",
-    "-",
-    "-"
-  },
-  {
-    "arrow_red_right",
-    "-",
-    "-"
-  },
-  {
-    "arrow_red_up",
-    "-",
-    "-"
-  },
-  {
-    "arrow_red_down",
-    "-",
-    "-"
-  },
 
   {
     NULL,

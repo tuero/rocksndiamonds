@@ -290,6 +290,18 @@ struct AudioSystemInfo
   int first_sound_channel;
 };
 
+struct FontInfo
+{
+  Bitmap *bitmap;
+  int src_x, src_y;		/* start position of animation frames */
+  int width, height;		/* width/height of each animation frame */
+  int draw_x, draw_y;		/* offset for drawing font characters */
+
+#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
+  Pixmap *clip_mask;		/* single-char-only clip mask array for X11 */
+#endif
+};
+
 struct GfxInfo
 {
   int sx, sy;
@@ -311,15 +323,9 @@ struct GfxInfo
   int background_bitmap_mask;
 
   boolean menu_main_hide_static_text;
-};
 
-struct FontInfo
-{
-  Bitmap *bitmap_initial;
-  Bitmap *bitmap_big;
-  Bitmap *bitmap_medium;
-  Bitmap *bitmap_small;
-  Bitmap *bitmap_tile;
+  int num_fonts;
+  struct FontInfo *font;
 };
 
 struct AnimInfo
@@ -581,7 +587,6 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
-extern struct FontInfo		font;
 extern struct AnimInfo		anim;
 extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;

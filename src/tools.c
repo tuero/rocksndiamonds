@@ -254,7 +254,7 @@ void BackToFront()
 	       MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
 	       MICROLEV_XPOS, MICROLEV_YPOS);
     BlitBitmap(backbuffer, window,
-	       SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE,
+	       SX, MICROLABEL_YPOS, SXSIZE, getFontHeight(FONT_SPECIAL_GAME),
 	       SX, MICROLABEL_YPOS);
     redraw_mask &= ~REDRAW_MICROLEVEL;
   }
@@ -279,7 +279,7 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
-    DrawTextExt(window, SX, SY, text, FS_SMALL, FC_YELLOW, FONT_OPAQUE);
+    DrawTextExt(window, SX, SY, text, FONT_DEFAULT_SMALL, FONT_OPAQUE);
   }
 
   FlushDisplay();
@@ -367,7 +367,7 @@ void SetMainBackgroundImage(int graphic)
   SetMainBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
 			  graphic_info[graphic].bitmap ?
 			  graphic_info[graphic].bitmap :
-			  graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+			  graphic_info[IMG_BACKGROUND].bitmap);
 }
 
 void SetDoorBackgroundImage(int graphic)
@@ -375,7 +375,7 @@ void SetDoorBackgroundImage(int graphic)
   SetDoorBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
 			  graphic_info[graphic].bitmap ?
 			  graphic_info[graphic].bitmap :
-			  graphic_info[IMG_BACKGROUND_DEFAULT].bitmap);
+			  graphic_info[IMG_BACKGROUND].bitmap);
 }
 
 void DrawBackground(int dest_x, int dest_y, int width, int height)
@@ -1621,13 +1621,12 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 #define MICROLABEL_IMPORTED_FROM	4
 #define MICROLABEL_LEVEL_IMPORT_INFO	5
 
-#define MAX_MICROLABEL_SIZE		(SXSIZE / FONT4_XSIZE)
-
 static void DrawMicroLevelLabelExt(int mode)
 {
-  char label_text[MAX_MICROLABEL_SIZE + 1];
+  char label_text[MAX_OUTPUT_LINESIZE + 1];
+  int max_len_label_text = SXSIZE / getFontWidth(FONT_SPECIAL_GAME);
 
-  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
+  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE,getFontHeight(FONT_SPECIAL_GAME));
 
   strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
 		       mode == MICROLABEL_CREATED_BY ? "created by" :
@@ -1635,15 +1634,16 @@ static void DrawMicroLevelLabelExt(int mode)
 		       mode == MICROLABEL_IMPORTED_FROM ? "imported from" :
 		       mode == MICROLABEL_LEVEL_IMPORT_INFO ?
 		       leveldir_current->imported_from : ""),
-	  MAX_MICROLABEL_SIZE);
-  label_text[MAX_MICROLABEL_SIZE] = '\0';
+	  max_len_label_text);
+  label_text[max_len_label_text] = '\0';
 
   if (strlen(label_text) > 0)
   {
-    int lxpos = SX + (SXSIZE - strlen(label_text) * FONT4_XSIZE) / 2;
+    int text_width = strlen(label_text) * getFontWidth(FONT_SPECIAL_GAME);
+    int lxpos = SX + (SXSIZE - text_width) / 2;
     int lypos = MICROLABEL_YPOS;
 
-    DrawText(lxpos, lypos, label_text, FS_SMALL, FC_SPECIAL2);
+    DrawText(lxpos, lypos, label_text, FONT_SPECIAL_GAME);
   }
 
   redraw_mask |= REDRAW_MICROLEVEL;
@@ -1811,7 +1811,7 @@ boolean Request(char *text, unsigned int req_state)
     text_line[tl] = 0;
 
     DrawText(DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
-	     text_line, FS_SMALL, FC_YELLOW);
+	     text_line, FONT_DEFAULT_SMALL);
 
     text += tl + (tc == ' ' ? 1 : 0);
   }

@@ -394,7 +394,6 @@
 #define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
 #define INFOTEXT_XSIZE			SXSIZE
 #define INFOTEXT_YSIZE			MINI_TILEX
-#define MAX_INFOTEXT_LEN		(SXSIZE / FONT2_XSIZE)
 
 static struct
 {
@@ -402,28 +401,28 @@ static struct
   char *text;
 } control_info[ED_NUM_CTRL_BUTTONS] =
 {
-  { 's', "draw single items" },
-  { 'd', "draw connected items" },
-  { 'l', "draw lines" },
-  { 'a', "draw arcs" },
-  { 'r', "draw outline rectangles" },
-  { 'R', "draw filled rectangles" },
-  { '\0', "wrap (rotate) level up" },
-  { 't', "enter text elements" },
-  { 'f', "flood fill" },
-  { '\0', "wrap (rotate) level left" },
-  { '?', "properties of drawing element" },
-  { '\0', "wrap (rotate) level right" },
-  { '\0', "random element placement" },
-  { 'b', "grab brush" },
-  { '\0', "wrap (rotate) level down" },
-  { ',', "pick drawing element" },
-  { 'U', "undo last operation" },
-  { 'I', "level properties" },
-  { 'S', "save level" },
-  { 'C', "clear level" },
-  { 'T', "test level" },
-  { 'E', "exit level editor" }
+  { 's',	"draw single items"		},
+  { 'd',	"draw connected items"		},
+  { 'l',	"draw lines"			},
+  { 'a',	"draw arcs"			},
+  { 'r',	"draw outline rectangles"	},
+  { 'R',	"draw filled rectangles"	},
+  { '\0',	"wrap (rotate) level up"	},
+  { 't',	"enter text elements"		},
+  { 'f',	"flood fill"			},
+  { '\0',	"wrap (rotate) level left"	},
+  { '?',	"properties of drawing element"	},
+  { '\0',	"wrap (rotate) level right"	},
+  { '\0',	"random element placement"	},
+  { 'b',	"grab brush"			},
+  { '\0',	"wrap (rotate) level down"	},
+  { ',',	"pick drawing element"		},
+  { 'U',	"undo last operation"		},
+  { 'I',	"level properties"		},
+  { 'S',	"save level"			},
+  { 'C',	"clear level"			},
+  { 'T',	"test level"			},
+  { 'E',	"exit level editor"		}
 };
 
 /* values for random placement */
@@ -784,11 +783,9 @@ static int undo_buffer_steps = 0;
 
 static int edit_mode;
 
-static int counter_xsize = DXSIZE + FONT2_XSIZE - 2 * ED_GADGET_DISTANCE;
+static int element_shift = 0;
 
-int element_shift = 0;
-
-int editor_el_boulderdash[] =
+static int editor_el_boulderdash[] =
 {
   EL_CHAR('B'),
   EL_CHAR('O'),
@@ -830,9 +827,9 @@ int editor_el_boulderdash[] =
   EL_BD_FIREFLY_DOWN,
   EL_EMPTY,
 };
-int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
+static int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
 
-int editor_el_emerald_mine[] =
+static int editor_el_emerald_mine[] =
 {
   EL_CHAR('E'),
   EL_CHAR('M'),
@@ -924,9 +921,9 @@ int editor_el_emerald_mine[] =
   EL_EM_GATE3_GRAY,
   EL_EM_GATE4_GRAY,
 };
-int num_editor_el_emerald_mine = SIZEOF_ARRAY_INT(editor_el_emerald_mine);
+static int num_editor_el_emerald_mine = SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
-int editor_el_more[] =
+static int editor_el_more[] =
 {
   EL_CHAR('M'),
   EL_CHAR('O'),
@@ -948,10 +945,10 @@ int editor_el_more[] =
   EL_GATE3_GRAY,
   EL_GATE4_GRAY,
 
-  EL_ARROW_BLUE_LEFT,
-  EL_ARROW_BLUE_RIGHT,
-  EL_ARROW_BLUE_UP,
-  EL_ARROW_BLUE_DOWN,
+  EL_ARROW_LEFT,
+  EL_ARROW_RIGHT,
+  EL_ARROW_UP,
+  EL_ARROW_DOWN,
 
   EL_AMOEBA_FULL,
   EL_EMERALD_YELLOW,
@@ -1028,9 +1025,9 @@ int editor_el_more[] =
   EL_EMC_WALL6,
   EL_EMC_WALL7,
 };
-int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
+static int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
 
-int editor_el_sokoban[] =
+static int editor_el_sokoban[] =
 {
   EL_CHAR('S'),
   EL_CHAR('O'),
@@ -1047,9 +1044,9 @@ int editor_el_sokoban[] =
   EL_SOKOBAN_FIELD_FULL,
   EL_STEELWALL,
 };
-int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
+static int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
 
-int editor_el_supaplex[] =
+static int editor_el_supaplex[] =
 {
   EL_CHAR('S'),
   EL_CHAR('U'),
@@ -1111,9 +1108,9 @@ int editor_el_supaplex[] =
   EL_SP_CHIP_UPPER,
   EL_SP_CHIP_LOWER,
 };
-int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
+static int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
 
-int editor_el_diamond_caves[] =
+static int editor_el_diamond_caves[] =
 {
   EL_CHAR('D'),
   EL_CHAR('I'),
@@ -1195,9 +1192,9 @@ int editor_el_diamond_caves[] =
   EL_EXTRA_TIME,
   EL_EMPTY,
 };
-int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
+static int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
 
-int editor_el_dx_boulderdash[] =
+static int editor_el_dx_boulderdash[] =
 {
   EL_CHAR('D'),
   EL_CHAR('X'),
@@ -1239,9 +1236,9 @@ int editor_el_dx_boulderdash[] =
   EL_EMPTY,
   EL_EMPTY
 };
-int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
+static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
 
-int editor_el_chars[] =
+static int editor_el_chars[] =
 {
   EL_CHAR('T'),
   EL_CHAR('E'),
@@ -1333,9 +1330,9 @@ int editor_el_chars[] =
   EL_CHAR('´'),
   EL_CHAR('|')
 };
-int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
+static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
-int editor_el_custom[] =
+static int editor_el_custom[] =
 {
   EL_CHAR('C'),
   EL_CHAR('U'),
@@ -1517,12 +1514,12 @@ int editor_el_custom[] =
   EL_CUSTOM_START + 126,
   EL_CUSTOM_START + 127
 };
-int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
+static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
-int *editor_elements = NULL;	/* dynamically allocated */
-int num_editor_elements = 0;	/* dynamically determined */
+static int *editor_elements = NULL;	/* dynamically allocated */
+static int num_editor_elements = 0;	/* dynamically determined */
 
-struct
+static struct
 {
   boolean *setup_value;
   int *element_list;
@@ -1610,6 +1607,16 @@ static void ReinitializeElementListButtons()
       *editor_elements_info[i].setup_value;
 
   initialization_needed = FALSE;
+}
+
+static int getCounterGadgetWidth()
+{
+  return (DXSIZE + getFontWidth(FONT_DEFAULT_SMALL) - 2 * ED_GADGET_DISTANCE);
+}
+
+static int getMaxInfoTextLength()
+{
+  return (SXSIZE / getFontWidth(FONT_DEFAULT_SMALL));
 }
 
 static char *getElementInfoText(int element)
@@ -1877,6 +1884,7 @@ static void CreateControlButtons()
 
 static void CreateCounterButtons()
 {
+  int max_infotext_len = getMaxInfoTextLength();
   int i;
 
   for (i=0; i<ED_NUM_COUNTERBUTTONS; i++)
@@ -1896,7 +1904,7 @@ static void CreateCounterButtons()
       int gd_x, gd_x1, gd_x2, gd_y;
       int x_size, y_size;
       unsigned long event_mask;
-      char infotext[MAX_INFOTEXT_LEN + 1];
+      char infotext[max_infotext_len + 1];
 
       event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
@@ -1955,7 +1963,7 @@ static void CreateCounterButtons()
 
       if (j == 0)
       {
-	int font_type = FC_YELLOW;
+	int font_type = FONT_DEFAULT_SMALL;
 	int gd_width = ED_WIN_COUNT_XSIZE;
 
 	id = counterbutton_info[i].gadget_id_text;
@@ -1963,7 +1971,7 @@ static void CreateCounterButtons()
 
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
-	  font_type = FC_SPECIAL3;
+	  font_type = FONT_SPECIAL_NARROW;
 
 	  xpos += 2 * ED_GADGET_DISTANCE;
 	  ypos -= ED_GADGET_DISTANCE;
@@ -2105,6 +2113,7 @@ static void CreateDrawingAreas()
 
 static void CreateTextInputGadgets()
 {
+  int max_infotext_len = getMaxInfoTextLength();
   int i;
 
   for (i=0; i<ED_NUM_TEXTINPUT; i++)
@@ -2113,7 +2122,7 @@ static void CreateTextInputGadgets()
     int gd_x, gd_y;
     struct GadgetInfo *gi;
     unsigned long event_mask;
-    char infotext[1024];
+    char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textinput_info[i].gadget_id;
 
     event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
@@ -2122,7 +2131,7 @@ static void CreateTextInputGadgets()
     gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
 
     sprintf(infotext, "Enter %s", textinput_info[i].infotext);
-    infotext[MAX_INFOTEXT_LEN] = '\0';
+    infotext[max_infotext_len] = '\0';
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2132,7 +2141,7 @@ static void CreateTextInputGadgets()
 		      GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
 		      GDI_TEXT_VALUE, textinput_info[i].value,
 		      GDI_TEXT_SIZE, textinput_info[i].size,
-		      GDI_TEXT_FONT, FC_YELLOW,
+		      GDI_TEXT_FONT, FONT_DEFAULT_SMALL,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_BORDER_SIZE, ED_BORDER_SIZE,
@@ -2600,16 +2609,7 @@ void DrawLevelEd()
 
   DrawEditModeWindow();
 
-  /*
-  FadeToFront();
-  */
-
-
   OpenDoor(DOOR_OPEN_1);
-
-  /*
-  OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2);
-  */
 }
 
 static void AdjustDrawingAreaGadgets()
@@ -2826,24 +2826,25 @@ static void DrawRandomPlacementBackgroundArea()
 
 static void DrawLevelInfoWindow()
 {
-  char infotext[1024];
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  int max_infotext_len = getMaxInfoTextLength();
   int xoffset_above = 0;
   int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
-  int xoffset_right = counter_xsize;
+  int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
-  int font_color = FC_GREEN;
+  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
 
-  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR_SETTINGS_LEVEL);
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
-	   "Level Settings", FS_BIG, FC_YELLOW);
+	   "Level Settings", FONT_DEFAULT_BIG);
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
-	   "Editor Settings", FS_BIG, FC_YELLOW);
+	   "Editor Settings", FONT_DEFAULT_BIG);
 
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
@@ -2854,7 +2855,7 @@ static void DrawLevelInfoWindow()
       y = counterbutton_info[i].y + yoffset_above;
 
       sprintf(infotext, "%s:", counterbutton_info[i].infotext_above);
-      infotext[MAX_INFOTEXT_LEN] = '\0';
+      infotext[max_infotext_len] = '\0';
       DrawTextF(x, y, font_color, infotext);
     }
 
@@ -2864,7 +2865,7 @@ static void DrawLevelInfoWindow()
       y = counterbutton_info[i].y + yoffset_right;
 
       sprintf(infotext, "%s", counterbutton_info[i].infotext_right);
-      infotext[MAX_INFOTEXT_LEN] = '\0';
+      infotext[max_infotext_len] = '\0';
       DrawTextF(x, y, font_color, infotext);
     }
 
@@ -2879,7 +2880,7 @@ static void DrawLevelInfoWindow()
     y = textinput_info[i].y + yoffset_above;
 
     sprintf(infotext, "%s:", textinput_info[i].infotext);
-    infotext[MAX_INFOTEXT_LEN] = '\0';
+    infotext[max_infotext_len] = '\0';
 
     DrawTextF(x, y, font_color, infotext);
     ModifyEditorTextInput(i, textinput_info[i].value);
@@ -2923,15 +2924,14 @@ static void DrawAmoebaContentArea()
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
-  int font_color = FC_GREEN;
+  int font_color = FONT(FS_SMALL, FC_GREEN);
 
   ElementContent[0][0][0] = level.amoeba_content;
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
-  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba",
-	   FS_SMALL, font_color);
+  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba", font_color);
 
   MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
 }
@@ -2943,9 +2943,9 @@ static void DrawElementContentAreas()
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
-  int xoffset_right = counter_xsize;
+  int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
-  int font_color = FC_GREEN;
+  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
 
   for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
@@ -2973,11 +2973,11 @@ static void DrawElementContentAreas()
 		      3 * MINI_TILEX, 3 * MINI_TILEY);
 
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
-	   "Content", FS_SMALL, font_color);
+	   "Content", font_color);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 1 * MINI_TILEY + 1,
-	   "when", FS_SMALL, font_color);
+	   "when",    font_color);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
-	   "smashed", FS_SMALL, font_color);
+	   "smashed", font_color);
 
   for (i=0; i<level.num_yam_contents; i++)
   {
@@ -3006,13 +3006,13 @@ static void DrawPropertiesWindow()
   int counter_id = ED_COUNTER_ID_ELEM_SCORE;
   int num_elements_in_level;
   float percentage;
-  int xoffset_right = counter_xsize;
+  int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
   int xstart = 2;
   int ystart = 4;
-  int font_color = FC_GREEN;
+  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
   static struct
   {
@@ -3069,12 +3069,12 @@ static void DrawPropertiesWindow()
     { -1, NULL, NULL }
   };
 
-  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR_SETTINGS_ELEMENT);
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
-	   "Element Settings", FS_BIG, FC_YELLOW);
+	   "Element Settings", FONT_DEFAULT_BIG);
 
   DrawElementBorder(SX + xstart * MINI_TILEX,
 		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
@@ -3097,8 +3097,9 @@ static void DrawPropertiesWindow()
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
   DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, font_color, "In this level:");
-  DrawTextF(ED_SETTINGS_XPOS + 15 * FONT2_XSIZE, 5 * TILEY, FC_YELLOW,
-	    "%d (%.2f%%)", num_elements_in_level, percentage);
+  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(font_color), 5 * TILEY,
+	    FONT(FS_SMALL, FC_YELLOW), "%d (%.2f%%)", num_elements_in_level,
+	    percentage);
 
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
@@ -4554,8 +4555,9 @@ void ClearEditorGadgetInfoText()
 void HandleEditorGadgetInfoText(void *ptr)
 {
   struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
-  char infotext[MAX_INFOTEXT_LEN + 1];
-  char shortcut[MAX_INFOTEXT_LEN + 1];
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  char shortcut[MAX_OUTPUT_LINESIZE + 1];
+  int max_infotext_len = getMaxInfoTextLength();
 
   if (game_status != LEVELED)
     return;
@@ -4572,8 +4574,8 @@ void HandleEditorGadgetInfoText(void *ptr)
   if (gi == NULL || gi->info_text == NULL)
     return;
 
-  strncpy(infotext, gi->info_text, MAX_INFOTEXT_LEN);
-  infotext[MAX_INFOTEXT_LEN] = '\0';
+  strncpy(infotext, gi->info_text, max_infotext_len);
+  infotext[max_infotext_len] = '\0';
 
   if (gi->custom_id < ED_NUM_CTRL_BUTTONS)
   {
@@ -4589,12 +4591,12 @@ void HandleEditorGadgetInfoText(void *ptr)
 	sprintf(shortcut, " ('%s%c')",
 		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
 
-      if (strlen(infotext) + strlen(shortcut) <= MAX_INFOTEXT_LEN)
+      if (strlen(infotext) + strlen(shortcut) <= max_infotext_len)
 	strcat(infotext, shortcut);
     }
   }
 
-  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FS_SMALL, FC_YELLOW);
+  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_DEFAULT_SMALL);
 }
 
 static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
@@ -4688,18 +4690,18 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	}
 
 	if (drawing_function == GADGET_ID_PICK_ELEMENT)
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 		    "%s: %d, %d", infotext, lx, ly);
 	else
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 		    "%s: %d, %d", infotext,
 		    ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
       }
       else if (drawing_function == GADGET_ID_PICK_ELEMENT)
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 		  "%s", getElementInfoText(Feld[lx][ly]));
       else
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 		  "Level position: %d, %d", lx, ly);
     }
 
@@ -4713,13 +4715,13 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     }
   }
   else if (id == GADGET_ID_AMOEBA_CONTENT)
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 	      "Amoeba content");
   else if (id == GADGET_ID_RANDOM_BACKGROUND)
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 	      "Random placement background");
   else
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
 	      "Content area %d position: %d, %d",
 	      id - GADGET_ID_ELEM_CONTENT_0 + 1, sx, sy);
 }

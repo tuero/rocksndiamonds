@@ -29,8 +29,9 @@
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
 
+#define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
 
-static Bitmap *bitmap_font_initial = NULL;
+struct FontInfo font_info_initial[NUM_INITIAL_FONTS];
 
 static void InitGlobal();
 static void InitSetup();
@@ -47,6 +48,7 @@ static void InitMusic();
 static void InitGfx();
 static void InitGfxBackground();
 static void InitGadgets();
+static void InitFontGraphicInfo();
 static void InitElementSmallImages();
 static void InitElementGraphicInfo();
 static void InitElementSpecialGraphicInfo();
@@ -243,14 +245,9 @@ static void ReinitializeGraphics()
   InitGraphicInfo();			/* graphic properties mapping */
 
   InitElementSmallImages();		/* create editor and preview images */
+  InitFontGraphicInfo();		/* initialize text drawing functions */
 
-  InitFontInfo(bitmap_font_initial,
-	       graphic_info[IMG_FONT_BIG].bitmap,
-	       graphic_info[IMG_FONT_MEDIUM].bitmap,
-	       graphic_info[IMG_FONT_SMALL].bitmap,
-	       graphic_info[IMG_FONT_EM].bitmap);
-
-  SetMainBackgroundImage(IMG_BACKGROUND_DEFAULT);
+  SetMainBackgroundImage(IMG_BACKGROUND);
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
 
   InitGadgets();
@@ -468,17 +465,40 @@ void FreeTileClipmasks()
 
 void InitGfx()
 {
-  char *config_token_font_initial = "font.small";
   char *filename_font_initial = NULL;
-  int i;
+  Bitmap *bitmap_font_initial = NULL;
+  int i, j;
 
-  /* determine filename for initial font (for displaying startup messages) */
+  /* determine settings for initial font (for displaying startup messages) */
   for (i=0; image_config[i].token != NULL; i++)
-    if (strcmp(image_config[i].token, config_token_font_initial) == 0)
-      filename_font_initial = image_config[i].value;
+  {
+    for (j=0; j < NUM_INITIAL_FONTS; j++)
+    {
+      char font_token[128];
+      int len_font_token;
+
+      sprintf(font_token, "%s_%d", CONFIG_TOKEN_FONT_INITIAL, j + 1);
+      len_font_token = strlen(font_token);
+
+      if (strcmp(image_config[i].token, font_token) == 0)
+	filename_font_initial = image_config[i].value;
+      else if (strlen(image_config[i].token) > len_font_token &&
+	       strncmp(image_config[i].token, font_token, len_font_token) == 0)
+      {
+	if (strcmp(&image_config[i].token[len_font_token], ".x") == 0)
+	  font_info_initial[j].src_x = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token], ".y") == 0)
+	  font_info_initial[j].src_y = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token], ".width") == 0)
+	  font_info_initial[j].width = atoi(image_config[i].value);
+	else if (strcmp(&image_config[i].token[len_font_token],".height") == 0)
+	  font_info_initial[j].height = atoi(image_config[i].value);
+      }
+    }
+  }
 
   if (filename_font_initial == NULL)	/* should not happen */
-    Error(ERR_EXIT, "cannot get filename for '%s'", config_token_font_initial);
+    Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
   /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
@@ -493,7 +513,10 @@ void InitGfx()
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 
-  InitFontInfo(bitmap_font_initial, NULL, NULL, NULL, NULL);
+  for (j=0; j < NUM_INITIAL_FONTS; j++)
+    font_info_initial[j].bitmap = bitmap_font_initial;
+
+  InitFontGraphicInfo();
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
@@ -699,9 +722,39 @@ void InitElementSmallImages()
   for (i=0; element_to_special_graphic[i].element > -1; i++)
     CreateImageWithSmallImages(element_to_special_graphic[i].graphic);
 
+  /* !!! CHECK FOR ELEMENT-ONLY GRAPHICS !!! */
   /* initialize images from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
     CreateImageWithSmallImages(property_mapping[i].artwork_index);
+}
+
+void InitFontGraphicInfo()
+{
+  static struct FontInfo font_info[NUM_IMG_FONTS];
+  int num_fonts = NUM_IMG_FONTS;
+  int i;
+
+  if (graphic_info == NULL)		/* still at startup phase */
+    num_fonts = NUM_INITIAL_FONTS;
+
+  for (i=0; i < num_fonts; i++)
+  {
+    if (i < NUM_INITIAL_FONTS)
+      font_info[i] = font_info_initial[i];
+    else
+    {
+      /* copy font relevant information from graphics information */
+      font_info[i].bitmap = graphic_info[FIRST_IMG_FONT + i].bitmap;
+      font_info[i].src_x  = graphic_info[FIRST_IMG_FONT + i].src_x;
+      font_info[i].src_y  = graphic_info[FIRST_IMG_FONT + i].src_y;
+      font_info[i].width  = graphic_info[FIRST_IMG_FONT + i].width;
+      font_info[i].height = graphic_info[FIRST_IMG_FONT + i].height;
+      font_info[i].draw_x = graphic_info[FIRST_IMG_FONT + i].draw_x;
+      font_info[i].draw_y = graphic_info[FIRST_IMG_FONT + i].draw_y;
+    }
+  }
+
+  InitFontInfo(font_info, num_fonts);
 }
 
 void InitElementGraphicInfo()
@@ -980,6 +1033,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* this is only used for toon animations */
   graphic_info[graphic].step_offset = parameter[GFX_ARG_STEP_OFFSET];
   graphic_info[graphic].step_delay  = parameter[GFX_ARG_STEP_DELAY];
+
+  /* this is only used for drawing font characters */
+  graphic_info[graphic].draw_x = parameter[GFX_ARG_DRAW_XOFFSET];
+  graphic_info[graphic].draw_y = parameter[GFX_ARG_DRAW_YOFFSET];
 }
 
 static void InitGraphicInfo()
@@ -2584,9 +2641,6 @@ void CloseAllAndExit(int exit_value)
 
   FreeAllImages();
   FreeTileClipmasks();
-
-  if (bitmap_font_initial)
-    FreeBitmap(bitmap_font_initial);
 
   CloseVideoDisplay();
   ClosePlatformDependantStuff();
