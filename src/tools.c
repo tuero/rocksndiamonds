@@ -1152,6 +1152,10 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic += !phase2;
   }
+  else if (element == EL_BALLOON)
+  {
+    graphic += phase4;
+  }
   else if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK ||
 	    IS_GEM(element)) && !cut_mode)
   {

@@ -951,6 +951,17 @@ int editor_element[] =
   EL_SPEED_PILL,
   EL_BLACK_ORB,
 
+  EL_EMC_STEEL_WALL_1,
+  EL_EMC_WALL_1,
+  EL_EMC_WALL_2,
+  EL_EMC_WALL_3,
+
+  EL_EMC_WALL_4,
+  EL_EMC_WALL_5,
+  EL_EMC_WALL_6,
+  EL_EMC_WALL_7,
+
+
   EL_CHAR('S'),
   EL_CHAR('O'),
   EL_CHAR('K'),
