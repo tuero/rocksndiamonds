@@ -20,12 +20,12 @@
 
 void TapeStartRecording(void);
 void TapeStopRecording(void);
-void TapeRecordAction(int);
+void TapeRecordAction(int *);
 void TapeRecordDelay(void);
 void TapeTogglePause(void);
 void TapeStartPlaying(void);
 void TapeStopPlaying(void);
-int TapePlayAction(void);
+int *TapePlayAction(void);
 BOOL TapePlayDelay(void);
 void TapeStop(void);
 void TapeErase(void);

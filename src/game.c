@@ -2710,6 +2710,8 @@ void CheckForDragon(int x, int y)
 
 void PlayerActions(struct PlayerInfo *player, int player_action)
 {
+  static int stored_player_action[MAX_PLAYERS];
+  static int num_stored_actions = 0;
   BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
   int jx = player->jx, jy = player->jy;
   int left	= player_action & JOY_LEFT;
@@ -2720,6 +2722,9 @@ void PlayerActions(struct PlayerInfo *player, int player_action)
   int button2	= player_action & JOY_BUTTON_2;
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
+
+  stored_player_action[player->nr] = 0;
+  num_stored_actions++;
 
   if (!player->active || player->gone)
     return;
@@ -2741,7 +2746,15 @@ void PlayerActions(struct PlayerInfo *player, int player_action)
     {
       if (bombed && !moved)
 	player_action &= JOY_BUTTON;
-      TapeRecordAction(player_action);
+
+      stored_player_action[player->nr] = player_action;
+
+      /* this allows cycled sequences of PlayerActions() */
+      if (num_stored_actions >= MAX_PLAYERS)
+      {
+	TapeRecordAction(stored_player_action);
+	num_stored_actions = 0;
+      }
     }
     else if (tape.playing && snapped)
       SnapField(player, 0,0);			/* stop snapping */
@@ -2757,7 +2770,8 @@ void PlayerActions(struct PlayerInfo *player, int player_action)
   if (tape.playing && !tape.pausing && !player_action &&
       tape.counter < tape.length)
   {
-    int next_joy = tape.pos[tape.counter].joystickdata & (JOY_LEFT|JOY_RIGHT);
+    int next_joy =
+      tape.pos[tape.counter].joystickdata[player->nr] & (JOY_LEFT|JOY_RIGHT);
 
     if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
     {
@@ -2785,6 +2799,7 @@ void GameActions(int player_action)
   long action_delay_value;
   int sieb_x = 0, sieb_y = 0;
   int i, x,y, element;
+  int *recorded_player_action;
 
   if (game_status != PLAYING)
     return;
@@ -2800,16 +2815,25 @@ void GameActions(int player_action)
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
 
+  if (tape.playing)
+    recorded_player_action = TapePlayAction();
+  else
+    recorded_player_action = NULL;
+
   for(i=0; i<MAX_PLAYERS; i++)
   {
+    int actual_player_action = player_action;
     /* TEST TEST TEST */
 
     if (i != TestPlayer && !stored_player[i].MovPos)
-      continue;
+      actual_player_action = 0;
 
     /* TEST TEST TEST */
 
-    PlayerActions(&stored_player[i], player_action);
+    if (recorded_player_action)
+      actual_player_action = recorded_player_action[i];
+
+    PlayerActions(&stored_player[i], actual_player_action);
     ScrollFigure(&stored_player[i], SCROLL_GO_ON);
   }
 

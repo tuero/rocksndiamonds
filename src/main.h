@@ -288,7 +288,7 @@ struct RecordingInfo
   BOOL changed;
   struct
   {
-    unsigned char joystickdata;
+    unsigned char joystickdata[MAX_PLAYERS];
     unsigned char delay;
   } pos[MAX_TAPELEN];
 };
@@ -956,10 +956,10 @@ extern char		*progname;
 
 /* directions for moving */
 #define MV_NO_MOVING		0
-#define MV_LEFT			1
-#define MV_RIGHT		2
-#define MV_UP			4
-#define MV_DOWN	       		8
+#define MV_LEFT			(1<<0)
+#define MV_RIGHT		(1<<1)
+#define MV_UP			(1<<2)
+#define MV_DOWN	       		(1<<3)
 
 /* font types */
 #define FS_SMALL		0
@@ -1038,12 +1038,13 @@ extern char		*progname;
 
 /* old cookies */
 #define NAMES_COOKIE_10		"ROCKSNDIAMONDS_NAMES_FILE_VERSION_1.0"
+#define LEVELREC_COOKIE_10	"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
 
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.0"
 #define NAMES_COOKIE		"ROCKSNDIAMONDS_NAMES_FILE_VERSION_1.1"
 #define LEVELDIR_COOKIE		"ROCKSNDIAMONDS_LEVELDIR_FILE_VERSION_1.0"
-#define LEVELREC_COOKIE		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
+#define LEVELREC_COOKIE		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.2"
 #define JOYSTICK_COOKIE		"ROCKSNDIAMONDS_JOYSTICK_FILE_VERSION_1.0"
 #define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE)+1)
 #define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE)+1)

@@ -220,6 +220,7 @@ void LoadLevelTape(int level_nr)
   char filename[MAX_FILENAME];
   char cookie[MAX_FILENAME];
   FILE *file;
+  BOOL levelrec_10 = FALSE;
 
 #ifndef MSDOS
   sprintf(filename,"%s/%s/%d.tape",
@@ -233,7 +234,9 @@ void LoadLevelTape(int level_nr)
   {
     fgets(cookie,LEVELREC_COOKIE_LEN,file);
     fgetc(file);
-    if (strcmp(cookie,LEVELREC_COOKIE))	/* ungültiges Format? */
+    if (!strcmp(cookie,LEVELREC_COOKIE_10))	/* old 1.0 tape format */
+      levelrec_10 = TRUE;
+    else if (strcmp(cookie,LEVELREC_COOKIE))	/* unknown tape format */
     {
       fprintf(stderr,"%s: wrong format of level recording file '%s'!\n",
 	      progname,filename);
@@ -262,10 +265,23 @@ void LoadLevelTape(int level_nr)
 
   for(i=0;i<tape.length;i++)
   {
-    if (i>=MAX_TAPELEN)
+    int j;
+
+    if (i >= MAX_TAPELEN)
       break;
-    tape.pos[i].joystickdata = fgetc(file);
-    tape.pos[i].delay        = fgetc(file);
+
+    for(j=0; j<MAX_PLAYERS; j++)
+    {
+      if (levelrec_10 && j>0)
+      {
+	tape.pos[i].joystickdata[j] = MV_NO_MOVING;
+	continue;
+      }
+      tape.pos[i].joystickdata[j] = fgetc(file);
+    }
+
+    tape.pos[i].delay = fgetc(file);
+
     if (feof(file))
       break;
   }
@@ -571,7 +587,11 @@ void SaveLevelTape(int level_nr)
 
   for(i=0;i<tape.length;i++)
   {
-    fputc(tape.pos[i].joystickdata,file);
+    int j;
+
+    for(j=0; j<MAX_PLAYERS; j++)
+      fputc(tape.pos[i].joystickdata[j],file);
+
     fputc(tape.pos[i].delay,file);
   }
 

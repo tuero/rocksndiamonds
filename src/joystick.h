@@ -41,8 +41,8 @@
 #define JOY_RIGHT		MV_RIGHT
 #define JOY_UP			MV_UP
 #define JOY_DOWN	       	MV_DOWN
-#define JOY_BUTTON_1		16
-#define JOY_BUTTON_2		32
+#define JOY_BUTTON_1		(1<<4)
+#define JOY_BUTTON_2		(1<<5)
 #define JOY_BUTTON		(JOY_BUTTON_1 | JOY_BUTTON_2)
 #define JOY_BUTTON_NOT_PRESSED	0
 #define JOY_BUTTON_PRESSED	1

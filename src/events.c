@@ -273,7 +273,7 @@ void HandleButton(int mx, int my, int button)
     int sx = (mx - SX) / TILEX;
     int sy = (my - SY) / TILEY;
 
-    if (IN_SCR_FIELD(sx,sy))
+    if (IN_VIS_FIELD(sx,sy))
     {
       int x = LEVELX(sx);
       int y = LEVELY(sy);
@@ -728,7 +728,12 @@ void HandleJoystick()
 {
   int joystick	= Joystick();
   int keyboard	= key_joystick_mapping;
+
+  /*
   int joy	= (tape.playing ? TapePlayAction() : (joystick | keyboard));
+  */
+
+  int joy	= (joystick | keyboard);
   int left	= joy & JOY_LEFT;
   int right	= joy & JOY_RIGHT;
   int up	= joy & JOY_UP;

@@ -42,10 +42,14 @@ void TapeStartRecording()
 
 void TapeStopRecording()
 {
+  int i;
+
   if (!tape.recording)
     return;
 
-  tape.pos[tape.counter].joystickdata = 0;
+  for(i=0; i<MAX_PLAYERS; i++)
+    tape.pos[tape.counter].joystickdata[i] = 0;
+
   tape.counter++;
   tape.length = tape.counter;
   tape.length_seconds = GetTapeLength();
@@ -54,8 +58,10 @@ void TapeStopRecording()
   DrawVideoDisplay(VIDEO_STATE_REC_OFF,0);
 }
 
-void TapeRecordAction(int joy)
+void TapeRecordAction(int joy[MAX_PLAYERS])
 {
+  int i;
+
   if (!tape.recording || tape.pausing)
     return;
 
@@ -65,16 +71,17 @@ void TapeRecordAction(int joy)
     return;
   }
 
-  if (joy)
-  {
-    tape.pos[tape.counter].joystickdata = joy;
-    tape.counter++;
-    tape.pos[tape.counter].delay = 0;
-  }
+  for(i=0; i<MAX_PLAYERS; i++)
+    tape.pos[tape.counter].joystickdata[i] = joy[i];
+
+  tape.counter++;
+  tape.pos[tape.counter].delay = 0;
 }
 
 void TapeRecordDelay()
 {
+  int i;
+
   if (!tape.recording || tape.pausing)
     return;
 
@@ -86,9 +93,11 @@ void TapeRecordDelay()
 
   tape.pos[tape.counter].delay++;
 
-  if (tape.pos[tape.counter].delay>=255)
+  if (tape.pos[tape.counter].delay >= 255)
   {
-    tape.pos[tape.counter].joystickdata = 0;
+    for(i=0; i<MAX_PLAYERS; i++)
+      tape.pos[tape.counter].joystickdata[i] = 0;
+
     tape.counter++;
     tape.pos[tape.counter].delay = 0;
   }
@@ -139,25 +148,32 @@ void TapeStopPlaying()
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF,0);
 }
 
-int TapePlayAction()
+int *TapePlayAction()
 {
+  static int joy[MAX_PLAYERS];
+  int i;
+
   if (!tape.playing || tape.pausing)
-    return(0);
+    return(NULL);
 
   if (tape.counter>=tape.length)
   {
     TapeStop();
-    return(0);
+    return(NULL);
   }
 
   if (tape.delay_played == tape.pos[tape.counter].delay)
   {
     tape.delay_played = 0;
     tape.counter++;
-    return(tape.pos[tape.counter-1].joystickdata);
+
+    for(i=0; i<MAX_PLAYERS; i++)
+      joy[i] = tape.pos[tape.counter-1].joystickdata[i];
+
+    return(joy);
   }
-  else
-    return(0);
+
+  return(NULL);
 }
 
 BOOL TapePlayDelay()
