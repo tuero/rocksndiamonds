@@ -471,7 +471,7 @@ void DrawGameDoorValues()
     for (j=0; j<4; j++)
       if (stored_player[i].key[j])
 	DrawMiniGraphicExt(drawto, DX_KEYS + j * MINI_TILEX, DY_KEYS,
-			   IMG_KEY1 + j);
+			   el2edimg(EL_KEY1 + j));
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
@@ -1512,7 +1512,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-      if (IS_MASSIVE(element) || element == EL_FLAMES)
+      if (IS_INDESTRUCTIBLE(element) || element == EL_FLAMES)
 	continue;
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
@@ -1714,7 +1714,7 @@ void DynaExplode(int ex, int ey)
       int y = ey + j * xy[i % 4][1];
       int element;
 
-      if (!IN_LEV_FIELD(x, y) || IS_MASSIVE(Feld[x][y]))
+      if (!IN_LEV_FIELD(x, y) || IS_INDESTRUCTIBLE(Feld[x][y]))
 	break;
 
       element = Feld[x][y];
@@ -5934,14 +5934,15 @@ int DigField(struct PlayerInfo *player,
     case EL_KEY4:
     {
       int key_nr = element - EL_KEY1;
+      int graphic = el2edimg(element);
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 IMG_KEY1 + key_nr);
+			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 IMG_KEY1 + key_nr);
+			 graphic);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;
     }
@@ -5952,14 +5953,15 @@ int DigField(struct PlayerInfo *player,
     case EL_EM_KEY4:
     {
       int key_nr = element - EL_EM_KEY1;
+      int graphic = el2edimg(EL_KEY1 + key_nr);
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(element);
       DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 IMG_KEY1 + key_nr);
+			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
-			 IMG_KEY1 + key_nr);
+			 graphic);
       PlaySoundLevel(x, y, SND_KEY_COLLECTING);
       break;
     }

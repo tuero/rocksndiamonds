@@ -426,7 +426,7 @@ void SetBorderElement()
   {
     for(x=0; x<lev_fieldx; x++)
     {
-      if (!IS_MASSIVE(Feld[x][y]))
+      if (!IS_INDESTRUCTIBLE(Feld[x][y]))
 	BorderElement = EL_STEELWALL;
 
       if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)

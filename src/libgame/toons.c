@@ -85,6 +85,7 @@ static int get_toon_direction(char *direction_raw)
 {
   static char *direction = NULL;
 
+  /* !!! MEMORY LEAK HERE! FIX IT! !!! */
   setString(&direction, getStringToLower(direction_raw));
 
   return (strcmp(direction, "left")  == 0 ? MV_LEFT :

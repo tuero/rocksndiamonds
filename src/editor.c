@@ -2491,7 +2491,7 @@ static void CopyCustomElementPropertiesToEditor()
     int properties = Properties1[element];
 
     custom_element_properties[i].indestructible =
-      ((properties & EP_BIT_MASSIVE) != 0 ? TRUE : FALSE);
+      ((properties & EP_BIT_INDESTRUCTIBLE) != 0 ? TRUE : FALSE);
 
     custom_element_properties[i].can_fall =
       ((properties & EP_BIT_CAN_FALL) != 0 ? TRUE : FALSE);
@@ -2518,9 +2518,9 @@ static void CopyCustomElementPropertiesToGame()
     Properties1[element] = EP_BITMASK_DEFAULT;
 
     if (custom_element_properties[i].indestructible)
-      Properties1[element] |= EP_BIT_MASSIVE;
+      Properties1[element] |= EP_BIT_INDESTRUCTIBLE;
     else
-      Properties1[element] &= ~EP_BIT_MASSIVE;
+      Properties1[element] &= ~EP_BIT_INDESTRUCTIBLE;
 
     if (custom_element_properties[i].can_fall)
       Properties1[element] |= EP_BIT_CAN_FALL;

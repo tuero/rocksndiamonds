@@ -175,6 +175,12 @@ static void InitArtworkConfig()
     "global.num_toons",
     NULL
   };
+  static char *ignore_sound_tokens[] =
+  {
+    "name",
+    "sort_priority",
+    NULL
+  };
   int i;
 
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
@@ -189,10 +195,11 @@ static void InitArtworkConfig()
     special_suffix[i] = special_suffix_info[i].suffix;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		element_prefix, action_suffix, direction_suffix,special_suffix,
-		ignore_image_tokens);
+		element_prefix, action_suffix, direction_suffix,
+		special_suffix, ignore_image_tokens);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		sound_class_prefix, action_suffix, dummy, dummy, dummy);
+		sound_class_prefix, action_suffix, dummy,
+		dummy, ignore_sound_tokens);
 }
 
 void InitLevelArtworkInfo()
@@ -1337,7 +1344,6 @@ void InitElementProperties()
 
   static int ep_solid[] =
   {
-    EL_STEELWALL,
     EL_WALL,
     EL_WALL_GROWING,
     EL_WALL_GROWING_X,
@@ -1371,16 +1377,43 @@ void InitElementProperties()
     EL_BD_MAGIC_WALL_DEAD,
     EL_GAMEOFLIFE,
     EL_BIOMAZE,
-    EL_ACIDPOOL_TOPLEFT,
-    EL_ACIDPOOL_TOPRIGHT,
-    EL_ACIDPOOL_BOTTOMLEFT,
-    EL_ACIDPOOL_BOTTOM,
-    EL_ACIDPOOL_BOTTOMRIGHT,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
     EL_SP_CHIP_UPPER,
     EL_SP_CHIP_LOWER,
+    EL_SP_TERMINAL,
+    EL_SP_TERMINAL_ACTIVE,
+    EL_SP_EXIT_CLOSED,
+    EL_SP_EXIT_OPEN,
+    EL_INVISIBLE_WALL,
+    EL_INVISIBLE_WALL_ACTIVE,
+    EL_SWITCHGATE_SWITCH_UP,
+    EL_SWITCHGATE_SWITCH_DOWN,
+    EL_TIMEGATE_SWITCH,
+    EL_TIMEGATE_SWITCH_ACTIVE,
+    EL_EMC_WALL_PILLAR_UPPER,
+    EL_EMC_WALL_PILLAR_MIDDLE,
+    EL_EMC_WALL_PILLAR_LOWER,
+    EL_EMC_WALL4,
+    EL_EMC_WALL5,
+    EL_EMC_WALL6,
+    EL_EMC_WALL7,
+    EL_EMC_WALL8,
+    EL_WALL_PEARL,
+    EL_WALL_CRYSTAL,
+
+    /* the following elements are a direct copy of "indestructible" elements,
+       except "EL_ACID", which is "indestructible", but not "solid"! */
+#if 0
+    EL_ACID,
+#endif
+    EL_STEELWALL,
+    EL_ACIDPOOL_TOPLEFT,
+    EL_ACIDPOOL_TOPRIGHT,
+    EL_ACIDPOOL_BOTTOMLEFT,
+    EL_ACIDPOOL_BOTTOM,
+    EL_ACIDPOOL_BOTTOMRIGHT,
     EL_SP_HARD_GRAY,
     EL_SP_HARD_GREEN,
     EL_SP_HARD_BLUE,
@@ -1392,14 +1425,8 @@ void InitElementProperties()
     EL_SP_HARD_BASE4,
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
-    EL_SP_TERMINAL,
-    EL_SP_TERMINAL_ACTIVE,
-    EL_SP_EXIT_CLOSED,
-    EL_SP_EXIT_OPEN,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_STEELWALL_ACTIVE,
-    EL_INVISIBLE_WALL,
-    EL_INVISIBLE_WALL_ACTIVE,
     EL_CONVEYOR_BELT1_SWITCH_LEFT,
     EL_CONVEYOR_BELT1_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT1_SWITCH_RIGHT,
@@ -1412,12 +1439,8 @@ void InitElementProperties()
     EL_CONVEYOR_BELT4_SWITCH_LEFT,
     EL_CONVEYOR_BELT4_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT4_SWITCH_RIGHT,
-    EL_SWITCHGATE_SWITCH_UP,
-    EL_SWITCHGATE_SWITCH_DOWN,
     EL_LIGHT_SWITCH,
     EL_LIGHT_SWITCH_ACTIVE,
-    EL_TIMEGATE_SWITCH,
-    EL_TIMEGATE_SWITCH_ACTIVE,
     EL_SIGN_EXCLAMATION,
     EL_SIGN_RADIOACTIVITY,
     EL_SIGN_STOP,
@@ -1435,17 +1458,7 @@ void InitElementProperties()
     EL_EMC_STEELWALL2,
     EL_EMC_STEELWALL3,
     EL_EMC_STEELWALL4,
-    EL_EMC_WALL_PILLAR_UPPER,
-    EL_EMC_WALL_PILLAR_MIDDLE,
-    EL_EMC_WALL_PILLAR_LOWER,
-    EL_EMC_WALL4,
-    EL_EMC_WALL5,
-    EL_EMC_WALL6,
-    EL_EMC_WALL7,
-    EL_EMC_WALL8,
     EL_CRYSTAL,
-    EL_WALL_PEARL,
-    EL_WALL_CRYSTAL,
     EL_GATE1,
     EL_GATE2,
     EL_GATE3,
@@ -1484,7 +1497,7 @@ void InitElementProperties()
   };
   static int ep_solid_num = SIZEOF_ARRAY_INT(ep_solid);
 
-  static int ep_massive[] =
+  static int ep_indestructible[] =
   {
     EL_STEELWALL,
     EL_ACID,
@@ -1574,7 +1587,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_massive_num = SIZEOF_ARRAY_INT(ep_massive);
+  static int ep_indestructible_num = SIZEOF_ARRAY_INT(ep_indestructible);
 
   static int ep_slippery[] =
   {
@@ -2332,7 +2345,7 @@ void InitElementProperties()
     EP_BIT_SCHLUESSEL,
     EP_BIT_PFORTE,
     EP_BIT_SOLID,
-    EP_BIT_MASSIVE,
+    EP_BIT_INDESTRUCTIBLE,
     EP_BIT_SLIPPERY,
     EP_BIT_ENEMY,
     EP_BIT_MAUER,
@@ -2373,7 +2386,7 @@ void InitElementProperties()
     ep_schluessel,
     ep_pforte,
     ep_solid,
-    ep_massive,
+    ep_indestructible,
     ep_slippery,
     ep_enemy,
     ep_mauer,
@@ -2414,7 +2427,7 @@ void InitElementProperties()
     &ep_schluessel_num,
     &ep_pforte_num,
     &ep_solid_num,
-    &ep_massive_num,
+    &ep_indestructible_num,
     &ep_slippery_num,
     &ep_enemy_num,
     &ep_mauer_num,
