@@ -3361,9 +3361,12 @@ void StartMoving(int x, int y)
 	     JustStopped[x][y])
 #endif
     {
-      /*
-      printf("::: %d\n", MovDir[x][y]);
-      */
+      /* calling "Impact()" here is not only completely unneccessary
+	 (because it already gets called from "ContinueMoving()" in
+	 all relevant situations), but also completely bullshit, because
+	 "JustStopped" also indicates a finished *horizontal* movement;
+	 we must keep this trash for backwards compatibility with older
+	 tapes */
 
       Impact(x, y);
     }
@@ -3446,7 +3449,7 @@ void StartMoving(int x, int y)
     }
   }
 
-  /* not "else if" because of EL_SPRING */
+  /* not "else if" because of elements that can fall and move (EL_SPRING) */
   if (CAN_MOVE(element) && !started_moving)
   {
     int newx, newy;
@@ -4004,16 +4007,24 @@ void ContinueMoving(int x, int y)
 
 #if 1
 #if 0
+    /* 2.1.1 (does not work correctly for spring) */
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 #else
 
 #if 0
+    /* (does not work for falling objects that slide horizontally) */
     if (CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN)
       MovDir[newx][newy] = 0;
 #else
+    /*
     if (!CAN_MOVE(element) ||
 	(element == EL_SPRING && MovDir[newx][newy] == MV_DOWN))
+      MovDir[newx][newy] = 0;
+    */
+
+    if (!CAN_MOVE(element) ||
+	(CAN_FALL(element) && MovDir[newx][newy] == MV_DOWN))
       MovDir[newx][newy] = 0;
 #endif
 
