@@ -3136,7 +3136,11 @@ void StartMoving(int x, int y)
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element == EL_SONDE)
+#if 0
 	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+#else
+	DrawNewGraphicAnimation(x, y, IMG_SATELLITE_MOVING);
+#endif
       else if (element == EL_SP_ELECTRON)
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 
@@ -3936,7 +3940,7 @@ void AusgangstuerOeffnen(int x, int y)
 
 void AusgangstuerBlinken(int x, int y)
 {
-  DrawGraphicAnimation(x, y, GFX_AUSGANG_AUF, 4, 4, ANIM_OSCILLATE);
+  DrawGraphicAnimation(x, y, GFX_AUSGANG_AUF, 4, 4, ANIM_PINGPONG);
 }
 
 void OpenSwitchgate(int x, int y)

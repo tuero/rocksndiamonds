@@ -29,11 +29,12 @@ struct FontInfo		font;
 /* ========================================================================= */
 
 void InitFontInfo(Bitmap *bitmap_big, Bitmap *bitmap_medium,
-		  Bitmap *bitmap_small)
+		  Bitmap *bitmap_small, Bitmap *bitmap_tile)
 {
   font.bitmap_big = bitmap_big;
   font.bitmap_medium = bitmap_medium;
   font.bitmap_small = bitmap_small;
+  font.bitmap_tile = bitmap_tile;
 }
 
 int getFontWidth(int font_size, int font_type)
@@ -118,16 +119,22 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
   font_width = getFontWidth(font_size, font_type);
   font_height = getFontHeight(font_size, font_type);
 
-  font_bitmap = (font_size == FS_BIG ? font.bitmap_big :
-		 font_size == FS_MEDIUM ? font.bitmap_medium :
+  font_bitmap = (font_type == FC_SPECIAL2	? font.bitmap_tile	:
+		 font_size == FS_BIG		? font.bitmap_big	:
+		 font_size == FS_MEDIUM		? font.bitmap_medium	:
+		 font_size == FS_SMALL		? font.bitmap_small	:
 		 font.bitmap_small);
-  font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
-			     font_size == FS_MEDIUM ? FONT6_YSIZE :
-			     FONT2_YSIZE) *
-		FONT_LINES_PER_FONT);
+
+  if (font_type == FC_SPECIAL2)
+    font_start = (font_size == FS_BIG ? 0 : FONT1_YSIZE) * FONT_LINES_PER_FONT;
+  else
+    font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
+			       font_size == FS_MEDIUM ? FONT6_YSIZE :
+			       FONT2_YSIZE) *
+		  FONT_LINES_PER_FONT);
 
   if (font_type == FC_SPECIAL3)
-    font_start += (FONT4_YSIZE - FONT2_YSIZE) * FONT_LINES_PER_FONT;
+    font_start -= FONT2_YSIZE * FONT_LINES_PER_FONT;
 
   while (*text)
   {

@@ -408,7 +408,7 @@ char *getSetupFilename()
 
 static char *getCorrectedImageBasename(char *basename)
 {
-  char *result = basename;
+  char *basename_corrected = basename;
 
 #if defined(PLATFORM_MSDOS)
   if (program.filename_prefix != NULL)
@@ -416,11 +416,25 @@ static char *getCorrectedImageBasename(char *basename)
     int prefix_len = strlen(program.filename_prefix);
 
     if (strncmp(basename, program.filename_prefix, prefix_len) == 0)
-      result = &basename[prefix_len];
+      basename_corrected = &basename[prefix_len];
+
+    /* if corrected filename is still longer than standard MS-DOS filename
+       size (8 characters + 1 dot + 3 characters file extension), shorten
+       filename by writing file extension after 8th basename character */
+    if (strlen(basename_corrected) > 8+1+3)
+    {
+      static char *msdos_filename = NULL;
+
+      if (filename != NULL)
+	free(filename);
+
+      filename = getStringCopy(basename_corrected);
+      strncpy(&filename[8], &basename[strlen(basename) - 1+3], 1+3 + 1);
+    }
   }
 #endif
 
-  return result;
+  return basename_corrected;
 }
 
 static boolean fileExists(char *filename)

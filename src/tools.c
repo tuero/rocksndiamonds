@@ -556,7 +556,7 @@ void DrawPlayer(struct PlayerInfo *player)
       else
 	graphic = GFX_MURPHY_GO_LEFT;
 
-      graphic += getGraphicAnimationPhase(3, 2, ANIM_OSCILLATE);
+      graphic += getGraphicAnimationPhase(3, 2, ANIM_PINGPONG);
     }
 
     if (player->MovDir == MV_LEFT || player->MovDir == MV_RIGHT)
@@ -598,7 +598,7 @@ void DrawPlayer(struct PlayerInfo *player)
 		   GFX2_SHIELD_PASSIVE);
 
     DrawGraphicAnimationShiftedThruMask(sx, sy, sxx, syy, graphic,
-					3, 8, ANIM_OSCILLATE);
+					3, 8, ANIM_PINGPONG);
   }
 
   if (player->Pushing && player->GfxPos)
@@ -690,7 +690,7 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
 {
   int phase;
 
-  if (mode == ANIM_OSCILLATE)
+  if (mode == ANIM_PINGPONG)
   {
     int max_anim_frames = 2 * frames - 2;
 
@@ -703,7 +703,30 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   if (mode == ANIM_REVERSE)
     phase = -phase;
 
-  return(phase);
+  return phase;
+}
+
+static int getNewGraphicAnimationFrame(int graphic)
+{
+  int frames = new_graphic_info[graphic].anim_frames;
+  int delay = new_graphic_info[graphic].anim_delay;
+  int mode = new_graphic_info[graphic].anim_mode;
+  int phase;
+
+  if (mode == ANIM_PINGPONG)
+  {
+    int max_anim_frames = 2 * frames - 2;
+
+    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
+    phase = (phase < frames ? phase : max_anim_frames - phase);
+  }
+  else
+    phase = (FrameCounter % (delay * frames)) / delay;
+
+  if (mode == ANIM_REVERSE)
+    phase = (frames - 1) - phase;
+
+  return phase;
 }
 
 void DrawGraphicAnimationExt(int x, int y, int graphic,
@@ -720,10 +743,30 @@ void DrawGraphicAnimationExt(int x, int y, int graphic,
   }
 }
 
+void DrawNewGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
+{
+  int delay = new_graphic_info[graphic].anim_delay;
+
+  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+  {
+    int frame = getNewGraphicAnimationFrame(graphic);
+
+    if (mask_mode == USE_MASKING)
+      DrawNewGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
+    else
+      DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+  }
+}
+
 void DrawGraphicAnimation(int x, int y, int graphic,
 			  int frames, int delay, int mode)
 {
   DrawGraphicAnimationExt(x, y, graphic, frames, delay, mode, NO_MASKING);
+}
+
+void DrawNewGraphicAnimation(int x, int y, int graphic)
+{
+  DrawNewGraphicAnimationExt(x, y, graphic, NO_MASKING);
 }
 
 void DrawGraphicAnimationThruMask(int x, int y, int graphic,
@@ -790,10 +833,9 @@ void getGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *bitmap = pix[PIX_BIGFONT];
+    *bitmap = pix[PIX_FONT_EM];
     *x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
-    *y = ((graphic / FONT_CHARS_PER_LINE) * TILEY +
-	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY);
+    *y = (graphic / FONT_CHARS_PER_LINE) * TILEY;
   }
   else
   {
@@ -806,16 +848,32 @@ void getGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 void DrawGraphic(int x, int y, int graphic)
 {
 #if DEBUG
-  if (!IN_SCR_FIELD(x,y))
+  if (!IN_SCR_FIELD(x, y))
   {
-    printf("DrawGraphic(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphic(): x = %d, y = %d, graphic = %d\n", x, y, graphic);
     printf("DrawGraphic(): This should never happen!\n");
     return;
   }
 #endif
 
-  DrawGraphicExt(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
-  MarkTileDirty(x,y);
+  DrawGraphicExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic);
+  MarkTileDirty(x, y);
+}
+
+void DrawNewGraphic(int x, int y, int graphic, int frame)
+{
+#if DEBUG
+  if (!IN_SCR_FIELD(x, y))
+  {
+    printf("DrawNewGraphic(): x = %d, y = %d, graphic = %d\n", x, y, graphic);
+    printf("DrawNewGraphic(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  DrawNewGraphicExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
+		    graphic, frame);
+  MarkTileDirty(x, y);
 }
 
 void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
@@ -827,10 +885,25 @@ void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
 
+void DrawNewGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
+		       int frame)
+{
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  int src_x = new_graphic_info[graphic].src_x;
+  int src_y = new_graphic_info[graphic].src_y;
+
+  if (new_graphic_info[graphic].anim_vertical)
+    src_y += frame * TILEY;
+  else
+    src_x += frame * TILEX;
+
+  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
+}
+
 void DrawGraphicThruMask(int x, int y, int graphic)
 {
 #if DEBUG
-  if (!IN_SCR_FIELD(x,y))
+  if (!IN_SCR_FIELD(x, y))
   {
     printf("DrawGraphicThruMask(): x = %d,y = %d, graphic = %d\n",x,y,graphic);
     printf("DrawGraphicThruMask(): This should never happen!\n");
@@ -838,8 +911,24 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicThruMaskExt(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
-  MarkTileDirty(x,y);
+  DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y *TILEY, graphic);
+  MarkTileDirty(x, y);
+}
+
+void DrawNewGraphicThruMask(int x, int y, int graphic, int frame)
+{
+#if DEBUG
+  if (!IN_SCR_FIELD(x, y))
+  {
+    printf("DrawGraphicThruMask(): x = %d,y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphicThruMask(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  DrawNewGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y *TILEY,
+			    graphic, frame);
+  MarkTileDirty(x, y);
 }
 
 void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic)
@@ -870,10 +959,27 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic)
 #endif
 #endif
 
-    SetClipOrigin(src_bitmap, drawing_gc, dest_x-src_x, dest_y-src_y);
+    SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
     BlitBitmapMasked(src_bitmap, d,
 		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
+}
+
+void DrawNewGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y,
+			       int graphic, int frame)
+{
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  GC drawing_gc = src_bitmap->stored_clip_gc;
+  int src_x = new_graphic_info[graphic].src_x;
+  int src_y = new_graphic_info[graphic].src_y;
+
+  if (new_graphic_info[graphic].anim_vertical)
+    src_y += frame * TILEY;
+  else
+    src_x += frame * TILEX;
+
+  SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
+  BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dest_x, dest_y);
 }
 
 void DrawMiniGraphic(int x, int y, int graphic)
@@ -915,10 +1021,9 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *bitmap = pix[PIX_SMALLFONT];
-    *x = (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE;
-    *y = ((graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE +
-	      FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT);
+    *bitmap = pix[PIX_FONT_EM];
+    *x = MINI_FONT_STARTX + (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE;
+    *y = MINI_FONT_STARTY + (graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE;
   }
   else
   {
@@ -1082,14 +1187,14 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 
   if (element == EL_PACMAN || element == EL_KAEFER || element == EL_FLIEGER)
   {
-    graphic += 4 * !phase2;
+    graphic += 1 * !phase2;
 
     if (dir == MV_UP)
-      graphic += 1;
+      graphic += 1 * 2;
     else if (dir == MV_LEFT)
-      graphic += 2;
+      graphic += 2 * 2;
     else if (dir == MV_DOWN)
-      graphic += 3;
+      graphic += 3 * 2;
   }
   else if (element == EL_SP_SNIKSNAK)
   {
@@ -1572,6 +1677,14 @@ void DrawMicroElement(int xpos, int ypos, int element)
     BlitBitmap(pix[PIX_MORE], drawto,
 	       MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE)*MICRO_TILEX,
 	       MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE)*MICRO_TILEY,
+	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  }
+  else if (graphic >= GFX_CHAR_START && graphic <= GFX_CHAR_END)
+  {
+    graphic -= GFX_CHAR_START;
+    BlitBitmap(pix[PIX_FONT_EM], drawto,
+	       MICRO_FONT_STARTX + (graphic % MICRO_GFX_PER_LINE)* MICRO_TILEX,
+	       MICRO_FONT_STARTY + (graphic / MICRO_GFX_PER_LINE)* MICRO_TILEY,
 	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else

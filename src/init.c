@@ -36,9 +36,10 @@ static char *image_filename[NUM_PICTURES] =
   "RocksSP.pcx",
   "RocksDC.pcx",
   "RocksMore.pcx",
-  "RocksFont.pcx",
-  "RocksFont2.pcx",
-  "RocksFont3.pcx"
+  "RocksFontBig.pcx",
+  "RocksFontSmall.pcx",
+  "RocksFontMedium.pcx",
+  "RocksFontEM.pcx"
 }; 
 
 static void InitSetup(void);
@@ -382,9 +383,9 @@ void InitGfx()
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 
-  pix[PIX_SMALLFONT] = LoadCustomImage(image_filename[PIX_SMALLFONT]);
+  pix[PIX_FONT_SMALL] = LoadCustomImage(image_filename[PIX_FONT_SMALL]);
 
-  InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
+  InitFontInfo(NULL, NULL, pix[PIX_FONT_SMALL], NULL);
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
@@ -393,7 +394,7 @@ void InitGfx()
 
   for(i=0; i<NUM_PICTURES; i++)
   {
-    if (i != PIX_SMALLFONT)
+    if (i != PIX_FONT_SMALL)
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
 
@@ -401,7 +402,8 @@ void InitGfx()
     }
   }
 
-  InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+  InitFontInfo(pix[PIX_FONT_BIG], pix[PIX_FONT_MEDIUM], pix[PIX_FONT_SMALL],
+	       pix[PIX_FONT_EM]);
 
   InitTileClipmasks();
 }
@@ -864,16 +866,31 @@ static void InitGraphicInfo()
     graphic_info[i].bitmap = NULL;
     graphic_info[i].src_x = 0;
     graphic_info[i].src_y = 0;
-    graphic_info[i].anim_frames = 1;
-    graphic_info[i].anim_delay = 0;
-    graphic_info[i].anim_mode = ANIM_NORMAL;
 
     getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
   }
 
-#if 0
+  for(i=0; i<NUM_IMAGE_FILES; i++)
+  {
+    int *parameter = image_files[i].parameter;
 
+    /* always start with reliable default values */
+    new_graphic_info[i].bitmap = getBitmapFromImageID(i);
+    new_graphic_info[i].src_x = parameter[GFXARG_XPOS] * TILEX;
+    new_graphic_info[i].src_y = parameter[GFXARG_YPOS] * TILEY;
+    new_graphic_info[i].anim_frames = parameter[GFXARG_FRAMES];
+    new_graphic_info[i].anim_delay = parameter[GFXARG_DELAY];
+    new_graphic_info[i].anim_vertical = parameter[GFXARG_VERTICAL];
+    new_graphic_info[i].anim_mode =
+      (parameter[GFXARG_PINGPONG] ? ANIM_PINGPONG :
+       parameter[GFXARG_REVERSE]  ? ANIM_REVERSE  : ANIM_NORMAL);
+
+    if (new_graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
+      new_graphic_info[i].anim_delay = 1;
+  }
+
+#if 0
   printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFXARG_NUM_FRAMES]);
   printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFXARG_NUM_FRAMES]);
 

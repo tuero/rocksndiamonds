@@ -111,7 +111,7 @@ struct ToonInfo toons[NUM_TOONS] =
     BIRD_FRAMES,
     BIRD_FPS,
     BIRD_STEPSIZE,
-    ANIM_OSCILLATE,
+    ANIM_PINGPONG,
     ANIMDIR_RIGHT,
     ANIMPOS_UPPER
   },
@@ -122,7 +122,7 @@ struct ToonInfo toons[NUM_TOONS] =
     BIRD_FRAMES,
     BIRD_FPS,
     BIRD_STEPSIZE,
-    ANIM_OSCILLATE,
+    ANIM_PINGPONG,
     ANIMDIR_LEFT,
     ANIMPOS_UPPER
   },
