@@ -194,6 +194,32 @@
 #define CP_HALF_DESTRUCTIVE	1
 #define CP_FULL_DESTRUCTIVE	2
 
+/* values for special move patterns (bits 0-3: basic move directions) */
+#define MV_BIT_TOWARDS_PLAYER	4
+#define MV_BIT_AWAY_FROM_PLAYER	5
+#define MV_BIT_ALONG_LEFT_SIDE	6
+#define MV_BIT_ALONG_RIGHT_SIDE	7
+#define MV_BIT_TURNING_LEFT	8
+#define MV_BIT_TURNING_RIGHT	9
+
+/* values for special move patterns for custom elements */
+#define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
+#define MV_VERTICAL		(MV_UP | MV_DOWN)
+#define MV_ALL_DIRECTIONS	(MV_HORIZONTAL | MV_VERTICAL)
+#define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
+#define MV_TOWARDS_PLAYER	(1 << MV_BIT_TOWARDS_PLAYER)
+#define MV_AWAY_FROM_PLAYER	(1 << MV_BIT_AWAY_FROM_PLAYER)
+#define MV_ALONG_LEFT_SIDE	(1 << MV_BIT_ALONG_LEFT_SIDE)
+#define MV_ALONG_RIGHT_SIDE	(1 << MV_BIT_ALONG_RIGHT_SIDE)
+#define MV_TURNING_LEFT		(1 << MV_BIT_TURNING_LEFT)
+#define MV_TURNING_RIGHT	(1 << MV_BIT_TURNING_RIGHT)
+
+/* values for slippery property for custom elements */
+#define SLIPPERY_ANY_RANDOM	0
+#define SLIPPERY_ANY_LEFT_RIGHT	1
+#define SLIPPERY_ANY_RIGHT_LEFT	2
+#define SLIPPERY_ONLY_LEFT	3
+#define SLIPPERY_ONLY_RIGHT	4
 
 /* macros for configurable properties */
 #define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
@@ -1238,6 +1264,8 @@ struct ElementInfo
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */
   int move_stepsize;		/* step size element moves with */
+
+  int slippery_type;		/* how/where other elements slip away */
 
   int content[3][3];		/* new elements after explosion */
 

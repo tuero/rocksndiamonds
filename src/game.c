@@ -3578,31 +3578,47 @@ void StartMoving(int x, int y)
 	     element != EL_DX_SUPABOMB && element != EL_SP_DISK_ORANGE)
 #endif
     {
-      boolean left  = (x>0 && IS_FREE(x-1, y) &&
-		       (IS_FREE(x-1, y + 1) || Feld[x-1][y + 1] == EL_ACID));
-      boolean right = (x<lev_fieldx-1 && IS_FREE(x+1, y) &&
-		       (IS_FREE(x+1, y + 1) || Feld[x+1][y + 1] == EL_ACID));
+      boolean can_fall_left  = (x > 0 && IS_FREE(x - 1, y) &&
+				(IS_FREE(x - 1, y + 1) ||
+				 Feld[x - 1][y + 1] == EL_ACID));
+      boolean can_fall_right = (x < lev_fieldx - 1 && IS_FREE(x + 1, y) &&
+				(IS_FREE(x + 1, y + 1) ||
+				 Feld[x + 1][y + 1] == EL_ACID));
+      boolean can_fall_any  = (can_fall_left || can_fall_right);
+      boolean can_fall_both = (can_fall_left && can_fall_right);
 
-      if (left || right)
+      if (can_fall_any && IS_CUSTOM_ELEMENT(Feld[x][y + 1]))
       {
-	if (left && right &&
+	int slippery_type = element_info[Feld[x][y + 1]].slippery_type;
+
+	if (slippery_type == SLIPPERY_ONLY_LEFT)
+	  can_fall_right = FALSE;
+	else if (slippery_type == SLIPPERY_ONLY_RIGHT)
+	  can_fall_left = FALSE;
+	else if (slippery_type == SLIPPERY_ANY_LEFT_RIGHT && can_fall_both)
+	  can_fall_right = FALSE;
+	else if (slippery_type == SLIPPERY_ANY_RIGHT_LEFT && can_fall_both)
+	  can_fall_left = FALSE;
+
+	can_fall_any  = (can_fall_left || can_fall_right);
+	can_fall_both = (can_fall_left && can_fall_right);
+      }
+
+      if (can_fall_any)
+      {
+	if (can_fall_both &&
 	    (game.emulation != EMU_BOULDERDASH &&
 	     element != EL_BD_ROCK && element != EL_BD_DIAMOND))
-	  left = !(right = RND(2));
+	  can_fall_left = !(can_fall_right = RND(2));
 
-	InitMovingField(x, y, left ? MV_LEFT : MV_RIGHT);
+	InitMovingField(x, y, can_fall_left ? MV_LEFT : MV_RIGHT);
 	started_moving = TRUE;
-
-#if 0
-	if (element == EL_BOMB)
-	  printf("::: SLIP DOWN [%d]\n", FrameCounter);
-#endif
       }
     }
     else if (IS_BELT_ACTIVE(Feld[x][y + 1]))
     {
-      boolean left_is_free  = (x>0 && IS_FREE(x-1, y));
-      boolean right_is_free = (x<lev_fieldx-1 && IS_FREE(x+1, y));
+      boolean left_is_free  = (x > 0 && IS_FREE(x - 1, y));
+      boolean right_is_free = (x < lev_fieldx - 1 && IS_FREE(x + 1, y));
       int belt_nr = getBeltNrFromBeltActiveElement(Feld[x][y + 1]);
       int belt_dir = game.belt_dir[belt_nr];
 

@@ -31,7 +31,7 @@
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CPART_CUS3_SIZE	134	/* size of CUS3 chunk part    */
-#define LEVEL_CPART_CUS3_UNUSED	16	/* unused CUS3 bytes / part   */
+#define LEVEL_CPART_CUS3_UNUSED	15	/* unused CUS3 bytes / part   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
 
@@ -128,6 +128,8 @@ static void setLevelInfoToDefaults()
     element_info[element].move_pattern = MV_ALL_DIRECTIONS;
     element_info[element].move_direction_initial = MV_NO_MOVING;
     element_info[element].move_stepsize = TILEX / 8;
+
+    element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
@@ -522,6 +524,8 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
       for(x=0; x<3; x++)
 	element_info[element].change.content[x][y] =
 	  checkLevelElement(getFile16BitBE(file));
+
+    element_info[element].slippery_type = getFile8Bit(file);
 
     /* some free bytes for future properties and padding */
     ReadUnusedBytesFromFile(file, LEVEL_CPART_CUS3_UNUSED);
@@ -1000,6 +1004,8 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
 	    putFile16BitBE(file, element_info[element].change.content[x][y]);
+
+	putFile8Bit(file, element_info[element].slippery_type);
 
 	/* some free bytes for future properties and padding */
 	WriteUnusedBytesToFile(file, LEVEL_CPART_CUS3_UNUSED);
