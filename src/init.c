@@ -1101,7 +1101,7 @@ void InitElementPropertiesStatic()
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE,
 
-    /* !!! currently not diggable, but handled by 'ep_dont_go_to' !!! */
+    /* !!! currently not diggable, but handled by 'ep_dont_run_into' !!! */
 #if 0
     EL_LANDMINE,
     EL_TRAP_ACTIVE,
@@ -1272,7 +1272,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_explode[] =
+  static int ep_can_explode_by_fire[] =
   {
     EL_BOMB,
     EL_DYNAMITE_ACTIVE,
@@ -1302,29 +1302,6 @@ void InitElementPropertiesStatic()
 
   static int ep_can_move[] =
   {
-    /* only stored in level file */
-    EL_BUG_RIGHT,
-    EL_BUG_UP,
-    EL_BUG_LEFT,
-    EL_BUG_DOWN,
-    EL_SPACESHIP_RIGHT,
-    EL_SPACESHIP_UP,
-    EL_SPACESHIP_LEFT,
-    EL_SPACESHIP_DOWN,
-    EL_BD_BUTTERFLY_RIGHT,
-    EL_BD_BUTTERFLY_UP,
-    EL_BD_BUTTERFLY_LEFT,
-    EL_BD_BUTTERFLY_DOWN,
-    EL_BD_FIREFLY_RIGHT,
-    EL_BD_FIREFLY_UP,
-    EL_BD_FIREFLY_LEFT,
-    EL_BD_FIREFLY_DOWN,
-    EL_PACMAN_RIGHT,
-    EL_PACMAN_UP,
-    EL_PACMAN_LEFT,
-    EL_PACMAN_DOWN,
-
-    /* level file and runtime elements */
     EL_BUG,
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
@@ -1563,7 +1540,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_enemy[] =
+  static int ep_dont_collide_with[] =
   {
     EL_BUG,
     EL_SPACESHIP,
@@ -1579,7 +1556,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_dont_go_to[] =
+  static int ep_dont_run_into[] =
   {
     EL_BUG,
     EL_SPACESHIP,
@@ -1983,6 +1960,22 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_classic_enemy[] =
+  {
+    EL_BUG,
+    EL_SPACESHIP,
+    EL_BD_BUTTERFLY,
+    EL_BD_FIREFLY,
+
+    EL_YAMYAM,
+    EL_DARK_YAMYAM,
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_SP_SNIKSNAK,
+    EL_SP_ELECTRON,
+    -1
+  };
+
   static int ep_belt[] =
   {
     EL_CONVEYOR_BELT_1_LEFT,
@@ -2273,9 +2266,9 @@ void InitElementPropertiesStatic()
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
     { ep_switchable,		EP_SWITCHABLE		},
     { ep_dont_touch,		EP_DONT_TOUCH		},
-    { ep_enemy,			EP_ENEMY		},
-    { ep_dont_go_to,		EP_DONT_GO_TO		},
-    { ep_can_explode,		EP_CAN_EXPLODE		},
+    { ep_dont_collide_with,	EP_DONT_COLLIDE_WITH	},
+    { ep_dont_run_into,		EP_DONT_RUN_INTO	},
+    { ep_can_explode_by_fire,	EP_CAN_EXPLODE_BY_FIRE	},
     { ep_bd_element,		EP_BD_ELEMENT		},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_sb_element,		EP_SB_ELEMENT		},
@@ -2285,6 +2278,7 @@ void InitElementPropertiesStatic()
     { ep_food_pig,		EP_FOOD_PIG		},
     { ep_historic_wall,		EP_HISTORIC_WALL	},
     { ep_historic_solid,	EP_HISTORIC_SOLID	},
+    { ep_classic_enemy,		EP_CLASSIC_ENEMY	},
     { ep_belt,			EP_BELT			},
     { ep_belt_active,		EP_BELT_ACTIVE		},
     { ep_belt_switch,		EP_BELT_SWITCH		},
@@ -2299,7 +2293,40 @@ void InitElementPropertiesStatic()
     { NULL,			-1			}
   };
 
-  int i, j;
+  static int copy_properties[][5] =
+  {
+    {
+      EL_BUG,
+      EL_BUG_LEFT,		EL_BUG_RIGHT,
+      EL_BUG_UP,		EL_BUG_DOWN
+    },
+    {
+      EL_SPACESHIP,
+      EL_SPACESHIP_LEFT,	EL_SPACESHIP_RIGHT,
+      EL_SPACESHIP_UP,		EL_SPACESHIP_DOWN
+    },
+    {
+      EL_BD_BUTTERFLY,
+      EL_BD_BUTTERFLY_LEFT,	EL_BD_BUTTERFLY_RIGHT,
+      EL_BD_BUTTERFLY_UP,	EL_BD_BUTTERFLY_DOWN
+    },
+    {
+      EL_BD_FIREFLY,
+      EL_BD_FIREFLY_LEFT,	EL_BD_FIREFLY_RIGHT,
+      EL_BD_FIREFLY_UP,		EL_BD_FIREFLY_DOWN
+    },
+    {
+      EL_PACMAN,
+      EL_PACMAN_LEFT,		EL_PACMAN_RIGHT,
+      EL_PACMAN_UP,		EL_PACMAN_DOWN
+    },
+    {
+      -1,
+      -1, -1, -1, -1
+    }
+  };
+
+  int i, j, k;
 
   /* always start with reliable default values (element has no properties) */
   for (i=0; i < MAX_NUM_ELEMENTS; i++)
@@ -2311,6 +2338,13 @@ void InitElementPropertiesStatic()
     for (j=0; (element_properties[i].elements)[j] != -1; j++)
       SET_PROPERTY((element_properties[i].elements)[j],
 		   element_properties[i].property, TRUE);
+
+  /* copy properties to some elements that are only stored in level file */
+  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
+    for (j=0; copy_properties[j][0] != -1; j++)
+      if (HAS_PROPERTY(copy_properties[j][0], i))
+	for (k=1; k<=4; k++)
+	  SET_PROPERTY(copy_properties[j][k], i, TRUE);
 }
 
 void InitElementPropertiesEngine(int engine_version)
@@ -2321,16 +2355,16 @@ void InitElementPropertiesEngine(int engine_version)
     EP_AMOEBALIVE,
     EP_AMOEBOID,
     EP_PFORTE,
-    EP_ENEMY,
+    EP_DONT_COLLIDE_WITH,
     EP_MAUER,
     EP_CAN_FALL,
     EP_CAN_SMASH,
     EP_CAN_PASS_MAGIC_WALL,
     EP_CAN_MOVE,
     EP_DONT_TOUCH,
-    EP_DONT_GO_TO,
+    EP_DONT_RUN_INTO,
     EP_GEM,
-    EP_CAN_EXPLODE,
+    EP_CAN_EXPLODE_BY_FIRE,
     EP_PUSHABLE,
     EP_PLAYER,
     EP_HAS_CONTENT,
@@ -2353,11 +2387,11 @@ void InitElementPropertiesEngine(int engine_version)
     EP_AMOEBALIVE,
     EP_AMOEBOID,
     EP_CAN_BE_CRUMBLED,
-    EP_ENEMY,
+    EP_DONT_COLLIDE_WITH,
     EP_CAN_FALL,
     EP_CAN_SMASH,
     EP_CAN_MOVE,
-    EP_DONT_GO_TO,
+    EP_DONT_RUN_INTO,
     EP_FOOD_DARK_YAMYAM,
     EP_GEM,
     EP_FOOD_PENGUIN,
@@ -2455,13 +2489,13 @@ void InitElementPropertiesEngine(int engine_version)
 					   !IS_WALKABLE_OVER(i) &&
 					   !IS_WALKABLE_UNDER(i)));
 
-    /* ---------- ENEMY ---------------------------------------------------- */
-    if (DONT_TOUCH(i))
-      SET_PROPERTY(i, EP_ENEMY, TRUE);
+    /* ---------- DONT_COLLIDE_WITH ---------------------------------------- */
+    if (DONT_TOUCH(i))		/* dont_touch => dont_collide_with */
+      SET_PROPERTY(i, EP_DONT_COLLIDE_WITH, TRUE);
 
-    /* ---------- DONT_GO_TO ----------------------------------------------- */
-    if (IS_ENEMY(i))
-      SET_PROPERTY(i, EP_DONT_GO_TO, TRUE);
+    /* ---------- DONT_RUN_INTO -------------------------------------------- */
+    if (DONT_COLLIDE_WITH(i))	/* dont_collide_with => dont_run_into */
+      SET_PROPERTY(i, EP_DONT_RUN_INTO, TRUE);
   }
 
 #if 0

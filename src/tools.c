@@ -1191,7 +1191,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   element = (GfxElement[x][y] != EL_UNDEFINED ? GfxElement[x][y] : Feld[x][y]);
 
   /* crumble field itself */
-  if (CAN_BE_CRUMBLED(element))
+  if (CAN_BE_CRUMBLED(element) && !IS_MOVING(x, y))
   {
     if (!IN_SCR_FIELD(sx, sy))
       return;
@@ -1206,7 +1206,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : EL_STEELWALL);
 
       /* check if neighbour field is of same type */
-      if (CAN_BE_CRUMBLED(element))
+      if (CAN_BE_CRUMBLED(element) && !IS_MOVING(xx, yy))
 	continue;
 
       if (i == 1 || i == 2)
@@ -1243,7 +1243,8 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       if (!IN_LEV_FIELD(xx, yy) ||
 	  !IN_SCR_FIELD(sxx, syy) ||
-	  !CAN_BE_CRUMBLED(Feld[xx][yy]))
+	  !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
+	  IS_MOVING(xx, yy))
 	continue;
 
       if (i == 1 || i == 2)

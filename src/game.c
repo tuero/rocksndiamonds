@@ -1825,7 +1825,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PLAYER(x, y))
       KillHeroUnlessProtected(x, y);
-    else if (CAN_EXPLODE(element))
+    else if (CAN_EXPLODE_BY_FIRE(element))
     {
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
@@ -2411,7 +2411,7 @@ void Impact(int x, int y)
     }
     else if (element == EL_BD_DIAMOND)
     {
-      if (IS_ENEMY(smashed) && IS_BD_ELEMENT(smashed))
+      if (IS_CLASSIC_ENEMY(smashed) && IS_BD_ELEMENT(smashed))
       {
 	Bang(x, y + 1);
 	return;
@@ -2430,7 +2430,7 @@ void Impact(int x, int y)
 	     element == EL_SP_ZONK ||
 	     element == EL_BD_ROCK)
     {
-      if (IS_ENEMY(smashed) ||
+      if (IS_CLASSIC_ENEMY(smashed) ||
 	  smashed == EL_BOMB ||
 	  smashed == EL_SP_DISK_ORANGE ||
 	  smashed == EL_DX_SUPABOMB ||
@@ -2931,11 +2931,11 @@ void TurnRound(int x, int y)
 
     if (IN_LEV_FIELD(left_x, left_y) &&
 	(IS_FREE(left_x, left_y) ||
-	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
+	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
       can_turn_left = TRUE;
     if (IN_LEV_FIELD(right_x, right_y) &&
 	(IS_FREE(right_x, right_y) ||
-	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
+	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
       can_turn_right = TRUE;
 
     if (can_turn_left && can_turn_right)
@@ -2970,11 +2970,11 @@ void TurnRound(int x, int y)
   {
     if (IN_LEV_FIELD(left_x, left_y) &&
 	(IS_FREE(left_x, left_y) ||
-	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
+	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
       MovDir[x][y] = left_dir;
     else if (!IN_LEV_FIELD(move_x, move_y) ||
 	     (!IS_FREE(move_x, move_y) &&
-	      (!IS_ENEMY(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
+	      (!DONT_COLLIDE_WITH(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
       MovDir[x][y] = right_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -2984,11 +2984,11 @@ void TurnRound(int x, int y)
   {
     if (IN_LEV_FIELD(right_x, right_y) &&
 	(IS_FREE(right_x, right_y) ||
-	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
+	 (DONT_COLLIDE_WITH(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
       MovDir[x][y] = right_dir;
     else if (!IN_LEV_FIELD(move_x, move_y) ||
 	     (!IS_FREE(move_x, move_y) &&
-	      (!IS_ENEMY(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
+	      (!DONT_COLLIDE_WITH(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
       MovDir[x][y] = left_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3049,7 +3049,7 @@ void TurnRound(int x, int y)
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
-				       (IS_ENEMY(element) &&
+				       (DONT_COLLIDE_WITH(element) &&
 					IS_FREE_OR_PLAYER(newx, newy)) ||
 				       Feld[newx][newy] == EL_ACID))
 	return;
@@ -3059,7 +3059,7 @@ void TurnRound(int x, int y)
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
-				       (IS_ENEMY(element) &&
+				       (DONT_COLLIDE_WITH(element) &&
 					IS_FREE_OR_PLAYER(newx, newy)) ||
 				       Feld[newx][newy] == EL_ACID))
 	return;
@@ -3431,7 +3431,7 @@ void StartMoving(int x, int y)
 	  {
 	    int flamed = MovingOrBlocked2Element(xx, yy);
 
-	    if (IS_ENEMY(flamed) || CAN_EXPLODE(flamed))
+	    if (IS_CLASSIC_ENEMY(flamed) || CAN_EXPLODE_BY_FIRE(flamed))
 	      Bang(xx, yy);
 	    else
 	      RemoveMovingField(xx, yy);
@@ -3463,14 +3463,14 @@ void StartMoving(int x, int y)
 
     Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
-    if (IS_ENEMY(element) && IS_PLAYER(newx, newy) &&
+    if (DONT_COLLIDE_WITH(element) && IS_PLAYER(newx, newy) &&
 	!PLAYER_PROTECTED(newx, newy))
     {
 #if 1
       TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
       return;
 #else
-      /* enemy got the player */
+      /* player killed by element which is deadly when colliding with */
       MovDir[x][y] = 0;
       KillHero(PLAYERINFO(newx, newy));
       return;
@@ -3515,6 +3515,8 @@ void StartMoving(int x, int y)
       }
       else if (!IS_FREE(newx, newy))
       {
+	GfxAction[x][y] = ACTION_WAITING;
+
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
@@ -3566,7 +3568,9 @@ void StartMoving(int x, int y)
 	int element2 = (IN_LEV_FIELD(newx2, newy2) ?
 			MovingOrBlocked2Element(newx2, newy2) : EL_STEELWALL);
 
-	if ((wanna_flame || IS_ENEMY(element1) || IS_ENEMY(element2)) &&
+	if ((wanna_flame ||
+	     IS_CLASSIC_ENEMY(element1) ||
+	     IS_CLASSIC_ENEMY(element2)) &&
 	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
 	    element1 != EL_FLAMES && element2 != EL_FLAMES)
 	{
@@ -5491,7 +5495,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   element = MovingOrBlocked2ElementIfNotLeaving(new_jx, new_jy);
 #endif
 
-  if (DONT_GO_TO(element))
+  if (DONT_RUN_INTO(element))
   {
     if (element == EL_ACID && dx == 0 && dy == 1)
     {
@@ -5829,11 +5833,11 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
     test_element = MovingOrBlocked2ElementIfNotLeaving(test_x, test_y);
 #endif
 
-    /* 1st case: good thing is moving towards DONT_GO_TO style bad thing;
+    /* 1st case: good thing is moving towards DONT_RUN_INTO style bad thing;
        2nd case: DONT_TOUCH style bad thing does not move away from good thing
     */
-    if ((DONT_GO_TO(test_element) && good_move_dir == test_dir[i]) ||
-	(DONT_TOUCH(test_element) && test_move_dir != test_dir[i]))
+    if ((DONT_RUN_INTO(test_element) && good_move_dir == test_dir[i]) ||
+	(DONT_TOUCH(test_element)    && test_move_dir != test_dir[i]))
     {
       kill_x = test_x;
       kill_y = test_y;
@@ -5893,11 +5897,11 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 
     test_element = Feld[test_x][test_y];
 
-    /* 1st case: good thing is moving towards DONT_GO_TO style bad thing;
+    /* 1st case: good thing is moving towards DONT_RUN_INTO style bad thing;
        2nd case: DONT_TOUCH style bad thing does not move away from good thing
     */
-    if ((DONT_GO_TO(bad_element) &&  bad_move_dir == test_dir[i]) ||
-	(DONT_TOUCH(bad_element) && test_move_dir != test_dir[i]))
+    if ((DONT_RUN_INTO(bad_element) &&  bad_move_dir == test_dir[i]) ||
+	(DONT_TOUCH(bad_element)    && test_move_dir != test_dir[i]))
     {
       /* good thing is player or penguin that does not move away */
       if (IS_PLAYER(test_x, test_y))

@@ -63,12 +63,12 @@
 /* values for configurable properties (custom elem's only, else pre-defined) */
 #define EP_DIGGABLE		0
 #define EP_COLLECTIBLE		1
-#define EP_DONT_GO_TO		2
-#define EP_ENEMY		3
+#define EP_DONT_RUN_INTO	2
+#define EP_DONT_COLLIDE_WITH	3
 #define EP_DONT_TOUCH		4
 #define EP_INDESTRUCTIBLE	5
 #define EP_SLIPPERY		6
-#define EP_CAN_EXPLODE		7
+#define EP_CAN_EXPLODE_BY_FIRE	7
 #define EP_CAN_MOVE		8
 #define EP_CAN_FALL		9
 #define EP_CAN_SMASH		10
@@ -79,8 +79,8 @@
 #define EP_PASSABLE_INSIDE	15
 #define EP_PASSABLE_UNDER	16
 #define EP_CHANGEABLE		17
-#define EP_UNUSED_18		18
-#define EP_UNUSED_19		19
+#define EP_CAN_EXPLODE_SMASHED	18
+#define EP_CAN_EXPLODE_IMPACT	19
 #define EP_UNUSED_20		20
 #define EP_UNUSED_21		21
 #define EP_UNUSED_22		22
@@ -106,35 +106,37 @@
 #define EP_FOOD_PIG		36
 #define EP_HISTORIC_WALL	37
 #define EP_HISTORIC_SOLID	38
-#define EP_BELT			39
-#define EP_BELT_ACTIVE		40
-#define EP_BELT_SWITCH		41
-#define EP_TUBE			42
-#define EP_KEYGATE		43
-#define EP_AMOEBOID		44
-#define EP_AMOEBALIVE		45
-#define EP_HAS_CONTENT		46
-#define EP_ACTIVE_BOMB		47
-#define EP_INACTIVE		48
+#define EP_CLASSIC_ENEMY	39
+#define EP_BELT			40
+#define EP_BELT_ACTIVE		41
+#define EP_BELT_SWITCH		42
+#define EP_TUBE			43
+#define EP_KEYGATE		44
+#define EP_AMOEBOID		45
+#define EP_AMOEBALIVE		46
+#define EP_HAS_CONTENT		47
+#define EP_ACTIVE_BOMB		48
+#define EP_INACTIVE		49
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER	49
-#define EP_ACCESSIBLE_INSIDE	50
-#define EP_ACCESSIBLE_UNDER	51
-#define EP_WALKABLE		52
-#define EP_PASSABLE		53
-#define EP_ACCESSIBLE		54
-#define EP_SNAPPABLE		55
-#define EP_WALL			56
-#define EP_SOLID_FOR_PUSHING	57
-#define EP_DRAGONFIRE_PROOF	58
-#define EP_EXPLOSION_PROOF	59
+#define EP_ACCESSIBLE_OVER	50
+#define EP_ACCESSIBLE_INSIDE	51
+#define EP_ACCESSIBLE_UNDER	52
+#define EP_WALKABLE		53
+#define EP_PASSABLE		54
+#define EP_ACCESSIBLE		55
+#define EP_SNAPPABLE		56
+#define EP_WALL			57
+#define EP_SOLID_FOR_PUSHING	58
+#define EP_DRAGONFIRE_PROOF	59
+#define EP_EXPLOSION_PROOF	60
 
 /* values for internal purpose only (level editor) */
-#define EP_WALK_TO_OBJECT	60
-#define EP_DEADLY		61
+#define EP_EXPLODE_RESULT	61
+#define EP_WALK_TO_OBJECT	62
+#define EP_DEADLY		63
 
-#define NUM_ELEMENT_PROPERTIES	62
+#define NUM_ELEMENT_PROPERTIES	64
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -170,12 +172,12 @@
 /* macros for configurable properties */
 #define IS_DIGGABLE(e)		HAS_PROPERTY(e, EP_DIGGABLE)
 #define IS_COLLECTIBLE(e)	HAS_PROPERTY(e, EP_COLLECTIBLE)
-#define DONT_GO_TO(e)		HAS_PROPERTY(e, EP_DONT_GO_TO)
-#define IS_ENEMY(e)		HAS_PROPERTY(e, EP_ENEMY)
+#define DONT_RUN_INTO(e)	HAS_PROPERTY(e, EP_DONT_RUN_INTO)
+#define DONT_COLLIDE_WITH(e)	HAS_PROPERTY(e, EP_DONT_COLLIDE_WITH)
 #define DONT_TOUCH(e)		HAS_PROPERTY(e, EP_DONT_TOUCH)
 #define IS_INDESTRUCTIBLE(e)	HAS_PROPERTY(e, EP_INDESTRUCTIBLE)
 #define IS_SLIPPERY(e)		HAS_PROPERTY(e, EP_SLIPPERY)
-#define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
+#define CAN_EXPLODE_BY_FIRE(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_FIRE)
 #define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_FALL(e)		HAS_PROPERTY(e, EP_CAN_FALL)
 #define CAN_SMASH(e)		HAS_PROPERTY(e, EP_CAN_SMASH)
@@ -207,6 +209,7 @@
 #define IS_FOOD_PIG(e)		HAS_PROPERTY(e, EP_FOOD_PIG)
 #define IS_HISTORIC_WALL(e)	HAS_PROPERTY(e, EP_HISTORIC_WALL)
 #define IS_HISTORIC_SOLID(e)	HAS_PROPERTY(e, EP_HISTORIC_SOLID)
+#define IS_CLASSIC_ENEMY(e)	HAS_PROPERTY(e, EP_CLASSIC_ENEMY)
 #define IS_BELT(e)		HAS_PROPERTY(e, EP_BELT)
 #define IS_BELT_ACTIVE(e)	HAS_PROPERTY(e, EP_BELT_ACTIVE)
 #define IS_BELT_SWITCH(e)	HAS_PROPERTY(e, EP_BELT_SWITCH)
@@ -1173,6 +1176,7 @@ struct ElementInfo
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */
 
+  int consistency;		/* only for level editor; not stored */
   int walk_to_action;		/* only for level editor; not stored */
   int deadliness;		/* only for level editor; not stored */
   int walkable_layer;		/* only for level editor; not stored */
