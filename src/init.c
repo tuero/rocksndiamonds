@@ -2428,6 +2428,14 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_sp_buggy_base[] =
+  {
+    EL_SP_BUGGY_BASE,
+    EL_SP_BUGGY_BASE_ACTIVATING,
+    EL_SP_BUGGY_BASE_ACTIVE,
+    -1
+  };
+
   static int ep_gem[] =
   {
     EL_BD_DIAMOND,
@@ -3072,6 +3080,7 @@ void InitElementPropertiesStatic()
     { ep_bd_element,		EP_BD_ELEMENT		},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_sb_element,		EP_SB_ELEMENT		},
+    { ep_sp_buggy_base,		EP_SP_BUGGY_BASE	},
     { ep_gem,			EP_GEM			},
     { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
     { ep_food_penguin,		EP_FOOD_PENGUIN		},
@@ -3377,6 +3386,10 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- MAYBE_DONT_COLLIDE_WITH ---------------------------------- */
     SET_PROPERTY(i, EP_MAYBE_DONT_COLLIDE_WITH, (i == EL_SP_SNIKSNAK ||
 						 i == EL_SP_ELECTRON));
+
+    /* ---------- DIGGABLE_WITH_GRAVITY ------------------------------------ */
+    SET_PROPERTY(i, EP_DIGGABLE_WITH_GRAVITY, (IS_DIGGABLE(i) &&
+					       !IS_SP_BUGGY_BASE(i)));
 
     /* ---------- CAN_MOVE_INTO_ACID --------------------------------------- */
     if (COULD_MOVE_INTO_ACID(i) && !IS_CUSTOM_ELEMENT(i))

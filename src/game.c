@@ -3503,9 +3503,15 @@ void DynaExplode(int ex, int ey)
       Explode(x, y, EX_PHASE_START, EX_TYPE_BORDER);
 
 #if 1
+#if 1
+      if (element != EL_EMPTY && element != EL_EXPLOSION &&
+	  !IS_DIGGABLE(element) && !dynabomb_xl)
+	break;
+#else
       if (element != EL_EMPTY && element != EL_EXPLOSION &&
 	  !CAN_GROW_INTO(element) && !dynabomb_xl)
 	break;
+#endif
 #else
       /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (element != EL_EMPTY && element != EL_EXPLOSION &&
@@ -7554,7 +7560,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   }
 
 #if 1
-  /* !!! indirect change before direct change !!! */
+  /* this uses direct change before indirect change */
   CheckTriggeredElementChangeByPage(x,y,old_element,CE_OTHER_IS_CHANGING,page);
 #endif
 
@@ -9009,7 +9015,7 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 
 #if 1
   return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
-	  (IS_DIGGABLE(Feld[newx][newy]) ||
+	  (IS_DIGGABLE_WITH_GRAVITY(Feld[newx][newy]) ||
 	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
 	   canPassField(newx, newy, move_dir)));
 #else
