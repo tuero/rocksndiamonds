@@ -42,7 +42,7 @@ void HandleSetupScreen(int, int, int, int, int);
 void HandleGameActions(void);
 
 void CreateScreenGadgets();
-void MapChooseLevelGadgets();
-void UnmapChooseLevelGadgets();
+void MapChooseTreeGadgets();
+void UnmapChooseTreeGadgets();
 
 #endif	/* SCREENS_H */

@@ -1083,7 +1083,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi)
   ldi->cl_first = -1;
   ldi->cl_cursor = -1;
 
-  ldi->type = TREE_TYPE_GENERIC;
+  /* ldi->type is expected to be already set! */
 
   ldi->filename = NULL;
   ldi->fullpath = NULL;
@@ -1092,22 +1092,26 @@ static void setTreeInfoToDefaults(TreeInfo *ldi)
   ldi->name_short = NULL;
   ldi->name_sorting = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
-  ldi->imported_from = NULL;
-  ldi->levels = 0;
-  ldi->first_level = 0;
-  ldi->last_level = 0;
+
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
-  ldi->level_group = FALSE;
   ldi->parent_link = FALSE;
   ldi->user_defined = FALSE;
-  ldi->readonly = TRUE;
   ldi->color = 0;
   ldi->class_desc = NULL;
-  ldi->handicap_level = 0;
+
+  if (ldi->type == TREE_TYPE_LEVEL_DIR)
+  {
+    ldi->imported_from = NULL;
+    ldi->levels = 0;
+    ldi->first_level = 0;
+    ldi->last_level = 0;
+    ldi->level_group = FALSE;
+    ldi->handicap_level = 0;
+    ldi->readonly = TRUE;
+  }
 }
 
-static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi,
-					    TreeInfo *parent)
+static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
 {
   if (parent == NULL)
   {
@@ -1210,24 +1214,30 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
 
 static void createParentTreeInfoNode(TreeInfo *node_parent)
 {
-  TreeInfo *leveldir_new = newTreeInfo();
+  TreeInfo *ti_new;
 
-  setTreeInfoToDefaults(leveldir_new);
+  if (node_parent == NULL)
+    return;
 
-  leveldir_new->node_parent = node_parent;
-  leveldir_new->parent_link = TRUE;
+  ti_new = newTreeInfo();
+  ti_new->type = node_parent->type;
 
-  leveldir_new->name = ".. (parent directory)";
-  leveldir_new->name_short = getStringCopy(leveldir_new->name);
-  leveldir_new->name_sorting = getStringCopy(leveldir_new->name);
+  setTreeInfoToDefaults(ti_new);
 
-  leveldir_new->filename = "..";
-  leveldir_new->fullpath = getStringCopy(node_parent->fullpath);
+  ti_new->node_parent = node_parent;
+  ti_new->parent_link = TRUE;
 
-  leveldir_new->sort_priority = node_parent->sort_priority;
-  leveldir_new->class_desc = getLevelClassDescription(leveldir_new);
+  ti_new->name = ".. (parent directory)";
+  ti_new->name_short = getStringCopy(ti_new->name);
+  ti_new->name_sorting = getStringCopy(ti_new->name);
 
-  pushTreeInfo(&node_parent->node_group, leveldir_new);
+  ti_new->filename = "..";
+  ti_new->fullpath = getStringCopy(node_parent->fullpath);
+
+  ti_new->sort_priority = node_parent->sort_priority;
+  ti_new->class_desc = getLevelClassDescription(ti_new);
+
+  pushTreeInfo(&node_parent->node_group, ti_new);
 }
 
 /* forward declaration for recursive call by "LoadLevelInfoFromLevelDir()" */
@@ -1255,6 +1265,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   }
 
   leveldir_new = newTreeInfo();
+  leveldir_new->type = TREE_TYPE_LEVEL_DIR;
 
   checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
   setTreeInfoToDefaultsFromParent(leveldir_new, node_parent);
@@ -1402,9 +1413,6 @@ void LoadLevelInfo()
 #endif
 }
 
-/* declaration for recursive call by "LoadArtworkInfoFromArtworkConf()" */
-static void LoadArtworkInfoFromArtworkDir(TreeInfo **, TreeInfo *, char *,int);
-
 static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 					      TreeInfo *node_parent,
 					      char *base_directory,
@@ -1460,6 +1468,8 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   }
 
   artwork_new = newTreeInfo();
+  artwork_new->type = type;
+
   setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
 
   artwork_new->filename = getStringCopy(directory_name);

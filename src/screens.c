@@ -59,6 +59,7 @@ static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
 static void CalibrateJoystick(int);
+static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
@@ -917,6 +918,315 @@ void HandleTypeName(int newxpos, Key key)
   BackToFront();
 }
 
+
+#if 1
+
+static void DrawChooseTree(TreeInfo **ti_ptr)
+{
+  UnmapAllGadgets();
+  CloseDoor(DOOR_CLOSE_2);
+
+  ClearWindow();
+  HandleChooseTree(0,0, 0,0, MB_MENU_INITIALIZE, ti_ptr);
+  MapChooseTreeGadgets();
+
+  FadeToFront();
+  InitAnimation();
+}
+
+static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
+{
+  struct GadgetInfo *gi = screen_gadget[id];
+  int items_max, items_visible, item_position;
+
+  items_max = numTreeInfoInGroup(ti);
+  items_visible = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+  item_position = first_entry;
+
+  if (item_position > items_max - items_visible)
+    item_position = items_max - items_visible;
+
+  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
+}
+
+static void drawChooseTreeList(int first_entry, int num_page_entries,
+			       TreeInfo *ti)
+{
+  int i;
+  char buffer[SCR_FIELDX * 2];
+  int max_buffer_len = (SCR_FIELDX - 2) * 2;
+  int num_entries = numTreeInfoInGroup(ti);
+  char *title_string = NULL;
+
+  ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
+  redraw_mask |= REDRAW_FIELD;
+
+  title_string =
+    (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Directories" :
+     ti->type == TREE_TYPE_GRAPHICS_DIR ? "Game Graphics" :
+     ti->type == TREE_TYPE_SOUNDS_DIR ? "Game Sounds" :
+     ti->type == TREE_TYPE_MUSIC_DIR ? "Game Music" : "");
+
+  DrawText(SX, SY, title_string, FS_BIG, FC_GREEN);
+
+  for(i=0; i<num_page_entries; i++)
+  {
+    TreeInfo *node, *node_first;
+    int entry_pos = first_entry + i;
+    int ypos = MENU_SCREEN_START_YPOS + i;
+
+    node_first = getTreeInfoFirstGroupEntry(ti);
+    node = getTreeInfoFromPos(node_first, entry_pos);
+
+    strncpy(buffer, node->name , max_buffer_len);
+    buffer[max_buffer_len] = '\0';
+
+    DrawText(SX + 32, SY + ypos * 32, buffer, FS_MEDIUM, node->color);
+
+    if (node->parent_link)
+      initCursor(i, GFX_ARROW_BLUE_LEFT);
+    else if (node->level_group)
+      initCursor(i, GFX_ARROW_BLUE_RIGHT);
+    else
+      initCursor(i, GFX_KUGEL_BLAU);
+  }
+
+  if (first_entry > 0)
+    DrawGraphic(0, 1, GFX_ARROW_BLUE_UP);
+
+  if (first_entry + num_page_entries < num_entries)
+    DrawGraphic(0, MAX_MENU_ENTRIES_ON_SCREEN + 1, GFX_ARROW_BLUE_DOWN);
+}
+
+static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
+{
+  TreeInfo *node, *node_first;
+  int x, last_redraw_mask = redraw_mask;
+  char *text = (ti->type == TREE_TYPE_LEVEL_DIR ? "group" : "directory");
+
+  node_first = getTreeInfoFirstGroupEntry(ti);
+  node = getTreeInfoFromPos(node_first, entry_pos);
+
+  ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
+
+  if (node->parent_link)
+    DrawTextFCentered(40, FC_RED, "leave %s \"%s\"", text, node->class_desc);
+  else if (node->level_group)
+    DrawTextFCentered(40, FC_RED, "enter %s \"%s\"", text, node->class_desc);
+  else if (ti->type == TREE_TYPE_LEVEL_DIR)
+    DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
+		      node->levels, node->class_desc);
+
+  /* let BackToFront() redraw only what is needed */
+  redraw_mask = last_redraw_mask | REDRAW_TILES;
+  for (x=0; x<SCR_FIELDX; x++)
+    MarkTileDirty(x, 1);
+}
+
+static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
+			     TreeInfo **ti_ptr)
+{
+  static unsigned long choose_delay = 0;
+  TreeInfo *ti = *ti_ptr;
+  int x = 0;
+  int y = ti->cl_cursor;
+  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int num_entries = numTreeInfoInGroup(ti);
+  int num_page_entries;
+
+  if (num_entries <= MAX_MENU_ENTRIES_ON_SCREEN)
+    num_page_entries = num_entries;
+  else
+    num_page_entries = MAX_MENU_ENTRIES_ON_SCREEN - 1;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    int entry_pos = posTreeInfo(ti);
+
+    if (ti->cl_first == -1)
+    {
+      ti->cl_first = MAX(0, entry_pos - num_page_entries + 1);
+      ti->cl_cursor =
+	entry_pos - ti->cl_first;
+    }
+
+    if (dx == 999)	/* first entry is set by scrollbar position */
+      ti->cl_first = dy;
+    else
+      AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				ti->cl_first, ti);
+
+    drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+    drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+    drawCursor(ti->cl_cursor, FC_RED);
+    return;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    if (ti->node_parent)
+    {
+      *ti_ptr = ti->node_parent;
+      DrawChooseTree(ti_ptr);
+    }
+    else
+    {
+      game_status = MAINMENU;
+      DrawMainMenu();
+    }
+    return;
+  }
+
+  if (mx || my)		/* mouse input */
+  {
+    x = (mx - SX) / 32;
+    y = (my - SY) / 32 - MENU_SCREEN_START_YPOS;
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
+    if (dy)
+      y = ti->cl_cursor + dy;
+
+    if (ABS(dy) == SCR_FIELDY)	/* handle KSYM_Page_Up, KSYM_Page_Down */
+    {
+      dy = SIGN(dy);
+      step = num_page_entries - 1;
+      y = (dy < 0 ? -1 : num_page_entries);
+    }
+  }
+
+  if (x == 0 && y == -1)
+  {
+    if (ti->cl_first > 0 &&
+	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
+    {
+      ti->cl_first -= step;
+      if (ti->cl_first < 0)
+	ti->cl_first = 0;
+
+      drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+      drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+      drawCursor(ti->cl_cursor, FC_RED);
+      AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				ti->cl_first, ti);
+      return;
+    }
+  }
+  else if (x == 0 && y > num_page_entries - 1)
+  {
+    if (ti->cl_first + num_page_entries < num_entries &&
+	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
+    {
+      ti->cl_first += step;
+      if (ti->cl_first + num_page_entries > num_entries)
+	ti->cl_first = MAX(0, num_entries - num_page_entries);
+
+      drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+      drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+      drawCursor(ti->cl_cursor, FC_RED);
+      AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				ti->cl_first, ti);
+      return;
+    }
+  }
+
+  if (dx == 1)
+  {
+    TreeInfo *node_first, *node_cursor;
+    int entry_pos = ti->cl_first + y;
+
+    node_first = getTreeInfoFirstGroupEntry(ti);
+    node_cursor = getTreeInfoFromPos(node_first, entry_pos);
+
+    if (node_cursor->node_group)
+    {
+      node_cursor->cl_first = ti->cl_first;
+      node_cursor->cl_cursor = ti->cl_cursor;
+      *ti_ptr = node_cursor->node_group;
+      DrawChooseTree(ti_ptr);
+      return;
+    }
+  }
+  else if (dx == -1 && ti->node_parent)
+  {
+    *ti_ptr = ti->node_parent;
+    DrawChooseTree(ti_ptr);
+    return;
+  }
+
+  if (x == 0 && y >= 0 && y < num_page_entries)
+  {
+    if (button)
+    {
+      if (y != ti->cl_cursor)
+      {
+	drawCursor(y, FC_RED);
+	drawCursor(ti->cl_cursor, FC_BLUE);
+	drawChooseTreeInfo(ti->cl_first + y, ti);
+	ti->cl_cursor = y;
+      }
+    }
+    else
+    {
+      TreeInfo *node_first, *node_cursor;
+      int entry_pos = ti->cl_first + y;
+
+      node_first = getTreeInfoFirstGroupEntry(ti);
+      node_cursor = getTreeInfoFromPos(node_first, entry_pos);
+
+      if (node_cursor->node_group)
+      {
+	node_cursor->cl_first = ti->cl_first;
+	node_cursor->cl_cursor = ti->cl_cursor;
+	*ti_ptr = node_cursor->node_group;
+	DrawChooseTree(ti_ptr);
+      }
+      else if (node_cursor->parent_link)
+      {
+	*ti_ptr = node_cursor->node_parent;
+	DrawChooseTree(ti_ptr);
+      }
+      else
+      {
+	node_cursor->cl_first = ti->cl_first;
+	node_cursor->cl_cursor = ti->cl_cursor;
+	*ti_ptr = node_cursor;
+
+	if (ti->type == TREE_TYPE_LEVEL_DIR)
+	{
+	  LoadLevelSetup_SeriesInfo();
+
+	  SaveLevelSetup_LastSeries();
+	  SaveLevelSetup_SeriesInfo();
+	  TapeErase();
+	}
+
+	game_status = MAINMENU;
+	DrawMainMenu();
+      }
+    }
+  }
+
+  BackToFront();
+
+  if (game_status == CHOOSELEVEL || game_status == SETUP)
+    DoAnimation();
+}
+
+void DrawChooseLevel()
+{
+  DrawChooseTree(&leveldir_current);
+}
+
+void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
+{
+  HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
+}
+
+
+#else
+
+
 void DrawChooseLevel()
 {
   UnmapAllGadgets();
@@ -1199,6 +1509,9 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   if (game_status == CHOOSELEVEL)
     DoAnimation();
 }
+
+#endif
+
 
 void DrawHallOfFame(int highlight_position)
 {
@@ -2449,7 +2762,7 @@ void CreateScreenGadgets()
   CreateScreenScrollbars();
 }
 
-void MapChooseLevelGadgets()
+void MapChooseTreeGadgets()
 {
   int num_leveldirs = numTreeInfoInGroup(leveldir_current);
   int i;
@@ -2461,7 +2774,7 @@ void MapChooseLevelGadgets()
     MapGadget(screen_gadget[i]);
 }
 
-void UnmapChooseLevelGadgets()
+void UnmapChooseTreeGadgets()
 {
   int i;
 
