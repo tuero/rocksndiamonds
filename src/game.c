@@ -2050,17 +2050,6 @@ void Impact(int x, int y)
       case EL_SP_ZONK:
 	sound = SND_SP_ZONKDOWN;
 	break;
-      case EL_SCHLUESSEL:
-      case EL_SCHLUESSEL1:
-      case EL_SCHLUESSEL2:
-      case EL_SCHLUESSEL3:
-      case EL_SCHLUESSEL4:
-      case EL_EM_KEY_1:
-      case EL_EM_KEY_2:
-      case EL_EM_KEY_3:
-      case EL_EM_KEY_4:
-	sound = SND_KINK;
-	break;
       case EL_ZEIT_VOLL:
       case EL_ZEIT_LEER:
 	sound = SND_DENG;

@@ -651,12 +651,22 @@ static void sound_handler(struct SoundControl snd_ctrl)
 #if !defined(PLATFORM_WIN32)
 static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 {
+  SoundInfo *snd_info;
   int i, k;
 
   if (snd_ctrl.music)
     snd_ctrl.nr = snd_ctrl.nr % num_music;
   else if (snd_ctrl.nr >= num_sounds)
     return;
+
+  snd_info = (snd_ctrl.music ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
+  if (snd_info == NULL)
+  {
+#if 1
+    printf("sound/music %d undefined\n", snd_ctrl.nr);
+#endif
+    return;
+  }
 
   /* if playlist is full, remove oldest sound */
   if (playing_sounds == MAX_SOUNDS_PLAYING)
@@ -752,9 +762,6 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     if (!playlist[i].active ||
 	(snd_ctrl.music && i == audio.music_channel))
     {
-      SoundInfo *snd_info =
-	(snd_ctrl.music ? Music[snd_ctrl.nr] : Sound[snd_ctrl.nr]);
-
       snd_ctrl.data_ptr = snd_info->data_ptr;
       snd_ctrl.data_len = snd_info->data_len;
       snd_ctrl.format   = snd_info->format;
@@ -1230,54 +1237,55 @@ static SoundInfo *Load_WAV(char *filename)
   return snd_info;
 }
 
-static void LoadCustomSound(SoundInfo **snd_info, char *basename)
+static void deleteSoundEntry(SoundInfo **snd_info)
 {
-  char *filename = getCustomSoundFilename(basename);
-  ListNode *node;
-
-  if (filename == NULL)		/* (should never happen) */
-  {
-    Error(ERR_WARN, "cannot find sound file '%s'", basename);
-    return;
-  }
-
   if (*snd_info)
   {
-    char *filename_old = (*snd_info)->source_filename;
-
-    if (strcmp(filename, filename_old) == 0)
-    {
-      /* The old and new sound are the same (have the same filename and path).
-      	 This usually means that this sound does not exist in this sound set
-	 and a fallback to the existing sound is done. */
+    char *filename = (*snd_info)->source_filename;
 
 #if 1
-      printf("[sound '%s' already exists (same list entry)]\n", filename);
-#endif
-
-      return;
-    }
-
-#if 1
-    printf("[decrementing reference counter of sound '%s']\n", filename_old);
+    printf("[decrementing reference counter of sound '%s']\n", filename);
 #endif
 
     if (--(*snd_info)->num_references <= 0)
     {
 #if 1
-      printf("[deleting sound '%s']\n", filename_old);
+      printf("[deleting sound '%s']\n", filename);
 #endif
 
       /*
       FreeSound(*snd_info);
       */
-      deleteNodeFromList(&SoundFileList, filename_old, FreeSound);
+      deleteNodeFromList(&SoundFileList, filename, FreeSound);
     }
+
+    *snd_info = NULL;
+  }
+}
+
+static void replaceSoundEntry(SoundInfo **snd_info, char *filename)
+{
+  ListNode *node;
+
+  /* check if the old and the new sound file are the same */
+  if (*snd_info && strcmp((*snd_info)->source_filename, filename) == 0)
+  {
+    /* The old and new sound are the same (have the same filename and path).
+       This usually means that this sound does not exist in this sound set
+       and a fallback to the existing sound is done. */
+
+#if 1
+    printf("[sound '%s' already exists (same list entry)]\n", filename);
+#endif
+
+    return;
   }
 
-  /* check if this sound already exists in the list of sounds */
-  node = getNodeFromKey(SoundFileList, filename);
-  if (node)
+  /* delete existing sound file entry */
+  deleteSoundEntry(snd_info);
+
+  /* check if the new sound file already exists in the list of sounds */
+  if ((node = getNodeFromKey(SoundFileList, filename)) != NULL)
   {
 #if 1
       printf("[sound '%s' already exists (other list entry)]\n", filename);
@@ -1285,14 +1293,31 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 
       *snd_info = (SoundInfo *)node->content;
       (*snd_info)->num_references++;
+  }
+  else if ((*snd_info = Load_WAV(filename)) != NULL)	/* load new sound */
+  {
+    (*snd_info)->num_references = 1;
+    addNodeToList(&SoundFileList, (*snd_info)->source_filename, *snd_info);
+  }
+}
 
-      return;
+static void LoadCustomSound(SoundInfo **snd_info, char *basename)
+{
+  char *filename = getCustomSoundFilename(basename);
+
+  if (strcmp(basename, "NONE") == 0)
+  {
+    deleteSoundEntry(snd_info);
+    return;
   }
 
-  *snd_info = Load_WAV(filename);
-  (*snd_info)->num_references = 1;
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "cannot find sound file '%s'", basename);
+    return;
+  }
 
-  addNodeToList(&SoundFileList, (*snd_info)->source_filename, *snd_info);
+  replaceSoundEntry(snd_info, filename);
 }
 
 void InitSoundList(struct SoundEffectInfo *sounds_list, int num_list_entries)
