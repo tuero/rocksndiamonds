@@ -366,17 +366,19 @@ struct LevelInfo
 
 struct LevelDirInfo
 {
-  char *filename;
-  char *name;
+  char *filename;	/* level series sub-directory inside level directory */
+  char *name;		/* level series name, as displayed on main screen */
   char *name_short;	/* optional short name for level selection screen */
-  char *author;
-  int levels;
-  int first_level;
-  int last_level;
-  int sort_priority;
-  boolean user_defined;
-  boolean readonly;
-  int color;
+  char *author;		/* level series author name levels without author */
+  char *imported_from;	/* optional comment for imported level series */
+  int levels;		/* number of levels in level series */
+  int first_level;	/* first level number (to allow start with 0 or 1) */
+  int last_level;	/* last level number (automatically calculated) */
+  int sort_priority;	/* sort levels by 'sort_priority' and then by name */
+  boolean user_defined;	/* user defined levels are stored in home directory */
+  boolean readonly;	/* readonly levels can not be changed with editor */
+  int color;		/* color to use on selection screen for this level */
+  char *class_desc;	/* description of level series class */
 };
 
 struct TapeInfo
@@ -815,35 +817,83 @@ extern char		*element_info[];
 #define EL_UNUSED_254		254
 #define EL_UNUSED_255		255
 
+#define EL_PEARL		256
+#define EL_CRYSTAL		257
+#define EL_WALL_PEARL		258
+#define EL_WALL_CRYSTAL		259
+#define EL_DOOR_WHITE		260
+#define EL_DOOR_WHITE_GRAY	261
+#define EL_KEY_WHITE		262
+#define EL_FORCE_FIELD		263
+#define EL_EXTRA_TIME		264
+#define EL_SWITCH_GATE_OPEN	265
+#define EL_SWITCH_GATE_CLOSED	266
+#define EL_SWITCH_GATE_SWITCH	267
+#define EL_TIME_GATE		268
+#define EL_TIME_GATE_WHEEL	269
+#define EL_BELT_GREEN_LEFT	270
+#define EL_BELT_GREEN_MIDDLE	271
+#define EL_BELT_GREEN_RIGHT	272
+#define EL_BELT_GREEN_SWITCH	273
+#define EL_BELT_RED_LEFT	274
+#define EL_BELT_RED_MIDDLE	275
+#define EL_BELT_RED_RIGHT	276
+#define EL_BELT_RED_SWITCH	277
+#define EL_BELT_BLUE_LEFT	278
+#define EL_BELT_BLUE_MIDDLE	279
+#define EL_BELT_BLUE_RIGHT	280
+#define EL_BELT_BLUE_SWITCH	281
+#define EL_LANDMINE		282
+#define EL_ENVELOPE		283
+#define EL_LIGHT_SWITCH		284
+#define EL_SIGN_EXCLAMATION	285
+#define EL_SIGN_RADIOACTIVITY	286
+#define EL_SIGN_STOP		287
+#define EL_SIGN_WHEELCHAIR	288
+#define EL_SIGN_PARKING		289
+#define EL_SIGN_ONEWAY		290
+#define EL_SIGN_HEART		291
+#define EL_SIGN_TRIANGLE	292
+#define EL_SIGN_ROUND		293
+#define EL_SIGN_EXIT		294
+#define EL_SIGN_YINYANG		295
+#define EL_SIGN_OTHER		296
+#define EL_MOLE_LEFT		297
+#define EL_MOLE_RIGHT		298
+#define EL_MOLE_UP		299
+#define EL_MOLE_DOWN		300
+#define EL_STEEL_SLANTED	301
+#define EL_SAND_INVISIBLE	302
+
 /* "real" (and therefore drawable) runtime elements */
-#define EL_SIEB_LEER		300
-#define EL_SIEB2_LEER		301
-#define EL_SIEB_VOLL		302
-#define EL_SIEB2_VOLL		303
-#define EL_SIEB_TOT		304
-#define EL_SIEB2_TOT		305
-#define EL_AUSGANG_ACT		306
-#define EL_SP_TERMINAL_ACTIVE	307
-#define EL_SP_BUG_ACTIVE	308
-#define EL_EM_KEY_1		309
-#define EL_EM_KEY_2		310
-#define EL_EM_KEY_3		311
-#define EL_EM_KEY_4		312
-#define EL_DYNABOMB_ACTIVE_1	313
-#define EL_DYNABOMB_ACTIVE_2	314
-#define EL_DYNABOMB_ACTIVE_3	315
-#define EL_DYNABOMB_ACTIVE_4	316
+#define EL_SIEB_LEER		1000
+#define EL_SIEB2_LEER		1001
+#define EL_SIEB_VOLL		1002
+#define EL_SIEB2_VOLL		1003
+#define EL_SIEB_TOT		1004
+#define EL_SIEB2_TOT		1005
+#define EL_AUSGANG_ACT		1006
+#define EL_SP_TERMINAL_ACTIVE	1007
+#define EL_SP_BUG_ACTIVE	1008
+#define EL_EM_KEY_1		1009
+#define EL_EM_KEY_2		1010
+#define EL_EM_KEY_3		1011
+#define EL_EM_KEY_4		1012
+#define EL_DYNABOMB_ACTIVE_1	1013
+#define EL_DYNABOMB_ACTIVE_2	1014
+#define EL_DYNABOMB_ACTIVE_3	1015
+#define EL_DYNABOMB_ACTIVE_4	1016
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_BLOCKED		400
-#define EL_EXPLODING		401
-#define EL_CRACKINGNUT		402
-#define EL_BLURB_LEFT		403
-#define EL_BLURB_RIGHT		404
-#define EL_AMOEBING		405
-#define EL_MAUERND		406
-#define EL_BURNING		407
-#define EL_PLAYER_IS_LEAVING	408
+#define EL_BLOCKED		2000
+#define EL_EXPLODING		2001
+#define EL_CRACKINGNUT		2002
+#define EL_BLURB_LEFT		2003
+#define EL_BLURB_RIGHT		2004
+#define EL_AMOEBING		2005
+#define EL_MAUERND		2006
+#define EL_BURNING		2007
+#define EL_PLAYER_IS_LEAVING	2008
 
 /* game graphics:
 **	  0 -  255: graphics from "RocksScreen"
@@ -1212,6 +1262,55 @@ extern char		*element_info[];
 #define GFX_CHAR_UE		(GFX_CHAR_ASCII0 + 93)
 #define GFX_CHAR_COPY		(GFX_CHAR_ASCII0 + 94)
 #define GFX_CHAR_END		(GFX_CHAR_START + 79)
+
+/* new elements which still have no graphic */
+#define GFX_PEARL		GFX_CHAR_FRAGE
+#define GFX_CRYSTAL		GFX_CHAR_FRAGE
+#define GFX_WALL_PEARL		GFX_CHAR_FRAGE
+#define GFX_WALL_CRYSTAL	GFX_CHAR_FRAGE
+#define GFX_DOOR_WHITE		GFX_CHAR_FRAGE
+#define GFX_DOOR_WHITE_GRAY	GFX_CHAR_FRAGE
+#define GFX_KEY_WHITE		GFX_CHAR_FRAGE
+#define GFX_FORCE_FIELD		GFX_CHAR_FRAGE
+#define GFX_EXTRA_TIME		GFX_CHAR_FRAGE
+#define GFX_SWITCH_GATE_OPEN	GFX_CHAR_FRAGE
+#define GFX_SWITCH_GATE_CLOSED	GFX_CHAR_FRAGE
+#define GFX_SWITCH_GATE_SWITCH	GFX_CHAR_FRAGE
+#define GFX_TIME_GATE		GFX_CHAR_FRAGE
+#define GFX_TIME_GATE_WHEEL	GFX_CHAR_FRAGE
+#define GFX_BELT_GREEN_LEFT	GFX_CHAR_FRAGE
+#define GFX_BELT_GREEN_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT_GREEN_RIGHT	GFX_CHAR_FRAGE
+#define GFX_BELT_GREEN_SWITCH	GFX_CHAR_FRAGE
+#define GFX_BELT_RED_LEFT	GFX_CHAR_FRAGE
+#define GFX_BELT_RED_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT_RED_RIGHT	GFX_CHAR_FRAGE
+#define GFX_BELT_RED_SWITCH	GFX_CHAR_FRAGE
+#define GFX_BELT_BLUE_LEFT	GFX_CHAR_FRAGE
+#define GFX_BELT_BLUE_MIDDLE	GFX_CHAR_FRAGE
+#define GFX_BELT_BLUE_RIGHT	GFX_CHAR_FRAGE
+#define GFX_BELT_BLUE_SWITCH	GFX_CHAR_FRAGE
+#define GFX_LANDMINE		GFX_CHAR_FRAGE
+#define GFX_ENVELOPE		GFX_CHAR_FRAGE
+#define GFX_LIGHT_SWITCH	GFX_CHAR_FRAGE
+#define GFX_SIGN_EXCLAMATION	GFX_CHAR_FRAGE
+#define GFX_SIGN_RADIOACTIVITY	GFX_CHAR_FRAGE
+#define GFX_SIGN_STOP		GFX_CHAR_FRAGE
+#define GFX_SIGN_WHEELCHAIR	GFX_CHAR_FRAGE
+#define GFX_SIGN_PARKING	GFX_CHAR_FRAGE
+#define GFX_SIGN_ONEWAY		GFX_CHAR_FRAGE
+#define GFX_SIGN_HEART		GFX_CHAR_FRAGE
+#define GFX_SIGN_TRIANGLE	GFX_CHAR_FRAGE
+#define GFX_SIGN_ROUND		GFX_CHAR_FRAGE
+#define GFX_SIGN_EXIT		GFX_CHAR_FRAGE
+#define GFX_SIGN_YINYANG	GFX_CHAR_FRAGE
+#define GFX_SIGN_OTHER		GFX_CHAR_FRAGE
+#define GFX_MOLE_LEFT		GFX_CHAR_FRAGE
+#define GFX_MOLE_RIGHT		GFX_CHAR_FRAGE
+#define GFX_MOLE_UP		GFX_CHAR_FRAGE
+#define GFX_MOLE_DOWN		GFX_CHAR_FRAGE
+#define GFX_STEEL_SLANTED	GFX_CHAR_FRAGE
+#define GFX_SAND_INVISIBLE	GFX_CHAR_FRAGE
 
 /* the names of the sounds */
 #define SND_ALCHEMY		0

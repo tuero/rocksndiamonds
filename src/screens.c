@@ -839,9 +839,16 @@ static void drawChooseLevelInfo(int leveldir_nr)
   int x, last_redraw_mask = redraw_mask;
 
   XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 32, 32);
+
+#if 0
   DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
 		    leveldir[leveldir_nr].levels,
 		    leveldir[leveldir_nr].readonly ? "readonly" : "writable");
+#else
+  DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
+		    leveldir[leveldir_nr].levels,
+		    leveldir[leveldir_nr].class_desc);
+#endif
 
   /* let BackToFront() redraw only what is needed */
   redraw_mask = last_redraw_mask | REDRAW_TILES;
@@ -915,7 +922,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 	first_entry = 0;
 
       drawChooseLevelList(first_entry, num_page_entries);
-      drawChooseLevelInfo(first_entry);
+      drawChooseLevelInfo(first_entry + choice - 3);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
       return;
     }
@@ -930,7 +937,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 	first_entry = MAX(0, num_leveldirs - num_page_entries);
 
       drawChooseLevelList(first_entry, num_page_entries);
-      drawChooseLevelInfo(first_entry + num_page_entries - 1);
+      drawChooseLevelInfo(first_entry + choice - 3);
       DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
       return;
     }

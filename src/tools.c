@@ -1532,26 +1532,35 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
   redraw_mask |= REDRAW_MICROLEVEL;
 }
 
+#define MICROLABEL_EMPTY		0
+#define MICROLABEL_LEVEL_NAME		1
+#define MICROLABEL_CREATED_BY		2
+#define MICROLABEL_LEVEL_AUTHOR		3
+#define MICROLABEL_IMPORTED_FROM	4
+#define MICROLABEL_LEVEL_IMPORT_INFO	5
+
+#define MAX_MICROLABEL_SIZE		(SXSIZE / FONT4_XSIZE)
+
 static void DrawMicroLevelLabelExt(int mode)
 {
-  char label_text[100];
+  char label_text[MAX_MICROLABEL_SIZE + 1];
 
   XFillRectangle(display, drawto,gc,
 		 SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
 
-  strcpy(label_text, (mode == 1 ? level.name :
-		      mode == 2 ? "created by" :
-		      mode == 3 ? level.author : ""));
+  strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
+		       mode == MICROLABEL_CREATED_BY ? "created by" :
+		       mode == MICROLABEL_LEVEL_AUTHOR ? level.author :
+		       mode == MICROLABEL_IMPORTED_FROM ? "imported from" :
+		       mode == MICROLABEL_LEVEL_IMPORT_INFO ?
+		       leveldir[leveldir_nr].imported_from : ""),
+	  MAX_MICROLABEL_SIZE);
+  label_text[MAX_MICROLABEL_SIZE] = '\0';
 
   if (strlen(label_text) > 0)
   {
-    int size, lxpos, lypos;
-
-    label_text[SXSIZE / FONT4_XSIZE] = '\0';
-
-    size = strlen(label_text);
-    lxpos = SX + (SXSIZE - size * FONT4_XSIZE) / 2;
-    lypos = MICROLABEL_YPOS;
+    int lxpos = SX + (SXSIZE - strlen(label_text) * FONT4_XSIZE) / 2;
+    int lypos = MICROLABEL_YPOS;
 
     DrawText(lxpos, lypos, label_text, FS_SMALL, FC_SPECIAL2);
   }
@@ -1630,10 +1639,22 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
       strcmp(level.author, leveldir[leveldir_nr].name) != 0 &&
       DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
   {
-    label_counter = (label_counter + 1) % 23;
-    label_state = (label_counter >= 0 && label_counter <= 7 ? 1 :
-		   label_counter >= 9 && label_counter <= 12 ? 2 :
-		   label_counter >= 14 && label_counter <= 21 ? 3 : 0);
+    int max_label_counter = 23;
+
+    if (leveldir[leveldir_nr].imported_from != NULL)
+      max_label_counter += 14;
+
+    label_counter = (label_counter + 1) % max_label_counter;
+    label_state = (label_counter >= 0 && label_counter <= 7 ?
+		   MICROLABEL_LEVEL_NAME :
+		   label_counter >= 9 && label_counter <= 12 ?
+		   MICROLABEL_CREATED_BY :
+		   label_counter >= 14 && label_counter <= 21 ?
+		   MICROLABEL_LEVEL_AUTHOR :
+		   label_counter >= 23 && label_counter <= 26 ?
+		   MICROLABEL_IMPORTED_FROM :
+		   label_counter >= 28 && label_counter <= 35 ?
+		   MICROLABEL_LEVEL_IMPORT_INFO : MICROLABEL_EMPTY);
     DrawMicroLevelLabelExt(label_state);
   }
 }
@@ -2425,6 +2446,53 @@ int el2gfx(int element)
     case EL_EM_KEY_2:		return GFX_EM_KEY_2;
     case EL_EM_KEY_3:		return GFX_EM_KEY_3;
     case EL_EM_KEY_4:		return GFX_EM_KEY_4;
+    case EL_PEARL:		return GFX_PEARL;
+    case EL_CRYSTAL:		return GFX_CRYSTAL;
+    case EL_WALL_PEARL:		return GFX_WALL_PEARL;
+    case EL_WALL_CRYSTAL:	return GFX_WALL_CRYSTAL;
+    case EL_DOOR_WHITE:		return GFX_DOOR_WHITE;
+    case EL_DOOR_WHITE_GRAY:	return GFX_DOOR_WHITE_GRAY;
+    case EL_KEY_WHITE:		return GFX_KEY_WHITE;
+    case EL_FORCE_FIELD:	return GFX_FORCE_FIELD;
+    case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
+    case EL_SWITCH_GATE_OPEN:	return GFX_SWITCH_GATE_OPEN;
+    case EL_SWITCH_GATE_CLOSED:	return GFX_SWITCH_GATE_CLOSED;
+    case EL_SWITCH_GATE_SWITCH:	return GFX_SWITCH_GATE_SWITCH;
+    case EL_TIME_GATE:		return GFX_TIME_GATE;
+    case EL_TIME_GATE_WHEEL:	return GFX_TIME_GATE_WHEEL;
+    case EL_BELT_GREEN_LEFT:	return GFX_BELT_GREEN_LEFT;
+    case EL_BELT_GREEN_MIDDLE:	return GFX_BELT_GREEN_MIDDLE;
+    case EL_BELT_GREEN_RIGHT:	return GFX_BELT_GREEN_RIGHT;
+    case EL_BELT_GREEN_SWITCH:	return GFX_BELT_GREEN_SWITCH;
+    case EL_BELT_RED_LEFT:	return GFX_BELT_RED_LEFT;
+    case EL_BELT_RED_MIDDLE:	return GFX_BELT_RED_MIDDLE;
+    case EL_BELT_RED_RIGHT:	return GFX_BELT_RED_RIGHT;
+    case EL_BELT_RED_SWITCH:	return GFX_BELT_RED_SWITCH;
+    case EL_BELT_BLUE_LEFT:	return GFX_BELT_BLUE_LEFT;
+    case EL_BELT_BLUE_MIDDLE:	return GFX_BELT_BLUE_MIDDLE;
+    case EL_BELT_BLUE_RIGHT:	return GFX_BELT_BLUE_RIGHT;
+    case EL_BELT_BLUE_SWITCH:	return GFX_BELT_BLUE_SWITCH;
+    case EL_LANDMINE:		return GFX_LANDMINE;
+    case EL_ENVELOPE:		return GFX_ENVELOPE;
+    case EL_LIGHT_SWITCH:	return GFX_LIGHT_SWITCH;
+    case EL_SIGN_EXCLAMATION:	return GFX_SIGN_EXCLAMATION;
+    case EL_SIGN_RADIOACTIVITY:	return GFX_SIGN_RADIOACTIVITY;
+    case EL_SIGN_STOP:		return GFX_SIGN_STOP;
+    case EL_SIGN_WHEELCHAIR:	return GFX_SIGN_WHEELCHAIR;
+    case EL_SIGN_PARKING:	return GFX_SIGN_PARKING;
+    case EL_SIGN_ONEWAY:	return GFX_SIGN_ONEWAY;
+    case EL_SIGN_HEART:		return GFX_SIGN_HEART;
+    case EL_SIGN_TRIANGLE:	return GFX_SIGN_TRIANGLE;
+    case EL_SIGN_ROUND:		return GFX_SIGN_ROUND;
+    case EL_SIGN_EXIT:		return GFX_SIGN_EXIT;
+    case EL_SIGN_YINYANG:	return GFX_SIGN_YINYANG;
+    case EL_SIGN_OTHER:		return GFX_SIGN_OTHER;
+    case EL_MOLE_LEFT:		return GFX_MOLE_LEFT;
+    case EL_MOLE_RIGHT:		return GFX_MOLE_RIGHT;
+    case EL_MOLE_UP:		return GFX_MOLE_UP;
+    case EL_MOLE_DOWN:		return GFX_MOLE_DOWN;
+    case EL_STEEL_SLANTED:	return GFX_STEEL_SLANTED;
+    case EL_SAND_INVISIBLE:	return GFX_SAND_INVISIBLE;
 
     default:
     {

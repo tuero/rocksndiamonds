@@ -26,14 +26,15 @@
 #define MAX_LINE_LEN		1000	/* maximal input line length */
 #define CHUNK_ID_LEN		4	/* IFF style chunk id length */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header */
-#define LEVEL_HEADER_UNUSED	16	/* unused level header bytes */
+#define LEVEL_HEADER_UNUSED	15	/* unused level header bytes */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header */
 #define TAPE_HEADER_UNUSED	7	/* unused tape header bytes */
-#define FILE_VERSION_1_0	10	/* old 1.0 file version */
-#define FILE_VERSION_1_2	12	/* actual file version */
+#define FILE_VERSION_1_0	10	/* 1.0 file version (old) */
+#define FILE_VERSION_1_2	12	/* 1.2 file version (still in use) */
+#define FILE_VERSION_1_4	14	/* 1.4 file version (new) */
 
 /* file identifier strings */
-#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
+#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 #define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
@@ -41,6 +42,7 @@
 #define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
 /* old file identifiers for backward compatibility */
 #define LEVEL_COOKIE_10		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
+#define LEVEL_COOKIE_12		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
 #define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
 
 /* file names and filename extensions */
@@ -82,36 +84,103 @@
 #define LEVELCLASS_CONTRIBUTION_END	299
 #define LEVELCLASS_USER_START		300
 #define LEVELCLASS_USER_END		399
+#define LEVELCLASS_BD_START		400
+#define LEVELCLASS_BD_END		499
+#define LEVELCLASS_EM_START		500
+#define LEVELCLASS_EM_END		599
+#define LEVELCLASS_SP_START		600
+#define LEVELCLASS_SP_END		699
+#define LEVELCLASS_DX_START		700
+#define LEVELCLASS_DX_END		799
 
 #define LEVELCLASS_TUTORIAL		LEVELCLASS_TUTORIAL_START
 #define LEVELCLASS_CLASSICS		LEVELCLASS_CLASSICS_START
 #define LEVELCLASS_CONTRIBUTION		LEVELCLASS_CONTRIBUTION_START
 #define LEVELCLASS_USER			LEVELCLASS_USER_START
+#define LEVELCLASS_BD			LEVELCLASS_BD_START
+#define LEVELCLASS_EM			LEVELCLASS_EM_START
+#define LEVELCLASS_SP			LEVELCLASS_SP_START
+#define LEVELCLASS_DX			LEVELCLASS_DX_START
+
 #define LEVELCLASS_UNDEFINED		999
 
-#define IS_LEVELCLASS_TUTORIAL(n) \
-	(leveldir[n].sort_priority >= LEVELCLASS_TUTORIAL_START && \
-	 leveldir[n].sort_priority <= LEVELCLASS_TUTORIAL_END)
-#define IS_LEVELCLASS_CLASSICS(n) \
-	(leveldir[n].sort_priority >= LEVELCLASS_CLASSICS_START && \
-	 leveldir[n].sort_priority <= LEVELCLASS_CLASSICS_END)
-#define IS_LEVELCLASS_CONTRIBUTION(n) \
-	(leveldir[n].sort_priority >= LEVELCLASS_CONTRIBUTION_START && \
-	 leveldir[n].sort_priority <= LEVELCLASS_CONTRIBUTION_END)
-#define IS_LEVELCLASS_USER(n) \
-	(leveldir[n].sort_priority >= LEVELCLASS_USER_START && \
-	 leveldir[n].sort_priority <= LEVELCLASS_USER_END)
+#define NUM_LEVELCLASS_DESC	8
+char *levelclass_desc[NUM_LEVELCLASS_DESC] =
+{
+  "Tutorial Levels",
+  "Classic Originals",
+  "Contributions",
+  "Private Levels",
+  "Boulderdash",
+  "Emerald Mine",
+  "Supaplex",
+  "DX Boulderdash"
+};
+
+#define IS_LEVELCLASS_TUTORIAL(p) \
+	((p)->sort_priority >= LEVELCLASS_TUTORIAL_START && \
+	 (p)->sort_priority <= LEVELCLASS_TUTORIAL_END)
+#define IS_LEVELCLASS_CLASSICS(p) \
+	((p)->sort_priority >= LEVELCLASS_CLASSICS_START && \
+	 (p)->sort_priority <= LEVELCLASS_CLASSICS_END)
+#define IS_LEVELCLASS_CONTRIBUTION(p) \
+	((p)->sort_priority >= LEVELCLASS_CONTRIBUTION_START && \
+	 (p)->sort_priority <= LEVELCLASS_CONTRIBUTION_END)
+#define IS_LEVELCLASS_USER(p) \
+	((p)->sort_priority >= LEVELCLASS_USER_START && \
+	 (p)->sort_priority <= LEVELCLASS_USER_END)
+#define IS_LEVELCLASS_BD(p) \
+	((p)->sort_priority >= LEVELCLASS_BD_START && \
+	 (p)->sort_priority <= LEVELCLASS_BD_END)
+#define IS_LEVELCLASS_EM(p) \
+	((p)->sort_priority >= LEVELCLASS_EM_START && \
+	 (p)->sort_priority <= LEVELCLASS_EM_END)
+#define IS_LEVELCLASS_SP(p) \
+	((p)->sort_priority >= LEVELCLASS_SP_START && \
+	 (p)->sort_priority <= LEVELCLASS_SP_END)
+#define IS_LEVELCLASS_DX(p) \
+	((p)->sort_priority >= LEVELCLASS_DX_START && \
+	 (p)->sort_priority <= LEVELCLASS_DX_END)
 
 #define LEVELCLASS(n)	(IS_LEVELCLASS_TUTORIAL(n) ? LEVELCLASS_TUTORIAL : \
 			 IS_LEVELCLASS_CLASSICS(n) ? LEVELCLASS_CLASSICS : \
 			 IS_LEVELCLASS_CONTRIBUTION(n) ? LEVELCLASS_CONTRIBUTION : \
 			 IS_LEVELCLASS_USER(n) ? LEVELCLASS_USER : \
+			 IS_LEVELCLASS_BD(n) ? LEVELCLASS_BD : \
+			 IS_LEVELCLASS_EM(n) ? LEVELCLASS_EM : \
+			 IS_LEVELCLASS_SP(n) ? LEVELCLASS_SP : \
+			 IS_LEVELCLASS_DX(n) ? LEVELCLASS_DX : \
 			 LEVELCLASS_UNDEFINED)
 
-#define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ? FC_BLUE : \
-			 IS_LEVELCLASS_CLASSICS(n) ? FC_YELLOW : \
-			 IS_LEVELCLASS_CONTRIBUTION(n) ? FC_GREEN : \
-			 IS_LEVELCLASS_USER(n) ? FC_RED : FC_BLUE)
+#define LEVELCOLOR(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		FC_BLUE : \
+			 IS_LEVELCLASS_CLASSICS(n) ?		FC_RED : \
+			 IS_LEVELCLASS_BD(n) ?			FC_GREEN : \
+			 IS_LEVELCLASS_EM(n) ?			FC_YELLOW : \
+			 IS_LEVELCLASS_SP(n) ?			FC_GREEN : \
+			 IS_LEVELCLASS_DX(n) ?			FC_YELLOW : \
+			 IS_LEVELCLASS_CONTRIBUTION(n) ?	FC_GREEN : \
+			 IS_LEVELCLASS_USER(n) ?		FC_RED : \
+			 FC_BLUE)
+
+#define LEVELSORTING(n)	(IS_LEVELCLASS_TUTORIAL(n) ?		0 : \
+			 IS_LEVELCLASS_CLASSICS(n) ?		1 : \
+			 IS_LEVELCLASS_BD(n) ?			2 : \
+			 IS_LEVELCLASS_EM(n) ?			3 : \
+			 IS_LEVELCLASS_SP(n) ?			4 : \
+			 IS_LEVELCLASS_DX(n) ?			5 : \
+			 IS_LEVELCLASS_CONTRIBUTION(n) ?	6 : \
+			 IS_LEVELCLASS_USER(n) ?		7 : \
+			 9)
+
+char *getLevelClassDescription(struct LevelDirInfo *ldi)
+{
+  int position = ldi->sort_priority / 100;
+
+  if (position >= 0 && position < NUM_LEVELCLASS_DESC)
+    return levelclass_desc[position];
+  else
+    return "Unknown Level Class";
+}
 
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
@@ -321,7 +390,7 @@ static void setLevelInfoToDefaults()
   }
   else
   {
-    switch (LEVELCLASS(leveldir_nr))
+    switch (LEVELCLASS(&leveldir[leveldir_nr]))
     {
       case LEVELCLASS_TUTORIAL:
   	strcpy(level.author, PROGRAM_AUTHOR_STRING);
@@ -350,7 +419,8 @@ void LoadLevel(int level_nr)
   char *filename = getLevelFilename(level_nr);
   char cookie[MAX_LINE_LEN];
   char chunk[CHUNK_ID_LEN + 1];
-  int file_version = FILE_VERSION_1_2;	/* last version of level files */
+  boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
+  int file_version = FILE_VERSION_1_4;	/* last version of level files */
   int chunk_length;
   FILE *file;
 
@@ -370,6 +440,8 @@ void LoadLevel(int level_nr)
 
   if (strcmp(cookie, LEVEL_COOKIE_10) == 0)	/* old 1.0 level format */
     file_version = FILE_VERSION_1_0;
+  else if (strcmp(cookie, LEVEL_COOKIE_12) == 0)/* 1.2 (8 bit) level format */
+    file_version = FILE_VERSION_1_2;
   else if (strcmp(cookie, LEVEL_COOKIE) != 0)	/* unknown level format */
   {
     Error(ERR_WARN, "wrong file identifier of level file '%s'", filename);
@@ -424,10 +496,11 @@ void LoadLevel(int level_nr)
   level.double_speed	= (fgetc(file) == 1 ? TRUE : FALSE);
   level.gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
 
+  encoding_16bit	= (fgetc(file) == 1 ? TRUE : FALSE);
+
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* skip unused header bytes */
     fgetc(file);
 
-  /* read chunk "BODY" */
   if (file_version >= FILE_VERSION_1_2)
   {
     getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
@@ -454,7 +527,10 @@ void LoadLevel(int level_nr)
       for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
-	    level.yam_content[i][x][y] = fgetc(file);
+	    level.yam_content[i][x][y] =
+	      (encoding_16bit ?
+	       getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
+	       fgetc(file));
 
       getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
     }
@@ -476,13 +552,16 @@ void LoadLevel(int level_nr)
   /* now read in the valid level fields from level file */
   for(y=0; y<lev_fieldy; y++)
     for(x=0; x<lev_fieldx; x++)
-      Feld[x][y] = Ur[x][y] = fgetc(file);
+      Feld[x][y] = Ur[x][y] =
+	(encoding_16bit ?
+	 getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
+	 fgetc(file));
 
   fclose(file);
 
   /* player was faster than monsters in pre-1.0 levels */
   if (file_version == FILE_VERSION_1_0 &&
-      IS_LEVELCLASS_CONTRIBUTION(leveldir_nr))
+      IS_LEVELCLASS_CONTRIBUTION(&leveldir[leveldir_nr]))
   {
     Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
     Error(ERR_WARN, "using high speed movement for player");
@@ -497,6 +576,8 @@ void SaveLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
+  boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
+  char *oldest_possible_cookie;
   FILE *file;
 
   if (!(file = fopen(filename, "w")))
@@ -505,7 +586,22 @@ void SaveLevel(int level_nr)
     return;
   }
 
-  fputs(LEVEL_COOKIE, file);		/* file identifier */
+  /* check yam content for 16-bit elements */
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	if (level.yam_content[i][x][y] > 255)
+	  encoding_16bit = TRUE;
+
+  /* check level field for 16-bit elements */
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++) 
+      if (Ur[x][y] > 255)
+	encoding_16bit = TRUE;
+
+  oldest_possible_cookie = (encoding_16bit ? LEVEL_COOKIE : LEVEL_COOKIE_12);
+
+  fputs(oldest_possible_cookie, file);		/* file identifier */
   fputc('\n', file);
 
   putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
@@ -523,13 +619,15 @@ void SaveLevel(int level_nr)
   for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc(level.yam_content[i][x][y], file);
+	fputc(encoding_16bit ? EL_LEERRAUM : level.yam_content[i][x][y], file);
   fputc(level.amoeba_speed, file);
   fputc(level.time_magic_wall, file);
   fputc(level.time_wheel, file);
   fputc(level.amoeba_content, file);
   fputc((level.double_speed ? 1 : 0), file);
   fputc((level.gravity ? 1 : 0), file);
+
+  fputc((encoding_16bit ? 1 : 0), file);
 
   for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* set unused header bytes to zero */
     fputc(0, file);
@@ -550,13 +648,20 @@ void SaveLevel(int level_nr)
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc(level.yam_content[i][x][y], file);
+	if (encoding_16bit)
+	  putFile16BitInteger(file, level.yam_content[i][x][y],
+			      BYTE_ORDER_BIG_ENDIAN);
+	else
+	  fputc(level.yam_content[i][x][y], file);
 
   putFileChunk(file, "BODY", lev_fieldx * lev_fieldy, BYTE_ORDER_BIG_ENDIAN);
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++) 
-      fputc(Ur[x][y], file);
+      if (encoding_16bit)
+	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
+      else
+	fputc(Ur[x][y], file);
 
   fclose(file);
 
@@ -909,11 +1014,13 @@ void SaveScore(int level_nr)
 
 /* level directory info */
 #define LEVELINFO_TOKEN_NAME		29
-#define LEVELINFO_TOKEN_AUTHOR		30
-#define LEVELINFO_TOKEN_LEVELS		31
-#define LEVELINFO_TOKEN_FIRST_LEVEL	32
-#define LEVELINFO_TOKEN_SORT_PRIORITY	33
-#define LEVELINFO_TOKEN_READONLY	34
+#define LEVELINFO_TOKEN_NAME_SHORT	30
+#define LEVELINFO_TOKEN_AUTHOR		31
+#define LEVELINFO_TOKEN_IMPORTED_FROM	32
+#define LEVELINFO_TOKEN_LEVELS		33
+#define LEVELINFO_TOKEN_FIRST_LEVEL	34
+#define LEVELINFO_TOKEN_SORT_PRIORITY	35
+#define LEVELINFO_TOKEN_READONLY	36
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TEAM_MODE
@@ -977,6 +1084,7 @@ static struct
   { TYPE_STRING,  &ldi.name,		"name"				},
   { TYPE_STRING,  &ldi.name_short,	"name_short"			},
   { TYPE_STRING,  &ldi.author,		"author"			},
+  { TYPE_STRING,  &ldi.imported_from,	"imported_from"			},
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
   { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
   { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
@@ -1243,6 +1351,7 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
   ldi->name = getStringCopy(ANONYMOUS_NAME);
   ldi->name_short = NULL;
   ldi->author = getStringCopy(ANONYMOUS_NAME);
+  ldi->imported_from = NULL;
   ldi->levels = 0;
   ldi->first_level = 0;
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
@@ -1400,18 +1509,20 @@ static int compareLevelDirInfoEntries(const void *object1, const void *object2)
   const struct LevelDirInfo *entry2 = object2;
   int compare_result;
 
-  if (entry1->sort_priority != entry2->sort_priority)
-    compare_result = entry1->sort_priority - entry2->sort_priority;
-  else
+  if (entry1->sort_priority == entry2->sort_priority)
   {
-    char *name1 = getStringToLower(entry1->name);
-    char *name2 = getStringToLower(entry2->name);
+    char *name1 = getStringToLower(entry1->name_short);
+    char *name2 = getStringToLower(entry2->name_short);
 
     compare_result = strcmp(name1, name2);
 
     free(name1);
     free(name2);
   }
+  else if (LEVELSORTING(entry1) == LEVELSORTING(entry2))
+    compare_result = entry1->sort_priority - entry2->sort_priority;
+  else
+    compare_result = LEVELSORTING(entry1) - LEVELSORTING(entry2);
 
   return compare_result;
 }
@@ -1474,7 +1585,9 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 	leveldir[current_entry].levels - 1;
       leveldir[current_entry].user_defined =
 	(level_directory == options.level_directory ? FALSE : TRUE);
-      leveldir[current_entry].color = LEVELCOLOR(current_entry);
+      leveldir[current_entry].color = LEVELCOLOR(&leveldir[current_entry]);
+      leveldir[current_entry].class_desc =
+	getLevelClassDescription(&leveldir[current_entry]);
 
       freeSetupFileList(setup_file_list);
       current_entry++;
@@ -1538,7 +1651,6 @@ static void SaveUserLevelInfo()
   setLevelDirInfoToDefaults(&ldi);
 
   ldi.name = getLoginName();
-  ldi.name_short = getLoginName();
   ldi.author = getRealName();
   ldi.levels = 100;
   ldi.first_level = 1;
@@ -1549,7 +1661,8 @@ static void SaveUserLevelInfo()
 	  getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER, LEVELINFO_COOKIE));
 
   for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
-    fprintf(file, "%s\n", getSetupLine("", i));
+    if (i != LEVELINFO_TOKEN_NAME_SHORT && i != LEVELINFO_TOKEN_IMPORTED_FROM)
+      fprintf(file, "%s\n", getSetupLine("", i));
 
   fclose(file);
   free(filename);
