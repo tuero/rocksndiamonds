@@ -1449,6 +1449,7 @@ static struct ValueTextInfo options_change_trigger_page[] =
 static struct ValueTextInfo options_change_replace_when[] =
 {
   { CP_WHEN_EMPTY,		"empty"				},
+  { CP_WHEN_WALKABLE,		"walkable"			},
   { CP_WHEN_DIGGABLE,		"diggable"			},
   { CP_WHEN_COLLECTIBLE,	"collectible"			},
   { CP_WHEN_REMOVABLE,		"removable"			},

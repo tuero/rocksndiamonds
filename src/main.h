@@ -245,6 +245,7 @@
 #define CP_WHEN_DESTRUCTIBLE	2
 #define CP_WHEN_COLLECTIBLE	3
 #define CP_WHEN_REMOVABLE	4
+#define CP_WHEN_WALKABLE	5
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER	4

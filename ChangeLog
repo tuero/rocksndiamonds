@@ -1,3 +1,6 @@
+2004-04-20
+	* added "replace when walkable" to relocate player to walkable element
+
 2004-04-18
 	* fixed graphic bug when player is snapping while moving in old levels
 	* fixed bug when a moving custom element leaves a player element behind

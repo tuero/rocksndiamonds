@@ -2652,67 +2652,19 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
-void RelocatePlayer(int x, int y, int element_raw)
+void DrawRelocatePlayer(struct PlayerInfo *player)
 {
-  int old_element = Feld[x][y];
-  int element = (element_raw == EL_SP_MURPHY ? EL_PLAYER_1 : element_raw);
-  struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
-  int old_jx, old_jy;
-
-  if (player->GameOver)		/* do not reanimate dead player */
-    return;
-
-  if (ELEM_IS_PLAYER(old_element))	/* player already set */
-  {
-    RemoveField(x, y);		/* temporarily remove newly placed player */
-    DrawLevelField(x, y);
-  }
-
-  if (player->present)
-  {
-    while (player->MovPos)
-    {
-      ScrollPlayer(player, SCROLL_GO_ON);
-      ScrollScreen(NULL, SCROLL_GO_ON);
-      FrameCounter++;
-
-      DrawPlayer(player);
-
-      BackToFront();
-      Delay(wait_delay_value);
-    }
-
-    DrawPlayer(player);		/* needed here only to cleanup last field */
-    DrawLevelField(player->jx, player->jy);	/* remove player graphic */
-
-    player->is_moving = FALSE;
-  }
-
-  old_jx = player->jx;
-  old_jy = player->jy;
-
-  Feld[x][y] = element;
-  InitPlayerField(x, y, element, TRUE);
-
-  if (!ELEM_IS_PLAYER(old_element))	/* player set on walkable element */
-  {
-    Feld[x][y] = old_element;
-    InitField(x, y, FALSE);
-  }
-
-  if (player != local_player)	/* do not visually relocate other players */
-    return;
+  int jx = player->jx;
+  int jy = player->jy;
 
   if (level.instant_relocation)
   {
 #if 1
     int offset = (setup.scroll_delay ? 3 : 0);
-    int jx = local_player->jx;
-    int jy = local_player->jy;
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {
@@ -2762,8 +2714,6 @@ void RelocatePlayer(int x, int y, int element_raw)
 #if 1
 #if 0
     int offset = (setup.scroll_delay ? 3 : 0);
-    int jx = local_player->jx;
-    int jy = local_player->jy;
 #endif
     int scroll_xx = -999, scroll_yy = -999;
 
@@ -2859,11 +2809,116 @@ void RelocatePlayer(int x, int y, int element_raw)
       Delay(wait_delay_value);
     }
 #endif
+
+    DrawPlayer(player);
+    BackToFront();
+    Delay(wait_delay_value);
+  }
+}
+
+void RelocatePlayer(int jx, int jy, int el_player_raw)
+{
+  int el_player = (el_player_raw == EL_SP_MURPHY ? EL_PLAYER_1 :el_player_raw);
+  struct PlayerInfo *player = &stored_player[el_player - EL_PLAYER_1];
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.warp_forward);
+  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+  int old_jx = player->jx;
+  int old_jy = player->jy;
+  int old_element = Feld[old_jx][old_jy];
+  int element = Feld[jx][jy];
+  boolean player_relocated = (old_jx != jx || old_jy != jy);
+
+  static int trigger_sides[4][2] =
+  {
+    /* enter side               leave side */
+    { CH_SIDE_RIGHT,		CH_SIDE_LEFT	},	/* moving left  */
+    { CH_SIDE_LEFT,		CH_SIDE_RIGHT	},	/* moving right */
+    { CH_SIDE_BOTTOM,		CH_SIDE_TOP	},	/* moving up    */
+    { CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
+  };
+  int move_dir_horiz = (jx < old_jx ? MV_LEFT : jx > old_jx ? MV_RIGHT : 0);
+  int move_dir_vert  = (jy < old_jy ? MV_UP   : jy > old_jy ? MV_DOWN  : 0);
+  int enter_side_horiz = trigger_sides[MV_DIR_BIT(move_dir_horiz)][0];
+  int enter_side_vert  = trigger_sides[MV_DIR_BIT(move_dir_vert)][0];
+  int enter_side = enter_side_horiz | enter_side_vert;
+  int leave_side_horiz = trigger_sides[MV_DIR_BIT(move_dir_horiz)][1];
+  int leave_side_vert  = trigger_sides[MV_DIR_BIT(move_dir_vert)][1];
+  int leave_side = leave_side_horiz | leave_side_vert;
+
+  if (player->GameOver)		/* do not reanimate dead player */
+    return;
+
+  if (!player_relocated)	/* no need to relocate the player */
+    return;
+
+  if (IS_PLAYER(jx, jy))	/* player already placed at new position */
+  {
+    RemoveField(jx, jy);	/* temporarily remove newly placed player */
+    DrawLevelField(jx, jy);
+  }
+
+  if (player->present)
+  {
+    while (player->MovPos)
+    {
+      ScrollPlayer(player, SCROLL_GO_ON);
+      ScrollScreen(NULL, SCROLL_GO_ON);
+      FrameCounter++;
+
+      DrawPlayer(player);
+
+      BackToFront();
+      Delay(wait_delay_value);
+    }
+
+    DrawPlayer(player);		/* needed here only to cleanup last field */
+    DrawLevelField(player->jx, player->jy);	/* remove player graphic */
+
+    player->is_moving = FALSE;
   }
 
 #if 1
-  TestIfHeroTouchesBadThing(x, y);
-  TestIfPlayerTouchesCustomElement(x, y);
+  if (IS_CUSTOM_ELEMENT(old_element))
+    CheckElementChangeByPlayer(old_jx, old_jy, old_element,
+			       CE_LEFT_BY_PLAYER,
+			       player->index_bit, leave_side);
+
+  CheckTriggeredElementChangeByPlayer(old_jx, old_jy, old_element,
+				      CE_OTHER_GETS_LEFT,
+				      player->index_bit, leave_side);
+#endif
+
+  Feld[jx][jy] = el_player;
+  InitPlayerField(jx, jy, el_player, TRUE);
+
+  Feld[jx][jy] = element;	/* player may be set on walkable element */
+  InitField(jx, jy, FALSE);
+
+#if 1
+  if (player == local_player)	/* only visually relocate local player */
+    DrawRelocatePlayer(player);
+#endif
+
+#if 1
+  TestIfHeroTouchesBadThing(jx, jy);
+  TestIfPlayerTouchesCustomElement(jx, jy);
+#endif
+
+#if 1
+  /* needed to allow change of walkable custom element by entering player */
+  Changed[jx][jy] = 0;		/* allow another change */
+#endif
+
+#if 1
+  if (IS_CUSTOM_ELEMENT(element))
+    CheckElementChangeByPlayer(jx, jy, element, CE_ENTERED_BY_PLAYER,
+			       player->index_bit, enter_side);
+
+  CheckTriggeredElementChangeByPlayer(jx, jy, element,
+				      CE_OTHER_GETS_ENTERED,
+				      player->index_bit, enter_side);
 #endif
 }
 
@@ -7245,9 +7300,14 @@ static void ChangeActiveTrap(int x, int y)
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
   int previous_move_direction = MovDir[x][y];
+#if 1
+  boolean add_player = (ELEM_IS_PLAYER(target_element) &&
+			IS_WALKABLE(Feld[x][y]));
+#else
   boolean add_player = (ELEM_IS_PLAYER(target_element) &&
 			IS_WALKABLE(Feld[x][y]) &&
 			!IS_MOVING(x, y));
+#endif
 
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
@@ -7339,7 +7399,10 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
+#if 1
+  /* !!! indirect change before direct change !!! */
   CheckTriggeredElementChangeByPage(x,y,Feld[x][y], CE_OTHER_IS_CHANGING,page);
+#endif
 
   if (change->explode)
   {
@@ -7357,6 +7420,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     for (yy = 0; yy < 3; yy++) for (xx = 0; xx < 3 ; xx++)
     {
       boolean is_empty;
+      boolean is_walkable;
       boolean is_diggable;
       boolean is_collectible;
       boolean is_removable;
@@ -7393,22 +7457,24 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
 #if 1
 
-#if 1
+#if 0
       is_empty = (IS_FREE(ex, ey) ||
 		  (IS_PLAYER(ex, ey) && IS_WALKABLE(content_element)) ||
 		  (IS_WALKABLE(e) && ELEM_IS_PLAYER(content_element) &&
 		   !IS_MOVING(ex, ey) && !IS_BLOCKED(ex, ey)));
 #else
-      is_empty = (IS_FREE(ex, ey) || (IS_PLAYER(ex, ey) &&
-				      IS_WALKABLE(content_element)));
+      is_empty = (IS_FREE(ex, ey) ||
+		  (IS_PLAYER(ex, ey) && IS_WALKABLE(content_element)));
 #endif
-      is_diggable = (is_empty || IS_DIGGABLE(e));
-      is_collectible = (is_empty || IS_COLLECTIBLE(e));
-      is_removable = (is_diggable || is_collectible);
+      is_walkable     = (is_empty || IS_WALKABLE(e));
+      is_diggable     = (is_empty || IS_DIGGABLE(e));
+      is_collectible  = (is_empty || IS_COLLECTIBLE(e));
       is_destructible = (is_empty || !IS_INDESTRUCTIBLE(e));
+      is_removable    = (is_diggable || is_collectible);
 
       can_replace[xx][yy] =
 	((change->replace_when == CP_WHEN_EMPTY        && is_empty) ||
+	 (change->replace_when == CP_WHEN_WALKABLE     && is_walkable) ||
 	 (change->replace_when == CP_WHEN_DIGGABLE     && is_diggable) ||
 	 (change->replace_when == CP_WHEN_COLLECTIBLE  && is_collectible) ||
 	 (change->replace_when == CP_WHEN_REMOVABLE    && is_removable) ||
@@ -9412,23 +9478,25 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       int move_direction = player->MovDir;
       int enter_side = trigger_sides[MV_DIR_BIT(move_direction)][0];
       int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
+      int old_element = Feld[old_jx][old_jy];
+      int new_element = Feld[jx][jy];
 
 #if 1
       /* !!! TEST ONLY !!! */
-      if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
-	CheckElementChangeByPlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+      if (IS_CUSTOM_ELEMENT(old_element))
+	CheckElementChangeByPlayer(old_jx, old_jy, old_element,
 				   CE_LEFT_BY_PLAYER,
 				   player->index_bit, leave_side);
 
-      CheckTriggeredElementChangeByPlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+      CheckTriggeredElementChangeByPlayer(old_jx, old_jy, old_element,
 					  CE_OTHER_GETS_LEFT,
 					  player->index_bit, leave_side);
 
-      if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
-	CheckElementChangeByPlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
+      if (IS_CUSTOM_ELEMENT(new_element))
+	CheckElementChangeByPlayer(jx, jy, new_element, CE_ENTERED_BY_PLAYER,
 				   player->index_bit, enter_side);
 
-      CheckTriggeredElementChangeByPlayer(jx, jy, Feld[jx][jy],
+      CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
 					  CE_OTHER_GETS_ENTERED,
 					  player->index_bit, enter_side);
 #endif
@@ -9567,23 +9635,25 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
       int old_jx = last_jx;
       int old_jy = last_jy;
+      int old_element = Feld[old_jx][old_jy];
+      int new_element = Feld[jx][jy];
 
 #if 1
       /* !!! TEST ONLY !!! */
-      if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
-	CheckElementChangeByPlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+      if (IS_CUSTOM_ELEMENT(old_element))
+	CheckElementChangeByPlayer(old_jx, old_jy, old_element,
 				   CE_LEFT_BY_PLAYER,
 				   player->index_bit, leave_side);
 
-      CheckTriggeredElementChangeByPlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+      CheckTriggeredElementChangeByPlayer(old_jx, old_jy, old_element,
 					  CE_OTHER_GETS_LEFT,
 					  player->index_bit, leave_side);
 
-      if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
-	CheckElementChangeByPlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
+      if (IS_CUSTOM_ELEMENT(new_element))
+	CheckElementChangeByPlayer(jx, jy, new_element, CE_ENTERED_BY_PLAYER,
 				   player->index_bit, enter_side);
 
-      CheckTriggeredElementChangeByPlayer(jx, jy, Feld[jx][jy],
+      CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
 					  CE_OTHER_GETS_ENTERED,
 					  player->index_bit, enter_side);
 #endif
