@@ -482,10 +482,11 @@ void DrawHelpScreenElAction(int start)
     i++;
   }
 
-  redraw_tiles += 28;
   for(i=2;i<16;i++)
-    redraw[0][i] = redraw[1][i] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  {
+    MarkTileDirty(0,i);
+    MarkTileDirty(1,i);
+  }
 }
 
 void DrawHelpScreenElText(int start)

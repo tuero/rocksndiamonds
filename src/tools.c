@@ -101,6 +101,15 @@ void BackToFront()
       XCopyArea(display,buffer,window,gc,
 		fx,fy, SXSIZE,SYSIZE,
 		SX,SY);
+
+
+
+      printf("Full screen redraw (%d) (%ld)\n",
+	     ScreenMovPos,
+	     Counter());
+
+
+
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
@@ -420,6 +429,10 @@ void DrawPlayerField()
 
 
 
+  MarkTileDirty(sx,sy);
+
+
+
   if (PlayerPushing && PlayerMovPos)
   {
     int nextJX = JX + (JX - lastJX);
@@ -544,9 +557,7 @@ void DrawGraphic(int x, int y, int graphic)
 #endif
 
   DrawGraphicExt(drawto_field, gc, x, y, graphic);
-  redraw_tiles++;
-  redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  MarkTileDirty(x,y);
 }
 
 void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
@@ -628,9 +639,7 @@ void DrawGraphicThruMask(int x, int y, int graphic)
     return;
   }
 
-  redraw_tiles++;
-  redraw[redraw_x1 + x][redraw_y1 + y]=TRUE;
-  redraw_mask|=REDRAW_TILES;
+  MarkTileDirty(x,y);
 }
 
 void DrawElementThruMask(int x, int y, int element)
@@ -641,9 +650,7 @@ void DrawElementThruMask(int x, int y, int element)
 void DrawMiniGraphic(int x, int y, int graphic)
 {
   DrawMiniGraphicExt(drawto, gc, x, y, graphic);
-  redraw_tiles++;
-  redraw[x/2][y/2]=TRUE;
-  redraw_mask|=REDRAW_TILES;
+  MarkTileDirty(x/2, y/2);
 }
 
 void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
@@ -709,7 +716,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
     else if (x==BX2 && dx>0)	/* Element verl‰ﬂt rechts das Bild */
       width -= dx;
     else if (dx)		/* allg. Bewegung in x-Richtung */
-      redraw[redraw_x1 + x + SIGN(dx)][redraw_y1 + y] = TRUE;
+      MarkTileDirty(x + SIGN(dx), y);
 
     if (y < BY1)		/* Element kommt von oben ins Bild */
     {
@@ -741,12 +748,12 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
       height = dy;
       cy = TILEY-dy;
       dy = TILEY;
-      redraw[redraw_x1 + x][redraw_y1 + y + 1] = TRUE;
+      MarkTileDirty(x, y + 1);
     }				/* Element verl‰ﬂt unten das Bild */
     else if (dy > 0 && (y == BY2 || cut_mode==CUT_BELOW))
       height -= dy;
     else if (dy)		/* allg. Bewegung in y-Richtung */
-      redraw[redraw_x1 + x][redraw_y1 + y + SIGN(dy)] = TRUE;
+      MarkTileDirty(x, y + SIGN(dy));
   }
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
@@ -775,9 +782,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
   }
 #endif
 
-  redraw_tiles++;
-  redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  MarkTileDirty(x,y);
 }
 
 void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
@@ -903,7 +908,7 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
     else if (x==BX2 && dx>0)	/* Element verl‰ﬂt rechts das Bild */
       width -= dx;
     else if (dx)		/* allg. Bewegung in x-Richtung */
-      redraw[redraw_x1 + x + SIGN(dx)][redraw_y1 + y] = TRUE;
+      MarkTileDirty(x + SIGN(dx), y);
 
     if (y < BY1)		/* Element kommt von oben ins Bild */
     {
@@ -935,12 +940,12 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
       height = dy;
       cy = TILEY-dy;
       dy = TILEY;
-      redraw[redraw_x1 + x][redraw_y1 + y + 1] = TRUE;
+      MarkTileDirty(x, y + 1);
     }				/* Element verl‰ﬂt unten das Bild */
     else if (dy > 0 && (y == BY2 || cut_mode==CUT_BELOW))
       height -= dy;
     else if (dy)		/* allg. Bewegung in y-Richtung */
-      redraw[redraw_x1 + x][redraw_y1 + y + SIGN(dy)] = TRUE;
+      MarkTileDirty(x, y + SIGN(dy));
   }
 
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
@@ -978,9 +983,7 @@ void DrawGraphicShiftedThruMask(int x,int y, int dx,int dy, int graphic,
   }
 #endif
 
-  redraw_tiles++;
-  redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  MarkTileDirty(x,y);
 }
 
 void ErdreichAnbroeckeln(int x, int y)
@@ -1048,8 +1051,7 @@ void ErdreichAnbroeckeln(int x, int y)
 		width,height, FX+x*TILEX+cx,FY+y*TILEY+cy);
     }
 
-    redraw_tiles++;
-    redraw[redraw_x1 + x][redraw_y1 + y] = TRUE;
+    MarkTileDirty(x,y);
   }
   else
   {
@@ -1093,8 +1095,7 @@ void ErdreichAnbroeckeln(int x, int y)
 		SY+(graphic / GFX_PER_LINE)*TILEY+cy,
 		width,height, FX+xx*TILEX+cx,FY+yy*TILEY+cy);
 
-      redraw_tiles++;
-      redraw[redraw_x1 + xx][redraw_y1 + yy] = TRUE;
+      MarkTileDirty(xx,yy);
     }
   }
 }
@@ -1216,10 +1217,6 @@ void DrawMiniElement(int x, int y, int element)
 
   graphic = el2gfx(element);
   DrawMiniGraphic(x,y,graphic);
-
-  redraw_tiles++;
-  redraw[x/2][y/2]=TRUE;
-  redraw_mask|=REDRAW_TILES;
 }
 
 void DrawMiniElementOrWall(int x, int y, int scroll_x, int scroll_y)

@@ -38,5 +38,6 @@ unsigned int SimpleRND(unsigned int);
 unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *GetLoginName(void);
+void MarkTileDirty(int, int);
 
 #endif

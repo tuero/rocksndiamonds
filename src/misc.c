@@ -167,3 +167,16 @@ char *GetLoginName()
   else
     return(pwd->pw_name);
 }
+
+void MarkTileDirty(int x, int y)
+{
+  int xx = redraw_x1 + x;
+  int yy = redraw_y1 + y;
+
+  if (!redraw[xx][yy])
+  {
+    redraw[xx][yy] = TRUE;
+    redraw_tiles++;
+    redraw_mask |= REDRAW_TILES;
+  }
+}

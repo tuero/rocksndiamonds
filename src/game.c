@@ -1008,6 +1008,13 @@ void Impact(int x, int y)
 	break;
       case EL_FELSBROCKEN:
 	sound = SND_KLOPF;
+
+
+
+	printf("FUMPF!\n");
+
+
+
 	break;
       case EL_SCHLUESSEL:
       case EL_SCHLUESSEL1:
@@ -2581,13 +2588,10 @@ void GameActions()
   */
 
 
-
   if (PlayerMovPos)
     ScrollFigure(0);
 
   DrawPlayerField();
-
-
 
 
   if (!DelayReached(&action_delay, action_delay_value))
@@ -2916,7 +2920,9 @@ void ScrollFigure(int init)
     if (oldJX != -1 && oldJY != -1)
       DrawLevelElement(oldJX,oldJY, Feld[oldJX][oldJY]);
 
-    if (Feld[lastJX][lastJY] == EL_LEERRAUM)
+    if (Feld[lastJX][lastJY] == EL_LEERRAUM &&
+	IN_LEV_FIELD(lastJX,lastJY-1) &&
+	CAN_FALL(Feld[lastJX][lastJY-1]))
       Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
     DrawLevelElement(lastJX,lastJY, Feld[lastJX][lastJY]);
     DrawPlayerField();
