@@ -1273,7 +1273,7 @@ void InitElementPropertiesStatic()
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
     EL_SWITCHGATE_CLOSING,
-#if 1
+#if 0
     EL_SWITCHGATE_SWITCH_UP,
     EL_SWITCHGATE_SWITCH_DOWN,
 #endif
@@ -1281,7 +1281,7 @@ void InitElementPropertiesStatic()
     EL_TIMEGATE_OPENING,
     EL_TIMEGATE_CLOSED,
     EL_TIMEGATE_CLOSING,
-#if 1
+#if 0
     EL_TIMEGATE_SWITCH,
     EL_TIMEGATE_SWITCH_ACTIVE,
 #endif
