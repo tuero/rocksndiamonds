@@ -5843,6 +5843,7 @@ static void CopyClassicElementPropertiesToGame(int element)
   if (COULD_MOVE_INTO_ACID(element))
     setMoveIntoAcidProperty(&level, element,
 			    custom_element_properties[EP_CAN_MOVE_INTO_ACID]);
+
 #else
 
   if (COULD_MOVE_INTO_ACID(element))

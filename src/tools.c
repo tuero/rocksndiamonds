@@ -40,6 +40,39 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
+void DumpTile(int x, int y)
+{
+  int sx = SCREENX(x);
+  int sy = SCREENX(y);
+
+  printf_line("-", 79);
+  printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
+  printf_line("-", 79);
+
+  if (!IN_LEV_FIELD(x, y))
+  {
+    printf("(not in level field)\n");
+    printf("\n");
+
+    return;
+  }
+
+  printf("  Feld:        %d ['%s']\n", Feld[x][y],
+	 element_info[Feld[x][y]].token_name);
+  printf("  Back:        %d\n", Back[x][y]);
+  printf("  Store:       %d\n", Store[x][y]);
+  printf("  Store2:      %d\n", Store2[x][y]);
+  printf("  StorePlayer: %d\n", StorePlayer[x][y]);
+  printf("  MovPos:      %d\n", MovPos[x][y]);
+  printf("  MovDir:      %d\n", MovDir[x][y]);
+  printf("  MovDelay:    %d\n", MovDelay[x][y]);
+  printf("  ChangeDelay: %d\n", ChangeDelay[x][y]);
+  printf("  GfxElement:  %d\n", GfxElement[x][y]);
+  printf("  GfxAction:   %d\n", GfxAction[x][y]);
+  printf("  GfxFrame:    %d\n", GfxFrame[x][y]);
+  printf("\n");
+}
+
 void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && setup.soft_scrolling)
@@ -1485,7 +1518,13 @@ void DrawScreenField(int x, int y)
       DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], content, cut_mode);
 
     if (content == EL_ACID)
-      DrawLevelElementThruMask(lx, ly + 1, EL_ACID);
+    {
+      int dir = MovDir[lx][ly];
+      int newlx = lx + (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
+      int newly = ly + (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
+
+      DrawLevelElementThruMask(newlx, newly, EL_ACID);
+    }
   }
   else if (IS_BLOCKED(lx, ly))
   {

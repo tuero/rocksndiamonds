@@ -2158,6 +2158,15 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
+  /* correct field access direction (for old levels without this option) */
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (element_info[element].access_direction == MV_NO_MOVING)
+      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+  }
+
 #if 0
   /* set default push delay values (corrected since version 3.0.7-1) */
   if (level->game_version < VERSION_IDENT(3,0,7,1))

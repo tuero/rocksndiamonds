@@ -3122,6 +3122,12 @@ void InitElementPropertiesEngine(int engine_version)
   InitElementPropertiesStatic();
 #endif
 
+  /* important: after initialization in InitElementPropertiesStatic(), the
+     elements are not again initialized to a default value; therefore all
+     changes have to make sure that they leave the element with a defined
+     property (which means that conditional property changes must be set to
+     a reliable default value before) */
+
   /* set all special, combined or engine dependent element properties */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -3131,8 +3137,7 @@ void InitElementPropertiesEngine(int engine_version)
 #endif
 
     /* ---------- INACTIVE ------------------------------------------------- */
-    if (i >= EL_CHAR_START && i <= EL_CHAR_END)
-      SET_PROPERTY(i, EP_INACTIVE, TRUE);
+    SET_PROPERTY(i, EP_INACTIVE, (i >= EL_CHAR_START && i <= EL_CHAR_END));
 
     /* ---------- WALKABLE, PASSABLE, ACCESSIBLE --------------------------- */
     SET_PROPERTY(i, EP_WALKABLE, (IS_WALKABLE_OVER(i) ||
@@ -3184,9 +3189,11 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_DIGGABLE(i) &&
 					     !IS_COLLECTIBLE(i)));
 
+#if 1
     /* ---------- PROTECTED ------------------------------------------------ */
     if (IS_ACCESSIBLE_INSIDE(i))
       SET_PROPERTY(i, EP_PROTECTED, TRUE);
+#endif
 
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
 
@@ -3219,6 +3226,8 @@ void InitElementPropertiesEngine(int engine_version)
 
     if (IS_CUSTOM_ELEMENT(i))
     {
+      /* these are additional properties which are initially false when set */
+
       /* ---------- DONT_COLLIDE_WITH / DONT_RUN_INTO ---------------------- */
       if (DONT_TOUCH(i))
 	SET_PROPERTY(i, EP_DONT_COLLIDE_WITH, TRUE);
@@ -3259,8 +3268,8 @@ void InitElementPropertiesEngine(int engine_version)
 					      IS_CUSTOM_ELEMENT(i)));
 
     /* ---------- CAN_MOVE_INTO_ACID --------------------------------------- */
-    if (getMoveIntoAcidProperty(&level, i))
-      SET_PROPERTY(i, EP_CAN_MOVE_INTO_ACID, TRUE);
+    if (!IS_CUSTOM_ELEMENT(i))
+      SET_PROPERTY(i, EP_CAN_MOVE_INTO_ACID,getMoveIntoAcidProperty(&level,i));
 
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&

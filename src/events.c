@@ -85,7 +85,7 @@ void EventLoop(void)
     {
       Event event;
 
-      if (NextValidEvent(&event))
+      while (NextValidEvent(&event))
       {
   	switch(event.type)
   	{
@@ -411,36 +411,8 @@ void HandleButton(int mx, int my, int button)
 
     case GAME_MODE_PLAYING:
 #ifdef DEBUG
-      if (button == MB_RELEASED)
-      {
-	if (IN_GFX_SCREEN(mx, my))
-	{
-	  int sx = (mx - SX) / TILEX;
-	  int sy = (my - SY) / TILEY;
-	  int x = LEVELX(sx);
-	  int y = LEVELY(sy);
-
-	  printf("INFO: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
-
-	  if (!IN_LEV_FIELD(x, y))
-	    break;
-
-	  printf("      Feld[%d][%d] == %d ('%s')\n", x,y, Feld[x][y],
-		 element_info[Feld[x][y]].token_name);
-	  printf("      Back[%d][%d] == %d\n", x,y, Back[x][y]);
-	  printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
-	  printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
-	  printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);
-	  printf("      MovPos[%d][%d] == %d\n", x,y, MovPos[x][y]);
-	  printf("      MovDir[%d][%d] == %d\n", x,y, MovDir[x][y]);
-	  printf("      MovDelay[%d][%d] == %d\n", x,y, MovDelay[x][y]);
-	  printf("      ChangeDelay[%d][%d] == %d\n", x,y, ChangeDelay[x][y]);
-	  printf("      GfxElement[%d][%d] == %d\n", x,y, GfxElement[x][y]);
-	  printf("      GfxAction[%d][%d] == %d\n", x,y, GfxAction[x][y]);
-	  printf("      GfxFrame[%d][%d] == %d\n", x,y, GfxFrame[x][y]);
-	  printf("\n");
-	}
-      }
+      if (button == MB_PRESSED && !motion_status && IN_GFX_SCREEN(mx, my))
+	DumpTile(LEVELX((mx - SX) / TILEX), LEVELY((my - SY) / TILEY));
 #endif
       break;
 

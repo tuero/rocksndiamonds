@@ -101,14 +101,21 @@
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
 
+#define ELEMENT_CAN_ENTER_FIELD_BASE(e, x, y, condition)		\
+		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
+					(CAN_MOVE_INTO_ACID(e) &&	\
+					 Feld[x][y] == EL_ACID) ||	\
+					(condition)))
+
+#if 0
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition) ||			\
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_PLAYER(x, y) &&		\
 					 !PLAYER_ENEMY_PROTECTED(x, y))))
-
-#define ELEMENT_CAN_ENTER_FIELD_GENERIC_X(e, x, y, condition)		\
+#else
+#define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition) ||			\
 					(CAN_MOVE_INTO_ACID(e) &&	\
@@ -116,6 +123,7 @@
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_PLAYER(x, y) &&		\
 					 !PLAYER_ENEMY_PROTECTED(x, y))))
+#endif
 
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -130,7 +138,11 @@
 #define ELEMENT_CAN_ENTER_FIELD_OR_ACID_2(x, y)				\
 	ELEMENT_CAN_ENTER_FIELD_GENERIC_2(x, y, (Feld[x][y] == EL_ACID))
 
-#define ENEMY_CAN_ENTER_FIELD(x, y) (IN_LEV_FIELD(x, y) && IS_FREE(x, y))
+#if 0
+#define ENEMY_CAN_ENTER_FIELD(e, x, y) (IN_LEV_FIELD(x, y) && IS_FREE(x, y))
+#else
+#define ENEMY_CAN_ENTER_FIELD(e, x, y) ELEMENT_CAN_ENTER_FIELD_BASE(e, x, y, 0)
+#endif
 
 #define YAMYAM_CAN_ENTER_FIELD(x, y)					\
 		(IN_LEV_FIELD(x, y) && (IS_FREE_OR_PLAYER(x, y) ||	\
@@ -162,17 +174,19 @@
 #define IS_EQUAL_OR_IN_GROUP(e, ge)					\
 	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
 
+#if 0
 #define CE_ENTER_FIELD_COND(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
 		 (Feld[x][y] == EL_ACID ||				\
 		  IS_EQUAL_OR_IN_GROUP(Feld[x][y], MOVE_ENTER_EL(e))))
-
-#define CE_ENTER_FIELD_COND_X(e, x, y)					\
+#else
+#define CE_ENTER_FIELD_COND(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
 		 IS_EQUAL_OR_IN_GROUP(Feld[x][y], MOVE_ENTER_EL(e)))
+#endif
 
 #define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_GENERIC_X(e, x, y, CE_ENTER_FIELD_COND_X(e, x, y))
+	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
 
 #define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
@@ -2321,8 +2335,25 @@ void RemoveMovingField(int x, int y)
   if (IS_MOVING(x, y))
   {
     Moving2Blocked(x, y, &newx, &newy);
+#if 0
     if (Feld[newx][newy] != EL_BLOCKED)
       return;
+#else
+    if (Feld[newx][newy] != EL_BLOCKED)
+    {
+      /* element is moving, but target field is not free (blocked), but
+	 already occupied by something different (example: acid pool);
+	 in this case, only remove the moving field, but not the target */
+
+      RemoveField(oldx, oldy);
+
+      Store[oldx][oldy] = Store2[oldx][oldy] = 0;
+
+      DrawLevelField(oldx, oldy);
+
+      return;
+    }
+#endif
   }
   else if (element == EL_BLOCKED)
   {
@@ -3086,23 +3117,42 @@ void Bang(int x, int y)
 
 void SplashAcid(int x, int y)
 {
+#if 1
+  if (IN_LEV_FIELD(x - 1, y - 1) && IS_FREE(x - 1, y - 1) &&
+      (!IN_LEV_FIELD(x - 1, y - 2) ||
+       !CAN_FALL(MovingOrBlocked2Element(x - 1, y - 2))))
+    Feld[x - 1][y - 1] = EL_ACID_SPLASH_LEFT;
+
+  if (IN_LEV_FIELD(x + 1, y - 1) && IS_FREE(x + 1, y - 1) &&
+      (!IN_LEV_FIELD(x + 1, y - 2) ||
+       !CAN_FALL(MovingOrBlocked2Element(x + 1, y - 2))))
+    Feld[x + 1][y - 1] = EL_ACID_SPLASH_RIGHT;
+
+  PlayLevelSound(x, y, SND_ACID_SPLASHING);
+#else
+  /* input: position of element entering acid (obsolete) */
+
   int element = Feld[x][y];
+
+  if (!IN_LEV_FIELD(x, y + 1) || Feld[x][y + 1] != EL_ACID)
+    return;
 
   if (element != EL_ACID_SPLASH_LEFT &&
       element != EL_ACID_SPLASH_RIGHT)
   {
     PlayLevelSound(x, y, SND_ACID_SPLASHING);
 
-    if (IN_LEV_FIELD(x-1, y) && IS_FREE(x-1, y) &&
-	(!IN_LEV_FIELD(x-1, y-1) ||
-	 !CAN_FALL(MovingOrBlocked2Element(x-1, y-1))))
-      Feld[x-1][y] = EL_ACID_SPLASH_LEFT;
+    if (IN_LEV_FIELD(x - 1, y) && IS_FREE(x - 1, y) &&
+	(!IN_LEV_FIELD(x - 1, y - 1) ||
+	 !CAN_FALL(MovingOrBlocked2Element(x - 1, y - 1))))
+      Feld[x - 1][y] = EL_ACID_SPLASH_LEFT;
 
-    if (IN_LEV_FIELD(x+1, y) && IS_FREE(x+1, y) &&
-	(!IN_LEV_FIELD(x+1, y-1) ||
-	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
-      Feld[x+1][y] = EL_ACID_SPLASH_RIGHT;
+    if (IN_LEV_FIELD(x + 1, y) && IS_FREE(x + 1, y) &&
+	(!IN_LEV_FIELD(x + 1, y - 1) ||
+	 !CAN_FALL(MovingOrBlocked2Element(x + 1, y - 1))))
+      Feld[x + 1][y] = EL_ACID_SPLASH_RIGHT;
   }
+#endif
 }
 
 static void InitBeltMovement()
@@ -3479,7 +3529,7 @@ void Impact(int x, int y)
 
   if (!lastline && smashed == EL_ACID)	/* element falls into acid */
   {
-    SplashAcid(x, y);
+    SplashAcid(x, y + 1);
     return;
   }
 
@@ -3730,9 +3780,9 @@ inline static void TurnRoundExt(int x, int y)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
-    if (ENEMY_CAN_ENTER_FIELD(right_x, right_y))
+    if (ENEMY_CAN_ENTER_FIELD(element, right_x, right_y))
       MovDir[x][y] = right_dir;
-    else if (!ENEMY_CAN_ENTER_FIELD(move_x, move_y))
+    else if (!ENEMY_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = left_dir;
 
     if (element == EL_BUG && MovDir[x][y] != old_move_dir)
@@ -3745,9 +3795,9 @@ inline static void TurnRoundExt(int x, int y)
   {
     TestIfBadThingTouchesOtherBadThing(x, y);
 
-    if (ENEMY_CAN_ENTER_FIELD(left_x, left_y))
+    if (ENEMY_CAN_ENTER_FIELD(element, left_x, left_y))
       MovDir[x][y] = left_dir;
-    else if (!ENEMY_CAN_ENTER_FIELD(move_x, move_y))
+    else if (!ENEMY_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = right_dir;
 
     if ((element == EL_SPACESHIP ||
@@ -4523,7 +4573,7 @@ void StartMoving(int x, int y)
     else if (CAN_FALL(element) && Feld[x][y + 1] == EL_ACID)
 #endif
     {
-      SplashAcid(x, y);
+      SplashAcid(x, y + 1);
 
       InitMovingField(x, y, MV_DOWN);
       started_moving = TRUE;
@@ -4929,9 +4979,15 @@ void StartMoving(int x, int y)
 
     }
 #if 1
+#if 1
+    else if (CAN_MOVE_INTO_ACID(element) &&
+	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID &&
+	     (MovDir[x][y] == MV_DOWN ||
+	      game.engine_version > VERSION_IDENT(3,0,8,0)))
+#else
     else if (CAN_MOVE_INTO_ACID(element) && MovDir[x][y] == MV_DOWN &&
 	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID)
-
+#endif
 #else
 
     else if ((element == EL_PENGUIN ||
@@ -4943,7 +4999,7 @@ void StartMoving(int x, int y)
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_ACID)
 #endif
     {
-      SplashAcid(x, y);
+      SplashAcid(newx, newy);
       Store[x][y] = EL_ACID;
     }
     else if (element == EL_PENGUIN && IN_LEV_FIELD(newx, newy))
@@ -5158,8 +5214,15 @@ void StartMoving(int x, int y)
 	  AmoebaCnt[AmoebaNr[newx][newy]]--;
       }
 
+#if 0
+      /* !!! test !!! */
+      if (IS_MOVING(newx, newy) || IS_BLOCKED(newx, newy))
+#else
       if (IS_MOVING(newx, newy))
+#endif
+      {
 	RemoveMovingField(newx, newy);
+      }
       else
       {
 	Feld[newx][newy] = EL_EMPTY;
@@ -7972,7 +8035,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   {
     if (element == EL_ACID && dx == 0 && dy == 1)
     {
-      SplashAcid(jx, jy);
+      SplashAcid(new_jx, new_jy);
       Feld[jx][jy] = EL_PLAYER_1;
       InitMovingField(jx, jy, MV_DOWN);
       Store[jx][jy] = EL_ACID;
