@@ -895,7 +895,7 @@ static void InitGameEngine()
 
     for (j=0; j < ei->num_change_pages; j++)
     {
-      if (!ei->change_page->can_change)
+      if (!ei->change_page[j].can_change)
 	continue;
 
       if (ei->change_page[j].events & CH_EVENT_BIT(CE_BY_OTHER_ACTION))
@@ -5622,7 +5622,8 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 static void ChangeElement(int x, int y, int page)
 {
   int element = MovingOrBlocked2Element(x, y);
-  struct ElementChangeInfo *change = &element_info[element].change_page[page];
+  struct ElementInfo *ei = &element_info[element];
+  struct ElementChangeInfo *change = &ei->change_page[page];
 
 #if 0
 #ifdef DEBUG
@@ -5702,7 +5703,8 @@ static boolean CheckTriggeredElementSideChange(int lx, int ly,
     {
       struct ElementChangeInfo *change = &element_info[element].change_page[j];
 
-      if (change->sides & trigger_side &&
+      if (change->can_change &&
+	  change->sides & trigger_side &&
 	  change->trigger_element == trigger_element)
       {
 	change_element = TRUE;
@@ -7001,7 +7003,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	struct ElementChangeInfo *change =
 	  &element_info[center_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->can_change &&
+	    change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
 	    change->sides & border_side &&
 	    change->trigger_element == border_element)
 	{
@@ -7022,7 +7025,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	struct ElementChangeInfo *change =
 	  &element_info[border_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	if (change->can_change &&
+	    change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
 	    change->sides & center_side &&
 	    change->trigger_element == center_element)
 	{

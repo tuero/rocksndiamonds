@@ -5412,6 +5412,15 @@ static void DrawPropertiesInfo()
   int screen_line = 0;
   int i, x, y;
 
+#if DEBUG
+  if (IS_CUSTOM_ELEMENT(properties_element))
+  {
+    DrawTextF(pad_x, pad_y + screen_line++ * font2_height, FONT_TEXT_3,
+	      "[Custom Element %d]", properties_element - EL_CUSTOM_START + 1);
+    screen_line++;
+  }
+#endif
+
   /* ----- print number of elements / percentage of this element in level */
 
   num_elements_in_level = 0;
