@@ -28,10 +28,14 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_MOVE_STYLE	TRUE	*1
-#define USE_NEW_MOVE_DELAY	TRUE	*1
-#define USE_NEW_PUSH_DELAY	TRUE	*1
-#define USE_NEW_BLOCK_STYLE	TRUE	*1
+#define USE_NEW_STUFF		TRUE				* 1
+
+#define USE_NEW_MOVE_STYLE	TRUE	* USE_NEW_STUFF		* 1
+#define USE_NEW_MOVE_DELAY	TRUE	* USE_NEW_STUFF		* 1
+#define USE_NEW_PUSH_DELAY	TRUE	* USE_NEW_STUFF		* 1
+#define USE_NEW_BLOCK_STYLE	TRUE	* USE_NEW_STUFF		* 1 * 1
+#define USE_NEW_SP_SLIPPERY	TRUE	* USE_NEW_STUFF		* 1
+#define USE_NEW_RANDOMIZE	TRUE	* USE_NEW_STUFF		* 1
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -392,18 +396,6 @@ struct ChangingElementInfo
 
 static struct ChangingElementInfo change_delay_list[] =
 {
-#if USE_NEW_BLOCK_STYLE
-#if 0
-  {
-    EL_PLAYER_IS_LEAVING,
-    EL_EMPTY,
-    -1,		/* delay for blocking field left by player set at runtime */
-    NULL,
-    NULL,
-    NULL
-  },
-#endif
-#endif
   {
     EL_NUT_BREAKING,
     EL_EMERALD,
@@ -791,6 +783,11 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     player->block_delay = (element == EL_SP_MURPHY ?
 			   (player->block_last_field ? 7 : 1) :
 			   (player->block_last_field ? 7 : 1));
+#endif
+
+#if 0
+    printf("::: block_last_field == %d, block_delay = %d\n",
+	   player->block_last_field, player->block_delay);
 #endif
 #endif
 
@@ -1183,7 +1180,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
 
 /*
   =============================================================================
- InitGameEngine()
+  InitGameEngine()
   -----------------------------------------------------------------------------
   initialize game engine due to level / tape version number
   =============================================================================
@@ -1810,6 +1807,11 @@ void InitGame()
 
 #if 0
 	  player->element_nr = some_player->element_nr;
+#endif
+
+#if USE_NEW_BLOCK_STYLE
+	  player->block_last_field = some_player->block_last_field;
+	  player->block_delay = some_player->block_delay;
 #endif
 
 	  StorePlayer[jx][jy] = player->element_nr;
@@ -4633,8 +4635,15 @@ inline static void TurnRoundExt(int x, int y)
     xx = x + move_xy[MovDir[x][y]].x;
     yy = y + move_xy[MovDir[x][y]].y;
 
+#if 1
+    /* !!! this bugfix breaks at least BD2K3, level 010 !!! */
+    if (!IN_LEV_FIELD(xx, yy) ||
+        (!IS_FREE(xx, yy) && !IS_FOOD_PIG(Feld[xx][yy])))
+      MovDir[x][y] = old_move_dir;
+#else
     if (!IS_FREE(xx, yy) && !IS_FOOD_PIG(Feld[xx][yy]))
       MovDir[x][y] = old_move_dir;
+#endif
 
     MovDelay[x][y] = 0;
   }
@@ -5428,13 +5437,39 @@ void StartMoving(int x, int y)
 	can_fall_both = (can_fall_left && can_fall_right);
       }
 
+#if USE_NEW_SP_SLIPPERY
+      /* !!! better use the same properties as for custom elements here !!! */
+      else if (game.engine_version >= VERSION_IDENT(3,1,1,0) &&
+	       can_fall_both && IS_SP_ELEMENT(Feld[x][y + 1]))
+      {
+	can_fall_right = FALSE;		/* slip down on left side */
+	can_fall_both = FALSE;
+      }
+#endif
+
+#if 1
+      if (can_fall_both)
+      {
+	if (game.emulation == EMU_BOULDERDASH ||
+	    element == EL_BD_ROCK || element == EL_BD_DIAMOND)
+	  can_fall_right = FALSE;	/* slip down on left side */
+	else
+	  can_fall_left = !(can_fall_right = RND(2));
+
+	can_fall_both = FALSE;
+      }
+#endif
+
       if (can_fall_any)
       {
+#if 0
 	if (can_fall_both &&
 	    (game.emulation != EMU_BOULDERDASH &&
 	     element != EL_BD_ROCK && element != EL_BD_DIAMOND))
 	  can_fall_left = !(can_fall_right = RND(2));
+#endif
 
+	/* if not determined otherwise, prefer left side for slipping down */
 	InitMovingField(x, y, can_fall_left ? MV_LEFT : MV_RIGHT);
 	started_moving = TRUE;
       }
@@ -9159,7 +9194,7 @@ void GameActions()
   }
 #endif
 
-#if 1
+#if USE_NEW_RANDOMIZE
   /* use random number generator in every frame to make it less predictable */
   if (game.engine_version >= VERSION_IDENT(3,1,1,0))
     RND(1);
@@ -9925,20 +9960,30 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
+#if 0
+    printf("::: %06d: %d,%d: %d (%d) [%d]\n",
+	   FrameCounter,
+	   last_jx, last_jy, Feld[last_jx][last_jy], EL_EXPLOSION,
+	   player->block_delay);
+#endif
+
 #if USE_NEW_BLOCK_STYLE
+
+#if 0
+    if (player->block_delay <= 0)
+      printf("::: ALERT! block_delay == %d\n", player->block_delay);
+#endif
+
     if (player->block_delay > 0 &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
-#if 1
       MovDelay[last_jx][last_jy] = player->block_delay + 1;
-#else
-      ChangeDelay[last_jx][last_jy] = player->block_last_field_delay;
-#endif
     }
 #else
 #if USE_NEW_MOVE_STYLE
-    if (player->block_last_field &&
+    if ((game.engine_version < VERSION_IDENT(3,1,1,0) ||
+	 player->block_last_field) &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 #else

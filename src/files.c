@@ -2235,10 +2235,14 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       }
     }
 
-#if 1
+#if 1	/* USE_NEW_BLOCK_STYLE */
     /* blocking the last field when moving was corrected in version 3.1.1 */
     if (level->game_version < VERSION_IDENT(3,1,1,0))
     {
+#if 0
+      printf("::: %d\n", level->block_last_field);
+#endif
+
       /* even "not blocking" was blocking the last field for one frame */
       level->block_delay    = (level->block_last_field    ? 7 : 1);
       level->sp_block_delay = (level->sp_block_last_field ? 7 : 1);
@@ -2488,8 +2492,13 @@ void LoadLevelTemplate(int nr)
   LoadLevelFromFilename_RND(&level_template, filename);
 #endif
 
+#if 1
+  LoadLevel_InitVersion(&level_template, filename);
+  LoadLevel_InitElements(&level_template, filename);
+#else
   LoadLevel_InitVersion(&level, filename);
   LoadLevel_InitElements(&level, filename);
+#endif
 
   ActivateLevelTemplate();
 }

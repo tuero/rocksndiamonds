@@ -1,3 +1,8 @@
+2004-06-13
+	* fixed bug (missing array boundary check) which caused broken tapes
+	* fixed bug (when loading level template) which caused broken levels
+	* fixed bug with new block last field code when using non-yellow player
+
 2004-06-12
 	* fixed bug when pressing "stop, pause, stop, play" on tape recorder
 	* internal change of how the player blocks the last field when moving
@@ -6,6 +11,7 @@
 	  unsuccessfully trying to move, when he directly could move after that
 	* the last two changes should make original Supaplex level 93 solvable
 	* improved use of random number generator to make it less predictable
+	* fixed behaviour of slippery SP elements to let slip left, then right
 
 2004-06-11
 	* fixed bug with wrong door state after trying to quickload empty tape
