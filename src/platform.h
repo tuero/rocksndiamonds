@@ -22,4 +22,20 @@
 #define PLATFORM_UNIX
 #endif
 
+/* define additional keywords for several Unix platforms */
+
+#if defined(__FreeBSD__)
+#define PLATFORM_FREEBSD
+#endif
+
+/* detecting HP-UX by the following compiler keyword definitions:
+   - in K&R mode (the default), the HP C compiler defines "hpux"
+   - in ANSI mode (-Aa or -Ae), the HP C compiler defines "__hpux"
+   - the gcc (Gnu) C compiler defines "__hpux__"
+   Thanks to Jarkko Hietaniemi  for this note. */
+
+#if defined(__hpux__) || defined(__hpux) || defined(hpux)
+#define PLATFORM_HPUX
+#endif
+
 #endif /* PLATFORM_H */

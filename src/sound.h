@@ -125,7 +125,7 @@ struct SoundHeader_8SVX
   char magic_8SVX[4];
 };
 
-struct SoundInfo
+struct SampleInfo
 { 
   char *name;
   byte *data_ptr;
@@ -169,7 +169,7 @@ boolean UnixInitAudio(void);
 void SoundServer(void);
 
 /* sound client functions */
-boolean LoadSound(struct SoundInfo *);
+boolean LoadSound(struct SampleInfo *);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);

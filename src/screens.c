@@ -1409,7 +1409,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     {
       int yy = y-1;
 
-      if (y==3 && sound_status==SOUND_AVAILABLE)
+      if (y == 3 && sysinfo.audio_available)
       {
 	if (setup.sound)
 	{
@@ -1423,7 +1423,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.sound = !setup.sound;
       }
-      else if (y==4 && sound_loops_allowed)
+      else if (y == 4 && sysinfo.audio_loops_available)
       {
 	if (setup.sound_loops)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1435,7 +1435,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	}
 	setup.sound_loops = !setup.sound_loops;
       }
-      else if (y==5 && sound_loops_allowed)
+      else if (y == 5 && sysinfo.audio_loops_available)
       {
 	if (setup.sound_music)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1449,7 +1449,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
 
 #if 0
-      else if (y==6)
+      else if (y == 6)
       {
 	if (setup.toons)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1457,7 +1457,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.toons = !setup.toons;
       }
-      else if (y==7)
+      else if (y == 7)
       {
 #if 0
 	if (setup.double_buffering)
@@ -1474,7 +1474,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
 #endif
 
-      else if (y==6)
+      else if (y == 6)
       {
 	if (setup.scroll_delay)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1482,7 +1482,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.scroll_delay = !setup.scroll_delay;
       }
-      else if (y==7)
+      else if (y == 7)
       {
 	if (setup.soft_scrolling)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1491,7 +1491,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	setup.soft_scrolling = !setup.soft_scrolling;
       }
 #if 0
-      else if (y==8)
+      else if (y == 8)
       {
 	if (setup.fading)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1500,7 +1500,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	setup.fading = !setup.fading;
       }
 #endif
-      else if (y==8 && fullscreen_available)
+      else if (y == 8 && fullscreen_available)
       {
 	if (setup.fullscreen)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1508,7 +1508,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.fullscreen = !setup.fullscreen;
       }
-      else if (y==9)
+      else if (y == 9)
       {
 	if (setup.quick_doors)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1516,7 +1516,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.quick_doors = !setup.quick_doors;
       }
-      else if (y==10)
+      else if (y == 10)
       {
 	if (setup.autorecord)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1524,7 +1524,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.autorecord = !setup.autorecord;
       }
-      else if (y==11)
+      else if (y == 11)
       {
 	if (setup.team_mode)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1532,7 +1532,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.team_mode = !setup.team_mode;
       }
-      else if (y==12)
+      else if (y == 12)
       {
 	if (setup.handicap)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1540,7 +1540,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.handicap = !setup.handicap;
       }
-      else if (y==13)
+      else if (y == 13)
       {
 	if (setup.time_limit)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1548,7 +1548,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	setup.time_limit = !setup.time_limit;
       }
-      else if (y==14)
+      else if (y == 14)
       {
 	game_status = SETUPINPUT;
 	DrawSetupInputScreen();

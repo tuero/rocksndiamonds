@@ -90,10 +90,11 @@ static void allegro_drivers()
   last_joystick_state = 0;
   joystick_event = FALSE;
 
+  sysinfo.audio_available = TRUE;
   reserve_voices(MAX_SOUNDS_PLAYING, 0);
   if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL) == -1)
     if (install_sound(DIGI_SB, MIDI_NONE, NULL) == -1)
-      sound_status = SOUND_OFF;
+      sysinfo.audio_available = FALSE;
 }
 
 static boolean hide_mouse(Display *display, int x, int y,

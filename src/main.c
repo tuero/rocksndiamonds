@@ -35,9 +35,8 @@ Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
 
-int		sound_pipe[2];
-int		sound_device;
 char	       *sound_device_name = SOUND_DEVICE;
+
 int		joystick_device = 0;
 char	       *joystick_device_name[MAX_PLAYERS] =
 {
@@ -57,8 +56,6 @@ boolean		motion_status = FALSE;
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;
-int	    	sound_status = SOUND_STATUS;
-boolean		sound_loops_allowed = FALSE;
 boolean		fullscreen_available = FULLSCREEN_STATUS;
 boolean		fullscreen_enabled = FALSE;
 
@@ -105,11 +102,12 @@ struct LevelDirInfo    *leveldir_first = NULL, *leveldir_current = NULL;
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
-struct SoundInfo	Sound[NUM_SOUNDS];
+struct SampleInfo	Sound[NUM_SOUNDS];
 struct TapeInfo		tape;
 struct OptionInfo	options;
 struct SetupInfo	setup;
 struct GameInfo		game;
+struct SystemInfo	sysinfo;
 struct GlobalInfo	global;
 
 /* data needed for playing sounds */

@@ -35,10 +35,6 @@ struct PictureFileInfo
   boolean picture_with_mask;
 };
 
-#ifndef TARGET_SDL
-static int sound_process_id = 0;
-#endif
-
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
@@ -146,31 +142,32 @@ void InitSound()
 {
   int i;
 
-  if (sound_status == SOUND_OFF)
+  /* REMOVE THIS! (gone to system.c:InitAudio) */
+  if (!sysinfo.audio_available)
     return;
 
 #if defined(TARGET_SDL)
   if (InitAudio())
   {
-    sound_status = SOUND_AVAILABLE;
-    sound_loops_allowed = TRUE;
+    sysinfo.audio_available = TRUE;
+    sysinfo.audio_loops_available = TRUE;
   }
   else
   {
-    sound_status = SOUND_OFF;
+    sysinfo.audio_available = FALSE;
   }
 #else /* !TARGET_SDL */
 
 #if defined(PLATFORM_UNIX)
-  if ((sound_status = CheckAudio(sound_device_name)) == SOUND_OFF)
+  if (!(sysinfo.audio_available = CheckAudio(sound_device_name)))
     return;
 
 #ifdef VOXWARE
-  sound_loops_allowed = TRUE;
+  sysinfo.audio_loops_available = TRUE;
 #endif
 
 #else /* !PLATFORM_UNIX */
-  sound_loops_allowed = TRUE;
+  sysinfo.audio_loops_available = TRUE;
 
 #endif /* !PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
@@ -181,8 +178,8 @@ void InitSound()
 
     if (!LoadSound(&Sound[i]))
     {
-      sound_status = SOUND_OFF;
-      sound_loops_allowed = FALSE;
+      sysinfo.audio_available = FALSE;
+      sysinfo.audio_loops_available = FALSE;
       return;
     }
   }
@@ -190,35 +187,35 @@ void InitSound()
 
 void InitSoundServer()
 {
-  if (sound_status == SOUND_OFF)
+  if (!sysinfo.audio_available)
     return;
 
 #if !defined(TARGET_SDL)
 #if defined(PLATFORM_UNIX)
 
-  if (pipe(sound_pipe)<0)
+  if (pipe(sysinfo.audio_process_pipe) < 0)
   {
     Error(ERR_WARN, "cannot create pipe - no sounds");
-    sound_status = SOUND_OFF;
+    sysinfo.audio_available = FALSE;
     return;
   }
 
-  if ((sound_process_id = fork()) < 0)
+  if ((sysinfo.audio_process_id = fork()) < 0)
   {       
     Error(ERR_WARN, "cannot create sound server process - no sounds");
-    sound_status = SOUND_OFF;
+    sysinfo.audio_available = FALSE;
     return;
   }
 
-  if (!sound_process_id)	/* we are child */
+  if (!sysinfo.audio_process_id)	/* we are child */
   {
     SoundServer();
 
     /* never reached */
     exit(0);
   }
-  else				/* we are parent */
-    close(sound_pipe[0]);	/* no reading from pipe needed */
+  else					/* we are parent */
+    close(sysinfo.audio_process_pipe[0]); /* no reading from pipe needed */
 
 #else /* !PLATFORM_UNIX */
 
@@ -1809,10 +1806,10 @@ void CloseAllAndExit(int exit_value)
   StopSounds();
   FreeSounds(NUM_SOUNDS);
 #else
-  if (sound_process_id)
+  if (sysinfo.audio_process_id)
   {
     StopSounds();
-    kill(sound_process_id, SIGTERM);
+    kill(sysinfo.audio_process_id, SIGTERM);
     FreeSounds(NUM_SOUNDS);
   }
 #endif

@@ -104,7 +104,7 @@ void SoundServer()
   struct SoundControl snd_ctrl;
   fd_set sound_fdset;
 
-  close(sound_pipe[1]);		/* no writing into pipe needed */
+  close(sysinfo.audio_process_pipe[1]);	/* no writing into pipe needed */
 #endif
 
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
@@ -122,15 +122,16 @@ void SoundServer()
 #endif
 
   FD_ZERO(&sound_fdset); 
-  FD_SET(sound_pipe[0], &sound_fdset);
+  FD_SET(sysinfo.audio_process_pipe[0], &sound_fdset);
 
   while(1)	/* wait for sound playing commands from client */
   {
-    FD_SET(sound_pipe[0], &sound_fdset);
-    select(sound_pipe[0]+1, &sound_fdset, NULL, NULL, NULL);
-    if (!FD_ISSET(sound_pipe[0], &sound_fdset))
+    FD_SET(sysinfo.audio_process_pipe[0], &sound_fdset);
+    select(sysinfo.audio_process_pipe[0] + 1, &sound_fdset, NULL, NULL, NULL);
+    if (!FD_ISSET(sysinfo.audio_process_pipe[0], &sound_fdset))
       continue;
-    if (read(sound_pipe[0], &snd_ctrl, sizeof(snd_ctrl)) != sizeof(snd_ctrl))
+    if (read(sysinfo.audio_process_pipe[0], &snd_ctrl, sizeof(snd_ctrl))
+	!= sizeof(snd_ctrl))
       Error(ERR_EXIT_SOUND_SERVER, "broken pipe - no sounds");
 
 #ifdef VOXWARE
@@ -153,7 +154,7 @@ void SoundServer()
 	playlist[i]=emptySoundControl;
       playing_sounds=0;
 
-      close(sound_device);
+      close(sysinfo.audio_fd);
     }
     else if (snd_ctrl.stop_sound)
     {
@@ -168,7 +169,7 @@ void SoundServer()
 	}
 
       if (!playing_sounds)
-	close(sound_device);
+	close(sysinfo.audio_fd);
     }
 
     if (playing_sounds || snd_ctrl.active)
@@ -188,7 +189,7 @@ void SoundServer()
 #endif
 
       if (playing_sounds ||
-	  (sound_device = OpenAudio(sound_device_name)) >= 0)
+	  (sysinfo.audio_fd = OpenAudio(sound_device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
@@ -196,12 +197,13 @@ void SoundServer()
 	  /* (with stereo the effective buffer size will shrink to 256) */
 	  fragment_size = 0x00020009;
 
-	  if (ioctl(sound_device, SNDCTL_DSP_SETFRAGMENT, &fragment_size) < 0)
+	  if (ioctl(sysinfo.audio_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_size)
+	      < 0)
 	    Error(ERR_EXIT_SOUND_SERVER,
 		  "cannot set fragment size of /dev/dsp - no sounds");
 
 	  /* try if we can use stereo sound */
-	  if (ioctl(sound_device, SNDCTL_DSP_STEREO, &stereo) < 0)
+	  if (ioctl(sysinfo.audio_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
 	  {
 #ifdef DEBUG
 	    static boolean reported = FALSE;
@@ -215,12 +217,13 @@ void SoundServer()
 	    stereo = FALSE;
 	  }
 
-	  if (ioctl(sound_device, SNDCTL_DSP_SPEED, &sample_rate) < 0)
+	  if (ioctl(sysinfo.audio_fd, SNDCTL_DSP_SPEED, &sample_rate) < 0)
 	    Error(ERR_EXIT_SOUND_SERVER,
 		  "cannot set sample rate of /dev/dsp - no sounds");
 
 	  /* get the real fragmentation size; this should return 512 */
-	  if (ioctl(sound_device, SNDCTL_DSP_GETBLKSIZE, &fragment_size) < 0)
+	  if (ioctl(sysinfo.audio_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size)
+	      < 0)
 	    Error(ERR_EXIT_SOUND_SERVER,
 		  "cannot get fragment size of /dev/dsp - no sounds");
 
@@ -231,9 +234,10 @@ void SoundServer()
 	  SoundServer_InsertNewSound(snd_ctrl);
 
 	while(playing_sounds &&
-	      select(sound_pipe[0]+1,&sound_fdset,NULL,NULL,&delay)<1)
+	      select(sysinfo.audio_process_pipe[0] + 1,
+		     &sound_fdset, NULL, NULL, &delay) < 1)
 	{	
-	  FD_SET(sound_pipe[0], &sound_fdset);
+	  FD_SET(sysinfo.audio_process_pipe[0], &sound_fdset);
 
 	  /* first clear the last premixing buffer */
 	  memset(premix_last_buffer,0,fragment_size*sizeof(int));
@@ -330,12 +334,12 @@ void SoundServer()
 	  }
 
 	  /* finally play the sound fragment */
-	  write(sound_device,playing_buffer,fragment_size);
+	  write(sysinfo.audio_fd, playing_buffer,fragment_size);
 	}
 
 	/* if no sounds playing, free device for other sound programs */
 	if (!playing_sounds)
-	  close(sound_device);
+	  close(sysinfo.audio_fd);
       }
     }
 
@@ -350,14 +354,15 @@ void SoundServer()
       int wait_percent = 90;	/* wait 90% of the real playing time */
       int i;
 
-      if ((sound_device = OpenAudio(sound_device_name)) >= 0)
+      if ((sysinfo.audio_fd = OpenAudio(sound_device_name)) >= 0)
       {
 	playing_sounds = 1;
 
 	while(playing_sounds &&
-	      select(sound_pipe[0]+1,&sound_fdset,NULL,NULL,&delay)<1)
+	      select(sysinfo.audio_process_pipe[0] + 1,
+		     &sound_fdset, NULL, NULL, &delay) < 1)
 	{	
-	  FD_SET(sound_pipe[0], &sound_fdset);
+	  FD_SET(sysinfo.audio_process_pipe[0], &sound_fdset);
 
 	  /* get pointer and size of the actual sound sample */
 	  sample_ptr = snd_ctrl.data_ptr + snd_ctrl.playingpos;
@@ -384,12 +389,12 @@ void SoundServer()
 	    playing_sounds = 0;
 
 	  /* finally play the sound fragment */
-	  write(sound_device,playing_buffer,sample_size);
+	  write(sysinfo.audio_fd,playing_buffer,sample_size);
 
 	  delay.tv_sec = 0;
 	  delay.tv_usec = ((sample_size*10*wait_percent)/(sample_rate))*1000;
 	}
-	close(sound_device);
+	close(sysinfo.audio_fd);
       }
     }
 
@@ -603,7 +608,7 @@ static void SoundServer_StopSound(int nr)
 
 #if !defined(PLATFORM_MSDOS)
   if (!playing_sounds)
-    close(sound_device);
+    close(sysinfo.audio_fd);
 #endif
 }
 
@@ -622,7 +627,7 @@ static void SoundServer_StopAllSounds()
   playing_sounds = 0;
 
 #if !defined(PLATFORM_MSDOS)
-  close(sound_device);
+  close(sysinfo.audio_fd);
 #endif
 }
 #endif /* PLATFORM_MSDOS */
@@ -767,7 +772,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		20	/* size of WAV file header */
 
-boolean LoadSound(struct SoundInfo *snd_info)
+boolean LoadSound(struct SampleInfo *snd_info)
 {
   char filename[256];
   char *sound_ext = "wav";
@@ -886,7 +891,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-  if (sound_status==SOUND_OFF || !setup.sound)
+  if (!sysinfo.audio_available || !setup.sound)
     return;
 
   if (volume<PSND_MIN_VOLUME)
@@ -916,10 +921,10 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 
 #else
 #if !defined(PLATFORM_MSDOS)
-  if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
+  if (write(sysinfo.audio_process_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
-    sound_status = SOUND_OFF;
+    sysinfo.audio_available = FALSE;
     return;
   }
 #else
@@ -952,7 +957,7 @@ void StopSoundExt(int nr, int method)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-  if (sound_status==SOUND_OFF)
+  if (!sysinfo.audio_available)
     return;
 
   if (SSND_FADING(method))
@@ -981,10 +986,10 @@ void StopSoundExt(int nr, int method)
 
 #else
 #if !defined(PLATFORM_MSDOS)
-  if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
+  if (write(sysinfo.audio_process_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
-    sound_status = SOUND_OFF;
+    sysinfo.audio_available = FALSE;
     return;
   }
 #else
@@ -997,7 +1002,7 @@ void FreeSounds(int num_sounds)
 {
   int i;
 
-  if (sound_status == SOUND_OFF)
+  if (!sysinfo.audio_available)
     return;
 
   for(i=0; i<num_sounds; i++)

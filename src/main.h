@@ -463,9 +463,8 @@ extern Pixmap		clipmask[], tile_clipmask[];
 extern DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 extern Colormap		cmap;
 
-extern int		sound_pipe[2];
-extern int		sound_device;
 extern char	       *sound_device_name;
+
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
 
@@ -478,8 +477,6 @@ extern int		button_status;
 extern boolean		motion_status;
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
-extern int		sound_status;
-extern boolean		sound_loops_allowed;
 extern boolean		fullscreen_available;
 extern boolean		fullscreen_enabled;
 
@@ -528,11 +525,12 @@ extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
-extern struct SoundInfo		Sound[];
+extern struct SampleInfo	Sound[];
 extern struct JoystickInfo	joystick[];
 extern struct OptionInfo	options;
 extern struct SetupInfo		setup;
 extern struct GameInfo		game;
+extern struct SystemInfo	sysinfo;
 extern struct GlobalInfo	global;
 
 extern char		*sound_name[];

@@ -84,7 +84,7 @@ endif
 CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
-CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(SOUNDS) $(JOYSTICK)
+CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
 DEBUG = -DDEBUG -g
 
 OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
@@ -93,6 +93,7 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
+# OPTIONS = -DSYSV -Ae				# may be needed for HP-UX
 
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
 LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm

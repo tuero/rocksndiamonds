@@ -28,7 +28,7 @@
 #endif
 
 
-/* system-wide contant definitions */
+/* contant definitions */
 
 #define DEFAULT_DEPTH			0
 
@@ -36,12 +36,24 @@
 #define FULLSCREEN_AVAILABLE		TRUE
 
 
-/* system-wide type definitions */
+/* type definitions */
 
 typedef int (*EventFilter)(const Event *);
 
 
-/* system-wide function definitions */
+/* structure definitions */
+
+struct SystemInfo
+{
+  boolean audio_available;
+  boolean audio_loops_available;
+  int audio_process_id;
+  int audio_process_pipe[2];
+  int audio_fd;
+};
+
+
+/* function definitions */
 
 inline void InitBufferedDisplay(DrawBuffer *, DrawWindow *);
 inline int GetDisplayDepth(void);

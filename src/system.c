@@ -235,6 +235,12 @@ inline void ChangeVideoModeIfNeeded(void)
 
 inline boolean InitAudio(void)
 {
+  sysinfo.audio_available = TRUE;
+  sysinfo.audio_loops_available = FALSE;
+
+  if (!sysinfo.audio_available)
+    return FALSE;
+
 #ifdef TARGET_SDL
   return SDLInitAudio();
 #else

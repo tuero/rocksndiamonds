@@ -25,9 +25,6 @@ X11_PATH = /usr/X11
 # uncomment this if your system has no joystick include file
 # JOYSTICK = -DNO_JOYSTICK
 
-# uncomment this if your system has no sound
-# SOUNDS = -DNO_SOUNDS
-
 # choose if you want to allow many global score file entries for one player
 # default is 'MANY_PER_NAME'
 # when installing the game in a multi user environment, choose this
