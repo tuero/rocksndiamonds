@@ -65,10 +65,13 @@ void EventLoop(void)
     else			/* got no event, but don't be lazy... */
     {
       HandleNoXEvent();
-      Delay(1000);		/* don't use all CPU time when idle */
-    }
 
-    XSync(display,FALSE);
+      /* don't use all CPU time when idle; the main loop while playing
+	 has its own synchronization and is CPU friendly, too */
+
+      if (game_status != PLAYING)
+	Delay(1000);
+    }
 
     if (game_status==EXITGAME)
       return;

@@ -78,6 +78,17 @@ void BackToFront()
   if (!redraw_mask)
     return;
 
+  /* synchronize X11 graphics at this point; if we would synchronize the
+     display immediately after the buffer switching (after the XFlush),
+     this could mean that we have to wait for the graphics to complete,
+     although we could go on doing calculations for the next frame */
+
+  XSync(display,FALSE);
+
+#ifdef MSDOS
+  wait_for_vsync = TRUE;
+#endif
+
   if (redraw_mask & REDRAW_ALL)
   {
     XCopyArea(display,backbuffer,window,gc,
@@ -88,9 +99,6 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_FIELD)
   {
-#ifdef MSDOS
-    wait_for_vsync = TRUE;
-#endif
     if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
       XCopyArea(display,backbuffer,window,gc,
 		REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
@@ -114,9 +122,6 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_DOORS)
   {
-#ifdef MSDOS
-    wait_for_vsync = TRUE;
-#endif
     if (redraw_mask & REDRAW_DOOR_1)
       XCopyArea(display,backbuffer,window,gc,
 		DX,DY, DXSIZE,DYSIZE,
@@ -1524,10 +1529,6 @@ unsigned int OpenDoor(unsigned int door_state)
 
   new_door_state = MoveDoor(door_state);
 
-/*
-  ClearEventQueue();
-*/
-
   return(new_door_state);
 }
 
@@ -1542,10 +1543,6 @@ unsigned int CloseDoor(unsigned int door_state)
 
   new_door_state = MoveDoor(door_state);
 
-/*
-  ClearEventQueue();
-*/
-
   return(new_door_state);
 }
 
@@ -1558,11 +1555,9 @@ unsigned int MoveDoor(unsigned int door_state)
 {
   static unsigned int door1 = DOOR_OPEN_1;
   static unsigned int door2 = DOOR_CLOSE_2;
-  int x, start, stepsize = 4, door_anim_delay = stepsize*5000;
-
-#ifdef MSDOS
-  stepsize = 2;
-#endif
+  static long door_delay = 0;
+  int x, start, stepsize = 2;
+  long door_delay_value = stepsize * 5000;
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
@@ -1579,7 +1574,7 @@ unsigned int MoveDoor(unsigned int door_state)
   if (quick_doors)
   {
     stepsize = 20;
-    door_anim_delay = 0;
+    door_delay_value = 0;
     StopSound(SND_OEFFNEN);
   }
 
@@ -1590,8 +1585,11 @@ unsigned int MoveDoor(unsigned int door_state)
 
     start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
 
-    for(x=start;x<=DXSIZE;x+=stepsize)
+    for(x=start; x<=DXSIZE; x+=stepsize)
     {
+      while(!DelayReached(&door_delay, door_delay_value/10000))
+	Delay(1000);
+
       if (door_state & DOOR_ACTION_1)
       {
 	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
@@ -1667,9 +1665,6 @@ unsigned int MoveDoor(unsigned int door_state)
       }
 
       BackToFront();
-#ifndef MSDOS
-      Delay(door_anim_delay);
-#endif
 
       if (game_status==MAINMENU)
 	DoAnimation();
