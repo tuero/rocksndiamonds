@@ -337,8 +337,6 @@ struct GlobalInfo
 
 extern GC		tile_clip_gc;
 extern Bitmap	       *pix[];
-extern Bitmap	       *pix_default[];
-extern Bitmap	       *pix_custom[];
 extern Pixmap		tile_clipmask[];
 extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;

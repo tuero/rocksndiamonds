@@ -39,6 +39,7 @@ static char *image_filename[NUM_PICTURES] =
 }; 
 
 static void InitPlayerInfo(void);
+static void InitSetup(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
@@ -66,6 +67,7 @@ void OpenAll(void)
 		  MSDOS_POINTER_FILENAME,
 		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
 
+  InitSetup();
   InitPlayerInfo();
 
   InitCounter();
@@ -93,6 +95,11 @@ void OpenAll(void)
   InitNetworkServer();
 }
 
+void InitSetup()
+{
+  LoadSetup();					/* global setup info */
+}
+
 void InitPlayerInfo()
 {
   int i;
@@ -104,8 +111,6 @@ void InitPlayerInfo()
     stored_player[i].connected = FALSE;
 
   local_player->connected = TRUE;
-
-  LoadSetup();					/* global setup info */
 }
 
 void InitLevelInfo()
@@ -289,7 +294,6 @@ void InitTileClipmasks()
 
 void InitGfx()
 {
-  char *filename;
   int i;
 
   /* initialize some global variables */
@@ -308,11 +312,7 @@ void InitGfx()
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 
-  filename = getImageFilename(image_filename[PIX_SMALLFONT]);
-  if ((pix_default[PIX_SMALLFONT] = LoadImage(filename)) == NULL)
-    Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
-  pix_custom[PIX_SMALLFONT] = NULL;
-  pix[PIX_SMALLFONT] = pix_default[PIX_SMALLFONT];
+  pix[PIX_SMALLFONT] = LoadCustomImage(image_filename[PIX_SMALLFONT]);
 
   InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
 
@@ -330,11 +330,7 @@ void InitGfx()
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
 
-      filename = getImageFilename(image_filename[i]);
-      if ((pix_default[i] = LoadImage(filename)) == NULL)
-	Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
-      pix_custom[i] = NULL;
-      pix[i] = pix_default[i];
+      pix[i] = LoadCustomImage(image_filename[i]);
     }
   }
 
@@ -1572,10 +1568,7 @@ void CloseAllAndExit(int exit_value)
   CloseAudio();
 
   for(i=0; i<NUM_BITMAPS; i++)
-  {
-    FreeBitmap(pix_default[i]);
-    FreeBitmap(pix_custom[i]);
-  }
+    FreeBitmap(pix[i]);
 
   CloseVideoDisplay();
   ClosePlatformDependantStuff();

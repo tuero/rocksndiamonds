@@ -247,6 +247,24 @@ char *getImageFilename(char *basename)
   return filename;
 }
 
+char *getCustomImageFilename(char *basename)
+{
+#if 0
+  if (strcmp(basename, "RocksFont.pcx") == 0)
+  {
+    char *dir = options.graphics_directory;
+
+    printf("checking directory '%s' ...\n", dir);
+
+    /*
+    dir = getPath2(options.graphics_directory);
+    */
+  }
+#endif
+
+  return getImageFilename(basename);
+}
+
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);

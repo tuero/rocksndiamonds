@@ -60,6 +60,7 @@ typedef int			Colormap;
 
 struct SDLSurfaceInfo
 {
+  char *source_filename;
   SDL_Surface *surface;
   SDL_Surface *surface_masked;
   GC gc;

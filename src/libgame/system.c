@@ -299,6 +299,9 @@ inline void FreeBitmap(Bitmap *bitmap)
     XFreeGC(display, bitmap->stored_clip_gc);
 #endif
 
+  if (bitmap->source_filename)
+    free(bitmap->source_filename);
+
   free(bitmap);
 }
 
@@ -602,6 +605,19 @@ Bitmap *LoadImage(char *filename)
 #else
   new_bitmap = X11LoadImage(filename);
 #endif
+
+  return new_bitmap;
+}
+
+Bitmap *LoadCustomImage(char *basename)
+{
+  char *filename = getStringCopy(getCustomImageFilename(basename));
+  Bitmap *new_bitmap;
+
+  if ((new_bitmap = LoadImage(filename)) == NULL)
+    Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
+
+  new_bitmap->source_filename = filename;
 
   return new_bitmap;
 }

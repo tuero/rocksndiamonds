@@ -410,6 +410,7 @@ inline boolean SetVideoMode(boolean);
 inline boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
+Bitmap *LoadCustomImage(char *);
 
 inline void OpenAudio(void);
 inline void CloseAudio(void);
