@@ -43,11 +43,12 @@ static struct SoundControl emptySoundControl =
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
 #if defined(AUDIO_STREAMING_DSP)
-static char premix_left_buffer[SND_BLOCKSIZE];
-static char premix_right_buffer[SND_BLOCKSIZE];
-static int premix_last_buffer[SND_BLOCKSIZE];
+static short premix_second_buffer[SND_BLOCKSIZE];
+static short premix_left_buffer[SND_BLOCKSIZE];
+static short premix_right_buffer[SND_BLOCKSIZE];
+static long premix_last_buffer[SND_BLOCKSIZE];
 #endif
-static unsigned char playing_buffer[SND_BLOCKSIZE];
+static short playing_buffer[SND_BLOCKSIZE];
 #endif
 
 /* forward declaration of internal functions */
@@ -345,8 +346,8 @@ void SoundServer(void)
       struct timeval delay = { 0, 0 };
       byte *sample_ptr;
       long sample_size;
-      static long max_sample_size = 0;
-      static long fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
+      static int max_sample_size = 0;
+      static int fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
       int sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
       static boolean stereo = TRUE;
 
@@ -360,7 +361,7 @@ void SoundServer(void)
 #elif defined(PLATFORM_NETBSD)
 	  stereo = InitAudioDevice_NetBSD(fragment_size, sample_rate);
 #endif
-	  max_sample_size = fragment_size / (stereo ? 2 : 1);
+	  max_sample_size = fragment_size / ((stereo ? 2 : 1) * sizeof(short));
 	}
 
 	if (snd_ctrl.active)	/* new sound has arrived */
@@ -373,9 +374,9 @@ void SoundServer(void)
 	  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
 
 	  /* first clear the last premixing buffer */
-	  memset(premix_last_buffer, 0, fragment_size * sizeof(int));
+	  memset(premix_last_buffer, 0, fragment_size * sizeof(short));
 
-	  for(i=0;i<MAX_SOUNDS_PLAYING;i++)
+	  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
 	  {
 	    int j;
 
@@ -400,6 +401,12 @@ void SoundServer(void)
 	      sample_size = max_sample_size;
 	    }
 
+#if 0
+	    /* expand sample from 8 to 16 bit */
+	    for(j=0; j<sample_size; j++)
+	      premix_second_buffer[j] = premix_first_buffer[j] << 8;
+#endif
+
 	    /* decrease volume if sound is fading out */
 	    if (playlist[i].fade_sound &&
 		playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
@@ -416,8 +423,8 @@ void SoundServer(void)
 	    if (stereo)
 	    {
 	      int middle_pos = PSND_MAX_LEFT2RIGHT/2;
-	      int left_volume  = stereo_volume[middle_pos +playlist[i].stereo];
-	      int right_volume = stereo_volume[middle_pos -playlist[i].stereo];
+	      int left_volume = stereo_volume[middle_pos + playlist[i].stereo];
+	      int right_volume= stereo_volume[middle_pos - playlist[i].stereo];
 
 	      for(j=0; j<sample_size; j++)
 	      {
@@ -427,13 +434,14 @@ void SoundServer(void)
 		premix_right_buffer[j] =
 		  (right_volume * (int)premix_first_buffer[j])
 		    >> PSND_MAX_LEFT2RIGHT_BITS;
-		premix_last_buffer[2*j+0] += premix_left_buffer[j];
-		premix_last_buffer[2*j+1] += premix_right_buffer[j];
+
+		premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
+		premix_last_buffer[2 * j + 1] += premix_right_buffer[j];
 	      }
 	    }
 	    else
 	    {
-	      for(j=0;j<sample_size;j++)
+	      for(j=0; j<sample_size; j++)
 		premix_last_buffer[j] += (int)premix_first_buffer[j];
 	    }
 
@@ -456,15 +464,29 @@ void SoundServer(void)
 	  }
 
 	  /* put last mixing buffer to final playing buffer */
+#if 0
 	  for(i=0; i<fragment_size; i++)
 	  {
-	    if (premix_last_buffer[i]<-255)
+	    if (premix_last_buffer[i] < -255)
 	      playing_buffer[i] = 0;
-	    else if (premix_last_buffer[i]>255)
+	    else if (premix_last_buffer[i] > 255)
 	      playing_buffer[i] = 255;
 	    else
-	      playing_buffer[i] = (premix_last_buffer[i]>>1)^0x80;
+	      playing_buffer[i] = (premix_last_buffer[i] >> 1) ^ 0x80;
 	  }
+#else
+	  for(i=0; i<fragment_size; i++)
+	  {
+	    if (premix_last_buffer[i] < -255)
+	      playing_buffer[i] = -127;
+	    else if (premix_last_buffer[i] > 255)
+	      playing_buffer[i] = 127;
+	    else
+	      playing_buffer[i] = (premix_last_buffer[i] >> 1);
+
+	    playing_buffer[i] <<= 8;
+	  }
+#endif
 
 	  /* finally play the sound fragment */
 	  write(audio.device_fd, playing_buffer, fragment_size);
@@ -787,16 +809,17 @@ static void SoundServer_StopAllSounds()
 /* ------------------------------------------------------------------------- */
 
 #if defined(AUDIO_LINUX_IOCTL)
-static boolean InitAudioDevice_Linux(long fragment_size, int sample_rate)
+static boolean InitAudioDevice_Linux(int fragment_size, int sample_rate)
 {
   /* "ioctl()" expects pointer to 'int' value for stereo flag
      (boolean is defined as 'char', which will not work here) */
+  unsigned int fragment_spec = 0;
+  unsigned int audio_format = 0;
+  int fragment_size_query;
   int stereo = TRUE;
-  unsigned long fragment_spec = 0;
 
   /* determine logarithm (log2) of the fragment size */
-  for (fragment_spec=0; (1 << fragment_spec) < fragment_size;
-       fragment_spec++);
+  for (fragment_spec=0; (1 << fragment_spec) < fragment_size; fragment_spec++);
 
   /* use two fragments (play one fragment, prepare the other);
      one fragment would result in interrupted audio output, more
@@ -811,6 +834,11 @@ static boolean InitAudioDevice_Linux(long fragment_size, int sample_rate)
   if (ioctl(audio.device_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_spec) < 0)
     Error(ERR_EXIT_SOUND_SERVER,
 	  "cannot set fragment size of /dev/dsp -- no sounds");
+
+  audio_format = AFMT_S16_LE;
+  if (ioctl(audio.device_fd, SNDCTL_DSP_SETFMT, &audio_format) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set audio format of /dev/dsp -- no sounds");
 
   /* try if we can use stereo sound */
   if (ioctl(audio.device_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
@@ -832,16 +860,19 @@ static boolean InitAudioDevice_Linux(long fragment_size, int sample_rate)
 	  "cannot set sample rate of /dev/dsp -- no sounds");
 
   /* get the real fragmentation size; this should return 512 */
-  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size) < 0)
+  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size_query) < 0)
     Error(ERR_EXIT_SOUND_SERVER,
 	  "cannot get fragment size of /dev/dsp -- no sounds");
+  if (fragment_size_query != fragment_size)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set fragment size of /dev/dsp -- no sounds");
 
   return (boolean)stereo;
 }
 #endif	/* AUDIO_LINUX_IOCTL */
 
 #if defined(PLATFORM_NETBSD)
-static boolean InitAudioDevice_NetBSD(long fragment_size, int sample_rate)
+static boolean InitAudioDevice_NetBSD(int fragment_size, int sample_rate)
 {
   audio_info_t a_info;
   boolean stereo = TRUE;
@@ -1116,7 +1147,7 @@ static SoundInfo *Load_WAV(char *filename)
   }
 
   for (i=0; i<snd_info->data_len; i++)
-    ((byte *)snd_info->data_ptr)[i] = ((byte *)snd_info->data_ptr)[i] ^ 0x80;
+    ((byte *)snd_info->data_ptr)[i] ^= 0x80;
 
 #endif	/* PLATFORM_UNIX */
 
