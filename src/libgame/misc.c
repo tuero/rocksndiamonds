@@ -1160,6 +1160,40 @@ char getCharFromKey(Key key)
 
 
 /* ========================================================================= */
+/* functions for checking filenames                                          */
+/* ========================================================================= */
+
+boolean FileIsGraphic(char *filename)
+{
+  if (strlen(filename) > 4 &&
+      strcmp(&filename[strlen(filename) - 4], ".pcx") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+boolean FileIsSound(char *filename)
+{
+  if (strlen(filename) > 4 &&
+      strcmp(&filename[strlen(filename) - 4], ".wav") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+boolean FileIsMusic(char *filename)
+{
+  if (strlen(filename) > 4 &&
+      (strcmp(&filename[strlen(filename) - 4], ".mod") == 0 ||
+       strcmp(&filename[strlen(filename) - 4], ".MOD") == 0 ||
+       strncmp(filename, "mod.", 4) == 0 ||
+       strncmp(filename, "MOD.", 4) == 0))
+    return TRUE;
+
+  return FALSE;
+}
+
+/* ========================================================================= */
 /* functions only needed for non-Unix (non-command-line) systems */
 /* ========================================================================= */
 

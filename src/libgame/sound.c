@@ -1080,21 +1080,10 @@ int LoadMusic(void)
   {
     char *filename = dir_entry->d_name;
 
-    if (strlen(filename) > 4 &&
-	strcmp(&filename[strlen(filename) - 4], ".wav") == 0)
-    {
-      if (LoadSoundExt(filename, TRUE))
-	num_wav_music++;
-    }
-    else if (strlen(filename) > 4 &&
-	     (strcmp(&filename[strlen(filename) - 4], ".mod") == 0 ||
-	      strcmp(&filename[strlen(filename) - 4], ".MOD") == 0 ||
-	      strncmp(filename, "mod.", 4) == 0 ||
-	      strncmp(filename, "MOD.", 4) == 0))
-    {
-      if (LoadMod(filename))
-	num_mod_music++;
-    }
+    if (FileIsSound(filename) && LoadSoundExt(filename, TRUE))
+      num_wav_music++;
+    else if (FileIsMusic(filename) && LoadMod(filename))
+      num_mod_music++;
   }
 
   closedir(dir);

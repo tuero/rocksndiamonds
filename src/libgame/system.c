@@ -40,8 +40,8 @@ struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;
 
-struct LevelDirInfo    *leveldir_first = NULL;
-struct LevelDirInfo    *leveldir_current = NULL;
+LevelDirTree	       *leveldir_first = NULL;
+LevelDirTree	       *leveldir_current = NULL;
 int			level_nr;
 
 Display		       *display = NULL;

@@ -27,6 +27,9 @@
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
+#define GRAPHICSINFO_FILENAME	"graphicsinfo.conf"
+#define SOUNDSINFO_FILENAME	"soundsinfo.conf"
+#define MUSICINFO_FILENAME	"musicinfo.conf"
 #define LEVELFILE_EXTENSION	"level"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
@@ -35,6 +38,9 @@
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
+#define GRAPHICSINFO_FILENAME	"gfxinfo.cnf"
+#define SOUNDSINFO_FILENAME	"sndinfo.cnf"
+#define MUSICINFO_FILENAME	"musinfo.cnf"
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
@@ -82,7 +88,7 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 /* file functions                                                            */
 /* ------------------------------------------------------------------------- */
 
-char *getLevelClassDescription(struct LevelDirInfo *ldi)
+static char *getLevelClassDescription(TreeInfo *ldi)
 {
   int position = ldi->sort_priority / 100;
 
@@ -101,7 +107,7 @@ static char *getUserLevelDir(char *level_subdir)
   if (userlevel_dir)
     free(userlevel_dir);
 
-  if (strlen(level_subdir) > 0)
+  if (level_subdir != NULL)
     userlevel_dir = getPath3(data_dir, userlevel_subdir, level_subdir);
   else
     userlevel_dir = getPath2(data_dir, userlevel_subdir);
@@ -118,7 +124,7 @@ static char *getTapeDir(char *level_subdir)
   if (tape_dir)
     free(tape_dir);
 
-  if (strlen(level_subdir) > 0)
+  if (level_subdir != NULL)
     tape_dir = getPath3(data_dir, tape_subdir, level_subdir);
   else
     tape_dir = getPath2(data_dir, tape_subdir);
@@ -135,7 +141,7 @@ static char *getScoreDir(char *level_subdir)
   if (score_dir)
     free(score_dir);
 
-  if (strlen(level_subdir) > 0)
+  if (level_subdir != NULL)
     score_dir = getPath3(data_dir, score_subdir, level_subdir);
   else
     score_dir = getPath2(data_dir, score_subdir);
@@ -152,12 +158,63 @@ static char *getLevelSetupDir(char *level_subdir)
   if (levelsetup_dir)
     free(levelsetup_dir);
 
-  if (strlen(level_subdir) > 0)
+  if (level_subdir != NULL)
     levelsetup_dir = getPath3(data_dir, levelsetup_subdir, level_subdir);
   else
     levelsetup_dir = getPath2(data_dir, levelsetup_subdir);
 
   return levelsetup_dir;
+}
+
+static char *getUserGraphicsDir(char *graphics_subdir)
+{
+  static char *usergraphics_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *usergraphics_subdir = GRAPHICS_DIRECTORY;
+
+  if (usergraphics_dir)
+    free(usergraphics_dir);
+
+  if (graphics_subdir != NULL)
+    usergraphics_dir = getPath3(data_dir, usergraphics_subdir,graphics_subdir);
+  else
+    usergraphics_dir = getPath2(data_dir, usergraphics_subdir);
+
+  return usergraphics_dir;
+}
+
+static char *getUserSoundsDir(char *sounds_subdir)
+{
+  static char *usersounds_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *usersounds_subdir = SOUNDS_DIRECTORY;
+
+  if (usersounds_dir)
+    free(usersounds_dir);
+
+  if (sounds_subdir != NULL)
+    usersounds_dir = getPath3(data_dir, usersounds_subdir,sounds_subdir);
+  else
+    usersounds_dir = getPath2(data_dir, usersounds_subdir);
+
+  return usersounds_dir;
+}
+
+static char *getUserMusicDir(char *music_subdir)
+{
+  static char *usermusic_dir = NULL;
+  char *data_dir = getUserDataDir();
+  char *usermusic_subdir = MUSIC_DIRECTORY;
+
+  if (usermusic_dir)
+    free(usermusic_dir);
+
+  if (music_subdir != NULL)
+    usermusic_dir = getPath3(data_dir, usermusic_subdir,music_subdir);
+  else
+    usermusic_dir = getPath2(data_dir, usermusic_subdir);
+
+  return usermusic_dir;
 }
 
 char *getLevelFilename(int nr)
@@ -170,7 +227,7 @@ char *getLevelFilename(int nr)
 
   sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
   filename = getPath3((leveldir_current->user_defined ?
-		       getUserLevelDir("") :
+		       getUserLevelDir(NULL) :
 		       options.level_directory),
 		      leveldir_current->fullpath,
 		      basename);
@@ -268,13 +325,13 @@ char *getCustomImageFilename(char *basename)
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
-  createDirectory(getTapeDir(""), "main tape", PERMS_PRIVATE);
+  createDirectory(getTapeDir(NULL), "main tape", PERMS_PRIVATE);
   createDirectory(getTapeDir(level_subdir), "level tape", PERMS_PRIVATE);
 }
 
 void InitScoreDirectory(char *level_subdir)
 {
-  createDirectory(getScoreDir(""), "main score", PERMS_PUBLIC);
+  createDirectory(getScoreDir(NULL), "main score", PERMS_PUBLIC);
   createDirectory(getScoreDir(level_subdir), "level score", PERMS_PUBLIC);
 }
 
@@ -285,7 +342,7 @@ void InitUserLevelDirectory(char *level_subdir)
   if (access(getUserLevelDir(level_subdir), F_OK) != 0)
   {
     createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
-    createDirectory(getUserLevelDir(""), "main user level", PERMS_PRIVATE);
+    createDirectory(getUserLevelDir(NULL), "main user level", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(level_subdir), "user level",PERMS_PRIVATE);
 
     SaveUserLevelInfo();
@@ -295,7 +352,7 @@ void InitUserLevelDirectory(char *level_subdir)
 void InitLevelSetupDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
-  createDirectory(getLevelSetupDir(""), "main level setup", PERMS_PRIVATE);
+  createDirectory(getLevelSetupDir(NULL), "main level setup", PERMS_PRIVATE);
   createDirectory(getLevelSetupDir(level_subdir), "level setup",PERMS_PRIVATE);
 }
 
@@ -348,19 +405,18 @@ void WriteChunk_VERS(FILE *file, int file_version, int game_version)
 /* some functions to handle lists of level directories                       */
 /* ------------------------------------------------------------------------- */
 
-struct LevelDirInfo *newLevelDirInfo()
+TreeInfo *newTreeInfo()
 {
-  return checked_calloc(sizeof(struct LevelDirInfo));
+  return checked_calloc(sizeof(TreeInfo));
 }
 
-void pushLevelDirInfo(struct LevelDirInfo **node_first,
-		      struct LevelDirInfo *node_new)
+void pushTreeInfo(TreeInfo **node_first, TreeInfo *node_new)
 {
   node_new->next = *node_first;
   *node_first = node_new;
 }
 
-int numLevelDirInfo(struct LevelDirInfo *node)
+int numTreeInfo(TreeInfo *node)
 {
   int num = 0;
 
@@ -373,12 +429,12 @@ int numLevelDirInfo(struct LevelDirInfo *node)
   return num;
 }
 
-boolean validLevelSeries(struct LevelDirInfo *node)
+boolean validLevelSeries(TreeInfo *node)
 {
   return (node != NULL && !node->node_group && !node->parent_link);
 }
 
-struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *node)
+TreeInfo *getFirstValidLevelSeries(TreeInfo *node)
 {
   if (node == NULL)
   {
@@ -400,7 +456,7 @@ struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *node)
     return node;
 }
 
-struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *node)
+TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *node)
 {
   if (node == NULL)
     return NULL;
@@ -411,14 +467,14 @@ struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *node)
     return node->node_parent->node_group;
 }
 
-int numLevelDirInfoInGroup(struct LevelDirInfo *node)
+int numTreeInfoInGroup(TreeInfo *node)
 {
-  return numLevelDirInfo(getLevelDirInfoFirstGroupEntry(node));
+  return numTreeInfo(getTreeInfoFirstGroupEntry(node));
 }
 
-int posLevelDirInfo(struct LevelDirInfo *node)
+int posTreeInfo(TreeInfo *node)
 {
-  struct LevelDirInfo *node_cmp = getLevelDirInfoFirstGroupEntry(node);
+  TreeInfo *node_cmp = getTreeInfoFirstGroupEntry(node);
   int pos = 0;
 
   while (node_cmp)
@@ -433,9 +489,9 @@ int posLevelDirInfo(struct LevelDirInfo *node)
   return 0;
 }
 
-struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *node, int pos)
+TreeInfo *getTreeInfoFromPos(TreeInfo *node, int pos)
 {
-  struct LevelDirInfo *node_default = node;
+  TreeInfo *node_default = node;
   int pos_cmp = 0;
 
   while (node)
@@ -450,8 +506,7 @@ struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *node, int pos)
   return node_default;
 }
 
-struct LevelDirInfo *getLevelDirInfoFromFilenameExt(struct LevelDirInfo *node,
-						    char *filename)
+TreeInfo *getTreeInfoFromFilenameExt(TreeInfo *node, char *filename)
 {
   if (filename == NULL)
     return NULL;
@@ -460,9 +515,9 @@ struct LevelDirInfo *getLevelDirInfoFromFilenameExt(struct LevelDirInfo *node,
   {
     if (node->node_group)
     {
-      struct LevelDirInfo *node_group;
+      TreeInfo *node_group;
 
-      node_group = getLevelDirInfoFromFilenameExt(node->node_group, filename);
+      node_group = getTreeInfoFromFilenameExt(node->node_group, filename);
 
       if (node_group)
 	return node_group;
@@ -479,12 +534,12 @@ struct LevelDirInfo *getLevelDirInfoFromFilenameExt(struct LevelDirInfo *node,
   return NULL;
 }
 
-struct LevelDirInfo *getLevelDirInfoFromFilename(char *filename)
+TreeInfo *getTreeInfoFromFilename(char *filename)
 {
-  return getLevelDirInfoFromFilenameExt(leveldir_first, filename);
+  return getTreeInfoFromFilenameExt(leveldir_first, filename);
 }
 
-void dumpLevelDirInfo(struct LevelDirInfo *node, int depth)
+void dumpTreeInfo(TreeInfo *node, int depth)
 {
   int i;
 
@@ -493,28 +548,28 @@ void dumpLevelDirInfo(struct LevelDirInfo *node, int depth)
     for (i=0; i<depth * 3; i++)
       printf(" ");
 
-    printf("filename == '%s'\n", node->filename);
+    printf("filename == '%s' [%s]\n", node->filename, node->name);
 
     if (node->node_group != NULL)
-      dumpLevelDirInfo(node->node_group, depth + 1);
+      dumpTreeInfo(node->node_group, depth + 1);
 
     node = node->next;
   }
 }
 
-void sortLevelDirInfo(struct LevelDirInfo **node_first,
-		      int (*compare_function)(const void *, const void *))
+void sortTreeInfo(TreeInfo **node_first,
+		  int (*compare_function)(const void *, const void *))
 {
-  int num_nodes = numLevelDirInfo(*node_first);
-  struct LevelDirInfo **sort_array;
-  struct LevelDirInfo *node = *node_first;
+  int num_nodes = numTreeInfo(*node_first);
+  TreeInfo **sort_array;
+  TreeInfo *node = *node_first;
   int i = 0;
 
   if (num_nodes == 0)
     return;
 
   /* allocate array for sorting structure pointers */
-  sort_array = checked_calloc(num_nodes * sizeof(struct LevelDirInfo *));
+  sort_array = checked_calloc(num_nodes * sizeof(TreeInfo *));
 
   /* writing structure pointers to sorting array */
   while (i < num_nodes && node)		/* double boundary check... */
@@ -526,7 +581,7 @@ void sortLevelDirInfo(struct LevelDirInfo **node_first,
   }
 
   /* sorting the structure pointers in the sorting array */
-  qsort(sort_array, num_nodes, sizeof(struct LevelDirInfo *),
+  qsort(sort_array, num_nodes, sizeof(TreeInfo *),
 	compare_function);
 
   /* update the linkage of list elements with the sorted node array */
@@ -544,7 +599,7 @@ void sortLevelDirInfo(struct LevelDirInfo **node_first,
   while (node)
   {
     if (node->node_group != NULL)
-      sortLevelDirInfo(&node->node_group, compare_function);
+      sortTreeInfo(&node->node_group, compare_function);
 
     node = node->next;
   }
@@ -1002,7 +1057,7 @@ void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 
 #define NUM_LEVELINFO_TOKENS		10
 
-static struct LevelDirInfo ldi;
+static LevelDirTree ldi;
 
 static struct TokenInfo levelinfo_tokens[] =
 {
@@ -1019,8 +1074,17 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"	}
 };
 
-static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
+static void setTreeInfoToDefaults(TreeInfo *ldi)
 {
+  ldi->node_parent = NULL;
+  ldi->node_group = NULL;
+  ldi->next = NULL;
+
+  ldi->cl_first = -1;
+  ldi->cl_cursor = -1;
+
+  ldi->type = TREE_TYPE_GENERIC;
+
   ldi->filename = NULL;
   ldi->fullpath = NULL;
   ldi->basepath = NULL;
@@ -1040,20 +1104,14 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
   ldi->color = 0;
   ldi->class_desc = NULL;
   ldi->handicap_level = 0;
-  ldi->cl_first = -1;
-  ldi->cl_cursor = -1;
-
-  ldi->node_parent = NULL;
-  ldi->node_group = NULL;
-  ldi->next = NULL;
 }
 
-static void setLevelDirInfoToDefaultsFromParent(struct LevelDirInfo *ldi,
-						struct LevelDirInfo *parent)
+static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi,
+					    TreeInfo *parent)
 {
   if (parent == NULL)
   {
-    setLevelDirInfoToDefaults(ldi);
+    setTreeInfoToDefaults(ldi);
     return;
   }
 
@@ -1124,10 +1182,10 @@ void setSetupInfo(struct TokenInfo *token_info,
   }
 }
 
-static int compareLevelDirInfoEntries(const void *object1, const void *object2)
+static int compareTreeInfoEntries(const void *object1, const void *object2)
 {
-  const struct LevelDirInfo *entry1 = *((struct LevelDirInfo **)object1);
-  const struct LevelDirInfo *entry2 = *((struct LevelDirInfo **)object2);
+  const TreeInfo *entry1 = *((TreeInfo **)object1);
+  const TreeInfo *entry2 = *((TreeInfo **)object2);
   int compare_result;
 
   if (entry1->parent_link || entry2->parent_link)
@@ -1150,11 +1208,11 @@ static int compareLevelDirInfoEntries(const void *object1, const void *object2)
   return compare_result;
 }
 
-static void createParentLevelDirNode(struct LevelDirInfo *node_parent)
+static void createParentTreeInfoNode(TreeInfo *node_parent)
 {
-  struct LevelDirInfo *leveldir_new = newLevelDirInfo();
+  TreeInfo *leveldir_new = newTreeInfo();
 
-  setLevelDirInfoToDefaults(leveldir_new);
+  setTreeInfoToDefaults(leveldir_new);
 
   leveldir_new->node_parent = node_parent;
   leveldir_new->parent_link = TRUE;
@@ -1169,23 +1227,21 @@ static void createParentLevelDirNode(struct LevelDirInfo *node_parent)
   leveldir_new->sort_priority = node_parent->sort_priority;
   leveldir_new->class_desc = getLevelClassDescription(leveldir_new);
 
-  pushLevelDirInfo(&node_parent->node_group, leveldir_new);
+  pushTreeInfo(&node_parent->node_group, leveldir_new);
 }
 
-/* forward declaration for recursive call by "LoadLevelInfoFromSetupFile()" */
-static void LoadLevelInfoFromLevelGroupDir(struct LevelDirInfo **,
-					   struct LevelDirInfo *,
-					   char *);
+/* forward declaration for recursive call by "LoadLevelInfoFromLevelDir()" */
+static void LoadLevelInfoFromLevelDir(TreeInfo **, TreeInfo *, char *);
 
-static boolean LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
-					 struct LevelDirInfo *node_parent,
-					 char *level_directory,
-					 char *directory_name)
+static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
+					  TreeInfo *node_parent,
+					  char *level_directory,
+					  char *directory_name)
 {
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
   struct SetupFileList *setup_file_list = loadSetupFileList(filename);
-  struct LevelDirInfo *leveldir_new = NULL;
+  LevelDirTree *leveldir_new = NULL;
   int i;
 
   if (setup_file_list == NULL)
@@ -1198,10 +1254,10 @@ static boolean LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
     return FALSE;
   }
 
-  leveldir_new = newLevelDirInfo();
+  leveldir_new = newTreeInfo();
 
   checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
-  setLevelDirInfoToDefaultsFromParent(leveldir_new, node_parent);
+  setTreeInfoToDefaultsFromParent(leveldir_new, node_parent);
 
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
@@ -1228,8 +1284,7 @@ static boolean LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
   else					/* sub level group */
   {
     leveldir_new->basepath = node_parent->basepath;
-    leveldir_new->fullpath = getPath2(node_parent->fullpath,
-				      directory_name);
+    leveldir_new->fullpath = getPath2(node_parent->fullpath, directory_name);
   }
 
   if (leveldir_new->levels < 1)
@@ -1249,18 +1304,18 @@ static boolean LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
      leveldir_new->last_level :
      leveldir_new->first_level);
 
-  pushLevelDirInfo(node_first, leveldir_new);
+  pushTreeInfo(node_first, leveldir_new);
 
   freeSetupFileList(setup_file_list);
 
   if (leveldir_new->level_group)
   {
     /* create node to link back to current level directory */
-    createParentLevelDirNode(leveldir_new);
+    createParentTreeInfoNode(leveldir_new);
 
     /* step into sub-directory and look for more level series */
-    LoadLevelInfoFromLevelGroupDir(&leveldir_new->node_group,
-				   leveldir_new, directory_path);
+    LoadLevelInfoFromLevelDir(&leveldir_new->node_group,
+			      leveldir_new, directory_path);
   }
 
   free(directory_path);
@@ -1269,9 +1324,9 @@ static boolean LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
   return TRUE;
 }
 
-static void LoadLevelInfoFromLevelGroupDir(struct LevelDirInfo **node_first,
-					   struct LevelDirInfo *node_parent,
-					   char *level_directory)
+static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
+				      TreeInfo *node_parent,
+				      char *level_directory)
 {
   DIR *dir;
   struct dirent *dir_entry;
@@ -1307,9 +1362,9 @@ static void LoadLevelInfoFromLevelGroupDir(struct LevelDirInfo **node_first,
 
     free(directory_path);
 
-    valid_entry_found |= LoadLevelInfoFromLevelDir(node_first, node_parent,
-						   level_directory,
-						   directory_name);
+    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
+						    level_directory,
+						    directory_name);
   }
 
   closedir(dir);
@@ -1317,8 +1372,8 @@ static void LoadLevelInfoFromLevelGroupDir(struct LevelDirInfo **node_first,
   if (!valid_entry_found)
   {
     /* check if this directory directly contains a file "levelinfo.conf" */
-    valid_entry_found |= LoadLevelInfoFromLevelDir(node_first, node_parent,
-						   level_directory, ".");
+    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
+						    level_directory, ".");
   }
 
   if (!valid_entry_found)
@@ -1332,19 +1387,251 @@ void LoadLevelInfo()
 
   DrawInitText("Loading level series:", 120, FC_GREEN);
 
-  /* check if this directory directly contains a file "levelinfo.conf" */
-  LoadLevelInfoFromLevelGroupDir(&leveldir_first,NULL,options.level_directory);
-  LoadLevelInfoFromLevelGroupDir(&leveldir_first,NULL,getUserLevelDir(""));
+  LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
+  LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
 
   leveldir_current = getFirstValidLevelSeries(leveldir_first);
 
   if (leveldir_first == NULL)
     Error(ERR_EXIT, "cannot find any valid level series in any directory");
 
-  sortLevelDirInfo(&leveldir_first, compareLevelDirInfoEntries);
+  sortTreeInfo(&leveldir_first, compareTreeInfoEntries);
 
 #if 0
-  dumpLevelDirInfo(leveldir_first, 0);
+  dumpTreeInfo(leveldir_first, 0);
+#endif
+}
+
+/* declaration for recursive call by "LoadArtworkInfoFromArtworkConf()" */
+static void LoadArtworkInfoFromArtworkDir(TreeInfo **, TreeInfo *, char *,int);
+
+static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
+					      TreeInfo *node_parent,
+					      char *base_directory,
+					      char *directory_name, int type)
+{
+  char *directory_path = getPath2(base_directory, directory_name);
+  char *filename =
+    getPath2(directory_path,
+	     (type == TREE_TYPE_GRAPHICS_DIR ? GRAPHICSINFO_FILENAME :
+	      type == TREE_TYPE_SOUNDS_DIR ? SOUNDSINFO_FILENAME :
+	      type == TREE_TYPE_MUSIC_DIR ? MUSICINFO_FILENAME : ""));
+  struct SetupFileList *setup_file_list = NULL;
+  TreeInfo *artwork_new = NULL;
+  char *check_dir = NULL;
+  int i;
+
+  if (access(getUserLevelDir(filename), F_OK) == 0)	/* file exists */
+    loadSetupFileList(filename);
+
+  if (setup_file_list == NULL)	/* no config file -- look for artwork files */
+  {
+    DIR *dir;
+    struct dirent *dir_entry;
+    boolean valid_file_found = FALSE;
+
+    if ((dir = opendir(base_directory)) != NULL)
+    {
+      while ((dir_entry = readdir(dir)) != NULL)
+      {
+	char *entry_name = dir_entry->d_name;
+
+	if ((type == TREE_TYPE_GRAPHICS_DIR && FileIsGraphic(entry_name)) ||
+	    (type == TREE_TYPE_SOUNDS_DIR && FileIsSound(entry_name)) ||
+	    (type == TREE_TYPE_MUSIC_DIR && FileIsMusic(entry_name)))
+	{
+	  valid_file_found = TRUE;
+	  break;
+	}
+      }
+
+      closedir(dir);
+    }
+
+    if (!valid_file_found)
+    {
+      Error(ERR_WARN, "ignoring artwork directory '%s'", base_directory);
+
+      free(directory_path);
+      free(filename);
+
+      return FALSE;
+    }
+  }
+
+  artwork_new = newTreeInfo();
+  setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
+
+  artwork_new->filename = getStringCopy(directory_name);
+
+  if (setup_file_list)
+  {
+#if 0
+    checkSetupFileListIdentifier(setup_file_list, getCookie("..."));
+#endif
+
+    /* set all structure fields according to the token/value pairs */
+    ldi = *artwork_new;
+    for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
+      setSetupInfo(levelinfo_tokens, i,
+		   getTokenValue(setup_file_list, levelinfo_tokens[i].text));
+    *artwork_new = ldi;
+
+    DrawInitText(artwork_new->name, 150, FC_YELLOW);
+
+    if (artwork_new->name_short == NULL)
+      artwork_new->name_short = getStringCopy(artwork_new->name);
+
+    if (artwork_new->name_sorting == NULL)
+      artwork_new->name_sorting = getStringCopy(artwork_new->name);
+  }
+  else
+  {
+    if (artwork_new->name != NULL)
+      free(artwork_new->name);
+
+    if (strcmp(artwork_new->filename, ".") == 0)
+      artwork_new->name = getStringCopy("default");
+    else
+      artwork_new->name = getStringCopy(artwork_new->filename);
+
+    artwork_new->name_short = getStringCopy(artwork_new->name);
+    artwork_new->name_sorting = getStringCopy(artwork_new->name);
+  }
+
+  if (node_parent == NULL)		/* top level group */
+  {
+    artwork_new->basepath = base_directory;
+    artwork_new->fullpath = artwork_new->filename;
+  }
+  else					/* sub level group */
+  {
+    artwork_new->basepath = node_parent->basepath;
+    artwork_new->fullpath = getPath2(node_parent->fullpath, directory_name);
+  }
+
+  check_dir = (type == TREE_TYPE_GRAPHICS_DIR ? options.graphics_directory :
+	       type == TREE_TYPE_SOUNDS_DIR ? options.sounds_directory :
+	       type == TREE_TYPE_MUSIC_DIR ? options.music_directory : "");
+  artwork_new->user_defined =
+    (artwork_new->basepath == check_dir ? FALSE : TRUE);
+
+#if 0
+  artwork_new->color = LEVELCOLOR(artwork_new);
+  artwork_new->class_desc = getLevelClassDescription(artwork_new);
+#endif
+
+  pushTreeInfo(node_first, artwork_new);
+
+  freeSetupFileList(setup_file_list);
+
+  free(directory_path);
+  free(filename);
+
+  return TRUE;
+}
+
+static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
+					  TreeInfo *node_parent,
+					  char *base_directory, int type)
+{
+  DIR *dir;
+  struct dirent *dir_entry;
+  boolean valid_entry_found = FALSE;
+
+  if ((dir = opendir(base_directory)) == NULL)
+  {
+    if ((type == TREE_TYPE_GRAPHICS_DIR &&
+	 base_directory == options.graphics_directory) ||
+	(type == TREE_TYPE_SOUNDS_DIR &&
+	 base_directory == options.sounds_directory) ||
+	(type == TREE_TYPE_MUSIC_DIR &&
+	 base_directory == options.music_directory))
+      Error(ERR_WARN, "cannot read directory '%s'", base_directory);
+    return;
+  }
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
+  {
+    struct stat file_status;
+    char *directory_name = dir_entry->d_name;
+    char *directory_path = getPath2(base_directory, directory_name);
+
+    /* skip entries for current and parent directory */
+    if (strcmp(directory_name, ".")  == 0 ||
+	strcmp(directory_name, "..") == 0)
+    {
+      free(directory_path);
+      continue;
+    }
+
+    /* find out if directory entry is itself a directory */
+    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
+	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    {
+      free(directory_path);
+      continue;
+    }
+
+    free(directory_path);
+
+    valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first,node_parent,
+							base_directory,
+							directory_name, type);
+  }
+
+  closedir(dir);
+
+  if (!valid_entry_found)
+  {
+    /* check if this directory directly contains an artwork config file */
+    valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first,node_parent,
+							base_directory, ".",
+							type);
+  }
+
+  if (!valid_entry_found)
+    Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
+	  base_directory);
+}
+
+void LoadArtworkInfo()
+{
+  DrawInitText("Looking for custom artwork:", 120, FC_GREEN);
+
+  LoadArtworkInfoFromArtworkDir(&artwork.gfx_first, NULL,
+				options.graphics_directory,
+				TREE_TYPE_GRAPHICS_DIR);
+  LoadArtworkInfoFromArtworkDir(&artwork.gfx_first, NULL,
+				getUserGraphicsDir(NULL),
+				TREE_TYPE_GRAPHICS_DIR);
+
+  LoadArtworkInfoFromArtworkDir(&artwork.snd_first, NULL,
+				options.sounds_directory,
+				TREE_TYPE_SOUNDS_DIR);
+  LoadArtworkInfoFromArtworkDir(&artwork.snd_first, NULL,
+				getUserSoundsDir(NULL),
+				TREE_TYPE_SOUNDS_DIR);
+
+  LoadArtworkInfoFromArtworkDir(&artwork.mus_first, NULL,
+				options.music_directory,
+				TREE_TYPE_MUSIC_DIR);
+  LoadArtworkInfoFromArtworkDir(&artwork.mus_first, NULL,
+				getUserMusicDir(NULL),
+				TREE_TYPE_MUSIC_DIR);
+
+  artwork.gfx_current = artwork.gfx_first;
+  artwork.snd_current = artwork.snd_first;
+  artwork.mus_current = artwork.mus_first;
+
+  sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
+  sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
+  sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
+
+#if 0
+  dumpTreeInfo(artwork.gfx_first, 0);
+  dumpTreeInfo(artwork.snd_first, 0);
+  dumpTreeInfo(artwork.mus_first, 0);
 #endif
 }
 
@@ -1364,7 +1651,7 @@ static void SaveUserLevelInfo()
   }
 
   /* always start with reliable default values */
-  setLevelDirInfoToDefaults(&ldi);
+  setTreeInfoToDefaults(&ldi);
 
   ldi.name = getLoginName();
   ldi.author = getRealName();
@@ -1486,7 +1773,7 @@ void LoadLevelSetup_LastSeries()
     char *last_level_series =
       getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
-    leveldir_current = getLevelDirInfoFromFilename(last_level_series);
+    leveldir_current = getTreeInfoFromFilename(last_level_series);
     if (leveldir_current == NULL)
       leveldir_current = leveldir_first;
 
@@ -1541,7 +1828,7 @@ static void checkSeriesInfo()
   /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
 
   level_directory = getPath2((leveldir_current->user_defined ?
-			      getUserLevelDir("") :
+			      getUserLevelDir(NULL) :
 			      options.level_directory),
 			     leveldir_current->fullpath);
 

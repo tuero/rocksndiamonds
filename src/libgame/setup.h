@@ -149,19 +149,19 @@ void InitLevelSetupDirectory(char *);
 void ReadChunk_VERS(FILE *, int *, int *);
 void WriteChunk_VERS(FILE *, int, int);
 
-struct LevelDirInfo *newLevelDirInfo();
-void pushLevelDirInfo(struct LevelDirInfo **, struct LevelDirInfo *);
-int numLevelDirInfo(struct LevelDirInfo *);
-boolean validLevelSeries(struct LevelDirInfo *);
-struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *);
-struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *);
-int numLevelDirInfoInGroup(struct LevelDirInfo *);
-int posLevelDirInfo(struct LevelDirInfo *);
-struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *, int);
-struct LevelDirInfo *getLevelDirInfoFromFilename(char *);
-void dumpLevelDirInfo(struct LevelDirInfo *, int);
-void sortLevelDirInfo(struct LevelDirInfo **,
-		      int (*compare_function)(const void *, const void *));
+TreeInfo *newTreeInfo();
+void pushTreeInfo(TreeInfo **, TreeInfo *);
+int numTreeInfo(TreeInfo *);
+boolean validLevelSeries(TreeInfo *);
+TreeInfo *getFirstValidLevelSeries(TreeInfo *);
+TreeInfo *getTreeInfoFirstGroupEntry(TreeInfo *);
+int numTreeInfoInGroup(TreeInfo *);
+int posTreeInfo(TreeInfo *);
+TreeInfo *getTreeInfoFromPos(TreeInfo *, int);
+TreeInfo *getTreeInfoFromFilename(char *);
+void dumpTreeInfo(TreeInfo *, int);
+void sortTreeInfo(TreeInfo **,
+		  int (*compare_function)(const void *, const void *));
 
 char *getUserDataDir(void);
 char *getSetupDir(void);
@@ -183,6 +183,7 @@ char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);
 
 void LoadLevelInfo(void);
+void LoadArtworkInfo(void);
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);

@@ -98,6 +98,10 @@ Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
 
+boolean FileIsGraphic(char *);
+boolean FileIsSound(char *);
+boolean FileIsMusic(char *);
+
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();
 FILE *openErrorFile();

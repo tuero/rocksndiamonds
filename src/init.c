@@ -43,6 +43,7 @@ static char *image_filename[NUM_PICTURES] =
 static void InitSetup(void);
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
+static void InitArtworkInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
 static void InitGfx(void);
@@ -82,6 +83,7 @@ void OpenAll(void)
 
   InitEventFilter(FilterMouseMotionEvents);
 
+  InitArtworkInfo();
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
@@ -119,6 +121,11 @@ void InitLevelInfo()
   LoadLevelInfo();				/* global level info */
   LoadLevelSetup_LastSeries();			/* last played series info */
   LoadLevelSetup_SeriesInfo();			/* last played level info */
+}
+
+void InitArtworkInfo()
+{
+  LoadArtworkInfo();
 }
 
 void InitNetworkServer()

@@ -122,7 +122,7 @@ static void ToggleFullscreenIfNeeded()
 
 void DrawMainMenu()
 {
-  static struct LevelDirInfo *leveldir_last_valid = NULL;
+  static LevelDirTree *leveldir_last_valid = NULL;
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
@@ -236,8 +236,8 @@ static void gotoTopLevelDir()
     /* write a "path" into level tree for easy navigation to last level */
     if (leveldir_current->node_parent->node_group->cl_first == -1)
     {
-      int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
-      int leveldir_pos = posLevelDirInfo(leveldir_current);
+      int num_leveldirs = numTreeInfoInGroup(leveldir_current);
+      int leveldir_pos = posTreeInfo(leveldir_current);
       int num_page_entries;
       int cl_first, cl_cursor;
 
@@ -935,7 +935,7 @@ static void AdjustChooseLevelScrollbar(int id, int first_entry)
   struct GadgetInfo *gi = screen_gadget[id];
   int items_max, items_visible, item_position;
 
-  items_max = numLevelDirInfoInGroup(leveldir_current);
+  items_max = numTreeInfoInGroup(leveldir_current);
   items_visible = MAX_MENU_ENTRIES_ON_SCREEN - 1;
   item_position = first_entry;
 
@@ -951,7 +951,7 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   int i;
   char buffer[SCR_FIELDX * 2];
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
-  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
+  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
 
   ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
@@ -960,12 +960,12 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
   for(i=0; i<num_page_entries; i++)
   {
-    struct LevelDirInfo *node, *node_first;
+    LevelDirTree *node, *node_first;
     int leveldir_pos = first_entry + i;
     int ypos = MENU_SCREEN_START_YPOS + i;
 
-    node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
-    node = getLevelDirInfoFromPos(node_first, leveldir_pos);
+    node_first = getTreeInfoFirstGroupEntry(leveldir_current);
+    node = getTreeInfoFromPos(node_first, leveldir_pos);
 
     strncpy(buffer, node->name , max_buffer_len);
     buffer[max_buffer_len] = '\0';
@@ -989,11 +989,11 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
 static void drawChooseLevelInfo(int leveldir_pos)
 {
-  struct LevelDirInfo *node, *node_first;
+  LevelDirTree *node, *node_first;
   int x, last_redraw_mask = redraw_mask;
 
-  node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
-  node = getLevelDirInfoFromPos(node_first, leveldir_pos);
+  node_first = getTreeInfoFirstGroupEntry(leveldir_current);
+  node = getTreeInfoFromPos(node_first, leveldir_pos);
 
   ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
 
@@ -1017,7 +1017,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   int x = 0;
   int y = leveldir_current->cl_cursor;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
+  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
   int num_page_entries;
 
   if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)
@@ -1027,7 +1027,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
-    int leveldir_pos = posLevelDirInfo(leveldir_current);
+    int leveldir_pos = posTreeInfo(leveldir_current);
 
     if (leveldir_current->cl_first == -1)
     {
@@ -1120,11 +1120,11 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   if (dx == 1)
   {
-    struct LevelDirInfo *node_first, *node_cursor;
+    LevelDirTree *node_first, *node_cursor;
     int leveldir_pos = leveldir_current->cl_first + y;
 
-    node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
-    node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
+    node_first = getTreeInfoFirstGroupEntry(leveldir_current);
+    node_cursor = getTreeInfoFromPos(node_first, leveldir_pos);
 
     if (node_cursor->node_group)
     {
@@ -1156,11 +1156,11 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     }
     else
     {
-      struct LevelDirInfo *node_first, *node_cursor;
+      LevelDirTree *node_first, *node_cursor;
       int leveldir_pos = leveldir_current->cl_first + y;
 
-      node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
-      node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
+      node_first = getTreeInfoFirstGroupEntry(leveldir_current);
+      node_cursor = getTreeInfoFromPos(node_first, leveldir_pos);
 
       if (node_cursor->node_group)
       {
@@ -2451,7 +2451,7 @@ void CreateScreenGadgets()
 
 void MapChooseLevelGadgets()
 {
-  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
+  int num_leveldirs = numTreeInfoInGroup(leveldir_current);
   int i;
 
   if (num_leveldirs <= MAX_MENU_ENTRIES_ON_SCREEN)

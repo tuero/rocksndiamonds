@@ -246,14 +246,6 @@ struct GfxInfo
   boolean draw_deactivation_mask;
 };
 
-struct ArtworkInfo
-{
-  char *custom_artwork;
-  char *custom_graphics;
-  char *custom_sounds;
-  char *custom_music;
-};
-
 struct JoystickInfo
 {
   int status;
@@ -318,8 +310,25 @@ struct SetupInfo
   struct SetupInputInfo input[MAX_PLAYERS];
 };
 
-struct LevelDirInfo
+#define TREE_TYPE_GENERIC		0
+#define TREE_TYPE_LEVEL_DIR		1
+#define TREE_TYPE_GRAPHICS_DIR		2
+#define TREE_TYPE_SOUNDS_DIR		3
+#define TREE_TYPE_MUSIC_DIR		4
+
+struct TreeInfo
 {
+  struct TreeInfo *node_parent;		/* parent level directory info */
+  struct TreeInfo *node_group;		/* level group sub-directory info */
+  struct TreeInfo *next;		/* next level series structure node */
+
+  int cl_first;		/* internal control field for setup screen */
+  int cl_cursor;	/* internal control field for setup screen */
+
+  int type;		/* type of tree content */
+
+  /* fields for "type == TREE_TYPE_LEVEL_DIR" */
+
   char *filename;	/* level series single directory name */
   char *fullpath;	/* complete path relative to level directory */
   char *basepath;	/* absolute base path of level directory */
@@ -339,12 +348,22 @@ struct LevelDirInfo
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
   int handicap_level;	/* number of the lowest unsolved level */
-  int cl_first;		/* internal control field for "choose level" screen */
-  int cl_cursor;	/* internal control field for "choose level" screen */
+};
 
-  struct LevelDirInfo *node_parent;	/* parent level directory info */
-  struct LevelDirInfo *node_group;	/* level group sub-directory info */
-  struct LevelDirInfo *next;		/* next level series structure node */
+typedef struct TreeInfo TreeInfo;
+typedef struct TreeInfo LevelDirTree;
+typedef struct TreeInfo GraphicsDirTree;
+typedef struct TreeInfo SoundsDirTree;
+typedef struct TreeInfo MusicDirTree;
+
+struct ArtworkInfo
+{
+  GraphicsDirTree *gfx_first;
+  GraphicsDirTree *gfx_current;
+  SoundsDirTree *snd_first;
+  SoundsDirTree *snd_current;
+  MusicDirTree *mus_first;
+  MusicDirTree *mus_current;
 };
 
 
@@ -361,8 +380,8 @@ extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
 extern struct SetupInfo		setup;
 
-extern struct LevelDirInfo     *leveldir_first;
-extern struct LevelDirInfo     *leveldir_current;
+extern LevelDirTree	       *leveldir_first;
+extern LevelDirTree	       *leveldir_current;
 extern int			level_nr;
 
 extern Display		       *display;
