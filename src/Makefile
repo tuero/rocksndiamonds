@@ -94,6 +94,7 @@ SRCS =	main.c		\
 	random.c	\
 	gifload.c	\
 	gif.c		\
+	pcx.c		\
 	image.c		\
 	network.c	\
 	netserv.c
@@ -115,6 +116,7 @@ OBJS =	main.o		\
 	random.o	\
 	gifload.o	\
 	gif.o		\
+	pcx.o		\
 	image.o		\
 	network.o	\
 	netserv.o

@@ -42,7 +42,7 @@ int Read_GIF_to_Pixmaps(Display *display, Window window, char *filename,
 #endif
 
   /* load GIF file */
-  if (!(image = Read_GIF_to_Image(filename)))
+  if (!(image = Read_PCX_to_Image(filename)))
   {
     printf("Loading GIF image failed -- maybe no GIF...\n");
     exit(1);

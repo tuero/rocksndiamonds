@@ -26,9 +26,9 @@
 #include "netserv.h"
 
 #ifdef DEBUG
-/*
+
 #define DEBUG_TIMING
-*/
+
 #endif
 
 struct PictureFileInfo
@@ -642,7 +642,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char *picturemask_ext = "Mask.xbm";
 #else
   int gif_err;
-  char *picture_ext = ".gif";
+  char *picture_ext = ".pcx";
 #endif
 
 #ifdef DEBUG_TIMING

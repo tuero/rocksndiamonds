@@ -18,7 +18,11 @@ Image *monochrome(Image *cimage)
   int bitmap_pixel;
 
   if (BITMAPP(cimage))
+  {
+    printf("-->ERROR(monochrome)\n");
+
     return(NULL);
+  }
 
   image = newBitImage(cimage->width, cimage->height);
 
@@ -319,6 +323,8 @@ void compress(Image *image)
   free(map);
   free(used);
 
+
+
 #if 0
   if (badcount)
     printf("%d out-of-range pixels, ", badcount);
@@ -335,6 +341,8 @@ void compress(Image *image)
 	   next_index, (next_index == 1 ? "" : "s"));
   }
 #endif
+
+
 
   image->rgb.compressed= TRUE;	/* don't do it again */
 }
