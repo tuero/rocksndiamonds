@@ -753,7 +753,8 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
 		   element == EL_CHAR(']')  ? EL_CHAR_UUMLAUT :
 		   element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
       }
-      else if (level->game_version < VERSION_IDENT(3,0,0))
+
+      if (level->game_version < VERSION_IDENT(3,0,0))
       {
 	/* map Supaplex gravity tube elements */
 	element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :

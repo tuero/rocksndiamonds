@@ -1,15 +1,35 @@
-Release Version 3.0.0 [02 AUG 2003]
+Release Version 3.0.0 [05 AUG 2003]
 ------------------------------------------
 	- final version bumped to 3.0.0 due to the massive changes
+	- graphics and sounds now completely and dynamically customizable
 	- custom elements now have lots of configurable properties
-	- advanced custom element settings for powerful new elements
+	- advanced custom element settings for powerful, self-created elements
 	- fixed Supaplex gravity tubes
 	- fixed very nasty bug in SDL_image (and X11) PCX loading routine
 	- fixed some very nasty bugs in bitmap zoom routine
-	- fixed very nasty bug in level/artwork tree routine
-	- added new contributed levels from the following players:
+	- fixed very nasty bug in level/artwork loading routine
+	- added new contributed levels and artwork from the following players:
+	  * in the section "Contributions - 2002":
+            + Abby King (14 levels)
+	    + Alan Bond (30 levels, all solvable, BD style artwork set)
+	    + David Hutchinson (25 levels, artwork set)
+	    + Equinox Tetrachloride (50 levels + 100 levels, all solvable)
+	    + Sylvan Hancock (39 levels)
+	  * in the section "Contributions - 2003":
+	    + Andreas Buschbeck (85 levels, all solvable, complete artwork set)
+	    + Edward Leuf (10 levels, all solvable, artwork set)
+	    + Emanuel Schmieg (22 levels, all solvable, complete artwork set)
+	    + Gavin Davidson (47 levels)
+	    + Jorge Jordan (17 levels)
+	    + Rafael Gatti (17 levels)
+	    + Randy Johannessen (17 levels)
+	    + Richard Valvona (3 levels)
+	    + Sam Bateman (35 levels)
+	- great new levels with full artwork are now available from:
 	  + Juergen Bonhagen (with complete artwork set)
+	    * download these levels from "http://www.jb-line.de/"
 	  + Andreas Buschbeck (with complete artwork set)
+	    * download these levels from "http://home.vr-web.de/~abuschbeck/"
 
 Pre-Release Version 2.2.0rc7 [17 JUL 2003]
 ------------------------------------------
