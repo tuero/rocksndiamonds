@@ -144,6 +144,20 @@ static void setLevelInfoToDefaults()
       for(y=0; y<3; y++)
 	element_info[element].change.content[x][y] = EL_EMPTY_SPACE;
 
+    element_info[element].access_type = 0;
+    element_info[element].access_layer = 0;
+    element_info[element].walk_to_action = 0;
+    element_info[element].smash_targets = 0;
+    element_info[element].deadliness = 0;
+    element_info[element].consistency = 0;
+    element_info[element].change_player_action = 0;
+    element_info[element].change_collide_action = 0;
+    element_info[element].change_other_action = 0;
+
+    element_info[element].can_explode_by_fire = FALSE;
+    element_info[element].can_explode_smashed = FALSE;
+    element_info[element].can_explode_impact = FALSE;
+
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
       Properties[element][j] = EP_BITMASK_DEFAULT;

@@ -890,7 +890,6 @@ static struct ValueTextInfo options_access_type[] =
   { EP_PASSABLE,		"pass"				},
   { -1,				NULL				}
 };
-static int value_access_type = 0;
 
 static struct ValueTextInfo options_access_layer[] =
 {
@@ -899,7 +898,6 @@ static struct ValueTextInfo options_access_layer[] =
   { EP_ACCESSIBLE_UNDER,	"under"				},
   { -1,				NULL				}
 };
-static int value_access_layer = 0;
 
 static struct ValueTextInfo options_walk_to_action[] =
 {
@@ -908,7 +906,6 @@ static struct ValueTextInfo options_walk_to_action[] =
   { EP_PUSHABLE,		"pushable"			},
   { -1,				NULL				}
 };
-static int value_walk_to_action = 0;
 
 static struct ValueTextInfo options_move_pattern[] =
 {
@@ -955,7 +952,6 @@ static struct ValueTextInfo options_smash_targets[] =
   { EP_CAN_SMASH_EVERYTHING,	"everything"			},
   { -1,				NULL				}
 };
-static int value_smash_targets = 0;
 
 static struct ValueTextInfo options_deadliness[] =
 {
@@ -964,7 +960,6 @@ static struct ValueTextInfo options_deadliness[] =
   { EP_DONT_TOUCH,		"touching"			},
   { -1,				NULL				}
 };
-static int value_deadliness = 0;
 
 static struct ValueTextInfo options_consistency[] =
 {
@@ -972,7 +967,6 @@ static struct ValueTextInfo options_consistency[] =
   { EP_INDESTRUCTIBLE,		"indestructible"		},
   { -1,				NULL				}
 };
-static int value_consistency = 0;
 
 static struct ValueTextInfo options_time_units[] =
 {
@@ -988,7 +982,6 @@ static struct ValueTextInfo options_change_player_action[] =
   { CE_PUSHED_BY_PLAYER,	"pushed"			},
   { -1,				NULL				}
 };
-static int value_change_player_action = 0;
 
 static struct ValueTextInfo options_change_collide_action[] =
 {
@@ -997,7 +990,6 @@ static struct ValueTextInfo options_change_collide_action[] =
   { CE_SMASHED,			"when smashed"			},
   { -1,				NULL				}
 };
-static int value_change_collide_action = 0;
 
 static struct ValueTextInfo options_change_other_action[] =
 {
@@ -1010,7 +1002,6 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_COLLECTED,		"player collects"		},
   { -1,				NULL					}
 };
-static int value_change_other_action = 0;
 
 static struct ValueTextInfo options_change_power[] =
 {
@@ -1037,7 +1028,7 @@ static struct
     GADGET_ID_CUSTOM_ACCESS_TYPE,
     -1,
     options_access_type,
-    &value_access_type,
+    &custom_element.access_type,
     "player can", NULL, "type of access to this field"
   },
   {
@@ -1045,7 +1036,7 @@ static struct
     GADGET_ID_CUSTOM_ACCESS_LAYER,
     -1,
     options_access_layer,
-    &value_access_layer,
+    &custom_element.access_layer,
     NULL, NULL, "layer of access for this field"
   },
   {
@@ -1053,7 +1044,7 @@ static struct
     GADGET_ID_CUSTOM_WALK_TO_ACTION,
     -1,
     options_walk_to_action,
-    &value_walk_to_action,
+    &custom_element.walk_to_action,
     NULL, NULL, "diggable/collectible/pushable"
   },
   {
@@ -1085,7 +1076,7 @@ static struct
     GADGET_ID_CUSTOM_SMASH_TARGETS,
     -1,
     options_smash_targets,
-    &value_smash_targets,
+    &custom_element.smash_targets,
     "can smash", NULL, "elements that can be smashed"
   },
   {
@@ -1093,7 +1084,7 @@ static struct
     GADGET_ID_CUSTOM_DEADLINESS,
     -1,
     options_deadliness,
-    &value_deadliness,
+    &custom_element.deadliness,
     "deadly when", NULL, "deadliness of element"
   },
   {
@@ -1101,7 +1092,7 @@ static struct
     GADGET_ID_CUSTOM_CONSISTENCY,
     -1,
     options_consistency,
-    &value_consistency,
+    &custom_element.consistency,
     NULL, "explodes to:", "consistency/destructibility"
   },
 
@@ -1120,7 +1111,7 @@ static struct
     GADGET_ID_CHANGE_PLAYER_ACTION,
     -1,
     options_change_player_action,
-    &value_change_player_action,
+    &custom_element.change_player_action,
     NULL, "by player", "type of player contact"
   },
   {
@@ -1128,7 +1119,7 @@ static struct
     GADGET_ID_CHANGE_COLLIDE_ACTION,
     -1,
     options_change_collide_action,
-    &value_change_collide_action,
+    &custom_element.change_collide_action,
     NULL, NULL, "change after impact or smash"
   },
   {
@@ -1136,7 +1127,7 @@ static struct
     GADGET_ID_CHANGE_OTHER_ACTION,
     -1,
     options_change_other_action,
-    &value_change_other_action,
+    &custom_element.change_other_action,
     NULL, "element:", "type of other element action"
   },
   {
@@ -1287,10 +1278,6 @@ static struct
   }
 };
 
-static boolean can_explode_by_fire = FALSE;
-static boolean can_explode_smashed = FALSE;
-static boolean can_explode_impact = FALSE;
-
 static struct
 {
   int x, y;
@@ -1388,19 +1375,19 @@ static struct
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,
-    &can_explode_by_fire,
+    &custom_element.can_explode_by_fire,
     "by fire",				"element can explode by fire/explosion"
   },
   {
     ED_SETTINGS_XPOS(7),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,
-    &can_explode_smashed,
+    &custom_element.can_explode_smashed,
     "smashed",				"element can explode when smashed"
   },
   {
     ED_SETTINGS_XPOS(13),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,
-    &can_explode_impact,
+    &custom_element.can_explode_impact,
     "impact",				"element can explode on impact"
   },
 
@@ -3632,88 +3619,88 @@ static void CopyCustomElementPropertiesToEditor(int element)
   /* ---------- element settings: configure (custom elements) ------------- */
 
   /* set accessible layer selectbox help value */
-  value_access_type =
+  custom_element.access_type =
     (IS_WALKABLE(element) ? EP_WALKABLE :
      IS_PASSABLE(element) ? EP_PASSABLE :
-     value_access_type);
-  value_access_layer =
+     custom_element.access_type);
+  custom_element.access_layer =
     (IS_ACCESSIBLE_OVER(element) ? EP_ACCESSIBLE_OVER :
      IS_ACCESSIBLE_INSIDE(element) ? EP_ACCESSIBLE_INSIDE :
      IS_ACCESSIBLE_UNDER(element) ? EP_ACCESSIBLE_UNDER :
-     value_access_layer);
+     custom_element.access_layer);
   custom_element_properties[EP_ACCESSIBLE] =
     (IS_ACCESSIBLE_OVER(element) ||
      IS_ACCESSIBLE_INSIDE(element) ||
      IS_ACCESSIBLE_UNDER(element));
 
   /* set walk-to-object action selectbox help value */
-  value_walk_to_action =
+  custom_element.walk_to_action =
     (IS_DIGGABLE(element) ? EP_DIGGABLE :
      IS_COLLECTIBLE(element) ? EP_COLLECTIBLE :
      IS_PUSHABLE(element) ? EP_PUSHABLE :
-     value_walk_to_action);
+     custom_element.walk_to_action);
   custom_element_properties[EP_WALK_TO_OBJECT] =
     (IS_DIGGABLE(element) ||
      IS_COLLECTIBLE(element) ||
      IS_PUSHABLE(element));
 
   /* set smash targets selectbox help value */
-  value_smash_targets =
+  custom_element.smash_targets =
     (CAN_SMASH_EVERYTHING(element) ? EP_CAN_SMASH_EVERYTHING :
      CAN_SMASH_ENEMIES(element) ? EP_CAN_SMASH_ENEMIES :
      CAN_SMASH_PLAYER(element) ? EP_CAN_SMASH_PLAYER :
-     value_smash_targets);
+     custom_element.smash_targets);
   custom_element_properties[EP_CAN_SMASH] =
     (CAN_SMASH_EVERYTHING(element) ||
      CAN_SMASH_ENEMIES(element) ||
      CAN_SMASH_PLAYER(element));
 
   /* set deadliness selectbox help value */
-  value_deadliness =
+  custom_element.deadliness =
     (DONT_TOUCH(element) ? EP_DONT_TOUCH :
      DONT_COLLIDE_WITH(element) ? EP_DONT_COLLIDE_WITH :
      DONT_RUN_INTO(element) ? EP_DONT_RUN_INTO :
-     value_deadliness);
+     custom_element.deadliness);
   custom_element_properties[EP_DEADLY] =
     (DONT_TOUCH(element) ||
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
   /* set consistency selectbox help value */
-  value_consistency =
+  custom_element.consistency =
     (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
      CAN_EXPLODE(element) ? EP_CAN_EXPLODE :
-     value_consistency);
+     custom_element.consistency);
   custom_element_properties[EP_EXPLODE_RESULT] =
     (IS_INDESTRUCTIBLE(element) ||
      CAN_EXPLODE(element));
 
   /* special case: sub-settings dependent from main setting */
-  if (CAN_EXPLODE(element))
-  {
-    can_explode_by_fire = CAN_EXPLODE_BY_FIRE(element);
-    can_explode_smashed = CAN_EXPLODE_SMASHED(element);
-    can_explode_impact  = CAN_EXPLODE_IMPACT(element);
-  };
+  if (CAN_EXPLODE_BY_FIRE(element))
+    custom_element.can_explode_by_fire = TRUE;
+  if (CAN_EXPLODE_SMASHED(element))
+    custom_element.can_explode_smashed = TRUE;
+  if (CAN_EXPLODE_IMPACT(element))
+    custom_element.can_explode_impact  = TRUE;
 
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   /* set change by player selectbox help value */
-  value_change_player_action =
+  custom_element.change_player_action =
     (HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
-     value_change_player_action);
+     custom_element.change_player_action);
 
   /* set change by collision selectbox help value */
-  value_change_collide_action =
+  custom_element.change_collide_action =
     (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
-     value_change_collide_action);
+     custom_element.change_collide_action);
 
   /* set change by other element action selectbox help value */
-  value_change_other_action =
+  custom_element.change_other_action =
     (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
@@ -3721,12 +3708,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
-     value_change_other_action);
+     custom_element.change_other_action);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
+  int access_type_and_layer;
 
   element_info[properties_element] = custom_element;
 
@@ -3739,30 +3727,31 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_PASSABLE_OVER] = FALSE;
   custom_element_properties[EP_PASSABLE_INSIDE] = FALSE;
   custom_element_properties[EP_PASSABLE_UNDER] = FALSE;
-  custom_element_properties[((value_access_type == EP_WALKABLE ?
-			      EP_WALKABLE_OVER : EP_PASSABLE_OVER) +
-			     (value_access_layer - EP_ACCESSIBLE_OVER))] =
+  access_type_and_layer = ((custom_element.access_type == EP_WALKABLE ?
+			    EP_WALKABLE_OVER : EP_PASSABLE_OVER) +
+			   (custom_element.access_layer - EP_ACCESSIBLE_OVER));
+  custom_element_properties[access_type_and_layer] =
     custom_element_properties[EP_ACCESSIBLE];
 
   /* set walk-to-object property from checkbox and selectbox */
   custom_element_properties[EP_DIGGABLE] = FALSE;
   custom_element_properties[EP_COLLECTIBLE] = FALSE;
   custom_element_properties[EP_PUSHABLE] = FALSE;
-  custom_element_properties[value_walk_to_action] =
+  custom_element_properties[custom_element.walk_to_action] =
     custom_element_properties[EP_WALK_TO_OBJECT];
 
   /* set smash property from checkbox and selectbox */
   custom_element_properties[EP_CAN_SMASH_PLAYER] = FALSE;
   custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
   custom_element_properties[EP_CAN_SMASH_EVERYTHING] = FALSE;
-  custom_element_properties[value_smash_targets] =
+  custom_element_properties[custom_element.smash_targets] =
     custom_element_properties[EP_CAN_SMASH];
 
   /* set deadliness property from checkbox and selectbox */
   custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
   custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
   custom_element_properties[EP_DONT_TOUCH] = FALSE;
-  custom_element_properties[value_deadliness] =
+  custom_element_properties[custom_element.deadliness] =
     custom_element_properties[EP_DEADLY];
 
   /* set consistency property from checkbox and selectbox */
@@ -3771,15 +3760,18 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
   custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
-  custom_element_properties[value_consistency] =
+  custom_element_properties[custom_element.consistency] =
     custom_element_properties[EP_EXPLODE_RESULT];
 
   /* special case: sub-settings dependent from main setting */
   if (custom_element_properties[EP_CAN_EXPLODE])
   {
-    custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = can_explode_by_fire;
-    custom_element_properties[EP_CAN_EXPLODE_SMASHED] = can_explode_smashed;
-    custom_element_properties[EP_CAN_EXPLODE_IMPACT]  = can_explode_impact;
+    custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
+      custom_element.can_explode_by_fire;
+    custom_element_properties[EP_CAN_EXPLODE_SMASHED] =
+      custom_element.can_explode_smashed;
+    custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
+      custom_element.can_explode_impact;
   }
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -3788,14 +3780,14 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
-  custom_element_change_events[value_change_player_action] =
+  custom_element_change_events[custom_element.change_player_action] =
     custom_element_change_events[CE_BY_PLAYER];
 
   /* set collision change event from checkbox and selectbox */
   custom_element_change_events[CE_COLLISION] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
-  custom_element_change_events[value_change_collide_action] =
+  custom_element_change_events[custom_element.change_collide_action] =
     custom_element_change_events[CE_BY_COLLISION];
 
   /* set other element action change event from checkbox and selectbox */
@@ -3806,7 +3798,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
-  custom_element_change_events[value_change_other_action] =
+  custom_element_change_events[custom_element.change_other_action] =
     custom_element_change_events[CE_BY_OTHER];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
@@ -4528,18 +4520,8 @@ static void DrawPropertiesTabulatorGadgets()
   int gd_y = gd->y + gd_gi->height - 1;
   Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
   int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
-#if 1
   int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
-#else
-  int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
-#endif
   int i;
-
-#if 0
-  /* draw additional "configure" tabulator for configurable elements */
-  if (checkPropertiesConfig())
-    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
-#endif
 
   /* draw additional "advanced" tabulator for custom elements */
   if (IS_CUSTOM_ELEMENT(properties_element))
@@ -4927,12 +4909,6 @@ static void DrawPropertiesWindow()
   if (edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED &&
       !IS_CUSTOM_ELEMENT(properties_element))
     edit_mode_properties = ED_MODE_PROPERTIES_CONFIG;
-
-#if 0
-  if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG &&
-      !checkPropertiesConfig())
-    edit_mode_properties = ED_MODE_PROPERTIES_INFO;
-#endif
 
   if (IS_CUSTOM_ELEMENT(properties_element))
     CopyCustomElementPropertiesToEditor(properties_element);

@@ -104,6 +104,7 @@ void DrawLevelElementThruMask(int, int, int);
 void DrawLevelFieldThruMask(int, int);
 void DrawLevelFieldCrumbledSand(int, int);
 void DrawLevelFieldCrumbledSandDigging(int, int, int, int);
+void DrawLevelFieldCrumbledSandNeighbours(int, int);
 void DrawScreenElement(int, int, int);
 void DrawLevelElement(int, int, int);
 void DrawScreenField(int, int);

@@ -1240,6 +1240,22 @@ struct ElementInfo
   int content[3][3];		/* new elements after explosion */
 
   struct ElementChangeInfo change;
+
+  /* ---------- internal values used in level editor ---------- */
+
+  int access_type;		/* walkable or passable */
+  int access_layer;		/* accessible over/inside/under */
+  int walk_to_action;		/* diggable/collectible/pushable */
+  int smash_targets;		/* can smash player/enemies/everything */
+  int deadliness;		/* deadly when running/colliding/touching */
+  int consistency;		/* indestructible/can explode */
+  int change_player_action;	/* touched/pressed/pushed by player */
+  int change_collide_action;	/* collision/impact/smashed */
+  int change_other_action;	/* various change actions */
+
+  boolean can_explode_by_fire;	/* element explodes by fire */
+  boolean can_explode_smashed;	/* element explodes when smashed */
+  boolean can_explode_impact;	/* element explodes on impact */
 };
 
 struct FontInfo

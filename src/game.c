@@ -169,7 +169,7 @@ static void KillHeroUnlessProtected(int, int);
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
 
-static boolean CheckTriggeredElementChange(int, int);
+static boolean CheckTriggeredElementChange(int, int, int, int);
 static boolean CheckElementChange(int, int, int, int);
 static void ChangeElementNow(int, int, int);
 
@@ -2256,7 +2256,7 @@ void Bang(int x, int y)
       break;
   }
 
-  CheckTriggeredElementChange(element, CE_OTHER_IS_EXPLODING);
+  CheckTriggeredElementChange(x, y, element, CE_OTHER_IS_EXPLODING);
 }
 
 void SplashAcid(int x, int y)
@@ -4003,47 +4003,22 @@ void ContinueMoving(int x, int y)
   int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
-  int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
   int nextx = newx + dx, nexty = newy + dy;
-#if 1
+  int horiz_move = (dx != 0);
   int sign = (horiz_move ? dx : dy);
   int step = sign * element_info[element].move_stepsize;
-#else
-  int step = (horiz_move ? dx : dy) * MOVE_STEPSIZE_NORMAL;
-#endif
   boolean pushed = Pushed[x][y];
 
-#if 1
-  if (CAN_FALL(element) && horiz_move &&
-      y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
-    step = sign * MOVE_STEPSIZE_NORMAL / 2;
-  else if (element == EL_SPRING && horiz_move)
-    step = sign * MOVE_STEPSIZE_NORMAL * 2;
-#else
-  if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
-    step /= 2;
-  else if (element == EL_QUICKSAND_FILLING ||
-	   element == EL_QUICKSAND_EMPTYING)
-    step /= 4;
-  else if (element == EL_MAGIC_WALL_FILLING ||
-	   element == EL_BD_MAGIC_WALL_FILLING ||
-	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_BD_MAGIC_WALL_EMPTYING)
-    step /= 2;
-  else if (CAN_FALL(element) && horiz_move &&
-	   y < lev_fieldy-1 && IS_BELT_ACTIVE(Feld[x][y+1]))
-    step /= 2;
-  else if (element == EL_SPRING && horiz_move)
-    step *= 2;
-  else if (IS_CUSTOM_ELEMENT(element))
-    step = SIGN(step) * element_info[element].move_stepsize;
-
-#if OLD_GAME_BEHAVIOUR
-  else if (CAN_FALL(element) && horiz_move && !IS_SP_ELEMENT(element))
-    step*=2;
-#endif
-#endif
+  /* special values for move stepsize for spring and things on conveyor belt */
+  if (horiz_move)
+  {
+    if (CAN_FALL(element) &&
+	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+      step = sign * MOVE_STEPSIZE_NORMAL / 2;
+    else if (element == EL_SPRING)
+      step = sign * MOVE_STEPSIZE_NORMAL * 2;
+  }
 
   MovPos[x][y] += step;
 
@@ -4058,31 +4033,11 @@ void ContinueMoving(int x, int y)
 
     if (element == EL_MOLE)
     {
-      int i;
-      static int xy[4][2] =
-      {
-	{ 0, -1 },
-	{ -1, 0 },
-	{ +1, 0 },
-	{ 0, +1 }
-      };
-
       Feld[x][y] = EL_SAND;
-      DrawLevelField(x, y);
 
-      for(i=0; i<4; i++)
-      {
-	int xx, yy;
-
-	xx = x + xy[i][0];
-	yy = y + xy[i][1];
-
-	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_SAND)
-	  DrawLevelField(xx, yy);	/* for "crumbled sand" */
-      }
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
     }
-
-    if (element == EL_QUICKSAND_FILLING)
+    else if (element == EL_QUICKSAND_FILLING)
     {
       element = Feld[newx][newy] = get_next_element(element);
       Store[newx][newy] = Store[x][y];
@@ -5117,40 +5072,14 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   DrawLevelField(x, y);
 
   if (CAN_BE_CRUMBLED(Feld[x][y]))
-  {
-    int sx = SCREENX(x), sy = SCREENY(y);
-    static int xy[4][2] =
-    {
-      { 0, -1 },
-      { -1, 0 },
-      { +1, 0 },
-      { 0, +1 }
-    };
-    int i;
-
-    for(i=0; i<4; i++)
-    {
-      int xx = x + xy[i][0];
-      int yy = y + xy[i][1];
-      int sxx = sx + xy[i][0];
-      int syy = sy + xy[i][1];
-
-      if (!IN_LEV_FIELD(xx, yy) ||
-	  !IN_SCR_FIELD(sxx, syy) ||
-	  !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
-	  IS_MOVING(xx, yy))
-	continue;
-
-      DrawLevelField(xx, yy);
-    }
-  }
+    DrawLevelFieldCrumbledSandNeighbours(x, y);
 }
 
 static void ChangeElementNow(int x, int y, int element)
 {
   struct ElementChangeInfo *change = &element_info[element].change;
 
-  CheckTriggeredElementChange(Feld[x][y], CE_OTHER_IS_CHANGING);
+  CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
 
   if (change->explode)
   {
@@ -5318,7 +5247,7 @@ static void ChangeElement(int x, int y)
   }
 }
 
-static boolean CheckTriggeredElementChange(int trigger_element,
+static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
 					   int trigger_event)
 {
   int i, x, y;
@@ -5334,6 +5263,9 @@ static boolean CheckTriggeredElementChange(int trigger_element,
 
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
     {
+      if (x == lx && y == ly)	/* do not change trigger element itself */
+	continue;
+
       if (Feld[x][y] == i)
       {
 	ChangeDelay[x][y] = 1;
@@ -6410,12 +6342,12 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
     if (center_is_player)
     {
-      CheckTriggeredElementChange(Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
+      CheckTriggeredElementChange(xx, yy, Feld[xx][yy], CE_OTHER_GETS_TOUCHED);
       CheckElementChange(xx, yy, Feld[xx][yy], CE_TOUCHED_BY_PLAYER);
     }
     else if (IS_PLAYER(xx, yy))
     {
-      CheckTriggeredElementChange(Feld[x][y], CE_OTHER_GETS_TOUCHED);
+      CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_GETS_TOUCHED);
       CheckElementChange(x, y, Feld[x][y], CE_TOUCHED_BY_PLAYER);
 
       break;
@@ -7204,7 +7136,7 @@ int DigField(struct PlayerInfo *player,
 	RaiseScoreElement(element);
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
-	CheckTriggeredElementChange(element, CE_OTHER_GETS_COLLECTED);
+	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_COLLECTED);
 
 	break;
       }
@@ -7294,14 +7226,14 @@ int DigField(struct PlayerInfo *player,
 	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
 	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
 
-	CheckTriggeredElementChange(element, CE_OTHER_GETS_PUSHED);
+	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_PUSHED);
 	CheckElementChange(x, y, element, CE_PUSHED_BY_PLAYER);
 
 	break;
       }
       else
       {
-	CheckTriggeredElementChange(element, CE_OTHER_GETS_PRESSED);
+	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_PRESSED);
 	CheckElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
       }
 

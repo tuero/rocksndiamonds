@@ -846,36 +846,13 @@ void DrawGraphic(int x, int y, int graphic, int frame)
   MarkTileDirty(x, y);
 }
 
-#if 0
-void DrawOldGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
-{
-  Bitmap *src_bitmap;
-  int src_x, src_y;
-
-  getOldGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
-  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
-}
-#endif
-
 void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 		    int frame)
 {
-#if 1
   Bitmap *src_bitmap;
   int src_x, src_y;
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
-#else
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
-  int src_x = graphic_info[graphic].src_x;
-  int src_y = graphic_info[graphic].src_y;
-  int offset_x = graphic_info[graphic].offset_x;
-  int offset_y = graphic_info[graphic].offset_y;
-
-  src_x += frame * offset_x;
-  src_y += frame * offset_y;
-#endif
-
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
 
@@ -1119,27 +1096,6 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
       frame = graphic_info[graphic].anim_frames - 1;
     }
   }
-#if 0
-  else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DROPPING)
-  {
-    graphic = (element == EL_BD_AMOEBA ? IMG_BD_AMOEBA_PART1 :
-	       element == EL_AMOEBA_WET ? IMG_AMOEBA_WET_PART1 :
-	       element == EL_AMOEBA_DRY ? IMG_AMOEBA_DRY_PART1 :
-	       element == EL_AMOEBA_FULL ? IMG_AMOEBA_FULL_PART1 :
-	       IMG_AMOEBA_DEAD_PART1);
-
-    graphic += (x + 2 * y + 4) % 4;
-  }
-#endif
-
-#if 0
-  if (IS_AMOEBOID(element) || element == EL_AMOEBA_DROPPING)
-  {
-    if (Feld[lx][ly] == EL_AMOEBA_DROPPING)
-      printf("---> %d -> %d / %d [%d]\n",
-	     element, graphic, frame, GfxRandom[lx][ly]);
-  }
-#endif
 
   if (dx || dy)
     DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
@@ -1168,18 +1124,6 @@ void DrawLevelElementShifted(int x, int y, int dx, int dy, int element,
 {
   DrawLevelElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
 }
-
-#if 0
-void DrawOldScreenElementThruMask(int x, int y, int element)
-{
-  DrawOldScreenElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
-}
-
-void DrawScreenElementThruMask(int x, int y, int element)
-{
-  DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
-}
-#endif
 
 void DrawLevelElementThruMask(int x, int y, int element)
 {
@@ -1225,7 +1169,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       int xx = x + xy[i][0];
       int yy = y + xy[i][1];
 
-      element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : EL_STEELWALL);
+      element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : BorderElement);
 
       /* check if neighbour field is of same type */
       if (CAN_BE_CRUMBLED(element) && !IS_MOVING(xx, yy))
@@ -1308,6 +1252,35 @@ void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
 
   DrawGraphic(sx, sy, graphic1, frame1);
   DrawLevelFieldCrumbledSandExt(x, y, graphic2, frame2);
+}
+
+void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
+{
+  int sx = SCREENX(x), sy = SCREENY(y);
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
+  int i;
+
+  for(i=0; i<4; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int sxx = sx + xy[i][0];
+    int syy = sy + xy[i][1];
+
+    if (!IN_LEV_FIELD(xx, yy) ||
+	!IN_SCR_FIELD(sxx, syy) ||
+	!CAN_BE_CRUMBLED(Feld[xx][yy]) ||
+	IS_MOVING(xx, yy))
+      continue;
+
+    DrawLevelField(xx, yy);
+  }
 }
 
 static int getBorderElement(int x, int y)
@@ -1484,19 +1457,6 @@ void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   int mini_starty = src_bitmap->height * 2 / 3;
   int src_x = mini_startx + graphic_info[graphic].src_x / 8;
   int src_y = mini_starty + graphic_info[graphic].src_y / 8;
-
-#if 0
-  if (src_x + MICRO_TILEX > src_bitmap->width ||
-      src_y + MICRO_TILEY > src_bitmap->height)
-  {
-    /* graphic of desired size seems not to be contained in this image;
-       dirty workaround: get it from the middle of the normal sized image */
-
-    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
-    src_x += (TILEX / 2 - MICRO_TILEX / 2);
-    src_y += (TILEY / 2 - MICRO_TILEY / 2);
-  }
-#endif
 
   *bitmap = src_bitmap;
   *x = src_x;
