@@ -4437,10 +4437,20 @@ void OpenAll()
   DrawMainMenu();
 
   InitNetworkServer();
+
+#if 1
+  em_open_all();
+#endif
+
 }
 
 void CloseAllAndExit(int exit_value)
 {
+
+#if 1
+  em_close_all();
+#endif
+
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();

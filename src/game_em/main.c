@@ -28,68 +28,35 @@ int arg_silence;
 extern void tab_generate();
 extern void ulaw_generate();
 
-int em_main_OLD(int argc, char **argv)
+void em_open_all()
 {
-	int result;
-	int option;
-	extern char *optarg;
+  /* pre-calculate some data */
+  tab_generate();
+  ulaw_generate();
 
-	/* pre-calculate some data */
-	tab_generate();
-	ulaw_generate();
+  progname = "emerald mine";
 
-	progname = strrchr(argv[0], '/'); progname = progname ? progname + 1 : argv[0];
-
-	while((option = getopt(argc, argv, "b:d:g:in")) != -1) {
-		switch(option) {
-		case 'b': arg_basedir = optarg; break;
-		case 'd': arg_display = optarg; break;
-		case 'g': arg_geometry = optarg; break;
-		case 'i': arg_install = 1; break;
-		case 'n': arg_silence = 1; break;
-		default:
-			printf("Emerald Mine for X11 © 2000,2001 David Tritscher\n\n");
-			printf("usage: %s [options]\n", progname);
-			printf("\t-b    set base directory\n");
-			printf("\t-d    server to contact\n");
-			printf("\t-g    geometry\n");
-			printf("\t-i    install colourmap\n");
-			printf("\t-n    no sounds\n");
-			exit(option == 'h' ? 0 : 1);
-		}
-	}
-	if(arg_basedir == 0) arg_basedir = getenv("EMERALD_BASE");
-
-	result = open_all(); if(result) goto fail;
-	result = game_start(); if(result) goto fail;
-	result = 0;
-fail:
-	close_all();
-	return(result);
+  if (open_all() != 0)
+    Error(ERR_EXIT, "em_open_all(): open_all() failed");
 }
 
-int em_main()
+void em_close_all()
 {
-	int result;
+  close_all();
+}
 
-	/* pre-calculate some data */
-	tab_generate();
-	ulaw_generate();
+void em_main()
+{
+#if 0
+  em_open_all();
+#endif
 
-	progname = "emerald mine";
+  if (game_start() != 0)
+    Error(ERR_EXIT, "em_main(): game_start() failed");
 
-	result = open_all();
-	if(result)
-	  goto fail;
-
-	result = game_start();
-	if(result)
-	  goto fail;
-
-	result = 0;
-fail:
-	close_all();
-	return(result);
+#if 0
+  em_close_all();
+#endif
 }
 
 /* massive kludge for buffer overflows
@@ -98,9 +65,11 @@ fail:
  */
 void snprintf_overflow(char *description)
 {
-	fprintf(stderr, "%s: %s\n", progname, "buffer overflow; check EMERALD_BASE environment variable");
-	fprintf(stderr, "%s %s\n", "Fault occured while attempting to", description);
-	abort();
+  fprintf(stderr, "%s: %s\n", progname,
+	  "buffer overflow; check EMERALD_BASE environment variable");
+  fprintf(stderr, "%s %s\n", "Fault occured while attempting to", description);
+
+  abort();
 }
 
 #else

@@ -1,6 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "../libgame/libgame.h"
+
 #define EM_GFX_DIR	"graphics.EM"
 #define EM_SND_DIR	"sounds.EM"
 #define EM_LVL_DIR	"levels.EM"

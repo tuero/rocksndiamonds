@@ -185,6 +185,58 @@ static void blitplayer(struct PLAYER *ply)
       screentiles[y / TILEY][x / TILEX] = -1; /* mark screen as dirty */
       screentiles[dy / TILEY][dx / TILEX] = -1;
 
+#if 1
+
+
+#if 1
+
+      SetClipMask(sprBitmap, sprBitmap->stored_clip_gc, spriteBitmap);
+
+      SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc, x, y);
+      BlitBitmapMasked(sprBitmap, screenBitmap,
+		       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		       x, y);
+
+      SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc, x - 22 * TILEX, y);
+      BlitBitmapMasked(sprBitmap, screenBitmap,
+		       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		       x - 22 * TILEX, y);
+
+      SetClipOrigin(sprBitmap, sprBitmap->stored_clip_gc, x, y - 14 * TILEY);
+      BlitBitmapMasked(sprBitmap, screenBitmap,
+		       (spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		       x, y - 14 * TILEY);
+
+      SetClipMask(sprBitmap, sprBitmap->stored_clip_gc, None);
+
+#else
+
+      XSetClipMask(display, sprBitmap->stored_clip_gc, spriteBitmap);
+
+      XSetClipOrigin(display, sprBitmap->stored_clip_gc, x, y);
+      XCopyArea(display, sprBitmap->drawable, screenBitmap->drawable,
+		sprBitmap->stored_clip_gc,
+		(spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		x, y);
+
+      XSetClipOrigin(display, sprBitmap->stored_clip_gc, x - 22 * TILEX, y);
+      XCopyArea(display, sprBitmap->drawable, screenBitmap->drawable,
+		sprBitmap->stored_clip_gc,
+		(spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		x - 22 * TILEX, y);
+
+      XSetClipOrigin(display, sprBitmap->stored_clip_gc, x, y - 14 * TILEY);
+      XCopyArea(display, sprBitmap->drawable, screenBitmap->drawable,
+		sprBitmap->stored_clip_gc,
+		(spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
+		x, y - 14 * TILEY);
+
+      XSetClipMask(display, sprBitmap->stored_clip_gc, None);
+
+#endif
+
+#else
+
       XSetClipMask(display, screenGC, spriteBitmap);
       XSetClipOrigin(display, screenGC, x, y);
       XCopyArea(display, sprPixmap, screenPixmap, screenGC,
@@ -199,6 +251,8 @@ static void blitplayer(struct PLAYER *ply)
 		(spr / 8) * TILEX, (spr % 8) * TILEY, TILEX, TILEY,
 		x, y - 14 * TILEY);
       XSetClipMask(display, screenGC, None);
+
+#endif
     }
   }
 }
@@ -367,6 +421,25 @@ void title_initscreen(void)
   colours[1] += 8;
   colour_anim = 0;
 
+#if 1
+
+  BlitBitmap(ttlBitmap, screenBitmap,
+	     0, 0, 20 * TILEX, 12 * TILEY, 0, 0);
+
+  if (botmaskBitmap)
+  {
+    BlitBitmap(botBitmap, scoreBitmap,
+	      0, colours[1] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
+
+    SetClipOrigin(botBitmap, botBitmap->stored_clip_gc,
+		  0, 0 - colours[0] * SCOREY);
+  }
+
+  BlitBitmapMasked(botBitmap, scoreBitmap,
+		   0, colours[0] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
+
+#else
+
   XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
 	    0, 0, 20 * TILEX, 12 * TILEY, 0, 0);
 
@@ -383,6 +456,8 @@ void title_initscreen(void)
 
   if (botmaskBitmap)
     XSetClipMask(display, scoreGC, None);
+
+#endif
 }
 
 void title_blitscore(void)
@@ -398,6 +473,22 @@ void title_blitscore(void)
   x = (i / 8 + 18) * 2 * SCOREX;
   y = (i % 8 + 16) * SCOREY;
 
+#if 1
+  if (botmaskBitmap)
+  {
+    BlitBitmap(botBitmap, scoreBitmap,
+	       32 * SCOREX, colours[1] * SCOREY, 2 * SCOREX, SCOREY,
+	       32 * SCOREX, 0);
+
+    SetClipOrigin(botBitmap, botBitmap->stored_clip_gc,
+		  32 * SCOREX - x, 0 - y);
+  }
+
+  BlitBitmapMasked(botBitmap, scoreBitmap,
+		   x, y, 2 * SCOREX, SCOREY, 32 * SCOREX, 0);
+
+#else
+
   if (botmaskBitmap)
   {
     XCopyArea(display, botPixmap, scorePixmap, scoreGC,
@@ -412,6 +503,7 @@ void title_blitscore(void)
 
   if (botmaskBitmap)
     XSetClipMask(display, scoreGC, None);
+#endif
 }
 
 void title_blitants(unsigned int y)
