@@ -128,19 +128,19 @@
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
-#define IS_FREE(x,y)		(Feld[x][y] == EL_LEERRAUM && !IS_PLAYER(x,y))
-#define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_LEERRAUM)
+#define IS_FREE(x,y)		(Feld[x][y] == EL_EMPTY && !IS_PLAYER(x,y))
+#define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y] == EL_EMPTY)
 
 #define IS_MOVING(x,y)		(MovPos[x][y] != 0)
 #define IS_FALLING(x,y)		(MovPos[x][y] != 0 && MovDir[x][y] == MV_DOWN)
 #define IS_BLOCKED(x,y)		(Feld[x][y] == EL_BLOCKED)
 
-#define EL_CHANGED(e)		((e) == EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
+#define EL_CHANGED(e)		((e) == EL_FELSBROCKEN    ? EL_EMERALD :  \
 				 (e) == EL_BD_ROCK        ? EL_EDELSTEIN_BD : \
-				 (e) == EL_EDELSTEIN      ? EL_DIAMANT :    \
-				 (e) == EL_EDELSTEIN_GELB ? EL_DIAMANT :    \
-				 (e) == EL_EDELSTEIN_ROT  ? EL_DIAMANT :    \
-				 (e) == EL_EDELSTEIN_LILA ? EL_DIAMANT :    \
+				 (e) == EL_EMERALD        ? EL_DIAMOND :    \
+				 (e) == EL_EDELSTEIN_YELLOW ? EL_DIAMOND :    \
+				 (e) == EL_EDELSTEIN_RED  ? EL_DIAMOND :    \
+				 (e) == EL_EDELSTEIN_PURPLE ? EL_DIAMOND :    \
 				 EL_FELSBROCKEN)
 #define EL_CHANGED2(e)		((e) == EL_FELSBROCKEN ? EL_EDELSTEIN_BD :  \
 				 (e) == EL_BD_ROCK     ? EL_EDELSTEIN_BD : \
@@ -276,71 +276,72 @@
 #define MICRO_MORE_PER_LINE	16
 
 /* game elements:
-**	  0 - 499: real elements, stored in level file
-**      500 - 699: flag elements, only used at runtime
+**	  0 <= element < xxx: real elements, stored in level file
+**      xxx <= element < yyy: flag elements, only used at runtime
 */
 /* "real" level elements */
-#define EL_LEERRAUM		0
-#define	EL_ERDREICH		1
-#define	EL_MAUERWERK		2
-#define	EL_FELSBODEN		3
-#define	EL_FELSBROCKEN		4
-#define	EL_SCHLUESSEL		5
-#define	EL_EDELSTEIN		6
-#define	EL_AUSGANG_ZU		7
-#define	EL_SPIELFIGUR		8
-#define EL_KAEFER		9
-#define EL_FLIEGER		10
-#define EL_MAMPFER		11
+#define EL_EMPTY_SPACE		0
+#define EL_EMPTY		EL_EMPTY_SPACE
+#define	EL_SAND			1
+#define	EL_WALL			2
+#define	EL_WALL_CRUMBLED	3
+#define	EL_ROCK			4
+#define	EL_KEY			5
+#define	EL_EMERALD		6
+#define	EL_EXIT_CLOSED		7
+#define	EL_PLAYER		8
+#define EL_BUG			9
+#define EL_SPACESHIP		10
+#define EL_YAMYAM		11
 #define EL_ROBOT		12
-#define EL_BETON		13
-#define EL_DIAMANT		14
-#define EL_AMOEBE_TOT		15
-#define EL_MORAST_LEER		16
-#define EL_MORAST_VOLL		17
-#define EL_TROPFEN		18
-#define EL_BOMBE		19
-#define EL_MAGIC_WALL_OFF	20
+#define EL_STEELWALL		13
+#define EL_DIAMOND		14
+#define EL_AMOEBA_DEAD		15
+#define EL_QUICKSAND_EMPTY	16
+#define EL_QUICKSAND_FULL	17
+#define EL_AMOEBA_DROP		18
+#define EL_BOMB			19
+#define EL_MAGIC_WALL		20
 #define EL_SPEED_PILL		21
-#define EL_SALZSAEURE		22
-#define EL_AMOEBE_NASS		23
-#define EL_AMOEBE_NORM		24
-#define EL_KOKOSNUSS		25
-#define EL_LIFE			26
-#define EL_LIFE_ASYNC		27
+#define EL_ACID			22
+#define EL_AMOEBA_WET		23
+#define EL_AMOEBA_DRY		24
+#define EL_NUT			25
+#define EL_GAMEOFLIFE		26
+#define EL_BIOMAZE		27
 #define EL_DYNAMITE_ACTIVE	28
-#define EL_BADEWANNE		29
-#define EL_ABLENK_AUS		30
-#define EL_ABLENK_EIN		31
-#define EL_SCHLUESSEL1		32
-#define EL_SCHLUESSEL2		33
-#define EL_SCHLUESSEL3		34
-#define EL_SCHLUESSEL4		35
-#define EL_PFORTE1		36
-#define EL_PFORTE2		37
-#define EL_PFORTE3		38
-#define EL_PFORTE4		39
-#define EL_PFORTE1X		40
-#define EL_PFORTE2X		41
-#define EL_PFORTE3X		42
-#define EL_PFORTE4X		43
-#define EL_DYNAMITE_INACTIVE	44
+#define EL_STONEBLOCK		29
+#define EL_ROBOT_WHEEL		30
+#define EL_ROBOT_WHEEL_ACTIVE	31
+#define EL_KEY1			32
+#define EL_KEY2			33
+#define EL_KEY3			34
+#define EL_KEY4			35
+#define EL_GATE1		36
+#define EL_GATE2		37
+#define EL_GATE3		38
+#define EL_GATE4		39
+#define EL_GATE1_GRAY		40
+#define EL_GATE2_GRAY		41
+#define EL_GATE3_GRAY		42
+#define EL_GATE4_GRAY		43
+#define EL_DYNAMITE		44
 #define EL_PACMAN		45
-#define EL_UNSICHTBAR		46
-#define EL_BIRNE_AUS		47
-#define EL_BIRNE_EIN		48
-#define EL_ERZ_EDEL		49
-#define EL_ERZ_DIAM		50
-#define EL_AMOEBE_VOLL		51
-#define EL_AMOEBE_BD		52
-#define EL_ZEIT_VOLL		53
-#define EL_ZEIT_LEER		54
+#define EL_INVISIBLE_WALL	46
+#define EL_LAMP			47
+#define EL_LAMP_ACTIVE		48
+#define EL_WALL_EMERALD		49
+#define EL_WALL_DIAMOND		50
+#define EL_AMOEBA_FULL		51
+#define EL_BD_AMOEBA		52
+#define EL_TIME_ORB_FULL	53
+#define EL_TIME_ORB_EMPTY	54
 #define EL_MAUER_LEBT		55
 #define EL_EDELSTEIN_BD		56
-#define EL_EDELSTEIN_GELB	57
-#define EL_ERZ_EDEL_BD		58
-#define EL_ERZ_EDEL_GELB	59
-#define EL_MAMPFER2		60
+#define EL_EDELSTEIN_YELLOW	57
+#define EL_WALL_BD_DIAMOND	58
+#define EL_WALL_EMERALD_YELLOW	59
+#define EL_DARK_YAMYAM		60
 #define EL_MAGIC_WALL_BD_OFF	61
 #define EL_INVISIBLE_STEEL	62
 
@@ -374,30 +375,30 @@
 #define EL_SPIELER2		81
 #define EL_SPIELER3		82
 #define EL_SPIELER4		83
-#define EL_KAEFER_RIGHT		84
-#define EL_KAEFER_UP		85
-#define EL_KAEFER_LEFT		86
-#define EL_KAEFER_DOWN		87
-#define EL_FLIEGER_RIGHT	88
-#define EL_FLIEGER_UP		89
-#define EL_FLIEGER_LEFT		90
-#define EL_FLIEGER_DOWN		91
+#define EL_BUG_RIGHT		84
+#define EL_BUG_UP		85
+#define EL_BUG_LEFT		86
+#define EL_BUG_DOWN		87
+#define EL_SPACESHIP_RIGHT	88
+#define EL_SPACESHIP_UP		89
+#define EL_SPACESHIP_LEFT	90
+#define EL_SPACESHIP_DOWN	91
 #define EL_PACMAN_RIGHT		92
 #define EL_PACMAN_UP		93
 #define EL_PACMAN_LEFT		94
 #define EL_PACMAN_DOWN		95
-#define EL_EDELSTEIN_ROT	96
-#define EL_EDELSTEIN_LILA	97
-#define EL_ERZ_EDEL_ROT		98
-#define EL_ERZ_EDEL_LILA	99
-#define EL_BADEWANNE1		100
-#define EL_BADEWANNE2		101
-#define EL_BADEWANNE3		102
-#define EL_BADEWANNE4		103
-#define EL_BADEWANNE5		104
+#define EL_EDELSTEIN_RED	96
+#define EL_EDELSTEIN_PURPLE	97
+#define EL_WALL_EMERALD_RED	98
+#define EL_WALL_EMERALD_PURPLE	99
+#define EL_ACIDPOOL_TOPLEFT	100
+#define EL_ACIDPOOL_TOPRIGHT	101
+#define EL_ACIDPOOL_BOTTOMLEFT	102
+#define EL_ACIDPOOL_BOTTOM	103
+#define EL_ACIDPOOL_BOTTOMRIGHT	104
 #define EL_BD_WALL		105
 #define EL_BD_ROCK		106
-#define EL_AUSGANG_AUF		107
+#define EL_EXIT_OPEN		107
 #define EL_BLACK_ORB		108
 #define EL_AMOEBA2DIAM		109
 #define EL_MOLE			110
@@ -410,7 +411,7 @@
 #define EL_SCHWEIN		117
 #define EL_DRACHE		118
 
-#define EL_EM_KEY_1_FILE	119
+#define EL_EM_KEY1_FILE		119
 
 #define EL_CHAR_START		120
 #define EL_CHAR_ASCII0		(EL_CHAR_START-32)
@@ -455,14 +456,14 @@
 #define EL_MAUER_Y		201
 #define EL_MAUER_XY		202
 
-#define EL_EM_GATE_1		203
-#define EL_EM_GATE_2		204
-#define EL_EM_GATE_3		205
-#define EL_EM_GATE_4		206
+#define EL_EM_GATE1		203
+#define EL_EM_GATE2		204
+#define EL_EM_GATE3		205
+#define EL_EM_GATE4		206
 
-#define EL_EM_KEY_2_FILE	207
-#define EL_EM_KEY_3_FILE	208
-#define EL_EM_KEY_4_FILE	209
+#define EL_EM_KEY2_FILE		207
+#define EL_EM_KEY3_FILE		208
+#define EL_EM_KEY4_FILE		209
 
 #define EL_SP_START		210
 #define EL_SP_EMPTY		(EL_SP_START + 0)
@@ -507,10 +508,10 @@
 #define EL_SP_CHIP_LOWER	(EL_SP_START + 39)
 #define EL_SP_END		(EL_SP_START + 39)
 
-#define EL_EM_GATE_1X		250
-#define EL_EM_GATE_2X		251
-#define EL_EM_GATE_3X		252
-#define EL_EM_GATE_4X		253
+#define EL_EM_GATE1_GRAY	250
+#define EL_EM_GATE2_GRAY	251
+#define EL_EM_GATE3_GRAY	252
+#define EL_EM_GATE4_GRAY	253
 
 #define EL_UNUSED_254		254
 #define EL_UNUSED_255		255
@@ -1263,7 +1264,7 @@
 #define GFX_ACTION_IMPACT		9
 #define GFX_ACTION_CRACKING		10
 #define GFX_ACTION_ACTIVATING		11
-#define GFX_ACTION_BURNING		12
+#define GFX_ACTION_ACTIVE		12
 #define GFX_ACTION_OTHER		13
 
 #define NUM_GFX_ACTIONS			14
@@ -1322,7 +1323,7 @@
 #define IMG_GATE3_GRAY				37
 #define IMG_GATE4_GRAY				38
 #define IMG_DYNAMITE				39
-#define IMG_DYNAMITE_BURNING			40
+#define IMG_DYNAMITE_ACTIVE			40
 #define IMG_SPACESHIP_RIGHT			41
 #define IMG_SPACESHIP_UP			42
 #define IMG_SPACESHIP_LEFT			43
@@ -1388,7 +1389,7 @@
 #define IMG_EXIT_OPENING			103
 #define IMG_EXIT_OPEN				104
 #define IMG_DARK_YAMYAM				105
-#define IMG_DYNABOMB_BURNING			106
+#define IMG_DYNABOMB_ACTIVE			106
 #define IMG_DYNABOMB_NR				107
 #define IMG_DYNABOMB_SZ				108
 #define IMG_ARROW_LEFT				109
@@ -1807,7 +1808,7 @@
 #define SND_NUT_IMPACT				54
 #define SND_DYNAMITE_COLLECTING			55
 #define SND_DYNAMITE_DROPPING			56
-#define SND_DYNAMITE_BURNING			57
+#define SND_DYNAMITE_ACTIVE			57
 #define SND_KEY_COLLECTING			58
 #define SND_GATE_PASSING			59
 #define SND_BUG_MOVING				60
@@ -1881,7 +1882,7 @@
 #define SND_DYNABOMB_SZ_COLLECTING		128
 #define SND_DYNABOMB_XL_COLLECTING		129
 #define SND_DYNABOMB_DROPPING			130
-#define SND_DYNABOMB_BURNING			131
+#define SND_DYNABOMB_ACTIVE			131
 #define SND_SATELLITE_MOVING			132
 #define SND_SATELLITE_WAITING			133
 #define SND_SATELLITE_PUSHING			134

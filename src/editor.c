@@ -420,7 +420,7 @@ static struct
 
 static int random_placement_value = 10;
 static int random_placement_method = RANDOM_USE_QUANTITY;
-static int random_placement_background_element = EL_ERDREICH;
+static int random_placement_background_element = EL_SAND;
 static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
 
@@ -694,13 +694,13 @@ static int level_xpos = -1, level_ypos = -1;
 #define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldy)
 
 /* drawing elements on the three mouse buttons */
-static int new_element1 = EL_MAUERWERK;
-static int new_element2 = EL_LEERRAUM;
-static int new_element3 = EL_ERDREICH;
+static int new_element1 = EL_WALL;
+static int new_element2 = EL_EMPTY;
+static int new_element3 = EL_SAND;
 
 #define BUTTON_ELEMENT(button) ((button) == 1 ? new_element1 : \
 				(button) == 2 ? new_element2 : \
-				(button) == 3 ? new_element3 : EL_LEERRAUM)
+				(button) == 3 ? new_element3 : EL_EMPTY)
 #define BUTTON_STEPSIZE(button) ((button) == 1 ? 1 : (button) == 2 ? 5 : 10)
 
 /* forward declaration for internal use */
@@ -754,15 +754,15 @@ int editor_element[] =
   EL_CHAR('S'),
   EL_CHAR('H'),
 
-  EL_SPIELFIGUR,
-  EL_LEERRAUM,
-  EL_ERDREICH,
-  EL_BETON,
+  EL_PLAYER,
+  EL_EMPTY,
+  EL_SAND,
+  EL_STEELWALL,
 
   EL_BD_WALL,
   EL_MAGIC_WALL_BD_OFF,
-  EL_AUSGANG_ZU,
-  EL_AUSGANG_AUF,
+  EL_EXIT_CLOSED,
+  EL_EXIT_OPEN,
 
   EL_EDELSTEIN_BD,
   EL_BUTTERFLY_UP,
@@ -774,10 +774,10 @@ int editor_element[] =
   EL_BUTTERFLY_RIGHT,
   EL_FIREFLY_RIGHT,
 
-  EL_AMOEBE_BD,
+  EL_BD_AMOEBA,
   EL_BUTTERFLY_DOWN,
   EL_FIREFLY_DOWN,
-  EL_LEERRAUM,
+  EL_EMPTY,
 
   EL_CHAR('E'),
   EL_CHAR('M'),
@@ -799,60 +799,60 @@ int editor_element[] =
   EL_SPIELER3,
   EL_SPIELER4,
 
-  EL_SPIELFIGUR,
-  EL_LEERRAUM,
-  EL_ERDREICH,
-  EL_FELSBROCKEN,
+  EL_PLAYER,
+  EL_EMPTY,
+  EL_SAND,
+  EL_ROCK,
 
-  EL_BETON,
-  EL_MAUERWERK,
-  EL_FELSBODEN,
-  EL_MAGIC_WALL_OFF,
+  EL_STEELWALL,
+  EL_WALL,
+  EL_WALL_CRUMBLED,
+  EL_MAGIC_WALL,
 
-  EL_EDELSTEIN,
-  EL_DIAMANT,
-  EL_KOKOSNUSS,
-  EL_BOMBE,
+  EL_EMERALD,
+  EL_DIAMOND,
+  EL_NUT,
+  EL_BOMB,
 
-  EL_ERZ_EDEL,
-  EL_ERZ_DIAM,
-  EL_MORAST_LEER,
-  EL_MORAST_VOLL,
+  EL_WALL_EMERALD,
+  EL_WALL_DIAMOND,
+  EL_QUICKSAND_EMPTY,
+  EL_QUICKSAND_FULL,
 
-  EL_DYNAMITE_INACTIVE,
+  EL_DYNAMITE,
   EL_DYNAMITE_ACTIVE,
-  EL_AUSGANG_ZU,
-  EL_AUSGANG_AUF,
+  EL_EXIT_CLOSED,
+  EL_EXIT_OPEN,
 
-  EL_MAMPFER,
-  EL_KAEFER_UP,
-  EL_FLIEGER_UP,
+  EL_YAMYAM,
+  EL_BUG_UP,
+  EL_SPACESHIP_UP,
   EL_ROBOT,
 
-  EL_KAEFER_LEFT,
-  EL_FLIEGER_LEFT,
-  EL_KAEFER_RIGHT,
-  EL_FLIEGER_RIGHT,
+  EL_BUG_LEFT,
+  EL_SPACESHIP_LEFT,
+  EL_BUG_RIGHT,
+  EL_SPACESHIP_RIGHT,
 
-  EL_ABLENK_AUS,
-  EL_KAEFER_DOWN,
-  EL_FLIEGER_DOWN,
-  EL_UNSICHTBAR,
+  EL_ROBOT_WHEEL,
+  EL_BUG_DOWN,
+  EL_SPACESHIP_DOWN,
+  EL_INVISIBLE_WALL,
 
-  EL_BADEWANNE1,
-  EL_SALZSAEURE,
-  EL_BADEWANNE2,
-  EL_LEERRAUM,
+  EL_ACIDPOOL_TOPLEFT,
+  EL_ACID,
+  EL_ACIDPOOL_TOPRIGHT,
+  EL_EMPTY,
 
-  EL_BADEWANNE3,
-  EL_BADEWANNE4,
-  EL_BADEWANNE5,
-  EL_LEERRAUM,
+  EL_ACIDPOOL_BOTTOMLEFT,
+  EL_ACIDPOOL_BOTTOM,
+  EL_ACIDPOOL_BOTTOMRIGHT,
+  EL_EMPTY,
 
-  EL_TROPFEN,
-  EL_AMOEBE_TOT,
-  EL_AMOEBE_NASS,
-  EL_AMOEBE_NORM,
+  EL_AMOEBA_DROP,
+  EL_AMOEBA_DEAD,
+  EL_AMOEBA_WET,
+  EL_AMOEBA_DRY,
 
   EL_EM_KEY_1_FILE,
   EL_EM_KEY_2_FILE,
@@ -864,60 +864,60 @@ int editor_element[] =
   EL_EM_GATE_3,
   EL_EM_GATE_4,
 
-  EL_EM_GATE_1X,
-  EL_EM_GATE_2X,
-  EL_EM_GATE_3X,
-  EL_EM_GATE_4X,
+  EL_EM_GATE1_GRAY,
+  EL_EM_GATE2_GRAY,
+  EL_EM_GATE3_GRAY,
+  EL_EM_GATE4_GRAY,
 
   EL_CHAR('M'),
   EL_CHAR('O'),
   EL_CHAR('R'),
   EL_CHAR('E'),
 
-  EL_SCHLUESSEL1,
-  EL_SCHLUESSEL2,
-  EL_SCHLUESSEL3,
-  EL_SCHLUESSEL4,
+  EL_KEY1,
+  EL_KEY2,
+  EL_KEY3,
+  EL_KEY4,
 
-  EL_PFORTE1,
-  EL_PFORTE2,
-  EL_PFORTE3,
-  EL_PFORTE4,
+  EL_GATE1,
+  EL_GATE2,
+  EL_GATE3,
+  EL_GATE4,
 
-  EL_PFORTE1X,
-  EL_PFORTE2X,
-  EL_PFORTE3X,
-  EL_PFORTE4X,
+  EL_GATE1_GRAY,
+  EL_GATE2_GRAY,
+  EL_GATE3_GRAY,
+  EL_GATE4_GRAY,
 
   EL_PFEIL_LEFT,
   EL_PFEIL_RIGHT,
   EL_PFEIL_UP,
   EL_PFEIL_DOWN,
 
-  EL_AMOEBE_VOLL,
-  EL_EDELSTEIN_GELB,
-  EL_EDELSTEIN_ROT,
-  EL_EDELSTEIN_LILA,
+  EL_AMOEBA_FULL,
+  EL_EDELSTEIN_YELLOW,
+  EL_EDELSTEIN_RED,
+  EL_EDELSTEIN_PURPLE,
 
-  EL_ERZ_EDEL_BD,
-  EL_ERZ_EDEL_GELB,
-  EL_ERZ_EDEL_ROT,
-  EL_ERZ_EDEL_LILA,
+  EL_WALL_BD_DIAMOND,
+  EL_WALL_EMERALD_YELLOW,
+  EL_WALL_EMERALD_RED,
+  EL_WALL_EMERALD_PURPLE,
 
-  EL_LIFE,
+  EL_GAMEOFLIFE,
   EL_PACMAN_UP,
-  EL_ZEIT_VOLL,
-  EL_ZEIT_LEER,
+  EL_TIME_ORB_FULL,
+  EL_TIME_ORB_EMPTY,
 
   EL_PACMAN_LEFT,
-  EL_MAMPFER2,
+  EL_DARK_YAMYAM,
   EL_PACMAN_RIGHT,
   EL_MAUER_LEBT,
 
-  EL_LIFE_ASYNC,
+  EL_BIOMAZE,
   EL_PACMAN_DOWN,
-  EL_BIRNE_AUS,
-  EL_BIRNE_EIN,
+  EL_LAMP,
+  EL_LAMP_ACTIVE,
 
   EL_DYNABOMB_NR,
   EL_DYNABOMB_SZ,
@@ -929,17 +929,17 @@ int editor_element[] =
   EL_SCHWEIN,
   EL_DRACHE,
 
-  EL_LEERRAUM,
+  EL_EMPTY,
   EL_MOLE_UP,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
+  EL_EMPTY,
+  EL_EMPTY,
 
   EL_MOLE_LEFT,
-  EL_LEERRAUM,
+  EL_EMPTY,
   EL_MOLE_RIGHT,
-  EL_LEERRAUM,
+  EL_EMPTY,
 
-  EL_LEERRAUM,
+  EL_EMPTY,
   EL_MOLE_DOWN,
   EL_BALLOON,
   EL_BALLOON_SEND_ANY,
@@ -955,7 +955,7 @@ int editor_element[] =
   EL_MAUER_XY,
 
   EL_INVISIBLE_STEEL,
-  EL_UNSICHTBAR,
+  EL_INVISIBLE_WALL,
   EL_SPEED_PILL,
   EL_BLACK_ORB,
 
@@ -983,7 +983,7 @@ int editor_element[] =
   EL_SOKOBAN_OBJEKT,
   EL_SOKOBAN_FELD_LEER,
   EL_SOKOBAN_FELD_VOLL,
-  EL_BETON,
+  EL_STEELWALL,
 
   EL_CHAR('S'),
   EL_CHAR('U'),
@@ -1108,12 +1108,12 @@ int editor_element[] =
   EL_TIMEGATE_CLOSED,
   EL_TIMEGATE_OPEN,
   EL_TIMEGATE_SWITCH_OFF,
-  EL_LEERRAUM,
+  EL_EMPTY,
 
   EL_LANDMINE,
   EL_SAND_INVISIBLE,
   EL_STEEL_SLANTED,
-  EL_LEERRAUM,
+  EL_EMPTY,
 
   EL_SIGN_EXCLAMATION,
   EL_SIGN_STOP,
@@ -1123,7 +1123,7 @@ int editor_element[] =
   EL_SHIELD_PASSIVE,
   EL_SHIELD_ACTIVE,
   EL_EXTRA_TIME,
-  EL_LEERRAUM,
+  EL_EMPTY,
 
   EL_CHAR('D'),
   EL_CHAR('X'),
@@ -1162,8 +1162,8 @@ int editor_element[] =
 
   EL_TRAP_INACTIVE,
   EL_DX_SUPABOMB,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
+  EL_EMPTY,
+  EL_EMPTY,
 
   /*
   EL_CHAR('D'),
@@ -1182,10 +1182,10 @@ int editor_element[] =
   EL_CHAR('R'),
   */
 
-  EL_LEERRAUM,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
+  EL_EMPTY,
+  EL_EMPTY,
+  EL_EMPTY,
+  EL_EMPTY,
 
   EL_CHAR(' '),
   EL_CHAR('!'),
@@ -2101,7 +2101,7 @@ static boolean LevelContainsPlayer()
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] == EL_SPIELFIGUR ||
+      if (Feld[x][y] == EL_PLAYER ||
 	  Feld[x][y] == EL_SPIELER1 ||
 	  Feld[x][y] == EL_SP_MURPHY) 
 	player_found = TRUE;
@@ -2368,7 +2368,7 @@ static void DrawRandomPlacementBackgroundArea()
   /* draw decorative border for the object */
   for (y=0; y<2; y++)
     for (x=0; x<2; x++)
-      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
+      DrawMiniElement(area_x + x, area_y + y, EL_SAND);
 
   ClearRectangle(drawto,
 		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
@@ -2490,7 +2490,7 @@ static void DrawAmoebaContentArea()
   /* draw decorative border for the object */
   for (y=0; y<2; y++)
     for (x=0; x<2; x++)
-      DrawMiniElement(area_x + x, area_y + y, EL_ERDREICH);
+      DrawMiniElement(area_x + x, area_y + y, EL_SAND);
 
   ClearRectangle(drawto,
 		 area_sx + MINI_TILEX/2 - 1, area_sy + MINI_TILEY/2 - 1,
@@ -2548,7 +2548,7 @@ static void DrawElementContentAreas()
     for (y=0; y<4; y++)
       for (x=0; x<4; x++)
 	DrawMiniElement(area_x + 5 * (i % 4) + x, area_y + 6 * (i / 4) + y,
-			EL_ERDREICH);
+			EL_SAND);
 
     ClearRectangle(drawto,
 		   area_sx + 5 * (i % 4) * MINI_TILEX + MINI_TILEX/2 - 1,
@@ -2610,51 +2610,51 @@ static void DrawPropertiesWindow()
     char *text;
   } elements_with_counter[] =
   {
-    { EL_EDELSTEIN,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EMERALD,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
     { EL_EDELSTEIN_BD,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_GELB,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_ROT,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_LILA,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
-    { EL_DIAMANT,	&level.score[SC_DIAMANT],	TEXT_COLLECTING },
-    { EL_KAEFER_RIGHT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_KAEFER_UP,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_KAEFER_LEFT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_KAEFER_DOWN,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_EDELSTEIN_YELLOW,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_RED,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_PURPLE,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_DIAMOND,	&level.score[SC_DIAMANT],	TEXT_COLLECTING },
+    { EL_BUG_RIGHT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUG_UP,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUG_LEFT,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUG_DOWN,	&level.score[SC_KAEFER],	TEXT_SMASHING },
     { EL_BUTTERFLY_RIGHT,&level.score[SC_KAEFER],	TEXT_SMASHING },
     { EL_BUTTERFLY_UP,	&level.score[SC_KAEFER],	TEXT_SMASHING },
     { EL_BUTTERFLY_LEFT,&level.score[SC_KAEFER],	TEXT_SMASHING },
     { EL_BUTTERFLY_DOWN,&level.score[SC_KAEFER],	TEXT_SMASHING },
-    { EL_FLIEGER_RIGHT,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_FLIEGER_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_FLIEGER_LEFT,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_FLIEGER_DOWN,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_SPACESHIP_RIGHT,&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_SPACESHIP_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_SPACESHIP_LEFT,&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_SPACESHIP_DOWN,&level.score[SC_FLIEGER],	TEXT_SMASHING },
     { EL_FIREFLY_RIGHT,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
     { EL_FIREFLY_UP,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
     { EL_FIREFLY_LEFT,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
     { EL_FIREFLY_DOWN,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
-    { EL_MAMPFER,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
-    { EL_MAMPFER2,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
+    { EL_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
+    { EL_DARK_YAMYAM,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
     { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING },
     { EL_PACMAN_RIGHT,	&level.score[SC_PACMAN],	TEXT_SMASHING },
     { EL_PACMAN_UP,	&level.score[SC_PACMAN],	TEXT_SMASHING },
     { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING },
     { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING },
-    { EL_KOKOSNUSS,	&level.score[SC_KOKOSNUSS],	TEXT_CRACKING },
-    { EL_DYNAMITE_INACTIVE,&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL1,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL2,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL3,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL4,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_NUT,		&level.score[SC_KOKOSNUSS],	TEXT_CRACKING },
+    { EL_DYNAMITE	,&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
+    { EL_KEY1,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_KEY2,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_KEY3,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_KEY4,		&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_1_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
     { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
-    { EL_AMOEBE_NASS,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_AMOEBE_NORM,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_AMOEBE_VOLL,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_AMOEBE_BD,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_MAGIC_WALL_OFF,&level.time_magic_wall,		TEXT_DURATION },
-    { EL_ABLENK_AUS,	&level.time_wheel,		TEXT_DURATION },
+    { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_BD_AMOEBA,	&level.amoeba_speed,		TEXT_SPEED },
+    { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION },
+    { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION },
     { -1, NULL, NULL }
   };
 
@@ -2667,7 +2667,7 @@ static void DrawPropertiesWindow()
   /* draw some decorative border for the object */
   for (y=0; y<3; y++)
     for (x=0; x<3; x++)
-      DrawMiniElement(xstart + x , ystart + y, EL_ERDREICH);
+      DrawMiniElement(xstart + x , ystart + y, EL_SAND);
 
   ClearRectangle(drawto,
 		 SX + xstart * MINI_TILEX + MINI_TILEX/2 - 1,
@@ -3447,20 +3447,20 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (new_element != Feld[lx][ly])
 	{
-	  if (new_element == EL_SPIELFIGUR)
+	  if (new_element == EL_PLAYER)
 	  {
 	    /* remove player at old position */
 	    for(y=0; y<lev_fieldy; y++)
 	    {
 	      for(x=0; x<lev_fieldx; x++)
 	      {
-		if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1)
+		if (Feld[x][y] == EL_PLAYER || Feld[x][y] == EL_SPIELER1)
 		{
-		  Feld[x][y] = EL_LEERRAUM;
+		  Feld[x][y] = EL_EMPTY;
 		  if (x - level_xpos >= 0 && x - level_xpos < ed_fieldx &&
 		      y - level_ypos >= 0 && y - level_ypos < ed_fieldy)
 		    DrawMiniElement(x - level_xpos, y - level_ypos,
-				    EL_LEERRAUM);
+				    EL_EMPTY);
 		}
 	      }
 	    }
@@ -3889,7 +3889,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_CLEAR:
       for(x=0; x<MAX_LEV_FIELDX; x++) 
 	for(y=0; y<MAX_LEV_FIELDY; y++) 
-	  Feld[x][y] = (button == 1 ? EL_LEERRAUM : new_element);
+	  Feld[x][y] = (button == 1 ? EL_EMPTY : new_element);
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
       DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
