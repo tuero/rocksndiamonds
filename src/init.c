@@ -1073,10 +1073,19 @@ static void InitGraphicInfo()
   {
     int *parameter = image_files[i].parameter;
 
-    /* always start with reliable default values */
     new_graphic_info[i].bitmap = getBitmapFromImageID(i);
+
     new_graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
     new_graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
+    new_graphic_info[i].offset_x = parameter[GFX_ARG_OFFSET];
+    new_graphic_info[i].offset_y = 0;
+
+    /* animation frames are ordered vertically instead of horizontally */
+    if (parameter[GFX_ARG_VERTICAL])
+    {
+      new_graphic_info[i].offset_x = 0;
+      new_graphic_info[i].offset_y = parameter[GFX_ARG_OFFSET];
+    }
 
     new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
 
@@ -1085,7 +1094,9 @@ static void InitGraphicInfo()
       new_graphic_info[i].anim_delay = 1;
 
     /* set mode for animation frame order */
-    if (parameter[GFX_ARG_MODE_LINEAR])
+    if (parameter[GFX_ARG_MODE_LOOP])
+      new_graphic_info[i].anim_mode = ANIM_LOOP;
+    else if (parameter[GFX_ARG_MODE_LINEAR])
       new_graphic_info[i].anim_mode = ANIM_LINEAR;
     else if (parameter[GFX_ARG_MODE_PINGPONG])
       new_graphic_info[i].anim_mode = ANIM_PINGPONG;
@@ -1102,8 +1113,6 @@ static void InitGraphicInfo()
 
     /* animation synchronized with global frame counter, not move position */
     new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
-
-    new_graphic_info[i].anim_vertical = parameter[GFX_ARG_VERTICAL];
   }
 
 #if 0

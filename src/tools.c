@@ -911,11 +911,11 @@ void DrawNewGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
   Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
   int src_x = new_graphic_info[graphic].src_x;
   int src_y = new_graphic_info[graphic].src_y;
+  int offset_x = new_graphic_info[graphic].offset_x;
+  int offset_y = new_graphic_info[graphic].offset_y;
 
-  if (new_graphic_info[graphic].anim_vertical)
-    src_y += frame * TILEY;
-  else
-    src_x += frame * TILEX;
+  src_x += frame * offset_x;
+  src_y += frame * offset_y;
 
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
@@ -992,11 +992,11 @@ void DrawNewGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y,
   GC drawing_gc = src_bitmap->stored_clip_gc;
   int src_x = new_graphic_info[graphic].src_x;
   int src_y = new_graphic_info[graphic].src_y;
+  int offset_x = new_graphic_info[graphic].offset_x;
+  int offset_y = new_graphic_info[graphic].offset_y;
 
-  if (new_graphic_info[graphic].anim_vertical)
-    src_y += frame * TILEY;
-  else
-    src_x += frame * TILEX;
+  src_x += frame * offset_x;
+  src_y += frame * offset_y;
 
   SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dest_x, dest_y);
@@ -1196,6 +1196,8 @@ void DrawNewGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
   GC drawing_gc;
   int src_x;
   int src_y;
+  int offset_x;
+  int offset_y;
 
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
@@ -1275,11 +1277,11 @@ void DrawNewGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
   drawing_gc = src_bitmap->stored_clip_gc;
   src_x = new_graphic_info[graphic].src_x;
   src_y = new_graphic_info[graphic].src_y;
+  offset_x = new_graphic_info[graphic].offset_x;
+  offset_y = new_graphic_info[graphic].offset_y;
 
-  if (new_graphic_info[graphic].anim_vertical)
-    src_y += frame * TILEY;
-  else
-    src_x += frame * TILEX;
+  src_x += frame * offset_x;
+  src_y += frame * offset_y;
 
   src_x += cx;
   src_y += cy;
@@ -3274,7 +3276,7 @@ int el2img(int element)
       break;
   }
 
-  return IMG_EMPTY_SPACE;
+  return IMG_EMPTY;
 #endif
 }
 

@@ -30,6 +30,8 @@
 #include "conf_gfx.h"
 #include "conf_snd.h"
 
+#define IMG_EMPTY	IMG_EMPTY_SPACE
+#define IMG_SP_EMPTY	IMG_SP_EMPTY_SPACE
 
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
@@ -1334,14 +1336,16 @@
 /* values for image configuration suffixes */
 #define GFX_ARG_XPOS				0
 #define GFX_ARG_YPOS				1
-#define GFX_ARG_FRAMES				2
-#define GFX_ARG_DELAY				3
-#define GFX_ARG_MODE_LINEAR			4
-#define GFX_ARG_MODE_PINGPONG			5
-#define GFX_ARG_MODE_PINGPONG2			6
-#define GFX_ARG_MODE_REVERSE			7
-#define GFX_ARG_GLOBAL_SYNC			8
-#define GFX_ARG_VERTICAL			9
+#define GFX_ARG_OFFSET				2
+#define GFX_ARG_VERTICAL			3
+#define GFX_ARG_FRAMES				4
+#define GFX_ARG_DELAY				5
+#define GFX_ARG_MODE_LOOP			6
+#define GFX_ARG_MODE_LINEAR			7
+#define GFX_ARG_MODE_PINGPONG			8
+#define GFX_ARG_MODE_PINGPONG2			9
+#define GFX_ARG_MODE_REVERSE			10
+#define GFX_ARG_GLOBAL_SYNC			11
 
 /* values for sound configuration suffixes */
 /* (currently none) */
@@ -1574,12 +1578,12 @@ struct GraphicInfo
 struct NewGraphicInfo
 {
   Bitmap *bitmap;
-  int src_x, src_y;
+  int src_x, src_y;		/* derived from (tile sized) .xpos/.ypos */
+  int offset_x, offset_y;	/* x/y offset to next animation frame */
   int anim_frames;
-  int anim_delay;
+  int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
   boolean anim_global_sync;
-  boolean anim_vertical;
 };
 
 extern GC		tile_clip_gc;

@@ -1732,6 +1732,7 @@ void Explode(int ex, int ey, int phase, int mode)
   }
   else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
+#if 0
     int graphic = GFX_EXPLOSION;
 
     if (game.emulation == EMU_SUPAPLEX)
@@ -1739,18 +1740,35 @@ void Explode(int ex, int ey, int phase, int mode)
 		 GFX_SP_EXPLODE_INFOTRON :
 		 GFX_SP_EXPLODE_EMPTY);
 
+    graphic += (phase / delay - 1);
+#else
+    int graphic = IMG_EXPLOSION;
+    int frame = (phase / delay - 1);
+
+    if (game.emulation == EMU_SUPAPLEX)
+      graphic = (Store[x][y] == EL_SP_INFOTRON ?
+		 IMG_SP_EXPLOSION_INFOTRON :
+		 IMG_SP_EXPLOSION);
+#endif
+
     if (phase == delay)
       ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
-
-    graphic += (phase / delay - 1);
 
     if (IS_PFORTE(Store[x][y]))
     {
       DrawNewLevelElement(x, y, Store[x][y]);
+#if 0
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic);
+#else
+      DrawNewGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
+#endif
     }
     else
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), graphic);
+#else
+      DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+#endif
   }
 }
 
@@ -1880,8 +1898,14 @@ void Blurb(int x, int y)
   }
   else								/* go on */
   {
+#if 0
     int graphic =
       (element == EL_ACID_SPLASHING_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
+#else
+    int graphic = (element == EL_ACID_SPLASHING_LEFT ?
+		   IMG_ACID_SPLASHING_LEFT :
+		   IMG_ACID_SPLASHING_RIGHT);
+#endif
 
     if (!MovDelay[x][y])	/* initialize animation counter */
       MovDelay[x][y] = 9;
@@ -1890,12 +1914,20 @@ void Blurb(int x, int y)
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	DrawGraphic(SCREENX(x), SCREENY(y), graphic+4-MovDelay[x][y]/2);
+#else
+      {
+	int frame = getNewGraphicAnimationFrame(graphic, 8 - MovDelay[x][y]);
+
+        DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+      }
+#endif
 
       if (!MovDelay[x][y])
       {
 	Feld[x][y] = EL_EMPTY;
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
       }
     }
   }
@@ -1960,7 +1992,7 @@ static void ToggleBeltSwitch(int x, int y)
 	if (e_belt_nr == belt_nr)
 	{
 	  Feld[xx][yy] = belt_base_switch_element[belt_nr] + belt_dir_nr;
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
 	}
       }
       else if (IS_BELT(element) && belt_dir != MV_NO_MOVING)
@@ -1972,7 +2004,7 @@ static void ToggleBeltSwitch(int x, int y)
 	  int belt_part = Feld[xx][yy] - belt_base_element[belt_nr];
 
 	  Feld[xx][yy] = belt_base_active_element[belt_nr] + belt_part;
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
 	}
       }
       else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NO_MOVING)
@@ -1984,7 +2016,7 @@ static void ToggleBeltSwitch(int x, int y)
 	  int belt_part = Feld[xx][yy] - belt_base_active_element[belt_nr];
 
 	  Feld[xx][yy] = belt_base_element[belt_nr] + belt_part;
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
 	}
       }
     }
@@ -2007,7 +2039,7 @@ static void ToggleSwitchgateSwitch(int x, int y)
 	  element == EL_SWITCHGATE_SWITCH_DOWN)
       {
 	Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
-	DrawLevelField(xx, yy);
+	DrawNewLevelField(xx, yy);
       }
       else if (element == EL_SWITCHGATE_OPEN ||
 	       element == EL_SWITCHGATE_OPENING)
@@ -2053,13 +2085,13 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	  game.light_time_left > 0)
       {
 	Feld[x][y] = EL_LIGHT_SWITCH_ACTIVE;
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
       }
       else if (element == EL_LIGHT_SWITCH_ACTIVE &&
 	       game.light_time_left == 0)
       {
 	Feld[x][y] = EL_LIGHT_SWITCH;
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
       }
       else if (element == EL_INVISIBLE_STEELWALL ||
 	       element == EL_INVISIBLE_WALL ||
@@ -2068,7 +2100,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	if (game.light_time_left > 0)
 	  Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
       }
       else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	       element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -2077,7 +2109,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	if (game.light_time_left == 0)
 	  Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
 
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
       }
     }
   }
@@ -2965,7 +2997,16 @@ void StartMoving(int x, int y)
 	  phase = 7 - phase;
 
 	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	  DrawGraphic(SCREENX(x), SCREENY(y), el2gfx(element) + phase);
+#else
+	{
+	  int graphic = el2img(element);
+	  int frame = getNewGraphicAnimationFrame(graphic, MovDelay[x][y] % 8);
+
+	  DrawNewGraphic(SCREENX(x), SCREENY(y), graphic, frame);
+	}
+#endif
 
 	if (MovDelay[x][y] % 4 == 3)
 	{
@@ -2976,23 +3017,36 @@ void StartMoving(int x, int y)
 	}
       }
       else if (element == EL_SP_ELECTRON)
+#if 0
 	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_LOOP);
+#else
+	DrawNewGraphicAnimation(x, y, IMG_SP_ELECTRON);
+#endif
       else if (element == EL_DRAGON)
       {
 	int i;
 	int dir = MovDir[x][y];
 	int dx = (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
 	int dy = (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
+#if 0
 	int graphic = (dir == MV_LEFT	? GFX_FLAMMEN_LEFT :
 		       dir == MV_RIGHT	? GFX_FLAMMEN_RIGHT :
 		       dir == MV_UP	? GFX_FLAMMEN_UP :
 		       dir == MV_DOWN	? GFX_FLAMMEN_DOWN : GFX_LEERRAUM);
 	int phase = FrameCounter % 2;
+#else
+	int graphic = (dir == MV_LEFT	? IMG_FLAMES_LEFT1 :
+		       dir == MV_RIGHT	? IMG_FLAMES_RIGHT1 :
+		       dir == MV_UP	? IMG_FLAMES_UP1 :
+		       dir == MV_DOWN	? IMG_FLAMES_DOWN1 : IMG_EMPTY);
+	int frame = getNewGraphicAnimationFrame(graphic, -1);
+#endif
 
 	for (i=1; i<=3; i++)
 	{
 	  int xx = x + i*dx, yy = y + i*dy;
 	  int sx = SCREENX(xx), sy = SCREENY(yy);
+	  int flame_graphic = graphic + (i - 1);
 
 	  if (!IN_LEV_FIELD(xx, yy) ||
 	      IS_SOLID(Feld[xx][yy]) || Feld[xx][yy] == EL_EXPLOSION)
@@ -3009,13 +3063,17 @@ void StartMoving(int x, int y)
 
 	    Feld[xx][yy] = EL_FLAMES;
 	    if (IN_SCR_FIELD(sx, sy))
+#if 0
 	      DrawGraphic(sx, sy, graphic + phase*3 + i-1);
+#else
+	      DrawNewGraphic(sx, sy, flame_graphic, frame);
+#endif
 	  }
 	  else
 	  {
 	    if (Feld[xx][yy] == EL_FLAMES)
 	      Feld[xx][yy] = EL_EMPTY;
-	    DrawLevelField(xx, yy);
+	    DrawNewLevelField(xx, yy);
 	  }
 	}
       }
