@@ -709,8 +709,11 @@ boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
   /* read chunk name */
   fgets(chunk_name, chunk_name_length + 1, file);
 
-  /* read chunk size */
-  *chunk_size = getFile32BitInteger(file, byte_order);
+  if (chunk_size != NULL)
+  {
+    /* read chunk size */
+    *chunk_size = getFile32BitInteger(file, byte_order);
+  }
 
   return (feof(file) || ferror(file) ? FALSE : TRUE);
 }
@@ -721,8 +724,11 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
   /* write chunk name */
   fputs(chunk_name, file);
 
-  /* write chunk size */
-  putFile32BitInteger(file, chunk_size, byte_order);
+  if (chunk_size >= 0)
+  {
+    /* write chunk size */
+    putFile32BitInteger(file, chunk_size, byte_order);
+  }
 }
 
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0

@@ -9,6 +9,7 @@ Release Version 2.0.1 [?? ??? 2002]
 	  (needed for quite some Emerald Mine Club levels)
 	- icon for Windows executable added
 	- bug when selecting default level series fixed
+	- new IFF style file format for level and tape files
 	- bug in storing amoeba content fixed
 	- nasty tape bugs fixed (completely reworked tape stuff)
 	- fullscreen mode now works with Windows (workaround for bug in SDL)

@@ -22,15 +22,18 @@
 #include "tape.h"
 #include "joystick.h"
 
-#define MAX_FILENAME_LEN	256	/* maximal filename length   */
-#define MAX_LINE_LEN		1000	/* maximal input line length */
-#define CHUNK_ID_LEN		4	/* IFF style chunk id length */
-#define LEVEL_HEADER_SIZE	80	/* size of level file header */
-#define LEVEL_HEADER_UNUSED	15	/* unused level header bytes */
-#define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk  */
-#define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes   */
-#define TAPE_HEADER_SIZE	20	/* size of tape file header  */
-#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes  */
+#define MAX_FILENAME_LEN	256	/* maximal filename length    */
+#define MAX_LINE_LEN		1000	/* maximal input line length  */
+#define CHUNK_ID_LEN		4	/* IFF style chunk id length  */
+#define CHUNK_SIZE_UNDEFINED	0	/* undefined chunk size == 0  */
+#define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
+#define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
+#define LEVEL_HEADER_SIZE	80	/* size of level file header  */
+#define LEVEL_HEADER_UNUSED	15	/* unused level header bytes  */
+#define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
+#define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
+#define TAPE_HEADER_SIZE	20	/* size of tape file header   */
+#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes   */
 
 /* file identifier strings */
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_2.0"
@@ -191,53 +194,6 @@ char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_CONTRIBUTION(n) ?	6 : \
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
-
-static int getFileVersionFromCookieString(const char *cookie)
-{
-  const char *ptr_cookie1, *ptr_cookie2;
-  const char *pattern1 = "_FILE_VERSION_";
-  const char *pattern2 = "?.?";
-  const int len_cookie = strlen(cookie);
-  const int len_pattern1 = strlen(pattern1);
-  const int len_pattern2 = strlen(pattern2);
-  const int len_pattern = len_pattern1 + len_pattern2;
-  int version_major, version_minor;
-
-  if (len_cookie <= len_pattern)
-    return -1;
-
-  ptr_cookie1 = &cookie[len_cookie - len_pattern];
-  ptr_cookie2 = &cookie[len_cookie - len_pattern2];
-
-  if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
-    return -1;
-
-  if (ptr_cookie2[0] < '0' || ptr_cookie2[0] > '9' ||
-      ptr_cookie2[1] != '.' ||
-      ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
-    return -1;
-
-  version_major = ptr_cookie2[0] - '0';
-  version_minor = ptr_cookie2[2] - '0';
-
-  return (version_major * 10 + version_minor);
-}
-
-boolean checkCookieString(const char *cookie, const char *template)
-{
-  const char *pattern = "_FILE_VERSION_?.?";
-  const int len_cookie = strlen(cookie);
-  const int len_template = strlen(template);
-  const int len_pattern = strlen(pattern);
-
-  if (len_cookie != len_template)
-    return FALSE;
-
-  if (strncmp(cookie, template, len_cookie - len_pattern) != 0)
-    return FALSE;
-
-  return TRUE;
-}
 
 char *getLevelClassDescription(struct LevelDirInfo *ldi)
 {
@@ -401,6 +357,109 @@ static void InitLevelSetupDirectory(char *level_subdir)
   createDirectory(getUserDataDir(), "user data");
   createDirectory(getLevelSetupDir(""), "main level setup");
   createDirectory(getLevelSetupDir(level_subdir), "level setup");
+}
+
+static void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fgetc(file);
+}
+
+static void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fputc(0, file);
+}
+
+static void ReadChunk_VERS(FILE *file, int *file_version, int *game_version)
+{
+  int file_version_major, file_version_minor, file_version_patch;
+  int game_version_major, game_version_minor, game_version_patch;
+
+  file_version_major = fgetc(file);
+  file_version_minor = fgetc(file);
+  file_version_patch = fgetc(file);
+  fgetc(file);		/* not used */
+
+  game_version_major = fgetc(file);
+  game_version_minor = fgetc(file);
+  game_version_patch = fgetc(file);
+  fgetc(file);		/* not used */
+
+  *file_version = VERSION_IDENT(file_version_major,
+				file_version_minor,
+				file_version_patch);
+
+  *game_version = VERSION_IDENT(game_version_major,
+				game_version_minor,
+				game_version_patch);
+}
+
+static void WriteChunk_VERS(FILE *file, int file_version, int game_version)
+{
+  int file_version_major = VERSION_MAJOR(file_version);
+  int file_version_minor = VERSION_MINOR(file_version);
+  int file_version_patch = VERSION_PATCH(file_version);
+  int game_version_major = VERSION_MAJOR(game_version);
+  int game_version_minor = VERSION_MINOR(game_version);
+  int game_version_patch = VERSION_PATCH(game_version);
+
+  fputc(file_version_major, file);
+  fputc(file_version_minor, file);
+  fputc(file_version_patch, file);
+  fputc(0, file);	/* not used */
+
+  fputc(game_version_major, file);
+  fputc(game_version_minor, file);
+  fputc(game_version_patch, file);
+  fputc(0, file);	/* not used */
+}
+
+static int getFileVersionFromCookieString(const char *cookie)
+{
+  const char *ptr_cookie1, *ptr_cookie2;
+  const char *pattern1 = "_FILE_VERSION_";
+  const char *pattern2 = "?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_pattern1 = strlen(pattern1);
+  const int len_pattern2 = strlen(pattern2);
+  const int len_pattern = len_pattern1 + len_pattern2;
+  int version_major, version_minor;
+
+  if (len_cookie <= len_pattern)
+    return -1;
+
+  ptr_cookie1 = &cookie[len_cookie - len_pattern];
+  ptr_cookie2 = &cookie[len_cookie - len_pattern2];
+
+  if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
+    return -1;
+
+  if (ptr_cookie2[0] < '0' || ptr_cookie2[0] > '9' ||
+      ptr_cookie2[1] != '.' ||
+      ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
+    return -1;
+
+  version_major = ptr_cookie2[0] - '0';
+  version_minor = ptr_cookie2[2] - '0';
+
+  return VERSION_IDENT(version_major, version_minor, 0);
+}
+
+boolean checkCookieString(const char *cookie, const char *template)
+{
+  const char *pattern = "_FILE_VERSION_?.?";
+  const int len_cookie = strlen(cookie);
+  const int len_template = strlen(template);
+  const int len_pattern = strlen(pattern);
+
+  if (len_cookie != len_template)
+    return FALSE;
+
+  if (strncmp(cookie, template, len_cookie - len_pattern) != 0)
+    return FALSE;
+
+  return TRUE;
 }
 
 static void setLevelInfoToDefaults()
@@ -695,19 +754,14 @@ void OLD_LoadLevel(int level_nr)
   SetBorderElement();
 }
 
-static void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
+static int LoadLevel_VERS(FILE *file, int chunk_size, struct LevelInfo *level)
 {
-  while (bytes--)
-    fgetc(file);
+  ReadChunk_VERS(file, &(level->file_version), &(level->game_version));
+
+  return chunk_size;
 }
 
-static void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
-{
-  while (bytes--)
-    fputc(0, file);
-}
-
-static int LoadLevel_HEAD(struct LevelInfo *level, FILE *file, int chunk_size)
+static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
 
@@ -744,7 +798,7 @@ static int LoadLevel_HEAD(struct LevelInfo *level, FILE *file, int chunk_size)
   return chunk_size;
 }
 
-static int LoadLevel_AUTH(struct LevelInfo *level, FILE *file, int chunk_size)
+static int LoadLevel_AUTH(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i;
 
@@ -755,7 +809,7 @@ static int LoadLevel_AUTH(struct LevelInfo *level, FILE *file, int chunk_size)
   return chunk_size;
 }
 
-static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
+static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
   int header_size = 4;
@@ -796,7 +850,7 @@ static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
   return chunk_size;
 }
 
-static int LoadLevel_BODY(struct LevelInfo *level, FILE *file, int chunk_size)
+static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int x, y;
   int chunk_size_expected = level->fieldx * level->fieldy;
@@ -824,7 +878,7 @@ static int LoadLevel_BODY(struct LevelInfo *level, FILE *file, int chunk_size)
   return chunk_size;
 }
 
-static int LoadLevel_CNT2(struct LevelInfo *level, FILE *file, int chunk_size)
+static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
   int element;
@@ -885,6 +939,7 @@ void LoadLevel(int level_nr)
     return;
   }
 
+#if 0
   /* check file identifier */
   fgets(cookie, MAX_LINE_LEN, file);
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
@@ -903,12 +958,48 @@ void LoadLevel(int level_nr)
     fclose(file);
     return;
   }
+#else
+  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+  if (strcmp(chunk_name, "RND1") == 0)
+  {
+    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	/* not used */
+
+    getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk_name, "CAVE") != 0)
+    {
+      Error(ERR_WARN, "unknown format of level file '%s'", filename);
+      fclose(file);
+      return;
+    }
+  }
+  else	/* check for pre-2.0 file format with cookie string */
+  {
+    strcpy(cookie, chunk_name);
+    fgets(&cookie[4], MAX_LINE_LEN - 4, file);
+    if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
+      cookie[strlen(cookie) - 1] = '\0';
+
+    if (!checkCookieString(cookie, LEVEL_COOKIE)) /* unknown file format */
+    {
+      Error(ERR_WARN, "unknown format of level file '%s'", filename);
+      fclose(file);
+      return;
+    }
+
+    if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
+    {
+      Error(ERR_WARN, "unsupported version of level file '%s'", filename);
+      fclose(file);
+      return;
+    }
+  }
+#endif
 
   if (level.file_version < FILE_VERSION_1_2)
   {
     /* level files from versions before 1.2.0 without chunk structure */
-    LoadLevel_HEAD(&level, file, LEVEL_HEADER_SIZE);
-    LoadLevel_BODY(&level, file, level.fieldx * level.fieldy);
+    LoadLevel_HEAD(file, LEVEL_HEADER_SIZE,           &level);
+    LoadLevel_BODY(file, level.fieldx * level.fieldy, &level);
   }
   else
   {
@@ -916,10 +1007,11 @@ void LoadLevel(int level_nr)
     {
       char *name;
       int size;
-      int (*loader)(struct LevelInfo *, FILE *, int);
+      int (*loader)(FILE *, int, struct LevelInfo *);
     }
     chunk_info[] =
     {
+      { "VERS", FILE_VERS_CHUNK_SIZE,	LoadLevel_VERS },
       { "HEAD", LEVEL_HEADER_SIZE,	LoadLevel_HEAD },
       { "AUTH", MAX_LEVEL_AUTHOR_LEN,	LoadLevel_AUTH },
       { "CONT", -1,			LoadLevel_CONT },
@@ -953,7 +1045,7 @@ void LoadLevel(int level_nr)
       {
 	/* call function to load this level chunk */
 	int chunk_size_expected =
-	  (chunk_info[i].loader)(&level, file, chunk_size);
+	  (chunk_info[i].loader)(file, chunk_size, &level);
 
 	/* the size of some chunks cannot be checked before reading other
 	   chunks first (like "HEAD" and "BODY") that contain some header
@@ -1095,7 +1187,7 @@ void OLD_SaveLevel(int level_nr)
   chmod(filename, LEVEL_PERMS);
 }
 
-static void SaveLevel_HEAD(struct LevelInfo *level, FILE *file)
+static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
 
@@ -1130,7 +1222,7 @@ static void SaveLevel_HEAD(struct LevelInfo *level, FILE *file)
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
 
-static void SaveLevel_AUTH(struct LevelInfo *level, FILE *file)
+static void SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
 {
   int i;
 
@@ -1139,7 +1231,7 @@ static void SaveLevel_AUTH(struct LevelInfo *level, FILE *file)
 }
 
 #if 0
-static void SaveLevel_CONT(struct LevelInfo *level, FILE *file)
+static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
 
@@ -1159,7 +1251,7 @@ static void SaveLevel_CONT(struct LevelInfo *level, FILE *file)
 }
 #endif
 
-static void SaveLevel_BODY(struct LevelInfo *level, FILE *file)
+static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
 {
   int x, y;
 
@@ -1171,7 +1263,7 @@ static void SaveLevel_BODY(struct LevelInfo *level, FILE *file)
 	fputc(Ur[x][y], file);
 }
 
-static void SaveLevel_CNT2(struct LevelInfo *level, FILE *file, int element)
+static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 {
   int i, x, y;
   int num_contents, content_xsize, content_ysize;
@@ -1256,14 +1348,22 @@ void SaveLevel(int level_nr)
   body_chunk_size =
     level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
 
+#if 0
   fputs(LEVEL_COOKIE, file);		/* file identifier */
   fputc('\n', file);
+#else
+  putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunk(file, "CAVE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
+
+  putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
+#endif
 
   putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
-  SaveLevel_HEAD(&level, file);
+  SaveLevel_HEAD(file, &level);
 
   putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
-  SaveLevel_AUTH(&level, file);
+  SaveLevel_AUTH(file, &level);
 
 #if 0
   if (level.encoding_16bit_field)	/* obsolete since new "CNT2" chunk */
@@ -1271,24 +1371,24 @@ void SaveLevel(int level_nr)
     chunk_size = 4 + 2 * (MAX_ELEMENT_CONTENTS * 3 * 3);
 
     putFileChunk(file, "CONT", chunk_size, BYTE_ORDER_BIG_ENDIAN);
-    SaveLevel_CONT(&level, file);
+    SaveLevel_CONT(file, &level);
   }
 #endif
 
   putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
-  SaveLevel_BODY(&level, file);
+  SaveLevel_BODY(file, &level);
 
   if (level.encoding_16bit_yamyam ||
       level.num_yam_contents != STD_ELEMENT_CONTENTS)
   {
     putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
-    SaveLevel_CNT2(&level, file, EL_MAMPFER);
+    SaveLevel_CNT2(file, &level, EL_MAMPFER);
   }
 
   if (level.encoding_16bit_amoeba)
   {
     putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
-    SaveLevel_CNT2(&level, file, EL_AMOEBE_BD);
+    SaveLevel_CNT2(file, &level, EL_AMOEBE_BD);
   }
 
   fclose(file);
@@ -1532,7 +1632,14 @@ void OLD_LoadTape(int level_nr)
   tape.length_seconds = GetTapeLength();
 }
 
-static int LoadTape_HEAD(struct TapeInfo *tape, FILE *file, int chunk_size)
+static int LoadTape_VERS(FILE *file, int chunk_size, struct TapeInfo *tape)
+{
+  ReadChunk_VERS(file, &(tape->file_version), &(tape->game_version));
+
+  return chunk_size;
+}
+
+static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
 {
   int i;
 
@@ -1564,7 +1671,7 @@ static int LoadTape_HEAD(struct TapeInfo *tape, FILE *file, int chunk_size)
   return chunk_size;
 }
 
-static int LoadTape_BODY(struct TapeInfo *tape, FILE *file, int chunk_size)
+static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
 {
   int i, j;
   int chunk_size_expected =
@@ -1660,6 +1767,7 @@ void LoadTape(int level_nr)
   if (!(file = fopen(filename, MODE_READ)))
     return;
 
+#if 0
   /* check file identifier */
   fgets(cookie, MAX_LINE_LEN, file);
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
@@ -1672,20 +1780,56 @@ void LoadTape(int level_nr)
     return;
   }
 
-  if ((tape.file_version = getFileVersionFromCookieString(cookie)) == -1)
+  if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
   {
-    Error(ERR_WARN, "unsupported version of tape file '%s'", filename);
+    Error(ERR_WARN, "unsupported version of level file '%s'", filename);
     fclose(file);
     return;
   }
+#else
+  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+  if (strcmp(chunk_name, "RND1") == 0)
+  {
+    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	/* not used */
+
+    getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk_name, "TAPE") != 0)
+    {
+      Error(ERR_WARN, "unknown format of tape file '%s'", filename);
+      fclose(file);
+      return;
+    }
+  }
+  else	/* check for pre-2.0 file format with cookie string */
+  {
+    strcpy(cookie, chunk_name);
+    fgets(&cookie[4], MAX_LINE_LEN - 4, file);
+    if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
+      cookie[strlen(cookie) - 1] = '\0';
+
+    if (!checkCookieString(cookie, TAPE_COOKIE)) /* unknown file format */
+    {
+      Error(ERR_WARN, "unknown format of tape file '%s'", filename);
+      fclose(file);
+      return;
+    }
+
+    if ((tape.file_version = getFileVersionFromCookieString(cookie)) == -1)
+    {
+      Error(ERR_WARN, "unsupported version of tape file '%s'", filename);
+      fclose(file);
+      return;
+    }
+  }
+#endif
 
   tape.game_version = tape.file_version;
 
   if (tape.file_version < FILE_VERSION_1_2)
   {
     /* tape files from versions before 1.2.0 without chunk structure */
-    LoadTape_HEAD(&tape, file, TAPE_HEADER_SIZE);
-    LoadTape_BODY(&tape, file, 2 * tape.length);
+    LoadTape_HEAD(file, TAPE_HEADER_SIZE, &tape);
+    LoadTape_BODY(file, 2 * tape.length,  &tape);
   }
   else
   {
@@ -1693,10 +1837,11 @@ void LoadTape(int level_nr)
     {
       char *name;
       int size;
-      int (*loader)(struct TapeInfo *, FILE *, int);
+      int (*loader)(FILE *, int, struct TapeInfo *);
     }
     chunk_info[] =
     {
+      { "VERS", FILE_VERS_CHUNK_SIZE,	LoadTape_VERS },
       { "HEAD", TAPE_HEADER_SIZE,	LoadTape_HEAD },
       { "BODY", -1,			LoadTape_BODY },
       {  NULL,  0,			NULL }
@@ -1727,7 +1872,7 @@ void LoadTape(int level_nr)
       {
 	/* call function to load this tape chunk */
 	int chunk_size_expected =
-	  (chunk_info[i].loader)(&tape, file, chunk_size);
+	  (chunk_info[i].loader)(file, chunk_size, &tape);
 
 	/* the size of some chunks cannot be checked before reading other
 	   chunks first (like "HEAD" and "BODY") that contain some header
@@ -1821,7 +1966,7 @@ void OLD_SaveTape(int level_nr)
     Request("tape saved !", REQ_CONFIRM);
 }
 
-static void SaveTape_HEAD(struct TapeInfo *tape, FILE *file)
+static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
 {
   int i;
   byte store_participating_players = 0;
@@ -1840,7 +1985,7 @@ static void SaveTape_HEAD(struct TapeInfo *tape, FILE *file)
   WriteUnusedBytesToFile(file, TAPE_HEADER_UNUSED);
 }
 
-static void SaveTape_BODY(struct TapeInfo *tape, FILE *file)
+static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
 {
   int i, j;
 
@@ -1886,14 +2031,22 @@ void SaveTape(int level_nr)
 
   body_chunk_size = (num_participating_players + 1) * tape.length;
 
+#if 0
   fputs(TAPE_COOKIE, file);		/* file identifier */
   fputc('\n', file);
+#else
+  putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunk(file, "TAPE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
+
+  putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
+#endif
 
   putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
-  SaveTape_HEAD(&tape, file);
+  SaveTape_HEAD(file, &tape);
 
   putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
-  SaveTape_BODY(&tape, file);
+  SaveTape_BODY(file, &tape);
 
   fclose(file);
 
@@ -1917,7 +2070,8 @@ void DumpTape(struct TapeInfo *tape)
 
   printf("\n");
   printf("-------------------------------------------------------------------------------\n");
-  printf("TAPE OF LEVEL %d\n", tape->level_nr);
+  printf("Tape of Level %d (file version %06d, game version %06d\n",
+	 tape->level_nr, tape->file_version, tape->game_version);
   printf("-------------------------------------------------------------------------------\n");
 
   for(i=0; i<tape->length; i++)

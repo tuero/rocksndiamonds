@@ -1533,7 +1533,11 @@ extern int		num_element_info;
 #define SETUPINPUT		9
 #define CALIBRATION		10
 
+#define PROGRAM_VERSION_MAJOR	2
+#define PROGRAM_VERSION_MINOR	0
+#define PROGRAM_VERSION_PATCH	1
 #define PROGRAM_VERSION_STRING	"2.0.1"
+
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2001 by"
@@ -1548,6 +1552,11 @@ extern int		num_element_info;
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
 
+#define VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
+#define VERSION_MAJOR(x)	((x) / 10000)
+#define VERSION_MINOR(x)	(((x) % 10000) / 100)
+#define VERSION_PATCH(x)	((x) % 100)
+
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
 ** currently supported/known file version numbers:
 **	1.0 (old)
@@ -1555,16 +1564,24 @@ extern int		num_element_info;
 **	1.4 (still in use)
 **	2.0 (actual)
 */
-#define FILE_VERSION_1_0	10
-#define FILE_VERSION_1_2	12
-#define FILE_VERSION_1_4	14
-#define FILE_VERSION_2_0	20
+#define FILE_VERSION_1_0	VERSION_IDENT(1,0,0)
+#define FILE_VERSION_1_2	VERSION_IDENT(1,2,0)
+#define FILE_VERSION_1_4	VERSION_IDENT(1,4,0)
+#define FILE_VERSION_2_0	VERSION_IDENT(2,0,0)
+
+/* file version does not change for every program version, but is changed
+   when new features are introduced that are incompatible with older file
+   versions, so that they can be treated accordingly */
 #define FILE_VERSION_ACTUAL	FILE_VERSION_2_0
+
 #define GAME_VERSION_1_0	FILE_VERSION_1_0
 #define GAME_VERSION_1_2	FILE_VERSION_1_2
 #define GAME_VERSION_1_4	FILE_VERSION_1_4
 #define GAME_VERSION_2_0	FILE_VERSION_2_0
-#define GAME_VERSION_ACTUAL	GAME_VERSION_2_0
+
+#define GAME_VERSION_ACTUAL	VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
+					      PROGRAM_VERSION_MINOR, \
+					      PROGRAM_VERSION_PATCH)
 
 /* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
 #define ANIM_NORMAL		0

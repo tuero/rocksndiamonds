@@ -25,6 +25,9 @@
 /* this switch controls how rocks move horizontally */
 #define OLD_GAME_BEHAVIOUR	FALSE
 
+/* EXPERIMENTAL STUFF */
+#define USE_NEW_AMOEBA_CODE	FALSE
+
 /* for DigField() */
 #define DF_NO_PUSH		0
 #define DF_DIG			1
@@ -436,6 +439,14 @@ void InitGame()
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
+
+#if DEBUG
+#if USE_NEW_AMOEBA_CODE
+  printf("Using new amoeba code.\n");
+#else
+  printf("Using old amoeba code.\n");
+#endif
+#endif
 
   /* don't play tapes over network */
   network_playing = (options.network && !tape.playing);
@@ -4503,10 +4514,12 @@ void GameActions()
       AmoebeWaechst(x, y);
     else if (element == EL_DEAMOEBING)
       AmoebeSchrumpft(x, y);
-#if 0
+
+#if !USE_NEW_AMOEBA_CODE
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
 #endif
+
     else if (element == EL_LIFE || element == EL_LIFE_ASYNC)
       Life(x, y);
     else if (element == EL_ABLENK_EIN)
@@ -4590,8 +4603,8 @@ void GameActions()
     }
   }
 
-#if 1
-  /* new experimental amoeba growth stuff*/
+#if USE_NEW_AMOEBA_CODE
+  /* new experimental amoeba growth stuff */
 #if 1
   if (!(FrameCounter % 8))
 #endif
