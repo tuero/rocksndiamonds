@@ -568,17 +568,6 @@ void title_blitscore(void)
 #endif
 }
 
-void title_blitants(unsigned int y)
-{
-  static const char ants_dashes[2] = { 8, 7 };
-
-  xdebug("title_blitants");
-
-  XSetDashes(display, antsGC, colour_anim, ants_dashes, 2);
-  XDrawRectangle(display, screenPixmap, antsGC,
-		 0, y * TILEY, SCR_MENUX * TILEX - 1, TILEY - 1);
-}
-
 void title_animscreen(void)
 {
   blitscreen();

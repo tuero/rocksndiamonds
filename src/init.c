@@ -263,13 +263,15 @@ void InitElementSmallImages()
     if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
       InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
 
-  /* !!! FIX ME (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
 #if 1
+  /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
   for (i = IMG_EMC_OBJECT; i <= IMG_EMC_TITLE; i++)
     InitElementSmallImagesScaledUp(i);
 #endif
 }
 
+#if 1
+/* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
 void SetBitmaps_EM(Bitmap **em_bitmap)
 {
   em_bitmap[0] = graphic_info[IMG_EMC_OBJECT].bitmap;
@@ -277,6 +279,7 @@ void SetBitmaps_EM(Bitmap **em_bitmap)
   em_bitmap[2] = graphic_info[IMG_EMC_SPRITE].bitmap;
   em_bitmap[3] = graphic_info[IMG_EMC_TITLE].bitmap;
 }
+#endif
 
 static int getFontBitmapID(int font_nr)
 {

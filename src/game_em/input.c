@@ -44,8 +44,6 @@ static int input_esc;
 static struct timeval tv1;
 static struct timeval tv2;
 
-static unsigned char keymatrix[32];
-
 static int player_mode;
 static char player_name[32];
 static int player_level;
@@ -203,7 +201,6 @@ int game_menu_loop(boolean init, byte action)
 
   if (!input_pause)
   {
-    title_blitants(4 + pos);
     title_blitscore();
     title_animscreen();
 
@@ -232,14 +229,12 @@ int game_menu_loop(boolean init, byte action)
       {
 	drawmenu(pos);
 	pos--;
-	title_blitants(4 + pos);
       }
 
       if (ply1.joy_s && pos < 4)
       {
 	drawmenu(pos);
 	pos++;
-	title_blitants(4 + pos);
       }
     }
 
@@ -292,7 +287,6 @@ int game_play_loop(byte action)
 
 void game_menu_init(void)
 {
-  int pos = 4;
   int i;
 
   title_initscreen();
@@ -300,7 +294,6 @@ void game_menu_init(void)
   for (i = 0; i < 7; i++)
     drawmenu(i);			/* display all lines */
 
-  title_blitants(4 + pos);
   title_blitscore();
   title_animscreen();
 
@@ -309,8 +302,6 @@ void game_menu_init(void)
 
 int game_loop(byte action)
 {
-#if 1
-
 #if 0
   printf("::: action == 0x%02x\n", action);
 #endif
@@ -350,45 +341,14 @@ int game_loop(byte action)
   }
 
   return 0;
-
-#else
-
-  while (1)
-  {
-    int result = game_menu_loop(0);
-
-    if (result == 1)
-      return 1;
-
-    if (result == 2)
-      break;
-  }
-
-  em_game_status = EM_GAME_STATUS_PLAY;
-  if (game_play_init(player_level) != 0)
-    return 0;
-
-  while (1)
-  {
-    if (game_play_loop() != 0)
-      break;
-  }
-
-  em_game_status = EM_GAME_STATUS_MENU;
-  game_menu_init();
-
-  return 0;
-
-#endif
 }
 
-/* read input device for players
- */
+
+/* read input device for players */
+
 void readjoy(byte action)
 {
   unsigned int north = 0, east = 0, south = 0, west = 0, fire = 0;
-
-#if 1
 
   if (action & JOY_LEFT)
     west = 1;
@@ -405,32 +365,9 @@ void readjoy(byte action)
   if (action & JOY_BUTTON_1)
     fire = 1;
 
+#if 0
   if (action & JOY_BUTTON_2)
     input_esc = 1;
-
-#else
-
-  unsigned int i;
-
-  for (i = 0; i < 3; i++)
-    if (keymatrix[northKeyCode[i] >> 3] & 1 << (northKeyCode[i] & 7))
-      north = 1;
-
-  for (i = 0; i < 3; i++)
-    if (keymatrix[eastKeyCode[i] >> 3] & 1 << (eastKeyCode[i] & 7))
-      east = 1;
-
-  for (i = 0; i < 3; i++)
-    if (keymatrix[southKeyCode[i] >> 3] & 1 << (southKeyCode[i] & 7))
-      south = 1;
-
-  for (i = 0; i < 3; i++)
-    if (keymatrix[westKeyCode[i] >> 3] & 1 << (westKeyCode[i] & 7))
-      west = 1;
-
-  for (i = 0; i < 3; i++)
-    if (keymatrix[fireKeyCode[i] >> 3] & 1 << (fireKeyCode[i] & 7))
-      fire = 1;
 #endif
 
   ply1.joy_fire = fire;
@@ -443,26 +380,14 @@ void readjoy(byte action)
   }
 }
 
-/* handle events from x windows and block until the next frame
- */
+
+/* handle events from x windows and block until the next frame */
+
 void input_eventloop(void)
 {
-#if 0
-  XEvent event;
-#endif
-  unsigned int i;
   unsigned long count;
 
-  if (input_pause)
-  {
-#if 0
-    XPeekEvent(display, &event); /* block until an event arrives */
-
-    if (gettimeofday(&tv1, 0) == -1)
-      tv1.tv_usec = 0;
-#endif
-  }
-  else
+  if (!input_pause)
   {
     XSync(display, False); /* block until all graphics are drawn */
 
@@ -486,52 +411,9 @@ void input_eventloop(void)
     }
   }
 
+  input_esc = 0;
   input_die = 0;
   input_refresh = 0;
-  lastKeySym = NoSymbol;
-
-#if 0
-  while (XPending(display))
-  {
-    /* drain the event queue */
-    XNextEvent(display, &event);
-
-    switch(event.xany.type)
-    {
-      case KeyPress:
-	XLookupString(&event.xkey, (char *)&count, 1, &lastKeySym, 0);
-	break;
-
-      case Expose:
-	if (event.xexpose.window == xwindow && event.xexpose.count == 0)
-	  input_refresh = 1;
-	break;
-
-      case ClientMessage:
-	if (event.xclient.window == xwindow &&
-	    (Atom)event.xclient.data.l[0] == deleteAtom)
-	  input_die = 1;
-	break;
-
-      case EnterNotify:
-	if (event.xcrossing.window == xwindow)
-	  input_pause = 0;
-	break;
-
-      case LeaveNotify:
-	if (event.xcrossing.window == xwindow)
-	  input_pause = 1;
-	break;
-    }
-  }
-
-  XQueryKeymap(display, keymatrix); /* read the keyboard */
-#endif
-
-  input_esc = 0;
-  for (i = 0; i < 1; i++)
-    if (keymatrix[escKeyCode[i] >> 3] & 1 << (escKeyCode[i] & 7))
-      input_esc = 1;
 }
 
 #endif

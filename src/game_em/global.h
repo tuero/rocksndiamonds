@@ -46,7 +46,6 @@ void game_animscreen(void);
 void title_initscreen(void);
 void title_blitscore(void);
 void title_animscreen(void);
-void title_blitants(unsigned int y);
 void title_string(unsigned int y, unsigned int left, unsigned int right,
 		  char *string);
 
