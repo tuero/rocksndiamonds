@@ -1054,6 +1054,10 @@ element_to_graphic[] =
     IMG_BALLOON_SWITCH_ANY
   },
   {
+    EL_BALLOON_SWITCH_NONE,		-1, -1, FALSE,
+    IMG_BALLOON_SWITCH_NONE
+  },
+  {
     EL_SPRING,				-1, -1, FALSE,
     IMG_SPRING
   },
@@ -2566,8 +2570,20 @@ element_to_graphic[] =
     IMG_TRIGGER_PLAYER
   },
   {
-    EL_BALLOON_SWITCH_NONE,		-1, -1, FALSE,
-    IMG_BALLOON_SWITCH_NONE
+    EL_EM_KEY_5,			-1, -1, FALSE,
+    IMG_EM_KEY_5
+  },
+  {
+    EL_EM_KEY_6,			-1, -1, FALSE,
+    IMG_EM_KEY_6
+  },
+  {
+    EL_EM_KEY_7,			-1, -1, FALSE,
+    IMG_EM_KEY_7
+  },
+  {
+    EL_EM_KEY_8,			-1, -1, FALSE,
+    IMG_EM_KEY_8
   },
   {
     EL_EM_GATE_5,			-1, -1, FALSE,
@@ -2602,28 +2618,16 @@ element_to_graphic[] =
     IMG_EM_GATE_8_GRAY
   },
   {
-    EL_EM_KEY_5,			-1, -1, FALSE,
-    IMG_EM_KEY_5
-  },
-  {
-    EL_EM_KEY_6,			-1, -1, FALSE,
-    IMG_EM_KEY_6
-  },
-  {
-    EL_EM_KEY_7,			-1, -1, FALSE,
-    IMG_EM_KEY_7
-  },
-  {
-    EL_EM_KEY_8,			-1, -1, FALSE,
-    IMG_EM_KEY_8
-  },
-  {
     EL_EMC_ANDROID,			-1, -1, FALSE,
     IMG_EMC_ANDROID
   },
   {
     EL_EMC_GRASS,			-1, -1, FALSE,
     IMG_EMC_GRASS
+  },
+  {
+    EL_EMC_GRASS,			-1, -1, TRUE,
+    IMG_EMC_GRASS_CRUMBLED
   },
   {
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_LEFT, FALSE,
@@ -2640,6 +2644,22 @@ element_to_graphic[] =
   {
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_DOWN, FALSE,
     IMG_EMC_GRASS_DIGGING_DOWN
+  },
+  {
+    EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_LEFT, TRUE,
+    IMG_EMC_GRASS_DIGGING_LEFT_CRUMBLED
+  },
+  {
+    EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_RIGHT, TRUE,
+    IMG_EMC_GRASS_DIGGING_RIGHT_CRUMBLED
+  },
+  {
+    EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_UP, TRUE,
+    IMG_EMC_GRASS_DIGGING_UP_CRUMBLED
+  },
+  {
+    EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_DOWN, TRUE,
+    IMG_EMC_GRASS_DIGGING_DOWN_CRUMBLED
   },
   {
     EL_EMC_MAGIC_BALL,			-1, -1, FALSE,
@@ -2676,6 +2696,10 @@ element_to_graphic[] =
   {
     EL_EMC_PLANT,			-1, -1, FALSE,
     IMG_EMC_PLANT
+  },
+  {
+    EL_EMC_PLANT,			-1, -1, TRUE,
+    IMG_EMC_PLANT_CRUMBLED
   },
   {
     EL_EMC_LENSES,			-1, -1, FALSE,

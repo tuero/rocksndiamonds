@@ -2964,6 +2964,13 @@ void HandleGameActions()
 	return;
     }
 
+    if (level.native_em_level->ply1->alive == 0 &&
+	level.native_em_level->ply2->alive == 0)	/* all dead */
+      AllPlayersGone = TRUE;
+
+    if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
+      TapeStop();
+
     /* --- game actions --- */
 
     if (tape.pausing)

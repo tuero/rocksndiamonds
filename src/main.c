@@ -1782,7 +1782,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "balloon_switch_any",
     "balloon_switch",
-    "send balloon in any direction"
+    "send balloon in pressed direction"
   },
   {
     "emc_steelwall_1",
