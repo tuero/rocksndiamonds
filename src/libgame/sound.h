@@ -160,7 +160,9 @@ struct SoundHeader_8SVX
 
 struct SampleInfo
 { 
+#if 0
   char *name;
+#endif
   byte *data_ptr;
   long data_len;
 
@@ -209,6 +211,7 @@ void SoundServer(void);
 void ReloadSounds(void);
 void ReloadMusic(void);
 boolean LoadSound(char *);
+boolean LoadCustomSound(char *);
 boolean LoadMod(char *);
 int LoadMusic(void);
 void PlayMusic(int);

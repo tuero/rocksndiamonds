@@ -808,7 +808,7 @@ void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 
 void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
 {
-  while (bytes--)
+  while (bytes-- && !feof(file))
     fgetc(file);
 }
 

@@ -21,6 +21,7 @@
 #include "system.h"
 #include "sound.h"
 #include "misc.h"
+#include "setup.h"
 
 
 static int num_sounds = 0, num_music = 0;
@@ -937,7 +938,7 @@ void ReloadMusic()
 }
 
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
-#define WAV_HEADER_SIZE		20	/* size of WAV file header */
+#define WAV_HEADER_SIZE		16	/* size of WAV file header */
 
 static boolean LoadSoundExt(char *sound_name, boolean is_music)
 {
@@ -945,8 +946,8 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   char *filename;
 #if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
-  char chunk[CHUNK_ID_LEN + 1];
-  int chunk_size, dummy;
+  char chunk_name[CHUNK_ID_LEN + 1];
+  int chunk_size;
   FILE *file;
   int i;
 #endif
@@ -958,16 +959,22 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   Sound = checked_realloc(Sound, num_sounds * sizeof(struct SampleInfo));
 
   snd_info = &Sound[num_sounds - 1];
+  snd_info->data_len = 0;
+  snd_info->data_ptr = NULL;
+#if 0
   snd_info->name = sound_name;
+#endif
 
-  filename = getPath2((is_music ? options.music_directory :
-		       options.sounds_directory), snd_info->name);
+  if (is_music)
+    filename = getPath2(options.music_directory, sound_name);
+  else
+    filename = getStringCopy(sound_name);
 
 #if defined(TARGET_SDL)
 
   if ((snd_info->mix_chunk = Mix_LoadWAV(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s'", filename);
     free(filename);
     return FALSE;
   }
@@ -976,14 +983,14 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
-    Error(ERR_WARN, "cannot open sound file '%s' -- no sounds", filename);
+    Error(ERR_WARN, "cannot open sound file '%s'", filename);
     free(filename);
     return FALSE;
   }
 
-  /* read chunk "RIFF" */
-  getFileChunk(file, chunk, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
-  if (strcmp(chunk, "RIFF") != 0)
+  /* read chunk id "RIFF" */
+  getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
+  if (strcmp(chunk_name, "RIFF") != 0)
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
     fclose(file);
@@ -991,44 +998,63 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
     return FALSE;
   }
 
-  /* read chunk "WAVE" */
-  getFileChunk(file, chunk, &dummy, BYTE_ORDER_LITTLE_ENDIAN);
-  if (strcmp(chunk, "WAVE") != 0)
+  /* read "RIFF" type id "WAVE" */
+  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_LITTLE_ENDIAN);
+  if (strcmp(chunk_name, "WAVE") != 0)
   {
-    Error(ERR_WARN, "missing 'WAVE' chunk of sound file '%s'", filename);
+    Error(ERR_WARN, "missing 'WAVE' type ID of sound file '%s'", filename);
     fclose(file);
     free(filename);
     return FALSE;
   }
 
-  /* read header information */
-  for (i=0; i<WAV_HEADER_SIZE; i++)
-    sound_header_buffer[i] = fgetc(file);
-
-  /* read chunk "data" */
-  getFileChunk(file, chunk, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
-  if (strcmp(chunk, "data") != 0)
+  while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN))
   {
-    Error(ERR_WARN, "missing 'data' chunk of sound file '%s'", filename);
-    fclose(file);
-    free(filename);
-    return FALSE;
-  }
+#if 0
+    printf("DEBUG: file '%s', chunk id '%s', chunk size '%d' [%d]\n",
+	   filename, chunk_name, chunk_size, feof(file));
+#endif
 
-  snd_info->data_len = chunk_size;
-  snd_info->data_ptr = checked_malloc(snd_info->data_len);
+    if (strcmp(chunk_name, "fmt ") == 0)
+    {
+      /* read header information */
+      for (i=0; i < MIN(chunk_size, WAV_HEADER_SIZE); i++)
+	sound_header_buffer[i] = fgetc(file);
 
-  /* read sound data */
-  if (fread(snd_info->data_ptr, 1, snd_info->data_len, file) !=
-      snd_info->data_len)
-  {
-    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
-    fclose(file);
-    free(filename);
-    return FALSE;
+      if (chunk_size > WAV_HEADER_SIZE)
+	ReadUnusedBytesFromFile(file, chunk_size - WAV_HEADER_SIZE);
+    }
+    else if (strcmp(chunk_name, "data") == 0)
+    {
+      snd_info->data_len = chunk_size;
+      snd_info->data_ptr = checked_malloc(snd_info->data_len);
+
+      /* read sound data */
+      if (fread(snd_info->data_ptr, 1, snd_info->data_len, file) !=
+	  snd_info->data_len)
+      {
+	Error(ERR_WARN,"cannot read 'data' chunk of sound file '%s'",filename);
+	fclose(file);
+	free(filename);
+	return FALSE;
+      }
+
+      /* check for odd number of sample bytes (data chunk is word aligned) */
+      if ((chunk_size % 2) == 1)
+	ReadUnusedBytesFromFile(file, 1);
+    }
+    else	/* unknown chunk -- ignore */
+      ReadUnusedBytesFromFile(file, chunk_size);
   }
 
   fclose(file);
+
+  if (snd_info->data_ptr == NULL)
+  {
+    Error(ERR_WARN, "missing 'data' chunk of sound file '%s'", filename);
+    free(filename);
+    return FALSE;
+  }
 
   for (i=0; i<snd_info->data_len; i++)
     snd_info->data_ptr[i] = snd_info->data_ptr[i] ^ 0x80;
@@ -1038,7 +1064,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   snd_info->sample_ptr = load_sample(filename);
   if (!snd_info->sample_ptr)
   {
-    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s'", filename);
     return FALSE;
   }
 
@@ -1052,6 +1078,19 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 boolean LoadSound(char *sound_name)
 {
   return LoadSoundExt(sound_name, FALSE);
+}
+
+boolean LoadCustomSound(char *basename)
+{
+  char *filename = getCustomSoundFilename(basename);
+
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "cannot find sound file '%s' -- no sounds", filename);
+    return FALSE;
+  }
+
+  return LoadSound(filename);
 }
 
 boolean LoadMod(char *mod_name)

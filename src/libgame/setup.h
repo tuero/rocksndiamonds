@@ -141,6 +141,7 @@ char *getScoreFilename(int);
 char *getSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
+char *getCustomSoundFilename(char *);
 
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);

@@ -387,6 +387,41 @@ char *getCustomImageFilename(char *basename)
   return NULL;					/* cannot find image file */
 }
 
+char *getCustomSoundFilename(char *basename)
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  /* 1st try: look for special artwork in current level series directory */
+  filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
+  if (fileExists(filename))
+    return filename;
+
+  /* 2nd try: look for special artwork in private artwork directory */
+  filename = getPath2(getUserSoundsDir(), basename);
+  if (fileExists(filename))
+    return filename;
+
+  /* 3rd try: look for special artwork in configured artwork directory */
+  filename = getPath2(getSetupArtworkDir(artwork.snd_current), basename);
+  if (fileExists(filename))
+    return filename;
+
+  /* 4th try: look for default artwork in new default artwork directory */
+  filename = getPath2(getDefaultSoundsDir(SOUNDS_SUBDIR), basename);
+  if (fileExists(filename))
+    return filename;
+
+  /* 5th try: look for default artwork in old default artwork directory */
+  filename = getPath2(options.sounds_directory, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;					/* cannot find image file */
+}
+
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);

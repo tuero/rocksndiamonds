@@ -159,8 +159,10 @@ void InitSound()
 
   for(i=0; i<NUM_SOUNDS; i++)
   {
-    if (!LoadSound(sound_name[i]))
+    if (!LoadCustomSound(sound_name[i]))
     {
+      Error(ERR_WARN, "sounds deactivated");
+
       audio.sound_available = FALSE;
       audio.loops_available = FALSE;
       audio.sound_enabled = FALSE;
