@@ -66,7 +66,7 @@ static boolean InitAudioDevice_NetBSD();
 static boolean InitAudioDevice_HPUX();
 #elif defined(PLATFORM_MSDOS)
 static void SoundServer_InsertNewSound(struct SoundControl);
-static void SoundServer_StopSound(int);
+static void SoundServer_StopSound(struct SoundControl);
 static void SoundServer_StopAllSounds();
 #endif
 
@@ -233,27 +233,16 @@ void SoundServer(void)
       TreeInfo *ti = *ti_ptr;
       unsigned long str_size1, str_size2, str_size3;
 
-      printf("B\n");
-
       if (leveldir_current == NULL)
 	leveldir_current = checked_calloc(sizeof(TreeInfo));
-      printf("B.1\n");
       if (ti == NULL)
 	ti = *ti_ptr = checked_calloc(sizeof(TreeInfo));
-      printf("B.2\n");
       if (leveldir_current->fullpath != NULL)
 	free(leveldir_current->fullpath);
-      printf("B.3 ['%s']\n", ti->basepath);
-#if 0
       if (ti->basepath != NULL)
 	free(ti->basepath);
-#endif
-      printf("B.4\n");
       if (ti->fullpath != NULL)
 	free(ti->fullpath);
-      printf("B.5\n");
-
-      printf("C\n");
 
       if (read(audio.soundserver_pipe[0], set_name,
 	       snd_ctrl.data_len) != snd_ctrl.data_len ||
@@ -269,8 +258,6 @@ void SoundServer(void)
 	       sizeof(unsigned long)) != sizeof(unsigned long))
 	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
-      printf("D\n");
-
       leveldir_current->fullpath = checked_calloc(str_size1);
       ti->basepath = checked_calloc(str_size2);
       ti->fullpath = checked_calloc(str_size3);
@@ -283,13 +270,9 @@ void SoundServer(void)
 	       str_size3) != str_size3)
 	Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
-      printf("E\n");
-
       InitPlaylist();
 
       close(audio.device_fd);
-
-      printf("X\n");
 
       if (snd_ctrl.reload_sounds)
       {
@@ -718,7 +701,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       playing_sounds++;
 
 #if defined(PLATFORM_MSDOS)
-      playlist[i].voice = allocate_voice(playlist[i].data_ptr);
+      playlist[i].voice = allocate_voice((SAMPLE *)playlist[i].data_ptr);
 
       if (snd_ctrl.loop)
         voice_set_playmode(playlist[i].voice, PLAYMODE_LOOP);
@@ -1153,8 +1136,6 @@ SoundInfo *LoadCustomSound(char *basename)
     return FALSE;
   }
 
-  printf("-> '%s'\n", filename);
-
   return Load_WAV(filename);
 }
 
@@ -1223,9 +1204,9 @@ void LoadCustomMusic(void)
     char *filename = getPath2(music_directory, basename);
     MusicInfo *mus_info = NULL;
 
-    if (FileIsSound(filename))
+    if (FileIsSound(basename))
       mus_info = Load_WAV(filename);
-    else if (FileIsMusic(filename))
+    else if (FileIsMusic(basename))
       mus_info = Load_MOD(filename);
 
     free(filename);
@@ -1251,6 +1232,8 @@ void PlayMusic(int nr)
     return;
 
 #if defined(TARGET_SDL)
+
+  nr = nr % num_music;
 
   if (Music[nr]->type == MUS_TYPE_MOD)
   {
@@ -1448,31 +1431,33 @@ void StopSoundExt(int nr, int method)
 
 static void InitReloadSoundsOrMusic(char *set_name, int type)
 {
+#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
   struct SoundControl snd_ctrl = emptySoundControl;
   TreeInfo *ti =
     (type == SND_RELOAD_SOUNDS ? artwork.snd_current : artwork.mus_current);
   unsigned long str_size1 = strlen(leveldir_current->fullpath) + 1;
   unsigned long str_size2 = strlen(ti->basepath) + 1;
   unsigned long str_size3 = strlen(ti->fullpath) + 1;
+#endif
 
   if (!audio.sound_available)
     return;
 
-  if (leveldir_current == NULL)
+#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
+  if (type == SND_RELOAD_SOUNDS)
+    audio.func_reload_sounds();
+  else
+    audio.func_reload_music();
+#elif defined(PLATFORM_UNIX)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
+  if (leveldir_current == NULL)		/* should never happen */
     Error(ERR_EXIT, "leveldir_current == NULL");
 
   snd_ctrl.reload_sounds = (type == SND_RELOAD_SOUNDS);
   snd_ctrl.reload_music  = (type == SND_RELOAD_MUSIC);
   snd_ctrl.data_len = strlen(set_name) + 1;
-
-#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
-  if (type == SND_RELOAD_SOUNDS)
-    audio.audio.func_reload_sounds();
-  else
-    audio.audio.func_reload_music();
-#elif defined(PLATFORM_UNIX)
-  if (audio.soundserver_pid == 0)	/* we are child process */
-    return;
 
   if (write(audio.soundserver_pipe[1], &snd_ctrl,
 	    sizeof(snd_ctrl)) < 0 ||
@@ -1499,9 +1484,6 @@ static void InitReloadSoundsOrMusic(char *set_name, int type)
     audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
-
-  printf("A\n");
-
 #endif
 }
 
@@ -1567,7 +1549,9 @@ void FreeAllSounds()
     FreeSound(Sound[i]);
 
   free(Sound);
+
   Sound = NULL;
+  num_sounds = 0;
 }
 
 void FreeAllMusic()
@@ -1581,7 +1565,9 @@ void FreeAllMusic()
     FreeMusic(Music[i]);
 
   free(Music);
+
   Music = NULL;
+  num_music = 0;
 }
 
 /* THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS                          */

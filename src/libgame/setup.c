@@ -1649,12 +1649,12 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
   if (node_parent == NULL)		/* top level group */
   {
-    artwork_new->basepath = base_directory;
-    artwork_new->fullpath = artwork_new->filename;
+    artwork_new->basepath = getStringCopy(base_directory);
+    artwork_new->fullpath = getStringCopy(artwork_new->filename);
   }
   else					/* sub level group */
   {
-    artwork_new->basepath = node_parent->basepath;
+    artwork_new->basepath = getStringCopy(node_parent->basepath);
     artwork_new->fullpath = getPath2(node_parent->fullpath, directory_name);
   }
 

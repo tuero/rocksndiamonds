@@ -45,6 +45,7 @@ static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
 static void InitNetworkServer(void);
+static void InitSoundServer(void);
 static void InitSound(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
@@ -74,7 +75,7 @@ void OpenAll(void)
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
 
   InitCounter();
-  InitSound();
+  InitSoundServer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
@@ -89,6 +90,7 @@ void OpenAll(void)
 
   InitLevelInfo();
   InitGadgets();		/* needs to know number of level series */
+  InitSound();			/* needs to know current level directory */
 
   InitGfxBackground();
   InitToons();
@@ -155,62 +157,51 @@ static void ReloadCustomSounds()
 {
   int i;
 
-  printf("DEBUG: reloading sounds '%s' [%d] ...\n",
-	 artwork.sounds_set_current, audio.soundserver_pid);
-
 #if 1
+  printf("DEBUG: reloading sounds '%s' ...\n", artwork.sounds_set_current);
+#endif
+
   FreeAllSounds();
 
   InitSoundList(NUM_SOUNDS);
   for(i=0; i<NUM_SOUNDS; i++)
     LoadSoundToList(sound_name[i], i);
-#endif
 }
 
 static void ReloadCustomMusic()
 {
-  printf("DEBUG: reloading music '%s' [%d] ...\n",
-	 artwork.music_set_current, audio.soundserver_pid);
-
 #if 1
+  printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current);
+#endif
+
   FreeAllMusic();
 
   LoadCustomMusic();
-#endif
 }
 
-void InitSound()
+static void InitSoundServer()
 {
-  int i;
-
   OpenAudio();
   SetAudioReloadFunctions(ReloadCustomSounds, ReloadCustomMusic);
 
-#if 1
-  InitSoundList(NUM_SOUNDS);
-
-  for(i=0; i<NUM_SOUNDS; i++)
-    LoadSoundToList(sound_name[i], i);
-
-  LoadCustomMusic();
-#endif
-
   StartSoundserver();
-
-#if 0
-  InitReloadSounds(artwork.snd_current->name);
-  InitReloadMusic(artwork.mus_current->name);
-#endif
 }
 
-void InitTileClipmasks()
+static void InitSound()
+{
+  InitReloadSounds(artwork.snd_current->name);
+  InitReloadMusic(artwork.mus_current->name);
+}
+
+static void InitTileClipmasks()
 {
 #if defined(TARGET_X11)
-  GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
 
 #if defined(TARGET_X11_NATIVE)
+  GC copy_clipmask_gc;
+
   static struct
   {
     int start;
@@ -1629,9 +1620,9 @@ void CloseAllAndExit(int exit_value)
   int i;
 
   StopSounds();
-  CloseAudio();
   FreeAllSounds();
   FreeAllMusic();
+  CloseAudio();		/* called after freeing sounds (needed for SDL) */
 
   FreeTileClipmasks();
   for(i=0; i<NUM_BITMAPS; i++)

@@ -234,12 +234,19 @@ static DrawWindow *X11InitWindow()
 
 static void SetImageDimensions(Bitmap *bitmap)
 {
+#if defined(TARGET_ALLEGRO)
+  BITMAP *allegro_bitmap = (BITMAP *)(bitmap->drawable);
+
+  bitmap->width  = allegro_bitmap->w;
+  bitmap->height = allegro_bitmap->h;
+#else
   Window root;
   int x, y;
   unsigned int border_width, depth;
 
   XGetGeometry(display, bitmap->drawable, &root, &x, &y,
 	       &bitmap->width, &bitmap->height, &border_width, &depth);
+#endif
 }
 
 Bitmap *X11LoadImage(char *filename)
