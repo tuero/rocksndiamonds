@@ -25,10 +25,7 @@
 
 void GetPlayerConfig()
 {
-#if 0
   int old_joystick_nr = setup.input[0].joystick_nr;
-#endif
-
 
   if (sound_status == SOUND_OFF)
     setup.sound_on = FALSE;
@@ -41,26 +38,6 @@ void GetPlayerConfig()
 
   setup.sound_simple_on = setup.sound_on;
 
-
-#if 0
-  setup.sound_on = setup.sound_simple_on = SETUP_SOUND_ON(local_player->setup);
-  setup.sound_loops_on = SETUP_SOUND_LOOPS_ON(local_player->setup);
-  setup.sound_music_on = SETUP_SOUND_MUSIC_ON(local_player->setup);
-  setup.toons_on = SETUP_TOONS_ON(local_player->setup);
-  setup.direct_draw_on = SETUP_DIRECT_DRAW_ON(local_player->setup);
-  setup.fading_on = SETUP_FADING_ON(local_player->setup);
-  setup.autorecord_on = SETUP_AUTO_RECORD_ON(local_player->setup);
-
-#if 0
-  setup.joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
-#endif
-
-  setup.input[0].joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
-
-  setup.quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
-  setup.scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
-  setup.soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
-
 #ifndef MSDOS
   if (setup.input[0].joystick_nr != old_joystick_nr)
   {
@@ -69,9 +46,6 @@ void GetPlayerConfig()
     InitJoystick();
   }
 #endif
-
-#endif
-
 }
 
 void InitGame()
@@ -94,10 +68,6 @@ void InitGame()
     player->active = FALSE;
 
     player->action = 0;
-
-    /*
-    player->local = FALSE;
-    */
 
     player->score = 0;
     player->gems_still_needed = level.edelsteine;
@@ -140,23 +110,9 @@ void InitGame()
     DigField(player, 0,0,0,0,DF_NO_PUSH);
     SnapField(player, 0,0);
 
-
-    /* TEST TEST TEST */
-
-    /*
-    stored_player[i].active = TRUE;
-    */
-
-    /* TEST TEST TEST */
-
     player->LevelSolved = FALSE;
     player->GameOver = FALSE;
   }
-
-  /*
-  local_player->active = TRUE;
-  local_player->local = TRUE;
-  */
 
   network_player_action_received = FALSE;
 
@@ -207,10 +163,6 @@ void InitGame()
 	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
 	int jx = player->jx, jy = player->jy;
 
-	/*
-	player->active = TRUE;
-	*/
-
 	player->present = TRUE;
 	if (!network_playing || player->connected)
 	{
@@ -227,14 +179,6 @@ void InitGame()
 		 local_player->element_nr,
 		 local_player->active ? "active" : "not active");
 	}
-
-#if 0
-	/* remove potentially duplicate players */
-	if (StorePlayer[jx][jy] == Feld[x][y])
-	  StorePlayer[jx][jy] = 0;
-
-	StorePlayer[x][y] = Feld[x][y];
-#endif
 
 	Feld[x][y] = EL_LEERRAUM;
 	player->jx = player->last_jx = x;
@@ -348,6 +292,7 @@ void InitGame()
       }
     }
   }
+
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
@@ -582,23 +527,6 @@ void GameWon()
     TapeStop();
     SaveLevelTape(tape.level_nr);	/* Ask to save tape */
   }
-
-
-  /*
-  if (level_nr == local_player->handicap &&
-      level_nr < leveldir[leveldir_nr].levels-1)
-  { 
-    local_player->handicap++; 
-    bumplevel = TRUE;
-
-
-#if 0
-    SavePlayerInfo(PLAYER_LEVEL);
-#endif
-
-  }
-  */
-
 
   if ((hi_pos=NewHiScore()) >= 0) 
   {
@@ -3027,31 +2955,11 @@ void GameActions()
   {
     int actual_player_action = stored_player[i].action;
 
-    /* TEST TEST TEST */
-
-    /*
-    if (i != TestPlayer && !stored_player[i].MovPos)
-      actual_player_action = 0;
-    */
-
-    /*
-    if (!options.network && i != TestPlayer)
-      actual_player_action = 0;
-    */
-
-    /* TEST TEST TEST */
-
-
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
 
     PlayerActions(&stored_player[i], actual_player_action);
     ScrollFigure(&stored_player[i], SCROLL_GO_ON);
-
-    /*
-    stored_player[i].action = 0;
-    */
-
   }
 
   network_player_action_received = FALSE;
@@ -3060,12 +2968,6 @@ void GameActions()
 
   FrameCounter++;
   TimeFrames++;
-
-
-  /*
-  printf("FrameCounter == %d, RND(100) == %d\n", FrameCounter, RND(100));
-  */
-
 
   for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
   {

@@ -94,66 +94,17 @@ void InitLevelAndPlayerInfo()
 {
   int i;
 
-
-#if 0
-
-  /* initialize local setup */
-  setup.sound_on = TRUE;
-  setup.sound_loops_on = FALSE;
-  setup.sound_music_on = FALSE;
-  setup.sound_simple_on = FALSE;
-  setup.toons_on = TRUE;
-  setup.direct_draw_on = FALSE;
-  setup.scroll_delay_on = FALSE;
-  setup.soft_scrolling_on = TRUE;
-  setup.fading_on = FALSE;
-  setup.autorecord_on = FALSE;
-  setup.quick_doors = FALSE;
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    setup.input[i].use_joystick = FALSE;
-    setup.input[i].joystick_nr = 0;
-    setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
-    setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-    setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
-    setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
-    setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
-    setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
-    setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
-    setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
-  }
-
-#endif
-
-
-
   /* choose default local player */
   local_player = &stored_player[0];
+  for (i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].connected = FALSE;
+  local_player->connected = TRUE;
 
   if (!LoadLevelInfo())			/* global level info */
     Error(ERR_EXIT, NULL);
 
-
   LoadSetup();				/* global setup info */
   LoadLevelSetup();			/* info about last played level */
-
-
-#if 0
-  LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
-  LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
-#endif
-
-
-#if 0
-  /* after LoadPlayerInfo(), because it overwrites 'local_player' */
-#endif
-  for (i=0; i<MAX_PLAYERS; i++)
-  {
-    stored_player[i].connected = FALSE;
-    stored_player[i].local = FALSE;
-  }
-  local_player->connected = TRUE;
-  local_player->local = TRUE;
 }
 
 void InitNetworkServer()

@@ -35,9 +35,9 @@
 #ifdef   XPM_INCLUDE_FILE
 #include XPM_INCLUDE_FILE
 #endif
-#else
+#else	/* MSDOS */
 #include "msdos.h"
-#endif  /* #ifndef MSDOS */
+#endif  /* MSDOS */
 
 typedef unsigned char boolean;
 typedef unsigned char byte;
@@ -52,10 +52,10 @@ typedef unsigned char byte;
 #ifndef MSDOS
 #define WIN_XPOS	0
 #define WIN_YPOS	0
-#else
+#else	/* MSDOS */
 #define WIN_XPOS	((XRES - WIN_XSIZE) / 2)
 #define WIN_YPOS	((YRES - WIN_YSIZE) / 2)
-#endif
+#endif	/* MSDOS */
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
@@ -82,6 +82,7 @@ typedef unsigned char byte;
 #ifndef SIGN
 #define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
 #endif
+
 #define SCREENX(a)	((a) - scroll_x)
 #define SCREENY(a)	((a) - scroll_y)
 #define LEVELX(a)	((a) + scroll_x)
@@ -265,8 +266,7 @@ struct SetupFileList
 struct PlayerInfo
 {
   boolean present;		/* player present in level playfield */
-  boolean connected;		/* player connected locally or via network */
-  boolean local;		/* player connected locally */
+  boolean connected;		/* player connected (locally or via network) */
   boolean active;		/* player (present && connected) */
 
   int index_nr, client_nr, element_nr;
@@ -275,16 +275,6 @@ struct PlayerInfo
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
-
-
-#if 0
-  int handicap;
-  unsigned int setup;
-#endif
-
-
-  int leveldir_nr;
-  int level_nr;
 
   int jx,jy, last_jx,last_jy;
   int MovDir, MovPos, GfxPos;
@@ -1243,4 +1233,4 @@ extern int		num_bg_loops;
 #define ANIM_OSCILLATE	1
 #define ANIM_REVERSE	2
 
-#endif
+#endif	/* MAIN_H */

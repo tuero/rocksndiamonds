@@ -324,7 +324,6 @@ static void Handle_OP_YOUR_NUMBER()
 
     *new_local_player = *old_local_player;
     old_local_player->connected = FALSE;
-    old_local_player->local = FALSE;
 
     local_player = new_local_player;
   }
@@ -373,7 +372,6 @@ static void Handle_OP_NUMBER_WANTED()
 
       *new_player = *old_player;
       old_player->connected = FALSE;
-      old_player->local = FALSE;
     }
 
     u = finduser(old_client_nr);
@@ -484,7 +482,10 @@ static void Handle_OP_START_PLAYING()
 
   leveldir_nr = new_leveldir_nr;
 
+  /*
   local_player->leveldir_nr = leveldir_nr;
+  */
+
 
   /*
   SaveLevelSetup();

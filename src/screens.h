@@ -52,4 +52,4 @@ void HandleVideoButtons(int, int, int);
 void HandleSoundButtons(int, int, int);
 void HandleGameButtons(int, int, int);
 
-#endif
+#endif	/* SCREENS_H */

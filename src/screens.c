@@ -70,10 +70,22 @@ void DrawMainMenu()
   DrawGraphic(14,3,GFX_PFEIL_R);
 
   DrawText(SX+40+16,SY+326,"A Game by Artsoft Entertainment",FS_SMALL,FC_BLUE);
+
+  /*
   DrawText(SX+40+16,SY+344,"Graphics: Deluxe Paint IV Amiga",
 	   FS_SMALL,FC_BLUE);
   DrawText(SX+60+16,SY+362,"Sounds: AudioMaster IV Amiga",
 	   FS_SMALL,FC_BLUE);
+  */
+
+  if (leveldir[leveldir_nr].name)
+  {
+    int len = strlen(leveldir[leveldir_nr].name);
+    int lxpos = SX+(SXSIZE-len*FONT4_XSIZE)/2;
+    int lypos = SY+352;
+
+    DrawText(lxpos,lypos,leveldir[leveldir_nr].name,FS_SMALL,FC_SPECIAL2);
+  }
 
   FadeToFront();
   InitAnimation();
@@ -151,13 +163,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     level_nr = new_level_nr;
 
-
-    /*
-    if (level_nr > local_player->handicap)
-      level_nr = local_player->handicap;
-    */
-
-
     DrawTextExt(drawto,gc,SX+11*32,SY+3*32,
 		int2str(level_nr,3), FS_BIG,FC_RED);
     DrawTextExt(window,gc,SX+11*32,SY+3*32,
@@ -198,15 +203,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (num_leveldirs)
 	{
 	  game_status = CHOOSELEVEL;
-
-
 	  SaveLevelSetup();
-
-#if 0
-	  SavePlayerInfo(PLAYER_LEVEL);
-#endif
-
-
 	  DrawChooseLevel();
 	}
       }
@@ -247,13 +244,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==10)
       {
-
 	SaveLevelSetup();
-
-#if 0
-	SavePlayerInfo(PLAYER_LEVEL);
-#endif
-
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
@@ -701,24 +692,6 @@ void HandleHelpScreen(int button)
   BackToFront();
 }
 
-
-#if 0
-void CheckCheat()
-{
-  int old_handicap = local_player->handicap;
-
-  if (!strcmp(local_player->alias_name,"Artsoft"))
-    local_player->handicap = leveldir[leveldir_nr].levels-1;
-
-  if (local_player->handicap != old_handicap)
-  {
-    SavePlayerInfo(PLAYER_LEVEL);
-    level_nr = local_player->handicap;
-  }
-}
-#endif
-
-
 void HandleTypeName(int newxpos, KeySym key)
 {
   static int xpos = 0, ypos = 2;
@@ -765,27 +738,10 @@ void HandleTypeName(int newxpos, KeySym key)
     DrawText(SX+6*32,SY+ypos*32,local_player->alias_name,FS_BIG,FC_RED);
     DrawGraphic(xpos+6,ypos,GFX_LEERRAUM);
 
-
     SaveSetup();
-
-
-#if 0
-    SavePlayerInfo(PLAYER_SETUP);
-#endif
-
-
-
-#if 0
-    CheckCheat();
-#endif
-
-
     game_status = MAINMENU;
-/*
-    DrawMainMenu();
-*/
-
   }
+
   BackToFront();
 }
 
@@ -864,20 +820,8 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     }
     else
     {
-      local_player->leveldir_nr = leveldir_nr = y-3;
-
+      leveldir_nr = y-3;
       SaveLevelSetup();
-
-      /*
-      LoadPlayerInfo(PLAYER_LEVEL);
-      SavePlayerInfo(PLAYER_SETUP);
-      */
-
-
-#if 0
-      CheckCheat();
-#endif
-
 
       TapeErase();
       LoadLevelTape(level_nr);
@@ -887,6 +831,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       redraw = TRUE;
     }
   }
+
   BackToFront();
 
   if (game_status==CHOOSELEVEL)
@@ -940,67 +885,32 @@ void HandleHallOfFame(int button)
 void DrawSetupScreen()
 {
   int i;
-
-
-#if 0
-  static struct setup
-  {
-    unsigned int bit;
-    char *text, *mode[2];
-    int color[2];
-  } setup[] =
-  {
-    {SETUP_SOUND,	"Sound:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_SOUND_LOOPS,	" Sound Loops:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_SOUND_MUSIC,	" Game Music:", {"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_TOONS,	"Toons:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_DIRECT_DRAW,	"Buffered gfx:",{"off","on" },	{FC_BLUE,FC_YELLOW}},
-    {SETUP_SCROLL_DELAY,"Scroll Delay:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_SOFT_SCROLL,	"Soft Scroll.:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_FADING,	"Fading:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_QUICK_DOORS,	"Quick Doors:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {SETUP_AUTO_RECORD,	"Auto-Record:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
-    {0,			"Input Devices",{"",   ""},	{0,0}},
-    {0,			"",		{"",   ""},	{0,0}},
-    {0,			"",		{"",   ""},	{0,0}},
-    {0,			"Exit",		{"",   ""},	{0,0}},
-    {0,			"Save and exit",{"",   ""},	{0,0}}
-  };
-#endif
-
   static struct setup
   {
     boolean *value;
     char *text, *mode[2];
-    int color[2];
   } setup_info[] =
   {
-    { &setup.sound_on,	"Sound:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.sound_loops_on," Sound Loops:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.sound_music_on," Game Music:", {"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.toons_on,	"Toons:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.direct_draw_on,"Buffered gfx:",{"off","on" },{FC_BLUE,FC_YELLOW}},
-    { &setup.scroll_delay_on,"Scroll Delay:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.soft_scrolling_on,	"Soft Scroll.:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.fading_on,	"Fading:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.quick_doors,"Quick Doors:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { &setup.autorecord_on,"Auto-Record:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
-    { NULL,		"Input Devices",{"",   ""},	{0,0}},
-    { NULL,		"",		{"",   ""},	{0,0}},
-    { NULL,		"",		{"",   ""},	{0,0}},
-    { NULL,		"Exit",		{"",   ""},	{0,0}},
-    { NULL,		"Save and exit",{"",   ""},	{0,0}}
+    { &setup.sound_on,		"Sound:",	{ "on", "off" } },
+    { &setup.sound_loops_on,	" Sound Loops:",{ "on", "off" } },
+    { &setup.sound_music_on,	" Game Music:", { "on", "off" } },
+    { &setup.toons_on,		"Toons:",	{ "on", "off" } },
+    { &setup.direct_draw_on,	"Buffered gfx:",{ "off","on"  } },
+    { &setup.scroll_delay_on,	"Scroll Delay:",{ "on", "off" } },
+    { &setup.soft_scrolling_on,	"Soft Scroll.:",{ "on", "off" } },
+    { &setup.fading_on,		"Fading:",	{ "on", "off" } },
+    { &setup.quick_doors,	"Quick Doors:",	{ "on", "off" } },
+    { &setup.autorecord_on,	"Auto-Record:",	{ "on", "off" } },
+    { NULL,			"Input Devices",{ "",   ""    } },
+    { NULL,			"",		{ "",   ""    } },
+    { NULL,			"",		{ "",   ""    } },
+    { NULL,			"Exit",		{ "",   ""    } },
+    { NULL,			"Save and exit",{ "",   ""    } }
   };
 
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
   DrawText(SX+16, SY+16, "SETUP",FS_BIG,FC_YELLOW);
-
-
-  /*
-  printf("setup.sound_loops_on == %d\n", setup.sound_loops_on);
-  */
-
 
   for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
   {
@@ -1012,21 +922,14 @@ void DrawSetupScreen()
       DrawText(SX+32,SY+i*32, setup_info[base].text, FS_BIG,FC_GREEN);
     }
 
-#if 0
-    if (i < SETUP_SCREEN_POS_EMPTY1)
-    {
-      int setting_bit = setup_info[base].bit;
-      int setting_pos = ((local_player->setup & setting_bit) != 0 ? 0 : 1);
-    }
-#endif
-
     if (setup_info[base].value)
     {
       int setting_value = *setup_info[base].value;
       int setting_pos = (setting_value != 0 ? 0 : 1);
+      int fc_on = (strcmp(setup_info[base].mode[setting_pos], "on") == 0);
 
-      DrawText(SX+14*32, SY+i*32,setup_info[base].mode[setting_pos],
-	       FS_BIG,setup_info[base].color[setting_pos]);
+      DrawText(SX+14*32, SY+i*32, setup_info[base].mode[setting_pos],
+	       FS_BIG, (fc_on ? FC_YELLOW : FC_BLUE));
     }
   }
 
@@ -1202,15 +1105,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       {
         if (y==pos_end)
 	{
-
-
 	  SaveSetup();
-
-
-#if 0
-	  SavePlayerInfo(PLAYER_SETUP);
-#endif
-
 	  SaveJoystickData();
 	}
 
@@ -2143,30 +2038,6 @@ void HandleGameButtons(int mx, int my, int button)
       }
       else
 	TapeTogglePause();
-
-      /*
-      if (tape.pausing)
-      {
-	if (options.network)
-	  SendToServer_ContinuePlaying();
-	else
-	{
-	  tape.pausing = FALSE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
-	}
-      }
-      else
-      {
-	if (options.network)
-	  SendToServer_PausePlaying();
-	else
-	{
-	  tape.pausing = TRUE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
-	}
-      }
-      */
-
       break;
 
     case BUTTON_GAME_PLAY:
