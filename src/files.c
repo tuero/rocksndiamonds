@@ -1603,7 +1603,7 @@ void LoadLevelTemplate(int nr)
   struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
   char *filename = level_file_info->filename;
 
-  LoadLevelFromFileInfo(&level, level_file_info);
+  LoadLevelFromFileInfo(&level_template, level_file_info);
 #else
   char *filename = getDefaultLevelFilename(nr);
 
