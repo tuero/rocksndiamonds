@@ -141,14 +141,14 @@
 #define ED_SCROLL_LEFT_YPOS		(SYSIZE - 2 * ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_RIGHT_XPOS		(SXSIZE - 2 * ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_RIGHT_YPOS		ED_SCROLL_LEFT_YPOS
-#define ED_SCROLL_VERTICAL_XPOS		ED_SCROLL_UP_XPOS
-#define ED_SCROLL_VERTICAL_YPOS	  (ED_SCROLL_UP_YPOS + ED_SCROLLBUTTON_YSIZE)
-#define ED_SCROLL_VERTICAL_XSIZE	ED_SCROLLBUTTON_XSIZE
-#define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 #define ED_SCROLL_HORIZONTAL_XPOS (ED_SCROLL_LEFT_XPOS + ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_HORIZONTAL_YPOS	ED_SCROLL_LEFT_YPOS
 #define ED_SCROLL_HORIZONTAL_XSIZE	(SXSIZE - 3 * ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_HORIZONTAL_YSIZE	ED_SCROLLBUTTON_YSIZE
+#define ED_SCROLL_VERTICAL_XPOS		ED_SCROLL_UP_XPOS
+#define ED_SCROLL_VERTICAL_YPOS	  (ED_SCROLL_UP_YPOS + ED_SCROLLBUTTON_YSIZE)
+#define ED_SCROLL_VERTICAL_XSIZE	ED_SCROLLBUTTON_XSIZE
+#define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 
 /* control button identifiers */
 #define GADGET_ID_NONE			-1
@@ -223,8 +223,8 @@
 #define GADGET_ID_SCROLL_DOWN		59
 #define GADGET_ID_SCROLL_LEFT		60
 #define GADGET_ID_SCROLL_RIGHT		61
-#define GADGET_ID_SCROLL_VERTICAL	62
-#define GADGET_ID_SCROLL_HORIZONTAL	63
+#define GADGET_ID_SCROLL_HORIZONTAL	62
+#define GADGET_ID_SCROLL_VERTICAL	63
 
 /* gadgets for scrolling element list */
 #define GADGET_ID_ELEMENTLIST_UP	64
@@ -246,13 +246,28 @@
 #define ED_COUNTER_ID_LEVEL_TIMELIMIT	6
 #define ED_COUNTER_ID_LEVEL_TIMESCORE	7
 
+#define ED_NUM_COUNTERBUTTONS		8
+
+/* values for scrollbutton gadgets */
+#define ED_SCROLLBUTTON_AREA_UP		0
+#define ED_SCROLLBUTTON_AREA_DOWN	1
+#define ED_SCROLLBUTTON_AREA_LEFT	2
+#define ED_SCROLLBUTTON_AREA_RIGHT	3
+#define ED_SCROLLBUTTON_LIST_UP		4
+#define ED_SCROLLBUTTON_LIST_DOWN	5
+
+#define ED_NUM_SCROLLBUTTONS		6
+
+/* values for scrollbar gadgets */
+#define ED_SCROLLBAR_HORIZONTAL		0
+#define ED_SCROLLBAR_VERTICAL		1
+
+#define ED_NUM_SCROLLBARS		2
+
 /* values for text input gadgets */
 #define ED_TEXTINPUT_ID_LEVEL_NAME	0
 #define ED_TEXTINPUT_ID_LEVEL_AUTHOR	1
 
-#define ED_NUM_COUNTERBUTTONS		8
-#define ED_NUM_SCROLLBUTTONS		6
-#define ED_NUM_SCROLLBARS		2
 #define ED_NUM_TEXTINPUT		2
 
 /* values for CopyLevelToUndoBuffer() */
@@ -462,21 +477,38 @@ static struct
 {
   {
     ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
-    ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
-    ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
-    GD_TYPE_SCROLLBAR_VERTICAL,
-    GADGET_ID_SCROLL_VERTICAL,
-    "scroll level editing area vertically"
-  },
-  {
-    ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
     ED_SCROLL_HORIZONTAL_XPOS,	ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,	ED_SCROLL_HORIZONTAL_YSIZE,
     GD_TYPE_SCROLLBAR_HORIZONTAL,
     GADGET_ID_SCROLL_HORIZONTAL,
     "scroll level editing area horizontally"
   },
+  {
+    ED_SCROLLBAR_XPOS,		ED_SCROLLBAR_YPOS,
+    ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
+    ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
+    GD_TYPE_SCROLLBAR_VERTICAL,
+    GADGET_ID_SCROLL_VERTICAL,
+    "scroll level editing area vertically"
+  },
 };
+
+/* maximal size of level editor drawing area */
+#define MAX_ED_FIELDX		(2 * SCR_FIELDX)
+#define MAX_ED_FIELDY		(2 * SCR_FIELDY - 1)
+
+/*
+#define ED_FIELDX	(2 * SCR_FIELDX - 1)
+#define ED_FIELDY	(2 * SCR_FIELDY - 2)
+*/
+
+/* actual size of level editor drawing area */
+static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
+
+/* actual position of level editor drawing area in level playfield */
+static int level_xpos = -1, level_ypos = -1;
+
+#define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldx)
 
 /* forward declaration for internal use */
 static void DrawDrawingWindow();
@@ -510,9 +542,7 @@ static int random_placement_method = RANDOM_USE_PERCENTAGE;
 static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
 #endif
 
-static int level_xpos, level_ypos;
 static int edit_mode;
-static boolean name_typing;
 static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
 static int new_element3 = EL_ERDREICH;
@@ -896,20 +926,20 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
   XCopyArea(display, drawto, drawto, gc,
 	    SX + (dx == -1 ? MINI_TILEX : 0),
 	    SY + (dy == -1 ? MINI_TILEY : 0),
-	    (ED_FIELDX * MINI_TILEX) - (dx != 0 ? MINI_TILEX : 0),
-	    (ED_FIELDY * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
+	    (ed_fieldx * MINI_TILEX) - (dx != 0 ? MINI_TILEX : 0),
+	    (ed_fieldy * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
 	    SX + (dx == +1 ? MINI_TILEX : 0),
 	    SY + (dy == +1 ? MINI_TILEY : 0));
   if (dx)
   {
-    x = (dx == 1 ? 0 : ED_FIELDX - 1);
-    for(y=0; y<ED_FIELDY; y++)
+    x = (dx == 1 ? 0 : ed_fieldx - 1);
+    for(y=0; y<ed_fieldy; y++)
       DrawMiniElementOrWall(x, y, from_x, from_y);
   }
   else if (dy)
   {
-    y = (dy == 1 ? 0 : ED_FIELDY - 1);
-    for(x=0; x<ED_FIELDX; x++)
+    y = (dy == 1 ? 0 : ed_fieldy - 1);
+    for(x=0; x<ed_fieldx; x++)
       DrawMiniElementOrWall(x, y, from_x, from_y);
   }
 
@@ -1225,7 +1255,7 @@ static void CreateDrawingAreas()
 		    GDI_X, SX,
 		    GDI_Y, SY,
 		    GDI_TYPE, GD_TYPE_DRAWING_AREA,
-		    GDI_AREA_SIZE, ED_FIELDX, ED_FIELDY,
+		    GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
 		    GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
 		    GDI_EVENT_MASK, event_mask,
 		    GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
@@ -1339,14 +1369,14 @@ static void CreateScrollbarGadgets()
 
     if (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL)
     {
-      items_max = MAX(lev_fieldx + 2, ED_FIELDX);
-      items_visible = ED_FIELDX;
+      items_max = MAX(lev_fieldx + 2, ed_fieldx);
+      items_visible = ed_fieldx;
       item_position = 0;
     }
     else
     {
-      items_max = MAX(lev_fieldy + 2, ED_FIELDY);
-      items_visible = ED_FIELDY;
+      items_max = MAX(lev_fieldy + 2, ed_fieldy);
+      items_visible = ed_fieldy;
       item_position = 0;
     }
 
@@ -1420,13 +1450,29 @@ static void MapTextInputGadget(int id)
 
 static void MapMainDrawingArea()
 {
+  boolean no_horizontal_scrollbar = (lev_fieldx + 2 <= ed_fieldx);
+  boolean no_vertical_scrollbar = (lev_fieldy + 2 <= ed_fieldy);
   int i;
 
   for (i=0; i<ED_NUM_SCROLLBUTTONS; i++)
+  {
+    if (((i == ED_SCROLLBUTTON_AREA_LEFT || i == ED_SCROLLBUTTON_AREA_RIGHT) &&
+	 no_horizontal_scrollbar) ||
+	((i == ED_SCROLLBUTTON_AREA_UP || i == ED_SCROLLBUTTON_AREA_DOWN) &&
+	 no_vertical_scrollbar))
+      continue;
+
     MapGadget(level_editor_gadget[scrollbutton_info[i].gadget_id]);
+  }
 
   for (i=0; i<ED_NUM_SCROLLBARS; i++)
+  {
+    if ((i == ED_SCROLLBAR_HORIZONTAL && no_horizontal_scrollbar) ||
+	(i == ED_SCROLLBAR_VERTICAL && no_vertical_scrollbar))
+      continue;
+
     MapGadget(level_editor_gadget[scrollbar_info[i].gadget_id]);
+  }
 
   MapDrawingArea(GADGET_ID_DRAWING_LEVEL);
 }
@@ -1458,7 +1504,6 @@ void DrawLevelEd()
   int i, x, y, graphic;
 
   edit_mode = ED_MODE_DRAWING;
-  name_typing = FALSE;
 
   CloseDoor(DOOR_CLOSE_ALL);
 
@@ -1486,7 +1531,7 @@ void DrawLevelEd()
   }
 
   /*
-  DrawMiniLevel(level_xpos, level_ypos);
+  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   FadeToFront();
   */
 
@@ -1582,7 +1627,11 @@ void DrawLevelEd()
   */
 }
 
-void DrawControlWindow()
+
+
+#if 0
+
+static void DrawControlWindow()
 {
   int i,x,y;
 
@@ -1741,38 +1790,104 @@ void DrawControlWindow()
 	   int2str(level.fieldy,3),FS_SMALL,FC_YELLOW);
 }
 
-void AdjustLevelScrollPosition()
+#endif
+
+
+
+static void AdjustDrawingAreaGadgets()
+{
+  int ed_xsize = lev_fieldx + 2;
+  int ed_ysize = lev_fieldy + 2;
+  int max_ed_fieldx = MAX_ED_FIELDX;
+  int max_ed_fieldy = MAX_ED_FIELDY;
+  boolean horizontal_scrollbar_needed;
+  boolean vertical_scrollbar_needed;
+  int x, y, width, height;
+  int xoffset, yoffset;
+
+  /* check if we need any scrollbars */
+  horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
+  vertical_scrollbar_needed = (ed_ysize > max_ed_fieldy);
+
+  /* check if we have a smaller editor field because of scrollbars */
+  if (horizontal_scrollbar_needed)
+    max_ed_fieldy = MAX_ED_FIELDY - 1;
+  if (vertical_scrollbar_needed)
+    max_ed_fieldx = MAX_ED_FIELDX - 1;
+
+  /* check again if we now need more scrollbars because of less space */
+  horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
+  vertical_scrollbar_needed = (ed_ysize > max_ed_fieldy);
+
+  /* check if editor field gets even smaller after adding new scrollbars */
+  if (horizontal_scrollbar_needed)
+    max_ed_fieldy = MAX_ED_FIELDY - 1;
+  if (vertical_scrollbar_needed)
+    max_ed_fieldx = MAX_ED_FIELDX - 1;
+
+  ed_fieldx = (ed_xsize < MAX_ED_FIELDX ? ed_xsize : max_ed_fieldx);
+  ed_fieldy = (ed_ysize < MAX_ED_FIELDY ? ed_ysize : max_ed_fieldy);
+
+  ModifyGadget(level_editor_gadget[GADGET_ID_DRAWING_LEVEL],
+	       GDI_WIDTH, ed_fieldx * MINI_TILEX,
+	       GDI_HEIGHT, ed_fieldy * MINI_TILEY,
+	       GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
+	       GDI_END);
+
+  xoffset = (ed_fieldx == MAX_ED_FIELDX ? ED_SCROLLBUTTON_XSIZE : 0);
+  yoffset = (ed_fieldy == MAX_ED_FIELDY ? ED_SCROLLBUTTON_YSIZE : 0);
+
+  x = SX + scrollbutton_info[ED_SCROLLBUTTON_AREA_RIGHT].x + xoffset;
+  y = SX + scrollbutton_info[ED_SCROLLBUTTON_AREA_DOWN].y + yoffset;
+
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_RIGHT], GDI_X, x, GDI_END);
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_DOWN], GDI_Y, y, GDI_END);
+
+  width = scrollbar_info[ED_SCROLLBAR_HORIZONTAL].width + xoffset;
+  height = scrollbar_info[ED_SCROLLBAR_VERTICAL].height + yoffset;
+
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
+	       GDI_WIDTH, width,
+	       GDI_SCROLLBAR_ITEMS_VISIBLE, ed_fieldx,
+	       GDI_END);
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_VERTICAL],
+	       GDI_HEIGHT, height,
+	       GDI_SCROLLBAR_ITEMS_VISIBLE, ed_fieldy,
+	       GDI_END);
+}
+
+static void AdjustLevelScrollPosition()
 {
   if (level_xpos < -1)
     level_xpos = -1;
-  if (level_xpos > lev_fieldx - ED_FIELDX + 1)
-    level_xpos = lev_fieldx - ED_FIELDX + 1;
-  if (lev_fieldx < ED_FIELDX - 2)
+  if (level_xpos > lev_fieldx - ed_fieldx + 1)
+    level_xpos = lev_fieldx - ed_fieldx + 1;
+  if (lev_fieldx < ed_fieldx - 2)
     level_xpos = -1;
 
   if (level_ypos < -1)
     level_ypos = -1;
-  if (level_ypos > lev_fieldy - ED_FIELDY + 1)
-    level_ypos = lev_fieldy - ED_FIELDY + 1;
-  if (lev_fieldy < ED_FIELDY - 2)
+  if (level_ypos > lev_fieldy - ed_fieldy + 1)
+    level_ypos = lev_fieldy - ed_fieldy + 1;
+  if (lev_fieldy < ed_fieldy - 2)
     level_ypos = -1;
 }
 
-void AdjustEditorScrollbar(int id)
+static void AdjustEditorScrollbar(int id)
 {
   struct GadgetInfo *gi = level_editor_gadget[id];
   int items_max, items_visible, item_position;
 
   if (id == GADGET_ID_SCROLL_HORIZONTAL)
   {
-    items_max = MAX(lev_fieldx + 2, ED_FIELDX);
-    items_visible = ED_FIELDX;
+    items_max = MAX(lev_fieldx + 2, ed_fieldx);
+    items_visible = ed_fieldx;
     item_position = level_xpos + 1;
   }
   else
   {
-    items_max = MAX(lev_fieldy + 2, ED_FIELDY);
-    items_visible = ED_FIELDY;
+    items_max = MAX(lev_fieldy + 2, ed_fieldy);
+    items_visible = ed_fieldy;
     item_position = level_ypos + 1;
   }
 
@@ -1783,7 +1898,7 @@ void AdjustEditorScrollbar(int id)
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
-void ModifyEditorTextInput(int textinput_id, char *new_text)
+static void ModifyEditorTextInput(int textinput_id, char *new_text)
 {
   int gadget_id = textinput_info[textinput_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
@@ -1791,7 +1906,7 @@ void ModifyEditorTextInput(int textinput_id, char *new_text)
   ModifyGadget(gi, GDI_TEXT_VALUE, new_text, GDI_END);
 }
 
-void ModifyEditorCounter(int counter_id, int new_value)
+static void ModifyEditorCounter(int counter_id, int new_value)
 {
   int *counter_value = *counterbutton_info[counter_id].counter_value;
   int gadget_id = counterbutton_info[counter_id].gadget_id_text;
@@ -1836,669 +1951,6 @@ static void PickDrawingElement(int button, int element)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-void LevelEd(int mx, int my, int button)
-{
-  static int last_button = 0;
-
-  /*
-  static int in_field_pressed = FALSE;
-  */
-
-  static boolean use_floodfill = FALSE;
-
-
-  /*
-  int x = (mx-SX)/MINI_TILEX; 
-  int y = (my-SY)/MINI_TILEY; 
-  */
-
-  /*
-  HandlePressedControlButtons();
-  HandleDrawingFunctions(mx, my, button);
-  */
-
-  if (use_floodfill)		/********** FLOOD FILL **********/
-  {
-
-
-#if 0
-
-    if (button)
-    {
-      if (mx>=SX && mx<SX+SXSIZE && my>=SY && my<SY+SYSIZE)
-      {
-	int from_x, from_y;
-	int fill_element;
-
-	if (x>lev_fieldx || y>lev_fieldy ||
-	    (x==0 && level_xpos<0) ||
-	    (x==ED_FIELDX-1 && level_xpos>lev_fieldx-ED_FIELDX) ||
-	    (y==0 && level_ypos<0) ||
-	    (y==ED_FIELDY-1 && level_ypos>lev_fieldy-ED_FIELDY))
-	  return;
-
-	from_x = x+level_xpos;
-	from_y = y+level_ypos;
-	fill_element = (button==1 ? new_element1 :
-			button==2 ? new_element2 :
-			button==3 ? new_element3 : 0);
-
-	FloodFill(from_x,from_y,fill_element);
-	DrawMiniLevel(level_xpos,level_ypos);
-      }
-
-      use_floodfill = FALSE;
-      CloseDoor(DOOR_CLOSE_1);
-      OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
-    }
-    return;
-
-#endif
-
-
-
-  }
-  else				/********** EDIT/CTRL-FENSTER **********/
-  {
-
-
-#if 0
-    static unsigned long choice_delay = 0;
-    int choice = CheckElemButtons(mx,my,button);
-    int elem_pos = choice-ED_BUTTON_ELEM;
-
-    if (((choice == ED_BUTTON_EUP && element_shift>0) ||
-	 (choice == ED_BUTTON_EDOWN &&
-	  element_shift<elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)) &&
-	DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-    {
-      int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-      int i;
-
-      step = step * MAX_ELEM_X * (choice == ED_BUTTON_EUP ? -1 : +1);
-      element_shift += step;
-
-      if (element_shift<0)
-	element_shift = 0;
-      if (element_shift>elements_in_list-MAX_ELEM_X*MAX_ELEM_Y)
-	element_shift = elements_in_list-MAX_ELEM_X*MAX_ELEM_Y;
-      if (element_shift % MAX_ELEM_X)
-	element_shift += MAX_ELEM_X-(element_shift % MAX_ELEM_X);
-
-      for(i=0;i<MAX_ELEM_X*MAX_ELEM_Y;i++)
-	DrawElemButton(i+2,ED_BUTTON_RELEASED);
-    }
-    else if (elem_pos>=0 && elem_pos<MAX_ELEM_X*MAX_ELEM_Y)
-    {
-      int new_element;
-
-      if (elem_pos+element_shift < elements_in_list)
-	new_element = editor_element[elem_pos+element_shift];
-      else
-	new_element = EL_LEERRAUM;
-
-      PickDrawingElement(last_button, new_element);
-
-      if (!HAS_CONTENT(properties_element))
-      {
-	properties_element = new_element;
-	if (edit_mode == ED_MODE_PROPERTIES)
-	  DrawPropertiesWindow();
-      }
-    }
-#endif
-
-
-  
-    if (edit_mode == ED_MODE_DRAWING)	/********** EDIT-FENSTER **********/
-    {
-
-
-
-#if 0
-
-      switch(CheckEditButtons(mx,my,button))
-      {
-	case ED_BUTTON_CTRL:
-	  CloseDoor(DOOR_CLOSE_2);
-	  DrawControlWindow();
-	  XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
-		    DOOR_GFX_PAGEX4,DOOR_GFX_PAGEY1+80,
-		    VXSIZE,VYSIZE,
-		    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
-	  OpenDoor(DOOR_OPEN_2);
-	  edit_mode = ED_MODE_INFO;
-	  break;
-	case ED_BUTTON_FILL:
-	  Request("Caution ! Flood fill mode ! Choose area !",REQ_OPEN);
-	  use_floodfill = TRUE;
-	  return;
-	  break;
-	case ED_BUTTON_LEFT:
-	  if (level_xpos>=0)
-	  {
-	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-	      break;
-	    if (lev_fieldx<ED_FIELDX-2)
-	      break;
-
-	    level_xpos -= (button==1 ? 1 : button==2 ? 5 : lev_fieldx);
-	    if (level_xpos<-1)
-	      level_xpos = -1;
-	    if (button==1)
-	      ScrollMiniLevel(level_xpos,level_ypos,ED_SCROLL_RIGHT);
-	    else
-	      DrawMiniLevel(level_xpos,level_ypos);
-	  }
-	  break;
-	case ED_BUTTON_RIGHT:
-	  if (level_xpos<=lev_fieldx-ED_FIELDX)
-	  {
-	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-	      break;
-	    if (lev_fieldx<ED_FIELDX-2)
-	      break;
-
-	    level_xpos += (button==1 ? 1 : button==2 ? 5 : lev_fieldx);
-	    if (level_xpos>lev_fieldx-ED_FIELDX+1)
-	      level_xpos = lev_fieldx-ED_FIELDX+1;
-	    if (button==1)
-	      ScrollMiniLevel(level_xpos,level_ypos,ED_SCROLL_LEFT);
-	    else
-	      DrawMiniLevel(level_xpos,level_ypos);
-	  }
-	  break;
-	case ED_BUTTON_UP:
-	  if (level_ypos>=0)
-	  {
-	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-	      break;
-	    if (lev_fieldy<ED_FIELDY-2)
-	      break;
-
-	    level_ypos -= (button==1 ? 1 : button==2 ? 5 : lev_fieldy);
-	    if (level_ypos<-1)
-	      level_ypos = -1;
-	    if (button==1)
-	      ScrollMiniLevel(level_xpos,level_ypos,ED_SCROLL_DOWN);
-	    else
-	      DrawMiniLevel(level_xpos,level_ypos);
-	  }
-	  break;
-	case ED_BUTTON_DOWN:
-	  if (level_ypos<=lev_fieldy-ED_FIELDY)
-	  {
-	    if (!DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-	      break;
-	    if (lev_fieldy<ED_FIELDY-2)
-	      break;
-
-	    level_ypos += (button==1 ? 1 : button==2 ? 5 : lev_fieldy);
-	    if (level_ypos>lev_fieldy-ED_FIELDY+1)
-	      level_ypos = lev_fieldy-ED_FIELDY+1;
-	    if (button==1)
-	      ScrollMiniLevel(level_xpos,level_ypos,ED_SCROLL_UP);
-	    else
-	      DrawMiniLevel(level_xpos,level_ypos);
-	  }
-	  break;
-	default:
-	  break;
-      }
-
-#endif
-
-
-
-#if 0
-
-      if (mx>=SX && mx<SX+SXSIZE && my>=SY && my<SY+SYSIZE)
-      {
-	int new_element;
-
-	if (button && !motion_status)
-	  in_field_pressed = TRUE;
-
-	if (!button || !in_field_pressed || button<1 || button>3 ||
-	    (y==0 && level_ypos<0) ||
-	    (y==ED_FIELDY-1 && level_ypos>lev_fieldy-ED_FIELDY) ||
-	    (x==0 && level_xpos<0) ||
-	    (x==ED_FIELDX-1 && level_xpos>lev_fieldx-ED_FIELDX) ||
-	    x>lev_fieldx || y>lev_fieldy)
-	  return;
-
-	new_element = (button==1 ? new_element1 :
-		       button==2 ? new_element2 :
-		       button==3 ? new_element3 : 0);
-
-	if (new_element != Feld[x+level_xpos][y+level_ypos])
-	{
-	  if (new_element==EL_SPIELFIGUR) /* Jeder nur EINE Figur bitte... */
-	  {
-	    int x,y;
-
-	    for(x=0;x<lev_fieldx;x++) for(y=0;y<lev_fieldy;y++)
-	    {
-	      if (Feld[x][y]==EL_SPIELFIGUR || Feld[x][y]==EL_SPIELER1)
-	      {
-		Feld[x][y] = EL_LEERRAUM;
-		if (x-level_xpos>=0 && x-level_xpos<ED_FIELDX &&
-		    y-level_ypos>=0 && y-level_ypos<ED_FIELDY)
-		  DrawMiniElement(x-level_xpos,y-level_ypos,EL_LEERRAUM);
-	      }
-	    }
-	  }
-
-	  Feld[x+level_xpos][y+level_ypos] = new_element;
-	  DrawMiniElement(x,y,new_element);
-	}
-      }
-      else if (!motion_status)	/* Mauszeiger nicht im Level-Feld */
-	in_field_pressed = FALSE;
-
-#endif
-
-
-
-    }
-    else if (edit_mode == ED_MODE_INFO)/********** KONTROLL-FENSTER **********/
-    {
-
-
-#if 0
-
-      int choice = CheckCountButtons(mx,my,button);
-      int step = (button==1 ? 1 : button==2 ? 5 : button==3 ? 10 : 0);
-
-      if (choice >= 0 && choice < 36 &&
-	  DelayReached(&choice_delay, GADGET_FRAME_DELAY))
-      {
-	if (!(choice % 2))
-	  step = -step;
-
-	choice /= 2;
-
-	if (choice<11)
-	{
-	  level.score[choice] += step;
-	  if (level.score[choice]<0)
-	    level.score[choice] = 0;
-	  else if (level.score[choice]>255)
-	    level.score[choice] = 255;
-	}
-	else if (choice==11)
-	{
-	  level.tempo_amoebe += step;
-	  if (level.tempo_amoebe<0)
-	    level.tempo_amoebe = 0;
-	  else if (level.tempo_amoebe>255)
-	    level.tempo_amoebe = 255;
-	}
-	else if (choice==12)
-	{
-	  level.dauer_sieb += step;
-	  if (level.dauer_sieb<0)
-	    level.dauer_sieb = 0;
-	  else if (level.dauer_sieb>255)
-	    level.dauer_sieb = 255;
-	}
-	else if (choice==13)
-	{
-	  level.dauer_ablenk += step;
-	  if (level.dauer_ablenk<0)
-	    level.dauer_ablenk = 0;
-	  else if (level.dauer_ablenk>255)
-	    level.dauer_ablenk = 255;
-	}
-	else if (choice==14)
-	{
-	  level.edelsteine += step;
-	  if (level.edelsteine<0)
-	    level.edelsteine = 0;
-	  else if (level.edelsteine>999)
-	    level.edelsteine = 999;
-	}
-	else if (choice==15)
-	{
-	  level.time += step;
-	  if (level.time<0)
-	    level.time = 0;
-	  else if (level.time>999)
-	    level.time = 999;
-	}
-	else if (choice==16)
-	{
-	  lev_fieldx += step;
-	  if (lev_fieldx<MIN_LEV_FIELDX)
-	    lev_fieldx = MIN_LEV_FIELDX;
-	  else if (lev_fieldx>MAX_LEV_FIELDX)
-	    lev_fieldx = MAX_LEV_FIELDX;
-	  level.fieldx = lev_fieldx;
-	}
-	else if (choice==17)
-	{
-	  lev_fieldy += step;
-	  if (lev_fieldy<MIN_LEV_FIELDY)
-	    lev_fieldy = MIN_LEV_FIELDY;
-	  else if (lev_fieldy>MAX_LEV_FIELDY)
-	    lev_fieldy = MAX_LEV_FIELDY;
-	  level.fieldy = lev_fieldy;
-	}
-
-	if (choice<11)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+choice*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.score[choice],3),FS_SMALL,FC_YELLOW);
-	else if (choice==11)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+11*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.tempo_amoebe,3),FS_SMALL,FC_YELLOW);
-	else if (choice==12)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+12*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.dauer_sieb,3),FS_SMALL,FC_YELLOW);
-	else if (choice==13)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+13*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.dauer_ablenk,3),FS_SMALL,FC_YELLOW);
-	else if (choice==14)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+14*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.edelsteine,3),FS_SMALL,FC_YELLOW);
-	else if (choice==15)
-	  DrawText(ED_COUNT_VALUE_XPOS,
-		   ED_COUNT_VALUE_YPOS+15*ED_COUNT_GADGET_YSIZE,
-		   int2str(level.time,3),FS_SMALL,FC_YELLOW);
-	else if (choice==16)
-	  DrawText(ED_SIZE_VALUE_XPOS,
-		   ED_SIZE_VALUE_YPOS+0*ED_SIZE_GADGET_YSIZE,
-		   int2str(level.fieldx,3),FS_SMALL,FC_YELLOW);
-	else if (choice==17)
-	  DrawText(ED_SIZE_VALUE_XPOS,
-		   ED_SIZE_VALUE_YPOS+1*ED_SIZE_GADGET_YSIZE,
-		   int2str(level.fieldy,3),FS_SMALL,FC_YELLOW);
-
-	redraw_mask &= ~REDRAW_FIELD;
-	if (choice<16)
-	  XCopyArea(display,drawto,window,gc,
-		    ED_COUNT_VALUE_XPOS,
-		    ED_COUNT_VALUE_YPOS+choice*ED_COUNT_GADGET_YSIZE,
-		    3*FONT2_XSIZE,FONT2_YSIZE,
-		    ED_COUNT_VALUE_XPOS,
-		    ED_COUNT_VALUE_YPOS+choice*ED_COUNT_GADGET_YSIZE);
-	else
-	  XCopyArea(display,drawto,window,gc,
-		    ED_SIZE_VALUE_XPOS,
-		    ED_SIZE_VALUE_YPOS+(choice-16)*ED_SIZE_GADGET_YSIZE,
-		    3*FONT2_XSIZE,FONT2_YSIZE,
-		    ED_SIZE_VALUE_XPOS,
-		    ED_SIZE_VALUE_YPOS+(choice-16)*ED_SIZE_GADGET_YSIZE);
-	XFlush(display);
-      }
-
-      switch(CheckCtrlButtons(mx,my,button))
-      {
-	case ED_BUTTON_EDIT:
-	  CloseDoor(DOOR_CLOSE_2);
-	  AdjustLevelScrollPosition();
-	  DrawMiniLevel(level_xpos,level_ypos);
-	  XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
-		    DOOR_GFX_PAGEX6,DOOR_GFX_PAGEY2,
-		    VXSIZE,VYSIZE,
-		    DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
-	  OpenDoor(DOOR_OPEN_2);
-	  edit_mode = ED_MODE_DRAWING;
-	  break;
-	case ED_BUTTON_CLEAR:
-	  if (Request("Are you sure to clear this level ?",REQ_ASK))
-	  {
-	    for(x=0;x<MAX_LEV_FIELDX;x++) 
-	      for(y=0;y<MAX_LEV_FIELDY;y++) 
-		Feld[x][y] = EL_ERDREICH;
-	    DrawMiniLevel(level_xpos,level_ypos);
-	  }
-	  break;
-	case ED_BUTTON_UNDO:
-	  if (leveldir[leveldir_nr].readonly ||
-	      Request("Exit without saving ?",REQ_ASK | REQ_STAY_OPEN))
-	  {
-	    CloseDoor(DOOR_CLOSE_ALL);
-	    game_status=MAINMENU;
-	    DrawMainMenu();
-	  }
-	  else
-	  {
-	    CloseDoor(DOOR_CLOSE_1);
-	    OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
-	  }
-	  break;
-	case ED_BUTTON_EXIT:
-	  {
-	    int figur_vorhanden = FALSE;
-
-	    if (leveldir[leveldir_nr].readonly)
-	    {
-	      Request("This level is read only !",REQ_CONFIRM);
-	      break;
-	    }
-
-	    for(y=0;y<lev_fieldy;y++) 
-	      for(x=0;x<lev_fieldx;x++)
-		if (Feld[x][y] == EL_SPIELFIGUR ||
-		    Feld[x][y] == EL_SPIELER1 ||
-		    Feld[x][y] == EL_SP_MURPHY) 
-		  figur_vorhanden = TRUE;
-
-	    if (!figur_vorhanden)
-	      Request("No Level without Gregor Mc Duffin please !",
-			 REQ_CONFIRM);
-	    else
-	    {
-	      if (Request("Save this level and kill the old ?",
-			     REQ_ASK | REQ_STAY_OPEN))
-	      {
-		for(x=0;x<lev_fieldx;x++)
-		  for(y=0;y<lev_fieldy;y++) 
-		    Ur[x][y]=Feld[x][y];
-		SaveLevel(level_nr);
-	      }
-	      CloseDoor(DOOR_CLOSE_ALL);
-	      game_status=MAINMENU;
-	      DrawMainMenu();
-	    }
-	  }
-	  break;
-	default:
-	  break;
-      }
-
-      if (mx>=ED_COUNT_GADGET_XPOS &&
-	  mx<ED_COUNT_GADGET_XPOS+31*FONT2_XSIZE+10 &&
-	  my>=ED_COUNT_GADGET_YPOS+16*ED_COUNT_GADGET_YSIZE &&
-	  my<ED_COUNT_GADGET_YPOS+16*ED_COUNT_GADGET_YSIZE+ED_WIN_COUNT_YSIZE)
-      {
-	if (!name_typing)
-	{
-	  name_typing = TRUE;
-	  DrawText(ED_COUNT_GADGET_XPOS+5,
-		   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		   level.name,FS_SMALL,FC_GREEN);
-	  DrawText(ED_COUNT_GADGET_XPOS+5+strlen(level.name)*FONT2_XSIZE,
-		   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		   "<",FS_SMALL,FC_RED);
-	}
-      }
-      else
-      {
-	if (name_typing)
-	{
-	  name_typing = FALSE;
-	  DrawText(ED_COUNT_GADGET_XPOS+5,
-		   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		   level.name,FS_SMALL,FC_YELLOW);
-	  DrawText(ED_COUNT_GADGET_XPOS+5+strlen(level.name)*FONT2_XSIZE,
-		   ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		   " ",FS_SMALL,FC_RED);
-	}
-      }
-
-      if (mx>=SX+29*MINI_TILEX && mx<SX+30*MINI_TILEX &&
-	  my>=SY+26*MINI_TILEY && my<SY+27*MINI_TILEY)
-      {
-	int new_element;
-
-	if (!button || button<1 || button>3)
-	  return;
-
-	new_element = (button==1 ? new_element1 :
-		       button==2 ? new_element2 :
-		       button==3 ? new_element3 : 0);
-
-	if (new_element != level.amoebe_inhalt)
-	{
-	  level.amoebe_inhalt = new_element;
-	  DrawMiniElement(29,26,new_element);
-	}
-      }
-
-      if (mx>=SX+1*MINI_TILEX && mx<SX+(1+4*5)*MINI_TILEX &&
-	  my>=SY+2*MINI_TILEY && my<SY+(2+3)*MINI_TILEY)
-      {
-	int x = (mx-SX-1*MINI_TILEX)/MINI_TILEX;
-	int y = (my-SY-2*MINI_TILEY)/MINI_TILEY;
-	int i = x/5;
-	int new_element;
-
-	x = x-i*5;
-	if (i>=0 && i<43 && x>=0 && x<3 && y>=0 && y<3)
-	{
-	  if (button && !motion_status)
-	    in_field_pressed = TRUE;
-
-	  if (!button || !in_field_pressed || button<1 || button>3)
-	    return;
-
-	  new_element = (button==1 ? new_element1 :
-			 button==2 ? new_element2 :
-			 button==3 ? new_element3 : 0);
-
-	  if (new_element != level.mampfer_inhalt[i][x][y])
-	  {
-	    level.mampfer_inhalt[i][x][y] = new_element;
-	    DrawMiniElement(1+5*i+x,2+y,new_element);
-	  }
-	}
-	else if (!motion_status)/* Mauszeiger nicht im Cruncher-Feld */
-	  in_field_pressed = FALSE;
-      }
-      else if (!motion_status)	/* Mauszeiger nicht im Cruncher-Feld */
-	in_field_pressed = FALSE;
-
-#endif
-
-
-
-    }
-  }
-
-  last_button = button;
-
-  BackToFront();
-}
-
-void LevelNameTyping(KeySym key)
-{
-  unsigned char ascii = 0;
-  int len = strlen(level.name);
-
-  if (!name_typing)
-    return;
-
-  if (key>=XK_A && key<=XK_Z)
-    ascii = 'A'+(char)(key-XK_A);
-  else if (key>=XK_a && key<=XK_z)
-    ascii = 'a'+(char)(key-XK_a);
-  else if (key>=XK_0 && key<=XK_9)
-    ascii = '0'+(char)(key-XK_0);
-#ifdef XK_LATIN1
-  else if (key>=XK_space && key<=XK_at)
-    ascii = ' '+(char)(key-XK_space);
-  else if (key==XK_Adiaeresis)
-    ascii = 'Ä';
-  else if (key==XK_Odiaeresis)
-    ascii = 'Ö';
-  else if (key==XK_Udiaeresis)
-    ascii = 'Ü';
-  else if (key==XK_adiaeresis)
-    ascii = 'ä';
-  else if (key==XK_odiaeresis)
-    ascii = 'ö';
-  else if (key==XK_udiaeresis)
-    ascii = 'ü';
-  else if (key==XK_underscore)
-    ascii = '_';
-#endif
-
-  if (ascii && len<MAX_LEVEL_NAME_LEN-2)
-  {
-    level.name[len] = ascii;
-    level.name[len+1] = 0;
-    len++;
-
-    DrawTextExt(drawto,gc,
-		ED_COUNT_GADGET_XPOS+5,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		level.name,FS_SMALL,FC_GREEN);
-    DrawTextExt(window,gc,
-		ED_COUNT_GADGET_XPOS+5,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		level.name,FS_SMALL,FC_GREEN);
-    DrawTextExt(drawto,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		"<",FS_SMALL,FC_RED);
-    DrawTextExt(window,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		"<",FS_SMALL,FC_RED);
-  }
-  else if ((key==XK_Delete || key==XK_BackSpace) && len>0)
-  {
-    level.name[len-1] = 0;
-    len--;
-
-    DrawTextExt(drawto,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		"< ",FS_SMALL,FC_GREEN);
-    DrawTextExt(window,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		"< ",FS_SMALL,FC_GREEN);
-  }
-  else if (key==XK_Return)
-  {
-    DrawTextExt(drawto,gc,
-		ED_COUNT_GADGET_XPOS+5,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		level.name,FS_SMALL,FC_YELLOW);
-    DrawTextExt(window,gc,
-		ED_COUNT_GADGET_XPOS+5,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		level.name,FS_SMALL,FC_YELLOW);
-    DrawTextExt(drawto,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		" ",FS_SMALL,FC_YELLOW);
-    DrawTextExt(window,gc,
-		ED_COUNT_GADGET_XPOS+5+len*FONT2_XSIZE,
-		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
-		" ",FS_SMALL,FC_YELLOW);
-
-    name_typing = FALSE;
-  }
-}
-
 static void DrawCounterValueField(int counter_id, int value)
 {
   int x = SX + counterbutton_info[counter_id].x + ED_WIN_COUNT_XPOS;
@@ -2518,10 +1970,11 @@ static void DrawDrawingWindow()
 {
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
+  AdjustDrawingAreaGadgets();
   AdjustLevelScrollPosition();
   AdjustEditorScrollbar(GADGET_ID_SCROLL_HORIZONTAL);
   AdjustEditorScrollbar(GADGET_ID_SCROLL_VERTICAL);
-  DrawMiniLevel(level_xpos, level_ypos);
+  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   MapMainDrawingArea();
 }
 
@@ -3034,7 +2487,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 			 int button, int mode)
 {
-  static short brush_buffer[ED_FIELDX][ED_FIELDY];
+  static short brush_buffer[MAX_ED_FIELDX][MAX_ED_FIELDY];
   static int brush_width, brush_height;
   static int last_cursor_x = -1, last_cursor_y = -1;
   static boolean delete_old_brush;
@@ -3271,9 +2724,9 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
 	delete_buffer[sx - start_sx] = Feld[lx][ly];
 	Feld[lx][ly] = letter_element;
 
-	if (sx + 1 < ED_FIELDX && lx + 1 < lev_fieldx)
+	if (sx + 1 < ed_fieldx && lx + 1 < lev_fieldx)
 	  DrawLevelText(sx + 1, sy, 0, TEXT_SETCURSOR);
-	else if (sy + 1 < ED_FIELDY && ly + 1 < lev_fieldy)
+	else if (sy + 1 < ed_fieldy && ly + 1 < lev_fieldy)
 	  DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
 	else
 	  DrawLevelText(0, 0, 0, TEXT_END);
@@ -3290,7 +2743,7 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
       break;
 
     case TEXT_NEWLINE:
-      if (sy + 1 < ED_FIELDY - 1 && ly + 1 < lev_fieldy - 1)
+      if (sy + 1 < ed_fieldy - 1 && ly + 1 < lev_fieldy - 1)
 	DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
       else
 	DrawLevelText(0, 0, 0, TEXT_END);
@@ -3393,7 +2846,7 @@ static void RandomPlacement(int button)
     }
   }
 
-  DrawMiniLevel(level_xpos, level_ypos);
+  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 }
 
@@ -3412,7 +2865,7 @@ void WrapLevel(int dx, int dy)
       Feld[x][y] =
 	FieldBackup[(x + wrap_dx) % lev_fieldx][(y + wrap_dy) % lev_fieldy];
 
-  DrawMiniLevel(level_xpos, level_ypos);
+  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   CopyLevelToUndoBuffer(UNDO_ACCUMULATE);
 }
 
@@ -3524,8 +2977,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 		if (Feld[x][y] == EL_SPIELFIGUR || Feld[x][y] == EL_SPIELER1)
 		{
 		  Feld[x][y] = EL_LEERRAUM;
-		  if (x - level_xpos >= 0 && x - level_xpos < ED_FIELDX &&
-		      y - level_ypos >= 0 && y - level_ypos < ED_FIELDY)
+		  if (x - level_xpos >= 0 && x - level_xpos < ed_fieldx &&
+		      y - level_ypos >= 0 && y - level_ypos < ed_fieldy)
 		    DrawMiniElement(x - level_xpos, y - level_ypos,
 				    EL_LEERRAUM);
 		}
@@ -3636,29 +3089,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
-
-
-#if 0
-    case GADGET_ID_TEXT:
-      /*
-      DrawMiniElement(last_sx, last_sy, Feld[lx][ly]);
-      DrawAreaBorder(sx, sy, sx, sy);
-      last_sx = sx;
-      last_sy = sy;
-      */
-
-      if (button_press_event)
-	DrawLevelText(sx, sy, 0, TEXT_INIT);
-      break;
-#endif
-
-
-
     case GADGET_ID_FLOOD_FILL:
       if (button_press_event && Feld[lx][ly] != new_element)
       {
 	FloodFill(lx, ly, new_element);
-	DrawMiniLevel(level_xpos, level_ypos);
+	DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 	CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
       }
       break;
@@ -3825,7 +3260,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-	if (lev_fieldx < ED_FIELDX - 2)
+	if (lev_fieldx < ed_fieldx - 2)
 	  break;
 
 	level_xpos -= step;
@@ -3834,28 +3269,28 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (button == 1)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
 	else
-	  DrawMiniLevel(level_xpos, level_ypos);
+	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
       }
       break;
 
     case GADGET_ID_SCROLL_RIGHT:
-      if (level_xpos <= lev_fieldx - ED_FIELDX)
+      if (level_xpos <= lev_fieldx - ed_fieldx)
       {
 	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-	if (lev_fieldx < ED_FIELDX - 2)
+	if (lev_fieldx < ed_fieldx - 2)
 	  break;
 
 	level_xpos += step;
-	if (level_xpos > lev_fieldx - ED_FIELDX + 1)
-	  level_xpos = lev_fieldx - ED_FIELDX + 1;
+	if (level_xpos > lev_fieldx - ed_fieldx + 1)
+	  level_xpos = lev_fieldx - ed_fieldx + 1;
 	if (button == 1)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
 	else
-	  DrawMiniLevel(level_xpos, level_ypos);
+	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
       }
@@ -3867,7 +3302,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-	if (lev_fieldy < ED_FIELDY - 2)
+	if (lev_fieldy < ed_fieldy - 2)
 	  break;
 
 	level_ypos -= step;
@@ -3876,28 +3311,28 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (button == 1)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
 	else
-	  DrawMiniLevel(level_xpos, level_ypos);
+	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
       }
       break;
 
     case GADGET_ID_SCROLL_DOWN:
-      if (level_ypos <= lev_fieldy - ED_FIELDY)
+      if (level_ypos <= lev_fieldy - ed_fieldy)
       {
 	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
-	if (lev_fieldy < ED_FIELDY - 2)
+	if (lev_fieldy < ed_fieldy - 2)
 	  break;
 
 	level_ypos += step;
-	if (level_ypos > lev_fieldy - ED_FIELDY + 1)
-	  level_ypos = lev_fieldy - ED_FIELDY + 1;
+	if (level_ypos > lev_fieldy - ed_fieldy + 1)
+	  level_ypos = lev_fieldy - ed_fieldy + 1;
 	if (button == 1)
 	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
 	else
-	  DrawMiniLevel(level_xpos, level_ypos);
+	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
       }
@@ -3905,12 +3340,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_SCROLL_HORIZONTAL:
       level_xpos = gi->event.item_position - 1;
-      DrawMiniLevel(level_xpos, level_ypos);
+      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_SCROLL_VERTICAL:
       level_ypos = gi->event.item_position - 1;
-      DrawMiniLevel(level_xpos, level_ypos);
+      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_ELEMENTLIST_UP:
@@ -3999,7 +3434,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       for(x=0; x<lev_fieldx; x++)
 	for(y=0; y<lev_fieldy; y++)
 	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
-      DrawMiniLevel(level_xpos,level_ypos);
+      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos,level_ypos);
       break;
 
     case GADGET_ID_INFO:
@@ -4021,7 +3456,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  Feld[x][y] = new_element3;
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
-      DrawMiniLevel(level_xpos, level_ypos);
+      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_SAVE:

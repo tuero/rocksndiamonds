@@ -1452,12 +1452,12 @@ void DrawLevel()
   redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 }
 
-void DrawMiniLevel(int scroll_x, int scroll_y)
+void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
 {
   int x,y;
 
-  for(x=0; x<ED_FIELDX; x++)
-    for(y=0; y<ED_FIELDY; y++)
+  for(x=0; x<size_x; x++)
+    for(y=0; y<size_y; y++)
       DrawMiniElementOrWall(x, y, scroll_x, scroll_y);
 
   redraw_mask |= REDRAW_FIELD;

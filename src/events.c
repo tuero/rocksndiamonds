@@ -340,7 +340,6 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case LEVELED:
-      LevelEd(mx,my, button);
       break;
 
     case HELPSCREEN:
@@ -546,7 +545,6 @@ void HandleKey(KeySym key, int key_status)
 
     case LEVELED:
       HandleLevelEditorKeyInput(key);
-      LevelNameTyping(key);
       break;
 
     case PLAYING:

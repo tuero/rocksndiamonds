@@ -430,12 +430,12 @@ void FreeGadget(struct GadgetInfo *);
 void ModifyGadget(struct GadgetInfo *, int, ...);
 void RedrawGadget(struct GadgetInfo *);
 
-void ClickOnGadget(struct GadgetInfo *);
-
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
 void UnmapAllGadgets();
 void RemapAllGadgets();
+
+void ClickOnGadget(struct GadgetInfo *);
 
 void HandleGadgets(int, int, int);
 void HandleGadgetsKeyInput(KeySym);

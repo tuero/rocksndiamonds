@@ -71,8 +71,6 @@ typedef unsigned char byte;
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
-#define ED_FIELDX	(2 * SCR_FIELDX - 1)
-#define ED_FIELDY	(2 * SCR_FIELDY - 2)
 
 #define MAX_PLAYERS	4
 
@@ -96,7 +94,6 @@ typedef unsigned char byte;
 #define IN_VIS_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
-#define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ED_FIELDX && (y)>=0 &&(y)<ED_FIELDY)
 
 #define EP_BIT_AMOEBALIVE	(1 << 0)
 #define EP_BIT_AMOEBOID		(1 << 1)
