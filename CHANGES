@@ -1,8 +1,10 @@
 Version 1.5.0
 -------------
-	- SDL!!!
+	- can be compiled with SDL library to build native Windows version
 	- trying to open already busy audio device does not block the game
 	- fixed network playing bug (patch from web site)
+	- SDL version can load and play music modules
+	- fixed element description in level editor for EM doors and keys
 
 Release Version 1.4.0 [27 OCT 1999]
 -----------------------------------

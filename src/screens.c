@@ -700,7 +700,9 @@ void DrawHelpScreenMusicText(int num)
 
   DrawTextFCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 
+#if 0
   PlaySoundLoop(background_loop[num]);
+#endif
 }
 
 void DrawHelpScreenCreditsText()

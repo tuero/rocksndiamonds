@@ -238,25 +238,7 @@ static KeySym ScancodeToKeySym(byte scancode)
   }
 }
 
-void XMapWindow(Display *display, Window window)
-{
-  int x, y;
-  unsigned int width, height;
-  boolean mouse_off;
-
-  x = AllegroDefaultScreen().x;
-  y = AllegroDefaultScreen().y;
-  width = AllegroDefaultScreen().width;
-  height = AllegroDefaultScreen().height;
-
-  mouse_off = hide_mouse(display, x, y, width, height);
-  blit((BITMAP *)window, video_bitmap, 0, 0, x, y, width, height);
-
-  if (mouse_off)
-    unhide_mouse(display);
-}
-
-static unsigned long AllocColorCell(int r, int g, int b)
+Pixel AllegroAllocColorCell(int r, int g, int b)
 {
   byte pixel_mapping = 0;
   int i;
@@ -282,14 +264,36 @@ static unsigned long AllocColorCell(int r, int g, int b)
     if (global_colormap_entries_used < MAX_COLORS)
       global_colormap_entries_used++;
 
+    i = global_colormap_entries_used - 1;
+
     global_colormap[i].r = r;
     global_colormap[i].g = g;
     global_colormap[i].b = b;
+
+    set_palette(global_colormap);
 
     pixel_mapping = i;
   }
 
   return pixel_mapping;
+}
+
+void XMapWindow(Display *display, Window window)
+{
+  int x, y;
+  unsigned int width, height;
+  boolean mouse_off;
+
+  x = AllegroDefaultScreen().x;
+  y = AllegroDefaultScreen().y;
+  width = AllegroDefaultScreen().width;
+  height = AllegroDefaultScreen().height;
+
+  mouse_off = hide_mouse(display, x, y, width, height);
+  blit((BITMAP *)window, video_bitmap, 0, 0, x, y, width, height);
+
+  if (mouse_off)
+    unhide_mouse(display);
 }
 
 Display *XOpenDisplay(char *display_name)
@@ -311,8 +315,8 @@ Display *XOpenDisplay(char *display_name)
   screen[0].white_pixel = 0xFF;
   screen[0].black_pixel = 0x00;
 #else
-  screen[0].white_pixel = AllocColorCell(0xFFFF, 0xFFFF, 0xFFFF);
-  screen[0].black_pixel = AllocColorCell(0x0000, 0x0000, 0x0000);
+  screen[0].white_pixel = AllegroAllocColorCell(0xFFFF, 0xFFFF, 0xFFFF);
+  screen[0].black_pixel = AllegroAllocColorCell(0x0000, 0x0000, 0x0000);
 #endif
   screen[0].video_bitmap = NULL;
 
@@ -562,9 +566,9 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
       pixel_mapping[i] = j;
     }
 #else
-    pixel_mapping[i] = AllocColorCell(image->rgb.red[i],
-				      image->rgb.green[i],
-				      image->rgb.blue[i]);
+    pixel_mapping[i] = AllegroAllocColorCell(image->rgb.red[i],
+					     image->rgb.green[i],
+					     image->rgb.blue[i]);
 #endif
 
   }
@@ -604,7 +608,17 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
     return errno_pcx;
 
   *pixmap = (Pixmap)bitmap;
+#if 0
   *pixmap_mask = (Pixmap)bitmap;
+  /* !!! two pointers on same bitmap => second free() fails !!! */
+#else
+  /* pixmap_mask will never be used in Allegro (which uses masked_blit()),
+     so use non-NULL dummy pointer to empty Pixmap */
+  /*
+  *pixmap_mask = (Pixmap)checked_calloc(sizeof(Pixmap));
+  */
+  *pixmap_mask = (Pixmap)DUMMY_MASK;
+#endif
 
   return PCX_Success;
 }
@@ -950,6 +964,11 @@ void AllegroDrawLine(Drawable d, int from_x, int from_y, int to_x, int to_y,
     unhide_mouse(display);
 
   freeze_mouse_flag = FALSE;
+}
+
+Pixel AllegroGetPixel(Drawable d, int x, int y)
+{
+  return getpixel((BITMAP *)d, x, y);
 }
 
 void MSDOSOpenAudio(void)

@@ -273,7 +273,7 @@ char *element_info[] =
   "normal wall (BD style)",
   "rock (BD style)",
   "open exit",
-  "unknown",
+  "black orb bomb",
   "amoeba",
   "mole",					/* 110 */
   "penguin",
@@ -284,7 +284,7 @@ char *element_info[] =
   "arrow down",
   "pig",
   "fire breathing dragon",
-  "unknown",
+  "red key (EM style)",
   "letter ' '",					/* 120 */
   "letter '!'",
   "letter '\"'",
@@ -368,13 +368,13 @@ char *element_info[] =
   "growing wall (horizontal)",			/* 200 */
   "growing wall (vertical)",
   "growing wall (all directions)",
-  "unused",
-  "unused",
-  "unused",
-  "unused",
-  "unused",
-  "unused",
-  "unused",
+  "red door (EM style)",
+  "yellow door (EM style)",
+  "green door (EM style)",
+  "blue door (EM style)",
+  "yellow key (EM style)",
+  "green key (EM style)",
+  "blue key (EM style)",
   "empty space",				/* 210 */
   "zonk",
   "base",
@@ -415,10 +415,10 @@ char *element_info[] =
   "hardware",
   "chip (upper half)",
   "chip (lower half)",
-  "unknown",					/* 250 */
-  "unknown",
-  "unknown",
-  "unknown",
+  "gray door (EM style, red key)",		/* 250 */
+  "gray door (EM style, yellow key)",
+  "gray door (EM style, green key)",
+  "gray door (EM style, blue key)",
   "unknown",
   "unknown",
 

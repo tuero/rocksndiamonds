@@ -441,6 +441,8 @@ inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 
 #if defined(TARGET_SDL)
   pixel = SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
+#elif defined(TARGET_ALLEGRO)
+  pixel = AllegroAllocColorCell(color_r << 8, color_g << 8, color_b << 8);
 #elif defined(TARGET_X11_NATIVE)
   XColor xcolor;
 

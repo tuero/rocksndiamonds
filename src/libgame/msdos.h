@@ -694,6 +694,8 @@ typedef union _XEvent
   XKeyEvent xkey;
 } XEvent;
 
+Pixel AllegroAllocColorCell(int, int, int);
+
 void XMapWindow(Display *, Window);
 Display *XOpenDisplay(char *);
 Window XCreateSimpleWindow(Display *, Window, int, int,
@@ -732,6 +734,7 @@ void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
 
 void AllegroDrawLine(Drawable, int, int, int, int, Pixel);
+Pixel AllegroGetPixel(Drawable, int, int);
 
 void MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);

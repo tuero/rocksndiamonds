@@ -341,7 +341,7 @@ void InitGfx()
   }; 
 #endif
 
-#ifdef TARGET_X11
+#if defined(TARGET_X11_NATIVE)
   static struct
   {
     int start;
@@ -433,7 +433,16 @@ void InitGfx()
 
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
 
+  /* initialize pixmap array for special X11 tile clipping to Pixmap 'None' */
+  for(i=0; i<NUM_TILES; i++)
+    tile_clipmask[i] = None;
+
 #if defined(TARGET_X11)
+  /* This stuff is needed because X11 (XSetClipOrigin(), to be precise) is
+     often very slow when preparing a masked XCopyArea() for big Pixmaps.
+     To prevent this, create small (tile-sized) mask Pixmaps which will then
+     be set much faster with XSetClipOrigin() and speed things up a lot. */
+
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
@@ -458,10 +467,7 @@ void InitGfx()
     }
   }
 
-  /* initialize pixmap array to Pixmap 'None' */
-  for(i=0; i<NUM_TILES; i++)
-    tile_clipmask[i] = None;
-
+#if defined(TARGET_X11_NATIVE)
   /* create only those clipping Pixmaps we really need */
   for(i=0; tile_needs_clipping[i].start>=0; i++)
   {
@@ -485,6 +491,7 @@ void InitGfx()
 		src_x, src_y, TILEX, TILEY, 0, 0);
     }
   }
+#endif /* TARGET_X11_ANTIVE */
 #endif /* TARGET_X11 */
 }
 

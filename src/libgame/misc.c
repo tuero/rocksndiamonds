@@ -551,15 +551,18 @@ void Error(int mode, char *format, ...)
 {
   char *process_name = "";
   FILE *error = stderr;
+  char *newline = "\n";
 
   /* display warnings only when running in verbose mode */
   if (mode & ERR_WARN && !options.verbose)
     return;
 
 #if !defined(PLATFORM_UNIX)
+  newline = "\r\n";
+
   if ((error = openErrorFile()) == NULL)
   {
-    printf("Cannot write to error output file!\n");
+    printf("Cannot write to error output file!%s", newline);
     program.exit_function(1);
   }
 #endif
@@ -584,15 +587,16 @@ void Error(int mode, char *format, ...)
     vfprintf(error, format, ap);
     va_end(ap);
   
-    fprintf(error, "\n");
+    fprintf(error, "%s", newline);
   }
   
   if (mode & ERR_HELP)
-    fprintf(error, "%s: Try option '--help' for more information.\n",
-	    program.command_basename);
+    fprintf(error, "%s: Try option '--help' for more information.%s",
+	    program.command_basename, newline);
 
   if (mode & ERR_EXIT)
-    fprintf(error, "%s%s: aborting\n", program.command_basename, process_name);
+    fprintf(error, "%s%s: aborting%s",
+	    program.command_basename, process_name, newline);
 
   if (error != stderr)
     fclose(error);
