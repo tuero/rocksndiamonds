@@ -55,6 +55,7 @@
 #define AUDIO_NUM_CHANNELS_MONO			1
 #define AUDIO_NUM_CHANNELS_STEREO		2
 
+#define AUDIO_FORMAT_UNKNOWN			(0)
 #define AUDIO_FORMAT_U8				(1 << 0)
 #define AUDIO_FORMAT_S16			(1 << 1)
 #define AUDIO_FORMAT_LE				(1 << 2)
