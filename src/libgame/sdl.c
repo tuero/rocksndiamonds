@@ -377,7 +377,7 @@ inline Pixel SDLGetPixel(Bitmap *dst_bitmap, int x, int y)
 
 
 /* ========================================================================= */
-/* The following functions have been taken from the SGE library              */
+/* The following functions were taken from the SGE library                   */
 /* (SDL Graphics Extension Library) by Anders Lindström                      */
 /* http://www.etek.chalmers.se/~e8cal1/sge/index.html                        */
 /* ========================================================================= */
@@ -821,6 +821,325 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 {
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
+
+
+/* ========================================================================= */
+/* The following functions were taken from the SDL_gfx library version 2.0.3 */
+/* (Rotozoomer) by Andreas Schiffler                                         */
+/* http://www.ferzkopp.net/Software/SDL_gfx-2.0/index.html                   */
+/* ========================================================================= */
+
+typedef struct
+{
+  Uint8 r;
+  Uint8 g;
+  Uint8 b;
+  Uint8 a;
+} tColorRGBA;
+
+/*
+  -----------------------------------------------------------------------------
+  32 bit zoomer
+
+  zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
+  -----------------------------------------------------------------------------
+*/
+
+int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
+{
+  int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
+  tColorRGBA *sp, *csp, *dp;
+  int sgap, dgap;
+
+  /* variable setup */
+  sx = (int) (65536.0 * (float) src->w / (float) dst->w);
+  sy = (int) (65536.0 * (float) src->h / (float) dst->h);
+
+  /* allocate memory for row increments */
+  sax = (int *)checked_malloc((dst->w + 1) * sizeof(Uint32));
+  say = (int *)checked_malloc((dst->h + 1) * sizeof(Uint32));
+
+  /* precalculate row increments */
+  csx = 0;
+  csax = sax;
+  for (x = 0; x <= dst->w; x++)
+  {
+    *csax = csx;
+    csax++;
+    csx &= 0xffff;
+    csx += sx;
+  }
+
+  csy = 0;
+  csay = say;
+  for (y = 0; y <= dst->h; y++)
+  {
+    *csay = csy;
+    csay++;
+    csy &= 0xffff;
+    csy += sy;
+  }
+
+  /* pointer setup */
+  sp = csp = (tColorRGBA *) src->pixels;
+  dp = (tColorRGBA *) dst->pixels;
+  sgap = src->pitch - src->w * 4;
+  dgap = dst->pitch - dst->w * 4;
+
+  csay = say;
+  for (y = 0; y < dst->h; y++)
+  {
+    sp = csp;
+    csax = sax;
+
+    for (x = 0; x < dst->w; x++)
+    {
+      /* draw */
+      *dp = *sp;
+
+      /* advance source pointers */
+      csax++;
+      sp += (*csax >> 16);
+
+      /* advance destination pointer */
+      dp++;
+    }
+
+    /* advance source pointer */
+    csay++;
+    csp = (tColorRGBA *) ((Uint8 *) csp + (*csay >> 16) * src->pitch);
+
+    /* advance destination pointers */
+    dp = (tColorRGBA *) ((Uint8 *) dp + dgap);
+  }
+
+  free(sax);
+  free(say);
+
+  return 0;
+}
+
+/*
+  -----------------------------------------------------------------------------
+  8 bit zoomer
+
+  zoomes 8 bit palette/Y 'src' surface to 'dst' surface
+  -----------------------------------------------------------------------------
+*/
+
+int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
+{
+  Uint32 x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
+  Uint8 *sp, *dp, *csp;
+  int dgap;
+
+  /* variable setup */
+  sx = (Uint32) (65536.0 * (float) src->w / (float) dst->w);
+  sy = (Uint32) (65536.0 * (float) src->h / (float) dst->h);
+
+  /* allocate memory for row increments */
+  sax = (Uint32 *)checked_malloc(dst->w * sizeof(Uint32));
+  say = (Uint32 *)checked_malloc(dst->h * sizeof(Uint32));
+
+  /* precalculate row increments */
+  csx = 0;
+  csax = sax;
+  for (x = 0; x < dst->w; x++)
+  {
+    csx += sx;
+    *csax = (csx >> 16);
+    csx &= 0xffff;
+    csax++;
+  }
+
+  csy = 0;
+  csay = say;
+  for (y = 0; y < dst->h; y++)
+  {
+    csy += sy;
+    *csay = (csy >> 16);
+    csy &= 0xffff;
+    csay++;
+  }
+
+  csx = 0;
+  csax = sax;
+  for (x = 0; x < dst->w; x++)
+  {
+    csx += (*csax);
+    csax++;
+  }
+
+  csy = 0;
+  csay = say;
+  for (y = 0; y < dst->h; y++)
+  {
+    csy += (*csay);
+    csay++;
+  }
+
+  /* pointer setup */
+  sp = csp = (Uint8 *) src->pixels;
+  dp = (Uint8 *) dst->pixels;
+  dgap = dst->pitch - dst->w;
+
+  /* draw */
+  csay = say;
+  for (y = 0; y < dst->h; y++)
+  {
+    csax = sax;
+    sp = csp;
+    for (x = 0; x < dst->w; x++)
+    {
+      /* draw */
+      *dp = *sp;
+
+      /* advance source pointers */
+      sp += (*csax);
+      csax++;
+
+      /* advance destination pointer */
+      dp++;
+    }
+
+    /* advance source pointer (for row) */
+    csp += ((*csay) * src->pitch);
+    csay++;
+
+    /* advance destination pointers */
+    dp += dgap;
+  }
+
+  free(sax);
+  free(say);
+
+  return 0;
+}
+
+/*
+  -----------------------------------------------------------------------------
+  zoomSurface()
+
+  Zoomes a 32bit or 8bit 'src' surface to newly created 'dst' surface.
+  'zoomx' and 'zoomy' are scaling factors for width and height.
+  If 'smooth' is 1 then the destination 32bit surface is anti-aliased.
+  If the surface is not 8bit or 32bit RGBA/ABGR it will be converted
+  into a 32bit RGBA format on the fly.
+  -----------------------------------------------------------------------------
+*/
+
+void zoomSurfaceSize(int width, int height, float zoom_x, float zoom_y,
+		     int *dst_width, int *dst_height)
+{
+  const float value_limit = 0.001;
+
+  /* sanity check zoom factors */
+  if (zoom_x < value_limit)
+    zoom_x = value_limit;
+  if (zoom_y < value_limit)
+    zoom_y = value_limit;
+
+  /* calculate target size */
+  *dst_width  = (int) ((float) width  * zoom_x);
+  *dst_height = (int) ((float) height * zoom_y);
+
+  if (*dst_width < 1)
+    *dst_width = 1;
+  if (*dst_height < 1)
+    *dst_height = 1;
+}
+
+SDL_Surface *zoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
+{
+  SDL_Surface *zoom_src = NULL;
+  SDL_Surface *zoom_dst = NULL;
+  int dst_width, dst_height;
+  boolean is_converted = FALSE;
+  boolean is_32bit;
+  int i;
+
+  if (src == NULL)
+    return NULL;
+
+  /* determine if source surface is 32 bit or 8 bit */
+  is_32bit = (src->format->BitsPerPixel == 32);
+
+  if (is_32bit || src->format->BitsPerPixel == 8)
+  {
+    /* use source surface 'as is' */
+    zoom_src = src;
+  }
+  else
+  {
+    /* new source surface is 32 bit with a defined RGB ordering */
+    zoom_src = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, src->h, 32,
+				    0x000000ff, 0x0000ff00, 0x00ff0000, 0);
+    SDL_BlitSurface(src, NULL, zoom_src, NULL);
+    is_32bit = TRUE;
+    is_converted = TRUE;
+  }
+
+  /* get size of destination surface */
+  zoomSurfaceSize(zoom_src->w, zoom_src->h, zoom_x, zoom_y,
+		  &dst_width, &dst_height);
+
+  /* allocate surface to completely contain the zoomed surface */
+  if (is_32bit)
+  {
+    /* target surface is 32 bit with source RGBA/ABGR ordering */
+    zoom_dst = SDL_CreateRGBSurface(SDL_SWSURFACE, dst_width, dst_height, 32,
+				    zoom_src->format->Rmask,
+				    zoom_src->format->Gmask,
+				    zoom_src->format->Bmask, 0);
+  }
+  else
+  {
+    /* target surface is 8 bit */
+    zoom_dst = SDL_CreateRGBSurface(SDL_SWSURFACE, dst_width, dst_height, 8,
+				    0, 0, 0, 0);
+  }
+
+  /* lock source surface */
+  SDL_LockSurface(zoom_src);
+
+  /* check which kind of surface we have */
+  if (is_32bit)
+  {
+    /* call the 32 bit transformation routine to do the zooming */
+    zoomSurfaceRGBA(zoom_src, zoom_dst);
+  }
+  else
+  {
+    /* copy palette */
+    for (i=0; i < zoom_src->format->palette->ncolors; i++)
+      zoom_dst->format->palette->colors[i] =
+	zoom_src->format->palette->colors[i];
+    zoom_dst->format->palette->ncolors = zoom_src->format->palette->ncolors;
+
+    /* call the 8 bit transformation routine to do the zooming */
+    zoomSurfaceY(zoom_src, zoom_dst);
+  }
+
+  /* unlock source surface */
+  SDL_UnlockSurface(zoom_src);
+
+  /* free temporary surface */
+  if (is_converted)
+    SDL_FreeSurface(zoom_src);
+
+  /* return destination surface */
+  return zoom_dst;
+}
+
+SDL_Surface *SDLZoomSurface(SDL_Surface *src, float zoom_x, float zoom_y)
+{
+  return zoomSurface(src, zoom_x, zoom_y);
+}
+
+
+/* ========================================================================= */
+/* load image to bitmap                                                      */
+/* ========================================================================= */
 
 Bitmap *SDLLoadImage(char *filename)
 {

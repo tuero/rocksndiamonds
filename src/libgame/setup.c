@@ -425,11 +425,11 @@ static char *getCorrectedImageBasename(char *basename)
     {
       static char *msdos_filename = NULL;
 
-      if (filename != NULL)
-	free(filename);
+      if (msdos_filename != NULL)
+	free(msdos_filename);
 
-      filename = getStringCopy(basename_corrected);
-      strncpy(&filename[8], &basename[strlen(basename) - 1+3], 1+3 + 1);
+      msdos_filename = getStringCopy(basename_corrected);
+      strncpy(&msdos_filename[8], &basename[strlen(basename) - 1+3], 1+3 + 1);
     }
   }
 #endif

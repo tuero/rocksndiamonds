@@ -546,14 +546,14 @@ void HandleKey(Key key, int key_status)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
   }
 
-
+#if 0
 #ifndef DEBUG
 
   if (game_status == PLAYING && (tape.playing || tape.pausing))
     return;
 
 #endif
-
+#endif
 
 
   HandleGadgetsKeyInput(key);
