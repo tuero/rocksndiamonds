@@ -2201,6 +2201,14 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_PORT_RIGHT,
     EL_SP_GRAVITY_PORT_UP,
     EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_ON_PORT_LEFT,
+    EL_SP_GRAVITY_ON_PORT_RIGHT,
+    EL_SP_GRAVITY_ON_PORT_UP,
+    EL_SP_GRAVITY_ON_PORT_DOWN,
+    EL_SP_GRAVITY_OFF_PORT_LEFT,
+    EL_SP_GRAVITY_OFF_PORT_RIGHT,
+    EL_SP_GRAVITY_OFF_PORT_UP,
+    EL_SP_GRAVITY_OFF_PORT_DOWN,
     -1
   };
 
@@ -2282,6 +2290,14 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_PORT_RIGHT,
     EL_SP_GRAVITY_PORT_UP,
     EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_ON_PORT_LEFT,
+    EL_SP_GRAVITY_ON_PORT_RIGHT,
+    EL_SP_GRAVITY_ON_PORT_UP,
+    EL_SP_GRAVITY_ON_PORT_DOWN,
+    EL_SP_GRAVITY_OFF_PORT_LEFT,
+    EL_SP_GRAVITY_OFF_PORT_RIGHT,
+    EL_SP_GRAVITY_OFF_PORT_UP,
+    EL_SP_GRAVITY_OFF_PORT_DOWN,
     -1
   };
 
@@ -2344,6 +2360,14 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_PORT_RIGHT,
     EL_SP_GRAVITY_PORT_UP,
     EL_SP_GRAVITY_PORT_DOWN,
+    EL_SP_GRAVITY_ON_PORT_LEFT,
+    EL_SP_GRAVITY_ON_PORT_RIGHT,
+    EL_SP_GRAVITY_ON_PORT_UP,
+    EL_SP_GRAVITY_ON_PORT_DOWN,
+    EL_SP_GRAVITY_OFF_PORT_LEFT,
+    EL_SP_GRAVITY_OFF_PORT_RIGHT,
+    EL_SP_GRAVITY_OFF_PORT_UP,
+    EL_SP_GRAVITY_OFF_PORT_DOWN,
     -1
   };
 
@@ -2441,6 +2465,7 @@ void InitElementPropertiesStatic()
     /* should always be valid */
     EL_EMPTY,
 
+    /* standard classic Supaplex elements */
     EL_SP_EMPTY,
     EL_SP_ZONK,
     EL_SP_BASE,
@@ -2482,11 +2507,24 @@ void InitElementPropertiesStatic()
     EL_SP_HARDWARE_BASE_6,
     EL_SP_CHIP_TOP,
     EL_SP_CHIP_BOTTOM,
+
     /* additional elements that appeared in newer Supaplex levels */
     EL_INVISIBLE_WALL,
-    /* more than one murphy in a level results in an inactive clone */
+
+    /* additional gravity port elements (not switching, but setting gravity) */
+    EL_SP_GRAVITY_ON_PORT_LEFT,
+    EL_SP_GRAVITY_ON_PORT_RIGHT,
+    EL_SP_GRAVITY_ON_PORT_UP,
+    EL_SP_GRAVITY_ON_PORT_DOWN,
+    EL_SP_GRAVITY_OFF_PORT_LEFT,
+    EL_SP_GRAVITY_OFF_PORT_RIGHT,
+    EL_SP_GRAVITY_OFF_PORT_UP,
+    EL_SP_GRAVITY_OFF_PORT_DOWN,
+
+    /* more than one Murphy in a level results in an inactive clone */
     EL_SP_MURPHY_CLONE,
-    /* runtime elements*/
+
+    /* runtime Supaplex elements */
     EL_SP_DISK_RED_ACTIVE,
     EL_SP_TERMINAL_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVATING,
@@ -3061,6 +3099,14 @@ void InitElementPropertiesStatic()
     EL_SP_HARDWARE_BASE_4,
     EL_SP_HARDWARE_BASE_5,
     EL_SP_HARDWARE_BASE_6,
+    EL_SP_GRAVITY_ON_PORT_LEFT,
+    EL_SP_GRAVITY_ON_PORT_RIGHT,
+    EL_SP_GRAVITY_ON_PORT_UP,
+    EL_SP_GRAVITY_ON_PORT_DOWN,
+    EL_SP_GRAVITY_OFF_PORT_LEFT,
+    EL_SP_GRAVITY_OFF_PORT_RIGHT,
+    EL_SP_GRAVITY_OFF_PORT_UP,
+    EL_SP_GRAVITY_OFF_PORT_DOWN,
     EL_CONVEYOR_BELT_1_SWITCH_LEFT,
     EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT_1_SWITCH_RIGHT,

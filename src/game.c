@@ -612,31 +612,39 @@ struct
 }
 access_direction_list[] =
 {
-  { EL_TUBE_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
-  { EL_TUBE_VERTICAL,		                     MV_UP | MV_DOWN },
-  { EL_TUBE_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
-  { EL_TUBE_VERTICAL_LEFT,	MV_LEFT |            MV_UP | MV_DOWN },
-  { EL_TUBE_VERTICAL_RIGHT,	          MV_RIGHT | MV_UP | MV_DOWN },
-  { EL_TUBE_HORIZONTAL_UP,	MV_LEFT | MV_RIGHT | MV_UP           },
-  { EL_TUBE_HORIZONTAL_DOWN,	MV_LEFT | MV_RIGHT |         MV_DOWN },
-  { EL_TUBE_LEFT_UP,		MV_LEFT |            MV_UP           },
-  { EL_TUBE_LEFT_DOWN,		MV_LEFT |                    MV_DOWN },
-  { EL_TUBE_RIGHT_UP,		          MV_RIGHT | MV_UP           },
-  { EL_TUBE_RIGHT_DOWN,		          MV_RIGHT |         MV_DOWN },
+  { EL_TUBE_ANY,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_TUBE_VERTICAL,			                     MV_UP | MV_DOWN },
+  { EL_TUBE_HORIZONTAL,			MV_LEFT | MV_RIGHT                   },
+  { EL_TUBE_VERTICAL_LEFT,		MV_LEFT |            MV_UP | MV_DOWN },
+  { EL_TUBE_VERTICAL_RIGHT,		          MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_TUBE_HORIZONTAL_UP,		MV_LEFT | MV_RIGHT | MV_UP           },
+  { EL_TUBE_HORIZONTAL_DOWN,		MV_LEFT | MV_RIGHT |         MV_DOWN },
+  { EL_TUBE_LEFT_UP,			MV_LEFT |            MV_UP           },
+  { EL_TUBE_LEFT_DOWN,			MV_LEFT |                    MV_DOWN },
+  { EL_TUBE_RIGHT_UP,			          MV_RIGHT | MV_UP           },
+  { EL_TUBE_RIGHT_DOWN,			          MV_RIGHT |         MV_DOWN },
 
-  { EL_SP_PORT_LEFT,		          MV_RIGHT                   },
-  { EL_SP_PORT_RIGHT,		MV_LEFT                              },
-  { EL_SP_PORT_UP,		                             MV_DOWN },
-  { EL_SP_PORT_DOWN,		                     MV_UP           },
-  { EL_SP_PORT_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
-  { EL_SP_PORT_VERTICAL,	                     MV_UP | MV_DOWN },
-  { EL_SP_PORT_ANY,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
-  { EL_SP_GRAVITY_PORT_LEFT,	          MV_RIGHT                   },
-  { EL_SP_GRAVITY_PORT_RIGHT,	MV_LEFT                              },
-  { EL_SP_GRAVITY_PORT_UP,	                             MV_DOWN },
-  { EL_SP_GRAVITY_PORT_DOWN,	                     MV_UP           },
+  { EL_SP_PORT_LEFT,			          MV_RIGHT                   },
+  { EL_SP_PORT_RIGHT,			MV_LEFT                              },
+  { EL_SP_PORT_UP,			                             MV_DOWN },
+  { EL_SP_PORT_DOWN,			                     MV_UP           },
+  { EL_SP_PORT_HORIZONTAL,		MV_LEFT | MV_RIGHT                   },
+  { EL_SP_PORT_VERTICAL,		                     MV_UP | MV_DOWN },
+  { EL_SP_PORT_ANY,			MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+  { EL_SP_GRAVITY_PORT_LEFT,		          MV_RIGHT                   },
+  { EL_SP_GRAVITY_PORT_RIGHT,		MV_LEFT                              },
+  { EL_SP_GRAVITY_PORT_UP,		                             MV_DOWN },
+  { EL_SP_GRAVITY_PORT_DOWN,		                     MV_UP           },
+  { EL_SP_GRAVITY_ON_PORT_LEFT,		          MV_RIGHT                   },
+  { EL_SP_GRAVITY_ON_PORT_RIGHT,	MV_LEFT                              },
+  { EL_SP_GRAVITY_ON_PORT_UP,		                             MV_DOWN },
+  { EL_SP_GRAVITY_ON_PORT_DOWN,		                     MV_UP           },
+  { EL_SP_GRAVITY_OFF_PORT_LEFT,	          MV_RIGHT                   },
+  { EL_SP_GRAVITY_OFF_PORT_RIGHT,	MV_LEFT                              },
+  { EL_SP_GRAVITY_OFF_PORT_UP,		                             MV_DOWN },
+  { EL_SP_GRAVITY_OFF_PORT_DOWN,	                     MV_UP           },
 
-  { EL_UNDEFINED,		MV_NO_MOVING			     }
+  { EL_UNDEFINED,			MV_NO_MOVING			     }
 };
 
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
@@ -11045,6 +11053,16 @@ int DigField(struct PlayerInfo *player,
 	      element == EL_SP_GRAVITY_PORT_UP ||
 	      element == EL_SP_GRAVITY_PORT_DOWN)
 	    game.gravity = !game.gravity;
+	  else if (element == EL_SP_GRAVITY_ON_PORT_LEFT ||
+		   element == EL_SP_GRAVITY_ON_PORT_RIGHT ||
+		   element == EL_SP_GRAVITY_ON_PORT_UP ||
+		   element == EL_SP_GRAVITY_ON_PORT_DOWN)
+	    game.gravity = TRUE;
+	  else if (element == EL_SP_GRAVITY_OFF_PORT_LEFT ||
+		   element == EL_SP_GRAVITY_OFF_PORT_RIGHT ||
+		   element == EL_SP_GRAVITY_OFF_PORT_UP ||
+		   element == EL_SP_GRAVITY_OFF_PORT_DOWN)
+	    game.gravity = FALSE;
 	}
 
 	/* automatically move to the next field with double speed */

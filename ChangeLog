@@ -1,3 +1,7 @@
+2004-05-12
+	* added "gravity on" and "gravity off" ports for Supaplex compatibility
+	* corrected original Supaplex level loading code to use these new ports
+
 2004-05-10
 	* fixed bug with missing initialization of "modified" flag for GEs
 

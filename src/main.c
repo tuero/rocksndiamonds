@@ -3416,6 +3416,46 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "trigger",
     "player triggering change"
   },
+  {
+    "sp_gravity_on_port_right",
+    "sp_port",
+    "gravity on port (leading right)"
+  },
+  {
+    "sp_gravity_on_port_down",
+    "sp_port",
+    "gravity on port (leading down)"
+  },
+  {
+    "sp_gravity_on_port_left",
+    "sp_port",
+    "gravity on port (leading left)"
+  },
+  {
+    "sp_gravity_on_port_up",
+    "sp_port",
+    "gravity on port (leading up)"
+  },
+  {
+    "sp_gravity_off_port_right",
+    "sp_port",
+    "gravity off port (leading right)"
+  },
+  {
+    "sp_gravity_off_port_down",
+    "sp_port",
+    "gravity off port (leading down)"
+  },
+  {
+    "sp_gravity_off_port_left",
+    "sp_port",
+    "gravity off port (leading left)"
+  },
+  {
+    "sp_gravity_off_port_up",
+    "sp_port",
+    "gravity off port (leading up)"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

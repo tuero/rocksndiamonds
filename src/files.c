@@ -1770,7 +1770,11 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
 				       int nr)
 {
+  int num_special_ports;
   int i, x, y;
+
+  /* for details of the Supaplex level format, see Herman Perk's Supaplex
+     documentation file "SPFIX63.DOC" from his Supaplex "SpeedFix" package */
 
   /* read level body (width * height == 60 * 24 tiles == 1440 bytes) */
   for (y = 0; y < SP_LEVEL_YSIZE; y++)
@@ -1796,28 +1800,93 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
     }
   }
 
-  ReadUnusedBytesFromFile(file, 4);
+  ReadUnusedBytesFromFile(file, 4);	/* (not used by Supaplex engine) */
 
-  /* Initial gravitation: 1 == "on", anything else (0) == "off" */
+  /* initial gravity: 1 == "on", anything else (0) == "off" */
   level->initial_gravity = (fgetc(file) == 1 ? TRUE : FALSE);
 
-  ReadUnusedBytesFromFile(file, 1);
+  ReadUnusedBytesFromFile(file, 1);	/* (not used by Supaplex engine) */
 
   /* level title in uppercase letters, padded with dashes ("-") (23 bytes) */
   for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
     level->name[i] = fgetc(file);
   level->name[SP_LEVEL_NAME_LEN] = '\0';
 
-  /* initial "freeze zonks": 2 == "on", anything else (0) == "off" */
-  ReadUnusedBytesFromFile(file, 1);	/* !!! NOT SUPPORTED YET !!! */
+  /* initial "freeze zonks": 2 == "on", anything else (0, 1) == "off" */
+  ReadUnusedBytesFromFile(file, 1);	/* (not used by R'n'D engine) */
 
   /* number of infotrons needed; 0 means that Supaplex will count the total
-     amount of infotrons in the level and use the low byte of that number.
+     amount of infotrons in the level and use the low byte of that number
      (a multiple of 256 infotrons will result in "0 infotrons needed"!) */
   level->gems_needed = fgetc(file);
 
-  /* information about special gravity port entries */
-  ReadUnusedBytesFromFile(file, 65);	/* !!! NOT SUPPORTED YET !!! */
+  /* number of special ("gravity") port entries below (maximum 10 allowed) */
+  num_special_ports = fgetc(file);
+
+  /* database of properties of up to 10 special ports (6 bytes per port) */
+  for (i = 0; i < 10; i++)
+  {
+    int port_location, port_x, port_y, port_element;
+    int gravity;
+
+    /* high and low byte of the location of a special port; if (x, y) are the
+       coordinates of a port in the field and (0, 0) is the top-left corner,
+       the 16 bit value here calculates as 2 * (x + (y * 60)) (this is twice
+       of what may be expected: Supaplex works with a game field in memory
+       which is 2 bytes per tile) */
+    port_location = getFile16BitBE(file);
+
+    /* change gravity: 1 == "turn on", anything else (0) == "turn off" */
+    gravity = fgetc(file);
+
+    /* "freeze zonks": 2 == "turn on", anything else (0, 1) == "turn off" */
+    ReadUnusedBytesFromFile(file, 1);	/* (not used by R'n'D engine) */
+
+    /* "freeze enemies": 1 == "turn on", anything else (0) == "turn off" */
+    ReadUnusedBytesFromFile(file, 1);	/* (not used by R'n'D engine) */
+
+    ReadUnusedBytesFromFile(file, 1);	/* (not used by Supaplex engine) */
+
+    if (i >= num_special_ports)
+      continue;
+
+    port_x = (port_location / 2) % SP_LEVEL_XSIZE;
+    port_y = (port_location / 2) / SP_LEVEL_XSIZE;
+
+    if (port_x < 0 || port_x >= SP_LEVEL_XSIZE ||
+	port_y < 0 || port_y >= SP_LEVEL_YSIZE)
+    {
+      Error(ERR_WARN, "special port position (%d, %d) out of bounds",
+	    port_x, port_y);
+
+      continue;
+    }
+
+    port_element = level->field[port_x][port_y];
+
+    if (port_element < EL_SP_GRAVITY_PORT_RIGHT ||
+	port_element > EL_SP_GRAVITY_PORT_UP)
+    {
+      Error(ERR_WARN, "no special port at position (%d, %d)", port_x, port_y);
+
+      continue;
+    }
+
+    /* change previous (wrong) gravity inverting special port to either
+       gravity enabling special port or gravity disabling special port */
+    level->field[port_x][port_y] +=
+      (gravity == 1 ? EL_SP_GRAVITY_ON_PORT_RIGHT :
+       EL_SP_GRAVITY_OFF_PORT_RIGHT) - EL_SP_GRAVITY_PORT_RIGHT;
+  }
+
+  ReadUnusedBytesFromFile(file, 4);	/* (not used by Supaplex engine) */
+
+  /* change special gravity ports without database entries to normal ports */
+  for (y = 0; y < SP_LEVEL_YSIZE; y++)
+    for (x = 0; x < SP_LEVEL_XSIZE; x++)
+      if (level->field[x][y] >= EL_SP_GRAVITY_PORT_RIGHT &&
+	  level->field[x][y] <= EL_SP_GRAVITY_PORT_UP)
+	level->field[x][y] += EL_SP_PORT_RIGHT - EL_SP_GRAVITY_PORT_RIGHT;
 
   level->fieldx = SP_LEVEL_XSIZE;
   level->fieldy = SP_LEVEL_YSIZE;
