@@ -26,6 +26,7 @@ int arg_install;
 int arg_silence;
 
 int em_game_status;
+boolean skip_menu = TRUE;
 
 extern void tab_generate();
 extern void ulaw_generate();
@@ -51,10 +52,21 @@ void em_close_all()
   close_all();
 }
 
-void em_main_init_game()
+int em_main_init_game(int level_nr)
 {
-  em_game_status = EM_GAME_STATUS_MENU;
-  game_menu_init();
+  if (skip_menu)
+  {
+    em_game_status = EM_GAME_STATUS_PLAY;
+    if (game_play_init(level_nr) != 0)
+      return 1;
+  }
+  else
+  {
+    em_game_status = EM_GAME_STATUS_MENU;
+    game_menu_init();
+  }
+
+  return 0;
 }
 
 int em_main_handle_game(byte action)

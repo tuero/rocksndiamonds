@@ -331,6 +331,9 @@ int game_loop(byte action)
     {
       /* stop playing */
 
+      if (skip_menu)
+	return 1;
+
       em_game_status = EM_GAME_STATUS_MENU;
       game_menu_init();
     }

@@ -503,15 +503,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	{
 	  game_status = GAME_MODE_PLAYING;
 	  StopAnimation();
-
-#if 1
-
-	  em_main_init_game();
-
-#else
 	  InitGame();
-
-#endif
 	}
       }
       else if (y == 6)

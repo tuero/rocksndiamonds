@@ -15,6 +15,8 @@
 
 #if defined(TARGET_X11)
 
+extern void DrawGameDoorValues_EM(int, int, int, int);
+
 unsigned int frame; /* current frame */
 unsigned int screen_x; /* current scroll position */
 unsigned int screen_y;
@@ -110,11 +112,13 @@ void blitscreen(void)
 	       SX + MAX_BUF_XSIZE * TILEX - x, SY + MAX_BUF_YSIZE * TILEY - y);
   }
 
-  /* draw either the main menu footer or the in-game time/gems/score values */
-
-  if (em_game_status == EM_GAME_STATUS_PLAY)
+  if (em_game_status == EM_GAME_STATUS_PLAY && SCR_FIELDY < 17)
+  {
     BlitBitmap(scoreBitmap, window, 0, 0, SCR_FIELDX * TILEX, SCOREY,
-	       SX, SY + SCR_FIELDY * TILEY - SCOREY);
+	       SX, SY + SCR_FIELDY * TILEY);
+    ClearRectangle(window, SX, SY + SCR_FIELDY * TILEY + SCOREY,
+		   SCR_FIELDX * TILEX, (17 - SCR_FIELDY) * TILEY - SCOREY);
+  }
 
   XFlush(display);
 
@@ -332,16 +336,22 @@ void game_blitscore(void)
 
   xdebug("game_blitscore");
 
+  DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
+			(lev.time + 4) / 5);
+
   i = (lev.time + 4) / 5;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     7 * SCOREX, 0); i /= 10;
+	     7 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     6 * SCOREX, 0); i /= 10;
+	     6 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     5 * SCOREX, 0); i /= 10;
+	     5 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
 	     4 * SCOREX, 0);
@@ -349,13 +359,16 @@ void game_blitscore(void)
   i = lev.score;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     31 * SCOREX, 0); i /= 10;
+	     31 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     30 * SCOREX, 0); i /= 10;
+	     30 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
-	     29 * SCOREX, 0); i /= 10;
+	     29 * SCOREX, 0);
+  i /= 10;
   BlitBitmap(botBitmap, scoreBitmap,
 	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
 	     28 * SCOREX, 0);

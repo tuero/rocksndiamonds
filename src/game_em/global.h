@@ -26,6 +26,7 @@ extern unsigned int frame;
 #define EM_GAME_STATUS_PLAY	2
 
 extern int em_game_status;
+extern boolean skip_menu;
 
 extern short ulaw_to_linear[256];
 extern unsigned char linear_to_ulaw[65536];
@@ -54,6 +55,7 @@ void sound_play(void);
 int cave_convert(char *filename);
 
 void game_init_vars(void);
+int game_play_init(int);
 int game_loop(byte);
 
 void synchro_1(void);

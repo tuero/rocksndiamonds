@@ -1124,6 +1124,14 @@ void DrawGameDoorValues()
   DrawGameValue_Time(TimeLeft);
 }
 
+void DrawGameDoorValues_EM(int emeralds, int dynamite, int score, int time)
+{
+  DrawGameValue_Emeralds(emeralds);
+  DrawGameValue_Dynamite(dynamite);
+  DrawGameValue_Score(score);
+  DrawGameValue_Time(time);
+}
+
 static void resolve_group_element(int group_element, int recursion_depth)
 {
   static int group_nr;
@@ -2052,6 +2060,18 @@ void InitGame()
 
   CloseDoor(DOOR_CLOSE_1);
 
+#if 1
+
+  if (em_main_init_game(level_nr) != 0)
+  {
+    game_status = GAME_MODE_MAIN;
+    DrawMainMenu();
+
+    return;
+  }
+
+#else
+
   DrawLevel();
   DrawAllPlayers();
 
@@ -2064,6 +2084,8 @@ void InitGame()
 
   redraw_mask |= REDRAW_FROM_BACKBUFFER;
   FadeToFront();
+
+#endif
 
   /* copy default game door content to main double buffer */
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
