@@ -1658,33 +1658,7 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
     if (gi->mapped &&
 	mx >= gi->x && mx < gi->x + gi->width &&
 	my >= gi->y && my < gi->y + gi->height)
-    {
-
-#if 0
-      if (gi->type & GD_TYPE_SCROLLBAR)
-      {
-	int mpos, gpos;
-
-	if (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL)
-	{
-	  mpos = mx;
-	  gpos = gi->x;
-	}
-	else
-	{
-	  mpos = my;
-	  gpos = gi->y;
-	}
-
-	if (mpos >= gpos + gi->scrollbar.position &&
-	    mpos < gpos + gi->scrollbar.position + gi->scrollbar.size)
-	  break;
-      }
-      else
-#endif
-
 	break;
-    }
 
     gi = gi->next;
   }
@@ -1845,6 +1819,27 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 
       case GDI_DESIGN_BORDER:
 	new_gadget->design_border = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_DESIGN:
+	new_gadget->deco.design.pixmap = va_arg(ap, Pixmap);
+	new_gadget->deco.design.x = va_arg(ap, int);
+	new_gadget->deco.design.y = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_POSITION:
+	new_gadget->deco.x = va_arg(ap, int);
+	new_gadget->deco.y = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_SIZE:
+	new_gadget->deco.width = va_arg(ap, int);
+	new_gadget->deco.height = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_SHIFTING:
+	new_gadget->deco.xshift = va_arg(ap, int);
+	new_gadget->deco.yshift = va_arg(ap, int);
 	break;
 
       case GDI_EVENT_MASK:
@@ -2025,6 +2020,12 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     case GD_TYPE_RADIO_BUTTON:
       XCopyArea(display, gd->pixmap, drawto, gc,
 		gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+      if (gi->deco.design.pixmap)
+	XCopyArea(display, gi->deco.design.pixmap, drawto, gc,
+		  gi->deco.design.x, gi->deco.design.y,
+		  gi->deco.width, gi->deco.height,
+		  gi->x + gi->deco.x + (pressed ? gi->deco.xshift : 0),
+		  gi->y + gi->deco.y + (pressed ? gi->deco.yshift : 0));
       break;
 
     case GD_TYPE_TEXTINPUT_ALPHANUMERIC:

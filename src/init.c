@@ -81,8 +81,8 @@ void OpenAll(int argc, char *argv[])
   XFlush(display);
 
   InitGfx();
-  InitGadgets();
   InitElementProperties();
+  InitGadgets();
 
   DrawMainMenu();
 

@@ -4887,18 +4887,18 @@ static struct
 
 void CreateGameButtons()
 {
-  Pixmap gd_pixmap = pix[PIX_DOOR];
-  struct GadgetInfo *gi;
-  unsigned long event_mask;
   int i;
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    int id = i;
-    int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    struct GadgetInfo *gi;
     int button_type;
     boolean checked;
+    unsigned long event_mask;
+    int gd_xoffset, gd_yoffset;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+    int id = i;
 
     gd_xoffset = gamebutton_info[i].x;
     gd_yoffset = gamebutton_info[i].y;

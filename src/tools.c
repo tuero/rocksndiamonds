@@ -775,6 +775,38 @@ void DrawMiniGraphic(int x, int y, int graphic)
   MarkTileDirty(x/2, y/2);
 }
 
+void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
+{
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
+    *pixmap = pix[PIX_BACK];
+    *x = MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX;
+    *y = MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    *pixmap = pix[PIX_MORE];
+    *x = MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX;
+    *y = MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY;
+  }
+  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
+  {
+    graphic -= GFX_START_ROCKSFONT;
+    *pixmap = pix[PIX_SMALLFONT];
+    *x = (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE;
+    *y = ((graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE +
+	  FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT);
+  }
+  else
+  {
+    *pixmap = pix[PIX_MORE];
+    *x = MINI_MORE_STARTX;
+    *y = MINI_MORE_STARTY;
+  }
+}
+
 void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)

@@ -77,6 +77,7 @@ void DrawGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicThruMask(int, int, int);
 void DrawGraphicThruMaskExt(Drawable, int, int, int);
 void DrawMiniGraphic(int, int, int);
+void getMiniGraphicSource(int, Pixmap *, int *, int *);
 void DrawMiniGraphicExt(Drawable, GC, int, int, int);
 void DrawGraphicShifted(int, int, int, int, int, int, int);
 void DrawGraphicShiftedThruMask(int, int, int, int, int, int);

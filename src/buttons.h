@@ -330,16 +330,20 @@ int CheckCountButtons(int, int, int);
 #define GDI_ALT_DESIGN_UNPRESSED	17
 #define GDI_ALT_DESIGN_PRESSED		18
 #define GDI_DESIGN_BORDER		19
-#define GDI_EVENT_MASK			20
-#define GDI_EVENT			21
-#define GDI_CALLBACK_INFO		22
-#define GDI_CALLBACK_ACTION		23
-#define GDI_AREA_SIZE			24
-#define GDI_ITEM_SIZE			25
-#define GDI_SCROLLBAR_ITEMS_MAX		26
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	27
-#define GDI_SCROLLBAR_ITEM_POSITION	28
-#define GDI_INFO_TEXT			29
+#define GDI_DECORATION_DESIGN		20
+#define GDI_DECORATION_POSITION		22
+#define GDI_DECORATION_SIZE		21
+#define GDI_DECORATION_SHIFTING		23
+#define GDI_EVENT_MASK			24
+#define GDI_EVENT			25
+#define GDI_CALLBACK_INFO		26
+#define GDI_CALLBACK_ACTION		27
+#define GDI_AREA_SIZE			28
+#define GDI_ITEM_SIZE			29
+#define GDI_SCROLLBAR_ITEMS_MAX		30
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	31
+#define GDI_SCROLLBAR_ITEM_POSITION	32
+#define GDI_INFO_TEXT			33
 
 typedef void (*gadget_function)(void *);
 
@@ -347,6 +351,14 @@ struct GadgetDesign
 {
   Pixmap pixmap;			/* Pixmap with gadget surface */
   int x, y;				/* position of rectangle in Pixmap */
+};
+
+struct GadgetDecoration
+{
+  struct GadgetDesign design;		/* decoration design structure */
+  int x, y;				/* position of deco on the gadget */
+  int width, height;			/* width and height of decoration */
+  int xshift, yshift;			/* deco shifting when gadget pressed */
 };
 
 struct GadgetEvent
@@ -400,6 +412,7 @@ struct GadgetInfo
   boolean mapped;			/* gadget is active */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
+  struct GadgetDecoration deco;		/* decoration on top of gadget */
   int design_border;			/* border size of gadget decoration */
   unsigned long event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
