@@ -161,12 +161,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "bug",
     "bug",
-    "bug"
+    "bug (random start direction)"
   },
   {
     "spaceship",
     "spaceship",
-    "spaceship"
+    "spaceship (random start direction)"
   },
   {
     "yamyam",
@@ -338,7 +338,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "pacman",
     "pacman",
-    "pac man"
+    "pac man (random start direction)"
   },
   {
     "invisible_wall",
@@ -500,12 +500,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "bd_butterfly",
     "bd_butterfly",
-    "butterfly"
+    "butterfly (random start direction)"
   },
   {
     "bd_firefly",
     "bd_firefly",
-    "firefly"
+    "firefly (random start direction)"
   },
   {
     "player_1",
@@ -657,7 +657,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "mole",
     "mole",
-    "mole"
+    "mole (random start direction)"
   },
   {
     "penguin",

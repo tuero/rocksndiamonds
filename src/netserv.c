@@ -20,7 +20,6 @@
 #include <signal.h>
 #include <sys/socket.h>
 #include <errno.h>
-#include <string.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>

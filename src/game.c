@@ -5643,10 +5643,9 @@ static boolean CheckTriggeredElementSideChange(int lx, int ly,
     int element = EL_CUSTOM_START + i;
 
     boolean change_element = FALSE;
-    int page;
+    int page = 0;
 
-    if (!CAN_CHANGE(element) ||
-	!HAS_ANY_CHANGE_EVENT(element, trigger_event))
+    if (!CAN_CHANGE(element) || !HAS_ANY_CHANGE_EVENT(element, trigger_event))
       continue;
 
     for (j=0; j < element_info[element].num_change_pages; j++)

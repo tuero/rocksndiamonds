@@ -1,6 +1,12 @@
-Release Version 3.0.5 [?? ??? ????]
+Release Version 3.0.5 [29 SEP 2003]
 -----------------------------------
-	- Enhanced (remaining low-resolution) Supaplex graphics
+	- fixed bug in multiple config pages loader code that caused crashes
+	- enhanced (remaining low-resolution) Supaplex graphics
+	- active/inactive sides configurable for custom element changes
+	- new movement type "move when pushed" available for custom elements
+	- now four envelope elements available
+	- font, background, animation and sound for envelope now configurable
+	- main menu doors opening/closing animation type now configurable
 
 Release Version 3.0.4 [13 SEP 2003]
 -----------------------------------
