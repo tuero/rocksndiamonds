@@ -71,6 +71,7 @@ void OpenAll(void)
 
   InitSetup();
   InitPlayerInfo();
+  InitArtworkInfo();		/* needed before loading gfx, sound & music */
 
   InitCounter();
   InitSound();
@@ -83,7 +84,6 @@ void OpenAll(void)
 
   InitEventFilter(FilterMouseMotionEvents);
 
-  InitArtworkInfo();
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 

@@ -543,9 +543,11 @@ void dumpTreeInfo(TreeInfo *node, int depth)
 {
   int i;
 
+  printf("Dumping TreeInfo:\n");
+
   while (node)
   {
-    for (i=0; i<depth * 3; i++)
+    for (i=0; i<(depth + 1) * 3; i++)
       printf(" ");
 
     printf("filename == '%s' [%s]\n", node->filename, node->name);
@@ -1074,12 +1076,9 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"	}
 };
 
-static void setTreeInfoToDefaults(TreeInfo *ldi)
+static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
 {
-  /* ldi->type is expected to be already set! */
-
-  if (ldi->type == 0)
-    Error(ERR_EXIT, "ldi->type == 0");
+  ldi->type = type;
 
   ldi->node_top = (ldi->type == TREE_TYPE_LEVEL_DIR ? &leveldir_first :
 		   ldi->type == TREE_TYPE_GRAPHICS_DIR ? &artwork.gfx_first :
@@ -1124,7 +1123,9 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
 {
   if (parent == NULL)
   {
-    setTreeInfoToDefaults(ldi);
+    Error(ERR_WARN, "setTreeInfoToDefaultsFromParent(): parent == NULL");
+
+    setTreeInfoToDefaults(ldi, TREE_TYPE_GENERIC);
     return;
   }
 
@@ -1230,9 +1231,7 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
     return;
 
   ti_new = newTreeInfo();
-  ti_new->type = node_parent->type;
-
-  setTreeInfoToDefaults(ti_new);
+  setTreeInfoToDefaults(ti_new, node_parent->type);
 
   ti_new->node_parent = node_parent;
   ti_new->parent_link = TRUE;
@@ -1275,10 +1274,13 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   }
 
   leveldir_new = newTreeInfo();
-  leveldir_new->type = TREE_TYPE_LEVEL_DIR;
+
+  if (node_parent)
+    setTreeInfoToDefaultsFromParent(leveldir_new, node_parent);
+  else
+    setTreeInfoToDefaults(leveldir_new, TREE_TYPE_LEVEL_DIR);
 
   checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
-  setTreeInfoToDefaultsFromParent(leveldir_new, node_parent);
 
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
@@ -1478,13 +1480,15 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   }
 
   artwork_new = newTreeInfo();
-  artwork_new->type = type;
 
-  setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
+  if (node_parent)
+    setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
+  else
+    setTreeInfoToDefaults(artwork_new, type);
 
   artwork_new->filename = getStringCopy(directory_name);
 
-  if (setup_file_list)
+  if (setup_file_list)	/* (before defining ".color" and ".class_desc") */
   {
 #if 0
     checkSetupFileListIdentifier(setup_file_list, getCookie("..."));
@@ -1505,19 +1509,6 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     if (artwork_new->name_sorting == NULL)
       artwork_new->name_sorting = getStringCopy(artwork_new->name);
   }
-  else
-  {
-    if (artwork_new->name != NULL)
-      free(artwork_new->name);
-
-    if (strcmp(artwork_new->filename, ".") == 0)
-      artwork_new->name = getStringCopy("default");
-    else
-      artwork_new->name = getStringCopy(artwork_new->filename);
-
-    artwork_new->name_short = getStringCopy(artwork_new->name);
-    artwork_new->name_sorting = getStringCopy(artwork_new->name);
-  }
 
   if (node_parent == NULL)		/* top level group */
   {
@@ -1536,10 +1527,28 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   artwork_new->user_defined =
     (artwork_new->basepath == check_dir ? FALSE : TRUE);
 
-#if 0
+  /* (may use ".sort_priority" from "setup_file_list" above) */
   artwork_new->color = LEVELCOLOR(artwork_new);
   artwork_new->class_desc = getLevelClassDescription(artwork_new);
-#endif
+
+  if (setup_file_list == NULL)	/* (after determining ".user_defined") */
+  {
+    if (artwork_new->name != NULL)
+      free(artwork_new->name);
+
+    if (strcmp(artwork_new->filename, ".") == 0)
+    {
+      if (artwork_new->user_defined)
+	artwork_new->name = getStringCopy("private");
+      else
+	artwork_new->name = getStringCopy("default");
+    }
+    else
+      artwork_new->name = getStringCopy(artwork_new->filename);
+
+    artwork_new->name_short = getStringCopy(artwork_new->name);
+    artwork_new->name_sorting = getStringCopy(artwork_new->name);
+  }
 
   pushTreeInfo(node_first, artwork_new);
 
@@ -1637,6 +1646,7 @@ void LoadArtworkInfo()
 				getUserMusicDir(NULL),
 				TREE_TYPE_MUSIC_DIR);
 
+  /* before sorting, the first entries will be from the user directory */
   artwork.gfx_current = artwork.gfx_first;
   artwork.snd_current = artwork.snd_first;
   artwork.mus_current = artwork.mus_first;
@@ -1645,7 +1655,7 @@ void LoadArtworkInfo()
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
 
-#if 0
+#if 1
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
@@ -1668,7 +1678,7 @@ static void SaveUserLevelInfo()
   }
 
   /* always start with reliable default values */
-  setTreeInfoToDefaults(&ldi);
+  setTreeInfoToDefaults(&ldi, TREE_TYPE_LEVEL_DIR);
 
   ldi.name = getLoginName();
   ldi.author = getRealName();

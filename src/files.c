@@ -1181,8 +1181,11 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_TIME_LIMIT		13
 #define SETUP_TOKEN_FULLSCREEN		14
 #define SETUP_TOKEN_ASK_ON_ESCAPE	15
+#define SETUP_TOKEN_GRAPHICS_DIR	16
+#define SETUP_TOKEN_SOUNDS_DIR		17
+#define SETUP_TOKEN_MUSIC_DIR		18
 
-#define NUM_GLOBAL_SETUP_TOKENS		16
+#define NUM_GLOBAL_SETUP_TOKENS		19
 
 /* shortcut setup */
 #define SETUP_TOKEN_SAVE_GAME		0
@@ -1231,8 +1234,11 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
   { TYPE_SWITCH, &si.handicap,		"handicap"			},
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
+  { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
-  { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			}
+  { TYPE_STRING, &si.graphics_dir,	"graphics_dir"			},
+  { TYPE_STRING, &si.sounds_dir,	"sounds_dir"			},
+  { TYPE_STRING, &si.music_dir,		"music_dir"			},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -1286,6 +1292,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
   si->ask_on_escape = TRUE;
+
+  si->graphics_dir = getStringCopy(GRAPHICS_DIRECTORY);
+  si->sounds_dir = getStringCopy(SOUNDS_DIRECTORY);
+  si->music_dir = getStringCopy(MUSIC_DIRECTORY);
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
@@ -1412,7 +1422,7 @@ void SaveSetup()
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
 
     /* just to make things nicer :) */
-    if (i == SETUP_TOKEN_PLAYER_NAME)
+    if (i == SETUP_TOKEN_PLAYER_NAME || i == SETUP_TOKEN_GRAPHICS_DIR - 1)
       fprintf(file, "\n");
   }
 

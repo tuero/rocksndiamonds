@@ -307,6 +307,10 @@ struct SetupInfo
   boolean fullscreen;
   boolean ask_on_escape;
 
+  char *graphics_dir;
+  char *sounds_dir;
+  char *music_dir;
+
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
 };
