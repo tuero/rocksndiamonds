@@ -1383,7 +1383,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_smash_friends[] =
+  static int ep_can_smash_player[] =
   {
     EL_ROCK,
     EL_BD_ROCK,
@@ -1416,7 +1416,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_can_smash_explosives[] =
+  static int ep_can_smash_everything[] =
   {
     EL_ROCK,
     EL_BD_ROCK,
@@ -2310,9 +2310,9 @@ void InitElementPropertiesStatic()
     { ep_can_change,		EP_CAN_CHANGE		},
     { ep_can_move,		EP_CAN_MOVE		},
     { ep_can_fall,		EP_CAN_FALL		},
-    { ep_can_smash_friends,	EP_CAN_SMASH_FRIENDS	},
+    { ep_can_smash_player,	EP_CAN_SMASH_PLAYER	},
     { ep_can_smash_enemies,	EP_CAN_SMASH_ENEMIES	},
-    { ep_can_smash_explosives,	EP_CAN_SMASH_EXPLOSIVES	},
+    { ep_can_smash_everything,	EP_CAN_SMASH_EVERYTHING	},
     { ep_can_explode_by_fire,	EP_CAN_EXPLODE_BY_FIRE	},
     { ep_can_explode_smashed,	EP_CAN_EXPLODE_SMASHED	},
     { ep_can_explode_impact,	EP_CAN_EXPLODE_IMPACT	},
@@ -2450,9 +2450,9 @@ void InitElementPropertiesEngine(int engine_version)
     EP_DONT_COLLIDE_WITH,
     EP_CAN_MOVE,
     EP_CAN_FALL,
-    EP_CAN_SMASH_FRIENDS,
+    EP_CAN_SMASH_PLAYER,
     EP_CAN_SMASH_ENEMIES,
-    EP_CAN_SMASH_EXPLOSIVES,
+    EP_CAN_SMASH_EVERYTHING,
     EP_PUSHABLE,
 
     EP_CAN_BE_CRUMBLED,
@@ -2562,17 +2562,17 @@ void InitElementPropertiesEngine(int engine_version)
       if (DONT_COLLIDE_WITH(i))
 	SET_PROPERTY(i, EP_DONT_RUN_INTO, TRUE);
 
-      /* ---------- CAN_SMASH_ENEMIES / CAN_SMASH_FRIENDS ------------------ */
-      if (CAN_SMASH_EXPLOSIVES(i))
+      /* ---------- CAN_SMASH_ENEMIES / CAN_SMASH_PLAYER ------------------- */
+      if (CAN_SMASH_EVERYTHING(i))
 	SET_PROPERTY(i, EP_CAN_SMASH_ENEMIES, TRUE);
       if (CAN_SMASH_ENEMIES(i))
-	SET_PROPERTY(i, EP_CAN_SMASH_FRIENDS, TRUE);
+	SET_PROPERTY(i, EP_CAN_SMASH_PLAYER, TRUE);
     }
 
     /* ---------- CAN_SMASH ------------------------------------------------ */
-    SET_PROPERTY(i, EP_CAN_SMASH, (CAN_SMASH_FRIENDS(i) ||
+    SET_PROPERTY(i, EP_CAN_SMASH, (CAN_SMASH_PLAYER(i) ||
 				   CAN_SMASH_ENEMIES(i) ||
-				   CAN_SMASH_EXPLOSIVES(i)));
+				   CAN_SMASH_EVERYTHING(i)));
 
     /* ---------- CAN_EXPLODE ---------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||

@@ -884,9 +884,9 @@ static int value_deadliness = 0;
 
 static struct ValueTextInfo options_smash_targets[] =
 {
-  { EP_CAN_SMASH_FRIENDS,	"friends"			},
+  { EP_CAN_SMASH_PLAYER,	"player"			},
   { EP_CAN_SMASH_ENEMIES,	"enemies"			},
-  { EP_CAN_SMASH_EXPLOSIVES,	"explosives"			},
+  { EP_CAN_SMASH_EVERYTHING,	"everything"			},
   { -1,				NULL				}
 };
 static int value_smash_targets = 0;
@@ -3447,14 +3447,14 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* set smash targets selectbox help value */
   value_smash_targets =
-    (CAN_SMASH_EXPLOSIVES(element) ? EP_CAN_SMASH_EXPLOSIVES :
+    (CAN_SMASH_EVERYTHING(element) ? EP_CAN_SMASH_EVERYTHING :
      CAN_SMASH_ENEMIES(element) ? EP_CAN_SMASH_ENEMIES :
-     CAN_SMASH_FRIENDS(element) ? EP_CAN_SMASH_FRIENDS :
-     EP_CAN_SMASH_FRIENDS);
+     CAN_SMASH_PLAYER(element) ? EP_CAN_SMASH_PLAYER :
+     EP_CAN_SMASH_PLAYER);
   custom_element_properties[EP_CAN_SMASH] =
-    (CAN_SMASH_EXPLOSIVES(element) ||
+    (CAN_SMASH_EVERYTHING(element) ||
      CAN_SMASH_ENEMIES(element) ||
-     CAN_SMASH_FRIENDS(element));
+     CAN_SMASH_PLAYER(element));
 
   /* set walkable layer selectbox help value */
   value_walkable_layer =
@@ -3501,9 +3501,9 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_properties[EP_DEADLY];
 
   /* set smash property from checkbox and selectbox */
-  custom_element_properties[EP_CAN_SMASH_FRIENDS] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_PLAYER] = FALSE;
   custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
-  custom_element_properties[EP_CAN_SMASH_EXPLOSIVES] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_EVERYTHING] = FALSE;
   custom_element_properties[value_smash_targets] =
     custom_element_properties[EP_CAN_SMASH];
 
@@ -4253,9 +4253,9 @@ static void DrawPropertiesInfo()
 #if 0
     { EP_CAN_SMASH,		"- can smash"				},
 #endif
-    { EP_CAN_SMASH_FRIENDS,	"- can smash player and friends"	},
+    { EP_CAN_SMASH_PLAYER,	"- can smash player"			},
     { EP_CAN_SMASH_ENEMIES,	"- can smash good and bad guys"		},
-    { EP_CAN_SMASH_EXPLOSIVES,	"- can smash everything smashable"	},
+    { EP_CAN_SMASH_EVERYTHING,	"- can smash everything smashable"	},
     { EP_CAN_EXPLODE,		"- can explode"				},
     { EP_CAN_EXPLODE_BY_FIRE,	"  - by fire or explosions"		},
     { EP_CAN_EXPLODE_SMASHED,	"  - when smashed"			},

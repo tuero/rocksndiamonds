@@ -2326,10 +2326,12 @@ void Impact(int x, int y)
       return;
 
     object_hit = (!IS_FREE(x, y+1) && (!IS_MOVING(x, y+1) ||
-				      MovDir[x][y+1] != MV_DOWN ||
-				      MovPos[x][y+1] <= TILEY / 2));
+				       MovDir[x][y+1] != MV_DOWN ||
+				       MovPos[x][y+1] <= TILEY / 2));
     if (object_hit)
       smashed = MovingOrBlocked2Element(x, y+1);
+
+    impact = (lastline || object_hit);
   }
 
   if (!lastline && smashed == EL_ACID)	/* element falls into acid */
@@ -2379,7 +2381,11 @@ void Impact(int x, int y)
     return;
   }
 
+#if 1
+  if (object_hit)		/* check which object was hit */
+#else
   if (!lastline && object_hit)		/* check which object was hit */
+#endif
   {
     if (CAN_PASS_MAGIC_WALL(element) && 
 	(smashed == EL_MAGIC_WALL ||
@@ -2406,13 +2412,19 @@ void Impact(int x, int y)
 
     if (IS_PLAYER(x, y + 1))
     {
-      KillHeroUnlessProtected(x, y+1);
-      return;
+      if (CAN_SMASH_PLAYER(element))
+      {
+	KillHeroUnlessProtected(x, y+1);
+	return;
+      }
     }
     else if (smashed == EL_PENGUIN)
     {
-      Bang(x, y + 1);
-      return;
+      if (CAN_SMASH_PLAYER(element))
+      {
+	Bang(x, y + 1);
+	return;
+      }
     }
     else if (element == EL_BD_DIAMOND)
     {
@@ -2431,11 +2443,18 @@ void Impact(int x, int y)
       Bang(x, y + 1);
       return;
     }
+#if 1
+    else if (CAN_SMASH_EVERYTHING(element))
+#else
     else if (element == EL_ROCK ||
 	     element == EL_SP_ZONK ||
 	     element == EL_BD_ROCK)
+#endif
     {
       if (IS_CLASSIC_ENEMY(smashed) ||
+#if 1
+	  CAN_EXPLODE_SMASHED(smashed))
+#else
 	  smashed == EL_BOMB ||
 	  smashed == EL_SP_DISK_ORANGE ||
 	  smashed == EL_DX_SUPABOMB ||
@@ -2443,6 +2462,7 @@ void Impact(int x, int y)
 	  smashed == EL_PIG ||
 	  smashed == EL_DRAGON ||
 	  smashed == EL_MOLE)
+#endif
       {
 	Bang(x, y + 1);
 	return;
