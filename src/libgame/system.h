@@ -493,6 +493,14 @@ struct FileInfo
   int *parameter;				/* array of file parameters */
 };
 
+struct SetupFileList
+{
+  char *token;
+  char *value;
+
+  struct SetupFileList *next;
+};
+
 struct ListNodeInfo
 {
   char *source_filename;			/* primary key for node list */
@@ -508,6 +516,7 @@ struct ArtworkListInfo
 
   struct FileInfo *file_list;			/* static artwork file array */
   struct ConfigInfo *suffix_list;		/* parameter suffixes array */
+  struct SetupFileList *custom_setup_list;	/* additional definitions */
 
   struct ListNodeInfo **artwork_list;		/* static artwork node array */
 

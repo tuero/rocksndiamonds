@@ -739,6 +739,7 @@ void InitImageList(struct ConfigInfo *config_list,
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   image_info->suffix_list = config_suffix_list;
+  image_info->custom_setup_list = NULL;
 
   image_info->artwork_list =
     checked_calloc(num_file_list_entries * sizeof(ImageInfo *));

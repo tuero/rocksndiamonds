@@ -179,553 +179,2671 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 {
   /* "real" level file elements */
 
-  { "empty_space",		"empty space"			},      /* 0 */
-  { "sand",			"sand"				},
-  { "wall",			"normal wall"			},
-  { "wall",			"round wall"			},
-  { "rock",			"rock"				},
-  { "key",			"key"				},
-  { "emerald",			"emerald"			},
-  { "exit",			"closed exit"			},
-  { "player",			"player"			},
-  { "bug",			"bug"				},
-  { "spaceship",		"spaceship"			},     /* 10 */
-  { "yamyam",			"yam yam"			},
-  { "robot",			"robot"				},
-  { "wall",			"steel wall"			},
-  { "diamond",			"diamond"			},
-  { "amoeba",			"dead amoeba"			},
-  { "quicksand",		"empty quicksand"		},
-  { "quicksand",		"quicksand with rock"		},
-  { "amoeba",			"amoeba drop"			},
-  { "bomb",			"bomb"				},
-  { "magic_wall",		"magic wall"			},     /* 20 */
-  { "speed_pill",		"speed pill"			},
-  { "acid",			"acid"				},
-  { "amoeba",			"dropping amoeba"		},
-  { "amoeba",			"normal amoeba"			},
-  { "nut",			"nut with emerald"		},
-  { "gameoflife",		"Conway's wall of life"		},
-  { "biomaze",			"biomaze"			},
-  { "dynamite",			"burning dynamite"		},
-  { "wall",			"wall"				},
-  { "robot_wheel",		"magic wheel"			},     /* 30 */
-  { "robot_wheel",		"magic wheel (running)"		},
-  { "key",			"red key"			},
-  { "key",			"yellow key"			},
-  { "key",			"green key"			},
-  { "key",			"blue key"			},
-  { "gate",			"red door"			},
-  { "gate",			"yellow door"			},
-  { "gate",			"green door"			},
-  { "gate",			"blue door"			},
-  { "gate",			"gray door (opened by red key)"	},     /* 40 */
-  { "gate",			"gray door (opened by yellow key)"},
-  { "gate",			"gray door (opened by green key)"},
-  { "gate",			"gray door (opened by blue key)"},
-  { "dynamite",			"dynamite"			},
-  { "pacman",			"pac man"			},
-  { "wall",			"invisible normal wall"		},
-  { "lamp",			"lamp (off)"			},
-  { "lamp",			"lamp (on)"			},
-  { "wall",			"wall with emerald"		},
-  { "wall",			"wall with diamond"		},     /* 50 */
-  { "amoeba",			"amoeba with content"		},
-  { "bd_amoeba",		"amoeba (BD style)"		},
-  { "time_orb_full",		"time orb (full)"		},
-  { "time_orb_empty",		"time orb (empty)"		},
-  { "wall",			"growing wall"			},
-  { "bd_diamond",		"diamond (BD style)"		},
-  { "emerald",			"yellow emerald"		},
-  { "wall",			"wall with BD style diamond"	},
-  { "wall",			"wall with yellow emerald"	},
-  { "dark_yamyam",		"dark yam yam"			},     /* 60 */
-  { "bd_magic_wall",		"magic wall (BD style)"		},
-  { "wall",			"invisible steel wall"		},
-
-  { NULL,			"(not used)"			},
-
-  { "dynabomb_nr",		"increases number of bombs"	},
-  { "dynabomb_sz",		"increases explosion size"	},
-  { "dynabomb_xl",		"increases power of explosion"	},
-  { "sokoban_object",		"sokoban object"		},
-  { "sokoban_field",		"sokoban empty field"		},
-  { "sokoban_field",		"sokoban field with object"	},
-  { "bd_butterfly",		"butterfly (starts moving right)"},    /* 70 */
-  { "bd_butterfly",		"butterfly (starts moving up)"	},
-  { "bd_butterfly",		"butterfly (starts moving left)"},
-  { "bd_butterfly",		"butterfly (starts moving down)"},
-  { "bd_firefly",		"firefly (starts moving right)"	},
-  { "bd_firefly",		"firefly (starts moving up)"	},
-  { "bd_firefly",		"firefly (starts moving left)"	},
-  { "bd_firefly",		"firefly (starts moving down)"	},
-  { "bd_butterfly",		"butterfly"			},
-  { "bd_firefly",		"firefly"			},
-  { "player",			"yellow player"			},     /* 80 */
-  { "player",			"red player"			},
-  { "player",			"green player"			},
-  { "player",			"blue player"			},
-  { "bug",			"bug (starts moving right)"	},
-  { "bug",			"bug (starts moving up)"	},
-  { "bug",			"bug (starts moving left)"	},
-  { "bug",			"bug (starts moving down)"	},
-  { "spaceship",		"spaceship (starts moving right)"},
-  { "spaceship",		"spaceship (starts moving up)"	},
-  { "spaceship",		"spaceship (starts moving left)"},     /* 90 */
-  { "spaceship",		"spaceship (starts moving down)"},
-  { "pacman",			"pac man (starts moving right)"	},
-  { "pacman",			"pac man (starts moving up)"	},
-  { "pacman",			"pac man (starts moving left)"	},
-  { "pacman",			"pac man (starts moving down)"	},
-  { "emerald",			"red emerald"			},
-  { "emerald",			"purple emerald"		},
-  { "wall",			"wall with red emerald"		},
-  { "wall",			"wall with purple emerald"	},
-  { "wall",			"acid pool (top left)"		},    /* 100 */
-  { "wall",			"acid pool (top right)"		},
-  { "wall",			"acid pool (bottom left)"	},
-  { "wall",			"acid pool (bottom)"		},
-  { "wall",			"acid pool (bottom right)"	},
-  { "wall",			"normal wall (BD style)"	},
-  { "bd_rock",			"rock (BD style)"		},
-  { "exit",			"open exit"			},
-  { NULL,			"black orb bomb"		},
-  { "amoeba",			"amoeba"			},
-  { "mole",			"mole"				},    /* 110 */
-  { "penguin",			"penguin"			},
-  { "satellite",		"satellite"			},
-  { NULL,			"arrow left"			},
-  { NULL,			"arrow right"			},
-  { NULL,			"arrow up"			},
-  { NULL,			"arrow down"			},
-  { "pig",			"pig"				},
-  { "dragon",			"fire breathing dragon"		},
-  { "key",			"red key (EM style)"		},
-  { NULL,			"letter ' '"			},    /* 120 */
-  { NULL,			"letter '!'"			},
-  { NULL,			"letter '\"'"			},
-  { NULL,			"letter '#'"			},
-  { NULL,			"letter '$'"			},
-  { NULL,			"letter '%'"			},
-  { NULL,			"letter '&'"			},
-  { NULL,			"letter '''"			},
-  { NULL,			"letter '('"			},
-  { NULL,			"letter ')'"			},
-  { NULL,			"letter '*'"			},    /* 130 */
-  { NULL,			"letter '+'"			},
-  { NULL,			"letter ','"			},
-  { NULL,			"letter '-'"			},
-  { NULL,			"letter '.'"			},
-  { NULL,			"letter '/'"			},
-  { NULL,			"letter '0'"			},
-  { NULL,			"letter '1'"			},
-  { NULL,			"letter '2'"			},
-  { NULL,			"letter '3'"			},
-  { NULL,			"letter '4'"			},    /* 140 */
-  { NULL,			"letter '5'"			},
-  { NULL,			"letter '6'"			},
-  { NULL,			"letter '7'"			},
-  { NULL,			"letter '8'"			},
-  { NULL,			"letter '9'"			},
-  { NULL,			"letter ':'"			},
-  { NULL,			"letter ';'"			},
-  { NULL,			"letter '<'"			},
-  { NULL,			"letter '='"			},
-  { NULL,			"letter '>'"			},    /* 150 */
-  { NULL,			"letter '?'"			},
-  { NULL,			"letter '@'"			},
-  { NULL,			"letter 'A'"			},
-  { NULL,			"letter 'B'"			},
-  { NULL,			"letter 'C'"			},
-  { NULL,			"letter 'D'"			},
-  { NULL,			"letter 'E'"			},
-  { NULL,			"letter 'F'"			},
-  { NULL,			"letter 'G'"			},
-  { NULL,			"letter 'H'"			},    /* 160 */
-  { NULL,			"letter 'I'"			},
-  { NULL,			"letter 'J'"			},
-  { NULL,			"letter 'K'"			},
-  { NULL,			"letter 'L'"			},
-  { NULL,			"letter 'M'"			},
-  { NULL,			"letter 'N'"			},
-  { NULL,			"letter 'O'"			},
-  { NULL,			"letter 'P'"			},
-  { NULL,			"letter 'Q'"			},
-  { NULL,			"letter 'R'"			},    /* 170 */
-  { NULL,			"letter 'S'"			},
-  { NULL,			"letter 'T'"			},
-  { NULL,			"letter 'U'"			},
-  { NULL,			"letter 'V'"			},
-  { NULL,			"letter 'W'"			},
-  { NULL,			"letter 'X'"			},
-  { NULL,			"letter 'Y'"			},
-  { NULL,			"letter 'Z'"			},
-  { NULL,			"letter 'Ä'"			},
-  { NULL,			"letter 'Ö'"			},    /* 180 */
-  { NULL,			"letter 'Ü'"			},
-  { NULL,			"letter '^'"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},    /* 190 */
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { NULL,			"letter ''"			},
-  { "wall",			"growing wall (horizontal)"	},    /* 200 */
-  { "wall",			"growing wall (vertical)"	},
-  { "wall",			"growing wall (all directions)"	},
-  { "gate",			"red door (EM style)"		},
-  { "gate",			"yellow door (EM style)"	},
-  { "gate",			"green door (EM style)"		},
-  { "gate",			"blue door (EM style)"		},
-  { "key",			"yellow key (EM style)"		},
-  { "key",			"green key (EM style)"		},
-  { "key",			"blue key (EM style)"		},
-  { "empty_space",		"empty space"			},    /* 210 */
-  { "sp_zonk",			"zonk"				},
-  { "sp_base",			"base"				},
-  { "player",			"murphy"			},
-  { "sp_infotron",		"infotron"			},
-  { "wall",			"chip (single)"			},
-  { "wall",			"hardware"			},
-  { "sp_exit",			"exit"				},
-  { "sp_disk_orange",		"orange disk"			},
-  { "sp_port",			"port (leading right)"		},
-  { "sp_port",			"port (leading down)"		},    /* 220 */
-  { "sp_port",			"port (leading left)"		},
-  { "sp_port",			"port (leading up)"		},
-  { "sp_port",			"port (leading right)"		},
-  { "sp_port",			"port (leading down)"		},
-  { "sp_port",			"port (leading left)"		},
-  { "sp_port",			"port (leading up)"		},
-  { "sp_sniksnak",		"snik snak"			},
-  { "sp_disk_yellow",		"yellow disk"			},
-  { "sp_terminal",		"terminal"			},
-  { "sp_disk_red",		"red disk"			},    /* 230 */
-  { "sp_port",			"port (vertical)"		},
-  { "sp_port",			"port (horizontal)"		},
-  { "sp_port",			"port (all directions)"		},
-  { "sp_electron",		"electron"			},
-  { "sp_buggy_base",		"buggy base"			},
-  { "wall",			"chip (left half)"		},
-  { "wall",			"chip (right half)"		},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},    /* 240 */
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"hardware"			},
-  { "wall",			"chip (upper half)"		},
-  { "wall",			"chip (lower half)"		},
-  { "gate",			"gray door (EM style, red key)"	},    /* 250 */
-  { "gate",			"gray door (EM style, yellow key)"},
-  { "gate",			"gray door (EM style, green key)"},
-  { "gate",			"gray door (EM style, blue key)"},
-
-  { NULL,			"(not used)"			},
-  { NULL,			"(not used)"			},
-
-  /* 256 */
-
-  { "pearl",			"pearl"				},  /* (256) */
-  { "crystal",			"crystal"			},
-  { "wall",			"wall with pearl"		},
-  { "wall",			"wall with crystal"		},
-  { "gate",			"white door"			},    /* 260 */
-  { "gate",			"gray door (opened by white key)"},
-  { "key",			"white key"			},
-  { "shield_normal",		"shield (normal)"		},
-  { "extra_time",		"extra time"			},
-  { "switchgate",		"switch gate (open)"		},
-  { "switchgate",		"switch gate (closed)"		},
-  { "switchgate_switch",	"switch for switch gate"	},
-  { "switchgate_switch",	"switch for switch gate"	},
-  { NULL,			"-"				},
-  { NULL,			"-"				},    /* 270 */
-  { "conveyor_belt",		"red conveyor belt (left)"	},
-  { "conveyor_belt",		"red conveyor belt (middle)"	},
-  { "conveyor_belt",		"red conveyor belt (right)"	},
-  { "conveyor_belt_switch",	"switch for red conveyor belt (left)"},
-  { "conveyor_belt_switch",	"switch for red conveyor belt (middle)"},
-  { "conveyor_belt_switch",	"switch for red conveyor belt (right)"},
-  { "conveyor_belt",		"yellow conveyor belt (left)"	},
-  { "conveyor_belt",		"yellow conveyor belt (middle)"	},
-  { "conveyor_belt",		"yellow conveyor belt (right)"	},
-  { "conveyor_belt_switch",	"switch for yellow conveyor belt (left)"},
-  { "conveyor_belt_switch",	"switch for yellow conveyor belt (middle)"},
-  { "conveyor_belt_switch",	"switch for yellow conveyor belt (right)"},
-  { "conveyor_belt",		"green conveyor belt (left)"	},
-  { "conveyor_belt",		"green conveyor belt (middle)"	},
-  { "conveyor_belt",		"green conveyor belt (right)"	},
-  { "conveyor_belt_switch",	"switch for green conveyor belt (left)"},
-  { "conveyor_belt_switch",	"switch for green conveyor belt (middle)"},
-  { "conveyor_belt_switch",	"switch for green conveyor belt (right)"},
-  { "conveyor_belt",		"blue conveyor belt (left)"	},
-  { "conveyor_belt",		"blue conveyor belt (middle)"	},
-  { "conveyor_belt",		"blue conveyor belt (right)"	},
-  { "conveyor_belt_switch",	"switch for blue conveyor belt (left)"},
-  { "conveyor_belt_switch",	"switch for blue conveyor belt (middle)"},
-  { "conveyor_belt_switch",	"switch for blue conveyor belt (right)"},
-  { "sand",			"land mine"			},
-  { "envelope",			"mail envelope"			},
-  { "light_switch",		"light switch (off)"		},
-  { "light_switch",		"light switch (on)"		},
-  { "wall",			"sign (exclamation)"		},
-  { "wall",			"sign (radio activity)"		},    /* 300 */
-  { "wall",			"sign (stop)"			},
-  { "wall",			"sign (wheel chair)"		},
-  { "wall",			"sign (parking)"		},
-  { "wall",			"sign (one way)"		},
-  { "wall",			"sign (heart)"			},
-  { "wall",			"sign (triangle)"		},
-  { "wall",			"sign (round)"			},
-  { "wall",			"sign (exit)"			},
-  { "wall",			"sign (yin yang)"		},
-  { "wall",			"sign (other)"			},    /* 310 */
-  { "mole",			"mole (starts moving left)"	},
-  { "mole",			"mole (starts moving right)"	},
-  { "mole",			"mole (starts moving up)"	},
-  { "mole",			"mole (starts moving down)"	},
-  { "wall",			"steel wall (slanted)"		},
-  { "sand",			"invisible sand"		},
-
-  { NULL,			"dx unknown element 15"		},
-  { NULL,			"dx unknown element 42"		},
-
-  { NULL,			"(not used)"			},
-  { NULL,			"(not used)"			},    /* 320 */
-
-  { "shield_deadly",		"shield (deadly, kills enemies)"},
-  { "timegate",			"time gate (open)"		},
-  { "timegate",			"time gate (closed)"		},
-  { "timegate_switch",		"switch for time gate"		},
-  { "timegate_switch",		"switch for time gate"		},
-  { "balloon",			"balloon"			},
-  { "balloon_switch",		"send balloon to the left"	},
-  { "balloon_switch",		"send balloon to the right"	},
-  { "balloon_switch",		"send balloon up"		},
-  { "balloon_switch",		"send balloon down"		},    /* 330 */
-  { "balloon_switch",		"send balloon in any direction"	},
-  { "wall",			"steel wall"			},
-  { "wall",			"steel wall"			},
-  { "wall",			"steel wall"			},
-  { "wall",			"steel wall"			},
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},    /* 340 */
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},
-  { "wall",			"normal wall"			},
-  { "tube",			"tube (all directions)"		},
-  { "tube",			"tube (vertical)"		},
-  { "tube",			"tube (horizontal)"		},
-  { "tube",			"tube (vertical & left)"	},
-  { "tube",			"tube (vertical & right)"	},
-  { "tube",			"tube (horizontal & up)"	},
-  { "tube",			"tube (horizontal & down)"	},    /* 350 */
-  { "tube",			"tube (left & up)"		},
-  { "tube",			"tube (left & down)"		},
-  { "tube",			"tube (right & up)"		},
-  { "tube",			"tube (right & down)"		},
-  { "spring",			"spring"			},
-  { "trap",			"trap"				},
-  { "dx_bomb",			"stable bomb (DX style)"	},
-  { NULL,			"-"				},
-  { NULL,			"-"				},
-  { "custom",			"custom element 1"		},    /* 360 */
-  { "custom",			"custom element 2"		},
-  { "custom",			"custom element 3"		},
-  { "custom",			"custom element 4"		},
-  { "custom",			"custom element 5"		},
-  { "custom",			"custom element 6"		},
-  { "custom",			"custom element 7"		},
-  { "custom",			"custom element 8"		},
-  { "custom",			"custom element 9"		},
-  { "custom",			"custom element 10"		},
-  { "custom",			"custom element 11"		},    /* 370 */
-  { "custom",			"custom element 12"		},
-  { "custom",			"custom element 13"		},
-  { "custom",			"custom element 14"		},
-  { "custom",			"custom element 15"		},
-  { "custom",			"custom element 16"		},
-  { "custom",			"custom element 17"		},
-  { "custom",			"custom element 18"		},
-  { "custom",			"custom element 19"		},
-  { "custom",			"custom element 20"		},
-  { "custom",			"custom element 21"		},    /* 380 */
-  { "custom",			"custom element 22"		},
-  { "custom",			"custom element 23"		},
-  { "custom",			"custom element 24"		},
-  { "custom",			"custom element 25"		},
-  { "custom",			"custom element 26"		},
-  { "custom",			"custom element 27"		},
-  { "custom",			"custom element 28"		},
-  { "custom",			"custom element 29"		},
-  { "custom",			"custom element 30"		},
-  { "custom",			"custom element 31"		},    /* 390 */
-  { "custom",			"custom element 32"		},
-  { "custom",			"custom element 33"		},
-  { "custom",			"custom element 34"		},
-  { "custom",			"custom element 35"		},
-  { "custom",			"custom element 36"		},
-  { "custom",			"custom element 37"		},
-  { "custom",			"custom element 38"		},
-  { "custom",			"custom element 39"		},
-  { "custom",			"custom element 40"		},
-  { "custom",			"custom element 41"		},    /* 400 */
-  { "custom",			"custom element 42"		},
-  { "custom",			"custom element 43"		},
-  { "custom",			"custom element 44"		},
-  { "custom",			"custom element 45"		},
-  { "custom",			"custom element 46"		},
-  { "custom",			"custom element 47"		},
-  { "custom",			"custom element 48"		},
-  { "custom",			"custom element 49"		},
-  { "custom",			"custom element 50"		},
-  { "custom",			"custom element 51"		},    /* 410 */
-  { "custom",			"custom element 52"		},
-  { "custom",			"custom element 53"		},
-  { "custom",			"custom element 54"		},
-  { "custom",			"custom element 55"		},
-  { "custom",			"custom element 56"		},
-  { "custom",			"custom element 57"		},
-  { "custom",			"custom element 58"		},
-  { "custom",			"custom element 59"		},
-  { "custom",			"custom element 60"		},
-  { "custom",			"custom element 61"		},    /* 420 */
-  { "custom",			"custom element 62"		},
-  { "custom",			"custom element 63"		},
-  { "custom",			"custom element 64"		},
-  { "custom",			"custom element 65"		},
-  { "custom",			"custom element 66"		},
-  { "custom",			"custom element 67"		},
-  { "custom",			"custom element 68"		},
-  { "custom",			"custom element 69"		},
-  { "custom",			"custom element 70"		},
-  { "custom",			"custom element 71"		},    /* 430 */
-  { "custom",			"custom element 72"		},
-  { "custom",			"custom element 73"		},
-  { "custom",			"custom element 74"		},
-  { "custom",			"custom element 75"		},
-  { "custom",			"custom element 76"		},
-  { "custom",			"custom element 77"		},
-  { "custom",			"custom element 78"		},
-  { "custom",			"custom element 79"		},
-  { "custom",			"custom element 80"		},
-  { "custom",			"custom element 81"		},    /* 440 */
-  { "custom",			"custom element 82"		},
-  { "custom",			"custom element 83"		},
-  { "custom",			"custom element 84"		},
-  { "custom",			"custom element 85"		},
-  { "custom",			"custom element 86"		},
-  { "custom",			"custom element 87"		},
-  { "custom",			"custom element 88"		},
-  { "custom",			"custom element 89"		},
-  { "custom",			"custom element 90"		},
-  { "custom",			"custom element 91"		},    /* 450 */
-  { "custom",			"custom element 92"		},
-  { "custom",			"custom element 93"		},
-  { "custom",			"custom element 94"		},
-  { "custom",			"custom element 95"		},
-  { "custom",			"custom element 96"		},
-  { "custom",			"custom element 97"		},
-  { "custom",			"custom element 98"		},
-  { "custom",			"custom element 99"		},
-  { "custom",			"custom element 100"		},
-  { "custom",			"custom element 101"		},    /* 460 */
-  { "custom",			"custom element 102"		},
-  { "custom",			"custom element 103"		},
-  { "custom",			"custom element 104"		},
-  { "custom",			"custom element 105"		},
-  { "custom",			"custom element 106"		},
-  { "custom",			"custom element 107"		},
-  { "custom",			"custom element 108"		},
-  { "custom",			"custom element 109"		},
-  { "custom",			"custom element 110"		},
-  { "custom",			"custom element 111"		},    /* 470 */
-  { "custom",			"custom element 112"		},
-  { "custom",			"custom element 113"		},
-  { "custom",			"custom element 114"		},
-  { "custom",			"custom element 115"		},
-  { "custom",			"custom element 116"		},
-  { "custom",			"custom element 117"		},
-  { "custom",			"custom element 118"		},
-  { "custom",			"custom element 119"		},
-  { "custom",			"custom element 120"		},
-  { "custom",			"custom element 121"		},    /* 480 */
-  { "custom",			"custom element 122"		},
-  { "custom",			"custom element 123"		},
-  { "custom",			"custom element 124"		},
-  { "custom",			"custom element 125"		},
-  { "custom",			"custom element 126"		},
-  { "custom",			"custom element 127"		},
-  { "custom",			"custom element 128"		},
+  {
+    "empty_space",
+    "empty_space",
+    "empty space"
+  },
+  {
+    "sand",
+    "sand",
+    "sand"
+  },
+  {
+    "wall",
+    "wall",
+    "normal wall"
+  },
+  {
+    "wall_crumbled",
+    "wall",
+    "round wall"
+  },
+  {
+    "rock",
+    "rock",
+    "rock"
+  },
+  {
+    "key_obsolete",
+    "key",
+    "key"
+  },
+  {
+    "emerald",
+    "emerald",
+    "emerald"
+  },
+  {
+    "exit_closed",
+    "exit",
+    "closed exit"
+  },
+  {
+    "player_obsolete",
+    "player",
+    "player"
+  },
+  {
+    "bug",
+    "bug",
+    "bug"
+  },
+  {
+    "spaceship",
+    "spaceship",
+    "spaceship"
+  },
+  {
+    "yamyam",
+    "yamyam",
+    "yam yam"
+  },
+  {
+    "robot",
+    "robot",
+    "robot"
+  },
+  {
+    "steelwall",
+    "wall",
+    "steel wall"
+  },
+  {
+    "diamond",
+    "diamond",
+    "diamond"
+  },
+  {
+    "amoeba_dead",
+    "amoeba",
+    "dead amoeba"
+  },
+  {
+    "quicksand_empty",
+    "quicksand",
+    "empty quicksand"
+  },
+  {
+    "quicksand_full",
+    "quicksand",
+    "quicksand with rock"
+  },
+  {
+    "amoeba_drop",
+    "amoeba",
+    "amoeba drop"
+  },
+  {
+    "bomb",
+    "bomb",
+    "bomb"
+  },
+  {
+    "magic_wall",
+    "magic_wall",
+    "magic wall"
+  },
+  {
+    "speed_pill",
+    "speed_pill",
+    "speed pill"
+  },
+  {
+    "acid",
+    "acid",
+    "acid"
+  },
+  {
+    "amoeba_wet",
+    "amoeba",
+    "dropping amoeba"
+  },
+  {
+    "amoeba_dry",
+    "amoeba",
+    "normal amoeba"
+  },
+  {
+    "nut",
+    "nut",
+    "nut with emerald"
+  },
+  {
+    "gameoflife",
+    "gameoflife",
+    "Conway's wall of life"
+  },
+  {
+    "biomaze",
+    "biomaze",
+    "biomaze"
+  },
+  {
+    "dynamite_active",
+    "dynamite",
+    "burning dynamite"
+  },
+  {
+    "stoneblock",
+    "wall",
+    "wall"
+  },
+  {
+    "robot_wheel",
+    "robot_wheel",
+    "magic wheel"
+  },
+  {
+    "robot_wheel_active",
+    "robot_wheel",
+    "magic wheel (running)"
+  },
+  {
+    "key1",
+    "key",
+    "red key"
+  },
+  {
+    "key2",
+    "key",
+    "yellow key"
+  },
+  {
+    "key3",
+    "key",
+    "green key"
+  },
+  {
+    "key4",
+    "key",
+    "blue key"
+  },
+  {
+    "gate1",
+    "gate",
+    "red door"
+  },
+  {
+    "gate2",
+    "gate",
+    "yellow door"
+  },
+  {
+    "gate3",
+    "gate",
+    "green door"
+  },
+  {
+    "gate4",
+    "gate",
+    "blue door"
+  },
+  {
+    "gate1_gray",
+    "gate",
+    "gray door (opened by red key)"
+  },
+  {
+    "gate2_gray",
+    "gate",
+    "gray door (opened by yellow key)"},
+  {
+    "gate3_gray",
+    "gate",
+    "gray door (opened by green key)"},
+  {
+    "gate4_gray",
+    "gate",
+    "gray door (opened by blue key)"},
+  {
+    "dynamite",
+    "dynamite",
+    "dynamite"
+  },
+  {
+    "pacman",
+    "pacman",
+    "pac man"
+  },
+  {
+    "invisible_wall",
+    "wall",
+    "invisible normal wall"
+  },
+  {
+    "lamp",
+    "lamp",
+    "lamp (off)"
+  },
+  {
+    "lamp_active",
+    "lamp",
+    "lamp (on)"
+  },
+  {
+    "wall_emerald",
+    "wall",
+    "wall with emerald"
+  },
+  {
+    "wall_diamond",
+    "wall",
+    "wall with diamond"
+  },
+  {
+    "amoeba_full",
+    "amoeba",
+    "amoeba with content"
+  },
+  {
+    "bd_amoeba",
+    "bd_amoeba",
+    "amoeba (BD style)"
+  },
+  {
+    "time_orb_full",
+    "time_orb_full",
+    "time orb (full)"
+  },
+  {
+    "time_orb_empty",
+    "time_orb_empty",
+    "time orb (empty)"
+  },
+  {
+    "wall_growing",
+    "wall",
+    "growing wall"
+  },
+  {
+    "bd_diamond",
+    "bd_diamond",
+    "diamond (BD style)"
+  },
+  {
+    "emerald_yellow",
+    "emerald",
+    "yellow emerald"
+  },
+  {
+    "wall_bd_diamond",
+    "wall",
+    "wall with BD style diamond"
+  },
+  {
+    "wall_emerald_yellow",
+    "wall",
+    "wall with yellow emerald"
+  },
+  {
+    "dark_yamyam",
+    "dark_yamyam",
+    "dark yam yam"
+  },
+  {
+    "bd_magic_wall",
+    "bd_magic_wall",
+    "magic wall (BD style)"
+  },
+  {
+    "invisible_steelwall",
+    "wall",
+    "invisible steel wall"
+  },
+  {
+    "unused_63",
+    NULL,
+    "(not used)"
+  },
+  {
+    "dynabomb_nr",
+    "dynabomb_nr",
+    "increases number of bombs"
+  },
+  {
+    "dynabomb_sz",
+    "dynabomb_sz",
+    "increases explosion size"
+  },
+  {
+    "dynabomb_xl",
+    "dynabomb_xl",
+    "increases power of explosion"
+  },
+  {
+    "sokoban_object",
+    "sokoban_object",
+    "sokoban object"
+  },
+  {
+    "sokoban_field_empty",
+    "sokoban_field",
+    "sokoban empty field"
+  },
+  {
+    "sokoban_field_full",
+    "sokoban_field",
+    "sokoban field with object"
+  },
+  {
+    "bd_butterfly_right",
+    "bd_butterfly",
+    "butterfly (starts moving right)"},
+  {
+    "bd_butterfly_up",
+    "bd_butterfly",
+    "butterfly (starts moving up)"
+  },
+  {
+    "bd_butterfly_left",
+    "bd_butterfly",
+    "butterfly (starts moving left)"},
+  {
+    "bd_butterfly_down",
+    "bd_butterfly",
+    "butterfly (starts moving down)"},
+  {
+    "bd_firefly_right",
+    "bd_firefly",
+    "firefly (starts moving right)"
+  },
+  {
+    "bd_firefly_up",
+    "bd_firefly",
+    "firefly (starts moving up)"
+  },
+  {
+    "bd_firefly_left",
+    "bd_firefly",
+    "firefly (starts moving left)"
+  },
+  {
+    "bd_firefly_down",
+    "bd_firefly",
+    "firefly (starts moving down)"
+  },
+  {
+    "bd_butterfly",
+    "bd_butterfly",
+    "butterfly"
+  },
+  {
+    "bd_firefly",
+    "bd_firefly",
+    "firefly"
+  },
+  {
+    "player1",
+    "player",
+    "yellow player"
+  },
+  {
+    "player2",
+    "player",
+    "red player"
+  },
+  {
+    "player3",
+    "player",
+    "green player"
+  },
+  {
+    "player4",
+    "player",
+    "blue player"
+  },
+  {
+    "bug_right",
+    "bug",
+    "bug (starts moving right)"
+  },
+  {
+    "bug_up",
+    "bug",
+    "bug (starts moving up)"
+  },
+  {
+    "bug_left",
+    "bug",
+    "bug (starts moving left)"
+  },
+  {
+    "bug_down",
+    "bug",
+    "bug (starts moving down)"
+  },
+  {
+    "spaceship_right",
+    "spaceship",
+    "spaceship (starts moving right)"},
+  {
+    "spaceship_up",
+    "spaceship",
+    "spaceship (starts moving up)"
+  },
+  {
+    "spaceship_left",
+    "spaceship",
+    "spaceship (starts moving left)"},
+  {
+    "spaceship_down",
+    "spaceship",
+    "spaceship (starts moving down)"},
+  {
+    "pacman_right",
+    "pacman",
+    "pac man (starts moving right)"
+  },
+  {
+    "pacman_up",
+    "pacman",
+    "pac man (starts moving up)"
+  },
+  {
+    "pacman_left",
+    "pacman",
+    "pac man (starts moving left)"
+  },
+  {
+    "pacman_down",
+    "pacman",
+    "pac man (starts moving down)"
+  },
+  {
+    "emerald_red",
+    "emerald",
+    "red emerald"
+  },
+  {
+    "emerald_purple",
+    "emerald",
+    "purple emerald"
+  },
+  {
+    "wall_emerald_red",
+    "wall",
+    "wall with red emerald"
+  },
+  {
+    "wall_emerald_purple",
+    "wall",
+    "wall with purple emerald"
+  },
+  {
+    "acidpool_topleft",
+    "wall",
+    "acid pool (top left)"
+  },
+  {
+    "acidpool_topright",
+    "wall",
+    "acid pool (top right)"
+  },
+  {
+    "acidpool_bottomleft",
+    "wall",
+    "acid pool (bottom left)"
+  },
+  {
+    "acidpool_bottom",
+    "wall",
+    "acid pool (bottom)"
+  },
+  {
+    "acidpool_bottomright",
+    "wall",
+    "acid pool (bottom right)"
+  },
+  {
+    "bd_wall",
+    "wall",
+    "normal wall (BD style)"
+  },
+  {
+    "bd_rock",
+    "bd_rock",
+    "rock (BD style)"
+  },
+  {
+    "exit_open",
+    "exit",
+    "open exit"
+  },
+  {
+    "black_orb",
+    NULL,
+    "black orb bomb"
+  },
+  {
+    "amoeba_to_diamond",
+    "amoeba",
+    "amoeba"
+  },
+  {
+    "mole",
+    "mole",
+    "mole"
+  },
+  {
+    "penguin",
+    "penguin",
+    "penguin"
+  },
+  {
+    "satellite",
+    "satellite",
+    "satellite"
+  },
+  {
+    "arrow_blue_left",
+    NULL,
+    "arrow left"
+  },
+  {
+    "arrow_blue_right",
+    NULL,
+    "arrow right"
+  },
+  {
+    "arrow_blue_up",
+    NULL,
+    "arrow up"
+  },
+  {
+    "arrow_blue_down",
+    NULL,
+    "arrow down"
+  },
+  {
+    "pig",
+    "pig",
+    "pig"
+  },
+  {
+    "dragon",
+    "dragon",
+    "fire breathing dragon"
+  },
+  {
+    "em_key1_file",
+    "key",
+    "red key (EM style)"
+  },
+  {
+    "char_space",
+    NULL,
+    "letter ' '"
+  },
+  {
+    "char_exclam",
+    NULL,
+    "letter '!'"
+  },
+  {
+    "char_quotedbl",
+    NULL,
+    "letter '\"'"
+  },
+  {
+    "char_numbersign",
+    NULL,
+    "letter '#'"
+  },
+  {
+    "char_dollar",
+    NULL,
+    "letter '$'"
+  },
+  {
+    "char_procent",
+    NULL,
+    "letter '%'"
+  },
+  {
+    "char_ampersand",
+    NULL,
+    "letter '&'"
+  },
+  {
+    "char_apostrophe",
+    NULL,
+    "letter '''"
+  },
+  {
+    "char_parenleft",
+    NULL,
+    "letter '('"
+  },
+  {
+    "char_parenright",
+    NULL,
+    "letter ')'"
+  },
+  {
+    "char_asterisk",
+    NULL,
+    "letter '*'"
+  },
+  {
+    "char_plus",
+    NULL,
+    "letter '+'"
+  },
+  {
+    "char_comma",
+    NULL,
+    "letter ','"
+  },
+  {
+    "char_minus",
+    NULL,
+    "letter '-'"
+  },
+  {
+    "char_period",
+    NULL,
+    "letter '.'"
+  },
+  {
+    "char_slash",
+    NULL,
+    "letter '/'"
+  },
+  {
+    "char_0",
+    NULL,
+    "letter '0'"
+  },
+  {
+    "char_1",
+    NULL,
+    "letter '1'"
+  },
+  {
+    "char_2",
+    NULL,
+    "letter '2'"
+  },
+  {
+    "char_3",
+    NULL,
+    "letter '3'"
+  },
+  {
+    "char_4",
+    NULL,
+    "letter '4'"
+  },
+  {
+    "char_5",
+    NULL,
+    "letter '5'"
+  },
+  {
+    "char_6",
+    NULL,
+    "letter '6'"
+  },
+  {
+    "char_7",
+    NULL,
+    "letter '7'"
+  },
+  {
+    "char_8",
+    NULL,
+    "letter '8'"
+  },
+  {
+    "char_9",
+    NULL,
+    "letter '9'"
+  },
+  {
+    "char_colon",
+    NULL,
+    "letter ':'"
+  },
+  {
+    "char_semicolon",
+    NULL,
+    "letter ';'"
+  },
+  {
+    "char_less",
+    NULL,
+    "letter '<'"
+  },
+  {
+    "char_equal",
+    NULL,
+    "letter '='"
+  },
+  {
+    "char_greater",
+    NULL,
+    "letter '>'"
+  },
+  {
+    "char_question",
+    NULL,
+    "letter '?'"
+  },
+  {
+    "char_at",
+    NULL,
+    "letter '@'"
+  },
+  {
+    "char_a",
+    NULL,
+    "letter 'A'"
+  },
+  {
+    "char_b",
+    NULL,
+    "letter 'B'"
+  },
+  {
+    "char_c",
+    NULL,
+    "letter 'C'"
+  },
+  {
+    "char_d",
+    NULL,
+    "letter 'D'"
+  },
+  {
+    "char_e",
+    NULL,
+    "letter 'E'"
+  },
+  {
+    "char_f",
+    NULL,
+    "letter 'F'"
+  },
+  {
+    "char_g",
+    NULL,
+    "letter 'G'"
+  },
+  {
+    "char_h",
+    NULL,
+    "letter 'H'"
+  },
+  {
+    "char_i",
+    NULL,
+    "letter 'I'"
+  },
+  {
+    "char_j",
+    NULL,
+    "letter 'J'"
+  },
+  {
+    "char_k",
+    NULL,
+    "letter 'K'"
+  },
+  {
+    "char_l",
+    NULL,
+    "letter 'L'"
+  },
+  {
+    "char_m",
+    NULL,
+    "letter 'M'"
+  },
+  {
+    "char_n",
+    NULL,
+    "letter 'N'"
+  },
+  {
+    "char_o",
+    NULL,
+    "letter 'O'"
+  },
+  {
+    "char_p",
+    NULL,
+    "letter 'P'"
+  },
+  {
+    "char_q",
+    NULL,
+    "letter 'Q'"
+  },
+  {
+    "char_r",
+    NULL,
+    "letter 'R'"
+  },
+  {
+    "char_s",
+    NULL,
+    "letter 'S'"
+  },
+  {
+    "char_t",
+    NULL,
+    "letter 'T'"
+  },
+  {
+    "char_u",
+    NULL,
+    "letter 'U'"
+  },
+  {
+    "char_v",
+    NULL,
+    "letter 'V'"
+  },
+  {
+    "char_w",
+    NULL,
+    "letter 'W'"
+  },
+  {
+    "char_x",
+    NULL,
+    "letter 'X'"
+  },
+  {
+    "char_y",
+    NULL,
+    "letter 'Y'"
+  },
+  {
+    "char_z",
+    NULL,
+    "letter 'Z'"
+  },
+  {
+    "char_ae",
+    NULL,
+    "letter 'Ä'"
+  },
+  {
+    "char_oe",
+    NULL,
+    "letter 'Ö'"
+  },
+  {
+    "char_ue",
+    NULL,
+    "letter 'Ü'"
+  },
+  {
+    "char_copyright",
+    NULL,
+    "letter '^'"
+  },
+  {
+    "char_underscore",
+    NULL,
+    "letter ''"
+  },
+  {
+    "char_empty",
+    NULL,
+    "letter ''"
+  },
+  {
+    "char_degree",
+    NULL,
+    "letter ''"
+  },
+  {
+    "char_tm",
+    NULL,
+    "letter ''"
+  },
+  {
+    "char_cursor",
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    NULL,
+    NULL,
+    "letter ''"
+  },
+  {
+    "wall_growing_x",
+    "wall",
+    "growing wall (horizontal)"
+  },
+  {
+    "wall_growing_y",
+    "wall",
+    "growing wall (vertical)"
+  },
+  {
+    "wall_growing_xy",
+    "wall",
+    "growing wall (all directions)"
+  },
+  {
+    "em_gate1",
+    "gate",
+    "red door (EM style)"
+  },
+  {
+    "em_gate2",
+    "gate",
+    "yellow door (EM style)"
+  },
+  {
+    "em_gate3",
+    "gate",
+    "green door (EM style)"
+  },
+  {
+    "em_gate4",
+    "gate",
+    "blue door (EM style)"
+  },
+  {
+    "em_key2_file",
+    "key",
+    "yellow key (EM style)"
+  },
+  {
+    "em_key3_file",
+    "key",
+    "green key (EM style)"
+  },
+  {
+    "em_key4_file",
+    "key",
+    "blue key (EM style)"
+  },
+  {
+    "sp_empty_space",
+    "empty_space",
+    "empty space"
+  },
+  {
+    "sp_zonk",
+    "sp_zonk",
+    "zonk"
+  },
+  {
+    "sp_base",
+    "sp_base",
+    "base"
+  },
+  {
+    "sp_murphy",
+    "player",
+    "murphy"
+  },
+  {
+    "sp_infotron",
+    "sp_infotron",
+    "infotron"
+  },
+  {
+    "sp_chip_single",
+    "wall",
+    "chip (single)"
+  },
+  {
+    "sp_hard_gray",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_exit_closed",
+    "sp_exit",
+    "exit"
+  },
+  {
+    "sp_disk_orange",
+    "sp_disk_orange",
+    "orange disk"
+  },
+  {
+    "sp_port1_right",
+    "sp_port",
+    "port (leading right)"
+  },
+  {
+    "sp_port1_down",
+    "sp_port",
+    "port (leading down)"
+  },
+  {
+    "sp_port1_left",
+    "sp_port",
+    "port (leading left)"
+  },
+  {
+    "sp_port1_up",
+    "sp_port",
+    "port (leading up)"
+  },
+  {
+    "sp_port2_right",
+    "sp_port",
+    "port (leading right)"
+  },
+  {
+    "sp_port2_down",
+    "sp_port",
+    "port (leading down)"
+  },
+  {
+    "sp_port2_left",
+    "sp_port",
+    "port (leading left)"
+  },
+  {
+    "sp_port2_up",
+    "sp_port",
+    "port (leading up)"
+  },
+  {
+    "sp_sniksnak",
+    "sp_sniksnak",
+    "snik snak"
+  },
+  {
+    "sp_disk_yellow",
+    "sp_disk_yellow",
+    "yellow disk"
+  },
+  {
+    "sp_terminal",
+    "sp_terminal",
+    "terminal"
+  },
+  {
+    "sp_disk_red",
+    "sp_disk_red",
+    "red disk"
+  },
+  {
+    "sp_port_y",
+    "sp_port",
+    "port (vertical)"
+  },
+  {
+    "sp_port_x",
+    "sp_port",
+    "port (horizontal)"
+  },
+  {
+    "sp_port_xy",
+    "sp_port",
+    "port (all directions)"
+  },
+  {
+    "sp_electron",
+    "sp_electron",
+    "electron"
+  },
+  {
+    "sp_buggy_base",
+    "sp_buggy_base",
+    "buggy base"
+  },
+  {
+    "sp_chip_left",
+    "wall",
+    "chip (left half)"
+  },
+  {
+    "sp_chip_right",
+    "wall",
+    "chip (right half)"
+  },
+  {
+    "sp_hard_base1",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_green",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_blue",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_red",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_yellow",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_base2",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_base3",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_base4",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_base5",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_hard_base6",
+    "wall",
+    "hardware"
+  },
+  {
+    "sp_chip_upper",
+    "wall",
+    "chip (upper half)"
+  },
+  {
+    "sp_chip_lower",
+    "wall",
+    "chip (lower half)"
+  },
+  {
+    "em_gate1_gray",
+    "gate",
+    "gray door (EM style, red key)"
+  },
+  {
+    "em_gate2_gray",
+    "gate",
+    "gray door (EM style, yellow key)"
+  },
+  {
+    "em_gate3_gray",
+    "gate",
+    "gray door (EM style, green key)"
+  },
+  {
+    "em_gate4_gray",
+    "gate",
+    "gray door (EM style, blue key)"
+  },
+  {
+    "unused_254",
+    NULL,
+    "(not used)"
+  },
+  {
+    "unused_255",
+    NULL,
+    "(not used)"
+  },
+  {
+    "pearl",
+    "pearl",
+    "pearl"
+  },
+  {
+    "crystal",
+    "crystal",
+    "crystal"
+  },
+  {
+    "wall_pearl",
+    "wall",
+    "wall with pearl"
+  },
+  {
+    "wall_crystal",
+    "wall",
+    "wall with crystal"
+  },
+  {
+    "door_white",
+    "gate",
+    "white door"
+  },
+  {
+    "door_white_gray",
+    "gate",
+    "gray door (opened by white key)"
+  },
+  {
+    "key_white",
+    "key",
+    "white key"
+  },
+  {
+    "shield_normal",
+    "shield_normal",
+    "shield (normal)"
+  },
+  {
+    "extra_time",
+    "extra_time",
+    "extra time"
+  },
+  {
+    "switchgate_open",
+    "switchgate",
+    "switch gate (open)"
+  },
+  {
+    "switchgate_closed",
+    "switchgate",
+    "switch gate (closed)"
+  },
+  {
+    "switchgate_switch_up",
+    "switchgate_switch",
+    "switch for switch gate"
+  },
+  {
+    "switchgate_switch_down",
+    "switchgate_switch",
+    "switch for switch gate"
+  },
+  {
+    "unused_269",
+    NULL,
+    "-"
+  },
+  {
+    "unused_270",
+    NULL,
+    "-"
+  },
+  {
+    "conveyor_belt1_left",
+    "conveyor_belt",
+    "red conveyor belt (left)"
+  },
+  {
+    "conveyor_belt1_middle",
+    "conveyor_belt",
+    "red conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt1_right",
+    "conveyor_belt",
+    "red conveyor belt (right)"
+  },
+  {
+    "conveyor_belt1_switch_left",
+    "conveyor_belt_switch",
+    "switch for red conveyor belt (left)"
+  },
+  {
+    "conveyor_belt1_switch_middle",
+    "conveyor_belt_switch",
+    "switch for red conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt1_switch_right",
+    "conveyor_belt_switch",
+    "switch for red conveyor belt (right)"
+  },
+  {
+    "conveyor_belt2_left",
+    "conveyor_belt",
+    "yellow conveyor belt (left)"
+  },
+  {
+    "conveyor_belt2_middle",
+    "conveyor_belt",
+    "yellow conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt2_right",
+    "conveyor_belt",
+    "yellow conveyor belt (right)"
+  },
+  {
+    "conveyor_belt2_switch_left",
+    "conveyor_belt_switch",
+    "switch for yellow conveyor belt (left)"
+  },
+  {
+    "conveyor_belt2_switch_middle",
+    "conveyor_belt_switch",
+    "switch for yellow conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt2_switch_right",
+    "conveyor_belt_switch",
+    "switch for yellow conveyor belt (right)"
+  },
+  {
+    "conveyor_belt3_left",
+    "conveyor_belt",
+    "green conveyor belt (left)"
+  },
+  {
+    "conveyor_belt3_middle",
+    "conveyor_belt",
+    "green conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt3_right",
+    "conveyor_belt",
+    "green conveyor belt (right)"
+  },
+  {
+    "conveyor_belt3_switch_left",
+    "conveyor_belt_switch",
+    "switch for green conveyor belt (left)"
+  },
+  {
+    "conveyor_belt3_switch_middle",
+    "conveyor_belt_switch",
+    "switch for green conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt3_switch_right",
+    "conveyor_belt_switch",
+    "switch for green conveyor belt (right)"
+  },
+  {
+    "conveyor_belt4_left",
+    "conveyor_belt",
+    "blue conveyor belt (left)"
+  },
+  {
+    "conveyor_belt4_middle",
+    "conveyor_belt",
+    "blue conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt4_right",
+    "conveyor_belt",
+    "blue conveyor belt (right)"
+  },
+  {
+    "conveyor_belt4_switch_left",
+    "conveyor_belt_switch",
+    "switch for blue conveyor belt (left)"
+  },
+  {
+    "conveyor_belt4_switch_middle",
+    "conveyor_belt_switch",
+    "switch for blue conveyor belt (middle)"
+  },
+  {
+    "conveyor_belt4_switch_right",
+    "conveyor_belt_switch",
+    "switch for blue conveyor belt (right)"
+  },
+  {
+    "landmine",
+    "sand",
+    "land mine"
+  },
+  {
+    "envelope",
+    "envelope",
+    "mail envelope"
+  },
+  {
+    "light_switch",
+    "light_switch",
+    "light switch (off)"
+  },
+  {
+    "light_switch_active",
+    "light_switch",
+    "light switch (on)"
+  },
+  {
+    "sign_exclamation",
+    "wall",
+    "sign (exclamation)"
+  },
+  {
+    "sign_radioactivity",
+    "wall",
+    "sign (radio activity)"
+  },
+  {
+    "sign_stop",
+    "wall",
+    "sign (stop)"
+  },
+  {
+    "sign_wheelchair",
+    "wall",
+    "sign (wheel chair)"
+  },
+  {
+    "sign_parking",
+    "wall",
+    "sign (parking)"
+  },
+  {
+    "sign_oneway",
+    "wall",
+    "sign (one way)"
+  },
+  {
+    "sign_heart",
+    "wall",
+    "sign (heart)"
+  },
+  {
+    "sign_triangle",
+    "wall",
+    "sign (triangle)"
+  },
+  {
+    "sign_round",
+    "wall",
+    "sign (round)"
+  },
+  {
+    "sign_exit",
+    "wall",
+    "sign (exit)"
+  },
+  {
+    "sign_yinyang",
+    "wall",
+    "sign (yin yang)"
+  },
+  {
+    "sign_other",
+    "wall",
+    "sign (other)"
+  },
+  {
+    "mole_left",
+    "mole",
+    "mole (starts moving left)"
+  },
+  {
+    "mole_right",
+    "mole",
+    "mole (starts moving right)"
+  },
+  {
+    "mole_up",
+    "mole",
+    "mole (starts moving up)"
+  },
+  {
+    "mole_down",
+    "mole",
+    "mole (starts moving down)"
+  },
+  {
+    "steelwall_slanted",
+    "wall",
+    "steel wall (slanted)"
+  },
+  {
+    "invisible_sand",
+    "sand",
+    "invisible sand"
+  },
+  {
+    "dx_unknown_15",
+    NULL,
+    "dx unknown element 15"
+  },
+  {
+    "dx_unknown_42",
+    NULL,
+    "dx unknown element 42"
+  },
+  {
+    "unused_319",
+    NULL,
+    "(not used)"
+  },
+  {
+    "unused_320",
+    NULL,
+    "(not used)"
+  },
+  {
+    "shield_deadly",
+    "shield_deadly",
+    "shield (deadly, kills enemies)"
+  },
+  {
+    "timegate_open",
+    "timegate",
+    "time gate (open)"
+  },
+  {
+    "timegate_closed",
+    "timegate",
+    "time gate (closed)"
+  },
+  {
+    "timegate_switch_active",
+    "timegate_switch",
+    "switch for time gate"
+  },
+  {
+    "timegate_switch",
+    "timegate_switch",
+    "switch for time gate"
+  },
+  {
+    "balloon",
+    "balloon",
+    "balloon"
+  },
+  {
+    "balloon_send_left",
+    "balloon_switch",
+    "send balloon to the left"
+  },
+  {
+    "balloon_send_right",
+    "balloon_switch",
+    "send balloon to the right"
+  },
+  {
+    "balloon_send_up",
+    "balloon_switch",
+    "send balloon up"
+  },
+  {
+    "balloon_send_down",
+    "balloon_switch",
+    "send balloon down"
+  },
+  {
+    "balloon_send_any_direction",
+    "balloon_switch",
+    "send balloon in any direction"
+  },
+  {
+    "emc_steelwall1",
+    "wall",
+    "steel wall"
+  },
+  {
+    "emc_steelwall2",
+    "wall",
+    "steel wall"
+  },
+  {
+    "emc_steelwall3",
+    "wall",
+    "steel wall"
+  },
+  {
+    "emc_steelwall4",
+    "wall",
+    "steel wall"
+  },
+  {
+    "emc_wall_pillar_upper",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_pillar_middle",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall_pillar_lower",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall4",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall5",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall6",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall7",
+    "wall",
+    "normal wall"
+  },
+  {
+    "emc_wall8",
+    "wall",
+    "normal wall"
+  },
+  {
+    "tube_all",
+    "tube",
+    "tube (all directions)"
+  },
+  {
+    "tube_vertical",
+    "tube",
+    "tube (vertical)"
+  },
+  {
+    "tube_horizontal",
+    "tube",
+    "tube (horizontal)"
+  },
+  {
+    "tube_vertical_left",
+    "tube",
+    "tube (vertical & left)"
+  },
+  {
+    "tube_vertical_right",
+    "tube",
+    "tube (vertical & right)"
+  },
+  {
+    "tube_horizontal_up",
+    "tube",
+    "tube (horizontal & up)"
+  },
+  {
+    "tube_horizontal_down",
+    "tube",
+    "tube (horizontal & down)"
+  },
+  {
+    "tube_left_up",
+    "tube",
+    "tube (left & up)"
+  },
+  {
+    "tube_left_down",
+    "tube",
+    "tube (left & down)"
+  },
+  {
+    "tube_right_up",
+    "tube",
+    "tube (right & up)"
+  },
+  {
+    "tube_right_down",
+    "tube",
+    "tube (right & down)"
+  },
+  {
+    "spring",
+    "spring",
+    "spring"
+  },
+  {
+    "trap",
+    "trap",
+    "trap"
+  },
+  {
+    "dx_supabomb",
+    "dx_bomb",
+    "stable bomb (DX style)"
+  },
+  {
+    "unused_358",
+    NULL,
+    "-"
+  },
+  {
+    "unused_359",
+    NULL,
+    "-"
+  },
+  {
+    "custom_1",
+    "custom",
+    "custom element 1"
+  },
+  {
+    "custom_2",
+    "custom",
+    "custom element 2"
+  },
+  {
+    "custom_3",
+    "custom",
+    "custom element 3"
+  },
+  {
+    "custom_4",
+    "custom",
+    "custom element 4"
+  },
+  {
+    "custom_5",
+    "custom",
+    "custom element 5"
+  },
+  {
+    "custom_6",
+    "custom",
+    "custom element 6"
+  },
+  {
+    "custom_7",
+    "custom",
+    "custom element 7"
+  },
+  {
+    "custom_8",
+    "custom",
+    "custom element 8"
+  },
+  {
+    "custom_9",
+    "custom",
+    "custom element 9"
+  },
+  {
+    "custom_10",
+    "custom",
+    "custom element 10"
+  },
+  {
+    "custom_11",
+    "custom",
+    "custom element 11"
+  },
+  {
+    "custom_12",
+    "custom",
+    "custom element 12"
+  },
+  {
+    "custom_13",
+    "custom",
+    "custom element 13"
+  },
+  {
+    "custom_14",
+    "custom",
+    "custom element 14"
+  },
+  {
+    "custom_15",
+    "custom",
+    "custom element 15"
+  },
+  {
+    "custom_16",
+    "custom",
+    "custom element 16"
+  },
+  {
+    "custom_17",
+    "custom",
+    "custom element 17"
+  },
+  {
+    "custom_18",
+    "custom",
+    "custom element 18"
+  },
+  {
+    "custom_19",
+    "custom",
+    "custom element 19"
+  },
+  {
+    "custom_20",
+    "custom",
+    "custom element 20"
+  },
+  {
+    "custom_21",
+    "custom",
+    "custom element 21"
+  },
+  {
+    "custom_22",
+    "custom",
+    "custom element 22"
+  },
+  {
+    "custom_23",
+    "custom",
+    "custom element 23"
+  },
+  {
+    "custom_24",
+    "custom",
+    "custom element 24"
+  },
+  {
+    "custom_25",
+    "custom",
+    "custom element 25"
+  },
+  {
+    "custom_26",
+    "custom",
+    "custom element 26"
+  },
+  {
+    "custom_27",
+    "custom",
+    "custom element 27"
+  },
+  {
+    "custom_28",
+    "custom",
+    "custom element 28"
+  },
+  {
+    "custom_29",
+    "custom",
+    "custom element 29"
+  },
+  {
+    "custom_30",
+    "custom",
+    "custom element 30"
+  },
+  {
+    "custom_31",
+    "custom",
+    "custom element 31"
+  },
+  {
+    "custom_32",
+    "custom",
+    "custom element 32"
+  },
+  {
+    "custom_33",
+    "custom",
+    "custom element 33"
+  },
+  {
+    "custom_34",
+    "custom",
+    "custom element 34"
+  },
+  {
+    "custom_35",
+    "custom",
+    "custom element 35"
+  },
+  {
+    "custom_36",
+    "custom",
+    "custom element 36"
+  },
+  {
+    "custom_37",
+    "custom",
+    "custom element 37"
+  },
+  {
+    "custom_38",
+    "custom",
+    "custom element 38"
+  },
+  {
+    "custom_39",
+    "custom",
+    "custom element 39"
+  },
+  {
+    "custom_40",
+    "custom",
+    "custom element 40"
+  },
+  {
+    "custom_41",
+    "custom",
+    "custom element 41"
+  },
+  {
+    "custom_42",
+    "custom",
+    "custom element 42"
+  },
+  {
+    "custom_43",
+    "custom",
+    "custom element 43"
+  },
+  {
+    "custom_44",
+    "custom",
+    "custom element 44"
+  },
+  {
+    "custom_45",
+    "custom",
+    "custom element 45"
+  },
+  {
+    "custom_46",
+    "custom",
+    "custom element 46"
+  },
+  {
+    "custom_47",
+    "custom",
+    "custom element 47"
+  },
+  {
+    "custom_48",
+    "custom",
+    "custom element 48"
+  },
+  {
+    "custom_49",
+    "custom",
+    "custom element 49"
+  },
+  {
+    "custom_50",
+    "custom",
+    "custom element 50"
+  },
+  {
+    "custom_51",
+    "custom",
+    "custom element 51"
+  },
+  {
+    "custom_52",
+    "custom",
+    "custom element 52"
+  },
+  {
+    "custom_53",
+    "custom",
+    "custom element 53"
+  },
+  {
+    "custom_54",
+    "custom",
+    "custom element 54"
+  },
+  {
+    "custom_55",
+    "custom",
+    "custom element 55"
+  },
+  {
+    "custom_56",
+    "custom",
+    "custom element 56"
+  },
+  {
+    "custom_57",
+    "custom",
+    "custom element 57"
+  },
+  {
+    "custom_58",
+    "custom",
+    "custom element 58"
+  },
+  {
+    "custom_59",
+    "custom",
+    "custom element 59"
+  },
+  {
+    "custom_60",
+    "custom",
+    "custom element 60"
+  },
+  {
+    "custom_61",
+    "custom",
+    "custom element 61"
+  },
+  {
+    "custom_62",
+    "custom",
+    "custom element 62"
+  },
+  {
+    "custom_63",
+    "custom",
+    "custom element 63"
+  },
+  {
+    "custom_64",
+    "custom",
+    "custom element 64"
+  },
+  {
+    "custom_65",
+    "custom",
+    "custom element 65"
+  },
+  {
+    "custom_66",
+    "custom",
+    "custom element 66"
+  },
+  {
+    "custom_67",
+    "custom",
+    "custom element 67"
+  },
+  {
+    "custom_68",
+    "custom",
+    "custom element 68"
+  },
+  {
+    "custom_69",
+    "custom",
+    "custom element 69"
+  },
+  {
+    "custom_70",
+    "custom",
+    "custom element 70"
+  },
+  {
+    "custom_71",
+    "custom",
+    "custom element 71"
+  },
+  {
+    "custom_72",
+    "custom",
+    "custom element 72"
+  },
+  {
+    "custom_73",
+    "custom",
+    "custom element 73"
+  },
+  {
+    "custom_74",
+    "custom",
+    "custom element 74"
+  },
+  {
+    "custom_75",
+    "custom",
+    "custom element 75"
+  },
+  {
+    "custom_76",
+    "custom",
+    "custom element 76"
+  },
+  {
+    "custom_77",
+    "custom",
+    "custom element 77"
+  },
+  {
+    "custom_78",
+    "custom",
+    "custom element 78"
+  },
+  {
+    "custom_79",
+    "custom",
+    "custom element 79"
+  },
+  {
+    "custom_80",
+    "custom",
+    "custom element 80"
+  },
+  {
+    "custom_81",
+    "custom",
+    "custom element 81"
+  },
+  {
+    "custom_82",
+    "custom",
+    "custom element 82"
+  },
+  {
+    "custom_83",
+    "custom",
+    "custom element 83"
+  },
+  {
+    "custom_84",
+    "custom",
+    "custom element 84"
+  },
+  {
+    "custom_85",
+    "custom",
+    "custom element 85"
+  },
+  {
+    "custom_86",
+    "custom",
+    "custom element 86"
+  },
+  {
+    "custom_87",
+    "custom",
+    "custom element 87"
+  },
+  {
+    "custom_88",
+    "custom",
+    "custom element 88"
+  },
+  {
+    "custom_89",
+    "custom",
+    "custom element 89"
+  },
+  {
+    "custom_90",
+    "custom",
+    "custom element 90"
+  },
+  {
+    "custom_91",
+    "custom",
+    "custom element 91"
+  },
+  {
+    "custom_92",
+    "custom",
+    "custom element 92"
+  },
+  {
+    "custom_93",
+    "custom",
+    "custom element 93"
+  },
+  {
+    "custom_94",
+    "custom",
+    "custom element 94"
+  },
+  {
+    "custom_95",
+    "custom",
+    "custom element 95"
+  },
+  {
+    "custom_96",
+    "custom",
+    "custom element 96"
+  },
+  {
+    "custom_97",
+    "custom",
+    "custom element 97"
+  },
+  {
+    "custom_98",
+    "custom",
+    "custom element 98"
+  },
+  {
+    "custom_99",
+    "custom",
+    "custom element 99"
+  },
+  {
+    "custom_100",
+    "custom",
+    "custom element 100"
+  },
+  {
+    "custom_101",
+    "custom",
+    "custom element 101"
+  },
+  {
+    "custom_102",
+    "custom",
+    "custom element 102"
+  },
+  {
+    "custom_103",
+    "custom",
+    "custom element 103"
+  },
+  {
+    "custom_104",
+    "custom",
+    "custom element 104"
+  },
+  {
+    "custom_105",
+    "custom",
+    "custom element 105"
+  },
+  {
+    "custom_106",
+    "custom",
+    "custom element 106"
+  },
+  {
+    "custom_107",
+    "custom",
+    "custom element 107"
+  },
+  {
+    "custom_108",
+    "custom",
+    "custom element 108"
+  },
+  {
+    "custom_109",
+    "custom",
+    "custom element 109"
+  },
+  {
+    "custom_110",
+    "custom",
+    "custom element 110"
+  },
+  {
+    "custom_111",
+    "custom",
+    "custom element 111"
+  },
+  {
+    "custom_112",
+    "custom",
+    "custom element 112"
+  },
+  {
+    "custom_113",
+    "custom",
+    "custom element 113"
+  },
+  {
+    "custom_114",
+    "custom",
+    "custom element 114"
+  },
+  {
+    "custom_115",
+    "custom",
+    "custom element 115"
+  },
+  {
+    "custom_116",
+    "custom",
+    "custom element 116"
+  },
+  {
+    "custom_117",
+    "custom",
+    "custom element 117"
+  },
+  {
+    "custom_118",
+    "custom",
+    "custom element 118"
+  },
+  {
+    "custom_119",
+    "custom",
+    "custom element 119"
+  },
+  {
+    "custom_120",
+    "custom",
+    "custom element 120"
+  },
+  {
+    "custom_121",
+    "custom",
+    "custom element 121"
+  },
+  {
+    "custom_122",
+    "custom",
+    "custom element 122"
+  },
+  {
+    "custom_123",
+    "custom",
+    "custom element 123"
+  },
+  {
+    "custom_124",
+    "custom",
+    "custom element 124"
+  },
+  {
+    "custom_125",
+    "custom",
+    "custom element 125"
+  },
+  {
+    "custom_126",
+    "custom",
+    "custom element 126"
+  },
+  {
+    "custom_127",
+    "custom",
+    "custom element 127"
+  },
+  {
+    "custom_128",
+    "custom",
+    "custom element 128"
+  },
 
   /* "real" (and therefore drawable) runtime elements */
 
-  { "key",			"-"				},
-  { "key",			"-"				},
-  { "key",			"-"				},    /* 490 */
-  { "key",			"-"				},
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "switchgate",		"-"				},
-  { "switchgate",		"-"				},
-  { "timegate",			"-"				},
-  { "timegate",			"-"				},
-  { "pearl",			"-"				},    /* 500 */
-  { "trap",			"-"				},
-  { "wall",			"-"				},
-  { "wall",			"-"				},
-  { "sand",			"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},    /* 510 */
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "exit",			"-"				},
-  { "sp_exit",			"-"				},
-  { "sp_terminal",		"-"				},
-  { "sp_buggy_base",		"-"				},    /* 520 */
-  { "sp_buggy_base",		"-"				},
-  { "murphy_clone",		"-"				},
-  { "amoeba",			"-"				},
-  { "quicksand",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},    /* 530 */
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
+  {
+    "em_key1",
+    "key",
+    "-"
+    },
+  {
+    "em_key2",
+    "key",
+    "-"
+    },
+  {
+    "em_key3",
+    "key",
+    "-"
+  },
+  {
+    "em_key4",
+    "key",
+    "-"
+  },
+  {
+    "dynabomb_player1_active",
+    "dynabomb",
+    "-"
+  },
+  {
+    "dynabomb_player2_active",
+    "dynabomb",
+    "-"
+  },
+  {
+    "dynabomb_player3_active",
+    "dynabomb",
+    "-"
+  },
+  {
+    "dynabomb_player4_active",
+    "dynabomb",
+    "-"
+  },
+  {
+    "switchgate_opening",
+    "switchgate",
+    "-"
+  },
+  {
+    "switchgate_closing",
+    "switchgate",
+    "-"
+  },
+  {
+    "timegate_opening",
+    "timegate",
+    "-"
+  },
+  {
+    "timegate_closing",
+    "timegate",
+    "-"
+  },
+  {
+    "pearl_breaking",
+    "pearl",
+    "-"
+  },
+  {
+    "trap_active",
+    "trap",
+    "-"
+  },
+  {
+    "invisible_steelwall_active",
+    "wall",
+    "-"
+  },
+  {
+    "invisible_wall_active",
+    "wall",
+    "-"
+  },
+  {
+    "invisible_sand_active",
+    "sand",
+    "-"
+  },
+  {
+    "conveyor_belt1_left_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt1_middle_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt1_right_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt2_left_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt2_middle_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt2_right_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt3_left_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt3_middle_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt3_right_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt4_left_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt4_middle_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "conveyor_belt4_right_active",
+    "conveyor_belt",
+    "-"
+  },
+  {
+    "exit_opening",
+    "exit",
+    "-"
+  },
+  {
+    "sp_exit_open",
+    "sp_exit",
+    "-"
+  },
+  {
+    "sp_terminal_active",
+    "sp_terminal",
+    "-"
+  },
+  {
+    "sp_buggy_base_activating",
+    "sp_buggy_base",
+    "-"
+  },
+  {
+    "sp_buggy_base_active",
+    "sp_buggy_base",
+    "-"
+  },
+  {
+    "sp_murphy_clone",
+    "murphy_clone",
+    "-"
+  },
+  {
+    "amoeba_dripping",
+    "amoeba",
+    "-"
+  },
+  {
+    "quicksand_emptying",
+    "quicksand",
+    "-"
+  },
+  {
+    "magic_wall_active",
+    "magic_wall",
+    "-"
+  },
+  {
+    "bd_magic_wall_active",
+    "magic_wall",
+    "-"
+  },
+  {
+    "magic_wall_full",
+    "magic_wall",
+    "-"
+  },
+  {
+    "bd_magic_wall_full",
+    "magic_wall",
+    "-"
+  },
+  {
+    "magic_wall_emptying",
+    "magic_wall",
+    "-"
+  },
+  {
+    "bd_magic_wall_emptying",
+    "magic_wall",
+    "-"
+  },
+  {
+    "magic_wall_dead",
+    "magic_wall",
+    "-"
+  },
+  {
+    "bd_magic_wall_dead",
+    "magic_wall",
+    "-"
+  },
 
-  { NULL,			"-"				}
+  {
+    "",
+    NULL,
+    "-"
+  }
 };
 
 #if 0

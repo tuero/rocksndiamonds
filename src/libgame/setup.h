@@ -55,14 +55,6 @@
 /* cookie token for file identifier and version number */
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
 
-/* structures for setup file handling */
-struct SetupFileList
-{
-  char *token;
-  char *value;
-  struct SetupFileList *next;
-};
-
 struct TokenInfo
 {
   int type;

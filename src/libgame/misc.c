@@ -1533,6 +1533,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   return file_list;
 }
 
+#if 0
 static void CheckArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
@@ -1597,6 +1598,7 @@ static void CheckArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   freeSetupFileList(setup_file_list);
 }
+#endif
 
 static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
@@ -1606,6 +1608,7 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
+  char *known_token_value = "[KNOWN_TOKEN]";
   int i, j;
 
 #if 0
@@ -1631,27 +1634,60 @@ static void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   for (i=0; i<num_file_list_entries; i++)
   {
+    /* check for config token that is the base token without any suffixes */
     char *filename = getTokenValue(setup_file_list, file_list[i].token);
 
-    if (filename)
+    if (filename != NULL)
+    {
       for (j=0; j<num_suffix_list_entries; j++)
 	file_list[i].parameter[j] =
 	  get_parameter_value(suffix_list[j].type, suffix_list[j].value);
+
+      file_list[i].filename = getStringCopy(filename);
+
+      /* mark token as well known from default config */
+      setTokenValue(setup_file_list, file_list[i].token, known_token_value);
+    }
     else
-      filename = file_list[i].default_filename;
+      file_list[i].filename = getStringCopy(file_list[i].default_filename);
 
-    file_list[i].filename = getStringCopy(filename);
-
+    /* check for config tokens that can be build by base token and suffixes */
     for (j=0; j<num_suffix_list_entries; j++)
     {
       char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
       char *value = getTokenValue(setup_file_list, token);
 
       if (value != NULL)
+      {
 	file_list[i].parameter[j] =
 	  get_parameter_value(suffix_list[j].type, value);
 
+	/* mark token as well known from default config */
+	setTokenValue(setup_file_list, token, known_token_value);
+      }
+
       free(token);
+    }
+  }
+
+  /* set some additional tokens to "known" */
+  setTokenValue(setup_file_list, "name", known_token_value);
+  setTokenValue(setup_file_list, "sort_priority", known_token_value);
+
+  if (options.verbose)
+  {
+    /* check each token in config file if it is defined in default config */
+    while (setup_file_list != NULL)
+    {
+      if (strcmp(setup_file_list->value, known_token_value) != 0)
+      {
+	Error(ERR_RETURN, "custom artwork configuration warning:");
+	Error(ERR_RETURN, "- config file: '%s'", filename);
+	Error(ERR_RETURN, "- config token: '%s'", setup_file_list->token);
+	Error(ERR_WARN, "token not recognized");
+      }
+
+      setup_file_list = setup_file_list->next;
     }
   }
 
@@ -1849,7 +1885,9 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   struct FileInfo *file_list = artwork_info->file_list;
   int i;
 
+#if 0
   CheckArtworkConfig(artwork_info);
+#endif
   LoadArtworkConfig(artwork_info);
 
 #if 0
