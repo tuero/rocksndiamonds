@@ -1864,7 +1864,7 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
   return FALSE;
 }
 
-#define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN]"
+#define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN_VALUE]"
 
 static void read_token_parameters(SetupFileHash *setup_file_hash,
 				  struct ConfigInfo *suffix_list,
@@ -1981,7 +1981,8 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
   int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
   int num_ignore_tokens = artwork_info->num_ignore_tokens;
-  SetupFileHash *setup_file_hash, *extra_file_hash;
+  SetupFileHash *setup_file_hash, *valid_file_hash;
+  SetupFileHash *extra_file_hash, *empty_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i, j, k, l;
 
@@ -1995,26 +1996,42 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
-  /* read parameters for all known config file tokens */
-  for (i = 0; i < num_file_list_entries; i++)
-    read_token_parameters(setup_file_hash, suffix_list, &file_list[i]);
-
-  /* set all tokens that can be ignored here to "known" keyword */
-  for (i = 0; i < num_ignore_tokens; i++)
-    setHashEntry(setup_file_hash, ignore_tokens[i], known_token_value);
-
-  /* copy all unknown config file tokens to extra config list */
-  extra_file_hash = newSetupFileHash();
+  /* separate valid (defined) from empty (undefined) config token values */
+  valid_file_hash = newSetupFileHash();
+  empty_file_hash = newSetupFileHash();
   BEGIN_HASH_ITERATION(setup_file_hash, itr)
   {
-    if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
-      setHashEntry(extra_file_hash,
-		   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));
+    char *value = HASH_ITERATION_VALUE(itr);
+
+    setHashEntry(*value ? valid_file_hash : empty_file_hash,
+		 HASH_ITERATION_TOKEN(itr), value);
   }
   END_HASH_ITERATION(setup_file_hash, itr)
 
-  /* at this point, we do not need the config file hash anymore -- free it */
+  /* at this point, we do not need the setup file hash anymore -- free it */
   freeSetupFileHash(setup_file_hash);
+
+  /* read parameters for all known config file tokens */
+  for (i = 0; i < num_file_list_entries; i++)
+    read_token_parameters(valid_file_hash, suffix_list, &file_list[i]);
+
+  /* set all tokens that can be ignored here to "known" keyword */
+  for (i = 0; i < num_ignore_tokens; i++)
+    setHashEntry(valid_file_hash, ignore_tokens[i], known_token_value);
+
+  /* copy all unknown config file tokens to extra config hash */
+  extra_file_hash = newSetupFileHash();
+  BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  {
+    char *value = HASH_ITERATION_VALUE(itr);
+
+    if (strcmp(value, known_token_value) != 0)
+      setHashEntry(extra_file_hash, HASH_ITERATION_TOKEN(itr), value);
+  }
+  END_HASH_ITERATION(valid_file_hash, itr)
+
+  /* at this point, we do not need the valid file hash anymore -- free it */
+  freeSetupFileHash(valid_file_hash);
 
   /* now try to determine valid, dynamically defined config tokens */
 
@@ -2231,11 +2248,12 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 		     artwork_info->sizeof_artwork_list_entry);
   }
 
-  if (extra_file_hash != NULL && options.verbose && IS_PARENT_PROCESS())
+  if (options.verbose && IS_PARENT_PROCESS())
   {
     SetupFileList *setup_file_list, *list;
     boolean dynamic_tokens_found = FALSE;
     boolean unknown_tokens_found = FALSE;
+    boolean undefined_values_found = (hashtable_count(empty_file_hash) != 0);
 
     if ((setup_file_list = loadSetupFileList(filename)) == NULL)
       Error(ERR_EXIT, "loadSetupFileHash works, but loadSetupFileList fails");
@@ -2283,10 +2301,28 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       Error(ERR_RETURN_LINE, "-");
     }
 
+    if (undefined_values_found)
+    {
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "warning: undefined values found in config file:");
+      Error(ERR_RETURN, "- config file: '%s'", filename);
+
+      for (list = setup_file_list; list != NULL; list = list->next)
+      {
+	char *value = getHashEntry(empty_file_hash, list->token);
+
+	if (value != NULL)
+	  Error(ERR_RETURN, "- undefined value for token: '%s'", list->token);
+      }
+
+      Error(ERR_RETURN_LINE, "-");
+    }
+
     freeSetupFileList(setup_file_list);
   }
 
   freeSetupFileHash(extra_file_hash);
+  freeSetupFileHash(empty_file_hash);
 
 #if 0
   for (i = 0; i < num_file_list_entries; i++)

@@ -254,6 +254,7 @@ SetupFileHash *newSetupFileHash();
 void freeSetupFileHash(SetupFileHash *);
 char *getHashEntry(SetupFileHash *, char *);
 void setHashEntry(SetupFileHash *, char *, char *);
+char *removeHashEntry(SetupFileHash *, char *);
 SetupFileHash *loadSetupFileHash(char *);
 void checkSetupFileHashIdentifier(SetupFileHash *, char *);
 void setSetupInfo(struct TokenInfo *, int, char *);

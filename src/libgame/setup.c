@@ -1391,6 +1391,14 @@ void setHashEntry(SetupFileHash *hash, char *token, char *value)
       Error(ERR_EXIT, "cannot insert into hash -- aborting");
 }
 
+char *removeHashEntry(SetupFileHash *hash, char *token)
+{
+  if (hash == NULL)
+    return NULL;
+
+  return remove_hash_entry(hash, token);
+}
+
 #if 0
 #ifdef DEBUG
 static void printSetupFileHash(SetupFileHash *hash)
@@ -1506,10 +1514,12 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
       if (*value != ' ' && *value != '\t')
 	break;
 
+#if 0
     if (*value == '\0')
       value = "true";	/* treat tokens without value as "true" */
+#endif
 
-    if (*token && *value)
+    if (*token)
     {
       if (use_hash)
 	setHashEntry((SetupFileHash *)setup_file_data, token, value);
