@@ -1135,7 +1135,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
   }
-  else if (IS_AMOEBOID(element))
+  else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
   {
     graphic = (element == EL_AMOEBE_TOT ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
     graphic += (x + 2 * y + 4) % 4;
@@ -1362,7 +1362,7 @@ void DrawScreenField(int x, int y)
     if (element == EL_QUICKSAND_EMPTYING ||
 	element == EL_MAGIC_WALL_EMPTYING ||
 	element == EL_MAGIC_WALL_BD_EMPTYING ||
-	content == EL_AMOEBE_NASS)
+	element == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
 	     element == EL_MAGIC_WALL_FILLING ||
@@ -1370,31 +1370,16 @@ void DrawScreenField(int x, int y)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
-    {
-      if (element == EL_QUICKSAND_EMPTYING ||
-	  element == EL_MAGIC_WALL_EMPTYING ||
-	  element == EL_MAGIC_WALL_BD_EMPTYING)
-	DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
-      else
-	DrawScreenElementShifted(x, y, 0, 0, content, NO_CUTTING);
-    }
+      DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
     else
       DrawScreenElement(x, y, EL_LEERRAUM);
 
     if (horiz_move)
       DrawScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
+    else if (cut_mode == NO_CUTTING)
+      DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], element, cut_mode);
     else
-    {
-      if (element == EL_QUICKSAND_EMPTYING ||
-	  element == EL_MAGIC_WALL_EMPTYING ||
-	  element == EL_MAGIC_WALL_BD_EMPTYING ||
-	  element == EL_QUICKSAND_FILLING ||
-	  element == EL_MAGIC_WALL_FILLING ||
-	  element == EL_MAGIC_WALL_BD_FILLING)
-	DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], content, cut_mode);
-      else
-	DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], element, cut_mode);
-    }
+      DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], content, cut_mode);
 
     if (content == EL_SALZSAEURE)
       DrawLevelElementThruMask(ux, uy + 1, EL_SALZSAEURE);
@@ -1419,7 +1404,7 @@ void DrawScreenField(int x, int y)
     if (element_old == EL_QUICKSAND_EMPTYING ||
 	element_old == EL_MAGIC_WALL_EMPTYING ||
 	element_old == EL_MAGIC_WALL_BD_EMPTYING ||
-	content_old == EL_AMOEBE_NASS)
+	element_old == EL_AMOEBA_DRIPPING)
       cut_mode = CUT_ABOVE;
 
     DrawScreenElement(x, y, EL_LEERRAUM);
@@ -1427,17 +1412,12 @@ void DrawScreenField(int x, int y)
     if (horiz_move)
       DrawScreenElementShifted(sx, sy, MovPos[oldx][oldy], 0, element_old,
 			       NO_CUTTING);
+    else if (cut_mode == NO_CUTTING)
+      DrawScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], element_old,
+			       cut_mode);
     else
-    {
-      if (element_old == EL_QUICKSAND_EMPTYING ||
-	  element_old == EL_MAGIC_WALL_EMPTYING ||
-	  element_old == EL_MAGIC_WALL_BD_EMPTYING)
-	DrawScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], content_old,
-				 cut_mode);
-      else
-	DrawScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], element_old,
-				 cut_mode);
-    }
+      DrawScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], content_old,
+			       cut_mode);
   }
   else if (IS_DRAWABLE(element))
     DrawScreenElement(x, y, element);
@@ -2436,6 +2416,7 @@ int el2gfx(int element)
     case EL_AMOEBE_VOLL:	return GFX_AMOEBE_VOLL;
     case EL_AMOEBE_BD:		return GFX_AMOEBE_BD;
     case EL_AMOEBA2DIAM:	return GFX_AMOEBA2DIAM;
+    case EL_AMOEBA_DRIPPING:	return GFX_AMOEBE_NASS;
     case EL_KOKOSNUSS:		return GFX_KOKOSNUSS;
     case EL_LIFE:		return GFX_LIFE;
     case EL_LIFE_ASYNC:		return GFX_LIFE_ASYNC;

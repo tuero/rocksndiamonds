@@ -1199,20 +1199,17 @@ void RemoveMovingField(int x, int y)
   if (Feld[x][y] == EL_BLOCKED &&
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
-       Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING))
+       Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING ||
+       Feld[oldx][oldy] == EL_AMOEBA_DRIPPING))
   {
     Feld[oldx][oldy] = (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ?
 			EL_MORAST_LEER :
 			Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ?
 			EL_MAGIC_WALL_EMPTY :
 			Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING ?
-			EL_MAGIC_WALL_BD_EMPTY : 0);
-    Store[oldx][oldy] = Store2[oldx][oldy] = 0;
-  }
-  else if (Feld[x][y] == EL_BLOCKED &&
-	   Store[oldx][oldy] == EL_AMOEBE_NASS)
-  {
-    Feld[oldx][oldy] = Store[oldx][oldy];
+			EL_MAGIC_WALL_BD_EMPTY :
+			Feld[oldx][oldy] == EL_AMOEBA_DRIPPING ?
+			EL_AMOEBE_NASS : 0);
     Store[oldx][oldy] = Store2[oldx][oldy] = 0;
   }
   else
@@ -2946,7 +2943,7 @@ void ContinueMoving(int x, int y)
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / 8;
 
-  if (element == EL_TROPFEN)
+  if (element == EL_TROPFEN || element == EL_AMOEBA_DRIPPING)
     step /= 2;
   else if (element == EL_QUICKSAND_FILLING ||
 	   element == EL_QUICKSAND_EMPTYING)
@@ -3041,16 +3038,17 @@ void ContinueMoving(int x, int y)
       element = Feld[newx][newy] = Store[x][y];
       Store[x][y] = 0;
     }
+    else if (element == EL_AMOEBA_DRIPPING)
+    {
+      Feld[x][y] = EL_AMOEBE_NASS;
+      element = Feld[newx][newy] = Store[x][y];
+      Store[x][y] = 0;
+    }
     else if (Store[x][y] == EL_SALZSAEURE)
     {
       Store[x][y] = 0;
       Feld[newx][newy] = EL_SALZSAEURE;
       element = EL_SALZSAEURE;
-    }
-    else if (Store[x][y] == EL_AMOEBE_NASS)
-    {
-      Store[x][y] = 0;
-      Feld[x][y] = EL_AMOEBE_NASS;
     }
 
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
@@ -3450,8 +3448,8 @@ void AmoebeAbleger(int ax, int ay)
   else
   {
     InitMovingField(ax, ay, MV_DOWN);
-    Feld[ax][ay] = EL_TROPFEN;
-    Store[ax][ay] = EL_AMOEBE_NASS;
+    Feld[ax][ay] = EL_AMOEBA_DRIPPING;
+    Store[ax][ay] = EL_TROPFEN;
     ContinueMoving(ax, ay);
     return;
   }

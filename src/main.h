@@ -910,6 +910,7 @@ extern int		num_element_info;
 #define EL_QUICKSAND_EMPTYING	525
 #define EL_MAGIC_WALL_EMPTYING	526
 #define EL_MAGIC_WALL_BD_EMPTYING 527
+#define EL_AMOEBA_DRIPPING	528
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
