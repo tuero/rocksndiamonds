@@ -55,6 +55,11 @@
 #define AUDIO_MONO_CHANNEL			1
 #define AUDIO_STEREO_CHANNELS			2
 
+#define AUDIO_FORMAT_U8				(1 << 0)
+#define AUDIO_FORMAT_S16			(1 << 1)
+#define AUDIO_FORMAT_LE				(1 << 2)
+#define AUDIO_FORMAT_BE				(1 << 3)
+
 #if defined(TARGET_SDL)
 /* one second fading interval == 1000 ticks (milliseconds) */
 #define SOUND_FADING_INTERVAL			1000
@@ -178,6 +183,14 @@ struct SoundHeader_8SVX
   char magic_8SVX[4];
 };
 #endif
+
+struct AudioFormatInfo
+{
+  boolean stereo;		/* availability of stereo sound */
+  int format;			/* size and endianess of sample data */
+  int sample_rate;		/* sample frequency */
+  int fragment_size;		/* audio device fragment size in bytes */
+};
 
 struct SampleInfo
 { 
