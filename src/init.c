@@ -148,14 +148,16 @@ void InitSound()
 
   OpenAudio(&audio);
 
+  AllocSoundArray(NUM_SOUNDS);
+
   for(i=0; i<NUM_SOUNDS; i++)
   {
-    Sound[i].name = sound_name[i];
-
-    if (!LoadSound(&Sound[i]))
+    if (!LoadSound(i, sound_name[i]))
     {
       audio.sound_available = FALSE;
       audio.loops_available = FALSE;
+      audio.sound_enabled = FALSE;
+
       return;
     }
   }

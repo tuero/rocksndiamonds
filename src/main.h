@@ -28,9 +28,7 @@
 #define DEBUG_TIMING	0
 #endif
 
-#if 0
 #include "libgame/libgame.h"
-#endif
 
 #ifndef FALSE
 #define FALSE		0
@@ -521,7 +519,9 @@ extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
+#if 0
 extern struct SampleInfo	Sound[];
+#endif
 extern struct JoystickInfo	joystick[];
 
 #if 0

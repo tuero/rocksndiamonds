@@ -27,13 +27,9 @@
 #include <sys/param.h>
 #endif
 
-#include "libgame.h"
-
 #include "misc.h"
+#include "random.h"
 
-#if 0
-#include "joystick_TMP.h"
-#endif
 
 #if defined(PLATFORM_MSDOS)
 volatile unsigned long counter = 0;

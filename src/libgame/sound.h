@@ -16,11 +16,11 @@
 
 #include <math.h>
 
+#include "platform.h"
+
 #if defined(PLATFORM_LINUX)
 #include <sys/ioctl.h>
 #endif
-
-#define SND_BLOCKSIZE 4096
 
 #if defined(PLATFORM_LINUX)
 #include <linux/soundcard.h>
@@ -28,11 +28,10 @@
 #include <machine/soundcard.h>
 #elif defined(PLATFORM_HPUX)
 #include <sys/audio.h>
-#undef  SND_BLOCKSIZE
-#define SND_BLOCKSIZE 32768
 #endif
 
-#include "libgame.h"
+#include "system.h"
+
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
 #define AUDIO_STREAMING_DSP
@@ -42,6 +41,12 @@
 #define MAX_SOUNDS_PLAYING	16
 #else
 #define MAX_SOUNDS_PLAYING	8
+#endif
+
+#if !defined(PLATFORM_HPUX)
+#define SND_BLOCKSIZE 4096
+#else
+#define SND_BLOCKSIZE 32768
 #endif
 
 /* some values for PlaySound(), StopSound() and friends */
@@ -155,7 +160,8 @@ void UnixCloseAudio(struct AudioSystemInfo *);
 void SoundServer(void);
 
 /* sound client functions */
-boolean LoadSound(struct SampleInfo *);
+void AllocSoundArray(int);
+boolean LoadSound(int, char *);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);

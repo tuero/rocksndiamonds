@@ -3,9 +3,7 @@
 # (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
-SRCS =	libgame.c	\
-	private.c	\
-	system.c	\
+SRCS =	system.c	\
 	gadgets.c	\
 	text.c		\
 	sound.c		\
@@ -17,9 +15,7 @@ SRCS =	libgame.c	\
 	x11.c		\
 	sdl.c
 
-OBJS =	libgame.o	\
-	private.o	\
-	system.o	\
+OBJS =	system.o	\
 	gadgets.o	\
 	text.o		\
 	sound.o		\

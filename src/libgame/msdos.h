@@ -18,6 +18,7 @@
 #include <time.h>
 #include "allegro.h"
 
+
 /* symbol 'window' is defined in DJGPP cross-compiler in libc.a(conio.o) */
 #define window window_djgpp
 
@@ -708,7 +709,7 @@ Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
 void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
 
-boolean MSDOSOpenAudio(void);
+Bool MSDOSOpenAudio(void);
 void MSDOSCloseAudio(void);
 
 void NetworkServer(int, int);

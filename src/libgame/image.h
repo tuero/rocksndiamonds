@@ -14,17 +14,10 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "platform.h"
-
-#ifndef TARGET_SDL
-
-#include "types.h"
 #include "system.h"
 
-/*
-#include "types.h"
-#include "x11.h"
-*/
+
+#if defined(TARGET_X11)
 
 #define MAX_COLORS	256	/* maximal number of colors for each image */
 
@@ -64,5 +57,6 @@ void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);
 int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
-#endif /* !TARGET_SDL */
+#endif /* TARGET_X11 */
+
 #endif	/* IMAGE_H */

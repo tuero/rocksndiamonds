@@ -20,9 +20,11 @@
 #include <fcntl.h>
 #endif
 
-#include "libgame.h"
+#include "system.h"
+#include "sound.h"
+#include "misc.h"
 
-#if 0
+
 /* ========================================================================= */
 /* exported variables                                                        */
 /* ========================================================================= */
@@ -32,6 +34,9 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+
+struct LevelDirInfo    *leveldir_first = NULL;
+struct LevelDirInfo    *leveldir_current = NULL;
 
 Display        *display = NULL;
 Visual	       *visual = NULL;
@@ -50,7 +55,6 @@ int		redraw_tiles = 0;
 
 int		FrameCounter = 0;
 
-#endif
 
 /* ========================================================================= */
 /* init functions                                                            */
@@ -431,6 +435,7 @@ inline boolean OpenAudio(struct AudioSystemInfo *audio)
 {
   audio->sound_available = FALSE;
   audio->loops_available = FALSE;
+  audio->sound_enabled = FALSE;
   audio->soundserver_pipe[0] = audio->soundserver_pipe[1] = 0;
   audio->soundserver_pid = 0;
   audio->device_name = NULL;
@@ -441,12 +446,14 @@ inline boolean OpenAudio(struct AudioSystemInfo *audio)
   {
     audio->sound_available = TRUE;
     audio->loops_available = TRUE;
+    audio->sound_enabled = TRUE;
   }
 #elif defined(PLATFORM_MSDOS)
   if (MSDOSOpenAudio())
   {
     audio->sound_available = TRUE;
     audio->loops_available = TRUE;
+    audio->sound_enabled = TRUE;
   }
 #elif defined(PLATFORM_UNIX)
   UnixOpenAudio(audio);
@@ -467,6 +474,15 @@ inline void CloseAudio(struct AudioSystemInfo *audio)
 
   audio->sound_available = FALSE;
   audio->loops_available = FALSE;
+  audio->sound_enabled = FALSE;
+}
+
+inline void SetAudioMode(boolean enabled)
+{
+  if (!audio.sound_available)
+    return;
+
+  audio.sound_enabled = enabled;
 }
 
 

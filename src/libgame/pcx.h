@@ -14,7 +14,9 @@
 #ifndef PCX_H
 #define PCX_H
 
-#include "libgame.h"
+#include "system.h"
+#include "image.h"
+
 
 #if !defined(TARGET_SDL)
 

@@ -11,13 +11,12 @@
 *  image.c                                                 *
 ***********************************************************/
 
-#include "platform.h"
-
-#if defined(TARGET_X11)
-
 #include "image.h"
 #include "pcx.h"
 #include "misc.h"
+
+
+#if defined(TARGET_X11)
 
 /* for MS-DOS/Allegro, exclude all except newImage() and freeImage() */
 

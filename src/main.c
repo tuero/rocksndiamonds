@@ -142,7 +142,9 @@ struct LevelDirInfo    *leveldir_first = NULL, *leveldir_current = NULL;
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
+#if 0
 struct SampleInfo	Sound[NUM_SOUNDS];
+#endif
 struct TapeInfo		tape;
 
 #if 0

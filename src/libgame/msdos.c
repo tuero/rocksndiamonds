@@ -12,9 +12,14 @@
 *  msdos.c                                                 *
 ***********************************************************/
 
-#include "libgame.h"
+#include "system.h"
+
 
 #if defined(PLATFORM_MSDOS)
+
+#include "sound.h"
+#include "misc.h"
+#include "pcx.h"
 
 #define AllegroDefaultScreen() (display->screens[display->default_screen])
 
@@ -915,7 +920,7 @@ void XAutoRepeatOff(Display *display)
   keyboard_auto_repeat = FALSE;
 }
 
-boolean MSDOSOpenAudio(void)
+Bool MSDOSOpenAudio(void)
 {
   return allegro_init_audio();
 }

@@ -12,9 +12,11 @@
 *  sdl.c                                                   *
 ***********************************************************/
 
-#include "libgame.h"
+#include "system.h"
+#include "misc.h"
 
-#ifdef TARGET_SDL
+
+#if defined(TARGET_SDL)
 
 inline void SDLInitVideoDisplay(void)
 {

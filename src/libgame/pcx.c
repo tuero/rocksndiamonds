@@ -13,9 +13,11 @@
 
 #ifndef TARGET_SDL
 
+#include <stdio.h>
+
 #include "pcx.h"
-#include "image.h"
 #include "misc.h"
+
 
 #define PCX_DEBUG		FALSE
 

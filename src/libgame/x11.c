@@ -12,7 +12,9 @@
 *  x11.c                                                   *
 ***********************************************************/
 
-#include "libgame.h"
+#include "system.h"
+#include "misc.h"
+
 
 #if defined(TARGET_X11)
 

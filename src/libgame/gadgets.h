@@ -14,7 +14,7 @@
 #ifndef GADGETS_H
 #define GADGETS_H
 
-#include "libgame.h"
+#include "system.h"
 
 
 #define GADGET_FRAME_DELAY	150	/* delay between gadget actions */

@@ -17,7 +17,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "libgame.h"
+#include "system.h"
+
 
 /* values for InitCounter() and Counter() */
 #define INIT_COUNTER			0

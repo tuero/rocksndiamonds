@@ -180,6 +180,7 @@ void GetPlayerConfig()
 
   setup.sound_simple = setup.sound;
 
+  SetAudioMode(setup.sound);
   InitJoysticks();
 }
 

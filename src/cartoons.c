@@ -11,11 +11,10 @@
 *  cartoons.c                                              *
 ***********************************************************/
 
-#include "libgame/libgame.h"
-
 #include "cartoons.h"
 #include "main.h"
 #include "tools.h"
+
 
 static void HandleAnimation(int);
 static boolean AnimateToon(int, boolean);

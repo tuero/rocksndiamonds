@@ -14,9 +14,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "libgame.h"
-
 #include "gadgets.h"
+#include "text.h"
+#include "misc.h"
 
 
 /* values for DrawGadget() */

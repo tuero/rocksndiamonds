@@ -11,12 +11,17 @@
 *  sound.c                                                 *
 ***********************************************************/
 
-#include "libgame.h"
-
-#include "main_TMP.h"
+#include <sys/time.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "sound.h"
 #include "misc.h"
+
+
+static int num_sounds = 0;
+static struct SampleInfo *Sound = NULL;
+
 
 /*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
@@ -101,6 +106,7 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
 
   audio->device_name = audio_device_name[i];
   audio->sound_available = TRUE;
+  audio->sound_enabled = TRUE;
 
 #if defined(AUDIO_STREAMING_DSP)
   audio->loops_available = TRUE;
@@ -785,11 +791,18 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
 /*** THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS ***/
 
+void AllocSoundArray(int num)
+{
+  num_sounds = num;
+  Sound = checked_calloc(num_sounds * sizeof(struct SampleInfo));
+}
+
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		20	/* size of WAV file header */
 
-boolean LoadSound(struct SampleInfo *snd_info)
+boolean LoadSound(int sound_nr, char *sound_name)
 {
+  struct SampleInfo *snd_info = &Sound[sound_nr];
   char filename[256];
   char *sound_ext = "wav";
 #if !defined(TARGET_SDL)
@@ -801,6 +814,8 @@ boolean LoadSound(struct SampleInfo *snd_info)
   int i;
 #endif
 #endif
+
+  snd_info->name = sound_name;
 
   sprintf(filename, "%s/%s/%s.%s",
 	  options.ro_base_directory, SOUNDS_DIRECTORY,
@@ -907,7 +922,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-  if (!audio.sound_available || !setup.sound)
+  if (!audio.sound_available || !audio.sound_enabled)
     return;
 
   if (volume<PSND_MIN_VOLUME)
@@ -940,7 +955,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
-    audio.sound_available = FALSE;
+    audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
 #else
@@ -1005,7 +1020,7 @@ void StopSoundExt(int nr, int method)
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process - no sounds");
-    audio.sound_available = FALSE;
+    audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
 #else

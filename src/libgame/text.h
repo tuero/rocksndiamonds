@@ -14,7 +14,8 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "libgame.h"
+#include "system.h"
+
 
 /* font types */
 #define FS_SMALL		0
