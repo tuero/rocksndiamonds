@@ -16,9 +16,12 @@
 
 #include "main.h"
 
-void LoadLevelFromFilename(char *);
+boolean LevelFileExists(int);
+void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
+void LoadLevelTemplate(int);
 void SaveLevel(int);
+void SaveLevelTemplate();
 void DumpLevel(struct LevelInfo *);
 
 void LoadTapeFromFilename(char *);
@@ -29,8 +32,8 @@ void DumpTape(struct TapeInfo *);
 void LoadScore(int);
 void SaveScore(int);
 
-void LoadSetup(void);
-void SaveSetup(void);
+void LoadSetup();
+void SaveSetup();
 
 void LoadCustomElementDescriptions();
 void LoadSpecialMenuDesignSettings();

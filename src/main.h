@@ -1112,6 +1112,8 @@ struct LevelInfo
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
+  short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
   boolean use_custom_template;	/* use custom properties from template file */
 
   boolean no_level_file;
@@ -1367,7 +1369,6 @@ extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int			redraw_x1, redraw_y1;
 
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -1417,7 +1418,7 @@ extern boolean			network_player_action_received;
 
 extern int			graphics_action_mapping[];
 
-extern struct LevelInfo		level;
+extern struct LevelInfo		level, level_template;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;

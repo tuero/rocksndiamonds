@@ -2749,7 +2749,7 @@ void Execute_Command(char *command)
     if (access(filename, F_OK) != 0)
       Error(ERR_EXIT, "cannot open file '%s'", filename);
 
-    LoadLevelFromFilename(filename);
+    LoadLevelFromFilename(&level, filename);
     DumpLevel(&level);
 
     exit(0);

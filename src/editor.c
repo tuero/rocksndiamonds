@@ -522,16 +522,16 @@
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
 
 /* values for selectbox gadgets */
-#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	0
-#define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	1
-#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	2
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE	0
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	1
+#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	2
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	3
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	4
 #define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	5
 #define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	6
 #define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	7
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE	8
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	9
+#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	8
+#define ED_SELECTBOX_ID_CUSTOM_CONSISTENCY	9
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	10
 #define ED_SELECTBOX_ID_CHANGE_PLAYER_ACTION	11
 #define ED_SELECTBOX_ID_CHANGE_COLLIDE_ACTION	12
@@ -540,8 +540,8 @@
 
 #define ED_NUM_SELECTBOX			15
 
-#define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
-#define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER
+#define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
+#define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_CONSISTENCY
 
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
 #define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_POWER
@@ -560,39 +560,39 @@
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	5
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	6
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	7
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	8
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	9
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		10
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	11
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	12
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	13
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	14
-#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	15
+#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	5
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	6
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	7
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	8
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	9
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	10
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		11
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	12
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	13
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	14
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	15
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	17
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	18
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	19
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	20
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	21
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	22
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		23
-#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	24
-#define ED_CHECKBUTTON_ID_CHANGE_BY_COLLISION	25
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	26
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	17
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		18
+#define ED_CHECKBUTTON_ID_CHANGE_BY_PLAYER	19
+#define ED_CHECKBUTTON_ID_CHANGE_BY_COLLISION	20
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER	21
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	22
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	23
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	24
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	25
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	26
 
 #define ED_NUM_CHECKBUTTONS			27
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
-#define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT
-#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE
+#define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE
+#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT
 
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
-#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_BY_OTHER
+#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -1520,6 +1520,7 @@ static void ModifyEditorCounter(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectbox(int, int);
 static void ModifyEditorElementList();
+static void RedrawDrawingElements();
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
@@ -3590,6 +3591,9 @@ static void ResetUndoBuffer()
 
 static void DrawEditModeWindow()
 {
+  ModifyEditorElementList();
+  RedrawDrawingElements();
+
   if (edit_mode == ED_MODE_INFO)
     DrawLevelInfoWindow();
   else if (edit_mode == ED_MODE_PROPERTIES)
@@ -3605,7 +3609,7 @@ static boolean LevelChanged()
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] != Ur[x][y])
+      if (Feld[x][y] != level.field[x][y])
 	level_changed = TRUE;
 
   return level_changed;
@@ -3642,7 +3646,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   /* needed here to initialize combined element properties */
   InitElementPropertiesEngine(level.game_version);
 
-  custom_element = element_info[properties_element];
+  custom_element = element_info[element];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     custom_element_properties[i] = HAS_PROPERTY(element, i);
@@ -3750,7 +3754,23 @@ static void CopyCustomElementPropertiesToGame(int element)
   int i;
   int access_type_and_layer;
 
-  element_info[properties_element] = custom_element;
+  if (level.use_custom_template)
+  {
+    if (Request("Copy and modify level tem- plate ?", REQ_ASK))
+    {
+      level.use_custom_template = FALSE;
+      ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
+		   GDI_CHECKED, FALSE, GDI_END);
+    }
+    else
+    {
+      LoadLevelTemplate(-1);
+
+      DrawEditModeWindow();
+    }
+  }
+
+  element_info[element] = custom_element;
 
   /* ---------- element settings: configure (custom elements) ------------- */
 
@@ -3842,7 +3862,7 @@ static void CopyCustomElementPropertiesToGame(int element)
     SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
 
   /* copy change events also to special level editor variable */
-  custom_element = element_info[properties_element];
+  custom_element = element_info[element];
 }
 
 void DrawLevelEd()
@@ -3852,8 +3872,8 @@ void DrawLevelEd()
 
   if (level_editor_test_game)
   {
-    CopyPlayfield(Ur, Feld);
-    CopyPlayfield(FieldBackup, Ur);
+    CopyPlayfield(level.field, Feld);
+    CopyPlayfield(FieldBackup, level.field);
 
     level_editor_test_game = FALSE;
   }
@@ -3872,16 +3892,10 @@ void DrawLevelEd()
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
+#if 0
   /* draw mouse button brush elements */
-  DrawMiniGraphicExt(drawto,
-		     DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
-		     el2edimg(new_element1));
-  DrawMiniGraphicExt(drawto,
-		     DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
-		     el2edimg(new_element2));
-  DrawMiniGraphicExt(drawto,
-		     DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
-		     el2edimg(new_element3));
+  RedrawDrawingElements();
+#endif
 
   /* draw bigger door */
   DrawSpecialEditorDoor();
@@ -3893,16 +3907,18 @@ void DrawLevelEd()
   redraw_mask |= REDRAW_ALL;
 
   ReinitializeElementListButtons();	/* only needed after setup changes */
+#if 0
   ModifyEditorElementList();		/* may be needed for custom elements */
+#endif
 
   UnmapTapeButtons();
   MapControlButtons();
 
+  DrawEditModeWindow();
+
   /* copy actual editor door content to door double buffer for OpenDoor() */
   BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-  DrawEditModeWindow();
 
   OpenDoor(DOOR_OPEN_1);
 }
@@ -4981,6 +4997,16 @@ static void DrawPropertiesWindow()
     DrawPropertiesAdvanced();
 }
 
+static void UpdateCustomElementGraphicGadgets()
+{
+  ModifyEditorElementList();
+  RedrawDrawingElements();
+
+  if (edit_mode == ED_MODE_PROPERTIES &&
+      edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED)
+    DrawPropertiesAdvancedDrawingAreas();
+}
+
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
 {
   int lx = sx + level_xpos;
@@ -5715,34 +5741,36 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	{
 	  new_element = GFX_ELEMENT(new_element);
 	  custom_element.gfx_element = new_element;
-	  element_info[properties_element] = custom_element;
 
-	  ModifyEditorElementList();
-	  RedrawDrawingElements();
+	  CopyCustomElementPropertiesToGame(properties_element);
 
-	  DrawPropertiesAdvancedDrawingAreas();
+	  UpdateCustomElementGraphicGadgets();
 
 	  FrameCounter = 0;	/* restart animation frame counter */
 	}
 	else if (id == GADGET_ID_CUSTOM_CONTENT)
 	{
 	  custom_element.content[sx][sy] = new_element;
-	  element_info[properties_element] = custom_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	{
 	  custom_element.change.target_element = new_element;
-	  element_info[properties_element] = custom_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
 	{
 	  custom_element.change.content[sx][sy] = new_element;
-	  element_info[properties_element] = custom_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	{
 	  custom_element.change.trigger_element = new_element;
-	  element_info[properties_element] = custom_element;
+
+	  CopyCustomElementPropertiesToGame(properties_element);
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;
@@ -5969,12 +5997,25 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 {
-  if (gi->custom_type_id >= ED_TEXTBUTTON_ID_PROPERTIES_INFO &&
-      gi->custom_type_id <= ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED)
+  int type_id = gi->custom_type_id;
+
+  if (type_id >= ED_TEXTBUTTON_ID_PROPERTIES_INFO &&
+      type_id <= ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED)
   {
     edit_mode_properties = gi->custom_type_id;
 
     DrawPropertiesWindow();
+  }
+  else if (type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE)
+  {
+    boolean new_template = (!LevelFileExists(-1));
+
+    if (new_template ||
+	Request("Save this tem- plate and kill the old ?", REQ_ASK))
+      SaveLevelTemplate();
+
+    if (new_template)
+      Request("Tem- plate saved !", REQ_CONFIRM);
   }
 }
 
@@ -5993,15 +6034,31 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   if ((type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
        type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST) ||
       (type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
-       type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST))
+       type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST &&
+       type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE))
+  {
     CopyCustomElementPropertiesToGame(properties_element);
+  }
 
   if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC)
   {
-    ModifyEditorElementList();
-    RedrawDrawingElements();
+    UpdateCustomElementGraphicGadgets();
+  }
+  else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
+  {
+    if (level.use_custom_template && !LevelFileExists(-1))
+    {
+      Request("No level tem- plate found !", REQ_CONFIRM);
 
-    DrawPropertiesAdvancedDrawingAreas();
+      level.use_custom_template = FALSE;
+      ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);
+
+      return;
+    }
+
+    LoadLevelTemplate(level.use_custom_template ? -1 : level_nr);
+
+    DrawEditModeWindow();
   }
 }
 
@@ -6249,12 +6306,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
       else
       {
-	if (Request("Save this level and kill the old ?", REQ_ASK))
+	boolean new_level = (!LevelFileExists(level_nr));
+
+	if (new_level ||
+	    Request("Save this level and kill the old ?", REQ_ASK))
 	{
-	  CopyPlayfield(Feld, Ur);
+	  CopyPlayfield(Feld, level.field);
 
 	  SaveLevel(level_nr);
 	}
+
+	if (new_level)
+	  Request("Level saved !", REQ_CONFIRM);
       }
       break;
 
@@ -6266,8 +6329,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (LevelChanged())
 	  level.game_version = GAME_VERSION_ACTUAL;
 
-	CopyPlayfield(Ur, FieldBackup);
-	CopyPlayfield(Feld, Ur);
+	CopyPlayfield(level.field, FieldBackup);
+	CopyPlayfield(Feld, level.field);
 
 	UnmapLevelEditorGadgets();
 	UndrawSpecialEditorDoor();

@@ -1521,7 +1521,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 
       if (lx >= 0 && lx < lev_fieldx && ly >= 0 && ly < lev_fieldy)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 Ur[lx][ly]);
+			 level.field[lx][ly]);
       else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1
 	       && BorderElement != EL_EMPTY)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
@@ -1711,6 +1711,10 @@ boolean Request(char *text, unsigned int req_state)
 #endif
 
   old_door_state = GetDoorState();
+
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
 
   UnmapAllGadgets();
 

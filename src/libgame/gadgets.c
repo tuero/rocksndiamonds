@@ -1131,6 +1131,13 @@ void HandleGadgets(int mx, int my, int button)
   if (gadget_list_first_entry == NULL)
     return;
 
+  /* simulated release of mouse button over last gadget */
+  if (mx == -1 && my == -1 && button == 0)
+  {
+    mx = last_mx;
+    my = last_my;
+  }
+
   /* check which gadget is under the mouse pointer */
   new_gi = getGadgetInfoFromMousePosition(mx, my);
 
@@ -1547,6 +1554,10 @@ void HandleGadgets(int mx, int my, int button)
 	gi->event_mask & GD_EVENT_OFF_BORDERS)
       gi->callback_action(gi);
   }
+
+  /* handle gadgets unmapped/mapped between pressing and releasing */
+  if (release_event && !gadget_released && new_gi)
+    new_gi->state = GD_BUTTON_UNPRESSED;
 }
 
 void HandleGadgetsKeyInput(Key key)

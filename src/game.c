@@ -1046,7 +1046,7 @@ void InitGame()
   {
     for (y=0; y<lev_fieldy; y++)
     {
-      Feld[x][y] = Ur[x][y];
+      Feld[x][y] = level.field[x][y];
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       ChangeDelay[x][y] = 0;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;

@@ -47,59 +47,58 @@
 /* level file functions                                                      */
 /* ========================================================================= */
 
-static void setLevelInfoToDefaults()
+static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   int i, j, x, y;
 
-  level.file_version = FILE_VERSION_ACTUAL;
-  level.game_version = GAME_VERSION_ACTUAL;
+  level->file_version = FILE_VERSION_ACTUAL;
+  level->game_version = GAME_VERSION_ACTUAL;
 
-  level.encoding_16bit_field = FALSE;	/* default: only 8-bit elements */
-  level.encoding_16bit_yamyam = FALSE;	/* default: only 8-bit elements */
-  level.encoding_16bit_amoeba = FALSE;	/* default: only 8-bit elements */
+  level->encoding_16bit_field  = FALSE;	/* default: only 8-bit elements */
+  level->encoding_16bit_yamyam = FALSE;	/* default: only 8-bit elements */
+  level->encoding_16bit_amoeba = FALSE;	/* default: only 8-bit elements */
 
-  lev_fieldx = level.fieldx = STD_LEV_FIELDX;
-  lev_fieldy = level.fieldy = STD_LEV_FIELDY;
+  level->fieldx = STD_LEV_FIELDX;
+  level->fieldy = STD_LEV_FIELDY;
 
   for(x=0; x<MAX_LEV_FIELDX; x++)
     for(y=0; y<MAX_LEV_FIELDY; y++)
-      Feld[x][y] = Ur[x][y] = EL_SAND;
+      level->field[x][y] = EL_SAND;
 
-  level.time = 100;
-  level.gems_needed = 0;
-  level.amoeba_speed = 10;
-  level.time_magic_wall = 10;
-  level.time_wheel = 10;
-  level.time_light = 10;
-  level.time_timegate = 10;
-  level.amoeba_content = EL_DIAMOND;
-  level.double_speed = FALSE;
-  level.gravity = FALSE;
-  level.em_slippery_gems = FALSE;
+  level->time = 100;
+  level->gems_needed = 0;
+  level->amoeba_speed = 10;
+  level->time_magic_wall = 10;
+  level->time_wheel = 10;
+  level->time_light = 10;
+  level->time_timegate = 10;
+  level->amoeba_content = EL_DIAMOND;
+  level->double_speed = FALSE;
+  level->gravity = FALSE;
+  level->em_slippery_gems = FALSE;
 
-  level.use_custom_template = FALSE;
+  level->use_custom_template = FALSE;
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    level.name[i] = '\0';
+    level->name[i] = '\0';
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
-    level.author[i] = '\0';
+    level->author[i] = '\0';
 
-  strcpy(level.name, NAMELESS_LEVEL_NAME);
-  strcpy(level.author, ANONYMOUS_NAME);
+  strcpy(level->name, NAMELESS_LEVEL_NAME);
+  strcpy(level->author, ANONYMOUS_NAME);
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    level.score[i] = 10;
+    level->score[i] = 10;
 
-  level.num_yamyam_contents = STD_ELEMENT_CONTENTS;
+  level->num_yamyam_contents = STD_ELEMENT_CONTENTS;
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
-	level.yamyam_content[i][x][y] =
+	level->yamyam_content[i][x][y] =
 	  (i < STD_ELEMENT_CONTENTS ? EL_ROCK : EL_EMPTY);
 
-  Feld[0][0] = Ur[0][0] = EL_PLAYER_1;
-  Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
-    Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
+  level->field[0][0] = EL_PLAYER_1;
+  level->field[STD_LEV_FIELDX - 1][STD_LEV_FIELDY - 1] = EL_EXIT_CLOSED;
 
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -176,7 +175,7 @@ static void setLevelInfoToDefaults()
 
   BorderElement = EL_STEELWALL;
 
-  level.no_level_file = FALSE;
+  level->no_level_file = FALSE;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
@@ -184,25 +183,25 @@ static void setLevelInfoToDefaults()
   /* try to determine better author name than 'anonymous' */
   if (strcmp(leveldir_current->author, ANONYMOUS_NAME) != 0)
   {
-    strncpy(level.author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
-    level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+    strncpy(level->author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
+    level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
   }
   else
   {
     switch (LEVELCLASS(leveldir_current))
     {
       case LEVELCLASS_TUTORIAL:
-	strcpy(level.author, PROGRAM_AUTHOR_STRING);
+	strcpy(level->author, PROGRAM_AUTHOR_STRING);
 	break;
 
       case LEVELCLASS_CONTRIBUTION:
-	strncpy(level.author, leveldir_current->name,MAX_LEVEL_AUTHOR_LEN);
-	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	strncpy(level->author, leveldir_current->name,MAX_LEVEL_AUTHOR_LEN);
+	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
 	break;
 
       case LEVELCLASS_USER:
-	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
-	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	strncpy(level->author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
+	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
 	break;
 
       default:
@@ -210,6 +209,20 @@ static void setLevelInfoToDefaults()
 	break;
     }
   }
+}
+
+static void ActivateLevelTemplate()
+{
+  /* Currently there is no special action needed to activate the template
+     data, because 'element_info' and 'Properties' overwrite the original
+     level data, while all other variables do not change. */
+}
+
+boolean LevelFileExists(int level_nr)
+{
+  char *filename = getLevelFilename(level_nr);
+
+  return (access(filename, F_OK) == 0);
 }
 
 static int checkLevelElement(int element)
@@ -239,35 +252,35 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
 
-  lev_fieldx = level->fieldx = fgetc(file);
-  lev_fieldy = level->fieldy = fgetc(file);
+  level->fieldx = getFile8Bit(file);
+  level->fieldy = getFile8Bit(file);
 
   level->time		= getFile16BitBE(file);
   level->gems_needed	= getFile16BitBE(file);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    level->name[i] = fgetc(file);
+    level->name[i] = getFile8Bit(file);
   level->name[MAX_LEVEL_NAME_LEN] = 0;
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    level->score[i] = fgetc(file);
+    level->score[i] = getFile8Bit(file);
 
   level->num_yamyam_contents = STD_ELEMENT_CONTENTS;
   for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	level->yamyam_content[i][x][y] = checkLevelElement(fgetc(file));
+	level->yamyam_content[i][x][y] = checkLevelElement(getFile8Bit(file));
 
-  level->amoeba_speed		= fgetc(file);
-  level->time_magic_wall	= fgetc(file);
-  level->time_wheel		= fgetc(file);
-  level->amoeba_content		= checkLevelElement(fgetc(file));
-  level->double_speed		= (fgetc(file) == 1 ? TRUE : FALSE);
-  level->gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
-  level->encoding_16bit_field	= (fgetc(file) == 1 ? TRUE : FALSE);
-  level->em_slippery_gems	= (fgetc(file) == 1 ? TRUE : FALSE);
+  level->amoeba_speed		= getFile8Bit(file);
+  level->time_magic_wall	= getFile8Bit(file);
+  level->time_wheel		= getFile8Bit(file);
+  level->amoeba_content		= checkLevelElement(getFile8Bit(file));
+  level->double_speed		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->gravity		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
-  level->use_custom_template	= (fgetc(file) == 1 ? TRUE : FALSE);
+  level->use_custom_template	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -279,7 +292,7 @@ static int LoadLevel_AUTH(FILE *file, int chunk_size, struct LevelInfo *level)
   int i;
 
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
-    level->author[i] = fgetc(file);
+    level->author[i] = getFile8Bit(file);
   level->author[MAX_LEVEL_NAME_LEN] = 0;
 
   return chunk_size;
@@ -306,9 +319,9 @@ static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for(y=0; y<level->fieldy; y++)
     for(x=0; x<level->fieldx; x++)
-      Feld[x][y] = Ur[x][y] =
-	checkLevelElement(level->encoding_16bit_field ?
-			  getFile16BitBE(file) : fgetc(file));
+      level->field[x][y] =
+	checkLevelElement(level->encoding_16bit_field ? getFile16BitBE(file) :
+			  getFile8Bit(file));
   return chunk_size;
 }
 
@@ -333,10 +346,10 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
     return chunk_size_expected;
   }
 
-  fgetc(file);
-  level->num_yamyam_contents = fgetc(file);
-  fgetc(file);
-  fgetc(file);
+  getFile8Bit(file);
+  level->num_yamyam_contents = getFile8Bit(file);
+  getFile8Bit(file);
+  getFile8Bit(file);
 
   /* correct invalid number of content fields -- should never happen */
   if (level->num_yamyam_contents < 1 ||
@@ -348,7 +361,7 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
       for(x=0; x<3; x++)
 	level->yamyam_content[i][x][y] =
 	  checkLevelElement(level->encoding_16bit_field ?
-			    getFile16BitBE(file) : fgetc(file));
+			    getFile16BitBE(file) : getFile8Bit(file));
   return chunk_size;
 }
 
@@ -360,9 +373,9 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   int content_array[MAX_ELEMENT_CONTENTS][3][3];
 
   element = checkLevelElement(getFile16BitBE(file));
-  num_contents = fgetc(file);
-  content_xsize = fgetc(file);
-  content_ysize = fgetc(file);
+  num_contents = getFile8Bit(file);
+  content_xsize = getFile8Bit(file);
+  content_ysize = getFile8Bit(file);
   ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT2_UNUSED);
 
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
@@ -534,7 +547,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
-void LoadLevelFromFilename(char *filename)
+void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 {
   char cookie[MAX_LINE_LEN];
   char chunk_name[CHUNK_ID_LEN + 1];
@@ -542,13 +555,15 @@ void LoadLevelFromFilename(char *filename)
   FILE *file;
 
   /* always start with reliable default values */
-  setLevelInfoToDefaults();
+  setLevelInfoToDefaults(level);
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    level.no_level_file = TRUE;
+    level->no_level_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
+    if (level != &level_template)
+      Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
+
     return;
   }
 
@@ -579,7 +594,7 @@ void LoadLevelFromFilename(char *filename)
       return;
     }
 
-    if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
+    if ((level->file_version = getFileVersionFromCookieString(cookie)) == -1)
     {
       Error(ERR_WARN, "unsupported version of level file '%s'", filename);
       fclose(file);
@@ -587,14 +602,14 @@ void LoadLevelFromFilename(char *filename)
     }
 
     /* pre-2.0 level files have no game version, so use file version here */
-    level.game_version = level.file_version;
+    level->game_version = level->file_version;
   }
 
-  if (level.file_version < FILE_VERSION_1_2)
+  if (level->file_version < FILE_VERSION_1_2)
   {
     /* level files from versions before 1.2.0 without chunk structure */
-    LoadLevel_HEAD(file, LEVEL_HEADER_SIZE,           &level);
-    LoadLevel_BODY(file, level.fieldx * level.fieldy, &level);
+    LoadLevel_HEAD(file, LEVEL_HEADER_SIZE,             level);
+    LoadLevel_BODY(file, level->fieldx * level->fieldy, level);
   }
   else
   {
@@ -643,7 +658,7 @@ void LoadLevelFromFilename(char *filename)
       {
 	/* call function to load this level chunk */
 	int chunk_size_expected =
-	  (chunk_info[i].loader)(file, chunk_size, &level);
+	  (chunk_info[i].loader)(file, chunk_size, level);
 
 	/* the size of some chunks cannot be checked before reading other
 	   chunks first (like "HEAD" and "BODY") that contain some header
@@ -658,6 +673,11 @@ void LoadLevelFromFilename(char *filename)
   }
 
   fclose(file);
+}
+
+static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
+{
+  int x, y;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
@@ -674,18 +694,18 @@ void LoadLevelFromFilename(char *filename)
        file format version used to store the level -- see above). */
 
     /* do some special adjustments to support older level versions */
-    if (level.file_version == FILE_VERSION_1_0)
+    if (level->file_version == FILE_VERSION_1_0)
     {
-      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
+      Error(ERR_WARN, "level file '%s'has version number 1.0", filename);
       Error(ERR_WARN, "using high speed movement for player");
 
       /* player was faster than monsters in (pre-)1.0 levels */
-      level.double_speed = TRUE;
+      level->double_speed = TRUE;
     }
 
     /* Default behaviour for EM style gems was "slippery" only in 2.0.1 */
-    if (level.game_version == VERSION_IDENT(2,0,1))
-      level.em_slippery_gems = TRUE;
+    if (level->game_version == VERSION_IDENT(2,0,1))
+      level->em_slippery_gems = TRUE;
   }
   else
   {
@@ -696,7 +716,7 @@ void LoadLevelFromFilename(char *filename)
        make the game emulation more accurate, while (hopefully) not
        breaking existing levels created from other players. */
 
-    level.game_version = GAME_VERSION_ACTUAL;
+    level->game_version = GAME_VERSION_ACTUAL;
 
     /* Set special EM style gems behaviour: EM style gems slip down from
        normal, steel and growing wall. As this is a more fundamental change,
@@ -705,21 +725,19 @@ void LoadLevelFromFilename(char *filename)
        of gem style elements). Already existing converted levels (neither
        private nor contributed levels) are changed to the new behaviour. */
 
-    if (level.file_version < FILE_VERSION_2_0)
-      level.em_slippery_gems = TRUE;
+    if (level->file_version < FILE_VERSION_2_0)
+      level->em_slippery_gems = TRUE;
   }
 
-  /* map some elements which have changed in newer versions */
-  if (level.game_version <= VERSION_IDENT(2,2,0))
+  /* map elements which have changed in newer versions */
+  if (level->game_version <= VERSION_IDENT(2,2,0))
   {
-    int x, y;
-
     /* map game font elements */
-    for(y=0; y<level.fieldy; y++)
+    for(y=0; y<level->fieldy; y++)
     {
-      for(x=0; x<level.fieldx; x++)
+      for(x=0; x<level->fieldx; x++)
       {
-	int element = Ur[x][y];
+	int element = level->field[x][y];
 
 	if (element == EL_CHAR('['))
 	  element = EL_CHAR_AUMLAUT;
@@ -730,21 +748,46 @@ void LoadLevelFromFilename(char *filename)
 	else if (element == EL_CHAR('^'))
 	  element = EL_CHAR_COPYRIGHT;
 
-	Feld[x][y] = Ur[x][y] = element;
+	level->field[x][y] = element;
       }
     }
   }
 
+  /* copy elements to runtime playfield array */
+  for(y=0; y<level->fieldy; y++)
+    for(x=0; x<level->fieldx; x++)
+      Feld[x][y] = level->field[x][y];
+
+  /* initialize level size variables for faster access */
+  lev_fieldx = level->fieldx;
+  lev_fieldy = level->fieldy;
+
   /* determine border element for this level */
   SetBorderElement();
+
+  /* initialize element properties for level editor etc. */
+  InitElementPropertiesEngine(level->game_version);
+}
+
+void LoadLevelTemplate(int level_nr)
+{
+  char *filename = getLevelFilename(level_nr);
+
+  LoadLevelFromFilename(&level_template, filename);
+
+  ActivateLevelTemplate();
 }
 
 void LoadLevel(int level_nr)
 {
   char *filename = getLevelFilename(level_nr);
 
-  LoadLevelFromFilename(filename);
-  InitElementPropertiesEngine(level.game_version);
+  LoadLevelFromFilename(&level, filename);
+
+  if (level.use_custom_template)
+    LoadLevelTemplate(-1);
+
+  LoadLevel_InitLevel(&level, filename);
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
@@ -757,35 +800,34 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
 
-  fputc(level->fieldx, file);
-  fputc(level->fieldy, file);
+  putFile8Bit(file, level->fieldx);
+  putFile8Bit(file, level->fieldy);
 
   putFile16BitBE(file, level->time);
   putFile16BitBE(file, level->gems_needed);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
-    fputc(level->name[i], file);
+    putFile8Bit(file, level->name[i]);
 
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
-    fputc(level->score[i], file);
+    putFile8Bit(file, level->score[i]);
 
   for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc((level->encoding_16bit_yamyam ? EL_EMPTY :
-	       level->yamyam_content[i][x][y]),
-	      file);
-  fputc(level->amoeba_speed, file);
-  fputc(level->time_magic_wall, file);
-  fputc(level->time_wheel, file);
-  fputc((level->encoding_16bit_amoeba ? EL_EMPTY : level->amoeba_content),
-	file);
-  fputc((level->double_speed ? 1 : 0), file);
-  fputc((level->gravity ? 1 : 0), file);
-  fputc((level->encoding_16bit_field ? 1 : 0), file);
-  fputc((level->em_slippery_gems ? 1 : 0), file);
+	putFile8Bit(file, (level->encoding_16bit_yamyam ? EL_EMPTY :
+			   level->yamyam_content[i][x][y]));
+  putFile8Bit(file, level->amoeba_speed);
+  putFile8Bit(file, level->time_magic_wall);
+  putFile8Bit(file, level->time_wheel);
+  putFile8Bit(file, (level->encoding_16bit_amoeba ? EL_EMPTY :
+		     level->amoeba_content));
+  putFile8Bit(file, (level->double_speed ? 1 : 0));
+  putFile8Bit(file, (level->gravity ? 1 : 0));
+  putFile8Bit(file, (level->encoding_16bit_field ? 1 : 0));
+  putFile8Bit(file, (level->em_slippery_gems ? 1 : 0));
 
-  fputc((level->use_custom_template ? 1 : 0), file);
+  putFile8Bit(file, (level->use_custom_template ? 1 : 0));
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
@@ -795,7 +837,7 @@ static void SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
   int i;
 
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
-    fputc(level->author[i], file);
+    putFile8Bit(file, level->author[i]);
 }
 
 static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
@@ -805,9 +847,9 @@ static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
   for(y=0; y<level->fieldy; y++) 
     for(x=0; x<level->fieldx; x++) 
       if (level->encoding_16bit_field)
-	putFile16BitBE(file, Ur[x][y]);
+	putFile16BitBE(file, level->field[x][y]);
       else
-	fputc(Ur[x][y], file);
+	putFile8Bit(file, level->field[x][y]);
 }
 
 #if 0
@@ -815,10 +857,10 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
 
-  fputc(EL_YAMYAM, file);
-  fputc(level->num_yamyam_contents, file);
-  fputc(0, file);
-  fputc(0, file);
+  putFile8Bit(file, EL_YAMYAM);
+  putFile8Bit(file, level->num_yamyam_contents);
+  putFile8Bit(file, 0);
+  putFile8Bit(file, 0);
 
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
@@ -826,7 +868,7 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 	if (level->encoding_16bit_field)
 	  putFile16BitBE(file, level->yamyam_content[i][x][y]);
 	else
-	  fputc(level->yamyam_content[i][x][y], file);
+	  putFile8Bit(file, level->yamyam_content[i][x][y]);
 }
 #endif
 
@@ -869,9 +911,9 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
   }
 
   putFile16BitBE(file, element);
-  fputc(num_contents, file);
-  fputc(content_xsize, file);
-  fputc(content_ysize, file);
+  putFile8Bit(file, num_contents);
+  putFile8Bit(file, content_xsize);
+  putFile8Bit(file, content_ysize);
 
   WriteUnusedBytesToFile(file, LEVEL_CHUNK_CNT2_UNUSED);
 
@@ -1019,9 +1061,8 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
     Error(ERR_WARN, "inconsistent number of custom element properties");
 }
 
-void SaveLevel(int level_nr)
+static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 {
-  char *filename = getLevelFilename(level_nr);
   int body_chunk_size;
   int num_changed_custom_elements = 0;
   int level_chunk_CUS3_size;
@@ -1034,32 +1075,32 @@ void SaveLevel(int level_nr)
     return;
   }
 
-  level.file_version = FILE_VERSION_ACTUAL;
-  level.game_version = GAME_VERSION_ACTUAL;
+  level->file_version = FILE_VERSION_ACTUAL;
+  level->game_version = GAME_VERSION_ACTUAL;
 
   /* check level field for 16-bit elements */
-  level.encoding_16bit_field = FALSE;
-  for(y=0; y<level.fieldy; y++) 
-    for(x=0; x<level.fieldx; x++) 
-      if (Ur[x][y] > 255)
-	level.encoding_16bit_field = TRUE;
+  level->encoding_16bit_field = FALSE;
+  for(y=0; y<level->fieldy; y++) 
+    for(x=0; x<level->fieldx; x++) 
+      if (level->field[x][y] > 255)
+	level->encoding_16bit_field = TRUE;
 
   /* check yamyam content for 16-bit elements */
-  level.encoding_16bit_yamyam = FALSE;
-  for(i=0; i<level.num_yamyam_contents; i++)
+  level->encoding_16bit_yamyam = FALSE;
+  for(i=0; i<level->num_yamyam_contents; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	if (level.yamyam_content[i][x][y] > 255)
-	  level.encoding_16bit_yamyam = TRUE;
+	if (level->yamyam_content[i][x][y] > 255)
+	  level->encoding_16bit_yamyam = TRUE;
 
   /* check amoeba content for 16-bit elements */
-  level.encoding_16bit_amoeba = FALSE;
-  if (level.amoeba_content > 255)
-    level.encoding_16bit_amoeba = TRUE;
+  level->encoding_16bit_amoeba = FALSE;
+  if (level->amoeba_content > 255)
+    level->encoding_16bit_amoeba = TRUE;
 
   /* calculate size of "BODY" chunk */
   body_chunk_size =
-    level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
+    level->fieldx * level->fieldy * (level->encoding_16bit_field ? 2 : 1);
 
   /* check for non-standard custom elements and calculate "CUS3" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -1071,39 +1112,53 @@ void SaveLevel(int level_nr)
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
 
   putFileChunkBE(file, "VERS", FILE_VERS_CHUNK_SIZE);
-  SaveLevel_VERS(file, &level);
+  SaveLevel_VERS(file, level);
 
   putFileChunkBE(file, "HEAD", LEVEL_HEADER_SIZE);
-  SaveLevel_HEAD(file, &level);
+  SaveLevel_HEAD(file, level);
 
   putFileChunkBE(file, "AUTH", MAX_LEVEL_AUTHOR_LEN);
-  SaveLevel_AUTH(file, &level);
+  SaveLevel_AUTH(file, level);
 
   putFileChunkBE(file, "BODY", body_chunk_size);
-  SaveLevel_BODY(file, &level);
+  SaveLevel_BODY(file, level);
 
-  if (level.encoding_16bit_yamyam ||
-      level.num_yamyam_contents != STD_ELEMENT_CONTENTS)
+  if (level->encoding_16bit_yamyam ||
+      level->num_yamyam_contents != STD_ELEMENT_CONTENTS)
   {
     putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
-    SaveLevel_CNT2(file, &level, EL_YAMYAM);
+    SaveLevel_CNT2(file, level, EL_YAMYAM);
   }
 
-  if (level.encoding_16bit_amoeba)
+  if (level->encoding_16bit_amoeba)
   {
     putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
-    SaveLevel_CNT2(file, &level, EL_BD_AMOEBA);
+    SaveLevel_CNT2(file, level, EL_BD_AMOEBA);
   }
 
-  if (num_changed_custom_elements > 0)
+  if (num_changed_custom_elements > 0 && !level->use_custom_template)
   {
     putFileChunkBE(file, "CUS3", level_chunk_CUS3_size);
-    SaveLevel_CUS3(file, &level, num_changed_custom_elements);
+    SaveLevel_CUS3(file, level, num_changed_custom_elements);
   }
 
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+}
+
+void SaveLevel(int level_nr)
+{
+  char *filename = getLevelFilename(level_nr);
+
+  SaveLevelFromFilename(&level, filename);
+}
+
+void SaveLevelTemplate()
+{
+  char *filename = getLevelFilename(-1);
+
+  SaveLevelFromFilename(&level, filename);
 }
 
 void DumpLevel(struct LevelInfo *level)
@@ -1183,7 +1238,7 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
   /* read header fields that are new since version 1.2 */
   if (tape->file_version >= FILE_VERSION_1_2)
   {
-    byte store_participating_players = fgetc(file);
+    byte store_participating_players = getFile8Bit(file);
     int engine_version;
 
     /* since version 1.2, tapes store which players participate in the tape */
@@ -1220,7 +1275,7 @@ static int LoadTape_INFO(FILE *file, int chunk_size, struct TapeInfo *tape)
     checked_realloc(tape->level_identifier, level_identifier_size);
 
   for(i=0; i < level_identifier_size; i++)
-    tape->level_identifier[i] = fgetc(file);
+    tape->level_identifier[i] = getFile8Bit(file);
 
   tape->level_nr = getFile16BitBE(file);
 
@@ -1251,10 +1306,10 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
       tape->pos[i].action[j] = MV_NO_MOVING;
 
       if (tape->player_participates[j])
-	tape->pos[i].action[j] = fgetc(file);
+	tape->pos[i].action[j] = getFile8Bit(file);
     }
 
-    tape->pos[i].delay = fgetc(file);
+    tape->pos[i].delay = getFile8Bit(file);
 
     if (tape->file_version == FILE_VERSION_1_0)
     {
@@ -1462,7 +1517,7 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
   putFile32BitBE(file, tape->date);
   putFile32BitBE(file, tape->length);
 
-  fputc(store_participating_players, file);
+  putFile8Bit(file, store_participating_players);
 
   /* unused bytes not at the end here for 4-byte alignment of engine_version */
   WriteUnusedBytesToFile(file, TAPE_HEADER_UNUSED);
@@ -1478,7 +1533,7 @@ static void SaveTape_INFO(FILE *file, struct TapeInfo *tape)
   putFile16BitBE(file, level_identifier_size);
 
   for(i=0; i < level_identifier_size; i++)
-    fputc(tape->level_identifier[i], file);
+    putFile8Bit(file, tape->level_identifier[i]);
 
   putFile16BitBE(file, tape->level_nr);
 }
@@ -1491,9 +1546,9 @@ static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
   {
     for(j=0; j<MAX_PLAYERS; j++)
       if (tape->player_participates[j])
-	fputc(tape->pos[i].action[j], file);
+	putFile8Bit(file, tape->pos[i].action[j]);
 
-    fputc(tape->pos[i].delay, file);
+    putFile8Bit(file, tape->pos[i].delay);
   }
 }
 

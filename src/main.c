@@ -40,7 +40,6 @@ boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int			redraw_x1 = 0, redraw_y1 = 0;
 
 short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -87,7 +86,7 @@ int			TimeFrames, TimePlayed, TimeLeft;
 
 boolean			network_player_action_received = FALSE;
 
-struct LevelInfo	level;
+struct LevelInfo	level, level_template;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct TapeInfo		tape;

@@ -361,7 +361,11 @@ char *getLevelFilename(int nr)
   if (filename != NULL)
     free(filename);
 
-  sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
+  if (nr < 0)
+    sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
+  else
+    sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
+
   filename = getPath2(getCurrentLevelDir(), basename);
 
   return filename;
