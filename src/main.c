@@ -139,7 +139,9 @@ char *sound_name[NUM_SOUNDS] =
 struct ArtworkConfigInfo image_config[] =
 {
   /* graphics for Boulder Dash style elements and actions */
-  { "bd_diamond.waiting",		"bd_diamond.pcx"	},
+  { "bd_diamond",			"bd_diamond.pcx"	},
+  { "bd_diamond.frame_xpos",		"0"			},
+  { "bd_diamond.num_frames",		"1"			},
 };
 
 struct ArtworkConfigInfo sound_config[] =

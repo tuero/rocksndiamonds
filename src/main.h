@@ -1459,7 +1459,7 @@ extern struct ArtworkConfigInfo	image_config[], sound_config[];
 
 
 /* values for image configuration */
-#define GFX_BD_DIAMOND_WAITING			0
+#define GFX_BD_DIAMOND				0
 
 #define NUM_IMAGE_CONFIG_ENTRIES		1
 

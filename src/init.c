@@ -310,11 +310,11 @@ static void InitTileClipmasks()
       int tile = tile_needs_clipping[i].start + j;
       int graphic = tile;
       int src_x, src_y;
-      int pixmap_nr;
+      Bitmap *src_bitmap;
       Pixmap src_pixmap;
 
-      getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-      src_pixmap = pix[pixmap_nr]->clip_mask;
+      getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+      src_pixmap = src_bitmap->clip_mask;
 
       tile_clipmask[tile] = XCreatePixmap(display, window->drawable,
 					  TILEX, TILEY, 1);
@@ -864,14 +864,8 @@ void InitGraphicInfo()
   }
 
   for(i=0; i<MAX_GRAPHICS; i++)
-  {
-    int bitmap_nr;
-
-    getGraphicSource(i, &bitmap_nr,
+    getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
-
-    graphic_info[i].bitmap = pix[bitmap_nr];
-  }
 }
 
 void InitElementProperties()

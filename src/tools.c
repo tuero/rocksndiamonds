@@ -742,54 +742,54 @@ static void DrawGraphicAnimationShiftedThruMask(int sx, int sy,
   DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic + phase, NO_CUTTING);
 }
 
-void getGraphicSource(int graphic, int *bitmap_nr, int *x, int *y)
+void getGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
-    *bitmap_nr = PIX_BACK;
+    *bitmap = pix[PIX_BACK];
     *x = SX + (graphic % GFX_PER_LINE) * TILEX;
     *y = SY + (graphic / GFX_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
-    *bitmap_nr = PIX_HEROES;
+    *bitmap = pix[PIX_HEROES];
     *x = (graphic % HEROES_PER_LINE) * TILEX;
     *y = (graphic / HEROES_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
     graphic -= GFX_START_ROCKSSP;
-    *bitmap_nr = PIX_SP;
+    *bitmap = pix[PIX_SP];
     *x = (graphic % SP_PER_LINE) * TILEX;
     *y = (graphic / SP_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    *bitmap_nr = PIX_DC;
+    *bitmap = pix[PIX_DC];
     *x = (graphic % DC_PER_LINE) * TILEX;
     *y = (graphic / DC_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
-    *bitmap_nr = PIX_MORE;
+    *bitmap = pix[PIX_MORE];
     *x = (graphic % MORE_PER_LINE) * TILEX;
     *y = (graphic / MORE_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *bitmap_nr = PIX_BIGFONT;
+    *bitmap = pix[PIX_BIGFONT];
     *x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
     *y = ((graphic / FONT_CHARS_PER_LINE) * TILEY +
 	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY);
   }
   else
   {
-    *bitmap_nr = PIX_SP;
+    *bitmap = pix[PIX_SP];
     *x = 0;
     *y = 0;
   }
@@ -810,13 +810,13 @@ void DrawGraphic(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicExt(DrawBuffer *bitmap, int x, int y, int graphic)
+void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic)
 {
-  int bitmap_nr;
+  Bitmap *src_bitmap;
   int src_x, src_y;
 
-  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  BlitBitmap(pix[bitmap_nr], bitmap, src_x, src_y, TILEX, TILEY, x, y);
+  getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
@@ -837,7 +837,6 @@ void DrawGraphicThruMask(int x, int y, int graphic)
 void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic)
 {
   int tile = graphic;
-  int bitmap_nr;
   int src_x, src_y;
   Bitmap *src_bitmap;
   GC drawing_gc;
@@ -845,9 +844,8 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic)
   if (graphic == GFX_LEERRAUM)
     return;
 
-  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  src_bitmap = pix[bitmap_nr];
-  drawing_gc = pix[bitmap_nr]->stored_clip_gc;
+  getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+  drawing_gc = src_bitmap->stored_clip_gc;
 
   if (tile_clipmask[tile] != None)
   {
@@ -939,7 +937,6 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int cx = 0, cy = 0;
   int src_x, src_y, dest_x, dest_y;
   int tile = graphic;
-  int bitmap_nr;
   Bitmap *src_bitmap;
   GC drawing_gc;
 
@@ -1013,9 +1010,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
       MarkTileDirty(x, y + SIGN(dy));
   }
 
-  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  src_bitmap = pix[bitmap_nr];
-  drawing_gc = pix[bitmap_nr]->stored_clip_gc;
+  getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+  drawing_gc = src_bitmap->stored_clip_gc;
 
   src_x += cx;
   src_y += cy;
@@ -1055,7 +1051,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
     }
   }
   else
-    BlitBitmap(pix[bitmap_nr], drawto_field,
+    BlitBitmap(src_bitmap, drawto_field,
 	       src_x, src_y, width, height, dest_x, dest_y);
 
   MarkTileDirty(x,y);
