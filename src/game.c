@@ -6947,6 +6947,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     {
       TestIfHeroTouchesBadThing(jx, jy);
       TestIfPlayerTouchesCustomElement(jx, jy);
+#if 1
+      TestIfElementTouchesCustomElement(jx, jy);	/* for empty space */
+#endif
 
       if (!player->active)
 	RemoveHero(player);
@@ -7739,7 +7742,10 @@ int DigField(struct PlayerInfo *player,
 
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_DIGGED);
 
-	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#if 1
+	if (mode == DF_SNAP)
+	  TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#endif
 
 	break;
       }
@@ -7834,7 +7840,10 @@ int DigField(struct PlayerInfo *player,
 
 	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_COLLECTED);
 
-	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#if 1
+	if (mode == DF_SNAP)
+	  TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#endif
 
 	break;
       }
