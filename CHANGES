@@ -5,6 +5,7 @@ Release Version 2.1.0 [XX XXX XXXX]
 	- new structured setup menu (with sob-menues for graphics and sounds)
 	- graphics, sounds and music now fully configurable
 	- added support for TrueColor PCX graphics files
+	- added support for 16 bit WAV sound files
 	- added "quick save" and "quick load" functions with shortcut key
 	- changed default slipping behaviour of gems back to 2.0.0 style;
 	  this is now an element property for gems in the level editor,

@@ -91,6 +91,18 @@ struct SoundHeader_8SVX
 };
 #endif
 
+#if defined(AUDIO_UNIX_NATIVE)
+struct SoundHeader_WAV
+{
+  unsigned short compression_code;
+  unsigned short num_channels;
+  unsigned long  sample_rate;
+  unsigned long  bytes_per_second;
+  unsigned short block_align;
+  unsigned short bits_per_sample;
+};
+#endif
+
 struct AudioFormatInfo
 {
   boolean stereo;		/* availability of stereo sound */
@@ -106,8 +118,8 @@ struct SampleInfo
 
   int type;
   int format;
-  long data_len;
-  void *data_ptr;
+  void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
+  long data_len;		/* number of samples, NOT number of bytes */
 };
 typedef struct SampleInfo SoundInfo;
 typedef struct SampleInfo MusicInfo;
@@ -127,8 +139,8 @@ struct SoundControl
 
   int type;
   int format;
-  long data_len;
-  void *data_ptr;
+  void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
+  long data_len;		/* number of samples, NOT number of bytes */
 
 #if defined(TARGET_ALLEGRO)
   int voice;
@@ -1487,11 +1499,14 @@ static SoundInfo *Load_WAV(char *filename)
 {
   SoundInfo *snd_info;
 #if defined(AUDIO_UNIX_NATIVE)
+  struct SoundHeader_WAV header;
+#if 0
   byte sound_header_buffer[WAV_HEADER_SIZE];
+  int i;
+#endif
   char chunk_name[CHUNK_ID_LEN + 1];
   int chunk_size;
   FILE *file;
-  int i;
 #endif
 
   if (!audio.sound_available)
@@ -1535,7 +1550,7 @@ static SoundInfo *Load_WAV(char *filename)
   }
 
   /* read chunk id "RIFF" */
-  getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
+  getFileChunkLE(file, chunk_name, &chunk_size);
   if (strcmp(chunk_name, "RIFF") != 0)
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
@@ -1545,7 +1560,7 @@ static SoundInfo *Load_WAV(char *filename)
   }
 
   /* read "RIFF" type id "WAVE" */
-  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_LITTLE_ENDIAN);
+  getFileChunkLE(file, chunk_name, NULL);
   if (strcmp(chunk_name, "WAVE") != 0)
   {
     Error(ERR_WARN, "missing 'WAVE' type ID of sound file '%s'", filename);
@@ -1554,16 +1569,69 @@ static SoundInfo *Load_WAV(char *filename)
     return NULL;
   }
 
-  while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN))
+  while (getFileChunkLE(file, chunk_name, &chunk_size))
   {
     if (strcmp(chunk_name, "fmt ") == 0)
     {
-      /* read header information */
-      for (i=0; i < MIN(chunk_size, WAV_HEADER_SIZE); i++)
-	sound_header_buffer[i] = fgetc(file);
+      if (chunk_size < WAV_HEADER_SIZE)
+      {
+	Error(ERR_WARN, "sound file '%s': chunk 'fmt ' too short", filename);
+	fclose(file);
+	free(snd_info);
+	return NULL;
+      }
+
+      header.compression_code = getFile16BitLE(file);
+      header.num_channels = getFile16BitLE(file);
+      header.sample_rate = getFile32BitLE(file);
+      header.bytes_per_second = getFile32BitLE(file);
+      header.block_align = getFile16BitLE(file);
+      header.bits_per_sample = getFile16BitLE(file);
 
       if (chunk_size > WAV_HEADER_SIZE)
 	ReadUnusedBytesFromFile(file, chunk_size - WAV_HEADER_SIZE);
+
+      if (header.compression_code != 1)
+      {
+	Error(ERR_WARN, "sound file '%s': compression code %d not supported",
+	      filename, header.compression_code);
+	fclose(file);
+	free(snd_info);
+	return NULL;
+      }
+
+      if (header.num_channels != 1)
+      {
+	Error(ERR_WARN, "sound file '%s': number of %d channels not supported",
+	      filename, header.num_channels);
+	fclose(file);
+	free(snd_info);
+	return NULL;
+      }
+
+      if (header.bits_per_sample != 8 && header.bits_per_sample != 16)
+      {
+	Error(ERR_WARN, "sound file '%s': %d bits per sample not supported",
+	      filename, header.bits_per_sample);
+	fclose(file);
+	free(snd_info);
+	return NULL;
+      }
+
+      /* warn, but accept wrong sample rate (may be only slightly different) */
+      if (header.sample_rate != DEFAULT_AUDIO_SAMPLE_RATE)
+	Error(ERR_WARN, "sound file '%s': wrong sample rate %d instead of %d",
+	      filename, header.sample_rate, DEFAULT_AUDIO_SAMPLE_RATE);
+
+#if 0
+      printf("WAV file: '%s'\n", filename);
+      printf("  Compression code: %d'\n", header.compression_code);
+      printf("  Number of channels: %d'\n", header.num_channels);
+      printf("  Sample rate: %ld'\n", header.sample_rate);
+      printf("  Average bytes per second: %ld'\n", header.bytes_per_second);
+      printf("  Block align: %d'\n", header.block_align);
+      printf("  Significant bits per sample: %d'\n", header.bits_per_sample);
+#endif
     }
     else if (strcmp(chunk_name, "data") == 0)
     {
@@ -1598,7 +1666,13 @@ static SoundInfo *Load_WAV(char *filename)
     return NULL;
   }
 
-  snd_info->format = AUDIO_FORMAT_U8;
+  if (header.bits_per_sample == 8)
+    snd_info->format = AUDIO_FORMAT_U8;
+  else					/* header.bits_per_sample == 16 */
+  {
+    snd_info->format = AUDIO_FORMAT_S16;
+    snd_info->data_len /= 2;		/* correct number of samples */
+  }
 
 #endif	/* AUDIO_UNIX_NATIVE */
 

@@ -152,8 +152,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   lev_fieldx = level->fieldx = fgetc(file);
   lev_fieldy = level->fieldy = fgetc(file);
 
-  level->time		= getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  level->gems_needed	= getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  level->time		= getFile16BitBE(file);
+  level->gems_needed	= getFile16BitBE(file);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     level->name[i] = fgetc(file);
@@ -229,8 +229,7 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
       for(x=0; x<3; x++)
 	level->yam_content[i][x][y] =
 	  checkLevelElement(level->encoding_16bit_field ?
-			    getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
-			    fgetc(file));
+			    getFile16BitBE(file) : fgetc(file));
   return chunk_size;
 }
 
@@ -257,8 +256,7 @@ static int LoadLevel_BODY(FILE *file, int chunk_size, struct LevelInfo *level)
     for(x=0; x<level->fieldx; x++)
       Feld[x][y] = Ur[x][y] =
 	checkLevelElement(level->encoding_16bit_field ?
-			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
-			  fgetc(file));
+			  getFile16BitBE(file) : fgetc(file));
   return chunk_size;
 }
 
@@ -269,7 +267,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   int num_contents, content_xsize, content_ysize;
   int content_array[MAX_ELEMENT_CONTENTS][3][3];
 
-  element = checkLevelElement(getFile16BitInteger(file,BYTE_ORDER_BIG_ENDIAN));
+  element = checkLevelElement(getFile16BitBE(file));
   num_contents = fgetc(file);
   content_xsize = fgetc(file);
   content_ysize = fgetc(file);
@@ -278,8 +276,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	content_array[i][x][y] =
-	  checkLevelElement(getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN));
+	content_array[i][x][y] = checkLevelElement(getFile16BitBE(file));
 
   /* correct invalid number of content fields -- should never happen */
   if (num_contents < 1 || num_contents > MAX_ELEMENT_CONTENTS)
@@ -323,12 +320,12 @@ void LoadLevel(int level_nr)
     return;
   }
 
-  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+  getFileChunkBE(file, chunk_name, NULL);
   if (strcmp(chunk_name, "RND1") == 0)
   {
-    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	/* not used */
+    getFile32BitBE(file);		/* not used */
 
-    getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+    getFileChunkBE(file, chunk_name, NULL);
     if (strcmp(chunk_name, "CAVE") != 0)
     {
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
@@ -386,7 +383,7 @@ void LoadLevel(int level_nr)
       {  NULL,  0,			NULL }
     };
 
-    while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN))
+    while (getFileChunkBE(file, chunk_name, &chunk_size))
     {
       int i = 0;
 
@@ -481,8 +478,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   fputc(level->fieldx, file);
   fputc(level->fieldy, file);
 
-  putFile16BitInteger(file, level->time,        BYTE_ORDER_BIG_ENDIAN);
-  putFile16BitInteger(file, level->gems_needed, BYTE_ORDER_BIG_ENDIAN);
+  putFile16BitBE(file, level->time);
+  putFile16BitBE(file, level->gems_needed);
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     fputc(level->name[i], file);
@@ -531,8 +528,7 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	if (level->encoding_16bit_field)
-	  putFile16BitInteger(file, level->yam_content[i][x][y],
-			      BYTE_ORDER_BIG_ENDIAN);
+	  putFile16BitBE(file, level->yam_content[i][x][y]);
 	else
 	  fputc(level->yam_content[i][x][y], file);
 }
@@ -545,7 +541,7 @@ static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
   for(y=0; y<level->fieldy; y++) 
     for(x=0; x<level->fieldx; x++) 
       if (level->encoding_16bit_field)
-	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
+	putFile16BitBE(file, Ur[x][y]);
       else
 	fputc(Ur[x][y], file);
 }
@@ -588,7 +584,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
     return;
   }
 
-  putFile16BitInteger(file, element, BYTE_ORDER_BIG_ENDIAN);
+  putFile16BitBE(file, element);
   fputc(num_contents, file);
   fputc(content_xsize, file);
   fputc(content_ysize, file);
@@ -598,8 +594,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	putFile16BitInteger(file, content_array[i][x][y],
-			    BYTE_ORDER_BIG_ENDIAN);
+	putFile16BitBE(file, content_array[i][x][y]);
 }
 
 void SaveLevel(int level_nr)
@@ -639,31 +634,31 @@ void SaveLevel(int level_nr)
   body_chunk_size =
     level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
 
-  putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
-  putFileChunk(file, "CAVE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
+  putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
 
-  putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "VERS", FILE_VERS_CHUNK_SIZE);
   WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
 
-  putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "HEAD", LEVEL_HEADER_SIZE);
   SaveLevel_HEAD(file, &level);
 
-  putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "AUTH", MAX_LEVEL_AUTHOR_LEN);
   SaveLevel_AUTH(file, &level);
 
-  putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "BODY", body_chunk_size);
   SaveLevel_BODY(file, &level);
 
   if (level.encoding_16bit_yamyam ||
       level.num_yam_contents != STD_ELEMENT_CONTENTS)
   {
-    putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
+    putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
     SaveLevel_CNT2(file, &level, EL_MAMPFER);
   }
 
   if (level.encoding_16bit_amoeba)
   {
-    putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
+    putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
     SaveLevel_CNT2(file, &level, EL_AMOEBE_BD);
   }
 
@@ -714,9 +709,9 @@ static int LoadTape_HEAD(FILE *file, int chunk_size, struct TapeInfo *tape)
 {
   int i;
 
-  tape->random_seed = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  tape->date        = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
-  tape->length      = getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  tape->random_seed = getFile32BitBE(file);
+  tape->date        = getFile32BitBE(file);
+  tape->length      = getFile32BitBE(file);
 
   /* read header fields that are new since version 1.2 */
   if (tape->file_version >= FILE_VERSION_1_2)
@@ -840,12 +835,12 @@ void LoadTape(int level_nr)
   if (!(file = fopen(filename, MODE_READ)))
     return;
 
-  getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+  getFileChunkBE(file, chunk_name, NULL);
   if (strcmp(chunk_name, "RND1") == 0)
   {
-    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	/* not used */
+    getFile32BitBE(file);		/* not used */
 
-    getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
+    getFileChunkBE(file, chunk_name, NULL);
     if (strcmp(chunk_name, "TAPE") != 0)
     {
       Error(ERR_WARN, "unknown format of tape file '%s'", filename);
@@ -900,7 +895,7 @@ void LoadTape(int level_nr)
       {  NULL,  0,			NULL }
     };
 
-    while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN))
+    while (getFileChunkBE(file, chunk_name, &chunk_size))
     {
       int i = 0;
 
@@ -954,9 +949,9 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
     if (tape->player_participates[i])
       store_participating_players |= (1 << i);
 
-  putFile32BitInteger(file, tape->random_seed, BYTE_ORDER_BIG_ENDIAN);
-  putFile32BitInteger(file, tape->date, BYTE_ORDER_BIG_ENDIAN);
-  putFile32BitInteger(file, tape->length, BYTE_ORDER_BIG_ENDIAN);
+  putFile32BitBE(file, tape->random_seed);
+  putFile32BitBE(file, tape->date);
+  putFile32BitBE(file, tape->length);
 
   fputc(store_participating_players, file);
 
@@ -1009,16 +1004,16 @@ void SaveTape(int level_nr)
 
   body_chunk_size = (num_participating_players + 1) * tape.length;
 
-  putFileChunk(file, "RND1", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
-  putFileChunk(file, "TAPE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
+  putFileChunkBE(file, "TAPE", CHUNK_SIZE_NONE);
 
-  putFileChunk(file, "VERS", FILE_VERS_CHUNK_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "VERS", FILE_VERS_CHUNK_SIZE);
   WriteChunk_VERS(file, FILE_VERSION_ACTUAL, GAME_VERSION_ACTUAL);
 
-  putFileChunk(file, "HEAD", TAPE_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "HEAD", TAPE_HEADER_SIZE);
   SaveTape_HEAD(file, &tape);
 
-  putFileChunk(file, "BODY", body_chunk_size, BYTE_ORDER_BIG_ENDIAN);
+  putFileChunkBE(file, "BODY", body_chunk_size);
   SaveTape_BODY(file, &tape);
 
   fclose(file);
