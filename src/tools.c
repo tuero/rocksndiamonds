@@ -546,8 +546,13 @@ static int getPlayerAction(struct PlayerInfo *player, int move_dir)
     {
       if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
       {
+	int last_special_action = player->special_action_sleeping;
+	int num_special_action = player->num_special_action_sleeping;
 	int special_action =
-	  ACTION_BORING_1 + SimpleRND(player->num_special_action_sleeping);
+	  (last_special_action == ACTION_DEFAULT ? ACTION_SLEEPING_1 :
+	   last_special_action == ACTION_SLEEPING ? ACTION_SLEEPING :
+	   last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
+	   last_special_action + 1 : ACTION_SLEEPING);
 	int special_graphic =
 	  el_act_dir2img(player->element_nr, special_action, move_dir);
 

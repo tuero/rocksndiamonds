@@ -1076,7 +1076,7 @@ void InitGame()
     player->num_special_action_sleeping = 0;
 
     /* determine number of special actions for bored and sleeping animation */
-    for (j=ACTION_BORING_1; j <= ACTION_BORING_8; j++)
+    for (j=ACTION_BORING_1; j <= ACTION_BORING_LAST; j++)
     {
       boolean found = FALSE;
 
@@ -1090,7 +1090,7 @@ void InitGame()
       else
 	break;
     }
-    for (j=ACTION_SLEEPING_1; j <= ACTION_SLEEPING_3; j++)
+    for (j=ACTION_SLEEPING_1; j <= ACTION_SLEEPING_LAST; j++)
     {
       boolean found = FALSE;
 
@@ -5992,12 +5992,12 @@ static boolean CheckElementChange(int x, int y, int element, int trigger_event)
 
 static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 {
+  int jx = player->jx, jy = player->jy;
+  int element = player->element_nr;
   boolean was_waiting = player->is_waiting;
 
   if (is_waiting)
   {
-    int jx = player->jx, jy = player->jy;
-    int element = player->element_nr;
     int action;
 
     if (!was_waiting)		/* not waiting -> waiting */
@@ -6037,6 +6037,9 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
   }
   else if (was_waiting)		/* waiting -> not waiting */
   {
+    if (player->is_sleeping)
+      PlayLevelSoundElementAction(jx, jy, element, ACTION_AWAKENING);
+
     player->is_waiting = FALSE;
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
@@ -6046,6 +6049,9 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
+
+    player->special_action_bored = ACTION_DEFAULT;
+    player->special_action_sleeping = ACTION_DEFAULT;
   }
 }
 

@@ -3064,7 +3064,19 @@ void LoadInfoAnimations()
   int i;
 
   if ((setup_file_list = loadSetupFileList(filename)) == NULL)
-    return;
+  {
+    /* use reliable default values from static configuration */
+    SetupFileList *insert_ptr;
+
+    insert_ptr = setup_file_list =
+      newSetupFileList(info_animation_config[0].token,
+		       info_animation_config[0].value);
+
+    for (i=1; info_animation_config[i].token; i++)
+	insert_ptr = addListEntry(insert_ptr,
+				  info_animation_config[i].token,
+				  info_animation_config[i].value);
+  }
 
   element_hash   = newSetupFileHash();
   action_hash    = newSetupFileHash();
@@ -3077,9 +3089,10 @@ void LoadInfoAnimations()
     setHashEntry(action_hash, element_action_info[i].suffix,
 		 itoa(element_action_info[i].value));
 
+  /* do not store direction index (bit) here, but direction value! */
   for (i=0; i < NUM_DIRECTIONS; i++)
     setHashEntry(direction_hash, element_direction_info[i].suffix,
-		 itoa(element_direction_info[i].value));
+		 itoa(1 << element_direction_info[i].value));
 
   for (list = setup_file_list; list != NULL; list = list->next)
   {

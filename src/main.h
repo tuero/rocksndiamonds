@@ -927,19 +927,26 @@
 #define ACTION_BORING_6				31
 #define ACTION_BORING_7				32
 #define ACTION_BORING_8				33
-#define ACTION_SLEEPING				34
-#define ACTION_SLEEPING_1			35
-#define ACTION_SLEEPING_2			36
-#define ACTION_SLEEPING_3			37
-#define ACTION_DYING				38
-#define ACTION_TURNING				39
-#define ACTION_TURNING_FROM_LEFT		40
-#define ACTION_TURNING_FROM_RIGHT		41
-#define ACTION_TURNING_FROM_UP			42
-#define ACTION_TURNING_FROM_DOWN		43
-#define ACTION_OTHER				44
+#define ACTION_BORING_9				34
+#define ACTION_BORING_10			35
+#define ACTION_SLEEPING				36
+#define ACTION_SLEEPING_1			37
+#define ACTION_SLEEPING_2			38
+#define ACTION_SLEEPING_3			39
+#define ACTION_AWAKENING			40
+#define ACTION_DYING				41
+#define ACTION_TURNING				42
+#define ACTION_TURNING_FROM_LEFT		43
+#define ACTION_TURNING_FROM_RIGHT		44
+#define ACTION_TURNING_FROM_UP			45
+#define ACTION_TURNING_FROM_DOWN		46
+#define ACTION_OTHER				47
 
-#define NUM_ACTIONS				45
+#define NUM_ACTIONS				48
+
+#define ACTION_BORING_LAST			ACTION_BORING_10
+#define ACTION_SLEEPING_LAST			ACTION_SLEEPING_3
+
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_DEFAULT			0
@@ -1667,5 +1674,6 @@ extern struct ConfigInfo	music_config[];
 extern struct ConfigInfo	image_config_suffix[];
 extern struct ConfigInfo	sound_config_suffix[];
 extern struct ConfigInfo	music_config_suffix[];
+extern struct ConfigInfo	info_animation_config[];
 
 #endif	/* MAIN_H */
