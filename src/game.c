@@ -736,8 +736,8 @@ void InitGame()
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
 
-    player->shield_passive_time_left = 0;
-    player->shield_active_time_left = 0;
+    player->shield_normal_time_left = 0;
+    player->shield_deadly_time_left = 0;
 
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
@@ -1471,6 +1471,7 @@ void DrawDynamite(int x, int y)
     DrawNewGraphic(sx, sy, el2img(Store[x][y]), 0);
 #endif
 
+#if 0
   if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
   {
     if ((frame = (96 - MovDelay[x][y]) / 12) > 6)
@@ -1481,8 +1482,7 @@ void DrawDynamite(int x, int y)
     if ((frame = ((96 - MovDelay[x][y]) / 6) % 8) > 3)
       frame = 7 - frame;
   }
-
-#if 1
+#else
   frame = getNewGraphicAnimationFrame(graphic, 96 - MovDelay[x][y]);
 #endif
 
@@ -1752,7 +1752,7 @@ void Explode(int ex, int ey, int phase, int mode)
 #endif
 
     if (phase == delay)
-      ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
+      DrawCrumbledSand(SCREENX(x), SCREENY(y));
 
     if (IS_PFORTE(Store[x][y]))
     {
@@ -1879,32 +1879,32 @@ void Blurb(int x, int y)
 {
   int element = Feld[x][y];
 
-  if (element != EL_ACID_SPLASHING_LEFT &&
-      element != EL_ACID_SPLASHING_RIGHT)	/* start */
+  if (element != EL_ACID_SPLASH_LEFT &&
+      element != EL_ACID_SPLASH_RIGHT)	/* start */
   {
     PlaySoundLevel(x, y, SND_ACID_SPLASHING);
     if (IN_LEV_FIELD(x-1, y) && IS_FREE(x-1, y) &&
 	(!IN_LEV_FIELD(x-1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x-1, y-1))))
     {
-      Feld[x-1][y] = EL_ACID_SPLASHING_LEFT;
+      Feld[x-1][y] = EL_ACID_SPLASH_LEFT;
     }
     if (IN_LEV_FIELD(x+1, y) && IS_FREE(x+1, y) &&
 	(!IN_LEV_FIELD(x+1, y-1) ||
 	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
     {
-      Feld[x+1][y] = EL_ACID_SPLASHING_RIGHT;
+      Feld[x+1][y] = EL_ACID_SPLASH_RIGHT;
     }
   }
   else								/* go on */
   {
 #if 0
     int graphic =
-      (element == EL_ACID_SPLASHING_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
+      (element == EL_ACID_SPLASH_LEFT ? GFX_BLURB_LEFT : GFX_BLURB_RIGHT);
 #else
-    int graphic = (element == EL_ACID_SPLASHING_LEFT ?
-		   IMG_ACID_SPLASHING_LEFT :
-		   IMG_ACID_SPLASHING_RIGHT);
+    int graphic = (element == EL_ACID_SPLASH_LEFT ?
+		   IMG_ACID_SPLASH_LEFT :
+		   IMG_ACID_SPLASH_RIGHT);
 #endif
 
     if (!MovDelay[x][y])	/* initialize animation counter */
@@ -2296,7 +2296,7 @@ void Impact(int x, int y)
 	}
 	else if (smashed == EL_NUT)
 	{
-	  Feld[x][y+1] = EL_CRACKINGNUT;
+	  Feld[x][y+1] = EL_NUT_CRACKING;
 	  PlaySoundLevel(x, y, SND_NUT_CRACKING);
 	  RaiseScoreElement(EL_NUT);
 	  return;
@@ -3411,7 +3411,7 @@ void ContinueMoving(int x, int y)
 	yy = y + xy[i][1];
 
 	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_SAND)
-	  DrawNewLevelField(xx, yy);	/* for "ErdreichAnbroeckeln()" */
+	  DrawNewLevelField(xx, yy);	/* for "DrawCrumbledSand()" */
       }
     }
 
@@ -4768,7 +4768,7 @@ static void CheckTrap(int x, int y)
 
 	    DrawNewGraphic(SCREENX(x),SCREENY(y), graphic, frame);
 #endif
-	    ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
+	    DrawCrumbledSand(SCREENX(x), SCREENY(y));
 	  }
 	}
 
@@ -5122,10 +5122,10 @@ void GameActions()
       TimegateWheel(x, y);
     else if (element == EL_ACID)
       Blubber(x, y);
-    else if (element == EL_ACID_SPLASHING_LEFT ||
-	     element == EL_ACID_SPLASHING_RIGHT)
+    else if (element == EL_ACID_SPLASH_LEFT ||
+	     element == EL_ACID_SPLASH_RIGHT)
       Blurb(x, y);
-    else if (element == EL_CRACKINGNUT)
+    else if (element == EL_NUT_CRACKING)
       NussKnacken(x, y);
     else if (element == EL_PEARL_BREAKING)
       BreakingPearl(x, y);
@@ -5266,8 +5266,8 @@ void GameActions()
 	  (element == EL_EMPTY ||
 	   element == EL_SAND ||
 	   element == EL_QUICKSAND_EMPTY ||
-	   element == EL_ACID_SPLASHING_LEFT ||
-	   element == EL_ACID_SPLASHING_RIGHT))
+	   element == EL_ACID_SPLASH_LEFT ||
+	   element == EL_ACID_SPLASH_RIGHT))
       {
 	if ((IN_LEV_FIELD(x, y-1) && Feld[x][y-1] == EL_AMOEBA_WET) ||
 	    (IN_LEV_FIELD(x-1, y) && Feld[x-1][y] == EL_AMOEBA_WET) ||
@@ -5366,9 +5366,9 @@ void GameActions()
 
     if (SHIELD_ON(player))
     {
-      if (player->shield_active_time_left)
+      if (player->shield_deadly_time_left)
 	PlaySoundLevel(player->jx, player->jy, SND_SHIELD_DEADLY_ACTIVE);
-      else if (player->shield_passive_time_left)
+      else if (player->shield_normal_time_left)
 	PlaySoundLevel(player->jx, player->jy, SND_SHIELD_NORMAL_ACTIVE);
     }
   }
@@ -5384,10 +5384,10 @@ void GameActions()
 
       if (SHIELD_ON(player))
       {
-	player->shield_passive_time_left--;
+	player->shield_normal_time_left--;
 
-	if (player->shield_active_time_left > 0)
-	  player->shield_active_time_left--;
+	if (player->shield_deadly_time_left > 0)
+	  player->shield_deadly_time_left--;
       }
     }
 
@@ -5737,7 +5737,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     else if (old_jx == jx && old_jy != jy)
       player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
-    DrawNewLevelField(jx, jy);	/* for "ErdreichAnbroeckeln()" */
+    DrawNewLevelField(jx, jy);	/* for "DrawCrumbledSand()" */
 
     player->last_move_dir = player->MovDir;
     player->is_moving = TRUE;
@@ -5907,7 +5907,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
     {
       struct PlayerInfo *player = PLAYERINFO(good_x, good_y);
 
-      if (player->shield_active_time_left > 0)
+      if (player->shield_deadly_time_left > 0)
 	Bang(kill_x, kill_y);
       else if (!PLAYER_PROTECTED(good_x, good_y))
 	KillHero(player);
@@ -6004,7 +6004,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 	;
 #endif
 
-      if (player->shield_active_time_left > 0)
+      if (player->shield_deadly_time_left > 0)
 	Bang(bad_x, bad_y);
       else if (!PLAYER_PROTECTED(kill_x, kill_y))
 	KillHero(player);
@@ -6089,8 +6089,8 @@ void KillHero(struct PlayerInfo *player)
     Feld[jx][jy] = EL_EMPTY;
 
   /* deactivate shield (else Bang()/Explode() would not work right) */
-  player->shield_passive_time_left = 0;
-  player->shield_active_time_left = 0;
+  player->shield_normal_time_left = 0;
+  player->shield_deadly_time_left = 0;
 
   Bang(jx, jy);
   BuryHero(player);
@@ -6252,14 +6252,14 @@ int DigField(struct PlayerInfo *player,
 
     case EL_SHIELD_NORMAL:
       RemoveField(x, y);
-      player->shield_passive_time_left += 10;
+      player->shield_normal_time_left += 10;
       PlaySoundLevel(x, y, SND_SHIELD_NORMAL_COLLECTING);
       break;
 
     case EL_SHIELD_DEADLY:
       RemoveField(x, y);
-      player->shield_passive_time_left += 10;
-      player->shield_active_time_left += 10;
+      player->shield_normal_time_left += 10;
+      player->shield_deadly_time_left += 10;
       PlaySoundLevel(x, y, SND_SHIELD_DEADLY_COLLECTING);
       break;
 

@@ -41,8 +41,12 @@ element_to_graphic[] =
     IMG_BD_ROCK_FALLING
   },
   {
-    EL_BD_ROCK,					-1, GFX_ACTION_PUSHING,
-    IMG_BD_ROCK_PUSHING
+    EL_BD_ROCK,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_BD_ROCK_MOVING_LEFT
+  },
+  {
+    EL_BD_ROCK,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_BD_ROCK_MOVING_RIGHT
   },
   {
     EL_BD_DIAMOND,				-1, -1,
@@ -189,8 +193,12 @@ element_to_graphic[] =
     IMG_SP_ZONK_FALLING
   },
   {
-    EL_SP_ZONK,					-1, GFX_ACTION_PUSHING,
-    IMG_SP_ZONK_PUSHING
+    EL_SP_ZONK,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_SP_ZONK_MOVING_LEFT
+  },
+  {
+    EL_SP_ZONK,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_SP_ZONK_MOVING_RIGHT
   },
   {
     EL_SP_BASE,					-1, -1,
@@ -497,8 +505,12 @@ element_to_graphic[] =
     IMG_ROCK_FALLING
   },
   {
-    EL_ROCK,					-1, GFX_ACTION_PUSHING,
-    IMG_ROCK_PUSHING
+    EL_ROCK,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_ROCK_MOVING_LEFT
+  },
+  {
+    EL_ROCK,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_ROCK_MOVING_RIGHT
   },
   {
     EL_EMERALD,					-1, -1,
@@ -525,7 +537,7 @@ element_to_graphic[] =
     IMG_NUT
   },
   {
-    EL_NUT,					-1, GFX_ACTION_CRACKING,
+    EL_NUT_CRACKING,				-1, -1,
     IMG_NUT_CRACKING
   },
   {
@@ -693,12 +705,12 @@ element_to_graphic[] =
     IMG_ACID
   },
   {
-    EL_ACID_SPLASHING_LEFT,			-1, -1,
-    IMG_ACID_SPLASHING_LEFT
+    EL_ACID_SPLASH_LEFT,			-1, -1,
+    IMG_ACID_SPLASH_LEFT
   },
   {
-    EL_ACID_SPLASHING_RIGHT,			-1, -1,
-    IMG_ACID_SPLASHING_RIGHT
+    EL_ACID_SPLASH_RIGHT,			-1, -1,
+    IMG_ACID_SPLASH_RIGHT
   },
   {
     EL_AMOEBA_DROP,				-1, -1,

@@ -161,10 +161,32 @@
 #define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing)
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_PLAYER1])
-#define SHIELD_ON(p)		((p)->shield_passive_time_left > 0)
+#define SHIELD_ON(p)		((p)->shield_normal_time_left > 0)
 #define PROTECTED_FIELD(x,y)	(IS_TUBE(Feld[x][y]))
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
+
+#define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER2 - IMG_PLAYER1))
+
+
+#if 0
+
+/* Bitmaps with graphic file */
+#define PIX_BACK		0
+#define PIX_DOOR		1
+#define PIX_TOONS		2
+#define PIX_FONT_BIG		3
+#define PIX_FONT_SMALL		4
+#define PIX_FONT_MEDIUM		5
+#define PIX_FONT_EM		6
+/* Bitmaps without graphic file */
+#define PIX_DB_DOOR		7
+#define PIX_DB_FIELD		8
+
+#define NUM_PICTURES		7
+#define NUM_BITMAPS		9
+
+#else
 
 /* Bitmaps with graphic file */
 #define PIX_BACK		0
@@ -185,6 +207,8 @@
 
 #define NUM_PICTURES		12
 #define NUM_BITMAPS		14
+
+#endif
 
 /* boundaries of arrays etc. */
 #define MAX_LEVEL_NAME_LEN	32
@@ -694,9 +718,9 @@
 
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)
-#define EL_CRACKINGNUT			(EL_FIRST_RUNTIME_UNREAL + 2)
-#define EL_ACID_SPLASHING_LEFT		(EL_FIRST_RUNTIME_UNREAL + 3)
-#define EL_ACID_SPLASHING_RIGHT		(EL_FIRST_RUNTIME_UNREAL + 4)
+#define EL_NUT_CRACKING			(EL_FIRST_RUNTIME_UNREAL + 2)
+#define EL_ACID_SPLASH_LEFT		(EL_FIRST_RUNTIME_UNREAL + 3)
+#define EL_ACID_SPLASH_RIGHT		(EL_FIRST_RUNTIME_UNREAL + 4)
 #define EL_AMOEBA_CREATING		(EL_FIRST_RUNTIME_UNREAL + 5)
 #define EL_AMOEBA_SHRINKING		(EL_FIRST_RUNTIME_UNREAL + 6)
 #define EL_WALL_GROWING_ACTIVE		(EL_FIRST_RUNTIME_UNREAL + 7)
@@ -1471,8 +1495,8 @@ struct PlayerInfo
   int key[4];
   int dynamite;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
-  int shield_passive_time_left;
-  int shield_active_time_left;
+  int shield_normal_time_left;
+  int shield_deadly_time_left;
 };
 
 struct LevelInfo

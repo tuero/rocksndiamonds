@@ -31,6 +31,15 @@
 
 static char *image_filename[NUM_PICTURES] =
 {
+#if 0
+  "RocksScreen.pcx",
+  "RocksDoor.pcx",
+  "RocksToons.pcx",
+  "RocksFontBig.pcx",
+  "RocksFontSmall.pcx",
+  "RocksFontMedium.pcx",
+  "RocksFontEM.pcx"
+#else
   "RocksScreen.pcx",
   "RocksElements.pcx",
   "RocksDoor.pcx",
@@ -43,6 +52,7 @@ static char *image_filename[NUM_PICTURES] =
   "RocksFontSmall.pcx",
   "RocksFontMedium.pcx",
   "RocksFontEM.pcx"
+#endif
 }; 
 
 static void InitSetup(void);
@@ -214,6 +224,8 @@ static void InitTileClipmasks()
   unsigned long clip_gc_valuemask;
 
 #if defined(TARGET_X11_NATIVE)
+
+#if 0
   GC copy_clipmask_gc;
 
   static struct
@@ -267,6 +279,8 @@ static void InitTileClipmasks()
     { GFX2_SHIELD_ACTIVE, 3 },
     { -1, 0 }
   };
+#endif
+
 #endif /* TARGET_X11_NATIVE */
 #endif /* TARGET_X11 */
 
@@ -301,6 +315,7 @@ static void InitTileClipmasks()
 
 #if defined(TARGET_X11_NATIVE)
 
+#if 0
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
@@ -332,6 +347,7 @@ static void InitTileClipmasks()
   }
 
   XFreeGC(display, copy_clipmask_gc);
+#endif
 
 #endif /* TARGET_X11_NATIVE */
 #endif /* TARGET_X11 */
@@ -1066,6 +1082,7 @@ static void InitGraphicInfo()
 
   image_files = getCurrentImageList();
 
+#if 0
   for(i=0; i<MAX_GRAPHICS; i++)
   {
     /* always start with reliable default values */
@@ -1076,6 +1093,7 @@ static void InitGraphicInfo()
     getGraphicSource(i, &graphic_info[i].bitmap,
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
   }
+#endif
 
   for(i=0; i<NUM_IMAGE_FILES; i++)
   {
