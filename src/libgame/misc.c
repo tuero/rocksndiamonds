@@ -635,7 +635,7 @@ void Error(int mode, char *format, ...)
   if (mode & ERR_WARN && !options.verbose)
     return;
 
-#if !defined(PLATFORM_UNIX)
+#if defined(PLATFORM_MSDOS)
   newline = "\r\n";
 
   if ((error = openErrorFile()) == NULL)
@@ -1265,44 +1265,27 @@ boolean FileIsArtworkType(char *basename, int type)
 
 
 /* ========================================================================= */
-/* functions only needed for non-Unix (non-command-line) systems */
+/* functions only needed for non-Unix (non-command-line) systems             */
+/* (MS-DOS only; SDL/Windows creates files "stdout.txt" and "stderr.txt")    */
 /* ========================================================================= */
 
-#if !defined(PLATFORM_UNIX)
+#if defined(PLATFORM_MSDOS)
 
-#define ERROR_FILENAME		"error.out"
+#define ERROR_FILENAME		"stderr.txt"
 
 void initErrorFile()
 {
-  char *filename;
-
-  InitUserDataDirectory();
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  unlink(filename);
-  free(filename);
+  unlink(ERROR_FILENAME);
 }
 
 FILE *openErrorFile()
 {
-  char *filename;
-  FILE *error_file;
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, MODE_APPEND);
-  free(filename);
-
-  return error_file;
+  return fopen(ERROR_FILENAME, MODE_APPEND);
 }
 
 void dumpErrorFile()
 {
-  char *filename;
-  FILE *error_file;
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, MODE_READ);
-  free(filename);
+  FILE *error_file = fopen(ERROR_FILENAME, MODE_READ);
 
   if (error_file != NULL)
   {

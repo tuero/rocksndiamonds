@@ -94,6 +94,9 @@ void InitPlatformDependantStuff(void)
 
 #if !defined(PLATFORM_UNIX)
   program.userdata_directory = "userdata";
+#endif
+
+#if defined(PLATFORM_MSDOS)
   initErrorFile();
 #endif
 
@@ -105,7 +108,7 @@ void InitPlatformDependantStuff(void)
 
 void ClosePlatformDependantStuff(void)
 {
-#if !defined(PLATFORM_UNIX)
+#if defined(PLATFORM_MSDOS)
   dumpErrorFile();
 #endif
 }

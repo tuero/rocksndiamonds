@@ -1000,19 +1000,11 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_ALL);
 
-#if 1
-  printf("starting game sound/music...\n");
-#endif
-
   PlaySoundStereo(SND_GAME_STARTING, SOUND_MAX_RIGHT);
   if (setup.sound_music)
     PlayMusic(level_nr);
 
   KeyboardAutoRepeatOff();
-
-#if 1
-  printf("started.\n");
-#endif
 
   if (options.debug)
   {

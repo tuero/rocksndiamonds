@@ -803,11 +803,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   int i, k;
 
 #if 0
-  printf("NEW SOUND %d HAS ARRIVED [%d]\n", snd_ctrl.nr, num_sounds);
-#endif
-
-#if 0
-  printf("%d ACTIVE CHANNELS\n", mixer_active_channels);
+  printf("NEW SOUND %d ARRIVED [%d] [%d ACTIVE CHANNELS]\n",
+	 snd_ctrl.nr, num_sounds, mixer_active_channels);
 #endif
 
   if (IS_MUSIC(snd_ctrl))
@@ -833,10 +830,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
   {
-#if 0
-    printf("PLAY MUSIC WITH VOLUME/STEREO %d/%d\n",
-	   snd_ctrl.volume, snd_ctrl.stereo_position);
-#endif
+    Mixer_StopMusicChannel();
 
     mixer[audio.music_channel] = snd_ctrl;
     Mixer_PlayMusicChannel();
@@ -921,11 +915,35 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
      of the channel's sound sample when compiling with the SDL mixer
      library, we use the current playing time (in milliseconds) instead. */
 
+#if DEBUG
+  /* Channel sanity check -- this should normally not be needed */
+  if (mixer_active_channels ==
+      audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
+  {
+    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    {
+      if (!mixer[i].active)
+      {
+	Error(ERR_RETURN, "Mixer_InsertSound: Channel %d inactive", i);
+	Error(ERR_RETURN, "Mixer_InsertSound: This should never happen!");
+
+	mixer_active_channels--;
+      }
+    }
+  }
+#endif
+
   if (mixer_active_channels ==
       audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
   {
     unsigned long playing_current = Counter();
     int longest = 0, longest_nr = audio.first_sound_channel;
+
+    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    {
+      Error(ERR_RETURN, "Mixer_InsertSound: %d [%d]: %ld (%ld)",
+	    i, mixer[i].active, mixer[i].data_len, (long)mixer[i].data_ptr);
+    }
 
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
@@ -943,40 +961,22 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   }
 
   /* add the new sound to the mixer */
-  for(i=0; i<audio.num_channels; i++)
+  for(i=audio.first_sound_channel; i<audio.num_channels; i++)
   {
 #if 0
     printf("CHECKING CHANNEL %d FOR SOUND %d ...\n", i, snd_ctrl.nr);
 #endif
 
-    /*
-    if (!mixer[i].active ||
-	(IS_MUSIC(snd_ctrl) && i == audio.music_channel))
-    */
-    if ((i == audio.music_channel && IS_MUSIC(snd_ctrl)) ||
-	(i != audio.music_channel && !mixer[i].active))
+    if (!mixer[i].active)
     {
 #if 0
       printf("ADDING NEW SOUND %d TO MIXER\n", snd_ctrl.nr);
 #endif
 
-#if 1
 #if defined(AUDIO_UNIX_NATIVE)
       if (snd_info->data_len == 0)
       {
 	printf("THIS SHOULD NEVER HAPPEN! [snd_info->data_len == 0]\n");
-      }
-#endif
-#endif
-
-#if 1
-      if (IS_MUSIC(snd_ctrl) && i == audio.music_channel && mixer[i].active)
-      {
-	printf("THIS SHOULD NEVER HAPPEN! [adding music twice]\n");
-
-#if 1
-	Mixer_StopChannel(i);
-#endif
       }
 #endif
 

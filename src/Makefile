@@ -171,7 +171,7 @@ libgame_dir:
 $(LIBGAME):
 	@$(MAKE) -C $(LIBDIR)
 
-$(TIMESTAMP_FILE): $(SRCS)
+$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME)
 	@date '+"[%Y-%m-%d %H:%M]"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
