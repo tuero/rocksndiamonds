@@ -1,3 +1,8 @@
+2003-12-02
+	* fixed bug with wrong default impact sound for colored emeralds
+
+2003-11-30
+	* added several sub-screens for the info screen
 
 2003-11-25
 	* added configurable "bored" and "sleeping" animations for the player

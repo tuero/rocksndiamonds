@@ -51,8 +51,9 @@
 #define INFO_MODE_MUSIC			2
 #define INFO_MODE_CREDITS		3
 #define INFO_MODE_PROGRAM		4
+#define INFO_MODE_LEVELSET		5
 
-#define MAX_INFO_MODES			5
+#define MAX_INFO_MODES			6
 
 /* for various menu stuff  */
 #define MAX_INFO_ELEMENTS_ON_SCREEN	10
@@ -323,7 +324,8 @@ void DrawMainMenu()
   }
 
   for (i = 0; i < 8; i++)
-    initCursor(i, (i == 1 || i == 6 ? IMG_MENU_BUTTON_RIGHT :IMG_MENU_BUTTON));
+    initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_RIGHT :
+		   IMG_MENU_BUTTON));
 
   drawCursorXY(level_width/32 + 4, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width/32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
@@ -439,7 +441,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       DelayReached(&level_delay, 0);	/* reset delay counter */
     }
   }
-  else if (IN_GFX_SCREEN(mx, my) &&
+  else if (IN_VIS_FIELD(x, y) &&
 	   y >= 0 && y <= 7 && (y != 1 || x < 10))
   {
     if (button)
@@ -561,6 +563,12 @@ static void execInfoProgram()
   DrawInfoScreen();
 }
 
+static void execInfoLevelSet()
+{
+  info_mode = INFO_MODE_LEVELSET;
+  DrawInfoScreen();
+}
+
 static void execExitInfo()
 {
   game_status = GAME_MODE_MAIN;
@@ -573,6 +581,7 @@ static struct TokenInfo info_info_main[] =
   { TYPE_ENTER_SCREEN,	execInfoMusic,		"Music Info"		},
   { TYPE_ENTER_SCREEN,	execInfoCredits,	"Credits"		},
   { TYPE_ENTER_SCREEN,	execInfoProgram,	"Program Info"		},
+  { TYPE_ENTER_SCREEN,	execInfoLevelSet,	"Level Set Info"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitInfo, 		"Exit"			},
 
@@ -678,7 +687,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
       y += dy;
   }
 
-  if (IN_GFX_SCREEN(mx, my) &&
+  if (IN_VIS_FIELD(x, y) &&
       y >= 0 && y < num_info_info && info_info[y].type & ~TYPE_SKIP_ENTRY)
   {
     if (button)
@@ -724,7 +733,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     ClearWindow();
     DrawHeadline();
 
-    DrawTextSCentered(100, FONT_TEXT_1, "The game elements:");
+    DrawTextSCentered(100, FONT_TEXT_1, "The Game Elements:");
 
     DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		      "Press any key or button for next page");
@@ -811,8 +820,6 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
   FrameCounter++;
 }
 
-#if 1
-
 static char *getHelpText(int element, int action, int direction)
 {
   char token[MAX_LINE_LEN];
@@ -830,12 +837,18 @@ static char *getHelpText(int element, int action, int direction)
 
 void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
+#if 0
   int font_nr = FONT_TEXT_2;
-  int max_chars_per_line = 34;
-  int max_lines_per_text = 2;    
-  int sx = mSX + 56;
+#else
+  int font_nr = FONT_LEVEL_NUMBER;
+#endif
+  int font_width = getFontWidth(font_nr);
+  int sx = mSX + MINI_TILEX + TILEX + MINI_TILEX;
   int sy = mSY + 65 + 2 * 32 + 1;
   int ystep = TILEY + 4;
+  int pad_x = sx - SX;
+  int max_chars_per_line = (SXSIZE - pad_x - MINI_TILEX) / font_width;
+  int max_lines_per_text = 2;    
   char *text = NULL;
 
   if (action != -1 && direction != -1)		/* element.action.direction */
@@ -859,48 +872,6 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
   DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
 		  max_chars_per_line, max_lines_per_text);
 }
-
-#else
-
-void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
-{
-  int font_nr = FONT_TEXT_2;
-  int max_chars_per_line = 34;
-  int max_lines_per_text = 2;    
-  int sx = mSX + 56;
-  int sy = mSY + 65 + 2 * 32 + 1;
-  int ystep = TILEY + 4;
-  char *text;
-
-  /* 1st try: get text for base element */
-  text = getHashEntry(helptext_info, element_info[element].token_name);
-
-  if (text == NULL)
-  {
-    /* 2nd try: get text for element/action/direction */
-    char token[MAX_LINE_LEN];
-
-    strcpy(token, element_info[element].token_name);
-
-    if (action != -1)
-      strcat(token, element_action_info[action].suffix);
-
-    if (direction != -1)
-      strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
-
-    text = getHashEntry(helptext_info, token);
-
-    if (text == NULL)
-      text = "No description available";
-  }
-
-  if (strlen(text) <= max_chars_per_line)	/* only one line of text */
-    sy += getFontHeight(font_nr) / 2;
-
-  DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
-		  max_chars_per_line, max_lines_per_text);
-}
-#endif
 
 void DrawInfoScreen_Elements()
 {
@@ -1036,7 +1007,7 @@ void HandleInfoScreen_Music(int button)
     ClearWindow();
     DrawHeadline();
 
-    DrawTextSCentered(100, FONT_TEXT_1, "The game background music:");
+    DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Music:");
 
     DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
     DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "\"%s\"", list->title);
@@ -1110,7 +1081,7 @@ void DrawInfoScreen_Program()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "Program information:");
+  DrawTextSCentered(100, FONT_TEXT_1, "Program Information:");
 
   DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
 		    "This game is Freeware!");
@@ -1165,6 +1136,66 @@ void HandleInfoScreen_Program(int button)
   }
 }
 
+void DrawInfoScreen_LevelSet()
+{
+  int ystart = 150;
+  int ybottom = SYSIZE - 20;
+  char *filename = getLevelSetInfoFilename();
+#if 0
+  int font_nr = FONT_TEXT_2;
+#else
+  int font_nr = FONT_LEVEL_NUMBER;
+#endif
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int pad_x = 32;
+  int pad_y = ystart;
+  int sx = SX + pad_x;
+  int sy = SY + pad_y;
+  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
+  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+
+  ClearWindow();
+  DrawHeadline();
+
+  DrawTextSCentered(100, FONT_TEXT_1, "Level Set Information:");
+
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
+		    "Press any key or button for info menu");
+
+  if (filename != NULL)
+    DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
+		     max_lines_per_screen);
+  else
+    DrawTextSCentered(ystart, FONT_TEXT_2,
+		      "No information for this level set.");
+}
+
+void HandleInfoScreen_LevelSet(int button)
+{
+  int button_released = !button;
+
+  if (button == MB_MENU_LEAVE)
+  {
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
+
+  if (button_released)
+  {
+    FadeSoundsAndMusic();
+
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+  }
+  else
+  {
+    PlayMenuSoundIfLoop();
+  }
+}
+
 void DrawInfoScreen()
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
@@ -1177,6 +1208,8 @@ void DrawInfoScreen()
     DrawInfoScreen_Credits();
   else if (info_mode == INFO_MODE_PROGRAM)
     DrawInfoScreen_Program();
+  else if (info_mode == INFO_MODE_LEVELSET)
+    DrawInfoScreen_LevelSet();
   else
     DrawInfoScreen_Main();
 
@@ -1197,6 +1230,8 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
     HandleInfoScreen_Credits(button);
   else if (info_mode == INFO_MODE_PROGRAM)
     HandleInfoScreen_Program(button);
+  else if (info_mode == INFO_MODE_LEVELSET)
+    HandleInfoScreen_LevelSet(button);
   else
     HandleInfoScreen_Main(mx, my, dx, dy, button);
 
@@ -1549,7 +1584,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     return;
   }
 
-  if (IN_GFX_SCREEN(mx, my) &&
+  if (IN_VIS_FIELD(x, y) &&
       mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
       y >= 0 && y < num_page_entries)
   {
@@ -2204,7 +2239,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       y += dy;
   }
 
-  if (IN_GFX_SCREEN(mx, my) &&
+  if (IN_VIS_FIELD(x, y) &&
       y >= 0 && y < num_setup_info && setup_info[y].type & ~TYPE_SKIP_ENTRY)
   {
     if (button)
@@ -2409,7 +2444,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
   }
 
-  if (IN_GFX_SCREEN(mx, my) &&
+  if (IN_VIS_FIELD(x, y) &&
       y == 0 && ((x < 10 && !button) || ((x == 10 || x == 12) && button)))
   {
     static unsigned long delay = 0;
@@ -2421,7 +2456,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
     drawPlayerSetupInputInfo(player_nr);
   }
-  else if (IN_GFX_SCREEN(mx, my) &&
+  else if (IN_VIS_FIELD(x, y) &&
 	   y >= pos_start && y <= pos_end &&
 	   !(y >= pos_empty1 && y <= pos_empty2))
   {

@@ -441,6 +441,34 @@ char *getHelpTextFilename()
   return filename;
 }
 
+char *getLevelSetInfoFilename()
+{
+  static char *filename = NULL;
+  char *basenames[] =
+  {
+    "readme",
+    "readme.txt",
+    "README",
+    "README.txt",
+    "README.TXT",
+
+    NULL
+  };
+  int i;
+
+  for (i = 0; basenames[i] != NULL; i++)
+  {
+    if (filename != NULL)
+      free(filename);
+
+    filename = getPath2(getCurrentLevelDir(), basenames[i]);
+    if (fileExists(filename))
+      return filename;
+  }
+
+  return NULL;
+}
+
 static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;

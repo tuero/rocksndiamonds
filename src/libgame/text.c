@@ -367,7 +367,7 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr, int line_length,
 
 boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
 			   int *dst_buffer_len, boolean last_line_was_empty,
-			   int max_chars_per_line)
+			   int line_length)
 {
   char *text_ptr = *src_buffer_ptr;
   char *buffer = dst_buffer;
@@ -406,7 +406,7 @@ boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
       if (buffer_len > 0 || !last_line_was_empty)
 	buffer_filled = TRUE;
     }
-    else if (word_len < max_chars_per_line - buffer_len)
+    else if (word_len < line_length - buffer_len)
     {
       /* word fits into text buffer -- add word */
 
@@ -428,9 +428,9 @@ boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
     {
       /* word does not fit at all into empty text buffer -- cut word */
 
-      strncpy(buffer, text_ptr, max_chars_per_line);
-      buffer[max_chars_per_line] = '\0';
-      text_ptr += max_chars_per_line;
+      strncpy(buffer, text_ptr, line_length);
+      buffer[line_length] = '\0';
+      text_ptr += line_length;
       buffer_filled = TRUE;
     }
 
@@ -463,4 +463,84 @@ void DrawTextWrapped(int x, int y, char *text, int font_nr, int line_length,
     DrawText(x, y + current_line * font_height, buffer, font_nr);
     current_line++;
   }
+}
+
+int DrawTextFromFile(int x, int y, char *filename, int font_nr,
+		     int line_length, int max_lines)
+{
+  int font_height = getFontHeight(font_nr);
+  char line[MAX_LINE_LEN];
+  char buffer[line_length + 1];
+  int buffer_len;
+  int current_line = 0;
+  FILE *file;
+
+  if (current_line >= max_lines)
+    return 0;
+
+  if (filename == NULL)
+    return 0;
+
+  if (!(file = fopen(filename, MODE_READ)))
+    return 0;
+
+  buffer[0] = '\0';
+  buffer_len = 0;
+
+  while (!feof(file) && current_line < max_lines)
+  {
+    char *line_ptr;
+    boolean last_line_was_empty = TRUE;
+
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* skip comments (lines directly beginning with '#') */
+    if (line[0] == '#')
+      continue;
+
+    /* cut trailing newline from input line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == '\n' || *line_ptr == '\r')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    if (strlen(line) == 0)		/* special case: force empty line */
+      strcpy(line, "\n");
+
+    line_ptr = line;
+
+    while (*line_ptr && current_line < max_lines)
+    {
+      boolean buffer_filled = RenderLineToBuffer(&line_ptr,
+						 buffer, &buffer_len,
+						 last_line_was_empty,
+						 line_length);
+      if (buffer_filled)
+      {
+	DrawText(x, y + current_line * font_height, buffer, font_nr);
+	current_line++;
+
+	last_line_was_empty = (buffer_len == 0);
+
+	buffer[0] = '\0';
+	buffer_len = 0;
+      }
+    }
+  }
+
+  fclose(file);
+
+  if (buffer_len > 0 && current_line < max_lines)
+  {
+    DrawText(x, y + current_line * font_height, buffer, font_nr);
+    current_line++;
+  }
+
+  return current_line;
 }

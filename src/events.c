@@ -377,7 +377,7 @@ void HandleButton(int mx, int my, int button)
   if (HandleGadgets(mx, my, button))
   {
     /* do not handle this button event anymore */
-    mx = my = 0;
+    mx = my = -32;	/* force mouse event to be outside screen tiles */
   }
 
   switch(game_status)

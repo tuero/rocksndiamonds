@@ -5547,6 +5547,26 @@ static boolean PrintInfoText(char *text, int font_nr, int start_line)
   return TRUE;
 }
 
+#if 1
+
+static int PrintElementDescriptionFromFile(char *filename, int start_line)
+{
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int pad_x = ED_SETTINGS_XPOS(0);
+  int pad_y = ED_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int sx = SX + pad_x;
+  int sy = SY + pad_y + start_line * font_height;
+  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
+  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+
+  return DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
+			  max_lines_per_screen);
+}
+
+#else
+
 static int PrintElementDescriptionFromFile(char *filename, int start_line)
 {
   int font_nr = FONT_TEXT_2;
@@ -5633,6 +5653,8 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
 
   return (current_line - start_line);
 }
+
+#endif
 
 static void DrawPropertiesTabulatorGadgets()
 {

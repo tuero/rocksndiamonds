@@ -201,6 +201,7 @@ char *getSetupFilename(void);
 char *getEditorSetupFilename(void);
 char *getHelpAnimFilename(void);
 char *getHelpTextFilename(void);
+char *getLevelSetInfoFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
