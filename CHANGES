@@ -8,6 +8,7 @@ Release Version 2.0.0 [01 JAN 2001]
 	- fixed network playing bug (patch from web site)
 	- SDL version can load and play music modules
 	- fixed element description in level editor for EM doors and keys
+	- sound sample frequency raised from 8 kHz to 22 kHz
 
 Release Version 1.4.0 [27 OCT 1999]
 -----------------------------------
