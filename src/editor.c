@@ -109,9 +109,9 @@
 #define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
 
 #define ED_SETTINGS_XPOS(n)		(ED_SETTINGS_XSTART + \
-	 				 n * ED_SETTINGS_XOFFSET)
+	 				 (n) * ED_SETTINGS_XOFFSET)
 #define ED_SETTINGS_YPOS(n)		(ED_SETTINGS_YSTART + \
-					 n * ED_SETTINGS_YOFFSET)
+					 (n) * ED_SETTINGS_YOFFSET)
 
 #define ED_SETTINGS1_YPOS		MINI_TILEY
 #define ED_SETTINGS2_XPOS		MINI_TILEX
@@ -121,9 +121,9 @@
 #define ED_COUNTER_YSTART		(ED_SETTINGS1_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
-					 n * ED_COUNTER_YDISTANCE)
+					 (n) * ED_COUNTER_YDISTANCE)
 #define ED_COUNTER2_YPOS(n)		(ED_COUNTER_YSTART + \
-					 n * ED_COUNTER_YDISTANCE - 2)
+					 (n) * ED_COUNTER_YDISTANCE - 2)
 
 /* values for element content drawing areas */
 /* amoeba content */
@@ -133,9 +133,9 @@
 
 /* yamyam content */
 #define ED_AREA_YAMYAM_CONTENT_XPOS(n)	(2 * MINI_TILEX + \
-					 5 * (n % 4) * MINI_TILEX)
-#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(22 * MINI_TILEY + \
-					 6 * (n / 4) * MINI_TILEY)
+					 5 * ((n) % 4) * MINI_TILEX)
+#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(17 * MINI_TILEY + \
+					 6 * ((n) / 4) * MINI_TILEY)
 
 /* custom change target */
 #define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(1) + \
@@ -505,32 +505,34 @@
 #define GADGET_ID_GRAVITY		(GADGET_ID_CHECKBUTTON_FIRST + 4)
 #define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 5)
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
-#define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_EXPLODE_RESULT	(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 20)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 21)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 22)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 23)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 24)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 25)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 26)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 27)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 28)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_USE_SPRING_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 7)
+#define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CAN_MOVE_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_CUSTOM_EXPLODE_RESULT	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 27)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 31)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 32)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -689,31 +691,33 @@
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
-#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	5
-#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	6
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	7
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	8
-#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	9
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	10
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	11
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	12
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	13
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	14
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		15
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	16
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	17
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	18
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	19
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	20
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		21
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	22
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	23
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	24
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	25
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	26
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	27
+#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	5
+#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	6
+#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	7
+#define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	8
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	9
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	10
+#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	11
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	12
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	13
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	14
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	15
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	16
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		17
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_RESULT	18
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	19
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	20
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	21
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	22
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		23
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	24
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	25
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	26
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	27
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	28
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	29
 
-#define ED_NUM_CHECKBUTTONS			28
+#define ED_NUM_CHECKBUTTONS			30
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -943,7 +947,7 @@ static struct
     NULL,				NULL, NULL
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
     MIN_ELEMENT_CONTENTS,		MAX_ELEMENT_CONTENTS,
     GADGET_ID_ELEMENT_CONTENT_DOWN,	GADGET_ID_ELEMENT_CONTENT_UP,
     GADGET_ID_ELEMENT_CONTENT_TEXT,	GADGET_ID_NONE,
@@ -1801,17 +1805,31 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    GADGET_ID_USE_SPRING_BUG,		GADGET_ID_NONE,
+    &level.use_spring_bug,
+    NULL,
+    "use spring pushing bug",		"use odd spring pushing behaviour"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
     GADGET_ID_BLOCK_LAST_FIELD,		GADGET_ID_NONE,
     &level.block_last_field,
     NULL,
     "block last field when moving",	"player blocks last field when moving"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
     GADGET_ID_SP_BLOCK_LAST_FIELD,	GADGET_ID_NONE,
     &level.sp_block_last_field,
     NULL,
     "block last field when moving",	"player blocks last field when moving"
+  },
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
+    GADGET_ID_CAN_MOVE_INTO_ACID,	GADGET_ID_NONE,
+    &custom_element_properties[EP_CAN_MOVE_INTO_ACID],
+    NULL,
+    "can move into acid",		"element can move into acid pool"
   },
 
   /* ---------- element settings: configure 1 (custom elements) ----------- */
@@ -2143,7 +2161,7 @@ static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
 static void UpdateCustomElementGraphicGadgets();
-static boolean checkPropertiesConfig();
+static boolean checkPropertiesConfig(int);
 static void CopyLevelToUndoBuffer(int);
 static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
@@ -5073,10 +5091,14 @@ static void MapCheckbuttonGadget(int id)
   int x_right = gi->x + gi->width + xoffset_right;
   int y = gi->y + yoffset;
 
-  /* special case needed for "sticky" gadget */
-  ModifyGadget(gi, GDI_CHECKED, *checkbutton_info[id].value,
-	       GDI_Y, SY + checkbutton_info[id].y, GDI_END);
-  y = gi->y + yoffset;
+  /* special case needed for "stickybutton" and "can move into acid" gadgets */
+  if (id == ED_CHECKBUTTON_ID_STICK_ELEMENT ||
+      id == ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID)
+  {
+    ModifyGadget(gi, GDI_CHECKED, *checkbutton_info[id].value,
+		 GDI_Y, SY + checkbutton_info[id].y, GDI_END);
+    y = gi->y + yoffset;
+  }
 
   if (checkbutton_info[id].text_left)
     DrawText(x_left, y, checkbutton_info[id].text_left, FONT_TEXT_1);
@@ -5640,12 +5662,26 @@ static void CopyGroupElementPropertiesToEditor(int element)
   custom_element = element_info[element];	/* needed for description */
 }
 
+static void CopyClassicElementPropertiesToEditor(int element)
+{
+  if (COULD_MOVE_INTO_ACID(element))
+  {
+    int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
+
+    if (bit_nr > -1)
+      custom_element_properties[EP_CAN_MOVE_INTO_ACID] =
+	((level.can_move_into_acid & (1 << bit_nr)) != 0);
+  }
+}
+
 static void CopyElementPropertiesToEditor(int element)
 {
   if (IS_CUSTOM_ELEMENT(element))
     CopyCustomElementPropertiesToEditor(element);
   else if (IS_GROUP_ELEMENT(element))
     CopyGroupElementPropertiesToEditor(element);
+  else
+    CopyClassicElementPropertiesToEditor(element);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -5794,12 +5830,30 @@ static void CopyGroupElementPropertiesToGame(int element)
   element_info[element].modified_settings = TRUE;
 }
 
+static void CopyClassicElementPropertiesToGame(int element)
+{
+  if (COULD_MOVE_INTO_ACID(element))
+  {
+    int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
+
+    if (bit_nr > -1)
+    {
+      level.can_move_into_acid &= ~(1 << bit_nr);
+
+      if (custom_element_properties[EP_CAN_MOVE_INTO_ACID])
+	level.can_move_into_acid |= (1 << bit_nr);
+    }
+  }
+}
+
 static void CopyElementPropertiesToGame(int element)
 {
   if (IS_CUSTOM_ELEMENT(element))
     CopyCustomElementPropertiesToGame(element);
   else if (IS_GROUP_ELEMENT(element))
     CopyGroupElementPropertiesToGame(element);
+  else
+    CopyClassicElementPropertiesToGame(element);
 }
 
 void DrawLevelEd()
@@ -6564,19 +6618,23 @@ static struct
   { EL_DIAMOND,		&level.score[SC_DIAMOND],	TEXT_COLLECTING	},
   { EL_CRYSTAL,		&level.score[SC_CRYSTAL],	TEXT_COLLECTING	},
   { EL_PEARL,		&level.score[SC_PEARL],		TEXT_COLLECTING	},
+  { EL_BUG,		&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_RIGHT,	&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_UP,		&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_LEFT,	&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BUG_DOWN,	&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_BD_BUTTERFLY,	&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_RIGHT,&level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_UP,   &level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_LEFT, &level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_BD_BUTTERFLY_DOWN, &level.score[SC_BUG],		TEXT_SMASHING	},
   { EL_SP_ELECTRON,	&level.score[SC_BUG],		TEXT_SMASHING	},
+  { EL_SPACESHIP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_RIGHT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_LEFT,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SPACESHIP_DOWN,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
+  { EL_BD_FIREFLY,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_BD_FIREFLY_RIGHT,&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_BD_FIREFLY_UP,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_BD_FIREFLY_LEFT, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
@@ -6585,6 +6643,7 @@ static struct
   { EL_YAMYAM,		&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_DARK_YAMYAM,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING	},
+  { EL_PACMAN,		&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_RIGHT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_UP,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_PACMAN_LEFT,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
@@ -6621,20 +6680,22 @@ static struct
   { -1,			NULL,				NULL		}
 };
 
-static boolean checkPropertiesConfig()
+static boolean checkPropertiesConfig(int element)
 {
   int i;
 
-  if (IS_GEM(properties_element) ||
-      IS_CUSTOM_ELEMENT(properties_element) ||
-      IS_GROUP_ELEMENT(properties_element) ||
-      IS_ENVELOPE(properties_element) ||
-      ELEM_IS_PLAYER(properties_element) ||
-      HAS_CONTENT(properties_element))
+  if (IS_GEM(element) ||
+      IS_CUSTOM_ELEMENT(element) ||
+      IS_GROUP_ELEMENT(element) ||
+      IS_ENVELOPE(element) ||
+      ELEM_IS_PLAYER(element) ||
+      HAS_CONTENT(element) ||
+      COULD_MOVE_INTO_ACID(element) ||
+      element == EL_SPRING)
     return TRUE;
   else
     for (i = 0; elements_with_counter[i].element != -1; i++)
-      if (elements_with_counter[i].element == properties_element)
+      if (elements_with_counter[i].element == element)
 	return TRUE;
 
   return FALSE;
@@ -6644,7 +6705,7 @@ static void DrawPropertiesConfig()
 {
   int i;
 
-  if (!checkPropertiesConfig())
+  if (!checkPropertiesConfig(properties_element))
   {
     PrintInfoText("No configuration options available.", FONT_TEXT_1, 0);
 
@@ -6658,10 +6719,9 @@ static void DrawPropertiesConfig()
     {
       int counter_id = ED_COUNTER_ID_ELEMENT_SCORE;
 
-      if (HAS_CONTENT(properties_element))	/* needs stickybutton */
-	counterbutton_info[counter_id].y = ED_SETTINGS_YPOS(1);
-      else
-	counterbutton_info[counter_id].y = ED_SETTINGS_YPOS(0);
+      counterbutton_info[counter_id].y =
+	ED_SETTINGS_YPOS((HAS_CONTENT(properties_element) ? 1 : 0) +
+			 (COULD_MOVE_INTO_ACID(properties_element) ? 1 : 0));
 
       counterbutton_info[counter_id].value = elements_with_counter[i].value;
       counterbutton_info[counter_id].text_right= elements_with_counter[i].text;
@@ -6683,13 +6743,25 @@ static void DrawPropertiesConfig()
       DrawElementContentAreas();
   }
 
-  if (IS_GEM(properties_element))
-    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS);
-
   if (ELEM_IS_PLAYER(properties_element))
     MapCheckbuttonGadget(properties_element == EL_SP_MURPHY ?
 			 ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD :
 			 ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD);
+
+  if (IS_GEM(properties_element))
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS);
+
+  if (COULD_MOVE_INTO_ACID(properties_element) &&
+      !IS_CUSTOM_ELEMENT(properties_element))
+  {
+    checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
+      ED_SETTINGS_YPOS(HAS_CONTENT(properties_element) ? 1 : 0);
+
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
+  }
+
+  if (properties_element == EL_SPRING)
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_SPRING_BUG);
 
   if (IS_ENVELOPE(properties_element))
   {
@@ -8137,11 +8209,12 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
   *checkbutton_info[type_id].value ^= TRUE;
 
-  if (((type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
-	type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST) ||
-       (type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
-	type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST)) &&
-      type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
+  if (type_id == ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID ||
+      (((type_id >= ED_CHECKBUTTON_ID_CUSTOM_FIRST &&
+	 type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST) ||
+	(type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
+	 type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST)) &&
+       type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE))
   {
     CopyElementPropertiesToGame(properties_element);
   }

@@ -2935,6 +2935,13 @@ void InitElementPropertiesStatic()
       EL_PACMAN_LEFT,		EL_PACMAN_RIGHT,
       EL_PACMAN_UP,		EL_PACMAN_DOWN
     },
+#if 1
+    {
+      EL_MOLE,
+      EL_MOLE_LEFT,		EL_MOLE_RIGHT,
+      EL_MOLE_UP,		EL_MOLE_DOWN
+    },
+#endif
     {
       -1,
       -1, -1, -1, -1
@@ -3021,6 +3028,7 @@ void InitElementPropertiesEngine(int engine_version)
     EP_ACTIVE_BOMB,
 
     EP_ACCESSIBLE,
+
     -1
   };
 
@@ -3162,6 +3170,9 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_EXPLOSION, (CAN_EXPLODE_BY_FIRE(i) ||
 						  i == EL_BLACK_ORB));
 
+    /* ---------- COULD_MOVE_INTO_ACID ------------------------------------- */
+    SET_PROPERTY(i, EP_COULD_MOVE_INTO_ACID, (CAN_MOVE(i) && i != EL_SPRING));
+
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
 				 IS_PASSABLE_INSIDE(i)));
@@ -3271,6 +3282,69 @@ void InitElementPropertiesEngine(int engine_version)
   /* this is needed because some graphics depend on element properties */
   if (game_status == GAME_MODE_PLAYING)
     InitElementGraphicInfo();
+}
+
+int get_special_property_bit(int element, int base_property_bit)
+{
+  static struct
+  {
+    int element;
+    int bit_nr;
+  } pb_can_move_into_acid[] =
+  {
+    { EL_BUG,			0 },
+    { EL_BUG_LEFT,		0 },
+    { EL_BUG_RIGHT,		0 },
+    { EL_BUG_UP,		0 },
+    { EL_BUG_DOWN,		0 },
+    { EL_SPACESHIP,		0 },
+    { EL_SPACESHIP_LEFT,	0 },
+    { EL_SPACESHIP_RIGHT,	0 },
+    { EL_SPACESHIP_UP,		0 },
+    { EL_SPACESHIP_DOWN,	0 },
+    { EL_BD_BUTTERFLY,		1 },
+    { EL_BD_BUTTERFLY_LEFT,	1 },
+    { EL_BD_BUTTERFLY_RIGHT,	1 },
+    { EL_BD_BUTTERFLY_UP,	1 },
+    { EL_BD_BUTTERFLY_DOWN,	1 },
+    { EL_BD_FIREFLY,		1 },
+    { EL_BD_FIREFLY_LEFT,	1 },
+    { EL_BD_FIREFLY_RIGHT,	1 },
+    { EL_BD_FIREFLY_UP,		1 },
+    { EL_BD_FIREFLY_DOWN,	1 },
+    { EL_YAMYAM,		2 },
+    { EL_DARK_YAMYAM,		2 },
+    { EL_ROBOT,			3 },
+    { EL_PACMAN,		4 },
+    { EL_PACMAN_LEFT,		4 },
+    { EL_PACMAN_RIGHT,		4 },
+    { EL_PACMAN_UP,		4 },
+    { EL_PACMAN_DOWN,		4 },
+    { EL_MOLE,			4 },
+    { EL_MOLE_LEFT,		4 },
+    { EL_MOLE_RIGHT,		4 },
+    { EL_MOLE_UP,		4 },
+    { EL_MOLE_DOWN,		4 },
+    { EL_PENGUIN,		5 },
+    { EL_PIG,			6 },
+    { EL_DRAGON,		6 },
+    { EL_SATELLITE,		7 },
+    { EL_SP_SNIKSNAK,		8 },
+    { EL_SP_ELECTRON,		8 },
+    { EL_BALLOON,		9 },
+
+    { -1,			0 },
+  };
+  int i;
+
+  if (base_property_bit != EP_CAN_MOVE_INTO_ACID)
+    return -1;
+
+  for (i = 0; pb_can_move_into_acid[i].element != -1; i++)
+    if (pb_can_move_into_acid[i].element == element)
+      return pb_can_move_into_acid[i].bit_nr;
+
+  return -1;
 }
 
 static void InitGlobal()

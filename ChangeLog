@@ -1,3 +1,6 @@
+2004-02-21
+	* "spring push bug" reintroduced as configurable element property
+
 2004-02-17
 	* fixed bug which caused all CE change pages to be ignored which had
 	  the same change event, but used a different element side

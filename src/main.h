@@ -88,6 +88,7 @@
 #define EP_PUSHABLE		24
 #define EP_CAN_EXPLODE_DYNA	25
 #define EP_PROTECTED		26
+#define EP_CAN_MOVE_INTO_ACID	27
 
 /* values for pre-defined properties */
 #define EP_PLAYER		32
@@ -139,13 +140,14 @@
 #define EP_SP_PORT		72
 #define EP_CAN_EXPLODE_BY_DRAGONFIRE 73
 #define EP_CAN_EXPLODE_BY_EXPLOSION  74
+#define EP_COULD_MOVE_INTO_ACID	75
 
 /* values for internal purpose only (level editor) */
-#define EP_EXPLODE_RESULT	75
-#define EP_WALK_TO_OBJECT	76
-#define EP_DEADLY		77
+#define EP_EXPLODE_RESULT	76
+#define EP_WALK_TO_OBJECT	77
+#define EP_DEADLY		78
 
-#define NUM_ELEMENT_PROPERTIES	78
+#define NUM_ELEMENT_PROPERTIES	79
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -310,6 +312,7 @@
 #define IS_PUSHABLE(e)		HAS_PROPERTY(e, EP_PUSHABLE)
 #define CAN_EXPLODE_DYNA(e)	HAS_PROPERTY(e, EP_CAN_EXPLODE_DYNA)
 #define IS_PROTECTED(e)		HAS_PROPERTY(e, EP_PROTECTED)
+#define CAN_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_CAN_MOVE_INTO_ACID)
 
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
@@ -363,6 +366,7 @@
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_DRAGONFIRE)
 #define CAN_EXPLODE_BY_EXPLOSION(e)	\
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_EXPLOSION)
+#define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
@@ -1376,26 +1380,37 @@ struct LevelInfo
   boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
 
   int fieldx, fieldy;
+
   int time;
   int gems_needed;
+
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
+
   char envelope_text[4][MAX_ENVELOPE_TEXT_LEN + 1];
   int envelope_xsize[4], envelope_ysize[4];
+
   int score[LEVEL_SCORE_ELEMENTS];
+
   int yamyam_content[MAX_ELEMENT_CONTENTS][3][3];
   int num_yamyam_contents;
+
   int amoeba_speed;
   int amoeba_content;
+
   int time_magic_wall;
   int time_wheel;
   int time_light;
   int time_timegate;
+
+  int can_move_into_acid;	/* bits indicate property for element groups */
+
   boolean double_speed;
   boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
+  boolean use_spring_bug;	/* for compatibility with old levels */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 

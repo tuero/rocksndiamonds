@@ -862,6 +862,36 @@ static void InitField(int x, int y, boolean init_game)
   }
 }
 
+static inline void InitField_WithBug1(int x, int y, boolean init_game)
+{
+  InitField(x, y, init_game);
+
+  /* not needed to call InitMovDir() -- already done by InitField()! */
+  if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+      CAN_MOVE(Feld[x][y]))
+    InitMovDir(x, y);
+}
+
+static inline void InitField_WithBug2(int x, int y, boolean init_game)
+{
+  int old_element = Feld[x][y];
+
+  InitField(x, y, init_game);
+
+  /* not needed to call InitMovDir() -- already done by InitField()! */
+  if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+      CAN_MOVE(old_element) &&
+      (old_element < EL_MOLE_LEFT || old_element > EL_MOLE_DOWN))
+    InitMovDir(x, y);
+
+  /* this case is in fact a combination of not less than three bugs:
+     first, it calls InitMovDir() for elements that can move, although this is
+     already done by InitField(); then, it checks the element that was at this
+     field _before_ the call to InitField() (which can change it)
+
+ */
+}
+
 void DrawGameDoorValues()
 {
   int i, j;
@@ -2866,11 +2896,21 @@ void Explode(int ex, int ey, int phase, int mode)
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
 
+#if 1
+    InitField_WithBug2(x, y, FALSE);
+#else
     InitField(x, y, FALSE);
 #if 1
     /* !!! not needed !!! */
+#if 1
+    if (game.engine_version < VERSION_IDENT(3,0,9,0) &&
+	CAN_MOVE(Feld[x][y]) && Feld[x][y] != EL_MOLE)
+      InitMovDir(x, y);
+#else
     if (CAN_MOVE(element))
       InitMovDir(x, y);
+#endif
+#endif
 #endif
     DrawLevelField(x, y);
 
@@ -4347,7 +4387,9 @@ static boolean JustBeingPushed(int x, int y)
 
 void StartMoving(int x, int y)
 {
+#if 0
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
+#endif
   boolean started_moving = FALSE;	/* some elements can fall _and_ move */
   int element = Feld[x][y];
 
@@ -4544,7 +4586,7 @@ void StartMoving(int x, int y)
 
       Impact(x, y);
     }
-    else if (IS_FREE(x, y + 1) && element == EL_SPRING && use_spring_bug)
+    else if (IS_FREE(x, y + 1) && element == EL_SPRING && level.use_spring_bug)
     {
       if (MovDir[x][y] == MV_NO_MOVING)
       {
@@ -5228,22 +5270,22 @@ void ContinueMoving(int x, int y)
   int nextx = newx + dx, nexty = newy + dy;
 #endif
 #if 1
-  boolean pushed = (Pushed[x][y] && IS_PLAYER(x, y));
+  boolean pushed_by_player   = (Pushed[x][y] && IS_PLAYER(x, y));
   boolean pushed_by_conveyor = (Pushed[x][y] && !IS_PLAYER(x, y));
 #else
-  boolean pushed = Pushed[x][y];
+  boolean pushed_by_player = Pushed[x][y];
 #endif
 
   MovPos[x][y] += getElementMoveStepsize(x, y);
 
 #if 0
-  if (pushed && IS_PLAYER(x, y))
+  if (pushed_by_player && IS_PLAYER(x, y))
   {
     /* special case: moving object pushed by player */
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
   }
 #else
-  if (pushed)		/* special case: moving object pushed by player */
+  if (pushed_by_player)	/* special case: moving object pushed by player */
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
 #endif
 
@@ -5397,7 +5439,7 @@ void ContinueMoving(int x, int y)
   Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
 
   /* prevent pushed element from moving on in pushed direction */
-  if (pushed && CAN_MOVE(element) &&
+  if (pushed_by_player && CAN_MOVE(element) &&
       element_info[element].move_pattern & MV_ANY_DIRECTION &&
       !(element_info[element].move_pattern & direction))
     TurnRound(newx, newy);
@@ -5409,7 +5451,7 @@ void ContinueMoving(int x, int y)
     MovDir[newx][newy] = 0;
 #endif
 
-  if (!pushed)	/* special case: moving object pushed by player */
+  if (!pushed_by_player)
   {
     WasJustMoving[newx][newy] = 3;
 
@@ -6439,9 +6481,13 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
     MovDir[x][y] = previous_move_direction;
 
+#if 1
+  InitField_WithBug1(x, y, FALSE);
+#else
   InitField(x, y, FALSE);
   if (CAN_MOVE(Feld[x][y]))
     InitMovDir(x, y);
+#endif
 
   DrawLevelField(x, y);
 
@@ -7239,7 +7285,19 @@ void GameActions()
 #endif
 
 #if 1
+  /* for downwards compatibility, the following code emulates a fixed bug that
+     occured when pushing elements (causing elements that just made their last
+     pushing step to already (if possible) make their first falling step in the
+     same game frame, which is bad); this code is also needed to use the famous
+     "spring push bug" which is used in older levels and might be wanted to be
+     used also in newer levels, but in this case the buggy pushing code is only
+     affecting the "spring" element and no other elements */
+
+#if 1
+  if (game.engine_version < VERSION_IDENT(2,2,0,7) || level.use_spring_bug)
+#else
   if (game.engine_version < VERSION_IDENT(2,2,0,7))
+#endif
   {
     for (i = 0; i < MAX_PLAYERS; i++)
     {
@@ -7247,8 +7305,15 @@ void GameActions()
       int x = player->jx;
       int y = player->jy;
 
+#if 1
+      if (player->active && player->is_pushing && player->is_moving &&
+	  IS_MOVING(x, y) &&
+	  (game.engine_version < VERSION_IDENT(2,2,0,7) ||
+	   Feld[x][y] == EL_SPRING))
+#else
       if (player->active && player->is_pushing && player->is_moving &&
 	  IS_MOVING(x, y))
+#endif
       {
 	ContinueMoving(x, y);
 
@@ -8972,7 +9037,9 @@ int DigField(struct PlayerInfo *player,
     CH_SIDE_BOTTOM,	/* moving up    */
     CH_SIDE_TOP,	/* moving down  */
   };
+#if 0
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0,0));
+#endif
   int jx = oldx, jy = oldy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
@@ -9386,7 +9453,7 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;
 
 	if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
-	    !(element == EL_SPRING && use_spring_bug))
+	    !(element == EL_SPRING && level.use_spring_bug))
 	  return MF_NO_ACTION;
 
 #if 1
@@ -9803,9 +9870,13 @@ boolean DropElement(struct PlayerInfo *player)
 
   if (Feld[jx][jy] == new_element)	/* uninitialized unless CE change */
   {
+#if 1
+    InitField_WithBug1(jx, jy, FALSE);
+#else
     InitField(jx, jy, FALSE);
     if (CAN_MOVE(Feld[jx][jy]))
       InitMovDir(jx, jy);
+#endif
   }
 
   new_element = Feld[jx][jy];

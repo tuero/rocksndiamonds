@@ -658,7 +658,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "black_orb",
     "black_orb",
-    "bomb"
+    "black orb bomb"
   },
   {
     "amoeba_to_diamond",
