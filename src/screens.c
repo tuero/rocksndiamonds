@@ -27,16 +27,17 @@
 /* screens in the setup menu */
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_GAME			1
-#define SETUP_MODE_INPUT		2
-#define SETUP_MODE_SHORTCUT		3
-#define SETUP_MODE_GRAPHICS		4
-#define SETUP_MODE_SOUND		5
-#define SETUP_MODE_ARTWORK		6
-#define SETUP_MODE_CHOOSE_GRAPHICS	7
-#define SETUP_MODE_CHOOSE_SOUNDS	8
-#define SETUP_MODE_CHOOSE_MUSIC		9
+#define SETUP_MODE_EDITOR		2
+#define SETUP_MODE_INPUT		3
+#define SETUP_MODE_SHORTCUT		4
+#define SETUP_MODE_GRAPHICS		5
+#define SETUP_MODE_SOUND		6
+#define SETUP_MODE_ARTWORK		7
+#define SETUP_MODE_CHOOSE_GRAPHICS	8
+#define SETUP_MODE_CHOOSE_SOUNDS	9
+#define SETUP_MODE_CHOOSE_MUSIC		10
 
-#define MAX_SETUP_MODES			10
+#define MAX_SETUP_MODES			11
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -1670,6 +1671,12 @@ static void execSetupGame()
   DrawSetupScreen();
 }
 
+static void execSetupEditor()
+{
+  setup_mode = SETUP_MODE_EDITOR;
+  DrawSetupScreen();
+}
+
 static void execSetupGraphics()
 {
   setup_mode = SETUP_MODE_GRAPHICS;
@@ -1745,6 +1752,7 @@ static void execSaveAndExitSetup()
 static struct TokenInfo setup_info_main[] =
 {
   { TYPE_ENTER_MENU,	execSetupGame,		"Game Settings"		},
+  { TYPE_ENTER_MENU,	execSetupEditor,	"Editor Settings"	},
   { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics"		},
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
   { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
@@ -1752,7 +1760,7 @@ static struct TokenInfo setup_info_main[] =
   { TYPE_ENTER_MENU,	execSetupShortcut,	"Key Shortcuts"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
-  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and exit"		},
+  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and Exit"		},
   { 0,			NULL,			NULL			}
 };
 
@@ -1763,7 +1771,24 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"		},
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_editor[] =
+{
+  { TYPE_STRING,	NULL,			"Offer Special Elements:"},
+  { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"BoulderDash:"	},
+  { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
+  { TYPE_SWITCH,	&setup.editor.el_more,		"More:"		},
+  { TYPE_SWITCH,	&setup.editor.el_sokoban,	"Sokoban:"	},
+  { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
+  { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamd. Caves:"	},
+  { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX Boulderd.:"	},
+  { TYPE_SWITCH,	&setup.editor.el_chars,		"Characters:"	},
+  { TYPE_SWITCH,	&setup.editor.el_custom,	"Custom:"	},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };
 
@@ -1779,7 +1804,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Doors:"		},
   { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };
 
@@ -1791,7 +1816,7 @@ static struct TokenInfo setup_info_sound[] =
   { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"		},
   { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };
 
@@ -1809,7 +1834,7 @@ static struct TokenInfo setup_info_artwork[] =
   { TYPE_YES_NO,	&setup.override_level_sounds,	"Sounds:"	},
   { TYPE_YES_NO,	&setup.override_level_music,	"Music:"	},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };
 
@@ -1824,7 +1849,7 @@ static struct TokenInfo setup_info_shortcut[] =
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_YES_NO,	&setup.ask_on_escape,	"Ask on Esc:"		},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
   { 0,			NULL,			NULL			}
 };
 
@@ -1957,6 +1982,11 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_game;
     title_string = "Setup Game";
   }
+  else if (setup_mode == SETUP_MODE_EDITOR)
+  {
+    setup_info = setup_info_editor;
+    title_string = "Setup Editor";
+  }
   else if (setup_mode == SETUP_MODE_GRAPHICS)
   {
     setup_info = setup_info_graphics;
@@ -2020,12 +2050,18 @@ static void DrawSetupScreen_Generic()
 void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 {
   static int choice_store[MAX_SETUP_MODES];
-  int choice = choice_store[setup_mode];
+  int choice = choice_store[setup_mode];	/* always starts with 0 */
   int x = 0;
   int y = choice;
 
   if (button == MB_MENU_INITIALIZE)
   {
+    /* advance to first valid menu entry */
+    while (choice < num_setup_info &&
+	   (setup_info[choice].type & TYPE_SKIP_ENTRY))
+      choice++;
+    choice_store[setup_mode] = choice;
+
     drawCursor(choice, FC_RED);
     return;
   }
@@ -2122,7 +2158,7 @@ void DrawSetupScreen_Input()
 
   DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
-  DrawText(SX+32, SY+15*32, "Exit", FS_BIG, FC_GREEN);
+  DrawText(SX+32, SY+15*32, "Back", FS_BIG, FC_GREEN);
 
 #if 0
   DeactivateJoystickForCalibration();

@@ -737,7 +737,7 @@ static int counter_xsize = DXSIZE + FONT2_XSIZE - 2 * ED_GADGET_DISTANCE;
 
 int element_shift = 0;
 
-int editor_element[] =
+int editor_el_boulderdash[] =
 {
   EL_CHAR('B'),
   EL_CHAR('O'),
@@ -778,7 +778,11 @@ int editor_element[] =
   EL_BD_BUTTERFLY_DOWN,
   EL_BD_FIREFLY_DOWN,
   EL_EMPTY,
+};
+int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
 
+int editor_el_emerald_mine[] =
+{
   EL_CHAR('E'),
   EL_CHAR('M'),
   EL_CHAR('E'),
@@ -868,7 +872,11 @@ int editor_element[] =
   EL_EM_GATE2_GRAY,
   EL_EM_GATE3_GRAY,
   EL_EM_GATE4_GRAY,
+};
+int num_editor_el_emerald_mine = SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
+int editor_el_more[] =
+{
   EL_CHAR('M'),
   EL_CHAR('O'),
   EL_CHAR('R'),
@@ -968,8 +976,11 @@ int editor_element[] =
   EL_EMC_WALL5,
   EL_EMC_WALL6,
   EL_EMC_WALL7,
+};
+int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
 
-
+int editor_el_sokoban[] =
+{
   EL_CHAR('S'),
   EL_CHAR('O'),
   EL_CHAR('K'),
@@ -984,7 +995,11 @@ int editor_element[] =
   EL_SOKOBAN_FIELD_EMPTY,
   EL_SOKOBAN_FIELD_FULL,
   EL_STEELWALL,
+};
+int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
 
+int editor_el_supaplex[] =
+{
   EL_CHAR('S'),
   EL_CHAR('U'),
   EL_CHAR('P'),
@@ -1044,7 +1059,11 @@ int editor_element[] =
   EL_SP_HARD_BASE6,
   EL_SP_CHIP_UPPER,
   EL_SP_CHIP_LOWER,
+};
+int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
 
+int editor_el_diamond_caves[] =
+{
   EL_CHAR('D'),
   EL_CHAR('I'),
   EL_CHAR('A'),
@@ -1124,7 +1143,11 @@ int editor_element[] =
   EL_SHIELD_DEADLY,
   EL_EXTRA_TIME,
   EL_EMPTY,
+};
+int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
 
+int editor_el_dx_boulderdash[] =
+{
   EL_CHAR('D'),
   EL_CHAR('X'),
   EL_CHAR('-'),
@@ -1163,85 +1186,12 @@ int editor_element[] =
   EL_TRAP,
   EL_DX_SUPABOMB,
   EL_EMPTY,
-  EL_EMPTY,
+  EL_EMPTY
+};
+int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
 
-  /*
-  EL_CHAR('D'),
-  EL_CHAR('Y'),
-  EL_CHAR('N'),
-  EL_CHAR('A'),
-
-  EL_CHAR('B'),
-  EL_CHAR('L'),
-  EL_CHAR('A'),
-  EL_CHAR('S'),
-
-  EL_CHAR_MINUS,
-  EL_CHAR('T'),
-  EL_CHAR('E'),
-  EL_CHAR('R'),
-  */
-
-  EL_CHAR('C'),
-  EL_CHAR('U'),
-  EL_CHAR('S'),
-  EL_CHAR('-'),
-
-  EL_CHAR('T'),
-  EL_CHAR('O'),
-  EL_CHAR('M'),
-  EL_CHAR(' '),
-
-  EL_CHAR('E'),
-  EL_CHAR('L'),
-  EL_CHAR('E'),
-  EL_CHAR('M'),
-
-  EL_CHAR('E'),
-  EL_CHAR('N'),
-  EL_CHAR('T'),
-  EL_CHAR('S'),
-
-  EL_GENERIC_START + 0,
-  EL_GENERIC_START + 1,
-  EL_GENERIC_START + 2,
-  EL_GENERIC_START + 3,
-
-  EL_GENERIC_START + 4,
-  EL_GENERIC_START + 5,
-  EL_GENERIC_START + 6,
-  EL_GENERIC_START + 7,
-
-  EL_GENERIC_START + 8,
-  EL_GENERIC_START + 9,
-  EL_GENERIC_START + 10,
-  EL_GENERIC_START + 11,
-
-  EL_GENERIC_START + 12,
-  EL_GENERIC_START + 13,
-  EL_GENERIC_START + 14,
-  EL_GENERIC_START + 15,
-
-  EL_GENERIC_START + 16,
-  EL_GENERIC_START + 17,
-  EL_GENERIC_START + 18,
-  EL_GENERIC_START + 19,
-
-  EL_GENERIC_START + 20,
-  EL_GENERIC_START + 21,
-  EL_GENERIC_START + 22,
-  EL_GENERIC_START + 23,
-
-  EL_GENERIC_START + 24,
-  EL_GENERIC_START + 25,
-  EL_GENERIC_START + 26,
-  EL_GENERIC_START + 27,
-
-  EL_GENERIC_START + 28,
-  EL_GENERIC_START + 29,
-  EL_GENERIC_START + 30,
-  EL_GENERIC_START + 31,
-
+int editor_el_chars[] =
+{
   EL_CHAR('T'),
   EL_CHAR('E'),
   EL_CHAR('X'),
@@ -1332,7 +1282,284 @@ int editor_element[] =
   EL_CHAR('´'),
   EL_CHAR('|')
 };
-int elements_in_list = sizeof(editor_element)/sizeof(int);
+int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
+
+int editor_el_custom[] =
+{
+  EL_CHAR('C'),
+  EL_CHAR('U'),
+  EL_CHAR('S'),
+  EL_CHAR('-'),
+
+  EL_CHAR('T'),
+  EL_CHAR('O'),
+  EL_CHAR('M'),
+  EL_CHAR(' '),
+
+  EL_CHAR('E'),
+  EL_CHAR('L'),
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+
+  EL_CHAR('E'),
+  EL_CHAR('N'),
+  EL_CHAR('T'),
+  EL_CHAR('S'),
+
+  EL_CUSTOM_START + 0,
+  EL_CUSTOM_START + 1,
+  EL_CUSTOM_START + 2,
+  EL_CUSTOM_START + 3,
+
+  EL_CUSTOM_START + 4,
+  EL_CUSTOM_START + 5,
+  EL_CUSTOM_START + 6,
+  EL_CUSTOM_START + 7,
+
+  EL_CUSTOM_START + 8,
+  EL_CUSTOM_START + 9,
+  EL_CUSTOM_START + 10,
+  EL_CUSTOM_START + 11,
+
+  EL_CUSTOM_START + 12,
+  EL_CUSTOM_START + 13,
+  EL_CUSTOM_START + 14,
+  EL_CUSTOM_START + 15,
+
+  EL_CUSTOM_START + 16,
+  EL_CUSTOM_START + 17,
+  EL_CUSTOM_START + 18,
+  EL_CUSTOM_START + 19,
+
+  EL_CUSTOM_START + 20,
+  EL_CUSTOM_START + 21,
+  EL_CUSTOM_START + 22,
+  EL_CUSTOM_START + 23,
+
+  EL_CUSTOM_START + 24,
+  EL_CUSTOM_START + 25,
+  EL_CUSTOM_START + 26,
+  EL_CUSTOM_START + 27,
+
+  EL_CUSTOM_START + 28,
+  EL_CUSTOM_START + 29,
+  EL_CUSTOM_START + 30,
+  EL_CUSTOM_START + 31,
+
+  EL_CUSTOM_START + 32,
+  EL_CUSTOM_START + 33,
+  EL_CUSTOM_START + 34,
+  EL_CUSTOM_START + 35,
+
+  EL_CUSTOM_START + 36,
+  EL_CUSTOM_START + 37,
+  EL_CUSTOM_START + 38,
+  EL_CUSTOM_START + 39,
+
+  EL_CUSTOM_START + 40,
+  EL_CUSTOM_START + 41,
+  EL_CUSTOM_START + 42,
+  EL_CUSTOM_START + 43,
+
+  EL_CUSTOM_START + 44,
+  EL_CUSTOM_START + 45,
+  EL_CUSTOM_START + 46,
+  EL_CUSTOM_START + 47,
+
+  EL_CUSTOM_START + 48,
+  EL_CUSTOM_START + 49,
+  EL_CUSTOM_START + 50,
+  EL_CUSTOM_START + 51,
+
+  EL_CUSTOM_START + 52,
+  EL_CUSTOM_START + 53,
+  EL_CUSTOM_START + 54,
+  EL_CUSTOM_START + 55,
+
+  EL_CUSTOM_START + 56,
+  EL_CUSTOM_START + 57,
+  EL_CUSTOM_START + 58,
+  EL_CUSTOM_START + 59,
+
+  EL_CUSTOM_START + 60,
+  EL_CUSTOM_START + 61,
+  EL_CUSTOM_START + 62,
+  EL_CUSTOM_START + 63,
+
+  EL_CUSTOM_START + 64,
+  EL_CUSTOM_START + 65,
+  EL_CUSTOM_START + 66,
+  EL_CUSTOM_START + 67,
+
+  EL_CUSTOM_START + 68,
+  EL_CUSTOM_START + 69,
+  EL_CUSTOM_START + 70,
+  EL_CUSTOM_START + 71,
+
+  EL_CUSTOM_START + 72,
+  EL_CUSTOM_START + 73,
+  EL_CUSTOM_START + 74,
+  EL_CUSTOM_START + 75,
+
+  EL_CUSTOM_START + 76,
+  EL_CUSTOM_START + 77,
+  EL_CUSTOM_START + 78,
+  EL_CUSTOM_START + 79,
+
+  EL_CUSTOM_START + 80,
+  EL_CUSTOM_START + 81,
+  EL_CUSTOM_START + 82,
+  EL_CUSTOM_START + 83,
+
+  EL_CUSTOM_START + 84,
+  EL_CUSTOM_START + 85,
+  EL_CUSTOM_START + 86,
+  EL_CUSTOM_START + 87,
+
+  EL_CUSTOM_START + 88,
+  EL_CUSTOM_START + 89,
+  EL_CUSTOM_START + 90,
+  EL_CUSTOM_START + 91,
+
+  EL_CUSTOM_START + 92,
+  EL_CUSTOM_START + 93,
+  EL_CUSTOM_START + 94,
+  EL_CUSTOM_START + 95,
+
+  EL_CUSTOM_START + 96,
+  EL_CUSTOM_START + 97,
+  EL_CUSTOM_START + 98,
+  EL_CUSTOM_START + 99,
+
+  EL_CUSTOM_START + 100,
+  EL_CUSTOM_START + 101,
+  EL_CUSTOM_START + 102,
+  EL_CUSTOM_START + 103,
+
+  EL_CUSTOM_START + 104,
+  EL_CUSTOM_START + 105,
+  EL_CUSTOM_START + 106,
+  EL_CUSTOM_START + 107,
+
+  EL_CUSTOM_START + 108,
+  EL_CUSTOM_START + 109,
+  EL_CUSTOM_START + 110,
+  EL_CUSTOM_START + 111,
+
+  EL_CUSTOM_START + 112,
+  EL_CUSTOM_START + 113,
+  EL_CUSTOM_START + 114,
+  EL_CUSTOM_START + 115,
+
+  EL_CUSTOM_START + 116,
+  EL_CUSTOM_START + 117,
+  EL_CUSTOM_START + 118,
+  EL_CUSTOM_START + 119,
+
+  EL_CUSTOM_START + 120,
+  EL_CUSTOM_START + 121,
+  EL_CUSTOM_START + 122,
+  EL_CUSTOM_START + 123,
+
+  EL_CUSTOM_START + 124,
+  EL_CUSTOM_START + 125,
+  EL_CUSTOM_START + 126,
+  EL_CUSTOM_START + 127
+};
+int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
+
+int *editor_elements = NULL;	/* dynamically allocated */
+int num_editor_elements = 0;	/* dynamically determined */
+
+struct
+{
+  boolean *setup_value;
+  int *element_list;
+  int *element_list_size;
+
+  boolean last_setup_value;
+}
+editor_elements_info[] =
+{
+  { &setup.editor.el_boulderdash,	editor_el_boulderdash,
+    &num_editor_el_boulderdash						},
+  { &setup.editor.el_emerald_mine,	editor_el_emerald_mine,
+    &num_editor_el_emerald_mine						},
+  { &setup.editor.el_more,		editor_el_more,
+    &num_editor_el_more							},
+  { &setup.editor.el_sokoban,		editor_el_sokoban,
+    &num_editor_el_sokoban						},
+  { &setup.editor.el_supaplex,		editor_el_supaplex,
+    &num_editor_el_supaplex						},
+  { &setup.editor.el_diamond_caves,	editor_el_diamond_caves,
+    &num_editor_el_diamond_caves					},
+  { &setup.editor.el_dx_boulderdash,	editor_el_dx_boulderdash,
+    &num_editor_el_dx_boulderdash					},
+  { &setup.editor.el_chars,		editor_el_chars,
+    &num_editor_el_chars						},
+  { &setup.editor.el_custom,		editor_el_custom,
+    &num_editor_el_custom						},
+  { NULL,				NULL,
+    NULL								}
+};
+
+static void ReinitializeElementList()
+{
+  int pos = 0;
+  int i, j;
+
+  if (editor_elements != NULL)
+    free(editor_elements);
+
+  num_editor_elements = 0;
+
+  /* determine size of element list */
+  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    if (*editor_elements_info[i].setup_value)
+      num_editor_elements += *editor_elements_info[i].element_list_size;
+
+  if (num_editor_elements < ED_NUM_ELEMENTLIST_BUTTONS)
+  {
+    /* workaround: offer at least as many elements as element buttons exist */
+    int list_nr = 1;	/* see above: editor_elements_info for Emerald Mine */
+
+    *editor_elements_info[list_nr].setup_value = TRUE;
+    num_editor_elements += *editor_elements_info[list_nr].element_list_size;
+  }
+
+  editor_elements = checked_malloc(num_editor_elements * sizeof(int));
+
+  /* fill element list */
+  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    if (*editor_elements_info[i].setup_value)
+      for (j=0; j<*editor_elements_info[i].element_list_size; j++)
+	editor_elements[pos++] = editor_elements_info[i].element_list[j];
+}
+
+static void ReinitializeElementListButtons()
+{
+  static boolean initialization_needed = TRUE;
+  int i;
+
+  if (!initialization_needed)	/* check if editor element setup has changed */
+    for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+      if (editor_elements_info[i].last_setup_value !=
+	  *editor_elements_info[i].setup_value)
+	initialization_needed = TRUE;
+
+  if (!initialization_needed)
+    return;
+
+  FreeLevelEditorGadgets();
+  CreateLevelEditorGadgets();
+
+  /* store current setup values for next invocation of this function */
+  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    editor_elements_info[i].last_setup_value =
+      *editor_elements_info[i].setup_value;
+
+  initialization_needed = FALSE;
+}
 
 static char *getElementInfoText(int element)
 {
@@ -1546,6 +1773,7 @@ static void CreateControlButtons()
     int x = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
     int y = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
     int id = GADGET_ID_ELEMENTLIST_FIRST + i;
+    int element = editor_elements[i];
 
     event_mask = GD_EVENT_RELEASED;
 
@@ -1556,14 +1784,13 @@ static void CreateControlButtons()
     gd_x2 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS;
     gd_y  = DOOR_GFX_PAGEY1 + ED_ELEMENTLIST_YPOS;
 
-    getMiniGraphicSource(el2img(editor_element[i]),
-			 &deco_bitmap, &deco_x, &deco_y);
+    getMiniGraphicSource(el2img(element), &deco_bitmap, &deco_x, &deco_y);
     deco_xpos = (ED_ELEMENTLIST_XSIZE - MINI_TILEX) / 2;
     deco_ypos = (ED_ELEMENTLIST_YSIZE - MINI_TILEY) / 2;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
-		      GDI_INFO_TEXT, getElementInfoText(editor_element[i]),
+		      GDI_INFO_TEXT, getElementInfoText(element),
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
 		      GDI_WIDTH, ED_ELEMENTLIST_XSIZE,
@@ -1877,7 +2104,7 @@ static void CreateScrollbarGadgets()
 
     if (i == ED_SCROLLBAR_ID_LIST_VERTICAL)
     {
-      items_max = elements_in_list / ED_ELEMENTLIST_BUTTONS_HORIZ;
+      items_max = num_editor_elements / ED_ELEMENTLIST_BUTTONS_HORIZ;
       items_visible = ED_ELEMENTLIST_BUTTONS_VERT;
       item_position = 0;
     }
@@ -2017,6 +2244,8 @@ static void CreateCheckbuttonGadgets()
 
 void CreateLevelEditorGadgets()
 {
+  ReinitializeElementList();
+
   CreateControlButtons();
   CreateCounterButtons();
   CreateDrawingAreas();
@@ -2234,6 +2463,9 @@ void DrawLevelEd()
 
   redraw_mask |= REDRAW_ALL;
 
+  ReinitializeElementListButtons();	/* only needed after setup changes */
+
+  UnmapTapeButtons();
   MapControlButtons();
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
@@ -3909,8 +4141,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	if (element_shift < 0)
 	  element_shift = 0;
-	if (element_shift > elements_in_list - ED_NUM_ELEMENTLIST_BUTTONS)
-	  element_shift = elements_in_list - ED_NUM_ELEMENTLIST_BUTTONS;
+	if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+	  element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
 
 	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
 		     GDI_SCROLLBAR_ITEM_POSITION,
@@ -3922,7 +4154,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetDesign *gd = &gi->deco.design;
-	int element = editor_element[element_shift + i];
+	int element = editor_elements[element_shift + i];
 
 	UnmapGadget(gi);
 	getMiniGraphicSource(el2img(element), &gd->bitmap, &gd->x, &gd->y);
@@ -4082,7 +4314,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  id <= GADGET_ID_ELEMENTLIST_LAST)
       {
 	int element_position = id - GADGET_ID_ELEMENTLIST_FIRST;
-	int new_element = editor_element[element_position + element_shift];
+	int new_element = editor_elements[element_position + element_shift];
 
 	PickDrawingElement(button, new_element);
 

@@ -1229,34 +1229,48 @@ void SaveScore(int level_nr)
 
 #define NUM_GLOBAL_SETUP_TOKENS			22
 
+/* editor setup */
+#define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
+#define SETUP_TOKEN_EDITOR_EL_EMERALD_MINE	1
+#define SETUP_TOKEN_EDITOR_EL_MORE		2
+#define SETUP_TOKEN_EDITOR_EL_SOKOBAN		3
+#define SETUP_TOKEN_EDITOR_EL_SUPAPLEX		4
+#define SETUP_TOKEN_EDITOR_EL_DIAMOND_CAVES	5
+#define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	6
+#define SETUP_TOKEN_EDITOR_EL_CHARS		7
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM		8
+
+#define NUM_EDITOR_SETUP_TOKENS			9
+
 /* shortcut setup */
-#define SETUP_TOKEN_SAVE_GAME			0
-#define SETUP_TOKEN_LOAD_GAME			1
-#define SETUP_TOKEN_TOGGLE_PAUSE		2
+#define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
+#define SETUP_TOKEN_SHORTCUT_LOAD_GAME		1
+#define SETUP_TOKEN_SHORTCUT_TOGGLE_PAUSE	2
 
 #define NUM_SHORTCUT_SETUP_TOKENS		3
 
 /* player setup */
-#define SETUP_TOKEN_USE_JOYSTICK		0
-#define SETUP_TOKEN_JOY_DEVICE_NAME		1
-#define SETUP_TOKEN_JOY_XLEFT			2
-#define SETUP_TOKEN_JOY_XMIDDLE			3
-#define SETUP_TOKEN_JOY_XRIGHT			4
-#define SETUP_TOKEN_JOY_YUPPER			5
-#define SETUP_TOKEN_JOY_YMIDDLE			6
-#define SETUP_TOKEN_JOY_YLOWER			7
-#define SETUP_TOKEN_JOY_SNAP			8
-#define SETUP_TOKEN_JOY_BOMB			9
-#define SETUP_TOKEN_KEY_LEFT			10
-#define SETUP_TOKEN_KEY_RIGHT			11
-#define SETUP_TOKEN_KEY_UP			12
-#define SETUP_TOKEN_KEY_DOWN			13
-#define SETUP_TOKEN_KEY_SNAP			14
-#define SETUP_TOKEN_KEY_BOMB			15
+#define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
+#define SETUP_TOKEN_PLAYER_JOY_DEVICE_NAME	1
+#define SETUP_TOKEN_PLAYER_JOY_XLEFT		2
+#define SETUP_TOKEN_PLAYER_JOY_XMIDDLE		3
+#define SETUP_TOKEN_PLAYER_JOY_XRIGHT		4
+#define SETUP_TOKEN_PLAYER_JOY_YUPPER		5
+#define SETUP_TOKEN_PLAYER_JOY_YMIDDLE		6
+#define SETUP_TOKEN_PLAYER_JOY_YLOWER		7
+#define SETUP_TOKEN_PLAYER_JOY_SNAP		8
+#define SETUP_TOKEN_PLAYER_JOY_BOMB		9
+#define SETUP_TOKEN_PLAYER_KEY_LEFT		10
+#define SETUP_TOKEN_PLAYER_KEY_RIGHT		11
+#define SETUP_TOKEN_PLAYER_KEY_UP		12
+#define SETUP_TOKEN_PLAYER_KEY_DOWN		13
+#define SETUP_TOKEN_PLAYER_KEY_SNAP		14
+#define SETUP_TOKEN_PLAYER_KEY_BOMB		15
 
 #define NUM_PLAYER_SETUP_TOKENS			16
 
 static struct SetupInfo si;
+static struct SetupEditorInfo sei;
 static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
 
@@ -1285,6 +1299,20 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.override_level_graphics, "override_level_graphics"	},
   { TYPE_SWITCH, &si.override_level_sounds,   "override_level_sounds"	},
   { TYPE_SWITCH, &si.override_level_music,    "override_level_music"	},
+};
+
+static struct TokenInfo editor_setup_tokens[] =
+{
+  /* shortcut setup */
+  { TYPE_SWITCH, &sei.el_boulderdash,	"editor.el_boulderdash"		},
+  { TYPE_SWITCH, &sei.el_emerald_mine,	"editor.el_emerald_mine"	},
+  { TYPE_SWITCH, &sei.el_more,		"editor.el_more"		},
+  { TYPE_SWITCH, &sei.el_sokoban,	"editor.el_sokoban"		},
+  { TYPE_SWITCH, &sei.el_supaplex,	"editor.el_supaplex"		},
+  { TYPE_SWITCH, &sei.el_diamond_caves,	"editor.el_diamond_caves"	},
+  { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
+  { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
+  { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -1347,6 +1375,16 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
 
+  si->editor.el_boulderdash = TRUE;
+  si->editor.el_emerald_mine = TRUE;
+  si->editor.el_more = TRUE;
+  si->editor.el_sokoban = TRUE;
+  si->editor.el_supaplex = TRUE;
+  si->editor.el_diamond_caves = TRUE;
+  si->editor.el_dx_boulderdash = TRUE;
+  si->editor.el_chars = TRUE;
+  si->editor.el_custom = FALSE;
+
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
   si->shortcut.toggle_pause = DEFAULT_KEY_TOGGLE_PAUSE;
@@ -1385,6 +1423,13 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
     setSetupInfo(global_setup_tokens, i,
 		 getTokenValue(setup_file_list, global_setup_tokens[i].text));
   setup = si;
+
+  /* editor setup */
+  sei = setup.editor;
+  for (i=0; i<NUM_EDITOR_SETUP_TOKENS; i++)
+    setSetupInfo(editor_setup_tokens, i,
+		 getTokenValue(setup_file_list,editor_setup_tokens[i].text));
+  setup.editor = sei;
 
   /* shortcut setup */
   ssi = setup.shortcut;
@@ -1470,12 +1515,19 @@ void SaveSetup()
   si = setup;
   for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
   {
-    fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
-
     /* just to make things nicer :) */
-    if (i == SETUP_TOKEN_PLAYER_NAME || i == SETUP_TOKEN_GRAPHICS_SET - 1)
+    if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
+	i == SETUP_TOKEN_GRAPHICS_SET)
       fprintf(file, "\n");
+
+    fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
   }
+
+  /* editor setup */
+  sei = setup.editor;
+  fprintf(file, "\n");
+  for (i=0; i<NUM_EDITOR_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(editor_setup_tokens, "", i));
 
   /* shortcut setup */
   ssi = setup.shortcut;

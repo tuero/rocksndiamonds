@@ -332,6 +332,19 @@ struct SetupInputInfo
   struct SetupKeyboardInfo key;
 };
 
+struct SetupEditorInfo
+{
+  boolean el_boulderdash;
+  boolean el_emerald_mine;
+  boolean el_more;
+  boolean el_sokoban;
+  boolean el_supaplex;
+  boolean el_diamond_caves;
+  boolean el_dx_boulderdash;
+  boolean el_chars;
+  boolean el_custom;
+};
+
 struct SetupShortcutInfo
 {
   Key save_game;
@@ -368,6 +381,7 @@ struct SetupInfo
   boolean override_level_sounds;
   boolean override_level_music;
 
+  struct SetupEditorInfo editor;
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
 };

@@ -473,13 +473,13 @@ struct ConfigInfo image_config[] =
   { "sp_electron.delay",			"2"			},
 
   { "sp_terminal",				"RocksSP.pcx"		},
-  { "sp_terminal.xpos",				"8"			},
-  { "sp_terminal.ypos",				"11"			},
+  { "sp_terminal.xpos",				"0"			},
+  { "sp_terminal.ypos",				"10"			},
   { "sp_terminal.frames",			"7"			},
   { "sp_terminal.delay",			"12"			},
   { "sp_terminal.active",			"RocksSP.pcx"		},
-  { "sp_terminal.active.xpos",			"8"			},
-  { "sp_terminal.active.ypos",			"12"			},
+  { "sp_terminal.active.xpos",			"0"			},
+  { "sp_terminal.active.ypos",			"11"			},
   { "sp_terminal.active.frames",		"7"			},
   { "sp_terminal.active.delay",			"4"			},
 
@@ -2071,7 +2071,7 @@ struct ConfigInfo image_config[] =
   { "stoneblock.ypos",				"1"			},
   { "stoneblock.frames",			"1"			},
 
-  /* images for generic elements and actions */
+  /* images for other elements and actions */
 
   { "player1",					"RocksHeroes.pcx"	},
   { "player1.xpos",				"0"			},
@@ -2566,7 +2566,7 @@ struct ConfigInfo image_config[] =
   { "scrollbar_yellow.frames",			"1"			},
 
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
-#include "conf_gen.c"	/* include auto-generated data structure definitions */
+#include "conf_cus.c"	/* include auto-generated data structure definitions */
 
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */

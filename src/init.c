@@ -701,9 +701,9 @@ void InitElementInfo()
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
       IMG_CHAR_START + (i - EL_CHAR_START);
 
-  for (i=EL_GENERIC_START; i<=EL_GENERIC_END; i++)
+  for (i=EL_CUSTOM_START; i<=EL_CUSTOM_END; i++)
     element_info[i].graphic[GFX_ACTION_DEFAULT] =
-      IMG_GENERIC_START + (i - EL_GENERIC_START);
+      IMG_CUSTOM_START + (i - EL_CUSTOM_START);
 
   i = 0;
   while (element_to_graphic[i].element > -1)

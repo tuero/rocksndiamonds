@@ -1,3 +1,7 @@
+Pre-Release Version 2.2.0rc2 [?? ??? ????]
+------------------------------------------
+	- added support for stereo WAV sound files
+
 Pre-Release Version 2.2.0rc1 [31 DEC 2002]
 ------------------------------------------
 	- level series artwork now configurable via level series config file
