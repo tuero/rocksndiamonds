@@ -40,14 +40,14 @@ static struct SoundControl emptySoundControl =
 };
 
 #if defined(PLATFORM_UNIX)
-static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
+static int stereo_volume[PSND_MAX_LEFT2RIGHT + 1];
 static short premix_first_buffer[SND_BLOCKSIZE];
 #if defined(AUDIO_STREAMING_DSP)
 static short premix_left_buffer[SND_BLOCKSIZE];
 static short premix_right_buffer[SND_BLOCKSIZE];
 static long premix_last_buffer[SND_BLOCKSIZE];
 #endif
-static short playing_buffer[SND_BLOCKSIZE];
+static byte playing_buffer[SND_BLOCKSIZE];
 #endif
 
 /* forward declaration of internal functions */
@@ -453,12 +453,19 @@ void SoundServer(void)
 	  /* put last mixing buffer to final playing buffer */
 	  for(i=0; i<max_sample_size * (stereo ? 2 : 1); i++)
 	  {
+	    /* cut off at 17 bit value */
 	    if (premix_last_buffer[i] < -65535)
-	      playing_buffer[i] = -32767;
+	      premix_last_buffer[i] = -65535;
 	    else if (premix_last_buffer[i] > 65535)
-	      playing_buffer[i] = 32767;
-	    else
-	      playing_buffer[i] = (short)(premix_last_buffer[i] >> 1);
+	      premix_last_buffer[i] = 65535;
+
+	    /* shift to 16 bit value */
+	    premix_last_buffer[i] >>= 1;
+
+	    /* fill playing buffer for "signed 16 bit little endian" audio
+	       format (independently of endianess of "short" integer type) */
+	    playing_buffer[2 * i + 0] = premix_last_buffer[i] & 0xff;
+	    playing_buffer[2 * i + 1] = premix_last_buffer[i] >> 8;
 	  }
 
 	  /* finally play the sound fragment */
