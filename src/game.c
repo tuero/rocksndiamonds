@@ -5310,14 +5310,14 @@ static void ChangeActiveTrap(int x, int y)
 
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
-#if 1
-  /* check if the new element is unaccessible for the player */
-  if (IS_PLAYER(x, y) && !IS_ACCESSIBLE(target_element))
+  /* check if element under player changes from accessible to unaccessible
+     (needed for special case of dropping element which then changes) */
+  if (IS_PLAYER(x, y) &&
+      IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(target_element))
   {
     Bang(x, y);
     return;
   }
-#endif
 
   RemoveField(x, y);
   Feld[x][y] = target_element;
