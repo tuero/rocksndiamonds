@@ -1,3 +1,11 @@
+2003-09-07	src/libgame/misc.c
+	* added support for loading various music formats through SDL_mixer
+
+2003-09-06	(various source files)
+	* fixed several nasty bugs that may have caused crashes on some systems
+	* added envelope content which gets displayed when collecting envelope
+	* added multiple change event pages for custom elements
+
 2003-08-24	src/game.c
 	* fixed problem with player animation when snapping and moving
 

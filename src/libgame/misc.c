@@ -1518,37 +1518,77 @@ boolean fileExists(char *filename)
   return (access(filename, F_OK) == 0);
 }
 
-boolean FileIsGraphic(char *filename)
+boolean fileHasPrefix(char *basename, char *prefix)
 {
-  if (strlen(filename) > 4 &&
-      strcmp(&filename[strlen(filename) - 4], ".pcx") == 0)
+  static char *basename_lower = NULL;
+  int basename_length, prefix_length;
+
+  if (basename_lower != NULL)
+    free(basename_lower);
+
+  if (basename == NULL || prefix == NULL)
+    return FALSE;
+
+  basename_lower = getStringToLower(basename);
+  basename_length = strlen(basename_lower);
+  prefix_length = strlen(prefix);
+
+  if (basename_length > prefix_length + 1 &&
+      basename_lower[prefix_length] == '.' &&
+      strncmp(basename_lower, prefix, prefix_length) == 0)
     return TRUE;
 
   return FALSE;
+}
+
+boolean fileHasSuffix(char *basename, char *suffix)
+{
+  static char *basename_lower = NULL;
+  int basename_length, suffix_length;
+
+  if (basename_lower != NULL)
+    free(basename_lower);
+
+  if (basename == NULL || suffix == NULL)
+    return FALSE;
+
+  basename_lower = getStringToLower(basename);
+  basename_length = strlen(basename_lower);
+  suffix_length = strlen(suffix);
+
+  if (basename_length > suffix_length + 1 &&
+      basename_lower[basename_length - suffix_length - 1] == '.' &&
+      strcmp(&basename_lower[basename_length - suffix_length], suffix) == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+boolean FileIsGraphic(char *basename)
+{
+  return fileHasSuffix(basename, "pcx");
 }
 
 boolean FileIsSound(char *basename)
 {
-  if (strlen(basename) > 4 &&
-      strcmp(&basename[strlen(basename) - 4], ".wav") == 0)
-    return TRUE;
-
-  return FALSE;
+  return fileHasSuffix(basename, "wav");
 }
 
 boolean FileIsMusic(char *basename)
 {
-  /* "music" can be a WAV (loop) file or (if compiled with SDL) a MOD file */
-
   if (FileIsSound(basename))
     return TRUE;
 
 #if defined(TARGET_SDL)
-  if (strlen(basename) > 4 &&
-      (strcmp(&basename[strlen(basename) - 4], ".mod") == 0 ||
-       strcmp(&basename[strlen(basename) - 4], ".MOD") == 0 ||
-       strncmp(basename, "mod.", 4) == 0 ||
-       strncmp(basename, "MOD.", 4) == 0))
+  if (fileHasPrefix(basename, "mod") ||
+      fileHasSuffix(basename, "mod") ||
+      fileHasSuffix(basename, "s3m") ||
+      fileHasSuffix(basename, "it") ||
+      fileHasSuffix(basename, "xm") ||
+      fileHasSuffix(basename, "midi") ||
+      fileHasSuffix(basename, "mid") ||
+      fileHasSuffix(basename, "mp3") ||
+      fileHasSuffix(basename, "ogg"))
     return TRUE;
 #endif
 
