@@ -84,6 +84,7 @@ static void animscreen(void)
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {
     dy = y % MAX_BUF_YSIZE;
+
     for (x = left; x < left + MAX_BUF_XSIZE; x++)
     {
       dx = x % MAX_BUF_XSIZE;

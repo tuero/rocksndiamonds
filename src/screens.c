@@ -1957,6 +1957,7 @@ static struct TokenInfo setup_info_editor[] =
 #endif
   { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"BoulderDash:"	},
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
+  { TYPE_SWITCH,	&setup.editor.el_emerald_mine_club,"E.M. Club:"	},
   { TYPE_SWITCH,	&setup.editor.el_more,		"More:"		},
   { TYPE_SWITCH,	&setup.editor.el_sokoban,	"Sokoban:"	},
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},

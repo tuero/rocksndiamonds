@@ -4096,7 +4096,11 @@ static void ReinitializeElementList()
 
   checked_free(editor_elements);
 
+#if 0
   if (!initialized)
+#else
+  /* reload user defined element list for each invocation of level editor */
+#endif
   {
     /* initialize optional user defined element list */
     LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,

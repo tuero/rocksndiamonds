@@ -404,7 +404,12 @@ char *getEditorSetupFilename()
   static char *filename = NULL;
 
   checked_free(filename);
+  filename = getPath2(getCurrentLevelDir(), EDITORSETUP_FILENAME);
 
+  if (fileExists(filename))
+    return filename;
+
+  checked_free(filename);
   filename = getPath2(getSetupDir(), EDITORSETUP_FILENAME);
 
   return filename;
@@ -438,8 +443,8 @@ char *getLevelSetInfoFilename()
   char *basenames[] =
   {
     "README",
-    "README.txt",
     "README.TXT",
+    "README.txt",
     "Readme",
     "Readme.txt",
     "readme",
@@ -452,8 +457,8 @@ char *getLevelSetInfoFilename()
   for (i = 0; basenames[i] != NULL; i++)
   {
     checked_free(filename);
-
     filename = getPath2(getCurrentLevelDir(), basenames[i]);
+
     if (fileExists(filename))
       return filename;
   }
