@@ -1,0 +1,89 @@
+
+Some recommendations for more fun playing Rocks'n'Diamonds:
+===========================================================
+
+About sound
+-----------
+It is highly recommended to have a decent sound interface for playing
+this game (although it only comes with bad-quality 8000-Hz-samples to
+save memory and to be compatible with /dev/audio).
+
+The best sound platform is an actual Linux system with (at least) kernel
+1.2.x, because it offers some nice real-time sound features which are
+needed to have background music loops in the game.
+
+On all other systems you don't have music loops, but you still have all
+the other sounds.
+
+
+About game speed
+----------------
+You should have a relatively fast hardware.
+
+The game was developed on a i486/33 (which is three years old now),
+and you should probably better not try to run it on a slower system.
+
+You should have an accelerated graphic card; I have found out that it
+starts being playable on my 486/33 with an old ISA cirrus logic 5426
+graphic card, which has a blitter that is supported by XFree86[tm],
+but that it was nearly unplayable on a 486/66 with old, unaccelerated
+ET4000.
+
+If all works fine, you should have something around 30 frames per second.
+
+If you think that the game is to slow to play, you should try out the
+following things:
+
+- Set "Buffered Gfx" to "off" in the setup menu. Normally (on a fast
+  enough system) you should use buffered graphics, which means that
+  all graphics is drawn into an invisible Pixmap and is then copied
+  to the X11 window to avoid flickering. If you disable this double
+  buffering, the graphic is directly drawn into the window. This can
+  cause some slight flickering, but makes graphic operations roughly
+  twice as fast compared to double buffering.
+
+- Set "Game Music" to "off" in the setup menu (and maybe "sound loops"
+  too). Where disabling buffered graphics may be required with slow
+  graphics hardware, disabling sound is especially recommended on slow
+  CPU systems (486/33 and slower), because the sound server eats up a
+  significant amount of CPU time when playing long sounds.
+
+You might also notice that bigger levels tend to be slower on slow
+systems.
+
+About the option "Fading" in the setup menu: It gives a nice looking
+fading when switching to a new screen, but you should really only try
+this out if you think that you have a very fast graphics hardware.
+
+
+About music
+-----------
+The background music loops are ripped out from several nice music albums.
+Just have a look at the info screen to find out from which album each
+sound loop came from -- they are all very well done pieces of music, but
+unfortunately they don't sound better after converting them to 8 kHz
+samples (to conform to standard SUN /dev/audio). Maybe I change this to
+a better quality in the future, but at the moment, where the sounds
+directory has a size of nearly a megabyte, I'll stay with 8 kHz samples.
+
+So, if you have a non-Linux system (which cannot play sound loops) or
+don't like the "telephone quality" of the music loops, just get some of
+these CDs and play them while your playing the game! ;-)
+
+
+About game-play
+---------------
+It is *strongly recommended* to play this game with a high-quality joystick.
+That means, throw your $10 joystick out of the window and buy a decent
+Competition-Pro Digital PC joystick or a high-quality CH Products Analog
+joystick. Believe me, it doubles the fun of playing the game.
+
+If you only have a normal Unix system (and no fine Linux system), you
+are forced to play with the keyboard. It works, but is not only less fun,
+but also more difficult with some levels, because you cannot move in
+diagonal directions with keyboard control at the moment. Another bad thing
+is that you will have some problems when pressing many keys at the same
+time. This might change in the future, when I implement a better keyboard
+handling which not only solves these problems but allows diagonal directions,
+too.
+

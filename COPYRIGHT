@@ -1,0 +1,25 @@
+This program is copyrighted (c) 1995 by Holger Schemel.
+
+It is freely distributable as long as no profit is made with it
+and as long as the package is left complete and unmodified.
+
+The fact that this program comes with full source does not mean
+that you can do what you want with it - it is only intended to
+give you the chance to build it on your own machine.
+
+If you want to distribute this program on CDROM, you have to ask for
+permission first -- just send me E-Mail and tell me what kind of
+CDROM it is. Normally I will give my permission if
+ - the CDROM itself contains only freely distributable software
+ - the author of this program (me!) gets a free copy of the CDROM
+ - the program is distributed in its original, unmodified package
+
+If the three conditions above are fulfilled, this permission will
+automatically given to the following CDROM distributions:
+ - InfoMagic "LINUX Developer's Resource"
+ - The Debian Linux Distribution CDROM
+ - any CDROM with a mirror of sunsite.unc.edu or a mirror of another
+   FTP server that contains this program
+
+If you are in doubt (e.g., want to distribute a pre-installed version),
+feel free to mail me about it (see the file 'README' in this archive).

@@ -1,0 +1,68 @@
+
+WHAT TO DO TO INSTALL "ROCKS_N_DIAMONDS-0.9" ON YOUR SYSTEM
+===========================================================
+
+If you have a Linux system (Intel based, a.out, kernel 1.2.x), you
+can use the precompiled binary.
+
+If you have another Unix system, or an ELF system or just want to
+compile the program by yourself, do the following:
+
+Edit the file "Makefile" and set the following options:
+
+XPM_INCLUDE_FILE	-	change this to the location where you
+				have your XPM-Library include file.
+
+				You must have the XPM-Library "libXpm"
+				installed on your system to run this game.
+				If you don't have it, look at your local
+				FTP site with X11 archive to get it! :)
+
+GAME_DIR		-	You can leave these values untouched
+				if you use the default location for
+				the game directory.
+				If you want to move it to other places in
+				your directory tree, just change them
+				accordingly. (You can use symlinks instead,
+				of course.)
+				You might want to set GAME_DIR to the full
+				path of the game in your file system, so
+				you don't have to go to the game directory
+				when you want to play it.
+
+SOUNDS			-	If you never want to hear any sounds,
+				set this to "-DNO_SOUNDS", but be warned:
+				It's much less fun playing without sound! :)
+				(The program detects by itself if it can
+				play sounds or not, anyway.)
+
+SCORE_ENTRIES		-	Set this to "-DONE_PER_NAME" if you want
+				to allow only one entry per player in the
+				score file for each level. This is useful
+				if there are many players to prevent one
+				single player to "flood" the Hall Of Fame
+				of every level completely with his name...
+				On single user systems, "-DMANY_PER_NAME"
+				might be useful to have your name more
+				than once in the list.
+
+SYSTEM			-	If you have problems with the default
+				settings, it might be useful to uncomment
+				one of the defines for "SYSTEM" in the
+				Makefile, which defines values like
+				"-DSYSV" and something like that.
+
+CC, INCL, LIBS		-	Set these ones to the appropriate values
+				you usually use on your system to compile.
+
+
+Now you can 'make clean' and 'make' and the game binary should be
+compiled right out of the box. I have tested it with "-Wall" on my
+system, so I hope that it compiles fine on other systems, too.
+
+The program should compile and run on Linux (of course),
+HP-UX, AIX, Net-BSD, SUN and IRIX.
+
+Have fun!
+
+Holger Schemel, 22. Oktober 1995

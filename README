@@ -1,0 +1,263 @@
+Welcome to
+
+   R O C K S   ' N '   D I A M O N D S
+   -----------------------------------
+
+A game for Unix/X11 by Holger Schemel, (c) 1995 by Holger Schemel.
+
+Introduction
+============
+This is a nice little game with color graphics and sound for your
+Unix system with color X11. You need an 8-Bit color display or better.
+It is not recommended on black&white systems, and maybe not on gray
+scale systems.
+
+If you know the game "Boulderdash" (Commodore C64) or "Emerald Mine"
+(Amiga), you know what "ROCKS'N'DIAMONDS" is about.
+
+
+Getting started
+===============
+Just 'cd' to the 'rocks_n_diamonds' directory and type 'rocksndiamonds'!
+This works only on Linux boxes, because the included binary was
+compiled for Linux systems. If you have another Unix system like
+HPUX, NetBSD or SUN, you first have to type 'make' to compile it.
+This may be needed on Linux systems, too, if you have an older
+system (kernel, libraries, ...) or if you have only ELF libraries.
+
+(The included binary was compiled on the following system:
+Kernel 1.2.13, libc 4.5.26, GCC 2.5.8, 'a.out' format)
+
+The Menues
+==========
+You can see eight blue circles on the left side of the eight green menu
+texts; these are buttons to activate the menu commands by simply clicking
+on them with the left mouse button. The button will then change to red.
+(You can control the menues over the keyboard or joystick, too. Just use
+the arrow keys and the 'Return' or 'Enter' key or, if you use a joystick,
+the appropriate direction and the fire button.)
+
+The menu 'name'
+---------------
+When you start the game the first time, your login name will appear in
+the 'NAME:' field. If you want to use a different name for playing, for
+example a funny player name or a name for cheating, you can click on the
+button and enter a new name.
+
+If you choose a certain special name, you will be in a cheat mode where
+you can choose all levels without playing the lower levels before... :)
+
+The menue 'level'
+-----------------
+If you have played some levels of this game, you can choose the already
+played levels at any time, but you cannot choose the higher levels. This
+means, you can choose levels from level 0 to the highest level that you
+have ever won. This is known as your 'handicap'.
+
+If the level number is red, you have choosen a 'ready' level, if it is
+yellow, you have choosen a 'user' level, which is blank and can be
+edited by yourself with the built-in level editor (see below).
+
+To choose new level series, click on the button on the left and choose
+the new level serie.
+
+Hall of fame
+------------
+Click on this button to see a list of the best players of this level.
+Click again to go back to the main menu.
+
+Level creator
+-------------
+This brings you to the level editor, if you have switched to a 'yellow'
+level, which are empty and can be filled by yourself. See below.
+
+Info screen
+-----------
+This screen shows you all elements which appear in the game and presents
+you the background music loops which you can listen to while playing the
+levels (only available on Linux systems).
+
+Start game
+----------
+This will start the game.
+
+Setup
+-----
+To change some things in the game, use the setup menu.
+You can enable/disable "Sound" (enables/disables _all_ sounds in
+the game), "Sound loops" (only allowed on Linux systems with
+VoxWare[tm] sound driver; don't worry if you never heard of it --
+it's the name of the standard Linux sound driver), "Game music"
+(can always be enabled on very fast systems [exception: you don't
+like it], on slower systems it will take some percent of CPU time
+which will slow things down a bit) and "Toons", which will forbid/
+permit the little animated toons.
+
+"Buffered Gfx" can be set to "off" on slower systems, "Fading" gives
+a nice fading effect when displaying new screens, but unfortunately
+I haven't found a system which is fast enough to display it so far.
+(Maybe this works better on highly accelerated X servers.) Better set
+this to "off" if you have a normal system...
+
+Set "auto-record" to "on" if you want to automatically record each game
+to tape.
+
+If you have a Linux system with a joystick, you can choose the "1st" or
+the "2nd" joystick port and use "Cal. Joystick" to calibrate it. Use
+"Save and exit" after calibration to save it for later playing sessions.
+
+"Exit" quits the setup menu without saving the changes, "Save and exit"
+will save and then return to the main menu.
+
+Quit
+----
+Exit the game.
+
+
+How To Play The Game
+====================
+When the game has started, you can see the playfield on the left side
+and a control field on the right side. The control field contains the
+following elements:
+
+Level indicator		Tells you which level you are playing.
+
+Emeralds		Shows you how many emeralds you still need
+			to win the current level.
+
+Dynamite		Shows you how many dynamite bombs you have.
+
+Keys			Shows you which keys you have in your inventory.
+
+Score			Shows the current score. In some levels there
+			are some extra items giving extra score points.
+
+Time			The seconds you have still left to play the level.
+
+Stop/Pause/Play		Game controls to stop the game, pause it and go on
+			playing. If the tape recorder is recording your
+			game, it is stopping/pausing/playing as well.
+
+Music buttons		The three music buttons can be used to control the
+			background music loop, the 'looping' sounds and
+			all other sounds. The little red light shows you
+			if it is enabled or disabled. On slower systems
+			(and a 486DX33 with Soundblaster _is_ a slower
+			system) it increases the game speed to turn off
+			background music. You can completely turn off all
+			sound effects in the setup menu, although it is
+			much more fun to have them enabled when it
+			doesn't eats up to much speed.
+
+			(A little note: The sound server currently needs
+			about 10% CPU time on my 486DX/33/SBPro system
+			when playing background music. I wonder if this
+			would get better with a better soundcard, like
+			Gravis Ultrasound, or if only pure CPU power
+			helps in this case...)
+
+About the game itself: Of course you know Boulderdash, so you will know
+how to play the game. :)
+If not: You can move your playing figure (the smiley) with the arrow
+keys or with the joystick (if you have no joystick and even no arrow
+keys on your keyboard, you can use the keys 'i', 'j', 'k' and 'm' for
+the directions. To 'snap' a field near you without moving to it, you
+can use the left fire button on your joystick (hold it down, move the
+stick to 'snap' the field, release the button) or the keys 'e', 's',
+'d' and 'x'. To place a piece of dynamite, use the right fire button
+on your joystick or use the 'b' key (and, after placing the dynamite,
+better see to move away from this field...).
+
+Just try the levels from the 'tutorial' level serie to see what most
+of the elements do or have a look at the info screen!
+
+Note: It is *highly recommended* to use a joystick for playing this
+game! It is possible to play it with the keyboard, but it is *much
+more fun* to play with a joystick, and some levels are very difficult
+to solve with the keyboard. So, the best platform for this game is a
+Linux system (which gives you background music, too).
+
+The Level Editor
+================
+To build your own levels, just choose a 'yellow', empty level. If you
+cannot find any 'yellow' levels, choose a different level serie or
+choose the higher level numbers (if you have a small 'handicap' number,
+the higher levels will be skipped to reach the 'empty' levels.
+
+Another way is to create your own level series. Just add a line to the
+file 'levels/ROCKS.levelinfo' with the following entries:
+- the name of the level directory (create this directory under 'levels')
+- the name of the level serie (don't use any whitespaces within the name)
+- the 'ready' (red) levels (start with zero)
+- the 'empty' (yellow) levels (set this to some number of blank levels)
+
+To edit a level, you can use all three mouse buttons to draw in the
+level window. Click into the elements field with one of the three buttons
+to remap it to the new element. Use the arrow widgets to scroll around in
+the level. Use the 'flood fill' field to init exactly ony flood fill
+operation in the level field (you will be prompted). Click on 'control
+window' to switch to the control window.
+
+In the control window you can modify different parameters like the size
+of the level playfield, the name of the level, the scores for different
+elements and something like that. The four 3x3 field on the upper left
+can be edited like the level field and indicate the 'contents' of smashed
+crunchers (just try it out with some crunchers in one of your own levels).
+
+'Undo & Exit' leaves the level editor, throwing away all the changes you
+have done to the level.
+'Save & Exit' leveas the level editor and saves the new level (the old one
+will be deleted).
+
+
+The Tape Recorder
+=================
+You can use the tape recorder to record games and play tapes of previously
+played games. Just use them like a normal video recorder.
+
+Recording a game on tape:
+-------------------------
+Just press the 'record' button (the one with the red point on it) and
+either press 'Start Game' or press on 'record' or 'pause' to end the
+pause mode and start playing and recording.
+
+If you have set "auto record" in the setup menu to "on", you just have
+to press 'Start Game' as usual.
+
+Saving a game tape:
+-------------------
+To save a tape to the tape file corresponding to the level (that means
+that you can only save one tape file for each level), just press the
+'eject' button (the very left button). Then you will be prompted if
+you really want to replace the old tape (if an old tape exists).
+
+Playing a tape:
+---------------
+Just press 'play' and then either 'play' or 'pause'.
+
+While recording or playing, you can press 'pause' to stop the recording
+or the playing of the tape and continue by pressing 'pause' again.
+You can use either the tape recorder buttons or the game control buttons
+for this purpose.
+
+
+And Now Have Fun!
+=================
+Have fun playing the game, building new levels and breaking all high
+scores! ;)
+
+If you have any comments, problems, suggestions, donations, flames,
+send them to
+
+	aeglos@valinor.owl.de
+or	aeglos@uni-paderborn.de
+
+or Snail Mail
+
+	Holger Schemel
+	Sennehof 28
+	33659 Bielefeld
+	GERMANY
+
+Have fun,
+		Holger
