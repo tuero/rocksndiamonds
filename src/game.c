@@ -6201,6 +6201,9 @@ void GameActions()
 
     tape_action[i] = PlayerActions(&stored_player[i], actual_player_action);
 
+    if (tape.recording && tape_action[i] && !tape.player_participates[i])
+      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
 
