@@ -78,6 +78,15 @@
 				 (s)==SND_TYGER || (s)==SND_VOYAGER || \
 				 (s)==SND_TWILIGHT)
 
+/* values for player movement speed (which is in fact a delay value) */
+#define MOVE_DELAY_NORMAL_SPEED	8
+#define MOVE_DELAY_HIGH_SPEED	4
+
+#define DOUBLE_MOVE_DELAY(x)	(x = (x <= MOVE_DELAY_HIGH_SPEED ? x * 2 : x))
+#define HALVE_MOVE_DELAY(x)	(x = (x >= MOVE_DELAY_HIGH_SPEED ? x / 2 : x))
+#define DOUBLE_PLAYER_SPEED(p)	(HALVE_MOVE_DELAY((p)->move_delay_value))
+#define HALVE_PLAYER_SPEED(p)	(DOUBLE_MOVE_DELAY((p)->move_delay_value))
+
 /* score for elements */
 #define SC_EDELSTEIN		0
 #define SC_DIAMANT		1
@@ -199,10 +208,6 @@ static void InitField(int x, int y, boolean init_game)
 	int jx = player->jx, jy = player->jy;
 
 	player->present = TRUE;
-
-	/*
-	if (!network_playing || player->connected)
-	*/
 
 	if (!options.network || player->connected)
 	{
@@ -387,7 +392,9 @@ void InitGame()
     player->move_delay = 0;
     player->last_move_dir = MV_NO_MOVING;
 
-    player->move_speed = (level.double_speed ? 4 : 8);
+    player->move_delay_value =
+      (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
     player->snapped = FALSE;
 
     player->gone = FALSE;
@@ -422,12 +429,7 @@ void InitGame()
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
-  /*
-  MoveSpeed = (level.double_speed ? 4 : 8);
-  ScrollStepSize = TILEX / MoveSpeed;
-  */
-
-  ScrollStepSize = 0;
+  ScrollStepSize = 0;	/* will be correctly initialized by ScrollScreen() */
 
   AllPlayersGone = FALSE;
   SiebAktiv = FALSE;
@@ -623,31 +625,19 @@ void InitGame()
 	      DOOR_GFX_PAGEX1 + XX_TIME, DOOR_GFX_PAGEY1 + YY_TIME,
 	      int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
-
-
-#if 0
-  DrawGameButton(BUTTON_GAME_STOP);
-  DrawGameButton(BUTTON_GAME_PAUSE);
-  DrawGameButton(BUTTON_GAME_PLAY);
-  DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (setup.sound_music  ? BUTTON_ON : 0));
-  DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (setup.sound_loops  ? BUTTON_ON : 0));
-  DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (setup.sound_simple ? BUTTON_ON : 0));
-#else
   UnmapGameButtons();
   game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
   game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
   game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
   MapGameButtons();
   MapTapeButtons();
-#endif
 
+  /* copy actual game buttons to door double buffer for OpenDoor() */
   XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
 	    DX + GAME_CONTROL_XPOS, DY + GAME_CONTROL_YPOS,
 	    GAME_CONTROL_XSIZE, 2 * GAME_CONTROL_YSIZE,
 	    DOOR_GFX_PAGEX1 + GAME_CONTROL_XPOS,
 	    DOOR_GFX_PAGEY1 + GAME_CONTROL_YPOS);
-
-
 
   OpenDoor(DOOR_OPEN_ALL);
 
@@ -659,8 +649,8 @@ void InitGame()
   if (options.verbose)
   {
     for (i=0; i<4; i++)
-      printf("Spieler %d %saktiv.\n",
-	     i+1, (stored_player[i].active ? "" : "nicht "));
+      printf("Player %d %sactive.\n",
+	     i + 1, (stored_player[i].active ? "" : "not "));
   }
 }
 
@@ -3391,32 +3381,19 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
 	player_action &= JOY_BUTTON;
 
       stored_player_action[player->index_nr] = player_action;
-
-#if 0
-      /* this allows cycled sequences of PlayerActions() */
-      if (num_stored_actions >= MAX_PLAYERS)
-      {
-	TapeRecordAction(stored_player_action);
-	num_stored_actions = 0;
-      }
-#endif
-
     }
     else if (tape.playing && snapped)
       SnapField(player, 0, 0);			/* stop snapping */
   }
   else
   {
+    /* no actions for this player (no input at player's configured device) */
+
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
     CheckGravityMovement(player);
 
-    /*
-    if (++player->frame_reset_delay > MoveSpeed)
-      player->Frame = 0;
-    */
-
-    if (++player->frame_reset_delay > player->move_speed)
+    if (++player->frame_reset_delay > player->move_delay_value)
       player->Frame = 0;
   }
 
@@ -3469,40 +3446,9 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
-  /*
-  if (tape.playing && tape.fast_forward)
-  {
-    char buf[100];
+  /* ---------- main game synchronization point ---------- */
 
-    sprintf(buf, "FFWD: %ld ms", action_delay_value);
-    print_debug(buf);
-  }
-  */
-
-
-  /* main game synchronization point */
-
-
-
-
-#if 1
   WaitUntilDelayReached(&action_delay, action_delay_value);
-#else
-
-  while (!DelayReached(&action_delay, action_delay_value))
-  {
-    char buf[100];
-
-    sprintf(buf, "%ld %ld %ld",
-	    Counter(), action_delay, action_delay_value);
-    print_debug(buf);
-  }
-  print_debug("done");
-
-#endif
-
-
-
 
   if (network_playing && !network_player_action_received)
   {
@@ -3530,14 +3476,6 @@ void GameActions()
       return;
     }
   }
-
-
-  /*
-  if (tape.pausing || (tape.playing && !TapePlayDelay()))
-    return;
-  else if (tape.recording)
-    TapeRecordDelay();
-  */
 
   if (tape.pausing)
     return;
@@ -3570,24 +3508,7 @@ void GameActions()
     int actual_player_action = stored_player[i].effective_action;
 
     if (stored_player[i].programmed_action)
-    {
-#if 0
-      /* this is very bad and need to be fixed!!! */
-      unsigned long move_delay = stored_player[i].move_delay;
-
-      /*
-      if (FrameReached(&move_delay, MoveSpeed))
-      */
-
-      if (FrameReached(&move_delay, stored_player[i].move_speed))
-      {
-	actual_player_action = stored_player[i].programmed_action;
-	stored_player[i].programmed_action = 0;
-      }
-#else
       actual_player_action = stored_player[i].programmed_action;
-#endif
-    }
 
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
@@ -3601,41 +3522,25 @@ void GameActions()
   ScrollScreen(NULL, SCROLL_GO_ON);
 
 
-  /*
-  if (tape.pausing || (tape.playing && !TapePlayDelay()))
-    return;
-  else if (tape.recording)
-    TapeRecordDelay();
-  */
-
-
-
-
 
 #ifdef DEBUG
-  /*
+#if 0
   if (TimeFrames == 0 && !local_player->gone)
   {
     extern unsigned int last_RND();
 
     printf("DEBUG: %03d last RND was %d \t [state checksum is %d]\n",
-	   TimePlayed,
-	   last_RND(),
-	   getStateCheckSum(TimePlayed));
+	   TimePlayed, last_RND(), getStateCheckSum(TimePlayed));
   }
-  */
 #endif
-
-
+#endif
 
 #ifdef DEBUG
-  /*
+#if 0
   if (GameFrameDelay >= 500)
     printf("FrameCounter == %d\n", FrameCounter);
-  */
 #endif
-
-
+#endif
 
 
 
@@ -3656,7 +3561,7 @@ void GameActions()
       Blocked2Moving(x, y, &oldx, &oldy);
       if (!IS_MOVING(oldx, oldy))
       {
-	printf("GameActions(): (BLOCKED=>MOVING) context corrupted!\n");
+	printf("GameActions(): (BLOCKED => MOVING) context corrupted!\n");
 	printf("GameActions(): BLOCKED: x = %d, y = %d\n", x, y);
 	printf("GameActions(): !MOVING: oldx = %d, oldy = %d\n", oldx, oldy);
 	printf("GameActions(): This should never happen!\n");
@@ -3957,12 +3862,8 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   jy = player->jy = new_jy;
   StorePlayer[jx][jy] = player->element_nr;
 
-  /*
-  player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / MoveSpeed);
-  */
-
   player->MovPos =
-    (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_speed);
+    (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
   ScrollFigure(player, SCROLL_INIT);
 
@@ -3978,12 +3879,8 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
   if (player->gone || (!dx && !dy))
     return FALSE;
 
-  /*
-  if (!FrameReached(&player->move_delay, MoveSpeed) && !tape.playing)
-    return FALSE;
-  */
-
-  if (!FrameReached(&player->move_delay, player->move_speed) && !tape.playing)
+  if (!FrameReached(&player->move_delay, player->move_delay_value) &&
+      !tape.playing)
     return FALSE;
 
   /* remove the last programmed player action */
@@ -3994,23 +3891,14 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     /* should only happen if pre-1.2 tape recordings are played */
     /* this is only for backward compatibility */
 
-    /*
-    int old_move_speed = MoveSpeed;
-    */
-
-    int old_move_speed = player->move_speed;
+    int original_move_delay_value = player->move_delay_value;
 
 #if DEBUG
     printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES.\n");
 #endif
 
     /* scroll remaining steps with finest movement resolution */
-
-    /*
-    MoveSpeed = 8;
-    */
-
-    player->move_speed = 8;
+    player->move_delay_value = MOVE_DELAY_NORMAL_SPEED;
 
     while (player->MovPos)
     {
@@ -4021,12 +3909,7 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       BackToFront();
     }
 
-    /*
-    MoveSpeed = old_move_speed;
-    */
-
-    player->move_speed = old_move_speed;
-
+    player->move_delay_value = original_move_delay_value;
   }
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
@@ -4147,7 +4030,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 {
   int jx = player->jx, jy = player->jy;
   int last_jx = player->last_jx, last_jy = player->last_jy;
-  int move_stepsize = TILEX / player->move_speed;
+  int move_stepsize = TILEX / player->move_delay_value;
 
   if (!player->active || player->gone || !player->MovPos)
     return;
@@ -4172,43 +4055,20 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
 
-
-#if 0
-  if (!player->MovPos && level.gravity)
-  {
-    if (player->action == MV_NO_MOVING)
-      player->programmed_action = MV_DOWN;
-    else if (player->action == MV_UP)
-    {
-    }
-    else if (player->action & (MV_LEFT | MV_RIGHT))
-    {
-    }
-  }
-#else
-  if (!player->MovPos)
+  /* before DrawPlayer() to draw correct player graphic for this case */
+  if (player->MovPos == 0)
     CheckGravityMovement(player);
-#endif
-
 
   DrawPlayer(player);
 
-  if (!player->MovPos)
+  if (player->MovPos == 0)
   {
     if (IS_QUICK_GATE(Feld[last_jx][last_jy]))
     {
-      /* continue with normal speed after moving through port */
-      /* FIX THIS: what about player already having eaten a speed pill? */
+      /* continue with normal speed after quickly moving through gate */
+      HALVE_PLAYER_SPEED(player);
 
-      /*
-      MoveSpeed = 8;
-      ScrollStepSize = TILEX / MoveSpeed;
-      */
-
-      player->move_speed = 8;
-
-      /* don't wait for the next move -- the whole move delay stuff
-	 is worse at the moment; FIX THIS! ;-) */
+      /* be able to make the next move without delay */
       player->move_delay = 0;
     }
 
@@ -4232,7 +4092,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
   if (mode == SCROLL_INIT)
   {
     /* set scrolling step size according to actual player's moving speed */
-    ScrollStepSize = TILEX / player->move_speed;
+    ScrollStepSize = TILEX / player->move_delay_value;
 
     screen_frame_counter = FrameCounter;
     ScreenMovDir = player->MovDir;
@@ -4527,14 +4387,7 @@ int DigField(struct PlayerInfo *player,
 
     case EL_SPEED_PILL:
       RemoveField(x, y);
-
-      player->move_speed = 4;
-
-      /*
-      MoveSpeed = 4;
-      ScrollStepSize = TILEX / MoveSpeed;
-      */
-
+      player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -4713,13 +4566,12 @@ int DigField(struct PlayerInfo *player,
     case EL_EM_GATE_4:
       if (!player->key[element - EL_EM_GATE_1])
 	return MF_NO_ACTION;
-
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
-      player->move_speed = 4;
+      DOUBLE_PLAYER_SPEED(player);
 
       break;
 
@@ -4729,13 +4581,12 @@ int DigField(struct PlayerInfo *player,
     case EL_EM_GATE_4X:
       if (!player->key[element - EL_EM_GATE_1X])
 	return MF_NO_ACTION;
-
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
-      player->move_speed = 4;
+      DOUBLE_PLAYER_SPEED(player);
 
       break;
 
@@ -4776,12 +4627,7 @@ int DigField(struct PlayerInfo *player,
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
-      player->move_speed = 4;
-
-      /*
-      MoveSpeed = 4;
-      ScrollStepSize = TILEX / MoveSpeed;
-      */
+      DOUBLE_PLAYER_SPEED(player);
 
       break;
 
@@ -4796,14 +4642,6 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 
       PlaySoundLevel(x, y, SND_BUING);
-
-      /*
-      player->gone = TRUE;
-      PlaySoundLevel(x, y, SND_BUING);
-
-      if (!local_player->friends_still_needed)
-	player->LevelSolved = player->GameOver = TRUE;
-      */
 
       break;
 
@@ -5015,19 +4853,21 @@ void PlaySoundLevel(int x, int y, int sound_nr)
   volume = PSND_MAX_VOLUME;
 
 #ifndef MSDOS
-  stereo = (sx-SCR_FIELDX/2)*12;
+  stereo = (sx - SCR_FIELDX/2) * 12;
 #else
-  stereo = PSND_MIDDLE+(2*sx-(SCR_FIELDX-1))*5;
-  if(stereo > PSND_MAX_RIGHT) stereo = PSND_MAX_RIGHT;
-  if(stereo < PSND_MAX_LEFT) stereo = PSND_MAX_LEFT;
+  stereo = PSND_MIDDLE + (2 * sx - (SCR_FIELDX - 1)) * 5;
+  if (stereo > PSND_MAX_RIGHT)
+    stereo = PSND_MAX_RIGHT;
+  if (stereo < PSND_MAX_LEFT)
+    stereo = PSND_MAX_LEFT;
 #endif
 
   if (!IN_SCR_FIELD(sx, sy))
   {
-    int dx = ABS(sx-SCR_FIELDX/2)-SCR_FIELDX/2;
-    int dy = ABS(sy-SCR_FIELDY/2)-SCR_FIELDY/2;
+    int dx = ABS(sx - SCR_FIELDX/2) - SCR_FIELDX/2;
+    int dy = ABS(sy - SCR_FIELDY/2) - SCR_FIELDY/2;
 
-    volume -= volume*(dx > dy ? dx : dy)/silence_distance;
+    volume -= volume * (dx > dy ? dx : dy) / silence_distance;
   }
 
   PlaySoundExt(sound_nr, volume, stereo, PSND_NO_LOOP);

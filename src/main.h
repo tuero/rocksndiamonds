@@ -321,8 +321,9 @@ struct PlayerInfo
   boolean gone, LevelSolved, GameOver;
   boolean snapped;
 
-  int move_speed;
   unsigned long move_delay;
+  int move_delay_value;
+
   int last_move_dir;
 
   unsigned long push_delay;
