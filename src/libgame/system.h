@@ -172,6 +172,10 @@
 #define VERSION_MINOR(x)	(((x) % 10000) / 100)
 #define VERSION_PATCH(x)	((x) % 100)
 
+/* functions for parent/child process identification */
+#define IS_PARENT_PROCESS(pid)	((pid) > 0)
+#define IS_CHILD_PROCESS(pid)	((pid) == 0)
+
 
 /* type definitions */
 typedef int (*EventFilter)(const Event *);

@@ -890,15 +890,6 @@ inline void SDLOpenAudio(void)
   audio.music_channel = MUSIC_CHANNEL;
   audio.first_sound_channel = FIRST_SOUND_CHANNEL;
 
-  /* reserve first channel for music loops */
-  if (Mix_ReserveChannels(1) == 1)
-    audio.music_channel = 0;
-  else
-    audio.music_available = FALSE;
-
-  Mix_Volume(-1, SOUND_MAX_VOLUME);
-  Mix_VolumeMusic(SOUND_MAX_VOLUME);
-
   Mixer_InitChannels();
 }
 

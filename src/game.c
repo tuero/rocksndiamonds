@@ -6425,31 +6425,32 @@ boolean PlaceBomb(struct PlayerInfo *player)
   return TRUE;
 }
 
-void PlaySoundLevel(int x, int y, int sound_nr)
+void PlaySoundLevel(int x, int y, int nr)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
-  int volume, stereo;
+  int volume, stereo_position;
   int silence_distance = 8;
+  int type = (IS_LOOP_SOUND(nr) ? SND_CTRL_PLAY_LOOP : SND_CTRL_PLAY_SOUND);
 
-  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound_nr)) ||
-      (!setup.sound_loops && IS_LOOP_SOUND(sound_nr)))
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(nr)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(nr)))
     return;
 
   if (!IN_LEV_FIELD(x, y) ||
-      sx < -silence_distance || sx >= SCR_FIELDX+silence_distance ||
-      sy < -silence_distance || sy >= SCR_FIELDY+silence_distance)
+      sx < -silence_distance || sx >= SCR_FIELDX + silence_distance ||
+      sy < -silence_distance || sy >= SCR_FIELDY + silence_distance)
     return;
 
   volume = PSND_MAX_VOLUME;
 
 #if !defined(PLATFORM_MSDOS)
-  stereo = (sx - SCR_FIELDX/2) * 12;
+  stereo_position = (sx - SCR_FIELDX / 2) * 12;
 #else
-  stereo = PSND_MIDDLE + (2 * sx - (SCR_FIELDX - 1)) * 5;
-  if (stereo > PSND_MAX_RIGHT)
-    stereo = PSND_MAX_RIGHT;
-  if (stereo < PSND_MAX_LEFT)
-    stereo = PSND_MAX_LEFT;
+  stereo_position = PSND_MIDDLE + (2 * sx - (SCR_FIELDX - 1)) * 5;
+  if (stereo_position > PSND_MAX_RIGHT)
+    stereo_position = PSND_MAX_RIGHT;
+  if (stereo_position < PSND_MAX_LEFT)
+    stereo_position = PSND_MAX_LEFT;
 #endif
 
   if (!IN_SCR_FIELD(sx, sy))
@@ -6460,7 +6461,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
     volume -= volume * (dx > dy ? dx : dy) / silence_distance;
   }
 
-  PlaySoundExt(sound_nr, volume, stereo, SND_CTRL_PLAY_SOUND);
+  PlaySoundExt(nr, volume, stereo_position, type);
 }
 
 void RaiseScore(int value)

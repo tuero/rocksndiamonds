@@ -17,6 +17,21 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <signal.h>
+#include <math.h>
+
+#include "platform.h"
+
+#if defined(PLATFORM_LINUX)
+#include <sys/ioctl.h>
+#include <linux/soundcard.h>
+#elif defined(PLATFORM_FREEBSD)
+#include <machine/soundcard.h>
+#elif defined(PLATFORM_NETBSD)
+#include <sys/ioctl.h>
+#include <sys/audioio.h>
+#elif defined(PLATFORM_HPUX)
+#include <sys/audio.h>
+#endif
 
 #include "system.h"
 #include "sound.h"
@@ -24,8 +39,101 @@
 #include "setup.h"
 
 
-#define IS_PARENT_PROCESS(pid)		((pid) > 0)
-#define IS_CHILD_PROCESS(pid)		((pid) == 0)
+/* expiration time (in milliseconds) for sound loops */
+#define SOUND_LOOP_EXPIRATION_TIME	200
+
+#if defined(TARGET_SDL)
+/* one second fading interval == 1000 ticks (milliseconds) */
+#define SOUND_FADING_INTERVAL		1000
+#define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
+#endif
+
+#if defined(AUDIO_STREAMING_DSP)
+#define SOUND_FADING_VOLUME_STEP	(PSND_MAX_VOLUME / 40)
+#define SOUND_FADING_VOLUME_THRESHOLD	(SOUND_FADING_VOLUME_STEP * 2)
+#endif
+
+#if !defined(PLATFORM_HPUX)
+#define SND_BLOCKSIZE			4096
+#else
+#define SND_BLOCKSIZE			32768
+#endif
+
+#define SND_TYPE_NONE			0
+#define SND_TYPE_WAV			1
+
+#define MUS_TYPE_NONE			0
+#define MUS_TYPE_WAV			1
+#define MUS_TYPE_MOD			2
+
+#define DEVICENAME_DSP			"/dev/dsp"
+#define DEVICENAME_AUDIO		"/dev/audio"
+#define DEVICENAME_AUDIOCTL		"/dev/audioCtl"
+
+
+#if 0
+struct SoundHeader_SUN
+{
+  unsigned long magic;
+  unsigned long hdr_size;
+  unsigned long data_size;
+  unsigned long encoding;
+  unsigned long sample_rate;
+  unsigned long channels;
+};
+
+struct SoundHeader_8SVX
+{
+  char magic_FORM[4];
+  unsigned long chunk_size;
+  char magic_8SVX[4];
+};
+#endif
+
+struct AudioFormatInfo
+{
+  boolean stereo;		/* availability of stereo sound */
+  int format;			/* size and endianess of sample data */
+  int sample_rate;		/* sample frequency */
+  int fragment_size;		/* audio device fragment size in bytes */
+};
+
+struct SampleInfo
+{
+  char *source_filename;
+  int num_references;
+
+  int type;
+  int format;
+  long data_len;
+  void *data_ptr;
+};
+typedef struct SampleInfo SoundInfo;
+typedef struct SampleInfo MusicInfo;
+
+struct SoundControl
+{
+  boolean active;
+
+  int nr;
+  int volume;
+  int stereo_position;
+
+  int state;
+
+  unsigned long playing_starttime;
+  unsigned long playing_pos;
+
+  int type;
+  int format;
+  long data_len;
+  void *data_ptr;
+
+#if defined(PLATFORM_MSDOS)
+  int voice;
+#endif
+};
+typedef struct SoundControl SoundControl;
 
 struct ListNode
 {
@@ -483,6 +591,45 @@ void Mixer_InitChannels()
   mixer_active_channels = 0;
 }
 
+static void Mixer_ResetChannelExpiration(int channel)
+{
+  mixer[channel].playing_starttime = Counter();
+
+#if defined(TARGET_SDL)
+  if (IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]))
+    Mix_ExpireChannel(channel, SOUND_LOOP_EXPIRATION_TIME);
+#endif
+}
+
+static boolean Mixer_ChannelExpired(int channel)
+{
+  if (!mixer[channel].active)
+    return TRUE;
+
+  if (IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]) &&
+      DelayReached(&mixer[channel].playing_starttime,
+		   SOUND_LOOP_EXPIRATION_TIME))
+    return TRUE;
+
+#if defined(TARGET_SDL)
+
+  if (!Mix_Playing(channel))
+    return TRUE;
+
+#elif defined(TARGET_ALLEGRO)
+
+  mixer[channel].playing_pos = voice_get_position(mixer[channel].voice);
+  mixer[channel].volume = voice_get_volume(mixer[channel].voice);
+
+  /* sound sample has completed playing or was completely faded out */
+  if (mixer[channel].playing_pos == -1 || mixer[channel].volume == 0)
+    return TRUE;
+
+#endif /* TARGET_ALLEGRO */
+
+  return FALSE;
+}
+
 static void Mixer_PlayChannel(int channel)
 {
   /* start with inactive channel in case something goes wrong */
@@ -490,9 +637,6 @@ static void Mixer_PlayChannel(int channel)
 
   if (mixer[channel].type != MUS_TYPE_WAV)
     return;
-
-  mixer[channel].playing_pos = 0;
-  mixer[channel].playing_starttime = Counter();
 
 #if defined(TARGET_SDL)
   Mix_Volume(channel, SOUND_MAX_VOLUME);
@@ -511,6 +655,9 @@ static void Mixer_PlayChannel(int channel)
   voice_start(mixer[channel].voice);       
 #endif
 
+  Mixer_ResetChannelExpiration(channel);
+
+  mixer[channel].playing_pos = 0;
   mixer[channel].active = TRUE;
   mixer_active_channels++;
 }
@@ -532,12 +679,6 @@ static void Mixer_PlayMusicChannel()
 
 static void Mixer_StopChannel(int channel)
 {
-#if 0
-#if defined(TARGET_SDL)
-  printf("----------> %d [%d]\n", Mix_Playing(channel), Mix_Playing(0));
-#endif
-#endif
-
   if (!mixer[channel].active)
     return;
 
@@ -642,15 +783,31 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 
   /* check if sound is already being played (and how often) */
   for (k=0, i=audio.first_sound_channel; i<audio.num_channels; i++)
-    if (mixer[i].nr == snd_ctrl.nr)
+    if (mixer[i].active && mixer[i].nr == snd_ctrl.nr)
       k++;
 
-  /* restart loop sounds only if they are just fading out */
-  if (k >= 1 && IS_LOOP(snd_ctrl))
+#if 0
+  printf("SOUND %d [CURRENTLY PLAYING %d TIMES]\n", snd_ctrl.nr, k);
+#endif
+
+  /* reset expiration delay for already playing loop sounds */
+  if (k > 0 && IS_LOOP(snd_ctrl))
   {
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-      if (mixer[i].nr == snd_ctrl.nr && IS_FADING(mixer[i]))
-	Mixer_UnFadeChannel(i);
+    {
+      if (mixer[i].active && mixer[i].nr == snd_ctrl.nr)
+      {
+#if 0
+	printf("RESETTING EXPIRATION FOR SOUND %d\n", snd_ctrl.nr);
+#endif
+
+#if 1
+	Mixer_ResetChannelExpiration(i);
+#endif
+	if (IS_FADING(mixer[i]))
+	  Mixer_UnFadeChannel(i);
+      }
+    }
 
     return;
   }
@@ -670,11 +827,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
       if (!mixer[i].active || mixer[i].nr != snd_ctrl.nr)
 	continue;
 
-#if 1
       actual = 1000 * playing_time / mixer[i].data_len;
-#else
-      actual = 100 * mixer[i].playing_pos / mixer[i].data_len;
-#endif
 
       if (actual >= longest)
       {
@@ -700,12 +853,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
-#if 1
       int playing_time = playing_current - mixer[i].playing_starttime;
       int actual = 1000 * playing_time / mixer[i].data_len;
-#else
-      int actual = 100 * mixer[i].playing_pos / mixer[i].data_len;
-#endif
 
       if (!IS_LOOP(mixer[i]) && actual > longest)
       {
@@ -717,7 +866,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     Mixer_StopChannel(longest_nr);
   }
 
-  /* add new sound to mixer */
+  /* add the new sound to the mixer */
   for(i=0; i<audio.num_channels; i++)
   {
 #if 0
@@ -775,34 +924,10 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
   }
 #endif
 
+  /* deactivate channels that have expired since the last request */
   for (i=0; i<audio.num_channels; i++)
-  {
-    if (!mixer[i].active)
-      continue;
-
-    if (i != audio.music_channel &&
-	DelayReached(&mixer[i].playing_starttime, SOUND_LOOP_EXPIRATION_TIME))
-    {
+    if (mixer[i].active && Mixer_ChannelExpired(i))
       Mixer_StopChannel(i);
-      continue;
-    }
-
-#if defined(TARGET_SDL)
-
-    if (!Mix_Playing(i))
-      Mixer_StopChannel(i);
-
-#elif defined(TARGET_ALLEGRO)
-
-    mixer[i].playing_pos = voice_get_position(mixer[i].voice);
-    mixer[i].volume = voice_get_volume(mixer[i].voice);
-
-    /* sound sample has completed playing or was completely faded out */
-    if (mixer[i].playing_pos == -1 || mixer[i].volume == 0)
-      Mixer_StopChannel(i);
-
-#endif /* TARGET_ALLEGRO */
-  }
 
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
@@ -954,6 +1079,12 @@ static void Mixer_Main_DSP()
 
     if (!mixer[i].active)
       continue;
+
+    if (Mixer_ChannelExpired(i))
+    {
+      Mixer_StopChannel(i);
+      continue;
+    }
 
     /* pointer, lenght and actual playing position of sound sample */
     sample_ptr = mixer[i].data_ptr;
