@@ -3160,22 +3160,6 @@ struct ConfigInfo image_config[] =
   { "trigger_player.ypos",			"13"			},
   { "trigger_player.frames",			"1"			},
 
-  { "internal_clipboard_custom",		"RocksElements.pcx"	},
-  { "internal_clipboard_custom.xpos",		"7"			},
-  { "internal_clipboard_custom.ypos",		"9"			},
-  { "internal_clipboard_custom.frames",		"1"			},
-  { "internal_clipboard_custom.EDITOR",		"RocksElements.pcx"	},
-  { "internal_clipboard_custom.EDITOR.xpos",	"15"			},
-  { "internal_clipboard_custom.EDITOR.ypos",	"13"			},
-
-  { "internal_clipboard_group",			"RocksDC.pcx"		},
-  { "internal_clipboard_group.xpos",		"4"			},
-  { "internal_clipboard_group.ypos",		"15"			},
-  { "internal_clipboard_group.frames",		"1"			},
-  { "internal_clipboard_group.EDITOR",		"RocksDC.pcx"		},
-  { "internal_clipboard_group.EDITOR.xpos",	"14"			},
-  { "internal_clipboard_group.EDITOR.ypos",	"15"			},
-
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
 #include "conf_grp.c"	/* include auto-generated data structure definitions */

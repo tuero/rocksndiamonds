@@ -275,7 +275,11 @@
    PAGEX3: buffer for animations
 */
 
-#define DOOR_GFX_PAGESIZE	(gfx.dxsize)
+/* these values are hard-coded to be able to use them in initialization */
+#define DOOR_GFX_PAGE_WIDTH	100	/* should be set to "gfx.dxsize" */
+#define DOOR_GFX_PAGE_HEIGHT	280	/* should be set to "gfx.dysize" */
+
+#define DOOR_GFX_PAGESIZE	(DOOR_GFX_PAGE_WIDTH)
 #define DOOR_GFX_PAGEX1		(0 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEX2		(1 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEX3		(2 * DOOR_GFX_PAGESIZE)
@@ -285,7 +289,7 @@
 #define DOOR_GFX_PAGEX7		(6 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEX8		(7 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		(0)
-#define DOOR_GFX_PAGEY2		(gfx.dysize)
+#define DOOR_GFX_PAGEY2		(DOOR_GFX_PAGE_HEIGHT)
 
 
 /* macros for version handling */

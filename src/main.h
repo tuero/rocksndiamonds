@@ -1473,7 +1473,8 @@ struct TapeInfo
   boolean pause_before_death;
   boolean recording, playing, pausing;
   boolean fast_forward;
-  boolean index_search;
+  boolean warp_forward;
+  boolean deactivate_display;
   boolean auto_play;
   boolean auto_play_level_solved;
   boolean quick_resume;

@@ -243,11 +243,12 @@
 #define ED_RADIOBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 44)
 #define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 66)
 
-/* some positions in the editor control window */
+/* values for some special graphic buttons */
 #define ED_BUTTON_ELEM_XPOS		6
 #define ED_BUTTON_ELEM_YPOS		30
 #define ED_BUTTON_ELEM_XSIZE		22
 #define ED_BUTTON_ELEM_YSIZE		22
+
 
 /* some values for text input, selectbox and counter gadgets */
 #define ED_BUTTON_COUNT_YPOS		60
@@ -493,9 +494,11 @@
 
 #define GADGET_ID_PREV_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 0)
 #define GADGET_ID_NEXT_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 1)
+#define GADGET_ID_COPY_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 2)
+#define GADGET_ID_PASTE_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 3)
 
 /* gadgets for scrolling of drawing area */
-#define GADGET_ID_SCROLLING_FIRST	(GADGET_ID_GRAPHICBUTTON_FIRST + 2)
+#define GADGET_ID_SCROLLING_FIRST	(GADGET_ID_GRAPHICBUTTON_FIRST + 4)
 
 #define GADGET_ID_SCROLL_UP		(GADGET_ID_SCROLLING_FIRST + 0)
 #define GADGET_ID_SCROLL_DOWN		(GADGET_ID_SCROLLING_FIRST + 1)
@@ -704,11 +707,13 @@
 /* values for graphicbutton gadgets */
 #define ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE	0
 #define ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE	1
+#define ED_GRAPHICBUTTON_ID_COPY_CHANGE_PAGE	2
+#define ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE	3
 
-#define ED_NUM_GRAPHICBUTTONS			2
+#define ED_NUM_GRAPHICBUTTONS			4
 
-#define ED_GRAPHICBUTTON_ID_CHANGE_FIRST   ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE
-#define ED_GRAPHICBUTTON_ID_CHANGE_LAST    ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE
+#define ED_GRAPHICBUTTON_ID_CHANGE_FIRST  ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE
+#define ED_GRAPHICBUTTON_ID_CHANGE_LAST   ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_ID_DOUBLE_SPEED		0
@@ -880,7 +885,7 @@ static struct
 
   { '\0',	"copy settings from other element"	},
   { '\0',	"copy settings to other element"	},
-  { '\0',	"exchange settings with other element"	},
+  { '\0',	"exchange element with other element"	},
 
   { '\0',	"copy settings from this element"	},
   { '\0',	"paste settings to this element"	},
@@ -1782,6 +1787,20 @@ static struct
     ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
     NULL, "change page",		"select next change page"
+  },
+  {
+    ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    -1,					ED_SETTINGS_YPOS(14),
+    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
+    GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
+    NULL, NULL,				"copy settings from this change page"
+  },
+  {
+    ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    -1,					ED_SETTINGS_YPOS(14),
+    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
+    GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
+    NULL, NULL,				"paste settings to this change page"
   },
 };
 

@@ -258,26 +258,30 @@ void BackToFront()
       BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
     if (redraw_mask & REDRAW_DOOR_2)
     {
+#if 0
       if ((redraw_mask & REDRAW_DOOR_2) == REDRAW_DOOR_2)
-	BlitBitmap(backbuffer, window, VX,VY, VXSIZE,VYSIZE, VX,VY);
+#endif
+	BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
+#if 0
       else
       {
 	if (redraw_mask & REDRAW_VIDEO_1)
 	  BlitBitmap(backbuffer, window,
-		     VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS,
-		     VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
-		     VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS);
+		     VX + VIDEO_DISPLAY1_XPOS, VY + VIDEO_DISPLAY1_YPOS,
+		     VIDEO_DISPLAY_XSIZE, VIDEO_DISPLAY_YSIZE,
+		     VX + VIDEO_DISPLAY1_XPOS, VY + VIDEO_DISPLAY1_YPOS);
 	if (redraw_mask & REDRAW_VIDEO_2)
 	  BlitBitmap(backbuffer, window,
-		     VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS,
-		     VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
-		     VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS);
+		     VX + VIDEO_DISPLAY2_XPOS, VY + VIDEO_DISPLAY2_YPOS,
+		     VIDEO_DISPLAY_XSIZE, VIDEO_DISPLAY_YSIZE,
+		     VX + VIDEO_DISPLAY2_XPOS, VY + VIDEO_DISPLAY2_YPOS);
 	if (redraw_mask & REDRAW_VIDEO_3)
 	  BlitBitmap(backbuffer, window,
-		     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS,
-		     VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
-		     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
+		     VX + VIDEO_CONTROL_XPOS, VY + VIDEO_CONTROL_YPOS,
+		     VIDEO_CONTROL_XSIZE, VIDEO_CONTROL_YSIZE,
+		     VX + VIDEO_CONTROL_XPOS, VY + VIDEO_CONTROL_YPOS);
       }
+#endif
     }
 
     if (redraw_mask & REDRAW_DOOR_3)
@@ -1658,7 +1662,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   boolean draw_masked = graphic_info[graphic].draw_masked;
   int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.index_search);
+  boolean no_delay = (tape.warp_forward);
   unsigned long anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int anim_delay_value = (no_delay ? 0 : frame_delay_value);
@@ -1710,7 +1714,7 @@ void ShowEnvelope(int envelope_nr)
   int sound_opening = element_info[element].sound[ACTION_OPENING];
   int sound_closing = element_info[element].sound[ACTION_CLOSING];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.index_search);
+  boolean no_delay = (tape.warp_forward);
   int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
   int wait_delay_value = (no_delay ? 0 : normal_delay_value);
   int anim_mode = graphic_info[graphic].anim_mode;
@@ -2052,11 +2056,8 @@ boolean Request(char *text, unsigned int req_state)
 
 #if 1
   /* disable deactivated drawing when quick-loading level tape recording */
-  if (tape.playing && tape.index_search)
-  {
-    SetDrawDeactivationMask(REDRAW_NONE);
-    audio.sound_deactivated = FALSE;
-  }
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOff(TRUE);
 #endif
 
 #if 1
@@ -2324,11 +2325,8 @@ boolean Request(char *text, unsigned int req_state)
 
 #if 1
   /* restore deactivated drawing when quick-loading level tape recording */
-  if (tape.playing && tape.index_search)
-  {
-    SetDrawDeactivationMask(REDRAW_FIELD);
-    audio.sound_deactivated = TRUE;
-  }
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOn();
 #endif
 
   return result;

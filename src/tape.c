@@ -22,21 +22,21 @@
 #include "cartoons.h"
 
 /* tape button identifiers */
-#define TAPE_CTRL_ID_EJECT		0
-#define TAPE_CTRL_ID_INDEX		1
-#define TAPE_CTRL_ID_STOP		2
-#define TAPE_CTRL_ID_PAUSE		3
-#define TAPE_CTRL_ID_RECORD		4
-#define TAPE_CTRL_ID_PLAY		5
+#define TAPE_CTRL_ID_EJECT			0
+#define TAPE_CTRL_ID_EXTRA			1
+#define TAPE_CTRL_ID_STOP			2
+#define TAPE_CTRL_ID_PAUSE			3
+#define TAPE_CTRL_ID_RECORD			4
+#define TAPE_CTRL_ID_PLAY			5
 
-#define NUM_TAPE_BUTTONS		6
+#define NUM_TAPE_BUTTONS			6
 
 /* values for tape handling */
 #define TAPE_PAUSE_SECONDS_BEFORE_DEATH		5
 
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
-static void TapeStopIndexSearch();
+static void TapeStopWarpForward();
 
 static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
@@ -46,80 +46,140 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 /* ========================================================================= */
 
 /* some positions in the video tape control window */
-#define VIDEO_DATE_LABEL_XPOS	(VIDEO_DISPLAY1_XPOS)
-#define VIDEO_DATE_LABEL_YPOS	(VIDEO_DISPLAY1_YPOS)
-#define VIDEO_DATE_LABEL_XSIZE	(VIDEO_DISPLAY_XSIZE)
-#define VIDEO_DATE_LABEL_YSIZE	(VIDEO_DISPLAY_YSIZE)
-#define VIDEO_DATE_XPOS		(VIDEO_DISPLAY1_XPOS + 2)
-#define VIDEO_DATE_YPOS		(VIDEO_DISPLAY1_YPOS + 14)
-#define VIDEO_DATE_XSIZE	(VIDEO_DISPLAY_XSIZE)
-#define VIDEO_DATE_YSIZE	16
-#define VIDEO_REC_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS)
-#define VIDEO_REC_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_REC_LABEL_XSIZE	20
-#define VIDEO_REC_LABEL_YSIZE	12
-#define VIDEO_REC_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS + 20)
-#define VIDEO_REC_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_REC_SYMBOL_XSIZE	16
-#define VIDEO_REC_SYMBOL_YSIZE	16
-#define VIDEO_PLAY_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS + 65)
-#define VIDEO_PLAY_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PLAY_LABEL_XSIZE	22
-#define VIDEO_PLAY_LABEL_YSIZE	12
-#define VIDEO_PLAY_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS + 52)
-#define VIDEO_PLAY_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PLAY_SYMBOL_XSIZE	11
-#define VIDEO_PLAY_SYMBOL_YSIZE	13
-#define VIDEO_PAUSE_LABEL_XPOS	(VIDEO_DISPLAY2_XPOS)
-#define VIDEO_PAUSE_LABEL_YPOS	(VIDEO_DISPLAY2_YPOS + 20)
-#define VIDEO_PAUSE_LABEL_XSIZE	35
-#define VIDEO_PAUSE_LABEL_YSIZE	8
-#define VIDEO_PAUSE_SYMBOL_XPOS	(VIDEO_DISPLAY2_XPOS + 35)
-#define VIDEO_PAUSE_SYMBOL_YPOS	(VIDEO_DISPLAY2_YPOS)
-#define VIDEO_PAUSE_SYMBOL_XSIZE 17
-#define VIDEO_PAUSE_SYMBOL_YSIZE 13
-#define VIDEO_TIME_XPOS		(VIDEO_DISPLAY2_XPOS + 39)
-#define VIDEO_TIME_YPOS		(VIDEO_DISPLAY2_YPOS + 14)
-#define VIDEO_TIME_XSIZE	50
-#define VIDEO_TIME_YSIZE	16
+#define VIDEO_DATE_LABEL_XPOS		(VIDEO_DISPLAY1_XPOS)
+#define VIDEO_DATE_LABEL_YPOS		(VIDEO_DISPLAY1_YPOS)
+#define VIDEO_DATE_LABEL_XSIZE		(VIDEO_DISPLAY_XSIZE)
+#define VIDEO_DATE_LABEL_YSIZE		(VIDEO_DISPLAY_YSIZE)
+#define VIDEO_DATE_XPOS			(VIDEO_DISPLAY1_XPOS + 2)
+#define VIDEO_DATE_YPOS			(VIDEO_DISPLAY1_YPOS + 14)
+#define VIDEO_DATE_XSIZE		(VIDEO_DISPLAY_XSIZE)
+#define VIDEO_DATE_YSIZE		16
+#define VIDEO_REC_LABEL_XPOS		(VIDEO_DISPLAY2_XPOS)
+#define VIDEO_REC_LABEL_YPOS		(VIDEO_DISPLAY2_YPOS)
+#define VIDEO_REC_LABEL_XSIZE		20
+#define VIDEO_REC_LABEL_YSIZE		12
+#define VIDEO_REC_SYMBOL_XPOS		(VIDEO_DISPLAY2_XPOS + 20)
+#define VIDEO_REC_SYMBOL_YPOS		(VIDEO_DISPLAY2_YPOS)
+#define VIDEO_REC_SYMBOL_XSIZE		16
+#define VIDEO_REC_SYMBOL_YSIZE		16
+#define VIDEO_PLAY_LABEL_XPOS		(VIDEO_DISPLAY2_XPOS + 65)
+#define VIDEO_PLAY_LABEL_YPOS		(VIDEO_DISPLAY2_YPOS)
+#define VIDEO_PLAY_LABEL_XSIZE		22
+#define VIDEO_PLAY_LABEL_YSIZE		12
+#define VIDEO_PLAY_SYMBOL_XPOS		(VIDEO_DISPLAY2_XPOS + 52)
+#define VIDEO_PLAY_SYMBOL_YPOS		(VIDEO_DISPLAY2_YPOS)
+#define VIDEO_PLAY_SYMBOL_XSIZE		11
+#define VIDEO_PLAY_SYMBOL_YSIZE		13
+#define VIDEO_PAUSE_LABEL_XPOS		(VIDEO_DISPLAY2_XPOS)
+#define VIDEO_PAUSE_LABEL_YPOS		(VIDEO_DISPLAY2_YPOS + 20)
+#define VIDEO_PAUSE_LABEL_XSIZE		35
+#define VIDEO_PAUSE_LABEL_YSIZE		8
+#define VIDEO_PAUSE_SYMBOL_XPOS		(VIDEO_DISPLAY2_XPOS + 35)
+#define VIDEO_PAUSE_SYMBOL_YPOS		(VIDEO_DISPLAY2_YPOS)
+#define VIDEO_PAUSE_SYMBOL_XSIZE	17
+#define VIDEO_PAUSE_SYMBOL_YSIZE	13
+#define VIDEO_TIME_XPOS			(VIDEO_DISPLAY2_XPOS + 39)
+#define VIDEO_TIME_YPOS			(VIDEO_DISPLAY2_YPOS + 14)
+#define VIDEO_TIME_XSIZE		50
+#define VIDEO_TIME_YSIZE		16
 
-/* special */
-#define VIDEO_PBEND_LABEL_XPOS	5
-#define VIDEO_PBEND_LABEL_YPOS	220
-#define VIDEO_PBEND_LABEL_XSIZE	35
-#define VIDEO_PBEND_LABEL_YSIZE	30
+/* some default values for tape labels and symbols */
+#define VIDEO_LABEL_XPOS		5
+#define VIDEO_LABEL_YPOS		42
+#define VIDEO_LABEL_XSIZE		40
+#define VIDEO_LABEL_YSIZE		28
+#define VIDEO_SYMBOL_XPOS		39
+#define VIDEO_SYMBOL_YPOS		42
+#define VIDEO_SYMBOL_XSIZE		56
+#define VIDEO_SYMBOL_YSIZE		13
 
-#define VIDEO_STATE_OFF		(VIDEO_STATE_PLAY_OFF	|	\
-				 VIDEO_STATE_REC_OFF	|	\
-				 VIDEO_STATE_PAUSE_OFF	|	\
-				 VIDEO_STATE_FFWD_OFF	|	\
-				 VIDEO_STATE_PBEND_OFF	|	\
-				 VIDEO_STATE_DATE_OFF	|	\
-				 VIDEO_STATE_TIME_OFF)
-#define VIDEO_PRESS_OFF		(VIDEO_PRESS_PLAY_OFF	|	\
-				 VIDEO_PRESS_REC_OFF	|	\
-				 VIDEO_PRESS_PAUSE_OFF	|	\
-				 VIDEO_PRESS_STOP_OFF	|	\
-				 VIDEO_PRESS_EJECT_OFF)
-#define VIDEO_ALL_OFF		(VIDEO_STATE_OFF | VIDEO_PRESS_OFF)
+/* values for certain tape labels and symbols */
+#define VIDEO_FFWD_LABEL_XPOS		VIDEO_LABEL_XPOS
+#define VIDEO_FFWD_LABEL_YPOS		193
+#define VIDEO_FFWD_LABEL_XSIZE		VIDEO_LABEL_XSIZE
+#define VIDEO_FFWD_LABEL_YSIZE		VIDEO_LABEL_YSIZE
+#define VIDEO_FFWD_SYMBOL_XPOS		VIDEO_SYMBOL_XPOS
+#define VIDEO_FFWD_SYMBOL_YPOS		126
+#define VIDEO_FFWD_SYMBOL_XSIZE		27
+#define VIDEO_FFWD_SYMBOL_YSIZE		VIDEO_SYMBOL_YSIZE
 
-#define VIDEO_STATE_ON		(VIDEO_STATE_PLAY_ON	|	\
-				 VIDEO_STATE_REC_ON	|	\
-				 VIDEO_STATE_PAUSE_ON	|	\
-				 VIDEO_STATE_FFWD_ON	|	\
-				 VIDEO_STATE_PBEND_ON	|	\
-				 VIDEO_STATE_DATE_ON	|	\
-				 VIDEO_STATE_TIME_ON)
-#define VIDEO_PRESS_ON		(VIDEO_PRESS_PLAY_ON	|	\
-				 VIDEO_PRESS_REC_ON	|	\
-				 VIDEO_PRESS_PAUSE_ON	|	\
-				 VIDEO_PRESS_STOP_ON	|	\
-				 VIDEO_PRESS_EJECT_ON)
-#define VIDEO_ALL_ON		(VIDEO_STATE_ON | VIDEO_PRESS_ON)
+#define VIDEO_PBEND_LABEL_XPOS		VIDEO_LABEL_XPOS
+#define VIDEO_PBEND_LABEL_YPOS		221
+#define VIDEO_PBEND_LABEL_XSIZE		VIDEO_LABEL_XSIZE
+#define VIDEO_PBEND_LABEL_YSIZE		VIDEO_LABEL_YSIZE
+#define VIDEO_PBEND_SYMBOL_XPOS		VIDEO_SYMBOL_XPOS
+#define VIDEO_PBEND_SYMBOL_YPOS		126
+#define VIDEO_PBEND_SYMBOL_XSIZE	27
+#define VIDEO_PBEND_SYMBOL_YSIZE	VIDEO_SYMBOL_YSIZE
 
-#define VIDEO_STATE		(VIDEO_STATE_ON | VIDEO_STATE_OFF)
-#define VIDEO_PRESS		(VIDEO_PRESS_ON | VIDEO_PRESS_OFF)
-#define VIDEO_ALL		(VIDEO_ALL_ON | VIDEO_ALL_OFF)
+#define VIDEO_WARP_LABEL_XPOS		VIDEO_LABEL_XPOS
+#define VIDEO_WARP_LABEL_YPOS		165
+#define VIDEO_WARP_LABEL_XSIZE		VIDEO_LABEL_XSIZE
+#define VIDEO_WARP_LABEL_YSIZE		VIDEO_LABEL_YSIZE
+#define VIDEO_WARP_SYMBOL_XPOS		VIDEO_SYMBOL_XPOS
+#define VIDEO_WARP_SYMBOL_YPOS		152
+#define VIDEO_WARP_SYMBOL_XSIZE		27
+#define VIDEO_WARP_SYMBOL_YSIZE		VIDEO_SYMBOL_YSIZE
+#define VIDEO_WARP2_SYMBOL_XPOS		VIDEO_SYMBOL_XPOS
+#define VIDEO_WARP2_SYMBOL_YPOS		139
+#define VIDEO_WARP2_SYMBOL_XSIZE	27
+#define VIDEO_WARP2_SYMBOL_YSIZE	VIDEO_SYMBOL_YSIZE
+
+#define VIDEO_1STEP_SYMBOL_XPOS		(VIDEO_SYMBOL_XPOS + 18)
+#define VIDEO_1STEP_SYMBOL_YPOS		113
+#define VIDEO_1STEP_SYMBOL_XSIZE	(VIDEO_SYMBOL_XSIZE - 18)
+#define VIDEO_1STEP_SYMBOL_YSIZE	VIDEO_SYMBOL_YSIZE
+
+#define PG_X3(x)			(DOOR_GFX_PAGEX3 + (x))
+#define PG_X4(x)			(DOOR_GFX_PAGEX4 + (x))
+#define PG_X5(x)			(DOOR_GFX_PAGEX5 + (x))
+#define PG_X6(x)			(DOOR_GFX_PAGEX6 + (x))
+
+#define PG_Y1(y)			(DOOR_GFX_PAGEY1 + (y))
+#define PG_Y2(y)			(DOOR_GFX_PAGEY2 + (y))
+
+#define VIDEO_INFO_OFF			(VIDEO_STATE_DATE_OFF	|	\
+					 VIDEO_STATE_TIME_OFF)
+#define VIDEO_STATE_OFF			(VIDEO_STATE_PLAY_OFF	|	\
+					 VIDEO_STATE_REC_OFF	|	\
+					 VIDEO_STATE_PAUSE_OFF	|	\
+					 VIDEO_STATE_FFWD_OFF	|	\
+					 VIDEO_STATE_PBEND_OFF	|	\
+					 VIDEO_STATE_1STEP_OFF)
+#define VIDEO_PRESS_OFF			(VIDEO_PRESS_PLAY_OFF	|	\
+					 VIDEO_PRESS_REC_OFF	|	\
+					 VIDEO_PRESS_PAUSE_OFF	|	\
+					 VIDEO_PRESS_STOP_OFF	|	\
+					 VIDEO_PRESS_EJECT_OFF)
+#define VIDEO_ALL_OFF			(VIDEO_INFO_OFF		|	\
+	 				 VIDEO_STATE_OFF	|	\
+	 				 VIDEO_PRESS_OFF)
+
+#define VIDEO_INFO_ON			(VIDEO_STATE_DATE_ON	|	\
+					 VIDEO_STATE_TIME_ON)
+#define VIDEO_STATE_ON			(VIDEO_STATE_PLAY_ON	|	\
+					 VIDEO_STATE_REC_ON	|	\
+					 VIDEO_STATE_PAUSE_ON	|	\
+					 VIDEO_STATE_FFWD_ON	|	\
+					 VIDEO_STATE_PBEND_ON	|	\
+					 VIDEO_STATE_1STEP_ON)
+#define VIDEO_PRESS_ON			(VIDEO_PRESS_PLAY_ON	|	\
+					 VIDEO_PRESS_REC_ON	|	\
+					 VIDEO_PRESS_PAUSE_ON	|	\
+					 VIDEO_PRESS_STOP_ON	|	\
+					 VIDEO_PRESS_EJECT_ON)
+#define VIDEO_ALL_ON			(VIDEO_INFO_ON		|	\
+	 				 VIDEO_STATE_ON		|	\
+	 				 VIDEO_PRESS_ON)
+
+#define VIDEO_INFO			(VIDEO_INFO_ON | VIDEO_INFO_OFF)
+#define VIDEO_STATE			(VIDEO_STATE_ON | VIDEO_STATE_OFF)
+#define VIDEO_PRESS			(VIDEO_PRESS_ON | VIDEO_PRESS_OFF)
+#define VIDEO_ALL			(VIDEO_ALL_ON | VIDEO_ALL_OFF)
+
+#define NUM_TAPE_FUNCTIONS		10
+#define NUM_TAPE_FUNCTION_PARTS		2
+#define NUM_TAPE_FUNCTION_STATES	2
 
 
 /* ========================================================================= */
@@ -128,44 +188,230 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
 void DrawVideoDisplay(unsigned long state, unsigned long value)
 {
-  int i;
-  int part_label = 0, part_symbol = 1;
-  int xpos = 0, ypos = 1, xsize = 2, ysize = 3;
+  int i, j, k;
   static char *monatsname[12] =
   {
     "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
   };
-  static int video_pos[5][2][4] =
+  static struct
   {
-    {{ VIDEO_PLAY_LABEL_XPOS, VIDEO_PLAY_LABEL_YPOS,
-       VIDEO_PLAY_LABEL_XSIZE,VIDEO_PLAY_LABEL_YSIZE },
-     { VIDEO_PLAY_SYMBOL_XPOS, VIDEO_PLAY_SYMBOL_YPOS,
-       VIDEO_PLAY_SYMBOL_XSIZE,VIDEO_PLAY_SYMBOL_YSIZE }},
-
-    {{ VIDEO_REC_LABEL_XPOS, VIDEO_REC_LABEL_YPOS,
-       VIDEO_REC_LABEL_XSIZE,VIDEO_REC_LABEL_YSIZE },
-     { VIDEO_REC_SYMBOL_XPOS, VIDEO_REC_SYMBOL_YPOS,
-       VIDEO_REC_SYMBOL_XSIZE,VIDEO_REC_SYMBOL_YSIZE }},
-
-    {{ VIDEO_PAUSE_LABEL_XPOS, VIDEO_PAUSE_LABEL_YPOS,
-       VIDEO_PAUSE_LABEL_XSIZE,VIDEO_PAUSE_LABEL_YSIZE },
-     { VIDEO_PAUSE_SYMBOL_XPOS, VIDEO_PAUSE_SYMBOL_YPOS,
-       VIDEO_PAUSE_SYMBOL_XSIZE,VIDEO_PAUSE_SYMBOL_YSIZE }},
-
-    {{ VIDEO_DATE_LABEL_XPOS, VIDEO_DATE_LABEL_YPOS,
-       VIDEO_DATE_LABEL_XSIZE,VIDEO_DATE_LABEL_YSIZE },
-     { VIDEO_DATE_XPOS, VIDEO_DATE_YPOS,
-       VIDEO_DATE_XSIZE,VIDEO_DATE_YSIZE }},
-
-    {{ 0,0,
-       0,0 },
-     { VIDEO_TIME_XPOS, VIDEO_TIME_YPOS,
-       VIDEO_TIME_XSIZE,VIDEO_TIME_YSIZE }}
+    int gd_x1, gd_y1;
+    int gd_x2, gd_y2;
+    int x, y;
+    int width, height;
+  }
+  video_pos[NUM_TAPE_FUNCTIONS][NUM_TAPE_FUNCTION_PARTS] =
+  {
+    {
+      {
+	PG_X4(VIDEO_PLAY_LABEL_XPOS),	PG_Y2(VIDEO_PLAY_LABEL_YPOS),
+	PG_X3(VIDEO_PLAY_LABEL_XPOS),	PG_Y2(VIDEO_PLAY_LABEL_YPOS),
+	VIDEO_PLAY_LABEL_XPOS,		VIDEO_PLAY_LABEL_YPOS,
+	VIDEO_PLAY_LABEL_XSIZE,		VIDEO_PLAY_LABEL_YSIZE
+      },
+      {
+	PG_X4(VIDEO_PLAY_SYMBOL_XPOS),	PG_Y2(VIDEO_PLAY_SYMBOL_YPOS),
+	PG_X3(VIDEO_PLAY_SYMBOL_XPOS),	PG_Y2(VIDEO_PLAY_SYMBOL_YPOS),
+	VIDEO_PLAY_SYMBOL_XPOS,		VIDEO_PLAY_SYMBOL_YPOS,
+	VIDEO_PLAY_SYMBOL_XSIZE,	VIDEO_PLAY_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	PG_X4(VIDEO_REC_LABEL_XPOS),	PG_Y2(VIDEO_REC_LABEL_YPOS),
+	PG_X3(VIDEO_REC_LABEL_XPOS),	PG_Y2(VIDEO_REC_LABEL_YPOS),
+	VIDEO_REC_LABEL_XPOS,		VIDEO_REC_LABEL_YPOS,
+	VIDEO_REC_LABEL_XSIZE,		VIDEO_REC_LABEL_YSIZE
+      },
+      {
+	PG_X4(VIDEO_REC_SYMBOL_XPOS),	PG_Y2(VIDEO_REC_SYMBOL_YPOS),
+	PG_X3(VIDEO_REC_SYMBOL_XPOS),	PG_Y2(VIDEO_REC_SYMBOL_YPOS),
+	VIDEO_REC_SYMBOL_XPOS,		VIDEO_REC_SYMBOL_YPOS,
+	VIDEO_REC_SYMBOL_XSIZE,		VIDEO_REC_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	PG_X4(VIDEO_PAUSE_LABEL_XPOS),	PG_Y2(VIDEO_PAUSE_LABEL_YPOS),
+	PG_X3(VIDEO_PAUSE_LABEL_XPOS),	PG_Y2(VIDEO_PAUSE_LABEL_YPOS),
+	VIDEO_PAUSE_LABEL_XPOS,		VIDEO_PAUSE_LABEL_YPOS,
+	VIDEO_PAUSE_LABEL_XSIZE,	VIDEO_PAUSE_LABEL_YSIZE
+      },
+      {
+	PG_X4(VIDEO_PAUSE_SYMBOL_XPOS),	PG_Y2(VIDEO_PAUSE_SYMBOL_YPOS),
+	PG_X3(VIDEO_PAUSE_SYMBOL_XPOS),	PG_Y2(VIDEO_PAUSE_SYMBOL_YPOS),
+	VIDEO_PAUSE_SYMBOL_XPOS,	VIDEO_PAUSE_SYMBOL_YPOS,
+	VIDEO_PAUSE_SYMBOL_XSIZE,	VIDEO_PAUSE_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	PG_X4(VIDEO_DATE_LABEL_XPOS),	PG_Y2(VIDEO_DATE_LABEL_YPOS),
+	PG_X3(VIDEO_DATE_LABEL_XPOS),	PG_Y2(VIDEO_DATE_LABEL_YPOS),
+	VIDEO_DATE_LABEL_XPOS,		VIDEO_DATE_LABEL_YPOS,
+	VIDEO_DATE_LABEL_XSIZE,		VIDEO_DATE_LABEL_YSIZE
+      },
+      {
+	PG_X4(VIDEO_DATE_XPOS),		PG_Y2(VIDEO_DATE_YPOS),
+	PG_X3(VIDEO_DATE_XPOS),		PG_Y2(VIDEO_DATE_YPOS),
+	VIDEO_DATE_XPOS,		VIDEO_DATE_YPOS,
+	VIDEO_DATE_XSIZE,		VIDEO_DATE_YSIZE
+      }
+    },
+    {
+      {
+	-1,				-1,
+	-1,				-1,
+	-1,				-1,
+	-1,				-1
+      },
+      {
+	PG_X4(VIDEO_TIME_XPOS),		PG_Y2(VIDEO_TIME_YPOS),
+	PG_X3(VIDEO_TIME_XPOS),		PG_Y2(VIDEO_TIME_YPOS),
+	VIDEO_TIME_XPOS,		VIDEO_TIME_YPOS,
+	VIDEO_TIME_XSIZE,		VIDEO_TIME_YSIZE
+      }
+    },
+    {
+      {
+	PG_X6(VIDEO_FFWD_LABEL_XPOS),	PG_Y1(VIDEO_FFWD_LABEL_YPOS),
+	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
+	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
+	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
+      },
+      {
+	PG_X6(VIDEO_FFWD_SYMBOL_XPOS),	PG_Y1(VIDEO_FFWD_SYMBOL_YPOS),
+	PG_X3(VIDEO_FFWD_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
+	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
+	VIDEO_FFWD_SYMBOL_XSIZE,	VIDEO_FFWD_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	PG_X6(VIDEO_PBEND_LABEL_XPOS),	PG_Y1(VIDEO_PBEND_LABEL_YPOS),
+	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
+	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
+	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
+      },
+      {
+	PG_X6(VIDEO_PBEND_SYMBOL_XPOS),	PG_Y1(VIDEO_PBEND_SYMBOL_YPOS),
+	PG_X3(VIDEO_PBEND_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
+	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
+	VIDEO_PBEND_SYMBOL_XSIZE,	VIDEO_PBEND_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	PG_X6(VIDEO_WARP_LABEL_XPOS),	PG_Y1(VIDEO_WARP_LABEL_YPOS),
+	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
+	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
+	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
+      },
+      {
+	PG_X6(VIDEO_WARP_SYMBOL_XPOS),	PG_Y1(VIDEO_WARP_SYMBOL_YPOS),
+	PG_X3(VIDEO_WARP_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
+	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
+	VIDEO_WARP_SYMBOL_XSIZE,	VIDEO_WARP_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	-1,				-1,
+	-1,				-1,
+	-1,				-1,
+	-1,				-1
+      },
+      {
+	PG_X6(VIDEO_WARP2_SYMBOL_XPOS),	PG_Y1(VIDEO_WARP2_SYMBOL_YPOS),
+	PG_X3(VIDEO_WARP2_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
+	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
+	VIDEO_WARP2_SYMBOL_XSIZE,	VIDEO_WARP2_SYMBOL_YSIZE
+      }
+    },
+    {
+      {
+	-1,				-1,
+	-1,				-1,
+	-1,				-1,
+	-1,				-1
+      },
+      {
+	PG_X6(VIDEO_1STEP_SYMBOL_XPOS),	PG_Y1(VIDEO_1STEP_SYMBOL_YPOS),
+	PG_X3(VIDEO_1STEP_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
+	VIDEO_1STEP_SYMBOL_XPOS,	VIDEO_SYMBOL_YPOS,
+	VIDEO_1STEP_SYMBOL_XSIZE,	VIDEO_1STEP_SYMBOL_YSIZE
+      }
+    },
   };
 
+#if 0
+  if (state & VIDEO_STATE_FFWD_OFF)
+  {
+#if 1
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_LABEL_XPOS,
+		 cy + VIDEO_LABEL_YPOS,
+		 VIDEO_LABEL_XSIZE,
+		 VIDEO_LABEL_YSIZE,
+		 VX + VIDEO_LABEL_XPOS,
+		 VY + VIDEO_LABEL_YPOS);
+
+    cx = DOOR_GFX_PAGEX3;
+    cy = DOOR_GFX_PAGEY2;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_FFWD_SYMBOL_XPOS,
+		 cy + VIDEO_SYMBOL_YPOS,
+		 VIDEO_FFWD_SYMBOL_XSIZE,
+		 VIDEO_FFWD_SYMBOL_YSIZE,
+		 VX + VIDEO_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+#else
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+	       cx + VIDEO_PLAY_SYMBOL_XPOS - 9,
+	       cy + VIDEO_PLAY_SYMBOL_YPOS,
+	       VIDEO_PLAY_SYMBOL_XSIZE - 2,
+	       VIDEO_PLAY_SYMBOL_YSIZE,
+	       VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
+	       VY + VIDEO_PLAY_SYMBOL_YPOS);
+#endif
+  }
+#endif
+
+#if 0
   if (state & VIDEO_STATE_PBEND_OFF)
   {
+#if 1
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_LABEL_XPOS,
+		 cy + VIDEO_LABEL_YPOS,
+		 VIDEO_LABEL_XSIZE,
+		 VIDEO_LABEL_YSIZE,
+		 VX + VIDEO_LABEL_XPOS,
+		 VY + VIDEO_LABEL_YPOS);
+
+    cx = DOOR_GFX_PAGEX3;
+    cy = DOOR_GFX_PAGEY2;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_PBEND_SYMBOL_XPOS,
+		 cy + VIDEO_SYMBOL_YPOS,
+		 VIDEO_PBEND_SYMBOL_XSIZE,
+		 VIDEO_PBEND_SYMBOL_YSIZE,
+		 VX + VIDEO_PBEND_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+#else
     int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
 
     BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
@@ -175,40 +421,88 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	       VIDEO_PBEND_LABEL_YSIZE,
 	       VX + VIDEO_REC_LABEL_XPOS,
 	       VY + VIDEO_REC_LABEL_YPOS);
+#endif
   }
+#endif
 
-  for (i = 0; i < 10; i++)
+#if 0
+  if (state & VIDEO_STATE_1STEP_OFF)
   {
-    if (state & (1<<i))
+    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_1STEP_SYMBOL_XPOS,
+		 cy + VIDEO_SYMBOL_YPOS,
+		 VIDEO_1STEP_SYMBOL_XSIZE,
+		 VIDEO_1STEP_SYMBOL_YSIZE,
+		 VX + VIDEO_1STEP_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+  }
+#endif
+
+  for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
+  {
+    for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
     {
-      int pos = i/2, cx, cy = DOOR_GFX_PAGEY2;
+      for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
+      {
+	if (state & (1 << (i * 2 + k)))
+	{
+	  int gd_x, gd_y;
+	  int skip_value =
+	    (j == 0 ? VIDEO_DISPLAY_SYMBOL_ONLY : VIDEO_DISPLAY_LABEL_ONLY);
 
-      if (i%2)			/* i ungerade => STATE_ON / PRESS_OFF */
-	cx = DOOR_GFX_PAGEX4;
-      else
-	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
+	  if (k == 1)		/* on */
+	  {
+	    gd_x = video_pos[i][j].gd_x1;
+	    gd_y = video_pos[i][j].gd_y1;
+	  }
+	  else			/* off */
+	  {
+	    gd_x = video_pos[i][j].gd_x2;
+	    gd_y = video_pos[i][j].gd_y2;
+	  }
 
-      if (video_pos[pos][part_label][0] && value != VIDEO_DISPLAY_SYMBOL_ONLY)
-	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		   cx + video_pos[pos][part_label][xpos],
-		   cy + video_pos[pos][part_label][ypos],
-		   video_pos[pos][part_label][xsize],
-		   video_pos[pos][part_label][ysize],
-		   VX + video_pos[pos][part_label][xpos],
-		   VY + video_pos[pos][part_label][ypos]);
-      if (video_pos[pos][part_symbol][0] && value != VIDEO_DISPLAY_LABEL_ONLY)
-	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		   cx + video_pos[pos][part_symbol][xpos],
-		   cy + video_pos[pos][part_symbol][ypos],
-		   video_pos[pos][part_symbol][xsize],
-		   video_pos[pos][part_symbol][ysize],
-		   VX + video_pos[pos][part_symbol][xpos],
-		   VY + video_pos[pos][part_symbol][ypos]);
+	  if (video_pos[i][j].x != -1 && value != skip_value)
+	    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		       gd_x, gd_y,
+		       video_pos[i][j].width,
+		       video_pos[i][j].height,
+		       VX + video_pos[i][j].x,
+		       VY + video_pos[i][j].y);
+	}
+      }
     }
   }
 
+#if 0
   if (state & VIDEO_STATE_FFWD_ON)
   {
+#if 1
+    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
+
+    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_FFWD_LABEL_XPOS,
+		 cy + VIDEO_FFWD_LABEL_YPOS,
+		 VIDEO_LABEL_XSIZE,
+		 VIDEO_LABEL_YSIZE,
+		 VX + VIDEO_LABEL_XPOS,
+		 VY + VIDEO_LABEL_YPOS);
+
+    cx = DOOR_GFX_PAGEX6;
+    cy = DOOR_GFX_PAGEY1;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_FFWD_SYMBOL_XPOS,
+		 cy + VIDEO_FFWD_SYMBOL_YPOS,
+		 VIDEO_FFWD_SYMBOL_XSIZE,
+		 VIDEO_FFWD_SYMBOL_YSIZE,
+		 VX + VIDEO_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+#else
     int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
 
     BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
@@ -218,10 +512,37 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	       VIDEO_PLAY_SYMBOL_YSIZE,
 	       VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
 	       VY + VIDEO_PLAY_SYMBOL_YPOS);
+#endif
   }
+#endif
 
+#if 0
   if (state & VIDEO_STATE_PBEND_ON)
   {
+#if 1
+    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
+
+    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_PBEND_LABEL_XPOS,
+		 cy + VIDEO_PBEND_LABEL_YPOS,
+		 VIDEO_LABEL_XSIZE,
+		 VIDEO_LABEL_YSIZE,
+		 VX + VIDEO_LABEL_XPOS,
+		 VY + VIDEO_LABEL_YPOS);
+
+    cx = DOOR_GFX_PAGEX6;
+    cy = DOOR_GFX_PAGEY1;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_PBEND_SYMBOL_XPOS,
+		 cy + VIDEO_PBEND_SYMBOL_YPOS,
+		 VIDEO_PBEND_SYMBOL_XSIZE,
+		 VIDEO_PBEND_SYMBOL_YSIZE,
+		 VX + VIDEO_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+#else
     int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
 
     BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
@@ -231,7 +552,25 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	       VIDEO_PBEND_LABEL_YSIZE,
 	       VX + VIDEO_REC_LABEL_XPOS,
 	       VY + VIDEO_REC_LABEL_YPOS);
+#endif
   }
+#endif
+
+#if 0
+  if (state & VIDEO_STATE_1STEP_ON)
+  {
+    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
+
+    if (value != VIDEO_DISPLAY_LABEL_ONLY)
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 cx + VIDEO_1STEP_SYMBOL_XPOS,
+		 cy + VIDEO_1STEP_SYMBOL_YPOS,
+		 VIDEO_1STEP_SYMBOL_XSIZE,
+		 VIDEO_1STEP_SYMBOL_YSIZE,
+		 VX + VIDEO_1STEP_SYMBOL_XPOS,
+		 VY + VIDEO_SYMBOL_YPOS);
+  }
+#endif
 
   if (state & VIDEO_STATE_DATE_ON)
   {
@@ -258,12 +597,16 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	     int2str(sec, 2), FONT_TAPE_RECORDER);
   }
 
+#if 1
+  redraw_mask |= REDRAW_DOOR_2;
+#else
   if (state & VIDEO_STATE_DATE)
     redraw_mask |= REDRAW_VIDEO_1;
   if ((state & ~VIDEO_STATE_DATE) & VIDEO_STATE)
     redraw_mask |= REDRAW_VIDEO_2;
   if (state & VIDEO_PRESS)
     redraw_mask |= REDRAW_VIDEO_3;
+#endif
 }
 
 void DrawCompleteVideoDisplay()
@@ -286,6 +629,24 @@ void DrawCompleteVideoDisplay()
 
   BlitBitmap(drawto, bitmap_db_door, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+}
+
+void TapeDeactivateDisplayOn()
+{
+  SetDrawDeactivationMask(REDRAW_FIELD);
+  audio.sound_deactivated = TRUE;
+}
+
+void TapeDeactivateDisplayOff(boolean redraw_display)
+{
+  SetDrawDeactivationMask(REDRAW_NONE);
+  audio.sound_deactivated = FALSE;
+
+  if (redraw_display)
+  {
+    RedrawPlayfield(TRUE, 0,0,0,0);
+    DrawGameDoorValues();
+  }
 }
 
 
@@ -333,7 +694,8 @@ static void TapeRewind()
   tape.recording = FALSE;
   tape.playing = FALSE;
   tape.fast_forward = FALSE;
-  tape.index_search = FALSE;
+  tape.warp_forward = FALSE;
+  tape.deactivate_display = FALSE;
   tape.auto_play = (global.autoplay_leveldir != NULL);
   tape.auto_play_level_solved = FALSE;
   tape.quick_resume = FALSE;
@@ -355,7 +717,7 @@ void TapeStartRecording()
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
-  MapTapeIndexButton();
+  MapTapeWarpButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
   audio.sound_deactivated = FALSE;
@@ -471,12 +833,17 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 
 void TapeTogglePause(boolean toggle_manual)
 {
-  unsigned long state;
+  int state = 0;
 
 #if 0
   if (!tape.recording && !tape.playing)
     return;
 #endif
+
+  if (tape.pause_before_death)
+    state |= VIDEO_STATE_PBEND_OFF;
+  else if (tape.fast_forward)
+    state |= VIDEO_STATE_FFWD_OFF;
 
   tape.pausing = !tape.pausing;
   tape.fast_forward = FALSE;
@@ -485,15 +852,22 @@ void TapeTogglePause(boolean toggle_manual)
   if (tape.single_step && toggle_manual)
     tape.single_step = FALSE;
 
-  state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+  state |= (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
   if (tape.playing)
-    state |= VIDEO_STATE_PBEND_OFF;
+    state |= VIDEO_STATE_PLAY_ON;
+  else
+    state |= (tape.single_step ? VIDEO_STATE_1STEP_ON : VIDEO_STATE_1STEP_OFF);
 
   DrawVideoDisplay(state, 0);
 
-  if (tape.index_search)
+#if 0
+  if (tape.pausing)
+    DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
+#endif
+
+  if (tape.warp_forward)
   {
-    TapeStopIndexSearch();
+    TapeStopWarpForward();
 
     if (tape.quick_resume)
     {
@@ -522,7 +896,7 @@ void TapeStartPlaying()
   DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
-  MapTapeIndexButton();
+  MapTapeWarpButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
   audio.sound_deactivated = FALSE;
@@ -545,8 +919,8 @@ void TapeStopPlaying()
   tape.playing = FALSE;
   tape.pausing = FALSE;
 
-  if (tape.index_search)
-    TapeStopIndexSearch();
+  if (tape.warp_forward)
+    TapeStopWarpForward();
 
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF, 0);
   MapTapeEjectButton();
@@ -570,16 +944,48 @@ byte *TapePlayAction()
 	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
     }
 
+    if (tape.warp_forward)
+    {
+      if (tape.deactivate_display)
+	DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      else
+	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+    }
+
     if (TimePlayed > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
       return NULL;
     }
   }
+  else if (tape.fast_forward)
+  {
+    if ((FrameCounter / 20) % 2)
+      DrawVideoDisplay(VIDEO_STATE_FFWD_ON, VIDEO_DISPLAY_LABEL_ONLY);
+    else
+      DrawVideoDisplay(VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+
+    if (tape.warp_forward)
+    {
+      if (tape.deactivate_display)
+	DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      else
+	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+    }
+  }
+  else if (tape.warp_forward)
+  {
+    if ((FrameCounter / 20) % 2)
+      DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_LABEL_ONLY);
+    else
+      DrawVideoDisplay(VIDEO_STATE_WARP_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+
+    DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+  }
 
   if (tape.counter >= tape.length)	/* end of tape reached */
   {
-    if (tape.index_search && !tape.auto_play)
+    if (tape.warp_forward && !tape.auto_play)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
     else
       TapeStop();
@@ -616,7 +1022,8 @@ void TapeStop()
   TapeStopRecording();
   TapeStopPlaying();
 
-  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+  DrawVideoDisplay(VIDEO_STATE_OFF, 0);
+
   if (tape.date && tape.length)
   {
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
@@ -643,26 +1050,44 @@ unsigned int GetTapeLength()
   return(tape_length * GAME_FRAME_DELAY / 1000);
 }
 
-static void TapeStartIndexSearch()
+static void TapeStartWarpForward()
 {
-  tape.index_search = TRUE;
+  tape.warp_forward = TRUE;
 
+#if 1
+  if (!tape.fast_forward && !tape.pause_before_death)
+  {
+    tape.pausing = FALSE;
+    tape.deactivate_display = TRUE;
+
+    TapeDeactivateDisplayOn();
+  }
+#else
   if (!tape.fast_forward || tape.pause_before_death)
   {
     tape.pausing = FALSE;
+    tape.deactivate_display = TRUE;
 
-    SetDrawDeactivationMask(REDRAW_FIELD);
-    audio.sound_deactivated = TRUE;
+    TapeDeactivateDisplayOn();
   }
+#endif
+
+  if (tape.fast_forward || tape.pause_before_death)
+    DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+  else
+    DrawVideoDisplay(VIDEO_STATE_WARP_ON, 0);
 }
 
-static void TapeStopIndexSearch()
+static void TapeStopWarpForward()
 {
-  tape.index_search = FALSE;
+  int state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
 
-  SetDrawDeactivationMask(REDRAW_NONE);
-  audio.sound_deactivated = FALSE;
+  tape.warp_forward = FALSE;
+  tape.deactivate_display = FALSE;
 
+  TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
+
+#if 0
 #if 1
   if (game_status == GAME_MODE_PLAYING)
 #endif
@@ -670,6 +1095,16 @@ static void TapeStopIndexSearch()
     RedrawPlayfield(TRUE, 0,0,0,0);
     DrawGameDoorValues();
   }
+#endif
+
+  if (tape.pause_before_death)
+    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_PBEND_ON;
+  else if (tape.fast_forward)
+    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_FFWD_ON;
+  else
+    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_PLAY_ON;
+
+  DrawVideoDisplay(state, 0);
 }
 
 static void TapeSingleStep()
@@ -681,6 +1116,9 @@ static void TapeSingleStep()
     TapeTogglePause(TAPE_TOGGLE_MANUAL);
 
   tape.single_step = !tape.single_step;
+
+  DrawVideoDisplay((tape.single_step ? VIDEO_STATE_1STEP_ON :
+		    VIDEO_STATE_1STEP_OFF), 0);
 }
 
 void TapeQuickSave()
@@ -710,7 +1148,7 @@ void TapeQuickLoad()
     if (!TAPE_IS_EMPTY(tape))
     {
       TapeStartGamePlaying();
-      TapeStartIndexSearch();
+      TapeStartWarpForward();
 
       tape.quick_resume = TRUE;
     }
@@ -827,7 +1265,7 @@ void AutoPlayTape()
     printf("playing tape ... ");
 
     TapeStartGamePlaying();
-    TapeStartIndexSearch();
+    TapeStartWarpForward();
 
     return;
   }
@@ -865,7 +1303,7 @@ void AutoPlayTape()
 #define TAPE_BUTTON_YPOS	77
 
 #define TAPE_BUTTON_EJECT_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
-#define TAPE_BUTTON_INDEX_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
+#define TAPE_BUTTON_EXTRA_XPOS	(TAPE_BUTTON_XPOS + 0 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_STOP_XPOS	(TAPE_BUTTON_XPOS + 1 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_PAUSE_XPOS	(TAPE_BUTTON_XPOS + 2 * TAPE_BUTTON_XSIZE)
 #define TAPE_BUTTON_RECORD_XPOS	(TAPE_BUTTON_XPOS + 3 * TAPE_BUTTON_XSIZE)
@@ -884,9 +1322,9 @@ static struct
     "eject tape"
   },
   {
-    TAPE_BUTTON_INDEX_XPOS,	TAPE_BUTTON_YPOS,
-    TAPE_CTRL_ID_INDEX,
-    "index mark"
+    TAPE_BUTTON_EXTRA_XPOS,	TAPE_BUTTON_YPOS,
+    TAPE_CTRL_ID_EXTRA,
+    "extra functions"
   },
   {
     TAPE_BUTTON_STOP_XPOS,	TAPE_BUTTON_YPOS,
@@ -928,7 +1366,7 @@ void CreateTapeButtons()
     gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
     gd_y  = DOOR_GFX_PAGEY2 + gd_yoffset;
 
-    if (i == TAPE_CTRL_ID_INDEX)
+    if (i == TAPE_CTRL_ID_EXTRA)
     {
       gd_x1 = DOOR_GFX_PAGEX6 + gd_xoffset;
       gd_x2 = DOOR_GFX_PAGEX5 + gd_xoffset;
@@ -965,14 +1403,14 @@ void FreeTapeButtons()
 
 void MapTapeEjectButton()
 {
-  UnmapGadget(tape_gadget[TAPE_CTRL_ID_INDEX]);
+  UnmapGadget(tape_gadget[TAPE_CTRL_ID_EXTRA]);
   MapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
 }
 
-void MapTapeIndexButton()
+void MapTapeWarpButton()
 {
   UnmapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
-  MapGadget(tape_gadget[TAPE_CTRL_ID_INDEX]);
+  MapGadget(tape_gadget[TAPE_CTRL_ID_EXTRA]);
 }
 
 void MapTapeButtons()
@@ -980,11 +1418,11 @@ void MapTapeButtons()
   int i;
 
   for (i = 0; i < NUM_TAPE_BUTTONS; i++)
-    if (i != TAPE_CTRL_ID_INDEX)
+    if (i != TAPE_CTRL_ID_EXTRA)
       MapGadget(tape_gadget[i]);
 
   if (tape.recording || tape.playing)
-    MapTapeIndexButton();
+    MapTapeWarpButton();
 }
 
 void UnmapTapeButtons()
@@ -1021,9 +1459,27 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       DrawCompleteVideoDisplay();
       break;
 
-    case TAPE_CTRL_ID_INDEX:
+    case TAPE_CTRL_ID_EXTRA:
       if (tape.playing)
-	TapeStartIndexSearch();
+      {
+	if (!tape.warp_forward)			/* PLAY -> WARP FORWARD PLAY */
+	{
+	  TapeStartWarpForward();
+	}
+	else					/* WARP FORWARD PLAY -> PLAY */
+	{
+	  TapeStopWarpForward();
+
+#if 0
+	  if (tape.pause_before_death)
+	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_PLAY_ON, 0);
+	  else if (tape.fast_forward)
+	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_FFWD_ON, 0);
+	  else
+	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_PBEND_ON, 0);
+#endif
+	}
+      }
       else if (tape.recording)
 	TapeSingleStep();
       break;
@@ -1041,7 +1497,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	TapeStartGameRecording();
       else if (tape.pausing)
       {
-	if (tape.playing)	/* PLAYING -> PAUSING -> RECORDING */
+	if (tape.playing)			/* PLAY -> PAUSE -> RECORD */
 	  TapeAppendRecording();
 	else
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -1070,13 +1526,22 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	else if (!tape.pause_before_death)	/* FFWD PLAY -> AUTO PAUSE */
 	{
 	  tape.pause_before_death = TRUE;
+#if 1
+	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
+#else
 	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
+#endif
 	}
 	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
 	  tape.fast_forward = FALSE;
 	  tape.pause_before_death = FALSE;
+	  tape.warp_forward = FALSE;
+#if 1
+	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF | VIDEO_STATE_PLAY_ON, 0);
+#else
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_OFF, 0);
+#endif
 	}
       }
       break;

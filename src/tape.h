@@ -36,44 +36,53 @@
 #define VIDEO_CONTROL_YSIZE	VIDEO_BUTTON_YSIZE
 
 /* values for video tape control */
-#define VIDEO_STATE_PLAY_OFF	(1L << 0)
-#define VIDEO_STATE_PLAY_ON	(1L << 1)
+#define VIDEO_STATE_PLAY_OFF	(1 << 0)
+#define VIDEO_STATE_PLAY_ON	(1 << 1)
 #define VIDEO_STATE_PLAY	(VIDEO_STATE_PLAY_OFF	| VIDEO_STATE_PLAY_ON)
-#define VIDEO_STATE_REC_OFF	(1L << 2)
-#define VIDEO_STATE_REC_ON	(1L << 3)
+#define VIDEO_STATE_REC_OFF	(1 << 2)
+#define VIDEO_STATE_REC_ON	(1 << 3)
 #define VIDEO_STATE_REC		(VIDEO_STATE_REC_OFF	| VIDEO_STATE_REC_ON)
-#define VIDEO_STATE_PAUSE_OFF	(1L << 4)
-#define VIDEO_STATE_PAUSE_ON	(1L << 5)
+#define VIDEO_STATE_PAUSE_OFF	(1 << 4)
+#define VIDEO_STATE_PAUSE_ON	(1 << 5)
 #define VIDEO_STATE_PAUSE	(VIDEO_STATE_PAUSE_OFF	| VIDEO_STATE_PAUSE_ON)
-#define VIDEO_STATE_DATE_OFF	(1L << 6)
-#define VIDEO_STATE_DATE_ON	(1L << 7)
+#define VIDEO_STATE_DATE_OFF	(1 << 6)
+#define VIDEO_STATE_DATE_ON	(1 << 7)
 #define VIDEO_STATE_DATE	(VIDEO_STATE_DATE_OFF	| VIDEO_STATE_DATE_ON)
-#define VIDEO_STATE_TIME_OFF	(1L << 8)
-#define VIDEO_STATE_TIME_ON	(1L << 9)
+#define VIDEO_STATE_TIME_OFF	(1 << 8)
+#define VIDEO_STATE_TIME_ON	(1 << 9)
 #define VIDEO_STATE_TIME	(VIDEO_STATE_TIME_OFF	| VIDEO_STATE_TIME_ON)
-#define VIDEO_PRESS_PLAY_ON	(1L << 10)
-#define VIDEO_PRESS_PLAY_OFF	(1L << 11)
-#define VIDEO_PRESS_PLAY	(VIDEO_PRESS_PLAY_OFF	| VIDEO_PRESS_PLAY_ON)
-#define VIDEO_PRESS_REC_ON	(1L << 12)
-#define VIDEO_PRESS_REC_OFF	(1L << 13)
-#define VIDEO_PRESS_REC		(VIDEO_PRESS_REC_OFF	| VIDEO_PRESS_REC_ON)
-#define VIDEO_PRESS_PAUSE_ON	(1L << 14)
-#define VIDEO_PRESS_PAUSE_OFF	(1L << 15)
-#define VIDEO_PRESS_PAUSE	(VIDEO_PRESS_PAUSE_OFF	| VIDEO_PRESS_PAUSE_ON)
-#define VIDEO_PRESS_STOP_ON	(1L << 16)
-#define VIDEO_PRESS_STOP_OFF	(1L << 17)
-#define VIDEO_PRESS_STOP	(VIDEO_PRESS_STOP_OFF	| VIDEO_PRESS_STOP_ON)
-#define VIDEO_PRESS_EJECT_ON	(1L << 18)
-#define VIDEO_PRESS_EJECT_OFF	(1L << 19)
-#define VIDEO_PRESS_EJECT	(VIDEO_PRESS_EJECT_OFF	| VIDEO_PRESS_EJECT_ON)
 
-/* special */
-#define VIDEO_STATE_FFWD_OFF	((1L << 20) | VIDEO_STATE_PAUSE_OFF)
-#define VIDEO_STATE_FFWD_ON	(1L << 21)
+#define VIDEO_STATE_FFWD_OFF	(1 << 10)
+#define VIDEO_STATE_FFWD_ON	(1 << 11)
 #define VIDEO_STATE_FFWD	(VIDEO_STATE_FFWD_OFF	| VIDEO_STATE_FFWD_ON)
-#define VIDEO_STATE_PBEND_OFF	(1L << 22)
-#define VIDEO_STATE_PBEND_ON	(1L << 23)
+#define VIDEO_STATE_PBEND_OFF	(1 << 12)
+#define VIDEO_STATE_PBEND_ON	(1 << 13)
 #define VIDEO_STATE_PBEND	(VIDEO_STATE_PBEND_OFF	| VIDEO_STATE_PBEND_ON)
+#define VIDEO_STATE_WARP_OFF	(1 << 14)
+#define VIDEO_STATE_WARP_ON	(1 << 15)
+#define VIDEO_STATE_WARP	(VIDEO_STATE_WARP_OFF	| VIDEO_STATE_WARP_ON)
+#define VIDEO_STATE_WARP2_OFF	(1 << 16)
+#define VIDEO_STATE_WARP2_ON	(1 << 17)
+#define VIDEO_STATE_WARP2	(VIDEO_STATE_WARP_OFF	| VIDEO_STATE_WARP_ON)
+#define VIDEO_STATE_1STEP_OFF	(1 << 18)
+#define VIDEO_STATE_1STEP_ON	(1 << 19)
+#define VIDEO_STATE_1STEP	(VIDEO_STATE_1STEP_OFF	| VIDEO_STATE_1STEP_ON)
+
+#define VIDEO_PRESS_PLAY_ON	(1 << 20)
+#define VIDEO_PRESS_PLAY_OFF	(1 << 21)
+#define VIDEO_PRESS_PLAY	(VIDEO_PRESS_PLAY_OFF	| VIDEO_PRESS_PLAY_ON)
+#define VIDEO_PRESS_REC_ON	(1 << 22)
+#define VIDEO_PRESS_REC_OFF	(1 << 23)
+#define VIDEO_PRESS_REC		(VIDEO_PRESS_REC_OFF	| VIDEO_PRESS_REC_ON)
+#define VIDEO_PRESS_PAUSE_ON	(1 << 24)
+#define VIDEO_PRESS_PAUSE_OFF	(1 << 25)
+#define VIDEO_PRESS_PAUSE	(VIDEO_PRESS_PAUSE_OFF	| VIDEO_PRESS_PAUSE_ON)
+#define VIDEO_PRESS_STOP_ON	(1 << 26)
+#define VIDEO_PRESS_STOP_OFF	(1 << 27)
+#define VIDEO_PRESS_STOP	(VIDEO_PRESS_STOP_OFF	| VIDEO_PRESS_STOP_ON)
+#define VIDEO_PRESS_EJECT_ON	(1 << 28)
+#define VIDEO_PRESS_EJECT_OFF	(1 << 29)
+#define VIDEO_PRESS_EJECT	(VIDEO_PRESS_EJECT_OFF	| VIDEO_PRESS_EJECT_ON)
 
 /* tags to draw video display labels or symbols only */
 /* (negative values to prevent misinterpretation in DrawVideoDisplay(), where
@@ -85,6 +94,9 @@
 
 void DrawVideoDisplay(unsigned long, unsigned long);
 void DrawCompleteVideoDisplay(void);
+
+void TapeDeactivateDisplayOn();
+void TapeDeactivateDisplayOff(boolean);
 
 void TapeStartRecording(void);
 void TapeHaltRecording(void);
@@ -106,7 +118,7 @@ void AutoPlayTape(void);
 void CreateTapeButtons();
 void FreeTapeButtons();
 void MapTapeEjectButton();
-void MapTapeIndexButton();
+void MapTapeWarpButton();
 void MapTapeButtons();
 void UnmapTapeButtons();
 

@@ -2616,7 +2616,7 @@ void RelocatePlayer(int x, int y, int element_raw)
   int element = (element_raw == EL_SP_MURPHY ? EL_PLAYER_1 : element_raw);
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.index_search);
+  boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
   int old_jx, old_jy;
@@ -7766,7 +7766,7 @@ void GameActions()
   action_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
-  if (tape.playing && tape.index_search && !tape.pausing)
+  if (tape.playing && tape.warp_forward && !tape.pausing)
     action_delay_value = 0;
 
   /* ---------- main game synchronization point ---------- */
@@ -11138,21 +11138,15 @@ void RequestQuitGame(boolean ask_if_really_quit)
   {
 
 #if 1
-    if (tape.playing && tape.index_search)
-    {
-      SetDrawDeactivationMask(REDRAW_NONE);
-      audio.sound_deactivated = FALSE;
-    }
+    if (tape.playing && tape.deactivate_display)
+      TapeDeactivateDisplayOff(TRUE);
 #endif
 
     OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
 
 #if 1
-    if (tape.playing && tape.index_search)
-    {
-      SetDrawDeactivationMask(REDRAW_FIELD);
-      audio.sound_deactivated = TRUE;
-    }
+    if (tape.playing && tape.deactivate_display)
+      TapeDeactivateDisplayOn();
 #endif
 
   }
