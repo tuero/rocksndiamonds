@@ -108,6 +108,18 @@ dist-win32:
 dist-macosx:
 	./Scripts/make_dist.sh mac . $(MAKE)
 
+upload-unix:
+	./Scripts/make_dist.sh unix . upload
+
+upload-msdos:
+	./Scripts/make_dist.sh dos . upload
+
+upload-win32:
+	./Scripts/make_dist.sh win . upload
+
+upload-macosx:
+	./Scripts/make_dist.sh mac . upload
+
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
@@ -118,6 +130,8 @@ dist-build-all:
 	@BUILD_DIST=TRUE $(MAKE) cross-msdos	; $(MAKE) dist-clean
 
 dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
+
+upload-all: upload-unix upload-msdos upload-win32 upload-macosx
 
 depend dep:
 	$(MAKE_CMD) depend
