@@ -293,10 +293,9 @@ struct SoundControl
 void UnixOpenAudio(void);
 void UnixCloseAudio(void);
 
-/* sound server functions */ 
-void InitPlaylist(void);
-void StartSoundserver(void);
-void SoundServer(void);
+/* mixer functions */ 
+void Mixer_InitChannels(void);
+void StartMixer(void);
 
 /* sound client functions */
 void PlayMusic(int);

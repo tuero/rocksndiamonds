@@ -936,7 +936,7 @@ void MSDOSOpenAudio(void)
     audio.music_channel = MUSIC_CHANNEL;
     audio.first_sound_channel = FIRST_SOUND_CHANNEL;
 
-    InitPlaylist();
+    Mixer_InitChannels();
   }
 }
 

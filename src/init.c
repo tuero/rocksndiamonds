@@ -45,7 +45,7 @@ static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitArtworkInfo(void);
 static void InitNetworkServer(void);
-static void InitSoundServer(void);
+static void InitMixer(void);
 static void InitSound(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
@@ -75,7 +75,7 @@ void OpenAll(void)
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
 
   InitCounter();
-  InitSoundServer();
+  InitMixer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
@@ -153,12 +153,12 @@ void InitNetworkServer()
 #endif
 }
 
-static void InitSoundServer()
+static void InitMixer()
 {
   OpenAudio();
   InitSoundList(sound_effects, NUM_SOUND_EFFECTS);
 
-  StartSoundserver();
+  StartMixer();
 }
 
 static void InitSound()

@@ -742,8 +742,8 @@ inline void OpenAudio(void)
   audio.sound_enabled = FALSE;
   audio.sound_deactivated = FALSE;
 
-  audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
-  audio.soundserver_pid = -1;
+  audio.mixer_pipe[0] = audio.mixer_pipe[1] = 0;
+  audio.mixer_pid = -1;
   audio.device_name = NULL;
   audio.device_fd = -1;
 

@@ -50,11 +50,12 @@ static int num_sounds = 0, num_music = 0;
 /* THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
 
 static struct AudioFormatInfo afmt;
-static struct SoundControl playlist[NUM_MIXER_CHANNELS];
-static int playing_sounds = 0;
+static struct SoundControl mixer[NUM_MIXER_CHANNELS];
+static int mixer_active_channels = 0;
 
 /* forward declaration of internal functions */
-static void SoundServer_InsertNewSound(struct SoundControl);
+static void Mixer_Main(void);
+static void Mixer_InsertNewSound(struct SoundControl);
 static void InitAudioDevice(struct AudioFormatInfo *);
 
 #if defined(PLATFORM_UNIX)
@@ -63,9 +64,9 @@ static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
 #endif
 #elif defined(PLATFORM_MSDOS)
-static void SoundServer_InsertNewSound(struct SoundControl);
-static void SoundServer_StopSound(struct SoundControl);
-static void SoundServer_StopAllSounds();
+static void Mixer_InsertNewSound(struct SoundControl);
+static void Mixer_StopSound(struct SoundControl);
+static void Mixer_StopAllSounds();
 #endif
 
 static void ReloadCustomSounds();
@@ -132,27 +133,27 @@ static boolean TestAudioDevices(void)
 #if !defined(TARGET_SDL)
 static boolean ForkAudioProcess(void)
 {
-  if (pipe(audio.soundserver_pipe) < 0)
+  if (pipe(audio.mixer_pipe) < 0)
   {
     Error(ERR_WARN, "cannot create pipe -- no sounds");
     return FALSE;
   }
 
-  if ((audio.soundserver_pid = fork()) < 0)
+  if ((audio.mixer_pid = fork()) < 0)
   {       
     Error(ERR_WARN, "cannot create sound server process -- no sounds");
     return FALSE;
   }
 
-  if (audio.soundserver_pid == 0)	/* we are child process */
+  if (audio.mixer_pid == 0)		/* we are child process */
   {
-    SoundServer();
+    Mixer_Main();
 
     /* never reached */
     exit(0);
   }
   else					/* we are parent */
-    close(audio.soundserver_pipe[0]); /* no reading from pipe needed */
+    close(audio.mixer_pipe[0]); 	/* no reading from pipe needed */
 
   return TRUE;
 }
@@ -181,8 +182,8 @@ void UnixCloseAudio(void)
   if (audio.device_fd)
     close(audio.device_fd);
 
-  if (audio.soundserver_pid > 0)	/* we are parent process */
-    kill(audio.soundserver_pid, SIGTERM);
+  if (audio.mixer_pid > 0)		/* we are parent process */
+    kill(audio.mixer_pid, SIGTERM);
 }
 
 static void WriteReloadInfoToPipe(char *set_name, int type)
@@ -194,29 +195,35 @@ static void WriteReloadInfoToPipe(char *set_name, int type)
   unsigned long str_size2 = strlen(ti->basepath) + 1;
   unsigned long str_size3 = strlen(ti->fullpath) + 1;
 
+  if (audio.mixer_pid == 0)		/* we are child process */
+    return;
+
+  if (leveldir_current == NULL)		/* should never happen */
+    Error(ERR_EXIT, "leveldir_current == NULL");
+
   snd_ctrl.active = FALSE;
   snd_ctrl.state = type;
   snd_ctrl.data_len = strlen(set_name) + 1;
 
-  if (write(audio.soundserver_pipe[1], &snd_ctrl,
+  if (write(audio.mixer_pipe[1], &snd_ctrl,
 	    sizeof(snd_ctrl)) < 0 ||
-      write(audio.soundserver_pipe[1], set_name,
+      write(audio.mixer_pipe[1], set_name,
 	    snd_ctrl.data_len) < 0 ||
-      write(audio.soundserver_pipe[1], leveldir_current,
+      write(audio.mixer_pipe[1], leveldir_current,
 	    sizeof(TreeInfo)) < 0 ||
-      write(audio.soundserver_pipe[1], ti,
+      write(audio.mixer_pipe[1], ti,
 	    sizeof(TreeInfo)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size1,
+      write(audio.mixer_pipe[1], &str_size1,
 	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size2,
+      write(audio.mixer_pipe[1], &str_size2,
 	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size3,
+      write(audio.mixer_pipe[1], &str_size3,
 	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], leveldir_current->fullpath,
+      write(audio.mixer_pipe[1], leveldir_current->fullpath,
 	    str_size1) < 0 ||
-      write(audio.soundserver_pipe[1], ti->basepath,
+      write(audio.mixer_pipe[1], ti->basepath,
 	    str_size2) < 0 ||
-      write(audio.soundserver_pipe[1], ti->fullpath,
+      write(audio.mixer_pipe[1], ti->fullpath,
 	    str_size3) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
@@ -249,17 +256,17 @@ static void ReadReloadInfoFromPipe(struct SoundControl snd_ctrl)
   if (ti->fullpath != NULL)
     free(ti->fullpath);
 
-  if (read(audio.soundserver_pipe[0], set_name,
+  if (read(audio.mixer_pipe[0], set_name,
 	   snd_ctrl.data_len) != snd_ctrl.data_len ||
-      read(audio.soundserver_pipe[0], leveldir_current,
+      read(audio.mixer_pipe[0], leveldir_current,
 	   sizeof(TreeInfo)) != sizeof(TreeInfo) ||
-      read(audio.soundserver_pipe[0], ti,
+      read(audio.mixer_pipe[0], ti,
 	   sizeof(TreeInfo)) != sizeof(TreeInfo) ||
-      read(audio.soundserver_pipe[0], &str_size1,
+      read(audio.mixer_pipe[0], &str_size1,
 	   sizeof(unsigned long)) != sizeof(unsigned long) ||
-      read(audio.soundserver_pipe[0], &str_size2,
+      read(audio.mixer_pipe[0], &str_size2,
 	   sizeof(unsigned long)) != sizeof(unsigned long) ||
-      read(audio.soundserver_pipe[0], &str_size3,
+      read(audio.mixer_pipe[0], &str_size3,
 	   sizeof(unsigned long)) != sizeof(unsigned long))
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
@@ -267,11 +274,11 @@ static void ReadReloadInfoFromPipe(struct SoundControl snd_ctrl)
   ti->basepath = checked_calloc(str_size2);
   ti->fullpath = checked_calloc(str_size3);
 
-  if (read(audio.soundserver_pipe[0], leveldir_current->fullpath,
+  if (read(audio.mixer_pipe[0], leveldir_current->fullpath,
 	   str_size1) != str_size1 ||
-      read(audio.soundserver_pipe[0], ti->basepath,
+      read(audio.mixer_pipe[0], ti->basepath,
 	   str_size2) != str_size2 ||
-      read(audio.soundserver_pipe[0], ti->fullpath,
+      read(audio.mixer_pipe[0], ti->fullpath,
 	   str_size3) != str_size3)
     Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
@@ -282,29 +289,34 @@ static void ReadReloadInfoFromPipe(struct SoundControl snd_ctrl)
 }
 #endif	/* PLATFORM_UNIX */
 
-void InitPlaylist(void)
+void Mixer_InitChannels()
 {
   int i;
 
   for(i=0; i<audio.num_channels; i++)
-    playlist[i].active = FALSE;
-  playing_sounds = 0;
+    mixer[i].active = FALSE;
+  mixer_active_channels = 0;
 }
 
-static void PlaylistRemoveSound(int pos)
+static void Mixer_FadeSound(int channel)
 {
-  if (!playing_sounds || !playlist[pos].active)
+  mixer[channel].state |= SND_CTRL_FADE;
+}
+
+static void Mixer_RemoveSound(int channel)
+{
+  if (!mixer_active_channels || !mixer[channel].active)
     return;
 
 #if 0
-  printf("REMOVING PLAYLIST SOUND %d\n", pos);
+  printf("REMOVING MIXER SOUND %d\n", channel);
 #endif
 
-  playlist[pos].active = FALSE;
-  playing_sounds--;
+  mixer[channel].active = FALSE;
+  mixer_active_channels--;
 }
 
-static void PlaylistInsertSound(struct SoundControl snd_ctrl)
+static void Mixer_InsertSound(struct SoundControl snd_ctrl)
 {
   SoundInfo *snd_info;
   int i, k;
@@ -328,53 +340,53 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
   }
 
 #if 0
-  printf("-> %d\n", playing_sounds);
+  printf("-> %d\n", mixer_active_channels);
 #endif
 
-  if (playing_sounds == audio.num_channels)
+  if (mixer_active_channels == audio.num_channels)
   {
     for (i=0; i<audio.num_channels; i++)
     {
-      if (playlist[i].data_ptr == NULL)
+      if (mixer[i].data_ptr == NULL)
       {
 #if 1
 	printf("THIS SHOULD NEVER HAPPEN! [%d]\n", i);
 #endif
 
-	PlaylistRemoveSound(i);
+	Mixer_RemoveSound(i);
       }
     }
   }
 
-  /* if playlist is full, remove oldest sound */
-  if (playing_sounds == audio.num_channels)
+  /* if mixer is full, remove oldest sound */
+  if (mixer_active_channels == audio.num_channels)
   {
     int longest = 0, longest_nr = audio.first_sound_channel;
 
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
 #if !defined(PLATFORM_MSDOS)
-      int actual = 100 * playlist[i].playingpos / playlist[i].data_len;
+      int actual = 100 * mixer[i].playingpos / mixer[i].data_len;
 #else
-      int actual = playlist[i].playingpos;
+      int actual = mixer[i].playingpos;
 #endif
 
-      if (!IS_LOOP(playlist[i]) && actual > longest)
+      if (!IS_LOOP(mixer[i]) && actual > longest)
       {
 	longest = actual;
 	longest_nr = i;
       }
     }
 #if defined(PLATFORM_MSDOS)
-    voice_set_volume(playlist[longest_nr].voice, 0);
-    deallocate_voice(playlist[longest_nr].voice);
+    voice_set_volume(mixer[longest_nr].voice, 0);
+    deallocate_voice(mixer[longest_nr].voice);
 #endif
-    PlaylistRemoveSound(longest_nr);
+    Mixer_RemoveSound(longest_nr);
   }
 
   /* check if sound is already being played (and how often) */
   for (k=0, i=audio.first_sound_channel; i<audio.num_channels; i++)
-    if (playlist[i].nr == snd_ctrl.nr)
+    if (mixer[i].nr == snd_ctrl.nr)
       k++;
 
   /* restart loop sounds only if they are just fading out */
@@ -382,14 +394,14 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
   {
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
-      if (playlist[i].nr == snd_ctrl.nr && IS_FADING(playlist[i]))
+      if (mixer[i].nr == snd_ctrl.nr && IS_FADING(mixer[i]))
       {
-	playlist[i].state &= ~SND_CTRL_FADE;
-	playlist[i].volume = PSND_MAX_VOLUME;
+	mixer[i].state &= ~SND_CTRL_FADE;
+	mixer[i].volume = PSND_MAX_VOLUME;
 #if defined(PLATFORM_MSDOS)
-        playlist[i].state |= SND_CTRL_LOOP;
-        voice_stop_volumeramp(playlist[i].voice);
-        voice_ramp_volume(playlist[i].voice, playlist[i].volume, 1000);
+        mixer[i].state |= SND_CTRL_LOOP;
+        voice_stop_volumeramp(mixer[i].voice);
+        voice_ramp_volume(mixer[i].voice, mixer[i].volume, 1000);
 #endif
       }
     }
@@ -407,13 +419,13 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
     {
       int actual;
 
-      if (!playlist[i].active || playlist[i].nr != snd_ctrl.nr)
+      if (!mixer[i].active || mixer[i].nr != snd_ctrl.nr)
 	continue;
 
 #if !defined(PLATFORM_MSDOS)
-      actual = 100 * playlist[i].playingpos / playlist[i].data_len;
+      actual = 100 * mixer[i].playingpos / mixer[i].data_len;
 #else
-      actual = playlist[i].playingpos;
+      actual = mixer[i].playingpos;
 #endif
       if (actual >= longest)
       {
@@ -423,13 +435,13 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
     }
 
 #if defined(PLATFORM_MSDOS)
-    voice_set_volume(playlist[longest_nr].voice, 0);
-    deallocate_voice(playlist[longest_nr].voice);
+    voice_set_volume(mixer[longest_nr].voice, 0);
+    deallocate_voice(mixer[longest_nr].voice);
 #endif
-    PlaylistRemoveSound(longest_nr);
+    Mixer_RemoveSound(longest_nr);
   }
 
-  /* add new sound to playlist */
+  /* add new sound to mixer */
   for(i=0; i<audio.num_channels; i++)
   {
 #if 0
@@ -437,11 +449,11 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
 #endif
 
     /*
-    if (!playlist[i].active ||
+    if (!mixer[i].active ||
 	(IS_MUSIC(snd_ctrl) && i == audio.music_channel))
     */
     if ((i == audio.music_channel && IS_MUSIC(snd_ctrl)) ||
-	(i != audio.music_channel && !playlist[i].active))
+	(i != audio.music_channel && !mixer[i].active))
     {
       snd_ctrl.data_ptr = snd_info->data_ptr;
       snd_ctrl.data_len = snd_info->data_len;
@@ -458,32 +470,32 @@ static void PlaylistInsertSound(struct SoundControl snd_ctrl)
 #endif
 
 #if 1
-      if (IS_MUSIC(snd_ctrl) && i == audio.music_channel && playlist[i].active)
+      if (IS_MUSIC(snd_ctrl) && i == audio.music_channel && mixer[i].active)
       {
 	printf("THIS SHOULD NEVER HAPPEN! [adding music twice]\n");
 
 #if 1
-	PlaylistRemoveSound(i);
+	Mixer_RemoveSound(i);
 #endif
       }
 #endif
 
-      playlist[i] = snd_ctrl;
-      playing_sounds++;
+      mixer[i] = snd_ctrl;
+      mixer_active_channels++;
 
 #if 0
-      printf("NEW SOUND %d ADDED TO PLAYLIST\n", snd_ctrl.nr);
+      printf("NEW SOUND %d ADDED TO MIXER\n", snd_ctrl.nr);
 #endif
 
 #if defined(PLATFORM_MSDOS)
-      playlist[i].voice = allocate_voice((SAMPLE *)playlist[i].data_ptr);
+      mixer[i].voice = allocate_voice((SAMPLE *)mixer[i].data_ptr);
 
       if (snd_ctrl.loop)
-        voice_set_playmode(playlist[i].voice, PLAYMODE_LOOP);
+        voice_set_playmode(mixer[i].voice, PLAYMODE_LOOP);
 
-      voice_set_volume(playlist[i].voice, snd_ctrl.volume);
-      voice_set_pan(playlist[i].voice, snd_ctrl.stereo);
-      voice_start(playlist[i].voice);       
+      voice_set_volume(mixer[i].voice, snd_ctrl.volume);
+      voice_set_pan(mixer[i].voice, snd_ctrl.stereo);
+      voice_start(mixer[i].voice);       
 #endif
       break;
     }
@@ -497,7 +509,7 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
     ReadReloadInfoFromPipe(snd_ctrl);
-    InitPlaylist();
+    Mixer_InitChannels();
     CloseAudioDevice(&audio.device_fd);
 
     if (snd_ctrl.state & SND_CTRL_RELOAD_SOUNDS)
@@ -507,44 +519,44 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
   }
   else if (IS_FADING(snd_ctrl))		/* fade out existing sound or music */
   {
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       return;
 
     if (IS_MUSIC(snd_ctrl))
     {
-      playlist[audio.music_channel].state |= SND_CTRL_FADE;
+      mixer[audio.music_channel].state |= SND_CTRL_FADE;
       return;
     }
 
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-      if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
-	playlist[i].state |= SND_CTRL_FADE;
+      if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+	mixer[i].state |= SND_CTRL_FADE;
   }
   else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
   {
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       return;
 
     if (IS_MUSIC(snd_ctrl))
     {
-      PlaylistRemoveSound(audio.music_channel);
+      Mixer_RemoveSound(audio.music_channel);
       return;
     }
 
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
-      if (playlist[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
-	PlaylistRemoveSound(i);
+      if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
+	Mixer_RemoveSound(i);
 
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       CloseAudioDevice(&audio.device_fd);
   }
-  else if (snd_ctrl.active)		/* add new sound to playlist */
+  else if (snd_ctrl.active)		/* add new sound to mixer */
   {
-    SoundServer_InsertNewSound(snd_ctrl);
+    Mixer_InsertNewSound(snd_ctrl);
   }
 }
 
-void StartSoundserver(void)
+void StartMixer(void)
 {
   if (!audio.sound_available)
     return;
@@ -575,7 +587,7 @@ static void CopySampleToMixingBuffer(struct SoundControl *snd_ctrl,
 }
 
 #if defined(AUDIO_STREAMING_DSP)
-static void SoundServer_Mixer()
+static void Mixer_Main_DSP()
 {
   static int stereo_volume[PSND_MAX_LEFT2RIGHT + 1];
   static boolean stereo_volume_calculated = FALSE;
@@ -599,7 +611,7 @@ static void SoundServer_Mixer()
     stereo_volume_calculated = TRUE;
   }
 
-  if (!playing_sounds)
+  if (!mixer_active_channels)
     return;
 
   if (audio.device_fd < 0)
@@ -626,29 +638,29 @@ static void SoundServer_Mixer()
     int sample_pos;
     int sample_size;
 
-    if (!playlist[i].active)
+    if (!mixer[i].active)
       continue;
 
     /* pointer, lenght and actual playing position of sound sample */
-    sample_ptr = playlist[i].data_ptr;
-    sample_len = playlist[i].data_len;
-    sample_pos = playlist[i].playingpos;
+    sample_ptr = mixer[i].data_ptr;
+    sample_len = mixer[i].data_len;
+    sample_pos = mixer[i].playingpos;
     sample_size = MIN(max_sample_size, sample_len - sample_pos);
-    playlist[i].playingpos += sample_size;
+    mixer[i].playingpos += sample_size;
 
     /* copy original sample to first mixing buffer */
-    CopySampleToMixingBuffer(&playlist[i], sample_pos, sample_size,
+    CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
 			     premix_first_buffer);
 
     /* are we about to restart a looping sound? */
-    if (IS_LOOP(playlist[i]) && sample_size < max_sample_size)
+    if (IS_LOOP(mixer[i]) && sample_size < max_sample_size)
     {
       while (sample_size < max_sample_size)
       {
 	int restarted_sample_size =
 	  MIN(max_sample_size - sample_size, sample_len);
 
-	if (playlist[i].format == AUDIO_FORMAT_U8)
+	if (mixer[i].format == AUDIO_FORMAT_U8)
 	  for (j=0; j<restarted_sample_size; j++)
 	    premix_first_buffer[sample_size + j] =
 	      ((short)(((byte *)sample_ptr)[j] ^ 0x80)) << 8;
@@ -657,29 +669,29 @@ static void SoundServer_Mixer()
 	    premix_first_buffer[sample_size + j] =
 	      ((short *)sample_ptr)[j];
 
-	playlist[i].playingpos = restarted_sample_size;
+	mixer[i].playingpos = restarted_sample_size;
 	sample_size += restarted_sample_size;
       }
     }
 
     /* decrease volume if sound is fading out */
-    if (IS_FADING(playlist[i]) &&
-	playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
-      playlist[i].volume -= SOUND_FADING_VOLUME_STEP;
+    if (IS_FADING(mixer[i]) &&
+	mixer[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
+      mixer[i].volume -= SOUND_FADING_VOLUME_STEP;
 
     /* adjust volume of actual sound sample */
-    if (playlist[i].volume != PSND_MAX_VOLUME)
+    if (mixer[i].volume != PSND_MAX_VOLUME)
       for(j=0; j<sample_size; j++)
 	premix_first_buffer[j] =
-	  (playlist[i].volume * (long)premix_first_buffer[j])
+	  (mixer[i].volume * (long)premix_first_buffer[j])
 	    >> PSND_MAX_VOLUME_BITS;
 
     /* fill the last mixing buffer with stereo or mono sound */
     if (stereo)
     {
       int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
-      int left_volume = stereo_volume[middle_pos + playlist[i].stereo];
-      int right_volume= stereo_volume[middle_pos - playlist[i].stereo];
+      int left_volume = stereo_volume[middle_pos + mixer[i].stereo];
+      int right_volume= stereo_volume[middle_pos - mixer[i].stereo];
 
       for(j=0; j<sample_size; j++)
       {
@@ -700,16 +712,16 @@ static void SoundServer_Mixer()
 	premix_last_buffer[j] += premix_first_buffer[j];
     }
 
-    /* delete completed sound entries from the playlist */
-    if (playlist[i].playingpos >= playlist[i].data_len)
+    /* delete completed sound entries from the mixer */
+    if (mixer[i].playingpos >= mixer[i].data_len)
     {
-      if (IS_LOOP(playlist[i]))
-	playlist[i].playingpos = 0;
+      if (IS_LOOP(mixer[i]))
+	mixer[i].playingpos = 0;
       else
-	PlaylistRemoveSound(i);
+	Mixer_RemoveSound(i);
     }
-    else if (playlist[i].volume <= SOUND_FADING_VOLUME_THRESHOLD)
-      PlaylistRemoveSound(i);
+    else if (mixer[i].volume <= SOUND_FADING_VOLUME_THRESHOLD)
+      Mixer_RemoveSound(i);
   }
 
   /* prepare final playing buffer according to system audio format */
@@ -743,13 +755,13 @@ static void SoundServer_Mixer()
   /* finally play the sound fragment */
   write(audio.device_fd, playing_buffer, fragment_size);
 
-  if (!playing_sounds)
+  if (!mixer_active_channels)
     CloseAudioDevice(&audio.device_fd);
 }
 
 #else /* !AUDIO_STREAMING_DSP */
 
-static int SoundServer_SimpleAudio(struct SoundControl snd_ctrl)
+static int Mixer_Main_SimpleAudio(struct SoundControl snd_ctrl)
 {
   static short premix_first_buffer[SND_BLOCKSIZE];
   static byte playing_buffer[SND_BLOCKSIZE];
@@ -763,21 +775,21 @@ static int SoundServer_SimpleAudio(struct SoundControl snd_ctrl)
   i = 1;
 
   /* pointer, lenght and actual playing position of sound sample */
-  sample_ptr = playlist[i].data_ptr;
-  sample_len = playlist[i].data_len;
-  sample_pos = playlist[i].playingpos;
+  sample_ptr = mixer[i].data_ptr;
+  sample_len = mixer[i].data_len;
+  sample_pos = mixer[i].playingpos;
   sample_size = MIN(max_sample_size, sample_len - sample_pos);
-  playlist[i].playingpos += sample_size;
+  mixer[i].playingpos += sample_size;
 
   /* copy original sample to first mixing buffer */
-  CopySampleToMixingBuffer(&playlist[i], sample_pos, sample_size,
+  CopySampleToMixingBuffer(&mixer[i], sample_pos, sample_size,
 			   premix_first_buffer);
 
   /* adjust volume of actual sound sample */
-  if (playlist[i].volume != PSND_MAX_VOLUME)
+  if (mixer[i].volume != PSND_MAX_VOLUME)
     for(j=0; j<sample_size; j++)
       premix_first_buffer[j] =
-	(playlist[i].volume * (long)premix_first_buffer[j])
+	(mixer[i].volume * (long)premix_first_buffer[j])
 	  >> PSND_MAX_VOLUME_BITS;
 
   /* might be needed for u-law /dev/audio */
@@ -787,9 +799,9 @@ static int SoundServer_SimpleAudio(struct SoundControl snd_ctrl)
       linear_to_ulaw(premix_first_buffer[j]);
 #endif
 
-  /* delete completed sound entries from the playlist */
-  if (playlist[i].playingpos >= playlist[i].data_len)
-    PlaylistRemoveSound(i);
+  /* delete completed sound entries from the mixer */
+  if (mixer[i].playingpos >= mixer[i].data_len)
+    Mixer_RemoveSound(i);
 
   for(i=0; i<sample_size; i++)
     playing_buffer[i] = (premix_first_buffer[i] >> 8) ^ 0x80;
@@ -801,31 +813,31 @@ static int SoundServer_SimpleAudio(struct SoundControl snd_ctrl)
 }
 #endif /* !AUDIO_STREAMING_DSP */
 
-void SoundServer()
+void Mixer_Main()
 {
   struct SoundControl snd_ctrl;
-  fd_set sound_fdset;
+  fd_set mixer_fdset;
 
-  close(audio.soundserver_pipe[1]);	/* no writing into pipe needed */
+  close(audio.mixer_pipe[1]);	/* no writing into pipe needed */
 
-  InitPlaylist();
+  Mixer_InitChannels();
 
 #if defined(PLATFORM_HPUX)
   InitAudioDevice(&afmt);
 #endif
 
-  FD_ZERO(&sound_fdset); 
-  FD_SET(audio.soundserver_pipe[0], &sound_fdset);
+  FD_ZERO(&mixer_fdset); 
+  FD_SET(audio.mixer_pipe[0], &mixer_fdset);
 
   while(1)	/* wait for sound playing commands from client */
   {
     struct timeval delay = { 0, 0 };
 
-    FD_SET(audio.soundserver_pipe[0], &sound_fdset);
-    select(audio.soundserver_pipe[0] + 1, &sound_fdset, NULL, NULL, NULL);
-    if (!FD_ISSET(audio.soundserver_pipe[0], &sound_fdset))
+    FD_SET(audio.mixer_pipe[0], &mixer_fdset);
+    select(audio.mixer_pipe[0] + 1, &mixer_fdset, NULL, NULL, NULL);
+    if (!FD_ISSET(audio.mixer_pipe[0], &mixer_fdset))
       continue;
-    if (read(audio.soundserver_pipe[0], &snd_ctrl, sizeof(snd_ctrl))
+    if (read(audio.mixer_pipe[0], &snd_ctrl, sizeof(snd_ctrl))
 	!= sizeof(snd_ctrl))
       Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
@@ -833,12 +845,13 @@ void SoundServer()
 
 #if defined(AUDIO_STREAMING_DSP)
 
-    while (playing_sounds && select(audio.soundserver_pipe[0] + 1,
-				    &sound_fdset, NULL, NULL, &delay) < 1)
+    while (mixer_active_channels &&
+	   select(audio.mixer_pipe[0] + 1,
+		  &mixer_fdset, NULL, NULL, &delay) < 1)
     {
-      FD_SET(audio.soundserver_pipe[0], &sound_fdset);
+      FD_SET(audio.mixer_pipe[0], &mixer_fdset);
 
-      SoundServer_Mixer();
+      Mixer_Main_DSP();
     }
 
 #else /* !AUDIO_STREAMING_DSP */
@@ -852,15 +865,16 @@ void SoundServer()
     delay.tv_sec = 0;
     delay.tv_usec = 0;
 
-    while (playing_sounds && select(audio.soundserver_pipe[0] + 1,
-				    &sound_fdset, NULL, NULL, &delay) < 1)
+    while (mixer_active_channels &&
+	   select(audio.mixer_pipe[0] + 1,
+		  &mixer_fdset, NULL, NULL, &delay) < 1)
     {
       int wait_percent = 90;	/* wait 90% of the real playing time */
       int sample_size;
 
-      FD_SET(audio.soundserver_pipe[0], &sound_fdset);
+      FD_SET(audio.mixer_pipe[0], &mixer_fdset);
 
-      sample_size = SoundServer_SimpleAudio(snd_ctrl);
+      sample_size = Mixer_Main_SimpleAudio(snd_ctrl);
 
       delay.tv_sec = 0;
       delay.tv_usec =
@@ -869,8 +883,7 @@ void SoundServer()
 
     CloseAudioDevice(&audio.device_fd);
 
-    /* delete all sounds from playlist */
-    InitPlaylist();
+    Mixer_InitChannels();	/* remove all sounds from mixer */
 
 #endif /* !AUDIO_STREAMING_DSP */
   }
@@ -884,50 +897,50 @@ static void sound_handler(struct SoundControl snd_ctrl)
 
   if (snd_ctrl.fade_sound)
   {
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       return;
 
     for (i=0; i<audio.num_channels; i++)
       if ((snd_ctrl.stop_all_sounds ||
-	   (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr) ||
+	   (i != audio.music_channel && mixer[i].nr == snd_ctrl.nr) ||
 	   (i == audio.music_channel && snd_ctrl.music)) &&
-	  !playlist[i].fade_sound)
+	  !mixer[i].fade_sound)
       {
-	playlist[i].fade_sound = TRUE;
-	if (voice_check(playlist[i].voice))
-	  voice_ramp_volume(playlist[i].voice, 1000, 0);
-	playlist[i].state &= ~SND_CTRL_IS_LOOP;
+	mixer[i].fade_sound = TRUE;
+	if (voice_check(mixer[i].voice))
+	  voice_ramp_volume(mixer[i].voice, 1000, 0);
+	mixer[i].state &= ~SND_CTRL_IS_LOOP;
       }
   }
   else if (snd_ctrl.stop_all_sounds)
   {
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       return;
-    SoundServer_StopAllSounds();
+    Mixer_StopAllSounds();
   }
   else if (snd_ctrl.stop_sound)
   {
-    if (!playing_sounds)
+    if (!mixer_active_channels)
       return;
-    SoundServer_StopSound(snd_ctrl);
+    Mixer_StopSound(snd_ctrl);
   }
 
   for (i=0; i<audio.num_channels; i++)
   {
-    if (!playlist[i].active || playlist[i].loop)
+    if (!mixer[i].active || mixer[i].loop)
       continue;
 
-    playlist[i].playingpos = voice_get_position(playlist[i].voice);
-    playlist[i].volume = voice_get_volume(playlist[i].voice);
-    if (playlist[i].playingpos == -1 || !playlist[i].volume)
+    mixer[i].playingpos = voice_get_position(mixer[i].voice);
+    mixer[i].volume = voice_get_volume(mixer[i].voice);
+    if (mixer[i].playingpos == -1 || !mixer[i].volume)
     {
-      deallocate_voice(playlist[i].voice);
-      PlaylistRemoveSound(i);
+      deallocate_voice(mixer[i].voice);
+      Mixer_RemoveSound(i);
     }
   }
 
   if (snd_ctrl.active)
-    SoundServer_InsertNewSound(snd_ctrl);
+    Mixer_InsertNewSound(snd_ctrl);
 }
 #endif /* PLATFORM_MSDOS */
 
@@ -941,68 +954,68 @@ static void sound_handler_SDL(struct SoundControl snd_ctrl)
 #endif
 
 #if !defined(PLATFORM_WIN32)
-static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
+static void Mixer_InsertNewSound(struct SoundControl snd_ctrl)
 {
-  PlaylistInsertSound(snd_ctrl);
+  Mixer_InsertSound(snd_ctrl);
 }
 #endif /* !PLATFORM_WIN32 */
 
 /*
-void SoundServer_FadeSound(int nr)
+void Mixer_FadeSound(int nr)
 {
   int i;
 
-  if (!playing_sounds)
+  if (!mixer_active_channels)
     return;
 
   for(i=0;i<audio.num_channels;i++)
-    if (snd_ctrl.stop_all_sounds || playlist[i].nr == snd_ctrl.nr)
-      playlist[i].fade_sound = TRUE;
+    if (snd_ctrl.stop_all_sounds || mixer[i].nr == snd_ctrl.nr)
+      mixer[i].fade_sound = TRUE;
 }
 */
 
 #if !defined(PLATFORM_WIN32)
 #if defined(PLATFORM_MSDOS)
-static void SoundServer_StopSound(struct SoundControl snd_ctrl)
+static void Mixer_StopSound(struct SoundControl snd_ctrl)
 {
   int nr = snd_ctrl.nr;
   int i;
 
-  if (!playing_sounds)
+  if (!mixer_active_channels)
     return;
 
   for(i=0; i<audio.num_channels; i++)
   {
     if ((i == audio.music_channel && snd_ctrl.music) ||
-	(i != audio.music_channel && playlist[i].nr == nr))
+	(i != audio.music_channel && mixer[i].nr == nr))
     {
 #if defined(PLATFORM_MSDOS)
-      voice_set_volume(playlist[i].voice, 0);
-      deallocate_voice(playlist[i].voice);
+      voice_set_volume(mixer[i].voice, 0);
+      deallocate_voice(mixer[i].voice);
 #endif
-      PlaylistRemoveSound(i);
+      Mixer_RemoveSound(i);
     }
   }
 
 #if !defined(PLATFORM_MSDOS)
-  if (!playing_sounds)
+  if (!mixer_active_channels)
     close(audio.device_fd);
 #endif
 }
 
-static void SoundServer_StopAllSounds()
+static void Mixer_StopAllSounds()
 {
   int i;
 
   for(i=0; i<audio.num_channels; i++)
   {
 #if defined(PLATFORM_MSDOS)
-    voice_set_volume(playlist[i].voice, 0);
-    deallocate_voice(playlist[i].voice);
+    voice_set_volume(mixer[i].voice, 0);
+    deallocate_voice(mixer[i].voice);
 #endif
-    PlaylistRemoveSound(i);
+    Mixer_RemoveSound(i);
   }
-  playing_sounds = 0;
+  mixer_active_channels = 0;
 
 #if !defined(PLATFORM_MSDOS)
   close(audio.device_fd);
@@ -1664,10 +1677,10 @@ void PlaySoundExt(int nr, int volume, int stereo, int state)
     Mix_PlayChannel(-1, Sound[nr]->data_ptr, (state & SND_CTRL_LOOP ? -1 : 0));
   }
 #elif defined(PLATFORM_UNIX)
-  if (audio.soundserver_pid == 0)	/* we are child process */
+  if (audio.mixer_pid == 0)		/* we are child process */
     return;
 
-  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
+  if (write(audio.mixer_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
@@ -1766,10 +1779,10 @@ void StopSoundExt(int nr, int state)
 
 #elif !defined(PLATFORM_MSDOS)
 
-  if (audio.soundserver_pid == 0)	/* we are child process */
+  if (audio.mixer_pid == 0)		/* we are child process */
     return;
 
-  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
+  if (write(audio.mixer_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
     Error(ERR_WARN, "cannot pipe to child process -- no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
@@ -1931,69 +1944,28 @@ static void ReloadCustomMusic()
   LoadCustomMusic();
 }
 
-static void InitReloadSoundsOrMusic(char *set_name, int type)
+void InitReloadSounds(char *set_name)
 {
   if (!audio.sound_available)
     return;
 
 #if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
-  if (type == SND_CTRL_RELOAD_SOUNDS)
-    ReloadCustomSounds();
-  else
-    ReloadCustomMusic();
+  ReloadCustomSounds();
 #elif defined(PLATFORM_UNIX)
-  if (audio.soundserver_pid == 0)	/* we are child process */
-    return;
-
-  if (leveldir_current == NULL)		/* should never happen */
-    Error(ERR_EXIT, "leveldir_current == NULL");
-
-#if 1
-  WriteReloadInfoToPipe(set_name, type);
-#else
-
-  snd_ctrl.active = FALSE;
-  snd_ctrl.state = type;
-  snd_ctrl.data_len = strlen(set_name) + 1;
-
-  if (write(audio.soundserver_pipe[1], &snd_ctrl,
-	    sizeof(snd_ctrl)) < 0 ||
-      write(audio.soundserver_pipe[1], set_name,
-	    snd_ctrl.data_len) < 0 ||
-      write(audio.soundserver_pipe[1], leveldir_current,
-	    sizeof(TreeInfo)) < 0 ||
-      write(audio.soundserver_pipe[1], ti,
-	    sizeof(TreeInfo)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size1,
-	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size2,
-	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], &str_size3,
-	    sizeof(unsigned long)) < 0 ||
-      write(audio.soundserver_pipe[1], leveldir_current->fullpath,
-	    str_size1) < 0 ||
-      write(audio.soundserver_pipe[1], ti->basepath,
-	    str_size2) < 0 ||
-      write(audio.soundserver_pipe[1], ti->fullpath,
-	    str_size3) < 0)
-  {
-    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
-    audio.sound_available = audio.sound_enabled = FALSE;
-    return;
-  }
+  WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_SOUNDS);
 #endif
-
-#endif
-}
-
-void InitReloadSounds(char *set_name)
-{
-  InitReloadSoundsOrMusic(set_name, SND_CTRL_RELOAD_SOUNDS);
 }
 
 void InitReloadMusic(char *set_name)
 {
-  InitReloadSoundsOrMusic(set_name, SND_CTRL_RELOAD_MUSIC);
+  if (!audio.music_available)
+    return;
+
+#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
+  ReloadCustomMusic();
+#elif defined(PLATFORM_UNIX)
+  WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_MUSIC);
+#endif
 }
 
 void FreeSound(void *ptr)
@@ -2050,7 +2022,7 @@ void FreeAllSounds()
     return;
 
   printf("%s: FREEING SOUNDS ...\n",
-	 audio.soundserver_pid == 0 ? "CHILD" : "PARENT");
+	 audio.mixer_pid == 0 ? "CHILD" : "PARENT");
 
   for(i=0; i<num_sounds; i++)
     deleteSoundEntry(&Sound[i]);
@@ -2059,7 +2031,7 @@ void FreeAllSounds()
   */
 
   printf("%s: FREEING SOUNDS -- DONE\n",
-	 audio.soundserver_pid == 0 ? "CHILD" : "PARENT");
+	 audio.mixer_pid == 0 ? "CHILD" : "PARENT");
 
   free(Sound);
 

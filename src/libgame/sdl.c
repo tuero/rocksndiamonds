@@ -899,7 +899,7 @@ inline void SDLOpenAudio(void)
   Mix_Volume(-1, SOUND_MAX_VOLUME);
   Mix_VolumeMusic(SOUND_MAX_VOLUME);
 
-  InitPlaylist();
+  Mixer_InitChannels();
 }
 
 inline void SDLCloseAudio(void)
