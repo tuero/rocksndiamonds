@@ -1016,6 +1016,9 @@ void InitGame()
     player->Frame = 0;
     player->StepFrame = 0;
 
+    player->switch_x = -1;
+    player->switch_y = -1;
+
     player->use_murphy_graphic = FALSE;
     player->use_disk_red_graphic = FALSE;
 
@@ -3095,6 +3098,11 @@ void Impact(int x, int y)
 	else
 	{
 	  CheckElementChange(x, y + 1, smashed, CE_SMASHED);
+
+	  CheckTriggeredElementSideChange(x, y + 1, smashed, CH_SIDE_TOP,
+					  CE_OTHER_IS_SWITCHING);
+	  CheckElementSideChange(x, y + 1, smashed, CH_SIDE_TOP,
+				 CE_SWITCHED, -1);
 	}
       }
       else
@@ -7415,6 +7423,7 @@ int DigField(struct PlayerInfo *player,
 
   switch (element)
   {
+#if 0
     case EL_ROBOT_WHEEL:
       Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
       ZX = x;
@@ -7423,7 +7432,9 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVATING);
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_SP_TERMINAL:
       {
 	int xx, yy;
@@ -7444,7 +7455,9 @@ int DigField(struct PlayerInfo *player,
 	return MF_ACTION;
       }
       break;
+#endif
 
+#if 0
     case EL_CONVEYOR_BELT_1_SWITCH_LEFT:
     case EL_CONVEYOR_BELT_1_SWITCH_MIDDLE:
     case EL_CONVEYOR_BELT_1_SWITCH_RIGHT:
@@ -7457,31 +7470,56 @@ int DigField(struct PlayerInfo *player,
     case EL_CONVEYOR_BELT_4_SWITCH_LEFT:
     case EL_CONVEYOR_BELT_4_SWITCH_MIDDLE:
     case EL_CONVEYOR_BELT_4_SWITCH_RIGHT:
+#if 1
+      if (!PLAYER_SWITCHING(player, x, y))
+#else
       if (!player->Switching)
+#endif
       {
 	player->Switching = TRUE;
+	player->switch_x = x;
+	player->switch_y = y;
+
 	ToggleBeltSwitch(x, y);
 	PlaySoundLevel(x, y, SND_CLASS_CONVEYOR_BELT_SWITCH_ACTIVATING);
       }
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_SWITCHGATE_SWITCH_UP:
     case EL_SWITCHGATE_SWITCH_DOWN:
+#if 1
+      if (!PLAYER_SWITCHING(player, x, y))
+#else
       if (!player->Switching)
+#endif
       {
 	player->Switching = TRUE;
+	player->switch_x = x;
+	player->switch_y = y;
+
 	ToggleSwitchgateSwitch(x, y);
 	PlaySoundLevel(x, y, SND_CLASS_SWITCHGATE_SWITCH_ACTIVATING);
       }
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_LIGHT_SWITCH:
     case EL_LIGHT_SWITCH_ACTIVE:
+#if 1
+      if (!PLAYER_SWITCHING(player, x, y))
+#else
       if (!player->Switching)
+#endif
       {
 	player->Switching = TRUE;
+	player->switch_x = x;
+	player->switch_y = y;
+
 	ToggleLightSwitch(x, y);
 	PlaySoundLevel(x, y, element == EL_LIGHT_SWITCH ?
 		       SND_LIGHT_SWITCH_ACTIVATING :
@@ -7489,14 +7527,18 @@ int DigField(struct PlayerInfo *player,
       }
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_TIMEGATE_SWITCH:
       ActivateTimegateSwitch(x, y);
       PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVATING);
 
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_BALLOON_SWITCH_LEFT:
     case EL_BALLOON_SWITCH_RIGHT:
     case EL_BALLOON_SWITCH_UP:
@@ -7514,6 +7556,7 @@ int DigField(struct PlayerInfo *player,
 
       return MF_ACTION;
       break;
+#endif
 
     case EL_SP_PORT_LEFT:
     case EL_SP_PORT_RIGHT:
@@ -7606,6 +7649,7 @@ int DigField(struct PlayerInfo *player,
       }
       break;
 
+#if 0
     case EL_LAMP:
       Feld[x][y] = EL_LAMP_ACTIVE;
       local_player->lights_still_needed--;
@@ -7613,7 +7657,9 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_LAMP_ACTIVATING);
       return MF_ACTION;
       break;
+#endif
 
+#if 0
     case EL_TIME_ORB_FULL:
       Feld[x][y] = EL_TIME_ORB_EMPTY;
       TimeLeft += 10;
@@ -7622,6 +7668,7 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MIDDLE);
       return MF_ACTION;
       break;
+#endif
 
     default:
 
@@ -7910,29 +7957,175 @@ int DigField(struct PlayerInfo *player,
 
 	break;
       }
+      else if (IS_SWITCHABLE(element))
+      {
+	if (PLAYER_SWITCHING(player, x, y))
+	  return MF_ACTION;
+
+#if 1
+	PlaySoundLevelElementAction(x, y, element, ACTION_ACTIVATING);
+#endif
+
+	if (element == EL_ROBOT_WHEEL)
+	{
+	  Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
+	  ZX = x;
+	  ZY = y;
+
+	  DrawLevelField(x, y);
+
+#if 0
+	  PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVATING);
+#endif
+	}
+	else if (element == EL_SP_TERMINAL)
+	{
+	  int xx, yy;
+
+#if 0
+	  PlaySoundLevel(x, y, SND_SP_TERMINAL_ACTIVATING);
+#endif
+
+	  for (yy=0; yy<lev_fieldy; yy++)
+	  {
+	    for (xx=0; xx<lev_fieldx; xx++)
+	    {
+	      if (Feld[xx][yy] == EL_SP_DISK_YELLOW)
+		Bang(xx, yy);
+	      else if (Feld[xx][yy] == EL_SP_TERMINAL)
+		Feld[xx][yy] = EL_SP_TERMINAL_ACTIVE;
+	    }
+	  }
+	}
+	else if (IS_BELT_SWITCH(element))
+	{
+#if 0
+	  if (!PLAYER_SWITCHING(player, x, y))
+#endif
+	  {
+	    player->Switching = TRUE;
+	    player->switch_x = x;
+	    player->switch_y = y;
+
+	    ToggleBeltSwitch(x, y);
+
+#if 0
+	    PlaySoundLevel(x, y, SND_CLASS_CONVEYOR_BELT_SWITCH_ACTIVATING);
+#endif
+	  }
+	}
+	else if (element == EL_SWITCHGATE_SWITCH_UP ||
+		 element == EL_SWITCHGATE_SWITCH_DOWN)
+	{
+#if 0
+	  if (!PLAYER_SWITCHING(player, x, y))
+#endif
+	  {
+	    player->Switching = TRUE;
+	    player->switch_x = x;
+	    player->switch_y = y;
+
+	    ToggleSwitchgateSwitch(x, y);
+
+#if 0
+	    PlaySoundLevel(x, y, SND_CLASS_SWITCHGATE_SWITCH_ACTIVATING);
+#endif
+	  }
+	}
+	else if (element == EL_LIGHT_SWITCH ||
+		 element == EL_LIGHT_SWITCH_ACTIVE)
+	{
+#if 0
+	  if (!PLAYER_SWITCHING(player, x, y))
+#endif
+	  {
+	    player->Switching = TRUE;
+	    player->switch_x = x;
+	    player->switch_y = y;
+
+	    ToggleLightSwitch(x, y);
+
+#if 0
+	    PlaySoundLevel(x, y, element == EL_LIGHT_SWITCH ?
+			   SND_LIGHT_SWITCH_ACTIVATING :
+			   SND_LIGHT_SWITCH_DEACTIVATING);
+#endif
+	  }
+	}
+	else if (element == EL_TIMEGATE_SWITCH)
+	{
+	  ActivateTimegateSwitch(x, y);
+
+#if 0
+	  PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVATING);
+#endif
+	}
+	else if (element == EL_BALLOON_SWITCH_LEFT ||
+		 element == EL_BALLOON_SWITCH_RIGHT ||
+		 element == EL_BALLOON_SWITCH_UP ||
+		 element == EL_BALLOON_SWITCH_DOWN ||
+		 element == EL_BALLOON_SWITCH_ANY)
+	{
+	  if (element == EL_BALLOON_SWITCH_ANY)
+	    game.balloon_dir = move_direction;
+	  else
+	    game.balloon_dir = (element == EL_BALLOON_SWITCH_LEFT  ? MV_LEFT :
+				element == EL_BALLOON_SWITCH_RIGHT ? MV_RIGHT :
+				element == EL_BALLOON_SWITCH_UP    ? MV_UP :
+				element == EL_BALLOON_SWITCH_DOWN  ? MV_DOWN :
+				MV_NO_MOVING);
+
+#if 0
+	  PlaySoundLevel(x, y, SND_CLASS_BALLOON_SWITCH_ACTIVATING);
+#endif
+	}
+	else if (element == EL_LAMP)
+	{
+	  Feld[x][y] = EL_LAMP_ACTIVE;
+	  local_player->lights_still_needed--;
+
+	  DrawLevelField(x, y);
+
+#if 0
+	  PlaySoundLevel(x, y, SND_LAMP_ACTIVATING);
+#endif
+	}
+	else if (element == EL_TIME_ORB_FULL)
+	{
+	  Feld[x][y] = EL_TIME_ORB_EMPTY;
+	  TimeLeft += 10;
+	  DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+
+	  DrawLevelField(x, y);
+
+#if 0
+	  PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MIDDLE);
+#endif
+	}
+
+	return MF_ACTION;
+      }
       else
       {
 #if 1
-
-#if 1
+	if (!PLAYER_SWITCHING(player, x, y))
+#else
 	if (!player->Switching)
+#endif
 	{
 	  player->Switching = TRUE;
+	  player->switch_x = x;
+	  player->switch_y = y;
+
 	  CheckTriggeredElementSideChange(x, y, element, dig_side,
-					  CE_OTHER_GETS_SWITCHED);
-	  CheckElementSideChange(x, y, element, dig_side,
-				 CE_SWITCHED_BY_PLAYER, -1);
+					  CE_OTHER_IS_SWITCHING);
+	  CheckElementSideChange(x, y, element, dig_side, CE_SWITCHED, -1);
 	}
-#endif
 
 	CheckTriggeredElementSideChange(x, y, element, dig_side,
 					CE_OTHER_GETS_PRESSED);
 	CheckElementSideChange(x, y, element, dig_side,
 			       CE_PRESSED_BY_PLAYER, -1);
-#else
-	CheckTriggeredElementChange(x, y, element, CE_OTHER_GETS_PRESSED);
-	CheckElementChange(x, y, element, CE_PRESSED_BY_PLAYER);
-#endif
       }
 
       return MF_NO_ACTION;

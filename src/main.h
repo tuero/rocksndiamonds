@@ -179,8 +179,8 @@
 #define CE_LEFT_BY_PLAYER	22
 #define CE_OTHER_GETS_ENTERED	23
 #define CE_OTHER_GETS_LEFT	24
-#define CE_SWITCHED_BY_PLAYER	25
-#define CE_OTHER_GETS_SWITCHED	26
+#define CE_SWITCHED		25
+#define CE_OTHER_IS_SWITCHING	26
 
 #define NUM_CHANGE_EVENTS	27
 
@@ -358,6 +358,9 @@
 				 IS_INDESTRUCTIBLE(Feld[x][y]))
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
+
+#define PLAYER_SWITCHING(p,x,y)	((p)->Switching &&			\
+				 (p)->switch_x == (x) && (p)->switch_y == (y))
 
 #define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER_2 - IMG_PLAYER_1))
 
@@ -1137,6 +1140,8 @@ struct PlayerInfo
   boolean Switching;
   boolean LevelSolved, GameOver;
   boolean snapped;
+
+  int switch_x, switch_y;
 
   int last_move_dir;
   boolean is_moving;

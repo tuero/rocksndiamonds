@@ -1114,11 +1114,11 @@ static struct ValueTextInfo options_change_direct_action[] =
 {
   { CE_TOUCHED_BY_PLAYER,	"touched by player ..."		},
   { CE_PRESSED_BY_PLAYER,	"pressed by player ..."		},
-  { CE_SWITCHED_BY_PLAYER,	"switched by player ..."	},
   { CE_PUSHED_BY_PLAYER,	"pushed by player ..."		},
   { CE_ENTERED_BY_PLAYER,	"entered by player ..."		},
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
   { CE_DROPPED_BY_PLAYER,	"dropped by player"		},
+  { CE_SWITCHED,		"switched ..."			},
   { CE_COLLISION,		"collision ..."			},
   { CE_IMPACT,			"impact"			},
   { CE_SMASHED,			"smashed"			},
@@ -1129,7 +1129,6 @@ static struct ValueTextInfo options_change_other_action[] =
 {
   { CE_OTHER_GETS_TOUCHED,	"player touches ..."		},
   { CE_OTHER_GETS_PRESSED,	"player presses ..."		},
-  { CE_OTHER_GETS_SWITCHED,	"player switches ..."		},
   { CE_OTHER_GETS_PUSHED,	"player pushes ..."		},
   { CE_OTHER_GETS_ENTERED,	"player enters ..."		},
   { CE_OTHER_GETS_LEFT,		"player leaves ..."		},
@@ -1137,6 +1136,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_COLLECTED,	"player collects"		},
   { CE_OTHER_GETS_DROPPED,	"player drops"			},
   { CE_OTHER_IS_TOUCHING,	"touching ..."			},
+  { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
   { CE_OTHER_IS_CHANGING,	"change of"			},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
   { -1,				NULL				}
@@ -4591,11 +4591,11 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.direct_action =
     (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
-     HAS_CHANGE_EVENT(element, CE_SWITCHED_BY_PLAYER) ? CE_SWITCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_ENTERED_BY_PLAYER) ? CE_ENTERED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_LEFT_BY_PLAYER) ? CE_LEFT_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_DROPPED_BY_PLAYER) ? CE_DROPPED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_SWITCHED) ? CE_SWITCHED :
      HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
@@ -4605,7 +4605,6 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.other_action =
     (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_SWITCHED) ? CE_OTHER_GETS_SWITCHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_ENTERED) ? CE_OTHER_GETS_ENTERED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_LEFT) ? CE_OTHER_GETS_LEFT :
@@ -4613,6 +4612,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
+     HAS_CHANGE_EVENT(element, CE_OTHER_IS_SWITCHING) ? CE_OTHER_IS_SWITCHING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
      custom_element_change.other_action);
@@ -4709,11 +4709,11 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set player change event from checkbox and selectbox */
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
-  custom_element_change_events[CE_SWITCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_ENTERED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_LEFT_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_DROPPED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_SWITCHED] = FALSE;
   custom_element_change_events[CE_COLLISION] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
@@ -4723,7 +4723,6 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set other element action change event from checkbox and selectbox */
   custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_SWITCHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_ENTERED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_LEFT] = FALSE;
@@ -4731,6 +4730,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
   custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
+  custom_element_change_events[CE_OTHER_IS_SWITCHING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
   custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
