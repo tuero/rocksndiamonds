@@ -405,6 +405,18 @@ char *getSetupFilename()
   return filename;
 }
 
+char *getEditorSetupFilename()
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(getSetupDir(), EDITORSETUP_FILENAME);
+
+  return filename;
+}
+
 static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;
@@ -1275,6 +1287,9 @@ SetupFileHash *newSetupFileHash()
   SetupFileHash *new_hash =
     create_hashtable(16, 0.75, get_hash_from_key, keys_are_equal);
 
+  if (new_hash == NULL)
+    Error(ERR_EXIT, "create_hashtable() failed -- out of memory");
+
   return new_hash;
 }
 
@@ -1387,7 +1402,11 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     if (line_ptr < line + line_len)
       value = line_ptr + 1;
     else
+#if 1
+      value = "true";	/* treat tokens without value as "true" */
+#else
       value = "\0";
+#endif
 
     /* cut leading whitespaces from value */
     for (; *value; value++)
@@ -2618,17 +2637,15 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 
 void LoadLevelSetup_LastSeries()
 {
-  char *filename;
-  SetupFileHash *level_setup_hash = NULL;
-
-  /* always start with reliable default values */
-  leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
-
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup.conf                                            */
   /* ----------------------------------------------------------------------- */
 
-  filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
+  char *filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
+  SetupFileHash *level_setup_hash = NULL;
+
+  /* always start with reliable default values */
+  leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
   if ((level_setup_hash = loadSetupFileHash(filename)))
   {
@@ -2652,17 +2669,15 @@ void LoadLevelSetup_LastSeries()
 
 void SaveLevelSetup_LastSeries()
 {
-  char *filename;
-  char *level_subdir = leveldir_current->filename;
-  FILE *file;
-
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup.conf                                            */
   /* ----------------------------------------------------------------------- */
 
-  InitUserDataDirectory();
+  char *filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
+  char *level_subdir = leveldir_current->filename;
+  FILE *file;
 
-  filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
+  InitUserDataDirectory();
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {

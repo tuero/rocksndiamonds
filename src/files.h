@@ -40,5 +40,6 @@ void SaveSetup();
 
 void LoadCustomElementDescriptions();
 void LoadSpecialMenuDesignSettings();
+void LoadUserDefinedEditorElementList(int **, int *);
 
 #endif	/* FILES_H */

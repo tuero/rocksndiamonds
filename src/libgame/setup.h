@@ -196,6 +196,7 @@ char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getScoreFilename(int);
 char *getSetupFilename(void);
+char *getEditorSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);

@@ -1922,6 +1922,8 @@ static int editor_el_boulderdash[] =
   EL_BD_FIREFLY_DOWN,
   EL_EMPTY,
 };
+static int *editor_hl_boulderdash_ptr = editor_hl_boulderdash;
+static int *editor_el_boulderdash_ptr = editor_el_boulderdash;
 static int num_editor_hl_boulderdash = SIZEOF_ARRAY_INT(editor_hl_boulderdash);
 static int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
 
@@ -2027,6 +2029,8 @@ static int editor_el_emerald_mine[] =
   EL_EM_GATE_3_GRAY,
   EL_EM_GATE_4_GRAY,
 };
+static int *editor_hl_emerald_mine_ptr = editor_hl_emerald_mine;
+static int *editor_el_emerald_mine_ptr = editor_el_emerald_mine;
 static int num_editor_hl_emerald_mine=SIZEOF_ARRAY_INT(editor_hl_emerald_mine);
 static int num_editor_el_emerald_mine=SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
@@ -2135,6 +2139,8 @@ static int editor_el_more[] =
   EL_EMC_WALL_6,
   EL_EMC_WALL_7,
 };
+static int *editor_hl_more_ptr = editor_hl_more;
+static int *editor_el_more_ptr = editor_el_more;
 static int num_editor_hl_more = SIZEOF_ARRAY_INT(editor_hl_more);
 static int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
 
@@ -2158,6 +2164,8 @@ static int editor_el_sokoban[] =
   EL_SOKOBAN_FIELD_FULL,
   EL_STEELWALL,
 };
+static int *editor_hl_sokoban_ptr = editor_hl_sokoban;
+static int *editor_el_sokoban_ptr = editor_el_sokoban;
 static int num_editor_hl_sokoban = SIZEOF_ARRAY_INT(editor_hl_sokoban);
 static int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
 
@@ -2230,6 +2238,8 @@ static int editor_el_supaplex[] =
   EL_SP_CHIP_TOP,
   EL_SP_CHIP_BOTTOM,
 };
+static int *editor_hl_supaplex_ptr = editor_hl_supaplex;
+static int *editor_el_supaplex_ptr = editor_el_supaplex;
 static int num_editor_hl_supaplex = SIZEOF_ARRAY_INT(editor_hl_supaplex);
 static int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
 
@@ -2323,6 +2333,8 @@ static int editor_el_diamond_caves[] =
   EL_EXTRA_TIME,
   EL_EMPTY,
 };
+static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
+static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;
 static int num_editor_hl_diamond_caves = SIZEOF_ARRAY_INT(editor_hl_diamond_caves);
 static int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
 
@@ -2371,6 +2383,8 @@ static int editor_el_dx_boulderdash[] =
   EL_EMPTY,
   EL_EMPTY
 };
+static int *editor_hl_dx_boulderdash_ptr = editor_hl_dx_boulderdash;
+static int *editor_el_dx_boulderdash_ptr = editor_el_dx_boulderdash;
 static int num_editor_hl_dx_boulderdash = SIZEOF_ARRAY_INT(editor_hl_dx_boulderdash);
 static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
 
@@ -2474,6 +2488,8 @@ static int editor_el_chars[] =
   EL_CHAR(FONT_ASCII_CURSOR),
   EL_CHAR(' ')
 };
+static int *editor_hl_chars_ptr = editor_hl_chars;
+static int *editor_el_chars_ptr = editor_el_chars;
 static int num_editor_hl_chars = SIZEOF_ARRAY_INT(editor_hl_chars);
 static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
@@ -2662,6 +2678,8 @@ static int editor_el_custom[] =
   EL_CUSTOM_START + 126,
   EL_CUSTOM_START + 127
 };
+static int *editor_hl_custom_ptr = editor_hl_custom;
+static int *editor_el_custom_ptr = editor_el_custom;
 static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
 static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
@@ -2831,8 +2849,43 @@ static int editor_el_custom_more[] =
   EL_CUSTOM_START + 254,
   EL_CUSTOM_START + 255
 };
+static int *editor_hl_custom_more_ptr = editor_hl_custom_more;
+static int *editor_el_custom_more_ptr = editor_el_custom_more;
 static int num_editor_hl_custom_more = SIZEOF_ARRAY_INT(editor_hl_custom_more);
 static int num_editor_el_custom_more = SIZEOF_ARRAY_INT(editor_el_custom_more);
+
+static int editor_hl_user_defined[] =
+{
+  EL_CHAR('U'),
+  EL_CHAR('S'),
+  EL_CHAR('E'),
+  EL_CHAR('R'),
+
+  EL_CHAR('D'),
+  EL_CHAR('E'),
+  EL_CHAR('F'),
+  EL_CHAR('I'),
+
+  EL_CHAR('-'),
+  EL_CHAR('N'),
+  EL_CHAR('E'),
+  EL_CHAR('D'),
+};
+
+static int *editor_hl_user_defined_ptr = editor_hl_user_defined;
+static int *editor_el_user_defined_ptr = NULL;
+static int num_editor_hl_user_defined=SIZEOF_ARRAY_INT(editor_hl_user_defined);
+static int num_editor_el_user_defined = 0;
+
+static int editor_hl_empty[] = { };
+static int editor_el_empty[ED_NUM_ELEMENTLIST_BUTTONS];
+
+static int *editor_hl_empty_ptr = editor_hl_empty;
+static int *editor_el_empty_ptr = editor_el_empty;
+static int num_editor_hl_empty = 0;
+static int num_editor_el_empty = 0;	/* dynamically determined, if needed */
+
+static boolean use_el_empty = FALSE;
 
 static int *editor_elements = NULL;	/* dynamically allocated */
 static int num_editor_elements = 0;	/* dynamically determined */
@@ -2841,10 +2894,10 @@ static struct
 {
   boolean *setup_value;
 
-  int *headline_list;
+  int **headline_list;
   int *headline_list_size;
 
-  int *element_list;
+  int **element_list;
   int *element_list_size;
 
   boolean last_setup_value;
@@ -2853,53 +2906,63 @@ editor_elements_info[] =
 {
   {
     &setup.editor.el_boulderdash,
-    editor_hl_boulderdash,		&num_editor_hl_boulderdash,
-    editor_el_boulderdash,		&num_editor_el_boulderdash
+    &editor_hl_boulderdash_ptr,		&num_editor_hl_boulderdash,
+    &editor_el_boulderdash_ptr,		&num_editor_el_boulderdash
   },
   {
     &setup.editor.el_emerald_mine,
-    editor_hl_emerald_mine,		&num_editor_hl_emerald_mine,
-    editor_el_emerald_mine,		&num_editor_el_emerald_mine
+    &editor_hl_emerald_mine_ptr,	&num_editor_hl_emerald_mine,
+    &editor_el_emerald_mine_ptr,	&num_editor_el_emerald_mine
   },
   {
     &setup.editor.el_more,
-    editor_hl_more,			&num_editor_hl_more,
-    editor_el_more,			&num_editor_el_more
+    &editor_hl_more_ptr,		&num_editor_hl_more,
+    &editor_el_more_ptr,		&num_editor_el_more
   },
   {
     &setup.editor.el_sokoban,
-    editor_hl_sokoban,			&num_editor_hl_sokoban,
-    editor_el_sokoban,			&num_editor_el_sokoban
+    &editor_hl_sokoban_ptr,		&num_editor_hl_sokoban,
+    &editor_el_sokoban_ptr,		&num_editor_el_sokoban
   },
   {
     &setup.editor.el_supaplex,
-    editor_hl_supaplex,			&num_editor_hl_supaplex,
-    editor_el_supaplex,			&num_editor_el_supaplex
+    &editor_hl_supaplex_ptr,		&num_editor_hl_supaplex,
+    &editor_el_supaplex_ptr,		&num_editor_el_supaplex
   },
   {
     &setup.editor.el_diamond_caves,
-    editor_hl_diamond_caves,		&num_editor_hl_diamond_caves,
-    editor_el_diamond_caves,		&num_editor_el_diamond_caves
+    &editor_hl_diamond_caves_ptr,	&num_editor_hl_diamond_caves,
+    &editor_el_diamond_caves_ptr,	&num_editor_el_diamond_caves
   },
   {
     &setup.editor.el_dx_boulderdash,
-    editor_hl_dx_boulderdash,		&num_editor_hl_dx_boulderdash,
-    editor_el_dx_boulderdash,		&num_editor_el_dx_boulderdash
+    &editor_hl_dx_boulderdash_ptr,	&num_editor_hl_dx_boulderdash,
+    &editor_el_dx_boulderdash_ptr,	&num_editor_el_dx_boulderdash
   },
   {
     &setup.editor.el_chars,
-    editor_hl_chars,			&num_editor_hl_chars,
-    editor_el_chars,			&num_editor_el_chars
+    &editor_hl_chars_ptr,		&num_editor_hl_chars,
+    &editor_el_chars_ptr,		&num_editor_el_chars
   },
   {
     &setup.editor.el_custom,
-    editor_hl_custom,			&num_editor_hl_custom,
-    editor_el_custom,			&num_editor_el_custom
+    &editor_hl_custom_ptr,		&num_editor_hl_custom,
+    &editor_el_custom_ptr,		&num_editor_el_custom
   },
   {
     &setup.editor.el_custom_more,
-    editor_hl_custom_more,		&num_editor_hl_custom_more,
-    editor_el_custom_more,		&num_editor_el_custom_more
+    &editor_hl_custom_more_ptr,		&num_editor_hl_custom_more,
+    &editor_el_custom_more_ptr,		&num_editor_el_custom_more
+  },
+  {
+    &setup.editor.el_user_defined,
+    &editor_hl_user_defined_ptr,	&num_editor_hl_user_defined,
+    &editor_el_user_defined_ptr,	&num_editor_el_user_defined
+  },
+  {
+    &use_el_empty,
+    &editor_hl_empty_ptr,		&num_editor_hl_empty,
+    &editor_el_empty_ptr,		&num_editor_el_empty,
   },
   {
     NULL,
@@ -2970,14 +3033,22 @@ static void ReinitializeElementList()
   if (editor_elements != NULL)
     free(editor_elements);
 
-  /* do some sanity check for each element from element list at startup */
   if (!initialized)
   {
+    /* initialize optional user defined element list */
+    LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,
+				     &num_editor_el_user_defined);
+
+    /* initialize list of empty elements (used for padding, if needed) */
+    for (i=0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+      editor_el_empty[i] = EL_EMPTY;
+
+    /* do some sanity checks for each element from element list */
     for (i=0; editor_elements_info[i].setup_value != NULL; i++)
     {
       for (j=0; j < *editor_elements_info[i].element_list_size; j++)
       {
-	int element = editor_elements_info[i].element_list[j];
+	int element = (*editor_elements_info[i].element_list)[j];
 
 	if (element >= NUM_FILE_ELEMENTS)
 	  Error(ERR_WARN, "editor element %d is runtime element", element);
@@ -2991,6 +3062,7 @@ static void ReinitializeElementList()
   }
 
   num_editor_elements = 0;
+  use_el_empty = FALSE;
 
   /* determine size of element list */
   for (i=0; editor_elements_info[i].setup_value != NULL; i++)
@@ -3006,11 +3078,11 @@ static void ReinitializeElementList()
 
   if (num_editor_elements < ED_NUM_ELEMENTLIST_BUTTONS)
   {
-    /* workaround: offer at least as many elements as element buttons exist */
-    int list_nr = 1;	/* see above: editor_elements_info for Emerald Mine */
+    /* offer at least as many elements as element buttons exist */
+    use_el_empty = TRUE;
+    num_editor_el_empty = ED_NUM_ELEMENTLIST_BUTTONS - num_editor_elements;
 
-    *editor_elements_info[list_nr].setup_value = TRUE;
-    num_editor_elements += *editor_elements_info[list_nr].element_list_size;
+    num_editor_elements += num_editor_el_empty;
   }
 
   editor_elements = checked_malloc(num_editor_elements * sizeof(int));
@@ -3022,10 +3094,10 @@ static void ReinitializeElementList()
     {
       if (setup.editor.el_headlines)
 	for (j=0; j < *editor_elements_info[i].headline_list_size; j++)
-	  editor_elements[pos++] = editor_elements_info[i].headline_list[j];
+	  editor_elements[pos++] = (*editor_elements_info[i].headline_list)[j];
 
       for (j=0; j < *editor_elements_info[i].element_list_size; j++)
-	editor_elements[pos++] = editor_elements_info[i].element_list[j];
+	editor_elements[pos++] = (*editor_elements_info[i].element_list)[j];
     }
   }
 

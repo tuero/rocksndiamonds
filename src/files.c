@@ -13,6 +13,7 @@
 
 #include <ctype.h>
 #include <sys/stat.h>
+#include <math.h>
 
 #include "libgame/libgame.h"
 
@@ -2299,8 +2300,9 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		8
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM_MORE	9
 #define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	11
 
-#define NUM_EDITOR_SETUP_TOKENS			11
+#define NUM_EDITOR_SETUP_TOKENS			12
 
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
@@ -2387,6 +2389,7 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
   { TYPE_SWITCH, &sei.el_custom_more,	"editor.el_custom_more"		},
   { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
+  { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -2485,6 +2488,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_custom_more = FALSE;
 
   si->editor.el_headlines = TRUE;
+  si->editor.el_user_defined = FALSE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
@@ -2755,4 +2759,88 @@ void LoadSpecialMenuDesignSettings()
   }
 
   freeSetupFileHash(setup_file_hash);
+}
+
+static char *itoa(unsigned int i)
+{
+  static char *a = NULL;
+
+  if (a != NULL)
+    free(a);
+
+  if (i > 2147483647)	/* yes, this is a kludge */
+    i = 2147483647;
+
+  a = checked_malloc(10 + 1);
+
+  sprintf(a, "%d", i);
+
+  return a;
+}
+
+void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
+{
+  char *filename = getEditorSetupFilename();
+  SetupFileList *setup_file_list, *list;
+  SetupFileHash *element_hash;
+  int num_unknown_tokens = 0;
+  int i;
+
+  if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+    return;
+
+  element_hash = newSetupFileHash();
+
+  for (i=0; i < NUM_FILE_ELEMENTS; i++)
+    setHashEntry(element_hash, element_info[i].token_name, itoa(i));
+
+  /* determined size may be larger than needed (due to unknown elements) */
+  *num_elements = 0;
+  for (list = setup_file_list; list != NULL; list = list->next)
+    (*num_elements)++;
+
+  /* add space for up to 3 more elements for padding that may be needed */
+  *num_elements += 3;
+
+  *elements = checked_malloc(*num_elements * sizeof(int));
+
+  *num_elements = 0;
+  for (list = setup_file_list; list != NULL; list = list->next)
+  {
+    char *value = getHashEntry(element_hash, list->token);
+
+    if (value)
+    {
+      (*elements)[(*num_elements)++] = atoi(value);
+    }
+    else
+    {
+      if (num_unknown_tokens == 0)
+      {
+	Error(ERR_RETURN_LINE, "-");
+	Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
+	Error(ERR_RETURN, "- config file: '%s'", filename);
+
+	num_unknown_tokens++;
+      }
+
+      Error(ERR_RETURN, "- token: '%s'", list->token);
+    }
+  }
+
+  if (num_unknown_tokens > 0)
+    Error(ERR_RETURN_LINE, "-");
+
+  while (*num_elements % 4)	/* pad with empty elements, if needed */
+    (*elements)[(*num_elements)++] = EL_EMPTY;
+
+  freeSetupFileList(setup_file_list);
+  freeSetupFileHash(element_hash);
+
+#if 0
+  /* TEST-ONLY */
+  for (i=0; i < *num_elements; i++)
+    printf("editor: element '%s' [%d]\n",
+	   element_info[(*elements)[i]].token_name, (*elements)[i]);
+#endif
 }

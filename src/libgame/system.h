@@ -227,6 +227,7 @@
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
+#define EDITORSETUP_FILENAME	"editorsetup.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
 #define GRAPHICSINFO_FILENAME	"graphicsinfo.conf"
 #define SOUNDSINFO_FILENAME	"soundsinfo.conf"
@@ -238,6 +239,7 @@
 #define LEVELSETUP_DIRECTORY	"lvlsetup"
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
+#define EDITORSETUP_FILENAME	"edsetup.conf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
 #define GRAPHICSINFO_FILENAME	"gfxinfo.cnf"
 #define SOUNDSINFO_FILENAME	"sndinfo.cnf"
@@ -539,6 +541,7 @@ struct SetupEditorInfo
   boolean el_chars;
   boolean el_custom;
   boolean el_custom_more;
+  boolean el_user_defined;
 
   boolean el_headlines;
 };
