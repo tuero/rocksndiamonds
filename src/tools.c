@@ -767,7 +767,11 @@ void DrawNewGraphicAnimationExt(int x, int y, int graphic, int mask_mode)
 {
   int delay = new_graphic_info[graphic].anim_delay;
 
+#if 0
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#else
+  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#endif
   {
     int frame = getNewGraphicAnimationFrame(graphic, -1);
 
@@ -1468,6 +1472,21 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     DrawGraphic(x, y, graphic);
 }
 
+inline static int getFramePosition(int x, int y)
+{
+  int element = Feld[x][y];
+  int frame_pos = -1;
+
+  if (element == EL_QUICKSAND_FULL ||
+      element == EL_MAGIC_WALL_FULL ||
+      element == EL_BD_MAGIC_WALL_FULL)
+    frame_pos = -1;
+  else if (IS_MOVING(x, y) || CAN_MOVE(element) || CAN_FALL(element))
+    frame_pos = ABS(MovPos[x][y]) / (TILEX / 8);
+
+  return frame_pos;
+}
+
 inline static int getGfxAction(int x, int y)
 {
   int gfx_action = GFX_ACTION_DEFAULT;
@@ -1485,7 +1504,7 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 {
   int ux = LEVELX(x), uy = LEVELY(y);
   int move_dir = MovDir[ux][uy];
-  int move_pos = ABS(MovPos[ux][uy]) / (TILEX / 8);
+  int move_pos = getFramePosition(ux, uy);
   int gfx_action = getGfxAction(ux, uy);
   int graphic = el_dir_act2img(element, move_dir, gfx_action);
   int frame = getNewGraphicAnimationFrame(graphic, move_pos);
@@ -1494,9 +1513,9 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     boolean left_stopped = FALSE, right_stopped = FALSE;
 
-    if (!IN_LEV_FIELD(ux-1, uy) || IS_MAUER(Feld[ux-1][uy]))
+    if (!IN_LEV_FIELD(ux - 1, uy) || IS_MAUER(Feld[ux - 1][uy]))
       left_stopped = TRUE;
-    if (!IN_LEV_FIELD(ux+1, uy) || IS_MAUER(Feld[ux+1][uy]))
+    if (!IN_LEV_FIELD(ux + 1, uy) || IS_MAUER(Feld[ux + 1][uy]))
       right_stopped = TRUE;
 
     if (left_stopped && right_stopped)
@@ -1531,12 +1550,17 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 	graphic += phase2;
     }
   }
+#endif
   else if (IS_AMOEBOID(element) || element == EL_AMOEBA_DRIPPING)
   {
-    graphic = (element == EL_AMOEBA_DEAD ? GFX_AMOEBE_TOT : GFX_AMOEBE_LEBT);
+    graphic = (element == EL_BD_AMOEBA ? IMG_BD_AMOEBA_PART1 :
+	       element == EL_AMOEBA_WET ? IMG_AMOEBA_WET_PART1 :
+	       element == EL_AMOEBA_DRY ? IMG_AMOEBA_DRY_PART1 :
+	       element == EL_AMOEBA_FULL ? IMG_AMOEBA_FULL_PART1 :
+	       IMG_AMOEBA_DEAD_PART1);
+
     graphic += (x + 2 * y + 4) % 4;
   }
-#endif
 
   if (dx || dy)
     DrawNewGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);

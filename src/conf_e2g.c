@@ -709,20 +709,72 @@ element_to_graphic[] =
     IMG_AMOEBA_CREATING
   },
   {
-    EL_AMOEBA_PART1,				-1, -1,
-    IMG_AMOEBA_PART1
+    EL_AMOEBA_SHRINKING,			-1, -1,
+    IMG_AMOEBA_SHRINKING
   },
   {
-    EL_AMOEBA_PART2,				-1, -1,
-    IMG_AMOEBA_PART2
+    EL_AMOEBA_WET,				-1, -1,
+    IMG_AMOEBA_WET
   },
   {
-    EL_AMOEBA_PART3,				-1, -1,
-    IMG_AMOEBA_PART3
+    EL_AMOEBA_WET_PART1,			-1, -1,
+    IMG_AMOEBA_WET_PART1
   },
   {
-    EL_AMOEBA_PART4,				-1, -1,
-    IMG_AMOEBA_PART4
+    EL_AMOEBA_WET_PART2,			-1, -1,
+    IMG_AMOEBA_WET_PART2
+  },
+  {
+    EL_AMOEBA_WET_PART3,			-1, -1,
+    IMG_AMOEBA_WET_PART3
+  },
+  {
+    EL_AMOEBA_WET_PART4,			-1, -1,
+    IMG_AMOEBA_WET_PART4
+  },
+  {
+    EL_AMOEBA_DRY,				-1, -1,
+    IMG_AMOEBA_DRY
+  },
+  {
+    EL_AMOEBA_DRY_PART1,			-1, -1,
+    IMG_AMOEBA_DRY_PART1
+  },
+  {
+    EL_AMOEBA_DRY_PART2,			-1, -1,
+    IMG_AMOEBA_DRY_PART2
+  },
+  {
+    EL_AMOEBA_DRY_PART3,			-1, -1,
+    IMG_AMOEBA_DRY_PART3
+  },
+  {
+    EL_AMOEBA_DRY_PART4,			-1, -1,
+    IMG_AMOEBA_DRY_PART4
+  },
+  {
+    EL_AMOEBA_FULL,				-1, -1,
+    IMG_AMOEBA_FULL
+  },
+  {
+    EL_AMOEBA_FULL,				-1, GFX_ACTION_OTHER,
+    IMG_AMOEBA_FULL_PART1
+  },
+  {
+    EL_AMOEBA_FULL,				-1, GFX_ACTION_OTHER,
+    IMG_AMOEBA_FULL_PART2
+  },
+  {
+    EL_AMOEBA_FULL,				-1, GFX_ACTION_OTHER,
+    IMG_AMOEBA_FULL_PART3
+  },
+  {
+    EL_AMOEBA_FULL,				-1, GFX_ACTION_OTHER,
+    IMG_AMOEBA_FULL_PART4
+  },
+  {
+    EL_AMOEBA_DEAD,				-1, -1,
+    IMG_AMOEBA_DEAD
   },
   {
     EL_AMOEBA_DEAD_PART1,			-1, -1,

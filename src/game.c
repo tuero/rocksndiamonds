@@ -3122,7 +3122,12 @@ void StartMoving(int x, int y)
 
 	PlaySoundLevel(newx, newy, SND_PENGUIN_PASSING_EXIT);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
+#if 0
 	  DrawGraphicThruMask(SCREENX(newx), SCREENY(newy), el2gfx(element));
+#else
+	  DrawNewGraphicThruMask(SCREENX(newx), SCREENY(newy), el2img(element),
+				 0);
+#endif
 
 	local_player->friends_still_needed--;
 	if (!local_player->friends_still_needed &&
@@ -3651,7 +3656,7 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 	AmoebaNr[x][y] = 0;
 	Feld[x][y] = new_element;
 	InitField(x, y, FALSE);
-	DrawLevelField(x, y);
+	DrawNewLevelField(x, y);
 	done = TRUE;
       }
     }
@@ -3686,13 +3691,22 @@ void AmoebeWaechst(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_AMOEBING + 3 - MovDelay[x][y]/2);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_AMOEBA_CREATING,
+					      6 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_CREATING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -3714,12 +3728,21 @@ void AmoebaDisappearing(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_AMOEBING + MovDelay[x][y]/2);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_AMOEBA_SHRINKING,
+					      6 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_SHRINKING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EMPTY;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
 
       /* don't let mole enter this field in this cycle;
 	 (give priority to objects falling to this field from above) */
@@ -3744,7 +3767,7 @@ void AmoebeAbleger(int ax, int ay)
   if (!level.amoeba_speed)
   {
     Feld[ax][ay] = EL_AMOEBA_DEAD;
-    DrawLevelField(ax, ay);
+    DrawNewLevelField(ax, ay);
     return;
   }
 
@@ -3807,7 +3830,7 @@ void AmoebeAbleger(int ax, int ay)
       if (i == 4 && (!waiting_for_player || game.emulation == EMU_BOULDERDASH))
       {
 	Feld[ax][ay] = EL_AMOEBA_DEAD;
-	DrawLevelField(ax, ay);
+	DrawNewLevelField(ax, ay);
 	AmoebaCnt[AmoebaNr[ax][ay]]--;
 
 	if (AmoebaCnt[AmoebaNr[ax][ay]] <= 0)	/* amoeba is completely dead */
@@ -3870,7 +3893,7 @@ void AmoebeAbleger(int ax, int ay)
     return;
   }
 
-  DrawLevelField(newax, neway);
+  DrawNewLevelField(newax, neway);
 }
 
 void Life(int ax, int ay)
@@ -3922,7 +3945,7 @@ void Life(int ax, int ay)
       {
 	Feld[xx][yy] = EL_EMPTY;
 	if (!Stop[xx][yy])
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
       }
@@ -3934,7 +3957,7 @@ void Life(int ax, int ay)
 	Feld[xx][yy] = element;
 	MovDelay[xx][yy] = (element == EL_GAMEOFLIFE ? 0 : life_time-1);
 	if (!Stop[xx][yy])
-	  DrawLevelField(xx, yy);
+	  DrawNewLevelField(xx, yy);
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
       }
@@ -3957,7 +3980,15 @@ void RobotWheel(int x, int y)
     if (MovDelay[x][y])
     {
       if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	DrawGraphic(SCREENX(x), SCREENY(y), GFX_ABLENK+MovDelay[x][y]%4);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_ROBOT_WHEEL_ACTIVE, -1);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_ROBOT_WHEEL_ACTIVE, frame);
+    }
+#endif
       if (!(MovDelay[x][y]%4))
 	PlaySoundLevel(x, y, SND_ROBOT_WHEEL_ACTIVE);
       return;
@@ -3965,7 +3996,7 @@ void RobotWheel(int x, int y)
   }
 
   Feld[x][y] = EL_ROBOT_WHEEL;
-  DrawLevelField(x, y);
+  DrawNewLevelField(x, y);
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
 }
@@ -3981,8 +4012,16 @@ void TimegateWheel(int x, int y)
     if (MovDelay[x][y])
     {
       if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
 	DrawGraphic(SCREENX(x), SCREENY(y),
 		    GFX_TIMEGATE_SWITCH + MovDelay[x][y]%4);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_TIMEGATE_SWITCH_ACTIVE, -1);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_SWITCH_ACTIVE, frame);
+    }
+#endif
       if (!(MovDelay[x][y]%4))
 	PlaySoundLevel(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
       return;
@@ -3990,17 +4029,21 @@ void TimegateWheel(int x, int y)
   }
 
   Feld[x][y] = EL_TIMEGATE_SWITCH;
-  DrawLevelField(x, y);
+  DrawNewLevelField(x, y);
   if (ZX == x && ZY == y)
     ZX = ZY = -1;
 }
 
 void Blubber(int x, int y)
 {
-  if (y > 0 && IS_MOVING(x, y-1) && MovDir[x][y-1] == MV_DOWN)
-    DrawLevelField(x, y-1);
+#if 0
+  if (y > 0 && IS_MOVING(x, y - 1) && MovDir[x][y - 1] == MV_DOWN)
+    DrawNewLevelField(x, y - 1);
   else
     DrawGraphicAnimation(x, y, GFX_GEBLUBBER, 4, 10, ANIM_LOOP);
+#else
+  DrawNewGraphicAnimation(x, y, IMG_ACID);
+#endif
 }
 
 void NussKnacken(int x, int y)
@@ -4012,13 +4055,22 @@ void NussKnacken(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y),
 		  GFX_CRACKINGNUT + 3 - MovDelay[x][y]/2);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_NUT_CRACKING,
+					      6 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_NUT_CRACKING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EMERALD;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4032,22 +4084,37 @@ void BreakingPearl(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y),
 		  GFX_PEARL_BREAKING + 4 - MovDelay[x][y]/2);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_PEARL_BREAKING,
+					      8 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_PEARL_BREAKING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EMPTY;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
 
-void SiebAktivieren(int x, int y, int typ)
+void SiebAktivieren(int x, int y, int type)
 {
-  int graphic = (typ == 1 ? GFX_MAGIC_WALL_FULL : GFX_MAGIC_WALL_BD_FULL) + 3;
+#if 0
+  int graphic = (type == 1 ? GFX_MAGIC_WALL_FULL : GFX_MAGIC_WALL_BD_FULL) + 3;
 
   DrawGraphicAnimation(x, y, graphic, 4, 4, ANIM_REVERSE);
+#else
+  int graphic = (type == 1 ? IMG_MAGIC_WALL_FULL : IMG_BD_MAGIC_WALL_FULL);
+
+  DrawNewGraphicAnimation(x, y, graphic);
+#endif
 }
 
 void AusgangstuerPruefen(int x, int y)
@@ -4085,7 +4152,7 @@ void AusgangstuerOeffnen(int x, int y)
   int delay = 6;
 
   if (!MovDelay[x][y])		/* next animation frame */
-    MovDelay[x][y] = 5*delay;
+    MovDelay[x][y] = 5 * delay;
 
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
@@ -4094,19 +4161,32 @@ void AusgangstuerOeffnen(int x, int y)
     MovDelay[x][y]--;
     tuer = MovDelay[x][y]/delay;
     if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_AUSGANG_AUF-tuer);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_EXIT_OPENING,
+					      29 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_EXIT_OPENING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EXIT_OPEN;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
 
 void AusgangstuerBlinken(int x, int y)
 {
+#if 0
   DrawGraphicAnimation(x, y, GFX_AUSGANG_AUF, 4, 4, ANIM_PINGPONG);
+#else
+  DrawNewGraphicAnimation(x, y, IMG_EXIT_OPEN);
+#endif
 }
 
 void OpenSwitchgate(int x, int y)
@@ -4123,12 +4203,21 @@ void OpenSwitchgate(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_SWITCHGATE_OPEN - phase);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_SWITCHGATE_OPENING,
+					      29 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_OPENING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_SWITCHGATE_OPEN;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4147,12 +4236,21 @@ void CloseSwitchgate(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_SWITCHGATE_CLOSED + phase);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_SWITCHGATE_CLOSING,
+					      29 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_SWITCHGATE_CLOSING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_SWITCHGATE_CLOSED;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4171,12 +4269,21 @@ void OpenTimegate(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_TIMEGATE_OPEN - phase);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_TIMEGATE_OPENING,
+					      29 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_OPENING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_TIMEGATE_OPEN;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4195,12 +4302,21 @@ void CloseTimegate(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), GFX_TIMEGATE_CLOSED + phase);
+#else
+    {
+      int frame = getNewGraphicAnimationFrame(IMG_TIMEGATE_CLOSING,
+					      29 - MovDelay[x][y]);
+
+      DrawNewGraphic(SCREENX(x), SCREENY(y), IMG_TIMEGATE_CLOSING, frame);
+    }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_TIMEGATE_CLOSED;
-      DrawLevelField(x, y);
+      DrawNewLevelField(x, y);
     }
   }
 }
@@ -4230,7 +4346,11 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (Feld[x][y] == EL_BD_DIAMOND)
+#if 0
     DrawGraphicAnimation(x, y, GFX_EDELSTEIN_BD, 4, 4, ANIM_REVERSE);
+#else
+    DrawNewGraphicAnimation(x, y, IMG_BD_DIAMOND);
+#endif
   else
   {
     if (!MovDelay[x][y])	/* next animation frame */
@@ -4243,7 +4363,11 @@ void EdelsteinFunkeln(int x, int y)
       if (setup.direct_draw && MovDelay[x][y])
 	SetDrawtoField(DRAW_BUFFERED);
 
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), el2gfx(Feld[x][y]));
+#else
+      DrawNewGraphic(SCREENX(x), SCREENY(y), el2img(Feld[x][y]), 0);
+#endif
 
       if (MovDelay[x][y])
       {
@@ -4252,14 +4376,24 @@ void EdelsteinFunkeln(int x, int y)
 	if (phase > 2)
 	  phase = 4-phase;
 
+#if 0
 	DrawGraphicThruMask(SCREENX(x), SCREENY(y), GFX_FUNKELN_WEISS + phase);
+#else
+	{
+	  int frame = getNewGraphicAnimationFrame(IMG_TWINKLE_WHITE,
+						  10 - MovDelay[x][y]);
+
+	  DrawNewGraphicThruMask(SCREENX(x), SCREENY(y), IMG_TWINKLE_WHITE,
+				 frame);
+	}
+#endif
 
 	if (setup.direct_draw)
 	{
 	  int dest_x, dest_y;
 
-	  dest_x = FX + SCREENX(x)*TILEX;
-	  dest_y = FY + SCREENY(y)*TILEY;
+	  dest_x = FX + SCREENX(x) * TILEX;
+	  dest_y = FY + SCREENY(y) * TILEY;
 
 	  BlitBitmap(drawto_field, window,
 		     dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);

@@ -1397,6 +1397,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   for (i=0; config_list[i].token != NULL; i++)
   {
     int len_config_token = strlen(config_list[i].token);
+    int len_config_value = strlen(config_list[i].value);
     boolean is_file_entry = TRUE;
 
     for (j=0; suffix_list[j].token != NULL; j++)
@@ -1419,8 +1420,18 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       if (i > 0)
 	list_pos++;
 
-      if (list_pos >= num_file_list_entries)
-	Error(ERR_EXIT, "inconsistant config list information -- please fix");
+      if (list_pos > num_file_list_entries - 1)
+	break;
+
+      /* simple sanity check if this is really a file definition */
+      if (strcmp(&config_list[i].value[len_config_value - 4], ".pcx") != 0 &&
+	  strcmp(&config_list[i].value[len_config_value - 4], ".wav") != 0 &&
+	  strcmp(config_list[i].value, UNDEFINED_FILENAME) != 0)
+      {
+	Error(ERR_RETURN, "Configuration directive '%s' -> '%s':",
+	      config_list[i].token, config_list[i].value);
+	Error(ERR_EXIT, "This seems to be no valid definition -- please fix");
+      }
 
       file_list[list_pos].token = config_list[i].token;
       file_list[list_pos].default_filename = config_list[i].value;
