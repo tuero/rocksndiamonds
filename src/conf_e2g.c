@@ -329,6 +329,14 @@ element_to_graphic[] =
     IMG_SP_DISK_RED_COLLECTING
   },
   {
+    EL_SP_DISK_RED_ACTIVE,			-1, -1,
+    IMG_SP_DISK_RED_ACTIVE
+  },
+  {
+    EL_SP_DISK_RED,				ACTION_ACTIVE, -1,
+    IMG_SP_DISK_RED_ACTIVE
+  },
+  {
     EL_SP_PORT1_RIGHT,				-1, -1,
     IMG_SP_PORT1_RIGHT
   },

@@ -2211,6 +2211,7 @@ void InitElementProperties()
     EL_DYNABOMB_NR,
     EL_DYNABOMB_SZ,
     EL_DYNABOMB_XL,
+    EL_SP_DISK_RED_ACTIVE,
     EL_BUG,
     EL_MOLE,
     EL_PENGUIN,
@@ -2398,7 +2399,8 @@ void InitElementProperties()
     EL_DYNABOMB_PLAYER1_ACTIVE,
     EL_DYNABOMB_PLAYER2_ACTIVE,
     EL_DYNABOMB_PLAYER3_ACTIVE,
-    EL_DYNABOMB_PLAYER4_ACTIVE
+    EL_DYNABOMB_PLAYER4_ACTIVE,
+    EL_SP_DISK_RED_ACTIVE
   };
   static int ep_active_bomb_num = SIZEOF_ARRAY_INT(ep_active_bomb);
 

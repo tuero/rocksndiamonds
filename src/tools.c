@@ -570,12 +570,14 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
 
-      if (last_element == EL_DYNAMITE_ACTIVE)
+      if (last_element == EL_DYNAMITE_ACTIVE ||
+	  last_element == EL_SP_DISK_RED_ACTIVE)
 	DrawDynamite(last_jx, last_jy);
       else
 	DrawLevelFieldThruMask(last_jx, last_jy);
     }
-    else if (last_element == EL_DYNAMITE_ACTIVE)
+    else if (last_element == EL_DYNAMITE_ACTIVE ||
+	     last_element == EL_SP_DISK_RED_ACTIVE)
       DrawDynamite(last_jx, last_jy);
     else
       DrawLevelField(last_jx, last_jy);

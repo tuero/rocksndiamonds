@@ -2581,6 +2581,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "sp_disk_red_active",
+    "dynamite",
+    "-"
+  },
+  {
     "switchgate_opening",
     "switchgate",
     "-"

@@ -646,6 +646,7 @@ void InitGame()
     player->GfxAction = ACTION_DEFAULT;
 
     player->use_murphy_graphic = FALSE;
+    player->use_disk_red_graphic = FALSE;
 
     player->actual_frame_counter = 0;
 
@@ -1430,12 +1431,19 @@ void DrawDynamite(int x, int y)
 
   frame = getGraphicAnimationFrame(graphic, GfxFrame[x][y]);
 
+#if 1
+  if (Store[x][y])
+    DrawGraphicThruMask(sx, sy, graphic, frame);
+  else
+    DrawGraphic(sx, sy, graphic, frame);
+#else
   if (game.emulation == EMU_SUPAPLEX)
     DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
   else if (Store[x][y])
     DrawGraphicThruMask(sx, sy, graphic, frame);
   else
     DrawGraphic(sx, sy, graphic, frame);
+#endif
 }
 
 void CheckDynamite(int x, int y)
@@ -1455,7 +1463,8 @@ void CheckDynamite(int x, int y)
     }
   }
 
-  if (Feld[x][y] == EL_DYNAMITE_ACTIVE)
+  if (Feld[x][y] == EL_DYNAMITE_ACTIVE ||
+      Feld[x][y] == EL_SP_DISK_RED_ACTIVE)
     StopSound(SND_DYNAMITE_ACTIVE);
   else
     StopSound(SND_DYNABOMB_ACTIVE);
@@ -5707,6 +5716,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SP_DISK_RED:
       RemoveField(x, y);
       player->dynamite++;
+      player->use_disk_red_graphic = (element == EL_SP_DISK_RED);
       RaiseScoreElement(EL_DYNAMITE);
       DrawText(DX_DYNAMITE, DY_DYNAMITE,
 	       int2str(local_player->dynamite, 3), FONT_DEFAULT_SMALL);
@@ -6336,17 +6346,22 @@ boolean PlaceBomb(struct PlayerInfo *player)
 
   if (player->dynamite)
   {
-    Feld[jx][jy] = EL_DYNAMITE_ACTIVE;
+    Feld[jx][jy] = (player->use_disk_red_graphic ? EL_SP_DISK_RED_ACTIVE :
+		    EL_DYNAMITE_ACTIVE);
     player->dynamite--;
 
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FONT_DEFAULT_SMALL);
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
     {
+#if 1
+      DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), el2img(Feld[jx][jy]), 0);
+#else
       if (game.emulation == EMU_SUPAPLEX)
 	DrawGraphic(SCREENX(jx), SCREENY(jy), IMG_SP_DISK_RED, 0);
       else
 	DrawGraphicThruMask(SCREENX(jx), SCREENY(jy), IMG_DYNAMITE_ACTIVE, 0);
+#endif
     }
 
     PlaySoundLevel(jx, jy, SND_DYNAMITE_DROPPING);
