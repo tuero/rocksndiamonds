@@ -1018,6 +1018,7 @@ struct CustomElementChangeInfo
 
   int delay_fixed;	/* added frame delay before changed (fixed) */
   int delay_random;	/* added frame delay before changed (random) */
+  int delay_frames;	/* either 1 (frames) or 50 (seconds; 50 fps) */
 };
 
 struct CustomElementInfo

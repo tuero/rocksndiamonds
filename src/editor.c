@@ -82,6 +82,8 @@
 
 #define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS2 + 9 * MINI_TILEX)
 
+#define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS2 + 9 * MINI_TILEX)
+
 #define ED_COUNTER_YSTART		(ED_SETTINGS_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
@@ -201,6 +203,10 @@
 #define ED_SELECTBOX_XSIZE		ED_WIN_COUNT_XSIZE
 #define ED_SELECTBOX_YSIZE		ED_WIN_COUNT_YSIZE
 
+#define ED_SELECTBOX_CHANGE_UNITS_XPOS	(ED_SETTINGS_XPOS2 + \
+					 ED_CHECKBUTTON_XSIZE + \
+					 2 * ED_GADGET_DISTANCE)
+
 #define ED_TEXTBUTTON_XPOS		ED_WIN_COUNT_XPOS
 #define ED_TEXTBUTTON_YPOS		(ED_WIN_COUNT_YPOS + \
 					 2 * (2 + ED_WIN_COUNT_YSIZE))
@@ -311,10 +317,11 @@
 /* selectbox identifiers */
 #define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
-#define GADGET_ID_CUSTOM_CHANGE_CAUSE	(GADGET_ID_SELECTBOX_FIRST + 0)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 0)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 1)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 2)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -428,9 +435,13 @@
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
 
 /* values for selectbox gadgets */
-#define ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE	0
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	0
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		1
 
-#define ED_NUM_SELECTBOX			1
+#define ED_NUM_SELECTBOX			2
+
+#define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
+#define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_CAUSE
 
 /* values for textbutton gadgets */
 #define ED_TEXTBUTTON_ID_PROPERTIES_INFO	0
@@ -657,7 +668,7 @@ static struct
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
     &custom_element_change.delay_fixed,
-    NULL,				"seconds (fixed)"
+    NULL,				"units (fixed)"
   },
   {
     ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(6),
@@ -665,7 +676,7 @@ static struct
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
     &custom_element_change.delay_random,
-    NULL,				"seconds (random)"
+    NULL,				"units (random)"
   }
 };
 
@@ -694,6 +705,14 @@ static struct
   }
 };
 
+static struct ValueTextInfo options_change_time_units[] =
+{
+  { 1,	"frames"		},
+  { 50,	"seconds"		},
+  { -1,	NULL			}
+};
+static int index_change_time_units = 0;
+
 static struct ValueTextInfo options_change_cause[] =
 {
   { 1,	"specified delay"	},
@@ -703,23 +722,32 @@ static struct ValueTextInfo options_change_cause[] =
   { 5,	"pressed by player"	},
   { -1,	NULL			}
 };
-static int index_change_cause = 0;
+static int index_change_cause = 0, value_change_cause = 0;
 
 static struct
 {
   int x, y;
   int gadget_id;
-  int size;
+  int size;	/* size of selectbox (chars) or '0' (dynamically determined) */
   struct ValueTextInfo *options;
-  int *index;
+  int *index, *value;
   char *text, *infotext;
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
   {
+    ED_SELECTBOX_CHANGE_UNITS_XPOS,	ED_COUNTER_YPOS2(7),
+    GADGET_ID_CHANGE_TIME_UNITS,
+    0,
+    options_change_time_units, &index_change_time_units,
+    &custom_element_change.delay_frames,
+    "time units measured in", "time units for change"
+  },
+  {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
-    GADGET_ID_CUSTOM_CHANGE_CAUSE,
-    17,
+    GADGET_ID_CHANGE_CAUSE,
+    0,
     options_change_cause, &index_change_cause,
+    &value_change_cause,
     "test:", "test-selectbox entry"
   },
 };
@@ -1013,6 +1041,7 @@ static int new_element3 = EL_SAND;
 /* forward declaration for internal use */
 static void ModifyEditorCounter(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
+static void ModifyEditorSelectbox(int, int);
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
@@ -2456,16 +2485,26 @@ static void CreateTextInputGadgets()
 static void CreateSelectboxGadgets()
 {
   int max_infotext_len = getMaxInfoTextLength();
-  int i;
+  int i, j;
 
   for (i=0; i<ED_NUM_SELECTBOX; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
+    int xoffset;
     struct GadgetInfo *gi;
     unsigned long event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = selectbox_info[i].gadget_id;
+
+    /* (we cannot use -1 for uninitialized values if we directly compare
+       with results from strlen(), because the '<' and '>' operation will
+       implicitely cast -1 to an unsigned integer value!) */
+
+    if (selectbox_info[i].size == 0)	/* dynamically determined */
+      for (j=0; selectbox_info[i].options[j].text != NULL; j++)
+	if (strlen(selectbox_info[i].options[j].text) > selectbox_info[i].size)
+	  selectbox_info[i].size = strlen(selectbox_info[i].options[j].text);
 
     event_mask = GD_EVENT_RELEASED |
       GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
@@ -2473,13 +2512,16 @@ static void CreateSelectboxGadgets()
     gd_x = DOOR_GFX_PAGEX4 + ED_SELECTBOX_XPOS;
     gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
 
+    xoffset = (getFontWidth(FONT_TEXT_1) * strlen(selectbox_info[i].text) +
+	       2 * ED_GADGET_DISTANCE);
+
     sprintf(infotext, "Select %s", selectbox_info[i].infotext);
     infotext[max_infotext_len] = '\0';
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, infotext,
-		      GDI_X, SX + selectbox_info[i].x,
+		      GDI_X, SX + selectbox_info[i].x + xoffset,
 		      GDI_Y, SY + selectbox_info[i].y,
 		      GDI_TYPE, GD_TYPE_SELECTBOX,
 		      GDI_SELECTBOX_OPTIONS, selectbox_info[i].options,
@@ -3130,6 +3172,20 @@ static void ModifyEditorCounterLimits(int counter_id, int min, int max)
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
   ModifyGadget(gi, GDI_NUMBER_MIN, min, GDI_NUMBER_MAX, max, GDI_END);
+}
+
+static void ModifyEditorSelectbox(int selectbox_id, int new_value)
+{
+  int gadget_id = selectbox_info[selectbox_id].gadget_id;
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+  int new_index_value = 0;
+  int i;
+
+  for(i=0; selectbox_info[selectbox_id].options[i].text != NULL; i++)
+    if (selectbox_info[selectbox_id].options[i].value == new_value)
+      new_index_value = i;
+
+  ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
 }
 
 static void PickDrawingElement(int button, int element)
@@ -3968,17 +4024,23 @@ static void DrawPropertiesAdvanced()
 
   DrawCustomChangedArea();
 
-  /* draw selectbox gadget */
-  i = ED_SELECTBOX_ID_CUSTOM_CHANGE_CAUSE;
-  x = selectbox_info[i].x + xoffset_right2;
-  y = selectbox_info[i].y + yoffset_right2;
+  /* draw selectbox gadgets */
+  for (i=ED_SELECTBOX_ID_CHANGE_FIRST; i<=ED_SELECTBOX_ID_CHANGE_LAST; i++)
+  {
+    int yoffset = ED_BORDER_SIZE;
 
-  selectbox_info[i].index = &index_change_cause;
+    x = selectbox_info[i].x;
+    y = selectbox_info[i].y + yoffset;
 
-  DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
-  ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
-	       GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
-  MapSelectboxGadget(i);
+    DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
+#if 1
+    ModifyEditorSelectbox(i, *selectbox_info[i].value);
+#else
+    ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
+		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
+#endif
+    MapSelectboxGadget(i);
+  }
 }
 
 static void DrawPropertiesWindow()
@@ -4944,6 +5006,12 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   int type_id = gi->custom_type_id;
 
   *selectbox_info[type_id].index = gi->selectbox.index;
+  *selectbox_info[type_id].value =
+    selectbox_info[type_id].options[gi->selectbox.index].value;
+
+  if (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
+      type_id <= ED_SELECTBOX_ID_CHANGE_LAST)
+    CopyCustomElementPropertiesToGame(properties_element);
 
 #if 0
   printf("Selected text value: '%s' [%d]\n",

@@ -702,7 +702,7 @@ static void InitGameEngine()
 
     if (HAS_CHANGE_EVENT(element, CE_DELAY_FIXED))
       changing_element[element].change_delay +=
-	change->delay_fixed * FRAMES_PER_SECOND;
+	change->delay_fixed * change->delay_frames;
 
     if (HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM));
     /* random frame delay added at runtime for each element individually */
@@ -4565,8 +4565,9 @@ static void ChangeElement(int x, int y)
     {
       int i = element - EL_CUSTOM_START;
       int max_random_delay = level.custom_element[i].change.delay_random;
+      int delay_frames = level.custom_element[i].change.delay_frames;
 
-      MovDelay[x][y] += RND(max_random_delay * FRAMES_PER_SECOND);
+      MovDelay[x][y] += RND(max_random_delay * delay_frames);
     }
 
     ResetGfxAnimation(x, y);
