@@ -1201,19 +1201,11 @@ void RemoveMovingField(int x, int y)
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING ||
        Feld[oldx][oldy] == EL_AMOEBA_DRIPPING))
-  {
-    Feld[oldx][oldy] = (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ?
-			EL_MORAST_LEER :
-			Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ?
-			EL_MAGIC_WALL_EMPTY :
-			Feld[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTYING ?
-			EL_MAGIC_WALL_BD_EMPTY :
-			Feld[oldx][oldy] == EL_AMOEBA_DRIPPING ?
-			EL_AMOEBE_NASS : 0);
-    Store[oldx][oldy] = Store2[oldx][oldy] = 0;
-  }
+    Feld[oldx][oldy] = get_next_element(Feld[oldx][oldy]);
   else
     Feld[oldx][oldy] = EL_LEERRAUM;
+
+  Store[oldx][oldy] = Store2[oldx][oldy] = 0;
 
   Feld[newx][newy] = EL_LEERRAUM;
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
@@ -2999,58 +2991,53 @@ void ContinueMoving(int x, int y)
 
     if (element == EL_QUICKSAND_FILLING)
     {
-      element = Feld[newx][newy] = EL_MORAST_VOLL;
+      element = Feld[newx][newy] = get_next_element(element);
       Store[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_QUICKSAND_EMPTYING)
     {
-      Feld[x][y] = EL_MORAST_LEER;
+      Feld[x][y] = get_next_element(element);
       element = Feld[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_MAGIC_WALL_FILLING)
     {
-      element = Feld[newx][newy] =
-	(game.magic_wall_active ? EL_MAGIC_WALL_FULL : EL_MAGIC_WALL_DEAD);
+      element = Feld[newx][newy] = get_next_element(element);
+      if (!game.magic_wall_active)
+	element = Feld[newx][newy] = EL_MAGIC_WALL_DEAD;
       Store[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_MAGIC_WALL_EMPTYING)
     {
-      Feld[x][y] = (game.magic_wall_active ? EL_MAGIC_WALL_EMPTY :
-		    EL_MAGIC_WALL_DEAD);
+      Feld[x][y] = get_next_element(element);
+      if (!game.magic_wall_active)
+	Feld[x][y] = EL_MAGIC_WALL_DEAD;
       element = Feld[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_MAGIC_WALL_BD_FILLING)
     {
-      element = Feld[newx][newy] =
-	(game.magic_wall_active ? EL_MAGIC_WALL_BD_FULL :
-	 EL_MAGIC_WALL_BD_DEAD);
+      element = Feld[newx][newy] = get_next_element(element);
+      if (!game.magic_wall_active)
+	element = Feld[newx][newy] = EL_MAGIC_WALL_BD_DEAD;
       Store[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_MAGIC_WALL_BD_EMPTYING)
     {
-      Feld[x][y] = (game.magic_wall_active ? EL_MAGIC_WALL_BD_EMPTY :
-		    EL_MAGIC_WALL_BD_DEAD);
+      Feld[x][y] = get_next_element(element);
+      if (!game.magic_wall_active)
+	Feld[x][y] = EL_MAGIC_WALL_BD_DEAD;
       element = Feld[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (element == EL_AMOEBA_DRIPPING)
     {
-      Feld[x][y] = EL_AMOEBE_NASS;
+      Feld[x][y] = get_next_element(element);
       element = Feld[newx][newy] = Store[x][y];
-      Store[x][y] = 0;
     }
     else if (Store[x][y] == EL_SALZSAEURE)
     {
-      Store[x][y] = 0;
-      Feld[newx][newy] = EL_SALZSAEURE;
-      element = EL_SALZSAEURE;
+      element = Feld[newx][newy] = EL_SALZSAEURE;
     }
 
+    Store[x][y] = 0;
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     MovDelay[newx][newy] = 0;
 

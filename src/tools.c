@@ -2356,6 +2356,22 @@ static void HandleToolButtons(struct GadgetInfo *gi)
   request_gadget_id = gi->custom_id;
 }
 
+int get_next_element(int element)
+{
+  switch(element)
+  {
+    case EL_QUICKSAND_FILLING:		return EL_MORAST_VOLL;
+    case EL_QUICKSAND_EMPTYING:		return EL_MORAST_LEER;
+    case EL_MAGIC_WALL_FILLING:		return EL_MAGIC_WALL_FULL;
+    case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_BD_FILLING:	return EL_MAGIC_WALL_BD_FULL;
+    case EL_MAGIC_WALL_BD_EMPTYING:	return EL_MAGIC_WALL_BD_EMPTY;
+    case EL_AMOEBA_DRIPPING:		return EL_AMOEBE_NASS;
+
+    default:				return element;
+  }
+}
+
 int el2gfx(int element)
 {
   switch(element)

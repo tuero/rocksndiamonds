@@ -111,6 +111,7 @@ int ReadPixel(DrawBuffer *, int, int);
 
 void CreateToolButtons();
 
+int get_next_element(int);
 int el2gfx(int);
 
 #endif	/* TOOLS_H */
