@@ -49,16 +49,8 @@ typedef struct
   byte         *data;		/* image data                          */
 } Image;
 
-#define PCX_Success		 0
-#define PCX_OpenFailed		-1
-#define PCX_ReadFailed		-2
-#define	PCX_FileInvalid		-3
-#define PCX_NoMemory		-4
-#define PCX_ColorFailed		-5
-
 int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
-Image *Read_PCX_to_Image(char *);
 Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);

@@ -12,6 +12,7 @@
 ***********************************************************/
 
 #include "image.h"
+#include "pcx.h"
 #include "misc.h"
 
 /* exclude all except newImage() and freeImage() */

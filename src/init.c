@@ -21,6 +21,7 @@
 #include "files.h"
 #include "joystick.h"
 #include "image.h"
+#include "pcx.h"
 #include "network.h"
 #include "netserv.h"
 

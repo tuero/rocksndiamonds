@@ -11,6 +11,7 @@
 *  pcx.c                                                   *
 ***********************************************************/
 
+#include "pcx.h"
 #include "image.h"
 #include "misc.h"
 
@@ -44,8 +45,76 @@ struct PCX_Header
   unsigned char filler[58];	/* fill to struct size of 128          */
 };
 
-static byte *PCX_ReadBitmap(Image *, byte *, byte *);
-static byte *PCX_ReadColormap(Image *, byte *, byte *);
+static byte *PCX_ReadBitmap(Image *image, byte *buffer_ptr, byte *buffer_last)
+{
+  /* Run Length Encoding: If the two high bits are set,
+   * then the low 6 bits contain a repeat count, and the byte to
+   * repeat is the next byte in the file.  If the two high bits are
+   * not set, then this is the byte to write.
+   */
+
+  unsigned int bytes_per_pixel = (image->depth + 7) / 8;
+  register byte *bitmap_ptr, *bitmap_last;
+  register byte value, count;
+
+  bitmap_ptr = image->data;
+  bitmap_last = bitmap_ptr + (image->width * image->height * bytes_per_pixel);
+
+  while (bitmap_ptr < bitmap_last && buffer_ptr < buffer_last)
+  {
+    value = *buffer_ptr++;
+
+    if ((value & 0xc0) == 0xc0)		/* this is a repeat count byte */
+    {
+      count = value & 0x3f;		/* extract repeat count from byte */
+      value = *buffer_ptr++;		/* next byte is value to repeat */
+
+      for (; count && bitmap_ptr < bitmap_last; count--)
+	*bitmap_ptr++ = value;
+
+      if (count)			/* repeat count spans end of bitmap */
+	return NULL;
+    }
+    else
+      *bitmap_ptr++ = value;
+
+    image->rgb.color_used[value] = TRUE;
+  }
+
+  /* check if end of buffer was reached before end of bitmap */
+  if (bitmap_ptr < bitmap_last)
+    return NULL;
+
+  /* return current buffer position for next decoding function */
+  return buffer_ptr;
+}
+
+static byte *PCX_ReadColormap(Image *image,byte *buffer_ptr, byte *buffer_last)
+{
+  int i, magic;
+
+  /* read colormap magic byte */
+  magic = *buffer_ptr++;
+
+  /* check magic colormap header byte */
+  if (magic != PCX_256COLORS_MAGIC)
+    return NULL;
+
+  /* check if enough bytes left for a complete colormap */
+  if (buffer_ptr + PCX_COLORMAP_SIZE > buffer_last)
+    return NULL;
+
+  /* read 256 colors from PCX colormap */
+  for (i=0; i<PCX_MAXCOLORS; i++)
+  {
+    image->rgb.red[i]   = *buffer_ptr++ << 8;
+    image->rgb.green[i] = *buffer_ptr++ << 8;
+    image->rgb.blue[i]  = *buffer_ptr++ << 8;
+  }
+
+  /* return current buffer position for next decoding function */
+  return buffer_ptr;
+}
 
 Image *Read_PCX_to_Image(char *filename)
 {
@@ -156,75 +225,4 @@ Image *Read_PCX_to_Image(char *filename)
     printf("Read_PCX_to_Image: %d colors found\n", image->rgb.used);
 
   return image;
-}
-
-static byte *PCX_ReadBitmap(Image *image, byte *buffer_ptr, byte *buffer_last)
-{
-  /* Run Length Encoding: If the two high bits are set,
-   * then the low 6 bits contain a repeat count, and the byte to
-   * repeat is the next byte in the file.  If the two high bits are
-   * not set, then this is the byte to write.
-   */
-
-  unsigned int bytes_per_pixel = (image->depth + 7) / 8;
-  register byte *bitmap_ptr, *bitmap_last;
-  register byte value, count;
-
-  bitmap_ptr = image->data;
-  bitmap_last = bitmap_ptr + (image->width * image->height * bytes_per_pixel);
-
-  while (bitmap_ptr < bitmap_last && buffer_ptr < buffer_last)
-  {
-    value = *buffer_ptr++;
-
-    if ((value & 0xc0) == 0xc0)		/* this is a repeat count byte */
-    {
-      count = value & 0x3f;		/* extract repeat count from byte */
-      value = *buffer_ptr++;		/* next byte is value to repeat */
-
-      for (; count && bitmap_ptr < bitmap_last; count--)
-	*bitmap_ptr++ = value;
-
-      if (count)			/* repeat count spans end of bitmap */
-	return NULL;
-    }
-    else
-      *bitmap_ptr++ = value;
-
-    image->rgb.color_used[value] = TRUE;
-  }
-
-  /* check if end of buffer was reached before end of bitmap */
-  if (bitmap_ptr < bitmap_last)
-    return NULL;
-
-  /* return current buffer position for next decoding function */
-  return buffer_ptr;
-}
-
-static byte *PCX_ReadColormap(Image *image,byte *buffer_ptr, byte *buffer_last)
-{
-  int i, magic;
-
-  /* read colormap magic byte */
-  magic = *buffer_ptr++;
-
-  /* check magic colormap header byte */
-  if (magic != PCX_256COLORS_MAGIC)
-    return NULL;
-
-  /* check if enough bytes left for a complete colormap */
-  if (buffer_ptr + PCX_COLORMAP_SIZE > buffer_last)
-    return NULL;
-
-  /* read 256 colors from PCX colormap */
-  for (i=0; i<PCX_MAXCOLORS; i++)
-  {
-    image->rgb.red[i]   = *buffer_ptr++ << 8;
-    image->rgb.green[i] = *buffer_ptr++ << 8;
-    image->rgb.blue[i]  = *buffer_ptr++ << 8;
-  }
-
-  /* return current buffer position for next decoding function */
-  return buffer_ptr;
 }
