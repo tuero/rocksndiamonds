@@ -1640,6 +1640,15 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
       leveldir[current_entry].color = LEVELCOLOR(&leveldir[current_entry]);
       leveldir[current_entry].class_desc =
 	getLevelClassDescription(&leveldir[current_entry]);
+#if 0
+      leveldir[current_entry].handicap_level =
+	leveldir[current_entry].first_level;	/* default value */
+#else
+      leveldir[current_entry].handicap_level =
+	(leveldir[current_entry].user_defined ?
+	 leveldir[current_entry].last_level :
+	 leveldir[current_entry].first_level);
+#endif
 
       freeSetupFileList(setup_file_list);
       current_entry++;
@@ -2000,8 +2009,12 @@ void LoadLevelSetup_SeriesInfo(int leveldir_nr)
   char *level_subdir = leveldir[leveldir_nr].filename;
 
   /* always start with reliable default values */
+#if 0
   level_nr = 0;
   leveldir[leveldir_nr].handicap_level = 0;
+#else
+  level_nr = leveldir[leveldir_nr].first_level;
+#endif
 
   checkSeriesInfo(leveldir_nr);
 
@@ -2038,6 +2051,9 @@ void LoadLevelSetup_SeriesInfo(int leveldir_nr)
       if (level_nr < leveldir[leveldir_nr].first_level)
 	level_nr = leveldir[leveldir_nr].first_level;
       if (level_nr > leveldir[leveldir_nr].last_level + 1)
+	level_nr = leveldir[leveldir_nr].last_level;
+
+      if (leveldir[leveldir_nr].user_defined)
 	level_nr = leveldir[leveldir_nr].last_level;
 
       leveldir[leveldir_nr].handicap_level = level_nr;
@@ -2090,38 +2106,21 @@ void SaveLevelSetup_SeriesInfo(int leveldir_nr)
 }
 
 #ifdef MSDOS
-static boolean initErrorFile()
+void initErrorFile()
 {
   char *filename;
-  FILE *error_file;
 
   InitUserDataDirectory();
 
   filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, "w");
+  unlink(filename);
   free(filename);
-
-  if (error_file == NULL)
-    return FALSE;
-
-  fclose(error_file);
-
-  return TRUE;
 }
 
 FILE *openErrorFile()
 {
-  static boolean first_access = TRUE;
   char *filename;
   FILE *error_file;
-
-  if (first_access)
-  {
-    if (!initErrorFile())
-      return NULL;
-
-    first_access = FALSE;
-  }
 
   filename = getPath2(getUserDataDir(), ERROR_FILENAME);
   error_file = fopen(filename, "a");

@@ -36,6 +36,7 @@ void LoadLevelSetup_SeriesInfo(int);
 void SaveLevelSetup_SeriesInfo(int);
 
 #ifdef MSDOS
+void initErrorFile();
 FILE *openErrorFile();
 void dumpErrorFile();
 #endif

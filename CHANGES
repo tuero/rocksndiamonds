@@ -1,9 +1,43 @@
 
+Release Version 1.3.5 [?? SEP 1999]
+-----------------------------------
+	- new cool medium-sized crystal font
+	- new elements and graphics for Diamond Caves II levels
+	- new elements and graphics for Emerald Mine Club levels
+	- brushed-up (higher resolution) graphics for Supaplex elements
+	- new elements for more authentic Emerald Mine elements (doors)
+	- more level editor enhancements:
+	  element list scrollbar and level number selection within editor
+	- lots of new levels converted from Emerald Mine Club disks,
+	  DX-Boulderdash and Supaplex
+	- new levels created and contributed by players
+	- now over 160 level series with over 14.000 levels
+	- high score list now scrollable to see all 100 entries
+	- new 16-bit elements level format to allow more than 256 elements
+	- re-introduced level handicap for more challange (levels must be
+	  solved to be able to play the next one; can be disabled in setup)
+	- new setup option to disable time limit for relaxed playing :-)
+	- GAME_DIR path split into RO_GAME_DIR and RW_GAME_DIR to allow
+	  distributors to separate read-only (levels, graphics, sounds)
+	  from writable (hich scores) game data
+	- new personal level setup files to store level handicap and
+	  last played level for each level series
+	- removed some 32-bit dependent code; should be 64-bit clean now
+	- some little bugs fixed
+
+Release Version 1.3.0 [5 FEB 1999]
+----------------------------------
+	- strongly enhanced level editor
+	- new elements, graphics and levels for Supaplex style games
+	- completely rewritten platform independent gadget code
+	  (buttons, scrollbars, text and number input gadgets)
+	- nasty sound bug fixed (showed up with Linux kernel 2.2.x)
+
 Release Version 1.2.0 [5 DEC 1998]
---------------------------------------------------------
+----------------------------------
 	- DOS/Windows version
-	- new WAV sound loader
-	- new PCX graphics loader
+	- new WAV sound loader (to replace the old Amiga 8SVX files)
+	- new PCX graphics loader (to avoid GIF license problems)
 	- network multiplayer games with upto four players
 	- no separate network server needed; each client can
 	  fork a network server at startup if there's no server
@@ -38,12 +72,12 @@ Release Version 1.2.0 [5 DEC 1998]
 	  execution
 
 Release Version 1.1 [???] [NOT RELEASED]
-----------------------------------
+----------------------------------------
 	- new (but broken) GIF graphics loader to be independent
-	  from the XPM library and replace all graphics by GIFs.
+	  from the XPM library and to replace all graphics by GIF files
 
 Release Version 1.0 [9 APR 1997] [NOT RELEASED]
----------------------------------------------
+-----------------------------------------------
 	- the game now contains many really playable levels,
 	  not only a few levels for testing
 	- the game is now even better playable by keyboard
@@ -60,11 +94,11 @@ Release Version 1.0 [9 APR 1997] [NOT RELEASED]
 	  position
 
 Prerelease Version 0.9b2 [21 NOV 1995] [NOT RELEASED]
----------------------------------------------------
+-----------------------------------------------------
 	- new game elements
 
 Prerelease Version 0.9b [4 NOV 1995]
-----------------------------------
+------------------------------------
 	- the game is now completely Freeware
 	- the game is now better playable by keyboard
 	  (in the last version, the player was making more than
@@ -80,5 +114,5 @@ Prerelease Version 0.9b [4 NOV 1995]
 	  Zucconi)
 
 Prerelease Version 0.9 [23 OCT 1995]
-----------------------------------
+------------------------------------
 	- first (pre)release version

@@ -55,6 +55,10 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
+#ifdef MSDOS
+  initErrorFile();
+#endif
+
   if (options.serveronly)
   {
     NetworkServer(options.server_port, options.serveronly);

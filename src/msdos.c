@@ -516,7 +516,10 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
 
   /* allocate new allegro bitmap structure */
   if ((bitmap = create_bitmap_ex(depth, image->width, image->height)) == NULL)
+  {
+    errno_pcx = PCX_NoMemory;
     return NULL;
+  }
 
   clear(bitmap);
 
@@ -582,17 +585,11 @@ static BITMAP *Read_PCX_to_AllegroBitmap(char *filename)
 
   /* read the graphic file in PCX format to internal image structure */
   if ((image = Read_PCX_to_Image(filename)) == NULL)
-  {
-    Error(ERR_RETURN, "Read_PCX_to_Image failed");
     return NULL;
-  }
 
   /* convert internal image structure to allegro bitmap structure */
   if ((bitmap = Image_to_AllegroBitmap(image)) == NULL)
-  {
-    Error(ERR_RETURN, "Image_to_AllegroBitmap failed");
     return NULL;
-  }
 
   set_palette(global_colormap);
 
@@ -605,7 +602,7 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   BITMAP *bitmap;
 
   if ((bitmap = Read_PCX_to_AllegroBitmap(filename)) == NULL)
-    return PCX_FileInvalid;
+    return errno_pcx;
 
   *pixmap = (Pixmap)bitmap;
   *pixmap_mask = (Pixmap)bitmap;
