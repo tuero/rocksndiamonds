@@ -527,10 +527,12 @@ void DrawPlayer(struct PlayerInfo *player)
   if (game_emulation == EMU_SUPAPLEX)
   {
     static int last_dir = MV_LEFT;
+    int action = (player->programmed_action ? player->programmed_action :
+		  player->action);
     boolean action_moving =
       (player_is_moving ||
-       ((player->action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
-	!(player->action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN))));
+       ((action & (MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)) &&
+	!(action & ~(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN))));
 
     graphic = GFX_SP_MURPHY;
 

@@ -102,6 +102,8 @@
 #define NUM_GAME_BUTTONS		6
 
 /* forward declaration for internal use */
+static void CheckGravityMovement(struct PlayerInfo *);
+
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
@@ -3407,6 +3409,7 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   {
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
+    CheckGravityMovement(player);
 
     /*
     if (++player->frame_reset_delay > MoveSpeed)
@@ -3568,6 +3571,7 @@ void GameActions()
 
     if (stored_player[i].programmed_action)
     {
+#if 0
       /* this is very bad and need to be fixed!!! */
       unsigned long move_delay = stored_player[i].move_delay;
 
@@ -3580,6 +3584,9 @@ void GameActions()
 	actual_player_action = stored_player[i].programmed_action;
 	stored_player[i].programmed_action = 0;
       }
+#else
+      actual_player_action = stored_player[i].programmed_action;
+#endif
     }
 
     if (recorded_player_action)
@@ -3868,6 +3875,32 @@ void ScrollLevel(int dx, int dy)
   redraw_mask |= REDRAW_FIELD;
 }
 
+static void CheckGravityMovement(struct PlayerInfo *player)
+{
+  if (level.gravity && !player->programmed_action)
+  {
+    int move_dir_vertical = player->action & (MV_UP | MV_DOWN);
+    int move_dir_horizontal = player->action & (MV_LEFT | MV_RIGHT);
+    int move_dir =
+      (player->last_move_dir & (MV_LEFT | MV_RIGHT) ?
+       (move_dir_vertical ? move_dir_vertical : move_dir_horizontal) :
+       (move_dir_horizontal ? move_dir_horizontal : move_dir_vertical));
+    int jx = player->jx, jy = player->jy;
+    int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
+    int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
+    int new_jx = jx + dx, new_jy = jy + dy;
+    boolean field_under_player_is_free =
+      (IN_LEV_FIELD(jx, jy + 1) && IS_FREE(jx, jy + 1));
+    boolean player_is_moving_to_valid_field =
+      (IN_LEV_FIELD(new_jx, new_jy) &&
+       (Feld[new_jx][new_jy] == EL_SP_BASE ||
+	Feld[new_jx][new_jy] == EL_ERDREICH));
+
+    if (field_under_player_is_free && !player_is_moving_to_valid_field)
+      player->programmed_action = MV_DOWN;
+  }
+}
+
 boolean MoveFigureOneStep(struct PlayerInfo *player,
 			  int dx, int dy, int real_dx, int real_dy)
 {
@@ -3952,6 +3985,9 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
   if (!FrameReached(&player->move_delay, player->move_speed) && !tape.playing)
     return FALSE;
+
+  /* remove the last programmed player action */
+  player->programmed_action = 0;
 
   if (player->MovPos)
   {
@@ -4093,7 +4129,11 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     player->last_move_dir = player->MovDir;
   }
   else
+  {
+    CheckGravityMovement(player);
+
     player->last_move_dir = MV_NO_MOVING;
+  }
 
   TestIfHeroHitsBadThing(jx, jy);
 
@@ -4133,13 +4173,22 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
 
 
-  /*
+#if 0
   if (!player->MovPos && level.gravity)
   {
     if (player->action == MV_NO_MOVING)
       player->programmed_action = MV_DOWN;
+    else if (player->action == MV_UP)
+    {
+    }
+    else if (player->action & (MV_LEFT | MV_RIGHT))
+    {
+    }
   }
-  */
+#else
+  if (!player->MovPos)
+    CheckGravityMovement(player);
+#endif
 
 
   DrawPlayer(player);
@@ -5193,7 +5242,8 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 	break;
       }
 
-      if (Request("Do you really want to quit the game ?",
+      if (level_editor_test_game ||
+	  Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
 #ifndef MSDOS

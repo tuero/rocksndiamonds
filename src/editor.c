@@ -247,12 +247,13 @@
 #define GADGET_ID_RANDOM_QUANTITY	107
 #define GADGET_ID_RANDOM_RESTRICTED	108
 #define GADGET_ID_DOUBLE_SPEED		109
-#define GADGET_ID_STICK_ELEMENT		110
+#define GADGET_ID_GRAVITY		110
+#define GADGET_ID_STICK_ELEMENT		111
 
 /* another drawing area for random placement */
-#define GADGET_ID_RANDOM_BACKGROUND	111
+#define GADGET_ID_RANDOM_BACKGROUND	112
 
-#define NUM_EDITOR_GADGETS		112
+#define NUM_EDITOR_GADGETS		113
 
 /* radio button numbers */
 #define RADIO_NR_NONE			0
@@ -301,10 +302,11 @@
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_ID_DOUBLE_SPEED		0
-#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	1
-#define ED_CHECKBUTTON_ID_STICK_ELEMENT		2
+#define ED_CHECKBUTTON_ID_GRAVITY		1
+#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
+#define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 
-#define ED_NUM_CHECKBUTTONS			3
+#define ED_NUM_CHECKBUTTONS			4
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -593,6 +595,12 @@ static struct
     GADGET_ID_DOUBLE_SPEED,
     &level.double_speed,
     "double speed movement",		"set movement speed of player"
+  },
+  {
+    ED_SETTINGS_XPOS + 340,		ED_COUNTER_YPOS(6) - MINI_TILEY,
+    GADGET_ID_GRAVITY,
+    &level.gravity,
+    "gravity",				"set level gravity"
   },
   {
     ED_SETTINGS_XPOS,			ED_COUNTER2_YPOS(9) - MINI_TILEY,
@@ -3812,6 +3820,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_DOUBLE_SPEED:
       *checkbutton_info[ED_CHECKBUTTON_ID_DOUBLE_SPEED].value ^= TRUE;
+      break;
+
+    case GADGET_ID_GRAVITY:
+      *checkbutton_info[ED_CHECKBUTTON_ID_GRAVITY].value ^= TRUE;
       break;
 
     case GADGET_ID_STICK_ELEMENT:
