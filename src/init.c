@@ -3200,8 +3200,8 @@ void ReloadCustomArtwork()
   if (leveldir_current->music_set != NULL)
     mus_new_identifier = leveldir_current->music_set;
 
-#if 0
-  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' ['%s', '%s']\n",
+#if 1
+  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' [setup '%s', level '%s']\n",
 	 artwork.gfx_current_identifier, gfx_new_identifier,
 	 artwork.gfx_current->identifier, leveldir_current->graphics_set);
 #endif
@@ -3209,7 +3209,7 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
-#if 0
+#if 1
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
 	   artwork.gfx_current_identifier,
 	   gfx_new_identifier,

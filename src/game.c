@@ -6417,6 +6417,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
 
 void TestIfPlayerTouchesCustomElement(int x, int y)
 {
+  static boolean check_changing = FALSE;
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6426,6 +6427,12 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   };
   boolean center_is_player = (IS_PLAYER(x, y));
   int i;
+
+  /* prevent TestIfPlayerTouchesCustomElement() from looping */
+  if (check_changing)
+    return;
+
+  check_changing = TRUE;
 
   for (i=0; i<4; i++)
   {
@@ -6448,10 +6455,13 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
       break;
     }
   }
+
+  check_changing = FALSE;
 }
 
 void TestIfElementTouchesCustomElement(int x, int y)
 {
+  static boolean check_changing = FALSE;
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6461,6 +6471,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
   };
   boolean center_is_custom = (IS_CUSTOM_ELEMENT(Feld[x][y]));
   int i;
+
+  /* prevent TestIfElementTouchesCustomElement() from looping */
+  if (check_changing)
+    return;
+
+  check_changing = TRUE;
 
   for (i=0; i<4; i++)
   {
@@ -6482,6 +6498,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
       CheckElementChange(xx, yy, Feld[xx][yy], CE_OTHER_IS_TOUCHING);
     }
   }
+
+  check_changing = FALSE;
 }
 
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)

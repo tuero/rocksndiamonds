@@ -1698,12 +1698,12 @@ static void execSetupSound()
 
 static void execSetupArtwork()
 {
-  /* needed if last screen (setup choice) changed graphics, sounds or music */
-  ReloadCustomArtwork();
-
   setup.graphics_set = artwork.gfx_current->identifier;
   setup.sounds_set = artwork.snd_current->identifier;
   setup.music_set = artwork.mus_current->identifier;
+
+  /* needed if last screen (setup choice) changed graphics, sounds or music */
+  ReloadCustomArtwork();
 
   /* needed for displaying artwork name instead of artwork identifier */
   graphics_set_name = artwork.gfx_current->name;

@@ -2282,6 +2282,11 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   ListNode *node;
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
 
+#if 1
+    if (strcmp(basename, "RocksScreen.pcx") == 0)
+      printf("::: got filename '%s'\n", filename);
+#endif
+
   if (filename == NULL)
   {
     int error_mode = ERR_WARN;
@@ -2301,8 +2306,11 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
        This usually means that this artwork does not exist in this artwork set
        and a fallback to the existing artwork is done. */
 
-#if 0
-    printf("[artwork '%s' already exists (same list entry)]\n", filename);
+#if 1
+#if 1
+    if (strcmp(basename, "RocksScreen.pcx") == 0)
+#endif
+      printf("[artwork '%s' already exists (same list entry)]\n", filename);
 #endif
 
     return;
