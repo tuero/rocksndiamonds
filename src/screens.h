@@ -16,6 +16,7 @@
 
 #include "main.h"
 
+/* for DrawSetupScreen(), HandleSetupScreen() */
 #define SETUP_SCREEN_POS_START		2
 #define SETUP_SCREEN_POS_END		16
 #define SETUP_SCREEN_POS_EMPTY		(SETUP_SCREEN_POS_END - 2)

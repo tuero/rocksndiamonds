@@ -23,6 +23,7 @@
 #include "buttons.h"
 #include "joystick.h"
 #include "cartoons.h"
+#include "network.h"
 
 #include <math.h>
 
@@ -1307,6 +1308,10 @@ BOOL Request(char *text, unsigned int req_state)
   int mx,my, ty, result = -1;
   unsigned int old_door_state;
 
+  /* pause network game while waiting for request to answer */
+  if (!standalone && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+    SendToServer_PausePlaying();
+
   old_door_state = GetDoorState();
 
   CloseDoor(DOOR_CLOSE_1);
@@ -1390,9 +1395,7 @@ BOOL Request(char *text, unsigned int req_state)
   OpenDoor(DOOR_OPEN_1);
   ClearEventQueue();
 
-  if (!(req_state & REQ_ASK) &&
-      !(req_state & REQ_CONFIRM) &&
-      !(req_state & REQ_PLAYER))
+  if (!(req_state & REQUEST_WAIT_FOR))
     return(FALSE);
 
   if (game_status != MAINMENU)
@@ -1530,6 +1533,10 @@ BOOL Request(char *text, unsigned int req_state)
       OpenDoor(DOOR_OPEN_1);
     }
   }
+
+  /* continue network game after request */
+  if (!standalone && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+    SendToServer_ContinuePlaying();
 
   return(result);
 }

@@ -506,6 +506,9 @@ static void Handle_OP_STOP_PLAYING()
   printf("OP_STOP_PLAYING: %d\n", buf[0]);
   sprintf(msgbuf, "client %d stops game", buf[0]);
   sysmsg(msgbuf);
+
+  game_status = MAINMENU;
+  DrawMainMenu();
 }
 
 static void Handle_OP_MOVE_FIGURE()

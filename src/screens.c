@@ -234,7 +234,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y==10)
       {
 	SavePlayerInfo(PLAYER_LEVEL);
-        if (Request("Do you really want to quit ?",REQ_ASK|REQ_STAY_CLOSED))
+        if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
 
@@ -1507,8 +1507,13 @@ void HandleGameButtons(int mx, int my, int button)
       if (Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
-	game_status = MAINMENU;
-	DrawMainMenu();
+	if (standalone)
+	{
+	  game_status = MAINMENU;
+	  DrawMainMenu();
+	}
+	else
+	  SendToServer_StopPlaying();
       }
       else
 	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);

@@ -459,7 +459,9 @@ void LoadPlayerInfo(int mode)
   }
 
   level_nr = local_player->level_nr;
-  fclose(file);
+
+  if (file)
+    fclose(file);
 }
 
 void SaveLevel(int level_nr)

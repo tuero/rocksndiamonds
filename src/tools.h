@@ -18,43 +18,45 @@
 #include "main.h"
 
 /* for SetDrawtoField */
-#define DRAW_DIRECT	0
-#define DRAW_BUFFERED	1
-#define DRAW_BACKBUFFER	2
+#define DRAW_DIRECT		0
+#define DRAW_BUFFERED		1
+#define DRAW_BACKBUFFER		2
 
 /* for DrawElementShifted */
-#define NO_CUTTING	0
-#define CUT_ABOVE	1
-#define CUT_BELOW	2
-#define CUT_LEFT	4
-#define CUT_RIGHT	8
+#define NO_CUTTING		0
+#define CUT_ABOVE		(1 << 0)
+#define CUT_BELOW		(1 << 1)
+#define CUT_LEFT		(1 << 2)
+#define CUT_RIGHT		(1 << 3)
 
 /* for masking functions */
-#define NO_MASKING	0
-#define USE_MASKING	1
+#define NO_MASKING		0
+#define USE_MASKING		1
  
 /* for MoveDoor */
-#define DOOR_OPEN_1	(1 << 0)
-#define DOOR_OPEN_2	(1 << 1)
-#define DOOR_CLOSE_1	(1 << 2)
-#define DOOR_CLOSE_2	(1 << 3)
-#define DOOR_OPEN_BOTH	(DOOR_OPEN_1 | DOOR_OPEN_2)
-#define DOOR_CLOSE_BOTH	(DOOR_CLOSE_1 | DOOR_CLOSE_2)
-#define DOOR_ACTION_1	(DOOR_OPEN_1 | DOOR_CLOSE_1)
-#define DOOR_ACTION_2	(DOOR_OPEN_2 | DOOR_CLOSE_2)
-#define DOOR_ACTION	(DOOR_ACTION_1 | DOOR_ACTION_2)
-#define DOOR_COPY_BACK	(1 << 4)
-#define DOOR_NO_DELAY	(1 << 5)
-#define DOOR_GET_STATE	(1 << 6)
+#define DOOR_OPEN_1		(1 << 0)
+#define DOOR_OPEN_2		(1 << 1)
+#define DOOR_CLOSE_1		(1 << 2)
+#define DOOR_CLOSE_2		(1 << 3)
+#define DOOR_OPEN_BOTH		(DOOR_OPEN_1 | DOOR_OPEN_2)
+#define DOOR_CLOSE_BOTH		(DOOR_CLOSE_1 | DOOR_CLOSE_2)
+#define DOOR_ACTION_1		(DOOR_OPEN_1 | DOOR_CLOSE_1)
+#define DOOR_ACTION_2		(DOOR_OPEN_2 | DOOR_CLOSE_2)
+#define DOOR_ACTION		(DOOR_ACTION_1 | DOOR_ACTION_2)
+#define DOOR_COPY_BACK		(1 << 4)
+#define DOOR_NO_DELAY		(1 << 5)
+#define DOOR_GET_STATE		(1 << 6)
 
 /* for Request */
-#define REQ_ASK		(1 << 0)
-#define REQ_OPEN	(1 << 1)
-#define REQ_CLOSE	(1 << 2)
-#define REQ_CONFIRM	(1 << 3)
-#define REQ_STAY_CLOSED	(1 << 4)
-#define REQ_STAY_OPEN	(1 << 5)
-#define REQ_PLAYER	(1 << 6)
+#define REQ_ASK			(1 << 0)
+#define REQ_OPEN		(1 << 1)
+#define REQ_CLOSE		(1 << 2)
+#define REQ_CONFIRM		(1 << 3)
+#define REQ_STAY_CLOSED		(1 << 4)
+#define REQ_STAY_OPEN		(1 << 5)
+#define REQ_PLAYER		(1 << 6)
+
+#define REQUEST_WAIT_FOR	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
 void SetDrawtoField(int);
 void BackToFront();
