@@ -139,12 +139,17 @@ void HandleAnimation(int mode)
 	SetDrawtoField(DRAW_DIRECT);
       }
 
+      if (soft_scrolling_on && game_status==PLAYING)
+	XCopyArea(display,fieldbuffer,backbuffer,gc,
+		  FX,FY, SXSIZE,SYSIZE,
+		  SX,SY);
+
       return;
       break;
     case ANIM_CONTINUE:
       break;
     case ANIM_STOP:
-      redraw_mask |= REDRAW_FIELD;
+      redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
       /* Redraw background even when in direct drawing mode */
       draw_mode = direct_draw_on;

@@ -32,6 +32,7 @@
 #define SETUP_2ND_JOYSTICK		(1<<7)
 #define SETUP_QUICK_DOORS		(1<<8)
 #define SETUP_SCROLL_DELAY		(1<<9)
+#define SETUP_SOFT_SCROLL		(1<<10)
 
 #define DEFAULT_SETUP			(SETUP_TOONS |		\
 					 SETUP_SOUND |		\
@@ -49,6 +50,7 @@
 #define SETUP_2ND_JOYSTICK_ON(x)	(((x) & SETUP_2ND_JOYSTICK) != 0)
 #define SETUP_QUICK_DOORS_ON(x)		(((x) & SETUP_QUICK_DOORS) != 0)
 #define SETUP_SCROLL_DELAY_ON(x)	(((x) & SETUP_SCROLL_DELAY) != 0)
+#define SETUP_SOFT_SCROLL_ON(x)		(((x) & SETUP_SOFT_SCROLL) != 0)
 
 BOOL CreateNewScoreFile(void);
 BOOL CreateNewNamesFile(int);

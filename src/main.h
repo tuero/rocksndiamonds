@@ -67,11 +67,12 @@ typedef int BOOL;
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
-/*
-#define IS_PLAYER(x,y)		(JX==(x) && JY==(y))
-*/
 
+#define IS_PLAYER(x,y)		(JX==(x) && JY==(y))
+
+/*
 #define IS_PLAYER(x,y)		((JX==(x) && JY==(y)) || (JX2==(x) && JY2==(y)))
+*/
 
 #define IS_FREE(x,y)		(Feld[x][y]==EL_LEERRAUM && !IS_PLAYER(x,y))
 #define IS_FREE_OR_PLAYER(x,y)	(Feld[x][y]==EL_LEERRAUM)
@@ -996,6 +997,7 @@ extern char		*progname;
 #define REDRAW_VIDEO_2		(1L<<5)
 #define REDRAW_VIDEO_3		(1L<<6)
 #define REDRAW_MICROLEV		(1L<<7)
+#define REDRAW_FROM_BACKBUFFER	(1L<<8)
 #define REDRAW_DOOR_2	(REDRAW_VIDEO_1 | REDRAW_VIDEO_2 | REDRAW_VIDEO_3)
 #define REDRAW_DOORS	(REDRAW_DOOR_1 | REDRAW_DOOR_2)
 #define REDRAW_MAIN	(REDRAW_FIELD | REDRAW_TILES | REDRAW_MICROLEV)

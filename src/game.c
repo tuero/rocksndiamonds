@@ -49,6 +49,7 @@ void GetPlayerConfig()
   joystick_nr = SETUP_2ND_JOYSTICK_ON(player.setup);
   quick_doors = SETUP_QUICK_DOORS_ON(player.setup);
   scroll_delay_on = SETUP_SCROLL_DELAY_ON(player.setup);
+  soft_scrolling_on = SETUP_SOFT_SCROLL_ON(player.setup);
 
   if (joystick_nr != old_joystick_nr)
   {
@@ -74,6 +75,7 @@ void InitGame()
   FrameCounter = 0;
   TimeFrames = 0;
   TimeLeft = level.time;
+  ScreenMovPos = 0;
   PlayerMovDir = MV_NO_MOVING;
   PlayerMovPos = 0;
   PlayerFrame = 0;
@@ -2751,6 +2753,9 @@ void GameActions()
   */
 
 
+  DrawPlayerField();
+
+
   BackToFront();
 }
 
@@ -2869,6 +2874,7 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
 BOOL MoveFigure(int dx, int dy)
 {
   static long move_delay = 0;
+  static int last_move_dir = MV_NO_MOVING;
   int moved = MF_NO_ACTION;
   int oldJX = JX, oldJY = JY;
 
@@ -2901,6 +2907,22 @@ BOOL MoveFigure(int dx, int dy)
       return(FALSE);
   }
 
+
+  if (last_move_dir & (MV_LEFT | MV_RIGHT))
+  {
+    if (!(moved |= MoveFigureOneStep(0,dy, dx,dy)))
+      moved |= MoveFigureOneStep(dx,0, dx,dy);
+  }
+  else
+  {
+    if (!(moved |= MoveFigureOneStep(dx,0, dx,dy)))
+      moved |= MoveFigureOneStep(0,dy, dx,dy);
+  }
+
+  last_move_dir = MV_NO_MOVING;
+
+
+  /*
   if (moved |= MoveFigureOneStep(dx,0, dx,dy))
     moved |= MoveFigureOneStep(0,dy, dx,dy);
   else
@@ -2908,6 +2930,7 @@ BOOL MoveFigure(int dx, int dy)
     moved |= MoveFigureOneStep(0,dy, dx,dy);
     moved |= MoveFigureOneStep(dx,0, dx,dy);
   }
+  */
 
   if (moved & MF_MOVING)
   {
@@ -2938,6 +2961,8 @@ BOOL MoveFigure(int dx, int dy)
       PlayerMovDir = (oldJY < JY ? MV_DOWN : MV_UP);
 
     DrawLevelField(JX,JY);	/* für "ErdreichAnbroeckeln()" */
+
+    last_move_dir = PlayerMovDir;
   }
 
   TestIfHeroHitsBadThing();
@@ -2961,6 +2986,8 @@ void ScrollFigure(int init)
   {
     if (PlayerMovPos && oldX != -1 && oldY != -1)
     {
+      if (Feld[JX2][JY2] == EL_LEERRAUM)
+	Feld[JX2][JY2] = EL_UNSICHTBAR;
       DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
       DrawPlayerField();
     }
@@ -2969,8 +2996,10 @@ void ScrollFigure(int init)
     oldY = JY2;
     actual_frame_counter = FrameCounter;
 
+    /*
     redraw[redraw_x1 + oldX][redraw_y1 + oldY] = 1;
     redraw_tiles++;
+    */
 
     /*
     DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
@@ -2990,6 +3019,9 @@ void ScrollFigure(int init)
     ScreenMovPos = PlayerMovPos;
     redraw_mask |= REDRAW_FIELD;
   }
+
+  if (Feld[oldX][oldY] == EL_UNSICHTBAR)
+    Feld[oldX][oldY] = EL_LEERRAUM;
 
   DrawLevelElement(oldX,oldY, Feld[oldX][oldY]);
   DrawPlayerField();

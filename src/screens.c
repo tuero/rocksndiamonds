@@ -892,6 +892,7 @@ void DrawSetupScreen()
     {SETUP_TOONS,	"Toons:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_DIRECT_DRAW,	"Buffered gfx:",{"off","on" },	{FC_BLUE,FC_YELLOW}},
     {SETUP_SCROLL_DELAY,"Scroll Delay:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
+    {SETUP_SOFT_SCROLL,	"Soft Scroll.:",{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_FADING,	"Fading:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_QUICK_DOORS,	"Quick Doors:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
     {SETUP_AUTO_RECORD,	"Auto-Record:",	{"on", "off"},	{FC_YELLOW,FC_BLUE}},
@@ -1055,13 +1056,21 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==9)
       {
+	if (SETUP_SOFT_SCROLL_ON(player.setup))
+	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
+	else
+	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
+	player.setup ^= SETUP_SOFT_SCROLL;
+      }
+      else if (y==10)
+      {
 	if (SETUP_FADING_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_FADING;
       }
-      else if (y==10)
+      else if (y==11)
       {
 	if (SETUP_QUICK_DOORS_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1069,7 +1078,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_QUICK_DOORS;
       }
-      else if (y==11)
+      else if (y==12)
       {
 	if (SETUP_AUTO_RECORD_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
@@ -1077,7 +1086,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_AUTO_RECORD;
       }
-      else if (y==12)
+      else if (y==13)
       {
 	if (SETUP_2ND_JOYSTICK_ON(player.setup))
 	  DrawText(SX+14*32, SY+yy*32,"1st",FS_BIG,FC_YELLOW);
@@ -1085,7 +1094,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	  DrawText(SX+14*32, SY+yy*32,"2nd",FS_BIG,FC_YELLOW);
 	player.setup ^= SETUP_2ND_JOYSTICK;
       }
-      else if (y==13)
+      else if (y==14)
       {
 	CalibrateJoystick();
 	redraw = TRUE;

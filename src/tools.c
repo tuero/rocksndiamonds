@@ -143,7 +143,7 @@ void BackToFront()
     int fx = FX + (PlayerMovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
     int fy = FY + (PlayerMovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
 
-    if (game_status == PLAYING)
+    if (game_status == PLAYING && !(redraw_mask & REDRAW_FROM_BACKBUFFER))
     {
       XCopyArea(display,buffer,window,gc,
 		fx,fy, SXSIZE,SYSIZE,
@@ -386,10 +386,16 @@ void DrawPlayerField()
   if (PlayerGone)
     return;
 
+  /*
+  printf("INFO: DrawPlayerField(): x = %d, y = %d\n",x,y);
+  */
+
+
 #if DEBUG
   if (!IN_LEV_FIELD(x,y) || !IN_SCR_FIELD(sx,sy))
   {
     printf("DrawPlayerField(): x = %d, y = %d\n",x,y);
+    printf("DrawPlayerField(): sx = %d, sy = %d\n",sx,sy);
     printf("DrawPlayerField(): This should never happen!\n");
     return;
   }
@@ -1126,7 +1132,12 @@ void DrawLevel()
     for(y=BY1; y<=BY2; y++)
       DrawScreenField(x,y);
 
-  redraw_mask |= REDRAW_FIELD;
+  if (soft_scrolling_on)
+    XCopyArea(display,fieldbuffer,backbuffer,gc,
+	      FX,FY, SXSIZE,SYSIZE,
+	      SX,SY);
+
+  redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 }
 
 void DrawMiniLevel(int scroll_x, int scroll_y)

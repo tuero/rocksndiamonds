@@ -160,6 +160,11 @@ void HandleExposeEvent(XExposeEvent *event)
     SetDrawtoField(DRAW_DIRECT);
   }
 
+  if (soft_scrolling_on && game_status==PLAYING)
+    XCopyArea(display,fieldbuffer,backbuffer,gc,
+	      FX,FY, SXSIZE,SYSIZE,
+	      SX,SY);
+
   XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
 
   XFlush(display);
@@ -202,6 +207,7 @@ void HandleFocusEvent(XFocusChangeEvent *event)
     XAutoRepeatOn(display);
     old_joystick_status = joystick_status;
     joystick_status = JOYSTICK_OFF;
+    key_joystick_mapping = 0;
   }
   else if (event->type == FocusIn)
   {

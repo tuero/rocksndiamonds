@@ -18,7 +18,7 @@
 #include "main.h"
 
 #define SETUP_SCREEN_POS_START		2
-#define SETUP_SCREEN_POS_END		15
+#define SETUP_SCREEN_POS_END		16
 #define SETUP_SCREEN_POS_EMPTY		(SETUP_SCREEN_POS_END - 2)
 
 void DrawHeadline(void);
