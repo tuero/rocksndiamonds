@@ -404,6 +404,37 @@ void ClearWindow()
   }
 }
 
+void MarkTileDirty(int x, int y)
+{
+  int xx = redraw_x1 + x;
+  int yy = redraw_y1 + y;
+
+  if (!redraw[xx][yy])
+    redraw_tiles++;
+
+  redraw[xx][yy] = TRUE;
+  redraw_mask |= REDRAW_TILES;
+}
+
+void SetBorderElement()
+{
+  int x, y;
+
+  BorderElement = EL_EMPTY;
+
+  for(y=0; y<lev_fieldy && BorderElement == EL_EMPTY; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (!IS_MASSIVE(Feld[x][y]))
+	BorderElement = EL_STEELWALL;
+
+      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
+	x = lev_fieldx - 2;
+    }
+  }
+}
+
 static int getGraphicAnimationPhase(int frames, int delay, int mode)
 {
   int phase;
@@ -437,35 +468,40 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   sync_frame);
 }
 
-void MarkTileDirty(int x, int y)
+inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+				    int graphic, int sync_frame, int mask_mode)
 {
-  int xx = redraw_x1 + x;
-  int yy = redraw_y1 + y;
+  int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-  if (!redraw[xx][yy])
-    redraw_tiles++;
-
-  redraw[xx][yy] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  if (mask_mode == USE_MASKING)
+    DrawGraphicThruMaskExt(dst_bitmap, x, y, graphic, frame);
+  else
+    DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-void SetBorderElement()
+inline boolean DrawGraphicAnimation(int x, int y, int graphic)
 {
-  int x, y;
+  int lx = LEVELX(x), ly = LEVELY(y);
 
-  BorderElement = EL_EMPTY;
+  if (!IN_SCR_FIELD(x, y) ||
+      (GfxFrame[lx][ly] % new_graphic_info[graphic].anim_delay) != 0)
+    return FALSE;
 
-  for(y=0; y<lev_fieldy && BorderElement == EL_EMPTY; y++)
-  {
-    for(x=0; x<lev_fieldx; x++)
-    {
-      if (!IS_MASSIVE(Feld[x][y]))
-	BorderElement = EL_STEELWALL;
+  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
+			  graphic, GfxFrame[lx][ly], NO_MASKING);
+  MarkTileDirty(x, y);
 
-      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
-	x = lev_fieldx - 2;
-    }
-  }
+  return TRUE;
+}
+
+boolean DrawLevelGraphicAnimation(int x, int y, int graphic)
+{
+  return DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+}
+
+boolean DrawLevelElementAnimation(int x, int y, int element)
+{
+  return DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
 }
 
 void DrawAllPlayers()
@@ -786,40 +822,6 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 
   MarkTileDirty(sx,sy);
-}
-
-inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
-				    int graphic, int sync_frame, int mask_mode)
-{
-  int frame = getGraphicAnimationFrame(graphic, sync_frame);
-
-  if (mask_mode == USE_MASKING)
-    DrawGraphicThruMaskExt(dst_bitmap, x, y, graphic, frame);
-  else
-    DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
-}
-
-inline void DrawGraphicAnimation(int x, int y, int graphic)
-{
-  int lx = LEVELX(x), ly = LEVELY(y);
-
-  if (!IN_SCR_FIELD(x, y) ||
-      (GfxFrame[lx][ly] % new_graphic_info[graphic].anim_delay) != 0)
-    return;
-
-  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
-			  graphic, GfxFrame[lx][ly], NO_MASKING);
-  MarkTileDirty(x, y);
-}
-
-void DrawLevelGraphicAnimation(int x, int y, int graphic)
-{
-  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
-}
-
-void DrawLevelElementAnimation(int x, int y, int element)
-{
-  DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
 }
 
 #if 0

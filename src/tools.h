@@ -70,25 +70,26 @@ void DrawBackground(int, int, int, int);
 void MarkTileDirty(int, int);
 void SetBorderElement();
 
+int getGraphicAnimationFrame(int, int);
+void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
+boolean DrawGraphicAnimation(int, int, int);
+boolean DrawLevelGraphicAnimation(int, int, int);
+boolean DrawLevelElementAnimation(int, int, int);
+
 void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
-int getGraphicAnimationFrame(int, int);
-void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
-void DrawGraphicAnimation(int, int, int);
-void DrawLevelGraphicAnimation(int, int, int);
-void DrawLevelElementAnimation(int, int, int);
+
 void getGraphicSource(int, int, Bitmap **, int *, int *);
 void DrawGraphic(int, int, int, int);
-#if 0
-void DrawOldGraphicExt(DrawBuffer *, int, int, int);
-#endif
 void DrawGraphicExt(DrawBuffer *, int, int, int, int);
 void DrawGraphicThruMask(int, int, int, int);
 void DrawGraphicThruMaskExt(DrawBuffer *, int, int, int, int);
+
 void DrawMiniGraphic(int, int, int);
 void getMiniGraphicSource(int, Bitmap **, int *, int *);
 void DrawMiniGraphicExt(DrawBuffer *, int, int, int);
+
 void DrawGraphicShifted(int, int, int, int, int, int, int, int);
 void DrawGraphicShiftedThruMask(int, int, int, int, int, int, int);
 void DrawScreenElementExt(int, int, int, int, int, int, int);
@@ -103,8 +104,10 @@ void DrawScreenElement(int, int, int);
 void DrawLevelElement(int, int, int);
 void DrawScreenField(int, int);
 void DrawLevelField(int, int);
+
 void DrawMiniElement(int, int, int);
 void DrawMiniElementOrWall(int, int, int, int);
+
 void getMicroGraphicSource(int, Bitmap **, int *, int *);
 void DrawMicroElement(int, int, int);
 void DrawLevel(void);

@@ -878,6 +878,8 @@ static void InitGraphicInfo()
       new_graphic_info[i].anim_mode = ANIM_PINGPONG;
     else if (parameter[GFX_ARG_MODE_PINGPONG2])
       new_graphic_info[i].anim_mode = ANIM_PINGPONG2;
+    else if (parameter[GFX_ARG_MODE_RANDOM])
+      new_graphic_info[i].anim_mode = ANIM_RANDOM;
     else if (new_graphic_info[i].anim_frames > 1)
       new_graphic_info[i].anim_mode = ANIM_LOOP;
     else
@@ -1878,6 +1880,7 @@ void InitElementProperties()
     EL_SAND,
     EL_SP_BASE,
     EL_SP_BUGGY_BASE,
+    EL_SP_BUGGY_BASE_ACTIVATING,
     EL_TRAP,
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE

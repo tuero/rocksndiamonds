@@ -24,6 +24,7 @@
 #define ANIM_PINGPONG		(1 << 2)
 #define ANIM_PINGPONG2		(1 << 3)
 #define ANIM_REVERSE		(1 << 4)
+#define ANIM_RANDOM		(1 << 5)
 
 /* values for toon animation direction */
 #define ANIMDIR_LEFT	1

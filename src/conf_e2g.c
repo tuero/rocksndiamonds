@@ -437,6 +437,10 @@ element_to_graphic[] =
     IMG_SP_BUGGY_BASE
   },
   {
+    EL_SP_BUGGY_BASE_ACTIVATING,		-1, -1,
+    IMG_SP_BUGGY_BASE_ACTIVATING
+  },
+  {
     EL_SP_BUGGY_BASE_ACTIVE,			-1, -1,
     IMG_SP_BUGGY_BASE_ACTIVE
   },

@@ -679,50 +679,51 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 
   /* "real" (and therefore drawable) runtime elements */
 
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},
-  { "magic_wall",		"-"				},    /* 490 */
-  { "magic_wall",		"-"				},
+  { "key",			"-"				},
+  { "key",			"-"				},
+  { "key",			"-"				},    /* 490 */
+  { "key",			"-"				},
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "dynabomb",			"-"				},
+  { "switchgate",		"-"				},
+  { "switchgate",		"-"				},
+  { "timegate",			"-"				},
+  { "timegate",			"-"				},
+  { "pearl",			"-"				},    /* 500 */
+  { "trap",			"-"				},
   { "wall",			"-"				},
   { "wall",			"-"				},
+  { "sand",			"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},    /* 510 */
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
+  { "conveyor_belt",		"-"				},
   { "exit",			"-"				},
+  { "sp_exit",			"-"				},
   { "sp_terminal",		"-"				},
+  { "sp_buggy_base",		"-"				},    /* 520 */
   { "sp_buggy_base",		"-"				},
-  { "key",			"-"				},
-  { "key",			"-"				},
-  { "key",			"-"				},
-  { "key",			"-"				},    /* 500 */
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "dynabomb",			"-"				},
-  { "switchgate",		"-"				},
-  { "switchgate",		"-"				},
-  { "timegate",			"-"				},
-  { "timegate",			"-"				},
-  { "pearl",			"-"				},
-  { "trap",			"-"				},    /* 510 */
   { "murphy_clone",		"-"				},
+  { "amoeba",			"-"				},
   { "quicksand",		"-"				},
   { "magic_wall",		"-"				},
   { "magic_wall",		"-"				},
-  { "amoeba",			"-"				},
-  { "sp_exit",			"-"				},
-  { "wall",			"-"				},
-  { "sand",			"-"				},
-  { "wall",			"-"				},
-  { "conveyor_belt",		"-"				},    /* 520 */
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},
-  { "conveyor_belt",		"-"				},    /* 530 */
-  { "conveyor_belt",		"-"				},
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},    /* 530 */
+  { "magic_wall",		"-"				},
+  { "magic_wall",		"-"				},
 
   { NULL,			"-"				}
 };

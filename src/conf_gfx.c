@@ -34,6 +34,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".mode_linear",			"false",		TYPE_BOOLEAN },
   { ".mode_pingpong",			"false",		TYPE_BOOLEAN },
   { ".mode_pingpong2",			"false",		TYPE_BOOLEAN },
+  { ".mode_random",			"false",		TYPE_BOOLEAN },
   { ".mode_reverse",			"false",		TYPE_BOOLEAN },
   { ".global_sync",			GFX_ARG_UNDEFINED,	TYPE_BOOLEAN },
 
@@ -491,10 +492,15 @@ struct ConfigInfo image_config[] =
   { "sp_buggy_base.xpos",			"1"			},
   { "sp_buggy_base.ypos",			"3"			},
   { "sp_buggy_base.frames",			"1"			},
+  { "sp_buggy_base.activating",			"RocksSP.pcx"		},
+  { "sp_buggy_base.activating.xpos",		"15"			},
+  { "sp_buggy_base.activating.ypos",		"2"			},
+  { "sp_buggy_base.activating.frames",		"1"			},
   { "sp_buggy_base.active",			"RocksSP.pcx"		},
   { "sp_buggy_base.active.xpos",		"8"			},
   { "sp_buggy_base.active.ypos",		"6"			},
   { "sp_buggy_base.active.frames",		"4"			},
+  { "sp_buggy_base.active.mode_random",		"true"			},
 
   { "sp_hard_base1",				"RocksSP.pcx"		},
   { "sp_hard_base1.xpos",			"4"			},

@@ -35,30 +35,36 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 
   sync_frame += start_frame * delay;
 
-  if (mode & ANIM_LOOP)			/* normal, looping animation */
+  if (mode & ANIM_LOOP)			/* looping animation */
   {
     frame = (sync_frame % (delay * num_frames)) / delay;
   }
-  else if (mode & ANIM_LINEAR)		/* normal, non-looping animation */
+  else if (mode & ANIM_LINEAR)		/* linear (non-looping) animation */
   {
     frame = sync_frame / delay;
 
     if (frame > num_frames - 1)
       frame = num_frames - 1;
   }
-  else if (mode & ANIM_PINGPONG)	/* use border frames once */
+  else if (mode & ANIM_PINGPONG)	/* oscillate (border frames once) */
   {
     int max_anim_frames = 2 * num_frames - 2;
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame);
   }
-  else if (mode & ANIM_PINGPONG2)	/* use border frames twice */
+  else if (mode & ANIM_PINGPONG2)	/* oscillate (border frames twice) */
   {
     int max_anim_frames = 2 * num_frames;
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
+  }
+  else if (mode & ANIM_RANDOM)		/* play frames in random order */
+  {
+    /* note: expect different frames for the same delay cycle! */
+
+    frame = SimpleRND(num_frames);
   }
 
   if (mode & ANIM_REVERSE)		/* use reverse animation direction */

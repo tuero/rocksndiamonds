@@ -100,6 +100,9 @@ run:
 gdb:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && gdb ./rocksndiamonds
 
+enginetest:
+	./Scripts/make_enginetest.sh
+
 backup:
 	./Scripts/make_backup.sh src
 

@@ -682,22 +682,28 @@ void TapeQuickLoad()
  * tape autoplay functions
  * ------------------------------------------------------------------------- */
 
+#define MAX_NUM_AUTOPLAY_LEVELS		1000
+
 void AutoPlayTape()
 {
   static LevelDirTree *autoplay_leveldir = NULL;
   static boolean autoplay_initialized = FALSE;
   static int autoplay_level_nr = -1;
-  static int levels_played = 0;
-  static int levels_solved = 0;
+  static int num_levels_played = 0;
+  static int num_levels_solved = 0;
+  static boolean levels_failed[MAX_NUM_AUTOPLAY_LEVELS];
+  int i;
 
   if (autoplay_initialized)
   {
     /* just finished auto-playing tape */
     printf("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
 
-    levels_played++;
+    num_levels_played++;
     if (tape.auto_play_level_solved)
-      levels_solved++;
+      num_levels_solved++;
+    else if (level_nr >= 0 && level_nr < MAX_NUM_AUTOPLAY_LEVELS)
+      levels_failed[level_nr] = TRUE;
   }
   else
   {
@@ -730,6 +736,9 @@ void AutoPlayTape()
     printf("Number of levels:        %d\n",   autoplay_leveldir->levels);
     printf_line('=', 79);
     printf("\n");
+
+    for (i=0; i<MAX_NUM_AUTOPLAY_LEVELS; i++)
+      levels_failed[i] = FALSE;
 
     autoplay_initialized = TRUE;
   }
@@ -766,14 +775,22 @@ void AutoPlayTape()
 
   printf("\n");
   printf_line('=', 79);
-  printf("Number of levels played: %d\n", levels_played);
-  printf("Number of levels solved: %d (%d%%)\n", levels_solved,
-	 levels_solved * 100 / levels_played);
+  printf("Number of levels played: %d\n", num_levels_played);
+  printf("Number of levels solved: %d (%d%%)\n", num_levels_solved,
+	 num_levels_solved * 100 / num_levels_played);
   printf_line('-', 79);
   printf("Summary (for automatic parsing by scripts):\n");
-  printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)\n",
-	 autoplay_leveldir->identifier, levels_solved, levels_played,
-	 levels_solved * 100 / levels_played);
+  printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
+	 autoplay_leveldir->identifier, num_levels_solved, num_levels_played,
+	 num_levels_solved * 100 / num_levels_played);
+  if (num_levels_played != num_levels_solved)
+  {
+    printf(", FAILED:");
+    for (i=0; i<MAX_NUM_AUTOPLAY_LEVELS; i++)
+      if (levels_failed[i])
+	printf(" %03d", i);
+  }
+  printf("\n");
   printf_line('=', 79);
 
   CloseAllAndExit(0);

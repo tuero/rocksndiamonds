@@ -172,14 +172,22 @@ struct ChangingElementInfo
   int base_element;
   int next_element;
   int change_delay;
-  void (*changer_function)(int x, int y);
+  void (*pre_change_function)(int x, int y);
+  void (*change_function)(int x, int y);
+  void (*post_change_function)(int x, int y);
 };
 
 static struct ChangingElementInfo changing_element_list[] =
 {
-  { EL_NUT_CRACKING,		EL_EMERALD,		6, NULL		},
-  { EL_PEARL_BREAKING,		EL_EMPTY,		8, NULL		},
-  { EL_UNDEFINED,		EL_UNDEFINED,	       -1, NULL		}
+  { EL_NUT_CRACKING,		EL_EMERALD,		 6, NULL, NULL, NULL },
+  { EL_PEARL_BREAKING,		EL_EMPTY,		 8, NULL, NULL, NULL },
+  { EL_EXIT_OPENING,		EL_EXIT_OPEN,		29, NULL, NULL, NULL },
+  { EL_SWITCHGATE_OPENING,	EL_SWITCHGATE_OPEN,	29, NULL, NULL, NULL },
+  { EL_SWITCHGATE_CLOSING,	EL_SWITCHGATE_CLOSED,	29, NULL, NULL, NULL },
+  { EL_TIMEGATE_OPENING,	EL_TIMEGATE_OPEN,	29, NULL, NULL, NULL },
+  { EL_TIMEGATE_CLOSING,	EL_TIMEGATE_CLOSED,	29, NULL, NULL, NULL },
+
+  { EL_UNDEFINED,		EL_UNDEFINED,	        -1, NULL	}
 };
 
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
@@ -691,7 +699,9 @@ static void InitGameEngine()
     changing_element[i].base_element = EL_UNDEFINED;
     changing_element[i].next_element = EL_UNDEFINED;
     changing_element[i].change_delay = -1;
-    changing_element[i].changer_function = NULL;
+    changing_element[i].pre_change_function = NULL;
+    changing_element[i].change_function = NULL;
+    changing_element[i].post_change_function = NULL;
   }
 
   i = 0;
@@ -700,10 +710,12 @@ static void InitGameEngine()
     struct ChangingElementInfo *ce = &changing_element_list[i];
     int element = ce->base_element;
 
-    changing_element[element].base_element     = ce->base_element;
-    changing_element[element].next_element     = ce->next_element;
-    changing_element[element].change_delay     = ce->change_delay;
-    changing_element[element].changer_function = ce->changer_function;
+    changing_element[element].base_element         = ce->base_element;
+    changing_element[element].next_element         = ce->next_element;
+    changing_element[element].change_delay         = ce->change_delay;
+    changing_element[element].pre_change_function  = ce->pre_change_function;
+    changing_element[element].change_function      = ce->change_function;
+    changing_element[element].post_change_function = ce->post_change_function;
 
     i++;
   }
@@ -4639,67 +4651,109 @@ void CheckForDragon(int x, int y)
   }
 }
 
+static void InitBuggyBase(int x, int y)
+{
+  int element = Feld[x][y];
+  int activating_delay = FRAMES_PER_SECOND / 4;
+
+  MovDelay[x][y] =
+    (element == EL_SP_BUGGY_BASE ?
+     2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND) - activating_delay :
+     element == EL_SP_BUGGY_BASE_ACTIVATING ?
+     activating_delay :
+     element == EL_SP_BUGGY_BASE_ACTIVE ?
+     1 * FRAMES_PER_SECOND + RND(1 * FRAMES_PER_SECOND) : 1);
+}
+
+static void WarnBuggyBase(int x, int y)
+{
+  int i;
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
+
+  for (i=0; i<4; i++)
+  {
+    int xx = x + xy[i][0], yy = y + xy[i][1];
+
+    if (IS_PLAYER(xx, yy))
+    {
+      PlaySoundLevel(x, y, SND_SP_BUGGY_BASE_ACTIVE);
+
+      break;
+    }
+  }
+}
+
 static void CheckBuggyBase(int x, int y)
 {
   int element = Feld[x][y];
 
   if (element == EL_SP_BUGGY_BASE)
   {
-    if (!MovDelay[x][y])	/* wait some time before activating base */
-      MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
-
-    if (MovDelay[x][y])
+    if (MovDelay[x][y] == 0)	/* wait some time before activating base */
     {
-      MovDelay[x][y]--;
-      if (MovDelay[x][y] < 5 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-        DrawGraphic(SCREENX(x), SCREENY(y), IMG_SP_BUGGY_BASE, 0);
-      if (MovDelay[x][y])
-	return;
+      GfxFrame[x][y] = 0;
 
+      InitBuggyBase(x, y);
+    }
+
+    MovDelay[x][y]--;
+
+    if (MovDelay[x][y] != 0)
+    {
+      DrawLevelElementAnimation(x, y, element);
+    }
+    else
+    {
+      Feld[x][y] = EL_SP_BUGGY_BASE_ACTIVATING;
+      DrawLevelField(x, y);
+    }
+  }
+  else if (element == EL_SP_BUGGY_BASE_ACTIVATING)
+  {
+    if (MovDelay[x][y] == 0)	/* display activation warning of buggy base */
+    {
+      GfxFrame[x][y] = 0;
+
+      InitBuggyBase(x, y);
+    }
+
+    MovDelay[x][y]--;
+
+    if (MovDelay[x][y] != 0)
+    {
+      DrawLevelElementAnimation(x, y, element);
+    }
+    else
+    {
       Feld[x][y] = EL_SP_BUGGY_BASE_ACTIVE;
+      DrawLevelField(x, y);
     }
   }
   else if (element == EL_SP_BUGGY_BASE_ACTIVE)
   {
-    if (!MovDelay[x][y])	/* start activating buggy base */
-      MovDelay[x][y] = 1 * FRAMES_PER_SECOND + RND(1 * FRAMES_PER_SECOND);
-
-    if (MovDelay[x][y])
+    if (MovDelay[x][y] == 0)	/* start activating buggy base */
     {
-      MovDelay[x][y]--;
-      if (MovDelay[x][y])
-      {
-	int i;
-	static int xy[4][2] =
-	{
-	  { 0, -1 },
-	  { -1, 0 },
-	  { +1, 0 },
-	  { 0, +1 }
-	};
+      GfxFrame[x][y] = 0;
 
-	if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-	{
-	  int graphic = IMG_SP_BUGGY_BASE_ACTIVE;
-	  int frame = getGraphicAnimationFrame(graphic, SimpleRND(100));
+      InitBuggyBase(x, y);
+    }
 
-          DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-	}
+    MovDelay[x][y]--;
 
-	for (i=0; i<4; i++)
-	{
-	  int xx = x + xy[i][0], yy = y + xy[i][1];
+    if (MovDelay[x][y] != 0)
+    {
+      DrawLevelElementAnimation(x, y, element);
 
-	  if (IS_PLAYER(xx, yy))
-	  {
-	    PlaySoundLevel(x, y, SND_SP_BUGGY_BASE_ACTIVE);
-	    break;
-	  }
-	}
-
-	return;
-      }
-
+      WarnBuggyBase(x, y);
+    }
+    else
+    {
       Feld[x][y] = EL_SP_BUGGY_BASE;
       DrawLevelField(x, y);
     }
@@ -4712,15 +4766,17 @@ static void CheckTrap(int x, int y)
 
   if (element == EL_TRAP)
   {
-    if (!MovDelay[x][y])	/* wait some time before activating trap */
+    if (MovDelay[x][y] == 0)	/* wait some time before activating trap */
       MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
 
-    if (MovDelay[x][y])
-    {
-      MovDelay[x][y]--;
-      if (MovDelay[x][y])
-	return;
+    MovDelay[x][y]--;
 
+    if (MovDelay[x][y] != 0)
+    {
+      /* do nothing while waiting */
+    }
+    else
+    {
       Feld[x][y] = EL_TRAP_ACTIVE;
       PlaySoundLevel(x, y, SND_TRAP_ACTIVATING);
     }
@@ -4730,36 +4786,28 @@ static void CheckTrap(int x, int y)
     int delay = 4;
     int num_frames = 8;
 
-    if (!MovDelay[x][y])	/* start activating trap */
-      MovDelay[x][y] = num_frames * delay;
-
-    if (MovDelay[x][y])
+    if (MovDelay[x][y] == 0)	/* start activating trap */
     {
-      MovDelay[x][y]--;
+      MovDelay[x][y] = num_frames * delay;
+      GfxFrame[x][y] = 0;
+    }
 
-      if (MovDelay[x][y])
-      {
-	if (!(MovDelay[x][y] % delay))
-	{
-	  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-	  {
-	    int graphic = IMG_TRAP_ACTIVE;
-	    int frame = getGraphicAnimationFrame(graphic, 31 - MovDelay[x][y]);
+    MovDelay[x][y]--;
 
-	    DrawGraphic(SCREENX(x),SCREENY(y), graphic, frame);
-	    DrawCrumbledSand(SCREENX(x), SCREENY(y));
-	  }
-	}
-
-	return;
-      }
-
+    if (MovDelay[x][y] != 0)
+    {
+      if (DrawLevelElementAnimation(x, y, element))
+	DrawCrumbledSand(SCREENX(x), SCREENY(y));
+    }
+    else
+    {
       Feld[x][y] = EL_TRAP;
       DrawLevelField(x, y);
     }
   }
 }
 
+#if 0
 static void DrawBeltAnimation(int x, int y, int element)
 {
   int belt_nr = getBeltNrFromBeltActiveElement(element);
@@ -4773,35 +4821,38 @@ static void DrawBeltAnimation(int x, int y, int element)
       PlaySoundLevelAction(x, y, SND_ACTION_ACTIVE);
   }
 }
+#endif
 
 static void ChangeElement(int x, int y)
 {
   int element = Feld[x][y];
-  int change_delay = changing_element[element].change_delay;
 
-  if (!MovDelay[x][y])			/* next animation frame */
+  if (MovDelay[x][y] == 0)		/* initialize element change */
   {
-    MovDelay[x][y] = change_delay + 1;
+    MovDelay[x][y] = changing_element[element].change_delay + 1;
     GfxFrame[x][y] = 0;
+
+    if (changing_element[element].pre_change_function)
+      changing_element[element].pre_change_function(x, y);
   }
 
-  if (MovDelay[x][y])			/* wait some time before next frame */
+  MovDelay[x][y]--;
+
+  if (MovDelay[x][y] != 0)		/* continue element change */
   {
-    MovDelay[x][y]--;
+    DrawLevelElementAnimation(x, y, element);
 
-    if (MovDelay[x][y])
-    {
-      DrawLevelElementAnimation(x, y, element);
-
-      return;
-    }
+    if (changing_element[element].change_function)
+      changing_element[element].change_function(x, y);
   }
+  else					/* finish element change */
+  {
+    Feld[x][y] = changing_element[element].next_element;
+    DrawLevelField(x, y);
 
-  Feld[x][y] = changing_element[element].next_element;
-  DrawLevelField(x, y);
-
-  if (changing_element[element].changer_function)
-    changing_element[element].changer_function(x, y);
+    if (changing_element[element].post_change_function)
+      changing_element[element].post_change_function(x, y);
+  }
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -5163,8 +5214,10 @@ void GameActions()
       AusgangstuerPruefen(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       AusgangstuerPruefen_SP(x, y);
+#if 0
     else if (element == EL_EXIT_OPENING)
       AusgangstuerOeffnen(x, y);
+#endif
     else if (element == EL_WALL_GROWING_ACTIVE)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
@@ -5174,14 +5227,15 @@ void GameActions()
       MauerAbleger(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);
-    else if (element == EL_SP_BUGGY_BASE || element == EL_SP_BUGGY_BASE_ACTIVE)
+    else if (element == EL_SP_BUGGY_BASE ||
+	     element == EL_SP_BUGGY_BASE_ACTIVATING ||
+	     element == EL_SP_BUGGY_BASE_ACTIVE)
       CheckBuggyBase(x, y);
     else if (element == EL_TRAP || element == EL_TRAP_ACTIVE)
       CheckTrap(x, y);
 #if 0
     else if (IS_BELT_ACTIVE(element))
       DrawBeltAnimation(x, y, element);
-#endif
     else if (element == EL_SWITCHGATE_OPENING)
       OpenSwitchgate(x, y);
     else if (element == EL_SWITCHGATE_CLOSING)
@@ -5190,6 +5244,7 @@ void GameActions()
       OpenTimegate(x, y);
     else if (element == EL_TIMEGATE_CLOSING)
       CloseTimegate(x, y);
+#endif
 
     else if (IS_AUTO_CHANGING(element))
       ChangeElement(x, y);
@@ -6199,6 +6254,7 @@ int DigField(struct PlayerInfo *player,
     case EL_TRAP:
     case EL_SP_BASE:
     case EL_SP_BUGGY_BASE:
+    case EL_SP_BUGGY_BASE_ACTIVATING:
       RemoveField(x, y);
       PlaySoundLevelElementAction(x, y, element, SND_ACTION_DIGGING);
       break;
