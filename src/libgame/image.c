@@ -865,6 +865,23 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->free_artwork = FreeImage;
 }
 
+void dumpImages()
+{
+  struct ListNode *node;
+
+  if (image_info->content_list == NULL)
+    return;
+
+  for (node = image_info->content_list; node != NULL; node = node->next)
+  {
+    ImageInfo *img_info = (ImageInfo *)node->content;
+
+    printf("---> '%s' [%d]\n",
+	   img_info->source_filename,
+	   img_info->num_references);
+  }
+}
+
 void ReloadCustomImages()
 {
 #if 0
@@ -873,6 +890,8 @@ void ReloadCustomImages()
 
   LoadArtworkConfig(image_info);
   ReloadCustomArtworkList(image_info);
+
+  dumpImages();
 }
 
 void FreeAllImages()

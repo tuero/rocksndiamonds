@@ -1773,9 +1773,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     }
 
     free(artwork_info->dynamic_file_list);
-
     artwork_info->dynamic_file_list = NULL;
-    artwork_info->num_dynamic_file_list_entries = 0;
 
     FreeCustomArtworkList(artwork_info, &artwork_info->dynamic_artwork_list,
 			  &artwork_info->num_dynamic_file_list_entries);
