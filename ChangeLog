@@ -1,3 +1,10 @@
+2004-03-22
+	* fixed another bug with custom elements digging and leaving elements
+	* fixed bug with "along left/right side" and automatic start direction
+	* trigger elements now also displayed when "more custom" deactivated
+	* fixed bug with clipboard element initialized when loading new level
+	* added option "drop delay" to set delay before dropping next element
+
 2004-03-20
 	* added copy and paste functions for custom change pages
 	* enhanced graphical display and functionality of tape recorder

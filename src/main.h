@@ -390,6 +390,9 @@
 #define IS_GROUP_ELEMENT(e)	((e) >= EL_GROUP_START &&		\
 	 			 (e) <= EL_GROUP_END)
 
+#define IS_CLIPBOARD_ELEMENT(e)	((e) >= EL_INTERNAL_CLIPBOARD_START &&	\
+	 			 (e) <= EL_INTERNAL_CLIPBOARD_END)
+
 #define IS_INTERNAL_ELEMENT(e)	((e) >= EL_INTERNAL_START &&		\
 	 			 (e) <= EL_INTERNAL_END)
 
@@ -1019,6 +1022,8 @@
 #define EL_INTERNAL_CLIPBOARD_GROUP		(EL_FIRST_INTERNAL + 2)
 #define EL_INTERNAL_DUMMY			(EL_FIRST_INTERNAL + 3)
 
+#define EL_INTERNAL_CLIPBOARD_START		(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_CLIPBOARD_END		(EL_FIRST_INTERNAL + 2)
 #define EL_INTERNAL_START			(EL_FIRST_INTERNAL + 0)
 #define EL_INTERNAL_END				(EL_FIRST_INTERNAL + 3)
 
@@ -1635,10 +1640,12 @@ struct ElementInfo
   int collect_score;		/* score value for collecting */
   int collect_count;		/* count value for collecting */
 
-  int push_delay_fixed;		/* constant frame delay for pushing */
-  int push_delay_random;	/* additional random frame delay for pushing */
-  int move_delay_fixed;		/* constant frame delay for moving */
-  int move_delay_random;	/* additional random frame delay for moving */
+  int push_delay_fixed;		/* constant delay before pushing */
+  int push_delay_random;	/* additional random delay before pushing */
+  int drop_delay_fixed;		/* constant delay after dropping */
+  int drop_delay_random;	/* additional random delay after dropping */
+  int move_delay_fixed;		/* constant delay after moving */
+  int move_delay_random;	/* additional random delay after moving */
 
   int move_pattern;		/* direction movable element moves to */
   int move_direction_initial;	/* initial direction element moves to */

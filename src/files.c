@@ -126,6 +126,8 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
+  static boolean clipboard_elements_initialized = FALSE;
+
   int i, j, x, y;
 
   level->file_version = FILE_VERSION_ACTUAL;
@@ -201,6 +203,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   {
     int element = i;
 
+    /* never initialize clipboard elements after the very first time */
+    if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
+      continue;
+
     setElementChangePages(&element_info[element], 1);
     setElementChangeInfoToDefaults(element_info[element].change);
 
@@ -232,6 +238,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].push_delay_fixed = -1;	/* initialize later */
       element_info[element].push_delay_random = -1;	/* initialize later */
+      element_info[element].drop_delay_fixed = 0;
+      element_info[element].drop_delay_random = 0;
       element_info[element].move_delay_fixed = 0;
       element_info[element].move_delay_random = 0;
 
@@ -292,6 +300,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].group->choice_mode = ANIM_RANDOM;
     }
   }
+
+  clipboard_elements_initialized = TRUE;
 
   BorderElement = EL_STEELWALL;
 
@@ -1043,8 +1053,10 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->collect_score = getFile8Bit(file);
   ei->collect_count = getFile8Bit(file);
 
-  ei->push_delay_fixed = getFile16BitBE(file);
-  ei->push_delay_random = getFile16BitBE(file);
+  ei->drop_delay_fixed = getFile8Bit(file);
+  ei->push_delay_fixed = getFile8Bit(file);
+  ei->drop_delay_random = getFile8Bit(file);
+  ei->push_delay_random = getFile8Bit(file);
   ei->move_delay_fixed = getFile16BitBE(file);
   ei->move_delay_random = getFile16BitBE(file);
 
@@ -2707,8 +2719,10 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   putFile8Bit(file, ei->collect_score);
   putFile8Bit(file, ei->collect_count);
 
-  putFile16BitBE(file, ei->push_delay_fixed);
-  putFile16BitBE(file, ei->push_delay_random);
+  putFile8Bit(file, ei->drop_delay_fixed);
+  putFile8Bit(file, ei->push_delay_fixed);
+  putFile8Bit(file, ei->drop_delay_random);
+  putFile8Bit(file, ei->push_delay_random);
   putFile16BitBE(file, ei->move_delay_fixed);
   putFile16BitBE(file, ei->move_delay_random);
 

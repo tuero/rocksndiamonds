@@ -100,6 +100,8 @@
 
 #define GET_NEW_PUSH_DELAY(e)	(   (element_info[e].push_delay_fixed) + \
 				 RND(element_info[e].push_delay_random))
+#define GET_NEW_DROP_DELAY(e)	(   (element_info[e].drop_delay_fixed) + \
+				 RND(element_info[e].drop_delay_random))
 #define GET_NEW_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				 RND(element_info[e].move_delay_random))
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
@@ -2092,6 +2094,11 @@ void InitMovDir(int x, int y)
 
 	      break;
 	    }
+
+#if 1
+	    if (MovDir[x][y] == MV_NO_MOVING)	/* no start direction found */
+	      MovDir[x][y] = 1 << RND(4);	/* => use random direction */
+#endif
 	  }
 	}		 
       }
@@ -5559,10 +5566,16 @@ void StartMoving(int x, int y)
       }
 
 #if 1
+#if 1
+      Store[newx][newy] = EL_EMPTY;
+      if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
+	Store[newx][newy] = element_info[element].move_leave_element;
+#else
       Store[newx][newy] = EL_EMPTY;
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)) ||
 	  element_info[element].move_leave_type == LEAVE_TYPE_UNLIMITED)
 	Store[newx][newy] = element_info[element].move_leave_element;
+#endif
 #else
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
 	element_info[element].can_leave_element = TRUE;
@@ -5875,11 +5888,13 @@ void ContinueMoving(int x, int y)
   }
 #if 1
   else if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
-	   ei->move_leave_element != EL_EMPTY && Store[x][y] != EL_EMPTY)
+	   ei->move_leave_element != EL_EMPTY &&
+	   (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
+	    Store[x][y] != EL_EMPTY))
   {
     /* some elements can leave other elements behind after moving */
 
-    Feld[x][y] = Store[x][y];
+    Feld[x][y] = ei->move_leave_element;
     InitField(x, y, FALSE);
 
     if (GFX_CRUMBLED(Feld[x][y]))
@@ -8757,7 +8772,9 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   player->step_counter++;
 
+#if 0
   player->drop_delay = 0;
+#endif
 
   PlayerVisit[jx][jy] = FrameCounter;
 
@@ -10776,13 +10793,14 @@ boolean DropElement(struct PlayerInfo *player)
   int drop_direction = player->MovDir;
   int drop_side = trigger_sides[MV_DIR_BIT(drop_direction)];
   int old_element = Feld[jx][jy];
-  int new_element = (player->inventory_size > 0 ?
-		     player->inventory_element[player->inventory_size - 1] :
-		     player->inventory_infinite_element != EL_UNDEFINED ?
-		     player->inventory_infinite_element :
-		     player->dynabombs_left > 0 ?
-		     EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
-		     EL_UNDEFINED);
+  int drop_element = (player->inventory_size > 0 ?
+		      player->inventory_element[player->inventory_size - 1] :
+		      player->inventory_infinite_element != EL_UNDEFINED ?
+		      player->inventory_infinite_element :
+		      player->dynabombs_left > 0 ?
+		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
+		      EL_UNDEFINED);
+  int new_element = drop_element;	/* default: element does not change */
 
   /* check if player is active, not moving and ready to drop */
   if (!player->active || player->MovPos || player->drop_delay > 0)
@@ -10890,12 +10908,14 @@ boolean DropElement(struct PlayerInfo *player)
 #endif
   }
 
-  new_element = Feld[jx][jy];
+  new_element = Feld[jx][jy];		/* element might have changed */
 
   if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
       element_info[new_element].move_pattern == MV_WHEN_DROPPED)
   {
+#if 0
     int move_stepsize = element_info[new_element].move_stepsize;
+#endif
     int direction, dx, dy, nextx, nexty;
 
     if (element_info[new_element].move_direction_initial == MV_START_AUTOMATIC)
@@ -10928,11 +10948,17 @@ boolean DropElement(struct PlayerInfo *player)
 #endif
     }
 
+#if 0
     player->drop_delay = 2 * TILEX / move_stepsize + 1;
+#endif
   }
 
 #if 0
   player->drop_delay = 8 + 8 + 8;
+#endif
+
+#if 1
+  player->drop_delay = GET_NEW_DROP_DELAY(drop_element);
 #endif
 
 #endif
