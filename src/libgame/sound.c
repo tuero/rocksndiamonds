@@ -46,12 +46,8 @@
 /* one second fading interval == 1000 ticks (milliseconds) */
 #define SOUND_FADING_INTERVAL		1000
 
-#if defined(TARGET_SDL)
-#define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
-#endif
-
 #if defined(AUDIO_STREAMING_DSP)
-#define SOUND_FADING_VOLUME_STEP	(PSND_MAX_VOLUME / 40)
+#define SOUND_FADING_VOLUME_STEP	(SOUND_MAX_VOLUME / 40)
 #define SOUND_FADING_VOLUME_THRESHOLD	(SOUND_FADING_VOLUME_STEP * 2)
 #endif
 
@@ -71,6 +67,9 @@
 #define DEVICENAME_DSP			"/dev/dsp"
 #define DEVICENAME_AUDIO		"/dev/audio"
 #define DEVICENAME_AUDIOCTL		"/dev/audioCtl"
+
+#define SOUND_VOLUME_LEFT(x)		(stereo_volume[x])
+#define SOUND_VOLUME_RIGHT(x)		(stereo_volume[SOUND_MAX_LEFT2RIGHT-x])
 
 
 #if 0
@@ -131,7 +130,7 @@ struct SoundControl
   long data_len;
   void *data_ptr;
 
-#if defined(PLATFORM_MSDOS)
+#if defined(TARGET_ALLEGRO)
   int voice;
 #endif
 };
@@ -157,6 +156,7 @@ static ListNode *SoundFileList = NULL;
 static SoundInfo **Sound = NULL;
 static MusicInfo **Music = NULL;
 static int num_sounds = 0, num_music = 0;
+static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 
 
 /* ========================================================================= */
@@ -632,6 +632,43 @@ static boolean Mixer_ChannelExpired(int channel)
   return FALSE;
 }
 
+static boolean Mixer_AllocateChannel(int channel)
+{
+#if defined(TARGET_ALLEGRO)
+  mixer[channel].voice = allocate_voice((SAMPLE *)mixer[channel].data_ptr);
+  if (mixer[channel].voice < 0)
+    return FALSE;
+#endif
+
+  return TRUE;
+}
+
+static void Mixer_SetChannelProperties(int channel)
+{
+#if defined(TARGET_SDL)
+  Mix_Volume(channel, mixer[channel].volume);
+  Mix_SetPanning(channel,
+		 SOUND_VOLUME_LEFT(mixer[channel].stereo_position),
+		 SOUND_VOLUME_RIGHT(mixer[channel].stereo_position));
+#elif defined(TARGET_ALLEGRO)
+  voice_set_volume(mixer[channel].voice, mixer[channel].volume);
+  voice_set_pan(mixer[channel].voice, mixer[channel].stereo_position);
+#endif
+}
+
+static void Mixer_StartChannel(int channel)
+{
+#if defined(TARGET_SDL)
+  Mix_PlayChannel(channel, mixer[channel].data_ptr,
+		  IS_LOOP(mixer[channel]) ? -1 : 0);
+#elif defined(TARGET_ALLEGRO)
+  if (IS_LOOP(mixer[channel]))
+    voice_set_playmode(mixer[channel].voice, PLAYMODE_LOOP);
+
+  voice_start(mixer[channel].voice);       
+#endif
+}
+
 static void Mixer_PlayChannel(int channel)
 {
   /* start with inactive channel in case something goes wrong */
@@ -640,22 +677,11 @@ static void Mixer_PlayChannel(int channel)
   if (mixer[channel].type != MUS_TYPE_WAV)
     return;
 
-#if defined(TARGET_SDL)
-  Mix_Volume(channel, SOUND_MAX_VOLUME);
-  Mix_PlayChannel(channel, mixer[channel].data_ptr,
-		  IS_LOOP(mixer[channel]) ? -1 : 0);
-#elif defined(PLATFORM_MSDOS)
-  mixer[channel].voice = allocate_voice((SAMPLE *)mixer[channel].data_ptr);
-  if (mixer[channel].voice < 0)
+  if (!Mixer_AllocateChannel(channel))
     return;
 
-  if (IS_LOOP(mixer[channel]))
-    voice_set_playmode(mixer[channel].voice, PLAYMODE_LOOP);
-
-  voice_set_volume(mixer[channel].voice, mixer[channel].volume);
-  voice_set_pan(mixer[channel].voice, mixer[channel].stereo_position);
-  voice_start(mixer[channel].voice);       
-#endif
+  Mixer_SetChannelProperties(channel);
+  Mixer_StartChannel(channel);
 
   Mixer_ResetChannelExpiration(channel);
 
@@ -686,7 +712,7 @@ static void Mixer_StopChannel(int channel)
 
 #if defined(TARGET_SDL)
   Mix_HaltChannel(channel);
-#elif defined(PLATFORM_MSDOS)
+#elif defined(TARGET_ALLEGRO)
   voice_set_volume(mixer[channel].voice, 0);
   deallocate_voice(mixer[channel].voice);
 #endif
@@ -713,7 +739,7 @@ static void Mixer_FadeChannel(int channel)
 
 #if defined(TARGET_SDL)
   Mix_FadeOutChannel(channel, SOUND_FADING_INTERVAL);
-#elif defined(PLATFORM_MSDOS)
+#elif defined(TARGET_ALLEGRO)
   if (voice_check(mixer[channel].voice))
     voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL, 0);
 #endif
@@ -734,11 +760,11 @@ static void Mixer_UnFadeChannel(int channel)
     return;
 
   mixer[channel].state &= ~SND_CTRL_FADE;
-  mixer[channel].volume = PSND_MAX_VOLUME;
+  mixer[channel].volume = SOUND_MAX_VOLUME;
 
 #if defined(TARGET_SDL)
   Mix_ExpireChannel(channel, -1);
-  Mix_Volume(channel, SOUND_MAX_VOLUME);
+  Mix_Volume(channel, mixer[channel].volume);
 #elif defined(TARGET_ALLEGRO)
   voice_stop_volumeramp(mixer[channel].voice);
   voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL,
@@ -777,6 +803,11 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
   {
+#if 0
+    printf("PLAY MUSIC WITH VOLUME/STEREO %d/%d\n",
+	   snd_ctrl.volume, snd_ctrl.stereo_position);
+#endif
+
     mixer[audio.music_channel] = snd_ctrl;
     Mixer_PlayMusicChannel();
 
@@ -803,11 +834,20 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 	printf("RESETTING EXPIRATION FOR SOUND %d\n", snd_ctrl.nr);
 #endif
 
-#if 1
-	Mixer_ResetChannelExpiration(i);
-#endif
 	if (IS_FADING(mixer[i]))
 	  Mixer_UnFadeChannel(i);
+
+	/* restore settings like volume and stereo position */
+	mixer[i].volume = snd_ctrl.volume;
+	mixer[i].stereo_position = snd_ctrl.stereo_position;
+
+	Mixer_SetChannelProperties(i);
+	Mixer_ResetChannelExpiration(i);
+
+#if 0
+	printf("RESETTING VOLUME/STEREO FOR SOUND %d TO %d/%d\n",
+	       snd_ctrl.nr, snd_ctrl.volume, snd_ctrl.stereo_position);
+#endif
       }
     }
 
@@ -984,6 +1024,8 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 
 void StartMixer(void)
 {
+  int i;
+
 #if 0
   SDL_version compile_version;
   const SDL_version *link_version;
@@ -1001,6 +1043,11 @@ void StartMixer(void)
 
   if (!audio.sound_available)
     return;
+
+  /* initialize stereo position conversion information */
+  for(i=0; i<=SOUND_MAX_LEFT2RIGHT; i++)
+    stereo_volume[i] =
+      (int)sqrt((float)(SOUND_MAX_LEFT2RIGHT * SOUND_MAX_LEFT2RIGHT - i * i));
 
 #if defined(AUDIO_UNIX_NATIVE)
   if (!ForkAudioProcess())
@@ -1030,8 +1077,6 @@ static void CopySampleToMixingBuffer(SoundControl *snd_ctrl,
 #if defined(AUDIO_STREAMING_DSP)
 static void Mixer_Main_DSP()
 {
-  static int stereo_volume[PSND_MAX_LEFT2RIGHT + 1];
-  static boolean stereo_volume_calculated = FALSE;
   static short premix_first_buffer[SND_BLOCKSIZE];
   static short premix_left_buffer[SND_BLOCKSIZE];
   static short premix_right_buffer[SND_BLOCKSIZE];
@@ -1042,15 +1087,6 @@ static void Mixer_Main_DSP()
   int sample_bytes;
   int max_sample_size;
   int i, j;
-
-  if (!stereo_volume_calculated)
-  {
-    for(i=0; i<=PSND_MAX_LEFT2RIGHT; i++)
-      stereo_volume[i] =
-	(int)sqrt((float)(PSND_MAX_LEFT2RIGHT * PSND_MAX_LEFT2RIGHT - i * i));
-
-    stereo_volume_calculated = TRUE;
-  }
 
   if (!mixer_active_channels)
     return;
@@ -1127,27 +1163,23 @@ static void Mixer_Main_DSP()
       mixer[i].volume -= SOUND_FADING_VOLUME_STEP;
 
     /* adjust volume of actual sound sample */
-    if (mixer[i].volume != PSND_MAX_VOLUME)
+    if (mixer[i].volume != SOUND_MAX_VOLUME)
       for(j=0; j<sample_size; j++)
 	premix_first_buffer[j] =
-	  (mixer[i].volume * (long)premix_first_buffer[j])
-	    >> PSND_MAX_VOLUME_BITS;
+	  mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
     /* fill the last mixing buffer with stereo or mono sound */
     if (stereo)
     {
-      int middle_pos = PSND_MAX_LEFT2RIGHT / 2;
-      int left_volume = stereo_volume[middle_pos + mixer[i].stereo_position];
-      int right_volume= stereo_volume[middle_pos - mixer[i].stereo_position];
+      int left_volume  = SOUND_VOLUME_LEFT(mixer[i].stereo_position);
+      int right_volume = SOUND_VOLUME_RIGHT(mixer[i].stereo_position);
 
       for(j=0; j<sample_size; j++)
       {
 	premix_left_buffer[j] =
-	  (left_volume * premix_first_buffer[j])
-	    >> PSND_MAX_LEFT2RIGHT_BITS;
+	  left_volume  * premix_first_buffer[j] / SOUND_MAX_LEFT2RIGHT;
 	premix_right_buffer[j] =
-	  (right_volume * premix_first_buffer[j])
-	    >> PSND_MAX_LEFT2RIGHT_BITS;
+	  right_volume * premix_first_buffer[j] / SOUND_MAX_LEFT2RIGHT;
 
 	premix_last_buffer[2 * j + 0] += premix_left_buffer[j];
 	premix_last_buffer[2 * j + 1] += premix_right_buffer[j];
@@ -1233,11 +1265,10 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 			   premix_first_buffer);
 
   /* adjust volume of actual sound sample */
-  if (mixer[i].volume != PSND_MAX_VOLUME)
+  if (mixer[i].volume != SOUND_MAX_VOLUME)
     for(j=0; j<sample_size; j++)
       premix_first_buffer[j] =
-	(mixer[i].volume * (long)premix_first_buffer[j])
-	  >> PSND_MAX_VOLUME_BITS;
+	mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
   /* might be needed for u-law /dev/audio */
 #if 0
@@ -1455,7 +1486,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 static SoundInfo *Load_WAV(char *filename)
 {
   SoundInfo *snd_info;
-#if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
+#if defined(AUDIO_UNIX_NATIVE)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk_name[CHUNK_ID_LEN + 1];
   int chunk_size;
@@ -1780,22 +1811,22 @@ void PlayMusic(int nr)
 
 void PlaySound(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_SOUND);
+  PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundStereo(int nr, int stereo_position)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_SOUND);
+  PlaySoundExt(nr, SOUND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundLoop(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_LOOP);
+  PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_LOOP);
 }
 
 void PlaySoundMusic(int nr)
 {
-  PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, SND_CTRL_PLAY_MUSIC);
+  PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_MUSIC);
 }
 
 void PlaySoundExt(int nr, int volume, int stereo_position, int state)
@@ -1807,15 +1838,15 @@ void PlaySoundExt(int nr, int volume, int stereo_position, int state)
       audio.sound_deactivated)
     return;
 
-  if (volume < PSND_MIN_VOLUME)
-    volume = PSND_MIN_VOLUME;
-  else if (volume > PSND_MAX_VOLUME)
-    volume = PSND_MAX_VOLUME;
+  if (volume < SOUND_MIN_VOLUME)
+    volume = SOUND_MIN_VOLUME;
+  else if (volume > SOUND_MAX_VOLUME)
+    volume = SOUND_MAX_VOLUME;
 
-  if (stereo_position < PSND_MAX_LEFT)
-    stereo_position = PSND_MAX_LEFT;
-  else if (stereo_position > PSND_MAX_RIGHT)
-    stereo_position = PSND_MAX_RIGHT;
+  if (stereo_position < SOUND_MAX_LEFT)
+    stereo_position = SOUND_MAX_LEFT;
+  else if (stereo_position > SOUND_MAX_RIGHT)
+    stereo_position = SOUND_MAX_RIGHT;
 
   snd_ctrl.active = TRUE;
   snd_ctrl.nr = nr;
@@ -2047,10 +2078,10 @@ void InitReloadSounds(char *set_name)
   if (!audio.sound_available)
     return;
 
-#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
-  ReloadCustomSounds();
-#elif defined(AUDIO_UNIX_NATIVE)
+#if defined(AUDIO_UNIX_NATIVE)
   WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_SOUNDS);
+#else
+  ReloadCustomSounds();
 #endif
 }
 
@@ -2059,10 +2090,10 @@ void InitReloadMusic(char *set_name)
   if (!audio.music_available)
     return;
 
-#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
-  ReloadCustomMusic();
-#elif defined(AUDIO_UNIX_NATIVE)
+#if defined(AUDIO_UNIX_NATIVE)
   WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_MUSIC);
+#else
+  ReloadCustomMusic();
 #endif
 }
 

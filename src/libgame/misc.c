@@ -112,7 +112,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
 
 #if defined(PLATFORM_MSDOS)
-  /* don't use select() to perform waiting operations under DOS/Windows
+  /* don't use select() to perform waiting operations under DOS
      environment; always use a busy loop for waiting instead */
   do_busy_waiting = TRUE;
 #endif

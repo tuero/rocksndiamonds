@@ -70,63 +70,51 @@
 
 
 /* values for PlaySound(), StopSound() and friends */
-#define SND_CTRL_NONE		(0)
-#define SND_CTRL_MUSIC		(1 << 0)
-#define SND_CTRL_LOOP		(1 << 1)
-#define SND_CTRL_FADE		(1 << 2)
-#define SND_CTRL_STOP		(1 << 3)
-#define SND_CTRL_ALL_SOUNDS	(1 << 4)
-#define SND_CTRL_RELOAD_SOUNDS	(1 << 5)
-#define SND_CTRL_RELOAD_MUSIC	(1 << 6)
+#define SND_CTRL_NONE			(0)
+#define SND_CTRL_MUSIC			(1 << 0)
+#define SND_CTRL_LOOP			(1 << 1)
+#define SND_CTRL_FADE			(1 << 2)
+#define SND_CTRL_STOP			(1 << 3)
+#define SND_CTRL_ALL_SOUNDS		(1 << 4)
+#define SND_CTRL_RELOAD_SOUNDS		(1 << 5)
+#define SND_CTRL_RELOAD_MUSIC		(1 << 6)
 
-#define SND_CTRL_PLAY_SOUND	(SND_CTRL_NONE)
-#define SND_CTRL_PLAY_LOOP	(SND_CTRL_LOOP)
-#define SND_CTRL_PLAY_MUSIC	(SND_CTRL_LOOP | SND_CTRL_MUSIC)
+#define SND_CTRL_PLAY_SOUND		(SND_CTRL_NONE)
+#define SND_CTRL_PLAY_LOOP		(SND_CTRL_LOOP)
+#define SND_CTRL_PLAY_MUSIC		(SND_CTRL_LOOP | SND_CTRL_MUSIC)
 
-#define SND_CTRL_FADE_SOUND	(SND_CTRL_FADE)
-#define SND_CTRL_FADE_MUSIC	(SND_CTRL_FADE | SND_CTRL_MUSIC)
-#define SND_CTRL_FADE_ALL	(SND_CTRL_FADE | SND_CTRL_ALL_SOUNDS)
+#define SND_CTRL_FADE_SOUND		(SND_CTRL_FADE)
+#define SND_CTRL_FADE_MUSIC		(SND_CTRL_FADE | SND_CTRL_MUSIC)
+#define SND_CTRL_FADE_ALL		(SND_CTRL_FADE | SND_CTRL_ALL_SOUNDS)
 
-#define SND_CTRL_STOP_SOUND	(SND_CTRL_STOP)
-#define SND_CTRL_STOP_MUSIC	(SND_CTRL_STOP | SND_CTRL_MUSIC)
-#define SND_CTRL_STOP_ALL	(SND_CTRL_STOP | SND_CTRL_ALL_SOUNDS)
+#define SND_CTRL_STOP_SOUND		(SND_CTRL_STOP)
+#define SND_CTRL_STOP_MUSIC		(SND_CTRL_STOP | SND_CTRL_MUSIC)
+#define SND_CTRL_STOP_ALL		(SND_CTRL_STOP | SND_CTRL_ALL_SOUNDS)
 
-#define IS_MUSIC(x)		((x).state & SND_CTRL_MUSIC)
-#define IS_LOOP(x)		((x).state & SND_CTRL_LOOP)
-#define IS_FADING(x)		((x).state & SND_CTRL_FADE)
-#define IS_STOPPING(x)		((x).state & SND_CTRL_STOP)
-#define IS_RELOADING(x)		((x).state & (SND_CTRL_RELOAD_SOUNDS | \
-					      SND_CTRL_RELOAD_MUSIC))
-#define ALL_SOUNDS(x)		((x).state & SND_CTRL_ALL_SOUNDS)
+#define IS_MUSIC(x)			((x).state & SND_CTRL_MUSIC)
+#define IS_LOOP(x)			((x).state & SND_CTRL_LOOP)
+#define IS_FADING(x)			((x).state & SND_CTRL_FADE)
+#define IS_STOPPING(x)			((x).state & SND_CTRL_STOP)
+#define IS_RELOADING(x)			((x).state & (SND_CTRL_RELOAD_SOUNDS |\
+						      SND_CTRL_RELOAD_MUSIC))
+#define ALL_SOUNDS(x)			((x).state & SND_CTRL_ALL_SOUNDS)
 
-
-#if !defined(TARGET_ALLEGRO)
-
-#define PSND_SILENCE		0
-#define PSND_MAX_VOLUME_BITS	15
-#define PSND_MIN_VOLUME		0
-#define PSND_MAX_VOLUME		(1 << PSND_MAX_VOLUME_BITS)
-#define PSND_MIDDLE		0
-#define PSND_MAX_STEREO_BITS	7
-#define PSND_MAX_STEREO		(1 << PSND_MAX_STEREO_BITS)
-#define PSND_MAX_LEFT		(-PSND_MAX_STEREO)
-#define PSND_MAX_RIGHT		(+PSND_MAX_STEREO)
-#define PSND_MAX_LEFT2RIGHT_BITS (PSND_MAX_STEREO_BITS+1)
-#define PSND_MAX_LEFT2RIGHT	(1 << PSND_MAX_LEFT2RIGHT_BITS)
-
-#else	/* TARGET_ALLEGRO */
-
-#define PSND_SILENCE		0
-#define PSND_MIN_VOLUME		0
-#define PSND_MAX_VOLUME		255
-#define PSND_MAX_LEFT		0
-#define PSND_MAX_RIGHT		255
-#define PSND_MIDDLE		128
-
+#define SOUND_MIN_VOLUME		0
+#if defined(TARGET_SDL)
+#define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
+#elif defined(TARGET_ALLEGRO)
+#define SOUND_MAX_VOLUME		255
+#else
+#define SOUND_MAX_VOLUME		128
 #endif
 
+#define SOUND_MAX_LEFT			0
+#define SOUND_MAX_RIGHT			255
+#define SOUND_MAX_LEFT2RIGHT		255
+#define SOUND_MIDDLE			(SOUND_MAX_LEFT2RIGHT / 2)
+
 /* value for undefined sound effect filename */
-#define SND_FILE_UNDEFINED	"NONE"
+#define SND_FILE_UNDEFINED		"NONE"
 
 
 struct SoundEffectInfo

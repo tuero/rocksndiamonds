@@ -30,14 +30,6 @@
 #define WIN_XSIZE	672
 #define WIN_YSIZE	560
 
-#if !defined(PLATFORM_MSDOS)
-#define WIN_XPOS	0
-#define WIN_YPOS	0
-#else
-#define WIN_XPOS	((XRES - WIN_XSIZE) / 2)
-#define WIN_YPOS	((YRES - WIN_YSIZE) / 2)
-#endif
-
 #define SCR_FIELDX	17
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)

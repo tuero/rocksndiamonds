@@ -865,7 +865,7 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_ALL);
 
-  PlaySoundStereo(SND_GAME_STARTING, PSND_MAX_RIGHT);
+  PlaySoundStereo(SND_GAME_STARTING, SOUND_MAX_RIGHT);
   if (setup.sound_music)
     PlayMusic(level_nr);
 
@@ -1018,18 +1018,18 @@ void GameWon()
 
   local_player->LevelSolved = FALSE;
 
-  PlaySoundStereo(SND_GAME_WINNING, PSND_MAX_RIGHT);
+  PlaySoundStereo(SND_GAME_WINNING, SOUND_MAX_RIGHT);
 
   if (TimeLeft)
   {
     if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
+      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
 		   SND_CTRL_PLAY_LOOP);
 
     while (TimeLeft > 0)
     {
       if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_RIGHT);
       if (TimeLeft > 0 && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimeLeft > 100 && !(TimeLeft % 10))
@@ -1049,13 +1049,13 @@ void GameWon()
   else if (level.time == 0)		/* level without time limit */
   {
     if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, PSND_MAX_VOLUME, PSND_MAX_RIGHT,
+      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
 		   SND_CTRL_PLAY_LOOP);
 
     while (TimePlayed < 999)
     {
       if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_RIGHT);
       if (TimePlayed < 999 && !(TimePlayed % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
@@ -4941,7 +4941,7 @@ void GameActions()
       TimeLeft--;
 
       if (TimeLeft <= 10 && setup.time_limit)
-	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MAX_RIGHT);
 
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
 
@@ -5807,7 +5807,7 @@ int DigField(struct PlayerInfo *player,
 	TimeLeft += 10;
 	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
       }
-      PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, PSND_MAX_RIGHT);
+      PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MAX_RIGHT);
       break;
 
     case EL_SHIELD_PASSIVE:
@@ -5999,7 +5999,7 @@ int DigField(struct PlayerInfo *player,
 	return MF_NO_ACTION;
 
       player->LevelSolved = player->GameOver = TRUE;
-      PlaySoundStereo(SND_SP_EXIT_ENTERING, PSND_MAX_RIGHT);
+      PlaySoundStereo(SND_SP_EXIT_ENTERING, SOUND_MAX_RIGHT);
       break;
 
     case EL_FELSBROCKEN:
@@ -6246,7 +6246,7 @@ int DigField(struct PlayerInfo *player,
       TimeLeft += 10;
       DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
       DrawLevelField(x, y);
-      PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, PSND_MAX_RIGHT);
+      PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MAX_RIGHT);
       return MF_ACTION;
       break;
 
@@ -6449,7 +6449,7 @@ void PlaySoundLevel(int x, int y, int nr)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo_position;
-  int silence_distance = 8;
+  int max_distance = 8;
   int type = (IS_LOOP_SOUND(nr) ? SND_CTRL_PLAY_LOOP : SND_CTRL_PLAY_SOUND);
 
   if ((!setup.sound_simple && !IS_LOOP_SOUND(nr)) ||
@@ -6457,29 +6457,23 @@ void PlaySoundLevel(int x, int y, int nr)
     return;
 
   if (!IN_LEV_FIELD(x, y) ||
-      sx < -silence_distance || sx >= SCR_FIELDX + silence_distance ||
-      sy < -silence_distance || sy >= SCR_FIELDY + silence_distance)
+      sx < -max_distance || sx >= SCR_FIELDX + max_distance ||
+      sy < -max_distance || sy >= SCR_FIELDY + max_distance)
     return;
 
-  volume = PSND_MAX_VOLUME;
-
-#if !defined(PLATFORM_MSDOS)
-  stereo_position = (sx - SCR_FIELDX / 2) * 12;
-#else
-  stereo_position = PSND_MIDDLE + (2 * sx - (SCR_FIELDX - 1)) * 5;
-  if (stereo_position > PSND_MAX_RIGHT)
-    stereo_position = PSND_MAX_RIGHT;
-  if (stereo_position < PSND_MAX_LEFT)
-    stereo_position = PSND_MAX_LEFT;
-#endif
+  volume = SOUND_MAX_VOLUME;
 
   if (!IN_SCR_FIELD(sx, sy))
   {
-    int dx = ABS(sx - SCR_FIELDX/2) - SCR_FIELDX/2;
-    int dy = ABS(sy - SCR_FIELDY/2) - SCR_FIELDY/2;
+    int dx = ABS(sx - SCR_FIELDX / 2) - SCR_FIELDX / 2;
+    int dy = ABS(sy - SCR_FIELDY / 2) - SCR_FIELDY / 2;
 
-    volume -= volume * (dx > dy ? dx : dy) / silence_distance;
+    volume -= volume * (dx > dy ? dx : dy) / max_distance;
   }
+
+  stereo_position = (SOUND_MAX_LEFT +
+		     (sx + max_distance) * SOUND_MAX_LEFT2RIGHT /
+		     (SCR_FIELDX + 2 * max_distance));
 
   PlaySoundExt(nr, volume, stereo_position, type);
 }

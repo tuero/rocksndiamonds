@@ -361,10 +361,7 @@ void InitGfx()
 
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
-#if defined(PLATFORM_MSDOS)
-  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
-  rest(200);
-#endif
+
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 
   for(i=0; i<NUM_PICTURES; i++)

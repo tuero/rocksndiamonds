@@ -20,10 +20,6 @@
 #include "network.h"
 #include "tape.h"
 
-#if defined(PLATFORM_MSDOS)
-extern boolean wait_for_vsync;
-#endif
-
 /* tool button identifiers */
 #define TOOL_CTRL_ID_YES	0
 #define TOOL_CTRL_ID_NO		1
@@ -2105,9 +2101,9 @@ unsigned int MoveDoor(unsigned int door_state)
     if (!(door_state & DOOR_NO_DELAY))
     {
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
-	PlaySoundStereo(SND_MENU_DOOR_OPENING, PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_MENU_DOOR_OPENING, SOUND_MAX_RIGHT);
       if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
-	PlaySoundStereo(SND_MENU_DOOR_CLOSING, PSND_MAX_RIGHT);
+	PlaySoundStereo(SND_MENU_DOOR_CLOSING, SOUND_MAX_RIGHT);
     }
 
     start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
