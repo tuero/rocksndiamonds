@@ -26,6 +26,21 @@
 #include "network.h"
 #include "init.h"
 
+/* for DrawSetupScreen(), HandleSetupScreen() */
+#define SETUP_SCREEN_POS_START		2
+#define SETUP_SCREEN_POS_END		16
+#define SETUP_SCREEN_POS_EMPTY1		(SETUP_SCREEN_POS_END - 2)
+#define SETUP_SCREEN_POS_EMPTY2		(SETUP_SCREEN_POS_END - 2)
+
+/* for HandleSetupInputScreen() */
+#define SETUPINPUT_SCREEN_POS_START	2
+#define SETUPINPUT_SCREEN_POS_END	15
+#define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
+#define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
+
+/* for HandleChooseLevel() */
+#define MAX_LEVEL_SERIES_ON_SCREEN	15
+
 #ifdef MSDOS
 extern unsigned char get_ascii(KeySym);
 #endif
@@ -782,7 +797,7 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
     DrawGraphic(0, 1, GFX_PFEIL_O);
 
   if (first_entry + num_page_entries < num_leveldirs)
-    DrawGraphic(0, MAX_VISIBLE_ENTRIES + 1, GFX_PFEIL_U);
+    DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_PFEIL_U);
 }
 
 static void drawChooseLevelInfo(int leveldir_nr)
@@ -802,10 +817,10 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
   int num_page_entries;
 
-  if (num_leveldirs <= MAX_VISIBLE_ENTRIES)
+  if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
     num_page_entries = num_leveldirs;
   else
-    num_page_entries = MAX_VISIBLE_ENTRIES - 1;
+    num_page_entries = MAX_LEVEL_SERIES_ON_SCREEN - 1;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -920,7 +935,7 @@ void DrawHallOfFame(int highlight_position)
   DrawText(SX + 80, SY + 8, "Hall Of Fame", FS_BIG, FC_YELLOW);
   DrawTextFCentered(46, FC_RED, "HighScores of Level %d", level_nr);
 
-  for(i=0; i<MAX_VISIBLE_ENTRIES; i++)
+  for(i=0; i<MAX_LEVEL_SERIES_ON_SCREEN; i++)
   {
     DrawText(SX, SY + 64 + i * 32, ".................", FS_BIG,
 	     (i == highlight_position ? FC_RED : FC_GREEN));

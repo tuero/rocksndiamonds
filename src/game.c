@@ -23,6 +23,84 @@
 #include "joystick.h"
 #include "network.h"
 
+/* for DigField() */
+#define DF_NO_PUSH		0
+#define DF_DIG			1
+#define DF_SNAP			2
+
+/* for MoveFigure() */
+#define MF_NO_ACTION		0
+#define MF_MOVING		1
+#define MF_ACTION		2
+
+/* for ScrollFigure() */
+#define SCROLL_INIT		0
+#define SCROLL_GO_ON		1
+
+/* for Explode() */
+#define EX_PHASE_START		0
+#define EX_NORMAL		0
+#define EX_CENTER		1
+#define EX_BORDER		2
+
+/* special positions in the game control window (relative to control window) */
+#define XX_LEVEL		37
+#define YY_LEVEL		20
+#define XX_EMERALDS		29
+#define YY_EMERALDS		54
+#define XX_DYNAMITE		29
+#define YY_DYNAMITE		89
+#define XX_KEYS			18
+#define YY_KEYS			123
+#define XX_SCORE		15
+#define YY_SCORE		159
+#define XX_TIME			29
+#define YY_TIME			194
+
+/* special positions in the game control window (relative to main window) */
+#define DX_LEVEL		(DX + XX_LEVEL)
+#define DY_LEVEL		(DY + YY_LEVEL)
+#define DX_EMERALDS		(DX + XX_EMERALDS)
+#define DY_EMERALDS		(DY + YY_EMERALDS)
+#define DX_DYNAMITE		(DX + XX_DYNAMITE)
+#define DY_DYNAMITE		(DY + YY_DYNAMITE)
+#define DX_KEYS			(DX + XX_KEYS)
+#define DY_KEYS			(DY + YY_KEYS)
+#define DX_SCORE		(DX + XX_SCORE)
+#define DY_SCORE		(DY + YY_SCORE)
+#define DX_TIME			(DX + XX_TIME)
+#define DY_TIME			(DY + YY_TIME)
+
+#define IS_LOOP_SOUND(s)	((s)==SND_KLAPPER || (s)==SND_ROEHR ||	\
+				 (s)==SND_NJAM || (s)==SND_MIEP)
+#define IS_MUSIC_SOUND(s)	((s)==SND_ALCHEMY || (s)==SND_CHASE || \
+				 (s)==SND_NETWORK || (s)==SND_CZARDASZ || \
+				 (s)==SND_TYGER || (s)==SND_VOYAGER || \
+				 (s)==SND_TWILIGHT)
+
+/* score for elements */
+#define SC_EDELSTEIN		0
+#define SC_DIAMANT		1
+#define SC_KAEFER		2
+#define SC_FLIEGER		3
+#define SC_MAMPFER		4
+#define SC_ROBOT		5
+#define SC_PACMAN		6
+#define SC_KOKOSNUSS		7
+#define SC_DYNAMIT		8
+#define SC_SCHLUESSEL		9
+#define SC_ZEITBONUS		10
+
+/* values for game_emulation */
+#define EMU_NONE		0
+#define EMU_BOULDERDASH		1
+#define EMU_SOKOBAN		2
+
+/* to control special behaviour of certain game elements */
+int game_emulation = EMU_NONE;
+
+
+
 #ifdef DEBUG
 #if 0
 static unsigned int getStateCheckSum(int counter)
@@ -72,6 +150,8 @@ static unsigned int getStateCheckSum(int counter)
 }
 #endif
 #endif
+
+
 
 void GetPlayerConfig()
 {

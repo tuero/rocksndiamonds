@@ -53,7 +53,6 @@ char	       *joystick_device_name[MAX_PLAYERS] =
 char	       *program_name = NULL;
 
 int		game_status = MAINMENU;
-int		game_emulation = EMU_NONE;
 boolean		network_playing = FALSE;
 int		button_status = MB_NOT_PRESSED;
 boolean		motion_status = FALSE;

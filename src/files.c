@@ -22,14 +22,53 @@
 #include "tape.h"
 #include "joystick.h"
 
-#define MAX_LINE_LEN			1000	/* file input line length */
-#define CHUNK_ID_LEN			4	/* IFF style chunk id length */
-#define LEVEL_HEADER_SIZE		80	/* size of level file header */
-#define LEVEL_HEADER_UNUSED		18	/* unused level header bytes */
-#define TAPE_HEADER_SIZE		20	/* size of tape file header */
-#define TAPE_HEADER_UNUSED		7	/* unused tape header bytes */
-#define FILE_VERSION_1_0		10	/* old 1.0 file version */
-#define FILE_VERSION_1_2		12	/* actual file version */
+#define MAX_FILENAME_LEN	256	/* maximal filename length */
+#define MAX_LINE_LEN		1000	/* maximal input line length */
+#define CHUNK_ID_LEN		4	/* IFF style chunk id length */
+#define LEVEL_HEADER_SIZE	80	/* size of level file header */
+#define LEVEL_HEADER_UNUSED	18	/* unused level header bytes */
+#define TAPE_HEADER_SIZE	20	/* size of tape file header */
+#define TAPE_HEADER_UNUSED	7	/* unused tape header bytes */
+#define FILE_VERSION_1_0	10	/* old 1.0 file version */
+#define FILE_VERSION_1_2	12	/* actual file version */
+
+/* file identifier strings */
+#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
+#define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
+#define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
+#define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
+#define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
+#define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
+/* old file identifiers for backward compatibility */
+#define LEVEL_COOKIE_10		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
+#define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
+
+/* file names and filename extensions */
+#ifndef MSDOS
+#define USERDATA_DIRECTORY	".rocksndiamonds"
+#define SETUP_FILENAME		"setup.conf"
+#define LEVELSETUP_FILENAME	"levelsetup.conf"
+#define LEVELINFO_FILENAME	"levelinfo.conf"
+#define TAPEFILE_EXTENSION	"tape"
+#define SCOREFILE_EXTENSION	"score"
+#else
+#define USERDATA_DIRECTORY	"userdata"
+#define SETUP_FILENAME		"setup.cnf"
+#define LEVELSETUP_FILENAME	"lvlsetup.cnf"
+#define LEVELINFO_FILENAME	"lvlinfo.cnf"
+#define TAPEFILE_EXTENSION	"rec"
+#define SCOREFILE_EXTENSION	"sco"
+#endif
+
+/* file permissions for newly written files */
+#define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
+#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
+#define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
+#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
+#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
+#define SCORE_PERMS		LEVEL_PERMS
+#define TAPE_PERMS		LEVEL_PERMS
+#define SETUP_PERMS		LEVEL_PERMS
 
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
@@ -166,7 +205,7 @@ static void setLevelInfoToDefaults()
 
   strcpy(level.name, "Nameless Level");
 
-  for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
+  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
 
   for(i=0; i<4; i++)
@@ -244,7 +283,7 @@ void LoadLevel(int level_nr)
     level.name[i]	= fgetc(file);
   level.name[MAX_LEVNAMLEN - 1] = 0;
 
-  for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
+  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i]	= fgetc(file);
 
   for(i=0; i<4; i++)
@@ -326,7 +365,7 @@ void SaveLevel(int level_nr)
 
   for(i=0; i<MAX_LEVNAMLEN; i++)
     fputc(level.name[i], file);
-  for(i=0; i<MAX_LEVSCORE_ENTRIES; i++)
+  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     fputc(level.score[i], file);
   for(i=0; i<4; i++)
     for(y=0; y<3; y++)
@@ -625,7 +664,7 @@ void SaveTape(int level_nr)
 
   fclose(file);
 
-  chmod(filename, LEVREC_PERMS);
+  chmod(filename, TAPE_PERMS);
 
   tape.changed = FALSE;
 
@@ -1287,13 +1326,6 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
     {
       free(directory);
-      continue;
-    }
-
-    if (strlen(dir_entry->d_name) >= MAX_LEVDIR_FILENAME)
-    {
-      Error(ERR_WARN, "filename of level directory '%s' too long -- ignoring",
-	    dir_entry->d_name);
       continue;
     }
 

@@ -191,21 +191,19 @@ typedef unsigned char byte;
 
 /* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
-
 #define MAX_LEVNAMLEN		32
-#define MAX_LEVSCORE_ENTRIES	16
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
-
-#define MAX_LEVDIR_FILENAME	(64+1)
-#define MAX_LEVDIR_NAME		(16+1)
 #define MAX_LEVDIR_ENTRIES	100
 #define MAX_SCORE_ENTRIES	100
-#define MAX_VISIBLE_ENTRIES	15
-
-#define MAX_OPTION_LEN		256
-#define MAX_FILENAME_LEN	256
-#define MAX_NUM_AMOEBA		100
 #define MAX_ELEMENTS		512
+#define MAX_NUM_AMOEBA		100
+
+#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
+
+/* fundamental game speed values */
+#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
+#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
+#define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
 
 struct HiScore
 {
@@ -329,7 +327,7 @@ struct LevelInfo
   int time;
   int edelsteine;
   char name[MAX_LEVNAMLEN];
-  int score[MAX_LEVSCORE_ENTRIES];
+  int score[LEVEL_SCORE_ELEMENTS];
   int mampfer_inhalt[4][3][3];
   int tempo_amoebe;
   int dauer_sieb;
@@ -391,7 +389,6 @@ extern char	       *joystick_device_name[];
 extern char	       *program_name;
 
 extern int		game_status;
-extern int		game_emulation;
 extern boolean		network_playing;
 extern int		button_status;
 extern boolean		motion_status;
@@ -952,19 +949,6 @@ extern int		num_bg_loops;
 #define GFX_CHAR_COPY		(GFX_CHAR_ASCII0+94)
 #define GFX_CHAR_END		(GFX_CHAR_START+79)
 
-/* score for elements */
-#define SC_EDELSTEIN		0
-#define SC_DIAMANT		1
-#define SC_KAEFER		2
-#define SC_FLIEGER		3
-#define SC_MAMPFER		4
-#define SC_ROBOT		5
-#define SC_PACMAN		6
-#define SC_KOKOSNUSS		7
-#define SC_DYNAMIT		8
-#define SC_SCHLUESSEL		9
-#define SC_ZEITBONUS		10
-
 /* the names of the sounds */
 #define SND_ALCHEMY		0
 #define SND_AMOEBE		1
@@ -1021,13 +1005,6 @@ extern int		num_bg_loops;
 
 #define NUM_SOUNDS		52
 
-#define IS_LOOP_SOUND(s)	((s)==SND_KLAPPER || (s)==SND_ROEHR ||	\
-				 (s)==SND_NJAM || (s)==SND_MIEP)
-#define IS_MUSIC_SOUND(s)	((s)==SND_ALCHEMY || (s)==SND_CHASE || \
-				 (s)==SND_NETWORK || (s)==SND_CZARDASZ || \
-				 (s)==SND_TYGER || (s)==SND_VOYAGER || \
-				 (s)==SND_TWILIGHT)
-
 /* default input keys */
 #define KEY_UNDEFINDED		XK_VoidSymbol
 #define DEFAULT_KEY_LEFT	XK_Left
@@ -1069,11 +1046,6 @@ extern int		num_bg_loops;
 #define SETUPINPUT		8
 #define EXITGAME		9
 
-/* values for game_emulation */
-#define EMU_NONE		0
-#define EMU_BOULDERDASH		1
-#define EMU_SOKOBAN		2
-
 #ifndef GAME_DIR
 #define GAME_DIR		"."
 #endif
@@ -1086,60 +1058,12 @@ extern int		num_bg_loops;
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
-#ifndef MSDOS
-#define USERDATA_DIRECTORY	".rocksndiamonds"
-#define SETUP_FILENAME		"setup.conf"
-#define LEVELSETUP_FILENAME	"levelsetup.conf"
-#define LEVELINFO_FILENAME	"levelinfo.conf"
-#define TAPEFILE_EXTENSION	"tape"
-#define SCOREFILE_EXTENSION	"score"
-#else
-#define USERDATA_DIRECTORY	"userdata"
-#define SETUP_FILENAME		"setup.cnf"
-#define LEVELSETUP_FILENAME	"lvlsetup.cnf"
-#define LEVELINFO_FILENAME	"lvlinfo.cnf"
-#define TAPEFILE_EXTENSION	"rec"
-#define SCOREFILE_EXTENSION	"sco"
-#endif
-
-#define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
-#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
-#define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
-#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
-#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
-#define SCORE_PERMS		LEVEL_PERMS
-#define NAMES_PERMS		LEVEL_PERMS
-#define LEVDIR_PERMS		LEVEL_PERMS
-#define LEVREC_PERMS		LEVEL_PERMS
-#define JOYDAT_PERMS		LEVEL_PERMS
-#define SETUP_PERMS		LEVEL_PERMS
-
-#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
-#define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
-#define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
-#define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
-#define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
-#define LEVELINFO_COOKIE	"ROCKSNDIAMONDS_LEVELINFO_FILE_VERSION_1.2"
-
-/* old cookies for backward compatibility */
-#define LEVEL_COOKIE_10		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
-#define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
-
-#define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE) + 1)
-#define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE) + 1)
-#define LEVELREC_COOKIE_LEN	(strlen(LEVELREC_COOKIE) + 1)
-#define TAPE_COOKIE_LEN		(strlen(TAPE_COOKIE) + 1)
-#define SETUP_COOKIE_LEN	(strlen(SETUP_COOKIE) + 1)
-#define LEVELSETUP_COOKIE_LEN	(strlen(LEVELSETUP_COOKIE) + 1)
-#define LEVELINFO_COOKIE_LEN	(strlen(LEVELINFO_COOKIE) + 1)
-
 #define VERSION_STRING		"1.2 preview 1"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"
 #define WINDOWTITLE_STRING	GAMETITLE_STRING " " VERSION_STRING
 #define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"
 
-/* Leerer Login- und Alias-Name */
-#define EMPTY_LOGIN		"NO_LOGIN"
+/* default name for empty highscore entry */
 #define EMPTY_ALIAS		"NO_NAME"
 
 /* values for button_status */
@@ -1158,11 +1082,6 @@ extern int		num_bg_loops;
 #define MB_RIGHT		3
 #endif
 
-/* values for key_status */
-#define KEY_NOT_PRESSED		FALSE
-#define KEY_RELEASED		FALSE
-#define KEY_PRESSED		TRUE
-
 /* values for redraw_mask */
 #define REDRAW_ALL		(1L<<0)
 #define REDRAW_FIELD		(1L<<1)
@@ -1178,51 +1097,24 @@ extern int		num_bg_loops;
 #define REDRAW_MAIN	(REDRAW_FIELD | REDRAW_TILES | REDRAW_MICROLEV)
 #define REDRAWTILES_THRESHOLD	SCR_FIELDX*SCR_FIELDY/2
 
-/* positions in the game control window */
-#define XX_LEVEL		37
-#define YY_LEVEL		20
-#define XX_EMERALDS		29
-#define YY_EMERALDS		54
-#define XX_DYNAMITE		29
-#define YY_DYNAMITE		89
-#define XX_KEYS			18
-#define YY_KEYS			123
-#define XX_SCORE		15
-#define YY_SCORE		159
-#define XX_TIME			29
-#define YY_TIME			194
-
-#define DX_LEVEL		(DX+XX_LEVEL)
-#define DY_LEVEL		(DY+YY_LEVEL)
-#define DX_EMERALDS		(DX+XX_EMERALDS)
-#define DY_EMERALDS		(DY+YY_EMERALDS)
-#define DX_DYNAMITE		(DX+XX_DYNAMITE)
-#define DY_DYNAMITE		(DY+YY_DYNAMITE)
-#define DX_KEYS			(DX+XX_KEYS)
-#define DY_KEYS			(DY+YY_KEYS)
-#define DX_SCORE		(DX+XX_SCORE)
-#define DY_SCORE		(DY+YY_SCORE)
-#define DX_TIME			(DX+XX_TIME)
-#define DY_TIME			(DY+YY_TIME)
-
-/* Felder in PIX_DOOR */
-/* Bedeutung in PIX_DB_DOOR: (3 PAGEs)
-   PAGEX1: 1. Zwischenspeicher für DOOR_1
-   PAGEX2: 2. Zwischenspeicher für DOOR_1
-   PAGEX3: Pufferspeicher für Animationen
+/* areas in pixmap PIX_DOOR */
+/* meaning in PIX_DB_DOOR: (3 PAGEs)
+   PAGEX1: 1. buffer for DOOR_1
+   PAGEX2: 2. buffer for DOOR_1
+   PAGEX3: buffer for animations
 */
 
 #define DOOR_GFX_PAGESIZE	DXSIZE
-#define DOOR_GFX_PAGEX1		(0*DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX2		(1*DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX3		(2*DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX4		(3*DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX5		(4*DOOR_GFX_PAGESIZE)
-#define DOOR_GFX_PAGEX6		(5*DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX1		(0 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX2		(1 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX3		(2 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX4		(3 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX5		(4 * DOOR_GFX_PAGESIZE)
+#define DOOR_GFX_PAGEX6		(5 * DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		0
 #define DOOR_GFX_PAGEY2		DYSIZE
 
-/* für DrawGraphicAnimation (tools.c) und AnimateToon (cartoons.c) */
+/* for DrawGraphicAnimation() [tools.c] and AnimateToon() [cartoons.c] */
 #define ANIM_NORMAL	0
 #define ANIM_OSCILLATE	1
 #define ANIM_REVERSE	2

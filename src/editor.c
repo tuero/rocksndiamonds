@@ -18,6 +18,24 @@
 #include "buttons.h"
 #include "files.h"
 
+/* positions in the level editor */
+#define ED_WIN_MB_LEFT_XPOS	7
+#define ED_WIN_MB_LEFT_YPOS	6
+#define ED_WIN_LEVELNR_XPOS	77
+#define ED_WIN_LEVELNR_YPOS	7
+#define ED_WIN_MB_MIDDLE_XPOS	7
+#define ED_WIN_MB_MIDDLE_YPOS	258
+#define ED_WIN_MB_RIGHT_XPOS	77
+#define ED_WIN_MB_RIGHT_YPOS	258
+
+/* other constants for the editor */
+#define ED_SCROLL_NO		0
+#define ED_SCROLL_LEFT		1
+#define ED_SCROLL_RIGHT		2
+#define ED_SCROLL_UP		4
+#define ED_SCROLL_DOWN		8
+
+/* delay value to avoid too fast scrolling etc. */
 #define CHOICE_DELAY_VALUE	100
 
 static int level_xpos,level_ypos;

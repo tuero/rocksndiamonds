@@ -16,28 +16,6 @@
 
 #include "main.h"
 
-#define DF_NO_PUSH		0
-#define DF_DIG			1
-#define DF_SNAP			2
-
-#define MF_NO_ACTION		0
-#define MF_MOVING		1
-#define MF_ACTION		2
-
-#define SCROLL_INIT		0
-#define SCROLL_GO_ON		1
-
-/* explosion position and phase marks */
-#define EX_PHASE_START		0
-#define EX_NORMAL		0
-#define EX_CENTER		1
-#define EX_BORDER		2
-
-/* fundamental game speed */
-#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
-#define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
-
 void GetPlayerConfig(void);
 void InitGame(void);
 void InitMovDir(int, int);

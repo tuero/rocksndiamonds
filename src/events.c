@@ -22,6 +22,11 @@
 #include "joystick.h"
 #include "network.h"
 
+/* values for key_status */
+#define KEY_NOT_PRESSED		FALSE
+#define KEY_RELEASED		FALSE
+#define KEY_PRESSED		TRUE
+
 void EventLoop(void)
 {
   while(1)

@@ -27,6 +27,9 @@
 #include "random.h"
 #include "joystick.h"
 
+/* maximal allowed length of a command line option */
+#define MAX_OPTION_LEN		256
+
 static unsigned long mainCounter(int mode)
 {
   static struct timeval base_time = { 0, 0 };
