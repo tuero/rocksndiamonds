@@ -15,11 +15,6 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#if defined(XPM_INCLUDE_FILE) && !defined(MSDOS)
-#define USE_XPM_LIBRARY
-#include XPM_INCLUDE_FILE
-#endif
-
 #if defined(MSDOS)
 #include "msdos.h"
 #endif
@@ -48,8 +43,12 @@ typedef int (*EventFilter)(const Event *);
 
 inline void InitEventFilter(EventFilter);
 inline void InitBufferedDisplay(DrawBuffer *, DrawWindow *);
+
 inline int GetDisplayDepth(void);
+
 inline Bitmap CreateBitmap(int, int, int);
+inline void FreeBitmap(Bitmap);
+
 inline void ClearRectangle(Bitmap, int, int, int, int);
 inline void BlitBitmap(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void SetClipMask(GC, Pixmap);

@@ -69,6 +69,15 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
 #endif
 }
 
+inline void FreeBitmap(Bitmap bitmap)
+{
+#ifdef USE_SDL_LIBRARY
+  SDL_FreeSurface(bitmap);
+#else
+  XFreePixmap(display, bitmap);
+#endif
+}
+
 inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
 {
 #ifdef USE_SDL_LIBRARY
@@ -241,7 +250,7 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 inline boolean SetVideoMode(void)
 {
 #ifdef USE_SDL_LIBRARY
-  return SDLSetVideoMode(&backbuffer, &window);
+  return SDLSetVideoMode(&backbuffer);
 #else
   boolean success = TRUE;
 

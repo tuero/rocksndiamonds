@@ -35,14 +35,6 @@ struct PictureFileInfo
   boolean picture_with_mask;
 };
 
-#if 0
-struct IconFileInfo
-{
-  char *picture_filename;
-  char *picturemask_filename;
-};
-#endif
-
 #ifndef USE_SDL_LIBRARY
 static int sound_process_id = 0;
 #endif
@@ -50,14 +42,8 @@ static int sound_process_id = 0;
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
-#if 0
-static void InitDisplay(void);
-#endif
 static void InitSound(void);
 static void InitSoundServer(void);
-#if 0
-static void InitWindow(int, char **);
-#endif
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void LoadGfx(int, struct PictureFileInfo *);
@@ -93,27 +79,8 @@ void OpenAll(int argc, char *argv[])
   signal(SIGINT, CloseAllAndExit);
   signal(SIGTERM, CloseAllAndExit);
 
-
   InitBufferedDisplay(&backbuffer, &window);
   InitEventFilter(FilterMouseMotionEvents);
-
-
-
-#if 0
-
-  InitDisplay();
-  InitWindow(argc, argv);
-
-#if 0
-#ifndef USE_SDL_LIBRARY
-  XMapWindow(display, window);
-  FlushDisplay();
-#endif
-#endif
-
-#endif
-
-
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
@@ -415,210 +382,6 @@ void InitJoysticks()
 #endif /* !USE_SDL_LIBRARY */
 }
 
-
-
-#if 0
-
-void InitDisplay()
-{
-#ifdef USE_SDL_LIBRARY
-  /* initialize SDL video */
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
-
-  /* automatically cleanup SDL stuff after exit() */
-  atexit(SDL_Quit);
-
-#else /* !USE_SDL_LIBRARY */
-
-#ifndef MSDOS
-  XVisualInfo vinfo_template, *vinfo;
-  int num_visuals;
-#endif
-  unsigned int depth;
-
-  /* connect to X server */
-  if (!(display = XOpenDisplay(options.display_name)))
-    Error(ERR_EXIT, "cannot connect to X server %s",
-	  XDisplayName(options.display_name));
-
-  screen = DefaultScreen(display);
-  visual = DefaultVisual(display, screen);
-  depth  = DefaultDepth(display, screen);
-  cmap   = DefaultColormap(display, screen);
-
-#ifndef MSDOS
-  /* look for good enough visual */
-  vinfo_template.screen = screen;
-  vinfo_template.class = (depth == 8 ? PseudoColor : TrueColor);
-  vinfo_template.depth = depth;
-  if ((vinfo = XGetVisualInfo(display, VisualScreenMask | VisualClassMask |
-			      VisualDepthMask, &vinfo_template, &num_visuals)))
-  {
-    visual = vinfo->visual;
-    XFree((void *)vinfo);
-  }
-
-  /* got appropriate visual? */
-  if (depth < 8)
-  {
-    printf("Sorry, displays with less than 8 bits per pixel not supported.\n");
-    exit(-1);
-  }
-  else if ((depth ==8 && visual->class != PseudoColor) ||
-	   (depth > 8 && visual->class != TrueColor &&
-	    visual->class != DirectColor))
-  {
-    printf("Sorry, cannot get appropriate visual.\n");
-    exit(-1);
-  }
-#endif /* !MSDOS */
-#endif /* !USE_SDL_LIBRARY */
-}
-
-void InitWindow(int argc, char *argv[])
-{
-#ifdef USE_SDL_LIBRARY
-  /* open SDL video output device (window or fullscreen mode) */
-#if 0
-  if ((backbuffer = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				 SDL_HWSURFACE))
-      == NULL)
-    Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-#else
-  if (!SetVideoMode())
-    Error(ERR_EXIT, "setting video mode failed");
-#endif
-
-  /* set window and icon title */
-  SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
-
-  /* set event filter to filter out certain mouse motion events */
-  SDL_SetEventFilter(EventFilter);
-
-#else /* !USE_SDL_LIBRARY */
-
-  unsigned int border_width = 4;
-  XGCValues gc_values;
-  unsigned long gc_valuemask;
-#ifndef MSDOS
-  XTextProperty windowName, iconName;
-  Pixmap icon_pixmap, iconmask_pixmap;
-  unsigned int icon_width, icon_height;
-  int icon_hot_x, icon_hot_y;
-  char icon_filename[256];
-  XSizeHints size_hints;
-  XWMHints wm_hints;
-  XClassHint class_hints;
-  char *window_name = WINDOW_TITLE_STRING;
-  char *icon_name = WINDOW_TITLE_STRING;
-  long window_event_mask;
-  Atom proto_atom = None, delete_atom = None;
-#endif
-  int screen_width, screen_height;
-  int win_xpos = WIN_XPOS, win_ypos = WIN_YPOS;
-  unsigned long pen_fg = WhitePixel(display,screen);
-  unsigned long pen_bg = BlackPixel(display,screen);
-  const int width = WIN_XSIZE, height = WIN_YSIZE;
-
-#ifndef MSDOS
-  static struct IconFileInfo icon_pic =
-  {
-    "rocks_icon.xbm",
-    "rocks_iconmask.xbm"
-  };
-#endif
-
-  screen_width = XDisplayWidth(display, screen);
-  screen_height = XDisplayHeight(display, screen);
-
-  win_xpos = (screen_width - width) / 2;
-  win_ypos = (screen_height - height) / 2;
-
-  window = XCreateSimpleWindow(display, RootWindow(display, screen),
-			       win_xpos, win_ypos, width, height, border_width,
-			       pen_fg, pen_bg);
-
-#ifndef MSDOS
-  proto_atom = XInternAtom(display, "WM_PROTOCOLS", FALSE);
-  delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", FALSE);
-  if ((proto_atom != None) && (delete_atom != None))
-    XChangeProperty(display, window, proto_atom, XA_ATOM, 32,
-		    PropModePrepend, (unsigned char *) &delete_atom, 1);
-
-  sprintf(icon_filename, "%s/%s/%s",
-	  options.ro_base_directory, GRAPHICS_DIRECTORY,
-	  icon_pic.picture_filename);
-  XReadBitmapFile(display,window,icon_filename,
-		  &icon_width,&icon_height,
-		  &icon_pixmap,&icon_hot_x,&icon_hot_y);
-  if (!icon_pixmap)
-    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
-
-  sprintf(icon_filename, "%s/%s/%s",
-	  options.ro_base_directory, GRAPHICS_DIRECTORY,
-	  icon_pic.picturemask_filename);
-  XReadBitmapFile(display,window,icon_filename,
-		  &icon_width,&icon_height,
-		  &iconmask_pixmap,&icon_hot_x,&icon_hot_y);
-  if (!iconmask_pixmap)
-    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
-
-  size_hints.width  = size_hints.min_width  = size_hints.max_width  = width;
-  size_hints.height = size_hints.min_height = size_hints.max_height = height;
-  size_hints.flags = PSize | PMinSize | PMaxSize;
-
-  if (win_xpos || win_ypos)
-  {
-    size_hints.x = win_xpos;
-    size_hints.y = win_ypos;
-    size_hints.flags |= PPosition;
-  }
-
-  if (!XStringListToTextProperty(&window_name, 1, &windowName))
-    Error(ERR_EXIT, "structure allocation for windowName failed");
-
-  if (!XStringListToTextProperty(&icon_name, 1, &iconName))
-    Error(ERR_EXIT, "structure allocation for iconName failed");
-
-  wm_hints.initial_state = NormalState;
-  wm_hints.input = True;
-  wm_hints.icon_pixmap = icon_pixmap;
-  wm_hints.icon_mask = iconmask_pixmap;
-  wm_hints.flags = StateHint | IconPixmapHint | IconMaskHint | InputHint;
-
-  class_hints.res_name = program_name;
-  class_hints.res_class = "Rocks'n'Diamonds";
-
-  XSetWMProperties(display, window, &windowName, &iconName, 
-		   argv, argc, &size_hints, &wm_hints, 
-		   &class_hints);
-
-  XFree(windowName.value);
-  XFree(iconName.value);
-
-  /* Select event types wanted */
-  window_event_mask =
-    ExposureMask | StructureNotifyMask | FocusChangeMask |
-    ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
-    PointerMotionHintMask | KeyPressMask | KeyReleaseMask;
-
-  XSelectInput(display, window, window_event_mask);
-#endif
-
-  /* create GC for drawing with window depth and background color (black) */
-  gc_values.graphics_exposures = False;
-  gc_values.foreground = pen_bg;
-  gc_values.background = pen_bg;
-  gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
-  gc = XCreateGC(display, window, gc_valuemask, &gc_values);
-#endif /* !USE_SDL_LIBRARY */
-}
-
-#endif
-
-
-
 void InitGfx()
 {
   int i, j;
@@ -659,21 +422,6 @@ void InitGfx()
     { "RocksFont2",	FALSE },
     { "RocksFont3",	FALSE }
   }; 
-#endif
-
-#ifdef DEBUG
-#if 0
-  static struct PictureFileInfo test_pic1 =
-  {
-    "RocksFont2",
-    FALSE
-  };
-  static struct PictureFileInfo test_pic2 =
-  {
-    "mouse",
-    FALSE
-  };
-#endif
 #endif
 
   static struct
@@ -730,54 +478,8 @@ void InitGfx()
 
   /* create additional image buffers for double-buffering */
 
-#if 0
-  pix[PIX_DB_BACK] = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-#endif
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
-
-
-
-#if 0
-
-#ifdef USE_SDL_LIBRARY
-
-  /* SDL cannot directly draw to the visible video framebuffer like X11,
-     but always uses a backbuffer, which is then blitted to the visible
-     video framebuffer with 'SDL_UpdateRect' (or replaced with the current
-     visible video framebuffer with 'SDL_Flip', if the hardware supports
-     this). Therefore do not use an additional backbuffer for drawing, but
-     use a symbolic buffer (distinguishable from the SDL backbuffer) called
-     'window', which indicates that the SDL backbuffer should be updated to
-     the visible video framebuffer when attempting to blit to it.
-
-     For convenience, it seems to be a good idea to create this symbolic
-     buffer 'window' at the same size as the SDL backbuffer. Although it
-     should never be drawn to directly, it would do no harm nevertheless. */
-
-  window = pix[PIX_DB_BACK];		/* 'window' is only symbolic buffer */
-  pix[PIX_DB_BACK] = backbuffer;	/* 'backbuffer' is SDL screen buffer */
-
-#endif /* !USE_SDL_LIBRARY */
-
-#endif
-
-
-
-#if DEBUG_TIMING
-  debug_print_timestamp(0, NULL);	/* initialize timestamp function */
-#endif
-
-#ifdef DEBUG
-#if 0
-  printf("Test: Loading RocksFont2.pcx ...\n");
-  LoadGfx(PIX_SMALLFONT,&test_pic1);
-  printf("Test: Done.\n");
-  printf("Test: Loading mouse.pcx ...\n");
-  LoadGfx(PIX_SMALLFONT,&test_pic2);
-  printf("Test: Done.\n");
-#endif
-#endif
 
   LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
@@ -791,10 +493,6 @@ void InitGfx()
   for(i=0; i<NUM_PICTURES; i++)
     if (i != PIX_SMALLFONT)
       LoadGfx(i,&pic[i]);
-
-#if DEBUG_TIMING
-  debug_print_timestamp(0, "SUMMARY LOADING ALL GRAPHICS:");
-#endif
 
   /* create additional image buffers for masking of graphics */
 
@@ -912,23 +610,12 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
   char basefilename[256];
   char filename[256];
 
-#ifdef USE_XPM_LIBRARY
-  int xpm_err, xbm_err;
-  unsigned int width,height;
-  int hot_x,hot_y;
-  Pixmap shapemask;
-  char *picture_ext = ".xpm";
-  char *picturemask_ext = "Mask.xbm";
-#else
-
 #ifdef USE_SDL_LIBRARY
   SDL_Surface *sdl_image_tmp;
 #else /* !USE_SDL_LIBRARY */
   int pcx_err;
 #endif /* !USE_SDL_LIBRARY */
   char *picture_ext = ".pcx";
-
-#endif /* !USE_XPM_LIBRARY */
 
   /* Grafik laden */
   if (pic->picture_filename)
@@ -941,10 +628,6 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 #ifdef MSDOS
     rest(100);
 #endif /* MSDOS */
-
-#if DEBUG_TIMING
-    debug_print_timestamp(1, NULL);	/* initialize timestamp function */
-#endif
 
 #ifdef USE_SDL_LIBRARY
     /* load image to temporary surface */
@@ -966,33 +649,6 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else /* !USE_SDL_LIBRARY */
 
-#ifdef USE_XPM_LIBRARY
-
-    xpm_att[pos].valuemask = XpmCloseness;
-    xpm_att[pos].closeness = 20000;
-    xpm_err = XpmReadFileToPixmap(display,window,filename,
-				  &pix[pos],&shapemask,&xpm_att[pos]);
-    switch(xpm_err)
-    {
-      case XpmOpenFailed:
-	Error(ERR_EXIT, "cannot open XPM file '%s'", filename);
-      case XpmFileInvalid:
-	Error(ERR_EXIT, "invalid XPM file '%s'", filename);
-      case XpmNoMemory:
-	Error(ERR_EXIT, "not enough memory for XPM file '%s'", filename);
-      case XpmColorFailed:
-	Error(ERR_EXIT, "cannot get colors for XPM file '%s'", filename);
-      default:
-	break;
-    }
-
-#if DEBUG_TIMING
-    printf("LOADING XPM FILE %s:", filename);
-    debug_print_timestamp(1, "");
-#endif
-
-#else /* !USE_XPM_LIBRARY */
-
     pcx_err = Read_PCX_to_Pixmap(display, window, gc, filename,
 				 &pix[pos], &clipmask[pos]);
     switch(pcx_err)
@@ -1013,13 +669,6 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-#if DEBUG_TIMING
-    printf("SUMMARY LOADING PCX FILE %s:", filename);
-    debug_print_timestamp(1, "");
-#endif
-
-#endif /* !USE_XPM_LIBRARY */
-
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
 
@@ -1032,46 +681,8 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #ifndef USE_SDL_LIBRARY
   /* zugehörige Maske laden (wenn vorhanden) */
-  if (pic->picture_with_mask)
-  {
-#ifdef USE_XPM_LIBRARY
-
-    sprintf(basefilename, "%s%s", pic->picture_filename, picturemask_ext);
-    DrawInitText(basefilename, 150, FC_YELLOW);
-    sprintf(filename, "%s/%s/%s",
-	    options.ro_base_directory, GRAPHICS_DIRECTORY, basefilename);
-
-#if DEBUG_TIMING
-    debug_print_timestamp(1, NULL);	/* initialize timestamp function */
-#endif
-
-    xbm_err = XReadBitmapFile(display,window,filename,
-			      &width,&height,&clipmask[pos],&hot_x,&hot_y);
-    switch(xbm_err)
-    {
-      case BitmapSuccess:
-        break;
-      case BitmapOpenFailed:
-	Error(ERR_EXIT, "cannot open XBM file '%s'", filename);
-      case BitmapFileInvalid:
-	Error(ERR_EXIT, "invalid XBM file '%s'", filename);
-      case BitmapNoMemory:
-	Error(ERR_EXIT, "not enough memory for XBM file '%s'", filename);
-	break;
-      default:
-	break;
-    }
-
-#if DEBUG_TIMING
-    printf("LOADING XBM FILE %s:", filename);
-    debug_print_timestamp(1, "");
-#endif
-
-#endif /* USE_XPM_LIBRARY */
-
-    if (!clipmask[pos])
-      Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
-  }
+  if (pic->picture_with_mask && !clipmask[pos])
+    Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
 #endif /* !USE_SDL_LIBRARY */
 }
 
@@ -2251,28 +1862,13 @@ void CloseAllAndExit(int exit_value)
   for(i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i])
-    {
-#ifdef USE_XPM_LIBRARY
-      if (i < NUM_PICTURES)	/* XPM pictures */
-      {
-	XFreeColors(display,DefaultColormap(display,screen),
-		    xpm_att[i].pixels,xpm_att[i].npixels,0);
-	XpmFreeAttributes(&xpm_att[i]);
-      }
-#endif
+      FreeBitmap(pix[i]);
 
 #ifdef USE_SDL_LIBRARY
-      SDL_FreeSurface(pix[i]);
-#else
-      XFreePixmap(display,pix[i]);
-#endif
-    }
-
-#ifdef USE_SDL_LIBRARY
-      SDL_FreeSurface(pix_masked[i]);
+    FreeBitmap(pix_masked[i]);
 #else
     if (clipmask[i])
-      XFreePixmap(display,clipmask[i]);
+      FreeBitmap(clipmask[i]);
     if (clip_gc[i])
       XFreeGC(display, clip_gc[i]);
 #endif

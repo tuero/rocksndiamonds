@@ -610,20 +610,6 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   return PCX_Success;
 }
 
-int XpmReadFileToPixmap(Display *display, Drawable d, char *filename,
-			Pixmap *pixmap_return, Pixmap *shapemask_return,
-			XpmAttributes *attributes)
-{
-  BITMAP *bitmap;
-
-  if ((bitmap = Read_PCX_to_AllegroBitmap(filename)) == NULL)
-    return XpmOpenFailed;
-
-  *pixmap_return = (Pixmap)bitmap;
-
-  return XpmSuccess;
-}
-
 int XReadBitmapFile(Display *display, Drawable d, char *filename,
 		    unsigned int *width_return, unsigned int *height_return,
 		    Pixmap *bitmap_return,

@@ -32,10 +32,6 @@ Bitmap		pix[NUM_BITMAPS];
 Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
 Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 
-#ifdef USE_XPM_LIBRARY
-XpmAttributes 	xpm_att[NUM_PICTURES];
-#endif
-
 DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
 

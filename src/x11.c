@@ -69,8 +69,9 @@ static void X11InitDisplay()
 #endif /* !MSDOS */
 }
 
-static void X11InitWindow()
+static DrawWindow X11InitWindow()
 {
+  Window window;
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned long gc_valuemask;
@@ -185,17 +186,21 @@ static void X11InitWindow()
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
   gc = XCreateGC(display, window, gc_valuemask, &gc_values);
+
+  return window;
 }
 
-inline void X11InitBufferedDisplay(DrawBuffer *unused1, DrawWindow *unused2)
+inline void X11InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 {
   X11InitDisplay();
-  X11InitWindow();
+  *window = X11InitWindow();
 
-  XMapWindow(display, window);
+  XMapWindow(display, *window);
   FlushDisplay();
 
-  pix[PIX_DB_BACK] = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  /* create additional buffer for double-buffering */
+  *backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is off-screen buffer */
 }
 
 #endif /* USE_X11_LIBRARY */

@@ -458,10 +458,6 @@ extern Bitmap		pix[];
 extern Bitmap		pix_masked[], tile_masked[];
 extern Pixmap		clipmask[], tile_clipmask[];
 
-#ifdef USE_XPM_LIBRARY
-extern XpmAttributes 	xpm_att[];
-#endif
-
 extern DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 extern Colormap		cmap;
 

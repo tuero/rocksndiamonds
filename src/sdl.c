@@ -27,14 +27,13 @@ inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
   atexit(SDL_Quit);
 
   /* open SDL video output device (window or fullscreen mode) */
-  if (!SDLSetVideoMode(backbuffer, window))
+  if (!SDLSetVideoMode(backbuffer))
     Error(ERR_EXIT, "setting video mode failed");
 
   /* set window and icon title */
   SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
 
   /* create additional buffer for double-buffering */
-
   pix[PIX_DB_BACK] = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
   /* SDL cannot directly draw to the visible video framebuffer like X11,
@@ -54,7 +53,7 @@ inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
   pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is SDL screen buffer */
 }
 
-inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, DrawWindow *window)
+inline boolean SDLSetVideoMode(DrawBuffer *backbuffer)
 {
   boolean success = TRUE;
 

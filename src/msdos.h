@@ -454,7 +454,6 @@
 #define XGetImage(a,b,c,d,e,f,g,h)		((XImage *) NULL)
 #define XDisplayName(a)				((char *) NULL)
 #define XFreeColors(a,b,c,d,e)
-#define XpmFreeAttributes(a)
 #define XSelectInput(a,b,c)
 #define XDefaultDepth(a,b)			(8)
 #define XSetWMProperties(a,b,c,d,e,f,g,h,i)
@@ -503,14 +502,6 @@
 #define PSize			(1L << 3) /* program specified size */
 #define PMinSize		(1L << 4) /* program specified minimum size */
 #define PMaxSize		(1L << 5) /* program specified maximum size */
-
-#define XpmSuccess		 0
-#define XpmOpenFailed		-1
-#define XpmFileInvalid		-2
-#define XpmNoMemory		-3
-#define XpmColorFailed		-4
-
-#define XpmCloseness		(1L << 12)
 
 #define PCX_Success		 0
 #define PCX_OpenFailed		-1
@@ -633,14 +624,6 @@ typedef struct
 
 typedef struct
 {
-  unsigned long valuemask;	/* specifies which attributes are */
-  unsigned int closeness;	/* allowable RGB deviation */
-  Pixel *pixels;		/* list of used color pixels */
-  unsigned int npixels;		/* number of used pixels */
-} XpmAttributes;
-
-typedef struct
-{
   int type;
   int x, y;
   int width, height;
@@ -702,8 +685,6 @@ void XSync(Display *, Bool);
 inline void XCopyArea(Display *, Drawable, Drawable, GC, int, int,
 		      unsigned int, unsigned int, int, int);
 int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
-int XpmReadFileToPixmap(Display *, Drawable, char *, Pixmap *, Pixmap *,
-			XpmAttributes *);
 int XReadBitmapFile(Display *, Drawable, char *,
 		    unsigned int *, unsigned int *, Pixmap *, int *, int *);
 void XFreePixmap(Display *, Pixmap);
