@@ -2196,6 +2196,35 @@ void DrawMicroElement(int xpos, int ypos, int element)
 	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
 }
 
+void getNewMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
+{
+  Bitmap *src_bitmap = new_graphic_info[graphic].bitmap;
+  int mini_startx = src_bitmap->width * 3 / 4;
+  int mini_starty = src_bitmap->height * 2 / 3;
+  int src_x = mini_startx + new_graphic_info[graphic].src_x / 8;
+  int src_y = mini_starty + new_graphic_info[graphic].src_y / 8;
+
+  *bitmap = src_bitmap;
+  *x = src_x;
+  *y = src_y;
+}
+
+void DrawNewMicroElement(int xpos, int ypos, int element)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int graphic;
+
+  if (element == EL_EMPTY)
+    return;
+
+  graphic = el2img(element);
+
+  getNewMicroGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+  BlitBitmap(src_bitmap, drawto, src_x, src_y, MICRO_TILEX, MICRO_TILEY,
+	     xpos, ypos);
+}
+
 void DrawLevel()
 {
   int x,y;
@@ -2263,6 +2292,38 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
   redraw_mask |= REDRAW_MICROLEVEL;
 }
 
+static void DrawNewMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
+{
+  int x, y;
+
+  ClearRectangle(drawto, xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
+
+  if (lev_fieldx < STD_LEV_FIELDX)
+    xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
+  if (lev_fieldy < STD_LEV_FIELDY)
+    ypos += (STD_LEV_FIELDY - lev_fieldy) / 2 * MICRO_TILEY;
+
+  xpos += MICRO_TILEX;
+  ypos += MICRO_TILEY;
+
+  for(x=-1; x<=STD_LEV_FIELDX; x++)
+  {
+    for(y=-1; y<=STD_LEV_FIELDY; y++)
+    {
+      int lx = from_x + x, ly = from_y + y;
+
+      if (lx >= 0 && lx < lev_fieldx && ly >= 0 && ly < lev_fieldy)
+	DrawNewMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
+			    Ur[lx][ly]);
+      else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1)
+	DrawNewMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
+			    BorderElement);
+    }
+  }
+
+  redraw_mask |= REDRAW_MICROLEVEL;
+}
+
 #define MICROLABEL_EMPTY		0
 #define MICROLABEL_LEVEL_NAME		1
 #define MICROLABEL_CREATED_BY		2
@@ -2312,7 +2373,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     label_state = 1;
     label_counter = 0;
 
-    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+    DrawNewMicroLevelExt(xpos, ypos, from_x, from_y);
     DrawMicroLevelLabelExt(label_state);
 
     /* initialize delay counters */

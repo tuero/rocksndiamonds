@@ -122,6 +122,7 @@ void DrawNewMiniElement(int, int, int);
 void DrawMiniElementOrWall(int, int, int, int);
 void DrawNewMiniElementOrWall(int, int, int, int);
 void DrawMicroElement(int, int, int);
+void DrawNewMicroElement(int, int, int);
 void DrawLevel(void);
 void DrawMiniLevel(int, int, int, int);
 void DrawNewMiniLevel(int, int, int, int);
