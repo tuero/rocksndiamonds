@@ -2336,7 +2336,7 @@ static struct
 
 static void CreateScreenScrollbuttons()
 {
-  Bitmap gd_bitmap = pix[PIX_MORE];
+  Bitmap *gd_bitmap = pix[PIX_MORE];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
@@ -2390,7 +2390,7 @@ static void CreateScreenScrollbars()
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
-    Bitmap gd_bitmap = pix[PIX_MORE];
+    Bitmap *gd_bitmap = pix[PIX_MORE];
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;

@@ -103,7 +103,7 @@ struct GadgetBorder
 
 struct GadgetDesign
 {
-  Bitmap bitmap;			/* Bitmap with gadget surface */
+  Bitmap *bitmap;			/* Bitmap with gadget surface */
   int x, y;				/* position of rectangle in Bitmap */
 };
 

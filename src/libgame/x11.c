@@ -18,7 +18,7 @@
 #if defined(TARGET_X11)
 
 static void X11InitDisplay();
-static DrawWindow X11InitWindow();
+static DrawWindow *X11InitWindow();
 
 inline void X11InitVideoDisplay(void)
 {
@@ -29,7 +29,7 @@ inline void X11InitVideoDisplay(void)
   video.default_depth = XDefaultDepth(display, screen);
 }
 
-inline void X11InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window)
+inline void X11InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window)
 {
   *window = X11InitWindow();
 
@@ -86,9 +86,9 @@ static void X11InitDisplay()
 #endif /* !PLATFORM_MSDOS */
 }
 
-static DrawWindow X11InitWindow()
+static DrawWindow *X11InitWindow()
 {
-  DrawWindow new_window = CreateBitmapStruct();
+  DrawWindow *new_window = CreateBitmapStruct();
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned long gc_valuemask;

@@ -34,7 +34,7 @@ inline void SDLInitVideoDisplay(void)
   atexit(SDL_Quit);
 }
 
-inline void SDLInitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
+inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 			       boolean fullscreen)
 {
   /* open SDL video output device (window or fullscreen mode) */
@@ -61,7 +61,7 @@ inline void SDLInitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
   *window = CreateBitmap(video.width, video.height, video.depth);
 }
 
-inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
+inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
   int surface_flags = SDL_HWSURFACE | (fullscreen ? SDL_FULLSCREEN : 0);
@@ -69,8 +69,8 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
-    DrawWindow window_old = *backbuffer;
-    DrawWindow window_new = CreateBitmapStruct();
+    DrawWindow *window_old = *backbuffer;
+    DrawWindow *window_new = CreateBitmapStruct();
 
     if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
 						video.depth, surface_flags))
@@ -97,8 +97,8 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   if ((!fullscreen && video.fullscreen_enabled) || !*backbuffer)
   {
     /* switch display to window mode */
-    DrawWindow window_old = *backbuffer;
-    DrawWindow window_new = CreateBitmapStruct();
+    DrawWindow *window_old = *backbuffer;
+    DrawWindow *window_new = CreateBitmapStruct();
 
     if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
 						video.depth, surface_flags))
@@ -123,12 +123,12 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   return success;
 }
 
-inline void SDLCopyArea(Bitmap src_bitmap, Bitmap dst_bitmap,
+inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			int src_x, int src_y,
 			int width, int height,
 			int dst_x, int dst_y, int copy_mode)
 {
-  Bitmap real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
+  Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
 
   src_rect.x = src_x;
@@ -150,10 +150,10 @@ inline void SDLCopyArea(Bitmap src_bitmap, Bitmap dst_bitmap,
     SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
 }
 
-inline void SDLFillRectangle(Bitmap dst_bitmap, int x, int y,
+inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
 			     int width, int height, unsigned int color)
 {
-  Bitmap real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
+  Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
   unsigned int color_r = (color >> 16) && 0xff;
   unsigned int color_g = (color >>  8) && 0xff;

@@ -42,9 +42,9 @@ Visual	       *visual = NULL;
 int		screen = 0;
 Colormap	cmap = None;
 
-DrawWindow	window = NULL;
-DrawBuffer	backbuffer = NULL;
-DrawBuffer	drawto = NULL;
+DrawWindow     *window = NULL;
+DrawBuffer     *backbuffer = NULL;
+DrawBuffer     *drawto = NULL;
 
 int		button_status = MB_NOT_PRESSED;
 boolean		motion_status = FALSE;
@@ -159,7 +159,7 @@ inline void InitVideoDisplay(void)
 #endif
 }
 
-inline void InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
+inline void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 			    int width, int height, int depth,
 			    boolean fullscreen)
 {
@@ -176,7 +176,7 @@ inline void InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
 #endif
 }
 
-inline Bitmap CreateBitmapStruct(void)
+inline Bitmap *CreateBitmapStruct(void)
 {
 #ifdef TARGET_SDL
   return checked_calloc(sizeof(struct SDLSurfaceInfo));
@@ -185,9 +185,9 @@ inline Bitmap CreateBitmapStruct(void)
 #endif
 }
 
-inline Bitmap CreateBitmap(int width, int height, int depth)
+inline Bitmap *CreateBitmap(int width, int height, int depth)
 {
-  Bitmap new_bitmap = CreateBitmapStruct();
+  Bitmap *new_bitmap = CreateBitmapStruct();
   int real_depth = GetRealDepth(depth);
 
 #ifdef TARGET_SDL
@@ -226,7 +226,7 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
   return new_bitmap;
 }
 
-inline void FreeBitmap(Bitmap bitmap)
+inline void FreeBitmap(Bitmap *bitmap)
 {
   if (bitmap == NULL)
     return;
@@ -248,7 +248,7 @@ inline void FreeBitmap(Bitmap bitmap)
   free(bitmap);
 }
 
-inline void CloseWindow(DrawWindow window)
+inline void CloseWindow(DrawWindow *window)
 {
 #ifdef TARGET_X11
   if (window->drawable)
@@ -261,7 +261,7 @@ inline void CloseWindow(DrawWindow window)
 #endif
 }
 
-inline void BlitBitmap(Bitmap src_bitmap, Bitmap dst_bitmap,
+inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		       int src_x, int src_y,
 		       int width, int height,
 		       int dst_x, int dst_y)
@@ -275,7 +275,7 @@ inline void BlitBitmap(Bitmap src_bitmap, Bitmap dst_bitmap,
 #endif
 }
 
-inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
+inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
 #ifdef TARGET_SDL
   SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
@@ -290,7 +290,7 @@ static GC last_clip_gc = 0;	/* needed for XCopyArea() through clip mask */
 #endif
 #endif
 
-inline void SetClipMask(Bitmap bitmap, GC clip_gc, Pixmap clip_pixmap)
+inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
 #ifdef TARGET_X11
   if (clip_gc)
@@ -304,7 +304,7 @@ inline void SetClipMask(Bitmap bitmap, GC clip_gc, Pixmap clip_pixmap)
 #endif
 }
 
-inline void SetClipOrigin(Bitmap bitmap, GC clip_gc, int clip_x, int clip_y)
+inline void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
 {
 #ifdef TARGET_X11
   if (clip_gc)
@@ -318,7 +318,7 @@ inline void SetClipOrigin(Bitmap bitmap, GC clip_gc, int clip_x, int clip_y)
 #endif
 }
 
-inline void BlitBitmapMasked(Bitmap src_bitmap, Bitmap dst_bitmap,
+inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			     int src_x, int src_y,
 			     int width, int height,
 			     int dst_x, int dst_y)
@@ -332,7 +332,7 @@ inline void BlitBitmapMasked(Bitmap src_bitmap, Bitmap dst_bitmap,
 #endif
 }
 
-inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
+inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
 #ifdef TARGET_SDL
@@ -345,7 +345,7 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 }
 
 #if !defined(TARGET_X11_NATIVE)
-inline void DrawLine(Bitmap bitmap, int from_x, int from_y,
+inline void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 		     int to_x, int to_y, Pixel pixel, int line_width)
 {
   int x, y;
@@ -375,7 +375,7 @@ inline void DrawLine(Bitmap bitmap, int from_x, int from_y,
 }
 #endif
 
-inline void DrawLines(Bitmap bitmap, struct XY *points, int num_points,
+inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
 		      Pixel pixel)
 {
 #if !defined(TARGET_X11_NATIVE)
@@ -399,7 +399,7 @@ inline void DrawLines(Bitmap bitmap, struct XY *points, int num_points,
 #endif
 }
 
-inline Pixel GetPixelFromRGB(Bitmap bitmap, unsigned int color_r,
+inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 			     unsigned int color_g, unsigned int color_b)
 {
   Pixel pixel;
@@ -420,7 +420,7 @@ inline Pixel GetPixelFromRGB(Bitmap bitmap, unsigned int color_r,
   return pixel;
 }
 
-inline Pixel GetPixelFromRGBcompact(Bitmap bitmap, unsigned int color)
+inline Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 {
   unsigned int color_r = (color >> 16) & 0xff;
   unsigned int color_g = (color >>  8) & 0xff;
@@ -466,7 +466,7 @@ inline void KeyboardAutoRepeatOff(void)
 #endif
 }
 
-inline boolean PointerInWindow(DrawWindow window)
+inline boolean PointerInWindow(DrawWindow *window)
 {
 #ifdef TARGET_SDL
   return TRUE;

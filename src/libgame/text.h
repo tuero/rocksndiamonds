@@ -55,17 +55,19 @@
 
 struct FontInfo
 {
-  Bitmap bitmap_big, bitmap_medium, bitmap_small;
+  Bitmap *bitmap_big;
+  Bitmap *bitmap_medium;
+  Bitmap *bitmap_small;
 };
 
 
-void InitFontInfo(Bitmap, Bitmap, Bitmap);
+void InitFontInfo(Bitmap *, Bitmap *, Bitmap *);
 int getFontWidth(int, int);
 int getFontHeight(int, int);
 void DrawInitText(char *, int, int);
 void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawText(int, int, char *, int, int);
-void DrawTextExt(DrawBuffer, int, int, char *, int, int);
+void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 
 #endif	/* TEXT_H */

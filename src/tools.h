@@ -74,12 +74,12 @@ void DrawGraphicAnimation(int, int, int, int, int, int);
 void DrawGraphicAnimationThruMask(int, int, int, int, int, int);
 void getGraphicSource(int, int *, int *, int *);
 void DrawGraphic(int, int, int);
-void DrawGraphicExt(DrawBuffer, int, int, int);
+void DrawGraphicExt(DrawBuffer *, int, int, int);
 void DrawGraphicThruMask(int, int, int);
-void DrawGraphicThruMaskExt(DrawBuffer, int, int, int);
+void DrawGraphicThruMaskExt(DrawBuffer *, int, int, int);
 void DrawMiniGraphic(int, int, int);
-void getMiniGraphicSource(int, Bitmap *, int *, int *);
-void DrawMiniGraphicExt(DrawBuffer, int, int, int);
+void getMiniGraphicSource(int, Bitmap **, int *, int *);
+void DrawMiniGraphicExt(DrawBuffer *, int, int, int);
 void DrawGraphicShifted(int, int, int, int, int, int, int);
 void DrawGraphicShiftedThruMask(int, int, int, int, int, int);
 void DrawScreenElementExt(int, int, int, int, int, int, int);
@@ -107,7 +107,7 @@ unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
 void DrawSpecialEditorDoor();
 void UndrawSpecialEditorDoor();
-int ReadPixel(DrawBuffer, int, int);
+int ReadPixel(DrawBuffer *, int, int);
 
 void CreateToolButtons();
 

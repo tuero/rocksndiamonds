@@ -580,7 +580,7 @@ void CreateTapeButtons()
 
   for (i=0; i<NUM_TAPE_BUTTONS; i++)
   {
-    Bitmap gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = pix[PIX_DOOR];
     struct GadgetInfo *gi;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y;

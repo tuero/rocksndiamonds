@@ -85,7 +85,7 @@ void SetDrawtoField(int mode)
 void BackToFront()
 {
   int x,y;
-  DrawBuffer buffer = (drawto_field == window ? backbuffer : drawto_field);
+  DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
 
   if (setup.direct_draw && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
@@ -771,7 +771,7 @@ void DrawGraphic(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicExt(DrawBuffer bitmap, int x, int y, int graphic)
+void DrawGraphicExt(DrawBuffer *bitmap, int x, int y, int graphic)
 {
   int bitmap_nr;
   int src_x, src_y;
@@ -795,12 +795,12 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
+void DrawGraphicThruMaskExt(DrawBuffer *d, int dest_x, int dest_y, int graphic)
 {
   int tile = graphic;
   int bitmap_nr;
   int src_x, src_y;
-  Bitmap src_bitmap;
+  Bitmap *src_bitmap;
   GC drawing_gc;
 
   if (graphic == GFX_LEERRAUM)
@@ -837,7 +837,7 @@ void DrawMiniGraphic(int x, int y, int graphic)
   MarkTileDirty(x/2, y/2);
 }
 
-void getMiniGraphicSource(int graphic, Bitmap *bitmap, int *x, int *y)
+void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
@@ -884,9 +884,9 @@ void getMiniGraphicSource(int graphic, Bitmap *bitmap, int *x, int *y)
   }
 }
 
-void DrawMiniGraphicExt(DrawBuffer d, int x, int y, int graphic)
+void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
 {
-  Bitmap bitmap;
+  Bitmap *bitmap;
   int src_x, src_y;
 
   getMiniGraphicSource(graphic, &bitmap, &src_x, &src_y);
@@ -901,7 +901,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int src_x, src_y, dest_x, dest_y;
   int tile = graphic;
   int bitmap_nr;
-  Bitmap src_bitmap;
+  Bitmap *src_bitmap;
   GC drawing_gc;
 
   if (graphic < 0)
@@ -2028,7 +2028,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
-      Bitmap bitmap = pix[PIX_DOOR];
+      Bitmap *bitmap = pix[PIX_DOOR];
       GC gc = bitmap->stored_clip_gc;
 
       WaitUntilDelayReached(&door_delay, door_delay_value);
@@ -2146,7 +2146,7 @@ void UndrawSpecialEditorDoor()
 }
 
 #ifndef	TARGET_SDL
-int ReadPixel(DrawBuffer bitmap, int x, int y)
+int ReadPixel(DrawBuffer *bitmap, int x, int y)
 {
   XImage *pixel_image;
   unsigned long pixel_value;
@@ -2275,8 +2275,8 @@ void CreateToolButtons()
 
   for (i=0; i<NUM_TOOL_BUTTONS; i++)
   {
-    Bitmap gd_bitmap = pix[PIX_DOOR];
-    Bitmap deco_bitmap = None;
+    Bitmap *gd_bitmap = pix[PIX_DOOR];
+    Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;
     unsigned long event_mask;

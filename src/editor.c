@@ -1305,7 +1305,7 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 
 static void CreateControlButtons()
 {
-  Bitmap gd_bitmap = pix[PIX_DOOR];
+  Bitmap *gd_bitmap = pix[PIX_DOOR];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
@@ -1465,7 +1465,7 @@ static void CreateControlButtons()
   /* create buttons for element list */
   for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
-    Bitmap deco_bitmap;
+    Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y;
@@ -1526,7 +1526,7 @@ static void CreateCounterButtons()
 
     for (j=0; j<2; j++)
     {
-      Bitmap gd_bitmap = pix[PIX_DOOR];
+      Bitmap *gd_bitmap = pix[PIX_DOOR];
       struct GadgetInfo *gi;
       int id = (j == 0 ?
 		counterbutton_info[i].gadget_id_down :
@@ -1748,7 +1748,7 @@ static void CreateTextInputGadgets()
 
   for (i=0; i<ED_NUM_TEXTINPUT; i++)
   {
-    Bitmap gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = pix[PIX_DOOR];
     int gd_x, gd_y;
     struct GadgetInfo *gi;
     unsigned long event_mask;
@@ -1795,7 +1795,7 @@ static void CreateScrollbarGadgets()
   for (i=0; i<ED_NUM_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
-    Bitmap gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = pix[PIX_DOOR];
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -1860,7 +1860,7 @@ static void CreateScrollbarGadgets()
 
 static void CreateCheckbuttonGadgets()
 {
-  Bitmap gd_bitmap = pix[PIX_DOOR];
+  Bitmap *gd_bitmap = pix[PIX_DOOR];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;

@@ -237,9 +237,9 @@ extern Visual	       *visual;
 extern int		screen;
 extern Colormap		cmap;
 
-extern DrawWindow	window;
-extern DrawBuffer	backbuffer;
-extern DrawBuffer	drawto;
+extern DrawWindow      *window;
+extern DrawBuffer      *backbuffer;
+extern DrawBuffer      *drawto;
 
 extern int		button_status;
 extern boolean		motion_status;
@@ -264,25 +264,25 @@ void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
 
 inline void InitVideoDisplay(void);
-inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);
-inline Bitmap CreateBitmapStruct(void);
-inline Bitmap CreateBitmap(int, int, int);
-inline void FreeBitmap(Bitmap);
-inline void BlitBitmap(Bitmap, Bitmap, int, int, int, int, int, int);
-inline void ClearRectangle(Bitmap, int, int, int, int);
-inline void SetClipMask(Bitmap, GC, Pixmap);
-inline void SetClipOrigin(Bitmap, GC, int, int);
-inline void BlitBitmapMasked(Bitmap, Bitmap, int, int, int, int, int, int);
-inline void DrawSimpleWhiteLine(Bitmap, int, int, int, int);
-inline void DrawLines(Bitmap, struct XY *, int, Pixel);
-inline Pixel GetPixelFromRGB(Bitmap, unsigned int, unsigned int, unsigned int);
-inline Pixel GetPixelFromRGBcompact(Bitmap, unsigned int);
+inline void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
+inline Bitmap *CreateBitmapStruct(void);
+inline Bitmap *CreateBitmap(int, int, int);
+inline void FreeBitmap(Bitmap *);
+inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
+inline void ClearRectangle(Bitmap *, int, int, int, int);
+inline void SetClipMask(Bitmap *, GC, Pixmap);
+inline void SetClipOrigin(Bitmap *, GC, int, int);
+inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
+inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
+inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
+inline Pixel GetPixelFromRGB(Bitmap *, unsigned int,unsigned int,unsigned int);
+inline Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 
 inline void FlushDisplay(void);
 inline void SyncDisplay(void);
 inline void KeyboardAutoRepeatOn(void);
 inline void KeyboardAutoRepeatOff(void);
-inline boolean PointerInWindow(DrawWindow);
+inline boolean PointerInWindow(DrawWindow *);
 inline boolean SetVideoMode(boolean);
 inline boolean ChangeVideoModeIfNeeded(boolean);
 

@@ -6082,7 +6082,7 @@ void CreateGameButtons()
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    Bitmap gd_bitmap = pix[PIX_DOOR];
+    Bitmap *gd_bitmap = pix[PIX_DOOR];
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;

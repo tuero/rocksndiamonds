@@ -39,9 +39,9 @@
 
 /* X11 type definitions */
 
-typedef struct X11DrawableInfo *Bitmap;
-typedef struct X11DrawableInfo *DrawWindow;
-typedef struct X11DrawableInfo *DrawBuffer;
+typedef struct X11DrawableInfo	Bitmap;
+typedef struct X11DrawableInfo	DrawWindow;
+typedef struct X11DrawableInfo	DrawBuffer;
 /* "Pixel" is already defined in X11/Intrinsic.h */
 
 typedef KeySym			Key;
@@ -287,6 +287,6 @@ struct XY
 /* X11 function definitions */
 
 inline void X11InitVideoDisplay(void);
-inline void X11InitVideoBuffer(DrawBuffer *, DrawWindow *);
+inline void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
 
 #endif /* X11_H */

@@ -386,9 +386,10 @@ struct GlobalInfo
 };
 
 extern GC		tile_clip_gc;
-extern Bitmap		pix[];
+extern Bitmap	       *pix[];
 extern Pixmap		tile_clipmask[];
-extern DrawBuffer	drawto_field, fieldbuffer;
+extern DrawBuffer      *fieldbuffer;
+extern DrawBuffer      *drawto_field;
 
 extern int		joystick_device;
 extern char	       *joystick_device_name[];

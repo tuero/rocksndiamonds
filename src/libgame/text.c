@@ -28,8 +28,8 @@ struct FontInfo		font;
 /* font functions                                                            */
 /* ========================================================================= */
 
-void InitFontInfo(Bitmap bitmap_big, Bitmap bitmap_medium,
-		  Bitmap bitmap_small)
+void InitFontInfo(Bitmap *bitmap_big, Bitmap *bitmap_medium,
+		  Bitmap *bitmap_small)
 {
   font.bitmap_big = bitmap_big;
   font.bitmap_medium = bitmap_medium;
@@ -103,10 +103,10 @@ void DrawText(int x, int y, char *text, int font_size, int font_type)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawTextExt(DrawBuffer bitmap, int x, int y,
+void DrawTextExt(DrawBuffer *bitmap, int x, int y,
 		 char *text, int font_size, int font_type)
 {
-  Bitmap font_bitmap;
+  Bitmap *font_bitmap;
   int font_width, font_height, font_start;
   boolean print_inverse = FALSE;
 

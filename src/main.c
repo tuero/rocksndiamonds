@@ -20,9 +20,10 @@
 #include "joystick.h"
 
 GC		tile_clip_gc;
-Bitmap		pix[NUM_BITMAPS];
+Bitmap	       *pix[NUM_BITMAPS];
 Pixmap		tile_clipmask[NUM_TILES];
-DrawBuffer	drawto_field, fieldbuffer;
+DrawBuffer     *fieldbuffer;
+DrawBuffer     *drawto_field;
 
 int		joystick_device = 0;
 char	       *joystick_device_name[MAX_PLAYERS] =

@@ -368,25 +368,25 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_DESIGN_UNPRESSED:
-	gi->design[GD_BUTTON_UNPRESSED].bitmap = va_arg(ap, Bitmap);
+	gi->design[GD_BUTTON_UNPRESSED].bitmap = va_arg(ap, Bitmap *);
 	gi->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	gi->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_PRESSED:
-	gi->design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap);
+	gi->design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap *);
 	gi->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	gi->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_ALT_DESIGN_UNPRESSED:
-	gi->alt_design[GD_BUTTON_UNPRESSED].bitmap= va_arg(ap, Bitmap);
+	gi->alt_design[GD_BUTTON_UNPRESSED].bitmap= va_arg(ap, Bitmap *);
 	gi->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	gi->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_ALT_DESIGN_PRESSED:
-	gi->alt_design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap);
+	gi->alt_design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap *);
 	gi->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	gi->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
@@ -400,7 +400,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_DECORATION_DESIGN:
-	gi->deco.design.bitmap = va_arg(ap, Bitmap);
+	gi->deco.design.bitmap = va_arg(ap, Bitmap *);
 	gi->deco.design.x = va_arg(ap, int);
 	gi->deco.design.y = va_arg(ap, int);
 	break;

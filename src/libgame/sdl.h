@@ -34,9 +34,9 @@
 
 /* SDL type definitions */
 
-typedef struct SDLSurfaceInfo  *Bitmap;
-typedef struct SDLSurfaceInfo  *DrawBuffer;
-typedef struct SDLSurfaceInfo  *DrawWindow;
+typedef struct SDLSurfaceInfo	Bitmap;
+typedef struct SDLSurfaceInfo	DrawBuffer;
+typedef struct SDLSurfaceInfo	DrawWindow;
 typedef Uint32			Pixel;
 
 typedef SDLKey			Key;
@@ -315,10 +315,10 @@ struct XY
 /* SDL function definitions */
 
 inline void SDLInitVideoDisplay(void);
-inline void SDLInitVideoBuffer(DrawBuffer *, DrawWindow *, boolean);
-inline boolean SDLSetVideoMode(DrawBuffer *, boolean);
-inline void SDLCopyArea(Bitmap, Bitmap, int, int, int, int, int, int, int);
-inline void SDLFillRectangle(Bitmap, int, int, int, int, unsigned int);
+inline void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
+inline boolean SDLSetVideoMode(DrawBuffer **, boolean);
+inline void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+inline void SDLFillRectangle(Bitmap *, int, int, int, int, unsigned int);
 inline void SDLDrawSimpleLine(SDL_Surface *, int, int, int, int, unsigned int);
 inline void SDLDrawLine(SDL_Surface *, int, int, int, int, Uint32);
 /* functions from SGE library */

@@ -18,7 +18,7 @@
 
 static void HandleAnimation(int);
 static boolean AnimateToon(int, boolean);
-static void DrawAnim(Bitmap, GC, int, int, int, int, int, int, int, int);
+static void DrawAnim(Bitmap *, GC, int, int, int, int, int, int, int, int);
 
 struct AnimInfo
 {
@@ -397,7 +397,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   };
   struct AnimInfo *anim = &toon[toon_nr];
   int anim_bitmap_nr = (toon_nr < 6 ? PIX_TOONS : PIX_HEROES);
-  Bitmap anim_bitmap = pix[anim_bitmap_nr];
+  Bitmap *anim_bitmap = pix[anim_bitmap_nr];
   GC anim_clip_gc = pix[anim_bitmap_nr]->stored_clip_gc;
 
   if (restart)
@@ -530,7 +530,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   return(FALSE);
 }
 
-void DrawAnim(Bitmap toon_bitmap, GC toon_clip_gc,
+void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 	      int src_x, int src_y, int width, int height,
 	      int dest_x, int dest_y, int pad_x, int pad_y)
 {
