@@ -147,6 +147,10 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y,
       c = 92;
     else if (c == 'ü' || c == 'Ü')
       c = 93;
+    else if (c == '[' || c == ']')	/* map to normal braces */
+      c = (c == '[' ? '(' : ')');
+    else if (c == '\\')			/* bad luck ... */
+      c = '/';
 
     if ((c >= 32 && c <= 95) || c == '°')
     {
