@@ -817,7 +817,7 @@ void DrawHelpScreen()
 
   FadeToFront();
   InitAnimation();
-  PlaySoundLoop(SND_RHYTHMLOOP);
+  PlaySoundLoop(SND_MENU_INFO_SCREEN);
 }
 
 void HandleHelpScreen(int button)
@@ -1257,7 +1257,7 @@ void DrawHallOfFame(int highlight_position)
   FadeToFront();
   InitAnimation();
   HandleHallOfFame(highlight_position,0, 0,0, MB_MENU_INITIALIZE);
-  PlaySound(SND_HALLOFFAME);
+  PlaySound(SND_MENU_HALL_OF_FAME);
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -1335,7 +1335,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
   if (button_released)
   {
-    FadeSound(SND_HALLOFFAME);
+    FadeSound(SND_MENU_HALL_OF_FAME);
     game_status = MAINMENU;
     DrawMainMenu();
   }

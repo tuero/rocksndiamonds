@@ -136,6 +136,7 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
+#if 0
 /* sound effects: setup file identifiers and corresponding default filenames */
 struct SoundEffectInfo sound_effects[NUM_SOUND_EFFECTS] =
 {
@@ -144,8 +145,9 @@ struct SoundEffectInfo sound_effects[NUM_SOUND_EFFECTS] =
   { "zonk_pushing",			"zonkpush.wav"		}, /* TEST */
   { "player_screaming",			"autsch.wav"		}  /* TEST */
 };
+#endif
 
-struct SoundEffectInfo sound_effects_NEW[] =
+struct SoundEffectInfo sound_effects[] =
 {
   /* sounds for Boulder Dash style elements and actions */
   { "bd_empty_space.digging",		"empty.wav"		},
@@ -228,14 +230,19 @@ struct SoundEffectInfo sound_effects_NEW[] =
   { "exit.entering",			"buing.wav"		},
 
   /* sounds for Emerald Mine Club style elements and actions */
-  { "balloon.moving",			"schlurf.wav"		},
+  { "balloon.moving",			SND_FILE_UNDEFINED	},
+  { "balloon.pushing",			"schlurf.wav"		},
+  { "spring.moving",			SND_FILE_UNDEFINED	},
   { "spring.pushing",			"pusch.wav"		},
+  { "spring.impact",			"klopf.wav"		},
   { "wall.growing",			SND_FILE_UNDEFINED	},
 
   /* sounds for Diamond Caves style elements and actions */
   { "pearl.collecting",			"pong.wav"		},
   { "pearl.breaking",			"knack.wav"		},
+  { "pearl.impact",			"pling.wav"		},
   { "crystal.collecting",		"pong.wav"		},
+  { "crystal.impact",			"pling.wav"		},
   { "envelope.collecting",		"pong.wav"		},
   { "sand_invisible.digging",		"schlurf.wav"		},
   { "shield_passive.collecting",	"pong.wav"		},
@@ -285,22 +292,26 @@ struct SoundEffectInfo sound_effects_NEW[] =
   { "biomaze.growing",			"amoebe.wav"		},
   { "pacman.moving",			SND_FILE_UNDEFINED	},
   { "pacman.eating_amoeba",		SND_FILE_UNDEFINED	},
+  { "dark_yamyam.moving",		SND_FILE_UNDEFINED	},
+  { "dark_yamyam.waiting",		"njam.wav"		},
   { "dark_yamyam.eating_any",		SND_FILE_UNDEFINED	},
   { "penguin.moving",			SND_FILE_UNDEFINED	},
   { "penguin.entering_exit",		"buing.wav"		},
   { "pig.moving",			SND_FILE_UNDEFINED	},
   { "pig.eating_gem",			SND_FILE_UNDEFINED	},
-  { "dragon.moving",		SND_FILE_UNDEFINED	},
+  { "dragon.moving",			SND_FILE_UNDEFINED	},
   { "dragon.breathing_fire",		SND_FILE_UNDEFINED	},
 
   /* sounds for generic elements and actions */
-  { "player.screaming",			"autsch.wav"		},
+  { "player.dying",			"autsch.wav"		},
   { "element.exploding",		"roaaar.wav"		},
 
   /* sounds for other game actions */
+  { "game.starting",			SND_FILE_UNDEFINED	},
   { "game.running_out_of_time",		"gong.wav"		},
   { "game.leveltime_bonus",		"sirr.wav"		},
-  { "game.laughing_at_player",		"lachen.wav"		},
+  { "game.losing",			"lachen.wav"		},
+  { "game.winning",			SND_FILE_UNDEFINED	},
 
   /* sounds for other non-game actions */
   { "menu.door_opening",		"oeffnen.wav"		},

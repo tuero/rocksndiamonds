@@ -1130,7 +1130,7 @@ static SoundInfo *Load_WAV(char *filename)
   if (!audio.sound_available)
     return NULL;
 
-#if 1
+#if 0
   printf("loading WAV file '%s'\n", filename);
 #endif
 
@@ -1274,7 +1274,7 @@ static void replaceSoundEntry(SoundInfo **snd_info, char *filename)
        This usually means that this sound does not exist in this sound set
        and a fallback to the existing sound is done. */
 
-#if 1
+#if 0
     printf("[sound '%s' already exists (same list entry)]\n", filename);
 #endif
 
@@ -1287,7 +1287,7 @@ static void replaceSoundEntry(SoundInfo **snd_info, char *filename)
   /* check if the new sound file already exists in the list of sounds */
   if ((node = getNodeFromKey(SoundFileList, filename)) != NULL)
   {
-#if 1
+#if 0
       printf("[sound '%s' already exists (other list entry)]\n", filename);
 #endif
 
@@ -1334,13 +1334,17 @@ void LoadSoundToList(char *basename, int list_pos)
   if (Sound == NULL || list_pos >= num_sounds)
     return;
 
+#if 0
   printf("loading sound '%s' ...  [%d]\n",
 	 basename, getNumNodes(SoundFileList));
+#endif
 
   LoadCustomSound(&Sound[list_pos], basename);
 
+#if 0
   printf("loading sound '%s' done [%d]\n",
 	 basename, getNumNodes(SoundFileList));
+#endif
 }
 
 static MusicInfo *Load_MOD(char *filename)
@@ -1726,7 +1730,7 @@ static void ReloadCustomSounds()
 {
   int i;
 
-#if 1
+#if 0
   printf("DEBUG: reloading sounds '%s' ...\n", artwork.sounds_set_current);
 #endif
 
@@ -1743,12 +1747,15 @@ static void ReloadCustomSounds()
   /*
   printf("list size == %d\n", getNumNodes(SoundFileList));
   */
+
+#if 0
   dumpList(SoundFileList);
+#endif
 }
 
 static void ReloadCustomMusic()
 {
-#if 1
+#if 0
   printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current);
 #endif
 

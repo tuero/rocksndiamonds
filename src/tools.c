@@ -2096,13 +2096,19 @@ unsigned int MoveDoor(unsigned int door_state)
   {
     stepsize = 20;
     door_delay_value = 0;
-    StopSound(SND_OEFFNEN);
+    StopSound(SND_MENU_DOOR_OPENING);
+    StopSound(SND_MENU_DOOR_CLOSING);
   }
 
   if (door_state & DOOR_ACTION)
   {
     if (!(door_state & DOOR_NO_DELAY))
-      PlaySoundStereo(SND_OEFFNEN, PSND_MAX_RIGHT);
+    {
+      if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
+	PlaySoundStereo(SND_MENU_DOOR_OPENING, PSND_MAX_RIGHT);
+      if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
+	PlaySoundStereo(SND_MENU_DOOR_CLOSING, PSND_MAX_RIGHT);
+    }
 
     start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
 
@@ -2197,7 +2203,10 @@ unsigned int MoveDoor(unsigned int door_state)
   }
 
   if (setup.quick_doors)
-    StopSound(SND_OEFFNEN);
+  {
+    StopSound(SND_MENU_DOOR_OPENING);
+    StopSound(SND_MENU_DOOR_CLOSING);
+  }
 
   if (door_state & DOOR_ACTION_1)
     door1 = door_state & DOOR_ACTION_1;
