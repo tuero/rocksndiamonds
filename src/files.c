@@ -37,7 +37,7 @@
 #endif
 
 /* file identifier strings */
-#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
+#define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_2.0"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 #define TAPE_COOKIE		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_1.2"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
@@ -46,6 +46,7 @@
 /* old file identifiers for backward compatibility */
 #define LEVEL_COOKIE_10		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.0"
 #define LEVEL_COOKIE_12		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.2"
+#define LEVEL_COOKIE_14		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_1.4"
 #define TAPE_COOKIE_10		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.0"
 
 /* file names and filename extensions */
@@ -214,9 +215,9 @@ static int getFileVersionFromCookieString(const char *cookie)
   if (strncmp(ptr_cookie1, pattern1, len_pattern1) != 0)
     return -1;
 
-  if (ptr_cookie2[0] <= '0' || ptr_cookie2[0] >= '9' ||
+  if (ptr_cookie2[0] < '0' || ptr_cookie2[0] > '9' ||
       ptr_cookie2[1] != '.' ||
-      ptr_cookie2[2] <= '0' || ptr_cookie2[2] >= '9')
+      ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
     return -1;
 
   version_major = ptr_cookie2[0] - '0';
@@ -412,6 +413,8 @@ static void setLevelInfoToDefaults()
   level.file_version = FILE_VERSION_ACTUAL;
   level.game_version = GAME_VERSION_ACTUAL;
 
+  level.encoding_16bit = FALSE;		/* default: only 8-bit elements */
+
   lev_fieldx = level.fieldx = STD_LEV_FIELDX;
   lev_fieldy = level.fieldy = STD_LEV_FIELDY;
 
@@ -495,7 +498,7 @@ static int checkLevelElement(int element)
   return element;
 }
 
-void LoadLevel(int level_nr)
+void OLD_LoadLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
@@ -642,7 +645,7 @@ void LoadLevel(int level_nr)
     }
 
     /* next check body chunk identifier and chunk length */
-    if (strcmp(chunk, "BODY") || chunk_length != lev_fieldx * lev_fieldy)
+    if (strcmp(chunk, "BODY") != 0 || chunk_length != lev_fieldx * lev_fieldy)
     {
       Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
       fclose(file);
@@ -691,11 +694,223 @@ void LoadLevel(int level_nr)
   SetBorderElement();
 }
 
+static void LoadLevel_HEAD(struct LevelInfo *level, FILE *file)
+{
+  int i, x, y;
+
+  lev_fieldx = level->fieldx = fgetc(file);
+  lev_fieldy = level->fieldy = fgetc(file);
+
+  level->time		= getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  level->gems_needed	= getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+
+  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
+    level->name[i] = fgetc(file);
+  level->name[MAX_LEVEL_NAME_LEN] = 0;
+
+  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
+    level->score[i] = fgetc(file);
+
+  level->num_yam_contents = STD_ELEMENT_CONTENTS;
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+  {
+    for(y=0; y<3; y++)
+    {
+      for(x=0; x<3; x++)
+      {
+	if (i < STD_ELEMENT_CONTENTS)
+	  level->yam_content[i][x][y] = checkLevelElement(fgetc(file));
+	else
+	  level->yam_content[i][x][y] = EL_LEERRAUM;
+      }
+    }
+  }
+
+  level->amoeba_speed		= fgetc(file);
+  level->time_magic_wall	= fgetc(file);
+  level->time_wheel		= fgetc(file);
+  level->amoeba_content		= checkLevelElement(fgetc(file));
+  level->double_speed		= (fgetc(file) == 1 ? TRUE : FALSE);
+  level->gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
+
+  level->encoding_16bit		= (fgetc(file) == 1 ? TRUE : FALSE);
+
+  for(i=0; i<LEVEL_HEADER_UNUSED; i++)	/* skip unused header bytes */
+    fgetc(file);
+}
+
+static void LoadLevel_AUTH(struct LevelInfo *level, FILE *file)
+{
+  int i;
+
+  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
+    level->author[i] = fgetc(file);
+  level->author[MAX_LEVEL_NAME_LEN] = 0;
+}
+
+static void LoadLevel_CONT(struct LevelInfo *level, FILE *file)
+{
+  int i, x, y;
+
+  fgetc(file);
+  level->num_yam_contents = fgetc(file);
+  fgetc(file);
+  fgetc(file);
+
+  if (level->num_yam_contents < 1 ||
+      level->num_yam_contents > MAX_ELEMENT_CONTENTS)
+  {
+#if DEBUG
+    printf("WARNING: num_yam_contents == %d (corrected)\n",
+	   level->num_yam_contents);
+#endif
+    level->num_yam_contents = STD_ELEMENT_CONTENTS;
+  }
+
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	level->yam_content[i][x][y] =
+	  checkLevelElement(level->encoding_16bit ?
+			    getFile16BitInteger(file,
+						BYTE_ORDER_BIG_ENDIAN) :
+			    fgetc(file));
+}
+
+static void LoadLevel_BODY(struct LevelInfo *level, FILE *file)
+{
+  int x, y;
+
+  /* now read in the valid level fields from level file */
+  for(y=0; y<lev_fieldy; y++)
+    for(x=0; x<lev_fieldx; x++)
+      Feld[x][y] = Ur[x][y] =
+	checkLevelElement(level->encoding_16bit ?
+			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
+			  fgetc(file));
+}
+
+void LoadLevel(int level_nr)
+{
+  char *filename = getLevelFilename(level_nr);
+  char cookie[MAX_LINE_LEN];
+  char chunk[CHUNK_ID_LEN + 1];
+  int chunk_length;
+  FILE *file;
+
+  /* always start with reliable default values */
+  setLevelInfoToDefaults();
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
+    return;
+  }
+
+  /* check file identifier */
+  fgets(cookie, MAX_LINE_LEN, file);
+  if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
+    cookie[strlen(cookie) - 1] = '\0';
+
+  if (!checkCookieString(cookie, LEVEL_COOKIE))	/* unknown file format */
+  {
+    Error(ERR_WARN, "unknown format of level file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  if ((level.file_version = getFileVersionFromCookieString(cookie)) == -1)
+  {
+    Error(ERR_WARN, "unsupported version of level file '%s'", filename);
+    fclose(file);
+    return;
+  }
+
+  if (level.file_version < FILE_VERSION_1_2)
+  {
+    /* level files from versions before 1.2.0 without chunk structure */
+    LoadLevel_HEAD(&level, file);
+    LoadLevel_BODY(&level, file);
+  }
+  else
+  {
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk, "HEAD") || chunk_length != LEVEL_HEADER_SIZE)
+    {
+      Error(ERR_WARN, "wrong 'HEAD' chunk of level file '%s'", filename);
+      fclose(file);
+      return;
+    }
+
+    LoadLevel_HEAD(&level, file);
+
+    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+
+    /* look for optional author chunk */
+    if (strcmp(chunk, "AUTH") == 0 && chunk_length == MAX_LEVEL_AUTHOR_LEN)
+    {
+      LoadLevel_AUTH(&level, file);
+
+      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+    }
+
+    /* look for optional content chunk */
+    if (strcmp(chunk, "CONT") == 0 &&
+	chunk_length == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
+    {
+      LoadLevel_CONT(&level, file);
+
+      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+    }
+
+    /* next check body chunk identifier and chunk length */
+    if (strcmp(chunk, "BODY") != 0 || chunk_length != lev_fieldx * lev_fieldy)
+    {
+      Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
+      fclose(file);
+      return;
+    }
+
+    LoadLevel_BODY(&level, file);
+  }
+
+  fclose(file);
+
+  if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
+      IS_LEVELCLASS_USER(leveldir_current))
+  {
+    /* for user contributed and private levels, use the version of
+       the game engine the levels were created for */
+    level.game_version = level.file_version;
+
+    /* player was faster than monsters in pre-1.0 levels */
+    if (level.file_version == FILE_VERSION_1_0)
+    {
+      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
+      Error(ERR_WARN, "using high speed movement for player");
+      level.double_speed = TRUE;
+    }
+  }
+  else
+  {
+    /* always use the latest version of the game engine for all but
+       user contributed and private levels */
+    level.game_version = GAME_VERSION_ACTUAL;
+  }
+
+  /* determine border element for this level */
+  SetBorderElement();
+}
+
 void SaveLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
-  boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
+#if 0
+  boolean encoding_16bit_amoeba = FALSE;
+  boolean encoding_16bit_yamyam = FALSE;
+#endif
+  boolean encoding_16bit = FALSE;	/* default: only 8-bit elements */
   char *oldest_possible_cookie;
   FILE *file;
 

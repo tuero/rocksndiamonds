@@ -700,8 +700,8 @@ void putFile32BitInteger(FILE *file, int value, int byte_order)
   }
 }
 
-void getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length,
-		  int byte_order)
+boolean getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length,
+		     int byte_order)
 {
   const int chunk_identifier_length = 4;
 
@@ -710,6 +710,8 @@ void getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length,
 
   /* read chunk length */
   *chunk_length = getFile32BitInteger(file, byte_order);
+
+  return (feof(file) || ferror(file) ? FALSE : TRUE);
 }
 
 void putFileChunk(FILE *file, char *chunk_name, int chunk_length,

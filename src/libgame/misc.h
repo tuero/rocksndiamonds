@@ -71,7 +71,7 @@ short getFile16BitInteger(FILE *, int);
 void putFile16BitInteger(FILE *, short, int);
 int getFile32BitInteger(FILE *, int);
 void putFile32BitInteger(FILE *, int, int);
-void getFileChunk(FILE *, char *, int *, int);
+boolean getFileChunk(FILE *, char *, int *, int);
 void putFileChunk(FILE *, char *, int, int);
 char *getKeyNameFromKey(Key);
 char *getX11KeyNameFromKey(Key);
