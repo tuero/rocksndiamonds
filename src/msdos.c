@@ -920,9 +920,14 @@ void XAutoRepeatOff(Display *display)
   keyboard_auto_repeat = FALSE;
 }
 
-boolean MSDOSInitAudio(void)
+boolean MSDOSOpenAudio(void)
 {
   return allegro_init_audio();
+}
+
+boolean MSDOSCloseAudio(void)
+{
+  /* nothing to be done here */
 }
 
 void NetworkServer(int port, int serveronly)

@@ -73,7 +73,8 @@ inline boolean PointerInWindow(DrawWindow);
 inline boolean SetVideoMode(void);
 inline void ChangeVideoModeIfNeeded(void);
 
-inline struct AudioSystemInfo InitAudio(void);
+inline boolean OpenAudio(struct AudioSystemInfo *);
+inline void CloseAudio(struct AudioSystemInfo *);
 
 inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);

@@ -55,9 +55,13 @@ static void SoundServer_StopAllSounds();
 #endif
 
 #if defined(PLATFORM_UNIX)
-int OpenAudio(char *audio_device_name)
+int OpenAudioDevice(char *audio_device_name)
 {
   int audio_fd;
+
+  /* check if desired audio device is accessible */
+  if (access(sound_device_name, W_OK) != 0)
+    return -1;
 
   /* try to open audio device in non-blocking mode */
   if ((audio_fd = open(audio_device_name, O_WRONLY | O_NONBLOCK)) < 0)
@@ -70,36 +74,42 @@ int OpenAudio(char *audio_device_name)
   return audio_fd;
 }
 
-int CheckAudio(char *audio_device_name)
+void UnixOpenAudio(struct AudioSystemInfo *audio)
 {
-  int audio_fd;
-
-  if (access(audio_device_name, W_OK) != 0)
+  static char *audio_device_name[] =
   {
-    Error(ERR_WARN, "cannot access audio device - no sound");
-    return SOUND_OFF;
-  }
+    DEV_DSP,
+    DEV_AUDIO
+  };
+  int audio_fd;
+  int i;
 
-  if ((audio_fd = OpenAudio(sound_device_name)) < 0)
+  /* look for available audio devices, starting with preferred ones */
+  for (i=0; i<sizeof(audio_device_name)/sizeof(char *); i++)
+    if ((audio_fd = OpenAudioDevice(sound_device_name)) >= 0)
+      break;
+
+  if (audio_fd < 0)
   {
     Error(ERR_WARN, "cannot open audio device - no sound");
-    return SOUND_OFF;
+    return;
   }
 
   close(audio_fd);
 
-  return SOUND_AVAILABLE;
-}
-
-void UnixInitAudio(struct AudioSystemInfo *audio)
-{
-  if (!(audio->sound_available = CheckAudio(sound_device_name)))
-    return;
+  audio->sound_available = TRUE;
 
 #ifdef VOXWARE
   audio->loops_available = TRUE;
 #endif
 }
+
+void UnixCloseAudio(struct AudioSystemInfo *audio)
+{
+  if (audio->device_fd)
+    close(audio->device_fd);
+}
+
 #endif	/* PLATFORM_UNIX */
 
 void SoundServer()
@@ -194,7 +204,7 @@ void SoundServer()
 #endif
 
       if (playing_sounds ||
-	  (audio.device_fd = OpenAudio(sound_device_name)) >= 0)
+	  (audio.device_fd = OpenAudioDevice(sound_device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
@@ -357,7 +367,7 @@ void SoundServer()
       int wait_percent = 90;	/* wait 90% of the real playing time */
       int i;
 
-      if ((audio.device_fd = OpenAudio(sound_device_name)) >= 0)
+      if ((audio.device_fd = OpenAudioDevice(sound_device_name)) >= 0)
       {
 	playing_sounds = 1;
 

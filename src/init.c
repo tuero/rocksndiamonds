@@ -142,7 +142,7 @@ void InitSound()
 {
   int i;
 
-  audio = InitAudio();
+  OpenAudio(&audio);
 
   for(i=0; i<NUM_SOUNDS; i++)
   {

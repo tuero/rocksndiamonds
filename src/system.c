@@ -234,33 +234,45 @@ inline void ChangeVideoModeIfNeeded(void)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline struct AudioSystemInfo InitAudio(void)
+inline boolean OpenAudio(struct AudioSystemInfo *audio)
 {
-  struct AudioSystemInfo audio;
-
-  audio.sound_available = FALSE;
-  audio.loops_available = FALSE;
-  audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
-  audio.soundserver_pid = 0;
-  audio.device_fd = 0;
+  audio->sound_available = FALSE;
+  audio->loops_available = FALSE;
+  audio->soundserver_pipe[0] = audio->soundserver_pipe[1] = 0;
+  audio->soundserver_pid = 0;
+  audio->device_fd = 0;
 
 #if defined(TARGET_SDL)
-  if (SDLInitAudio())
+  if (SDLOpenAudio())
   {
-    audio.sound_available = TRUE;
-    audio.loops_available = TRUE;
+    audio->sound_available = TRUE;
+    audio->loops_available = TRUE;
   }
 #elif defined(PLATFORM_MSDOS)
-  if (MSDOSInitAudio())
+  if (MSDOSOpenAudio())
   {
-    audio.sound_available = TRUE;
-    audio.loops_available = TRUE;
+    audio->sound_available = TRUE;
+    audio->loops_available = TRUE;
   }
 #elif defined(PLATFORM_UNIX)
-  UnixInitAudio(&audio);
+  UnixOpenAudio(audio);
 #endif
 
-  return audio;
+  return audio->sound_available;
+}
+
+inline void CloseAudio(struct AudioSystemInfo *audio)
+{
+#if defined(TARGET_SDL)
+  SDLCloseAudio();
+#elif defined(PLATFORM_MSDOS)
+  MSDOSCloseAudio();
+#elif defined(PLATFORM_UNIX)
+  UnixCloseAudio(audio);
+#endif
+
+  audio->sound_available = FALSE;
+  audio->loops_available = FALSE;
 }
 
 

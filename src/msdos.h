@@ -704,7 +704,9 @@ Bool XQueryPointer(Display *, Window, Window *, Window *, int *, int *,
 void XAutoRepeatOn(Display *);
 void XAutoRepeatOff(Display *);
 
-boolean MSDOSInitAudio(void);
+boolean MSDOSOpenAudio(void);
+boolean MSDOSCloseAudio(void);
+
 void NetworkServer(int, int);
 
 #endif /* MSDOS_H */

@@ -90,22 +90,14 @@ extern void ioctl(long, long, void *);
 #define SND_PATH	"./sounds"
 #endif
 
-#define DEV_AUDIO	"/dev/audio"
 #define DEV_DSP		"/dev/dsp"
+#define DEV_AUDIO	"/dev/audio"
+#define DEV_AUDIOCTL	"/dev/audioCtl"
 
 #ifdef	VOXWARE
 #define SOUND_DEVICE   	DEV_DSP
 #else
 #define SOUND_DEVICE	DEV_AUDIO
-#endif
-
-#define SOUND_OFF	0
-#define	SOUND_AVAILABLE	1
-
-#ifdef NO_SOUNDS
-#define SOUND_STATUS	SOUND_OFF
-#else
-#define SOUND_STATUS	SOUND_AVAILABLE
 #endif
 
 struct SoundHeader_SUN
@@ -161,9 +153,8 @@ struct SoundControl
 };
 
 /* general sound functions */
-int OpenAudio(char *);
-int CheckAudio(char *);
-void UnixInitAudio(struct AudioSystemInfo *);
+void UnixOpenAudio(struct AudioSystemInfo *);
+void UnixCloseAudio(struct AudioSystemInfo *);
 
 /* sound server functions */ 
 void SoundServer(void);

@@ -183,7 +183,7 @@ inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
 }
 
-inline boolean SDLInitAudio(void)
+inline boolean SDLOpenAudio(void)
 {
   if (SDL_Init(SDL_INIT_AUDIO) < 0)
   {
@@ -201,6 +201,14 @@ inline boolean SDLInitAudio(void)
   Mix_VolumeMusic(SDL_MIX_MAXVOLUME / 4);
 
   return TRUE;
+}
+
+inline void SDLCloseAudio(void)
+{
+  Mix_HaltMusic();
+  Mix_HaltChannel(-1);
+
+  Mix_CloseAudio();
 }
 
 #endif /* TARGET_SDL */
