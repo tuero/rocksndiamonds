@@ -1534,16 +1534,11 @@ void Explode(int ex, int ey, int phase, int mode)
 	RemoveMovingField(x, y);
       }
 
-#if 1
       if ((IS_INDESTRUCTIBLE(element) &&
 	   (game.engine_version < VERSION_IDENT(2,2,0) ||
 	    (!IS_WALKABLE_OVER(element) && !IS_WALKABLE_UNDER(element)))) ||
 	  element == EL_FLAMES)
 	continue;
-#else
-      if (IS_INDESTRUCTIBLE(element) || element == EL_FLAMES)
-        continue;
-#endif
 
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)))
       {
@@ -1557,25 +1552,13 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
       }
 
-#if 1
       /* save walkable background elements while explosion on same tile */
       if (IS_INDESTRUCTIBLE(element))
 	Back[x][y] = element;
-#endif
 
       /* ignite explodable elements reached by other explosion */
       if (element == EL_EXPLOSION)
 	element = Store2[x][y];
-
-#if 0
-      else if (IS_INDESTRUCTIBLE(Store2[x][y]))	/* hard element under bomb */
-	element = Store2[x][y];
-#endif
-
-#if 0
-      else if (IS_INDESTRUCTIBLE(Store[x][y]))	/* hard element under bomb */
-	element = Store[x][y];
-#endif
 
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
       {
@@ -1599,18 +1582,6 @@ void Explode(int ex, int ey, int phase, int mode)
 	if (game.emulation == EMU_SUPAPLEX)
 	  Store[x][y] = EL_EMPTY;
       }
-#if 0
-      else if (IS_INDESTRUCTIBLE(Store[x][y]))
-	;
-#endif
-#if 0
-      else if (IS_INDESTRUCTIBLE(element))
-	Store[x][y] = element;
-#endif
-#if 0
-      else if (IS_INDESTRUCTIBLE(element) && IS_ACCESSIBLE(element))
-	Store[x][y] = element;
-#endif
       else if (center_element == EL_MOLE)
 	Store[x][y] = EL_EMERALD_RED;
       else if (center_element == EL_PENGUIN)
@@ -1641,31 +1612,8 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_PEARL;
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
-#if 1
-#if 0
-#if 0
-      else if (IS_INDESTRUCTIBLE(element) && IS_ACCESSIBLE(element))
-	Store[x][y] = element;
-#else
-      else if (IS_INDESTRUCTIBLE(element))
-	Store[x][y] = element;
-#endif
-#endif
       else
 	Store[x][y] = EL_EMPTY;
-#else
-
-#if 0
-      else if (IS_PFORTE(element))
-	Store[x][y] = element;
-      else
-	Store[x][y] = EL_EMPTY;
-#else
-      else if (!IS_PFORTE(Store[x][y]))
-	Store[x][y] = EL_EMPTY;
-#endif
-
-#endif
 
       if (x != ex || y != ey ||
 	  center_element == EL_AMOEBA_TO_DIAMOND || mode == EX_BORDER)
@@ -1736,11 +1684,9 @@ void Explode(int ex, int ey, int phase, int mode)
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
 
-#if 1
     if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
       element = Feld[x][y] = Back[x][y];
     Back[x][y] = 0;
-#endif
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
@@ -1762,7 +1708,6 @@ void Explode(int ex, int ey, int phase, int mode)
     if (phase == delay)
       DrawLevelFieldCrumbledSand(x, y);
 
-#if 1
     if (IS_WALKABLE_OVER(Back[x][y]))
     {
       DrawLevelElement(x, y, Back[x][y]);
@@ -1775,15 +1720,6 @@ void Explode(int ex, int ey, int phase, int mode)
     }
     else if (!IS_WALKABLE_INSIDE(Back[x][y]))
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-#else
-    if (IS_PFORTE(Store[x][y]))
-    {
-      DrawLevelElement(x, y, Store[x][y]);
-      DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
-    }
-    else
-      DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-#endif
   }
 }
 
@@ -1909,6 +1845,26 @@ void SplashAcid(int x, int y)
 	 !CAN_FALL(MovingOrBlocked2Element(x+1, y-1))))
       Feld[x+1][y] = EL_ACID_SPLASH_RIGHT;
   }
+}
+
+static int ChangeElementOnPlayfield(int element_old, int element_new)
+{
+  int x, y;
+  int num_changes = 0;
+
+  for(y=0; y<lev_fieldy; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (Feld[x][y] == element_old)
+      {
+	Feld[x][y] = element_new;
+	num_changes++;
+      }
+    }
+  }
+
+  return num_changes;
 }
 
 static void InitBeltMovement()
@@ -2201,7 +2157,11 @@ static void ActivateTimegateSwitch(int x, int y)
 	  element == EL_TIMEGATE_CLOSING)
       {
 	Feld[xx][yy] = EL_TIMEGATE_OPENING;
+#if 1
+	PlaySoundLevelElementAction(xx, yy, Feld[xx][yy], ACTION_OPENING);
+#else
 	PlaySoundLevel(xx, yy, SND_TIMEGATE_OPENING);
+#endif
       }
 
       /*
@@ -5695,13 +5655,8 @@ void KillHero(struct PlayerInfo *player)
   if (!player->active)
     return;
 
-#if 1
   /* remove accessible field at the player's position */
   Feld[jx][jy] = EL_EMPTY;
-#else
-  if (IS_PFORTE(Feld[jx][jy]))
-    Feld[jx][jy] = EL_EMPTY;
-#endif
 
   /* deactivate shield (else Bang()/Explode() would not work right) */
   player->shield_normal_time_left = 0;
@@ -5957,6 +5912,8 @@ int DigField(struct PlayerInfo *player,
     {
       int key_nr = element - EL_KEY_1;
       int graphic = el2edimg(element);
+      int element_old, element_new;
+      int num_changes;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5966,6 +5923,34 @@ int DigField(struct PlayerInfo *player,
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
+
+      element_old = EL_GATE_1_CLOSED + key_nr;
+      element_new = EL_GATE_1_OPEN + key_nr;
+      num_changes = ChangeElementOnPlayfield(element_old, element_new);
+      if (num_changes > 0)
+	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+      element_old = EL_GATE_1_GRAY_CLOSED + key_nr;
+      element_new = EL_GATE_1_GRAY_OPEN + key_nr;
+      num_changes = ChangeElementOnPlayfield(element_old, element_new);
+      if (num_changes > 0)
+	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+      if (game.engine_version < VERSION_IDENT(2,2,0))
+      {
+	element_old = EL_EM_GATE_1_CLOSED + key_nr;
+	element_new = EL_EM_GATE_1_OPEN + key_nr;
+	num_changes = ChangeElementOnPlayfield(element_old, element_new);
+	if (num_changes > 0)
+	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+	element_old = EL_EM_GATE_1_GRAY_CLOSED + key_nr;
+	element_new = EL_EM_GATE_1_GRAY_OPEN + key_nr;
+	num_changes = ChangeElementOnPlayfield(element_old, element_new);
+	if (num_changes > 0)
+	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+      }
+
       break;
     }
 
@@ -5976,6 +5961,8 @@ int DigField(struct PlayerInfo *player,
     {
       int key_nr = element - EL_EM_KEY_1;
       int graphic = el2edimg(EL_KEY_1 + key_nr);
+      int element_old, element_new;
+      int num_changes;
 
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
@@ -5985,6 +5972,34 @@ int DigField(struct PlayerInfo *player,
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
+
+      element_old = EL_EM_GATE_1_CLOSED + key_nr;
+      element_new = EL_EM_GATE_1_OPEN + key_nr;
+      num_changes = ChangeElementOnPlayfield(element_old, element_new);
+      if (num_changes > 0)
+	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+      element_old = EL_EM_GATE_1_GRAY_CLOSED + key_nr;
+      element_new = EL_EM_GATE_1_GRAY_OPEN + key_nr;
+      num_changes = ChangeElementOnPlayfield(element_old, element_new);
+      if (num_changes > 0)
+	PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+      if (game.engine_version < VERSION_IDENT(2,2,0))
+      {
+	element_old = EL_GATE_1_CLOSED + key_nr;
+	element_new = EL_GATE_1_OPEN + key_nr;
+	num_changes = ChangeElementOnPlayfield(element_old, element_new);
+	if (num_changes > 0)
+	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+
+	element_old = EL_GATE_1_GRAY_CLOSED + key_nr;
+	element_new = EL_GATE_1_GRAY_OPEN + key_nr;
+	num_changes = ChangeElementOnPlayfield(element_old, element_new);
+	if (num_changes > 0)
+	  PlaySoundLevelElementAction(x, y, element_old, ACTION_OPENING);
+      }
+
       break;
     }
 
@@ -6155,28 +6170,34 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);
       break;
 
-    case EL_GATE_1:
-    case EL_GATE_2:
-    case EL_GATE_3:
-    case EL_GATE_4:
+    case EL_GATE_1_OPEN:
+    case EL_GATE_2_OPEN:
+    case EL_GATE_3_OPEN:
+    case EL_GATE_4_OPEN:
+#if 0
       if (!player->key[element - EL_GATE_1])
 	return MF_NO_ACTION;
+#endif
       break;
 
-    case EL_GATE_1_GRAY:
-    case EL_GATE_2_GRAY:
-    case EL_GATE_3_GRAY:
-    case EL_GATE_4_GRAY:
+    case EL_GATE_1_GRAY_OPEN:
+    case EL_GATE_2_GRAY_OPEN:
+    case EL_GATE_3_GRAY_OPEN:
+    case EL_GATE_4_GRAY_OPEN:
+#if 0
       if (!player->key[element - EL_GATE_1_GRAY])
 	return MF_NO_ACTION;
+#endif
       break;
 
-    case EL_EM_GATE_1:
-    case EL_EM_GATE_2:
-    case EL_EM_GATE_3:
-    case EL_EM_GATE_4:
+    case EL_EM_GATE_1_OPEN:
+    case EL_EM_GATE_2_OPEN:
+    case EL_EM_GATE_3_OPEN:
+    case EL_EM_GATE_4_OPEN:
+#if 0
       if (!player->key[element - EL_EM_GATE_1])
 	return MF_NO_ACTION;
+#endif
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
@@ -6184,15 +6205,21 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
+#if 1
+      PlaySoundLevelAction(x, y, ACTION_PASSING);
+#else
       PlaySoundLevel(x, y, SND_CLASS_GATE_PASSING);
+#endif
       break;
 
-    case EL_EM_GATE_1_GRAY:
-    case EL_EM_GATE_2_GRAY:
-    case EL_EM_GATE_3_GRAY:
-    case EL_EM_GATE_4_GRAY:
+    case EL_EM_GATE_1_GRAY_OPEN:
+    case EL_EM_GATE_2_GRAY_OPEN:
+    case EL_EM_GATE_3_GRAY_OPEN:
+    case EL_EM_GATE_4_GRAY_OPEN:
+#if 0
       if (!player->key[element - EL_EM_GATE_1_GRAY])
 	return MF_NO_ACTION;
+#endif
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 

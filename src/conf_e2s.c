@@ -257,7 +257,7 @@ element_to_sound[] =
     SND_CLASS_KEY_COLLECTING
   },
   {
-    EL_GATE_1, TRUE,				ACTION_PASSING,
+    EL_GATE_1_CLOSED, TRUE,			ACTION_PASSING,
     SND_CLASS_GATE_PASSING
   },
   {
