@@ -873,7 +873,7 @@ inline void SDLOpenAudio(void)
   }
 
   if (Mix_OpenAudio(DEFAULT_AUDIO_SAMPLE_RATE, AUDIO_S16,
-		    AUDIO_STEREO_CHANNELS,
+		    AUDIO_NUM_CHANNELS_STEREO,
 		    DEFAULT_AUDIO_FRAGMENT_SIZE) < 0)
   {
     Error(ERR_WARN, "Mix_OpenAudio() failed: %s", SDL_GetError());
@@ -885,8 +885,8 @@ inline void SDLOpenAudio(void)
   audio.loops_available = TRUE;
   audio.sound_enabled = TRUE;
 
-  /* determine number of available channels */
-  audio.channels = Mix_AllocateChannels(MIX_CHANNELS);
+  /* set number of available mixer channels */
+  audio.channels = Mix_AllocateChannels(NUM_MIXER_CHANNELS);
 
   /* reserve first channel for music loops */
   if (Mix_ReserveChannels(1) == 1)

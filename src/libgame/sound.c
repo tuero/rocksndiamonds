@@ -55,7 +55,7 @@ static struct AudioFormatInfo afmt =
 };
 
 static int playing_sounds = 0;
-static struct SoundControl playlist[MAX_SOUNDS_PLAYING];
+static struct SoundControl playlist[NUM_MIXER_CHANNELS];
 static struct SoundControl emptySoundControl =
 {
   -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE, 0,0, 0,NULL
@@ -196,10 +196,65 @@ void InitPlaylist(void)
 {
   int i;
 
-  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for(i=0; i<NUM_MIXER_CHANNELS; i++)
     playlist[i] = emptySoundControl;
   playing_sounds = 0;
 }
+
+#if 0
+static void HandleSoundRequest(struct SoundControl snd_ctrl)
+{
+  int i;
+
+  if (snd_ctrl.fade_sound)
+  {
+    if (!playing_sounds)
+      continue;
+
+    if (snd_ctrl.music)
+      playlist[audio.music_channel].fade_sound = TRUE;
+    else
+      for(i=0; i<NUM_MIXER_CHANNELS; i++)
+	if (snd_ctrl.stop_all_sounds ||
+	    (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr))
+	  playlist[i].fade_sound = TRUE;
+  }
+  else if (snd_ctrl.stop_all_sounds)
+  {
+    if (!playing_sounds)
+      continue;
+
+    for(i=0; i<NUM_MIXER_CHANNELS; i++)
+      playlist[i] = emptySoundControl;
+    playing_sounds = 0;
+
+    close(audio.device_fd);
+  }
+  else if (snd_ctrl.stop_sound)
+  {
+    if (!playing_sounds)
+      continue;
+
+    if (snd_ctrl.music)
+    {
+      playlist[audio.music_channel] = emptySoundControl;
+      playing_sounds--;
+    }
+
+    for(i=0; i<NUM_MIXER_CHANNELS; i++)
+    {
+      if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
+      {
+	playlist[i] = emptySoundControl;
+	playing_sounds--;
+      }
+    }
+
+    if (!playing_sounds)
+      close(audio.device_fd);
+  }
+}
+#endif
 
 void StartSoundserver(void)
 {
@@ -313,6 +368,10 @@ void SoundServer(void)
 
 #if defined(AUDIO_STREAMING_DSP)
 
+#if 0
+    HandleSoundRequest(snd_ctrl);
+#else
+
     if (snd_ctrl.fade_sound)
     {
       if (!playing_sounds)
@@ -321,7 +380,7 @@ void SoundServer(void)
       if (snd_ctrl.music)
 	playlist[audio.music_channel].fade_sound = TRUE;
       else
-	for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+	for(i=0; i<NUM_MIXER_CHANNELS; i++)
 	  if (snd_ctrl.stop_all_sounds ||
 	      (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr))
 	    playlist[i].fade_sound = TRUE;
@@ -331,7 +390,7 @@ void SoundServer(void)
       if (!playing_sounds)
 	continue;
 
-      for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+      for(i=0; i<NUM_MIXER_CHANNELS; i++)
 	playlist[i] = emptySoundControl;
       playing_sounds = 0;
 
@@ -344,11 +403,14 @@ void SoundServer(void)
 
       if (snd_ctrl.music)
       {
-	playlist[audio.music_channel] = emptySoundControl;
-	playing_sounds--;
+	if (playlist[audio.music_channel].active)
+	{
+	  playlist[audio.music_channel] = emptySoundControl;
+	  playing_sounds--;
+	}
       }
 
-      for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+      for(i=0; i<NUM_MIXER_CHANNELS; i++)
       {
 	if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
 	{
@@ -360,6 +422,7 @@ void SoundServer(void)
       if (!playing_sounds)
 	close(audio.device_fd);
     }
+#endif
 
     if (playing_sounds || snd_ctrl.active)
     {
@@ -391,7 +454,7 @@ void SoundServer(void)
 	  memset(premix_last_buffer, 0,
 		 max_sample_size * (stereo ? 2 : 1) * sizeof(long));
 
-	  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+	  for(i=0; i<NUM_MIXER_CHANNELS; i++)
 	  {
 	    void *sample_ptr;
 	    int sample_len;
@@ -603,7 +666,7 @@ static void sound_handler(struct SoundControl snd_ctrl)
     if (!playing_sounds)
       return;
 
-    for (i=0; i<MAX_SOUNDS_PLAYING; i++)
+    for (i=0; i<NUM_MIXER_CHANNELS; i++)
       if ((snd_ctrl.stop_all_sounds ||
 	   (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr) ||
 	   (i == audio.music_channel && snd_ctrl.music)) &&
@@ -628,7 +691,7 @@ static void sound_handler(struct SoundControl snd_ctrl)
     SoundServer_StopSound(snd_ctrl);
   }
 
-  for (i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for (i=0; i<NUM_MIXER_CHANNELS; i++)
   {
     if (!playlist[i].active || playlist[i].loop)
       continue;
@@ -647,6 +710,63 @@ static void sound_handler(struct SoundControl snd_ctrl)
     SoundServer_InsertNewSound(snd_ctrl);
 }
 #endif /* PLATFORM_MSDOS */
+
+#if 0
+#if defined(TARGET_SDL)
+static void sound_handler_SDL(struct SoundControl snd_ctrl)
+{
+  int i;
+
+  if (snd_ctrl.fade_sound)
+  {
+    if (!playing_sounds)
+      return;
+
+    for (i=0; i<NUM_MIXER_CHANNELS; i++)
+      if ((snd_ctrl.stop_all_sounds ||
+	   (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr) ||
+	   (i == audio.music_channel && snd_ctrl.music)) &&
+	  !playlist[i].fade_sound)
+      {
+	playlist[i].fade_sound = TRUE;
+	if (voice_check(playlist[i].voice))
+	  voice_ramp_volume(playlist[i].voice, 1000, 0);
+	playlist[i].loop = PSND_NO_LOOP;
+      }
+  }
+  else if (snd_ctrl.stop_all_sounds)
+  {
+    if (!playing_sounds)
+      return;
+    SoundServer_StopAllSounds();
+  }
+  else if (snd_ctrl.stop_sound)
+  {
+    if (!playing_sounds)
+      return;
+    SoundServer_StopSound(snd_ctrl);
+  }
+
+  for (i=0; i<NUM_MIXER_CHANNELS; i++)
+  {
+    if (!playlist[i].active || playlist[i].loop)
+      continue;
+
+    playlist[i].playingpos = voice_get_position(playlist[i].voice);
+    playlist[i].volume = voice_get_volume(playlist[i].voice);
+    if (playlist[i].playingpos == -1 || !playlist[i].volume)
+    {
+      deallocate_voice(playlist[i].voice);
+      playlist[i] = emptySoundControl;
+      playing_sounds--;
+    }
+  }
+
+  if (snd_ctrl.active)
+    SoundServer_InsertNewSound(snd_ctrl);
+}
+#endif /* TARGET_SDL */
+#endif
 
 #if !defined(PLATFORM_WIN32)
 static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
@@ -668,12 +788,32 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     return;
   }
 
+#if 0
+  printf("-> %d\n", playing_sounds);
+#endif
+
+  if (playing_sounds == NUM_MIXER_CHANNELS)
+  {
+    for (i=0; i<NUM_MIXER_CHANNELS; i++)
+    {
+      if (playlist[i].data_ptr == NULL)
+      {
+#if 1
+	printf("THIS SHOULD NEVER HAPPEN! [%d]\n", i);
+#endif
+
+	playlist[i] = emptySoundControl;
+	playing_sounds--;
+      }
+    }
+  }
+
   /* if playlist is full, remove oldest sound */
-  if (playing_sounds == MAX_SOUNDS_PLAYING)
+  if (playing_sounds == NUM_MIXER_CHANNELS)
   {
     int longest = 0, longest_nr = 0;
 
-    for (i=0; i<MAX_SOUNDS_PLAYING; i++)
+    for (i=0; i<NUM_MIXER_CHANNELS; i++)
     {
 #if !defined(PLATFORM_MSDOS)
       int actual = 100 * playlist[i].playingpos / playlist[i].data_len;
@@ -696,14 +836,14 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   }
 
   /* check if sound is already being played (and how often) */
-  for (k=0,i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for (k=0,i=0; i<NUM_MIXER_CHANNELS; i++)
     if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr)
       k++;
 
   /* restart loop sounds only if they are just fading out */
   if (k >= 1 && snd_ctrl.loop)
   {
-    for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+    for(i=0; i<NUM_MIXER_CHANNELS; i++)
     {
       if (i != audio.music_channel && playlist[i].nr == snd_ctrl.nr &&
 	  playlist[i].fade_sound)
@@ -727,7 +867,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     int longest = 0, longest_nr = 0;
 
     /* look for oldest equal sound */
-    for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+    for(i=0; i<NUM_MIXER_CHANNELS; i++)
     {
       int actual;
 
@@ -757,7 +897,7 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
   }
 
   /* add new sound to playlist */
-  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for(i=0; i<NUM_MIXER_CHANNELS; i++)
   {
     if (!playlist[i].active ||
 	(snd_ctrl.music && i == audio.music_channel))
@@ -765,6 +905,25 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
       snd_ctrl.data_ptr = snd_info->data_ptr;
       snd_ctrl.data_len = snd_info->data_len;
       snd_ctrl.format   = snd_info->format;
+
+#if 1
+      if (snd_info->data_len == 0)
+      {
+	printf("THIS SHOULD NEVER HAPPEN! [snd_info->data_len == 0]\n");
+      }
+#endif
+
+#if 1
+      if (snd_ctrl.music && i == audio.music_channel && playlist[i].active)
+      {
+	printf("THIS SHOULD NEVER HAPPEN! [adding music twice]\n");
+
+#if 1
+	playlist[i] = emptySoundControl;
+	playing_sounds--;
+#endif
+      }
+#endif
 
       playlist[i] = snd_ctrl;
       playing_sounds++;
@@ -793,7 +952,7 @@ void SoundServer_FadeSound(int nr)
   if (!playing_sounds)
     return;
 
-  for(i=0;i<MAX_SOUNDS_PLAYING;i++)
+  for(i=0;i<NUM_MIXER_CHANNELS;i++)
     if (snd_ctrl.stop_all_sounds || playlist[i].nr == snd_ctrl.nr)
       playlist[i].fade_sound = TRUE;
 }
@@ -809,7 +968,7 @@ static void SoundServer_StopSound(struct SoundControl snd_ctrl)
   if (!playing_sounds)
     return;
 
-  for(i=0; i<MAX_SOUNDS_PLAYING; i++)
+  for(i=0; i<NUM_MIXER_CHANNELS; i++)
   {
     if ((i == audio.music_channel && snd_ctrl.music) ||
 	(i != audio.music_channel && playlist[i].nr == nr))
@@ -833,13 +992,13 @@ static void SoundServer_StopAllSounds()
 {
   int i;
 
-  for(i=0;i<MAX_SOUNDS_PLAYING;i++)
+  for(i=0; i<NUM_MIXER_CHANNELS; i++)
   {
 #if defined(PLATFORM_MSDOS)
     voice_set_volume(playlist[i].voice, 0);
     deallocate_voice(playlist[i].voice);
 #endif
-    playlist[i]=emptySoundControl;
+    playlist[i] = emptySoundControl;
   }
   playing_sounds = 0;
 
@@ -1243,13 +1402,13 @@ static void deleteSoundEntry(SoundInfo **snd_info)
   {
     char *filename = (*snd_info)->source_filename;
 
-#if 1
+#if 0
     printf("[decrementing reference counter of sound '%s']\n", filename);
 #endif
 
     if (--(*snd_info)->num_references <= 0)
     {
-#if 1
+#if 0
       printf("[deleting sound '%s']\n", filename);
 #endif
 
@@ -1497,8 +1656,11 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop_type)
 #endif
 
 #if defined(TARGET_SDL)
-  Mix_Volume(-1, SOUND_MAX_VOLUME);
-  Mix_PlayChannel(-1, Sound[nr]->data_ptr, (loop_type ? -1 : 0));
+  if (Sound[nr])
+  {
+    Mix_Volume(-1, SOUND_MAX_VOLUME);
+    Mix_PlayChannel(-1, Sound[nr]->data_ptr, (loop_type ? -1 : 0));
+  }
 #elif defined(PLATFORM_UNIX)
   if (audio.soundserver_pid == 0)	/* we are child process */
     return;
@@ -1616,7 +1778,7 @@ void StopSoundExt(int nr, int method)
     audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
-#else
+#else /* PLATFORM_MSDOS */
   sound_handler(snd_ctrl);
 #endif
 }
@@ -1646,12 +1808,16 @@ void deleteNodeFromList(ListNode **node_first, char *key,
   if (node_first == NULL || *node_first == NULL)
     return;
 
+#if 0
   printf("[CHECKING LIST KEY '%s' == '%s']\n",
 	 (*node_first)->key, key);
+#endif
 
   if (strcmp((*node_first)->key, key) == 0)
   {
+#if 0
     printf("[DELETING LIST ENTRY]\n");
+#endif
 
     free((*node_first)->key);
     if (destructor_function)
@@ -1780,9 +1946,9 @@ static void InitReloadSoundsOrMusic(char *set_name, int type)
 
 #if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
   if (type == SND_RELOAD_SOUNDS)
-    audio.func_reload_sounds();
+    ReloadCustomSounds();
   else
-    audio.func_reload_music();
+    ReloadCustomMusic();
 #elif defined(PLATFORM_UNIX)
   if (audio.soundserver_pid == 0)	/* we are child process */
     return;
@@ -1885,8 +2051,17 @@ void FreeAllSounds()
   if (Sound == NULL)
     return;
 
+  printf("%s: FREEING SOUNDS ...\n",
+	 audio.soundserver_pid == 0 ? "CHILD" : "PARENT");
+
   for(i=0; i<num_sounds; i++)
+    deleteSoundEntry(&Sound[i]);
+  /*
     FreeSound(Sound[i]);
+  */
+
+  printf("%s: FREEING SOUNDS -- DONE\n",
+	 audio.soundserver_pid == 0 ? "CHILD" : "PARENT");
 
   free(Sound);
 

@@ -56,7 +56,7 @@ boolean wait_for_vsync;
 
 /*
 extern int playing_sounds;
-extern struct SoundControl playlist[MAX_SOUNDS_PLAYING];
+extern struct SoundControl playlist[NUM_MIXER_CHANNELS];
 extern struct SoundControl emptySoundControl;
 */
 
@@ -92,7 +92,7 @@ static void allegro_init_drivers()
 
 static boolean allegro_init_audio()
 {
-  reserve_voices(MAX_SOUNDS_PLAYING, 0);
+  reserve_voices(NUM_MIXER_CHANNELS, 0);
 
   if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL) == -1)
     if (install_sound(DIGI_SB, MIDI_NONE, NULL) == -1)
