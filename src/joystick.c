@@ -85,7 +85,7 @@ int Joystick()
 #ifndef MSDOS
   if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
   {
-    Error(ERR_RETURN, "cannot read joystick settings - no joystick support");
+    Error(ERR_WARN, "cannot read joystick settings - no joystick support");
     joystick_status = JOYSTICK_OFF;
     return(0);
   }

@@ -151,8 +151,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     level_nr = new_level_nr;
 
+
+    /*
     if (level_nr > local_player->handicap)
       level_nr = local_player->handicap;
+    */
+
 
     DrawTextExt(drawto,gc,SX+11*32,SY+3*32,
 		int2str(level_nr,3), FS_BIG,FC_RED);
@@ -194,7 +198,15 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (num_leveldirs)
 	{
 	  game_status = CHOOSELEVEL;
+
+
+	  SaveLevelSetup();
+
+#if 0
 	  SavePlayerInfo(PLAYER_LEVEL);
+#endif
+
+
 	  DrawChooseLevel();
 	}
       }
@@ -235,7 +247,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==10)
       {
+
+	SaveLevelSetup();
+
+#if 0
 	SavePlayerInfo(PLAYER_LEVEL);
+#endif
+
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
@@ -683,13 +701,13 @@ void HandleHelpScreen(int button)
   BackToFront();
 }
 
+
+#if 0
 void CheckCheat()
 {
   int old_handicap = local_player->handicap;
 
-#if 0
   if (!strcmp(local_player->alias_name,"Artsoft"))
-#endif
     local_player->handicap = leveldir[leveldir_nr].levels-1;
 
   if (local_player->handicap != old_handicap)
@@ -698,6 +716,8 @@ void CheckCheat()
     level_nr = local_player->handicap;
   }
 }
+#endif
+
 
 void HandleTypeName(int newxpos, KeySym key)
 {
@@ -744,8 +764,21 @@ void HandleTypeName(int newxpos, KeySym key)
   {
     DrawText(SX+6*32,SY+ypos*32,local_player->alias_name,FS_BIG,FC_RED);
     DrawGraphic(xpos+6,ypos,GFX_LEERRAUM);
+
+
+    SaveSetup();
+
+
+#if 0
     SavePlayerInfo(PLAYER_SETUP);
+#endif
+
+
+
+#if 0
     CheckCheat();
+#endif
+
 
     game_status = MAINMENU;
 /*
@@ -832,9 +865,19 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     else
     {
       local_player->leveldir_nr = leveldir_nr = y-3;
+
+      SaveLevelSetup();
+
+      /*
       LoadPlayerInfo(PLAYER_LEVEL);
       SavePlayerInfo(PLAYER_SETUP);
+      */
+
+
+#if 0
       CheckCheat();
+#endif
+
 
       TapeErase();
       LoadLevelTape(level_nr);
@@ -897,6 +940,9 @@ void HandleHallOfFame(int button)
 void DrawSetupScreen()
 {
   int i;
+
+
+#if 0
   static struct setup
   {
     unsigned int bit;
@@ -920,10 +966,41 @@ void DrawSetupScreen()
     {0,			"Exit",		{"",   ""},	{0,0}},
     {0,			"Save and exit",{"",   ""},	{0,0}}
   };
+#endif
+
+  static struct setup
+  {
+    boolean *value;
+    char *text, *mode[2];
+    int color[2];
+  } setup_info[] =
+  {
+    { &setup.sound_on,	"Sound:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.sound_loops_on," Sound Loops:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.sound_music_on," Game Music:", {"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.toons_on,	"Toons:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.direct_draw_on,"Buffered gfx:",{"off","on" },{FC_BLUE,FC_YELLOW}},
+    { &setup.scroll_delay_on,"Scroll Delay:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.soft_scrolling_on,	"Soft Scroll.:",{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.fading_on,	"Fading:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.quick_doors,"Quick Doors:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { &setup.autorecord_on,"Auto-Record:",	{"on", "off"},{FC_YELLOW,FC_BLUE}},
+    { NULL,		"Input Devices",{"",   ""},	{0,0}},
+    { NULL,		"",		{"",   ""},	{0,0}},
+    { NULL,		"",		{"",   ""},	{0,0}},
+    { NULL,		"Exit",		{"",   ""},	{0,0}},
+    { NULL,		"Save and exit",{"",   ""},	{0,0}}
+  };
 
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
   DrawText(SX+16, SY+16, "SETUP",FS_BIG,FC_YELLOW);
+
+
+  /*
+  printf("setup.sound_loops_on == %d\n", setup.sound_loops_on);
+  */
+
 
   for(i=SETUP_SCREEN_POS_START;i<=SETUP_SCREEN_POS_END;i++)
   {
@@ -932,15 +1009,24 @@ void DrawSetupScreen()
     if (!(i >= SETUP_SCREEN_POS_EMPTY1 && i <= SETUP_SCREEN_POS_EMPTY2))
     {
       DrawGraphic(0,i,GFX_KUGEL_BLAU);
-      DrawText(SX+32,SY+i*32, setup[base].text, FS_BIG,FC_GREEN);
+      DrawText(SX+32,SY+i*32, setup_info[base].text, FS_BIG,FC_GREEN);
     }
 
+#if 0
     if (i < SETUP_SCREEN_POS_EMPTY1)
     {
-      int setting_bit = setup[base].bit;
+      int setting_bit = setup_info[base].bit;
       int setting_pos = ((local_player->setup & setting_bit) != 0 ? 0 : 1);
-      DrawText(SX+14*32, SY+i*32,setup[base].mode[setting_pos],
-	       FS_BIG,setup[base].color[setting_pos]);
+    }
+#endif
+
+    if (setup_info[base].value)
+    {
+      int setting_value = *setup_info[base].value;
+      int setting_pos = (setting_value != 0 ? 0 : 1);
+
+      DrawText(SX+14*32, SY+i*32,setup_info[base].mode[setting_pos],
+	       FS_BIG,setup_info[base].color[setting_pos]);
     }
   }
 
@@ -1014,97 +1100,97 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
       if (y==3 && sound_status==SOUND_AVAILABLE)
       {
-	if (SETUP_SOUND_ON(local_player->setup))
+	if (setup.sound_on)
 	{
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	  DrawText(SX+14*32, SY+(yy+1)*32,"off",FS_BIG,FC_BLUE);
 	  DrawText(SX+14*32, SY+(yy+2)*32,"off",FS_BIG,FC_BLUE);
-	  local_player->setup &= ~SETUP_SOUND_LOOPS;
-	  local_player->setup &= ~SETUP_SOUND_MUSIC;
+	  setup.sound_loops_on = FALSE;
+	  setup.sound_music_on = FALSE;
 	}
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_SOUND;
+	setup.sound_on = !setup.sound_on;
       }
       else if (y==4 && sound_loops_allowed)
       {
-	if (SETUP_SOUND_LOOPS_ON(local_player->setup))
+	if (setup.sound_loops_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	  DrawText(SX+14*32, SY+(yy-1)*32,"on ",FS_BIG,FC_YELLOW);
-	  local_player->setup |= SETUP_SOUND;
+	  setup.sound_on = TRUE;
 	}
-	local_player->setup ^= SETUP_SOUND_LOOPS;
+	setup.sound_loops_on = !setup.sound_loops_on;
       }
       else if (y==5 && sound_loops_allowed)
       {
-	if (SETUP_SOUND_MUSIC_ON(local_player->setup))
+	if (setup.sound_music_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	{
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
 	  DrawText(SX+14*32, SY+(yy-2)*32,"on ",FS_BIG,FC_YELLOW);
-	  local_player->setup |= SETUP_SOUND;
+	  setup.sound_on = TRUE;
 	}
-	local_player->setup ^= SETUP_SOUND_MUSIC;
+	setup.sound_music_on = !setup.sound_music_on;
       }
       else if (y==6)
       {
-	if (SETUP_TOONS_ON(local_player->setup))
+	if (setup.toons_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_TOONS;
+	setup.toons_on = !setup.toons_on;
       }
       else if (y==7)
       {
-	if (!SETUP_DIRECT_DRAW_ON(local_player->setup))
+	if (!setup.direct_draw_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_DIRECT_DRAW;
+	setup.direct_draw_on = !setup.direct_draw_on;
       }
       else if (y==8)
       {
-	if (SETUP_SCROLL_DELAY_ON(local_player->setup))
+	if (setup.scroll_delay_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_SCROLL_DELAY;
+	setup.scroll_delay_on = !setup.scroll_delay_on;
       }
       else if (y==9)
       {
-	if (SETUP_SOFT_SCROLL_ON(local_player->setup))
+	if (setup.soft_scrolling_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_SOFT_SCROLL;
+	setup.soft_scrolling_on = !setup.soft_scrolling_on;
       }
       else if (y==10)
       {
-	if (SETUP_FADING_ON(local_player->setup))
+	if (setup.fading_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_FADING;
+	setup.fading_on = !setup.fading_on;
       }
       else if (y==11)
       {
-	if (SETUP_QUICK_DOORS_ON(local_player->setup))
+	if (setup.quick_doors)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_QUICK_DOORS;
+	setup.quick_doors = !setup.quick_doors;
       }
       else if (y==12)
       {
-	if (SETUP_AUTO_RECORD_ON(local_player->setup))
+	if (setup.autorecord_on)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);
 	else
 	  DrawText(SX+14*32, SY+yy*32,"on ",FS_BIG,FC_YELLOW);
-	local_player->setup ^= SETUP_AUTO_RECORD;
+	setup.autorecord_on = !setup.autorecord_on;
       }
       else if (y==13)
       {
@@ -1116,7 +1202,15 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       {
         if (y==pos_end)
 	{
+
+
+	  SaveSetup();
+
+
+#if 0
 	  SavePlayerInfo(PLAYER_SETUP);
+#endif
+
 	  SaveJoystickData();
 	}
 
@@ -1958,14 +2052,12 @@ void HandleSoundButtons(int mx, int my, int button)
       if (setup.sound_music_on)
       { 
 	setup.sound_music_on = FALSE;
-	local_player->setup &= ~SETUP_SOUND_MUSIC;
 	FadeSound(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_OFF);
       }
       else if (sound_loops_allowed)
       { 
 	setup.sound_on = setup.sound_music_on = TRUE;
-	local_player->setup |= (SETUP_SOUND | SETUP_SOUND_MUSIC);
 	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_ON);
       }
@@ -1977,13 +2069,11 @@ void HandleSoundButtons(int mx, int my, int button)
       if (setup.sound_loops_on)
       { 
 	setup.sound_loops_on = FALSE;
-	local_player->setup &= ~SETUP_SOUND_LOOPS;
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_OFF);
       }
       else if (sound_loops_allowed)
       { 
 	setup.sound_on = setup.sound_loops_on = TRUE;
-	local_player->setup |= (SETUP_SOUND | SETUP_SOUND_LOOPS);
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_ON);
       }
       else
@@ -1994,13 +2084,11 @@ void HandleSoundButtons(int mx, int my, int button)
       if (setup.sound_simple_on)
       { 
 	setup.sound_simple_on = FALSE;
-	local_player->setup &= ~SETUP_SOUND;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       }
       else if (sound_status==SOUND_AVAILABLE)
       { 
 	setup.sound_on = setup.sound_simple_on = TRUE;
-	local_player->setup |= SETUP_SOUND;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_ON);
       }
       else

@@ -25,16 +25,24 @@
 
 void GetPlayerConfig()
 {
+#if 0
   int old_joystick_nr = setup.input[0].joystick_nr;
+#endif
 
-  if (sound_status==SOUND_OFF)
-    local_player->setup &= ~SETUP_SOUND;
+
+  if (sound_status == SOUND_OFF)
+    setup.sound_on = FALSE;
+
   if (!sound_loops_allowed)
   {
-    local_player->setup &= ~SETUP_SOUND_LOOPS;
-    local_player->setup &= ~SETUP_SOUND_MUSIC;
+    setup.sound_loops_on = FALSE;
+    setup.sound_music_on = FALSE;
   }
 
+  setup.sound_simple_on = setup.sound_on;
+
+
+#if 0
   setup.sound_on = setup.sound_simple_on = SETUP_SOUND_ON(local_player->setup);
   setup.sound_loops_on = SETUP_SOUND_LOOPS_ON(local_player->setup);
   setup.sound_music_on = SETUP_SOUND_MUSIC_ON(local_player->setup);
@@ -61,6 +69,9 @@ void GetPlayerConfig()
     InitJoystick();
   }
 #endif
+
+#endif
+
 }
 
 void InitGame()
@@ -572,13 +583,22 @@ void GameWon()
     SaveLevelTape(tape.level_nr);	/* Ask to save tape */
   }
 
+
+  /*
   if (level_nr == local_player->handicap &&
       level_nr < leveldir[leveldir_nr].levels-1)
   { 
     local_player->handicap++; 
     bumplevel = TRUE;
+
+
+#if 0
     SavePlayerInfo(PLAYER_LEVEL);
+#endif
+
   }
+  */
+
 
   if ((hi_pos=NewHiScore()) >= 0) 
   {

@@ -145,7 +145,7 @@ static void StartNetworkServer(int port)
       exit(0);
 
     case -1:
-      Error(ERR_RETURN,
+      Error(ERR_WARN,
 	    "cannot create network server process - no network games");
       options.network = FALSE;
       return;
@@ -303,7 +303,7 @@ void SendToServer_MovePlayer(byte player_action)
 
 static void Handle_OP_BAD_PROTOCOL_VERSION()
 {
-  Error(ERR_RETURN, "protocol version mismatch");
+  Error(ERR_WARN, "protocol version mismatch");
   Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
 	buf[2], buf[3], PROT_VERS_1, PROT_VERS_2, PROT_VERS_3);
 }
@@ -480,13 +480,21 @@ static void Handle_OP_START_PLAYING()
 
 
   if (strcmp(leveldir[new_leveldir_nr].name, new_leveldir_name) != 0)
-    Error(ERR_RETURN, "no such level directory: '%s'",new_leveldir_name);
+    Error(ERR_WARN, "no such level directory: '%s'",new_leveldir_name);
 
   leveldir_nr = new_leveldir_nr;
 
   local_player->leveldir_nr = leveldir_nr;
+
+  /*
+  SaveLevelSetup();
+  */
+
+  /*
   LoadPlayerInfo(PLAYER_LEVEL);
   SavePlayerInfo(PLAYER_SETUP);
+  */
+
 
   level_nr = new_level_nr;
 

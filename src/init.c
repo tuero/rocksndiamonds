@@ -134,15 +134,19 @@ void InitLevelAndPlayerInfo()
     Error(ERR_EXIT, NULL);
 
 
+  LoadSetup();				/* global setup info */
+  LoadLevelSetup();			/* info about last played level */
 
-  LoadSetup();
 
-
-
+#if 0
   LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
+#endif
 
+
+#if 0
   /* after LoadPlayerInfo(), because it overwrites 'local_player' */
+#endif
   for (i=0; i<MAX_PLAYERS; i++)
   {
     stored_player[i].connected = FALSE;
@@ -181,14 +185,14 @@ void InitSound()
 #ifndef MSDOS
   if (access(sound_device_name,W_OK)<0)
   {
-    Error(ERR_RETURN, "cannot access sound device - no sounds");
+    Error(ERR_WARN, "cannot access sound device - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
 
   if ((sound_device = open(sound_device_name,O_WRONLY))<0)
   {
-    Error(ERR_RETURN, "cannot open sound device - no sounds");
+    Error(ERR_WARN, "cannot open sound device - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
@@ -198,11 +202,19 @@ void InitSound()
 
 #ifdef VOXWARE
   sound_loops_allowed = TRUE;
+
+  /*
   setup.sound_loops_on = TRUE;
+  */
+
 #endif
 #else
   sound_loops_allowed = TRUE;
+
+  /*
   setup.sound_loops_on = TRUE;
+  */
+
 #endif
 
   for(i=0; i<NUM_SOUNDS; i++)
@@ -227,14 +239,14 @@ void InitSoundServer()
 #ifndef MSDOS
   if (pipe(sound_pipe)<0)
   {
-    Error(ERR_RETURN, "cannot create pipe - no sounds");
+    Error(ERR_WARN, "cannot create pipe - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
 
   if ((sound_process_id = fork()) < 0)
   {       
-    Error(ERR_RETURN, "cannot create sound server process - no sounds");
+    Error(ERR_WARN, "cannot create sound server process - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
@@ -263,7 +275,7 @@ void InitJoystick()
 #ifndef MSDOS
   if (access(joystick_device_name[joystick_nr], R_OK) < 0)
   {
-    Error(ERR_RETURN, "cannot access joystick device '%s'",
+    Error(ERR_WARN, "cannot access joystick device '%s'",
 	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
@@ -272,7 +284,7 @@ void InitJoystick()
   if ((joystick_device =
        open(joystick_device_name[joystick_nr], O_RDONLY)) < 0)
   {
-    Error(ERR_RETURN, "cannot open joystick device '%s'",
+    Error(ERR_WARN, "cannot open joystick device '%s'",
 	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;

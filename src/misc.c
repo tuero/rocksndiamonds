@@ -76,7 +76,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
     delay.tv_usec = 1000 * (milliseconds_delay % 1000);
 
     if (select(0, NULL, NULL, NULL, &delay) != 0)
-      Error(ERR_RETURN, "sleep_milliseconds(): select() failed");
+      Error(ERR_WARN, "sleep_milliseconds(): select() failed");
   }
 }
 
@@ -129,12 +129,23 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
   *counter_var = actual_counter;
 }
 
-char *int2str(int ct, int nr)
+char *int2str(int number, int size)
 {
-  static char str[20];
+  static char s[40];
 
-  sprintf(str,"%09d",ct);
-  return(&str[strlen(str)-nr]);
+  if (size > 20)
+    size = 20;
+
+  if (size)
+  {
+    sprintf(s, "                    %09d", number);
+    return &s[strlen(s) - size];
+  }
+  else
+  {
+    sprintf(s, "%d", number);
+    return s;
+  }
 }
 
 unsigned int SimpleRND(unsigned int max)
@@ -318,7 +329,7 @@ void Error(int mode, char *format_str, ...)
   FILE *output_stream = stderr;
   char *process_name = "";
 
-  if (mode == ERR_EXIT_SOUNDSERVER)
+  if (mode & ERR_SOUNDSERVER)
     process_name = " sound server";
 
   if (format_str)
@@ -330,6 +341,9 @@ void Error(int mode, char *format_str, ...)
     double d_value;
 
     fprintf(output_stream, "%s%s: ", program_name, process_name);
+
+    if (mode & ERR_WARN)
+      fprintf(output_stream, "warning: ");
 
     va_start(ap, format_str);	/* ap points to first unnamed argument */
   
@@ -370,11 +384,11 @@ void Error(int mode, char *format_str, ...)
     fprintf(output_stream, "\n");
   }
   
-  if (mode == ERR_EXIT_HELP)
+  if (mode & ERR_HELP)
     fprintf(output_stream, "%s: Try option '--help' for more information.\n",
 	    program_name);
 
-  if (mode != ERR_RETURN)
+  if (mode & ERR_EXIT)
   {
     fprintf(output_stream, "%s%s: aborting\n", program_name, process_name);
     CloseAllAndExit(1);

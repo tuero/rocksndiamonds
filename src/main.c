@@ -105,6 +105,8 @@ struct SoundInfo	Sound[NUM_SOUNDS];
 struct RecordingInfo	tape;
 struct OptionInfo	options;
 struct SetupInfo	setup;
+struct SetupFileList	*setup_list = NULL;
+struct SetupFileList	*level_setup_list = NULL;
 
 struct JoystickInfo joystick[2] =
 {

@@ -16,6 +16,10 @@
 
 #include "main.h"
 
+
+
+#if 0
+
 /* names file mode: local level setup or global game setup */
 #define PLAYER_LEVEL	0
 #define PLAYER_SETUP	1
@@ -51,25 +55,44 @@
 #define SETUP_SCROLL_DELAY_ON(x)	(((x) & SETUP_SCROLL_DELAY) != 0)
 #define SETUP_SOFT_SCROLL_ON(x)		(((x) & SETUP_SOFT_SCROLL) != 0)
 
+#endif
+
+
+
 /* for LoadSetup() */
 #define MAX_LINE_LEN			1000
 #define MAX_SETUP_TOKEN_LEN		100
 #define MAX_SETUP_VALUE_LEN		100
 
 boolean CreateNewScoreFile(void);
+
+/*
 boolean CreateNewNamesFile(int);
+*/
+
 boolean LoadLevelInfo(void);
 void LoadLevel(int);
 void LoadLevelTape(int);
 void LoadScore(int);
+
+/*
 void LoadPlayerInfo(int);
+*/
+
 void SaveLevel(int);
 void SaveLevelTape(int);
 void SaveScore(int);
+
+/*
 void SavePlayerInfo(int);
+*/
+
 void LoadJoystickData(void);
 void SaveJoystickData(void);
+
 void LoadSetup(void);
+void LoadLevelSetup(void);
 void SaveSetup(void);
+void SaveLevelSetup(void);
 
 #endif

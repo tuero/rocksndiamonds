@@ -255,11 +255,11 @@ struct SetupInfo
   } input[MAX_PLAYERS];
 };
 
-struct SetupFileInfo
+struct SetupFileList
 {
   char *token;
   char *value;
-  struct SetupFileInfo *next;
+  struct SetupFileList *next;
 };
 
 struct PlayerInfo
@@ -275,8 +275,14 @@ struct PlayerInfo
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
+
+
+#if 0
   int handicap;
   unsigned int setup;
+#endif
+
+
   int leveldir_nr;
   int level_nr;
 
@@ -438,6 +444,8 @@ extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
 extern struct OptionInfo	options;
 extern struct SetupInfo		setup;
+extern struct SetupFileList	*setup_list;
+extern struct SetupFileList	*level_setup_list;
 
 extern char		*sound_name[];
 extern int		background_loop[];
@@ -1100,12 +1108,14 @@ extern int		num_bg_loops;
 #define LEVDIR_FILENAME		"ROCKS.levelinfo"
 #define JOYDAT_FILENAME		"ROCKS.joystick"
 #define SETUP_FILENAME		"ROCKS.setup"
+#define LEVELSETUP_FILENAME	"ROCKS.levelsetup"
 #else
 #define SCORE_FILENAME		"ROCKS.sco"
 #define NAMES_FILENAME		"ROCKS.nam"
 #define LEVDIR_FILENAME		"ROCKS.lev"
 #define JOYDAT_FILENAME		"ROCKS.joy"
 #define SETUP_FILENAME		"ROCKS.set"
+#define LEVELSETUP_FILENAME	"ROCKS.lvs"
 #endif
 
 #define JOYDAT_FILE		JOYDAT_PATH "/" JOYDAT_FILENAME
@@ -1129,6 +1139,7 @@ extern int		num_bg_loops;
 #define LEVELREC_COOKIE		"ROCKSNDIAMONDS_LEVELREC_FILE_VERSION_1.2"
 #define JOYSTICK_COOKIE		"ROCKSNDIAMONDS_JOYSTICK_FILE_VERSION_1.0"
 #define SETUP_COOKIE		"ROCKSNDIAMONDS_SETUP_FILE_VERSION_1.2"
+#define LEVELSETUP_COOKIE	"ROCKSNDIAMONDS_LEVELSETUP_FILE_VERSION_1.2"
 #define LEVEL_COOKIE_LEN	(strlen(LEVEL_COOKIE)+1)
 #define SCORE_COOKIE_LEN	(strlen(SCORE_COOKIE)+1)
 #define NAMES_COOKIE_LEN	(strlen(NAMES_COOKIE)+1)
@@ -1136,6 +1147,7 @@ extern int		num_bg_loops;
 #define LEVELREC_COOKIE_LEN	(strlen(LEVELREC_COOKIE)+1)
 #define JOYSTICK_COOKIE_LEN	(strlen(JOYSTICK_COOKIE)+1)
 #define SETUP_COOKIE_LEN	(strlen(SETUP_COOKIE)+1)
+#define LEVELSETUP_COOKIE_LEN	(strlen(LEVELSETUP_COOKIE)+1)
 
 #define VERSION_STRING		"1.2"
 #define GAMETITLE_STRING	"Rocks'n'Diamonds"

@@ -22,9 +22,12 @@
 #define NEW_RANDOMIZE		-1
 
 #define ERR_RETURN		0
-#define ERR_EXIT		1
-#define ERR_EXIT_HELP		2
-#define ERR_EXIT_SOUNDSERVER	3
+#define ERR_WARN		(1 << 0)
+#define ERR_EXIT		(1 << 1)
+#define ERR_HELP		(1 << 2)
+#define ERR_SOUNDSERVER		(1 << 3)
+#define ERR_EXIT_HELP		(ERR_EXIT | ERR_HELP)
+#define ERR_EXIT_SOUNDSERVER	(ERR_EXIT | ERR_SOUNDSERVER)
 
 void InitCounter(void);
 unsigned long Counter(void);

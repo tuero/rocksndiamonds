@@ -53,6 +53,10 @@ boolean CreateNewScoreFile()
   return(TRUE);
 }
 
+
+
+#if 0
+
 boolean CreateNewNamesFile(int mode)
 {
   char filename[MAX_FILENAME_LEN];
@@ -74,6 +78,9 @@ boolean CreateNewNamesFile(int mode)
   return(TRUE);
 }
 
+#endif
+
+
 boolean LoadLevelInfo()
 {
   int i;
@@ -85,14 +92,14 @@ boolean LoadLevelInfo()
 
   if (!(file=fopen(filename,"r")))
   {
-    Error(ERR_RETURN, "cannot read level info '%s'", filename);
+    Error(ERR_WARN, "cannot read level info '%s'", filename);
     return(FALSE);
   }
 
   fscanf(file,"%s\n",cookie);
   if (strcmp(cookie,LEVELDIR_COOKIE))	/* ungültiges Format? */
   {
-    Error(ERR_RETURN, "wrong format of level info file");
+    Error(ERR_WARN, "wrong format of level info file");
     fclose(file);
     return(FALSE);
   }
@@ -113,7 +120,7 @@ boolean LoadLevelInfo()
 
   if (!num_leveldirs)
   {
-    Error(ERR_RETURN, "empty level info '%s'", filename);
+    Error(ERR_WARN, "empty level info '%s'", filename);
     return(FALSE);
   }
 
@@ -131,7 +138,7 @@ void LoadLevel(int level_nr)
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if (!(file = fopen(filename,"r")))
-    Error(ERR_RETURN, "cannot read level '%s' - creating new level", filename);
+    Error(ERR_WARN, "cannot read level '%s' - creating new level", filename);
   else
   {
     fgets(cookie,LEVEL_COOKIE_LEN,file);
@@ -139,7 +146,7 @@ void LoadLevel(int level_nr)
 
     if (strcmp(cookie,LEVEL_COOKIE))	/* ungültiges Format? */
     {
-      Error(ERR_RETURN, "wrong format of level file '%s'", filename);
+      Error(ERR_WARN, "wrong format of level file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -234,7 +241,7 @@ void LoadLevelTape(int level_nr)
       levelrec_10 = TRUE;
     else if (strcmp(cookie,LEVELREC_COOKIE))	/* unknown tape format */
     {
-      Error(ERR_RETURN, "wrong format of level recording file '%s'", filename);
+      Error(ERR_WARN, "wrong format of level recording file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -284,7 +291,7 @@ void LoadLevelTape(int level_nr)
   fclose(file);
 
   if (i != tape.length)
-    Error(ERR_RETURN, "level recording file '%s' corrupted", filename);
+    Error(ERR_WARN, "level recording file '%s' corrupted", filename);
 
   tape.length_seconds = GetTapeLength();
 }
@@ -302,9 +309,9 @@ void LoadScore(int level_nr)
   if (!(file = fopen(filename,"r")))
   {
     if (!CreateNewScoreFile())
-      Error(ERR_RETURN, "cannot create score file '%s'", filename);
+      Error(ERR_WARN, "cannot create score file '%s'", filename);
     else if (!(file = fopen(filename,"r"))) 
-      Error(ERR_RETURN, "cannot read score for level %d", level_nr);
+      Error(ERR_WARN, "cannot read score for level %d", level_nr);
   }
 
   if (file)
@@ -312,7 +319,7 @@ void LoadScore(int level_nr)
     fgets(cookie,SCORE_COOKIE_LEN,file);
     if (strcmp(cookie,SCORE_COOKIE))	/* ungültiges Format? */
     {
-      Error(ERR_RETURN, "wrong format of score file '%s'", filename);
+      Error(ERR_WARN, "wrong format of score file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -341,6 +348,10 @@ void LoadScore(int level_nr)
   }
 }
 
+
+
+#if 0
+
 void LoadPlayerInfo(int mode)
 {
   int i;
@@ -350,6 +361,15 @@ void LoadPlayerInfo(int mode)
   char *login_name = GetLoginName();
   struct PlayerInfo default_player, new_player;
   int version_10_file = FALSE;
+
+
+
+  if (mode == PLAYER_SETUP)
+    LoadSetup();
+  else if (mode == PLAYER_LEVEL)
+    LoadLevelSetup();
+
+
 
   if (mode==PLAYER_LEVEL)
     sprintf(filename,"%s/%s/%s",
@@ -371,9 +391,9 @@ void LoadPlayerInfo(int mode)
   if (!(file = fopen(filename,"r")))
   {
     if (!CreateNewNamesFile(mode))
-      Error(ERR_RETURN, "cannot create names file '%s'", filename);
+      Error(ERR_WARN, "cannot create names file '%s'", filename);
     else if (!(file = fopen(filename,"r"))) 
-      Error(ERR_RETURN, "cannot read player information file '%s'", filename);
+      Error(ERR_WARN, "cannot read player information file '%s'", filename);
   }
 
   if (file)
@@ -383,7 +403,7 @@ void LoadPlayerInfo(int mode)
       version_10_file = TRUE;
     else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
     {
-      Error(ERR_RETURN, "wrong format of names file '%s'", filename);
+      Error(ERR_WARN, "wrong format of names file '%s'", filename);
       fclose(file);
       file = NULL;
     }
@@ -420,7 +440,7 @@ void LoadPlayerInfo(int mode)
 
       fclose(file);
       if (!(file = fopen(filename,"a")))
-	Error(ERR_RETURN, "cannot append new player to names file '%s'",
+	Error(ERR_WARN, "cannot append new player to names file '%s'",
 	      filename);
       else
       {
@@ -466,6 +486,10 @@ void LoadPlayerInfo(int mode)
     fclose(file);
 }
 
+#endif
+
+
+
 void SaveLevel(int level_nr)
 {
   int i,x,y;
@@ -477,7 +501,7 @@ void SaveLevel(int level_nr)
 
   if (!(file=fopen(filename,"w")))
   {
-    Error(ERR_RETURN, "cannot save level file '%s'", filename);
+    Error(ERR_WARN, "cannot save level file '%s'", filename);
     return;
   }
 
@@ -543,7 +567,7 @@ void SaveLevelTape(int level_nr)
 
   if (!(file=fopen(filename,"w")))
   {
-    Error(ERR_RETURN, "cannot save level recording file '%s'", filename);
+    Error(ERR_WARN, "cannot save level recording file '%s'", filename);
     return;
   }
 
@@ -596,7 +620,7 @@ void SaveScore(int level_nr)
 
   if (!(file=fopen(filename,"r+")))
   {
-    Error(ERR_RETURN, "cannot save score for level %d", level_nr);
+    Error(ERR_WARN, "cannot save score for level %d", level_nr);
     return;
   }
 
@@ -613,6 +637,10 @@ void SaveScore(int level_nr)
   fclose(file);
 }
 
+
+
+#if 0
+
 void SavePlayerInfo(int mode)
 {
   int i;
@@ -626,6 +654,8 @@ void SavePlayerInfo(int mode)
 
   if (mode == PLAYER_SETUP)
     SaveSetup();
+  else if (mode == PLAYER_LEVEL)
+    SaveLevelSetup();
 
 
 
@@ -637,7 +667,7 @@ void SavePlayerInfo(int mode)
 
   if (!(file = fopen(filename,"r+")))
   {
-    Error(ERR_RETURN, "cannot save player information to file '%s'", filename);
+    Error(ERR_WARN, "cannot save player information to file '%s'", filename);
     return;
   }
 
@@ -646,7 +676,7 @@ void SavePlayerInfo(int mode)
     version_10_file = TRUE;
   else if (strcmp(cookie,NAMES_COOKIE))	/* ungültiges Format? */
   {
-    Error(ERR_RETURN, "wrong format of names file '%s'", filename);
+    Error(ERR_WARN, "wrong format of names file '%s'", filename);
     fclose(file);
     return;
   }
@@ -700,6 +730,10 @@ void SavePlayerInfo(int mode)
   fclose(file);
 }
 
+#endif
+
+
+
 void LoadJoystickData()
 {
   int i;
@@ -716,7 +750,7 @@ void LoadJoystickData()
   fscanf(file,"%s",cookie);
   if (strcmp(cookie,JOYSTICK_COOKIE))	/* ungültiges Format? */
   {
-    Error(ERR_RETURN, "wrong format of joystick file '%s'", JOYDAT_FILE);
+    Error(ERR_WARN, "wrong format of joystick file '%s'", JOYDAT_FILE);
     fclose(file);
     return;
   }
@@ -750,7 +784,7 @@ void SaveJoystickData()
 
   if (!(file=fopen(JOYDAT_FILE,"w")))
   {
-    Error(ERR_RETURN, "cannot save joystick calibration data to file '%s'",
+    Error(ERR_WARN, "cannot save joystick calibration data to file '%s'",
 	  JOYDAT_FILE);
     return;
   }
@@ -777,6 +811,17 @@ void SaveJoystickData()
 /* new setup functions                                                       */
 /* ------------------------------------------------------------------------- */
 
+#define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
+#define TOKEN_STR_LAST_LEVEL_SERIES	"last_level_series"
+#define TOKEN_STR_ALIAS_NAME		"alias_name"
+
+#define TOKEN_STR_PLAYER_PREFIX		"player_"
+#define TOKEN_VALUE_POSITION		30
+#define TOKEN_INVALID			-1
+#define TOKEN_IGNORE			-99
+
+#define SETUP_TOKEN_ALIAS_NAME		100
+
 #define SETUP_TOKEN_SOUND		0
 #define SETUP_TOKEN_SOUND_LOOPS		1
 #define SETUP_TOKEN_SOUND_MUSIC		2
@@ -800,8 +845,6 @@ void SaveJoystickData()
 #define SETUP_TOKEN_KEY_BOMB		20
 
 #define NUM_SETUP_TOKENS		21
-
-#define SETUP_TOKEN_PLAYER_PREFIX	"player_"
 
 static struct
 {
@@ -902,13 +945,28 @@ static char *getSetupValue(int token_nr, boolean token_value)
     return setup_info[token_nr].value_false;
 }
 
+static char *getFormattedSetupEntry(char *token, char *value)
+{
+  int i;
+  static char entry[MAX_LINE_LEN];
+
+  sprintf(entry, "%s:", token);
+  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
+    entry[i] = ' ';
+  entry[i] = '\0';
+
+  strcat(entry, value);
+
+  return entry;
+}
+
 static char *getSetupEntry(char *prefix, int token_nr, int token_value)
 {
   int i;
-  static char entry[80];
+  static char entry[MAX_LINE_LEN];
 
   sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
-  for (i=strlen(entry); i<30; i++)
+  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
     entry[i] = ' ';
   entry[i] = '\0';
 
@@ -920,11 +978,11 @@ static char *getSetupEntry(char *prefix, int token_nr, int token_value)
 static char *getSetupEntryWithComment(char *prefix,int token_nr, KeySym keysym)
 {
   int i;
-  static char entry[80];
+  static char entry[MAX_LINE_LEN];
   char *keyname = getKeyNameFromKeySym(keysym);
 
   sprintf(entry, "%s%s:", prefix, getSetupToken(token_nr));
-  for (i=strlen(entry); i<30; i++)
+  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
     entry[i] = ' ';
   entry[i] = '\0';
 
@@ -944,23 +1002,23 @@ static char *getSetupEntryWithComment(char *prefix,int token_nr, KeySym keysym)
   return entry;
 }
 
-static void freeSetupFileInfo(struct SetupFileInfo *setup_file_info)
+static void freeSetupFileList(struct SetupFileList *setup_file_list)
 {
-  if (!setup_file_info)
+  if (!setup_file_list)
     return;
 
-  if (setup_file_info->token)
-    free(setup_file_info->token);
-  if (setup_file_info->value)
-    free(setup_file_info->value);
-  if (setup_file_info->next)
-    freeSetupFileInfo(setup_file_info->next);
-  free(setup_file_info);
+  if (setup_file_list->token)
+    free(setup_file_list->token);
+  if (setup_file_list->value)
+    free(setup_file_list->value);
+  if (setup_file_list->next)
+    freeSetupFileList(setup_file_list->next);
+  free(setup_file_list);
 }
 
-static struct SetupFileInfo *newSetupFileInfo(char *token, char *value)
+static struct SetupFileList *newSetupFileList(char *token, char *value)
 {
-  struct SetupFileInfo *new = checked_malloc(sizeof(struct SetupFileInfo));
+  struct SetupFileList *new = checked_malloc(sizeof(struct SetupFileList));
 
   new->token = checked_malloc(strlen(token) + 1);
   strcpy(new->token, token);
@@ -973,35 +1031,204 @@ static struct SetupFileInfo *newSetupFileInfo(char *token, char *value)
   return new;
 }
 
-static char *lookupSetupFileValue(struct SetupFileInfo *setup_file_info,
-				  char *token)
+static char *getSetupFileListEntry(struct SetupFileList *setup_file_list,
+				   char *token)
 {
-  if (!setup_file_info)
+  if (!setup_file_list)
     return NULL;
 
-  if (strcmp(setup_file_info->token, token) == 0)
-    return setup_file_info->value;
+  if (strcmp(setup_file_list->token, token) == 0)
+    return setup_file_list->value;
   else
-    return lookupSetupFileValue(setup_file_info->next, token);
+    return getSetupFileListEntry(setup_file_list->next, token);
+}
+
+boolean setSetupFileListEntry(struct SetupFileList *setup_file_list,
+			      char *token, char *value)
+{
+  if (!setup_file_list)
+    return FALSE;
+
+  if (strcmp(setup_file_list->token, token) == 0)
+  {
+    free(setup_file_list->value);
+    setup_file_list->value = checked_malloc(strlen(value) + 1);
+    strcpy(setup_file_list->value, value);
+
+    return TRUE;
+  }
+  else
+    return setSetupFileListEntry(setup_file_list->next, token, value);
+}
+
+void updateSetupFileListEntry(struct SetupFileList *setup_file_list,
+			      char *token, char *value)
+{
+  if (!setup_file_list)
+    return;
+
+  if (getSetupFileListEntry(setup_file_list, token) != NULL)
+    setSetupFileListEntry(setup_file_list, token, value);
+  else
+  {
+    struct SetupFileList *list_entry = setup_file_list;
+
+    while (list_entry->next)
+      list_entry = list_entry->next;
+
+    list_entry->next = newSetupFileList(token, value);
+  }
 }
 
 #ifdef DEBUG
-static void printSetupFileInfo(struct SetupFileInfo *setup_file_info)
+static void printSetupFileList(struct SetupFileList *setup_file_list)
 {
-  if (!setup_file_info)
+  if (!setup_file_list)
     return;
 
-  printf("token: '%s'\n", setup_file_info->token);
-  printf("value: '%s'\n", setup_file_info->value);
+  printf("token: '%s'\n", setup_file_list->token);
+  printf("value: '%s'\n", setup_file_list->value);
 
-  printSetupFileInfo(setup_file_info->next);
+  printSetupFileList(setup_file_list->next);
 }
 #endif
 
-static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
+static struct SetupFileList *loadSetupFileList(char *filename)
+{
+  int line_len;
+  char line[MAX_LINE_LEN];
+  char *token, *value, *line_ptr;
+  struct SetupFileList *setup_file_list = newSetupFileList("", "");
+  struct SetupFileList *first_valid_list_entry;
+
+
+
+  /*
+  struct SetupFileList **next_entry = &setup_file_list;
+  */
+
+
+  FILE *file;
+
+  if (!(file = fopen(filename, "r")))
+  {
+    Error(ERR_WARN, "cannot open setup file '%s'", filename);
+    return NULL;
+  }
+
+  while(!feof(file))
+  {
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* cut trailing comment or whitespace from input line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == '#' || *line_ptr == '\n')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    /* cut trailing whitespaces from input line */
+    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
+      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
+	*line_ptr = '\0';
+
+    /* ignore empty lines */
+    if (*line == '\0')
+      continue;
+
+    line_len = strlen(line);
+
+    /* cut leading whitespaces from token */
+    for (token = line; *token; token++)
+      if (*token != ' ' && *token != '\t')
+	break;
+
+    /* find end of token */
+    for (line_ptr = token; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
+      {
+	*line_ptr = '\0';
+	break;
+      }
+    }
+
+    if (line_ptr < line + line_len)
+      value = line_ptr + 1;
+    else
+      value = "\0";
+
+    /* cut leading whitespaces from value */
+    for (; *value; value++)
+      if (*value != ' ' && *value != '\t')
+	break;
+
+    if (*token && *value)
+      updateSetupFileListEntry(setup_file_list, token, value);
+
+
+#if 0
+    {
+      /* allocate new token/value pair */
+
+      *next_entry = newSetupFileList(token, value);
+      next_entry = &((*next_entry)->next);
+    }
+#endif
+
+
+
+  }
+
+  fclose(file);
+
+  first_valid_list_entry = setup_file_list->next;
+
+  /* free empty list header */
+  setup_file_list->next = NULL;
+  freeSetupFileList(setup_file_list);
+
+  if (!first_valid_list_entry)
+    Error(ERR_WARN, "setup file is empty");
+
+  return first_valid_list_entry;
+}
+
+static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
+					 char *identifier)
+{
+  if (!setup_file_list)
+    return;
+
+  if (strcmp(setup_file_list->token, TOKEN_STR_FILE_IDENTIFIER) == 0)
+  {
+    if (strcmp(setup_file_list->value, identifier) != 0)
+    {
+      Error(ERR_WARN, "setup file has wrong version");
+      return;
+    }
+    else
+      return;
+  }
+
+  if (setup_file_list->next)
+    checkSetupFileListIdentifier(setup_file_list->next, identifier);
+  else
+  {
+    Error(ERR_WARN, "setup file has no version information");
+    return;
+  }
+}
+
+static void decodeSetupFileList(struct SetupFileList *setup_file_list)
 {
   int i;
-  int token_nr = -1;
+  int token_nr = TOKEN_INVALID;
   int player_nr = 0;
   char *token;
   char *token_value;
@@ -1009,17 +1236,18 @@ static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
   boolean token_boolean_value;
   int token_player_prefix_len;
 
-  if (!setup_file_info)
+  if (!setup_file_list)
     return;
 
-  token = setup_file_info->token;
-  token_value = setup_file_info->value;
+  token = setup_file_list->token;
+  token_value = setup_file_list->value;
   token_integer_value = get_string_integer_value(token_value);
   token_boolean_value = get_string_boolean_value(token_value);
 
-  token_player_prefix_len = strlen(SETUP_TOKEN_PLAYER_PREFIX);
+  token_player_prefix_len = strlen(TOKEN_STR_PLAYER_PREFIX);
 
-  if (strncmp(token, SETUP_TOKEN_PLAYER_PREFIX, token_player_prefix_len) == 0)
+  if (strncmp(token, TOKEN_STR_PLAYER_PREFIX,
+	      token_player_prefix_len) == 0)
   {
     token += token_player_prefix_len;
 
@@ -1039,19 +1267,10 @@ static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
     }
   }
 
-
-
-  /*
-  printf("token == '%s', token_integer_value == %d\n",
-	 token, token_integer_value);
-
-
-  printf("[player %d] token == '%s', token_value == '%s' (%ld)\n",
-	 player_nr, token, token_value,
-	 (unsigned long)getKeySymFromX11KeyName(token_value));
-  */
-
-
+  if (strcmp(token, TOKEN_STR_FILE_IDENTIFIER) == 0)
+    token_nr = TOKEN_IGNORE;
+  else if (strcmp(token, TOKEN_STR_ALIAS_NAME) == 0)
+    token_nr = SETUP_TOKEN_ALIAS_NAME;
 
   switch (token_nr)
   {
@@ -1071,7 +1290,7 @@ static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
       setup.toons_on = token_boolean_value;
       break;
     case SETUP_TOKEN_DIRECT_DRAW:
-      setup.direct_draw_on = token_boolean_value;
+      setup.direct_draw_on = !token_boolean_value;
       break;
     case SETUP_TOKEN_SCROLL_DELAY:
       setup.scroll_delay_on = token_boolean_value;
@@ -1121,164 +1340,142 @@ static void decodeSetupFileInfo(struct SetupFileInfo *setup_file_info)
     case SETUP_TOKEN_KEY_BOMB:
       setup.input[player_nr].key.bomb = getKeySymFromX11KeyName(token_value);
       break;
+
+    case SETUP_TOKEN_ALIAS_NAME:
+      strncpy(local_player->alias_name, token_value, MAX_NAMELEN-1);
+      local_player->alias_name[MAX_NAMELEN-1] = '\0';
+      break;
+
+    case TOKEN_INVALID:
+      Error(ERR_WARN, "unknown token '%s' not recognized", token);
+      break;
+
+    case TOKEN_IGNORE:
     default:
       break;
   }
 
-  decodeSetupFileInfo(setup_file_info->next);
+  decodeSetupFileList(setup_file_list->next);
 }
 
 void LoadSetup()
 {
-  int line_len;
+  int i;
   char filename[MAX_FILENAME_LEN];
-  char line[MAX_LINE_LEN];
-  char *token, *value, *line_ptr;
-  struct SetupFileInfo *setup_file_info, **next_entry = &setup_file_info;
-  FILE *file;
+  struct SetupFileList *setup_file_list = NULL;
 
+  /* always start with reliable default setup values */
 
+  strncpy(local_player->login_name, GetLoginName(), MAX_NAMELEN-1);
+  local_player->login_name[MAX_NAMELEN-1] = '\0';
 
-  printf("LoadSetup\n");
+  strncpy(local_player->alias_name, GetLoginName(), MAX_NAMELEN-1);
+  local_player->alias_name[MAX_NAMELEN-1] = '\0';
 
+  setup.sound_on = TRUE;
+  setup.sound_loops_on = FALSE;
+  setup.sound_music_on = FALSE;
+  setup.sound_simple_on = FALSE;
+  setup.toons_on = TRUE;
+  setup.direct_draw_on = FALSE;
+  setup.scroll_delay_on = FALSE;
+  setup.soft_scrolling_on = TRUE;
+  setup.fading_on = FALSE;
+  setup.autorecord_on = FALSE;
+  setup.quick_doors = FALSE;
 
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    setup.input[i].use_joystick = FALSE;
+    setup.input[i].joystick_nr = 0;
+    setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
+    setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+    setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
+    setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
+    setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
+    setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
+    setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
+    setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
+  }
 
   sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
 
-  if (!(file = fopen(filename, "r")))
+  setup_file_list = loadSetupFileList(filename);
+
+  if (setup_file_list)
+  {
+
+#if 0
+    printSetupFileList(setup_file_list);
+#endif
+
+    checkSetupFileListIdentifier(setup_file_list, SETUP_COOKIE);
+    decodeSetupFileList(setup_file_list);
+
+    freeSetupFileList(setup_file_list);
+  }
+  else
+    Error(ERR_RETURN, "using default setup values");
+}
+
+void LoadLevelSetup()
+{
+  char filename[MAX_FILENAME_LEN];
+
+  /* always start with reliable default setup values */
+
+  leveldir_nr = 0;
+  level_nr = 0;
+
+  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
+
+  if (level_setup_list)
+    freeSetupFileList(level_setup_list);
+
+  level_setup_list = loadSetupFileList(filename);
+
+  if (level_setup_list)
   {
     int i;
 
-    Error(ERR_RETURN, "cannot open setup file '%s'", filename);
+    char *last_level_series =
+      getSetupFileListEntry(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
-    /* use default values for setup */
-
-    setup.sound_on = TRUE;
-    setup.sound_loops_on = FALSE;
-    setup.sound_music_on = FALSE;
-    setup.sound_simple_on = FALSE;
-    setup.toons_on = TRUE;
-    setup.direct_draw_on = FALSE;
-    setup.scroll_delay_on = FALSE;
-    setup.soft_scrolling_on = TRUE;
-    setup.fading_on = FALSE;
-    setup.autorecord_on = FALSE;
-    setup.quick_doors = FALSE;
-
-    for (i=0; i<MAX_PLAYERS; i++)
+    if (last_level_series)
     {
-      setup.input[i].use_joystick = FALSE;
-      setup.input[i].joystick_nr = 0;
-      setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
-      setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
-      setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
-      setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
-      setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
-      setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
-      setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
-      setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
-    }
-
-    return;
-  }
-
-
-
-  /*
-  next_entry = &setup_file;
-  */
-
-
-
-  while(!feof(file))
-  {
-    /* read next line */
-    if (!fgets(line, MAX_LINE_LEN, file))
-      break;
-
-    /* cut trailing comment or whitespace from input line */
-    for (line_ptr = line; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == '#' || *line_ptr == '\n')
+      for (i=0; i<num_leveldirs; i++)
       {
-	*line_ptr = '\0';
-	break;
+	if (strcmp(last_level_series, leveldir[i].filename) == 0)
+	{
+	  char *token_value =
+	    getSetupFileListEntry(level_setup_list, last_level_series);
+
+	  leveldir_nr = i;
+
+	  if (token_value)
+	  {
+	    level_nr = atoi(token_value);
+
+	    if (level_nr < 0)
+	      level_nr = 0;
+	    if (level_nr > leveldir[leveldir_nr].levels - 1)
+	      level_nr = leveldir[leveldir_nr].levels - 1;
+	  }
+
+	  break;
+	}
       }
     }
 
-    /* cut trailing whitespaces from input line */
-    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
-      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
-	*line_ptr = '\0';
-
-    /* ignore empty lines */
-    if (*line == '\0')
-      continue;
-
-    line_len = strlen(line);
-
-
-    /*
-    printf("line: '%s'\n", line);
-    */
-
-
-    /* cut leading whitespaces from token */
-    for (token = line; *token; token++)
-      if (*token != ' ' && *token != '\t')
-	break;
-
-    /* find end of token */
-    for (line_ptr = token; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
-      {
-	*line_ptr = '\0';
-	break;
-      }
-    }
-
-    if (line_ptr < line + line_len)
-      value = line_ptr + 1;
-    else
-      value = "\0";
-
-    /* cut leading whitespaces from value */
-    for (; *value; value++)
-      if (*value != ' ' && *value != '\t')
-	break;
-
-
-    /*
-    printf("token / value: '%s' / '%s'\n", token, value);
-    */
-
-
-    if (*token && *value)
-    {
-      /* allocate new token/value pair */
-
-      *next_entry = newSetupFileInfo(token, value);
-      next_entry = &((*next_entry)->next);
-    }
-  }
-
-  fclose(file);
 
 #if 0
-  printf("Content of setup file info:\n");
-
-  printSetupFileInfo(setup_file_info);
+    printSetupFileList(level_setup_list);
 #endif
 
-
-
-  printf("decodeSetupFileInfo\n");
-
-
-
-  decodeSetupFileInfo(setup_file_info);
-  freeSetupFileInfo(setup_file_info);
+    checkSetupFileListIdentifier(level_setup_list, LEVELSETUP_COOKIE);
+  }
+  else
+    Error(ERR_RETURN, "using default setup values");
 }
 
 void SaveSetup()
@@ -1287,22 +1484,16 @@ void SaveSetup()
   char filename[MAX_FILENAME_LEN];
   FILE *file;
 
-
-
-  printf("SaveSetup\n");
-
-
-
   sprintf(filename, "%s/%s", SETUP_PATH, SETUP_FILENAME);
 
   if (!(file = fopen(filename, "w")))
   {
-    Error(ERR_RETURN, "cannot write setup file '%s'", filename);
+    Error(ERR_WARN, "cannot write setup file '%s'", filename);
     return;
   }
 
-  fprintf(file, "file_identifier:              %s\n",
-	  SETUP_COOKIE);
+  fprintf(file, "%s:              %s\n",
+	  TOKEN_STR_FILE_IDENTIFIER, SETUP_COOKIE);
 
   fprintf(file, "\n");
 
@@ -1340,11 +1531,17 @@ void SaveSetup()
 	  getSetupEntry("", SETUP_TOKEN_QUICK_DOORS,
 			setup.quick_doors));
 
+  fprintf(file, "\n");
+
+  fprintf(file, "%s\n",
+	  getFormattedSetupEntry(TOKEN_STR_ALIAS_NAME,
+				 local_player->alias_name));
+
   for (i=0; i<MAX_PLAYERS; i++)
   {
     char prefix[30];
 
-    sprintf(prefix, "%s%d", SETUP_TOKEN_PLAYER_PREFIX, i + 1);
+    sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, i + 1);
 
     fprintf(file, "\n");
 
@@ -1381,6 +1578,51 @@ void SaveSetup()
 	    getSetupEntryWithComment(prefix, SETUP_TOKEN_KEY_BOMB,
 				     setup.input[i].key.bomb));
   }
+
+  fclose(file);
+
+  chmod(filename, SETUP_PERMS);
+}
+
+void SaveLevelSetup()
+{
+  char filename[MAX_FILENAME_LEN];
+  struct SetupFileList *list_entry = level_setup_list;
+  FILE *file;
+
+  updateSetupFileListEntry(level_setup_list,
+			   TOKEN_STR_LAST_LEVEL_SERIES,
+			   leveldir[leveldir_nr].filename);
+
+  updateSetupFileListEntry(level_setup_list,
+			   leveldir[leveldir_nr].filename,
+			   int2str(level_nr, 0));
+
+  sprintf(filename, "%s/%s", SETUP_PATH, LEVELSETUP_FILENAME);
+
+  if (!(file = fopen(filename, "w")))
+  {
+    Error(ERR_WARN, "cannot write setup file '%s'", filename);
+    return;
+  }
+
+  fprintf(file, "%s:              %s\n\n",
+	  TOKEN_STR_FILE_IDENTIFIER, LEVELSETUP_COOKIE);
+
+  while (list_entry)
+  {
+    if (strcmp(list_entry->token, TOKEN_STR_FILE_IDENTIFIER) != 0)
+      fprintf(file, "%s\n",
+	      getFormattedSetupEntry(list_entry->token, list_entry->value));
+
+    /* just to make things nicer :) */
+    if (strcmp(list_entry->token, TOKEN_STR_LAST_LEVEL_SERIES) == 0)
+      fprintf(file, "\n");
+
+    list_entry = list_entry->next;
+  }
+
+  fclose(file);
 
   chmod(filename, SETUP_PERMS);
 }

@@ -632,13 +632,13 @@ boolean LoadSound(struct SoundInfo *snd_info)
 #ifndef MSDOS
   if (!(file=fopen(filename,"r")))
   {
-    Error(ERR_RETURN, "cannot open sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot open sound file '%s' - no sounds", filename);
     return(FALSE);
   }
 
   if (fseek(file,0,SEEK_END)<0)
   {
-    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -648,14 +648,14 @@ boolean LoadSound(struct SoundInfo *snd_info)
 
   if (!(snd_info->file_ptr=malloc(snd_info->file_len)))
   {
-    Error(ERR_RETURN, "out of memory (this shouldn't happen :) - no sounds");
+    Error(ERR_WARN, "out of memory (this shouldn't happen :) - no sounds");
     fclose(file);
     return(FALSE);
   }
 
   if (fread(snd_info->file_ptr,1,snd_info->file_len,file)!=snd_info->file_len)
   {
-    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -668,7 +668,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
       snd_info->file_len != be2long(&sound_header->chunk_size)+8 ||
       strncmp(sound_header->magic_8SVX,"8SVX",4))
   {
-    Error(ERR_RETURN, "'%s' is not an IFF/8SVX file or broken - no sounds",
+    Error(ERR_WARN, "'%s' is not an IFF/8SVX file or broken - no sounds",
 	  filename);
     return(FALSE);
   }
@@ -711,7 +711,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
   snd_info->sample_ptr = load_sample(filename);
   if(!snd_info->sample_ptr)
   {
-    Error(ERR_RETURN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
     fclose(file);
     return(FALSE);
   }
@@ -762,7 +762,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
-    Error(ERR_RETURN, "cannot pipe to child process - no sounds");
+    Error(ERR_WARN, "cannot pipe to child process - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
@@ -812,7 +812,7 @@ void StopSoundExt(int nr, int method)
 #ifndef MSDOS
   if (write(sound_pipe[1], &snd_ctrl, sizeof(snd_ctrl))<0)
   {
-    Error(ERR_RETURN, "cannot pipe to child process - no sounds");
+    Error(ERR_WARN, "cannot pipe to child process - no sounds");
     sound_status = SOUND_OFF;
     return;
   }
