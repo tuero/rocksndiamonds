@@ -244,7 +244,7 @@ boolean cleanup_em_level(unsigned char *src, int *length)
   src[2098] &= 7;
   src[src[2098] << 8 | src[2099]] = 128;
 
-  /* ameuba speed */
+  /* amoeba speed */
   if ((src[2100] << 8 | src[2101]) > 9999)
   {
     src[2100] = 39;
@@ -406,7 +406,7 @@ static unsigned short remap_emerald[256] =
   Xblank, Xround_wall_1, Xgrass, Xsteel_1, Xwall_1, Xkey_1, Xkey_2, Xkey_3,
   Xkey_4, Xdoor_1, Xdoor_2, Xdoor_3, Xdoor_4, Xdripper, Xfake_door_1, Xfake_door_2,
   Xfake_door_3, Xfake_door_4, Xwonderwall, Xwheel, Xsand, Xacid_nw, Xacid_ne, Xacid_sw,
-  Xacid_se, Xfake_blank, Xameuba_1, Xameuba_2, Xameuba_3, Xameuba_4, Xexit, Xalpha_arrow_w,
+  Xacid_se, Xfake_blank, Xamoeba_1, Xamoeba_2, Xamoeba_3, Xamoeba_4, Xexit, Xalpha_arrow_w,
   Xfake_grass, Xlenses, Xmagnify, Xfake_blank, Xfake_grass, Xswitch, Xswitch, Xblank,
   Xdecor_8, Xdecor_9, Xdecor_10, Xdecor_5, Xalpha_comma, Xalpha_quote, Xalpha_minus, Xdynamite,
   Xsteel_3, Xdecor_6, Xdecor_7, Xsteel_2, Xround_wall_2, Xdecor_2, Xdecor_4, Xdecor_3,
@@ -441,7 +441,7 @@ void convert_em_level(unsigned char *src)
   temp = (src[0x834] << 8 | src[0x835]) * 28;
   if (temp > 9999)
     temp = 9999;
-  lev.ameuba_time = temp;
+  lev.amoeba_time = temp;
 
   lev.android_move_time = src[0x874] << 8 | src[0x875];
   lev.android_clone_time = src[0x876] << 8 | src[0x877];
@@ -675,14 +675,14 @@ void convert_em_level(unsigned char *src)
   {
     lev.android_array[Xdripper] =
       lev.android_array[XdripperB] =
-      lev.android_array[Xameuba_1] =
-      lev.android_array[Xameuba_2] =
-      lev.android_array[Xameuba_3] =
-      lev.android_array[Xameuba_4] =
-      lev.android_array[Xameuba_5] =
-      lev.android_array[Xameuba_6] =
-      lev.android_array[Xameuba_7] =
-      lev.android_array[Xameuba_8] = Xdrip_eat;
+      lev.android_array[Xamoeba_1] =
+      lev.android_array[Xamoeba_2] =
+      lev.android_array[Xamoeba_3] =
+      lev.android_array[Xamoeba_4] =
+      lev.android_array[Xamoeba_5] =
+      lev.android_array[Xamoeba_6] =
+      lev.android_array[Xamoeba_7] =
+      lev.android_array[Xamoeba_8] = Xdrip_eat;
   }
 
   if (temp & 4096)

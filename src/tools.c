@@ -2891,6 +2891,1643 @@ static void HandleToolButtons(struct GadgetInfo *gi)
   request_gadget_id = gi->custom_id;
 }
 
+#if 1
+
+static struct
+{
+  int element_em;
+  boolean is_rnd_to_em_mapping;
+
+  int element_rnd;
+  int action;
+  int direction;
+}
+mapping_EM_to_RND_list[] =
+{
+  {
+    Xblank,			TRUE,
+    EL_EMPTY,			-1, -1
+  },
+  {
+    Yacid_splash_eB,		FALSE,
+    EL_EMPTY,			-1, -1
+  },
+  {
+    Yacid_splash_wB,		FALSE,
+    EL_EMPTY,			-1, -1
+  },
+
+#ifdef EM_ENGINE_BAD_ROLL
+  {
+    Xstone_force_e,		FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xstone_force_w,		FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xnut_force_e,		FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xnut_force_w,		FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xspring_force_e,		FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xspring_force_w,		FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xemerald_force_e,		FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xemerald_force_w,		FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xdiamond_force_e,		FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xdiamond_force_w,		FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xbomb_force_e,		FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xbomb_force_w,		FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_LEFT
+  },
+#endif
+
+  {
+    Xstone,			TRUE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Xstone_pause,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Xstone_fall,		FALSE,
+    EL_ROCK,			ACTION_FALLING, -1
+  },
+  {
+    Ystone_s,			FALSE,
+    EL_ROCK,			ACTION_FALLING, -1
+  },
+  {
+    Ystone_sB,			FALSE,
+    EL_ROCK,			ACTION_FALLING, -1
+  },
+  {
+    Ystone_e,			FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ystone_eB,			FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ystone_w,			FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ystone_wB,			FALSE,
+    EL_ROCK,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xnut,			TRUE,
+    EL_NUT,			-1, -1
+  },
+  {
+    Xnut_pause,			FALSE,
+    EL_NUT,			-1, -1
+  },
+  {
+    Xnut_fall,			FALSE,
+    EL_NUT,			ACTION_FALLING, -1
+  },
+  {
+    Ynut_s,			FALSE,
+    EL_NUT,			ACTION_FALLING, -1
+  },
+  {
+    Ynut_sB,			FALSE,
+    EL_NUT,			ACTION_FALLING, -1
+  },
+  {
+    Ynut_e,			FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ynut_eB,			FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ynut_w,			FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ynut_wB,			FALSE,
+    EL_NUT,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xbug_n,			TRUE,
+    EL_BUG_UP,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xbug_e,			TRUE,
+    EL_BUG_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xbug_s,			TRUE,
+    EL_BUG_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Xbug_w,			TRUE,
+    EL_BUG_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xbug_gon,			FALSE,
+    EL_BUG_UP,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xbug_goe,			FALSE,
+    EL_BUG_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xbug_gos,			FALSE,
+    EL_BUG_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Xbug_gow,			FALSE,
+    EL_BUG_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ybug_n,			FALSE,
+    EL_BUG_UP,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ybug_nB,			FALSE,
+    EL_BUG_UP,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ybug_e,			FALSE,
+    EL_BUG_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ybug_eB,			FALSE,
+    EL_BUG_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ybug_s,			FALSE,
+    EL_BUG_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ybug_sB,			FALSE,
+    EL_BUG_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ybug_w,			FALSE,
+    EL_BUG_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ybug_wB,			FALSE,
+    EL_BUG_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ybug_w_n,			FALSE,
+    EL_BUG_UP,			ACTION_TURNING_FROM_LEFT, MV_BIT_UP
+  },
+  {
+    Ybug_n_e,			FALSE,
+    EL_BUG_RIGHT,		ACTION_TURNING_FROM_UP, MV_BIT_RIGHT
+  },
+  {
+    Ybug_e_s,			FALSE,
+    EL_BUG_DOWN,		ACTION_TURNING_FROM_RIGHT, MV_BIT_DOWN
+  },
+  {
+    Ybug_s_w,			FALSE,
+    EL_BUG_LEFT,		ACTION_TURNING_FROM_DOWN, MV_BIT_LEFT
+  },
+  {
+    Ybug_e_n,			FALSE,
+    EL_BUG_UP,			ACTION_TURNING_FROM_RIGHT, MV_BIT_UP
+  },
+  {
+    Ybug_s_e,			FALSE,
+    EL_BUG_RIGHT,		ACTION_TURNING_FROM_DOWN, MV_BIT_RIGHT
+  },
+  {
+    Ybug_w_s,			FALSE,
+    EL_BUG_DOWN,		ACTION_TURNING_FROM_LEFT, MV_BIT_DOWN
+  },
+  {
+    Ybug_n_w,			FALSE,
+    EL_BUG_LEFT,		ACTION_TURNING_FROM_UP, MV_BIT_LEFT
+  },
+  {
+    Ybug_stone,			FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Ybug_spring,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xtank_n,			TRUE,
+    EL_SPACESHIP_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xtank_e,			TRUE,
+    EL_SPACESHIP_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xtank_s,			TRUE,
+    EL_SPACESHIP_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Xtank_w,			TRUE,
+    EL_SPACESHIP_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xtank_gon,			FALSE,
+    EL_SPACESHIP_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xtank_goe,			FALSE,
+    EL_SPACESHIP_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xtank_gos,			FALSE,
+    EL_SPACESHIP_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Xtank_gow,			FALSE,
+    EL_SPACESHIP_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ytank_n,			FALSE,
+    EL_SPACESHIP_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ytank_nB,			FALSE,
+    EL_SPACESHIP_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ytank_e,			FALSE,
+    EL_SPACESHIP_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ytank_eB,			FALSE,
+    EL_SPACESHIP_RIGHT,		ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ytank_s,			FALSE,
+    EL_SPACESHIP_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ytank_sB,			FALSE,
+    EL_SPACESHIP_DOWN,		ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ytank_w,			FALSE,
+    EL_SPACESHIP_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ytank_wB,			FALSE,
+    EL_SPACESHIP_LEFT,		ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ytank_w_n,			FALSE,
+    EL_SPACESHIP_UP,		ACTION_TURNING_FROM_LEFT, MV_BIT_UP
+  },
+  {
+    Ytank_n_e,			FALSE,
+    EL_SPACESHIP_RIGHT,		ACTION_TURNING_FROM_UP, MV_BIT_RIGHT
+  },
+  {
+    Ytank_e_s,			FALSE,
+    EL_SPACESHIP_DOWN,		ACTION_TURNING_FROM_RIGHT, MV_BIT_DOWN
+  },
+  {
+    Ytank_s_w,			FALSE,
+    EL_SPACESHIP_LEFT,		ACTION_TURNING_FROM_DOWN, MV_BIT_LEFT
+  },
+  {
+    Ytank_e_n,			FALSE,
+    EL_SPACESHIP_UP,		ACTION_TURNING_FROM_RIGHT, MV_BIT_UP
+  },
+  {
+    Ytank_s_e,			FALSE,
+    EL_SPACESHIP_RIGHT,		ACTION_TURNING_FROM_DOWN, MV_BIT_RIGHT
+  },
+  {
+    Ytank_w_s,			FALSE,
+    EL_SPACESHIP_DOWN,		ACTION_TURNING_FROM_LEFT, MV_BIT_DOWN
+  },
+  {
+    Ytank_n_w,			FALSE,
+    EL_SPACESHIP_LEFT,		ACTION_TURNING_FROM_UP, MV_BIT_LEFT
+  },
+  {
+    Ytank_stone,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Ytank_spring,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xandroid,			TRUE,
+    EL_EMC_ANDROID,		-1, -1
+  },
+  {
+    Xandroid_1_n,		TRUE,
+    EL_EMC_ANDROID_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xandroid_2_n,		FALSE,
+    EL_EMC_ANDROID_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xandroid_1_e,		TRUE,
+    EL_EMC_ANDROID_RIGHT,	ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xandroid_2_e,		FALSE,
+    EL_EMC_ANDROID_RIGHT,	ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xandroid_1_w,		TRUE,
+    EL_EMC_ANDROID_LEFT,	ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xandroid_2_w,		FALSE,
+    EL_EMC_ANDROID_LEFT,	ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xandroid_1_s,		TRUE,
+    EL_EMC_ANDROID_DOWN,	ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Xandroid_2_s,		FALSE,
+    EL_EMC_ANDROID_DOWN,	ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yandroid_n,			FALSE,
+    EL_EMC_ANDROID_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yandroid_nB,		FALSE,
+    EL_EMC_ANDROID_UP,		ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yandroid_ne,		FALSE,
+    EL_EMC_ANDROID_RIGHT_UP,	
+  },
+  {
+    Yandroid_neB,		FALSE,
+    EL_EMC_ANDROID_RIGHT_UP,	-1, -1
+  },
+  {
+    Yandroid_e,			FALSE,
+    EL_EMC_ANDROID_RIGHT,	ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yandroid_eB,		FALSE,
+    EL_EMC_ANDROID_RIGHT,	ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yandroid_se,		FALSE,
+    EL_EMC_ANDROID_RIGHT_DOWN,	-1, -1
+  },
+  {
+    Yandroid_seB,		FALSE,
+    EL_EMC_ANDROID_RIGHT_DOWN,	-1, -1
+  },
+  {
+    Yandroid_s,			FALSE,
+    EL_EMC_ANDROID_DOWN,	ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yandroid_sB,		FALSE,
+    EL_EMC_ANDROID_DOWN,	ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yandroid_sw,		FALSE,
+    EL_EMC_ANDROID_LEFT_DOWN,	-1, -1
+  },
+  {
+    Yandroid_swB,		FALSE,
+    EL_EMC_ANDROID_LEFT_DOWN,	-1, -1
+  },
+  {
+    Yandroid_w,			FALSE,
+    EL_EMC_ANDROID_LEFT,	ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yandroid_wB,		FALSE,
+    EL_EMC_ANDROID_LEFT,	ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yandroid_nw,		FALSE,
+    EL_EMC_ANDROID_LEFT_UP,	-1, -1
+  },
+  {
+    Yandroid_nwB,		FALSE,
+    EL_EMC_ANDROID_LEFT_UP,	-1, -1
+  },
+  {
+    Xspring,			TRUE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xspring_pause,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xspring_e,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xspring_w,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xspring_fall,		FALSE,
+    EL_SPRING,			ACTION_FALLING, -1
+  },
+  {
+    Yspring_s,			FALSE,
+    EL_SPRING,			ACTION_FALLING, -1
+  },
+  {
+    Yspring_sB,			FALSE,
+    EL_SPRING,			ACTION_FALLING, -1
+  },
+  {
+    Yspring_e,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yspring_eB,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yspring_w,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yspring_wB,			FALSE,
+    EL_SPRING,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yspring_kill_e,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Yspring_kill_eB,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Yspring_kill_w,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Yspring_kill_wB,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xeater_n,			TRUE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Xeater_e,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Xeater_w,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xeater_s,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yeater_n,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yeater_nB,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yeater_e,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yeater_eB,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yeater_s,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yeater_sB,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yeater_w,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yeater_wB,			FALSE,
+    EL_YAMYAM,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yeater_stone,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Yeater_spring,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xalien,			TRUE,
+    EL_ROBOT,			-1, -1
+  },
+  {
+    Xalien_pause,		FALSE,
+    EL_ROBOT,			-1, -1
+  },
+  {
+    Yalien_n,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yalien_nB,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yalien_e,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yalien_eB,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yalien_s,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yalien_sB,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yalien_w,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yalien_wB,			FALSE,
+    EL_ROBOT,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yalien_stone,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Yalien_spring,		FALSE,
+    EL_SPRING,			-1, -1
+  },
+  {
+    Xemerald,			TRUE,
+    EL_EMERALD,			-1, -1
+  },
+  {
+    Xemerald_pause,		FALSE,
+    EL_EMERALD,			-1, -1
+  },
+  {
+    Xemerald_fall,		FALSE,
+    EL_EMERALD,			ACTION_FALLING, -1
+  },
+  {
+    Xemerald_shine,		FALSE,
+    EL_EMERALD,			-1, -1
+  },
+  {
+    Yemerald_s,			FALSE,
+    EL_EMERALD,			ACTION_FALLING, -1
+  },
+  {
+    Yemerald_sB,		FALSE,
+    EL_EMERALD,			ACTION_FALLING, -1
+  },
+  {
+    Yemerald_e,			FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yemerald_eB,		FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yemerald_w,			FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yemerald_wB,		FALSE,
+    EL_EMERALD,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yemerald_eat,		FALSE,
+    EL_EMERALD,			-1, -1
+  },
+  {
+    Yemerald_stone,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Xdiamond,			TRUE,
+    EL_DIAMOND,			-1, -1
+  },
+  {
+    Xdiamond_pause,		FALSE,
+    EL_DIAMOND,			-1, -1
+  },
+  {
+    Xdiamond_fall,		FALSE,
+    EL_DIAMOND,			ACTION_FALLING, -1
+  },
+  {
+    Xdiamond_shine,		FALSE,
+    EL_DIAMOND,			-1, -1
+  },
+  {
+    Ydiamond_s,			FALSE,
+    EL_DIAMOND,			ACTION_FALLING, -1
+  },
+  {
+    Ydiamond_sB,		FALSE,
+    EL_DIAMOND,			ACTION_FALLING, -1
+  },
+  {
+    Ydiamond_e,			FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ydiamond_eB,		FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ydiamond_w,			FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ydiamond_wB,		FALSE,
+    EL_DIAMOND,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ydiamond_eat,		FALSE,
+    EL_DIAMOND,			-1, -1
+  },
+  {
+    Ydiamond_stone,		FALSE,
+    EL_ROCK,			-1, -1
+  },
+  {
+    Xdrip_fall,			TRUE,
+    EL_AMOEBA_DROP,		ACTION_FALLING, -1
+  },
+  {
+    Xdrip_stretch,		FALSE,
+    EL_AMOEBA_DROP,		-1, -1
+  },
+  {
+    Xdrip_stretchB,		FALSE,
+    EL_AMOEBA_DROP,		-1, -1
+  },
+  {
+    Xdrip_eat,			FALSE,
+    EL_AMOEBA_DROP,		-1, -1
+  },
+  {
+    Ydrip_s1,			FALSE,
+    EL_AMOEBA_DROP,		ACTION_FALLING, -1
+  },
+  {
+    Ydrip_s1B,			FALSE,
+    EL_AMOEBA_DROP,		ACTION_FALLING, -1
+  },
+  {
+    Ydrip_s2,			FALSE,
+    EL_AMOEBA_DROP,		ACTION_FALLING, -1
+  },
+  {
+    Ydrip_s2B,			FALSE,
+    EL_AMOEBA_DROP,		ACTION_FALLING, -1
+  },
+  {
+    Xbomb,			TRUE,
+    EL_BOMB,			-1, -1
+  },
+  {
+    Xbomb_pause,		FALSE,
+    EL_BOMB,			-1, -1
+  },
+  {
+    Xbomb_fall,			FALSE,
+    EL_BOMB,			ACTION_FALLING, -1
+  },
+  {
+    Ybomb_s,			FALSE,
+    EL_BOMB,			ACTION_FALLING, -1
+  },
+  {
+    Ybomb_sB,			FALSE,
+    EL_BOMB,			ACTION_FALLING, -1
+  },
+  {
+    Ybomb_e,			FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ybomb_eB,			FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ybomb_w,			FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ybomb_wB,			FALSE,
+    EL_BOMB,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Ybomb_eat,			FALSE,
+    EL_BOMB,			-1, -1
+  },
+  {
+    Xballoon,			TRUE,
+    EL_BALLOON,			-1, -1
+  },
+  {
+    Yballoon_n,			FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yballoon_nB,		FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Yballoon_e,			FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yballoon_eB,		FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Yballoon_s,			FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yballoon_sB,		FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Yballoon_w,			FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Yballoon_wB,		FALSE,
+    EL_BALLOON,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xgrass,			TRUE,
+    EL_SAND,			-1, -1
+  },
+  {
+    Ygrass_nB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ygrass_eB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ygrass_sB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ygrass_wB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xdirt,			TRUE,
+    EL_SAND,			-1, -1
+  },
+  {
+    Ydirt_nB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_UP
+  },
+  {
+    Ydirt_eB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_RIGHT
+  },
+  {
+    Ydirt_sB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_DOWN
+  },
+  {
+    Ydirt_wB,			FALSE,
+    EL_SAND,			ACTION_MOVING, MV_BIT_LEFT
+  },
+  {
+    Xacid_ne,			TRUE,
+    EL_ACID_POOL_TOPRIGHT,	-1, -1
+  },
+  {
+    Xacid_se,			TRUE,
+    EL_ACID_POOL_BOTTOMRIGHT,	-1, -1
+  },
+  {
+    Xacid_s,			TRUE,
+    EL_ACID_POOL_BOTTOM,	-1, -1
+  },
+  {
+    Xacid_sw,			TRUE,
+    EL_ACID_POOL_BOTTOMLEFT,	-1, -1
+  },
+  {
+    Xacid_nw,			TRUE,
+    EL_ACID_POOL_TOPLEFT,	-1, -1
+  },
+  {
+    Xacid_1,			TRUE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_2,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_3,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_4,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_5,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_6,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_7,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xacid_8,			FALSE,
+    EL_ACID,			-1, -1
+  },
+  {
+    Xball_1,			TRUE,
+    EL_EMC_GENERATOR_BALL,	-1, -1
+  },
+  {
+    Xball_1B,			FALSE,
+    EL_EMC_GENERATOR_BALL,	-1, -1
+  },
+  {
+    Xball_2,			FALSE,
+    EL_EMC_GENERATOR_BALL,	-1, -1
+  },
+  {
+    Xball_2B,			FALSE,
+    EL_EMC_GENERATOR_BALL,	-1, -1
+  },
+  {
+    Yball_eat,			FALSE,
+    EL_EMC_GENERATOR_BALL,	-1, -1
+  },
+  {
+    Xgrow_ns,			TRUE,
+    EL_EMC_GROW,		-1, -1
+  },
+  {
+    Ygrow_ns_eat,		FALSE,
+    EL_EMC_GROW,		-1, -1
+  },
+  {
+    Xgrow_ew,			FALSE,
+    EL_EMC_GROW,		-1, -1
+  },
+  {
+    Ygrow_ew_eat,		FALSE,
+    EL_EMC_GROW,		-1, -1
+  },
+  {
+    Xwonderwall,		TRUE,
+    EL_MAGIC_WALL,		-1, -1
+  },
+  {
+    XwonderwallB,		FALSE,
+    EL_MAGIC_WALL,		-1, -1
+  },
+  {
+    Xamoeba_1,			TRUE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_2,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_3,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_4,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_5,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_6,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_7,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xamoeba_8,			FALSE,
+    EL_AMOEBA_WET,		-1, -1
+  },
+  {
+    Xdoor_1,			TRUE,
+    EL_EM_GATE_1,		-1, -1
+  },
+  {
+    Xdoor_2,			TRUE,
+    EL_EM_GATE_2,		-1, -1
+  },
+  {
+    Xdoor_3,			TRUE,
+    EL_EM_GATE_3,		-1, -1
+  },
+  {
+    Xdoor_4,			TRUE,
+    EL_EM_GATE_4,		-1, -1
+  },
+  {
+    Xdoor_5,			TRUE,
+    EL_EMC_GATE_5,		-1, -1
+  },
+  {
+    Xdoor_6,			TRUE,
+    EL_EMC_GATE_6,		-1, -1
+  },
+  {
+    Xdoor_7,			TRUE,
+    EL_EMC_GATE_7,		-1, -1
+  },
+  {
+    Xdoor_8,			TRUE,
+    EL_EMC_GATE_8,		-1, -1
+  },
+  {
+    Xkey_1,			TRUE,
+    EL_EM_KEY_1,		-1, -1
+  },
+  {
+    Xkey_2,			TRUE,
+    EL_EM_KEY_2,		-1, -1
+  },
+  {
+    Xkey_3,			TRUE,
+    EL_EM_KEY_3,		-1, -1
+  },
+  {
+    Xkey_4,			TRUE,
+    EL_EM_KEY_4,		-1, -1
+  },
+  {
+    Xkey_5,			TRUE,
+    EL_EMC_KEY_5,		-1, -1
+  },
+  {
+    Xkey_6,			TRUE,
+    EL_EMC_KEY_6,		-1, -1
+  },
+  {
+    Xkey_7,			TRUE,
+    EL_EMC_KEY_7,		-1, -1
+  },
+  {
+    Xkey_8,			TRUE,
+    EL_EMC_KEY_8,		-1, -1
+  },
+  {
+    Xwind_n,			TRUE,
+    EL_BALLOON_SWITCH_UP,	-1, -1
+  },
+  {
+    Xwind_e,			TRUE,
+    EL_BALLOON_SWITCH_RIGHT,	-1, -1
+  },
+  {
+    Xwind_s,			TRUE,
+    EL_BALLOON_SWITCH_DOWN,	-1, -1
+  },
+  {
+    Xwind_w,			TRUE,
+    EL_BALLOON_SWITCH_LEFT,	-1, -1
+  },
+  {
+    Xwind_nesw,			TRUE,
+    EL_BALLOON_SWITCH_ANY,	-1, -1
+  },
+  {
+    Xwind_stop,			TRUE,
+    EL_BALLOON_SWITCH_NONE,	-1, -1
+  },
+  {
+    Xexit,			TRUE,
+    EL_EXIT_CLOSED,		-1, -1
+  },
+  {
+    Xexit_1,			TRUE,
+    EL_EXIT_OPEN,		-1, -1
+  },
+  {
+    Xexit_2,			FALSE,
+    EL_EXIT_OPEN,		-1, -1
+  },
+  {
+    Xexit_3,			FALSE,
+    EL_EXIT_OPEN,		-1, -1
+  },
+  {
+    Xdynamite,			TRUE,
+    EL_DYNAMITE,		-1, -1
+  },
+  {
+    Ydynamite_eat,		FALSE,
+    EL_DYNAMITE,		-1, -1
+  },
+  {
+    Xdynamite_1,		TRUE,
+    EL_DYNAMITE_ACTIVE,		-1, -1
+  },
+  {
+    Xdynamite_2,		FALSE,
+    EL_DYNAMITE_ACTIVE,		-1, -1
+  },
+  {
+    Xdynamite_3,		FALSE,
+    EL_DYNAMITE_ACTIVE,		-1, -1
+  },
+  {
+    Xdynamite_4,		FALSE,
+    EL_DYNAMITE_ACTIVE,		-1, -1
+  },
+  {
+    Xbumper,			TRUE,
+    EL_EMC_BUMPER,		-1, -1
+  },
+  {
+    XbumperB,			FALSE,
+    EL_EMC_BUMPER,		-1, -1
+  },
+  {
+    Xwheel,			TRUE,
+    EL_ROBOT_WHEEL,		-1, -1
+  },
+  {
+    XwheelB,			FALSE,
+    EL_ROBOT_WHEEL,		-1, -1
+  },
+  {
+    Xswitch,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    XswitchB,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xsand,			TRUE,
+    EL_QUICKSAND_EMPTY,		-1, -1
+  },
+  {
+    Xsand_stone,		TRUE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonein_1,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonein_2,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonein_3,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonein_4,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonesand_1,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonesand_2,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonesand_3,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stonesand_4,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stoneout_1,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_stoneout_2,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_sandstone_1,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_sandstone_2,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_sandstone_3,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xsand_sandstone_4,		FALSE,
+    EL_QUICKSAND_FULL,		-1, -1
+  },
+  {
+    Xplant,			TRUE,
+    EL_EMC_PLANT,		-1, -1
+  },
+  {
+    Yplant,			FALSE,
+    EL_EMC_PLANT,		-1, -1
+  },
+  {
+    Xlenses,			TRUE,
+    EL_EMC_LENSES,		-1, -1
+  },
+  {
+    Xmagnify,			TRUE,
+    EL_EMC_MAGNIFIER,		-1, -1
+  },
+  {
+    Xdripper,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    XdripperB,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xfake_blank,		TRUE,
+    EL_INVISIBLE_WALL,		-1, -1
+  },
+  {
+    Xfake_blankB,		FALSE,
+    EL_INVISIBLE_WALL,		-1, -1
+  },
+  {
+    Xfake_grass,		TRUE,
+    EL_INVISIBLE_SAND,		-1, -1
+  },
+  {
+    Xfake_grassB,		FALSE,
+    EL_INVISIBLE_SAND,		-1, -1
+  },
+  {
+    Xfake_door_1,		TRUE,
+    EL_EM_GATE_1_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_2,		TRUE,
+    EL_EM_GATE_2_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_3,		TRUE,
+    EL_EM_GATE_3_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_4,		TRUE,
+    EL_EM_GATE_4_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_5,		TRUE,
+    EL_EMC_GATE_5_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_6,		TRUE,
+    EL_EMC_GATE_6_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_7,		TRUE,
+    EL_EMC_GATE_7_GRAY,		-1, -1
+  },
+  {
+    Xfake_door_8,		TRUE,
+    EL_EMC_GATE_8_GRAY,		-1, -1
+  },
+  {
+    Xsteel_1,			TRUE,
+    EL_STEELWALL,		-1, -1
+  },
+  {
+    Xsteel_2,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xsteel_3,			TRUE,
+    EL_EMC_STEELWALL_1,		-1, -1
+  },
+  {
+    Xsteel_4,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xwall_1,			TRUE,
+    EL_WALL,			-1, -1
+  },
+  {
+    Xwall_2,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xwall_3,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xwall_4,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xround_wall_1,		TRUE,
+    EL_WALL_SLIPPERY,		-1, -1
+  },
+  {
+    Xround_wall_2,		FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xround_wall_3,		FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xround_wall_4,		FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xdecor_1,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xdecor_2,			TRUE,
+    EL_EMC_WALL_6,		-1, -1
+  },
+  {
+    Xdecor_3,			TRUE,
+    EL_EMC_WALL_4,		-1, -1
+  },
+  {
+    Xdecor_4,			TRUE,
+    EL_EMC_WALL_5,		-1, -1
+  },
+  {
+    Xdecor_5,			TRUE,
+    EL_EMC_WALL_7,		-1, -1
+  },
+  {
+    Xdecor_6,			TRUE,
+    EL_EMC_WALL_8,		-1, -1
+  },
+  {
+    Xdecor_7,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xdecor_8,			TRUE,
+    EL_EMC_WALL_1,		-1, -1
+  },
+  {
+    Xdecor_9,			TRUE,
+    EL_EMC_WALL_2,		-1, -1
+  },
+  {
+    Xdecor_10,			TRUE,
+    EL_EMC_WALL_3,		-1, -1
+  },
+  {
+    Xdecor_11,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xdecor_12,			FALSE,
+    EL_UNKNOWN,			-1, -1
+  },
+  {
+    Xalpha_0,			TRUE,
+    EL_CHAR('0'),		-1, -1
+  },
+  {
+    Xalpha_1,			TRUE,
+    EL_CHAR('1'),		-1, -1
+  },
+  {
+    Xalpha_2,			TRUE,
+    EL_CHAR('2'),		-1, -1
+  },
+  {
+    Xalpha_3,			TRUE,
+    EL_CHAR('3'),		-1, -1
+  },
+  {
+    Xalpha_4,			TRUE,
+    EL_CHAR('4'),		-1, -1
+  },
+  {
+    Xalpha_5,			TRUE,
+    EL_CHAR('5'),		-1, -1
+  },
+  {
+    Xalpha_6,			TRUE,
+    EL_CHAR('6'),		-1, -1
+  },
+  {
+    Xalpha_7,			TRUE,
+    EL_CHAR('7'),		-1, -1
+  },
+  {
+    Xalpha_8,			TRUE,
+    EL_CHAR('8'),		-1, -1
+  },
+  {
+    Xalpha_9,			TRUE,
+    EL_CHAR('9'),		-1, -1
+  },
+  {
+    Xalpha_excla,		TRUE,
+    EL_CHAR('!'),		-1, -1
+  },
+  {
+    Xalpha_quote,		TRUE,
+    EL_CHAR('"'),		-1, -1
+  },
+  {
+    Xalpha_comma,		TRUE,
+    EL_CHAR(','),		-1, -1
+  },
+  {
+    Xalpha_minus,		TRUE,
+    EL_CHAR('-'),		-1, -1
+  },
+  {
+    Xalpha_perio,		TRUE,
+    EL_CHAR('.'),		-1, -1
+  },
+  {
+    Xalpha_colon,		TRUE,
+    EL_CHAR(':'),		-1, -1
+  },
+  {
+    Xalpha_quest,		TRUE,
+    EL_CHAR('?'),		-1, -1
+  },
+  {
+    Xalpha_a,			TRUE,
+    EL_CHAR('A'),		-1, -1
+  },
+  {
+    Xalpha_b,			TRUE,
+    EL_CHAR('B'),		-1, -1
+  },
+  {
+    Xalpha_c,			TRUE,
+    EL_CHAR('C'),		-1, -1
+  },
+  {
+    Xalpha_d,			TRUE,
+    EL_CHAR('D'),		-1, -1
+  },
+  {
+    Xalpha_e,			TRUE,
+    EL_CHAR('E'),		-1, -1
+  },
+  {
+    Xalpha_f,			TRUE,
+    EL_CHAR('F'),		-1, -1
+  },
+  {
+    Xalpha_g,			TRUE,
+    EL_CHAR('G'),		-1, -1
+  },
+  {
+    Xalpha_h,			TRUE,
+    EL_CHAR('H'),		-1, -1
+  },
+  {
+    Xalpha_i,			TRUE,
+    EL_CHAR('I'),		-1, -1
+  },
+  {
+    Xalpha_j,			TRUE,
+    EL_CHAR('J'),		-1, -1
+  },
+  {
+    Xalpha_k,			TRUE,
+    EL_CHAR('K'),		-1, -1
+  },
+  {
+    Xalpha_l,			TRUE,
+    EL_CHAR('L'),		-1, -1
+  },
+  {
+    Xalpha_m,			TRUE,
+    EL_CHAR('M'),		-1, -1
+  },
+  {
+    Xalpha_n,			TRUE,
+    EL_CHAR('N'),		-1, -1
+  },
+  {
+    Xalpha_o,			TRUE,
+    EL_CHAR('O'),		-1, -1
+  },
+  {
+    Xalpha_p,			TRUE,
+    EL_CHAR('P'),		-1, -1
+  },
+  {
+    Xalpha_q,			TRUE,
+    EL_CHAR('Q'),		-1, -1
+  },
+  {
+    Xalpha_r,			TRUE,
+    EL_CHAR('R'),		-1, -1
+  },
+  {
+    Xalpha_s,			TRUE,
+    EL_CHAR('S'),		-1, -1
+  },
+  {
+    Xalpha_t,			TRUE,
+    EL_CHAR('T'),		-1, -1
+  },
+  {
+    Xalpha_u,			TRUE,
+    EL_CHAR('U'),		-1, -1
+  },
+  {
+    Xalpha_v,			TRUE,
+    EL_CHAR('V'),		-1, -1
+  },
+  {
+    Xalpha_w,			TRUE,
+    EL_CHAR('W'),		-1, -1
+  },
+  {
+    Xalpha_x,			TRUE,
+    EL_CHAR('X'),		-1, -1
+  },
+  {
+    Xalpha_y,			TRUE,
+    EL_CHAR('Y'),		-1, -1
+  },
+  {
+    Xalpha_z,			TRUE,
+    EL_CHAR('Z'),		-1, -1
+  },
+  {
+    Xalpha_arrow_e,		TRUE,
+    EL_CHAR('>'),		-1, -1
+  },
+  {
+    Xalpha_arrow_w,		TRUE,
+    EL_CHAR('<'),		-1, -1
+  },
+  {
+    Xalpha_copyr,		TRUE,
+    EL_CHAR('©'),		-1, -1
+  },
+
+  {
+    Zplayer,			TRUE,
+    EL_PLAYER_1,		-1, -1
+  },
+
+  {
+    ZBORDER,			TRUE,
+    EL_EMC_LEVEL_BORDER,	-1, -1
+  },
+
+  {
+    -1,				FALSE,
+    -1,				-1, -1
+  }
+};
+
+int map_element_RND_to_EM(int element_rnd)
+{
+  static unsigned short mapping_RND_to_EM[NUM_FILE_ELEMENTS];
+  static boolean mapping_initialized = FALSE;
+
+  if (!mapping_initialized)
+  {
+    int i;
+
+    /* return "Xalpha_quest" for all undefined elements in mapping array */
+    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+      mapping_RND_to_EM[i] = Xalpha_quest;
+
+    for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
+      if (mapping_EM_to_RND_list[i].is_rnd_to_em_mapping)
+	mapping_RND_to_EM[mapping_EM_to_RND_list[i].element_rnd] =
+	  mapping_EM_to_RND_list[i].element_em;
+
+    mapping_initialized = TRUE;
+  }
+
+  if (element_rnd >= 0 && element_rnd < NUM_FILE_ELEMENTS)
+    return mapping_RND_to_EM[element_rnd];
+
+  Error(ERR_WARN, "invalid RND level element %d", element_rnd);
+
+  return EL_UNKNOWN;
+}
+
+int map_element_EM_to_RND(int element_em)
+{
+  static unsigned short mapping_EM_to_RND[TILE_MAX];
+  static boolean mapping_initialized = FALSE;
+
+  if (!mapping_initialized)
+  {
+    int i;
+
+    /* return "EL_UNKNOWN" for all undefined elements in mapping array */
+    for (i = 0; i < TILE_MAX; i++)
+      mapping_EM_to_RND[i] = EL_UNKNOWN;
+
+    for (i = 0; mapping_EM_to_RND_list[i].element_em != -1; i++)
+      mapping_EM_to_RND[mapping_EM_to_RND_list[i].element_em] =
+	mapping_EM_to_RND_list[i].element_rnd;
+
+    mapping_initialized = TRUE;
+  }
+
+  if (element_em >= 0 && element_em < TILE_MAX)
+    return mapping_EM_to_RND[element_em];
+
+  Error(ERR_WARN, "invalid EM level element %d", element_em);
+
+  return EL_UNKNOWN;
+}
+
+#else
+
 int map_element_RND_to_EM(int element_rnd)
 {
   static unsigned short mapping_RND_to_EM[NUM_FILE_ELEMENTS];
@@ -2938,7 +4575,7 @@ int map_element_RND_to_EM(int element_rnd)
     { Xball_1,			EL_EMC_GENERATOR_BALL		},
     { Xgrow_ns,			EL_EMC_GROW			},
     { Xwonderwall,		EL_MAGIC_WALL			},
-    { Xameuba_1,		EL_AMOEBA_WET			},
+    { Xamoeba_1,		EL_AMOEBA_WET			},
     { Xdoor_1,			EL_EM_GATE_1			},
     { Xdoor_2,			EL_EM_GATE_2			},
     { Xdoor_3,			EL_EM_GATE_3			},
@@ -2972,7 +4609,7 @@ int map_element_RND_to_EM(int element_rnd)
     { Xsand_stone,		EL_QUICKSAND_FULL		},
     { Xplant,			EL_EMC_PLANT			},
     { Xlenses,			EL_EMC_LENSES			},
-    { Xmagnify,			EL_EMC_MAGNIFY			},
+    { Xmagnify,			EL_EMC_MAGNIFIER		},
     { Xdripper,			EL_UNKNOWN			},
     { Xfake_blank,		EL_INVISIBLE_WALL		},
     { Xfake_grass,		EL_INVISIBLE_SAND		},
@@ -3340,14 +4977,14 @@ int map_element_EM_to_RND(int element_em)
     { Ygrow_ew_eat,		EL_EMC_GROW			},
     { Xwonderwall,		EL_MAGIC_WALL			},
     { XwonderwallB,		EL_MAGIC_WALL			},
-    { Xameuba_1,		EL_AMOEBA_WET			},
-    { Xameuba_2,		EL_AMOEBA_WET			},
-    { Xameuba_3,		EL_AMOEBA_WET			},
-    { Xameuba_4,		EL_AMOEBA_WET			},
-    { Xameuba_5,		EL_AMOEBA_WET			},
-    { Xameuba_6,		EL_AMOEBA_WET			},
-    { Xameuba_7,		EL_AMOEBA_WET			},
-    { Xameuba_8,		EL_AMOEBA_WET			},
+    { Xamoeba_1,		EL_AMOEBA_WET			},
+    { Xamoeba_2,		EL_AMOEBA_WET			},
+    { Xamoeba_3,		EL_AMOEBA_WET			},
+    { Xamoeba_4,		EL_AMOEBA_WET			},
+    { Xamoeba_5,		EL_AMOEBA_WET			},
+    { Xamoeba_6,		EL_AMOEBA_WET			},
+    { Xamoeba_7,		EL_AMOEBA_WET			},
+    { Xamoeba_8,		EL_AMOEBA_WET			},
     { Xdoor_1,			EL_EM_GATE_1			},
     { Xdoor_2,			EL_EM_GATE_2			},
     { Xdoor_3,			EL_EM_GATE_3			},
@@ -3405,7 +5042,7 @@ int map_element_EM_to_RND(int element_em)
     { Xplant,			EL_EMC_PLANT			},
     { Yplant,			EL_EMC_PLANT			},
     { Xlenses,			EL_EMC_LENSES			},
-    { Xmagnify,			EL_EMC_MAGNIFY			},
+    { Xmagnify,			EL_EMC_MAGNIFIER		},
     { Xdripper,			EL_UNKNOWN			},
     { XdripperB,		EL_UNKNOWN			},
     { Xfake_blank,		EL_INVISIBLE_WALL		},
@@ -3520,6 +5157,8 @@ int map_element_EM_to_RND(int element_em)
 
   return EL_UNKNOWN;
 }
+
+#endif
 
 int get_next_element(int element)
 {

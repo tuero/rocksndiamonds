@@ -43,16 +43,16 @@ void synchro_3(void)
     lev.wonderwall_time--;
 
   if (lev.time > 0 && lev.time <= 50 && lev.time % 5 == 0)
-    play[SAMPLE_time] = 1;
+    play_sound(-1, -1, SAMPLE_time);
 
   if (lev.wheel_cnt)
-    play[SAMPLE_wheel] = 1;
+    play_sound(-1, -1, SAMPLE_wheel);
 
-  /* grow ameuba */
+  /* grow amoeba */
 
   random = Random;
 
-  for (count = lev.ameuba_time; count--;)
+  for (count = lev.amoeba_time; count--;)
   {
     x = (random >> 10) % (WIDTH - 2);
     y = (random >> 20) % (HEIGHT - 2);
@@ -66,10 +66,10 @@ void synchro_3(void)
       case Xsand:
       case Xplant:
       case Yplant:
-	if (tab_ameuba[Cave[y-1][x]] ||
-	    tab_ameuba[Cave[y][x+1]] ||
-	    tab_ameuba[Cave[y+1][x]] ||
-	    tab_ameuba[Cave[y][x-1]])
+	if (tab_amoeba[Cave[y-1][x]] ||
+	    tab_amoeba[Cave[y][x+1]] ||
+	    tab_amoeba[Cave[y+1][x]] ||
+	    tab_amoeba[Cave[y][x-1]])
 	  Cave[y][x] = Xdrip_eat;
     }
 

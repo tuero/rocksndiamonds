@@ -15,9 +15,9 @@ enum
   SAMPLE_slurp,     /* spring kills alien */
   SAMPLE_eater,     /* eater sits/eats diamond */
   SAMPLE_alien,     /* alien moves */
-  SAMPLE_collect,   /* player collects diamond/emerald/dynamite/key/lenses/magnify */
+  SAMPLE_collect,   /* player collects object */
   SAMPLE_diamond,   /* diamond/emerald hits ground */
-  SAMPLE_squash,    /* stone squashes diamond, stone/emerald/diamond thru wonderwall */
+  SAMPLE_squash,    /* stone squashes diamond; object falls thru wonderwall */
   SAMPLE_drip,      /* drip hits ground */
   SAMPLE_push,      /* player pushes spring/balloon/android */
   SAMPLE_dirt,      /* player walks on dirt */
@@ -34,8 +34,11 @@ enum
   SAMPLE_boom,      /* explosion */
   SAMPLE_time,      /* time runs out */
   SAMPLE_die,       /* player dies */
+
   SAMPLE_MAX
 };
+
+extern void play_sound(int, int, int);
 
 extern char play[SAMPLE_MAX];
 extern int sound_pipe[2];

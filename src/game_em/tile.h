@@ -263,14 +263,14 @@ enum
   Ygrow_ew_eat,
   Xwonderwall,
   XwonderwallB,
-  Xameuba_1,
-  Xameuba_2,
-  Xameuba_3,
-  Xameuba_4,
-  Xameuba_5,
-  Xameuba_6,
-  Xameuba_7,
-  Xameuba_8,
+  Xamoeba_1,
+  Xamoeba_2,
+  Xamoeba_3,
+  Xamoeba_4,
+  Xamoeba_5,
+  Xamoeba_6,
+  Xamoeba_7,
+  Xamoeba_8,
   Xdoor_1,
   Xdoor_2,
   Xdoor_3,
@@ -441,7 +441,7 @@ enum
 
 extern unsigned char tab_blank[TILE_MAX];
 extern unsigned char tab_acid[TILE_MAX];
-extern unsigned char tab_ameuba[TILE_MAX];
+extern unsigned char tab_amoeba[TILE_MAX];
 extern unsigned char tab_android_move[TILE_MAX];
 extern unsigned short tab_explode_normal[TILE_MAX];
 extern unsigned short tab_explode_dynamite[TILE_MAX];

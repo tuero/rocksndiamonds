@@ -252,14 +252,14 @@ enum
   Ygrow_ew_eat,
   Xwonderwall,
   XwonderwallB,
-  Xameuba_1,
-  Xameuba_2,
-  Xameuba_3,
-  Xameuba_4,
-  Xameuba_5,
-  Xameuba_6,
-  Xameuba_7,
-  Xameuba_8,
+  Xamoeba_1,
+  Xamoeba_2,
+  Xamoeba_3,
+  Xamoeba_4,
+  Xamoeba_5,
+  Xamoeba_6,
+  Xamoeba_7,
+  Xamoeba_8,
   Xdoor_1,
   Xdoor_2,
   Xdoor_3,
@@ -441,7 +441,7 @@ struct LEVEL
 
   /* fill in all below /every/ time you read a level */
   unsigned int alien_score;           /* alien popped by stone/spring score */
-  unsigned int ameuba_time;           /* ameuba speed */
+  unsigned int amoeba_time;           /* amoeba speed */
   unsigned int android_move_cnt_initial; /* android move time counter (initial) */
   unsigned int android_move_cnt;      /* android move time counter */
   unsigned int android_move_time;     /* android move reset time */

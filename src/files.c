@@ -1797,7 +1797,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 	lev->eater_array[i][y * 3 + x] =
 	  map_element_RND_to_EM(level->yamyam_content[i][x][y]);
 
-  lev->ameuba_time		= level->amoeba_speed;
+  lev->amoeba_time		= level->amoeba_speed;
   lev->wonderwall_time_initial	= level->time_magic_wall;
   lev->wheel_time		= level->time_wheel;
 
@@ -1870,7 +1870,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
 	level->yamyam_content[i][x][y] =
 	  map_element_EM_to_RND(lev->eater_array[i][y * 3 + x]);
 
-  level->amoeba_speed		= lev->ameuba_time;
+  level->amoeba_speed		= lev->amoeba_time;
   level->time_magic_wall	= lev->wonderwall_time_initial;
   level->time_wheel		= lev->wheel_time;
 

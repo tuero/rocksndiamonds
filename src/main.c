@@ -3459,6 +3459,216 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "sp_port",
     "gravity off port (leading up)"
   },
+  {
+    "balloon_switch_none",
+    "balloon_switch",
+    "stop moving balloon"
+  },
+  {
+    "emc_level_border",
+    "wall",
+    "level border steelwall",
+  },
+  {
+    "emc_android",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_right",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_up",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_left",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_down",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_left_up",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_left_down",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_right_up",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android_right_down",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_grass",
+    "emc_grass",
+    "grass",
+  },
+  {
+    "emc_generator_ball",
+    "emc_generator_ball",
+    "generator ball",
+  },
+  {
+    "emc_grow",
+    "emc_grow",
+    "grow",
+  },
+  {
+    "emc_gate_1",
+    "gate",
+    "door 1 (EMC style)",
+  },
+  {
+    "emc_gate_2",
+    "gate",
+    "door 2 (EMC style)",
+  },
+  {
+    "emc_gate_3",
+    "gate",
+    "door 3 (EMC style)",
+  },
+  {
+    "emc_gate_4",
+    "gate",
+    "door 4 (EMC style)",
+  },
+  {
+    "emc_gate_5",
+    "gate",
+    "door 5 (EMC style)",
+  },
+  {
+    "emc_gate_6",
+    "gate",
+    "door 6 (EMC style)",
+  },
+  {
+    "emc_gate_7",
+    "gate",
+    "door 7 (EMC style)",
+  },
+  {
+    "emc_gate_8",
+    "gate",
+    "door 8 (EMC style)",
+  },
+  {
+    "emc_gate_1_gray",
+    "gate",
+    "gray door (EMC style, key 1)",
+  },
+  {
+    "emc_gate_2_gray",
+    "gate",
+    "gray door (EMC style, key 2)",
+  },
+  {
+    "emc_gate_3_gray",
+    "gate",
+    "gray door (EMC style, key 3)",
+  },
+  {
+    "emc_gate_4_gray",
+    "gate",
+    "gray door (EMC style, key 4)",
+  },
+  {
+    "emc_gate_5_gray",
+    "gate",
+    "gray door (EMC style, key 5)",
+  },
+  {
+    "emc_gate_6_gray",
+    "gate",
+    "gray door (EMC style, key 6)",
+  },
+  {
+    "emc_gate_7_gray",
+    "gate",
+    "gray door (EMC style, key 7)",
+  },
+  {
+    "emc_gate_8_gray",
+    "gate",
+    "gray door (EMC style, key 8)",
+  },
+  {
+    "emc_key_1",
+    "key",
+    "key 1 (EMC style)",
+  },
+  {
+    "emc_key_2",
+    "key",
+    "key 2 (EMC style)",
+  },
+  {
+    "emc_key_3",
+    "key",
+    "key 3 (EMC style)",
+  },
+  {
+    "emc_key_4",
+    "key",
+    "key 4 (EMC style)",
+  },
+  {
+    "emc_key_5",
+    "key",
+    "key 5 (EMC style)",
+  },
+  {
+    "emc_key_6",
+    "key",
+    "key 6 (EMC style)",
+  },
+  {
+    "emc_key_7",
+    "key",
+    "key 7 (EMC style)",
+  },
+  {
+    "emc_key_8",
+    "key",
+    "key 8 (EMC style)",
+  },
+  {
+    "emc_bumper",
+    "emc_bumper",
+    "bumper",
+  },
+  {
+    "emc_plant",
+    "emc_plant",
+    "plant",
+  },
+  {
+    "emc_lenses",
+    "emc_lenses",
+    "lenses",
+  },
+  {
+    "emc_magnifier",
+    "emc_magnifier",
+    "magnifier",
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

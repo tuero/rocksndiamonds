@@ -890,10 +890,21 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].height = parameter[GFX_ARG_HEIGHT];
 
+  /* optional zoom factor for scaling up the image to a larger size */
+  if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
+  if (graphic_info[graphic].scale_up_factor < 1)
+    graphic_info[graphic].scale_up_factor = 1;		/* no scaling */
+
   if (src_bitmap)
   {
-    anim_frames_per_row = src_bitmap->width  / graphic_info[graphic].width;
-    anim_frames_per_col = src_bitmap->height / graphic_info[graphic].height;
+    /* bitmap is not scaled at this stage, so calculate final size */
+    int scale_up_factor = graphic_info[graphic].scale_up_factor;
+    int src_bitmap_width  = src_bitmap->width  * scale_up_factor;
+    int src_bitmap_height = src_bitmap->height * scale_up_factor;
+
+    anim_frames_per_row = src_bitmap_width  / graphic_info[graphic].width;
+    anim_frames_per_col = src_bitmap_height / graphic_info[graphic].height;
   }
 
   /* correct x or y offset dependent of vertical or horizontal frame order */
@@ -965,12 +976,6 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* optional border size for "crumbling" diggable graphics */
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].border_size = parameter[GFX_ARG_BORDER_SIZE];
-
-  /* optional zoom factor for scaling up the image to a larger size */
-  if (parameter[GFX_ARG_SCALE_UP] != ARG_UNDEFINED_VALUE)
-    graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP];
-  if (graphic_info[graphic].scale_up_factor < 1)
-    graphic_info[graphic].scale_up_factor = 1;		/* no scaling */
 
   /* this is only used for player "boring" and "sleeping" actions */
   if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
@@ -1044,6 +1049,7 @@ static void InitGraphicInfo()
     Bitmap *src_bitmap;
     int src_x, src_y;
     int first_frame, last_frame;
+    int scale_up_factor, src_bitmap_width, src_bitmap_height;
 
 #if 0
     printf("::: image: '%s' [%d]\n", image->token, i);
@@ -1062,11 +1068,16 @@ static void InitGraphicInfo()
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
 
+    /* bitmap is not scaled at this stage, so calculate final size */
+    scale_up_factor = graphic_info[i].scale_up_factor;
+    src_bitmap_width  = graphic_info[i].bitmap->width  * scale_up_factor;
+    src_bitmap_height = graphic_info[i].bitmap->height * scale_up_factor;
+
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
     if (src_x < 0 || src_y < 0 ||
-	src_x + TILEX > src_bitmap->width ||
-	src_y + TILEY > src_bitmap->height)
+	src_x + TILEX > src_bitmap_width ||
+	src_y + TILEY > src_bitmap_height)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");
@@ -1081,6 +1092,10 @@ static void InitGraphicInfo()
 	    src_x, src_y);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
 
+#if 1
+      Error(ERR_RETURN, "scale_up_factor == %d", scale_up_factor);
+#endif
+
       if (i == fallback_graphic)
 	Error(ERR_EXIT, "fatal error: no fallback graphic available");
 
@@ -1094,8 +1109,8 @@ static void InitGraphicInfo()
     last_frame = graphic_info[i].anim_frames - 1;
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
     if (src_x < 0 || src_y < 0 ||
-	src_x + TILEX > src_bitmap->width ||
-	src_y + TILEY > src_bitmap->height)
+	src_x + TILEX > src_bitmap_width ||
+	src_y + TILEY > src_bitmap_height)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");
@@ -1585,7 +1600,7 @@ static void ReinitializeGraphics()
   InitElementGraphicInfo();		/* element game graphic mapping */
   InitElementSpecialGraphicInfo();	/* element special graphic mapping */
 
-  InitElementSmallImages();		/* create editor and preview images */
+  InitElementSmallImages();		/* scale images to all needed sizes */
   InitFontGraphicInfo();		/* initialize text drawing functions */
 
   SetMainBackgroundImage(IMG_BACKGROUND);
@@ -3698,6 +3713,10 @@ static void InitGlobal()
 
   for (i = 0; i < MAX_NUM_ELEMENTS + 1; i++)
   {
+    /* check if element_name_info entry defined for each element in "main.h" */
+    if (i < MAX_NUM_ELEMENTS && element_name_info[i].token_name == NULL)
+      Error(ERR_EXIT, "undefined 'element_name_info' entry for element %d", i);
+
     element_info[i].token_name = element_name_info[i].token_name;
     element_info[i].class_name = element_name_info[i].class_name;
     element_info[i].editor_description=element_name_info[i].editor_description;

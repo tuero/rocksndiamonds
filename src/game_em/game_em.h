@@ -26,6 +26,7 @@
 extern void SetBitmaps_EM(Bitmap **);
 extern void DrawGameDoorValues_EM(int, int, int, int);
 extern int getGameFrameDelay_EM(int);
+extern void PlayLevelSound_EM(int, int, int, int);
 
 
 /* ========================================================================= */

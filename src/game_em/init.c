@@ -42,19 +42,70 @@ long sound_length[SAMPLE_MAX];		/* length of sound data */
 
 static const char *sound_names[SAMPLE_MAX] =
 {
-  "00.blank.au","01.roll.au","02.stone.au","03.nut.au","04.crack.au",
-  "05.bug.au","06.tank.au","07.android.au","08.spring.au","09.slurp.au",
-  "10.eater.au","11.alien.au","12.collect.au","13.diamond.au","14.squash.au",
-  "15.drip.au","16.push.au","17.dirt.au","18.acid.au","19.ball.au",
-  "20.grow.au","21.wonder.au","22.door.au","23.exit.au","24.dynamite.au",
-  "25.tick.au","26.press.au","27.wheel.au","28.boom.au","29.time.au",
+  "00.blank.au",
+  "01.roll.au",
+  "02.stone.au",
+  "03.nut.au",
+  "04.crack.au",
+  "05.bug.au",
+  "06.tank.au",
+  "07.android.au",
+  "08.spring.au",
+  "09.slurp.au",
+  "10.eater.au",
+  "11.alien.au",
+  "12.collect.au",
+  "13.diamond.au",
+  "14.squash.au",
+  "15.drip.au",
+  "16.push.au",
+  "17.dirt.au",
+  "18.acid.au",
+  "19.ball.au",
+  "20.grow.au",
+  "21.wonder.au",
+  "22.door.au",
+  "23.exit.au",
+  "24.dynamite.au",
+  "25.tick.au",
+  "26.press.au",
+  "27.wheel.au",
+  "28.boom.au",
+  "29.time.au",
   "30.die.au"
 };
 static const int sound_volume[SAMPLE_MAX] =
 {
-  20,100,100,100,100,20,20,100,100,100,
-  50,100,100,100,100,100,100,100,100,100,
-  100,20,100,100,100,100,100,20,100,100,
+  20,
+  100,
+  100,
+  100,
+  100,
+  20,
+  20,
+  100,
+  100,
+  100,
+  50,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  20,
+  100,
+  100,
+  100,
+  100,
+  100,
+  20,
+  100,
+  100,
   100
 };
 #endif
@@ -220,8 +271,39 @@ void em_close_all(void)
 
 /* ---------------------------------------------------------------------- */
 
+extern unsigned int screen_x;
+extern unsigned int screen_y;
+
+void play_sound(int x, int y, int sample)
+{
+  unsigned int left = screen_x / TILEX;
+  unsigned int top  = screen_y / TILEY;
+
+#if 0
+  if (x == -1 && y == -1)	/* play sound in the middle of the screen */
+    play[sample] = 0xffff;
+  else if ((unsigned int)(y - top)  <= SCR_FIELDY &&
+	   (unsigned int)(x - left) <= SCR_FIELDX)
+    play[sample] = (y << 8) | (x & 0xff);
+#else
+  if ((x == -1 && y == -1) ||	/* play sound in the middle of the screen */
+      ((unsigned int)(y - top)  <= SCR_FIELDY &&
+       (unsigned int)(x - left) <= SCR_FIELDX))
+    play[sample] = 1;
+#endif
+}
+
 void sound_play(void)
 {
+#if 0
+  int i;
+
+  for (i = 0; i < SAMPLE_MAX; i++)
+    if (play[i])
+      PlayLevelSound_EM(0,0,0,0);
+
+#else
+
 #if defined(AUDIO_UNIX_NATIVE)
   if (sound_pipe[1] != -1)
   {
@@ -242,7 +324,8 @@ void sound_play(void)
       }
     }
   }
+#endif
+#endif
 
   memset(play, 0, sizeof(play));
-#endif
 }

@@ -22,7 +22,7 @@ struct LEVEL
 
   /* fill in all below /every/ time you read a level */
   unsigned int alien_score;           /* alien popped by stone/spring score */
-  unsigned int ameuba_time;           /* ameuba speed */
+  unsigned int amoeba_time;           /* amoeba speed */
   unsigned int android_move_cnt;      /* android move time counter */
   unsigned int android_move_time;     /* android move reset time */
   unsigned int android_clone_cnt;     /* android clone time counter */

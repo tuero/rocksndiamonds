@@ -52,7 +52,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".post_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".post_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
-  { ".scale_up",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".scale_up_factor",			ARG_UNDEFINED,	TYPE_INTEGER	},
 
   { NULL,				NULL,		0		}
 };
@@ -3217,12 +3217,100 @@ struct ConfigInfo image_config[] =
   { "trigger_player.ypos",			"13"			},
   { "trigger_player.frames",			"1"			},
 
+  { "balloon_switch_none",			"emc_object.pcx"	},
+  { "balloon_switch_none.xpos",			"24"			},
+  { "balloon_switch_none.ypos",			"23"			},
+  { "balloon_switch_none.frames",		"1"			},
+  { "balloon_switch_none.scale_up_factor",	"2"			},
+
+  { "emc_android",				"emc_object.pcx"	},
+  { "emc_android.xpos",				"7"			},
+  { "emc_android.ypos",				"13"			},
+  { "emc_android.frames",			"1"			},
+  { "emc_android.scale_up_factor",		"2"			},
+
+  { "emc_generator_ball",			"emc_object.pcx"	},
+  { "emc_generator_ball.xpos",			"22"			},
+  { "emc_generator_ball.ypos",			"18"			},
+  { "emc_generator_ball.frames",		"1"			},
+  { "emc_generator_ball.scale_up_factor",	"2"			},
+
+  { "emc_gate_5",				"emc_object.pcx"	},
+  { "emc_gate_5.xpos",				"24"			},
+  { "emc_gate_5.ypos",				"6"			},
+  { "emc_gate_5.frames",			"1"			},
+  { "emc_gate_5.scale_up_factor",		"2"			},
+  { "emc_gate_5_gray",				"emc_object.pcx"	},
+  { "emc_gate_5_gray.xpos",			"25"			},
+  { "emc_gate_5_gray.ypos",			"18"			},
+  { "emc_gate_5_gray.frames",			"1"			},
+  { "emc_gate_5_gray.scale_up_factor",		"2"			},
+  { "emc_gate_6",				"emc_object.pcx"	},
+  { "emc_gate_6.xpos",				"24"			},
+  { "emc_gate_6.ypos",				"7"			},
+  { "emc_gate_6.frames",			"1"			},
+  { "emc_gate_6.scale_up_factor",		"2"			},
+  { "emc_gate_6_gray",				"emc_object.pcx"	},
+  { "emc_gate_6_gray.xpos",			"25"			},
+  { "emc_gate_6_gray.ypos",			"18"			},
+  { "emc_gate_6_gray.frames",			"1"			},
+  { "emc_gate_6_gray.scale_up_factor",		"2"			},
+  { "emc_gate_7",				"emc_object.pcx"	},
+  { "emc_gate_7.xpos",				"24"			},
+  { "emc_gate_7.ypos",				"8"			},
+  { "emc_gate_7.frames",			"1"			},
+  { "emc_gate_7.scale_up_factor",		"2"			},
+  { "emc_gate_7_gray",				"emc_object.pcx"	},
+  { "emc_gate_7_gray.xpos",			"25"			},
+  { "emc_gate_7_gray.ypos",			"18"			},
+  { "emc_gate_7_gray.frames",			"1"			},
+  { "emc_gate_7_gray.scale_up_factor",		"2"			},
+  { "emc_gate_8",				"emc_object.pcx"	},
+  { "emc_gate_8.xpos",				"24"			},
+  { "emc_gate_8.ypos",				"9"			},
+  { "emc_gate_8.frames",			"1"			},
+  { "emc_gate_8.scale_up_factor",		"2"			},
+  { "emc_gate_8_gray",				"emc_object.pcx"	},
+  { "emc_gate_8_gray.xpos",			"25"			},
+  { "emc_gate_8_gray.ypos",			"18"			},
+  { "emc_gate_8_gray.frames",			"1"			},
+  { "emc_gate_8_gray.scale_up_factor",		"2"			},
+
+  { "emc_key_5",				"emc_object.pcx"	},
+  { "emc_key_5.xpos",				"24"			},
+  { "emc_key_5.ypos",				"14"			},
+  { "emc_key_5.frames",				"1"			},
+  { "emc_key_5.scale_up_factor",		"2"			},
+  { "emc_key_6",				"emc_object.pcx"	},
+  { "emc_key_6.xpos",				"24"			},
+  { "emc_key_6.ypos",				"15"			},
+  { "emc_key_6.frames",				"1"			},
+  { "emc_key_6.scale_up_factor",		"2"			},
+  { "emc_key_7",				"emc_object.pcx"	},
+  { "emc_key_7.xpos",				"24"			},
+  { "emc_key_7.ypos",				"16"			},
+  { "emc_key_7.frames",				"1"			},
+  { "emc_key_7.scale_up_factor",		"2"			},
+  { "emc_key_8",				"emc_object.pcx"	},
+  { "emc_key_8.xpos",				"24"			},
+  { "emc_key_8.ypos",				"17"			},
+  { "emc_key_8.frames",				"1"			},
+  { "emc_key_8.scale_up_factor",		"2"			},
+
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
 #include "conf_grp.c"	/* include auto-generated data structure definitions */
 
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
+
+  /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
+
+  { "emc_object",				"emc_object.pcx"	},
+  { "emc_object.scale_up_factor",		"2"			},
+
+  { "emc_sprite",				"emc_sprite.pcx"	},
+  { "emc_sprite.scale_up_factor",		"2"			},
 
   { "toon_1",					"RocksToons.pcx"	},
   { "toon_1.x",					"2"			},
@@ -3768,14 +3856,6 @@ struct ConfigInfo image_config[] =
   { "background.INFO[ELEMENTS]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
-
-  /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
-
-  { "emc_object",				"emc_object.pcx"	},
-  { "emc_object.scale_up",			"2"			},
-
-  { "emc_sprite",				"emc_sprite.pcx"	},
-  { "emc_sprite.scale_up",			"2"			},
 
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */

@@ -8,6 +8,7 @@
 #include "tile.h"
 #include "level.h"
 #include "sample.h"
+#include "display.h"
 
 
 static void player(struct PLAYER *);
@@ -298,11 +299,11 @@ static void die(struct PLAYER *ply)
     case Xexit_1:
     case Xexit_2:
     case Xexit_3:
-      play[SAMPLE_exit] = 1;
+      play_sound(x, y, SAMPLE_exit);
       break;
 
     default:
-      play[SAMPLE_die] = 1;
+      play_sound(x, y, SAMPLE_die);
       break;
   }
 
@@ -389,7 +390,7 @@ static void player(struct PLAYER *ply)
       if (++ply->dynamite_cnt == 5 && ply->dynamite)
       {
 	Cave[y][x] = Xdynamite_1;
-	play[SAMPLE_dynamite] = 1;
+	play_sound(x, y, SAMPLE_dynamite);
 	ply->dynamite--;
       }
     }
@@ -417,7 +418,7 @@ static void player(struct PLAYER *ply)
       case Yacid_splash_wB:
 	Cave[y][x] = Zplayer;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_blank] = 1;
+	play_sound(x, y, SAMPLE_blank);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -458,7 +459,7 @@ static void player(struct PLAYER *ply)
 	Cave[y][x] = (dy ? (dy < 0 ? Ygrass_nB : Ygrass_sB) :
 		      (dx > 0 ? Ygrass_eB : Ygrass_wB));
 	Next[y][x] = Zplayer;
-	play[SAMPLE_dirt] = 1;
+	play_sound(x, y, SAMPLE_dirt);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -468,7 +469,7 @@ static void player(struct PLAYER *ply)
 	Cave[y][x] = (dy ? (dy < 0 ? Ydirt_nB : Ydirt_sB) :
 		      (dx > 0 ? Ydirt_eB : Ydirt_wB));
 	Next[y][x] = Zplayer;
-	play[SAMPLE_dirt] = 1;
+	play_sound(x, y, SAMPLE_dirt);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -478,7 +479,7 @@ static void player(struct PLAYER *ply)
       case Xdiamond_pause:
 	Cave[y][x] = Ydiamond_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
 	ply->anim = SPR_walk + anim;
@@ -490,7 +491,7 @@ static void player(struct PLAYER *ply)
       case Xemerald_pause:
 	Cave[y][x] = Yemerald_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
 	ply->anim = SPR_walk + anim;
@@ -501,7 +502,7 @@ static void player(struct PLAYER *ply)
       case Xdynamite:
 	Cave[y][x] = Ydynamite_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.dynamite_score;
 	ply->dynamite = ply->dynamite > 9998 ? 9999 : ply->dynamite + 1;
 	ply->anim = SPR_walk + anim;
@@ -545,7 +546,7 @@ static void player(struct PLAYER *ply)
 
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.key_score;
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
@@ -555,7 +556,7 @@ static void player(struct PLAYER *ply)
       case Xlenses:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.lenses_score;
 	lev.lenses_cnt = lev.lenses_time;
 	ply->anim = SPR_walk + anim;
@@ -566,7 +567,7 @@ static void player(struct PLAYER *ply)
       case Xmagnify:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Zplayer;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.magnify_score;
 	lev.magnify_cnt = lev.magnify_time;
 	ply->anim = SPR_walk + anim;
@@ -592,7 +593,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto stone_walk;
 
           case Xblank:
@@ -605,7 +606,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ystone_eB : Ystone_wB;
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_roll] = 1;
+	    play_sound(x, y, SAMPLE_roll);
 	    ply->x = x;
 	}
 
@@ -630,7 +631,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto bomb_walk;
 
 	  case Xblank:
@@ -643,7 +644,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ybomb_eB : Ybomb_wB;
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_roll] = 1;
+	    play_sound(x, y, SAMPLE_roll);
 	    ply->x = x;
 	}
 
@@ -668,7 +669,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto nut_walk;
 
           case Xblank:
@@ -681,7 +682,7 @@ static void player(struct PLAYER *ply)
 
 	    Cave[y][x] = dx > 0 ? Ynut_eB : Ynut_wB;
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_roll] = 1;
+	    play_sound(x, y, SAMPLE_roll);
 	    ply->x = x;
 	}
 
@@ -700,7 +701,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x+dx] = dx > 0 ? Yspring_kill_e : Yspring_kill_w;
 	    Next[y][x] = Zplayer;
 	    Next[y][x+dx] = dx > 0 ? Xspring_e : Xspring_w;
-	    play[SAMPLE_slurp] = 1;
+	    play_sound(x, y, SAMPLE_slurp);
 	    lev.score += lev.slurp_score;
 	    ply->x = x;
 	    break;
@@ -717,7 +718,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y-1][x+dx-1] == Xblank)
 	      Cave[y-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto spring_walk;
 
           case Xblank:
@@ -729,7 +730,7 @@ static void player(struct PLAYER *ply)
 	  spring_walk:
 	    Cave[y][x] = dx > 0 ? Yspring_eB : Yspring_wB;
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_roll] = 1;
+	    play_sound(x, y, SAMPLE_roll);
 	    ply->x = x;
 	}
 
@@ -765,7 +766,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y+dy-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y+dy-1][x+dx-1] == Xblank)
 	      Cave[y+dy-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto balloon_walk;
 
           case Xblank:
@@ -779,7 +780,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x] = (dy ? (dy < 0 ? Yballoon_nB : Yballoon_sB) :
 			  (dx > 0 ? Yballoon_eB : Yballoon_wB));
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_push] = 1;
+	    play_sound(x, y, SAMPLE_push);
 	    ply->x = x;
 	    ply->y = y;
 	}
@@ -810,7 +811,7 @@ static void player(struct PLAYER *ply)
 	      Cave[y+dy-1][x+dx+1] = Yacid_splash_eB;
 	    if (Cave[y+dy-1][x+dx-1] == Xblank)
 	      Cave[y+dy-1][x+dx-1] = Yacid_splash_wB;
-	    play[SAMPLE_acid] = 1;
+	    play_sound(x, y, SAMPLE_acid);
 	    goto android_walk;
 
           case Xblank:
@@ -825,7 +826,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x] = (dy ? (dy < 0 ? Yandroid_nB : Yandroid_sB) :
 			  (dx > 0 ? Yandroid_eB : Yandroid_wB));
 	    Next[y][x] = Zplayer;
-	    play[SAMPLE_push] = 1;
+	    play_sound(x, y, SAMPLE_push);
 	    ply->x = x;
 	    ply->y = y;
 	}
@@ -895,14 +896,14 @@ static void player(struct PLAYER *ply)
 
 	Cave[y+dy][x+dx] = Zplayer;
 	Next[y+dy][x+dx] = Zplayer;
-	play[SAMPLE_door] = 1;
+	play_sound(x, y, SAMPLE_door);
 	ply->anim = SPR_walk + anim;
 	ply->x = x + dx;
 	ply->y = y + dy;
 	break;
 
       case Xwheel:
-	play[SAMPLE_press] = 1;
+	play_sound(x, y, SAMPLE_press);
 	lev.wheel_cnt = lev.wheel_time;
 	lev.wheel_x = x;
 	lev.wheel_y = y;
@@ -929,17 +930,17 @@ static void player(struct PLAYER *ply)
 	goto wind_walk;
 
       wind_walk:
-	play[SAMPLE_press] = 1;
+	play_sound(x, y, SAMPLE_press);
 	lev.wind_cnt = lev.wind_time;
 	break;
 
       case Xwind_stop:
-	play[SAMPLE_press] = 1;
+	play_sound(x, y, SAMPLE_press);
 	lev.wind_cnt = 0;
 	break;
 
       case Xswitch:
-	play[SAMPLE_press] = 1;
+	play_sound(x, y, SAMPLE_press);
 	lev.ball_cnt = lev.ball_time;
 	lev.ball_state = !lev.ball_state;
 	break;
@@ -947,7 +948,7 @@ static void player(struct PLAYER *ply)
       case Xplant:
 	Cave[y][x] = Yplant;
 	Next[y][x] = Xplant;
-	play[SAMPLE_blank] = 1;
+	play_sound(x, y, SAMPLE_blank);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -956,7 +957,7 @@ static void player(struct PLAYER *ply)
       case Xexit_1:
       case Xexit_2:
       case Xexit_3:
-	play[SAMPLE_exit] = 1;
+	play_sound(x, y, SAMPLE_exit);
 	if (--lev.home == 0)
 	  lev.score += lev.time * lev.exit_score / 100;
 	ply->anim = SPR_walk + anim;
@@ -975,7 +976,7 @@ static void player(struct PLAYER *ply)
       case Xdirt:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_dirt] = 1;
+	play_sound(x, y, SAMPLE_dirt);
 	ply->anim = SPR_spray + anim;
 	break;
 
@@ -983,7 +984,7 @@ static void player(struct PLAYER *ply)
       case Xdiamond_pause:
 	Cave[y][x] = Ydiamond_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
 	ply->anim = SPR_walk + anim;
@@ -993,7 +994,7 @@ static void player(struct PLAYER *ply)
       case Xemerald_pause:
 	Cave[y][x] = Yemerald_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
 	ply->anim = SPR_walk + anim;
@@ -1002,7 +1003,7 @@ static void player(struct PLAYER *ply)
       case Xdynamite:
 	Cave[y][x] = Ydynamite_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.dynamite_score;
 	ply->dynamite = ply->dynamite > 9998 ? 9999 : ply->dynamite + 1;
 	ply->anim = SPR_walk + anim;
@@ -1043,7 +1044,7 @@ static void player(struct PLAYER *ply)
       key_shoot:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.key_score;
 	ply->anim = SPR_walk + anim;
 	break;
@@ -1051,7 +1052,7 @@ static void player(struct PLAYER *ply)
       case Xlenses:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.lenses_score;
 	lev.lenses_cnt = lev.lenses_time;
 	ply->anim = SPR_walk + anim;
@@ -1060,7 +1061,7 @@ static void player(struct PLAYER *ply)
       case Xmagnify:
 	Cave[y][x] = Yball_eat;
 	Next[y][x] = Xblank;
-	play[SAMPLE_collect] = 1;
+	play_sound(x, y, SAMPLE_collect);
 	lev.score += lev.magnify_score;
 	lev.magnify_cnt = lev.magnify_time;
 	ply->anim = SPR_walk + anim;

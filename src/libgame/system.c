@@ -917,6 +917,7 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
 
 #endif
 
+  old_bitmap->width  = new_bitmap->width;
   old_bitmap->height = new_bitmap->height;
 
   FreeBitmap(new_bitmap);

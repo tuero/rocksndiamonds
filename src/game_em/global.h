@@ -31,6 +31,7 @@ void blitscreen(void);
 void game_initscreen(void);
 void game_animscreen(void);
 
+void play_sound(int, int, int);
 void sound_play(void);
 
 int cave_convert(char *);
