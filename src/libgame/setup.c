@@ -1442,6 +1442,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   else
     setTreeInfoToDefaults(leveldir_new, TREE_TYPE_LEVEL_DIR);
 
+  leveldir_new->filename = getStringCopy(directory_name);
+
   checkSetupFileListIdentifier(setup_file_list, getCookie("LEVELINFO"));
 
   /* set all structure fields according to the token/value pairs */
@@ -1464,8 +1466,6 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   if (leveldir_new->name_sorting == NULL)
     leveldir_new->name_sorting = getStringCopy(leveldir_new->name);
-
-  leveldir_new->filename = getStringCopy(directory_name);
 
   if (node_parent == NULL)		/* top level group */
   {

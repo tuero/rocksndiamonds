@@ -444,6 +444,10 @@ void LoadLevel(int level_nr)
       /* player was faster than monsters in (pre-)1.0 levels */
       level.double_speed = TRUE;
     }
+
+    /* Default behaviour for EM style gems was "slippery" only in 2.0.1 */
+    if (level.game_version == VERSION_IDENT(2,0,1))
+      level.em_slippery_gems = TRUE;
   }
   else
   {

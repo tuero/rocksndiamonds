@@ -837,6 +837,7 @@ void InitGame()
   {
     static int ep_em_slippery_wall[] =
     {
+      EL_BETON,		/* dummy entry; may be overwritten with EL_MAUERND */
       EL_BETON,
       EL_MAUERWERK,
       EL_MAUER_LEBT,
@@ -851,10 +852,23 @@ void InitGame()
       sizeof(ep_em_slippery_wall) / sizeof(int);
 #endif
 
+#if 1
+    printf("level %d: level version == %06d\n", level_nr, level.game_version);
+    printf("         tape version == %06d\n", tape.game_version);
+    printf("      => game.version == %06d\n", game.version);
+
     /*
     printf("level %d: game.version == %06d\n", level_nr, level.game_version);
     printf("         file_version == %06d\n", level.file_version);
     */
+#endif
+
+    if (game.version > VERSION_IDENT(2,0,1))
+      ep_em_slippery_wall[0] = EL_MAUERND;
+    else
+      ep_em_slippery_wall[0] = EL_BETON;	/* dummy entry */
+
+    Elementeigenschaften2[EL_MAUERND] &= ~EP_BIT_EM_SLIPPERY_WALL;
 
     for (i=0; i<ep_em_slippery_wall_num; i++)
     {
@@ -869,6 +883,11 @@ void InitGame()
 	Elementeigenschaften2[ep_em_slippery_wall[i]] &=
 	  ~EP_BIT_EM_SLIPPERY_WALL;
     }
+
+    if (IS_EM_SLIPPERY_WALL(EL_MAUERND))
+      printf("IS_EM_SLIPPERY_WALL(EL_MAUERND)\n");
+    else
+      printf("! IS_EM_SLIPPERY_WALL(EL_MAUERND)\n");
   }
 
   if (BorderElement == EL_LEERRAUM)
