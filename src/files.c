@@ -421,20 +421,6 @@ void LoadLevel(int level_nr)
     Error(ERR_WARN, "using high speed movement for player");
     level.high_speed = TRUE;
   }
-
-  /* determine border element */
-  BorderElement = EL_LEERRAUM;
-  for(y=0; y<lev_fieldy && BorderElement == EL_LEERRAUM; y++)
-  {
-    for(x=0; x<lev_fieldx; x++)
-    {
-      if (!IS_MASSIVE(Feld[x][y]))
-	BorderElement = EL_BETON;
-
-      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
-	x = lev_fieldx - 2;
-    }
-  }
 }
 
 void SaveLevel(int level_nr)

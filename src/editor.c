@@ -18,6 +18,7 @@
 #include "buttons.h"
 #include "files.h"
 #include "game.h"
+#include "tape.h"
 
 /* positions in the level editor */
 #define ED_WIN_MB_LEFT_XPOS	7
@@ -908,6 +909,8 @@ void DrawLevelEd()
   name_typing = FALSE;
 
   CloseDoor(DOOR_CLOSE_ALL);
+
+  OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
 
   if (level_editor_test_game)
   {
@@ -2969,8 +2972,25 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  for(y=0; y<lev_fieldy; y++)
 	    Ur[x][y] = Feld[x][y];
 
+	UnmapLevelEditorGadgets();
+
+	/* draw smaller door */
+	XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+		  DOOR_GFX_PAGEX7, 64,
+		  108, 64,
+		  EX - 4, EY - 12);
+	redraw_mask |= REDRAW_ALL;
+
+	CloseDoor(DOOR_CLOSE_ALL);
+
+	DrawCompleteVideoDisplay();
+
+	if (setup.autorecord)
+	  TapeStartRecording();
+
 	level_editor_test_game = TRUE;
 	game_status = PLAYING;
+
 	InitGame();
       }
       break;

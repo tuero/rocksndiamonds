@@ -535,6 +535,9 @@ void InitGame()
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
+  /* determine border element for this level */
+  SetBorderElement();
+
   if (BorderElement == EL_LEERRAUM)
   {
     SBX_Left = 0;
@@ -551,26 +554,11 @@ void InitGame()
   }
 
   if (lev_fieldx < SCR_FIELDX)
-  {
     SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
 
-    /*
-    SBX_Left  -= (SCR_FIELDX - lev_fieldx) / 2;
-    SBX_Right -= (SCR_FIELDX - lev_fieldx) / 2;
-    */
-  }
-
   if (lev_fieldy < SCR_FIELDY)
-  {
     SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
 
-    /*
-    SBY_Upper -= (SCR_FIELDY - lev_fieldy) / 2;
-    SBY_Lower -= (SCR_FIELDY - lev_fieldy) / 2;
-    */
-  }
-
-#if 1
   scroll_x = SBX_Left;
   scroll_y = SBY_Upper;
   if (local_player->jx >= SBX_Left + MIDPOSX)
@@ -581,17 +569,6 @@ void InitGame()
     scroll_y = (local_player->jy <= SBY_Lower + MIDPOSY ?
 		local_player->jy - MIDPOSY :
 		SBY_Lower);
-#else
-  scroll_x = scroll_y = -1;
-  if (local_player->jx >= MIDPOSX-1)
-    scroll_x = (local_player->jx <= lev_fieldx-MIDPOSX ?
-		local_player->jx - MIDPOSX :
-		lev_fieldx - SCR_FIELDX + 1);
-  if (local_player->jy >= MIDPOSY-1)
-    scroll_y = (local_player->jy <= lev_fieldy-MIDPOSY ?
-		local_player->jy - MIDPOSY :
-		lev_fieldy - SCR_FIELDY + 1);
-#endif
 
   CloseDoor(DOOR_CLOSE_1);
 
@@ -630,7 +607,7 @@ void InitGame()
 	    DOOR_GFX_PAGEX1 + GAME_CONTROL_XPOS,
 	    DOOR_GFX_PAGEY1 + GAME_CONTROL_YPOS);
 
-  OpenDoor(DOOR_OPEN_1);
+  OpenDoor(DOOR_OPEN_ALL);
 
   if (setup.sound_music)
     PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
@@ -3919,19 +3896,13 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     {
       if (jx != old_jx)		/* player has moved horizontally */
       {
- 	if ((player->MovDir == MV_LEFT && scroll_x > jx-MIDPOSX+offset) ||
-	    (player->MovDir == MV_RIGHT && scroll_x < jx-MIDPOSX-offset))
+ 	if ((player->MovDir == MV_LEFT && scroll_x > jx - MIDPOSX + offset) ||
+	    (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
 	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
 
-#if 1
 	/* don't scroll over playfield boundaries */
 	if (scroll_x < SBX_Left || scroll_x > SBX_Right)
 	  scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
-#else
-	/* don't scroll over playfield boundaries */
-	if (scroll_x < -1 || scroll_x > lev_fieldx - SCR_FIELDX + 1)
-	  scroll_x = (scroll_x < -1 ? -1 : lev_fieldx - SCR_FIELDX + 1);
-#endif
 
 	/* don't scroll more than one field at a time */
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
@@ -3943,19 +3914,13 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       }
       else			/* player has moved vertically */
       {
-	if ((player->MovDir == MV_UP && scroll_y > jy-MIDPOSY+offset) ||
-	    (player->MovDir == MV_DOWN && scroll_y < jy-MIDPOSY-offset))
+	if ((player->MovDir == MV_UP && scroll_y > jy - MIDPOSY + offset) ||
+	    (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
 	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
 
-#if 1
 	/* don't scroll over playfield boundaries */
 	if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
 	  scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
-#else
-	/* don't scroll over playfield boundaries */
-	if (scroll_y < -1 || scroll_y > lev_fieldy - SCR_FIELDY + 1)
-	  scroll_y = (scroll_y < -1 ? -1 : lev_fieldy - SCR_FIELDY + 1);
-#endif
 
 	/* don't scroll more than one field at a time */
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);

@@ -498,6 +498,7 @@ void SoundServer_FadeSound(int nr)
 }
 */
 
+#ifdef MSDOS
 static void SoundServer_StopSound(int nr)
 {
   int i;
@@ -540,6 +541,7 @@ static void SoundServer_StopAllSounds()
   close(sound_device);
 #endif
 }
+#endif /* MSDOS */
 
 #ifdef HPUX_AUDIO
 static void HPUX_Audio_Control()
@@ -564,6 +566,7 @@ static void HPUX_Audio_Control()
 }
 #endif /* HPUX_AUDIO */
 
+#ifndef VOXWARE
 /* these two are stolen from "sox"... :) */
 
 /*
@@ -667,6 +670,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
   return(sample);
 }
+#endif /* !VOXWARE */
 
 /*** THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 

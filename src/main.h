@@ -65,14 +65,8 @@ typedef unsigned char byte;
 #define SCR_FIELDY	17
 #define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE	(SCR_FIELDY + 2)
-
-#if 0
-#define MIN_LEV_FIELDX	(SCR_FIELDX - 2)
-#define MIN_LEV_FIELDY	(SCR_FIELDY - 2)
-#else
 #define MIN_LEV_FIELDX	3
 #define MIN_LEV_FIELDY	3
-#endif
 #define STD_LEV_FIELDX	64
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128

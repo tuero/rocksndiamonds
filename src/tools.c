@@ -1383,6 +1383,9 @@ void DrawMicroLevel(int xpos, int ypos)
 {
   int x,y;
 
+  /* determine border element for this level */
+  SetBorderElement();
+
   XFillRectangle(display, drawto, gc,
 		 xpos - MICRO_TILEX, ypos - MICRO_TILEY,
 		 MICRO_TILEX * (STD_LEV_FIELDX + 2),

@@ -315,6 +315,25 @@ void MarkTileDirty(int x, int y)
   redraw_mask |= REDRAW_TILES;
 }
 
+void SetBorderElement()
+{
+  int x, y;
+
+  BorderElement = EL_LEERRAUM;
+
+  for(y=0; y<lev_fieldy && BorderElement == EL_LEERRAUM; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (!IS_MASSIVE(Feld[x][y]))
+	BorderElement = EL_BETON;
+
+      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
+	x = lev_fieldx - 2;
+    }
+  }
+}
+
 void GetOptions(char *argv[])
 {
   char **options_left = &argv[1];

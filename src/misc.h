@@ -51,6 +51,7 @@ char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
 void MarkTileDirty(int, int);
+void SetBorderElement();
 void GetOptions(char **);
 void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
