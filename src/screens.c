@@ -2921,7 +2921,7 @@ static void CreateScreenScrollbars()
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
-		      GDI_BORDER_SIZE, SC_BORDER_SIZE,
+		      GDI_BORDER_SIZE, SC_BORDER_SIZE, SC_BORDER_SIZE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);
