@@ -273,7 +273,7 @@ void SoundServer(void)
       static long max_sample_size = 0;
       static long fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
       int sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
-      boolean stereo = TRUE;
+      static boolean stereo = TRUE;
 
       if (playing_sounds ||
 	  (audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
