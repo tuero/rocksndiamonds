@@ -467,8 +467,8 @@ char *element_info[] =
   "extra time",
   "switch gate (open)",
   "switch gate (closed)",
-  "switch for switch gate (open)",
-  "switch for switch gate (closed)",
+  "switch for switch gate",
+  "switch for switch gate",
   "time gate",
   "time gate with magic wheel",			/* 270 */
   "red conveyor belt (left)",
@@ -497,10 +497,11 @@ char *element_info[] =
   "switch for blue conveyor belt (right)",
   "land mine",
   "mail envelope",
-  "light switch",
+  "light switch (off)",
+  "light switch (on)",
   "sign (exclamation)",
-  "sign (radio activity)",
-  "sign (stop)",				/* 300 */
+  "sign (radio activity)",			/* 300 */
+  "sign (stop)",
   "sign (wheel chair)",
   "sign (parking)",
   "sign (one way)",
@@ -509,18 +510,18 @@ char *element_info[] =
   "sign (round)",
   "sign (exit)",
   "sign (yin yang)",
-  "sign (other)",
-  "mole (starts moving left)",			/* 310 */
+  "sign (other)",				/* 310 */
+  "mole (starts moving left)",
   "mole (starts moving right)",
   "mole (starts moving up)",
   "mole (starts moving down)",
-  "steel (?)",
+  "steel wall (slanted)",
   "invisible sand",
   "-",
   "-",
   "-",
-  "-",
   "-",						/* 320 */
+  "-",
   "-",
   "-",
   "-",

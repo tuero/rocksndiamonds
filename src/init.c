@@ -870,7 +870,9 @@ void InitElementProperties()
     EL_EM_GATE_1X,
     EL_EM_GATE_2X,
     EL_EM_GATE_3X,
-    EL_EM_GATE_4X
+    EL_EM_GATE_4X,
+    EL_SWITCHGATE_OPEN,
+    EL_SWITCHGATE_CLOSED
   };
   static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
 
@@ -926,7 +928,34 @@ void InitElementProperties()
     EL_SP_HARD_BASE6,
     EL_SP_TERMINAL,
     EL_SP_EXIT,
-    EL_INVISIBLE_STEEL
+    EL_INVISIBLE_STEEL,
+    EL_BELT1_SWITCH_L,
+    EL_BELT1_SWITCH_M,
+    EL_BELT1_SWITCH_R,
+    EL_BELT2_SWITCH_L,
+    EL_BELT2_SWITCH_M,
+    EL_BELT2_SWITCH_R,
+    EL_BELT3_SWITCH_L,
+    EL_BELT3_SWITCH_M,
+    EL_BELT3_SWITCH_R,
+    EL_BELT4_SWITCH_L,
+    EL_BELT4_SWITCH_M,
+    EL_BELT4_SWITCH_R,
+    EL_LIGHT_SWITCH_OFF,
+    EL_LIGHT_SWITCH_ON,
+    EL_SIGN_EXCLAMATION,
+    EL_SIGN_RADIOACTIVITY,
+    EL_SIGN_STOP,
+    EL_SIGN_WHEELCHAIR,
+    EL_SIGN_PARKING,
+    EL_SIGN_ONEWAY,
+    EL_SIGN_HEART,
+    EL_SIGN_TRIANGLE,
+    EL_SIGN_ROUND,
+    EL_SIGN_EXIT,
+    EL_SIGN_YINYANG,
+    EL_SIGN_OTHER,
+    EL_STEEL_SLANTED
   };
   static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
 
@@ -955,6 +984,8 @@ void InitElementProperties()
     EL_EM_GATE_2X,
     EL_EM_GATE_3X,
     EL_EM_GATE_4X,
+    EL_SWITCHGATE_OPEN,
+    EL_SWITCHGATE_CLOSED,
     EL_SP_HARD_GRAY,
     EL_SP_HARD_GREEN,
     EL_SP_HARD_BLUE,
@@ -966,7 +997,34 @@ void InitElementProperties()
     EL_SP_HARD_BASE4,
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
-    EL_INVISIBLE_STEEL
+    EL_INVISIBLE_STEEL,
+    EL_BELT1_SWITCH_L,
+    EL_BELT1_SWITCH_M,
+    EL_BELT1_SWITCH_R,
+    EL_BELT2_SWITCH_L,
+    EL_BELT2_SWITCH_M,
+    EL_BELT2_SWITCH_R,
+    EL_BELT3_SWITCH_L,
+    EL_BELT3_SWITCH_M,
+    EL_BELT3_SWITCH_R,
+    EL_BELT4_SWITCH_L,
+    EL_BELT4_SWITCH_M,
+    EL_BELT4_SWITCH_R,
+    EL_LIGHT_SWITCH_OFF,
+    EL_LIGHT_SWITCH_ON,
+    EL_SIGN_EXCLAMATION,
+    EL_SIGN_RADIOACTIVITY,
+    EL_SIGN_STOP,
+    EL_SIGN_WHEELCHAIR,
+    EL_SIGN_PARKING,
+    EL_SIGN_ONEWAY,
+    EL_SIGN_HEART,
+    EL_SIGN_TRIANGLE,
+    EL_SIGN_ROUND,
+    EL_SIGN_EXIT,
+    EL_SIGN_YINYANG,
+    EL_SIGN_OTHER,
+    EL_STEEL_SLANTED
   };
   static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
 
@@ -998,7 +1056,8 @@ void InitElementProperties()
     EL_SP_CHIP_RIGHT,
     EL_SP_CHIP_UPPER,
     EL_SP_CHIP_LOWER,
-    EL_SPEED_PILL
+    EL_SPEED_PILL,
+    EL_STEEL_SLANTED
   };
   static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
 
@@ -1064,7 +1123,8 @@ void InitElementProperties()
     EL_SP_HARD_BASE6,
     EL_SP_TERMINAL,
     EL_SP_EXIT,
-    EL_INVISIBLE_STEEL
+    EL_INVISIBLE_STEEL,
+    EL_STEEL_SLANTED
   };
   static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
 
@@ -1199,7 +1259,8 @@ void InitElementProperties()
     EL_SALZSAEURE,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
-    EL_SP_BUG_ACTIVE
+    EL_SP_BUG_ACTIVE,
+    EL_LANDMINE
   };
   static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
 
@@ -1374,7 +1435,32 @@ void InitElementProperties()
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
     EL_SP_EXIT,
-    EL_INVISIBLE_STEEL
+    EL_INVISIBLE_STEEL,
+    EL_BELT1_SWITCH_L,
+    EL_BELT1_SWITCH_M,
+    EL_BELT1_SWITCH_R,
+    EL_BELT2_SWITCH_L,
+    EL_BELT2_SWITCH_M,
+    EL_BELT2_SWITCH_R,
+    EL_BELT3_SWITCH_L,
+    EL_BELT3_SWITCH_M,
+    EL_BELT3_SWITCH_R,
+    EL_BELT4_SWITCH_L,
+    EL_BELT4_SWITCH_M,
+    EL_BELT4_SWITCH_R,
+    EL_SIGN_EXCLAMATION,
+    EL_SIGN_RADIOACTIVITY,
+    EL_SIGN_STOP,
+    EL_SIGN_WHEELCHAIR,
+    EL_SIGN_PARKING,
+    EL_SIGN_ONEWAY,
+    EL_SIGN_HEART,
+    EL_SIGN_TRIANGLE,
+    EL_SIGN_ROUND,
+    EL_SIGN_EXIT,
+    EL_SIGN_YINYANG,
+    EL_SIGN_OTHER,
+    EL_STEEL_SLANTED
   };
   static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
 
@@ -1454,7 +1540,8 @@ void InitElementProperties()
   {
     EL_ERDREICH,
     EL_SP_BASE,
-    EL_SP_BUG
+    EL_SP_BUG,
+    EL_SAND_INVISIBLE
   };
   static int ep_eatable_num = sizeof(ep_eatable)/sizeof(int);
 
@@ -1525,7 +1612,8 @@ void InitElementProperties()
     EL_SP_PORT2_DOWN,
     EL_SP_PORT_X,
     EL_SP_PORT_Y,
-    EL_SP_PORT_XY
+    EL_SP_PORT_XY,
+    EL_SWITCHGATE_OPEN
   };
   static int ep_quick_gate_num = sizeof(ep_quick_gate)/sizeof(int);
 

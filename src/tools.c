@@ -1157,6 +1157,14 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     else if (rechts_massiv)
       graphic = GFX_MAUER_L;
   }
+  else if ((element == EL_INVISIBLE_STEEL ||
+	    element == EL_UNSICHTBAR ||
+	    element == EL_SAND_INVISIBLE) && game.light_time_left)
+  {
+    graphic = (element == EL_INVISIBLE_STEEL ? GFX_INVISIBLE_STEEL_ON :
+	       element == EL_UNSICHTBAR ? GFX_UNSICHTBAR_ON :
+	       GFX_SAND_INVISIBLE_ON);
+  }
 
   if (dx || dy)
     DrawGraphicShifted(x, y, dx, dy, graphic, cut_mode, mask_mode);
@@ -1220,7 +1228,7 @@ void ErdreichAnbroeckeln(int x, int y)
 
   element = Feld[ux][uy];
 
-  if (element == EL_ERDREICH)
+  if (element == EL_ERDREICH || element == EL_LANDMINE)
   {
     if (!IN_SCR_FIELD(x, y))
       return;
@@ -1238,7 +1246,7 @@ void ErdreichAnbroeckeln(int x, int y)
       else
 	element = Feld[uxx][uyy];
 
-      if (element == EL_ERDREICH)
+      if (element == EL_ERDREICH || element == EL_LANDMINE)
 	continue;
 
       if (i == 1 || i == 2)
@@ -1277,7 +1285,8 @@ void ErdreichAnbroeckeln(int x, int y)
       uxx = ux + xy[i][0];
       uyy = uy + xy[i][1];
 
-      if (!IN_LEV_FIELD(uxx, uyy) || Feld[uxx][uyy] != EL_ERDREICH ||
+      if (!IN_LEV_FIELD(uxx, uyy) ||
+	  (Feld[uxx][uyy] != EL_ERDREICH && Feld[uxx][uyy] != EL_LANDMINE) ||
 	  !IN_SCR_FIELD(xx, yy))
 	continue;
 
@@ -2482,8 +2491,8 @@ int el2gfx(int element)
     case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
     case EL_SWITCHGATE_OPEN:	return GFX_SWITCHGATE_OPEN;
     case EL_SWITCHGATE_CLOSED:	return GFX_SWITCHGATE_CLOSED;
-    case EL_SWITCHGATE_SWITCH_L:return GFX_SWITCHGATE_SWITCH_L;
-    case EL_SWITCHGATE_SWITCH_R:return GFX_SWITCHGATE_SWITCH_R;
+    case EL_SWITCHGATE_SWITCH_1:return GFX_SWITCHGATE_SWITCH_1;
+    case EL_SWITCHGATE_SWITCH_2:return GFX_SWITCHGATE_SWITCH_2;
     case EL_TIME_GATE:		return GFX_TIME_GATE;
     case EL_TIME_GATE_WHEEL:	return GFX_TIME_GATE_WHEEL;
     case EL_BELT1_LEFT:		return GFX_BELT1_LEFT;
@@ -2512,7 +2521,8 @@ int el2gfx(int element)
     case EL_BELT4_SWITCH_R:	return GFX_BELT4_SWITCH_R;
     case EL_LANDMINE:		return GFX_LANDMINE;
     case EL_ENVELOPE:		return GFX_ENVELOPE;
-    case EL_LIGHT_SWITCH:	return GFX_LIGHT_SWITCH;
+    case EL_LIGHT_SWITCH_OFF:	return GFX_LIGHT_SWITCH_OFF;
+    case EL_LIGHT_SWITCH_ON:	return GFX_LIGHT_SWITCH_ON;
     case EL_SIGN_EXCLAMATION:	return GFX_SIGN_EXCLAMATION;
     case EL_SIGN_RADIOACTIVITY:	return GFX_SIGN_RADIOACTIVITY;
     case EL_SIGN_STOP:		return GFX_SIGN_STOP;

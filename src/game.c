@@ -394,6 +394,18 @@ static void InitField(int x, int y, boolean init_game)
 	  Feld[x][y] = Feld[x][y] - belt_dir_nr + game.belt_dir_nr[belt_nr];
 	}
       }
+      break;
+
+    case EL_SWITCHGATE_SWITCH_2:	/* always start with same switch pos */
+      if (init_game)
+	Feld[x][y] = EL_SWITCHGATE_SWITCH_1;
+      break;
+
+    case EL_LIGHT_SWITCH_ON:
+      if (init_game)
+	game.light_time_left = 10 * FRAMES_PER_SECOND;
+      break;
+
     default:
       break;
   }
@@ -495,10 +507,12 @@ void InitGame()
   AllPlayersGone = FALSE;
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
+  game.switchgate_pos = 0;
+  game.light_time_left = 0;
   for (i=0; i<4; i++)
   {
     game.belt_dir[i] = MV_NO_MOVING;
-    game.belt_dir_nr[i] = 3;		/* no moving, next switch left */
+    game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
   }
 
   for (i=0; i<MAX_NUM_AMOEBA; i++)
@@ -532,6 +546,11 @@ void InitGame()
       InitField(x, y, TRUE);
     }
   }
+
+  /* correct non-moving belts to start moving left */
+  for (i=0; i<4; i++)
+    if (game.belt_dir[i] == MV_NO_MOVING)
+      game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
   /* check if any connected player was not found in playfield */
   for (i=0; i<MAX_PLAYERS; i++)
@@ -3164,6 +3183,54 @@ void AusgangstuerBlinken(int x, int y)
   DrawGraphicAnimation(x, y, GFX_AUSGANG_AUF, 4, 4, ANIM_OSCILLATE);
 }
 
+void OpenSwitchgate(int x, int y)
+{
+  int delay = 6;
+
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = 5 * delay;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = MovDelay[x][y] / delay;
+    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_SWITCHGATE_OPEN - phase);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_SWITCHGATE_OPEN;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
+void CloseSwitchgate(int x, int y)
+{
+  int delay = 6;
+
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = 5 * delay;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    int phase;
+
+    MovDelay[x][y]--;
+    phase = MovDelay[x][y] / delay;
+    if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_SWITCHGATE_CLOSED + phase);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_SWITCHGATE_CLOSED;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
 void EdelsteinFunkeln(int x, int y)
 {
   if (!IN_SCR_FIELD(SCREENX(x), SCREENY(y)) || IS_MOVING(x, y))
@@ -3762,6 +3829,10 @@ void GameActions()
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
     else if (IS_BELT(element))
       DrawBeltAnimation(x, y, element);
+    else if (element == EL_SWITCHGATE_OPENING)
+      OpenSwitchgate(x, y);
+    else if (element == EL_SWITCHGATE_CLOSING)
+      CloseSwitchgate(x, y);
 
     if (game.magic_wall_active)
     {
@@ -3803,6 +3874,7 @@ void GameActions()
 	for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
 	{
 	  element = Feld[x][y];
+
 	  if (element == EL_SIEB_LEER || element == EL_SIEB_VOLL)
 	  {
 	    Feld[x][y] = EL_SIEB_TOT;
@@ -3816,6 +3888,29 @@ void GameActions()
 	}
 
 	game.magic_wall_active = FALSE;
+      }
+    }
+  }
+
+  if (game.light_time_left > 0)
+  {
+    game.light_time_left--;
+
+    if (game.light_time_left == 0)
+    {
+      for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+      {
+	element = Feld[x][y];
+
+	if (element == EL_LIGHT_SWITCH_ON)
+	{
+	  Feld[x][y] = EL_LIGHT_SWITCH_OFF;
+	  DrawLevelField(x, y);
+	}
+	else if (element == EL_INVISIBLE_STEEL ||
+		 element == EL_UNSICHTBAR ||
+		 element == EL_SAND_INVISIBLE)
+	  DrawLevelField(x, y);
       }
     }
   }
@@ -4493,6 +4588,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     case EL_ERDREICH:
+    case EL_SAND_INVISIBLE:
       Feld[x][y] = EL_LEERRAUM;
       PlaySoundLevel(x, y, SND_SCHLURF);
       break;
@@ -4527,6 +4623,11 @@ int DigField(struct PlayerInfo *player,
     case EL_SPEED_PILL:
       RemoveField(x, y);
       player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
+      PlaySoundLevel(x, y, SND_PONG);
+      break;
+
+    case EL_ENVELOPE:
+      Feld[x][y] = EL_LEERRAUM;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -4669,21 +4770,23 @@ int DigField(struct PlayerInfo *player,
 	if (player->Switching)
 	  return MF_ACTION;
 
+	player->Switching = TRUE;
+
 	game.belt_dir_nr[belt_nr] = belt_dir_nr;
 	game.belt_dir[belt_nr] = belt_dir;
 
 	if (belt_dir_nr == 3)
 	  belt_dir_nr = 1;
 
-	player->Switching = TRUE;
-
 	for (yy=0; yy<lev_fieldy; yy++)
 	{
 	  for (xx=0; xx<lev_fieldx; xx++)
 	  {
-	    if (IS_BELT_SWITCH(Feld[xx][yy]))
+	    int element = Feld[xx][yy];
+
+	    if (IS_BELT_SWITCH(element))
 	    {
-	      int e_belt_nr = getBeltNrFromSwitchElement(Feld[xx][yy]);
+	      int e_belt_nr = getBeltNrFromSwitchElement(element);
 
 	      if (e_belt_nr == belt_nr)
 	      {
@@ -4691,13 +4794,99 @@ int DigField(struct PlayerInfo *player,
 		DrawLevelField(xx, yy);
 	      }
 	    }
-	    else if (belt_dir == MV_NO_MOVING && IS_BELT(Feld[xx][yy]))
+	    else if (belt_dir == MV_NO_MOVING && IS_BELT(element))
 	    {
-	      int e_belt_nr = getBeltNrFromElement(Feld[xx][yy]);
+	      int e_belt_nr = getBeltNrFromElement(element);
 
 	      if (e_belt_nr == belt_nr)
 		DrawLevelField(xx, yy);    /* set belt to parking position */
 	    }
+	  }
+	}
+
+	return MF_ACTION;
+      }
+      break;
+
+    case EL_SWITCHGATE_SWITCH_1:
+    case EL_SWITCHGATE_SWITCH_2:
+      {
+	int xx, yy;
+
+	if (player->Switching)
+	  return MF_ACTION;
+
+	player->Switching = TRUE;
+
+	game.switchgate_pos = !game.switchgate_pos;
+
+	for (yy=0; yy<lev_fieldy; yy++)
+	{
+	  for (xx=0; xx<lev_fieldx; xx++)
+	  {
+	    int element = Feld[xx][yy];
+
+	    if (element == EL_SWITCHGATE_SWITCH_1 ||
+		element == EL_SWITCHGATE_SWITCH_2)
+	    {
+	      Feld[xx][yy] = EL_SWITCHGATE_SWITCH_1 + game.switchgate_pos;
+	      DrawLevelField(xx, yy);
+	    }
+	    else if (element == EL_SWITCHGATE_OPEN ||
+		     element == EL_SWITCHGATE_OPENING)
+	    {
+	      Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
+	      PlaySoundLevel(xx, yy, SND_OEFFNEN);
+	    }
+	    else if (element == EL_SWITCHGATE_CLOSED ||
+		     element == EL_SWITCHGATE_CLOSING)
+	    {
+	      Feld[xx][yy] = EL_SWITCHGATE_OPENING;
+	      PlaySoundLevel(xx, yy, SND_OEFFNEN);
+	    }
+	  }
+	}
+
+	return MF_ACTION;
+      }
+      break;
+
+    case EL_LIGHT_SWITCH_OFF:
+    case EL_LIGHT_SWITCH_ON:
+      {
+	int xx, yy;
+
+	if (player->Switching)
+	  return MF_ACTION;
+
+	player->Switching = TRUE;
+
+	game.light_time_left =
+	  (element == EL_LIGHT_SWITCH_OFF ? 10 * FRAMES_PER_SECOND : 0);
+
+	for (yy=0; yy<lev_fieldy; yy++)
+	{
+	  for (xx=0; xx<lev_fieldx; xx++)
+	  {
+	    int element = Feld[xx][yy];
+
+	    if (element == EL_LIGHT_SWITCH_OFF &&
+		game.light_time_left > 0)
+	    {
+	      Feld[xx][yy] = EL_LIGHT_SWITCH_ON;
+	      DrawLevelField(xx, yy);
+	    }
+	    else if (element == EL_LIGHT_SWITCH_ON &&
+		     game.light_time_left == 0)
+	    {
+	      Feld[xx][yy] = EL_LIGHT_SWITCH_OFF;
+	      DrawLevelField(xx, yy);
+	    }
+
+	    if (element == EL_INVISIBLE_STEEL ||
+		element == EL_UNSICHTBAR ||
+		element == EL_SAND_INVISIBLE)
+	      DrawLevelField(xx, yy);
 	  }
 	}
 
@@ -4794,6 +4983,18 @@ int DigField(struct PlayerInfo *player,
     case EL_EM_GATE_4X:
       if (!player->key[element - EL_EM_GATE_1X])
 	return MF_NO_ACTION;
+      if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	return MF_NO_ACTION;
+
+      /* automatically move to the next field with double speed */
+      player->programmed_action = move_direction;
+      DOUBLE_PLAYER_SPEED(player);
+
+      PlaySoundLevel(x, y, SND_GATE);
+
+      break;
+
+    case EL_SWITCHGATE_OPEN:
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
 
