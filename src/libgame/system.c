@@ -12,9 +12,31 @@
 *  system.c                                                *
 ***********************************************************/
 
-#include "main.h"
-#include "misc.h"
-#include "sound.h"
+#include "libgame.h"
+
+
+/* ========================================================================= */
+/* internal variables                                                        */
+/* ========================================================================= */
+
+Display        *display;
+Visual	       *visual;
+int		screen;
+Colormap	cmap;
+
+DrawWindow  	window = None;
+GC		gc;
+
+int		FrameCounter;
+
+
+/* ========================================================================= */
+/* exported variables                                                        */
+/* ========================================================================= */
+
+struct VideoSystemInfo	video;
+struct AudioSystemInfo	audio;
+struct OptionInfo	options;
 
 
 /* ========================================================================= */
@@ -23,6 +45,9 @@
 
 inline void InitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 {
+  video.fullscreen_available = FULLSCREEN_STATUS;
+  video.fullscreen_enabled = FALSE;
+
 #ifdef TARGET_SDL
   SDLInitBufferedDisplay(backbuffer, window);
 #else
@@ -199,19 +224,19 @@ inline boolean PointerInWindow(DrawWindow window)
 #endif
 }
 
-inline boolean SetVideoMode(void)
+inline boolean SetVideoMode(boolean fullscreen)
 {
 #ifdef TARGET_SDL
-  return SDLSetVideoMode(&backbuffer);
+  return SDLSetVideoMode(&backbuffer, fullscreen);
 #else
   boolean success = TRUE;
 
-  if (setup.fullscreen && fullscreen_available)
+  if (fullscreen && video.fullscreen_available)
   {
     Error(ERR_WARN, "fullscreen not available in X11 version");
 
     /* display error message only once */
-    fullscreen_available = FALSE;
+    video.fullscreen_available = FALSE;
 
     success = FALSE;
   }
@@ -220,13 +245,15 @@ inline boolean SetVideoMode(void)
 #endif
 }
 
-inline void ChangeVideoModeIfNeeded(void)
+inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
 {
 #ifdef TARGET_SDL
-  if ((setup.fullscreen && !fullscreen_enabled && fullscreen_available) ||
-      (!setup.fullscreen && fullscreen_enabled))
-    SetVideoMode();
+  if ((fullscreen && !video.fullscreen_enabled && video.fullscreen_available)||
+      (!fullscreen && video.fullscreen_enabled))
+    fullscreen = SetVideoMode(fullscreen_wanted);
 #endif
+
+  return fullscreen;
 }
 
 
@@ -240,6 +267,7 @@ inline boolean OpenAudio(struct AudioSystemInfo *audio)
   audio->loops_available = FALSE;
   audio->soundserver_pipe[0] = audio->soundserver_pipe[1] = 0;
   audio->soundserver_pid = 0;
+  audio->device_name = NULL;
   audio->device_fd = 0;
 
 #if defined(TARGET_SDL)

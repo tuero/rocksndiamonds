@@ -8,28 +8,20 @@
 *              phone: ++49 +521 290471                     *
 *              email: aeglos@valinor.owl.de                *
 *----------------------------------------------------------*
-*  pcx.h                                                   *
+*  text.h                                                  *
 ***********************************************************/
 
-#ifndef PCX_H
-#define PCX_H
+#ifndef TEXT_H
+#define TEXT_H
 
-#ifndef TARGET_SDL
+#include "libgame.h"
 
-#include "main.h"
-#include "image.h"
+int getFontWidth(int, int);
+int getFontHeight(int, int);
+void DrawInitText(char *, int, int);
+void DrawTextF(int, int, int, char *, ...);
+void DrawTextFCentered(int, int, char *, ...);
+void DrawText(int, int, char *, int, int);
+void DrawTextExt(DrawBuffer, GC, int, int, char *, int, int);
 
-#define PCX_Success		 0
-#define PCX_OpenFailed		-1
-#define PCX_ReadFailed		-2
-#define	PCX_FileInvalid		-3
-#define PCX_NoMemory		-4
-#define PCX_ColorFailed		-5
-
-/* global PCX error value */
-extern int errno_pcx;
-
-Image *Read_PCX_to_Image(char *);
-
-#endif /* !TARGET_SDL */
-#endif	/* PCX_H */
+#endif	/* TEXT_H */

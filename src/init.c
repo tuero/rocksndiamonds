@@ -13,10 +13,10 @@
 
 #include <signal.h>
 
+#include "libgame/libgame.h"
+
 #include "init.h"
 #include "events.h"
-#include "misc.h"
-#include "sound.h"
 #include "screens.h"
 #include "editor.h"
 #include "game.h"
@@ -24,8 +24,6 @@
 #include "tools.h"
 #include "files.h"
 #include "joystick.h"
-#include "image.h"
-#include "pcx.h"
 #include "network.h"
 #include "netserv.h"
 

@@ -12,18 +12,9 @@
 *  msdos.c                                                 *
 ***********************************************************/
 
-#include "platform.h"
+#include "libgame.h"
 
 #if defined(PLATFORM_MSDOS)
-
-#include "main.h"
-#include "misc.h"
-#include "tools.h"
-#include "sound.h"
-#include "files.h"
-#include "joystick.h"
-#include "image.h"
-#include "pcx.h"
 
 /* allegro driver declarations */
 DECLARE_GFX_DRIVER_LIST(GFX_DRIVER_VBEAF GFX_DRIVER_VESA2L GFX_DRIVER_VESA1)

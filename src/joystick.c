@@ -11,12 +11,13 @@
 *  joystick.c                                              *
 ***********************************************************/
 
-#ifdef __FreeBSD__
+#if defined(PLATFORM_FREEBSD)
 #include <machine/joystick.h>
 #endif
 
+#include "libgame/libgame.h"
+
 #include "joystick.h"
-#include "misc.h"
 
 #if !defined(PLATFORM_MSDOS)
 static int JoystickPosition(int middle, int margin, int actual)

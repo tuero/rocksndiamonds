@@ -11,7 +11,7 @@
 *  network.c                                               *
 ***********************************************************/
 
-#include "platform.h"
+#include "libgame/libgame.h"
 
 #if defined(PLATFORM_UNIX)
 
@@ -24,15 +24,17 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#if 0
+#include "libgame/libgame.h"
+#endif
+
 #include "network.h"
 #include "netserv.h"
 #include "game.h"
 #include "tape.h"
 #include "files.h"
 #include "tools.h"
-#include "buttons.h"
 #include "screens.h"
-#include "misc.h"
 
 struct NetworkClientPlayerInfo
 {

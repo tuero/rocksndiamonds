@@ -14,7 +14,7 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
-#include "main.h"
+#include "libgame.h"
 
 /* the following definitions are also used by tools.c */
 

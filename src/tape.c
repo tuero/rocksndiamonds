@@ -11,10 +11,10 @@
 *  tape.c                                                  *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "tape.h"
-#include "misc.h"
 #include "game.h"
-#include "buttons.h"
 #include "tools.h"
 #include "files.h"
 #include "network.h"

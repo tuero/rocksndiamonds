@@ -11,6 +11,10 @@
 *  sound.c                                                 *
 ***********************************************************/
 
+#include "libgame.h"
+
+#include "main_TMP.h"
+
 #include "sound.h"
 #include "misc.h"
 
@@ -58,7 +62,7 @@ int OpenAudioDevice(char *audio_device_name)
   int audio_fd;
 
   /* check if desired audio device is accessible */
-  if (access(sound_device_name, W_OK) != 0)
+  if (access(audio_device_name, W_OK) != 0)
     return -1;
 
   /* try to open audio device in non-blocking mode */
@@ -79,12 +83,12 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
     DEVICENAME_DSP,
     DEVICENAME_AUDIO
   };
-  int audio_fd;
+  int audio_fd = -1;
   int i;
 
   /* look for available audio devices, starting with preferred ones */
   for (i=0; i<sizeof(audio_device_name)/sizeof(char *); i++)
-    if ((audio_fd = OpenAudioDevice(sound_device_name)) >= 0)
+    if ((audio_fd = OpenAudioDevice(audio_device_name[i])) >= 0)
       break;
 
   if (audio_fd < 0)
@@ -95,6 +99,7 @@ void UnixOpenAudio(struct AudioSystemInfo *audio)
 
   close(audio_fd);
 
+  audio->device_name = audio_device_name[i];
   audio->sound_available = TRUE;
 
 #if defined(AUDIO_STREAMING_DSP)
@@ -202,7 +207,7 @@ void SoundServer()
 #endif
 
       if (playing_sounds ||
-	  (audio.device_fd = OpenAudioDevice(sound_device_name)) >= 0)
+	  (audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
@@ -365,7 +370,7 @@ void SoundServer()
       int wait_percent = 90;	/* wait 90% of the real playing time */
       int i;
 
-      if ((audio.device_fd = OpenAudioDevice(sound_device_name)) >= 0)
+      if ((audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
       {
 	playing_sounds = 1;
 

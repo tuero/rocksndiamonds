@@ -12,10 +12,11 @@
 *  x11.c                                                   *
 ***********************************************************/
 
+#include "libgame.h"
+
 #if defined(TARGET_X11)
 
-#include "main.h"
-#include "misc.h"
+#include "main_TMP.h"
 
 struct IconFileInfo
 {

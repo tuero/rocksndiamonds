@@ -14,7 +14,10 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include "main.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "libgame.h"
 
 /* values for InitCounter() and Counter() */
 #define INIT_COUNTER			0

@@ -11,13 +11,12 @@
 *  game.c                                                  *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "game.h"
-#include "misc.h"
 #include "tools.h"
 #include "screens.h"
-#include "sound.h"
 #include "init.h"
-#include "buttons.h"
 #include "files.h"
 #include "tape.h"
 #include "joystick.h"
@@ -176,7 +175,7 @@ void GetPlayerConfig()
     setup.sound_music = FALSE;
   }
 
-  if (!fullscreen_available)
+  if (!video.fullscreen_available)
     setup.fullscreen = FALSE;
 
   setup.sound_simple = setup.sound;

@@ -11,31 +11,36 @@
 *  main.c                                                  *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "main.h"
 #include "init.h"
 #include "game.h"
 #include "events.h"
-#include "sound.h"
 #include "joystick.h"
-#include "misc.h"
 
 #if defined(PLATFORM_MSDOS)
 #include <fcntl.h>
 #endif
 
-Display        *display;
-Visual	       *visual;
-int		screen;
+#if 0
 DrawWindow  	window = None;
-GC		gc, clip_gc[NUM_BITMAPS], tile_clip_gc;
+GC		gc;
+#endif
+
+GC		clip_gc[NUM_BITMAPS], tile_clip_gc;
 Bitmap		pix[NUM_BITMAPS];
 Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
 Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 
 DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
+#if 0
 Colormap	cmap;
+#endif
 
+#if 0
 char	       *sound_device_name = AUDIO_DEVICE;
+#endif
 
 int		joystick_device = 0;
 char	       *joystick_device_name[MAX_PLAYERS] =
@@ -56,8 +61,11 @@ boolean		motion_status = FALSE;
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;
+
+#if 0
 boolean		fullscreen_available = FULLSCREEN_STATUS;
 boolean		fullscreen_enabled = FALSE;
+#endif
 
 boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;
@@ -94,7 +102,12 @@ int		SBX_Left, SBX_Right;
 int		SBY_Upper, SBY_Lower;
 int		ZX,ZY, ExitX,ExitY;
 int		AllPlayersGone;
-int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
+
+#if 0
+int		FrameCounter;
+#endif
+
+int		TimeFrames, TimePlayed, TimeLeft;
 
 boolean		network_player_action_received = FALSE;
 
@@ -104,10 +117,19 @@ struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SampleInfo	Sound[NUM_SOUNDS];
 struct TapeInfo		tape;
+
+#if 0
 struct OptionInfo	options;
+#endif
+
 struct SetupInfo	setup;
 struct GameInfo		game;
+
+#if 0
+struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
+#endif
+
 struct GlobalInfo	global;
 
 /* data needed for playing sounds */

@@ -13,11 +13,11 @@
 
 #include <stdarg.h>
 
+#include "libgame.h"
+
+#include "main_TMP.h"
+
 #include "buttons.h"
-#include "tools.h"
-#include "misc.h"
-#include "editor.h"
-#include "tape.h"
 
 /* some positions in the video tape control window */
 #define VIDEO_DATE_LABEL_XPOS	(VIDEO_DISPLAY1_XPOS)
@@ -324,8 +324,12 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
 
 static void default_callback_info(void *ptr)
 {
+#if 0
   if (game_status == LEVELED)
     HandleEditorGadgetInfoText(ptr);
+#endif
+
+  return;
 }
 
 static void default_callback_action(void *ptr)

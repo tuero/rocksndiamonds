@@ -28,10 +28,9 @@
 #define DEBUG_TIMING	0
 #endif
 
-typedef unsigned char boolean;
-typedef unsigned char byte;
-
-#include "system.h"
+#if 0
+#include "libgame/libgame.h"
+#endif
 
 #ifndef FALSE
 #define FALSE		0
@@ -238,20 +237,6 @@ struct HiScore
   int Score;
 };
 
-struct OptionInfo
-{
-  char *display_name;
-  char *server_host;
-  int server_port;
-  char *ro_base_directory;
-  char *rw_base_directory;
-  char *level_directory;
-  boolean serveronly;
-  boolean network;
-  boolean verbose;
-  boolean debug;
-};
-
 struct SetupJoystickInfo
 {
   char *device_name;
@@ -451,19 +436,24 @@ struct GlobalInfo
   int fps_slowdown_factor;
 };
 
-extern Display	       *display;
-extern Visual	       *visual;
-extern int		screen;
+#if 0
 extern DrawWindow	window;
-extern GC		gc, clip_gc[], tile_clip_gc;
+extern GC		gc;
+#endif
+
+extern GC		clip_gc[], tile_clip_gc;
 extern Bitmap		pix[];
 extern Bitmap		pix_masked[], tile_masked[];
 extern Pixmap		clipmask[], tile_clipmask[];
 
 extern DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
+#if 0
 extern Colormap		cmap;
+#endif
 
+#if 0
 extern char	       *sound_device_name;
+#endif
 
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
@@ -477,8 +467,11 @@ extern int		button_status;
 extern boolean		motion_status;
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
+
+#if 0
 extern boolean		fullscreen_available;
 extern boolean		fullscreen_enabled;
+#endif
 
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -514,7 +507,12 @@ extern int		SBX_Left, SBX_Right;
 extern int		SBY_Upper, SBY_Lower;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
-extern int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
+
+#if 0
+extern int		FrameCounter;
+#endif
+
+extern int		TimeFrames, TimePlayed, TimeLeft;
 extern boolean		SiebAktiv;
 extern int		SiebCount;
 
@@ -527,10 +525,19 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct SampleInfo	Sound[];
 extern struct JoystickInfo	joystick[];
+
+#if 0
 extern struct OptionInfo	options;
+#endif
+
 extern struct SetupInfo		setup;
 extern struct GameInfo		game;
+
+#if 0
+extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
+#endif
+
 extern struct GlobalInfo	global;
 
 extern char		*sound_name[];

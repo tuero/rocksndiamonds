@@ -48,7 +48,7 @@ SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
 all:
-	@$(MAKE_CMD) TARGET=sdl
+	@$(MAKE_CMD) TARGET=x11
 
 x11:
 	@$(MAKE_CMD) TARGET=x11

@@ -13,16 +13,15 @@
 
 #include <stdarg.h>
 
-#ifdef __FreeBSD__
+#if defined(PLATFORM_FREEBSD)
 #include <machine/joystick.h>
 #endif
+
+#include "libgame/libgame.h"
 
 #include "tools.h"
 #include "game.h"
 #include "events.h"
-#include "sound.h"
-#include "misc.h"
-#include "buttons.h"
 #include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
@@ -352,6 +351,8 @@ void ClearWindow()
   redraw_mask |= REDRAW_FIELD;
 }
 
+
+#if 0
 int getFontWidth(int font_size, int font_type)
 {
   return (font_size == FS_BIG ? FONT1_XSIZE :
@@ -489,6 +490,8 @@ void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
     x += font_width;
   }
 }
+#endif
+
 
 void DrawAllPlayers()
 {
@@ -2365,10 +2368,12 @@ static struct
   }
 };
 
+#if 0
 static void DoNotDisplayInfoText(void *ptr)
 {
   return;
 }
+#endif
 
 void CreateToolButtons()
 {
@@ -2416,8 +2421,12 @@ void CreateToolButtons()
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK_ACTION, HandleToolButtons,
+
+#if 0
 		      GDI_CALLBACK_INFO, DoNotDisplayInfoText,
+#endif
+
+		      GDI_CALLBACK_ACTION, HandleToolButtons,
 		      GDI_END);
 
     if (gi == NULL)

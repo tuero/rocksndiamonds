@@ -15,7 +15,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "platform.h"
+#include "libgame.h"
 
 #if defined(PLATFORM_MSDOS)
 #include "msdos.h"
@@ -43,14 +43,57 @@ typedef int (*EventFilter)(const Event *);
 
 /* structure definitions */
 
+struct VideoSystemInfo
+{
+  boolean fullscreen_available;
+  boolean fullscreen_enabled;
+};
+
 struct AudioSystemInfo
 {
   boolean sound_available;
   boolean loops_available;
   int soundserver_pipe[2];
   int soundserver_pid;
+  char *device_name;
   int device_fd;
 };
+
+struct OptionInfo
+{
+  char *display_name;
+  char *server_host;
+  int server_port;
+  char *ro_base_directory;
+  char *rw_base_directory;
+  char *level_directory;
+  boolean serveronly;
+  boolean network;
+  boolean verbose;
+  boolean debug;
+};
+
+
+/* ========================================================================= */
+/* exported variables                                                        */
+/* ========================================================================= */
+
+extern struct VideoSystemInfo	video;
+extern struct AudioSystemInfo	audio;
+extern struct OptionInfo	options;
+
+
+/* declarations of internal variables */
+
+extern Display	       *display;
+extern Visual	       *visual;
+extern int		screen;
+extern Colormap		cmap;
+
+extern DrawWindow	window;
+extern GC		gc;
+
+extern int		FrameCounter;
 
 
 /* function definitions */
@@ -70,8 +113,8 @@ inline void SyncDisplay(void);
 inline void KeyboardAutoRepeatOn(void);
 inline void KeyboardAutoRepeatOff(void);
 inline boolean PointerInWindow(DrawWindow);
-inline boolean SetVideoMode(void);
-inline void ChangeVideoModeIfNeeded(void);
+inline boolean SetVideoMode(boolean);
+inline boolean ChangeVideoModeIfNeeded(boolean);
 
 inline boolean OpenAudio(struct AudioSystemInfo *);
 inline void CloseAudio(struct AudioSystemInfo *);

@@ -3,6 +3,8 @@
 # (c) 1995-2000 Holger Schemel, info@artsoft.org                              #
 #=============================================================================#
 
+.EXPORT_ALL_VARIABLES:
+
 ifndef PLATFORM			# platform not specified -- try auto detection
 ifdef COMSPEC
 PLATFORM = msdos
@@ -18,6 +20,8 @@ X11_INCL = -I$(XINC_PATH)
 X11_LIBS = -L$(XLIB_PATH)
 endif
 
+AR = ar
+RANLIB = ranlib
 
 ifeq ($(PLATFORM),msdos)	# MS-DOS native compiling
 
@@ -98,66 +102,56 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
 LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 
+
 SRCS =	main.c		\
 	init.c		\
 	events.c	\
 	tools.c		\
 	screens.c	\
-	misc.c		\
 	game.c		\
 	editor.c	\
-	buttons.c	\
 	files.c		\
 	tape.c		\
-	sound.c		\
 	joystick.c	\
 	cartoons.c	\
-	random.c	\
-	pcx.c		\
-	image.c		\
 	network.c	\
-	netserv.c	\
-	msdos.c		\
-	system.c	\
-	x11.c		\
-	sdl.c
+	netserv.c
 
 OBJS =	main.o		\
 	init.o		\
 	events.o	\
 	tools.o		\
 	screens.o	\
-	misc.o		\
 	game.o		\
 	editor.o	\
-	buttons.o	\
 	files.o		\
 	tape.o		\
-	sound.o		\
 	joystick.o	\
 	cartoons.o	\
-	random.o	\
-	pcx.o		\
-	image.o		\
 	network.o	\
-	netserv.o	\
-	msdos.o		\
-	system.o	\
-	x11.o		\
-	sdl.o
+	netserv.o
 
-all:	$(PROGNAME)
+LIBDIR = libgame
+LIBGAME = $(LIBDIR)/libgame.a
 
-$(PROGNAME):	$(OBJS)
-	$(CC) $(PROFILING) $(OBJS) $(LDFLAGS) -o $(PROGNAME)
+
+all: $(PROGNAME)
+
+$(PROGNAME): $(LIBGAME) $(OBJS)
+	$(CC) $(PROFILING) $(OBJS) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
+
+$(LIBGAME):
+	$(MAKE) -C $(LIBDIR)
 
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 clean:
-	$(RM) *.o
-	$(RM) ../*.exe
+	$(MAKE) -C $(LIBDIR) clean
+	$(RM) $(OBJS)
+	$(RM) $(LIBGAME)
 	$(RM) $(PROGNAME)
+	$(RM) ../*.exe
 
 
 #-----------------------------------------------------------------------------#
@@ -165,6 +159,7 @@ clean:
 #-----------------------------------------------------------------------------#
 
 depend:
+	$(MAKE) -C $(LIBDIR) depend
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
 
 ifeq (.depend,$(wildcard .depend))

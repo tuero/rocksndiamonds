@@ -12,10 +12,9 @@
 *  sdl.c                                                   *
 ***********************************************************/
 
-#ifdef TARGET_SDL
+#include "libgame.h"
 
-#include "main.h"
-#include "misc.h"
+#ifdef TARGET_SDL
 
 inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
 {
@@ -53,11 +52,11 @@ inline void SDLInitBufferedDisplay(DrawBuffer *backbuffer, DrawWindow *window)
   pix[PIX_DB_BACK] = *backbuffer;	/* 'backbuffer' is SDL screen buffer */
 }
 
-inline boolean SDLSetVideoMode(DrawBuffer *backbuffer)
+inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
 
-  if (setup.fullscreen && !fullscreen_enabled && fullscreen_available)
+  if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
     DrawWindow window_old = *backbuffer;
@@ -71,7 +70,7 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer)
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
 
       /* do not try it again */
-      fullscreen_available = FALSE;
+      video.fullscreen_available = FALSE;
       success = FALSE;
     }
     else
@@ -80,12 +79,12 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer)
 	SDL_FreeSurface(window_old);
       *backbuffer = window_new;
 
-      fullscreen_enabled = TRUE;
+      video.fullscreen_enabled = TRUE;
       success = TRUE;
     }
   }
 
-  if ((!setup.fullscreen && fullscreen_enabled) || !*backbuffer)
+  if ((!fullscreen && video.fullscreen_enabled) || !*backbuffer)
   {
     /* switch display to window mode */
     DrawWindow window_old = *backbuffer;
@@ -106,7 +105,7 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer)
 	SDL_FreeSurface(window_old);
       *backbuffer = window_new;
 
-      fullscreen_enabled = FALSE;
+      video.fullscreen_enabled = FALSE;
       success = TRUE;
     }
   }

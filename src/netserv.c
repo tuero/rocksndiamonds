@@ -11,7 +11,7 @@
 *  network.c                                               *
 ***********************************************************/
 
-#include "platform.h"
+#include "libgame/libgame.h"
 
 #if defined(PLATFORM_UNIX)
 
@@ -26,8 +26,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#if 0
+#include "libgame/libgame.h"
+#endif
+
 #include "netserv.h"
-#include "misc.h"
 
 static int clients = 0;
 static int onceonly = 0;

@@ -14,9 +14,12 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include "platform.h"
+
 #ifndef TARGET_SDL
 
-#include "main.h"
+#include "types.h"
+#include "x11.h"
 
 #define MAX_COLORS	256	/* maximal number of colors for each image */
 

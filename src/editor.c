@@ -13,11 +13,11 @@
 
 #include <math.h>
 
+#include "libgame/libgame.h"
+
 #include "editor.h"
 #include "screens.h"
 #include "tools.h"
-#include "misc.h"
-#include "buttons.h"
 #include "files.h"
 #include "game.h"
 #include "tape.h"
@@ -1394,6 +1394,7 @@ static void CreateControlButtons()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
 		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
@@ -1451,6 +1452,7 @@ static void CreateControlButtons()
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
@@ -1501,6 +1503,7 @@ static void CreateControlButtons()
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
@@ -1579,6 +1582,7 @@ static void CreateCounterButtons()
 			GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
 			GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
 			GDI_EVENT_MASK, event_mask,
+			GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 			GDI_CALLBACK_ACTION, HandleCounterButtons,
 			GDI_END);
 
@@ -1629,6 +1633,7 @@ static void CreateCounterButtons()
 			  GDI_BORDER_SIZE, ED_BORDER_SIZE,
 			  GDI_TEXTINPUT_DESIGN_WIDTH, gd_width,
 			  GDI_EVENT_MASK, event_mask,
+			  GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 			  GDI_CALLBACK_ACTION, HandleCounterButtons,
 			  GDI_END);
 
@@ -1772,6 +1777,7 @@ static void CreateTextInputGadgets()
 		      GDI_BORDER_SIZE, ED_BORDER_SIZE,
 		      GDI_TEXTINPUT_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleTextInputGadgets,
 		      GDI_END);
 
@@ -1841,6 +1847,7 @@ static void CreateScrollbarGadgets()
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_BORDER_SIZE, ED_BORDER_SIZE,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
 
@@ -1890,6 +1897,7 @@ static void CreateCheckbuttonGadgets()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x3, gd_y,
 		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleRadiobuttons,
 		      GDI_END);
 
@@ -1922,6 +1930,7 @@ static void CreateCheckbuttonGadgets()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x3, gd_y,
 		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleCheckbuttons,
 		      GDI_END);
 
@@ -4047,6 +4056,9 @@ void HandleEditorGadgetInfoText(void *ptr)
   struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
   char infotext[MAX_INFOTEXT_LEN + 1];
   char shortcut[MAX_INFOTEXT_LEN + 1];
+
+  if (game_status != LEVELED)
+    return;
 
   ClearEditorGadgetInfoText();
 

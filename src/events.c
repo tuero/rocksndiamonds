@@ -11,16 +11,16 @@
 *  events.c                                                *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "events.h"
 #include "init.h"
 #include "screens.h"
 #include "tools.h"
 #include "game.h"
 #include "editor.h"
-#include "misc.h"
 #include "tape.h"
 #include "joystick.h"
-#include "buttons.h"
 #include "network.h"
 
 /* values for key_status */

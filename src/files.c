@@ -15,9 +15,10 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
+#include "libgame/libgame.h"
+
 #include "files.h"
 #include "tools.h"
-#include "misc.h"
 #include "tape.h"
 #include "joystick.h"
 

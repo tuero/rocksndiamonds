@@ -11,9 +11,10 @@
 *  cartoons.c                                              *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "cartoons.h"
 #include "main.h"
-#include "misc.h"
 #include "tools.h"
 
 static void HandleAnimation(int);

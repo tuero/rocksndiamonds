@@ -11,15 +11,14 @@
 *  screens.c                                               *
 ***********************************************************/
 
+#include "libgame/libgame.h"
+
 #include "screens.h"
 #include "events.h"
-#include "sound.h"
 #include "game.h"
 #include "tools.h"
 #include "editor.h"
-#include "misc.h"
 #include "files.h"
-#include "buttons.h"
 #include "tape.h"
 #include "joystick.h"
 #include "cartoons.h"
@@ -85,7 +84,7 @@ void DrawMainMenu()
   UndrawSpecialEditorDoor();
 
   /* needed if last screen was the setup screen and fullscreen state changed */
-  ChangeVideoModeIfNeeded();
+  setup.fullscreen = ChangeVideoModeIfNeeded(setup.fullscreen);
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
@@ -1500,7 +1499,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 	setup.fading = !setup.fading;
       }
 #endif
-      else if (y == 8 && fullscreen_available)
+      else if (y == 8 && video.fullscreen_available)
       {
 	if (setup.fullscreen)
 	  DrawText(SX+14*32, SY+yy*32,"off",FS_BIG,FC_BLUE);

@@ -11,8 +11,6 @@
 *  misc.c                                                  *
 ***********************************************************/
 
-#include "platform.h"
-
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -24,13 +22,13 @@
 #include <sys/param.h>
 #endif
 
+#include "libgame.h"
+
+#include "main_TMP.h"
+
 #include "misc.h"
-#include "init.h"
-#include "tools.h"
-#include "sound.h"
-#include "random.h"
-#include "joystick.h"
-#include "files.h"
+
+#include "joystick_TMP.h"
 
 #if defined(PLATFORM_MSDOS)
 volatile unsigned long counter = 0;

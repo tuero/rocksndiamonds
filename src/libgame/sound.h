@@ -14,8 +14,6 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include "platform.h"
-
 #include <sys/ioctl.h>
 #include <math.h>
 
@@ -31,7 +29,7 @@
 #define SND_BLOCKSIZE 32768
 #endif
 
-#include "main.h"
+#include "libgame.h"
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
 #define AUDIO_STREAMING_DSP
@@ -86,10 +84,12 @@
 #define DEVICENAME_AUDIO	"/dev/audio"
 #define DEVICENAME_AUDIOCTL	"/dev/audioCtl"
 
+#if 0
 #if defined(AUDIO_STREAMING_DSP)
 #define AUDIO_DEVICE   	DEVICENAME_DSP
 #else
 #define AUDIO_DEVICE	DEVICENAME_AUDIO
+#endif
 #endif
 
 struct SoundHeader_SUN
