@@ -4292,51 +4292,6 @@ static void PlayerActions(struct PlayerInfo *player, byte player_action)
   }
 }
 
-static void sleep_milliseconds_x(unsigned long milliseconds_delay)
-{
-  boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
-
-#if defined(PLATFORM_MSDOS)
-  /* don't use select() to perform waiting operations under DOS/Windows
-     environment; always use a busy loop for waiting instead */
-  do_busy_waiting = TRUE;
-#endif
-
-
-
-  do_busy_waiting = TRUE;
-
-
-
-  if (do_busy_waiting)
-  {
-    /* we want to wait only a few ms -- if we assume that we have a
-       kernel timer resolution of 10 ms, we would wait far to long;
-       therefore it's better to do a short interval of busy waiting
-       to get our sleeping time more accurate */
-
-    unsigned long base_counter = Counter(), actual_counter = Counter();
-
-    while (actual_counter < base_counter + milliseconds_delay &&
-	   actual_counter >= base_counter)
-      actual_counter = Counter();
-  }
-  else
-  {
-#if defined(TARGET_SDL)
-    SDL_Delay(milliseconds_delay);
-#else
-    struct timeval delay;
-
-    delay.tv_sec  = milliseconds_delay / 1000;
-    delay.tv_usec = 1000 * (milliseconds_delay % 1000);
-
-    if (select(0, NULL, NULL, NULL, &delay) != 0)
-      Error(ERR_WARN, "sleep_milliseconds(): select() failed");
-#endif
-  }
-}
-
 void GameActions()
 {
   static unsigned long action_delay = 0;
@@ -4354,45 +4309,7 @@ void GameActions()
 
   /* ---------- main game synchronization point ---------- */
 
-
-
-#if 1
-    WaitUntilDelayReached(&action_delay, action_delay_value);
-#else
-  {
-    unsigned long count1 = SDL_GetTicks(), count2, current_ms, test;
-
-    /*
-    WaitUntilDelayReached(&action_delay, action_delay_value);
-    */
-
-    /*
-    SDL_Delay(20);
-    */
-
-    /*
-    sleep_milliseconds_x(20);
-    */
-
-    current_ms = SDL_GetTicks();
-    test = -1;
-    while (current_ms < count1 + 20)
-    {
-      current_ms = SDL_GetTicks();		/* busy wait! */
-
-      if (test != current_ms)
-      {
-	Error(ERR_RETURN, "current_ms == %ld", current_ms);
-	test = current_ms;
-      }
-    }
-
-    count2 = SDL_GetTicks();
-    Error(ERR_RETURN, "delay == %ld", count2 - count1);
-  }
-#endif
-
-
+  WaitUntilDelayReached(&action_delay, action_delay_value);
 
   if (network_playing && !network_player_action_received)
   {

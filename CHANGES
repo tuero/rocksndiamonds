@@ -6,6 +6,8 @@ Release Version 2.0.1 [?? ??? 2001]
 	  + infotrons kill electrons and snik snaks and trigger orange disks
 	  + explosion chain reactions are now a bit slower than murphy
 	- behaviour of robots adjusted to make them less aggressive
+        - icon for Windows executable added
+        - bug when selecting default level series fixed
 
 Release Version 2.0.0 [01 JAN 2001]
 -----------------------------------

@@ -2077,7 +2077,7 @@ void LoadLevelSetup_LastSeries()
   struct SetupFileList *level_setup_list = NULL;
 
   /* always start with reliable default values */
-  leveldir_current = leveldir_first;
+  leveldir_current = getFirstValidLevelSeries(leveldir_first);
 
   /* ----------------------------------------------------------------------- */
   /* ~/.rocksndiamonds/levelsetup.conf                                       */
