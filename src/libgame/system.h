@@ -66,6 +66,7 @@
 #define DEFAULT_KEY_LOAD_GAME	KSYM_F2
 #define DEFAULT_KEY_TOGGLE_PAUSE KSYM_space
 
+
 /* values for move directions and special "button" keys */
 #define MV_BIT_LEFT		0
 #define MV_BIT_RIGHT		1
@@ -88,6 +89,7 @@
 				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
 				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
 
+
 /* values for button status */
 #define MB_NOT_PRESSED		FALSE
 #define MB_NOT_RELEASED		TRUE
@@ -101,6 +103,7 @@
 #define MB_MIDDLEBUTTON		2
 #define MB_RIGHTBUTTON		3
 
+
 /* values for animation mode (frame order and direction) */
 #define ANIM_NONE		0
 #define ANIM_LOOP		(1 << 0)
@@ -109,6 +112,7 @@
 #define ANIM_PINGPONG2		(1 << 3)
 #define ANIM_RANDOM		(1 << 4)
 #define ANIM_REVERSE		(1 << 5)
+
 
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)
@@ -134,6 +138,15 @@
 				 REDRAW_MICROLEVEL)
 #define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
+
+
+/* values for mouse cursor */
+#define CURSOR_DEFAULT		0
+#define CURSOR_PLAYFIELD	1
+
+#define CURSOR_MAX_WIDTH	32
+#define CURSOR_MAX_HEIGHT	32
+
 
 /* maximum number of parallel players supported by libgame functions */
 #define MAX_PLAYERS		4
@@ -243,7 +256,7 @@ struct ProgramInfo
 
   char *x11_icon_filename;
   char *x11_iconmask_filename;
-  char *msdos_pointer_filename;
+  char *msdos_cursor_filename;
 
   char *cookie_prefix;
   char *filename_prefix;	/* prefix to cut off from DOS filenames */
@@ -348,6 +361,15 @@ struct JoystickInfo
 {
   int status;
   int fd[MAX_PLAYERS];		/* file descriptor of player's joystick */
+};
+
+struct MouseCursorInfo
+{
+  int width, height;
+  int hot_x, hot_y;
+
+  char data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
+  char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
 struct SetupJoystickInfo
@@ -687,6 +709,8 @@ void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
 void CreateBitmapWithSmallBitmaps(Bitmap *);
+
+void SetMouseCursor(int);
 
 inline void OpenAudio(void);
 inline void CloseAudio(void);

@@ -199,6 +199,7 @@ void DrawMainMenu()
 
   KeyboardAutoRepeatOn();
   ActivateJoystick();
+  SetMouseCursor(CURSOR_DEFAULT);
 
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);

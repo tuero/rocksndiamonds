@@ -35,6 +35,7 @@ typedef struct SDLSurfaceInfo	Bitmap;
 typedef struct SDLSurfaceInfo	DrawBuffer;
 typedef struct SDLSurfaceInfo	DrawWindow;
 typedef Uint32			Pixel;
+typedef SDL_Cursor	       *Cursor;
 
 typedef SDLKey			Key;
 
@@ -337,6 +338,8 @@ inline void SDLInvertArea(Bitmap *, int, int, int, int, Uint32);
 void SDLZoomBitmap(Bitmap *, Bitmap *);
 
 Bitmap *SDLLoadImage(char *);
+
+void SDLSetMouseCursor(const char **);
 
 inline void SDLOpenAudio(void);
 inline void SDLCloseAudio(void);

@@ -297,7 +297,7 @@ Display *XOpenDisplay(char *display_name)
   Screen *screen;
   Display *display;
   BITMAP *mouse_bitmap = NULL;
-  char *mouse_filename =getCustomImageFilename(program.msdos_pointer_filename);
+  char *mouse_filename = getCustomImageFilename(program.msdos_cursor_filename);
 
   if ((mouse_bitmap = Read_PCX_to_AllegroBitmap(mouse_filename)) == NULL)
     return NULL;

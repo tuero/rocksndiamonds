@@ -70,7 +70,7 @@ void InitProgramInfo(char *argv0,
 		     char *userdata_directory, char *program_title,
 		     char *window_title, char *icon_title,
 		     char *x11_icon_filename, char *x11_iconmask_filename,
-		     char *msdos_pointer_filename,
+		     char *msdos_cursor_filename,
 		     char *cookie_prefix, char *filename_prefix,
 		     int program_version)
 {
@@ -83,7 +83,7 @@ void InitProgramInfo(char *argv0,
   program.icon_title = icon_title;
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
-  program.msdos_pointer_filename = msdos_pointer_filename;
+  program.msdos_cursor_filename = msdos_cursor_filename;
 
   program.cookie_prefix = cookie_prefix;
   program.filename_prefix = filename_prefix;
@@ -607,6 +607,10 @@ inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
 
 inline Pixel GetPixel(Bitmap *bitmap, int x, int y)
 {
+  if (x < 0 || x >= bitmap->width ||
+      y < 0 || y >= bitmap->height)
+    return BLACK_PIXEL;
+
 #if defined(TARGET_SDL)
   return SDLGetPixel(bitmap, x, y);
 #elif defined(TARGET_ALLEGRO)
@@ -844,6 +848,119 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   src_bitmap->height = tmp_bitmap->height;
 
   FreeBitmap(tmp_bitmap);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* mouse pointer functions                                                   */
+/* ------------------------------------------------------------------------- */
+
+/* cursor bitmap in XPM format */
+static const char *cursor_image_playfield[] =
+{
+  /* width height num_colors chars_per_pixel */
+  "    32    32        3            1",
+
+  /* colors */
+  "X c #000000",
+  ". c #ffffff",
+  "  c None",
+
+  " X                              ",
+  "X.X                             ",
+  " X                              ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "1,1"
+};
+
+static struct MouseCursorInfo *get_cursor_from_image(const char **image)
+{
+  struct MouseCursorInfo *cursor;
+  int row, col, i;
+
+  cursor = checked_calloc(sizeof(struct MouseCursorInfo));
+
+  i = -1;
+  for (row=0; row<32; ++row)
+  {
+    for (col=0; col<32; ++col)
+    {
+      if (col % 8)
+      {
+        cursor->data[i] <<= 1;
+        cursor->mask[i] <<= 1;
+      }
+      else
+      {
+        i++;
+        cursor->data[i] = cursor->mask[i] = 0;
+      }
+
+      switch (image[4+row][col])
+      {
+        case 'X':
+	  cursor->data[i] |= 0x01;
+	  cursor->mask[i] |= 0x01;
+	  break;
+
+        case '.':
+	  cursor->mask[i] |= 0x01;
+	  break;
+
+        case ' ':
+	  break;
+      }
+    }
+  }
+
+  sscanf(image[4+row], "%d,%d", &cursor->hot_x, &cursor->hot_y);
+
+  cursor->width = 32;
+  cursor->height = 32;
+
+  return cursor;
+}
+
+void SetMouseCursor(int mode)
+{
+  struct MouseCursorInfo *cursor_playfield = NULL;
+
+  if (cursor_playfield == NULL)
+    cursor_playfield = get_cursor_from_image(cursor_image_playfield);
+
+#if defined(TARGET_SDL)
+  SDLSetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+#elif defined(TARGET_X11_NATIVE)
+  X11SetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+#endif
 }
 
 

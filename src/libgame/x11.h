@@ -51,7 +51,8 @@
 typedef struct X11DrawableInfo	Bitmap;
 typedef struct X11DrawableInfo	DrawWindow;
 typedef struct X11DrawableInfo	DrawBuffer;
-/* "Pixel" is already defined in X11/Intrinsic.h */
+/* "Pixel" is already defined */
+/* "Cursor" is already defined */
 
 typedef KeySym			Key;
 
@@ -318,5 +319,9 @@ inline void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
 inline void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
 inline Pixel X11GetPixel(Bitmap *, int, int);
 inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
+
+#if defined(TARGET_X11_NATIVE)
+void X11SetMouseCursor(const char **);
+#endif
 
 #endif /* X11_H */

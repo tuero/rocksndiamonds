@@ -30,15 +30,31 @@
 
 
 /* event filter especially needed for SDL event filtering due to
-   delay problems with lots of mouse motion events when mouse
-   button not pressed */
+   delay problems with lots of mouse motion events when mouse button
+   not pressed (X11 can handle this with 'PointerMotionHintMask') */
 
 int FilterMouseMotionEvents(const Event *event)
 {
+  /* non-motion events are directly passed to event handler functions */
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
 
-  /* get mouse motion events without pressed button only in level editor */
+  /* when playing, display a different mouse pointer inside the playfield */
+  if (game_status == PLAYING)
+  {
+    static boolean inside_field = FALSE;
+    MotionEvent *motion = (MotionEvent *)event;
+
+    if ((motion->x >= SX && motion->x < SX + SXSIZE &&
+	 motion->y >= SY && motion->y < SY + SYSIZE) != inside_field)
+    {
+      inside_field = !inside_field;
+
+      SetMouseCursor(inside_field ? CURSOR_PLAYFIELD : CURSOR_DEFAULT);
+    }
+  }
+
+  /* skip mouse motion events without pressed button outside level editor */
   if (button_status == MB_RELEASED && game_status != LEVELED)
     return 0;
   else
