@@ -1382,7 +1382,6 @@ struct PlayerInfo
 
   boolean block_last_field;
   int block_delay;
-  int block_delay_value;
 
   boolean can_fall_into_acid;
 
@@ -1512,12 +1511,15 @@ struct LevelInfo
   boolean double_speed;
   boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
-  boolean block_last_field;	/* player blocks previous field while moving */
-  boolean sp_block_last_field;	/* player blocks previous field while moving */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
   boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
+
+  boolean block_last_field;	/* player blocks previous field while moving */
+  boolean sp_block_last_field;	/* player blocks previous field while moving */
+  int block_delay;		/* delay for blocking previous field */
+  int sp_block_delay;		/* delay for blocking previous field */
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */

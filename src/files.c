@@ -159,14 +159,17 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->double_speed = FALSE;
   level->initial_gravity = FALSE;
   level->em_slippery_gems = FALSE;
-  level->block_last_field = FALSE;
-  level->sp_block_last_field = TRUE;
   level->instant_relocation = FALSE;
   level->can_pass_to_walkable = FALSE;
   level->grow_into_diggable = TRUE;
 
+  level->block_last_field = FALSE;	/* EM does not block by default */
+  level->sp_block_last_field = TRUE;	/* SP blocks the last field */
+  level->block_delay = 8;		/* when blocking, block 8 frames */
+  level->sp_block_delay = 9;		/* SP indeed blocks 9 frames, not 8 */
+
   level->can_move_into_acid_bits = ~0;	/* everything can move into acid */
-  level->dont_collide_with_bits = ~0;	/* always deadly when colliding  */
+  level->dont_collide_with_bits = ~0;	/* always deadly when colliding */
 
   level->use_spring_bug = FALSE;
   level->use_step_counter = FALSE;
@@ -2197,9 +2200,11 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     if (level->game_version == VERSION_IDENT(2,0,1,0))
       level->em_slippery_gems = TRUE;
 
+    /* springs could be pushed over pits before (pre-release version) 2.2.0 */
     if (level->game_version < VERSION_IDENT(2,2,0,0))
       level->use_spring_bug = TRUE;
 
+    /* only few elements were able to actively move into acid before 3.1.0 */
     if (level->game_version < VERSION_IDENT(3,1,0,0))
     {
       int i, j;
@@ -2229,8 +2234,21 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	}
       }
     }
+
+#if 1
+    /* blocking the last field when moving was corrected in version 3.1.1 */
+    if (level->game_version < VERSION_IDENT(3,1,1,0))
+    {
+      /* even "not blocking" was blocking the last field for one frame */
+      level->block_delay    = (level->block_last_field    ? 7 : 1);
+      level->sp_block_delay = (level->sp_block_last_field ? 7 : 1);
+
+      level->block_last_field = TRUE;
+      level->sp_block_last_field = TRUE;
+    }
+#endif
   }
-  else
+  else		/* always use the latest game engine version */
   {
 #if 0
     printf("\n::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",

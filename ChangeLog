@@ -1,5 +1,6 @@
 2004-06-12
 	* fixed bug when pressing "stop, pause, stop, play" on tape recorder
+	* internal change of how the player blocks the last field when moving
 
 2004-06-11
 	* fixed bug with wrong door state after trying to quickload empty tape

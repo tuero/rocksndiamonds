@@ -28,7 +28,7 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_MOVE_STYLE	TRUE	*0
+#define USE_NEW_MOVE_STYLE	TRUE	*1
 #define USE_NEW_MOVE_DELAY	TRUE	*1
 #define USE_NEW_PUSH_DELAY	TRUE	*1
 #define USE_NEW_BLOCK_STYLE	TRUE	*1
@@ -774,10 +774,6 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
   {
     struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_PLAYER_1];
     int jx = player->jx, jy = player->jy;
-    int sp_block_delay = 7;
-    int em_block_delay = 7;
-    int sp_no_block_delay = 1;
-    int em_no_block_delay = 1;
 
     player->present = TRUE;
 
@@ -785,10 +781,18 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
 				level.sp_block_last_field :
 				level.block_last_field);
 
-    player->block_delay_value =
-      (element == EL_SP_MURPHY ?
-       (player->block_last_field ? sp_block_delay : sp_no_block_delay) :
-       (player->block_last_field ? em_block_delay : em_no_block_delay));
+#if USE_NEW_BLOCK_STYLE
+#if 1
+    player->block_delay = (player->block_last_field ?
+			   (element == EL_SP_MURPHY ?
+			    level.sp_block_delay :
+			    level.block_delay) : 0);
+#else
+    player->block_delay = (element == EL_SP_MURPHY ?
+			   (player->block_last_field ? 7 : 1) :
+			   (player->block_last_field ? 7 : 1));
+#endif
+#endif
 
     if (!options.network || player->connected)
     {
@@ -1408,8 +1412,11 @@ static void InitGameEngine()
       if (IS_SP_ELEMENT(i))
       {
 #if USE_NEW_MOVE_STYLE
-	element_info[i].push_delay_fixed  = 7;	/* just enough to escape ... */
-	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
+	/* set SP push delay to just enough to push under a falling zonk */
+	int delay = (game.engine_version >= VERSION_IDENT(3,1,1,0) ? 8 : 6);
+
+	element_info[i].push_delay_fixed  = delay;
+	element_info[i].push_delay_random = 0;
 #else
 	element_info[i].push_delay_fixed  = 6;	/* just enough to escape ... */
 	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
@@ -1539,8 +1546,7 @@ void InitGame()
     player->use_murphy_graphic = FALSE;
 
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
-    player->block_delay = 0;
-    player->block_delay_value = -1;	/* initialized in InitPlayerField() */
+    player->block_delay = -1;		/* initialized in InitPlayerField() */
 
     player->can_fall_into_acid = CAN_MOVE_INTO_ACID(player->element_nr);
 
@@ -6441,7 +6447,8 @@ void ContinueMoving(int x, int y)
   /* give the player one last chance (one more frame) to move away */
   if (CAN_FALL(element) && direction == MV_DOWN &&
       (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
-      !IS_PLAYER(x, newy + 1))
+      (!IS_PLAYER(x, newy + 1) ||
+       game.engine_version < VERSION_IDENT(3,1,1,0)))
     Impact(x, newy);
 #else
   if (CAN_FALL(element) && direction == MV_DOWN &&
@@ -8657,6 +8664,7 @@ void GameActions()
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
+#if USE_NEW_BLOCK_STYLE
     /* this must be handled before main playfield loop */
     if (Feld[x][y] == EL_PLAYER_IS_LEAVING)
     {
@@ -8664,6 +8672,7 @@ void GameActions()
       if (MovDelay[x][y] <= 0)
 	RemoveField(x, y);
     }
+#endif
 
 #if DEBUG
     if (ChangePage[x][y] != -1 && ChangeDelay[x][y] != 1)
@@ -9874,7 +9883,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     /* (currently, the player is forced to wait eight frames before he can try
        again!!!) */
 
-    player->move_delay = 0;	/* allow direct movement in the next frame */
+    if (game.engine_version >= VERSION_IDENT(3,1,1,0))
+      player->move_delay = 0;	/* allow direct movement in the next frame */
 #endif
   }
 
@@ -9910,12 +9920,12 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
 #if USE_NEW_BLOCK_STYLE
-    if (player->block_delay_value > 0 &&
+    if (player->block_delay > 0 &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 #if 1
-      MovDelay[last_jx][last_jy] = player->block_delay_value + 1;
+      MovDelay[last_jx][last_jy] = player->block_delay + 1;
 #else
       ChangeDelay[last_jx][last_jy] = player->block_last_field_delay;
 #endif
