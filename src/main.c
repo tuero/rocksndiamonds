@@ -46,6 +46,7 @@ char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
 char	       *level_directory = LEVEL_PATH;
 int     	width, height;
 
+char	       *program_name = NULL;
 char	       *display_name = NULL;
 char	       *server_host = NULL;
 int		server_port = 0;
@@ -193,174 +194,17 @@ int background_loop[] =
 };
 int num_bg_loops = sizeof(background_loop)/sizeof(int);
 
-char 		*program_name;
-
-#define MAX_OPTION_LEN	1024
-
-static void fatal_option()
-{
-  fprintf(stderr,"Try '%s --help' for more information.\n",
-	  program_name);
-  exit(1);
-}
-
-static void fatal_unrecognized_option(char *option)
-{
-  fprintf(stderr,"%s: unrecognized option '%s'\n",
-	  program_name, option);
-  fatal_option();
-}
-
-static void fatal_option_requires_argument(char *option)
-{
-  fprintf(stderr,"%s: option '%s' requires an argument\n",
-	  program_name, option);
-  fatal_option();
-}
-
-static void fatal_invalid_option_argument(char *option)
-{
-  fprintf(stderr,"%s: option '%s' has invalid argument\n",
-	  program_name, option);
-  fatal_option();
-}
-
-static void fatal_too_many_arguments()
-{
-  fprintf(stderr,"%s: too many arguments\n",
-	  program_name);
-  fatal_option();
-}
-
-extern void fatal(char *);
-
 int main(int argc, char *argv[])
 {
-  char **options_left = &argv[1];
-
   program_name = (strrchr(argv[0],'/') ? strrchr(argv[0],'/') + 1 : argv[0]);
-
-  while (*options_left)
-  {
-    char option_str[MAX_OPTION_LEN];
-    char *option = options_left[0];
-    char *next_option = options_left[1];
-    char *option_arg = NULL;
-    int option_len = strlen(option);
-
-    strcpy(option_str, option);			/* copy argument into buffer */
-    option = option_str;
-
-    if (strcmp(option, "--") == 0)		/* stop scanning arguments */
-      break;
-
-    if (option_len >= MAX_OPTION_LEN)
-      fatal_unrecognized_option(option);
-
-    if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
-      option++;
-
-    option_arg = strchr(option, '=');
-    if (option_arg == NULL)			/* no '=' in option */
-      option_arg = next_option;
-    else
-    {
-      *option_arg++ = '\0';			/* cut argument from option */
-      if (*option_arg == '\0')			/* no argument after '=' */
-	fatal_invalid_option_argument(option);
-    }
-
-    option_len = strlen(option);
-
-    if (strcmp(option, "-") == 0)
-      fatal_unrecognized_option(option);
-    else if (strncmp(option, "-help", option_len) == 0)
-    {
-      printf("Usage: %s [options] [server.name [port]]\n"
-	     "Options:\n"
-	     "  -d, --display machine:0       X server display\n"
-	     "  -l, --levels directory        alternative level directory\n"
-	     "  -v, --verbose                 verbose mode\n",
-	     program_name);
-      exit(0);
-    }
-    else if (strncmp(option, "-display", option_len) == 0)
-    {
-      if (option_arg == NULL)
-	fatal_option_requires_argument(option_str);
-
-      display_name = option_arg;
-      if (option_arg == next_option)
-	options_left++;
-
-      printf("--display == '%s'\n", display_name);
-    }
-    else if (strncmp(option, "-levels", option_len) == 0)
-    {
-      if (option_arg == NULL)
-	fatal_option_requires_argument(option_str);
-
-      level_directory = option_arg;
-      if (option_arg == next_option)
-	options_left++;
-
-      printf("--levels == '%s'\n", level_directory);
-    }
-    else if (strncmp(option, "-verbose", option_len) == 0)
-    {
-      printf("--verbose\n");
-
-      verbose = TRUE;
-    }
-    else if (*option == '-')
-      fatal_unrecognized_option(option_str);
-    else if (server_host == NULL)
-    {
-      server_host = *options_left;
-
-      printf("server.name == '%s'\n", server_host);
-    }
-    else if (server_port == 0)
-    {
-      server_port = atoi(*options_left);
-      if (server_port < 1024)
-        fatal("Bad port number");
-
-      printf("port == %d\n", server_port);
-    }
-    else
-      fatal_too_many_arguments();
-
-    options_left++;
-  }
-
-  /*
-  printf("All went fine -- exiting\n");
-  exit(0);
-  */
-
-  /*
-  if (argc>1)
-    level_directory = argv[1];
-    */
-
-
-    /*
-  if (argc > 1)
-    server_host = argv[1];
-
-  if (argc > 2)
-    server_port = atoi(argv[2]);
-    */
-
 
 #ifdef MSDOS
   _fmode = O_BINARY;
 #endif
 
+  GetOptions(argv);
   OpenAll(argc,argv);
   EventLoop();
-  CloseAll();
-
-  exit(0);
+  CloseAllAndExit(0);
+  exit(0);	/* to keep compilers happy */
 }

@@ -23,6 +23,7 @@
 
 #define ERR_RETURN		0
 #define ERR_EXIT		1
+#define ERR_EXITHELP		2
 
 void InitCounter(void);
 unsigned long Counter(void);
@@ -36,6 +37,7 @@ unsigned int RND(unsigned int);
 unsigned int InitRND(long);
 char *GetLoginName(void);
 void MarkTileDirty(int, int);
-void Error(BOOL, char *, ...);
+void GetOptions(char **);
+void Error(int, char *, ...);
 
 #endif

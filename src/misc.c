@@ -189,58 +189,164 @@ void MarkTileDirty(int x, int y)
   }
 }
 
-void Error(BOOL fatal_error, char *format_str, ...)
+void GetOptions(char *argv[])
+{
+  char **options_left = &argv[1];
+
+  while (*options_left)
+  {
+    char option_str[MAX_OPTION_LEN];
+    char *option = options_left[0];
+    char *next_option = options_left[1];
+    char *option_arg = NULL;
+    int option_len = strlen(option);
+
+    strcpy(option_str, option);			/* copy argument into buffer */
+    option = option_str;
+
+    if (strcmp(option, "--") == 0)		/* stop scanning arguments */
+      break;
+
+    if (option_len >= MAX_OPTION_LEN)
+      Error(ERR_EXITHELP, "unrecognized option '%s'", option);
+
+    if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
+      option++;
+
+    option_arg = strchr(option, '=');
+    if (option_arg == NULL)			/* no '=' in option */
+      option_arg = next_option;
+    else
+    {
+      *option_arg++ = '\0';			/* cut argument from option */
+      if (*option_arg == '\0')			/* no argument after '=' */
+	Error(ERR_EXITHELP, "option '%s' has invalid argument", option_str);
+    }
+
+    option_len = strlen(option);
+
+    if (strcmp(option, "-") == 0)
+      Error(ERR_EXITHELP, "unrecognized option '%s'", option);
+    else if (strncmp(option, "-help", option_len) == 0)
+    {
+      printf("Usage: %s [options] [server.name [port]]\n"
+	     "Options:\n"
+	     "  -d, --display machine:0       X server display\n"
+	     "  -l, --levels directory        alternative level directory\n"
+	     "  -v, --verbose                 verbose mode\n",
+	     program_name);
+      exit(0);
+    }
+    else if (strncmp(option, "-display", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXITHELP, "option '%s' requires an argument", option_str);
+
+      display_name = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+
+      printf("--display == '%s'\n", display_name);
+    }
+    else if (strncmp(option, "-levels", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXITHELP, "option '%s' requires an argument", option_str);
+
+      level_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+
+      printf("--levels == '%s'\n", level_directory);
+    }
+    else if (strncmp(option, "-verbose", option_len) == 0)
+    {
+      printf("--verbose\n");
+
+      verbose = TRUE;
+    }
+    else if (*option == '-')
+      Error(ERR_EXITHELP, "unrecognized option '%s'", option_str);
+    else if (server_host == NULL)
+    {
+      server_host = *options_left;
+
+      printf("server.name == '%s'\n", server_host);
+    }
+    else if (server_port == 0)
+    {
+      server_port = atoi(*options_left);
+      if (server_port < 1024)
+	Error(ERR_EXITHELP, "bad port number '%d'", server_port);
+
+      printf("port == %d\n", server_port);
+    }
+    else
+      Error(ERR_EXITHELP, "too many arguments");
+
+    options_left++;
+  }
+}
+
+void Error(int mode, char *format_str, ...)
 {
   FILE *output_stream = stderr;
-  va_list ap;
-  char *format_ptr;
-  char *s_value;
-  int i_value;
-  double d_value;
 
-  va_start(ap, format_str);	/* ap points to first unnamed argument */
-
-  fprintf(output_stream, "%s: ", program_name);
-
-  for(format_ptr=format_str; *format_ptr; format_ptr++)
+  if (format_str)
   {
-    if (*format_ptr != '%')
+    va_list ap;
+    char *format_ptr;
+    char *s_value;
+    int i_value;
+    double d_value;
+
+    fprintf(output_stream, "%s: ", program_name);
+
+    va_start(ap, format_str);	/* ap points to first unnamed argument */
+  
+    for(format_ptr=format_str; *format_ptr; format_ptr++)
     {
-      fprintf(output_stream, "%c", *format_ptr);
-      continue;
+      if (*format_ptr != '%')
+      {
+  	fprintf(output_stream, "%c", *format_ptr);
+  	continue;
+      }
+  
+      switch(*++format_ptr)
+      {
+  	case 'd':
+  	  i_value = va_arg(ap, int);
+  	  fprintf(output_stream, "%d", i_value);
+  	  break;
+  
+  	case 'f':
+  	  d_value = va_arg(ap, double);
+  	  fprintf(output_stream, "%f", d_value);
+  	  break;
+  
+  	case 's':
+  	  s_value = va_arg(ap, char *);
+  	  fprintf(output_stream, "%s", s_value);
+  	  break;
+  
+  	default:
+  	  fprintf(stderr, "\nError(): invalid format string: %s\n",format_str);
+	  CloseAllAndExit(10);
+      }
     }
 
-    switch(*++format_ptr)
-    {
-      case 'd':
-	i_value = va_arg(ap, int);
-	fprintf(output_stream, "%d", i_value);
-	break;
-
-      case 'f':
-	d_value = va_arg(ap, double);
-	fprintf(output_stream, "%f", d_value);
-	break;
-
-      case 's':
-	s_value = va_arg(ap, char *);
-	fprintf(output_stream, "%s", s_value);
-	break;
-
-      default:
-	fprintf(stderr, "\nfatal(): invalid format string: %s\n", format_str);
-	exit(-1);
-    }
+    va_end(ap);
+  
+    fprintf(output_stream, "\n");
   }
+  
+  if (mode == ERR_EXITHELP)
+    fprintf(output_stream, "%s: Try option '--help' for more information.\n",
+	    program_name);
 
-  va_end(ap);
-
-  fprintf(output_stream, "\n");
-
-  if (fatal_error)
+  if (mode == ERR_EXIT || mode == ERR_EXITHELP)
   {
     fprintf(output_stream, "%s: aborting\n", program_name);
-    CloseAll();
-    exit(1);
+    CloseAllAndExit(1);
   }
 }

@@ -18,16 +18,6 @@
 #include "joystick.h"
 #include "misc.h"
 
-/*
-#include "tools.h"
-#include "game.h"
-#include "events.h"
-#include "sound.h"
-#include "misc.h"
-#include "buttons.h"
-#include <math.h>
-*/
-
 void CheckJoystickData()
 {
   int i;

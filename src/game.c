@@ -2592,23 +2592,37 @@ void MauerWaechst(int x, int y)
     phase = 2-MovDelay[x][y]/delay;
     if (!(MovDelay[x][y]%delay) && IN_SCR_FIELD(SCREENX(x),SCREENY(y)))
       DrawGraphic(SCREENX(x),SCREENY(y),
-		  (Store[x][y]==MV_LEFT ? GFX_MAUER_L1 : GFX_MAUER_R1)+phase);
+		  (MovDir[x][y] == MV_LEFT  ? GFX_MAUER_LEFT  :
+		   MovDir[x][y] == MV_RIGHT ? GFX_MAUER_RIGHT :
+		   MovDir[x][y] == MV_UP    ? GFX_MAUER_UP    :
+		                              GFX_MAUER_DOWN  ) + phase);
 
     if (!MovDelay[x][y])
     {
-      if (Store[x][y]==MV_LEFT)
+      if (MovDir[x][y] == MV_LEFT)
       {
 	if (IN_LEV_FIELD(x-1,y) && IS_MAUER(Feld[x-1][y]))
 	  DrawLevelField(x-1,y);
       }
-      else
+      else if (MovDir[x][y] == MV_RIGHT)
       {
 	if (IN_LEV_FIELD(x+1,y) && IS_MAUER(Feld[x+1][y]))
 	  DrawLevelField(x+1,y);
       }
+      else if (MovDir[x][y] == MV_UP)
+      {
+	if (IN_LEV_FIELD(x,y-1) && IS_MAUER(Feld[x][y-1]))
+	  DrawLevelField(x,y-1);
+      }
+      else
+      {
+	if (IN_LEV_FIELD(x,y+1) && IS_MAUER(Feld[x][y+1]))
+	  DrawLevelField(x,y+1);
+      }
 
-      Feld[x][y] = EL_MAUER_LEBT;
+      Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
+      MovDir[x][y] = MV_NO_MOVING;
       DrawLevelField(x,y);
     }
   }
@@ -2616,7 +2630,10 @@ void MauerWaechst(int x, int y)
 
 void MauerAbleger(int ax, int ay)
 {
+  int element = Feld[ax][ay];
+  BOOL oben_frei = FALSE, unten_frei = FALSE;
   BOOL links_frei = FALSE, rechts_frei = FALSE;
+  BOOL oben_massiv = FALSE, unten_massiv = FALSE;
   BOOL links_massiv = FALSE, rechts_massiv = FALSE;
 
   if (!MovDelay[ax][ay])	/* neue Mauer / noch nicht gewartet */
@@ -2629,35 +2646,72 @@ void MauerAbleger(int ax, int ay)
       return;
   }
 
+  if (IN_LEV_FIELD(ax,ay-1) && IS_FREE(ax,ay-1))
+    oben_frei = TRUE;
+  if (IN_LEV_FIELD(ax,ay+1) && IS_FREE(ax,ay+1))
+    unten_frei = TRUE;
   if (IN_LEV_FIELD(ax-1,ay) && IS_FREE(ax-1,ay))
     links_frei = TRUE;
   if (IN_LEV_FIELD(ax+1,ay) && IS_FREE(ax+1,ay))
     rechts_frei = TRUE;
 
-  if (links_frei)
+  if (element == EL_MAUER_Y || element == EL_MAUER_XY)
   {
-    Feld[ax-1][ay] = EL_MAUERND;
-    Store[ax-1][ay] = MV_LEFT;
-    if (IN_SCR_FIELD(SCREENX(ax-1),SCREENY(ay)))
-      DrawGraphic(SCREENX(ax-1),SCREENY(ay),GFX_MAUER_L1);
-  }
-  if (rechts_frei)
-  {
-    Feld[ax+1][ay] = EL_MAUERND;
-    Store[ax+1][ay] = MV_RIGHT;
-    if (IN_SCR_FIELD(SCREENX(ax+1),SCREENY(ay)))
-      DrawGraphic(SCREENX(ax+1),SCREENY(ay),GFX_MAUER_R1);
+    if (oben_frei)
+    {
+      Feld[ax][ay-1] = EL_MAUERND;
+      Store[ax][ay-1] = element;
+      MovDir[ax][ay-1] = MV_UP;
+      if (IN_SCR_FIELD(SCREENX(ax),SCREENY(ay-1)))
+  	DrawGraphic(SCREENX(ax),SCREENY(ay-1),GFX_MAUER_UP);
+    }
+    if (unten_frei)
+    {
+      Feld[ax][ay+1] = EL_MAUERND;
+      Store[ax][ay+1] = element;
+      MovDir[ax][ay+1] = MV_DOWN;
+      if (IN_SCR_FIELD(SCREENX(ax),SCREENY(ay+1)))
+  	DrawGraphic(SCREENX(ax),SCREENY(ay+1),GFX_MAUER_DOWN);
+    }
   }
 
-  if (links_frei || rechts_frei)
+  if (element == EL_MAUER_X || element == EL_MAUER_XY ||
+      element == EL_MAUER_LEBT)
+  {
+    if (links_frei)
+    {
+      Feld[ax-1][ay] = EL_MAUERND;
+      Store[ax-1][ay] = element;
+      MovDir[ax-1][ay] = MV_LEFT;
+      if (IN_SCR_FIELD(SCREENX(ax-1),SCREENY(ay)))
+  	DrawGraphic(SCREENX(ax-1),SCREENY(ay),GFX_MAUER_LEFT);
+    }
+    if (rechts_frei)
+    {
+      Feld[ax+1][ay] = EL_MAUERND;
+      Store[ax+1][ay] = element;
+      MovDir[ax+1][ay] = MV_RIGHT;
+      if (IN_SCR_FIELD(SCREENX(ax+1),SCREENY(ay)))
+  	DrawGraphic(SCREENX(ax+1),SCREENY(ay),GFX_MAUER_RIGHT);
+    }
+  }
+
+  if (element == EL_MAUER_LEBT && (links_frei || rechts_frei))
     DrawLevelField(ax,ay);
 
+  if (!IN_LEV_FIELD(ax,ay-1) || IS_MAUER(Feld[ax][ay-1]))
+    oben_massiv = TRUE;
+  if (!IN_LEV_FIELD(ax,ay+1) || IS_MAUER(Feld[ax][ay+1]))
+    unten_massiv = TRUE;
   if (!IN_LEV_FIELD(ax-1,ay) || IS_MAUER(Feld[ax-1][ay]))
     links_massiv = TRUE;
   if (!IN_LEV_FIELD(ax+1,ay) || IS_MAUER(Feld[ax+1][ay]))
     rechts_massiv = TRUE;
 
-  if (links_massiv && rechts_massiv)
+  if (((oben_massiv && unten_massiv) ||
+       element == EL_MAUER_X || element == EL_MAUER_LEBT) &&
+      ((links_massiv && rechts_massiv) ||
+       element == EL_MAUER_Y))
     Feld[ax][ay] = EL_MAUERWERK;
 }
 
@@ -2914,7 +2968,10 @@ void GameActions(int player_action)
       AusgangstuerBlinken(x,y);
     else if (element==EL_MAUERND)
       MauerWaechst(x,y);
-    else if (element==EL_MAUER_LEBT)
+    else if (element==EL_MAUER_LEBT ||
+	     element==EL_MAUER_X ||
+	     element==EL_MAUER_Y ||
+	     element==EL_MAUER_XY)
       MauerAbleger(x,y);
     else if (element==EL_BURNING)
       CheckForDragon(x,y);

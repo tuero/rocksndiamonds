@@ -65,8 +65,8 @@ void OpenAll(int argc, char *argv[])
   InitJoystick();
   InitRND(NEW_RANDOMIZE);
 
-  signal(SIGINT, CloseAll);
-  signal(SIGTERM, CloseAll);
+  signal(SIGINT, CloseAllAndExit);
+  signal(SIGTERM, CloseAllAndExit);
 
   InitDisplay();
   InitWindow(argc, argv);
@@ -85,7 +85,7 @@ void InitLevelAndPlayerInfo()
   local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
-    CloseAll();
+    Error(ERR_EXIT, NULL);
 
   LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
@@ -438,6 +438,7 @@ void InitGfx()
     { GFX_GEBLUBBER, 4 },
     { GFX_DYNAMIT, 7 },
     { GFX_DYNABOMB, 4 },
+    { GFX_EXPLOSION, 8 },
     { GFX_SOKOBAN_OBJEKT, 1 },
     { GFX_FUNKELN_BLAU, 3 },
     { GFX_FUNKELN_WEISS, 3 },
@@ -615,21 +616,13 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     switch(xpm_err)
     {
       case XpmOpenFailed:
-        fprintf(stderr,"Cannot open Xpm file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "cannot open XPM file '%s'", filename);
       case XpmFileInvalid:
-	fprintf(stderr,"Invalid Xpm file '%s'!\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "invalid XPM file '%s'", filename);
       case XpmNoMemory:
-	fprintf(stderr,"Not enough memory for Xpm file '%s'!\n",filename);
-	CloseAll();
-	exit(1);
+	Error(ERR_EXIT, "not enough memory for XPM file '%s'", filename);
       case XpmColorFailed:
-	fprintf(stderr,"Can't get colors for Xpm file '%s'!\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "cannot get colors for XPM file '%s'", filename);
       default:
 	break;
     }
@@ -650,25 +643,15 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       case GIF_Success:
         break;
       case GIF_OpenFailed:
-        fprintf(stderr,"Cannot open GIF file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
+        Error(ERR_EXIT, "cannot open GIF file '%s'", filename);
       case GIF_ReadFailed:
-        fprintf(stderr,"Cannot read GIF file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
+        Error(ERR_EXIT, "cannot read GIF file '%s'", filename);
       case GIF_FileInvalid:
-	fprintf(stderr,"Invalid GIF file '%s'!\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "invalid GIF file '%s'", filename);
       case GIF_NoMemory:
-	fprintf(stderr,"Not enough memory for GIF file '%s'!\n",filename);
-	CloseAll();
-	exit(1);
+	Error(ERR_EXIT, "not enough memory for GIF file '%s'", filename);
       case GIF_ColorFailed:
-	fprintf(stderr,"Can't get colors for GIF file '%s'!\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "cannot get colors for GIF file '%s'", filename);
       default:
 	break;
     }
@@ -707,19 +690,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       case BitmapSuccess:
         break;
       case BitmapOpenFailed:
-	fprintf(stderr,"Bitmap file open failed on '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
-	break;
+	Error(ERR_EXIT, "cannot open XBM file '%s'", filename);
       case BitmapFileInvalid:
-	fprintf(stderr,"Bitmap file invalid: '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
-	break;
+	Error(ERR_EXIT, "invalid XBM file '%s'", filename);
       case BitmapNoMemory:
-	fprintf(stderr,"No memory for file '%s' !\n",filename);
-	CloseAll();
-	exit(-1);
+	Error(ERR_EXIT, "not enough memory for XBM file '%s'", filename);
 	break;
       default:
 	break;
@@ -788,6 +763,9 @@ void InitElementProperties()
     EL_BETON,
     EL_MAUERWERK,
     EL_MAUER_LEBT,
+    EL_MAUER_X,
+    EL_MAUER_Y,
+    EL_MAUER_XY,
     EL_FELSBODEN,
     EL_AUSGANG_ZU,
     EL_AUSGANG_ACT,
@@ -889,6 +867,9 @@ void InitElementProperties()
     EL_MAUERWERK,
     EL_FELSBODEN,
     EL_MAUER_LEBT,
+    EL_MAUER_X,
+    EL_MAUER_Y,
+    EL_MAUER_XY,
     EL_MAUERND
   };
   static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
@@ -1286,7 +1267,7 @@ void InitElementProperties()
     Elementeigenschaften[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
-void CloseAll()
+void CloseAllAndExit(int exit_value)
 {
   int i;
 
@@ -1326,5 +1307,5 @@ void CloseAll()
     XCloseDisplay(display);
   }
 
-  exit(0);
+  exit(exit_value);
 }

@@ -80,6 +80,7 @@ void DrawScreenElementShifted(int, int, int, int, int, int);
 void DrawLevelElementShifted(int, int, int, int, int, int);
 void DrawScreenElementThruMask(int, int, int);
 void DrawLevelElementThruMask(int, int, int);
+void DrawLevelFieldThruMask(int, int);
 void ErdreichAnbroeckeln(int, int);
 void DrawScreenElement(int, int, int);
 void DrawLevelElement(int, int, int);

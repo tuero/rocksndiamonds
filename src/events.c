@@ -245,7 +245,7 @@ void HandleClientMessageEvent(XClientMessageEvent *event)
 {
   if ((event->window == window) &&
       (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
-    CloseAll();
+    game_status = EXITGAME;
 }
 
 void HandleButton(int mx, int my, int button)

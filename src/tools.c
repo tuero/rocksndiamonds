@@ -382,7 +382,7 @@ void DrawPlayer(struct PlayerInfo *player)
     if (Store[last_jx][last_jy])
     {
       DrawLevelElement(last_jx,last_jy, Store[last_jx][last_jy]);
-      DrawLevelElementThruMask(last_jx,last_jy, Feld[last_jx][last_jy]);
+      DrawLevelFieldThruMask(last_jx,last_jy);
     }
     else if (Feld[last_jx][last_jy] == EL_DYNAMIT)
       DrawDynamite(last_jx,last_jy);
@@ -481,6 +481,16 @@ void DrawPlayer(struct PlayerInfo *player)
     }
 
     DrawGraphicThruMask(sx,sy, graphic + phase);
+  }
+
+  if ((last_jx != jx || last_jy != jy) && Feld[last_jx][last_jy]==EL_EXPLODING)
+  {
+    int phase = Frame[last_jx][last_jy];
+    int delay = 2;
+
+    if (phase > 2)
+      DrawGraphicThruMask(SCREENX(last_jx),SCREENY(last_jy),
+			  GFX_EXPLOSION + ((phase-1)/delay-1));
   }
 
   if (direct_draw_on)
@@ -946,6 +956,11 @@ void DrawLevelElementThruMask(int x, int y, int element)
   DrawLevelElementExt(x,y, 0,0, element, NO_CUTTING, USE_MASKING);
 }
 
+void DrawLevelFieldThruMask(int x, int y)
+{
+  DrawLevelElementExt(x,y, 0,0, Feld[x][y], NO_CUTTING, USE_MASKING);
+}
+
 void ErdreichAnbroeckeln(int x, int y)
 {
   int i, width, height, cx,cy;
@@ -1087,13 +1102,8 @@ void DrawScreenField(int x, int y)
 	Store[ux][uy]==EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (Store[ux][uy]==EL_MORAST_VOLL ||
-
-#if 0
-	Store[ux][uy]==EL_SALZSAEURE ||
-#endif
-
-	Store[ux][uy]==EL_SIEB_VOLL ||
-	Store[ux][uy]==EL_SIEB2_VOLL)
+	     Store[ux][uy]==EL_SIEB_VOLL ||
+	     Store[ux][uy]==EL_SIEB2_VOLL)
       cut_mode = CUT_BELOW;
 
     if (cut_mode==CUT_ABOVE)
@@ -1106,11 +1116,8 @@ void DrawScreenField(int x, int y)
     else
       DrawScreenElementShifted(x,y, 0,MovPos[ux][uy], element, cut_mode);
 
-#if 1
     if (Store[ux][uy] == EL_SALZSAEURE)
       DrawLevelElementThruMask(ux,uy+1, EL_SALZSAEURE);
-#endif
-
   }
   else if (IS_BLOCKED(ux,uy))
   {
@@ -1736,6 +1743,9 @@ int el2gfx(int element)
     case EL_ZEIT_VOLL:		return(GFX_ZEIT_VOLL);
     case EL_ZEIT_LEER:		return(GFX_ZEIT_LEER);
     case EL_MAUER_LEBT:		return(GFX_MAUER_LEBT);
+    case EL_MAUER_X:		return(GFX_MAUER_X);
+    case EL_MAUER_Y:		return(GFX_MAUER_Y);
+    case EL_MAUER_XY:		return(GFX_MAUER_XY);
     case EL_EDELSTEIN_BD:	return(GFX_EDELSTEIN_BD);
     case EL_EDELSTEIN_GELB:	return(GFX_EDELSTEIN_GELB);
     case EL_EDELSTEIN_ROT:	return(GFX_EDELSTEIN_ROT);

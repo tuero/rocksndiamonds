@@ -206,9 +206,9 @@ int editor_element[] =
   EL_DRACHE,
 
   EL_SONDE,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
-  EL_LEERRAUM,
+  EL_MAUER_X,
+  EL_MAUER_Y,
+  EL_MAUER_XY,
 
   EL_CHAR_A + ('S' - 'A'),
   EL_CHAR_A + ('O' - 'A'),

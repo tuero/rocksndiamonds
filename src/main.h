@@ -200,7 +200,8 @@ typedef int BOOL;
 #define MAX_LEVDIR_ENTRIES	15
 #define MAX_SCORE_ENTRIES	15
 
-#define MAX_FILENAME		256
+#define MAX_OPTION_LEN		256
+#define MAX_FILENAME_LEN	256
 #define MAX_NUM_AMOEBA		100
 #define MAX_ELEMENTS		512
 
@@ -321,6 +322,7 @@ extern char	       *joystick_device_name[2];
 extern char	       *level_directory;
 extern int     		width, height;
 
+extern char	       *program_name;
 extern char	       *display_name;
 extern char	       *server_host;
 extern int		server_port;
@@ -392,8 +394,6 @@ extern struct JoystickInfo	joystick[];
 extern char		*sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
-
-extern char		*program_name;
 
 
 /* often used screen positions */
@@ -616,7 +616,11 @@ extern char		*program_name;
 #define EL_CHAR_COPY		(EL_CHAR_ASCII0+94)
 #define EL_CHAR_END		(EL_CHAR_START+79)
 
-#define EL_UNUSED_200		200
+#define EL_MAUER_X		200
+#define EL_MAUER_Y		201
+#define EL_MAUER_XY		202
+
+#define EL_UNUSED_200		203
 /* ... */
 #define EL_UNUSED_255		255
 
@@ -756,15 +760,20 @@ extern char		*program_name;
 #define GFX_MAULWURF		145
 #define GFX_SCHWEIN		146
 #define GFX_DRACHE		147
+#define GFX_MAUER_XY		148
+#define GFX_MAUER_X		149
+#define GFX_MAUER_Y		150
 #define GFX_EDELSTEIN_ROT	152
 #define GFX_EDELSTEIN_LILA	154
 #define GFX_DYNABOMB_XL		156
 #define GFX_SONDE		159
 /* Zeile 10 (160) */
 #define GFX_EDELSTEIN_BD	163
-#define GFX_MAUER_R1		165
+#define GFX_MAUER_RIGHT		165
+#define GFX_MAUER_R1		GFX_MAUER_RIGHT
 #define GFX_MAUER_R		167
-#define GFX_MAUER_L1		168
+#define GFX_MAUER_LEFT		168
+#define GFX_MAUER_L1		GFX_MAUER_LEFT
 #define GFX_MAUER_L		170
 #define GFX_MAUER_LEBT		171
 #define GFX_SIEB2_LEER		172
@@ -824,6 +833,9 @@ extern char		*program_name;
 #define GFX_SPIELER4_RIGHT	(GFX_START_ROCKSHEROES +10*HEROES_PER_LINE + 4)
 #define GFX_SPIELER4_PUSH_RIGHT	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 0)
 #define GFX_SPIELER4_PUSH_LEFT	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 4)
+#define GFX_MAUER_DOWN		(GFX_START_ROCKSHEROES +12*HEROES_PER_LINE + 0)
+#define GFX_MAUER_UP		(GFX_START_ROCKSHEROES +12*HEROES_PER_LINE + 3)
+
 #define GFX_SONDE_START		(GFX_START_ROCKSHEROES + 9*HEROES_PER_LINE + 8)
 #define GFX_SCHWEIN_DOWN	(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE + 8)
 #define GFX_SCHWEIN_UP		(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE +12)

@@ -20,7 +20,7 @@
 BOOL CreateNewScoreFile()
 {
   int i,j,k;
-  char filename[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
   char empty_alias[MAX_NAMELEN];
   FILE *file;
 
@@ -53,7 +53,7 @@ BOOL CreateNewScoreFile()
 
 BOOL CreateNewNamesFile(int mode)
 {
-  char filename[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
   FILE *file;
 
   if (mode==PLAYER_LEVEL)
@@ -75,8 +75,8 @@ BOOL CreateNewNamesFile(int mode)
 BOOL LoadLevelInfo()
 {
   int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
   sprintf(filename,"%s/%s",level_directory,LEVDIR_FILENAME);
@@ -121,19 +121,15 @@ BOOL LoadLevelInfo()
 void LoadLevel(int level_nr)
 {
   int i,x,y;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
   sprintf(filename,"%s/%s/%d",
 	  level_directory,leveldir[leveldir_nr].filename,level_nr);
 
   if (!(file = fopen(filename,"r")))
-  {
-/*
-    Error(ERR_RETURN, "cannot load level '%s'", filename);
-*/
-  }
+    Error(ERR_RETURN, "cannot load level '%s' - creating new level", filename);
   else
   {
     fgets(cookie,LEVEL_COOKIE_LEN,file);
@@ -215,8 +211,8 @@ void LoadLevel(int level_nr)
 void LoadLevelTape(int level_nr)
 {
   int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
   BOOL levelrec_10 = FALSE;
 
@@ -294,8 +290,8 @@ void LoadLevelTape(int level_nr)
 void LoadScore(int level_nr)
 {
   int i,j;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
 
   sprintf(filename,"%s/%s/%s",
@@ -346,8 +342,8 @@ void LoadScore(int level_nr)
 void LoadPlayerInfo(int mode)
 {
   int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
   char *login_name = GetLoginName();
   struct PlayerInfo default_player, new_player;
@@ -469,7 +465,7 @@ void LoadPlayerInfo(int mode)
 void SaveLevel(int level_nr)
 {
   int i,x,y;
-  char filename[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
   FILE *file;
 
   sprintf(filename,"%s/%s/%d",
@@ -519,7 +515,7 @@ void SaveLevel(int level_nr)
 void SaveLevelTape(int level_nr)
 {
   int i;
-  char filename[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
   FILE *file;
   BOOL new_tape = TRUE;
 
@@ -588,7 +584,7 @@ void SaveLevelTape(int level_nr)
 void SaveScore(int level_nr)
 {
   int i,j;
-  char filename[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
   FILE *file;
 
   sprintf(filename,"%s/%s/%s",
@@ -616,8 +612,8 @@ void SaveScore(int level_nr)
 void SavePlayerInfo(int mode)
 {
   int i;
-  char filename[MAX_FILENAME];
-  char cookie[MAX_FILENAME];
+  char filename[MAX_FILENAME_LEN];
+  char cookie[MAX_FILENAME_LEN];
   FILE *file;
   struct PlayerInfo default_player;
   int version_10_file = FALSE;
