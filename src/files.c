@@ -58,7 +58,7 @@
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
 #define LEVELFILE_EXTENSION	"lvl"
-#define TAPEFILE_EXTENSION	"rec"
+#define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
 #define ERROR_FILENAME		"error.out"
 #endif

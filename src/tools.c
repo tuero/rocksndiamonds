@@ -117,13 +117,15 @@ void BackToFront()
 
       if (setup.soft_scrolling)
       {
-	fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
-	fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
+	fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+	fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
       }
 
-      XCopyArea(display,buffer,window,gc,
-		fx,fy, SXSIZE,SYSIZE,
-		SX,SY);
+      if (setup.soft_scrolling ||
+	  ABS(ScreenGfxPos) + ScrollStepSize == TILEX ||
+	  ABS(ScreenGfxPos) == ScrollStepSize ||
+	  redraw_tiles > REDRAWTILES_THRESHOLD)
+	XCopyArea(display, buffer, window, gc, fx, fy, SXSIZE, SYSIZE, SX, SY);
     }
     redraw_mask &= ~REDRAW_MAIN;
   }
