@@ -693,6 +693,7 @@ static int getGraphicAnimationPhase(int frames, int delay, int mode)
   if (mode == ANIM_OSCILLATE)
   {
     int max_anim_frames = 2 * frames - 2;
+
     phase = (FrameCounter % (delay * max_anim_frames)) / delay;
     phase = (phase < frames ? phase : max_anim_frames - phase);
   }

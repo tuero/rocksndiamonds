@@ -858,9 +858,6 @@ static void InitGraphicInfo()
 
   image_files = getCurrentImageList();
 
-  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFXARG_NUM_FRAMES]);
-  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFXARG_NUM_FRAMES]);
-
   for(i=0; i<MAX_GRAPHICS; i++)
   {
     /* always start with reliable default values */
@@ -875,7 +872,11 @@ static void InitGraphicInfo()
 		     &graphic_info[i].src_x, &graphic_info[i].src_y);
   }
 
-#if 1
+#if 0
+
+  printf("D> %d\n", image_files[GFX_BD_DIAMOND].parameter[GFXARG_NUM_FRAMES]);
+  printf("W> %d\n", image_files[GFX_ROBOT_WHEEL].parameter[GFXARG_NUM_FRAMES]);
+
   graphic_info[GFX_ABLENK].bitmap = getBitmapFromImageID(GFX_ROBOT_WHEEL);
   graphic_info[GFX_ABLENK].src_x = 0;
   graphic_info[GFX_ABLENK].src_y = 0;
