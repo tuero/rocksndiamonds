@@ -30,5 +30,13 @@ clean:
 backup:
 	./Scripts/make_backup.sh
 
+dist: dist-unix dist-dos
+
+dist-unix:
+	./Scripts/make_dist_unix.sh .
+
+dist-dos:
+	./Scripts/make_dist_dos.sh .
+
 depend:
 	$(MAKE_CMD) depend
