@@ -1,7 +1,12 @@
+2004-03-14
+	* fixed graphical bug when displaying explosion animations
+	* fixed bug when appending to tapes, resulting in broken tapes
+	* re-recorded a few tapes broken by fixing gravity checking bug
+
 2004-03-13
 	* "can move into acid" property now for all elements independently
 	* "can fall into acid" property for player stored in same bitfield now
-	* added option for deadliness for sp_sniksnak and sp_electron
+	* added option for deadliness of Supaplex 'sniksnak' and 'electron'
 	* version number set to 3.1.0 (finally!)
 
 2004-03-09

@@ -103,6 +103,10 @@
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
 
+#define GET_TARGET_ELEMENT(e, ch)					\
+	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
+	 (e) == EL_TRIGGER_PLAYER  ? (ch)->actual_trigger_player : (e))
+
 #define ELEMENT_CAN_ENTER_FIELD_BASE_X(x, y, condition)			\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					(condition)))
@@ -295,23 +299,25 @@ static void ChangeElement(int, int, int);
 
 static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
 #define CheckTriggeredElementChange(x, y, e, ev)			\
-	CheckTriggeredElementChangeExt(x, y, e, ev, -1, CH_SIDE_ANY, -1)
+	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY,	\
+				       CH_SIDE_ANY, -1)
 #define CheckTriggeredElementChangePlayer(x, y, e, ev, p, s)		\
 	CheckTriggeredElementChangeExt(x, y, e, ev, p, s, -1)
 #define CheckTriggeredElementChangeSide(x, y, e, ev, s)			\
-	CheckTriggeredElementChangeExt(x, y, e, ev, -1, s, -1)
+	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY, s, -1)
 #define CheckTriggeredElementChangePage(x, y, e, ev, p)			\
-	CheckTriggeredElementChangeExt(x, y, e, ev, -1, CH_SIDE_ANY, p)
+	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY,	\
+				       CH_SIDE_ANY, p)
 
-static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
-#define CheckElementChange(x, y, e, ev)					\
-	CheckElementChangeExt(x, y, e, ev, -1, CH_SIDE_ANY, -1)
+static boolean CheckElementChangeExt(int, int, int, int, int, int, int, int);
+#define CheckElementChange(x, y, e, te, ev)				\
+	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, CH_SIDE_ANY, -1)
 #define CheckElementChangePlayer(x, y, e, ev, p, s)			\
-	CheckElementChangeExt(x, y, e, ev, p, s, -1)
-#define CheckElementChangeSide(x, y, e, ev, s)				\
-	CheckElementChangeExt(x, y, e, ev, -1, s, -1)
-#define CheckElementChangePage(x, y, e, ev, p)				\
-	CheckElementChangeExt(x, y, e, ev, -1, CH_SIDE_ANY, p)
+	CheckElementChangeExt(x, y, e, EL_EMPTY, ev, p, s, CH_PAGE_ANY)
+#define CheckElementChangeSide(x, y, e, te, ev, s)			\
+	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, s, CH_PAGE_ANY)
+#define CheckElementChangePage(x, y, e, te, ev, p)			\
+	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, CH_SIDE_ANY, p)
 
 static void PlayLevelSound(int, int, int);
 static void PlayLevelSoundNearest(int, int, int);
@@ -1234,6 +1240,19 @@ static void InitGameEngine()
       element_info[element].change_events |= CH_EVENT_BIT(CE_DELAY);
   }
 #endif
+
+  /* ---------- initialize run-time trigger player and element ------------- */
+
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    struct ElementInfo *ei = &element_info[EL_CUSTOM_START + i];
+
+    for (j = 0; j < ei->num_change_pages; j++)
+    {
+      ei->change_page[j].actual_trigger_element = EL_EMPTY;
+      ei->change_page[j].actual_trigger_player = EL_PLAYER_1;
+    }
+  }
 
   /* ---------- initialize trigger events ---------------------------------- */
 
@@ -3753,7 +3772,7 @@ void Impact(int x, int y)
   boolean object_hit = FALSE;
   boolean impact = (lastline || object_hit);
   int element = Feld[x][y];
-  int smashed = EL_UNDEFINED;
+  int smashed = EL_STEELWALL;
 
   if (!lastline)	/* check if element below was hit */
   {
@@ -3804,7 +3823,7 @@ void Impact(int x, int y)
     PlayLevelSound(x, y, SND_PEARL_BREAKING);
     return;
   }
-  else if (impact && CheckElementChange(x, y, element, CE_IMPACT))
+  else if (impact && CheckElementChange(x, y, element, smashed, CE_IMPACT))
   {
     PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
 
@@ -3949,16 +3968,17 @@ void Impact(int x, int y)
 	  TestIfElementSmashesCustomElement(x, y, MV_DOWN);
 #endif
 
-	  CheckElementChange(x, y + 1, smashed, CE_SMASHED);
+	  CheckElementChange(x, y + 1, smashed, element, CE_SMASHED);
 
 	  CheckTriggeredElementChangeSide(x, y + 1, smashed,
 					  CE_OTHER_IS_SWITCHING, CH_SIDE_TOP);
-	  CheckElementChangeSide(x, y + 1, smashed, CE_SWITCHED, CH_SIDE_TOP);
+	  CheckElementChangeSide(x, y + 1, smashed, element,
+				 CE_SWITCHED, CH_SIDE_TOP);
 	}
       }
       else
       {
-	CheckElementChange(x, y + 1, smashed, CE_SMASHED);
+	CheckElementChange(x, y + 1, smashed, element, CE_SMASHED);
       }
     }
   }
@@ -5876,7 +5896,7 @@ void ContinueMoving(int x, int y)
 		change->trigger_element == touched_element)
 	    {
 	      CheckElementChangePage(newx, newy, hitting_element,
-				     CE_OTHER_IS_HITTING, i);
+				     touched_element, CE_OTHER_IS_HITTING, i);
 	      break;
 	    }
 	  }
@@ -5896,7 +5916,7 @@ void ContinueMoving(int x, int y)
 		change->trigger_element == hitting_element)
 	    {
 	      CheckElementChangePage(nextx, nexty, touched_element,
-				     CE_OTHER_GETS_HIT, i);
+				     hitting_element, CE_OTHER_GETS_HIT, i);
 	      break;
 	    }
 	  }
@@ -6852,10 +6872,18 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 static boolean ChangeElementNow(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
+  int target_element;
 
   /* always use default change event to prevent running into a loop */
   if (ChangeEvent[x][y] == CE_BITMASK_DEFAULT)
     ChangeEvent[x][y] = CH_EVENT_BIT(CE_DELAY);
+
+  if (ChangeEvent[x][y] == CH_EVENT_BIT(CE_DELAY))
+  {
+    /* reset actual trigger element and player */
+    change->actual_trigger_element = EL_EMPTY;
+    change->actual_trigger_player = EL_PLAYER_1;
+  }
 
   /* do not change already changed elements with same change event */
 #if 0
@@ -6947,7 +6975,9 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
 	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
-	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
+	  target_element = GET_TARGET_ELEMENT(change->content[xx][yy], change);
+
+	  ChangeElementNowExt(ex, ey, target_element);
 
 	  something_has_changed = TRUE;
 
@@ -6963,7 +6993,9 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   }
   else
   {
-    ChangeElementNowExt(x, y, change->target_element);
+    target_element = GET_TARGET_ELEMENT(change->target_element, change);
+
+    ChangeElementNowExt(x, y, target_element);
 
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
   }
@@ -7020,6 +7052,8 @@ static void ChangeElement(int x, int y, int page)
     {
       page = ChangePage[x][y];
       ChangePage[x][y] = -1;
+
+      change = &ei->change_page[page];
     }
 
 #if 0
@@ -7050,6 +7084,7 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 					      int trigger_page)
 {
   int i, j, x, y;
+  int trigger_page_bits = (trigger_page < 0 ? CH_PAGE_ANY : 1 << trigger_page);
 
   if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
     return FALSE;
@@ -7072,7 +7107,7 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 	  change->events & CH_EVENT_BIT(trigger_event) &&
 	  change->trigger_side & trigger_side &&
 	  change->trigger_player & trigger_player &&
-	  change->trigger_page & (1 << trigger_page) &&
+	  change->trigger_page & trigger_page_bits &&
 	  IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element))
       {
 #if 0
@@ -7083,6 +7118,9 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 
 	change_element = TRUE;
 	page = j;
+
+	change->actual_trigger_element = trigger_element;
+	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 
 	break;
       }
@@ -7112,6 +7150,7 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 
 static boolean CheckElementChangeExt(int x, int y,
 				     int element,
+				     int trigger_element,
 				     int trigger_event,
 				     int trigger_player,
 				     int trigger_side,
@@ -7144,12 +7183,23 @@ static boolean CheckElementChangeExt(int x, int y,
 	change_element = TRUE;
 	trigger_page = i;
 
+	change->actual_trigger_element = trigger_element;
+	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
+
 	break;
       }
     }
 
     if (!change_element)
       return FALSE;
+  }
+  else
+  {
+    struct ElementInfo *ei = &element_info[element];
+    struct ElementChangeInfo *change = &ei->change_page[trigger_page];
+
+    change->actual_trigger_element = trigger_element;
+    change->actual_trigger_player = EL_PLAYER_1;	/* unused */
   }
 
 #else
@@ -9093,6 +9143,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
   int center_element = Feld[x][y];	/* should always be non-moving! */
+  int border_trigger_element;
   int i, j;
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
@@ -9137,6 +9188,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	{
 	  change_center_element = TRUE;
 	  center_element_change_page = j;
+	  border_trigger_element = border_element;
 
 	  break;
 	}
@@ -9162,8 +9214,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 #endif
 	    )
 	{
-	  CheckElementChangePage(xx, yy, border_element, CE_OTHER_IS_TOUCHING,
-				 j);
+#if 0
+	  printf("::: border_element %d, %d\n", x, y);
+#endif
+
+	  CheckElementChangePage(xx, yy, border_element, center_element,
+				 CE_OTHER_IS_TOUCHING, j);
 	  break;
 	}
       }
@@ -9171,8 +9227,14 @@ void TestIfElementTouchesCustomElement(int x, int y)
   }
 
   if (change_center_element)
-    CheckElementChangePage(x, y, center_element, CE_OTHER_IS_TOUCHING,
-			   center_element_change_page);
+  {
+#if 0
+    printf("::: center_element %d, %d\n", x, y);
+#endif
+
+    CheckElementChangePage(x, y, center_element, border_trigger_element,
+			   CE_OTHER_IS_TOUCHING, center_element_change_page);
+  }
 }
 
 void TestIfElementHitsCustomElement(int x, int y, int direction)
@@ -9181,6 +9243,7 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int hitx = x + dx, hity = y + dy;
   int hitting_element = Feld[x][y];
+  int touched_element;
 #if 0
   boolean object_hit = (IN_LEV_FIELD(hitx, hity) &&
 			!IS_FREE(hitx, hity) &&
@@ -9197,15 +9260,20 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
     return;
 #endif
 
-  CheckElementChangeSide(x, y, hitting_element, CE_HITTING_SOMETHING,
-			 direction);
+  touched_element = (IN_LEV_FIELD(hitx, hity) ?
+		     MovingOrBlocked2Element(hitx, hity) : EL_STEELWALL);
+
+  CheckElementChangeSide(x, y, hitting_element, touched_element,
+			 CE_HITTING_SOMETHING, direction);
 
   if (IN_LEV_FIELD(hitx, hity))
   {
     int opposite_direction = MV_DIR_OPPOSITE(direction);
     int hitting_side = direction;
     int touched_side = opposite_direction;
+#if 0
     int touched_element = MovingOrBlocked2Element(hitx, hity);
+#endif
 #if 1
     boolean object_hit = (!IS_MOVING(hitx, hity) ||
 			  MovDir[hitx][hity] != direction ||
@@ -9218,8 +9286,8 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
     {
       int i;
 
-      CheckElementChangeSide(hitx, hity, touched_element, CE_HIT_BY_SOMETHING,
-			     opposite_direction);
+      CheckElementChangeSide(hitx, hity, touched_element, hitting_element,
+			     CE_HIT_BY_SOMETHING, opposite_direction);
 
       if (IS_CUSTOM_ELEMENT(hitting_element) &&
 	  HAS_ANY_CHANGE_EVENT(hitting_element, CE_OTHER_IS_HITTING))
@@ -9240,8 +9308,8 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 #endif
 	      )
 	  {
-	    CheckElementChangePage(x, y, hitting_element, CE_OTHER_IS_HITTING,
-				   i);
+	    CheckElementChangePage(x, y, hitting_element, touched_element,
+				   CE_OTHER_IS_HITTING, i);
 	    break;
 	  }
 	}
@@ -9266,7 +9334,7 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 	      )
 	  {
 	    CheckElementChangePage(hitx, hity, touched_element,
-				   CE_OTHER_GETS_HIT, i);
+				   hitting_element, CE_OTHER_GETS_HIT, i);
 	    break;
 	  }
 	}
@@ -9282,6 +9350,7 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int hitx = x + dx, hity = y + dy;
   int hitting_element = Feld[x][y];
+  int touched_element;
 #if 0
   boolean object_hit = (IN_LEV_FIELD(hitx, hity) &&
 			!IS_FREE(hitx, hity) &&
@@ -9298,15 +9367,20 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
     return;
 #endif
 
-  CheckElementChangeSide(x, y, hitting_element, EP_CAN_SMASH_EVERYTHING,
-			 direction);
+  touched_element = (IN_LEV_FIELD(hitx, hity) ?
+		     MovingOrBlocked2Element(hitx, hity) : EL_STEELWALL);
+
+  CheckElementChangeSide(x, y, hitting_element, touched_element,
+			 EP_CAN_SMASH_EVERYTHING, direction);
 
   if (IN_LEV_FIELD(hitx, hity))
   {
     int opposite_direction = MV_DIR_OPPOSITE(direction);
     int hitting_side = direction;
     int touched_side = opposite_direction;
+#if 0
     int touched_element = MovingOrBlocked2Element(hitx, hity);
+#endif
 #if 1
     boolean object_hit = (!IS_MOVING(hitx, hity) ||
 			  MovDir[hitx][hity] != direction ||
@@ -9319,7 +9393,7 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
     {
       int i;
 
-      CheckElementChangeSide(hitx, hity, touched_element,
+      CheckElementChangeSide(hitx, hity, touched_element, hitting_element,
 			     CE_SMASHED_BY_SOMETHING, opposite_direction);
 
       if (IS_CUSTOM_ELEMENT(hitting_element) &&
@@ -9341,8 +9415,8 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
 #endif
 	      )
 	  {
-	    CheckElementChangePage(x, y, hitting_element, CE_OTHER_IS_SMASHING,
-				   i);
+	    CheckElementChangePage(x, y, hitting_element, touched_element,
+				   CE_OTHER_IS_SMASHING, i);
 	    break;
 	  }
 	}
@@ -9367,7 +9441,7 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
 	      )
 	  {
 	    CheckElementChangePage(hitx, hity, touched_element,
-				   CE_OTHER_GETS_SMASHED, i);
+				   hitting_element, CE_OTHER_GETS_SMASHED, i);
 	    break;
 	  }
 	}
@@ -10634,8 +10708,8 @@ boolean DropElement(struct PlayerInfo *player)
 #if 1
       TestIfElementHitsCustomElement(jx, jy, direction);
 #else
-      CheckElementChangeSide(jx, jy, new_element, CE_HITTING_SOMETHING,
-			     direction);
+      CheckElementChangeSide(jx, jy, new_element, touched_element,
+			     CE_HITTING_SOMETHING, direction);
 #endif
     }
 

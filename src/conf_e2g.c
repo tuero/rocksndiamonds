@@ -2526,6 +2526,14 @@ element_to_graphic[] =
     IMG_UNKNOWN
   },
   {
+    EL_TRIGGER_ELEMENT,			-1, -1, FALSE,
+    IMG_TRIGGER_ELEMENT
+  },
+  {
+    EL_TRIGGER_PLAYER,			-1, -1, FALSE,
+    IMG_TRIGGER_PLAYER
+  },
+  {
     EL_BD_BUTTERFLY_DOWN,		-1, -1, FALSE,
     IMG_BD_BUTTERFLY
   },

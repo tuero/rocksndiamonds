@@ -3150,6 +3150,16 @@ struct ConfigInfo image_config[] =
   { "unknown.ypos",				"1"			},
   { "unknown.frames",				"1"			},
 
+  { "trigger_element",				"RocksDC.pcx"		},
+  { "trigger_element.xpos",			"15"			},
+  { "trigger_element.ypos",			"14"			},
+  { "trigger_element.frames",			"1"			},
+
+  { "trigger_player",				"RocksDC.pcx"		},
+  { "trigger_player.xpos",			"15"			},
+  { "trigger_player.ypos",			"13"			},
+  { "trigger_player.frames",			"1"			},
+
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
 #include "conf_grp.c"	/* include auto-generated data structure definitions */

@@ -3294,7 +3294,12 @@ static int editor_el_custom_more[] =
   EL_CUSTOM_START + 252,
   EL_CUSTOM_START + 253,
   EL_CUSTOM_START + 254,
-  EL_CUSTOM_START + 255
+  EL_CUSTOM_START + 255,
+
+  EL_TRIGGER_ELEMENT,
+  EL_TRIGGER_PLAYER,
+  EL_EMPTY,
+  EL_EMPTY
 };
 static int *editor_hl_custom_more_ptr = editor_hl_custom_more;
 static int *editor_el_custom_more_ptr = editor_el_custom_more;

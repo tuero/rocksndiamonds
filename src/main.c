@@ -3400,6 +3400,16 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "unknown",
     "unknown element"
   },
+  {
+    "trigger_element",
+    "trigger",
+    "element triggering change"
+  },
+  {
+    "trigger_player",
+    "trigger",
+    "player triggering change"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

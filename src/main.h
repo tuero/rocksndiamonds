@@ -902,8 +902,10 @@
 /* ---------- end of custom elements section ------------------------------- */
 
 #define EL_UNKNOWN			656
+#define EL_TRIGGER_ELEMENT		657
+#define EL_TRIGGER_PLAYER		658
 
-#define NUM_FILE_ELEMENTS		657
+#define NUM_FILE_ELEMENTS		659
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1542,7 +1544,7 @@ struct ElementChangeInfo
   int delay_random;		/* added frame delay before changed (random) */
   int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
-  short trigger_element;	/* custom element triggering change */
+  short trigger_element;	/* element triggering change */
 
   int content[3][3];		/* new elements after extended change */
   boolean use_content;		/* use extended change content */
@@ -1558,6 +1560,11 @@ struct ElementChangeInfo
   void (*pre_change_function)(int x, int y);
   void (*change_function)(int x, int y);
   void (*post_change_function)(int x, int y);
+
+  /* ---------- internal values used at runtime when playing ---------- */
+
+  short actual_trigger_element;	/* element that actually triggered change */
+  int actual_trigger_player;	/* player which actually triggered change */
 
   /* ---------- internal values used in level editor ---------- */
 
