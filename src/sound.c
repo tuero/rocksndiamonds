@@ -119,7 +119,7 @@ void SoundServer()
       char *sample_ptr;
       long sample_size, max_sample_size;
       long fragment_size;
-      BOOL stereo;
+      boolean stereo;
 
       if (playing_sounds || (sound_device=open(sound_device_name,O_WRONLY))>=0)
       {
@@ -615,7 +615,7 @@ static unsigned long be2long(unsigned long *be)	/* big-endian -> longword */
   return(ptr[0]<<24 | ptr[1]<<16 | ptr[2]<<8 | ptr[3]);
 }
 
-BOOL LoadSound(struct SoundInfo *snd_info)
+boolean LoadSound(struct SoundInfo *snd_info)
 {
   FILE *file;
   char filename[256];
@@ -734,11 +734,11 @@ void PlaySoundLoop(int nr)
   PlaySoundExt(nr, PSND_MAX_VOLUME, PSND_MIDDLE, PSND_LOOP);
 }
 
-void PlaySoundExt(int nr, int volume, int stereo, BOOL loop)
+void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-  if (sound_status==SOUND_OFF || !sound_on)
+  if (sound_status==SOUND_OFF || !setup.sound_on)
     return;
 
   if (volume<PSND_MIN_VOLUME)

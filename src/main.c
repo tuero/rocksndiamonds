@@ -47,52 +47,37 @@ char	       *level_directory = LEVEL_PATH;
 int     	width, height;
 
 char	       *program_name = NULL;
-char	       *display_name = NULL;
-char	       *server_host = NULL;
-int		server_port = 0;
-int		serveronly = FALSE;
-int		network = FALSE;
-int		verbose = FALSE;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;
-int		network_playing = FALSE;
-int		button_status = MB_NOT_PRESSED, motion_status = FALSE;
+boolean		network_playing = FALSE;
+int		button_status = MB_NOT_PRESSED;
+boolean		motion_status = FALSE;
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
 int	    	joystick_status = JOYSTICK_STATUS;
-int	    	sound_status = SOUND_STATUS, sound_on = TRUE;
-int		sound_loops_allowed = FALSE, sound_loops_on = FALSE;
-int		sound_music_on = FALSE;
-int		sound_simple_on = FALSE;
-int		toons_on = TRUE;
-int		direct_draw_on = FALSE;
-int		scroll_delay_on = FALSE;
-int		soft_scrolling_on = TRUE;
-int		fading_on = FALSE;
-int		autorecord_on = FALSE;
-int		joystick_nr = 0;
-int		quick_doors = FALSE;
+int	    	sound_status = SOUND_STATUS;
+boolean		sound_loops_allowed = FALSE;
 
-BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;
 int		redraw_mask;
 int		redraw_tiles;
 
-int		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-long		Elementeigenschaften[MAX_ELEMENTS];
+short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+unsigned long	Elementeigenschaften[MAX_ELEMENTS];
 
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
@@ -108,7 +93,7 @@ int		FrameCounter, TimeFrames, TimeLeft;
 int		MampferNr, SiebAktiv;
 
 byte		network_player_action[MAX_PLAYERS];
-BOOL		network_player_action_received = FALSE;
+boolean		network_player_action_received = FALSE;
 int		TestPlayer = 0;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
@@ -118,6 +103,8 @@ struct PlayerInfo      *local_player;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SoundInfo	Sound[NUM_SOUNDS];
 struct RecordingInfo	tape;
+struct OptionInfo	options;
+struct SetupInfo	setup;
 
 struct JoystickInfo joystick[2] =
 {

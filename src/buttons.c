@@ -535,7 +535,7 @@ int CheckVideoButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   static int video_button[5] =
   {
     VIDEO_PRESS_EJECT_ON,
@@ -595,12 +595,12 @@ int CheckSoundButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   int sound_state[3];
 
-  sound_state[0] = BUTTON_SOUND_MUSIC  | (BUTTON_ON * sound_music_on);
-  sound_state[1] = BUTTON_SOUND_LOOPS  | (BUTTON_ON * sound_loops_on);
-  sound_state[2] = BUTTON_SOUND_SIMPLE | (BUTTON_ON * sound_simple_on);
+  sound_state[0] = BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music_on);
+  sound_state[1] = BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops_on);
+  sound_state[2] = BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple_on);
 
   if (button)
   {
@@ -652,7 +652,7 @@ int CheckGameButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   int game_state[3] =
   {
     BUTTON_GAME_STOP,
@@ -710,7 +710,7 @@ int CheckYesNoButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   static int yesno_button[5] =
   {
     BUTTON_OK,
@@ -767,7 +767,7 @@ int CheckConfirmButton(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
 
   if (button)
   {
@@ -818,7 +818,7 @@ int CheckPlayerButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   int player_state[4] =
   {
     BUTTON_PLAYER_1,
@@ -879,7 +879,7 @@ int CheckEditButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   static int edit_button[6] =
   {
     ED_BUTTON_CTRL,
@@ -949,7 +949,7 @@ int CheckCtrlButtons(int mx, int my, int button)
 {
   int return_code = 0;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
   static int ctrl_button[4] =
   {
     ED_BUTTON_EDIT,
@@ -1008,7 +1008,7 @@ int CheckElemButtons(int mx, int my, int button)
 {
   int return_code = -1;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
 
   if (button)
   {
@@ -1069,7 +1069,7 @@ int CheckCountButtons(int mx, int my, int button)
 {
   int return_code = -1;
   static int choice = -1;
-  static BOOL pressed = FALSE;
+  static boolean pressed = FALSE;
 
   if (button)
   {

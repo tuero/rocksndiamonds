@@ -39,7 +39,7 @@
 #include "msdos.h"
 #endif  /* #ifndef MSDOS */
 
-typedef int BOOL;
+typedef unsigned char boolean;
 typedef unsigned char byte;
 
 #ifndef FALSE
@@ -207,12 +207,38 @@ struct HiScore
   int Score;
 };
 
+struct OptionInfo
+{
+  char *display_name;
+  char *server_host;
+  int server_port;
+  boolean serveronly;
+  boolean network;
+  boolean verbose;
+};
+
+struct SetupInfo
+{
+  boolean sound_on;
+  boolean sound_loops_on;
+  boolean sound_music_on;
+  boolean sound_simple_on;
+  boolean toons_on;
+  boolean direct_draw_on;
+  boolean scroll_delay_on;
+  boolean soft_scrolling_on;
+  boolean fading_on;
+  boolean autorecord_on;
+  boolean quick_doors;
+  int joystick_nr;
+};
+
 struct PlayerInfo
 {
-  BOOL present;			/* player present in level playfield */
-  BOOL connected;		/* player connected locally or via network */
-  BOOL local;			/* player connected locally */
-  BOOL active;			/* player (present && connected) */
+  boolean present;		/* player present in level playfield */
+  boolean connected;		/* player connected locally or via network */
+  boolean local;		/* player connected locally */
+  boolean active;		/* player (present && connected) */
 
   int index_nr, client_nr, element_nr;
 
@@ -227,9 +253,9 @@ struct PlayerInfo
   int MovDir, MovPos, GfxPos;
   int Frame;
 
-  BOOL Pushing;
-  BOOL gone, LevelSolved, GameOver;
-  BOOL snapped;
+  boolean Pushing;
+  boolean gone, LevelSolved, GameOver;
+  boolean snapped;
 
   long move_delay;
   int last_move_dir;
@@ -283,10 +309,10 @@ struct RecordingInfo
   unsigned long length;
   unsigned long length_seconds;
   unsigned int delay_played;
-  BOOL pause_before_death;
-  BOOL recording, playing, pausing;
-  BOOL fast_forward;
-  BOOL changed;
+  boolean pause_before_death;
+  boolean recording, playing, pausing;
+  boolean fast_forward;
+  boolean changed;
   struct
   {
     byte action[MAX_PLAYERS];
@@ -324,51 +350,36 @@ extern char	       *level_directory;
 extern int     		width, height;
 
 extern char	       *program_name;
-extern char	       *display_name;
-extern char	       *server_host;
-extern int		server_port;
-extern int		serveronly;
-extern int		network;
-extern int		verbose;
 
 extern int		game_status;
 extern int		game_emulation;
-extern int		network_playing;
-extern int		button_status, motion_status;
+extern boolean		network_playing;
+extern int		button_status;
+extern boolean		motion_status;
 extern int		key_joystick_mapping;
 extern int	    	global_joystick_status, joystick_status;
-extern int		sound_status, sound_on;
-extern int		sound_loops_allowed, sound_loops_on;
-extern int		sound_music_on;
-extern int		sound_simple_on;
-extern int		toons_on;
-extern int		direct_draw_on;
-extern int		scroll_delay_on;
-extern int		soft_scrolling_on;
-extern int		fading_on;
-extern int		autorecord_on;
-extern int		joystick_nr;
-extern int		quick_doors;
+extern int		sound_status;
+extern boolean		sound_loops_allowed;
 
-extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
 extern int		redraw_mask;
 extern int		redraw_tiles;
 
-extern int		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-extern long		Elementeigenschaften[MAX_ELEMENTS];
+extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		JustHit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
+extern unsigned long	Elementeigenschaften[MAX_ELEMENTS];
 
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
@@ -383,7 +394,7 @@ extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
 
 extern byte		network_player_action[];
-extern BOOL		network_player_action_received;
+extern boolean		network_player_action_received;
 extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];
@@ -394,6 +405,8 @@ extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape;
 extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
+struct OptionInfo		options;
+struct SetupInfo		setup;
 
 extern char		*sound_name[];
 extern int		background_loop[];

@@ -28,12 +28,12 @@
 #include <math.h>
 
 #ifdef MSDOS
-extern BOOL wait_for_vsync;
+extern boolean wait_for_vsync;
 #endif
 
 void SetDrawtoField(int mode)
 {
-  if (mode == DRAW_BUFFERED && soft_scrolling_on)
+  if (mode == DRAW_BUFFERED && setup.soft_scrolling_on)
   {
     FX = TILEX;
     FY = TILEY;
@@ -66,7 +66,7 @@ void BackToFront()
   int x,y;
   Drawable buffer = (drawto_field != window ? drawto_field : backbuffer);
 
-  if (direct_draw_on && game_status == PLAYING)
+  if (setup.direct_draw_on && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
@@ -107,7 +107,7 @@ void BackToFront()
     {
       int fx = FX, fy = FY;
 
-      if (soft_scrolling_on)
+      if (setup.soft_scrolling_on)
       {
 	fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
 	fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
@@ -189,7 +189,7 @@ void FadeToFront()
 /*
   long fading_delay = 300;
 
-  if (fading_on && (redraw_mask & REDRAW_FIELD))
+  if (setup.fading_on && (redraw_mask & REDRAW_FIELD))
   {
 */
 
@@ -257,7 +257,7 @@ void ClearWindow()
   XFillRectangle(display,backbuffer,gc,
 		 REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
 
-  if (soft_scrolling_on && game_status==PLAYING)
+  if (setup.soft_scrolling_on && game_status==PLAYING)
   {
     XFillRectangle(display,fieldbuffer,gc,
 		   0,0, FXSIZE,FYSIZE);
@@ -266,7 +266,7 @@ void ClearWindow()
   else
     SetDrawtoField(DRAW_BACKBUFFER);
 
-  if (direct_draw_on && game_status==PLAYING)
+  if (setup.direct_draw_on && game_status==PLAYING)
   {
     XFillRectangle(display,window,gc,
 		   REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
@@ -410,7 +410,7 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!IN_SCR_FIELD(sx,sy))
     return;
 
-  if (direct_draw_on)
+  if (setup.direct_draw_on)
     SetDrawtoField(DRAW_BUFFERED);
 
   /* draw things behind the player, if needed */
@@ -442,7 +442,7 @@ void DrawPlayer(struct PlayerInfo *player)
       syy = player->GfxPos;
   }
 
-  if (!soft_scrolling_on && ScreenMovPos)
+  if (!setup.soft_scrolling_on && ScreenMovPos)
     sxx = syy = 0;
 
   DrawGraphicShiftedThruMask(sx,sy, sxx,syy, graphic, NO_CUTTING);
@@ -503,7 +503,7 @@ void DrawPlayer(struct PlayerInfo *player)
 			  GFX_EXPLOSION + ((phase-1)/delay-1));
   }
 
-  if (direct_draw_on)
+  if (setup.direct_draw_on)
   {
     int dest_x = SX + SCREENX(MIN(jx,last_jx))*TILEX;
     int dest_y = SY + SCREENY(MIN(jy,last_jy))*TILEY;
@@ -913,7 +913,7 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element==EL_MAUER_LEBT)
   {
-    BOOL links_massiv = FALSE, rechts_massiv = FALSE;
+    boolean links_massiv = FALSE, rechts_massiv = FALSE;
 
     if (!IN_LEV_FIELD(ux-1,uy) || IS_MAUER(Feld[ux-1][uy]))
       links_massiv = TRUE;
@@ -1104,7 +1104,7 @@ void DrawScreenField(int x, int y)
   if (IS_MOVING(ux,uy))
   {
     int horiz_move = (MovDir[ux][uy]==MV_LEFT || MovDir[ux][uy]==MV_RIGHT);
-    BOOL cut_mode = NO_CUTTING;
+    boolean cut_mode = NO_CUTTING;
 
     if (Store[ux][uy]==EL_MORAST_LEER ||
 	Store[ux][uy]==EL_SIEB_LEER ||
@@ -1134,7 +1134,7 @@ void DrawScreenField(int x, int y)
     int oldx,oldy;
     int sx, sy;
     int horiz_move;
-    BOOL cut_mode = NO_CUTTING;
+    boolean cut_mode = NO_CUTTING;
 
     Blocked2Moving(ux,uy,&oldx,&oldy);
     sx = SCREENX(oldx);
@@ -1234,7 +1234,7 @@ void DrawLevel()
     for(y=BY1; y<=BY2; y++)
       DrawScreenField(x,y);
 
-  if (soft_scrolling_on)
+  if (setup.soft_scrolling_on)
     XCopyArea(display,fieldbuffer,backbuffer,gc,
 	      FX,FY, SXSIZE,SYSIZE,
 	      SX,SY);
@@ -1303,13 +1303,15 @@ int REQ_in_range(int x, int y)
   return(0);
 }
 
-BOOL Request(char *text, unsigned int req_state)
+boolean Request(char *text, unsigned int req_state)
 {
   int mx,my, ty, result = -1;
   unsigned int old_door_state;
 
   /* pause network game while waiting for request to answer */
-  if (network && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+  if (options.network &&
+      game_status == PLAYING &&
+      req_state & REQUEST_WAIT_FOR)
     SendToServer_PausePlaying();
 
   old_door_state = GetDoorState();
@@ -1511,7 +1513,9 @@ BOOL Request(char *text, unsigned int req_state)
   }
 
   /* continue network game after request */
-  if (network && game_status == PLAYING && req_state & REQUEST_WAIT_FOR)
+  if (options.network &&
+      game_status == PLAYING &&
+      req_state & REQUEST_WAIT_FOR)
     SendToServer_ContinuePlaying();
 
   return(result);
@@ -1573,7 +1577,7 @@ unsigned int MoveDoor(unsigned int door_state)
   else if (door2==DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
     door_state &= ~DOOR_CLOSE_2;
 
-  if (quick_doors)
+  if (setup.quick_doors)
   {
     stepsize = 20;
     door_delay_value = 0;

@@ -30,14 +30,14 @@ DECLARE_JOYSTICK_DRIVER_LIST(JOYSTICK_DRIVER_STANDARD)
 static int key_buffer[OSD_MAX_KEY];
 static XEvent event_buffer[MAX_EVENT_BUFFER];
 static int pending_events;
-static BOOL joystick_event;
-static BOOL mouse_installed = FALSE;
+static boolean joystick_event;
+static boolean mouse_installed = FALSE;
 static int last_mouse_pos;
 static int last_mouse_b;
 static int last_joystick_state;
 static BITMAP* video_bitmap;
 
-BOOL wait_for_vsync;
+boolean wait_for_vsync;
 
 extern int playing_sounds;
 extern struct SoundControl playlist[MAX_SOUNDS_PLAYING];
@@ -72,7 +72,8 @@ void allegro_drivers()
 
 }
 
-BOOL hide_mouse(Display *display, int x, int y, unsigned int width, unsigned int height)
+boolean hide_mouse(Display *display, int x, int y,
+		   unsigned int width, unsigned int height)
 {
   if(mouse_x + display->mouse_ptr->w < x || mouse_x > x+width) return FALSE;
   if(mouse_y + display->mouse_ptr->h < y || mouse_y > y+height) return FALSE;
@@ -203,7 +204,7 @@ void XMapWindow(Display* display, Window w)
 {
   int x, y;
   unsigned int width, height;
-  BOOL mouse_off;
+  boolean mouse_off;
 
   x = display->screens[display->default_screen].x;
   y = display->screens[display->default_screen].y;
@@ -350,7 +351,7 @@ void XFillRectangle(
 	unsigned int width,
 	unsigned int height)
 {
-  BOOL mouse_off;
+  boolean mouse_off;
 
   if((BITMAP *) d == video_bitmap)
   {
@@ -395,7 +396,7 @@ inline void XCopyArea(
 	int dest_x,
 	int dest_y)
 {
-  BOOL mouse_off;
+  boolean mouse_off;
 
   if((BITMAP *) src == video_bitmap )
   {
@@ -484,7 +485,7 @@ void XNextEvent(Display* display, XEvent* event_return)
 int XPending(Display* display)
 {
   int i, state;
-  static BOOL joy_button_2 = FALSE;
+  static boolean joy_button_2 = FALSE;
 
   XKeyEvent *xkey;
   XButtonEvent *xbutton;

@@ -29,8 +29,8 @@
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);
-BOOL FrameReached(unsigned long *, unsigned long);
-BOOL DelayReached(unsigned long *, unsigned long);
+boolean FrameReached(unsigned long *, unsigned long);
+boolean DelayReached(unsigned long *, unsigned long);
 void WaitUntilDelayReached(unsigned long *, unsigned long);
 char *int2str(int, int);
 unsigned int SimpleRND(unsigned int);

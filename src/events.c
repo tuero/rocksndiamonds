@@ -136,7 +136,7 @@ void ClearEventQueue()
 
 void SleepWhileUnmapped()
 {
-  BOOL window_unmapped = TRUE;
+  boolean window_unmapped = TRUE;
 
   XAutoRepeatOn(display);
 
@@ -177,7 +177,7 @@ void HandleExposeEvent(XExposeEvent *event)
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
 
-  if (direct_draw_on && game_status==PLAYING)
+  if (setup.direct_draw_on && game_status==PLAYING)
   {
     int xx,yy;
     int x1 = (x-SX)/TILEX, y1 = (y-SY)/TILEY;
@@ -194,7 +194,7 @@ void HandleExposeEvent(XExposeEvent *event)
     SetDrawtoField(DRAW_DIRECT);
   }
 
-  if (soft_scrolling_on && game_status == PLAYING)
+  if (setup.soft_scrolling_on && game_status == PLAYING)
   {
     int fx = FX, fy = FY;
 
@@ -672,7 +672,7 @@ void HandleKey(KeySym key, int key_status)
 	  }
 	  */
 
-	  printf("direct_draw_on == %d\n", direct_draw_on);
+	  printf("direct_draw_on == %d\n", setup.direct_draw_on);
 
 	  break;
 
@@ -726,7 +726,7 @@ void HandleNoXEvent()
     return;
   }
 
-  if (network)
+  if (options.network)
     HandleNetworking();
 
   switch(game_status)

@@ -51,9 +51,9 @@
 #define SETUP_SCROLL_DELAY_ON(x)	(((x) & SETUP_SCROLL_DELAY) != 0)
 #define SETUP_SOFT_SCROLL_ON(x)		(((x) & SETUP_SOFT_SCROLL) != 0)
 
-BOOL CreateNewScoreFile(void);
-BOOL CreateNewNamesFile(int);
-BOOL LoadLevelInfo(void);
+boolean CreateNewScoreFile(void);
+boolean CreateNewNamesFile(int);
+boolean LoadLevelInfo(void);
 void LoadLevel(int);
 void LoadLevelTape(int);
 void LoadScore(int);

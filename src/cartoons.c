@@ -17,7 +17,7 @@
 #include "tools.h"
 
 static void HandleAnimation(int);
-static BOOL AnimateToon(int, BOOL);
+static boolean AnimateToon(int, boolean);
 static void DrawAnim(Pixmap, GC, int, int, int, int, int, int, int, int);
 
 struct AnimInfo
@@ -27,7 +27,7 @@ struct AnimInfo
   int frames;
   int frames_per_second;
   int stepsize;
-  BOOL pingpong;
+  boolean pingpong;
   int direction;
   int position;
 };
@@ -109,12 +109,12 @@ void HandleAnimation(int mode)
 {
   static long animstart_delay = -1;
   static long animstart_delay_value = 0;
-  static BOOL anim_restart = TRUE;
-  static BOOL reset_delay = TRUE;
+  static boolean anim_restart = TRUE;
+  static boolean reset_delay = TRUE;
   static int toon_nr = 0;
   int draw_mode;
 
-  if (!toons_on)
+  if (!setup.toons_on)
     return;
 
   switch(mode)
@@ -124,7 +124,7 @@ void HandleAnimation(int mode)
       reset_delay = TRUE;
 
       /* Fill empty backbuffer for animation functions */
-      if (direct_draw_on && game_status == PLAYING)
+      if (setup.direct_draw_on && game_status == PLAYING)
       {
 	int xx,yy;
 
@@ -138,7 +138,7 @@ void HandleAnimation(int mode)
 	SetDrawtoField(DRAW_DIRECT);
       }
 
-      if (soft_scrolling_on && game_status == PLAYING)
+      if (setup.soft_scrolling_on && game_status == PLAYING)
       {
 	int fx = FX, fy = FY;
 
@@ -158,12 +158,12 @@ void HandleAnimation(int mode)
       redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
       /* Redraw background even when in direct drawing mode */
-      draw_mode = direct_draw_on;
-      direct_draw_on = FALSE;
+      draw_mode = setup.direct_draw_on;
+      setup.direct_draw_on = FALSE;
 
       BackToFront();
 
-      direct_draw_on = draw_mode;
+      setup.direct_draw_on = draw_mode;
 
       return;
       break;
@@ -189,12 +189,12 @@ void HandleAnimation(int mode)
   anim_restart = reset_delay = AnimateToon(toon_nr,anim_restart);
 }
 
-BOOL AnimateToon(int toon_nr, BOOL restart)
+boolean AnimateToon(int toon_nr, boolean restart)
 {
   static pos_x = 0, pos_y = 0;
   static delta_x = 0, delta_y = 0;
   static int frame = 0, frame_step = 1;
-  static BOOL horiz_move, vert_move;
+  static boolean horiz_move, vert_move;
   static long anim_delay = 0;
   static int anim_delay_value = 0;
   static int width,height;

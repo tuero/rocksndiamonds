@@ -120,7 +120,7 @@ static void dropuser(struct user *u)
 {
   struct user *v, *w;
   
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: dropping client %d (%s)\n", u->number, u->nick);
 
   if (u == user0)
@@ -170,7 +170,7 @@ static void dropuser(struct user *u)
 
   if (onceonly && clients == bots)
   {
-    if (verbose)
+    if (options.verbose)
     {
       printf("RND_SERVER: no clients left\n");
       printf("RND_SERVER: aborting\n");
@@ -224,7 +224,7 @@ static void new_connect(int fd)
   }
 
   u->number = nxn;
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d connecting from %s\n", nxn, inet_ntoa(saddr.sin_addr));
   clients++;
 
@@ -238,7 +238,7 @@ static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
 {
   if (len != 5 || buf[2] != PROT_VERS_1 || buf[3] != PROT_VERS_2)
   {
-    if (verbose)
+    if (options.verbose)
       printf("RND_SERVER: client %d (%s) has wrong protocol version %d.%d.%d\n", u->number, u->nick, buf[2], buf[3], buf[4]);
 
     buf[0] = 0;
@@ -254,7 +254,7 @@ static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
   }
   else
   {
-    if (verbose)
+    if (options.verbose)
       printf("RND_SERVER: client %d (%s) uses protocol version %d.%d.%d\n", u->number, u->nick, buf[2], buf[3], buf[4]);
   }
 }
@@ -266,7 +266,7 @@ static void Handle_OP_NUMBER_WANTED(struct user *u)
   int nr_wanted = buf[2];
   int nr_is_free = 1;
 
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d (%s) wants to switch to # %d\n",
 	   u->number, u->nick, nr_wanted);
 
@@ -279,7 +279,7 @@ static void Handle_OP_NUMBER_WANTED(struct user *u)
     }
   }
 
-  if (verbose)
+  if (options.verbose)
   {
     if (nr_is_free)
       printf("RND_SERVER: client %d (%s) switches to # %d\n",
@@ -333,7 +333,7 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
     broadcast(u, 2, 0);
   }
 	      
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d calls itself \"%s\"\n", u->number, u->nick);
   buf[1] = OP_NICKNAME;
   broadcast(u, len, 0);
@@ -376,7 +376,7 @@ static void Handle_OP_START_PLAYING(struct user *u)
 {
   struct user *v, *w;
 
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d (%s) starts game [level %d from levedir %d (%s)]\n",
 	   u->number, u->nick,
 	   (buf[2] << 8) + buf[3],
@@ -429,7 +429,7 @@ static void Handle_OP_START_PLAYING(struct user *u)
 
 static void Handle_OP_PAUSE_PLAYING(struct user *u)
 {
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d (%s) pauses game\n", u->number, u->nick);
   broadcast(NULL, 2, 0);
   paused = 1;
@@ -437,7 +437,7 @@ static void Handle_OP_PAUSE_PLAYING(struct user *u)
 
 static void Handle_OP_CONTINUE_PLAYING(struct user *u)
 {
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d (%s) continues game\n", u->number, u->nick);
   broadcast(NULL, 2, 0);
   paused = 0;
@@ -445,7 +445,7 @@ static void Handle_OP_CONTINUE_PLAYING(struct user *u)
 
 static void Handle_OP_STOP_PLAYING(struct user *u)
 {
-  if (verbose)
+  if (options.verbose)
     printf("RND_SERVER: client %d (%s) stops game\n", u->number, u->nick);
   broadcast(NULL, 2, 0);
 }
@@ -557,7 +557,7 @@ void NetworkServer(int port, int serveronly)
   if (is_daemon)
   {
     /* become a daemon, breaking all ties with the controlling terminal */
-    verbose = 0;
+    options.verbose = 0;
     for (i=0; i<255; i++)
     {
       if (i != lfd)
@@ -577,7 +577,7 @@ void NetworkServer(int port, int serveronly)
     open("/dev/null", O_WRONLY);
   }
 
-  if (verbose)
+  if (options.verbose)
   {
     printf("rocksndiamonds network server: started up, listening on port %d\n",
 	   port);
@@ -594,7 +594,7 @@ void NetworkServer(int port, int serveronly)
     {
       buf[0] = 0;
       do_play();
-      if (verbose)
+      if (options.verbose)
 	printf("RND_SERVER: everyone lost... restarting game\n");
       timetoplay = 0;
     }
@@ -626,7 +626,7 @@ void NetworkServer(int port, int serveronly)
 
     if (clients > 0 && clients == bots)
     {
-      if (verbose)
+      if (options.verbose)
 	printf("RND_SERVER: only bots left... dropping all bots\n");
       while (user0)
 	dropuser(user0);
@@ -668,7 +668,7 @@ void NetworkServer(int port, int serveronly)
 	r = read(u->fd, u->readbuf + u->nread, MAX_BUFFER_SIZE - u->nread);
 	if (r <= 0)
 	{
-	  if (verbose)
+	  if (options.verbose)
 	    printf("RND_SERVER: EOF from client %d (%s)\n", u->number, u->nick);
 	  dropuser(u);
 	  interrupt = 1;
@@ -680,7 +680,7 @@ void NetworkServer(int port, int serveronly)
 	  len = u->readbuf[3];
 	  if (u->readbuf[0] || u->readbuf[1] || u->readbuf[2])
 	  {
-	    if (verbose)
+	    if (options.verbose)
 	      printf("RND_SERVER: crap from client %d (%s)\n", u->number, u->nick);
 	    write(u->fd, "\033]50;kanji24\007\033#8\033(0", 19);
 	    dropuser(u);
@@ -694,7 +694,7 @@ void NetworkServer(int port, int serveronly)
 	  buf[0] = u->number;
 	  if (!u->introduced && buf[1] != OP_NICKNAME)
 	  {
-	    if (verbose)
+	    if (options.verbose)
 	      printf("RND_SERVER: !(client %d)->introduced && buf[1]==%d (expected OP_NICKNAME)\n", buf[0], buf[1]);
 
 	    dropuser(u);
@@ -746,7 +746,7 @@ void NetworkServer(int port, int serveronly)
 	      {
 		if (v->isbot)
 		{
-		  if (verbose)
+		  if (options.verbose)
 		    printf("RND_SERVER: client %d (%s) kills bot %d (%s)\n", u->number, u->nick, v->number, v->nick);
 
 		  dropuser(v);
@@ -755,7 +755,7 @@ void NetworkServer(int port, int serveronly)
 		}
 		else
 		{
-		  if (verbose)
+		  if (options.verbose)
 		    printf("RND_SERVER: client %d (%s) attempting to kill non-bot %d (%s)\n", u->number, u->nick, v->number, v->nick);
 		}
 	      }
@@ -763,7 +763,7 @@ void NetworkServer(int port, int serveronly)
 
 	    case OP_MODE:
 	      mode = buf[2];
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) sets mode %d (%s)\n", u->number, u->nick, buf[2], buf[2] == 0 ? "normal" : (buf[2] == 1 ? "fun" : "unknown"));
 	      broadcast(NULL, 3, 0);
 	      break;
@@ -772,13 +772,13 @@ void NetworkServer(int port, int serveronly)
 	      if (!u->isbot)
 		bots++;
 	      u->isbot = 1;
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) declares itself to be a bot\n", u->number, u->nick);
 	      break;
 	    
 	    case OP_LEVEL:
 	      levelnr = buf[2];
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) sets level %d\n", u->number, u->nick, buf[2]);
 	      broadcast(NULL, 3, 0);
 	      break;
@@ -787,7 +787,7 @@ void NetworkServer(int port, int serveronly)
 	      {
 		struct user *won = NULL;
 
-		if (verbose)
+		if (options.verbose)
 		  printf("RND_SERVER: client %d (%s) has lost\n", u->number, u->nick);
 		u->playing = 0;
 		broadcast(u, 2, 1);
@@ -837,7 +837,7 @@ void NetworkServer(int port, int serveronly)
 	    
 	    case OP_ZERO:
 	      broadcast(NULL, 2, 0);
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) resets the game counters\n", u->number, u->nick);
 	      for (v=user0; v; v=v->next)
 		v->games = 0;
@@ -850,7 +850,7 @@ void NetworkServer(int port, int serveronly)
 
 	    case OP_MSG:
 	      buf[len] = '\0';
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: client %d (%s) sends message: %s\n", u->number, u->nick, &buf[2]);
 	      broadcast(u, len, 0);
 	      break;
@@ -858,7 +858,7 @@ void NetworkServer(int port, int serveronly)
 	    case OP_LINES:
 	      if (len != 3)
 	      {
-		if (verbose)
+		if (options.verbose)
 		  printf("RND_SERVER: client %d (%s) sends crap for an OP_LINES\n", u->number, u->nick);
 
 		dropuser(u);
@@ -867,7 +867,7 @@ void NetworkServer(int port, int serveronly)
 	      }
 	      if (u->nextvictim)
 	      {
-		if (verbose)
+		if (options.verbose)
 		  printf("RND_SERVER: client %d (%s) sends %d %s to client %d (%s)\n", u->number, u->nick, (int)buf[2], buf[2] == 1 ? "line" : "lines", u->nextvictim->number, u->nextvictim->nick);
 		sendtoone(u->nextvictim, 3);
 		buf[3] = u->nextvictim->number;
@@ -882,12 +882,12 @@ void NetworkServer(int port, int serveronly)
 		  }
 		}
 	      }
-	      else if (verbose)
+	      else if (options.verbose)
 		printf("RND_SERVER: client %d (%s) makes %d %s but has no victim\n", u->number, u->nick, (int)buf[2], buf[2] == 1 ? "line" : "lines");
 	      break;
 	    
 	    default:
-	      if (verbose)
+	      if (options.verbose)
 		printf("RND_SERVER: opcode %d from client %d (%s) not understood\n", buf[0], u->number, u->nick);
 	  }
 	}

@@ -215,10 +215,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==8)
       {
-	if (autorecord_on)
+	if (setup.autorecord_on)
 	  TapeStartRecording();
 
-	if (network)
+	if (options.network)
 	  SendToServer_StartPlaying();
 	else
 	{
@@ -1245,12 +1245,12 @@ void CalibrateJoystick()
   new_joystick_xmiddle = joy_ctrl.x;
   new_joystick_ymiddle = joy_ctrl.y;
 
-  joystick[joystick_nr].xleft = new_joystick_xleft;
-  joystick[joystick_nr].yupper = new_joystick_yupper;
-  joystick[joystick_nr].xright = new_joystick_xright;
-  joystick[joystick_nr].ylower = new_joystick_ylower;
-  joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
-  joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
+  joystick[setup.joystick_nr].xleft = new_joystick_xleft;
+  joystick[setup.joystick_nr].yupper = new_joystick_yupper;
+  joystick[setup.joystick_nr].xright = new_joystick_xright;
+  joystick[setup.joystick_nr].ylower = new_joystick_ylower;
+  joystick[setup.joystick_nr].xmiddle = new_joystick_xmiddle;
+  joystick[setup.joystick_nr].ymiddle = new_joystick_ymiddle;
 
   CheckJoystickData();
 
@@ -1359,7 +1359,7 @@ void HandleVideoButtons(int mx, int my, int button)
       {
 	TapeStartRecording();
 
-	if (network)
+	if (options.network)
 	  SendToServer_StartPlaying();
 	else
 	{
@@ -1432,16 +1432,16 @@ void HandleSoundButtons(int mx, int my, int button)
   switch(CheckSoundButtons(mx,my,button))
   {
     case BUTTON_SOUND_MUSIC:
-      if (sound_music_on)
+      if (setup.sound_music_on)
       { 
-	sound_music_on = FALSE;
+	setup.sound_music_on = FALSE;
 	local_player->setup &= ~SETUP_SOUND_MUSIC;
 	FadeSound(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_OFF);
       }
       else if (sound_loops_allowed)
       { 
-	sound_on = sound_music_on = TRUE;
+	setup.sound_on = setup.sound_music_on = TRUE;
 	local_player->setup |= (SETUP_SOUND | SETUP_SOUND_MUSIC);
 	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 	DrawSoundDisplay(BUTTON_SOUND_MUSIC_ON);
@@ -1451,15 +1451,15 @@ void HandleSoundButtons(int mx, int my, int button)
       break;
 
     case BUTTON_SOUND_LOOPS:
-      if (sound_loops_on)
+      if (setup.sound_loops_on)
       { 
-	sound_loops_on = FALSE;
+	setup.sound_loops_on = FALSE;
 	local_player->setup &= ~SETUP_SOUND_LOOPS;
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_OFF);
       }
       else if (sound_loops_allowed)
       { 
-	sound_on = sound_loops_on = TRUE;
+	setup.sound_on = setup.sound_loops_on = TRUE;
 	local_player->setup |= (SETUP_SOUND | SETUP_SOUND_LOOPS);
 	DrawSoundDisplay(BUTTON_SOUND_LOOPS_ON);
       }
@@ -1468,15 +1468,15 @@ void HandleSoundButtons(int mx, int my, int button)
       break;
 
     case BUTTON_SOUND_SIMPLE:
-      if (sound_simple_on)
+      if (setup.sound_simple_on)
       { 
-	sound_simple_on = FALSE;
+	setup.sound_simple_on = FALSE;
 	local_player->setup &= ~SETUP_SOUND;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_OFF);
       }
       else if (sound_status==SOUND_AVAILABLE)
       { 
-	sound_on = sound_simple_on = TRUE;
+	setup.sound_on = setup.sound_simple_on = TRUE;
 	local_player->setup |= SETUP_SOUND;
 	DrawSoundDisplay(BUTTON_SOUND_SIMPLE_ON);
       }
@@ -1510,7 +1510,7 @@ void HandleGameButtons(int mx, int my, int button)
       if (Request("Do you really want to quit the game ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       { 
-	if (network)
+	if (options.network)
 	  SendToServer_StopPlaying();
 	else
 	{
@@ -1523,7 +1523,7 @@ void HandleGameButtons(int mx, int my, int button)
       break;
 
     case BUTTON_GAME_PAUSE:
-      if (network)
+      if (options.network)
       {
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
@@ -1536,7 +1536,7 @@ void HandleGameButtons(int mx, int my, int button)
       /*
       if (tape.pausing)
       {
-	if (network)
+	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else
 	{
@@ -1546,7 +1546,7 @@ void HandleGameButtons(int mx, int my, int button)
       }
       else
       {
-	if (network)
+	if (options.network)
 	  SendToServer_PausePlaying();
 	else
 	{
@@ -1561,7 +1561,7 @@ void HandleGameButtons(int mx, int my, int button)
     case BUTTON_GAME_PLAY:
       if (tape.pausing)
       {
-	if (network)
+	if (options.network)
 	  SendToServer_ContinuePlaying();
 	else
 	{

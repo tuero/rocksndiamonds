@@ -21,8 +21,8 @@
 #define CHOICE_DELAY_VALUE	100
 
 static int level_xpos,level_ypos;
-static BOOL edit_mode;
-static BOOL name_typing;
+static boolean edit_mode;
+static boolean name_typing;
 static int new_element1 = EL_MAUERWERK;
 static int new_element2 = EL_LEERRAUM;
 static int new_element3 = EL_ERDREICH;
@@ -638,7 +638,7 @@ void LevelEd(int mx, int my, int button)
 {
   static int last_button = 0;
   static int in_field_pressed = FALSE;
-  static BOOL use_floodfill = FALSE;
+  static boolean use_floodfill = FALSE;
   int x = (mx-SX)/MINI_TILEX; 
   int y = (my-SY)/MINI_TILEY; 
 

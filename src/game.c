@@ -25,7 +25,7 @@
 
 void GetPlayerConfig()
 {
-  int old_joystick_nr = joystick_nr;
+  int old_joystick_nr = setup.joystick_nr;
 
   if (sound_status==SOUND_OFF)
     local_player->setup &= ~SETUP_SOUND;
@@ -35,20 +35,20 @@ void GetPlayerConfig()
     local_player->setup &= ~SETUP_SOUND_MUSIC;
   }
 
-  sound_on = sound_simple_on = SETUP_SOUND_ON(local_player->setup);
-  sound_loops_on = SETUP_SOUND_LOOPS_ON(local_player->setup);
-  sound_music_on = SETUP_SOUND_MUSIC_ON(local_player->setup);
-  toons_on = SETUP_TOONS_ON(local_player->setup);
-  direct_draw_on = SETUP_DIRECT_DRAW_ON(local_player->setup);
-  fading_on = SETUP_FADING_ON(local_player->setup);
-  autorecord_on = SETUP_AUTO_RECORD_ON(local_player->setup);
-  joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
-  quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
-  scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
-  soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
+  setup.sound_on = setup.sound_simple_on = SETUP_SOUND_ON(local_player->setup);
+  setup.sound_loops_on = SETUP_SOUND_LOOPS_ON(local_player->setup);
+  setup.sound_music_on = SETUP_SOUND_MUSIC_ON(local_player->setup);
+  setup.toons_on = SETUP_TOONS_ON(local_player->setup);
+  setup.direct_draw_on = SETUP_DIRECT_DRAW_ON(local_player->setup);
+  setup.fading_on = SETUP_FADING_ON(local_player->setup);
+  setup.autorecord_on = SETUP_AUTO_RECORD_ON(local_player->setup);
+  setup.joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
+  setup.quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
+  setup.scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
+  setup.soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
 
 #ifndef MSDOS
-  if (joystick_nr != old_joystick_nr)
+  if (setup.joystick_nr != old_joystick_nr)
   {
     if (joystick_device)
       close(joystick_device);
@@ -60,11 +60,11 @@ void GetPlayerConfig()
 void InitGame()
 {
   int i,j, x,y;
-  BOOL emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
-  BOOL emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
+  boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
+  boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
 
   /* don't play tapes over network */
-  network_playing = (network && !tape.playing);
+  network_playing = (options.network && !tape.playing);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
@@ -376,9 +376,9 @@ void InitGame()
   DrawGameButton(BUTTON_GAME_STOP);
   DrawGameButton(BUTTON_GAME_PAUSE);
   DrawGameButton(BUTTON_GAME_PLAY);
-  DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (BUTTON_ON * sound_music_on));
-  DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (BUTTON_ON * sound_loops_on));
-  DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (BUTTON_ON * sound_simple_on));
+  DrawSoundDisplay(BUTTON_SOUND_MUSIC  | (BUTTON_ON * setup.sound_music_on));
+  DrawSoundDisplay(BUTTON_SOUND_LOOPS  | (BUTTON_ON * setup.sound_loops_on));
+  DrawSoundDisplay(BUTTON_SOUND_SIMPLE | (BUTTON_ON * setup.sound_simple_on));
   XCopyArea(display,drawto,pix[PIX_DB_DOOR],gc,
 	    DX+GAME_CONTROL_XPOS,DY+GAME_CONTROL_YPOS,
 	    GAME_CONTROL_XSIZE,2*GAME_CONTROL_YSIZE,
@@ -387,7 +387,7 @@ void InitGame()
 
   OpenDoor(DOOR_OPEN_1);
 
-  if (sound_music_on)
+  if (setup.sound_music_on)
     PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 
   XAutoRepeatOff(display);
@@ -516,12 +516,12 @@ void GameWon()
 
   if (TimeLeft)
   {
-    if (sound_loops_on)
+    if (setup.sound_loops_on)
       PlaySoundExt(SND_SIRR, PSND_MAX_VOLUME, PSND_MAX_RIGHT, PSND_LOOP);
 
     while(TimeLeft > 0)
     {
-      if (!sound_loops_on)
+      if (!setup.sound_loops_on)
 	PlaySoundStereo(SND_SIRR, PSND_MAX_RIGHT);
       if (TimeLeft && !(TimeLeft % 10))
 	RaiseScore(level.score[SC_ZEITBONUS]);
@@ -534,7 +534,7 @@ void GameWon()
       Delay(10);
     }
 
-    if (sound_loops_on)
+    if (setup.sound_loops_on)
       StopSound(SND_SIRR);
   }
 
@@ -581,7 +581,7 @@ void GameWon()
   BackToFront();
 }
 
-BOOL NewHiScore()
+boolean NewHiScore()
 {
   int k,l;
   int position = -1;
@@ -1065,8 +1065,8 @@ void Blurb(int x, int y)
 
 void Impact(int x, int y)
 {
-  BOOL lastline = (y==lev_fieldy-1);
-  BOOL object_hit = FALSE;
+  boolean lastline = (y==lev_fieldy-1);
+  boolean object_hit = FALSE;
   int element = Feld[x][y];
   int smashed = 0;
 
@@ -1296,7 +1296,7 @@ void TurnRound(int x, int y)
   }
   else if (element==EL_MAMPFER)
   {
-    BOOL can_turn_left = FALSE, can_turn_right = FALSE;
+    boolean can_turn_left = FALSE, can_turn_right = FALSE;
 
     if (IN_LEV_FIELD(left_x,left_y) &&
 	(IS_FREE_OR_PLAYER(left_x,left_y) ||
@@ -1320,7 +1320,7 @@ void TurnRound(int x, int y)
   }
   else if (element==EL_MAMPFER2)
   {
-    BOOL can_turn_left = FALSE, can_turn_right = FALSE;
+    boolean can_turn_left = FALSE, can_turn_right = FALSE;
 
     if (IN_LEV_FIELD(left_x,left_y) &&
 	(IS_FREE_OR_PLAYER(left_x,left_y) ||
@@ -1344,7 +1344,7 @@ void TurnRound(int x, int y)
   }
   else if (element==EL_PACMAN)
   {
-    BOOL can_turn_left = FALSE, can_turn_right = FALSE;
+    boolean can_turn_left = FALSE, can_turn_right = FALSE;
 
     if (IN_LEV_FIELD(left_x,left_y) &&
 	(IS_FREE_OR_PLAYER(left_x,left_y) ||
@@ -1368,9 +1368,9 @@ void TurnRound(int x, int y)
   }
   else if (element==EL_SCHWEIN)
   {
-    BOOL can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
-    BOOL should_turn_left = FALSE, should_turn_right = FALSE;
-    BOOL should_move_on = FALSE;
+    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
+    boolean should_turn_left = FALSE, should_turn_right = FALSE;
+    boolean should_move_on = FALSE;
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
@@ -1440,7 +1440,7 @@ void TurnRound(int x, int y)
   }
   else if (element==EL_DRACHE)
   {
-    BOOL can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
+    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
     int rnd_value = 24;
     int rnd = RND(rnd_value);
 
@@ -1559,7 +1559,7 @@ void TurnRound(int x, int y)
 
       if ((MovDir[x][y]&(MV_LEFT|MV_RIGHT)) && (MovDir[x][y]&(MV_UP|MV_DOWN)))
       {
-	BOOL first_horiz = RND(2);
+	boolean first_horiz = RND(2);
 	int new_move_dir = MovDir[x][y];
 
 	MovDir[x][y] =
@@ -1593,7 +1593,7 @@ void TurnRound(int x, int y)
   }
 }
 
-static BOOL JustBeingPushed(int x, int y)
+static boolean JustBeingPushed(int x, int y)
 {
   int i;
 
@@ -1738,10 +1738,10 @@ void StartMoving(int x, int y)
     }
     else if (IS_SLIPPERY(Feld[x][y+1]) && !Store[x][y+1])
     {
-      BOOL left  = (x>0 && IS_FREE(x-1,y) &&
-		    (IS_FREE(x-1,y+1) || Feld[x-1][y+1]==EL_SALZSAEURE));
-      BOOL right = (x<lev_fieldx-1 && IS_FREE(x+1,y) &&
-		    (IS_FREE(x+1,y+1) || Feld[x+1][y+1]==EL_SALZSAEURE));
+      boolean left  = (x>0 && IS_FREE(x-1,y) &&
+		       (IS_FREE(x-1,y+1) || Feld[x-1][y+1]==EL_SALZSAEURE));
+      boolean right = (x<lev_fieldx-1 && IS_FREE(x+1,y) &&
+		       (IS_FREE(x+1,y+1) || Feld[x+1][y+1]==EL_SALZSAEURE));
 
       if (left || right)
       {
@@ -1934,7 +1934,7 @@ void StartMoving(int x, int y)
       }
       else
       {
-	BOOL wanna_flame = !RND(10);
+	boolean wanna_flame = !RND(10);
 	int dx = newx - x, dy = newy - y;
 	int newx1 = newx+1*dx, newy1 = newy+1*dy;
 	int newx2 = newx+2*dx, newy2 = newy+2*dy;
@@ -2238,7 +2238,7 @@ void AmoebeUmwandeln2(int ax, int ay, int new_element)
 {
   int x,y;
   int group_nr = AmoebaNr[ax][ay];
-  BOOL done = FALSE;
+  boolean done = FALSE;
 
   for(y=0;y<lev_fieldy;y++) for(x=0;x<lev_fieldx;x++)
   {
@@ -2341,7 +2341,7 @@ void AmoebeAbleger(int ax, int ay)
   else				/* normale oder "gefüllte" Amöbe */
   {
     int start = RND(4);
-    BOOL waiting_for_player = FALSE;
+    boolean waiting_for_player = FALSE;
 
     for(i=0;i<4;i++)
     {
@@ -2631,7 +2631,7 @@ void EdelsteinFunkeln(int x, int y)
     {
       MovDelay[x][y]--;
 
-      if (direct_draw_on && MovDelay[x][y])
+      if (setup.direct_draw_on && MovDelay[x][y])
 	SetDrawtoField(DRAW_BUFFERED);
 
       DrawGraphic(SCREENX(x),SCREENY(y), el2gfx(Feld[x][y]));
@@ -2645,7 +2645,7 @@ void EdelsteinFunkeln(int x, int y)
 
 	DrawGraphicThruMask(SCREENX(x),SCREENY(y), GFX_FUNKELN_WEISS + phase);
 
-	if (direct_draw_on)
+	if (setup.direct_draw_on)
 	{
 	  int dest_x,dest_y;
 
@@ -2715,10 +2715,10 @@ void MauerWaechst(int x, int y)
 void MauerAbleger(int ax, int ay)
 {
   int element = Feld[ax][ay];
-  BOOL oben_frei = FALSE, unten_frei = FALSE;
-  BOOL links_frei = FALSE, rechts_frei = FALSE;
-  BOOL oben_massiv = FALSE, unten_massiv = FALSE;
-  BOOL links_massiv = FALSE, rechts_massiv = FALSE;
+  boolean oben_frei = FALSE, unten_frei = FALSE;
+  boolean links_frei = FALSE, rechts_frei = FALSE;
+  boolean oben_massiv = FALSE, unten_massiv = FALSE;
+  boolean links_massiv = FALSE, rechts_massiv = FALSE;
 
   if (!MovDelay[ax][ay])	/* neue Mauer / noch nicht gewartet */
     MovDelay[ax][ay] = 6;
@@ -2802,7 +2802,7 @@ void MauerAbleger(int ax, int ay)
 void CheckForDragon(int x, int y)
 {
   int i,j;
-  BOOL dragon_found = FALSE;
+  boolean dragon_found = FALSE;
   static int xy[4][2] =
   {
     { 0,-1 },
@@ -2852,7 +2852,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   static byte stored_player_action[MAX_PLAYERS];
   static int num_stored_actions = 0;
-  BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
+  boolean moved = FALSE, snapped = FALSE, bombed = FALSE;
   int jx = player->jx, jy = player->jy;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
@@ -2999,7 +2999,7 @@ void GameActions(byte player_action)
   {
     /*
     int actual_player_action =
-      (network ? network_player_action[i] : player_action);
+      (options.network ? network_player_action[i] : player_action);
       */
 
     int actual_player_action =
@@ -3020,7 +3020,7 @@ void GameActions(byte player_action)
       actual_player_action = 0;
     */
 
-    if (!network && i != TestPlayer)
+    if (!options.network && i != TestPlayer)
       actual_player_action = 0;
 
     /* TEST TEST TEST */
@@ -3129,7 +3129,7 @@ void GameActions(byte player_action)
 
     if (SiebAktiv)
     {
-      BOOL sieb = FALSE;
+      boolean sieb = FALSE;
       int jx = local_player->jx, jy = local_player->jy;
 
       if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL ||
@@ -3199,7 +3199,7 @@ void GameActions(byte player_action)
   DrawAllPlayers();
 }
 
-static BOOL AllPlayersInSight(struct PlayerInfo *player, int x, int y)
+static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
 {
   int min_x = x, min_y = y, max_x = x, max_y = y;
   int i;
@@ -3221,7 +3221,7 @@ static BOOL AllPlayersInSight(struct PlayerInfo *player, int x, int y)
   return(max_x - min_x < SCR_FIELDX && max_y - min_y < SCR_FIELDY);
 }
 
-static BOOL AllPlayersInVisibleScreen()
+static boolean AllPlayersInVisibleScreen()
 {
   int i;
 
@@ -3241,7 +3241,7 @@ static BOOL AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
-  int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
+  int softscroll_offset = (setup.soft_scrolling_on ? TILEX : 0);
   int x,y;
 
   /*
@@ -3272,8 +3272,8 @@ void ScrollLevel(int dx, int dy)
   redraw_mask |= REDRAW_FIELD;
 }
 
-BOOL MoveFigureOneStep(struct PlayerInfo *player,
-		       int dx, int dy, int real_dx, int real_dy)
+boolean MoveFigureOneStep(struct PlayerInfo *player,
+			  int dx, int dy, int real_dx, int real_dy)
 {
   int jx = player->jx, jy = player->jy;
   int new_jx = jx+dx, new_jy = jy+dy;
@@ -3291,7 +3291,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   if (!IN_LEV_FIELD(new_jx,new_jy))
     return(MF_NO_ACTION);
 
-  if (!network && !AllPlayersInSight(player, new_jx,new_jy))
+  if (!options.network && !AllPlayersInSight(player, new_jx,new_jy))
     return(MF_NO_ACTION);
 
   element = MovingOrBlocked2Element(new_jx,new_jy);
@@ -3331,7 +3331,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   return(MF_MOVING);
 }
 
-BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
+boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int old_jx = jx, old_jy = jy;
@@ -3364,10 +3364,10 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
   */
 
   if (moved & MF_MOVING && !ScreenMovPos &&
-      (player == local_player || !network))
+      (player == local_player || !options.network))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
-    int offset = (scroll_delay_on ? 3 : 0);
+    int offset = (setup.scroll_delay_on ? 3 : 0);
 
     /*
     if (player == local_player)
@@ -3434,7 +3434,7 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
-      if (!network && !AllPlayersInVisibleScreen())
+      if (!options.network && !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;
@@ -4045,7 +4045,7 @@ int DigField(struct PlayerInfo *player,
   return(MF_MOVING);
 }
 
-BOOL SnapField(struct PlayerInfo *player, int dx, int dy)
+boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
@@ -4080,7 +4080,7 @@ BOOL SnapField(struct PlayerInfo *player, int dx, int dy)
   return(TRUE);
 }
 
-BOOL PlaceBomb(struct PlayerInfo *player)
+boolean PlaceBomb(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
   int element;
@@ -4126,8 +4126,8 @@ void PlaySoundLevel(int x, int y, int sound_nr)
   int volume, stereo;
   int silence_distance = 8;
 
-  if ((!sound_simple_on && !IS_LOOP_SOUND(sound_nr)) ||
-      (!sound_loops_on && IS_LOOP_SOUND(sound_nr)))
+  if ((!setup.sound_simple_on && !IS_LOOP_SOUND(sound_nr)) ||
+      (!setup.sound_loops_on && IS_LOOP_SOUND(sound_nr)))
     return;
 
   if (!IN_LEV_FIELD(x,y) ||

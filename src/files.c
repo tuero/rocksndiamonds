@@ -17,7 +17,7 @@
 #include "tape.h"
 #include "joystick.h"
 
-BOOL CreateNewScoreFile()
+boolean CreateNewScoreFile()
 {
   int i,j,k;
   char filename[MAX_FILENAME_LEN];
@@ -51,7 +51,7 @@ BOOL CreateNewScoreFile()
   return(TRUE);
 }
 
-BOOL CreateNewNamesFile(int mode)
+boolean CreateNewNamesFile(int mode)
 {
   char filename[MAX_FILENAME_LEN];
   FILE *file;
@@ -72,7 +72,7 @@ BOOL CreateNewNamesFile(int mode)
   return(TRUE);
 }
 
-BOOL LoadLevelInfo()
+boolean LoadLevelInfo()
 {
   int i;
   char filename[MAX_FILENAME_LEN];
@@ -214,7 +214,7 @@ void LoadLevelTape(int level_nr)
   char filename[MAX_FILENAME_LEN];
   char cookie[MAX_FILENAME_LEN];
   FILE *file;
-  BOOL levelrec_10 = FALSE;
+  boolean levelrec_10 = FALSE;
 
 #ifndef MSDOS
   sprintf(filename,"%s/%s/%d.tape",
@@ -519,7 +519,7 @@ void SaveLevelTape(int level_nr)
   int i;
   char filename[MAX_FILENAME_LEN];
   FILE *file;
-  BOOL new_tape = TRUE;
+  boolean new_tape = TRUE;
 
 #ifndef MSDOS
   sprintf(filename,"%s/%s/%d.tape",

@@ -176,7 +176,7 @@ int *TapePlayAction()
   return(NULL);
 }
 
-BOOL TapePlayDelay()
+boolean TapePlayDelay()
 {
   if (!tape.playing || tape.pausing)
     return(FALSE);

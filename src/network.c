@@ -62,7 +62,7 @@ int nread = 0, nwrite = 0;
 
 static void sysmsg(char *s)
 {
-  if (verbose)
+  if (options.verbose)
   {
     printf("** %s\n", s);
     fflush(stdout);
@@ -88,7 +88,7 @@ static void flushbuf()
 
 static void sendbuf(int len)
 {
-  if (network)
+  if (options.network)
   {
     realbuf[0] = realbuf[1] = realbuf[2] = 0;
     realbuf[3] = (unsigned char)len;
@@ -139,7 +139,7 @@ static void StartNetworkServer(int port)
   switch (fork())
   {
     case 0:
-      NetworkServer(port, serveronly);
+      NetworkServer(port, options.serveronly);
 
       /* never reached */
       exit(0);
@@ -147,7 +147,7 @@ static void StartNetworkServer(int port)
     case -1:
       Error(ERR_RETURN,
 	    "cannot create network server process - no network games");
-      network = FALSE;
+      options.network = FALSE;
       return;
 
     default:
@@ -156,7 +156,7 @@ static void StartNetworkServer(int port)
   }
 }
 
-BOOL ConnectToServer(char *host, int port)
+boolean ConnectToServer(char *host, int port)
 {
   struct hostent *hp;
   struct sockaddr_in s;
@@ -498,7 +498,7 @@ static void Handle_OP_START_PLAYING()
 
 
 
-  if (autorecord_on)
+  if (setup.autorecord_on)
     TapeStartRecording();
 
 

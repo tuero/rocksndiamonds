@@ -96,7 +96,7 @@ void DrawMicroElement(int, int, int);
 void DrawLevel(void);
 void DrawMiniLevel(int, int);
 void DrawMicroLevel(int, int);
-BOOL Request(char *, unsigned int);
+boolean Request(char *, unsigned int);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);

@@ -84,7 +84,8 @@ void Delay(unsigned long delay)	/* Sleep specified number of milliseconds */
   sleep_milliseconds(delay);
 }
 
-BOOL FrameReached(unsigned long *frame_counter_var, unsigned long frame_delay)
+boolean FrameReached(unsigned long *frame_counter_var,
+		     unsigned long frame_delay)
 {
   unsigned long actual_frame_counter = FrameCounter;
 
@@ -96,7 +97,8 @@ BOOL FrameReached(unsigned long *frame_counter_var, unsigned long frame_delay)
   return(TRUE);
 }
 
-BOOL DelayReached(unsigned long *counter_var, unsigned long delay)
+boolean DelayReached(unsigned long *counter_var,
+		     unsigned long delay)
 {
   unsigned long actual_counter = Counter();
 
@@ -193,6 +195,14 @@ void GetOptions(char *argv[])
 {
   char **options_left = &argv[1];
 
+  /* initialize global program options */
+  options.display_name = NULL;
+  options.server_host = NULL;
+  options.server_port = 0;
+  options.serveronly = FALSE;
+  options.network = FALSE;
+  options.verbose = FALSE;
+
   while (*options_left)
   {
     char option_str[MAX_OPTION_LEN];
@@ -244,11 +254,11 @@ void GetOptions(char *argv[])
       if (option_arg == NULL)
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
-      display_name = option_arg;
+      options.display_name = option_arg;
       if (option_arg == next_option)
 	options_left++;
 
-      printf("--display == '%s'\n", display_name);
+      printf("--display == '%s'\n", options.display_name);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
@@ -265,35 +275,35 @@ void GetOptions(char *argv[])
     {
       printf("--network\n");
 
-      network = TRUE;
+      options.network = TRUE;
     }
     else if (strncmp(option, "-serveronly", option_len) == 0)
     {
       printf("--serveronly\n");
 
-      serveronly = TRUE;
+      options.serveronly = TRUE;
     }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {
       printf("--verbose\n");
 
-      verbose = TRUE;
+      options.verbose = TRUE;
     }
     else if (*option == '-')
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option_str);
-    else if (server_host == NULL)
+    else if (options.server_host == NULL)
     {
-      server_host = *options_left;
+      options.server_host = *options_left;
 
-      printf("server.name == '%s'\n", server_host);
+      printf("server.name == '%s'\n", options.server_host);
     }
-    else if (server_port == 0)
+    else if (options.server_port == 0)
     {
-      server_port = atoi(*options_left);
-      if (server_port < 1024)
-	Error(ERR_EXIT_HELP, "bad port number '%d'", server_port);
+      options.server_port = atoi(*options_left);
+      if (options.server_port < 1024)
+	Error(ERR_EXIT_HELP, "bad port number '%d'", options.server_port);
 
-      printf("port == %d\n", server_port);
+      printf("port == %d\n", options.server_port);
     }
     else
       Error(ERR_EXIT_HELP, "too many arguments");

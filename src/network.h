@@ -16,7 +16,7 @@
 
 #include "main.h"
 
-BOOL ConnectToServer(char *, int);
+boolean ConnectToServer(char *, int);
 void SendToServer_Nickname(char *);
 void SendToServer_ProtocolVersion(void);
 void SendToServer_NrWanted(int);

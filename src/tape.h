@@ -26,7 +26,7 @@ void TapeTogglePause(void);
 void TapeStartPlaying(void);
 void TapeStopPlaying(void);
 int *TapePlayAction(void);
-BOOL TapePlayDelay(void);
+boolean TapePlayDelay(void);
 void TapeStop(void);
 void TapeErase(void);
 unsigned int GetTapeLength(void);

@@ -138,11 +138,11 @@ struct SoundControl
   int nr;
   int volume;
   int stereo;
-  BOOL active;
-  BOOL loop;
-  BOOL fade_sound;
-  BOOL stop_sound;
-  BOOL stop_all_sounds;
+  boolean active;
+  boolean loop;
+  boolean fade_sound;
+  boolean stop_sound;
+  boolean stop_all_sounds;
   int playingtime;
   long playingpos;
   long data_len;
@@ -162,11 +162,11 @@ unsigned char linear_to_ulaw(int);
 int ulaw_to_linear(unsigned char);
 
 /* application functions */
-BOOL LoadSound(struct SoundInfo *);
+boolean LoadSound(struct SoundInfo *);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);
-void PlaySoundExt(int, int, int, BOOL);
+void PlaySoundExt(int, int, int, boolean);
 void FadeSound(int);
 void FadeSounds(void);
 void StopSound(int);

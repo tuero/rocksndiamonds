@@ -34,7 +34,7 @@
 struct PictureFileInfo
 {
   char *picture_filename;
-  BOOL picture_with_mask;
+  boolean picture_with_mask;
 };
 
 struct IconFileInfo
@@ -57,9 +57,9 @@ static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
-  if (serveronly)
+  if (options.serveronly)
   {
-    NetworkServer(server_port, serveronly);
+    NetworkServer(options.server_port, options.serveronly);
 
     /* never reached */
     exit(0);
@@ -94,6 +94,21 @@ void InitLevelAndPlayerInfo()
 {
   int i;
 
+  /* initialize local player's setup */
+  setup.sound_on = TRUE;
+  setup.sound_loops_on = FALSE;
+  setup.sound_music_on = FALSE;
+  setup.sound_simple_on = FALSE;
+  setup.toons_on = TRUE;
+  setup.direct_draw_on = FALSE;
+  setup.scroll_delay_on = FALSE;
+  setup.soft_scrolling_on = TRUE;
+  setup.fading_on = FALSE;
+  setup.autorecord_on = FALSE;
+  setup.quick_doors = FALSE;
+  setup.joystick_nr = 0;
+
+  /* choose default local player */
   local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
@@ -102,6 +117,7 @@ void InitLevelAndPlayerInfo()
   LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
 
+  /* after LoadPlayerInfo(), because it overwrites 'local_player' */
   for (i=0; i<MAX_PLAYERS; i++)
   {
     stored_player[i].connected = FALSE;
@@ -115,12 +131,12 @@ void InitNetworkServer()
 {
   int nr_wanted;
 
-  if (!network)
+  if (!options.network)
     return;
 
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
-  if (!ConnectToServer(server_host, server_port))
+  if (!ConnectToServer(options.server_host, options.server_port))
     Error(ERR_EXIT, "cannot connect to multiplayer server");
 
   SendToServer_Nickname(local_player->alias_name);
@@ -157,11 +173,11 @@ void InitSound()
 
 #ifdef VOXWARE
   sound_loops_allowed = TRUE;
-  sound_loops_on = TRUE;
+  setup.sound_loops_on = TRUE;
 #endif
 #else
   sound_loops_allowed = TRUE;
-  sound_loops_on = TRUE;
+  setup.sound_loops_on = TRUE;
 #endif
 
   for(i=0; i<NUM_SOUNDS; i++)
@@ -218,18 +234,19 @@ void InitJoystick()
     return;
 
 #ifndef MSDOS
-  if (access(joystick_device_name[joystick_nr],R_OK)<0)
+  if (access(joystick_device_name[setup.joystick_nr], R_OK) < 0)
   {
     Error(ERR_RETURN, "cannot access joystick device '%s'",
-	  joystick_device_name[joystick_nr]);
+	  joystick_device_name[setup.joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
 
-  if ((joystick_device = open(joystick_device_name[joystick_nr],O_RDONLY))<0)
+  if ((joystick_device =
+       open(joystick_device_name[setup.joystick_nr], O_RDONLY)) < 0)
   {
     Error(ERR_RETURN, "cannot open joystick device '%s'",
-	  joystick_device_name[joystick_nr]);
+	  joystick_device_name[setup.joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
@@ -248,8 +265,9 @@ void InitDisplay()
   unsigned int depth;
 
   /* connect to X server */
-  if (!(display = XOpenDisplay(display_name)))
-    Error(ERR_EXIT,"cannot connect to X server %s",XDisplayName(display_name));
+  if (!(display = XOpenDisplay(options.display_name)))
+    Error(ERR_EXIT, "cannot connect to X server %s",
+	  XDisplayName(options.display_name));
 
   screen = DefaultScreen(display);
   visual = DefaultVisual(display, screen);
