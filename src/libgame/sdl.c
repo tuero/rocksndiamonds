@@ -172,6 +172,34 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   return success;
 }
 
+inline void SDLCreateBitmapContent(Bitmap *new_bitmap,
+				   int width, int height, int depth)
+{
+  SDL_Surface *surface_tmp, *surface_native;
+
+  if ((surface_tmp = SDL_CreateRGBSurface(SURFACE_FLAGS, width, height, depth,
+					  0, 0, 0, 0))
+      == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+  if ((surface_native = SDL_DisplayFormat(surface_tmp)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  SDL_FreeSurface(surface_tmp);
+
+  new_bitmap->surface = surface_native;
+}
+
+inline void SDLFreeBitmapPointers(Bitmap *bitmap)
+{
+  if (bitmap->surface)
+    SDL_FreeSurface(bitmap->surface);
+  if (bitmap->surface_masked)
+    SDL_FreeSurface(bitmap->surface_masked);
+  bitmap->surface = NULL;
+  bitmap->surface_masked = NULL;
+}
+
 inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			int src_x, int src_y,
 			int width, int height,

@@ -327,6 +327,45 @@ Bitmap *X11LoadImage(char *filename)
   return new_bitmap;
 }
 
+inline void X11CreateBitmapContent(Bitmap *new_bitmap,
+				   int width, int height, int depth)
+{
+  Pixmap pixmap;
+
+  if ((pixmap = XCreatePixmap(display, window->drawable, width, height, depth))
+      == None)
+    Error(ERR_EXIT, "cannot create pixmap");
+
+  new_bitmap->drawable = pixmap;
+
+  if (window == NULL)
+    Error(ERR_EXIT, "Window GC needed for Bitmap -- create Window first");
+
+  new_bitmap->gc = window->gc;
+
+  new_bitmap->line_gc[0] = window->line_gc[0];
+  new_bitmap->line_gc[1] = window->line_gc[1];
+}
+
+inline void X11FreeBitmapPointers(Bitmap *bitmap)
+{
+  /* The X11 version seems to have a memory leak here -- although
+     "XFreePixmap()" is called, the corresponding memory seems not
+     to be freed (according to "ps"). The SDL version apparently
+     does not have this problem. */
+
+  if (bitmap->drawable)
+    XFreePixmap(display, bitmap->drawable);
+  if (bitmap->clip_mask)
+    XFreePixmap(display, bitmap->clip_mask);
+  if (bitmap->stored_clip_gc)
+    XFreeGC(display, bitmap->stored_clip_gc);
+  /* the other GCs are only pointers to GCs used elsewhere */
+  bitmap->drawable = None;
+  bitmap->clip_mask = None;
+  bitmap->stored_clip_gc = None;
+}
+
 inline void X11CopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			int src_x, int src_y, int width, int height,
 			int dst_x, int dst_y, int mask_mode)

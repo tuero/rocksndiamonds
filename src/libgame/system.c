@@ -311,7 +311,6 @@ inline void CloseVideoDisplay(void)
 #if defined(TARGET_SDL)
   SDL_QuitSubSystem(SDL_INIT_VIDEO);
 #else
-
   if (display)
     XCloseDisplay(display);
 #endif
@@ -349,36 +348,9 @@ inline Bitmap *CreateBitmap(int width, int height, int depth)
   int real_depth = GetRealDepth(depth);
 
 #ifdef TARGET_SDL
-  SDL_Surface *surface_tmp, *surface_native;
-
-  if ((surface_tmp = SDL_CreateRGBSurface(SURFACE_FLAGS, width, height,
-					  real_depth, 0, 0, 0, 0))
-      == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-  if ((surface_native = SDL_DisplayFormat(surface_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(surface_tmp);
-
-  new_bitmap->surface = surface_native;
+  SDLCreateBitmapContent(new_bitmap, width, height, real_depth);
 #else
-  Pixmap pixmap;
-
-  if ((pixmap = XCreatePixmap(display, window->drawable,
-			      width, height, real_depth))
-      == None)
-    Error(ERR_EXIT, "cannot create pixmap");
-
-  new_bitmap->drawable = pixmap;
-
-  if (window == NULL)
-    Error(ERR_EXIT, "Window GC needed for Bitmap -- create Window first");
-
-  new_bitmap->gc = window->gc;
-
-  new_bitmap->line_gc[0] = window->line_gc[0];
-  new_bitmap->line_gc[1] = window->line_gc[1];
+  X11CreateBitmapContent(new_bitmap, width, height, real_depth);
 #endif
 
   new_bitmap->width = width;
@@ -393,28 +365,9 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
     return;
 
 #ifdef TARGET_SDL
-  if (bitmap->surface)
-    SDL_FreeSurface(bitmap->surface);
-  if (bitmap->surface_masked)
-    SDL_FreeSurface(bitmap->surface_masked);
-  bitmap->surface = NULL;
-  bitmap->surface_masked = NULL;
+  SDLFreeBitmapPointers(bitmap);
 #else
-  /* The X11 version seems to have a memory leak here -- although
-     "XFreePixmap()" is called, the corresponding memory seems not
-     to be freed (according to "ps"). The SDL version apparently
-     does not have this problem. */
-
-  if (bitmap->drawable)
-    XFreePixmap(display, bitmap->drawable);
-  if (bitmap->clip_mask)
-    XFreePixmap(display, bitmap->clip_mask);
-  if (bitmap->stored_clip_gc)
-    XFreeGC(display, bitmap->stored_clip_gc);
-  /* the other GCs are only pointers to GCs used elsewhere */
-  bitmap->drawable = None;
-  bitmap->clip_mask = None;
-  bitmap->stored_clip_gc = None;
+  X11FreeBitmapPointers(bitmap);
 #endif
 
   if (bitmap->source_filename)

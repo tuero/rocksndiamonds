@@ -324,6 +324,8 @@ struct XY
 inline void SDLInitVideoDisplay(void);
 inline void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
 inline boolean SDLSetVideoMode(DrawBuffer **, boolean);
+inline void SDLCreateBitmapContent(Bitmap *, int, int, int);
+inline void SDLFreeBitmapPointers(Bitmap *);
 inline void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
 inline void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
 inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
