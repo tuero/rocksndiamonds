@@ -380,15 +380,15 @@ static struct
   { 'E', "exit level editor" }
 };
 
-/* pointers to counter values */
-static int *gadget_elem_score_value = NULL;
-static int *gadget_elem_content_value = NULL;
-static int *gadget_level_xsize_value = NULL;
-static int *gadget_level_ysize_value = NULL;
-static int *gadget_level_random_value = NULL;
-static int *gadget_level_collect_value = NULL;
-static int *gadget_level_timelimit_value = NULL;
-static int *gadget_level_timescore_value = NULL;
+/* values for random placement */
+#define RANDOM_USE_PERCENTAGE		0
+#define RANDOM_USE_QUANTITY		1
+
+static int random_placement_value = 10;
+static int random_placement_method = RANDOM_USE_QUANTITY;
+static int random_placement_background_element = EL_ERDREICH;
+static boolean random_placement_background_restricted = FALSE;
+static boolean stick_element_properties_window = FALSE;
 
 static struct
 {
@@ -396,7 +396,7 @@ static struct
   int min_value, max_value;
   int gadget_id_down, gadget_id_up;
   int gadget_id_text;
-  int **counter_value;
+  int *value;
   char *infotext_above, *infotext_right;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
@@ -405,7 +405,7 @@ static struct
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEM_SCORE_DOWN,		GADGET_ID_ELEM_SCORE_UP,
     GADGET_ID_ELEM_SCORE_TEXT,
-    &gadget_elem_score_value,
+    NULL,				/* will be set when used */
     "element score",			NULL
   },
   {
@@ -413,7 +413,7 @@ static struct
     MIN_ELEM_CONTENT,			MAX_ELEM_CONTENT,
     GADGET_ID_ELEM_CONTENT_DOWN,	GADGET_ID_ELEM_CONTENT_UP,
     GADGET_ID_ELEM_CONTENT_TEXT,
-    &gadget_elem_content_value,
+    &MampferMax,
     "element content",			NULL
   },
   {
@@ -421,7 +421,7 @@ static struct
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
     GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
     GADGET_ID_LEVEL_XSIZE_TEXT,
-    &gadget_level_xsize_value,
+    &level.fieldx,
     "playfield size",			"width",
   },
   {
@@ -429,7 +429,7 @@ static struct
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
     GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
     GADGET_ID_LEVEL_YSIZE_TEXT,
-    &gadget_level_ysize_value,
+    &level.fieldy,
     NULL,				"height",
   },
   {
@@ -437,7 +437,7 @@ static struct
     0,					999,
     GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
     GADGET_ID_LEVEL_COLLECT_TEXT,
-    &gadget_level_collect_value,
+    &level.edelsteine,
     "number of emeralds to collect",	NULL
   },
   {
@@ -445,7 +445,7 @@ static struct
     0,					999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,
-    &gadget_level_timelimit_value,
+    &level.time,
     "time available to solve level",	"(0 => no time limit)"
   },
   {
@@ -453,7 +453,7 @@ static struct
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
-    &gadget_level_timescore_value,
+    &level.score[SC_ZEITBONUS],
     "score for each 10 seconds left",	NULL
   },
   {
@@ -461,7 +461,7 @@ static struct
     1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
-    &gadget_level_random_value,
+    &random_placement_value,
     "random element placement",		"in"
   }
 };
@@ -565,16 +565,6 @@ static struct
   }
 };
 
-/* values for random placement */
-#define RANDOM_USE_PERCENTAGE		0
-#define RANDOM_USE_QUANTITY		1
-
-static int random_placement_value = 10;
-static int random_placement_method = RANDOM_USE_QUANTITY;
-static int random_placement_background_element = EL_ERDREICH;
-static boolean random_placement_background_restricted = FALSE;
-static boolean stick_element_properties_window = FALSE;
-
 static struct
 {
   int x, y;
@@ -655,17 +645,20 @@ static int new_element3 = EL_ERDREICH;
 #define BUTTON_ELEMENT(button) (button == 1 ? new_element1 : \
 				button == 2 ? new_element2 : \
 				button == 3 ? new_element3 : EL_LEERRAUM)
+#define BUTTON_STEPSIZE(button) (button == 1 ? 1 : button == 2 ? 5 : 10)
 
 /* forward declaration for internal use */
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
 static void CopyLevelToUndoBuffer(int);
-static void HandleControlButtons(struct GadgetInfo *);
-static void HandleCounterButtons(struct GadgetInfo *);
 static void HandleDrawingAreas(struct GadgetInfo *);
-static void HandleDrawingAreaInfo(struct GadgetInfo *);
+static void HandleCounterButtons(struct GadgetInfo *);
 static void HandleTextInputGadgets(struct GadgetInfo *);
+static void HandleRadiobuttons(struct GadgetInfo *);
+static void HandleCheckbuttons(struct GadgetInfo *);
+static void HandleControlButtons(struct GadgetInfo *);
+static void HandleDrawingAreaInfo(struct GadgetInfo *);
 
 static struct GadgetInfo *level_editor_gadget[NUM_EDITOR_GADGETS];
 
@@ -1178,6 +1171,7 @@ static void CreateControlButtons()
     gd_y2  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, control_info[i].text,
 		      GDI_X, EX + gd_xoffset,
 		      GDI_Y, EY + gd_yoffset,
@@ -1235,9 +1229,10 @@ static void CreateControlButtons()
       gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[i].ypos;
       gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
       gd_y2 = gd_y1;
-   }
+    }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, scrollbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -1283,6 +1278,7 @@ static void CreateControlButtons()
     deco_ypos = (ED_ELEMENTLIST_YSIZE - MINI_TILEY) / 2;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, element_info[editor_element[i]],
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
@@ -1340,6 +1336,7 @@ static void CreateCounterButtons()
 	      (j == 0 ? "decrease" : "increase"));
 
       gi = CreateGadget(GDI_CUSTOM_ID, id,
+			GDI_CUSTOM_TYPE_ID, i,
 			GDI_INFO_TEXT, infotext,
 			GDI_X, xpos,
 			GDI_Y, ypos,
@@ -1368,6 +1365,7 @@ static void CreateCounterButtons()
 	gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
 
 	gi = CreateGadget(GDI_CUSTOM_ID, id,
+			  GDI_CUSTOM_TYPE_ID, i,
 			  GDI_INFO_TEXT, "enter counter value",
 			  GDI_X, xpos,
 			  GDI_Y, ypos,
@@ -1430,6 +1428,7 @@ static void CreateDrawingAreas()
 
     id = GADGET_ID_ELEM_CONTENT_0 + i;
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_X, gx,
 		      GDI_Y, gy,
 		      GDI_WIDTH, 3 * MINI_TILEX,
@@ -1509,6 +1508,7 @@ static void CreateTextInputGadgets()
     infotext[MAX_INFOTEXT_LEN] = '\0';
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, infotext,
 		      GDI_X, SX + textinput_info[i].x,
 		      GDI_Y, SY + textinput_info[i].y,
@@ -1563,6 +1563,7 @@ static void CreateScrollbarGadgets()
     gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].ypos;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
 		      GDI_X, SX + scrollbar_info[i].x,
 		      GDI_Y, SY + scrollbar_info[i].y,
@@ -1612,6 +1613,7 @@ static void CreateCheckbuttonGadgets()
       (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, radiobutton_info[i].infotext,
 		      GDI_X, SX + radiobutton_info[i].x,
 		      GDI_Y, SY + radiobutton_info[i].y,
@@ -1625,7 +1627,7 @@ static void CreateCheckbuttonGadgets()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y,
 		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK_ACTION, HandleControlButtons,
+		      GDI_CALLBACK_ACTION, HandleRadiobuttons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -1644,6 +1646,7 @@ static void CreateCheckbuttonGadgets()
       gd_y  = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_YPOS;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
 		      GDI_X, SX + checkbutton_info[i].x,
 		      GDI_Y, SY + checkbutton_info[i].y,
@@ -1656,7 +1659,7 @@ static void CreateCheckbuttonGadgets()
 		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x3, gd_y,
 		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x4, gd_y,
 		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK_ACTION, HandleControlButtons,
+		      GDI_CALLBACK_ACTION, HandleCheckbuttons,
 		      GDI_END);
 
     if (gi == NULL)
@@ -1976,7 +1979,7 @@ static void ModifyEditorTextInput(int textinput_id, char *new_text)
 
 static void ModifyEditorCounter(int counter_id, int new_value)
 {
-  int *counter_value = *counterbutton_info[counter_id].counter_value;
+  int *counter_value = counterbutton_info[counter_id].value;
   int gadget_id = counterbutton_info[counter_id].gadget_id_text;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
@@ -2080,12 +2083,16 @@ static void DrawLevelInfoWindow()
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
 	   "Editor Settings", FS_BIG, FC_YELLOW);
 
+
+  /*
   gadget_level_xsize_value = &lev_fieldx;
   gadget_level_ysize_value = &lev_fieldy;
   gadget_level_random_value = &random_placement_value;
   gadget_level_collect_value = &level.edelsteine;
   gadget_level_timelimit_value = &level.time;
-  gadget_level_timescore_value = &level.score[10];
+  gadget_level_timescore_value = &level.score[SC_ZEITBONUS];
+  */
+
 
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
@@ -2110,7 +2117,13 @@ static void DrawLevelInfoWindow()
       DrawTextF(x, y, font_color, infotext);
     }
 
+
+    /*
     ModifyEditorCounter(i, **counterbutton_info[i].counter_value);
+    */
+
+    ModifyEditorCounter(i, *counterbutton_info[i].value);
+
     MapCounterButtons(i);
   }
 
@@ -2213,12 +2226,24 @@ static void DrawElementContentAreas()
     UnmapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 
   /* display counter to choose number of element content areas */
+
+  /*
   gadget_elem_content_value = num_areas;
+  */
+
 
   x = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].x + xoffset_right;
   y = counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].y + yoffset_right;
   DrawTextF(x, y, font_color, "number of content areas");
+
+  /*
   ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT, *gadget_elem_content_value);
+  */
+
+
+  ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT,
+		      *counterbutton_info[ED_COUNTER_ID_ELEM_CONTENT].value);
+
   MapCounterButtons(ED_COUNTER_ID_ELEM_CONTENT);
 
   /* delete content areas in case of reducing number of them */
@@ -2289,55 +2314,55 @@ static void DrawPropertiesWindow()
   static struct
   {
     int element;
-    int *counter_value;
+    int *value;
     char *text;
   } elements_with_counter[] =
   {
-    { EL_EDELSTEIN,	&level.score[0],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_BD,	&level.score[0],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_GELB,&level.score[0],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_ROT,	&level.score[0],	TEXT_COLLECTING },
-    { EL_EDELSTEIN_LILA,&level.score[0],	TEXT_COLLECTING },
-    { EL_DIAMANT,	&level.score[1],	TEXT_COLLECTING },
-    { EL_KAEFER_R,	&level.score[2],	TEXT_SMASHING },
-    { EL_KAEFER_O,	&level.score[2],	TEXT_SMASHING },
-    { EL_KAEFER_L,	&level.score[2],	TEXT_SMASHING },
-    { EL_KAEFER_U,	&level.score[2],	TEXT_SMASHING },
-    { EL_BUTTERFLY_R,	&level.score[2],	TEXT_SMASHING },
-    { EL_BUTTERFLY_O,	&level.score[2],	TEXT_SMASHING },
-    { EL_BUTTERFLY_L,	&level.score[2],	TEXT_SMASHING },
-    { EL_BUTTERFLY_U,	&level.score[2],	TEXT_SMASHING },
-    { EL_FLIEGER_R,	&level.score[3],	TEXT_SMASHING },
-    { EL_FLIEGER_O,	&level.score[3],	TEXT_SMASHING },
-    { EL_FLIEGER_L,	&level.score[3],	TEXT_SMASHING },
-    { EL_FLIEGER_U,	&level.score[3],	TEXT_SMASHING },
-    { EL_FIREFLY_R,	&level.score[3],	TEXT_SMASHING },
-    { EL_FIREFLY_O,	&level.score[3],	TEXT_SMASHING },
-    { EL_FIREFLY_L,	&level.score[3],	TEXT_SMASHING },
-    { EL_FIREFLY_U,	&level.score[3],	TEXT_SMASHING },
-    { EL_MAMPFER,	&level.score[4],	TEXT_SMASHING },
-    { EL_MAMPFER2,	&level.score[4],	TEXT_SMASHING },
-    { EL_ROBOT,		&level.score[5],	TEXT_SMASHING },
-    { EL_PACMAN_R,	&level.score[6],	TEXT_SMASHING },
-    { EL_PACMAN_O,	&level.score[6],	TEXT_SMASHING },
-    { EL_PACMAN_L,	&level.score[6],	TEXT_SMASHING },
-    { EL_PACMAN_U,	&level.score[6],	TEXT_SMASHING },
-    { EL_KOKOSNUSS,	&level.score[7],	TEXT_CRACKING },
-    { EL_DYNAMIT_AUS,	&level.score[8],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL1,	&level.score[9],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL2,	&level.score[9],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL3,	&level.score[9],	TEXT_COLLECTING },
-    { EL_SCHLUESSEL4,	&level.score[9],	TEXT_COLLECTING },
-    { EL_EM_KEY_1_FILE,	&level.score[9],	TEXT_COLLECTING },
-    { EL_EM_KEY_2_FILE,	&level.score[9],	TEXT_COLLECTING },
-    { EL_EM_KEY_3_FILE,	&level.score[9],	TEXT_COLLECTING },
-    { EL_EM_KEY_4_FILE,	&level.score[9],	TEXT_COLLECTING },
-    { EL_AMOEBE_NASS,	&level.tempo_amoebe,	TEXT_SPEED },
-    { EL_AMOEBE_NORM,	&level.tempo_amoebe,	TEXT_SPEED },
-    { EL_AMOEBE_VOLL,	&level.tempo_amoebe,	TEXT_SPEED },
-    { EL_AMOEBE_BD,	&level.tempo_amoebe,	TEXT_SPEED },
-    { EL_SIEB_INAKTIV,	&level.dauer_sieb,	TEXT_DURATION },
-    { EL_ABLENK_AUS,	&level.dauer_ablenk,	TEXT_DURATION },
+    { EL_EDELSTEIN,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_BD,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_GELB,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_ROT,	&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_LILA,&level.score[SC_EDELSTEIN],	TEXT_COLLECTING },
+    { EL_DIAMANT,	&level.score[SC_DIAMANT],	TEXT_COLLECTING },
+    { EL_KAEFER_R,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_KAEFER_O,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_KAEFER_L,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_KAEFER_U,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUTTERFLY_R,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUTTERFLY_O,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUTTERFLY_L,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_BUTTERFLY_U,	&level.score[SC_KAEFER],	TEXT_SMASHING },
+    { EL_FLIEGER_R,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FLIEGER_O,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FLIEGER_L,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FLIEGER_U,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FIREFLY_R,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FIREFLY_O,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FIREFLY_L,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_FIREFLY_U,	&level.score[SC_FLIEGER],	TEXT_SMASHING },
+    { EL_MAMPFER,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
+    { EL_MAMPFER2,	&level.score[SC_MAMPFER],	TEXT_SMASHING },
+    { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING },
+    { EL_PACMAN_R,	&level.score[SC_PACMAN],	TEXT_SMASHING },
+    { EL_PACMAN_O,	&level.score[SC_PACMAN],	TEXT_SMASHING },
+    { EL_PACMAN_L,	&level.score[SC_PACMAN],	TEXT_SMASHING },
+    { EL_PACMAN_U,	&level.score[SC_PACMAN],	TEXT_SMASHING },
+    { EL_KOKOSNUSS,	&level.score[SC_KOKOSNUSS],	TEXT_CRACKING },
+    { EL_DYNAMIT_AUS,	&level.score[SC_DYNAMIT],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL1,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL2,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL3,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL4,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_EM_KEY_1_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_EM_KEY_2_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_EM_KEY_3_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_EM_KEY_4_FILE,	&level.score[SC_SCHLUESSEL],	TEXT_COLLECTING },
+    { EL_AMOEBE_NASS,	&level.tempo_amoebe,		TEXT_SPEED },
+    { EL_AMOEBE_NORM,	&level.tempo_amoebe,		TEXT_SPEED },
+    { EL_AMOEBE_VOLL,	&level.tempo_amoebe,		TEXT_SPEED },
+    { EL_AMOEBE_BD,	&level.tempo_amoebe,		TEXT_SPEED },
+    { EL_SIEB_INAKTIV,	&level.dauer_sieb,		TEXT_DURATION },
+    { EL_ABLENK_AUS,	&level.dauer_ablenk,		TEXT_DURATION },
     { -1, NULL, NULL }
   };
 
@@ -2397,10 +2422,26 @@ static void DrawPropertiesWindow()
       int x = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].x + xoffset_right;
       int y = counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].y + yoffset_right;
 
+
+      /*
       gadget_elem_score_value = elements_with_counter[i].counter_value;
+      */
+
+
+      counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].value =
+	elements_with_counter[i].value;
 
       DrawTextF(x, y, font_color, elements_with_counter[i].text);
+
+
+      /*
       ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE, *gadget_elem_score_value);
+      */
+
+
+      ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE,
+			  *counterbutton_info[ED_COUNTER_ID_ELEM_SCORE].value);
+
       MapCounterButtons(ED_COUNTER_ID_ELEM_SCORE);
       break;
     }
@@ -3289,127 +3330,47 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 static void HandleCounterButtons(struct GadgetInfo *gi)
 {
-  int id = gi->custom_id;
+  int gadget_id = gi->custom_id;
+  int counter_id = gi->custom_type_id;
   int button = gi->event.button;
-  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int *counter_value = counterbutton_info[counter_id].value;
+  int step = BUTTON_STEPSIZE(button) *
+    (gadget_id == counterbutton_info[counter_id].gadget_id_down ? -1 : +1);
 
-  switch (id)
-  {
-    case GADGET_ID_ELEM_SCORE_DOWN:
-    case GADGET_ID_ELEM_SCORE_UP:
-      step *= (id == GADGET_ID_ELEM_SCORE_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE,
-			  *gadget_elem_score_value + step);
-      break;
-    case GADGET_ID_ELEM_SCORE_TEXT:
-      *gadget_elem_score_value = gi->text.number_value;
-      break;
+  if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
+    *counter_value = gi->text.number_value;
+  else
+    ModifyEditorCounter(counter_id, *counter_value + step);
 
-    case GADGET_ID_ELEM_CONTENT_DOWN:
-    case GADGET_ID_ELEM_CONTENT_UP:
-      step *= (id == GADGET_ID_ELEM_CONTENT_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT,
-			  *gadget_elem_content_value + step);
-      DrawElementContentAreas();
-      break;
-    case GADGET_ID_ELEM_CONTENT_TEXT:
-      *gadget_elem_content_value = gi->text.number_value;
-      DrawElementContentAreas();
-      break;
-
-    case GADGET_ID_LEVEL_XSIZE_DOWN:
-    case GADGET_ID_LEVEL_XSIZE_UP:
-      step *= (id == GADGET_ID_LEVEL_XSIZE_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_XSIZE,
-			  *gadget_level_xsize_value + step);
-      level.fieldx = lev_fieldx;
-      break;
-    case GADGET_ID_LEVEL_XSIZE_TEXT:
-      *gadget_level_xsize_value = gi->text.number_value;
-      level.fieldx = lev_fieldx;
-      break;
-
-    case GADGET_ID_LEVEL_YSIZE_DOWN:
-    case GADGET_ID_LEVEL_YSIZE_UP:
-      step *= (id == GADGET_ID_LEVEL_YSIZE_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_YSIZE,
-			  *gadget_level_ysize_value + step);
-      level.fieldy = lev_fieldy;
-      break;
-    case GADGET_ID_LEVEL_YSIZE_TEXT:
-      *gadget_level_ysize_value = gi->text.number_value;
-      level.fieldy = lev_fieldy;
-      break;
-
-    case GADGET_ID_LEVEL_RANDOM_DOWN:
-    case GADGET_ID_LEVEL_RANDOM_UP:
-      step *= (id == GADGET_ID_LEVEL_RANDOM_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_RANDOM,
-			  *gadget_level_random_value + step);
-      break;
-    case GADGET_ID_LEVEL_RANDOM_TEXT:
-      *gadget_level_random_value = gi->text.number_value;
-      break;
-
-    case GADGET_ID_LEVEL_COLLECT_DOWN:
-    case GADGET_ID_LEVEL_COLLECT_UP:
-      step *= (id == GADGET_ID_LEVEL_COLLECT_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_COLLECT,
-			  *gadget_level_collect_value + step);
-      break;
-    case GADGET_ID_LEVEL_COLLECT_TEXT:
-      *gadget_level_collect_value = gi->text.number_value;
-      break;
-
-    case GADGET_ID_LEVEL_TIMELIMIT_DOWN:
-    case GADGET_ID_LEVEL_TIMELIMIT_UP:
-      step *= (id == GADGET_ID_LEVEL_TIMELIMIT_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_TIMELIMIT,
-			  *gadget_level_timelimit_value + step);
-      break;
-    case GADGET_ID_LEVEL_TIMELIMIT_TEXT:
-      *gadget_level_timelimit_value = gi->text.number_value;
-      break;
-
-    case GADGET_ID_LEVEL_TIMESCORE_DOWN:
-    case GADGET_ID_LEVEL_TIMESCORE_UP:
-      step *= (id == GADGET_ID_LEVEL_TIMESCORE_DOWN ? -1 : 1);
-      ModifyEditorCounter(ED_COUNTER_ID_LEVEL_TIMESCORE,
-			  *gadget_level_timescore_value + step);
-      break;
-    case GADGET_ID_LEVEL_TIMESCORE_TEXT:
-      *gadget_level_timescore_value = gi->text.number_value;
-      break;
-
-    default:
-      break;
-  }
+  if (counter_id == ED_COUNTER_ID_ELEM_CONTENT)
+    DrawElementContentAreas();
+  else if (counter_id == ED_COUNTER_ID_LEVEL_XSIZE)
+    lev_fieldx = level.fieldx;
+  else if (counter_id == ED_COUNTER_ID_LEVEL_YSIZE)
+    lev_fieldy = level.fieldy;
 }
 
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
 {
-  int id = gi->custom_id;
+  strcpy(textinput_info[gi->custom_type_id].value, gi->text.value);
+}
 
-  switch (id)
-  {
-    case GADGET_ID_LEVEL_NAME:
-      strcpy(level.name, gi->text.value);
-      break;
+static void HandleRadiobuttons(struct GadgetInfo *gi)
+{
+  *radiobutton_info[gi->custom_type_id].value =
+    radiobutton_info[gi->custom_type_id].checked_value;
+}
 
-    case GADGET_ID_LEVEL_AUTHOR:
-      strcpy(level.author, gi->text.value);
-      break;
-
-    default:
-      break;
-  }
+static void HandleCheckbuttons(struct GadgetInfo *gi)
+{
+  *checkbutton_info[gi->custom_type_id].value ^= TRUE;
 }
 
 static void HandleControlButtons(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
   int button = gi->event.button;
-  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int step = BUTTON_STEPSIZE(button);
   int new_element = BUTTON_ELEMENT(button);
   int player_present = FALSE;
   int level_changed = FALSE;
@@ -3743,32 +3704,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 		  DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 	OpenDoor(DOOR_OPEN_1);
       }
-      break;
-
-    case GADGET_ID_RANDOM_PERCENTAGE:
-      *radiobutton_info[ED_RADIOBUTTON_ID_PERCENTAGE].value =
-	radiobutton_info[ED_RADIOBUTTON_ID_PERCENTAGE].checked_value;
-      break;
-
-    case GADGET_ID_RANDOM_QUANTITY:
-      *radiobutton_info[ED_RADIOBUTTON_ID_QUANTITY].value =
-	radiobutton_info[ED_RADIOBUTTON_ID_QUANTITY].checked_value;
-      break;
-
-    case GADGET_ID_RANDOM_RESTRICTED:
-      *checkbutton_info[ED_CHECKBUTTON_ID_RANDOM_RESTRICTED].value ^= TRUE;
-      break;
-
-    case GADGET_ID_DOUBLE_SPEED:
-      *checkbutton_info[ED_CHECKBUTTON_ID_DOUBLE_SPEED].value ^= TRUE;
-      break;
-
-    case GADGET_ID_GRAVITY:
-      *checkbutton_info[ED_CHECKBUTTON_ID_GRAVITY].value ^= TRUE;
-      break;
-
-    case GADGET_ID_STICK_ELEMENT:
-      *checkbutton_info[ED_CHECKBUTTON_ID_STICK_ELEMENT].value ^= TRUE;
       break;
 
     default:

@@ -130,38 +130,39 @@ void DrawCompleteVideoDisplay(void);
 /* gadget creation tags */
 #define GDI_END				0
 #define GDI_CUSTOM_ID			1
-#define GDI_X				2
-#define GDI_Y				3
-#define GDI_WIDTH			4
-#define GDI_HEIGHT			5
-#define GDI_TYPE			6
-#define GDI_STATE			7
-#define GDI_CHECKED			8
-#define GDI_RADIO_NR			9
-#define GDI_NUMBER_VALUE		10
-#define GDI_NUMBER_MIN			11
-#define GDI_NUMBER_MAX			12
-#define GDI_TEXT_VALUE			13
-#define GDI_TEXT_SIZE			14
-#define GDI_DESIGN_UNPRESSED		15
-#define GDI_DESIGN_PRESSED		16
-#define GDI_ALT_DESIGN_UNPRESSED	17
-#define GDI_ALT_DESIGN_PRESSED		18
-#define GDI_DESIGN_BORDER		19
-#define GDI_DECORATION_DESIGN		20
+#define GDI_CUSTOM_TYPE_ID		2
+#define GDI_X				3
+#define GDI_Y				4
+#define GDI_WIDTH			5
+#define GDI_HEIGHT			6
+#define GDI_TYPE			7
+#define GDI_STATE			8
+#define GDI_CHECKED			9
+#define GDI_RADIO_NR			10
+#define GDI_NUMBER_VALUE		11
+#define GDI_NUMBER_MIN			12
+#define GDI_NUMBER_MAX			13
+#define GDI_TEXT_VALUE			14
+#define GDI_TEXT_SIZE			15
+#define GDI_DESIGN_UNPRESSED		16
+#define GDI_DESIGN_PRESSED		17
+#define GDI_ALT_DESIGN_UNPRESSED	18
+#define GDI_ALT_DESIGN_PRESSED		19
+#define GDI_DESIGN_BORDER		20
+#define GDI_DECORATION_DESIGN		21
 #define GDI_DECORATION_POSITION		22
-#define GDI_DECORATION_SIZE		21
-#define GDI_DECORATION_SHIFTING		23
-#define GDI_EVENT_MASK			24
-#define GDI_EVENT			25
-#define GDI_CALLBACK_INFO		26
-#define GDI_CALLBACK_ACTION		27
-#define GDI_AREA_SIZE			28
-#define GDI_ITEM_SIZE			29
-#define GDI_SCROLLBAR_ITEMS_MAX		30
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	31
-#define GDI_SCROLLBAR_ITEM_POSITION	32
-#define GDI_INFO_TEXT			33
+#define GDI_DECORATION_SIZE		23
+#define GDI_DECORATION_SHIFTING		24
+#define GDI_EVENT_MASK			25
+#define GDI_EVENT			26
+#define GDI_CALLBACK_INFO		27
+#define GDI_CALLBACK_ACTION		28
+#define GDI_AREA_SIZE			29
+#define GDI_ITEM_SIZE			30
+#define GDI_SCROLLBAR_ITEMS_MAX		31
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	32
+#define GDI_SCROLLBAR_ITEM_POSITION	33
+#define GDI_INFO_TEXT			34
 
 typedef void (*gadget_function)(void *);
 
@@ -220,6 +221,7 @@ struct GadgetInfo
 {
   int id;				/* internal gadget identifier */
   int custom_id;			/* custom gadget identifier */
+  int custom_type_id;			/* custom gadget type identifier */
   char info_text[MAX_INFO_TEXTSIZE];	/* short popup info text */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */

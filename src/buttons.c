@@ -510,6 +510,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->custom_id = va_arg(ap, int);
 	break;
 
+      case GDI_CUSTOM_TYPE_ID:
+	gi->custom_type_id = va_arg(ap, int);
+	break;
+
       case GDI_INFO_TEXT:
 	{
 	  int max_textsize = MAX_INFO_TEXTSIZE - 1;

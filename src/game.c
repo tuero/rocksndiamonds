@@ -87,19 +87,6 @@
 #define DOUBLE_PLAYER_SPEED(p)	(HALVE_MOVE_DELAY((p)->move_delay_value))
 #define HALVE_PLAYER_SPEED(p)	(DOUBLE_MOVE_DELAY((p)->move_delay_value))
 
-/* score for elements */
-#define SC_EDELSTEIN		0
-#define SC_DIAMANT		1
-#define SC_KAEFER		2
-#define SC_FLIEGER		3
-#define SC_MAMPFER		4
-#define SC_ROBOT		5
-#define SC_PACMAN		6
-#define SC_KOKOSNUSS		7
-#define SC_DYNAMIT		8
-#define SC_SCHLUESSEL		9
-#define SC_ZEITBONUS		10
-
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1

@@ -16,6 +16,19 @@
 
 #include "main.h"
 
+/* score for elements (also used by editor.c) */
+#define SC_EDELSTEIN		0
+#define SC_DIAMANT		1
+#define SC_KAEFER		2
+#define SC_FLIEGER		3
+#define SC_MAMPFER		4
+#define SC_ROBOT		5
+#define SC_PACMAN		6
+#define SC_KOKOSNUSS		7
+#define SC_DYNAMIT		8
+#define SC_SCHLUESSEL		9
+#define SC_ZEITBONUS		10
+
 void GetPlayerConfig(void);
 void InitGame(void);
 void InitMovDir(int, int);
