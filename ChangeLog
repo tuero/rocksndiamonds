@@ -1,3 +1,6 @@
+2003-11-04
+	* introduced "turning..." action graphic for elements with move delay
+
 2003-11-02
 	* fixed bug when pushing element that can move away to the side
 	  (like pushing falling elements, but now with moving elements)

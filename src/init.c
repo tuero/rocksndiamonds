@@ -615,6 +615,10 @@ void InitElementGraphicInfo()
       boolean act_remove = ((IS_DIGGABLE(i)    && act == ACTION_DIGGING)  ||
 			    (IS_SNAPPABLE(i)   && act == ACTION_SNAPPING) ||
 			    (IS_COLLECTIBLE(i) && act == ACTION_COLLECTING));
+      boolean act_turning = (act == ACTION_TURNING_FROM_LEFT ||
+			     act == ACTION_TURNING_FROM_RIGHT ||
+			     act == ACTION_TURNING_FROM_UP ||
+			     act == ACTION_TURNING_FROM_DOWN);
 
       /* generic default action graphic (defined by "[default]" directive) */
       int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
@@ -648,10 +652,16 @@ void InitElementGraphicInfo()
 	/* no graphic for current action -- use default direction graphic */
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
-	    (act_remove ? IMG_EMPTY : default_direction_graphic[dir]);
+	    (act_remove ? IMG_EMPTY :
+	     act_turning ?
+	     element_info[i].direction_graphic[ACTION_TURNING][dir] :
+	     default_direction_graphic[dir]);
 	if (default_action_direction_crumbled == -1)
 	  default_action_direction_crumbled =
-	    (act_remove ? IMG_EMPTY : default_direction_crumbled[dir]);
+	    (act_remove ? IMG_EMPTY :
+	     act_turning ?
+	     element_info[i].direction_crumbled[ACTION_TURNING][dir] :
+	     default_direction_crumbled[dir]);
 
 	if (element_info[i].direction_graphic[act][dir] == -1)
 	  element_info[i].direction_graphic[act][dir] =
@@ -664,10 +674,14 @@ void InitElementGraphicInfo()
       /* no graphic for this specific action -- use default action graphic */
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] =
-	  (act_remove ? IMG_EMPTY : default_action_graphic);
+	  (act_remove ? IMG_EMPTY :
+	   act_turning ? element_info[i].graphic[ACTION_TURNING] :
+	   default_action_graphic);
       if (element_info[i].crumbled[act] == -1)
 	element_info[i].crumbled[act] =
-	  (act_remove ? IMG_EMPTY : default_action_crumbled);
+	  (act_remove ? IMG_EMPTY :
+	   act_turning ? element_info[i].crumbled[ACTION_TURNING] :
+	   default_action_crumbled);
     }
   }
 

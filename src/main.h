@@ -915,13 +915,14 @@
 #define ACTION_CHANGING				23
 #define ACTION_EXPLODING			24
 #define ACTION_DYING				25
-#define ACTION_XXX_LEFT				26
-#define ACTION_XXX_RIGHT			27
-#define ACTION_XXX_UP				28
-#define ACTION_XXX_DOWN				29
-#define ACTION_OTHER				30
+#define ACTION_TURNING				26
+#define ACTION_TURNING_FROM_LEFT		27
+#define ACTION_TURNING_FROM_RIGHT		28
+#define ACTION_TURNING_FROM_UP			29
+#define ACTION_TURNING_FROM_DOWN		30
+#define ACTION_OTHER				31
 
-#define NUM_ACTIONS				31
+#define NUM_ACTIONS				32
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_MAIN			0

@@ -3733,22 +3733,22 @@ static void TurnRound(int x, int y)
 {
   int direction = MovDir[x][y];
 
-#if 1
+#if 0
   GfxDir[x][y] = MovDir[x][y];
 #endif
 
   TurnRoundExt(x, y);
 
-#if 0
+#if 1
   GfxDir[x][y] = MovDir[x][y];
 #endif
 
   if (direction != MovDir[x][y])
     GfxFrame[x][y] = 0;
 
-#if 0
+#if 1
   if (MovDelay[x][y])
-    GfxAction[x][y] = ACTION_XXX_LEFT + MV_DIR_BIT(direction);
+    GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_BIT(direction);
 #else
   if (MovDelay[x][y])
     GfxAction[x][y] = ACTION_WAITING;
@@ -3786,7 +3786,6 @@ void StartMoving(int x, int y)
     return;
 
 #if 1
-  /* !!! this should be handled more generic (not only for mole) !!! */
   if (MovDelay[x][y] == 0)
     GfxAction[x][y] = ACTION_DEFAULT;
 #else
