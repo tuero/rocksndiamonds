@@ -1,7 +1,7 @@
-Release Version 3.0.1 [?? ??? ????]
+Release Version 3.0.1 [18 AUG 2003]
 -----------------------------------
-	- fixed bug which caused a crash at startup under Solaris
-	- fixed bug which caused the DOS version not finding its files
+	- fixed bug that caused a crash at startup under Solaris
+	- fixed bug that caused the DOS version not finding its files
 	- fixed bug with missing graphic for active red disk bomb
 	- added custom element property for dropping collected elements
 	- added another 128 custom elements for those who can't get enough
