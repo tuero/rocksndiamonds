@@ -868,7 +868,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   {
     if (first_entry == -1)
     {
-      first_entry = leveldir_nr - num_page_entries + 1;
+      first_entry = MAX(0, leveldir_nr - num_page_entries + 1);
       choice = leveldir_nr - first_entry + 3;
     }
 
@@ -927,7 +927,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     {
       first_entry += step;
       if (first_entry + num_page_entries > num_leveldirs)
-	first_entry = num_leveldirs - num_page_entries;
+	first_entry = MAX(0, num_leveldirs - num_page_entries);
 
       drawChooseLevelList(first_entry, num_page_entries);
       drawChooseLevelInfo(first_entry + num_page_entries - 1);
