@@ -129,7 +129,7 @@ static void setLevelInfoToDefaults()
 
 static int checkLevelElement(int element)
 {
-  if (element >= EL_FIRST_RUNTIME)
+  if (element >= NUM_FILE_ELEMENTS)
   {
     Error(ERR_WARN, "invalid level element %d", element);
     element = EL_CHAR_QUESTION;

@@ -458,7 +458,7 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 #endif
 
-  if (element == EL_EXPLODING)
+  if (element == EL_EXPLOSION)
     return;
 
   /* draw things in the field the player is leaving, if needed */
@@ -653,7 +653,7 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(sx, sy, graphic + phase);
   }
 
-  if (player_is_moving && last_element == EL_EXPLODING)
+  if (player_is_moving && last_element == EL_EXPLOSION)
   {
     int phase = Frame[last_jx][last_jy];
     int delay = 2;
@@ -1408,9 +1408,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 	graphic += phase2;
     }
   }
-  else if (element == EL_MAGIC_WALL_EMPTY ||
+  else if (element == EL_MAGIC_WALL_ACTIVE ||
 	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_BD_MAGIC_WALL_EMPTY ||
+	   element == EL_BD_MAGIC_WALL_ACTIVE ||
 	   element == EL_BD_MAGIC_WALL_EMPTYING ||
 	   element == EL_MAGIC_WALL_FULL ||
 	   element == EL_BD_MAGIC_WALL_FULL)
@@ -1574,9 +1574,9 @@ void DrawNewScreenElementExt(int x, int y, int dx, int dy, int element,
 	graphic += phase2;
     }
   }
-  else if (element == EL_MAGIC_WALL_EMPTY ||
+  else if (element == EL_MAGIC_WALL_ACTIVE ||
 	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_BD_MAGIC_WALL_EMPTY ||
+	   element == EL_BD_MAGIC_WALL_ACTIVE ||
 	   element == EL_BD_MAGIC_WALL_EMPTYING ||
 	   element == EL_MAGIC_WALL_FULL ||
 	   element == EL_BD_MAGIC_WALL_FULL)
@@ -3003,9 +3003,9 @@ int get_next_element(int element)
     case EL_QUICKSAND_FILLING:		return EL_QUICKSAND_FULL;
     case EL_QUICKSAND_EMPTYING:		return EL_QUICKSAND_EMPTY;
     case EL_MAGIC_WALL_FILLING:		return EL_MAGIC_WALL_FULL;
-    case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_ACTIVE;
     case EL_BD_MAGIC_WALL_FILLING:	return EL_BD_MAGIC_WALL_FULL;
-    case EL_BD_MAGIC_WALL_EMPTYING:	return EL_BD_MAGIC_WALL_EMPTY;
+    case EL_BD_MAGIC_WALL_EMPTYING:	return EL_BD_MAGIC_WALL_ACTIVE;
     case EL_AMOEBA_DRIPPING:		return EL_AMOEBA_WET;
 
     default:				return element;
@@ -3061,7 +3061,7 @@ int el2gfx_OLD(int element)
     case EL_AMOEBA_DROP:		return GFX_TROPFEN;
     case EL_BOMB:			return GFX_BOMBE;
     case EL_MAGIC_WALL:			return GFX_MAGIC_WALL_OFF;
-    case EL_MAGIC_WALL_EMPTY:		return GFX_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_ACTIVE:		return GFX_MAGIC_WALL_EMPTY;
     case EL_MAGIC_WALL_EMPTYING:	return GFX_MAGIC_WALL_EMPTY;
     case EL_MAGIC_WALL_FULL:		return GFX_MAGIC_WALL_FULL;
     case EL_MAGIC_WALL_DEAD:		return GFX_MAGIC_WALL_DEAD;
@@ -3124,7 +3124,7 @@ int el2gfx_OLD(int element)
     case EL_WALL_EMERALD_PURPLE:	return GFX_ERZ_EDEL_LILA;
     case EL_DARK_YAMYAM:		return GFX_MAMPFER2;
     case EL_BD_MAGIC_WALL:		return GFX_MAGIC_WALL_BD_OFF;
-    case EL_BD_MAGIC_WALL_EMPTY:	return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_BD_MAGIC_WALL_ACTIVE:	return GFX_MAGIC_WALL_BD_EMPTY;
     case EL_BD_MAGIC_WALL_EMPTYING:	return GFX_MAGIC_WALL_BD_EMPTY;
     case EL_BD_MAGIC_WALL_FULL:		return GFX_MAGIC_WALL_BD_FULL;
     case EL_BD_MAGIC_WALL_DEAD:		return GFX_MAGIC_WALL_BD_DEAD;
@@ -3187,24 +3187,36 @@ int el2gfx_OLD(int element)
     case EL_CONVEYOR_BELT1_LEFT:	return GFX_BELT1_LEFT;
     case EL_CONVEYOR_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
     case EL_CONVEYOR_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
+    case EL_CONVEYOR_BELT1_LEFT_ACTIVE:	return GFX_BELT1_LEFT;
+    case EL_CONVEYOR_BELT1_MIDDLE_ACTIVE:return GFX_BELT1_MIDDLE;
+    case EL_CONVEYOR_BELT1_RIGHT_ACTIVE:return GFX_BELT1_RIGHT;
     case EL_CONVEYOR_BELT1_SWITCH_LEFT:	return GFX_BELT1_SWITCH_LEFT;
     case EL_CONVEYOR_BELT1_SWITCH_MIDDLE:return GFX_BELT1_SWITCH_MIDDLE;
     case EL_CONVEYOR_BELT1_SWITCH_RIGHT:return GFX_BELT1_SWITCH_RIGHT;
     case EL_CONVEYOR_BELT2_LEFT:	return GFX_BELT2_LEFT;
     case EL_CONVEYOR_BELT2_MIDDLE:	return GFX_BELT2_MIDDLE;
     case EL_CONVEYOR_BELT2_RIGHT:	return GFX_BELT2_RIGHT;
+    case EL_CONVEYOR_BELT2_LEFT_ACTIVE:	return GFX_BELT2_LEFT;
+    case EL_CONVEYOR_BELT2_MIDDLE_ACTIVE:return GFX_BELT2_MIDDLE;
+    case EL_CONVEYOR_BELT2_RIGHT_ACTIVE:return GFX_BELT2_RIGHT;
     case EL_CONVEYOR_BELT2_SWITCH_LEFT:	return GFX_BELT2_SWITCH_LEFT;
     case EL_CONVEYOR_BELT2_SWITCH_MIDDLE:return GFX_BELT2_SWITCH_MIDDLE;
     case EL_CONVEYOR_BELT2_SWITCH_RIGHT:return GFX_BELT2_SWITCH_RIGHT;
     case EL_CONVEYOR_BELT3_LEFT:	return GFX_BELT3_LEFT;
     case EL_CONVEYOR_BELT3_MIDDLE:	return GFX_BELT3_MIDDLE;
     case EL_CONVEYOR_BELT3_RIGHT:	return GFX_BELT3_RIGHT;
+    case EL_CONVEYOR_BELT3_LEFT_ACTIVE:	return GFX_BELT3_LEFT;
+    case EL_CONVEYOR_BELT3_MIDDLE_ACTIVE:return GFX_BELT3_MIDDLE;
+    case EL_CONVEYOR_BELT3_RIGHT_ACTIVE:return GFX_BELT3_RIGHT;
     case EL_CONVEYOR_BELT3_SWITCH_LEFT:	return GFX_BELT3_SWITCH_LEFT;
     case EL_CONVEYOR_BELT3_SWITCH_MIDDLE:return GFX_BELT3_SWITCH_MIDDLE;
     case EL_CONVEYOR_BELT3_SWITCH_RIGHT:return GFX_BELT3_SWITCH_RIGHT;
     case EL_CONVEYOR_BELT4_LEFT:	return GFX_BELT4_LEFT;
     case EL_CONVEYOR_BELT4_MIDDLE:	return GFX_BELT4_MIDDLE;
     case EL_CONVEYOR_BELT4_RIGHT:	return GFX_BELT4_RIGHT;
+    case EL_CONVEYOR_BELT4_LEFT_ACTIVE:	return GFX_BELT4_LEFT;
+    case EL_CONVEYOR_BELT4_MIDDLE_ACTIVE:return GFX_BELT4_MIDDLE;
+    case EL_CONVEYOR_BELT4_RIGHT_ACTIVE:return GFX_BELT4_RIGHT;
     case EL_CONVEYOR_BELT4_SWITCH_LEFT:	return GFX_BELT4_SWITCH_LEFT;
     case EL_CONVEYOR_BELT4_SWITCH_MIDDLE:return GFX_BELT4_SWITCH_MIDDLE;
     case EL_CONVEYOR_BELT4_SWITCH_RIGHT:return GFX_BELT4_SWITCH_RIGHT;
