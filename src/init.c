@@ -24,6 +24,7 @@
 #include "network.h"
 #include "netserv.h"
 #include "cartoons.h"
+#include "config.h"
 
 static char *image_filename[NUM_PICTURES] =
 {
@@ -62,7 +63,7 @@ void OpenAll(void)
   }
 
   InitProgramInfo(UNIX_USERDATA_DIRECTORY,
-		  PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
+		  PROGRAM_TITLE_STRING, getWindowTitleString(),
 		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
 		  MSDOS_POINTER_FILENAME,
 		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);

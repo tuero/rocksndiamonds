@@ -489,9 +489,9 @@ void HandleKey(Key key, int key_status)
   /* special shortcuts for quick game tape saving and loading */
   if (game_status == MAINMENU || game_status == PLAYING)
   {
-    if (key == KSYM_F1)		/* save game */
+    if (key == setup.shortcut.save_game)
       TapeQuickSave();
-    else if (key == KSYM_F2)	/* load game */
+    else if (key == setup.shortcut.load_game)
       TapeQuickLoad();
   }
 

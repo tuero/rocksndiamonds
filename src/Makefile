@@ -118,6 +118,7 @@ LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 
 SRCS =	main.c		\
 	init.c		\
+	config.c	\
 	events.c	\
 	tools.c		\
 	screens.c	\
@@ -131,6 +132,7 @@ SRCS =	main.c		\
 
 OBJS =	main.o		\
 	init.o		\
+	config.o	\
 	events.o	\
 	tools.o		\
 	screens.o	\
@@ -141,6 +143,8 @@ OBJS =	main.o		\
 	cartoons.o	\
 	network.o	\
 	netserv.o
+
+TIMESTAMP_FILE = timestamp.h
 
 LIBDIR = libgame
 LIBGAME = $(LIBDIR)/libgame.a
@@ -161,6 +165,11 @@ libgame_dir:
 	@$(MAKE) -C $(LIBDIR)
 $(LIBGAME):
 	@$(MAKE) -C $(LIBDIR)
+
+$(TIMESTAMP_FILE): $(SRCS)
+	@date '+"[%Y-%m-%d %H:%M]"' \
+	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
+	> $(TIMESTAMP_FILE)
 
 $(ICON):
 	$(BMP2ICO) -transparent $(ICONBASE).ico $(ICON32X32)

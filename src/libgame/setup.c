@@ -1102,6 +1102,10 @@ void setSetupInfo(struct TokenInfo *token_info,
       break;
 
     case TYPE_KEY:
+      *(Key *)setup_value = getKeyFromKeyName(token_value);
+      break;
+
+    case TYPE_KEY_X11:
       *(Key *)setup_value = getKeyFromX11KeyName(token_value);
       break;
 
@@ -1403,6 +1407,10 @@ char *getSetupValue(int type, void *value)
       break;
 
     case TYPE_KEY:
+      strcpy(value_string, getKeyNameFromKey(*(Key *)value));
+      break;
+
+    case TYPE_KEY_X11:
       strcpy(value_string, getX11KeyNameFromKey(*(Key *)value));
       break;
 
@@ -1439,7 +1447,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
   /* continue with the token's value (which can have different types) */
   strcat(entry, value_string);
 
-  if (token_type == TYPE_KEY)
+  if (token_type == TYPE_KEY_X11)
   {
     Key key = *(Key *)setup_value;
     char *keyname = getKeyNameFromKey(key);

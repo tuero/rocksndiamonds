@@ -27,18 +27,19 @@
 /* screens in the setup menu */
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_INPUT		1
-#define SETUP_MODE_GRAPHICS		2
-#define SETUP_MODE_SOUND		3
+#define SETUP_MODE_SHORTCUT		2
+#define SETUP_MODE_GRAPHICS		3
+#define SETUP_MODE_SOUND		4
 
-#define MAX_SETUP_MODES			4
+#define MAX_SETUP_MODES			5
 
-/* for HandleSetupInputScreen() */
+/* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
 #define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
 #define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
 #define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
-/* for HandleChooseLevel() */
+/* for various menu stuff  */
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - 2)
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		14
@@ -52,8 +53,12 @@
 #define NUM_SCREEN_SCROLLBARS		1
 #define NUM_SCREEN_GADGETS		3
 
-/* forward declaration for internal use */
+/* forward declarations of internal functions */
 static void HandleScreenGadgets(struct GadgetInfo *);
+static void HandleSetupScreen_Generic(int, int, int, int, int);
+static void HandleSetupScreen_Input(int, int, int, int, int);
+static void CustomizeKeyboard(int);
+static void CalibrateJoystick(int);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
@@ -1323,6 +1328,12 @@ static void execSetupInput()
   DrawSetupScreen();
 }
 
+static void execSetupShortcut()
+{
+  setup_mode = SETUP_MODE_SHORTCUT;
+  DrawSetupScreen();
+}
+
 static void execExitSetup()
 {
   game_status = MAINMENU;
@@ -1339,8 +1350,9 @@ static struct TokenInfo setup_info_main[] =
 {
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound Setup"	},
   { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"	},
-  { TYPE_EMPTY,		NULL,			""		},
+  { TYPE_ENTER_MENU,	execSetupShortcut,	"Key Shortcuts"	},
 #if 0
+  { TYPE_EMPTY,		NULL,			""		},
   { TYPE_SWITCH,	&setup.sound,		"Sound:",	},
   { TYPE_SWITCH,	&setup.sound_loops,	" Sound Loops:"	},
   { TYPE_SWITCH,	&setup.sound_music,	" Game Music:"	},
@@ -1378,6 +1390,64 @@ static struct TokenInfo setup_info_sound[] =
   { 0,			NULL,			NULL		}
 };
 
+static struct TokenInfo setup_info_shortcut[] =
+{
+  { TYPE_KEYTEXT,	NULL,			"Quick Save Game:",	},
+  { TYPE_KEY,		&setup.shortcut.save_game,	""		},
+  { TYPE_KEYTEXT,	NULL,			"Quick Load Game:",	},
+  { TYPE_KEY,		&setup.shortcut.load_game,	""		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Exit"			},
+  { 0,			NULL,			NULL			}
+};
+
+static Key getSetupKey()
+{
+  Key key = KSYM_UNDEFINED;
+  boolean got_key_event = FALSE;
+
+  while (!got_key_event)
+  {
+    if (PendingEvent())		/* got event */
+    {
+      Event event;
+
+      NextEvent(&event);
+
+      switch(event.type)
+      {
+        case EVENT_KEYPRESS:
+	  {
+	    key = GetEventKey((KeyEvent *)&event, TRUE);
+
+	    /* press 'Escape' or 'Enter' to keep the existing key binding */
+	    if (key == KSYM_Escape || key == KSYM_Return)
+	      key = KSYM_UNDEFINED;	/* keep old value */
+
+	    got_key_event = TRUE;
+	  }
+	  break;
+
+        case EVENT_KEYRELEASE:
+	  key_joystick_mapping = 0;
+	  break;
+
+        default:
+	  HandleOtherEvents(&event);
+	  break;
+      }
+    }
+
+    BackToFront();
+    DoAnimation();
+
+    /* don't eat all CPU time */
+    Delay(10);
+  }
+
+  return key;
+}
+
 static void drawSetupValue(int pos)
 {
   int xpos = MENU_SCREEN_VALUE_XPOS;
@@ -1386,23 +1456,49 @@ static void drawSetupValue(int pos)
   char *value_string = getSetupValue(setup_info[pos].type & ~TYPE_GHOSTED,
 				     setup_info[pos].value);
 
-  if (setup_info[pos].type & TYPE_SWITCH ||
-      setup_info[pos].type & TYPE_YES_NO)
+  if (setup_info[pos].type & TYPE_KEY)
   {
-    boolean value = *(boolean *)(setup_info[pos].value);
-    int value_length = 3;
+    xpos = 3;
 
-    if (!value)
-      value_color = FC_BLUE;
-
-    if (strlen(value_string) < value_length)
-      strcat(value_string, " ");
+    if (setup_info[pos].type & TYPE_QUERY)
+    {
+      value_string = "<press key>";
+      value_color = FC_RED;
+    }
   }
 
+  if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
+      !*(boolean *)(setup_info[pos].value))
+    value_color = FC_BLUE;
+
+  DrawText(SX + xpos * 32, SY + ypos * 32,
+	   (xpos == 3 ? "              " : "   "), FS_BIG, FC_YELLOW);
   DrawText(SX + xpos * 32, SY + ypos * 32, value_string, FS_BIG, value_color);
 }
 
-static void DrawGenericSetupScreen()
+static void changeSetupValue(int pos)
+{
+  if (setup_info[pos].type & TYPE_BOOLEAN_STYLE)
+  {
+    *(boolean *)setup_info[pos].value ^= TRUE;
+  }
+  else if (setup_info[pos].type & TYPE_KEY)
+  {
+    Key key;
+
+    setup_info[pos].type |= TYPE_QUERY;
+    drawSetupValue(pos);
+    setup_info[pos].type &= ~TYPE_QUERY;
+
+    key = getSetupKey();
+    if (key != KSYM_UNDEFINED)
+      *(Key *)setup_info[pos].value = key;
+  }
+
+  drawSetupValue(pos);
+}
+
+static void DrawSetupScreen_Generic()
 {
   char *title_string = NULL;
   int i;
@@ -1419,7 +1515,12 @@ static void DrawGenericSetupScreen()
   else if (setup_mode == SETUP_MODE_SOUND)
   {
     setup_info = setup_info_sound;
-    title_string = "Sound Setup";
+    title_string = "Setup Sound";
+  }
+  else if (setup_mode == SETUP_MODE_SHORTCUT)
+  {
+    setup_info = setup_info_shortcut;
+    title_string = "Setup Shortcuts";
   }
 
   DrawText(SX + 16, SY + 16, title_string, FS_BIG, FC_YELLOW);
@@ -1444,10 +1545,10 @@ static void DrawGenericSetupScreen()
       initCursor(i, GFX_ARROW_BLUE_RIGHT);
     else if (setup_info[i].type & TYPE_LEAVE_MENU)
       initCursor(i, GFX_ARROW_BLUE_LEFT);
-    else if (setup_info[i].type != TYPE_EMPTY)
+    else if (setup_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, GFX_KUGEL_BLAU);
 
-    if (setup_info[i].type & TYPE_BOOLEAN_STYLE)
+    if (setup_info[i].type & TYPE_VALUE)
       drawSetupValue(i);
 
     num_setup_info++;
@@ -1455,10 +1556,10 @@ static void DrawGenericSetupScreen()
 
   FadeToFront();
   InitAnimation();
-  HandleSetupScreen(0,0,0,0,MB_MENU_INITIALIZE);
+  HandleSetupScreen_Generic(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
-void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
+void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 {
   static int choice_store[MAX_SETUP_MODES];
   int choice = choice_store[setup_mode];
@@ -1479,7 +1580,7 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
 	void (*menu_callback_function)(void) = setup_info[y].value;
 
 	menu_callback_function();
-	break;	/* absolutely needed because 'setup_info' has changed! */
+	break;	/* absolutely needed because function changes 'setup_info'! */
       }
     }
 
@@ -1495,10 +1596,10 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
   {
     if (dx)
     {
-      int type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
+      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
 
-      if (!(setup_info[choice].type & TYPE_ENTER_OR_LEAVE_MENU) ||
-	  setup_info[choice].type == type)
+      if ((setup_info[choice].type & menu_navigation_type) ||
+	  (setup_info[choice].type & TYPE_BOOLEAN_STYLE))
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -1506,12 +1607,12 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
 
     /* jump to next non-empty menu entry (up or down) */
     while (y > 0 && y < num_setup_info - 1 &&
-	   setup_info[y].type == TYPE_EMPTY)
+	   (setup_info[y].type & TYPE_SKIP_ENTRY))
       y += dy;
   }
 
   if (x == 0 && y >= 0 && y < num_setup_info &&
-      setup_info[y].type != TYPE_EMPTY)
+      (setup_info[y].type & ~TYPE_SKIP_ENTRY))
   {
     if (button)
     {
@@ -1524,6 +1625,7 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
     }
     else if (!(setup_info[y].type & TYPE_GHOSTED))
     {
+#if 0
       if (setup_info[y].type & TYPE_BOOLEAN_STYLE)
       {
 	boolean new_value = !*(boolean *)(setup_info[y].value);
@@ -1531,12 +1633,34 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
 	*(boolean *)setup_info[y].value = new_value;
 	drawSetupValue(y);
       }
+      else if (setup_info[y].type == TYPE_KEYTEXT &&
+	       setup_info[y + 1].type == TYPE_KEY)
+      {
+	changeSetupValue(y + 1);
+      }
       else if (setup_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
       {
 	void (*menu_callback_function)(void) = setup_info[choice].value;
 
 	menu_callback_function();
       }
+#else
+      if (setup_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
+      {
+	void (*menu_callback_function)(void) = setup_info[choice].value;
+
+	menu_callback_function();
+      }
+      else
+      {
+	if ((setup_info[y].type & TYPE_KEYTEXT) &&
+	    (setup_info[y + 1].type & TYPE_KEY))
+	  y++;
+
+	if (setup_info[y].type & TYPE_VALUE)
+	  changeSetupValue(y);
+      }
+#endif
     }
   }
 
@@ -1546,10 +1670,10 @@ void HandleGenericSetupScreen(int mx, int my, int dx, int dy, int button)
     DoAnimation();
 }
 
-void DrawSetupInputScreen()
+void DrawSetupScreen_Input()
 {
   ClearWindow();
-  DrawText(SX+16, SY+16, "SETUP INPUT", FS_BIG, FC_YELLOW);
+  DrawText(SX+16, SY+16, "Setup Input", FS_BIG, FC_YELLOW);
 
   initCursor(0, GFX_KUGEL_BLAU);
   initCursor(1, GFX_KUGEL_BLAU);
@@ -1567,7 +1691,7 @@ void DrawSetupInputScreen()
   DrawTextFCentered(SYSIZE - 20, FC_BLUE,
 		    "Joysticks deactivated on this screen");
 
-  HandleSetupInputScreen(0,0, 0,0, MB_MENU_INITIALIZE);
+  HandleSetupScreen_Input(0,0, 0,0, MB_MENU_INITIALIZE);
   FadeToFront();
   InitAnimation();
 }
@@ -1664,7 +1788,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 }
 
-void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
+void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 0;
   static int player_nr = 0;
@@ -1783,22 +1907,6 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 
   if (game_status == SETUP)
     DoAnimation();
-}
-
-void DrawSetupScreen()
-{
-  if (setup_mode == SETUP_MODE_INPUT)
-    DrawSetupInputScreen();
-  else
-    DrawGenericSetupScreen();
-}
-
-void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
-{
-  if (setup_mode == SETUP_MODE_INPUT)
-    HandleSetupInputScreen(mx, my, dx, dy, button);
-  else
-    HandleGenericSetupScreen(mx, my, dx, dy, button);
 }
 
 void CustomizeKeyboard(int player_nr)
@@ -1928,7 +2036,7 @@ void CustomizeKeyboard(int player_nr)
   setup.input[player_nr].key = custom_key;
 
   StopAnimation();
-  DrawSetupInputScreen();
+  DrawSetupScreen_Input();
 }
 
 static boolean CalibrateJoystickMain(int player_nr)
@@ -2096,7 +2204,7 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   StopAnimation();
 
-  DrawSetupInputScreen();
+  DrawSetupScreen_Input();
 
   /* wait until the last pressed button was released */
   while (Joystick(player_nr) & JOY_BUTTON)
@@ -2126,6 +2234,22 @@ void CalibrateJoystick(int player_nr)
     BackToFront();
     Delay(2000);	/* show error message for two seconds */
   }
+}
+
+void DrawSetupScreen()
+{
+  if (setup_mode == SETUP_MODE_INPUT)
+    DrawSetupScreen_Input();
+  else
+    DrawSetupScreen_Generic();
+}
+
+void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
+{
+  if (setup_mode == SETUP_MODE_INPUT)
+    HandleSetupScreen_Input(mx, my, dx, dy, button);
+  else
+    HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
 
 void HandleGameActions()

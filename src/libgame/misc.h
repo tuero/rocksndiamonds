@@ -94,6 +94,7 @@ void WriteUnusedBytesToFile(FILE *, unsigned long);
 
 char *getKeyNameFromKey(Key);
 char *getX11KeyNameFromKey(Key);
+Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
 

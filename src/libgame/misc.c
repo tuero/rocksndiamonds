@@ -818,7 +818,8 @@ void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
 
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
-#define TRANSLATE_X11KEYNAME_TO_KEYSYM	2
+#define TRANSLATE_KEYNAME_TO_KEYSYM	2
+#define TRANSLATE_X11KEYNAME_TO_KEYSYM	3
 
 void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 {
@@ -1005,6 +1006,26 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
     *x11name = name_buffer;
   }
+  else if (mode == TRANSLATE_KEYNAME_TO_KEYSYM)
+  {
+    Key key = KSYM_UNDEFINED;
+
+    i = 0;
+    do
+    {
+      if (strcmp(translate_key[i].name, *name) == 0)
+      {
+	key = translate_key[i].key;
+	break;
+      }
+    }
+    while (translate_key[++i].x11name);
+
+    if (key == KSYM_UNDEFINED)
+      Error(ERR_WARN, "getKeyFromKeyName(): not completely implemented");
+
+    *keysym = key;
+  }
   else if (mode == TRANSLATE_X11KEYNAME_TO_KEYSYM)
   {
     Key key = KSYM_UNDEFINED;
@@ -1104,6 +1125,14 @@ char *getX11KeyNameFromKey(Key key)
 
   translate_keyname(&key, &x11name, NULL, TRANSLATE_KEYSYM_TO_X11KEYNAME);
   return x11name;
+}
+
+Key getKeyFromKeyName(char *name)
+{
+  Key key;
+
+  translate_keyname(&key, NULL, &name, TRANSLATE_KEYNAME_TO_KEYSYM);
+  return key;
 }
 
 Key getKeyFromX11KeyName(char *x11name)

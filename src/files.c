@@ -1183,6 +1183,12 @@ void SaveScore(int level_nr)
 
 #define NUM_GLOBAL_SETUP_TOKENS		15
 
+/* shortcut setup */
+#define SETUP_TOKEN_SAVE_GAME		0
+#define SETUP_TOKEN_LOAD_GAME		1
+
+#define NUM_SHORTCUT_SETUP_TOKENS	2
+
 /* player setup */
 #define SETUP_TOKEN_USE_JOYSTICK	0
 #define SETUP_TOKEN_JOY_DEVICE_NAME	1
@@ -1204,26 +1210,34 @@ void SaveScore(int level_nr)
 #define NUM_PLAYER_SETUP_TOKENS		16
 
 static struct SetupInfo si;
+static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
 
 static struct TokenInfo global_setup_tokens[] =
 {
   /* global setup */
-  { TYPE_STRING,  &si.player_name,	"player_name"			},
-  { TYPE_SWITCH,  &si.sound,		"sound"				},
-  { TYPE_SWITCH,  &si.sound_loops,	"repeating_sound_loops"		},
-  { TYPE_SWITCH,  &si.sound_music,	"background_music"		},
-  { TYPE_SWITCH,  &si.sound_simple,	"simple_sound_effects"		},
-  { TYPE_SWITCH,  &si.toons,		"toons"				},
-  { TYPE_SWITCH,  &si.scroll_delay,	"scroll_delay"			},
-  { TYPE_SWITCH,  &si.soft_scrolling,	"soft_scrolling"		},
-  { TYPE_SWITCH,  &si.fading,		"screen_fading"			},
-  { TYPE_SWITCH,  &si.autorecord,	"automatic_tape_recording"	},
-  { TYPE_SWITCH,  &si.quick_doors,	"quick_doors"			},
-  { TYPE_SWITCH,  &si.team_mode,	"team_mode"			},
-  { TYPE_SWITCH,  &si.handicap,		"handicap"			},
-  { TYPE_SWITCH,  &si.time_limit,	"time_limit"			},
-  { TYPE_SWITCH,  &si.fullscreen,	"fullscreen"			}
+  { TYPE_STRING, &si.player_name,	"player_name"			},
+  { TYPE_SWITCH, &si.sound,		"sound"				},
+  { TYPE_SWITCH, &si.sound_loops,	"repeating_sound_loops"		},
+  { TYPE_SWITCH, &si.sound_music,	"background_music"		},
+  { TYPE_SWITCH, &si.sound_simple,	"simple_sound_effects"		},
+  { TYPE_SWITCH, &si.toons,		"toons"				},
+  { TYPE_SWITCH, &si.scroll_delay,	"scroll_delay"			},
+  { TYPE_SWITCH, &si.soft_scrolling,	"soft_scrolling"		},
+  { TYPE_SWITCH, &si.fading,		"screen_fading"			},
+  { TYPE_SWITCH, &si.autorecord,	"automatic_tape_recording"	},
+  { TYPE_SWITCH, &si.quick_doors,	"quick_doors"			},
+  { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
+  { TYPE_SWITCH, &si.handicap,		"handicap"			},
+  { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
+  { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			}
+};
+
+static struct TokenInfo shortcut_setup_tokens[] =
+{
+  /* shortcut setup */
+  { TYPE_KEY_X11, &ssi.save_game,		"shortcut.save_game"	},
+  { TYPE_KEY_X11, &ssi.load_game,		"shortcut.load_game"	}
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -1239,12 +1253,12 @@ static struct TokenInfo player_setup_tokens[] =
   { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
   { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
   { TYPE_INTEGER, &sii.joy.bomb,	".joy.place_bomb"		},
-  { TYPE_KEY,     &sii.key.left,	".key.move_left"		},
-  { TYPE_KEY,     &sii.key.right,	".key.move_right"		},
-  { TYPE_KEY,     &sii.key.up,		".key.move_up"			},
-  { TYPE_KEY,     &sii.key.down,	".key.move_down"		},
-  { TYPE_KEY,     &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEY,     &sii.key.bomb,	".key.place_bomb"		}
+  { TYPE_KEY_X11, &sii.key.left,	".key.move_left"		},
+  { TYPE_KEY_X11, &sii.key.right,	".key.move_right"		},
+  { TYPE_KEY_X11, &sii.key.up,		".key.move_up"			},
+  { TYPE_KEY_X11, &sii.key.down,	".key.move_down"		},
+  { TYPE_KEY_X11, &sii.key.snap,	".key.snap_field"		},
+  { TYPE_KEY_X11, &sii.key.bomb,	".key.place_bomb"		}
 };
 
 static void setSetupInfoToDefaults(struct SetupInfo *si)
@@ -1269,6 +1283,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->handicap = TRUE;
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
+
+  si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
+  si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
 
   for (i=0; i<MAX_PLAYERS; i++)
   {
@@ -1298,14 +1315,21 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   if (!setup_file_list)
     return;
 
-  /* handle global setup values */
+  /* global setup */
   si = setup;
   for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
     setSetupInfo(global_setup_tokens, i,
 		 getTokenValue(setup_file_list, global_setup_tokens[i].text));
   setup = si;
 
-  /* handle player specific setup values */
+  /* shortcut setup */
+  ssi = setup.shortcut;
+  for (i=0; i<NUM_SHORTCUT_SETUP_TOKENS; i++)
+    setSetupInfo(shortcut_setup_tokens, i,
+		 getTokenValue(setup_file_list,shortcut_setup_tokens[i].text));
+  setup.shortcut = ssi;
+
+  /* player setup */
   for (pnr=0; pnr<MAX_PLAYERS; pnr++)
   {
     char prefix[30];
@@ -1378,7 +1402,7 @@ void SaveSetup()
 					       getCookie("SETUP")));
   fprintf(file, "\n");
 
-  /* handle global setup values */
+  /* global setup */
   si = setup;
   for (i=0; i<NUM_GLOBAL_SETUP_TOKENS; i++)
   {
@@ -1389,7 +1413,13 @@ void SaveSetup()
       fprintf(file, "\n");
   }
 
-  /* handle player specific setup values */
+  /* shortcut setup */
+  ssi = setup.shortcut;
+  fprintf(file, "\n");
+  for (i=0; i<NUM_SHORTCUT_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(shortcut_setup_tokens, "", i));
+
+  /* player setup */
   for (pnr=0; pnr<MAX_PLAYERS; pnr++)
   {
     char prefix[30];

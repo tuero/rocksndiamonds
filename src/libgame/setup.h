@@ -22,20 +22,34 @@
 #define TYPE_SWITCH			(1 << 1)
 #define TYPE_YES_NO			(1 << 2)
 #define TYPE_KEY			(1 << 3)
-#define TYPE_INTEGER			(1 << 4)
-#define TYPE_STRING			(1 << 5)
+#define TYPE_KEY_X11			(1 << 4)
+#define TYPE_INTEGER			(1 << 5)
+#define TYPE_STRING			(1 << 6)
 
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
 					 TYPE_SWITCH  | \
 					 TYPE_YES_NO)
 
 /* additional values for setup screen */
-#define TYPE_ENTER_MENU			(1 << 6)
-#define TYPE_LEAVE_MENU			(1 << 7)
-#define TYPE_EMPTY			(1 << 8)
-#define TYPE_GHOSTED			(1 << 9)
+#define TYPE_ENTER_MENU			(1 << 7)
+#define TYPE_LEAVE_MENU			(1 << 8)
+#define TYPE_EMPTY			(1 << 9)
+#define TYPE_KEYTEXT			(1 << 10)
 
-#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_MENU | TYPE_LEAVE_MENU)
+#define TYPE_GHOSTED			(1 << 11)
+#define TYPE_QUERY			(1 << 12)
+
+#define TYPE_VALUE			(TYPE_BOOLEAN_STYLE | \
+					 TYPE_KEY | \
+					 TYPE_KEY_X11 | \
+					 TYPE_INTEGER | \
+					 TYPE_STRING)
+
+#define TYPE_SKIP_ENTRY			(TYPE_EMPTY | \
+					 TYPE_KEY)
+
+#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_MENU | \
+					 TYPE_LEAVE_MENU)
 
 /* cookie token for file identifier and version number */
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"

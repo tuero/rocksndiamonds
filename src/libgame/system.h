@@ -48,6 +48,10 @@
 #define DEFAULT_KEY_OKAY	KSYM_Return
 #define DEFAULT_KEY_CANCEL	KSYM_Escape
 
+/* default shortcut keys */
+#define DEFAULT_KEY_SAVE_GAME	KSYM_F1
+#define DEFAULT_KEY_LOAD_GAME	KSYM_F2
+
 /* values for move directions */
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << 0)
@@ -283,6 +287,12 @@ struct SetupInputInfo
   struct SetupKeyboardInfo key;
 };
 
+struct SetupShortcutInfo
+{
+  Key save_game;
+  Key load_game;
+};
+
 struct SetupInfo
 {
   char *player_name;
@@ -304,6 +314,7 @@ struct SetupInfo
   boolean time_limit;
   boolean fullscreen;
 
+  struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
 };
 
