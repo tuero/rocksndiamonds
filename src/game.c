@@ -1505,9 +1505,9 @@ void Explode(int ex, int ey, int phase, int mode)
   {
     int center_element = Feld[ex][ey];
 
-    /* remove things displayed in background while burnig dynamite */
-    if (!IS_INDESTRUCTIBLE(Back[x][y]))
-      Back[x][y] = 0;
+    /* remove things displayed in background while burning dynamite */
+    if (!IS_INDESTRUCTIBLE(Back[ex][ey]))
+      Back[ex][ey] = 0;
 
     if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
     {
