@@ -76,8 +76,7 @@ endif
 
 ifeq ($(TARGET),x11)
 SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
-# SYS_LDFLAGS = $(X11_LIBS) -lX11
-SYS_LDFLAGS = $(XLIB_PATH)/libX11.a
+SYS_LDFLAGS = $(X11_LIBS) -lX11
 endif
 
 ifeq ($(TARGET),sdl)

@@ -617,7 +617,7 @@ struct TreeInfo
 
   /* fields for "type == TREE_TYPE_LEVEL_DIR" */
 
-  char *filename;	/* tree info sub-directory basename (may be ".") */
+  char *subdir;		/* tree info sub-directory basename (may be ".") */
   char *fullpath;	/* complete path relative to tree base directory */
   char *basepath;	/* absolute base path of tree base directory */
   char *identifier;	/* identifier string for configuration files */
@@ -632,6 +632,9 @@ struct TreeInfo
   char *graphics_path;	/* path to optional custom graphics set (level only) */
   char *sounds_path;	/* path to optional custom sounds set (level only) */
   char *music_path;	/* path to optional custom music set (level only) */
+
+  char *level_filename;	/* filename of level file (for packed level file) */
+  char *level_filetype;	/* type of levels in level directory or level file */
 
   int levels;		/* number of levels in level series */
   int first_level;	/* first level number (to allow start with 0 or 1) */

@@ -329,8 +329,9 @@ static char *getSingleLevelBasename(int nr, int type)
 {
   static char basename[MAX_FILENAME_LEN];
 
-  if (leveldir_current->filename == NULL)
-    leveldir_current->filename = getStringCat2("%%03d.%s",LEVELFILE_EXTENSION);
+  if (leveldir_current->level_filename == NULL)
+    leveldir_current->level_filename =
+      getStringCat2("%%03d.", LEVELFILE_EXTENSION);
 
   switch (type)
   {
@@ -347,7 +348,7 @@ static char *getSingleLevelBasename(int nr, int type)
 
     case LEVEL_FILE_TYPE_UNKNOWN:
     default:
-      sprintf(basename, leveldir_current->filename, nr);
+      sprintf(basename, leveldir_current->level_filename, nr);
       break;
   }
 
@@ -357,13 +358,47 @@ static char *getSingleLevelBasename(int nr, int type)
 static char *getPackedLevelBasename(int type)
 {
   static char basename[MAX_FILENAME_LEN];
+  char *directory = getCurrentLevelDir();
+  DIR *dir;
+  struct dirent *dir_entry;
 
-  switch (type)
+  strcpy(basename, UNDEFINED_FILENAME);		/* default: undefined file */
+
+  if ((dir = opendir(directory)) == NULL)
   {
-    default:
-      strcpy(basename, UNDEFINED_FILENAME);
+    Error(ERR_WARN, "cannot read current level directory '%s'", directory);
+
+    return basename;
+  }
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
+  {
+    char *entry_basename = dir_entry->d_name;
+    boolean valid_entry_found = FALSE;
+
+    switch (type)
+    {
+      case LEVEL_FILE_TYPE_SP:
+	if (strlen(entry_basename) == 10 &&
+	    (strncmp(entry_basename, "levels.d", 8) == 0 ||
+	     strncmp(entry_basename, "LEVELS.D", 8) == 0))
+	{
+	  /* looks like a typical filename of a Supaplex level package file */
+	  strcpy(basename, entry_basename);
+	  valid_entry_found = TRUE;
+	}
+	break;
+
+      default:
+	valid_entry_found = TRUE;
+	break;
+    }
+
+    if (valid_entry_found)
       break;
   }
+
+  closedir(dir);
 
   return basename;
 }
@@ -389,32 +424,35 @@ static void setLevelFileInfo_Filename(struct LevelFileInfo *lfi)
   if (lfi->nr < 0)
   {
     lfi->type = LEVEL_FILE_TYPE_RND;
-    lfi->filename = getDefaultLevelFilename(nr);
+    lfi->filename = getDefaultLevelFilename(lfi->nr);
 
     return;
   }
 
-  if (leveldir_current->filename != NULL)
+  if (leveldir_current->level_filename != NULL)
   {
-    /* 1st try: check for file name/pattern specified in "levelinfo.conf" */
+    /* check for file name/pattern specified in "levelinfo.conf" */
     lfi->type = LEVEL_FILE_TYPE_UNKNOWN;
     lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
-
     if (fileExists(lfi->filename))
       return;
   }
 
-  /* 2nd try: check for native Rocks'n'Diamonds level file */
+  /* check for native Rocks'n'Diamonds level file */
   lfi->type = LEVEL_FILE_TYPE_RND;
   lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
-
   if (fileExists(lfi->filename))
     return;
 
-  /* 3rd try: check for classic Emerald Mine level file */
+  /* check for classic Emerald Mine level file */
   lfi->type = LEVEL_FILE_TYPE_EM;
   lfi->filename = getSingleLevelFilename(lfi->nr, lfi->type);
+  if (fileExists(lfi->filename))
+    return;
 
+  /* check for packed Supaplex level file */
+  lfi->type = LEVEL_FILE_TYPE_SP;
+  lfi->filename = getPackedLevelFilename(lfi->type);
   if (fileExists(lfi->filename))
     return;
 
@@ -427,18 +465,16 @@ static void setLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
 {
   struct stat file_status;
 
-  if (level_file_info.type != LEVEL_FILE_TYPE_UNKNOWN)
+  if (lfi->type != LEVEL_FILE_TYPE_UNKNOWN)
     return;
 
   /* ---------- try to determine file type from filename ---------- */
 
   if (strlen(lfi->filename) == 10 &&
       (strncmp(lfi->filename, "levels.d", 8) == 0 ||
-       strncmp(lfi->filename, "LEVELS.D", 8) == 0) &&
-      lfi->filename[8] >= '0' && lfi->filename[8] <= '9' &&
-      lfi->filename[9] >= '0' && lfi->filename[9] <= '9')
+       strncmp(lfi->filename, "LEVELS.D", 8) == 0))
   {
-    /* this looks like a typical filename of a Supaplex level package file */
+    /* looks like a typical filename of a Supaplex level package file */
     lfi->type = LEVEL_FILE_TYPE_SP;
 
     return;
@@ -448,9 +484,9 @@ static void setLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
 
   if (stat(lfi->filename, &file_status) == 0)
   {
-    if (file_status.off_t == 170496)
+    if (file_status.st_size == 170496)
     {
-      /* this looks like a typical filesize of a Supaplex level package file */
+      /* looks like a typical filesize of a Supaplex level package file */
       lfi->type = LEVEL_FILE_TYPE_SP;
 
       return;
@@ -1487,7 +1523,8 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 #define SP_LEVEL_YSIZE			24
 #define SP_LEVEL_NAME_LEN		23
 
-static void LoadLevelFromFileStream_SP(struct LevelInfo *level, FILE *file)
+static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
+				       int nr)
 {
   int i, x, y;
 
@@ -1500,15 +1537,15 @@ static void LoadLevelFromFileStream_SP(struct LevelInfo *level, FILE *file)
       int element_new;
 
       if (element_old <= 0x27)
-	element_new = EL_SP_START + element_old;
+	element_new = getMappedElement(EL_SP_START + element_old);
       else if (element_old == 0x28)
 	element_new = EL_INVISIBLE_WALL;
       else
       {
-	Error(ERR_WARN, "in level %d, at position %d, %d:", l, x, y);
+	Error(ERR_WARN, "in level %d, at position %d, %d:", nr, x, y);
 	Error(ERR_WARN, "invalid level element %d", element_old);
 
-	element_new = EL_CHAR_FRAGE;
+	element_new = EL_CHAR_QUESTION;
       }
 
       level->field[x][y] = element_new;
@@ -1518,7 +1555,7 @@ static void LoadLevelFromFileStream_SP(struct LevelInfo *level, FILE *file)
   ReadUnusedBytesFromFile(file, 4);
 
   /* Initial gravitation: 1 == "on", anything else (0) == "off" */
-  level->gravity = (fgetc(file) == 1 ? TRUE : FALSE);
+  level->initial_gravity = (fgetc(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, 1);
 
@@ -1562,7 +1599,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 {
   char *filename = level_file_info->filename;
   FILE *file;
-  int nr = level_file_info->nr;
+  int nr = level_file_info->nr - leveldir_current->first_level;
   int i, l, x, y;
   char name_first, name_last;
   struct LevelInfo multipart_level;
@@ -1601,7 +1638,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 
   for (l = nr; l < NUM_SUPAPLEX_LEVELS_PER_PACKAGE; l++)
   {
-    LoadLevelFromFileStream_SP(level, file);
+    LoadLevelFromFileStream_SP(file, level, l);
 
     /* check if this level is a part of a bigger multi-part level */
 
@@ -1667,12 +1704,12 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
     if (is_first_part)	/* start with first part of new multi-part level */
     {
       /* copy level info structure from first part */
-      multipart_level = level;
+      multipart_level = *level;
 
       /* clear playfield of new multi-part level */
       for (y = 0; y < MAX_LEV_FIELDY; y++)
 	for (x = 0; x < MAX_LEV_FIELDX; x++)
-	  multipart_level->field[x][y] = EL_EMPTY;
+	  multipart_level.field[x][y] = EL_EMPTY;
     }
 
     if (name_first == '?')
@@ -1683,8 +1720,8 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
     multipart_xpos = (int)(name_first - '0');
     multipart_ypos = (int)(name_last  - '0');
 
-#if 1
-    printf("----------> Part (%d/%d) of multi-part level '%s'\n",
+#if 0
+    printf("----------> part (%d/%d) of multi-part level '%s'\n",
 	   multipart_xpos, multipart_ypos, multipart_level.name);
 #endif
 
@@ -1709,7 +1746,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 	int start_x = (multipart_xpos - 1) * SP_LEVEL_XSIZE;
 	int start_y = (multipart_ypos - 1) * SP_LEVEL_YSIZE;
 
-	multipart_level->field[start_x + x][start_y + y] = level->field[x][y];
+	multipart_level.field[start_x + x][start_y + y] = level->field[x][y];
       }
     }
   }
@@ -2992,7 +3029,7 @@ void SaveTape(int nr)
   int body_chunk_size;
   int i;
 
-  InitTapeDirectory(leveldir_current->filename);
+  InitTapeDirectory(leveldir_current->subdir);
 
   /* if a tape still exists, ask to overwrite it */
   if (access(filename, F_OK) == 0)
@@ -3154,7 +3191,7 @@ void SaveScore(int nr)
   char *filename = getScoreFilename(nr);
   FILE *file;
 
-  InitScoreDirectory(leveldir_current->filename);
+  InitScoreDirectory(leveldir_current->subdir);
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
