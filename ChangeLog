@@ -1,3 +1,6 @@
+2004-12-30
+	* level data now reset to defaults after attempt to load invalid file
+
 2004-11-13
 	* added use of "editorsetup.conf" for different level sets
 
