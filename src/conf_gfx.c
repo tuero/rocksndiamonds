@@ -1125,6 +1125,12 @@ struct ConfigInfo image_config[] =
   { "exit_open.frames",				"4"			},
   { "exit_open.delay",				"4"			},
   { "exit_open.anim_mode",			"pingpong"		},
+  { "exit.closing",				"RocksElements.pcx"	},
+  { "exit.closing.xpos",			"0"			},
+  { "exit.closing.ypos",			"11"			},
+  { "exit.closing.frames",			"5"			},
+  { "exit.closing.delay",			"6"			},
+  { "exit.closing.anim_mode",			"linear,reverse"	},
 
   /* images for Emerald Mine Club style elements and actions */
 

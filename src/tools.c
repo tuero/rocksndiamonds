@@ -1298,6 +1298,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
 #if 1
       graphic = el_act2crm(Feld[xx][yy], ACTION_DEFAULT);
+      crumbled_border_size = graphic_info[graphic].border_size;
 
       getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 #endif

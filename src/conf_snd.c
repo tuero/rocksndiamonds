@@ -125,6 +125,7 @@ struct ConfigInfo sound_config[] =
   { "[quicksand].filling",		UNDEFINED_FILENAME	},
   { "[quicksand].emptying",		UNDEFINED_FILENAME	},
   { "[exit].opening",			"oeffnen.wav"		},
+  { "[exit].closing",			"oeffnen.wav"		},
   { "[exit].passing",			"buing.wav"		},
   { "penguin.passing",			"buing.wav"		},
 

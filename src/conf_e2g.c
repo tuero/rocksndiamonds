@@ -942,6 +942,10 @@ element_to_graphic[] =
     IMG_EXIT_OPEN
   },
   {
+    EL_EXIT_CLOSING,			-1, -1, FALSE,
+    IMG_EXIT_CLOSING
+  },
+  {
     EL_BALLOON,				-1, -1, FALSE,
     IMG_BALLOON
   },

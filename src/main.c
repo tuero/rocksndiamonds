@@ -3344,6 +3344,11 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "exit_closing",
+    "exit",
+    "-"
+  },
+  {
     "sp_exit_open",
     "sp_exit",
     "-"

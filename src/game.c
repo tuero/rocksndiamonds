@@ -242,6 +242,14 @@ static struct ChangingElementInfo change_delay_list[] =
     NULL
   },
   {
+    EL_EXIT_CLOSING,
+    EL_EXIT_CLOSED,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_OPEN,
     29,
@@ -1646,6 +1654,14 @@ void GameWon()
       StopSound(SND_GAME_LEVELTIME_BONUS);
   }
 
+  /* close exit door after last player */
+  if (Feld[ExitX][ExitY] == EL_EXIT_OPEN && AllPlayersGone)
+  {
+    Feld[ExitX][ExitY] = EL_EXIT_CLOSING;
+
+    PlaySoundLevelElementAction(ExitX, ExitY, EL_EXIT_OPEN, ACTION_CLOSING);
+  }
+
   /* Hero disappears */
   DrawLevelField(ExitX, ExitY);
   BackToFront();
@@ -2294,8 +2310,10 @@ void Explode(int ex, int ey, int phase, int mode)
 
   if (GfxElement[x][y] == EL_UNDEFINED)
   {
+    printf("\n\n\n");
     printf("Explode(): x = %d, y = %d: GfxElement == EL_UNDEFINED\n", x, y);
     printf("Explode(): This should never happen!\n");
+    printf("\n\n\n");
 
     GfxElement[x][y] = EL_EMPTY;
   }
@@ -4988,6 +5006,9 @@ void CheckExit(int x, int y)
 
     return;
   }
+
+  if (AllPlayersGone)	/* do not re-open exit door closed after last player */
+    return;
 
   Feld[x][y] = EL_EXIT_OPENING;
 
