@@ -878,7 +878,9 @@ void DrawPlayer(struct PlayerInfo *player)
   else if (player_is_moving && IS_ACCESSIBLE_UNDER(last_element))
     DrawLevelFieldThruMask(last_jx, last_jy);
 
-#if 1
+#if 0
+  /* !!! I have forgotton what this should be good for !!! */
+  /* !!! causes player being visible when pushing from within tubes !!! */
   if (!player->is_pushing)
 #endif
   {

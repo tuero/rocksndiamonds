@@ -117,6 +117,9 @@ enginetestcustom: all
 enginetestfast: all
 	./Scripts/make_enginetest.sh fast
 
+enginetestnew: all
+	./Scripts/make_enginetest.sh new
+
 backup:
 	./Scripts/make_backup.sh src
 

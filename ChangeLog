@@ -1,5 +1,7 @@
 2004-04-20
 	* added "replace when walkable" to relocate player to walkable element
+	* added "enter"/"leave" event for elements affected by relocation
+	* fixed "direct"/"indirect" change order also for "when change" event
 
 2004-04-18
 	* fixed graphic bug when player is snapping while moving in old levels

@@ -2893,8 +2893,11 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   Feld[jx][jy] = el_player;
   InitPlayerField(jx, jy, el_player, TRUE);
 
-  Feld[jx][jy] = element;	/* player may be set on walkable element */
-  InitField(jx, jy, FALSE);
+  if (!ELEM_IS_PLAYER(element))	/* player may be set on walkable element */
+  {
+    Feld[jx][jy] = element;
+    InitField(jx, jy, FALSE);
+  }
 
 #if 1
   if (player == local_player)	/* only visually relocate local player */
@@ -7376,6 +7379,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
   int target_element;
+  int old_element = Feld[x][y];
 
   /* always use default change event to prevent running into a loop */
   if (ChangeEvent[x][y] == CE_BITMASK_DEFAULT)
@@ -7399,7 +7403,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
-#if 1
+#if 0
   /* !!! indirect change before direct change !!! */
   CheckTriggeredElementChangeByPage(x,y,Feld[x][y], CE_OTHER_IS_CHANGING,page);
 #endif
@@ -7548,6 +7552,11 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
   }
+
+#if 1
+  /* !!! indirect change before direct change !!! */
+  CheckTriggeredElementChangeByPage(x,y,old_element,CE_OTHER_IS_CHANGING,page);
+#endif
 
   return TRUE;
 }
