@@ -122,6 +122,7 @@ char *progname;
 char *arg_basedir;
 
 extern void tab_generate();
+extern void tab_generate_graphics_info_em();
 extern void ulaw_generate();
 
 int open_all(void)
@@ -243,6 +244,9 @@ void em_open_all()
 
   if (open_all() != 0)
     Error(ERR_EXIT, "em_open_all(): open_all() failed");
+
+  /* after "open_all()", because we need the graphic bitmaps to be defined */
+  tab_generate_graphics_info_em();
 
   game_init_vars();
 }

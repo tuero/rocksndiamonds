@@ -87,15 +87,33 @@ static void animscreen(void)
 
     for (x = left; x < left + MAX_BUF_XSIZE; x++)
     {
+      int tile = Draw[y][x];
+
       dx = x % MAX_BUF_XSIZE;
-      obj = map_obj[frame][Draw[y][x]];
+      obj = map_obj[frame][tile];
 
       if (screentiles[dy][dx] != obj)
       {
-	screentiles[dy][dx] = obj;
+#if 1
+	struct GraphicInfo_EM *g = &graphic_info_em[tile][frame];
+	int dst_x = dx * TILEX;
+	int dst_y = dy * TILEY;
+
+	if (g->width != TILEX || g->height != TILEY)
+	  ClearRectangle(screenBitmap, dst_x, dst_y, TILEX, TILEY);
+
+	if (g->width > 0 && g->height > 0)
+	  BlitBitmap(g->bitmap, screenBitmap,
+		     g->src_x + g->src_offset_x, g->src_y + g->src_offset_y,
+		     g->width, g->height,
+		     dst_x + g->dst_offset_x, dst_y + g->dst_offset_y);
+#else
 	BlitBitmap(objBitmap, screenBitmap,
 		   (obj / 512) * TILEX, (obj % 512) * TILEY / 16,
 		   TILEX, TILEY, dx * TILEX, dy * TILEY);
+#endif
+
+	screentiles[dy][dx] = obj;
       }
     }
   }

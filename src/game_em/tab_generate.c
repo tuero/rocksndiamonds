@@ -12,6 +12,7 @@
  */
 
 #include "tile.h"
+#include "display.h"
 
 
 /* ---------------------------------------------------------------------- */
@@ -4322,18 +4323,21 @@ unsigned short map_spr[2][8][13];
 /* map ascii to coords */
 unsigned short map_ttl[128];
 
+/* map tiles and frames to graphics info */
+struct GraphicInfo_EM graphic_info_em[TILE_MAX][8];
+
 void create_tab(int *invert, unsigned char *array)
 {
   int i;
   int buffer[TILE_MAX];
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
     buffer[i] = 0;
 
-  for(;invert[0] < TILE_MAX; invert += 2)
+  for (;invert[0] < TILE_MAX; invert += 2)
     buffer[invert[0]] = invert[1];
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
     array[i] = buffer[i];
 }
 
@@ -4343,20 +4347,20 @@ void create_explode()
   int *tile = tile_explode;
   int buffer[TILE_MAX];
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
     buffer[i] = Xboom_1;
-  while((i = *tile++) < TILE_MAX)
+  while ((i = *tile++) < TILE_MAX)
     buffer[i] = i;			/* these tiles are indestructable */
-  while((i = *tile++) < TILE_MAX)
+  while ((i = *tile++) < TILE_MAX)
     buffer[i] = *tile++;		/* these tiles are special */
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
     tab_explode_normal[i] = buffer[i];
 
-  while((i = *tile++) < TILE_MAX)
+  while ((i = *tile++) < TILE_MAX)
     buffer[i] = *tile++;		/* these tiles for dynamite */
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
     tab_explode_dynamite[i] = buffer[i];
 }
 
@@ -4370,13 +4374,13 @@ void create_obj()
 
   int debug = 0;
 
-  for(i = 0; i < 8; i++)
-    for(j = 0; j < TILE_MAX; j++)
+  for (i = 0; i < 8; i++)
+    for (j = 0; j < TILE_MAX; j++)
       buffer[i][j] = 0;
 
-  for(i = 0; i < 64; i++)
+  for (i = 0; i < 64; i++)
   {
-    for(;*map != -1; map += 2)
+    for (;*map != -1; map += 2)
     {
       if (map[0] < 0 || map[0] >= TILE_MAX || map[1] < 0 || map[1] >= 8)
       {
@@ -4390,9 +4394,9 @@ void create_obj()
     map++;
   }
 
-  for(i = 0; i < 896; i++)
+  for (i = 0; i < 896; i++)
   {
-    for(;*map != -1; map += 2)
+    for (;*map != -1; map += 2)
     {
       if (map[0] < 0 || map[0] >= TILE_MAX || map[1] < 0 || map[1] >= 8)
       {
@@ -4405,9 +4409,9 @@ void create_obj()
     map++;
   }
 
-  for(i = 0; i < TILE_MAX; i++)
+  for (i = 0; i < TILE_MAX; i++)
   {
-    for(j = 0; j < 8; j++)
+    for (j = 0; j < 8; j++)
     {
       switch(buffer[j][i])
       {
@@ -4425,45 +4429,71 @@ void create_obj()
     }
   }
 
-  if(sizeof(obj_map) / sizeof(*obj_map) != map - obj_map)
+  if (sizeof(obj_map) / sizeof(*obj_map) != map - obj_map)
   {
     fprintf(stderr, "obj_map: bad end (%d != %d)\n", 
 	    sizeof(obj_map) / sizeof(*obj_map), map - obj_map);
     debug = 1;
   }
 
-  if(debug == 0)
+  if (debug == 0)
     fprintf(stderr, "obj_map: looks good, now disable debug code\n");
 
   abort();
 
 #else
 
-  for(i = 0; i < 8; i++)
-    for(j = 0; j < TILE_MAX; j++)
+  for (i = 0; i < 8; i++)
+    for (j = 0; j < TILE_MAX; j++)
       buffer[i][j] = Xblank;
 
   /* special case for first 64 entries */
-  for(i = 0; i < 64; i++)
+  for (i = 0; i < 64; i++)
   {
-    for(;*map != -1; map += 2)
+    for (;*map != -1; map += 2)
       buffer[map[1]][map[0]] = i;
     map++;
   }
 
   /* now regular entries */
-  for(i = 0; i < 896 * 16; i += 16)
+  for (i = 0; i < 896 * 16; i += 16)
   {
-    for(;*map != -1; map += 2)
+    for (;*map != -1; map += 2)
       buffer[map[1]][map[0]] = i;
     map++;
   }
 
-  for(i = 0; i < 8; i++)
-    for(j = 0; j < TILE_MAX; j++)
+  for (i = 0; i < 8; i++)
+    for (j = 0; j < TILE_MAX; j++)
       map_obj[i][j] = buffer[7 - i][j];
 
 #endif
+}
+
+void create_obj_graphics_info_em()
+{
+  int i, j;
+
+  for (i = 0; i < TILE_MAX; i++)
+  {
+    for (j = 0; j < 8; j++)
+    {
+      struct GraphicInfo_EM *g = &graphic_info_em[i][j];
+      int obj = map_obj[j][i];
+
+      g->bitmap = objBitmap;
+      g->src_x = (obj / 512) * TILEX;
+      g->src_y = (obj % 512) * TILEY / 16;
+      g->src_offset_x = 0;
+      g->src_offset_y = 0;
+      g->dst_offset_x = 0;
+      g->dst_offset_y = 0;
+      g->width = TILEX;
+      g->height = TILEY;
+    }
+  }
+
+  InitGraphicsInfoEM();
 }
 
 void create_spr()
@@ -4472,17 +4502,17 @@ void create_spr()
   int *map = spr_map;
   int buffer[2][8][SPR_MAX];
 
-  while(*map < SPR_MAX)
+  while (*map < SPR_MAX)
   {
     i = *map++;
     j = *map++;
-    for(k = 0; k < 8; k++)
+    for (k = 0; k < 8; k++)
       buffer[j][k][i] = *map++;
   }
 
-  for(i = 0; i < 2; i++)
-    for(j = 0; j < 8; j++)
-      for(k = 0; k < SPR_MAX; k++)
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 8; j++)
+      for (k = 0; k < SPR_MAX; k++)
 	map_spr[i][j][k] = buffer[i][7 - j][k];
 }
 
@@ -4495,4 +4525,9 @@ void tab_generate()
   create_explode();
   create_obj();
   create_spr();
+}
+
+void tab_generate_graphics_info_em()
+{
+  create_obj_graphics_info_em();
 }

@@ -3625,6 +3625,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "slippery wall"
   },
   {
+    "emc_fake_grass",
+    "fake_grass",
+    "fake_grass"
+  },
+  {
     "emc_dripper",
     "dripper",
     "dripper"
@@ -4168,6 +4173,10 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".turning_from_right",	ACTION_TURNING_FROM_RIGHT,	FALSE	},
   { ".turning_from_up",		ACTION_TURNING_FROM_UP,		FALSE	},
   { ".turning_from_down",	ACTION_TURNING_FROM_DOWN,	FALSE	},
+  { ".smashed_by_rock",		ACTION_SMASHED_BY_ROCK,		FALSE	},
+  { ".smashed_by_spring",	ACTION_SMASHED_BY_SPRING,	FALSE	},
+  { ".slurped_by_spring",	ACTION_SLURPED_BY_SPRING,	FALSE	},
+  { ".twinkling",		ACTION_TWINKLING,		FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */

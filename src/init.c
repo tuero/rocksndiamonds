@@ -615,6 +615,69 @@ void InitElementGraphicInfo()
   }
 #endif
 
+#if 1
+  /* adjust graphics with 2nd tile for movement according to direction
+     (do this before correcting '-1' values to minimize calculations) */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    for (act = 0; act < NUM_ACTIONS; act++)
+    {
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      {
+	int graphic = element_info[i].direction_graphic[act][dir];
+	int move_dir = (act == ACTION_FALLING ? MV_BIT_DOWN : dir);
+
+	if (act == ACTION_FALLING)	/* special case */
+	  graphic = element_info[i].graphic[act];
+
+	if (graphic != -1 && graphic_info[graphic].double_movement)
+	{
+	  struct GraphicInfo *g = &graphic_info[graphic];
+	  int src_x_front = g->src_x;
+	  int src_y_front = g->src_y;
+	  int src_x_back = g->src_x + g->offset2_x;
+	  int src_y_back = g->src_y + g->offset2_y;
+	  boolean frames_are_ordered_diagonally = (g->offset_x != 0 &&
+						   g->offset_y != 0);
+	  boolean front_is_left_or_upper = (src_x_front < src_x_back ||
+					    src_y_front < src_y_back);
+	  Bitmap *dummy;
+
+#if 0
+	  printf("::: CHECKING ELEMENT %d ('%s'), ACTION '%s', DIRECTION %d\n",
+		 i, element_info[i].token_name,
+		 element_action_info[act].suffix, move_dir);
+#endif
+
+	  /* swap frontside and backside graphic tile coordinates, if needed */
+	  if (!frames_are_ordered_diagonally &&
+	      ((move_dir == MV_BIT_LEFT  && !front_is_left_or_upper) ||
+	       (move_dir == MV_BIT_RIGHT && front_is_left_or_upper) ||
+	       (move_dir == MV_BIT_UP    && !front_is_left_or_upper) ||
+	       (move_dir == MV_BIT_DOWN  && front_is_left_or_upper)))
+	  {
+	    /* get current (wrong) backside tile coordinates */
+	    getGraphicSourceExt(graphic, 0, &dummy, &src_x_back, &src_y_back,
+				TRUE);
+
+	    /* set frontside tile coordinates to backside tile coordinates */
+	    g->src_x = src_x_back;
+	    g->src_y = src_y_back;
+
+	    /* invert tile offset to point to new backside tile coordinates */
+	    g->offset2_x *= -1;
+	    g->offset2_y *= -1;
+
+#if 0
+	    printf("    CORRECTED\n");
+#endif
+	  }
+	}
+      }
+    }
+  }
+#endif
+
   /* now set all '-1' values to element specific default values */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -691,6 +754,7 @@ void InitElementGraphicInfo()
 	int default_action_direction_crumbled = element_info[i].crumbled[act];
 
 	/* no graphic for current action -- use default direction graphic */
+	/* !!! maybe it's better to use default _action_ graphic here !!! */
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
 	    (act_remove ? IMG_EMPTY :
@@ -863,6 +927,8 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   graphic_info[graphic].height = TILEY;
   graphic_info[graphic].offset_x = 0;	/* one or both of these values ... */
   graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
+  graphic_info[graphic].offset2_x = 0;	/* one or both of these values ... */
+  graphic_info[graphic].offset2_y = 0;	/* ... will be corrected later */
   graphic_info[graphic].crumbled_like = -1;	/* do not use clone element */
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
@@ -928,6 +994,28 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
     graphic_info[graphic].offset_x = parameter[GFX_ARG_XOFFSET];
   if (parameter[GFX_ARG_YOFFSET] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].offset_y = parameter[GFX_ARG_YOFFSET];
+
+  /* optionally, moving animations may have separate start and end graphics */
+  graphic_info[graphic].double_movement = parameter[GFX_ARG_2ND_MOVEMENT_TILE];
+
+  if (parameter[GFX_ARG_2ND_VERTICAL] == ARG_UNDEFINED_VALUE)
+    parameter[GFX_ARG_2ND_VERTICAL] = !parameter[GFX_ARG_VERTICAL];
+
+  /* correct x or y offset2 dependent of vertical or horizontal frame order */
+  if (parameter[GFX_ARG_2ND_VERTICAL])	/* frames are ordered vertically */
+    graphic_info[graphic].offset2_y =
+      (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
+       parameter[GFX_ARG_2ND_OFFSET] : graphic_info[graphic].height);
+  else					/* frames are ordered horizontally */
+    graphic_info[graphic].offset2_x =
+      (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
+       parameter[GFX_ARG_2ND_OFFSET] : graphic_info[graphic].width);
+
+  /* optionally, the x and y offset of 2nd graphic can be specified directly */
+  if (parameter[GFX_ARG_2ND_XOFFSET] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].offset2_x = parameter[GFX_ARG_2ND_XOFFSET];
+  if (parameter[GFX_ARG_2ND_YOFFSET] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].offset2_y = parameter[GFX_ARG_2ND_YOFFSET];
 
   /* automatically determine correct number of frames, if not defined */
   if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)

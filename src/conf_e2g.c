@@ -2626,10 +2626,6 @@ element_to_graphic[] =
     IMG_EMC_GRASS
   },
   {
-    EL_EMC_GRASS,			-1, -1, TRUE,
-    IMG_EMC_GRASS_CRUMBLED
-  },
-  {
     EL_EMC_GRASS,			ACTION_DIGGING, MV_BIT_LEFT, FALSE,
     IMG_EMC_GRASS_DIGGING_LEFT
   },
@@ -2716,6 +2712,10 @@ element_to_graphic[] =
   {
     EL_EMC_WALL_SLIPPERY_4,		-1, -1, FALSE,
     IMG_EMC_WALL_SLIPPERY_4
+  },
+  {
+    EL_EMC_FAKE_GRASS,			-1, -1, FALSE,
+    IMG_EMC_FAKE_GRASS
   },
   {
     EL_EMC_DRIPPER,			-1, -1, FALSE,

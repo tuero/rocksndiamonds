@@ -94,6 +94,7 @@ extern struct PLAYER ply2;
 extern struct LEVEL lev;
 
 extern struct LevelInfo_EM native_em_level;
+extern struct GraphicInfo_EM graphic_info_em[TILE_MAX][8];
 
 extern unsigned short **Boom;
 extern unsigned short **Cave;

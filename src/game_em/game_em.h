@@ -28,6 +28,7 @@ extern void UpdateEngineValues(int, int);
 extern void DrawGameDoorValues_EM(int, int, int, int);
 extern int getGameFrameDelay_EM(int);
 extern void PlayLevelSound_EM(int, int, int, int);
+extern void InitGraphicsInfoEM(void);
 
 
 /* ========================================================================= */
@@ -37,6 +38,7 @@ extern void PlayLevelSound_EM(int, int, int, int);
 #include "main_em.h"
 
 extern struct LevelInfo_EM native_em_level;
+extern struct GraphicInfo_EM graphic_info_em[][8];
 
 extern void em_open_all();
 extern void em_close_all();

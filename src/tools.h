@@ -85,6 +85,7 @@ void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
 
+void getGraphicSourceExt(int, int, Bitmap **, int *, int *, boolean);
 void getGraphicSource(int, int, Bitmap **, int *, int *);
 void DrawGraphic(int, int, int, int);
 void DrawGraphicExt(DrawBuffer *, int, int, int, int);

@@ -1,6 +1,9 @@
 #ifndef MAIN_EM_H
 #define MAIN_EM_H
 
+#include "game_em.h"
+
+
 /* 2000-07-30T11:06:03Z ---------------------------------------------------- */
 
 #define EM_MAX_CAVE_WIDTH		102
@@ -9,6 +12,17 @@
 /* define these for backwards compatibility */
 #define EM_ENGINE_BAD_ROLL
 #define EM_ENGINE_BAD_SPRING
+
+
+/*
+  -----------------------------------------------------------------------------
+  definition of elements used in the Emerald Mine Club engine;
+  the element names have the following properties:
+  - elements that start with an 'X' can be stored in a level file;
+  - elements that start with an 'Y' indicate moving elements;
+  - elements that end with a 'B' are the "backside" of a moving element.
+  -----------------------------------------------------------------------------
+*/
 
 enum
 {
@@ -585,6 +599,15 @@ struct LevelInfo_EM
   struct PLAYER *ply1, *ply2;
 
   unsigned short cave[EM_MAX_CAVE_WIDTH][EM_MAX_CAVE_HEIGHT];
+};
+
+struct GraphicInfo_EM
+{
+  Bitmap *bitmap;
+  int src_x, src_y;
+  int src_offset_x, src_offset_y;
+  int dst_offset_x, dst_offset_y;
+  int width, height;
 };
 
 #endif	/* MAIN_EM_H */

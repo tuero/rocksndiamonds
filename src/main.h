@@ -999,9 +999,10 @@
 #define EL_EMC_WALL_SLIPPERY_2		697
 #define EL_EMC_WALL_SLIPPERY_3		698
 #define EL_EMC_WALL_SLIPPERY_4		699
-#define EL_EMC_DRIPPER			700
+#define EL_EMC_FAKE_GRASS		700
+#define EL_EMC_DRIPPER			701
 
-#define NUM_FILE_ELEMENTS		701
+#define NUM_FILE_ELEMENTS		702
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1168,9 +1169,13 @@
 #define ACTION_TURNING_FROM_RIGHT	44
 #define ACTION_TURNING_FROM_UP		45
 #define ACTION_TURNING_FROM_DOWN	46
-#define ACTION_OTHER			47
+#define ACTION_SMASHED_BY_ROCK		47
+#define ACTION_SMASHED_BY_SPRING	48
+#define ACTION_SLURPED_BY_SPRING	49
+#define ACTION_TWINKLING		50
+#define ACTION_OTHER			51
 
-#define NUM_ACTIONS			48
+#define NUM_ACTIONS			52
 
 #define ACTION_BORING_LAST		ACTION_BORING_10
 #define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
@@ -1199,34 +1204,39 @@
 #define GFX_ARG_YPOS			3
 #define GFX_ARG_WIDTH			4
 #define GFX_ARG_HEIGHT			5
-#define GFX_ARG_OFFSET			6
-#define GFX_ARG_VERTICAL		7
+#define GFX_ARG_VERTICAL		6
+#define GFX_ARG_OFFSET			7
 #define GFX_ARG_XOFFSET			8
 #define GFX_ARG_YOFFSET			9
-#define GFX_ARG_FRAMES			10
-#define GFX_ARG_FRAMES_PER_LINE		11
-#define GFX_ARG_START_FRAME		12
-#define GFX_ARG_DELAY			13
-#define GFX_ARG_ANIM_MODE		14
-#define GFX_ARG_GLOBAL_SYNC		15
-#define GFX_ARG_CRUMBLED_LIKE		16
-#define GFX_ARG_DIGGABLE_LIKE		17
-#define GFX_ARG_BORDER_SIZE		18
-#define GFX_ARG_STEP_OFFSET		19
-#define GFX_ARG_STEP_DELAY		20
-#define GFX_ARG_DIRECTION		21
-#define GFX_ARG_POSITION		22
-#define GFX_ARG_DRAW_XOFFSET		23
-#define GFX_ARG_DRAW_YOFFSET		24
-#define GFX_ARG_DRAW_MASKED		25
-#define GFX_ARG_ANIM_DELAY_FIXED	26
-#define GFX_ARG_ANIM_DELAY_RANDOM	27
-#define GFX_ARG_POST_DELAY_FIXED	28
-#define GFX_ARG_POST_DELAY_RANDOM	29
-#define GFX_ARG_NAME			30
-#define GFX_ARG_SCALE_UP_FACTOR		31
+#define GFX_ARG_2ND_MOVEMENT_TILE	10
+#define GFX_ARG_2ND_VERTICAL		11
+#define GFX_ARG_2ND_OFFSET		12
+#define GFX_ARG_2ND_XOFFSET		13
+#define GFX_ARG_2ND_YOFFSET		14
+#define GFX_ARG_FRAMES			15
+#define GFX_ARG_FRAMES_PER_LINE		16
+#define GFX_ARG_START_FRAME		17
+#define GFX_ARG_DELAY			18
+#define GFX_ARG_ANIM_MODE		19
+#define GFX_ARG_GLOBAL_SYNC		20
+#define GFX_ARG_CRUMBLED_LIKE		21
+#define GFX_ARG_DIGGABLE_LIKE		22
+#define GFX_ARG_BORDER_SIZE		23
+#define GFX_ARG_STEP_OFFSET		24
+#define GFX_ARG_STEP_DELAY		25
+#define GFX_ARG_DIRECTION		26
+#define GFX_ARG_POSITION		27
+#define GFX_ARG_DRAW_XOFFSET		28
+#define GFX_ARG_DRAW_YOFFSET		29
+#define GFX_ARG_DRAW_MASKED		30
+#define GFX_ARG_ANIM_DELAY_FIXED	31
+#define GFX_ARG_ANIM_DELAY_RANDOM	32
+#define GFX_ARG_POST_DELAY_FIXED	33
+#define GFX_ARG_POST_DELAY_RANDOM	34
+#define GFX_ARG_NAME			35
+#define GFX_ARG_SCALE_UP_FACTOR		36
 
-#define NUM_GFX_ARGS			32
+#define NUM_GFX_ARGS			37
 
 
 /* values for sound configuration suffixes */
@@ -1889,6 +1899,8 @@ struct GraphicInfo
   int src_x, src_y;		/* start position of animation frames */
   int width, height;		/* width/height of each animation frame */
   int offset_x, offset_y;	/* x/y offset to next animation frame */
+  int offset2_x, offset2_y;	/* x/y offset to second movement tile */
+  boolean double_movement;	/* animation has second movement tile */
   int anim_frames;
   int anim_frames_per_line;
   int anim_start_frame;
