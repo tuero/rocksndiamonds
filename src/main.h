@@ -1478,6 +1478,7 @@ extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ChangePage[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

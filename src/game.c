@@ -169,6 +169,7 @@ static void KillHeroUnlessProtected(int, int);
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
 
+static void ChangeElement(int, int, int);
 static boolean CheckTriggeredElementSideChange(int, int, int, int, int);
 static boolean CheckTriggeredElementChange(int, int, int, int);
 static boolean CheckElementSideChange(int, int, int, int, int, int);
@@ -1123,6 +1124,7 @@ void InitGame()
       Feld[x][y] = level.field[x][y];
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       ChangeDelay[x][y] = 0;
+      ChangePage[x][y] = -1;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
@@ -1938,6 +1940,7 @@ static void RemoveField(int x, int y)
 
   AmoebaNr[x][y] = 0;
   ChangeDelay[x][y] = 0;
+  ChangePage[x][y] = -1;
   Pushed[x][y] = FALSE;
 
   GfxElement[x][y] = EL_UNDEFINED;
@@ -2395,7 +2398,10 @@ void Explode(int ex, int ey, int phase, int mode)
       element = Feld[x][y] = Back[x][y];
     Back[x][y] = 0;
 
-    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = ChangeDelay[x][y] = 0;
+    MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+    ChangeDelay[x][y] = 0;
+    ChangePage[x][y] = -1;
+
     InitField(x, y, FALSE);
     if (CAN_MOVE(element))
       InitMovDir(x, y);
@@ -4486,10 +4492,12 @@ void ContinueMoving(int x, int y)
 
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
+    ChangePage[newx][newy] = ChangePage[x][y];
     Changed[newx][newy] = Changed[x][y];
     ChangeEvent[newx][newy] = ChangeEvent[x][y];
 
     ChangeDelay[x][y] = 0;
+    ChangePage[x][y] = -1;
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
@@ -4552,12 +4560,18 @@ void ContinueMoving(int x, int y)
 	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
       Impact(x, newy);
 
-    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
-      CheckElementSideChange(newx, newy, element, direction, CE_COLLISION, -1);
-
 #if 1
     TestIfElementTouchesCustomElement(x, y);		/* for empty space */
 #endif
+
+#if 0
+    if (ChangePage[newx][newy] != -1)			/* delayed change */
+      ChangeElement(newx, newy, ChangePage[newx][newy]);
+#endif
+
+    if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
+      CheckElementSideChange(newx, newy, Feld[newx][newy], direction,
+			     CE_COLLISION, -1);
 
     TestIfPlayerTouchesCustomElement(newx, newy);
     TestIfElementTouchesCustomElement(newx, newy);
@@ -5664,9 +5678,22 @@ static void ChangeElement(int x, int y, int page)
   }
   else					/* finish element change */
   {
+    if (ChangePage[x][y] != -1)		/* remember page from delayed change */
+    {
+      page = ChangePage[x][y]    * 1;
+      ChangePage[x][y] = -1;
+    }
+
     if (IS_MOVING(x, y))		/* never change a running system ;-) */
     {
       ChangeDelay[x][y] = 1;		/* try change after next move step */
+      ChangePage[x][y] = page;		/* remember page to use for change */
+
+#if 0
+      if (page != 0)
+	printf("::: delayed change for element '%s'...\n",
+	       element_info[element].token_name);
+#endif
 
       return;
     }
@@ -5963,6 +5990,16 @@ void GameActions()
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
 
+#if DEBUG
+    if (ChangePage[x][y] != -1 && ChangeDelay[x][y] != 1)
+    {
+      printf("GameActions(): x = %d, y = %d: ChangePage != -1\n", x, y);
+      printf("GameActions(): This should never happen!\n");
+
+      ChangePage[x][y] = -1;
+    }
+#endif
+
     Stop[x][y] = FALSE;
     if (JustStopped[x][y] > 0)
       JustStopped[x][y]--;
@@ -6039,7 +6076,13 @@ void GameActions()
     /* this may take place after moving, so 'element' may have changed */
     if (IS_CHANGING(x, y))
     {
+#if 0
+      ChangeElement(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] :
+		    element_info[element].event_page_nr[CE_DELAY]);
+#else
       ChangeElement(x, y, element_info[element].event_page_nr[CE_DELAY]);
+#endif
+
       element = Feld[x][y];
       graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
     }
@@ -6968,10 +7011,27 @@ void TestIfElementTouchesCustomElement(int x, int y)
     { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
     { CH_SIDE_BOTTOM,	CH_SIDE_TOP	}	/* check bottom */
   };
+  static int touch_dir[4] =
+  {
+    MV_LEFT | MV_RIGHT,
+    MV_UP   | MV_DOWN,
+    MV_UP   | MV_DOWN,
+    MV_LEFT | MV_RIGHT
+  };
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
-  int center_element = Feld[x][y];
+#if 0
+  int center_element = MovingOrBlocked2Element(x, y);
+#else
+  int center_element = Feld[x][y];	/* should always be non-moving! */
+#endif
   int i, j;
+
+#if 0
+  if (center_element == EL_CUSTOM_START + 244)
+    printf("::: checking element %d at %d,%d... [%d]\n",
+	   center_element, x, y, Feld[x][y + 1]);
+#endif
 
 #if 0
   if (check_changing)	/* prevent this function from running into a loop */
@@ -6991,7 +7051,34 @@ void TestIfElementTouchesCustomElement(int x, int y)
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-    border_element = Feld[xx][yy];
+#if 0
+    if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
+      border_element = Feld[xx][yy];
+    else if (MovDir[xx][yy] & touch_dir[i])	/* elements are touching */
+    {
+#if 0
+      printf("::: moving && touching...\n");
+#endif
+
+      border_element = MovingOrBlocked2Element(xx, yy);
+    }
+    else
+    {
+#if 0
+      printf("::: moving && NOT touching...\n");
+#endif
+
+      continue;			/* center and border element do not touch */
+    }
+#else
+
+#if 0
+    border_element = MovingOrBlocked2Element(xx, yy);
+#else
+    border_element = Feld[xx][yy];	/* may be moving! */
+#endif
+
+#endif
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
@@ -7030,6 +7117,11 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	    change->sides & center_side &&
 	    change->trigger_element == center_element)
 	{
+#if 0
+	  printf("::: changing border element %d at %d,%d\n",
+		 border_element, xx, yy);
+#endif
+
 	  CheckElementSideChange(xx, yy, border_element, CH_SIDE_ANY,
 				 CE_OTHER_IS_TOUCHING, j);
 	  break;
@@ -7039,8 +7131,15 @@ void TestIfElementTouchesCustomElement(int x, int y)
   }
 
   if (change_center_element)
+  {
+#if 0
+    printf("::: changing center element %d at %d,%d\n",
+	   center_element, x, y);
+#endif
+
     CheckElementSideChange(x, y, center_element, CH_SIDE_ANY,
 			   CE_OTHER_IS_TOUCHING, center_element_change_page);
+  }
 
 #if 0
   check_changing = FALSE;
