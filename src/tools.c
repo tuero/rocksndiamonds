@@ -1678,6 +1678,9 @@ unsigned int MoveDoor(unsigned int door_state)
     }
   }
 
+  if (setup.quick_doors)
+    StopSound(SND_OEFFNEN);
+
   if (door_state & DOOR_ACTION_1)
     door1 = door_state & DOOR_ACTION_1;
   if (door_state & DOOR_ACTION_2)
