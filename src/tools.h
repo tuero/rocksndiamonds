@@ -149,4 +149,6 @@ int el2img(int);
 int el2edimg(int);
 int el2preimg(int);
 
+unsigned int InitRND(long);
+
 #endif	/* TOOLS_H */

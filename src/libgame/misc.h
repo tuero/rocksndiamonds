@@ -27,7 +27,7 @@
 /* values for InitRND() */
 #define NEW_RANDOMIZE			-1
 
-#define InitRND(seed)			init_random_number(0, seed)
+#define InitEngineRND(seed)		init_random_number(0, seed)
 #define InitSimpleRND(seed)		init_random_number(1, seed)
 #define RND(max)			get_random_number(0, max)
 #define SimpleRND(max)			get_random_number(1, max)

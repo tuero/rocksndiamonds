@@ -5234,3 +5234,11 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
   return (GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
 	  GameFrameDelay);
 }
+
+unsigned int InitRND(long seed)
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return InitEngineRND_EM(seed);
+  else
+    return InitEngineRND(seed);
+}

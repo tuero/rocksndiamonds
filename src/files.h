@@ -17,24 +17,6 @@
 #include "main.h"
 
 
-/* values for level file type identifier */
-#define LEVEL_FILE_TYPE_UNKNOWN		0
-#define LEVEL_FILE_TYPE_RND		1
-#define LEVEL_FILE_TYPE_BD		2
-#define LEVEL_FILE_TYPE_EM		3
-#define LEVEL_FILE_TYPE_SP		4
-#define LEVEL_FILE_TYPE_DX		5
-#define LEVEL_FILE_TYPE_SB		6
-#define LEVEL_FILE_TYPE_DC		7
-
-#define NUM_LEVEL_FILE_TYPES		8
-
-#define GAME_ENGINE_TYPE_UNKNOWN	LEVEL_FILE_TYPE_UNKNOWN
-#define GAME_ENGINE_TYPE_RND		LEVEL_FILE_TYPE_RND
-#define GAME_ENGINE_TYPE_EM		LEVEL_FILE_TYPE_EM
-
-#define NUM_ENGINE_TYPES		3
-
 #define LEVEL_PACKED_START		100
 #define PACKED_LEVELS(x)		(LEVEL_PACKED_START + x)
 

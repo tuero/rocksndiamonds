@@ -11,6 +11,7 @@
 #include "global.h"
 #include "display.h"
 #include "sample.h"
+#include "level.h"
 
 
 Bitmap *objBitmap;
@@ -349,4 +350,22 @@ void sound_play(void)
 #endif
 
   memset(play, 0, sizeof(play));
+}
+
+unsigned int InitEngineRND_EM(long seed)
+{
+  if (seed == NEW_RANDOMIZE)
+  {
+    int simple_rnd = SimpleRND(1000);
+    int i;
+
+    for (i = 0; i < simple_rnd || Random == NEW_RANDOMIZE; i++)
+      Random = Random * 129 + 1;
+
+    seed = Random;
+  }
+
+  Random = seed;
+
+  return (unsigned int) seed;
 }

@@ -1078,261 +1078,261 @@
 /* dummy elements (never used as game elements, only used as graphics) */
 #define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 18)
 
-#define EL_STEELWALL_TOPLEFT			(EL_FIRST_DUMMY + 0)
-#define EL_STEELWALL_TOPRIGHT			(EL_FIRST_DUMMY + 1)
-#define EL_STEELWALL_BOTTOMLEFT			(EL_FIRST_DUMMY + 2)
-#define EL_STEELWALL_BOTTOMRIGHT		(EL_FIRST_DUMMY + 3)
-#define EL_STEELWALL_HORIZONTAL			(EL_FIRST_DUMMY + 4)
-#define EL_STEELWALL_VERTICAL			(EL_FIRST_DUMMY + 5)
-#define EL_INVISIBLE_STEELWALL_TOPLEFT		(EL_FIRST_DUMMY + 6)
-#define EL_INVISIBLE_STEELWALL_TOPRIGHT		(EL_FIRST_DUMMY + 7)
-#define EL_INVISIBLE_STEELWALL_BOTTOMLEFT	(EL_FIRST_DUMMY + 8)
-#define EL_INVISIBLE_STEELWALL_BOTTOMRIGHT	(EL_FIRST_DUMMY + 9)
-#define EL_INVISIBLE_STEELWALL_HORIZONTAL	(EL_FIRST_DUMMY + 10)
-#define EL_INVISIBLE_STEELWALL_VERTICAL		(EL_FIRST_DUMMY + 11)
-#define EL_DYNABOMB				(EL_FIRST_DUMMY + 12)
-#define EL_DYNABOMB_ACTIVE			(EL_FIRST_DUMMY + 13)
-#define EL_DYNABOMB_PLAYER_1			(EL_FIRST_DUMMY + 14)
-#define EL_DYNABOMB_PLAYER_2			(EL_FIRST_DUMMY + 15)
-#define EL_DYNABOMB_PLAYER_3			(EL_FIRST_DUMMY + 16)
-#define EL_DYNABOMB_PLAYER_4			(EL_FIRST_DUMMY + 17)
-#define EL_SHIELD_NORMAL_ACTIVE			(EL_FIRST_DUMMY + 18)
-#define EL_SHIELD_DEADLY_ACTIVE			(EL_FIRST_DUMMY + 19)
-#define EL_AMOEBA				(EL_FIRST_DUMMY + 20)
-#define EL_DEFAULT				(EL_FIRST_DUMMY + 21)
-#define EL_BD_DEFAULT				(EL_FIRST_DUMMY + 22)
-#define EL_SP_DEFAULT				(EL_FIRST_DUMMY + 23)
-#define EL_SB_DEFAULT				(EL_FIRST_DUMMY + 24)
+#define EL_STEELWALL_TOPLEFT		(EL_FIRST_DUMMY + 0)
+#define EL_STEELWALL_TOPRIGHT		(EL_FIRST_DUMMY + 1)
+#define EL_STEELWALL_BOTTOMLEFT		(EL_FIRST_DUMMY + 2)
+#define EL_STEELWALL_BOTTOMRIGHT	(EL_FIRST_DUMMY + 3)
+#define EL_STEELWALL_HORIZONTAL		(EL_FIRST_DUMMY + 4)
+#define EL_STEELWALL_VERTICAL		(EL_FIRST_DUMMY + 5)
+#define EL_INVISIBLE_STEELWALL_TOPLEFT	   (EL_FIRST_DUMMY + 6)
+#define EL_INVISIBLE_STEELWALL_TOPRIGHT	   (EL_FIRST_DUMMY + 7)
+#define EL_INVISIBLE_STEELWALL_BOTTOMLEFT  (EL_FIRST_DUMMY + 8)
+#define EL_INVISIBLE_STEELWALL_BOTTOMRIGHT (EL_FIRST_DUMMY + 9)
+#define EL_INVISIBLE_STEELWALL_HORIZONTAL  (EL_FIRST_DUMMY + 10)
+#define EL_INVISIBLE_STEELWALL_VERTICAL	   (EL_FIRST_DUMMY + 11)
+#define EL_DYNABOMB			(EL_FIRST_DUMMY + 12)
+#define EL_DYNABOMB_ACTIVE		(EL_FIRST_DUMMY + 13)
+#define EL_DYNABOMB_PLAYER_1		(EL_FIRST_DUMMY + 14)
+#define EL_DYNABOMB_PLAYER_2		(EL_FIRST_DUMMY + 15)
+#define EL_DYNABOMB_PLAYER_3		(EL_FIRST_DUMMY + 16)
+#define EL_DYNABOMB_PLAYER_4		(EL_FIRST_DUMMY + 17)
+#define EL_SHIELD_NORMAL_ACTIVE		(EL_FIRST_DUMMY + 18)
+#define EL_SHIELD_DEADLY_ACTIVE		(EL_FIRST_DUMMY + 19)
+#define EL_AMOEBA			(EL_FIRST_DUMMY + 20)
+#define EL_DEFAULT			(EL_FIRST_DUMMY + 21)
+#define EL_BD_DEFAULT			(EL_FIRST_DUMMY + 22)
+#define EL_SP_DEFAULT			(EL_FIRST_DUMMY + 23)
+#define EL_SB_DEFAULT			(EL_FIRST_DUMMY + 24)
 
 /* internal elements (only used for internal purposes like copying) */
-#define EL_FIRST_INTERNAL			(EL_FIRST_DUMMY + 25)
+#define EL_FIRST_INTERNAL		(EL_FIRST_DUMMY + 25)
 
-#define EL_INTERNAL_CLIPBOARD_CUSTOM		(EL_FIRST_INTERNAL + 0)
-#define EL_INTERNAL_CLIPBOARD_CHANGE		(EL_FIRST_INTERNAL + 1)
-#define EL_INTERNAL_CLIPBOARD_GROUP		(EL_FIRST_INTERNAL + 2)
-#define EL_INTERNAL_DUMMY			(EL_FIRST_INTERNAL + 3)
+#define EL_INTERNAL_CLIPBOARD_CUSTOM	(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_CLIPBOARD_CHANGE	(EL_FIRST_INTERNAL + 1)
+#define EL_INTERNAL_CLIPBOARD_GROUP	(EL_FIRST_INTERNAL + 2)
+#define EL_INTERNAL_DUMMY		(EL_FIRST_INTERNAL + 3)
 
-#define EL_INTERNAL_CLIPBOARD_START		(EL_FIRST_INTERNAL + 0)
-#define EL_INTERNAL_CLIPBOARD_END		(EL_FIRST_INTERNAL + 2)
-#define EL_INTERNAL_START			(EL_FIRST_INTERNAL + 0)
-#define EL_INTERNAL_END				(EL_FIRST_INTERNAL + 3)
+#define EL_INTERNAL_CLIPBOARD_START	(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_CLIPBOARD_END	(EL_FIRST_INTERNAL + 2)
+#define EL_INTERNAL_START		(EL_FIRST_INTERNAL + 0)
+#define EL_INTERNAL_END			(EL_FIRST_INTERNAL + 3)
 
-#define MAX_NUM_ELEMENTS			(EL_FIRST_INTERNAL + 4)
+#define MAX_NUM_ELEMENTS		(EL_FIRST_INTERNAL + 4)
 
 
 /* values for graphics/sounds action types */
-#define ACTION_DEFAULT				0
-#define ACTION_WAITING				1
-#define ACTION_FALLING				2
-#define ACTION_MOVING				3
-#define ACTION_DIGGING				4
-#define ACTION_SNAPPING				5
-#define ACTION_COLLECTING			6
-#define ACTION_DROPPING				7
-#define ACTION_PUSHING				8
-#define ACTION_WALKING				9
-#define ACTION_PASSING				10
-#define ACTION_IMPACT				11
-#define ACTION_BREAKING				12
-#define ACTION_ACTIVATING			13
-#define ACTION_DEACTIVATING			14
-#define ACTION_OPENING				15
-#define ACTION_CLOSING				16
-#define ACTION_ATTACKING			17
-#define ACTION_GROWING				18
-#define ACTION_SHRINKING			19
-#define ACTION_ACTIVE				20
-#define ACTION_FILLING				21
-#define ACTION_EMPTYING				22
-#define ACTION_CHANGING				23
-#define ACTION_EXPLODING			24
-#define ACTION_BORING				25
-#define ACTION_BORING_1				26
-#define ACTION_BORING_2				27
-#define ACTION_BORING_3				28
-#define ACTION_BORING_4				29
-#define ACTION_BORING_5				30
-#define ACTION_BORING_6				31
-#define ACTION_BORING_7				32
-#define ACTION_BORING_8				33
-#define ACTION_BORING_9				34
-#define ACTION_BORING_10			35
-#define ACTION_SLEEPING				36
-#define ACTION_SLEEPING_1			37
-#define ACTION_SLEEPING_2			38
-#define ACTION_SLEEPING_3			39
-#define ACTION_AWAKENING			40
-#define ACTION_DYING				41
-#define ACTION_TURNING				42
-#define ACTION_TURNING_FROM_LEFT		43
-#define ACTION_TURNING_FROM_RIGHT		44
-#define ACTION_TURNING_FROM_UP			45
-#define ACTION_TURNING_FROM_DOWN		46
-#define ACTION_OTHER				47
+#define ACTION_DEFAULT			0
+#define ACTION_WAITING			1
+#define ACTION_FALLING			2
+#define ACTION_MOVING			3
+#define ACTION_DIGGING			4
+#define ACTION_SNAPPING			5
+#define ACTION_COLLECTING		6
+#define ACTION_DROPPING			7
+#define ACTION_PUSHING			8
+#define ACTION_WALKING			9
+#define ACTION_PASSING			10
+#define ACTION_IMPACT			11
+#define ACTION_BREAKING			12
+#define ACTION_ACTIVATING		13
+#define ACTION_DEACTIVATING		14
+#define ACTION_OPENING			15
+#define ACTION_CLOSING			16
+#define ACTION_ATTACKING		17
+#define ACTION_GROWING			18
+#define ACTION_SHRINKING		19
+#define ACTION_ACTIVE			20
+#define ACTION_FILLING			21
+#define ACTION_EMPTYING			22
+#define ACTION_CHANGING			23
+#define ACTION_EXPLODING		24
+#define ACTION_BORING			25
+#define ACTION_BORING_1			26
+#define ACTION_BORING_2			27
+#define ACTION_BORING_3			28
+#define ACTION_BORING_4			29
+#define ACTION_BORING_5			30
+#define ACTION_BORING_6			31
+#define ACTION_BORING_7			32
+#define ACTION_BORING_8			33
+#define ACTION_BORING_9			34
+#define ACTION_BORING_10		35
+#define ACTION_SLEEPING			36
+#define ACTION_SLEEPING_1		37
+#define ACTION_SLEEPING_2		38
+#define ACTION_SLEEPING_3		39
+#define ACTION_AWAKENING		40
+#define ACTION_DYING			41
+#define ACTION_TURNING			42
+#define ACTION_TURNING_FROM_LEFT	43
+#define ACTION_TURNING_FROM_RIGHT	44
+#define ACTION_TURNING_FROM_UP		45
+#define ACTION_TURNING_FROM_DOWN	46
+#define ACTION_OTHER			47
 
-#define NUM_ACTIONS				48
+#define NUM_ACTIONS			48
 
-#define ACTION_BORING_LAST			ACTION_BORING_10
-#define ACTION_SLEEPING_LAST			ACTION_SLEEPING_3
+#define ACTION_BORING_LAST		ACTION_BORING_10
+#define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
 
 
 /* values for special image configuration suffixes (must match game mode) */
-#define GFX_SPECIAL_ARG_DEFAULT			0
-#define GFX_SPECIAL_ARG_MAIN			1
-#define GFX_SPECIAL_ARG_LEVELS			2
-#define GFX_SPECIAL_ARG_SCORES			3
-#define GFX_SPECIAL_ARG_EDITOR			4
-#define GFX_SPECIAL_ARG_INFO			5
-#define GFX_SPECIAL_ARG_SETUP			6
-#define GFX_SPECIAL_ARG_PLAYING			7
-#define GFX_SPECIAL_ARG_DOOR			8
-#define GFX_SPECIAL_ARG_PREVIEW			9
-#define GFX_SPECIAL_ARG_CRUMBLED		10
+#define GFX_SPECIAL_ARG_DEFAULT		0
+#define GFX_SPECIAL_ARG_MAIN		1
+#define GFX_SPECIAL_ARG_LEVELS		2
+#define GFX_SPECIAL_ARG_SCORES		3
+#define GFX_SPECIAL_ARG_EDITOR		4
+#define GFX_SPECIAL_ARG_INFO		5
+#define GFX_SPECIAL_ARG_SETUP		6
+#define GFX_SPECIAL_ARG_PLAYING		7
+#define GFX_SPECIAL_ARG_DOOR		8
+#define GFX_SPECIAL_ARG_PREVIEW		9
+#define GFX_SPECIAL_ARG_CRUMBLED	10
 
-#define NUM_SPECIAL_GFX_ARGS			11
+#define NUM_SPECIAL_GFX_ARGS		11
 
 
 /* values for image configuration suffixes */
-#define GFX_ARG_X				0
-#define GFX_ARG_Y				1
-#define GFX_ARG_XPOS				2
-#define GFX_ARG_YPOS				3
-#define GFX_ARG_WIDTH				4
-#define GFX_ARG_HEIGHT				5
-#define GFX_ARG_OFFSET				6
-#define GFX_ARG_VERTICAL			7
-#define GFX_ARG_XOFFSET				8
-#define GFX_ARG_YOFFSET				9
-#define GFX_ARG_FRAMES				10
-#define GFX_ARG_FRAMES_PER_LINE			11
-#define GFX_ARG_START_FRAME			12
-#define GFX_ARG_DELAY				13
-#define GFX_ARG_ANIM_MODE			14
-#define GFX_ARG_GLOBAL_SYNC			15
-#define GFX_ARG_CRUMBLED_LIKE			16
-#define GFX_ARG_DIGGABLE_LIKE			17
-#define GFX_ARG_BORDER_SIZE			18
-#define GFX_ARG_STEP_OFFSET			19
-#define GFX_ARG_STEP_DELAY			20
-#define GFX_ARG_DIRECTION			21
-#define GFX_ARG_POSITION			22
-#define GFX_ARG_DRAW_XOFFSET			23
-#define GFX_ARG_DRAW_YOFFSET			24
-#define GFX_ARG_DRAW_MASKED			25
-#define GFX_ARG_ANIM_DELAY_FIXED		26
-#define GFX_ARG_ANIM_DELAY_RANDOM		27
-#define GFX_ARG_POST_DELAY_FIXED		28
-#define GFX_ARG_POST_DELAY_RANDOM		29
-#define GFX_ARG_NAME				30
-#define GFX_ARG_SCALE_UP_FACTOR			31
+#define GFX_ARG_X			0
+#define GFX_ARG_Y			1
+#define GFX_ARG_XPOS			2
+#define GFX_ARG_YPOS			3
+#define GFX_ARG_WIDTH			4
+#define GFX_ARG_HEIGHT			5
+#define GFX_ARG_OFFSET			6
+#define GFX_ARG_VERTICAL		7
+#define GFX_ARG_XOFFSET			8
+#define GFX_ARG_YOFFSET			9
+#define GFX_ARG_FRAMES			10
+#define GFX_ARG_FRAMES_PER_LINE		11
+#define GFX_ARG_START_FRAME		12
+#define GFX_ARG_DELAY			13
+#define GFX_ARG_ANIM_MODE		14
+#define GFX_ARG_GLOBAL_SYNC		15
+#define GFX_ARG_CRUMBLED_LIKE		16
+#define GFX_ARG_DIGGABLE_LIKE		17
+#define GFX_ARG_BORDER_SIZE		18
+#define GFX_ARG_STEP_OFFSET		19
+#define GFX_ARG_STEP_DELAY		20
+#define GFX_ARG_DIRECTION		21
+#define GFX_ARG_POSITION		22
+#define GFX_ARG_DRAW_XOFFSET		23
+#define GFX_ARG_DRAW_YOFFSET		24
+#define GFX_ARG_DRAW_MASKED		25
+#define GFX_ARG_ANIM_DELAY_FIXED	26
+#define GFX_ARG_ANIM_DELAY_RANDOM	27
+#define GFX_ARG_POST_DELAY_FIXED	28
+#define GFX_ARG_POST_DELAY_RANDOM	29
+#define GFX_ARG_NAME			30
+#define GFX_ARG_SCALE_UP_FACTOR		31
 
-#define NUM_GFX_ARGS				32
+#define NUM_GFX_ARGS			32
 
 
 /* values for sound configuration suffixes */
-#define SND_ARG_MODE_LOOP			0
-#define SND_ARG_VOLUME				1
-#define SND_ARG_PRIORITY			2
+#define SND_ARG_MODE_LOOP		0
+#define SND_ARG_VOLUME			1
+#define SND_ARG_PRIORITY		2
 
-#define NUM_SND_ARGS				3
+#define NUM_SND_ARGS			3
 
 
 /* values for music configuration suffixes */
-#define MUS_ARG_MODE_LOOP			0
+#define MUS_ARG_MODE_LOOP		0
 
-#define NUM_MUS_ARGS				1
+#define NUM_MUS_ARGS			1
 
 
 /* values for font configuration */
-#define FONT_INITIAL_1				0
-#define FONT_INITIAL_2				1
-#define FONT_INITIAL_3				2
-#define FONT_INITIAL_4				3
-#define FONT_TITLE_1				4
-#define FONT_TITLE_2				5
-#define FONT_MENU_1				6
-#define FONT_MENU_2				7
-#define FONT_TEXT_1_ACTIVE			8
-#define FONT_TEXT_2_ACTIVE			9
-#define FONT_TEXT_3_ACTIVE			10
-#define FONT_TEXT_4_ACTIVE			11
-#define FONT_TEXT_1				12
-#define FONT_TEXT_2				13
-#define FONT_TEXT_3				14
-#define FONT_TEXT_4				15
-#define FONT_ENVELOPE_1				16
-#define FONT_ENVELOPE_2				17
-#define FONT_ENVELOPE_3				18
-#define FONT_ENVELOPE_4				19
-#define FONT_INPUT_1_ACTIVE			20
-#define FONT_INPUT_2_ACTIVE			21
-#define FONT_INPUT_1				22
-#define FONT_INPUT_2				23
-#define FONT_OPTION_OFF				24
-#define FONT_OPTION_ON				25
-#define FONT_VALUE_1				26
-#define FONT_VALUE_2				27
-#define FONT_VALUE_OLD				28
-#define FONT_LEVEL_NUMBER			29
-#define FONT_TAPE_RECORDER			30
-#define FONT_GAME_INFO				31
+#define FONT_INITIAL_1			0
+#define FONT_INITIAL_2			1
+#define FONT_INITIAL_3			2
+#define FONT_INITIAL_4			3
+#define FONT_TITLE_1			4
+#define FONT_TITLE_2			5
+#define FONT_MENU_1			6
+#define FONT_MENU_2			7
+#define FONT_TEXT_1_ACTIVE		8
+#define FONT_TEXT_2_ACTIVE		9
+#define FONT_TEXT_3_ACTIVE		10
+#define FONT_TEXT_4_ACTIVE		11
+#define FONT_TEXT_1			12
+#define FONT_TEXT_2			13
+#define FONT_TEXT_3			14
+#define FONT_TEXT_4			15
+#define FONT_ENVELOPE_1			16
+#define FONT_ENVELOPE_2			17
+#define FONT_ENVELOPE_3			18
+#define FONT_ENVELOPE_4			19
+#define FONT_INPUT_1_ACTIVE		20
+#define FONT_INPUT_2_ACTIVE		21
+#define FONT_INPUT_1			22
+#define FONT_INPUT_2			23
+#define FONT_OPTION_OFF			24
+#define FONT_OPTION_ON			25
+#define FONT_VALUE_1			26
+#define FONT_VALUE_2			27
+#define FONT_VALUE_OLD			28
+#define FONT_LEVEL_NUMBER		29
+#define FONT_TAPE_RECORDER		30
+#define FONT_GAME_INFO			31
 
-#define NUM_FONTS				32
-#define NUM_INITIAL_FONTS			4
+#define NUM_FONTS			32
+#define NUM_INITIAL_FONTS		4
 
 /* values for game_status (must match special image configuration suffixes) */
-#define GAME_MODE_DEFAULT			0
-#define GAME_MODE_MAIN				1
-#define GAME_MODE_LEVELS			2
-#define GAME_MODE_SCORES			3
-#define GAME_MODE_EDITOR			4
-#define GAME_MODE_INFO				5
-#define GAME_MODE_SETUP				6
-#define GAME_MODE_PLAYING			7
-#define GAME_MODE_PSEUDO_DOOR			8
-#define GAME_MODE_PSEUDO_PREVIEW		9
-#define GAME_MODE_PSEUDO_CRUMBLED		10
+#define GAME_MODE_DEFAULT		0
+#define GAME_MODE_MAIN			1
+#define GAME_MODE_LEVELS		2
+#define GAME_MODE_SCORES		3
+#define GAME_MODE_EDITOR		4
+#define GAME_MODE_INFO			5
+#define GAME_MODE_SETUP			6
+#define GAME_MODE_PLAYING		7
+#define GAME_MODE_PSEUDO_DOOR		8
+#define GAME_MODE_PSEUDO_PREVIEW	9
+#define GAME_MODE_PSEUDO_CRUMBLED	10
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME		11
-#define GAME_MODE_QUIT				12
+#define GAME_MODE_PSEUDO_TYPENAME	11
+#define GAME_MODE_QUIT			12
 
 /* special definitions currently only used for custom artwork configuration */
-#define MUSIC_PREFIX_BACKGROUND			0
-#define NUM_MUSIC_PREFIXES			1
-#define MAX_LEVELS				1000
+#define MUSIC_PREFIX_BACKGROUND		0
+#define NUM_MUSIC_PREFIXES		1
+#define MAX_LEVELS			1000
 
 /* definitions for demo animation lists */
-#define HELPANIM_LIST_NEXT			-1
-#define HELPANIM_LIST_END			-999
+#define HELPANIM_LIST_NEXT		-1
+#define HELPANIM_LIST_END		-999
 
 
 /* program information and versioning definitions */
 
-#define PROGRAM_VERSION_MAJOR	3
-#define PROGRAM_VERSION_MINOR	1
-#define PROGRAM_VERSION_PATCH	1
-#define PROGRAM_VERSION_BUILD	0
+#define PROGRAM_VERSION_MAJOR		3
+#define PROGRAM_VERSION_MINOR		1
+#define PROGRAM_VERSION_PATCH		1
+#define PROGRAM_VERSION_BUILD		0
 
-#define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
-#define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING "Copyright ©1995-2004 by Holger Schemel"
+#define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
+#define PROGRAM_AUTHOR_STRING		"Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING       "Copyright ©1995-2004 by Holger Schemel"
 
-#define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
-#define COOKIE_PREFIX		"ROCKSNDIAMONDS"
-#define FILENAME_PREFIX		"Rocks"
+#define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
+#define COOKIE_PREFIX			"ROCKSNDIAMONDS"
+#define FILENAME_PREFIX			"Rocks"
 
 #if defined(PLATFORM_UNIX)
-#define USERDATA_DIRECTORY	".rocksndiamonds"
+#define USERDATA_DIRECTORY		".rocksndiamonds"
 #elif defined(PLATFORM_WIN32)
-#define USERDATA_DIRECTORY	PROGRAM_TITLE_STRING
+#define USERDATA_DIRECTORY		PROGRAM_TITLE_STRING
 #else
-#define USERDATA_DIRECTORY	"userdata"
+#define USERDATA_DIRECTORY		"userdata"
 #endif
 
-#define X11_ICON_FILENAME	"rocks_icon.xbm"
-#define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
-#define MSDOS_POINTER_FILENAME	"mouse.pcx"
+#define X11_ICON_FILENAME		"rocks_icon.xbm"
+#define X11_ICONMASK_FILENAME		"rocks_iconmask.xbm"
+#define MSDOS_POINTER_FILENAME		"mouse.pcx"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
 ** currently supported/known file version numbers:
@@ -1341,31 +1341,51 @@
 **	1.4 (still in use)
 **	2.0 (actual)
 */
-#define FILE_VERSION_1_0	VERSION_IDENT(1,0,0,0)
-#define FILE_VERSION_1_2	VERSION_IDENT(1,2,0,0)
-#define FILE_VERSION_1_4	VERSION_IDENT(1,4,0,0)
-#define FILE_VERSION_2_0	VERSION_IDENT(2,0,0,0)
+#define FILE_VERSION_1_0		VERSION_IDENT(1,0,0,0)
+#define FILE_VERSION_1_2		VERSION_IDENT(1,2,0,0)
+#define FILE_VERSION_1_4		VERSION_IDENT(1,4,0,0)
+#define FILE_VERSION_2_0		VERSION_IDENT(2,0,0,0)
 
 /* file version does not change for every program version, but is changed
    when new features are introduced that are incompatible with older file
    versions, so that they can be treated accordingly */
-#define FILE_VERSION_ACTUAL	FILE_VERSION_2_0
+#define FILE_VERSION_ACTUAL		FILE_VERSION_2_0
 
-#define GAME_VERSION_1_0	FILE_VERSION_1_0
-#define GAME_VERSION_1_2	FILE_VERSION_1_2
-#define GAME_VERSION_1_4	FILE_VERSION_1_4
-#define GAME_VERSION_2_0	FILE_VERSION_2_0
+#define GAME_VERSION_1_0		FILE_VERSION_1_0
+#define GAME_VERSION_1_2		FILE_VERSION_1_2
+#define GAME_VERSION_1_4		FILE_VERSION_1_4
+#define GAME_VERSION_2_0		FILE_VERSION_2_0
 
-#define GAME_VERSION_ACTUAL	VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
-					      PROGRAM_VERSION_MINOR, \
-					      PROGRAM_VERSION_PATCH, \
-					      PROGRAM_VERSION_BUILD)
+#define GAME_VERSION_ACTUAL		VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
+						      PROGRAM_VERSION_MINOR, \
+						      PROGRAM_VERSION_PATCH, \
+						      PROGRAM_VERSION_BUILD)
 
 /* values for game_emulation */
-#define EMU_NONE		0
-#define EMU_BOULDERDASH		1
-#define EMU_SOKOBAN		2
-#define EMU_SUPAPLEX		3
+#define EMU_NONE			0
+#define EMU_BOULDERDASH			1
+#define EMU_SOKOBAN			2
+#define EMU_SUPAPLEX			3
+
+/* values for level file type identifier */
+#define LEVEL_FILE_TYPE_UNKNOWN		0
+#define LEVEL_FILE_TYPE_RND		1
+#define LEVEL_FILE_TYPE_BD		2
+#define LEVEL_FILE_TYPE_EM		3
+#define LEVEL_FILE_TYPE_SP		4
+#define LEVEL_FILE_TYPE_DX		5
+#define LEVEL_FILE_TYPE_SB		6
+#define LEVEL_FILE_TYPE_DC		7
+
+#define NUM_LEVEL_FILE_TYPES		8
+
+/* values for game engine type identifier */
+#define GAME_ENGINE_TYPE_UNKNOWN	LEVEL_FILE_TYPE_UNKNOWN
+#define GAME_ENGINE_TYPE_RND		LEVEL_FILE_TYPE_RND
+#define GAME_ENGINE_TYPE_EM		LEVEL_FILE_TYPE_EM
+
+#define NUM_ENGINE_TYPES		3
+
 
 struct MenuInfo
 {
