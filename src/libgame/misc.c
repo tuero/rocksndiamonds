@@ -473,7 +473,8 @@ void GetOptions(char *argv[])
 	     "  -l, --level directory         alternative level directory\n"
 	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
-	     "  -v, --verbose                 verbose mode\n",
+	     "  -v, --verbose                 verbose mode\n"
+	     "      --debug                   display debugging information\n",
 	     program.command_basename);
       exit(0);
     }

@@ -268,7 +268,7 @@ static void InitField(int x, int y, boolean init_game)
 
 	  StorePlayer[x][y] = Feld[x][y];
 
-	  if (options.verbose)
+	  if (options.debug)
 	  {
 	    printf("Player %d activated.\n", player->element_nr);
 	    printf("[Local player is %d and currently %s.]\n",
@@ -659,7 +659,7 @@ void InitGame()
 	tape.player_participates[i] = TRUE;
   }
 
-  if (options.verbose)
+  if (options.debug)
   {
     for (i=0; i<MAX_PLAYERS; i++)
     {
@@ -793,7 +793,7 @@ void InitGame()
 
   KeyboardAutoRepeatOff();
 
-  if (options.verbose)
+  if (options.debug)
   {
     for (i=0; i<4; i++)
       printf("Player %d %sactive.\n",

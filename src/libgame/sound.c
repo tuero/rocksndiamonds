@@ -31,7 +31,8 @@ static struct SampleInfo *Mod = NULL;
 #endif
 
 
-/*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
+/* ========================================================================= */
+/* THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
 
 static int playing_sounds = 0;
 static struct SoundControl playlist[MAX_SOUNDS_PLAYING];
@@ -59,11 +60,13 @@ static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
 #endif
 
-#if defined(PLATFORM_HPUX)
-static void HPUX_Audio_Control();
-#endif
-
-#if defined(PLATFORM_MSDOS)
+#if defined(AUDIO_LINUX_IOCTL)
+static boolean InitAudioDevice_Linux();
+#elif defined(PLATFORM_NETBSD)
+static boolean InitAudioDevice_NetBSD();
+#elif defined(PLATFORM_HPUX)
+static boolean InitAudioDevice_HPUX();
+#elif defined(PLATFORM_MSDOS)
 static void SoundServer_InsertNewSound(struct SoundControl);
 static void SoundServer_StopSound(int);
 static void SoundServer_StopAllSounds();
@@ -106,7 +109,7 @@ static boolean TestAudioDevices(void)
 
   if (audio_fd < 0)
   {
-    Error(ERR_WARN, "cannot open audio device - no sound");
+    Error(ERR_WARN, "cannot open audio device -- no sound");
     return FALSE;
   }
 
@@ -122,13 +125,13 @@ static boolean ForkAudioProcess(void)
 {
   if (pipe(audio.soundserver_pipe) < 0)
   {
-    Error(ERR_WARN, "cannot create pipe - no sounds");
+    Error(ERR_WARN, "cannot create pipe -- no sounds");
     return FALSE;
   }
 
   if ((audio.soundserver_pid = fork()) < 0)
   {       
-    Error(ERR_WARN, "cannot create sound server process - no sounds");
+    Error(ERR_WARN, "cannot create sound server process -- no sounds");
     return FALSE;
   }
 
@@ -208,7 +211,7 @@ void SoundServer(void)
       (int)sqrt((float)(PSND_MAX_LEFT2RIGHT*PSND_MAX_LEFT2RIGHT-i*i));
 
 #if defined(PLATFORM_HPUX)
-  HPUX_Audio_Control();
+  InitAudioDevice_HPUX();
 #endif
 
   FD_ZERO(&sound_fdset); 
@@ -222,7 +225,7 @@ void SoundServer(void)
       continue;
     if (read(audio.soundserver_pipe[0], &snd_ctrl, sizeof(snd_ctrl))
 	!= sizeof(snd_ctrl))
-      Error(ERR_EXIT_SOUND_SERVER, "broken pipe - no sounds");
+      Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
 #if defined(AUDIO_STREAMING_DSP)
 
@@ -270,59 +273,18 @@ void SoundServer(void)
       static long max_sample_size = 0;
       static long fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
       int sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
-      int stereo = TRUE;
-      /* 'ioctl()' expects pointer to integer value for stereo flag
-	 (boolean is defined as 'char', which will not work here) */
+      boolean stereo = TRUE;
 
       if (playing_sounds ||
 	  (audio.device_fd = OpenAudioDevice(audio.device_name)) >= 0)
       {
 	if (!playing_sounds)	/* we just opened the audio device */
 	{
-	  unsigned long fragment_spec = 0;
-
-	  /* determine logarithm (log2) of the fragment size */
-	  for (fragment_spec=0; (1 << fragment_spec) < fragment_size;
-	       fragment_spec++);
-
-	  /* use two fragments (play one fragment, prepare the other);
-	     one fragment would result in interrupted audio output, more
-	     than two fragments would raise audio output latency to much */
-	  fragment_spec |= 0x00020000;
-
-	  /* Example for fragment specification:
-	     - 2 buffers / 512 bytes (giving 1/16 second resolution for 8 kHz)
-	     - (with stereo the effective buffer size will shrink to 256)
-	     => fragment_size = 0x00020009 */
-
-	  if (ioctl(audio.device_fd,SNDCTL_DSP_SETFRAGMENT,&fragment_spec) < 0)
-	    Error(ERR_EXIT_SOUND_SERVER,
-		  "cannot set fragment size of /dev/dsp - no sounds");
-
-	  /* try if we can use stereo sound */
-	  if (ioctl(audio.device_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
-	  {
-#ifdef DEBUG
-	    static boolean reported = FALSE;
-
-	    if (!reported)
-	    {
-	      Error(ERR_RETURN, "cannot get stereo sound on /dev/dsp");
-	      reported = TRUE;
-	    }
+#if defined(AUDIO_LINUX_IOCTL)
+	  stereo = InitAudioDevice_Linux(fragment_size, sample_rate);
+#elif defined(PLATFORM_NETBSD)
+	  stereo = InitAudioDevice_NetBSD(fragment_size, sample_rate);
 #endif
-	    stereo = FALSE;
-	  }
-
-	  if (ioctl(audio.device_fd, SNDCTL_DSP_SPEED, &sample_rate) < 0)
-	    Error(ERR_EXIT_SOUND_SERVER,
-		  "cannot set sample rate of /dev/dsp - no sounds");
-
-	  /* get the real fragmentation size; this should return 512 */
-	  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE,&fragment_size) < 0)
-	    Error(ERR_EXIT_SOUND_SERVER,
-		  "cannot get fragment size of /dev/dsp - no sounds");
-
 	  max_sample_size = fragment_size / (stereo ? 2 : 1);
 	}
 
@@ -468,7 +430,6 @@ void SoundServer(void)
 
 	  /* fill the first mixing buffer with original sample */
 	  memcpy(premix_first_buffer,sample_ptr,sample_size);
-
 
 	  /* adjust volume of actual sound sample */
 	  if (snd_ctrl.volume != PSND_MAX_VOLUME)
@@ -725,26 +686,115 @@ static void SoundServer_StopAllSounds()
 #endif /* PLATFORM_MSDOS */
 #endif /* !PLATFORM_WIN32 */
 
+
+/* ------------------------------------------------------------------------- */
+/* platform dependant audio initialization code                              */
+/* ------------------------------------------------------------------------- */
+
+#if defined(AUDIO_LINUX_IOCTL)
+static boolean InitAudioDevice_Linux(long fragment_size, int sample_rate)
+{
+  /* "ioctl()" expects pointer to 'int' value for stereo flag
+     (boolean is defined as 'char', which will not work here) */
+  int stereo = TRUE;
+  unsigned long fragment_spec = 0;
+
+  /* determine logarithm (log2) of the fragment size */
+  for (fragment_spec=0; (1 << fragment_spec) < fragment_size;
+       fragment_spec++);
+
+  /* use two fragments (play one fragment, prepare the other);
+     one fragment would result in interrupted audio output, more
+     than two fragments would raise audio output latency to much */
+  fragment_spec |= 0x00020000;
+
+  /* Example for fragment specification:
+     - 2 buffers / 512 bytes (giving 1/16 second resolution for 8 kHz)
+     - (with stereo the effective buffer size will shrink to 256)
+     => fragment_size = 0x00020009 */
+
+  if (ioctl(audio.device_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_spec) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set fragment size of /dev/dsp -- no sounds");
+
+  /* try if we can use stereo sound */
+  if (ioctl(audio.device_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
+  {
+#ifdef DEBUG
+    static boolean reported = FALSE;
+
+    if (!reported)
+    {
+      Error(ERR_RETURN, "cannot get stereo sound on /dev/dsp");
+      reported = TRUE;
+    }
+#endif
+    stereo = FALSE;
+  }
+
+  if (ioctl(audio.device_fd, SNDCTL_DSP_SPEED, &sample_rate) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set sample rate of /dev/dsp -- no sounds");
+
+  /* get the real fragmentation size; this should return 512 */
+  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot get fragment size of /dev/dsp -- no sounds");
+
+  return (boolean)stereo;
+}
+#endif	/* AUDIO_LINUX_IOCTL */
+
+#if defined(PLATFORM_NETBSD)
+static boolean InitAudioDevice_NetBSD(long fragment_size, int sample_rate)
+{
+  audio_info_t a_info;
+  boolean stereo = TRUE;
+
+  AUDIO_INITINFO(&a_info);
+  a_info.play.encoding = AUDIO_ENCODING_LINEAR8;
+  a_info.play.precision = 8;
+  a_info.play.channels = 2;
+  a_info.play.sample_rate = sample_rate;
+  a_info.blocksize = fragment_size;
+
+  if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
+  {
+    /* try to disable stereo */
+    a_info.play.channels = 1;
+    stereo = FALSE;
+
+    if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
+      Error(ERR_EXIT_SOUND_SERVER,
+	    "cannot set sample rate of /dev/audio -- no sounds");
+  }
+
+  return stereo;
+}
+#endif /* PLATFORM_NETBSD */
+
 #if defined(PLATFORM_HPUX)
-static void HPUX_Audio_Control()
+static boolean InitAudioDevice_HPUX()
 {
   struct audio_describe ainfo;
   int audio_ctl;
 
   audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
   if (audio_ctl == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl -- no sounds");
 
   if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "no audio info - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "no audio info -- no sounds");
 
   if (ioctl(audio_ctl, AUDIO_SET_DATA_FORMAT, AUDIO_FORMAT_ULAW) == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "ulaw audio not available - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "ulaw audio not available -- no sounds");
 
   ioctl(audio_ctl, AUDIO_SET_CHANNELS, 1);
   ioctl(audio_ctl, AUDIO_SET_SAMPLE_RATE, 8000);
 
   close(audio_ctl);
+
+  return TRUE;	/* to provide common interface for InitAudioDevice_...() */
 }
 #endif /* PLATFORM_HPUX */
 
@@ -855,11 +905,11 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 }
 #endif /* PLATFORM_UNIX && !AUDIO_STREAMING_DSP */
 
-/*** THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
-/*===========================================================================*/
+/* THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
+/* ========================================================================= */
+/* THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS                          */
 
-/*** THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS ***/
 
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		20	/* size of WAV file header */
@@ -892,7 +942,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 
   if ((snd_info->mix_chunk = Mix_LoadWAV(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
     return FALSE;
   }
 
@@ -900,7 +950,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
-    Error(ERR_WARN, "cannot open sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot open sound file '%s' -- no sounds", filename);
     return FALSE;
   }
 
@@ -942,7 +992,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   if (fread(snd_info->data_ptr, 1, snd_info->data_len, file) !=
       snd_info->data_len)
   {
-    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
     fclose(file);
     return FALSE;
   }
@@ -957,7 +1007,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   snd_info->sample_ptr = load_sample(filename);
   if (!snd_info->sample_ptr)
   {
-    Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read sound file '%s' -- no sounds", filename);
     return FALSE;
   }
 
@@ -988,7 +1038,7 @@ boolean LoadMod(char *mod_name)
 
   if ((mod_info->mix_music = Mix_LoadMUS(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read music file '%s' - no music", filename);
+    Error(ERR_WARN, "cannot read music file '%s' -- no music", filename);
     return FALSE;
   }
 
@@ -1125,7 +1175,7 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 #elif defined(PLATFORM_UNIX)
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
-    Error(ERR_WARN, "cannot pipe to child process - no sounds");
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
@@ -1227,7 +1277,7 @@ void StopSoundExt(int nr, int method)
 #if !defined(PLATFORM_MSDOS)
   if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
   {
-    Error(ERR_WARN, "cannot pipe to child process - no sounds");
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
     audio.sound_available = audio.sound_enabled = FALSE;
     return;
   }
@@ -1254,4 +1304,5 @@ void FreeSounds(int num_sounds)
 #endif
 }
 
-/*** THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS ***/
+/* THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS                          */
+/* ========================================================================= */

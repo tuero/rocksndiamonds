@@ -56,6 +56,10 @@
 #define PLATFORM_FREEBSD
 #endif
 
+#if defined(__NetBSD__)
+#define PLATFORM_NETBSD
+#endif
+
 /* detecting HP-UX by the following compiler keyword definitions:
    - in K&R mode (the default), the HP C compiler defines "hpux"
    - in ANSI mode (-Aa or -Ae), the HP C compiler defines "__hpux"

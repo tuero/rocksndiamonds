@@ -1,14 +1,19 @@
 Release Version 2.0.1 [?? ??? 2002]
 -----------------------------------
 	- bug in explosion code fixed that broke level 24 of "Baby Ghost Mine"
-	- several Supaplex emulation bugs fixed thanks to Mihail Milushev:
+	- several Supaplex emulation bugs fixed (thanks to Mihail Milushev):
 	  + orange disk does not fall off from slippery elements
 	  + infotrons kill electrons and snik snaks and trigger orange disks
 	  + explosion chain reactions are now a bit slower than murphy
 	- behaviour of robots adjusted to make them less aggressive
+	  (needed for quite some Emerald Mine Club levels)
 	- icon for Windows executable added
 	- bug when selecting default level series fixed
-	- Windows fullscreen bug fixed (workaround for bug in SDL)
+	- bug in storing amoeba content fixed
+	- nasty tape bugs fixed (completely reworked tape stuff)
+	- fullscreen mode now works with Windows (workaround for bug in SDL)
+	- /dev/dsp support for NetBSD added (thanks to Krister Walfridsson)
+	- some small sound bugs fixed
 
 Release Version 2.0.0 [01 JAN 2001]
 -----------------------------------

@@ -26,6 +26,9 @@
 #include <linux/soundcard.h>
 #elif defined(PLATFORM_FREEBSD)
 #include <machine/soundcard.h>
+#elif defined(PLATFORM_NETBSD)
+#include <sys/ioctl.h>
+#include <sys/audioio.h>
 #elif defined(PLATFORM_HPUX)
 #include <sys/audio.h>
 #endif
@@ -34,6 +37,10 @@
 
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
+#define AUDIO_LINUX_IOCTL
+#endif
+
+#if defined(AUDIO_LINUX_IOCTL) || defined(PLATFORM_NETBSD)
 #define AUDIO_STREAMING_DSP
 #endif
 
@@ -132,6 +139,7 @@
 #endif
 #endif
 
+#if 0
 struct SoundHeader_SUN
 {
   unsigned long magic;
@@ -148,6 +156,7 @@ struct SoundHeader_8SVX
   unsigned long chunk_size;
   char magic_8SVX[4];
 };
+#endif
 
 struct SampleInfo
 { 

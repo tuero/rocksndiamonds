@@ -1204,6 +1204,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 void DrawHallOfFame(int highlight_position)
 {
   UnmapAllGadgets();
+  FadeSounds();
   CloseDoor(DOOR_CLOSE_2);
 
   if (highlight_position < 0) 
