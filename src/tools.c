@@ -2433,7 +2433,7 @@ int get_next_element(int element)
   }
 }
 
-int el2gfx(int element)
+int el2gfx_OLD(int element)
 {
   switch(element)
   {
@@ -2713,4 +2713,23 @@ int el2gfx(int element)
 	return -1;
     }
   }
+}
+
+int el2gfx(int element)
+{
+  int graphic_OLD = el2gfx_OLD(element);
+  int graphic_NEW = element_info[element].graphic;
+
+  if (element >= MAX_ELEMENTS)
+  {
+    Error(ERR_WARN, "el2gfx: element == %d >= MAX_ELEMENTS", element);
+  }
+
+  if (graphic_NEW != graphic_OLD)
+  {
+    Error(ERR_WARN, "el2gfx: graphic_NEW (%d) != graphic_OLD (%d)",
+	  graphic_NEW, graphic_OLD);
+  }
+
+  return graphic_NEW;
 }

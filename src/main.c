@@ -353,7 +353,7 @@ struct SoundEffectInfo sound_effects[] =
 #endif
 };
 
-struct ElementInfo element_info[] =
+struct ElementInfo element_info[MAX_ELEMENTS] =
 {
   { "empty_space",		"empty space"			},      /* 0 */
   { "sand",			"sand"				},
@@ -722,6 +722,8 @@ struct ElementInfo element_info[] =
   "-------------------------------",
   */
 };
+
+struct GraphicInfo graphic_info[MAX_GRAPHICS];
 
 
 /* ========================================================================= */

@@ -180,6 +180,7 @@
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
+#define MAX_GRAPHICS		1536		/* see below: NUM_TILES */
 #define MAX_NUM_AMOEBA		100
 
 /* values for elements with content */
@@ -340,8 +341,19 @@ struct GlobalInfo
 
 struct ElementInfo
 {
-  char *sound_class_name;
-  char *editor_description;
+  char *sound_class_name;	/* classification for custom sound effects */
+  char *editor_description;	/* short description for level editor */
+
+  int graphic;
+};
+
+struct GraphicInfo
+{
+  Bitmap *bitmap;
+  int src_x, src_y;
+  int anim_frames;
+  int anim_delay;
+  int anim_mode;
 };
 
 extern GC		tile_clip_gc;
@@ -402,6 +414,7 @@ extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
+extern struct GraphicInfo	graphic_info[];
 extern struct SoundEffectInfo	sound_effects[];
 
 /* often used screen positions */
@@ -900,7 +913,7 @@ extern struct SoundEffectInfo	sound_effects[];
 #define GFX_START_ROCKSMORE	1280
 #define GFX_END_ROCKSMORE	1535
 
-#define NUM_TILES		1536
+#define NUM_TILES		1536		/* see above: MAX_GRAPHICS */
 
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */

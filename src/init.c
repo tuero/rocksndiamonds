@@ -51,6 +51,7 @@ static void InitSound(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
+static void InitElementInfo(void);
 static void InitElementProperties(void);
 static void Execute_Debug_Command(char *);
 
@@ -95,6 +96,7 @@ void OpenAll(void)
   InitEventFilter(FilterMouseMotionEvents);
 
   InitGfx();
+  InitElementInfo();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
   InitLevelInfo();
@@ -533,9 +535,335 @@ void InitGadgets()
   CreateScreenGadgets();
 }
 
+void InitElementInfo()
+{
+  int i;
+
+  static struct
+  {
+    int element;
+    int graphic;
+  }
+  element_to_graphic[] =
+  {
+    { EL_LEERRAUM,			GFX_LEERRAUM		},
+    { EL_ERDREICH,			GFX_ERDREICH		},
+    { EL_MAUERWERK,			GFX_MAUERWERK		},
+    { EL_FELSBODEN,			GFX_FELSBODEN		},
+    { EL_FELSBROCKEN,			GFX_FELSBROCKEN		},
+    { EL_SCHLUESSEL,			GFX_SCHLUESSEL		},
+    { EL_EDELSTEIN,			GFX_EDELSTEIN		},
+    { EL_AUSGANG_ZU,			GFX_AUSGANG_ZU		},
+    { EL_AUSGANG_ACT,			GFX_AUSGANG_ACT		},
+    { EL_AUSGANG_AUF,			GFX_AUSGANG_AUF		},
+    { EL_SPIELFIGUR,			GFX_SPIELFIGUR		},
+    { EL_SPIELER1,			GFX_SPIELER1		},
+    { EL_SPIELER2,			GFX_SPIELER2		},
+    { EL_SPIELER3,			GFX_SPIELER3		},
+    { EL_SPIELER4,			GFX_SPIELER4		},
+    { EL_KAEFER,			GFX_KAEFER		},
+    { EL_KAEFER_RIGHT,			GFX_KAEFER_RIGHT	},
+    { EL_KAEFER_UP,			GFX_KAEFER_UP		},
+    { EL_KAEFER_LEFT,			GFX_KAEFER_LEFT		},
+    { EL_KAEFER_DOWN,			GFX_KAEFER_DOWN		},
+    { EL_FLIEGER,			GFX_FLIEGER		},
+    { EL_FLIEGER_RIGHT,			GFX_FLIEGER_RIGHT	},
+    { EL_FLIEGER_UP,			GFX_FLIEGER_UP		},
+    { EL_FLIEGER_LEFT,			GFX_FLIEGER_LEFT	},
+    { EL_FLIEGER_DOWN,			GFX_FLIEGER_DOWN	},
+    { EL_BUTTERFLY,			GFX_BUTTERFLY		},
+    { EL_BUTTERFLY_RIGHT,		GFX_BUTTERFLY_RIGHT	},
+    { EL_BUTTERFLY_UP,			GFX_BUTTERFLY_UP	},
+    { EL_BUTTERFLY_LEFT,		GFX_BUTTERFLY_LEFT	},
+    { EL_BUTTERFLY_DOWN,		GFX_BUTTERFLY_DOWN	},
+    { EL_FIREFLY,			GFX_FIREFLY		},
+    { EL_FIREFLY_RIGHT,			GFX_FIREFLY_RIGHT	},
+    { EL_FIREFLY_UP,			GFX_FIREFLY_UP		},
+    { EL_FIREFLY_LEFT,			GFX_FIREFLY_LEFT	},
+    { EL_FIREFLY_DOWN,			GFX_FIREFLY_DOWN	},
+    { EL_MAMPFER,			GFX_MAMPFER		},
+    { EL_ROBOT,				GFX_ROBOT		},
+    { EL_BETON,				GFX_BETON		},
+    { EL_DIAMANT,			GFX_DIAMANT		},
+    { EL_MORAST_LEER,			GFX_MORAST_LEER		},
+    { EL_MORAST_VOLL,			GFX_MORAST_VOLL		},
+    { EL_QUICKSAND_EMPTYING,		GFX_MORAST_LEER		},
+    { EL_TROPFEN,			GFX_TROPFEN		},
+    { EL_BOMBE,				GFX_BOMBE		},
+    { EL_MAGIC_WALL_OFF,		GFX_MAGIC_WALL_OFF	},
+    { EL_MAGIC_WALL_EMPTY,		GFX_MAGIC_WALL_EMPTY	},
+    { EL_MAGIC_WALL_EMPTYING,		GFX_MAGIC_WALL_EMPTY	},
+    { EL_MAGIC_WALL_FULL,		GFX_MAGIC_WALL_FULL	},
+    { EL_MAGIC_WALL_DEAD,		GFX_MAGIC_WALL_DEAD	},
+    { EL_SALZSAEURE,			GFX_SALZSAEURE		},
+    { EL_AMOEBE_TOT,			GFX_AMOEBE_TOT		},
+    { EL_AMOEBE_NASS,			GFX_AMOEBE_NASS		},
+    { EL_AMOEBE_NORM,			GFX_AMOEBE_NORM		},
+    { EL_AMOEBE_VOLL,			GFX_AMOEBE_VOLL		},
+    { EL_AMOEBE_BD,			GFX_AMOEBE_BD		},
+    { EL_AMOEBA2DIAM,			GFX_AMOEBA2DIAM		},
+    { EL_AMOEBA_DRIPPING,		GFX_AMOEBE_NASS		},
+    { EL_KOKOSNUSS,			GFX_KOKOSNUSS		},
+    { EL_LIFE,				GFX_LIFE		},
+    { EL_LIFE_ASYNC,			GFX_LIFE_ASYNC		},
+    { EL_DYNAMITE_ACTIVE,		GFX_DYNAMIT		},
+    { EL_BADEWANNE,			GFX_BADEWANNE		},
+    { EL_BADEWANNE1,			GFX_BADEWANNE1		},
+    { EL_BADEWANNE2,			GFX_BADEWANNE2		},
+    { EL_BADEWANNE3,			GFX_BADEWANNE3		},
+    { EL_BADEWANNE4,			GFX_BADEWANNE4		},
+    { EL_BADEWANNE5,			GFX_BADEWANNE5		},
+    { EL_ABLENK_AUS,			GFX_ABLENK_AUS		},
+    { EL_ABLENK_EIN,			GFX_ABLENK_EIN		},
+    { EL_SCHLUESSEL1,			GFX_SCHLUESSEL1		},
+    { EL_SCHLUESSEL2,			GFX_SCHLUESSEL2		},
+    { EL_SCHLUESSEL3,			GFX_SCHLUESSEL3		},
+    { EL_SCHLUESSEL4,			GFX_SCHLUESSEL4		},
+    { EL_PFORTE1,			GFX_PFORTE1		},
+    { EL_PFORTE2,			GFX_PFORTE2		},
+    { EL_PFORTE3,			GFX_PFORTE3		},
+    { EL_PFORTE4,			GFX_PFORTE4		},
+    { EL_PFORTE1X,			GFX_PFORTE1X		},
+    { EL_PFORTE2X,			GFX_PFORTE2X		},
+    { EL_PFORTE3X,			GFX_PFORTE3X		},
+    { EL_PFORTE4X,			GFX_PFORTE4X		},
+    { EL_DYNAMITE_INACTIVE,		GFX_DYNAMIT_AUS		},
+    { EL_PACMAN,			GFX_PACMAN		},
+    { EL_PACMAN_RIGHT,			GFX_PACMAN_RIGHT	},
+    { EL_PACMAN_UP,			GFX_PACMAN_UP		},
+    { EL_PACMAN_LEFT,			GFX_PACMAN_LEFT		},
+    { EL_PACMAN_DOWN,			GFX_PACMAN_DOWN		},
+    { EL_UNSICHTBAR,			GFX_UNSICHTBAR		},
+    { EL_ERZ_EDEL,			GFX_ERZ_EDEL		},
+    { EL_ERZ_DIAM,			GFX_ERZ_DIAM		},
+    { EL_BIRNE_AUS,			GFX_BIRNE_AUS		},
+    { EL_BIRNE_EIN,			GFX_BIRNE_EIN		},
+    { EL_ZEIT_VOLL,			GFX_ZEIT_VOLL		},
+    { EL_ZEIT_LEER,			GFX_ZEIT_LEER		},
+    { EL_MAUER_LEBT,			GFX_MAUER_LEBT		},
+    { EL_MAUER_X,			GFX_MAUER_X		},
+    { EL_MAUER_Y,			GFX_MAUER_Y		},
+    { EL_MAUER_XY,			GFX_MAUER_XY		},
+    { EL_EDELSTEIN_BD,			GFX_EDELSTEIN_BD	},
+    { EL_EDELSTEIN_GELB,		GFX_EDELSTEIN_GELB	},
+    { EL_EDELSTEIN_ROT,			GFX_EDELSTEIN_ROT	},
+    { EL_EDELSTEIN_LILA,		GFX_EDELSTEIN_LILA	},
+    { EL_ERZ_EDEL_BD,			GFX_ERZ_EDEL_BD		},
+    { EL_ERZ_EDEL_GELB,			GFX_ERZ_EDEL_GELB	},
+    { EL_ERZ_EDEL_ROT,			GFX_ERZ_EDEL_ROT	},
+    { EL_ERZ_EDEL_LILA,			GFX_ERZ_EDEL_LILA	},
+    { EL_MAMPFER2,			GFX_MAMPFER2		},
+    { EL_MAGIC_WALL_BD_OFF,		GFX_MAGIC_WALL_BD_OFF	},
+    { EL_MAGIC_WALL_BD_EMPTY,		GFX_MAGIC_WALL_BD_EMPTY	},
+    { EL_MAGIC_WALL_BD_EMPTYING,	GFX_MAGIC_WALL_BD_EMPTY	},
+    { EL_MAGIC_WALL_BD_FULL,		GFX_MAGIC_WALL_BD_FULL	},
+    { EL_MAGIC_WALL_BD_DEAD,		GFX_MAGIC_WALL_BD_DEAD	},
+    { EL_DYNABOMB_ACTIVE_1,		GFX_DYNABOMB		},
+    { EL_DYNABOMB_ACTIVE_2,		GFX_DYNABOMB		},
+    { EL_DYNABOMB_ACTIVE_3,		GFX_DYNABOMB		},
+    { EL_DYNABOMB_ACTIVE_4,		GFX_DYNABOMB		},
+    { EL_DYNABOMB_NR,			GFX_DYNABOMB_NR		},
+    { EL_DYNABOMB_SZ,			GFX_DYNABOMB_SZ		},
+    { EL_DYNABOMB_XL,			GFX_DYNABOMB_XL		},
+    { EL_SOKOBAN_OBJEKT,		GFX_SOKOBAN_OBJEKT	},
+    { EL_SOKOBAN_FELD_LEER,		GFX_SOKOBAN_FELD_LEER	},
+    { EL_SOKOBAN_FELD_VOLL,		GFX_SOKOBAN_FELD_VOLL	},
+    { EL_MOLE,				GFX_MOLE		},
+    { EL_PINGUIN,			GFX_PINGUIN		},
+    { EL_SCHWEIN,			GFX_SCHWEIN		},
+    { EL_DRACHE,			GFX_DRACHE		},
+    { EL_SONDE,				GFX_SONDE		},
+    { EL_PFEIL_LEFT,			GFX_PFEIL_LEFT		},
+    { EL_PFEIL_RIGHT,			GFX_PFEIL_RIGHT		},
+    { EL_PFEIL_UP,			GFX_PFEIL_UP		},
+    { EL_PFEIL_DOWN,			GFX_PFEIL_DOWN		},
+    { EL_SPEED_PILL,			GFX_SPEED_PILL		},
+    { EL_SP_TERMINAL_ACTIVE,		GFX_SP_TERMINAL		},
+    { EL_SP_BUG_ACTIVE,			GFX_SP_BUG_ACTIVE	},
+    { EL_SP_ZONK,			GFX_SP_ZONK		},
+    { EL_INVISIBLE_STEEL,		GFX_INVISIBLE_STEEL	},
+    { EL_BLACK_ORB,			GFX_BLACK_ORB		},
+    { EL_EM_GATE_1,			GFX_EM_GATE_1		},
+    { EL_EM_GATE_2,			GFX_EM_GATE_2		},
+    { EL_EM_GATE_3,			GFX_EM_GATE_3		},
+    { EL_EM_GATE_4,			GFX_EM_GATE_4		},
+    { EL_EM_GATE_1X,			GFX_EM_GATE_1X		},
+    { EL_EM_GATE_2X,			GFX_EM_GATE_2X		},
+    { EL_EM_GATE_3X,			GFX_EM_GATE_3X		},
+    { EL_EM_GATE_4X,			GFX_EM_GATE_4X		},
+    { EL_EM_KEY_1_FILE,			GFX_EM_KEY_1		},
+    { EL_EM_KEY_2_FILE,			GFX_EM_KEY_2		},
+    { EL_EM_KEY_3_FILE,			GFX_EM_KEY_3		},
+    { EL_EM_KEY_4_FILE,			GFX_EM_KEY_4		},
+    { EL_EM_KEY_1,			GFX_EM_KEY_1		},
+    { EL_EM_KEY_2,			GFX_EM_KEY_2		},
+    { EL_EM_KEY_3,			GFX_EM_KEY_3		},
+    { EL_EM_KEY_4,			GFX_EM_KEY_4		},
+    { EL_PEARL,				GFX_PEARL		},
+    { EL_CRYSTAL,			GFX_CRYSTAL		},
+    { EL_WALL_PEARL,			GFX_WALL_PEARL		},
+    { EL_WALL_CRYSTAL,			GFX_WALL_CRYSTAL	},
+    { EL_DOOR_WHITE,			GFX_DOOR_WHITE		},
+    { EL_DOOR_WHITE_GRAY,		GFX_DOOR_WHITE_GRAY	},
+    { EL_KEY_WHITE,			GFX_KEY_WHITE		},
+    { EL_SHIELD_PASSIVE,		GFX_SHIELD_PASSIVE	},
+    { EL_SHIELD_ACTIVE,			GFX_SHIELD_ACTIVE	},
+    { EL_EXTRA_TIME,			GFX_EXTRA_TIME		},
+    { EL_SWITCHGATE_OPEN,		GFX_SWITCHGATE_OPEN	},
+    { EL_SWITCHGATE_CLOSED,		GFX_SWITCHGATE_CLOSED	},
+    { EL_SWITCHGATE_SWITCH_1,		GFX_SWITCHGATE_SWITCH_1	},
+    { EL_SWITCHGATE_SWITCH_2,		GFX_SWITCHGATE_SWITCH_2	},
+    { EL_BELT1_LEFT,			GFX_BELT1_LEFT		},
+    { EL_BELT1_MIDDLE,			GFX_BELT1_MIDDLE	},
+    { EL_BELT1_RIGHT,			GFX_BELT1_RIGHT		},
+    { EL_BELT1_SWITCH_LEFT,		GFX_BELT1_SWITCH_LEFT	},
+    { EL_BELT1_SWITCH_MIDDLE,		GFX_BELT1_SWITCH_MIDDLE	},
+    { EL_BELT1_SWITCH_RIGHT,		GFX_BELT1_SWITCH_RIGHT	},
+    { EL_BELT2_LEFT,			GFX_BELT2_LEFT		},
+    { EL_BELT2_MIDDLE,			GFX_BELT2_MIDDLE	},
+    { EL_BELT2_RIGHT,			GFX_BELT2_RIGHT		},
+    { EL_BELT2_SWITCH_LEFT,		GFX_BELT2_SWITCH_LEFT	},
+    { EL_BELT2_SWITCH_MIDDLE,		GFX_BELT2_SWITCH_MIDDLE	},
+    { EL_BELT2_SWITCH_RIGHT,		GFX_BELT2_SWITCH_RIGHT	},
+    { EL_BELT3_LEFT,			GFX_BELT3_LEFT		},
+    { EL_BELT3_MIDDLE,			GFX_BELT3_MIDDLE	},
+    { EL_BELT3_RIGHT,			GFX_BELT3_RIGHT		},
+    { EL_BELT3_SWITCH_LEFT,		GFX_BELT3_SWITCH_LEFT	},
+    { EL_BELT3_SWITCH_MIDDLE,		GFX_BELT3_SWITCH_MIDDLE	},
+    { EL_BELT3_SWITCH_RIGHT,		GFX_BELT3_SWITCH_RIGHT	},
+    { EL_BELT4_LEFT,			GFX_BELT4_LEFT		},
+    { EL_BELT4_MIDDLE,			GFX_BELT4_MIDDLE	},
+    { EL_BELT4_RIGHT,			GFX_BELT4_RIGHT		},
+    { EL_BELT4_SWITCH_LEFT,		GFX_BELT4_SWITCH_LEFT	},
+    { EL_BELT4_SWITCH_MIDDLE,		GFX_BELT4_SWITCH_MIDDLE	},
+    { EL_BELT4_SWITCH_RIGHT,		GFX_BELT4_SWITCH_RIGHT	},
+    { EL_LANDMINE,			GFX_LANDMINE		},
+    { EL_ENVELOPE,			GFX_ENVELOPE		},
+    { EL_LIGHT_SWITCH_OFF,		GFX_LIGHT_SWITCH_OFF	},
+    { EL_LIGHT_SWITCH_ON,		GFX_LIGHT_SWITCH_ON	},
+    { EL_SIGN_EXCLAMATION,		GFX_SIGN_EXCLAMATION	},
+    { EL_SIGN_RADIOACTIVITY,		GFX_SIGN_RADIOACTIVITY	},
+    { EL_SIGN_STOP,			GFX_SIGN_STOP		},
+    { EL_SIGN_WHEELCHAIR,		GFX_SIGN_WHEELCHAIR	},
+    { EL_SIGN_PARKING,			GFX_SIGN_PARKING	},
+    { EL_SIGN_ONEWAY,			GFX_SIGN_ONEWAY		},
+    { EL_SIGN_HEART,			GFX_SIGN_HEART		},
+    { EL_SIGN_TRIANGLE,			GFX_SIGN_TRIANGLE	},
+    { EL_SIGN_ROUND,			GFX_SIGN_ROUND		},
+    { EL_SIGN_EXIT,			GFX_SIGN_EXIT		},
+    { EL_SIGN_YINYANG,			GFX_SIGN_YINYANG	},
+    { EL_SIGN_OTHER,			GFX_SIGN_OTHER		},
+    { EL_MOLE_LEFT,			GFX_MOLE_LEFT		},
+    { EL_MOLE_RIGHT,			GFX_MOLE_RIGHT		},
+    { EL_MOLE_UP,			GFX_MOLE_UP		},
+    { EL_MOLE_DOWN,			GFX_MOLE_DOWN		},
+    { EL_STEEL_SLANTED,			GFX_STEEL_SLANTED	},
+    { EL_SAND_INVISIBLE,		GFX_SAND_INVISIBLE	},
+    { EL_DX_UNKNOWN_15,			GFX_DX_UNKNOWN_15	},
+    { EL_DX_UNKNOWN_42,			GFX_DX_UNKNOWN_42	},
+    { EL_TIMEGATE_OPEN,			GFX_TIMEGATE_OPEN	},
+    { EL_TIMEGATE_CLOSED,		GFX_TIMEGATE_CLOSED	},
+    { EL_TIMEGATE_SWITCH_ON,		GFX_TIMEGATE_SWITCH	},
+    { EL_TIMEGATE_SWITCH_OFF,		GFX_TIMEGATE_SWITCH	},
+    { EL_BALLOON,			GFX_BALLOON		},
+    { EL_BALLOON_SEND_LEFT,		GFX_BALLOON_SEND_LEFT	},
+    { EL_BALLOON_SEND_RIGHT,		GFX_BALLOON_SEND_RIGHT	},
+    { EL_BALLOON_SEND_UP,		GFX_BALLOON_SEND_UP	},
+    { EL_BALLOON_SEND_DOWN,		GFX_BALLOON_SEND_DOWN	},
+    { EL_BALLOON_SEND_ANY,		GFX_BALLOON_SEND_ANY	},
+    { EL_EMC_STEEL_WALL_1,		GFX_EMC_STEEL_WALL_1	},
+    { EL_EMC_STEEL_WALL_2,		GFX_EMC_STEEL_WALL_2	},
+    { EL_EMC_STEEL_WALL_3,		GFX_EMC_STEEL_WALL_3	},
+    { EL_EMC_STEEL_WALL_4,		GFX_EMC_STEEL_WALL_4	},
+    { EL_EMC_WALL_1,			GFX_EMC_WALL_1		},
+    { EL_EMC_WALL_2,			GFX_EMC_WALL_2		},
+    { EL_EMC_WALL_3,			GFX_EMC_WALL_3		},
+    { EL_EMC_WALL_4,			GFX_EMC_WALL_4		},
+    { EL_EMC_WALL_5,			GFX_EMC_WALL_5		},
+    { EL_EMC_WALL_6,			GFX_EMC_WALL_6		},
+    { EL_EMC_WALL_7,			GFX_EMC_WALL_7		},
+    { EL_EMC_WALL_8,			GFX_EMC_WALL_8		},
+    { EL_TUBE_CROSS,			GFX_TUBE_CROSS		},
+    { EL_TUBE_VERTICAL,			GFX_TUBE_VERTICAL	},
+    { EL_TUBE_HORIZONTAL,		GFX_TUBE_HORIZONTAL	},
+    { EL_TUBE_VERT_LEFT,		GFX_TUBE_VERT_LEFT	},
+    { EL_TUBE_VERT_RIGHT,		GFX_TUBE_VERT_RIGHT	},
+    { EL_TUBE_HORIZ_UP,			GFX_TUBE_HORIZ_UP	},
+    { EL_TUBE_HORIZ_DOWN,		GFX_TUBE_HORIZ_DOWN	},
+    { EL_TUBE_LEFT_UP,			GFX_TUBE_LEFT_UP	},
+    { EL_TUBE_LEFT_DOWN,		GFX_TUBE_LEFT_DOWN	},
+    { EL_TUBE_RIGHT_UP,			GFX_TUBE_RIGHT_UP	},
+    { EL_TUBE_RIGHT_DOWN,		GFX_TUBE_RIGHT_DOWN	},
+    { EL_SPRING,			GFX_SPRING		},
+    { EL_SPRING_MOVING,			GFX_SPRING		},
+    { EL_TRAP_INACTIVE,			GFX_TRAP_INACTIVE	},
+    { EL_TRAP_ACTIVE,			GFX_TRAP_ACTIVE		},
+    { EL_BD_WALL,			GFX_BD_WALL		},
+    { EL_BD_ROCK,			GFX_BD_ROCK		},
+    { EL_DX_SUPABOMB,			GFX_DX_SUPABOMB		},
+    { EL_SP_MURPHY_CLONE,		GFX_SP_MURPHY_CLONE	},
+    { -1,				-1			}
+  };
+
+  /* always start with reliable default values */
+  for(i=0; i<MAX_ELEMENTS; i++)
+    element_info[i].graphic = GFX_LEERRAUM;
+
+  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
+    element_info[i].graphic = GFX_CHAR_START + (i - EL_CHAR_START);
+
+  for (i=EL_SP_START; i<=EL_SP_END; i++)
+  {
+    int nr_element = i - EL_SP_START;
+    int gfx_per_line = 8;
+    int nr_graphic =
+      (nr_element / gfx_per_line) * SP_PER_LINE +
+      (nr_element % gfx_per_line);
+
+    element_info[i].graphic = GFX_START_ROCKSSP + nr_graphic;
+  }
+
+  /* this overrides some of the above default settings (GFX_SP_ZONK etc.) */
+  i = 0;
+  while (element_to_graphic[i].element > -1)
+  {
+    int element = element_to_graphic[i].element;
+    int graphic = element_to_graphic[i].graphic;
+
+    element_info[element].graphic = graphic;
+    i++;
+  }
+}
+
+void InitGraphicInfo()
+{
+  int i;
+
+  /* always start with reliable default values */
+  for(i=0; i<MAX_GRAPHICS; i++)
+  {
+    graphic_info[i].bitmap = pix[PIX_SP];	/* graphic that ... */
+    graphic_info[i].src_x = 0;			/* ... contains ... */
+    graphic_info[i].src_y = 0;			/* ... empty space. */
+    graphic_info[i].anim_frames = 1;
+    graphic_info[i].anim_delay = 0;
+    graphic_info[i].anim_mode = ANIM_NORMAL;
+  }
+
+  for(i=0; i<MAX_GRAPHICS; i++)
+  {
+    int bitmap_nr;
+
+    getGraphicSource(i, &bitmap_nr,
+		     &graphic_info[i].src_x, &graphic_info[i].src_y);
+
+    graphic_info[i].bitmap = pix[bitmap_nr];
+  }
+}
+
 void InitElementProperties()
 {
-  int i,j;
+  int i, j;
 
   static int ep_amoebalive[] =
   {

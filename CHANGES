@@ -1,3 +1,7 @@
+Release Version 2.1.2 [?? ??? ????]
+-----------------------------------
+	- level series artwork now configurable via level series config file
+
 Release Version 2.1.1 [13 AUG 2002]
 -----------------------------------
 	- sound bug (causing crashes) fixed (reported by Keith Peterston)
