@@ -39,7 +39,7 @@ void StartMoving(int, int);
 void ContinueMoving(int, int);
 int AmoebeNachbarNr(int, int);
 void AmoebeUmwandeln(int, int);
-void AmoebeUmwandeln2(int, int, int);
+void AmoebeUmwandelnBD(int, int, int);
 void AmoebeWaechst(int, int);
 void AmoebeAbleger(int, int);
 void Life(int, int);

@@ -971,7 +971,8 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if ((element == EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
   {
-    graphic += phase * (element == EL_FELSBROCKEN ? 2 : 1);
+    if (element != EL_SP_INFOTRON)
+      graphic += phase * (element == EL_FELSBROCKEN ? 2 : 1);
   }
   else if ((element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
 	    element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL) && SiebAktiv)
@@ -1292,10 +1293,13 @@ void DrawMicroElement(int xpos, int ypos, int element)
   graphic = el2gfx(element);
 
   if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
     XCopyArea(display, pix[PIX_MORE], drawto, gc,
 	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
 	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
 	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  }
   else
     XCopyArea(display, pix[PIX_BACK], drawto, gc,
 	      MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,

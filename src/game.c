@@ -171,6 +171,138 @@ void GetPlayerConfig()
   InitJoysticks();
 }
 
+static void InitField(int x, int y, boolean init_game)
+{
+  switch (Feld[x][y])
+  {
+    case EL_SPIELFIGUR:
+      if (init_game)
+	Feld[x][y] = EL_SPIELER1;
+      /* no break! */
+    case EL_SPIELER1:
+    case EL_SPIELER2:
+    case EL_SPIELER3:
+    case EL_SPIELER4:
+      if (init_game)
+      {
+	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
+	int jx = player->jx, jy = player->jy;
+
+	player->present = TRUE;
+
+	/*
+	if (!network_playing || player->connected)
+	*/
+
+	if (!options.network || player->connected)
+	{
+	  player->active = TRUE;
+
+	  /* remove potentially duplicate players */
+	  if (StorePlayer[jx][jy] == Feld[x][y])
+	    StorePlayer[jx][jy] = 0;
+
+	  StorePlayer[x][y] = Feld[x][y];
+
+	  if (options.verbose)
+	  {
+	    printf("Player %d activated.\n", player->element_nr);
+	    printf("[Local player is %d and currently %s.]\n",
+		   local_player->element_nr,
+		   local_player->active ? "active" : "not active");
+	  }
+	}
+
+	Feld[x][y] = EL_LEERRAUM;
+	player->jx = player->last_jx = x;
+	player->jy = player->last_jy = y;
+      }
+      break;
+
+    case EL_BADEWANNE:
+      if (x < lev_fieldx-1 && Feld[x+1][y] == EL_SALZSAEURE)
+	Feld[x][y] = EL_BADEWANNE1;
+      else if (x > 0 && Feld[x-1][y] == EL_SALZSAEURE)
+	Feld[x][y] = EL_BADEWANNE2;
+      else if (y > 0 && Feld[x][y-1] == EL_BADEWANNE1)
+	Feld[x][y] = EL_BADEWANNE3;
+      else if (y > 0 && Feld[x][y-1] == EL_SALZSAEURE)
+	Feld[x][y] = EL_BADEWANNE4;
+      else if (y > 0 && Feld[x][y-1] == EL_BADEWANNE2)
+	Feld[x][y] = EL_BADEWANNE5;
+      break;
+
+    case EL_KAEFER_R:
+    case EL_KAEFER_O:
+    case EL_KAEFER_L:
+    case EL_KAEFER_U:
+    case EL_KAEFER:
+    case EL_FLIEGER_R:
+    case EL_FLIEGER_O:
+    case EL_FLIEGER_L:
+    case EL_FLIEGER_U:
+    case EL_FLIEGER:
+    case EL_BUTTERFLY_R:
+    case EL_BUTTERFLY_O:
+    case EL_BUTTERFLY_L:
+    case EL_BUTTERFLY_U:
+    case EL_BUTTERFLY:
+    case EL_FIREFLY_R:
+    case EL_FIREFLY_O:
+    case EL_FIREFLY_L:
+    case EL_FIREFLY_U:
+    case EL_FIREFLY:
+    case EL_PACMAN_R:
+    case EL_PACMAN_O:
+    case EL_PACMAN_L:
+    case EL_PACMAN_U:
+    case EL_MAMPFER:
+    case EL_MAMPFER2:
+    case EL_ROBOT:
+    case EL_PACMAN:
+      InitMovDir(x, y);
+      break;
+
+    case EL_AMOEBE_VOLL:
+    case EL_AMOEBE_BD:
+      InitAmoebaNr(x, y);
+      break;
+
+    case EL_TROPFEN:
+      if (y == lev_fieldy - 1)
+      {
+	Feld[x][y] = EL_AMOEBING;
+	Store[x][y] = EL_AMOEBE_NASS;
+      }
+      break;
+
+    case EL_DYNAMIT:
+      MovDelay[x][y] = 96;
+      break;
+
+    case EL_BIRNE_AUS:
+      local_player->lights_still_needed++;
+      break;
+
+    case EL_SOKOBAN_FELD_LEER:
+      local_player->sokobanfields_still_needed++;
+      break;
+
+    case EL_MAULWURF:
+    case EL_PINGUIN:
+      local_player->friends_still_needed++;
+      break;
+
+    case EL_SCHWEIN:
+    case EL_DRACHE:
+      MovDir[x][y] = 1 << RND(4);
+      break;
+
+    default:
+      break;
+  }
+}
+
 void InitGame()
 {
   int i, j, x, y;
@@ -283,123 +415,7 @@ void InitGame()
     if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
       emulate_sb = FALSE;
 
-    switch (Feld[x][y])
-    {
-      case EL_SPIELFIGUR:
-	Feld[x][y] = EL_SPIELER1;
-	/* no break! */
-      case EL_SPIELER1:
-      case EL_SPIELER2:
-      case EL_SPIELER3:
-      case EL_SPIELER4:
-      {
-	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
-	int jx = player->jx, jy = player->jy;
-
-	player->present = TRUE;
-
-	/*
-	if (!network_playing || player->connected)
-	*/
-
-	if (!options.network || player->connected)
-	{
-	  player->active = TRUE;
-
-	  /* remove potentially duplicate players */
-	  if (StorePlayer[jx][jy] == Feld[x][y])
-	    StorePlayer[jx][jy] = 0;
-
-	  StorePlayer[x][y] = Feld[x][y];
-
-	  if (options.verbose)
-	  {
-	    printf("Player %d activated.\n", player->element_nr);
-	    printf("[Local player is %d and currently %s.]\n",
-		   local_player->element_nr,
-		   local_player->active ? "active" : "not active");
-	  }
-	}
-
-	Feld[x][y] = EL_LEERRAUM;
-	player->jx = player->last_jx = x;
-	player->jy = player->last_jy = y;
-
-	break;
-      }
-      case EL_BADEWANNE:
-	if (x < lev_fieldx-1 && Feld[x+1][y] == EL_SALZSAEURE)
-	  Feld[x][y] = EL_BADEWANNE1;
-	else if (x > 0 && Feld[x-1][y] == EL_SALZSAEURE)
-	  Feld[x][y] = EL_BADEWANNE2;
-	else if (y > 0 && Feld[x][y-1] == EL_BADEWANNE1)
-	  Feld[x][y] = EL_BADEWANNE3;
-	else if (y > 0 && Feld[x][y-1] == EL_SALZSAEURE)
-	  Feld[x][y] = EL_BADEWANNE4;
-	else if (y > 0 && Feld[x][y-1] == EL_BADEWANNE2)
-	  Feld[x][y] = EL_BADEWANNE5;
-	break;
-      case EL_KAEFER_R:
-      case EL_KAEFER_O:
-      case EL_KAEFER_L:
-      case EL_KAEFER_U:
-      case EL_KAEFER:
-      case EL_FLIEGER_R:
-      case EL_FLIEGER_O:
-      case EL_FLIEGER_L:
-      case EL_FLIEGER_U:
-      case EL_FLIEGER:
-      case EL_BUTTERFLY_R:
-      case EL_BUTTERFLY_O:
-      case EL_BUTTERFLY_L:
-      case EL_BUTTERFLY_U:
-      case EL_BUTTERFLY:
-      case EL_FIREFLY_R:
-      case EL_FIREFLY_O:
-      case EL_FIREFLY_L:
-      case EL_FIREFLY_U:
-      case EL_FIREFLY:
-      case EL_PACMAN_R:
-      case EL_PACMAN_O:
-      case EL_PACMAN_L:
-      case EL_PACMAN_U:
-      case EL_MAMPFER:
-      case EL_MAMPFER2:
-      case EL_ROBOT:
-      case EL_PACMAN:
-	InitMovDir(x, y);
-	break;
-      case EL_AMOEBE_VOLL:
-      case EL_AMOEBE_BD:
-	InitAmoebaNr(x, y);
-	break;
-      case EL_TROPFEN:
-	if (y == lev_fieldy - 1)
-	{
-	  Feld[x][y] = EL_AMOEBING;
-	  Store[x][y] = EL_AMOEBE_NASS;
-	}
-	break;
-      case EL_DYNAMIT:
-	MovDelay[x][y] = 96;
-	break;
-      case EL_BIRNE_AUS:
-	local_player->lights_still_needed++;
-	break;
-      case EL_SOKOBAN_FELD_LEER:
-	local_player->sokobanfields_still_needed++;
-	break;
-      case EL_MAULWURF:
-      case EL_PINGUIN:
-	local_player->friends_still_needed++;
-	break;
-      case EL_SCHWEIN:
-      case EL_DRACHE:
-	MovDir[x][y] = 1 << RND(4);
-	break;
-      default:
-	break;
-    }
+    InitField(x, y, TRUE);
   }
 
   /* check if any connected player was not found in playfield */
@@ -1089,6 +1105,7 @@ void Explode(int ex, int ey, int phase, int mode)
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+    InitField(x, y, FALSE);
     if (CAN_MOVE(element) || COULD_MOVE(element))
       InitMovDir(x, y);
     DrawLevelField(x, y);
@@ -2301,13 +2318,13 @@ int AmoebeNachbarNr(int ax, int ay)
 
   for (i=0; i<4; i++)
   {
-    int x = ax+xy[i%4][0];
-    int y = ay+xy[i%4][1];
+    int x = ax + xy[i][0];
+    int y = ay + xy[i][1];
 
     if (!IN_LEV_FIELD(x, y))
       continue;
 
-    if (Feld[x][y] == element && AmoebaNr[x][y]>0)
+    if (Feld[x][y] == element && AmoebaNr[x][y] > 0)
       group_nr = AmoebaNr[x][y];
   }
 
@@ -2326,13 +2343,13 @@ void AmoebenVereinigen(int ax, int ay)
     { 0, +1 }
   };
 
-  if (!new_group_nr)
+  if (new_group_nr == 0)
     return;
 
   for (i=0; i<4; i++)
   {
-    x = ax+xy[i%4][0];
-    y = ay+xy[i%4][1];
+    x = ax + xy[i][0];
+    y = ay + xy[i][1];
 
     if (!IN_LEV_FIELD(x, y))
       continue;
@@ -2344,14 +2361,22 @@ void AmoebenVereinigen(int ax, int ay)
     {
       int old_group_nr = AmoebaNr[x][y];
 
+      if (old_group_nr == 0)
+	return;
+
       AmoebaCnt[new_group_nr] += AmoebaCnt[old_group_nr];
       AmoebaCnt[old_group_nr] = 0;
       AmoebaCnt2[new_group_nr] += AmoebaCnt2[old_group_nr];
       AmoebaCnt2[old_group_nr] = 0;
 
-      for (yy=0; yy<lev_fieldy; yy++) for (xx=0; xx<lev_fieldx; xx++)
-	if (AmoebaNr[xx][yy] == old_group_nr)
-	  AmoebaNr[xx][yy] = new_group_nr;
+      for (yy=0; yy<lev_fieldy; yy++)
+      {
+	for (xx=0; xx<lev_fieldx; xx++)
+	{
+	  if (AmoebaNr[xx][yy] == old_group_nr)
+	    AmoebaNr[xx][yy] = new_group_nr;
+	}
+      }
     }
   }
 }
@@ -2359,33 +2384,47 @@ void AmoebenVereinigen(int ax, int ay)
 void AmoebeUmwandeln(int ax, int ay)
 {
   int i, x, y;
-  int group_nr = AmoebaNr[ax][ay];
-  static int xy[4][2] =
-  {
-    { 0, -1 },
-    { -1, 0 },
-    { +1, 0 },
-    { 0, +1 }
-  };
 
   if (Feld[ax][ay] == EL_AMOEBE_TOT)
   {
-    for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+    int group_nr = AmoebaNr[ax][ay];
+
+#ifdef DEBUG
+    if (group_nr == 0)
     {
-      if (Feld[x][y] == EL_AMOEBE_TOT && AmoebaNr[x][y] == group_nr)
+      printf("AmoebeUmwandeln(): ax = %d, ay = %d\n", ax, ay);
+      printf("AmoebeUmwandeln(): This should never happen!\n");
+      return;
+    }
+#endif
+
+    for (y=0; y<lev_fieldy; y++)
+    {
+      for (x=0; x<lev_fieldx; x++)
       {
-	AmoebaNr[x][y] = 0;
-	Feld[x][y] = EL_AMOEBA2DIAM;
+	if (Feld[x][y] == EL_AMOEBE_TOT && AmoebaNr[x][y] == group_nr)
+	{
+	  AmoebaNr[x][y] = 0;
+	  Feld[x][y] = EL_AMOEBA2DIAM;
+	}
       }
     }
     Bang(ax, ay);
   }
   else
   {
+    static int xy[4][2] =
+    {
+      { 0, -1 },
+      { -1, 0 },
+      { +1, 0 },
+      { 0, +1 }
+    };
+
     for (i=0; i<4; i++)
     {
-      x = ax+xy[i%4][0];
-      y = ay+xy[i%4][1];
+      x = ax + xy[i][0];
+      y = ay + xy[i][1];
 
       if (!IN_LEV_FIELD(x, y))
 	continue;
@@ -2396,23 +2435,36 @@ void AmoebeUmwandeln(int ax, int ay)
   }
 }
 
-void AmoebeUmwandeln2(int ax, int ay, int new_element)
+void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 {
   int x, y;
   int group_nr = AmoebaNr[ax][ay];
   boolean done = FALSE;
 
-  for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+#ifdef DEBUG
+  if (group_nr == 0)
   {
-    if (AmoebaNr[x][y] == group_nr &&
-	(Feld[x][y] == EL_AMOEBE_TOT ||
-	 Feld[x][y] == EL_AMOEBE_BD ||
-	 Feld[x][y] == EL_AMOEBING))
+    printf("AmoebeUmwandelnBD(): ax = %d, ay = %d\n", ax, ay);
+    printf("AmoebeUmwandelnBD(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  for (y=0; y<lev_fieldy; y++)
+  {
+    for (x=0; x<lev_fieldx; x++)
     {
-      AmoebaNr[x][y] = 0;
-      Feld[x][y] = new_element;
-      DrawLevelField(x, y);
-      done = TRUE;
+      if (AmoebaNr[x][y] == group_nr &&
+	  (Feld[x][y] == EL_AMOEBE_TOT ||
+	   Feld[x][y] == EL_AMOEBE_BD ||
+	   Feld[x][y] == EL_AMOEBING))
+      {
+	AmoebaNr[x][y] = 0;
+	Feld[x][y] = new_element;
+	InitField(x, y, FALSE);
+	DrawLevelField(x, y);
+	done = TRUE;
+      }
     }
   }
 
@@ -2441,7 +2493,7 @@ void AmoebeWaechst(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      DrawGraphic(SCREENX(x), SCREENY(y), GFX_AMOEBING+3-MovDelay[x][y]/2);
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_AMOEBING + 3 - MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
@@ -2473,7 +2525,7 @@ void AmoebeAbleger(int ax, int ay)
   }
 
   if (!MovDelay[ax][ay])	/* start making new amoeba field */
-    MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25/(1+level.tempo_amoebe));
+    MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25 / (1 + level.tempo_amoebe));
 
   if (MovDelay[ax][ay])		/* wait some time before making new amoeba */
   {
@@ -2485,8 +2537,8 @@ void AmoebeAbleger(int ax, int ay)
   if (element == EL_AMOEBE_NASS)	/* object is an acid / amoeba drop */
   {
     int start = RND(4);
-    int x = ax+xy[start][0];
-    int y = ay+xy[start][1];
+    int x = ax + xy[start][0];
+    int y = ay + xy[start][1];
 
     if (!IN_LEV_FIELD(x, y))
       return;
@@ -2501,16 +2553,16 @@ void AmoebeAbleger(int ax, int ay)
     if (newax == ax && neway == ay)
       return;
   }
-  else				/* normal or "filled" amoeba */
+  else				/* normal or "filled" (BD style) amoeba */
   {
     int start = RND(4);
     boolean waiting_for_player = FALSE;
 
     for (i=0; i<4; i++)
     {
-      int j = (start+i)%4;
-      int x = ax+xy[j][0];
-      int y = ay+xy[j][1];
+      int j = (start + i) % 4;
+      int x = ax + xy[j][0];
+      int y = ay + xy[j][1];
 
       if (!IN_LEV_FIELD(x, y))
 	continue;
@@ -2526,7 +2578,7 @@ void AmoebeAbleger(int ax, int ay)
 	waiting_for_player = TRUE;
     }
 
-    if (newax == ax && neway == ay)
+    if (newax == ax && neway == ay)		/* amoeba cannot grow */
     {
       if (i == 4 && !waiting_for_player)
       {
@@ -2534,35 +2586,48 @@ void AmoebeAbleger(int ax, int ay)
 	DrawLevelField(ax, ay);
 	AmoebaCnt[AmoebaNr[ax][ay]]--;
 
-	if (AmoebaCnt[AmoebaNr[ax][ay]]<=0)	/* amoeba is completely dead */
+	if (AmoebaCnt[AmoebaNr[ax][ay]] <= 0)	/* amoeba is completely dead */
 	{
 	  if (element == EL_AMOEBE_VOLL)
 	    AmoebeUmwandeln(ax, ay);
 	  else if (element == EL_AMOEBE_BD)
-	    AmoebeUmwandeln2(ax, ay, level.amoebe_inhalt);
+	    AmoebeUmwandelnBD(ax, ay, level.amoebe_inhalt);
 	}
       }
       return;
     }
     else if (element == EL_AMOEBE_VOLL || element == EL_AMOEBE_BD)
     {
+      /* amoeba gets larger by growing in some direction */
+
       int new_group_nr = AmoebaNr[ax][ay];
+
+#ifdef DEBUG
+  if (new_group_nr == 0)
+  {
+    printf("AmoebeAbleger(): newax = %d, neway = %d\n", newax, neway);
+    printf("AmoebeAbleger(): This should never happen!\n");
+    return;
+  }
+#endif
 
       AmoebaNr[newax][neway] = new_group_nr;
       AmoebaCnt[new_group_nr]++;
       AmoebaCnt2[new_group_nr]++;
+
+      /* if amoeba touches other amoeba(s) after growing, unify them */
       AmoebenVereinigen(newax, neway);
 
-      if (AmoebaCnt2[new_group_nr] >= 200 && element == EL_AMOEBE_BD)
+      if (element == EL_AMOEBE_BD && AmoebaCnt2[new_group_nr] >= 200)
       {
-	AmoebeUmwandeln2(newax, neway, EL_FELSBROCKEN);
+	AmoebeUmwandelnBD(newax, neway, EL_FELSBROCKEN);
 	return;
       }
     }
   }
 
-  if (element!=EL_AMOEBE_NASS || neway<ay || !IS_FREE(newax, neway) ||
-      (neway == lev_fieldy-1 && newax!=ax))
+  if (element != EL_AMOEBE_NASS || neway < ay || !IS_FREE(newax, neway) ||
+      (neway == lev_fieldy - 1 && newax != ax))
   {
     Feld[newax][neway] = EL_AMOEBING;
     Store[newax][neway] = element;
@@ -4004,6 +4069,7 @@ int DigField(struct PlayerInfo *player,
     case EL_EDELSTEIN_ROT:
     case EL_EDELSTEIN_LILA:
     case EL_DIAMANT:
+    case EL_SP_INFOTRON:
       RemoveField(x, y);
       local_player->gems_still_needed -= (element == EL_DIAMANT ? 3 : 1);
       if (local_player->gems_still_needed < 0)
@@ -4251,7 +4317,11 @@ int DigField(struct PlayerInfo *player,
       break;
 
     default:
-      return MF_NO_ACTION;
+      if (IS_EATABLE(element))		/* other kinds of 'dirt' */
+	Feld[x][y] = EL_LEERRAUM;
+      else
+	return MF_NO_ACTION;
+
       break;
   }
 
