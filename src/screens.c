@@ -127,6 +127,18 @@ static void drawCursorXY(int xpos, int ypos, int graphic)
   drawCursorExt(xpos, ypos, -1, graphic);
 }
 
+static void drawChooseTreeCursor(int ypos, int color)
+{
+  int last_game_status = game_status;	/* save current game status */
+
+  /* force LEVELS draw offset on artwork setup screen */
+  game_status = GAME_MODE_LEVELS;
+
+  drawCursorExt(0, ypos, color, 0);
+
+  game_status = last_game_status;	/* restore current game status */
+}
+
 static void PlaySound_Menu_Start(int sound)
 {
   if (sound_info[sound].loop)
@@ -1205,6 +1217,7 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
     item_position = items_max - items_visible;
 
   ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
@@ -1306,13 +1319,22 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (button == MB_MENU_INITIALIZE)
   {
+    int num_entries = numTreeInfoInGroup(ti);
     int entry_pos = posTreeInfo(ti);
 
     if (ti->cl_first == -1)
     {
+      /* only on initialization */
       ti->cl_first = MAX(0, entry_pos - num_page_entries + 1);
-      ti->cl_cursor =
-	entry_pos - ti->cl_first;
+      ti->cl_cursor = entry_pos - ti->cl_first;
+    }
+    else if (ti->cl_cursor >= num_page_entries ||
+	     (num_entries > num_page_entries &&
+	      num_entries - ti->cl_first < num_page_entries))
+    {
+      /* only after change of list size (by custom graphic configuration) */
+      ti->cl_first = MAX(0, entry_pos - num_page_entries + 1);
+      ti->cl_cursor = entry_pos - ti->cl_first;
     }
 
     if (dx == 999)	/* first entry is set by scrollbar position */
@@ -1323,7 +1345,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
     drawChooseTreeList(ti->cl_first, num_page_entries, ti);
     drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-    drawCursor(ti->cl_cursor, FC_RED);
+    drawChooseTreeCursor(ti->cl_cursor, FC_RED);
+
     return;
   }
   else if (button == MB_MENU_LEAVE)
@@ -1348,8 +1371,15 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (mx || my)		/* mouse input */
   {
+    int last_game_status = game_status;	/* save current game status */
+
+    /* force LEVELS draw offset on artwork setup screen */
+    game_status = GAME_MODE_LEVELS;
+
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
+
+    game_status = last_game_status;	/* restore current game status */
   }
   else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
   {
@@ -1377,7 +1407,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
 	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-	drawCursor(ti->cl_cursor, FC_RED);
+	drawChooseTreeCursor(ti->cl_cursor, FC_RED);
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
@@ -1391,7 +1421,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
 	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-	drawCursor(ti->cl_cursor, FC_RED);
+	drawChooseTreeCursor(ti->cl_cursor, FC_RED);
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
@@ -1417,6 +1447,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       node_cursor->cl_cursor = ti->cl_cursor;
       *ti_ptr = node_cursor->node_group;
       DrawChooseTree(ti_ptr);
+
       return;
     }
   }
@@ -1424,6 +1455,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   {
     *ti_ptr = ti->node_parent;
     DrawChooseTree(ti_ptr);
+
     return;
   }
 
@@ -1433,8 +1465,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     {
       if (y != ti->cl_cursor)
       {
-	drawCursor(y, FC_RED);
-	drawCursor(ti->cl_cursor, FC_BLUE);
+	drawChooseTreeCursor(y, FC_RED);
+	drawChooseTreeCursor(ti->cl_cursor, FC_BLUE);
 	drawChooseTreeInfo(ti->cl_first + y, ti);
 	ti->cl_cursor = y;
       }
@@ -1570,6 +1602,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     first_entry = 0;
     highlight_position = mx;
     drawHallOfFameList(first_entry, highlight_position);
+
     return;
   }
 
@@ -1585,6 +1618,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 	first_entry = 0;
 
       drawHallOfFameList(first_entry, highlight_position);
+
       return;
     }
   }
@@ -1597,6 +1631,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 	first_entry = MAX(0, MAX_SCORE_ENTRIES - NUM_MENU_ENTRIES_ON_SCREEN);
 
       drawHallOfFameList(first_entry, highlight_position);
+
       return;
     }
   }

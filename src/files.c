@@ -2199,36 +2199,12 @@ void LoadSpecialMenuDesignSettings()
   SetupFileHash *setup_file_hash;
   int i, j;
 
-#if 0
-  for (i=0; image_config_vars[i].token != NULL; i++)
-    printf("::: '%s'\n", image_config_vars[i].token);
-
-  printf("!!! '%lx'\n", image_config[353].token);
-
-#if 0
-  for (j=0; image_config[j].token != NULL; j++)
-  {
-    printf("!!! %d: '%lx'\n", j, image_config[j].token);
-    printf("!!! %d: '%s'\n", j, image_config[j].token);
-  }
-
-  printf("::: DONE\n");
-#endif
-#endif
-
-
   /* always start with reliable default values from default config */
   for (i=0; image_config_vars[i].token != NULL; i++)
-  {
-    /*
-    printf("::: %d\n", i);
-    */
-
     for (j=0; image_config[j].token != NULL; j++)
       if (strcmp(image_config_vars[i].token, image_config[j].token) == 0)
 	*image_config_vars[i].value =
 	  get_integer_from_string(image_config[j].value);
-  }
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;

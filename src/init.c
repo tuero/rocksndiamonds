@@ -3091,9 +3091,15 @@ void ReloadCustomArtwork()
   static boolean last_override_level_sounds = FALSE;
   static boolean last_override_level_music = FALSE;
   /* identifier for new artwork; default: artwork configured in setup */
+#if 0
   char *gfx_new_identifier = artwork.gfx_current->identifier;
   char *snd_new_identifier = artwork.snd_current->identifier;
   char *mus_new_identifier = artwork.mus_current->identifier;
+#else
+  char *gfx_new_identifier = artwork.gfx_current_identifier;
+  char *snd_new_identifier = artwork.snd_current_identifier;
+  char *mus_new_identifier = artwork.mus_current_identifier;
+#endif
   boolean redraw_screen = FALSE;
 
 #if 0
@@ -3123,7 +3129,7 @@ void ReloadCustomArtwork()
 
   /* when a new level series was selected, check if there was a change
      in custom artwork stored in level series directory */
-  if (leveldir_current_identifier != leveldir_current->identifier)
+  if (1 || leveldir_current_identifier != leveldir_current->identifier)
   {
 #if 0
     char *identifier_old = leveldir_current_identifier;
@@ -3203,7 +3209,7 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
-#if 0
+#if 1
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
 	   artwork.gfx_current_identifier,
 	   gfx_new_identifier,
@@ -3223,6 +3229,10 @@ void ReloadCustomArtwork()
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
     InitImages();
+
+#if 0
+    printf("::: %d\n", menu.list_size[GAME_MODE_LEVELS]);
+#endif
 
     FreeTileClipmasks();
     InitTileClipmasks();
