@@ -989,6 +989,9 @@ void Impact(int x, int y)
   /* Element darunter berührt? */
   if (!lastline)
   {
+    if (Feld[x][y+1] == EL_PLAYER_IS_LEAVING)
+      return;
+
     object_hit = (!IS_FREE(x,y+1) && (!IS_MOVING(x,y+1) ||
 				      MovDir[x][y+1]!=MV_DOWN ||
 				      MovPos[x][y+1]<=TILEY/2));

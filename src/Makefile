@@ -60,12 +60,13 @@ SRCS =	main.c		\
 	sound.c		\
 	joystick.c	\
 	cartoons.c	\
+	random.c	\
 	gfxload.c	\
 	gifload.c	\
 	gif.c		\
 	send.c		\
 	new.c		\
-	random.c
+	network.c
 
 OBJS =	main.o		\
 	init.o		\
@@ -81,12 +82,13 @@ OBJS =	main.o		\
 	sound.o		\
 	joystick.o	\
 	cartoons.o	\
+	random.o	\
 	gfxload.o	\
 	gifload.o	\
 	gif.o		\
 	send.o		\
 	new.o		\
-	random.o
+	network.o
 
 all:	$(PROGNAME) $(SERVNAME)
 
