@@ -1203,6 +1203,7 @@ extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

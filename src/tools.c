@@ -575,9 +575,9 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player_is_moving)
   {
-    if (Store[last_jx][last_jy] && IS_DRAWABLE(last_element))
+    if (Back[last_jx][last_jy] && IS_DRAWABLE(last_element))
     {
-      DrawLevelElement(last_jx, last_jy, Store[last_jx][last_jy]);
+      DrawLevelElement(last_jx, last_jy, Back[last_jx][last_jy]);
 
       if (last_element == EL_DYNAMITE_ACTIVE ||
 	  last_element == EL_SP_DISK_RED_ACTIVE)
@@ -615,8 +615,8 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw things behind the player, if needed                                */
   /* ----------------------------------------------------------------------- */
 
-  if (Store[jx][jy])
-    DrawLevelElement(jx, jy, Store[jx][jy]);
+  if (Back[jx][jy])
+    DrawLevelElement(jx, jy, Back[jx][jy]);
   else if (IS_ACTIVE_BOMB(element))
     DrawLevelElement(jx, jy, EL_EMPTY);
   else

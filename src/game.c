@@ -723,7 +723,7 @@ void InitGame()
     {
       Feld[x][y] = Ur[x][y];
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
-      Store[x][y] = Store2[x][y] = StorePlayer[x][y] = 0;
+      Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
       AmoebaNr[x][y] = 0;
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
@@ -1433,13 +1433,18 @@ void DrawDynamite(int x, int y)
   if (!IN_SCR_FIELD(sx, sy) || IS_PLAYER(x, y))
     return;
 
-  if (Store[x][y])
+  if (IS_WALKABLE_INSIDE(Back[x][y]))
+    return;
+
+  if (Back[x][y])
+    DrawGraphic(sx, sy, el2img(Back[x][y]), 0);
+  else if (Store[x][y])
     DrawGraphic(sx, sy, el2img(Store[x][y]), 0);
 
   frame = getGraphicAnimationFrame(graphic, GfxFrame[x][y]);
 
 #if 1
-  if (Store[x][y])
+  if (Back[x][y] || Store[x][y])
     DrawGraphicThruMask(sx, sy, graphic, frame);
   else
     DrawGraphic(sx, sy, graphic, frame);
@@ -1500,6 +1505,10 @@ void Explode(int ex, int ey, int phase, int mode)
   {
     int center_element = Feld[ex][ey];
 
+    /* remove things displayed in background while burnig dynamite */
+    if (!IS_INDESTRUCTIBLE(Back[x][y]))
+      Back[x][y] = 0;
+
     if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
     {
       /* put moving element to center field (and let it explode there) */
@@ -1548,17 +1557,24 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
       }
 
+#if 1
+      /* save walkable background elements while explosion on same tile */
+      if (IS_INDESTRUCTIBLE(element))
+	Back[x][y] = element;
+#endif
+
+      /* ignite explodable elements reached by other explosion */
       if (element == EL_EXPLOSION)
 	element = Store2[x][y];
 
-#if 1
-      if (IS_INDESTRUCTIBLE(Store[x][y]))	/* hard element under bomb */
-	element = Store[x][y];
+#if 0
+      else if (IS_INDESTRUCTIBLE(Store2[x][y]))	/* hard element under bomb */
+	element = Store2[x][y];
 #endif
 
 #if 0
-      if (!IS_INDESTRUCTIBLE(Store[x][y]) != !IS_PFORTE(Store[x][y]))
-	printf("\n::: %d\n", Store[x][y]);
+      else if (IS_INDESTRUCTIBLE(Store[x][y]))	/* hard element under bomb */
+	element = Store[x][y];
 #endif
 
       if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
@@ -1583,6 +1599,18 @@ void Explode(int ex, int ey, int phase, int mode)
 	if (game.emulation == EMU_SUPAPLEX)
 	  Store[x][y] = EL_EMPTY;
       }
+#if 0
+      else if (IS_INDESTRUCTIBLE(Store[x][y]))
+	;
+#endif
+#if 0
+      else if (IS_INDESTRUCTIBLE(element))
+	Store[x][y] = element;
+#endif
+#if 0
+      else if (IS_INDESTRUCTIBLE(element) && IS_ACCESSIBLE(element))
+	Store[x][y] = element;
+#endif
       else if (center_element == EL_MOLE)
 	Store[x][y] = EL_EMERALD_RED;
       else if (center_element == EL_PENGUIN)
@@ -1614,13 +1642,20 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
 #if 1
+#if 0
+#if 0
       else if (IS_INDESTRUCTIBLE(element) && IS_ACCESSIBLE(element))
 	Store[x][y] = element;
+#else
+      else if (IS_INDESTRUCTIBLE(element))
+	Store[x][y] = element;
+#endif
+#endif
       else
 	Store[x][y] = EL_EMPTY;
 #else
 
-#if 1
+#if 0
       else if (IS_PFORTE(element))
 	Store[x][y] = element;
       else
@@ -1700,6 +1735,13 @@ void Explode(int ex, int ey, int phase, int mode)
 
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
+
+#if 1
+    if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
+      element = Feld[x][y] = Back[x][y];
+    Back[x][y] = 0;
+#endif
+
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
     if (CAN_MOVE(element) || COULD_MOVE(element))
@@ -1721,17 +1763,17 @@ void Explode(int ex, int ey, int phase, int mode)
       DrawLevelFieldCrumbledSand(x, y);
 
 #if 1
-    if (IS_WALKABLE_OVER(Store[x][y]))
+    if (IS_WALKABLE_OVER(Back[x][y]))
     {
-      DrawLevelElement(x, y, Store[x][y]);
+      DrawLevelElement(x, y, Back[x][y]);
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), graphic, frame);
     }
-    else if (IS_WALKABLE_UNDER(Store[x][y]))
+    else if (IS_WALKABLE_UNDER(Back[x][y]))
     {
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
-      DrawLevelElementThruMask(x, y, Store[x][y]);
+      DrawLevelElementThruMask(x, y, Back[x][y]);
     }
-    else
+    else if (!IS_WALKABLE_INSIDE(Back[x][y]))
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
 #else
     if (IS_PFORTE(Store[x][y]))
@@ -6528,7 +6570,13 @@ boolean PlaceBomb(struct PlayerInfo *player)
     return FALSE;
 
   if (element != EL_EMPTY)
+  {
+#if 0
     Store[jx][jy] = element;
+#else
+    Back[jx][jy] = element;
+#endif
+  }
 
   MovDelay[jx][jy] = 96;
 
