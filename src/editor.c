@@ -806,7 +806,6 @@ static boolean custom_element_change_events[NUM_CHANGE_EVENTS];
 static struct ElementChangeInfo custom_element_change;
 static struct ElementGroupInfo group_element_info;
 static struct ElementInfo custom_element;
-static struct ElementInfo group_element;
 
 static struct
 {
@@ -3395,13 +3394,9 @@ static void DrawDrawingArea(int id)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.trigger_element));
   else if (id == ED_DRAWING_ID_GROUP_CONTENT)
-  {
-    int nr = group_element_info.num_elements;
-
-    for (x = 0; x < nr; x++)
+    for (x = 0; x < group_element_info.num_elements; x++)
       DrawMiniGraphicExt(drawto, gi->x + x * MINI_TILEX, gi->y,
-			 el2edimg(group_element_info.element[nr]));
-  }
+			 el2edimg(group_element_info.element[x]));
   else if (id >= ED_DRAWING_ID_ELEMENT_CONTENT_0 &&
 	   id <= ED_DRAWING_ID_ELEMENT_CONTENT_7)
   {
@@ -5148,7 +5143,6 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
 static void CopyGroupElementPropertiesToEditor(int element)
 {
-  group_element = element_info[element];
   group_element_info = *element_info[element].group;
 }
 
@@ -5289,9 +5283,8 @@ static void CopyCustomElementPropertiesToGame(int element)
 static void CopyGroupElementPropertiesToGame(int element)
 {
   /* mark that this group element has been modified */
-  group_element.modified_settings = TRUE;
+  element_info[element].modified_settings = TRUE;
 
-  element_info[element] = group_element;
   *element_info[element].group = group_element_info;
 }
 
@@ -7320,6 +7313,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
     case ED_COUNTER_ID_GROUP_CONTENT:
       DrawGroupElementArea(properties_element);
+      CopyGroupElementPropertiesToGame(properties_element);
       break;
 
     case ED_COUNTER_ID_ENVELOPE_XSIZE:

@@ -41,6 +41,7 @@
 
 #define LEVEL_CHUNK_CUS3_SIZE(x) (2 + (x) * LEVEL_CPART_CUS3_SIZE)
 #define LEVEL_CHUNK_CUS4_SIZE(x) (48 + 48 + (x) * 48)
+#define LEVEL_CHUNK_GRP1_SIZE(x) (2 + 8 + (x) * 2)
 
 /* file identifier strings */
 #define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
@@ -918,6 +919,46 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  struct ElementGroupInfo *group;
+  int chunk_size_expected;
+  int element;
+  int i;
+
+  element = getFile16BitBE(file);
+
+  if (!IS_GROUP_ELEMENT(element))
+  {
+    Error(ERR_WARN, "invalid group element number %d", element);
+
+    ReadUnusedBytesFromFile(file, chunk_size - 2);
+    return chunk_size;
+  }
+
+  group = element_info[element].group;
+
+  group->num_elements = getFile8Bit(file);
+
+  /* some free bytes for future values and padding */
+  ReadUnusedBytesFromFile(file, 7);
+
+  chunk_size_expected = LEVEL_CHUNK_GRP1_SIZE(group->num_elements);
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size - 10);
+    return chunk_size_expected;
+  }
+
+  for (i = 0; i < group->num_elements; i++)
+    group->element[i] = checkLevelElement(getFile16BitBE(file));
+
+  /* mark this group element as modified */
+  element_info[element].modified_settings = TRUE;
+
+  return chunk_size;
+}
+
 static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 				      struct LevelFileInfo *level_file_info)
 {
@@ -1005,6 +1046,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       { "CUS2", -1,			LoadLevel_CUS2 },
       { "CUS3", -1,			LoadLevel_CUS3 },
       { "CUS4", -1,			LoadLevel_CUS4 },
+      { "GRP1", -1,			LoadLevel_GRP1 },
       {  NULL,  0,			NULL }
     };
 
@@ -2026,6 +2068,22 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   }
 }
 
+static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
+{
+  struct ElementGroupInfo *group = element_info[element].group;
+  int i;
+
+  putFile16BitBE(file, element);
+
+  putFile8Bit(file, group->num_elements);
+
+  /* some free bytes for future values and padding */
+  WriteUnusedBytesToFile(file, 7);
+
+  for (i = 0; i < group->num_elements; i++)
+    putFile16BitBE(file, group->element[i]);
+}
+
 static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 {
   int body_chunk_size;
@@ -2118,6 +2176,23 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 
 	putFileChunkBE(file, "CUS4", LEVEL_CHUNK_CUS4_SIZE(num_change_pages));
 	SaveLevel_CUS4(file, level, element);
+      }
+    }
+  }
+
+  /* check for non-default group elements (unless using template level) */
+  if (!level->use_custom_template)
+  {
+    for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+    {
+      int element = EL_GROUP_START + i;
+
+      if (element_info[element].modified_settings)
+      {
+	int num_elements = element_info[element].group->num_elements;
+
+	putFileChunkBE(file, "GRP1", LEVEL_CHUNK_GRP1_SIZE(num_elements));
+	SaveLevel_GRP1(file, level, element);
       }
     }
   }
