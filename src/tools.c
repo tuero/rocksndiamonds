@@ -936,13 +936,14 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 {
   int ux = LEVELX(x), uy = LEVELY(y);
   int graphic = el2gfx(element);
-  int phase4 = ABS(MovPos[ux][uy]) / (TILEX / 4);
-  int phase  = phase4 / 2;
+  int phase8 = ABS(MovPos[ux][uy]) / (TILEX / 8);
+  int phase4 = phase8 / 2;
+  int phase2  = phase8 / 4;
   int dir = MovDir[ux][uy];
 
   if (element == EL_PACMAN || element == EL_KAEFER || element == EL_FLIEGER)
   {
-    graphic += 4*!phase;
+    graphic += 4 * !phase2;
 
     if (dir == MV_UP)
       graphic += 1;
@@ -950,6 +951,23 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
       graphic += 2;
     else if (dir == MV_DOWN)
       graphic += 3;
+  }
+  else if (element == EL_SP_SNIKSNAK)
+  {
+    if (dir == MV_LEFT)
+      graphic = GFX_SP_SNIKSNAK_LEFT;
+    else if (dir == MV_RIGHT)
+      graphic = GFX_SP_SNIKSNAK_RIGHT;
+    else if (dir == MV_UP)
+      graphic = GFX_SP_SNIKSNAK_UP;
+    else
+      graphic = GFX_SP_SNIKSNAK_DOWN;
+
+    graphic += (phase8 < 4 ? phase8 : 7 - phase8);
+  }
+  else if (element == EL_SP_ELECTRON)
+  {
+    graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
   else if (element == EL_MAULWURF || element == EL_PINGUIN ||
 	   element == EL_SCHWEIN || element == EL_DRACHE)
@@ -983,12 +1001,12 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   }
   else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
   {
-    graphic += !phase;
+    graphic += !phase2;
   }
   else if ((element == EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
   {
     if (element != EL_SP_INFOTRON)
-      graphic += phase * (element == EL_FELSBROCKEN ? 2 : 1);
+      graphic += phase2 * (element == EL_FELSBROCKEN ? 2 : 1);
   }
   else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
 	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)
@@ -1941,7 +1959,15 @@ int el2gfx(int element)
       if (IS_CHAR(element))
 	return GFX_CHAR_START + (element - EL_CHAR_START);
       else if (element >= EL_SP_START && element <= EL_SP_END)
-	return GFX_START_ROCKSMORE + (element - EL_SP_START);
+      {
+	int nr_element = element - EL_SP_START;
+	int gfx_per_line = 8;
+	int nr_graphic =
+	  (nr_element / gfx_per_line) * MORE_PER_LINE +
+	  (nr_element % gfx_per_line);
+
+	return GFX_START_ROCKSMORE + nr_graphic;
+      }
       else
 	return -1;
     }

@@ -942,6 +942,7 @@ void InitElementProperties()
     EL_BADEWANNE2,
     EL_SONDE,
     EL_SP_ZONK,
+    EL_SP_INFOTRON,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
@@ -1280,7 +1281,6 @@ void InitElementProperties()
     EL_SP_PORT_XY,
     EL_SP_DISK_RED,
     EL_SP_DISK_YELLOW,
-    EL_SP_TERMINAL,
     EL_SP_CHIP_SINGLE,
     EL_SP_CHIP_LEFT,
     EL_SP_CHIP_RIGHT,
@@ -1297,7 +1297,6 @@ void InitElementProperties()
     EL_SP_HARD_BASE4,
     EL_SP_HARD_BASE5,
     EL_SP_HARD_BASE6,
-    EL_SP_TERMINAL,
     EL_SP_EXIT
   };
   static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);

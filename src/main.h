@@ -522,7 +522,7 @@ extern int		num_bg_loops;
 #define MINI_MORE_STARTY	160
 #define MICRO_MORE_STARTX	0
 #define MICRO_MORE_STARTY	208
-#define MORE_PER_LINE		8
+#define MORE_PER_LINE		16
 #define MINI_MORE_PER_LINE	16
 #define MICRO_MORE_PER_LINE	16
 #define FONT_CHARS_PER_LINE	16
@@ -786,22 +786,22 @@ extern int		num_bg_loops;
 #define EL_PLAYER_IS_LEAVING	408
 
 /* game graphics:
-**	  0 - 209: graphics from "RocksScreen"
-**	210 - 255: graphics from "RocksMore"
-**	256 - 511: graphics from "RocksFont"
-**	512 - 767: graphics from "RocksHeroes"
+**	  0 -  255: graphics from "RocksScreen"
+**	256 -  511: graphics from "RocksMore"
+**	512 -  767: graphics from "RocksFont"
+**	768 - 1023: graphics from "RocksHeroes"
 */
 
 #define GFX_START_ROCKSSCREEN	0
-#define GFX_END_ROCKSSCREEN	209
-#define GFX_START_ROCKSMORE	210
-#define GFX_END_ROCKSMORE	255
-#define GFX_START_ROCKSFONT	256
-#define GFX_END_ROCKSFONT	511
-#define GFX_START_ROCKSHEROES	512
-#define GFX_END_ROCKSHEROES	767
+#define GFX_END_ROCKSSCREEN	255
+#define GFX_START_ROCKSMORE	256
+#define GFX_END_ROCKSMORE	511
+#define GFX_START_ROCKSFONT	512
+#define GFX_END_ROCKSFONT	767
+#define GFX_START_ROCKSHEROES	768
+#define GFX_END_ROCKSHEROES	1023
 
-#define NUM_TILES		768
+#define NUM_TILES		1024
 
 /* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
@@ -1057,6 +1057,17 @@ extern int		num_bg_loops;
 #define GFX_SP_HARD_BASE6	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 5)
 #define GFX_SP_CHIP_UPPER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 6)
 #define GFX_SP_CHIP_LOWER	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 7)
+
+#define GFX_SP_EXPLODE_EMPTY	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE + 8)
+#define GFX_SP_EXPLODE_INFOTRON	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE + 8)
+#define GFX_SP_SNIKSNAK_LEFT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE + 8)
+#define GFX_SP_SNIKSNAK_RIGHT	(GFX_START_ROCKSMORE +  8 * MORE_PER_LINE +12)
+#define GFX_SP_SNIKSNAK_UP	(GFX_START_ROCKSMORE +  9 * MORE_PER_LINE + 8)
+#define GFX_SP_SNIKSNAK_DOWN	(GFX_START_ROCKSMORE +  9 * MORE_PER_LINE +12)
+
+#define GFX2_SP_ELECTRON	(GFX_START_ROCKSMORE + 10 * MORE_PER_LINE + 8)
+#define GFX2_SP_TERMINAL	(GFX_START_ROCKSMORE + 11 * MORE_PER_LINE + 8)
+#define GFX2_SP_TERMINAL_ACTIVE	(GFX_START_ROCKSMORE + 12 * MORE_PER_LINE + 8)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)

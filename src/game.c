@@ -95,6 +95,7 @@
 #define EMU_NONE		0
 #define EMU_BOULDERDASH		1
 #define EMU_SOKOBAN		2
+#define EMU_SUPAPLEX		3
 
 /* to control special behaviour of certain game elements */
 int game_emulation = EMU_NONE;
@@ -315,6 +316,7 @@ void InitGame()
   int i, j, x, y;
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
+  boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
 
   /* don't play tapes over network */
   network_playing = (options.network && !tape.playing);
@@ -428,14 +430,19 @@ void InitGame()
     }
   }
 
-  for(y=0; y<lev_fieldy; y++) for(x=0; x<lev_fieldx; x++)
+  for(y=0; y<lev_fieldy; y++)
   {
-    if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
-      emulate_bd = FALSE;
-    if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
-      emulate_sb = FALSE;
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
+	emulate_bd = FALSE;
+      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
+	emulate_sb = FALSE;
+      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
+	emulate_sp = FALSE;
 
-    InitField(x, y, TRUE);
+      InitField(x, y, TRUE);
+    }
   }
 
   /* check if any connected player was not found in playfield */
@@ -533,7 +540,8 @@ void InitGame()
   }
 
   game_emulation = (emulate_bd ? EMU_BOULDERDASH :
-		    emulate_sb ? EMU_SOKOBAN : EMU_NONE);
+		    emulate_sb ? EMU_SOKOBAN :
+		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
 
   scroll_x = scroll_y = -1;
   if (local_player->jx >= MIDPOSX-1)
@@ -622,6 +630,7 @@ void InitMovDir(int x, int y)
       Feld[x][y] = EL_KAEFER;
       MovDir[x][y] = direction[0][element - EL_KAEFER_R];
       break;
+
     case EL_FLIEGER_R:
     case EL_FLIEGER_O:
     case EL_FLIEGER_L:
@@ -629,6 +638,7 @@ void InitMovDir(int x, int y)
       Feld[x][y] = EL_FLIEGER;
       MovDir[x][y] = direction[0][element - EL_FLIEGER_R];
       break;
+
     case EL_BUTTERFLY_R:
     case EL_BUTTERFLY_O:
     case EL_BUTTERFLY_L:
@@ -636,6 +646,7 @@ void InitMovDir(int x, int y)
       Feld[x][y] = EL_BUTTERFLY;
       MovDir[x][y] = direction[0][element - EL_BUTTERFLY_R];
       break;
+
     case EL_FIREFLY_R:
     case EL_FIREFLY_O:
     case EL_FIREFLY_L:
@@ -643,6 +654,7 @@ void InitMovDir(int x, int y)
       Feld[x][y] = EL_FIREFLY;
       MovDir[x][y] = direction[0][element - EL_FIREFLY_R];
       break;
+
     case EL_PACMAN_R:
     case EL_PACMAN_O:
     case EL_PACMAN_L:
@@ -650,14 +662,21 @@ void InitMovDir(int x, int y)
       Feld[x][y] = EL_PACMAN;
       MovDir[x][y] = direction[0][element - EL_PACMAN_R];
       break;
+
+    case EL_SP_SNIKSNAK:
+      MovDir[x][y] = MV_UP;
+      break;
+
+    case EL_SP_ELECTRON:
+      MovDir[x][y] = MV_LEFT;
+      break;
+
     default:
       MovDir[x][y] = 1 << RND(4);
       if (element != EL_KAEFER &&
 	  element != EL_FLIEGER &&
 	  element != EL_BUTTERFLY &&
-	  element != EL_FIREFLY &&
-	  element != EL_SP_SNIKSNAK &&
-	  element != EL_SP_ELECTRON)
+	  element != EL_FIREFLY)
 	break;
 
       for (i=0; i<4; i++)
@@ -1043,6 +1062,9 @@ void Explode(int ex, int ey, int phase, int mode)
 	    Store[x][y] = EL_EDELSTEIN_GELB;
 	    break;
 	}
+
+	if (game_emulation == EMU_SUPAPLEX)
+	  Store[x][y] = EL_LEERRAUM;
       }
       else if (center_element == EL_MAULWURF)
 	Store[x][y] = EL_EDELSTEIN_ROT;
@@ -1052,6 +1074,8 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = ((x == ex && y == ey) ? EL_DIAMANT : EL_EDELSTEIN);
       else if (center_element == EL_BUTTERFLY)
 	Store[x][y] = EL_EDELSTEIN_BD;
+      else if (center_element == EL_SP_ELECTRON)
+	Store[x][y] = EL_SP_INFOTRON;
       else if (center_element == EL_MAMPFER)
 	Store[x][y] = level.mampfer_inhalt[MampferNr][x-ex+1][y-ey+1];
       else if (center_element == EL_AMOEBA2DIAM)
@@ -1133,12 +1157,19 @@ void Explode(int ex, int ey, int phase, int mode)
       InitMovDir(x, y);
     DrawLevelField(x, y);
   }
-  else if (!(phase%delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+  else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
+    int graphic = GFX_EXPLOSION;
+
+    if (game_emulation == EMU_SUPAPLEX)
+      graphic = (Store[x][y] == EL_SP_INFOTRON ?
+		 GFX_SP_EXPLODE_INFOTRON :
+		 GFX_SP_EXPLODE_EMPTY);
+
     if (phase == delay)
       ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
 
-    DrawGraphic(SCREENX(x), SCREENY(y), GFX_EXPLOSION+(phase/delay-1));
+    DrawGraphic(SCREENX(x), SCREENY(y), graphic + (phase / delay - 1));
   }
 }
 
@@ -1349,7 +1380,7 @@ void Impact(int x, int y)
 	return;
       }
     }
-    else if (element == EL_FELSBROCKEN)
+    else if (element == EL_FELSBROCKEN || element == EL_SP_ZONK)
     {
       if (IS_ENEMY(smashed) ||
 	  smashed == EL_BOMBE || smashed == EL_SP_DISK_ORANGE ||
@@ -1995,8 +2026,8 @@ void StartMoving(int x, int y)
     {
       MovDelay[x][y]--;
 
-      if (element == EL_ROBOT || element == EL_MAMPFER ||
-	  element == EL_MAMPFER2)
+      if (element == EL_ROBOT ||
+	  element == EL_MAMPFER || element == EL_MAMPFER2)
       {
 	int phase = MovDelay[x][y] % 8;
 
@@ -2010,6 +2041,8 @@ void StartMoving(int x, int y)
 	    && MovDelay[x][y]%4 == 3)
 	  PlaySoundLevel(x, y, SND_NJAM);
       }
+      else if (element == EL_SP_ELECTRON)
+	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
       else if (element == EL_DRACHE)
       {
 	int i;
@@ -2232,12 +2265,14 @@ void StartMoving(int x, int y)
       TurnRound(x, y);
 
       if (element == EL_KAEFER || element == EL_FLIEGER ||
-	  element == EL_SP_SNIKSNAK || element == EL_SP_ELECTRON)
+	  element == EL_SP_SNIKSNAK)
 	DrawLevelField(x, y);
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
       else if (element == EL_SONDE)
 	DrawGraphicAnimation(x, y, GFX_SONDE_START, 8, 2, ANIM_NORMAL);
+      else if (element == EL_SP_ELECTRON)
+	DrawGraphicAnimation(x, y, GFX2_SP_ELECTRON, 8, 2, ANIM_NORMAL);
 
       return;
     }
@@ -3460,6 +3495,10 @@ void GameActions()
       MauerAbleger(x, y);
     else if (element == EL_BURNING)
       CheckForDragon(x, y);
+    else if (element == EL_SP_TERMINAL)
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 10, ANIM_NORMAL);
+    else if (element == EL_SP_TERMINAL_ACTIVE)
+      DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 2, ANIM_NORMAL);
 
     if (SiebAktiv)
     {
@@ -4211,12 +4250,16 @@ int DigField(struct PlayerInfo *player,
 	int xx, yy;
 
 	for (yy=0; yy<lev_fieldy; yy++)
+	{
 	  for (xx=0; xx<lev_fieldx; xx++)
+	  {
 	    if (Feld[xx][yy] == EL_SP_DISK_YELLOW)
 	      Bang(xx, yy);
+	    else if (Feld[xx][yy] == EL_SP_TERMINAL)
+	      Feld[xx][yy] = EL_SP_TERMINAL_ACTIVE;
+	  }
+	}
 
-	Feld[x][y] = EL_SP_TERMINAL_ACTIVE;
-	DrawLevelField(x, y);
 	return MF_ACTION;
       }
       break;
