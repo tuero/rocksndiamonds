@@ -3455,11 +3455,18 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input.xpos",		"0"			},
   { "editor.element_border_input.ypos",		"0"			},
 
-  { "game.envelope_background",			"RocksScreen.pcx"	},
-  { "game.envelope_background.x",		"0"			},
-  { "game.envelope_background.y",		"0"			},
-  { "game.envelope_background.width",		"560"			},
-  { "game.envelope_background.height",		"560"			},
+  { "game.envelope.background",			"RocksScreen.pcx"	},
+  { "game.envelope.background.x",		"0"			},
+  { "game.envelope.background.y",		"0"			},
+  { "game.envelope.background.width",		"560"			},
+  { "game.envelope.background.height",		"560"			},
+  { "game.envelope.background.anim_mode",	"default"		},
+  { "game.envelope.background.draw_masked",	"false"			},
+
+  { "game.envelope_1.background",		UNDEFINED_FILENAME	},
+  { "game.envelope_2.background",		UNDEFINED_FILENAME	},
+  { "game.envelope_3.background",		UNDEFINED_FILENAME	},
+  { "game.envelope_4.background",		UNDEFINED_FILENAME	},
 
   { "background",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
@@ -3497,11 +3504,12 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.SCORES",			"-1"			},
   { "menu.list_size.INFO",			"-1"			},
 
-  { "door.step_offset",				"2"			},
-  { "door.step_delay",				"10"			},
-  { "door.anim_mode",				"default"		},
-
-  { "game.envelope.anim_mode",			"full"			},
+  { "door_1.step_offset",			"2"			},
+  { "door_1.step_delay",			"10"			},
+  { "door_1.anim_mode",				"default"		},
+  { "door_2.step_offset",			"2"			},
+  { "door_2.step_delay",			"10"			},
+  { "door_2.anim_mode",				"default"		},
 
   { NULL,					NULL			}
 };

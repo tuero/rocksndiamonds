@@ -748,10 +748,15 @@ static int get_element_from_token(char *token)
 static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
+  boolean special_envelope_graphic;
   int parameter[NUM_GFX_ARGS];
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
   int i;
+
+  special_envelope_graphic = (graphic == IMG_GAME_ENVELOPE_BACKGROUND ||
+			      (graphic >= IMG_GAME_ENVELOPE_1_BACKGROUND &&
+			       graphic <= IMG_GAME_ENVELOPE_4_BACKGROUND));
 
   /* get integer values from string parameters */
   for (i=0; i < NUM_GFX_ARGS; i++)
@@ -842,7 +847,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
     graphic_info[graphic].anim_delay = 1;
 
   graphic_info[graphic].anim_mode = parameter[GFX_ARG_ANIM_MODE];
-  if (graphic_info[graphic].anim_frames == 1)
+  if (graphic_info[graphic].anim_frames == 1 && !special_envelope_graphic)
     graphic_info[graphic].anim_mode = ANIM_NONE;
 
   /* automatically determine correct start frame, if not defined */
@@ -879,6 +884,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
   /* this is only used for drawing envelope graphics */
   graphic_info[graphic].draw_masked = parameter[GFX_ARG_DRAW_MASKED];
+
+  /* global envelope settings override specific settings, if undefined */
+  if (special_envelope_graphic && graphic_info[graphic].bitmap == NULL)
+    graphic_info[graphic] = graphic_info[IMG_GAME_ENVELOPE_BACKGROUND];
 }
 
 static void InitGraphicInfo()
@@ -1393,9 +1402,9 @@ void InitElementPropertiesStatic()
 
     /* !!! maybe this should better be handled by 'ep_diggable' !!! */
 #if 1
-    EL_SP_BUGGY_BASE_ACTIVE,
-    EL_TRAP_ACTIVE,
     EL_LANDMINE,
+    EL_TRAP_ACTIVE,
+    EL_SP_BUGGY_BASE_ACTIVE,
 #endif
     -1
   };
@@ -1794,6 +1803,16 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_droppable[] =
+  {
+    -1
+  };
+
+  static int ep_can_explode_1x1[] =
+  {
+    -1
+  };
+
   static int ep_pushable[] =
   {
     EL_ROCK,
@@ -1810,15 +1829,6 @@ void InitElementPropertiesStatic()
     EL_SATELLITE,
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
-    -1
-  };
-
-  static int ep_can_be_crumbled[] =
-  {
-    EL_SAND,
-    EL_LANDMINE,
-    EL_TRAP,
-    EL_TRAP_ACTIVE,
     -1
   };
 
@@ -2546,6 +2556,20 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_em_slippery_wall[] =
+  {
+    -1
+  };
+
+  static int ep_gfx_crumbled[] =
+  {
+    EL_SAND,
+    EL_LANDMINE,
+    EL_TRAP,
+    EL_TRAP_ACTIVE,
+    -1
+  };
+
   static struct
   {
     int *elements;
@@ -2574,9 +2598,9 @@ void InitElementPropertiesStatic()
     { ep_passable_over,		EP_PASSABLE_OVER	},
     { ep_passable_inside,	EP_PASSABLE_INSIDE	},
     { ep_passable_under,	EP_PASSABLE_UNDER	},
+    { ep_droppable,		EP_DROPPABLE		},
+    { ep_can_explode_1x1,	EP_CAN_EXPLODE_1X1	},
     { ep_pushable,		EP_PUSHABLE		},
-
-    { ep_can_be_crumbled,	EP_CAN_BE_CRUMBLED	},
 
     { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
@@ -2601,6 +2625,10 @@ void InitElementPropertiesStatic()
     { ep_has_content,		EP_HAS_CONTENT		},
     { ep_active_bomb,		EP_ACTIVE_BOMB		},
     { ep_inactive,		EP_INACTIVE		},
+
+    { ep_em_slippery_wall,	EP_EM_SLIPPERY_WALL	},
+
+    { ep_gfx_crumbled,		EP_GFX_CRUMBLED		},
 
     { NULL,			-1			}
   };
@@ -2690,7 +2718,6 @@ void InitElementPropertiesEngine(int engine_version)
     EP_BELT_SWITCH,
     EP_WALKABLE_UNDER,
     EP_EM_SLIPPERY_WALL,
-    EP_CAN_BE_CRUMBLED,
   };
 #endif
 
@@ -2706,8 +2733,6 @@ void InitElementPropertiesEngine(int engine_version)
     EP_CAN_SMASH_ENEMIES,
     EP_CAN_SMASH_EVERYTHING,
     EP_PUSHABLE,
-
-    EP_CAN_BE_CRUMBLED,
 
     EP_PLAYER,
     EP_GEM,
@@ -2839,22 +2864,15 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
 					 !CAN_EXPLODE_1X1(i)));
 
-    /* ---------- CAN_BE_CRUMBLED ------------------------------------------ */
-    SET_PROPERTY(i, EP_CAN_BE_CRUMBLED,
-		 element_info[i].crumbled[ACTION_DEFAULT] != IMG_EMPTY);
-
-#if 0
-    if (CAN_BE_CRUMBLED(i))
-      printf("::: '%s' can be crumbled [%d]\n",
-	     element_info[i].token_name,
-	     element_info[i].crumbled[ACTION_DEFAULT]);
-#endif
-
     /* ---------- CAN_CHANGE ----------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */
     for (j=0; j < element_info[i].num_change_pages; j++)
       if (element_info[i].change_page[j].can_change)
 	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
+
+    /* ---------- GFX_CRUMBLED --------------------------------------------- */
+    SET_PROPERTY(i, EP_GFX_CRUMBLED,
+		 element_info[i].crumbled[ACTION_DEFAULT] != IMG_EMPTY);
   }
 
 #if 0

@@ -160,6 +160,7 @@ boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
 
 int get_parameter_value(char *, char *, int);
+int get_auto_parameter_value(char *, char *);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigInfo *, char **, int);

@@ -2811,20 +2811,6 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
-static int get_special_integer_from_string(char *string_raw)
-{
-  char *string = getStringToLower(string_raw);
-  int value = (strcmp(string, "none")  == 0 ? 0 :
-	       strcmp(string, "short") == 0 ? 1 :
-	       strcmp(string, "full")  == 0 ? 2 :
-	       strcmp(string, "default")  == 0 ? 0 :
-	       strcmp(string, "curtain")  == 0 ? 1 : -1);
-
-  free(string);
-
-  return value;
-}
-
 void LoadSpecialMenuDesignSettings()
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
@@ -2835,15 +2821,9 @@ void LoadSpecialMenuDesignSettings()
   for (i=0; image_config_vars[i].token != NULL; i++)
     for (j=0; image_config[j].token != NULL; j++)
       if (strcmp(image_config_vars[i].token, image_config[j].token) == 0)
-      {
-	if (strcmp(image_config_vars[i].token, "game.envelope.anim_mode") == 0
-	    || strcmp(image_config_vars[i].token, "door.anim_mode") == 0)
-	  *image_config_vars[i].value =
-	    get_special_integer_from_string(image_config[j].value);
-	else
-	  *image_config_vars[i].value =
-	    get_integer_from_string(image_config[j].value);
-      }
+	*image_config_vars[i].value =
+	  get_auto_parameter_value(image_config_vars[i].token,
+				   image_config[j].value);
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
@@ -2869,13 +2849,8 @@ void LoadSpecialMenuDesignSettings()
     char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
 
     if (value != NULL)
-    {
-      if (strcmp(image_config_vars[i].token, "game.envelope.anim_mode") == 0
-	  || strcmp(image_config_vars[i].token, "door.anim_mode") == 0)
-	*image_config_vars[i].value = get_special_integer_from_string(value);
-      else
-	*image_config_vars[i].value = get_integer_from_string(value);
-    }
+      *image_config_vars[i].value =
+	get_auto_parameter_value(image_config_vars[i].token, value);
   }
 
   freeSetupFileHash(setup_file_hash);

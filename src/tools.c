@@ -72,7 +72,7 @@ void SetDrawtoField(int mode)
 
 void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 {
-  if (game_status == GAME_MODE_PLAYING)
+  if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {
     if (force_redraw)
     {
@@ -506,7 +506,7 @@ inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 
   DrawGraphicAnimation(sx, sy, graphic);
 
-  if (CAN_BE_CRUMBLED(Feld[x][y]))
+  if (GFX_CRUMBLED(Feld[x][y]))
     DrawLevelFieldCrumbledSand(x, y);
 }
 
@@ -525,7 +525,7 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
 
   DrawGraphicAnimation(sx, sy, graphic);
 
-  if (CAN_BE_CRUMBLED(element))
+  if (GFX_CRUMBLED(element))
     DrawLevelFieldCrumbledSand(x, y);
 }
 
@@ -671,7 +671,7 @@ void DrawPlayer(struct PlayerInfo *player)
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
 #if 1
-      if (CAN_BE_CRUMBLED(GfxElement[jx][jy]))
+      if (GFX_CRUMBLED(GfxElement[jx][jy]))
 	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
 #else
       if (GfxElement[jx][jy] == EL_SAND)
@@ -688,13 +688,6 @@ void DrawPlayer(struct PlayerInfo *player)
     }
     else
     {
-#if 0
-      if (player->is_collecting && GfxElement[jx][jy] == EL_ENVELOPE)
-      {
-	ShowEnvelope();
-      }
-#endif
-
       GfxElement[jx][jy] = EL_UNDEFINED;
 
       DrawLevelField(jx, jy);
@@ -1238,7 +1231,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	     GfxElement[x][y] : Feld[x][y]);
 
   /* crumble field itself */
-  if (CAN_BE_CRUMBLED(element) && !IS_MOVING(x, y))
+  if (GFX_CRUMBLED(element) && !IS_MOVING(x, y))
   {
     if (!IN_SCR_FIELD(sx, sy))
       return;
@@ -1253,14 +1246,14 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : BorderElement);
 
       /* check if neighbour field is of same type */
-      if (CAN_BE_CRUMBLED(element) && !IS_MOVING(xx, yy))
+      if (GFX_CRUMBLED(element) && !IS_MOVING(xx, yy))
 	continue;
 
 #if 0
       if (Feld[x][y] == EL_CUSTOM_START + 123)
 	printf("::: crumble [%d] THE CHAOS ENGINE (%d, %d): %d, %d\n",
 	       i, Feld[x][y], element,
-	       CAN_BE_CRUMBLED(element), IS_MOVING(x, y));
+	       GFX_CRUMBLED(element), IS_MOVING(x, y));
 #endif
 
       if (i == 1 || i == 2)
@@ -1299,7 +1292,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       if (!IN_LEV_FIELD(xx, yy) ||
 	  !IN_SCR_FIELD(sxx, syy) ||
-	  !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
+	  !GFX_CRUMBLED(Feld[xx][yy]) ||
 	  IS_MOVING(xx, yy))
 	continue;
 
@@ -1388,7 +1381,7 @@ void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
 
     if (!IN_LEV_FIELD(xx, yy) ||
 	!IN_SCR_FIELD(sxx, syy) ||
-	!CAN_BE_CRUMBLED(Feld[xx][yy]) ||
+	!GFX_CRUMBLED(Feld[xx][yy]) ||
 	IS_MOVING(xx, yy))
       continue;
 
@@ -1563,13 +1556,12 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
-#if 1
-void DrawEnvelopeBackground(int startx, int starty, int x, int y,
-			    int xsize, int ysize, int font_nr)
+void DrawEnvelopeBackground(int envelope_nr, int startx, int starty,
+			    int x, int y, int xsize, int ysize, int font_nr)
 {
   int font_width  = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
+  int graphic = IMG_GAME_ENVELOPE_1_BACKGROUND + envelope_nr;
   Bitmap *src_bitmap;
   int src_x, src_y;
   int dst_x = SX + startx + x * font_width;
@@ -1607,58 +1599,31 @@ void DrawEnvelopeBackground(int startx, int starty, int x, int y,
 	       dst_x, dst_y);
 }
 
-#else
-
-void DrawEnvelopeBackground(int dst_x, int dst_y, int ex, int ey, int font_nr)
-{
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
-  Bitmap *src_bitmap;
-  int src_x, src_y;
-  int width = graphic_info[graphic].width;
-  int height = graphic_info[graphic].height;
-  boolean draw_masked = graphic_info[graphic].draw_masked;
-
-  getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
-
-  if (src_bitmap == NULL)
-  {
-    ClearRectangle(drawto, dst_x, dst_y, font_width, font_height);
-    return;
-  }
-
-  src_x += (ex == -1 ? 0 : ex == +1 ? width  - font_width  : font_width);
-  src_y += (ey == -1 ? 0 : ey == +1 ? height - font_height : font_height);
-
-  if (draw_masked)
-  {
-    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
-    BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, font_width, font_height,
-		     dst_x, dst_y);
-  }
-  else
-    BlitBitmap(src_bitmap, drawto, src_x, src_y, font_width, font_height,
-	       dst_x, dst_y);
-}
-#endif
-
 void ShowEnvelope(int envelope_nr)
 {
-  int graphic = IMG_GAME_ENVELOPE_BACKGROUND;
+  int element = EL_ENVELOPE_1 + envelope_nr;
+  int graphic = IMG_GAME_ENVELOPE_1_BACKGROUND + envelope_nr;
+  int sound_opening = element_info[element].sound[ACTION_OPENING];
+  int sound_closing = element_info[element].sound[ACTION_CLOSING];
   boolean draw_masked = graphic_info[graphic].draw_masked;
+  int anim_mode = graphic_info[graphic].anim_mode;
   int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   int font_nr = FONT_TEXT_1;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  int anim_delay = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int wait_delay = (ffwd_delay ? 500 : 1000);
+  unsigned long anim_delay = 0;
+  int anim_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int wait_delay_value = (ffwd_delay ? 500 : 1000);
   int start_pos_vertically = 0;
   int i, x, y;
 
-  if (game.envelope.anim_mode > 1)
+  game.envelope_active = TRUE;
+
+  if (anim_mode != ANIM_NONE)
+    PlaySoundStereo(sound_opening, SOUND_MIDDLE);
+
+  if (anim_mode == ANIM_DEFAULT)
   {
     /* open envelope window horizontally */
     for (i = 0; i <= level.envelope_xsize[envelope_nr]; i++)
@@ -1674,29 +1639,18 @@ void ShowEnvelope(int envelope_nr)
 
       SetDrawtoField(DRAW_BACKBUFFER);
 
-#if 1
       for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
-#else
-      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      {
-	int sx = SX + startx + x * font_width;
-	int sy = SY + starty + y * font_height;
-	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
-
-	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-      }
-#endif
+	DrawEnvelopeBackground(envelope_nr, startx, starty, x, y, xsize, ysize,
+			       font_nr);
 
       redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
       BackToFront();
 
-      Delay(anim_delay / 2);
+      WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
     }
   }
 
-  if (game.envelope.anim_mode < 1)
+  if (anim_mode == ANIM_NONE)
     start_pos_vertically = level.envelope_ysize[envelope_nr];
 
   /* open envelope window vertically */
@@ -1713,20 +1667,9 @@ void ShowEnvelope(int envelope_nr)
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
-#if 1
     for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
-#else
-    for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-    {
-      int sx = SX + startx + x * font_width;
-      int sy = SY + starty + y * font_height;
-      int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-      int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
-
-      DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-    }
-#endif
+      DrawEnvelopeBackground(envelope_nr, startx, starty, x, y, xsize, ysize,
+			     font_nr);
 
     DrawTextToTextArea(SX + startx + font_width, SY + starty + font_height,
 		       level.envelope_text[envelope_nr], FONT_TEXT_1,
@@ -1735,15 +1678,18 @@ void ShowEnvelope(int envelope_nr)
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
-    Delay(anim_delay);
+    WaitUntilDelayReached(&anim_delay, anim_delay_value);
   }
 
   if (tape.playing)
-    Delay(wait_delay);
+    Delay(wait_delay_value);
   else
     WaitForEventToContinue();
 
-  if (game.envelope.anim_mode > 0)
+  if (anim_mode != ANIM_NONE)
+    PlaySoundStereo(sound_closing, SOUND_MIDDLE);
+
+  if (anim_mode != ANIM_NONE)
   {
     /* close envelope window vertically */
     for (i = level.envelope_ysize[envelope_nr]; i >= 0; i--)
@@ -1759,20 +1705,9 @@ void ShowEnvelope(int envelope_nr)
 
       SetDrawtoField(DRAW_BACKBUFFER);
 
-#if 1
       for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
-#else
-      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      {
-	int sx = SX + startx + x * font_width;
-	int sy = SY + starty + y * font_height;
-	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
-
-	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-      }
-#endif
+	DrawEnvelopeBackground(envelope_nr, startx, starty, x, y, xsize, ysize,
+			       font_nr);
 
       DrawTextToTextArea(SX + startx + font_width, SY + starty + font_height,
 			 level.envelope_text[envelope_nr], FONT_TEXT_1,
@@ -1781,11 +1716,11 @@ void ShowEnvelope(int envelope_nr)
       redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
       BackToFront();
 
-      Delay(anim_delay);
+      WaitUntilDelayReached(&anim_delay, anim_delay_value);
     }
   }
 
-  if (game.envelope.anim_mode > 1)
+  if (anim_mode == ANIM_DEFAULT)
   {
     /* close envelope window horizontally */
     for (i = level.envelope_xsize[envelope_nr]; i >= 0; i--)
@@ -1801,27 +1736,18 @@ void ShowEnvelope(int envelope_nr)
 
       SetDrawtoField(DRAW_BACKBUFFER);
 
-#if 1
       for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-	DrawEnvelopeBackground(startx, starty, x, y, xsize, ysize, font_nr);
-#else
-      for (y=0; y < ysize; y++) for (x=0; x < xsize; x++)
-      {
-	int sx = SX + startx + x * font_width;
-	int sy = SY + starty + y * font_height;
-	int ex = (x == 0 ? -1 : x == xsize - 1 ? +1 : 0);
-	int ey = (y == 0 ? -1 : y == ysize - 1 ? +1 : 0);
-
-	DrawEnvelopeBackground(sx, sy, ex, ey, font_nr);
-      }
-#endif
+	DrawEnvelopeBackground(envelope_nr, startx, starty, x, y, xsize, ysize,
+			       font_nr);
 
       redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
       BackToFront();
 
-      Delay(anim_delay / 2);
+      WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
     }
   }
+
+  game.envelope_active = FALSE;
 
   SetDrawtoField(DRAW_BUFFERED);
 
@@ -2425,9 +2351,9 @@ unsigned int MoveDoor(unsigned int door_state)
 {
   static int door1 = DOOR_OPEN_1;
   static int door2 = DOOR_CLOSE_2;
-  static unsigned long door_delay = 0;
-  int x, start, stepsize = door.step_offset;
-  unsigned long door_delay_value = door.step_delay;
+  unsigned long door_delay = 0;
+  unsigned long door_delay_value = door_1.step_delay;
+  int stepsize = 1;
 
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
@@ -2453,7 +2379,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (setup.quick_doors)
   {
-    stepsize = 20;
+    stepsize = 20;		/* must be choosen to always draw last frame */
     door_delay_value = 0;
 
     StopSound(SND_DOOR_OPENING);
@@ -2468,6 +2394,13 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (door_state & DOOR_ACTION)
   {
+    boolean door_1_done = !(door_state & DOOR_ACTION_1);
+    boolean door_2_done = !(door_state & DOOR_ACTION_2);
+    int start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
+    int end = (door_state & DOOR_ACTION_1 &&
+	       door_1.anim_mode == ANIM_VERTICAL ? DYSIZE : DXSIZE);
+    int x;
+
     if (!(door_state & DOOR_NO_DELAY))
     {
       /* opening door sound has priority over simultaneously closing door */
@@ -2477,29 +2410,61 @@ unsigned int MoveDoor(unsigned int door_state)
 	PlaySoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
     }
 
-    start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
-
-    for(x=start; x<=DXSIZE; x+=stepsize)
+    for(x = start; x <= end && !(door_1_done && door_2_done); x += stepsize)
     {
       Bitmap *bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 
-      if (!(door_state & DOOR_NO_DELAY))
-	WaitUntilDelayReached(&door_delay, door_delay_value);
-
       if (door_state & DOOR_ACTION_1)
       {
-	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
-	int j = (door.anim_mode == 0 ? (DXSIZE - i) / 3 : 0);
+	int a = MIN(x * door_1.step_offset, end);
+	int i = (door_state & DOOR_OPEN_1 ? end - a : a);
 
-	BlitBitmap(bitmap_db_door, drawto,
-		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i/2,
-		   DXSIZE,DYSIZE - i/2, DX, DY);
-
-	ClearRectangle(drawto, DX, DY + DYSIZE - i/2, DXSIZE,i/2);
-
-	if (door.anim_mode == 0)
+	if (x <= a)
 	{
+	  BlitBitmap(bitmap_db_door, drawto,
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i / 2,
+		     DXSIZE,DYSIZE - i / 2, DX, DY);
+
+	  ClearRectangle(drawto, DX, DY + DYSIZE - i / 2, DXSIZE, i / 2);
+	}
+
+	if (door_1.anim_mode == ANIM_HORIZONTAL && x <= DXSIZE)
+	{
+	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
+	  int dst1_x = DX + DXSIZE - i,	dst1_y = DY;
+	  int src2_x = DXSIZE - i,	src2_y = DOOR_GFX_PAGEY1;
+	  int dst2_x = DX,		dst2_y = DY;
+	  int width = i, height = DYSIZE;
+
+	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
+	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
+			   dst1_x, dst1_y);
+
+	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
+	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
+			   dst2_x, dst2_y);
+	}
+	else if (door_1.anim_mode == ANIM_VERTICAL && x <= DYSIZE)
+	{
+	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
+	  int dst1_x = DX,		dst1_y = DY + DYSIZE - i;
+	  int src2_x = 0,		src2_y = DOOR_GFX_PAGEY1 + DYSIZE - i;
+	  int dst2_x = DX,		dst2_y = DY;
+	  int width = DXSIZE, height = i;
+
+	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
+	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
+			   dst1_x, dst1_y);
+
+	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
+	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
+			   dst2_x, dst2_y);
+	}
+	else if (x <= DXSIZE)	/* ANIM_DEFAULT */
+	{
+	  int j = (door_1.anim_mode == ANIM_DEFAULT ? (DXSIZE - i) / 3 : 0);
+
 	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
 	  BlitBitmapMasked(bitmap, drawto,
 			   DXSIZE, DOOR_GFX_PAGEY1, i, 77,
@@ -2530,59 +2495,92 @@ unsigned int MoveDoor(unsigned int door_state)
 			   DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
 			   DX + DXSIZE - i, DY + 203 + j);
 	}
-	else
-	{
-	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE, DOOR_GFX_PAGEY1, i, DYSIZE,
-			   DX + DXSIZE - i, DY);
-
-	  SetClipOrigin(bitmap, gc, DX - DXSIZE + i, DY - DOOR_GFX_PAGEY1);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE - i, DOOR_GFX_PAGEY1, i, DYSIZE,
-			   DX, DY);
-	}
 
 	redraw_mask |= REDRAW_DOOR_1;
+	door_1_done = (a == end);
       }
 
       if (door_state & DOOR_ACTION_2)
       {
-	int i = (door_state & DOOR_OPEN_2 ? VXSIZE - x : x);
-	int j = (VXSIZE - i) / 3;
+	int a = MIN(x * door_2.step_offset, VXSIZE);
+	int i = (door_state & DOOR_OPEN_2 ? VXSIZE - a : a);
 
-	BlitBitmap(bitmap_db_door, drawto,
-		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i/2,
-		   VXSIZE, VYSIZE - i/2, VX, VY);
+	if (x <= VYSIZE)
+	{
+	  BlitBitmap(bitmap_db_door, drawto,
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i / 2,
+		     VXSIZE, VYSIZE - i / 2, VX, VY);
 
-	ClearRectangle(drawto, VX, VY + VYSIZE-i/2, VXSIZE, i/2);
+	  ClearRectangle(drawto, VX, VY + VYSIZE - i / 2, VXSIZE, i / 2);
+	}
 
-	SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	BlitBitmapMasked(bitmap, drawto,
-			 VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2,
-			 VX + VXSIZE-i, VY+j);
-	SetClipOrigin(bitmap, gc,
-		      VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
-	BlitBitmapMasked(bitmap, drawto,
-			 VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j,
-			 VX, VY);
+	if (door_2.anim_mode == ANIM_HORIZONTAL && x <= VXSIZE)
+	{
+	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
+	  int dst1_x = VX + VXSIZE - i,	dst1_y = VY;
+	  int src2_x = VXSIZE - i,	src2_y = DOOR_GFX_PAGEY2;
+	  int dst2_x = VX,		dst2_y = VY;
+	  int width = i, height = VYSIZE;
 
-	BlitBitmapMasked(bitmap, drawto,
-			 VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2,
-			 i, VYSIZE / 2, VX, VY + VYSIZE / 2 - j);
-	SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	BlitBitmapMasked(bitmap, drawto,
-			 VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2,
-			 i, VYSIZE / 2 - j,
-			 VX + VXSIZE - i, VY + VYSIZE / 2 + j);
+	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
+	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
+			   dst1_x, dst1_y);
+
+	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
+	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
+			   dst2_x, dst2_y);
+	}
+	else if (door_2.anim_mode == ANIM_VERTICAL && x <= VYSIZE)
+	{
+	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
+	  int dst1_x = VX,		dst1_y = VY + VYSIZE - i;
+	  int src2_x = 0,		src2_y = DOOR_GFX_PAGEY2 + VYSIZE - i;
+	  int dst2_x = VX,		dst2_y = VY;
+	  int width = VXSIZE, height = i;
+
+	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
+	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
+			   dst1_x, dst1_y);
+
+	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
+	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
+			   dst2_x, dst2_y);
+	}
+	else if (x <= VXSIZE)	/* ANIM_DEFAULT */
+	{
+	  int j = (door_2.anim_mode == ANIM_DEFAULT ? (VXSIZE - i) / 3 : 0);
+
+	  SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	  BlitBitmapMasked(bitmap, drawto,
+			   VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2,
+			   VX + VXSIZE - i, VY + j);
+	  SetClipOrigin(bitmap, gc,
+			VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
+	  BlitBitmapMasked(bitmap, drawto,
+			   VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j,
+			   VX, VY);
+
+	  BlitBitmapMasked(bitmap, drawto,
+			   VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2,
+			   i, VYSIZE / 2, VX, VY + VYSIZE / 2 - j);
+	  SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	  BlitBitmapMasked(bitmap, drawto,
+			   VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2,
+			   i, VYSIZE / 2 - j,
+			   VX + VXSIZE - i, VY + VYSIZE / 2 + j);
+	}
 
 	redraw_mask |= REDRAW_DOOR_2;
+	door_2_done = (a == VXSIZE);
       }
 
       BackToFront();
 
       if (game_status == GAME_MODE_MAIN)
 	DoAnimation();
+
+      if (!(door_state & DOOR_NO_DELAY))
+	WaitUntilDelayReached(&door_delay, door_delay_value);
     }
   }
 

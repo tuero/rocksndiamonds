@@ -96,7 +96,7 @@ struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
 struct MenuInfo		menu;
-struct DoorInfo		door;
+struct DoorInfo		door_1, door_2;
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 
@@ -3747,11 +3747,12 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	   },
   { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	   },
 
-  { "door.step_offset",		&door.step_offset			   },
-  { "door.step_delay",		&door.step_delay			   },
-  { "door.anim_mode",		&door.anim_mode				   },
-
-  { "game.envelope.anim_mode",	&game.envelope.anim_mode		   },
+  { "door_1.step_offset",	&door_1.step_offset			   },
+  { "door_1.step_delay",	&door_1.step_delay			   },
+  { "door_1.anim_mode",		&door_1.anim_mode			   },
+  { "door_2.step_offset",	&door_2.step_offset			   },
+  { "door_2.step_delay",	&door_2.step_delay			   },
+  { "door_2.anim_mode",		&door_2.anim_mode			   },
 
   { NULL,			NULL,					   }
 };

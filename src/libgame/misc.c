@@ -1376,32 +1376,41 @@ int get_integer_from_string(char *s)
 {
   static char *number_text[][3] =
   {
-    { "0", "zero", "null", },
-    { "1", "one", "first" },
-    { "2", "two", "second" },
-    { "3", "three", "third" },
-    { "4", "four", "fourth" },
-    { "5", "five", "fifth" },
-    { "6", "six", "sixth" },
-    { "7", "seven", "seventh" },
-    { "8", "eight", "eighth" },
-    { "9", "nine", "ninth" },
-    { "10", "ten", "tenth" },
-    { "11", "eleven", "eleventh" },
-    { "12", "twelve", "twelfth" },
+    { "0",	"zero",		"null",		},
+    { "1",	"one",		"first"		},
+    { "2",	"two",		"second"	},
+    { "3",	"three",	"third"		},
+    { "4",	"four",		"fourth"	},
+    { "5",	"five",		"fifth"		},
+    { "6",	"six",		"sixth"		},
+    { "7",	"seven",	"seventh"	},
+    { "8",	"eight",	"eighth"	},
+    { "9",	"nine",		"ninth"		},
+    { "10",	"ten",		"tenth"		},
+    { "11",	"eleven",	"eleventh"	},
+    { "12",	"twelve",	"twelfth"	},
+
+    { NULL,	NULL,		NULL		},
   };
 
   int i, j;
   char *s_lower = getStringToLower(s);
   int result = -1;
 
-  for (i=0; i<13; i++)
-    for (j=0; j<3; j++)
+  for (i=0; number_text[i][0] != NULL; i++)
+    for (j=0; j < 3; j++)
       if (strcmp(s_lower, number_text[i][j]) == 0)
 	result = i;
 
   if (result == -1)
-    result = atoi(s);
+  {
+    if (strcmp(s_lower, "false") == 0)
+      result = 0;
+    else if (strcmp(s_lower, "true") == 0)
+      result = 1;
+    else
+      result = atoi(s);
+  }
 
   free(s_lower);
 
@@ -1646,27 +1655,29 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
-int get_parameter_value(char *token, char *value_raw, int type)
+int get_parameter_value(char *suffix, char *value_raw, int type)
 {
   char *value = getStringToLower(value_raw);
   int result = 0;	/* probably a save default value */
 
-  if (strcmp(token, ".direction") == 0)
+  if (strcmp(suffix, ".direction") == 0)
   {
     result = (strcmp(value, "left")  == 0 ? MV_LEFT :
 	      strcmp(value, "right") == 0 ? MV_RIGHT :
 	      strcmp(value, "up")    == 0 ? MV_UP :
 	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
   }
-  else if (strcmp(token, ".anim_mode") == 0)
+  else if (strcmp(suffix, ".anim_mode") == 0)
   {
-    result = (string_has_parameter(value, "loop")      ? ANIM_LOOP :
-	      string_has_parameter(value, "linear")    ? ANIM_LINEAR :
-	      string_has_parameter(value, "pingpong")  ? ANIM_PINGPONG :
-	      string_has_parameter(value, "pingpong2") ? ANIM_PINGPONG2 :
-	      string_has_parameter(value, "random")    ? ANIM_RANDOM :
-	      string_has_parameter(value, "none")      ? ANIM_NONE :
-	      ANIM_LOOP);
+    result = (string_has_parameter(value, "none")       ? ANIM_NONE :
+	      string_has_parameter(value, "loop")       ? ANIM_LOOP :
+	      string_has_parameter(value, "linear")     ? ANIM_LINEAR :
+	      string_has_parameter(value, "pingpong")   ? ANIM_PINGPONG :
+	      string_has_parameter(value, "pingpong2")  ? ANIM_PINGPONG2 :
+	      string_has_parameter(value, "random")     ? ANIM_RANDOM :
+	      string_has_parameter(value, "horizontal") ? ANIM_HORIZONTAL :
+	      string_has_parameter(value, "vertical")   ? ANIM_VERTICAL :
+	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))
       result |= ANIM_REVERSE;
@@ -1682,6 +1693,20 @@ int get_parameter_value(char *token, char *value_raw, int type)
   free(value);
 
   return result;
+}
+
+int get_auto_parameter_value(char *token, char *value_raw)
+{
+  char *suffix;
+
+  if (token == NULL || value_raw == NULL)
+    return ARG_UNDEFINED_VALUE;
+
+  suffix = strrchr(token, '.');
+  if (suffix == NULL)
+    suffix = token;
+
+  return get_parameter_value(suffix, value_raw, TYPE_INTEGER);
 }
 
 static void FreeCustomArtworkList(struct ArtworkListInfo *,

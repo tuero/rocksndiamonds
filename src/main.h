@@ -88,36 +88,36 @@
 #define EP_CAN_EXPLODE_1X1	23
 #define EP_PUSHABLE		24
 
+/* values for pre-defined properties */
+#define EP_PLAYER		32
+#define EP_CAN_PASS_MAGIC_WALL	33
+#define EP_SWITCHABLE		34
+#define EP_BD_ELEMENT		35
+#define EP_SP_ELEMENT		36
+#define EP_SB_ELEMENT		37
+#define EP_GEM			38
+#define EP_FOOD_DARK_YAMYAM	39
+#define EP_FOOD_PENGUIN		40
+#define EP_FOOD_PIG		41
+#define EP_HISTORIC_WALL	42
+#define EP_HISTORIC_SOLID	43
+#define EP_CLASSIC_ENEMY	44
+#define EP_BELT			45
+#define EP_BELT_ACTIVE		46
+#define EP_BELT_SWITCH		47
+#define EP_TUBE			48
+#define EP_KEYGATE		49
+#define EP_AMOEBOID		50
+#define EP_AMOEBALIVE		51
+#define EP_HAS_CONTENT		52
+#define EP_ACTIVE_BOMB		53
+#define EP_INACTIVE		54
+
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL	32
+#define EP_EM_SLIPPERY_WALL	35
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_CAN_BE_CRUMBLED	33
-
-/* values for pre-defined properties */
-#define EP_PLAYER		34
-#define EP_CAN_PASS_MAGIC_WALL	35
-#define EP_SWITCHABLE		36
-#define EP_BD_ELEMENT		37
-#define EP_SP_ELEMENT		38
-#define EP_SB_ELEMENT		39
-#define EP_GEM			40
-#define EP_FOOD_DARK_YAMYAM	41
-#define EP_FOOD_PENGUIN		42
-#define EP_FOOD_PIG		43
-#define EP_HISTORIC_WALL	44
-#define EP_HISTORIC_SOLID	45
-#define EP_CLASSIC_ENEMY	46
-#define EP_BELT			47
-#define EP_BELT_ACTIVE		48
-#define EP_BELT_SWITCH		49
-#define EP_TUBE			50
-#define EP_KEYGATE		51
-#define EP_AMOEBOID		52
-#define EP_AMOEBALIVE		53
-#define EP_HAS_CONTENT		54
-#define EP_ACTIVE_BOMB		55
-#define EP_INACTIVE		56
+#define EP_GFX_CRUMBLED		56
 
 /* values for derived properties (determined from properties above) */
 #define EP_ACCESSIBLE_OVER	57
@@ -275,7 +275,7 @@
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
 
 /* macros for special graphics properties */
-#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(GFX_ELEMENT(e),EP_CAN_BE_CRUMBLED)
+#define GFX_CRUMBLED(e)		HAS_PROPERTY(GFX_ELEMENT(e), EP_GFX_CRUMBLED)
 
 /* macros for pre-defined properties */
 #define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
@@ -1100,11 +1100,6 @@ struct DoorInfo
   int anim_mode;
 };
 
-struct EnvelopeInfo
-{
-  int anim_mode;
-};
-
 struct HiScore
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
@@ -1247,7 +1242,7 @@ struct GameInfo
   int initial_move_delay;
   int initial_move_delay_value;
 
-  struct EnvelopeInfo envelope;
+  boolean envelope_active;
 
   /* variable within running game */
   int yamyam_content_nr;
@@ -1527,7 +1522,7 @@ extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct MenuInfo		menu;
-extern struct DoorInfo		door;
+extern struct DoorInfo		door_1, door_2;
 extern struct ElementInfo	element_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];

@@ -1085,6 +1085,8 @@ void InitGame()
   game.balloon_dir = MV_NO_MOVING;
   game.explosions_delayed = TRUE;
 
+  game.envelope_active = FALSE;
+
   for (i=0; i<4; i++)
   {
     game.belt_dir[i] = MV_NO_MOVING;
@@ -2377,7 +2379,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     TestIfElementTouchesCustomElement(x, y);
 
-    if (CAN_BE_CRUMBLED(element))
+    if (GFX_CRUMBLED(element))
       DrawLevelFieldCrumbledSandNeighbours(x, y);
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x,y)->present)
@@ -3830,6 +3832,7 @@ void StartMoving(int x, int y)
 #if 1
 
 #if 0
+    /* TEST: bug where player gets not killed by falling rock ... */
     else if (CAN_SMASH(element) &&
 	     (Feld[x][y + 1] == EL_BLOCKED ||
 	      IS_PLAYER(x, y + 1)) &&
@@ -5423,7 +5426,7 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 
   DrawLevelField(x, y);
 
-  if (CAN_BE_CRUMBLED(Feld[x][y]))
+  if (GFX_CRUMBLED(Feld[x][y]))
     DrawLevelFieldCrumbledSandNeighbours(x, y);
 
   TestIfBadThingTouchesHero(x, y);
@@ -7637,7 +7640,7 @@ int DigField(struct PlayerInfo *player,
 	  GfxElement[x][y] = GFX_ELEMENT(element);
 #else
 	  GfxElement[x][y] =
-	    (CAN_BE_CRUMBLED(element) ? EL_SAND : GFX_ELEMENT(element));
+	    (GFX_CRUMBLED(element) ? EL_SAND : GFX_ELEMENT(element));
 #endif
 	  player->is_digging = TRUE;
 	}
