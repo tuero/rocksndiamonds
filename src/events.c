@@ -79,13 +79,15 @@ void EventLoop(void)
   	}
       }
     }
-
-    HandleNoXEvent();
+    else
+      HandleNoEvent();
 
     /* don't use all CPU time when idle; the main loop while playing
        has its own synchronization and is CPU friendly, too */
 
-    if (game_status != PLAYING)
+    if (game_status == PLAYING)
+      HandleGameActions();
+    else
     {
       SyncDisplay();
       if (!PendingEvent())	/* delay only if no pending events */
@@ -258,7 +260,7 @@ void HandleMotionEvent(MotionEvent *event)
   if (!PointerInWindow(window))
     return;	/* window and pointer are on different screens */
 
-#if 0
+#if 1
   if (button_status == MB_RELEASED && game_status != LEVELED)
     return;
 #endif
@@ -738,7 +740,7 @@ void HandleKey(Key key, int key_status)
   }
 }
 
-void HandleNoXEvent()
+void HandleNoEvent()
 {
   if (button_status && game_status != PLAYING)
   {
@@ -752,9 +754,6 @@ void HandleNoXEvent()
 #endif
 
   HandleJoystick();
-
-  if (game_status == PLAYING)
-    HandleGameActions();
 }
 
 static int HandleJoystickForAllPlayers()
