@@ -475,6 +475,9 @@ void handlemessages()
 	unsigned long new_random_seed;
 	unsigned char *new_leveldir_name;
 
+	if (game_status == PLAYING)
+	  break;
+
 	new_level_nr = (buf[2] << 8) + buf[3];
 	new_leveldir_nr = (buf[4] << 8) + buf[5];
 	new_random_seed =
@@ -507,12 +510,16 @@ void handlemessages()
 	GetPlayerConfig();
 	LoadLevel(level_nr);
 
+	/*
 	if (autorecord_on)
 	  TapeStartRecording();
+	*/
 
-	tape.random_seed = new_random_seed;
-
-	InitRND(tape.random_seed);
+	if (tape.recording)
+	{
+	  tape.random_seed = new_random_seed;
+	  InitRND(tape.random_seed);
+	}
 
 	/*
 	printf("tape.random_seed == %d\n", tape.random_seed);

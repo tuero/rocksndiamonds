@@ -4023,7 +4023,8 @@ BOOL PlaceBomb(struct PlayerInfo *player)
     player->dynamite--;
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FS_SMALL, FC_YELLOW);
-    DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNAMIT);
+    if (IN_SCR_FIELD(SCREENX(jx),SCREENY(jy)))
+      DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNAMIT);
   }
   else
   {
@@ -4031,7 +4032,8 @@ BOOL PlaceBomb(struct PlayerInfo *player)
     Store2[jx][jy] = player->element_nr;	/* for DynaExplode() */
     MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
-    DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNABOMB);
+    if (IN_SCR_FIELD(SCREENX(jx),SCREENY(jy)))
+      DrawGraphicThruMask(SCREENX(jx),SCREENY(jy),GFX_DYNABOMB);
   }
 
   return(TRUE);

@@ -215,11 +215,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y==8)
       {
+	if (autorecord_on)
+	  TapeStartRecording();
+
 	if (standalone)
 	{
-	  if (autorecord_on)
-	    TapeStartRecording();
-
 	  game_status = PLAYING;
 	  InitGame();
 	}
@@ -1355,8 +1355,14 @@ void HandleVideoButtons(int mx, int my, int button)
       if (TAPE_IS_STOPPED(tape))
       {
 	TapeStartRecording();
-	game_status = PLAYING;
-	InitGame();
+
+	if (standalone)
+	{
+	  game_status = PLAYING;
+	  InitGame();
+	}
+	else
+	  SendToServer_StartPlaying();
       }
       else if (tape.pausing)
       {
@@ -1380,8 +1386,14 @@ void HandleVideoButtons(int mx, int my, int button)
       if (TAPE_IS_STOPPED(tape))
       {
 	TapeStartPlaying();
-	game_status = PLAYING;
-	InitGame();
+
+	if (standalone)
+	{
+	  game_status = PLAYING;
+	  InitGame();
+	}
+	else
+	  SendToServer_StartPlaying();
       }
       else if (tape.playing)
       {
