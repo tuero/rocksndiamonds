@@ -2125,7 +2125,7 @@ void HandleGadgets(int mx, int my, int button)
 
   /* handle gadget popup info text */
   if (last_info_gi != new_gi ||
-      (new_gi && new_gi->type == GD_TYPE_DRAWING_AREA))
+      (new_gi && new_gi->type == GD_TYPE_DRAWING_AREA && changed_position))
   {
     last_info_gi = new_gi;
 

@@ -284,6 +284,7 @@ static boolean level_editor_gadgets_created = FALSE;
 
 static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
 static int last_drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
+static boolean draw_with_brush = FALSE;
 static int properties_element = 0;
 
 static short ElementContent[MAX_ELEMCONT][3][3];
@@ -2557,52 +2558,106 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
 
-static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
-			  int element, boolean change_level)
-{
-  int lx = sx + level_xpos;
-  int ly = sy + level_ypos;
-
-  if (element == -1)
-    DrawMiniElement(sx, sy, Feld[lx][ly]);
-  else
-    DrawAreaBorder(sx, sy, sx, sy);
-}
-
 /* values for CopyBrushExt() */
 #define CB_AREA_TO_BRUSH	0
-#define CB_BRUSH_TO_LEVEL	1
+#define CB_BRUSH_TO_CURSOR	1
+#define CB_BRUSH_TO_LEVEL	2
+#define CB_DELETE_OLD_CURSOR	3
 
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y, int mode)
 {
-  static short brush_buffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-  static int brush_from_x, brush_from_y;
-  static int brush_to_x, brush_to_y;
+  static short brush_buffer[ED_FIELDX][ED_FIELDY];
+  static int brush_width, brush_height;
+  static int last_cursor_x = -1, last_cursor_y = -1;
+  static boolean delete_old_brush;
   int x, y;
 
-  if (from_x > to_x)
-    swap_numbers(&from_x, &to_x);
-
-  if (from_y > to_y)
-    swap_numbers(&from_y, &to_y);
+  if (mode == CB_DELETE_OLD_CURSOR && !delete_old_brush)
+    return;
 
   if (mode == CB_AREA_TO_BRUSH)
   {
-    for (y=from_y; y<=to_y; y++)
-      for (x=from_x; x<=to_x; x++)
-	brush_buffer[x][y] = Feld[x][y];
+    int from_lx, from_ly;
 
-    brush_from_x = from_x;
-    brush_from_y = from_y;
-    brush_to_x = to_x;
-    brush_to_y = to_y;
+    if (from_x > to_x)
+      swap_numbers(&from_x, &to_x);
+
+    if (from_y > to_y)
+      swap_numbers(&from_y, &to_y);
+
+    brush_width = to_x - from_x + 1;
+    brush_height = to_y - from_y + 1;
+
+    from_lx = from_x + level_xpos;
+    from_ly = from_y + level_ypos;
+
+    for (y=0; y<brush_height; y++)
+      for (x=0; x<brush_width; x++)
+	brush_buffer[x][y] = Feld[from_lx + x][from_ly + y];
+
+    delete_old_brush = FALSE;
   }
-  else
+  else if (mode == CB_BRUSH_TO_CURSOR || mode == CB_DELETE_OLD_CURSOR ||
+	   mode == CB_BRUSH_TO_LEVEL)
   {
-    for (y=brush_from_y; y<=brush_to_y; y++)
-      for (x=brush_from_x; x<=brush_to_x; x++)
-	Feld[x][y] = brush_buffer[x][y];
-    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+    int cursor_x = (mode == CB_DELETE_OLD_CURSOR ? last_cursor_x : from_x);
+    int cursor_y = (mode == CB_DELETE_OLD_CURSOR ? last_cursor_y : from_y);
+    int cursor_from_x = cursor_x - brush_width / 2;
+    int cursor_from_y = cursor_y - brush_height / 2;
+    int border_from_x = cursor_x, border_from_y = cursor_y;
+    int border_to_x = cursor_x, border_to_y = cursor_y;
+
+    if (mode != CB_DELETE_OLD_CURSOR && delete_old_brush)
+      CopyBrushExt(0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
+
+    if (!IN_LEV_FIELD(cursor_x + level_xpos, cursor_y + level_ypos))
+    {
+      delete_old_brush = FALSE;
+      return;
+    }
+
+    for (y=0; y<brush_height; y++)
+    {
+      for (x=0; x<brush_width; x++)
+      {
+	int sx = cursor_from_x + x;
+	int sy = cursor_from_y + y;
+	int lx = sx + level_xpos;
+	int ly = sy + level_ypos;
+	int element = (mode == CB_DELETE_OLD_CURSOR ? -1 : brush_buffer[x][y]);
+	boolean change_level = (mode == CB_BRUSH_TO_LEVEL);
+
+	if (IN_LEV_FIELD(lx, ly) &&
+	    sx >=0 && sx < ED_FIELDX && sy >=0 && sy < ED_FIELDY)
+	{
+	  if (sx < border_from_x)
+	    border_from_x = sx;
+	  else if (sx > border_to_x)
+	    border_to_x = sx;
+	  if (sy < border_from_y)
+	    border_from_y = sy;
+	  else if (sy > border_to_y)
+	    border_to_y = sy;
+
+	  DrawLineElement(sx, sy, element, change_level);
+	}
+      }
+    }
+
+    /*
+    printf("%d, %d - %d, %d in level and screen\n",
+	   border_from_x, border_from_y, border_to_x, border_to_y);
+    */
+
+    if (mode != CB_DELETE_OLD_CURSOR)
+      DrawAreaBorder(border_from_x, border_from_y, border_to_x, border_to_y);
+
+    if (mode == CB_BRUSH_TO_LEVEL)
+      CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+
+    last_cursor_x = cursor_x;
+    last_cursor_y = cursor_y;
+    delete_old_brush = TRUE;
   }
 }
 
@@ -2611,12 +2666,20 @@ static void CopyAreaToBrush(int from_x, int from_y, int to_x, int to_y)
   CopyBrushExt(from_x, from_y, to_x, to_y, CB_AREA_TO_BRUSH);
 }
 
-#if 0
-static void CopyBrushToLevel()
+static void CopyBrushToLevel(int x, int y)
 {
-  CopyBrushExt(0, 0, 0, 0, CB_BRUSH_TO_LEVEL);
+  CopyBrushExt(x, y, 0, 0, CB_BRUSH_TO_LEVEL);
 }
-#endif
+
+static void CopyBrushToCursor(int x, int y)
+{
+  CopyBrushExt(x, y, 0, 0, CB_BRUSH_TO_CURSOR);
+}
+
+static void DeleteBrushFromCursor()
+{
+  CopyBrushExt(0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
+}
 
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
@@ -2756,6 +2819,18 @@ static void DrawLevelText(int sx, int sy, char letter, int mode)
   }
 }
 
+static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
+			  int element, boolean change_level)
+{
+  int lx = sx + level_xpos;
+  int ly = sy + level_ypos;
+
+  if (element == -1)
+    DrawMiniElement(sx, sy, Feld[lx][ly]);
+  else
+    DrawAreaBorder(sx, sy, sx, sy);
+}
+
 static void CopyLevelToUndoBuffer(int mode)
 {
   static boolean accumulated_undo = FALSE;
@@ -2856,7 +2931,6 @@ void WrapLevel(int dx, int dy)
 static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
-  static boolean draw_with_brush = FALSE;
   int id = gi->custom_id;
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
@@ -3513,6 +3587,10 @@ void HandleEditorGadgetInfoText(void *ptr)
 
   ClearEditorGadgetInfoText();
 
+  /* misuse this function to delete brush cursor, if needed */
+  if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
+    DeleteBrushFromCursor();
+
   if (gi == NULL || gi->description_text == NULL)
     return;
 
@@ -3537,6 +3615,10 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     if (IN_LEV_FIELD(lx, ly))
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 		"Level: %d, %d (Screen: %d, %d)", lx, ly, sx, sy);
+
+    /* misuse this function to draw brush cursor, if needed */
+    if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
+      CopyBrushToCursor(sx, sy);
   }
   else if (id == ED_CTRL_ID_AMOEBA_CONTENT)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
