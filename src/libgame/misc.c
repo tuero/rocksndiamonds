@@ -52,6 +52,7 @@ void printf_line(char *line_string, int line_length)
   fprintf_line(stdout, line_string, line_length);
 }
 
+
 /* int2str() returns a number converted to a string;
    the used memory is static, but will be overwritten by later calls,
    so if you want to save the result, copy it to a private string buffer;
@@ -82,6 +83,7 @@ char *int2str(int number, int size)
   }
 }
 
+
 /* something similar to "int2str()" above, but allocates its own memory
    and has a different interface; we cannot use "itoa()", because this
    seems to be already defined when cross-compiling to the win32 target */
@@ -100,6 +102,23 @@ char *i_to_a(unsigned int i)
   sprintf(a, "%d", i);
 
   return a;
+}
+
+
+/* calculate base-2 logarithm of argument (rounded down to integer;
+   this function returns the number of the highest bit set in argument) */
+
+int log_2(unsigned int x)
+{
+  int e = 0;
+
+  while ((1 << e) < x)
+  {
+    x -= (1 << e);	/* for rounding down (rounding up: remove this line) */
+    e++;
+  }
+
+  return e;
 }
 
 

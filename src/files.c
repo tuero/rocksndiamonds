@@ -92,7 +92,10 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->can_change = FALSE;
 
   change->events = CE_BITMASK_DEFAULT;
-  change->sides = CH_SIDE_ANY;
+
+  change->trigger_player = CH_PLAYER_ANY;
+  change->trigger_side = CH_SIDE_ANY;
+  change->trigger_page = CH_PAGE_ANY;
 
   change->target_element = EL_EMPTY_SPACE;
 
@@ -1069,13 +1072,23 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     change->can_change = getFile8Bit(file);
 
-    change->sides = getFile8Bit(file);
+    change->trigger_side = getFile8Bit(file);
 
-    if (change->sides == CH_SIDE_NONE)	/* correct empty sides field */
-      change->sides = CH_SIDE_ANY;
+#if 1
+    change->trigger_player = getFile8Bit(file);
+    change->trigger_page = getFile8Bit(file);
+
+    change->trigger_page = (change->trigger_page == CH_PAGE_ANY_FILE ?
+			    CH_PAGE_ANY : (1 << change->trigger_page));
+
+    /* some free bytes for future change property values and padding */
+    ReadUnusedBytesFromFile(file, 6);
+
+#else
 
     /* some free bytes for future change property values and padding */
     ReadUnusedBytesFromFile(file, 8);
+#endif
   }
 
   /* mark this custom element as modified */
@@ -2042,7 +2055,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
     if (level->game_version < VERSION_IDENT(3,0,9,0))
     {
-      int i;
+      int i, j;
 
       level->can_move_into_acid = 0;	/* nothing can move into acid */
 
@@ -2053,6 +2066,20 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
       for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
 	SET_PROPERTY(EL_CUSTOM_START + i, EP_CAN_MOVE_INTO_ACID, TRUE);
+
+      for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+      {
+	int element = EL_CUSTOM_START + i;
+	struct ElementInfo *ei = &element_info[element];
+
+	for (j = 0; j < ei->num_change_pages; j++)
+	{
+	  struct ElementChangeInfo *change = &ei->change_page[j];
+
+	  change->trigger_player = CH_PLAYER_ANY;
+	  change->trigger_page = CH_PAGE_ANY;
+	}
+      }
     }
   }
   else
@@ -2158,13 +2185,22 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
-  /* correct field access direction (for old levels without this option) */
+  /* correct custom element fields (for old levels without these options) */
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
+    struct ElementInfo *ei = &element_info[element];
 
-    if (element_info[element].access_direction == MV_NO_MOVING)
-      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+    if (ei->access_direction == MV_NO_MOVING)
+      ei->access_direction = MV_ALL_DIRECTIONS;
+
+    for (j = 0; j < ei->num_change_pages; j++)
+    {
+      struct ElementChangeInfo *change = &ei->change_page[j];
+
+      if (change->trigger_side == CH_SIDE_NONE)
+	change->trigger_side = CH_SIDE_ANY;
+    }
   }
 
 #if 0
@@ -2671,10 +2707,21 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
     putFile8Bit(file, change->can_change);
 
-    putFile8Bit(file, change->sides);
+    putFile8Bit(file, change->trigger_side);
+
+#if 1
+    putFile8Bit(file, change->trigger_player);
+    putFile8Bit(file, (change->trigger_page == CH_PAGE_ANY ? CH_PAGE_ANY_FILE :
+		       log_2(change->trigger_page)));
+
+    /* some free bytes for future change property values and padding */
+    WriteUnusedBytesToFile(file, 6);
+
+#else
 
     /* some free bytes for future change property values and padding */
     WriteUnusedBytesToFile(file, 8);
+#endif
   }
 }
 

@@ -455,9 +455,9 @@
 #define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 13)
 #define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 14)
 #define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 15)
-#define GADGET_ID_CHANGE_SIDES		(GADGET_ID_SELECTBOX_FIRST + 16)
-#define GADGET_ID_CHANGE_PLAYERS	(GADGET_ID_SELECTBOX_FIRST + 17)
-#define GADGET_ID_CHANGE_PAGES		(GADGET_ID_SELECTBOX_FIRST + 18)
+#define GADGET_ID_CHANGE_SIDE		(GADGET_ID_SELECTBOX_FIRST + 16)
+#define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 17)
+#define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 18)
 #define GADGET_ID_CHANGE_POWER		(GADGET_ID_SELECTBOX_FIRST + 19)
 #define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 20)
 #define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 21)
@@ -643,9 +643,9 @@
 #define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	13
 #define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	14
 #define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	15
-#define ED_SELECTBOX_ID_CHANGE_SIDES		16
-#define ED_SELECTBOX_ID_CHANGE_PLAYERS		17
-#define ED_SELECTBOX_ID_CHANGE_PAGES		18
+#define ED_SELECTBOX_ID_CHANGE_SIDE		16
+#define ED_SELECTBOX_ID_CHANGE_PLAYER		17
+#define ED_SELECTBOX_ID_CHANGE_PAGE		18
 #define ED_SELECTBOX_ID_CHANGE_POWER		19
 #define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	20
 #define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	21
@@ -1138,6 +1138,7 @@ static struct ValueTextInfo options_access_type[] =
 {
   { EP_WALKABLE,		"walkable"			},
   { EP_PASSABLE,		"passable"			},
+
   { -1,				NULL				}
 };
 
@@ -1146,6 +1147,7 @@ static struct ValueTextInfo options_access_layer[] =
   { EP_ACCESSIBLE_OVER,		"over"				},
   { EP_ACCESSIBLE_INSIDE,	"inside"			},
   { EP_ACCESSIBLE_UNDER,	"under"				},
+
   { -1,				NULL				}
 };
 
@@ -1153,6 +1155,7 @@ static struct ValueTextInfo options_access_protected[] =
 {
   { 0,				"unprotected"			},
   { 1,				"protected"			},
+
   { -1,				NULL				}
 };
 
@@ -1173,6 +1176,7 @@ static struct ValueTextInfo options_access_direction[] =
   { MV_VERTICAL   | MV_LEFT,	"vertical + left"		},
   { MV_VERTICAL   | MV_RIGHT,	"vertical + right"		},
   { MV_ALL_DIRECTIONS,		"all directions"		},
+
   { -1,				NULL				}
 };
 
@@ -1182,6 +1186,7 @@ static struct ValueTextInfo options_walk_to_action[] =
   { EP_COLLECTIBLE_ONLY,	"collectible"			},
   { EP_DROPPABLE,		"collectible & droppable"	},
   { EP_PUSHABLE,		"pushable"			},
+
   { -1,				NULL				}
 };
 
@@ -1207,6 +1212,7 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_WHEN_DROPPED,		"when dropped"			},
   { MV_MAZE_RUNNER,		"maze runner style"		},
   { MV_MAZE_HUNTER,		"maze hunter style"		},
+
   { -1,				NULL				}
 };
 
@@ -1219,6 +1225,7 @@ static struct ValueTextInfo options_move_direction[] =
   { MV_START_DOWN,		"down"				},
   { MV_START_RANDOM,		"random"			},
   { MV_START_PREVIOUS,		"previous"			},
+
   { -1,				NULL				}
 };
 
@@ -1229,6 +1236,7 @@ static struct ValueTextInfo options_move_stepsize[] =
   { 4,				"normal"			},
   { 8,				"fast"				},
   { 16,				"very fast"			},
+
   { -1,				NULL				}
 };
 
@@ -1236,6 +1244,7 @@ static struct ValueTextInfo options_move_leave_type[] =
 {
   { LEAVE_TYPE_UNLIMITED,	"leave behind"			},
   { LEAVE_TYPE_LIMITED,		"change it to"			},
+
   { -1,				NULL				}
 };
 
@@ -1246,6 +1255,7 @@ static struct ValueTextInfo options_smash_targets[] =
   { EP_CAN_SMASH_ENEMIES,	"enemies"			},
 #endif
   { EP_CAN_SMASH_EVERYTHING,	"everything"			},
+
   { -1,				NULL				}
 };
 
@@ -1256,6 +1266,7 @@ static struct ValueTextInfo options_slippery_type[] =
   { SLIPPERY_ANY_RIGHT_LEFT,	"right, left"			},
   { SLIPPERY_ONLY_LEFT,		"only left"			},
   { SLIPPERY_ONLY_RIGHT,	"only right"			},
+
   { -1,				NULL				}
 };
 
@@ -1264,6 +1275,7 @@ static struct ValueTextInfo options_deadliness[] =
   { EP_DONT_RUN_INTO,		"running into"			},
   { EP_DONT_COLLIDE_WITH,	"colliding with"		},
   { EP_DONT_TOUCH,		"touching"			},
+
   { -1,				NULL				}
 };
 
@@ -1273,6 +1285,7 @@ static struct ValueTextInfo options_consistency[] =
   { EP_CAN_EXPLODE_DYNA,	"can explode 3+3"		},
   { EP_CAN_EXPLODE_1X1,		"can explode 1x1"		},
   { EP_INDESTRUCTIBLE,		"indestructible"		},
+
   { -1,				NULL				}
 };
 
@@ -1280,6 +1293,7 @@ static struct ValueTextInfo options_time_units[] =
 {
   { 1,				"frames"			},
   { FRAMES_PER_SECOND,		"seconds"			},
+
   { -1,				NULL				}
 };
 
@@ -1300,6 +1314,7 @@ static struct ValueTextInfo options_change_direct_action[] =
 #endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
+
   { -1,				NULL				}
 };
 
@@ -1319,12 +1334,13 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_OTHER_GETS_HIT,		"hit by ..."			},
 #endif
   { CE_OTHER_IS_SWITCHING,	"switch of ..."			},
-  { CE_OTHER_IS_CHANGING,	"change of"			},
+  { CE_OTHER_IS_CHANGING,	"change by page of"		},
   { CE_OTHER_IS_EXPLODING,	"explosion of"			},
+
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_sides[] =
+static struct ValueTextInfo options_change_trigger_side[] =
 {
   { CH_SIDE_LEFT,		"left"				},
   { CH_SIDE_RIGHT,		"right"				},
@@ -1333,54 +1349,57 @@ static struct ValueTextInfo options_change_sides[] =
   { CH_SIDE_LEFT_RIGHT,		"left/right"			},
   { CH_SIDE_TOP_BOTTOM,		"top/bottom"			},
   { CH_SIDE_ANY,		"any"				},
+
   { -1,				NULL				}
 };
 
 static struct ValueTextInfo options_change_trigger_player[] =
 {
-  { 0,				"any"				},
-  { 1,				"1"				},
-  { 2,				"2"				},
-  { 3,				"3"				},
-  { 4,				"4"				},
+  { CH_PLAYER_1,		"1"				},
+  { CH_PLAYER_2,		"2"				},
+  { CH_PLAYER_3,		"3"				},
+  { CH_PLAYER_4,		"4"				},
+  { CH_PLAYER_ANY,		"any"				},
+
   { -1,				NULL				}
 };
 
 static struct ValueTextInfo options_change_trigger_page[] =
 {
-  { 0,				"any"				},
-  { 1,				"1"				},
-  { 2,				"2"				},
-  { 3,				"3"				},
-  { 4,				"4"				},
-  { 5,				"5"				},
-  { 6,				"6"				},
-  { 7,				"7"				},
-  { 8,				"8"				},
-  { 9,				"9"				},
-  { 10,				"10"				},
-  { 11,				"11"				},
-  { 12,				"12"				},
-  { 13,				"13"				},
-  { 14,				"14"				},
-  { 15,				"15"				},
-  { 16,				"16"				},
-  { 17,				"17"				},
-  { 18,				"18"				},
-  { 19,				"19"				},
-  { 20,				"20"				},
-  { 21,				"21"				},
-  { 22,				"22"				},
-  { 23,				"23"				},
-  { 24,				"24"				},
-  { 25,				"25"				},
-  { 26,				"26"				},
-  { 27,				"27"				},
-  { 28,				"28"				},
-  { 29,				"29"				},
-  { 30,				"30"				},
-  { 31,				"31"				},
-  { 32,				"32"				},
+  { (1 << 0),			"1"				},
+  { (1 << 1),			"2"				},
+  { (1 << 2),			"3"				},
+  { (1 << 3),			"4"				},
+  { (1 << 4),			"5"				},
+  { (1 << 5),			"6"				},
+  { (1 << 6),			"7"				},
+  { (1 << 7),			"8"				},
+  { (1 << 8),			"9"				},
+  { (1 << 9),			"10"				},
+  { (1 << 10),			"11"				},
+  { (1 << 11),			"12"				},
+  { (1 << 12),			"13"				},
+  { (1 << 13),			"14"				},
+  { (1 << 14),			"15"				},
+  { (1 << 15),			"16"				},
+  { (1 << 16),			"17"				},
+  { (1 << 17),			"18"				},
+  { (1 << 18),			"19"				},
+  { (1 << 19),			"20"				},
+  { (1 << 20),			"21"				},
+  { (1 << 21),			"22"				},
+  { (1 << 22),			"23"				},
+  { (1 << 23),			"24"				},
+  { (1 << 24),			"25"				},
+  { (1 << 25),			"26"				},
+  { (1 << 26),			"27"				},
+  { (1 << 27),			"28"				},
+  { (1 << 28),			"29"				},
+  { (1 << 29),			"30"				},
+  { (1 << 30),			"31"				},
+  { (1 << 31),			"32"				},
+  { CH_PAGE_ANY,		"any"				},
+
   { -1,				NULL				}
 };
 
@@ -1389,6 +1408,7 @@ static struct ValueTextInfo options_change_power[] =
   { CP_NON_DESTRUCTIVE,		"empty"				},
   { CP_HALF_DESTRUCTIVE,	"diggable"			},
   { CP_FULL_DESTRUCTIVE,	"destructible"			},
+
   { -1,				NULL				}
 };
 
@@ -1405,6 +1425,7 @@ static struct ValueTextInfo options_group_choice_mode[] =
   { ANIM_LINEAR,		"linear"			},
   { ANIM_PINGPONG,		"pingpong"			},
   { ANIM_PINGPONG2,		"pingpong 2"			},
+
   { -1,				NULL				}
 };
 
@@ -1557,15 +1578,15 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(6),
-    GADGET_ID_CHANGE_SIDES,		GADGET_ID_NONE,
+    GADGET_ID_CHANGE_SIDE,		GADGET_ID_NONE,
     -1,
-    options_change_sides,
-    &custom_element_change.sides,
+    options_change_trigger_side,
+    &custom_element_change.trigger_side,
     "... at", "side",			"element side that causes change"
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
-    GADGET_ID_CHANGE_PLAYERS,		GADGET_ID_NONE,
+    GADGET_ID_CHANGE_PLAYER,		GADGET_ID_NONE,
     -1,
     options_change_trigger_player,
     &custom_element_change.trigger_player,
@@ -1573,7 +1594,7 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(7),
-    GADGET_ID_CHANGE_PAGES,		GADGET_ID_CHANGE_PLAYERS,
+    GADGET_ID_CHANGE_PAGE,		GADGET_ID_CHANGE_PLAYER,
     -1,
     options_change_trigger_page,
     &custom_element_change.trigger_page,
@@ -5479,7 +5500,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
     change_to->can_change = change_from->can_change;
 
-    change_to->sides = change_from->sides;
+    change_to->trigger_side = change_from->trigger_side;
   }
 #endif
 

@@ -211,7 +211,7 @@
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
 				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
 
-/* values for change sides for custom elements */
+/* values for change side for custom elements */
 #define CH_SIDE_NONE		MV_NO_MOVING
 #define CH_SIDE_LEFT		MV_LEFT
 #define CH_SIDE_RIGHT		MV_RIGHT
@@ -220,6 +220,19 @@
 #define CH_SIDE_LEFT_RIGHT	MV_HORIZONTAL
 #define CH_SIDE_TOP_BOTTOM	MV_VERTICAL
 #define CH_SIDE_ANY		MV_ANY_DIRECTION
+
+/* values for change player for custom elements */
+#define CH_PLAYER_NONE		0
+#define CH_PLAYER_1		(1 << 0)
+#define CH_PLAYER_2		(1 << 1)
+#define CH_PLAYER_3		(1 << 2)
+#define CH_PLAYER_4		(1 << 3)
+#define CH_PLAYER_ANY		(CH_PLAYER_1 | CH_PLAYER_2 | CH_PLAYER_3 | \
+				 CH_PLAYER_4)
+
+/* values for change page for custom elements */
+#define CH_PAGE_ANY_FILE	(0xff)
+#define CH_PAGE_ANY		(0xffffffff)
 
 /* values for change power for custom elements */
 #define CP_NON_DESTRUCTIVE	0
@@ -1279,7 +1292,10 @@ struct PlayerInfo
   boolean connected;		/* player connected (locally or via network) */
   boolean active;		/* player present and connected */
 
-  int index_nr, client_nr, element_nr;
+  int index_nr;			/* player number (0 to 3) */
+  int index_bit;		/* player number bit (1 << 0 to 1 << 3) */
+  int element_nr;		/* element (EL_PLAYER_1 to EL_PLAYER_4) */
+  int client_nr;		/* network client identifier */
 
   byte action;			/* action from local input device */
   byte effective_action;	/* action acknowledged from network server
@@ -1506,8 +1522,9 @@ struct ElementChangeInfo
   boolean can_change;		/* use or ignore this change info */
 
   unsigned long events;		/* change events */
-  int sides;			/* change sides */
+
   int trigger_player;		/* player triggering change */
+  int trigger_side;		/* side triggering change */
   int trigger_page;		/* page triggering change */
 
   short target_element;		/* target element after change */
