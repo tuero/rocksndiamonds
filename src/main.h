@@ -895,11 +895,12 @@
 #define GFX_SPECIAL_ARG_EDITOR			3
 #define GFX_SPECIAL_ARG_INFO			4
 #define GFX_SPECIAL_ARG_SETUP			5
-#define GFX_SPECIAL_ARG_DOOR			6
-#define GFX_SPECIAL_ARG_PREVIEW			7
-#define GFX_SPECIAL_ARG_CRUMBLED		8
+#define GFX_SPECIAL_ARG_PLAYING			6
+#define GFX_SPECIAL_ARG_DOOR			7
+#define GFX_SPECIAL_ARG_PREVIEW			8
+#define GFX_SPECIAL_ARG_CRUMBLED		9
 
-#define NUM_SPECIAL_GFX_ARGS			9
+#define NUM_SPECIAL_GFX_ARGS			10
 
 
 /* values for image configuration suffixes */
@@ -979,12 +980,12 @@
 #define GAME_MODE_EDITOR			3
 #define GAME_MODE_INFO				4
 #define GAME_MODE_SETUP				5
-#define GAME_MODE_PSEUDO_DOOR			6
-#define GAME_MODE_PSEUDO_PREVIEW		7
-#define GAME_MODE_PSEUDO_CRUMBLED		8
+#define GAME_MODE_PLAYING			6
+#define GAME_MODE_PSEUDO_DOOR			7
+#define GAME_MODE_PSEUDO_PREVIEW		8
+#define GAME_MODE_PSEUDO_CRUMBLED		9
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PLAYING			9
 #define GAME_MODE_PSEUDO_TYPENAME		10
 #define GAME_MODE_QUIT				11
 
