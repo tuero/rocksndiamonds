@@ -54,12 +54,6 @@ static int global_colormap_entries_used = 0;
 
 boolean wait_for_vsync;
 
-/*
-extern int playing_sounds;
-extern struct SoundControl playlist[NUM_MIXER_CHANNELS];
-extern struct SoundControl emptySoundControl;
-*/
-
 static BITMAP *Read_PCX_to_AllegroBitmap(char *);
 
 static void allegro_init_drivers()

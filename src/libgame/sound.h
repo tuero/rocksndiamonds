@@ -36,6 +36,10 @@
 #include "system.h"
 
 
+#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
+#define AUDIO_UNIX_NATIVE
+#endif
+
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
 #define AUDIO_LINUX_IOCTL
 #endif
@@ -255,6 +259,7 @@ typedef struct SampleInfo	MusicInfo;
 #define IS_STOPPING(x)		((x).state & SND_CTRL_STOP)
 #define IS_RELOADING(x)		((x).state & (SND_CTRL_RELOAD_SOUNDS | \
 					      SND_CTRL_RELOAD_MUSIC))
+#define IS_MUSIC_MODULE(x)	((x).format == AUDIO_FORMAT_UNKNOWN)
 #define ALL_SOUNDS(x)		((x).state & SND_CTRL_ALL_SOUNDS)
 
 struct SoundControl
@@ -265,17 +270,7 @@ struct SoundControl
   int volume;
   int stereo;
 
-#if 1
   int state;
-#else
-  boolean loop;
-  boolean music;
-  boolean fade_sound;
-  boolean stop_sound;
-  boolean stop_all_sounds;
-  boolean reload_sounds;
-  boolean reload_music;
-#endif
 
   int playingtime;
   long playingpos;
@@ -288,6 +283,8 @@ struct SoundControl
   int voice;
 #endif
 };
+
+typedef struct SoundControl	SoundControl;
 
 /* general sound functions */
 void UnixOpenAudio(void);
