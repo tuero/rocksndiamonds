@@ -177,7 +177,8 @@ char *sound_name[NUM_SOUNDS] =
   "boom",
   "booom",
   "exit",
-  "empty"
+  "empty",
+  "gate"
 };
 
 /* background music */

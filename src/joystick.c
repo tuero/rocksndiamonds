@@ -157,7 +157,7 @@ int Joystick(int player_nr)
   if (joystick_nr < 0)
     return 0;
 
-  /* the allegro global variable ïnum_joysticksï contains the number
+  /* the allegro global variable 'num_joysticks' contains the number
      of joysticks found at initialization under MSDOS / Windows */
 
 #if 0

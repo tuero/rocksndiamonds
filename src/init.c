@@ -388,7 +388,7 @@ void InitWindow(int argc, char *argv[])
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
   sprintf(icon_filename, "%s/%s/%s",
-	  options.base_directory, GRAPHICS_DIRECTORY,
+	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picture_filename);
   XReadBitmapFile(display,window,icon_filename,
 		  &icon_width,&icon_height,
@@ -397,7 +397,7 @@ void InitWindow(int argc, char *argv[])
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
 
   sprintf(icon_filename, "%s/%s/%s",
-	  options.base_directory, GRAPHICS_DIRECTORY,
+	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picturemask_filename);
   XReadBitmapFile(display,window,icon_filename,
 		  &icon_width,&icon_height,
@@ -696,7 +696,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     sprintf(basefilename, "%s%s", pic->picture_filename, picture_ext);
     DrawInitText(basefilename, 150, FC_YELLOW);
     sprintf(filename, "%s/%s/%s",
-	    options.base_directory, GRAPHICS_DIRECTORY, basefilename);
+	    options.ro_base_directory, GRAPHICS_DIRECTORY, basefilename);
 
 #ifdef MSDOS
     rest(100);
@@ -772,7 +772,7 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     sprintf(basefilename, "%s%s", pic->picture_filename, picturemask_ext);
     DrawInitText(basefilename, 150, FC_YELLOW);
     sprintf(filename, "%s/%s/%s",
-	    options.base_directory, GRAPHICS_DIRECTORY, basefilename);
+	    options.ro_base_directory, GRAPHICS_DIRECTORY, basefilename);
 
 #if DEBUG_TIMING
     debug_print_timestamp(1, NULL);	/* initialize timestamp function */

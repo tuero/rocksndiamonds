@@ -1313,6 +1313,11 @@ void DynaExplode(int ex, int ey)
 	break;
 
       element = Feld[x][y];
+
+      /* do not restart explosions of fields with active bombs */
+      if (element == EL_EXPLODING && IS_ACTIVE_BOMB(Store2[x][y]))
+	continue;
+
       Explode(x, y, EX_PHASE_START, EX_BORDER);
 
       if (element != EL_LEERRAUM &&
@@ -4579,6 +4584,8 @@ int DigField(struct PlayerInfo *player,
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
 
+      PlaySoundLevel(x, y, SND_GATE);
+
       break;
 
     case EL_EM_GATE_1X:
@@ -4593,6 +4600,8 @@ int DigField(struct PlayerInfo *player,
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
+
+      PlaySoundLevel(x, y, SND_GATE);
 
       break;
 
@@ -4634,6 +4643,8 @@ int DigField(struct PlayerInfo *player,
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
       DOUBLE_PLAYER_SPEED(player);
+
+      PlaySoundLevel(x, y, SND_GATE);
 
       break;
 

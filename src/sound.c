@@ -724,7 +724,8 @@ boolean LoadSound(struct SoundInfo *snd_info)
 #endif
 
   sprintf(filename, "%s/%s/%s.%s",
-	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);
+	  options.ro_base_directory, SOUNDS_DIRECTORY,
+	  snd_info->name, sound_ext);
 
 #ifndef MSDOS
 

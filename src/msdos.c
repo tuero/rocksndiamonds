@@ -294,7 +294,7 @@ Display *XOpenDisplay(char *display_name)
   BITMAP *mouse_bitmap = NULL;
   char *filename;
 
-  filename = getPath3(options.base_directory, GRAPHICS_DIRECTORY,
+  filename = getPath3(options.ro_base_directory, GRAPHICS_DIRECTORY,
 		      MOUSE_FILENAME);
 
   mouse_bitmap = Read_PCX_to_AllegroBitmap(filename);

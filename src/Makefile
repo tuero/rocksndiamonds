@@ -16,8 +16,11 @@ CC = gcc
 # specify X11 library path on your system
 XLIB_PATH = /usr/X11/lib
 
-# change this to the directory where you want to install game data like levels
-GAME_DIR = .
+# choose directory for read-only game data (like graphics, sounds, levels)
+# RO_GAME_DIR = /usr/games
+
+# choose directory for writable game data (like highscore files)
+# RW_GAME_DIR = /var/games
 
 # uncomment this if your system has no joystick include file
 # JOYSTICK = -DNO_JOYSTICK
@@ -62,8 +65,17 @@ endif
 
 CPP = $(CC) -E
 
-CONFIG_GAME_DIR = -DGAME_DIR="\"$(GAME_DIR)\""
+ifdef RO_GAME_DIR
+CONFIG_RO_GAME_DIR = -DRO_GAME_DIR="\"$(RO_GAME_DIR)\""
+endif
+
+ifdef RW_GAME_DIR
+CONFIG_RW_GAME_DIR = -DRW_GAME_DIR="\"$(RW_GAME_DIR)\""
+endif
+
 CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
+
+CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(CONFIG_SCORE_ENTRIES) $(XPM_INCLUDE_FILE)

@@ -116,11 +116,6 @@
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
 
-static char *getGlobalDataDir()
-{
-  return GAME_DIR;
-}
-
 char *getUserDataDir()
 {
   static char *userdata_dir = NULL;
@@ -178,7 +173,7 @@ static char *getTapeDir(char *level_subdir)
 static char *getScoreDir(char *level_subdir)
 {
   static char *score_dir = NULL;
-  char *data_dir = getGlobalDataDir();
+  char *data_dir = options.rw_base_directory;
   char *score_subdir = SCORES_DIRECTORY;
 
   if (score_dir)

@@ -236,7 +236,8 @@ struct OptionInfo
   char *display_name;
   char *server_host;
   int server_port;
-  char *base_directory;
+  char *ro_base_directory;
+  char *rw_base_directory;
   char *level_directory;
   boolean serveronly;
   boolean network;
@@ -1273,8 +1274,9 @@ extern char		*element_info[];
 #define SND_SP_BOOOM		58
 #define SND_SP_EXIT		59
 #define SND_EMPTY		60
+#define SND_GATE		61
 
-#define NUM_SOUNDS		61
+#define NUM_SOUNDS		62
 
 /* default input keys */
 #define KEY_UNDEFINDED		XK_VoidSymbol
@@ -1319,11 +1321,16 @@ extern char		*element_info[];
 #define SETUPINPUT		9
 #define CALIBRATION		10
 
-#ifndef GAME_DIR
-#define GAME_DIR		"."
+#ifndef RO_GAME_DIR
+#define RO_GAME_DIR		"."
 #endif
 
-#define BASE_PATH		GAME_DIR
+#ifndef RW_GAME_DIR
+#define RW_GAME_DIR		"."
+#endif
+
+#define RO_BASE_PATH		RO_GAME_DIR
+#define RW_BASE_PATH		RW_GAME_DIR
 
 #define GRAPHICS_DIRECTORY	"graphics"
 #define SOUNDS_DIRECTORY	"sounds"

@@ -379,8 +379,9 @@ void GetOptions(char *argv[])
   options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
-  options.base_directory = BASE_PATH;
-  options.level_directory = BASE_PATH "/" LEVELS_DIRECTORY;
+  options.ro_base_directory = RO_BASE_PATH;
+  options.rw_base_directory = RW_BASE_PATH;
+  options.level_directory = RO_BASE_PATH "/" LEVELS_DIRECTORY;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -446,13 +447,15 @@ void GetOptions(char *argv[])
       if (option_arg == NULL)
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
-      options.base_directory = option_arg;
+      /* this should be extended to separate options for ro and rw data */
+      options.ro_base_directory = option_arg;
+      options.rw_base_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
 
       /* adjust path for level directory accordingly */
       options.level_directory =
-	getPath2(options.base_directory, LEVELS_DIRECTORY);
+	getPath2(options.ro_base_directory, LEVELS_DIRECTORY);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
