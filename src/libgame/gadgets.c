@@ -110,8 +110,8 @@ static void default_callback_action(void *ptr)
 
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
-  int state = (pressed ? 1 : 0);
-  struct GadgetDesign *gd = (!gi->active ? &gi->alt_design[0] :
+  int state = (pressed ? GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
+  struct GadgetDesign *gd = (!gi->active ? &gi->alt_design[state] :
 			     gi->checked ? &gi->alt_design[state] :
 			     &gi->design[state]);
   boolean redraw_selectbox = FALSE;

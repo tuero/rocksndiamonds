@@ -22,6 +22,13 @@
 #include "game.h"
 #include "tape.h"
 
+
+/*
+  -----------------------------------------------------------------------------
+  screen and artwork graphic pixel position definitions
+  -----------------------------------------------------------------------------
+*/
+
 /* positions in the level editor */
 #define ED_WIN_MB_LEFT_XPOS		6
 #define ED_WIN_MB_LEFT_YPOS		258
@@ -29,25 +36,6 @@
 #define ED_WIN_MB_MIDDLE_YPOS		ED_WIN_MB_LEFT_YPOS
 #define ED_WIN_MB_RIGHT_XPOS		78
 #define ED_WIN_MB_RIGHT_YPOS		ED_WIN_MB_LEFT_YPOS
-
-/* other constants for the editor */
-#define ED_SCROLL_NO			0
-#define ED_SCROLL_LEFT			1
-#define ED_SCROLL_RIGHT			2
-#define ED_SCROLL_UP			4
-#define ED_SCROLL_DOWN			8
-
-/* screens in the level editor */
-#define ED_MODE_DRAWING			0
-#define ED_MODE_INFO			1
-#define ED_MODE_PROPERTIES		2
-
-/* how many steps can be cancelled */
-#define NUM_UNDO_STEPS			(10 + 1)
-
-/* values for elements with score */
-#define MIN_SCORE			0
-#define MAX_SCORE			255
 
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 	236
@@ -218,7 +206,18 @@
 #define ED_TEXTBUTTON_XSIZE		ED_WIN_COUNT_XSIZE
 #define ED_TEXTBUTTON_YSIZE		ED_WIN_COUNT_YSIZE
 
-/* editor gadget identifiers */
+/* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
+#define INFOTEXT_XPOS			SX
+#define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
+#define INFOTEXT_XSIZE			SXSIZE
+#define INFOTEXT_YSIZE			MINI_TILEX
+
+
+/*
+  -----------------------------------------------------------------------------
+  editor gadget definitions
+  -----------------------------------------------------------------------------
+*/
 
 /* drawing toolbox buttons */
 #define GADGET_ID_NONE			-1
@@ -308,9 +307,9 @@
 /* textbutton identifiers */
 #define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 1)
 
-#define GADGET_ID_EDIT_PROPERTIES	(GADGET_ID_TEXTBUTTON_FIRST + 0)
-#define GADGET_ID_SHOW_DESCRIPTION	(GADGET_ID_TEXTBUTTON_FIRST + 1)
-#define GADGET_ID_EDIT_CUSTOM_CHANGE	(GADGET_ID_TEXTBUTTON_FIRST + 2)
+#define GADGET_ID_PROPERTIES_MAIN	(GADGET_ID_TEXTBUTTON_FIRST + 0)
+#define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 1)
+#define GADGET_ID_PROPERTIES_ADVANCED	(GADGET_ID_TEXTBUTTON_FIRST + 2)
 
 /* gadgets for scrolling of drawing area */
 #define GADGET_ID_SCROLLING_FIRST	(GADGET_ID_TEXTBUTTON_FIRST + 3)
@@ -411,9 +410,9 @@
 #define ED_NUM_SELECTBOX			1
 
 /* values for textbutton gadgets */
-#define ED_TEXTBUTTON_ID_EDIT_PROPERTIES	0
-#define ED_TEXTBUTTON_ID_SHOW_DESCRIPTION	1
-#define ED_TEXTBUTTON_ID_EDIT_CUSTOM_CHANGE	2
+#define ED_TEXTBUTTON_ID_PROPERTIES_MAIN	0
+#define ED_TEXTBUTTON_ID_PROPERTIES_INFO	1
+#define ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED	2
 
 #define ED_NUM_TEXTBUTTON			3
 
@@ -446,15 +445,55 @@
 #define ED_RADIOBUTTON_ID_LEVEL_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
 #define ED_RADIOBUTTON_ID_LEVEL_LAST	ED_RADIOBUTTON_ID_QUANTITY
 
+
+/*
+  -----------------------------------------------------------------------------
+  some internally used definitions
+  -----------------------------------------------------------------------------
+*/
+
 /* values for CopyLevelToUndoBuffer() */
 #define UNDO_IMMEDIATE			0
 #define UNDO_ACCUMULATE			1
 
-/* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
-#define INFOTEXT_XPOS			SX
-#define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
-#define INFOTEXT_XSIZE			SXSIZE
-#define INFOTEXT_YSIZE			MINI_TILEX
+/* values for scrollbars */
+#define ED_SCROLL_NO			0
+#define ED_SCROLL_LEFT			1
+#define ED_SCROLL_RIGHT			2
+#define ED_SCROLL_UP			4
+#define ED_SCROLL_DOWN			8
+
+/* screens in the level editor */
+#define ED_MODE_DRAWING			0
+#define ED_MODE_INFO			1
+#define ED_MODE_PROPERTIES		2
+
+/* sub-screens in the element properties section */
+#define ED_MODE_PROPERTIES_MAIN		ED_TEXTBUTTON_ID_PROPERTIES_MAIN
+#define ED_MODE_PROPERTIES_INFO		ED_TEXTBUTTON_ID_PROPERTIES_INFO
+#define ED_MODE_PROPERTIES_ADVANCED	ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED
+
+/* how many steps can be cancelled */
+#define NUM_UNDO_STEPS			(10 + 1)
+
+/* values for elements with score */
+#define MIN_SCORE			0
+#define MAX_SCORE			255
+
+/* values for random placement */
+#define RANDOM_USE_PERCENTAGE		0
+#define RANDOM_USE_QUANTITY		1
+
+/* maximal size of level editor drawing area */
+#define MAX_ED_FIELDX		(2 * SCR_FIELDX)
+#define MAX_ED_FIELDY		(2 * SCR_FIELDY - 1)
+
+
+/*
+  -----------------------------------------------------------------------------
+  some internally used data structure definitions
+  -----------------------------------------------------------------------------
+*/
 
 static struct
 {
@@ -485,10 +524,6 @@ static struct
   { 'T',	"test level"			},
   { 'E',	"exit level editor"		}
 };
-
-/* values for random placement */
-#define RANDOM_USE_PERCENTAGE		0
-#define RANDOM_USE_QUANTITY		1
 
 static int random_placement_value = 10;
 static int random_placement_method = RANDOM_USE_QUANTITY;
@@ -655,19 +690,19 @@ static struct
 {
   {
     ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(1),
-    GADGET_ID_EDIT_PROPERTIES,
+    GADGET_ID_PROPERTIES_MAIN,
     11, "Properties",
     "Edit element properties"
   },
   {
     ED_SETTINGS_XPOS + 166,		ED_COUNTER_YPOS(1),
-    GADGET_ID_SHOW_DESCRIPTION,
+    GADGET_ID_PROPERTIES_INFO,
     11, "Description",
     "Show element description"
   },
   {
     ED_SETTINGS_XPOS + 332,		ED_COUNTER_YPOS(1),
-    GADGET_ID_EDIT_CUSTOM_CHANGE,
+    GADGET_ID_PROPERTIES_ADVANCED,
     11, "Advanced",
     "Advanced element features"
   },
@@ -851,9 +886,12 @@ static struct
   }
 };
 
-/* maximal size of level editor drawing area */
-#define MAX_ED_FIELDX		(2 * SCR_FIELDX)
-#define MAX_ED_FIELDY		(2 * SCR_FIELDY - 1)
+
+/*
+  -----------------------------------------------------------------------------
+  some internally used variables
+  -----------------------------------------------------------------------------
+*/
 
 /* actual size of level editor drawing area */
 static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
@@ -904,6 +942,7 @@ static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
 
 static int edit_mode;
+static int edit_mode_properties;
 
 static int element_shift = 0;
 
@@ -1677,6 +1716,13 @@ editor_elements_info[] =
   { NULL,				NULL,
     NULL								}
 };
+
+
+/*
+  -----------------------------------------------------------------------------
+  functions
+  -----------------------------------------------------------------------------
+*/
 
 static void ReinitializeElementList()
 {
@@ -2840,8 +2886,10 @@ void DrawLevelEd()
   else
   {
     edit_mode = ED_MODE_DRAWING;
+    edit_mode_properties = ED_MODE_PROPERTIES_MAIN;
 
     ResetUndoBuffer();
+
     level_xpos = -1;
     level_ypos = -1;
   }
@@ -3189,6 +3237,47 @@ static void DrawLevelInfoWindow()
   DrawRandomPlacementBackgroundArea();
 }
 
+static void DrawPropertiesTabulatorGadgets()
+{
+  struct GadgetInfo *gd_gi = level_editor_gadget[GADGET_ID_PROPERTIES_MAIN];
+  struct GadgetDesign *gd = &gd_gi->alt_design[GD_BUTTON_UNPRESSED];
+  int gd_x = gd->x + gd_gi->border.width / 2;
+  int gd_y = gd->y + gd_gi->height - 1;
+  Pixel line_color = GetPixel(gd->bitmap, gd_x, gd_y);
+  int id_first = ED_TEXTBUTTON_ID_PROPERTIES_MAIN;
+  int id_last = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+  int i;
+
+  /* draw additional "advanced" tabulator for custom elements */
+  if (IS_CUSTOM_ELEMENT(properties_element))
+    id_last = ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED;
+
+  for (i=id_first; i <= id_last; i++)
+  {
+    int gadget_id = textbutton_info[i].gadget_id;
+    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+    boolean active = (i != edit_mode_properties);
+    Pixel color = (active ? BLACK_PIXEL : line_color);
+
+    /* draw solid or black line below tabulator button */
+    FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, color);
+
+    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
+    MapTextbuttonGadget(i);
+  }
+
+  /* draw little border line below tabulator buttons */
+  FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
+		3 * gd_gi->width + 2 * ED_GADGET_DISTANCE, ED_GADGET_DISTANCE,
+		line_color);
+
+#if 0
+		SX + ED_SETTINGS_XPOS,
+		SY + ED_COUNTER_YPOS(1) + ED_TEXTBUTTON_YSIZE + 1,
+		SXSIZE - 2 * ED_SETTINGS_XPOS, 2, line_color);
+#endif
+}
+
 static void DrawAmoebaContentArea()
 {
   int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
@@ -3296,7 +3385,7 @@ static void DrawElementContentAreas()
 #define TEXT_SPEED		"Speed of amoeba growth"
 #define TEXT_DURATION		"Duration when activated"
 
-static void DrawPropertiesWindow()
+static void DrawPropertiesMain()
 {
   int counter_id = ED_COUNTER_ID_ELEM_SCORE;
   int num_elements_in_level;
@@ -3305,8 +3394,6 @@ static void DrawPropertiesWindow()
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
-  int xstart = 2;
-  int ystart = 4;
   int i, x, y;
   static struct
   {
@@ -3362,26 +3449,6 @@ static void DrawPropertiesWindow()
     { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION },
     { -1, NULL, NULL }
   };
-
-  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
-  ClearWindow();
-  UnmapLevelEditorWindowGadgets();
-
-  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
-	   "Element Settings", FONT_TITLE_1);
-
-  DrawElementBorder(SX + xstart * MINI_TILEX,
-		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-		    TILEX, TILEY);
-  DrawGraphicAnimationExt(drawto,
-			  SX + xstart * MINI_TILEX,
-			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-			  el2edimg(properties_element), -1, NO_MASKING);
-
-  FrameCounter = 0;	/* restart animation frame counter */
-
-  DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    FONT_TEXT_1, getElementInfoText(properties_element));
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3527,36 +3594,58 @@ static void DrawPropertiesWindow()
 		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
     MapSelectboxGadget(i);
   }
+}
 
-  /* draw textbutton gadget */
-  i = ED_TEXTBUTTON_ID_EDIT_PROPERTIES;
-  x = textbutton_info[i].x + xoffset_right2;
-  y = textbutton_info[i].y + yoffset_right2;
+static void DrawPropertiesInfo()
+{
+  DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY, "No description available.",
+	   FONT_TEXT_1);
+}
 
-  ModifyGadget(level_editor_gadget[textbutton_info[i].gadget_id],
-	       GDI_ACTIVE, FALSE, GDI_END);
-  MapTextbuttonGadget(i);
+static void DrawPropertiesAdvanced()
+{
+  DrawText(SX + ED_SETTINGS_XPOS, SY + 5 * TILEY, "Coming soon!", FONT_TEXT_1);
+}
 
-  /* draw textbutton gadget */
-  i = ED_TEXTBUTTON_ID_SHOW_DESCRIPTION;
-  x = textbutton_info[i].x + xoffset_right2;
-  y = textbutton_info[i].y + yoffset_right2;
+static void DrawPropertiesWindow()
+{
+  int xstart = 2;
+  int ystart = 4;
 
-  ModifyGadget(level_editor_gadget[textbutton_info[i].gadget_id],
-	       GDI_ACTIVE, TRUE, GDI_END);
-  MapTextbuttonGadget(i);
+  /* make sure that previous properties edit mode exists for this element */
+  if (edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED &&
+      !IS_CUSTOM_ELEMENT(properties_element))
+    edit_mode_properties = ED_MODE_PROPERTIES_MAIN;
 
-  if (IS_CUSTOM_ELEMENT(properties_element))
-  {
-    /* draw textbutton gadget */
-    i = ED_TEXTBUTTON_ID_EDIT_CUSTOM_CHANGE;
-    x = textbutton_info[i].x + xoffset_right2;
-    y = textbutton_info[i].y + yoffset_right2;
+  UnmapLevelEditorWindowGadgets();
 
-    ModifyGadget(level_editor_gadget[textbutton_info[i].gadget_id],
-		 GDI_ACTIVE, TRUE, GDI_END);
-    MapTextbuttonGadget(i);
-  }
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
+  ClearWindow();
+
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
+	   "Element Settings", FONT_TITLE_1);
+
+  DrawElementBorder(SX + xstart * MINI_TILEX,
+		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
+		    TILEX, TILEY);
+  DrawGraphicAnimationExt(drawto,
+			  SX + xstart * MINI_TILEX,
+			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
+			  el2edimg(properties_element), -1, NO_MASKING);
+
+  FrameCounter = 0;	/* restart animation frame counter */
+
+  DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
+	    FONT_TEXT_1, getElementInfoText(properties_element));
+
+  DrawPropertiesTabulatorGadgets();
+
+  if (edit_mode_properties == ED_MODE_PROPERTIES_MAIN)
+    DrawPropertiesMain();
+  else if (edit_mode_properties == ED_MODE_PROPERTIES_INFO)
+    DrawPropertiesInfo();
+  else	/* edit_mode_properties == ED_MODE_PROPERTIES_ADVANCED */
+    DrawPropertiesAdvanced();
 }
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
@@ -4482,20 +4571,13 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 {
-  int i;
-
-  for (i=0; i<ED_NUM_TEXTBUTTON; i++)
+  if (gi->custom_type_id >= ED_TEXTBUTTON_ID_PROPERTIES_MAIN &&
+      gi->custom_type_id <= ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED)
   {
-    struct GadgetInfo *gii = level_editor_gadget[textbutton_info[i].gadget_id];
-    boolean active = (gii->custom_type_id != gi->custom_type_id);
+    edit_mode_properties = gi->custom_type_id;
 
-    ModifyGadget(level_editor_gadget[textbutton_info[i].gadget_id],
-		 GDI_ACTIVE, active, GDI_END);
+    DrawPropertiesWindow();
   }
-
-#if 0
-  printf("text button %d pressed\n", gi->custom_type_id);
-#endif
 }
 
 static void HandleRadiobuttons(struct GadgetInfo *gi)
