@@ -32,13 +32,10 @@ extern unsigned char get_ascii(KeySym);
 
 void DrawHeadline()
 {
-  int x1 = SX + (SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
-  int y1 = SY + 8;
-  int x2 = SX + (SXSIZE - strlen(COPYRIGHT_STRING) * FONT2_XSIZE) / 2;
-  int y2 = SY + 46;
+  int x = SX + (SXSIZE - strlen(GAMETITLE_STRING) * FONT1_XSIZE) / 2;
 
-  DrawText(x1, y1, GAMETITLE_STRING, FS_BIG, FC_YELLOW);
-  DrawText(x2, y2, COPYRIGHT_STRING, FS_SMALL, FC_RED);
+  DrawText(x, SY + 8, GAMETITLE_STRING, FS_BIG, FC_YELLOW);
+  DrawTextFCentered(46, FC_RED, COPYRIGHT_STRING);
 }
 
 void DrawMainMenu()
@@ -70,6 +67,8 @@ void DrawMainMenu()
     DrawGraphic(0, i, GFX_KUGEL_BLAU);
   DrawGraphic(10, 3, GFX_PFEIL_L);
   DrawGraphic(14, 3, GFX_PFEIL_R);
+
+  DrawTextF(15*32 + 6, 3*32 + 9, FC_RED, "%d", leveldir[leveldir_nr].levels);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -185,8 +184,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	DrawGraphic(0, y-1, GFX_KUGEL_ROT);
 	DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
+	choice = y;
       }
-      choice = y;
     }
     else
     {
@@ -513,7 +512,7 @@ void DrawHelpScreenElText(int start)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextCentered(100, FC_GREEN, "The game elements:");
+  DrawTextFCentered(100, FC_GREEN, "The game elements:");
 
   for(i=start; i < start + MAX_HELPSCREEN_ELS && i < num_helpscreen_els; i++)
   {
@@ -524,7 +523,7 @@ void DrawHelpScreenElText(int start)
 	     helpscreen_eltext[i][1], FS_SMALL, FC_YELLOW);
   }
 
-  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
+  DrawTextFCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 }
 
 void DrawHelpScreenMusicText(int num)
@@ -536,22 +535,22 @@ void DrawHelpScreenMusicText(int num)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextCentered(100, FC_GREEN, "The game background music loops:");
+  DrawTextFCentered(100, FC_GREEN, "The game background music loops:");
 
-  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
-		   "Excerpt from");
-  DrawTextCentered(ystart + 1 * ystep, FC_RED, "\"%s\"",
-		   helpscreen_music[num][0]);
-  DrawTextCentered(ystart + 2 * ystep, FC_YELLOW,
-		   "by");
-  DrawTextCentered(ystart + 3 * ystep, FC_RED,
-		   "%s", helpscreen_music[num][1]);
-  DrawTextCentered(ystart + 4 * ystep, FC_YELLOW,
-		   "from the album");
-  DrawTextCentered(ystart + 5 * ystep, FC_RED, "\"%s\"",
-		   helpscreen_music[num][2]);
+  DrawTextFCentered(ystart + 0 * ystep, FC_YELLOW,
+		    "Excerpt from");
+  DrawTextFCentered(ystart + 1 * ystep, FC_RED, "\"%s\"",
+		    helpscreen_music[num][0]);
+  DrawTextFCentered(ystart + 2 * ystep, FC_YELLOW,
+		    "by");
+  DrawTextFCentered(ystart + 3 * ystep, FC_RED,
+		    "%s", helpscreen_music[num][1]);
+  DrawTextFCentered(ystart + 4 * ystep, FC_YELLOW,
+		    "from the album");
+  DrawTextFCentered(ystart + 5 * ystep, FC_RED, "\"%s\"",
+		    helpscreen_music[num][2]);
 
-  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
+  DrawTextFCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 
   PlaySoundLoop(background_loop[num]);
 }
@@ -565,22 +564,22 @@ void DrawHelpScreenCreditsText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextCentered(100, FC_GREEN,
-		   "Credits:");
-  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
-		   "DOS/Windows port of the game:");
-  DrawTextCentered(ystart + 1 * ystep, FC_RED,
-		   "Guido Schulz");
-  DrawTextCentered(ystart + 2 * ystep, FC_YELLOW,
-		   "Additional toons:");
-  DrawTextCentered(ystart + 3 * ystep, FC_RED,
-		   "Karl Hörnell");
-  DrawTextCentered(ystart + 5 * ystep, FC_YELLOW,
-		   "...and many thanks to all contributors");
-  DrawTextCentered(ystart + 6 * ystep, FC_YELLOW,
-		   "of new levels!");
+  DrawTextFCentered(100, FC_GREEN,
+		    "Credits:");
+  DrawTextFCentered(ystart + 0 * ystep, FC_YELLOW,
+		    "DOS/Windows port of the game:");
+  DrawTextFCentered(ystart + 1 * ystep, FC_RED,
+		    "Guido Schulz");
+  DrawTextFCentered(ystart + 2 * ystep, FC_YELLOW,
+		    "Additional toons:");
+  DrawTextFCentered(ystart + 3 * ystep, FC_RED,
+		    "Karl Hörnell");
+  DrawTextFCentered(ystart + 5 * ystep, FC_YELLOW,
+		    "...and many thanks to all contributors");
+  DrawTextFCentered(ystart + 6 * ystep, FC_YELLOW,
+		    "of new levels!");
 
-  DrawTextCentered(ybottom, FC_BLUE, "Press any key or button for next page");
+  DrawTextFCentered(ybottom, FC_BLUE, "Press any key or button for next page");
 }
 
 void DrawHelpScreenContactText()
@@ -591,34 +590,33 @@ void DrawHelpScreenContactText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextCentered(100, FC_GREEN, "Program information:");
+  DrawTextFCentered(100, FC_GREEN, "Program information:");
 
-  DrawTextCentered(ystart + 0 * ystep, FC_YELLOW,
-		   "This game is Freeware!");
-  DrawTextCentered(ystart + 1 * ystep, FC_YELLOW,
-		   "If you like it, send e-mail to:");
-  DrawTextCentered(ystart + 2 * ystep, FC_RED,
-		   "aeglos@valinor.owl.de");
-  DrawTextCentered(ystart + 3 * ystep, FC_YELLOW,
-		   "or SnailMail to:");
-  DrawTextCentered(ystart + 4 * ystep + 0, FC_RED,
-		   "Holger Schemel");
-  DrawTextCentered(ystart + 4 * ystep + 20, FC_RED,
-		   "Oststrasse 11a");
-  DrawTextCentered(ystart + 4 * ystep + 40, FC_RED,
-		   "33604 Bielefeld");
-  DrawTextCentered(ystart + 4 * ystep + 60, FC_RED,
-		   "Germany");
+  DrawTextFCentered(ystart + 0 * ystep, FC_YELLOW,
+		    "This game is Freeware!");
+  DrawTextFCentered(ystart + 1 * ystep, FC_YELLOW,
+		    "If you like it, send e-mail to:");
+  DrawTextFCentered(ystart + 2 * ystep, FC_RED,
+		    "aeglos@valinor.owl.de");
+  DrawTextFCentered(ystart + 3 * ystep, FC_YELLOW,
+		    "or SnailMail to:");
+  DrawTextFCentered(ystart + 4 * ystep + 0, FC_RED,
+		    "Holger Schemel");
+  DrawTextFCentered(ystart + 4 * ystep + 20, FC_RED,
+		    "Oststrasse 11a");
+  DrawTextFCentered(ystart + 4 * ystep + 40, FC_RED,
+		    "33604 Bielefeld");
+  DrawTextFCentered(ystart + 4 * ystep + 60, FC_RED,
+		    "Germany");
 
-  DrawTextCentered(ystart + 7 * ystep, FC_YELLOW,
-		   "If you have created new levels,");
-  DrawTextCentered(ystart + 8 * ystep, FC_YELLOW,
-		   "send them to me to include them!");
-  DrawTextCentered(ystart + 9 * ystep, FC_YELLOW,
-		   ":-)");
+  DrawTextFCentered(ystart + 7 * ystep, FC_YELLOW,
+		    "If you have created new levels,");
+  DrawTextFCentered(ystart + 8 * ystep, FC_YELLOW,
+		    "send them to me to include them!");
+  DrawTextFCentered(ystart + 9 * ystep, FC_YELLOW,
+		    ":-)");
 
-  DrawTextCentered(ybottom, FC_BLUE,
-		   "Press any key or button for main menu");
+  DrawTextFCentered(ybottom, FC_BLUE, "Press any key or button for main menu");
 }
 
 void DrawHelpScreen()
@@ -713,10 +711,7 @@ void HandleTypeName(int newxpos, KeySym key)
       ascii = 'A'+(char)(key-XK_A);
     if (key>=XK_a && key<=XK_z)
       ascii = 'a'+(char)(key-XK_a);
-#else
-  if((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
-  {
-#endif
+
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos+1] = 0;
     xpos++;
@@ -726,6 +721,19 @@ void HandleTypeName(int newxpos, KeySym key)
 		setup.player_name,FS_BIG,FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
   }
+#else
+  if ((ascii = get_ascii(key)) && xpos<MAX_NAMELEN-1)
+  {
+    setup.player_name[xpos] = ascii;
+    setup.player_name[xpos+1] = 0;
+    xpos++;
+    DrawTextExt(drawto,gc,SX+6*32,SY+ypos*32,
+		setup.player_name,FS_BIG,FC_YELLOW);
+    DrawTextExt(window,gc,SX+6*32,SY+ypos*32,
+		setup.player_name,FS_BIG,FC_YELLOW);
+    DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
+  }
+#endif
   else if ((key==XK_Delete || key==XK_BackSpace) && xpos>0)
   {
     xpos--;
@@ -747,39 +755,76 @@ void HandleTypeName(int newxpos, KeySym key)
 
 void DrawChooseLevel()
 {
-  int i;
-
   CloseDoor(DOOR_CLOSE_2);
-
-  ClearWindow();
-  DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
-  for(i=0; i<num_leveldirs; i++)
-  {
-    DrawText(SX + 32, SY + (i + 2) * 32, leveldir[i].name, FS_BIG,
-	     (leveldir[i].readonly ? FC_RED : FC_YELLOW));
-    DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
-  }
 
   FadeToFront();
   InitAnimation();
   HandleChooseLevel(0,0, 0,0, MB_MENU_INITIALIZE);
 }
 
+static void drawChooseLevelList(int first_entry, int num_page_entries)
+{
+  int i;
+  char buffer[SCR_FIELDX];
+
+  ClearWindow();
+  DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
+
+  for(i=0; i<num_page_entries; i++)
+  {
+    strncpy(buffer, leveldir[first_entry + i].name , SCR_FIELDX - 1);
+    buffer[SCR_FIELDX - 1] = '\0';
+    DrawText(SX + 32, SY + (i + 2) * 32, buffer, FS_BIG, FC_YELLOW);
+    DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
+  }
+
+  if (first_entry > 0)
+    DrawGraphic(0, 1, GFX_PFEIL_O);
+
+  if (first_entry + num_page_entries < num_leveldirs)
+    DrawGraphic(0, MAX_VISIBLE_ENTRIES + 1, GFX_PFEIL_U);
+}
+
+static void drawChooseLevelInfo(int leveldir_nr)
+{
+  XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 32, 32);
+  DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
+		    leveldir[leveldir_nr].levels,
+		    leveldir[leveldir_nr].readonly ? "readonly" : "writable");
+}
+
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 3;
+  static int first_entry = 0;
+  static long choose_delay = 0;
   static int redraw = TRUE;
-  int x = (mx+32-SX)/32, y = (my+32-SY)/32;
+  int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
+  int num_page_entries;
+
+  if (num_leveldirs <= MAX_VISIBLE_ENTRIES)
+    num_page_entries = num_leveldirs;
+  else
+    num_page_entries = MAX_VISIBLE_ENTRIES - 1;
 
   if (button == MB_MENU_INITIALIZE)
   {
     redraw = TRUE;
-    choice = leveldir_nr + 3;
+    choice = leveldir_nr + 3 - first_entry;
+
+    if (choice > num_page_entries + 2)
+    {
+      choice = num_page_entries + 2;
+      first_entry = num_leveldirs - num_page_entries;
+    }
+
+    drawChooseLevelList(first_entry, num_page_entries);
+    drawChooseLevelInfo(leveldir_nr);
   }
 
   if (redraw)
   {
-    DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
+    DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
     redraw = FALSE;
   }
 
@@ -791,15 +836,35 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (dy)
     {
       x = 1;
-      y = choice+dy;
+      y = choice + dy;
     }
     else
       x = y = 0;
+  }
 
-    if (y<3)
-      y = 3;
-    else if (y>num_leveldirs+2)
-      y = num_leveldirs+2;
+  if (x == 1 && y == 2)
+  {
+    if (first_entry > 0 &&
+	(dy || DelayReached(&choose_delay, 150)))
+    {
+      first_entry--;
+      drawChooseLevelList(first_entry, num_page_entries);
+      drawChooseLevelInfo(first_entry);
+      DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
+      return;
+    }
+  }
+  else if (x == 1 && y > num_page_entries + 2)
+  {
+    if (first_entry + num_page_entries < num_leveldirs &&
+	(dy || DelayReached(&choose_delay, 150)))
+    {
+      first_entry++;
+      drawChooseLevelList(first_entry, num_page_entries);
+      drawChooseLevelInfo(first_entry + num_page_entries - 1);
+      DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
+      return;
+    }
   }
 
   if (!mx && !my && !dx && !dy)
@@ -808,20 +873,21 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (x==1 && y>=3 && y<=num_leveldirs+2)
+  if (x == 1 && y >= 3 && y <= num_page_entries + 2)
   {
     if (button)
     {
-      if (y!=choice)
+      if (y != choice)
       {
-        DrawGraphic(0,y-1,GFX_KUGEL_ROT);
-        DrawGraphic(0,choice-1,GFX_KUGEL_BLAU);
+        DrawGraphic(0, y - 1, GFX_KUGEL_ROT);
+        DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
+	drawChooseLevelInfo(first_entry + y - 3);
+	choice = y;
       }
-      choice = y;
     }
     else
     {
-      leveldir_nr = y-3;
+      leveldir_nr = first_entry + y - 3;
       level_nr =
 	getLastPlayedLevelOfLevelSeries(leveldir[leveldir_nr].filename);
 
@@ -838,32 +904,33 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   BackToFront();
 
-  if (game_status==CHOOSELEVEL)
+  if (game_status == CHOOSELEVEL)
     DoAnimation();
 }
 
-void DrawHallOfFame(int pos)
+void DrawHallOfFame(int highlight_position)
 {
-  int y;
-  char txt[40];
+  int i;
 
   CloseDoor(DOOR_CLOSE_2);
 
-  if (pos<0) 
+  if (highlight_position < 0) 
     LoadScore(level_nr);
+
   ClearWindow();
-  DrawText(SX+64,SY+10,"Hall Of Fame",FS_BIG,FC_YELLOW);
-  sprintf(txt,"HighScores of Level %d",level_nr);
-  DrawText(SX+256-strlen(txt)*7,SY+48,txt,FS_SMALL,FC_RED);
-  for(y=0; y<15; y++)
+
+  DrawText(SX + 80, SY + 8, "Hall Of Fame", FS_BIG, FC_YELLOW);
+  DrawTextFCentered(46, FC_RED, "HighScores of Level %d", level_nr);
+
+  for(i=0; i<MAX_VISIBLE_ENTRIES; i++)
   {
-    DrawText(SX,SY+64+y*32,".................",FS_BIG,
-	     (y==pos ? FC_RED : FC_GREEN));
-    DrawText(SX,SY+64+y*32,highscore[y].Name,FS_BIG,
-	     (y==pos ? FC_RED : FC_GREEN));
-    DrawText(SX+12*32,SY+64+y*32,
-	     int2str(highscore[y].Score,5),FS_BIG,
-	     (y==pos ? FC_RED : FC_GREEN));
+    DrawText(SX, SY + 64 + i * 32, ".................", FS_BIG,
+	     (i == highlight_position ? FC_RED : FC_GREEN));
+    DrawText(SX, SY + 64 + i * 32, highscore[i].Name, FS_BIG,
+	     (i == highlight_position ? FC_RED : FC_GREEN));
+    DrawText(SX + 12 * 32, SY + 64 + i * 32,
+	     int2str(highscore[i].Score, 5), FS_BIG,
+	     (i == highlight_position ? FC_RED : FC_GREEN));
   }
 
   FadeToFront();

@@ -282,7 +282,7 @@ void ClearWindow()
   redraw_mask |= REDRAW_FIELD;
 }
 
-void DrawTextCentered(int y, int font_type, char *format, ...)
+void DrawTextFCentered(int y, int font_type, char *format, ...)
 {
   char buffer[FULL_SXSIZE / FONT3_XSIZE + 10];
   int font_xsize;
@@ -297,6 +297,18 @@ void DrawTextCentered(int y, int font_type, char *format, ...)
 
   DrawText(SX + (SXSIZE - strlen(buffer) * font_xsize) / 2, SY + y,
 	   buffer, FS_SMALL, font_type);
+}
+
+void DrawTextF(int x, int y, int font_type, char *format, ...)
+{
+  char buffer[FULL_SXSIZE / FONT3_XSIZE + 10];
+  va_list ap;
+
+  va_start(ap, format);
+  vsprintf(buffer, format, ap);
+  va_end(ap);
+
+  DrawText(SX + x, SY + y, buffer, FS_SMALL, font_type);
 }
 
 void DrawText(int x, int y, char *text, int font_size, int font_type)
