@@ -436,9 +436,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "invisible steel wall"
   },
   {
-    "maze_runner",
-    "maze_runner",
-    "maze runner"
+    "unused_63",
+    "unused",
+    "(not used)"
   },
   {
     "dynabomb_increase_number",

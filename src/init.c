@@ -1843,7 +1843,6 @@ void InitElementPropertiesStatic()
     EL_SP_ELECTRON,
     EL_BALLOON,
     EL_SPRING,
-    EL_MAZE_RUNNER,
     -1
   };
 

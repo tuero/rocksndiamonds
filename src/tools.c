@@ -1192,6 +1192,10 @@ void DrawLevelFieldThruMask(int x, int y)
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
+#define TILE_GFX_ELEMENT(x, y)						    \
+	(GfxElement[x][y] != EL_UNDEFINED && Feld[x][y] != EL_EXPLOSION ?   \
+	 GfxElement[x][y] : Feld[x][y])
+
 static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 {
   Bitmap *src_bitmap;
@@ -1221,8 +1225,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   if (!IN_LEV_FIELD(x, y))
     return;
 
-  element = (GfxElement[x][y] != EL_UNDEFINED && Feld[x][y] != EL_EXPLOSION ?
-	     GfxElement[x][y] : Feld[x][y]);
+  element = TILE_GFX_ELEMENT(x, y);
 
   /* crumble field itself */
   if (GFX_CRUMBLED(element) && !IS_MOVING(x, y))
@@ -1237,7 +1240,12 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       int xx = x + xy[i][0];
       int yy = y + xy[i][1];
 
+#if 1
+      element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
+		 BorderElement);
+#else
       element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : BorderElement);
+#endif
 
       /* check if neighbour field is of same type */
       if (GFX_CRUMBLED(element) && !IS_MOVING(xx, yy))
@@ -1284,11 +1292,23 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       int sxx = sx + xy[i][0];
       int syy = sy + xy[i][1];
 
+#if 1
+      if (!IN_LEV_FIELD(xx, yy) ||
+	  !IN_SCR_FIELD(sxx, syy) ||
+	  IS_MOVING(xx, yy))
+	continue;
+
+      element = TILE_GFX_ELEMENT(xx, yy);
+
+      if (!GFX_CRUMBLED(element))
+	continue;
+#else
       if (!IN_LEV_FIELD(xx, yy) ||
 	  !IN_SCR_FIELD(sxx, syy) ||
 	  !GFX_CRUMBLED(Feld[xx][yy]) ||
 	  IS_MOVING(xx, yy))
 	continue;
+#endif
 
 #if 1
       graphic = el_act2crm(Feld[xx][yy], ACTION_DEFAULT);

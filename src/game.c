@@ -144,6 +144,7 @@
 					Feld[x][y] == EL_EXIT_OPEN ||	\
 					Feld[x][y] == EL_ACID))
 
+#if 0
 #if 1
 #define MAZE_RUNNER_CAN_ENTER_FIELD(x, y)				\
 		(IN_LEV_FIELD(x, y) && IS_FREE(x, y))
@@ -152,6 +153,21 @@
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
 					IS_FOOD_DARK_YAMYAM(Feld[x][y])))
 #endif
+#endif
+
+#define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
+#define IS_IN_GROUP(e, g)	(element_info[e].in_group[g] == TRUE)
+#define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
+
+#define CE_ENTER_FIELD_COND(e, x, y)					\
+		(!IS_PLAYER(x, y) &&					\
+		 (Feld[x][y] == EL_ACID ||				\
+		  Feld[x][y] == MOVE_ENTER_EL(e) ||			\
+		  (IS_GROUP_ELEMENT(MOVE_ENTER_EL(e)) &&		\
+		   IS_IN_GROUP_EL(Feld[x][y], MOVE_ENTER_EL(e)))))
+
+#define CUSTOM_ELEMENT_CAN_ENTER_FIELD(e, x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, CE_ENTER_FIELD_COND(e, x, y))
 
 #define MOLE_CAN_ENTER_FIELD(x, y, condition)				\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) || (condition)))
@@ -3793,8 +3809,10 @@ inline static void TurnRoundExt(int x, int y)
 	   move_pattern == MV_TURNING_RANDOM ||
 	   move_pattern == MV_ALL_DIRECTIONS)
   {
-    boolean can_turn_left  = ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
-    boolean can_turn_right = ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
+    boolean can_turn_left =
+      CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y);
+    boolean can_turn_right =
+      CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
     if (move_pattern == MV_TURNING_LEFT)
       MovDir[x][y] = left_dir;
@@ -3838,9 +3856,9 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (move_pattern == MV_ALONG_LEFT_SIDE)
   {
-    if (ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y))
+    if (CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y))
       MovDir[x][y] = left_dir;
-    else if (!ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
+    else if (!CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = right_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3848,9 +3866,9 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (move_pattern == MV_ALONG_RIGHT_SIDE)
   {
-    if (ELEMENT_CAN_ENTER_FIELD(element, right_x, right_y))
+    if (CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, right_x, right_y))
       MovDir[x][y] = right_dir;
-    else if (!ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
+    else if (!CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
       MovDir[x][y] = left_dir;
 
     if (MovDir[x][y] != old_move_dir)
@@ -3910,14 +3928,14 @@ inline static void TurnRoundExt(int x, int y)
 	new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
       Moving2Blocked(x, y, &newx, &newy);
 
-      if (ELEMENT_CAN_ENTER_FIELD_OR_ACID(element, newx, newy))
+      if (CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
 	return;
 
       MovDir[x][y] =
 	new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
       Moving2Blocked(x, y, &newx, &newy);
 
-      if (ELEMENT_CAN_ENTER_FIELD_OR_ACID(element, newx, newy))
+      if (CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
 	return;
 
       MovDir[x][y] = old_move_dir;
@@ -3931,8 +3949,7 @@ inline static void TurnRoundExt(int x, int y)
 
     MovDelay[x][y] = 0;
   }
-  else if (move_pattern & MV_MAZE_RUNNER_STYLE ||
-	   element == EL_MAZE_RUNNER)
+  else if (move_pattern & MV_MAZE_RUNNER_STYLE)
   {
     static int test_xy[7][2] =
     {
@@ -3976,7 +3993,7 @@ inline static void TurnRoundExt(int x, int y)
 	break;
       }
 
-      if (!MAZE_RUNNER_CAN_ENTER_FIELD(xx, yy))
+      if (!CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, xx, yy))
 	continue;
 
       move_dir_preference = -1 * RunnerVisit[xx][yy];
@@ -4580,6 +4597,7 @@ void StartMoving(int x, int y)
     {
 #if 1
       TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
+
       return;
 #else
       /* player killed by element which is deadly when colliding with */
@@ -4638,6 +4656,7 @@ void StartMoving(int x, int y)
 	  DrawPlayerField(x, y);
 	else
 	  DrawLevelField(x, y);
+
 	return;
       }
     }
@@ -4661,41 +4680,55 @@ void StartMoving(int x, int y)
 	  DrawPlayerField(x, y);
 	else
 	  DrawLevelField(x, y);
+
 	return;
       }
     }
-    else if ((move_pattern & MV_MAZE_RUNNER_STYLE ||
-	      element == EL_MAZE_RUNNER) && IN_LEV_FIELD(newx, newy))
+
+    /*
+    else if (move_pattern & MV_MAZE_RUNNER_STYLE && IN_LEV_FIELD(newx, newy))
+    */
+
+    else if (IS_CUSTOM_ELEMENT(element) &&
+	     CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
     {
-#if 1
-      if (IS_FREE(newx, newy))
-#else
-      if (IS_FOOD_DARK_YAMYAM(Feld[newx][newy]))
-#endif
-      {
-	if (IS_MOVING(newx, newy))
-	  RemoveMovingField(newx, newy);
-	else
-	{
-	  Feld[newx][newy] = EL_EMPTY;
-	  DrawLevelField(newx, newy);
-	}
+      int new_element = Feld[newx][newy];
+      int sound;
 
-	PlayLevelSound(x, y, SND_DARK_YAMYAM_DIGGING);
-      }
-      else if (!IS_FREE(newx, newy))
-      {
-#if 0
-	if (IS_PLAYER(x, y))
-	  DrawPlayerField(x, y);
-	else
-	  DrawLevelField(x, y);
-#endif
+      /* no element can dig solid indestructible elements */
+      if (IS_INDESTRUCTIBLE(new_element) &&
+	  !IS_DIGGABLE(new_element) &&
+	  !IS_COLLECTIBLE(new_element))
 	return;
+
+      if (AmoebaNr[newx][newy] &&
+	  (new_element == EL_AMOEBA_FULL ||
+	   new_element == EL_BD_AMOEBA ||
+	   new_element == EL_AMOEBA_GROWING))
+      {
+	AmoebaCnt[AmoebaNr[newx][newy]]--;
+	AmoebaCnt2[AmoebaNr[newx][newy]]--;
       }
 
-      RunnerVisit[x][y] = FrameCounter;
-      PlayerVisit[x][y] /= 8;		/* expire player visit path */
+      if (IS_MOVING(newx, newy))
+	RemoveMovingField(newx, newy);
+      else
+      {
+	RemoveField(newx, newy);
+	DrawLevelField(newx, newy);
+      }
+
+      sound = (IS_DIGGABLE(new_element) ? ACTION_DIGGING :
+	       IS_COLLECTIBLE(new_element) ? ACTION_COLLECTING :
+	       ACTION_BREAKING);
+
+      PlayLevelSoundAction(x, y, sound);
+
+      if (move_pattern & MV_MAZE_RUNNER_STYLE)
+      {
+	RunnerVisit[x][y] = FrameCounter;
+	PlayerVisit[x][y] /= 8;		/* expire player visit path */
+      }
     }
     else if (element == EL_DRAGON && IN_LEV_FIELD(newx, newy))
     {
@@ -4804,6 +4837,7 @@ void StartMoving(int x, int y)
 	DrawLevelField(x, y);
 
 	MovDelay[newx][newy] = 0;	/* start amoeba shrinking delay */
+
 	return;				/* wait for shrinking amoeba */
       }
       else	/* element == EL_PACMAN */
@@ -4982,6 +5016,23 @@ void ContinueMoving(int x, int y)
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
+
+  if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y))
+  {
+    int new_element = element_info[element].move_leave_element;
+
+    Feld[x][y] = new_element;
+
+    if (new_element != EL_EMPTY)
+    {
+      InitField(x, y, FALSE);
+
+      TestIfElementTouchesCustomElement(x, y);
+
+      if (GFX_CRUMBLED(new_element))
+	DrawLevelFieldCrumbledSandNeighbours(x, y);
+    }
+  }
 
 #if 0
   /* 2.1.1 (does not work correctly for spring) */

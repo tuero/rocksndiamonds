@@ -2209,11 +2209,7 @@ static int editor_el_more[] =
   EL_BD_FIREFLY,
 
   EL_MOLE_LEFT,
-#if 0
-  EL_MAZE_RUNNER,
-#else
   EL_EMPTY,
-#endif
   EL_MOLE_RIGHT,
   EL_PACMAN,
 
@@ -8240,8 +8236,6 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	strncpy(infotext, getElementInfoText(Feld[lx][ly]), max_infotext_len);
       else
 	sprintf(infotext, "Level position: %d, %d", lx, ly);
-
-      infotext[max_infotext_len] = '\0';
 #else
       else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
@@ -8263,36 +8257,33 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   }
   else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
   {
+    int element = EL_EMPTY;
+
     if (id == GADGET_ID_AMOEBA_CONTENT)
-      text = getElementInfoText(level.amoeba_content);
+      element = level.amoeba_content;
     else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      text = getElementInfoText(custom_element.gfx_element);
+      element = custom_element.gfx_element;
     else if (id == GADGET_ID_CUSTOM_CONTENT)
-      text = getElementInfoText(custom_element.content[sx][sy]);
+      element = custom_element.content[sx][sy];
     else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-      text = getElementInfoText(custom_element.move_enter_element);
+      element = custom_element.move_enter_element;
     else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-      text = getElementInfoText(custom_element.move_leave_element);
+      element = custom_element.move_leave_element;
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      text = getElementInfoText(custom_element_change.target_element);
+      element = custom_element_change.target_element;
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      text = getElementInfoText(custom_element_change.content[sx][sy]);
+      element = custom_element_change.content[sx][sy];
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      text = getElementInfoText(custom_element_change.trigger_element);
+      element = custom_element_change.trigger_element;
     else if (id == GADGET_ID_GROUP_CONTENT)
-      text = getElementInfoText(group_element_info.element[sx]);
+      element = group_element_info.element[sx];
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      text = getElementInfoText(random_placement_background_element);
+      element = random_placement_background_element;
     else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
 	     id <= GADGET_ID_ELEMENT_CONTENT_7)
-    {
-      int i = id - GADGET_ID_ELEMENT_CONTENT_0;
+      element = level.yamyam_content[id - GADGET_ID_ELEMENT_CONTENT_0][sx][sy];
 
-      text = getElementInfoText(level.yamyam_content[i][sx][sy]);
-    }
-
-    strncpy(infotext, text, max_infotext_len);
-    infotext[max_infotext_len] = '\0';
+    strncpy(infotext, getElementInfoText(element), max_infotext_len);
   }
   else
   {
@@ -8303,9 +8294,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CONTENT)
       sprintf(infotext, "Custom element content position: %d, %d", sx, sy);
     else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-      strcpy(infotext, "Element that can be digged");
+      strcpy(infotext, "Element that can be digged/collected");
     else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-      strcpy(infotext, "Element that can be left behind");
+      strcpy(infotext, "Element that will be left behind");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       strcpy(infotext, "New element after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
@@ -8321,6 +8312,8 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       sprintf(infotext, "Content area %d position: %d, %d",
 	      id - GADGET_ID_ELEMENT_CONTENT_0 + 1, sx, sy);
   }
+
+  infotext[max_infotext_len] = '\0';
 
   if (strlen(infotext) > 0)
     DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, infotext);
