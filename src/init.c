@@ -92,6 +92,8 @@ void OpenAll(int argc, char *argv[])
 
 void InitLevelAndPlayerInfo()
 {
+  int i;
+
   local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
@@ -99,6 +101,14 @@ void InitLevelAndPlayerInfo()
 
   LoadPlayerInfo(PLAYER_SETUP);		/* global setup info */
   LoadPlayerInfo(PLAYER_LEVEL);		/* level specific info */
+
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    stored_player[i].connected = FALSE;
+    stored_player[i].local = FALSE;
+  }
+  local_player->connected = TRUE;
+  local_player->local = TRUE;
 }
 
 void InitNetworkServer()

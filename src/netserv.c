@@ -270,6 +270,7 @@ static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
 static void Handle_OP_NUMBER_WANTED(struct user *u)
 {
   struct user *v;
+  int client_nr = u->number;
   int nr_wanted = buf[2];
   int nr_is_free = 1;
 
@@ -302,11 +303,16 @@ static void Handle_OP_NUMBER_WANTED(struct user *u)
   if (nr_is_free)
     u->number = nr_wanted;
 
-  buf[0] = 0;
+  buf[0] = client_nr;
   buf[1] = OP_NUMBER_WANTED;
   buf[2] = nr_wanted;
   buf[3] = u->number;
+
+  /*
   sendtoone(u, 4);
+  */
+
+  broadcast(NULL, 4, 0);
 }
 
 static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
@@ -455,8 +461,8 @@ static void Handle_OP_STOP_PLAYING(struct user *u)
 static void Handle_OP_MOVE_FIGURE(struct user *u)
 {
   struct user *v;
-  int actions_complete = 1;
   int last_client_nr = 0;
+  int i;
 
   /* store player action */
   for (v=user0; v; v=v->next)
@@ -472,14 +478,15 @@ static void Handle_OP_MOVE_FIGURE(struct user *u)
   for (v=user0; v; v=v->next)
   {
     if (!v->action_received)
-    {
-      actions_complete = 0;
-      break;
-    }
+      return;
+
+    if (v->number > last_client_nr)
+      last_client_nr = v->number;
   }
 
-  if (!actions_complete)
-    return;
+  /* initialize all player actions to zero */
+  for (i=0; i<last_client_nr; i++)
+    buf[6 + i] = 0;
 
   /* broadcast actions of all players to all players */
   for (v=user0; v; v=v->next)
@@ -487,9 +494,6 @@ static void Handle_OP_MOVE_FIGURE(struct user *u)
     buf[6 + v->number-1] = v->action;
     v->action = 0;
     v->action_received = 0;
-
-    if (v->number > last_client_nr)
-      last_client_nr = v->number;
   }
 
   buf[2] = (unsigned char)((frame_counter >> 24) & 0xff);

@@ -209,7 +209,11 @@ struct HiScore
 
 struct PlayerInfo
 {
-  int active, local;
+  BOOL present;			/* player present in level playfield */
+  BOOL connected;		/* player connected locally or via network */
+  BOOL local;			/* player connected locally */
+  BOOL active;			/* player (present && connected) */
+
   int index_nr, client_nr, element_nr;
 
   char login_name[MAX_NAMELEN];
@@ -221,13 +225,11 @@ struct PlayerInfo
 
   int jx,jy, last_jx,last_jy;
   int MovDir, MovPos, GfxPos;
-  int Pushing, Frame;
+  int Frame;
 
-  int gone, LevelSolved, GameOver;
-
-  long actual_frame_counter;
-
-  int frame_reset_delay;
+  BOOL Pushing;
+  BOOL gone, LevelSolved, GameOver;
+  BOOL snapped;
 
   long move_delay;
   int last_move_dir;
@@ -235,7 +237,9 @@ struct PlayerInfo
   long push_delay;
   int push_delay_value;
 
-  int snapped;
+  int frame_reset_delay;
+
+  long actual_frame_counter;
 
   int score;
   int gems_still_needed;

@@ -72,8 +72,13 @@ void InitGame()
 
     player->index_nr = i;
     player->element_nr = EL_SPIELER1 + i;
+
+    player->present = FALSE;
     player->active = FALSE;
+
+    /*
     player->local = FALSE;
+    */
 
     player->score = 0;
     player->gems_still_needed = level.edelsteine;
@@ -129,8 +134,10 @@ void InitGame()
     player->GameOver = FALSE;
   }
 
+  /*
   local_player->active = TRUE;
   local_player->local = TRUE;
+  */
 
   network_player_action_received = FALSE;
 
@@ -181,16 +188,30 @@ void InitGame()
 	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
 	int jx = player->jx, jy = player->jy;
 
-	/* remove duplicate players */
+	/*
+	player->active = TRUE;
+	*/
+
+	player->present = TRUE;
+	if (player->connected)
+	{
+	  player->active = TRUE;
+
+	  printf("Player %d activated.\n", player->element_nr);
+	  printf("[Local player is %d and currently %s.]\n",
+		 local_player->element_nr,
+		 local_player->active ? "active" : "not active");
+	}
+
+	/* remove potentially duplicate players */
 	if (StorePlayer[jx][jy] == Feld[x][y])
 	  StorePlayer[jx][jy] = 0;
-
-	player->active = TRUE;
 
 	StorePlayer[x][y] = Feld[x][y];
 	Feld[x][y] = EL_LEERRAUM;
 	player->jx = player->last_jx = x;
 	player->jy = player->last_jy = y;
+
 	break;
       }
       case EL_BADEWANNE:
@@ -268,6 +289,52 @@ void InitGame()
     }
   }
 
+  /* check if any connected player was not found in playfield */
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    if (player->connected && !player->present)
+    {
+      printf("Oops!\n");
+
+
+      for(j=0; j<MAX_PLAYERS; j++)
+      {
+	struct PlayerInfo *some_player = &stored_player[j];
+	int jx = some_player->jx, jy = some_player->jy;
+
+	/* assign first free player found that is present in the playfield */
+	if (some_player->present && !some_player->connected)
+	{
+	  player->present = TRUE;
+	  player->active = TRUE;
+	  some_player->present = FALSE;
+
+	  StorePlayer[jx][jy] = player->element_nr;
+	  player->jx = player->last_jx = jx;
+	  player->jy = player->last_jy = jy;
+
+	  break;
+	}
+      }
+    }
+  }
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    printf("Player %d: present == %d, connected == %d, active == %d.\n",
+	   i+1,
+	   player->present,
+	   player->connected,
+	   player->active);
+    if (local_player == player)
+      printf("Player %d is local player.\n", i+1);
+  }
+
+
   game_emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN : EMU_NONE);
 
@@ -324,6 +391,12 @@ void InitGame()
     PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 
   XAutoRepeatOff(display);
+
+
+  for (i=0;i<4;i++)
+    printf("Spieler %d %saktiv.\n",
+	   i+1, (stored_player[i].active ? "" : "nicht "));
+
 }
 
 void InitMovDir(int x, int y)

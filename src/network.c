@@ -314,12 +314,22 @@ static void Handle_OP_YOUR_NUMBER()
 {
   int new_client_nr = buf[2];
   int new_index_nr = new_client_nr - 1;
+  struct PlayerInfo *old_local_player = local_player;
+  struct PlayerInfo *new_local_player = &stored_player[new_index_nr];
 
   printf("OP_YOUR_NUMBER: %d\n", buf[0]);
   me.nr = new_client_nr;
 
-  stored_player[new_index_nr] = *local_player;
-  local_player = &stored_player[new_index_nr];
+  if (old_local_player != new_local_player)
+  {
+    /* copy existing player settings and change to new player */
+
+    *new_local_player = *old_local_player;
+    old_local_player->connected = FALSE;
+    old_local_player->local = FALSE;
+
+    local_player = new_local_player;
+  }
 
   TestPlayer = new_index_nr;
 
@@ -333,37 +343,62 @@ static void Handle_OP_YOUR_NUMBER()
 static void Handle_OP_NUMBER_WANTED()
 {
   int client_nr_wanted = buf[2];
+  int old_client_nr = buf[0];
   int new_client_nr = buf[3];
+  int old_index_nr = old_client_nr - 1;
   int new_index_nr = new_client_nr - 1;
+  int index_nr_wanted = client_nr_wanted - 1;
+  struct PlayerInfo *old_player = &stored_player[old_index_nr];
+  struct PlayerInfo *new_player = &stored_player[new_index_nr];
 
   printf("OP_NUMBER_WANTED: %d\n", buf[0]);
 
-  if (new_client_nr != client_nr_wanted)
+  if (new_client_nr == client_nr_wanted)	/* switching succeeded */
+  {
+    struct user *u;
+
+    if (old_client_nr != client_nr_wanted)	/* client's nr has changed */
+    {
+      sprintf(msgbuf, "client %d switches to # %d",
+	      old_client_nr, new_client_nr);
+      sysmsg(msgbuf);
+    }
+    else if (old_client_nr == me.nr)		/* local player keeps his nr */
+    {
+      sprintf(msgbuf, "keeping client # %d", new_client_nr);
+      sysmsg(msgbuf);
+    }
+
+    if (old_client_nr != new_client_nr)
+    {
+      /* copy existing player settings and change to new player */
+
+      *new_player = *old_player;
+      old_player->connected = FALSE;
+      old_player->local = FALSE;
+    }
+
+    u = finduser(old_client_nr);
+    u->nr = new_client_nr;
+
+    if (old_client_nr == local_player->client_nr) /* local player switched */
+      local_player = new_player;
+
+
+
+    TestPlayer = new_index_nr;
+  }
+  else if (old_client_nr == me.nr)		/* failed -- local player? */
   {
     char *color[] = { "yellow", "red", "green", "blue" };
 
-    sprintf(msgbuf, "Sorry ! You are %s player !",
-	    color[new_index_nr]);
+    sprintf(msgbuf, "Sorry ! %s player still exists ! You are %s player !",
+	    color[index_nr_wanted], color[new_index_nr]);
     Request(msgbuf, REQ_CONFIRM);
 
     sprintf(msgbuf, "cannot switch -- you keep client # %d",
 	    new_client_nr);
     sysmsg(msgbuf);
-  }
-  else
-  {
-    if (me.nr != client_nr_wanted)
-      sprintf(msgbuf, "switching to client # %d", new_client_nr);
-    else
-      sprintf(msgbuf, "keeping client # %d", new_client_nr);
-    sysmsg(msgbuf);
-
-    me.nr = new_client_nr;
-
-    stored_player[new_index_nr] = *local_player;
-    local_player = &stored_player[new_index_nr];
-
-    TestPlayer = new_index_nr;
   }
 }
 
@@ -382,23 +417,27 @@ static void Handle_OP_NICKNAME(unsigned int len)
 static void Handle_OP_PLAYER_CONNECTED()
 {
   struct user *u, *v = NULL;
+  int new_client_nr = buf[0];
+  int new_index_nr = new_client_nr - 1;
 
-  printf("OP_PLAYER_CONNECTED: %d\n", buf[0]);
-  sprintf(msgbuf, "new client %d connected", buf[0]);
+  printf("OP_PLAYER_CONNECTED: %d\n", new_client_nr);
+  sprintf(msgbuf, "new client %d connected", new_client_nr);
   sysmsg(msgbuf);
 
   for (u = &me; u; u = u->next)
   {
-    if (u->nr == buf[0])
+    if (u->nr == new_client_nr)
       Error(ERR_EXIT, "multiplayer server sent duplicate player id");
     else
       v = u;
   }
 
   v->next = u = mmalloc(sizeof(struct user));
-  u->nr = buf[0];
+  u->nr = new_client_nr;
   u->name[0] = '\0';
   u->next = NULL;
+
+  stored_player[new_index_nr].connected = TRUE;
 }
 
 static void Handle_OP_PLAYER_DISCONNECTED()
@@ -511,7 +550,7 @@ static void Handle_OP_STOP_PLAYING()
   DrawMainMenu();
 }
 
-static void Handle_OP_MOVE_FIGURE()
+static void Handle_OP_MOVE_FIGURE(unsigned int len)
 {
   int frame_nr;
   int i;
@@ -530,11 +569,10 @@ static void Handle_OP_MOVE_FIGURE()
     Error(ERR_EXIT,   "this should not happen -- please debug");
   }
 
+  /* copy valid player actions */
   for (i=0; i<MAX_PLAYERS; i++)
-  {
-    if (stored_player[i].active)
-      network_player_action[i] = buf[6 + i];
-  }
+    network_player_action[i] =
+      (i < len - 6 && stored_player[i].active ? buf[6 + i] : 0);
 
   network_player_action_received = TRUE;
 
@@ -602,7 +640,7 @@ static void handlemessages()
 	break;
 
       case OP_MOVE_FIGURE:
-	Handle_OP_MOVE_FIGURE();
+	Handle_OP_MOVE_FIGURE(len);
 	break;
 
       case OP_WON:
