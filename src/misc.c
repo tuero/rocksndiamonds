@@ -421,8 +421,12 @@ void Error(int mode, char *format, ...)
   FILE *output_stream = stderr;
   char *process_name = "";
 
-  if (mode & ERR_SOUNDSERVER)
+  if (mode & ERR_SOUND_SERVER)
     process_name = " sound server";
+  else if (mode & ERR_NETWORK_SERVER)
+    process_name = " network server";
+  else if (mode & ERR_NETWORK_CLIENT)
+    process_name = " network client **";
 
   if (format)
   {

@@ -25,9 +25,13 @@
 #define ERR_WARN		(1 << 0)
 #define ERR_EXIT		(1 << 1)
 #define ERR_HELP		(1 << 2)
-#define ERR_SOUNDSERVER		(1 << 3)
+#define ERR_SOUND_SERVER	(1 << 3)
+#define ERR_NETWORK_SERVER	(1 << 4)
+#define ERR_NETWORK_CLIENT	(1 << 5)
 #define ERR_EXIT_HELP		(ERR_EXIT | ERR_HELP)
-#define ERR_EXIT_SOUNDSERVER	(ERR_EXIT | ERR_SOUNDSERVER)
+#define ERR_EXIT_SOUND_SERVER	(ERR_EXIT | ERR_SOUND_SERVER)
+#define ERR_EXIT_NETWORK_SERVER	(ERR_EXIT | ERR_NETWORK_SERVER)
+#define ERR_EXIT_NETWORK_CLIENT	(ERR_EXIT | ERR_NETWORK_CLIENT)
 
 void InitCounter(void);
 unsigned long Counter(void);

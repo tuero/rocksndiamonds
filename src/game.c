@@ -739,8 +739,8 @@ boolean NewHiScore()
 
   LoadScore(level_nr);
 
-  if (!strcmp(setup.player_name, EMPTY_ALIAS) ||
-      local_player->score < highscore[MAX_SCORE_ENTRIES-1].Score) 
+  if (strcmp(setup.player_name, EMPTY_PLAYER_NAME) == 0 ||
+      local_player->score < highscore[MAX_SCORE_ENTRIES - 1].Score) 
     return -1;
 
   for (k=0; k<MAX_SCORE_ENTRIES; k++) 

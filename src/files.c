@@ -698,7 +698,7 @@ void LoadScore(int level_nr)
   /* always start with reliable default values */
   for(i=0; i<MAX_SCORE_ENTRIES; i++)
   {
-    strcpy(highscore[i].Name, EMPTY_ALIAS);
+    strcpy(highscore[i].Name, EMPTY_PLAYER_NAME);
     highscore[i].Score = 0;
   }
 

@@ -113,9 +113,9 @@ void InitNetworkServer()
   nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
 
   if (!ConnectToServer(options.server_host, options.server_port))
-    Error(ERR_EXIT, "cannot connect to multiplayer server");
+    Error(ERR_EXIT, "cannot connect to network game server");
 
-  SendToServer_Nickname(setup.player_name);
+  SendToServer_PlayerName(setup.player_name);
   SendToServer_ProtocolVersion();
 
   if (nr_wanted)

@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #ifndef MSDOS
 #define XK_MISCELLANY
@@ -433,7 +433,6 @@ extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
 
 extern boolean		network_player_action_received;
-extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;
@@ -1065,7 +1064,7 @@ extern int		num_bg_loops;
 #define COPYRIGHT_STRING	"Copyright ^1995-98 by Holger Schemel"
 
 /* default name for empty highscore entry */
-#define EMPTY_ALIAS		"NO_NAME"
+#define EMPTY_PLAYER_NAME	"no name"
 
 /* values for button_status */
 #define MB_NOT_PRESSED		FALSE

@@ -17,7 +17,7 @@
 #include "main.h"
 
 boolean ConnectToServer(char *, int);
-void SendToServer_Nickname(char *);
+void SendToServer_PlayerName(char *);
 void SendToServer_ProtocolVersion(void);
 void SendToServer_NrWanted(int);
 void SendToServer_StartPlaying(void);

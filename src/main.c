@@ -98,7 +98,6 @@ int		FrameCounter, TimeFrames, TimeLeft;
 int		MampferNr, SiebAktiv;
 
 boolean		network_player_action_received = FALSE;
-int		TestPlayer = 0;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
 struct LevelInfo	level;

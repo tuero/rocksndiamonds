@@ -75,7 +75,7 @@ void SoundServer()
     if (!FD_ISSET(sound_pipe[0], &sound_fdset))
       continue;
     if (read(sound_pipe[0], &snd_ctrl, sizeof(snd_ctrl)) != sizeof(snd_ctrl))
-      Error(ERR_EXIT_SOUNDSERVER, "broken pipe - no sounds");
+      Error(ERR_EXIT_SOUND_SERVER, "broken pipe - no sounds");
 
 #ifdef VOXWARE
 
@@ -485,13 +485,13 @@ void HPUX_Audio_Control()
 
   audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
   if (audio_ctl == -1)
-    Error(ERR_EXIT_SOUNDSERVER, "cannot open /dev/audioCtl - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl - no sounds");
 
   if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
-    Error(ERR_EXIT_SOUNDSERVER, "no audio info - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "no audio info - no sounds");
 
   if (ioctl(audio_ctl, AUDIO_SET_DATA_FORMAT, AUDIO_FORMAT_ULAW) == -1)
-    Error(ERR_EXIT_SOUNDSERVER, "ulaw audio not available - no sounds");
+    Error(ERR_EXIT_SOUND_SERVER, "ulaw audio not available - no sounds");
 
   ioctl(audio_ctl, AUDIO_SET_CHANNELS, 1);
   ioctl(audio_ctl, AUDIO_SET_SAMPLE_RATE, 8000);

@@ -14,7 +14,9 @@
 #ifndef NETSERV_H
 #define NETSERV_H
 
-#define DEFAULTPORT		19504
+#include "main.h"
+
+#define DEFAULT_SERVER_PORT	19504
 
 #define PROTOCOL_VERSION_1	1
 #define PROTOCOL_VERSION_2	2
@@ -24,7 +26,7 @@
 #define OP_BAD_PROTOCOL_VERSION	2
 #define OP_YOUR_NUMBER		3
 #define OP_NUMBER_WANTED	4
-#define OP_NICKNAME		5
+#define OP_PLAYER_NAME		5
 #define OP_PLAYER_CONNECTED	6
 #define OP_PLAYER_DISCONNECTED	7
 #define OP_START_PLAYING	8
@@ -32,21 +34,7 @@
 #define OP_CONTINUE_PLAYING	10
 #define OP_STOP_PLAYING		11
 #define OP_MOVE_FIGURE		12
-
-#define OP_LOST			13
-#define OP_CLEAR		14
-#define OP_LINES		15
-#define OP_GROW			16
-#define OP_MODE			17
-#define OP_LEVEL		18
-#define OP_BOT			19
-#define OP_KILL			20
-#define OP_BADVERS		21
-#define OP_MSG			22
-#define OP_YOUARE		23
-#define OP_LINESTO		24
-#define OP_WON			25
-#define OP_ZERO			26
+#define OP_BROADCAST_MESSAGE	13
 
 #define MAX_BUFFER_SIZE		4096
 

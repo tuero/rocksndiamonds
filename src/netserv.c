@@ -11,11 +11,8 @@
 *  network.c                                               *
 ***********************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <sys/socket.h>
@@ -33,25 +30,22 @@ static int clients = 0;
 static int onceonly = 0;
 static int is_daemon = 0;
 
-struct user
+struct NetworkServerPlayerInfo
 {
   int fd;
-  unsigned char nick[16];
+  unsigned char player_name[16];
   unsigned char number;
-  struct user *next, *nextvictim;
+  struct NetworkServerPlayerInfo *next;
   char active;
   char introduced;
   unsigned char readbuf[MAX_BUFFER_SIZE];
-  int nread;
   unsigned char writbuf[MAX_BUFFER_SIZE];
-  int nwrite;
-  char playing;
-  unsigned int games;
-  unsigned char action;
-  int action_received;
+  int nread, nwrite;
+  byte action;
+  boolean action_received;
 };
 
-static struct user *user0 = NULL;
+static struct NetworkServerPlayerInfo *user0 = NULL;
 
 #define NEXT(u) ((u)->next ? (u)->next : user0)
 
@@ -62,7 +56,7 @@ static unsigned char realbuf[512], *buf = realbuf + 4;
 static int interrupt;
 static int tcp = -1;
 
-static unsigned long frame_counter = 0;
+static unsigned long ServerFrameCounter = 0;
 
 static fd_set fds;
 
@@ -73,7 +67,8 @@ static void syserr(char *s)
   exit(1);
 }
 
-static void addtobuffer(struct user *u, unsigned char *b, int len)
+static void addtobuffer(struct NetworkServerPlayerInfo *u,
+			unsigned char *b, int len)
 {
   if (u->nwrite + len >= MAX_BUFFER_SIZE)
     Error(ERR_EXIT, "internal error: network send buffer overflow");
@@ -82,7 +77,7 @@ static void addtobuffer(struct user *u, unsigned char *b, int len)
   u->nwrite += len;
 }
 
-static void flushuser(struct user *u)
+static void flushuser(struct NetworkServerPlayerInfo *u)
 {
   if (u->nwrite)
   {
@@ -91,9 +86,10 @@ static void flushuser(struct user *u)
   }
 }
 
-static void broadcast(struct user *except, int len, int activeonly)
+static void broadcast(struct NetworkServerPlayerInfo *except,
+		      int len, int activeonly)
 {
-  struct user *u;
+  struct NetworkServerPlayerInfo *u;
 
   realbuf[0] = realbuf[1] = realbuf[2] = 0;
   realbuf[3] = (unsigned char)len;
@@ -102,19 +98,20 @@ static void broadcast(struct user *except, int len, int activeonly)
       addtobuffer(u, realbuf, 4 + len);
 }
 
-static void sendtoone(struct user *to, int len)
+static void sendtoone(struct NetworkServerPlayerInfo *to, int len)
 {
   realbuf[0] = realbuf[1] = realbuf[2] = 0;
   realbuf[3] = (unsigned char)len;
   addtobuffer(to, realbuf, 4 + len);
 }
 
-static void dropuser(struct user *u)
+static void dropuser(struct NetworkServerPlayerInfo *u)
 {
-  struct user *v, *w;
+  struct NetworkServerPlayerInfo *v;
   
   if (options.verbose)
-    printf("RND_SERVER: dropping client %d (%s)\n", u->number, u->nick);
+    Error(ERR_NETWORK_SERVER, "dropping client %d (%s)",
+	  u->number, u->player_name);
 
   if (u == user0)
     user0 = u->next;
@@ -138,23 +135,6 @@ static void dropuser(struct user *u)
     broadcast(u, 2, 0);
   }
 
-  for (v=user0; v; v=v->next)
-  {
-    if (v->nextvictim == u)
-    {
-      for (w=NEXT(v); w!=v; w=NEXT(w))
-      {
-	if (w->active && w->playing)
-	{
-	  v->nextvictim = w;
-	  break;
-	}
-      }
-      if (v->nextvictim == u)
-	v->nextvictim = NULL;
-    }
-  }
-
   free(u);
   clients--;
 
@@ -162,8 +142,8 @@ static void dropuser(struct user *u)
   {
     if (options.verbose)
     {
-      printf("RND_SERVER: no clients left\n");
-      printf("RND_SERVER: aborting\n");
+      Error(ERR_NETWORK_SERVER, "no clients left");
+      Error(ERR_NETWORK_SERVER, "aborting");
     }
     exit(0);
   }
@@ -171,23 +151,20 @@ static void dropuser(struct user *u)
 
 static void new_connect(int fd)
 {
-  struct user *u, *v;
+  struct NetworkServerPlayerInfo *u, *v;
   unsigned char nxn;
 
-  u = checked_malloc(sizeof (struct user));
+  u = checked_malloc(sizeof (struct NetworkServerPlayerInfo));
 
   u->fd = fd;
-  u->nick[0] = 0;
+  u->player_name[0] = 0;
   u->next = user0;
-  u->nextvictim = NULL;
   u->active = 0;
   u->nread = 0;
   u->nwrite = 0;
-  u->playing = 0;
   u->introduced = 0;
-  u->games = 0;
   u->action = 0;
-  u->action_received = 0;
+  u->action_received = FALSE;
 
   user0 = u;
 
@@ -207,7 +184,8 @@ static void new_connect(int fd)
 
   u->number = nxn;
   if (options.verbose)
-    printf("RND_SERVER: client %d connecting from %s\n", nxn, inet_ntoa(saddr.sin_addr));
+    Error(ERR_NETWORK_SERVER, "client %d connecting from %s",
+	  nxn, inet_ntoa(saddr.sin_addr));
   clients++;
 
   buf[0] = 0;
@@ -216,15 +194,18 @@ static void new_connect(int fd)
   sendtoone(u, 3);
 }
 
-static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
+static void Handle_OP_PROTOCOL_VERSION(struct NetworkServerPlayerInfo *u,
+				       unsigned int len)
 {
   if (len != 5 || buf[2] != PROTOCOL_VERSION_1 || buf[3] != PROTOCOL_VERSION_2)
   {
     if (options.verbose)
-      printf("RND_SERVER: client %d (%s) has wrong protocol version %d.%d.%d\n", u->number, u->nick, buf[2], buf[3], buf[4]);
+      Error(ERR_NETWORK_SERVER,
+	    "client %d (%s) has wrong protocol version %d.%d.%d",
+	    u->number, u->player_name, buf[2], buf[3], buf[4]);
 
     buf[0] = 0;
-    buf[1] = OP_BADVERS;
+    buf[1] = OP_BAD_PROTOCOL_VERSION;
     buf[2] = PROTOCOL_VERSION_1;
     buf[3] = PROTOCOL_VERSION_2;
     buf[4] = PROTOCOL_VERSION_3;
@@ -237,20 +218,22 @@ static void Handle_OP_PROTOCOL_VERSION(struct user *u, unsigned int len)
   else
   {
     if (options.verbose)
-      printf("RND_SERVER: client %d (%s) uses protocol version %d.%d.%d\n", u->number, u->nick, buf[2], buf[3], buf[4]);
+      Error(ERR_NETWORK_SERVER,
+	    "client %d (%s) uses protocol version %d.%d.%d",
+	    u->number, u->player_name, buf[2], buf[3], buf[4]);
   }
 }
 
-static void Handle_OP_NUMBER_WANTED(struct user *u)
+static void Handle_OP_NUMBER_WANTED(struct NetworkServerPlayerInfo *u)
 {
-  struct user *v;
+  struct NetworkServerPlayerInfo *v;
   int client_nr = u->number;
   int nr_wanted = buf[2];
   int nr_is_free = 1;
 
   if (options.verbose)
-    printf("RND_SERVER: client %d (%s) wants to switch to # %d\n",
-	   u->number, u->nick, nr_wanted);
+      Error(ERR_NETWORK_SERVER, "client %d (%s) wants to switch to # %d",
+	    u->number, u->player_name, nr_wanted);
 
   for (v=user0; v; v=v->next)
   {
@@ -264,14 +247,15 @@ static void Handle_OP_NUMBER_WANTED(struct user *u)
   if (options.verbose)
   {
     if (nr_is_free)
-      printf("RND_SERVER: client %d (%s) switches to # %d\n",
-	     u->number, u->nick, nr_wanted);
+      Error(ERR_NETWORK_SERVER, "client %d (%s) switches to # %d",
+	    u->number, u->player_name, nr_wanted);
     else if (u->number == nr_wanted)
-      printf("RND_SERVER: client %d (%s) still has # %d\n",
-	     u->number, u->nick, nr_wanted);
+      Error(ERR_NETWORK_SERVER, "client %d (%s) still has # %d",
+	    u->number, u->player_name, nr_wanted);
     else
-      printf("RND_SERVER: client %d (%s) cannot switch (client %d still exists)\n",
-	     u->number, u->nick, nr_wanted);
+      Error(ERR_NETWORK_SERVER,
+	    "client %d (%s) cannot switch (client %d still exists)",
+	    u->number, u->player_name, nr_wanted);
   }
 
   if (nr_is_free)
@@ -289,21 +273,22 @@ static void Handle_OP_NUMBER_WANTED(struct user *u)
   broadcast(NULL, 4, 0);
 }
 
-static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
+static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *u,
+				  unsigned int len)
 {
-  struct user *v;
+  struct NetworkServerPlayerInfo *v;
   int i;
 
   if (len>16)
     len=16;
-  memcpy(u->nick, &buf[2], len-2);
-  u->nick[len-2] = 0;
+  memcpy(u->player_name, &buf[2], len-2);
+  u->player_name[len-2] = 0;
   for (i=0; i<len-2; i++)
   {
-    if (u->nick[i] < ' ' || 
-	(u->nick[i] > 0x7e && u->nick[i] <= 0xa0))
+    if (u->player_name[i] < ' ' || 
+	(u->player_name[i] > 0x7e && u->player_name[i] <= 0xa0))
     {
-      u->nick[i] = 0;
+      u->player_name[i] = 0;
       break;
     }
   }
@@ -316,8 +301,9 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
   }
 	      
   if (options.verbose)
-    printf("RND_SERVER: client %d calls itself \"%s\"\n", u->number, u->nick);
-  buf[1] = OP_NICKNAME;
+    Error(ERR_NETWORK_SERVER, "client %d calls itself \"%s\"",
+	  u->number, u->player_name);
+  buf[1] = OP_PLAYER_NAME;
   broadcast(u, len, 0);
 
   if (!u->introduced)
@@ -328,12 +314,10 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
       {
 	buf[0] = v->number;
 	buf[1] = OP_PLAYER_CONNECTED;
-	buf[2] = (v->games >> 8);
-	buf[3] = (v->games & 0xff);
-	sendtoone(u, 4);
-	buf[1] = OP_NICKNAME;
-	memcpy(&buf[2], v->nick, 14);
-	sendtoone(u, 2+strlen(v->nick));
+	sendtoone(u, 2);
+	buf[1] = OP_PLAYER_NAME;
+	memcpy(&buf[2], v->player_name, 14);
+	sendtoone(u, 2+strlen(v->player_name));
       }
     }
   }
@@ -341,72 +325,62 @@ static void Handle_OP_NICKNAME(struct user *u, unsigned int len)
   u->introduced = 1;
 }
 
-static void Handle_OP_START_PLAYING(struct user *u)
+static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *u)
 {
-  struct user *v, *w;
+  struct NetworkServerPlayerInfo *v, *w;
 
   if (options.verbose)
-    printf("RND_SERVER: client %d (%s) starts game [level %d from levedir %d (%s)]\n",
-	   u->number, u->nick,
-	   (buf[2] << 8) + buf[3],
-	   (buf[4] << 8) + buf[5],
-	   &buf[6]);
+    Error(ERR_NETWORK_SERVER,
+	  "client %d (%s) starts game [level %d from levedir %d (%s)]",
+	  u->number, u->player_name,
+	  (buf[2] << 8) + buf[3],
+	  (buf[4] << 8) + buf[5],
+	  &buf[6]);
 
   for (w=user0; w; w=w->next)
-  {
     if (w->introduced)
-    {
       w->active = 1;
-      w->playing = 1;
-      w->nextvictim = NULL;
-      for (v=NEXT(w); v!=w; v=NEXT(v))
-      {
-	if (v->introduced)
-	{
-	  w->nextvictim = v;
-	  break;
-	}
-      }
-    }
-  }
 
   /* reset frame counter */
-  frame_counter = 0;
+  ServerFrameCounter = 0;
 
   /* reset player actions */
   for (v=user0; v; v=v->next)
   {
     v->action = 0;
-    v->action_received = 0;
+    v->action_received = FALSE;
   }
 
   broadcast(NULL, 10 + strlen(&buf[10])+1, 0);
 }
 
-static void Handle_OP_PAUSE_PLAYING(struct user *u)
+static void Handle_OP_PAUSE_PLAYING(struct NetworkServerPlayerInfo *u)
 {
   if (options.verbose)
-    printf("RND_SERVER: client %d (%s) pauses game\n", u->number, u->nick);
+    Error(ERR_NETWORK_SERVER, "client %d (%s) pauses game",
+	  u->number, u->player_name);
   broadcast(NULL, 2, 0);
 }
 
-static void Handle_OP_CONTINUE_PLAYING(struct user *u)
+static void Handle_OP_CONTINUE_PLAYING(struct NetworkServerPlayerInfo *u)
 {
   if (options.verbose)
-    printf("RND_SERVER: client %d (%s) continues game\n", u->number, u->nick);
+    Error(ERR_NETWORK_SERVER, "client %d (%s) continues game",
+	  u->number, u->player_name);
   broadcast(NULL, 2, 0);
 }
 
-static void Handle_OP_STOP_PLAYING(struct user *u)
+static void Handle_OP_STOP_PLAYING(struct NetworkServerPlayerInfo *u)
 {
   if (options.verbose)
-    printf("RND_SERVER: client %d (%s) stops game\n", u->number, u->nick);
+    Error(ERR_NETWORK_SERVER, "client %d (%s) stops game",
+	  u->number, u->player_name);
   broadcast(NULL, 2, 0);
 }
 
-static void Handle_OP_MOVE_FIGURE(struct user *u)
+static void Handle_OP_MOVE_FIGURE(struct NetworkServerPlayerInfo *u)
 {
-  struct user *v;
+  struct NetworkServerPlayerInfo *v;
   int last_client_nr = 0;
   int i;
 
@@ -416,7 +390,7 @@ static void Handle_OP_MOVE_FIGURE(struct user *u)
     if (v->number == u->number)
     {
       v->action = buf[2];
-      v->action_received = 1;
+      v->action_received = TRUE;
     }
   }
 
@@ -439,30 +413,23 @@ static void Handle_OP_MOVE_FIGURE(struct user *u)
   {
     buf[6 + v->number-1] = v->action;
     v->action = 0;
-    v->action_received = 0;
+    v->action_received = FALSE;
   }
 
-  buf[2] = (unsigned char)((frame_counter >> 24) & 0xff);
-  buf[3] = (unsigned char)((frame_counter >> 16) & 0xff);
-  buf[4] = (unsigned char)((frame_counter >>  8) & 0xff);
-  buf[5] = (unsigned char)((frame_counter >>  0) & 0xff);
+  buf[2] = (unsigned char)((ServerFrameCounter >> 24) & 0xff);
+  buf[3] = (unsigned char)((ServerFrameCounter >> 16) & 0xff);
+  buf[4] = (unsigned char)((ServerFrameCounter >>  8) & 0xff);
+  buf[5] = (unsigned char)((ServerFrameCounter >>  0) & 0xff);
 
   broadcast(NULL, 6 + last_client_nr, 0);
 
-  frame_counter++;
-
-  /*
-    if (verbose)
-    printf("RND_SERVER: frame %d: client %d (%s) moves player [0x%02x]\n",
-    frame_counter,
-    u->number, u->nick, buf[2]);
-  */
+  ServerFrameCounter++;
 }
 
 void NetworkServer(int port, int serveronly)
 {
   int i, sl, on;
-  struct user *u;
+  struct NetworkServerPlayerInfo *u;
   int mfd;
   int r; 
   unsigned int len;
@@ -475,7 +442,7 @@ void NetworkServer(int port, int serveronly)
 #endif
 
   if (port == 0)
-    port = DEFAULTPORT;
+    port = DEFAULT_SERVER_PORT;
 
   if (!serveronly)
     onceonly = 1;
@@ -533,10 +500,9 @@ void NetworkServer(int port, int serveronly)
 
   if (options.verbose)
   {
-    printf("rocksndiamonds network server: started up, listening on port %d\n",
-	   port);
-    printf("rocksndiamonds network server: using protocol version %d.%d.%d\n",
-	   PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+    Error(ERR_NETWORK_SERVER, "started up, listening on port %d", port);
+    Error(ERR_NETWORK_SERVER, "using protocol version %d.%d.%d",
+	  PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
   }
 
   while(1)
@@ -606,7 +572,8 @@ void NetworkServer(int port, int serveronly)
 	if (r <= 0)
 	{
 	  if (options.verbose)
-	    printf("RND_SERVER: EOF from client %d (%s)\n", u->number, u->nick);
+	    Error(ERR_NETWORK_SERVER, "EOF from client %d (%s)",
+		  u->number, u->player_name);
 	  dropuser(u);
 	  interrupt = 1;
 	  break;
@@ -618,7 +585,8 @@ void NetworkServer(int port, int serveronly)
 	  if (u->readbuf[0] || u->readbuf[1] || u->readbuf[2])
 	  {
 	    if (options.verbose)
-	      printf("RND_SERVER: crap from client %d (%s)\n", u->number, u->nick);
+	      Error(ERR_NETWORK_SERVER, "crap from client %d (%s)",
+		    u->number, u->player_name);
 	    write(u->fd, "\033]50;kanji24\007\033#8\033(0", 19);
 	    dropuser(u);
 	    interrupt = 1;
@@ -629,10 +597,10 @@ void NetworkServer(int port, int serveronly)
 	  memmove(u->readbuf, u->readbuf + 4 + len, u->nread);
 
 	  buf[0] = u->number;
-	  if (!u->introduced && buf[1] != OP_NICKNAME)
+	  if (!u->introduced && buf[1] != OP_PLAYER_NAME)
 	  {
 	    if (options.verbose)
-	      printf("RND_SERVER: !(client %d)->introduced && buf[1]==%d (expected OP_NICKNAME)\n", buf[0], buf[1]);
+	      Error(ERR_NETWORK_SERVER, "!(client %d)->introduced && buf[1]==%d (expected OP_PLAYER_NAME)", buf[0], buf[1]);
 
 	    dropuser(u);
 	    interrupt = 1;
@@ -641,8 +609,8 @@ void NetworkServer(int port, int serveronly)
 
 	  switch(buf[1])
 	  {
-	    case OP_NICKNAME:
-	      Handle_OP_NICKNAME(u, len);
+	    case OP_PLAYER_NAME:
+	      Handle_OP_PLAYER_NAME(u, len);
 	      break;
 
 	    case OP_PROTOCOL_VERSION:
@@ -673,16 +641,19 @@ void NetworkServer(int port, int serveronly)
 	      Handle_OP_MOVE_FIGURE(u);
 	      break;
 
-	    case OP_MSG:
+	    case OP_BROADCAST_MESSAGE:
 	      buf[len] = '\0';
 	      if (options.verbose)
-		printf("RND_SERVER: client %d (%s) sends message: %s\n", u->number, u->nick, &buf[2]);
+		Error(ERR_NETWORK_SERVER, "client %d (%s) sends message: %s",
+		      u->number, u->player_name, &buf[2]);
 	      broadcast(u, len, 0);
 	      break;
 	    
 	    default:
 	      if (options.verbose)
-		printf("RND_SERVER: opcode %d from client %d (%s) not understood\n", buf[0], u->number, u->nick);
+		Error(ERR_NETWORK_SERVER,
+		      "unknown opcode %d from client %d (%s)",
+		      buf[0], u->number, u->player_name);
 	  }
 	}
       }
