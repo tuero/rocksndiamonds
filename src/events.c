@@ -127,6 +127,8 @@ void HandleOtherEvents(Event *event)
 
     case EVENT_UNMAPNOTIFY:
 #if 0
+      /* This causes the game to stop not only when iconified, but also
+	 when on another virtual desktop, which might be not desired. */
       SleepWhileUnmapped();
 #endif
       break;

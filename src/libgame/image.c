@@ -705,7 +705,7 @@ Bitmap *getBitmapFromImageID(int graphic)
 {
   ImageInfo **img_info = (ImageInfo **)image_info->artwork_list;
 
-  return img_info[graphic]->bitmap;
+  return (img_info[graphic] != NULL ? img_info[graphic]->bitmap : NULL);
 }
 
 char *getTokenFromImageID(int graphic)

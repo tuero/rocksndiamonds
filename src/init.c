@@ -481,7 +481,7 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
+  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, backbuffer,
 	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
@@ -870,6 +870,9 @@ static void InitGraphicInfo()
       new_graphic_info[i].anim_global_sync = FALSE;
 
     /* now check if no animation frames are outside of the loaded image */
+
+    if (new_graphic_info[i].bitmap == NULL)
+      continue;				/* skip check for optional images */
 
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);

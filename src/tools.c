@@ -380,6 +380,13 @@ void ClearWindow()
     SetDrawtoField(DRAW_DIRECT);
   }
 
+#if 1
+  if (game_status != PLAYING &&
+      new_graphic_info[IMG_MENU_BACK].bitmap != NULL)
+    BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
+	       0, 0, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
+#endif
+
   redraw_mask |= REDRAW_FIELD;
 }
 
@@ -669,9 +676,7 @@ void DrawPlayer(struct PlayerInfo *player)
       int frame = 0;
 #endif
 
-      if ((element == EL_ROCK ||
-	   element == EL_BD_ROCK ||
-	   element == EL_SP_ZONK) && sxx)
+      if (sxx && IS_PUSHABLE(element))
       {
 	graphic = el_dir_act2img(element, player->MovDir, GFX_ACTION_MOVING);
 #if 1
@@ -2397,7 +2402,7 @@ void DrawSpecialEditorDoor()
   BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
 	     EX - 4, EY - 12);
-  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, drawto,
 	     EX - 4, VY - 4, EXSIZE + 8, EYSIZE - VYSIZE + 4,
 	     EX - 4, EY - 4);
 
@@ -2407,7 +2412,7 @@ void DrawSpecialEditorDoor()
 void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
-  BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, drawto,
+  BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, drawto,
 	     EX - 4, EY - 12, EXSIZE + 8, EYSIZE - VYSIZE + 12,
 	     EX - 4, EY - 12);
 

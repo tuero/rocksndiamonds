@@ -633,6 +633,18 @@ struct ConfigInfo image_config[] =
   { "nut.xpos",					"12"			},
   { "nut.ypos",					"1"			},
   { "nut.frames",				"1"			},
+  { "nut.falling",				"RocksElements.pcx"	},
+  { "nut.falling.xpos",				"12"			},
+  { "nut.falling.ypos",				"1"			},
+  { "nut.falling.frames",			"1"			},
+  { "nut.moving_left",				"RocksElements.pcx"	},
+  { "nut.moving_left.xpos",			"12"			},
+  { "nut.moving_left.ypos",			"1"			},
+  { "nut.moving_left.frames",			"1"			},
+  { "nut.moving_right",				"RocksElements.pcx"	},
+  { "nut.moving_right.xpos",			"12"			},
+  { "nut.moving_right.ypos",			"1"			},
+  { "nut.moving_right.frames",			"1"			},
   { "nut.cracking",				"RocksElements.pcx"	},
   { "nut.cracking.xpos",			"13"			},
   { "nut.cracking.ypos",			"1"			},
@@ -2571,7 +2583,8 @@ struct ConfigInfo image_config[] =
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
-  { "menu.back",				"RocksScreen.pcx"	},
+  { "menu.frame",				"RocksScreen.pcx"	},
+  { "menu.back",				UNDEFINED_FILENAME	},
   { "menu.door",				"RocksDoor.pcx"		},
   { "menu.toons",				"RocksToons.pcx"	},
   { "menu.font_big",				"RocksFontBig.pcx"	},

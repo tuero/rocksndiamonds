@@ -962,7 +962,6 @@ void InitGame()
 
   DrawLevel();
   DrawAllPlayers();
-  FadeToFront();
 
   /* after drawing the level, correct some elements */
   if (game.timegate_time_left == 0)
@@ -972,6 +971,7 @@ void InitGame()
     BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
   redraw_mask |= REDRAW_FROM_BACKBUFFER;
+  FadeToFront();
 
   /* copy default game door content to main double buffer */
   BlitBitmap(new_graphic_info[IMG_MENU_DOOR].bitmap, drawto,

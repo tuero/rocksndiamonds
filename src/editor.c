@@ -2651,6 +2651,12 @@ static void PickDrawingElement(int button, int element)
 static void DrawDrawingWindow()
 {
   ClearWindow();
+
+#if 1
+  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  redraw_mask |= REDRAW_FROM_BACKBUFFER;
+#endif
+
   UnmapLevelEditorWindowGadgets();
   AdjustDrawingAreaGadgets();
   AdjustLevelScrollPosition();

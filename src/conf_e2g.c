@@ -549,6 +549,18 @@ element_to_graphic[] =
     IMG_NUT
   },
   {
+    EL_NUT,					-1, GFX_ACTION_FALLING,
+    IMG_NUT_FALLING
+  },
+  {
+    EL_NUT,					MV_LEFT, GFX_ACTION_MOVING,
+    IMG_NUT_MOVING_LEFT
+  },
+  {
+    EL_NUT,					MV_RIGHT, GFX_ACTION_MOVING,
+    IMG_NUT_MOVING_RIGHT
+  },
+  {
     EL_NUT_CRACKING,				-1, GFX_ACTION_CRACKING,
     IMG_NUT_CRACKING
   },

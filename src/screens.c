@@ -119,7 +119,7 @@ static void ToggleFullscreenIfNeeded()
     setup.fullscreen = video.fullscreen_enabled;
 
     /* redraw background to newly created backbuffer */
-    BlitBitmap(new_graphic_info[IMG_MENU_BACK].bitmap, backbuffer,
+    BlitBitmap(new_graphic_info[IMG_MENU_FRAME].bitmap, backbuffer,
 	       0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
 
     /* restore old door content */

@@ -200,8 +200,17 @@ void DrawTextExt(DrawBuffer *bitmap, int x, int y, char *text,
 			 0, 0, font_width, font_height, dest_x, dest_y);
       }
       else
-	BlitBitmap(font_bitmap, bitmap,
-		   src_x, src_y, font_width, font_height, dest_x, dest_y);
+      {
+#if 1
+	BlitBitmap(font_bitmap, bitmap, src_x, src_y,
+		   font_width, font_height, dest_x, dest_y);
+#else
+	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
+		      dest_x - src_x, dest_y - src_y);
+	BlitBitmapMasked(font_bitmap, bitmap, src_x, src_y,
+			 font_width, font_height, dest_x, dest_y);
+#endif
+      }
     }
 
     x += font_width;

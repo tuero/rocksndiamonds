@@ -1374,6 +1374,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   int num_file_list_entries)
 {
   struct FileInfo *file_list;
+  int num_file_list_entries_found = 0;
   int num_suffix_list_entries = 0;
   int list_pos = 0;
   int i, j;
@@ -1433,7 +1434,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       if (i > 0)
 	list_pos++;
 
-      if (list_pos > num_file_list_entries - 1)
+      if (list_pos >= num_file_list_entries)
 	break;
 
       /* simple sanity check if this is really a file definition */
@@ -1451,8 +1452,16 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
     }
   }
 
-  if (list_pos != num_file_list_entries - 1)
-    Error(ERR_EXIT, "inconsistant config list information (%d != %d) -- please fix", list_pos, num_file_list_entries - 1);
+  num_file_list_entries_found = list_pos + 1;
+  if (num_file_list_entries_found != num_file_list_entries)
+  {
+    Error(ERR_RETURN, "inconsistant config list information:");
+    Error(ERR_RETURN, "- should be:   %d (according to 'src/conf_gfx.h')",
+	  num_file_list_entries);
+    Error(ERR_RETURN, "- found to be: %d (according to 'src/conf_gfx.c')",
+	  num_file_list_entries_found);
+    Error(ERR_EXIT,   "please fix");
+  }
 
   return file_list;
 }
