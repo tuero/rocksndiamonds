@@ -107,8 +107,8 @@ void DrawMainMenu()
 
   for(i=2; i<10; i++)
     DrawGraphic(0, i, GFX_KUGEL_BLAU);
-  DrawGraphic(10, 3, GFX_PFEIL_L);
-  DrawGraphic(14, 3, GFX_PFEIL_R);
+  DrawGraphic(10, 3, GFX_PFEIL_LEFT);
+  DrawGraphic(14, 3, GFX_PFEIL_RIGHT);
 
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
@@ -380,10 +380,10 @@ static int helpscreen_action[] =
   GFX_MAMPFER2+1,1,1, GFX_MAMPFER2+0,1,1,			HA_NEXT,
   GFX_ROBOT+0,4,1, GFX_ROBOT+3,1,1, GFX_ROBOT+2,1,1,
   GFX_ROBOT+1,1,1, GFX_ROBOT+0,1,1,				HA_NEXT,
-  GFX_MAULWURF_DOWN,4,2,
-  GFX_MAULWURF_UP,4,2,
-  GFX_MAULWURF_LEFT,4,2,
-  GFX_MAULWURF_RIGHT,4,2,					HA_NEXT,
+  GFX_MOLE_DOWN,4,2,
+  GFX_MOLE_UP,4,2,
+  GFX_MOLE_LEFT,4,2,
+  GFX_MOLE_RIGHT,4,2,						HA_NEXT,
   GFX_PINGUIN_DOWN,4,2,
   GFX_PINGUIN_UP,4,2,
   GFX_PINGUIN_LEFT,4,2,
@@ -461,7 +461,7 @@ static char *helpscreen_eltext[][2] =
  {"Cruncher: Eats diamonds and you,",	"if you're not careful"},
  {"Cruncher (BD style):",		"Eats almost everything"},
  {"Robot: Tries to kill the player",	""},
- {"The mole: You must guide him savely","to the exit; he will follow you"},
+ {"The mole: Eats the amoeba and turns","empty space into normal sand"},
  {"The penguin: Guide him to the exit,","but keep him away from monsters!"},
  {"The Pig: Harmless, but eats all",	"gems it can get"},
  {"The Dragon: Breathes fire,",		"especially to some monsters"},
@@ -828,10 +828,10 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   }
 
   if (first_entry > 0)
-    DrawGraphic(0, 1, GFX_PFEIL_O);
+    DrawGraphic(0, 1, GFX_PFEIL_UP);
 
   if (first_entry + num_page_entries < num_leveldirs)
-    DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_PFEIL_U);
+    DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_PFEIL_DOWN);
 }
 
 static void drawChooseLevelInfo(int leveldir_nr)
@@ -1300,8 +1300,8 @@ void DrawSetupInputScreen()
   DrawGraphic(0, 3, GFX_KUGEL_BLAU);
   DrawGraphic(0, 4, GFX_KUGEL_BLAU);
   DrawGraphic(0, 15, GFX_KUGEL_BLAU);
-  DrawGraphic(10, 2, GFX_PFEIL_L);
-  DrawGraphic(12, 2, GFX_PFEIL_R);
+  DrawGraphic(10, 2, GFX_PFEIL_LEFT);
+  DrawGraphic(12, 2, GFX_PFEIL_RIGHT);
 
   DrawText(SX+32, SY+2*32, "Player:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
@@ -1381,10 +1381,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 
   DrawText(SX+32, SY+5*32, "Actual Settings:", FS_BIG, FC_GREEN);
-  DrawGraphic(1, 6, GFX_PFEIL_L);
-  DrawGraphic(1, 7, GFX_PFEIL_R);
-  DrawGraphic(1, 8, GFX_PFEIL_O);
-  DrawGraphic(1, 9, GFX_PFEIL_U);
+  DrawGraphic(1, 6, GFX_PFEIL_LEFT);
+  DrawGraphic(1, 7, GFX_PFEIL_RIGHT);
+  DrawGraphic(1, 8, GFX_PFEIL_UP);
+  DrawGraphic(1, 9, GFX_PFEIL_DOWN);
   DrawText(SX+2*32, SY+6*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+7*32, ":", FS_BIG, FC_BLUE);
   DrawText(SX+2*32, SY+8*32, ":", FS_BIG, FC_BLUE);

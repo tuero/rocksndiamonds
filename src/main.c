@@ -519,8 +519,8 @@ char *element_info[] =
   "invisible sand",
   "dx unknown 15",
   "dx unknown 42",
-  "dx unknown 229",
-  "dx unknown 233",				/* 320 */
+  "-",
+  "-",						/* 320 */
   "force field (active, kills enemies)",
   "-",
   "-",

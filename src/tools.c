@@ -1096,23 +1096,23 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic = GFX2_SP_ELECTRON + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
   }
-  else if (element == EL_MAULWURF || element == EL_PINGUIN ||
+  else if (element == EL_MOLE || element == EL_PINGUIN ||
 	   element == EL_SCHWEIN || element == EL_DRACHE)
   {
     if (dir == MV_LEFT)
-      graphic = (element == EL_MAULWURF ? GFX_MAULWURF_LEFT :
+      graphic = (element == EL_MOLE ? GFX_MOLE_LEFT :
 		 element == EL_PINGUIN ? GFX_PINGUIN_LEFT :
 		 element == EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
     else if (dir == MV_RIGHT)
-      graphic = (element == EL_MAULWURF ? GFX_MAULWURF_RIGHT :
+      graphic = (element == EL_MOLE ? GFX_MOLE_RIGHT :
 		 element == EL_PINGUIN ? GFX_PINGUIN_RIGHT :
 		 element == EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
     else if (dir == MV_UP)
-      graphic = (element == EL_MAULWURF ? GFX_MAULWURF_UP :
+      graphic = (element == EL_MOLE ? GFX_MOLE_UP :
 		 element == EL_PINGUIN ? GFX_PINGUIN_UP :
 		 element == EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
     else
-      graphic = (element == EL_MAULWURF ? GFX_MAULWURF_DOWN :
+      graphic = (element == EL_MOLE ? GFX_MOLE_DOWN :
 		 element == EL_PINGUIN ? GFX_PINGUIN_DOWN :
 		 element == EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
 
@@ -2363,25 +2363,25 @@ int el2gfx(int element)
     case EL_SPIELER3:		return GFX_SPIELER3;
     case EL_SPIELER4:		return GFX_SPIELER4;
     case EL_KAEFER:		return GFX_KAEFER;
-    case EL_KAEFER_R:		return GFX_KAEFER_R;
-    case EL_KAEFER_O:		return GFX_KAEFER_O;
-    case EL_KAEFER_L:		return GFX_KAEFER_L;
-    case EL_KAEFER_U:		return GFX_KAEFER_U;
+    case EL_KAEFER_RIGHT:	return GFX_KAEFER_RIGHT;
+    case EL_KAEFER_UP:		return GFX_KAEFER_UP;
+    case EL_KAEFER_LEFT:	return GFX_KAEFER_LEFT;
+    case EL_KAEFER_DOWN:	return GFX_KAEFER_DOWN;
     case EL_FLIEGER:		return GFX_FLIEGER;
-    case EL_FLIEGER_R:		return GFX_FLIEGER_R;
-    case EL_FLIEGER_O:		return GFX_FLIEGER_O;
-    case EL_FLIEGER_L:		return GFX_FLIEGER_L;
-    case EL_FLIEGER_U:		return GFX_FLIEGER_U;
+    case EL_FLIEGER_RIGHT:	return GFX_FLIEGER_RIGHT;
+    case EL_FLIEGER_UP:		return GFX_FLIEGER_UP;
+    case EL_FLIEGER_LEFT:	return GFX_FLIEGER_LEFT;
+    case EL_FLIEGER_DOWN:	return GFX_FLIEGER_DOWN;
     case EL_BUTTERFLY:		return GFX_BUTTERFLY;
-    case EL_BUTTERFLY_R:	return GFX_BUTTERFLY_R;
-    case EL_BUTTERFLY_O:	return GFX_BUTTERFLY_O;
-    case EL_BUTTERFLY_L:	return GFX_BUTTERFLY_L;
-    case EL_BUTTERFLY_U:	return GFX_BUTTERFLY_U;
+    case EL_BUTTERFLY_RIGHT:	return GFX_BUTTERFLY_RIGHT;
+    case EL_BUTTERFLY_UP:	return GFX_BUTTERFLY_UP;
+    case EL_BUTTERFLY_LEFT:	return GFX_BUTTERFLY_LEFT;
+    case EL_BUTTERFLY_DOWN:	return GFX_BUTTERFLY_DOWN;
     case EL_FIREFLY:		return GFX_FIREFLY;
-    case EL_FIREFLY_R:		return GFX_FIREFLY_R;
-    case EL_FIREFLY_O:		return GFX_FIREFLY_O;
-    case EL_FIREFLY_L:		return GFX_FIREFLY_L;
-    case EL_FIREFLY_U:		return GFX_FIREFLY_U;
+    case EL_FIREFLY_RIGHT:	return GFX_FIREFLY_RIGHT;
+    case EL_FIREFLY_UP:		return GFX_FIREFLY_UP;
+    case EL_FIREFLY_LEFT:	return GFX_FIREFLY_LEFT;
+    case EL_FIREFLY_DOWN:	return GFX_FIREFLY_DOWN;
     case EL_MAMPFER:		return GFX_MAMPFER;
     case EL_ROBOT:		return GFX_ROBOT;
     case EL_BETON:		return GFX_BETON;
@@ -2427,10 +2427,10 @@ int el2gfx(int element)
     case EL_PFORTE4X:		return GFX_PFORTE4X;
     case EL_DYNAMITE_INACTIVE:	return GFX_DYNAMIT_AUS;
     case EL_PACMAN:		return GFX_PACMAN;
-    case EL_PACMAN_R:		return GFX_PACMAN_R;
-    case EL_PACMAN_O:		return GFX_PACMAN_O;
-    case EL_PACMAN_L:		return GFX_PACMAN_L;
-    case EL_PACMAN_U:		return GFX_PACMAN_U;
+    case EL_PACMAN_RIGHT:	return GFX_PACMAN_RIGHT;
+    case EL_PACMAN_UP:		return GFX_PACMAN_UP;
+    case EL_PACMAN_LEFT:	return GFX_PACMAN_LEFT;
+    case EL_PACMAN_DOWN:	return GFX_PACMAN_DOWN;
     case EL_UNSICHTBAR:		return GFX_UNSICHTBAR;
     case EL_ERZ_EDEL:		return GFX_ERZ_EDEL;
     case EL_ERZ_DIAM:		return GFX_ERZ_DIAM;
@@ -2465,15 +2465,15 @@ int el2gfx(int element)
     case EL_SOKOBAN_OBJEKT:	return GFX_SOKOBAN_OBJEKT;
     case EL_SOKOBAN_FELD_LEER:	return GFX_SOKOBAN_FELD_LEER;
     case EL_SOKOBAN_FELD_VOLL:	return GFX_SOKOBAN_FELD_VOLL;
-    case EL_MAULWURF:		return GFX_MAULWURF;
+    case EL_MOLE:		return GFX_MOLE;
     case EL_PINGUIN:		return GFX_PINGUIN;
     case EL_SCHWEIN:		return GFX_SCHWEIN;
     case EL_DRACHE:		return GFX_DRACHE;
     case EL_SONDE:		return GFX_SONDE;
-    case EL_PFEIL_L:		return GFX_PFEIL_L;
-    case EL_PFEIL_R:		return GFX_PFEIL_R;
-    case EL_PFEIL_O:		return GFX_PFEIL_O;
-    case EL_PFEIL_U:		return GFX_PFEIL_U;
+    case EL_PFEIL_LEFT:		return GFX_PFEIL_LEFT;
+    case EL_PFEIL_RIGHT:	return GFX_PFEIL_RIGHT;
+    case EL_PFEIL_UP:		return GFX_PFEIL_UP;
+    case EL_PFEIL_DOWN:		return GFX_PFEIL_DOWN;
     case EL_SPEED_PILL:		return GFX_SPEED_PILL;
     case EL_SP_TERMINAL_ACTIVE:	return GFX_SP_TERMINAL;
     case EL_SP_BUG_ACTIVE:	return GFX_SP_BUG_ACTIVE;
@@ -2516,27 +2516,27 @@ int el2gfx(int element)
     case EL_BELT1_LEFT:		return GFX_BELT1_LEFT;
     case EL_BELT1_MIDDLE:	return GFX_BELT1_MIDDLE;
     case EL_BELT1_RIGHT:	return GFX_BELT1_RIGHT;
-    case EL_BELT1_SWITCH_L:	return GFX_BELT1_SWITCH_L;
-    case EL_BELT1_SWITCH_M:	return GFX_BELT1_SWITCH_M;
-    case EL_BELT1_SWITCH_R:	return GFX_BELT1_SWITCH_R;
+    case EL_BELT1_SWITCH_LEFT:	return GFX_BELT1_SWITCH_LEFT;
+    case EL_BELT1_SWITCH_MIDDLE:return GFX_BELT1_SWITCH_MIDDLE;
+    case EL_BELT1_SWITCH_RIGHT:	return GFX_BELT1_SWITCH_RIGHT;
     case EL_BELT2_LEFT:		return GFX_BELT2_LEFT;
     case EL_BELT2_MIDDLE:	return GFX_BELT2_MIDDLE;
     case EL_BELT2_RIGHT:	return GFX_BELT2_RIGHT;
-    case EL_BELT2_SWITCH_L:	return GFX_BELT2_SWITCH_L;
-    case EL_BELT2_SWITCH_M:	return GFX_BELT2_SWITCH_M;
-    case EL_BELT2_SWITCH_R:	return GFX_BELT2_SWITCH_R;
+    case EL_BELT2_SWITCH_LEFT:	return GFX_BELT2_SWITCH_LEFT;
+    case EL_BELT2_SWITCH_MIDDLE:return GFX_BELT2_SWITCH_MIDDLE;
+    case EL_BELT2_SWITCH_RIGHT:	return GFX_BELT2_SWITCH_RIGHT;
     case EL_BELT3_LEFT:		return GFX_BELT3_LEFT;
     case EL_BELT3_MIDDLE:	return GFX_BELT3_MIDDLE;
     case EL_BELT3_RIGHT:	return GFX_BELT3_RIGHT;
-    case EL_BELT3_SWITCH_L:	return GFX_BELT3_SWITCH_L;
-    case EL_BELT3_SWITCH_M:	return GFX_BELT3_SWITCH_M;
-    case EL_BELT3_SWITCH_R:	return GFX_BELT3_SWITCH_R;
+    case EL_BELT3_SWITCH_LEFT:	return GFX_BELT3_SWITCH_LEFT;
+    case EL_BELT3_SWITCH_MIDDLE:return GFX_BELT3_SWITCH_MIDDLE;
+    case EL_BELT3_SWITCH_RIGHT:	return GFX_BELT3_SWITCH_RIGHT;
     case EL_BELT4_LEFT:		return GFX_BELT4_LEFT;
     case EL_BELT4_MIDDLE:	return GFX_BELT4_MIDDLE;
     case EL_BELT4_RIGHT:	return GFX_BELT4_RIGHT;
-    case EL_BELT4_SWITCH_L:	return GFX_BELT4_SWITCH_L;
-    case EL_BELT4_SWITCH_M:	return GFX_BELT4_SWITCH_M;
-    case EL_BELT4_SWITCH_R:	return GFX_BELT4_SWITCH_R;
+    case EL_BELT4_SWITCH_LEFT:	return GFX_BELT4_SWITCH_LEFT;
+    case EL_BELT4_SWITCH_MIDDLE:return GFX_BELT4_SWITCH_MIDDLE;
+    case EL_BELT4_SWITCH_RIGHT:	return GFX_BELT4_SWITCH_RIGHT;
     case EL_LANDMINE:		return GFX_LANDMINE;
     case EL_ENVELOPE:		return GFX_ENVELOPE;
     case EL_LIGHT_SWITCH_OFF:	return GFX_LIGHT_SWITCH_OFF;
@@ -2561,8 +2561,6 @@ int el2gfx(int element)
     case EL_SAND_INVISIBLE:	return GFX_SAND_INVISIBLE;
     case EL_DX_UNKNOWN_15:	return GFX_DX_UNKNOWN_15;
     case EL_DX_UNKNOWN_42:	return GFX_DX_UNKNOWN_42;
-    case EL_DX_UNKNOWN_229:	return GFX_DX_UNKNOWN_229;
-    case EL_DX_UNKNOWN_233:	return GFX_DX_UNKNOWN_233;
 
     default:
     {

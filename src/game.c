@@ -189,19 +189,19 @@ static int getBeltNrFromElement(int element)
 
 static int getBeltNrFromSwitchElement(int element)
 {
-  return (element < EL_BELT2_SWITCH_L ? 0 :
-	  element < EL_BELT3_SWITCH_L ? 1 :
-	  element < EL_BELT4_SWITCH_L ? 2 : 3);
+  return (element < EL_BELT2_SWITCH_LEFT ? 0 :
+	  element < EL_BELT3_SWITCH_LEFT ? 1 :
+	  element < EL_BELT4_SWITCH_LEFT ? 2 : 3);
 }
 
 static int getBeltDirNrFromSwitchElement(int element)
 {
   static int belt_base_element[4] =
   {
-    EL_BELT1_SWITCH_L,
-    EL_BELT2_SWITCH_L,
-    EL_BELT3_SWITCH_L,
-    EL_BELT4_SWITCH_L
+    EL_BELT1_SWITCH_LEFT,
+    EL_BELT2_SWITCH_LEFT,
+    EL_BELT3_SWITCH_LEFT,
+    EL_BELT4_SWITCH_LEFT
   };
 
   int belt_nr = getBeltNrFromSwitchElement(element);
@@ -282,36 +282,41 @@ static void InitField(int x, int y, boolean init_game)
 	Feld[x][y] = EL_BADEWANNE5;
       break;
 
-    case EL_KAEFER_R:
-    case EL_KAEFER_O:
-    case EL_KAEFER_L:
-    case EL_KAEFER_U:
+    case EL_KAEFER_RIGHT:
+    case EL_KAEFER_UP:
+    case EL_KAEFER_LEFT:
+    case EL_KAEFER_DOWN:
     case EL_KAEFER:
-    case EL_FLIEGER_R:
-    case EL_FLIEGER_O:
-    case EL_FLIEGER_L:
-    case EL_FLIEGER_U:
+    case EL_FLIEGER_RIGHT:
+    case EL_FLIEGER_UP:
+    case EL_FLIEGER_LEFT:
+    case EL_FLIEGER_DOWN:
     case EL_FLIEGER:
-    case EL_BUTTERFLY_R:
-    case EL_BUTTERFLY_O:
-    case EL_BUTTERFLY_L:
-    case EL_BUTTERFLY_U:
+    case EL_BUTTERFLY_RIGHT:
+    case EL_BUTTERFLY_UP:
+    case EL_BUTTERFLY_LEFT:
+    case EL_BUTTERFLY_DOWN:
     case EL_BUTTERFLY:
-    case EL_FIREFLY_R:
-    case EL_FIREFLY_O:
-    case EL_FIREFLY_L:
-    case EL_FIREFLY_U:
+    case EL_FIREFLY_RIGHT:
+    case EL_FIREFLY_UP:
+    case EL_FIREFLY_LEFT:
+    case EL_FIREFLY_DOWN:
     case EL_FIREFLY:
-    case EL_PACMAN_R:
-    case EL_PACMAN_O:
-    case EL_PACMAN_L:
-    case EL_PACMAN_U:
+    case EL_PACMAN_RIGHT:
+    case EL_PACMAN_UP:
+    case EL_PACMAN_LEFT:
+    case EL_PACMAN_DOWN:
     case EL_MAMPFER:
     case EL_MAMPFER2:
     case EL_ROBOT:
     case EL_PACMAN:
     case EL_SP_SNIKSNAK:
     case EL_SP_ELECTRON:
+    case EL_MOLE_LEFT:
+    case EL_MOLE_RIGHT:
+    case EL_MOLE_UP:
+    case EL_MOLE_DOWN:
+    case EL_MOLE:
       InitMovDir(x, y);
       break;
 
@@ -340,7 +345,6 @@ static void InitField(int x, int y, boolean init_game)
       local_player->sokobanfields_still_needed++;
       break;
 
-    case EL_MAULWURF:
     case EL_PINGUIN:
       local_player->friends_still_needed++;
       break;
@@ -367,18 +371,18 @@ static void InitField(int x, int y, boolean init_game)
       Feld[x][y] = EL_EM_KEY_4;
       break;
 
-    case EL_BELT1_SWITCH_L:
-    case EL_BELT1_SWITCH_M:
-    case EL_BELT1_SWITCH_R:
-    case EL_BELT2_SWITCH_L:
-    case EL_BELT2_SWITCH_M:
-    case EL_BELT2_SWITCH_R:
-    case EL_BELT3_SWITCH_L:
-    case EL_BELT3_SWITCH_M:
-    case EL_BELT3_SWITCH_R:
-    case EL_BELT4_SWITCH_L:
-    case EL_BELT4_SWITCH_M:
-    case EL_BELT4_SWITCH_R:
+    case EL_BELT1_SWITCH_LEFT:
+    case EL_BELT1_SWITCH_MIDDLE:
+    case EL_BELT1_SWITCH_RIGHT:
+    case EL_BELT2_SWITCH_LEFT:
+    case EL_BELT2_SWITCH_MIDDLE:
+    case EL_BELT2_SWITCH_RIGHT:
+    case EL_BELT3_SWITCH_LEFT:
+    case EL_BELT3_SWITCH_MIDDLE:
+    case EL_BELT3_SWITCH_RIGHT:
+    case EL_BELT4_SWITCH_LEFT:
+    case EL_BELT4_SWITCH_MIDDLE:
+    case EL_BELT4_SWITCH_RIGHT:
       if (init_game)
       {
 	int belt_nr = getBeltNrFromSwitchElement(Feld[x][y]);
@@ -760,52 +764,53 @@ void InitMovDir(int x, int y)
     {  0, -1 },
     { -1,  0 }
   };
-  static int direction[2][4] =
+  static int direction[3][4] =
   {
     { MV_RIGHT, MV_UP,   MV_LEFT,  MV_DOWN },
-    { MV_LEFT,  MV_DOWN, MV_RIGHT, MV_UP }
+    { MV_LEFT,  MV_DOWN, MV_RIGHT, MV_UP },
+    { MV_LEFT,  MV_RIGHT, MV_UP, MV_DOWN }
   };
 
   switch(element)
   {
-    case EL_KAEFER_R:
-    case EL_KAEFER_O:
-    case EL_KAEFER_L:
-    case EL_KAEFER_U:
+    case EL_KAEFER_RIGHT:
+    case EL_KAEFER_UP:
+    case EL_KAEFER_LEFT:
+    case EL_KAEFER_DOWN:
       Feld[x][y] = EL_KAEFER;
-      MovDir[x][y] = direction[0][element - EL_KAEFER_R];
+      MovDir[x][y] = direction[0][element - EL_KAEFER_RIGHT];
       break;
 
-    case EL_FLIEGER_R:
-    case EL_FLIEGER_O:
-    case EL_FLIEGER_L:
-    case EL_FLIEGER_U:
+    case EL_FLIEGER_RIGHT:
+    case EL_FLIEGER_UP:
+    case EL_FLIEGER_LEFT:
+    case EL_FLIEGER_DOWN:
       Feld[x][y] = EL_FLIEGER;
-      MovDir[x][y] = direction[0][element - EL_FLIEGER_R];
+      MovDir[x][y] = direction[0][element - EL_FLIEGER_RIGHT];
       break;
 
-    case EL_BUTTERFLY_R:
-    case EL_BUTTERFLY_O:
-    case EL_BUTTERFLY_L:
-    case EL_BUTTERFLY_U:
+    case EL_BUTTERFLY_RIGHT:
+    case EL_BUTTERFLY_UP:
+    case EL_BUTTERFLY_LEFT:
+    case EL_BUTTERFLY_DOWN:
       Feld[x][y] = EL_BUTTERFLY;
-      MovDir[x][y] = direction[0][element - EL_BUTTERFLY_R];
+      MovDir[x][y] = direction[0][element - EL_BUTTERFLY_RIGHT];
       break;
 
-    case EL_FIREFLY_R:
-    case EL_FIREFLY_O:
-    case EL_FIREFLY_L:
-    case EL_FIREFLY_U:
+    case EL_FIREFLY_RIGHT:
+    case EL_FIREFLY_UP:
+    case EL_FIREFLY_LEFT:
+    case EL_FIREFLY_DOWN:
       Feld[x][y] = EL_FIREFLY;
-      MovDir[x][y] = direction[0][element - EL_FIREFLY_R];
+      MovDir[x][y] = direction[0][element - EL_FIREFLY_RIGHT];
       break;
 
-    case EL_PACMAN_R:
-    case EL_PACMAN_O:
-    case EL_PACMAN_L:
-    case EL_PACMAN_U:
+    case EL_PACMAN_RIGHT:
+    case EL_PACMAN_UP:
+    case EL_PACMAN_LEFT:
+    case EL_PACMAN_DOWN:
       Feld[x][y] = EL_PACMAN;
-      MovDir[x][y] = direction[0][element - EL_PACMAN_R];
+      MovDir[x][y] = direction[0][element - EL_PACMAN_RIGHT];
       break;
 
     case EL_SP_SNIKSNAK:
@@ -814,6 +819,14 @@ void InitMovDir(int x, int y)
 
     case EL_SP_ELECTRON:
       MovDir[x][y] = MV_LEFT;
+      break;
+
+    case EL_MOLE_LEFT:
+    case EL_MOLE_RIGHT:
+    case EL_MOLE_UP:
+    case EL_MOLE_DOWN:
+      Feld[x][y] = EL_MOLE;
+      MovDir[x][y] = direction[2][element - EL_MOLE_LEFT];
       break;
 
     default:
@@ -1281,7 +1294,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	if (game.emulation == EMU_SUPAPLEX)
 	  Store[x][y] = EL_LEERRAUM;
       }
-      else if (center_element == EL_MAULWURF)
+      else if (center_element == EL_MOLE)
 	Store[x][y] = EL_EDELSTEIN_ROT;
       else if (center_element == EL_PINGUIN)
 	Store[x][y] = EL_EDELSTEIN_LILA;
@@ -1475,6 +1488,7 @@ void Bang(int x, int y)
     case EL_MAMPFER2:
     case EL_ROBOT:
     case EL_PACMAN:
+    case EL_MOLE:
       RaiseScoreElement(element);
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
       break;
@@ -1487,7 +1501,6 @@ void Bang(int x, int y)
     case EL_DYNABOMB_XL:
       DynaExplode(x, y);
       break;
-    case EL_MAULWURF:
     case EL_PINGUIN:
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
@@ -1548,10 +1561,10 @@ static void ToggleBeltSwitch(int x, int y)
 {
   static int belt_base_element[4] =
   {
-    EL_BELT1_SWITCH_L,
-    EL_BELT2_SWITCH_L,
-    EL_BELT3_SWITCH_L,
-    EL_BELT4_SWITCH_L
+    EL_BELT1_SWITCH_LEFT,
+    EL_BELT2_SWITCH_LEFT,
+    EL_BELT3_SWITCH_LEFT,
+    EL_BELT4_SWITCH_LEFT
   };
   static int belt_move_dir[4] =
   {
@@ -1708,7 +1721,7 @@ void Impact(int x, int y)
   {
     if (object_hit && IS_PLAYER(x, y+1))
       KillHeroUnlessForceField(PLAYERINFO(x, y+1));
-    else if (object_hit && (smashed == EL_MAULWURF || smashed == EL_PINGUIN))
+    else if (object_hit && smashed == EL_PINGUIN)
       Bang(x, y+1);
     else
     {
@@ -1743,7 +1756,7 @@ void Impact(int x, int y)
       KillHeroUnlessForceField(PLAYERINFO(x, y+1));
       return;
     }
-    else if (smashed == EL_MAULWURF || smashed == EL_PINGUIN)
+    else if (smashed == EL_PINGUIN)
     {
       Bang(x, y+1);
       return;
@@ -1760,7 +1773,8 @@ void Impact(int x, int y)
     {
       if (IS_ENEMY(smashed) ||
 	  smashed == EL_BOMBE || smashed == EL_SP_DISK_ORANGE ||
-	  smashed == EL_SONDE || smashed == EL_SCHWEIN || smashed == EL_DRACHE)
+	  smashed == EL_SONDE || smashed == EL_SCHWEIN ||
+	  smashed == EL_DRACHE || smashed == EL_MOLE)
       {
 	Bang(x, y+1);
 	return;
@@ -2113,8 +2127,36 @@ void TurnRound(int x, int y)
 
     MovDelay[x][y] = 0;
   }
-  else if (element == EL_ROBOT || element == EL_SONDE ||
-	   element == EL_MAULWURF || element == EL_PINGUIN)
+  else if (element == EL_MOLE)
+  {
+    boolean can_turn_left = FALSE, can_turn_right = FALSE, can_move_on = FALSE;
+
+    if (IN_LEV_FIELD(move_x, move_y) &&
+	(IS_FREE(move_x, move_y) || IS_AMOEBOID(Feld[move_x][move_y]) ||
+	 Feld[move_x][move_y] == EL_DEAMOEBING))
+      can_move_on = TRUE;
+
+    if (!can_move_on)
+    {
+      if (IN_LEV_FIELD(left_x, left_y) &&
+	  (IS_FREE(left_x, left_y) || IS_AMOEBOID(Feld[left_x][left_y])))
+	can_turn_left = TRUE;
+      if (IN_LEV_FIELD(right_x, right_y) &&
+	  (IS_FREE(right_x, right_y) || IS_AMOEBOID(Feld[right_x][right_y])))
+	can_turn_right = TRUE;
+
+      if (can_turn_left && can_turn_right)
+	MovDir[x][y] = (RND(2) ? left_dir : right_dir);
+      else if (can_turn_left)
+	MovDir[x][y] = left_dir;
+      else
+	MovDir[x][y] = right_dir;
+    }
+
+    if (MovDir[x][y] != old_move_dir)
+      MovDelay[x][y] = 9;
+  }
+  else if (element == EL_ROBOT || element == EL_SONDE || element == EL_PINGUIN)
   {
     int attr_x = -1, attr_y = -1;
 
@@ -2149,7 +2191,7 @@ void TurnRound(int x, int y)
       attr_y = ZY;
     }
 
-    if (element == EL_MAULWURF || element == EL_PINGUIN)
+    if (element == EL_PINGUIN)
     {
       int i;
       static int xy[4][2] =
@@ -2215,7 +2257,7 @@ void TurnRound(int x, int y)
 	if (IN_LEV_FIELD(newx, newy) &&
 	    (IS_FREE(newx, newy) ||
 	     Feld[newx][newy] == EL_SALZSAEURE ||
-	     ((element == EL_MAULWURF || element == EL_PINGUIN) &&
+	     (element == EL_PINGUIN &&
 	      (Feld[newx][newy] == EL_AUSGANG_AUF ||
 	       IS_MAMPF3(Feld[newx][newy])))))
 	  return;
@@ -2227,7 +2269,7 @@ void TurnRound(int x, int y)
 	if (IN_LEV_FIELD(newx, newy) &&
 	    (IS_FREE(newx, newy) ||
 	     Feld[newx][newy] == EL_SALZSAEURE ||
-	     ((element == EL_MAULWURF || element == EL_PINGUIN) &&
+	     (element == EL_PINGUIN &&
 	      (Feld[newx][newy] == EL_AUSGANG_AUF ||
 	       IS_MAMPF3(Feld[newx][newy])))))
 	  return;
@@ -2429,9 +2471,11 @@ void StartMoving(int x, int y)
       if (element!=EL_MAMPFER && element!=EL_MAMPFER2 && element!=EL_PACMAN)
       {
 	TurnRound(x, y);
-	if (MovDelay[x][y] && (element == EL_KAEFER || element == EL_FLIEGER ||
+	if (MovDelay[x][y] && (element == EL_KAEFER ||
+			       element == EL_FLIEGER ||
 			       element == EL_SP_SNIKSNAK ||
-			       element == EL_SP_ELECTRON))
+			       element == EL_SP_ELECTRON ||
+			       element == EL_MOLE))
 	  DrawLevelField(x, y);
       }
     }
@@ -2532,7 +2576,7 @@ void StartMoving(int x, int y)
 #endif
 
     }
-    else if ((element == EL_MAULWURF || element == EL_PINGUIN ||
+    else if ((element == EL_PINGUIN ||
 	      element == EL_ROBOT || element == EL_SONDE) &&
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_SALZSAEURE)
@@ -2540,8 +2584,7 @@ void StartMoving(int x, int y)
       Blurb(x, y);
       Store[x][y] = EL_SALZSAEURE;
     }
-    else if ((element == EL_MAULWURF || element == EL_PINGUIN) &&
-	     IN_LEV_FIELD(newx, newy))
+    else if (element == EL_PINGUIN && IN_LEV_FIELD(newx, newy))
     {
       if (Feld[newx][newy] == EL_AUSGANG_AUF)
       {
@@ -2666,8 +2709,8 @@ void StartMoving(int x, int y)
 	DrawLevelField(newx, newy);
       }
     }
-    else if (element == EL_PACMAN && IN_LEV_FIELD(newx, newy) &&
-	     IS_AMOEBOID(Feld[newx][newy]))
+    else if ((element == EL_PACMAN || element == EL_MOLE)
+	     && IN_LEV_FIELD(newx, newy) && IS_AMOEBOID(Feld[newx][newy]))
     {
       if (AmoebaNr[newx][newy])
       {
@@ -2677,8 +2720,24 @@ void StartMoving(int x, int y)
 	  AmoebaCnt[AmoebaNr[newx][newy]]--;
       }
 
-      Feld[newx][newy] = EL_LEERRAUM;
-      DrawLevelField(newx, newy);
+      if (element == EL_MOLE)
+      {
+	Feld[newx][newy] = EL_DEAMOEBING;
+	MovDelay[newx][newy] = 0;	/* start amoeba shrinking delay */
+	return;				/* wait for shrinking amoeba */
+      }
+      else	/* element == EL_PACMAN */
+      {
+	Feld[newx][newy] = EL_LEERRAUM;
+	DrawLevelField(newx, newy);
+      }
+    }
+    else if (element == EL_MOLE && IN_LEV_FIELD(newx, newy) &&
+	     (Feld[newx][newy] == EL_DEAMOEBING ||
+	      (Feld[newx][newy] == EL_LEERRAUM && Stop[newx][newy])))
+    {
+      /* wait for shrinking amoeba to completely disappear */
+      return;
     }
     else if (!IN_LEV_FIELD(newx, newy) || !IS_FREE(newx, newy))
     {
@@ -2687,7 +2746,7 @@ void StartMoving(int x, int y)
       TurnRound(x, y);
 
       if (element == EL_KAEFER || element == EL_FLIEGER ||
-	  element == EL_SP_SNIKSNAK)
+	  element == EL_SP_SNIKSNAK || element == EL_MOLE)
 	DrawLevelField(x, y);
       else if (element == EL_BUTTERFLY || element == EL_FIREFLY)
 	DrawGraphicAnimation(x, y, el2gfx(element), 2, 4, ANIM_NORMAL);
@@ -2738,6 +2797,32 @@ void ContinueMoving(int x, int y)
   {
     Feld[x][y] = EL_LEERRAUM;
     Feld[newx][newy] = element;
+
+    if (element == EL_MOLE)
+    {
+      int i;
+      static int xy[4][2] =
+      {
+	{ 0, -1 },
+	{ -1, 0 },
+	{ +1, 0 },
+	{ 0, +1 }
+      };
+
+      Feld[x][y] = EL_ERDREICH;
+      DrawLevelField(x, y);
+
+      for(i=0; i<4; i++)
+      {
+	int xx, yy;
+
+	xx = x + xy[i][0];
+	yy = y + xy[i][1];
+
+	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_ERDREICH)
+	  DrawLevelField(xx, yy);	/* for "ErdreichAnbroeckeln()" */
+      }
+    }
 
     if (Store[x][y] == EL_MORAST_VOLL)
     {
@@ -3010,6 +3095,40 @@ void AmoebeWaechst(int x, int y)
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
       DrawLevelField(x, y);
+    }
+  }
+}
+
+void AmoebeSchrumpft(int x, int y)
+{
+  static unsigned long sound_delay = 0;
+  static unsigned long sound_delay_value = 0;
+
+  if (!MovDelay[x][y])		/* start new shrinking cycle */
+  {
+    MovDelay[x][y] = 7;
+
+    if (DelayReached(&sound_delay, sound_delay_value))
+    {
+      PlaySoundLevel(x, y, SND_BLURB);
+      sound_delay_value = 30;
+    }
+  }
+
+  if (MovDelay[x][y])		/* wait some time before shrinking */
+  {
+    MovDelay[x][y]--;
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y), GFX_AMOEBING + MovDelay[x][y]/2);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_LEERRAUM;
+      DrawLevelField(x, y);
+
+      /* don't let mole enter this field in this cycle;
+	 (give priority to objects falling to this field from above) */
+      Stop[x][y] = TRUE;
     }
   }
 }
@@ -3965,6 +4084,8 @@ void GameActions()
       Explode(x, y, Frame[x][y], EX_NORMAL);
     else if (element == EL_AMOEBING)
       AmoebeWaechst(x, y);
+    else if (element == EL_DEAMOEBING)
+      AmoebeSchrumpft(x, y);
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
     else if (element == EL_LIFE || element == EL_LIFE_ASYNC)
@@ -4976,18 +5097,18 @@ int DigField(struct PlayerInfo *player,
       }
       break;
 
-    case EL_BELT1_SWITCH_L:
-    case EL_BELT1_SWITCH_M:
-    case EL_BELT1_SWITCH_R:
-    case EL_BELT2_SWITCH_L:
-    case EL_BELT2_SWITCH_M:
-    case EL_BELT2_SWITCH_R:
-    case EL_BELT3_SWITCH_L:
-    case EL_BELT3_SWITCH_M:
-    case EL_BELT3_SWITCH_R:
-    case EL_BELT4_SWITCH_L:
-    case EL_BELT4_SWITCH_M:
-    case EL_BELT4_SWITCH_R:
+    case EL_BELT1_SWITCH_LEFT:
+    case EL_BELT1_SWITCH_MIDDLE:
+    case EL_BELT1_SWITCH_RIGHT:
+    case EL_BELT2_SWITCH_LEFT:
+    case EL_BELT2_SWITCH_MIDDLE:
+    case EL_BELT2_SWITCH_RIGHT:
+    case EL_BELT3_SWITCH_LEFT:
+    case EL_BELT3_SWITCH_MIDDLE:
+    case EL_BELT3_SWITCH_RIGHT:
+    case EL_BELT4_SWITCH_LEFT:
+    case EL_BELT4_SWITCH_MIDDLE:
+    case EL_BELT4_SWITCH_RIGHT:
       if (!player->Switching)
       {
 	player->Switching = TRUE;
@@ -5279,7 +5400,6 @@ int DigField(struct PlayerInfo *player,
 
       break;
 
-    case EL_MAULWURF:
     case EL_PINGUIN:
     case EL_SCHWEIN:
     case EL_DRACHE:
