@@ -125,7 +125,6 @@ SRCS =	main.c		\
 	editor.c	\
 	files.c		\
 	tape.c		\
-	joystick.c	\
 	cartoons.c	\
 	network.c	\
 	netserv.c
@@ -139,7 +138,6 @@ OBJS =	main.o		\
 	editor.o	\
 	files.o		\
 	tape.o		\
-	joystick.o	\
 	cartoons.o	\
 	network.o	\
 	netserv.o

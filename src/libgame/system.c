@@ -22,6 +22,7 @@
 
 #include "system.h"
 #include "sound.h"
+#include "setup.h"
 #include "misc.h"
 
 
@@ -34,26 +35,29 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+struct JoystickInfo	joystick;
+struct SetupInfo	setup;
 
 struct LevelDirInfo    *leveldir_first = NULL;
 struct LevelDirInfo    *leveldir_current = NULL;
+int			level_nr;
 
-Display        *display = NULL;
-Visual	       *visual = NULL;
-int		screen = 0;
-Colormap	cmap = None;
+Display		       *display = NULL;
+Visual		       *visual = NULL;
+int			screen = 0;
+Colormap		cmap = None;
 
-DrawWindow     *window = NULL;
-DrawBuffer     *backbuffer = NULL;
-DrawBuffer     *drawto = NULL;
+DrawWindow	       *window = NULL;
+DrawBuffer	       *backbuffer = NULL;
+DrawBuffer	       *drawto = NULL;
 
-int		button_status = MB_NOT_PRESSED;
-boolean		motion_status = FALSE;
+int			button_status = MB_NOT_PRESSED;
+boolean			motion_status = FALSE;
 
-int		redraw_mask = REDRAW_NONE;
-int		redraw_tiles = 0;
+int			redraw_mask = REDRAW_NONE;
+int			redraw_tiles = 0;
 
-int		FrameCounter = 0;
+int			FrameCounter = 0;
 
 
 /* ========================================================================= */

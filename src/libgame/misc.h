@@ -59,31 +59,6 @@
 #define MAX_FILENAME_LEN		256
 #define MAX_LINE_LEN			1000
 
-/* values for setup file stuff */
-#define TYPE_BOOLEAN			1
-#define TYPE_SWITCH			2
-#define TYPE_KEY			3
-#define TYPE_INTEGER			4
-#define TYPE_STRING			5
-
-#define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
-
-#define TOKEN_VALUE_POSITION		30
-
-struct SetupFileList
-{
-  char *token;
-  char *value;
-  struct SetupFileList *next;
-};
-
-struct TokenInfo
-{
-  int type;
-  void *value;
-  char *text;
-};
-
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);
@@ -106,6 +81,9 @@ void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
+inline void swap_numbers(int *, int *);
+inline void swap_number_pairs(int *, int *, int *, int *);
+
 short getFile16BitInteger(FILE *, int);
 void putFile16BitInteger(FILE *, short, int);
 int getFile32BitInteger(FILE *, int);
@@ -119,42 +97,6 @@ char *getKeyNameFromKey(Key);
 char *getX11KeyNameFromKey(Key);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
-char *getJoyNameFromJoySymbol(int);
-int getJoySymbolFromJoyName(char *);
-int getJoystickNrFromDeviceName(char *);
-
-struct LevelDirInfo *newLevelDirInfo();
-void pushLevelDirInfo(struct LevelDirInfo **, struct LevelDirInfo *);
-int numLevelDirInfo(struct LevelDirInfo *);
-boolean validLevelSeries(struct LevelDirInfo *);
-struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *);
-struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *);
-int numLevelDirInfoInGroup(struct LevelDirInfo *);
-int posLevelDirInfo(struct LevelDirInfo *);
-struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *, int);
-struct LevelDirInfo *getLevelDirInfoFromFilename(char *);
-void dumpLevelDirInfo(struct LevelDirInfo *, int);
-void sortLevelDirInfo(struct LevelDirInfo **,
-		      int (*compare_function)(const void *, const void *));
-
-inline void swap_numbers(int *, int *);
-inline void swap_number_pairs(int *, int *, int *, int *);
-
-char *getUserDataDir(void);
-char *getSetupDir(void);
-void createDirectory(char *, char *, int);
-void InitUserDataDirectory(void);
-void SetFilePermissions(char *, int);
-int getFileVersionFromCookieString(const char *);
-boolean checkCookieString(const char *, const char *);
-
-int get_string_integer_value(char *);
-boolean get_string_boolean_value(char *);
-char *getFormattedSetupEntry(char *, char *);
-void freeSetupFileList(struct SetupFileList *);
-char *getTokenValue(struct SetupFileList *, char *);
-struct SetupFileList *loadSetupFileList(char *);
-void checkSetupFileListIdentifier(struct SetupFileList *, char *);
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();

@@ -17,7 +17,6 @@
 #include "init.h"
 #include "game.h"
 #include "events.h"
-#include "joystick.h"
 
 GC		tile_clip_gc;
 Bitmap	       *pix[NUM_BITMAPS];
@@ -25,22 +24,12 @@ Pixmap		tile_clipmask[NUM_TILES];
 DrawBuffer     *fieldbuffer;
 DrawBuffer     *drawto_field;
 
-int		joystick_device = 0;
-char	       *joystick_device_name[MAX_PLAYERS] =
-{
-  DEV_JOYSTICK_0,
-  DEV_JOYSTICK_1,
-  DEV_JOYSTICK_2,
-  DEV_JOYSTICK_3
-};
-
 int		game_status = MAINMENU;
 boolean		level_editor_test_game = FALSE;
 boolean		network_playing = FALSE;
 
 int		key_joystick_mapping = 0;
 int	    	global_joystick_status = JOYSTICK_STATUS;
-int	    	joystick_status = JOYSTICK_STATUS;
 
 boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;
@@ -62,7 +51,6 @@ short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-int		level_nr;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		FX = SX, FY = SY, ScrollStepSize;

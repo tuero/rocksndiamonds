@@ -21,7 +21,6 @@
 #include "tape.h"
 #include "tools.h"
 #include "files.h"
-#include "joystick.h"
 #include "network.h"
 #include "netserv.h"
 
@@ -84,10 +83,7 @@ void InitPlayerInfo()
   local_player = &stored_player[0];
 
   for (i=0; i<MAX_PLAYERS; i++)
-  {
-    stored_player[i].joystick_fd = -1;	/* joystick device closed */
     stored_player[i].connected = FALSE;
-  }
 
   local_player->connected = TRUE;
 
@@ -155,10 +151,13 @@ void InitJoysticks()
 
   int i;
 
-  if (global_joystick_status == JOYSTICK_OFF)
-    return;
+  /* always start with reliable default values */
+  joystick.status = JOYSTICK_NOT_AVAILABLE;
+  for (i=0; i<MAX_PLAYERS; i++)
+    joystick.fd[i] = -1;		/* joystick device closed */
 
-  joystick_status = JOYSTICK_OFF;
+  if (global_joystick_status == JOYSTICK_NOT_AVAILABLE)
+    return;
 
 #if defined(TARGET_SDL)
 
@@ -182,7 +181,7 @@ void InitJoysticks()
       joystick_nr = -1;
 
     /* misuse joystick file descriptor variable to store joystick number */
-    stored_player[i].joystick_fd = joystick_nr;
+    joystick.fd[i] = joystick_nr;
 
     /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
     if (Check_SDL_JoystickOpened(joystick_nr))
@@ -197,7 +196,7 @@ void InitJoysticks()
       continue;
     }
 
-    joystick_status = JOYSTICK_AVAILABLE;
+    joystick.status = JOYSTICK_ACTIVATED;
   }
 
 #else /* !TARGET_SDL */
@@ -208,10 +207,10 @@ void InitJoysticks()
     char *device_name = setup.input[i].joy.device_name;
 
     /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
-    if (stored_player[i].joystick_fd != -1)
+    if (joystick.fd[i] != -1)
     {
-      close(stored_player[i].joystick_fd);
-      stored_player[i].joystick_fd = -1;
+      close(joystick.fd[i]);
+      joystick.fd[i] = -1;
     }
 
     if (!setup.input[i].use_joystick)
@@ -223,13 +222,13 @@ void InitJoysticks()
       continue;
     }
 
-    if ((stored_player[i].joystick_fd = open(device_name, O_RDONLY)) < 0)
+    if ((joystick.fd[i] = open(device_name, O_RDONLY)) < 0)
     {
       Error(ERR_WARN, "cannot open joystick device '%s'", device_name);
       continue;
     }
 
-    joystick_status = JOYSTICK_AVAILABLE;
+    joystick.status = JOYSTICK_ACTIVATED;
   }
 
 #else /* !PLATFORM_UNIX */
@@ -237,7 +236,7 @@ void InitJoysticks()
   /* try to access two joysticks; if that fails, try to access just one */
   if (install_joystick(JOY_TYPE_2PADS) == 0 ||
       install_joystick(JOY_TYPE_AUTODETECT) == 0)
-    joystick_status = JOYSTICK_AVAILABLE;
+    joystick.status = JOYSTICK_ACTIVATED;
 
   /*
   load_joystick_data(JOYSTICK_FILENAME);
@@ -252,7 +251,7 @@ void InitJoysticks()
       joystick_nr = -1;
 
     /* misuse joystick file descriptor variable to store joystick number */
-    stored_player[i].joystick_fd = joystick_nr;
+    joystick.fd[i] = joystick_nr;
   }
 #endif
 

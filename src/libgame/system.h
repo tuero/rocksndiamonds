@@ -40,7 +40,24 @@
 #define FULLSCREEN_NOT_AVAILABLE FALSE
 #define FULLSCREEN_AVAILABLE	 TRUE
 
-/* values for button_status */
+/* default input keys */
+#define DEFAULT_KEY_LEFT	KSYM_Left
+#define DEFAULT_KEY_RIGHT	KSYM_Right
+#define DEFAULT_KEY_UP		KSYM_Up
+#define DEFAULT_KEY_DOWN	KSYM_Down
+#define DEFAULT_KEY_SNAP	KSYM_Shift_L
+#define DEFAULT_KEY_BOMB	KSYM_Shift_R
+#define DEFAULT_KEY_OKAY	KSYM_Return
+#define DEFAULT_KEY_CANCEL	KSYM_Escape
+
+/* values for move directions */
+#define MV_NO_MOVING		0
+#define MV_LEFT			(1 << 0)
+#define MV_RIGHT		(1 << 1)
+#define MV_UP			(1 << 2)
+#define MV_DOWN	       		(1 << 3)
+
+/* values for button status */
 #define MB_NOT_PRESSED		FALSE
 #define MB_NOT_RELEASED		TRUE
 #define MB_RELEASED		FALSE
@@ -77,6 +94,11 @@
 #define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
+/* maximum number of parallel players supported by libgame functions */
+#define MAX_PLAYERS		4
+
+/* maximum allowed length of player name */
+#define MAX_PLAYER_NAME_LEN	10
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
@@ -206,6 +228,63 @@ struct GfxInfo
   int vxsize, vysize;
 };
 
+struct JoystickInfo
+{
+  int status;
+  int fd[MAX_PLAYERS];		/* file descriptor of player's joystick */
+};
+
+struct SetupJoystickInfo
+{
+  char *device_name;		/* device name of player's joystick */
+
+  int xleft, xmiddle, xright;
+  int yupper, ymiddle, ylower;
+  int snap;
+  int bomb;
+};
+
+struct SetupKeyboardInfo
+{
+  Key left;
+  Key right;
+  Key up;
+  Key down;
+  Key snap;
+  Key bomb;
+};
+
+struct SetupInputInfo
+{
+  boolean use_joystick;
+  struct SetupJoystickInfo joy;
+  struct SetupKeyboardInfo key;
+};
+
+struct SetupInfo
+{
+  char *player_name;
+
+  boolean sound;
+  boolean sound_loops;
+  boolean sound_music;
+  boolean sound_simple;
+  boolean toons;
+  boolean double_buffering;
+  boolean direct_draw;		/* !double_buffering (redundant!) */
+  boolean scroll_delay;
+  boolean soft_scrolling;
+  boolean fading;
+  boolean autorecord;
+  boolean quick_doors;
+  boolean team_mode;
+  boolean handicap;
+  boolean time_limit;
+  boolean fullscreen;
+
+  struct SetupInputInfo input[MAX_PLAYERS];
+};
+
 struct LevelDirInfo
 {
   char *filename;	/* level series single directory name */
@@ -245,26 +324,29 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
+extern struct JoystickInfo	joystick;
+extern struct SetupInfo		setup;
 
 extern struct LevelDirInfo     *leveldir_first;
 extern struct LevelDirInfo     *leveldir_current;
+extern int			level_nr;
 
-extern Display	       *display;
-extern Visual	       *visual;
-extern int		screen;
-extern Colormap		cmap;
+extern Display		       *display;
+extern Visual		       *visual;
+extern int			screen;
+extern Colormap			cmap;
 
-extern DrawWindow      *window;
-extern DrawBuffer      *backbuffer;
-extern DrawBuffer      *drawto;
+extern DrawWindow	       *window;
+extern DrawBuffer	       *backbuffer;
+extern DrawBuffer	       *drawto;
 
-extern int		button_status;
-extern boolean		motion_status;
+extern int			button_status;
+extern boolean			motion_status;
 
-extern int		redraw_mask;
-extern int		redraw_tiles;
+extern int			redraw_mask;
+extern int			redraw_tiles;
 
-extern int		FrameCounter;
+extern int			FrameCounter;
 
 
 /* function definitions */

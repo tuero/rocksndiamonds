@@ -23,8 +23,10 @@
 #include "gadgets.h"
 #include "text.h"
 #include "sound.h"
+#include "joystick.h"
 #include "image.h"
 #include "pcx.h"
+#include "setup.h"
 #include "misc.h"
 
 #endif /* LIBGAME_H */

@@ -1,7 +1,7 @@
 /***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
+* Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1995-2001 Artsoft Entertainment                      *
+* (c) 1995-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -14,14 +14,16 @@
 #ifndef JOYSTICK_H
 #define JOYSTICK_H
 
-#include "main.h"
+#include "system.h"
 
 /* values for the joystick */
-#define JOYSTICK_OFF		0
-#define	JOYSTICK_AVAILABLE	1
+#define JOYSTICK_NOT_AVAILABLE	0
+#define	JOYSTICK_AVAILABLE	(1 << 0)
+#define	JOYSTICK_ACTIVE		(1 << 1)
 
-#ifdef __FreeBSD__
-#include <machine/joystick.h>
+#define JOYSTICK_ACTIVATED	(JOYSTICK_AVAILABLE | JOYSTICK_ACTIVE)
+
+#if defined(PLATFORM_FREEBSD)
 #define DEV_JOYSTICK_0		"/dev/joy0"
 #define DEV_JOYSTICK_1		"/dev/joy1"
 #define DEV_JOYSTICK_2		"/dev/joy2"
@@ -58,8 +60,8 @@
 #define JOY_RIGHT		MV_RIGHT
 #define JOY_UP			MV_UP
 #define JOY_DOWN	       	MV_DOWN
-#define JOY_BUTTON_1		(1<<4)
-#define JOY_BUTTON_2		(1<<5)
+#define JOY_BUTTON_1		(1 << 4)
+#define JOY_BUTTON_2		(1 << 5)
 #define JOY_BUTTON		(JOY_BUTTON_1 | JOY_BUTTON_2)
 
 #define JOY_BUTTON_NOT_PRESSED	0
@@ -68,11 +70,16 @@
 #define JOY_BUTTON_NEW_RELEASED	3
 
 #ifdef NO_JOYSTICK
-#define JOYSTICK_STATUS		JOYSTICK_OFF
+#define JOYSTICK_STATUS		JOYSTICK_NOT_AVAILABLE
 #else
 #define JOYSTICK_STATUS		JOYSTICK_AVAILABLE
 #endif
 
+
+char *getJoyNameFromJoySymbol(int);
+int getJoySymbolFromJoyName(char *);
+int getJoystickNrFromDeviceName(char *);
+char *getDeviceNameFromJoystickNr(int);
 
 #if defined(TARGET_SDL)
 SDL_Joystick *Get_SDL_Joystick(int);
@@ -88,5 +95,8 @@ int Joystick(int);
 int JoystickButton(int);
 int AnyJoystick(void);
 int AnyJoystickButton(void);
+
+void DeactivateJoystickForCalibration();
+void ActivateJoystickIfAvailable();
 
 #endif	/* JOYSTICK_H */

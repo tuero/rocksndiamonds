@@ -21,7 +21,6 @@
 #include "editor.h"
 #include "files.h"
 #include "tape.h"
-#include "joystick.h"
 #include "network.h"
 
 /* values for key_status */
@@ -304,8 +303,8 @@ void HandleFocusEvent(FocusChangeEvent *event)
     int i;
 
     KeyboardAutoRepeatOn();
-    old_joystick_status = joystick_status;
-    joystick_status = JOYSTICK_OFF;
+    old_joystick_status = joystick.status;
+    joystick.status = JOYSTICK_NOT_AVAILABLE;
 
     /* simulate key release events for still pressed keys */
     key_joystick_mapping = 0;
@@ -336,7 +335,7 @@ void HandleFocusEvent(FocusChangeEvent *event)
       KeyboardAutoRepeatOff();
     }
     if (old_joystick_status != -1)
-      joystick_status = old_joystick_status;
+      joystick.status = old_joystick_status;
   }
 }
 

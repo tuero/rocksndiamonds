@@ -1,7 +1,7 @@
 /***********************************************************
-* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
+* Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1995-2001 Artsoft Entertainment                      *
+* (c) 1995-2002 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -15,12 +15,24 @@
 #include <machine/joystick.h>
 #endif
 
-#include "libgame/libgame.h"
-
 #include "joystick.h"
+#include "misc.h"
+
 
 #define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
 #define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
+
+#if 0
+static int joystick_device = 0;
+char *joystick_device_name[MAX_PLAYERS] =
+{
+  DEV_JOYSTICK_0,
+  DEV_JOYSTICK_1,
+  DEV_JOYSTICK_2,
+  DEV_JOYSTICK_3
+};
+#endif
+
 
 void translate_joyname(int *joysymbol, char **name, int mode)
 {
@@ -101,6 +113,20 @@ int getJoystickNrFromDeviceName(char *device_name)
     joystick_nr = 0;
 
   return joystick_nr;
+}
+
+char *getDeviceNameFromJoystickNr(int joystick_nr)
+{
+  static char *joystick_device_name[MAX_PLAYERS] =
+  {
+    DEV_JOYSTICK_0,
+    DEV_JOYSTICK_1,
+    DEV_JOYSTICK_2,
+    DEV_JOYSTICK_3
+  };
+
+  return (joystick_nr >= 0 && joystick_nr <= 3 ?
+	  joystick_device_name[joystick_nr] : "");
 }
 
 #if !defined(PLATFORM_MSDOS)
@@ -226,15 +252,16 @@ void CheckJoystickData()
 
 int Joystick(int player_nr)
 {
+#if 0
   int joystick_nr = stored_player[player_nr].joystick_fd;
+#else
+  int joystick_nr = joystick.fd[player_nr];
+#endif
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result = 0;
 
-  if (joystick_status == JOYSTICK_OFF)
-    return 0;
-
-  if (game_status == SETUPINPUT)
+  if (joystick.status != JOYSTICK_ACTIVATED)
     return 0;
 
   if (!setup.input[player_nr].use_joystick ||
@@ -319,7 +346,7 @@ void CheckJoystickData()
 #if defined(PLATFORM_UNIX)
 int Joystick(int player_nr)
 {
-#ifdef __FreeBSD__
+#if defined(PLATFORM_FREEBSD)
   struct joystick joy_ctrl;
 #else
   struct joystick_control
@@ -330,15 +357,16 @@ int Joystick(int player_nr)
   } joy_ctrl;
 #endif
 
+#if 0
   int joystick_fd = stored_player[player_nr].joystick_fd;
+#else
+  int joystick_fd = joystick.fd[player_nr];
+#endif
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result = 0;
 
-  if (joystick_status == JOYSTICK_OFF)
-    return 0;
-
-  if (game_status == SETUPINPUT)
+  if (joystick.status != JOYSTICK_ACTIVATED)
     return 0;
 
   if (joystick_fd < 0 || !setup.input[player_nr].use_joystick)
@@ -348,14 +376,14 @@ int Joystick(int player_nr)
   {
     Error(ERR_WARN, "cannot read joystick device '%s'",
 	  setup.input[player_nr].joy.device_name);
-    joystick_status = JOYSTICK_OFF;
+    joystick.status = JOYSTICK_NOT_AVAILABLE;
     return 0;
   }
 
   js_x  = joy_ctrl.x;
   js_y  = joy_ctrl.y;
 
-#ifdef __FreeBSD__
+#if defined(PLATFORM_FREEBSD)
   js_b1 = joy_ctrl.b1;
   js_b2 = joy_ctrl.b2;
 #else
@@ -397,13 +425,14 @@ extern JOYSTICK_INFO joy[];
 
 int Joystick(int player_nr)
 {
+#if 0
   int joystick_nr = stored_player[player_nr].joystick_fd;
+#else
+  int joystick_nr = joystick.fd[player_nr];
+#endif
   int result = 0;
 
-  if (joystick_status == JOYSTICK_OFF)
-    return 0;
-
-  if (game_status == SETUPINPUT)
+  if (joystick.status != JOYSTICK_ACTIVATED)
     return 0;
 
   if (joystick_nr < 0)
@@ -418,9 +447,15 @@ int Joystick(int player_nr)
 #else
 
 #if 1
+  /*
   if (joystick_nr >= num_joysticks ||
       (game_status == PLAYING && !setup.input[player_nr].use_joystick))
     return 0;
+  */
+
+  if (joystick_nr >= num_joysticks || !setup.input[player_nr].use_joystick)
+    return 0;
+
 #else
   if (joystick_nr >= num_joysticks)
     return 0;
@@ -518,4 +553,25 @@ int AnyJoystickButton()
   }
 
   return result;
+}
+
+void DeactivateJoystickForCalibration()
+{
+  /* Temporarily deactivate joystick. This is needed for calibration
+     screens, where the player has to select a joystick device that
+     should be calibrated. If there is a totally uncalibrated joystick
+     active, it may be impossible (due to messed up input from joystick)
+     to select the joystick device to calibrate even when trying to use
+     the mouse or keyboard to select the device. */
+
+  if (joystick.status & JOYSTICK_AVAILABLE)
+    joystick.status &= ~JOYSTICK_ACTIVE;
+}
+
+void ActivateJoystickIfAvailable()
+{
+  /* reactivate temporarily deactivated joystick */
+
+  if (joystick.status & JOYSTICK_AVAILABLE)
+    joystick.status |= JOYSTICK_ACTIVE;
 }

@@ -19,7 +19,6 @@
 #include "init.h"
 #include "files.h"
 #include "tape.h"
-#include "joystick.h"
 #include "network.h"
 
 /* this switch controls how rocks move horizontally */

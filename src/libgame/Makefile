@@ -7,9 +7,11 @@ SRCS =	system.c	\
 	gadgets.c	\
 	text.c		\
 	sound.c		\
+	joystick.c	\
 	pcx.c		\
 	image.c		\
 	random.c	\
+	setup.c		\
 	misc.c		\
 	msdos.c		\
 	x11.c		\
@@ -19,9 +21,11 @@ OBJS =	system.o	\
 	gadgets.o	\
 	text.o		\
 	sound.o		\
+	joystick.o	\
 	pcx.o		\
 	image.o		\
 	random.o	\
+	setup.o		\
 	misc.o		\
 	msdos.o		\
 	x11.o		\

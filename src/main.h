@@ -49,8 +49,6 @@
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
 
-#define MAX_PLAYERS	4
-
 #define SCREENX(a)	((a) - scroll_x)
 #define SCREENY(a)	((a) - scroll_y)
 #define LEVELX(a)	((a) + scroll_x)
@@ -185,7 +183,6 @@
 #define NUM_BITMAPS		12
 
 /* boundaries of arrays etc. */
-#define MAX_PLAYER_NAME_LEN	10
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
@@ -213,56 +210,6 @@ struct HiScore
   int Score;
 };
 
-struct SetupJoystickInfo
-{
-  char *device_name;
-  int xleft, xmiddle, xright;
-  int yupper, ymiddle, ylower;
-  int snap;
-  int bomb;
-};
-
-struct SetupKeyboardInfo
-{
-  Key left;
-  Key right;
-  Key up;
-  Key down;
-  Key snap;
-  Key bomb;
-};
-
-struct SetupInputInfo
-{
-  boolean use_joystick;
-  struct SetupJoystickInfo joy;
-  struct SetupKeyboardInfo key;
-};
-
-struct SetupInfo
-{
-  char *player_name;
-
-  boolean sound;
-  boolean sound_loops;
-  boolean sound_music;
-  boolean sound_simple;
-  boolean toons;
-  boolean double_buffering;
-  boolean direct_draw;		/* !double_buffering (redundant!) */
-  boolean scroll_delay;
-  boolean soft_scrolling;
-  boolean fading;
-  boolean autorecord;
-  boolean quick_doors;
-  boolean team_mode;
-  boolean handicap;
-  boolean time_limit;
-  boolean fullscreen;
-
-  struct SetupInputInfo input[MAX_PLAYERS];
-};
-
 struct PlayerInfo
 {
   boolean present;		/* player present in level playfield */
@@ -277,8 +224,6 @@ struct PlayerInfo
 				   devices when in single player mode */
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
-
-  int joystick_fd;		/* file descriptor of player's joystick */
 
   int jx,jy, last_jx,last_jy;
   int MovDir, MovPos, GfxPos;
@@ -404,7 +349,7 @@ extern boolean		level_editor_test_game;
 extern boolean		network_playing;
 
 extern int		key_joystick_mapping;
-extern int	    	global_joystick_status, joystick_status;
+extern int	    	global_joystick_status;
 
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -426,7 +371,6 @@ extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-extern int		level_nr;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScrollStepSize;
@@ -450,8 +394,6 @@ extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
-extern struct JoystickInfo	joystick[];
-extern struct SetupInfo		setup;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 
@@ -1497,23 +1439,6 @@ extern int		num_element_info;
 #define SND_GATE		54
 
 #define NUM_SOUNDS		55
-
-/* default input keys */
-#define DEFAULT_KEY_LEFT	KSYM_Left
-#define DEFAULT_KEY_RIGHT	KSYM_Right
-#define DEFAULT_KEY_UP		KSYM_Up
-#define DEFAULT_KEY_DOWN	KSYM_Down
-#define DEFAULT_KEY_SNAP	KSYM_Shift_L
-#define DEFAULT_KEY_BOMB	KSYM_Shift_R
-#define DEFAULT_KEY_OKAY	KSYM_Return
-#define DEFAULT_KEY_CANCEL	KSYM_Escape
-
-/* directions for moving */
-#define MV_NO_MOVING		0
-#define MV_LEFT			(1 << 0)
-#define MV_RIGHT		(1 << 1)
-#define MV_UP			(1 << 2)
-#define MV_DOWN	       		(1 << 3)
 
 /* values for game_status */
 #define EXITGAME		0

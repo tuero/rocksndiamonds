@@ -20,7 +20,6 @@
 #include "editor.h"
 #include "files.h"
 #include "tape.h"
-#include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
 #include "init.h"
@@ -94,6 +93,7 @@ void DrawMainMenu()
   UnmapAllGadgets();
   FadeSounds();
   KeyboardAutoRepeatOn();
+  ActivateJoystickIfAvailable();
 
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
@@ -1635,6 +1635,7 @@ void DrawSetupInputScreen()
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+15*32, "Exit", FS_BIG, FC_GREEN);
 
+  DeactivateJoystickForCalibration();
   DrawTextFCentered(SYSIZE - 20, FC_BLUE,
 		    "Joysticks deactivated on this screen");
 
@@ -1660,7 +1661,8 @@ static void setJoystickDeviceToNr(char *device_name, int device_nr)
       device_name[strlen(device_name) - 1] = '0' + (char)(device_nr % 10);
   }
   else
-    strncpy(device_name, joystick_device_name[device_nr], strlen(device_name));
+    strncpy(device_name, getDeviceNameFromJoystickNr(device_nr),
+	    strlen(device_name));
 }
 
 static void drawPlayerSetupInputInfo(int player_nr)
@@ -2052,14 +2054,14 @@ void CalibrateJoystick(int player_nr)
   int calibration_step = 1;
 #endif
 
-  int joystick_fd = stored_player[player_nr].joystick_fd;
+  int joystick_fd = joystick.fd[player_nr];
   int x, y, last_x, last_y, xpos = 8, ypos = 3;
   boolean check[3][3];
   int check_remaining;
   int joy_value;
   int result = -1;
 
-  if (joystick_status == JOYSTICK_OFF ||
+  if (joystick.status == JOYSTICK_NOT_AVAILABLE ||
       joystick_fd < 0 ||
       !setup.input[player_nr].use_joystick)
     goto error_out;
@@ -2153,7 +2155,7 @@ void CalibrateJoystick(int player_nr)
 #else
     if (read(joystick_fd, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
     {
-      joystick_status = JOYSTICK_OFF;
+      joystick.status = JOYSTICK_NOT_AVAILABLE;
       goto error_out;
     }
 #endif
@@ -2192,7 +2194,7 @@ void CalibrateJoystick(int player_nr)
       }
       else if (calibrate_joystick(joystick_fd) != 0)
       {
-	joystick_status = JOYSTICK_OFF;
+	joystick.status = JOYSTICK_NOT_AVAILABLE;
 	goto error_out;
       }
 

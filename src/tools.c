@@ -11,10 +11,12 @@
 * tools.c                                                  *
 ***********************************************************/
 
+#if 0
 #include <stdarg.h>
 
 #if defined(PLATFORM_FREEBSD)
 #include <machine/joystick.h>
+#endif
 #endif
 
 #include "libgame/libgame.h"
@@ -22,7 +24,6 @@
 #include "tools.h"
 #include "game.h"
 #include "events.h"
-#include "joystick.h"
 #include "cartoons.h"
 #include "network.h"
 #include "tape.h"
