@@ -38,24 +38,24 @@
 
 #define SND_UNDEFINED		(-1)
 
-#define WIN_XSIZE	672
-#define WIN_YSIZE	560
+#define WIN_XSIZE		672
+#define WIN_YSIZE		560
 
-#define SCR_FIELDX	17
-#define SCR_FIELDY	17
-#define MAX_BUF_XSIZE	(SCR_FIELDX + 2)
-#define MAX_BUF_YSIZE	(SCR_FIELDY + 2)
-#define MIN_LEV_FIELDX	3
-#define MIN_LEV_FIELDY	3
-#define STD_LEV_FIELDX	64
-#define STD_LEV_FIELDY	32
-#define MAX_LEV_FIELDX	128
-#define MAX_LEV_FIELDY	128
+#define SCR_FIELDX		17
+#define SCR_FIELDY		17
+#define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
+#define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
+#define MIN_LEV_FIELDX		3
+#define MIN_LEV_FIELDY		3
+#define STD_LEV_FIELDX		64
+#define STD_LEV_FIELDY		32
+#define MAX_LEV_FIELDX		128
+#define MAX_LEV_FIELDY		128
 
-#define SCREENX(a)	((a) - scroll_x)
-#define SCREENY(a)	((a) - scroll_y)
-#define LEVELX(a)	((a) + scroll_x)
-#define LEVELY(a)	((a) + scroll_y)
+#define SCREENX(a)		((a) - scroll_x)
+#define SCREENY(a)		((a) - scroll_y)
+#define LEVELX(a)		((a) + scroll_x)
+#define LEVELY(a)		((a) + scroll_y)
 #define IN_VIS_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
@@ -1060,73 +1060,84 @@ struct SoundInfo
   boolean loop;
 };
 
-struct SoundActionProperties
+struct ElementActionInfo
 {
-  char *text;
+  char *suffix;
   int value;
-  boolean is_loop;
+  boolean is_loop_sound;
+};
+
+struct ElementDirectionInfo
+{
+  char *suffix;
+  int value;
 };
 
 
 #if 0
-extern GC		tile_clip_gc;
-extern Bitmap	       *pix[];
+extern GC			tile_clip_gc;
+extern Bitmap		       *pix[];
 #endif
-extern Bitmap	       *bitmap_db_field, *bitmap_db_door;
-extern Pixmap		tile_clipmask[];
-extern DrawBuffer      *fieldbuffer;
-extern DrawBuffer      *drawto_field;
+extern Bitmap		       *bitmap_db_field, *bitmap_db_door;
+extern Pixmap			tile_clipmask[];
+extern DrawBuffer	      *fieldbuffer;
+extern DrawBuffer	      *drawto_field;
 
-extern int		game_status;
-extern boolean		level_editor_test_game;
-extern boolean		network_playing;
+extern int			game_status;
+extern boolean			level_editor_test_game;
+extern boolean			network_playing;
 
-extern int		key_joystick_mapping;
+extern int			key_joystick_mapping;
 
-extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-extern int		redraw_x1, redraw_y1;
+extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+extern int			redraw_x1, redraw_y1;
 
-extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-extern short		ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			AmoebaCnt[MAX_NUM_AMOEBA];
+extern short			AmoebaCnt2[MAX_NUM_AMOEBA];
+extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-extern unsigned long	Properties1[MAX_NUM_ELEMENTS];
-extern unsigned long	Properties2[MAX_NUM_ELEMENTS];
+extern unsigned long		Properties1[MAX_NUM_ELEMENTS];
+extern unsigned long		Properties2[MAX_NUM_ELEMENTS];
 
-extern int		GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
+extern int			lev_fieldx, lev_fieldy;
+extern int			scroll_x, scroll_y;
 
-extern int		FX,FY, ScrollStepSize;
-extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
-extern int		BorderElement;
-extern int		GameFrameDelay;
-extern int		FfwdFrameDelay;
-extern int		BX1,BY1, BX2,BY2;
-extern int		SBX_Left, SBX_Right;
-extern int		SBY_Upper, SBY_Lower;
-extern int		ZX,ZY, ExitX,ExitY;
-extern int		AllPlayersGone;
+extern int			FX, FY;
+extern int			ScrollStepSize;
+extern int			ScreenMovDir, ScreenMovPos, ScreenGfxPos;
+extern int			BorderElement;
+extern int			GameFrameDelay;
+extern int			FfwdFrameDelay;
+extern int			BX1, BY1;
+extern int			BX2, BY2;
+extern int			SBX_Left, SBX_Right;
+extern int			SBY_Upper, SBY_Lower;
+extern int			ZX, ZY;
+extern int			ExitX, ExitY;
+extern int			AllPlayersGone;
 
-extern int		TimeFrames, TimePlayed, TimeLeft;
-extern boolean		SiebAktiv;
-extern int		SiebCount;
+extern int			TimeFrames, TimePlayed, TimeLeft;
+extern boolean			SiebAktiv;
+extern int			SiebCount;
 
-extern boolean		network_player_action_received;
+extern boolean			network_player_action_received;
 
-extern int		graphics_action_mapping[];
+extern int			graphics_action_mapping[];
 
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
@@ -1135,9 +1146,10 @@ extern struct TapeInfo		tape;
 extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
+extern struct ElementActionInfo	element_action_info[];
+extern struct ElementDirectionInfo element_direction_info[];
 extern struct GraphicInfo	graphic_info[];
 extern struct SoundInfo		sound_info[];
-extern struct SoundActionProperties sound_action_properties[];
 extern struct ConfigInfo	image_config[], sound_config[];
 extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
 extern struct FileInfo	       *image_files, *sound_files;

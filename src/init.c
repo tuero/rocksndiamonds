@@ -184,8 +184,21 @@ static void InitArtworkInfo()
 
 static void InitArtworkConfig()
 {
-  InitImageList(image_config, image_config_suffix, NUM_IMAGE_FILES);
-  InitSoundList(sound_config, sound_config_suffix, NUM_SOUND_FILES);
+  static struct ConfigInfo action_suffix[NUM_ACTIONS + 1];
+  static struct ConfigInfo direction_suffix[NUM_DIRECTIONS + 1];
+  static struct ConfigInfo empty[1];
+  int i;
+
+  for (i=0; i<NUM_ACTIONS + 1; i++)
+    action_suffix[i].token = element_action_info[i].suffix;
+  for (i=0; i<NUM_DIRECTIONS + 1; i++)
+    direction_suffix[i].token = element_direction_info[i].suffix;
+  empty[0].token = NULL;
+
+  InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
+		action_suffix, direction_suffix);
+  InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
+		action_suffix, empty);
 }
 
 void InitLevelArtworkInfo()
@@ -550,10 +563,6 @@ void ReloadCustomArtwork()
   if (!validLevelSeries(leveldir_current))
     return;
 
-#if 0
-  printf("--> '%s'\n", artwork.gfx_current_identifier);
-#endif
-
   /* when a new level series was selected, check if there was a change
      in custom artwork stored in level series directory */
   if (leveldir_current_identifier != leveldir_current->identifier)
@@ -587,8 +596,8 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
       last_override_level_graphics != setup.override_level_graphics)
   {
-#if 1
-    printf("RELOADING GRAPHICS '%s' -> '%s' (-> '%s')\n",
+#if 0
+    printf("RELOADING GRAPHICS '%s' -> '%s' ('%s')\n",
 	   artwork.gfx_current_identifier,
 	   artwork.gfx_current->identifier,
 	   gfx_new_identifier);
@@ -604,11 +613,7 @@ void ReloadCustomArtwork()
     FreeTileClipmasks();
     InitTileClipmasks();
 
-#if 0
-    artwork.gfx_current_identifier = gfx_new_identifier;
-#else
     artwork.gfx_current_identifier = artwork.gfx_current->identifier;
-#endif
     last_override_level_graphics = setup.override_level_graphics;
 
     redraw_screen = TRUE;
@@ -617,11 +622,11 @@ void ReloadCustomArtwork()
   if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
       last_override_level_sounds != setup.override_level_sounds)
   {
-#if 1
-    printf("RELOADING SOUNDS '%s' -> '%s' (-> '%s')\n",
+#if 0
+    printf("RELOADING SOUNDS '%s' -> '%s' ('%s')\n",
 	   artwork.snd_current_identifier,
-	   snd_new_identifier,
-	   artwork.snd_current->identifier);
+	   artwork.snd_current->identifier,
+	   snd_new_identifier);
 #endif
 
     /* set artwork path to send it to the sound server process */
@@ -630,12 +635,7 @@ void ReloadCustomArtwork()
     InitReloadCustomSounds(snd_new_identifier);
     ReinitializeSounds();
 
-#if 0
-    artwork.snd_current_identifier = snd_new_identifier;
-#else
     artwork.snd_current_identifier = artwork.snd_current->identifier;
-#endif
-
     last_override_level_sounds = setup.override_level_sounds;
 
     redraw_screen = TRUE;
@@ -650,11 +650,7 @@ void ReloadCustomArtwork()
     InitReloadCustomMusic(mus_new_identifier);
     ReinitializeMusic();
 
-#if 0
-    artwork.mus_current_identifier = mus_new_identifier;
-#else
     artwork.mus_current_identifier = artwork.mus_current->identifier;
-#endif
     last_override_level_music = setup.override_level_music;
 
     redraw_screen = TRUE;
@@ -668,10 +664,6 @@ void ReloadCustomArtwork()
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
   }
-
-#if 0
-  printf("<-- '%s'\n", artwork.gfx_current_identifier);
-#endif
 }
 
 void FreeGadgets()
@@ -701,7 +693,6 @@ void InitGadgets()
 
 void InitElementInfo()
 {
-
   int i, act, dir;
 
   /* set values to -1 to identify later as "uninitialized" values */
@@ -787,7 +778,7 @@ void InitElementInfo()
   }
 }
 
-static void set_graphic_parameters(int graphic, int action, int *parameter)
+static void set_graphic_parameters(int graphic, int *parameter)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
   int num_xtiles = (src_bitmap ? src_bitmap->width          : TILEX) / TILEX;
@@ -847,33 +838,22 @@ static void set_graphic_parameters(int graphic, int action, int *parameter)
   if (parameter[GFX_ARG_MODE_REVERSE])
     graphic_info[graphic].anim_mode |= ANIM_REVERSE;
 
-  /* set first frame of animation after determining animation mode */
-  graphic_info[graphic].anim_start_frame = parameter[GFX_ARG_START_FRAME];
-
   /* automatically determine correct start frame, if not defined */
   if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
     graphic_info[graphic].anim_start_frame = 0;
   else if (graphic_info[graphic].anim_mode & ANIM_REVERSE)
     graphic_info[graphic].anim_start_frame =
       graphic_info[graphic].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
+  else
+    graphic_info[graphic].anim_start_frame = parameter[GFX_ARG_START_FRAME];
 
   /* animation synchronized with global frame counter, not move position */
   graphic_info[graphic].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
-
-  /* set global_sync for all animations with undefined "animation action" */
-  if (parameter[GFX_ARG_GLOBAL_SYNC] == ARG_UNDEFINED_VALUE)
-    graphic_info[graphic].anim_global_sync =
-      (action == ACTION_DEFAULT ? TRUE : FALSE);
-
-  /* "linear" animations are never globally synchronized */
-  if (parameter[GFX_ARG_MODE_LINEAR])
-    graphic_info[graphic].anim_global_sync = FALSE;
 }
 
 static void InitGraphicInfo()
 {
   static boolean clipmasks_initialized = FALSE;
-  static int gfx_action[NUM_IMAGE_FILES];
   int i;
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap src_pixmap;
@@ -883,25 +863,6 @@ static void InitGraphicInfo()
 #endif
 
   image_files = getCurrentImageList();
-
-  /* set temporary graphics action field to default value */
-  for (i=0; i<NUM_IMAGE_FILES; i++)
-    gfx_action[i] = ACTION_DEFAULT;
-
-  /* set temporary graphics action field from element_to_graphic list */
-  i = 0;
-  while (element_to_graphic[i].element > -1)
-  {
-    int action    = element_to_graphic[i].action;
-    int graphic   = element_to_graphic[i].graphic;
-
-    if (action == -1)
-      action = ACTION_DEFAULT;
-
-    gfx_action[graphic] = action;
-
-    i++;
-  }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
@@ -925,7 +886,7 @@ static void InitGraphicInfo()
     int src_x, src_y;
     int first_frame, last_frame;
 
-    set_graphic_parameters(i, gfx_action[i], image_files[i].parameter);
+    set_graphic_parameters(i, image_files[i].parameter);
 
     /* now check if no animation frames are outside of the loaded image */
 
@@ -952,8 +913,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, gfx_action[i],
-			     image_files[i].default_parameter);
+      set_graphic_parameters(i, image_files[i].default_parameter);
     }
 
     last_frame = graphic_info[i].anim_frames - 1;
@@ -976,8 +936,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, gfx_action[i],
-			     image_files[i].default_parameter);
+      set_graphic_parameters(i, image_files[i].default_parameter);
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -1043,17 +1002,17 @@ static void InitSoundInfo()
 
     /* determine all loop sounds and identify certain sound classes */
 
-    for (j=0; sound_action_properties[j].text; j++)
+    for (j=0; element_action_info[j].suffix; j++)
     {
-      int len_action_text = strlen(sound_action_properties[j].text);
+      int len_action_text = strlen(element_action_info[j].suffix);
 
       if (len_action_text < len_effect_text &&
 	  strcmp(&sound_files[i].token[len_effect_text - len_action_text],
-		 sound_action_properties[j].text) == 0)
+		 element_action_info[j].suffix) == 0)
       {
-	sound_effect_properties[i] = sound_action_properties[j].value;
+	sound_effect_properties[i] = element_action_info[j].value;
 
-	if (sound_action_properties[j].is_loop)
+	if (element_action_info[j].is_loop_sound)
 	  sound_info[i].loop = TRUE;
       }
     }
@@ -1088,11 +1047,11 @@ static void InitSoundInfo()
     int sound_action = ACTION_DIGGING;
     int j = 0;
 
-    while (sound_action_properties[j].text)
+    while (element_action_info[j].suffix)
     {
-      if (sound_action_properties[j].value == sound_action)
+      if (element_action_info[j].value == sound_action)
 	printf("element %d, sound action '%s'  == %d\n",
-	       element, sound_action_properties[j].text,
+	       element, element_action_info[j].suffix,
 	       element_info_[element].sound[sound_action]);
       j++;
     }

@@ -1770,9 +1770,10 @@ struct FileInfo *getCurrentSoundList()
   return sound_info->file_list;
 }
 
-void InitSoundList(struct ConfigInfo *config_list,
+void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
-		   int num_file_list_entries)
+		   struct ConfigInfo *ext1_suffix_list,
+		   struct ConfigInfo *ext2_suffix_list)
 {
   int i;
 
@@ -1781,14 +1782,25 @@ void InitSoundList(struct ConfigInfo *config_list,
   sound_info->type = ARTWORK_TYPE_SOUNDS;
 
   sound_info->num_file_list_entries = num_file_list_entries;
+
   sound_info->num_suffix_list_entries = 0;
   for (i=0; config_suffix_list[i].token != NULL; i++)
     sound_info->num_suffix_list_entries++;
+
+  sound_info->num_ext1_suffix_list_entries = 0;
+  for (i=0; ext1_suffix_list[i].token != NULL; i++)
+    sound_info->num_ext1_suffix_list_entries++;
+
+  sound_info->num_ext2_suffix_list_entries = 0;
+  for (i=0; ext2_suffix_list[i].token != NULL; i++)
+    sound_info->num_ext2_suffix_list_entries++;
 
   sound_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   sound_info->suffix_list = config_suffix_list;
+  sound_info->ext1_suffix_list = ext1_suffix_list;
+  sound_info->ext2_suffix_list = ext2_suffix_list;
   sound_info->custom_setup_list = NULL;
 
   sound_info->artwork_list =

@@ -206,6 +206,7 @@ boolean checkCookieString(const char *, const char *);
 
 char *getFormattedSetupEntry(char *, char *);
 void freeSetupFileList(struct SetupFileList *);
+struct SetupFileList *newSetupFileList(char *, char *);
 char *getTokenValue(struct SetupFileList *, char *);
 void setTokenValue(struct SetupFileList *, char *, char *);
 struct SetupFileList *loadSetupFileList(char *);

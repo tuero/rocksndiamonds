@@ -76,7 +76,8 @@ struct FileInfo *getCurrentImageList();
 Bitmap *getBitmapFromImageID(int);
 char *getTokenFromImageID(int);
 char *getImageConfigFilename();
-void InitImageList(struct ConfigInfo *, struct ConfigInfo *, int);
+void InitImageList(struct ConfigInfo *, int, struct ConfigInfo *,
+		   struct ConfigInfo *, struct ConfigInfo *);
 void ReloadCustomImages();
 void FreeAllImages();
 

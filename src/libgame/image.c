@@ -720,9 +720,10 @@ char *getImageConfigFilename()
   return getCustomArtworkConfigFilename(image_info->type);
 }
 
-void InitImageList(struct ConfigInfo *config_list,
+void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
-		   int num_file_list_entries)
+		   struct ConfigInfo *ext1_suffix_list,
+		   struct ConfigInfo *ext2_suffix_list)
 {
   int i;
 
@@ -731,14 +732,25 @@ void InitImageList(struct ConfigInfo *config_list,
   image_info->type = ARTWORK_TYPE_GRAPHICS;
 
   image_info->num_file_list_entries = num_file_list_entries;
+
   image_info->num_suffix_list_entries = 0;
   for (i=0; config_suffix_list[i].token != NULL; i++)
     image_info->num_suffix_list_entries++;
+
+  image_info->num_ext1_suffix_list_entries = 0;
+  for (i=0; ext1_suffix_list[i].token != NULL; i++)
+    image_info->num_ext1_suffix_list_entries++;
+
+  image_info->num_ext2_suffix_list_entries = 0;
+  for (i=0; ext2_suffix_list[i].token != NULL; i++)
+    image_info->num_ext2_suffix_list_entries++;
 
   image_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   image_info->suffix_list = config_suffix_list;
+  image_info->ext1_suffix_list = ext1_suffix_list;
+  image_info->ext2_suffix_list = ext2_suffix_list;
   image_info->custom_setup_list = NULL;
 
   image_info->artwork_list =

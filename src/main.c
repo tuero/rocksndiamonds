@@ -19,63 +19,68 @@
 #include "events.h"
 
 #if 0
-GC		tile_clip_gc;
-Bitmap	       *pix[NUM_BITMAPS];
+GC			tile_clip_gc;
+Bitmap		       *pix[NUM_BITMAPS];
 #endif
-Bitmap	       *bitmap_db_field, *bitmap_db_door;
+Bitmap		       *bitmap_db_field, *bitmap_db_door;
 #if 0
-Pixmap		tile_clipmask[NUM_TILES];
+Pixmap			tile_clipmask[NUM_TILES];
 #endif
-DrawBuffer     *fieldbuffer;
-DrawBuffer     *drawto_field;
+DrawBuffer	     *fieldbuffer;
+DrawBuffer	     *drawto_field;
 
-int		game_status = MAINMENU;
-boolean		level_editor_test_game = FALSE;
-boolean		network_playing = FALSE;
+int			game_status = MAINMENU;
+boolean			level_editor_test_game = FALSE;
+boolean			network_playing = FALSE;
 
-int		key_joystick_mapping = 0;
+int			key_joystick_mapping = 0;
 
-boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-int		redraw_x1 = 0, redraw_y1 = 0;
+boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+int			redraw_x1 = 0, redraw_y1 = 0;
 
-short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
-short		ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			AmoebaCnt[MAX_NUM_AMOEBA];
+short			AmoebaCnt2[MAX_NUM_AMOEBA];
+short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			ExplodeField[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-unsigned long	Properties1[MAX_NUM_ELEMENTS];
-unsigned long	Properties2[MAX_NUM_ELEMENTS];
+unsigned long		Properties1[MAX_NUM_ELEMENTS];
+unsigned long		Properties2[MAX_NUM_ELEMENTS];
 
-int		GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short		GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
-int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
+int			lev_fieldx, lev_fieldy;
+int			scroll_x, scroll_y;
 
-int		FX = SX, FY = SY, ScrollStepSize;
-int		ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
-int		ScreenGfxPos = 0;
-int		BorderElement = EL_STEELWALL;
-int		GameFrameDelay = GAME_FRAME_DELAY;
-int		FfwdFrameDelay = FFWD_FRAME_DELAY;
-int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
-int		SBX_Left, SBX_Right;
-int		SBY_Upper, SBY_Lower;
-int		ZX,ZY, ExitX,ExitY;
-int		AllPlayersGone;
+int			FX = SX, FY = SY;
+int			ScrollStepSize;
+int			ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
+int			ScreenGfxPos = 0;
+int			BorderElement = EL_STEELWALL;
+int			GameFrameDelay = GAME_FRAME_DELAY;
+int			FfwdFrameDelay = FFWD_FRAME_DELAY;
+int			BX1 = 0, BY1 = 0;
+int			BX2 = SCR_FIELDX - 1, BY2 = SCR_FIELDY - 1;
+int			SBX_Left, SBX_Right;
+int			SBY_Upper, SBY_Lower;
+int			ZX, ZY;
+int			ExitX, ExitY;
+int			AllPlayersGone;
 
-int		TimeFrames, TimePlayed, TimeLeft;
+int			TimeFrames, TimePlayed, TimeLeft;
 
-boolean		network_player_action_received = FALSE;
+boolean			network_player_action_received = FALSE;
 
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
@@ -86,6 +91,13 @@ struct GameInfo		game;
 struct GlobalInfo	global;
 struct FileInfo	       *image_files;
 struct FileInfo	       *sound_files;
+struct GraphicInfo	graphic_info[NUM_IMAGE_FILES];
+struct SoundInfo	sound_info[NUM_SOUND_FILES];
+
+
+/* ------------------------------------------------------------------------- */
+/* element definitions                                                       */
+/* ------------------------------------------------------------------------- */
 
 struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 {
@@ -2760,34 +2772,45 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 
 
 /* ------------------------------------------------------------------------- */
-/* sound definitions                                                         */
+/* element action and direction definitions                                  */
 /* ------------------------------------------------------------------------- */
 
-struct SoundActionProperties sound_action_properties[] =
+struct ElementActionInfo element_action_info[] =
 {
-  /* insert _all_ loop sound actions here */
-  { ".waiting",		ACTION_WAITING,		TRUE },
-  { ".moving",		ACTION_MOVING,		TRUE }, /* continuos moving */
-  { ".active",		ACTION_ACTIVE,		TRUE },
-  { ".growing",		ACTION_GROWING,		TRUE },
-  { ".attacking",	ACTION_ATTACKING,	TRUE },
+  { ".[DEFAULT]",	ACTION_DEFAULT,		TRUE	},
+  { ".waiting",		ACTION_WAITING,		TRUE	},
+  { ".falling",		ACTION_FALLING,		TRUE	},
+  { ".moving",		ACTION_MOVING,		TRUE	},
+  { ".digging",		ACTION_DIGGING,		FALSE	},
+  { ".snapping",	ACTION_SNAPPING,	FALSE	},
+  { ".collecting",	ACTION_COLLECTING,	FALSE	},
+  { ".pushing",		ACTION_PUSHING,		FALSE	},
+  { ".passing",		ACTION_PASSING,		FALSE	},
+  { ".impact",		ACTION_IMPACT,		FALSE	},
+  { ".cracking",	ACTION_CRACKING,	FALSE	},
+  { ".breaking",	ACTION_BREAKING,	FALSE	},
+  { ".activating",	ACTION_ACTIVATING,	FALSE	},
+  { ".opening",		ACTION_OPENING,		FALSE	},
+  { ".closing",		ACTION_CLOSING,		FALSE	},
+  { ".eating",		ACTION_EATING,		FALSE	},
+  { ".attacking",	ACTION_ATTACKING,	TRUE	},
+  { ".growing",		ACTION_GROWING,		TRUE	},
+  { ".shrinking",	ACTION_SHRINKING,	FALSE	},
+  { ".active",		ACTION_ACTIVE,		TRUE	},
+  { ".other",		ACTION_OTHER,		FALSE	},
 
-  /* other (non-loop) sound actions are optional */
-#if 0
-  { ".stepping",	ACTION_MOVING,		FALSE }, /* discrete moving */
-#endif
-  { ".digging",		ACTION_DIGGING,		FALSE },
-  { ".collecting",	ACTION_COLLECTING,	FALSE },
-  { ".passing",		ACTION_PASSING,		FALSE },
-  { ".impact",		ACTION_IMPACT,		FALSE },
-  { ".pushing",		ACTION_PUSHING,		FALSE },
-  { ".activating",	ACTION_ACTIVATING,	FALSE },
-  { NULL,		0,			0 },
+  { NULL,		0,			0	},
 };
 
+struct ElementDirectionInfo element_direction_info[] =
+{
+  { ".left",		MV_BIT_LEFT			},
+  { ".right",		MV_BIT_RIGHT			},
+  { ".up",		MV_BIT_UP			},
+  { ".down",		MV_BIT_DOWN			},
 
-struct GraphicInfo graphic_info[NUM_IMAGE_FILES];
-struct SoundInfo sound_info[NUM_SOUND_FILES];
+  { NULL,		0				},
+};
 
 
 /* ========================================================================= */

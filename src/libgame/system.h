@@ -517,9 +517,13 @@ struct ArtworkListInfo
 
   int num_file_list_entries;
   int num_suffix_list_entries;
+  int num_ext1_suffix_list_entries;
+  int num_ext2_suffix_list_entries;
 
   struct FileInfo *file_list;			/* static artwork file array */
   struct ConfigInfo *suffix_list;		/* parameter suffixes array */
+  struct ConfigInfo *ext1_suffix_list;		/* property suffixes array 1 */
+  struct ConfigInfo *ext2_suffix_list;		/* property suffixes array 2 */
   struct SetupFileList *custom_setup_list;	/* additional definitions */
 
   struct ListNodeInfo **artwork_list;		/* static artwork node array */

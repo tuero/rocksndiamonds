@@ -1614,6 +1614,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
+  struct SetupFileList *extra_file_list = NULL;
   char *known_token_value = "[KNOWN_TOKEN]";
   int i, j;
 
@@ -1689,6 +1690,13 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     {
       if (strcmp(setup_file_list->value, known_token_value) != 0)
       {
+	if (extra_file_list == NULL)
+	  extra_file_list = newSetupFileList(setup_file_list->token,
+					     setup_file_list->value);
+	else
+	  setTokenValue(extra_file_list, setup_file_list->token,
+			setup_file_list->value);
+
 	if (!unknown_tokens_found)
 	{
 	  Error(ERR_RETURN_LINE, "-");
@@ -1709,6 +1717,8 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   }
 
   freeSetupFileList(setup_file_list);
+
+  freeSetupFileList(extra_file_list);
 
 #if 0
   for (i=0; i<num_file_list_entries; i++)

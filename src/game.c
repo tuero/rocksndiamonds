@@ -2178,7 +2178,7 @@ void Impact(int x, int y)
   if ((element == EL_BOMB ||
        element == EL_SP_DISK_ORANGE ||
        element == EL_DX_SUPABOMB) &&
-      (lastline || object_hit))	/* element is bomb */
+      (lastline || object_hit))		/* element is bomb */
   {
     Bang(x, y);
     return;
@@ -2207,7 +2207,8 @@ void Impact(int x, int y)
   if (!lastline && object_hit)		/* check which object was hit */
   {
     if (CAN_CHANGE(element) && 
-	(smashed == EL_MAGIC_WALL || smashed == EL_BD_MAGIC_WALL))
+	(smashed == EL_MAGIC_WALL ||
+	 smashed == EL_BD_MAGIC_WALL))
     {
       int xx, yy;
       int activated_magic_wall =
@@ -2228,29 +2229,31 @@ void Impact(int x, int y)
 			    SND_BD_MAGIC_WALL_ACTIVATING));
     }
 
-    if (IS_PLAYER(x, y+1))
+    if (IS_PLAYER(x, y + 1))
     {
       KillHeroUnlessProtected(x, y+1);
       return;
     }
     else if (smashed == EL_PENGUIN)
     {
-      Bang(x, y+1);
+      Bang(x, y + 1);
       return;
     }
     else if (element == EL_BD_DIAMOND)
     {
       if (IS_ENEMY(smashed) && IS_BD_ELEMENT(smashed))
       {
-	Bang(x, y+1);
+	Bang(x, y + 1);
 	return;
       }
     }
-    else if ((element == EL_SP_INFOTRON || element == EL_SP_ZONK) &&
-	     (smashed == EL_SP_SNIKSNAK || smashed == EL_SP_ELECTRON ||
+    else if ((element == EL_SP_INFOTRON ||
+	      element == EL_SP_ZONK) &&
+	     (smashed == EL_SP_SNIKSNAK ||
+	      smashed == EL_SP_ELECTRON ||
 	      smashed == EL_SP_DISK_ORANGE))
     {
-      Bang(x, y+1);
+      Bang(x, y + 1);
       return;
     }
     else if (element == EL_ROCK ||
@@ -2258,19 +2261,23 @@ void Impact(int x, int y)
 	     element == EL_BD_ROCK)
     {
       if (IS_ENEMY(smashed) ||
-	  smashed == EL_BOMB || smashed == EL_SP_DISK_ORANGE ||
+	  smashed == EL_BOMB ||
+	  smashed == EL_SP_DISK_ORANGE ||
 	  smashed == EL_DX_SUPABOMB ||
-	  smashed == EL_SATELLITE || smashed == EL_PIG ||
-	  smashed == EL_DRAGON || smashed == EL_MOLE)
+	  smashed == EL_SATELLITE ||
+	  smashed == EL_PIG ||
+	  smashed == EL_DRAGON ||
+	  smashed == EL_MOLE)
       {
-	Bang(x, y+1);
+	Bang(x, y + 1);
 	return;
       }
-      else if (!IS_MOVING(x, y+1))
+      else if (!IS_MOVING(x, y + 1))
       {
-	if (smashed == EL_LAMP || smashed == EL_LAMP_ACTIVE)
+	if (smashed == EL_LAMP ||
+	    smashed == EL_LAMP_ACTIVE)
 	{
-	  Bang(x, y+1);
+	  Bang(x, y + 1);
 	  return;
 	}
 	else if (smashed == EL_NUT)
@@ -5224,6 +5231,8 @@ void GameActions()
       ChangeElement(x, y);
 
 #if 1
+    else if (element == EL_EXPLOSION)
+      ;	/* drawing of correct explosion animation is handled separately */
     else if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimation(x, y, graphic);
 #endif

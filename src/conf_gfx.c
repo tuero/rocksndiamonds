@@ -36,7 +36,7 @@ struct ConfigInfo image_config_suffix[] =
   { ".mode_pingpong2",			"false",	TYPE_BOOLEAN },
   { ".mode_random",			"false",	TYPE_BOOLEAN },
   { ".mode_reverse",			"false",	TYPE_BOOLEAN },
-  { ".global_sync",			ARG_UNDEFINED,	TYPE_BOOLEAN },
+  { ".global_sync",			"false",	TYPE_BOOLEAN },
 
   { NULL,				NULL,		0	     }
 };
@@ -531,10 +531,14 @@ struct ConfigInfo image_config[] =
   { "sp_explosion.xpos",			"8"			},
   { "sp_explosion.ypos",			"3"			},
   { "sp_explosion.frames",			"8"			},
+  { "sp_explosion.delay",			"3"			},
+  { "sp_explosion.mode_linear",			"true"			},
   { "sp_explosion_infotron",			"RocksSP.pcx"		},
   { "sp_explosion_infotron.xpos",		"8"			},
   { "sp_explosion_infotron.ypos",		"4"			},
   { "sp_explosion_infotron.frames",		"8"			},
+  { "sp_explosion.delay",			"3"			},
+  { "sp_explosion.mode_linear",			"true"			},
 
   /* images for Sokoban style elements and actions */
 

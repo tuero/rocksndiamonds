@@ -1031,7 +1031,7 @@ char *getFormattedSetupEntry(char *token, char *value)
 
 void freeSetupFileList(struct SetupFileList *setup_file_list)
 {
-  if (!setup_file_list)
+  if (setup_file_list == NULL)
     return;
 
   if (setup_file_list->token)
@@ -1043,15 +1043,12 @@ void freeSetupFileList(struct SetupFileList *setup_file_list)
   free(setup_file_list);
 }
 
-static struct SetupFileList *newSetupFileList(char *token, char *value)
+struct SetupFileList *newSetupFileList(char *token, char *value)
 {
   struct SetupFileList *new = checked_malloc(sizeof(struct SetupFileList));
 
-  new->token = checked_malloc(strlen(token) + 1);
-  strcpy(new->token, token);
-
-  new->value = checked_malloc(strlen(value) + 1);
-  strcpy(new->value, value);
+  new->token = getStringCopy(token);
+  new->value = getStringCopy(value);
 
   new->next = NULL;
 
@@ -1060,7 +1057,7 @@ static struct SetupFileList *newSetupFileList(char *token, char *value)
 
 char *getTokenValue(struct SetupFileList *setup_file_list, char *token)
 {
-  if (!setup_file_list)
+  if (setup_file_list == NULL)
     return NULL;
 
   if (strcmp(setup_file_list->token, token) == 0)
@@ -1072,14 +1069,15 @@ char *getTokenValue(struct SetupFileList *setup_file_list, char *token)
 void setTokenValue(struct SetupFileList *setup_file_list,
 		   char *token, char *value)
 {
-  if (!setup_file_list)
+  if (setup_file_list == NULL)
     return;
 
   if (strcmp(setup_file_list->token, token) == 0)
   {
-    free(setup_file_list->value);
-    setup_file_list->value = checked_malloc(strlen(value) + 1);
-    strcpy(setup_file_list->value, value);
+    if (setup_file_list->value)
+      free(setup_file_list->value);
+
+    setup_file_list->value = getStringCopy(value);
   }
   else if (setup_file_list->next == NULL)
     setup_file_list->next = newSetupFileList(token, value);
