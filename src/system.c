@@ -88,6 +88,10 @@ inline void FlushDisplay()
 {
 #ifndef USE_SDL_LIBRARY
   XFlush(display);
+#else
+#if 0
+  SDL_UpdateRect(window, 0, 0, 0, 0);
+#endif
 #endif
 }
 

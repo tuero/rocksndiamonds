@@ -1649,7 +1649,11 @@ extern char		*element_info[];
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 
+#ifdef USE_SDL_LIBRARY
 #define PROGRAM_VERSION_STRING	"1.4.0 SDL"
+#else
+#define PROGRAM_VERSION_STRING	"1.4.0"
+#endif
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_VERSION_STRING

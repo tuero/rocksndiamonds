@@ -35,6 +35,8 @@ EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
 USE_SDL = true
+# USE_SDL = false
+# USE_SDL_OLD_LIBS = true
 USE_SDL_OLD_LIBS = false
 
 ifeq ($(USE_SDL_OLD_LIBS),true)
