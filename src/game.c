@@ -4117,12 +4117,27 @@ void StartMoving(int x, int y)
 		       dir == MV_RIGHT	? IMG_FLAMES_1_RIGHT :
 		       dir == MV_UP	? IMG_FLAMES_1_UP :
 		       dir == MV_DOWN	? IMG_FLAMES_1_DOWN : IMG_EMPTY);
-	int frame = getGraphicAnimationFrame(graphic, -1);
+	int frame = getGraphicAnimationFrame(graphic, GfxFrame[x][y]);
 
-	for (i=1; i<=3; i++)
+#if 0
+	printf("::: %d, %d\n", GfxAction[x][y], GfxFrame[x][y]);
+#endif
+
+	GfxAction[x][y] = ACTION_ATTACKING;
+
+	if (IS_PLAYER(x, y))
+	  DrawPlayerField(x, y);
+	else
+	  DrawLevelField(x, y);
+
+	PlaySoundLevelActionIfLoop(x, y, ACTION_ATTACKING);
+
+	for (i=1; i <= 3; i++)
 	{
-	  int xx = x + i*dx, yy = y + i*dy;
-	  int sx = SCREENX(xx), sy = SCREENY(yy);
+	  int xx = x + i * dx;
+	  int yy = y + i * dy;
+	  int sx = SCREENX(xx);
+	  int sy = SCREENY(yy);
 	  int flame_graphic = graphic + (i - 1);
 
 	  if (!IN_LEV_FIELD(xx, yy) || IS_DRAGONFIRE_PROOF(Feld[xx][yy]))
@@ -4139,7 +4154,10 @@ void StartMoving(int x, int y)
 
 	    Feld[xx][yy] = EL_FLAMES;
 	    if (IN_SCR_FIELD(sx, sy))
+	    {
+	      DrawLevelFieldCrumbledSand(xx, yy);
 	      DrawGraphic(sx, sy, flame_graphic, frame);
+	    }
 	  }
 	  else
 	  {
@@ -4260,14 +4278,15 @@ void StartMoving(int x, int y)
 	  DrawPlayerField(x, y);
 	else
 	  DrawLevelField(x, y);
+
 	return;
       }
       else
       {
 	boolean wanna_flame = !RND(10);
 	int dx = newx - x, dy = newy - y;
-	int newx1 = newx+1*dx, newy1 = newy+1*dy;
-	int newx2 = newx+2*dx, newy2 = newy+2*dy;
+	int newx1 = newx + 1 * dx, newy1 = newy + 1 * dy;
+	int newx2 = newx + 2 * dx, newy2 = newy + 2 * dy;
 	int element1 = (IN_LEV_FIELD(newx1, newy1) ?
 			MovingOrBlocked2Element(newx1, newy1) : EL_STEELWALL);
 	int element2 = (IN_LEV_FIELD(newx2, newy2) ?
@@ -4292,6 +4311,7 @@ void StartMoving(int x, int y)
 	  PlaySoundLevel(x, y, SND_DRAGON_ATTACKING);
 
 	  MovDelay[x][y] = 50;
+
 	  Feld[newx][newy] = EL_FLAMES;
 	  if (IN_LEV_FIELD(newx1, newy1) && Feld[newx1][newy1] == EL_EMPTY)
 	    Feld[newx1][newy1] = EL_FLAMES;
