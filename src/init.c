@@ -3447,7 +3447,7 @@ void InitElementPropertiesEngine(int engine_version)
 
       element_info[element].access_direction = MV_ALL_DIRECTIONS;
 
-      element_info[element].explosion_delay = 18;
+      element_info[element].explosion_delay = 17;
       element_info[element].ignition_delay = 8;
     }
   }

@@ -1629,23 +1629,32 @@ void InitGame()
   {
     if (!IS_CUSTOM_ELEMENT(i))
     {
-      int num_phase = 9;
-      int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
-      int last_phase = num_phase * delay;
+      int num_phase = 8;
+      int delay = ((IS_SP_ELEMENT(i) &&
+		    game.engine_version >= VERSION_IDENT(3,1,0,0)) ||
+		   game.emulation == EMU_SUPAPLEX ? 3 : 2);
+      int last_phase = (num_phase + 1) * delay;
       int half_phase = (num_phase / 2) * delay;
 
-      element_info[i].explosion_delay = last_phase;
+      element_info[i].explosion_delay = last_phase - 1;
       element_info[i].ignition_delay = half_phase;
 
+#if 0
+      if (i == EL_BLACK_ORB)
+	element_info[i].ignition_delay = 0;
+#else
       if (i == EL_BLACK_ORB)
 	element_info[i].ignition_delay = 1;
+#endif
     }
 
-    if (element_info[i].explosion_delay < 2)	/* !!! check again !!! */
-      element_info[i].explosion_delay = 2;
+#if 0
+    if (element_info[i].explosion_delay < 1)	/* !!! check again !!! */
+      element_info[i].explosion_delay = 1;
 
     if (element_info[i].ignition_delay < 1)	/* !!! check again !!! */
       element_info[i].ignition_delay = 1;
+#endif
   }
 
   /* correct non-moving belts to start moving left */
@@ -2759,7 +2768,16 @@ void Explode(int ex, int ey, int phase, int mode)
     }
 
 #if 1
+
+#if 1
+    last_phase = element_info[center_element].explosion_delay + 1;
+#else
     last_phase = element_info[center_element].explosion_delay;
+#endif
+
+#if 0
+    printf("::: %d -> %d\n", center_element, last_phase);
+#endif
 #endif
 
     for (y = ey - 1; y <= ey + 1; y++) for (x = ex - 1; x <= ex + 1; x++)
@@ -2865,8 +2883,13 @@ void Explode(int ex, int ey, int phase, int mode)
 	    break;
 	}
 
+#if 1
+	if (PLAYERINFO(ex, ey)->use_murphy_graphic)
+	  Store[x][y] = EL_EMPTY;
+#else
 	if (game.emulation == EMU_SUPAPLEX)
 	  Store[x][y] = EL_EMPTY;
+#endif
       }
       else if (center_element == EL_MOLE)
 	Store[x][y] = EL_EMERALD_RED;
@@ -2940,6 +2963,15 @@ void Explode(int ex, int ey, int phase, int mode)
 #if 1
       ExplodeDelay[x][y] = last_phase;
 #endif
+
+#if 0
+#if 1
+      GfxFrame[x][y] = 0;	/* animation does not start until next frame */
+#else
+      GfxFrame[x][y] = -1;	/* animation does not start until next frame */
+#endif
+#endif
+
       Stop[x][y] = TRUE;
     }
 
@@ -2955,6 +2987,15 @@ void Explode(int ex, int ey, int phase, int mode)
 
   x = ex;
   y = ey;
+
+#if 1
+  if (phase == 1)
+    GfxFrame[x][y] = 0;		/* restart explosion animation */
+#endif
+
+#if 0
+  printf(":X: phase == %d [%d]\n", phase, GfxFrame[x][y]);
+#endif
 
 #if 1
   last_phase = ExplodeDelay[x][y];
@@ -2985,6 +3026,10 @@ void Explode(int ex, int ey, int phase, int mode)
   border_element = Store2[x][y];
   if (IS_PLAYER(x, y))
     border_element = StorePlayer[x][y];
+
+#if 0
+  printf("::: phase == %d\n", phase);
+#endif
 
   if (phase == element_info[border_element].ignition_delay ||
       phase == last_phase)
@@ -3146,7 +3191,20 @@ void Explode(int ex, int ey, int phase, int mode)
 		   stored == EL_SP_INFOTRON ? IMG_SP_EXPLOSION_INFOTRON :
 		   IMG_SP_EXPLOSION);
 #endif
+#if 1
+    int frame = getGraphicAnimationFrame(graphic, GfxFrame[x][y]);
+#else
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
+#endif
+
+#if 0
+  printf("::: phase == %d [%d]\n", phase, GfxFrame[x][y]);
+#endif
+
+#if 0
+    printf("::: %d / %d [%d - %d]\n",
+	   GfxFrame[x][y], phase - delay, phase, delay);
+#endif
 
 #if 0
     printf("::: %d ['%s'] -> %d\n", GfxElement[x][y],
@@ -7562,7 +7620,7 @@ void GameActions()
        - rnd_equinox_tetrachloride 048
        - rnd_equinox_tetrachloride_ii 096
        - rnd_emanuel_schmieg 002
-       - doctor_sloan_ww 020
+       - doctor_sloan_ww 001, 020
     */
     if (stored_player[i].MovPos == 0)
       CheckGravityMovement(&stored_player[i]);

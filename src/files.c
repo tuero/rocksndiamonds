@@ -240,7 +240,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
-      element_info[element].explosion_delay = 18;
+      element_info[element].explosion_delay = 16;
       element_info[element].ignition_delay = 8;
 
       for (x = 0; x < 3; x++)
