@@ -43,10 +43,10 @@
   { "char_dollar.ypos",				"0"			},
   { "char_dollar.frames",			"1"			},
 
-  { "char_procent",				"RocksFontEM.pcx"	},
-  { "char_procent.xpos",			"5"			},
-  { "char_procent.ypos",			"0"			},
-  { "char_procent.frames",			"1"			},
+  { "char_percent",				"RocksFontEM.pcx"	},
+  { "char_percent.xpos",			"5"			},
+  { "char_percent.ypos",			"0"			},
+  { "char_percent.frames",			"1"			},
 
   { "char_ampersand",				"RocksFontEM.pcx"	},
   { "char_ampersand.xpos",			"6"			},

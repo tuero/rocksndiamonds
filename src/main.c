@@ -750,7 +750,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "letter '$'"
   },
   {
-    "char_procent",
+    "char_percent",
     "char",
     "letter '%'"
   },
@@ -3636,8 +3636,8 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "emc_fake_grass",
-    "fake_grass",
-    "fake_grass"
+    "fake grass",
+    "fake grass"
   },
   {
     "emc_dripper",

@@ -2784,7 +2784,7 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_SPRING_BUMPER,
 
   EL_EMC_DRIPPER,
-  EL_EMPTY,
+  EL_EMC_FAKE_GRASS,
   EL_EMPTY,
   EL_EMPTY,
 };

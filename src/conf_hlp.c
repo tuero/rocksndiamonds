@@ -77,7 +77,7 @@ struct ConfigInfo helpanim_config[] =
   { "char_quotedbl",				"10"			},
   { "char_numbersign",				"10"			},
   { "char_dollar",				"10"			},
-  { "char_procent",				"10"			},
+  { "char_percent",				"10"			},
   { "char_ampersand",				"10"			},
   { "char_apostrophe",				"10"			},
   { "char_parenleft",				"10"			},

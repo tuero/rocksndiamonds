@@ -1990,6 +1990,43 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   /* at this point, we do not need the setup file hash anymore -- free it */
   freeSetupFileHash(setup_file_hash);
 
+#if 1
+  /* map deprecated to current tokens (using prefix match and replace) */
+  BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  {
+    /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+    static char *map_token_prefix[][2] =
+    {	/* old prefix	->	new prefix	*/
+      { "char_procent",		"char_percent"	},
+      { NULL,			NULL		}
+    };
+    char *token = HASH_ITERATION_TOKEN(itr);
+
+    for (i = 0; map_token_prefix[i][0] != NULL; i++)
+    {
+      int token_prefix_length = strlen(map_token_prefix[i][0]);
+
+      if (strncmp(token, map_token_prefix[i][0], token_prefix_length) == 0)
+      {
+	char *value = HASH_ITERATION_VALUE(itr);
+	char *mapped_token = getStringCat2(map_token_prefix[i][1],
+					   &token[token_prefix_length]);
+
+	/* add mapped token */
+	setHashEntry(valid_file_hash, mapped_token, value);
+
+	/* ignore old token (by setting it to "known" keyword) */
+	setHashEntry(valid_file_hash, token, known_token_value);
+
+	free(mapped_token);
+
+	break;
+      }
+    }
+  }
+  END_HASH_ITERATION(valid_file_hash, itr)
+#endif
+
   /* read parameters for all known config file tokens */
   for (i = 0; i < num_file_list_entries; i++)
     read_token_parameters(valid_file_hash, suffix_list, &file_list[i]);

@@ -328,6 +328,10 @@ element_to_special_graphic[] =
     IMG_EM_GATE_8_GRAY_EDITOR
   },
   {
+    EL_EMC_DRIPPER,				GFX_SPECIAL_ARG_EDITOR,
+    IMG_EMC_DRIPPER_EDITOR
+  },
+  {
     EL_CUSTOM_1,				GFX_SPECIAL_ARG_EDITOR,
     IMG_CUSTOM_1_EDITOR
   },

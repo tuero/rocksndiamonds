@@ -4168,6 +4168,10 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	  Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
 	DrawLevelField(x, y);
+
+	/* uncrumble neighbour fields, if needed */
+	if (element == EL_INVISIBLE_SAND)
+	  DrawLevelFieldCrumbledSandNeighbours(x, y);
       }
       else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	       element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -4177,6 +4181,10 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 	  Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
 
 	DrawLevelField(x, y);
+
+	/* re-crumble neighbour fields, if needed */
+	if (element == EL_INVISIBLE_SAND)
+	  DrawLevelFieldCrumbledSandNeighbours(x, y);
       }
     }
   }

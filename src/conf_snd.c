@@ -152,6 +152,7 @@ struct ConfigInfo sound_config[] =
   { "[envelope].opening",		UNDEFINED_FILENAME		},
   { "[envelope].closing",		UNDEFINED_FILENAME		},
   { "invisible_sand.digging",		"schlurf.wav"			},
+  { "invisible_sand.active.digging",	"schlurf.wav"			},
   { "shield_normal.collecting",		"pong.wav"			},
   { "shield_normal.active",		UNDEFINED_FILENAME		},
   { "shield_deadly.collecting",		"pong.wav"			},
