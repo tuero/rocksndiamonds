@@ -1370,10 +1370,8 @@ void DrawMiniLevel(int scroll_x, int scroll_y)
 {
   int x,y;
 
-  ClearWindow();
-
-  for(x=0; x<2*SCR_FIELDX; x++)
-    for(y=0; y<2*SCR_FIELDY; y++)
+  for(x=0; x<ED_FIELDX; x++)
+    for(y=0; y<ED_FIELDY; y++)
       DrawMiniElementOrWall(x, y, scroll_x, scroll_y);
 
   redraw_mask |= REDRAW_FIELD;

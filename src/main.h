@@ -71,6 +71,8 @@ typedef unsigned char byte;
 #define STD_LEV_FIELDY	32
 #define MAX_LEV_FIELDX	128
 #define MAX_LEV_FIELDY	128
+#define ED_FIELDX	(2 * SCR_FIELDX - 2)
+#define ED_FIELDY	(2 * SCR_FIELDY - 2)
 
 #define MAX_PLAYERS	4
 
@@ -438,8 +440,8 @@ extern int		GameFrameDelay;
 extern int		FfwdFrameDelay;
 extern int		MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
-extern int		SBX_Left, SBX_Middle, SBX_Right;
-extern int		SBY_Upper, SBY_Middle, SBY_Lower;
+extern int		SBX_Left, SBX_Right;
+extern int		SBY_Upper, SBY_Lower;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
