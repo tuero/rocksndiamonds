@@ -94,18 +94,18 @@ static void drawmenu(int pos)
       break;
 
     case 5:
-      title_string(10, 1, 13, "played");
+      title_string(10, 3, 13, "played");
       title_string(10, 14, 26, "score");
-      title_string(10, 27, 39, "won");
+      title_string(10, 27, 37, "won");
       break;
 
     case 6:
       sprintf(buffer, "%d", 0);
-      title_string(11, 1, 13, buffer);
+      title_string(11, 3, 13, buffer);
       sprintf(buffer, "%d", 0);
       title_string(11, 14, 26, buffer);
       sprintf(buffer, "%d", 0);
-      title_string(11, 27, 39, buffer);
+      title_string(11, 27, 37, buffer);
       break;
   }
 }
@@ -320,8 +320,9 @@ int game_loop(byte action)
     {
       /* start playing */
 
-      if (game_play_init(player_level) == 0)
-	em_game_status = EM_GAME_STATUS_PLAY;
+      em_game_status = EM_GAME_STATUS_PLAY;
+      if (game_play_init(player_level) != 0)
+	em_game_status = EM_GAME_STATUS_MENU;
     }
   }
   else if (em_game_status == EM_GAME_STATUS_PLAY)
@@ -330,8 +331,8 @@ int game_loop(byte action)
     {
       /* stop playing */
 
-      game_menu_init();
       em_game_status = EM_GAME_STATUS_MENU;
+      game_menu_init();
     }
   }
 

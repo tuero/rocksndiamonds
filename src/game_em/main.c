@@ -53,8 +53,8 @@ void em_close_all()
 
 void em_main_init_game()
 {
-  game_menu_init();
   em_game_status = EM_GAME_STATUS_MENU;
+  game_menu_init();
 }
 
 int em_main_handle_game(byte action)

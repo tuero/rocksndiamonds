@@ -558,11 +558,13 @@ int open_all(void)
 #endif
 
 #if 1
-  screenBitmap = CreateBitmap(22 * TILEX, 14 * TILEY, DEFAULT_DEPTH);
+  screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
+			      DEFAULT_DEPTH);
   scoreBitmap = CreateBitmap(20 * TILEX, SCOREY, DEFAULT_DEPTH);
 #endif
 
-  screenPixmap = XCreatePixmap(display, xwindow, 22 * TILEX, 14 * TILEY,
+  screenPixmap = XCreatePixmap(display, xwindow,
+			       MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
 			       screenDepth);
   if (screenPixmap == 0)
   {

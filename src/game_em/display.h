@@ -26,9 +26,23 @@
 #define MENUFONTX		(ORIG_MENUFONTX		* ZOOM_FACTOR)
 #define MENUFONTY		(ORIG_MENUFONTY		* ZOOM_FACTOR)
 
+#define ORIG_SCR_MENUX		20
+#define ORIG_SCR_MENUY		12
+#define SCR_MENUX		17
+#define SCR_MENUY		12
+#define SCR_FIELDX		17
+#define SCR_FIELDY		17
+#define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
+#define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
+
 /* often used screen positions */
+#define ORIG_MENU_SX		((ORIG_SCR_MENUX - SCR_MENUX) * TILEX / 2)
+#define ORIG_MENU_SY		0
+#define SY			8
 #define SX			8
 #define SY			8
+#define SXSIZE			(SCR_FIELDX * TILEX)
+#define SYSIZE			(SCR_FIELDY * TILEY)
 
 #if 0
 
