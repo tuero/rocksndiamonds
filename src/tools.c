@@ -666,13 +666,14 @@ void DrawPlayer(struct PlayerInfo *player)
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
 #if 1
-      if (CAN_BE_CRUMBLED(GfxElement[jx][jy]))
+      /* !!! insert DrawLevelFieldCrumbledSandDigging code here !!! */
+      if (player->is_digging && CAN_BE_CRUMBLED(GfxElement[jx][jy]))
 	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
 #else
       if (GfxElement[jx][jy] == EL_SAND)
 	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
 #endif
-      else
+      else	/* player->is_collecting */
       {
 	int old_element = GfxElement[jx][jy];
 	int old_graphic = el_act_dir2img(old_element, action, move_dir);
@@ -1322,7 +1323,9 @@ void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
   int sx = SCREENX(x), sy = SCREENY(y);
 
   DrawGraphic(sx, sy, graphic1, frame1);
-  DrawLevelFieldCrumbledSandExt(x, y, graphic2, frame2);
+
+  if (graphic1 != IMG_EMPTY_SPACE)
+    DrawLevelFieldCrumbledSandExt(x, y, graphic2, frame2);
 }
 
 void DrawLevelFieldCrumbledSandNeighbours(int x, int y)

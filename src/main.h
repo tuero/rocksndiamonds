@@ -971,9 +971,9 @@
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	0
+#define PROGRAM_VERSION_PATCH	1
 #define PROGRAM_VERSION_RELEASE	0
-#define PROGRAM_VERSION_STRING	"3.0.0"
+#define PROGRAM_VERSION_STRING	"3.0.1"
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
@@ -1117,7 +1117,7 @@ struct LevelInfo
   int time_light;
   int time_timegate;
   boolean double_speed;
-  boolean gravity;
+  boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -1179,6 +1179,7 @@ struct GameInfo
   int switchgate_pos;
   int balloon_dir;
   boolean explosions_delayed;
+  boolean current_gravity;
 };
 
 struct GlobalInfo

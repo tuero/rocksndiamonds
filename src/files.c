@@ -74,7 +74,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->time_timegate = 10;
   level->amoeba_content = EL_DIAMOND;
   level->double_speed = FALSE;
-  level->gravity = FALSE;
+  level->initial_gravity = FALSE;
   level->em_slippery_gems = FALSE;
 
   level->use_custom_template = FALSE;
@@ -276,7 +276,7 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->time_wheel		= getFile8Bit(file);
   level->amoeba_content		= checkLevelElement(getFile8Bit(file));
   level->double_speed		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
-  level->gravity		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
@@ -838,7 +838,7 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile8Bit(file, (level->encoding_16bit_amoeba ? EL_EMPTY :
 		     level->amoeba_content));
   putFile8Bit(file, (level->double_speed ? 1 : 0));
-  putFile8Bit(file, (level->gravity ? 1 : 0));
+  putFile8Bit(file, (level->initial_gravity ? 1 : 0));
   putFile8Bit(file, (level->encoding_16bit_field ? 1 : 0));
   putFile8Bit(file, (level->em_slippery_gems ? 1 : 0));
 
@@ -1198,7 +1198,7 @@ void DumpLevel(struct LevelInfo *level)
   printf("\n");
   printf("Amoeba Speed: %d\n", level->amoeba_speed);
   printf("\n");
-  printf("Gravity:                %s\n", (level->gravity ? "yes" : "no"));
+  printf("Gravity:                %s\n", (level->initial_gravity ?"yes":"no"));
   printf("Double Speed Movement:  %s\n", (level->double_speed ? "yes" : "no"));
   printf("EM style slippery gems: %s\n", (level->em_slippery_gems ? "yes" : "no"));
 

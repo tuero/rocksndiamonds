@@ -1032,6 +1032,7 @@ void InitGame()
   game.switchgate_pos = 0;
   game.balloon_dir = MV_NO_MOVING;
   game.explosions_delayed = TRUE;
+  game.current_gravity = level.initial_gravity;
 
   for (i=0; i<4; i++)
   {
@@ -6087,7 +6088,7 @@ void ScrollLevel(int dx, int dy)
 
 static void CheckGravityMovement(struct PlayerInfo *player)
 {
-  if (level.gravity && !player->programmed_action)
+  if (game.current_gravity && !player->programmed_action)
   {
     int move_dir_vertical = player->action & (MV_UP | MV_DOWN);
     int move_dir_horizontal = player->action & (MV_LEFT | MV_RIGHT);
@@ -7085,7 +7086,7 @@ int DigField(struct PlayerInfo *player,
 	  element == EL_SP_GRAVITY_PORT_RIGHT ||
 	  element == EL_SP_GRAVITY_PORT_UP ||
 	  element == EL_SP_GRAVITY_PORT_DOWN)
-	level.gravity = !level.gravity;
+	game.current_gravity = !game.current_gravity;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
