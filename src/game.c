@@ -7382,6 +7382,12 @@ void GameActions()
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
+#if 1
+  if (recorded_player_action != NULL)
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].action = recorded_player_action[i];
+#endif
+
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     summarized_player_action |= stored_player[i].action;
@@ -7413,11 +7419,13 @@ void GameActions()
 #if 0
       if (stored_player[i].programmed_action &&
 	  stored_player[i].programmed_action != recorded_player_action[i])
-	printf("::: %d <-> %d\n",
+	printf("::: %d: %d <-> %d\n", i,
 	       stored_player[i].programmed_action, recorded_player_action[i]);
 #endif
 
+#if 0
       actual_player_action = recorded_player_action[i];
+#endif
     }
 
 #if 0

@@ -549,7 +549,7 @@ static struct LevelFileInfo *getLevelFileInfo(int nr)
 
 int getMappedElement(int element)
 {
-  /* map some (historic, now obsolete) elements */
+  /* remap some (historic, now obsolete) elements */
 
 #if 1
   switch (element)
@@ -606,6 +606,32 @@ int getMappedElement(int element)
   else if (element == EL_KEY_OBSOLETE)
     element = EL_KEY_1;
 #endif
+
+  return element;
+}
+
+int getMappedElementByVersion(int element, int game_version)
+{
+  /* remap some elements due to certain game version */
+
+  if (game_version <= VERSION_IDENT(2,2,0,0))
+  {
+    /* map game font elements */
+    element = (element == EL_CHAR('[')  ? EL_CHAR_AUMLAUT :
+	       element == EL_CHAR('\\') ? EL_CHAR_OUMLAUT :
+	       element == EL_CHAR(']')  ? EL_CHAR_UUMLAUT :
+	       element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
+  }
+
+  if (game_version < VERSION_IDENT(3,0,0,0))
+  {
+    /* map Supaplex gravity tube elements */
+    element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :
+	       element == EL_SP_GRAVITY_PORT_RIGHT ? EL_SP_PORT_RIGHT :
+	       element == EL_SP_GRAVITY_PORT_UP    ? EL_SP_PORT_UP    :
+	       element == EL_SP_GRAVITY_PORT_DOWN  ? EL_SP_PORT_DOWN  :
+	       element);
+  }
 
   return element;
 }
@@ -2130,7 +2156,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 {
-  int i, j;
+  int i, j, x, y;
 
   /* map custom element change events that have changed in newer versions
      (these following values were accidentally changed in version 3.0.1) */
@@ -2189,7 +2215,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
-  /* correct custom element fields (for old levels without these options) */
+  /* correct custom element values (for old levels without these options) */
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
@@ -2232,6 +2258,16 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   }
 #endif
 
+  /* map elements that have changed in newer versions */
+  level->amoeba_content = getMappedElementByVersion(level->amoeba_content,
+						    level->game_version);
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (x = 0; x < 3; x++)
+      for (y = 0; y < 3; y++)
+	level->yamyam_content[i][x][y] =
+	  getMappedElementByVersion(level->yamyam_content[i][x][y],
+				    level->game_version);
+
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
 }
@@ -2247,6 +2283,9 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
     {
       int element = level->field[x][y];
 
+#if 1
+      element = getMappedElementByVersion(element, level->game_version);
+#else
       if (level->game_version <= VERSION_IDENT(2,2,0,0))
       {
 	/* map game font elements */
@@ -2265,6 +2304,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
 		   element == EL_SP_GRAVITY_PORT_DOWN  ? EL_SP_PORT_DOWN  :
 		   element);
       }
+#endif
 
       level->field[x][y] = element;
     }
