@@ -424,6 +424,7 @@ void HandleButton(int mx, int my, int button)
 
 	  printf("      Feld[%d][%d] == %d ('%s')\n", x,y, Feld[x][y],
 		 element_info[Feld[x][y]].token_name);
+	  printf("      Back[%d][%d] == %d\n", x,y, Back[x][y]);
 	  printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
 	  printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
 	  printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);

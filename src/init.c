@@ -291,8 +291,13 @@ void InitFontGraphicInfo()
   /* ---------- initialize font graphic definitions ---------- */
 
   /* always start with reliable default values (normal font graphics) */
+#if 1
+  for (i=0; i < NUM_FONTS; i++)
+    font_info[i].graphic = IMG_FONT_INITIAL_1;
+#else
   for (i=0; i < NUM_FONTS; i++)
     font_info[i].graphic = FONT_INITIAL_1;
+#endif
 
   /* initialize normal font/graphic mapping from static configuration */
   for (i=0; font_to_graphic[i].font_nr > -1; i++)
@@ -665,6 +670,34 @@ void InitElementGraphicInfo()
     }
   }
 
+#if 1
+  /* set animation mode to "none" for each graphic with only 1 frame */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    for (act=0; act<NUM_ACTIONS; act++)
+    {
+      int graphic = element_info[i].graphic[act];
+      int crumbled = element_info[i].crumbled[act];
+
+      if (graphic_info[graphic].anim_frames == 1)
+	graphic_info[graphic].anim_mode = ANIM_NONE;
+      if (graphic_info[crumbled].anim_frames == 1)
+	graphic_info[crumbled].anim_mode = ANIM_NONE;
+
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      {
+	graphic = element_info[i].direction_graphic[act][dir];
+	crumbled = element_info[i].direction_crumbled[act][dir];
+
+	if (graphic_info[graphic].anim_frames == 1)
+	  graphic_info[graphic].anim_mode = ANIM_NONE;
+	if (graphic_info[crumbled].anim_frames == 1)
+	  graphic_info[crumbled].anim_mode = ANIM_NONE;
+      }
+    }
+  }
+#endif
+
 #if 0
 #if DEBUG
   if (options.verbose)
@@ -842,6 +875,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
     graphic_info[graphic].anim_delay = 1;
 
   graphic_info[graphic].anim_mode = parameter[GFX_ARG_ANIM_MODE];
+#if 0
+  if (graphic_info[graphic].anim_frames == 1)
+    graphic_info[graphic].anim_mode = ANIM_NONE;
+#endif
 
   /* automatically determine correct start frame, if not defined */
   if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)

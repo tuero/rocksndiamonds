@@ -48,7 +48,11 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   }
   else if (mode & ANIM_PINGPONG)	/* oscillate (border frames once) */
   {
+#if 1
+    int max_anim_frames = (num_frames > 1 ? 2 * num_frames - 2 : 1);
+#else
     int max_anim_frames = 2 * num_frames - 2;
+#endif
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame);

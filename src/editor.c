@@ -1114,6 +1114,7 @@ static struct ValueTextInfo options_change_direct_action[] =
 {
   { CE_TOUCHED_BY_PLAYER,	"touched by player ..."		},
   { CE_PRESSED_BY_PLAYER,	"pressed by player ..."		},
+  { CE_SWITCHED_BY_PLAYER,	"switched by player ..."	},
   { CE_PUSHED_BY_PLAYER,	"pushed by player ..."		},
   { CE_ENTERED_BY_PLAYER,	"entered by player ..."		},
   { CE_LEFT_BY_PLAYER,		"left by player ..."		},
@@ -1128,6 +1129,7 @@ static struct ValueTextInfo options_change_other_action[] =
 {
   { CE_OTHER_GETS_TOUCHED,	"player touches ..."		},
   { CE_OTHER_GETS_PRESSED,	"player presses ..."		},
+  { CE_OTHER_GETS_SWITCHED,	"player switches ..."		},
   { CE_OTHER_GETS_PUSHED,	"player pushes ..."		},
   { CE_OTHER_GETS_ENTERED,	"player enters ..."		},
   { CE_OTHER_GETS_LEFT,		"player leaves ..."		},
@@ -4589,6 +4591,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.direct_action =
     (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_SWITCHED_BY_PLAYER) ? CE_SWITCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_ENTERED_BY_PLAYER) ? CE_ENTERED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_LEFT_BY_PLAYER) ? CE_LEFT_BY_PLAYER :
@@ -4602,6 +4605,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.other_action =
     (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
+     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_SWITCHED) ? CE_OTHER_GETS_SWITCHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_ENTERED) ? CE_OTHER_GETS_ENTERED :
      HAS_CHANGE_EVENT(element, CE_OTHER_GETS_LEFT) ? CE_OTHER_GETS_LEFT :
@@ -4705,6 +4709,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set player change event from checkbox and selectbox */
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_SWITCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_ENTERED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_LEFT_BY_PLAYER] = FALSE;
@@ -4718,6 +4723,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set other element action change event from checkbox and selectbox */
   custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
+  custom_element_change_events[CE_OTHER_GETS_SWITCHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_ENTERED] = FALSE;
   custom_element_change_events[CE_OTHER_GETS_LEFT] = FALSE;

@@ -179,11 +179,10 @@
 #define CE_LEFT_BY_PLAYER	22
 #define CE_OTHER_GETS_ENTERED	23
 #define CE_OTHER_GETS_LEFT	24
+#define CE_SWITCHED_BY_PLAYER	25
+#define CE_OTHER_GETS_SWITCHED	26
 
-/* values for derived change events (determined from properties above) */
-#define CE_TOUCHING_SOME_SIDE	25	/* summarized left/right/up/down/any */
-
-#define NUM_CHANGE_EVENTS	26
+#define NUM_CHANGE_EVENTS	27
 
 #define CE_BITMASK_DEFAULT	0
 

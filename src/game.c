@@ -2479,7 +2479,11 @@ void Bang(int x, int y)
   int element = Feld[x][y];
 #endif
 
+#if 1
+  if (IS_PLAYER(x, y) && !PLAYER_PROTECTED(x, y))
+#else
   if (IS_PLAYER(x, y))
+#endif
   {
     struct PlayerInfo *player = PLAYERINFO(x, y);
 
@@ -4491,6 +4495,12 @@ void ContinueMoving(int x, int y)
 
     Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
 
+    /* prevent pushed element from moving on in pushed direction */
+    if (pushed && CAN_MOVE(element) &&
+	element_info[element].move_pattern & MV_ANY_DIRECTION &&
+	!(element_info[element].move_pattern & MovDir[newx][newy]))
+      TurnRound(newx, newy);
+
     if (!pushed)	/* special case: moving object pushed by player */
       JustStopped[newx][newy] = 3;
 
@@ -5544,6 +5554,8 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 	{
 	  if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
 	    RemoveMovingField(ex, ey);
+
+	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
 	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
 
@@ -6696,6 +6708,10 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 #if 1
     player->snapped = FALSE;
 #endif
+
+#if 1
+    player->Switching = FALSE;
+#endif
   }
   else
   {
@@ -7645,6 +7661,11 @@ int DigField(struct PlayerInfo *player,
 	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
 	  return MF_NO_ACTION;
 
+#if 1
+	if (CAN_MOVE(element))	/* only fixed elements can be passed! */
+	  return MF_NO_ACTION;
+#endif
+
 	if (element >= EL_EM_GATE_1 && element <= EL_EM_GATE_4)
 	{
 	  if (!player->key[element - EL_EM_GATE_1])
@@ -7797,13 +7818,6 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;
 
 #if 1
-	/*
-	printf("::: %d [%d,%d,%d => %d]\n", MovDir[x][y],
-	       CAN_MOVE(element), move_direction, getElementMoveStepsize(x, y),
-	       (CAN_MOVE(element) && MovDir[x][y] == move_direction &&
-		getElementMoveStepsize(x, y) > MOVE_STEPSIZE_NORMAL) );
-	*/
-
 	/* do not push elements already moving away faster than player */
 	if (CAN_MOVE(element) && MovDir[x][y] == move_direction &&
 	    ABS(getElementMoveStepsize(x, y)) > MOVE_STEPSIZE_NORMAL)
@@ -7899,8 +7913,20 @@ int DigField(struct PlayerInfo *player,
       else
       {
 #if 1
+
+#if 1
+	if (!player->Switching)
+	{
+	  player->Switching = TRUE;
+	  CheckTriggeredElementSideChange(x, y, element, dig_side,
+					  CE_OTHER_GETS_SWITCHED);
+	  CheckElementSideChange(x, y, element, dig_side,
+				 CE_SWITCHED_BY_PLAYER, -1);
+	}
+#endif
+
 	CheckTriggeredElementSideChange(x, y, element, dig_side,
-				    CE_OTHER_GETS_PRESSED);
+					CE_OTHER_GETS_PRESSED);
 	CheckElementSideChange(x, y, element, dig_side,
 			       CE_PRESSED_BY_PLAYER, -1);
 #else
