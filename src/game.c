@@ -59,33 +59,72 @@ void GetPlayerConfig()
 
 void InitGame()
 {
-  int i, x,y;
+  int i,j, x,y;
   BOOL emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   BOOL emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
 
   for(i=0; i<MAX_PLAYERS; i++)
-    stored_player[i].active = FALSE;
+  {
+    struct PlayerInfo *player = &stored_player[i];
 
-  local_player->nr = 1;
+    player->nr = i;
+    player->active = FALSE;
+    player->local = FALSE;
+
+    player->score = 0;
+    player->gems_still_needed = level.edelsteine;
+    player->sokobanfields_still_needed = 0;
+    player->lights_still_needed = 0;
+    player->friends_still_needed = 0;
+
+    for(j=0; j<4; j++)
+      player->key[j] = FALSE;
+
+    player->dynamite = 0;
+    player->dynabomb_count = 0;
+    player->dynabomb_size = 0;
+    player->dynabombs_left = 0;
+    player->dynabomb_xl = FALSE;
+
+    player->MovDir = MV_NO_MOVING;
+    player->MovPos = 0;
+    player->Pushing = FALSE;
+    player->GfxPos = 0;
+    player->Frame = 0;
+
+    player->actual_frame_counter = 0;
+
+    player->frame_reset_delay = 0;
+
+    player->push_delay = 0;
+    player->push_delay_value = 5;
+
+    player->move_delay = 0;
+    player->last_move_dir = MV_NO_MOVING;
+
+    player->snapped = FALSE;
+
+    player->gone = FALSE;
+
+    player->last_jx = player->last_jy = 0;
+    player->jx = player->jy = 0;
+
+    DigField(player, 0,0,0,0,DF_NO_PUSH);
+    SnapField(player, 0,0);
+
+
+    /* TEST TEST TEST */
+    stored_player[i].active = TRUE;
+    /* TEST TEST TEST */
+
+    player->LevelSolved = FALSE;
+    player->GameOver = FALSE;
+  }
+
   local_player->active = TRUE;
   local_player->local = TRUE;
 
-  player = local_player;
-
-  player->score = 0;
-  player->gems_still_needed = level.edelsteine;
-  player->sokobanfields_still_needed = 0;
-  player->lights_still_needed = 0;
-  player->friends_still_needed = 0;
-
-  for(i=0; i<4; i++)
-    player->key[i] = FALSE;
-
-  player->dynamite = 0;
-  player->dynabomb_count = 0;
-  player->dynabomb_size = 0;
-  player->dynabombs_left = 0;
-  player->dynabomb_xl = FALSE;
+  ZX = ZY = -1;
 
   MampferNr = 0;
   FrameCounter = 0;
@@ -93,43 +132,7 @@ void InitGame()
   TimeLeft = level.time;
   ScreenMovPos = 0;
 
-  player->MovDir = MV_NO_MOVING;
-  player->MovPos = 0;
-  player->Pushing = FALSE;
-  player->GfxPos = 0;
-  player->Frame = 0;
-
-  player->frame_reset_delay = 0;
-
-  player->push_delay = 0;
-  player->push_delay_value = 5;
-
-  player->move_delay = 0;
-  player->last_move_dir = MV_NO_MOVING;
-
-  player->lastJX = player->lastJY = 0;
-  player->JX = player->JY = 0;
-
-  lastJX = lastJY = 0;
-  JX = JY = 0;
-  ZX = ZY = -1;
-
-
-  /* test */
-  for(i=1; i<MAX_PLAYERS; i++)
-  {
-    stored_player[i] = stored_player[0];
-    stored_player[i].nr = i+1;
-    stored_player[i].active = TRUE;
-    stored_player[i].local = FALSE;
-  }
-
-
-
-  PlayerGone = LevelSolved = GameOver = SiebAktiv = FALSE;
-
-  DigField(0,0,0,0,DF_NO_PUSH);
-  SnapField(0,0);
+  AllPlayersGone = SiebAktiv = FALSE;
 
   for(i=0;i<MAX_NUM_AMOEBA;i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
@@ -151,30 +154,26 @@ void InitGame()
     switch(Feld[x][y])
     {
       case EL_SPIELFIGUR:
+	Feld[x][y] = EL_SPIELER1;
+	/* no break! */
       case EL_SPIELER1:
-	StorePlayer[x][y] = EL_SPIELER1;
-	Feld[x][y] = EL_LEERRAUM;
-	JX = lastJX = x;
-	JY = lastJY = y;
-
-	player->JX = JX;
-	player->JY = JY;
-	player->lastJX = lastJX;
-	player->lastJY = lastJY;
-
-	break;
       case EL_SPIELER2:
       case EL_SPIELER3:
       case EL_SPIELER4:
+      {
+	struct PlayerInfo *player = &stored_player[Feld[x][y] - EL_SPIELER1];
+	int jx = player->jx, jy = player->jy;
+
+	/* remove duplicate players */
+	if (StorePlayer[jx][jy] == Feld[x][y])
+	  StorePlayer[jx][jy] = 0;
+
 	StorePlayer[x][y] = Feld[x][y];
 	Feld[x][y] = EL_LEERRAUM;
-
-	stored_player[StorePlayer[x][y] - EL_SPIELER1].JX = x;
-	stored_player[StorePlayer[x][y] - EL_SPIELER1].JY = y;
-	stored_player[StorePlayer[x][y] - EL_SPIELER1].lastJX = x;
-	stored_player[StorePlayer[x][y] - EL_SPIELER1].lastJY = y;
-
+	player->jx = player->last_jx = x;
+	player->jy = player->last_jy = y;
 	break;
+      }
       case EL_BADEWANNE:
 	if (x<lev_fieldx-1 && Feld[x+1][y]==EL_SALZSAEURE)
 	  Feld[x][y] = EL_BADEWANNE1;
@@ -254,17 +253,19 @@ void InitGame()
 		    emulate_sb ? EMU_SOKOBAN : EMU_NONE);
 
   scroll_x = scroll_y = -1;
-  if (JX>=MIDPOSX-1)
-    scroll_x =
-      (JX<=lev_fieldx-MIDPOSX ? JX-MIDPOSX : lev_fieldx-SCR_FIELDX+1);
-  if (JY>=MIDPOSY-1)
-    scroll_y =
-      (JY<=lev_fieldy-MIDPOSY ? JY-MIDPOSY : lev_fieldy-SCR_FIELDY+1);
+  if (local_player->jx >= MIDPOSX-1)
+    scroll_x = (local_player->jx <= lev_fieldx-MIDPOSX ?
+		local_player->jx - MIDPOSX :
+		lev_fieldx - SCR_FIELDX + 1);
+  if (local_player->jy >= MIDPOSY-1)
+    scroll_y = (local_player->jy <= lev_fieldy-MIDPOSY ?
+		local_player->jy - MIDPOSY :
+		lev_fieldy - SCR_FIELDY + 1);
 
   CloseDoor(DOOR_CLOSE_1);
 
   DrawLevel();
-  DrawLevelElement(JX,JY,EL_SPIELFIGUR);
+  DrawAllPlayers();
   FadeToFront();
 
   XCopyArea(display,pix[PIX_DOOR],pix[PIX_DB_DOOR],gc,
@@ -419,7 +420,7 @@ void GameWon()
   int hi_pos;
   int bumplevel = FALSE;
 
-  LevelSolved = FALSE;
+  local_player->LevelSolved = FALSE;
 
   if (TimeLeft)
   {
@@ -730,7 +731,24 @@ void Explode(int ex, int ey, int phase, int mode)
 	element = Store2[x][y];
 
       if (IS_PLAYER(ex,ey))
-	Store[x][y] = EL_EDELSTEIN_GELB;
+      {
+	switch(StorePlayer[ex][ey])
+	{
+	  case EL_SPIELER2:
+	    Store[x][y] = EL_EDELSTEIN_ROT;
+	    break;
+	  case EL_SPIELER3:
+	    Store[x][y] = EL_EDELSTEIN;
+	    break;
+	  case EL_SPIELER4:
+	    Store[x][y] = EL_EDELSTEIN_LILA;
+	    break;
+	  case EL_SPIELER1:
+	  default:
+	    Store[x][y] = EL_EDELSTEIN_GELB;
+	    break;
+	}
+      }
       else if (center_element==EL_MAULWURF)
 	Store[x][y] = EL_EDELSTEIN_ROT;
       else if (center_element==EL_PINGUIN)
@@ -796,7 +814,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int element = Store2[x][y];
 
     if (IS_PLAYER(x,y))
-      KillHero();
+      KillHero(PLAYERINFO(x,y));
     else if (IS_EXPLOSIVE(element))
     {
       Feld[x][y] = Store2[x][y];
@@ -827,9 +845,10 @@ void Explode(int ex, int ey, int phase, int mode)
   }
 }
 
-void DynaExplode(int ex, int ey, int size)
+void DynaExplode(int ex, int ey)
 {
   int i,j;
+  struct PlayerInfo *player = &stored_player[Store2[ex][ey] - EL_SPIELER1];
   static int xy[4][2] =
   {
     { 0,-1 },
@@ -838,11 +857,13 @@ void DynaExplode(int ex, int ey, int size)
     { 0,+1 }
   };
 
+  Store2[ex][ey] = 0;	/* delete player information */
+
   Explode(ex,ey,0,EX_CENTER);
 
   for(i=0;i<4;i++)
   {
-    for(j=1;j<=size;j++)
+    for(j=1; j<=player->dynabomb_size; j++)
     {
       int x = ex+j*xy[i%4][0];
       int y = ey+j*xy[i%4][1];
@@ -888,7 +909,7 @@ void Bang(int x, int y)
     case EL_DYNABOMB_NR:
     case EL_DYNABOMB_SZ:
     case EL_DYNABOMB_XL:
-      DynaExplode(x,y,player->dynabomb_size);
+      DynaExplode(x,y);
       break;
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
@@ -977,7 +998,7 @@ void Impact(int x, int y)
   if (element==EL_TROPFEN && (lastline || object_hit))
   {
     if (object_hit && IS_PLAYER(x,y+1))
-      KillHero();
+      KillHero(PLAYERINFO(x,y+1));
     else if (object_hit && (smashed==EL_MAULWURF || smashed==EL_PINGUIN))
       Bang(x,y+1);
     else
@@ -997,7 +1018,7 @@ void Impact(int x, int y)
 
     if (IS_PLAYER(x,y+1))
     {
-      KillHero();
+      KillHero(PLAYERINFO(x,y+1));
       return;
     }
     else if (smashed==EL_MAULWURF || smashed==EL_PINGUIN)
@@ -1346,13 +1367,31 @@ void TurnRound(int x, int y)
   else if (element==EL_ROBOT || element==EL_SONDE ||
 	   element==EL_MAULWURF || element==EL_PINGUIN)
   {
-    int attr_x = JX, attr_y = JY;
-    int newx, newy;
+    int attr_x = -1, attr_y = -1;
 
-    if (PlayerGone)
+    if (AllPlayersGone)
     {
       attr_x = ExitX;
       attr_y = ExitY;
+    }
+    else
+    {
+      int i;
+
+      for(i=0; i<MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+	int jx = player->jx, jy = player->jy;
+
+	if (!player->active || player->gone)
+	  continue;
+
+	if (attr_x == -1 || ABS(jx-x)+ABS(jy-y) < ABS(attr_x-x)+ABS(attr_y-y))
+	{
+	  attr_x = jx;
+	  attr_y = jy;
+	}
+      }
     }
 
     if (element==EL_ROBOT && ZX>=0 && ZY>=0)
@@ -1374,8 +1413,8 @@ void TurnRound(int x, int y)
 
       for(i=0;i<4;i++)
       {
-    	int ex = x+xy[i%4][0];
-    	int ey = y+xy[i%4][1];
+    	int ex = x + xy[i%4][0];
+    	int ey = y + xy[i%4][1];
 
     	if (IN_LEV_FIELD(ex,ey) && Feld[ex][ey] == EL_AUSGANG_AUF)
 	{
@@ -1388,16 +1427,18 @@ void TurnRound(int x, int y)
 
     MovDir[x][y] = MV_NO_MOVING;
     if (attr_x<x)
-      MovDir[x][y] |= (GameOver ? MV_RIGHT : MV_LEFT);
+      MovDir[x][y] |= (AllPlayersGone ? MV_RIGHT : MV_LEFT);
     else if (attr_x>x)
-      MovDir[x][y] |= (GameOver ? MV_LEFT : MV_RIGHT);
+      MovDir[x][y] |= (AllPlayersGone ? MV_LEFT : MV_RIGHT);
     if (attr_y<y)
-      MovDir[x][y] |= (GameOver ? MV_DOWN : MV_UP);
+      MovDir[x][y] |= (AllPlayersGone ? MV_DOWN : MV_UP);
     else if (attr_y>y)
-      MovDir[x][y] |= (GameOver ? MV_UP : MV_DOWN);
+      MovDir[x][y] |= (AllPlayersGone ? MV_UP : MV_DOWN);
 
     if (element==EL_ROBOT)
     {
+      int newx, newy;
+
       if ((MovDir[x][y]&(MV_LEFT|MV_RIGHT)) && (MovDir[x][y]&(MV_UP|MV_DOWN)))
 	MovDir[x][y] &= (RND(2) ? (MV_LEFT|MV_RIGHT) : (MV_UP|MV_DOWN));
       Moving2Blocked(x,y,&newx,&newy);
@@ -1409,6 +1450,8 @@ void TurnRound(int x, int y)
     }
     else
     {
+      int newx, newy;
+
       MovDelay[x][y] = 1;
 
       if ((MovDir[x][y]&(MV_LEFT|MV_RIGHT)) && (MovDir[x][y]&(MV_UP|MV_DOWN)))
@@ -1463,14 +1506,15 @@ void StartMoving(int x, int y)
 
       for(i=0; i<MAX_PLAYERS; i++)
       {
-	struct PlayerInfo *pl = &stored_player[i];
+	struct PlayerInfo *player = &stored_player[i];
 
-	if (pl->active && pl->Pushing && pl->MovPos)
+	if (player->active && !player->gone &&
+	    player->Pushing && player->MovPos)
 	{
-	  int nextJX = pl->JX + (pl->JX - pl->lastJX);
-	  int nextJY = pl->JY + (pl->JY - pl->lastJY);
+	  int next_jx = player->jx + (player->jx - player->last_jx);
+	  int next_jy = player->jy + (player->jy - player->last_jy);
 
-	  if (x == nextJX && y == nextJY)
+	  if (x == next_jx && y == next_jy)
 	    return;
 	}
       }
@@ -1700,7 +1744,7 @@ void StartMoving(int x, int y)
     {
       /* Spieler erwischt */
       MovDir[x][y] = 0;
-      KillHero();
+      KillHero(PLAYERINFO(newx,newy));
       return;
     }
     else if ((element == EL_MAULWURF || element == EL_PINGUIN ||
@@ -1724,14 +1768,15 @@ void StartMoving(int x, int y)
 	  DrawGraphicThruMask(SCROLLX(newx),SCROLLY(newy),el2gfx(element));
 
 	local_player->friends_still_needed--;
-	if (!local_player->friends_still_needed && PlayerGone && !GameOver)
-	  LevelSolved = GameOver = TRUE;
+	if (!local_player->friends_still_needed &&
+	    !local_player->GameOver && AllPlayersGone)
+	  local_player->LevelSolved = local_player->GameOver = TRUE;
 
 	return;
       }
       else if (IS_MAMPF3(Feld[newx][newy]))
       {
-	if (DigField(newx,newy, 0,0, DF_DIG) == MF_MOVING)
+	if (DigField(local_player, newx,newy, 0,0, DF_DIG) == MF_MOVING)
 	  DrawLevelField(newx,newy);
 	else
 	  MovDir[x][y] = MV_NO_MOVING;
@@ -1863,14 +1908,15 @@ void StartMoving(int x, int y)
 	/* check if this element is just being pushed */
 	for(i=0; i<MAX_PLAYERS; i++)
 	{
-	  struct PlayerInfo *pl = &stored_player[i];
+	  struct PlayerInfo *player = &stored_player[i];
 
-	  if (pl->active && pl->Pushing && pl->GfxPos)
+	  if (player->active && !player->gone &&
+	      player->Pushing && player->GfxPos)
 	  {
-	    int nextJX = pl->JX + (pl->JX - pl->lastJX);
-	    int nextJY = pl->JY + (pl->JY - pl->lastJY);
+	    int next_jx = player->jx + (player->jx - player->last_jx);
+	    int next_jy = player->jy + (player->jy - player->last_jy);
 
-	    if (x == nextJX && y == nextJY)
+	    if (x == next_jx && y == next_jy)
 	      return;
 	  }
 	}
@@ -1972,7 +2018,7 @@ void ContinueMoving(int x, int y)
 
     if (DONT_TOUCH(element))	/* Käfer oder Flieger */
     {
-      TestIfBadThingHitsHero();
+      TestIfBadThingHitsHero(newx,newy);
       TestIfBadThingHitsFriend(newx,newy);
       TestIfBadThingHitsOtherBadThing(newx,newy);
     }
@@ -2441,10 +2487,11 @@ void AusgangstuerPruefen(int x, int y)
   {
     Feld[x][y] = EL_AUSGANG_ACT;
 
-    if (IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
-      PlaySoundLevel(x,y,SND_OEFFNEN);
-    else
-      PlaySoundLevel(JX,JY,SND_OEFFNEN);
+    PlaySoundLevel(x < UNSCROLLX(BX1) ? UNSCROLLX(BX1) :
+		   (x > UNSCROLLX(BX2) ? UNSCROLLX(BX2) : x),
+		   y < UNSCROLLY(BY1) ? UNSCROLLY(BY1) :
+		   (y > UNSCROLLY(BY2) ? UNSCROLLY(BY2) : y),
+		   SND_OEFFNEN);
   }
 }
 
@@ -2500,31 +2547,20 @@ void EdelsteinFunkeln(int x, int y)
 
       if (MovDelay[x][y])
       {
-	int src_x,src_y, dest_x,dest_y;
 	int phase = (MovDelay[x][y]-1)/2;
 
 	if (phase > 2)
 	  phase = 4-phase;
 
-	src_x  = SX + GFX_PER_LINE*TILEX;
-	src_y  = SY + phase*TILEY;
-	dest_x = FX + SCROLLX(x)*TILEX;
-	dest_y = FY + SCROLLY(y)*TILEY;
-
-	/*
-	XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
-	XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
-		  src_x,src_y, TILEX,TILEY, dest_x,dest_y);
-		  */
-
-	XSetClipMask(display, tile_clip_gc,
-		     tile_clipmask[GFX_MASK_SPARKLING + phase]);
-	XSetClipOrigin(display, tile_clip_gc, dest_x,dest_y);
-	XCopyArea(display, pix[PIX_BACK], drawto_field, tile_clip_gc,
-		  src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+	DrawGraphicThruMask(SCROLLX(x),SCROLLY(y), GFX_FUNKELN_WEISS + phase);
 
 	if (direct_draw_on)
 	{
+	  int dest_x,dest_y;
+
+	  dest_x = FX + SCROLLX(x)*TILEX;
+	  dest_y = FY + SCROLLY(y)*TILEY;
+
 	  XCopyArea(display,drawto_field,window,gc,
 		    dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
 	  SetDrawtoField(DRAW_DIRECT);
@@ -2667,9 +2703,10 @@ void CheckForDragon(int x, int y)
   }
 }
 
-void PlayerActions(int player_action)
+void PlayerActions(struct PlayerInfo *player, int player_action)
 {
   BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
+  int jx = player->jx, jy = player->jy;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
   int up	= player_action & JOY_UP;
@@ -2679,17 +2716,20 @@ void PlayerActions(int player_action)
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
 
+  if (!player->active || player->gone)
+    return;
+
   if (player_action)
   {
     player->frame_reset_delay = 0;
 
     if (button1)
-      snapped = SnapField(dx,dy);
+      snapped = SnapField(player, dx,dy);
     else
     {
       if (button2)
-	bombed = PlaceBomb();
-      moved = MoveFigure(dx,dy);
+	bombed = PlaceBomb(player);
+      moved = MoveFigure(player, dx,dy);
     }
 
     if (tape.recording && (moved || snapped || bombed))
@@ -2699,12 +2739,12 @@ void PlayerActions(int player_action)
       TapeRecordAction(player_action);
     }
     else if (tape.playing && snapped)
-      SnapField(0,0);			/* stop snapping */
+      SnapField(player, 0,0);			/* stop snapping */
   }
   else
   {
-    DigField(0,0,0,0,DF_NO_PUSH);
-    SnapField(0,0);
+    DigField(player, 0,0, 0,0, DF_NO_PUSH);
+    SnapField(player, 0,0);
     if (++player->frame_reset_delay > MoveSpeed)
       player->Frame = 0;
   }
@@ -2718,9 +2758,9 @@ void PlayerActions(int player_action)
     {
       int dx = (next_joy == JOY_LEFT ? -1 : +1);
 
-      if (IN_LEV_FIELD(JX+dx,JY) && IS_PUSHABLE(Feld[JX+dx][JY]))
+      if (IN_LEV_FIELD(jx+dx,jy) && IS_PUSHABLE(Feld[jx+dx][jy]))
       {
-	int el = Feld[JX+dx][JY];
+	int el = Feld[jx+dx][jy];
 	int push_delay = (IS_SB_ELEMENT(el) || el==EL_SONDE ? 2 : 10);
 
 	if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
@@ -2757,26 +2797,9 @@ void GameActions(int player_action)
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
-    player = &stored_player[i];
-    JX = player->JX;
-    JY = player->JY;
-    lastJX = player->lastJX;
-    lastJY = player->lastJY;
-
-    if (!player->active)
-      continue;
-
-    PlayerActions(player_action);
-
-    if (player->MovPos)
-      ScrollFigure(0);
+    PlayerActions(&stored_player[i], player_action);
+    ScrollFigure(&stored_player[i], SCROLL_FIGURE_GO_ON);
   }
-
-  player = local_player;
-  JX = player->JX;
-  JY = player->JY;
-  lastJX = player->lastJX;
-  lastJY = player->lastJY;
 
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
@@ -2859,6 +2882,7 @@ void GameActions(int player_action)
     if (SiebAktiv)
     {
       BOOL sieb = FALSE;
+      int jx = local_player->jx, jy = local_player->jy;
 
       if (element==EL_SIEB_LEER || element==EL_SIEB_VOLL ||
 	  Store[x][y]==EL_SIEB_LEER)
@@ -2873,7 +2897,8 @@ void GameActions(int player_action)
 	sieb = TRUE;
       }
 
-      if (sieb && ABS(x-JX)+ABS(y-JY) < ABS(sieb_x-JX)+ABS(sieb_y-JY))
+      /* play the element sound at the position nearest to the player */
+      if (sieb && ABS(x-jx)+ABS(y-jy) < ABS(sieb_x-jx)+ABS(sieb_y-jy))
       {
 	sieb_x = x;
 	sieb_y = y;
@@ -2919,35 +2944,11 @@ void GameActions(int player_action)
     DrawText(DX_TIME,DY_TIME,int2str(TimeLeft,3),FS_SMALL,FC_YELLOW);
 
     if (!TimeLeft)
-      KillHero();
+      for(i=0; i<MAX_PLAYERS; i++)
+	KillHero(&stored_player[i]);
   }
 
-
-
-
-  for(i=0; i<MAX_PLAYERS; i++)
-  {
-    player = &stored_player[i];
-    JX = player->JX;
-    JY = player->JY;
-    lastJX = player->lastJX;
-    lastJY = player->lastJY;
-
-    if (!player->active)
-      continue;
-
-    DrawPlayerField(player->JX,player->JY);
-  }
-
-  player = local_player;
-  JX = player->JX;
-  JY = player->JY;
-  lastJX = player->lastJX;
-  lastJY = player->lastJY;
-
-  /*
-  DrawPlayerField(JX,JY);
-  */
+  DrawAllPlayers();
 }
 
 void ScrollLevel(int dx, int dy)
@@ -2955,7 +2956,7 @@ void ScrollLevel(int dx, int dy)
   int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
   int x,y;
 
-  ScreenMovPos = player->GfxPos;
+  ScreenMovPos = local_player->GfxPos;
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2981,13 +2982,15 @@ void ScrollLevel(int dx, int dy)
   redraw_mask |= REDRAW_FIELD;
 }
 
-BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
+BOOL MoveFigureOneStep(struct PlayerInfo *player,
+		       int dx, int dy, int real_dx, int real_dy)
 {
-  int newJX = JX+dx, newJY = JY+dy;
+  int jx = player->jx, jy = player->jy;
+  int new_jx = jx+dx, new_jy = jy+dy;
   int element;
   int can_move;
 
-  if (PlayerGone || (!dx && !dy))
+  if (player->gone || (!dx && !dy))
     return(MF_NO_ACTION);
 
   player->MovDir = (dx < 0 ? MV_LEFT :
@@ -2995,53 +2998,53 @@ BOOL MoveFigureOneStep(int dx, int dy, int real_dx, int real_dy)
 		    dy < 0 ? MV_UP :
 		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
 
-  if (!IN_LEV_FIELD(newJX,newJY))
+  if (!IN_LEV_FIELD(new_jx,new_jy))
     return(MF_NO_ACTION);
 
-  element = MovingOrBlocked2Element(newJX,newJY);
+  element = MovingOrBlocked2Element(new_jx,new_jy);
 
   if (DONT_GO_TO(element))
   {
     if (element==EL_SALZSAEURE && dx==0 && dy==1)
     {
-      Blurb(JX,JY);
-      Feld[JX][JY] = EL_SPIELFIGUR;
-      InitMovingField(JX,JY,MV_DOWN);
-      Store[JX][JY] = EL_SALZSAEURE;
-      ContinueMoving(JX,JY);
-      BuryHero();
+      Blurb(jx,jy);
+      Feld[jx][jy] = EL_SPIELFIGUR;
+      InitMovingField(jx,jy,MV_DOWN);
+      Store[jx][jy] = EL_SALZSAEURE;
+      ContinueMoving(jx,jy);
+      BuryHero(player);
     }
     else
-      KillHero();
+      KillHero(player);
 
     return(MF_MOVING);
   }
 
-  can_move = DigField(newJX,newJY, real_dx,real_dy, DF_DIG);
+  can_move = DigField(player, new_jx,new_jy, real_dx,real_dy, DF_DIG);
   if (can_move != MF_MOVING)
     return(can_move);
 
-  lastJX = player->lastJX = JX;
-  lastJY = player->lastJY = JY;
-  JX = player->JX = newJX;
-  JY = player->JY = newJY;
-
-  StorePlayer[lastJX][lastJY] = EL_LEERRAUM;
-  StorePlayer[JX][JY] = EL_SPIELER1;
+  StorePlayer[jx][jy] = EL_LEERRAUM;
+  player->last_jx = jx;
+  player->last_jy = jy;
+  jx = player->jx = new_jx;
+  jy = player->jy = new_jy;
+  StorePlayer[jx][jy] = EL_SPIELER1 + player->nr;
 
   player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
 
-  ScrollFigure(-1);
+  ScrollFigure(player, SCROLL_FIGURE_INIT);
 
   return(MF_MOVING);
 }
 
-BOOL MoveFigure(int dx, int dy)
+BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
 {
+  int jx = player->jx, jy = player->jy;
+  int old_jx = jx, old_jy = jy;
   int moved = MF_NO_ACTION;
-  int oldJX = JX, oldJY = JY;
 
-  if (PlayerGone || (!dx && !dy))
+  if (player->gone || (!dx && !dy))
     return(FALSE);
 
   if (!FrameReached(&player->move_delay,MoveSpeed) && !tape.playing)
@@ -3049,32 +3052,29 @@ BOOL MoveFigure(int dx, int dy)
 
   if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
   {
-    if (!(moved |= MoveFigureOneStep(0,dy, dx,dy)))
-      moved |= MoveFigureOneStep(dx,0, dx,dy);
+    if (!(moved |= MoveFigureOneStep(player, 0,dy, dx,dy)))
+      moved |= MoveFigureOneStep(player, dx,0, dx,dy);
   }
   else
   {
-    if (!(moved |= MoveFigureOneStep(dx,0, dx,dy)))
-      moved |= MoveFigureOneStep(0,dy, dx,dy);
+    if (!(moved |= MoveFigureOneStep(player, dx,0, dx,dy)))
+      moved |= MoveFigureOneStep(player, 0,dy, dx,dy);
   }
 
-
-  /*
-  player->last_move_dir = MV_NO_MOVING;
-  */
-
+  jx = player->jx;
+  jy = player->jy;
 
   if (moved & MF_MOVING && player == local_player)
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
 
-    if ((scroll_x < JX-MIDPOSX-offset || scroll_x > JX-MIDPOSX+offset) &&
-	JX >= MIDPOSX-1-offset && JX <= lev_fieldx-(MIDPOSX-offset))
-      scroll_x = JX-MIDPOSX + (scroll_x < JX-MIDPOSX ? -offset : offset);
-    if ((scroll_y < JY-MIDPOSY-offset || scroll_y > JY-MIDPOSY+offset) &&
-	JY >= MIDPOSY-1-offset && JY <= lev_fieldy-(MIDPOSY-offset))
-      scroll_y = JY-MIDPOSY + (scroll_y < JY-MIDPOSY ? -offset : offset);
+    if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
+	jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
+      scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
+    if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
+	jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
+      scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
       ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
@@ -3087,41 +3087,46 @@ BOOL MoveFigure(int dx, int dy)
 
   if (moved & MF_MOVING)
   {
-    if (oldJX != JX && oldJY == JY)
-      player->MovDir = (oldJX < JX ? MV_RIGHT : MV_LEFT);
-    else if (oldJX == JX && oldJY != JY)
-      player->MovDir = (oldJY < JY ? MV_DOWN : MV_UP);
+    if (old_jx != jx && old_jy == jy)
+      player->MovDir = (old_jx < jx ? MV_RIGHT : MV_LEFT);
+    else if (old_jx == jx && old_jy != jy)
+      player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
-    DrawLevelField(JX,JY);	/* für "ErdreichAnbroeckeln()" */
+    DrawLevelField(jx,jy);	/* für "ErdreichAnbroeckeln()" */
 
     player->last_move_dir = player->MovDir;
   }
+  else
+    player->last_move_dir = MV_NO_MOVING;
 
-  TestIfHeroHitsBadThing();
+  TestIfHeroHitsBadThing(jx,jy);
 
-  if (PlayerGone)
-    RemoveHero();
+  if (player->gone)
+    RemoveHero(player);
 
   return(moved);
 }
 
-void ScrollFigure(int init)
+void ScrollFigure(struct PlayerInfo *player, int mode)
 {
-  static long actual_frame_counter = 0;
+  int jx = player->jx, jy = player->jy;
+  int last_jx = player->last_jx, last_jy = player->last_jy;
 
-  if (init)
+  if (!player->active || player->gone || !player->MovPos)
+    return;
+
+  if (mode == SCROLL_FIGURE_INIT)
   {
-    actual_frame_counter = FrameCounter;
-
+    player->actual_frame_counter = FrameCounter;
     player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
-    if (Feld[lastJX][lastJY] == EL_LEERRAUM)
-      Feld[lastJX][lastJY] = EL_PLAYER_IS_LEAVING;
+    if (Feld[last_jx][last_jy] == EL_LEERRAUM)
+      Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
 
-    DrawPlayerField(JX,JY);
+    DrawPlayer(player);
     return;
   }
-  else if (!FrameReached(&actual_frame_counter,1))
+  else if (!FrameReached(&player->actual_frame_counter,1))
     return;
 
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX/8;
@@ -3133,15 +3138,15 @@ void ScrollFigure(int init)
     redraw_mask |= REDRAW_FIELD;
   }
 
-  if (Feld[lastJX][lastJY] == EL_PLAYER_IS_LEAVING)
-    Feld[lastJX][lastJY] = EL_LEERRAUM;
+  if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
+    Feld[last_jx][last_jy] = EL_LEERRAUM;
 
-  DrawPlayerField(JX,JY);
+  DrawPlayer(player);
 
   if (!player->MovPos)
   {
-    lastJX = JX;
-    lastJY = JY;
+    player->last_jx = jx;
+    player->last_jy = jy;
   }
 }
 
@@ -3163,12 +3168,12 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     MV_DOWN
   };
 
-  for(i=0;i<4;i++)
+  for(i=0; i<4; i++)
   {
-    int x,y,element;
+    int x,y, element;
 
-    x = goodx+xy[i][0];
-    y = goody+xy[i][1];
+    x = goodx + xy[i][0];
+    y = goody + xy[i][1];
     if (!IN_LEV_FIELD(x,y))
       continue;
 
@@ -3176,7 +3181,7 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
 
     if (DONT_TOUCH(element))
     {
-      if (MovDir[x][y]==harmless[i])
+      if (MovDir[x][y] == harmless[i])
 	continue;
 
       killx = x;
@@ -3185,10 +3190,10 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
     }
   }
 
-  if (killx!=goodx || killy!=goody)
+  if (killx != goodx || killy != goody)
   {
     if (IS_PLAYER(goodx,goody))
-      KillHero();
+      KillHero(PLAYERINFO(goodx,goody));
     else
       Bang(goodx,goody);
   }
@@ -3212,20 +3217,26 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     MV_DOWN
   };
 
-  for(i=0;i<4;i++)
+  for(i=0; i<4; i++)
   {
-    int x,y,element;
+    int x,y, element;
 
-    x = badx+xy[i][0];
-    y = bady+xy[i][1];
+    x = badx + xy[i][0];
+    y = bady + xy[i][1];
     if (!IN_LEV_FIELD(x,y))
       continue;
 
     element = Feld[x][y];
 
-    if (element==EL_PINGUIN)
+    if (IS_PLAYER(x,y))
     {
-      if (MovDir[x][y]==harmless[i] && IS_MOVING(x,y))
+      killx = x;
+      killy = y;
+      break;
+    }
+    else if (element == EL_PINGUIN)
+    {
+      if (MovDir[x][y] == harmless[i] && IS_MOVING(x,y))
 	continue;
 
       killx = x;
@@ -3234,19 +3245,27 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
     }
   }
 
-  if (killx!=badx || killy!=bady)
-    Bang(killx,killy);
+  if (killx != badx || killy != bady)
+  {
+    if (IS_PLAYER(killx,killy))
+      KillHero(PLAYERINFO(killx,killy));
+    else
+      Bang(killx,killy);
+  }
 }
 
-void TestIfHeroHitsBadThing()
+void TestIfHeroHitsBadThing(int x, int y)
 {
-  TestIfGoodThingHitsBadThing(JX,JY);
+  TestIfGoodThingHitsBadThing(x,y);
 }
 
-void TestIfBadThingHitsHero()
+void TestIfBadThingHitsHero(int x, int y)
 {
+  /*
   TestIfGoodThingHitsBadThing(JX,JY);
-  /* (no typo!) */
+  */
+
+  TestIfBadThingHitsGoodThing(x,y);
 }
 
 void TestIfFriendHitsBadThing(int x, int y)
@@ -3261,7 +3280,7 @@ void TestIfBadThingHitsFriend(int x, int y)
 
 void TestIfBadThingHitsOtherBadThing(int badx, int bady)
 {
-  int i, killx=badx, killy=bady;
+  int i, killx = badx, killy = bady;
   static int xy[4][2] =
   {
     { 0,-1 },
@@ -3270,65 +3289,81 @@ void TestIfBadThingHitsOtherBadThing(int badx, int bady)
     { 0,+1 }
   };
 
-  for(i=0;i<4;i++)
+  for(i=0; i<4; i++)
   {
-    int x,y,element;
+    int x,y, element;
 
-    x=badx+xy[i][0];
-    y=bady+xy[i][1];
+    x=badx + xy[i][0];
+    y=bady + xy[i][1];
     if (!IN_LEV_FIELD(x,y))
       continue;
 
-    element=Feld[x][y];
-    if (IS_AMOEBOID(element) || element==EL_LIFE ||
-	element==EL_AMOEBING ||	element==EL_TROPFEN)
+    element = Feld[x][y];
+    if (IS_AMOEBOID(element) || element == EL_LIFE ||
+	element == EL_AMOEBING || element == EL_TROPFEN)
     {
-      killx=x;
-      killy=y;
+      killx = x;
+      killy = y;
       break;
     }
   }
 
-  if (killx!=badx || killy!=bady)
+  if (killx != badx || killy != bady)
     Bang(badx,bady);
 }
 
-void KillHero()
+void KillHero(struct PlayerInfo *player)
 {
-  if (PlayerGone)
+  int jx = player->jx, jy = player->jy;
+
+  if (player->gone)
     return;
 
-  if (IS_PFORTE(Feld[JX][JY]))
-    Feld[JX][JY] = EL_LEERRAUM;
+  if (IS_PFORTE(Feld[jx][jy]))
+    Feld[jx][jy] = EL_LEERRAUM;
 
-  Bang(JX,JY);
-  BuryHero();
+  Bang(jx,jy);
+  BuryHero(player);
 }
 
-void BuryHero()
+void BuryHero(struct PlayerInfo *player)
 {
-  if (PlayerGone)
+  int jx = player->jx, jy = player->jy;
+
+  if (player->gone)
     return;
 
-  PlaySoundLevel(JX,JY,SND_AUTSCH);
-  PlaySoundLevel(JX,JY,SND_LACHEN);
+  PlaySoundLevel(jx,jy, SND_AUTSCH);
+  PlaySoundLevel(jx,jy, SND_LACHEN);
 
-  GameOver = TRUE;
-  RemoveHero();
+  player->GameOver = TRUE;
+  RemoveHero(player);
 }
 
-void RemoveHero()
+void RemoveHero(struct PlayerInfo *player)
 {
-  PlayerGone = TRUE;
+  int jx = player->jx, jy = player->jy;
+  int i, found = FALSE;
 
-  ExitX = ZX = JX;
-  ExitY = ZY = JY;
-  JX = JY = -1;
+  player->gone = TRUE;
+  StorePlayer[jx][jy] = 0;
+
+  for(i=0; i<MAX_PLAYERS; i++)
+    if (stored_player[i].active && !stored_player[i].gone)
+      found = TRUE;
+
+  if (!found)
+    AllPlayersGone = TRUE;
+
+  ExitX = ZX = jx;
+  ExitY = ZY = jy;
 }
 
-int DigField(int x, int y, int real_dx, int real_dy, int mode)
+int DigField(struct PlayerInfo *player,
+	     int x, int y, int real_dx, int real_dy, int mode)
 {
-  int dx = x-JX, dy = y-JY;
+  int jx = player->jx, jy = player->jy;
+  int dx = x - jx, dy = y - jy;
   int element;
 
   if (!player->MovPos)
@@ -3451,12 +3486,12 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 
       player->Pushing = TRUE;
 
-      if (!IN_LEV_FIELD(x+dx,y+dy) || Feld[x+dx][y+dy] != EL_LEERRAUM)
+      if (!IN_LEV_FIELD(x+dx,y+dy) || !IS_FREE(x+dx,y+dy))
 	return(MF_NO_ACTION);
 
       if (real_dy)
       {
-	if (IN_LEV_FIELD(JX,JY+real_dy) && !IS_SOLID(Feld[JX][JY+real_dy]))
+	if (IN_LEV_FIELD(jx,jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
 	  return(MF_NO_ACTION);
       }
 
@@ -3506,11 +3541,11 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       if (mode==DF_SNAP)
 	return(MF_NO_ACTION);
 
-      PlayerGone = TRUE;
+      player->gone = TRUE;
       PlaySoundLevel(x,y,SND_BUING);
 
       if (!local_player->friends_still_needed)
-	LevelSolved = GameOver = TRUE;
+	player->LevelSolved = player->GameOver = TRUE;
 
       break;
 
@@ -3543,19 +3578,19 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
       player->Pushing = TRUE;
 
       if (!IN_LEV_FIELD(x+dx,y+dy)
-	  || (Feld[x+dx][y+dy] != EL_LEERRAUM
+	  || (!IS_FREE(x+dx,y+dy)
 	      && (Feld[x+dx][y+dy] != EL_SOKOBAN_FELD_LEER
 		  || !IS_SB_ELEMENT(element))))
 	return(MF_NO_ACTION);
 
       if (dx && real_dy)
       {
-	if (IN_LEV_FIELD(JX,JY+real_dy) && !IS_SOLID(Feld[JX][JY+real_dy]))
+	if (IN_LEV_FIELD(jx,jy+real_dy) && !IS_SOLID(Feld[jx][jy+real_dy]))
 	  return(MF_NO_ACTION);
       }
       else if (dy && real_dx)
       {
-	if (IN_LEV_FIELD(JX+real_dx,JY) && !IS_SOLID(Feld[JX+real_dx][JY]))
+	if (IN_LEV_FIELD(jx+real_dx,jy) && !IS_SOLID(Feld[jx+real_dx][jy]))
 	  return(MF_NO_ACTION);
       }
 
@@ -3601,7 +3636,7 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
 	  local_player->sokobanfields_still_needed == 0 &&
 	  game_emulation == EMU_SOKOBAN)
       {
-	LevelSolved = GameOver = TRUE;
+	player->LevelSolved = player->GameOver = TRUE;
 	PlaySoundLevel(x,y,SND_BUING);
       }
 
@@ -3623,21 +3658,24 @@ int DigField(int x, int y, int real_dx, int real_dy, int mode)
   return(MF_MOVING);
 }
 
-BOOL SnapField(int dx, int dy)
+BOOL SnapField(struct PlayerInfo *player, int dx, int dy)
 {
-  int x = JX+dx, y = JY+dy;
-  static int snapped = FALSE;
+  int jx = player->jx, jy = player->jy;
+  int x = jx + dx, y = jy + dy;
 
-  if (PlayerGone || !IN_LEV_FIELD(x,y))
+  if (player->gone || !IN_LEV_FIELD(x,y))
     return(FALSE);
+
   if (dx && dy)
     return(FALSE);
+
   if (!dx && !dy)
   {
-    snapped = FALSE;
+    player->snapped = FALSE;
     return(FALSE);
   }
-  if (snapped)
+
+  if (player->snapped)
     return(FALSE);
 
   player->MovDir = (dx < 0 ? MV_LEFT :
@@ -3645,47 +3683,49 @@ BOOL SnapField(int dx, int dy)
 		    dy < 0 ? MV_UP :
 		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
 
-  if (!DigField(x,y, 0,0, DF_SNAP))
+  if (!DigField(player, x,y, 0,0, DF_SNAP))
     return(FALSE);
 
-  snapped = TRUE;
+  player->snapped = TRUE;
   DrawLevelField(x,y);
   BackToFront();
 
   return(TRUE);
 }
 
-BOOL PlaceBomb(void)
+BOOL PlaceBomb(struct PlayerInfo *player)
 {
+  int jx = player->jx, jy = player->jy;
   int element;
 
-  if (PlayerGone || player->MovPos)
+  if (player->gone || player->MovPos)
     return(FALSE);
 
-  element = Feld[JX][JY];
+  element = Feld[jx][jy];
 
   if ((player->dynamite==0 && player->dynabombs_left==0) ||
       element==EL_DYNAMIT || element==EL_DYNABOMB || element==EL_EXPLODING)
     return(FALSE);
 
   if (element != EL_LEERRAUM)
-    Store[JX][JY] = element;
+    Store[jx][jy] = element;
 
   if (player->dynamite)
   {
-    Feld[JX][JY] = EL_DYNAMIT;
-    MovDelay[JX][JY] = 96;
+    Feld[jx][jy] = EL_DYNAMIT;
+    MovDelay[jx][jy] = 96;
     player->dynamite--;
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	     FS_SMALL, FC_YELLOW);
-    DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNAMIT);
+    DrawGraphicThruMask(SCROLLX(jx),SCROLLY(jy),GFX_DYNAMIT);
   }
   else
   {
-    Feld[JX][JY] = EL_DYNABOMB;
-    MovDelay[JX][JY] = 96;
+    Feld[jx][jy] = EL_DYNABOMB;
+    Store2[jx][jy] = EL_SPIELER1 + player->nr;	/* for DynaExplode() */
+    MovDelay[jx][jy] = 96;
     player->dynabombs_left--;
-    DrawGraphicThruMask(SCROLLX(JX),SCROLLY(JY),GFX_DYNABOMB);
+    DrawGraphicThruMask(SCROLLX(jx),SCROLLY(jy),GFX_DYNABOMB);
   }
 
   return(TRUE);

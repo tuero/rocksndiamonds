@@ -91,15 +91,15 @@ int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 int		FX = SX, FY = SY, ScreenMovPos = 0, ScrollStepSize = TILEX/8;
 int		GameFrameDelay = GAME_FRAME_DELAY, MoveSpeed = 8;
 int		BX1 = 0, BY1 = 0, BX2 = SCR_FIELDX-1, BY2 = SCR_FIELDY-1;
-int		JX,JY, lastJX,lastJY, ZX,ZY, ExitX,ExitY;
-int		PlayerGone, LevelSolved, GameOver;
+int		ZX,ZY, ExitX,ExitY;
+int		AllPlayersGone;
 int		FrameCounter, TimeFrames, TimeLeft;
 int		MampferNr, SiebAktiv;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS+1];
-struct PlayerInfo      *local_player, *player;
+struct PlayerInfo      *local_player;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SoundInfo	Sound[NUM_SOUNDS];
 struct RecordingInfo	tape;

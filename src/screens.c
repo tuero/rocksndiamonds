@@ -69,7 +69,7 @@ void DrawMainMenu()
   DrawGraphic(10,3,GFX_PFEIL_L);
   DrawGraphic(14,3,GFX_PFEIL_R);
 
-  DrawText(SX+54+16,SY+326,"A Game by Artsoft Development",FS_SMALL,FC_BLUE);
+  DrawText(SX+40+16,SY+326,"A Game by Artsoft Entertainment",FS_SMALL,FC_BLUE);
   DrawText(SX+40+16,SY+344,"Graphics: Deluxe Paint IV Amiga",
 	   FS_SMALL,FC_BLUE);
   DrawText(SX+60+16,SY+362,"Sounds: AudioMaster IV Amiga",
@@ -255,12 +255,12 @@ static int helpscreen_frame[MAX_HELPSCREEN_ELS];
 static int helpscreen_delay[MAX_HELPSCREEN_ELS];
 static int helpscreen_action[] =
 {
-  GFX_SPIELER_DOWN,4,2,
-  GFX_SPIELER_UP,4,2,
-  GFX_SPIELER_LEFT,4,2,
-  GFX_SPIELER_RIGHT,4,2,
-  GFX_SPIELER_PUSH_LEFT,4,2,
-  GFX_SPIELER_PUSH_RIGHT,4,2,					HA_NEXT,
+  GFX_SPIELER1_DOWN,4,2,
+  GFX_SPIELER1_UP,4,2,
+  GFX_SPIELER1_LEFT,4,2,
+  GFX_SPIELER1_RIGHT,4,2,
+  GFX_SPIELER1_PUSH_LEFT,4,2,
+  GFX_SPIELER1_PUSH_RIGHT,4,2,					HA_NEXT,
   GFX_ERDREICH,1,100,						HA_NEXT,
   GFX_LEERRAUM,1,100,						HA_NEXT,
   GFX_MORAST_LEER,1,100,					HA_NEXT,
@@ -1304,10 +1304,10 @@ void HandleGameActions(int player_action)
   if (game_status != PLAYING)
     return;
 
-  if (LevelSolved)
+  if (local_player->LevelSolved)
     GameWon();
 
-  if (PlayerGone && !TAPE_IS_STOPPED(tape))
+  if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
     TapeStop();
 
   GameActions(player_action);
@@ -1477,7 +1477,7 @@ void HandleGameButtons(int mx, int my, int button)
   switch(CheckGameButtons(mx,my,button))
   {
     case BUTTON_GAME_STOP:
-      if (GameOver)
+      if (AllPlayersGone)
       {
 	CloseDoor(DOOR_CLOSE_1);
 	game_status = MAINMENU;

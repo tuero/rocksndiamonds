@@ -167,11 +167,11 @@ void HandleExposeEvent(XExposeEvent *event)
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
-    for(xx=0;xx<SCR_FIELDX;xx++)
-      for(yy=0;yy<SCR_FIELDY;yy++)
+    for(xx=0; xx<SCR_FIELDX; xx++)
+      for(yy=0; yy<SCR_FIELDY; yy++)
 	if (xx>=x1 && xx<=x2 && yy>=y1 && yy<=y2)
 	  DrawScreenField(xx,yy);
-    DrawPlayerField(JX,JY);
+    DrawAllPlayers();
 
     SetDrawtoField(DRAW_DIRECT);
   }
@@ -266,6 +266,26 @@ void HandleButton(int mx, int my, int button)
     HandleSoundButtons(mx,my,button);
     HandleGameButtons(mx,my,button);
   }
+
+#ifdef DEBUG
+  if (game_status == PLAYING && button)
+  {
+    int sx = (mx - SX) / TILEX;
+    int sy = (my - SY) / TILEY;
+
+    if (IN_SCR_FIELD(sx,sy))
+    {
+      int x = UNSCROLLX(sx);
+      int y = UNSCROLLY(sy);
+
+      printf("INFO: Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
+      printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
+      printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
+      printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);
+      printf("\n");
+    }
+  }
+#endif
 
   switch(game_status)
   {
@@ -438,7 +458,7 @@ void HandleKey(KeySym key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if (key==XK_Return && game_status==PLAYING && GameOver)
+  if (key==XK_Return && game_status==PLAYING && AllPlayersGone)
   {
     CloseDoor(DOOR_CLOSE_1);
     game_status = MAINMENU;
@@ -611,6 +631,7 @@ void HandleKey(KeySym key, int key_status)
 	  break;
 
 	case XK_y:
+	  /*
 	  {
 	    printf("FX = %d, FY = %d\n", FX,FY);
 
@@ -621,6 +642,26 @@ void HandleKey(KeySym key, int key_status)
 	    XFlush(display);
 	    XSync(display,FALSE);
 	    Delay(1000);
+	  }
+	  */
+
+	  printf("direct_draw_on == %d\n", direct_draw_on);
+
+	  break;
+
+	case XK_z:
+	  {
+	    int i;
+
+	    for(i=0; i<MAX_PLAYERS; i++)
+	    {
+	      printf("Player %d:\n", i);
+	      printf("  jx == %d, jy == %d\n",
+		     stored_player[i].jx, stored_player[i].jy);
+	      printf("  last_jx == %d, last_jy == %d\n",
+		     stored_player[i].last_jx, stored_player[i].last_jy);
+	    }
+	    printf("\n");
 	  }
 
 	  break;
@@ -712,7 +753,7 @@ void HandleJoystick()
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);
 
-      if (GameOver && newbutton)
+      if (AllPlayersGone && newbutton)
       {
 	CloseDoor(DOOR_CLOSE_1);
 	game_status = MAINMENU;
@@ -720,7 +761,7 @@ void HandleJoystick()
 	return;
       }
 
-      if (tape.pausing || PlayerGone)
+      if (tape.pausing || AllPlayersGone)
 	joy = 0;
 
       HandleGameActions(joy);

@@ -80,7 +80,7 @@ void OpenAll(int argc, char *argv[])
 
 void InitLevelAndPlayerInfo()
 {
-  player = local_player = &stored_player[0];
+  local_player = &stored_player[0];
 
   if (!LoadLevelInfo())			/* global level info */
     CloseAll();
@@ -432,17 +432,36 @@ void InitGfx()
   }
   tile_needs_clipping[] =
   {
-    { GFX_SPIELER_UP, 4 },
-    { GFX_SPIELER_DOWN, 4 },
-    { GFX_SPIELER_LEFT, 4 },
-    { GFX_SPIELER_RIGHT, 4 },
-    { GFX_SPIELER_PUSH_LEFT, 4 },
-    { GFX_SPIELER_PUSH_RIGHT, 4 },
+    { GFX_SPIELER1_UP, 4 },
+    { GFX_SPIELER1_DOWN, 4 },
+    { GFX_SPIELER1_LEFT, 4 },
+    { GFX_SPIELER1_RIGHT, 4 },
+    { GFX_SPIELER1_PUSH_LEFT, 4 },
+    { GFX_SPIELER1_PUSH_RIGHT, 4 },
+    { GFX_SPIELER2_UP, 4 },
+    { GFX_SPIELER2_DOWN, 4 },
+    { GFX_SPIELER2_LEFT, 4 },
+    { GFX_SPIELER2_RIGHT, 4 },
+    { GFX_SPIELER2_PUSH_LEFT, 4 },
+    { GFX_SPIELER2_PUSH_RIGHT, 4 },
+    { GFX_SPIELER3_UP, 4 },
+    { GFX_SPIELER3_DOWN, 4 },
+    { GFX_SPIELER3_LEFT, 4 },
+    { GFX_SPIELER3_RIGHT, 4 },
+    { GFX_SPIELER3_PUSH_LEFT, 4 },
+    { GFX_SPIELER3_PUSH_RIGHT, 4 },
+    { GFX_SPIELER4_UP, 4 },
+    { GFX_SPIELER4_DOWN, 4 },
+    { GFX_SPIELER4_LEFT, 4 },
+    { GFX_SPIELER4_RIGHT, 4 },
+    { GFX_SPIELER4_PUSH_LEFT, 4 },
+    { GFX_SPIELER4_PUSH_RIGHT, 4 },
     { GFX_GEBLUBBER, 4 },
     { GFX_DYNAMIT, 7 },
     { GFX_DYNABOMB, 4 },
     { GFX_SOKOBAN_OBJEKT, 1 },
-    { GFX_MASK_SPARKLING, 3 },
+    { GFX_FUNKELN_BLAU, 3 },
+    { GFX_FUNKELN_WEISS, 3 },
     { -1, 0 }
   };
 
@@ -504,15 +523,8 @@ void InitGfx()
       int src_x, src_y;
       Pixmap src_pixmap;
 
-      if (tile_needs_clipping[i].start == GFX_MASK_SPARKLING)
-      {
-	/* special case -- should be cleaned up sometimes... */
-	src_pixmap = clipmask[PIX_BACK];
-	src_x  = SX + GFX_PER_LINE*TILEX;
-	src_y  = SY + j*TILEY;
-      }
-      else if (graphic >= GFX_START_ROCKSSCREEN &&
-	       graphic <= GFX_END_ROCKSSCREEN)
+      if (graphic >= GFX_START_ROCKSSCREEN &&
+	  graphic <= GFX_END_ROCKSSCREEN)
       {
 	src_pixmap = clipmask[PIX_BACK];
 	graphic -= GFX_START_ROCKSSCREEN;

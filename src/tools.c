@@ -330,24 +330,40 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   }
 }
 
+void DrawAllPlayers()
+{
+  int i;
+
+  for(i=0; i<MAX_PLAYERS; i++)
+    if (stored_player[i].active)
+      DrawPlayer(&stored_player[i]);
+}
+
 void DrawPlayerField(int x, int y)
 {
-  int lastJX = player->lastJX, lastJY = player->lastJY;
-  int sx = SCROLLX(x), sy = SCROLLY(y);
-  int sxx = 0, syy = 0;
-  int element = Feld[x][y];
-  int graphic, phase;
-
   if (!IS_PLAYER(x,y))
     return;
 
-  if (PlayerGone)
+  DrawPlayer(PLAYERINFO(x,y));
+}
+
+void DrawPlayer(struct PlayerInfo *player)
+{
+  int jx = player->jx, jy = player->jy;
+  int last_jx = player->last_jx, last_jy = player->last_jy;
+  int next_jx = jx + (jx - last_jx), next_jy = jy + (jy - last_jy);
+  int sx = SCROLLX(jx), sy = SCROLLY(jy);
+  int sxx = 0, syy = 0;
+  int element = Feld[jx][jy];
+  int graphic, phase;
+
+  if (!player->active || player->gone || !IN_SCR_FIELD(sx,sy))
     return;
 
 #if DEBUG
-  if (!IN_LEV_FIELD(x,y) || !IN_SCR_FIELD(sx,sy))
+  if (!IN_LEV_FIELD(jx,jy) || !IN_SCR_FIELD(sx,sy))
   {
-    printf("DrawPlayerField(): x = %d, y = %d\n",x,y);
+    printf("DrawPlayerField(): x = %d, y = %d\n",jx,jy);
     printf("DrawPlayerField(): sx = %d, sy = %d\n",sx,sy);
     printf("DrawPlayerField(): This should never happen!\n");
     return;
@@ -362,53 +378,51 @@ void DrawPlayerField(int x, int y)
 
   /* draw things in the field the player is leaving, if needed */
 
-  if (lastJX != JX || lastJY != JY)
+  if (last_jx != jx || last_jy != jy)
   {
-    if (Store[lastJX][lastJY])
+    if (Store[last_jx][last_jy])
     {
-      DrawLevelElement(lastJX,lastJY, Store[lastJX][lastJY]);
-      DrawLevelElementThruMask(lastJX,lastJY, Feld[lastJX][lastJY]);
+      DrawLevelElement(last_jx,last_jy, Store[last_jx][last_jy]);
+      DrawLevelElementThruMask(last_jx,last_jy, Feld[last_jx][last_jy]);
     }
-    else if (Feld[lastJX][lastJY] == EL_DYNAMIT)
-      DrawDynamite(lastJX,lastJY);
+    else if (Feld[last_jx][last_jy] == EL_DYNAMIT)
+      DrawDynamite(last_jx,last_jy);
     else
-      DrawLevelField(lastJX,lastJY);
+      DrawLevelField(last_jx,last_jy);
 
     if (player->Pushing)
     {
-      int nextJX = JX + (JX - lastJX);
-      int nextJY = JY + (JY - lastJY);
-
       if (player->GfxPos)
       {
-  	if (Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
-  	  DrawLevelElement(nextJX,nextJY, EL_SOKOBAN_FELD_LEER);
+  	if (Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
+  	  DrawLevelElement(next_jx,next_jy, EL_SOKOBAN_FELD_LEER);
   	else
-  	  DrawLevelElement(nextJX,nextJY, EL_LEERRAUM);
+  	  DrawLevelElement(next_jx,next_jy, EL_LEERRAUM);
       }
       else
-  	DrawLevelField(nextJX,nextJY);
+  	DrawLevelField(next_jx,next_jy);
     }
   }
 
   /* draw things behind the player, if needed */
 
-  if (Store[x][y])
-    DrawLevelElement(x,y, Store[x][y]);
+  if (Store[jx][jy])
+    DrawLevelElement(jx,jy, Store[jx][jy]);
   else if (element != EL_DYNAMIT && element != EL_DYNABOMB)
-    DrawLevelField(x,y);
+    DrawLevelField(jx,jy);
 
   /* draw player himself */
 
   if (player->MovDir==MV_LEFT)
-    graphic = (player->Pushing ? GFX_SPIELER_PUSH_LEFT : GFX_SPIELER_LEFT);
+    graphic = (player->Pushing ? GFX_SPIELER1_PUSH_LEFT : GFX_SPIELER1_LEFT);
   else if (player->MovDir==MV_RIGHT)
-    graphic = (player->Pushing ? GFX_SPIELER_PUSH_RIGHT : GFX_SPIELER_RIGHT);
+    graphic = (player->Pushing ? GFX_SPIELER1_PUSH_RIGHT : GFX_SPIELER1_RIGHT);
   else if (player->MovDir==MV_UP)
-    graphic = GFX_SPIELER_UP;
+    graphic = GFX_SPIELER1_UP;
   else	/* MV_DOWN || MV_NO_MOVING */
-    graphic = GFX_SPIELER_DOWN;
+    graphic = GFX_SPIELER1_DOWN;
 
+  graphic += player->nr * 3*HEROES_PER_LINE;
   graphic += player->Frame;
 
   if (player->GfxPos)
@@ -426,16 +440,14 @@ void DrawPlayerField(int x, int y)
 
   if (player->Pushing && player->GfxPos)
   {
-    int nextJX = JX + (JX - lastJX);
-    int nextJY = JY + (JY - lastJY);
-    int px = SCROLLX(nextJX), py = SCROLLY(nextJY);
+    int px = SCROLLX(next_jx), py = SCROLLY(next_jy);
 
-    if (Feld[JX][JY] == EL_SOKOBAN_FELD_LEER ||
-	Feld[nextJX][nextJY] == EL_SOKOBAN_FELD_VOLL)
+    if (Feld[jx][jy] == EL_SOKOBAN_FELD_LEER ||
+	Feld[next_jx][next_jy] == EL_SOKOBAN_FELD_VOLL)
       DrawGraphicShiftedThruMask(px,py,sxx,syy, GFX_SOKOBAN_OBJEKT,NO_CUTTING);
     else
     {
-      int element = Feld[nextJX][nextJY];
+      int element = Feld[next_jx][next_jy];
       int graphic = el2gfx(element);
 
       if (element == EL_FELSBROCKEN && sxx)
@@ -460,12 +472,12 @@ void DrawPlayerField(int x, int y)
 
     if (element == EL_DYNAMIT)
     {
-      if ((phase = (96-MovDelay[x][y])/12) > 6)
+      if ((phase = (96-MovDelay[jx][jy])/12) > 6)
 	phase = 6;
     }
     else
     {
-      if ((phase = ((96-MovDelay[x][y])/6) % 8) > 3)
+      if ((phase = ((96-MovDelay[jx][jy])/6) % 8) > 3)
 	phase = 7-phase;
     }
 
@@ -474,17 +486,17 @@ void DrawPlayerField(int x, int y)
 
   if (direct_draw_on)
   {
-    int dest_x = SX+SCROLLX(x)*TILEX;
-    int dest_y = SY+SCROLLY(y)*TILEY;
+    int dest_x = SX + sx*TILEX;
+    int dest_y = SY + sy*TILEY;
     int x_size = TILEX;
     int y_size = TILEY;
 
     if (!ScreenMovPos)
     {
-      dest_x = SX + SCROLLX(MIN(JX,lastJX))*TILEX;
-      dest_y = SY + SCROLLY(MIN(JY,lastJY))*TILEY;
-      x_size = TILEX * (1 + ABS(JX - lastJX));
-      y_size = TILEY * (1 + ABS(JY - lastJY));
+      dest_x = SX + SCROLLX(MIN(jx,last_jx))*TILEX;
+      dest_y = SY + SCROLLY(MIN(jy,last_jy))*TILEY;
+      x_size = TILEX * (1 + ABS(jx - last_jx));
+      y_size = TILEY * (1 + ABS(jy - last_jy));
     }
 
     XCopyArea(display,drawto_field,window,gc,

@@ -25,6 +25,9 @@
 #define MF_MOVING		1
 #define MF_ACTION		2
 
+#define SCROLL_FIGURE_INIT	0
+#define SCROLL_FIGURE_GO_ON	1
+
 /* explosion position marks */
 #define EX_NORMAL		0
 #define EX_CENTER		1
@@ -49,7 +52,7 @@ void RemoveMovingField(int, int);
 void DrawDynamite(int, int);
 void CheckDynamite(int, int);
 void Explode(int, int, int, int);
-void DynaExplode(int, int, int);
+void DynaExplode(int, int);
 void Bang(int, int);
 void Blurb(int, int);
 void Impact(int, int);
@@ -74,24 +77,24 @@ void MauerWaechst(int, int);
 void MauerAbleger(int, int);
 void GameActions(int);
 void ScrollLevel(int, int);
-BOOL MoveFigureOneStep(int, int, int, int);
-BOOL MoveFigure(int, int);
 
-void ScrollFigure(int);
+BOOL MoveFigureOneStep(struct PlayerInfo *, int, int, int, int);
+BOOL MoveFigure(struct PlayerInfo *, int, int);
+void ScrollFigure(struct PlayerInfo *, int);
 
 void TestIfGoodThingHitsBadThing(int, int);
 void TestIfBadThingHitsGoodThing(int, int);
-void TestIfHeroHitsBadThing(void);
-void TestIfBadThingHitsHero(void);
+void TestIfHeroHitsBadThing(int, int);
+void TestIfBadThingHitsHero(int, int);
 void TestIfFriendHitsBadThing(int, int);
 void TestIfBadThingHitsFriend(int, int);
 void TestIfBadThingHitsOtherBadThing(int, int);
-void KillHero(void);
-void BuryHero(void);
-void RemoveHero(void);
-int DigField(int, int, int, int, int);
-BOOL SnapField(int, int);
-BOOL PlaceBomb(void);
+void KillHero(struct PlayerInfo *);
+void BuryHero(struct PlayerInfo *);
+void RemoveHero(struct PlayerInfo *);
+int DigField(struct PlayerInfo *, int, int, int, int, int);
+BOOL SnapField(struct PlayerInfo *, int, int);
+BOOL PlaceBomb(struct PlayerInfo *);
 void PlaySoundLevel(int, int, int);
 void RaiseScore(int);
 void RaiseScoreElement(int);
