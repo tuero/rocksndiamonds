@@ -2321,10 +2321,10 @@ void Explode(int ex, int ey, int phase, int mode)
 
   if (GfxElement[x][y] == EL_UNDEFINED)
   {
-    printf("\n\n\n");
+    printf("\n\n");
     printf("Explode(): x = %d, y = %d: GfxElement == EL_UNDEFINED\n", x, y);
     printf("Explode(): This should never happen!\n");
-    printf("\n\n\n");
+    printf("\n\n");
 
     GfxElement[x][y] = EL_EMPTY;
   }
@@ -3828,6 +3828,14 @@ void StartMoving(int x, int y)
 #endif
     }
 #if 1
+
+#if 0
+    else if (CAN_SMASH(element) &&
+	     (Feld[x][y + 1] == EL_BLOCKED ||
+	      IS_PLAYER(x, y + 1)) &&
+	     JustStopped[x][y] && !Pushed[x][y + 1])
+
+#else
 #if 1
     else if (game.engine_version < RELEASE_IDENT(2,2,0,7) &&
 	     CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
@@ -3836,6 +3844,8 @@ void StartMoving(int x, int y)
     else if (CAN_SMASH(element) && Feld[x][y + 1] == EL_BLOCKED &&
 	     JustStopped[x][y])
 #endif
+#endif
+
     {
       /* calling "Impact()" here is not only completely unneccessary
 	 (because it already gets called from "ContinueMoving()" in
@@ -4422,14 +4432,12 @@ void ContinueMoving(int x, int y)
 
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
-#if 1
     Changed[newx][newy] = Changed[x][y];
     ChangeEvent[newx][newy] = ChangeEvent[x][y];
 
     ChangeDelay[x][y] = 0;
     Changed[x][y] = CE_BITMASK_DEFAULT;
     ChangeEvent[x][y] = CE_BITMASK_DEFAULT;
-#endif
 
     /* copy animation control values to new field */
     GfxFrame[newx][newy]  = GfxFrame[x][y];
@@ -5551,14 +5559,17 @@ static void ChangeElement(int x, int y, int page)
   int element = MovingOrBlocked2Element(x, y);
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
 
+#if 0
 #ifdef DEBUG
   if (!CAN_CHANGE(element))
   {
-    printf("\n\n\n");
-    printf("ChangeElement(): element = %d\n", element);
-    printf("Explode(): This should never happen!\n");
-    printf("\n\n\n");
+    printf("\n\n");
+    printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
+	   x, y, element, element_info[element].token_name);
+    printf("ChangeElement(): This should never happen!\n");
+    printf("\n\n");
   }
+#endif
 #endif
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
