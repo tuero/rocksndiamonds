@@ -27,14 +27,10 @@
 #define CHUNK_ID_LEN		4	/* IFF style chunk id length */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header */
 #define LEVEL_HEADER_UNUSED	15	/* unused level header bytes */
+#define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk  */
+#define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header  */
 #define TAPE_HEADER_UNUSED	7	/* unused tape header bytes  */
-
-#if 0
-#define FILE_VERSION_1_0	10	/* 1.0 file version (old)          */
-#define FILE_VERSION_1_2	12	/* 1.2 file version (still in use) */
-#define FILE_VERSION_1_4	14	/* 1.4 file version (new)          */
-#endif
 
 /* file identifier strings */
 #define LEVEL_COOKIE		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_2.0"
@@ -503,10 +499,10 @@ void OLD_LoadLevel(int level_nr)
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
   char cookie[MAX_LINE_LEN];
-  char chunk[CHUNK_ID_LEN + 1];
+  char chunk_name[CHUNK_ID_LEN + 1];
   boolean encoding_16bit = FALSE;	/* default: maximal 256 elements */
   int file_version = FILE_VERSION_ACTUAL;
-  int chunk_length;
+  int chunk_size;
   FILE *file;
 
   /* always start with reliable default values */
@@ -550,8 +546,8 @@ void OLD_LoadLevel(int level_nr)
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk, "HEAD") || chunk_length != LEVEL_HEADER_SIZE)
+    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk_name, "HEAD") || chunk_size != LEVEL_HEADER_SIZE)
     {
       Error(ERR_WARN, "wrong 'HEAD' chunk of level file '%s'", filename);
       fclose(file);
@@ -601,21 +597,21 @@ void OLD_LoadLevel(int level_nr)
 
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
 
     /* look for optional author chunk */
-    if (strcmp(chunk, "AUTH") == 0 && chunk_length == MAX_LEVEL_AUTHOR_LEN)
+    if (strcmp(chunk_name, "AUTH") == 0 && chunk_size == MAX_LEVEL_AUTHOR_LEN)
     {
       for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
 	level.author[i]	= fgetc(file);
       level.author[MAX_LEVEL_NAME_LEN] = 0;
 
-      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+      getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
     }
 
     /* look for optional content chunk */
-    if (strcmp(chunk, "CONT") == 0 &&
-	chunk_length == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
+    if (strcmp(chunk_name, "CONT") == 0 &&
+	chunk_size == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
     {
       fgetc(file);
       level.num_yam_contents = fgetc(file);
@@ -641,11 +637,12 @@ void OLD_LoadLevel(int level_nr)
 						    BYTE_ORDER_BIG_ENDIAN) :
 				fgetc(file));
 
-      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
+      getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
     }
 
-    /* next check body chunk identifier and chunk length */
-    if (strcmp(chunk, "BODY") != 0 || chunk_length != lev_fieldx * lev_fieldy)
+    /* next check body chunk identifier and chunk size */
+    if (strcmp(chunk_name, "BODY") != 0 ||
+	chunk_size != lev_fieldx * lev_fieldy)
     {
       Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
       fclose(file);
@@ -694,13 +691,19 @@ void OLD_LoadLevel(int level_nr)
   SetBorderElement();
 }
 
-static void SkipBytesInFile(FILE *file, unsigned long bytes)
+static void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
 {
   while (bytes--)
     fgetc(file);
 }
 
-static void LoadLevel_HEAD(struct LevelInfo *level, FILE *file)
+static void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
+{
+  while (bytes--)
+    fputc(0, file);
+}
+
+static int LoadLevel_HEAD(struct LevelInfo *level, FILE *file, int chunk_size)
 {
   int i, x, y;
 
@@ -741,36 +744,50 @@ static void LoadLevel_HEAD(struct LevelInfo *level, FILE *file)
 
   level->encoding_16bit		= (fgetc(file) == 1 ? TRUE : FALSE);
 
-  SkipBytesInFile(file, LEVEL_HEADER_UNUSED);	/* skip unused header bytes */
+  ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
+
+  return chunk_size;
 }
 
-static void LoadLevel_AUTH(struct LevelInfo *level, FILE *file)
+static int LoadLevel_AUTH(struct LevelInfo *level, FILE *file, int chunk_size)
 {
   int i;
 
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
     level->author[i] = fgetc(file);
   level->author[MAX_LEVEL_NAME_LEN] = 0;
+
+  return chunk_size;
 }
 
-static void LoadLevel_CONT(struct LevelInfo *level, FILE *file)
+static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
 {
   int i, x, y;
+  int header_size = 4;
+  int content_size_type1 = MAX_ELEMENT_CONTENTS * 3 * 3;
+
+  int chunk_size_expected = header_size + content_size_type1;
+
+  /* Note: "chunk_size" was wrong before version 2.0 when elements are
+     stored with 16-bit encoding (and should be twice as big then). */
+  if (level->encoding_16bit && level->file_version >= FILE_VERSION_2_0)
+    chunk_size_expected += content_size_type1;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size);
+    return chunk_size_expected;
+  }
 
   fgetc(file);
   level->num_yam_contents = fgetc(file);
   fgetc(file);
   fgetc(file);
 
+  /* correct invalid number of content fields -- should never happen */
   if (level->num_yam_contents < 1 ||
       level->num_yam_contents > MAX_ELEMENT_CONTENTS)
-  {
-#if DEBUG
-    printf("WARNING: num_yam_contents == %d (corrected)\n",
-	   level->num_yam_contents);
-#endif
     level->num_yam_contents = STD_ELEMENT_CONTENTS;
-  }
 
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
@@ -780,11 +797,24 @@ static void LoadLevel_CONT(struct LevelInfo *level, FILE *file)
 			    getFile16BitInteger(file,
 						BYTE_ORDER_BIG_ENDIAN) :
 			    fgetc(file));
+  return chunk_size;
 }
 
-static void LoadLevel_BODY(struct LevelInfo *level, FILE *file)
+static int LoadLevel_BODY(struct LevelInfo *level, FILE *file, int chunk_size)
 {
   int x, y;
+  int chunk_size_expected = level->fieldx * level->fieldy;
+
+  /* Note: "chunk_size" was wrong before version 2.0 when elements are
+     stored with 16-bit encoding (and should be twice as big then). */
+  if (level->encoding_16bit && level->file_version >= FILE_VERSION_2_0)
+    chunk_size_expected *= 2;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size);
+    return chunk_size_expected;
+  }
 
   for(y=0; y<level->fieldy; y++)
     for(x=0; x<level->fieldx; x++)
@@ -792,14 +822,59 @@ static void LoadLevel_BODY(struct LevelInfo *level, FILE *file)
 	checkLevelElement(level->encoding_16bit ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
 			  fgetc(file));
+  return chunk_size;
+}
+
+static int LoadLevel_CNT2(struct LevelInfo *level, FILE *file, int chunk_size)
+{
+  int i, x, y;
+  int element;
+  int num_contents, content_xsize, content_ysize;
+  int content_array[MAX_ELEMENT_CONTENTS][3][3];
+
+  element = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  num_contents = fgetc(file);
+  content_xsize = fgetc(file);
+  content_ysize = fgetc(file);
+  ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT2_UNUSED);
+
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	content_array[i][x][y] =
+	  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+
+  /* correct invalid number of content fields -- should never happen */
+  if (num_contents < 1 || num_contents > MAX_ELEMENT_CONTENTS)
+    num_contents = STD_ELEMENT_CONTENTS;
+
+  if (element == EL_MAMPFER)
+  {
+    level->num_yam_contents = num_contents;
+
+    for(i=0; i<num_contents; i++)
+      for(y=0; y<3; y++)
+	for(x=0; x<3; x++)
+	  level->yam_content[i][x][y] = content_array[i][x][y];
+  }
+  else if (element == EL_AMOEBE_BD)
+  {
+    level->amoeba_content = content_array[0][0][0];
+  }
+  else
+  {
+    Error(ERR_WARN, "cannot load content for element '%d'", element);
+  }
+
+  return chunk_size;
 }
 
 void LoadLevel(int level_nr)
 {
   char *filename = getLevelFilename(level_nr);
   char cookie[MAX_LINE_LEN];
-  char chunk[CHUNK_ID_LEN + 1];
-  int chunk_length;
+  char chunk_name[CHUNK_ID_LEN + 1];
+  int chunk_size;
   FILE *file;
 
   /* always start with reliable default values */
@@ -833,101 +908,64 @@ void LoadLevel(int level_nr)
   if (level.file_version < FILE_VERSION_1_2)
   {
     /* level files from versions before 1.2.0 without chunk structure */
-    LoadLevel_HEAD(&level, file);
-    LoadLevel_BODY(&level, file);
+    LoadLevel_HEAD(&level, file, LEVEL_HEADER_SIZE);
+    LoadLevel_BODY(&level, file, level.fieldx * level.fieldy);
   }
   else
   {
     static struct
     {
-      char *chunk_name;
-      void (*chunk_loader)(struct LevelInfo *, FILE *);
-      int chunk_length;
+      char *name;
+      int size;
+      int (*loader)(struct LevelInfo *, FILE *, int);
     }
     chunk_info[] =
     {
-      { "HEAD", LoadLevel_HEAD, LEVEL_HEADER_SIZE },
-      { "AUTH", LoadLevel_AUTH, MAX_LEVEL_AUTHOR_LEN },
-      { "CONT", LoadLevel_CONT, 4 + MAX_ELEMENT_CONTENTS * 3 * 3 },
-      { "BODY", LoadLevel_BODY, 0 },	/* depends on contents of "HEAD" */
-      {  NULL,  NULL,           0 }
+      { "HEAD", LEVEL_HEADER_SIZE,	LoadLevel_HEAD },
+      { "AUTH", MAX_LEVEL_AUTHOR_LEN,	LoadLevel_AUTH },
+      { "CONT", -1,			LoadLevel_CONT },
+      { "BODY", -1,			LoadLevel_BODY },
+      { "CNT2", LEVEL_CHUNK_CNT2_SIZE,	LoadLevel_CNT2 },
+      {  NULL,  0,			NULL }
     };
 
-    while (getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN))
+    while (getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN))
     {
       int i = 0;
 
-      while (chunk_info[i].chunk_name != NULL &&
-	     strcmp(chunk, chunk_info[i].chunk_name) != 0)
+      while (chunk_info[i].name != NULL &&
+	     strcmp(chunk_name, chunk_info[i].name) != 0)
 	i++;
 
-      if (chunk_info[i].chunk_name == NULL)
+      if (chunk_info[i].name == NULL)
       {
 	Error(ERR_WARN, "unknown chunk '%s' in level file '%s'",
-	      chunk, filename);
-	SkipBytesInFile(file, chunk_length);
+	      chunk_name, filename);
+	ReadUnusedBytesFromFile(file, chunk_size);
       }
-      else if (chunk_length != chunk_info[i].chunk_length)
+      else if (chunk_info[i].size != -1 &&
+	       chunk_info[i].size != chunk_size)
       {
 	Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
-	      chunk_length, chunk, filename);
-	SkipBytesInFile(file, chunk_length);
+	      chunk_size, chunk_name, filename);
+	ReadUnusedBytesFromFile(file, chunk_size);
       }
       else
       {
 	/* call function to load this level chunk */
-	(chunk_info[i].chunk_loader)(&level, file);
+	int chunk_size_expected =
+	  (chunk_info[i].loader)(&level, file, chunk_size);
 
-	if (strcmp(chunk, "HEAD") == 0)
+	/* the size of some chunks cannot be checked before reading other
+	   chunks first (like "HEAD" and "BODY") or before reading some
+	   header information first (like "CONT"), so check them here */
+	if (chunk_size_expected != chunk_size)
 	{
-	  /* Note: "chunk_length" for CONT and BODY is wrong when elements are
-	     stored with 16-bit encoding (and should be twice as big then). */
-
-	  chunk_info[3].chunk_length = level.fieldx * level.fieldy;
+	  Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
+		chunk_size, chunk_name, filename);
 	}
       }
     }
-
-#if 0
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk, "HEAD") || chunk_length != LEVEL_HEADER_SIZE)
-    {
-      Error(ERR_WARN, "wrong 'HEAD' chunk of level file '%s'", filename);
-      fclose(file);
-      return;
-    }
-
-    LoadLevel_HEAD(&level, file);
-
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-
-    /* look for optional author chunk */
-    if (strcmp(chunk, "AUTH") == 0 && chunk_length == MAX_LEVEL_AUTHOR_LEN)
-    {
-      LoadLevel_AUTH(&level, file);
-
-      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    }
-
-    /* look for optional content chunk */
-    if (strcmp(chunk, "CONT") == 0 &&
-	chunk_length == 4 + MAX_ELEMENT_CONTENTS * 3 * 3)
-    {
-      LoadLevel_CONT(&level, file);
-
-      getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    }
-
-    /* next check body chunk identifier and chunk length */
-    if (strcmp(chunk, "BODY") != 0 || chunk_length != lev_fieldx * lev_fieldy)
-    {
-      Error(ERR_WARN, "wrong 'BODY' chunk of level file '%s'", filename);
-      fclose(file);
-      return;
-    }
-
-    LoadLevel_BODY(&level, file);
-#endif
   }
 
   fclose(file);
@@ -958,7 +996,7 @@ void LoadLevel(int level_nr)
   SetBorderElement();
 }
 
-void SaveLevel(int level_nr)
+void OLD_SaveLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
@@ -1058,16 +1096,218 @@ void SaveLevel(int level_nr)
   chmod(filename, LEVEL_PERMS);
 }
 
+static void SaveLevel_HEAD(struct LevelInfo *level, FILE *file)
+{
+  int i, x, y;
+
+  fputc(level->fieldx, file);
+  fputc(level->fieldy, file);
+
+  putFile16BitInteger(file, level->time,        BYTE_ORDER_BIG_ENDIAN);
+  putFile16BitInteger(file, level->gems_needed, BYTE_ORDER_BIG_ENDIAN);
+
+  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
+    fputc(level->name[i], file);
+
+  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
+    fputc(level->score[i], file);
+
+  for(i=0; i<STD_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	fputc((level->encoding_16bit ? EL_LEERRAUM :
+	       level->yam_content[i][x][y]),
+	      file);
+  fputc(level->amoeba_speed, file);
+  fputc(level->time_magic_wall, file);
+  fputc(level->time_wheel, file);
+  fputc(level->amoeba_content, file);
+  fputc((level->double_speed ? 1 : 0), file);
+  fputc((level->gravity ? 1 : 0), file);
+
+  fputc((level->encoding_16bit ? 1 : 0), file);
+
+  WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
+}
+
+static void SaveLevel_AUTH(struct LevelInfo *level, FILE *file)
+{
+  int i;
+
+  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
+    fputc(level->author[i], file);
+}
+
+static void SaveLevel_CONT(struct LevelInfo *level, FILE *file)
+{
+  int i, x, y;
+
+  fputc(EL_MAMPFER, file);
+  fputc(level->num_yam_contents, file);
+  fputc(0, file);
+  fputc(0, file);
+
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	if (level->encoding_16bit)
+	  putFile16BitInteger(file, level->yam_content[i][x][y],
+			      BYTE_ORDER_BIG_ENDIAN);
+	else
+	  fputc(level->yam_content[i][x][y], file);
+}
+
+static void SaveLevel_BODY(struct LevelInfo *level, FILE *file)
+{
+  int x, y;
+
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++) 
+      if (level->encoding_16bit)
+	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
+      else
+	fputc(Ur[x][y], file);
+}
+
+static void SaveLevel_CNT2(struct LevelInfo *level, FILE *file, int element)
+{
+  int i, x, y;
+  int num_contents, content_xsize, content_ysize;
+  int content_array[MAX_ELEMENT_CONTENTS][3][3];
+
+  if (element == EL_MAMPFER)
+  {
+    num_contents = level->num_yam_contents;
+    content_xsize = 3;
+    content_ysize = 3;
+
+    for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+      for(y=0; y<3; y++)
+	for(x=0; x<3; x++)
+	  content_array[i][x][y] = level->yam_content[i][x][y];
+  }
+  else if (element == EL_AMOEBE_BD)
+  {
+    num_contents = 1;
+    content_xsize = 1;
+    content_ysize = 1;
+
+    for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+      for(y=0; y<3; y++)
+	for(x=0; x<3; x++)
+	  content_array[i][x][y] = EL_LEERRAUM;
+    content_array[0][0][0] = level->amoeba_content;
+  }
+  else
+  {
+    /* chunk header already written -- write empty chunk data */
+    for(i=0; i<LEVEL_CHUNK_CNT2_SIZE; i++)
+      fputc(0, file);
+
+    Error(ERR_WARN, "cannot save content for element '%d'", element);
+    return;
+  }
+
+  putFile16BitInteger(file, element, BYTE_ORDER_BIG_ENDIAN);
+  fputc(num_contents, file);
+  fputc(content_xsize, file);
+  fputc(content_ysize, file);
+  for(i=0; i<LEVEL_CHUNK_CNT2_UNUSED; i++)
+    fputc(0, file);
+
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	putFile16BitInteger(file, content_array[i][x][y],
+			    BYTE_ORDER_BIG_ENDIAN);
+}
+
+void SaveLevel(int level_nr)
+{
+  int i, x, y;
+  char *filename = getLevelFilename(level_nr);
+#if 1
+  boolean encoding_16bit_amoeba = FALSE;
+  boolean encoding_16bit_yamyam = FALSE;
+#endif
+#if 0
+  boolean encoding_16bit = FALSE;	/* default: only 8-bit elements */
+  char *oldest_possible_cookie;
+#endif
+  int chunk_size;
+  FILE *file;
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot save level file '%s'", filename);
+    return;
+  }
+
+  /* check level field for 16-bit elements */
+  for(y=0; y<lev_fieldy; y++) 
+    for(x=0; x<lev_fieldx; x++) 
+      if (Ur[x][y] > 255)
+	level.encoding_16bit = TRUE;
+
+  /* check yam content for 16-bit elements */
+  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	if (level.yam_content[i][x][y] > 255)
+	  encoding_16bit_yamyam = TRUE;
+
+  /* check amoeba content for 16-bit elements */
+  if (level.amoeba_content > 255)
+    encoding_16bit_amoeba = TRUE;
+
+  fputs(LEVEL_COOKIE, file);		/* file identifier */
+  fputc('\n', file);
+
+  putFileChunk(file, "HEAD", LEVEL_HEADER_SIZE, BYTE_ORDER_BIG_ENDIAN);
+  SaveLevel_HEAD(&level, file);
+
+  putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
+  SaveLevel_AUTH(&level, file);
+
+  if (0 && level.encoding_16bit)	/* obsolete since new "CNT2" chunk */
+  {
+    chunk_size = 4 + 2 * (MAX_ELEMENT_CONTENTS * 3 * 3);
+
+    putFileChunk(file, "CONT", chunk_size, BYTE_ORDER_BIG_ENDIAN);
+    SaveLevel_CONT(&level, file);
+  }
+
+  chunk_size = level.fieldx * level.fieldy * (level.encoding_16bit ? 2 : 1);
+  putFileChunk(file, "BODY", chunk_size, BYTE_ORDER_BIG_ENDIAN);
+  SaveLevel_BODY(&level, file);
+
+  if (encoding_16bit_yamyam)
+  {
+    putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
+    SaveLevel_CNT2(&level, file, EL_MAMPFER);
+  }
+
+  if (encoding_16bit_amoeba)
+  {
+    putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
+    SaveLevel_CNT2(&level, file, EL_AMOEBE_BD);
+  }
+
+  fclose(file);
+
+  chmod(filename, LEVEL_PERMS);
+}
+
 void LoadTape(int level_nr)
 {
   int i, j;
   char *filename = getTapeFilename(level_nr);
   char cookie[MAX_LINE_LEN];
-  char chunk[CHUNK_ID_LEN + 1];
+  char chunk_name[CHUNK_ID_LEN + 1];
   FILE *file;
   int num_participating_players;
   int file_version = FILE_VERSION_ACTUAL; /* last version of tape files */
-  int chunk_length;
+  int chunk_size;
 
   /* always start with reliable default values (empty tape) */
   tape.file_version = FILE_VERSION_ACTUAL;
@@ -1116,8 +1356,8 @@ void LoadTape(int level_nr)
   /* read chunk "HEAD" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk, "HEAD") || chunk_length != TAPE_HEADER_SIZE)
+    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk_name, "HEAD") || chunk_size != TAPE_HEADER_SIZE)
     {
       Error(ERR_WARN, "wrong 'HEAD' chunk of tape file '%s'", filename);
       fclose(file);
@@ -1162,9 +1402,9 @@ void LoadTape(int level_nr)
   /* read chunk "BODY" */
   if (file_version >= FILE_VERSION_1_2)
   {
-    getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_BIG_ENDIAN);
-    if (strcmp(chunk, "BODY") ||
-	chunk_length != (num_participating_players + 1) * tape.length)
+    getFileChunk(file, chunk_name, &chunk_size, BYTE_ORDER_BIG_ENDIAN);
+    if (strcmp(chunk_name, "BODY") ||
+	chunk_size != (num_participating_players + 1) * tape.length)
     {
       Error(ERR_WARN, "wrong 'BODY' chunk of tape file '%s'", filename);
       fclose(file);

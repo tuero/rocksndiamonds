@@ -871,7 +871,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
 #if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
-  int chunk_length, dummy;
+  int chunk_size, dummy;
   FILE *file;
   int i;
 #endif
@@ -905,7 +905,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
   }
 
   /* read chunk "RIFF" */
-  getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_LITTLE_ENDIAN);
+  getFileChunk(file, chunk, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
   if (strcmp(chunk, "RIFF") != 0)
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
@@ -927,7 +927,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
     sound_header_buffer[i] = fgetc(file);
 
   /* read chunk "data" */
-  getFileChunk(file, chunk, &chunk_length, BYTE_ORDER_LITTLE_ENDIAN);
+  getFileChunk(file, chunk, &chunk_size, BYTE_ORDER_LITTLE_ENDIAN);
   if (strcmp(chunk, "data") != 0)
   {
     Error(ERR_WARN, "missing 'data' chunk of sound file '%s'", filename);
@@ -935,7 +935,7 @@ static boolean LoadSoundExt(char *sound_name, boolean is_music)
     return FALSE;
   }
 
-  snd_info->data_len = chunk_length;
+  snd_info->data_len = chunk_size;
   snd_info->data_ptr = checked_malloc(snd_info->data_len);
 
   /* read sound data */

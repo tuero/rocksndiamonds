@@ -700,28 +700,28 @@ void putFile32BitInteger(FILE *file, int value, int byte_order)
   }
 }
 
-boolean getFileChunk(FILE *file, char *chunk_buffer, int *chunk_length,
+boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
 		     int byte_order)
 {
-  const int chunk_identifier_length = 4;
+  const int chunk_name_length = 4;
 
-  /* read chunk identifier */
-  fgets(chunk_buffer, chunk_identifier_length + 1, file);
+  /* read chunk name */
+  fgets(chunk_name, chunk_name_length + 1, file);
 
-  /* read chunk length */
-  *chunk_length = getFile32BitInteger(file, byte_order);
+  /* read chunk size */
+  *chunk_size = getFile32BitInteger(file, byte_order);
 
   return (feof(file) || ferror(file) ? FALSE : TRUE);
 }
 
-void putFileChunk(FILE *file, char *chunk_name, int chunk_length,
+void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 		  int byte_order)
 {
-  /* write chunk identifier */
+  /* write chunk name */
   fputs(chunk_name, file);
 
-  /* write chunk length */
-  putFile32BitInteger(file, chunk_length, byte_order);
+  /* write chunk size */
+  putFile32BitInteger(file, chunk_size, byte_order);
 }
 
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
