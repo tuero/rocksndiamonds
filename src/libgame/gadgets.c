@@ -172,6 +172,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	cursor_string[1] = (cursor_letter != '\0' ? cursor_letter : ' ');
 	cursor_string[2] = '\0';
 
+	SetInverseTextColor(gi->text.inverse_color);
+
 	/* draw cursor, if active */
 	if (pressed)
 	  DrawTextExt(drawto,
@@ -328,11 +330,13 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			    gi->selectbox.x + border,
 			    gi->selectbox.y + border + i * font_height,
 			    gi->selectbox.width - 2 * border, font_height,
-			    gi->selectbox.reverse_color);
+			    gi->selectbox.inverse_color);
 
 	      text[0] = '~';
 	      strncpy(&text[1], gi->selectbox.values[i], gi->selectbox.size);
 	      text[1 + gi->selectbox.size] = '\0';
+
+	      SetInverseTextColor(gi->selectbox.inverse_color);
 	    }
 	    else
 	    {
@@ -746,12 +750,23 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
   if (gi->type & GD_TYPE_TEXTINPUT)
   {
-    int font_width = getFontWidth(gi->text.font_type);
-    int font_height = getFontHeight(gi->text.font_type);
+    int font_nr = gi->text.font_type;
+    int font_bitmap_id = gfx.select_font_function(font_nr);
+    struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+    int font_width = getFontWidth(font_nr);
+    int font_height = getFontHeight(font_nr);
     int border_size = gi->border.size;
+    int src_x, src_y;
 
     gi->width  = 2 * border_size + (gi->text.size + 1) * font_width;
     gi->height = 2 * border_size + font_height;
+
+    if (!getFontChar(font_nr, '|', &src_x, &src_y))
+      Error(ERR_EXIT, "text input gadget incomplete (cannot get cursor)");
+
+    src_x += font_width / 2;
+    src_y += font_height / 2;
+    gi->text.inverse_color = GetPixel(font->bitmap, src_x, src_y);
   }
 
   if (gi->type & GD_TYPE_SELECTBOX)
@@ -759,8 +774,8 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     int font_nr = gi->selectbox.font_type;
     int font_bitmap_id = gfx.select_font_function(font_nr);
     struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
-    int font_width = getFontWidth(gi->selectbox.font_type);
-    int font_height = getFontHeight(gi->selectbox.font_type);
+    int font_width = getFontWidth(font_nr);
+    int font_height = getFontHeight(font_nr);
     int border_size = gi->border.size;
     int button_size = gi->border.size_selectbutton;
     int src_x, src_y;
@@ -792,7 +807,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
     src_x += font_width / 2;
     src_y += font_height / 2;
-    gi->selectbox.reverse_color = GetPixel(font->bitmap, src_x, src_y);
+    gi->selectbox.inverse_color = GetPixel(font->bitmap, src_x, src_y);
 
     /* always start with closed selectbox */
     gi->selectbox.open = FALSE;

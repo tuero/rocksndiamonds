@@ -144,8 +144,9 @@ struct GadgetTextInput
   int number_min;			/* minimal allowed numeric value */
   int number_max;			/* maximal allowed numeric value */
   int size;				/* maximal size of input text */
-  int cursor_position;			/* actual cursor position */
   int font_type;			/* font to use for text input */
+  int cursor_position;			/* actual cursor position */
+  Pixel inverse_color;			/* color for highlighting */
 };
 
 struct GadgetSelectbox
@@ -159,7 +160,7 @@ struct GadgetSelectbox
   int x, y;				/* open selectbox position */
   int width, height;			/* open selectbox size */
   int num_values;			/* number of text strings */
-  Pixel reverse_color;			/* color for highlighting */
+  Pixel inverse_color;			/* color for highlighting */
 
   /* runtime values */
   boolean open;				/* opening state of selectbox */

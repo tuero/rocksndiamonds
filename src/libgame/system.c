@@ -275,7 +275,7 @@ inline static int GetRealDepth(int depth)
 inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
 			       int width, int height, Pixel color)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLFillRectangle(bitmap, x, y, width, height, color);
 #else
   X11FillRectangle(bitmap, x, y, width, height, color);
@@ -286,12 +286,12 @@ inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			       int src_x, int src_y, int width, int height,
 			       int dst_x, int dst_y, int mask_mode)
 {
-#ifdef TARGET_SDL
-  SDLCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y, mask_mode);
+#if defined(TARGET_SDL)
+  SDLCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	      dst_x, dst_y, mask_mode);
 #else
-  X11CopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y, mask_mode);
+  X11CopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	      dst_x, dst_y, mask_mode);
 #endif
 }
 
@@ -326,7 +326,7 @@ inline void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLInitVideoBuffer(backbuffer, window, fullscreen);
 #else
   X11InitVideoBuffer(backbuffer, window);
@@ -335,7 +335,7 @@ inline void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 
 inline Bitmap *CreateBitmapStruct(void)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   return checked_calloc(sizeof(struct SDLSurfaceInfo));
 #else
   return checked_calloc(sizeof(struct X11DrawableInfo));
@@ -347,7 +347,7 @@ inline Bitmap *CreateBitmap(int width, int height, int depth)
   Bitmap *new_bitmap = CreateBitmapStruct();
   int real_depth = GetRealDepth(depth);
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLCreateBitmapContent(new_bitmap, width, height, real_depth);
 #else
   X11CreateBitmapContent(new_bitmap, width, height, real_depth);
@@ -364,7 +364,7 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   if (bitmap == NULL)
     return;
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLFreeBitmapPointers(bitmap);
 #else
   X11FreeBitmapPointers(bitmap);
@@ -398,7 +398,7 @@ inline void FreeBitmap(Bitmap *bitmap)
 
 inline void CloseWindow(DrawWindow *window)
 {
-#ifdef TARGET_X11
+#if defined(TARGET_X11)
   if (window->drawable)
   {
     XUnmapWindow(display, window->drawable);
@@ -483,7 +483,7 @@ static GC last_clip_gc = 0;	/* needed for XCopyArea() through clip mask */
 
 inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
-#ifdef TARGET_X11
+#if defined(TARGET_X11)
   if (clip_gc)
   {
     bitmap->clip_gc = clip_gc;
@@ -497,7 +497,7 @@ inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 
 inline void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
 {
-#ifdef TARGET_X11
+#if defined(TARGET_X11)
   if (clip_gc)
   {
     bitmap->clip_gc = clip_gc;
@@ -546,7 +546,7 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
 #else
   X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
@@ -655,7 +655,7 @@ inline void SyncDisplay(void)
 
 inline void KeyboardAutoRepeatOn(void)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
 		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
   SDL_EnableUNICODE(1);
@@ -667,7 +667,7 @@ inline void KeyboardAutoRepeatOn(void)
 
 inline void KeyboardAutoRepeatOff(void)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
   SDL_EnableUNICODE(0);
 #else
@@ -678,7 +678,7 @@ inline void KeyboardAutoRepeatOff(void)
 
 inline boolean PointerInWindow(DrawWindow *window)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   return TRUE;
 #else
   Window root, child;
@@ -695,7 +695,7 @@ inline boolean PointerInWindow(DrawWindow *window)
 
 inline boolean SetVideoMode(boolean fullscreen)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   return SDLSetVideoMode(&backbuffer, fullscreen);
 #else
   boolean success = TRUE;
@@ -716,7 +716,7 @@ inline boolean SetVideoMode(boolean fullscreen)
 
 inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   if ((fullscreen && !video.fullscreen_enabled && video.fullscreen_available)||
       (!fullscreen && video.fullscreen_enabled))
     fullscreen = SetVideoMode(fullscreen);
@@ -833,7 +833,7 @@ void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
   FreeBitmap(tmp_bitmap_2);
   FreeBitmap(tmp_bitmap_8);
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   src_bitmap->surface = tmp_bitmap->surface;
   tmp_bitmap->surface = NULL;
 #else
@@ -907,7 +907,7 @@ inline void SetAudioMode(boolean enabled)
 
 inline void InitEventFilter(EventFilter filter_function)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   /* set event filter to filter out certain events */
   SDL_SetEventFilter(filter_function);
 #endif
@@ -915,7 +915,7 @@ inline void InitEventFilter(EventFilter filter_function)
 
 inline boolean PendingEvent(void)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);
 #else
   return (XPending(display) ? TRUE : FALSE);
@@ -924,7 +924,7 @@ inline boolean PendingEvent(void)
 
 inline void NextEvent(Event *event)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLNextEvent(event);
 #else
   XNextEvent(display, event);
@@ -933,7 +933,7 @@ inline void NextEvent(Event *event)
 
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 #if 0
   printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
 	 (int)event->keysym.unicode,
@@ -986,7 +986,7 @@ inline void InitJoysticks()
 {
   int i;
 
-#ifdef NO_JOYSTICK
+#if defined(NO_JOYSTICK)
   return;	/* joysticks generally deactivated by compile-time directive */
 #endif
 

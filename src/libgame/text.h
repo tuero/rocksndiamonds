@@ -37,8 +37,9 @@
 
 /* font structure definitions */
 
-void InitFontInfo(struct FontBitmapInfo *, int,
-		  int (*select_font_function)(int));
+void InitFontInfo(struct FontBitmapInfo *, int, int (*function)(int));
+void SetInverseTextColor(Pixel);
+
 int getFontWidth(int);
 int getFontHeight(int);
 boolean getFontChar(int, char, int *, int *);

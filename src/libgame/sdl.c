@@ -548,9 +548,9 @@ void sge_PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 }
 
 void sge_PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
-		  Uint8 R, Uint8 G, Uint8 B)
+		  Uint8 r, Uint8 g, Uint8 b)
 {
-  sge_PutPixel(surface, x, y, SDL_MapRGB(surface->format, R, G, B));
+  sge_PutPixel(surface, x, y, SDL_MapRGB(surface->format, r, g, b));
 }
 
 Sint32 sge_CalcYPitch(SDL_Surface *dest, Sint16 y)
@@ -862,6 +862,30 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 		 Sint16 y2, Uint8 R, Uint8 G, Uint8 B)
 {
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
+}
+
+
+/*
+  -----------------------------------------------------------------------------
+  quick (no, it's slow) and dirty hack to "invert" rectangle inside SDL surface
+  -----------------------------------------------------------------------------
+*/
+
+inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
+			  int width, int height, Uint32 color)
+{
+  SDL_Surface *surface = bitmap->surface;
+  int x, y;
+
+  for (y=src_y; y < src_y + height; y++)
+  {
+    for (x=src_x; x < src_x + width; x++)
+    {
+      Uint32 pixel = SDLGetPixel(bitmap, x, y);
+
+      sge_PutPixel(surface, x, y, pixel == BLACK_PIXEL ? color : BLACK_PIXEL);
+    }
+  }
 }
 
 

@@ -115,10 +115,16 @@ void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
   gfx.num_fonts = num_fonts;
   gfx.font_bitmap_info = font_bitmap_info;
   gfx.select_font_function = select_font_function;
+  gfx.inverse_text_color = WHITE_PIXEL;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
 #endif
+}
+
+void SetInverseTextColor(Pixel inverse_text_color)
+{
+  gfx.inverse_text_color = inverse_text_color;
 }
 
 int getFontWidth(int font_nr)
@@ -265,6 +271,15 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     {
       if (print_inverse)	/* special mode for text gadgets */
       {
+#if defined(TARGET_SDL)
+	/* blit normally (non-masked) */
+	BlitBitmap(font->bitmap, dst_bitmap, src_x, src_y,
+		   font->width, font->height, dst_x, dst_y);
+
+	/* invert character */
+	SDLInvertArea(dst_bitmap, dst_x, dst_y, font->width, font->height,
+		      gfx.inverse_text_color);
+#else
 	/* first step: draw solid colored rectangle (use "cursor" character) */
 	if (print_inverse_cursor)
 	  BlitBitmap(font->bitmap, dst_bitmap,
@@ -277,6 +292,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		      dst_x - src_x, dst_y - src_y);
 	BlitBitmapMasked(font->bitmap, dst_bitmap,
 			 0, 0, font->width, font->height, dst_x, dst_y);
+#endif
       }
       else if (mask_mode == BLIT_MASKED)
       {

@@ -339,6 +339,7 @@ struct GfxInfo
   int num_fonts;
   struct FontBitmapInfo *font_bitmap_info;
   int (*select_font_function)(int);
+  Pixel inverse_text_color;
 
   int anim_random_frame;
 };
