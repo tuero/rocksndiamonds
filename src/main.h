@@ -25,12 +25,14 @@
 #define XK_MISCELLANY
 #define XK_LATIN1
 
+/*
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/Xos.h>
 #include <X11/Intrinsic.h>
 #include <X11/keysymdef.h>
+*/
 
 #ifdef   XPM_INCLUDE_FILE
 #define  USE_XPM_LIBRARY
@@ -40,16 +42,14 @@
 #include "msdos.h"
 #endif  /* MSDOS */
 
-#ifdef	USE_SDL_LIBRARY
-#include "sdl.h"
-#endif
-
 #ifdef DEBUG
 #define DEBUG_TIMING	0
 #endif
 
 typedef unsigned char boolean;
 typedef unsigned char byte;
+
+#include "system.h"
 
 #ifndef FALSE
 #define FALSE		0
@@ -205,7 +205,7 @@ typedef unsigned char byte;
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
 
-/* Pixmaps with graphic file */
+/* Bitmaps with graphic file */
 #define PIX_BACK		0
 #define PIX_DOOR		1
 #define PIX_HEROES		2
@@ -216,13 +216,13 @@ typedef unsigned char byte;
 #define	PIX_BIGFONT		7
 #define PIX_SMALLFONT		8
 #define PIX_MEDIUMFONT		9
-/* Pixmaps without graphic file */
+/* Bitmaps without graphic file */
 #define PIX_DB_BACK		10
 #define PIX_DB_DOOR		11
 #define PIX_DB_FIELD		12
 
 #define NUM_PICTURES		10
-#define NUM_PIXMAPS		13
+#define NUM_BITMAPS		13
 
 /* boundaries of arrays etc. */
 #define MAX_PLAYER_NAME_LEN	10
@@ -466,25 +466,18 @@ struct GlobalInfo
 extern Display	       *display;
 extern Visual	       *visual;
 extern int		screen;
-extern Window  		window;
+extern DrawWindow	window;
 extern GC		gc, clip_gc[], tile_clip_gc;
-extern Pixmap		pix[];
+extern Bitmap		pix[];
+extern Bitmap		pix_masked[], tile_masked[];
 extern Pixmap		clipmask[], tile_clipmask[];
 
 #ifdef USE_XPM_LIBRARY
 extern XpmAttributes 	xpm_att[];
 #endif
 
-extern Drawable    	drawto, drawto_field, backbuffer, fieldbuffer;
+extern DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 extern Colormap		cmap;
-
-#ifdef USE_SDL_LIBRARY
-extern SDL_Surface    *sdl_window;
-extern SDL_Surface    *sdl_drawto, *sdl_drawto_field;
-extern SDL_Surface    *sdl_backbuffer, *sdl_fieldbuffer;
-extern SDL_Surface    *sdl_pix[];
-extern SDL_Surface    *sdl_pix_masked[], *sdl_tile_masked[];
-#endif
 
 extern int		sound_pipe[2];
 extern int		sound_device;
@@ -1723,7 +1716,7 @@ extern char		*element_info[];
 				 REDRAW_MICROLEVEL)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
-/* areas in pixmap PIX_DOOR */
+/* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
    PAGEX1: 1. buffer for DOOR_1
    PAGEX2: 2. buffer for DOOR_1

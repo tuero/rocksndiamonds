@@ -1273,6 +1273,26 @@ void sortLevelDirInfo(struct LevelDirInfo **node_first,
   }
 }
 
+inline void swap_numbers(int *i1, int *i2)
+{
+  int help = *i1;
+
+  *i1 = *i2;
+  *i2 = help;
+}
+
+inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
+{
+  int help_x = *x1;
+  int help_y = *y1;
+
+  *x1 = *x2;
+  *x2 = help_x;
+
+  *y1 = *y2;
+  *y2 = help_y;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* the following is only for debugging purpose and normally not used         */

@@ -138,13 +138,13 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   {
     int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
 
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      cx + VIDEO_REC_LABEL_XPOS,
-	      cy + VIDEO_REC_LABEL_YPOS,
-	      VIDEO_PBEND_LABEL_XSIZE,
-	      VIDEO_PBEND_LABEL_YSIZE,
-	      VX + VIDEO_REC_LABEL_XPOS,
-	      VY + VIDEO_REC_LABEL_YPOS);
+    BlitBitmap(pix[PIX_DOOR], drawto,
+	       cx + VIDEO_REC_LABEL_XPOS,
+	       cy + VIDEO_REC_LABEL_YPOS,
+	       VIDEO_PBEND_LABEL_XSIZE,
+	       VIDEO_PBEND_LABEL_YSIZE,
+	       VX + VIDEO_REC_LABEL_XPOS,
+	       VY + VIDEO_REC_LABEL_YPOS);
   }
 
   for(i=0;i<10;i++)
@@ -159,21 +159,21 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
 
       if (video_pos[pos][part_label][0] && value != VIDEO_DISPLAY_SYMBOL_ONLY)
-	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part_label][xpos],
-		  cy + video_pos[pos][part_label][ypos],
-		  video_pos[pos][part_label][xsize],
-		  video_pos[pos][part_label][ysize],
-		  VX + video_pos[pos][part_label][xpos],
-		  VY + video_pos[pos][part_label][ypos]);
+	BlitBitmap(pix[PIX_DOOR], drawto,
+		   cx + video_pos[pos][part_label][xpos],
+		   cy + video_pos[pos][part_label][ypos],
+		   video_pos[pos][part_label][xsize],
+		   video_pos[pos][part_label][ysize],
+		   VX + video_pos[pos][part_label][xpos],
+		   VY + video_pos[pos][part_label][ypos]);
       if (video_pos[pos][part_symbol][0] && value != VIDEO_DISPLAY_LABEL_ONLY)
-	XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-		  cx + video_pos[pos][part_symbol][xpos],
-		  cy + video_pos[pos][part_symbol][ypos],
-		  video_pos[pos][part_symbol][xsize],
-		  video_pos[pos][part_symbol][ysize],
-		  VX + video_pos[pos][part_symbol][xpos],
-		  VY + video_pos[pos][part_symbol][ypos]);
+	BlitBitmap(pix[PIX_DOOR], drawto,
+		   cx + video_pos[pos][part_symbol][xpos],
+		   cy + video_pos[pos][part_symbol][ypos],
+		   video_pos[pos][part_symbol][xsize],
+		   video_pos[pos][part_symbol][ysize],
+		   VX + video_pos[pos][part_symbol][xpos],
+		   VY + video_pos[pos][part_symbol][ypos]);
     }
   }
 
@@ -181,26 +181,26 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   {
     int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
 
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      cx + VIDEO_PLAY_SYMBOL_XPOS,
-	      cy + VIDEO_PLAY_SYMBOL_YPOS,
-	      VIDEO_PLAY_SYMBOL_XSIZE - 2,
-	      VIDEO_PLAY_SYMBOL_YSIZE,
-	      VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
-	      VY + VIDEO_PLAY_SYMBOL_YPOS);
+    BlitBitmap(pix[PIX_DOOR], drawto,
+	       cx + VIDEO_PLAY_SYMBOL_XPOS,
+	       cy + VIDEO_PLAY_SYMBOL_YPOS,
+	       VIDEO_PLAY_SYMBOL_XSIZE - 2,
+	       VIDEO_PLAY_SYMBOL_YSIZE,
+	       VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
+	       VY + VIDEO_PLAY_SYMBOL_YPOS);
   }
 
   if (state & VIDEO_STATE_PBEND_ON)
   {
     int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
 
-    XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	      cx + VIDEO_PBEND_LABEL_XPOS,
-	      cy + VIDEO_PBEND_LABEL_YPOS,
-	      VIDEO_PBEND_LABEL_XSIZE,
-	      VIDEO_PBEND_LABEL_YSIZE,
-	      VX + VIDEO_REC_LABEL_XPOS,
-	      VY + VIDEO_REC_LABEL_YPOS);
+    BlitBitmap(pix[PIX_DOOR], drawto,
+	       cx + VIDEO_PBEND_LABEL_XPOS,
+	       cy + VIDEO_PBEND_LABEL_YPOS,
+	       VIDEO_PBEND_LABEL_XSIZE,
+	       VIDEO_PBEND_LABEL_YSIZE,
+	       VX + VIDEO_REC_LABEL_XPOS,
+	       VY + VIDEO_REC_LABEL_YPOS);
   }
 
   if (state & VIDEO_STATE_DATE_ON)
@@ -238,13 +238,13 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 
 void DrawCompleteVideoDisplay()
 {
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX3,DOOR_GFX_PAGEY2, VXSIZE,VYSIZE, VX,VY);
-  XCopyArea(display,pix[PIX_DOOR],drawto,gc,
-	    DOOR_GFX_PAGEX4+VIDEO_CONTROL_XPOS,
-	    DOOR_GFX_PAGEY2+VIDEO_CONTROL_YPOS,
-	    VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
-	    VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
+  BlitBitmap(pix[PIX_DOOR], drawto,
+	     DOOR_GFX_PAGEX3,DOOR_GFX_PAGEY2, VXSIZE,VYSIZE, VX,VY);
+  BlitBitmap(pix[PIX_DOOR], drawto,
+	     DOOR_GFX_PAGEX4+VIDEO_CONTROL_XPOS,
+	     DOOR_GFX_PAGEY2+VIDEO_CONTROL_YPOS,
+	     VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
+	     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
 
   DrawVideoDisplay(VIDEO_ALL_OFF,0);
   if (tape.date && tape.length)
@@ -253,8 +253,8 @@ void DrawCompleteVideoDisplay()
     DrawVideoDisplay(VIDEO_STATE_TIME_ON,tape.length_seconds);
   }
 
-  XCopyArea(display,drawto,pix[PIX_DB_DOOR],gc,
-	    VX,VY, VXSIZE,VYSIZE, DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
+  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+	     VX,VY, VXSIZE,VYSIZE, DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY2);
 }
 
 
@@ -345,14 +345,14 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     case GD_TYPE_NORMAL_BUTTON:
     case GD_TYPE_CHECK_BUTTON:
     case GD_TYPE_RADIO_BUTTON:
-      XCopyArea(display, gd->pixmap, drawto, gc,
-		gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
-      if (gi->deco.design.pixmap)
-	XCopyArea(display, gi->deco.design.pixmap, drawto, gc,
-		  gi->deco.design.x, gi->deco.design.y,
-		  gi->deco.width, gi->deco.height,
-		  gi->x + gi->deco.x + (pressed ? gi->deco.xshift : 0),
-		  gi->y + gi->deco.y + (pressed ? gi->deco.yshift : 0));
+      BlitBitmap(gd->bitmap, drawto,
+		 gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+      if (gi->deco.design.bitmap)
+	BlitBitmap(gi->deco.design.bitmap, drawto,
+		   gi->deco.design.x, gi->deco.design.y,
+		   gi->deco.width, gi->deco.height,
+		   gi->x + gi->deco.x + (pressed ? gi->deco.xshift : 0),
+		   gi->y + gi->deco.y + (pressed ? gi->deco.yshift : 0));
       break;
 
     case GD_TYPE_TEXTINPUT_ALPHANUMERIC:
@@ -369,19 +369,19 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	strcat(text, " ");
 
 	/* left part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y, border, gi->height, gi->x, gi->y);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x, gd->y, border, gi->height, gi->x, gi->y);
 
 	/* middle part of gadget */
 	for (i=0; i<=gi->text.size; i++)
-	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + border, gd->y, font_width, gi->height,
-		    gi->x + border + i * font_width, gi->y);
+	  BlitBitmap(gd->bitmap, drawto,
+		     gd->x + border, gd->y, font_width, gi->height,
+		     gi->x + border + i * font_width, gi->y);
 
 	/* right part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x + gi->border.width - border, gd->y,
-		  border, gi->height, gi->x + gi->width - border, gi->y);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x + gi->border.width - border, gd->y,
+		   border, gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
 	DrawText(gi->x + border, gi->y + border, text, FS_SMALL, font_type);
@@ -411,34 +411,33 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int step_size_remain = size_body - num_steps * design_body;
 
 	/* clear scrollbar area */
-	XFillRectangle(display, backbuffer, gc,
-		       gi->x, gi->y, gi->width, gi->height);
+	ClearRectangle(backbuffer, gi->x, gi->y, gi->width, gi->height);
 
 	/* upper part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y,
-		  gi->width, gi->border.size,
-		  xpos, ypos);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x, gd->y,
+		   gi->width, gi->border.size,
+		   xpos, ypos);
 
 	/* middle part of gadget */
 	for (i=0; i<num_steps; i++)
-	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x, gd->y + gi->border.size,
-		    gi->width, design_body,
-		    xpos, ypos + gi->border.size + i * design_body);
+	  BlitBitmap(gd->bitmap, drawto,
+		     gd->x, gd->y + gi->border.size,
+		     gi->width, design_body,
+		     xpos, ypos + gi->border.size + i * design_body);
 
 	/* remaining middle part of gadget */
 	if (step_size_remain > 0)
-	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x,  gd->y + gi->border.size,
-		    gi->width, step_size_remain,
-		    xpos, ypos + gi->border.size + num_steps * design_body);
+	  BlitBitmap(gd->bitmap, drawto,
+		     gd->x,  gd->y + gi->border.size,
+		     gi->width, step_size_remain,
+		     xpos, ypos + gi->border.size + num_steps * design_body);
 
 	/* lower part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y + design_full - gi->border.size,
-		  gi->width, gi->border.size,
-		  xpos, ypos + size_full - gi->border.size);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x, gd->y + design_full - gi->border.size,
+		   gi->width, gi->border.size,
+		   xpos, ypos + size_full - gi->border.size);
       }
       break;
 
@@ -455,34 +454,33 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int step_size_remain = size_body - num_steps * design_body;
 
 	/* clear scrollbar area */
-	XFillRectangle(display, backbuffer, gc,
-		       gi->x, gi->y, gi->width, gi->height);
+	ClearRectangle(backbuffer, gi->x, gi->y, gi->width, gi->height);
 
 	/* left part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x, gd->y,
-		  gi->border.size, gi->height,
-		  xpos, ypos);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x, gd->y,
+		   gi->border.size, gi->height,
+		   xpos, ypos);
 
 	/* middle part of gadget */
 	for (i=0; i<num_steps; i++)
-	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + gi->border.size, gd->y,
-		    design_body, gi->height,
-		    xpos + gi->border.size + i * design_body, ypos);
+	  BlitBitmap(gd->bitmap, drawto,
+		     gd->x + gi->border.size, gd->y,
+		     design_body, gi->height,
+		     xpos + gi->border.size + i * design_body, ypos);
 
 	/* remaining middle part of gadget */
 	if (step_size_remain > 0)
-	  XCopyArea(display, gd->pixmap, drawto, gc,
-		    gd->x + gi->border.size, gd->y,
-		    step_size_remain, gi->height,
-		    xpos + gi->border.size + num_steps * design_body, ypos);
+	  BlitBitmap(gd->bitmap, drawto,
+		     gd->x + gi->border.size, gd->y,
+		     step_size_remain, gi->height,
+		     xpos + gi->border.size + num_steps * design_body, ypos);
 
 	/* right part of gadget */
-	XCopyArea(display, gd->pixmap, drawto, gc,
-		  gd->x + design_full - gi->border.size, gd->y,
-		  gi->border.size, gi->height,
-		  xpos + size_full - gi->border.size, ypos);
+	BlitBitmap(gd->bitmap, drawto,
+		   gd->x + design_full - gi->border.size, gd->y,
+		   gi->border.size, gi->height,
+		   xpos + size_full - gi->border.size, ypos);
       }
       break;
 
@@ -491,8 +489,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
   }
 
   if (direct)
-    XCopyArea(display, drawto, window, gc,
-	      gi->x, gi->y, gi->width, gi->height, gi->x, gi->y);
+    BlitBitmap(drawto, window,
+	       gi->x, gi->y, gi->width, gi->height, gi->x, gi->y);
   else
     redraw_mask |= (gi->x < SX + SXSIZE ? REDRAW_FIELD :
 		    gi->y < DY + DYSIZE ? REDRAW_DOOR_1 :
@@ -608,25 +606,25 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_DESIGN_UNPRESSED:
-	gi->design[GD_BUTTON_UNPRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->design[GD_BUTTON_UNPRESSED].bitmap = va_arg(ap, Bitmap);
 	gi->design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	gi->design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_PRESSED:
-	gi->design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap);
 	gi->design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	gi->design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_ALT_DESIGN_UNPRESSED:
-	gi->alt_design[GD_BUTTON_UNPRESSED].pixmap= va_arg(ap, Pixmap);
+	gi->alt_design[GD_BUTTON_UNPRESSED].bitmap= va_arg(ap, Bitmap);
 	gi->alt_design[GD_BUTTON_UNPRESSED].x = va_arg(ap, int);
 	gi->alt_design[GD_BUTTON_UNPRESSED].y = va_arg(ap, int);
 	break;
 
       case GDI_ALT_DESIGN_PRESSED:
-	gi->alt_design[GD_BUTTON_PRESSED].pixmap = va_arg(ap, Pixmap);
+	gi->alt_design[GD_BUTTON_PRESSED].bitmap = va_arg(ap, Bitmap);
 	gi->alt_design[GD_BUTTON_PRESSED].x = va_arg(ap, int);
 	gi->alt_design[GD_BUTTON_PRESSED].y = va_arg(ap, int);
 	break;
@@ -640,7 +638,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_DECORATION_DESIGN:
-	gi->deco.design.pixmap = va_arg(ap, Pixmap);
+	gi->deco.design.bitmap = va_arg(ap, Bitmap);
 	gi->deco.design.x = va_arg(ap, int);
 	gi->deco.design.y = va_arg(ap, int);
 	break;
@@ -731,9 +729,9 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
   /* check if gadget complete */
   if (gi->type != GD_TYPE_DRAWING_AREA &&
-      (!gi->design[GD_BUTTON_UNPRESSED].pixmap ||
-       !gi->design[GD_BUTTON_PRESSED].pixmap))
-    Error(ERR_EXIT, "gadget incomplete (missing Pixmap)");
+      (!gi->design[GD_BUTTON_UNPRESSED].bitmap ||
+       !gi->design[GD_BUTTON_PRESSED].bitmap))
+    Error(ERR_EXIT, "gadget incomplete (missing Bitmap)");
 
   /* adjust gadget values in relation to other gadget values */
 

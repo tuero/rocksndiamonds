@@ -81,14 +81,13 @@ void OpenAll(int argc, char *argv[])
 
 #ifndef USE_SDL_LIBRARY
   XMapWindow(display, window);
-  XFlush(display);
+  FlushDisplay();
 #endif
 
   InitGfx();
   InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
 
   InitLevelAndPlayerInfo();
-  return;
   InitGadgets();		/* needs to know number of level series */
 
   DrawMainMenu();
@@ -360,16 +359,13 @@ void InitWindow(int argc, char *argv[])
 {
 #ifdef USE_SDL_LIBRARY
   /* open SDL video output device (window or fullscreen mode) */
-  if ((sdl_window = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
-				     SDL_HWSURFACE))
+  if ((window = SDL_SetVideoMode(WIN_XSIZE, WIN_YSIZE, WIN_SDL_DEPTH,
+				 SDL_HWSURFACE))
       == NULL)
     Error(ERR_EXIT, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
 
   /* set window and icon title */
   SDL_WM_SetCaption(WINDOW_TITLE_STRING, WINDOW_TITLE_STRING);
-
-  /* select event types: initially no mouse motion events */
-  SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
 
 #else /* !USE_SDL_LIBRARY */
 
@@ -481,7 +477,7 @@ void InitWindow(int argc, char *argv[])
   XSelectInput(display, window, window_event_mask);
 #endif
 
-  /* create GC for drawing with window depth */
+  /* create GC for drawing with window depth and background color (black) */
   gc_values.graphics_exposures = False;
   gc_values.foreground = pen_bg;
   gc_values.background = pen_bg;
@@ -641,7 +637,7 @@ void InitGfx()
       == NULL)
     Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
 
-  if ((sdl_pix[PIX_DB_BACK] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+  if ((pix[PIX_DB_BACK] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
     Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
@@ -653,7 +649,7 @@ void InitGfx()
       == NULL)
     Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
 
-  if ((sdl_pix[PIX_DB_DOOR] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+  if ((pix[PIX_DB_DOOR] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
     Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
@@ -665,14 +661,14 @@ void InitGfx()
       == NULL)
     Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
 
-  if ((sdl_pix[PIX_DB_FIELD] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+  if ((pix[PIX_DB_FIELD] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
     Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
 
   SDL_FreeSurface(sdl_image_tmp);
 
   /* initialize surface array to 'NULL' */
   for(i=0; i<NUM_TILES; i++)
-    sdl_tile_masked[i] = NULL;
+    tile_masked[i] = NULL;
 
   /* create only those masked surfaces we really need */
   for(i=0; tile_needs_clipping[i].start>=0; i++)
@@ -680,33 +676,31 @@ void InitGfx()
     for(j=0; j<tile_needs_clipping[i].count; j++)
     {
       int tile = tile_needs_clipping[i].start + j;
-#if 0
       int graphic = tile;
       int src_x, src_y;
-      int pixmap_nr;
-      Pixmap src_pixmap;
+      int bitmap_nr;
+      Bitmap src_bitmap;
 
-      getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-      src_pixmap = clipmask[pixmap_nr];
+      getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
+      src_bitmap = pix_masked[bitmap_nr];
 
-      tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
+      /* create surface for masked tile graphic */
+      if ((sdl_image_tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, TILEX, TILEY,
+						WIN_SDL_DEPTH, 0, 0, 0, 0))
+	  == NULL)
+	Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s\n", SDL_GetError());
 
-      XCopyArea(display,src_pixmap,tile_clipmask[tile],copy_clipmask_gc,
-		src_x,src_y, TILEX,TILEY, 0,0);
-#endif
+      /* create native transparent surface for current image */
+      SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
+		      SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+      if ((tile_masked[tile] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+	Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
+
+      SDL_FreeSurface(sdl_image_tmp);
+
+      BlitBitmap(src_bitmap, tile_masked[tile], src_x,src_y, TILEX,TILEY, 0,0);
     }
   }
-
-  sdl_drawto = sdl_backbuffer = sdl_pix[PIX_DB_BACK];
-  sdl_fieldbuffer = sdl_pix[PIX_DB_FIELD];
-  SetDrawtoField(DRAW_BACKBUFFER);
-
-  SDLCopyArea(sdl_pix[PIX_BACK], sdl_backbuffer,
-	      0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-  SDLFillRectangle(sdl_pix[PIX_DB_BACK],
-		   REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, 0x000000);
-  SDLFillRectangle(sdl_pix[PIX_DB_DOOR],
-		   0,0, 3*DXSIZE,DYSIZE+VYSIZE, 0x000000);
 
 #else /* !USE_SDL_LIBRARY */
 
@@ -758,7 +752,7 @@ void InitGfx()
   if (!pix[PIX_DB_BACK] || !pix[PIX_DB_DOOR])
     Error(ERR_EXIT, "cannot create additional pixmaps");
 
-  for(i=0; i<NUM_PIXMAPS; i++)
+  for(i=0; i<NUM_BITMAPS; i++)
   {
     if (clipmask[i])
     {
@@ -769,17 +763,15 @@ void InitGfx()
     }
   }
 
+#endif /* !USE_SDL_LIBRARY */
+
   drawto = backbuffer = pix[PIX_DB_BACK];
   fieldbuffer = pix[PIX_DB_FIELD];
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  XCopyArea(display, pix[PIX_BACK], backbuffer, gc,
-	    0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-  XFillRectangle(display, pix[PIX_DB_BACK], gc,
-		 REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
-  XFillRectangle(display, pix[PIX_DB_DOOR], gc,
-		 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
-#endif /* !USE_SDL_LIBRARY */
+  BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
+  ClearRectangle(pix[PIX_DB_BACK], REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE);
+  ClearRectangle(pix[PIX_DB_DOOR], 0,0, 3*DXSIZE,DYSIZE+VYSIZE);
 
   for(i=0; i<MAX_BUF_XSIZE; i++)
     for(j=0; j<MAX_BUF_YSIZE; j++)
@@ -833,13 +825,13 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
       Error(ERR_EXIT, "IMG_Load() failed: %s\n", SDL_GetError());
 
     /* create native non-transparent surface for current image */
-    if ((sdl_pix[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    if ((pix[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
 
     /* create native transparent surface for current image */
     SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
 		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
-    if ((sdl_pix_masked[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
+    if ((pix_masked[pos] = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s\n", SDL_GetError());
 
     /* free temporary surface */
@@ -903,6 +895,11 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
     if (!pix[pos])
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
+
+    /* setting pix_masked[] to pix[] allows BlitBitmapMasked() to always
+       use pix_masked[], although they are the same when not using SDL */
+    pix_masked[pos] = pix[pos];
+
 #endif /* !USE_SDL_LIBRARY */
   }
 
@@ -2119,7 +2116,7 @@ void CloseAllAndExit(int exit_value)
     FreeSounds(NUM_SOUNDS);
   }
 
-  for(i=0; i<NUM_PIXMAPS; i++)
+  for(i=0; i<NUM_BITMAPS; i++)
   {
     if (pix[i])
     {
@@ -2131,22 +2128,36 @@ void CloseAllAndExit(int exit_value)
 	XpmFreeAttributes(&xpm_att[i]);
       }
 #endif
+
+#ifdef USE_SDL_LIBRARY
+      SDL_FreeSurface(pix[i]);
+#else
       XFreePixmap(display,pix[i]);
+#endif
     }
+
+#ifdef USE_SDL_LIBRARY
+      SDL_FreeSurface(pix_masked[i]);
+#else
     if (clipmask[i])
       XFreePixmap(display,clipmask[i]);
     if (clip_gc[i])
       XFreeGC(display, clip_gc[i]);
+#endif
   }
 
+#ifdef USE_SDL_LIBRARY
+  KeyboardAutoRepeatOn();
+#else
   if (gc)
     XFreeGC(display, gc);
 
   if (display)
   {
-    XAutoRepeatOn(display);
+    KeyboardAutoRepeatOn();
     XCloseDisplay(display);
   }
+#endif
 
 #ifdef MSDOS
   dumpErrorFile();

@@ -17,16 +17,16 @@
 #include "main.h"
 
 void EventLoop(void);
-void HandleOtherEvents(XEvent *);
+void HandleOtherEvents(Event *);
 void ClearEventQueue(void);
 void SleepWhileUnmapped(void);
 
-void HandleExposeEvent(XExposeEvent *);
-void HandleButtonEvent(XButtonEvent *);
-void HandleMotionEvent(XMotionEvent *);
-void HandleKeyEvent(XKeyEvent *);
-void HandleFocusEvent(XFocusChangeEvent *);
-void HandleClientMessageEvent(XClientMessageEvent *event);
+void HandleExposeEvent(ExposeEvent *);
+void HandleButtonEvent(ButtonEvent *);
+void HandleMotionEvent(MotionEvent *);
+void HandleKeyEvent(KeyEvent *);
+void HandleFocusEvent(FocusChangeEvent *);
+void HandleClientMessageEvent(ClientMessageEvent *event);
 
 void HandleNoXEvent(void);
 

@@ -32,26 +32,26 @@ void EventLoop(void)
 {
   while(1)
   {
-    if (XPending(display))	/* got event from X server */
+    if (PendingEvent())		/* got event */
     {
-      XEvent event;
+      Event event;
 
-      XNextEvent(display, &event);
+      NextEvent(&event);
 
       switch(event.type)
       {
-	case ButtonPress:
-	case ButtonRelease:
-	  HandleButtonEvent((XButtonEvent *) &event);
+	case EVENT_BUTTONPRESS:
+	case EVENT_BUTTONRELEASE:
+	  HandleButtonEvent((ButtonEvent *) &event);
 	  break;
 
-	case MotionNotify:
-	  HandleMotionEvent((XMotionEvent *) &event);
+	case EVENT_MOTIONNOTIFY:
+	  HandleMotionEvent((MotionEvent *) &event);
 	  break;
 
-	case KeyPress:
-	case KeyRelease:
-	  HandleKeyEvent((XKeyEvent *) &event);
+	case EVENT_KEYPRESS:
+	case EVENT_KEYRELEASE:
+	  HandleKeyEvent((KeyEvent *) &event);
 	  break;
 
 	default:
@@ -67,8 +67,8 @@ void EventLoop(void)
 
     if (game_status != PLAYING)
     {
-      XSync(display, FALSE);
-      if (!XPending(display))	/* delay only if no pending events */
+      SyncDisplay();
+      if (!PendingEvent())	/* delay only if no pending events */
 	Delay(10);
     }
 
@@ -80,25 +80,25 @@ void EventLoop(void)
   }
 }
 
-void HandleOtherEvents(XEvent *event)
+void HandleOtherEvents(Event *event)
 {
   switch(event->type)
   {
-    case Expose:
-      HandleExposeEvent((XExposeEvent *) event);
+    case EVENT_EXPOSE:
+      HandleExposeEvent((ExposeEvent *) event);
       break;
 
-    case UnmapNotify:
+    case EVENT_UNMAPNOTIFY:
       SleepWhileUnmapped();
       break;
 
-    case FocusIn:
-    case FocusOut:
-      HandleFocusEvent((XFocusChangeEvent *) event);
+    case EVENT_FOCUSIN:
+    case EVENT_FOCUSOUT:
+      HandleFocusEvent((FocusChangeEvent *) event);
       break;
 
-    case ClientMessage:
-      HandleClientMessageEvent((XClientMessageEvent *) event);
+    case EVENT_CLIENTMESSAGE:
+      HandleClientMessageEvent((ClientMessageEvent *) event);
       break;
 
     default:
@@ -108,19 +108,19 @@ void HandleOtherEvents(XEvent *event)
 
 void ClearEventQueue()
 {
-  while(XPending(display))
+  while (PendingEvent())
   {
-    XEvent event;
+    Event event;
 
-    XNextEvent(display, &event);
+    NextEvent(&event);
 
     switch(event.type)
     {
-      case ButtonRelease:
+      case EVENT_BUTTONRELEASE:
 	button_status = MB_RELEASED;
 	break;
 
-      case KeyRelease:
+      case EVENT_KEYRELEASE:
 	key_joystick_mapping = 0;
 	break;
 
@@ -135,29 +135,29 @@ void SleepWhileUnmapped()
 {
   boolean window_unmapped = TRUE;
 
-  XAutoRepeatOn(display);
+  KeyboardAutoRepeatOn();
 
   while(window_unmapped)
   {
-    XEvent event;
+    Event event;
 
-    XNextEvent(display, &event);
+    NextEvent(&event);
 
     switch(event.type)
     {
-      case ButtonRelease:
+      case EVENT_BUTTONRELEASE:
 	button_status = MB_RELEASED;
 	break;
 
-      case KeyRelease:
+      case EVENT_KEYRELEASE:
 	key_joystick_mapping = 0;
 	break;
 
-      case MapNotify:
+      case EVENT_MAPNOTIFY:
 	window_unmapped = FALSE;
 	break;
 
-      case UnmapNotify:
+      case EVENT_UNMAPNOTIFY:
 	/* this is only to surely prevent the 'should not happen' case
 	 * of recursively looping between 'SleepWhileUnmapped()' and
 	 * 'HandleOtherEvents()' which usually calls this funtion.
@@ -171,10 +171,10 @@ void SleepWhileUnmapped()
   }
 
   if (game_status == PLAYING)
-    XAutoRepeatOff(display);
+    KeyboardAutoRepeatOff();
 }
 
-void HandleExposeEvent(XExposeEvent *event)
+void HandleExposeEvent(ExposeEvent *event)
 {
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
@@ -203,21 +203,19 @@ void HandleExposeEvent(XExposeEvent *event)
     fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
     fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
 
-    XCopyArea(display,fieldbuffer,backbuffer,gc,
-	      fx,fy, SXSIZE,SYSIZE,
-	      SX,SY);
+    BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
   }
 
-  XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
+  BlitBitmap(drawto, window, x,y, width,height, x,y);
 
-  XFlush(display);
+  FlushDisplay();
 }
 
-void HandleButtonEvent(XButtonEvent *event)
+void HandleButtonEvent(ButtonEvent *event)
 {
   motion_status = FALSE;
 
-  if (event->type == ButtonPress)
+  if (event->type == EVENT_BUTTONPRESS)
     button_status = event->button;
   else
     button_status = MB_RELEASED;
@@ -225,16 +223,12 @@ void HandleButtonEvent(XButtonEvent *event)
   HandleButton(event->x, event->y, button_status);
 }
 
-void HandleMotionEvent(XMotionEvent *event)
+void HandleMotionEvent(MotionEvent *event)
 {
-  Window root, child;
-  int root_x, root_y;
   int win_x, win_y;
-  unsigned int mask;
 
-  if (!XQueryPointer(display, window, &root, &child, &root_x, &root_y,
-		     &win_x, &win_y, &mask))
-    return;
+  if (!QueryPointer(window, &win_x, &win_y))
+    return;	/* window and pointer are on different screens */
 
   if (!button_status && game_status != LEVELED)
     return;
@@ -244,9 +238,9 @@ void HandleMotionEvent(XMotionEvent *event)
   HandleButton(win_x, win_y, button_status);
 }
 
-void HandleKeyEvent(XKeyEvent *event)
+void HandleKeyEvent(KeyEvent *event)
 {
-  int key_status = (event->type == KeyPress ? KEY_PRESSED : KEY_RELEASED);
+  int key_status = (event->type==EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
   KeySym key;
 
   if (game_status == PLAYING)
@@ -269,15 +263,15 @@ void HandleKeyEvent(XKeyEvent *event)
   HandleKey(key, key_status);
 }
 
-void HandleFocusEvent(XFocusChangeEvent *event)
+void HandleFocusEvent(FocusChangeEvent *event)
 {
   static int old_joystick_status = -1;
 
-  if (event->type == FocusOut)
+  if (event->type == EVENT_FOCUSOUT)
   {
     int i;
 
-    XAutoRepeatOn(display);
+    KeyboardAutoRepeatOn();
     old_joystick_status = joystick_status;
     joystick_status = JOYSTICK_OFF;
 
@@ -286,7 +280,7 @@ void HandleFocusEvent(XFocusChangeEvent *event)
     for (i=0; i<MAX_PLAYERS; i++)
       stored_player[i].action = 0;
   }
-  else if (event->type == FocusIn)
+  else if (event->type == EVENT_FOCUSIN)
   {
     /* When there are two Rocks'n'Diamonds windows which overlap and
        the player moves the pointer from one game window to the other,
@@ -307,19 +301,23 @@ void HandleFocusEvent(XFocusChangeEvent *event)
     if (game_status == PLAYING)
     {
       Delay(100);
-      XAutoRepeatOff(display);
+      KeyboardAutoRepeatOff();
     }
     if (old_joystick_status != -1)
       joystick_status = old_joystick_status;
   }
 }
 
-void HandleClientMessageEvent(XClientMessageEvent *event)
+void HandleClientMessageEvent(ClientMessageEvent *event)
 {
+#ifdef USE_SDL_LIBRARY
+  CloseAllAndExit(0);	/* the only possible message here is SDL_QUIT */
+#else
 #ifndef MSDOS
   if ((event->window == window) &&
       (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
     CloseAllAndExit(0);
+#endif
 #endif
 }
 

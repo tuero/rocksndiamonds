@@ -75,7 +75,7 @@ void DrawMainMenu()
 
   UnmapAllGadgets();
   FadeSounds();
-  XAutoRepeatOn(display);
+  KeyboardAutoRepeatOn();
 
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
@@ -274,7 +274,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     /* needed because DrawMicroLevel() takes some time */
     BackToFront();
-    XSync(display, FALSE);
+    SyncDisplay();
     DelayReached(&level_delay, 0);	/* reset delay counter */
   }
   else if (x == 1 && y >= 3 && y <= 10)
@@ -927,7 +927,7 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
   int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
 
-  XFillRectangle(display, backbuffer, gc, SX, SY, SXSIZE - 32, SYSIZE);
+  ClearRectangle(backbuffer, SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
 
   DrawText(SX, SY, "Level Directories", FS_BIG, FC_GREEN);
@@ -969,7 +969,7 @@ static void drawChooseLevelInfo(int leveldir_pos)
   node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
   node = getLevelDirInfoFromPos(node_first, leveldir_pos);
 
-  XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 64, 32);
+  ClearRectangle(drawto, SX + 32, SY + 32, SXSIZE - 64, 32);
 
   if (node->parent_link)
     DrawTextFCentered(40, FC_RED, "leave group \"%s\"", node->class_desc);
@@ -1890,18 +1890,18 @@ void CustomizeKeyboard(int player_nr)
 
   while(!finished)
   {
-    if (XPending(display))	/* got event from X server */
+    if (PendingEvent())		/* got event */
     {
-      XEvent event;
+      Event event;
 
-      XNextEvent(display, &event);
+      NextEvent(&event);
 
       switch(event.type)
       {
-        case KeyPress:
+        case EVENT_KEYPRESS:
 	  {
-	    KeySym key = XLookupKeysym((XKeyEvent *)&event,
-				       ((XKeyEvent *)&event)->state);
+	    KeySym key = XLookupKeysym((KeyEvent *)&event,
+				       ((KeyEvent *)&event)->state);
 
 	    if (key == XK_Escape || (key == XK_Return && step_nr == 6))
 	    {
@@ -1953,7 +1953,7 @@ void CustomizeKeyboard(int player_nr)
 	  }
 	  break;
 
-        case KeyRelease:
+        case EVENT_KEYRELEASE:
 	  key_joystick_mapping = 0;
 	  break;
 
@@ -2056,17 +2056,17 @@ void CalibrateJoystick(int player_nr)
 
   while(result < 0)
   {
-    if (XPending(display))	/* got event from X server */
+    if (PendingEvent())		/* got event */
     {
-      XEvent event;
+      Event event;
 
-      XNextEvent(display, &event);
+      NextEvent(&event);
 
       switch(event.type)
       {
-	case KeyPress:
-	  switch(XLookupKeysym((XKeyEvent *)&event,
-			       ((XKeyEvent *)&event)->state))
+	case EVENT_KEYPRESS:
+	  switch(XLookupKeysym((KeyEvent *)&event,
+			       ((KeyEvent *)&event)->state))
 	  {
 	    case XK_Return:
 	      if (check_remaining == 0)
@@ -2082,7 +2082,7 @@ void CalibrateJoystick(int player_nr)
 	  }
 	  break;
 
-	case KeyRelease:
+	case EVENT_KEYRELEASE:
 	  key_joystick_mapping = 0;
 	  break;
 
@@ -2300,7 +2300,7 @@ static struct
 
 static void CreateScreenScrollbuttons()
 {
-  Pixmap gd_pixmap = pix[PIX_MORE];
+  Bitmap gd_bitmap = pix[PIX_MORE];
   struct GadgetInfo *gi;
   unsigned long event_mask;
   int i;
@@ -2334,8 +2334,8 @@ static void CreateScreenScrollbuttons()
 		      GDI_HEIGHT, height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);
@@ -2354,7 +2354,7 @@ static void CreateScreenScrollbars()
   for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
-    Pixmap gd_pixmap = pix[PIX_MORE];
+    Bitmap gd_bitmap = pix[PIX_MORE];
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -2395,8 +2395,8 @@ static void CreateScreenScrollbars()
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_BORDER_SIZE, SC_BORDER_SIZE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,

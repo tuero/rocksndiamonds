@@ -18,7 +18,7 @@
 
 static void HandleAnimation(int);
 static boolean AnimateToon(int, boolean);
-static void DrawAnim(Pixmap, GC, int, int, int, int, int, int, int, int);
+static void DrawAnim(Bitmap, GC, int, int, int, int, int, int, int, int);
 
 struct AnimInfo
 {
@@ -145,9 +145,7 @@ void HandleAnimation(int mode)
         fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
         fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
 
-	XCopyArea(display,fieldbuffer,backbuffer,gc,
-		  fx,fy, SXSIZE,SYSIZE,
-		  SX,SY);
+	BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
       }
 
       return;
@@ -398,8 +396,9 @@ boolean AnimateToon(int toon_nr, boolean restart)
     },
   };
   struct AnimInfo *anim = &toon[toon_nr];
-  Pixmap anim_pixmap = (toon_nr < 6 ? pix[PIX_TOONS] : pix[PIX_HEROES]);
-  GC anim_clip_gc = (toon_nr < 6 ? clip_gc[PIX_TOONS] : clip_gc[PIX_HEROES]);
+  int anim_bitmap_nr = (toon_nr < 6 ? PIX_TOONS : PIX_HEROES);
+  Bitmap anim_bitmap = pix_masked[anim_bitmap_nr];
+  GC anim_clip_gc = clip_gc[anim_bitmap_nr];
 
   if (restart)
   {
@@ -465,7 +464,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
     if ((game_status == HELPSCREEN ||
 	 (game_status == MAINMENU && redraw_mask & REDRAW_MICROLEVEL))
 	&& !restart)
-      DrawAnim(anim_pixmap, anim_clip_gc,
+      DrawAnim(anim_bitmap, anim_clip_gc,
 	       src_x + cut_x, src_y + cut_y, width, height,
 	       REAL_SX + dest_x, REAL_SY + dest_y, pad_x, pad_y);
 
@@ -509,7 +508,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   else if (pos_y>FULL_SYSIZE-anim->height)
     height -= (pos_y - (FULL_SYSIZE-anim->height));
 
-  DrawAnim(anim_pixmap,anim_clip_gc,
+  DrawAnim(anim_bitmap,anim_clip_gc,
 	   src_x+cut_x,src_y+cut_y, width,height,
 	   REAL_SX+dest_x,REAL_SY+dest_y, pad_x,pad_y);
 
@@ -531,7 +530,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   return(FALSE);
 }
 
-void DrawAnim(Pixmap toon_pixmap, GC toon_clip_gc,
+void DrawAnim(Bitmap toon_bitmap, GC toon_clip_gc,
 	      int src_x, int src_y, int width, int height,
 	      int dest_x, int dest_y, int pad_x, int pad_y)
 {
@@ -539,27 +538,26 @@ void DrawAnim(Pixmap toon_pixmap, GC toon_clip_gc,
 
 #if 1
   /* special method to avoid flickering interference with BackToFront() */
-  XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,dest_x-pad_x,dest_y-pad_y,
-	    width+2*pad_x,height+2*pad_y, buf_x,buf_y);
-  XSetClipOrigin(display,toon_clip_gc,dest_x-src_x,dest_y-src_y);
-  XCopyArea(display,toon_pixmap,backbuffer,toon_clip_gc,
-	    src_x,src_y, width,height, dest_x,dest_y);
-  XCopyArea(display,backbuffer,window,gc, dest_x-pad_x,dest_y-pad_y,
-	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
+  BlitBitmap(backbuffer, pix[PIX_DB_DOOR], dest_x-pad_x, dest_y-pad_y,
+	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
+  SetClipOrigin(toon_clip_gc, dest_x-src_x, dest_y-src_y);
+  BlitBitmapMasked(toon_bitmap, backbuffer,
+		   src_x, src_y, width, height, dest_x, dest_y);
+  BlitBitmap(backbuffer, window, dest_x-pad_x, dest_y-pad_y,
+	     width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
   BackToFront();
-  XCopyArea(display,pix[PIX_DB_DOOR],backbuffer,gc, buf_x,buf_y,
-	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
+  BlitBitmap(pix[PIX_DB_DOOR], backbuffer, buf_x, buf_y,
+	    width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
 #else
   /* normal method, causing flickering interference with BackToFront() */
-  XCopyArea(display,backbuffer,pix[PIX_DB_DOOR],gc,dest_x-pad_x,dest_y-pad_y,
-	    width+2*pad_x,height+2*pad_y, buf_x,buf_y);
-  XSetClipOrigin(display,toon_clip_gc,
-		 buf_x-src_x+pad_x,buf_y-src_y+pad_y);
-  XCopyArea(display,toon_pixmap,pix[PIX_DB_DOOR],toon_clip_gc,
-	    src_x,src_y, width,height, buf_x+pad_x,buf_y+pad_y);
-  XCopyArea(display,pix[PIX_DB_DOOR],window,gc, buf_x,buf_y,
-	    width+2*pad_x,height+2*pad_y, dest_x-pad_x,dest_y-pad_y);
+  BlitBitmap(backbuffer, pix[PIX_DB_DOOR], dest_x-pad_x, dest_y-pad_y,
+	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
+  SetClipOrigin(toon_clip_gc, buf_x-src_x+pad_x, buf_y-src_y+pad_y);
+  BlitBitmapMasked(toon_bitmap, pix[PIX_DB_DOOR],
+		   src_x, src_y, width, height, buf_x+pad_x, buf_y+pad_y);
+  BlitBitmap(pix[PIX_DB_DOOR], window, buf_x, buf_y,
+	     width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
 #endif
 
-  XFlush(display);
+  FlushDisplay();
 }

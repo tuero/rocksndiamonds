@@ -328,7 +328,7 @@ void CreateTapeButtons()
 
   for (i=0; i<NUM_TAPE_BUTTONS; i++)
   {
-    Pixmap gd_pixmap = pix[PIX_DOOR];
+    Bitmap gd_bitmap = pix[PIX_DOOR];
     struct GadgetInfo *gi;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y;
@@ -348,8 +348,8 @@ void CreateTapeButtons()
 		      GDI_HEIGHT, TAPE_BUTTON_YSIZE,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
 		      GDI_EVENT_MASK, GD_EVENT_RELEASED,
 		      GDI_CALLBACK_ACTION, HandleTapeButtons,
 		      GDI_END);

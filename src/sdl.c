@@ -15,6 +15,7 @@
 #ifdef USE_SDL_LIBRARY
 
 #include "main.h"
+#include "misc.h"
 
 inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
 			int src_x, int src_y,
@@ -49,6 +50,29 @@ inline void SDLFillRectangle(SDL_Surface *surface, int x, int y,
   rect.y = y;
   rect.w = width;
   rect.h = height;
+
+  SDL_FillRect(surface, &rect,
+               SDL_MapRGB(surface->format, color_r, color_g, color_b));
+}
+
+inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
+			      int to_x, int to_y, unsigned int color)
+{
+  SDL_Rect rect;
+  unsigned int color_r = (color >> 2) && 0xff;
+  unsigned int color_g = (color >> 1) && 0xff;
+  unsigned int color_b = (color >> 0) && 0xff;
+
+  if (from_x > to_x)
+    swap_numbers(&from_x, &to_x);
+
+  if (from_y > to_y)
+    swap_numbers(&from_y, &to_y);
+
+  rect.x = from_x;
+  rect.y = from_y;
+  rect.w = (to_x - from_x + 1);
+  rect.h = (to_y - from_y + 1);
 
   SDL_FillRect(surface, &rect,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));

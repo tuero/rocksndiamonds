@@ -26,25 +26,18 @@
 Display        *display;
 Visual	       *visual;
 int		screen;
-Window  	window;
-GC		gc, clip_gc[NUM_PIXMAPS], tile_clip_gc;
-Pixmap		pix[NUM_PIXMAPS];
-Pixmap		clipmask[NUM_PIXMAPS], tile_clipmask[NUM_TILES];
+DrawWindow  	window;
+GC		gc, clip_gc[NUM_BITMAPS], tile_clip_gc;
+Bitmap		pix[NUM_BITMAPS];
+Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
+Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
 
 #ifdef USE_XPM_LIBRARY
 XpmAttributes 	xpm_att[NUM_PICTURES];
 #endif
 
-Drawable        drawto, drawto_field, backbuffer, fieldbuffer;
+DrawBuffer	drawto, drawto_field, backbuffer, fieldbuffer;
 Colormap	cmap;
-
-#ifdef USE_SDL_LIBRARY
-SDL_Surface    *sdl_window;
-SDL_Surface    *sdl_drawto, *sdl_drawto_field;
-SDL_Surface    *sdl_backbuffer, *sdl_fieldbuffer;
-SDL_Surface    *sdl_pix[NUM_PIXMAPS];
-SDL_Surface    *sdl_pix_masked[NUM_PIXMAPS], *sdl_tile_masked[NUM_TILES];
-#endif
 
 int		sound_pipe[2];
 int		sound_device;
@@ -586,7 +579,7 @@ void TEST_SDL_BLIT_RECT(int x, int y)
 {
   SDL_Rect rect_src, rect_dst;
 
-  SDLCopyArea(sdl_pix_masked[PIX_HEROES], sdl_window,
+  SDLCopyArea(pix_masked[PIX_HEROES], window,
 	      8 * TILEX, 8 * TILEY, TILEX, TILEY, x, y);
   return;
 
@@ -680,59 +673,73 @@ void TEST_SDL_INIT_DISPLAY()
 
 void TEST_SDL_EVENT_LOOP()
 {
-  SDL_Event event;
   int quit_loop = 0;
 
   SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
 
+  /*
   while (!quit_loop && SDL_WaitEvent(&event) >=0)
+  */
+
+  while (!quit_loop)
   {
-    /* hier werden die Ereignisse behandelt */
-    switch(event.type)
+    SDL_Event event;
+
+    if (SDL_PollEvent(&event))
     {
-      case SDL_QUIT:
+      /* hier werden die Ereignisse behandelt */
+      switch(event.type)
       {
-	quit_loop = 1;
-	break;
+        case SDL_QUIT:
+	{
+	  quit_loop = 1;
+	  break;
+	}
+
+        case SDL_MOUSEBUTTONDOWN:
+	{
+	  int x = event.button.x;
+	  int y = event.button.y;
+
+	  SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+
+	  TEST_SDL_BLIT_RECT(x, y);
+
+	  printf("SDL_MOUSEBUTTONDOWN(%d, %d)\n", x, y);
+	  break;
+	}
+
+        case SDL_MOUSEBUTTONUP:
+	{
+	  int x = event.button.x;
+	  int y = event.button.y;
+
+	  SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+
+	  printf("SDL_MOUSEBUTTONUP(%d, %d)\n", x, y);
+	  break;
+	}
+
+        case SDL_MOUSEMOTION:
+	{
+	  int x = event.motion.x;
+	  int y = event.motion.y;
+
+	  TEST_SDL_BLIT_RECT(x, y);
+
+	  printf("SDL_MOUSEMOTION(%d, %d)\n", x, y);
+	  break;
+	}
+
+        default:
+	  break;
       }
+    }
 
-      case SDL_MOUSEBUTTONDOWN:
-      {
-	int x = event.button.x;
-	int y = event.button.y;
-
-	SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
-
-	TEST_SDL_BLIT_RECT(x, y);
-
-	printf("SDL_MOUSEBUTTONDOWN(%d, %d)\n", x, y);
-	break;
-      }
-
-      case SDL_MOUSEBUTTONUP:
-      {
-	int x = event.button.x;
-	int y = event.button.y;
-
-	SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
-
-	printf("SDL_MOUSEBUTTONUP(%d, %d)\n", x, y);
-	break;
-      }
-
-      case SDL_MOUSEMOTION:
-      {
-	int x = event.motion.x;
-	int y = event.motion.y;
-
-	TEST_SDL_BLIT_RECT(x, y);
-
-	printf("SDL_MOUSEMOTION(%d, %d)\n", x, y);
-	break;
-      }
-
-      default:
-	break;
+    if (!SDL_PollEvent(NULL))	/* delay only if no pending events */
+    {
+      printf("waiting...\n");
+      Delay(100);
     }
   }
 
@@ -759,10 +766,12 @@ int main(int argc, char *argv[])
   GetOptions(argv);
   OpenAll(argc,argv);
 
+#if 0
 #ifdef USE_SDL_LIBRARY
   TEST_SDL_BLIT_RECT((WIN_XSIZE - TILEX)/2, (WIN_YSIZE - TILEY)/2);
   TEST_SDL_EVENT_LOOP();
   exit(0);
+#endif
 #endif
 
   EventLoop();

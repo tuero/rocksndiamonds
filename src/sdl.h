@@ -12,10 +12,15 @@
 *  sdl.h                                                   *
 ***********************************************************/
 
-#include <SDL/SDL.h>
-#include <IMG.h>
+#ifndef SDL_H
+#define SDL_H
+
+#include "SDL.h"
+#include "IMG.h"
 
 inline void SDLCopyArea(SDL_Surface *, SDL_Surface *,
 			int, int, int, int, int, int);
-inline void SDLFillRectangle(SDL_Surface *, int, int,
-			     int, int, unsigned int);
+inline void SDLFillRectangle(SDL_Surface *, int, int, int, int, unsigned int);
+inline void SDLDrawSimpleLine(SDL_Surface *, int, int, int, int, unsigned int);
+
+#endif /* SDL_H */

@@ -85,7 +85,7 @@ void SetDrawtoField(int mode)
 void BackToFront()
 {
   int x,y;
-  Drawable buffer = (drawto_field == window ? backbuffer : drawto_field);
+  DrawBuffer buffer = (drawto_field == window ? backbuffer : drawto_field);
 
   if (setup.direct_draw && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
@@ -104,13 +104,11 @@ void BackToFront()
      this could mean that we have to wait for the graphics to complete,
      although we could go on doing calculations for the next frame */
 
-  XSync(display, FALSE);
+  SyncDisplay();
 
   if (redraw_mask & REDRAW_ALL)
   {
-    XCopyArea(display, backbuffer, window, gc,
-	      0, 0, WIN_XSIZE, WIN_YSIZE,
-	      0, 0);
+    BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
     redraw_mask = 0;
   }
 
@@ -118,9 +116,8 @@ void BackToFront()
   {
     if (game_status != PLAYING || redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
-      XCopyArea(display, backbuffer, window, gc,
-		REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		REAL_SX, REAL_SY);
+      BlitBitmap(backbuffer, window,
+		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
     }
     else
     {
@@ -137,7 +134,7 @@ void BackToFront()
 	  ABS(ScreenMovPos) == ScrollStepSize ||
 	  redraw_tiles > REDRAWTILES_THRESHOLD)
       {
-	XCopyArea(display, buffer, window, gc, fx, fy, SXSIZE, SYSIZE, SX, SY);
+	BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
 
 #ifdef DEBUG
 #if 0
@@ -160,49 +157,43 @@ void BackToFront()
   if (redraw_mask & REDRAW_DOORS)
   {
     if (redraw_mask & REDRAW_DOOR_1)
-      XCopyArea(display, backbuffer, window, gc,
-		DX, DY, DXSIZE, DYSIZE,
-		DX, DY);
+      BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
     if (redraw_mask & REDRAW_DOOR_2)
     {
       if ((redraw_mask & REDRAW_DOOR_2) == REDRAW_DOOR_2)
-	XCopyArea(display,backbuffer,window,gc,
-		  VX,VY, VXSIZE,VYSIZE,
-		  VX,VY);
+	BlitBitmap(backbuffer, window, VX,VY, VXSIZE,VYSIZE, VX,VY);
       else
       {
 	if (redraw_mask & REDRAW_VIDEO_1)
-	  XCopyArea(display,backbuffer,window,gc,
-		    VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS,
-		    VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
-		    VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS);
+	  BlitBitmap(backbuffer, window,
+		     VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS,
+		     VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
+		     VX+VIDEO_DISPLAY1_XPOS,VY+VIDEO_DISPLAY1_YPOS);
 	if (redraw_mask & REDRAW_VIDEO_2)
-	  XCopyArea(display,backbuffer,window,gc,
-		    VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS,
-		    VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
-		    VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS);
+	  BlitBitmap(backbuffer, window,
+		     VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS,
+		     VIDEO_DISPLAY_XSIZE,VIDEO_DISPLAY_YSIZE,
+		     VX+VIDEO_DISPLAY2_XPOS,VY+VIDEO_DISPLAY2_YPOS);
 	if (redraw_mask & REDRAW_VIDEO_3)
-	  XCopyArea(display,backbuffer,window,gc,
-		    VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS,
-		    VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
-		    VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
+	  BlitBitmap(backbuffer, window,
+		     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS,
+		     VIDEO_CONTROL_XSIZE,VIDEO_CONTROL_YSIZE,
+		     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
       }
     }
     if (redraw_mask & REDRAW_DOOR_3)
-      XCopyArea(display, backbuffer, window, gc,
-		EX, EY, EXSIZE, EYSIZE,
-		EX, EY);
+      BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
     redraw_mask &= ~REDRAW_DOORS;
   }
 
   if (redraw_mask & REDRAW_MICROLEVEL)
   {
-    XCopyArea(display,backbuffer,window,gc,
-	      MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
-	      MICROLEV_XPOS, MICROLEV_YPOS);
-    XCopyArea(display,backbuffer,window,gc,
-	      SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE,
-	      SX, MICROLABEL_YPOS);
+    BlitBitmap(backbuffer, window,
+	       MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
+	       MICROLEV_XPOS, MICROLEV_YPOS);
+    BlitBitmap(backbuffer, window,
+	       SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE,
+	       SX, MICROLABEL_YPOS);
     redraw_mask &= ~REDRAW_MICROLEVEL;
   }
 
@@ -211,12 +202,12 @@ void BackToFront()
     for(x=0; x<SCR_FIELDX; x++)
       for(y=0; y<SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
-	  XCopyArea(display, buffer, window, gc,
-		    FX + x * TILEX, FX + y * TILEY, TILEX, TILEY,
-		    SX + x * TILEX, SY + y * TILEY);
+	  BlitBitmap(buffer, window,
+		     FX + x * TILEX, FX + y * TILEY, TILEX, TILEY,
+		     SX + x * TILEX, SY + y * TILEY);
   }
 
-  XFlush(display);
+  FlushDisplay();
 
   for(x=0; x<MAX_BUF_XSIZE; x++)
     for(y=0; y<MAX_BUF_YSIZE; y++)
@@ -227,80 +218,82 @@ void BackToFront()
 
 void FadeToFront()
 {
-/*
+#if 0
   long fading_delay = 300;
 
   if (setup.fading && (redraw_mask & REDRAW_FIELD))
   {
-*/
+#endif
 
-/*
+#if 0
     int x,y;
 
-    XFillRectangle(display,window,gc,
-		   REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
-    XFlush(display);
+    ClearRectangle(window, REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
+    FlushDisplay();
 
     for(i=0;i<2*FULL_SYSIZE;i++)
     {
       for(y=0;y<FULL_SYSIZE;y++)
       {
-	XCopyArea(display,backbuffer,window,gc,
-		  REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
+	BlitBitmap(backbuffer, window,
+		   REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
       }
-      XFlush(display);
+      FlushDisplay();
       Delay(10);
     }
-*/
+#endif
 
-/*
+#if 0
     for(i=1;i<FULL_SYSIZE;i+=2)
-      XCopyArea(display,backbuffer,window,gc,
-		REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
-    XFlush(display);
+      BlitBitmap(backbuffer, window,
+		 REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
+    FlushDisplay();
     Delay(fading_delay);
-*/
+#endif
 
-/*
-    XSetClipOrigin(display,clip_gc[PIX_FADEMASK],0,0);
-    XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
-	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
-    XFlush(display);
-    Delay(fading_delay);
-
-    XSetClipOrigin(display,clip_gc[PIX_FADEMASK],-1,-1);
-    XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
-	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
-    XFlush(display);
+#if 0
+    SetClipOrigin(clip_gc[PIX_FADEMASK], 0, 0);
+    BlitBitmapMasked(backbuffer, window,
+		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
+		     REAL_SX,REAL_SY);
+    FlushDisplay();
     Delay(fading_delay);
 
-    XSetClipOrigin(display,clip_gc[PIX_FADEMASK],0,-1);
-    XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
-	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
-    XFlush(display);
+    SetClipOrigin(clip_gc[PIX_FADEMASK], -1, -1);
+    BlitBitmapMasked(backbuffer, window,
+		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
+		     REAL_SX,REAL_SY);
+    FlushDisplay();
     Delay(fading_delay);
 
-    XSetClipOrigin(display,clip_gc[PIX_FADEMASK],-1,0);
-    XCopyArea(display,backbuffer,window,clip_gc[PIX_FADEMASK],
-	      REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE, REAL_SX,REAL_SY);
-    XFlush(display);
+    SetClipOrigin(clip_gc[PIX_FADEMASK], 0, -1);
+    BlitBitmapMasked(backbuffer, window,
+		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
+		     REAL_SX,REAL_SY);
+    FlushDisplay();
+    Delay(fading_delay);
+
+    SetClipOrigin(clip_gc[PIX_FADEMASK], -1, 0);
+    BlitBitmapMasked(backbuffer, window,
+		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
+		     REAL_SX,REAL_SY);
+    FlushDisplay();
     Delay(fading_delay);
 
     redraw_mask &= ~REDRAW_MAIN;
   }
-*/
+#endif
 
   BackToFront();
 }
 
 void ClearWindow()
 {
-  XFillRectangle(display, backbuffer, gc,
-		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
   if (setup.soft_scrolling && game_status == PLAYING)
   {
-    XFillRectangle(display, fieldbuffer, gc, 0, 0, FXSIZE, FYSIZE);
+    ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
     SetDrawtoField(DRAW_BUFFERED);
   }
   else
@@ -308,8 +301,7 @@ void ClearWindow()
 
   if (setup.direct_draw && game_status == PLAYING)
   {
-    XFillRectangle(display, window, gc,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+    ClearRectangle(window, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
     SetDrawtoField(DRAW_DIRECT);
   }
 
@@ -339,20 +331,20 @@ int getFontHeight(int font_size, int font_type)
 void DrawInitText(char *text, int ypos, int color)
 {
 #ifdef USE_SDL_LIBRARY
-  if (sdl_window && sdl_pix[PIX_SMALLFONT])
+  if (window && pix[PIX_SMALLFONT])
   {
-    SDLFillRectangle(sdl_window, 0, ypos, WIN_XSIZE, FONT2_YSIZE, 0x000000);
+    ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
     DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
-		ypos,text,FS_SMALL,color);
-    SDL_Flip(sdl_window);
+		ypos, text, FS_SMALL, color);
+    SDL_Flip(window);
   }
 #else
   if (display && window && pix[PIX_SMALLFONT])
   {
-    XFillRectangle(display, window, gc, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
+    ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
     DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
-		ypos,text,FS_SMALL,color);
-    XFlush(display);
+		ypos, text, FS_SMALL, color);
+    FlushDisplay();
   }
 #endif
 }
@@ -393,11 +385,11 @@ void DrawText(int x, int y, char *text, int font_size, int font_type)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawTextExt(Drawable d, GC gc, int x, int y,
+void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
 		 char *text, int font_size, int font_type)
 {
   int font_width, font_height, font_start;
-  int font_pixmap;
+  int font_bitmap;
   boolean print_inverse = FALSE;
 
   if (font_size != FS_SMALL && font_size != FS_BIG && font_size != FS_MEDIUM)
@@ -408,7 +400,7 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   font_width = getFontWidth(font_size, font_type);
   font_height = getFontHeight(font_size, font_type);
 
-  font_pixmap = (font_size == FS_BIG ? PIX_BIGFONT :
+  font_bitmap = (font_size == FS_BIG ? PIX_BIGFONT :
 		 font_size == FS_MEDIUM ? PIX_MEDIUMFONT :
 		 PIX_SMALLFONT);
   font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
@@ -446,26 +438,18 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
 
       if (print_inverse)
       {
-	XCopyArea(display, pix[font_pixmap], d, gc,
-		  FONT_CHARS_PER_LINE * font_width,
-		  3 * font_height + font_start,
-		  font_width, font_height, x, y);
+	BlitBitmap(pix[font_bitmap], d,
+		   FONT_CHARS_PER_LINE * font_width,
+		   3 * font_height + font_start,
+		   font_width, font_height, x, y);
 
-	XSetClipOrigin(display, clip_gc[font_pixmap],
-		       dest_x - src_x, dest_y - src_y);
-	XCopyArea(display, pix[font_pixmap], d, clip_gc[font_pixmap],
-		  0, 0, font_width, font_height, dest_x, dest_y);
+	SetClipOrigin(clip_gc[font_bitmap], dest_x - src_x, dest_y - src_y);
+	BlitBitmapMasked(pix_masked[font_bitmap], d,
+			 0, 0, font_width, font_height, dest_x, dest_y);
       }
       else
-      {
-#ifdef USE_SDL_LIBRARY
-	SDLCopyArea(sdl_pix[font_pixmap], sdl_window,
-		    src_x, src_y, font_width, font_height, dest_x, dest_y);
-#else
-	XCopyArea(display, pix[font_pixmap], d, gc,
-		  src_x, src_y, font_width, font_height, dest_x, dest_y);
-#endif
-      }
+	BlitBitmap(pix[font_bitmap], d,
+		   src_x, src_y, font_width, font_height, dest_x, dest_y);
     }
 
     x += font_width;
@@ -728,8 +712,8 @@ void DrawPlayer(struct PlayerInfo *player)
     int x_size = TILEX * (1 + ABS(jx - last_jx));
     int y_size = TILEY * (1 + ABS(jy - last_jy));
 
-    XCopyArea(display, drawto_field, window, gc,
-	      dest_x, dest_y, x_size, y_size, dest_x, dest_y);
+    BlitBitmap(drawto_field, window,
+	       dest_x, dest_y, x_size, y_size, dest_x, dest_y);
     SetDrawtoField(DRAW_DIRECT);
   }
 
@@ -792,54 +776,54 @@ static void DrawGraphicAnimationShiftedThruMask(int sx, int sy,
   DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic + phase, NO_CUTTING);
 }
 
-void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
+void getGraphicSource(int graphic, int *bitmap_nr, int *x, int *y)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
-    *pixmap_nr = PIX_BACK;
+    *bitmap_nr = PIX_BACK;
     *x = SX + (graphic % GFX_PER_LINE) * TILEX;
     *y = SY + (graphic / GFX_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
     graphic -= GFX_START_ROCKSHEROES;
-    *pixmap_nr = PIX_HEROES;
+    *bitmap_nr = PIX_HEROES;
     *x = (graphic % HEROES_PER_LINE) * TILEX;
     *y = (graphic / HEROES_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSSP && graphic <= GFX_END_ROCKSSP)
   {
     graphic -= GFX_START_ROCKSSP;
-    *pixmap_nr = PIX_SP;
+    *bitmap_nr = PIX_SP;
     *x = (graphic % SP_PER_LINE) * TILEX;
     *y = (graphic / SP_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    *pixmap_nr = PIX_DC;
+    *bitmap_nr = PIX_DC;
     *x = (graphic % DC_PER_LINE) * TILEX;
     *y = (graphic / DC_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
-    *pixmap_nr = PIX_MORE;
+    *bitmap_nr = PIX_MORE;
     *x = (graphic % MORE_PER_LINE) * TILEX;
     *y = (graphic / MORE_PER_LINE) * TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *pixmap_nr = PIX_BIGFONT;
+    *bitmap_nr = PIX_BIGFONT;
     *x = (graphic % FONT_CHARS_PER_LINE) * TILEX;
     *y = ((graphic / FONT_CHARS_PER_LINE) * TILEY +
 	  FC_SPECIAL1 * FONT_LINES_PER_FONT * TILEY);
   }
   else
   {
-    *pixmap_nr = PIX_SP;
+    *bitmap_nr = PIX_SP;
     *x = 0;
     *y = 0;
   }
@@ -860,14 +844,13 @@ void DrawGraphic(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
+void DrawGraphicExt(DrawBuffer d, GC gc, int x, int y, int graphic)
 {
-  int pixmap_nr;
+  int bitmap_nr;
   int src_x, src_y;
 
-  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-  XCopyArea(display, pix[pixmap_nr], d, gc,
-	    src_x, src_y, TILEX, TILEY, x, y);
+  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
+  BlitBitmap(pix[bitmap_nr], d, src_x, src_y, TILEX, TILEY, x, y);
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
@@ -885,37 +868,39 @@ void DrawGraphicThruMask(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicThruMaskExt(Drawable d, int dest_x, int dest_y, int graphic)
+void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
 {
   int tile = graphic;
-  int pixmap_nr;
+  int bitmap_nr;
   int src_x, src_y;
-  Pixmap src_pixmap;
+  Bitmap src_bitmap;
   GC drawing_gc;
 
   if (graphic == GFX_LEERRAUM)
     return;
 
-  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-  src_pixmap = pix[pixmap_nr];
-  drawing_gc = clip_gc[pixmap_nr];
+  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
+  src_bitmap = pix_masked[bitmap_nr];
+  drawing_gc = clip_gc[bitmap_nr];
 
   if (tile_clipmask[tile] != None)
   {
-    XSetClipMask(display, tile_clip_gc, tile_clipmask[tile]);
-    XSetClipOrigin(display, tile_clip_gc, dest_x, dest_y);
-    XCopyArea(display, src_pixmap, d, tile_clip_gc,
-	      src_x, src_y, TILEX, TILEY, dest_x, dest_y);
+    SetClipMask(tile_clip_gc, tile_clipmask[tile]);
+    SetClipOrigin(tile_clip_gc, dest_x, dest_y);
+    BlitBitmapMasked(src_bitmap, d,
+		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
   else
   {
 #if DEBUG
+#ifndef USE_SDL_LIBRARY
     printf("DrawGraphicThruMask(): tile '%d' needs clipping!\n", tile);
 #endif
+#endif
 
-    XSetClipOrigin(display, drawing_gc, dest_x-src_x, dest_y-src_y);
-    XCopyArea(display, src_pixmap, d, drawing_gc,
-	      src_x, src_y, TILEX, TILEY, dest_x, dest_y);
+    SetClipOrigin(drawing_gc, dest_x-src_x, dest_y-src_y);
+    BlitBitmapMasked(src_bitmap, d,
+		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
 }
 
@@ -925,12 +910,12 @@ void DrawMiniGraphic(int x, int y, int graphic)
   MarkTileDirty(x/2, y/2);
 }
 
-void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
+void getMiniGraphicSource(int graphic, Bitmap *bitmap, int *x, int *y)
 {
   if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
   {
     graphic -= GFX_START_ROCKSSCREEN;
-    *pixmap = pix[PIX_BACK];
+    *bitmap = pix[PIX_BACK];
     *x = MINI_GFX_STARTX + (graphic % MINI_GFX_PER_LINE) * MINI_TILEX;
     *y = MINI_GFX_STARTY + (graphic / MINI_GFX_PER_LINE) * MINI_TILEY;
   }
@@ -938,48 +923,47 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
   {
     graphic -= GFX_START_ROCKSSP;
     graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
-    *pixmap = pix[PIX_SP];
+    *bitmap = pix[PIX_SP];
     *x = MINI_SP_STARTX + (graphic % MINI_SP_PER_LINE) * MINI_TILEX;
     *y = MINI_SP_STARTY + (graphic / MINI_SP_PER_LINE) * MINI_TILEY;
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    *pixmap = pix[PIX_DC];
+    *bitmap = pix[PIX_DC];
     *x = MINI_DC_STARTX + (graphic % MINI_DC_PER_LINE) * MINI_TILEX;
     *y = MINI_DC_STARTY + (graphic / MINI_DC_PER_LINE) * MINI_TILEY;
   }
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
-    *pixmap = pix[PIX_MORE];
+    *bitmap = pix[PIX_MORE];
     *x = MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX;
     *y = MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY;
   }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
-    *pixmap = pix[PIX_SMALLFONT];
+    *bitmap = pix[PIX_SMALLFONT];
     *x = (graphic % FONT_CHARS_PER_LINE) * FONT4_XSIZE;
     *y = ((graphic / FONT_CHARS_PER_LINE) * FONT4_YSIZE +
 	      FC_SPECIAL2 * FONT2_YSIZE * FONT_LINES_PER_FONT);
   }
   else
   {
-    *pixmap = pix[PIX_SP];
+    *bitmap = pix[PIX_SP];
     *x = MINI_SP_STARTX;
     *y = MINI_SP_STARTY;
   }
 }
 
-void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
+void DrawMiniGraphicExt(DrawBuffer d, GC gc, int x, int y, int graphic)
 {
-  Pixmap pixmap;
+  Bitmap bitmap;
   int src_x, src_y;
 
-  getMiniGraphicSource(graphic, &pixmap, &src_x, &src_y);
-  XCopyArea(display, pixmap, d, gc,
-	    src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
+  getMiniGraphicSource(graphic, &bitmap, &src_x, &src_y);
+  BlitBitmap(bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
 
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
@@ -989,8 +973,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int cx = 0, cy = 0;
   int src_x, src_y, dest_x, dest_y;
   int tile = graphic;
-  int pixmap_nr;
-  Pixmap src_pixmap;
+  int bitmap_nr;
   GC drawing_gc;
 
   if (graphic < 0)
@@ -1063,9 +1046,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
       MarkTileDirty(x, y + SIGN(dy));
   }
 
-  getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-  src_pixmap = pix[pixmap_nr];
-  drawing_gc = clip_gc[pixmap_nr];
+  getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
+  drawing_gc = clip_gc[bitmap_nr];
 
   src_x += cx;
   src_y += cy;
@@ -1086,25 +1068,27 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   {
     if (tile_clipmask[tile] != None)
     {
-      XSetClipMask(display, tile_clip_gc, tile_clipmask[tile]);
-      XSetClipOrigin(display, tile_clip_gc, dest_x, dest_y);
-      XCopyArea(display, src_pixmap, drawto_field, tile_clip_gc,
-		src_x, src_y, TILEX, TILEY, dest_x, dest_y);
+      SetClipMask(tile_clip_gc, tile_clipmask[tile]);
+      SetClipOrigin(tile_clip_gc, dest_x, dest_y);
+      BlitBitmapMasked(pix_masked[bitmap_nr], drawto_field,
+		       src_x, src_y, TILEX, TILEY, dest_x, dest_y);
     }
     else
     {
 #if DEBUG
+#ifndef	USE_SDL_LIBRARY
       printf("DrawGraphicShifted(): tile '%d' needs clipping!\n", tile);
 #endif
+#endif
 
-      XSetClipOrigin(display, drawing_gc, dest_x - src_x, dest_y - src_y);
-      XCopyArea(display, src_pixmap, drawto_field, drawing_gc,
-		src_x, src_y, width, height, dest_x, dest_y);
+      SetClipOrigin(drawing_gc, dest_x - src_x, dest_y - src_y);
+      BlitBitmapMasked(pix_masked[bitmap_nr], drawto_field,
+		       src_x, src_y, width, height, dest_x, dest_y);
     }
   }
   else
-    XCopyArea(display, src_pixmap, drawto_field, gc,
-	      src_x, src_y, width, height, dest_x, dest_y);
+    BlitBitmap(pix[bitmap_nr], drawto_field,
+	       src_x, src_y, width, height, dest_x, dest_y);
 
   MarkTileDirty(x,y);
 }
@@ -1354,10 +1338,10 @@ void ErdreichAnbroeckeln(int x, int y)
 	cy = (i == 3 ? TILEY - snip : 0);
       }
 
-      XCopyArea(display, pix[PIX_BACK], drawto_field, gc,
-		SX + (graphic % GFX_PER_LINE) * TILEX + cx,
-		SY + (graphic / GFX_PER_LINE) * TILEY + cy,
-		width, height, FX + x * TILEX + cx, FY + y * TILEY + cy);
+      BlitBitmap(pix[PIX_BACK], drawto_field,
+		 SX + (graphic % GFX_PER_LINE) * TILEX + cx,
+		 SY + (graphic / GFX_PER_LINE) * TILEY + cy,
+		 width, height, FX + x * TILEX + cx, FY + y * TILEY + cy);
     }
 
     MarkTileDirty(x, y);
@@ -1398,10 +1382,10 @@ void ErdreichAnbroeckeln(int x, int y)
 	cy = (i==0 ? TILEY-snip : 0);
       }
 
-      XCopyArea(display, pix[PIX_BACK], drawto_field, gc,
-		SX + (graphic % GFX_PER_LINE) * TILEX + cx,
-		SY + (graphic / GFX_PER_LINE) * TILEY + cy,
-		width, height, FX + xx * TILEX + cx, FY + yy * TILEY + cy);
+      BlitBitmap(pix[PIX_BACK], drawto_field,
+		 SX + (graphic % GFX_PER_LINE) * TILEX + cx,
+		 SY + (graphic / GFX_PER_LINE) * TILEY + cy,
+		 width, height, FX + xx * TILEX + cx, FY + yy * TILEY + cy);
 
       MarkTileDirty(xx, yy);
     }
@@ -1582,32 +1566,32 @@ void DrawMicroElement(int xpos, int ypos, int element)
   {
     graphic -= GFX_START_ROCKSSP;
     graphic -= ((graphic / SP_PER_LINE) * SP_PER_LINE) / 2;
-    XCopyArea(display, pix[PIX_SP], drawto, gc,
-	      MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) * MICRO_TILEX,
-	      MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) * MICRO_TILEY,
-	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+    BlitBitmap(pix[PIX_SP], drawto,
+	       MICRO_SP_STARTX + (graphic % MICRO_SP_PER_LINE) * MICRO_TILEX,
+	       MICRO_SP_STARTY + (graphic / MICRO_SP_PER_LINE) * MICRO_TILEY,
+	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else if (graphic >= GFX_START_ROCKSDC && graphic <= GFX_END_ROCKSDC)
   {
     graphic -= GFX_START_ROCKSDC;
-    XCopyArea(display, pix[PIX_DC], drawto, gc,
-	      MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) * MICRO_TILEX,
-	      MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) * MICRO_TILEY,
-	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+    BlitBitmap(pix[PIX_DC], drawto,
+	       MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) * MICRO_TILEX,
+	       MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) * MICRO_TILEY,
+	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
   {
     graphic -= GFX_START_ROCKSMORE;
-    XCopyArea(display, pix[PIX_MORE], drawto, gc,
-	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
-	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
-	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+    BlitBitmap(pix[PIX_MORE], drawto,
+	       MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE)*MICRO_TILEX,
+	       MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE)*MICRO_TILEY,
+	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else
-    XCopyArea(display, pix[PIX_BACK], drawto, gc,
-	      MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,
-	      MICRO_GFX_STARTY + (graphic / MICRO_GFX_PER_LINE) * MICRO_TILEY,
-	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+    BlitBitmap(pix[PIX_BACK], drawto,
+	       MICRO_GFX_STARTX + (graphic % MICRO_GFX_PER_LINE) * MICRO_TILEX,
+	       MICRO_GFX_STARTY + (graphic / MICRO_GFX_PER_LINE) * MICRO_TILEY,
+	       MICRO_TILEX, MICRO_TILEY, xpos, ypos);
 }
 
 void DrawLevel()
@@ -1638,8 +1622,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 {
   int x, y;
 
-  XFillRectangle(display, drawto, gc,
-		 xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
+  ClearRectangle(drawto, xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
 
   if (lev_fieldx < STD_LEV_FIELDX)
     xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
@@ -1680,8 +1663,7 @@ static void DrawMicroLevelLabelExt(int mode)
 {
   char label_text[MAX_MICROLABEL_SIZE + 1];
 
-  XFillRectangle(display, drawto,gc,
-		 SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
+  ClearRectangle(drawto, SX, MICROLABEL_YPOS, SXSIZE, FONT4_YSIZE);
 
   strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
 		       mode == MICROLABEL_CREATED_BY ? "created by" :
@@ -1826,12 +1808,12 @@ boolean Request(char *text, unsigned int req_state)
   CloseDoor(DOOR_CLOSE_1);
 
   /* save old door content */
-  XCopyArea(display, pix[PIX_DB_DOOR], pix[PIX_DB_DOOR], gc,
-	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	    DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
+  BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+	     DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
 
   /* clear door drawing field */
-  XFillRectangle(display, drawto, gc, DX, DY, DXSIZE, DYSIZE);
+  ClearRectangle(drawto, DX, DY, DXSIZE, DYSIZE);
 
   /* write text for request */
   for(ty=0; ty<13; ty++)
@@ -1880,9 +1862,9 @@ boolean Request(char *text, unsigned int req_state)
   }
 
   /* copy request gadgets to door backbuffer */
-  XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
-	    DX, DY, DXSIZE, DYSIZE,
-	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+	     DX, DY, DXSIZE, DYSIZE,
+	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   OpenDoor(DOOR_OPEN_1);
 
@@ -1902,43 +1884,39 @@ boolean Request(char *text, unsigned int req_state)
 
   while(result < 0)
   {
-    if (XPending(display))
+    if (PendingEvent())
     {
-      XEvent event;
+      Event event;
 
-      XNextEvent(display, &event);
+      NextEvent(&event);
 
       switch(event.type)
       {
-	case ButtonPress:
-	case ButtonRelease:
-	case MotionNotify:
+	case EVENT_BUTTONPRESS:
+	case EVENT_BUTTONRELEASE:
+	case EVENT_MOTIONNOTIFY:
 	{
-	  if (event.type == MotionNotify)
+	  if (event.type == EVENT_MOTIONNOTIFY)
 	  {
-	    Window root, child;
-	    int root_x, root_y;
 	    int win_x, win_y;
-	    unsigned int mask;
 
-	    if (!XQueryPointer(display, window, &root, &child,
-			       &root_x, &root_y, &win_x, &win_y, &mask))
-	      continue;
+	    if (!QueryPointer(window, &win_x, &win_y))
+	      continue;	/* window and pointer are on different screens */
 
 	    if (!button_status)
 	      continue;
 
 	    motion_status = TRUE;
-	    mx = ((XMotionEvent *) &event)->x;
-	    my = ((XMotionEvent *) &event)->y;
+	    mx = ((MotionEvent *) &event)->x;
+	    my = ((MotionEvent *) &event)->y;
 	  }
 	  else
 	  {
 	    motion_status = FALSE;
-	    mx = ((XButtonEvent *) &event)->x;
-	    my = ((XButtonEvent *) &event)->y;
-	    if (event.type==ButtonPress)
-	      button_status = ((XButtonEvent *) &event)->button;
+	    mx = ((ButtonEvent *) &event)->x;
+	    my = ((ButtonEvent *) &event)->y;
+	    if (event.type == EVENT_BUTTONPRESS)
+	      button_status = ((ButtonEvent *) &event)->button;
 	    else
 	      button_status = MB_RELEASED;
 	  }
@@ -1978,9 +1956,9 @@ boolean Request(char *text, unsigned int req_state)
 	  break;
 	}
 
-	case KeyPress:
-	  switch(XLookupKeysym((XKeyEvent *)&event,
-			       ((XKeyEvent *)&event)->state))
+	case EVENT_KEYPRESS:
+	  switch(XLookupKeysym((KeyEvent *)&event,
+			       ((KeyEvent *)&event)->state))
 	  {
 	    case XK_Return:
 	      result = 1;
@@ -1997,7 +1975,7 @@ boolean Request(char *text, unsigned int req_state)
 	    result = 0;
 	  break;
 
-	case KeyRelease:
+	case EVENT_KEYRELEASE:
 	  key_joystick_mapping = 0;
 	  break;
 
@@ -2033,9 +2011,9 @@ boolean Request(char *text, unsigned int req_state)
 
     if (!(req_state & REQ_STAY_CLOSED) && (old_door_state & DOOR_OPEN_1))
     {
-      XCopyArea(display,pix[PIX_DB_DOOR],pix[PIX_DB_DOOR],gc,
-		DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
-		DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
+      BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+		 DOOR_GFX_PAGEX2,DOOR_GFX_PAGEY1, DXSIZE,DYSIZE,
+		 DOOR_GFX_PAGEX1,DOOR_GFX_PAGEY1);
       OpenDoor(DOOR_OPEN_1);
     }
   }
@@ -2059,9 +2037,9 @@ unsigned int OpenDoor(unsigned int door_state)
 
   if (door_state & DOOR_COPY_BACK)
   {
-    XCopyArea(display, pix[PIX_DB_DOOR], pix[PIX_DB_DOOR], gc,
-	      DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE + VYSIZE,
-	      DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+    BlitBitmap(pix[PIX_DB_DOOR], pix[PIX_DB_DOOR],
+	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE + VYSIZE,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
     door_state &= ~DOOR_COPY_BACK;
   }
 
@@ -2074,10 +2052,10 @@ unsigned int CloseDoor(unsigned int door_state)
 {
   unsigned int new_door_state;
 
-  XCopyArea(display, backbuffer, pix[PIX_DB_DOOR], gc,
-	    DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-  XCopyArea(display, backbuffer, pix[PIX_DB_DOOR], gc,
-	    VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+  BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+  BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+	     VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
 
   new_door_state = MoveDoor(door_state);
 
@@ -2132,40 +2110,41 @@ unsigned int MoveDoor(unsigned int door_state)
 	int i = (door_state & DOOR_OPEN_1 ? DXSIZE-x : x);
 	int j = (DXSIZE - i) / 3;
 
-	XCopyArea(display, pix[PIX_DB_DOOR], drawto, gc,
-		  DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i/2,
-		  DXSIZE,DYSIZE - i/2, DX, DY);
+	BlitBitmap(pix[PIX_DB_DOOR], drawto,
+		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i/2,
+		   DXSIZE,DYSIZE - i/2, DX, DY);
 
-	XFillRectangle(display, drawto, gc, DX, DY + DYSIZE - i/2, DXSIZE,i/2);
+	ClearRectangle(drawto, DX, DY + DYSIZE - i/2, DXSIZE,i/2);
 
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	XCopyArea(display, pix[PIX_DOOR], drawto,clip_gc[PIX_DOOR],
-		  DXSIZE, DOOR_GFX_PAGEY1, i, 77, DX + DXSIZE - i, DY + j);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63, DX + DXSIZE - i,
-		  DY + 140 + j);
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       DX - DXSIZE + i, DY - (DOOR_GFX_PAGEY1 + j));
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j, DX, DY);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63, DX, DY + 140 - j);
+	SetClipOrigin(clip_gc[PIX_DOOR], DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE, DOOR_GFX_PAGEY1, i, 77,
+			 DX + DXSIZE - i, DY + j);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63,
+			 DX + DXSIZE - i, DY + 140 + j);
+	SetClipOrigin(clip_gc[PIX_DOOR],
+		      DX - DXSIZE + i, DY - (DOOR_GFX_PAGEY1 + j));
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j,
+			 DX, DY);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63,
+			 DX, DY + 140 - j);
 
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
-		  DX, DY + 77 - j);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
-		  DX, DY + 203 - j);
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
-		  DX + DXSIZE - i, DY + 77 + j);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
-		  DX + DXSIZE - i, DY + 203 + j);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
+			 DX, DY + 77 - j);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
+			 DX, DY + 203 - j);
+	SetClipOrigin(clip_gc[PIX_DOOR], DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
+			 DX + DXSIZE - i, DY + 77 + j);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
+			 DX + DXSIZE - i, DY + 203 + j);
 
 	redraw_mask |= REDRAW_DOOR_1;
       }
@@ -2175,29 +2154,30 @@ unsigned int MoveDoor(unsigned int door_state)
 	int i = (door_state & DOOR_OPEN_2 ? VXSIZE - x : x);
 	int j = (VXSIZE - i) / 3;
 
-	XCopyArea(display, pix[PIX_DB_DOOR], drawto, gc,
-		  DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i/2,
-		  VXSIZE, VYSIZE - i/2, VX, VY);
+	BlitBitmap(pix[PIX_DB_DOOR], drawto,
+		   DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i/2,
+		   VXSIZE, VYSIZE - i/2, VX, VY);
 
-	XFillRectangle(display, drawto, gc, VX, VY + VYSIZE-i/2, VXSIZE, i/2);
+	ClearRectangle(drawto, VX, VY + VYSIZE-i/2, VXSIZE, i/2);
 
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2, VX + VXSIZE-i, VY+j);
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
-	XCopyArea(display, pix[PIX_DOOR], drawto,clip_gc[PIX_DOOR],
-		  VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j, VX, VY);
+	SetClipOrigin(clip_gc[PIX_DOOR], VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2,
+			 VX + VXSIZE-i, VY+j);
+	SetClipOrigin(clip_gc[PIX_DOOR],
+		      VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j,
+			 VX, VY);
 
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2, i, VYSIZE / 2,
-		  VX, VY + VYSIZE / 2 - j);
-	XSetClipOrigin(display, clip_gc[PIX_DOOR],
-		       VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	XCopyArea(display, pix[PIX_DOOR], drawto, clip_gc[PIX_DOOR],
-		  VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2, i, VYSIZE / 2 - j,
-		  VX + VXSIZE - i, VY + VYSIZE / 2 + j);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2,
+			 i, VYSIZE / 2, VX, VY + VYSIZE / 2 - j);
+	SetClipOrigin(clip_gc[PIX_DOOR], VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+			 VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2,
+			 i, VYSIZE / 2 - j,
+			 VX + VXSIZE - i, VY + VYSIZE / 2 + j);
 
 	redraw_mask |= REDRAW_DOOR_2;
       }
@@ -2223,8 +2203,8 @@ unsigned int MoveDoor(unsigned int door_state)
 void DrawSpecialEditorDoor()
 {
   /* draw bigger toolbox window */
-  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-	    DOOR_GFX_PAGEX7, 0, 108, 56, EX - 4, EY - 12);
+  BlitBitmap(pix[PIX_DOOR], drawto,
+	     DOOR_GFX_PAGEX7, 0, 108, 56, EX - 4, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
 }
@@ -2232,13 +2212,14 @@ void DrawSpecialEditorDoor()
 void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
-  XCopyArea(display, pix[PIX_BACK], drawto, gc,
-	    562, 344, 108, 56, EX - 4, EY - 12);
+  BlitBitmap(pix[PIX_BACK], drawto,
+	     562, 344, 108, 56, EX - 4, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
 }
 
-int ReadPixel(Drawable d, int x, int y)
+#ifndef	USE_SDL_LIBRARY
+int ReadPixel(DrawBuffer d, int x, int y)
 {
   XImage *pixel_image;
   unsigned long pixel_value;
@@ -2250,6 +2231,7 @@ int ReadPixel(Drawable d, int x, int y)
 
   return pixel_value;
 }
+#endif
 
 /* ---------- new tool button stuff ---------------------------------------- */
 
@@ -2363,8 +2345,8 @@ void CreateToolButtons()
 
   for (i=0; i<NUM_TOOL_BUTTONS; i++)
   {
-    Pixmap gd_pixmap = pix[PIX_DOOR];
-    Pixmap deco_pixmap = None;
+    Bitmap gd_bitmap = pix[PIX_DOOR];
+    Bitmap deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;
     unsigned long event_mask;
@@ -2383,7 +2365,7 @@ void CreateToolButtons()
     if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
     {
       getMiniGraphicSource(GFX_SPIELER1 + id - TOOL_CTRL_ID_PLAYER_1,
-			   &deco_pixmap, &deco_x, &deco_y);
+			   &deco_bitmap, &deco_x, &deco_y);
       deco_xpos = (toolbutton_info[i].width - MINI_TILEX) / 2;
       deco_ypos = (toolbutton_info[i].height - MINI_TILEY) / 2;
     }
@@ -2396,9 +2378,9 @@ void CreateToolButtons()
 		      GDI_HEIGHT, toolbutton_info[i].height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
-		      GDI_DECORATION_DESIGN, deco_pixmap, deco_x, deco_y,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
+		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_DECORATION_SHIFTING, 1, 1,

@@ -90,6 +90,7 @@ SRCS =	main.c		\
 	network.c	\
 	netserv.c	\
 	msdos.c		\
+	system.c	\
 	sdl.c
 
 OBJS =	main.o		\
@@ -112,6 +113,7 @@ OBJS =	main.o		\
 	network.o	\
 	netserv.o	\
 	msdos.o		\
+	system.o	\
 	sdl.o
 
 all:	$(PROGNAME)

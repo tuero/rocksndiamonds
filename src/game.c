@@ -715,14 +715,13 @@ void InitGame()
     CloseAllOpenTimegates();
 
   if (setup.soft_scrolling)
-    XCopyArea(display, fieldbuffer, backbuffer, gc,
-	      FX, FY, SXSIZE, SYSIZE, SX, SY);
+    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
   redraw_mask |= REDRAW_FROM_BACKBUFFER;
 
   /* copy default game door content to main double buffer */
-  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-	    DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+  BlitBitmap(pix[PIX_DOOR], drawto,
+	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   if (level_nr < 100)
     DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
@@ -731,10 +730,10 @@ void InitGame()
   {
     DrawTextExt(drawto, gc, DX + XX_EMERALDS, DY + YY_EMERALDS,
 		int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
-    XCopyArea(display, drawto, drawto, gc,
-	      DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
-	      FONT5_XSIZE * 3, FONT5_YSIZE - 1,
-	      DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
+    BlitBitmap(drawto, drawto,
+	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
+	       FONT5_XSIZE * 3, FONT5_YSIZE - 1,
+	       DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
   }
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
@@ -754,15 +753,15 @@ void InitGame()
   MapTapeButtons();
 
   /* copy actual game door content to door double buffer for OpenDoor() */
-  XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
-	    DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+  BlitBitmap(drawto, pix[PIX_DB_DOOR],
+	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
   OpenDoor(DOOR_OPEN_ALL);
 
   if (setup.sound_music)
     PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
 
-  XAutoRepeatOff(display);
+  KeyboardAutoRepeatOff();
 
   if (options.verbose)
   {
@@ -3793,8 +3792,8 @@ void EdelsteinFunkeln(int x, int y)
 	  dest_x = FX + SCREENX(x)*TILEX;
 	  dest_y = FY + SCREENY(y)*TILEY;
 
-	  XCopyArea(display, drawto_field, window, gc,
-		    dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);
+	  BlitBitmap(drawto_field, window,
+		     dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);
 	  SetDrawtoField(DRAW_DIRECT);
 	}
       }
@@ -4607,13 +4606,13 @@ void ScrollLevel(int dx, int dy)
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
   int x, y;
 
-  XCopyArea(display, drawto_field, drawto_field, gc,
-	    FX + TILEX*(dx == -1) - softscroll_offset,
-	    FY + TILEY*(dy == -1) - softscroll_offset,
-	    SXSIZE - TILEX*(dx!=0) + 2*softscroll_offset,
-	    SYSIZE - TILEY*(dy!=0) + 2*softscroll_offset,
-	    FX + TILEX*(dx == 1) - softscroll_offset,
-	    FY + TILEY*(dy == 1) - softscroll_offset);
+  BlitBitmap(drawto_field, drawto_field,
+	     FX + TILEX*(dx == -1) - softscroll_offset,
+	     FY + TILEY*(dy == -1) - softscroll_offset,
+	     SXSIZE - TILEX*(dx!=0) + 2*softscroll_offset,
+	     SYSIZE - TILEY*(dy!=0) + 2*softscroll_offset,
+	     FX + TILEX*(dx == 1) - softscroll_offset,
+	     FY + TILEY*(dy == 1) - softscroll_offset);
 
   if (dx)
   {
@@ -6065,7 +6064,7 @@ void CreateGameButtons()
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    Pixmap gd_pixmap = pix[PIX_DOOR];
+    Bitmap gd_bitmap = pix[PIX_DOOR];
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;
@@ -6110,10 +6109,10 @@ void CreateGameButtons()
 		      GDI_TYPE, button_type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_CHECKED, checked,
-		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y2,
-		      GDI_ALT_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y1,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
+		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleGameButtons,
 		      GDI_END);

@@ -92,6 +92,9 @@ void dumpLevelDirInfo(struct LevelDirInfo *, int);
 void sortLevelDirInfo(struct LevelDirInfo **,
 		      int (*compare_function)(const void *, const void *));
 
+inline void swap_numbers(int *, int *);
+inline void swap_number_pairs(int *, int *, int *, int *);
+
 void debug_print_timestamp(int, char *);
 
 #endif /* MISC_H */
