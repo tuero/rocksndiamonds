@@ -42,6 +42,10 @@
 /* how many steps can be cancelled */
 #define NUM_UNDO_STEPS		(10 + 1)
 
+/* values for random placement */
+#define RANDOM_USE_PERCENTAGE	0
+#define RANDOM_USE_NUM_OBJECTS	1
+
 /* values for the control window */
 #define ED_CTRL_BUTTONS_GFX_YPOS 236
 #define ED_CTRL1_BUTTONS_HORIZ	4
@@ -97,6 +101,14 @@ static short OrigBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
+
+static int random_placement_percentage = 10;
+static int random_placement_num_objects = 10;
+#if 0
+static int random_placement_method = RANDOM_USE_PERCENTAGE;
+#else
+static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
+#endif
 
 static int level_xpos,level_ypos;
 static boolean edit_mode;
@@ -1643,6 +1655,44 @@ void CopyLevelToUndoBuffer()
   */
 }
 
+void RandomPlacement(int button)
+{
+  int new_element;
+  int x, y;
+
+  new_element = (button == 1 ? new_element1 :
+		 button == 2 ? new_element2 :
+		 button == 3 ? new_element3 : 0);
+
+  CopyLevelToUndoBuffer();
+
+  if (random_placement_method == RANDOM_USE_PERCENTAGE)
+  {
+    for(x=0; x<lev_fieldx; x++)
+      for(y=0; y<lev_fieldy; y++)
+	if (RND(100) < random_placement_percentage)
+	  Feld[x][y] = new_element;
+  }
+  else
+  {
+    int elements_left = random_placement_num_objects;
+
+    while (elements_left > 0)
+    {
+      x = RND(lev_fieldx);
+      y = RND(lev_fieldy);
+
+      if (Feld[x][y] != new_element)
+      {
+	Feld[x][y] = new_element;
+	elements_left--;
+      }
+    }
+  }
+
+  DrawMiniLevel(level_xpos, level_ypos);
+}
+
 void HandleDrawingFunctions(int mx, int my, int button)
 {
   static int last_button = 0;
@@ -1892,6 +1942,7 @@ void HandlePressedControlButtons()
 void HandleControlButtons(struct GadgetInfo *gi)
 {
   int event_type = gi->event.type;
+  int button = gi->event.button;
   int player_present = FALSE;
   int level_changed = FALSE;
   int id;
@@ -1918,9 +1969,12 @@ void HandleControlButtons(struct GadgetInfo *gi)
     case ED_CTRL_ID_RECTANGLE:
     case ED_CTRL_ID_FILLED_BOX:
     case ED_CTRL_ID_FLOOD_FILL:
-    case ED_CTRL_ID_RANDOM_PLACEMENT:
     case ED_CTRL_ID_BRUSH:
       drawing_function = id;
+      break;
+
+    case ED_CTRL_ID_RANDOM_PLACEMENT:
+      RandomPlacement(button);
       break;
 
     case ED_CTRL_ID_UNDO:
@@ -2063,11 +2117,11 @@ void HandleControlButtons(struct GadgetInfo *gi)
 
     default:
       if (event_type == GD_EVENT_PRESSED)
-	printf("test_func2: GD_EVENT_PRESSED\n");
+	printf("HandleControlButtons: GD_EVENT_PRESSED\n");
       else if (event_type == GD_EVENT_RELEASED)
-	printf("test_func2: GD_EVENT_RELEASED\n");
+	printf("HandleControlButtons: GD_EVENT_RELEASED\n");
       else
-	printf("test_func2: ?\n");
+	printf("HandleControlButtons: ?\n");
       break;
   }
 }

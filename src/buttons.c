@@ -1721,7 +1721,6 @@ void HandleGadgets(int mx, int my, int button)
 	  DrawGadget(gi, TRUE, TRUE);
 	gi->state = GD_BUTTON_PRESSED;
 	gi->event.type = GD_EVENT_MOVING;
-	gi->event.button = button;
 
 	if (gi->event_mask & GD_EVENT_MOVING)
 	  gi->callback(gi);
@@ -1736,7 +1735,6 @@ void HandleGadgets(int mx, int my, int button)
     {
       gi->state = GD_BUTTON_UNPRESSED;
       gi->event.type = GD_EVENT_RELEASED;
-      gi->event.button = button;
       DrawGadget(gi, FALSE, TRUE);
 
       if (gi->event_mask & GD_EVENT_RELEASED)
