@@ -176,6 +176,7 @@ void SleepWhileUnmapped()
 
 void HandleExposeEvent(ExposeEvent *event)
 {
+#ifndef USE_SDL_LIBRARY
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
 
@@ -209,6 +210,7 @@ void HandleExposeEvent(ExposeEvent *event)
   BlitBitmap(drawto, window, x,y, width,height, x,y);
 
   FlushDisplay();
+#endif
 }
 
 void HandleButtonEvent(ButtonEvent *event)

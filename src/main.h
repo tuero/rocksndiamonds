@@ -17,30 +17,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-
-#ifndef MSDOS
-#define XK_MISCELLANY
-#define XK_LATIN1
-
-/*
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/Xos.h>
-#include <X11/Intrinsic.h>
-#include <X11/keysymdef.h>
-*/
-
-#ifdef   XPM_INCLUDE_FILE
-#define  USE_XPM_LIBRARY
-#include XPM_INCLUDE_FILE
-#endif
-#else	/* MSDOS */
-#include "msdos.h"
-#endif  /* MSDOS */
+#include <unistd.h>
+#include <fcntl.h>
 
 #ifdef DEBUG
 #define DEBUG_TIMING	0

@@ -13,7 +13,6 @@
 
 #ifndef MSDOS
 
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/time.h>
 #include <signal.h>

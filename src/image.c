@@ -11,6 +11,8 @@
 *  image.c                                                 *
 ***********************************************************/
 
+#ifndef USE_SDL_LIBRARY
+
 #include "image.h"
 #include "pcx.h"
 #include "misc.h"
@@ -551,4 +553,5 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   return PCX_Success;
 }
 
+#endif /* !USE_SDL_LIBRARY */
 #endif /* !MSDOS */

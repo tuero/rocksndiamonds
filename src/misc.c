@@ -12,7 +12,6 @@
 ***********************************************************/
 
 #include <pwd.h>
-#include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
 #include <sys/param.h>

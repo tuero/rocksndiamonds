@@ -35,10 +35,23 @@ EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
 SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)
-SDL_LDFLAGS := -lIMG $(shell sdl-config --libs)
+SDL_LDFLAGS := -lSDL_image $(shell sdl-config --libs)
 
-INCL = $(X11_INCL)
-LIBS = $(X11_LIBS) -lX11 -lm $(EXTRA_LIBS) $(SDL_LDFLAGS)
+X11_CFLAGS = $(X11_INCL)
+X11_LDFLAGS = $(X11_LIBS) -lX11
+
+USE_SDL = true
+
+ifdef USE_SDL
+SYS_CFLAGS  = $(SDL_CFLAGS)
+SYS_LDFLAGS = $(SDL_LDFLAGS)
+else
+SYS_CFLAGS  = $(X11_CFLAGS)
+SYS_LDFLAGS = $(X11_LDFLAGS)
+endif
+
+INCL = $(SYS_CFLAGS)
+LIBS = $(SYS_LDFLAGS) $(EXTRA_LIBS) -lm
 
 endif
 
@@ -66,9 +79,9 @@ OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
 
-# SYSTEM = -DSYSV -Ae		# may be needed for HP-UX
+# SYSTEM = -DSYSV -Ae				# may be needed for HP-UX
 
-CFLAGS = $(OPTIONS) $(SDL_CFLAGS) $(SYSTEM) $(INCL) $(CONFIG)
+CFLAGS = $(OPTIONS) $(SYSTEM) $(SYS_CFLAGS) $(CONFIG)
 
 SRCS =	main.c		\
 	init.c		\
@@ -91,6 +104,7 @@ SRCS =	main.c		\
 	netserv.c	\
 	msdos.c		\
 	system.c	\
+	x11.c		\
 	sdl.c
 
 OBJS =	main.o		\
@@ -114,12 +128,13 @@ OBJS =	main.o		\
 	netserv.o	\
 	msdos.o		\
 	system.o	\
+	x11.o		\
 	sdl.o
 
 all:	$(PROGNAME)
 
 $(PROGNAME):	$(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
+	$(CC) $(OBJS) $(LIBS) -o $(PROGNAME)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $*.c

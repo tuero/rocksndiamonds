@@ -53,6 +53,7 @@ inline void SDLFillRectangle(SDL_Surface *surface, int x, int y,
 
   SDL_FillRect(surface, &rect,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
+  SDL_UpdateRect(surface, x, y, width, height);
 }
 
 inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,

@@ -14,6 +14,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#ifndef USE_SDL_LIBRARY
+
 #include "main.h"
 
 #define MAX_COLORS	256	/* maximal number of colors for each image */
@@ -54,5 +56,7 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);
 void freeXImage(Image *, XImageInfo *);
+
+#endif /* !USE_SDL_LIBRARY */
 
 #endif	/* IMAGE_H */

@@ -13,7 +13,6 @@
 
 #ifndef MSDOS
 
-#include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/wait.h>

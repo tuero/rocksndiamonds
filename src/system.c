@@ -14,10 +14,6 @@
 
 #include "main.h"
 
-#ifdef	USE_SDL_LIBRARY
-#include "sdl.h"
-#endif
-
 inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
 {
 #ifdef USE_SDL_LIBRARY
@@ -162,20 +158,11 @@ inline void NextEvent(Event *event)
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #ifdef USE_SDL_LIBRARY
-#if 0
-  printf("0x%x, 0x%x\n",
-	 event->keysym.sym, event->keysym.unicode);
-#endif
   if (with_modifiers && event->keysym.unicode != 0)
     return event->keysym.unicode;
   else
     return event->keysym.sym;
 #else
-#if 0
-  printf("0x%x, 0x%x\n",
-	 (unsigned int)XLookupKeysym(event, 0),
-	 (unsigned int)XLookupKeysym(event, event->state));
-#endif
   if (with_modifiers)
     return XLookupKeysym(event, event->state);
   else
