@@ -73,17 +73,11 @@ static void X11InitDisplay()
 
   /* got appropriate visual? */
   if (depth < 8)
-  {
-    printf("Sorry, displays with less than 8 bits per pixel not supported.\n");
-    exit(-1);
-  }
+    Error(ERR_EXIT, "X11 display not supported (less than 8 bits per pixel)");
   else if ((depth ==8 && visual->class != PseudoColor) ||
 	   (depth > 8 && visual->class != TrueColor &&
 	    visual->class != DirectColor))
-  {
-    printf("Sorry, cannot get appropriate visual.\n");
-    exit(-1);
-  }
+    Error(ERR_EXIT, "X11 display not supported (inappropriate visual)");
 #endif /* !PLATFORM_MSDOS */
 }
 
@@ -146,8 +140,7 @@ static DrawWindow *X11InitWindow()
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
 #if 0
-  sprintf(icon_filename, "%s/%s/%s",
-	  options.ro_base_directory, GRAPHICS_DIRECTORY,
+  sprintf(icon_filename, "%s/%s", options.graphics_directory,
 	  icon_pic.picture_filename);
 #endif
   if (XReadBitmapFile(display, new_window->drawable,
@@ -158,8 +151,7 @@ static DrawWindow *X11InitWindow()
 	  program.x11_icon_filename);
 
 #if 0
-  sprintf(icon_filename, "%s/%s/%s",
-	  options.ro_base_directory, GRAPHICS_DIRECTORY,
+  sprintf(icon_filename, "%s/%s", options.graphics_directory,
 	  icon_pic.picturemask_filename);
 #endif
   if (XReadBitmapFile(display, new_window->drawable,

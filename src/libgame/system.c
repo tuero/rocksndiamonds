@@ -109,12 +109,12 @@ void InitProgramInfo(char *unix_userdata_directory, char *program_title,
 		     char *x11_icon_basename, char *x11_iconmask_basename,
 		     char *msdos_pointer_basename)
 {
-  char *gfx_dir = getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
-  char *x11_icon_filename = getPath2(gfx_dir, x11_icon_basename);
-  char *x11_iconmask_filename = getPath2(gfx_dir, x11_iconmask_basename);
-  char *msdos_pointer_filename = getPath2(gfx_dir, msdos_pointer_basename);
-
-  free(gfx_dir);
+  char *x11_icon_filename =
+    getPath2(options.graphics_directory, x11_icon_basename);
+  char *x11_iconmask_filename =
+    getPath2(options.graphics_directory, x11_iconmask_basename);
+  char *msdos_pointer_filename =
+    getPath2(options.graphics_directory, msdos_pointer_basename);
 
 #if defined(PLATFORM_UNIX)
   program.userdata_directory = unix_userdata_directory;
@@ -581,8 +581,7 @@ inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
 Bitmap *LoadImage(char *basename)
 {
   Bitmap *new_bitmap;
-  char *filename = getPath3(options.ro_base_directory, GRAPHICS_DIRECTORY,
-			    basename);
+  char *filename = getPath2(options.graphics_directory, basename);
 
 #if defined(TARGET_SDL)
   new_bitmap = SDLLoadImage(filename);

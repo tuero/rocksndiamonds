@@ -50,7 +50,8 @@ typedef struct
   unsigned int  width;		/* width of image in pixels            */
   unsigned int  height;		/* height of image in pixels           */
   unsigned int  depth;		/* depth of image in bits if IRGB type */
-  unsigned int  bytes_per_row;	/* ((depth + 7) / 8) bytes * width     */
+  unsigned int  bytes_per_pixel;/* (depth + 7) / 8                     */
+  unsigned int  bytes_per_row;	/* width * bytes_per_pixel             */
   byte         *data;		/* image data                          */
 } Image;
 

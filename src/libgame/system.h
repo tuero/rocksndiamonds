@@ -156,6 +156,7 @@ struct OptionInfo
   char *ro_base_directory;
   char *rw_base_directory;
   char *level_directory;
+  char *graphics_directory;
   boolean serveronly;
   boolean network;
   boolean verbose;

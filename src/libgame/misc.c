@@ -425,6 +425,7 @@ void GetOptions(char *argv[])
   options.ro_base_directory = RO_BASE_PATH;
   options.rw_base_directory = RW_BASE_PATH;
   options.level_directory = RO_BASE_PATH "/" LEVELS_DIRECTORY;
+  options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -471,8 +472,9 @@ void GetOptions(char *argv[])
 	     "  -d, --display machine:0       X server display\n"
 	     "  -b, --basepath directory      alternative base directory\n"
 	     "  -l, --level directory         alternative level directory\n"
-	     "  -s, --serveronly              only start network server\n"
+	     "  -g, --graphics directory      alternative graphics directory\n"
 	     "  -n, --network                 network multiplayer game\n"
+	     "  -s, --serveronly              only start network server\n"
 	     "  -v, --verbose                 verbose mode\n"
 	     "      --debug                   display debugging information\n",
 	     program.command_basename);
@@ -508,6 +510,15 @@ void GetOptions(char *argv[])
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       options.level_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-graphics", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.graphics_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
     }

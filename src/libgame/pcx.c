@@ -19,7 +19,7 @@
 #include "misc.h"
 
 
-#define PCX_DEBUG		TRUE
+#define PCX_DEBUG		FALSE
 
 #define PCX_MAGIC		0x0a	/* first byte in a PCX image file    */
 #define PCX_SUPPORTED_VERSION	5	/* last acceptable version number    */
