@@ -318,8 +318,16 @@ element_to_graphic[] =
     IMG_SP_EXIT_CLOSED
   },
   {
+    EL_SP_EXIT_OPENING,			-1, -1, FALSE,
+    IMG_SP_EXIT_OPENING
+  },
+  {
     EL_SP_EXIT_OPEN,			-1, -1, FALSE,
     IMG_SP_EXIT_OPEN
+  },
+  {
+    EL_SP_EXIT_CLOSING,			-1, -1, FALSE,
+    IMG_SP_EXIT_CLOSING
   },
   {
     EL_SP_DISK_ORANGE,			-1, -1, FALSE,

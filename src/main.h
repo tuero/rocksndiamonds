@@ -821,24 +821,26 @@
 #define EL_CONVEYOR_BELT_4_RIGHT_ACTIVE	 (EL_FIRST_RUNTIME_REAL + 25)
 #define EL_EXIT_OPENING			(EL_FIRST_RUNTIME_REAL + 26)
 #define EL_EXIT_CLOSING			(EL_FIRST_RUNTIME_REAL + 27)
-#define EL_SP_EXIT_OPEN			(EL_FIRST_RUNTIME_REAL + 28)
-#define EL_SP_TERMINAL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 29)
-#define EL_SP_BUGGY_BASE_ACTIVATING	(EL_FIRST_RUNTIME_REAL + 30)
-#define EL_SP_BUGGY_BASE_ACTIVE		(EL_FIRST_RUNTIME_REAL + 31)
-#define EL_SP_MURPHY_CLONE		(EL_FIRST_RUNTIME_REAL + 32)
-#define EL_AMOEBA_DROPPING		(EL_FIRST_RUNTIME_REAL + 33)
-#define EL_QUICKSAND_EMPTYING		(EL_FIRST_RUNTIME_REAL + 34)
-#define EL_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 35)
-#define EL_BD_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 36)
-#define EL_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 37)
-#define EL_BD_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 38)
-#define EL_MAGIC_WALL_EMPTYING		(EL_FIRST_RUNTIME_REAL + 39)
-#define EL_BD_MAGIC_WALL_EMPTYING	(EL_FIRST_RUNTIME_REAL + 40)
-#define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 41)
-#define EL_BD_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 42)
+#define EL_SP_EXIT_OPENING		(EL_FIRST_RUNTIME_REAL + 28)
+#define EL_SP_EXIT_CLOSING		(EL_FIRST_RUNTIME_REAL + 29)
+#define EL_SP_EXIT_OPEN			(EL_FIRST_RUNTIME_REAL + 30)
+#define EL_SP_TERMINAL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 31)
+#define EL_SP_BUGGY_BASE_ACTIVATING	(EL_FIRST_RUNTIME_REAL + 32)
+#define EL_SP_BUGGY_BASE_ACTIVE		(EL_FIRST_RUNTIME_REAL + 33)
+#define EL_SP_MURPHY_CLONE		(EL_FIRST_RUNTIME_REAL + 34)
+#define EL_AMOEBA_DROPPING		(EL_FIRST_RUNTIME_REAL + 35)
+#define EL_QUICKSAND_EMPTYING		(EL_FIRST_RUNTIME_REAL + 36)
+#define EL_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 37)
+#define EL_BD_MAGIC_WALL_ACTIVE		(EL_FIRST_RUNTIME_REAL + 38)
+#define EL_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 39)
+#define EL_BD_MAGIC_WALL_FULL		(EL_FIRST_RUNTIME_REAL + 40)
+#define EL_MAGIC_WALL_EMPTYING		(EL_FIRST_RUNTIME_REAL + 41)
+#define EL_BD_MAGIC_WALL_EMPTYING	(EL_FIRST_RUNTIME_REAL + 42)
+#define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 43)
+#define EL_BD_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 44)
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 43)
+#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 45)
 
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)
@@ -1026,9 +1028,9 @@
 
 #define PROGRAM_VERSION_MAJOR	3
 #define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	6
+#define PROGRAM_VERSION_PATCH	7
 #define PROGRAM_VERSION_RELEASE	0
-#define PROGRAM_VERSION_STRING	"3.0.6"
+#define PROGRAM_VERSION_STRING	"3.0.7"
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
@@ -1199,7 +1201,7 @@ struct LevelInfo
   int time_light;
   int time_timegate;
   boolean double_speed;
-  boolean gravity;
+  boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -1250,8 +1252,6 @@ struct GameInfo
   int initial_move_delay;
   int initial_move_delay_value;
 
-  boolean envelope_active;
-
   /* variable within running game */
   int yamyam_content_nr;
   boolean magic_wall_active;
@@ -1262,7 +1262,9 @@ struct GameInfo
   int belt_dir_nr[4];
   int switchgate_pos;
   int balloon_dir;
+  boolean gravity;
   boolean explosions_delayed;
+  boolean envelope_active;
 };
 
 struct GlobalInfo

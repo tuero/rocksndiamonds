@@ -3370,6 +3370,16 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "sp_exit.opening",
+    "sp_exit",
+    "-"
+  },
+  {
+    "sp_exit.closing",
+    "sp_exit",
+    "-"
+  },
+  {
     "sp_exit_open",
     "sp_exit",
     "-"

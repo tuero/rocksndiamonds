@@ -71,6 +71,7 @@ struct ConfigInfo sound_config[] =
   { "[sp_port].passing",		"gate.wav"		},
   { "[sp_exit].passing",		"exit.wav"		},
   { "[sp_exit].opening",		UNDEFINED_FILENAME	},
+  { "[sp_exit].closing",		UNDEFINED_FILENAME	},
   { "sp_sniksnak.moving",		UNDEFINED_FILENAME	},
   { "sp_sniksnak.waiting",		UNDEFINED_FILENAME	},
   { "sp_electron.moving",		UNDEFINED_FILENAME	},

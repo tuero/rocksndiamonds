@@ -252,6 +252,22 @@ static struct ChangingElementInfo change_delay_list[] =
     NULL
   },
   {
+    EL_SP_EXIT_OPENING,
+    EL_SP_EXIT_OPEN,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_SP_EXIT_CLOSING,
+    EL_SP_EXIT_CLOSED,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_OPEN,
     29,
@@ -1086,6 +1102,7 @@ void InitGame()
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
   game.balloon_dir = MV_NO_MOVING;
+  game.gravity = level.initial_gravity;
   game.explosions_delayed = TRUE;
 
   game.envelope_active = FALSE;
@@ -1671,11 +1688,15 @@ void GameWon()
   }
 
   /* close exit door after last player */
-  if (Feld[ExitX][ExitY] == EL_EXIT_OPEN && AllPlayersGone)
+  if ((Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
+       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN) && AllPlayersGone)
   {
-    Feld[ExitX][ExitY] = EL_EXIT_CLOSING;
+    int element = Feld[ExitX][ExitY];
 
-    PlaySoundLevelElementAction(ExitX, ExitY, EL_EXIT_OPEN, ACTION_CLOSING);
+    Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
+			  EL_SP_EXIT_CLOSING);
+
+    PlaySoundLevelElementAction(ExitX, ExitY, element, ACTION_CLOSING);
   }
 
   /* Hero disappears */
@@ -4236,6 +4257,11 @@ void StartMoving(int x, int y)
 	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
 	    element1 != EL_FLAMES && element2 != EL_FLAMES)
 	{
+#if 1
+	  ResetGfxAnimation(x, y);
+	  GfxAction[x][y] = ACTION_ATTACKING;
+#endif
+
 	  if (IS_PLAYER(x, y))
 	    DrawPlayerField(x, y);
 	  else
@@ -4249,6 +4275,7 @@ void StartMoving(int x, int y)
 	    Feld[newx1][newy1] = EL_FLAMES;
 	  if (IN_LEV_FIELD(newx2, newy2) && Feld[newx2][newy2] == EL_EMPTY)
 	    Feld[newx2][newy2] = EL_FLAMES;
+
 	  return;
 	}
       }
@@ -5094,7 +5121,10 @@ void CheckExitSP(int x, int y)
     return;
   }
 
-  Feld[x][y] = EL_SP_EXIT_OPEN;
+  if (AllPlayersGone)	/* do not re-open exit door closed after last player */
+    return;
+
+  Feld[x][y] = EL_SP_EXIT_OPENING;
 
   PlaySoundLevelNearest(x, y, SND_CLASS_SP_EXIT_OPENING);
 }
@@ -6425,7 +6455,7 @@ void ScrollLevel(int dx, int dy)
 
 static void CheckGravityMovement(struct PlayerInfo *player)
 {
-  if (level.gravity && !player->programmed_action)
+  if (game.gravity && !player->programmed_action)
   {
     int move_dir_vertical = player->action & (MV_UP | MV_DOWN);
     int move_dir_horizontal = player->action & (MV_LEFT | MV_RIGHT);
@@ -6794,13 +6824,14 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     player->last_jy = jy;
 
     if (Feld[jx][jy] == EL_EXIT_OPEN ||
-	Feld[jx][jy] == EL_SP_EXIT_OPEN)
+	Feld[jx][jy] == EL_SP_EXIT_OPEN ||
+	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
       DrawPlayer(player);	/* needed here only to cleanup last field */
       RemoveHero(player);
 
       if (local_player->friends_still_needed == 0 ||
-	  Feld[jx][jy] == EL_SP_EXIT_OPEN)
+	  IS_SP_ELEMENT(Feld[jx][jy]))
 	player->LevelSolved = player->GameOver = TRUE;
     }
 
@@ -7597,7 +7628,7 @@ int DigField(struct PlayerInfo *player,
 	  element == EL_SP_GRAVITY_PORT_RIGHT ||
 	  element == EL_SP_GRAVITY_PORT_UP ||
 	  element == EL_SP_GRAVITY_PORT_DOWN)
-	level.gravity = !level.gravity;
+	game.gravity = !game.gravity;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;
@@ -7686,7 +7717,9 @@ int DigField(struct PlayerInfo *player,
 	  if (!player->key[element - EL_GATE_1_GRAY])
 	    return MF_NO_ACTION;
 	}
-	else if (element == EL_EXIT_OPEN || element == EL_SP_EXIT_OPEN)
+	else if (element == EL_EXIT_OPEN ||
+		 element == EL_SP_EXIT_OPEN ||
+		 element == EL_SP_EXIT_OPENING)
 	{
 	  sound_action = ACTION_PASSING;	/* player is passing exit */
 	}

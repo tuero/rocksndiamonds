@@ -1758,6 +1758,7 @@ void InitElementPropertiesStatic()
     EL_SOKOBAN_FIELD_EMPTY,
     EL_EXIT_OPEN,
     EL_SP_EXIT_OPEN,
+    EL_SP_EXIT_OPENING,
     EL_GATE_1,
     EL_GATE_2,
     EL_GATE_3,
@@ -1996,6 +1997,8 @@ void InitElementPropertiesStatic()
     EL_SP_TERMINAL_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVATING,
     EL_SP_BUGGY_BASE_ACTIVE,
+    EL_SP_EXIT_OPENING,
+    EL_SP_EXIT_CLOSING,
     -1
   };
 

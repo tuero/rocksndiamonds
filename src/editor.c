@@ -1517,7 +1517,7 @@ static struct
   {
     -1,					ED_COUNTER_YPOS(6) - MINI_TILEY,
     GADGET_ID_GRAVITY,			GADGET_ID_DOUBLE_SPEED,
-    &level.gravity,
+    &level.initial_gravity,
     " ", "gravity",			"set level gravity"
   },
   {
