@@ -4234,7 +4234,11 @@ void EdelsteinFunkeln(int x, int y)
       if (setup.direct_draw && MovDelay[x][y])
 	SetDrawtoField(DRAW_BUFFERED);
 
+#if 0
       DrawGraphic(SCREENX(x), SCREENY(y), el2img(Feld[x][y]), 0);
+#else
+      DrawGraphicAnimation(x, y, el2img(Feld[x][y]));
+#endif
 
       if (MovDelay[x][y])
       {
@@ -4883,6 +4887,13 @@ void GameActions()
     if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element)))
     {
       StartMoving(x, y);
+
+#if 1
+      if (Feld[x][y] == EL_EMERALD &&
+	  new_graphic_info[IMG_EMERALD].anim_frames > 1 &&
+	  !IS_MOVING(x, y))
+	DrawGraphicAnimation(x, y, IMG_EMERALD);
+#endif
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	EdelsteinFunkeln(x, y);
