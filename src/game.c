@@ -3791,7 +3791,16 @@ void ContinueMoving(int x, int y)
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
   struct PlayerInfo *player = (IS_PLAYER(x, y) ? PLAYERINFO(x, y) : NULL);
+#if 0
+  boolean pushing = (player != NULL && player->Pushing && player->MovPos != 0);
+#else
   boolean pushing = (player != NULL && player->Pushing && player->is_moving);
+#endif
+
+#if 0
+  if (player && player->is_moving && player->MovPos == 0)
+    printf("::: !!!\n");
+#endif
 
   if (element == EL_AMOEBA_DROP || element == EL_AMOEBA_DROPPING)
     step /= 2;
@@ -3820,12 +3829,22 @@ void ContinueMoving(int x, int y)
 
 #if 1
   if (pushing)		/* special case: moving object pushed by player */
+#if 1
+    MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
+#else
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->GfxPos));
+#endif
 #endif
 
 #if 0
-  if (pushing)
-    printf("::: OOPS! pushing '%s'\n", element_info[element].token_name);
+  if (element == EL_SPRING)
+    printf("::: spring moves %d [%d: %d, %d, %d/%d]\n",
+	   MovPos[x][y],
+	   pushing,
+	   (player?player->Pushing:-42),
+	   (player?player->is_moving:-42),
+	   (player?player->MovPos:-42),
+	   (player?player->GfxPos:-42));
 #endif
 
   if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
@@ -6817,11 +6836,13 @@ int DigField(struct PlayerInfo *player,
 	     FrameCounter, player->push_delay_value);
 #endif
 
+#if 0
       if (element == EL_SPRING)
       {
 	Feld[x + dx][y + dy] = EL_SPRING;
 	MovDir[x + dx][y + dy] = move_direction;
       }
+#endif
 
       player->push_delay_value = (element == EL_SPRING ? 0 : 2 + RND(8));
 
