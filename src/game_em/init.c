@@ -439,6 +439,20 @@ int open_all(void)
 
 	  pcxBitmapsX2[i]->clip_mask = clip_mask;
 
+	  /* add clip mask GC */
+	  {
+	    XGCValues clip_gc_values;
+	    unsigned long clip_gc_valuemask;
+
+	    clip_gc_values.graphics_exposures = False;
+	    clip_gc_values.clip_mask = pcxBitmapsX2[i]->clip_mask;
+	    clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
+	    pcxBitmapsX2[i]->stored_clip_gc = XCreateGC(display,
+							window->drawable,
+							clip_gc_valuemask,
+							&clip_gc_values);
+	  }
+
 #if 0
 	  printf("::: %ld, %ld, %ld, %ld, %ld, %ld, %ld\n",
 		 pcxBitmaps[i]->gc,
@@ -490,6 +504,11 @@ int open_all(void)
 		fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, XDisplayName(arg_display), "failed to create pixmap", strerror(errno));
 		return(1);
 	}
+
+#if 1
+	screenBitmap->drawable = screenPixmap;
+	scoreBitmap->drawable = scorePixmap;
+#endif
 
 	spriteBitmap = XCreatePixmap(display, xwindow, TILEX, TILEY, 1);
 	if(spriteBitmap == 0) {

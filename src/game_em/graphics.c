@@ -34,15 +34,19 @@ static void xdebug(char *msg)
 
 static void colour_shuffle(void)
 {
-	unsigned int i, j, k;
-	for (i = 0; i < 8; i++) colours[i] = i;
-	for (i = 0; i < 8; i++) {
-		Random = Random * 129 + 1;
-		j = (Random >> 10) & 7;
-		k = colours[i];
-		colours[i] = colours[j];
-		colours[j] = k;
-	}
+  unsigned int i, j, k;
+
+  for (i = 0; i < 8; i++)
+    colours[i] = i;
+
+  for (i = 0; i < 8; i++)
+  {
+    Random = Random * 129 + 1;
+    j = (Random >> 10) & 7;
+    k = colours[i];
+    colours[i] = colours[j];
+    colours[j] = k;
+  }
 }
 
 /* copy the entire screen to the window at the scroll position
@@ -51,40 +55,48 @@ static void colour_shuffle(void)
  */
 void blitscreen(void)
 {
-	unsigned int x = screen_x % (22 * TILEX);
-	unsigned int y = screen_y % (14 * TILEY);
+  unsigned int x = screen_x % (22 * TILEX);
+  unsigned int y = screen_y % (14 * TILEY);
 
-	xdebug("blitscreen");
+  xdebug("blitscreen");
 
-#if 0
-	printf("::: %d, %d [%d, %d]\n", x, y, TILEX, TILEY);
-#endif
+  if (x < 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, window, x, y,
+	       20 * TILEX, 12 * TILEY, SX, SY);
+  }
+  else if (x < 2 * TILEX && y >= 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, window, x, y,
+	       20 * TILEX, 14 * TILEY - y, SX, SY);
+    BlitBitmap(screenBitmap, window, x, 0,
+	       20 * TILEX, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
+  }
+  else if (x >= 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, window, x, y,
+	       22 * TILEX - x, 12 * TILEY, SX, SY);
+    BlitBitmap(screenBitmap, window, 0, y,
+	       x - 2 * TILEX, 12 * TILEY, SX + 22 * TILEX - x, SY);
+  }
+  else
+  {
+    BlitBitmap(screenBitmap, window, x, y,
+	       22 * TILEX - x, 14 * TILEY - y, SX, SY);
+    BlitBitmap(screenBitmap, window, 0, y,
+	       x - 2 * TILEX, 14 * TILEY - y, SX + 22 * TILEX - x, SY);
+    BlitBitmap(screenBitmap, window, x, 0,
+	       22 * TILEX - x, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
+    BlitBitmap(screenBitmap, window, 0, 0,
+	       x - 2 * TILEX, y - 2 * TILEY,
+	       SX + 22 * TILEX - x, SY + 14 * TILEY - y);
+  }
 
-	if (x < 2 * TILEX && y < 2 * TILEY) {
+  BlitBitmap(scoreBitmap, window, 0, 0,
+	     20 * TILEX, SCOREY, SX, SY + 12 * TILEY);
+  XFlush(display);
 
-#if 0
-	  printf("!!! %ld, %ld, %ld, %ld\n",
-		 display, screenPixmap, xwindow, screenGC);
-#endif
-
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 12 * TILEY, SX, SY);
-	} else if (x < 2 * TILEX && y >= 2 * TILEY) {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 20 * TILEX, 14 * TILEY - y, SX, SY);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 20 * TILEX, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
-	} else if (x >= 2 * TILEX && y < 2 * TILEY) {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 12 * TILEY, SX, SY);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 12 * TILEY, SX + 22 * TILEX - x, SY);
-	} else {
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, y, 22 * TILEX - x, 14 * TILEY - y, SX, SY);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, y, x - 2 * TILEX, 14 * TILEY - y, SX + 22 * TILEX - x, SY);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, x, 0, 22 * TILEX - x, y - 2 * TILEY, SX, SY + 14 * TILEY - y);
-		XCopyArea(display, screenPixmap, xwindow, screenGC, 0, 0, x - 2 * TILEX, y - 2 * TILEY, SX + 22 * TILEX - x, SY + 14 * TILEY - y);
-	}
-
-	XCopyArea(display, scorePixmap, xwindow, scoreGC, 0, 0, 20 * TILEX, SCOREY, SX, SY + 12 * TILEY);
-	XFlush(display);
-
-	xdebug("blitscreen - done");
+  xdebug("blitscreen - done");
 }
 
 /* draw differences between game tiles and screen tiles
@@ -95,24 +107,30 @@ void blitscreen(void)
  */
 static void animscreen(void)
 {
-	unsigned int x, y, dx, dy;
-	unsigned short obj;
-	unsigned int left = screen_x / TILEX;
-	unsigned int top = screen_y / TILEY;
+  unsigned int x, y, dx, dy;
+  unsigned short obj;
+  unsigned int left = screen_x / TILEX;
+  unsigned int top = screen_y / TILEY;
 
-	xdebug("animscreen");
+  xdebug("animscreen");
 
-	for (y = top; y < top + 14; y++) {
-		dy = y % 14;
-		for (x = left; x < left + 22; x++) {
-			dx = x % 22;
-			obj = map_obj[frame][Draw[y][x]];
-			if (screentiles[dy][dx] != obj) {
-				screentiles[dy][dx] = obj;
-				XCopyArea(display, objPixmap, screenPixmap, screenGC, (obj / 512) * TILEX, (obj % 512) * TILEY / 16, TILEX, TILEY, dx * TILEX, dy * TILEY);
-			}
-		}
-	}
+  for (y = top; y < top + 14; y++)
+  {
+    dy = y % 14;
+    for (x = left; x < left + 22; x++)
+    {
+      dx = x % 22;
+      obj = map_obj[frame][Draw[y][x]];
+
+      if (screentiles[dy][dx] != obj)
+      {
+	screentiles[dy][dx] = obj;
+	BlitBitmap(objBitmap, screenBitmap,
+		   (obj / 512) * TILEX, (obj % 512) * TILEY / 16,
+		   TILEX, TILEY, dx * TILEX, dy * TILEY);
+      }
+    }
+  }
 }
 
 /* blit players to the screen
@@ -187,157 +205,232 @@ static void blitplayer(struct PLAYER *ply)
 
 void game_initscreen(void)
 {
-	unsigned int x,y;
+  unsigned int x,y;
 
-	xdebug("game_initscreen");
+  xdebug("game_initscreen");
 
-	frame = 6;
-	screen_x = 0;
-	screen_y = 0;
+  frame = 6;
+  screen_x = 0;
+  screen_y = 0;
 
-	for (y = 0; y < 14; y++) {
-		for (x = 0; x < 22; x++) {
-			screentiles[y][x] = -1;
-		}
-	}
+  for (y = 0; y < 14; y++)
+    for (x = 0; x < 22; x++)
+      screentiles[y][x] = -1;
 
-	colour_shuffle();
-	colours[0] += 16;
-	colours[1] += 16;
-	colours[2] += 16;
-	colour_anim = 0;
+  colour_shuffle();
+  colours[0] += 16;
+  colours[1] += 16;
+  colours[2] += 16;
+  colour_anim = 0;
 
-	XFillRectangle(display, scorePixmap, scoreGC, 0, 0, 20 * TILEX, SCOREY);
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 11 * SCOREX, colours[0] * SCOREY, 3 * SCOREX, SCOREY, 1 * SCOREX, 0); /* 0-63 time */
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 18 * SCOREX, colours[0] * SCOREY, 6 * SCOREX, SCOREY, 15 * SCOREX, 0); /* 112-207 diamonds */
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 14 * SCOREX, colours[0] * SCOREY, 4 * SCOREX, SCOREY, 32 * SCOREX, 0); /* 256-319 score */
+  ClearRectangle(scoreBitmap, 0, 0, 20 * TILEX, SCOREY);
+  BlitBitmap(botBitmap, scoreBitmap,
+	     11 * SCOREX, colours[0] * SCOREY, 3 * SCOREX, SCOREY,
+	     1 * SCOREX, 0);				/* 0-63 time */
+  BlitBitmap(botBitmap, scoreBitmap,
+	     18 * SCOREX, colours[0] * SCOREY, 6 * SCOREX, SCOREY,
+	     15 * SCOREX, 0);				/* 112-207 diamonds */
+  BlitBitmap(botBitmap, scoreBitmap,
+	     14 * SCOREX, colours[0] * SCOREY, 4 * SCOREX, SCOREY,
+	     32 * SCOREX, 0);				/* 256-319 score */
 }
 
 void game_blitscore(void)
 {
-	unsigned int i;
+  unsigned int i;
 
-	xdebug("game_blitscore");
+  xdebug("game_blitscore");
 
-	i = (lev.time + 4) / 5;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 7 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 6 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 5 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 4 * SCOREX, 0);
-	i = lev.score;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 39 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 38 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 37 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 36 * SCOREX, 0);
-	if (lev.home == 0) {
-		XCopyArea(display, botPixmap, scorePixmap, scoreGC, 12 * SCOREX, 24 * SCOREY, 12 * SCOREX, SCOREY, 14 * SCOREX, 0); /* relax */
-		goto done;
-	}
-	if (ply1.alive + ply2.alive >= lev.home && lev.required == 0) {
-		XCopyArea(display, botPixmap, scorePixmap, scoreGC, 24 * SCOREX, colours[2] * SCOREY, 12 * SCOREX, SCOREY, 14 * SCOREX, 0); /* find the exit */
-		goto done;
-	}
-	if (ply1.alive + ply2.alive < lev.home) {
-		if (++colour_anim > 11) colour_anim = 0;
-		if (colour_anim < 6) {
-			XCopyArea(display, botPixmap, scorePixmap, scoreGC, 0, 24 * SCOREY, 12 * SCOREX, SCOREY, 14 * SCOREX, 0); /* forget it */
-			goto done;
-		}
-		XCopyArea(display, botPixmap, scorePixmap, scoreGC, 18 * SCOREX, colours[0] * SCOREY, 6 * SCOREX, SCOREY, 15 * SCOREX, 0); /* diamonds */
-	}
-	i = lev.required;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 24 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 23 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 22 * SCOREX, 0); i /= 10;
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY, 21 * SCOREX, 0);
-done:
+  i = (lev.time + 4) / 5;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     7 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     6 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     5 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     4 * SCOREX, 0);
+
+  i = lev.score;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     39 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     38 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     37 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     36 * SCOREX, 0);
+
+  if (lev.home == 0)
+  {
+    BlitBitmap(botBitmap, scoreBitmap,
+	       12 * SCOREX, 24 * SCOREY, 12 * SCOREX, SCOREY,
+	       14 * SCOREX, 0); /* relax */
+
+    goto done;
+  }
+
+  if (ply1.alive + ply2.alive >= lev.home && lev.required == 0)
+  {
+    BlitBitmap(botBitmap, scoreBitmap,
+	       24 * SCOREX, colours[2] * SCOREY, 12 * SCOREX, SCOREY,
+	       14 * SCOREX, 0); /* find the exit */
+
+    goto done;
+  }
+
+  if (ply1.alive + ply2.alive < lev.home)
+  {
+    if (++colour_anim > 11)
+      colour_anim = 0;
+
+    if (colour_anim < 6)
+    {
+      BlitBitmap(botBitmap, scoreBitmap,
+		 0, 24 * SCOREY, 12 * SCOREX, SCOREY,
+		 14 * SCOREX, 0); /* forget it */
+
+      goto done;
+    }
+
+    BlitBitmap(botBitmap, scoreBitmap,
+	       18 * SCOREX, colours[0] * SCOREY, 6 * SCOREX, SCOREY,
+	       15 * SCOREX, 0); /* diamonds */
+  }
+
+  i = lev.required;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     24 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     23 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     22 * SCOREX, 0); i /= 10;
+  BlitBitmap(botBitmap, scoreBitmap,
+	     (i % 10) * SCOREX, colours[1] * SCOREY, SCOREX, SCOREY,
+	     21 * SCOREX, 0);
+
+ done:
 }
 
 void game_animscreen(void)
 {
-	unsigned int x,y;
+  unsigned int x,y;
 
-	xdebug("game_animscreen");
+  xdebug("game_animscreen");
 
-	x = (frame * ply1.oldx + (8 - frame) * ply1.x) * TILEX / 8 + (19 * TILEX) / 2;
-	y = (frame * ply1.oldy + (8 - frame) * ply1.y) * TILEY / 8 + (11 * TILEY) / 2;
-	if (x > lev.width * TILEX) x = lev.width * TILEX;
-	if (y > lev.height * TILEY) y = lev.height * TILEY;
-	if (x < 20 * TILEX) x = 20 * TILEY;
-	if (y < 12 * TILEY) y = 12 * TILEY;
-	screen_x = x - 19 * TILEX;
-	screen_y = y - 11 * TILEY;
+  x = (frame * ply1.oldx + (8 - frame) * ply1.x) * TILEX / 8
+    + (19 * TILEX) / 2;
+  y = (frame * ply1.oldy + (8 - frame) * ply1.y) * TILEY / 8
+    + (11 * TILEY) / 2;
 
-	animscreen();
-	blitplayer(&ply1);
-	blitplayer(&ply2);
-	blitscreen();
-	XFlush(display);
+  if (x > lev.width * TILEX)
+    x = lev.width * TILEX;
+  if (y > lev.height * TILEY)
+    y = lev.height * TILEY;
+  if (x < 20 * TILEX)
+    x = 20 * TILEY;
+  if (y < 12 * TILEY)
+    y = 12 * TILEY;
 
-	Random = Random * 129 + 1;
+  screen_x = x - 19 * TILEX;
+  screen_y = y - 11 * TILEY;
+
+  animscreen();
+  blitplayer(&ply1);
+  blitplayer(&ply2);
+  blitscreen();
+
+  XFlush(display);
+
+  Random = Random * 129 + 1;
 }
 
 void title_initscreen(void)
 {
-	xdebug("title_initscreen");
+  xdebug("title_initscreen");
 
-	screen_x = 0;
-	screen_y = 0;
+  screen_x = 0;
+  screen_y = 0;
 
-	colour_shuffle();
-	colours[1] += 8;
-	colour_anim = 0;
+  colour_shuffle();
+  colours[1] += 8;
+  colour_anim = 0;
 
-	XCopyArea(display, ttlPixmap, screenPixmap, screenGC, 0, 0, 20 * TILEX, 12 * TILEY, 0, 0);
-	if (botmaskBitmap) {
-		XCopyArea(display, botPixmap, scorePixmap, scoreGC, 0, colours[1] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
-		XSetClipMask(display, scoreGC, botmaskBitmap);
-		XSetClipOrigin(display, scoreGC, 0, 0 - colours[0] * SCOREY);
-	}
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, 0, colours[0] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
-	if (botmaskBitmap) {
-		XSetClipMask(display, scoreGC, None);
-	}
+  XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
+	    0, 0, 20 * TILEX, 12 * TILEY, 0, 0);
+
+  if (botmaskBitmap)
+  {
+    XCopyArea(display, botPixmap, scorePixmap, scoreGC,
+	      0, colours[1] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
+    XSetClipMask(display, scoreGC, botmaskBitmap);
+    XSetClipOrigin(display, scoreGC, 0, 0 - colours[0] * SCOREY);
+  }
+
+  XCopyArea(display, botPixmap, scorePixmap, scoreGC,
+	    0, colours[0] * SCOREY, 20 * TILEX, SCOREY, 0, 0);
+
+  if (botmaskBitmap)
+    XSetClipMask(display, scoreGC, None);
 }
 
 void title_blitscore(void)
 {
-	unsigned int x, y, i;
+  unsigned int x, y, i;
 
-	xdebug("title_blitscore");
+  xdebug("title_blitscore");
 
-	if (++colour_anim > 30) colour_anim = 0;
-	i = colour_anim >= 16 ? 31 - colour_anim : colour_anim;
-	x = (i / 8 + 18) * 2 * SCOREX;
-	y = (i % 8 + 16) * SCOREY;
+  if (++colour_anim > 30)
+    colour_anim = 0;
 
-	if (botmaskBitmap) {
-		XCopyArea(display, botPixmap, scorePixmap, scoreGC, 32 * SCOREX, colours[1] * SCOREY, 2 * SCOREX, SCOREY, 32 * SCOREX, 0);
-		XSetClipMask(display, scoreGC, botmaskBitmap);
-		XSetClipOrigin(display, scoreGC, 32 * SCOREX - x, 0 - y);
-	}
-	XCopyArea(display, botPixmap, scorePixmap, scoreGC, x, y, 2 * SCOREX, SCOREY, 32 * SCOREX, 0);
-	if (botmaskBitmap) {
-		XSetClipMask(display, scoreGC, None);
-	}
+  i = colour_anim >= 16 ? 31 - colour_anim : colour_anim;
+  x = (i / 8 + 18) * 2 * SCOREX;
+  y = (i % 8 + 16) * SCOREY;
+
+  if (botmaskBitmap)
+  {
+    XCopyArea(display, botPixmap, scorePixmap, scoreGC,
+	      32 * SCOREX, colours[1] * SCOREY, 2 * SCOREX, SCOREY,
+	      32 * SCOREX, 0);
+    XSetClipMask(display, scoreGC, botmaskBitmap);
+    XSetClipOrigin(display, scoreGC, 32 * SCOREX - x, 0 - y);
+  }
+
+  XCopyArea(display, botPixmap, scorePixmap, scoreGC,
+	    x, y, 2 * SCOREX, SCOREY, 32 * SCOREX, 0);
+
+  if (botmaskBitmap)
+    XSetClipMask(display, scoreGC, None);
 }
 
 void title_blitants(unsigned int y)
 {
-	static const char ants_dashes[2] = { 8, 7 };
+  static const char ants_dashes[2] = { 8, 7 };
 
-	xdebug("title_blitants");
+  xdebug("title_blitants");
 
-	XSetDashes(display, antsGC, colour_anim, ants_dashes, 2);
-	XDrawRectangle(display, screenPixmap, antsGC, 0, y * TILEY, 20 * TILEX - 1, TILEY - 1);
+  XSetDashes(display, antsGC, colour_anim, ants_dashes, 2);
+  XDrawRectangle(display, screenPixmap, antsGC,
+		 0, y * TILEY, 20 * TILEX - 1, TILEY - 1);
 }
 
 void title_animscreen(void)
 {
-	blitscreen();
-	XFlush(display);
+  blitscreen();
+  XFlush(display);
 
-	Random = Random * 129 + 1;
+  Random = Random * 129 + 1;
 }
 
 static int ttl_map[] =
@@ -368,11 +461,14 @@ void title_string(unsigned int y, unsigned int left, unsigned int right,
   if (x < left || x >= right) x = left;
 
   /* restore background graphic where text will be drawn */
-  XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
-	    left, y, right - left, MENUFONTY, left, y);
+  BlitBitmap(ttlBitmap, screenBitmap,
+	     left, y, right - left, MENUFONTY, left, y);
 
+#if 1
+#else
   if (ttlmaskBitmap)
     XSetClipMask(display, screenGC, ttlmaskBitmap);
+#endif
 
   for (i = 0; string[i] && x < right; i++)
   {
@@ -386,16 +482,27 @@ void title_string(unsigned int y, unsigned int left, unsigned int right,
     ch_x = (ch_pos % 22) * GFXMENUFONTX;
     ch_y = (ch_pos / 22 + 12) * TILEY;
 
+#if 1
+    SetClipOrigin(ttlBitmap, ttlBitmap->stored_clip_gc,
+		  x - ch_x, y - ch_y);
+
+    BlitBitmapMasked(ttlBitmap, screenBitmap,
+		     ch_x, ch_y, MENUFONTX, MENUFONTY, x, y);
+#else
     if (ttlmaskBitmap)
       XSetClipOrigin(display, screenGC, x - ch_x, y - ch_y);
 
     XCopyArea(display, ttlPixmap, screenPixmap, screenGC,
 	      ch_x, ch_y, MENUFONTX, MENUFONTY, x, y);
+#endif
 
     x += MENUFONTX;
   }
 
+#if 1
+#else
   XSetClipMask(display, screenGC, None);
+#endif
 }
 
 #endif
