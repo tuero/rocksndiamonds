@@ -1,6 +1,11 @@
-Release Version 2.0.2 [XX XXX XXXX]
+Release Version 2.1.0 [XX XXX XXXX]
 -----------------------------------
+	- bug fixed that prevented walking through tubes when gravity on
+	- enhanced sound system (especially regarding stereo and loop sounds)
+	- new structured setup menu (with sob-menues for graphics and sounds)
+	- graphics, sounds and music now fully configurable
 	- added support for TrueColor PCX graphics files
+	- added "quick save" and "quick load" functions with shortcut key
 	- changed default slipping behaviour of gems back to 2.0.0 style;
 	  this is now an element property for gems in the level editor,
 	  although existing converted levels use the new EM gems behaviour

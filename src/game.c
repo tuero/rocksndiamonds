@@ -5064,7 +5064,9 @@ static void CheckGravityMovement(struct PlayerInfo *player)
        (Feld[new_jx][new_jy] == EL_SP_BASE ||
 	Feld[new_jx][new_jy] == EL_ERDREICH));
 
-    if (field_under_player_is_free && !player_is_moving_to_valid_field)
+    if (field_under_player_is_free &&
+	!player_is_moving_to_valid_field &&
+	!IS_TUBE(Feld[jx][jy]))
       player->programmed_action = MV_DOWN;
   }
 }
