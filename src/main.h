@@ -907,8 +907,9 @@ extern int		num_element_info;
 #define EL_TRAP_ACTIVE		522
 #define EL_SPRING_MOVING	523
 #define EL_SP_MURPHY_CLONE	524
-#define EL_QUICKSAND_FILLING	525
-#define EL_QUICKSAND_EMPTYING	526
+#define EL_QUICKSAND_EMPTYING	525
+#define EL_MAGIC_WALL_EMPTYING	526
+#define EL_MAGIC_WALL_BD_EMPTYING 527
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -921,6 +922,9 @@ extern int		num_element_info;
 #define EL_MAUERND		607
 #define EL_BURNING		608
 #define EL_PLAYER_IS_LEAVING	609
+#define EL_QUICKSAND_FILLING	610
+#define EL_MAGIC_WALL_FILLING	611
+#define EL_MAGIC_WALL_BD_FILLING 612
 
 /* game graphics:
 **	  0 -  255: graphics from "RocksScreen"

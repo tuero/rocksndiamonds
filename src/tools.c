@@ -1127,7 +1127,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     }
   }
   else if (element == EL_MAGIC_WALL_EMPTY ||
+	   element == EL_MAGIC_WALL_EMPTYING ||
 	   element == EL_MAGIC_WALL_BD_EMPTY ||
+	   element == EL_MAGIC_WALL_BD_EMPTYING ||
 	   element == EL_MAGIC_WALL_FULL ||
 	   element == EL_MAGIC_WALL_BD_FULL)
   {
@@ -1358,18 +1360,20 @@ void DrawScreenField(int x, int y)
     boolean cut_mode = NO_CUTTING;
 
     if (element == EL_QUICKSAND_EMPTYING ||
-	content == EL_MAGIC_WALL_EMPTY ||
-	content == EL_MAGIC_WALL_BD_EMPTY ||
+	element == EL_MAGIC_WALL_EMPTYING ||
+	element == EL_MAGIC_WALL_BD_EMPTYING ||
 	content == EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
-	     content == EL_MAGIC_WALL_FULL ||
-	     content == EL_MAGIC_WALL_BD_FULL)
+	     element == EL_MAGIC_WALL_FILLING ||
+	     element == EL_MAGIC_WALL_BD_FILLING)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
     {
-      if (element == EL_QUICKSAND_EMPTYING)
+      if (element == EL_QUICKSAND_EMPTYING ||
+	  element == EL_MAGIC_WALL_EMPTYING ||
+	  element == EL_MAGIC_WALL_BD_EMPTYING)
 	DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
       else
 	DrawScreenElementShifted(x, y, 0, 0, content, NO_CUTTING);
@@ -1381,7 +1385,12 @@ void DrawScreenField(int x, int y)
       DrawScreenElementShifted(x, y, MovPos[ux][uy], 0, element, NO_CUTTING);
     else
     {
-      if (element == EL_QUICKSAND_FILLING || element == EL_QUICKSAND_EMPTYING)
+      if (element == EL_QUICKSAND_EMPTYING ||
+	  element == EL_MAGIC_WALL_EMPTYING ||
+	  element == EL_MAGIC_WALL_BD_EMPTYING ||
+	  element == EL_QUICKSAND_FILLING ||
+	  element == EL_MAGIC_WALL_FILLING ||
+	  element == EL_MAGIC_WALL_BD_FILLING)
 	DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], content, cut_mode);
       else
 	DrawScreenElementShifted(x, y, 0, MovPos[ux][uy], element, cut_mode);
@@ -1408,8 +1417,8 @@ void DrawScreenField(int x, int y)
     content_old = Store[oldx][oldy];
 
     if (element_old == EL_QUICKSAND_EMPTYING ||
-	content_old == EL_MAGIC_WALL_EMPTY ||
-	content_old == EL_MAGIC_WALL_BD_EMPTY ||
+	element_old == EL_MAGIC_WALL_EMPTYING ||
+	element_old == EL_MAGIC_WALL_BD_EMPTYING ||
 	content_old == EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
 
@@ -1420,7 +1429,9 @@ void DrawScreenField(int x, int y)
 			       NO_CUTTING);
     else
     {
-      if (element_old == EL_QUICKSAND_EMPTYING)
+      if (element_old == EL_QUICKSAND_EMPTYING ||
+	  element_old == EL_MAGIC_WALL_EMPTYING ||
+	  element_old == EL_MAGIC_WALL_BD_EMPTYING)
 	DrawScreenElementShifted(sx, sy, 0, MovPos[oldx][oldy], content_old,
 				 cut_mode);
       else
@@ -2415,6 +2426,7 @@ int el2gfx(int element)
     case EL_BOMBE:		return GFX_BOMBE;
     case EL_MAGIC_WALL_OFF:	return GFX_MAGIC_WALL_OFF;
     case EL_MAGIC_WALL_EMPTY:	return GFX_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_EMPTYING:return GFX_MAGIC_WALL_EMPTY;
     case EL_MAGIC_WALL_FULL:	return GFX_MAGIC_WALL_FULL;
     case EL_MAGIC_WALL_DEAD:	return GFX_MAGIC_WALL_DEAD;
     case EL_SALZSAEURE:		return GFX_SALZSAEURE;
@@ -2476,6 +2488,7 @@ int el2gfx(int element)
     case EL_MAMPFER2:		return GFX_MAMPFER2;
     case EL_MAGIC_WALL_BD_OFF:	return GFX_MAGIC_WALL_BD_OFF;
     case EL_MAGIC_WALL_BD_EMPTY:return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_MAGIC_WALL_BD_EMPTYING:return GFX_MAGIC_WALL_BD_EMPTY;
     case EL_MAGIC_WALL_BD_FULL:	return GFX_MAGIC_WALL_BD_FULL;
     case EL_MAGIC_WALL_BD_DEAD:	return GFX_MAGIC_WALL_BD_DEAD;
     case EL_DYNABOMB_ACTIVE_1:	return GFX_DYNABOMB;
