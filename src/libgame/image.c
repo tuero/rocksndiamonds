@@ -915,6 +915,10 @@ void CreateImageWithSmallImages(int pos)
   CreateBitmapWithSmallBitmaps(img_info->bitmap);
 
   img_info->contains_small_images = TRUE;
+
+#if 0
+  printf("CreateImageWithSmallImages: '%s' done\n", img_info->source_filename);
+#endif
 }
 
 void FreeAllImages()

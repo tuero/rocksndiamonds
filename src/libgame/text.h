@@ -62,7 +62,8 @@
 
 /* font structure definitions */
 
-void InitFontInfo(struct FontBitmapInfo *, int);
+void InitFontInfo(struct FontBitmapInfo *, int,
+		  int (*select_font_function)(int));
 int getFontWidth(int);
 int getFontHeight(int);
 void DrawInitText(char *, int, int);

@@ -35,25 +35,25 @@ static void InitFontClipmasks()
   GC copy_clipmask_gc;
   int i, j;
 
-  if (gfx.num_fonts == 0 || gfx.font[0].bitmap == NULL)
+  if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
     return;
 
   if (!clipmasks_initialized)
   {
     for (i=0; i < gfx.num_fonts; i++)
-      gfx.font[i].clip_mask = NULL;
+      gfx.font_bitmap_info[i].clip_mask = NULL;
 
     clipmasks_initialized = TRUE;
   }
 
   for (i=0; i < gfx.num_fonts; i++)
   {
-    if (gfx.font[i].clip_mask)
+    if (gfx.font_bitmap_info[i].clip_mask)
       for (j=0; j < NUM_FONT_CHARS; j++)
-	XFreePixmap(display, gfx.font[i].clip_mask[j]);
-    free(gfx.font[i].clip_mask);
+	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
+    free(gfx.font_bitmap_info[i].clip_mask);
 
-    gfx.font[i].clip_mask = NULL;
+    gfx.font_bitmap_info[i].clip_mask = NULL;
   }
 
   if (font_clip_gc)
@@ -73,32 +73,34 @@ static void InitFontClipmasks()
   /* create graphic context structures needed for clipping */
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
-  copy_clipmask_gc = XCreateGC(display, gfx.font[0].bitmap->clip_mask,
+  copy_clipmask_gc = XCreateGC(display,
+			       gfx.font_bitmap_info[0].bitmap->clip_mask,
 			       clip_gc_valuemask, &clip_gc_values);
 
   /* create only those clipping Pixmaps we really need */
   for (i=0; i < gfx.num_fonts; i++)
   {
-    if (gfx.font[i].bitmap == NULL)
+    if (gfx.font_bitmap_info[i].bitmap == NULL)
       continue;
 
-    gfx.font[i].clip_mask = checked_calloc(NUM_FONT_CHARS * sizeof(Pixmap));
+    gfx.font_bitmap_info[i].clip_mask =
+      checked_calloc(NUM_FONT_CHARS * sizeof(Pixmap));
 
     for (j=0; j < NUM_FONT_CHARS; j++)
     {
-      Bitmap *src_bitmap = gfx.font[i].bitmap;
+      Bitmap *src_bitmap = gfx.font_bitmap_info[i].bitmap;
       Pixmap src_pixmap = src_bitmap->clip_mask;
       int xpos = j % FONT_CHARS_PER_LINE;
       int ypos = j / FONT_CHARS_PER_LINE;
-      int width  = gfx.font[i].width;
-      int height = gfx.font[i].height;
-      int src_x = gfx.font[i].src_x + xpos * width;
-      int src_y = gfx.font[i].src_y + ypos * height;
+      int width  = gfx.font_bitmap_info[i].width;
+      int height = gfx.font_bitmap_info[i].height;
+      int src_x = gfx.font_bitmap_info[i].src_x + xpos * width;
+      int src_y = gfx.font_bitmap_info[i].src_y + ypos * height;
 
-      gfx.font[i].clip_mask[j] =
+      gfx.font_bitmap_info[i].clip_mask[j] =
 	XCreatePixmap(display, window->drawable, width, height, 1);
 
-      XCopyArea(display, src_pixmap, gfx.font[i].clip_mask[j],
+      XCopyArea(display, src_pixmap, gfx.font_bitmap_info[i].clip_mask[j],
 		copy_clipmask_gc, src_x, src_y, width, height, 0, 0);
     }
   }
@@ -107,10 +109,12 @@ static void InitFontClipmasks()
 }
 #endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
 
-void InitFontInfo(struct FontBitmapInfo *font_info, int num_fonts)
+void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
+		  int (*select_font_function)(int))
 {
   gfx.num_fonts = num_fonts;
-  gfx.font = font_info;
+  gfx.font_bitmap_info = font_bitmap_info;
+  gfx.select_font_function = select_font_function;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
@@ -119,28 +123,30 @@ void InitFontInfo(struct FontBitmapInfo *font_info, int num_fonts)
 
 int getFontWidth(int font_nr)
 {
-  return gfx.font[font_nr].width;
+  return gfx.font_bitmap_info[font_nr].width;
 }
 
 int getFontHeight(int font_nr)
 {
-  return gfx.font[font_nr].height;
+  return gfx.font_bitmap_info[font_nr].height;
 }
 
 void DrawInitText(char *text, int ypos, int font_nr)
 {
-  if (window && gfx.num_fonts > 0 && gfx.font[font_nr].bitmap != NULL)
+  if (window &&
+      gfx.num_fonts > 0 &&
+      gfx.font_bitmap_info[font_nr].bitmap != NULL)
   {
-    int text_width = strlen(text) * gfx.font[font_nr].width;
+    int text_width = strlen(text) * getFontWidth(font_nr);
 
-    ClearRectangle(window, 0, ypos, video.width, gfx.font[font_nr].height);
+    ClearRectangle(window, 0, ypos, video.width, getFontHeight(font_nr));
     DrawTextExt(window, (video.width - text_width) / 2, ypos, text, font_nr,
 		FONT_OPAQUE);
     FlushDisplay();
   }
 }
 
-void DrawTextFCentered(int y, int font, char *format, ...)
+void DrawTextFCentered(int y, int font_nr, char *format, ...)
 {
   char buffer[MAX_OUTPUT_LINESIZE + 1];
   va_list ap;
@@ -152,11 +158,11 @@ void DrawTextFCentered(int y, int font, char *format, ...)
   if (strlen(buffer) > MAX_OUTPUT_LINESIZE)
     Error(ERR_EXIT, "string too long in DrawTextFCentered() -- aborting");
 
-  DrawText(gfx.sx + (gfx.sxsize - strlen(buffer) * gfx.font[font].width) / 2,
-	   gfx.sy + y, buffer, font);
+  DrawText(gfx.sx + (gfx.sxsize - strlen(buffer) * getFontWidth(font_nr)) / 2,
+	   gfx.sy + y, buffer, font_nr);
 }
 
-void DrawTextF(int x, int y, int font, char *format, ...)
+void DrawTextF(int x, int y, int font_nr, char *format, ...)
 {
   char buffer[MAX_OUTPUT_LINESIZE + 1];
   va_list ap;
@@ -168,17 +174,17 @@ void DrawTextF(int x, int y, int font, char *format, ...)
   if (strlen(buffer) > MAX_OUTPUT_LINESIZE)
     Error(ERR_EXIT, "string too long in DrawTextF() -- aborting");
 
-  DrawText(gfx.sx + x, gfx.sy + y, buffer, font);
+  DrawText(gfx.sx + x, gfx.sy + y, buffer, font_nr);
 }
 
-void DrawText(int x, int y, char *text, int font)
+void DrawText(int x, int y, char *text, int font_nr)
 {
   int mask_mode = FONT_OPAQUE;
 
   if (DrawingOnBackground(x, y))
     mask_mode = FONT_MASKED;
 
-  DrawTextExt(drawto, x, y, text, font, mask_mode);
+  DrawTextExt(drawto, x, y, text, font_nr, mask_mode);
 
   if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
@@ -189,7 +195,8 @@ void DrawText(int x, int y, char *text, int font)
 void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		 int font_nr, int mask_mode)
 {
-  struct FontBitmapInfo *font = &gfx.font[font_nr];
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+  struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
   boolean print_inverse = FALSE;
 
   if (font->bitmap == NULL)

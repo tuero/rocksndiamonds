@@ -2984,12 +2984,6 @@ struct ConfigInfo image_config[] =
   { "font.small_4.width",			"14"			},
   { "font.small_4.height",			"14"			},
 
-  { "font.small_3.EDITOR",			"RocksFontSmall.pcx"	},
-  { "font.small_3.EDITOR.x",			"0"			},
-  { "font.small_3.EDITOR.y",			"0"			},
-  { "font.small_3.EDITOR.width",		"14"			},
-  { "font.small_3.EDITOR.height",		"14"			},
-
   { "font.tape",				"RocksFontSmall.pcx"	},
   { "font.tape.x",				"0"			},
   { "font.tape.y",				"224"			},

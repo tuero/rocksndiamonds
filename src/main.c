@@ -2978,6 +2978,33 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
   { NULL,		0,				}
 };
 
+/* ------------------------------------------------------------------------- */
+/* font definitions                                                          */
+/* ------------------------------------------------------------------------- */
+
+struct FontInfo font_info[NUM_FONTS + 1] =
+{
+  { "font.initial_1"	},
+  { "font.initial_2"	},
+  { "font.initial_3"	},
+  { "font.initial_4"	},
+  { "font.big_1"	},
+  { "font.big_2"	},
+  { "font.big_3"	},
+  { "font.big_4"	},
+  { "font.medium_1"	},
+  { "font.medium_2"	},
+  { "font.medium_3"	},
+  { "font.medium_4"	},
+  { "font.small_1"	},
+  { "font.small_2"	},
+  { "font.small_3"	},
+  { "font.small_4"	},
+  { "font.tape"		},
+  { "font.game"		},
+  { "font.narrow"	},
+};
+
 
 /* ========================================================================= */
 /* main()                                                                    */

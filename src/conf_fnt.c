@@ -92,10 +92,6 @@ font_to_graphic[] =
     IMG_FONT_SMALL_4
   },
   {
-    FONT_SMALL_3,				GFX_SPECIAL_ARG_EDITOR,
-    IMG_FONT_SMALL_3
-  },
-  {
     FONT_TAPE,					-1,
     IMG_FONT_TAPE
   },

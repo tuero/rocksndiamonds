@@ -28,6 +28,7 @@
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
 #include "conf_esg.c"	/* include auto-generated data structure definitions */
+#include "conf_fnt.c"	/* include auto-generated data structure definitions */
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
 
@@ -163,11 +164,11 @@ static void InitArtworkInfo()
 
 static void InitArtworkConfig()
 {
-  static char *element_prefix[MAX_NUM_ELEMENTS + 1];
-  static char *sound_class_prefix[MAX_NUM_ELEMENTS + 1];
-  static char *action_suffix[NUM_ACTIONS + 1];
-  static char *direction_suffix[NUM_DIRECTIONS + 1];
-  static char *special_suffix[NUM_SPECIAL_GFX_ARGS + 1];
+  static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
+  static char *sound_id_prefix[MAX_NUM_ELEMENTS + 1];
+  static char *action_id_suffix[NUM_ACTIONS + 1];
+  static char *direction_id_suffix[NUM_DIRECTIONS + 1];
+  static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
   static char *dummy[1] = { NULL };
   static char *ignore_image_tokens[] =
   {
@@ -185,22 +186,28 @@ static void InitArtworkConfig()
   };
   int i;
 
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    image_id_prefix[i] = element_info[i].token_name;
+  for (i=0; i<NUM_FONTS + 1; i++)
+    image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
+
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
-    element_prefix[i] = element_info[i].token_name;
-  for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
-    sound_class_prefix[i] = element_info[i].sound_class_name;
+    sound_id_prefix[i] = element_info[i].sound_class_name;
+
   for (i=0; i<NUM_ACTIONS + 1; i++)
-    action_suffix[i] = element_action_info[i].suffix;
+    action_id_suffix[i] = element_action_info[i].suffix;
+
   for (i=0; i<NUM_DIRECTIONS + 1; i++)
-    direction_suffix[i] = element_direction_info[i].suffix;
+    direction_id_suffix[i] = element_direction_info[i].suffix;
+
   for (i=0; i<NUM_SPECIAL_GFX_ARGS + 1; i++)
-    special_suffix[i] = special_suffix_info[i].suffix;
+    special_id_suffix[i] = special_suffix_info[i].suffix;
 
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
-		element_prefix, action_suffix, direction_suffix,
-		special_suffix, ignore_image_tokens);
+		image_id_prefix, action_id_suffix, direction_id_suffix,
+		special_id_suffix, ignore_image_tokens);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		sound_class_prefix, action_suffix, dummy,
+		sound_id_prefix, action_id_suffix, dummy,
 		dummy, ignore_sound_tokens);
 }
 
@@ -722,39 +729,132 @@ void InitElementSmallImages()
   for (i=0; element_to_special_graphic[i].element > -1; i++)
     CreateImageWithSmallImages(element_to_special_graphic[i].graphic);
 
-  /* !!! CHECK FOR ELEMENT-ONLY GRAPHICS !!! */
   /* initialize images from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
-    CreateImageWithSmallImages(property_mapping[i].artwork_index);
+    if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
+      CreateImageWithSmallImages(property_mapping[i].artwork_index);
+}
+
+static int getFontBitmapID(int font_nr)
+{
+  if (game_status == LEVELED)
+    return font_info[font_nr].special_bitmap_id[GFX_SPECIAL_ARG_EDITOR];
+  else
+    return font_nr;
 }
 
 void InitFontGraphicInfo()
 {
-  static struct FontBitmapInfo font_bitmap_info[NUM_IMG_FONTS];
-  int num_fonts = NUM_IMG_FONTS;
-  int i;
+  static struct FontBitmapInfo *font_bitmap_info = NULL;
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
+  int num_font_bitmaps = NUM_FONTS;
+  int i, j;
 
   if (graphic_info == NULL)		/* still at startup phase */
-    num_fonts = NUM_INITIAL_FONTS;
-
-  for (i=0; i < num_fonts; i++)
   {
-    if (i < NUM_INITIAL_FONTS)
-      font_bitmap_info[i] = font_initial[i];
-    else
+    InitFontInfo(font_initial, NUM_INITIAL_FONTS, getFontBitmapID);
+
+    return;
+  }
+
+  /* ---------- initialize font graphic definitions ---------- */
+
+  /* always start with reliable default values (normal font graphics) */
+  for (i=0; i < NUM_FONTS; i++)
+    font_info[i].graphic = FONT_INITIAL_1;
+
+  /* initialize normal font/graphic mapping from static configuration */
+  for (i=0; font_to_graphic[i].font_nr > -1; i++)
+  {
+    int font_nr = font_to_graphic[i].font_nr;
+    int special = font_to_graphic[i].special;
+    int graphic = font_to_graphic[i].graphic;
+
+    if (special != -1)
+      continue;
+
+    font_info[font_nr].graphic = graphic;
+  }
+
+  /* always start with reliable default values (special font graphics) */
+  for (i=0; i < NUM_FONTS; i++)
+  {
+    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
     {
-      /* copy font relevant information from graphics information */
-      font_bitmap_info[i].bitmap = graphic_info[FIRST_IMG_FONT + i].bitmap;
-      font_bitmap_info[i].src_x  = graphic_info[FIRST_IMG_FONT + i].src_x;
-      font_bitmap_info[i].src_y  = graphic_info[FIRST_IMG_FONT + i].src_y;
-      font_bitmap_info[i].width  = graphic_info[FIRST_IMG_FONT + i].width;
-      font_bitmap_info[i].height = graphic_info[FIRST_IMG_FONT + i].height;
-      font_bitmap_info[i].draw_x = graphic_info[FIRST_IMG_FONT + i].draw_x;
-      font_bitmap_info[i].draw_y = graphic_info[FIRST_IMG_FONT + i].draw_y;
+      font_info[i].special_graphic[j] = font_info[i].graphic;
+      font_info[i].special_bitmap_id[j] = i;
     }
   }
 
-  InitFontInfo(font_bitmap_info, num_fonts);
+  /* initialize special font/graphic mapping from static configuration */
+  for (i=0; font_to_graphic[i].font_nr > -1; i++)
+  {
+    int font_nr = font_to_graphic[i].font_nr;
+    int special = font_to_graphic[i].special;
+    int graphic = font_to_graphic[i].graphic;
+
+    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    {
+      font_info[font_nr].special_graphic[special] = graphic;
+      font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
+      num_font_bitmaps++;
+    }
+  }
+
+  /* initialize special element/graphic mapping from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+  {
+    int font_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
+    int special = property_mapping[i].ext3_index;
+    int graphic = property_mapping[i].artwork_index;
+
+    if (font_nr < 0)
+      continue;
+
+    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    {
+      font_info[font_nr].special_graphic[special] = graphic;
+      font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
+      num_font_bitmaps++;
+    }
+  }
+
+  /* ---------- initialize font bitmap array ---------- */
+
+  if (font_bitmap_info != NULL)
+    free(font_bitmap_info);
+
+  font_bitmap_info =
+    checked_calloc(num_font_bitmaps * sizeof(struct FontBitmapInfo));
+
+  /* ---------- initialize font bitmap definitions ---------- */
+
+  for (i=0; i < NUM_FONTS; i++)
+  {
+    if (i < NUM_INITIAL_FONTS)
+    {
+      font_bitmap_info[i] = font_initial[i];
+      continue;
+    }
+
+    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+    {
+      int font_bitmap_id = font_info[i].special_bitmap_id[j];
+      int graphic = font_info[i].special_graphic[j];
+
+      /* copy font relevant information from graphics information */
+      font_bitmap_info[font_bitmap_id].bitmap = graphic_info[graphic].bitmap;
+      font_bitmap_info[font_bitmap_id].src_x  = graphic_info[graphic].src_x;
+      font_bitmap_info[font_bitmap_id].src_y  = graphic_info[graphic].src_y;
+      font_bitmap_info[font_bitmap_id].width  = graphic_info[graphic].width;
+      font_bitmap_info[font_bitmap_id].height = graphic_info[graphic].height;
+      font_bitmap_info[font_bitmap_id].draw_x = graphic_info[graphic].draw_x;
+      font_bitmap_info[font_bitmap_id].draw_y = graphic_info[graphic].draw_y;
+    }
+  }
+
+  InitFontInfo(font_bitmap_info, num_font_bitmaps, getFontBitmapID);
 }
 
 void InitElementGraphicInfo()
@@ -774,16 +874,6 @@ void InitElementGraphicInfo()
 	element_info[i].direction_graphic[act][dir] = -1;
     }
   }
-
-#if 0
-  for (i=EL_CHAR_START; i<=EL_CHAR_END; i++)
-    element_info[i].graphic[ACTION_DEFAULT] =
-      IMG_CHAR_START + (i - EL_CHAR_START);
-
-  for (i=EL_CUSTOM_START; i<=EL_CUSTOM_END; i++)
-    element_info[i].graphic[ACTION_DEFAULT] =
-      IMG_CUSTOM_START + (i - EL_CUSTOM_START);
-#endif
 
   /* initialize normal element/graphic mapping from static configuration */
   for (i=0; element_to_graphic[i].element > -1; i++)
@@ -811,7 +901,7 @@ void InitElementGraphicInfo()
     int special   = property_mapping[i].ext3_index;
     int graphic   = property_mapping[i].artwork_index;
 
-    if (special != -1)
+    if (element >= MAX_NUM_ELEMENTS || special != -1)
       continue;
 
     if (action < 0)
@@ -909,6 +999,9 @@ void InitElementSpecialGraphicInfo()
     int element = property_mapping[i].base_index;
     int special = property_mapping[i].ext3_index;
     int graphic = property_mapping[i].artwork_index;
+
+    if (element >= MAX_NUM_ELEMENTS)
+      continue;
 
     if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
       element_info[element].special_graphic[special] = graphic;

@@ -325,7 +325,8 @@ struct GfxInfo
   boolean menu_main_hide_static_text;
 
   int num_fonts;
-  struct FontBitmapInfo *font;
+  struct FontBitmapInfo *font_bitmap_info;
+  int (*select_font_function)(int);
 
   int anim_random_frame;
 };

@@ -1049,34 +1049,30 @@ struct GlobalInfo
 
 struct ElementInfo
 {
-  char *token_name;		/* element token prefix used in config files */
+  char *token_name;		/* element token used in config files */
   char *sound_class_name;	/* classification for custom sound effects */
   char *editor_description;	/* short description for level editor */
   char *custom_description;	/* custom description for level editor */
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
-
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
 				/* special graphics for left/right/up/down */
-
   int special_graphic[NUM_SPECIAL_GFX_ARGS];
   				/* special graphics for certain screens */
-
-  int editor_graphic;		/* graphic displayed in level editor */
-  int preview_graphic;		/* graphic displayed in level preview */
 
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
 };
 
-#if 0
 struct FontInfo
 {
-  int graphic;			/* default graphic for this font */
+  char *token_name;		/* font token used in config files */
 
+  int graphic;			/* default graphic for this font */
   int special_graphic[NUM_SPECIAL_GFX_ARGS];
   				/* special graphics for certain screens */
+  int special_bitmap_id[NUM_SPECIAL_GFX_ARGS];
+  				/* internal bitmap ID for special graphics */
 };
-#endif
 
 struct GraphicInfo
 {
@@ -1202,6 +1198,7 @@ extern struct ElementInfo	element_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
+extern struct FontInfo		font_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct ConfigInfo	image_config[], sound_config[];
