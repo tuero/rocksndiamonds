@@ -90,9 +90,11 @@
 /* values for special configurable properties (depending on level settings) */
 #define EP_EM_SLIPPERY_WALL	25
 
+/* values for special graphics properties (no effect on game engine) */
+#define EP_CAN_BE_CRUMBLED	26
+
 /* values for pre-defined properties */
-#define EP_PLAYER		26
-#define EP_CAN_BE_CRUMBLED	27
+#define EP_PLAYER		27
 #define EP_CAN_MOVE		28
 #define EP_CAN_PASS_MAGIC_WALL	29
 #define EP_SWITCHABLE		30
@@ -133,7 +135,10 @@
 #define EP_DRAGONFIRE_PROOF	63
 #define EP_EXPLOSION_PROOF	64
 
-#define NUM_ELEMENT_PROPERTIES	65
+/* values for internal purpose only (level editor) */
+#define EP_WALK_TO_OBJECT	65
+
+#define NUM_ELEMENT_PROPERTIES	66
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -188,10 +193,11 @@
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)
 
+/* macros for special graphics properties */
+#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(GFX_ELEMENT(e),EP_CAN_BE_CRUMBLED)
+
 /* macros for pre-defined properties */
 #define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
-#define CAN_BE_CRUMBLED_OLD(e)	HAS_PROPERTY(e, EP_CAN_BE_CRUMBLED)
-#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(GFX_ELEMENT(e),EP_CAN_BE_CRUMBLED)
 #define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_PASS_MAGIC_WALL(e)	HAS_PROPERTY(e, EP_CAN_PASS_MAGIC_WALL)
 #define IS_SWITCHABLE(e)	HAS_PROPERTY(e, EP_SWITCHABLE)
@@ -1030,6 +1036,9 @@ struct CustomElementInfo
 {
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */
+
+  int walk_to_action;		/* only for level editor; not stored */
+  int walkable_layer;		/* only for level editor; not stored */
 
   struct CustomElementChangeInfo change;
 };

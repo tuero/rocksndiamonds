@@ -68,28 +68,34 @@
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
 /* values for the setting windows */
-#define ED_SETTINGS_XPOS		(MINI_TILEX + 8)
-#define ED_SETTINGS_XPOS2		(3 * MINI_TILEX + 8)
-#define ED_SETTINGS_YPOS		MINI_TILEY
+#define ED_SETTINGS_XSTART		(3 * MINI_TILEX / 2)
+#define ED_SETTINGS_YSTART		(MINI_TILEY * 10)
+
+#define ED_SETTINGS_XOFFSET		(ED_CHECKBUTTON_XSIZE + \
+					 2 * ED_GADGET_DISTANCE)
+#define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
+
+#define ED_SETTINGS_XPOS(n)		(ED_SETTINGS_XSTART + \
+	 				 n * ED_SETTINGS_XOFFSET)
+#define ED_SETTINGS_YPOS(n)		(ED_SETTINGS_YSTART + \
+					 n * ED_SETTINGS_YOFFSET)
+
+#define ED_SETTINGS1_YPOS		MINI_TILEY
 #define ED_SETTINGS2_XPOS		MINI_TILEX
-#define ED_SETTINGS2_YPOS		(ED_SETTINGS_YPOS + 12 * TILEY - 2)
+#define ED_SETTINGS2_YPOS		(ED_SETTINGS1_YPOS + 12 * TILEY - 2)
 
 /* values for counter gadgets */
-#define ED_COUNT_ELEMENT_SCORE_XPOS	ED_SETTINGS_XPOS
-#define ED_COUNT_ELEMENT_SCORE_YPOS	(11 * MINI_TILEY)
-#define ED_COUNT_ELEMENT_CONTENT_XPOS	ED_SETTINGS_XPOS
-#define ED_COUNT_ELEMENT_CONTENT_YPOS	(19 * MINI_TILEY)
+#define ED_COUNT_ELEMENT_SCORE_XPOS	ED_SETTINGS_XPOS(0)
+#define ED_COUNT_ELEMENT_SCORE_YPOS	ED_SETTINGS_YPOS(0)
+#define ED_COUNT_ELEMENT_CONTENT_XPOS	ED_SETTINGS_XPOS(0)
+#define ED_COUNT_ELEMENT_CONTENT_YPOS	ED_SETTINGS_YPOS(6)
 
-#define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS2 + 9 * MINI_TILEX)
+#define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS(1) + 9 * MINI_TILEX)
 
-#define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS2 + 9 * MINI_TILEX)
-
-#define ED_COUNTER_YSTART		(ED_SETTINGS_YPOS + 2 * TILEY)
+#define ED_COUNTER_YSTART		(ED_SETTINGS1_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE)
-#define ED_COUNTER_YPOS2(n)		(ED_COUNTER_YSTART + \
-					 n * ED_COUNTER_YDISTANCE / 2)
 #define ED_COUNTER2_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE - 2)
 
@@ -103,11 +109,11 @@
 #define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
 #define ED_AREA_ELEM_CONTENT2_XPOS	(20 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT2_YPOS	(ED_COUNTER_YPOS2(5) + \
+#define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(1) + \
 					 ED_GADGET_DISTANCE)
 
 #define ED_AREA_ELEM_CONTENT3_XPOS	(24 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT3_YPOS	(ED_COUNTER_YPOS2(6) + \
+#define ED_AREA_ELEM_CONTENT3_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE)
 
 /* values for random placement background drawing area */
@@ -207,10 +213,6 @@
 					 2 + ED_WIN_COUNT_YSIZE)
 #define ED_SELECTBOX_XSIZE		ED_WIN_COUNT_XSIZE
 #define ED_SELECTBOX_YSIZE		ED_WIN_COUNT_YSIZE
-
-#define ED_SELECTBOX_CHANGE_UNITS_XPOS	(ED_SETTINGS_XPOS2 + \
-					 ED_CHECKBUTTON_XSIZE + \
-					 2 * ED_GADGET_DISTANCE)
 
 #define ED_TEXTBUTTON_XPOS		ED_WIN_COUNT_XPOS
 #define ED_TEXTBUTTON_YPOS		(ED_WIN_COUNT_YPOS + \
@@ -323,11 +325,13 @@
 /* selectbox identifiers */
 #define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 0)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 0)
+#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 3)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 4)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -361,23 +365,19 @@
 #define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 5)
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
 #define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_CUSTOM_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_COLLECTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_CUSTOM_PUSHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CUSTOM_WALKABLE_OVER	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CUSTOM_WALKABLE_INSIDE (GADGET_ID_CHECKBUTTON_FIRST+ 16)
-#define GADGET_ID_CUSTOM_WALKABLE_UNDER	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
-#define GADGET_ID_CHANGE_DELAY_FIXED	(GADGET_ID_CHECKBUTTON_FIRST + 20)
-#define GADGET_ID_CHANGE_DELAY_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CHANGE_DELAY_FIXED	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CHANGE_DELAY_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 17)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 18)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -442,10 +442,15 @@
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
 
 /* values for selectbox gadgets */
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	0
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		1
+#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_OBJECT	0
+#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	1
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	2
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		3
 
-#define ED_NUM_SELECTBOX			2
+#define ED_NUM_SELECTBOX			4
+
+#define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_OBJECT
+#define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
 
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
 #define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_CHANGE_CAUSE
@@ -464,22 +469,18 @@
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
-#define ED_CHECKBUTTON_ID_CUSTOM_DIGGABLE	6
-#define ED_CHECKBUTTON_ID_CUSTOM_COLLECTIBLE	7
-#define ED_CHECKBUTTON_ID_CUSTOM_PUSHABLE	8
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	9
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	10
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	11
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	12
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_OVER	13
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_INSIDE 14
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE_UNDER	15
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
-#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	17
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_FIXED	18
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM	19
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	6
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	7
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	8
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	9
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	10
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	11
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	12
+#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	13
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY_FIXED	14
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM	15
 
-#define ED_NUM_CHECKBUTTONS			20
+#define ED_NUM_CHECKBUTTONS			16
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -607,7 +608,7 @@ static struct
     NULL,				NULL
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(2),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(2),
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
     GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
     GADGET_ID_LEVEL_XSIZE_TEXT,
@@ -615,7 +616,7 @@ static struct
     "playfield size",			"width",
   },
   {
-    ED_SETTINGS_XPOS + 2 * DXSIZE,	ED_COUNTER_YPOS(2),
+    ED_SETTINGS_XPOS(0) + 2 * DXSIZE,	ED_COUNTER_YPOS(2),
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
     GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
     GADGET_ID_LEVEL_YSIZE_TEXT,
@@ -623,7 +624,7 @@ static struct
     NULL,				"height",
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(3),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(3),
     0,					999,
     GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
     GADGET_ID_LEVEL_COLLECT_TEXT,
@@ -631,7 +632,7 @@ static struct
     "number of emeralds to collect",	NULL
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
     0,					999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,
@@ -639,7 +640,7 @@ static struct
     "time available to solve level",	"(0 => no time limit)"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(5),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(5),
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
@@ -647,7 +648,7 @@ static struct
     "score for each 10 seconds left",	NULL
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER2_YPOS(8),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
     1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
@@ -671,7 +672,7 @@ static struct
     "element content",			NULL
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(6),
+    ED_COUNT_CHANGE_DELAY_XPOS,		ED_SETTINGS_YPOS(2),
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
@@ -679,7 +680,7 @@ static struct
     NULL,				"units (fixed)"
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_COUNTER_YPOS2(7),
+    ED_COUNT_CHANGE_DELAY_XPOS,		ED_SETTINGS_YPOS(3),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
@@ -698,14 +699,14 @@ static struct
 } textinput_info[ED_NUM_TEXTINPUT] =
 {
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(0),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(0),
     GADGET_ID_LEVEL_NAME,
     MAX_LEVEL_NAME_LEN,
     level.name,
     "Title"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(1),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(1),
     GADGET_ID_LEVEL_AUTHOR,
     MAX_LEVEL_AUTHOR_LEN,
     level.author,
@@ -713,22 +714,40 @@ static struct
   }
 };
 
-static struct ValueTextInfo options_change_time_units[] =
+static struct ValueTextInfo options_walk_to_action[] =
 {
-  { 50,	"seconds"		},
-  { 1,	"frames"		},
-  { -1,	NULL			}
+  { EP_DIGGABLE,	"diggable"		},
+  { EP_COLLECTIBLE,	"collectible"		},
+  { EP_PUSHABLE,	"pushable"		},
+  { -1,			NULL			}
 };
-static int index_change_time_units = 0;
+static int index_walk_to_action = 0;
+
+static struct ValueTextInfo options_walkable_layer[] =
+{
+  { EP_WALKABLE_OVER,	"over"			},
+  { EP_WALKABLE_INSIDE,	"inside"		},
+  { EP_WALKABLE_UNDER,	"under"			},
+  { -1,			NULL			}
+};
+static int index_walkable_layer = 0;
+
+static struct ValueTextInfo options_time_units[] =
+{
+  { 50,			"seconds"		},
+  { 1,			"frames"		},
+  { -1,			NULL			}
+};
+static int index_time_units = 0;
 
 static struct ValueTextInfo options_change_cause[] =
 {
-  { 1,	"specified delay"	},
-  { 2,	"impact (active)"	},
-  { 3,	"impact (passive)"	},
-  { 4,	"touched by player"	},
-  { 5,	"pressed by player"	},
-  { -1,	NULL			}
+  { 1,			"specified delay"	},
+  { 2,			"impact (active)"	},
+  { 3,			"impact (passive)"	},
+  { 4,			"touched by player"	},
+  { 5,			"pressed by player"	},
+  { -1,			NULL			}
 };
 static int index_change_cause = 0, value_change_cause = 0;
 
@@ -743,15 +762,31 @@ static struct
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
   {
-    ED_SELECTBOX_CHANGE_UNITS_XPOS,	ED_COUNTER_YPOS2(8),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(4),
+    GADGET_ID_CUSTOM_WALK_TO_ACTION,
+    0,
+    options_walk_to_action, &index_walk_to_action,
+    &custom_element.walk_to_action,
+    NULL, "diggable, collectible or pushable"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(9),
+    GADGET_ID_CUSTOM_WALKABLE_LAYER,
+    0,
+    options_walkable_layer, &index_walkable_layer,
+    &custom_element.walkable_layer,
+    "player can walk", "layer where player can walk"
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_TIME_UNITS,
     0,
-    options_change_time_units, &index_change_time_units,
+    options_time_units, &index_time_units,
     &custom_element.change.delay_frames,
     "delay units given in", "time units for change"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(8),
     GADGET_ID_CHANGE_CAUSE,
     0,
     options_change_cause, &index_change_cause,
@@ -770,19 +805,19 @@ static struct
 } textbutton_info[ED_NUM_TEXTBUTTON] =
 {
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(1),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_INFO,
     11, "Information",
     "Show information about element"
   },
   {
-    ED_SETTINGS_XPOS + 166,		ED_COUNTER_YPOS(1),
+    ED_SETTINGS_XPOS(0) + 166,		ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_CONFIG,
     11, "Configure",
     "Configure element properties"
   },
   {
-    ED_SETTINGS_XPOS + 332,		ED_COUNTER_YPOS(1),
+    ED_SETTINGS_XPOS(0) + 332,		ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_ADVANCED,
     11, "Advanced",
     "Advanced element configuration"
@@ -882,14 +917,14 @@ static struct
 } radiobutton_info[ED_NUM_RADIOBUTTONS] =
 {
   {
-    ED_SETTINGS_XPOS + 160,		ED_COUNTER2_YPOS(8),
+    ED_SETTINGS_XPOS(0) + 160,		ED_COUNTER2_YPOS(8),
     GADGET_ID_RANDOM_PERCENTAGE,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_PERCENTAGE,
     "percentage",			"use percentage for random elements"
   },
   {
-    ED_SETTINGS_XPOS + 340,		ED_COUNTER2_YPOS(8),
+    ED_SETTINGS_XPOS(0) + 340,		ED_COUNTER2_YPOS(8),
     GADGET_ID_RANDOM_QUANTITY,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_QUANTITY,
@@ -906,121 +941,97 @@ static struct
 } checkbutton_info[ED_NUM_CHECKBUTTONS] =
 {
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(6) - MINI_TILEY,
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(6) - MINI_TILEY,
     GADGET_ID_DOUBLE_SPEED,
     &level.double_speed,
     "double speed movement",		"set movement speed of player"
   },
   {
-    ED_SETTINGS_XPOS + 340,		ED_COUNTER_YPOS(6) - MINI_TILEY,
+    ED_SETTINGS_XPOS(0) + 340,		ED_COUNTER_YPOS(6) - MINI_TILEY,
     GADGET_ID_GRAVITY,
     &level.gravity,
     "gravity",				"set level gravity"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER2_YPOS(9) - MINI_TILEY,
+    ED_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(9) - MINI_TILEY,
     GADGET_ID_RANDOM_RESTRICTED,
     &random_placement_background_restricted,
     "restrict random placement to",	"set random placement restriction"
   },
   {
-    ED_SETTINGS_XPOS,			0,	/* set at runtime */
+    ED_SETTINGS_XPOS(0),		0,	/* set at runtime */
     GADGET_ID_STICK_ELEMENT,
     &stick_element_properties_window,
     "stick this screen to edit content","stick this screen to edit content"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
     GADGET_ID_EM_SLIPPERY_GEMS,
     &level.em_slippery_gems,
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(7),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
     "indestructible",			"element cannot be destroyed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(8),
-    GADGET_ID_CUSTOM_DIGGABLE,
-    &custom_element_properties[EP_DIGGABLE],
-    "diggable",				"element can be digged away"
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(4),
+    GADGET_ID_CUSTOM_WALK_TO_OBJECT,
+    &custom_element_properties[EP_WALK_TO_OBJECT],
+    NULL,				"player can dig/collect/push element"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(9),
-    GADGET_ID_CUSTOM_COLLECTIBLE,
-    &custom_element_properties[EP_COLLECTIBLE],
-    "collectible",			"element can be collected"
-  },
-  {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
-    GADGET_ID_CUSTOM_PUSHABLE,
-    &custom_element_properties[EP_PUSHABLE],
-    "pushable",				"element can be pushed"
-  },
-  {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[EP_CAN_SMASH],
     "can smash",			"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
     "can move",				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(15),
-    GADGET_ID_CUSTOM_WALKABLE_OVER,
-    &custom_element_properties[EP_WALKABLE_OVER],
-    "player can walk over",		"player can walk over this element"
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    GADGET_ID_CUSTOM_WALKABLE,
+    &custom_element_properties[EP_WALKABLE],
+    NULL,				"player can walk on the same field"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(16),
-    GADGET_ID_CUSTOM_WALKABLE_INSIDE,
-    &custom_element_properties[EP_WALKABLE_INSIDE],
-    "player can walk inside",		"player can walk inside this element"
-  },
-  {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(17),
-    GADGET_ID_CUSTOM_WALKABLE_UNDER,
-    &custom_element_properties[EP_WALKABLE_UNDER],
-    "player can walk under",		"player can walk under this element"
-  },
-  {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(6),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_USE_GRAPHIC,
     &custom_element.use_gfx_element,
     "use graphic of element:",		"use optional custom graphic element"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(5),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CHANGEABLE,
     &custom_element_properties[EP_CHANGEABLE],
     "element changes to    after:",	"element can change to other element"
   },
   {
-    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(6),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CHANGE_DELAY_FIXED,
     &custom_element_change_events[CE_DELAY_FIXED],
     "delay of",				"element changes after fixed delay"
   },
   {
-    ED_SETTINGS_XPOS2,			ED_COUNTER_YPOS2(7),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CHANGE_DELAY_RANDOM,
     &custom_element_change_events[CE_DELAY_RANDOM],
     "delay of",				"element changes after random delay"
@@ -2526,20 +2537,24 @@ static void CreateSelectboxGadgets()
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
-    int xoffset;
+    int xoffset = 0;
     struct GadgetInfo *gi;
     unsigned long event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = selectbox_info[i].gadget_id;
 
-    /* (we cannot use -1 for uninitialized values if we directly compare
-       with results from strlen(), because the '<' and '>' operation will
-       implicitely cast -1 to an unsigned integer value!) */
-
     if (selectbox_info[i].size == 0)	/* dynamically determined */
+    {
+      /* (we cannot use -1 for uninitialized values if we directly compare
+	 with results from strlen(), because the '<' and '>' operation will
+	 implicitely cast -1 to an unsigned integer value!) */
+
       for (j=0; selectbox_info[i].options[j].text != NULL; j++)
 	if (strlen(selectbox_info[i].options[j].text) > selectbox_info[i].size)
 	  selectbox_info[i].size = strlen(selectbox_info[i].options[j].text);
+
+      selectbox_info[i].size++;		/* add one character empty space */
+    }
 
     event_mask = GD_EVENT_RELEASED |
       GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
@@ -2547,8 +2562,10 @@ static void CreateSelectboxGadgets()
     gd_x = DOOR_GFX_PAGEX4 + ED_SELECTBOX_XPOS;
     gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
 
-    xoffset = (getFontWidth(FONT_TEXT_1) * strlen(selectbox_info[i].text) +
-	       2 * ED_GADGET_DISTANCE);
+    /* determine horizontal offset for leading selectbox text */
+    if (selectbox_info[i].text != NULL)
+      xoffset = (getFontWidth(FONT_TEXT_1) * strlen(selectbox_info[i].text) +
+		 2 * ED_GADGET_DISTANCE);
 
     sprintf(infotext, "Select %s", selectbox_info[i].infotext);
     infotext[max_infotext_len] = '\0';
@@ -2996,6 +3013,18 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   for (i=0; i < NUM_CHANGE_EVENTS; i++)
     custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
+
+  /* set walk-to-object action selectbox help value */
+  custom_element.walk_to_action =
+    (IS_DIGGABLE(element) ? EP_DIGGABLE :
+     IS_COLLECTIBLE(element) ? EP_COLLECTIBLE :
+     EP_PUSHABLE);
+
+  /* set walkable layer selectbox help value */
+  custom_element.walkable_layer =
+    (IS_WALKABLE_OVER(element) ? EP_WALKABLE_OVER :
+     IS_WALKABLE_INSIDE(element) ? EP_WALKABLE_INSIDE :
+     EP_WALKABLE_UNDER);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3004,6 +3033,20 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   i = properties_element - EL_CUSTOM_START;
   level.custom_element[i] = custom_element;
+
+  /* set walk-to-object property from checkbox and selectbox */
+  custom_element_properties[EP_DIGGABLE] = FALSE;
+  custom_element_properties[EP_COLLECTIBLE] = FALSE;
+  custom_element_properties[EP_PUSHABLE] = FALSE;
+  custom_element_properties[custom_element.walk_to_action] =
+    custom_element_properties[EP_WALK_TO_OBJECT];
+
+  /* set walkable property from checkbox and selectbox */
+  custom_element_properties[EP_WALKABLE_OVER] = FALSE;
+  custom_element_properties[EP_WALKABLE_INSIDE] = FALSE;
+  custom_element_properties[EP_WALKABLE_UNDER] = FALSE;
+  custom_element_properties[custom_element.walkable_layer] =
+    custom_element_properties[EP_WALKABLE];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
@@ -3334,7 +3377,7 @@ static void DrawLevelInfoWindow()
   int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int xoffset_right2 = ED_SETTINGS_XOFFSET;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
 
@@ -3342,7 +3385,7 @@ static void DrawLevelInfoWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
-  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
 	   "Level Settings", FONT_TITLE_1);
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
 	   "Editor Settings", FONT_TITLE_1);
@@ -3440,7 +3483,7 @@ static void DrawCustomGraphicElementArea()
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_GRAPHIC];
 #if 0
-  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int xoffset_right2 = ED_SETTINGS_XOFFSET;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i = ED_CHECKBUTTON_ID_CUSTOM_GRAPHIC;
   int text_len = strlen(checkbutton_info[i].text);
@@ -3451,8 +3494,6 @@ static void DrawCustomGraphicElementArea()
   int xpos = ED_AREA_ELEM_CONTENT3_XPOS;
   int ypos = ED_AREA_ELEM_CONTENT3_YPOS;
 #endif
-  int area_x = xpos / MINI_TILEX;
-  int area_y = ypos / MINI_TILEY;
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
 
@@ -3487,7 +3528,7 @@ static void DrawCustomChangedArea()
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGED];
 #if 0
-  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int xoffset_right2 = ED_SETTINGS_XOFFSET;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i = ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE;
   int text_len = strlen(checkbutton_info[i].text);
@@ -3498,8 +3539,6 @@ static void DrawCustomChangedArea()
   int xpos = ED_AREA_ELEM_CONTENT2_XPOS;
   int ypos = ED_AREA_ELEM_CONTENT2_YPOS;
 #endif
-  int area_x = xpos / MINI_TILEX;
-  int area_y = ypos / MINI_TILEY;
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
 
@@ -3618,8 +3657,8 @@ char *getElementDescriptionFilename(int element)
 static boolean PrintInfoText(char *text, int font_nr, int screen_line)
 {
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_SETTINGS_XPOS;
-  int pad_y = 5 * TILEY;
+  int pad_x = ED_SETTINGS_XPOS(0);
+  int pad_y = ED_SETTINGS_YPOS(0);
   int sx = SX + pad_x;
   int sy = SY + pad_y;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
@@ -3636,7 +3675,7 @@ static int PrintElementDescriptionFromFile(char *filename, int screen_line)
 {
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int pad_x = ED_SETTINGS_XPOS;
+  int pad_x = ED_SETTINGS_XPOS(0);
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   char line[MAX_LINE_LEN];
   char buffer[max_chars_per_line + 1];
@@ -3854,10 +3893,12 @@ static void DrawPropertiesInfo()
   int font2_nr = FONT_TEXT_2;
   int font1_width = getFontWidth(font1_nr);
   int font2_height = getFontHeight(font2_nr);
-  int pad_x = ED_SETTINGS_XPOS;
-  int pad_y = 5 * TILEY;
-  int screen_line = 2;
+  int pad_x = ED_SETTINGS_XPOS(0);
+  int pad_y = ED_SETTINGS_YPOS(0);
+  int screen_line = 0;
   int i, x, y;
+
+  /* ----- print number of elements / percentage of this element in level */
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3866,34 +3907,36 @@ static void DrawPropertiesInfo()
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextF(pad_x, pad_y, font1_nr, percentage_text);
-  DrawTextF(pad_x + strlen(percentage_text) * font1_width, pad_y,
-	    font2_nr, "%d (%.2f%%)", num_elements_in_level, percentage);
+  DrawTextF(pad_x, pad_y + screen_line * font2_height, font1_nr,
+	    percentage_text);
+  DrawTextF(pad_x + strlen(percentage_text) * font1_width,
+	    pad_y + screen_line++ * font2_height, font2_nr,
+	    "%d (%.2f%%)", num_elements_in_level, percentage);
+
+  screen_line++;
+
+  /* ----- print standard properties of this element */
+
+  DrawTextF(pad_x, pad_y + screen_line++ * font2_height, font1_nr,
+	    properties_text);
 
   for (i=0; properties[i].value != -1; i++)
-    if (HAS_PROPERTY(properties_element, properties[i].value))
-      num_standard_properties++;
-
-#if 1
-  if (num_standard_properties > 0)
   {
-    DrawTextF(pad_x, pad_y + screen_line * font2_height, font1_nr,
-	      properties_text);
-    screen_line++;
+    if (!HAS_PROPERTY(properties_element, properties[i].value))
+      continue;
 
-    for (i=0; properties[i].value != -1; i++)
-    {
-      if (!HAS_PROPERTY(properties_element, properties[i].value))
-	continue;
-
-      DrawTextF(pad_x, pad_y + screen_line * font2_height, font2_nr,
-		properties[i].text);
-      screen_line++;
-    }
-
-    screen_line++;
+    DrawTextF(pad_x, pad_y + screen_line++ * font2_height, font2_nr,
+	      properties[i].text);
+    num_standard_properties++;
   }
-#endif
+
+  if (num_standard_properties == 0)
+    DrawTextF(pad_x + strlen(properties_text) * font1_width,
+	      pad_y + (screen_line - 1) * font2_height, font2_nr, "none");
+
+  screen_line++;
+
+  /* ----- print special description of this element */
 
   PrintInfoText("Description:", FONT_TEXT_1, screen_line);
   if (PrintElementDescriptionFromFile(filename, screen_line + 1) == 0)
@@ -3985,7 +4028,7 @@ static void DrawPropertiesConfig()
   int counter_id = ED_COUNTER_ID_ELEMENT_SCORE;
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int xoffset_right2 = ED_SETTINGS_XOFFSET;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
 
@@ -4038,7 +4081,7 @@ static void DrawPropertiesConfig()
     if (HAS_CONTENT(properties_element))
       checkbutton_info[i].y = ED_COUNTER_YPOS(4);
     else
-      checkbutton_info[i].y = ED_COUNTER_YPOS2(5);
+      checkbutton_info[i].y = ED_SETTINGS_YPOS(1);
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
@@ -4083,6 +4126,19 @@ static void DrawPropertiesConfig()
 		   GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
       MapCheckbuttonGadget(i);
     }
+
+    /* draw selectbox gadgets */
+    for (i=ED_SELECTBOX_ID_CUSTOM_FIRST; i <= ED_SELECTBOX_ID_CUSTOM_LAST; i++)
+    {
+      int yoffset = ED_BORDER_SIZE;
+
+      x = selectbox_info[i].x;
+      y = selectbox_info[i].y + yoffset;
+
+      DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
+      ModifyEditorSelectbox(i, *selectbox_info[i].value);
+      MapSelectboxGadget(i);
+    }
   }
 }
 
@@ -4092,13 +4148,13 @@ static void DrawPropertiesAdvanced()
   int max_infotext_len = getMaxInfoTextLength();
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
+  int xoffset_right2 = ED_SETTINGS_XOFFSET;
   int yoffset_right2 = ED_BORDER_SIZE;
   int i, x, y;
 
   /* draw stickybutton gadget */
   i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-  checkbutton_info[i].y = ED_COUNTER_YPOS2(4);
+  checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
   x = checkbutton_info[i].x + xoffset_right2;
   y = checkbutton_info[i].y + yoffset_right2;
 
@@ -4147,12 +4203,7 @@ static void DrawPropertiesAdvanced()
     y = selectbox_info[i].y + yoffset;
 
     DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
-#if 1
     ModifyEditorSelectbox(i, *selectbox_info[i].value);
-#else
-    ModifyGadget(level_editor_gadget[selectbox_info[i].gadget_id],
-		 GDI_SELECTBOX_INDEX, *selectbox_info[i].index, GDI_END);
-#endif
     MapSelectboxGadget(i);
   }
 
@@ -4181,7 +4232,7 @@ static void DrawPropertiesWindow()
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearWindow();
 
-  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
 	   "Element Settings", FONT_TITLE_1);
 
   DrawElementBorder(SX + xstart * MINI_TILEX,
@@ -5142,8 +5193,10 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   *selectbox_info[type_id].value =
     selectbox_info[type_id].options[gi->selectbox.index].value;
 
-  if (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
-      type_id <= ED_SELECTBOX_ID_CHANGE_LAST)
+  if ((type_id >= ED_SELECTBOX_ID_CUSTOM_FIRST &&
+       type_id <= ED_SELECTBOX_ID_CUSTOM_LAST) ||
+      (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
+       type_id <= ED_SELECTBOX_ID_CHANGE_LAST))
     CopyCustomElementPropertiesToGame(properties_element);
 
 #if 0

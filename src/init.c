@@ -1398,21 +1398,21 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_player[] =
-  {
-    EL_PLAYER_1,
-    EL_PLAYER_2,
-    EL_PLAYER_3,
-    EL_PLAYER_4,
-    -1
-  };
-
   static int ep_can_be_crumbled[] =
   {
     EL_SAND,
     EL_LANDMINE,
     EL_TRAP,
     EL_TRAP_ACTIVE,
+    -1
+  };
+
+  static int ep_player[] =
+  {
+    EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4,
     -1
   };
 
