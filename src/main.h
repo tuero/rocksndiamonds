@@ -322,9 +322,11 @@ struct PlayerInfo
 
 struct LevelInfo
 {
-  int file_version;	  /* version of file this level was stored with */
-  int game_version;	  /* version of game engine to play this level */
-  boolean encoding_16bit; /* level contains 16-bit elements */
+  int file_version;		/* version of file the level was stored with */
+  int game_version;		/* version of game engine to play this level */
+  boolean encoding_16bit_field;		/* level contains 16-bit elements */
+  boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
+  boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
 
   int fieldx;
   int fieldy;

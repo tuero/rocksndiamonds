@@ -409,7 +409,9 @@ static void setLevelInfoToDefaults()
   level.file_version = FILE_VERSION_ACTUAL;
   level.game_version = GAME_VERSION_ACTUAL;
 
-  level.encoding_16bit = FALSE;		/* default: only 8-bit elements */
+  level.encoding_16bit_field = FALSE;	/* default: only 8-bit elements */
+  level.encoding_16bit_yamyam = FALSE;	/* default: only 8-bit elements */
+  level.encoding_16bit_amoeba = FALSE;	/* default: only 8-bit elements */
 
   lev_fieldx = level.fieldx = STD_LEV_FIELDX;
   lev_fieldy = level.fieldy = STD_LEV_FIELDY;
@@ -444,7 +446,8 @@ static void setLevelInfoToDefaults()
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
-	level.yam_content[i][x][y] = EL_FELSBROCKEN;
+	level.yam_content[i][x][y] =
+	  (i < STD_ELEMENT_CONTENTS ? EL_FELSBROCKEN : EL_LEERRAUM);
 
   Feld[0][0] = Ur[0][0] = EL_SPIELFIGUR;
   Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
@@ -721,19 +724,10 @@ static int LoadLevel_HEAD(struct LevelInfo *level, FILE *file, int chunk_size)
     level->score[i] = fgetc(file);
 
   level->num_yam_contents = STD_ELEMENT_CONTENTS;
-  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
-  {
+  for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
-    {
       for(x=0; x<3; x++)
-      {
-	if (i < STD_ELEMENT_CONTENTS)
-	  level->yam_content[i][x][y] = checkLevelElement(fgetc(file));
-	else
-	  level->yam_content[i][x][y] = EL_LEERRAUM;
-      }
-    }
-  }
+	level->yam_content[i][x][y] = checkLevelElement(fgetc(file));
 
   level->amoeba_speed		= fgetc(file);
   level->time_magic_wall	= fgetc(file);
@@ -742,7 +736,7 @@ static int LoadLevel_HEAD(struct LevelInfo *level, FILE *file, int chunk_size)
   level->double_speed		= (fgetc(file) == 1 ? TRUE : FALSE);
   level->gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
 
-  level->encoding_16bit		= (fgetc(file) == 1 ? TRUE : FALSE);
+  level->encoding_16bit_field	= (fgetc(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -769,8 +763,11 @@ static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
   int chunk_size_expected = header_size + content_size_type1;
 
   /* Note: "chunk_size" was wrong before version 2.0 when elements are
-     stored with 16-bit encoding (and should be twice as big then). */
-  if (level->encoding_16bit && level->file_version >= FILE_VERSION_2_0)
+     stored with 16-bit encoding (and should be twice as big then).
+     Even worse, playfield data was stored 16-bit when only yamyam content
+     contained 16-bit elements and vice versa. */
+
+  if (level->encoding_16bit_field && level->file_version >= FILE_VERSION_2_0)
     chunk_size_expected += content_size_type1;
 
   if (chunk_size_expected != chunk_size)
@@ -793,9 +790,8 @@ static int LoadLevel_CONT(struct LevelInfo *level, FILE *file, int chunk_size)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	level->yam_content[i][x][y] =
-	  checkLevelElement(level->encoding_16bit ?
-			    getFile16BitInteger(file,
-						BYTE_ORDER_BIG_ENDIAN) :
+	  checkLevelElement(level->encoding_16bit_field ?
+			    getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
 			    fgetc(file));
   return chunk_size;
 }
@@ -806,8 +802,11 @@ static int LoadLevel_BODY(struct LevelInfo *level, FILE *file, int chunk_size)
   int chunk_size_expected = level->fieldx * level->fieldy;
 
   /* Note: "chunk_size" was wrong before version 2.0 when elements are
-     stored with 16-bit encoding (and should be twice as big then). */
-  if (level->encoding_16bit && level->file_version >= FILE_VERSION_2_0)
+     stored with 16-bit encoding (and should be twice as big then).
+     Even worse, playfield data was stored 16-bit when only yamyam content
+     contained 16-bit elements and vice versa. */
+
+  if (level->encoding_16bit_field && level->file_version >= FILE_VERSION_2_0)
     chunk_size_expected *= 2;
 
   if (chunk_size_expected != chunk_size)
@@ -819,7 +818,7 @@ static int LoadLevel_BODY(struct LevelInfo *level, FILE *file, int chunk_size)
   for(y=0; y<level->fieldy; y++)
     for(x=0; x<level->fieldx; x++)
       Feld[x][y] = Ur[x][y] =
-	checkLevelElement(level->encoding_16bit ?
+	checkLevelElement(level->encoding_16bit_field ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
 			  fgetc(file));
   return chunk_size;
@@ -832,7 +831,7 @@ static int LoadLevel_CNT2(struct LevelInfo *level, FILE *file, int chunk_size)
   int num_contents, content_xsize, content_ysize;
   int content_array[MAX_ELEMENT_CONTENTS][3][3];
 
-  element = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+  element = checkLevelElement(getFile16BitInteger(file,BYTE_ORDER_BIG_ENDIAN));
   num_contents = fgetc(file);
   content_xsize = fgetc(file);
   content_ysize = fgetc(file);
@@ -842,7 +841,7 @@ static int LoadLevel_CNT2(struct LevelInfo *level, FILE *file, int chunk_size)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	content_array[i][x][y] =
-	  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
+	  checkLevelElement(getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN));
 
   /* correct invalid number of content fields -- should never happen */
   if (num_contents < 1 || num_contents > MAX_ELEMENT_CONTENTS)
@@ -1115,17 +1114,18 @@ static void SaveLevel_HEAD(struct LevelInfo *level, FILE *file)
   for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	fputc((level->encoding_16bit ? EL_LEERRAUM :
+	fputc((level->encoding_16bit_yamyam ? EL_LEERRAUM :
 	       level->yam_content[i][x][y]),
 	      file);
   fputc(level->amoeba_speed, file);
   fputc(level->time_magic_wall, file);
   fputc(level->time_wheel, file);
-  fputc(level->amoeba_content, file);
+  fputc((level->encoding_16bit_amoeba ? EL_LEERRAUM : level->amoeba_content),
+	file);
   fputc((level->double_speed ? 1 : 0), file);
   fputc((level->gravity ? 1 : 0), file);
 
-  fputc((level->encoding_16bit ? 1 : 0), file);
+  fputc((level->encoding_16bit_field ? 1 : 0), file);
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
@@ -1138,6 +1138,7 @@ static void SaveLevel_AUTH(struct LevelInfo *level, FILE *file)
     fputc(level->author[i], file);
 }
 
+#if 0
 static void SaveLevel_CONT(struct LevelInfo *level, FILE *file)
 {
   int i, x, y;
@@ -1150,12 +1151,13 @@ static void SaveLevel_CONT(struct LevelInfo *level, FILE *file)
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	if (level->encoding_16bit)
+	if (level->encoding_16bit_field)
 	  putFile16BitInteger(file, level->yam_content[i][x][y],
 			      BYTE_ORDER_BIG_ENDIAN);
 	else
 	  fputc(level->yam_content[i][x][y], file);
 }
+#endif
 
 static void SaveLevel_BODY(struct LevelInfo *level, FILE *file)
 {
@@ -1163,7 +1165,7 @@ static void SaveLevel_BODY(struct LevelInfo *level, FILE *file)
 
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++) 
-      if (level->encoding_16bit)
+      if (level->encoding_16bit_field)
 	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
       else
 	fputc(Ur[x][y], file);
@@ -1226,14 +1228,6 @@ void SaveLevel(int level_nr)
 {
   int i, x, y;
   char *filename = getLevelFilename(level_nr);
-#if 1
-  boolean encoding_16bit_amoeba = FALSE;
-  boolean encoding_16bit_yamyam = FALSE;
-#endif
-#if 0
-  boolean encoding_16bit = FALSE;	/* default: only 8-bit elements */
-  char *oldest_possible_cookie;
-#endif
   int chunk_size;
   FILE *file;
 
@@ -1244,21 +1238,21 @@ void SaveLevel(int level_nr)
   }
 
   /* check level field for 16-bit elements */
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++) 
+  for(y=0; y<level.fieldy; y++) 
+    for(x=0; x<level.fieldx; x++) 
       if (Ur[x][y] > 255)
-	level.encoding_16bit = TRUE;
+	level.encoding_16bit_field = TRUE;
 
-  /* check yam content for 16-bit elements */
-  for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
+  /* check yamyam content for 16-bit elements */
+  for(i=0; i<level.num_yam_contents; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	if (level.yam_content[i][x][y] > 255)
-	  encoding_16bit_yamyam = TRUE;
+	  level.encoding_16bit_yamyam = TRUE;
 
   /* check amoeba content for 16-bit elements */
   if (level.amoeba_content > 255)
-    encoding_16bit_amoeba = TRUE;
+    level.encoding_16bit_amoeba = TRUE;
 
   fputs(LEVEL_COOKIE, file);		/* file identifier */
   fputc('\n', file);
@@ -1269,25 +1263,29 @@ void SaveLevel(int level_nr)
   putFileChunk(file, "AUTH", MAX_LEVEL_AUTHOR_LEN, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_AUTH(&level, file);
 
-  if (0 && level.encoding_16bit)	/* obsolete since new "CNT2" chunk */
+#if 0
+  if (level.encoding_16bit_field)	/* obsolete since new "CNT2" chunk */
   {
     chunk_size = 4 + 2 * (MAX_ELEMENT_CONTENTS * 3 * 3);
 
     putFileChunk(file, "CONT", chunk_size, BYTE_ORDER_BIG_ENDIAN);
     SaveLevel_CONT(&level, file);
   }
+#endif
 
-  chunk_size = level.fieldx * level.fieldy * (level.encoding_16bit ? 2 : 1);
+  chunk_size =
+    level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
   putFileChunk(file, "BODY", chunk_size, BYTE_ORDER_BIG_ENDIAN);
   SaveLevel_BODY(&level, file);
 
-  if (encoding_16bit_yamyam)
+  if (level.encoding_16bit_yamyam ||
+      level.num_yam_contents != STD_ELEMENT_CONTENTS)
   {
     putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
     SaveLevel_CNT2(&level, file, EL_MAMPFER);
   }
 
-  if (encoding_16bit_amoeba)
+  if (level.encoding_16bit_amoeba)
   {
     putFileChunk(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE, BYTE_ORDER_BIG_ENDIAN);
     SaveLevel_CNT2(&level, file, EL_AMOEBE_BD);
