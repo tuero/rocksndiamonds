@@ -527,7 +527,7 @@ static void CreateControlButtons()
 	i == ED_CTRL_ID_WRAP_RIGHT ||
 	i == ED_CTRL_ID_WRAP_UP ||
 	i == ED_CTRL_ID_WRAP_DOWN)
-      event_mask = GD_EVENT_PRESSED_REPEATED;
+      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
     else
       event_mask = GD_EVENT_RELEASED;
 
@@ -588,6 +588,9 @@ static void CreateCounterButtons(int counter_id)
     int gd_xoffset;
     int gd_x1, gd_x2, gd_y;
     int id = counter_info[counter_id].gadget_id + i;
+    unsigned long event_mask;
+
+    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
     gd_xoffset = (i == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
     gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
@@ -603,7 +606,7 @@ static void CreateCounterButtons(int counter_id)
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
-		      GDI_EVENT_MASK, GD_EVENT_PRESSED_REPEATED,
+		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK, HandleCounterButtons,
 		      GDI_END);
 
@@ -1967,14 +1970,8 @@ static void RandomPlacement(int button)
   DrawMiniLevel(level_xpos, level_ypos);
 }
 
-/*
-static void HandleDrawingAreas(int mx, int my, int button)
-*/
-
 static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
-  static int last_button = 0;
-  static int last_element = 0;
   static boolean started_inside_drawing_area = FALSE;
   boolean inside_drawing_area;
   boolean button_press_event;
@@ -1992,9 +1989,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   if (edit_mode != ED_MODE_DRAWING)
     return;
 
-  button_press_event = (last_button == 0 && button != 0);
-  button_release_event = (last_button != 0 && button == 0);
-  last_button = button;
+  button_press_event = (gi->event.type == GD_EVENT_PRESSED);
+  button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
   inside_drawing_area =
     (mx >= min_mx && mx <= max_mx && my >= min_my && my <= max_my);
@@ -2011,6 +2007,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
   if (!started_inside_drawing_area)
     return;
+
+  printf("%d,%d, %d,%d, %d,%d, %d,%d.\n",
+	 gi->event.x, gi->event.y, mx, my, sx, sy, lx, ly);
 
   if ((!button && !button_release_event) ||
       sx > lev_fieldx || sy > lev_fieldy ||
@@ -2102,7 +2101,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (button_release_event)
 	{
-	  draw_func(start_sx, start_sy, sx, sy, last_element, TRUE);
+	  draw_func(start_sx, start_sy, sx, sy, new_element, TRUE);
 	  CopyLevelToUndoBuffer();
 	}
 	else if (last_sx != sx || last_sy != sy)
@@ -2127,8 +2126,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     default:
       break;
   }
-
-  last_element = new_element;
 }
 
 
@@ -2279,7 +2276,6 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 static void HandleControlButtons(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
-  int event_type = gi->event.type;
   int button = gi->event.button;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int new_element;
@@ -2522,11 +2518,11 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     default:
-      if (event_type == GD_EVENT_PRESSED)
+      if (gi->event.type == GD_EVENT_PRESSED)
 	printf("default: HandleControlButtons: GD_EVENT_PRESSED\n");
-      else if (event_type == GD_EVENT_RELEASED)
+      else if (gi->event.type == GD_EVENT_RELEASED)
 	printf("default: HandleControlButtons: GD_EVENT_RELEASED\n");
-      else if (event_type == GD_EVENT_MOVING)
+      else if (gi->event.type == GD_EVENT_MOVING)
 	printf("default: HandleControlButtons: GD_EVENT_MOVING\n");
       else
 	printf("default: HandleControlButtons: ?\n");

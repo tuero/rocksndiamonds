@@ -1788,6 +1788,9 @@ void HandleGadgets(int mx, int my, int button)
   gadget_released =
     (button == 0 && gi != NULL && new_gi == gi);
 
+  if (gadget_pressed)
+    gi = new_gi;
+
   if (gi)
   {
     gi->event.x = mx - gi->x;
@@ -1802,8 +1805,6 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_pressed)
   {
-    gi = new_gi;
-
     DrawGadget(gi, TRUE, TRUE);
 
     gi->state = GD_BUTTON_PRESSED;
@@ -1814,30 +1815,15 @@ void HandleGadgets(int mx, int my, int button)
     pressed_delay = 0;
     DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
 
-
-    /*
-    printf("new gadget pressed\n");
-    */
-
-
     if (gi->event_mask & GD_EVENT_PRESSED)
       gi->callback(gi);
   }
 
   if (gadget_pressed_repeated)
   {
-    if (gi->event_mask & GD_EVENT_PRESSED_REPEATED &&
+    if (gi->event_mask & GD_EVENT_REPEATED &&
 	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
-    {
-
-
-      /*
-	printf("gadget pressed (repeated)\n");
-      */
-
-
-	gi->callback(gi);
-    }
+      gi->callback(gi);
   }
 
   if (gadget_moving_inside)
@@ -1847,11 +1833,6 @@ void HandleGadgets(int mx, int my, int button)
 
     gi->state = GD_BUTTON_PRESSED;
     gi->event.type = GD_EVENT_MOVING;
-
-
-    /*
-    printf("inside gadget\n");
-    */
 
     if (gi->event_mask & GD_EVENT_MOVING)
       gi->callback(gi);
@@ -1865,12 +1846,6 @@ void HandleGadgets(int mx, int my, int button)
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_MOVING;
 
-
-    /*
-    printf("outside gadget\n");
-    */
-
-
     if (gi->event_mask & GD_EVENT_MOVING)
       gi->callback(gi);
   }
@@ -1881,12 +1856,6 @@ void HandleGadgets(int mx, int my, int button)
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;
-
-
-    /*
-    printf("gadget released\n");
-    */
-
 
     if (gi->event_mask & GD_EVENT_RELEASED)
       gi->callback(gi);
