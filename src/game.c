@@ -10934,9 +10934,6 @@ int DigField(struct PlayerInfo *player,
       }
       else if (IS_SWITCHABLE(element))
       {
-
-	printf("::: SWITCH!\n");
-
 	if (PLAYER_SWITCHING(player, x, y))
 	  return MF_ACTION;
 
