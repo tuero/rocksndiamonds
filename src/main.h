@@ -86,6 +86,7 @@ typedef int BOOL;
 #define SCREENY(a)	((a) - scroll_y)
 #define LEVELX(a)	((a) + scroll_x)
 #define LEVELY(a)	((a) + scroll_y)
+#define IN_VIS_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
@@ -222,8 +223,8 @@ struct PlayerInfo
   int level_nr;
 
   int jx,jy, last_jx,last_jy;
-  int MovDir, MovPos, Pushing;
-  int Frame, GfxPos;
+  int MovDir, MovPos, GfxPos;
+  int Pushing, Frame;
 
   int gone, LevelSolved, GameOver;
 
@@ -338,6 +339,7 @@ extern int		fading_on;
 extern int		autorecord_on;
 extern int		joystick_nr;
 extern int		quick_doors;
+extern int		networking;
 
 extern BOOL		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
@@ -362,13 +364,16 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-extern int		FX,FY, ScreenMovPos, ScrollStepSize;
+extern int		FX,FY, ScrollStepSize;
+extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
 extern int		GameFrameDelay, MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
+
+extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;

@@ -180,8 +180,8 @@ void HandleExposeEvent(XExposeEvent *event)
   {
     int fx = FX, fy = FY;
 
-    fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-    fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+    fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
+    fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
 
     XCopyArea(display,fieldbuffer,backbuffer,gc,
 	      fx,fy, SXSIZE,SYSIZE,
@@ -665,6 +665,18 @@ void HandleKey(KeySym key, int key_status)
 		     stored_player[i].last_jx, stored_player[i].last_jy);
 	    }
 	    printf("\n");
+	  }
+
+	  break;
+
+	case XK_t:
+	  {
+	    char *color[] = { "yellow", "red", "green", "blue" };
+
+	    TestPlayer = (TestPlayer + 1) % MAX_PLAYERS;
+
+	    printf("TestPlayer = %d (%s player)\n",
+		   TestPlayer, color[TestPlayer]);
 	  }
 
 	  break;

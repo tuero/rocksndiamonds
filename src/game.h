@@ -25,8 +25,8 @@
 #define MF_MOVING		1
 #define MF_ACTION		2
 
-#define SCROLL_FIGURE_INIT	0
-#define SCROLL_FIGURE_GO_ON	1
+#define SCROLL_INIT		0
+#define SCROLL_GO_ON		1
 
 /* explosion position marks */
 #define EX_NORMAL		0
@@ -81,6 +81,7 @@ void ScrollLevel(int, int);
 BOOL MoveFigureOneStep(struct PlayerInfo *, int, int, int, int);
 BOOL MoveFigure(struct PlayerInfo *, int, int);
 void ScrollFigure(struct PlayerInfo *, int);
+void ScrollScreen(struct PlayerInfo *, int);
 
 void TestIfGoodThingHitsBadThing(int, int);
 void TestIfBadThingHitsGoodThing(int, int);

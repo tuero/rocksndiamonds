@@ -143,8 +143,8 @@ void HandleAnimation(int mode)
       {
 	int fx = FX, fy = FY;
 
-        fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-        fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+        fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
+        fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
 
 	XCopyArea(display,fieldbuffer,backbuffer,gc,
 		  fx,fy, SXSIZE,SYSIZE,

@@ -72,7 +72,7 @@ void BackToFront()
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
 
-  if (redraw_mask & REDRAW_FIELD || ScreenMovPos)
+  if (redraw_mask & REDRAW_FIELD || ScreenGfxPos)
     redraw_mask &= ~REDRAW_TILES;
 
   if (!redraw_mask)
@@ -109,8 +109,8 @@ void BackToFront()
 
       if (soft_scrolling_on)
       {
-	fx += (local_player->MovDir & (MV_LEFT|MV_RIGHT) ? ScreenMovPos : 0);
-	fy += (local_player->MovDir & (MV_UP|MV_DOWN)    ? ScreenMovPos : 0);
+	fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
+	fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
       }
 
       XCopyArea(display,buffer,window,gc,
@@ -486,18 +486,10 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (direct_draw_on)
   {
-    int dest_x = SX + sx*TILEX;
-    int dest_y = SY + sy*TILEY;
-    int x_size = TILEX;
-    int y_size = TILEY;
-
-    if (!ScreenMovPos)
-    {
-      dest_x = SX + SCREENX(MIN(jx,last_jx))*TILEX;
-      dest_y = SY + SCREENY(MIN(jy,last_jy))*TILEY;
-      x_size = TILEX * (1 + ABS(jx - last_jx));
-      y_size = TILEY * (1 + ABS(jy - last_jy));
-    }
+    int dest_x = SX + SCREENX(MIN(jx,last_jx))*TILEX;
+    int dest_y = SY + SCREENY(MIN(jy,last_jy))*TILEY;
+    int x_size = TILEX * (1 + ABS(jx - last_jx));
+    int y_size = TILEY * (1 + ABS(jy - last_jy));
 
     XCopyArea(display,drawto_field,window,gc,
 	      dest_x,dest_y, x_size,y_size, dest_x,dest_y);

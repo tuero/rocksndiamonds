@@ -130,7 +130,10 @@ void InitGame()
   FrameCounter = 0;
   TimeFrames = 0;
   TimeLeft = level.time;
+
+  ScreenMovDir = MV_NO_MOVING;
   ScreenMovPos = 0;
+  ScreenGfxPos = 0;
 
   AllPlayersGone = SiebAktiv = FALSE;
 
@@ -2793,9 +2796,18 @@ void GameActions(int player_action)
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
+    /* TEST TEST TEST */
+
+    if (i != TestPlayer)
+      continue;
+
+    /* TEST TEST TEST */
+
     PlayerActions(&stored_player[i], player_action);
-    ScrollFigure(&stored_player[i], SCROLL_FIGURE_GO_ON);
+    ScrollFigure(&stored_player[i], SCROLL_GO_ON);
   }
+
+  ScrollScreen(NULL, SCROLL_GO_ON);
 
   if (tape.pausing || (tape.playing && !TapePlayDelay()))
     return;
@@ -2947,12 +2959,54 @@ void GameActions(int player_action)
   DrawAllPlayers();
 }
 
+static BOOL AllPlayersInSight(struct PlayerInfo *player, int x, int y)
+{
+  int min_x = x, min_y = y, max_x = x, max_y = y;
+  int i;
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    int jx = stored_player[i].jx, jy = stored_player[i].jy;
+
+    if (!stored_player[i].active || stored_player[i].gone ||
+	&stored_player[i] == player)
+      continue;
+
+    min_x = MIN(min_x, jx);
+    min_y = MIN(min_y, jy);
+    max_x = MAX(max_x, jx);
+    max_y = MAX(max_y, jy);
+  }
+
+  return(max_x - min_x < SCR_FIELDX && max_y - min_y < SCR_FIELDY);
+}
+
+static BOOL AllPlayersInVisibleScreen()
+{
+  int i;
+
+  for(i=0; i<MAX_PLAYERS; i++)
+  {
+    int jx = stored_player[i].jx, jy = stored_player[i].jy;
+
+    if (!stored_player[i].active || stored_player[i].gone)
+      continue;
+
+    if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
+      return(FALSE);
+  }
+
+  return(TRUE);
+}
+
 void ScrollLevel(int dx, int dy)
 {
   int softscroll_offset = (soft_scrolling_on ? TILEX : 0);
   int x,y;
 
-  ScreenMovPos = local_player->GfxPos;
+  /*
+  ScreenGfxPos = local_player->GfxPos;
+  */
 
   XCopyArea(display,drawto_field,drawto_field,gc,
 	    FX + TILEX*(dx==-1) - softscroll_offset,
@@ -2997,6 +3051,9 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
   if (!IN_LEV_FIELD(new_jx,new_jy))
     return(MF_NO_ACTION);
 
+  if (!networking && !AllPlayersInSight(player, new_jx,new_jy))
+    return(MF_NO_ACTION);
+
   element = MovingOrBlocked2Element(new_jx,new_jy);
 
   if (DONT_GO_TO(element))
@@ -3029,7 +3086,7 @@ BOOL MoveFigureOneStep(struct PlayerInfo *player,
 
   player->MovPos = (dx > 0 || dy > 0 ? -1 : 1) * 7*TILEX/8;
 
-  ScrollFigure(player, SCROLL_FIGURE_INIT);
+  ScrollFigure(player, SCROLL_INIT);
 
   return(MF_MOVING);
 }
@@ -3060,20 +3117,93 @@ BOOL MoveFigure(struct PlayerInfo *player, int dx, int dy)
   jx = player->jx;
   jy = player->jy;
 
+
+
+  /*
   if (moved & MF_MOVING && player == local_player)
+  */
+
+  if (moved & MF_MOVING && !ScreenMovPos)
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (scroll_delay_on ? 3 : 0);
 
-    if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
-	jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
-      scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
-    if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
-	jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
-      scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
+    if (!IN_VIS_FIELD(SCREENX(jx),SCREENY(jy)))
+    {
+      /* actual player has left the screen -- scroll in that direction */
+      if (jx != old_jx)		/* player has moved horizontally */
+	scroll_x += (jx - old_jx);
+      else			/* player has moved vertically */
+	scroll_y += (jy - old_jy);
+    }
+    else
+    {
+      if (jx != old_jx)		/* player has moved horizontally */
+      {
+	if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
+	    jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
+	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
+
+	/* don't scroll more than one field at a time */
+	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
+
+	/* don't scroll against the player's moving direction */
+	if ((player->MovDir == MV_LEFT && scroll_x > old_scroll_x) ||
+	    (player->MovDir == MV_RIGHT && scroll_x < old_scroll_x))
+	  scroll_x = old_scroll_x;
+      }
+      else			/* player has moved vertically */
+      {
+	if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
+	    jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
+	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
+
+	/* don't scroll more than one field at a time */
+	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
+
+	/* don't scroll against the player's moving direction */
+	if ((player->MovDir == MV_UP && scroll_y > old_scroll_y) ||
+	    (player->MovDir == MV_DOWN && scroll_y < old_scroll_y))
+	  scroll_y = old_scroll_y;
+      }
+    }
+
+#if 0
+    if (player == local_player)
+    {
+      if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
+	  jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
+	scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
+      if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
+	  jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
+	scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
+
+      /* don't scroll more than one field at a time */
+      scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
+      scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
+    }
+#endif
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
-      ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
+    {
+      if (networking || AllPlayersInVisibleScreen())
+      {
+	ScrollScreen(player, SCROLL_INIT);
+
+	/*
+	ScreenMovDir = player->MovDir;
+	ScreenMovPos = player->MovPos;
+	ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
+	*/
+
+	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
+      }
+      else
+      {
+	scroll_x = old_scroll_x;
+	scroll_y = old_scroll_y;
+      }
+    }
   }
 
   if (!(moved & MF_MOVING) && !player->Pushing)
@@ -3111,10 +3241,14 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   if (!player->active || player->gone || !player->MovPos)
     return;
 
-  if (mode == SCROLL_FIGURE_INIT)
+  if (mode == SCROLL_INIT)
   {
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
+
+    /*
+    ScreenGfxPos = local_player->GfxPos;
+    */
 
     if (Feld[last_jx][last_jy] == EL_LEERRAUM)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
@@ -3128,11 +3262,21 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * TILEX/8;
   player->GfxPos = ScrollStepSize * (player->MovPos / ScrollStepSize);
 
-  if (ScreenMovPos && ScreenMovPos != local_player->GfxPos)
+  /*
+  if (ScreenMovPos)
   {
-    ScreenMovPos = local_player->GfxPos;
+    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX/8;
+    ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
+  }
+  */
+
+  /*
+  if (ScreenGfxPos && ScreenGfxPos != local_player->GfxPos)
+  {
+    ScreenGfxPos = local_player->GfxPos;
     redraw_mask |= REDRAW_FIELD;
   }
+  */
 
   if (Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
     Feld[last_jx][last_jy] = EL_LEERRAUM;
@@ -3152,6 +3296,37 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 	player->LevelSolved = player->GameOver = TRUE;
     }
   }
+}
+
+void ScrollScreen(struct PlayerInfo *player, int mode)
+{
+  static long screen_frame_counter = 0;
+
+  if (mode == SCROLL_INIT)
+  {
+    screen_frame_counter = FrameCounter;
+    ScreenMovDir = player->MovDir;
+    ScreenMovPos = player->MovPos;
+    ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
+    return;
+  }
+  else if (!FrameReached(&screen_frame_counter,1))
+    return;
+
+  if (ScreenMovPos)
+  {
+    /*
+    printf("ScreenMovDir = %d, ", ScreenMovDir);
+    printf("ScreenMovPos = %d, ", ScreenMovPos);
+    printf("ScreenGfxPos = %d\n", ScreenGfxPos);
+    */
+
+    ScreenMovPos += (ScreenMovPos > 0 ? -1 : 1) * TILEX/8;
+    ScreenGfxPos = ScrollStepSize * (ScreenMovPos / ScrollStepSize);
+    redraw_mask |= REDRAW_FIELD;
+  }
+  else
+    ScreenMovDir = MV_NO_MOVING;
 }
 
 void TestIfGoodThingHitsBadThing(int goodx, int goody)
