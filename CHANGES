@@ -1,6 +1,9 @@
 Release Version 2.0.2 [XX XXX XXXX]
 -----------------------------------
 	- added support for TrueColor PCX graphics files
+	- changed default slipping behaviour of gems back to 2.0.0 style;
+	  this is now an element property for gems in the level editor,
+	  although existing converted levels use the new EM gems behaviour
 
 Release Version 2.0.1 [19 MAR 2002]
 -----------------------------------
@@ -11,6 +14,11 @@ Release Version 2.0.1 [19 MAR 2002]
 	  + explosion chain reactions are now a bit slower than murphy
 	- behaviour of robots adjusted to make them less aggressive
 	  (needed for quite some Emerald Mine Club levels)
+	- emeralds and diamonds now fall off normal, steel and growing walls,
+	  as this is the correct behaviour in Emerald Mine; existing private
+	  and contributed levels will still behave as before, unless saved
+	  again (with or without modifications) from the level editor of the
+	  current version of the game
 	- icon for Windows executable added
 	- bug when selecting default level series fixed
 	- new IFF style file format for level and tape files

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -96,7 +97,7 @@
 #define EP_BIT_BELT		(1 << 0)
 #define EP_BIT_BELT_SWITCH	(1 << 1)
 #define EP_BIT_TUBE		(1 << 2)
-#define EP_BIT_SLIPPERY_GEMS	(1 << 3)
+#define EP_BIT_EM_SLIPPERY_WALL	(1 << 3)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften1[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften1[e] & EP_BIT_AMOEBOID)
@@ -133,7 +134,7 @@
 #define IS_BELT(e)		(Elementeigenschaften2[e] & EP_BIT_BELT)
 #define IS_BELT_SWITCH(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_SWITCH)
 #define IS_TUBE(e)		(Elementeigenschaften2[e] & EP_BIT_TUBE)
-#define IS_SLIPPERY_GEMS(e)	(Elementeigenschaften2[e] & EP_BIT_SLIPPERY_GEMS)
+#define IS_EM_SLIPPERY_WALL(e)	(Elementeigenschaften2[e] & EP_BIT_EM_SLIPPERY_WALL)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -315,9 +316,9 @@ struct PlayerInfo
 
 struct LevelInfo
 {
-  int file_version;		/* version of file the level was stored with */
-  int game_version;		/* version of game engine to play this level */
-  boolean encoding_16bit_field;		/* level contains 16-bit elements */
+  int file_version;	/* file format version the level is stored with    */
+  int game_version;	/* game engine version the level was created with  */
+  boolean encoding_16bit_field;		/* level contains 16-bit elements  */
   boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
   boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
 
@@ -338,12 +339,13 @@ struct LevelInfo
   int time_timegate;
   boolean double_speed;
   boolean gravity;
+  boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 };
 
 struct TapeInfo
 {
-  int file_version;	/* version of file this level tape was stored with */
-  int game_version;	/* version of game engine to play this tape´s level */
+  int file_version;	/* file format version the tape is stored with   */
+  int game_version;	/* game engine version the tape was created with */
   int version;
   int level_nr;
   unsigned long random_seed;
@@ -1533,7 +1535,7 @@ extern int		num_element_info;
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
-#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2001 by"
+#define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2002 by"
 #define PROGRAM_DOS_PORT_STRING	"DOS port done by Guido Schulz"
 #define PROGRAM_IDENT_STRING	PROGRAM_VERSION_STRING " " TARGET_STRING
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING

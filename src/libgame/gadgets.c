@@ -309,7 +309,9 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_CHECKED:
-	gi->checked = va_arg(ap, boolean);
+	/* take care here: "boolean" is typedef'ed as "unsigned char",
+	   which gets promoted to "int" */
+	gi->checked = (boolean)va_arg(ap, int);
 	break;
 
       case GDI_RADIO_NR:

@@ -288,13 +288,14 @@
 #define GADGET_ID_DOUBLE_SPEED		73
 #define GADGET_ID_GRAVITY		74
 #define GADGET_ID_STICK_ELEMENT		75
+#define GADGET_ID_EM_SLIPPERY_GEMS	76
 
 /* another drawing area for random placement */
-#define GADGET_ID_RANDOM_BACKGROUND	76
+#define GADGET_ID_RANDOM_BACKGROUND	77
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	77
-#define GADGET_ID_ELEMENTLIST_LAST	(77 + ED_NUM_ELEMENTLIST_BUTTONS - 1)
+#define GADGET_ID_ELEMENTLIST_FIRST	78
+#define GADGET_ID_ELEMENTLIST_LAST	(78 + ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
 #define NUM_EDITOR_GADGETS		(GADGET_ID_ELEMENTLIST_LAST + 1)
 
@@ -356,8 +357,9 @@
 #define ED_CHECKBUTTON_ID_GRAVITY		1
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	2
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
+#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 
-#define ED_NUM_CHECKBUTTONS			4
+#define ED_NUM_CHECKBUTTONS			5
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -670,6 +672,12 @@ static struct
     GADGET_ID_STICK_ELEMENT,
     &stick_element_properties_window,
     "stick window to edit content",	"stick window to edit content"
+  },
+  {
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    GADGET_ID_EM_SLIPPERY_GEMS,
+    &level.em_slippery_gems,
+    "slip down from certain flat walls","use EM style slipping behaviour"
   }
 };
 
@@ -2731,6 +2739,19 @@ static void DrawPropertiesWindow()
       DrawAmoebaContentArea();
     else
       DrawElementContentAreas();
+  }
+
+  if (IS_GEM(properties_element))
+  {
+    /* draw checkbutton gadget */
+    i = ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS;
+    x = checkbutton_info[i].x + xoffset_right2;
+    y = checkbutton_info[i].y + yoffset_right2;
+
+    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
+		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
+    MapCheckbuttonGadget(i);
   }
 }
 

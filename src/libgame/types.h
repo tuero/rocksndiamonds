@@ -38,4 +38,7 @@ typedef unsigned char byte;
 #define SIGN(a)		((a) < 0 ? -1 : ((a)>0 ? 1 : 0))
 #endif
 
+#define SIZEOF_ARRAY(array, type)	(sizeof(array) / sizeof(type))
+#define SIZEOF_ARRAY_INT(array)		SIZEOF_ARRAY(array, int)
+
 #endif /* TYPES_H */

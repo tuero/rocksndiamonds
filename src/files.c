@@ -27,7 +27,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	15	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	14	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
@@ -388,6 +388,7 @@ static void setLevelInfoToDefaults()
   level.amoeba_content = EL_DIAMANT;
   level.double_speed = FALSE;
   level.gravity = FALSE;
+  level.em_slippery_gems = FALSE;
 
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     level.name[i] = '\0';
@@ -491,8 +492,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->amoeba_content		= checkLevelElement(fgetc(file));
   level->double_speed		= (fgetc(file) == 1 ? TRUE : FALSE);
   level->gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
-
   level->encoding_16bit_field	= (fgetc(file) == 1 ? TRUE : FALSE);
+  level->em_slippery_gems	= (fgetc(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -673,6 +674,9 @@ void LoadLevel(int level_nr)
       fclose(file);
       return;
     }
+
+    /* pre-2.0 level files have no game version, so use file version here */
+    level.game_version = level.file_version;
   }
 
   if (level.file_version < FILE_VERSION_1_2)
@@ -744,23 +748,44 @@ void LoadLevel(int level_nr)
   if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
       IS_LEVELCLASS_USER(leveldir_current))
   {
-    /* for user contributed and private levels, use the version of
-       the game engine the levels were created for */
-    level.game_version = level.file_version;
+    /* For user contributed and private levels, use the version of
+       the game engine the levels were created for.
+       Since 2.0.1, the game engine version is now directly stored
+       in the level file (chunk "VERS"), so there is no need anymore
+       to set the game version from the file version (except for old,
+       pre-2.0 levels, where the game version is still taken from the
+       file format version used to store the level -- see above). */
 
-    /* player was faster than monsters in pre-1.0 levels */
+    /* do some special adjustments to support older level versions */
     if (level.file_version == FILE_VERSION_1_0)
     {
       Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
       Error(ERR_WARN, "using high speed movement for player");
+
+      /* player was faster than monsters in (pre-)1.0 levels */
       level.double_speed = TRUE;
     }
   }
   else
   {
-    /* always use the latest version of the game engine for all but
-       user contributed and private levels */
+    /* Always use the latest version of the game engine for all but
+       user contributed and private levels; this allows for actual
+       corrections in the game engine to take effect for existing,
+       converted levels (from "classic" or other existing games) to
+       make the game emulation more accurate, while (hopefully) not
+       breaking existing levels created from other players. */
+
     level.game_version = GAME_VERSION_ACTUAL;
+
+    /* Set special EM style gems behaviour: EM style gems slip down from
+       normal, steel and growing wall. As this is a more fundamental change,
+       it seems better to set the default behaviour to "off" (as it is more
+       natural) and make it configurable in the level editor (as a property
+       of gem style elements). Already existing converted levels (neither
+       private nor contributed levels) are changed to the new behaviour. */
+
+    if (level.file_version < FILE_VERSION_2_0)
+      level.em_slippery_gems = TRUE;
   }
 
   /* determine border element for this level */
@@ -796,8 +821,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 	file);
   fputc((level->double_speed ? 1 : 0), file);
   fputc((level->gravity ? 1 : 0), file);
-
   fputc((level->encoding_16bit_field ? 1 : 0), file);
+  fputc((level->em_slippery_gems ? 1 : 0), file);
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
@@ -1159,9 +1184,10 @@ void LoadTape(int level_nr)
       fclose(file);
       return;
     }
-  }
 
-  tape.game_version = tape.file_version;
+    /* pre-2.0 tape files have no game version, so use file version here */
+    tape.game_version = tape.file_version;
+  }
 
   if (tape.file_version < FILE_VERSION_1_2)
   {

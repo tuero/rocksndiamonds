@@ -693,7 +693,7 @@ void InitGame()
 
   /* dynamically adjust element properties according to game engine version */
   {
-    static int ep_slippery[] =
+    static int ep_em_slippery_wall[] =
     {
       EL_BETON,
       EL_MAUERWERK,
@@ -702,14 +702,30 @@ void InitGame()
       EL_MAUER_Y,
       EL_MAUER_XY
     };
-    static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
+#if 1
+    static int ep_em_slippery_wall_num = SIZEOF_ARRAY_INT(ep_em_slippery_wall);
+#else
+    static int ep_em_slippery_wall_num =
+      sizeof(ep_em_slippery_wall) / sizeof(int);
+#endif
 
-    for (i=0; i<ep_slippery_num; i++)
+    /*
+    printf("level %d: game.version == %06d\n", level_nr, level.game_version);
+    printf("         file_version == %06d\n", level.file_version);
+    */
+
+    for (i=0; i<ep_em_slippery_wall_num; i++)
     {
+#if 1
+      if (level.em_slippery_gems)	/* special EM style gems behaviour */
+#else
       if (game.version >= GAME_VERSION_2_0)
-	Elementeigenschaften2[ep_slippery[i]] |= EP_BIT_SLIPPERY_GEMS;
+#endif
+	Elementeigenschaften2[ep_em_slippery_wall[i]] |=
+	  EP_BIT_EM_SLIPPERY_WALL;
       else
-	Elementeigenschaften2[ep_slippery[i]] &= ~EP_BIT_SLIPPERY_GEMS;
+	Elementeigenschaften2[ep_em_slippery_wall[i]] &=
+	  ~EP_BIT_EM_SLIPPERY_WALL;
     }
   }
 
@@ -2626,7 +2642,7 @@ void StartMoving(int x, int y)
 #endif
 #else
     else if ((IS_SLIPPERY(Feld[x][y+1]) ||
-	      (IS_SLIPPERY_GEMS(Feld[x][y+1]) && IS_GEM(element))) &&
+	      (IS_EM_SLIPPERY_WALL(Feld[x][y+1]) && IS_GEM(element))) &&
 	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1] &&
 	     element != EL_DX_SUPABOMB && element != EL_SP_DISK_ORANGE)
 #endif

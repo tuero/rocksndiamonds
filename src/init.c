@@ -492,7 +492,7 @@ void InitElementProperties()
     EL_AMOEBE_VOLL,
     EL_AMOEBE_BD
   };
-  static int ep_amoebalive_num = sizeof(ep_amoebalive)/sizeof(int);
+  static int ep_amoebalive_num = SIZEOF_ARRAY_INT(ep_amoebalive);
 
   static int ep_amoeboid[] =
   {
@@ -502,7 +502,7 @@ void InitElementProperties()
     EL_AMOEBE_VOLL,
     EL_AMOEBE_BD
   };
-  static int ep_amoeboid_num = sizeof(ep_amoeboid)/sizeof(int);
+  static int ep_amoeboid_num = SIZEOF_ARRAY_INT(ep_amoeboid);
 
   static int ep_schluessel[] =
   {
@@ -515,7 +515,7 @@ void InitElementProperties()
     EL_EM_KEY_3,
     EL_EM_KEY_4
   };
-  static int ep_schluessel_num = sizeof(ep_schluessel)/sizeof(int);
+  static int ep_schluessel_num = SIZEOF_ARRAY_INT(ep_schluessel);
 
   static int ep_pforte[] =
   {
@@ -551,7 +551,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
+  static int ep_pforte_num = SIZEOF_ARRAY_INT(ep_pforte);
 
   static int ep_solid[] =
   {
@@ -667,7 +667,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
+  static int ep_solid_num = SIZEOF_ARRAY_INT(ep_solid);
 
   static int ep_massive[] =
   {
@@ -754,7 +754,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
+  static int ep_massive_num = SIZEOF_ARRAY_INT(ep_massive);
 
   static int ep_slippery[] =
   {
@@ -791,7 +791,7 @@ void InitElementProperties()
     EL_PEARL,
     EL_CRYSTAL
   };
-  static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
+  static int ep_slippery_num = SIZEOF_ARRAY_INT(ep_slippery);
 
   static int ep_enemy[] =
   {
@@ -806,7 +806,7 @@ void InitElementProperties()
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON
   };
-  static int ep_enemy_num = sizeof(ep_enemy)/sizeof(int);
+  static int ep_enemy_num = SIZEOF_ARRAY_INT(ep_enemy);
 
   static int ep_mauer[] =
   {
@@ -871,7 +871,7 @@ void InitElementProperties()
     EL_EMC_WALL_7,
     EL_EMC_WALL_8
   };
-  static int ep_mauer_num = sizeof(ep_mauer)/sizeof(int);
+  static int ep_mauer_num = SIZEOF_ARRAY_INT(ep_mauer);
 
   static int ep_can_fall[] =
   {
@@ -899,7 +899,7 @@ void InitElementProperties()
     EL_SPRING,
     EL_DX_SUPABOMB
   };
-  static int ep_can_fall_num = sizeof(ep_can_fall)/sizeof(int);
+  static int ep_can_fall_num = SIZEOF_ARRAY_INT(ep_can_fall);
 
   static int ep_can_smash[] =
   {
@@ -932,7 +932,7 @@ void InitElementProperties()
     EL_SPRING,
     EL_DX_SUPABOMB
   };
-  static int ep_can_smash_num = sizeof(ep_can_smash)/sizeof(int);
+  static int ep_can_smash_num = SIZEOF_ARRAY_INT(ep_can_smash);
 
   static int ep_can_change[] =
   {
@@ -945,7 +945,7 @@ void InitElementProperties()
     EL_EDELSTEIN_LILA,
     EL_DIAMANT
   };
-  static int ep_can_change_num = sizeof(ep_can_change)/sizeof(int);
+  static int ep_can_change_num = SIZEOF_ARRAY_INT(ep_can_change);
 
   static int ep_can_move[] =
   {
@@ -967,7 +967,7 @@ void InitElementProperties()
     EL_BALLOON,
     EL_SPRING_MOVING
   };
-  static int ep_can_move_num = sizeof(ep_can_move)/sizeof(int);
+  static int ep_can_move_num = SIZEOF_ARRAY_INT(ep_can_move);
 
   static int ep_could_move[] =
   {
@@ -992,7 +992,7 @@ void InitElementProperties()
     EL_PACMAN_LEFT,
     EL_PACMAN_DOWN
   };
-  static int ep_could_move_num = sizeof(ep_could_move)/sizeof(int);
+  static int ep_could_move_num = SIZEOF_ARRAY_INT(ep_could_move);
 
   static int ep_dont_touch[] =
   {
@@ -1001,7 +1001,7 @@ void InitElementProperties()
     EL_BUTTERFLY,
     EL_FIREFLY
   };
-  static int ep_dont_touch_num = sizeof(ep_dont_touch)/sizeof(int);
+  static int ep_dont_touch_num = SIZEOF_ARRAY_INT(ep_dont_touch);
 
   static int ep_dont_go_to[] =
   {
@@ -1021,7 +1021,7 @@ void InitElementProperties()
     EL_TRAP_ACTIVE,
     EL_LANDMINE
   };
-  static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
+  static int ep_dont_go_to_num = SIZEOF_ARRAY_INT(ep_dont_go_to);
 
   static int ep_mampf2[] =
   {
@@ -1048,7 +1048,7 @@ void InitElementProperties()
     EL_PEARL,
     EL_CRYSTAL
   };
-  static int ep_mampf2_num = sizeof(ep_mampf2)/sizeof(int);
+  static int ep_mampf2_num = SIZEOF_ARRAY_INT(ep_mampf2);
 
   static int ep_bd_element[] =
   {
@@ -1077,7 +1077,7 @@ void InitElementProperties()
     EL_AMOEBE_BD,
     EL_CHAR_FRAGE
   };
-  static int ep_bd_element_num = sizeof(ep_bd_element)/sizeof(int);
+  static int ep_bd_element_num = SIZEOF_ARRAY_INT(ep_bd_element);
 
   static int ep_sb_element[] =
   {
@@ -1089,7 +1089,7 @@ void InitElementProperties()
     EL_SPIELFIGUR,
     EL_INVISIBLE_STEEL
   };
-  static int ep_sb_element_num = sizeof(ep_sb_element)/sizeof(int);
+  static int ep_sb_element_num = SIZEOF_ARRAY_INT(ep_sb_element);
 
   static int ep_gem[] =
   {
@@ -1100,7 +1100,7 @@ void InitElementProperties()
     EL_EDELSTEIN_LILA,
     EL_DIAMANT
   };
-  static int ep_gem_num = sizeof(ep_gem)/sizeof(int);
+  static int ep_gem_num = SIZEOF_ARRAY_INT(ep_gem);
 
   static int ep_inactive[] =
   {
@@ -1237,7 +1237,7 @@ void InitElementProperties()
     EL_EMC_WALL_7,
     EL_EMC_WALL_8
   };
-  static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
+  static int ep_inactive_num = SIZEOF_ARRAY_INT(ep_inactive);
 
   static int ep_explosive[] =
   {
@@ -1264,7 +1264,7 @@ void InitElementProperties()
     EL_SP_ELECTRON,
     EL_DX_SUPABOMB
   };
-  static int ep_explosive_num = sizeof(ep_explosive)/sizeof(int);
+  static int ep_explosive_num = SIZEOF_ARRAY_INT(ep_explosive);
 
   static int ep_mampf3[] =
   {
@@ -1277,7 +1277,7 @@ void InitElementProperties()
     EL_PEARL,
     EL_CRYSTAL
   };
-  static int ep_mampf3_num = sizeof(ep_mampf3)/sizeof(int);
+  static int ep_mampf3_num = SIZEOF_ARRAY_INT(ep_mampf3);
 
   static int ep_pushable[] =
   {
@@ -1296,7 +1296,7 @@ void InitElementProperties()
     EL_SPRING,
     EL_DX_SUPABOMB
   };
-  static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
+  static int ep_pushable_num = SIZEOF_ARRAY_INT(ep_pushable);
 
   static int ep_player[] =
   {
@@ -1306,7 +1306,7 @@ void InitElementProperties()
     EL_SPIELER3,
     EL_SPIELER4
   };
-  static int ep_player_num = sizeof(ep_player)/sizeof(int);
+  static int ep_player_num = SIZEOF_ARRAY_INT(ep_player);
 
   static int ep_has_content[] =
   {
@@ -1316,7 +1316,7 @@ void InitElementProperties()
     EL_AMOEBE_VOLL,
     EL_AMOEBE_BD
   };
-  static int ep_has_content_num = sizeof(ep_has_content)/sizeof(int);
+  static int ep_has_content_num = SIZEOF_ARRAY_INT(ep_has_content);
 
   static int ep_eatable[] =
   {
@@ -1326,7 +1326,7 @@ void InitElementProperties()
     EL_TRAP_INACTIVE,
     EL_SAND_INVISIBLE
   };
-  static int ep_eatable_num = sizeof(ep_eatable)/sizeof(int);
+  static int ep_eatable_num = SIZEOF_ARRAY_INT(ep_eatable);
 
   static int ep_sp_element[] =
   {
@@ -1375,7 +1375,7 @@ void InitElementProperties()
     /* more than one murphy in a level results in an inactive clone */
     EL_SP_MURPHY_CLONE
   };
-  static int ep_sp_element_num = sizeof(ep_sp_element)/sizeof(int);
+  static int ep_sp_element_num = SIZEOF_ARRAY_INT(ep_sp_element);
 
   static int ep_quick_gate[] =
   {
@@ -1401,7 +1401,7 @@ void InitElementProperties()
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN
   };
-  static int ep_quick_gate_num = sizeof(ep_quick_gate)/sizeof(int);
+  static int ep_quick_gate_num = SIZEOF_ARRAY_INT(ep_quick_gate);
 
   static int ep_over_player[] =
   {
@@ -1428,7 +1428,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_over_player_num = sizeof(ep_over_player)/sizeof(int);
+  static int ep_over_player_num = SIZEOF_ARRAY_INT(ep_over_player);
 
   static int ep_active_bomb[] =
   {
@@ -1438,7 +1438,7 @@ void InitElementProperties()
     EL_DYNABOMB_ACTIVE_3,
     EL_DYNABOMB_ACTIVE_4
   };
-  static int ep_active_bomb_num = sizeof(ep_active_bomb)/sizeof(int);
+  static int ep_active_bomb_num = SIZEOF_ARRAY_INT(ep_active_bomb);
 
   static int ep_belt[] =
   {
@@ -1455,7 +1455,7 @@ void InitElementProperties()
     EL_BELT4_MIDDLE,
     EL_BELT4_RIGHT,
   };
-  static int ep_belt_num = sizeof(ep_belt)/sizeof(int);
+  static int ep_belt_num = SIZEOF_ARRAY_INT(ep_belt);
 
   static int ep_belt_switch[] =
   {
@@ -1472,7 +1472,7 @@ void InitElementProperties()
     EL_BELT4_SWITCH_MIDDLE,
     EL_BELT4_SWITCH_RIGHT,
   };
-  static int ep_belt_switch_num = sizeof(ep_belt_switch)/sizeof(int);
+  static int ep_belt_switch_num = SIZEOF_ARRAY_INT(ep_belt_switch);
 
   static int ep_tube[] =
   {
@@ -1488,7 +1488,7 @@ void InitElementProperties()
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN
   };
-  static int ep_tube_num = sizeof(ep_tube)/sizeof(int);
+  static int ep_tube_num = SIZEOF_ARRAY_INT(ep_tube);
 
   static long ep1_bit[] =
   {
@@ -1610,8 +1610,8 @@ void InitElementProperties()
     &ep_belt_switch_num,
     &ep_tube_num
   };
-  static int num_properties1 = sizeof(ep1_num)/sizeof(int *);
-  static int num_properties2 = sizeof(ep2_num)/sizeof(int *);
+  static int num_properties1 = SIZEOF_ARRAY(ep1_num, int *);
+  static int num_properties2 = SIZEOF_ARRAY(ep2_num, int *);
 
   for(i=0; i<MAX_ELEMENTS; i++)
   {
